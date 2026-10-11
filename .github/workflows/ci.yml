@@ -222,7 +222,7 @@ jobs:
           ls
       - name: Beispielrechnungen prüfen
         run: |
-          JAR=$(find kosit -name 'validat*standalone*.jar' | head -1)
+          JAR=$(find kosit -maxdepth 1 -name 'validator-*.jar' | head -1)
           SZ=$(find kosit -name 'scenarios.xml' | head -1)
           echo "Validator: $JAR, Szenarien: $SZ"
           mkdir -p berichte
