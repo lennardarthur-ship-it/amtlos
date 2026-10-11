@@ -1,0 +1,13 @@
+persona: grenzfall
+beschreibung: Onboarding abgebrochen – nur Rechtsform bekannt. Nichts darf als "nicht zutreffend" erscheinen.
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: gbr
+erwartet:
+  steuern.ust_voranmeldung: unbekannt
+  arbeitsschutz.gefaehrdungsbeurteilung: unbekannt
+  gruendung.berufsgenossenschaft: gilt
+fehlende_fakten:
+  steuern.ust_voranmeldung: [profil.ust.kleinunternehmer, profil.ust.zahllast_vorjahr, profil.gruendungsdatum]
+  arbeitsschutz.gefaehrdungsbeurteilung: [profil.beschaeftigte.gesamt]
+  gruendung.berufsgenossenschaft: [profil.gruendungsdatum]

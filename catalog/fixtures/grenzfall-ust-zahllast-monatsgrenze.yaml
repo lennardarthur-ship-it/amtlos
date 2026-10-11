@@ -1,0 +1,14 @@
+persona: grenzfall
+beschreibung: Vorjahres-Zahllast exakt 9.000 € → noch vierteljährlich; 9.000,01 € wäre monatlich
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: "2018-06-01"
+  profil.ust.kleinunternehmer: false
+  profil.ust.zahllast_vorjahr: 9000
+  profil.ust.dauerfristverlaengerung: false
+  profil.bundesland: HH
+erwartet:
+  steuern.ust_voranmeldung: gilt
+termine_enthaelt:
+  steuern.ust_voranmeldung: [["2026-Q3", "2026-10-12"]]

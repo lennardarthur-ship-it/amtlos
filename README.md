@@ -2,7 +2,7 @@
 
 Das Bürokratie-Betriebssystem für Kleinunternehmer und Startups in Deutschland.
 
-**Stand:** Architekturpaket (Spezifikation Abschnitt 14, Schritt 2) – wartet auf Freigabe durch den Product Owner. Noch kein Anwendungscode.
+**Stand:** Architekturpaket freigegeben (2026-10-11). Bauabschnitt 1 (Fundament) in Arbeit.
 
 ## Inhalt
 

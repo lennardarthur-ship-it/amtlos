@@ -1,0 +1,106 @@
+/**
+ * TypeScript-Abbild von packages/rules-schema/pflicht.schema.json und regelwert.schema.json.
+ * Das JSON-Schema ist maßgeblich; diese Typen müssen dazu passen (geprüft durch test/schema-kompatibel.test.ts).
+ */
+import type { Datum, FaelligkeitsRegel, Rhythmus, Verschiebung } from "@amtlos/fristen";
+
+export interface Text {
+  de: string;
+  en?: string;
+}
+
+export type Ergebnis = "gilt" | "gilt_nicht" | "unbekannt";
+export type StatusRecht = "in_kraft" | "beschlossen" | "entwurf" | "geplant" | "ausgelaufen";
+export type Operator =
+  | "=="
+  | "!="
+  | ">"
+  | ">="
+  | "<"
+  | "<="
+  | "in"
+  | "nicht_in"
+  | "enthaelt"
+  | "enthaelt_eines"
+  | "vorhanden"
+  | "nicht_vorhanden";
+
+export interface RegelwertVerweis {
+  regelwert: string;
+  faktor?: number;
+}
+export type Wert = number | string | boolean | (number | string)[] | RegelwertVerweis;
+
+export type Bedingung =
+  | { all: Bedingung[]; label?: Text }
+  | { any: Bedingung[]; label?: Text }
+  | { not: Bedingung; label?: Text }
+  | { immer: true }
+  | { feld: string; op: Operator; wert?: Wert; label?: Text }
+  | { ereignis: string; op: "eingetreten" | "nicht_eingetreten" | "geplant"; innerhalb?: string; label?: Text };
+
+export type Frist =
+  | { typ: "dauerhaft"; erinnerung?: string[] }
+  | { typ: "absolut"; datum: Datum; verschiebung: Verschiebung; erinnerung?: string[] }
+  | {
+      typ: "relativ";
+      bezug: { ereignis: string } | { fakt: string } | { pflicht_erledigt: string };
+      versatz: string;
+      zeitpunkt?: "spaetestens" | "vor_beginn";
+      verschiebung: Verschiebung;
+      erinnerung?: string[];
+    }
+  | {
+      typ: "wiederkehrend";
+      rhythmus: Rhythmus | { waehle: { wenn: Bedingung; dann: Rhythmus }[]; sonst: Rhythmus };
+      faellig: FaelligkeitsRegel;
+      verlaengerung?: { wenn: Bedingung; versatz: string };
+      verschiebung: Verschiebung;
+      erinnerung?: string[];
+    };
+
+export interface Pflicht {
+  schema_version: 1;
+  id: string;
+  version: number;
+  katalog_nr?: string;
+  titel: Text;
+  kurz: Text;
+  erklaerung: Text;
+  rechtsgrundlage: string[];
+  kategorie: string;
+  ausloeser: Bedingung;
+  voraussetzungen?: string[];
+  frist: Frist;
+  wiederholung: { art: "einmalig" | "periodisch" | "bei_aenderung" | "dauerhaft"; neu_ausloesen_bei?: ({ fakt: string } | { ereignis: string })[] };
+  sanktion: { text: Text; schwere: "niedrig" | "mittel" | "hoch" };
+  status_recht: StatusRecht;
+  gueltig_ab: Datum | null;
+  gueltig_bis?: Datum | null;
+  erneut_erledigen?: boolean;
+  [weitere: string]: unknown;
+}
+
+export interface RegelwertVersion {
+  id: string;
+  version: number;
+  wert: number;
+  gueltig_ab: Datum;
+  gueltig_bis?: Datum | null;
+  [weitere: string]: unknown;
+}
+
+export interface Katalog {
+  pflichten: readonly Pflicht[];
+  regelwerte: readonly RegelwertVersion[];
+}
+
+/** Fakten nach fakten.json. Fehlende Schlüssel oder null bedeuten "unbekannt". */
+export type Fakten = Readonly<Record<string, unknown>>;
+
+export interface Ereignis {
+  typ: string;
+  datum: Datum;
+  /** true, wenn durch ein späteres Storno-Ereignis aufgehoben */
+  storniert?: boolean;
+}

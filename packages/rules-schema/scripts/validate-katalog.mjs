@@ -135,10 +135,28 @@ for (const { datei, inhalt: p } of pflichten) {
   }
 }
 
+// ---------- Fixtures ----------
+const fixtures = ladeYaml(path.join(katalogDir, "fixtures"));
+for (const { datei, inhalt: fx } of fixtures) {
+  if (!fx?.stichtag || !fx?.erwartet) {
+    fehlerAus(datei, "Fixture braucht 'stichtag' und 'erwartet'");
+    continue;
+  }
+  for (const [k, v] of Object.entries(fx.fakten ?? {})) {
+    const fakt = fakten.get(k);
+    if (!fakt) fehlerAus(datei, `unbekannter Fakt '${k}'`);
+    else if (fakt.werte && ![].concat(v).every((w) => fakt.werte.includes(w))) fehlerAus(datei, `ungültiger Wert für '${k}': ${JSON.stringify(v)}`);
+  }
+  for (const e of fx.ereignisse ?? []) if (!ereignisse.has(e.typ)) fehlerAus(datei, `unbekanntes Ereignis '${e.typ}'`);
+  for (const id of [...Object.keys(fx.erwartet), ...Object.keys(fx.termine_enthaelt ?? {}), ...Object.keys(fx.fehlende_fakten ?? {})])
+    if (!pflichtIds.has(id)) fehlerAus(datei, `unbekannte Pflicht '${id}'`);
+  for (const [id, e] of Object.entries(fx.erwartet)) if (!["gilt", "gilt_nicht", "unbekannt"].includes(e)) fehlerAus(datei, `${id}: Ergebnis '${e}' ungültig`);
+}
+
 const anzahlRw = [...regelwerte.values()].reduce((s, v) => s + v.length, 0);
 if (fehler.length) {
   console.error(`✗ ${fehler.length} Fehler${prod ? " (prod-Modus)" : ""}:`);
   for (const f of fehler) console.error("  - " + f);
   process.exit(1);
 }
-console.log(`✓ Katalog gültig${prod ? " (prod-Modus)" : ""}: ${pflichten.length} Pflichten, ${anzahlRw} Regelwert-Versionen, ${fakten.size} Fakten, ${ereignisse.size} Ereignistypen`);
+console.log(`✓ Katalog gültig${prod ? " (prod-Modus)" : ""}: ${pflichten.length} Pflichten, ${anzahlRw} Regelwert-Versionen, ${fixtures.length} Fixtures, ${fakten.size} Fakten, ${ereignisse.size} Ereignistypen`);

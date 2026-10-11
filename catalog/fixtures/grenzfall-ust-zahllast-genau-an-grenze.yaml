@@ -1,0 +1,12 @@
+persona: grenzfall
+beschreibung: Vorjahres-Zahllast exakt 2.000 € – Befreiungsgrenze ist nicht überschritten
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2020-01-01"
+  profil.ust.kleinunternehmer: false
+  profil.ust.zahllast_vorjahr: 2000
+  profil.beschaeftigte.gesamt: 0
+  profil.bundesland: BE
+erwartet:
+  steuern.ust_voranmeldung: gilt_nicht

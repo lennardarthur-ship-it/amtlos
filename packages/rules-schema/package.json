@@ -5,11 +5,19 @@
   "type": "module",
   "scripts": {
     "validate": "node scripts/validate-katalog.mjs ../../catalog",
-    "validate:prod": "node scripts/validate-katalog.mjs ../../catalog --prod"
+    "validate:prod": "node scripts/validate-katalog.mjs ../../catalog --prod",
+    "test": "node scripts/validate-katalog.mjs ../../catalog",
+    "lint": "echo 'kein TS-Code'"
   },
   "devDependencies": {
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
     "yaml": "^2.6.0"
+  },
+  "exports": {
+    "./pflicht.schema.json": "./pflicht.schema.json",
+    "./regelwert.schema.json": "./regelwert.schema.json",
+    "./fakten.json": "./fakten.json",
+    "./ereignisse.json": "./ereignisse.json"
   }
 }

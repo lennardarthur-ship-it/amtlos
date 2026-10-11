@@ -75,7 +75,7 @@ Jeder Fakt hat einen Typ. Der Validator lehnt unbekannte Fakten, unpassende Oper
 
 ### Regelwerte (E-034)
 
-`{ regelwert: id }` wird zum **Stichtag der Auswertung** aufgelöst: die freigegebene Version mit `gueltig_ab ≤ Stichtag ≤ gueltig_bis`. Die Begründung nennt Wert, Version und Quelle. Für Fristen in der Zukunft (z. B. Erinnerung im Januar an eine Pflicht, deren Grenze sich zum 1.1. ändert) wird pro Periode mit dem Stichtag des Periodenbeginns ausgewertet.
+`{ regelwert: id }` wird zum **Stichtag der Auswertung** aufgelöst: die freigegebene Version mit `gueltig_ab ≤ Stichtag ≤ gueltig_bis`. Die Begründung nennt Wert, Version und Quelle. Termine in einem späteren Kalenderjahr als der Stichtag werden mit `vorlaeufig: true` markiert: Sie beruhen auf heutigen Fakten (etwa der Vorjahres-Zahllast), die sich bis dahin ändern. Zum Jahreswechsel löst der Tageswechsel-Job eine Neuberechnung aus; dann gelten die neuen Regelwerte und Fakten.
 
 ## Fristen
 
@@ -87,6 +87,8 @@ Jeder Fakt hat einen Typ. Der Validator lehnt unbekannte Fakten, unpassende Oper
 | `wiederkehrend` | USt-VA | Rhythmus (ggf. abhängig von Fakten) + Fälligkeitsregel + optionale Verlängerung |
 
 Fälligkeitsregeln bei `wiederkehrend`: `tag_nach_periodenende` (USt-VA, Lohnsteuer), `feste_termine` (Vorauszahlungen `03-10`, `06-10`, …), `n_letzter_bankarbeitstag` (SV-Beiträge, mit `arbeitstage_vorher` für den Beitragsnachweis).
+
+**Relative Fristen:** Fehlt das Bezugsereignis, gilt die Pflicht trotzdem, aber ohne Termin; die Karte zeigt „Termin hängt von … ab“. Bei `zeitpunkt: vor_beginn` ist der Termin der Tag vor dem Bezugstag. Mehrere Ereignisse gleichen Typs: Bezug ist das früheste nicht stornierte.
 
 **Berechnungsreihenfolge:** Rohtermin → Verlängerung (`verlaengerung.versatz`, falls Bedingung gilt) → Verschiebung (`verschiebung.regel` mit `kalender`). Monatsende-Regel: Ein Versatz von einem Monat ab dem 31. landet auf dem letzten Tag des Folgemonats. Jeder Termin hat eine `periode` (`2026-10`, `2026-Q3`, `2026`, `einmalig`); zusammen mit Pflicht-ID und Unternehmen ist sie eindeutig.
 

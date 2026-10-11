@@ -1,0 +1,16 @@
+persona: grenzfall
+beschreibung: Vorjahres-Zahllast 2.000,01 € – vierteljährlich, ohne Dauerfristverlängerung
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2020-01-01"
+  profil.ust.kleinunternehmer: false
+  profil.ust.zahllast_vorjahr: 2000.01
+  profil.ust.dauerfristverlaengerung: false
+  profil.beschaeftigte.gesamt: 0
+  profil.bundesland: BE
+erwartet:
+  steuern.ust_voranmeldung: gilt
+termine_enthaelt:
+  # Q3: 10.10.2026 ist Samstag → Montag 12.10.
+  steuern.ust_voranmeldung: [["2026-Q3", "2026-10-12"], ["2026-Q4", "2027-01-11"]]

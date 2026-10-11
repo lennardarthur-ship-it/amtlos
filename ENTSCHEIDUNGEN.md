@@ -19,7 +19,7 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - Prüfer-Partner (Steuerberater, Rechtsanwalt, Fachkraft für Arbeitssicherheit) sind noch zu gewinnen → Risiko R-01.
 
 ### E-003 · Fachsprache im Code
-- **Datum:** 2026-10-11 · **Status:** vorgeschlagen
+- **Datum:** 2026-10-11 · **Status:** angenommen
 - Domänenbegriffe (Tabellen, Spalten, Regel-Felder) auf Deutsch in ASCII (`ausloeser`, `pflicht_instanz`), technische Infrastruktur auf Englisch (`createdAt` nur in Framework-Code, `logger`, `queue`).
 - **Begründung:** Die Spezifikation und alle Rechtsquellen sind deutsch. Rechtsbegriffe wie „Betriebsstätte“ oder „Anmeldezeitraum“ verlieren beim Übersetzen Präzision, und Prüfer müssen Regeln ohne Übersetzungsschritt lesen können.
 
@@ -36,7 +36,7 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Abgelehnt:** FastAPI (gute Wahl für ML, aber doppelte Engine). Python bleibt für isolierte Worker erlaubt, falls OCR/ML es erfordern.
 
 ### E-011 · Modularer Monolith plus wenige isolierte Dienste
-- **Datum:** 2026-10-11 · **Status:** vorgeschlagen
+- **Datum:** 2026-10-11 · **Status:** angenommen
 - Ein API-Prozess und ein Worker-Prozess aus derselben Codebasis. Separat isoliert nur, was andere Sicherheits- oder Laufzeitanforderungen hat:
   - **ERiC-Gateway** (native ELSTER-Bibliothek, eigener Container ohne Internetzugang außer ELSTER, ab Abschnitt 3)
   - **Dokument-Renderer** (HTML→PDF, ab Abschnitt 1)
@@ -50,28 +50,28 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - Mandantentrennung durch PostgreSQL Row Level Security. Die API setzt pro Transaktion `amtlos.konto_id` und `amtlos.unternehmen_id`. Die App-Datenbankrolle ist nicht Tabelleneigentümer, sodass RLS auch nicht versehentlich umgangen wird (`FORCE ROW LEVEL SECURITY`).
 
 ### E-013 · Hosting bei einem deutschen Cloud-Anbieter
-- **Datum:** 2026-10-11 · **Status:** angenommen (Anbieterwahl vorgeschlagen)
+- **Datum:** 2026-10-11 · **Status:** angenommen
 - Vorschlag: **STACKIT** (Kubernetes, Managed PostgreSQL, Object Storage, Rechenzentren in Deutschland). Fallback: IONOS Cloud.
 - Infrastruktur als Code mit OpenTofu. Umgebungen dev, staging, prod in getrennten Projekten.
 - **Technisch zu prüfen vor Abschnitt 1:** Object-Lock/WORM für GoBD-Archiv, Managed-Postgres-Version ≥ 16 mit `btree_gist`, Backup-Wiederherstellung je Zeitpunkt.
 
 ### E-014 · Identität: selbst gehosteter OIDC-Identity-Provider
-- **Datum:** 2026-10-11 · **Status:** vorgeschlagen
+- **Datum:** 2026-10-11 · **Status:** angenommen
 - Vorschlag: **Zitadel**, selbst gehostet in derselben Umgebung. Passkeys, TOTP, Organisationen, Audit-Log, OIDC. Später SSO für Steuerberater-Kanzleien und White-Label-Partner.
 - Alternative: Keycloak (reifer, schwerer im Betrieb). Abgelehnt: SaaS-IdP außerhalb der EU.
 - Die Anwendung speichert nur `idp_subject`, E-Mail und Anzeigename.
 
 ### E-015 · Warteschlange in PostgreSQL
-- **Datum:** 2026-10-11 · **Status:** vorgeschlagen
+- **Datum:** 2026-10-11 · **Status:** angenommen
 - Hintergrundjobs (Neuberechnung, Erinnerungen, Benachrichtigungen, Exporte) über **pg-boss** in derselben Datenbank.
 - **Begründung:** Transaktionale Konsistenz (Ereignis speichern und Neuberechnung einreihen in einer Transaktion), keine zusätzliche Komponente wie Redis. Die zu erwartende Last (Zehntausende Unternehmen, Fristen auf Tagesbasis) liegt weit unter der Grenze.
 
 ### E-016 · Objektspeicher für Dokumente, WORM für GoBD
-- **Datum:** 2026-10-11 · **Status:** vorgeschlagen
+- **Datum:** 2026-10-11 · **Status:** angenommen
 - Dateien liegen S3-kompatibel, verschlüsselt, mit SHA-256 in der Datenbank. Aufbewahrungspflichtige Dokumente in einem Bucket mit Object Lock bis `aufbewahrung_bis`.
 
 ### E-017 · Beobachtbarkeit
-- **Datum:** 2026-10-11 · **Status:** vorgeschlagen
+- **Datum:** 2026-10-11 · **Status:** angenommen
 - OpenTelemetry → selbst gehosteter Grafana-Stack (Logs, Metriken, Traces). Fehler-Tracking mit selbst gehostetem GlitchTip (Sentry-kompatibel). Keine personenbezogenen Daten in Logs (strukturierte Logs mit Allowlist von Feldern).
 
 ### E-018 · Offline-Sync nur anhängend
@@ -91,7 +91,7 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 ## Regel-Engine und Katalog
 
 ### E-030 · Datenbank ist Quelle der Wahrheit, Repo enthält den Export
-- **Datum:** 2026-10-11 · **Status:** vorgeschlagen
+- **Datum:** 2026-10-11 · **Status:** angenommen
 - Experten bearbeiten Pflichten im Studio (Datenbank). Jede Veröffentlichung eines Katalog-Releases exportiert den vollständigen Katalog als YAML nach `catalog/` und öffnet automatisch einen Pull Request.
 - **Begründung:** Experten arbeiten ohne Git. Entwickler bekommen trotzdem lesbare Diffs, CI-Tests gegen Fixtures und eine Historie im Repo. Der Startbestand wird einmalig aus YAML importiert.
 
@@ -101,12 +101,12 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Abgelehnt:** JSONLogic (zu generisch, keine Typprüfung gegen Fakten, schlechte Erklärbarkeit).
 
 ### E-032 · Fakten-Katalog als Schnittstelle zwischen Profil und Regeln
-- **Datum:** 2026-10-11 · **Status:** vorgeschlagen
+- **Datum:** 2026-10-11 · **Status:** angenommen
 - Regeln greifen nie direkt auf Profil-JSON zu, sondern auf typisierte **Fakten** (`profil.beschaeftigte.gesamt`, `abgeleitet.ist_kapitalgesellschaft`). Jeder Fakt ist im Code definiert (Typ, Herleitung, Beschreibung) und als Liste exportiert. Das Schema prüft, dass jede Regel nur bekannte Fakten mit passendem Operator nutzt.
 - **Begründung:** Profiländerungen brechen keine Regeln unbemerkt; Zählweisen (z. B. Beschäftigte je Gesetz) werden an einer Stelle definiert.
 
 ### E-033 · Dreiwertige Logik: gilt / gilt nicht / unbekannt
-- **Datum:** 2026-10-11 · **Status:** vorgeschlagen
+- **Datum:** 2026-10-11 · **Status:** angenommen
 - Fehlt ein Fakt, ist das Ergebnis `unbekannt`, nicht `gilt_nicht`. Unbekannte Pflichten erscheinen als Karte „Angabe fehlt“ mit der konkreten Frage.
 - **Begründung:** „Nicht zutreffend“ ist haftungsrechtlich die gefährlichste Aussage (Spezifikation 8, Rückfrage 22). Die Engine darf fehlende Angaben nie als Entlastung werten.
 
@@ -115,7 +115,7 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - Schwellen und Beträge (Mindestlohn, Minijob-Grenze, Kleinunternehmergrenzen, USt-VA-Grenzen) sind eigene versionierte `regelwert`-Datensätze mit Gültigkeitszeitraum, Quelle und Freigabe. Pflichten verweisen per `{ regelwert: id }`. Überlappende freigegebene Gültigkeiten sind in der Datenbank technisch ausgeschlossen.
 
 ### E-035 · Gespeicherter Status vs. angezeigter Status
-- **Datum:** 2026-10-11 · **Status:** vorgeschlagen
+- **Datum:** 2026-10-11 · **Status:** angenommen
 - Gespeichert werden nur `offen`, `erledigt`, `nicht_zutreffend`, `entfallen`. „Fällig bald“ und „überfällig“ werden zur Anzeigezeit aus `faellig_am` und heute berechnet.
 - **Begründung:** Zeitabhängige Status in der Datenbank veralten über Nacht und brauchen sonst einen fehleranfälligen Batch.
 
@@ -132,12 +132,12 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - In dev und staging können ungeprüfte Versionen mit Banner „ungeprüft“ angezeigt werden. In prod verhindert ein Datenbank-Trigger, dass ein Release ungeprüfte Inhalte enthält; die API prüft zusätzlich.
 
 ### E-039 · Vier-Augen-Freigabe mit Qualifikation
-- **Datum:** 2026-10-11 · **Status:** vorgeschlagen
+- **Datum:** 2026-10-11 · **Status:** angenommen
 - Freigabe braucht zwei verschiedene Prüfer, beide nicht Autor der Version, mindestens einer mit zur Kategorie passender Qualifikation (Steuern → Steuerberater; Personal, Datenschutz, Online, Gesellschaft → Rechtsanwalt; Arbeitsschutz → Fachkraft für Arbeitssicherheit oder Rechtsanwalt). Die Zuordnung ist selbst `[FACHLICH ZU PRÜFEN]`.
 - `geprueft_von` und `geprueft_am` aus der Spezifikation werden aus den Freigaben abgeleitet, nicht frei eingetragen.
 
 ### E-040 · Texte im Katalog zweisprachig, Englisch als Release-Bedingung
-- **Datum:** 2026-10-11 · **Status:** vorgeschlagen
+- **Datum:** 2026-10-11 · **Status:** angenommen
 - Textfelder sind `{ de, en }`. Das Schema verlangt `de`; ein prod-Release verlangt zusätzlich `en`.
 
 ---

@@ -1,0 +1,24 @@
+persona: kleiner_betrieb
+beschreibung: Café in Baden-Württemberg, regelbesteuert, Dauerfristverlängerung, erste Mitarbeiterin ab 2.11.2026
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2019-04-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.erwerb: haupt
+  profil.ust.kleinunternehmer: false
+  profil.ust.zahllast_vorjahr: 12400
+  profil.ust.dauerfristverlaengerung: true
+  profil.beschaeftigte.gesamt: 1
+  profil.bundesland: BW
+ereignisse:
+  - { typ: erste_einstellung, datum: "2026-11-02" }
+erwartet:
+  steuern.ust_voranmeldung: gilt
+  arbeitsschutz.gefaehrdungsbeurteilung: gilt
+  gruendung.berufsgenossenschaft: gilt
+termine_enthaelt:
+  # September: 10.10. + 1 Monat Dauerfristverlängerung = 10.11.2026 (Dienstag)
+  steuern.ust_voranmeldung: [["2026-09", "2026-11-10"], ["2026-10", "2026-12-10"]]
+  # vor Arbeitsbeginn am 2.11. → spätestens 1.11. (Verschiebung: keine)
+  arbeitsschutz.gefaehrdungsbeurteilung: [["einmalig", "2026-11-01"]]
