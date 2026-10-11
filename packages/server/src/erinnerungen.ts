@@ -26,13 +26,15 @@ function intervallZuDauer(i: string | { days?: number }): string {
 }
 
 /**
- * Plant die Erinnerungen eines Unternehmens neu: alle noch nicht gesendeten werden verworfen
- * und aus den offenen Pflichten mit Datum neu erzeugt. Empfänger: Inhaber und Admins.
+ * Plant die Erinnerungen eines Unternehmens neu: Soll-Menge aus den offenen Pflichten mit Datum; nicht mehr passende
+ * geplante Erinnerungen werden gelöscht, neue eingefügt, unveränderte bleiben stehen. Empfänger: Inhaber und Admins.
  */
 export async function planeErinnerungen(tx: Tx, unternehmenId: string, stichtag: Datum = heute()): Promise<number> {
-  await tx.abfrage("delete from app.erinnerung where unternehmen_id = $1 and status = 'geplant'", [unternehmenId]);
   const aktiv = await ladeAktivenKatalog(tx);
-  if (!aktiv) return 0;
+  if (!aktiv) {
+    await tx.abfrage("delete from app.erinnerung where unternehmen_id = $1 and status = 'geplant'", [unternehmenId]);
+    return 0;
+  }
   const vorlaufJePflicht = new Map(aktiv.katalog.pflichten.map((p) => [p.id, ("erinnerung" in p.frist && p.frist.erinnerung) || undefined]));
 
   const instanzen = await tx.abfrage<{ id: string; pflicht_id: string; faellig_am: Datum }>(
@@ -48,14 +50,24 @@ export async function planeErinnerungen(tx: Tx, unternehmenId: string, stichtag:
     "select konto_id, kanal, aktiv, vorlauf from app.benachrichtigung_einstellung where unternehmen_id = $1",
     [unternehmenId],
   );
-
   // Konten mit registriertem Gerät bekommen ohne eigene Einstellung zusätzlich Push (E-108)
   const mitGeraet = new Set(
     (await tx.abfrage<{ konto_id: string }>("select distinct konto_id from app.geraet where aktiv and konto_id = any($1)", [empfaenger.map((e) => e.konto_id)])).map((g) => g.konto_id),
   );
+  // Bisherige Erinnerungen in einer Abfrage: gesendete (für „nur einmal sofort erinnern“) und geplante
+  // (Sofort-Erinnerungen behalten ihren Zeitpunkt, sonst würde jede Neuplanung sie verschieben)
+  const gesendet = new Set<string>();
+  const geplant = new Map<string, string>();
+  for (const g of await tx.abfrage<{ s: string; status: string; geplant_fuer: Date }>(
+    "select pflicht_instanz_id || '|' || konto_id || '|' || kanal as s, status, geplant_fuer from app.erinnerung where unternehmen_id = $1 and status in ('gesendet', 'geplant')",
+    [unternehmenId],
+  )) {
+    if (g.status === "gesendet") gesendet.add(g.s);
+    else if (!geplant.has(g.s) || g.geplant_fuer.toISOString() < geplant.get(g.s)!) geplant.set(g.s, g.geplant_fuer.toISOString());
+  }
 
   const jetzt = Date.now();
-  let anzahl = 0;
+  const soll: { pflicht_instanz_id: string; konto_id: string; kanal: string; geplant_fuer: string }[] = [];
   for (const { konto_id } of empfaenger) {
     const eigene = einstellungen.filter((e) => e.konto_id === konto_id);
     const standard = [{ kanal: "email", vorlauf: undefined as unknown[] | undefined }, ...(mitGeraet.has(konto_id) ? [{ kanal: "push", vorlauf: undefined as unknown[] | undefined }] : [])];
@@ -64,24 +76,31 @@ export async function planeErinnerungen(tx: Tx, unternehmenId: string, stichtag:
       for (const i of instanzen) {
         const vorlauf = vorlaufJePflicht.get(i.pflicht_id) ?? (k.vorlauf?.length ? k.vorlauf.map((v) => intervallZuDauer(v as string)) : STANDARD_VORLAUF);
         const zeitpunkte = [...new Set(vorlauf)].map((v) => zeitpunktInZone(minusDauer(i.faellig_am, v), UHRZEIT)).filter((z) => z.getTime() > jetzt);
-        // Frist so nah, dass alle Vorlauf-Zeitpunkte vorbei sind: einmal sofort erinnern – aber nur,
-        // wenn für diese Pflicht noch keine Erinnerung an diese Person über diesen Kanal hinausging.
-        if (!zeitpunkte.length) {
-          const schon = await tx.eine("select 1 from app.erinnerung where pflicht_instanz_id = $1 and konto_id = $2 and kanal = $3 and status = 'gesendet'", [i.id, konto_id, k.kanal]);
-          if (!schon) zeitpunkte.push(new Date(jetzt + 60_000));
-        }
-        for (const zeitpunkt of zeitpunkte) {
-          await tx.abfrage(
-            `insert into app.erinnerung (unternehmen_id, pflicht_instanz_id, konto_id, kanal, geplant_fuer)
-             values ($1, $2, $3, $4, $5) on conflict do nothing`,
-            [unternehmenId, i.id, konto_id, k.kanal, zeitpunkt],
-          );
-          anzahl++;
-        }
+        // Frist so nah, dass alle Vorlauf-Zeitpunkte vorbei sind: einmal sofort erinnern – aber nur, wenn für diese
+        // Pflicht noch keine Erinnerung an diese Person über diesen Kanal hinausging.
+        const schluessel = `${i.id}|${konto_id}|${k.kanal}`;
+        if (!zeitpunkte.length && !gesendet.has(schluessel)) zeitpunkte.push(new Date(geplant.get(schluessel) ?? jetzt + 60_000));
+        for (const z of zeitpunkte) soll.push({ pflicht_instanz_id: i.id, konto_id, kanal: k.kanal, geplant_fuer: z.toISOString() });
       }
     }
   }
-  return anzahl;
+
+  // Nur Unterschiede schreiben (Lasttest E-109): Überholtes löschen, Neues einfügen, Gleiches stehen lassen
+  const json = JSON.stringify(soll);
+  await tx.abfrage(
+    `delete from app.erinnerung e where e.unternehmen_id = $1 and e.status = 'geplant'
+       and not exists (select 1 from jsonb_to_recordset($2::jsonb) as s(pflicht_instanz_id uuid, konto_id uuid, kanal text, geplant_fuer timestamptz)
+                        where s.pflicht_instanz_id = e.pflicht_instanz_id and s.konto_id = e.konto_id and s.kanal = e.kanal and s.geplant_fuer = e.geplant_fuer)`,
+    [unternehmenId, json],
+  );
+  await tx.abfrage(
+    `insert into app.erinnerung (unternehmen_id, pflicht_instanz_id, konto_id, kanal, geplant_fuer)
+     select $1, s.pflicht_instanz_id, s.konto_id, s.kanal, s.geplant_fuer
+       from jsonb_to_recordset($2::jsonb) as s(pflicht_instanz_id uuid, konto_id uuid, kanal text, geplant_fuer timestamptz)
+     on conflict do nothing`,
+    [unternehmenId, json],
+  );
+  return soll.length;
 }
 
 export interface Nachricht {

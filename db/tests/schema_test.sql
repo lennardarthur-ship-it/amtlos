@@ -327,6 +327,15 @@ select pg_temp.erwarte_fehler($$insert into app.geraet (konto_id, push_token, pl
 select pg_temp.ok(true, 'Geräte nur über die Registrierungsfunktion');
 reset role;
 
+-- ---------- Skalierung (0017) ----------
+select pg_temp.ok(not exists (
+  select 1 from pg_class c join pg_namespace n on n.oid = c.relnamespace
+    join pg_attribute a on a.attrelid = c.oid and a.attname = 'unternehmen_id'
+   where n.nspname = 'app' and c.relkind = 'r' and c.relname <> 'unternehmen'
+     and not exists (select 1 from pg_index i join pg_attribute a2 on a2.attrelid = i.indrelid and a2.attnum = i.indkey[0]
+                      where i.indrelid = c.oid and a2.attname = 'unternehmen_id')
+), 'Jede Mandantentabelle hat einen Index mit unternehmen_id vorne (RLS-Filter)');
+
 -- ---------- Audit ----------
 select pg_temp.ok((select count(*) > 10 from audit.ereignis), 'Audit protokolliert Änderungen');
 select pg_temp.ok((select bool_and(vorgaenger_hash is not null) from audit.ereignis where id > (select min(id) from audit.ereignis)), 'Hash-Kette lückenlos');

@@ -16,11 +16,12 @@ const cache = new Map<string, AktiverKatalog>();
  * daher darf je Release-ID im Prozess zwischengespeichert werden.
  */
 export async function ladeAktivenKatalog(tx: Tx): Promise<AktiverKatalog | undefined> {
-  const release = await tx.eine<{ id: string; nummer: number }>("select id, nummer from katalog.aktives_release");
+  // Übersetzungen ändern sich ohne neues Release (E-107): ihr Stand gehört zum Cache-Schlüssel (eine Abfrage)
+  const release = await tx.eine<{ id: string; nummer: number; stand: string | null }>(
+    "select id, nummer, (select max(geaendert_am)::text from katalog.uebersetzung) as stand from katalog.aktives_release",
+  );
   if (!release) return undefined;
-  // Übersetzungen ändern sich ohne neues Release (E-107): ihr Stand gehört zum Cache-Schlüssel
-  const stand = await tx.eine<{ stand: string | null }>("select max(geaendert_am)::text as stand from katalog.uebersetzung");
-  const schluessel = `${release.id}|${stand?.stand ?? ""}`;
+  const schluessel = `${release.id}|${release.stand ?? ""}`;
   const vorhanden = cache.get(schluessel);
   if (vorhanden) return vorhanden;
 
