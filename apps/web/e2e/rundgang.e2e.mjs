@@ -93,8 +93,9 @@ async function rundgang(farbschema, breite) {
   await barrierefrei(p, name("team"));
   await p.fill("#email", `${gast}@example.org`);
   await p.check('input[name="rolle"][value="steuerberater"]');
-  await Promise.all([p.waitForLoadState("networkidle"), p.getByRole("button", { name: "Einladung senden" }).click()]);
-  const einladungsLink = await p.locator('div[role="status"] input').inputValue().catch(() => "");
+  await p.getByRole("button", { name: "Einladung senden" }).click();
+  // Server-Aktion + Redirect abwarten (networkidle kann schon vor dem Klick erreicht sein)
+  const einladungsLink = await p.locator('div[role="status"] input').inputValue({ timeout: 15000 }).catch((e) => `FEHLER ${e.message.split("\n")[0]}`);
   pruefe(/\/einladung\/[A-Za-z0-9_-]{43}$/.test(einladungsLink), `${name("team")}: kein Einladungslink (${einladungsLink})`);
   await barrierefrei(p, name("team-eingeladen"));
   // Der Link steht nie in der URL (Verlauf, Logs); er ist zwei Minuten über ein httpOnly-Cookie abrufbar, wie beim Kalender-Abo
@@ -115,7 +116,7 @@ async function rundgang(farbschema, breite) {
     pruefe(await g.getByText("Testbetrieb").count(), `${name("einladung")}: nach Annahme nicht im Unternehmen`);
     await ctx2.close();
     await p.goto(`${B}/team`);
-    pruefe(await p.getByText("Steuerberatung").count(), `${name("team")}: neues Mitglied fehlt`);
+      pruefe(await p.getByText(gast, { exact: true }).count(), `${name("team")}: neues Mitglied fehlt`);
   }
   await ctx.close();
 }
@@ -129,6 +130,8 @@ try {
 }
 if (fehler.length) {
   console.error(`✗ ${fehler.length} Befunde:\n- ${fehler.join("\n- ")}`);
+  // In GitHub Actions zusätzlich als Annotationen (lesbar ohne Log-Download)
+  if (process.env.GITHUB_ACTIONS) for (const f of fehler.slice(0, 10)) console.log(`::error title=E2E Web::${f.replace(/[\r\n]+/g, " ")}`);
   process.exit(1);
 }
 console.log("✓ Rundgang hell/dunkel, Desktop/mobil ohne Befunde (inkl. axe WCAG 2.2 AA)");
