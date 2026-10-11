@@ -6,6 +6,7 @@
     "version": "0.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
+    "splash": { "backgroundColor": "#136f5b", "image": "./assets/icon.png", "resizeMode": "contain" },
     "icon": "./assets/icon.png",
     "ios": {
       "bundleIdentifier": "de.amtlos.app",
@@ -27,6 +28,7 @@
     ],
     "extra": {
       "apiUrl": "http://localhost:3001",
+      "webUrl": "http://localhost:3000",
       "authModus": "dev",
       "oidcIssuer": null,
       "oidcClientId": null

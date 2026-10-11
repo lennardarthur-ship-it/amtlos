@@ -76,6 +76,7 @@ Stand: 2026-10-11 (Bauabschnitt 2)
 | T-46 | Rechtsseiten (Impressum, Datenschutzerklärung, Nutzungsbedingungen): anwaltliche Prüfung aller Texte, AVV-Muster für Beschäftigtendaten, Haftungsklausel, Streitbeilegungshinweis | RA/DSB | E-115 |
 | T-47 | Abo: Widerrufsbelehrung nötig trotz B2B? Rechnungsstellung über Stripe (automatische Steuer, Reverse Charge für EU-Kunden), Preisangabe inkl./exkl. USt | RA/StB | E-113 |
 | T-48 | Löschkonzept: Welche Nachweise müssen nach Löschung eines Unternehmens wie lange bleiben (Zeiten, Unterweisungen, Erledigungen)? Reicht die Anonymisierung? | RA/DSB | E-114 |
+| T-49 | Apple-Store-Regeln: Darf die App auf das Abo am Computer hinweisen (Reader-/External-Link-Regeln)? Wird In-App-Kauf nötig, und mit welchen Folgen für Preis und Stripe? | RA / App-Store-Beratung | E-117 |
 | G-15 | Sammelbestätigung „vor dem Start erledigt“: Wortlaut und ob ein Hinweis zu Nachholpflichten nötig ist | RA | E-072 |
 | G-22 | Audit der Erstberechnung gebündelt je Berechnungslauf statt je Pflichtinstanz? (Erstberechnung nach großem Release ≈ 35 min für 100.000 auf 2 Kernen) | Tech/Revision | E-109 |
 | G-24 | prod-Release erst, wenn jeder deutsche Katalogtext eine geprüfte englische Übersetzung hat (Prüfung im Release-Trigger) | Produkt | E-107 |

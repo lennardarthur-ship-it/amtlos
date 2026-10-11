@@ -16,8 +16,22 @@ export class ApiFehler extends Error {
 }
 
 export interface Ich { konto: { id: string; email: string; anzeigename: string; sprache: Sprache }; unternehmen: { id: string; name: string; rolle: string }[] }
-export interface Karte { pflicht_id: string; periode: string; titel: string; kurz: string; status: string; faellig_am: string | null; kategorie?: string }
-export interface Heute { als_naechstes: Karte[]; zaehler: { offen: number; ueberfaellig: number; angabe_fehlt: number; erledigt: number }; ampel: Record<string, "gruen" | "gelb" | "rot"> }
+export interface Karte { pflicht_id: string; periode: string; titel: string; kurz: string; status: string; ergebnis?: "gilt" | "gilt_nicht" | "unbekannt"; faellig_am: string | null; kategorie?: string; bereich?: string }
+export interface KartenDetail extends Karte {
+  erklaerung: string;
+  warum: string[];
+  sanktion: { text: string; schwere: string };
+  stelle: string;
+  rechtsgrundlage: string[];
+  quellen: { titel: string; url: string }[];
+  begriffe: { begriff: string; erklaerung: string }[];
+  erledigt_am?: string | null;
+  fehlende_fakten: string[];
+  pruefung: { status: string; geprueft_am: string | null };
+  ungeprueft?: boolean;
+}
+export interface Profil { version: number; daten: Record<string, unknown> }
+export interface Heute { als_naechstes: Karte[]; zaehler: { offen: number; ueberfaellig: number; angabe_fehlt: number; erledigt: number; klar: number; naechste_90: number }; ampel: Record<string, "gruen" | "gelb" | "rot"> }
 export interface Beschaeftigter { id: string; vorname: string; nachname: string; austritt: string | null }
 export interface Zeiteintrag { id: string; beschaeftigter_id: string; beginn: string; ende: string | null; offline?: boolean }
 
@@ -32,7 +46,8 @@ export interface KlientEinstellungen {
 export class ApiKlient {
   private readonly abruf: Abruf;
   constructor(private readonly e: KlientEinstellungen) {
-    this.abruf = e.abruf ?? (fetch as unknown as Abruf);
+    // Nicht die Funktion selbst übergeben: im Browser braucht fetch sein globales this
+    this.abruf = e.abruf ?? ((url, init) => fetch(url, init as RequestInit) as unknown as ReturnType<Abruf>);
   }
 
   /** mitUnternehmen: true = aktuelles Unternehmen, false = keins, string = genau dieses (Offline-Stempel). */
@@ -69,8 +84,29 @@ export class ApiKlient {
   heute() {
     return this.anfrage<Heute>("/v1/heute");
   }
-  pflichten() {
-    return this.anfrage<Karte[]>("/v1/pflichten");
+  pflichten(status = "alle") {
+    return this.anfrage<Karte[]>(`/v1/pflichten?status=${status}`);
+  }
+  pflicht(id: string, periode: string) {
+    return this.anfrage<KartenDetail>(`/v1/pflichten/${encodeURIComponent(id)}/${encodeURIComponent(periode)}`);
+  }
+  erledigen(id: string, periode: string, notiz?: string) {
+    return this.anfrage<unknown>(`/v1/pflichten/${encodeURIComponent(id)}/${encodeURIComponent(periode)}/erledigen`, "POST", notiz ? { notiz } : {});
+  }
+  wiederOeffnen(id: string, periode: string) {
+    return this.anfrage<unknown>(`/v1/pflichten/${encodeURIComponent(id)}/${encodeURIComponent(periode)}/wieder-oeffnen`, "POST");
+  }
+  profil() {
+    return this.anfrage<Profil>("/v1/profil");
+  }
+  profilSpeichern(daten: Record<string, unknown>) {
+    return this.anfrage<Profil>("/v1/profil", "PUT", { daten });
+  }
+  unternehmenAnlegen(name: string) {
+    return this.anfrage<{ id: string; name: string; rolle: string }>("/v1/unternehmen", "POST", { name }, false);
+  }
+  abo() {
+    return this.anfrage<{ status: string; test_bis: string; laeuft_bis: string | null; schreibbar: boolean }>("/v1/abo");
   }
   beschaeftigte() {
     return this.anfrage<Beschaeftigter[]>("/v1/beschaeftigte");

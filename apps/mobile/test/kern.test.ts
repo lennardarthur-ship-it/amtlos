@@ -121,3 +121,12 @@ describe("Zeitanzeige", () => {
     expect(dauerSeit("2026-10-11T06:15:00Z", Date.parse("2026-10-11T09:20:30Z"))).toBe("3:05 h");
   });
 });
+
+describe("Gruppen nach Zeithorizont", () => {
+  it("teilt in überfällig, Woche, Monat, später, laufend", async () => {
+    const { gruppiere } = await import("../src/kern/gruppen");
+    const k = (id: string, faellig_am: string | null, status = "offen") => ({ pflicht_id: id, periode: "x", titel: id, kurz: "", status, faellig_am });
+    const g = gruppiere([k("a", "2026-10-05", "ueberfaellig"), k("b", "2026-10-15"), k("c", "2026-11-05"), k("d", "2027-01-01"), k("e", null), k("f", "2026-10-12")], "2026-10-11");
+    expect(Object.fromEntries(Object.entries(g).map(([n, l]) => [n, l.map((x) => x.pflicht_id)]))).toEqual({ ueberfaellig: ["a"], woche: ["f", "b"], monat: ["c"], spaeter: ["d"], laufend: ["e"] });
+  });
+});

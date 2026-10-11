@@ -4,8 +4,8 @@ import { useState } from "react";
 import { ScrollView, Text, TextInput, View } from "react-native";
 import { ApiFehler, NetzFehler } from "../kern/api";
 import { KONFIG } from "../konfig";
-import { Absatz, Hinweis, Knopf, Titel } from "../ui/bausteine";
-import { GROESSE, ZIEL, useFarben } from "../ui/thema";
+import { Hinweis, Knopf, T } from "../ui/bausteine";
+import { RADIUS, RAND, SCHRIFT, ZIEL, useFarben } from "../ui/thema";
 import { useAmtlos } from "../zustand";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -51,17 +51,17 @@ export function Anmelden() {
   }
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 20, paddingTop: 48 }} keyboardShouldPersistTaps="handled">
-      <Text style={{ fontSize: GROESSE.titel, fontWeight: "700", color: f.tinte, marginBottom: 32 }}>{t.app.name}</Text>
-      <Titel>{t.anmelden.titel}</Titel>
-      <Absatz>{t.mobil.anmelden_text}</Absatz>
+    <ScrollView contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 72, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
+      <View style={{ width: 56, height: 56, borderRadius: 14, backgroundColor: f.amt, alignItems: "center", justifyContent: "center", marginBottom: 28 }} accessibilityElementsHidden>
+        <Text style={{ fontFamily: SCHRIFT.bold, fontSize: 30, color: "#ffffff" }}>A</Text>
+      </View>
+      <T v="grossTitel" accessibilityRole="header">{t.app.name}</T>
+      <T leise stil={{ marginTop: 8, maxWidth: 360 }}>{t.mobil.anmelden_text}</T>
       {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
       {KONFIG.authModus === "dev" ? (
-        <View style={{ marginTop: 16 }}>
+        <View style={{ marginTop: 28 }}>
           <Hinweis text={t.mobil.anmelden_dev} />
-          <Text nativeID="kennung" style={{ fontWeight: "700", color: f.tinte, marginTop: 12, fontSize: GROESSE.basis }}>
-            {t.mobil.kennung}
-          </Text>
+          <T v="klein" fett nativeID="kennung" stil={{ marginTop: 12 }}>{t.mobil.kennung}</T>
           <TextInput
             accessibilityLabelledBy="kennung"
             accessibilityLabel={t.mobil.kennung}
@@ -69,12 +69,14 @@ export function Anmelden() {
             onChangeText={setKennung}
             autoCapitalize="none"
             autoCorrect={false}
-            style={{ minHeight: ZIEL, borderWidth: 2, borderColor: f.linie, borderRadius: 6, paddingHorizontal: 12, color: f.tinte, backgroundColor: f.blatt, fontSize: GROESSE.basis, marginVertical: 8 }}
+            returnKeyType="go"
+            onSubmitEditing={() => kennung.trim().length >= 2 && void dev()}
+            style={{ minHeight: ZIEL, borderWidth: 1.5, borderColor: f.linie, borderRadius: RADIUS.klein, paddingHorizontal: 14, color: f.tinte, backgroundColor: f.blatt, fontFamily: SCHRIFT.regular, fontSize: 17, marginTop: 6, marginBottom: 14 }}
           />
           <Knopf text={t.mobil.anmelden} onPress={dev} laedt={laedt} deaktiviert={kennung.trim().length < 2} />
         </View>
       ) : (
-        <Knopf text={t.mobil.anmelden} onPress={oidc} deaktiviert={!anfrage} />
+        <Knopf text={t.mobil.anmelden} onPress={oidc} deaktiviert={!anfrage} stil={{ marginTop: 28 }} />
       )}
     </ScrollView>
   );

@@ -1,6 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
-import { RefreshControl, ScrollView, type ScrollViewProps } from "react-native";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { RefreshControl, ScrollView, View, type ScrollViewProps } from "react-native";
 import { ApiFehler, NetzFehler } from "../kern/api";
+import { T } from "../ui/bausteine";
+import { RAND, useFarben } from "../ui/thema";
 import { useAmtlos } from "../zustand";
 
 /** Lädt Daten von der API, mit Ziehen zum Aktualisieren und verständlichen Fehlern. */
@@ -27,10 +29,34 @@ export function useLaden<T>(laden: () => Promise<T>, abh: unknown[]) {
   return { daten, fehler, laedt, neu };
 }
 
-export function Seite({ laedt, neu, children, ...rest }: ScrollViewProps & { laedt?: boolean; neu?: () => void }) {
+/** Seitenrahmen mit großem Titel (iOS-Stil) und optionaler Unterzeile, z. B. dem heutigen Datum. */
+export function Seite({ titel, unterzeile, laedt, neu, children, kopfRechts, ...rest }: ScrollViewProps & { titel: string; unterzeile?: string; laedt?: boolean; neu?: () => void; kopfRechts?: ReactNode }) {
+  const f = useFarben();
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 32 }} refreshControl={neu ? <RefreshControl refreshing={Boolean(laedt)} onRefresh={neu} /> : undefined} {...rest}>
+    <ScrollView
+      contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 8, paddingBottom: 120 }}
+      contentInsetAdjustmentBehavior="automatic"
+      refreshControl={neu ? <RefreshControl refreshing={Boolean(laedt)} onRefresh={neu} tintColor={f.tinteLeise} /> : undefined}
+      {...rest}
+    >
+      <View style={{ flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 20 }}>
+        <View style={{ flex: 1 }}>
+          {unterzeile ? <T v="klein" leise>{unterzeile}</T> : null}
+          <T v="grossTitel" accessibilityRole="header">{titel}</T>
+        </View>
+        {kopfRechts}
+      </View>
       {children}
     </ScrollView>
+  );
+}
+
+/** Leerer Zustand als Einladung: ein Satz, was jetzt sinnvoll ist. */
+export function Leer({ text }: { text: string }) {
+  const f = useFarben();
+  return (
+    <View style={{ paddingVertical: 28, paddingHorizontal: 16, borderRadius: 14, backgroundColor: f.amtHauch }}>
+      <T fett farbe={f.amt}>{text}</T>
+    </View>
   );
 }

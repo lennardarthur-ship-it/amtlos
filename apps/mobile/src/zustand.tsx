@@ -27,6 +27,11 @@ interface Zustand {
   offeneStempel: Stempel[];
   fehlgeschlagen: Fehlgeschlagen[];
   anmelden(token: string): Promise<void>;
+  /** Konto und Unternehmen neu laden (z. B. nach dem Anlegen) und ein Unternehmen wählen */
+  anmeldenAktualisieren(unternehmenId?: string): Promise<void>;
+  /** Profil noch nie ausgefüllt → Schnellstart */
+  profilFehlt: boolean | null;
+  profilFehltSetzen(wert: boolean): void;
   abmelden(): Promise<void>;
   unternehmenWaehlen(id: string): Promise<void>;
   spracheSetzen(s: Sprache): Promise<void>;
@@ -44,11 +49,18 @@ export function useAmtlos(): Zustand {
 }
 
 const speicher = { lesen: (k: string) => AsyncStorage.getItem(k), schreiben: (k: string, v: string) => AsyncStorage.setItem(k, v) };
+/** Token im sicheren Speicher; wo es ihn nicht gibt (Web-Vorschau), im normalen Speicher. */
+const geheim = {
+  lesen: (k: string) => SecureStore.getItemAsync(k).catch(() => AsyncStorage.getItem(k)),
+  schreiben: (k: string, v: string) => SecureStore.setItemAsync(k, v).catch(() => AsyncStorage.setItem(k, v)),
+  loeschen: (k: string) => SecureStore.deleteItemAsync(k).catch(() => AsyncStorage.removeItem(k)),
+};
 
 export function AmtlosAnbieter({ children }: { children: ReactNode }) {
   const [bereit, setBereit] = useState(false);
   const [sprache, setSprache] = useState<Sprache>(Localization.getLocales()[0]?.languageCode === "en" ? "en" : "de");
   const [ich, setIch] = useState<Ich | null>(null);
+  const [profilFehlt, setProfilFehlt] = useState<boolean | null>(null);
   const [unternehmenId, setUnternehmenId] = useState<string | null>(null);
   const [online, setOnline] = useState(true);
   const [offeneStempel, setOffeneStempel] = useState<Stempel[]>([]);
@@ -85,10 +97,15 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       const gemerkt = await AsyncStorage.getItem(UNTERNEHMEN);
       const id = i.unternehmen.find((u) => u.id === gemerkt)?.id ?? i.unternehmen[0]?.id ?? null;
       setUnternehmenId(id);
+      zustand.current = { ...zustand.current, unternehmenId: id };
+      if (id) {
+        const p = await klient.profil().catch(() => null);
+        setProfilFehlt(p ? p.version === 0 : false);
+      } else setProfilFehlt(true);
     } catch (e) {
       if (e instanceof ApiFehler && e.status === 401) {
         token.current = null;
-        await SecureStore.deleteItemAsync(TOKEN);
+        await geheim.loeschen(TOKEN);
         setIch(null);
       } else if (e instanceof NetzFehler) setOnline(false);
     }
@@ -98,10 +115,13 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
     void (async () => {
       const s = await AsyncStorage.getItem(SPRACHE);
       if (s === "de" || s === "en") setSprache(s);
-      token.current = await SecureStore.getItemAsync(TOKEN);
-      if (token.current) await ichLaden();
-      await standLaden();
-      setBereit(true);
+      try {
+        token.current = await geheim.lesen(TOKEN);
+        if (token.current) await ichLaden();
+        await standLaden();
+      } finally {
+        setBereit(true);
+      }
     })();
   }, [ichLaden, standLaden]);
 
@@ -133,12 +153,18 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
     fehlgeschlagen,
     async anmelden(t) {
       token.current = t;
-      await SecureStore.setItemAsync(TOKEN, t);
+      await geheim.schreiben(TOKEN, t);
       await ichLaden();
     },
+    async anmeldenAktualisieren(id) {
+      if (id) await AsyncStorage.setItem(UNTERNEHMEN, id);
+      await ichLaden();
+    },
+    profilFehlt,
+    profilFehltSetzen: setProfilFehlt,
     async abmelden() {
       token.current = null;
-      await SecureStore.deleteItemAsync(TOKEN);
+      await geheim.loeschen(TOKEN);
       setIch(null);
       setUnternehmenId(null);
     },

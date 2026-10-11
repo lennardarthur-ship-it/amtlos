@@ -464,6 +464,16 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Datum:** 2026-10-11 · **Status:** angenommen
 - Kernseiten antworten serverseitig in unter 1,5 s und sind in unter 3 s vollständig geladen (auf dem CI-Läufer geprüft; lokal unter 150 ms). Die E2E-Prüfung misst das bei jedem Lauf. JavaScript nur, wo es Interaktion braucht (Kopierfeld, Auto-Aktualisierung, Navigation).
 
+### E-117 · App zuerst für iPhone: ruhig, nativ, ein prägendes Element
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Die App ist zuerst für iOS gebaut (Android bleibt lauffähig, wird aber nicht gestaltet). Gestaltung folgt dem Designsystem (docs/06): Papier und Tinte, eine Handlungsfarbe, Statusfarben nie allein; Schrift Atkinson Hyperlegible wie im Web; große Titel wie in iOS-Apps; Tippziele 48 pt.
+- **Fristblatt** als das eine prägende Element – in jeder Zeile klein, auf der Pflicht-Karte groß. SF Symbols auf iOS (Ionicons als Ersatz), Tableiste mit Unschärfe, dezente Haptik beim Tippen.
+- **Ein animierter Moment:** der Erledigt-Stempel (Feder-Animation, Erfolgs-Haptik). Sonst keine Bewegung ohne Anlass.
+- **Pflicht-Karte** als Blatt von unten (Seitenvertrag docs/04): Was · Bis wann · Erledigen · Warum · Was sonst · Mehr · Quellen. Erledigen und Wieder öffnen gehen in der App; Angaben ändern bleibt am Computer.
+- **Schnellstart und Nachfragen in der App** (dieselben Fragen wie im Web, E-111): Wer sich zuerst auf dem Handy anmeldet, kommt ohne Computer zur ersten Pflichtenliste. „Heute“ zeigt dieselbe eine nächste Handlung wie das Web (E-112).
+- **Abo nicht in der App:** Die App zeigt nur den Stand (Testphase, aktiv) und verweist zum Computer – kein Bezahlen und kein Link zum Abschluss in der App, bis die Store-Regeln geklärt sind (T-49).
+- Prüfung ohne Simulator über den Web-Export (`apps/mobile/e2e/schau.mjs`); die iOS-Darstellung wird vor dem Store auf echten Geräten geprüft.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)
