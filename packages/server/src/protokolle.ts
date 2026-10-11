@@ -224,3 +224,125 @@ export async function gefahrstoffverzeichnisPdf(v: GefahrstoffVerzeichnis): Prom
   if (!v.stoffe.length) s.absatz("Keine Gefahrstoffe erfasst.");
   return s.fertig();
 }
+
+// ------------------------------------------------------------ Datenschutz (Abschnitt 6)
+
+/** Schutzziele nach Art. 32 Abs. 1 DSGVO (Wortlaut fachlich zu prüfen, T-22). */
+export const SCHUTZZIELE: Record<string, string> = {
+  pseudonymisierung_verschluesselung: "Pseudonymisierung und Verschlüsselung",
+  vertraulichkeit: "Vertraulichkeit",
+  integritaet: "Integrität",
+  verfuegbarkeit_belastbarkeit: "Verfügbarkeit und Belastbarkeit",
+  wiederherstellung: "Rasche Wiederherstellung nach einem Zwischenfall",
+  ueberpruefung: "Regelmäßige Überprüfung der Wirksamkeit",
+  sonstiges: "Sonstige Maßnahmen",
+};
+
+export interface DatenschutzDokumentation {
+  unternehmen: string;
+  stand: string;
+  verarbeitungen: { bezeichnung: string; zweck: string; rechtsgrundlage: string; betroffene: string; datenarten: string; empfaenger: string; drittland: string; loeschfrist: string; tom_hinweis: string }[];
+  tom: { schutzziel: string; massnahme: string; umgesetzt_am: string | null; verantwortlich: string | null }[];
+  dienstleister: { name: string; leistung: string; auftragsverarbeitung: boolean; avv_datum: string | null; avv_vorhanden: boolean; drittland: string }[];
+}
+
+/** Verzeichnis der Verarbeitungstätigkeiten mit TOM und Dienstleistern in einem Dokument. */
+export async function datenschutzDokumentationPdf(d: DatenschutzDokumentation): Promise<Buffer> {
+  const s = await satz("Verzeichnis der Verarbeitungstätigkeiten", d.unternehmen);
+  s.text(d.unternehmen, 50, 9, s.fett);
+  s.zeile(30);
+  s.text("Verzeichnis der Verarbeitungstätigkeiten", 50, 16, s.fett);
+  s.zeile(20);
+  s.text(`Stand: ${datumDe(d.stand)} · Verantwortlicher: ${d.unternehmen}`, 50, 9);
+  s.zeile(24);
+  for (const v of d.verarbeitungen) {
+    s.platz(90);
+    s.text(v.bezeichnung, 50, 11, s.fett);
+    s.zeile(15);
+    for (const [k, w] of [["Zweck", v.zweck], ["Rechtsgrundlage", v.rechtsgrundlage], ["Betroffene", v.betroffene], ["Datenarten", v.datenarten], ["Empfänger", v.empfaenger], ["Drittland", v.drittland || "keine Übermittlung angegeben"], ["Löschfrist", v.loeschfrist], ["TOM", v.tom_hinweis]] as const) {
+      s.text(k, 60, 9);
+      s.absatz(w || "– (noch nicht angegeben)", 170, 9, s.normal, 12);
+    }
+    s.zeile(8);
+  }
+  if (!d.verarbeitungen.length) s.absatz("Keine Verarbeitungstätigkeiten erfasst.");
+  s.zeile(10);
+  s.platz(60);
+  s.text("Technische und organisatorische Maßnahmen", 50, 13, s.fett);
+  s.zeile(20);
+  for (const [ziel, titel] of Object.entries(SCHUTZZIELE)) {
+    const liste = d.tom.filter((x) => x.schutzziel === ziel);
+    if (!liste.length) continue;
+    s.platz(40);
+    s.text(titel, 50, 10, s.fett);
+    s.zeile(15);
+    for (const m of liste) s.absatz(`• ${m.massnahme}${m.umgesetzt_am ? ` (umgesetzt ${datumDe(m.umgesetzt_am)})` : " (geplant)"}${m.verantwortlich ? ` – ${m.verantwortlich}` : ""}`, 60, 9, s.normal, 12);
+    s.zeile(4);
+  }
+  if (!d.tom.length) s.absatz("Keine Maßnahmen erfasst.");
+  s.zeile(10);
+  s.platz(60);
+  s.text("Dienstleister", 50, 13, s.fett);
+  s.zeile(20);
+  for (const x of d.dienstleister) {
+    s.platz(30);
+    const avv = x.auftragsverarbeitung ? (x.avv_vorhanden || x.avv_datum ? `AVV ${x.avv_datum ? `vom ${datumDe(x.avv_datum)}` : "liegt vor"}` : "AVV fehlt") : "keine Auftragsverarbeitung";
+    s.absatz(`${x.name}${x.leistung ? ` – ${x.leistung}` : ""} · ${avv}${x.drittland ? ` · Drittland: ${x.drittland}` : ""}`, 50, 9, s.normal, 12);
+  }
+  if (!d.dienstleister.length) s.absatz("Keine Dienstleister erfasst.");
+  return s.fertig();
+}
+
+export interface DatenpanneMeldung {
+  unternehmen: string;
+  entdeckt_am: string;
+  beschreibung: string;
+  datenarten: string;
+  betroffene_anzahl: string;
+  folgen: string;
+  massnahmen: string;
+  risiko: string | null;
+  begruendung: string | null;
+  gemeldet_am: string | null;
+  aktenzeichen: string | null;
+  kontakt: string;
+}
+
+/**
+ * Meldeentwurf bzw. Dokumentation einer Datenpanne, gegliedert nach den Mindestangaben des Art. 33 Abs. 3 DSGVO
+ * (Gliederung fachlich zu prüfen, T-23). Gemeldet wird über das Portal der Aufsichtsbehörde.
+ */
+export async function datenpanneMeldungPdf(m: DatenpanneMeldung): Promise<Buffer> {
+  const s = await satz("Datenpanne", m.unternehmen);
+  const RISIKO: Record<string, string> = { kein_risiko: "voraussichtlich kein Risiko – keine Meldung, nur Dokumentation", risiko: "Risiko – Meldung an die Aufsichtsbehörde", hohes_risiko: "hohes Risiko – Meldung und Benachrichtigung der Betroffenen prüfen" };
+  s.text(m.unternehmen, 50, 9, s.fett);
+  s.zeile(30);
+  s.text(m.gemeldet_am ? "Meldung einer Datenpanne (Dokumentation)" : "Datenpanne – Meldeentwurf und Dokumentation", 50, 15, s.fett);
+  s.zeile(24);
+  for (const [k, w] of [
+    ["Entdeckt am", zeitDe(m.entdeckt_am)],
+    ["Frist (72 Stunden)", zeitDe(new Date(new Date(m.entdeckt_am).getTime() + 72 * 3600_000).toISOString())],
+    ["Bewertung", m.risiko ? RISIKO[m.risiko] ?? m.risiko : "noch offen"],
+    ["Gemeldet am", m.gemeldet_am ? `${zeitDe(m.gemeldet_am)}${m.aktenzeichen ? ` · Aktenzeichen ${m.aktenzeichen}` : ""}` : "noch nicht gemeldet"],
+  ] as const) {
+    s.text(k, 50, 9);
+    s.absatz(w, 170, 9, s.normal, 12);
+  }
+  s.zeile(8);
+  for (const [titel, inhalt] of [
+    ["Art der Verletzung", m.beschreibung],
+    ["Kategorien der Daten", m.datenarten],
+    ["Betroffene Personen und Datensätze (ungefähre Zahl)", m.betroffene_anzahl],
+    ["Kontakt für Rückfragen", m.kontakt],
+    ["Wahrscheinliche Folgen", m.folgen],
+    ["Ergriffene und vorgeschlagene Maßnahmen", m.massnahmen],
+    ...(m.risiko === "kein_risiko" ? [["Begründung, warum keine Meldung nötig ist", m.begruendung ?? ""]] : []),
+  ] as const) {
+    s.platz(50);
+    s.text(titel, 50, 10, s.fett);
+    s.zeile(15);
+    s.absatz(inhalt || "– (noch nicht angegeben)", 50, 10);
+    s.zeile(6);
+  }
+  return s.fertig();
+}

@@ -388,7 +388,24 @@ export const SCHRITTE: Schritt[] = [
           keine: { de: "Keine", en: "None" },
         },
       },
+      {
+        feld: "datenschutz.dienstleister",
+        art: "janein",
+        frage: { de: "Verarbeiten Dienstleister für dich Daten über Menschen (z. B. Cloud, Lohnbüro, Newsletter-Tool)?", en: "Do service providers process personal data for you (e.g. cloud, payroll office, newsletter tool)?" },
+      },
       { feld: "ki.nutzung", art: "janein", frage: { de: "Nutzt du KI-Werkzeuge im Unternehmen?", en: "Do you use AI tools in your business?" } },
+      {
+        feld: "ki.eigene_produkte",
+        art: "janein",
+        frage: { de: "Bietest du eigene KI-Produkte oder -Funktionen an (z. B. einen Chatbot auf deiner Website)?", en: "Do you offer your own AI products or features (e.g. a chatbot on your website)?" },
+      },
+      {
+        feld: "nis2.betroffen",
+        art: "auswahl",
+        frage: { de: "Fällt dein Unternehmen unter die NIS2-Regeln zur Cybersicherheit?", en: "Is your business covered by the NIS2 cybersecurity rules?" },
+        hilfe: { de: "Das hängt von Branche und Größe ab. Das BSI bietet dafür eine Betroffenheitsprüfung an.", en: "This depends on sector and size. The BSI (German Federal Office for Information Security) offers a check." },
+        optionen: { ja: { de: "Ja", en: "Yes" }, nein: { de: "Nein", en: "No" }, unklar: { de: "Weiß ich nicht", en: "I don't know" } },
+      },
     ],
   },
 ];

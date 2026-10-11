@@ -1,0 +1,56 @@
+# Katalog F.65 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: ki.transparenz
+version: 1
+katalog_nr: F.65
+titel:
+  de: KI-Inhalte und KI-Interaktion kennzeichnen
+kurz:
+  de: Ab 2.12.2026 gelten Transparenz- und Kennzeichnungspflichten, etwa für Chatbots und KI-erzeugte Inhalte.
+erklaerung:
+  de: Nach Art. 50 KI-Verordnung müssen Menschen erkennen können, dass sie mit einer KI interagieren oder Inhalte KI-erzeugt
+    sind.
+rechtsgrundlage:
+- Art. 50 KI-VO
+kategorie: ki
+ausloeser:
+  feld: profil.ki.eigene_produkte
+  op: ==
+  wert: true
+  label:
+    de: Ihr bietet eigene KI-Produkte oder -Funktionen an.
+frist:
+  typ: absolut
+  datum: '2026-12-02'
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: beschlossen
+radar:
+  wahrscheinlichkeit: sicher
+  erwartet_ab: '2026-12-02'
+gueltig_ab: '2026-12-02'
+gueltig_bis: null
+quellen:
+- titel: KI-Verordnung (EU) 2024/1689
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32024R1689
+  abgerufen: null
+fachlich_zu_pruefen:
+- Welche Fälle des Art. 50 treffen auf Kleinbetriebe zu (Chatbot, Deepfake, generierte Texte)?
+- Nach dem 2.12.2026 auf in_kraft umstellen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

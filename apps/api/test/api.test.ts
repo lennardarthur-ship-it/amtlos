@@ -596,4 +596,113 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       expect((await alsLea(http().get("/v1/gefahrstoffe")).expect(200)).body[0].entfernt_am).toBe(heuteIso);
     });
   });
+
+  describe("Datenschutz, IT-Sicherheit, KI", () => {
+    let dana: string;
+    let u: string;
+    const alsDana = (x: request.Test) => x.set("Authorization", `Bearer ${dana}`).set("X-Unternehmen-Id", u);
+    const heuteIso = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Berlin" }).format(new Date());
+    const pflicht = async (id: string, periode?: string) =>
+      ((await alsDana(http().get("/v1/pflichten")).expect(200)).body as { pflicht_id: string; periode: string; ergebnis: string; status: string }[]).filter((x) => x.pflicht_id === id && (!periode || x.periode === periode));
+    const binaer = (r: request.Test) => r.buffer(true).parse((res, cb) => { const t: Buffer[] = []; res.on("data", (c: Buffer) => t.push(c)); res.on("end", () => cb(null, Buffer.concat(t))); });
+
+    beforeAll(async () => {
+      dana = await token("dana");
+      u = (await http().post("/v1/unternehmen").set("Authorization", `Bearer ${dana}`).send({ name: "Danas Agentur" }).expect(201)).body.id;
+      await alsDana(http().put("/v1/profil")).send({ daten: {
+        rechtsform: "gmbh", gruendungsdatum: "2021-01-01", "taetigkeit.einordnung": "gewerbe", "beschaeftigte.gesamt": 3, gemeinde_ags: "11000000",
+        "datenverarbeitung.arten": ["kundendaten", "newsletter"], "datenschutz.dienstleister": false, "ki.nutzung": true, "ki.eigene_produkte": false, "nis2.betroffen": "nein",
+      } }).expect(200);
+      await neuberechnen(worker, u, "test", { kalender: new StandardKalender() });
+    });
+
+    it("Katalog F: VVT und KI-Kompetenz gelten, AVV ohne Dienstleister nicht, NIS2 geklärt", async () => {
+      expect((await pflicht("datenschutz.vvt"))[0]?.ergebnis).toBe("gilt");
+      expect((await pflicht("datenschutz.avv"))[0]?.ergebnis).toBe("gilt_nicht");
+      expect((await pflicht("ki.kompetenz"))[0]?.ergebnis).toBe("gilt");
+      expect((await pflicht("it_sicherheit.nis2_pruefen"))[0]?.ergebnis).toBe("gilt_nicht");
+    });
+
+    it("VVT mit Vorschlägen aus dem Profil, TOM nach Schutzzielen, Dienstleister mit AVV; Ablage erledigt die Pflichten", async () => {
+      const v = (await alsDana(http().get("/v1/verarbeitungen/vorschlaege")).expect(200)).body;
+      expect(v).toEqual(expect.arrayContaining(["Kundenverwaltung und Rechnungen", "Personalverwaltung", "Newsletter", "Einsatz von KI-Werkzeugen"]));
+      await alsDana(http().post("/v1/datenschutz/dokumentation")).expect(422); // noch nichts erfasst
+      const a = (await alsDana(http().post("/v1/verarbeitungen")).send({ bezeichnung: "Kundenverwaltung und Rechnungen", zweck: "Aufträge abwickeln", betroffene: "Kunden", datenarten: "Name, Adresse", loeschfrist: "nach Ablauf der Aufbewahrung" }).expect(201)).body;
+      expect((await alsDana(http().get("/v1/verarbeitungen/vorschlaege")).expect(200)).body).not.toContain("Kundenverwaltung und Rechnungen");
+      await alsDana(http().put(`/v1/verarbeitungen/${a.id}`)).send({ bezeichnung: "Kundenverwaltung und Rechnungen", zweck: "Aufträge abwickeln und abrechnen" }).expect(200);
+      await alsDana(http().post("/v1/tom")).send({ schutzziel: "geheim", massnahme: "x" }).expect(422);
+      await alsDana(http().post("/v1/tom")).send({ schutzziel: "pseudonymisierung_verschluesselung", massnahme: "Festplatten verschlüsselt", umgesetzt_am: heuteIso }).expect(201);
+      const t2 = (await alsDana(http().post("/v1/tom")).send({ schutzziel: "wiederherstellung", massnahme: "Tägliche Datensicherung" }).expect(201)).body;
+      await alsDana(http().delete(`/v1/tom/${t2.id}`)).expect(204);
+      expect((await alsDana(http().get("/v1/tom/schutzziele")).expect(200)).body).toHaveLength(7);
+      const d = (await alsDana(http().post("/v1/dienstleister")).send({ name: "Mail-Tool GmbH", leistung: "Newsletter-Versand" }).expect(201)).body;
+      expect((await alsDana(http().get("/v1/profil")).expect(200)).body.daten["datenschutz.dienstleister"]).toBe(true);
+      expect((await alsDana(http().get("/v1/dienstleister")).expect(200)).body[0].avv_fehlt).toBe(true);
+      await alsDana(http().post(`/v1/dienstleister/${d.id}/avv`)).attach("datei", Buffer.from("kein pdf"), { filename: "avv.pdf", contentType: "application/pdf" }).expect(422);
+      await alsDana(http().post(`/v1/dienstleister/${d.id}/avv`)).attach("datei", Buffer.from("%PDF-1.4\n% AVV\n"), { filename: "avv.pdf", contentType: "application/pdf" }).expect(201);
+      expect((await alsDana(http().get("/v1/dienstleister")).expect(200)).body[0].avv_fehlt).toBe(false);
+      await neuberechnen(worker, u, "test", { kalender: new StandardKalender() });
+      expect((await pflicht("datenschutz.avv"))[0]?.ergebnis).toBe("gilt");
+      const pdf = await binaer(alsDana(http().get("/v1/datenschutz/dokumentation"))).expect(200);
+      expect((pdf.body as Buffer).subarray(0, 5).toString()).toBe("%PDF-");
+      const r = (await alsDana(http().post("/v1/datenschutz/dokumentation")).expect(201)).body;
+      expect(r.erledigte_pflichten).toBe(3); // VVT, TOM, AVV
+      for (const id of ["datenschutz.vvt", "datenschutz.tom", "datenschutz.avv"]) expect((await pflicht(id))[0]?.status).toBe("erledigt");
+    });
+
+    it("Betroffenenanfrage: Frist ein Monat, Pflicht entsteht je Eingangstag und wird mit der Antwort erledigt", async () => {
+      const morgen = new Date(Date.now() + 86_400_000 * 2).toISOString().slice(0, 10);
+      await alsDana(http().post("/v1/betroffenenanfragen")).send({ eingang_am: morgen, art: "auskunft", person: "M. Muster" }).expect(422);
+      const a = (await alsDana(http().post("/v1/betroffenenanfragen")).send({ eingang_am: heuteIso, art: "auskunft", person: "M. Muster" }).expect(201)).body;
+      const [j, m, t] = heuteIso.split("-").map(Number) as [number, number, number];
+      const frist = new Date(Date.UTC(j, m, 1));
+      frist.setUTCDate(Math.min(t, new Date(Date.UTC(j, m + 1, 0)).getUTCDate()));
+      expect(a.frist_am).toBe(frist.toISOString().slice(0, 10));
+      expect((await alsDana(http().get("/v1/betroffenenanfragen")).expect(200)).body[0].tage_uebrig).toBeGreaterThanOrEqual(28);
+      await neuberechnen(worker, u, "test", { kalender: new StandardKalender() });
+      const periode = `aenderung-${heuteIso.replaceAll("-", "")}`;
+      expect((await pflicht("datenschutz.betroffenenanfrage", periode))[0]).toMatchObject({ ergebnis: "gilt", status: "offen" });
+      const e = (await alsDana(http().post(`/v1/betroffenenanfragen/${a.id}/erledigen`)).send({ datum: heuteIso, antwort: "Auskunft per E-Mail erteilt" }).expect(201)).body;
+      expect(e.erledigte_pflichten).toBe(1);
+      await alsDana(http().post(`/v1/betroffenenanfragen/${a.id}/erledigen`)).send({ datum: heuteIso, antwort: "nochmal" }).expect(409);
+      expect((await pflicht("datenschutz.betroffenenanfrage", periode))[0]?.status).toBe("erledigt");
+    });
+
+    it("Datenpanne: Notfallknopf mit 72-Stunden-Frist, Bewertung, Meldung, Meldeentwurf; danach unveränderlich", async () => {
+      const p = (await alsDana(http().post("/v1/datenpannen")).send({ beschreibung: "Laptop mit Kundendaten im Zug verloren" }).expect(201)).body;
+      expect(new Date(p.frist_bis).getTime() - new Date(p.entdeckt_am).getTime()).toBe(72 * 3600_000);
+      await alsDana(http().post(`/v1/datenpannen/${p.id}/abschliessen`)).expect(422); // Bewertung fehlt
+      await alsDana(http().put(`/v1/datenpannen/${p.id}`)).send({ beschreibung: p.beschreibung, risiko: "kein_risiko" }).expect(422); // Begründung fehlt
+      await alsDana(http().put(`/v1/datenpannen/${p.id}`)).send({ beschreibung: p.beschreibung, datenarten: "Name, Adresse", betroffene_anzahl: "ca. 120", risiko: "risiko", massnahmen: "Fernlöschung" }).expect(200);
+      await alsDana(http().post(`/v1/datenpannen/${p.id}/abschliessen`)).expect(422); // Meldung fehlt
+      const entwurf = await binaer(alsDana(http().get(`/v1/datenpannen/${p.id}/meldeentwurf`))).expect(200);
+      expect((entwurf.body as Buffer).subarray(0, 5).toString()).toBe("%PDF-");
+      await alsDana(http().post(`/v1/datenpannen/${p.id}/gemeldet`)).send({ gemeldet_am: new Date().toISOString(), aktenzeichen: "LDA-123" }).expect(201);
+      await neuberechnen(worker, u, "test", { kalender: new StandardKalender() });
+      const pPeriode = `aenderung-${heuteIso.replaceAll("-", "")}`;
+      expect((await pflicht("datenschutz.datenpanne_meldung", pPeriode))[0]).toMatchObject({ ergebnis: "gilt", status: "faellig_bald" });
+      const r = (await alsDana(http().post(`/v1/datenpannen/${p.id}/abschliessen`)).expect(201)).body;
+      expect(r.erledigte_pflichten).toBe(1);
+      expect((await pflicht("datenschutz.datenpanne_meldung", pPeriode))[0]?.status).toBe("erledigt");
+      await alsDana(http().put(`/v1/datenpannen/${p.id}`)).send({ beschreibung: "geändert" }).expect(404);
+      const danaKonto = (await http().get("/v1/ich").set("Authorization", `Bearer ${dana}`).expect(200)).body.konto.id;
+      const apiDb = new Datenbank(urls.api);
+      await expect(apiDb.imKontext({ kontoId: danaKonto, unternehmenId: u }, (tx) => tx.abfrage("update app.datenpanne set beschreibung = 'x' where id = $1", [p.id]))).rejects.toThrow(/datenpanne_unveraenderlich/);
+      await expect(apiDb.imKontext({ kontoId: danaKonto, unternehmenId: u }, (tx) => tx.abfrage("delete from app.datenpanne where id = $1", [p.id]))).rejects.toThrow(/permission denied|datenpanne_unveraenderlich/);
+      await apiDb.schliessen();
+    });
+
+    it("KI-Kompetenz-Schulung über das Unterweisungsmodul erledigt die Pflicht nach Art. 4 KI-VO", async () => {
+      const b = (await alsDana(http().post("/v1/beschaeftigte")).send({ vorname: "Kai", nachname: "Klug", art: "vollzeit", eintritt: "2021-02-01" }).expect(201)).body;
+      const s2 = (await alsDana(http().post("/v1/unterweisungen")).send({ thema: "KI im Arbeitsalltag", inhalt: "Chancen, Grenzen, Regeln im Betrieb", datum: heuteIso, durchgefuehrt_von: "Dana", art: "ki_kompetenz" }).expect(201)).body;
+      expect(s2.art).toBe("ki_kompetenz");
+      await alsDana(http().post(`/v1/unterweisungen/${s2.id}/bestaetigen`)).send({ beschaeftigter_id: b.id, name: "Kai Klug" }).expect(201);
+      const r = (await alsDana(http().post(`/v1/unterweisungen/${s2.id}/abschliessen`)).expect(201)).body;
+      expect(r.erledigte_pflichten).toBe(1);
+      expect((await pflicht("ki.kompetenz"))[0]?.status).toBe("erledigt");
+      expect((await alsDana(http().get("/v1/unterweisungen?art=ki_kompetenz")).expect(200)).body).toHaveLength(1);
+      expect((await alsDana(http().get("/v1/unterweisungen?art=arbeitsschutz")).expect(200)).body).toHaveLength(0);
+      await alsDana(http().get("/v1/unterweisungen?art=quatsch")).expect(400);
+    });
+  });
 });

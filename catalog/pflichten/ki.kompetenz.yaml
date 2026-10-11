@@ -1,0 +1,65 @@
+# Katalog F.65 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: ki.kompetenz
+version: 1
+katalog_nr: F.65
+titel:
+  de: KI-Kompetenz der Beschäftigten sicherstellen
+kurz:
+  de: Wer im Unternehmen mit KI arbeitet, braucht ausreichende KI-Kompetenz – sorge für Schulung und halte sie fest.
+erklaerung:
+  de: Die Pflicht nach Art. 4 KI-Verordnung gilt seit 2.2.2025, durchgesetzt wird sie ab August 2026. Amtlos bietet Schulungen
+    mit Bestätigung als Nachweis.
+begriffe:
+- begriff:
+    de: KI-Kompetenz
+  erklaerung:
+    de: Wissen und Fähigkeiten, um KI-Systeme sachkundig einzusetzen und ihre Chancen und Risiken zu kennen.
+rechtsgrundlage:
+- Art. 4 KI-VO
+kategorie: ki
+ausloeser:
+  any:
+  - feld: profil.ki.nutzung
+    op: ==
+    wert: true
+    label:
+      de: Ihr nutzt KI-Werkzeuge.
+  - feld: profil.ki.eigene_produkte
+    op: ==
+    wert: true
+    label:
+      de: Ihr bietet eigene KI-Produkte an.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: dokument_generator
+aktion:
+  art: link
+  ziel: app.schulungen
+  nachweis_erforderlich: true
+status_recht: in_kraft
+gueltig_ab: '2025-02-02'
+gueltig_bis: null
+quellen:
+- titel: KI-Verordnung (EU) 2024/1689
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32024R1689
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Inhalt und Umfang einer ausreichenden Schulung fachlich festlegen
+- Genauer Beginn der Durchsetzung („ab August 2026“) – Datum ergänzen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

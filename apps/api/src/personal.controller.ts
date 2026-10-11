@@ -22,8 +22,12 @@ const BeschaeftigterNeu = z
   .object({ vorname: z.string().trim().min(1).max(100), nachname: z.string().trim().min(1).max(100), art: ART, eintritt: DATUM, wochenstunden: z.number().positive().max(80).nullable().optional() })
   .strict();
 const BeschaeftigterAendern = BeschaeftigterNeu.omit({ eintritt: true });
+const UNTERWEISUNGSARTEN = ["arbeitsschutz", "ki_kompetenz", "datenschutz"] as const;
 const UnterweisungNeu = z
-  .object({ thema: z.string().trim().min(1).max(200), inhalt: z.string().trim().min(1).max(20000), datum: DATUM, durchgefuehrt_von: z.string().trim().min(1).max(200), teilnehmer: z.array(Uuid).max(500).default([]) })
+  .object({
+    thema: z.string().trim().min(1).max(200), inhalt: z.string().trim().min(1).max(20000), datum: DATUM, durchgefuehrt_von: z.string().trim().min(1).max(200),
+    teilnehmer: z.array(Uuid).max(500).default([]), art: z.enum(UNTERWEISUNGSARTEN).default("arbeitsschutz"),
+  })
   .strict();
 const Bestaetigen = z.object({ beschaeftigter_id: Uuid, name: z.string().trim().min(1).max(200) }).strict();
 const Zeitpunkt = z.string().datetime({ offset: true });
@@ -209,13 +213,14 @@ export class PersonalController {
 
   @MitUnternehmen()
   @Get("unterweisungen")
-  async unterweisungen(@Kontext() k: Anfragekontext) {
+  async unterweisungen(@Kontext() k: Anfragekontext, @Query("art") art?: string) {
+    if (art !== undefined && !(UNTERWEISUNGSARTEN as readonly string[]).includes(art)) throw new BadRequestException("art unbekannt");
     return this.db.imKontext(this.kontext(k), (tx) =>
       tx.abfrage(
-        `select u.id, u.thema, u.datum, u.durchgefuehrt_von, u.abgeschlossen_am, u.dokument_id,
+        `select u.id, u.thema, u.art, u.datum, u.durchgefuehrt_von, u.abgeschlossen_am, u.dokument_id,
                 (select count(*)::int from app.unterweisung_teilnahme t where t.unterweisung_id = u.id) as bestaetigt
-           from app.unterweisung u where u.unternehmen_id = $1 order by u.datum desc, u.erstellt_am desc`,
-        [k.unternehmenId],
+           from app.unterweisung u where u.unternehmen_id = $1 and ($2::text is null or u.art = $2) order by u.datum desc, u.erstellt_am desc`,
+        [k.unternehmenId, art ?? null],
       ),
     );
   }
@@ -243,9 +248,9 @@ export class PersonalController {
     return this.db
       .imKontext(this.kontext(k), (tx) =>
         tx.eine(
-          `insert into app.unterweisung (unternehmen_id, thema, inhalt, datum, durchgefuehrt_von, inhalt_sha256, erstellt_von)
-           values ($1, $2, $3, $4, $5, $6, $7) returning id, thema, datum`,
-          [k.unternehmenId, d.thema, d.inhalt, d.datum, d.durchgefuehrt_von, hash(`${d.thema}\n${d.inhalt}`), k.kontoId],
+          `insert into app.unterweisung (unternehmen_id, thema, inhalt, datum, durchgefuehrt_von, inhalt_sha256, erstellt_von, art)
+           values ($1, $2, $3, $4, $5, $6, $7, $8) returning id, thema, datum, art`,
+          [k.unternehmenId, d.thema, d.inhalt, d.datum, d.durchgefuehrt_von, hash(`${d.thema}\n${d.inhalt}`), k.kontoId, d.art],
         ),
       )
       .catch(uebersetzeDbFehler);
@@ -290,7 +295,7 @@ export class PersonalController {
     pruefe(Uuid, id);
     return this.db
       .imKontext(this.kontext(k), async (tx) => {
-        const u = await tx.eine<{ thema: string; inhalt: string; datum: string; durchgefuehrt_von: string; inhalt_sha256: Buffer; abgeschlossen_am: string | null }>(
+        const u = await tx.eine<{ thema: string; inhalt: string; datum: string; durchgefuehrt_von: string; inhalt_sha256: Buffer; abgeschlossen_am: string | null; art: string }>(
           "select * from app.unterweisung where id = $1 for update",
           [id],
         );
@@ -307,19 +312,29 @@ export class PersonalController {
           unternehmen, thema: u.thema, inhalt: u.inhalt, datum: u.datum, durchgefuehrt_von: u.durchgefuehrt_von, inhalt_sha256: u.inhalt_sha256.toString("hex"),
           teilnahmen: teilnahmen.map((x) => ({ name: `${x.vorname} ${x.nachname}`, bestaetigt_am: new Date(x.bestaetigt_am).toISOString(), name_bestaetigt: x.name_bestaetigt })),
         });
-        const dok = await dokumentAblegen(tx, this.ablage, { unternehmenId: k.unternehmenId!, kontoId: k.kontoId, titel: `Unterweisung ${u.thema} ${u.datum}`, art: "nachweis", quelle: "generiert", mime: "application/pdf", inhalt: pdf, endung: "pdf" });
+        const dok = await dokumentAblegen(tx, this.ablage, { unternehmenId: k.unternehmenId!, kontoId: k.kontoId, titel: `${u.art === "arbeitsschutz" ? "Unterweisung" : "Schulung"} ${u.thema} ${u.datum}`, art: "nachweis", quelle: "generiert", mime: "application/pdf", inhalt: pdf, endung: "pdf" });
         await tx.abfrage("update app.unterweisung set abgeschlossen_am = now(), dokument_id = $2 where id = $1", [id, dok.id]);
-        await this.ereignis(tx, k, "unterweisung_durchgefuehrt", u.datum, { thema: u.thema, unterweisung_id: id });
-        // Offene Pflichten erledigen: Wiederholungen bis einschließlich Datum + 1 Jahr und Erstunterweisungen der Teilnehmenden
-        const perioden = teilnahmen.map((x) => `aenderung-${x.eintritt.replaceAll("-", "")}`);
-        const erledigt = await tx.abfrage<{ id: string }>(
-          `update app.pflicht_instanz set status = 'erledigt', erledigt_am = now(), erledigt_von = $2, erledigt_mit_version_id = pflicht_version_id, aktualisiert_am = now()
-            where unternehmen_id = $1 and status = 'offen'
-              and ((pflicht_id = 'arbeitsschutz.unterweisung_wiederholen' and (faellig_am is null or faellig_am <= ($3::date + interval '1 year')))
-                or (pflicht_id = 'arbeitsschutz.erstunterweisung' and periode = any($4)))
-            returning id`,
-          [k.unternehmenId, k.kontoId, u.datum, perioden],
-        );
+        let erledigt: { id: string }[] = [];
+        if (u.art === "arbeitsschutz") {
+          await this.ereignis(tx, k, "unterweisung_durchgefuehrt", u.datum, { thema: u.thema, unterweisung_id: id });
+          // Offene Pflichten erledigen: Wiederholungen bis einschließlich Datum + 1 Jahr und Erstunterweisungen der Teilnehmenden
+          const perioden = teilnahmen.map((x) => `aenderung-${x.eintritt.replaceAll("-", "")}`);
+          erledigt = await tx.abfrage<{ id: string }>(
+            `update app.pflicht_instanz set status = 'erledigt', erledigt_am = now(), erledigt_von = $2, erledigt_mit_version_id = pflicht_version_id, aktualisiert_am = now()
+              where unternehmen_id = $1 and status = 'offen'
+                and ((pflicht_id = 'arbeitsschutz.unterweisung_wiederholen' and (faellig_am is null or faellig_am <= ($3::date + interval '1 year')))
+                  or (pflicht_id = 'arbeitsschutz.erstunterweisung' and periode = any($4)))
+              returning id`,
+            [k.unternehmenId, k.kontoId, u.datum, perioden],
+          );
+        } else if (u.art === "ki_kompetenz") {
+          // KI-Kompetenz (Art. 4 KI-VO): die Schulung ist der Nachweis (E-095)
+          erledigt = await tx.abfrage<{ id: string }>(
+            `update app.pflicht_instanz set status = 'erledigt', erledigt_am = now(), erledigt_von = $2, erledigt_mit_version_id = pflicht_version_id, aktualisiert_am = now()
+              where unternehmen_id = $1 and status = 'offen' and ergebnis = 'gilt' and pflicht_id = 'ki.kompetenz' returning id`,
+            [k.unternehmenId, k.kontoId],
+          );
+        }
         for (const { id: instanz } of erledigt)
           await tx.abfrage("insert into app.nachweis (unternehmen_id, pflicht_instanz_id, art, dokument_id, notiz, erstellt_von) values ($1, $2, 'generiertes_dokument', $3, $4, $5)", [
             k.unternehmenId, instanz, dok.id, `Unterweisung „${u.thema}“ vom ${u.datum}`, k.kontoId,

@@ -1,0 +1,28 @@
+persona: praxis
+beschreibung: Praxis mit Gesundheitsdaten und Videoüberwachung, NIS2 betroffen, eine Datenpanne und eine Auskunftsanfrage
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: partg
+  profil.gruendungsdatum: "2010-01-01"
+  profil.taetigkeit.einordnung: freiberuf
+  profil.beschaeftigte.gesamt: 8
+  profil.datenverarbeitung.arten: [kundendaten, gesundheitsdaten, videoueberwachung]
+  profil.datenschutz.dienstleister: false
+  profil.ki.nutzung: false
+  profil.ki.eigene_produkte: false
+  profil.nis2.betroffen: ja
+  profil.bundesland: NW
+  profil.gemeinde_ags: "05315000"
+ereignisse:
+  - { typ: datenpanne, datum: "2026-10-09" }
+  - { typ: betroffenenanfrage, datum: "2026-09-30" }
+erwartet:
+  datenschutz.avv: gilt_nicht
+  datenschutz.dsfa: gilt
+  datenschutz.videoueberwachung: gilt
+  it_sicherheit.nis2_pruefen: gilt_nicht
+  it_sicherheit.nis2_registrierung: gilt
+  it_sicherheit.nis2_meldepflichten: gilt
+  ki.kompetenz: gilt_nicht
+  datenschutz.datenpanne_meldung: gilt
+  datenschutz.betroffenenanfrage: gilt

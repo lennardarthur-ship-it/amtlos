@@ -1,0 +1,58 @@
+# Katalog F.61 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: datenschutz.dsb
+version: 1
+katalog_nr: F.61
+titel:
+  de: Datenschutzbeauftragten benennen
+kurz:
+  de: Sind in der Regel mindestens 20 Personen ständig mit der automatisierten Verarbeitung von Daten beschäftigt, benennst
+    du einen Datenschutzbeauftragten.
+erklaerung:
+  de: Die Pflicht folgt aus § 38 BDSG bzw. Art. 37 DSGVO. Die Bundesregierung plant, § 38 BDSG bis Ende 2026 zu streichen;
+    ein Gesetz gibt es noch nicht.
+rechtsgrundlage:
+- § 38 BDSG
+- Art. 37 DSGVO
+kategorie: datenschutz
+ausloeser:
+  all:
+  - feld: profil.beschaeftigte.gesamt
+    op: '>='
+    wert:
+      regelwert: datenschutz.dsb.schwelle_personen
+  - feld: abgeleitet.beschaeftigte.zaehlung_bdsg38
+    op: '>='
+    wert:
+      regelwert: datenschutz.dsb.schwelle_personen
+    label:
+      de: Mindestens 20 Personen sind ständig mit automatisierter Datenverarbeitung beschäftigt.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Meldung der Kontaktdaten an die Aufsichtsbehörde
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Bundesdatenschutzgesetz § 38
+  url: https://www.gesetze-im-internet.de/bdsg_2018/__38.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Zählweise „ständig mit automatisierter Verarbeitung“ (G-05)
+- Benennungspflicht nach Art. 37 DSGVO unabhängig von der Zahl (z. B. Kerntätigkeit) als eigener Zweig?
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

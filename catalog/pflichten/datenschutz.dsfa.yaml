@@ -1,0 +1,55 @@
+# Katalog F.62 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: datenschutz.dsfa
+version: 1
+katalog_nr: F.62
+titel:
+  de: Prüfen, ob eine Datenschutz-Folgenabschätzung nötig ist
+kurz:
+  de: Verarbeitest du besonders sensible Daten oder überwachst du mit Video, prüfst du, ob eine Datenschutz-Folgenabschätzung
+    nötig ist.
+erklaerung:
+  de: Bei voraussichtlich hohem Risiko für die Betroffenen ist vorab eine Folgenabschätzung durchzuführen und zu dokumentieren.
+rechtsgrundlage:
+- Art. 35 DSGVO
+kategorie: datenschutz
+ausloeser:
+  any:
+  - feld: profil.datenverarbeitung.arten
+    op: enthaelt
+    wert: gesundheitsdaten
+    label:
+      de: Du verarbeitest Gesundheitsdaten.
+  - feld: profil.datenverarbeitung.arten
+    op: enthaelt
+    wert: videoueberwachung
+    label:
+      de: Du setzt Videoüberwachung ein.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; ggf. Datenschutzbeauftragter
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: DSGVO Art. 35
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Auslöser (Gesundheitsdaten, Video) sind eine Vorauswahl – Liste der Aufsichtsbehörden (Muss-Liste) einbeziehen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

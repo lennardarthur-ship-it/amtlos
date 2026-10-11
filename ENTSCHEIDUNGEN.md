@@ -340,6 +340,18 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - Erfassen eines Geräts bzw. Gefahrstoffs setzt die passende Profilangabe (`arbeitsschutz.elektrische_geraete`, `arbeitsschutz.gefahrstoffe`), damit die Pflichten ohne erneutes Onboarding erscheinen.
 - Pflicht-Details verlinken auf die Stelle in Amtlos, an der die Pflicht erledigt wird („In Amtlos erledigen“), über `aktion.ziel` bzw. die Pflicht-ID.
 
+### E-095 · Datenschutz-Modul: Struktur statt Inhalt, Fristen aus Ereignissen
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- **VVT, TOM, Dienstleister:** Amtlos gibt die Gliederung vor (VVT-Felder nach Art. 30, TOM nach den Schutzzielen des Art. 32 Abs. 1, AVV-Status je Dienstleister) und schlägt aus dem Profil nur **Bezeichnungen** von Verarbeitungen vor. Zwecke, Rechtsgrundlagen, Löschfristen und Maßnahmen trägt der Betrieb ein – keine vorformulierten Rechtsinhalte (T-22, T-24). Fehlende Kernangaben werden je Verarbeitung angezeigt. „Stand ablegen“ erzeugt ein PDF (VVT + TOM + Dienstleister) als unveränderliches Dokument und erledigt VVT (≥ 1 Verarbeitung), TOM (≥ 1 umgesetzte Maßnahme) und AVV (alle Auftragsverarbeiter mit Vertrag).
+- **Betroffenenanfragen:** Eingang erfassen erzeugt das Ereignis `betroffenenanfrage`; die Pflicht entsteht je Eingangstag (`je_ereignis`, P1M). Die Frist der Anfrage wird mit derselben Monatsregel berechnet (Monatsende). Beantworten erledigt die Pflicht, sobald keine Anfrage dieses Tages mehr offen ist. Gespeichert wird nur, was zur Bearbeitung nötig ist (Name/Kontakt, Art, Antwort in Stichworten).
+- **Datenpannen:** Notfallknopf für alle Mitglieder (auch Mitarbeitende), erfasst Zeitpunkt der Entdeckung (unveränderlich) und Beschreibung, meldet `datenpanne`. Countdown stundengenau (72 h), Katalogfrist tagesgenau (P3D, T-23). Bewertung kein/Risiko/hohes Risiko; „kein Risiko“ nur mit Begründung (Datenbank-Check). Meldeentwurf als PDF nach den Mindestangaben des Art. 33 Abs. 3; gemeldet wird über das Portal der Aufsichtsbehörde (keine Schnittstelle). Abschließen dokumentiert jede Panne – auch nicht meldepflichtige (Art. 33 Abs. 5) – unveränderlich; Löschen ist ausgeschlossen.
+- **KI-Kompetenz:** keine eigene Schulungstabelle, sondern das Unterweisungsmodul mit `art = ki_kompetenz` (gleiche Bestätigung per Namen, gleiches PDF). Abschließen erledigt `ki.kompetenz`. Die Gliederung im Formular ist nur ein Vorschlag (T-25).
+- **NIS2:** Ohne Sektorliste und Größenschwellen in der Spezifikation fragt Amtlos die Betroffenheit als Profilangabe (ja/nein/weiß nicht) ab; daraus folgen Registrierung (Nachfrist 31.7.2026) und Meldepflichten. Ein geführter Betroffenheitscheck folgt nach fachlicher Zulieferung (T-26).
+
+### E-096 · Navigation mit sieben Bereichen
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- „Datenschutz“ kommt als eigener Navigationspunkt hinzu (Spezifikation 6.7). Damit die Ziele in der mobilen Leiste groß genug bleiben (≥ 44 px Höhe, ≥ 55 px Breite bei 390 px), steht „Einstellungen“ mobil im Kopf statt in der Leiste; am Desktop bleibt es in der Seitenleiste.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

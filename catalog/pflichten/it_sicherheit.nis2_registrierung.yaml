@@ -1,0 +1,52 @@
+# Katalog F.64 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: it_sicherheit.nis2_registrierung
+version: 1
+katalog_nr: F.64
+titel:
+  de: Beim BSI registrieren (NIS2)
+kurz:
+  de: Fällt dein Unternehmen unter NIS2, registrierst du es beim BSI. Die Nachfrist endete am 31.7.2026.
+erklaerung:
+  de: Die Registrierung ist Voraussetzung für die Meldewege bei Sicherheitsvorfällen.
+rechtsgrundlage:
+- BSIG (NIS2UmsuCG)
+kategorie: it_sicherheit
+ausloeser:
+  feld: profil.nis2.betroffen
+  op: ==
+  wert: ja
+  label:
+    de: Dein Unternehmen fällt unter NIS2.
+frist:
+  typ: absolut
+  datum: '2026-07-31'
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Bundesamt für Sicherheit in der Informationstechnik (BSI)
+kanal: portal
+kosten: null
+sanktion:
+  text:
+    de: Bußgelder bis 10 Mio. € bzw. 2 % des Umsatzes sind möglich.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: BSI-Gesetz
+  url: https://www.gesetze-im-internet.de/bsig_2009/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Fundstelle im BSIG nach NIS2-Umsetzung prüfen
+- „Nachfrist“ – was gilt für Unternehmen, die erst später betroffen werden?
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

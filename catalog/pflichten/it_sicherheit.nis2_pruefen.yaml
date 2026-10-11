@@ -1,0 +1,59 @@
+# Katalog F.64 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: it_sicherheit.nis2_pruefen
+version: 1
+katalog_nr: F.64
+titel:
+  de: Prüfen, ob NIS2 für dich gilt
+kurz:
+  de: Kläre, ob dein Unternehmen nach Sektor und Größe unter die NIS2-Regeln fällt.
+erklaerung:
+  de: NIS2 betrifft Unternehmen bestimmter Sektoren ab einer bestimmten Größe. Wer betroffen ist, muss sich beim BSI registrieren
+    und Sicherheitsvorfälle melden. Beantworte die Frage im Profil, sobald du es weißt.
+rechtsgrundlage:
+- NIS2-Richtlinie (EU) 2022/2555
+- BSIG
+kategorie: it_sicherheit
+ausloeser:
+  any:
+  - feld: profil.nis2.betroffen
+    op: nicht_vorhanden
+    label:
+      de: Du hast noch nicht angegeben, ob NIS2 für dich gilt.
+  - feld: profil.nis2.betroffen
+    op: ==
+    wert: unklar
+    label:
+      de: Du bist unsicher, ob NIS2 für dich gilt.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Hilfe beim BSI
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Ohne diese Klärung bleibt offen, ob Registrierung und Meldepflichten gelten.
+  schwere: mittel
+automatisierung: hinweis
+aktion:
+  art: formular
+  ziel: onboarding.daten
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: NIS2-Richtlinie
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32022L2555
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Sektoren und Größenschwellen stehen nicht in der Spezifikation – als Betroffenheitscheck fachlich ergänzen
+- Vorbereitender Schritt – Darstellung bestätigen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

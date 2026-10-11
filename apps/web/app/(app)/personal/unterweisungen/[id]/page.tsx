@@ -10,7 +10,7 @@ import type { Beschaeftigter } from "../../page";
 export const metadata = { title: "Unterweisung" };
 
 interface Detail {
-  id: string; thema: string; inhalt: string; datum: string; durchgefuehrt_von: string; abgeschlossen_am: string | null; dokument_id: string | null; inhalt_sha256: string;
+  id: string; art: string; thema: string; inhalt: string; datum: string; durchgefuehrt_von: string; abgeschlossen_am: string | null; dokument_id: string | null; inhalt_sha256: string;
   teilnahmen: { beschaeftigter_id: string; vorname: string; nachname: string; bestaetigt_am: string; name_bestaetigt: string }[];
 }
 
@@ -36,6 +36,7 @@ async function loeschen(id: string) {
   redirect("/personal/unterweisungen");
 }
 
+
 export default async function UnterweisungSeite({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ fehler?: string; erledigt?: string }> }) {
   const { id } = await params;
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
@@ -47,7 +48,7 @@ export default async function UnterweisungSeite({ params, searchParams }: { para
   const zeit = (iso: string) => new Intl.DateTimeFormat(s === "de" ? "de-DE" : "en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/Berlin" }).format(new Date(iso));
   return (
     <div className="lesetext space-y-8">
-      <p className="text-klein"><Link href="/personal/unterweisungen" className="verweis">{x.unterweisung.zurueck}</Link></p>
+      <p className="text-klein"><Link href={`/personal/unterweisungen?art=${w.art}`} className="verweis">{w.art === "ki_kompetenz" ? x.schulung.titel : x.unterweisung.zurueck}</Link></p>
       <header>
         <h1 className="text-titel font-bold">{w.thema}</h1>
         <p className="mt-1 text-klein text-tinte-leise">{datumLang(w.datum, s)} · {w.durchgefuehrt_von}</p>

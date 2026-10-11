@@ -1,0 +1,61 @@
+# Katalog F.59 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: datenschutz.betroffenenanfrage
+version: 1
+katalog_nr: F.59
+titel:
+  de: Anfrage einer betroffenen Person beantworten
+kurz:
+  de: Fragt jemand nach seinen Daten oder verlangt Löschung, antwortest du innerhalb eines Monats.
+erklaerung:
+  de: Betroffene haben unter anderem Rechte auf Auskunft, Berichtigung, Löschung und Widerspruch. Amtlos zeigt die Frist ab
+    Eingang und führt die Anfrage bis zur Antwort.
+rechtsgrundlage:
+- Art. 12 Abs. 3 DSGVO
+- Art. 15–22 DSGVO
+kategorie: datenschutz
+ausloeser:
+  ereignis: betroffenenanfrage
+  op: eingetreten
+  label:
+    de: Eine betroffene Person hat eine Anfrage gestellt.
+frist:
+  typ: relativ
+  bezug:
+    ereignis: betroffenenanfrage
+  versatz: P1M
+  zeitpunkt: spaetestens
+  je_ereignis: true
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+aktion:
+  art: link
+  ziel: app.betroffenenanfragen
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: DSGVO Art. 12
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679
+  abgerufen: null
+fachlich_zu_pruefen:
+- Verlängerung um zwei Monate bei komplexen Anfragen (Art. 12 Abs. 3 Satz 2) abbilden?
+- Mehrere Anfragen am selben Tag ergeben eine Instanz (T-15)
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

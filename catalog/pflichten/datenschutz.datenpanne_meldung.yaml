@@ -1,0 +1,60 @@
+# Katalog F.60 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: datenschutz.datenpanne_meldung
+version: 1
+katalog_nr: F.60
+titel:
+  de: Datenpanne der Aufsichtsbehörde melden
+kurz:
+  de: Bei einer Datenpanne meldest du sie binnen 72 Stunden der Datenschutz-Aufsichtsbehörde.
+erklaerung:
+  de: Die Frist beginnt, sobald du von der Panne erfährst. Keine Meldung ist nötig, wenn voraussichtlich kein Risiko für die
+    Betroffenen besteht – das entscheidest und dokumentierst du. Amtlos zeigt einen Countdown und erstellt einen Meldeentwurf.
+rechtsgrundlage:
+- Art. 33 DSGVO
+kategorie: datenschutz
+ausloeser:
+  ereignis: datenpanne
+  op: eingetreten
+  label:
+    de: Du hast eine Datenpanne entdeckt.
+frist:
+  typ: relativ
+  bezug:
+    ereignis: datenpanne
+  versatz: P3D
+  zeitpunkt: spaetestens
+  je_ereignis: true
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Datenschutz-Aufsichtsbehörde des Landes
+kanal: portal
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: dokument_generator
+aktion:
+  art: link
+  ziel: app.datenpanne
+  nachweis_erforderlich: true
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: DSGVO Art. 33
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679
+  abgerufen: null
+fachlich_zu_pruefen:
+- 72 Stunden tagesgenau als 3 Tage ab dem Tag der Entdeckung umgesetzt; der Countdown in der App rechnet stundengenau – bestätigen
+- Benachrichtigung der Betroffenen bei hohem Risiko (Art. 34) als eigene Pflicht?
+- Zuständige Aufsichtsbehörde je Land
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

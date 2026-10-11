@@ -238,6 +238,28 @@ select set_config('amtlos.unternehmen_id', :'u2', false);
 select pg_temp.ok((select count(*) = 0 from app.gefaehrdungsbeurteilung) and (select count(*) = 0 from app.arbeitsmittel) and (select count(*) = 0 from app.gefahrstoff), 'Arbeitsschutzdaten sind mandantengetrennt');
 reset role;
 
+-- ---------- Datenschutz (0010) ----------
+set role api_user;
+select set_config('amtlos.konto_id', :'anna_konto_anmelden', false);
+select set_config('amtlos.unternehmen_id', :'u1', false);
+insert into app.datenpanne (unternehmen_id, entdeckt_am, beschreibung) values (:'u1', '2026-11-01 10:00+01', 'USB-Stick verloren') returning id as dp1 \gset
+select pg_temp.erwarte_fehler(format($$update app.datenpanne set risiko = 'kein_risiko' where id = %L$$, :'dp1'), 'check constraint');
+select pg_temp.ok(true, '„Kein Risiko“ nur mit Begründung');
+select pg_temp.erwarte_fehler(format($$update app.datenpanne set entdeckt_am = entdeckt_am + interval '1 day' where id = %L$$, :'dp1'), 'datenpanne_unveraenderlich');
+select pg_temp.ok(true, 'Zeitpunkt der Entdeckung ist nicht änderbar');
+update app.datenpanne set risiko = 'risiko', gemeldet_am = now(), abgeschlossen_am = now() where id = :'dp1';
+select pg_temp.erwarte_fehler(format($$update app.datenpanne set beschreibung = 'x' where id = %L$$, :'dp1'), 'datenpanne_unveraenderlich');
+select pg_temp.erwarte_fehler(format($$delete from app.datenpanne where id = %L$$, :'dp1'), 'permission denied');
+select pg_temp.ok(true, 'Abgeschlossene Datenpannen sind unveränderlich und nicht löschbar');
+select pg_temp.erwarte_fehler(format($$insert into app.betroffenenanfrage (unternehmen_id, eingang_am, art, person, frist_am, erledigt_am) values (%L, '2026-11-02', 'auskunft', 'X', '2026-12-02', '2026-11-01')$$, :'u1'), 'check constraint');
+select pg_temp.ok(true, 'Antwort nicht vor dem Eingang');
+select pg_temp.erwarte_fehler(format($$insert into app.unterweisung (unternehmen_id, thema, inhalt, datum, durchgefuehrt_von, inhalt_sha256, art) values (%L, 't', 'i', '2026-11-01', 'A', '\x00'::bytea, 'erste_hilfe')$$, :'u1'), 'check constraint');
+select pg_temp.ok(true, 'Schulungsart nur aus der festen Liste');
+select set_config('amtlos.konto_id', :'ben_konto_anmelden', false);
+select set_config('amtlos.unternehmen_id', :'u2', false);
+select pg_temp.ok((select count(*) = 0 from app.datenpanne) and (select count(*) = 0 from app.verarbeitung) and (select count(*) = 0 from app.betroffenenanfrage), 'Datenschutzdaten sind mandantengetrennt');
+reset role;
+
 -- ---------- Audit ----------
 select pg_temp.ok((select count(*) > 10 from audit.ereignis), 'Audit protokolliert Änderungen');
 select pg_temp.ok((select bool_and(vorgaenger_hash is not null) from audit.ereignis where id > (select min(id) from audit.ereignis)), 'Hash-Kette lückenlos');

@@ -1,0 +1,13 @@
+persona: grenzfall
+beschreibung: 20 Beschäftigte ohne Zählung nach § 38 BDSG – offen (Angabe/Prüfung fehlt)
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: "2018-01-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.beschaeftigte.gesamt: 20
+  profil.datenverarbeitung.arten: [kundendaten]
+  profil.bundesland: BY
+  profil.gemeinde_ags: "09162000"
+erwartet:
+  datenschutz.dsb: unbekannt

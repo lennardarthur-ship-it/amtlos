@@ -1,0 +1,15 @@
+persona: grenzfall
+beschreibung: 19 Beschäftigte (unter jeder Zählweise unter 20) – Datenschutzbeauftragter gilt nicht; ab 20 hängt es von der Zählweise ab (G-05)
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: "2018-01-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.beschaeftigte.gesamt: 19
+  profil.datenverarbeitung.arten: [kundendaten]
+  profil.bundesland: BY
+  profil.gemeinde_ags: "09162000"
+erwartet:
+  datenschutz.dsb: gilt_nicht
+  datenschutz.dsb_streichung: gilt_nicht
+  datenschutz.vvt: gilt

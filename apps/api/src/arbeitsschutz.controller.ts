@@ -9,6 +9,9 @@ import { ABLAGE } from "./finanzen.controller.js";
 import { pruefe, uebersetzeDbFehler } from "./hilfen.js";
 import { WARTESCHLANGE } from "./kern.controller.js";
 import { profilNachziehen } from "./profil-sync.js";
+import { plusMonate } from "./datum.js";
+
+export { plusMonate };
 
 const SCHREIBEN = ["inhaber", "admin", "steuerberater"] as const;
 const Uuid = z.string().uuid();
@@ -43,15 +46,6 @@ const Gefahrstoff = z
   .strict();
 
 interface Datei { originalname: string; mimetype: string; buffer: Buffer; size: number }
-
-/** Monate addieren, Monatsende beachten (31.1. + 1 Monat = 28./29.2.). */
-export function plusMonate(datum: string, monate: number): string {
-  const [j, m, t] = datum.split("-").map(Number) as [number, number, number];
-  const ziel = new Date(Date.UTC(j, m - 1 + monate, 1));
-  const letzter = new Date(Date.UTC(ziel.getUTCFullYear(), ziel.getUTCMonth() + 1, 0)).getUTCDate();
-  ziel.setUTCDate(Math.min(t, letzter));
-  return ziel.toISOString().slice(0, 10);
-}
 
 /**
  * Arbeitsschutz-Dokumentation (Spezifikation 4 E, 6.4): Gefährdungsbeurteilung, Prüfung elektrischer Arbeitsmittel,

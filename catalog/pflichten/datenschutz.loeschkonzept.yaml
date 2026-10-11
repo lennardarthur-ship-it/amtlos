@@ -1,0 +1,66 @@
+# Katalog F.58 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: datenschutz.loeschkonzept
+version: 1
+katalog_nr: F.58
+titel:
+  de: Löschkonzept festlegen
+kurz:
+  de: Du legst fest, wann welche Daten gelöscht werden – unter Beachtung der Aufbewahrungsfristen.
+erklaerung:
+  de: Daten dürfen nur so lange gespeichert werden, wie es für den Zweck nötig ist. Gesetzliche Aufbewahrungspflichten (z.
+    B. für Rechnungen) gehen vor.
+rechtsgrundlage:
+- Art. 5 Abs. 1 lit. e DSGVO
+- Art. 17 DSGVO
+kategorie: datenschutz
+ausloeser:
+  any:
+  - feld: profil.datenverarbeitung.arten
+    op: enthaelt_eines
+    wert:
+    - kundendaten
+    - beschaeftigtendaten
+    - gesundheitsdaten
+    - videoueberwachung
+    - newsletter
+    - tracking
+    label:
+      de: Du verarbeitest Daten über Menschen (z. B. Kunden oder Beschäftigte).
+  - feld: abgeleitet.hat_beschaeftigte
+    op: ==
+    wert: true
+    label:
+      de: Du beschäftigst mindestens eine Person.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: niedrig
+automatisierung: hinweis
+aktion:
+  art: link
+  ziel: app.vvt
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: DSGVO Art. 17
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Zusammenspiel mit Aufbewahrungsfristen (C.32, G-21) erläutern
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

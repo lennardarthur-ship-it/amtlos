@@ -223,6 +223,61 @@ async function rundgang(farbschema, breite) {
     }
   }
 
+  // Datenschutz: Notfallknopf bis zum Abschluss, VVT aus Vorschlag, TOM, Dienstleister, Anfrage, Dokumentation ablegen
+  if (farbschema === "light") {
+    await p.goto(`${B}/datenschutz`);
+    await barrierefrei(p, name("datenschutz"));
+    await Promise.all([p.waitForURL(/\/datenschutz\/pannen/), p.getByRole("link", { name: "Datenpanne melden" }).click()]);
+    await p.fill("#beschreibung", "Laptop im Zug verloren");
+    await Promise.all([p.waitForURL(/pannen\/[0-9a-f-]{36}/), p.getByRole("button", { name: "Jetzt erfassen" }).click()]);
+    pruefe(await p.getByRole("timer").count(), `${name("datenpanne")}: kein Countdown`);
+    await p.check('input[name="risiko"][value="risiko"]');
+    await p.getByRole("button", { name: "Speichern" }).click();
+    await p.getByRole("button", { name: "Eintragen" }).waitFor({ timeout: 10000 });
+    const entwurf = await p.request.get(`${p.url().split("?")[0]}/meldeentwurf`);
+    pruefe(entwurf.ok() && (await entwurf.body()).subarray(0, 5).toString() === "%PDF-", `${name("datenpanne")}: Meldeentwurf nicht abrufbar`);
+    await barrierefrei(p, name("datenpanne"));
+    await p.getByRole("button", { name: "Eintragen" }).click();
+    await p.getByText(/Gemeldet am/).waitFor({ timeout: 10000 });
+    await Promise.all([p.waitForURL(/erledigt=/), p.getByRole("button", { name: "Abschließen und dokumentieren" }).click()]);
+    await barrierefrei(p, name("datenpanne-abgeschlossen"));
+    await p.goto(`${B}/datenschutz/vvt`);
+    await p.getByRole("button", { name: /^\+ / }).first().click();
+    await p.getByText("Angaben fehlen").first().waitFor({ timeout: 10000 }).catch(() => pruefe(false, `${name("vvt")}: Vorschlag nicht angelegt`));
+    await barrierefrei(p, name("vvt"));
+    await p.goto(`${B}/datenschutz/tom`);
+    await p.fill("#massnahme", "Festplatten verschlüsselt");
+    await p.fill("#umgesetzt_am", "2026-10-01");
+    await p.getByRole("button", { name: "Erfassen" }).click();
+    await p.getByText("Festplatten verschlüsselt").waitFor({ timeout: 10000 });
+    await barrierefrei(p, name("tom"));
+    await p.goto(`${B}/datenschutz/dienstleister`);
+    await p.fill("#name", "Mail-Tool GmbH");
+    await p.getByRole("button", { name: "Erfassen" }).click();
+    await p.getByText("AVV fehlt").waitFor({ timeout: 10000 });
+    await barrierefrei(p, name("dienstleister"));
+    await p.goto(`${B}/datenschutz/anfragen`);
+    await p.fill("#person", "M. Muster");
+    await p.getByRole("button", { name: "Erfassen" }).click();
+    await p.getByText(/Antwort bis/).waitFor({ timeout: 10000 });
+    await barrierefrei(p, name("anfragen"));
+    await p.locator("summary", { hasText: "Als beantwortet markieren" }).click();
+    await p.locator('input[name="antwort"]').fill("Auskunft erteilt");
+    await p.getByRole("button", { name: "Als beantwortet markieren" }).click();
+    await p.getByText(/beantwortet am/).waitFor({ timeout: 10000 }).catch(() => pruefe(false, `${name("anfragen")}: nicht beantwortet`));
+    await p.goto(`${B}/datenschutz`);
+    await Promise.all([p.waitForURL(/abgelegt=|fehler=/), p.getByRole("button", { name: "Stand ablegen" }).click()]);
+    pruefe(p.url().includes("abgelegt="), `${name("datenschutz")}: Dokumentation nicht abgelegt (${p.url()})`);
+    await p.goto(`${B}/personal/unterweisungen?art=ki_kompetenz`);
+    pruefe((await p.locator("#u-inhalt").inputValue()).includes("KI"), `${name("ki-schulung")}: Vorlage fehlt`);
+    await barrierefrei(p, name("ki-schulung"));
+  } else {
+    for (const seite of ["datenschutz", "datenschutz/vvt", "datenschutz/tom", "datenschutz/dienstleister", "datenschutz/anfragen", "datenschutz/pannen"]) {
+      await p.goto(`${B}/${seite}`);
+      await barrierefrei(p, name(seite.replaceAll("/", "-")));
+    }
+  }
+
   // Team: einladen, Link nur einmal sichtbar; Eingeladene meldet sich über den Link an und nimmt an
   const gast = `${kennung}-gast-${farbschema}`;
   await p.goto(`${B}/team`);

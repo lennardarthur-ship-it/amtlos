@@ -19,6 +19,7 @@
     { "typ": "gesellschafterwechsel", "beschreibung": "Änderung im Gesellschafterkreis", "payload": ["wirksam_ab"] },
     { "typ": "datenpanne", "beschreibung": "Verletzung des Schutzes personenbezogener Daten bekannt geworden", "payload": ["bekannt_seit"] },
     { "typ": "unterweisung_durchgefuehrt", "beschreibung": "Unterweisung durchgeführt (aus dem Unterweisungsmodul)", "payload": ["datum", "thema"] },
+    { "typ": "betroffenenanfrage", "beschreibung": "Eine betroffene Person macht Rechte nach der DSGVO geltend (Auskunft, Löschung usw.)", "payload": ["art"] },
     { "typ": "betriebsaufgabe", "beschreibung": "Aufgabe der Tätigkeit", "payload": ["datum"] }
   ]
 }

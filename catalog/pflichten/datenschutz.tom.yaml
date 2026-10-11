@@ -1,0 +1,71 @@
+# Katalog F.58 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: datenschutz.tom
+version: 1
+katalog_nr: F.58
+titel:
+  de: Technische und organisatorische Maßnahmen festlegen
+kurz:
+  de: Du legst fest und dokumentierst, wie du die Daten schützt, zum Beispiel mit Verschlüsselung, Zugriffsrechten und Datensicherung.
+erklaerung:
+  de: Die Maßnahmen (TOM) müssen dem Risiko angemessen sein. Amtlos gliedert sie nach den Schutzzielen der DSGVO; du trägst
+    ein, was umgesetzt ist.
+begriffe:
+- begriff:
+    de: TOM
+  erklaerung:
+    de: Technische und organisatorische Maßnahmen zum Schutz personenbezogener Daten.
+rechtsgrundlage:
+- Art. 32 DSGVO
+kategorie: datenschutz
+ausloeser:
+  any:
+  - feld: profil.datenverarbeitung.arten
+    op: enthaelt_eines
+    wert:
+    - kundendaten
+    - beschaeftigtendaten
+    - gesundheitsdaten
+    - videoueberwachung
+    - newsletter
+    - tracking
+    label:
+      de: Du verarbeitest Daten über Menschen (z. B. Kunden oder Beschäftigte).
+  - feld: abgeleitet.hat_beschaeftigte
+    op: ==
+    wert: true
+    label:
+      de: Du beschäftigst mindestens eine Person.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: dokument_generator
+aktion:
+  art: link
+  ziel: app.tom
+  nachweis_erforderlich: true
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: DSGVO Art. 32
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Gliederung nach Art. 32 Abs. 1 DSGVO – Wortlaut prüfen
+- Vorschlagsliste typischer Maßnahmen für Kleinbetriebe fachlich erstellen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

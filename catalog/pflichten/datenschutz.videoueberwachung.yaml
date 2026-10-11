@@ -1,0 +1,52 @@
+# Katalog F.62 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: datenschutz.videoueberwachung
+version: 1
+katalog_nr: F.62
+titel:
+  de: Videoüberwachung kennzeichnen und begründen
+kurz:
+  de: Wenn du Videoüberwachung einsetzt, machst du sie erkennbar und dokumentierst den Zweck.
+erklaerung:
+  de: Videoüberwachung braucht einen berechtigten Zweck, muss erkennbar sein (Hinweisschild) und gehört ins Verzeichnis der
+    Verarbeitungstätigkeiten.
+rechtsgrundlage:
+- § 4 BDSG
+- Art. 6, 13 DSGVO
+kategorie: datenschutz
+ausloeser:
+  feld: profil.datenverarbeitung.arten
+  op: enthaelt
+  wert: videoueberwachung
+  label:
+    de: Du setzt Videoüberwachung ein.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Bundesdatenschutzgesetz § 4
+  url: https://www.gesetze-im-internet.de/bdsg_2018/__4.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Speicherdauer der Aufnahmen fachlich ergänzen
+- 'Beschäftigte: Mitbestimmung/Information'
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

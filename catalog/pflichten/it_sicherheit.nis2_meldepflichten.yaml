@@ -1,0 +1,49 @@
+# Katalog F.64 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: it_sicherheit.nis2_meldepflichten
+version: 1
+katalog_nr: F.64
+titel:
+  de: Sicherheitsvorfälle melden (NIS2)
+kurz:
+  de: Erhebliche Sicherheitsvorfälle meldest du dem BSI in festen Stufen und Fristen.
+erklaerung:
+  de: Wer unter NIS2 fällt, muss erhebliche Sicherheitsvorfälle melden und Risikomanagement-Maßnahmen umsetzen. Die Geschäftsleitung
+    haftet für die Umsetzung.
+rechtsgrundlage:
+- BSIG (NIS2UmsuCG)
+kategorie: it_sicherheit
+ausloeser:
+  feld: profil.nis2.betroffen
+  op: ==
+  wert: ja
+  label:
+    de: Dein Unternehmen fällt unter NIS2.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: BSI
+kanal: portal
+kosten: null
+sanktion:
+  text:
+    de: Bußgelder bis 10 Mio. € bzw. 2 % des Umsatzes sind möglich.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: BSI-Gesetz
+  url: https://www.gesetze-im-internet.de/bsig_2009/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Meldestufen und Fristen stehen nicht in der Spezifikation – fachlich ergänzen
+- Haftung und Schulungspflicht der Geschäftsleitung als eigene Pflicht?
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

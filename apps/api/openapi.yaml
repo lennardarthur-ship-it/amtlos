@@ -30,6 +30,7 @@ tags:
   - name: Finanzen
   - name: Personal
   - name: Arbeitsschutz
+  - name: Datenschutz
 
 paths:
   /v1/gesundheit:
@@ -564,8 +565,8 @@ paths:
   /v1/unterweisungen:
     get:
       tags: [Personal]
-      summary: Unterweisungen mit Zahl der Bestätigungen
-      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      summary: Unterweisungen und Schulungen mit Zahl der Bestätigungen
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: art, in: query, required: false, schema: { type: string, enum: [arbeitsschutz, ki_kompetenz, datenschutz] } }]
       responses:
         "200": { description: OK }
     post:
@@ -585,6 +586,7 @@ paths:
                 inhalt: { type: string, maxLength: 20000 }
                 datum: { type: string, format: date }
                 durchgefuehrt_von: { type: string }
+                art: { type: string, enum: [arbeitsschutz, ki_kompetenz, datenschutz], default: arbeitsschutz }
       responses:
         "201": { description: Angelegt }
 
@@ -933,6 +935,268 @@ paths:
       responses:
         "200": { description: PDF, content: { application/pdf: { schema: { type: string, format: binary } } } }
 
+  /v1/verarbeitungen:
+    get:
+      tags: [Datenschutz]
+      summary: Verzeichnis der Verarbeitungstätigkeiten
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK }
+    post:
+      tags: [Datenschutz]
+      summary: Verarbeitungstätigkeit anlegen
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/VerarbeitungEingabe" } } } }
+      responses:
+        "201": { description: Angelegt }
+
+  /v1/verarbeitungen/vorschlaege:
+    get:
+      tags: [Datenschutz]
+      summary: Vorschläge aus dem Profil (nur Bezeichnungen, noch nicht angelegte)
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: array, items: { type: string } } } } }
+
+  /v1/verarbeitungen/{id}:
+    put:
+      tags: [Datenschutz]
+      summary: Verarbeitungstätigkeit ändern oder stilllegen (aktiv false)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { allOf: [{ $ref: "#/components/schemas/VerarbeitungEingabe" }, { type: object, properties: { aktiv: { type: boolean } } }] } } } }
+      responses:
+        "200": { description: Geändert }
+        "404": { description: Nicht gefunden }
+
+  /v1/tom:
+    get:
+      tags: [Datenschutz]
+      summary: Technische und organisatorische Maßnahmen
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK }
+    post:
+      tags: [Datenschutz]
+      summary: Maßnahme erfassen
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/TomEingabe" } } } }
+      responses:
+        "201": { description: Erfasst }
+
+  /v1/tom/schutzziele:
+    get:
+      tags: [Datenschutz]
+      summary: Schutzziele (Gliederung nach Art. 32 Abs. 1 DSGVO)
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK }
+
+  /v1/tom/{id}:
+    put:
+      tags: [Datenschutz]
+      summary: Maßnahme ändern
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/TomEingabe" } } } }
+      responses:
+        "200": { description: Geändert }
+        "404": { description: Nicht gefunden }
+    delete:
+      tags: [Datenschutz]
+      summary: Maßnahme löschen
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "204": { description: Gelöscht }
+        "404": { description: Nicht gefunden }
+
+  /v1/dienstleister:
+    get:
+      tags: [Datenschutz]
+      summary: Dienstleister mit Status des Auftragsverarbeitungsvertrags
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK }
+    post:
+      tags: [Datenschutz]
+      summary: Dienstleister erfassen; setzt bei Auftragsverarbeitung die Profilangabe
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/DienstleisterEingabe" } } } }
+      responses:
+        "201": { description: Erfasst }
+
+  /v1/dienstleister/{id}:
+    put:
+      tags: [Datenschutz]
+      summary: Dienstleister ändern
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/DienstleisterEingabe" } } } }
+      responses:
+        "200": { description: Geändert }
+        "404": { description: Nicht gefunden }
+
+  /v1/dienstleister/{id}/avv:
+    post:
+      tags: [Datenschutz]
+      summary: Auftragsverarbeitungsvertrag (PDF) ablegen
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { multipart/form-data: { schema: { type: object, required: [datei], properties: { datei: { type: string, format: binary } } } } } }
+      responses:
+        "201": { description: Abgelegt }
+        "422": { description: Kein PDF }
+
+  /v1/dienstleister/{id}/beenden:
+    post:
+      tags: [Datenschutz]
+      summary: Zusammenarbeit beendet (bleibt im Verlauf)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [datum], properties: { datum: { type: string, format: date } } } } } }
+      responses:
+        "201": { description: Beendet }
+        "404": { description: Nicht gefunden }
+
+  /v1/datenschutz/dokumentation:
+    get:
+      tags: [Datenschutz]
+      summary: Verzeichnis der Verarbeitungstätigkeiten mit TOM und Dienstleistern als PDF (aktueller Stand)
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: PDF, content: { application/pdf: { schema: { type: string, format: binary } } } }
+    post:
+      tags: [Datenschutz]
+      summary: Stand als Dokument ablegen; erledigt VVT, TOM und AVV, soweit vollständig
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "201": { description: Abgelegt, content: { application/json: { schema: { type: object, properties: { dokument_id: { type: string }, erledigte_pflichten: { type: integer } } } } } }
+        "422": { description: Keine Verarbeitung erfasst }
+
+  /v1/betroffenenanfragen:
+    get:
+      tags: [Datenschutz]
+      summary: Anfragen Betroffener mit Fristuhr (Tage bis zur Frist)
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK }
+    post:
+      tags: [Datenschutz]
+      summary: Eingang erfassen – Frist ein Monat, meldet das Ereignis
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [eingang_am, art, person]
+              properties:
+                eingang_am: { type: string, format: date }
+                art: { type: string, enum: [auskunft, berichtigung, loeschung, einschraenkung, uebertragbarkeit, widerspruch, sonstiges] }
+                person: { type: string }
+                notiz: { type: [string, "null"] }
+      responses:
+        "201": { description: Erfasst }
+        "422": { description: Eingabe ungültig }
+
+  /v1/betroffenenanfragen/{id}/erledigen:
+    post:
+      tags: [Datenschutz]
+      summary: Anfrage beantwortet – erledigt die Pflicht des Eingangstags
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [datum, antwort], properties: { datum: { type: string, format: date }, antwort: { type: string } } } } } }
+      responses:
+        "201": { description: Erledigt }
+        "409": { description: Schon beantwortet }
+
+  /v1/datenpannen:
+    get:
+      tags: [Datenschutz]
+      summary: Datenpannen mit 72-Stunden-Frist
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK }
+    post:
+      tags: [Datenschutz]
+      summary: Notfallknopf – Panne sofort erfassen (alle Mitglieder)
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [beschreibung], properties: { entdeckt_am: { type: string, format: date-time }, beschreibung: { type: string } } } } } }
+      responses:
+        "201": { description: Erfasst }
+        "422": { description: Eingabe ungültig }
+
+  /v1/datenpannen/{id}:
+    get:
+      tags: [Datenschutz]
+      summary: Datenpanne
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "200": { description: OK }
+        "404": { description: Nicht gefunden }
+    put:
+      tags: [Datenschutz]
+      summary: Angaben und Risikobewertung ergänzen (Begründung bei „kein Risiko“ Pflicht)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [beschreibung]
+              properties:
+                beschreibung: { type: string }
+                datenarten: { type: string }
+                betroffene_anzahl: { type: string }
+                folgen: { type: string }
+                massnahmen: { type: string }
+                risiko: { type: [string, "null"], enum: [kein_risiko, risiko, hohes_risiko, null] }
+                begruendung: { type: [string, "null"] }
+      responses:
+        "200": { description: Geändert }
+        "404": { description: Nicht offen }
+        "422": { description: Begründung fehlt }
+
+  /v1/datenpannen/{id}/gemeldet:
+    post:
+      tags: [Datenschutz]
+      summary: Meldung an die Aufsichtsbehörde eintragen
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [gemeldet_am], properties: { gemeldet_am: { type: string, format: date-time }, aktenzeichen: { type: [string, "null"] } } } } } }
+      responses:
+        "201": { description: Eingetragen }
+        "404": { description: Nicht offen oder schon gemeldet }
+
+  /v1/datenpannen/{id}/meldeentwurf:
+    get:
+      tags: [Datenschutz]
+      summary: Meldeentwurf als PDF (Gliederung nach Art. 33 Abs. 3 DSGVO)
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "200": { description: PDF, content: { application/pdf: { schema: { type: string, format: binary } } } }
+        "404": { description: Nicht gefunden }
+
+  /v1/datenpannen/{id}/abschliessen:
+    post:
+      tags: [Datenschutz]
+      summary: Abschließen – Dokumentation ablegen, Meldepflicht erledigen
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "201": { description: Abgeschlossen }
+        "409": { description: Schon abgeschlossen }
+        "422": { description: Bewertung oder Meldung fehlt }
+
   /v1/glossar:
     get:
       tags: [Pflichten]
@@ -1111,6 +1375,36 @@ components:
           schema: { type: object, properties: { meldung: { type: string }, fehler: { type: array, items: { type: object, properties: { feld: { type: string }, meldung: { type: string } } } } } }
 
   schemas:
+    VerarbeitungEingabe:
+      type: object
+      required: [bezeichnung]
+      properties:
+        bezeichnung: { type: string }
+        zweck: { type: string }
+        rechtsgrundlage: { type: string }
+        betroffene: { type: string }
+        datenarten: { type: string }
+        empfaenger: { type: string }
+        drittland: { type: string }
+        loeschfrist: { type: string }
+        tom_hinweis: { type: string }
+    TomEingabe:
+      type: object
+      required: [schutzziel, massnahme]
+      properties:
+        schutzziel: { type: string, enum: [pseudonymisierung_verschluesselung, vertraulichkeit, integritaet, verfuegbarkeit_belastbarkeit, wiederherstellung, ueberpruefung, sonstiges] }
+        massnahme: { type: string }
+        umgesetzt_am: { type: [string, "null"], format: date }
+        verantwortlich: { type: [string, "null"] }
+    DienstleisterEingabe:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
+        leistung: { type: string }
+        auftragsverarbeitung: { type: boolean, default: true }
+        avv_datum: { type: [string, "null"], format: date }
+        drittland: { type: string }
     GefaehrdungsbeurteilungEingabe:
       type: object
       required: [arbeitsbereich, beurteilt_von, datum]

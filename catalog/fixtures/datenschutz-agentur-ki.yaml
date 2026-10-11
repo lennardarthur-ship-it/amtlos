@@ -1,0 +1,33 @@
+persona: agentur
+beschreibung: Agentur (GmbH, 12 Beschäftigte) mit Kunden- und Beschäftigtendaten, Newsletter, Tracking, Dienstleistern und eigenem KI-Produkt; NIS2 nicht betroffen
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: "2020-03-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.beschaeftigte.gesamt: 12
+  profil.datenverarbeitung.arten: [kundendaten, beschaeftigtendaten, newsletter, tracking]
+  profil.datenschutz.dienstleister: true
+  profil.ki.nutzung: true
+  profil.ki.eigene_produkte: true
+  profil.nis2.betroffen: nein
+  profil.bundesland: BE
+  profil.gemeinde_ags: "11000000"
+erwartet:
+  datenschutz.vvt: gilt
+  datenschutz.tom: gilt
+  datenschutz.avv: gilt
+  datenschutz.informationspflichten: gilt
+  datenschutz.loeschkonzept: gilt
+  datenschutz.dsb: gilt_nicht
+  datenschutz.dsfa: gilt_nicht
+  datenschutz.videoueberwachung: gilt_nicht
+  datenschutz.beschaeftigtendaten: gilt
+  online.cookie_einwilligung: gilt
+  it_sicherheit.nis2_pruefen: gilt_nicht
+  it_sicherheit.nis2_registrierung: gilt_nicht
+  ki.kompetenz: gilt
+  ki.transparenz: gilt
+  ki.hochrisiko: gilt
+  datenschutz.betroffenenanfrage: gilt_nicht
+  datenschutz.datenpanne_meldung: gilt_nicht

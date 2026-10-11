@@ -390,6 +390,23 @@
       "ab": 2
     },
     {
+      "pfad": "profil.datenschutz.dienstleister",
+      "typ": "bool",
+      "herleitung": "Onboarding: externe Dienstleister, die personenbezogene Daten verarbeiten (Auftragsverarbeitung); auch aus der Dienstleisterliste",
+      "ab": 6
+    },
+    {
+      "pfad": "profil.nis2.betroffen",
+      "typ": "enum",
+      "werte": [
+        "ja",
+        "nein",
+        "unklar"
+      ],
+      "herleitung": "Onboarding: Ergebnis des NIS2-Betroffenheitschecks",
+      "ab": 6
+    },
+    {
       "pfad": "profil.gesellschafter.anzahl",
       "typ": "ganzzahl",
       "herleitung": "Onboarding / Cap Table",

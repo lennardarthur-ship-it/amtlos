@@ -1,0 +1,70 @@
+# Katalog F.58 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: datenschutz.vvt
+version: 1
+katalog_nr: F.58
+titel:
+  de: Verzeichnis der Verarbeitungstätigkeiten führen
+kurz:
+  de: Du führst ein Verzeichnis, welche Daten über Menschen du wofür verarbeitest.
+erklaerung:
+  de: Das Verzeichnis beschreibt je Verarbeitung Zweck, betroffene Personen, Datenarten, Empfänger und Löschfristen. Amtlos
+    hilft beim Anlegen und erzeugt das Verzeichnis als PDF.
+begriffe:
+- begriff:
+    de: Verarbeitungstätigkeit
+  erklaerung:
+    de: Ein Vorgang, bei dem du Daten über Menschen nutzt, z. B. Kundenverwaltung oder Lohnabrechnung.
+rechtsgrundlage:
+- Art. 30 DSGVO
+kategorie: datenschutz
+ausloeser:
+  any:
+  - feld: profil.datenverarbeitung.arten
+    op: enthaelt_eines
+    wert:
+    - kundendaten
+    - beschaeftigtendaten
+    - gesundheitsdaten
+    - videoueberwachung
+    - newsletter
+    - tracking
+    label:
+      de: Du verarbeitest Daten über Menschen (z. B. Kunden oder Beschäftigte).
+  - feld: abgeleitet.hat_beschaeftigte
+    op: ==
+    wert: true
+    label:
+      de: Du beschäftigst mindestens eine Person.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: dokument_generator
+aktion:
+  art: link
+  ziel: app.vvt
+  nachweis_erforderlich: true
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: DSGVO Art. 30
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Ausnahme nach Art. 30 Abs. 5 DSGVO (unter 250 Beschäftigte) – wann greift sie? Darstellung prüfen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

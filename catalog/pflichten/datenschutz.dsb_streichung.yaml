@@ -1,0 +1,58 @@
+# Katalog F.61 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: datenschutz.dsb_streichung
+version: 1
+katalog_nr: F.61
+titel:
+  de: Wegfall der Schwelle nach § 38 BDSG (geplant)
+kurz:
+  de: Die Bundesregierung plant, die Benennungspflicht ab 20 Personen nach § 38 BDSG zu streichen.
+erklaerung:
+  de: Geplant bis Ende 2026, noch kein Gesetz. Die Pflichten nach Art. 37 DSGVO blieben bestehen.
+rechtsgrundlage:
+- § 38 BDSG
+kategorie: datenschutz
+ausloeser:
+  all:
+  - feld: profil.beschaeftigte.gesamt
+    op: '>='
+    wert:
+      regelwert: datenschutz.dsb.schwelle_personen
+  - feld: abgeleitet.beschaeftigte.zaehlung_bdsg38
+    op: '>='
+    wert:
+      regelwert: datenschutz.dsb.schwelle_personen
+    label:
+      de: Mindestens 20 Personen sind ständig mit automatisierter Datenverarbeitung beschäftigt.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: –
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Keine – geplante Erleichterung.
+  schwere: niedrig
+automatisierung: hinweis
+status_recht: geplant
+radar:
+  wahrscheinlichkeit: mittel
+  erwartet_ab: '2026-12-31'
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Bundesdatenschutzgesetz § 38
+  url: https://www.gesetze-im-internet.de/bdsg_2018/__38.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Status offen – Radar
+- Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „mittel“)
+- „bis Ende 2026“ als erwartet ab 31.12.2026 eingetragen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

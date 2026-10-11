@@ -1,0 +1,62 @@
+# Katalog F.58 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: datenschutz.informationspflichten
+version: 1
+katalog_nr: F.58
+titel:
+  de: Über die Datenverarbeitung informieren
+kurz:
+  de: Wenn du Daten erhebst, informierst du die Menschen darüber – etwa in einer Datenschutzerklärung oder einem Informationsblatt.
+erklaerung:
+  de: Die Information nennt unter anderem Zweck, Rechtsgrundlage, Empfänger, Speicherdauer und die Rechte der Betroffenen.
+rechtsgrundlage:
+- Art. 13 DSGVO
+- Art. 14 DSGVO
+kategorie: datenschutz
+ausloeser:
+  any:
+  - feld: profil.datenverarbeitung.arten
+    op: enthaelt_eines
+    wert:
+    - kundendaten
+    - beschaeftigtendaten
+    - gesundheitsdaten
+    - videoueberwachung
+    - newsletter
+    - tracking
+    label:
+      de: Du verarbeitest Daten über Menschen (z. B. Kunden oder Beschäftigte).
+  - feld: abgeleitet.hat_beschaeftigte
+    op: ==
+    wert: true
+    label:
+      de: Du beschäftigst mindestens eine Person.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: dokument_generator
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: DSGVO Art. 13
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Pflichtinhalte als Checkliste fachlich ergänzen
+- Vorlage Datenschutzerklärung (6.4) erst nach Prüfung
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

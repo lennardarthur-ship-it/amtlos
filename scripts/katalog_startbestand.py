@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Erzeugt catalog/pflichten/*.yaml für Katalog A (Gründung) und C (Steuern) aus Spezifikation Abschnitt 4.
+Erzeugt catalog/pflichten/*.yaml für die Kataloge A–F aus Spezifikation Abschnitt 4.
 
 Regeln (E-054, Spezifikation 14.4):
 - Inhalte (Fristen, Beträge, Auslöser) nur aus der Spezifikation.
@@ -957,5 +957,196 @@ pflicht("arbeitsschutz.unfallanzeige", "E.57", "Arbeitsunfall der Berufsgenossen
   [q("Sozialgesetzbuch VII § 193", "sgb_7/__193.html")],
   ["Fristbeginn: Unfalltag oder Kenntnis der AU über drei Tage? bestätigen", "AU-Tage aus dem Ereignis (Payload au_tage) in die Bedingung aufnehmen, sobald Ereignis-Payload auswertbar ist"],
   rg_ergaenzt=True, schwere="hoch")
+
+
+# ============================================================ F. Datenschutz, IT-Sicherheit, KI (Bauabschnitt 6)
+
+DATENARTEN = ["kundendaten", "beschaeftigtendaten", "gesundheitsdaten", "videoueberwachung", "newsletter", "tracking"]
+VERARBEITET = {"any": [v("profil.datenverarbeitung.arten", "enthaelt_eines", DATENARTEN, "Du verarbeitest Daten über Menschen (z. B. Kunden oder Beschäftigte)."), HAT_B]}
+DATENART = lambda art, text: v("profil.datenverarbeitung.arten", "enthaelt", art, text)
+DSGVO = lambda art: q(f"DSGVO Art. {art}", f"https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679")
+KI_VO = q("KI-Verordnung (EU) 2024/1689", "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32024R1689")
+NIS2_JA = v("profil.nis2.betroffen", "==", "ja", "Dein Unternehmen fällt unter NIS2.")
+KI_NUTZT = {"any": [v("profil.ki.nutzung", "==", True, "Ihr nutzt KI-Werkzeuge."), v("profil.ki.eigene_produkte", "==", True, "Ihr bietet eigene KI-Produkte an.")]}
+KI_EIGEN = v("profil.ki.eigene_produkte", "==", True, "Ihr bietet eigene KI-Produkte oder -Funktionen an.")
+
+pflicht("datenschutz.vvt", "F.58", "Verzeichnis der Verarbeitungstätigkeiten führen",
+  "Du führst ein Verzeichnis, welche Daten über Menschen du wofür verarbeitest.",
+  "Das Verzeichnis beschreibt je Verarbeitung Zweck, betroffene Personen, Datenarten, Empfänger und Löschfristen. Amtlos hilft beim Anlegen und erzeugt das Verzeichnis als PDF.",
+  ["Art. 30 DSGVO"], "datenschutz",
+  VERARBEITET, "dauerhaft", "Du selbst", "intern_dokumentieren", "dokument_generator",
+  [DSGVO(30)],
+  ["Ausnahme nach Art. 30 Abs. 5 DSGVO (unter 250 Beschäftigte) – wann greift sie? Darstellung prüfen"], schwere="mittel",
+  begriffe=[("Verarbeitungstätigkeit", "Ein Vorgang, bei dem du Daten über Menschen nutzt, z. B. Kundenverwaltung oder Lohnabrechnung.")],
+  aktion={"art": "link", "ziel": "app.vvt", "nachweis_erforderlich": True})
+
+pflicht("datenschutz.tom", "F.58", "Technische und organisatorische Maßnahmen festlegen",
+  "Du legst fest und dokumentierst, wie du die Daten schützt, zum Beispiel mit Verschlüsselung, Zugriffsrechten und Datensicherung.",
+  "Die Maßnahmen (TOM) müssen dem Risiko angemessen sein. Amtlos gliedert sie nach den Schutzzielen der DSGVO; du trägst ein, was umgesetzt ist.",
+  ["Art. 32 DSGVO"], "datenschutz",
+  VERARBEITET, "dauerhaft", "Du selbst", "intern_dokumentieren", "dokument_generator",
+  [DSGVO(32)],
+  ["Gliederung nach Art. 32 Abs. 1 DSGVO – Wortlaut prüfen", "Vorschlagsliste typischer Maßnahmen für Kleinbetriebe fachlich erstellen"], schwere="mittel",
+  begriffe=[("TOM", "Technische und organisatorische Maßnahmen zum Schutz personenbezogener Daten.")],
+  aktion={"art": "link", "ziel": "app.tom", "nachweis_erforderlich": True})
+
+pflicht("datenschutz.avv", "F.58", "Auftragsverarbeitungsverträge abschließen",
+  "Mit Dienstleistern, die für dich Daten verarbeiten (z. B. Cloud, Lohnbüro, Newsletter-Tool), schließt du einen Auftragsverarbeitungsvertrag.",
+  "Der Vertrag regelt, wie der Dienstleister die Daten nach deinen Weisungen verarbeitet. Amtlos führt die Liste deiner Dienstleister und legt die Verträge ab.",
+  ["Art. 28 DSGVO"], "datenschutz",
+  {"all": [VERARBEITET, v("profil.datenschutz.dienstleister", "==", True, "Du nutzt Dienstleister, die für dich Daten verarbeiten.")]},
+  "dauerhaft", "Du selbst mit dem Dienstleister", "intern_dokumentieren", "hinweis",
+  [DSGVO(28)],
+  ["Abgrenzung Auftragsverarbeitung ↔ eigene Verantwortung (z. B. Steuerberatung) als Hinweis ergänzen"], schwere="mittel",
+  begriffe=[("Auftragsverarbeitung", "Ein Dienstleister verarbeitet Daten in deinem Auftrag und nach deinen Weisungen.")],
+  aktion={"art": "link", "ziel": "app.dienstleister"})
+
+pflicht("datenschutz.informationspflichten", "F.58", "Über die Datenverarbeitung informieren",
+  "Wenn du Daten erhebst, informierst du die Menschen darüber – etwa in einer Datenschutzerklärung oder einem Informationsblatt.",
+  "Die Information nennt unter anderem Zweck, Rechtsgrundlage, Empfänger, Speicherdauer und die Rechte der Betroffenen.",
+  ["Art. 13 DSGVO", "Art. 14 DSGVO"], "datenschutz",
+  VERARBEITET, "dauerhaft", "Du selbst", "intern_dokumentieren", "dokument_generator",
+  [DSGVO(13)],
+  ["Pflichtinhalte als Checkliste fachlich ergänzen", "Vorlage Datenschutzerklärung (6.4) erst nach Prüfung"], schwere="mittel")
+
+pflicht("datenschutz.loeschkonzept", "F.58", "Löschkonzept festlegen",
+  "Du legst fest, wann welche Daten gelöscht werden – unter Beachtung der Aufbewahrungsfristen.",
+  "Daten dürfen nur so lange gespeichert werden, wie es für den Zweck nötig ist. Gesetzliche Aufbewahrungspflichten (z. B. für Rechnungen) gehen vor.",
+  ["Art. 5 Abs. 1 lit. e DSGVO", "Art. 17 DSGVO"], "datenschutz",
+  VERARBEITET, "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
+  [DSGVO(17)],
+  ["Zusammenspiel mit Aufbewahrungsfristen (C.32, G-21) erläutern"], rg_ergaenzt=True, schwere="niedrig",
+  aktion={"art": "link", "ziel": "app.vvt"})
+
+pflicht("datenschutz.betroffenenanfrage", "F.59", "Anfrage einer betroffenen Person beantworten",
+  "Fragt jemand nach seinen Daten oder verlangt Löschung, antwortest du innerhalb eines Monats.",
+  "Betroffene haben unter anderem Rechte auf Auskunft, Berichtigung, Löschung und Widerspruch. Amtlos zeigt die Frist ab Eingang und führt die Anfrage bis zur Antwort.",
+  ["Art. 12 Abs. 3 DSGVO", "Art. 15–22 DSGVO"], "datenschutz",
+  {"ereignis": "betroffenenanfrage", "op": "eingetreten", "label": t("Eine betroffene Person hat eine Anfrage gestellt.")},
+  JE("betroffenenanfrage", "P1M"), "Du selbst", "intern_dokumentieren", "hinweis",
+  [DSGVO(12)],
+  ["Verlängerung um zwei Monate bei komplexen Anfragen (Art. 12 Abs. 3 Satz 2) abbilden?", "Mehrere Anfragen am selben Tag ergeben eine Instanz (T-15)"], rg_ergaenzt=True, schwere="hoch",
+  aktion={"art": "link", "ziel": "app.betroffenenanfragen"})
+
+pflicht("datenschutz.datenpanne_meldung", "F.60", "Datenpanne der Aufsichtsbehörde melden",
+  "Bei einer Datenpanne meldest du sie binnen 72 Stunden der Datenschutz-Aufsichtsbehörde.",
+  "Die Frist beginnt, sobald du von der Panne erfährst. Keine Meldung ist nötig, wenn voraussichtlich kein Risiko für die Betroffenen besteht – das entscheidest und dokumentierst du. Amtlos zeigt einen Countdown und erstellt einen Meldeentwurf.",
+  ["Art. 33 DSGVO"], "datenschutz",
+  {"ereignis": "datenpanne", "op": "eingetreten", "label": t("Du hast eine Datenpanne entdeckt.")},
+  JE("datenpanne", "P3D"), "Datenschutz-Aufsichtsbehörde des Landes", "portal", "dokument_generator",
+  [DSGVO(33)],
+  ["72 Stunden tagesgenau als 3 Tage ab dem Tag der Entdeckung umgesetzt; der Countdown in der App rechnet stundengenau – bestätigen", "Benachrichtigung der Betroffenen bei hohem Risiko (Art. 34) als eigene Pflicht?", "Zuständige Aufsichtsbehörde je Land"],
+  schwere="hoch", sanktion="Die Folgen sind noch nicht fachlich erfasst.",
+  aktion={"art": "link", "ziel": "app.datenpanne", "nachweis_erforderlich": True})
+
+pflicht("datenschutz.dsb", "F.61", "Datenschutzbeauftragten benennen",
+  "Sind in der Regel mindestens 20 Personen ständig mit der automatisierten Verarbeitung von Daten beschäftigt, benennst du einen Datenschutzbeauftragten.",
+  "Die Pflicht folgt aus § 38 BDSG bzw. Art. 37 DSGVO. Die Bundesregierung plant, § 38 BDSG bis Ende 2026 zu streichen; ein Gesetz gibt es noch nicht.",
+  ["§ 38 BDSG", "Art. 37 DSGVO"], "datenschutz",
+  SCHWELLE("abgeleitet.beschaeftigte.zaehlung_bdsg38", "datenschutz.dsb.schwelle_personen", "Mindestens 20 Personen sind ständig mit automatisierter Datenverarbeitung beschäftigt."),
+  "dauerhaft", "Du selbst; Meldung der Kontaktdaten an die Aufsichtsbehörde", "intern_dokumentieren", "hinweis",
+  [q("Bundesdatenschutzgesetz § 38", "bdsg_2018/__38.html")],
+  ["Zählweise „ständig mit automatisierter Verarbeitung“ (G-05)", "Benennungspflicht nach Art. 37 DSGVO unabhängig von der Zahl (z. B. Kerntätigkeit) als eigener Zweig?"], schwere="hoch")
+
+pflicht("datenschutz.dsb_streichung", "F.61", "Wegfall der Schwelle nach § 38 BDSG (geplant)",
+  "Die Bundesregierung plant, die Benennungspflicht ab 20 Personen nach § 38 BDSG zu streichen.",
+  "Geplant bis Ende 2026, noch kein Gesetz. Die Pflichten nach Art. 37 DSGVO blieben bestehen.",
+  ["§ 38 BDSG"], "datenschutz",
+  SCHWELLE("abgeleitet.beschaeftigte.zaehlung_bdsg38", "datenschutz.dsb.schwelle_personen", "Mindestens 20 Personen sind ständig mit automatisierter Datenverarbeitung beschäftigt."),
+  "dauerhaft", "–", "intern_dokumentieren", "hinweis",
+  [q("Bundesdatenschutzgesetz § 38", "bdsg_2018/__38.html")],
+  ["Status offen – Radar", "Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „mittel“)", "„bis Ende 2026“ als erwartet ab 31.12.2026 eingetragen"],
+  status_recht="geplant", radar={"wahrscheinlichkeit": "mittel", "erwartet_ab": "2026-12-31"}, sanktion="Keine – geplante Erleichterung.", schwere="niedrig")
+
+pflicht("datenschutz.dsfa", "F.62", "Prüfen, ob eine Datenschutz-Folgenabschätzung nötig ist",
+  "Verarbeitest du besonders sensible Daten oder überwachst du mit Video, prüfst du, ob eine Datenschutz-Folgenabschätzung nötig ist.",
+  "Bei voraussichtlich hohem Risiko für die Betroffenen ist vorab eine Folgenabschätzung durchzuführen und zu dokumentieren.",
+  ["Art. 35 DSGVO"], "datenschutz",
+  {"any": [DATENART("gesundheitsdaten", "Du verarbeitest Gesundheitsdaten."), DATENART("videoueberwachung", "Du setzt Videoüberwachung ein.")]},
+  "dauerhaft", "Du selbst; ggf. Datenschutzbeauftragter", "intern_dokumentieren", "hinweis",
+  [DSGVO(35)],
+  ["Auslöser (Gesundheitsdaten, Video) sind eine Vorauswahl – Liste der Aufsichtsbehörden (Muss-Liste) einbeziehen"], schwere="hoch")
+
+pflicht("datenschutz.videoueberwachung", "F.62", "Videoüberwachung kennzeichnen und begründen",
+  "Wenn du Videoüberwachung einsetzt, machst du sie erkennbar und dokumentierst den Zweck.",
+  "Videoüberwachung braucht einen berechtigten Zweck, muss erkennbar sein (Hinweisschild) und gehört ins Verzeichnis der Verarbeitungstätigkeiten.",
+  ["§ 4 BDSG", "Art. 6, 13 DSGVO"], "datenschutz",
+  DATENART("videoueberwachung", "Du setzt Videoüberwachung ein."), "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
+  [q("Bundesdatenschutzgesetz § 4", "bdsg_2018/__4.html")],
+  ["Speicherdauer der Aufnahmen fachlich ergänzen", "Beschäftigte: Mitbestimmung/Information"], rg_ergaenzt=True, schwere="mittel")
+
+pflicht("datenschutz.beschaeftigtendaten", "F.62", "Beschäftigtendaten schützen",
+  "Daten deiner Beschäftigten verarbeitest du nur, soweit es für das Arbeitsverhältnis nötig ist.",
+  "Für Beschäftigtendaten gelten besondere Regeln. Amtlos selbst speichert nur das Nötigste (Name, Beschäftigungsart, Eintritt und Austritt).",
+  ["§ 26 BDSG", "Art. 88 DSGVO"], "datenschutz",
+  {"any": [HAT_B, DATENART("beschaeftigtendaten", "Du verarbeitest Daten von Beschäftigten.")]}, "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
+  [q("Bundesdatenschutzgesetz § 26", "bdsg_2018/__26.html")],
+  ["Anwendbarkeit von § 26 BDSG nach der Rechtsprechung des EuGH (2023) prüfen"], rg_ergaenzt=True, schwere="niedrig")
+
+pflicht("online.cookie_einwilligung", "F.63", "Einwilligung für Cookies und Tracking einholen",
+  "Setzt deine Website Tracking oder nicht notwendige Cookies ein, holst du vorher die Einwilligung der Besucher ein.",
+  "Nach § 25 TDDDG ist für das Speichern und Auslesen von Informationen auf dem Endgerät grundsätzlich eine Einwilligung nötig, außer es ist unbedingt erforderlich. Der Consent-Check deiner Website folgt mit dem Online-Check (Abschnitt 7).",
+  ["§ 25 TDDDG"], "online",
+  DATENART("tracking", "Deine Website nutzt Tracking."), "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
+  [q("Telekommunikation-Digitale-Dienste-Datenschutz-Gesetz § 25", "ttdsg/__25.html")],
+  ["URL des Gesetzes nach Umbenennung (TTDSG → TDDDG) prüfen"], schwere="hoch")
+
+pflicht("it_sicherheit.nis2_pruefen", "F.64", "Prüfen, ob NIS2 für dich gilt",
+  "Kläre, ob dein Unternehmen nach Sektor und Größe unter die NIS2-Regeln fällt.",
+  "NIS2 betrifft Unternehmen bestimmter Sektoren ab einer bestimmten Größe. Wer betroffen ist, muss sich beim BSI registrieren und Sicherheitsvorfälle melden. Beantworte die Frage im Profil, sobald du es weißt.",
+  ["NIS2-Richtlinie (EU) 2022/2555", "BSIG"], "it_sicherheit",
+  {"any": [v("profil.nis2.betroffen", "nicht_vorhanden", label="Du hast noch nicht angegeben, ob NIS2 für dich gilt."),
+           v("profil.nis2.betroffen", "==", "unklar", "Du bist unsicher, ob NIS2 für dich gilt.")]},
+  "dauerhaft", "Du selbst; Hilfe beim BSI", "intern_dokumentieren", "hinweis",
+  [q("NIS2-Richtlinie", "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32022L2555")],
+  ["Sektoren und Größenschwellen stehen nicht in der Spezifikation – als Betroffenheitscheck fachlich ergänzen", "Vorbereitender Schritt – Darstellung bestätigen"], rg_ergaenzt=True,
+  sanktion="Ohne diese Klärung bleibt offen, ob Registrierung und Meldepflichten gelten.", schwere="mittel",
+  aktion={"art": "formular", "ziel": "onboarding.daten"})
+
+pflicht("it_sicherheit.nis2_registrierung", "F.64", "Beim BSI registrieren (NIS2)",
+  "Fällt dein Unternehmen unter NIS2, registrierst du es beim BSI. Die Nachfrist endete am 31.7.2026.",
+  "Die Registrierung ist Voraussetzung für die Meldewege bei Sicherheitsvorfällen.",
+  ["BSIG (NIS2UmsuCG)"], "it_sicherheit",
+  NIS2_JA, {"typ": "absolut", "datum": "2026-07-31", "verschiebung": KEINE}, "Bundesamt für Sicherheit in der Informationstechnik (BSI)", "portal", "hinweis",
+  [q("BSI-Gesetz", "bsig_2009/")],
+  ["Fundstelle im BSIG nach NIS2-Umsetzung prüfen", "„Nachfrist“ – was gilt für Unternehmen, die erst später betroffen werden?"], rg_ergaenzt=True,
+  sanktion="Bußgelder bis 10 Mio. € bzw. 2 % des Umsatzes sind möglich.", schwere="hoch")
+
+pflicht("it_sicherheit.nis2_meldepflichten", "F.64", "Sicherheitsvorfälle melden (NIS2)",
+  "Erhebliche Sicherheitsvorfälle meldest du dem BSI in festen Stufen und Fristen.",
+  "Wer unter NIS2 fällt, muss erhebliche Sicherheitsvorfälle melden und Risikomanagement-Maßnahmen umsetzen. Die Geschäftsleitung haftet für die Umsetzung.",
+  ["BSIG (NIS2UmsuCG)"], "it_sicherheit",
+  NIS2_JA, "dauerhaft", "BSI", "portal", "hinweis",
+  [q("BSI-Gesetz", "bsig_2009/")],
+  ["Meldestufen und Fristen stehen nicht in der Spezifikation – fachlich ergänzen", "Haftung und Schulungspflicht der Geschäftsleitung als eigene Pflicht?"], rg_ergaenzt=True,
+  sanktion="Bußgelder bis 10 Mio. € bzw. 2 % des Umsatzes sind möglich.", schwere="hoch")
+
+pflicht("ki.kompetenz", "F.65", "KI-Kompetenz der Beschäftigten sicherstellen",
+  "Wer im Unternehmen mit KI arbeitet, braucht ausreichende KI-Kompetenz – sorge für Schulung und halte sie fest.",
+  "Die Pflicht nach Art. 4 KI-Verordnung gilt seit 2.2.2025, durchgesetzt wird sie ab August 2026. Amtlos bietet Schulungen mit Bestätigung als Nachweis.",
+  ["Art. 4 KI-VO"], "ki",
+  KI_NUTZT, "dauerhaft", "Du selbst", "intern_dokumentieren", "dokument_generator",
+  [KI_VO],
+  ["Inhalt und Umfang einer ausreichenden Schulung fachlich festlegen", "Genauer Beginn der Durchsetzung („ab August 2026“) – Datum ergänzen"], gueltig_ab="2025-02-02", schwere="mittel",
+  begriffe=[("KI-Kompetenz", "Wissen und Fähigkeiten, um KI-Systeme sachkundig einzusetzen und ihre Chancen und Risiken zu kennen.")],
+  aktion={"art": "link", "ziel": "app.schulungen", "nachweis_erforderlich": True})
+
+pflicht("ki.transparenz", "F.65", "KI-Inhalte und KI-Interaktion kennzeichnen",
+  "Ab 2.12.2026 gelten Transparenz- und Kennzeichnungspflichten, etwa für Chatbots und KI-erzeugte Inhalte.",
+  "Nach Art. 50 KI-Verordnung müssen Menschen erkennen können, dass sie mit einer KI interagieren oder Inhalte KI-erzeugt sind.",
+  ["Art. 50 KI-VO"], "ki",
+  KI_EIGEN, {"typ": "absolut", "datum": "2026-12-02", "verschiebung": KEINE}, "Du selbst", "intern_dokumentieren", "hinweis",
+  [KI_VO],
+  ["Welche Fälle des Art. 50 treffen auf Kleinbetriebe zu (Chatbot, Deepfake, generierte Texte)?", "Nach dem 2.12.2026 auf in_kraft umstellen"], gueltig_ab="2026-12-02",
+  status_recht="beschlossen", radar={"wahrscheinlichkeit": "sicher", "erwartet_ab": "2026-12-02"}, schwere="mittel")
+
+pflicht("ki.hochrisiko", "F.65", "Pflichten für Hochrisiko-KI (verschoben)",
+  "Für Hochrisiko-KI-Systeme gelten umfangreiche Pflichten – verschoben auf 2.12.2027 bzw. 2.8.2028.",
+  "Der „Digital Omnibus“ hat die Hochrisiko-Pflichten verschoben. Betroffen sind vor allem Anbieter und Betreiber von KI in sensiblen Bereichen.",
+  ["KI-VO, Kapitel III"], "ki",
+  KI_EIGEN, "dauerhaft", "–", "intern_dokumentieren", "hinweis",
+  [KI_VO],
+  ["Status und Daten nach dem Digital Omnibus prüfen", "Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „hoch“)", "Welcher der beiden Termine gilt wofür?"],
+  status_recht="beschlossen", radar={"wahrscheinlichkeit": "hoch", "erwartet_ab": "2027-12-02"}, sanktion="Noch keine – Pflichten gelten später.", schwere="mittel")
 
 print("geschrieben:", len(list(ZIEL.glob("*.yaml"))))

@@ -1,0 +1,53 @@
+# Katalog F.65 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: ki.hochrisiko
+version: 1
+katalog_nr: F.65
+titel:
+  de: Pflichten für Hochrisiko-KI (verschoben)
+kurz:
+  de: Für Hochrisiko-KI-Systeme gelten umfangreiche Pflichten – verschoben auf 2.12.2027 bzw. 2.8.2028.
+erklaerung:
+  de: Der „Digital Omnibus“ hat die Hochrisiko-Pflichten verschoben. Betroffen sind vor allem Anbieter und Betreiber von KI
+    in sensiblen Bereichen.
+rechtsgrundlage:
+- KI-VO, Kapitel III
+kategorie: ki
+ausloeser:
+  feld: profil.ki.eigene_produkte
+  op: ==
+  wert: true
+  label:
+    de: Ihr bietet eigene KI-Produkte oder -Funktionen an.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: –
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Noch keine – Pflichten gelten später.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: beschlossen
+radar:
+  wahrscheinlichkeit: hoch
+  erwartet_ab: '2027-12-02'
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: KI-Verordnung (EU) 2024/1689
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32024R1689
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Status und Daten nach dem Digital Omnibus prüfen
+- Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „hoch“)
+- Welcher der beiden Termine gilt wofür?
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

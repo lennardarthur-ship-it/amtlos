@@ -1,0 +1,49 @@
+# Katalog F.63 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: online.cookie_einwilligung
+version: 1
+katalog_nr: F.63
+titel:
+  de: Einwilligung für Cookies und Tracking einholen
+kurz:
+  de: Setzt deine Website Tracking oder nicht notwendige Cookies ein, holst du vorher die Einwilligung der Besucher ein.
+erklaerung:
+  de: Nach § 25 TDDDG ist für das Speichern und Auslesen von Informationen auf dem Endgerät grundsätzlich eine Einwilligung
+    nötig, außer es ist unbedingt erforderlich. Der Consent-Check deiner Website folgt mit dem Online-Check (Abschnitt 7).
+rechtsgrundlage:
+- § 25 TDDDG
+kategorie: online
+ausloeser:
+  feld: profil.datenverarbeitung.arten
+  op: enthaelt
+  wert: tracking
+  label:
+    de: Deine Website nutzt Tracking.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Telekommunikation-Digitale-Dienste-Datenschutz-Gesetz § 25
+  url: https://www.gesetze-im-internet.de/ttdsg/__25.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- URL des Gesetzes nach Umbenennung (TTDSG → TDDDG) prüfen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

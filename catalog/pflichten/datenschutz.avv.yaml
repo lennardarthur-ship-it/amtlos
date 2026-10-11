@@ -1,0 +1,75 @@
+# Katalog F.58 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: datenschutz.avv
+version: 1
+katalog_nr: F.58
+titel:
+  de: Auftragsverarbeitungsverträge abschließen
+kurz:
+  de: Mit Dienstleistern, die für dich Daten verarbeiten (z. B. Cloud, Lohnbüro, Newsletter-Tool), schließt du einen Auftragsverarbeitungsvertrag.
+erklaerung:
+  de: Der Vertrag regelt, wie der Dienstleister die Daten nach deinen Weisungen verarbeitet. Amtlos führt die Liste deiner
+    Dienstleister und legt die Verträge ab.
+begriffe:
+- begriff:
+    de: Auftragsverarbeitung
+  erklaerung:
+    de: Ein Dienstleister verarbeitet Daten in deinem Auftrag und nach deinen Weisungen.
+rechtsgrundlage:
+- Art. 28 DSGVO
+kategorie: datenschutz
+ausloeser:
+  all:
+  - any:
+    - feld: profil.datenverarbeitung.arten
+      op: enthaelt_eines
+      wert:
+      - kundendaten
+      - beschaeftigtendaten
+      - gesundheitsdaten
+      - videoueberwachung
+      - newsletter
+      - tracking
+      label:
+        de: Du verarbeitest Daten über Menschen (z. B. Kunden oder Beschäftigte).
+    - feld: abgeleitet.hat_beschaeftigte
+      op: ==
+      wert: true
+      label:
+        de: Du beschäftigst mindestens eine Person.
+  - feld: profil.datenschutz.dienstleister
+    op: ==
+    wert: true
+    label:
+      de: Du nutzt Dienstleister, die für dich Daten verarbeiten.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst mit dem Dienstleister
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+aktion:
+  art: link
+  ziel: app.dienstleister
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: DSGVO Art. 28
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Abgrenzung Auftragsverarbeitung ↔ eigene Verantwortung (z. B. Steuerberatung) als Hinweis ergänzen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null
