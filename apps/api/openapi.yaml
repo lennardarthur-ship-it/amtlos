@@ -227,7 +227,7 @@ paths:
                 type: object
                 properties:
                   ampel: { type: object, additionalProperties: { enum: [gruen, gelb, rot] }, description: Ampel je Bereich }
-                  zaehler: { type: object, properties: { offen: { type: integer }, ueberfaellig: { type: integer }, angabe_fehlt: { type: integer } } }
+                  zaehler: { type: object, properties: { offen: { type: integer }, ueberfaellig: { type: integer }, angabe_fehlt: { type: integer }, erledigt: { type: integer }, klar: { type: integer, description: sicher geltende offene Pflichten }, naechste_90: { type: integer, description: davon mit Frist in 90 Tagen oder überfällig } } }
                   als_naechstes: { type: array, maxItems: 3, items: { $ref: "#/components/schemas/PflichtKarte" } }
                   vor_start: { type: object, properties: { anzahl: { type: integer }, seit: { type: [string, "null"], format: date } } }
 

@@ -53,24 +53,42 @@ async function rundgang(farbschema, breite) {
   const antworten = {
     rechtsform: () => p.check('input[value="einzelunternehmen"]'),
     start: () => p.fill('input[name="gruendungsdatum"]', "2024-03-01"),
-    ort: () => p.fill('input[name="gemeinde_ags"]', "11000000"),
-    umsatzsteuer: async () => { await p.check('input[name="ust.kleinunternehmer"][value="nein"]'); await p.fill('input[name="ust.zahllast_vorjahr"]', "12.400"); },
+    taetigkeit: () => p.check('input[name="taetigkeit.einordnung"][value="gewerbe"]'),
+    umsatzsteuer: () => p.check('input[name="ust.kleinunternehmer"][value="nein"]'),
     beschaeftigte: () => p.fill('input[name="beschaeftigte.gesamt"]', "2"),
   };
+  // Schnellstart (E-111): wenige Kernfragen, Fortschritt in Fragen
+  const schritte = [];
   for (let i = 0; i < 12 && p.url().includes("/onboarding/"); i++) {
     const schritt = p.url().split("/onboarding/")[1].split("?")[0];
+    schritte.push(schritt);
+    if (schritt === "start") await p.check('input[name="bundesland"][value="BE"]');
     await antworten[schritt]?.();
     await Promise.all([p.waitForURL((u) => !u.href.includes(`/onboarding/${schritt}`)), p.click("form button.knopf:not(.knopf-leise)")]);
   }
-  pruefe(p.url().includes("/heute"), `${name("onboarding")}: endet nicht auf /heute (${p.url()})`);
+  pruefe(schritte.length <= 6, `${name("onboarding")}: Schnellstart hat ${schritte.length} Schritte (${schritte.join(", ")}) – zu viele`);
+  pruefe(p.url().includes("/heute?willkommen=1"), `${name("onboarding")}: endet nicht auf der Willkommensseite (${p.url()})`);
 
-  // Worker rechnet asynchron
+  // Die Seite aktualisiert sich selbst, bis die erste Berechnung da ist; dann die Willkommenskarte
+  await p.locator("#willkommen").waitFor({ timeout: 30000 }).catch(() => pruefe(false, `${name("heute")}: Willkommenskarte erscheint nicht`));
+  pruefe(await p.locator("#naechstes").count(), `${name("heute")}: keine Aufgaben nach Berechnung`);
+  await barrierefrei(p, name("heute-willkommen"));
+
+  // Nachfragen: nur offene, nicht zum Schnellstart gehörende Fragen; Steuerangaben für die weiteren Prüfungen ergänzen
+  await p.goto(`${B}/heute`);
+  pruefe(await p.getByRole("link", { name: "Fragen beantworten" }).count(), `${name("heute")}: Hinweis auf Nachfragen fehlt`);
+  await p.goto(`${B}/onboarding/umsatzsteuer?phase=nachfragen`);
+  pruefe((await p.locator('input[name="ust.kleinunternehmer"]').count()) === 0, `${name("nachfragen")}: beantwortete Frage wird erneut gestellt`);
+  await p.fill('input[name="ust.zahllast_vorjahr"]', "12.400");
+  await Promise.all([p.waitForURL((u) => !u.href.includes("/onboarding/umsatzsteuer")), p.click("form button.knopf:not(.knopf-leise)")]);
+  await p.goto(`${B}/onboarding/ort?zurueck=/heute`);
+  await p.fill('input[name="gemeinde_ags"]', "11000000");
+  await Promise.all([p.waitForURL(/\/heute/), p.click("form button.knopf:not(.knopf-leise)")]);
   for (let i = 0; i < 20; i++) {
     await p.goto(`${B}/heute`);
     if (await p.locator("#naechstes").count()) break;
     await p.waitForTimeout(500);
   }
-  pruefe(await p.locator("#naechstes").count(), `${name("heute")}: keine Aufgaben nach Berechnung`);
   await barrierefrei(p, name("heute"));
 
   // Sammelbestätigung vor dem Start
@@ -87,7 +105,12 @@ async function rundgang(farbschema, breite) {
   await p.goto(`${B}${link}`);
   await barrierefrei(p, name("pflicht"));
   if (await p.getByRole("button", { name: "Als erledigt markieren" }).count()) {
-    await p.getByRole("button", { name: "Als erledigt markieren" }).click();
+    // Erledigen führt zurück auf „Heute“ mit Bestätigung und dem Nächsten (E-112)
+    await Promise.all([p.waitForURL(/\/heute\?erledigt=/, { timeout: 15000 }), p.getByRole("button", { name: "Als erledigt markieren" }).click()]);
+    const bestaetigt = await p.locator('[role="status"] .stempel').first().waitFor({ timeout: 10000 }).then(() => true, () => false);
+    pruefe(bestaetigt, `${name("heute")}: keine Erledigt-Bestätigung auf Heute`);
+    await barrierefrei(p, name("heute-erledigt"));
+    await p.goto(`${B}${link}`);
     const gestempelt = await p.locator(".stempel").first().waitFor({ timeout: 15000 }).then(() => true, () => false);
     pruefe(gestempelt, `${name("pflicht")}: kein Erledigt-Stempel`);
   }

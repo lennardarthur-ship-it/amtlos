@@ -32,12 +32,13 @@ const GEWICHT = { hoch: 1, mittel: 1.5, niedrig: 2 } as const;
 
 /**
  * Dringlichkeit: kleiner = dringender. Überfällige zuerst (je länger überfällig, desto dringender),
- * danach Tage bis Fälligkeit gewichtet mit der Sanktionsschwere. „Angabe fehlt“ zählt wie eine Frist
- * in 7 Tagen, damit fehlende Angaben nicht hinter fernen Terminen verschwinden; Aufgaben ohne Datum zuletzt.
+ * danach Tage bis Fälligkeit gewichtet mit der Sanktionsschwere. „Angabe fehlt“ kommt nach allen Fristen
+ * innerhalb eines Jahres: Auf „Heute“ werden fehlende Angaben gebündelt als Nachfragen gestellt (E-111),
+ * nicht als einzelne Aufgaben; Aufgaben ohne Datum zuletzt.
  */
 export function dringlichkeit(a: Aufgabe, heute: Datum): number {
   if (a.anzeige_status === "ueberfaellig" && a.faellig_am) return -1_000_000 + differenzTage(heute, a.faellig_am);
-  if (a.anzeige_status === "angabe_fehlt") return 7 * GEWICHT[a.schwere];
+  if (a.anzeige_status === "angabe_fehlt") return 400 * GEWICHT[a.schwere];
   if (!a.faellig_am) return 10_000 * GEWICHT[a.schwere];
   return Math.max(0, differenzTage(heute, a.faellig_am)) * GEWICHT[a.schwere];
 }
@@ -65,6 +66,10 @@ export function heuteUebersicht(aufgaben: Aufgabe[], heute: Datum, max = 3) {
       ueberfaellig: offen.filter((a) => a.anzeige_status === "ueberfaellig").length,
       angabe_fehlt: offen.filter((a) => a.anzeige_status === "angabe_fehlt").length,
       erledigt: aufgaben.filter((a) => a.anzeige_status === "erledigt").length,
+      /** sicher geltende, offene Pflichten (ohne „Angabe fehlt“) */
+      klar: offen.filter((a) => a.anzeige_status !== "angabe_fehlt").length,
+      /** davon mit Frist in den nächsten 90 Tagen oder überfällig */
+      naechste_90: offen.filter((a) => a.anzeige_status !== "angabe_fehlt" && a.faellig_am && differenzTage(heute, a.faellig_am) <= 90).length,
     },
   };
 }

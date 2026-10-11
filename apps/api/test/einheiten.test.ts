@@ -28,7 +28,8 @@ describe("Profil-Validierung", () => {
     expect(ProfilSchema.safeParse({ "beschaeftigte.gesamt": 1.5 }).success).toBe(false);
     expect(ProfilSchema.safeParse({ gruendungsdatum: "1.10.2026" }).success).toBe(false);
     expect(ProfilSchema.safeParse({ "kunden.segmente": ["b2b", "b2b"] }).success).toBe(false);
-    expect(ProfilSchema.safeParse({ gemeinde_ags: "11000000", bundesland: "BY" }).success).toBe(false);
+    // Der Gemeindeschlüssel bestimmt das Bundesland (E-111): ein widersprüchliches Bundesland wird überschrieben
+    expect(ProfilSchema.parse({ gemeinde_ags: "11000000", bundesland: "BY" })).toMatchObject({ bundesland: "BE" });
   });
   it("entfernt null-Werte (Angabe gelöscht → unbekannt)", () => {
     expect(ProfilSchema.parse({ rechtsform: null, erwerb: "haupt" })).toEqual({ erwerb: "haupt" });
@@ -37,7 +38,7 @@ describe("Profil-Validierung", () => {
 
 describe("Heute", () => {
   const a = (x: Partial<Aufgabe>): Aufgabe => ({ pflicht_id: "p", periode: "einmalig", kategorie: "steuern", anzeige_status: "offen", faellig_am: null, schwere: "mittel", ...x });
-  it("priorisiert Überfälliges, dann fehlende Angaben und nahe Fristen nach Schwere", () => {
+  it("priorisiert Überfälliges und nahe Fristen nach Schwere; fehlende Angaben danach", () => {
     const heute = "2026-10-11";
     const liste = [
       a({ pflicht_id: "fern", faellig_am: "2026-12-01", anzeige_status: "offen" }),
@@ -47,12 +48,12 @@ describe("Heute", () => {
       a({ pflicht_id: "erledigt", anzeige_status: "erledigt" }),
     ];
     const u = heuteUebersicht(liste, heute);
-    expect(u.als_naechstes.map((x) => x.pflicht_id)).toEqual(["ueber", "bald-niedrig", "angabe"]);
+    expect(u.als_naechstes.map((x) => x.pflicht_id)).toEqual(["ueber", "bald-niedrig", "fern"]); // Angaben werden gebündelt nachgefragt (E-111)
     expect(u.ampel.steuern).toBe("rot");
     expect(u.ampel.personal).toBe("gruen");
     expect(heuteUebersicht([a({ kategorie: "arbeitsschutz", anzeige_status: "offen", faellig_am: null })], heute).ampel.arbeitsschutz).toBe("gelb");
     expect(heuteUebersicht([a({ kategorie: "arbeitsschutz", anzeige_status: "offen", faellig_am: "2027-06-01" })], heute).ampel.arbeitsschutz).toBe("gruen");
-    expect(u.zaehler).toEqual({ offen: 4, ueberfaellig: 1, angabe_fehlt: 1, erledigt: 1 });
+    expect(u.zaehler).toEqual({ offen: 4, ueberfaellig: 1, angabe_fehlt: 1, erledigt: 1, klar: 3, naechste_90: 3 });
     expect(dringlichkeit(a({ faellig_am: "2026-10-21", schwere: "hoch" }), heute)).toBeLessThan(dringlichkeit(a({ faellig_am: "2026-10-21", schwere: "niedrig" }), heute));
   });
 });

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { datumLang, frageFuerFakt, fuelle, schrittFuerFakt } from "@amtlos/i18n";
 import { Fristblatt } from "@/komponenten/fristblatt";
 import { periodeText } from "@/lib/periode";
@@ -17,6 +18,7 @@ export async function generateMetadata({ params }: { params: Params }) {
   return { title: d.titel };
 }
 
+/** Erledigen und zurück auf „Heute“ – dort steht sofort das Nächste (E-112). */
 async function erledigen(pflichtId: string, periode: string, formular: FormData) {
   "use server";
   const notiz = String(formular.get("notiz") ?? "").trim();
@@ -25,6 +27,8 @@ async function erledigen(pflichtId: string, periode: string, formular: FormData)
     body: JSON.stringify(notiz ? { notiz } : {}),
   });
   revalidatePath(`/pflichten/${pflichtId}/${periode}`);
+  revalidatePath("/heute");
+  redirect(`/heute?erledigt=${encodeURIComponent(`${pflichtId}|${periode}`)}`);
 }
 
 async function wiederOeffnen(pflichtId: string, periode: string) {
@@ -94,11 +98,17 @@ export default async function PflichtSeite({ params }: { params: Params }) {
           </p>
         ) : null}
         <form action={erledigen.bind(null, pflichtId, periode)} className="lesetext space-y-3">
-          <label className="block text-klein" htmlFor="notiz">
-            {x.karte.notiz}
-          </label>
-          <textarea id="notiz" name="notiz" rows={2} maxLength={2000} className="feld" />
-          <button className="knopf">{x.karte.erledigen}</button>
+          <div className="flex flex-wrap items-center gap-3">
+            <button className="knopf">{x.karte.erledigen}</button>
+            <span className="text-klein text-tinte-leise">{x.karte.erledigen_hinweis}</span>
+          </div>
+          <details className="text-klein">
+            <summary className="cursor-pointer text-tinte-leise">{x.karte.notiz_zeigen}</summary>
+            <label className="mt-2 block" htmlFor="notiz">
+              {x.karte.notiz}
+            </label>
+            <textarea id="notiz" name="notiz" rows={2} maxLength={2000} className="feld mt-1" />
+          </details>
         </form>
         </>
       ) : null}

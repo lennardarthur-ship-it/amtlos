@@ -8,6 +8,8 @@ type T = { de: string; en: string };
 export interface Frage {
   feld: string;
   art: "auswahl" | "mehrfach" | "janein" | "zahl" | "betrag" | "datum" | "text";
+  /** Teil des Schnellstarts (E-111): die wenigen Fragen, die für die ersten Pflichten reichen. Alles andere wird später nachgefragt. */
+  schnell?: true;
   frage: T;
   hilfe?: T;
   optionen?: Record<string, T>;
@@ -32,6 +34,26 @@ export function sichtbareSchritte(profil: Record<string, unknown>): Schritt[] {
   return SCHRITTE.filter((s) => schrittSichtbar(s, profil));
 }
 
+export type Phase = "schnell" | "nachfragen" | "alle";
+const unbeantwortet = (profil: Record<string, unknown>, f: Frage) => profil[f.feld] === undefined || profil[f.feld] === null;
+
+/** Fragen eines Schritts je Phase: Schnellstart = nur Kernfragen, Nachfragen = nur Unbeantwortetes, alle = alles. */
+export function fragenJePhase(s: Schritt, phase: Phase, profil: Record<string, unknown>): Frage[] {
+  if (phase === "schnell") return s.fragen.filter((f) => f.schnell);
+  if (phase === "nachfragen") return s.fragen.filter((f) => !f.schnell && unbeantwortet(profil, f));
+  return s.fragen;
+}
+
+/** Schritte, die in dieser Phase mindestens eine Frage haben. */
+export function schritteJePhase(phase: Phase, profil: Record<string, unknown>): Schritt[] {
+  return sichtbareSchritte(profil).filter((s) => fragenJePhase(s, phase, profil).length > 0);
+}
+
+/** Wie viele Fragen sind noch offen (für den Hinweis auf „Heute“)? */
+export function offeneFragen(profil: Record<string, unknown>): number {
+  return sichtbareSchritte(profil).reduce((n, s) => n + s.fragen.filter((f) => !f.schnell && unbeantwortet(profil, f)).length, 0);
+}
+
 export const SCHRITTE: Schritt[] = [
   {
     id: "rechtsform",
@@ -39,6 +61,7 @@ export const SCHRITTE: Schritt[] = [
     fragen: [
       {
         feld: "rechtsform",
+        schnell: true,
         art: "auswahl",
         frage: { de: "Welche Rechtsform hat dein Unternehmen?", en: "What legal form does your business have?" },
         hilfe: { de: "Die Rechtsform steht in deiner Gewerbeanmeldung oder im Handelsregister.", en: "You find it in your trade registration or the commercial register." },
@@ -64,6 +87,7 @@ export const SCHRITTE: Schritt[] = [
     fragen: [
       {
         feld: "gesellschaft.handelsregister",
+        schnell: true,
         art: "auswahl",
         frage: { de: "Ist deine Gesellschaft schon im Handelsregister eingetragen?", en: "Is your company already entered in the commercial register?" },
         hilfe: { de: "Danach richtet sich, welche Gründungsschritte noch anstehen.", en: "This decides which founding steps are still ahead." },
@@ -97,6 +121,7 @@ export const SCHRITTE: Schritt[] = [
     fragen: [
       {
         feld: "taetigkeit.einordnung",
+        schnell: true,
         art: "auswahl",
         frage: { de: "Ist deine Tätigkeit ein Gewerbe oder ein freier Beruf?", en: "Is your activity a trade or a liberal profession?" },
         hilfe: {
@@ -118,6 +143,7 @@ export const SCHRITTE: Schritt[] = [
       },
       {
         feld: "taetigkeit.branchen",
+        schnell: true,
         art: "mehrfach",
         frage: { de: "In welcher Branche bist du tätig?", en: "Which industry are you in?" },
         optionen: {
@@ -202,8 +228,22 @@ export const SCHRITTE: Schritt[] = [
     fragen: [
       {
         feld: "gruendungsdatum",
+        schnell: true,
         art: "datum",
         frage: { de: "Wann hast du angefangen oder wann willst du anfangen?", en: "When did you start or when do you plan to start?" },
+      },
+      {
+        feld: "bundesland",
+        schnell: true,
+        art: "auswahl",
+        frage: { de: "In welchem Bundesland sitzt dein Unternehmen?", en: "In which federal state is your business based?" },
+        hilfe: { de: "Danach richten sich Feiertage und Zuständigkeiten. Den genauen Ort kannst du später ergänzen.", en: "Public holidays and responsible authorities depend on it. You can add the exact place later." },
+        optionen: {
+          BW: { de: "Baden-Württemberg", en: "Baden-Württemberg" }, BY: { de: "Bayern", en: "Bavaria" }, BE: { de: "Berlin", en: "Berlin" }, BB: { de: "Brandenburg", en: "Brandenburg" },
+          HB: { de: "Bremen", en: "Bremen" }, HH: { de: "Hamburg", en: "Hamburg" }, HE: { de: "Hessen", en: "Hesse" }, MV: { de: "Mecklenburg-Vorpommern", en: "Mecklenburg-Western Pomerania" },
+          NI: { de: "Niedersachsen", en: "Lower Saxony" }, NW: { de: "Nordrhein-Westfalen", en: "North Rhine-Westphalia" }, RP: { de: "Rheinland-Pfalz", en: "Rhineland-Palatinate" }, SL: { de: "Saarland", en: "Saarland" },
+          SN: { de: "Sachsen", en: "Saxony" }, ST: { de: "Sachsen-Anhalt", en: "Saxony-Anhalt" }, SH: { de: "Schleswig-Holstein", en: "Schleswig-Holstein" }, TH: { de: "Thüringen", en: "Thuringia" },
+        },
       },
       { feld: "alg1_bezug", art: "janein", frage: { de: "Bekommst du gerade Arbeitslosengeld I?", en: "Are you currently receiving unemployment benefit I?" } },
     ],
@@ -218,8 +258,8 @@ export const SCHRITTE: Schritt[] = [
         muster: "^\\d{8}$",
         frage: { de: "Wie lautet der Gemeindeschlüssel deines Firmensitzes?", en: "What is the municipality key of your registered office?" },
         hilfe: {
-          de: "Achtstellige Nummer, zum Beispiel 11000000 für Berlin. Eine Suche nach Ortsnamen folgt.",
-          en: "Eight digits, for example 11000000 for Berlin. A search by place name is coming.",
+          de: "Achtstellige Nummer, zum Beispiel 11000000 für Berlin – steht im Gewerbeschein oder in der Gemeindeliste des Statistischen Bundesamts. Nur für örtliche Feiertage nötig; das Bundesland reicht sonst.",
+          en: "Eight digits, for example 11000000 for Berlin – found on the trade licence or in the Federal Statistical Office's municipality list. Only needed for local holidays; the federal state is enough otherwise.",
         },
       },
       {
@@ -236,6 +276,7 @@ export const SCHRITTE: Schritt[] = [
     fragen: [
       {
         feld: "ust.kleinunternehmer",
+        schnell: true,
         art: "janein",
         frage: { de: "Nutzt du die Kleinunternehmerregelung?", en: "Do you use the small business scheme (Kleinunternehmerregelung)?" },
         hilfe: { de: "Dann weist du auf Rechnungen keine Umsatzsteuer aus.", en: "Then your invoices show no VAT." },
@@ -339,6 +380,7 @@ export const SCHRITTE: Schritt[] = [
     fragen: [
       {
         feld: "beschaeftigte.gesamt",
+        schnell: true,
         art: "zahl",
         frage: { de: "Wie viele Menschen arbeiten für dich, dich selbst nicht mitgezählt?", en: "How many people work for you, not counting yourself?" },
         hilfe: { de: "Alle zählen: Vollzeit, Teilzeit, Minijob, Azubis.", en: "Count everyone: full-time, part-time, mini-jobs, apprentices." },

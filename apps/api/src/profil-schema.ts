@@ -57,15 +57,10 @@ export const ProfilSchema = z
     ),
   )
   .strict()
-  .superRefine((p, ctx) => {
-    const ags = p["gemeinde_ags"] as string | null | undefined;
-    const land = p["bundesland"] as string | null | undefined;
-    if (ags && land && LAND_AUS_AGS[ags.slice(0, 2)] !== land)
-      ctx.addIssue({ code: "custom", path: ["bundesland"], message: "Bundesland passt nicht zum Gemeindeschlüssel" });
-  })
   .transform((p) => {
     const sauber = Object.fromEntries(Object.entries(p).filter(([, v]) => v !== null && v !== undefined));
+    // Der Gemeindeschlüssel ist genauer als das Bundesland und bestimmt es (E-111)
     const ags = sauber["gemeinde_ags"] as string | undefined;
-    if (ags && !sauber["bundesland"] && LAND_AUS_AGS[ags.slice(0, 2)]) sauber["bundesland"] = LAND_AUS_AGS[ags.slice(0, 2)];
+    if (ags && LAND_AUS_AGS[ags.slice(0, 2)]) sauber["bundesland"] = LAND_AUS_AGS[ags.slice(0, 2)];
     return sauber;
   });

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { SCHRITTE, fuelle, sichtbareSchritte, type Frage } from "@amtlos/i18n";
+import { SCHRITTE, fragenJePhase, fuelle, schritteJePhase, type Frage, type Phase } from "@amtlos/i18n";
 import { EingabeFehler, api } from "@/lib/api";
 import { t } from "@/lib/sprache";
 
@@ -29,26 +29,33 @@ function wertAus(f: Frage, formular: FormData, sprache: "de" | "en" = "de"): unk
   }
 }
 
-async function speichern(schrittId: string, zurueck: string | undefined, formular: FormData) {
+const phaseAus = (p: string | undefined): Phase => (p === "schnell" || p === "nachfragen" ? p : "alle");
+
+/**
+ * Speichert die Fragen der Phase (E-111): Schnellstart = Kernfragen, Nachfragen = nur offene Fragen, alle = der ganze
+ * Schritt (Einstellungen). Danach der nächste Schritt derselben Phase; am Ende „Heute“.
+ */
+async function speichern(schrittId: string, phase: Phase, zurueck: string | undefined, formular: FormData) {
   "use server";
   const schritt = SCHRITTE.find((s) => s.id === schrittId)!;
   const alt = await api<Profil>("/v1/profil");
   const daten: Record<string, unknown> = { ...alt.daten };
   const { s: sprache } = await t();
-  for (const f of schritt.fragen) daten[f.feld] = wertAus(f, formular, sprache);
-  // Bundesland folgt dem Gemeindeschlüssel – beim Ändern des Orts neu ableiten lassen
-  if (schritt.fragen.some((f) => f.feld === "gemeinde_ags")) delete daten["bundesland"];
+  // In der Nachfrage-Phase stehen nur die damals offenen Fragen im Formular: genau die kommen als Felder mit
+  const fragen = phase === "nachfragen" ? schritt.fragen.filter((f) => formular.has(f.feld) || formular.has(`${f.feld}__gezeigt`)) : fragenJePhase(schritt, phase, alt.daten);
+  for (const f of fragen) daten[f.feld] = wertAus(f, formular, sprache);
   try {
     await api("/v1/profil", { method: "PUT", body: JSON.stringify({ daten }) });
   } catch (e) {
-    if (e instanceof EingabeFehler) redirect(`/onboarding/${schrittId}?fehler=${encodeURIComponent(e.message)}`);
+    if (e instanceof EingabeFehler) redirect(`/onboarding/${schrittId}?phase=${phase}&fehler=${encodeURIComponent(e.message)}`);
     throw e;
   }
   if (zurueck) redirect(zurueck);
-  // Nächster relevanter Schritt nach den gerade gespeicherten Angaben (z. B. „Gesellschaft“ nur für UG/GmbH)
+  // Nächster relevanter Schritt der Phase nach den gerade gespeicherten Angaben (z. B. „Gesellschaft“ nur für UG/GmbH)
   const pos = SCHRITTE.findIndex((s) => s.id === schrittId);
-  const naechster = SCHRITTE.slice(pos + 1).find((s) => sichtbareSchritte(daten).includes(s));
-  redirect(naechster ? `/onboarding/${naechster.id}` : "/heute?profil=gespeichert");
+  const naechster = SCHRITTE.slice(pos + 1).find((s) => schritteJePhase(phase, phase === "nachfragen" ? alt.daten : daten).includes(s));
+  if (naechster) redirect(`/onboarding/${naechster.id}?phase=${phase}`);
+  redirect(phase === "schnell" ? "/heute?willkommen=1" : "/heute?profil=gespeichert");
 }
 
 export default async function OnboardingSchritt({
@@ -56,23 +63,34 @@ export default async function OnboardingSchritt({
   searchParams,
 }: {
   params: Promise<{ schritt: string }>;
-  searchParams: Promise<{ fehler?: string; zurueck?: string }>;
+  searchParams: Promise<{ fehler?: string; zurueck?: string; phase?: string }>;
 }) {
-  const [{ schritt: id }, { fehler, zurueck }] = await Promise.all([params, searchParams]);
+  const [{ schritt: id }, { fehler, zurueck, phase: phaseRoh }] = await Promise.all([params, searchParams]);
   const schritt = SCHRITTE.find((s) => s.id === id);
   if (!schritt) notFound();
   const [{ s, t: x }, profil] = await Promise.all([t(), api<Profil>("/v1/profil")]);
-  const sichtbar = sichtbareSchritte(profil.daten);
+  // Ohne Profil beginnt der Schnellstart; Einstellungen und „Angabe ergänzen“ zeigen den ganzen Schritt
+  const phase: Phase = phaseRoh ? phaseAus(phaseRoh) : profil.version === 0 ? "schnell" : "alle";
+  const fragen = fragenJePhase(schritt, phase, profil.daten);
+  if (!fragen.length && phase === "nachfragen") redirect("/heute");
+  const sichtbar = schritteJePhase(phase, profil.daten);
   // Ein ausgeblendeter Schritt bleibt direkt aufrufbar (z. B. aus den Einstellungen), zählt aber nicht mit
   const liste = sichtbar.includes(schritt) ? sichtbar : SCHRITTE;
   const index = liste.indexOf(schritt);
+  const gesamtFragen = liste.reduce((n, l) => n + fragenJePhase(l, phase, profil.daten).length, 0);
+  const bisherFragen = liste.slice(0, index).reduce((n, l) => n + fragenJePhase(l, phase, profil.daten).length, 0);
   // Nur interne Rücksprünge erlauben (kein offener Redirect)
   const sichererRuecksprung = zurueck?.startsWith("/") && !zurueck.startsWith("//") ? zurueck : undefined;
 
   return (
     <div className="lesetext space-y-6">
-      <p className="text-klein text-tinte-leise">{fuelle(x.onboarding.schritt, { n: index + 1, gesamt: liste.length })}</p>
-      <progress className="h-1.5 w-full accent-amt" value={index + 1} max={liste.length} aria-hidden="true" />
+      <p className="text-klein text-tinte-leise">
+        {phase === "schnell" ? x.onboarding.schnellstart : phase === "nachfragen" ? x.onboarding.nachfragen_titel : null}
+        {phase !== "alle" ? " · " : ""}
+        {fuelle(x.onboarding.schritt, { n: index + 1, gesamt: liste.length })}
+        {phase === "schnell" && index === 0 ? ` · ${x.onboarding.dauer}` : ""}
+      </p>
+      <progress className="h-1.5 w-full accent-amt" value={bisherFragen} max={gesamtFragen} aria-hidden="true" />
       <h1 className="text-titel font-bold">{schritt.titel[s]}</h1>
       {fehler ? (
         <p role="alert" className="rounded-md border-2 border-frist bg-frist-hauch p-4">
@@ -80,19 +98,24 @@ export default async function OnboardingSchritt({
         </p>
       ) : null}
 
-      <form action={speichern.bind(null, schritt.id, sichererRuecksprung)} className="space-y-8">
-        {schritt.fragen.map((f) => (
+      <form action={speichern.bind(null, schritt.id, phase, sichererRuecksprung)} className="space-y-8">
+        {fragen.map((f) => (
           <FrageFeld key={f.feld} frage={f} wert={profil.daten[f.feld]} sprache={s} unbekanntText={x.onboarding.spaeter} jaNein={[x.gemeinsam.ja, x.gemeinsam.nein]} />
         ))}
         <div className="flex flex-wrap items-center gap-3">
           <button className="knopf">{index + 1 < liste.length && !sichererRuecksprung ? x.onboarding.weiter : x.onboarding.fertig}</button>
           {index > 0 && !sichererRuecksprung ? (
-            <Link href={`/onboarding/${liste[index - 1]!.id}`} className="knopf knopf-leise">
+            <Link href={`/onboarding/${liste[index - 1]!.id}?phase=${phase}`} className="knopf knopf-leise">
               {x.onboarding.zurueck}
             </Link>
           ) : null}
+          {phase === "nachfragen" ? (
+            <Link href="/heute" className="verweis text-klein">
+              {x.onboarding.spaeter_weiter}
+            </Link>
+          ) : null}
         </div>
-        <p className="text-klein text-tinte-leise">{x.onboarding.unterbrechen}</p>
+        <p className="text-klein text-tinte-leise">{phase === "schnell" ? x.onboarding.schnell_hinweis : x.onboarding.unterbrechen}</p>
       </form>
     </div>
   );
@@ -108,6 +131,7 @@ function FrageFeld({ frage: f, wert, sprache: s, unbekanntText, jaNein }: { frag
     </label>
   );
 
+  const gezeigt = <input type="hidden" name={`${f.feld}__gezeigt`} value="1" />;
   if (f.art === "auswahl" || f.art === "mehrfach" || f.art === "janein") {
     const typ = f.art === "mehrfach" ? "checkbox" : "radio";
     const optionen = f.art === "janein" ? { ja: jaNein[0], nein: jaNein[1] } : Object.fromEntries(Object.entries(f.optionen ?? {}).map(([k, v]) => [k, v[s]]));
@@ -115,6 +139,7 @@ function FrageFeld({ frage: f, wert, sprache: s, unbekanntText, jaNein }: { frag
       f.art === "janein" ? (k === "ja" ? wert === true : wert === false) : f.art === "mehrfach" ? Array.isArray(wert) && wert.includes(k) : wert === k;
     return (
       <fieldset aria-describedby={hilfeId}>
+        {gezeigt}
         <legend className="text-gross font-bold">{f.frage[s]}</legend>
         {f.hilfe ? <p id={hilfeId} className="mt-1 text-tinte-leise">{f.hilfe[s]}</p> : null}
         <div className="mt-3 space-y-1">
@@ -128,6 +153,7 @@ function FrageFeld({ frage: f, wert, sprache: s, unbekanntText, jaNein }: { frag
   const art = f.art === "datum" ? "date" : f.art === "text" ? "text" : "text";
   return (
     <div>
+      {gezeigt}
       <label htmlFor={f.feld} className="text-gross font-bold">
         {f.frage[s]}
       </label>

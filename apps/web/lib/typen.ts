@@ -40,7 +40,7 @@ export interface KartenDetail extends Karte {
 export interface Heute {
   ampel: Record<Bereich, "gruen" | "gelb" | "rot">;
   als_naechstes: Karte[];
-  zaehler: { offen: number; ueberfaellig: number; angabe_fehlt: number; erledigt: number };
+  zaehler: { offen: number; ueberfaellig: number; angabe_fehlt: number; erledigt: number; klar: number; naechste_90: number };
   vor_start: { anzahl: number; seit: string | null };
 }
 
