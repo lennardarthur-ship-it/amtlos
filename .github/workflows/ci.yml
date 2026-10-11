@@ -227,7 +227,8 @@ jobs:
           echo "Validator: $JAR, Szenarien: $SZ"
           mkdir -p berichte
           echo "::notice title=KoSIT-Dateien::$(find kosit -maxdepth 2 | head -30 | tr '\n' ' ')"
-          java -jar "$JAR" -s "$SZ" -r "$(dirname "$SZ")" -o berichte e-rechnungen/*.xml > validator.log 2>&1 || true
+          grep -m3 -E "java .*(-cp|-jar)" kosit/docs/usage.md | sed 's/^/::notice title=Aufruf laut Doku::/' || true
+          java -cp "$JAR:kosit/libs/*" de.kosit.validationtool.cmd.CommandLineApplication -s "$SZ" -r "$(dirname "$SZ")" -o berichte e-rechnungen/*.xml > validator.log 2>&1 || true
           tail -n 15 validator.log | sed 's/^/::notice title=Validator::/'
           ls berichte | sed 's/^/::notice title=Bericht::/' || true
           fehler=0
