@@ -904,8 +904,8 @@ export const en: Texte = {
   },
   mobil: {
     demo_starten: "Try without an account",
-    demo_text: "With sample data, nothing is saved.",
-    demo_hinweis: "Demo with sample data. Whatever you complete or clock is gone once you end the demo.",
+    demo_text: "No sign-in. Your answers stay on this device only.",
+    demo_hinweis: "Demo without an account: your answers and completed tasks stay on this device only. “End demo” deletes them.",
     demo_beenden: "End demo",
     demo_push: "The demo has no reminders. With an account, Amtlos reminds you in time.",
     oder: "or",

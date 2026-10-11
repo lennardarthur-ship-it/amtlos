@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { StandardKalender, plusMonate, type Datum, type Kalender } from "@amtlos/fristen";
-import { ENGINE_VERSION, auswerten, entscheidendeSaetze, type Ereignis, type Pflicht, type PflichtErgebnis } from "@amtlos/rules-engine";
+import { ENGINE_VERSION, auswerten, sollInstanzen, type Ereignis, type Instanz, type Pflicht, type Soll } from "@amtlos/rules-engine";
 import type { Datenbank, Tx } from "./datenbank.js";
 import { kanonisch } from "./katalog-import.js";
 import { ladeAktivenKatalog } from "./katalog.js";
@@ -21,30 +21,6 @@ export function profilZuFakten(daten: Record<string, unknown>): Record<string, u
 
 export function heute(zeitzone = "Europe/Berlin"): Datum {
   return new Intl.DateTimeFormat("sv-SE", { timeZone: zeitzone, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
-}
-
-interface Instanz {
-  id: string;
-  pflicht_id: string;
-  periode: string;
-  status: "offen" | "erledigt" | "nicht_zutreffend" | "entfallen";
-  faellig_am: Datum | null;
-  erledigt_am: string | null;
-  erledigt_mit_version_id: string | null;
-  pflicht_version_id?: string;
-}
-
-interface Soll {
-  pflicht_id: string;
-  pflicht_version_id: string;
-  periode: string;
-  ergebnis: PflichtErgebnis["ergebnis"];
-  status: "offen" | "nicht_zutreffend";
-  faellig_am: Datum | null;
-  faellig_roh: Datum | null;
-  begruendung: unknown;
-  fehlende_fakten: string[];
-  nicht_zutreffend_grund: string | null;
 }
 
 /**
@@ -113,69 +89,6 @@ export async function neuberechnenInTx(
 
   await tx.abfrage("update app.berechnungslauf set dauer_ms = $2 where id = $1", [lauf!.id, Date.now() - start]);
   return { status: "berechnet", laufId: lauf!.id, instanzen: zaehler, benachrichtigt };
-}
-
-function sollInstanzen(
-  ergebnisse: PflichtErgebnis[],
-  pflichten: Map<string, Pflicht>,
-  versionIds: Map<string, string>,
-  bestand: Instanz[],
-  ereignisse: Ereignis[],
-): Soll[] {
-  const soll: Soll[] = [];
-  for (const e of ergebnisse) {
-    if (e.radar) continue; // Radar wird getrennt angezeigt, nicht als Aufgabe
-    const p = pflichten.get(e.pflicht_id)!;
-    const versionId = versionIds.get(e.pflicht_id)!;
-    const basis = {
-      pflicht_id: e.pflicht_id,
-      pflicht_version_id: versionId,
-      ergebnis: e.ergebnis,
-      begruendung: { knoten: e.begruendung, hinweise: e.hinweise, regelwerte: e.regelwerte_genutzt },
-      fehlende_fakten: e.fehlende_fakten,
-    };
-
-    if (e.ergebnis === "gilt_nicht") {
-      soll.push({ ...basis, periode: "einmalig", status: "nicht_zutreffend", faellig_am: null, faellig_roh: null,
-        nicht_zutreffend_grund: entscheidendeSaetze(e.begruendung).join(" ") || null });
-      continue;
-    }
-    if (e.ergebnis === "unbekannt" && p.frist.typ === "wiederkehrend") {
-      // Ob die Pflicht gilt, ist offen: eine Frage-Karte statt einer „Angabe fehlt“-Karte je Termin
-      soll.push({ ...basis, periode: "einmalig", status: "offen", faellig_am: null, faellig_roh: null, nicht_zutreffend_grund: null });
-    } else if (e.termine.length) {
-      for (const t of e.termine)
-        soll.push({ ...basis, periode: t.periode, status: "offen", faellig_am: t.faellig_am, faellig_roh: t.verlaengert ?? t.roh, nicht_zutreffend_grund: null });
-    } else if (p.frist.typ !== "wiederkehrend" || e.hinweise.includes("rhythmus_unbekannt")) {
-      // einmalig/dauerhaft/bei_aenderung ohne Termin, oder Rhythmus noch unbekannt → eine Instanz ohne Datum
-      soll.push({ ...basis, periode: "einmalig", status: "offen", faellig_am: null, faellig_roh: null, nicht_zutreffend_grund: null });
-    }
-
-    // E-036: neue Version mit erneut_erledigen öffnet erledigte Pflicht erneut
-    // bei_aenderung: auslösendes Ereignis nach der letzten Erledigung öffnet die Pflicht erneut
-    const letzteErledigung = bestand
-      .filter((i) => i.pflicht_id === e.pflicht_id && i.status === "erledigt")
-      .sort((a, b) => (a.erledigt_am ?? "").localeCompare(b.erledigt_am ?? ""))
-      .at(-1);
-    if (letzteErledigung) {
-      if (p.erneut_erledigen && letzteErledigung.erledigt_mit_version_id !== versionId) {
-        soll.push({ ...basis, periode: `aenderung-${p.version}`, status: "offen", faellig_am: null, faellig_roh: null, nicht_zutreffend_grund: null });
-      }
-      if (p.wiederholung.art === "bei_aenderung") {
-        const typen = new Set((p.wiederholung.neu_ausloesen_bei ?? []).flatMap((x) => ("ereignis" in x ? [x.ereignis] : [])));
-        const ausloeser = ereignisse
-          .filter((x) => typen.has(x.typ) && !x.storniert && x.datum > (letzteErledigung.erledigt_am ?? ""))
-          .map((x) => x.datum)
-          .sort()
-          .at(-1);
-        const periode = `aenderung-${ausloeser?.replaceAll("-", "")}`;
-        // Gibt es für dieses Ereignis schon eine Instanz mit Termin (je_ereignis), nicht durch eine ohne Termin ersetzen
-        if (ausloeser && !soll.some((s) => s.pflicht_id === e.pflicht_id && s.periode === periode))
-          soll.push({ ...basis, periode, status: "offen", faellig_am: null, faellig_roh: null, nicht_zutreffend_grund: null });
-      }
-    }
-  }
-  return soll;
 }
 
 /**

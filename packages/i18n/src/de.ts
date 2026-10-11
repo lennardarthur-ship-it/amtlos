@@ -903,8 +903,8 @@ export const de = {
   },
   mobil: {
     demo_starten: "Ohne Konto ausprobieren",
-    demo_text: "Mit Beispieldaten, nichts wird gespeichert.",
-    demo_hinweis: "Demo mit Beispieldaten. Was du erledigst oder stempelst, ist nach dem Beenden wieder weg.",
+    demo_text: "Ohne Anmeldung. Deine Angaben bleiben nur auf diesem Gerät.",
+    demo_hinweis: "Demo ohne Konto: Deine Angaben und Erledigungen bleiben nur auf diesem Gerät. „Demo beenden“ löscht sie.",
     demo_beenden: "Demo beenden",
     demo_push: "In der Demo gibt es keine Erinnerungen. Mit einem Konto erinnert dich Amtlos rechtzeitig.",
     oder: "oder",

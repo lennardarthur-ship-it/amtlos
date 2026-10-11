@@ -32,7 +32,7 @@ function wertAus(f: Frage, roh: string | string[] | undefined, sprache: "de" | "
  * Eine Frage je Bildschirmabschnitt, große Antwortflächen, Fortschritt oben. Nach dem letzten Schritt: Heute.
  */
 export function Schnellstart({ fertig, phase = "schnell", profilStart = {}, abbrechen }: { fertig: () => void; phase?: "schnell" | "nachfragen"; profilStart?: Record<string, unknown>; abbrechen?: () => void }) {
-  const { t, sprache, klient, ich, anmeldenAktualisieren } = useAmtlos();
+  const { t, sprache, klient, ich, anmeldenAktualisieren, demo, abmelden } = useAmtlos();
   const f = useFarben();
   const [name, setName] = useState("");
   const [profil, setProfil] = useState<Record<string, unknown>>(profilStart);
@@ -120,6 +120,7 @@ export function Schnellstart({ fertig, phase = "schnell", profilStart = {}, abbr
               <T v="klein" fett nativeID="name" stil={{ marginTop: 24 }}>{t.unternehmen.name}</T>
               <TextInput accessibilityLabelledBy="name" accessibilityLabel={t.unternehmen.name} value={name} onChangeText={setName} autoFocus autoCapitalize="words" returnKeyType="done" onSubmitEditing={() => name.trim() && void unternehmenAnlegen()} style={[feldStil, { marginTop: 6 }]} />
               <Knopf text={t.unternehmen.anlegen} onPress={() => void unternehmenAnlegen()} laedt={laedt} deaktiviert={name.trim().length < 2} stil={{ marginTop: 20 }} />
+              {demo ? <Knopf leise text={t.mobil.demo_beenden} onPress={() => void abmelden()} stil={{ marginTop: 12 }} /> : null}
             </>
           ) : schritt ? (
             <>

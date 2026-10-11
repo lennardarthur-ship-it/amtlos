@@ -18,7 +18,8 @@ cd apps/web && node ../mobile/e2e/schau.mjs <web-export> <bilder> <kennung>   # 
 
 **Auf dem iPhone testen (ohne Server):** `bash werkzeuge/testpaket.sh <ordner>` baut ein eigenständiges Paket mit
 Anleitung (`LIESMICH.txt`): Node installieren, `npm install`, `npx expo start`, QR-Code mit Expo Go öffnen, „Ohne Konto
-ausprobieren“. Demo-Daten neu holen: `node werkzeuge/demo-schnappschuss.mjs http://localhost:3901 <kennung>` (E-119).
+ausprobieren“. Die Demo startet leer und rechnet auf dem Gerät mit Engine und Katalog (E-119); nach Katalogänderungen
+`node werkzeuge/katalog-buendel.mjs` ausführen.
 
 **Konfiguration** (`app.json` → `expo.extra`): `apiUrl`, `authModus` (`demo` = nur Demo ohne Server; `dev` = Anmeldung mit Kennung über
 `POST /v1/dev/token`, nur wenn die API mit `AUTH_MODUS=dev` läuft; `oidc` = Identity-Provider mit PKCE),

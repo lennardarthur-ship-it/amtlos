@@ -99,9 +99,15 @@ importers:
 
   apps/mobile:
     dependencies:
+      '@amtlos/fristen':
+        specifier: workspace:*
+        version: link:../../packages/fristen
       '@amtlos/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
+      '@amtlos/rules-engine':
+        specifier: workspace:*
+        version: link:../../packages/rules-engine
       '@expo-google-fonts/atkinson-hyperlegible':
         specifier: ^0.4.1
         version: 0.4.1
