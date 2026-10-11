@@ -106,7 +106,7 @@ jobs:
       - run: pnpm --filter @amtlos/web exec playwright-core install --with-deps chromium
       - name: Dienste starten
         run: |
-          UMGEBUNG=dev PORT=3001 AUTH_MODUS=dev WEB_URL=http://localhost:3000 ONLINECHECK_PRIVATE_NETZE=erlaubt \
+          UMGEBUNG=dev PORT=3001 AUTH_MODUS=dev WEB_URL=http://localhost:3000 RATE_ANGEMELDET=5000 ONLINECHECK_PRIVATE_NETZE=erlaubt \
             DATABASE_URL=postgresql://api_user:amtlos@localhost:5432/amtlos nohup node apps/api/dist/main.js > api.log 2>&1 &
           UMGEBUNG=dev WORKER_DATABASE_URL=postgresql://worker_user:amtlos@localhost:5432/amtlos nohup node apps/worker/dist/main.js > worker.log 2>&1 &
           UMGEBUNG=dev AUTH_MODUS=dev AMTLOS_UMFANG=alles WEB_URL=http://localhost:3000 API_INTERN_URL=http://localhost:3001 \

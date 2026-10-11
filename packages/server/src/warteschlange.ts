@@ -8,6 +8,8 @@ export const JOBS = {
   erinnerungenVersenden: "erinnerungen-versenden",
   einladungVersenden: "einladung-versenden",
   marktplatzAnfrage: "marktplatz-anfrage",
+  /** Täglich: endgültiges Löschen nach Frist (E-114) */
+  loeschlauf: "loeschlauf",
 } as const;
 
 /** Anfrage an einen Marktplatz-Partner (E-102): der Worker liest sie im Kontext des Unternehmens. */
@@ -52,6 +54,7 @@ export async function queuesAnlegen(boss: PgBoss): Promise<void> {
     [JOBS.erinnerungenVersenden, "singleton"],
     [JOBS.einladungVersenden, "standard"],
     [JOBS.marktplatzAnfrage, "standard"],
+    [JOBS.loeschlauf, "singleton"],
   ] as const) {
     if (!(await boss.getQueue(name))) await boss.createQueue(name, { name, policy, retryLimit: 3, retryDelay: 30, retryBackoff: true });
   }

@@ -336,6 +336,18 @@ select pg_temp.ok(not exists (
                       where i.indrelid = c.oid and a2.attname = 'unternehmen_id')
 ), 'Jede Mandantentabelle hat einen Index mit unternehmen_id vorne (RLS-Filter)');
 
+-- ---------- Abo und Löschen (0018) ----------
+select pg_temp.ok((select count(*) = (select count(*) from app.unternehmen) from app.abo), 'Jedes Unternehmen hat genau ein Abo (Testphase)');
+set role api_user;
+select set_config('amtlos.konto_id', :'anna_konto_anmelden', false);
+select set_config('amtlos.unternehmen_id', :'u1', false);
+select pg_temp.erwarte_fehler(format($$update app.abo set status = 'aktiv' where unternehmen_id = %L$$, :'u1'), 'permission denied');
+select pg_temp.ok(true, 'Abo-Status ändert nur die Systemfunktion (Webhook)');
+select pg_temp.ok((select schreibbar from app.abo_stand(:'u1')), 'Testphase ist schreibbar');
+select pg_temp.erwarte_fehler($$select app.konto_loeschen()$$, 'konto_hat_unternehmen');
+select pg_temp.ok(true, 'Konto löschen nur ohne Unternehmen');
+reset role;
+
 -- ---------- Audit ----------
 select pg_temp.ok((select count(*) > 10 from audit.ereignis), 'Audit protokolliert Änderungen');
 select pg_temp.ok((select bool_and(vorgaenger_hash is not null) from audit.ereignis where id > (select min(id) from audit.ereignis)), 'Hash-Kette lückenlos');

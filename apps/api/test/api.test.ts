@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import { createHmac } from "node:crypto";
 import fs from "node:fs";
 import nodeHttp from "node:http";
 import type { AddressInfo } from "node:net";
@@ -15,6 +16,12 @@ import { erzeugeApp } from "../src/main.js";
 
 const GEHEIM = "test-geheimnis-mindestens-32-zeichen-lang";
 const METRIK_TOKEN = "metriken-token-mindestens-32-zeichen-lang";
+const WEBHOOK_GEHEIM = "whsec_test_geheimnis_mindestens_zwanzig";
+/** Signiert einen Stripe-Webhook wie Stripe selbst (t.payload mit HMAC-SHA256). */
+const signiert = (payload: object, geheim = WEBHOOK_GEHEIM, t = Math.floor(Date.now() / 1000)) => {
+  const roh = JSON.stringify(payload);
+  return { roh, kopf: `t=${t},v1=${createHmac("sha256", geheim).update(`${t}.${roh}`).digest("hex")}` };
+};
 const token = (sub: string, email = `${sub}@example.org`) =>
   new SignJWT({ email, name: sub }).setProtectedHeader({ alg: "HS256" }).setSubject(sub).setIssuer("amtlos-dev").setExpirationTime("10m").sign(new TextEncoder().encode(GEHEIM));
 
@@ -40,6 +47,7 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       UMGEBUNG: "test", PORT: 0, DATABASE_URL: urls.api, AUTH_MODUS: "dev", DEV_JWT_SECRET: GEHEIM,
       WEB_URL: "https://app.amtlos.test", API_URL: "https://api.amtlos.test", OIDC_ISSUER: undefined, OIDC_AUDIENCE: undefined, METRIKEN_TOKEN: METRIK_TOKEN, RATE_ANGEMELDET: 10_000, RATE_ANONYM: 1_000, ABLAGE_VERZEICHNIS: fs.mkdtempSync(path.join(os.tmpdir(), "ablage-")),
       ONLINECHECK_PRIVATE_NETZE: "erlaubt", ONLINECHECK_JE_TAG: 3,
+      STRIPE_WEBHOOK_SECRET: WEBHOOK_GEHEIM, ABO_TESTTAGE: 14,
     });
     await app.init();
     [anna, ben, mia] = await Promise.all([token("anna"), token("ben"), token("mia")]);
@@ -1060,6 +1068,67 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       // Das vom Dienst als ungültig gemeldete Token ist abgemeldet
       expect((await alsAnna(http().get("/v1/geraete")).expect(200)).body).toHaveLength(1);
       await alsAnna(http().put("/v1/benachrichtigungen/einstellungen")).send({ kanaele: [{ kanal: "email", aktiv: true, vorlauf_tage: [14, 3] }, { kanal: "push", aktiv: false, vorlauf_tage: [14, 3] }] }).expect(200);
+    });
+  });
+
+  describe("Launch: Abo, Export, Löschen", () => {
+    it("jedes Unternehmen beginnt mit einer Testphase; danach 402 beim Schreiben, Lesen bleibt", async () => {
+      const t = await token("abo-kundin");
+      const als = (r: request.Test) => r.set("Authorization", `Bearer ${t}`);
+      const u = (await als(http().post("/v1/unternehmen")).send({ name: "Abo GmbH" }).expect(201)).body.id as string;
+      const mitU = (r: request.Test) => als(r).set("X-Unternehmen-Id", u);
+      const a = (await mitU(http().get("/v1/abo")).expect(200)).body;
+      expect(a).toMatchObject({ status: "test", schreibbar: true, bezahlen_moeglich: false, testtage: 14 });
+      await mitU(http().post("/v1/abo/checkout")).expect(503); // kein Stripe-Schlüssel im Test
+      const owner = new Datenbank(urls.owner);
+      await owner.imKontext({}, (tx) => tx.abfrage("update app.abo set test_bis = current_date - 1 where unternehmen_id = $1", [u]));
+      const r = await mitU(http().put("/v1/profil")).send({ daten: { rechtsform: "gmbh" } }).expect(402);
+      expect(r.body.abo.status).toBe("test");
+      await mitU(http().get("/v1/profil")).expect(200);
+      await mitU(http().get("/v1/export")).expect(200); // Lesen geht weiter
+      // Webhook: Abo aktiv → schreiben geht wieder; doppelte Ereignisse werden erkannt; falsche Signatur abgelehnt
+      const ereignis = { id: "evt_1", type: "customer.subscription.updated", data: { object: { id: "sub_1", customer: "cus_1", status: "active", cancel_at_period_end: false, current_period_end: Math.floor(Date.now() / 1000) + 30 * 86400, metadata: { unternehmen_id: u }, items: { data: [{ price: { lookup_key: "start-monatlich" } }] } } } };
+      const { roh, kopf } = signiert(ereignis);
+      await http().post("/v1/stripe/webhook").set("Content-Type", "application/json").set("Stripe-Signature", signiert(ereignis, "whsec_falsch_aber_lang_genug_xx").kopf).send(roh).expect(400);
+      await http().post("/v1/stripe/webhook").set("Content-Type", "application/json").set("Stripe-Signature", signiert(ereignis, WEBHOOK_GEHEIM, Math.floor(Date.now() / 1000) - 600).kopf).send(roh).expect(400); // zu alt
+      expect((await http().post("/v1/stripe/webhook").set("Content-Type", "application/json").set("Stripe-Signature", kopf).send(roh).expect(200)).body).toEqual({ ergebnis: "verarbeitet" });
+      expect((await http().post("/v1/stripe/webhook").set("Content-Type", "application/json").set("Stripe-Signature", kopf).send(roh).expect(200)).body).toEqual({ ergebnis: "doppelt" });
+      expect((await mitU(http().get("/v1/abo")).expect(200)).body).toMatchObject({ status: "aktiv", schreibbar: true });
+      await mitU(http().put("/v1/profil")).send({ daten: { rechtsform: "gmbh", gruendungsdatum: "2026-01-01", "taetigkeit.einordnung": "gewerbe", bundesland: "BE" } }).expect(200);
+      // Kunde ohne Metadaten (z. B. invoice.payment_failed) wird über die Kundennummer zugeordnet
+      const zahlung = { id: "evt_2", type: "invoice.payment_failed", data: { object: { customer: "cus_1" } } };
+      const z = signiert(zahlung);
+      await http().post("/v1/stripe/webhook").set("Content-Type", "application/json").set("Stripe-Signature", z.kopf).send(z.roh).expect(200);
+      const nachher = (await mitU(http().get("/v1/abo")).expect(200)).body;
+      expect(nachher.status).toBe("ueberfaellig");
+      expect(nachher.schreibbar).toBe(true); // Kulanz
+      await owner.schliessen();
+    });
+
+    it("Datenexport enthält alle Tabellen des Unternehmens; Löschen nur mit Namen und nur durch Inhaber; Konto nur ohne Unternehmen", async () => {
+      const e = (await alsAnna(http().get("/v1/export")).expect(200)).body;
+      expect(e.unternehmen.name).toBe("Annas Café");
+      expect(Array.isArray(e.profil_version) && e.profil_version.length).toBeTruthy();
+      expect(Array.isArray(e.pflicht_instanz) && e.pflicht_instanz.length).toBeTruthy();
+      expect(e.abo).toHaveLength(1);
+      const t = await token("loeschkundin");
+      const als = (r: request.Test) => r.set("Authorization", `Bearer ${t}`);
+      await als(http().post("/v1/ich/loeschen")).expect(204); // ohne Unternehmen sofort möglich
+      const t2 = await token("loeschkundin2");
+      const als2 = (r: request.Test) => r.set("Authorization", `Bearer ${t2}`);
+      const u = (await als2(http().post("/v1/unternehmen")).send({ name: "Weg GmbH" }).expect(201)).body.id as string;
+      await als2(http().post("/v1/ich/loeschen")).expect(409);
+      await als2(http().delete("/v1/unternehmen")).set("X-Unternehmen-Id", u).send({ name: "Falsch" }).expect(400);
+      await als2(http().delete("/v1/unternehmen")).set("X-Unternehmen-Id", u).send({ name: "Weg GmbH" }).expect(204);
+      await als2(http().get("/v1/profil")).set("X-Unternehmen-Id", u).expect(404); // unsichtbar
+      expect((await als2(http().get("/v1/ich")).expect(200)).body.unternehmen).toEqual([]);
+      await als2(http().post("/v1/ich/loeschen")).expect(204);
+      const owner = new Datenbank(urls.owner);
+      expect(await owner.imKontext({}, (tx) => tx.eine("select 1 from app.konto where email = 'loeschkundin2@example.org'"))).toBeUndefined(); // unkenntlich
+      await owner.schliessen();
+      // Endgültiges Löschen durch den Worker nach Frist
+      const n = await worker.imKontext({}, (tx) => tx.eine<{ n: number }>("select app.endgueltig_loeschen(interval '0 days') as n"));
+      expect(n!.n).toBeGreaterThanOrEqual(1);
     });
   });
 });

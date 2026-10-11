@@ -1,8 +1,11 @@
+import { Fusszeile } from "@/komponenten/fusszeile";
 import { Markenname } from "@/komponenten/markenname";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Navigation, type NavEintrag } from "@/komponenten/navigation";
-import { aktivesUnternehmen, ich } from "@/lib/api";
+import { aktivesUnternehmen, api, ich } from "@/lib/api";
+import { fuelle } from "@amtlos/i18n";
+import type { Abo } from "./einstellungen/abo/page";
 import { t } from "@/lib/sprache";
 import { pfadSichtbar } from "@/lib/umfang";
 
@@ -10,7 +13,9 @@ import { pfadSichtbar } from "@/lib/umfang";
 const MEHR = ["/radar", "/frag", "/experten", "/team", "/hilfe", "/melden", "/kanzlei"];
 
 export default async function AppRahmen({ children }: { children: ReactNode }) {
-  const [{ s, t: x }, u, i] = await Promise.all([t(), aktivesUnternehmen(), ich()]);
+  const [{ s, t: x }, u, i, abo] = await Promise.all([t(), aktivesUnternehmen(), ich(), api<Abo>("/v1/abo").catch(() => null)]);
+  const resttage = abo?.status === "test" ? Math.round((Date.parse(abo.test_bis) - Date.now()) / 864e5) : null;
+  const aboHinweis = abo && (!abo.schreibbar || (resttage !== null && resttage <= 7));
   return (
     <div className="mx-auto flex min-h-dvh max-w-6xl flex-col md:flex-row md:gap-10 md:px-6">
       <a href="#inhalt" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-30 focus:bg-blatt focus:p-3">
@@ -51,8 +56,15 @@ export default async function AppRahmen({ children }: { children: ReactNode }) {
         />
       </aside>
       <main id="inhalt" className="min-w-0 flex-1 px-4 pb-28 pt-2 md:px-0 md:py-8">
+        {aboHinweis ? (
+          <p className={`mb-6 rounded-md border-2 p-3 text-klein ${abo.schreibbar ? "border-bald bg-bald-hauch" : "border-frist bg-frist-hauch"}`}>
+            {abo.schreibbar ? fuelle(x.abo.hinweis_tage, { n: Math.max(0, resttage ?? 0) }) : `${x.abo.schreiben_gesperrt} `}
+            <Link href="/einstellungen/abo" className="verweis font-bold">{x.abo.hinweis_link}</Link>
+          </p>
+        ) : null}
         {children}
         {s === "en" ? <p className="mt-16 border-t border-linie pt-4 text-klein text-tinte-leise">{x.app.uebersetzung_hinweis}</p> : null}
+        <Fusszeile className={`${s === "en" ? "mt-4" : "mt-16 border-t border-linie pt-4"}`} />
       </main>
     </div>
   );

@@ -9,11 +9,12 @@ import {
   UnauthorizedException,
   BadRequestException,
   createParamDecorator,
+  HttpException,
 } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import type { Request } from "express";
 import { createRemoteJWKSet, jwtVerify, type JWTPayload, type JWTVerifyGetKey } from "jose";
-import { Datenbank } from "@amtlos/server";
+import { Datenbank, aboStand } from "@amtlos/server";
 import { KONFIGURATION, type Konfiguration } from "./konfiguration.js";
 
 export type Rolle = "inhaber" | "mitarbeiter" | "steuerberater" | "admin";
@@ -35,6 +36,7 @@ declare module "express" {
 const OEFFENTLICH = "amtlos:oeffentlich";
 const ROLLEN = "amtlos:rollen";
 const UNTERNEHMEN_NOETIG = "amtlos:unternehmen";
+const OHNE_ABO = "amtlos:ohne_abo";
 
 /** Route ohne Anmeldung (Gesundheit, ICS mit Token). */
 export const Oeffentlich = () => SetMetadata(OEFFENTLICH, true);
@@ -43,6 +45,16 @@ export const MitUnternehmen = (...rollen: Rolle[]) => (ziel: object, schluessel?
   SetMetadata(UNTERNEHMEN_NOETIG, true)(ziel, schluessel!, desc!);
   if (rollen.length) SetMetadata(ROLLEN, rollen)(ziel, schluessel!, desc!);
 };
+
+/** Schreibende Route, die auch ohne laufendes Abo erlaubt ist (Abo abschließen, Unternehmen löschen, Team verlassen). */
+export const OhneAbo = () => SetMetadata(OHNE_ABO, true);
+
+/** HTTP 402: Testphase oder Abo abgelaufen – lesen geht weiter, schreiben nicht (E-113). */
+export class AboNoetig extends HttpException {
+  constructor(readonly stand: { status: string; test_bis: string; laeuft_bis: string | null }) {
+    super({ statusCode: 402, meldung: "Testphase abgelaufen – mit einem Abo geht es weiter. Deine Daten bleiben erhalten.", abo: stand }, 402);
+  }
+}
 
 export const Kontext = createParamDecorator((_: unknown, ctx: ExecutionContext): Anfragekontext => {
   const k = ctx.switchToHttp().getRequest<Request>().amtlos;
@@ -89,7 +101,8 @@ export class AuthGuard implements CanActivate {
     if (unternehmenNoetig) {
       if (typeof header !== "string" || !UUID.test(header)) throw new BadRequestException("Header X-Unternehmen-Id fehlt oder ist ungültig");
       const m = await this.db.imKontext({ kontoId: konto.id, unternehmenId: header }, (tx) =>
-        tx.eine<{ rolle: Rolle }>("select rolle from app.mitgliedschaft where unternehmen_id = $1 and konto_id = $2", [header, konto.id]),
+        // Gelöschte Unternehmen sind über die RLS-Policy auf app.unternehmen unsichtbar (E-114)
+        tx.eine<{ rolle: Rolle }>("select m.rolle from app.mitgliedschaft m join app.unternehmen u on u.id = m.unternehmen_id where m.unternehmen_id = $1 and m.konto_id = $2", [header, konto.id]),
       );
       // Kein Unterschied zwischen „gibt es nicht“ und „gehört dir nicht“ (keine Existenz-Auskunft)
       if (!m) throw new NotFoundException("Unternehmen nicht gefunden");
@@ -97,6 +110,11 @@ export class AuthGuard implements CanActivate {
       kontext.rolle = m.rolle;
       const rollen = this.reflector.getAllAndOverride<Rolle[] | undefined>(ROLLEN, ziele);
       if (rollen && !rollen.includes(m.rolle)) throw new ForbiddenException("Für diese Aktion fehlt die Berechtigung");
+      // Schreiben nur mit laufender Testphase oder Abo (E-113); Lesen immer – die Daten gehören der Nutzerin
+      if (req.method !== "GET" && req.method !== "HEAD" && !this.reflector.getAllAndOverride<boolean>(OHNE_ABO, ziele)) {
+        const stand = await this.db.imKontext({ kontoId: konto.id, unternehmenId: header }, (tx) => aboStand(tx, header));
+        if (stand && !stand.schreibbar) throw new AboNoetig(stand);
+      }
     }
     req.amtlos = kontext;
     return true;

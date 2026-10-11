@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
-import { sichtbareSchritte } from "@amtlos/i18n";
+import { datumLang, fuelle, sichtbareSchritte } from "@amtlos/i18n";
 import { redirect } from "next/navigation";
 import { senden } from "@/lib/aktion";
-import { api, apiAntwort } from "@/lib/api";
+import { api, apiAntwort, aktivesUnternehmen } from "@/lib/api";
+import { sitzungBeenden } from "@/lib/sitzung";
+import type { Abo } from "./abo/page";
 import { SPRACH_COOKIE, t } from "@/lib/sprache";
 
 export const metadata = { title: "Einstellungen" };
@@ -29,13 +31,30 @@ async function erinnerungenSetzen(f: FormData) {
   redirect("/einstellungen?gespeichert=erinnerungen#erinnerungen");
 }
 
+async function unternehmenLoeschen(f: FormData) {
+  "use server";
+  await senden("/v1/unternehmen", "DELETE", { name: String(f.get("name") ?? "") }, "/einstellungen#loeschen");
+  redirect("/unternehmen?geloescht=1");
+}
+
+async function kontoLoeschen() {
+  "use server";
+  const r = await apiAntwort("/v1/ich/loeschen", { method: "POST", ohneUnternehmen: true });
+  if (r.status === 409) redirect(`/einstellungen?fehler=${encodeURIComponent("Zuerst alle Unternehmen löschen oder verlassen")}#loeschen`);
+  await sitzungBeenden();
+  redirect("/anmelden?geloescht=1");
+}
+
 export default async function Einstellungen({ searchParams }: { searchParams: Promise<{ gespeichert?: string; fehler?: string }> }) {
-  const [{ s, t: x }, profil, erinnerung, { gespeichert, fehler }] = await Promise.all([
+  const [{ s, t: x }, profil, erinnerung, { gespeichert, fehler }, u, abo] = await Promise.all([
     t(),
     api<{ daten: Record<string, unknown> }>("/v1/profil"),
     api<{ geraet_vorhanden: boolean; kanaele: Kanal[] }>("/v1/benachrichtigungen/einstellungen"),
     searchParams,
+    aktivesUnternehmen(),
+    api<Abo>("/v1/abo"),
   ]);
+  const darfVerwalten = u.rolle === "inhaber" || u.rolle === "admin";
   return (
     <div className="lesetext space-y-10">
       <h1 className="text-titel font-bold">{x.einstellungen.titel}</h1>
@@ -92,6 +111,43 @@ export default async function Einstellungen({ searchParams }: { searchParams: Pr
           </select>
           <button className="knopf knopf-leise">{x.einstellungen.sprache_speichern}</button>
         </form>
+      </section>
+
+      <section aria-labelledby="abo-titel" className="rounded-md border border-linie bg-blatt p-4">
+        <h2 id="abo-titel" className="text-gross font-bold">{x.abo.titel}</h2>
+        <p className="mt-1">
+          <span className="font-bold">{x.abo.status[abo.status]}</span>
+          {abo.status === "test" ? ` · ${fuelle(x.abo.test_laeuft, { n: Math.max(0, Math.round((Date.parse(abo.test_bis) - Date.now()) / 864e5)), datum: datumLang(abo.test_bis, s) })}` : ""}
+        </p>
+        <Link href="/einstellungen/abo" className="knopf knopf-leise mt-3">{abo.status === "test" || abo.status === "abgelaufen" ? x.abo.abschliessen : x.abo.verwalten}</Link>
+      </section>
+
+      <section aria-labelledby="loeschen" id="loeschen" className="space-y-4">
+        <h2 id="loeschen-titel" className="text-gross font-bold">{x.loeschen.titel}</h2>
+        {darfVerwalten ? (
+          <p>
+            <a href="/einstellungen/export" className="verweis font-bold">{x.loeschen.export}</a>
+            <span className="block text-klein text-tinte-leise">{x.loeschen.export_text}</span>
+          </p>
+        ) : null}
+        {u.rolle === "inhaber" ? (
+          <details className="rounded-md border border-linie p-4">
+            <summary className="cursor-pointer font-bold">{x.loeschen.unternehmen_titel}</summary>
+            <p className="mt-2 text-klein">{x.loeschen.unternehmen_text}</p>
+            <form action={unternehmenLoeschen} className="mt-3 space-y-2">
+              <label htmlFor="loesch-name" className="block text-klein font-bold">{fuelle(x.loeschen.unternehmen_bestaetigen, { name: u.name })}</label>
+              <input id="loesch-name" name="name" required autoComplete="off" className="feld" />
+              <button className="knopf knopf-notfall">{x.loeschen.unternehmen_knopf}</button>
+            </form>
+          </details>
+        ) : null}
+        <details className="rounded-md border border-linie p-4">
+          <summary className="cursor-pointer font-bold">{x.loeschen.konto_titel}</summary>
+          <p className="mt-2 text-klein">{x.loeschen.konto_text}</p>
+          <form action={kontoLoeschen} className="mt-3">
+            <button className="knopf knopf-notfall">{x.loeschen.konto_knopf}</button>
+          </form>
+        </details>
       </section>
 
       <ul className="space-y-2">

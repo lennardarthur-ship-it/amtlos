@@ -63,7 +63,12 @@ export async function arbeiterStarten(boss: PgBoss, db: Datenbank, versand: Vers
       log.info("marktplatz_anfrage", { anfrage: job.data.anfrageId, ergebnis: r }); // keine Inhalte im Log
     }
   });
+  await boss.work(JOBS.loeschlauf, async () => {
+    const r = await db.imKontext({}, (tx) => tx.eine<{ n: number }>("select app.endgueltig_loeschen() as n"));
+    if (r?.n) log.info("loeschlauf", { unternehmen: r.n });
+  });
   // Zeitpläne (Europe/Berlin): Tageswechsel kurz nach Mitternacht, Erinnerungen alle 15 Minuten
   await boss.schedule(JOBS.tageswechsel, "5 0 * * *", {}, { tz: "Europe/Berlin" });
+  await boss.schedule(JOBS.loeschlauf, "30 3 * * *", {}, { tz: "Europe/Berlin" });
   await boss.schedule(JOBS.erinnerungenVersenden, "*/15 * * * *", {}, { tz: "Europe/Berlin" });
 }

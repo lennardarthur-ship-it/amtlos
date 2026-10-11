@@ -11,7 +11,8 @@ export async function erzeugeApp(k: Konfiguration): Promise<NestExpressApplicati
     logger: k.UMGEBUNG === "test" ? false : ["error", "warn", "log"],
     bodyParser: false,
   });
-  app.useBodyParser("json", { limit: "256kb" });
+  // rawBody für Webhook-Signaturen (Stripe prüft über den unveränderten Body)
+  app.useBodyParser("json", { limit: "256kb", verify: (req: { rawBody?: Buffer }, _res: unknown, buf: Buffer) => { req.rawBody = buf; } });
   const metriken = app.get<Metriken>(METRIKEN);
   app.set("trust proxy", 1);
   app.use(zugriffsprotokoll(metriken, k.UMGEBUNG !== "test"));

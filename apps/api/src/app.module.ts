@@ -3,7 +3,7 @@ import { APP_GUARD } from "@nestjs/core";
 import { Inject } from "@nestjs/common";
 import type PgBoss from "pg-boss";
 import path from "node:path";
-import { DateiAblage, Datenbank, NichtVerfuegbaresElster, erzeugeWarteschlange } from "@amtlos/server";
+import { DateiAblage, Datenbank, NichtVerfuegbaresElster, StripeRest, erzeugeWarteschlange } from "@amtlos/server";
 import { ArbeitsschutzController } from "./arbeitsschutz.controller.js";
 import { AssistentController } from "./assistent.controller.js";
 import { AuthGuard } from "./auth.js";
@@ -16,6 +16,7 @@ import { KernController, WARTESCHLANGE } from "./kern.controller.js";
 import { KONFIGURATION, type Konfiguration } from "./konfiguration.js";
 import { KanzleiController } from "./kanzlei.controller.js";
 import { MobilController } from "./mobil.controller.js";
+import { KontoController, STRIPE } from "./konto.controller.js";
 import { MarktplatzController } from "./marktplatz.controller.js";
 import { OnlineCheckController } from "./onlinecheck.controller.js";
 import { PersonalController } from "./personal.controller.js";
@@ -25,11 +26,12 @@ import { TeamController } from "./team.controller.js";
 
 export function appModul(k: Konfiguration) {
   @Module({
-    controllers: [KernController, PflichtenController, TeamController, ElsterController, FinanzenController, PersonalController, ArbeitsschutzController, DatenschutzController, OnlineCheckController, BranchenController, AssistentController, PostfachController, MarktplatzController, KanzleiController, MobilController, BetriebController],
+    controllers: [KernController, PflichtenController, TeamController, ElsterController, FinanzenController, PersonalController, ArbeitsschutzController, DatenschutzController, OnlineCheckController, BranchenController, AssistentController, PostfachController, MarktplatzController, KanzleiController, MobilController, KontoController, BetriebController],
     providers: [
       { provide: KONFIGURATION, useValue: k },
       { provide: METRIKEN, useFactory: erzeugeMetriken },
       { provide: ELSTER, useClass: NichtVerfuegbaresElster },
+      { provide: STRIPE, useFactory: () => (k.STRIPE_SECRET_KEY ? new StripeRest(k.STRIPE_SECRET_KEY) : null) },
       { provide: ABLAGE, useFactory: () => new DateiAblage(path.resolve(k.ABLAGE_VERZEICHNIS ?? "ablage")) },
       { provide: Datenbank, useFactory: () => new Datenbank({ connectionString: k.DATABASE_URL, max: 20 }) },
       {

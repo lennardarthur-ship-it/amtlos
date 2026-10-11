@@ -19,6 +19,7 @@ async function fehlertext(r: Response): Promise<string> {
  */
 export async function senden<T = unknown>(pfad: string, methode: string, koerper: unknown, zurueck: string): Promise<T> {
   const r = await apiAntwort(pfad, { method: methode, ...(koerper === undefined ? {} : { body: JSON.stringify(koerper) }) });
+  if (r.status === 402) redirect("/einstellungen/abo?abgelaufen=1");
   if (r.status >= 400 && r.status < 500) {
     const trenner = zurueck.includes("?") ? "&" : "?";
     redirect(`${zurueck}${trenner}fehler=${encodeURIComponent(await fehlertext(r))}`);

@@ -3,7 +3,7 @@ import { Body, ConflictException, Controller, Delete, ForbiddenException, Get, H
 import type PgBoss from "pg-boss";
 import { z } from "zod";
 import { Datenbank, einladungEinreihen, pgFehlercode } from "@amtlos/server";
-import { Kontext, MitUnternehmen, type Anfragekontext } from "./auth.js";
+import { Kontext, MitUnternehmen, OhneAbo, type Anfragekontext } from "./auth.js";
 import { pruefe, uebersetzeDbFehler } from "./hilfen.js";
 import { KONFIGURATION, type Konfiguration } from "./konfiguration.js";
 import { WARTESCHLANGE } from "./kern.controller.js";
@@ -159,6 +159,7 @@ export class TeamController {
 
   /** Selbst austreten (jede Rolle). Der letzte Inhaber kann nicht austreten. */
   @MitUnternehmen()
+  @OhneAbo()
   @Post("team/verlassen")
   @HttpCode(204)
   async verlassen(@Kontext() k: Anfragekontext) {

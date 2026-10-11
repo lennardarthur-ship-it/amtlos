@@ -11,3 +11,30 @@ services:
       interval: 5s
 volumes:
   pgdaten:
+
+  # Identity-Provider für AUTH_MODUS=oidc (E-014): `docker compose --profile auth up -d`
+  # Erste Anmeldung: http://localhost:8080/ui/console mit zitadel-admin@zitadel.localhost / Password1!
+  # Danach: Projekt „Amtlos“ anlegen, eine Web-Anwendung (PKCE, Redirect http://localhost:3000/auth/rueckruf)
+  # und eine native Anwendung für die App (Redirect amtlos://anmelden); Client-IDs in .env eintragen.
+  zitadel:
+    profiles: [auth]
+    image: ghcr.io/zitadel/zitadel:v2.65.0
+    command: start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
+    environment:
+      ZITADEL_DATABASE_POSTGRES_HOST: postgres
+      ZITADEL_DATABASE_POSTGRES_PORT: 5432
+      ZITADEL_DATABASE_POSTGRES_DATABASE: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
+      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: postgres
+      ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: postgres
+      ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
+      ZITADEL_EXTERNALSECURE: "false"
+      ZITADEL_EXTERNALDOMAIN: localhost
+      ZITADEL_EXTERNALPORT: 8080
+      ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_PASSWORDLESSTYPE: PASSWORDLESS_TYPE_ALLOWED   # Passkeys
+      ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_FORCEMFA: "false"
+    depends_on:
+      postgres: { condition: service_healthy }
+    ports: ["8080:8080"]

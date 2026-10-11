@@ -22,6 +22,12 @@ const Schema = z
     ONLINECHECK_PRIVATE_NETZE: z.enum(["erlaubt", "verboten"]).default("verboten"),
     /** Online-Checks je Unternehmen und Tag */
     ONLINECHECK_JE_TAG: z.coerce.number().int().positive().default(20),
+    /** Abo über Stripe (E-113): ohne Schlüssel ist Bezahlen abgeschaltet (nur Testphase); in staging/prod Pflicht. */
+    STRIPE_SECRET_KEY: z.string().min(20).optional(),
+    STRIPE_WEBHOOK_SECRET: z.string().min(20).optional(),
+    STRIPE_PREIS_ID: z.string().min(5).optional(),
+    /** Länge der Testphase in Tagen (Konfiguration, nicht Code – Spezifikation 9) */
+    ABO_TESTTAGE: z.coerce.number().int().min(0).max(365).default(14),
   })
   .superRefine((k, ctx) => {
     if (k.AUTH_MODUS === "oidc" && (!k.OIDC_ISSUER || !k.OIDC_AUDIENCE))
@@ -30,6 +36,8 @@ const Schema = z
       ctx.addIssue({ code: "custom", message: "ABLAGE_VERZEICHNIS ist in staging/prod Pflicht (Belege und Rechnungen müssen dauerhaft liegen)" });
     if ((k.UMGEBUNG === "prod" || k.UMGEBUNG === "staging") && k.ONLINECHECK_PRIVATE_NETZE === "erlaubt")
       ctx.addIssue({ code: "custom", message: "ONLINECHECK_PRIVATE_NETZE=erlaubt ist in staging und prod verboten (SSRF)" });
+    if ((k.UMGEBUNG === "prod" || k.UMGEBUNG === "staging") && (!k.STRIPE_SECRET_KEY || !k.STRIPE_WEBHOOK_SECRET || !k.STRIPE_PREIS_ID))
+      ctx.addIssue({ code: "custom", message: "STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET und STRIPE_PREIS_ID sind in staging/prod Pflicht (Abo, E-113)" });
     if (k.AUTH_MODUS === "dev") {
       if (!k.DEV_JWT_SECRET) ctx.addIssue({ code: "custom", message: "AUTH_MODUS=dev braucht DEV_JWT_SECRET (≥ 32 Zeichen)" });
       if (k.UMGEBUNG === "prod" || k.UMGEBUNG === "staging")

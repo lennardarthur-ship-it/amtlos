@@ -14,3 +14,4 @@ export * from "./onlinecheck.js";
 export * from "./assistent.js";
 export * from "./marktplatz.js";
 export * from "./push.js";
+export * from "./abo.js";

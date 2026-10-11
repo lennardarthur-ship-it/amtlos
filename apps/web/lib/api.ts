@@ -49,6 +49,7 @@ export async function api<T>(pfad: string, init: RequestInit = {}): Promise<T> {
   const u = await aktivesUnternehmen();
   const r = await roh(pfad, { ...init, unternehmen: u.id });
   if (r.status === 404) notFound();
+  if (r.status === 402) redirect("/einstellungen/abo?abgelaufen=1"); // Testphase vorbei: zum Abo (E-113)
   if (r.status === 422) throw new EingabeFehler(((await r.json()) as { fehler?: { feld: string; meldung: string }[] }).fehler ?? []);
   if (!r.ok) throw new Error(`API ${init.method ?? "GET"} ${pfad}: ${r.status}`);
   return (r.status === 204 ? undefined : await r.json()) as T;

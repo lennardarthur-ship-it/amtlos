@@ -92,6 +92,15 @@ paths:
       responses:
         "201": { description: Angelegt, content: { application/json: { schema: { $ref: "#/components/schemas/UnternehmenMitRolle" } } } }
         "422": { $ref: "#/components/responses/Eingabefehler" }
+    delete:
+      tags: [Konto]
+      summary: Unternehmen löschen (nur Inhaber, Name zur Bestätigung); sofort unsichtbar, endgültig nach 30 Tagen
+      x-rollen: [inhaber]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [name], properties: { name: { type: string } } } } } }
+      responses:
+        "204": { description: Gelöscht }
+        "400": { description: Name passt nicht }
 
   /v1/profil:
     get:
@@ -1757,6 +1766,61 @@ paths:
       responses:
         "201": { description: Token }
         "403": { description: Nicht in dieser Umgebung }
+
+  /v1/abo:
+    get:
+      tags: [Konto]
+      summary: Abo-Stand des Unternehmens (Testphase, aktiv, überfällig, abgelaufen) und ob Schreiben erlaubt ist
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: object, properties: { status: { type: string }, test_bis: { type: string, format: date }, laeuft_bis: { type: string, format: date, nullable: true }, schreibbar: { type: boolean }, bezahlen_moeglich: { type: boolean }, plan_name: { type: string }, testtage: { type: integer } } } } } }
+
+  /v1/abo/checkout:
+    post:
+      tags: [Konto]
+      summary: Bezahlvorgang bei Stripe starten (Adresse zum Weiterleiten); auch ohne laufendes Abo erlaubt
+      x-rollen: [inhaber, admin]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "201": { description: OK, content: { application/json: { schema: { type: object, properties: { url: { type: string } } } } } }
+        "503": { description: Bezahlen nicht eingerichtet }
+
+  /v1/abo/portal:
+    post:
+      tags: [Konto]
+      summary: Stripe-Kundenportal öffnen (Rechnungen, Zahlungsmittel, Kündigung)
+      x-rollen: [inhaber, admin]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "201": { description: OK }
+        "409": { description: Noch kein Abo }
+        "503": { description: Bezahlen nicht eingerichtet }
+
+  /v1/stripe/webhook:
+    post:
+      tags: [Konto]
+      summary: Stripe-Webhook (Signatur über den rohen Body, idempotent über die Ereignis-ID)
+      security: []
+      responses:
+        "200": { description: Verarbeitet, doppelt oder ignoriert }
+        "400": { description: Signatur ungültig }
+
+  /v1/export:
+    get:
+      tags: [Konto]
+      summary: Datenexport des Unternehmens als JSON (DSGVO Art. 20)
+      x-rollen: [inhaber, admin]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: JSON-Datei }
+
+  /v1/ich/loeschen:
+    post:
+      tags: [Konto]
+      summary: Eigenes Konto löschen (nur ohne aktives Unternehmen); personenbezogene Felder werden unkenntlich
+      responses:
+        "204": { description: Gelöscht }
+        "409": { description: Noch Unternehmen vorhanden }
 
 components:
   securitySchemes:

@@ -1,3 +1,4 @@
+import { Fusszeile } from "@/komponenten/fusszeile";
 import { Markenname } from "@/komponenten/markenname";
 import { redirect } from "next/navigation";
 import { devAnmelden } from "@amtlos/web-kern/auth-routen";
@@ -16,8 +17,8 @@ async function devLogin(formular: FormData) {
   redirect(weiter);
 }
 
-export default async function Anmelden({ searchParams }: { searchParams: Promise<{ fehler?: string; weiter?: string }> }) {
-  const [{ t: x }, { fehler, weiter: roh }] = await Promise.all([t(), searchParams]);
+export default async function Anmelden({ searchParams }: { searchParams: Promise<{ fehler?: string; weiter?: string; geloescht?: string }> }) {
+  const [{ t: x }, { fehler, weiter: roh, geloescht }] = await Promise.all([t(), searchParams]);
   const weiter = sichererPfad(roh);
   if (await sitzung()) redirect(weiter);
   const dev = konfig().authModus === "dev";
@@ -26,6 +27,7 @@ export default async function Anmelden({ searchParams }: { searchParams: Promise
       <p><Markenname /></p>
       <h1 className="mt-10 text-titel font-bold">{x.anmelden.titel}</h1>
       <p className="mt-2">{x.anmelden.text}</p>
+      {geloescht ? <p role="status" className="mt-4 rounded-md bg-amt-hauch p-4 font-bold text-amt">{x.loeschen.geloescht}</p> : null}
       {fehler ? (
         <p role="alert" className="mt-4 rounded-md border-2 border-frist bg-frist-hauch p-4">
           {x.anmelden.fehler}
@@ -46,6 +48,7 @@ export default async function Anmelden({ searchParams }: { searchParams: Promise
           {x.anmelden.knopf}
         </a>
       )}
+      <Fusszeile className="mt-12" />
     </main>
   );
 }

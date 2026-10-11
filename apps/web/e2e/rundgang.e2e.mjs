@@ -115,7 +115,7 @@ async function rundgang(farbschema, breite) {
     pruefe(gestempelt, `${name("pflicht")}: kein Erledigt-Stempel`);
   }
 
-  for (const seite of ["kalender", "melden", "einstellungen", "hilfe", "pflichten/nicht-zutreffend", "gruendung", "gruendung/fragebogen"]) {
+  for (const seite of ["kalender", "melden", "einstellungen", "einstellungen/abo", "recht/impressum", "recht/datenschutz", "recht/agb", "hilfe", "pflichten/nicht-zutreffend", "gruendung", "gruendung/fragebogen"]) {
     await p.goto(`${B}/${seite}`);
     await barrierefrei(p, name(seite.replace("/", "-")));
   }
@@ -468,6 +468,32 @@ async function rundgang(farbschema, breite) {
   await p.goto(`${B}/einstellungen`);
   await p.selectOption('select[name="sprache"]', "de");
   await Promise.all([p.waitForLoadState("networkidle"), p.getByRole("button", { name: "Save language" }).click()]);
+
+  // Abo-Stand und Datenexport; Unternehmen löschen mit Namensbestätigung (eigenes Wegwerf-Konto)
+  if (farbschema === "light") {
+    await p.goto(`${B}/einstellungen`);
+    pruefe(await p.getByText("Testphase").count(), `${name("einstellungen")}: Abo-Stand fehlt`);
+    const exp = await p.request.get(`${B}/einstellungen/export`);
+    pruefe(exp.ok() && (await exp.json()).unternehmen?.name === "Testbetrieb", `${name("export")}: Datenexport fehlt oder unvollständig`);
+    const ctx3 = await browser.newContext({ viewport: { width: breite, height: 900 }, colorScheme: farbschema, locale: "de-DE" });
+    const w = await ctx3.newPage();
+    await w.goto(`${B}/anmelden`);
+    await w.fill("#kennung", `${kennung}-weg`);
+    await Promise.all([w.waitForURL(/unternehmen\/neu/), w.click("button")]);
+    await w.fill("#name", "Wegwerf");
+    await Promise.all([w.waitForURL(/onboarding/), w.click("button")]);
+    await w.goto(`${B}/einstellungen`);
+    await w.getByText("Unternehmen löschen", { exact: true }).click(); // <details> öffnen
+    await w.fill("#loesch-name", "Falsch");
+    await Promise.all([w.waitForURL(/fehler=/), w.getByRole("button", { name: "Unternehmen endgültig löschen" }).click()]);
+    await w.getByText("Unternehmen löschen", { exact: true }).click();
+    await w.fill("#loesch-name", "Wegwerf");
+    await Promise.all([w.waitForURL(/\/unternehmen\?geloescht=1/), w.getByRole("button", { name: "Unternehmen endgültig löschen" }).click()]);
+    await barrierefrei(w, name("unternehmen-geloescht"));
+    await Promise.all([w.waitForURL(/anmelden\?geloescht=1/), w.getByRole("button", { name: "Mein Konto löschen" }).click()]);
+    pruefe(await w.getByText("Gelöscht. Du wurdest abgemeldet.").count(), `${name("konto-geloescht")}: keine Bestätigung`);
+    await ctx3.close();
+  }
   await ctx.close();
 }
 
