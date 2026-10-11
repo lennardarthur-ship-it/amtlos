@@ -1,0 +1,57 @@
+# Katalog H.3 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: branche.beauty_kosmetikverordnung
+version: 1
+katalog_nr: H.3
+titel:
+  de: Kosmetikverordnung bei eigenen Produkten
+kurz:
+  de: Stellst du eigene Kosmetikprodukte her oder bringst sie unter deinem Namen in Verkehr, gelten die Pflichten der EU-Kosmetikverordnung.
+erklaerung:
+  de: Dazu gehören eine verantwortliche Person, eine Sicherheitsbewertung und eine Produktinformationsdatei.
+rechtsgrundlage:
+- Verordnung (EG) Nr. 1223/2009
+kategorie: branche
+branchen:
+- beauty_kosmetik
+ausloeser:
+  all:
+  - feld: profil.taetigkeit.branchen
+    op: enthaelt
+    wert: beauty_kosmetik
+    label:
+      de: Dein Betrieb gehört zur Beauty- und Kosmetikbranche.
+  - feld: profil.produkte.arten
+    op: enthaelt
+    wert: kosmetik
+    label:
+      de: Du verkaufst Kosmetik.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; verantwortliche Person
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Verordnung (EG) Nr. 1223/2009
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32009R1223
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Notifizierung (CPNP) und Kennzeichnung ergänzen
+- Abgrenzung Herstellung ↔ Weiterverkauf
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

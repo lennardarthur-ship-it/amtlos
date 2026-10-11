@@ -1,0 +1,24 @@
+persona: mehrere_branchen
+beschreibung: Mischbetrieb (Bau, Transport, IT, Immobilien mit § 34c) – je Branche die passenden Pflichten
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: "2012-01-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [bau, transport_logistik, it_agentur_freelancer, immobilien_finanzen]
+  profil.erlaubnis.gewo_paragraphen: ["34c"]
+  profil.beschaeftigte.gesamt: 15
+  profil.rentenversicherung.pflichtgruppe: [keine]
+  profil.bundesland: BB
+  profil.gemeinde_ags: "12054000"
+erwartet:
+  branche.bau_soka: gilt
+  branche.bau_baustellenverordnung: gilt
+  branche.transport_erlaubnis: gilt
+  branche.transport_lenkzeiten: gilt
+  branche.it_scheinselbststaendigkeit: gilt
+  branche.it_haftung: gilt
+  branche.immo_weiterbildung: gilt
+  branche.immo_gwg: gilt
+  branche.gesundheit_erlaubnisse: gilt_nicht
+  branche.gastro_haccp: gilt_nicht

@@ -1,0 +1,50 @@
+# Katalog H.8 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: branche.immo_gwg
+version: 1
+katalog_nr: H.8
+titel:
+  de: Geldwäschegesetz für Immobilien- und Finanzbranche
+kurz:
+  de: Immobilienmakler und viele Finanzdienstleister sind Verpflichtete nach dem Geldwäschegesetz.
+erklaerung:
+  de: Dazu gehören Risikoanalyse, Identifizierung der Vertragspartner und Verdachtsmeldungen.
+rechtsgrundlage:
+- § 2 GwG
+kategorie: branche
+branchen:
+- immobilien_finanzen
+ausloeser:
+  feld: profil.taetigkeit.branchen
+  op: enthaelt
+  wert: immobilien_finanzen
+  label:
+    de: Dein Betrieb gehört zur Immobilien- oder Finanzbranche.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Aufsicht der Länder bzw. BaFin
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Geldwäschegesetz § 2
+  url: https://www.gesetze-im-internet.de/gwg_2017/__2.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Welche Tätigkeiten genau (Makler, Vermittler) – Auslöser verfeinern
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

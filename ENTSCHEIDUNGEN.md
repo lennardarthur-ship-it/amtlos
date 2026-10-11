@@ -363,6 +363,12 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Datum:** 2026-10-11 · **Status:** angenommen (ersetzt den mobilen Teil von E-096)
 - Mit „Online“ hat die App acht Bereiche. Am Desktop stehen alle in der Seitenleiste. Mobil zeigt die Leiste fünf Bereiche (Heute, Pflichten, Kalender, Finanzen, Personal) und „Mehr“; dort stehen Datenschutz, Online, Änderung melden, Team, Hilfe und Einstellungen. „Mehr“ ist aktiv markiert, wenn man sich in einem dieser Bereiche befindet. Der Notfallknopf für Datenpannen ist zusätzlich von „Heute“ und „Änderung melden“ aus erreichbar.
 
+### E-099 · Branchenpakete: Katalog-Zuordnung plus wenige Werkzeuge
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Ein Branchenpaket ist **keine eigene Datenstruktur**: Pflichten tragen im Katalog das Feld `branchen` (vorhandene Pflichten wurden zugeordnet und dafür in neuer Version veröffentlicht, Versionen bleiben unveränderlich). Die Seite „Branche“ zeigt je Branche des Profils die zutreffenden Pflichten und die passenden Werkzeuge. Onlinehandel gilt auch bei angegebenem Onlineshop.
+- Katalog H (18 neue Pflichten) für alle neun Branchen der Spezifikation; ausgebaut mit eigenen Werkzeugen ist zuerst die **Gastronomie**: HACCP-Eigenkontrollen (Messpunkte mit vom Betrieb festgelegten Grenzwerten, Messungen nur anhängend, Abweichung nur mit Maßnahme, Grenzwerte je Messung mitgespeichert, Monatsprotokoll), **Allergenliste** je Gericht mit den 14 Hauptallergenen nach Anhang II LMIV (Liste als feste Auswahl, fachlich zu prüfen T-33) und Aushang-PDF, **Belehrung nach § 43 IfSG** als Unterweisungsart, die die Pflicht je Einstellung erledigt. Handwerk, Bau und Beauty nutzen die vorhandenen Arbeitsschutz-Werkzeuge; Onlinehandel den Online-Check; IT die Dienstleister- und KI-Werkzeuge.
+- Keine Grenzwerte, Kontrollfrequenzen, Prüffristen oder Verjährungsfristen im Code – wo die Spezifikation sie nicht nennt, sind sie Prüfpunkte.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

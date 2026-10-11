@@ -58,6 +58,7 @@ function karte(z: Zeile, s: "de" | "en") {
     titel: t(d.titel, s),
     kurz: t(d.kurz, s),
     kategorie: d.kategorie,
+    branchen: (d.branchen as string[] | undefined) ?? [],
     bereich: BEREICH_JE_KATEGORIE[d.kategorie] ?? "gesellschaft",
     sanktion: { text: t(d.sanktion.text, s), schwere: d.sanktion.schwere },
     rechtsgrundlage: d.rechtsgrundlage,

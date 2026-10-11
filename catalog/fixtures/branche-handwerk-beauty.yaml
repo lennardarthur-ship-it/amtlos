@@ -1,0 +1,23 @@
+persona: handwerk
+beschreibung: Friseur- und Kosmetiksalon (Handwerk und Beauty) mit eigener Kosmetiklinie und 4 Beschäftigten
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2015-01-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [handwerk, beauty_kosmetik]
+  profil.handwerk.anlage: a
+  profil.beschaeftigte.gesamt: 4
+  profil.kunden.segmente: [b2c]
+  profil.produkte.arten: [dienstleistung, kosmetik]
+  profil.arbeitsschutz.gefahrstoffe: true
+  profil.bundesland: RP
+  profil.gemeinde_ags: "07315000"
+erwartet:
+  branche.handwerk_gefaehrdung_gewerk: gilt
+  branche.handwerk_gewaehrleistung: gilt
+  branche.beauty_hygieneplan: gilt
+  branche.beauty_hautschutzplan: gilt
+  branche.beauty_kosmetikverordnung: gilt
+  arbeitsschutz.gefahrstoffe: gilt
+  branche.bau_soka: gilt_nicht

@@ -1,7 +1,7 @@
 # Katalog G.70 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.barrierefreiheit
-version: 1
+version: 2
 katalog_nr: G.70
 titel:
   de: Barrierefreiheit von Onlineshop und Buchungstools (BFSG)
@@ -13,6 +13,8 @@ erklaerung:
 rechtsgrundlage:
 - BFSG
 kategorie: online
+branchen:
+- onlinehandel
 ausloeser:
   all:
   - feld: profil.kunden.segmente

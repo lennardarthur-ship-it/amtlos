@@ -1,7 +1,7 @@
 # Katalog G.74 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.dac7
-version: 1
+version: 2
 katalog_nr: G.74
 titel:
   de: Meldungen der Plattformen an das Finanzamt (DAC7) verstehen
@@ -14,6 +14,8 @@ erklaerung:
 rechtsgrundlage:
 - PStTG
 kategorie: online
+branchen:
+- onlinehandel
 ausloeser:
   feld: profil.vertrieb.kanaele
   op: enthaelt

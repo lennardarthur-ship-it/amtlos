@@ -32,6 +32,7 @@ tags:
   - name: Arbeitsschutz
   - name: Datenschutz
   - name: Online
+  - name: Branchen
 
 paths:
   /v1/gesundheit:
@@ -567,7 +568,7 @@ paths:
     get:
       tags: [Personal]
       summary: Unterweisungen und Schulungen mit Zahl der Bestätigungen
-      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: art, in: query, required: false, schema: { type: string, enum: [arbeitsschutz, ki_kompetenz, datenschutz] } }]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: art, in: query, required: false, schema: { type: string, enum: [arbeitsschutz, ki_kompetenz, datenschutz, ifsg] } }]
       responses:
         "200": { description: OK }
     post:
@@ -587,7 +588,7 @@ paths:
                 inhalt: { type: string, maxLength: 20000 }
                 datum: { type: string, format: date }
                 durchgefuehrt_von: { type: string }
-                art: { type: string, enum: [arbeitsschutz, ki_kompetenz, datenschutz], default: arbeitsschutz }
+                art: { type: string, enum: [arbeitsschutz, ki_kompetenz, datenschutz, ifsg], default: arbeitsschutz }
       responses:
         "201": { description: Angelegt }
 
@@ -1225,6 +1226,106 @@ paths:
         "200": { description: OK }
         "404": { description: Nicht gefunden }
 
+  /v1/messpunkte:
+    get:
+      tags: [Branchen]
+      summary: Messpunkte der Eigenkontrollen (HACCP) mit letzter Messung
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK }
+    post:
+      tags: [Branchen]
+      summary: Messpunkt anlegen – Grenzwerte legt der Betrieb fest
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/MesspunktEingabe" } } } }
+      responses:
+        "201": { description: Angelegt }
+        "422": { description: Eingabe ungültig }
+
+  /v1/messpunkte/{id}:
+    put:
+      tags: [Branchen]
+      summary: Messpunkt ändern (frühere Messungen behalten ihre Grenzwerte)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/MesspunktEingabe" } } } }
+      responses:
+        "200": { description: Geändert }
+        "404": { description: Nicht gefunden }
+
+  /v1/messpunkte/{id}/messungen:
+    post:
+      tags: [Branchen]
+      summary: Messung erfassen (alle Mitglieder); bei Abweichung ist eine Maßnahme Pflicht
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [wert], properties: { wert: { type: number }, gemessen_am: { type: string, format: date-time }, massnahme: { type: string } } } } } }
+      responses:
+        "201": { description: Erfasst }
+        "404": { description: Kein aktiver Messpunkt }
+        "422": { description: Maßnahme fehlt }
+
+  /v1/eigenkontrollen:
+    get:
+      tags: [Branchen]
+      summary: Messungen eines Monats mit Zahl der Abweichungen
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: monat, in: query, required: true, schema: { type: string } }]
+      responses:
+        "200": { description: OK }
+        "400": { description: Monat fehlt }
+
+  /v1/eigenkontrollen/protokoll:
+    get:
+      tags: [Branchen]
+      summary: Monatsprotokoll der Eigenkontrollen als PDF
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: monat, in: query, required: true, schema: { type: string } }]
+      responses:
+        "200": { description: PDF, content: { application/pdf: { schema: { type: string, format: binary } } } }
+        "400": { description: Monat fehlt }
+
+  /v1/allergene:
+    get:
+      tags: [Branchen]
+      summary: Die 14 Hauptallergene (Anhang II LMIV)
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK }
+
+  /v1/gerichte:
+    get:
+      tags: [Branchen]
+      summary: Gerichte mit Allergenen
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK }
+    post:
+      tags: [Branchen]
+      summary: Gericht anlegen
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/GerichtEingabe" } } } }
+      responses:
+        "201": { description: Angelegt }
+
+  /v1/gerichte/{id}:
+    put:
+      tags: [Branchen]
+      summary: Gericht ändern oder aus dem Angebot nehmen (aktiv false)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/GerichtEingabe" } } } }
+      responses:
+        "200": { description: Geändert }
+        "404": { description: Nicht gefunden }
+
+  /v1/gerichte/aushang:
+    get:
+      tags: [Branchen]
+      summary: Allergenübersicht zum Aushängen (PDF)
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: PDF, content: { application/pdf: { schema: { type: string, format: binary } } } }
+
   /v1/glossar:
     get:
       tags: [Pflichten]
@@ -1403,6 +1504,23 @@ components:
           schema: { type: object, properties: { meldung: { type: string }, fehler: { type: array, items: { type: object, properties: { feld: { type: string }, meldung: { type: string } } } } } }
 
   schemas:
+    MesspunktEingabe:
+      type: object
+      required: [bezeichnung]
+      properties:
+        bezeichnung: { type: string }
+        einheit: { type: string, enum: ["°C", "%", pH, sonstige] }
+        grenze_min: { type: [number, "null"] }
+        grenze_max: { type: [number, "null"] }
+        aktiv: { type: boolean }
+    GerichtEingabe:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
+        kategorie: { type: string }
+        allergene: { type: array, items: { type: string, enum: [gluten, krebstiere, eier, fische, erdnuesse, soja, milch, schalenfruechte, sellerie, senf, sesam, schwefeldioxid, lupinen, weichtiere] } }
+        aktiv: { type: boolean }
     VerarbeitungEingabe:
       type: object
       required: [bezeichnung]

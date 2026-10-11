@@ -1,7 +1,7 @@
 # Katalog G.69 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.vsbg_hinweis
-version: 1
+version: 2
 katalog_nr: G.69
 titel:
   de: Hinweis zur Verbraucherstreitbeilegung
@@ -13,6 +13,8 @@ erklaerung:
 rechtsgrundlage:
 - § 36 VSBG
 kategorie: online
+branchen:
+- onlinehandel
 ausloeser:
   all:
   - feld: profil.kunden.segmente

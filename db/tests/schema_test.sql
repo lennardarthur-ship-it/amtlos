@@ -269,6 +269,20 @@ select pg_temp.erwarte_fehler(format($$update app.online_check set status = 'feh
 select pg_temp.ok(true, 'Online-Check-Ergebnisse sind unveränderlich');
 reset role;
 
+-- ---------- Branchen (0012) ----------
+set role api_user;
+select set_config('amtlos.konto_id', :'anna_konto_anmelden', false);
+select set_config('amtlos.unternehmen_id', :'u1', false);
+insert into app.messpunkt (unternehmen_id, bezeichnung, grenze_max) values (:'u1', 'Kühlschrank', 7) returning id as mp1 \gset
+select pg_temp.erwarte_fehler(format($$insert into app.messung (unternehmen_id, messpunkt_id, wert, in_ordnung) values (%L, %L, 9, false)$$, :'u1', :'mp1'), 'check constraint');
+select pg_temp.ok(true, 'Abweichende Messung nur mit Maßnahme');
+insert into app.messung (unternehmen_id, messpunkt_id, wert, in_ordnung) values (:'u1', :'mp1', 5, true) returning id as ms1 \gset
+select pg_temp.erwarte_fehler(format($$update app.messung set wert = 4 where id = %L$$, :'ms1'), 'permission denied');
+select pg_temp.ok(true, 'Messungen sind unveränderlich');
+select pg_temp.erwarte_fehler(format($$insert into app.gericht (unternehmen_id, name, allergene) values (%L, 'X', '{gluten,nuesse}')$$, :'u1'), 'check constraint');
+select pg_temp.ok(true, 'Nur die 14 Hauptallergene');
+reset role;
+
 -- ---------- Audit ----------
 select pg_temp.ok((select count(*) > 10 from audit.ereignis), 'Audit protokolliert Änderungen');
 select pg_temp.ok((select bool_and(vorgaenger_hash is not null) from audit.ereignis where id > (select min(id) from audit.ereignis)), 'Hash-Kette lückenlos');

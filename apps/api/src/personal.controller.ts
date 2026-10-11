@@ -22,7 +22,7 @@ const BeschaeftigterNeu = z
   .object({ vorname: z.string().trim().min(1).max(100), nachname: z.string().trim().min(1).max(100), art: ART, eintritt: DATUM, wochenstunden: z.number().positive().max(80).nullable().optional() })
   .strict();
 const BeschaeftigterAendern = BeschaeftigterNeu.omit({ eintritt: true });
-const UNTERWEISUNGSARTEN = ["arbeitsschutz", "ki_kompetenz", "datenschutz"] as const;
+const UNTERWEISUNGSARTEN = ["arbeitsschutz", "ki_kompetenz", "datenschutz", "ifsg"] as const;
 const UnterweisungNeu = z
   .object({
     thema: z.string().trim().min(1).max(200), inhalt: z.string().trim().min(1).max(20000), datum: DATUM, durchgefuehrt_von: z.string().trim().min(1).max(200),
@@ -312,7 +312,7 @@ export class PersonalController {
           unternehmen, thema: u.thema, inhalt: u.inhalt, datum: u.datum, durchgefuehrt_von: u.durchgefuehrt_von, inhalt_sha256: u.inhalt_sha256.toString("hex"),
           teilnahmen: teilnahmen.map((x) => ({ name: `${x.vorname} ${x.nachname}`, bestaetigt_am: new Date(x.bestaetigt_am).toISOString(), name_bestaetigt: x.name_bestaetigt })),
         });
-        const dok = await dokumentAblegen(tx, this.ablage, { unternehmenId: k.unternehmenId!, kontoId: k.kontoId, titel: `${u.art === "arbeitsschutz" ? "Unterweisung" : "Schulung"} ${u.thema} ${u.datum}`, art: "nachweis", quelle: "generiert", mime: "application/pdf", inhalt: pdf, endung: "pdf" });
+        const dok = await dokumentAblegen(tx, this.ablage, { unternehmenId: k.unternehmenId!, kontoId: k.kontoId, titel: `${u.art === "arbeitsschutz" ? "Unterweisung" : u.art === "ifsg" ? "Belehrung IfSG" : "Schulung"} ${u.thema} ${u.datum}`, art: "nachweis", quelle: "generiert", mime: "application/pdf", inhalt: pdf, endung: "pdf" });
         await tx.abfrage("update app.unterweisung set abgeschlossen_am = now(), dokument_id = $2 where id = $1", [id, dok.id]);
         let erledigt: { id: string }[] = [];
         if (u.art === "arbeitsschutz") {
@@ -326,6 +326,14 @@ export class PersonalController {
                   or (pflicht_id = 'arbeitsschutz.erstunterweisung' and periode = any($4)))
               returning id`,
             [k.unternehmenId, k.kontoId, u.datum, perioden],
+          );
+        } else if (u.art === "ifsg") {
+          // Belehrung nach § 43 IfSG: erledigt die Pflicht je Einstellung der Teilnehmenden (Branchenpaket Gastronomie)
+          const perioden = teilnahmen.map((x) => `aenderung-${x.eintritt.replaceAll("-", "")}`);
+          erledigt = await tx.abfrage<{ id: string }>(
+            `update app.pflicht_instanz set status = 'erledigt', erledigt_am = now(), erledigt_von = $2, erledigt_mit_version_id = pflicht_version_id, aktualisiert_am = now()
+              where unternehmen_id = $1 and status = 'offen' and ergebnis = 'gilt' and pflicht_id = 'branche.gastro_ifsg_belehrung' and periode = any($3) returning id`,
+            [k.unternehmenId, k.kontoId, perioden],
           );
         } else if (u.art === "ki_kompetenz") {
           // KI-Kompetenz (Art. 4 KI-VO): die Schulung ist der Nachweis (E-095)

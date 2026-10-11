@@ -1,0 +1,60 @@
+# Katalog H.4 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: branche.bau_soka
+version: 1
+katalog_nr: H.4
+titel:
+  de: Teilnahme an SOKA-BAU
+kurz:
+  de: Baubetriebe mit gewerblichen Beschäftigten nehmen an den Sozialkassenverfahren der Bauwirtschaft (SOKA-BAU) teil.
+erklaerung:
+  de: Die Sozialkassen regeln unter anderem Urlaub und Berufsbildung in der Bauwirtschaft. Ob dein Betrieb erfasst ist, hängt
+    von den überwiegenden Tätigkeiten ab.
+rechtsgrundlage:
+- Tarifverträge über das Sozialkassenverfahren (VTV)
+- SokaSiG
+kategorie: branche
+branchen:
+- bau
+ausloeser:
+  all:
+  - feld: profil.taetigkeit.branchen
+    op: enthaelt
+    wert: bau
+    label:
+      de: Dein Betrieb gehört zur Baubranche.
+  - feld: abgeleitet.hat_beschaeftigte
+    op: ==
+    wert: true
+    label:
+      de: Du beschäftigst mindestens eine Person.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: SOKA-BAU
+kanal: portal
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Sozialkassenverfahrensicherungsgesetz
+  url: https://www.gesetze-im-internet.de/sokasig/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Erfassung nach überwiegender Tätigkeit – Prüfhinweis ergänzen
+- Meldefristen nicht in der Spezifikation
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

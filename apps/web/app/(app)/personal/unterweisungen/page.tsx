@@ -8,7 +8,7 @@ import { t } from "@/lib/sprache";
 export const metadata = { title: "Unterweisungen" };
 
 interface Unterweisung { id: string; thema: string; datum: string; durchgefuehrt_von: string; abgeschlossen_am: string | null; dokument_id: string | null; bestaetigt: number }
-const ARTEN = ["arbeitsschutz", "ki_kompetenz", "datenschutz"] as const;
+const ARTEN = ["arbeitsschutz", "ki_kompetenz", "datenschutz", "ifsg"] as const;
 type Art = (typeof ARTEN)[number];
 
 async function anlegen(art: Art, f: FormData) {
@@ -25,13 +25,14 @@ export default async function UnterweisungenSeite({ searchParams }: { searchPara
   const fehler = sp.fehler;
   const [{ s, t: x }, liste, u] = await Promise.all([t(), api<Unterweisung[]>(`/v1/unterweisungen?art=${art}`), aktivesUnternehmen()]);
   const ki = art === "ki_kompetenz";
+  const ifsg = art === "ifsg";
   const heute = new Date().toISOString().slice(0, 10);
   return (
     <div className="lesetext space-y-8">
-      <p className="text-klein">{ki ? <Link href="/datenschutz" className="verweis">{x.ds.zurueck}</Link> : <Link href="/personal" className="verweis">{x.personal.zurueck}</Link>}</p>
+      <p className="text-klein">{ki ? <Link href="/datenschutz" className="verweis">{x.ds.zurueck}</Link> : ifsg ? <Link href="/branche" className="verweis">{x.branche.zurueck}</Link> : <Link href="/personal" className="verweis">{x.personal.zurueck}</Link>}</p>
       <header>
-        <h1 className="text-titel font-bold">{ki ? x.schulung.titel : x.unterweisung.titel}</h1>
-        <p className="mt-2">{ki ? x.schulung.text : x.unterweisung.text}</p>
+        <h1 className="text-titel font-bold">{ki ? x.schulung.titel : ifsg ? x.ifsg.titel : x.unterweisung.titel}</h1>
+        <p className="mt-2">{ki ? x.schulung.text : ifsg ? x.ifsg.text : x.unterweisung.text}</p>
       </header>
       {fehler ? <p role="alert" className="rounded-md border-2 border-frist bg-frist-hauch p-4">{fehler}</p> : null}
       {liste.length ? (

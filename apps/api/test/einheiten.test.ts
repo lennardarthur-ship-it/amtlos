@@ -134,3 +134,16 @@ describe("Monate addieren (Prüftermine)", async () => {
     expect(plusMonate("2026-11-15", 3)).toBe("2027-02-15");
   });
 });
+
+describe("Eigenkontrollen: Grenzwerte", async () => {
+  const { innerhalb } = await import("../src/branchen.controller.js");
+  it("prüft offene und geschlossene Grenzen einschließlich der Grenzwerte selbst", () => {
+    expect(innerhalb(7, null, 7)).toBe(true);
+    expect(innerhalb(7.01, null, 7)).toBe(false);
+    expect(innerhalb(-18, null, -18)).toBe(true);
+    expect(innerhalb(-17.5, null, -18)).toBe(false);
+    expect(innerhalb(65, 60, null)).toBe(true);
+    expect(innerhalb(59.9, 60, null)).toBe(false);
+    expect(innerhalb(3, null, null)).toBe(true);
+  });
+});

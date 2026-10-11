@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Erzeugt catalog/pflichten/*.yaml für die Kataloge A–G aus Spezifikation Abschnitt 4.
+Erzeugt catalog/pflichten/*.yaml für die Kataloge A–H aus Spezifikation Abschnitt 4.
 
 Regeln (E-054, Spezifikation 14.4):
 - Inhalte (Fristen, Beträge, Auslöser) nur aus der Spezifikation.
@@ -20,6 +20,9 @@ FOLGEN_PLATZHALTER = "Die Folgen sind noch nicht fachlich erfasst."
 WERKTAG_LAND = {"regel": "naechster_werktag", "kalender": "bundesland"}
 KEINE = {"regel": "keine", "kalender": "bundeseinheitlich"}
 NATUERLICHE = ["einzelunternehmen", "freiberuf", "ek", "gbr", "partg", "partg_mbb", "gmbh_co_kg"]
+
+# Bereits veröffentlichte Pflichten, deren Inhalt sich geändert hat, bekommen eine neue Version (Versionen sind unveränderlich, E-019).
+VERSION = {"arbeitsschutz.dguv_v3": 2, "datenschutz.avv": 2, "datenschutz.dsfa": 2, "gruendung.erlaubnis_pruefen": 2, "gruendung.rentenversicherungspflicht": 2, "ki.kompetenz": 2, "ki.transparenz": 2, "online.barrierefreiheit": 2, "online.button_loesung": 2, "online.cookie_einwilligung": 2, "online.dac7": 2, "online.datenschutzerklaerung": 2, "online.impressum": 2, "online.kuendigungsbutton": 2, "online.marktplatz_angaben": 2, "online.os_link": 2, "online.preisangaben": 2, "online.vsbg_hinweis": 2, "online.widerrufsbelehrung": 2, "online.widerrufsbutton": 2, "produkte.batterien": 2, "produkte.elektrogeraete": 2, "produkte.geldwaesche_gueterhaendler": 2, "produkte.gpsr": 2, "produkte.verpackung": 2}  # Abschnitt 8: Branchenpakete zugeordnet
 
 def t(de): return {"de": de}
 def q(titel, pfad): return {"titel": titel, "url": pfad if pfad.startswith("http") else GII + pfad, "abgerufen": None}
@@ -41,7 +44,7 @@ def pflicht(id, nr, titel, kurz, erklaerung, rechtsgrundlage, kategorie, ausloes
     if sanktion is None: sanktion = FOLGEN_PLATZHALTER; pp.append(OHNE_FOLGEN)
     if rg_ergaenzt: pp.append("Rechtsgrundlage ergänzt, steht nicht in der Spezifikation")
     p = {
-        "schema_version": 1, "id": id, "version": 1, "katalog_nr": nr,
+        "schema_version": 1, "id": id, "version": VERSION.get(id, 1), "katalog_nr": nr,
         "titel": t(titel), "kurz": t(kurz), "erklaerung": t(erklaerung),
         **({"begriffe": [{"begriff": t(b), "erklaerung": t(e)} for b, e in begriffe]} if begriffe else {}),
         "rechtsgrundlage": rechtsgrundlage, "kategorie": kategorie,
@@ -99,7 +102,7 @@ pflicht("gruendung.erlaubnis_pruefen", "A.3", "Erlaubnis für dein Gewerbe einho
   GRUENDUNGSDATUM("P0D", "vor_beginn"), "Zuständige Erlaubnisbehörde (je nach Gewerbe und Land)", "portal", "hinweis",
   [q("Gewerbeordnung", "gewo/")],
   ["Reisegewerbekarte (§ 55 GewO) als eigene Pflicht führen?", "Gaststättenrecht je Land: Zuständigkeit und Erlaubnisfreiheit einzelner Länder prüfen"],
-  sanktion=None, schwere="hoch")
+  sanktion=None, schwere="hoch", branchen=['gastronomie_lebensmittel', 'transport_logistik', 'immobilien_finanzen'])
 
 pflicht("gruendung.handwerksrolle", "A.4", "In die Handwerksrolle eintragen",
   "Wenn du ein Handwerk betreibst, musst du dich bei der Handwerkskammer eintragen lassen.",
@@ -179,7 +182,7 @@ pflicht("gruendung.rentenversicherungspflicht", "A.11", "Rentenversicherungspfli
   GRUENDUNGSDATUM("P3M"), "Deutsche Rentenversicherung", "post", "hinweis",
   [q("Sozialgesetzbuch VI § 2", "sgb_6/__2.html"), q("Sozialgesetzbuch VI § 190a", "sgb_6/__190a.html")],
   ["Liste der Gruppen vollständig (§ 2 SGB VI)?", "Fristbeginn: Aufnahme der Tätigkeit = Gründungsdatum?"],
-  schwere="hoch")
+  schwere="hoch", branchen=['gesundheit_pflege', 'it_agentur_freelancer'])
 
 pflicht("gruendung.statusfeststellung", "A.12", "Statusfeststellung erwägen (Scheinselbstständigkeit)",
   "Wenn du nur einen Auftraggeber hast, kannst du bei der Clearingstelle der Rentenversicherung klären lassen, ob du wirklich selbstständig bist.",
@@ -930,7 +933,7 @@ pflicht("arbeitsschutz.dguv_v3", "E.54", "Elektrische Geräte prüfen lassen",
   ["DGUV Vorschrift 3"], "arbeitsschutz",
   {"all": [HAT_B, v("profil.arbeitsschutz.elektrische_geraete", "==", True, "Ihr nutzt elektrische Geräte im Betrieb.")]}, "dauerhaft", "Elektrofachkraft", "partner", "hinweis",
   [q("DGUV Vorschrift 3", "https://publikationen.dguv.de/regelwerk/dguv-vorschriften/")],
-  ["Prüffristen je Geräteart als Regelwerte (nicht in der Spezifikation)"], schwere="mittel")
+  ["Prüffristen je Geräteart als Regelwerte (nicht in der Spezifikation)"], schwere="mittel", branchen=['handwerk', 'bau'])
 
 pflicht("arbeitsschutz.gefahrstoffe", "E.55", "Gefahrstoffverzeichnis und Betriebsanweisungen",
   "Wenn ihr mit Gefahrstoffen arbeitet, führst du ein Verzeichnis und schreibst Betriebsanweisungen.",
@@ -999,7 +1002,7 @@ pflicht("datenschutz.avv", "F.58", "Auftragsverarbeitungsverträge abschließen"
   [DSGVO(28)],
   ["Abgrenzung Auftragsverarbeitung ↔ eigene Verantwortung (z. B. Steuerberatung) als Hinweis ergänzen"], schwere="mittel",
   begriffe=[("Auftragsverarbeitung", "Ein Dienstleister verarbeitet Daten in deinem Auftrag und nach deinen Weisungen.")],
-  aktion={"art": "link", "ziel": "app.dienstleister"})
+  aktion={"art": "link", "ziel": "app.dienstleister"}, branchen=['it_agentur_freelancer'])
 
 pflicht("datenschutz.informationspflichten", "F.58", "Über die Datenverarbeitung informieren",
   "Wenn du Daten erhebst, informierst du die Menschen darüber – etwa in einer Datenschutzerklärung oder einem Informationsblatt.",
@@ -1065,7 +1068,7 @@ pflicht("datenschutz.dsfa", "F.62", "Prüfen, ob eine Datenschutz-Folgenabschät
   {"any": [DATENART("gesundheitsdaten", "Du verarbeitest Gesundheitsdaten."), DATENART("videoueberwachung", "Du setzt Videoüberwachung ein.")]},
   "dauerhaft", "Du selbst; ggf. Datenschutzbeauftragter", "intern_dokumentieren", "hinweis",
   [DSGVO(35)],
-  ["Auslöser (Gesundheitsdaten, Video) sind eine Vorauswahl – Liste der Aufsichtsbehörden (Muss-Liste) einbeziehen"], schwere="hoch")
+  ["Auslöser (Gesundheitsdaten, Video) sind eine Vorauswahl – Liste der Aufsichtsbehörden (Muss-Liste) einbeziehen"], schwere="hoch", branchen=['gesundheit_pflege'])
 
 pflicht("datenschutz.videoueberwachung", "F.62", "Videoüberwachung kennzeichnen und begründen",
   "Wenn du Videoüberwachung einsetzt, machst du sie erkennbar und dokumentierst den Zweck.",
@@ -1089,7 +1092,7 @@ pflicht("online.cookie_einwilligung", "F.63", "Einwilligung für Cookies und Tra
   ["§ 25 TDDDG"], "online",
   DATENART("tracking", "Deine Website nutzt Tracking."), "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
   [q("Telekommunikation-Digitale-Dienste-Datenschutz-Gesetz § 25", "ttdsg/__25.html")],
-  ["URL des Gesetzes nach Umbenennung (TTDSG → TDDDG) prüfen"], schwere="hoch")
+  ["URL des Gesetzes nach Umbenennung (TTDSG → TDDDG) prüfen"], schwere="hoch", branchen=['onlinehandel'])
 
 pflicht("it_sicherheit.nis2_pruefen", "F.64", "Prüfen, ob NIS2 für dich gilt",
   "Kläre, ob dein Unternehmen nach Sektor und Größe unter die NIS2-Regeln fällt.",
@@ -1129,7 +1132,7 @@ pflicht("ki.kompetenz", "F.65", "KI-Kompetenz der Beschäftigten sicherstellen",
   [KI_VO],
   ["Inhalt und Umfang einer ausreichenden Schulung fachlich festlegen", "Genauer Beginn der Durchsetzung („ab August 2026“) – Datum ergänzen"], gueltig_ab="2025-02-02", schwere="mittel",
   begriffe=[("KI-Kompetenz", "Wissen und Fähigkeiten, um KI-Systeme sachkundig einzusetzen und ihre Chancen und Risiken zu kennen.")],
-  aktion={"art": "link", "ziel": "app.schulungen", "nachweis_erforderlich": True})
+  aktion={"art": "link", "ziel": "app.schulungen", "nachweis_erforderlich": True}, branchen=['it_agentur_freelancer'])
 
 pflicht("ki.transparenz", "F.65", "KI-Inhalte und KI-Interaktion kennzeichnen",
   "Ab 2.12.2026 gelten Transparenz- und Kennzeichnungspflichten, etwa für Chatbots und KI-erzeugte Inhalte.",
@@ -1138,7 +1141,7 @@ pflicht("ki.transparenz", "F.65", "KI-Inhalte und KI-Interaktion kennzeichnen",
   KI_EIGEN, {"typ": "absolut", "datum": "2026-12-02", "verschiebung": KEINE}, "Du selbst", "intern_dokumentieren", "hinweis",
   [KI_VO],
   ["Welche Fälle des Art. 50 treffen auf Kleinbetriebe zu (Chatbot, Deepfake, generierte Texte)?", "Nach dem 2.12.2026 auf in_kraft umstellen"], gueltig_ab="2026-12-02",
-  status_recht="beschlossen", radar={"wahrscheinlichkeit": "sicher", "erwartet_ab": "2026-12-02"}, schwere="mittel")
+  status_recht="beschlossen", radar={"wahrscheinlichkeit": "sicher", "erwartet_ab": "2026-12-02"}, schwere="mittel", branchen=['it_agentur_freelancer'])
 
 pflicht("ki.hochrisiko", "F.65", "Pflichten für Hochrisiko-KI (verschoben)",
   "Für Hochrisiko-KI-Systeme gelten umfangreiche Pflichten – verschoben auf 2.12.2027 bzw. 2.8.2028.",
@@ -1167,7 +1170,7 @@ pflicht("online.impressum", "G.66", "Impressum auf der Website",
   WEBSITE, "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
   [q("Digitale-Dienste-Gesetz § 5", "ddg/__5.html")],
   ["Pflichtangaben je Rechtsform als Checkliste fachlich ergänzen"], schwere="hoch",
-  aktion={"art": "link", "ziel": "app.onlinecheck"})
+  aktion={"art": "link", "ziel": "app.onlinecheck"}, branchen=['onlinehandel'])
 
 pflicht("online.datenschutzerklaerung", "G.66", "Datenschutzerklärung auf der Website",
   "Auf deiner Website informierst du in einer Datenschutzerklärung über die Verarbeitung von Daten.",
@@ -1176,7 +1179,7 @@ pflicht("online.datenschutzerklaerung", "G.66", "Datenschutzerklärung auf der W
   WEBSITE, "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
   [DSGVO(13)],
   ["Vorlage erst nach fachlicher Prüfung (6.4)"], rg_ergaenzt=True, schwere="hoch",
-  aktion={"art": "link", "ziel": "app.onlinecheck"})
+  aktion={"art": "link", "ziel": "app.onlinecheck"}, branchen=['onlinehandel'])
 
 pflicht("online.preisangaben", "G.67", "Preise richtig angeben",
   "Gegenüber Verbrauchern gibst du Gesamtpreise an, bei Waren nach Gewicht, Volumen oder Länge auch den Grundpreis.",
@@ -1184,7 +1187,7 @@ pflicht("online.preisangaben", "G.67", "Preise richtig angeben",
   ["PAngV"], "online",
   B2C, "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
   [q("Preisangabenverordnung", "pangv_2022/")],
-  ["Ausnahmen und Einzelheiten (z. B. Grundpreis-Einheiten) fachlich ergänzen"], schwere="mittel")
+  ["Ausnahmen und Einzelheiten (z. B. Grundpreis-Einheiten) fachlich ergänzen"], schwere="mittel", branchen=['onlinehandel'])
 
 pflicht("online.widerrufsbelehrung", "G.68", "Über das Widerrufsrecht belehren",
   "Bei Verträgen mit Verbrauchern über Fernabsatz belehrst du über das Widerrufsrecht.",
@@ -1192,7 +1195,7 @@ pflicht("online.widerrufsbelehrung", "G.68", "Über das Widerrufsrecht belehren"
   ["§ 312d BGB", "§ 355 BGB"], "online",
   {"all": [B2C, FERNABSATZ]}, "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
   [q("Bürgerliches Gesetzbuch § 312d", "bgb/__312d.html")],
-  ["Muster-Widerrufsbelehrung erst nach Prüfung", "Ausnahmen vom Widerrufsrecht als Hinweis"], rg_ergaenzt=True, schwere="hoch")
+  ["Muster-Widerrufsbelehrung erst nach Prüfung", "Ausnahmen vom Widerrufsrecht als Hinweis"], rg_ergaenzt=True, schwere="hoch", branchen=['onlinehandel'])
 
 pflicht("online.button_loesung", "G.68", "Bestellbutton eindeutig beschriften (Button-Lösung)",
   "Der Button, mit dem Verbraucher kostenpflichtig bestellen, muss eindeutig auf die Zahlungspflicht hinweisen.",
@@ -1200,7 +1203,7 @@ pflicht("online.button_loesung", "G.68", "Bestellbutton eindeutig beschriften (B
   ["§ 312j BGB"], "online",
   {"all": [B2C, ONLINESHOP]}, "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
   [q("Bürgerliches Gesetzbuch § 312j", "bgb/__312j.html")],
-  ["Zulässige Beschriftungen als Beispiele ergänzen"], schwere="hoch")
+  ["Zulässige Beschriftungen als Beispiele ergänzen"], schwere="hoch", branchen=['onlinehandel'])
 
 pflicht("online.kuendigungsbutton", "G.68", "Kündigungsbutton bei Abos",
   "Können Verbraucher auf deiner Website Abos abschließen, brauchst du einen Kündigungsbutton.",
@@ -1209,7 +1212,7 @@ pflicht("online.kuendigungsbutton", "G.68", "Kündigungsbutton bei Abos",
   {"all": [B2C, v("profil.vertrieb.kanaele", "enthaelt", "abo", "Du bietest Abos an.")]}, "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
   [q("Bürgerliches Gesetzbuch § 312k", "bgb/__312k.html")],
   ["Vorgeschriebene Beschriftung und Ablauf (Bestätigungsseite) fachlich ergänzen"], schwere="hoch",
-  aktion={"art": "link", "ziel": "app.onlinecheck"})
+  aktion={"art": "link", "ziel": "app.onlinecheck"}, branchen=['onlinehandel'])
 
 pflicht("online.widerrufsbutton", "G.68", "Widerrufsbutton für Online-Verträge",
   "Seit 19.6.2026 brauchen B2C-Online-Verträge mit Widerrufsrecht einen Widerrufsbutton – zweistufig, ohne Login, mit Eingangsbestätigung auf einem dauerhaften Datenträger.",
@@ -1218,7 +1221,7 @@ pflicht("online.widerrufsbutton", "G.68", "Widerrufsbutton für Online-Verträge
   {"all": [B2C, FERNABSATZ]}, "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
   [q("Richtlinie (EU) 2023/2673", "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32023L2673")],
   ["Fundstelle im BGB nach Umsetzung ergänzen", "Beschriftung des Buttons fachlich ergänzen"], rg_ergaenzt=True, gueltig_ab="2026-06-19", schwere="hoch",
-  aktion={"art": "link", "ziel": "app.onlinecheck"})
+  aktion={"art": "link", "ziel": "app.onlinecheck"}, branchen=['onlinehandel'])
 
 pflicht("online.vsbg_hinweis", "G.69", "Hinweis zur Verbraucherstreitbeilegung",
   "Mit mehr als 10 Beschäftigten informierst du auf Website und in AGB, ob du an Streitbeilegungsverfahren teilnimmst.",
@@ -1227,7 +1230,7 @@ pflicht("online.vsbg_hinweis", "G.69", "Hinweis zur Verbraucherstreitbeilegung",
   {"all": [B2C, v("profil.beschaeftigte.gesamt", ">", rw("online.vsbg.schwelle_beschaeftigte")), v("abgeleitet.beschaeftigte.zaehlung_vsbg", ">", rw("online.vsbg.schwelle_beschaeftigte"), "Du hast mehr als 10 Beschäftigte im Sinne des VSBG.")]},
   "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
   [q("Verbraucherstreitbeilegungsgesetz § 36", "vsbg/__36.html")],
-  ["Zählweise (G-05)", "Auslöser „Website oder AGB“ – AGB sind nicht im Profil"], schwere="mittel")
+  ["Zählweise (G-05)", "Auslöser „Website oder AGB“ – AGB sind nicht im Profil"], schwere="mittel", branchen=['onlinehandel'])
 
 pflicht("online.os_link", "G.69", "Link zur OS-Plattform prüfen",
   "Prüfe, ob der frühere Link zur Online-Streitbeilegungsplattform der EU auf deiner Website noch aktuell ist.",
@@ -1236,7 +1239,7 @@ pflicht("online.os_link", "G.69", "Link zur OS-Plattform prüfen",
   {"all": [B2C, ONLINESHOP]}, "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
   [q("Verordnung (EU) Nr. 524/2013", "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32013R0524")],
   ["Aktueller Status der OS-Plattform und der Linkpflicht – fachlich prüfen und Text anpassen"], rg_ergaenzt=True, schwere="niedrig",
-  aktion={"art": "link", "ziel": "app.onlinecheck"})
+  aktion={"art": "link", "ziel": "app.onlinecheck"}, branchen=['onlinehandel'])
 
 pflicht("online.barrierefreiheit", "G.70", "Barrierefreiheit von Onlineshop und Buchungstools (BFSG)",
   "Seit 28.6.2025 müssen bestimmte Dienstleistungen wie Onlineshops barrierefrei sein – mit Barrierefreiheitserklärung.",
@@ -1248,7 +1251,7 @@ pflicht("online.barrierefreiheit", "G.70", "Barrierefreiheit von Onlineshop und 
   "dauerhaft", "Marktüberwachung der Länder", "intern_dokumentieren", "hinweis",
   [q("Barrierefreiheitsstärkungsgesetz", "bfsg/")],
   ["Bilanzsumme als Alternative zum Umsatz fehlt im Profil", "Zählweise (G-05)", "Welche Dienstleistungen genau (Buchungstools, Bankdienste …) – Liste ergänzen"],
-  gueltig_ab="2025-06-28", schwere="hoch", aktion={"art": "link", "ziel": "app.onlinecheck"})
+  gueltig_ab="2025-06-28", schwere="hoch", aktion={"art": "link", "ziel": "app.onlinecheck"}, branchen=['onlinehandel'])
 
 pflicht("produkte.barrierefreiheit", "G.70", "Prüfen, ob deine Produkte unter das BFSG fallen",
   "Für bestimmte Produkte (z. B. Computer, Smartphones, E-Book-Reader) gelten Barrierefreiheitsanforderungen – die Kleinstunternehmen-Ausnahme gilt dafür nicht verlässlich.",
@@ -1264,7 +1267,7 @@ pflicht("produkte.verpackung", "G.71", "Verpackungen registrieren und lizenziere
   ["VerpackG"], "produkte",
   PRODUKT("verpackung", "Du bringst verpackte Waren in Verkehr."), "dauerhaft", "Zentrale Stelle Verpackungsregister (LUCID)", "portal", "hinweis",
   [q("Verpackungsgesetz", "verpackg/")],
-  ["„Vor dem ersten Inverkehrbringen“ als Frist mit Ereignis abbilden?"], schwere="hoch")
+  ["„Vor dem ersten Inverkehrbringen“ als Frist mit Ereignis abbilden?"], schwere="hoch", branchen=['onlinehandel'])
 
 pflicht("produkte.elektrogeraete", "G.72", "Elektrogeräte bei der stiftung ear registrieren",
   "Bevor du Elektrogeräte verkaufst, registrierst du dich bei der stiftung ear.",
@@ -1272,7 +1275,7 @@ pflicht("produkte.elektrogeraete", "G.72", "Elektrogeräte bei der stiftung ear 
   ["ElektroG"], "produkte",
   PRODUKT("elektrogeraete", "Du verkaufst Elektrogeräte."), "dauerhaft", "stiftung elektro-altgeräte register (ear)", "portal", "hinweis",
   [q("Elektro- und Elektronikgerätegesetz", "elektrog_2015/")],
-  ["Wer gilt als Hersteller (Import, Eigenmarke)?"], schwere="hoch")
+  ["Wer gilt als Hersteller (Import, Eigenmarke)?"], schwere="hoch", branchen=['onlinehandel'])
 
 pflicht("produkte.batterien", "G.72", "Batterien registrieren (BattDG)",
   "Bevor du Batterien oder Geräte mit Batterien verkaufst, registrierst du dich nach dem Batteriegesetz.",
@@ -1280,7 +1283,7 @@ pflicht("produkte.batterien", "G.72", "Batterien registrieren (BattDG)",
   ["BattDG"], "produkte",
   PRODUKT("batterien", "Du verkaufst Batterien oder Geräte mit Batterien."), "dauerhaft", "Zuständige Stelle nach BattDG", "portal", "hinweis",
   [q("Batterierecht-Durchführungsgesetz", "battdg/")],
-  ["Zuständige Stelle und Registrierungsweg ergänzen"], schwere="hoch")
+  ["Zuständige Stelle und Registrierungsweg ergänzen"], schwere="hoch", branchen=['onlinehandel'])
 
 pflicht("produkte.gpsr", "G.73", "Produktsicherheit (GPSR): Angaben und verantwortliche Person",
   "Für Verbraucherprodukte brauchst du eine verantwortliche Person in der EU, Herstellerangaben und Sicherheitsinformationen – auch im Onlineshop.",
@@ -1289,7 +1292,7 @@ pflicht("produkte.gpsr", "G.73", "Produktsicherheit (GPSR): Angaben und verantwo
   {"all": [B2C, WARE]}, "dauerhaft", "Du selbst; Hersteller", "intern_dokumentieren", "hinweis",
   [q("Verordnung (EU) 2023/988", "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32023R0988")],
   ["Pflichten für Händler vs. Hersteller trennen", "Lebensmittel und Kosmetik haben eigene Regeln – Abgrenzung"], gueltig_ab="2024-12-13", schwere="hoch",
-  aktion={"art": "link", "ziel": "app.onlinecheck"})
+  aktion={"art": "link", "ziel": "app.onlinecheck"}, branchen=['onlinehandel'])
 
 pflicht("online.marktplatz_angaben", "G.74", "Händlerangaben auf Marktplätzen",
   "Auf Online-Marktplätzen stellst du deine Händlerangaben vollständig bereit.",
@@ -1297,7 +1300,7 @@ pflicht("online.marktplatz_angaben", "G.74", "Händlerangaben auf Marktplätzen"
   ["§ 5 DDG", "Art. 30 DSA"], "online",
   v("profil.vertrieb.kanaele", "enthaelt", "marktplatz", "Du verkaufst über Online-Marktplätze."), "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
   [q("Digitale-Dienste-Gesetz § 5", "ddg/__5.html")],
-  ["Rechtsgrundlagen ergänzt – prüfen"], rg_ergaenzt=True, schwere="mittel")
+  ["Rechtsgrundlagen ergänzt – prüfen"], rg_ergaenzt=True, schwere="mittel", branchen=['onlinehandel'])
 
 pflicht("online.dac7", "G.74", "Meldungen der Plattformen an das Finanzamt (DAC7) verstehen",
   "Marktplätze melden Verkäufer und Umsätze an das Bundeszentralamt für Steuern – deine Angaben in der Steuererklärung sollten dazu passen.",
@@ -1305,7 +1308,7 @@ pflicht("online.dac7", "G.74", "Meldungen der Plattformen an das Finanzamt (DAC7
   ["PStTG"], "online",
   v("profil.vertrieb.kanaele", "enthaelt", "marktplatz", "Du verkaufst über Online-Marktplätze."), "dauerhaft", "–", "intern_dokumentieren", "hinweis",
   [q("Plattformen-Steuertransparenzgesetz", "psttg/")],
-  ["Meldeschwellen der Plattformen nicht in der Spezifikation"], rg_ergaenzt=True, sanktion="Keine eigene Pflicht – Erklärung der Plattformmeldungen.", schwere="niedrig")
+  ["Meldeschwellen der Plattformen nicht in der Spezifikation"], rg_ergaenzt=True, sanktion="Keine eigene Pflicht – Erklärung der Plattformmeldungen.", schwere="niedrig", branchen=['onlinehandel'])
 
 pflicht("produkte.geldwaesche_gueterhaendler", "G.75", "Geldwäschegesetz bei hohen Bargeschäften",
   "Als Güterhändler hast du bei Bargeschäften ab der Schwelle des Geldwäschegesetzes Sorgfaltspflichten.",
@@ -1313,6 +1316,175 @@ pflicht("produkte.geldwaesche_gueterhaendler", "G.75", "Geldwäschegesetz bei ho
   ["GwG"], "produkte",
   {"all": [WARE, v("profil.handel.hohe_bargeschaefte", "==", True, "Du nimmst hohe Barzahlungen für Waren an.")]}, "dauerhaft", "Du selbst; Aufsicht der Länder", "intern_dokumentieren", "hinweis",
   [q("Geldwäschegesetz", "gwg_2017/")],
-  ["Schwelle für Barzahlungen nicht in der Spezifikation – als Regelwert ergänzen", "Immobilien- und Finanzbranche als Branchenmodul (H)"], schwere="hoch")
+  ["Schwelle für Barzahlungen nicht in der Spezifikation – als Regelwert ergänzen", "Immobilien- und Finanzbranche als Branchenmodul (H)"], schwere="hoch", branchen=['immobilien_finanzen'])
+
+
+# ============================================================ H. Branchenmodule (Bauabschnitt 8)
+
+BRANCHE = lambda b, text: v("profil.taetigkeit.branchen", "enthaelt", b, text)
+GASTRO = BRANCHE("gastronomie_lebensmittel", "Dein Betrieb gehört zur Gastronomie oder Lebensmittelbranche.")
+HANDWERK = BRANCHE("handwerk", "Dein Betrieb ist ein Handwerksbetrieb.")
+BEAUTY = BRANCHE("beauty_kosmetik", "Dein Betrieb gehört zur Beauty- und Kosmetikbranche.")
+BAU = BRANCHE("bau", "Dein Betrieb gehört zur Baubranche.")
+TRANSPORT = BRANCHE("transport_logistik", "Dein Betrieb gehört zu Transport und Logistik.")
+IT = BRANCHE("it_agentur_freelancer", "Du arbeitest im IT-, Agentur- oder Freelancer-Bereich.")
+GESUNDHEIT = BRANCHE("gesundheit_pflege", "Dein Betrieb gehört zu Gesundheit und Pflege.")
+IMMO = BRANCHE("immobilien_finanzen", "Dein Betrieb gehört zur Immobilien- oder Finanzbranche.")
+EUR_LEX = lambda titel, celex: q(titel, f"https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:{celex}")
+
+pflicht("branche.gastro_lebensmittelregistrierung", "H.1", "Bei der Lebensmittelüberwachung registrieren",
+  "Bevor du Lebensmittel herstellst, behandelst oder verkaufst, registrierst du deinen Betrieb bei der Lebensmittelüberwachung.",
+  "Lebensmittelunternehmen müssen jeden Betrieb bei der zuständigen Behörde registrieren lassen – meist beim Veterinär- und Lebensmittelüberwachungsamt des Kreises.",
+  ["Art. 6 Verordnung (EG) Nr. 852/2004"], "branche",
+  GASTRO, "dauerhaft", "Lebensmittelüberwachung des Kreises bzw. der Stadt", "post", "hinweis",
+  [EUR_LEX("Verordnung (EG) Nr. 852/2004", "32004R0852")],
+  ["Frist „vor Aufnahme der Tätigkeit“ als Gründungsschritt mit Termin?", "Zuständigkeit je Land"], rg_ergaenzt=True, schwere="hoch",
+  phase="gruendung", branchen=["gastronomie_lebensmittel"])
+
+pflicht("branche.gastro_ifsg_belehrung", "H.1", "Belehrung nach § 43 Infektionsschutzgesetz",
+  "Wer bei dir mit Lebensmitteln arbeitet, braucht vor dem ersten Arbeitstag die Belehrung nach § 43 IfSG.",
+  "Die Erstbelehrung macht das Gesundheitsamt oder ein beauftragter Arzt; die Bescheinigung bewahrst du auf. Danach belehrst du selbst in Abständen. Amtlos dokumentiert die Belehrung im Unterweisungsmodul.",
+  ["§ 43 IfSG"], "branche",
+  {"all": [GASTRO, EINSTELLUNG]}, JE("einstellung", zeitpunkt="vor_beginn"), "Gesundheitsamt; danach du selbst", "intern_dokumentieren", "dokument_generator",
+  [q("Infektionsschutzgesetz § 43", "ifsg/__43.html")],
+  ["Abstand der Folgebelehrungen und Höchstalter der Bescheinigung stehen nicht in der Spezifikation – ergänzen", "Gilt das auch für die Inhaberin selbst?"],
+  rg_ergaenzt=False, schwere="hoch", branchen=["gastronomie_lebensmittel"],
+  aktion={"art": "link", "ziel": "app.ifsg", "nachweis_erforderlich": True})
+
+pflicht("branche.gastro_haccp", "H.1", "Eigenkontrollen nach HACCP",
+  "Du kontrollierst und dokumentierst regelmäßig die kritischen Punkte deiner Lebensmittelhygiene, zum Beispiel Kühltemperaturen.",
+  "Lebensmittelunternehmen müssen ein Verfahren nach den HACCP-Grundsätzen einrichten und die Kontrollen dokumentieren. Amtlos bietet Kontrolllisten mit Grenzwerten, die du festlegst.",
+  ["Art. 5 Verordnung (EG) Nr. 852/2004"], "branche",
+  GASTRO, "dauerhaft", "Du selbst; Kontrolle durch die Lebensmittelüberwachung", "intern_dokumentieren", "dokument_generator",
+  [EUR_LEX("Verordnung (EG) Nr. 852/2004", "32004R0852")],
+  ["Grenzwerte (z. B. Kühltemperaturen) und Kontrollhäufigkeit nicht in der Spezifikation – Betrieb legt sie fest; Vorschläge fachlich ergänzen", "Leitlinien für gute Hygienepraxis je Branche verlinken"],
+  rg_ergaenzt=True, schwere="hoch", branchen=["gastronomie_lebensmittel"],
+  aktion={"art": "link", "ziel": "app.eigenkontrollen"})
+
+pflicht("branche.gastro_allergene", "H.1", "Allergene kennzeichnen",
+  "Du informierst deine Gäste über die 14 Hauptallergene in deinen Speisen und Getränken – auch bei loser Ware.",
+  "Die Lebensmittelinformationsverordnung verlangt Angaben zu Allergenen. Amtlos führt eine Allergenliste je Gericht und erstellt daraus eine Übersicht zum Aushängen.",
+  ["Art. 9 und 44 Verordnung (EU) Nr. 1169/2011", "LMIDV"], "branche",
+  GASTRO, "dauerhaft", "Du selbst", "intern_dokumentieren", "dokument_generator",
+  [EUR_LEX("Verordnung (EU) Nr. 1169/2011", "32011R1169")],
+  ["Liste der 14 Allergene (Anhang II LMIV) im Werkzeug prüfen", "Form der Information bei loser Ware (LMIDV) erläutern"], rg_ergaenzt=True, schwere="hoch",
+  branchen=["gastronomie_lebensmittel"], aktion={"art": "link", "ziel": "app.allergene"})
+
+pflicht("branche.handwerk_gefaehrdung_gewerk", "H.2", "Gefährdungsbeurteilung je Gewerk",
+  "Im Handwerk beurteilst du die Gefährdungen je Gewerk und Einsatzort – auch auf Baustellen beim Kunden.",
+  "Die allgemeine Gefährdungsbeurteilung (E.50) wird im Handwerk je Gewerk und Tätigkeit konkretisiert. Branchenvorlagen folgen nach fachlicher Prüfung.",
+  ["§§ 5, 6 ArbSchG"], "branche",
+  {"all": [HANDWERK, HAT_B]}, "dauerhaft", "Du selbst", "intern_dokumentieren", "dokument_generator",
+  [q("Arbeitsschutzgesetz § 5", "arbschg/__5.html")],
+  ["Vorlagen je Gewerk (BG-Handlungshilfen) – T-20"], schwere="mittel", branchen=["handwerk", "bau"],
+  aktion={"art": "link", "ziel": "vorlage.gefaehrdungsbeurteilung"})
+
+pflicht("branche.handwerk_gewaehrleistung", "H.2", "Gewährleistung im Blick behalten",
+  "Für deine Werkleistungen haftest du für Mängel. Dokumentiere Abnahmen und behalte die Fristen im Blick.",
+  "Wie lange Mängelansprüche bestehen, hängt von der Art des Werks ab. Amtlos erinnert nach fachlicher Freigabe an das Ende der Fristen.",
+  ["§§ 634, 634a BGB"], "branche",
+  HANDWERK, "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
+  [q("Bürgerliches Gesetzbuch § 634a", "bgb/__634a.html")],
+  ["Verjährungsfristen je Werkart nicht in der Spezifikation – als Regelwerte ergänzen", "Ist das eine Pflicht oder ein Hinweis? Darstellung bestätigen"], rg_ergaenzt=True,
+  sanktion="Keine eigene Pflicht – Hinweis zum Risiko.", schwere="niedrig", branchen=["handwerk", "bau"])
+
+pflicht("branche.beauty_hygieneplan", "H.3", "Hygieneplan führen",
+  "In Beauty- und Kosmetikbetrieben legst du in einem Hygieneplan fest, wie Geräte, Flächen und Hände gereinigt und desinfiziert werden.",
+  "Die Anforderungen ergeben sich aus dem Infektionsschutz und den Hygieneverordnungen der Länder.",
+  ["IfSG", "Hygieneverordnungen der Länder"], "branche",
+  BEAUTY, "dauerhaft", "Du selbst; Gesundheitsamt", "intern_dokumentieren", "dokument_generator",
+  [q("Infektionsschutzgesetz", "ifsg/")],
+  ["Rechtsgrundlage je Land ergänzen", "Vorlage Hygieneplan nach Prüfung (6.4)"], rg_ergaenzt=True, schwere="mittel", branchen=["beauty_kosmetik"])
+
+pflicht("branche.beauty_hautschutzplan", "H.3", "Hautschutzplan aushängen",
+  "Für Tätigkeiten mit Feuchtarbeit oder hautbelastenden Stoffen legst du in einem Hautschutzplan Schutz, Reinigung und Pflege fest.",
+  "Der Hautschutzplan ergänzt die Gefährdungsbeurteilung und die Unterweisung.",
+  ["TRGS 401", "GefStoffV"], "branche",
+  {"all": [BEAUTY, HAT_B]}, "dauerhaft", "Du selbst", "intern_dokumentieren", "dokument_generator",
+  [q("TRGS 401", "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-401.html")],
+  ["Rechtsgrundlage ergänzt – prüfen"], rg_ergaenzt=True, schwere="mittel", branchen=["beauty_kosmetik"])
+
+pflicht("branche.beauty_kosmetikverordnung", "H.3", "Kosmetikverordnung bei eigenen Produkten",
+  "Stellst du eigene Kosmetikprodukte her oder bringst sie unter deinem Namen in Verkehr, gelten die Pflichten der EU-Kosmetikverordnung.",
+  "Dazu gehören eine verantwortliche Person, eine Sicherheitsbewertung und eine Produktinformationsdatei.",
+  ["Verordnung (EG) Nr. 1223/2009"], "branche",
+  {"all": [BEAUTY, PRODUKT("kosmetik", "Du verkaufst Kosmetik.")]}, "dauerhaft", "Du selbst; verantwortliche Person", "intern_dokumentieren", "hinweis",
+  [EUR_LEX("Verordnung (EG) Nr. 1223/2009", "32009R1223")],
+  ["Notifizierung (CPNP) und Kennzeichnung ergänzen", "Abgrenzung Herstellung ↔ Weiterverkauf"], schwere="hoch", branchen=["beauty_kosmetik"])
+
+pflicht("branche.bau_soka", "H.4", "Teilnahme an SOKA-BAU",
+  "Baubetriebe mit gewerblichen Beschäftigten nehmen an den Sozialkassenverfahren der Bauwirtschaft (SOKA-BAU) teil.",
+  "Die Sozialkassen regeln unter anderem Urlaub und Berufsbildung in der Bauwirtschaft. Ob dein Betrieb erfasst ist, hängt von den überwiegenden Tätigkeiten ab.",
+  ["Tarifverträge über das Sozialkassenverfahren (VTV)", "SokaSiG"], "branche",
+  {"all": [BAU, HAT_B]}, "dauerhaft", "SOKA-BAU", "portal", "hinweis",
+  [q("Sozialkassenverfahrensicherungsgesetz", "sokasig/")],
+  ["Erfassung nach überwiegender Tätigkeit – Prüfhinweis ergänzen", "Meldefristen nicht in der Spezifikation"], rg_ergaenzt=True, schwere="hoch", branchen=["bau"])
+
+pflicht("branche.bau_baustellenverordnung", "H.4", "Baustellenverordnung beachten",
+  "Auf Baustellen gelten zusätzliche Pflichten zum Arbeitsschutz, etwa Vorankündigung, Koordination und Sicherheitsplan.",
+  "Welche Pflichten greifen, hängt von Größe und Dauer der Baustelle und der Zahl der beteiligten Firmen ab; meist trifft sie den Bauherrn.",
+  ["BaustellV"], "branche",
+  BAU, "dauerhaft", "Bauherr bzw. Koordinator", "intern_dokumentieren", "hinweis",
+  [q("Baustellenverordnung", "baustellv/")],
+  ["Schwellen (Dauer, Beschäftigte) nicht in der Spezifikation", "Rolle des Betriebs (Bauherr ↔ Auftragnehmer)"], schwere="mittel", branchen=["bau"])
+
+pflicht("branche.transport_erlaubnis", "H.5", "Erlaubnis für Güter- oder Personenbeförderung",
+  "Für gewerblichen Güterkraftverkehr oder die Beförderung von Personen brauchst du in der Regel eine Erlaubnis oder Lizenz.",
+  "Ob und welche Erlaubnis nötig ist, hängt von Fahrzeuggewicht, Art der Beförderung und Gebiet ab.",
+  ["GüKG", "PBefG"], "branche",
+  TRANSPORT, "dauerhaft", "Zuständige Verkehrsbehörde", "post", "hinweis",
+  [q("Güterkraftverkehrsgesetz", "g_kg_1998/")],
+  ["Schwellen (z. B. Fahrzeuggewicht) nicht in der Spezifikation", "Personenbeförderung (Taxi, Mietwagen) getrennt?"], schwere="hoch", phase="gruendung", branchen=["transport_logistik"])
+
+pflicht("branche.transport_lenkzeiten", "H.5", "Lenk- und Ruhezeiten einhalten und aufzeichnen",
+  "Für Fahrerinnen und Fahrer gelten Lenk- und Ruhezeiten, die mit dem Fahrtenschreiber aufgezeichnet werden.",
+  "Die Regeln gelten für bestimmte Fahrzeugklassen. Daten aus Fahrtenschreibern müssen ausgelesen und aufbewahrt werden.",
+  ["Verordnung (EG) Nr. 561/2006", "FPersG"], "branche",
+  TRANSPORT, "dauerhaft", "Du selbst; Kontrolle durch BALM und Polizei", "intern_dokumentieren", "hinweis",
+  [EUR_LEX("Verordnung (EG) Nr. 561/2006", "32006R0561")],
+  ["Fahrzeugklassen und Auslese-/Aufbewahrungsfristen nicht in der Spezifikation"], schwere="hoch", branchen=["transport_logistik"])
+
+pflicht("branche.it_scheinselbststaendigkeit", "H.6", "Scheinselbstständigkeit vermeiden",
+  "Arbeitest du überwiegend für einen Auftraggeber und eingebunden wie Angestellte, droht Scheinselbstständigkeit. Ein Statusfeststellungsverfahren schafft Klarheit.",
+  "Entscheidend ist das Gesamtbild der Tätigkeit. Die Deutsche Rentenversicherung prüft den Status auf Antrag.",
+  ["§ 7 SGB IV", "§ 7a SGB IV"], "branche",
+  {"all": [IT, {"any": [v("profil.rentenversicherung.pflichtgruppe", "enthaelt", "ein_auftraggeber", "Du arbeitest im Wesentlichen für einen Auftraggeber."), HAT_B]}]},
+  "dauerhaft", "Deutsche Rentenversicherung (Clearingstelle)", "portal", "hinweis",
+  [q("Sozialgesetzbuch IV § 7a", "sgb_4/__7a.html")],
+  ["Auslöser: auch Auftraggeber-Seite (Einsatz von Freelancern) abbilden?"], rg_ergaenzt=True, schwere="hoch", branchen=["it_agentur_freelancer"])
+
+pflicht("branche.it_haftung", "H.6", "Haftung begrenzen und absichern",
+  "Prüfe in deinen Verträgen die Haftung und ob eine Berufs- oder Betriebshaftpflicht passt.",
+  "In IT- und Agenturprojekten können Fehler teuer werden. Haftungsregeln in Verträgen und eine passende Versicherung begrenzen das Risiko.",
+  ["§§ 276, 309 Nr. 7 BGB"], "branche",
+  IT, "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
+  [q("Bürgerliches Gesetzbuch § 309", "bgb/__309.html")],
+  ["Hinweis statt Pflicht – Darstellung bestätigen", "Rechtsgrundlagen ergänzt"], rg_ergaenzt=True, sanktion="Keine eigene Pflicht – Hinweis zum Risiko.", schwere="niedrig",
+  branchen=["it_agentur_freelancer"])
+
+pflicht("branche.gesundheit_erlaubnisse", "H.7", "Berufserlaubnis und Zulassung",
+  "Gesundheits- und Pflegeberufe brauchen je nach Tätigkeit eine Approbation, Erlaubnis oder Zulassung.",
+  "Welche Erlaubnis nötig ist, hängt vom Beruf ab (z. B. Heilpraktiker, Pflege, Physiotherapie). Ohne sie darfst du die Tätigkeit nicht ausüben.",
+  ["Berufsgesetze der Gesundheitsberufe"], "branche",
+  GESUNDHEIT, "dauerhaft", "Gesundheitsamt bzw. zuständige Kammer oder Behörde", "post", "hinweis",
+  [q("Heilpraktikergesetz", "heilprg/")],
+  ["Liste der Berufe und zuständigen Stellen ergänzen"], rg_ergaenzt=True, schwere="hoch", phase="gruendung", branchen=["gesundheit_pflege"])
+
+pflicht("branche.immo_weiterbildung", "H.8", "Weiterbildungspflicht (Immobilien und Finanzen)",
+  "Für bestimmte erlaubnispflichtige Tätigkeiten gilt eine regelmäßige Weiterbildungspflicht – nur wo sie noch gilt.",
+  "Betroffen sind etwa Immobilienmakler, Wohnimmobilienverwalter und Versicherungsvermittler. Umfang und Nachweis regelt die jeweilige Vorschrift.",
+  ["§ 34c Abs. 2a GewO", "§ 34d Abs. 9 GewO"], "branche",
+  {"all": [IMMO, v("profil.erlaubnis.gewo_paragraphen", "enthaelt_eines", ["34c", "34d", "34f"], "Du hast eine Erlaubnis nach § 34c, § 34d oder § 34f GewO.")]},
+  "dauerhaft", "Du selbst; Nachweis gegenüber der Erlaubnisbehörde", "intern_dokumentieren", "hinweis",
+  [q("Gewerbeordnung § 34c", "gewo/__34c.html")],
+  ["„nur wo noch geltend“ – aktuellen Stand je Vorschrift prüfen", "Umfang (Stunden) und Zeitraum als Regelwerte"], rg_ergaenzt=True, schwere="mittel", branchen=["immobilien_finanzen"])
+
+pflicht("branche.immo_gwg", "H.8", "Geldwäschegesetz für Immobilien- und Finanzbranche",
+  "Immobilienmakler und viele Finanzdienstleister sind Verpflichtete nach dem Geldwäschegesetz.",
+  "Dazu gehören Risikoanalyse, Identifizierung der Vertragspartner und Verdachtsmeldungen.",
+  ["§ 2 GwG"], "branche",
+  IMMO, "dauerhaft", "Du selbst; Aufsicht der Länder bzw. BaFin", "intern_dokumentieren", "hinweis",
+  [q("Geldwäschegesetz § 2", "gwg_2017/__2.html")],
+  ["Welche Tätigkeiten genau (Makler, Vermittler) – Auslöser verfeinern"], schwere="hoch", branchen=["immobilien_finanzen"])
 
 print("geschrieben:", len(list(ZIEL.glob("*.yaml"))))

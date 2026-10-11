@@ -15,6 +15,9 @@ const NACH_ZIEL: Record<string, string> = {
   "app.datenpanne": "/datenschutz/pannen",
   "app.schulungen": "/personal/unterweisungen?art=ki_kompetenz",
   "app.onlinecheck": "/online",
+  "app.eigenkontrollen": "/branche/eigenkontrollen",
+  "app.allergene": "/branche/allergene",
+  "app.ifsg": "/personal/unterweisungen?art=ifsg",
 };
 const NACH_PFLICHT: Record<string, string> = {
   "arbeitsschutz.dguv_v3": "/personal/arbeitsmittel",

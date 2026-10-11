@@ -1,7 +1,7 @@
 # Katalog G.67 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.preisangaben
-version: 1
+version: 2
 katalog_nr: G.67
 titel:
   de: Preise richtig angeben
@@ -12,6 +12,8 @@ erklaerung:
 rechtsgrundlage:
 - PAngV
 kategorie: online
+branchen:
+- onlinehandel
 ausloeser:
   feld: profil.kunden.segmente
   op: enthaelt

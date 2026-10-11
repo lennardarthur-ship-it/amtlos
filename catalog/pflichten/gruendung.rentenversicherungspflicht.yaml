@@ -1,7 +1,7 @@
 # Katalog A.11 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gruendung.rentenversicherungspflicht
-version: 1
+version: 2
 katalog_nr: A.11
 titel:
   de: Rentenversicherungspflicht melden
@@ -15,6 +15,9 @@ rechtsgrundlage:
 - § 2 SGB VI
 - § 190a SGB VI
 kategorie: gruendung
+branchen:
+- gesundheit_pflege
+- it_agentur_freelancer
 ausloeser:
   feld: profil.rentenversicherung.pflichtgruppe
   op: enthaelt_eines

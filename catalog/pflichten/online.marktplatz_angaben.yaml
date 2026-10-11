@@ -1,7 +1,7 @@
 # Katalog G.74 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.marktplatz_angaben
-version: 1
+version: 2
 katalog_nr: G.74
 titel:
   de: Händlerangaben auf Marktplätzen
@@ -13,6 +13,8 @@ rechtsgrundlage:
 - § 5 DDG
 - Art. 30 DSA
 kategorie: online
+branchen:
+- onlinehandel
 ausloeser:
   feld: profil.vertrieb.kanaele
   op: enthaelt

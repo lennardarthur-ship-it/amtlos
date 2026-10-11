@@ -38,6 +38,7 @@ export default async function AppRahmen({ children }: { children: ReactNode }) {
             { href: "/personal", text: x.nav.personal, symbol: "personal" },
             { href: "/datenschutz", text: x.nav.datenschutz, symbol: "datenschutz", nurDesktop: true },
             { href: "/online", text: x.nav.online, symbol: "online", nurDesktop: true },
+            { href: "/branche", text: x.nav.branche, symbol: "branche", nurDesktop: true },
             { href: "/einstellungen", text: x.nav.einstellungen, symbol: "einstellungen", nurDesktop: true },
             { href: "/mehr", text: x.nav.mehr, symbol: "mehr", nurMobil: true },
           ]}

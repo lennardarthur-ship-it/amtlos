@@ -1,0 +1,26 @@
+persona: gastronomie
+beschreibung: Café, kürzlich gegründet, mit erster Einstellung – Lebensmittelregistrierung, IfSG-Belehrung je Einstellung, HACCP, Allergene
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2026-10-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [gastronomie_lebensmittel]
+  profil.erlaubnis.gaststaette: true
+  profil.beschaeftigte.gesamt: 1
+  profil.kunden.segmente: [b2c]
+  profil.vertrieb.kanaele: [ladengeschaeft]
+  profil.produkte.arten: [lebensmittel]
+  profil.bundesland: HB
+  profil.gemeinde_ags: "04011000"
+ereignisse:
+  - { typ: erste_einstellung, datum: "2026-10-01" }
+  - { typ: einstellung, datum: "2026-10-01" }
+erwartet:
+  branche.gastro_lebensmittelregistrierung: gilt
+  branche.gastro_ifsg_belehrung: gilt
+  branche.gastro_haccp: gilt
+  branche.gastro_allergene: gilt
+  gruendung.erlaubnis_pruefen: gilt
+  branche.handwerk_gewaehrleistung: gilt_nicht
+  branche.beauty_hygieneplan: gilt_nicht

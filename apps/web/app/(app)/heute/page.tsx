@@ -4,6 +4,7 @@ import { datumLang, fuelle } from "@amtlos/i18n";
 import { PflichtZeile } from "@/komponenten/pflicht-zeile";
 import { StatusForm } from "@/komponenten/status";
 import { api } from "@/lib/api";
+import { branchenAusProfil } from "@/lib/branchen";
 import { t } from "@/lib/sprache";
 import type { Bereich, Gruendung, Heute } from "@/lib/typen";
 
@@ -19,8 +20,9 @@ async function vorStartErledigt() {
 }
 
 export default async function HeuteSeite() {
-  const [{ s, t: x }, h, profil, g] = await Promise.all([t(), api<Heute>("/v1/heute"), api<{ version: number }>("/v1/profil"), api<Gruendung>("/v1/gruendung")]);
+  const [{ s, t: x }, h, profil, g] = await Promise.all([t(), api<Heute>("/v1/heute"), api<{ version: number; daten?: Record<string, unknown> }>("/v1/profil"), api<Gruendung>("/v1/gruendung")]);
   const gruendungOffen = g.fortschritt.gesamt > 0 && !g.fortschritt.fertig;
+  const branchen = branchenAusProfil((profil as { daten?: Record<string, unknown> }).daten ?? {});
   const ohneProfil = profil.version === 0;
   const nochNichtBerechnet = !ohneProfil && h.zaehler.offen + h.zaehler.erledigt === 0 && h.als_naechstes.length === 0;
 
@@ -64,6 +66,12 @@ export default async function HeuteSeite() {
             {x.gruendung.heute_link}
           </Link>
         </section>
+      ) : null}
+
+      {branchen.length ? (
+        <p className="lesetext">
+          <Link href="/branche" className="verweis">{fuelle(x.branche.heute_karte, { namen: branchen.map((b) => x.branche.namen[b]).join(", ") })}</Link>
+        </p>
       ) : null}
 
       {nochNichtBerechnet ? <p className="lesetext text-tinte-leise">{x.heute.berechnung_laeuft}</p> : null}

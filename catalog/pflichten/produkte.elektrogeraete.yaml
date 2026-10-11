@@ -1,7 +1,7 @@
 # Katalog G.72 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: produkte.elektrogeraete
-version: 1
+version: 2
 katalog_nr: G.72
 titel:
   de: Elektrogeräte bei der stiftung ear registrieren
@@ -12,6 +12,8 @@ erklaerung:
 rechtsgrundlage:
 - ElektroG
 kategorie: produkte
+branchen:
+- onlinehandel
 ausloeser:
   feld: profil.produkte.arten
   op: enthaelt

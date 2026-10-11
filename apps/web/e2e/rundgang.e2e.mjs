@@ -304,6 +304,41 @@ async function rundgang(farbschema, breite) {
     await barrierefrei(p, name("online"));
   }
 
+  // Branchenpaket: Eigenkontrollen mit Abweichung, Allergene je Gericht, PDFs
+  if (farbschema === "light") {
+    await p.goto(`${B}/branche`);
+    await barrierefrei(p, name("branche"));
+    await p.goto(`${B}/branche/eigenkontrollen`);
+    await p.fill("#bezeichnung", "Kühlschrank Küche");
+    await p.fill("#grenze_max", "7");
+    await p.getByRole("button", { name: "Anlegen" }).click();
+    await p.getByText("Kühlschrank Küche").first().waitFor({ timeout: 10000 });
+    await p.locator('input[name="wert"]').first().fill("9,5");
+    const abgewiesen = await Promise.all([p.waitForURL(/fehler=/, { timeout: 10000 }), p.getByRole("button", { name: "Eintragen" }).first().click()]).then(() => true, () => false);
+    pruefe(abgewiesen, `${name("eigenkontrollen")}: Abweichung ohne Maßnahme nicht abgewiesen`);
+    await p.locator('input[name="wert"]').first().fill("9,5");
+    await p.locator('input[name="massnahme"]').first().fill("Tür war offen, Ware geprüft");
+    await Promise.all([p.waitForURL((u) => !u.search.includes("fehler"), { timeout: 10000 }), p.getByRole("button", { name: "Eintragen" }).first().click()]);
+    await p.getByText(/Zuletzt .* · außerhalb/).first().waitFor({ timeout: 10000 }).catch(() => pruefe(false, `${name("eigenkontrollen")}: Abweichung nicht markiert`));
+    await barrierefrei(p, name("eigenkontrollen"));
+    const ekPdf = await p.request.get(`${B}${await p.getByRole("link", { name: "Monatsprotokoll (PDF)" }).getAttribute("href")}`);
+    pruefe(ekPdf.ok() && (await ekPdf.body()).subarray(0, 5).toString() === "%PDF-", `${name("eigenkontrollen")}: Protokoll nicht abrufbar`);
+    await p.goto(`${B}/branche/allergene`);
+    await p.fill("#neu-name", "Pizza Margherita");
+    await p.locator("#neu-name").locator("xpath=ancestor::form").locator('input[value="gluten"]').check();
+    await p.locator("#neu-name").locator("xpath=ancestor::form").locator('input[value="milch"]').check();
+    await p.getByRole("button", { name: "Anlegen" }).click();
+    await p.getByText("Glutenhaltiges Getreide, Milch (inkl. Laktose)").waitFor({ timeout: 10000 }).catch(() => pruefe(false, `${name("allergene")}: Gericht fehlt`));
+    await barrierefrei(p, name("allergene"));
+    const aushang = await p.request.get(`${B}/branche/allergene/aushang`);
+    pruefe(aushang.ok() && (await aushang.body()).subarray(0, 5).toString() === "%PDF-", `${name("allergene")}: Aushang nicht abrufbar`);
+  } else {
+    for (const seite of ["branche", "branche/eigenkontrollen", "branche/allergene"]) {
+      await p.goto(`${B}/${seite}`);
+      await barrierefrei(p, name(seite.replaceAll("/", "-")));
+    }
+  }
+
   // Team: einladen, Link nur einmal sichtbar; Eingeladene meldet sich über den Link an und nimmt an
   const gast = `${kennung}-gast-${farbschema}`;
   await p.goto(`${B}/team`);

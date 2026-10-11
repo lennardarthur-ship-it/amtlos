@@ -1,7 +1,7 @@
 # Katalog G.66 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.impressum
-version: 1
+version: 2
 katalog_nr: G.66
 titel:
   de: Impressum auf der Website
@@ -13,6 +13,8 @@ erklaerung:
 rechtsgrundlage:
 - § 5 DDG
 kategorie: online
+branchen:
+- onlinehandel
 ausloeser:
   any:
   - feld: profil.online.website

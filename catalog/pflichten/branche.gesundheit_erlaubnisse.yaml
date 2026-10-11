@@ -1,0 +1,53 @@
+# Katalog H.7 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: branche.gesundheit_erlaubnisse
+version: 1
+katalog_nr: H.7
+titel:
+  de: Berufserlaubnis und Zulassung
+kurz:
+  de: Gesundheits- und Pflegeberufe brauchen je nach Tätigkeit eine Approbation, Erlaubnis oder Zulassung.
+erklaerung:
+  de: Welche Erlaubnis nötig ist, hängt vom Beruf ab (z. B. Heilpraktiker, Pflege, Physiotherapie). Ohne sie darfst du die
+    Tätigkeit nicht ausüben.
+rechtsgrundlage:
+- Berufsgesetze der Gesundheitsberufe
+kategorie: branche
+branchen:
+- gesundheit_pflege
+ausloeser:
+  feld: profil.taetigkeit.branchen
+  op: enthaelt
+  wert: gesundheit_pflege
+  label:
+    de: Dein Betrieb gehört zu Gesundheit und Pflege.
+phase: gruendung
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Gesundheitsamt bzw. zuständige Kammer oder Behörde
+kanal: post
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Heilpraktikergesetz
+  url: https://www.gesetze-im-internet.de/heilprg/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Liste der Berufe und zuständigen Stellen ergänzen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

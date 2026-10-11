@@ -1,7 +1,7 @@
 # Katalog G.75 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: produkte.geldwaesche_gueterhaendler
-version: 1
+version: 2
 katalog_nr: G.75
 titel:
   de: Geldwäschegesetz bei hohen Bargeschäften
@@ -13,6 +13,8 @@ erklaerung:
 rechtsgrundlage:
 - GwG
 kategorie: produkte
+branchen:
+- immobilien_finanzen
 ausloeser:
   all:
   - feld: profil.produkte.arten

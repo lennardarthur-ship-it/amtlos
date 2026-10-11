@@ -1,7 +1,7 @@
 # Katalog G.73 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: produkte.gpsr
-version: 1
+version: 2
 katalog_nr: G.73
 titel:
   de: 'Produktsicherheit (GPSR): Angaben und verantwortliche Person'
@@ -14,6 +14,8 @@ erklaerung:
 rechtsgrundlage:
 - Verordnung (EU) 2023/988 (GPSR)
 kategorie: produkte
+branchen:
+- onlinehandel
 ausloeser:
   all:
   - feld: profil.kunden.segmente

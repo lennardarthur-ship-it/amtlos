@@ -9,6 +9,7 @@ export default async function MehrSeite() {
   const eintraege = [
     ["/datenschutz", x.nav.datenschutz, x.ds.text],
     ["/online", x.nav.online, x.oc.titel],
+    ["/branche", x.nav.branche, x.branche.text],
     ["/melden", x.mehr.melden, x.melden.text],
     ["/team", x.team.titel, ""],
     ["/hilfe", x.hilfe.titel, ""],

@@ -1,0 +1,59 @@
+# Katalog H.3 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: branche.beauty_hautschutzplan
+version: 1
+katalog_nr: H.3
+titel:
+  de: Hautschutzplan aushängen
+kurz:
+  de: Für Tätigkeiten mit Feuchtarbeit oder hautbelastenden Stoffen legst du in einem Hautschutzplan Schutz, Reinigung und
+    Pflege fest.
+erklaerung:
+  de: Der Hautschutzplan ergänzt die Gefährdungsbeurteilung und die Unterweisung.
+rechtsgrundlage:
+- TRGS 401
+- GefStoffV
+kategorie: branche
+branchen:
+- beauty_kosmetik
+ausloeser:
+  all:
+  - feld: profil.taetigkeit.branchen
+    op: enthaelt
+    wert: beauty_kosmetik
+    label:
+      de: Dein Betrieb gehört zur Beauty- und Kosmetikbranche.
+  - feld: abgeleitet.hat_beschaeftigte
+    op: ==
+    wert: true
+    label:
+      de: Du beschäftigst mindestens eine Person.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: dokument_generator
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: TRGS 401
+  url: https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-401.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Rechtsgrundlage ergänzt – prüfen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

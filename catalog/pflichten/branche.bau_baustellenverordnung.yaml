@@ -1,0 +1,52 @@
+# Katalog H.4 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: branche.bau_baustellenverordnung
+version: 1
+katalog_nr: H.4
+titel:
+  de: Baustellenverordnung beachten
+kurz:
+  de: Auf Baustellen gelten zusätzliche Pflichten zum Arbeitsschutz, etwa Vorankündigung, Koordination und Sicherheitsplan.
+erklaerung:
+  de: Welche Pflichten greifen, hängt von Größe und Dauer der Baustelle und der Zahl der beteiligten Firmen ab; meist trifft
+    sie den Bauherrn.
+rechtsgrundlage:
+- BaustellV
+kategorie: branche
+branchen:
+- bau
+ausloeser:
+  feld: profil.taetigkeit.branchen
+  op: enthaelt
+  wert: bau
+  label:
+    de: Dein Betrieb gehört zur Baubranche.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Bauherr bzw. Koordinator
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Baustellenverordnung
+  url: https://www.gesetze-im-internet.de/baustellv/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Schwellen (Dauer, Beschäftigte) nicht in der Spezifikation
+- Rolle des Betriebs (Bauherr ↔ Auftragnehmer)
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

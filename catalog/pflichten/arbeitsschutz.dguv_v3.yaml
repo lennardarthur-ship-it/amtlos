@@ -1,7 +1,7 @@
 # Katalog E.54 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: arbeitsschutz.dguv_v3
-version: 1
+version: 2
 katalog_nr: E.54
 titel:
   de: Elektrische Geräte prüfen lassen
@@ -13,6 +13,9 @@ erklaerung:
 rechtsgrundlage:
 - DGUV Vorschrift 3
 kategorie: arbeitsschutz
+branchen:
+- handwerk
+- bau
 ausloeser:
   all:
   - feld: abgeleitet.hat_beschaeftigte

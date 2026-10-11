@@ -756,4 +756,73 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       expect((await alsOtto(http().get("/v1/onlinecheck")).expect(200)).body).toHaveLength(3);
     });
   });
+
+  describe("Branchenpaket Gastronomie", () => {
+    let gina: string;
+    let u: string;
+    const alsGina = (x: request.Test) => x.set("Authorization", `Bearer ${gina}`).set("X-Unternehmen-Id", u);
+    const heuteIso = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Berlin" }).format(new Date());
+    const binaer = (r: request.Test) => r.buffer(true).parse((res, cb) => { const t: Buffer[] = []; res.on("data", (c: Buffer) => t.push(c)); res.on("end", () => cb(null, Buffer.concat(t))); });
+
+    beforeAll(async () => {
+      gina = await token("gina");
+      u = (await http().post("/v1/unternehmen").set("Authorization", `Bearer ${gina}`).send({ name: "Ginas Bistro" }).expect(201)).body.id;
+      await alsGina(http().put("/v1/profil")).send({ daten: { rechtsform: "einzelunternehmen", gruendungsdatum: "2020-05-01", "taetigkeit.einordnung": "gewerbe", "taetigkeit.branchen": ["gastronomie_lebensmittel"], "beschaeftigte.gesamt": 0, gemeinde_ags: "06414000" } }).expect(200);
+      await neuberechnen(worker, u, "test", { kalender: new StandardKalender() });
+    });
+
+    it("Pflichtkarten tragen die Branchen; HACCP und Allergene gelten für die Gastronomie", async () => {
+      const p = (await alsGina(http().get("/v1/pflichten")).expect(200)).body as { pflicht_id: string; ergebnis: string; branchen: string[] }[];
+      const haccp = p.find((x) => x.pflicht_id === "branche.gastro_haccp");
+      expect(haccp).toMatchObject({ ergebnis: "gilt", branchen: ["gastronomie_lebensmittel"] });
+      expect(p.find((x) => x.pflicht_id === "branche.gastro_allergene")?.ergebnis).toBe("gilt");
+      expect(p.find((x) => x.pflicht_id === "branche.handwerk_gewaehrleistung")?.ergebnis).toBe("gilt_nicht");
+    });
+
+    it("Eigenkontrollen: Grenzen vom Betrieb, Abweichung nur mit Maßnahme, Messungen unveränderlich, Monatsprotokoll", async () => {
+      await alsGina(http().post("/v1/messpunkte")).send({ bezeichnung: "Kühlschrank", grenze_min: 8, grenze_max: 2 }).expect(422);
+      const m = (await alsGina(http().post("/v1/messpunkte")).send({ bezeichnung: "Kühlschrank Küche", grenze_max: 7 }).expect(201)).body;
+      expect(m).toMatchObject({ einheit: "°C", grenze_min: null, grenze_max: 7 });
+      expect((await alsGina(http().post(`/v1/messpunkte/${m.id}/messungen`)).send({ wert: 5 }).expect(201)).body.in_ordnung).toBe(true);
+      await alsGina(http().post(`/v1/messpunkte/${m.id}/messungen`)).send({ wert: 9.5 }).expect(422);
+      const ab = (await alsGina(http().post(`/v1/messpunkte/${m.id}/messungen`)).send({ wert: 9.5, massnahme: "Tür war offen, Ware geprüft, nach 30 Min. 6 °C" }).expect(201)).body;
+      expect(ab).toMatchObject({ in_ordnung: false, wert: 9.5 });
+      const liste = (await alsGina(http().get("/v1/messpunkte")).expect(200)).body;
+      expect(liste[0]).toMatchObject({ letzter_wert: 9.5, letzte_in_ordnung: false, heute: 2 });
+      const monat = heuteIso.slice(0, 7);
+      await alsGina(http().get("/v1/eigenkontrollen?monat=2026-13")).expect(400);
+      expect((await alsGina(http().get(`/v1/eigenkontrollen?monat=${monat}`)).expect(200)).body).toMatchObject({ abweichungen: 1 });
+      const pdf = await binaer(alsGina(http().get(`/v1/eigenkontrollen/protokoll?monat=${monat}`))).expect(200);
+      expect((pdf.body as Buffer).subarray(0, 5).toString()).toBe("%PDF-");
+      await alsGina(http().put(`/v1/messpunkte/${m.id}`)).send({ bezeichnung: "Kühlschrank Küche", grenze_max: 7, aktiv: false }).expect(200);
+      await alsGina(http().post(`/v1/messpunkte/${m.id}/messungen`)).send({ wert: 4 }).expect(404);
+      const ginaKonto = (await http().get("/v1/ich").set("Authorization", `Bearer ${gina}`).expect(200)).body.konto.id;
+      const apiDb = new Datenbank(urls.api);
+      await expect(apiDb.imKontext({ kontoId: ginaKonto, unternehmenId: u }, (tx) => tx.abfrage("update app.messung set wert = 5 where id = $1", [ab.id]))).rejects.toThrow(/permission denied|append-only/);
+      await apiDb.schliessen();
+    });
+
+    it("Allergene je Gericht und Aushang als PDF", async () => {
+      expect((await alsGina(http().get("/v1/allergene")).expect(200)).body).toHaveLength(14);
+      await alsGina(http().post("/v1/gerichte")).send({ name: "Pizza", allergene: ["gluten", "nuesse"] }).expect(422);
+      const g = (await alsGina(http().post("/v1/gerichte")).send({ name: "Pizza Margherita", kategorie: "Hauptgerichte", allergene: ["gluten", "milch", "milch"] }).expect(201)).body;
+      expect(g.allergene).toEqual(["gluten", "milch"]);
+      await alsGina(http().put(`/v1/gerichte/${g.id}`)).send({ name: "Pizza Margherita", kategorie: "Hauptgerichte", allergene: ["gluten", "milch", "senf"] }).expect(200);
+      const pdf = await binaer(alsGina(http().get("/v1/gerichte/aushang"))).expect(200);
+      expect((pdf.body as Buffer).subarray(0, 5).toString()).toBe("%PDF-");
+    });
+
+    it("IfSG-Belehrung über das Unterweisungsmodul erledigt die Pflicht der Einstellung", async () => {
+      const b = (await alsGina(http().post("/v1/beschaeftigte")).send({ vorname: "Kim", nachname: "Koch", art: "teilzeit", eintritt: heuteIso }).expect(201)).body;
+      await neuberechnen(worker, u, "test", { kalender: new StandardKalender() });
+      const periode = `aenderung-${heuteIso.replaceAll("-", "")}`;
+      const vor = ((await alsGina(http().get("/v1/pflichten")).expect(200)).body as { pflicht_id: string; periode: string; ergebnis: string; status: string }[]).find((x) => x.pflicht_id === "branche.gastro_ifsg_belehrung" && x.periode === periode);
+      expect(vor?.ergebnis).toBe("gilt");
+      const w = (await alsGina(http().post("/v1/unterweisungen")).send({ thema: "Belehrung § 43 IfSG", inhalt: "Tätigkeitsverbote, Hygiene", datum: heuteIso, durchgefuehrt_von: "Gina", art: "ifsg" }).expect(201)).body;
+      await alsGina(http().post(`/v1/unterweisungen/${w.id}/bestaetigen`)).send({ beschaeftigter_id: b.id, name: "Kim Koch" }).expect(201);
+      expect((await alsGina(http().post(`/v1/unterweisungen/${w.id}/abschliessen`)).expect(201)).body.erledigte_pflichten).toBe(1);
+      const nach = ((await alsGina(http().get("/v1/pflichten")).expect(200)).body as { pflicht_id: string; periode: string; status: string }[]).find((x) => x.pflicht_id === "branche.gastro_ifsg_belehrung" && x.periode === periode);
+      expect(nach?.status).toBe("erledigt");
+    });
+  });
 });

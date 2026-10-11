@@ -1,7 +1,7 @@
 # Katalog G.71 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: produkte.verpackung
-version: 1
+version: 2
 katalog_nr: G.71
 titel:
   de: Verpackungen registrieren und lizenzieren
@@ -14,6 +14,8 @@ erklaerung:
 rechtsgrundlage:
 - VerpackG
 kategorie: produkte
+branchen:
+- onlinehandel
 ausloeser:
   feld: profil.produkte.arten
   op: enthaelt

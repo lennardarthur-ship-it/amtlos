@@ -1,7 +1,7 @@
 # Katalog F.63 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.cookie_einwilligung
-version: 1
+version: 2
 katalog_nr: F.63
 titel:
   de: Einwilligung für Cookies und Tracking einholen
@@ -13,6 +13,8 @@ erklaerung:
 rechtsgrundlage:
 - § 25 TDDDG
 kategorie: online
+branchen:
+- onlinehandel
 ausloeser:
   feld: profil.datenverarbeitung.arten
   op: enthaelt

@@ -1,7 +1,7 @@
 # Katalog F.62 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: datenschutz.dsfa
-version: 1
+version: 2
 katalog_nr: F.62
 titel:
   de: Prüfen, ob eine Datenschutz-Folgenabschätzung nötig ist
@@ -13,6 +13,8 @@ erklaerung:
 rechtsgrundlage:
 - Art. 35 DSGVO
 kategorie: datenschutz
+branchen:
+- gesundheit_pflege
 ausloeser:
   any:
   - feld: profil.datenverarbeitung.arten

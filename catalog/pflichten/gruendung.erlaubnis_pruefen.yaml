@@ -1,7 +1,7 @@
 # Katalog A.3 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gruendung.erlaubnis_pruefen
-version: 1
+version: 2
 katalog_nr: A.3
 titel:
   de: Erlaubnis für dein Gewerbe einholen
@@ -16,6 +16,10 @@ rechtsgrundlage:
 - §§ 30–34i GewO
 - Gaststättenrecht der Länder
 kategorie: gruendung
+branchen:
+- gastronomie_lebensmittel
+- transport_logistik
+- immobilien_finanzen
 ausloeser:
   any:
   - feld: profil.erlaubnis.gewo_paragraphen

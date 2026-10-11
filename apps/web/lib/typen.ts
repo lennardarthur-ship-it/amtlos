@@ -11,6 +11,7 @@ export interface Karte {
   titel: string;
   kurz: string;
   kategorie: string;
+  branchen?: string[];
   bereich: Bereich;
   sanktion: { text: string; schwere: "niedrig" | "mittel" | "hoch" };
   rechtsgrundlage: string[];

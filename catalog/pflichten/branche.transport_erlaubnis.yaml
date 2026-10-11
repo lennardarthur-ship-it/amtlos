@@ -1,0 +1,53 @@
+# Katalog H.5 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: branche.transport_erlaubnis
+version: 1
+katalog_nr: H.5
+titel:
+  de: Erlaubnis für Güter- oder Personenbeförderung
+kurz:
+  de: Für gewerblichen Güterkraftverkehr oder die Beförderung von Personen brauchst du in der Regel eine Erlaubnis oder Lizenz.
+erklaerung:
+  de: Ob und welche Erlaubnis nötig ist, hängt von Fahrzeuggewicht, Art der Beförderung und Gebiet ab.
+rechtsgrundlage:
+- GüKG
+- PBefG
+kategorie: branche
+branchen:
+- transport_logistik
+ausloeser:
+  feld: profil.taetigkeit.branchen
+  op: enthaelt
+  wert: transport_logistik
+  label:
+    de: Dein Betrieb gehört zu Transport und Logistik.
+phase: gruendung
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Zuständige Verkehrsbehörde
+kanal: post
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Güterkraftverkehrsgesetz
+  url: https://www.gesetze-im-internet.de/g_kg_1998/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Schwellen (z. B. Fahrzeuggewicht) nicht in der Spezifikation
+- Personenbeförderung (Taxi, Mietwagen) getrennt?
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

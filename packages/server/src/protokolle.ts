@@ -346,3 +346,91 @@ export async function datenpanneMeldungPdf(m: DatenpanneMeldung): Promise<Buffer
   }
   return s.fertig();
 }
+
+// ------------------------------------------------------------ Branchen (Abschnitt 8)
+
+/** Die 14 Hauptallergene nach Anhang II der LMIV (Bezeichnungen fachlich zu prüfen, E-099). */
+export const ALLERGENE: Record<string, string> = {
+  gluten: "Glutenhaltiges Getreide",
+  krebstiere: "Krebstiere",
+  eier: "Eier",
+  fische: "Fische",
+  erdnuesse: "Erdnüsse",
+  soja: "Soja",
+  milch: "Milch (einschließlich Laktose)",
+  schalenfruechte: "Schalenfrüchte",
+  sellerie: "Sellerie",
+  senf: "Senf",
+  sesam: "Sesamsamen",
+  schwefeldioxid: "Schwefeldioxid und Sulphite",
+  lupinen: "Lupinen",
+  weichtiere: "Weichtiere",
+};
+
+export interface AllergenAushang {
+  unternehmen: string;
+  stand: string;
+  gerichte: { name: string; kategorie: string; allergene: string[] }[];
+}
+
+/** Allergenübersicht zum Aushängen oder Auslegen: je Gericht die enthaltenen Hauptallergene. */
+export async function allergenAushangPdf(a: AllergenAushang): Promise<Buffer> {
+  const s = await satz("Allergene", a.unternehmen);
+  s.text(a.unternehmen, 50, 9, s.fett);
+  s.zeile(30);
+  s.text("Allergene in unseren Speisen und Getränken", 50, 15, s.fett);
+  s.zeile(18);
+  s.text(`Stand: ${datumDe(a.stand)}`, 50, 9);
+  s.zeile(22);
+  const kategorien = [...new Set(a.gerichte.map((g) => g.kategorie))];
+  for (const k of kategorien) {
+    if (k) {
+      s.platz(40);
+      s.text(k, 50, 11, s.fett);
+      s.zeile(16);
+    }
+    for (const g of a.gerichte.filter((x) => x.kategorie === k)) {
+      s.platz(28);
+      s.text(g.name, 60, 10, s.fett);
+      s.zeile(13);
+      s.absatz(g.allergene.length ? g.allergene.map((x) => ALLERGENE[x] ?? x).join(", ") : "keine der 14 Hauptallergene angegeben", 70, 9, s.normal, 12);
+      s.zeile(4);
+    }
+  }
+  if (!a.gerichte.length) s.absatz("Keine Gerichte erfasst.");
+  s.zeile(8);
+  s.absatz("Bei Fragen zu Allergenen und Zutaten sprechen Sie uns gern an.", 50, 9, s.normal, 12);
+  return s.fertig();
+}
+
+export interface EigenkontrollProtokoll {
+  unternehmen: string;
+  monat: string;
+  messungen: { gemessen_am: string; messpunkt: string; einheit: string; wert: number; grenze_min: number | null; grenze_max: number | null; in_ordnung: boolean; massnahme: string | null }[];
+}
+
+/** Monatsprotokoll der Eigenkontrollen (HACCP). */
+export async function eigenkontrollProtokollPdf(p: EigenkontrollProtokoll): Promise<Buffer> {
+  const s = await satz(`Eigenkontrollen ${p.monat}`, p.unternehmen);
+  const z = (n: number) => new Intl.NumberFormat("de-DE", { maximumFractionDigits: 2 }).format(n);
+  s.text(p.unternehmen, 50, 9, s.fett);
+  s.zeile(30);
+  s.text(`Eigenkontrollen ${p.monat.slice(5)}/${p.monat.slice(0, 4)}`, 50, 15, s.fett);
+  s.zeile(24);
+  const grenze = (m: EigenkontrollProtokoll["messungen"][number]) =>
+    m.grenze_min !== null && m.grenze_max !== null ? `${z(m.grenze_min)} bis ${z(m.grenze_max)}` : m.grenze_min !== null ? `ab ${z(m.grenze_min)}` : m.grenze_max !== null ? `bis ${z(m.grenze_max)}` : "–";
+  s.text("Zeitpunkt", 50, 8, s.fett); s.text("Messpunkt", 145, 8, s.fett); s.text("Wert", 300, 8, s.fett); s.text("Grenzen", 355, 8, s.fett); s.text("OK", 440, 8, s.fett); s.text("Maßnahme", 470, 8, s.fett);
+  s.zeile(13);
+  for (const m of p.messungen) {
+    s.platz(24);
+    s.text(zeitDe(m.gemessen_am), 50, 8);
+    s.text(m.messpunkt.slice(0, 30), 145, 8);
+    s.text(`${z(m.wert)} ${m.einheit === "sonstige" ? "" : m.einheit}`, 300, 8);
+    s.text(grenze(m), 355, 8);
+    s.text(m.in_ordnung ? "ja" : "NEIN", 440, 8, m.in_ordnung ? s.normal : s.fett);
+    if (m.massnahme) s.absatz(m.massnahme, 470, 8, s.normal, 11);
+    else s.zeile(11);
+  }
+  if (!p.messungen.length) s.absatz("Keine Messungen in diesem Monat.");
+  return s.fertig();
+}

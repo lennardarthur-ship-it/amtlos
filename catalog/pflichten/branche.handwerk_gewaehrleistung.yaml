@@ -1,0 +1,53 @@
+# Katalog H.2 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: branche.handwerk_gewaehrleistung
+version: 1
+katalog_nr: H.2
+titel:
+  de: Gewährleistung im Blick behalten
+kurz:
+  de: Für deine Werkleistungen haftest du für Mängel. Dokumentiere Abnahmen und behalte die Fristen im Blick.
+erklaerung:
+  de: Wie lange Mängelansprüche bestehen, hängt von der Art des Werks ab. Amtlos erinnert nach fachlicher Freigabe an das
+    Ende der Fristen.
+rechtsgrundlage:
+- §§ 634, 634a BGB
+kategorie: branche
+branchen:
+- handwerk
+- bau
+ausloeser:
+  feld: profil.taetigkeit.branchen
+  op: enthaelt
+  wert: handwerk
+  label:
+    de: Dein Betrieb ist ein Handwerksbetrieb.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Keine eigene Pflicht – Hinweis zum Risiko.
+  schwere: niedrig
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Bürgerliches Gesetzbuch § 634a
+  url: https://www.gesetze-im-internet.de/bgb/__634a.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Verjährungsfristen je Werkart nicht in der Spezifikation – als Regelwerte ergänzen
+- Ist das eine Pflicht oder ein Hinweis? Darstellung bestätigen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

@@ -1,7 +1,7 @@
 # Katalog F.65 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: ki.kompetenz
-version: 1
+version: 2
 katalog_nr: F.65
 titel:
   de: KI-Kompetenz der Beschäftigten sicherstellen
@@ -18,6 +18,8 @@ begriffe:
 rechtsgrundlage:
 - Art. 4 KI-VO
 kategorie: ki
+branchen:
+- it_agentur_freelancer
 ausloeser:
   any:
   - feld: profil.ki.nutzung

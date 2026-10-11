@@ -1,7 +1,7 @@
 # Katalog F.65 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: ki.transparenz
-version: 1
+version: 2
 katalog_nr: F.65
 titel:
   de: KI-Inhalte und KI-Interaktion kennzeichnen
@@ -13,6 +13,8 @@ erklaerung:
 rechtsgrundlage:
 - Art. 50 KI-VO
 kategorie: ki
+branchen:
+- it_agentur_freelancer
 ausloeser:
   feld: profil.ki.eigene_produkte
   op: ==

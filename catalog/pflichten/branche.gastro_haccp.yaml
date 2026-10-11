@@ -1,0 +1,57 @@
+# Katalog H.1 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: branche.gastro_haccp
+version: 1
+katalog_nr: H.1
+titel:
+  de: Eigenkontrollen nach HACCP
+kurz:
+  de: Du kontrollierst und dokumentierst regelmäßig die kritischen Punkte deiner Lebensmittelhygiene, zum Beispiel Kühltemperaturen.
+erklaerung:
+  de: Lebensmittelunternehmen müssen ein Verfahren nach den HACCP-Grundsätzen einrichten und die Kontrollen dokumentieren.
+    Amtlos bietet Kontrolllisten mit Grenzwerten, die du festlegst.
+rechtsgrundlage:
+- Art. 5 Verordnung (EG) Nr. 852/2004
+kategorie: branche
+branchen:
+- gastronomie_lebensmittel
+ausloeser:
+  feld: profil.taetigkeit.branchen
+  op: enthaelt
+  wert: gastronomie_lebensmittel
+  label:
+    de: Dein Betrieb gehört zur Gastronomie oder Lebensmittelbranche.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Kontrolle durch die Lebensmittelüberwachung
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: dokument_generator
+aktion:
+  art: link
+  ziel: app.eigenkontrollen
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Verordnung (EG) Nr. 852/2004
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32004R0852
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Grenzwerte (z. B. Kühltemperaturen) und Kontrollhäufigkeit nicht in der Spezifikation – Betrieb legt sie fest; Vorschläge
+  fachlich ergänzen
+- Leitlinien für gute Hygienepraxis je Branche verlinken
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

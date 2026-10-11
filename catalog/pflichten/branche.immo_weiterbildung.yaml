@@ -1,0 +1,63 @@
+# Katalog H.8 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: branche.immo_weiterbildung
+version: 1
+katalog_nr: H.8
+titel:
+  de: Weiterbildungspflicht (Immobilien und Finanzen)
+kurz:
+  de: Für bestimmte erlaubnispflichtige Tätigkeiten gilt eine regelmäßige Weiterbildungspflicht – nur wo sie noch gilt.
+erklaerung:
+  de: Betroffen sind etwa Immobilienmakler, Wohnimmobilienverwalter und Versicherungsvermittler. Umfang und Nachweis regelt
+    die jeweilige Vorschrift.
+rechtsgrundlage:
+- § 34c Abs. 2a GewO
+- § 34d Abs. 9 GewO
+kategorie: branche
+branchen:
+- immobilien_finanzen
+ausloeser:
+  all:
+  - feld: profil.taetigkeit.branchen
+    op: enthaelt
+    wert: immobilien_finanzen
+    label:
+      de: Dein Betrieb gehört zur Immobilien- oder Finanzbranche.
+  - feld: profil.erlaubnis.gewo_paragraphen
+    op: enthaelt_eines
+    wert:
+    - 34c
+    - 34d
+    - 34f
+    label:
+      de: Du hast eine Erlaubnis nach § 34c, § 34d oder § 34f GewO.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Nachweis gegenüber der Erlaubnisbehörde
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Gewerbeordnung § 34c
+  url: https://www.gesetze-im-internet.de/gewo/__34c.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- „nur wo noch geltend“ – aktuellen Stand je Vorschrift prüfen
+- Umfang (Stunden) und Zeitraum als Regelwerte
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

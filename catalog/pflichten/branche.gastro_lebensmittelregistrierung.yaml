@@ -1,0 +1,53 @@
+# Katalog H.1 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: branche.gastro_lebensmittelregistrierung
+version: 1
+katalog_nr: H.1
+titel:
+  de: Bei der Lebensmittelüberwachung registrieren
+kurz:
+  de: Bevor du Lebensmittel herstellst, behandelst oder verkaufst, registrierst du deinen Betrieb bei der Lebensmittelüberwachung.
+erklaerung:
+  de: Lebensmittelunternehmen müssen jeden Betrieb bei der zuständigen Behörde registrieren lassen – meist beim Veterinär-
+    und Lebensmittelüberwachungsamt des Kreises.
+rechtsgrundlage:
+- Art. 6 Verordnung (EG) Nr. 852/2004
+kategorie: branche
+branchen:
+- gastronomie_lebensmittel
+ausloeser:
+  feld: profil.taetigkeit.branchen
+  op: enthaelt
+  wert: gastronomie_lebensmittel
+  label:
+    de: Dein Betrieb gehört zur Gastronomie oder Lebensmittelbranche.
+phase: gruendung
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Lebensmittelüberwachung des Kreises bzw. der Stadt
+kanal: post
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Verordnung (EG) Nr. 852/2004
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32004R0852
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist „vor Aufnahme der Tätigkeit“ als Gründungsschritt mit Termin?
+- Zuständigkeit je Land
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

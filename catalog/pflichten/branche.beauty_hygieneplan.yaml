@@ -1,0 +1,54 @@
+# Katalog H.3 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: branche.beauty_hygieneplan
+version: 1
+katalog_nr: H.3
+titel:
+  de: Hygieneplan führen
+kurz:
+  de: In Beauty- und Kosmetikbetrieben legst du in einem Hygieneplan fest, wie Geräte, Flächen und Hände gereinigt und desinfiziert
+    werden.
+erklaerung:
+  de: Die Anforderungen ergeben sich aus dem Infektionsschutz und den Hygieneverordnungen der Länder.
+rechtsgrundlage:
+- IfSG
+- Hygieneverordnungen der Länder
+kategorie: branche
+branchen:
+- beauty_kosmetik
+ausloeser:
+  feld: profil.taetigkeit.branchen
+  op: enthaelt
+  wert: beauty_kosmetik
+  label:
+    de: Dein Betrieb gehört zur Beauty- und Kosmetikbranche.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Gesundheitsamt
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: dokument_generator
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Infektionsschutzgesetz
+  url: https://www.gesetze-im-internet.de/ifsg/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Rechtsgrundlage je Land ergänzen
+- Vorlage Hygieneplan nach Prüfung (6.4)
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

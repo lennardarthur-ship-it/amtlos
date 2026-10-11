@@ -1,7 +1,7 @@
 # Katalog G.68 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.kuendigungsbutton
-version: 1
+version: 2
 katalog_nr: G.68
 titel:
   de: Kündigungsbutton bei Abos
@@ -13,6 +13,8 @@ erklaerung:
 rechtsgrundlage:
 - § 312k BGB
 kategorie: online
+branchen:
+- onlinehandel
 ausloeser:
   all:
   - feld: profil.kunden.segmente

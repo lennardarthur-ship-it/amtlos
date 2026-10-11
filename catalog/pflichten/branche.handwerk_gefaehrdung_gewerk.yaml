@@ -1,0 +1,61 @@
+# Katalog H.2 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: branche.handwerk_gefaehrdung_gewerk
+version: 1
+katalog_nr: H.2
+titel:
+  de: Gefährdungsbeurteilung je Gewerk
+kurz:
+  de: Im Handwerk beurteilst du die Gefährdungen je Gewerk und Einsatzort – auch auf Baustellen beim Kunden.
+erklaerung:
+  de: Die allgemeine Gefährdungsbeurteilung (E.50) wird im Handwerk je Gewerk und Tätigkeit konkretisiert. Branchenvorlagen
+    folgen nach fachlicher Prüfung.
+rechtsgrundlage:
+- §§ 5, 6 ArbSchG
+kategorie: branche
+branchen:
+- handwerk
+- bau
+ausloeser:
+  all:
+  - feld: profil.taetigkeit.branchen
+    op: enthaelt
+    wert: handwerk
+    label:
+      de: Dein Betrieb ist ein Handwerksbetrieb.
+  - feld: abgeleitet.hat_beschaeftigte
+    op: ==
+    wert: true
+    label:
+      de: Du beschäftigst mindestens eine Person.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: dokument_generator
+aktion:
+  art: link
+  ziel: vorlage.gefaehrdungsbeurteilung
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Arbeitsschutzgesetz § 5
+  url: https://www.gesetze-im-internet.de/arbschg/__5.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Vorlagen je Gewerk (BG-Handlungshilfen) – T-20
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

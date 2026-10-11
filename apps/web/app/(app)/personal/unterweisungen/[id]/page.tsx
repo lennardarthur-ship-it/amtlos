@@ -48,7 +48,7 @@ export default async function UnterweisungSeite({ params, searchParams }: { para
   const zeit = (iso: string) => new Intl.DateTimeFormat(s === "de" ? "de-DE" : "en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/Berlin" }).format(new Date(iso));
   return (
     <div className="lesetext space-y-8">
-      <p className="text-klein"><Link href={`/personal/unterweisungen?art=${w.art}`} className="verweis">{w.art === "ki_kompetenz" ? x.schulung.titel : x.unterweisung.zurueck}</Link></p>
+      <p className="text-klein"><Link href={`/personal/unterweisungen?art=${w.art}`} className="verweis">{w.art === "ki_kompetenz" ? x.schulung.titel : w.art === "ifsg" ? x.ifsg.titel : x.unterweisung.zurueck}</Link></p>
       <header>
         <h1 className="text-titel font-bold">{w.thema}</h1>
         <p className="mt-1 text-klein text-tinte-leise">{datumLang(w.datum, s)} · {w.durchgefuehrt_von}</p>

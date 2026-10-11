@@ -1,0 +1,57 @@
+# Katalog H.1 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: branche.gastro_allergene
+version: 1
+katalog_nr: H.1
+titel:
+  de: Allergene kennzeichnen
+kurz:
+  de: Du informierst deine Gäste über die 14 Hauptallergene in deinen Speisen und Getränken – auch bei loser Ware.
+erklaerung:
+  de: Die Lebensmittelinformationsverordnung verlangt Angaben zu Allergenen. Amtlos führt eine Allergenliste je Gericht und
+    erstellt daraus eine Übersicht zum Aushängen.
+rechtsgrundlage:
+- Art. 9 und 44 Verordnung (EU) Nr. 1169/2011
+- LMIDV
+kategorie: branche
+branchen:
+- gastronomie_lebensmittel
+ausloeser:
+  feld: profil.taetigkeit.branchen
+  op: enthaelt
+  wert: gastronomie_lebensmittel
+  label:
+    de: Dein Betrieb gehört zur Gastronomie oder Lebensmittelbranche.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: dokument_generator
+aktion:
+  art: link
+  ziel: app.allergene
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Verordnung (EU) Nr. 1169/2011
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32011R1169
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Liste der 14 Allergene (Anhang II LMIV) im Werkzeug prüfen
+- Form der Information bei loser Ware (LMIDV) erläutern
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null
