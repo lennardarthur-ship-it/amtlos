@@ -25,6 +25,7 @@ ausloeser:
     wert: true
     label:
       de: Deine Selbstständigkeit hat noch nicht begonnen.
+phase: gruendung
 frist:
   typ: relativ
   bezug:

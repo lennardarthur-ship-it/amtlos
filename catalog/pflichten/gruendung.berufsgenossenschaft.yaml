@@ -17,6 +17,7 @@ begriffe:
     erklaerung: { de: Die Unfallversicherung für Arbeitsunfälle und Berufskrankheiten in deiner Branche. }
 rechtsgrundlage: ["§ 192 SGB VII"]
 kategorie: gruendung
+phase: gruendung
 ausloeser:
   immer: true
 frist:

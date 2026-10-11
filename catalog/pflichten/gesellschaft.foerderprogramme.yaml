@@ -1,0 +1,54 @@
+# Katalog B.22 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: gesellschaft.foerderprogramme
+version: 1
+katalog_nr: B.22
+titel:
+  de: Förderprogramme prüfen (Option)
+kurz:
+  de: Für Startups gibt es Förderprogramme wie EXIST, INVEST, KfW-Programme und Programme der Länder.
+erklaerung:
+  de: Amtlos zeigt passende Förderprogramme, sobald das Matching nach Profil fachlich hinterlegt ist. Fristen und Antragsunterlagen
+    hängen vom Programm ab.
+rechtsgrundlage:
+- Förderrichtlinien des Bundes und der Länder
+kategorie: gesellschaft
+ausloeser:
+  any:
+  - feld: abgeleitet.ist_kapitalgesellschaft
+    op: ==
+    wert: true
+    label:
+      de: Dein Unternehmen ist eine UG oder GmbH.
+  - feld: abgeleitet.noch_nicht_gestartet
+    op: ==
+    wert: true
+    label:
+      de: Du gründest gerade.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Fördergeber (z. B. BMWK, KfW, Länder)
+kanal: portal
+kosten: null
+sanktion:
+  text:
+    de: Keine Pflicht.
+  schwere: niedrig
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Förderdatenbank des Bundes
+  url: https://www.foerderdatenbank.de/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Option, keine Pflicht
+- Matching-Kriterien und Fristen je Programm fachlich hinterlegen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

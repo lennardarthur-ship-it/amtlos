@@ -26,6 +26,7 @@ ausloeser:
   - sonstige
   label:
     de: Du gehörst zu einer Gruppe von Selbstständigen, die rentenversicherungspflichtig sein kann.
+phase: gruendung
 frist:
   typ: relativ
   bezug:

@@ -19,6 +19,7 @@ ausloeser:
   wert: true
   label:
     de: Deine Tätigkeit ist ein Gewerbe.
+phase: gruendung
 frist:
   typ: relativ
   bezug:

@@ -42,3 +42,18 @@ export interface Heute {
   zaehler: { offen: number; ueberfaellig: number; angabe_fehlt: number; erledigt: number };
   vor_start: { anzahl: number; seit: string | null };
 }
+
+export interface GruendungsSchritt extends Karte {
+  katalog_nr?: string;
+  voraussetzungen: string[];
+  gesperrt_durch: { pflicht_id: string; titel: string }[];
+  stelle: string;
+  kanal: string;
+}
+
+export interface Gruendung {
+  schritte: GruendungsSchritt[];
+  fortschritt: { erledigt: number; gesamt: number; fertig: boolean };
+  kapitalgesellschaft: "ug" | "gmbh" | null;
+  kennzahlen: { id: string; bezeichnung: string; wert: number; einheit: string; ungeprueft: boolean }[];
+}

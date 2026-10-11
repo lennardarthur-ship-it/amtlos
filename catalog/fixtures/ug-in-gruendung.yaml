@@ -1,0 +1,42 @@
+persona: ug_in_gruendung
+beschreibung: Zwei Gründerinnen gründen eine UG in Leipzig, Start geplant zum 1.12.2026, noch nicht beim Notar, keine Beschäftigten
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: ug
+  profil.gruendungsdatum: "2026-12-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [onlinehandel]
+  profil.erwerb: haupt
+  profil.alg1_bezug: false
+  profil.rentenversicherung.pflichtgruppe: [keine]
+  profil.erlaubnis.gewo_paragraphen: [keine]
+  profil.erlaubnis.gaststaette: false
+  profil.handwerk.anlage: keine
+  profil.ust.kleinunternehmer: false
+  profil.kunden.segmente: [b2c]
+  profil.kunden.regionen: [inland]
+  profil.kasse.elektronisch: false
+  profil.betriebsstaetten.anzahl: 1
+  profil.beschaeftigte.gesamt: 0
+  profil.gesellschafter.anzahl: 2
+  profil.gesellschafter.auslaendische_investoren: false
+  profil.gesellschaft.handelsregister: nicht_beantragt
+  profil.gesellschaft.geschaeftsjahr: kalenderjahr
+  profil.bundesland: SN
+  profil.gemeinde_ags: "14713000"
+erwartet:
+  gesellschaft.gesellschaftsvertrag_notar: gilt
+  gesellschaft.stammkapital_einzahlen: gilt
+  gesellschaft.handelsregister_anmeldung: gilt
+  gesellschaft.ug_ruecklage: gilt
+  gesellschaft.transparenzregister: gilt
+  gesellschaft.gesellschafterliste_aktualisieren: gilt_nicht
+  gesellschaft.mitarbeiterbeteiligung: gilt_nicht
+  gesellschaft.awv_meldung: gilt_nicht
+  gesellschaft.investitionspruefung_hinweis: gilt_nicht
+  gesellschaft.foerderprogramme: gilt
+  gesellschaft.offenlegung: gilt
+  gruendung.fragebogen_steuerliche_erfassung: gilt
+  gruendung.gruendungszuschuss: gilt_nicht
+  steuern.est_erklaerung: gilt_nicht
+  steuern.kst_erklaerung: gilt

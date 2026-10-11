@@ -1,0 +1,55 @@
+# Katalog B.18 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: gesellschaft.offenlegung_abweichendes_gj
+version: 1
+katalog_nr: B.18
+titel:
+  de: Jahresabschluss offenlegen (abweichendes Geschäftsjahr)
+kurz:
+  de: Den Jahresabschluss reichst du spätestens zwölf Monate nach Ende deines Geschäftsjahres beim Unternehmensregister ein.
+erklaerung:
+  de: Bei einem vom Kalenderjahr abweichenden Geschäftsjahr berechnet Amtlos den Termin noch nicht; die Frist beträgt zwölf
+    Monate nach Ende des Geschäftsjahres.
+rechtsgrundlage:
+- § 325 HGB
+kategorie: gesellschaft
+ausloeser:
+  all:
+  - feld: abgeleitet.ist_kapitalgesellschaft
+    op: ==
+    wert: true
+    label:
+      de: Dein Unternehmen ist eine UG oder GmbH.
+  - feld: profil.gesellschaft.geschaeftsjahr
+    op: ==
+    wert: abweichend
+    label:
+      de: Dein Geschäftsjahr weicht vom Kalenderjahr ab.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Unternehmensregister
+kanal: portal
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Handelsgesetzbuch § 325
+  url: https://www.gesetze-im-internet.de/hgb/__325.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Frist: Termin für abweichendes Geschäftsjahr berechnen (Angabe des Geschäftsjahresendes im Profil nötig)'
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

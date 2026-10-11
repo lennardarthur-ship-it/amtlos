@@ -26,6 +26,7 @@ tags:
   - name: Pflichten
   - name: Kalender
   - name: Team
+  - name: Gründung und ELSTER
 
 paths:
   /v1/gesundheit:
@@ -210,6 +211,79 @@ paths:
                   als_naechstes: { type: array, maxItems: 3, items: { $ref: "#/components/schemas/PflichtKarte" } }
                   vor_start: { type: object, properties: { anzahl: { type: integer }, seit: { type: [string, "null"], format: date } } }
 
+  /v1/gruendung:
+    get:
+      tags: [Pflichten]
+      summary: Gründungsassistent – Schritte in der Reihenfolge ihrer Voraussetzungen, mit Sperren, Fortschritt und Kennzahlen (UG/GmbH)
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  schritte:
+                    type: array
+                    items:
+                      allOf:
+                        - { $ref: "#/components/schemas/PflichtKarte" }
+                        - type: object
+                          properties:
+                            katalog_nr: { type: string }
+                            voraussetzungen: { type: array, items: { type: string } }
+                            gesperrt_durch: { type: array, items: { type: object, properties: { pflicht_id: { type: string }, titel: { type: string } } } }
+                            stelle: { type: string }
+                            kanal: { type: string }
+                  fortschritt: { type: object, properties: { erledigt: { type: integer }, gesamt: { type: integer }, fertig: { type: boolean } } }
+                  kapitalgesellschaft: { enum: [ug, gmbh, null] }
+                  kennzahlen:
+                    type: array
+                    items: { type: object, properties: { id: { type: string }, bezeichnung: { type: string }, wert: { type: number }, einheit: { type: string }, ungeprueft: { type: boolean } } }
+
+  /v1/gruendung/fragebogen:
+    get:
+      tags: [Gründung und ELSTER]
+      summary: Angaben aus dem Profil für den Fragebogen zur steuerlichen Erfassung (Vorbereitung, kein amtliches Formular)
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  abschnitte:
+                    type: array
+                    items: { type: object, properties: { titel: { type: string }, angaben: { type: array, items: { type: object, properties: { feld: { type: string }, label: { type: string }, wert: { type: [string, "null"] }, schritt: { type: string } } } } } }
+                  fehlend: { type: array, items: { type: string } }
+                  hinweise: { type: array, items: { enum: [verzicht_bindet] } }
+                  uebermittlung: { $ref: "#/components/schemas/ElsterStatus" }
+
+  /v1/elster/status:
+    get:
+      tags: [Gründung und ELSTER]
+      summary: Ist die direkte Übermittlung an ELSTER verfügbar?
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/ElsterStatus" } } } }
+
+  /v1/elster/{vorgang}:
+    post:
+      tags: [Gründung und ELSTER]
+      summary: Übermittlung an ELSTER im Auftrag des Nutzers (derzeit nicht verfügbar → 501 mit Begründung)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters:
+        - { $ref: "#/components/parameters/Unternehmen" }
+        - { name: vorgang, in: path, required: true, schema: { enum: [fragebogen_steuerliche_erfassung, ust_voranmeldung, zusammenfassende_meldung, kassenmeldung] } }
+      requestBody: { content: { application/json: { schema: { type: object } } } }
+      responses:
+        "201": { description: Übermittelt (Transferticket) }
+        "404": { description: Unbekannter Vorgang }
+        "501": { description: Übermittlung nicht verfügbar, content: { application/json: { schema: { $ref: "#/components/schemas/ElsterStatus" } } } }
+
   /v1/glossar:
     get:
       tags: [Pflichten]
@@ -388,6 +462,12 @@ components:
           schema: { type: object, properties: { meldung: { type: string }, fehler: { type: array, items: { type: object, properties: { feld: { type: string }, meldung: { type: string } } } } } }
 
   schemas:
+    ElsterStatus:
+      type: object
+      properties:
+        verfuegbar: { type: boolean }
+        grund: { type: string }
+        alternative: { type: object, properties: { titel: { type: string }, url: { type: string, format: uri } } }
     Rolle: { enum: [inhaber, mitarbeiter, steuerberater, admin] }
     Konto:
       type: object

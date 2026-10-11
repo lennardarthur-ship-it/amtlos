@@ -1,0 +1,64 @@
+# Werte unverändert aus Spezifikation Abschnitt 4, Katalog B.14 (E-054). Rechtsgrundlagen ergänzt – fachlich zu prüfen.
+- schema_version: 1
+  id: gesellschaft.gmbh.stammkapital_mindest
+  version: 1
+  katalog_nr: B.14
+  bezeichnung: { de: "Mindeststammkapital der GmbH", en: "Minimum share capital of a GmbH" }
+  einheit: EUR
+  wert: 25000
+  gueltig_ab: "2026-01-01"
+  gueltig_bis: null
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 5 GmbHG"]
+  quellen:
+    - { titel: GmbH-Gesetz § 5, url: "https://www.gesetze-im-internet.de/gmbhg/__5.html", abgerufen: null }
+  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Rechtsgrundlage ergänzt, steht nicht in der Spezifikation"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+
+- schema_version: 1
+  id: gesellschaft.gmbh.mindesteinzahlung_anteil
+  version: 1
+  katalog_nr: B.14
+  bezeichnung: { de: "Mindestens einzuzahlender Anteil des Stammkapitals (GmbH)", en: "Minimum share of capital to be paid in (GmbH)" }
+  einheit: prozent
+  wert: 50
+  gueltig_ab: "2026-01-01"
+  gueltig_bis: null
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 7 Abs. 2 GmbHG"]
+  quellen:
+    - { titel: GmbH-Gesetz § 7, url: "https://www.gesetze-im-internet.de/gmbhg/__7.html", abgerufen: null }
+  fachlich_zu_pruefen: ["Spezifikation: „mindestens Hälfte einzuzahlen“ – Bezug (Mindeststammkapital oder Summe der Anteile) und Einzahlung je Geschäftsanteil prüfen", "Rechtsgrundlage ergänzt"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+
+- schema_version: 1
+  id: gesellschaft.ug.stammkapital_mindest
+  version: 1
+  katalog_nr: B.14
+  bezeichnung: { de: "Mindeststammkapital der UG (haftungsbeschränkt)", en: "Minimum share capital of a UG" }
+  einheit: EUR
+  wert: 1
+  gueltig_ab: "2026-01-01"
+  gueltig_bis: null
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 5a GmbHG"]
+  quellen:
+    - { titel: GmbH-Gesetz § 5a, url: "https://www.gesetze-im-internet.de/gmbhg/__5a.html", abgerufen: null }
+  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Rechtsgrundlage ergänzt"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+
+- schema_version: 1
+  id: gesellschaft.ug.ruecklage_anteil
+  version: 1
+  katalog_nr: B.14
+  bezeichnung: { de: "Rücklage der UG: Anteil am Jahresüberschuss", en: "UG statutory reserve: share of annual surplus" }
+  einheit: prozent
+  wert: 25
+  gueltig_ab: "2026-01-01"
+  gueltig_bis: null
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 5a Abs. 3 GmbHG"]
+  quellen:
+    - { titel: GmbH-Gesetz § 5a, url: "https://www.gesetze-im-internet.de/gmbhg/__5a.html", abgerufen: null }
+  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Rechtsgrundlage ergänzt", "Berechnungsbasis (Jahresüberschuss abzüglich Verlustvortrag) prüfen"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }

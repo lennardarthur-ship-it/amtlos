@@ -28,6 +28,8 @@ fakten:
   profil.gesellschafter.auslaendische_investoren: true
   profil.bundesland: HH
   profil.gemeinde_ags: "02000000"
+  profil.gesellschaft.handelsregister: eingetragen
+  profil.gesellschaft.geschaeftsjahr: kalenderjahr
 erwartet:
   gruendung.gewerbeanzeige: gilt
   gruendung.ust_idnr: gilt
@@ -44,7 +46,28 @@ erwartet:
   steuern.e_rechnung_versand_2027: gilt
   steuern.e_rechnung_versand_2028: gilt
   arbeitsschutz.gefaehrdungsbeurteilung: gilt
+  # Katalog B: eingetragene GmbH – Gründungsschritte entfallen, laufende Pflichten gelten
+  gesellschaft.gesellschaftsvertrag_notar: gilt_nicht
+  gesellschaft.stammkapital_einzahlen: gilt_nicht
+  gesellschaft.handelsregister_anmeldung: gilt_nicht
+  gesellschaft.gesellschafterliste_aktualisieren: gilt_nicht
+  gesellschaft.transparenzregister: gilt
+  gesellschaft.gf_sozialversicherungsstatus: gilt
+  gesellschaft.gf_pflichten_haftung: gilt
+  gesellschaft.insolvenzantragspflicht: gilt
+  gesellschaft.jahresabschluss: gilt
+  steuern.e_bilanz: gilt
+  gesellschaft.offenlegung: gilt
+  gesellschaft.offenlegung_abweichendes_gj: gilt_nicht
+  gesellschaft.ug_ruecklage: gilt_nicht
+  steuern.kst_erklaerung: gilt
+  gesellschaft.mitarbeiterbeteiligung: gilt
+  gesellschaft.awv_meldung: gilt
+  gesellschaft.investitionspruefung_hinweis: gilt
+  gesellschaft.foerderprogramme: gilt
 termine_enthaelt:
+  # Gegründet 2025, Geschäftsjahr = Kalenderjahr → Offenlegung für 2025 bis 31.12.2026
+  gesellschaft.offenlegung: [["2025", "2026-12-31"]]
   # Vorjahr Gründungsjahr → Voranmeldung gilt; Zahllast 3.000 € ≤ 9.000 € → vierteljährlich
   steuern.ust_voranmeldung: [["2026-Q3", "2026-10-12"]]
   steuern.e_rechnung_versand_2027: [["einmalig", "2027-01-01"]]

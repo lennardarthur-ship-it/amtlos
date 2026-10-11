@@ -1,0 +1,50 @@
+# Katalog B.19 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: steuern.kst_erklaerung
+version: 1
+katalog_nr: B.19
+titel:
+  de: Körperschaftsteuererklärung abgeben
+kurz:
+  de: Einmal im Jahr gibst du für deine Gesellschaft elektronisch die Körperschaftsteuererklärung ab.
+erklaerung:
+  de: Kapitalgesellschaften zahlen Körperschaftsteuer und geben dafür jährlich eine Erklärung ab. Die Fristen stehen als Regeldaten
+    in Amtlos, sobald sie fachlich freigegeben sind.
+rechtsgrundlage:
+- KStG
+kategorie: steuern
+ausloeser:
+  feld: abgeleitet.ist_kapitalgesellschaft
+  op: ==
+  wert: true
+  label:
+    de: Dein Unternehmen ist eine UG oder GmbH.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Finanzamt
+kanal: elster
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Körperschaftsteuergesetz
+  url: https://www.gesetze-im-internet.de/kstg_1977/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Abgabefristen mit und ohne Steuerberatung als Regeldaten (wie G-18)
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

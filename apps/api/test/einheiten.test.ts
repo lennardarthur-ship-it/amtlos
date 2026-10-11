@@ -100,3 +100,27 @@ describe("Ratenbegrenzung", () => {
     expect(aufruf("/v1/heute", "tok").durch).toBe(true);
   });
 });
+
+describe("Gründungsassistent: Reihenfolge", () => {
+  it("ordnet nach Voraussetzungen, dann Frist, dann Katalognummer; sperrt bis zur Erledigung", async () => {
+    const { ordne, offeneVoraussetzungen, fortschritt } = await import("../src/gruendung.js");
+    const s = (pflicht_id: string, katalog_nr: string, voraussetzungen: string[] = [], faellig_am: string | null = null, status = "offen") =>
+      ({ pflicht_id, periode: "einmalig", status, faellig_am, katalog_nr, voraussetzungen });
+    const liste = [
+      s("fragebogen", "A.5", ["elster"], "2026-11-01"),
+      s("gewerbe", "A.2", [], "2026-10-01"),
+      s("hr", "B.15", ["kapital"]),
+      s("elster", "A.5"),
+      s("kapital", "B.14", ["notar"]),
+      s("notar", "B.14"),
+      s("ihk", "A.7", ["fehlt_im_katalog"]),
+      s("rundfunk", "A.10"),
+      s("rv", "A.9"),
+    ];
+    expect(ordne(liste).map((x) => x.pflicht_id)).toEqual(["gewerbe", "elster", "fragebogen", "ihk", "rv", "rundfunk", "notar", "kapital", "hr"]);
+    expect(offeneVoraussetzungen(liste[0]!, liste)).toEqual(["elster"]);
+    const nachElster = liste.map((x) => (x.pflicht_id === "elster" ? { ...x, status: "erledigt" } : x));
+    expect(offeneVoraussetzungen(nachElster[0]!, nachElster)).toEqual([]);
+    expect(fortschritt([...nachElster, s("x", "A.1", [], null, "nicht_zutreffend")])).toEqual({ erledigt: 1, gesamt: 9, fertig: false });
+  });
+});

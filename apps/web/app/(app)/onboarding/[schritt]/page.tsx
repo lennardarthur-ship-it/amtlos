@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { SCHRITTE, fuelle, type Frage } from "@amtlos/i18n";
+import { SCHRITTE, fuelle, sichtbareSchritte, type Frage } from "@amtlos/i18n";
 import { EingabeFehler, api } from "@/lib/api";
 import { t } from "@/lib/sprache";
 
@@ -10,7 +10,7 @@ type Profil = { version: number; daten: Record<string, unknown> };
 const UNBEKANNT = "__unbekannt__";
 
 /** Formularwerte einer Frage in den Profilwert übersetzen; null = „weiß ich nicht“ (Angabe bleibt unbekannt). */
-function wertAus(f: Frage, formular: FormData): unknown {
+function wertAus(f: Frage, formular: FormData, sprache: "de" | "en" = "de"): unknown {
   const roh = formular.getAll(f.feld).map(String);
   if (roh.includes(UNBEKANNT)) return null;
   switch (f.art) {
@@ -20,7 +20,8 @@ function wertAus(f: Frage, formular: FormData): unknown {
       return roh[0] === "ja" ? true : roh[0] === "nein" ? false : null;
     case "zahl":
     case "betrag": {
-      const text = (roh[0] ?? "").replace(/\./g, "").replace(",", ".").trim();
+      // Deutsch: 12.400,50 · Englisch: 12,400.50
+      const text = (sprache === "en" ? (roh[0] ?? "").replace(/,/g, "") : (roh[0] ?? "").replace(/\./g, "").replace(",", ".")).trim();
       return text === "" ? null : Number(text);
     }
     default:
@@ -33,7 +34,8 @@ async function speichern(schrittId: string, zurueck: string | undefined, formula
   const schritt = SCHRITTE.find((s) => s.id === schrittId)!;
   const alt = await api<Profil>("/v1/profil");
   const daten: Record<string, unknown> = { ...alt.daten };
-  for (const f of schritt.fragen) daten[f.feld] = wertAus(f, formular);
+  const { s: sprache } = await t();
+  for (const f of schritt.fragen) daten[f.feld] = wertAus(f, formular, sprache);
   // Bundesland folgt dem Gemeindeschlüssel – beim Ändern des Orts neu ableiten lassen
   if (schritt.fragen.some((f) => f.feld === "gemeinde_ags")) delete daten["bundesland"];
   try {
@@ -42,9 +44,11 @@ async function speichern(schrittId: string, zurueck: string | undefined, formula
     if (e instanceof EingabeFehler) redirect(`/onboarding/${schrittId}?fehler=${encodeURIComponent(e.message)}`);
     throw e;
   }
-  const index = SCHRITTE.findIndex((s) => s.id === schrittId);
   if (zurueck) redirect(zurueck);
-  redirect(index + 1 < SCHRITTE.length ? `/onboarding/${SCHRITTE[index + 1]!.id}` : "/heute?profil=gespeichert");
+  // Nächster relevanter Schritt nach den gerade gespeicherten Angaben (z. B. „Gesellschaft“ nur für UG/GmbH)
+  const pos = SCHRITTE.findIndex((s) => s.id === schrittId);
+  const naechster = SCHRITTE.slice(pos + 1).find((s) => sichtbareSchritte(daten).includes(s));
+  redirect(naechster ? `/onboarding/${naechster.id}` : "/heute?profil=gespeichert");
 }
 
 export default async function OnboardingSchritt({
@@ -55,17 +59,20 @@ export default async function OnboardingSchritt({
   searchParams: Promise<{ fehler?: string; zurueck?: string }>;
 }) {
   const [{ schritt: id }, { fehler, zurueck }] = await Promise.all([params, searchParams]);
-  const index = SCHRITTE.findIndex((s) => s.id === id);
-  if (index < 0) notFound();
-  const schritt = SCHRITTE[index]!;
+  const schritt = SCHRITTE.find((s) => s.id === id);
+  if (!schritt) notFound();
   const [{ s, t: x }, profil] = await Promise.all([t(), api<Profil>("/v1/profil")]);
+  const sichtbar = sichtbareSchritte(profil.daten);
+  // Ein ausgeblendeter Schritt bleibt direkt aufrufbar (z. B. aus den Einstellungen), zählt aber nicht mit
+  const liste = sichtbar.includes(schritt) ? sichtbar : SCHRITTE;
+  const index = liste.indexOf(schritt);
   // Nur interne Rücksprünge erlauben (kein offener Redirect)
   const sichererRuecksprung = zurueck?.startsWith("/") && !zurueck.startsWith("//") ? zurueck : undefined;
 
   return (
     <div className="lesetext space-y-6">
-      <p className="text-klein text-tinte-leise">{fuelle(x.onboarding.schritt, { n: index + 1, gesamt: SCHRITTE.length })}</p>
-      <progress className="h-1.5 w-full accent-amt" value={index + 1} max={SCHRITTE.length} aria-hidden="true" />
+      <p className="text-klein text-tinte-leise">{fuelle(x.onboarding.schritt, { n: index + 1, gesamt: liste.length })}</p>
+      <progress className="h-1.5 w-full accent-amt" value={index + 1} max={liste.length} aria-hidden="true" />
       <h1 className="text-titel font-bold">{schritt.titel[s]}</h1>
       {fehler ? (
         <p role="alert" className="rounded-md border-2 border-frist bg-frist-hauch p-4">
@@ -78,9 +85,9 @@ export default async function OnboardingSchritt({
           <FrageFeld key={f.feld} frage={f} wert={profil.daten[f.feld]} sprache={s} unbekanntText={x.onboarding.spaeter} jaNein={[x.gemeinsam.ja, x.gemeinsam.nein]} />
         ))}
         <div className="flex flex-wrap items-center gap-3">
-          <button className="knopf">{index + 1 < SCHRITTE.length && !sichererRuecksprung ? x.onboarding.weiter : x.onboarding.fertig}</button>
+          <button className="knopf">{index + 1 < liste.length && !sichererRuecksprung ? x.onboarding.weiter : x.onboarding.fertig}</button>
           {index > 0 && !sichererRuecksprung ? (
-            <Link href={`/onboarding/${SCHRITTE[index - 1]!.id}`} className="knopf knopf-leise">
+            <Link href={`/onboarding/${liste[index - 1]!.id}`} className="knopf knopf-leise">
               {x.onboarding.zurueck}
             </Link>
           ) : null}
@@ -131,7 +138,7 @@ function FrageFeld({ frage: f, wert, sprache: s, unbekanntText, jaNein }: { frag
         type={art}
         inputMode={f.art === "zahl" ? "numeric" : f.art === "betrag" ? "decimal" : undefined}
         pattern={f.muster ?? (f.art === "zahl" ? "\\d*" : f.art === "betrag" ? "[0-9.,]*" : undefined)}
-        defaultValue={unbekannt ? "" : f.art === "betrag" ? String(wert).replace(".", ",") : String(wert)}
+        defaultValue={unbekannt ? "" : f.art === "betrag" && s === "de" ? String(wert).replace(".", ",") : String(wert)}
         aria-describedby={hilfeId}
         className="feld mt-3 max-w-xs"
       />

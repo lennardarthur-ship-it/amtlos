@@ -105,6 +105,10 @@
     "ausloeser": {
       "$ref": "#/$defs/bedingung"
     },
+    "phase": {
+      "enum": ["gruendung"],
+      "description": "Teil des Gründungsassistenten (Spezifikation 6.2). Reihenfolge über voraussetzungen."
+    },
     "voraussetzungen": {
       "type": "array",
       "items": {

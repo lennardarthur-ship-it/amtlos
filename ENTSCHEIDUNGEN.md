@@ -282,6 +282,17 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Datum:** 2026-10-11 · **Status:** angenommen
 - Der Lasttest zeigte 39 Unternehmen/s (Ziel verfehlt). Ursachen: eine Anweisung je Instanz, Neuschreiben unveränderter Zeilen, und dadurch je Zeile ein Audit-Eintrag hinter einer globalen Sperre. Jetzt: ein Upsert mit `is distinct from`, ein Update für Entfallenes; Begründungsbaum und Fakten nicht im Audit (reproduzierbar). Ergebnis: Tageswechsel ≈ 149 Unternehmen/s auf 2 Kernen, hochgerechnet 11 min für 100.000. `letzter_lauf_id` zeigt nun auf den letzten Lauf, der die Instanz geändert hat.
 
+## Bauabschnitt 3
+
+### E-086 · ELSTER: Gateway-Schnittstelle jetzt, Übermittlung erst nach Registrierung und J-1
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- `ElsterGateway` (packages/server) ist die einzige Stelle, über die später übermittelt wird (ERiC in einem isolierten Dienst, docs/01). Bis Herstellerregistrierung und juristische Klärung J-1 vorliegen, liefert das Gateway eine begründete Absage (API: 501 mit Grund und Alternative „Mein ELSTER“). Die Oberfläche bereitet den Fragebogen aus dem Profil vor (Wahl der Kleinunternehmerregelung, Umsatz- und Gewinnprognose laut Spezifikation, plus Stammdaten); Feldnummern des amtlichen Formulars erfinden wir nicht (T-03).
+
+### E-087 · Gründungsassistent aus dem Katalog: phase=gruendung und voraussetzungen
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Welche Pflichten zum Assistenten gehören, steht im Katalog (`phase: gruendung`, Katalog A und die Gründungsschritte aus B), die Reihenfolge ergibt sich aus `voraussetzungen` (topologisch), danach Frist und Katalognummer. Offene Voraussetzungen sperren den Erledigen-Knopf („Erst erledigen: …“). Der Validator verbietet Kreise. Eine darüber hinausgehende Reihenfolge (z. B. Notar vor Gewerbeanzeige) nennt die Spezifikation nicht – Prüfpunkt T-04.
+- Katalog B (B.14–B.22) als 19 Pflichten aus der Spezifikation; fehlende Fristen sind „laufend ohne Termin“ mit Prüfpunkt, Werte aus B.14 als Regelwerte (Stammkapital, Einzahlung, UG-Rücklage). Neue Fakten `gesellschaft.handelsregister` und `gesellschaft.geschaeftsjahr`; der Onboarding-Schritt „Gesellschaft“ erscheint nur für UG/GmbH. Gewinnangaben dürfen negativ sein; Beträge werden je Sprache gelesen (12.400,50 / 12,400.50).
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

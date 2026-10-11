@@ -228,6 +228,17 @@ export function validiereKatalog(katalogDir, optionen = {}) {
     for (const f of pruefePflichtObjekt(p, { regelwertIds: new Set(regelwerte.keys()), pflichtIds, prod })) fehlerAus(datei, f);
     if (p?.id && path.basename(datei).replace(/\.ya?ml$/, "") !== p.id) fehlerAus(datei, `Dateiname muss der ID '${p.id}' entsprechen`);
   }
+  // Voraussetzungen dürfen keinen Kreis bilden (sonst ist im Gründungsassistenten nie etwas zu tun)
+  const vor = new Map(pflichten.map((p) => [p.inhalt?.id, p.inhalt?.voraussetzungen ?? []]));
+  const zustand = new Map();
+  const besuche = (id, pfad) => {
+    if (zustand.get(id) === "fertig") return;
+    if (zustand.get(id) === "aktiv") { fehlerAus(`${id}.yaml`, `voraussetzungen bilden einen Kreis: ${[...pfad, id].join(" → ")}`); return; }
+    zustand.set(id, "aktiv");
+    for (const v of vor.get(id) ?? []) besuche(v, [...pfad, id]);
+    zustand.set(id, "fertig");
+  };
+  for (const id of vor.keys()) besuche(id, []);
 
   // ---------- Fixtures ----------
   const fixtures = ladeYaml(path.join(katalogDir, "fixtures"));

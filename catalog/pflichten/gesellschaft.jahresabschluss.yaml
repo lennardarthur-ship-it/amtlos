@@ -1,0 +1,57 @@
+# Katalog B.18 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: gesellschaft.jahresabschluss
+version: 1
+katalog_nr: B.18
+titel:
+  de: Jahresabschluss aufstellen und feststellen
+kurz:
+  de: Nach jedem Geschäftsjahr erstellst du Bilanz und Gewinn- und Verlustrechnung; die Gesellschafter stellen den Abschluss
+    fest.
+erklaerung:
+  de: Zum Jahresabschluss gehören Bilanz und Gewinn- und Verlustrechnung. Die Gesellschafter stellen ihn fest. Die Bilanz
+    geht außerdem elektronisch als E-Bilanz ans Finanzamt.
+begriffe:
+- begriff:
+    de: E-Bilanz
+  erklaerung:
+    de: Die Bilanz in elektronischer Form, die ans Finanzamt übermittelt wird.
+rechtsgrundlage:
+- HGB
+- GmbHG
+kategorie: gesellschaft
+ausloeser:
+  feld: abgeleitet.ist_kapitalgesellschaft
+  op: ==
+  wert: true
+  label:
+    de: Dein Unternehmen ist eine UG oder GmbH.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du und die Gesellschafter; Finanzamt (E-Bilanz)
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Handelsgesetzbuch
+  url: https://www.gesetze-im-internet.de/hgb/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Fristen für Aufstellung und Feststellung als Regeldaten ergänzen
+- Jährliche Wiederholung abbilden, sobald Fristen feststehen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

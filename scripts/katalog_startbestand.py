@@ -33,8 +33,9 @@ GRUENDUNGSDATUM = lambda versatz, zeitpunkt="spaetestens", vs=KEINE: {"typ": "re
 
 def pflicht(id, nr, titel, kurz, erklaerung, rechtsgrundlage, kategorie, ausloeser, frist, stelle, kanal, automatisierung,
             quellen, pruefpunkte, wiederholung=None, sanktion=None, schwere="mittel", begriffe=None, aktion=None,
-            voraussetzungen=None, gueltig_ab=None, rg_ergaenzt=False, branchen=None):
+            voraussetzungen=None, gueltig_ab=None, rg_ergaenzt=False, branchen=None, phase=None):
     pp = list(pruefpunkte)
+    if phase is None and nr.startswith("A."): phase = "gruendung"  # Katalog A = Gründung und Registrierung
     if frist == "dauerhaft": frist = {"typ": "dauerhaft"}
     if frist["typ"] == "dauerhaft" and not any("Frist" in x for x in pp): pp.insert(0, OHNE_FRIST)
     if sanktion is None: sanktion = FOLGEN_PLATZHALTER; pp.append(OHNE_FOLGEN)
@@ -46,6 +47,7 @@ def pflicht(id, nr, titel, kurz, erklaerung, rechtsgrundlage, kategorie, ausloes
         "rechtsgrundlage": rechtsgrundlage, "kategorie": kategorie,
         **({"branchen": branchen} if branchen else {}),
         "ausloeser": ausloeser,
+        **({"phase": phase} if phase else {}),
         **({"voraussetzungen": voraussetzungen} if voraussetzungen else {}),
         "frist": frist,
         "wiederholung": wiederholung or {"art": "einmalig"},
@@ -434,5 +436,193 @@ pflicht("steuern.bauabzugsteuer_freistellung", "C.35", "Freistellungsbescheinigu
   [q("Einkommensteuergesetz § 48b", "estg/__48b.html")],
   ["Auch Handwerksbetriebe mit Bauleistungen erfassen (Branche handwerk)?", "Gültigkeitsdauer der Bescheinigung und Erneuerung ergänzen"],
   branchen=["bau", "handwerk"])
+
+# ============================================================ B. Kapitalgesellschaften und Startups (UG/GmbH)
+
+KAPG = v("abgeleitet.ist_kapitalgesellschaft", "==", True, "Dein Unternehmen ist eine UG oder GmbH.")
+NICHT_EINGETRAGEN = v("profil.gesellschaft.handelsregister", "!=", "eingetragen", "Deine Gesellschaft ist noch nicht im Handelsregister eingetragen.")
+UG = v("profil.rechtsform", "==", "ug", "Dein Unternehmen ist eine UG (haftungsbeschränkt).")
+JAEHRLICH_NACH_GJ = lambda monate, tag: {"typ": "wiederkehrend", "rhythmus": "jaehrlich", "faellig": {"art": "tag_nach_periodenende", "monate_nach": monate, "tag": tag}, "verschiebung": KEINE}
+
+pflicht("gesellschaft.gesellschaftsvertrag_notar", "B.14", "Gesellschaftsvertrag beim Notar beurkunden",
+  "Für eine UG oder GmbH lässt du den Gesellschaftsvertrag notariell beurkunden – auch online möglich.",
+  "Die Gründung einer GmbH oder UG beginnt mit dem Gesellschaftsvertrag, den ein Notar beurkundet. Die Beurkundung ist auch online möglich. Für die GmbH beträgt das Stammkapital mindestens 25.000 €, davon ist mindestens die Hälfte einzuzahlen. Eine UG kann ab 1 € gegründet werden.",
+  ["GmbHG"], "gesellschaft",
+  {"all": [KAPG, NICHT_EINGETRAGEN]},
+  "dauerhaft", "Notarin oder Notar", "notar", "hinweis",
+  [q("GmbH-Gesetz", "gmbhg/")],
+  ["Einzelne Vorschriften (z. B. § 2 GmbHG Form, § 5 Stammkapital, § 7 Einzahlung) zuordnen", "Online-Beurkundung: Voraussetzungen und Grenzen ergänzen"],
+  rg_ergaenzt=True, schwere="hoch",
+  begriffe=[("Stammkapital", "Das Kapital, das die Gesellschafter bei der Gründung einer GmbH oder UG mindestens aufbringen.")],
+  aktion={"art": "abhaken", "nachweis_erforderlich": True}, phase="gruendung")
+
+pflicht("gesellschaft.stammkapital_einzahlen", "B.14", "Stammkapital einzahlen",
+  "Zahl das Stammkapital auf das Geschäftskonto ein, bevor die Gesellschaft zum Handelsregister angemeldet wird.",
+  "Bei der GmbH ist mindestens die Hälfte des Mindeststammkapitals von 25.000 € einzuzahlen. Bei der UG ab 1 € wird das Stammkapital voll eingezahlt.",
+  ["GmbHG"], "gesellschaft",
+  {"all": [KAPG, NICHT_EINGETRAGEN]},
+  "dauerhaft", "Du und deine Mitgesellschafter; Bank", "intern_dokumentieren", "hinweis",
+  [q("GmbH-Gesetz", "gmbhg/")],
+  ["Reihenfolge „vor der Anmeldung“ bestätigen", "UG: Volleinzahlung und Bareinlage (Spezifikation nennt nur „ab 1 €“) bestätigen", "Höhe der Einzahlung bei GmbH: Anteil je Geschäftsanteil oder insgesamt?"],
+  rg_ergaenzt=True, schwere="hoch", voraussetzungen=["gesellschaft.gesellschaftsvertrag_notar"],
+  aktion={"art": "abhaken", "nachweis_erforderlich": True}, phase="gruendung")
+
+pflicht("gesellschaft.handelsregister_anmeldung", "B.15", "Gesellschaft im Handelsregister eintragen lassen",
+  "Der Notar meldet die Gesellschaft zum Handelsregister an; mit der Eintragung entsteht die GmbH oder UG.",
+  "Zur Anmeldung gehört die Gesellschafterliste. Spätere Änderungen, etwa im Gesellschaftsvertrag oder bei der Geschäftsführung, werden ebenfalls notariell angemeldet.",
+  ["HGB", "GmbHG"], "gesellschaft",
+  {"all": [KAPG, NICHT_EINGETRAGEN]},
+  "dauerhaft", "Registergericht (über den Notar)", "notar", "hinweis",
+  [q("GmbH-Gesetz", "gmbhg/"), q("Handelsgesetzbuch", "hgb/")],
+  ["Einzelvorschriften (§§ 7, 8 GmbHG) zuordnen", "Haftung vor Eintragung (Vorgesellschaft) als Hinweis ergänzen?"],
+  rg_ergaenzt=True, schwere="hoch", voraussetzungen=["gesellschaft.stammkapital_einzahlen"],
+  aktion={"art": "formular", "ziel": "onboarding.gesellschaft"}, phase="gruendung")
+
+pflicht("gesellschaft.gesellschafterliste_aktualisieren", "B.15", "Gesellschafterliste aktualisieren",
+  "Wenn sich im Gesellschafterkreis etwas ändert, muss eine neue Gesellschafterliste zum Handelsregister – über den Notar.",
+  "Änderungen im Gesellschafterkreis werden notariell abgewickelt; die aktualisierte Gesellschafterliste wird beim Handelsregister eingereicht.",
+  ["GmbHG"], "gesellschaft",
+  {"all": [KAPG, {"ereignis": "gesellschafterwechsel", "op": "eingetreten", "label": t("Im Gesellschafterkreis hat sich etwas geändert.")}]},
+  "dauerhaft", "Notarin oder Notar; Registergericht", "notar", "hinweis",
+  [q("GmbH-Gesetz § 40", "gmbhg/__40.html")],
+  ["Frist für die Einreichung ergänzen"], rg_ergaenzt=True, schwere="mittel",
+  wiederholung={"art": "bei_aenderung", "neu_ausloesen_bei": [{"ereignis": "gesellschafterwechsel"}]})
+
+pflicht("gesellschaft.transparenzregister", "B.16", "Wirtschaftlich Berechtigte ans Transparenzregister melden",
+  "Melde, wer hinter deiner Gesellschaft steht, und halte die Angaben aktuell.",
+  "Gesellschaften müssen ihre wirtschaftlich Berechtigten dem Transparenzregister mitteilen und die Angaben bei Änderungen aktualisieren.",
+  ["GwG"], "gesellschaft",
+  KAPG, "dauerhaft", "Transparenzregister (Bundesanzeiger Verlag)", "portal", "hinweis",
+  [q("Transparenzregister", "https://www.transparenzregister.de/"), q("Geldwäschegesetz", "gwg_2017/")],
+  ["Einzelvorschriften (§§ 19, 20 GwG) zuordnen", "Gilt auch für GmbH & Co. KG und Personengesellschaften – Auslöser erweitern?", "Frist nach Gründung und bei Änderung ergänzen"],
+  rg_ergaenzt=True, schwere="hoch",
+  wiederholung={"art": "bei_aenderung", "neu_ausloesen_bei": [{"ereignis": "gesellschafterwechsel"}]},
+  begriffe=[("Wirtschaftlich Berechtigte", "Die Menschen, denen eine Gesellschaft letztlich gehört oder die sie kontrollieren.")],
+  aktion={"art": "link", "ziel": "portal.transparenzregister", "nachweis_erforderlich": True}, phase="gruendung")
+
+pflicht("gesellschaft.gf_sozialversicherungsstatus", "B.17", "Sozialversicherungsstatus der Geschäftsführung klären",
+  "Kläre, ob Geschäftsführerinnen und Geschäftsführer sozialversicherungspflichtig sind – zum Beispiel mit einer Statusfeststellung.",
+  "Ob eine Geschäftsführerin oder ein Geschäftsführer sozialversicherungspflichtig beschäftigt ist, hängt vom Einzelfall ab. Sicherheit schafft eine Statusfeststellung bei der Deutschen Rentenversicherung.",
+  ["§ 7a SGB IV"], "gesellschaft",
+  KAPG, "dauerhaft", "Deutsche Rentenversicherung, Clearingstelle", "post", "hinweis",
+  [q("Sozialgesetzbuch IV § 7a", "sgb_4/__7a.html")],
+  ["Kriterien (Beteiligung, Sperrminorität) nicht in der Spezifikation – nur als Hinweis auf die Statusfeststellung darstellen"],
+  rg_ergaenzt=True, schwere="mittel")
+
+pflicht("gesellschaft.gf_pflichten_haftung", "B.17", "Pflichten und Haftung der Geschäftsführung kennen",
+  "Als Geschäftsführerin oder Geschäftsführer hast du besondere Pflichten und kannst persönlich haften.",
+  "Die Geschäftsführung einer GmbH oder UG hat gesetzliche Pflichten. Wer sie verletzt, kann persönlich haften. Amtlos erklärt die Pflichten allgemein; für deinen Einzelfall hilft eine Rechtsberatung.",
+  ["GmbHG"], "gesellschaft",
+  KAPG, "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
+  [q("GmbH-Gesetz", "gmbhg/")],
+  ["Inhalt der Erklärung (welche Pflichten, § 43 GmbHG) fachlich festlegen – Spezifikation nennt nur „Pflichten und Haftung erklären“"],
+  rg_ergaenzt=True, schwere="mittel", aktion={"art": "abhaken"})
+
+pflicht("gesellschaft.insolvenzantragspflicht", "B.17", "Insolvenzantragspflicht kennen",
+  "Bei Zahlungsunfähigkeit oder Überschuldung muss die Geschäftsführung rechtzeitig Insolvenz beantragen.",
+  "Die Insolvenzantragspflicht nach § 15a InsO trifft die Geschäftsführung. Die genauen Fristen stehen als geprüfte Regeldaten in Amtlos, sobald sie fachlich freigegeben sind.",
+  ["§ 15a InsO"], "gesellschaft",
+  KAPG, "dauerhaft", "Insolvenzgericht", "post", "hinweis",
+  [q("Insolvenzordnung § 15a", "inso/__15a.html")],
+  ["Fristen nach § 15a InsO als Regelwerte erfassen (Spezifikation: „Fristen aus Regeldaten“, Werte nicht genannt)", "Darstellung: allgemeine Information, keine Prüfung des Einzelfalls (RDG)"],
+  schwere="hoch", sanktion=None)
+
+pflicht("gesellschaft.jahresabschluss", "B.18", "Jahresabschluss aufstellen und feststellen",
+  "Nach jedem Geschäftsjahr erstellst du Bilanz und Gewinn- und Verlustrechnung; die Gesellschafter stellen den Abschluss fest.",
+  "Zum Jahresabschluss gehören Bilanz und Gewinn- und Verlustrechnung. Die Gesellschafter stellen ihn fest. Die Bilanz geht außerdem elektronisch als E-Bilanz ans Finanzamt.",
+  ["HGB", "GmbHG"], "gesellschaft",
+  KAPG, "dauerhaft", "Du und die Gesellschafter; Finanzamt (E-Bilanz)", "intern_dokumentieren", "hinweis",
+  [q("Handelsgesetzbuch", "hgb/")],
+  ["Fristen für Aufstellung und Feststellung als Regeldaten ergänzen", "Jährliche Wiederholung abbilden, sobald Fristen feststehen"],
+  rg_ergaenzt=True, schwere="hoch",
+  begriffe=[("E-Bilanz", "Die Bilanz in elektronischer Form, die ans Finanzamt übermittelt wird.")])
+
+pflicht("steuern.e_bilanz", "B.18", "E-Bilanz ans Finanzamt übermitteln",
+  "Die Bilanz deiner Gesellschaft übermittelst du elektronisch ans Finanzamt.",
+  "Die E-Bilanz ist die elektronische Übermittlung von Bilanz und Gewinn- und Verlustrechnung an das Finanzamt.",
+  ["§ 5b EStG"], "steuern",
+  KAPG, "dauerhaft", "Finanzamt", "elster", "hinweis",
+  [q("Einkommensteuergesetz § 5b", "estg/__5b.html")],
+  ["Frist (gekoppelt an die Steuererklärung) als Regeldaten ergänzen"], rg_ergaenzt=True, schwere="mittel")
+
+pflicht("gesellschaft.offenlegung", "B.18", "Jahresabschluss offenlegen",
+  "Den Jahresabschluss reichst du spätestens zwölf Monate nach Ende des Geschäftsjahres beim Unternehmensregister ein.",
+  "Kapitalgesellschaften müssen ihren Jahresabschluss beim Unternehmensregister offenlegen, binnen zwölf Monaten nach Ende des Geschäftsjahres. Kleinstkapitalgesellschaften können ihn stattdessen hinterlegen.",
+  ["§ 325 HGB"], "gesellschaft",
+  {"all": [KAPG, v("profil.gesellschaft.geschaeftsjahr", "==", "kalenderjahr", "Dein Geschäftsjahr ist das Kalenderjahr.")]},
+  JAEHRLICH_NACH_GJ(12, 31), "Unternehmensregister", "portal", "hinweis",
+  [q("Handelsgesetzbuch § 325", "hgb/__325.html"), q("Unternehmensregister", "https://www.unternehmensregister.de/")],
+  ["Frist „binnen 12 Monaten“ als 31.12. des Folgejahres umgesetzt (Kalenderjahr) – bestätigen", "Verschiebung bei Fristende am Wochenende/Feiertag festlegen",
+   "Kleinstkapitalgesellschaft: Merkmale nicht in der Spezifikation – nur Hinweis auf Hinterlegung", "Erstes Rumpfgeschäftsjahr nach Gründung: Periodenbeginn prüfen"],
+  rg_ergaenzt=True, schwere="hoch", wiederholung={"art": "periodisch"},
+  begriffe=[("Offenlegung", "Der Jahresabschluss wird öffentlich zugänglich beim Unternehmensregister eingereicht.")],
+  aktion={"art": "link", "ziel": "portal.unternehmensregister", "nachweis_erforderlich": True})
+
+pflicht("gesellschaft.offenlegung_abweichendes_gj", "B.18", "Jahresabschluss offenlegen (abweichendes Geschäftsjahr)",
+  "Den Jahresabschluss reichst du spätestens zwölf Monate nach Ende deines Geschäftsjahres beim Unternehmensregister ein.",
+  "Bei einem vom Kalenderjahr abweichenden Geschäftsjahr berechnet Amtlos den Termin noch nicht; die Frist beträgt zwölf Monate nach Ende des Geschäftsjahres.",
+  ["§ 325 HGB"], "gesellschaft",
+  {"all": [KAPG, v("profil.gesellschaft.geschaeftsjahr", "==", "abweichend", "Dein Geschäftsjahr weicht vom Kalenderjahr ab.")]},
+  "dauerhaft", "Unternehmensregister", "portal", "hinweis",
+  [q("Handelsgesetzbuch § 325", "hgb/__325.html")],
+  ["Frist: Termin für abweichendes Geschäftsjahr berechnen (Angabe des Geschäftsjahresendes im Profil nötig)"], rg_ergaenzt=True, schwere="hoch")
+
+pflicht("gesellschaft.ug_ruecklage", "B.14", "Rücklage der UG bilden",
+  "Eine UG muss jedes Jahr ein Viertel ihres Jahresüberschusses in eine Rücklage stellen.",
+  "Die UG (haftungsbeschränkt) muss 25 % ihres Jahresüberschusses in eine gesetzliche Rücklage einstellen.",
+  ["§ 5a GmbHG"], "gesellschaft",
+  UG, "dauerhaft", "Du selbst (im Jahresabschluss)", "intern_dokumentieren", "hinweis",
+  [q("GmbH-Gesetz § 5a", "gmbhg/__5a.html")],
+  ["Ende der Rücklagepflicht (Erreichen des GmbH-Stammkapitals) ergänzen", "Verlustvortrag bei der Berechnung berücksichtigen?"],
+  rg_ergaenzt=True, schwere="mittel")
+
+pflicht("steuern.kst_erklaerung", "B.19", "Körperschaftsteuererklärung abgeben",
+  "Einmal im Jahr gibst du für deine Gesellschaft elektronisch die Körperschaftsteuererklärung ab.",
+  "Kapitalgesellschaften zahlen Körperschaftsteuer und geben dafür jährlich eine Erklärung ab. Die Fristen stehen als Regeldaten in Amtlos, sobald sie fachlich freigegeben sind.",
+  ["KStG"], "steuern",
+  KAPG, "dauerhaft", "Finanzamt", "elster", "hinweis",
+  [q("Körperschaftsteuergesetz", "kstg_1977/")],
+  ["Abgabefristen mit und ohne Steuerberatung als Regeldaten (wie G-18)"], rg_ergaenzt=True, schwere="hoch")
+
+pflicht("gesellschaft.mitarbeiterbeteiligung", "B.20", "Mitarbeiterbeteiligung prüfen (Option)",
+  "Wenn du Mitarbeitende am Unternehmen beteiligen willst, gibt es dafür besondere Regeln und Modelle wie VSOP.",
+  "Für Mitarbeiterbeteiligungen gibt es steuerliche Sonderregeln (§ 19a EStG) und virtuelle Modelle (VSOP). Amtlos erklärt die Modelle; Vorlagen folgen mit dem Dokumentengenerator.",
+  ["§ 19a EStG"], "gesellschaft",
+  {"all": [KAPG, v("abgeleitet.hat_beschaeftigte", "==", True, "Du hast Beschäftigte.")]},
+  "dauerhaft", "Du selbst; Steuerberatung", "intern_dokumentieren", "hinweis",
+  [q("Einkommensteuergesetz § 19a", "estg/__19a.html")],
+  ["Option, keine Pflicht – Darstellung bestätigen", "Inhalt der Erklärung zu § 19a EStG und VSOP fachlich festlegen"],
+  sanktion="Keine Pflicht.", schwere="niedrig",
+  begriffe=[("VSOP", "Virtuelles Beteiligungsprogramm: Mitarbeitende werden wirtschaftlich beteiligt, ohne echte Anteile zu bekommen.")])
+
+pflicht("gesellschaft.awv_meldung", "B.21", "Auslandszahlungen nach AWV melden",
+  "Bei grenzüberschreitenden Zahlungen über der Meldegrenze – zum Beispiel Investorengeld aus dem Ausland – besteht eine Meldepflicht.",
+  "Die Außenwirtschaftsverordnung verlangt Meldungen bei grenzüberschreitenden Zahlungen über einer Meldegrenze. Die Grenze steht als Regelwert in Amtlos, sobald sie fachlich freigegeben ist.",
+  ["AWV"], "gesellschaft",
+  v("profil.gesellschafter.auslaendische_investoren", "==", True, "Du hast Investoren aus dem Ausland."),
+  "dauerhaft", "Deutsche Bundesbank", "portal", "hinweis",
+  [q("Außenwirtschaftsverordnung", "awv_2013/")],
+  ["Meldegrenze als Regelwert erfassen (nicht in der Spezifikation)", "Meldefrist ergänzen", "Auch ohne Investoren bei Auslandszahlungen über der Grenze – weiterer Auslöser?"],
+  schwere="mittel")
+
+pflicht("gesellschaft.investitionspruefung_hinweis", "B.21", "Investitionsprüfung in sensiblen Sektoren beachten",
+  "Wenn ausländische Investoren in ein Unternehmen in einem sensiblen Sektor einsteigen, kann eine Investitionsprüfung nötig sein.",
+  "Bei Beteiligungen ausländischer Investoren an Unternehmen in sensiblen Sektoren kann der Staat die Investition prüfen. Amtlos gibt hier nur einen allgemeinen Hinweis.",
+  ["AWG", "AWV"], "gesellschaft",
+  v("profil.gesellschafter.auslaendische_investoren", "==", True, "Du hast Investoren aus dem Ausland."),
+  "dauerhaft", "Bundesministerium für Wirtschaft und Klimaschutz", "post", "hinweis",
+  [q("Außenwirtschaftsgesetz", "awg_2013/")],
+  ["Hinweis laut Spezifikation – sensible Sektoren und Schwellen fachlich ergänzen", "Zuständiges Ministerium (Bezeichnung) aktuell?"],
+  sanktion="Keine eigene Handlung, solange kein sensibler Sektor betroffen ist.", schwere="niedrig")
+
+pflicht("gesellschaft.foerderprogramme", "B.22", "Förderprogramme prüfen (Option)",
+  "Für Startups gibt es Förderprogramme wie EXIST, INVEST, KfW-Programme und Programme der Länder.",
+  "Amtlos zeigt passende Förderprogramme, sobald das Matching nach Profil fachlich hinterlegt ist. Fristen und Antragsunterlagen hängen vom Programm ab.",
+  ["Förderrichtlinien des Bundes und der Länder"], "gesellschaft",
+  {"any": [KAPG, v("abgeleitet.noch_nicht_gestartet", "==", True, "Du gründest gerade.")]},
+  "dauerhaft", "Fördergeber (z. B. BMWK, KfW, Länder)", "portal", "hinweis",
+  [q("Förderdatenbank des Bundes", "https://www.foerderdatenbank.de/")],
+  ["Option, keine Pflicht", "Matching-Kriterien und Fristen je Programm fachlich hinterlegen"],
+  sanktion="Keine Pflicht.", schwere="niedrig")
 
 print("geschrieben:", len(list(ZIEL.glob("*.yaml"))))

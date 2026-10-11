@@ -9,6 +9,7 @@ import { Kontext, MitUnternehmen, Oeffentlich, type Anfragekontext } from "./aut
 import { BEREICH_JE_KATEGORIE, heuteUebersicht } from "./heute.js";
 import { pruefe, t, uebersetzeDbFehler, type Text } from "./hilfen.js";
 import { erzeugeIcs } from "./ics.js";
+import { fortschritt, offeneVoraussetzungen, ordne } from "./gruendung.js";
 import { KONFIGURATION, type Konfiguration } from "./konfiguration.js";
 import { WARTESCHLANGE } from "./kern.controller.js";
 
@@ -208,6 +209,55 @@ export class PflichtenController {
         return { erledigt: ids.length };
       })
       .catch(uebersetzeDbFehler);
+  }
+
+  /**
+   * Gründungsassistent (6.2): alle Pflichten mit phase=gruendung in der Reihenfolge ihrer Voraussetzungen,
+   * mit Sperre („erst … erledigen“) und Fortschritt. Für UG/GmbH zusätzlich die Kennzahlen aus den Regelwerten.
+   */
+  @MitUnternehmen()
+  @Get("gruendung")
+  async gruendung(@Kontext() k: Anfragekontext) {
+    return this.db.imKontext({ kontoId: k.kontoId, unternehmenId: k.unternehmenId }, async (tx) => {
+      const zeilen = await this.laden(k, tx, "and pi.status <> 'entfallen' and pv.daten->>'phase' = 'gruendung'");
+      const schritte = zeilen.map((z) => ({
+        ...karte(z, k.sprache),
+        status: z.anzeige_status,
+        katalog_nr: z.daten.katalog_nr as string | undefined,
+        voraussetzungen: (z.daten.voraussetzungen as string[] | undefined) ?? [],
+        stelle: t(z.daten.stelle, k.sprache),
+        kanal: z.daten.kanal as string,
+      }));
+      const titel = new Map(schritte.map((x) => [x.pflicht_id, x.titel]));
+      const geordnet = ordne(schritte.filter((x) => x.status !== "nicht_zutreffend")).map((x) => ({
+        ...x,
+        gesperrt_durch: offeneVoraussetzungen(x, schritte).map((id) => ({ pflicht_id: id, titel: titel.get(id) })),
+      }));
+      const profil = await tx.eine<{ daten: Record<string, unknown> }>(
+        "select daten from app.profil_version where unternehmen_id = $1 order by version desc limit 1",
+        [k.unternehmenId],
+      );
+      const rechtsform = profil?.daten.rechtsform as string | undefined;
+      const kennzahlen =
+        rechtsform === "gmbh" || rechtsform === "ug"
+          ? await tx.abfrage<{ id: string; wert: number; einheit: string; bezeichnung: Text; pruef_status: string }>(
+              `select rv.regelwert_id as id, rv.wert::float8 as wert, r.einheit, r.bezeichnung, rv.pruef_status
+                 from katalog.aktives_release a
+                 join katalog.release_inhalt ri on ri.release_id = a.id and ri.objekt_art = 'regelwert_version'
+                 join katalog.regelwert_version rv on rv.id = ri.objekt_id
+                 join katalog.regelwert r on r.id = rv.regelwert_id
+                where rv.regelwert_id like $1 and rv.gueltig_ab <= $2::date and (rv.gueltig_bis is null or rv.gueltig_bis >= $2::date)
+                order by rv.regelwert_id`,
+              [`gesellschaft.${rechtsform}.%`, heute()],
+            )
+          : [];
+      return {
+        schritte: geordnet,
+        fortschritt: fortschritt(schritte),
+        kapitalgesellschaft: rechtsform === "gmbh" || rechtsform === "ug" ? rechtsform : null,
+        kennzahlen: kennzahlen.map((r) => ({ id: r.id, bezeichnung: t(r.bezeichnung, k.sprache), wert: r.wert, einheit: r.einheit, ungeprueft: r.pruef_status !== "freigegeben" })),
+      };
+    });
   }
 
   /** Fachbegriffe aus dem aktiven Katalog (Prinzip 5: jeder Fachbegriff hat eine Ein-Satz-Erklärung). */

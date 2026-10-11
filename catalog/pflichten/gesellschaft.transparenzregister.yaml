@@ -1,0 +1,66 @@
+# Katalog B.16 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: gesellschaft.transparenzregister
+version: 1
+katalog_nr: B.16
+titel:
+  de: Wirtschaftlich Berechtigte ans Transparenzregister melden
+kurz:
+  de: Melde, wer hinter deiner Gesellschaft steht, und halte die Angaben aktuell.
+erklaerung:
+  de: Gesellschaften müssen ihre wirtschaftlich Berechtigten dem Transparenzregister mitteilen und die Angaben bei Änderungen
+    aktualisieren.
+begriffe:
+- begriff:
+    de: Wirtschaftlich Berechtigte
+  erklaerung:
+    de: Die Menschen, denen eine Gesellschaft letztlich gehört oder die sie kontrollieren.
+rechtsgrundlage:
+- GwG
+kategorie: gesellschaft
+ausloeser:
+  feld: abgeleitet.ist_kapitalgesellschaft
+  op: ==
+  wert: true
+  label:
+    de: Dein Unternehmen ist eine UG oder GmbH.
+phase: gruendung
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: bei_aenderung
+  neu_ausloesen_bei:
+  - ereignis: gesellschafterwechsel
+stelle:
+  de: Transparenzregister (Bundesanzeiger Verlag)
+kanal: portal
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+aktion:
+  art: link
+  ziel: portal.transparenzregister
+  nachweis_erforderlich: true
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Transparenzregister
+  url: https://www.transparenzregister.de/
+  abgerufen: null
+- titel: Geldwäschegesetz
+  url: https://www.gesetze-im-internet.de/gwg_2017/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Einzelvorschriften (§§ 19, 20 GwG) zuordnen
+- Gilt auch für GmbH & Co. KG und Personengesellschaften – Auslöser erweitern?
+- Frist nach Gründung und bei Änderung ergänzen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

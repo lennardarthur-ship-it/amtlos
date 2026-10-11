@@ -71,6 +71,7 @@ export interface Pflicht {
   kategorie: string;
   ausloeser: Bedingung;
   voraussetzungen?: string[];
+  phase?: "gruendung";
   frist: Frist;
   wiederholung: { art: "einmalig" | "periodisch" | "bei_aenderung" | "dauerhaft"; neu_ausloesen_bei?: ({ fakt: string } | { ereignis: string })[] };
   sanktion: { text: Text; schwere: "niedrig" | "mittel" | "hoch" };

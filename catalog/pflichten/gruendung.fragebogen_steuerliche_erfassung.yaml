@@ -20,6 +20,7 @@ rechtsgrundlage:
 kategorie: gruendung
 ausloeser:
   immer: true
+phase: gruendung
 voraussetzungen:
 - gruendung.elster_konto
 frist:

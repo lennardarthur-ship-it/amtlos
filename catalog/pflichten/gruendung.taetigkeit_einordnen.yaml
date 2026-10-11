@@ -29,6 +29,7 @@ ausloeser:
     wert: unklar
     label:
       de: Du bist unsicher, ob deine Tätigkeit ein Gewerbe oder ein freier Beruf ist.
+phase: gruendung
 frist:
   typ: dauerhaft
 wiederholung:

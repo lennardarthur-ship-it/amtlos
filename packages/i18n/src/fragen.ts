@@ -18,6 +18,18 @@ export interface Schritt {
   id: string;
   titel: T;
   fragen: Frage[];
+  /** Schritt nur zeigen, wenn das Profilfeld einen dieser Werte hat (z. B. nur für UG/GmbH). */
+  nurWenn?: { feld: string; in: string[] };
+}
+
+/** Ist der Schritt für dieses Profil relevant? Ohne Bedingung immer. */
+export function schrittSichtbar(s: Schritt, profil: Record<string, unknown>): boolean {
+  return !s.nurWenn || s.nurWenn.in.includes(String(profil[s.nurWenn.feld]));
+}
+
+/** Die für dieses Profil relevanten Schritte in Reihenfolge. */
+export function sichtbareSchritte(profil: Record<string, unknown>): Schritt[] {
+  return SCHRITTE.filter((s) => schrittSichtbar(s, profil));
 }
 
 export const SCHRITTE: Schritt[] = [
@@ -42,6 +54,40 @@ export const SCHRITTE: Schritt[] = [
           partg_mbb: { de: "PartG mbB", en: "PartG mbB" },
           sonstige: { de: "Andere", en: "Other" },
         },
+      },
+    ],
+  },
+  {
+    id: "gesellschaft",
+    titel: { de: "Gesellschaft", en: "Company" },
+    nurWenn: { feld: "rechtsform", in: ["ug", "gmbh"] },
+    fragen: [
+      {
+        feld: "gesellschaft.handelsregister",
+        art: "auswahl",
+        frage: { de: "Ist deine Gesellschaft schon im Handelsregister eingetragen?", en: "Is your company already entered in the commercial register?" },
+        hilfe: { de: "Danach richtet sich, welche Gründungsschritte noch anstehen.", en: "This decides which founding steps are still ahead." },
+        optionen: {
+          nicht_beantragt: { de: "Noch nicht beantragt", en: "Not applied for yet" },
+          beantragt: { de: "Beantragt, noch nicht eingetragen", en: "Applied for, not yet entered" },
+          eingetragen: { de: "Eingetragen", en: "Entered" },
+        },
+      },
+      {
+        feld: "gesellschaft.geschaeftsjahr",
+        art: "auswahl",
+        frage: { de: "Ist euer Geschäftsjahr das Kalenderjahr?", en: "Is your financial year the calendar year?" },
+        hilfe: { de: "Das steht im Gesellschaftsvertrag. Meist ist es das Kalenderjahr.", en: "It is set in the articles of association. Usually it is the calendar year." },
+        optionen: {
+          kalenderjahr: { de: "Ja, Kalenderjahr", en: "Yes, calendar year" },
+          abweichend: { de: "Nein, abweichend", en: "No, it differs" },
+        },
+      },
+      { feld: "gesellschafter.anzahl", art: "zahl", frage: { de: "Wie viele Gesellschafter gibt es?", en: "How many shareholders are there?" } },
+      {
+        feld: "gesellschafter.auslaendische_investoren",
+        art: "janein",
+        frage: { de: "Sind Investoren aus dem Ausland beteiligt oder geplant?", en: "Are investors from abroad involved or planned?" },
       },
     ],
   },
@@ -197,6 +243,13 @@ export const SCHRITTE: Schritt[] = [
       { feld: "umsatz.vorjahr", art: "betrag", frage: { de: "Wie hoch war dein Umsatz im letzten Jahr (in Euro)?", en: "What was your turnover last year (in euros)?" } },
       { feld: "umsatz.prognose_laufendes_jahr", art: "betrag", frage: { de: "Welchen Umsatz erwartest du dieses Jahr?", en: "What turnover do you expect this year?" } },
       {
+        feld: "gewinn.prognose_laufendes_jahr",
+        art: "betrag",
+        frage: { de: "Welchen Gewinn erwartest du dieses Jahr?", en: "What profit do you expect this year?" },
+        muster: "-?[0-9.,]*",
+        hilfe: { de: "Eine Schätzung reicht, bei Verlust mit Minus. Das Finanzamt fragt danach im Fragebogen zur steuerlichen Erfassung.", en: "An estimate is enough; use a minus for a loss. The tax office asks for it in the tax registration questionnaire." },
+      },
+      {
         feld: "ust.zahllast_vorjahr",
         art: "betrag",
         frage: { de: "Wie viel Umsatzsteuer hast du im letzten Jahr ans Finanzamt gezahlt?", en: "How much VAT did you pay to the tax office last year?" },
@@ -208,7 +261,13 @@ export const SCHRITTE: Schritt[] = [
         frage: { de: "Hast du eine Dauerfristverlängerung?", en: "Do you have a permanent filing extension (Dauerfristverlängerung)?" },
         hilfe: { de: "Damit gibst du die Voranmeldung einen Monat später ab.", en: "It lets you file advance returns one month later." },
       },
-      { feld: "gewinn.vorjahr", art: "betrag", frage: { de: "Wie hoch war dein Gewinn im letzten Jahr (in Euro)?", en: "What was your profit last year (in euros)?" } },
+      {
+        feld: "gewinn.vorjahr",
+        art: "betrag",
+        muster: "-?[0-9.,]*",
+        frage: { de: "Wie hoch war dein Gewinn im letzten Jahr (in Euro)?", en: "What was your profit last year (in euros)?" },
+        hilfe: { de: "Bei Verlust mit Minus, zum Beispiel -5.000.", en: "For a loss use a minus, e.g. -5000." },
+      },
       {
         feld: "vorauszahlung.est_kst",
         art: "janein",

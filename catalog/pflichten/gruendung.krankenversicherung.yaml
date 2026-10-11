@@ -15,6 +15,7 @@ rechtsgrundlage:
 kategorie: gruendung
 ausloeser:
   immer: true
+phase: gruendung
 frist:
   typ: dauerhaft
 wiederholung:

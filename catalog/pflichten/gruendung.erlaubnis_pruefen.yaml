@@ -44,6 +44,7 @@ ausloeser:
     wert: true
     label:
       de: Du betreibst eine Gaststätte.
+phase: gruendung
 frist:
   typ: relativ
   bezug:

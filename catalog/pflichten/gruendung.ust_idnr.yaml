@@ -18,6 +18,7 @@ ausloeser:
   wert: eu
   label:
     de: Du hast Kunden in anderen EU-Ländern.
+phase: gruendung
 frist:
   typ: dauerhaft
 wiederholung:

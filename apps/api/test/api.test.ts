@@ -269,4 +269,45 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
     expect(m.text).toContain('amtlos_warteschlange_wartend{queue="einladung-versenden"}');
     expect(m.text).not.toMatch(/[A-Za-z0-9_-]{43}\.ics/);
   });
+
+  it("Gründungsassistent: Reihenfolge aus Voraussetzungen, Sperren, Kennzahlen für die UG", async () => {
+    const zoe = await token("zoe");
+    const u = (await http().post("/v1/unternehmen").set("Authorization", `Bearer ${zoe}`).send({ name: "Zoes UG" }).expect(201)).body.id;
+    const alsZoe = (r: request.Test) => r.set("Authorization", `Bearer ${zoe}`).set("X-Unternehmen-Id", u);
+    await alsZoe(http().put("/v1/profil"))
+      .send({ daten: { rechtsform: "ug", gruendungsdatum: "2026-12-01", "taetigkeit.einordnung": "gewerbe", "gesellschaft.handelsregister": "nicht_beantragt", "gesellschaft.geschaeftsjahr": "kalenderjahr", alg1_bezug: false, "beschaeftigte.gesamt": 0, gemeinde_ags: "14713000" } })
+      .expect(200);
+    await neuberechnen(worker, u, "test", { stichtag: "2026-10-11", kalender: new StandardKalender() });
+    const g = (await alsZoe(http().get("/v1/gruendung")).expect(200)).body;
+    const ids = g.schritte.map((x: { pflicht_id: string }) => x.pflicht_id);
+    for (const [vor, nach] of [["gruendung.elster_konto", "gruendung.fragebogen_steuerliche_erfassung"], ["gesellschaft.gesellschaftsvertrag_notar", "gesellschaft.stammkapital_einzahlen"], ["gesellschaft.stammkapital_einzahlen", "gesellschaft.handelsregister_anmeldung"]])
+      expect(ids.indexOf(vor), `${vor} vor ${nach}`).toBeLessThan(ids.indexOf(nach));
+    expect(ids).not.toContain("gruendung.gruendungszuschuss"); // gilt nicht (kein ALG I) → nicht im Assistenten
+    const fragebogen = g.schritte.find((x: { pflicht_id: string }) => x.pflicht_id === "gruendung.fragebogen_steuerliche_erfassung");
+    expect(fragebogen.gesperrt_durch).toEqual([{ pflicht_id: "gruendung.elster_konto", titel: "ELSTER-Konto beantragen" }]);
+    expect(g.kapitalgesellschaft).toBe("ug");
+    expect(g.kennzahlen.map((x: { id: string }) => x.id)).toEqual(["gesellschaft.ug.ruecklage_anteil", "gesellschaft.ug.stammkapital_mindest"]);
+    expect(g.kennzahlen[1]).toMatchObject({ wert: 1, einheit: "EUR", ungeprueft: true });
+    expect(g.fortschritt).toMatchObject({ erledigt: 0, fertig: false });
+
+    // ELSTER-Konto erledigen → Fragebogen entsperrt
+    await alsZoe(http().post("/v1/pflichten/gruendung.elster_konto/einmalig/erledigen")).send({}).expect(201);
+    const g2 = (await alsZoe(http().get("/v1/gruendung")).expect(200)).body;
+    expect(g2.schritte.find((x: { pflicht_id: string }) => x.pflicht_id === "gruendung.fragebogen_steuerliche_erfassung").gesperrt_durch).toEqual([]);
+    expect(g2.fortschritt.erledigt).toBe(1);
+  });
+
+  it("Fragebogen-Vorbereitung aus dem Profil; ELSTER-Übermittlung ehrlich nicht verfügbar", async () => {
+    const f = (await alsAnna(http().get("/v1/gruendung/fragebogen")).expect(200)).body;
+    const angaben = Object.fromEntries(f.abschnitte.flatMap((a: { angaben: { feld: string; wert: string | null }[] }) => a.angaben).map((a: { feld: string; wert: string | null }) => [a.feld, a.wert]));
+    expect(angaben).toMatchObject({ name: "Annas Café", rechtsform: "Einzelunternehmen", gruendungsdatum: "1.4.2019", "ust.kleinunternehmer": "Nein, ich verzichte" });
+    expect(f.fehlend).toContain("gewinn.prognose_laufendes_jahr");
+    expect(f.hinweise).toEqual(["verzicht_bindet"]);
+    expect(f.uebermittlung).toMatchObject({ verfuegbar: false, alternative: { url: "https://www.elster.de/" } });
+    const r = await alsAnna(http().post("/v1/elster/fragebogen_steuerliche_erfassung")).send({}).expect(501);
+    expect(r.body.message).toMatch(/noch nicht freigeschaltet/);
+    await alsAnna(http().post("/v1/elster/gibt_es_nicht")).send({}).expect(404);
+    const alsMia = (x: request.Test) => x.set("Authorization", `Bearer ${mia}`).set("X-Unternehmen-Id", firma);
+    await alsMia(http().post("/v1/elster/fragebogen_steuerliche_erfassung")).send({}).expect(403);
+  });
 });

@@ -1,0 +1,64 @@
+# Katalog B.14 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: gesellschaft.stammkapital_einzahlen
+version: 1
+katalog_nr: B.14
+titel:
+  de: Stammkapital einzahlen
+kurz:
+  de: Zahl das Stammkapital auf das Geschäftskonto ein, bevor die Gesellschaft zum Handelsregister angemeldet wird.
+erklaerung:
+  de: Bei der GmbH ist mindestens die Hälfte des Mindeststammkapitals von 25.000 € einzuzahlen. Bei der UG ab 1 € wird das
+    Stammkapital voll eingezahlt.
+rechtsgrundlage:
+- GmbHG
+kategorie: gesellschaft
+ausloeser:
+  all:
+  - feld: abgeleitet.ist_kapitalgesellschaft
+    op: ==
+    wert: true
+    label:
+      de: Dein Unternehmen ist eine UG oder GmbH.
+  - feld: profil.gesellschaft.handelsregister
+    op: '!='
+    wert: eingetragen
+    label:
+      de: Deine Gesellschaft ist noch nicht im Handelsregister eingetragen.
+phase: gruendung
+voraussetzungen:
+- gesellschaft.gesellschaftsvertrag_notar
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du und deine Mitgesellschafter; Bank
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+aktion:
+  art: abhaken
+  nachweis_erforderlich: true
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: GmbH-Gesetz
+  url: https://www.gesetze-im-internet.de/gmbhg/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Reihenfolge „vor der Anmeldung“ bestätigen
+- 'UG: Volleinzahlung und Bareinlage (Spezifikation nennt nur „ab 1 €“) bestätigen'
+- 'Höhe der Einzahlung bei GmbH: Anteil je Geschäftsanteil oder insgesamt?'
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

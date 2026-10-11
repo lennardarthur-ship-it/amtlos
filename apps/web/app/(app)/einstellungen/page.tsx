@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
-import { SCHRITTE } from "@amtlos/i18n";
+import { sichtbareSchritte } from "@amtlos/i18n";
+import { api } from "@/lib/api";
 import { SPRACH_COOKIE, t } from "@/lib/sprache";
 
 export const metadata = { title: "Einstellungen" };
@@ -14,7 +15,7 @@ async function spracheSetzen(formular: FormData) {
 }
 
 export default async function Einstellungen() {
-  const { s, t: x } = await t();
+  const [{ s, t: x }, profil] = await Promise.all([t(), api<{ daten: Record<string, unknown> }>("/v1/profil")]);
   return (
     <div className="lesetext space-y-10">
       <h1 className="text-titel font-bold">{x.einstellungen.titel}</h1>
@@ -25,7 +26,7 @@ export default async function Einstellungen() {
         </h2>
         <p className="mt-1 text-tinte-leise">{x.einstellungen.profil_text}</p>
         <ul className="mt-3 border-t border-linie">
-          {SCHRITTE.map((schritt) => (
+          {sichtbareSchritte(profil.daten).map((schritt) => (
             <li key={schritt.id} className="border-b border-linie">
               <Link href={`/onboarding/${schritt.id}?zurueck=/einstellungen`} className="flex min-h-12 items-center hover:underline">
                 {schritt.titel[s]}

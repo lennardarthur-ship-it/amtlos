@@ -25,6 +25,7 @@ ausloeser:
   wert: ein_auftraggeber
   label:
     de: Du arbeitest überwiegend für einen Auftraggeber.
+phase: gruendung
 frist:
   typ: dauerhaft
 wiederholung:

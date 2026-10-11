@@ -1,0 +1,22 @@
+persona: ug_gesellschafterwechsel
+beschreibung: Bestehende UG, Angaben zum Handelsregister und Geschäftsjahr fehlen, Gesellschafterwechsel gemeldet
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: ug
+  profil.gruendungsdatum: "2023-03-01"
+  profil.taetigkeit.einordnung: freiberuf
+  profil.beschaeftigte.gesamt: 0
+  profil.bundesland: BE
+  profil.gemeinde_ags: "11000000"
+ereignisse:
+  - { typ: gesellschafterwechsel, datum: "2026-09-15" }
+erwartet:
+  gesellschaft.gesellschafterliste_aktualisieren: gilt
+  gesellschaft.transparenzregister: gilt
+  # Ohne Angabe zum Handelsregister bleibt offen, ob die Gründungsschritte noch anstehen
+  gesellschaft.gesellschaftsvertrag_notar: unbekannt
+  gesellschaft.handelsregister_anmeldung: unbekannt
+  # Ohne Geschäftsjahr: beide Offenlegungs-Varianten offen
+  gesellschaft.offenlegung: unbekannt
+  gesellschaft.offenlegung_abweichendes_gj: unbekannt
+  gesellschaft.mitarbeiterbeteiligung: gilt_nicht

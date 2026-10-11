@@ -1,0 +1,78 @@
+# Katalog B.18 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: gesellschaft.offenlegung
+version: 1
+katalog_nr: B.18
+titel:
+  de: Jahresabschluss offenlegen
+kurz:
+  de: Den Jahresabschluss reichst du spätestens zwölf Monate nach Ende des Geschäftsjahres beim Unternehmensregister ein.
+erklaerung:
+  de: Kapitalgesellschaften müssen ihren Jahresabschluss beim Unternehmensregister offenlegen, binnen zwölf Monaten nach Ende
+    des Geschäftsjahres. Kleinstkapitalgesellschaften können ihn stattdessen hinterlegen.
+begriffe:
+- begriff:
+    de: Offenlegung
+  erklaerung:
+    de: Der Jahresabschluss wird öffentlich zugänglich beim Unternehmensregister eingereicht.
+rechtsgrundlage:
+- § 325 HGB
+kategorie: gesellschaft
+ausloeser:
+  all:
+  - feld: abgeleitet.ist_kapitalgesellschaft
+    op: ==
+    wert: true
+    label:
+      de: Dein Unternehmen ist eine UG oder GmbH.
+  - feld: profil.gesellschaft.geschaeftsjahr
+    op: ==
+    wert: kalenderjahr
+    label:
+      de: Dein Geschäftsjahr ist das Kalenderjahr.
+frist:
+  typ: wiederkehrend
+  rhythmus: jaehrlich
+  faellig:
+    art: tag_nach_periodenende
+    monate_nach: 12
+    tag: 31
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: periodisch
+stelle:
+  de: Unternehmensregister
+kanal: portal
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+aktion:
+  art: link
+  ziel: portal.unternehmensregister
+  nachweis_erforderlich: true
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Handelsgesetzbuch § 325
+  url: https://www.gesetze-im-internet.de/hgb/__325.html
+  abgerufen: null
+- titel: Unternehmensregister
+  url: https://www.unternehmensregister.de/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist „binnen 12 Monaten“ als 31.12. des Folgejahres umgesetzt (Kalenderjahr) – bestätigen
+- Verschiebung bei Fristende am Wochenende/Feiertag festlegen
+- 'Kleinstkapitalgesellschaft: Merkmale nicht in der Spezifikation – nur Hinweis auf Hinterlegung'
+- 'Erstes Rumpfgeschäftsjahr nach Gründung: Periodenbeginn prüfen'
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

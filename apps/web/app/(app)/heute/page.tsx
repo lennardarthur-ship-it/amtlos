@@ -5,7 +5,7 @@ import { PflichtZeile } from "@/komponenten/pflicht-zeile";
 import { StatusForm } from "@/komponenten/status";
 import { api } from "@/lib/api";
 import { t } from "@/lib/sprache";
-import type { Bereich, Heute } from "@/lib/typen";
+import type { Bereich, Gruendung, Heute } from "@/lib/typen";
 
 export const metadata = { title: "Heute" };
 
@@ -19,7 +19,8 @@ async function vorStartErledigt() {
 }
 
 export default async function HeuteSeite() {
-  const [{ s, t: x }, h, profil] = await Promise.all([t(), api<Heute>("/v1/heute"), api<{ version: number }>("/v1/profil")]);
+  const [{ s, t: x }, h, profil, g] = await Promise.all([t(), api<Heute>("/v1/heute"), api<{ version: number }>("/v1/profil"), api<Gruendung>("/v1/gruendung")]);
+  const gruendungOffen = g.fortschritt.gesamt > 0 && !g.fortschritt.fertig;
   const ohneProfil = profil.version === 0;
   const nochNichtBerechnet = !ohneProfil && h.zaehler.offen + h.zaehler.erledigt === 0 && h.als_naechstes.length === 0;
 
@@ -50,6 +51,18 @@ export default async function HeuteSeite() {
               {x.heute.vor_start_einzeln}
             </Link>
           </div>
+        </section>
+      ) : null}
+
+      {gruendungOffen ? (
+        <section aria-labelledby="gruendung" className="lesetext rounded-md border-2 border-amt bg-blatt p-6">
+          <h2 id="gruendung" className="text-gross font-bold">
+            {fuelle(x.gruendung.heute_karte, { n: g.fortschritt.erledigt, gesamt: g.fortschritt.gesamt })}
+          </h2>
+          <progress className="mt-3 h-2 w-full accent-amt" value={g.fortschritt.erledigt} max={g.fortschritt.gesamt} aria-hidden="true" />
+          <Link href="/gruendung" className="knopf mt-4">
+            {x.gruendung.heute_link}
+          </Link>
         </section>
       ) : null}
 

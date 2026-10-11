@@ -1,0 +1,67 @@
+# Katalog B.14 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: gesellschaft.gesellschaftsvertrag_notar
+version: 1
+katalog_nr: B.14
+titel:
+  de: Gesellschaftsvertrag beim Notar beurkunden
+kurz:
+  de: Für eine UG oder GmbH lässt du den Gesellschaftsvertrag notariell beurkunden – auch online möglich.
+erklaerung:
+  de: Die Gründung einer GmbH oder UG beginnt mit dem Gesellschaftsvertrag, den ein Notar beurkundet. Die Beurkundung ist
+    auch online möglich. Für die GmbH beträgt das Stammkapital mindestens 25.000 €, davon ist mindestens die Hälfte einzuzahlen.
+    Eine UG kann ab 1 € gegründet werden.
+begriffe:
+- begriff:
+    de: Stammkapital
+  erklaerung:
+    de: Das Kapital, das die Gesellschafter bei der Gründung einer GmbH oder UG mindestens aufbringen.
+rechtsgrundlage:
+- GmbHG
+kategorie: gesellschaft
+ausloeser:
+  all:
+  - feld: abgeleitet.ist_kapitalgesellschaft
+    op: ==
+    wert: true
+    label:
+      de: Dein Unternehmen ist eine UG oder GmbH.
+  - feld: profil.gesellschaft.handelsregister
+    op: '!='
+    wert: eingetragen
+    label:
+      de: Deine Gesellschaft ist noch nicht im Handelsregister eingetragen.
+phase: gruendung
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Notarin oder Notar
+kanal: notar
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+aktion:
+  art: abhaken
+  nachweis_erforderlich: true
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: GmbH-Gesetz
+  url: https://www.gesetze-im-internet.de/gmbhg/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Einzelne Vorschriften (z. B. § 2 GmbHG Form, § 5 Stammkapital, § 7 Einzahlung) zuordnen
+- 'Online-Beurkundung: Voraussetzungen und Grenzen ergänzen'
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

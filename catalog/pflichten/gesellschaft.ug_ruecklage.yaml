@@ -1,0 +1,50 @@
+# Katalog B.14 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: gesellschaft.ug_ruecklage
+version: 1
+katalog_nr: B.14
+titel:
+  de: Rücklage der UG bilden
+kurz:
+  de: Eine UG muss jedes Jahr ein Viertel ihres Jahresüberschusses in eine Rücklage stellen.
+erklaerung:
+  de: Die UG (haftungsbeschränkt) muss 25 % ihres Jahresüberschusses in eine gesetzliche Rücklage einstellen.
+rechtsgrundlage:
+- § 5a GmbHG
+kategorie: gesellschaft
+ausloeser:
+  feld: profil.rechtsform
+  op: ==
+  wert: ug
+  label:
+    de: Dein Unternehmen ist eine UG (haftungsbeschränkt).
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst (im Jahresabschluss)
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: GmbH-Gesetz § 5a
+  url: https://www.gesetze-im-internet.de/gmbhg/__5a.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Ende der Rücklagepflicht (Erreichen des GmbH-Stammkapitals) ergänzen
+- Verlustvortrag bei der Berechnung berücksichtigen?
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

@@ -363,6 +363,27 @@
       "ab": 3
     },
     {
+      "pfad": "profil.gesellschaft.handelsregister",
+      "typ": "enum",
+      "werte": [
+        "nicht_beantragt",
+        "beantragt",
+        "eingetragen"
+      ],
+      "herleitung": "Onboarding / Gründungsassistent (Kapitalgesellschaft)",
+      "ab": 3
+    },
+    {
+      "pfad": "profil.gesellschaft.geschaeftsjahr",
+      "typ": "enum",
+      "werte": [
+        "kalenderjahr",
+        "abweichend"
+      ],
+      "herleitung": "Onboarding (Kapitalgesellschaft)",
+      "ab": 3
+    },
+    {
       "pfad": "profil.bundesland",
       "typ": "enum",
       "werte": [

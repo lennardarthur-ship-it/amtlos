@@ -1,0 +1,56 @@
+# Katalog B.15 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: gesellschaft.gesellschafterliste_aktualisieren
+version: 1
+katalog_nr: B.15
+titel:
+  de: Gesellschafterliste aktualisieren
+kurz:
+  de: Wenn sich im Gesellschafterkreis etwas ändert, muss eine neue Gesellschafterliste zum Handelsregister – über den Notar.
+erklaerung:
+  de: Änderungen im Gesellschafterkreis werden notariell abgewickelt; die aktualisierte Gesellschafterliste wird beim Handelsregister
+    eingereicht.
+rechtsgrundlage:
+- GmbHG
+kategorie: gesellschaft
+ausloeser:
+  all:
+  - feld: abgeleitet.ist_kapitalgesellschaft
+    op: ==
+    wert: true
+    label:
+      de: Dein Unternehmen ist eine UG oder GmbH.
+  - ereignis: gesellschafterwechsel
+    op: eingetreten
+    label:
+      de: Im Gesellschafterkreis hat sich etwas geändert.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: bei_aenderung
+  neu_ausloesen_bei:
+  - ereignis: gesellschafterwechsel
+stelle:
+  de: Notarin oder Notar; Registergericht
+kanal: notar
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: GmbH-Gesetz § 40
+  url: https://www.gesetze-im-internet.de/gmbhg/__40.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist für die Einreichung ergänzen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

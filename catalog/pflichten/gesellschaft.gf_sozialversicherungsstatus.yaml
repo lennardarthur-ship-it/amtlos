@@ -1,0 +1,50 @@
+# Katalog B.17 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: gesellschaft.gf_sozialversicherungsstatus
+version: 1
+katalog_nr: B.17
+titel:
+  de: Sozialversicherungsstatus der Geschäftsführung klären
+kurz:
+  de: Kläre, ob Geschäftsführerinnen und Geschäftsführer sozialversicherungspflichtig sind – zum Beispiel mit einer Statusfeststellung.
+erklaerung:
+  de: Ob eine Geschäftsführerin oder ein Geschäftsführer sozialversicherungspflichtig beschäftigt ist, hängt vom Einzelfall
+    ab. Sicherheit schafft eine Statusfeststellung bei der Deutschen Rentenversicherung.
+rechtsgrundlage:
+- § 7a SGB IV
+kategorie: gesellschaft
+ausloeser:
+  feld: abgeleitet.ist_kapitalgesellschaft
+  op: ==
+  wert: true
+  label:
+    de: Dein Unternehmen ist eine UG oder GmbH.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Deutsche Rentenversicherung, Clearingstelle
+kanal: post
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Sozialgesetzbuch IV § 7a
+  url: https://www.gesetze-im-internet.de/sgb_4/__7a.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Kriterien (Beteiligung, Sperrminorität) nicht in der Spezifikation – nur als Hinweis auf die Statusfeststellung darstellen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

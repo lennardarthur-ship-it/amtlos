@@ -82,7 +82,7 @@ async function rundgang(farbschema, breite) {
     pruefe(gestempelt, `${name("pflicht")}: kein Erledigt-Stempel`);
   }
 
-  for (const seite of ["kalender", "melden", "einstellungen", "hilfe", "pflichten/nicht-zutreffend"]) {
+  for (const seite of ["kalender", "melden", "einstellungen", "hilfe", "pflichten/nicht-zutreffend", "gruendung", "gruendung/fragebogen"]) {
     await p.goto(`${B}/${seite}`);
     await barrierefrei(p, name(seite.replace("/", "-")));
   }

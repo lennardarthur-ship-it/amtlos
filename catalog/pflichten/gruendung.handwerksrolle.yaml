@@ -29,6 +29,7 @@ ausloeser:
   - b2
   label:
     de: Dein Betrieb ist ein Handwerk nach Anlage A oder B der Handwerksordnung.
+phase: gruendung
 frist:
   typ: dauerhaft
 wiederholung:

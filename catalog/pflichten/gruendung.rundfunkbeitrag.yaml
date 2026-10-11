@@ -18,6 +18,7 @@ ausloeser:
   wert: 1
   label:
     de: Du hast mindestens eine Betriebsstätte.
+phase: gruendung
 frist:
   typ: dauerhaft
 wiederholung:

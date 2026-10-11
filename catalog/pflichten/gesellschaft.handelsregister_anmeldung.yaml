@@ -1,0 +1,67 @@
+# Katalog B.15 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: gesellschaft.handelsregister_anmeldung
+version: 1
+katalog_nr: B.15
+titel:
+  de: Gesellschaft im Handelsregister eintragen lassen
+kurz:
+  de: Der Notar meldet die Gesellschaft zum Handelsregister an; mit der Eintragung entsteht die GmbH oder UG.
+erklaerung:
+  de: Zur Anmeldung gehört die Gesellschafterliste. Spätere Änderungen, etwa im Gesellschaftsvertrag oder bei der Geschäftsführung,
+    werden ebenfalls notariell angemeldet.
+rechtsgrundlage:
+- HGB
+- GmbHG
+kategorie: gesellschaft
+ausloeser:
+  all:
+  - feld: abgeleitet.ist_kapitalgesellschaft
+    op: ==
+    wert: true
+    label:
+      de: Dein Unternehmen ist eine UG oder GmbH.
+  - feld: profil.gesellschaft.handelsregister
+    op: '!='
+    wert: eingetragen
+    label:
+      de: Deine Gesellschaft ist noch nicht im Handelsregister eingetragen.
+phase: gruendung
+voraussetzungen:
+- gesellschaft.stammkapital_einzahlen
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Registergericht (über den Notar)
+kanal: notar
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+aktion:
+  art: formular
+  ziel: onboarding.gesellschaft
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: GmbH-Gesetz
+  url: https://www.gesetze-im-internet.de/gmbhg/
+  abgerufen: null
+- titel: Handelsgesetzbuch
+  url: https://www.gesetze-im-internet.de/hgb/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Einzelvorschriften (§§ 7, 8 GmbHG) zuordnen
+- Haftung vor Eintragung (Vorgesellschaft) als Hinweis ergänzen?
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

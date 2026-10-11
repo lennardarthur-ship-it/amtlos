@@ -46,7 +46,12 @@ export const ProfilSchema = z
         .filter((f) => f.pfad.startsWith("profil."))
         .map((f) => {
           const name = f.pfad.slice("profil.".length);
-          const basis = name === "gemeinde_ags" ? z.string().regex(/^\d{8}$/, "8-stelliger Gemeindeschlüssel") : feldSchema(f.typ, f.werte);
+          const basis =
+            name === "gemeinde_ags"
+              ? z.string().regex(/^\d{8}$/, "8-stelliger Gemeindeschlüssel")
+              : name.startsWith("gewinn.")
+                ? z.number().finite().min(-1e12).max(1e12) // Gewinn kann ein Verlust sein
+                : feldSchema(f.typ, f.werte);
           return [name, basis.nullable().optional()];
         }),
     ),
