@@ -65,6 +65,8 @@ jobs:
         env:
           AMTLOS_DB_TESTS: pflicht
         run: pnpm --filter @amtlos/server --filter @amtlos/api --filter @amtlos/worker test
+      - name: Lasttest Neuberechnung (1.000 Unternehmen, Hochrechnung < 30 min für 100.000)
+        run: node scripts/lasttest-neuberechnung.mjs 1000 8
 
   e2e:
     name: End-to-End Web und Studio, Barrierefreiheit (WCAG 2.2 AA)

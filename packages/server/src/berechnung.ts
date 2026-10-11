@@ -173,41 +173,55 @@ function sollInstanzen(
   return soll;
 }
 
+/**
+ * Abgleich Soll ↔ Bestand in zwei Anweisungen (E-085): ein Upsert für alle Soll-Instanzen, ein Update für Entfallenes.
+ * Unveränderte Zeilen werden nicht angefasst – kein neues Tupel, kein Audit-Eintrag. Der tägliche Lauf schreibt
+ * daher fast nichts und blockiert die Audit-Kette nicht.
+ */
 async function abgleichen(tx: Tx, unternehmenId: string, laufId: string, soll: Soll[], bestand: Instanz[], fensterVon: Datum) {
   const z = { neu: 0, aktualisiert: 0, entfallen: 0, nicht_zutreffend: 0 };
   const schluessel = (pflicht: string, periode: string) => `${pflicht}|${periode}`;
   const vorhanden = new Map(bestand.map((i) => [schluessel(i.pflicht_id, i.periode), i]));
-  const sollSchluessel = new Set<string>();
+  const sollSchluessel = new Set(soll.map((s) => schluessel(s.pflicht_id, s.periode)));
+  // Erledigtes bleibt unangetastet (E-036); doppelte Schlüssel (sollte nicht vorkommen) → letzter gewinnt
+  const zeilen = [...new Map(soll.filter((s) => vorhanden.get(schluessel(s.pflicht_id, s.periode))?.status !== "erledigt").map((s) => [schluessel(s.pflicht_id, s.periode), s])).values()];
+  z.nicht_zutreffend = zeilen.filter((s) => s.status === "nicht_zutreffend").length;
 
-  for (const s of soll) {
-    const k = schluessel(s.pflicht_id, s.periode);
-    sollSchluessel.add(k);
-    const alt = vorhanden.get(k);
-    if (alt?.status === "erledigt") continue; // Erledigtes bleibt unangetastet (E-036)
-    if (s.status === "nicht_zutreffend") z.nicht_zutreffend++;
-    await tx.abfrage(
+  if (zeilen.length) {
+    const r = await tx.abfrage<{ neu: boolean }>(
       `insert into app.pflicht_instanz
          (unternehmen_id, pflicht_id, pflicht_version_id, periode, ergebnis, status, faellig_am, faellig_roh, begruendung, fehlende_fakten, letzter_lauf_id, nicht_zutreffend_grund)
-       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+       select $1, x.pflicht_id, x.pflicht_version_id, x.periode, x.ergebnis::app.ergebnis, x.status::app.instanz_status, x.faellig_am, x.faellig_roh,
+              x.begruendung, coalesce(x.fehlende_fakten, '{}'), $2, x.nicht_zutreffend_grund
+         from jsonb_to_recordset($3::jsonb) as x(pflicht_id text, pflicht_version_id uuid, periode text, ergebnis text, status text,
+              faellig_am date, faellig_roh date, begruendung jsonb, fehlende_fakten text[], nicht_zutreffend_grund text)
        on conflict (unternehmen_id, pflicht_id, periode) do update set
          pflicht_version_id = excluded.pflicht_version_id, ergebnis = excluded.ergebnis, status = excluded.status,
          faellig_am = excluded.faellig_am, faellig_roh = excluded.faellig_roh, begruendung = excluded.begruendung,
          fehlende_fakten = excluded.fehlende_fakten, letzter_lauf_id = excluded.letzter_lauf_id,
          nicht_zutreffend_grund = excluded.nicht_zutreffend_grund, aktualisiert_am = now()
-       where app.pflicht_instanz.status <> 'erledigt'`,
-      [unternehmenId, s.pflicht_id, s.pflicht_version_id, s.periode, s.ergebnis, s.status, s.faellig_am, s.faellig_roh, s.begruendung, s.fehlende_fakten, laufId, s.nicht_zutreffend_grund],
+       where app.pflicht_instanz.status <> 'erledigt'
+         and (app.pflicht_instanz.pflicht_version_id, app.pflicht_instanz.ergebnis, app.pflicht_instanz.status, app.pflicht_instanz.faellig_am,
+              app.pflicht_instanz.faellig_roh, app.pflicht_instanz.begruendung, app.pflicht_instanz.fehlende_fakten, app.pflicht_instanz.nicht_zutreffend_grund)
+             is distinct from
+             (excluded.pflicht_version_id, excluded.ergebnis, excluded.status, excluded.faellig_am,
+              excluded.faellig_roh, excluded.begruendung, excluded.fehlende_fakten, excluded.nicht_zutreffend_grund)
+       returning (xmax = 0) as neu`,
+      [unternehmenId, laufId, JSON.stringify(zeilen.map((s) => ({ ...s, begruendung: s.begruendung })))],
     );
-    if (alt) z.aktualisiert++;
-    else z.neu++;
+    z.neu = r.filter((x) => x.neu).length;
+    z.aktualisiert = r.length - z.neu;
   }
 
   // Nicht mehr gewünschte offene Instanzen: entfallen – außer überfällige vor dem Fenster (bleiben offen)
-  for (const i of bestand) {
-    if (sollSchluessel.has(schluessel(i.pflicht_id, i.periode))) continue;
-    if (i.status === "erledigt" || i.status === "entfallen") continue;
-    if (i.status === "offen" && i.faellig_am && i.faellig_am < fensterVon) continue;
-    await tx.abfrage("update app.pflicht_instanz set status = 'entfallen', letzter_lauf_id = $2, aktualisiert_am = now() where id = $1", [i.id, laufId]);
-    z.entfallen++;
+  const weg = bestand
+    .filter((i) => !sollSchluessel.has(schluessel(i.pflicht_id, i.periode)))
+    .filter((i) => i.status !== "erledigt" && i.status !== "entfallen")
+    .filter((i) => !(i.status === "offen" && i.faellig_am && i.faellig_am < fensterVon))
+    .map((i) => i.id);
+  if (weg.length) {
+    await tx.abfrage("update app.pflicht_instanz set status = 'entfallen', letzter_lauf_id = $2, aktualisiert_am = now() where id = any($1::uuid[])", [weg, laufId]);
+    z.entfallen = weg.length;
   }
   return z;
 }

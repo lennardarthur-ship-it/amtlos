@@ -278,6 +278,10 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Datum:** 2026-10-11 · **Status:** angenommen
 - `docker/Dockerfile` baut api, worker, web, studio und werkzeug (Migrationen, Katalog-Import, Betriebskommandos). Node-Dienste als `pnpm deploy --prod`-Bündel (Workspace-Pakete mit `files: ["dist"]`), Next.js als standalone; das Studio nimmt die Schemas ausdrücklich ins Bündel (`outputFileTracingIncludes`). Ohne Root, ohne Paketmanager. Die CI baut alle Images und startet sie gegen PostgreSQL. Infrastruktur als Code (OpenTofu) folgt mit dem Hosting-Vertrag (E-013).
 
+### E-085 · Neuberechnung gebündelt, nur Änderungen schreiben, Audit ohne Begründungsbaum
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Der Lasttest zeigte 39 Unternehmen/s (Ziel verfehlt). Ursachen: eine Anweisung je Instanz, Neuschreiben unveränderter Zeilen, und dadurch je Zeile ein Audit-Eintrag hinter einer globalen Sperre. Jetzt: ein Upsert mit `is distinct from`, ein Update für Entfallenes; Begründungsbaum und Fakten nicht im Audit (reproduzierbar). Ergebnis: Tageswechsel ≈ 149 Unternehmen/s auf 2 Kernen, hochgerechnet 11 min für 100.000. `letzter_lauf_id` zeigt nun auf den letzten Lauf, der die Instanz geändert hat.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)
