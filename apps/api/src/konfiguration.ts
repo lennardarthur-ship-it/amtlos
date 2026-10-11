@@ -11,6 +11,8 @@ const Schema = z
     DEV_JWT_SECRET: z.string().min(32).optional(),
     WEB_URL: z.string().url().default("http://localhost:3000"),
     API_URL: z.string().url().default("http://localhost:3001"),
+    /** Bearer-Token für GET /metriken (Prometheus). Ohne Token ist die Route abgeschaltet. */
+    METRIKEN_TOKEN: z.string().min(32).optional(),
   })
   .superRefine((k, ctx) => {
     if (k.AUTH_MODUS === "oidc" && (!k.OIDC_ISSUER || !k.OIDC_AUDIENCE))

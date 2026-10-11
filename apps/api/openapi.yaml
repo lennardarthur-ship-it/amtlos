@@ -1,0 +1,434 @@
+openapi: 3.1.0
+info:
+  title: Amtlos API
+  version: "1"
+  description: |
+    Schnittstelle für Web-App, Mobile-App und (später) Steuerberatungen.
+
+    - Anmeldung: `Authorization: Bearer <Token>` vom Identity-Provider (OIDC, E-014).
+    - Mandant: Routen mit dem Parameter `X-Unternehmen-Id` laufen im Kontext dieses Unternehmens.
+      Ohne Mitgliedschaft antwortet die API mit 404 – nie mit einem Hinweis, dass es das Unternehmen gibt.
+    - Rollen: `x-rollen` nennt, welche Rollen eine Route aufrufen dürfen. Fehlt das Feld, dürfen alle Mitglieder.
+    - Fehler: JSON `{ statusCode, message }`; Eingabefehler (422) zusätzlich `fehler: [{ feld, meldung }]`.
+    - Texte kommen in der Sprache des Kontos (de/en).
+
+    Diese Datei wird gegen die Routen der API geprüft (Test `openapi.test.ts`): jede Route muss hier stehen,
+    mit denselben Rollen; hier darf nichts stehen, was es nicht gibt.
+servers:
+  - url: http://localhost:3001
+    description: Entwicklung
+security:
+  - bearer: []
+
+tags:
+  - name: Konto
+  - name: Profil und Ereignisse
+  - name: Pflichten
+  - name: Kalender
+  - name: Team
+
+paths:
+  /v1/gesundheit:
+    get:
+      tags: [Konto]
+      summary: Lebenszeichen (prüft die Datenbankverbindung)
+      security: []
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: object, properties: { status: { const: ok } } } } } }
+
+  /v1/openapi.json:
+    get:
+      tags: [Konto]
+      summary: Diese Beschreibung als JSON
+      security: []
+      responses:
+        "200": { description: OpenAPI-Dokument }
+
+  /v1/ich:
+    get:
+      tags: [Konto]
+      summary: Eigenes Konto und Unternehmen mit Rolle
+      description: Legt beim ersten Aufruf das Konto an.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  konto: { $ref: "#/components/schemas/Konto" }
+                  unternehmen: { type: array, items: { $ref: "#/components/schemas/UnternehmenMitRolle" } }
+        "401": { $ref: "#/components/responses/NichtAngemeldet" }
+
+  /v1/unternehmen:
+    post:
+      tags: [Konto]
+      summary: Unternehmen anlegen (der Anlegende wird Inhaber)
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [name], additionalProperties: false, properties: { name: { type: string, minLength: 1, maxLength: 200 } } } } }
+      responses:
+        "201": { description: Angelegt, content: { application/json: { schema: { $ref: "#/components/schemas/UnternehmenMitRolle" } } } }
+        "422": { $ref: "#/components/responses/Eingabefehler" }
+
+  /v1/profil:
+    get:
+      tags: [Profil und Ereignisse]
+      summary: Aktuelle Profilversion
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/ProfilVersion" } } } }
+        "404": { $ref: "#/components/responses/NichtGefunden" }
+    put:
+      tags: [Profil und Ereignisse]
+      summary: Neue Profilversion speichern und Neuberechnung einreihen
+      description: Profile werden nie überschrieben (E-018). Aufbau der Daten siehe `apps/api/src/profil-schema.ts`.
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [daten], additionalProperties: false, properties: { daten: { $ref: "#/components/schemas/ProfilDaten" } } } } }
+      responses:
+        "200": { description: Gespeichert, content: { application/json: { schema: { type: object, properties: { version: { type: integer }, daten: { $ref: "#/components/schemas/ProfilDaten" } } } } } }
+        "403": { $ref: "#/components/responses/KeineBerechtigung" }
+        "422": { $ref: "#/components/responses/Eingabefehler" }
+
+  /v1/ereignisse:
+    get:
+      tags: [Profil und Ereignisse]
+      summary: Gemeldete Ereignisse (neueste zuerst)
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Ereignis" } } } } }
+    post:
+      tags: [Profil und Ereignisse]
+      summary: Ereignis melden (idempotent über client_id)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [typ, datum]
+              additionalProperties: false
+              properties:
+                typ: { type: string, description: "Ereignistyp aus packages/rules-schema/ereignisse.json" }
+                datum: { type: string, format: date }
+                payload: { type: object }
+                client_id: { type: string, format: uuid, description: Wiederholtes Senden liefert das vorhandene Ereignis mit `wiederholt=true`. }
+      responses:
+        "201": { description: Gemeldet, content: { application/json: { schema: { type: object, properties: { id: { type: string, format: uuid }, typ: { type: string }, datum: { type: string }, wiederholt: { type: boolean } } } } } }
+        "422": { $ref: "#/components/responses/Eingabefehler" }
+
+  /v1/ereignisse/{id}/storno:
+    post:
+      tags: [Profil und Ereignisse]
+      summary: Ereignis zurücknehmen (als Gegenbuchung, nichts wird gelöscht)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "201": { description: Storniert, content: { application/json: { schema: { type: object, properties: { id: { type: string }, storniert: { const: true } } } } } }
+        "404": { $ref: "#/components/responses/NichtGefunden" }
+
+  /v1/neuberechnung:
+    post:
+      tags: [Profil und Ereignisse]
+      summary: Neuberechnung von Hand einreihen
+      x-rollen: [inhaber, admin]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: grund, in: query, schema: { type: string, maxLength: 50 } }]
+      responses:
+        "202": { description: Eingereiht, content: { application/json: { schema: { type: object, properties: { eingereiht: { const: true } } } } } }
+
+  /v1/pflichten:
+    get:
+      tags: [Pflichten]
+      summary: Pflicht-Karten, nach Fälligkeit sortiert
+      parameters:
+        - { $ref: "#/components/parameters/Unternehmen" }
+        - { name: status, in: query, schema: { enum: [offen, faellig_bald, ueberfaellig, angabe_fehlt, erledigt, nicht_zutreffend, alle], default: alle } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/PflichtKarte" } } } } }
+
+  /v1/pflichten/{pflichtId}/{periode}:
+    get:
+      tags: [Pflichten]
+      summary: Pflicht im Detail – mit Begründung, Quellen, Prüfstatus und Nachweisen
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { $ref: "#/components/parameters/PflichtId" }, { $ref: "#/components/parameters/Periode" }]
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/PflichtDetail" } } } }
+        "404": { $ref: "#/components/responses/NichtGefunden" }
+
+  /v1/pflichten/{pflichtId}/{periode}/erledigen:
+    post:
+      tags: [Pflichten]
+      summary: Als erledigt markieren (mit optionaler Notiz als Nachweis)
+      x-rollen: [inhaber, admin, steuerberater, mitarbeiter]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { $ref: "#/components/parameters/PflichtId" }, { $ref: "#/components/parameters/Periode" }]
+      requestBody:
+        content: { application/json: { schema: { type: object, additionalProperties: false, properties: { notiz: { type: string, maxLength: 2000 } } } } }
+      responses:
+        "201": { description: Erledigt, content: { application/json: { schema: { $ref: "#/components/schemas/StatusAntwort" } } } }
+        "404": { description: Keine offene Pflicht mit dieser Periode }
+
+  /v1/pflichten/{pflichtId}/{periode}/wieder-oeffnen:
+    post:
+      tags: [Pflichten]
+      summary: Erledigt zurücknehmen
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { $ref: "#/components/parameters/PflichtId" }, { $ref: "#/components/parameters/Periode" }]
+      responses:
+        "201": { description: Wieder offen, content: { application/json: { schema: { $ref: "#/components/schemas/StatusAntwort" } } } }
+        "404": { description: Keine erledigte Pflicht mit dieser Periode }
+
+  /v1/pflichten/vor-start-erledigt:
+    post:
+      tags: [Pflichten]
+      summary: Sammelbestätigung für Fristen vor dem Start bei Amtlos
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "201": { description: OK, content: { application/json: { schema: { type: object, properties: { erledigt: { type: integer } } } } } }
+
+  /v1/heute:
+    get:
+      tags: [Pflichten]
+      summary: Startseite – Ampel je Bereich, höchstens drei nächste Aufgaben, Fristen vor dem Start
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ampel: { type: object, additionalProperties: { enum: [gruen, gelb, rot] }, description: Ampel je Bereich }
+                  zaehler: { type: object, properties: { offen: { type: integer }, ueberfaellig: { type: integer }, angabe_fehlt: { type: integer } } }
+                  als_naechstes: { type: array, maxItems: 3, items: { $ref: "#/components/schemas/PflichtKarte" } }
+                  vor_start: { type: object, properties: { anzahl: { type: integer }, seit: { type: [string, "null"], format: date } } }
+
+  /v1/glossar:
+    get:
+      tags: [Pflichten]
+      summary: Fachbegriffe aus dem aktiven Katalog, alphabetisch, ohne Doppelte
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    begriff: { type: string }
+                    erklaerung: { type: string }
+                    pflichten: { type: array, items: { type: object, properties: { id: { type: string }, titel: { type: string } } } }
+
+  /v1/kalender/abo:
+    post:
+      tags: [Kalender]
+      summary: Kalender-Abo anlegen – die Adresse wird nur jetzt gezeigt
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "201": { description: Angelegt, content: { application/json: { schema: { type: object, properties: { url: { type: string, format: uri } } } } } }
+
+  /v1/kalender/{datei}:
+    get:
+      tags: [Kalender]
+      summary: ICS-Feed (für Kalender-Apps, ohne Login – das Token in der Adresse ist der Schlüssel)
+      security: []
+      parameters: [{ name: datei, in: path, required: true, schema: { type: string, pattern: "^[A-Za-z0-9_-]{43}\\.ics$" } }]
+      responses:
+        "200": { description: iCalendar, content: { text/calendar: { schema: { type: string } } } }
+        "404": { description: Token unbekannt oder widerrufen }
+
+  /v1/team:
+    get:
+      tags: [Team]
+      summary: Mitglieder; offene Einladungen nur für Inhaber und Admins
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mitglieder:
+                    type: array
+                    items: { type: object, properties: { konto_id: { type: string, format: uuid }, anzeigename: { type: string }, email: { type: string }, rolle: { $ref: "#/components/schemas/Rolle" }, ich: { type: boolean } } }
+                  einladungen: { type: array, items: { $ref: "#/components/schemas/Einladung" } }
+                  darf_verwalten: { type: boolean }
+
+  /v1/team/{kontoId}:
+    delete:
+      tags: [Team]
+      summary: Mitglied entfernen (Inhaber nur durch Inhaber; der letzte Inhaber bleibt)
+      x-rollen: [inhaber, admin]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: kontoId, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "204": { description: Entfernt }
+        "403": { $ref: "#/components/responses/KeineBerechtigung" }
+        "404": { $ref: "#/components/responses/NichtGefunden" }
+        "409": { description: Das Unternehmen braucht mindestens einen Inhaber }
+
+  /v1/einladungen:
+    post:
+      tags: [Team]
+      summary: Per E-Mail einladen – gilt 7 Tage, nur für diese Adresse
+      description: Eine neue Einladung an dieselbe Adresse ersetzt die offene. Der Link wird einmal zurückgegeben und per E-Mail verschickt.
+      x-rollen: [inhaber, admin]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, rolle]
+              additionalProperties: false
+              properties:
+                email: { type: string, format: email, maxLength: 254 }
+                rolle: { enum: [mitarbeiter, steuerberater, admin] }
+      responses:
+        "201":
+          description: Eingeladen
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: "#/components/schemas/Einladung" }
+                  - { type: object, properties: { link: { type: string, format: uri } } }
+        "409": { description: Diese Person ist schon im Team }
+        "422": { $ref: "#/components/responses/Eingabefehler" }
+
+  /v1/einladungen/{id}:
+    delete:
+      tags: [Team]
+      summary: Offene Einladung zurückziehen
+      x-rollen: [inhaber, admin]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "204": { description: Zurückgezogen }
+        "404": { $ref: "#/components/responses/NichtGefunden" }
+
+  /v1/einladungen/vorschau:
+    post:
+      tags: [Team]
+      summary: Wohin lädt ein Link ein? (POST, damit das Token nicht in Zugriffslogs steht)
+      requestBody: { $ref: "#/components/requestBodies/Token" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { type: object, properties: { unternehmen: { type: string }, rolle: { $ref: "#/components/schemas/Rolle" }, eingeladen_von: { type: [string, "null"] }, laeuft_ab: { type: string, format: date-time } } }
+        "404": { description: Einladung ungültig oder abgelaufen }
+
+  /v1/einladungen/annehmen:
+    post:
+      tags: [Team]
+      summary: Einladung annehmen – nur angemeldet mit der eingeladenen E-Mail-Adresse, einmalig
+      requestBody: { $ref: "#/components/requestBodies/Token" }
+      responses:
+        "200": { description: Beigetreten, content: { application/json: { schema: { type: object, properties: { unternehmen_id: { type: string, format: uuid } } } } } }
+        "403": { description: Einladung gilt für eine andere E-Mail-Adresse }
+        "404": { description: Einladung ungültig, schon benutzt, zurückgezogen oder abgelaufen }
+
+components:
+  securitySchemes:
+    bearer: { type: http, scheme: bearer, bearerFormat: JWT }
+
+  parameters:
+    Unternehmen: { name: X-Unternehmen-Id, in: header, required: true, schema: { type: string, format: uuid } }
+    PflichtId: { name: pflichtId, in: path, required: true, schema: { type: string, example: steuern.ust_voranmeldung } }
+    Periode: { name: periode, in: path, required: true, schema: { type: string, pattern: "^(einmalig|\\d{4}(-(0[1-9]|1[0-2]|Q[1-4]|H[12]))?|aenderung-\\d+)$", example: 2026-09 } }
+
+  requestBodies:
+    Token:
+      required: true
+      content: { application/json: { schema: { type: object, required: [token], additionalProperties: false, properties: { token: { type: string, pattern: "^[A-Za-z0-9_-]{43}$" } } } } }
+
+  responses:
+    NichtAngemeldet: { description: Kein oder ungültiges Token }
+    KeineBerechtigung: { description: Rolle reicht für diese Aktion nicht }
+    NichtGefunden: { description: Gibt es nicht oder gehört nicht zu diesem Unternehmen }
+    Eingabefehler:
+      description: Eingabe ungültig
+      content:
+        application/json:
+          schema: { type: object, properties: { meldung: { type: string }, fehler: { type: array, items: { type: object, properties: { feld: { type: string }, meldung: { type: string } } } } } }
+
+  schemas:
+    Rolle: { enum: [inhaber, mitarbeiter, steuerberater, admin] }
+    Konto:
+      type: object
+      properties: { id: { type: string, format: uuid }, email: { type: string }, anzeigename: { type: string }, sprache: { enum: [de, en] } }
+    UnternehmenMitRolle:
+      type: object
+      properties: { id: { type: string, format: uuid }, name: { type: string }, rolle: { $ref: "#/components/schemas/Rolle" } }
+    ProfilDaten:
+      type: object
+      description: Unternehmensprofil; maßgeblich ist das Zod-Schema in apps/api/src/profil-schema.ts.
+    ProfilVersion:
+      type: object
+      properties: { version: { type: integer, description: 0 = noch kein Profil }, daten: { $ref: "#/components/schemas/ProfilDaten" }, erstellt_am: { type: [string, "null"], format: date-time } }
+    Ereignis:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        typ: { type: string }
+        datum: { type: string, format: date }
+        payload: { type: object }
+        erfasst_am: { type: string, format: date-time }
+        storniert_ereignis_id: { type: [string, "null"], description: Gesetzt bei einer Gegenbuchung }
+        storniert: { type: boolean }
+    StatusAntwort:
+      type: object
+      properties: { pflicht_id: { type: string }, periode: { type: string }, status: { enum: [offen, erledigt] } }
+    Einladung:
+      type: object
+      properties: { id: { type: string, format: uuid }, email: { type: string }, rolle: { $ref: "#/components/schemas/Rolle" }, laeuft_ab: { type: string, format: date-time } }
+    PflichtKarte:
+      type: object
+      description: Eine Pflicht für eine Periode, Texte in der Sprache des Kontos.
+      properties:
+        pflicht_id: { type: string }
+        periode: { type: string }
+        titel: { type: string }
+        kurz: { type: string }
+        status: { enum: [offen, faellig_bald, ueberfaellig, angabe_fehlt, erledigt, nicht_zutreffend] }
+        ergebnis: { enum: [gilt, gilt_nicht, unbekannt] }
+        faellig_am: { type: [string, "null"], format: date }
+        verschoben_von: { type: [string, "null"], format: date, description: Ursprüngliches Datum, wenn die Frist wegen Wochenende/Feiertag verschoben wurde }
+        kategorie: { type: string }
+        bereich: { type: string }
+        sanktion: { type: object, properties: { text: { type: string }, schwere: { enum: [niedrig, mittel, hoch] } } }
+        rechtsgrundlage: { type: array, items: { type: string } }
+        warum: { type: array, items: { type: string }, description: "„Gilt für dich, weil …“" }
+        zu_klaeren: { type: array, items: { type: string }, description: Offene Bedingungen, als Fragen anzuzeigen }
+        fehlende_fakten: { type: array, items: { type: string } }
+        pruefung: { type: object, properties: { status: { type: string }, geprueft_von: { type: [array, "null"] }, geprueft_am: { type: [string, "null"] } } }
+        ungeprueft: { type: boolean, description: In dev/staging können ungeprüfte Inhalte erscheinen (E-038). }
+        erledigt_am: { type: [string, "null"], format: date-time }
+    PflichtDetail:
+      allOf:
+        - { $ref: "#/components/schemas/PflichtKarte" }
+        - type: object
+          properties:
+            erklaerung: { type: string }
+            begriffe: { type: array, items: { type: object, properties: { begriff: { type: string }, erklaerung: { type: string } } } }
+            stelle: { type: string }
+            kosten: { type: [string, "null"] }
+            quellen: { type: array, items: { type: object, properties: { titel: { type: string }, url: { type: string }, abgerufen: { type: [string, "null"] } } } }
+            dokumente: { type: array, items: { type: string } }
+            pflicht_version: { type: integer }
+            regelwerte: { type: array, items: { type: object, properties: { id: { type: string }, version: { type: integer } } } }
+            begruendung: { type: object, description: Auswertungsbaum der Regel }
+            nachweise: { type: array, items: { type: object } }

@@ -249,6 +249,23 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Datum:** 2026-10-11 · **Status:** angenommen
 - Die Redaktion bearbeitet Pflichten in Formularen; Auslöser als Baum mit nur passenden Operatoren je Fakt-Typ und Klartext-Vorschau. Prüfmeldungen sind deutsch und nennen bei Varianten (Bedingung, Frist) nur die Fehler der gemeinten Variante.
 
+### E-079 · Einladungen: Link per E-Mail, nur für die eingeladene Adresse
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Inhaber und Admins laden per E-Mail ein (Rollen Mitarbeiter, Steuerberatung, Admin; nie Inhaber). Der Link enthält ein 256-Bit-Token; in `app.einladung` steht nur der SHA-256. Annehmen geht nur angemeldet mit genau dieser E-Mail-Adresse, einmalig, bis zum Ablauf nach 7 Tagen (Produktentscheidung). Eine neue Einladung an dieselbe Adresse zieht die alte zurück; Widerruf statt Löschen (Audit-Trigger).
+- Die E-Mail verschickt der Worker (Job in derselben Transaktion). Das Token steht dafür im Job; pg-boss archiviert erledigte Jobs einige Tage. Bewusst hingenommen, weil das Token ohne Zugang zum eingeladenen E-Mail-Konto nutzlos ist. Der Link wird dem Einladenden zusätzlich zwei Minuten lang angezeigt (httpOnly-Cookie, nie in der URL).
+- Einladungen sehen nur Inhaber und Admins (fremde E-Mail-Adressen). Der letzte Inhaber kann weder entfernt noch herabgestuft werden (Trigger).
+- Voraussetzung: Der Identity-Provider liefert nur bestätigte E-Mail-Adressen (Zitadel: Standard). Ohne diese Zusage müsste die API zusätzlich `email_verified` prüfen → Prüfpunkt T-01.
+
+### E-080 · API-Beschreibung als OpenAPI-Datei mit Abgleichtest
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- `apps/api/openapi.yaml` (OpenAPI 3.1) ist von Hand geschrieben, weil die Eingaben mit Zod geprüft werden und Swagger-Dekoratoren eine zweite Wahrheit wären. Ein Test liest die Routen und Rollen aus den Nest-Metadaten und verlangt, dass die Datei genau diese Routen mit denselben Rollen, demselben Mandanten-Header und denselben öffentlichen Routen beschreibt. Ausgeliefert unter `GET /v1/openapi.json`. Antwortschemas sind bei großen Objekten (Profil, Begründungsbaum) bewusst grob.
+
+### E-081 · Betrieb: strukturierte Zugriffslogs und Prometheus-Metriken, Tracing später
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Die API schreibt je Anfrage eine JSON-Zeile (Anfrage-ID, Methode, Routen-Muster, Status, Dauer) und setzt `X-Request-Id`. Routen erscheinen als Muster (`/v1/kalender/:datei`), damit keine Tokens in Logs oder Metriken landen; keine IPs, keine Konto- oder Unternehmens-IDs.
+- `GET /metriken` liefert Prometheus-Metriken (Anfragen, Antwortzeiten, wartende Jobs je Warteschlange, Prozesswerte) nur mit `METRIKEN_TOKEN`; ohne Token gibt es die Route nicht.
+- OpenTelemetry-Tracing folgt, wenn Hosting und Observability-Anbieter feststehen (dann ohne Codeumbau über den OTLP-Exporter). Bis dahin: Logs + Metriken.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

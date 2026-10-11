@@ -8,7 +8,8 @@
     "./sitzung": "./src/sitzung.ts",
     "./oidc": "./src/oidc.ts",
     "./auth-routen": "./src/auth-routen.ts",
-    "./designsystem.css": "./src/designsystem.css"
+    "./designsystem.css": "./src/designsystem.css",
+    "./pfad": "./src/pfad.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

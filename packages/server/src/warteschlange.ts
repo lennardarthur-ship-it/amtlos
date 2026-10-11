@@ -6,7 +6,18 @@ export const JOBS = {
   neuberechnung: "neuberechnung",
   tageswechsel: "tageswechsel",
   erinnerungenVersenden: "erinnerungen-versenden",
+  einladungVersenden: "einladung-versenden",
 } as const;
+
+/**
+ * Das Token steht im Job (für den Link in der E-Mail), in app.einladung nur als SHA-256.
+ * pg-boss archiviert erledigte Jobs einige Tage. Das Token allein nützt dort nichts: Annehmen geht nur
+ * angemeldet mit der eingeladenen E-Mail-Adresse, einmalig und bis zum Ablauf (E-079).
+ */
+export interface EinladungsJob {
+  einladungId: string;
+  token: string;
+}
 
 export interface NeuberechnungsJob {
   unternehmenId: string;
@@ -32,6 +43,7 @@ export async function queuesAnlegen(boss: PgBoss): Promise<void> {
     [JOBS.neuberechnung, "stately"],
     [JOBS.tageswechsel, "singleton"],
     [JOBS.erinnerungenVersenden, "singleton"],
+    [JOBS.einladungVersenden, "standard"],
   ] as const) {
     if (!(await boss.getQueue(name))) await boss.createQueue(name, { name, policy, retryLimit: 3, retryDelay: 30, retryBackoff: true });
   }
@@ -44,6 +56,14 @@ export async function queuesAnlegen(boss: PgBoss): Promise<void> {
 export async function neuberechnungEinreihen(boss: PgBoss, tx: Tx, job: NeuberechnungsJob): Promise<void> {
   await boss.send(JOBS.neuberechnung, job, {
     singletonKey: job.unternehmenId,
+    db: { executeSql: (text: string, values: unknown[]) => tx.client.query(text, values) },
+  });
+}
+
+/** Einladungs-E-Mail in derselben Transaktion einreihen wie die Einladung selbst. */
+export async function einladungEinreihen(boss: PgBoss, tx: Tx, job: EinladungsJob): Promise<void> {
+  await boss.send(JOBS.einladungVersenden, job, {
+    expireInSeconds: 3600,
     db: { executeSql: (text: string, values: unknown[]) => tx.client.query(text, values) },
   });
 }

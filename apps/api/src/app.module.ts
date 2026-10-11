@@ -4,15 +4,18 @@ import { Inject } from "@nestjs/common";
 import type PgBoss from "pg-boss";
 import { Datenbank, erzeugeWarteschlange } from "@amtlos/server";
 import { AuthGuard } from "./auth.js";
+import { BetriebController, METRIKEN, erzeugeMetriken } from "./betrieb.js";
 import { KernController, WARTESCHLANGE } from "./kern.controller.js";
 import { KONFIGURATION, type Konfiguration } from "./konfiguration.js";
 import { PflichtenController } from "./pflichten.controller.js";
+import { TeamController } from "./team.controller.js";
 
 export function appModul(k: Konfiguration) {
   @Module({
-    controllers: [KernController, PflichtenController],
+    controllers: [KernController, PflichtenController, TeamController, BetriebController],
     providers: [
       { provide: KONFIGURATION, useValue: k },
+      { provide: METRIKEN, useFactory: erzeugeMetriken },
       { provide: Datenbank, useFactory: () => new Datenbank({ connectionString: k.DATABASE_URL, max: 20 }) },
       {
         provide: WARTESCHLANGE,

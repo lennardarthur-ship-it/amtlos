@@ -59,3 +59,10 @@ export async function apiOhneUnternehmen<T>(pfad: string, init: RequestInit = {}
   if (!r.ok) throw new Error(`API ${init.method ?? "GET"} ${pfad}: ${r.status}`);
   return r.json() as Promise<T>;
 }
+
+/** Rohe Antwort (für Seiten, die Statuscodes wie 403/409 selbst erklären). */
+export async function apiAntwort(pfad: string, init: RequestInit & { ohneUnternehmen?: boolean } = {}): Promise<Response> {
+  const { ohneUnternehmen, ...rest } = init;
+  const unternehmen = ohneUnternehmen ? false : (await aktivesUnternehmen()).id;
+  return roh(pfad, { ...rest, unternehmen });
+}

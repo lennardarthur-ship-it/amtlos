@@ -3,6 +3,7 @@ import { NestFactory } from "@nestjs/core";
 import type { NestExpressApplication } from "@nestjs/platform-express";
 import helmet from "helmet";
 import { appModul } from "./app.module.js";
+import { METRIKEN, zugriffsprotokoll, type Metriken } from "./betrieb.js";
 import { ladeKonfiguration, type Konfiguration } from "./konfiguration.js";
 
 export async function erzeugeApp(k: Konfiguration): Promise<NestExpressApplication> {
@@ -11,8 +12,9 @@ export async function erzeugeApp(k: Konfiguration): Promise<NestExpressApplicati
     bodyParser: false,
   });
   app.useBodyParser("json", { limit: "256kb" });
+  app.use(zugriffsprotokoll(app.get<Metriken>(METRIKEN), k.UMGEBUNG !== "test"));
   app.use(helmet());
-  app.enableCors({ origin: [k.WEB_URL], credentials: false, allowedHeaders: ["Authorization", "Content-Type", "X-Unternehmen-Id"] });
+  app.enableCors({ origin: [k.WEB_URL], credentials: false, allowedHeaders: ["Authorization", "Content-Type", "X-Unternehmen-Id", "X-Request-Id"], exposedHeaders: ["X-Request-Id"] });
   app.set("trust proxy", 1);
   app.enableShutdownHooks();
   return app;

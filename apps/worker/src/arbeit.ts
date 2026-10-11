@@ -5,7 +5,9 @@ import {
   neuberechnenInTx,
   planeErinnerungen,
   versendeFaelligeErinnerungen,
+  versendeEinladung,
   type Datenbank,
+  type EinladungsJob,
   type NeuberechnungsJob,
   type Versand,
 } from "@amtlos/server";
@@ -46,6 +48,12 @@ export async function arbeiterStarten(boss: PgBoss, db: Datenbank, versand: Vers
     const r = await versendeFaelligeErinnerungen(db, versand, appUrl);
     if (r.gesendet || r.fehler) log.info("erinnerungen", r);
     if (r.fehler) log.fehler("erinnerungen_fehler", r);
+  });
+  await boss.work<EinladungsJob>(JOBS.einladungVersenden, async (jobs) => {
+    for (const job of jobs) {
+      const r = await versendeEinladung(db, versand, appUrl, job.data);
+      log.info("einladung", { einladung: job.data.einladungId, ergebnis: r }); // kein Token, keine Adresse im Log
+    }
   });
   // Zeitpläne (Europe/Berlin): Tageswechsel kurz nach Mitternacht, Erinnerungen alle 15 Minuten
   await boss.schedule(JOBS.tageswechsel, "5 0 * * *", {}, { tz: "Europe/Berlin" });

@@ -1,5 +1,7 @@
 import { Body, Controller, Get, HttpCode, Inject, NotFoundException, Param, Post, Put, Query } from "@nestjs/common";
 import type PgBoss from "pg-boss";
+import fs from "node:fs";
+import { parse } from "yaml";
 import { z } from "zod";
 import { Datenbank, neuberechnungEinreihen } from "@amtlos/server";
 import { Kontext, MitUnternehmen, Oeffentlich, type Anfragekontext } from "./auth.js";
@@ -20,6 +22,9 @@ const EreignisNeu = z
   .strict();
 const Uuid = z.string().uuid();
 
+/** Die Beschreibung liegt neben src/ und dist/ (apps/api/openapi.yaml); einmal beim Start gelesen. */
+export const OPENAPI = parse(fs.readFileSync(new URL("../openapi.yaml", import.meta.url), "utf8")) as Record<string, unknown>;
+
 @Controller("v1")
 export class KernController {
   constructor(
@@ -32,6 +37,12 @@ export class KernController {
   async gesundheit() {
     await this.db.imKontext({}, (tx) => tx.eine("select 1"));
     return { status: "ok" };
+  }
+
+  @Oeffentlich()
+  @Get("openapi.json")
+  openapi() {
+    return OPENAPI;
   }
 
   @Get("ich")

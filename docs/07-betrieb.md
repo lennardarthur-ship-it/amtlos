@@ -31,6 +31,17 @@ cd apps/studio && STUDIO_DATABASE_URL=postgresql://studio_user:amtlos@localhost:
 | Integration (Server, API, Worker) | mit `PGHOST` gesetzt: `pnpm --filter @amtlos/server --filter @amtlos/api --filter @amtlos/worker test` |
 | E2E + Barrierefreiheit | laufende Dienste, dann `E2E_URL=http://localhost:3000 pnpm --filter @amtlos/web e2e` |
 
+## Beobachten
+
+| Was | Wo |
+|---|---|
+| Zugriffslog der API | stdout, eine JSON-Zeile je Anfrage (`msg: "http"`, Anfrage-ID, Routen-Muster, Status, `dauer_ms`) |
+| Worker | stdout, JSON (`neuberechnung`, `erinnerungen`, `einladung`, `tageswechsel`) – nur IDs und Zähler |
+| Metriken | `GET /metriken` mit `Authorization: Bearer $METRIKEN_TOKEN` (Prometheus-Format) |
+| API-Beschreibung | `GET /v1/openapi.json` (Quelle: `apps/api/openapi.yaml`, muss im Container neben `dist/` liegen) |
+
+Wichtige Metriken: `amtlos_http_anfragen_total{status=~"5.."}`, `amtlos_http_dauer_sekunden`, `amtlos_warteschlange_wartend{queue="neuberechnung"}` (staut sich die Berechnung?), `amtlos_warteschlange_wartend{queue="einladung-versenden"}`. Alarmregeln legen wir mit dem Hosting fest (E-081).
+
 ## Deploy (Reihenfolge)
 
 1. Rollen und Erweiterungen durch die Plattform anlegen (`amtlos_owner`, `amtlos_app`, `amtlos_worker`, `amtlos_studio`, Login-Rollen je Dienst; `pgcrypto`, `citext`, `btree_gist`).

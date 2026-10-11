@@ -86,6 +86,37 @@ async function rundgang(farbschema, breite) {
     await p.goto(`${B}/${seite}`);
     await barrierefrei(p, name(seite.replace("/", "-")));
   }
+
+  // Team: einladen, Link nur einmal sichtbar; Eingeladene meldet sich über den Link an und nimmt an
+  const gast = `${kennung}-gast-${farbschema}`;
+  await p.goto(`${B}/team`);
+  await barrierefrei(p, name("team"));
+  await p.fill("#email", `${gast}@example.org`);
+  await p.check('input[name="rolle"][value="steuerberater"]');
+  await Promise.all([p.waitForLoadState("networkidle"), p.getByRole("button", { name: "Einladung senden" }).click()]);
+  const einladungsLink = await p.locator('div[role="status"] input').inputValue().catch(() => "");
+  pruefe(/\/einladung\/[A-Za-z0-9_-]{43}$/.test(einladungsLink), `${name("team")}: kein Einladungslink (${einladungsLink})`);
+  await barrierefrei(p, name("team-eingeladen"));
+  // Der Link steht nie in der URL (Verlauf, Logs); er ist zwei Minuten über ein httpOnly-Cookie abrufbar, wie beim Kalender-Abo
+  pruefe(!p.url().includes(einladungsLink.split("/").pop() || "§"), `${name("team")}: Token steht in der URL`);
+  pruefe(await p.getByText(`${gast}@example.org`).count(), `${name("team")}: offene Einladung fehlt`);
+
+  if (einladungsLink) {
+    const ctx2 = await browser.newContext({ viewport: { width: breite, height: 900 }, colorScheme: farbschema, locale: "de-DE" });
+    const g = await ctx2.newPage();
+    await g.goto(new URL(new URL(einladungsLink).pathname, B).href);
+    await barrierefrei(g, name("einladung-anmelden"));
+    await Promise.all([g.waitForURL(/anmelden\?weiter=/), g.getByRole("link", { name: "Anmelden und Einladung annehmen" }).click()]);
+    await g.fill("#kennung", gast);
+    await Promise.all([g.waitForURL(/\/einladung\//), g.click("button")]);
+    pruefe(await g.getByText("Testbetrieb").count(), `${name("einladung")}: Unternehmen nicht genannt`);
+    await barrierefrei(g, name("einladung"));
+    await Promise.all([g.waitForURL(/\/heute/), g.getByRole("button", { name: "Einladung annehmen" }).click()]);
+    pruefe(await g.getByText("Testbetrieb").count(), `${name("einladung")}: nach Annahme nicht im Unternehmen`);
+    await ctx2.close();
+    await p.goto(`${B}/team`);
+    pruefe(await p.getByText("Steuerberatung").count(), `${name("team")}: neues Mitglied fehlt`);
+  }
   await ctx.close();
 }
 
