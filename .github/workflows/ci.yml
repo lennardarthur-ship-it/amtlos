@@ -183,9 +183,9 @@ jobs:
           warte localhost:3000/anmelden
           warte localhost:3100/anmelden
           sleep 3
-          laufend=$(docker ps --format '{{.Names}}' | sort | tr '\n' ' ')
-          echo "laufend: $laufend"
-          [ "$laufend" = "api studio web worker " ] || { echo "::error title=Rauchtest::Nicht alle Container laufen: $(docker ps -a --format '{{.Names}}={{.Status}}' | tr '\n' ' ')"; exit 1; }
+          for c in api worker web studio; do
+            [ "$(docker inspect -f '{{.State.Running}}' $c)" = "true" ] || { echo "::error title=Rauchtest::Container $c läuft nicht: $(docker inspect -f '{{.State.Status}} {{.State.ExitCode}}' $c)"; exit 1; }
+          done
           # Läuft als Nicht-Root?
           uid=$(docker exec api id -u)
           [ "$uid" != "0" ] || { echo "::error title=Rauchtest::API-Container läuft als root"; exit 1; }
