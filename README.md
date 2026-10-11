@@ -2,7 +2,7 @@
 
 Das Bürokratie-Betriebssystem für Kleinunternehmer und Startups in Deutschland.
 
-**Stand:** Bauabschnitte 1–9 umgesetzt (Fundament; Profil, Pflichten, Kalender; Gründungsassistent und Kapitalgesellschaften; Finanzen light mit E-Rechnung; Personal und Arbeitsschutz; Datenschutz, IT-Sicherheit, KI; Online-Check, Handel und Produkte; Branchenmodule; Radar, Frag Amtlos, Behörden-Postfach und Experten-Marktplatz). Testberichte: [1](docs/testberichte/abschnitt-1.md), [2](docs/testberichte/abschnitt-2.md), [3](docs/testberichte/abschnitt-3.md), [4](docs/testberichte/abschnitt-4.md), [5](docs/testberichte/abschnitt-5.md), [6](docs/testberichte/abschnitt-6.md), [7](docs/testberichte/abschnitt-7.md), [8](docs/testberichte/abschnitt-8.md), [9](docs/testberichte/abschnitt-9.md), [Lasttest](docs/testberichte/lasttest.md). API: [`apps/api/openapi.yaml`](apps/api/openapi.yaml). Fachliche Inhalte sind ungeprüft und erscheinen in prod erst nach Freigabe (E-002).
+**Stand:** Bauabschnitte 1–10 umgesetzt (Fundament; Profil, Pflichten, Kalender; Gründungsassistent und Kapitalgesellschaften; Finanzen light mit E-Rechnung; Personal und Arbeitsschutz; Datenschutz, IT-Sicherheit, KI; Online-Check, Handel und Produkte; Branchenmodule; Radar, Frag Amtlos, Behörden-Postfach und Experten-Marktplatz; Kanzleien, White-Label, Englisch, mobile App und Skalierung). Testberichte: [1](docs/testberichte/abschnitt-1.md), [2](docs/testberichte/abschnitt-2.md), [3](docs/testberichte/abschnitt-3.md), [4](docs/testberichte/abschnitt-4.md), [5](docs/testberichte/abschnitt-5.md), [6](docs/testberichte/abschnitt-6.md), [7](docs/testberichte/abschnitt-7.md), [8](docs/testberichte/abschnitt-8.md), [9](docs/testberichte/abschnitt-9.md), [10](docs/testberichte/abschnitt-10.md), [Lasttest](docs/testberichte/lasttest.md). API: [`apps/api/openapi.yaml`](apps/api/openapi.yaml). Fachliche Inhalte sind ungeprüft und erscheinen in prod erst nach Freigabe (E-002).
 
 ## Aufbau
 
@@ -11,7 +11,8 @@ Das Bürokratie-Betriebssystem für Kleinunternehmer und Startups in Deutschland
 | `apps/web` | Nutzer-App (Next.js, PWA) |
 | `apps/studio` | Experten-Backend: Katalog bearbeiten, prüfen, veröffentlichen |
 | `apps/api` | REST-API (NestJS) |
-| `apps/worker` | Neuberechnung, Tageswechsel, Erinnerungen |
+| `apps/worker` | Neuberechnung, Tageswechsel, Erinnerungen (E-Mail, Push), Einladungen, Marktplatz-Anfragen |
+| `apps/mobile` | Mobile App (Expo): Heute, Pflichten, Stempeln auch offline, Belege, Push |
 | `packages/rules-engine` | Regel-Engine (rein, deterministisch, dreiwertig) |
 | `packages/fristen` | Fristen, Feiertage, Perioden |
 | `packages/rules-schema` | JSON-Schemas, Fakten- und Ereignis-Katalog, Validator |

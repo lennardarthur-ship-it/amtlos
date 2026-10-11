@@ -79,7 +79,7 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - Offline erfasste Belege, Zeitbuchungen und Unterschriften werden als unveränderliche Ereignisse mit Client-ID und Gerätezeit hochgeladen. Korrekturen sind neue Ereignisse (Storno + Neubuchung), nie Überschreibungen.
 
 ### E-019 · Mobile: PWA bis Abschnitt 10, Expo-Gerüst ab Abschnitt 1
-- **Datum:** 2026-10-11 · **Status:** angenommen
+- **Datum:** 2026-10-11 · **Status:** umgesetzt in Abschnitt 10 (E-108); das Gerüst entstand erst dort
 - Die Web-App ist von Beginn an PWA (installierbar, offline für Belege und Zeiterfassung). `apps/mobile` (Expo) wird in Abschnitt 1 angelegt, nutzt die geteilten Pakete, wird aber erst in Abschnitt 10 im Store veröffentlicht.
 
 ### E-020 · KI-Anbieter über austauschbares Gateway
@@ -397,6 +397,37 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 ### E-104 · Navigation: Postfach in der Seitenleiste, „Mehr“ auch am Desktop
 - **Datum:** 2026-10-11 · **Status:** angenommen (ergänzt E-098)
 - Am Desktop steht „Postfach“ in der Seitenleiste. „Mehr“ gibt es jetzt auch am Desktop: Es führt zu Frag Amtlos, Radar, Experten, Änderung melden, Team und Hilfe. Mobil zeigt „Mehr“ zusätzlich die Bereiche, die nur am Desktop in der Leiste stehen. Frag Amtlos ist außerdem als Suchfeld auf „Heute“ erreichbar, das Radar von „Heute“ und „Pflichten“.
+
+### E-105 · White-Label-Marken: nur Name, zwei geprüfte Farben, Logo
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Partner (Steuerberatungen, Kammern, Verbände) bieten Amtlos unter eigener Adresse an. Eine Marke (`katalog.marke`, Pflege nur durch Plattform-Admins im Studio) hat Name, Hostnamen, eine Handlungsfarbe für hell und eine für dunkel, ein optionales Logo (https-Bild) und eine Support-Adresse. Die Web-App erkennt die Marke am Hostnamen (`GET /v1/marke?host=`, öffentlich, fünf Minuten zwischengespeichert). Sie ersetzt „Amtlos“ durch den Markennamen mit dem Zusatz „mit Amtlos“, setzt die Farben als CSS-Variablen und passt den Seitentitel an.
+- **Barrierefreiheit bleibt erhalten:** Beide Farben müssen auf allen Flächen des Designsystems mindestens 4,5 : 1 Kontrast erreichen (Prüfung beim Speichern, Kontrastwerte in der Studio-Liste). Abgeleitete Töne entstehen mit `color-mix`. Es gibt kein freies CSS, kein HTML und keinen Logo-Upload: kein Einfallstor für Skripte und keine Verschlechterung der Lesbarkeit.
+- Inhalte, Prüfstatus, Datenschutz und Konten bleiben gleich. Unternehmen merken sich die Marke, unter der sie angelegt wurden (`marke_id`, Lizenzbericht im Studio als reine Anzahl). Rechtliche Fragen zu Impressum, Verantwortlichkeit und Vertrag: T-43.
+
+### E-106 · Kanzleien: Mandantenübersicht und Mandanten anlegen
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- `/kanzlei` zeigt alle Unternehmen der Person mit Ampel, Zählern und der dringendsten Pflicht, Überfälliges zuerst. Die Daten kommen aus einer Transaktion, die den Unternehmenskontext je Unternehmen setzt. RLS gilt also wie bei jedem Einzelaufruf, es gibt keine Sicht über Mandanten hinweg in der Datenbank.
+- **Mandant anlegen:** Die Kanzlei wird Mitglied mit Rolle „Steuerberatung“. Die Mandantin erhält eine Einladung als **Inhaberin**. Inhaber-Einladungen sind nur auf diesem Weg möglich (Datenbankregel `mandant_anlage`). Normale Einladungen vergeben nie die Inhaberrolle (E-079). Der Link wird wie bei Team-Einladungen nur einmal angezeigt. Ob die Kanzlei dafür eine Vollmacht oder einen AVV braucht: T-45.
+
+### E-107 · Englische Katalogtexte als Übersetzungsschicht
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Veröffentlichte Versionen sind unveränderlich, deshalb hängen Übersetzungen nicht an der Version, sondern am **deutschen Text**: `katalog.uebersetzung (sprache, de, text, status)`, Quelle `catalog/uebersetzungen/en.yaml`. Je Version wird ein lokalisiertes Dokument vorberechnet (`*_lokal`, Trigger bei neuen Versionen, Auffrischen nach Import oder Prüfung). Lesende Stellen verwenden die Sichten `*_anzeige`. Ändert sich der deutsche Text, fehlt die Übersetzung und es erscheint Deutsch.
+- Startbestand: 732 Texte, **mit KI übersetzt** (Status `maschinell`), Zahlen und Fundstellen per Test gegen das Original geprüft. Verbindlich ist immer Deutsch. Die englische Oberfläche sagt das unter jeder Seite. Im Studio prüft die Redaktion Texte, geprüfte Einträge gewinnen beim nächsten Import gegen die Datei (Datenbank ist Quelle der Wahrheit, E-030). Ein Test stellt sicher, dass jeder deutsche Katalogtext eine Übersetzung hat.
+- **Ersetzt den zweiten Satz von E-040:** `en` muss nicht mehr im Versionsdokument stehen. Die Release-Bedingung für prod lautet künftig, dass jeder deutsche Text eine geprüfte Übersetzung hat. Erzwungen wird das mit dem Livegang (G-24); bis dahin zeigt die App den Hinweis.
+- Die Oberfläche schickt ihre Sprache je Anfrage (`X-Sprache`). Die Kontosprache (`PUT /v1/ich/sprache`) bestimmt E-Mails und Push. PDFs für Behörden und Dokumentationen bleiben deutsch.
+
+### E-108 · Mobile App mit Expo, offline stempeln, Push über Expo
+- **Datum:** 2026-10-11 · **Status:** angenommen (Store-Veröffentlichung offen)
+- `apps/mobile`: React Native mit Expo SDK 54 (die neueste Version, deren Schnittstellen wir sicher kennen), Texte aus `@amtlos/i18n`, Farben aus dem Designsystem, Tippziele ≥ 48 pt, Rollen und Zustände für Screenreader. Funktionen nach Spezifikation „mobil zuerst“: Heute, offene Pflichten, Stempeln, Belege fotografieren, Push. Erledigen mit Nachweis und Formulare bleiben am Computer.
+- **Offline-Stempel** (umgesetzt nach E-018): Jeder Stempel bekommt beim Tippen eine `client_id` und den Gerätezeitpunkt und wird zuerst lokal gespeichert, dann übertragen. Die API ist über `client_id` idempotent. Ein Gerätezeitpunkt wird nur angenommen, wenn er höchstens 72 Stunden alt ist und nicht in der Zukunft liegt. Solche Einträge sind als `offline` gekennzeichnet; `erfasst_am` zeigt den Eingang beim Server. Sofort übertragene Stempel nutzen die Serverzeit. Abgelehnte Stempel werden angezeigt, nie stillschweigend verworfen (T-44).
+- **Push:** Geräte gehören zum Konto (`app.geraet`, RLS je Konto, Token-Wechsel über eine Funktion). Erinnerungen gehen bei registriertem Gerät zusätzlich als Push. Der Sperrbildschirm zeigt nur Titel und Datum. Ungültige Tokens werden abgemeldet. Versand über den Expo-Push-Dienst, im Worker standardmäßig **aus** (`PUSH_ANBIETER=expo` schaltet ein), weil Expo an APNs/FCM weiterleitet (T-41).
+- Anmeldung: OIDC mit PKCE (Identity-Provider offen, E-061). In dev/test stellt `POST /v1/dev/token` ein Token aus (nur mit `AUTH_MODUS=dev`, in staging/prod durch die Konfigurationsprüfung ausgeschlossen). CI bündelt die App für Android und iOS.
+- Benachrichtigungseinstellungen (E-Mail/Push, Tage vorher) gibt es jetzt je Person und Unternehmen in Web und API.
+
+### E-109 · Skalierung: Index für jeden RLS-Filter, nur Unterschiede schreiben
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Jede Mandantentabelle braucht einen Index mit `unternehmen_id` vorne. Migration 0017 ergänzt 24 fehlende, ein Schematest erzwingt die Regel. Die Erinnerungsplanung schreibt nur noch Unterschiede. Lasttest mit 10.000 Unternehmen und 146 Pflichten: Tageswechsel hochgerechnet 14,8 Minuten für 100.000 Unternehmen, Durchsatz unabhängig von der Mandantenzahl (docs/testberichte/lasttest.md).
+- Horizontal: API und Worker sind zustandslos bis auf Prozess-Caches (Katalog je Release, Konten fünf Minuten). Diese Caches sind unkritisch, weil ein neues Release eine neue ID hat. Die Ratenbegrenzung zählt je Prozess (E-082). Bei mehreren API-Instanzen wirkt das Limit also je Instanz; vor dem Livegang gehört sie an den Ingress oder in einen gemeinsamen Speicher (G-23). Worker skalieren über pg-boss (je Unternehmen ein Singleton-Job).
 
 ---
 

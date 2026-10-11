@@ -48,7 +48,7 @@ Gefunden und behoben (E-109):
 2. **Erinnerungen wurden täglich komplett neu geschrieben.** Jetzt werden nur Unterschiede geschrieben. Sofort-Erinnerungen behalten ihren Zeitpunkt.
 3. Zwei Abfragen je Katalog-Zugriff sind zu einer zusammengefasst.
 
-Die **Erstberechnung** nach einem großen Release liegt hochgerechnet bei 35 Minuten. Grund ist das Audit jeder neuen Pflichtinstanz über die globale Hash-Kette. Das ist vertretbar, weil sie nur nach Releases mit vielen Änderungen anfällt und der Rollout über die Warteschlange verteilt läuft. Ein eigener Datenbankserver bringt deutlich mehr. Abhilfe, falls nötig: Audit der Erstanlage gebündelt je Berechnungslauf statt je Zeile (Prüfpunkt G-16).
+Die **Erstberechnung** nach einem großen Release liegt hochgerechnet bei 35 Minuten. Grund ist das Audit jeder neuen Pflichtinstanz über die globale Hash-Kette. Das ist vertretbar, weil sie nur nach Releases mit vielen Änderungen anfällt und der Rollout über die Warteschlange verteilt läuft. Ein eigener Datenbankserver bringt deutlich mehr. Abhilfe, falls nötig: Audit der Erstanlage gebündelt je Berechnungslauf statt je Zeile (Prüfpunkt G-22).
 
 Speicher bei 10.000 Unternehmen: 2,7 GB ≈ 267 KB je Unternehmen (≈ 27 GB für 100.000). Den größten Teil machen Pflichtinstanzen mit Begründungsbaum und deren Audit aus. Die Aufbewahrung der Berechnungsläufe (G-09) bleibt offen.
 

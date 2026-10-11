@@ -71,3 +71,21 @@ Infrastruktur als Code (OpenTofu, STACKIT) folgt, sobald der Hosting-Vertrag ste
 ## Online-Check
 
 Der Online-Check (E-097) ruft fremde Websites aus der API heraus ab. Dafür braucht die API ausgehendes HTTP/HTTPS (Ports 80/443). Interne Ziele sind gesperrt; `ONLINECHECK_PRIVATE_NETZE=erlaubt` ist nur für Entwicklung und Tests gedacht (lokale Testseite) und wird in staging/prod beim Start abgelehnt. `ONLINECHECK_JE_TAG` begrenzt die Checks je Unternehmen und Tag (Standard 20). Empfehlung für den Betrieb: ausgehender Verkehr der API über einen Egress-Proxy mit Sperrliste für interne Netze als zweite Schutzschicht.
+
+## White-Label-Marken
+
+Eine Marke (E-105) gilt für die Hostnamen, die im Studio unter „Marken“ eingetragen sind. Für jeden Host braucht es DNS (CNAME auf die Web-App) und ein TLS-Zertifikat am Ingress. Die Web-App liest den Host aus `X-Forwarded-Host` bzw. `Host`. Der Ingress muss diesen Kopf setzen und darf nur bekannte Hosts durchlassen. Einladungs- und Erinnerungslinks zeigen auf `WEB_URL`, die Amtlos-Adresse. Links unter der Markenadresse folgen mit dem Hosting.
+
+## Übersetzungen
+
+`katalog-importieren` übernimmt auch `catalog/uebersetzungen/en.yaml` (nur geänderte Einträge, im Studio geprüfte bleiben) und berechnet die lokalisierten Dokumente neu. Fehlende Übersetzungen nach Katalogänderungen zeigt `python3 scripts/uebersetzung_abdeckung.py` (mit `--fehlende-als-vorlage` als YAML-Gerüst); ein Test schlägt fehl, solange Texte fehlen.
+
+## Mobile App und Push
+
+- App: `apps/mobile` (README dort). `expo.extra.apiUrl` zeigt auf die öffentliche API. Die API erlaubt die Kopfzeilen `X-Unternehmen-Id` und `X-Sprache`.
+- Push im Worker: `PUSH_ANBIETER=expo` (Standard `aus`), optional `EXPO_ZUGANGSTOKEN`. Erst einschalten, wenn T-41 geklärt ist. Ohne Push-Anbieter werden Push-Erinnerungen als verworfen markiert, E-Mail läuft weiter.
+- `POST /v1/dev/token` gibt es nur mit `AUTH_MODUS=dev` in dev/test.
+
+## Skalierung
+
+Lasttest: `PGHOST=… node scripts/lasttest-neuberechnung.mjs 10000 8` (Ergebnisse in docs/testberichte/lasttest.md). Mehrere API- und Worker-Instanzen sind möglich (Caches je Prozess sind unkritisch). Die Ratenbegrenzung zählt je Instanz (G-23).

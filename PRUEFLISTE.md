@@ -68,7 +68,15 @@ Stand: 2026-10-11 (Bauabschnitt 2)
 | T-38 | Frag Amtlos: Muster für Beratungsfragen (StBerG/RDG) vollständig? Hinweistext bei Verweis auf Partner | RA | E-100 |
 | T-39 | Marktplatz: Wortlaut der Einwilligung in die Weitergabe, Nachweis der Berufszulassung (Kammerregister), Darstellung von Festpreisen, Werbeverbote im Berufsrecht | RA | E-102 |
 | T-40 | Radar: Wahrscheinlichkeiten und erwartete Termine der Radar-Einträge (Gründungsbeschleunigung, USt-VA für Neugründer und vorhandene Entwürfe), Checklisten zur Vorbereitung | RA/StB | E-103 |
+| T-41 | Push über Expo: Weiterleitung an Apple (APNs) und Google (FCM) – Drittland, AVV, Datenschutzhinweis in App und Store; Inhalt der Mitteilung (nur Titel und Datum) ausreichend datensparsam? | DSB | E-108 |
+| T-42 | Englische Katalogtexte (732, KI-übersetzt): sprachlich und fachlich prüfen, besonders Fachbegriffe mit deutschem Original in Klammern | Übersetzung/RA | E-107 |
+| T-43 | White-Label: Wer ist Anbieter und Verantwortlicher (Impressum, Datenschutzerklärung) unter der Partnermarke? Vertragsmuster, Haftung, Kennzeichnung „mit Amtlos“ ausreichend? | RA/DSB | E-105 |
+| T-44 | Offline-Stempel: Reicht ein Gerätezeitpunkt (≤ 72 h, gekennzeichnet) für die Arbeitszeitaufzeichnung? Fenster und Kennzeichnung im Export | RA | E-108 |
+| T-45 | Kanzlei legt Mandanten an: Vollmacht oder Einwilligung der Mandantin, Rollenverteilung (eigene Verantwortung der Steuerberatung vs. Auftragsverarbeitung) | RA/DSB | E-106 |
 | G-15 | Sammelbestätigung „vor dem Start erledigt“: Wortlaut und ob ein Hinweis zu Nachholpflichten nötig ist | RA | E-072 |
+| G-22 | Audit der Erstberechnung gebündelt je Berechnungslauf statt je Pflichtinstanz? (Erstberechnung nach großem Release ≈ 35 min für 100.000 auf 2 Kernen) | Tech/Revision | E-109 |
+| G-24 | prod-Release erst, wenn jeder deutsche Katalogtext eine geprüfte englische Übersetzung hat (Prüfung im Release-Trigger) | Produkt | E-107 |
+| G-23 | Ratenbegrenzung über mehrere API-Instanzen (Ingress oder gemeinsamer Speicher) vor dem Livegang | Tech | E-109 |
 
 ## Juristische Grundsatzfragen (blockieren Abschnitte)
 

@@ -184,6 +184,23 @@ Alle Tabellen mit `unternehmen_id` und RLS, sofern nicht anders vermerkt.
 | `partner` (global), `partner_paket`, `auftrag`, `datenfreigabe` | Qualifikation, Pakete; Auftrag mit Status; freigegebene Daten mit Zweck, Umfang und Ablauf | Freigabe widerrufbar, protokolliert |
 | `rechtsaenderung_mitteilung` | Release, betroffene Unternehmen, „was ändert sich“, gelesen am | |
 
+Umgesetzt (0013): `behoerdenbrief` (Frist von Hand aus dem Brief, E-101), `katalog.partner`, `marktplatz_anfrage` (Momentaufnahme der geteilten Daten mit Einwilligung, E-102), Benachrichtigungen nur fürs eigene Konto. Frag Amtlos speichert keine Fragen (E-100).
+
+### Abschnitt 10 · Kanzleien, White-Label, Englisch, Mobil, Skalierung (physisch)
+
+| Tabelle | Inhalt | Schutz |
+|---|---|---|
+| `katalog.marke` | Schlüssel, Name, Hostnamen, Farbe hell/dunkel (#rrggbb), Logo-URL (https), Support-Adresse, aktiv | nur Studio schreibt; Host höchstens einer aktiven Marke (Trigger); Kontrastprüfung im Studio-Kern (E-105) |
+| `app.unternehmen.marke_id` | Marke bei der Anlage (Lizenzbericht über `katalog.marken_nutzung()`, nur Anzahlen) | |
+| `app.einladung.mandant_anlage` | Inhaber-Einladung nur über `app.mandant_anlegen()` (E-106) | Check-Constraint |
+| `katalog.uebersetzung` | Sprache, deutscher Text (Schlüssel über MD5), Übersetzung, Status maschinell/geprüft | Studio schreibt; geprüfte gewinnen beim Import (E-107) |
+| `katalog.pflicht_version_lokal`, `katalog.regelwert_version_lokal` | vorberechnete Dokumente mit `en` | Trigger bei neuen Versionen, `katalog.lokal_auffrischen()` |
+| Sichten `katalog.pflicht_version_anzeige`, `katalog.regelwert_version_anzeige` | lesende Stellen der App | |
+| `app.geraet` | Konto, Push-Token (eindeutig), Plattform, aktiv | RLS je Konto; Worker nur Geräte der Mitglieder des Unternehmens im Kontext; Registrierung über Funktion (E-108) |
+| `app.zeiteintrag` + `client_id`, `ende_client_id`, `offline`, `ende_offline` | idempotente Offline-Stempel mit Kennzeichnung | eindeutig je Unternehmen; Schutztrigger erlaubt beim Schließen nur Ende, Pause und die Felder fürs Gehen |
+
+Jede Tabelle mit `unternehmen_id` hat einen Index mit dieser Spalte vorne (0017, Schematest, E-109).
+
 ### Abrechnung (Abschnitt 1, ohne Mandanten-RLS für Stripe-Webhooks)
 
 `abo` (Plan aus Konfiguration, Status, Stripe-IDs), `abrechnungsereignis` (Webhook-Payload, idempotent). Preise stehen in Konfiguration, nicht im Code (Spezifikation 9).
