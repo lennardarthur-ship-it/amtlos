@@ -94,7 +94,7 @@ function BriefSeite({ id, foto, geaendert }: { id: string; foto?: string; geaend
     setFristArt((b.frist_art as (typeof FRISTARTEN)[number]) ?? null);
     setBetrag(b.betrag_cent);
     setNotiz(b.notiz ?? "");
-  }, [b]);
+  }, [b?.id]); // nur beim ersten Laden füllen – stilles Neuladen soll Eingaben nicht überschreiben
   const erklaerung = (t.postfach.erklaerungen as Record<string, string>)[art];
   return (
     <Unterseite titel={absender || t.postfach.neu}>

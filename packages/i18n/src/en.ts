@@ -225,7 +225,7 @@ export const en: Texte = {
     ust: "Prepare VAT advance return",
     kassen: "Cash registers",
     angaben: "Your invoice details and customers",
-    rechnungen_text: "Write, send, mark as paid.",
+    rechnungen_text: "Write and issue – with e-invoices for business customers.",
     belege_text: "Collect receipts and invoices, also from your phone.",
     ust_text: "Figures from invoices and receipts, ready to file.",
     kassen_text: "Cash registers and their notice to the tax office.",

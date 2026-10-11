@@ -44,7 +44,12 @@ export function Symbol({ name, groesse = 22, farbe, gewicht = "medium" }: { name
   const f = useFarben();
   const c = farbe ?? f.tinteLeise;
   if (istIos) return <SymbolView name={name as SymbolViewProps["name"]} size={groesse} tintColor={c} weight={gewicht} resizeMode="scaleAspectFit" style={{ width: groesse, height: groesse }} />;
-  return <Ionicons name={FALLBACK[name] ?? "ellipse-outline"} size={groesse} color={c} />;
+  // Das Ersatz-Icon ist ein Schriftzeichen – für Screenreader verbergen, sonst wird es mitgelesen
+  return (
+    <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden>
+      <Ionicons name={FALLBACK[name] ?? "ellipse-outline"} size={groesse} color={c} />
+    </View>
+  );
 }
 
 /**

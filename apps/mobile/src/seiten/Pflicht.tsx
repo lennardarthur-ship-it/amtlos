@@ -24,12 +24,15 @@ export function PflichtBlatt({ karte, offen, schliessen, geaendert }: { karte: K
   const [notiz, setNotiz] = useState("");
   // Fehlende Angabe direkt hier beantworten (E-120): der passende Fragen-Schritt öffnet sich als Blatt
   const [frageSchritt, setFrageSchritt] = useState<string | null>(null);
+  const [frageFelder, setFrageFelder] = useState<string[]>([]);
   const [profil, setProfil] = useState<Record<string, unknown>>({});
   async function angabeErgaenzen() {
     const fakt = d?.fehlende_fakten.find((x) => schrittFuerFakt(x));
     const schritt = fakt ? schrittFuerFakt(fakt) : undefined;
     if (!schritt) return;
     setProfil((await klient.profil().catch(() => ({ daten: {} }))).daten ?? {});
+    // Nur die Fragen zu den fehlenden Fakten dieses Schritts (z. B. „Fällt dein Unternehmen unter NIS2?“)
+    setFrageFelder((d?.fehlende_fakten ?? []).filter((x) => schrittFuerFakt(x) === schritt).map((x) => x.replace(/^profil\./, "")));
     setFrageSchritt(schritt);
   }
   const stempel = useRef(new Animated.Value(0)).current;
@@ -210,6 +213,7 @@ export function PflichtBlatt({ karte, offen, schliessen, geaendert }: { karte: K
           <Schnellstart
             phase="alle"
             nurSchritt={frageSchritt}
+            nurFelder={frageFelder}
             profilStart={profil}
             abbrechen={() => setFrageSchritt(null)}
             fertig={() => {

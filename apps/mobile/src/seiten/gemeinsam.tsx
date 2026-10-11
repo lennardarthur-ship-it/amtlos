@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { RefreshControl, ScrollView, View, type ScrollViewProps } from "react-native";
 import { ApiFehler, NetzFehler } from "../kern/api";
 import { T } from "../ui/bausteine";
@@ -7,7 +7,7 @@ import { useAmtlos } from "../zustand";
 
 /** Lädt Daten von der API, mit Ziehen zum Aktualisieren und verständlichen Fehlern. */
 export function useLaden<T>(laden: () => Promise<T>, abh: unknown[]) {
-  const { t } = useAmtlos();
+  const { t, stand } = useAmtlos();
   const [daten, setDaten] = useState<T | null>(null);
   const [fehler, setFehler] = useState<string | null>(null);
   const [laedt, setLaedt] = useState(false);
@@ -26,6 +26,19 @@ export function useLaden<T>(laden: () => Promise<T>, abh: unknown[]) {
   useEffect(() => {
     void neu();
   }, [neu]);
+  // Nach Änderungen irgendwo in der App still neu laden (ohne Ladekreisel), damit nichts veraltet
+  const erstes = useRef(true);
+  useEffect(() => {
+    if (erstes.current) {
+      erstes.current = false;
+      return;
+    }
+    laden().then(
+      (d) => setDaten(d),
+      () => undefined,
+    );
+    // bewusst nur bei Änderungen des Stands
+  }, [stand]);
   return { daten, fehler, laedt, neu };
 }
 

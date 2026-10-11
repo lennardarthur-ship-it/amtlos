@@ -14,7 +14,7 @@ mkdir -p "$P/pakete/i18n"
 cp -r "$APP/src" "$APP/assets" "$APP/index.ts" "$P/"
 cp -r "$I18N/src" "$P/pakete/i18n/"
 find "$P/pakete/i18n/src" -name '*.test.ts' -delete
-for paket in rules-engine fristen; do
+for paket in rules-engine fristen fachlogik; do
   test -f "$PAKETE/$paket/dist/index.js" || { echo "packages/$paket/dist fehlt – erst pnpm build"; exit 1; }
   mkdir -p "$P/pakete/$paket/dist"
   cp "$PAKETE/$paket/dist/"*.js "$P/pakete/$paket/dist/"
@@ -23,7 +23,7 @@ node - "$APP" "$P" <<'JS'
 const fs = require("node:fs");
 const [app, p] = process.argv.slice(2);
 const pkg = JSON.parse(fs.readFileSync(`${app}/package.json`, "utf8"));
-for (const k of ["@amtlos/i18n", "@amtlos/rules-engine", "@amtlos/fristen"]) delete pkg.dependencies[k]; // über tsconfig-Pfade eingebunden
+for (const k of ["@amtlos/i18n", "@amtlos/rules-engine", "@amtlos/fristen", "@amtlos/fachlogik"]) delete pkg.dependencies[k]; // über tsconfig-Pfade eingebunden
 const expoTs = require(require.resolve("typescript/package.json", { paths: [app] })).version;
 fs.writeFileSync(`${p}/package.json`, JSON.stringify({
   name: "amtlos-app", version: pkg.version, private: true, main: "index.ts",
@@ -40,6 +40,7 @@ fs.writeFileSync(`${p}/tsconfig.json`, JSON.stringify({
     "@amtlos/i18n": ["./pakete/i18n/src/index.ts"],
     "@amtlos/rules-engine": ["./pakete/rules-engine/dist/index.js"],
     "@amtlos/fristen": ["./pakete/fristen/dist/index.js"],
+    "@amtlos/fachlogik": ["./pakete/fachlogik/dist/index.js"],
   } },
   include: ["index.ts", "src", "pakete"],
 }, null, 2) + "\n");
@@ -60,6 +61,8 @@ Amtlos – Testversion für das iPhone (Demo mit Beispieldaten)
 4. Es erscheint ein QR-Code. Mit der normalen Kamera-App des iPhones scannen → „In Expo Go öffnen“.
    iPhone und Mac müssen im selben WLAN sein. Fragt der Mac, ob „node“ Verbindungen annehmen darf: Erlauben.
 5. In der App: „Ohne Konto ausprobieren“ – dann dein Unternehmen anlegen und die Fragen beantworten.
+   Unten fünf Bereiche: Heute, Pflichten, Finanzen (Belege, Rechnungen, Umsatzsteuer), Personal (Team,
+   Stempeln, Unterweisungen) und Mehr (Gründung, Behördenbriefe, Kalender, Team, Einstellungen).
    Die Pflichten rechnet die App selbst aus (gleiche Regeln wie der Server). Alles bleibt nur auf dem iPhone.
 
 Beenden: im Terminal Ctrl + C. Nächstes Mal reichen die Befehle „cd …“ und „npx expo start“.

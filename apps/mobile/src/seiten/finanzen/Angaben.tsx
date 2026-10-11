@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Kunde, Steller } from "../../kern/typen";
 import { Feld, Hinweis, Karte, Knopf, Schalter, T, Zeile } from "../../ui/bausteine";
 import { Unterseite } from "../../ui/navigation";
@@ -13,8 +13,12 @@ export function Angaben({ fertig }: { fertig?: () => void } = {}) {
     return { steller, kunden };
   }, [unternehmenId]);
   const [s, setS] = useState<Steller>({});
+  const gefuellt = useRef(false);
   useEffect(() => {
-    if (daten) setS({ ...daten.steller, name: daten.steller.name ?? ich?.unternehmen.find((u) => u.id === unternehmenId)?.name ?? "" });
+    // nur einmal vorausfüllen – stilles Neuladen soll Eingaben nicht überschreiben
+    if (!daten || gefuellt.current) return;
+    gefuellt.current = true;
+    setS({ ...daten.steller, name: daten.steller.name ?? ich?.unternehmen.find((u) => u.id === unternehmenId)?.name ?? "" });
   }, [daten, ich, unternehmenId]);
   const feld = (k: keyof Steller) => ({ wert: (s[k] as string | null | undefined) ?? "", aendern: (w: string) => setS((x) => ({ ...x, [k]: w })) });
   const aktion = useAktion();

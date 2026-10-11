@@ -4,9 +4,11 @@ React Native mit Expo SDK 57, geteilte Texte aus `@amtlos/i18n` (Deutsch/Englisc
 
 Zuerst für iPhone gebaut (E-117): Fristblatt, SF Symbols, Tableiste mit Unschärfe, Erledigt-Stempel mit Haptik.
 
-**Funktionen:** Schnellstart und Nachfragen, Heute mit einer klaren nächsten Handlung, Pflichten nach Fälligkeit gruppiert,
-Pflicht-Karte mit Erledigen, Stempeln (auch offline, mit Übertragung über `client_id`), Belege fotografieren,
-Push-Erinnerungen, Unternehmen und Sprache wählen. Angaben ändern, Nachweise, Formulare und Abo laufen am Computer.
+**Funktionen (E-120):** alles aus dem Kernumfang der Web-App – Heute, Pflichten (mit Kalender und „Angabe ergänzen“),
+Finanzen (Beleg fotografieren, Rechnungen, Belege, USt-Voranmeldung, Kassen, Angaben und Kunden), Personal (Stempeln
+auch offline, Team mit Checklisten, Arbeitszeiten, Unterweisungen, Schwellenwerte), Mehr (Gründung mit Fragebogen,
+Behördenbriefe, Kalender, Änderung melden, Team, Hilfe, Einstellungen). Nicht in der App: Dateien herunterladen und Abo.
+Rundgang durch alle Bereiche ohne Server: `e2e/rundgang.mjs` (Kopf der Datei).
 
 ```bash
 pnpm --filter @amtlos/mobile start          # Expo Dev Server (Expo Go oder Development Build)

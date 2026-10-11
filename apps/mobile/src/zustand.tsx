@@ -25,6 +25,8 @@ interface Zustand {
   unternehmenId: string | null;
   rolle: string | null;
   klient: ApiKlient;
+  /** zählt erfolgreiche Änderungen – Seiten laden dann still neu (E-120) */
+  stand: number;
   online: boolean;
   wartend: number;
   /** noch nicht übertragene Stempel (für die Anzeige „läuft seit“ ohne Netz) */
@@ -77,8 +79,9 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
   const zustand = useRef({ unternehmenId, sprache });
   zustand.current = { unternehmenId, sprache };
 
-  // Demo: dieselbe Klasse, nur die Antworten kommen aus dem Schnappschuss im Gerät
+  // Demo: dieselbe Klasse, nur die Antworten kommen aus dem Katalog und dem Stand im Gerät
   const demoAntworten = useRef<Abruf | null>(null);
+  const standSetzen = useRef<(f: (n: number) => number) => void>(() => undefined);
   const klient = useMemo(() => {
     const echt: Abruf = (url, init) => fetch(url, init as RequestInit) as unknown as ReturnType<Abruf>;
     const abruf: Abruf = (url, init) => {
@@ -88,9 +91,18 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       demoAntworten.current ??= demoAbruf(require("./demo/katalog.json") as Katalog, undefined, demoSpeicher);
       return demoAntworten.current(url, init);
     };
-    return new ApiKlient({ basis: KONFIG.apiUrl, token: async () => token.current, unternehmen: () => zustand.current.unternehmenId, sprache: () => zustand.current.sprache, abruf });
+    return new ApiKlient({
+      basis: KONFIG.apiUrl,
+      token: async () => token.current,
+      unternehmen: () => zustand.current.unternehmenId,
+      sprache: () => zustand.current.sprache,
+      abruf,
+      nachSchreiben: () => standSetzen.current((n) => n + 1),
+    });
   }, []);
   const [demo, setDemo] = useState(false);
+  const [stand, setStand] = useState(0);
+  standSetzen.current = setStand;
   const schlange = useMemo(() => new StempelWarteschlange(speicher), []);
 
   const standLaden = useCallback(async () => {
@@ -165,6 +177,7 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
     unternehmenId,
     rolle: ich?.unternehmen.find((u) => u.id === unternehmenId)?.rolle ?? null,
     klient,
+    stand,
     online,
     wartend,
     offeneStempel,

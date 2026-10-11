@@ -224,7 +224,7 @@ export const de = {
     ust: "Umsatzsteuer-Voranmeldung vorbereiten",
     kassen: "Kassen",
     angaben: "Deine Angaben auf Rechnungen und Kunden",
-    rechnungen_text: "Schreiben, versenden, als bezahlt markieren.",
+    rechnungen_text: "Schreiben und stellen – mit E-Rechnung für Geschäftskunden.",
     belege_text: "Quittungen und Rechnungen sammeln, auch vom Handy.",
     ust_text: "Zahlen aus Rechnungen und Belegen, fertig zum Übertragen.",
     kassen_text: "Kassensysteme und ihre Meldung beim Finanzamt.",

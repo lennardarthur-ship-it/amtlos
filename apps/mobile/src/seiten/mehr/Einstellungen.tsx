@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Modal, Share } from "react-native";
 import { fuelle, sichtbareSchritte } from "@amtlos/i18n";
 import type { Erinnerungen } from "../../kern/typen";
@@ -18,8 +18,10 @@ export function Einstellungen() {
   const [schritt, setSchritt] = useState<string | null>(null);
   const [kanaele, setKanaele] = useState<Erinnerungen["kanaele"]>([]);
   const [vorlauf, setVorlauf] = useState<Record<string, string>>({});
+  const gefuellt = useRef(false);
   useEffect(() => {
-    if (!daten) return;
+    if (!daten || gefuellt.current) return;
+    gefuellt.current = true;
     setKanaele(daten.erinnerungen.kanaele);
     setVorlauf(Object.fromEntries(daten.erinnerungen.kanaele.map((k) => [k.kanal, k.vorlauf_tage.join(", ")])));
   }, [daten]);

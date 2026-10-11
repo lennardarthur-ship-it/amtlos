@@ -48,6 +48,8 @@ export interface KlientEinstellungen {
   unternehmen: () => string | null;
   sprache: () => Sprache;
   abruf?: Abruf;
+  /** nach jeder erfolgreichen Änderung (POST/PUT/DELETE) – damit offene Seiten neu laden */
+  nachSchreiben?: () => void;
 }
 
 export class ApiKlient {
@@ -76,6 +78,7 @@ export class ApiKlient {
     } catch (e) {
       throw new NetzFehler((e as Error).message);
     }
+    if (r.ok && methode !== "GET") this.e.nachSchreiben?.();
     if (r.status === 204) return undefined as T;
     const j = (await r.json().catch(() => ({}))) as { meldung?: string; message?: string | string[]; fehler?: { meldung: string }[] };
     if (!r.ok) throw new ApiFehler(r.status, j.fehler?.map((f) => f.meldung).join("; ") ?? j.meldung ?? (Array.isArray(j.message) ? j.message.join("; ") : j.message) ?? `Fehler ${r.status}`, j as Record<string, unknown>);

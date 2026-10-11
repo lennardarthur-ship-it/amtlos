@@ -489,6 +489,15 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - Expo SDK auf 57 angehoben (React Native 0.86, React 19.2), weil die aktuelle Expo-Go-App nur das neueste SDK lädt.
 - Testpaket für Expo Go (`werkzeuge/testpaket.sh`): die App ohne Monorepo, Übersetzungen, Engine und Fristen über tsconfig-Pfade eingebettet, `authModus: "demo"`.
 
+### E-120 · Alle Kernbereiche auch in der App; gemeinsame Fachlogik
+- **Datum:** 2026-10-12 · **Status:** angenommen
+- Die App kann alles, was die Web-App im Kernumfang (E-110) kann – außer Dateien herunterladen (PDF/E-Rechnung, CSV-Exporte) und Bezahlen (T-49). Tabs: Heute · Pflichten · Finanzen · Personal · Mehr. Beleg fotografieren steht oben in Finanzen, Stempeln oben in Personal; Gründung, Behördenbriefe, Kalender, Änderung melden, Team, Hilfe und Einstellungen unter „Mehr“.
+- Navigation ohne zusätzliche Pakete: ein Stapel je Tab, Unterseiten schieben sich herein, Zurück per Knopf oder Wischen vom linken Rand; erneutes Tippen auf den Tab führt zur ersten Seite. Besuchte Tabs bleiben eingehängt (Scrollposition und Unterseiten bleiben erhalten).
+- Fehlende Angaben werden auf der Pflicht-Karte beantwortet – nur die Frage(n), die diese Pflicht klären, nicht der ganze Fragen-Schritt. Gleiche Bearbeitung für Fragebogen und Einstellungen.
+- Nach jeder Änderung laden geöffnete Seiten still neu; Formulare werden dabei nicht überschrieben.
+- Reine Fachlogik liegt in `@amtlos/fachlogik` (Gründungsreihenfolge, Fragebogen-Vorbereitung, Rechnungssummen, E-Rechnungs-Vollständigkeit, USt-Zeitraum und Umsätze) und `@amtlos/rules-engine` (sollInstanzen, anzeigeStatus, heuteUebersicht). Server, API und der Demo-Modus der App nutzen dieselben Funktionen.
+- Der Demo-Server der App ist in Module geteilt (kern, finanzen, personal, postfach, konto) und bildet die Controller nach; Rundgang durch alle Bereiche als Skript (`apps/mobile/e2e/rundgang.mjs`).
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

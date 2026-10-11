@@ -41,7 +41,7 @@ function formAus(f: Frage, wert: unknown, sprache: "de" | "en"): string | string
  * Schnellstart in der App (E-111, E-117): Unternehmen anlegen, dann fünf Schritte mit den Kernfragen.
  * Eine Frage je Bildschirmabschnitt, große Antwortflächen, Fortschritt oben. Nach dem letzten Schritt: Heute.
  */
-export function Schnellstart({ fertig, phase = "schnell", profilStart = {}, abbrechen, nurSchritt }: { fertig: () => void; phase?: "schnell" | "nachfragen" | "alle"; profilStart?: Record<string, unknown>; abbrechen?: () => void; /** genau einen Schritt bearbeiten (Angabe ergänzen, Einstellungen) */ nurSchritt?: string }) {
+export function Schnellstart({ fertig, phase = "schnell", profilStart = {}, abbrechen, nurSchritt, nurFelder }: { fertig: () => void; phase?: "schnell" | "nachfragen" | "alle"; profilStart?: Record<string, unknown>; abbrechen?: () => void; /** genau einen Schritt bearbeiten (Angabe ergänzen, Einstellungen) */ nurSchritt?: string; /** nur diese Fragen (Profilfelder) – eine Pflicht klären, ohne den ganzen Schritt */ nurFelder?: string[] }) {
   const { t, sprache, klient, ich, anmeldenAktualisieren, demo, abmelden } = useAmtlos();
   const f = useFarben();
   const [name, setName] = useState("");
@@ -65,7 +65,9 @@ export function Schnellstart({ fertig, phase = "schnell", profilStart = {}, abbr
     [phase, basis, profil, nurSchritt],
   );
   const schritt = schritte[pos];
-  const fragen = schritt ? fragenJePhase(schritt, phase, basis) : [];
+  const alleFragen = schritt ? fragenJePhase(schritt, phase, basis) : [];
+  const gefiltert = nurFelder?.length ? alleFragen.filter((fr) => nurFelder.includes(fr.feld)) : alleFragen;
+  const fragen = gefiltert.length ? gefiltert : alleFragen;
   const gesamt = schritte.reduce((n, s) => n + fragenJePhase(s, phase, basis).length, 0);
   const bisher = schritte.slice(0, Math.max(0, pos)).reduce((n, s) => n + fragenJePhase(s, phase, basis).length, 0);
 

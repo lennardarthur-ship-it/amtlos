@@ -88,7 +88,7 @@ function RechnungSeite({ id, geaendert }: { id: string | null; geaendert: () => 
     setFaellig(r.faellig_am);
     setHinweis(r.hinweis ?? "");
     setPos(r.positionen.length ? r.positionen.map((p) => ({ bezeichnung: p.bezeichnung, menge: String(p.menge).replace(".", ","), einheit: p.einheit, preis_cent: p.preis_cent, ust_art: p.ust_art === "ermaessigt" ? "ermaessigt" : "regel" })) : [leerePosition()]);
-  }, [r]);
+  }, [r?.id, r?.status]); // nur beim Laden/Statuswechsel – stilles Neuladen soll Eingaben nicht überschreiben
 
   const entwurf = !r || r.status === "entwurf";
   const menge = (x: string) => Number(x.replace(",", "."));
@@ -129,14 +129,8 @@ function RechnungSeite({ id, geaendert }: { id: string | null; geaendert: () => 
   return (
     <Unterseite titel={r?.nummer ?? (rid ? t.rechnung.entwurf : t.rechnung.neu)}>
       <Inhalt>
-        {aktion.fehler ? <Hinweis art="fehler" text={aktion.fehler} /> : null}
-        {aktion.meldung ? <Hinweis art="erfolg" text={aktion.meldung} /> : null}
-        {fehlend.length ? (
-          <View>
-            <Hinweis art="fehler" text={fuelle(t.rechnung.fehlend, { liste: fehlend.map((x) => namen[x.replaceAll(".", "_")] ?? x).join(", ") })} />
-            {fehlend.some((x) => x.startsWith("steller") || x.startsWith("kunde")) ? <Knopf leise text={t.mobil.angaben_kurz} onPress={() => nav.oeffnen("angaben", () => <Angaben fertig={() => void neu()} />)} stil={{ alignSelf: "flex-start" }} /> : null}
-          </View>
-        ) : null}
+        {!entwurf && aktion.meldung ? <Hinweis art="erfolg" text={aktion.meldung} /> : null}
+        {!entwurf && aktion.fehler ? <Hinweis art="fehler" text={aktion.fehler} /> : null}
         {!entwurf && r ? (
           <>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
@@ -199,6 +193,15 @@ function RechnungSeite({ id, geaendert }: { id: string | null; geaendert: () => 
               <T fett stil={{ fontVariant: ["tabular-nums"] }}>{euroText(netto, sprache)}</T>
             </View>
             {!ku ? <T v="caption" leise>{t.mobil.ust_beim_stellen}</T> : null}
+            {/* Rückmeldung dort, wo der Knopf ist – sonst stünde sie außer Sicht oben */}
+            {aktion.fehler ? <Hinweis art="fehler" text={aktion.fehler} /> : null}
+            {aktion.meldung ? <Hinweis art="erfolg" text={aktion.meldung} /> : null}
+            {fehlend.length ? (
+              <View>
+                <Hinweis art="fehler" text={fuelle(t.rechnung.fehlend, { liste: fehlend.map((x) => namen[x.replaceAll(".", "_")] ?? x).join(", ") })} />
+                {fehlend.some((x) => x.startsWith("steller") || x.startsWith("kunde")) ? <Knopf leise text={t.mobil.angaben_kurz} onPress={() => nav.oeffnen("angaben", () => <Angaben fertig={() => void neu()} />)} stil={{ alignSelf: "flex-start" }} /> : null}
+              </View>
+            ) : null}
             <Knopf text={t.rechnung.stellen} symbol="checkmark" onPress={() => void stellen()} laedt={aktion.laedt} deaktiviert={!positionen.length || !kunde} stil={{ marginTop: 20 }} />
             <T v="caption" leise stil={{ marginTop: 6 }}>{t.rechnung.stellen_text}</T>
             <Knopf leise text={t.rechnung.speichern} onPress={() => void speichern()} laedt={aktion.laedt} stil={{ marginTop: 12 }} />
