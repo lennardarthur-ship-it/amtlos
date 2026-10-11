@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 import { z } from "zod";
-import { Datenbank, ProtokollVersand, erzeugeWarteschlange, type Nachricht, type Versand } from "@amtlos/server";
+import { Datenbank, ExpoPush, ProtokollVersand, erzeugeWarteschlange, type Nachricht, type PushNachricht, type Versand } from "@amtlos/server";
 import { arbeiterStarten, type Protokoll } from "./arbeit.js";
 
 const Konfig = z
@@ -10,6 +10,9 @@ const Konfig = z
     WEB_URL: z.string().url().default("http://localhost:3000"),
     SMTP_URL: z.string().url().optional(),
     MAIL_ABSENDER: z.string().default("Amtlos <erinnerung@amtlos.de>"),
+    // Push an die mobile App (E-108): aus, bis Anbieter und AVV geklärt sind (T-41)
+    PUSH_ANBIETER: z.enum(["aus", "expo"]).default("aus"),
+    EXPO_ZUGANGSTOKEN: z.string().optional(),
   })
   .superRefine((k, ctx) => {
     if ((k.UMGEBUNG === "prod" || k.UMGEBUNG === "staging") && !k.SMTP_URL)
@@ -32,15 +35,24 @@ class SmtpVersand implements Versand {
   }
 }
 
+/** E-Mail über den gewählten Weg, Push optional über Expo. */
+function versandMitPush(basis: Versand, push?: ExpoPush): Versand {
+  if (!push) return { email: (n) => basis.email(n) };
+  return { email: (n) => basis.email(n), push: (n: PushNachricht) => push.senden(n) };
+}
+
 const k = Konfig.parse(process.env);
 const db = new Datenbank({ connectionString: k.WORKER_DATABASE_URL, max: 10 });
 const boss = erzeugeWarteschlange(k.WORKER_DATABASE_URL, { planen: true });
 boss.on("error", (e) => log.fehler("warteschlange", { meldung: e.message }));
-const versand: Versand = k.SMTP_URL ? new SmtpVersand(k.SMTP_URL, k.MAIL_ABSENDER) : new ProtokollVersand();
+const versand: Versand = versandMitPush(
+  k.SMTP_URL ? new SmtpVersand(k.SMTP_URL, k.MAIL_ABSENDER) : new ProtokollVersand(),
+  k.PUSH_ANBIETER === "expo" ? new ExpoPush(k.EXPO_ZUGANGSTOKEN) : undefined,
+);
 
 await boss.start();
 await arbeiterStarten(boss, db, versand, k.WEB_URL, log);
-log.info("worker_gestartet", { umgebung: k.UMGEBUNG, versand: k.SMTP_URL ? "smtp" : "protokoll" });
+log.info("worker_gestartet", { umgebung: k.UMGEBUNG, versand: k.SMTP_URL ? "smtp" : "protokoll", push: k.PUSH_ANBIETER });
 
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.once(signal, async () => {

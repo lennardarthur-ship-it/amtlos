@@ -2,6 +2,8 @@ import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { sichtbareSchritte } from "@amtlos/i18n";
+import { redirect } from "next/navigation";
+import { senden } from "@/lib/aktion";
 import { api, apiAntwort } from "@/lib/api";
 import { SPRACH_COOKIE, t } from "@/lib/sprache";
 
@@ -16,8 +18,24 @@ async function spracheSetzen(formular: FormData) {
   revalidatePath("/", "layout");
 }
 
-export default async function Einstellungen() {
-  const [{ s, t: x }, profil] = await Promise.all([t(), api<{ daten: Record<string, unknown> }>("/v1/profil")]);
+interface Kanal { kanal: "email" | "push"; aktiv: boolean; vorlauf_tage: number[] }
+
+async function erinnerungenSetzen(f: FormData) {
+  "use server";
+  const tage = (k: string) => [...new Set(String(f.get(`${k}_tage`) ?? "").split(/[\s,;]+/).map(Number).filter((n) => Number.isInteger(n) && n >= 0 && n <= 90))].sort((a, b) => b - a).slice(0, 5);
+  const kanaele = (["email", "push"] as const).map((k) => ({ kanal: k, aktiv: f.get(`${k}_aktiv`) === "on", vorlauf_tage: tage(k).length ? tage(k) : [14, 3] }));
+  await senden("/v1/benachrichtigungen/einstellungen", "PUT", { kanaele }, "/einstellungen");
+  revalidatePath("/einstellungen");
+  redirect("/einstellungen?gespeichert=erinnerungen#erinnerungen");
+}
+
+export default async function Einstellungen({ searchParams }: { searchParams: Promise<{ gespeichert?: string; fehler?: string }> }) {
+  const [{ s, t: x }, profil, erinnerung, { gespeichert, fehler }] = await Promise.all([
+    t(),
+    api<{ daten: Record<string, unknown> }>("/v1/profil"),
+    api<{ geraet_vorhanden: boolean; kanaele: Kanal[] }>("/v1/benachrichtigungen/einstellungen"),
+    searchParams,
+  ]);
   return (
     <div className="lesetext space-y-10">
       <h1 className="text-titel font-bold">{x.einstellungen.titel}</h1>
@@ -36,6 +54,31 @@ export default async function Einstellungen() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section aria-labelledby="erinnerungen" className="space-y-3">
+        <h2 id="erinnerungen" className="text-gross font-bold">{x.einstellungen.erinnerungen}</h2>
+        <p className="text-tinte-leise">{x.einstellungen.erinnerungen_text}</p>
+        {gespeichert === "erinnerungen" ? <p role="status" className="rounded-md bg-amt-hauch p-3 font-bold text-amt">{x.einstellungen.gespeichert}</p> : null}
+        {fehler ? <p role="alert" className="rounded-md border-2 border-frist bg-frist-hauch p-3">{fehler}</p> : null}
+        <form action={erinnerungenSetzen} className="space-y-4">
+          {erinnerung.kanaele.map((k) => (
+            <fieldset key={k.kanal} className="space-y-2 rounded-md border border-linie p-3">
+              <legend className="px-1 font-bold">{x.einstellungen.kanal[k.kanal]}</legend>
+              <label className="flex items-center gap-2">
+                <input type="checkbox" name={`${k.kanal}_aktiv`} defaultChecked={k.aktiv} className="size-5" disabled={k.kanal === "push" && !erinnerung.geraet_vorhanden} />
+                {x.einstellungen.aktiv}
+              </label>
+              {k.kanal === "push" && !erinnerung.geraet_vorhanden ? <p className="text-klein text-tinte-leise">{x.einstellungen.push_ohne_geraet}</p> : null}
+              <div>
+                <label htmlFor={`${k.kanal}_tage`} className="block text-klein font-bold">{x.einstellungen.vorlauf}</label>
+                <input id={`${k.kanal}_tage`} name={`${k.kanal}_tage`} defaultValue={k.vorlauf_tage.join(", ")} inputMode="numeric" className="feld mt-1 max-w-48" aria-describedby={`${k.kanal}_tage_hilfe`} />
+                <p id={`${k.kanal}_tage_hilfe`} className="mt-1 text-klein text-tinte-leise">{x.einstellungen.vorlauf_hilfe}</p>
+              </div>
+            </fieldset>
+          ))}
+          <button className="knopf knopf-leise">{x.einstellungen.erinnerungen_speichern}</button>
+        </form>
       </section>
 
       <section aria-labelledby="sprache">

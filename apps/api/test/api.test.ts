@@ -9,7 +9,7 @@ import { SignJWT } from "jose";
 import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { StandardKalender } from "@amtlos/fristen";
-import { Datenbank, JOBS, ProtokollVersand, erzeugeWarteschlange, importiereKatalog, neuberechnen, versendeMarktplatzAnfrage } from "@amtlos/server";
+import { Datenbank, JOBS, ProtokollVersand, erzeugeWarteschlange, importiereKatalog, neuberechnen, planeErinnerungen, versendeFaelligeErinnerungen, versendeMarktplatzAnfrage } from "@amtlos/server";
 import { DB_VERFUEGBAR, WURZEL, frischeDatenbank } from "@amtlos/server/testhilfen";
 import { erzeugeApp } from "../src/main.js";
 
@@ -543,6 +543,25 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       await apiDb.schliessen();
     });
 
+
+    it("Offline-Stempel der App: idempotent über client_id, gekennzeichnet, nur plausible Zeitpunkte", async () => {
+      const basis = Date.now();
+      const vor = (min: number) => new Date(basis - min * 60_000).toISOString();
+      const kid = "6f1c2b8e-1111-4a1a-9a9a-000000000001";
+      const gid = "6f1c2b8e-1111-4a1a-9a9a-000000000002";
+      await alsLea(http().post("/v1/zeiten/kommen")).send({ beschaeftigter_id: person, zeitpunkt: vor(90) }).expect(422); // ohne client_id
+      await alsLea(http().post("/v1/zeiten/kommen")).send({ beschaeftigter_id: person, client_id: kid, zeitpunkt: vor(-30) }).expect(422); // Zukunft
+      await alsLea(http().post("/v1/zeiten/kommen")).send({ beschaeftigter_id: person, client_id: kid, zeitpunkt: vor(73 * 60) }).expect(422); // zu alt
+      const a = (await alsLea(http().post("/v1/zeiten/kommen")).send({ beschaeftigter_id: person, client_id: kid, zeitpunkt: vor(90) }).expect(201)).body;
+      expect(a).toMatchObject({ offline: true, quelle: "stempel", client_id: kid });
+      const b = (await alsLea(http().post("/v1/zeiten/kommen")).send({ beschaeftigter_id: person, client_id: kid, zeitpunkt: vor(90) }).expect(201)).body;
+      expect(b.id).toBe(a.id); // zweite Übertragung derselben Aktion
+      const g = (await alsLea(http().post("/v1/zeiten/gehen")).send({ beschaeftigter_id: person, client_id: gid, zeitpunkt: vor(10), pause_minuten: 15 }).expect(201)).body;
+      expect(g).toMatchObject({ id: a.id, ende_offline: true, pause_minuten: 15 });
+      const g2 = (await alsLea(http().post("/v1/zeiten/gehen")).send({ beschaeftigter_id: person, client_id: gid, zeitpunkt: vor(10), pause_minuten: 15 }).expect(201)).body;
+      expect(g2.id).toBe(a.id);
+      expect(new Date(g.ende).getTime() - new Date(g.beginn).getTime()).toBe(80 * 60_000);
+    });
     it("Gefährdungsbeurteilung: Gefährdungen mit Maßnahmen, Abschluss mit PDF erledigt die Pflichten, danach nur Umsetzung", async () => {
       const b = (await alsLea(http().post("/v1/gefaehrdungsbeurteilungen")).send({ arbeitsbereich: "Backstube", taetigkeiten: "Teig, Ofen", beurteilt_von: "Lea", datum: heuteIso, mutterschutz: true }).expect(201)).body;
       await alsLea(http().post(`/v1/gefaehrdungsbeurteilungen/${b.id}/abschliessen`)).expect(422);
@@ -997,6 +1016,50 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       const a = (await alsAnna(http().post("/v1/frage")).set("X-Sprache", "en").send({ frage: "Do I have to submit an advance VAT return?" }).expect(201)).body;
       expect(a.treffer[0]).toMatchObject({ pflicht_id: "steuern.ust_voranmeldung" });
       expect(a.treffer[0].titel).toMatch(/VAT/);
+    });
+  });
+
+  describe("Abschnitt 10: Mobile App", () => {
+    it("Dev-Token für die App nur in dev/test; Geräte registrieren und abmelden", async () => {
+      await http().post("/v1/dev/token").send({ kennung: "A B" }).expect(422);
+      const t = (await http().post("/v1/dev/token").send({ kennung: "app-nutzerin" }).expect(201)).body.token as string;
+      const als = (r: request.Test) => r.set("Authorization", `Bearer ${t}`);
+      expect((await als(http().get("/v1/ich")).expect(200)).body.konto.email).toBe("app-nutzerin@example.org");
+      await als(http().post("/v1/geraete")).send({ push_token: "kurz", plattform: "ios" }).expect(422);
+      const g = (await als(http().post("/v1/geraete")).send({ push_token: "ExponentPushToken[abcdefghijklmnop]", plattform: "ios", name: "iPhone" }).expect(201)).body;
+      // Dasselbe Token von einem anderen Konto: gehört jetzt diesem Konto
+      await alsAnna(http().post("/v1/geraete")).send({ push_token: "ExponentPushToken[abcdefghijklmnop]", plattform: "ios" }).expect(201);
+      expect((await als(http().get("/v1/geraete")).expect(200)).body).toEqual([]);
+      const annas = (await alsAnna(http().get("/v1/geraete")).expect(200)).body;
+      expect(annas).toHaveLength(1);
+      await als(http().delete(`/v1/geraete/${g.id}`)).expect(404); // fremdes Gerät
+      await alsAnna(http().delete(`/v1/geraete/${annas[0].id}`)).expect(204);
+    });
+
+    it("Benachrichtigungseinstellungen und Push-Erinnerungen an registrierte Geräte", async () => {
+      const e0 = (await alsAnna(http().get("/v1/benachrichtigungen/einstellungen")).expect(200)).body;
+      expect(e0).toMatchObject({ eigene: false, geraet_vorhanden: false, kanaele: [{ kanal: "email", aktiv: true, vorlauf_tage: [14, 3] }, { kanal: "push", aktiv: false }] });
+      await alsAnna(http().put("/v1/benachrichtigungen/einstellungen")).send({ kanaele: [{ kanal: "sms", aktiv: true, vorlauf_tage: [1] }] }).expect(422);
+      await alsAnna(http().post("/v1/geraete")).send({ push_token: "ExponentPushToken[UNGUELTIG-annas-altes]", plattform: "android" }).expect(201);
+      await alsAnna(http().post("/v1/geraete")).send({ push_token: "ExponentPushToken[annas-neues-telefon]", plattform: "android" }).expect(201);
+      const e1 = (await alsAnna(http().put("/v1/benachrichtigungen/einstellungen")).send({ kanaele: [{ kanal: "email", aktiv: true, vorlauf_tage: [7] }, { kanal: "push", aktiv: true, vorlauf_tage: [7, 1] }] }).expect(200)).body;
+      expect(e1).toMatchObject({ eigene: true, geraet_vorhanden: true, kanaele: [{ kanal: "email", vorlauf_tage: [7] }, { kanal: "push", vorlauf_tage: [7, 1] }] });
+      // Erinnerungen planen und sofort fällig machen
+      await worker.imKontext({ unternehmenId: firma }, (tx) => planeErinnerungen(tx, firma));
+      const n = await worker.imKontext({ unternehmenId: firma }, async (tx) => {
+        const r = await tx.abfrage("update app.erinnerung set geplant_fuer = now() - interval '1 minute' where unternehmen_id = $1 and kanal = 'push' and status = 'geplant' and id = (select id from app.erinnerung where unternehmen_id = $1 and kanal = 'push' and status = 'geplant' order by geplant_fuer limit 1) returning id", [firma]);
+        await tx.abfrage("update app.erinnerung set geplant_fuer = now() + interval '30 days' where unternehmen_id = $1 and status = 'geplant' and geplant_fuer < now() and kanal <> 'push'", [firma]);
+        return r.length;
+      });
+      expect(n).toBe(1);
+      const versand = new ProtokollVersand();
+      await versendeFaelligeErinnerungen(worker, versand, "https://app.amtlos.test");
+      expect(versand.pushes).toHaveLength(1);
+      expect(versand.pushes[0]!.tokens.sort()).toEqual(["ExponentPushToken[UNGUELTIG-annas-altes]", "ExponentPushToken[annas-neues-telefon]"]);
+      expect(versand.pushes[0]!.link).toMatch(/^\/pflichten\//);
+      // Das vom Dienst als ungültig gemeldete Token ist abgemeldet
+      expect((await alsAnna(http().get("/v1/geraete")).expect(200)).body).toHaveLength(1);
+      await alsAnna(http().put("/v1/benachrichtigungen/einstellungen")).send({ kanaele: [{ kanal: "email", aktiv: true, vorlauf_tage: [14, 3] }, { kanal: "push", aktiv: false, vorlauf_tage: [14, 3] }] }).expect(200);
     });
   });
 });

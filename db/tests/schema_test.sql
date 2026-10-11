@@ -316,6 +316,17 @@ select pg_temp.erwarte_fehler($$insert into katalog.marke (schluessel, name, far
 select pg_temp.ok(true, 'Farben nur als #rrggbb');
 reset role;
 
+-- ---------- Mobil (0016) ----------
+set role api_user;
+select set_config('amtlos.konto_id', :'anna_konto_anmelden', false);
+select app.geraet_registrieren('ExponentPushToken[schema-test-1]', 'ios', 'Test');
+select pg_temp.ok((select count(*) = 1 from app.geraet where push_token = 'ExponentPushToken[schema-test-1]'), 'Gerät registriert');
+select set_config('amtlos.konto_id', :'ben_konto_anmelden', false);
+select pg_temp.ok((select count(*) = 0 from app.geraet where push_token = 'ExponentPushToken[schema-test-1]'), 'Fremde Geräte sind unsichtbar');
+select pg_temp.erwarte_fehler($$insert into app.geraet (konto_id, push_token, plattform) values (gen_random_uuid(), 'ExponentPushToken[x-direkt]', 'ios')$$, 'permission denied');
+select pg_temp.ok(true, 'Geräte nur über die Registrierungsfunktion');
+reset role;
+
 -- ---------- Audit ----------
 select pg_temp.ok((select count(*) > 10 from audit.ereignis), 'Audit protokolliert Änderungen');
 select pg_temp.ok((select bool_and(vorgaenger_hash is not null) from audit.ereignis where id > (select min(id) from audit.ereignis)), 'Hash-Kette lückenlos');

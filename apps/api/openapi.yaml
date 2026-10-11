@@ -23,6 +23,7 @@ security:
 tags:
   - name: Konto
   - name: Kanzlei
+  - name: Mobil
   - name: Profil und Ereignisse
   - name: Pflichten
   - name: Kalender
@@ -676,9 +677,9 @@ paths:
   /v1/zeiten/kommen:
     post:
       tags: [Personal]
-      summary: Kommen stempeln
+      summary: Kommen stempeln; offline erfasste Stempel mit client_id (idempotent) und zeitpunkt vom Gerät (≤ 72 h alt)
       parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
-      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [beschaeftigter_id], properties: { beschaeftigter_id: { type: string, format: uuid } } } } } }
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [beschaeftigter_id], properties: { beschaeftigter_id: { type: string, format: uuid }, client_id: { type: string, format: uuid }, zeitpunkt: { type: string, format: date-time } } } } } }
       responses:
         "201": { description: Gestempelt }
         "409": { description: Läuft schon }
@@ -688,7 +689,7 @@ paths:
       tags: [Personal]
       summary: Gehen stempeln (schließt den offenen Eintrag)
       parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
-      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [beschaeftigter_id], properties: { beschaeftigter_id: { type: string, format: uuid }, pause_minuten: { type: integer, minimum: 0 } } } } } }
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [beschaeftigter_id], properties: { beschaeftigter_id: { type: string, format: uuid }, pause_minuten: { type: integer, minimum: 0 }, client_id: { type: string, format: uuid }, zeitpunkt: { type: string, format: date-time } } } } } }
       responses:
         "201": { description: Gestempelt }
         "404": { description: Nichts offen }
@@ -1707,6 +1708,55 @@ paths:
       responses:
         "200": { description: OK, content: { application/json: { schema: { type: object, properties: { schluessel: { type: string }, name: { type: string }, farbe_hell: { type: string }, farbe_dunkel: { type: string }, logo_url: { type: string, nullable: true }, support_email: { type: string, nullable: true } } } } } }
         "404": { description: Keine Marke }
+
+  /v1/geraete:
+    get:
+      tags: [Mobil]
+      summary: Eigene Geräte mit Push
+      responses:
+        "200": { description: OK }
+    post:
+      tags: [Mobil]
+      summary: Gerät für Push registrieren (Token der App; gehört dem zuletzt angemeldeten Konto)
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [push_token, plattform], additionalProperties: false, properties: { push_token: { type: string }, plattform: { type: string, enum: [ios, android] }, name: { type: string, maxLength: 100 } } } } } }
+      responses:
+        "201": { description: Registriert }
+        "422": { $ref: "#/components/responses/Eingabefehler" }
+
+  /v1/geraete/{id}:
+    delete:
+      tags: [Mobil]
+      summary: Gerät abmelden (keine Pushes mehr)
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "204": { description: Abgemeldet }
+        "404": { description: Nicht gefunden }
+
+  /v1/benachrichtigungen/einstellungen:
+    get:
+      tags: [Mobil]
+      summary: Eigene Erinnerungskanäle (E-Mail, Push) und Vorlauf in diesem Unternehmen
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK }
+    put:
+      tags: [Mobil]
+      summary: Erinnerungskanäle setzen
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [kanaele], properties: { kanaele: { type: array, items: { type: object, properties: { kanal: { type: string, enum: [email, push] }, aktiv: { type: boolean }, vorlauf_tage: { type: array, items: { type: integer } } } } } } } } } }
+      responses:
+        "200": { description: Gespeichert }
+        "422": { $ref: "#/components/responses/Eingabefehler" }
+
+  /v1/dev/token:
+    post:
+      tags: [Mobil]
+      summary: Nur Entwicklung/Test (AUTH_MODUS=dev) – Anmeldetoken für die App ohne Identity-Provider
+      security: []
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [kennung], properties: { kennung: { type: string } } } } } }
+      responses:
+        "201": { description: Token }
+        "403": { description: Nicht in dieser Umgebung }
 
 components:
   securitySchemes:

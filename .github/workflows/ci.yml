@@ -26,6 +26,11 @@ jobs:
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
+      - name: Mobile App bündeln (Metro, Android und iOS)
+        run: |
+          cd apps/mobile
+          CI=1 npx expo export --platform android --output-dir ../../mobile-export/android
+          CI=1 npx expo export --platform ios --output-dir ../../mobile-export/ios
 
   datenbank:
     name: Datenbank- und Integrationstests (PostgreSQL 16)

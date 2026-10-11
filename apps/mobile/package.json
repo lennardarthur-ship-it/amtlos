@@ -1,0 +1,35 @@
+{
+  "name": "@amtlos/mobile",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.ts",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "eslint src test"
+  },
+  "dependencies": {
+    "@amtlos/i18n": "workspace:*",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "expo": "~54.0.37",
+    "expo-auth-session": "~7.0.11",
+    "expo-constants": "~18.0.14",
+    "expo-crypto": "~15.0.9",
+    "expo-device": "~8.0.10",
+    "expo-image-picker": "~17.0.11",
+    "expo-localization": "~17.0.9",
+    "expo-notifications": "~0.32.17",
+    "expo-secure-store": "~15.0.8",
+    "expo-status-bar": "~3.0.9",
+    "expo-web-browser": "~15.0.11",
+    "react": "19.1.0",
+    "react-native": "0.81.5",
+    "react-native-safe-area-context": "~5.6.0"
+  },
+  "devDependencies": {
+    "@types/react": "~19.1.10"
+  }
+}

@@ -49,11 +49,17 @@ export async function planeErinnerungen(tx: Tx, unternehmenId: string, stichtag:
     [unternehmenId],
   );
 
+  // Konten mit registriertem Gerät bekommen ohne eigene Einstellung zusätzlich Push (E-108)
+  const mitGeraet = new Set(
+    (await tx.abfrage<{ konto_id: string }>("select distinct konto_id from app.geraet where aktiv and konto_id = any($1)", [empfaenger.map((e) => e.konto_id)])).map((g) => g.konto_id),
+  );
+
   const jetzt = Date.now();
   let anzahl = 0;
   for (const { konto_id } of empfaenger) {
     const eigene = einstellungen.filter((e) => e.konto_id === konto_id);
-    const kanaele = eigene.length ? eigene.filter((e) => e.aktiv) : [{ kanal: "email", vorlauf: undefined as unknown[] | undefined }];
+    const standard = [{ kanal: "email", vorlauf: undefined as unknown[] | undefined }, ...(mitGeraet.has(konto_id) ? [{ kanal: "push", vorlauf: undefined as unknown[] | undefined }] : [])];
+    const kanaele = eigene.length ? eigene.filter((e) => e.aktiv && (e.kanal !== "push" || mitGeraet.has(konto_id))) : standard;
     for (const k of kanaele) {
       for (const i of instanzen) {
         const vorlauf = vorlaufJePflicht.get(i.pflicht_id) ?? (k.vorlauf?.length ? k.vorlauf.map((v) => intervallZuDauer(v as string)) : STANDARD_VORLAUF);
@@ -84,15 +90,31 @@ export interface Nachricht {
   text: string;
 }
 
+/** Push an die Geräte eines Kontos. Rückgabe: Tokens, die der Dienst als ungültig meldet (werden abgemeldet). */
+export interface PushNachricht {
+  tokens: string[];
+  titel: string;
+  text: string;
+  /** Ziel in der App, z. B. /pflichten/… */
+  link: string;
+}
+
 /** Versandweg. Konkreter Anbieter (EU, AVV) wird vor Livegang gewählt; bis dahin Protokoll oder SMTP. */
 export interface Versand {
   email(n: Nachricht): Promise<void>;
+  /** Ohne Push-Anbieter fehlt die Methode: Push-Erinnerungen werden dann verworfen. */
+  push?(n: PushNachricht): Promise<{ ungueltig: string[] }>;
 }
 
 export class ProtokollVersand implements Versand {
   readonly gesendet: Nachricht[] = [];
+  readonly pushes: PushNachricht[] = [];
   async email(n: Nachricht): Promise<void> {
     this.gesendet.push(n);
+  }
+  async push(n: PushNachricht): Promise<{ ungueltig: string[] }> {
+    this.pushes.push(n);
+    return { ungueltig: n.tokens.filter((t) => t.includes("UNGUELTIG")) };
   }
 }
 
@@ -105,8 +127,8 @@ export async function versendeFaelligeErinnerungen(db: Datenbank, versand: Versa
   for (const unternehmenId of new Set(faellig.map((f) => f.unternehmen_id))) {
     const ids = faellig.filter((f) => f.unternehmen_id === unternehmenId).map((f) => f.erinnerung_id);
     await db.imKontext({ unternehmenId }, async (tx) => {
-      const zeilen = await tx.abfrage<{ id: string; kanal: string; email: string; sprache: string; faellig_am: Datum; titel: { de: string; en?: string }; pflicht_id: string; periode: string }>(
-        `select e.id, e.kanal, k.email, k.sprache, pi.faellig_am, pv.daten->'titel' as titel, pi.pflicht_id, pi.periode
+      const zeilen = await tx.abfrage<{ id: string; kanal: string; konto_id: string; email: string; sprache: string; faellig_am: Datum; titel: { de: string; en?: string }; pflicht_id: string; periode: string }>(
+        `select e.id, e.kanal, e.konto_id, k.email, k.sprache, pi.faellig_am, pv.daten->'titel' as titel, pi.pflicht_id, pi.periode
            from app.erinnerung e
            join app.konto k on k.id = e.konto_id
            join app.pflicht_instanz pi on pi.id = e.pflicht_instanz_id
@@ -117,17 +139,24 @@ export async function versendeFaelligeErinnerungen(db: Datenbank, versand: Versa
       );
       for (const z2 of zeilen) {
         try {
+          const titel = (z2.sprache === "en" && z2.titel.en) || z2.titel.de;
+          const datum = new Date(`${z2.faellig_am}T12:00:00Z`).toLocaleDateString(z2.sprache === "en" ? "en-GB" : "de-DE", { timeZone: "UTC", day: "2-digit", month: "2-digit", year: "numeric" });
+          const betreff = z2.sprache === "en" ? `Due on ${datum}: ${titel}` : `Fällig am ${datum}: ${titel}`;
+          const pfad = `/pflichten/${encodeURIComponent(z2.pflicht_id)}/${encodeURIComponent(z2.periode)}`;
+          let status = "verworfen"; // sms: erst nach Anbieterwahl
           if (z2.kanal === "email") {
-            const titel = (z2.sprache === "en" && z2.titel.en) || z2.titel.de;
-            const datum = new Date(`${z2.faellig_am}T12:00:00Z`).toLocaleDateString(z2.sprache === "en" ? "en-GB" : "de-DE", { timeZone: "UTC", day: "2-digit", month: "2-digit", year: "numeric" });
-            await versand.email({
-              an: z2.email,
-              betreff: z2.sprache === "en" ? `Due on ${datum}: ${titel}` : `Fällig am ${datum}: ${titel}`,
-              text: `${titel}\n\n${appUrl}/pflichten/${encodeURIComponent(z2.pflicht_id)}/${encodeURIComponent(z2.periode)}`,
-            });
+            await versand.email({ an: z2.email, betreff, text: `${titel}\n\n${appUrl}${pfad}` });
+            status = "gesendet";
+          } else if (z2.kanal === "push" && versand.push) {
+            const tokens = (await tx.abfrage<{ push_token: string }>("select push_token from app.geraet where konto_id = $1 and aktiv", [z2.konto_id])).map((g) => g.push_token);
+            if (tokens.length) {
+              // Push zeigt nur Titel und Datum (Sperrbildschirm), keine weiteren Unternehmensdaten
+              const r = await versand.push({ tokens, titel: betreff, text: z2.sprache === "en" ? "Open Amtlos to see what to do." : "Öffne Amtlos, um zu sehen, was zu tun ist.", link: pfad });
+              if (r.ungueltig.length) await tx.abfrage("update app.geraet set aktiv = false where push_token = any($1)", [r.ungueltig]);
+              status = "gesendet";
+            }
           }
-          // push/sms: ab Abschnitt 10 bzw. nach Anbieterwahl; bis dahin als verworfen markieren
-          await tx.abfrage("update app.erinnerung set status = $2, gesendet_am = now() where id = $1", [z2.id, z2.kanal === "email" ? "gesendet" : "verworfen"]);
+          await tx.abfrage("update app.erinnerung set status = $2, gesendet_am = now() where id = $1", [z2.id, status]);
           z.gesendet++;
         } catch {
           await tx.abfrage("update app.erinnerung set status = 'fehler' where id = $1", [z2.id]);

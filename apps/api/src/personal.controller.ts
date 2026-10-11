@@ -31,6 +31,19 @@ const UnterweisungNeu = z
   .strict();
 const Bestaetigen = z.object({ beschaeftigter_id: Uuid, name: z.string().trim().min(1).max(200) }).strict();
 const Zeitpunkt = z.string().datetime({ offset: true });
+/** Stempel: Zeitpunkt vom Gerät nur mit client_id und nur plausibel (höchstens 72 Stunden alt, nicht in der Zukunft). */
+const STEMPEL = { beschaeftigter_id: Uuid, client_id: Uuid.optional(), zeitpunkt: z.string().datetime({ offset: true }).optional() };
+function stempelPruefen<T extends z.ZodRawShape>(form: T) {
+  return z
+    .object({ ...STEMPEL, ...form })
+    .strict()
+    .refine((d) => !d.zeitpunkt || d.client_id, { message: "Offline-Stempel brauchen eine client_id", path: ["client_id"] })
+    .refine((d) => !d.zeitpunkt || new Date(d.zeitpunkt).getTime() <= Date.now() + 2 * 60_000, { message: "Zeitpunkt liegt in der Zukunft", path: ["zeitpunkt"] })
+    .refine((d) => !d.zeitpunkt || new Date(d.zeitpunkt).getTime() >= Date.now() - 72 * 3600_000, { message: "Offline-Stempel älter als 72 Stunden – bitte als Nachtrag mit Grund erfassen", path: ["zeitpunkt"] });
+}
+const Kommen = stempelPruefen({});
+const Gehen = stempelPruefen({ pause_minuten: z.number().int().min(0).max(1440).default(0) });
+
 const ZeitNachtrag = z.object({ beschaeftigter_id: Uuid, beginn: Zeitpunkt, ende: Zeitpunkt, pause_minuten: z.number().int().min(0).max(1440).default(0), grund: z.string().trim().min(1).max(500) }).strict();
 const ZeitKorrektur = z.object({ beginn: Zeitpunkt.optional(), ende: Zeitpunkt.optional(), pause_minuten: z.number().int().min(0).max(1440).optional(), storniert: z.boolean().optional(), grund: z.string().trim().min(1).max(500) }).strict();
 
@@ -371,15 +384,25 @@ export class PersonalController {
 
   // ------------------------------------------------------------ Zeiterfassung
 
-  /** Kommen: offenen Stempel anlegen (höchstens einer je Person). */
+  /**
+   * Kommen: offenen Stempel anlegen (höchstens einer je Person). Die App überträgt offline erfasste Stempel später mit
+   * client_id (idempotent) und dem Zeitpunkt vom Gerät; solche Einträge sind als offline gekennzeichnet (E-108).
+   */
   @MitUnternehmen()
   @Post("zeiten/kommen")
   async kommen(@Kontext() k: Anfragekontext, @Body() body: unknown) {
-    const { beschaeftigter_id } = pruefe(z.object({ beschaeftigter_id: Uuid }).strict(), body);
+    const { beschaeftigter_id, client_id, zeitpunkt } = pruefe(Kommen, body);
     return this.db
-      .imKontext(this.kontext(k), (tx) =>
-        tx.eine("insert into app.zeiteintrag (unternehmen_id, beschaeftigter_id, beginn, quelle, erfasst_von) values ($1, $2, now(), 'stempel', $3) returning *", [k.unternehmenId, beschaeftigter_id, k.kontoId]),
-      )
+      .imKontext(this.kontext(k), async (tx) => {
+        if (client_id) {
+          const schon = await tx.eine("select * from app.zeiteintrag where unternehmen_id = $1 and client_id = $2", [k.unternehmenId, client_id]);
+          if (schon) return schon;
+        }
+        return tx.eine(
+          "insert into app.zeiteintrag (unternehmen_id, beschaeftigter_id, beginn, quelle, erfasst_von, client_id, offline) values ($1, $2, coalesce($4::timestamptz, now()), 'stempel', $3, $5, $6) returning *",
+          [k.unternehmenId, beschaeftigter_id, k.kontoId, zeitpunkt ?? null, client_id ?? null, Boolean(zeitpunkt)],
+        );
+      })
       .catch((e) => {
         if (/zeiteintrag_offen/.test(String((e as Error).message))) throw new ConflictException("Es läuft schon eine Zeiterfassung für diese Person");
         return uebersetzeDbFehler(e);
@@ -389,11 +412,19 @@ export class PersonalController {
   @MitUnternehmen()
   @Post("zeiten/gehen")
   async gehen(@Kontext() k: Anfragekontext, @Body() body: unknown) {
-    const { beschaeftigter_id, pause_minuten } = pruefe(z.object({ beschaeftigter_id: Uuid, pause_minuten: z.number().int().min(0).max(1440).default(0) }).strict(), body);
+    const { beschaeftigter_id, pause_minuten, client_id, zeitpunkt } = pruefe(Gehen, body);
     const r = await this.db
-      .imKontext(this.kontext(k), (tx) =>
-        tx.eine("update app.zeiteintrag set ende = now(), pause_minuten = $2 where beschaeftigter_id = $1 and ende is null and not storniert returning *", [beschaeftigter_id, pause_minuten]),
-      )
+      .imKontext(this.kontext(k), async (tx) => {
+        if (client_id) {
+          const schon = await tx.eine("select * from app.zeiteintrag where unternehmen_id = $1 and ende_client_id = $2", [k.unternehmenId, client_id]);
+          if (schon) return schon;
+        }
+        return tx.eine(
+          `update app.zeiteintrag set ende = coalesce($3::timestamptz, now()), pause_minuten = $2, ende_client_id = $4, ende_offline = $5
+            where beschaeftigter_id = $1 and ende is null and not storniert returning *`,
+          [beschaeftigter_id, pause_minuten, zeitpunkt ?? null, client_id ?? null, Boolean(zeitpunkt)],
+        );
+      })
       .catch(uebersetzeDbFehler);
     if (!r) throw new NotFoundException("Keine laufende Zeiterfassung");
     return r;

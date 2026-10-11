@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "Amtlos",
+    "slug": "amtlos",
+    "scheme": "amtlos",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "icon": "./assets/icon.png",
+    "ios": {
+      "bundleIdentifier": "de.amtlos.app",
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "Amtlos nutzt die Kamera, um Belege zu fotografieren.",
+        "NSPhotoLibraryUsageDescription": "Amtlos nutzt deine Fotos, um Belege hochzuladen."
+      }
+    },
+    "android": {
+      "package": "de.amtlos.app",
+      "permissions": ["CAMERA", "POST_NOTIFICATIONS"]
+    },
+    "plugins": [
+      "expo-secure-store",
+      ["expo-notifications", { "color": "#136f5b" }],
+      ["expo-image-picker", { "cameraPermission": "Amtlos nutzt die Kamera, um Belege zu fotografieren.", "photosPermission": "Amtlos nutzt deine Fotos, um Belege hochzuladen." }],
+      "expo-localization"
+    ],
+    "extra": {
+      "apiUrl": "http://localhost:3001",
+      "authModus": "dev",
+      "oidcIssuer": null,
+      "oidcClientId": null
+    }
+  }
+}
