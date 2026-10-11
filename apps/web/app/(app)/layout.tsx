@@ -16,10 +16,7 @@ export default async function AppRahmen({ children }: { children: ReactNode }) {
           <Link href="/heute" className="text-titel font-bold tracking-tight">
             {x.app.name}
           </Link>
-          <Link href="/einstellungen" className="verweis order-last text-klein md:hidden">
-            {x.nav.einstellungen}
-          </Link>
-          <p className="min-w-0 flex-1 truncate text-right text-klein text-tinte-leise md:mt-1 md:text-left" title={u.name}>
+          <p className="truncate text-klein text-tinte-leise md:mt-1" title={u.name}>
             {u.name}
             {i.unternehmen.length > 1 ? (
               <>
@@ -39,8 +36,10 @@ export default async function AppRahmen({ children }: { children: ReactNode }) {
             { href: "/kalender", text: x.nav.kalender, symbol: "kalender" },
             { href: "/finanzen", text: x.nav.finanzen, symbol: "finanzen" },
             { href: "/personal", text: x.nav.personal, symbol: "personal" },
-            { href: "/datenschutz", text: x.nav.datenschutz, symbol: "datenschutz" },
+            { href: "/datenschutz", text: x.nav.datenschutz, symbol: "datenschutz", nurDesktop: true },
+            { href: "/online", text: x.nav.online, symbol: "online", nurDesktop: true },
             { href: "/einstellungen", text: x.nav.einstellungen, symbol: "einstellungen", nurDesktop: true },
+            { href: "/mehr", text: x.nav.mehr, symbol: "mehr", nurMobil: true },
           ]}
         />
       </aside>

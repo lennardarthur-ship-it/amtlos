@@ -67,3 +67,7 @@ Wichtige Metriken: `amtlos_http_anfragen_total{status=~"5.."}`, `amtlos_http_dau
 5. Katalog nur über das Studio (Vier-Augen-Freigabe), nicht über `katalog-importieren`.
 
 Infrastruktur als Code (OpenTofu, STACKIT) folgt, sobald der Hosting-Vertrag steht (E-013).
+
+## Online-Check
+
+Der Online-Check (E-097) ruft fremde Websites aus der API heraus ab. Dafür braucht die API ausgehendes HTTP/HTTPS (Ports 80/443). Interne Ziele sind gesperrt; `ONLINECHECK_PRIVATE_NETZE=erlaubt` ist nur für Entwicklung und Tests gedacht (lokale Testseite) und wird in staging/prod beim Start abgelehnt. `ONLINECHECK_JE_TAG` begrenzt die Checks je Unternehmen und Tag (Standard 20). Empfehlung für den Betrieb: ausgehender Verkehr der API über einen Egress-Proxy mit Sperrliste für interne Netze als zweite Schutzschicht.

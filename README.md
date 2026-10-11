@@ -2,7 +2,7 @@
 
 Das Bürokratie-Betriebssystem für Kleinunternehmer und Startups in Deutschland.
 
-**Stand:** Bauabschnitte 1–6 umgesetzt (Fundament; Profil, Pflichten, Kalender; Gründungsassistent und Kapitalgesellschaften; Finanzen light mit E-Rechnung; Personal und Arbeitsschutz; Datenschutz, IT-Sicherheit, KI). Testberichte: [1](docs/testberichte/abschnitt-1.md), [2](docs/testberichte/abschnitt-2.md), [3](docs/testberichte/abschnitt-3.md), [4](docs/testberichte/abschnitt-4.md), [5](docs/testberichte/abschnitt-5.md), [6](docs/testberichte/abschnitt-6.md), [Lasttest](docs/testberichte/lasttest.md). API: [`apps/api/openapi.yaml`](apps/api/openapi.yaml). Fachliche Inhalte sind ungeprüft und erscheinen in prod erst nach Freigabe (E-002).
+**Stand:** Bauabschnitte 1–7 umgesetzt (Fundament; Profil, Pflichten, Kalender; Gründungsassistent und Kapitalgesellschaften; Finanzen light mit E-Rechnung; Personal und Arbeitsschutz; Datenschutz, IT-Sicherheit, KI; Online-Check, Handel und Produkte). Testberichte: [1](docs/testberichte/abschnitt-1.md), [2](docs/testberichte/abschnitt-2.md), [3](docs/testberichte/abschnitt-3.md), [4](docs/testberichte/abschnitt-4.md), [5](docs/testberichte/abschnitt-5.md), [6](docs/testberichte/abschnitt-6.md), [7](docs/testberichte/abschnitt-7.md), [Lasttest](docs/testberichte/lasttest.md). API: [`apps/api/openapi.yaml`](apps/api/openapi.yaml). Fachliche Inhalte sind ungeprüft und erscheinen in prod erst nach Freigabe (E-002).
 
 ## Aufbau
 

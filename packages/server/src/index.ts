@@ -10,3 +10,4 @@ export * from "./migrieren.js";
 export * from "./studio.js";
 export * from "./finanzen.js";
 export * from "./protokolle.js";
+export * from "./onlinecheck.js";

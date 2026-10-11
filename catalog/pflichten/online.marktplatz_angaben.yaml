@@ -1,0 +1,50 @@
+# Katalog G.74 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: online.marktplatz_angaben
+version: 1
+katalog_nr: G.74
+titel:
+  de: Händlerangaben auf Marktplätzen
+kurz:
+  de: Auf Online-Marktplätzen stellst du deine Händlerangaben vollständig bereit.
+erklaerung:
+  de: Marktplätze verlangen Angaben zu deinem Unternehmen und zeigen sie Kunden an; viele davon sind gesetzlich vorgeschrieben.
+rechtsgrundlage:
+- § 5 DDG
+- Art. 30 DSA
+kategorie: online
+ausloeser:
+  feld: profil.vertrieb.kanaele
+  op: enthaelt
+  wert: marktplatz
+  label:
+    de: Du verkaufst über Online-Marktplätze.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Digitale-Dienste-Gesetz § 5
+  url: https://www.gesetze-im-internet.de/ddg/__5.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Rechtsgrundlagen ergänzt – prüfen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

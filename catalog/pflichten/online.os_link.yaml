@@ -1,0 +1,61 @@
+# Katalog G.69 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: online.os_link
+version: 1
+katalog_nr: G.69
+titel:
+  de: Link zur OS-Plattform prüfen
+kurz:
+  de: Prüfe, ob der frühere Link zur Online-Streitbeilegungsplattform der EU auf deiner Website noch aktuell ist.
+erklaerung:
+  de: Die Spezifikation verlangt, den Status des früheren OS-Plattform-Links zu prüfen und aktuell zu halten. Der Online-Check
+    meldet, ob der Link auf deiner Website steht.
+rechtsgrundlage:
+- Verordnung (EU) Nr. 524/2013
+kategorie: online
+ausloeser:
+  all:
+  - feld: profil.kunden.segmente
+    op: enthaelt
+    wert: b2c
+    label:
+      de: Du verkaufst an Verbraucher.
+  - feld: profil.vertrieb.kanaele
+    op: enthaelt_eines
+    wert:
+    - onlineshop
+    - app
+    label:
+      de: Du verkaufst über einen Onlineshop oder eine App.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: niedrig
+automatisierung: hinweis
+aktion:
+  art: link
+  ziel: app.onlinecheck
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Verordnung (EU) Nr. 524/2013
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32013R0524
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Aktueller Status der OS-Plattform und der Linkpflicht – fachlich prüfen und Text anpassen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

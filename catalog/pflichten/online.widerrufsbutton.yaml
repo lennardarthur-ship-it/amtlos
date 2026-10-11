@@ -1,0 +1,64 @@
+# Katalog G.68 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: online.widerrufsbutton
+version: 1
+katalog_nr: G.68
+titel:
+  de: Widerrufsbutton für Online-Verträge
+kurz:
+  de: Seit 19.6.2026 brauchen B2C-Online-Verträge mit Widerrufsrecht einen Widerrufsbutton – zweistufig, ohne Login, mit Eingangsbestätigung
+    auf einem dauerhaften Datenträger.
+erklaerung:
+  de: Verbraucher müssen den Widerruf online so einfach erklären können wie den Vertragsschluss.
+rechtsgrundlage:
+- BGB (Umsetzung der Richtlinie (EU) 2023/2673)
+kategorie: online
+ausloeser:
+  all:
+  - feld: profil.kunden.segmente
+    op: enthaelt
+    wert: b2c
+    label:
+      de: Du verkaufst an Verbraucher.
+  - feld: profil.vertrieb.kanaele
+    op: enthaelt_eines
+    wert:
+    - onlineshop
+    - marktplatz
+    - abo
+    - app
+    label:
+      de: Du schließt Verträge online oder per App.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+aktion:
+  art: link
+  ziel: app.onlinecheck
+status_recht: in_kraft
+gueltig_ab: '2026-06-19'
+gueltig_bis: null
+quellen:
+- titel: Richtlinie (EU) 2023/2673
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32023L2673
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Fundstelle im BGB nach Umsetzung ergänzen
+- Beschriftung des Buttons fachlich ergänzen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

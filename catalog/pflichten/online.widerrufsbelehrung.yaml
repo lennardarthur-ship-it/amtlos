@@ -1,0 +1,62 @@
+# Katalog G.68 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: online.widerrufsbelehrung
+version: 1
+katalog_nr: G.68
+titel:
+  de: Über das Widerrufsrecht belehren
+kurz:
+  de: Bei Verträgen mit Verbrauchern über Fernabsatz belehrst du über das Widerrufsrecht.
+erklaerung:
+  de: Verbraucher haben bei Fernabsatzverträgen in der Regel ein Widerrufsrecht, über das du vor Vertragsschluss informieren
+    musst.
+rechtsgrundlage:
+- § 312d BGB
+- § 355 BGB
+kategorie: online
+ausloeser:
+  all:
+  - feld: profil.kunden.segmente
+    op: enthaelt
+    wert: b2c
+    label:
+      de: Du verkaufst an Verbraucher.
+  - feld: profil.vertrieb.kanaele
+    op: enthaelt_eines
+    wert:
+    - onlineshop
+    - marktplatz
+    - abo
+    - app
+    label:
+      de: Du schließt Verträge online oder per App.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Bürgerliches Gesetzbuch § 312d
+  url: https://www.gesetze-im-internet.de/bgb/__312d.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Muster-Widerrufsbelehrung erst nach Prüfung
+- Ausnahmen vom Widerrufsrecht als Hinweis
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

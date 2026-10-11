@@ -1,0 +1,61 @@
+# Katalog G.75 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: produkte.geldwaesche_gueterhaendler
+version: 1
+katalog_nr: G.75
+titel:
+  de: Geldwäschegesetz bei hohen Bargeschäften
+kurz:
+  de: Als Güterhändler hast du bei Bargeschäften ab der Schwelle des Geldwäschegesetzes Sorgfaltspflichten.
+erklaerung:
+  de: Dazu gehören unter anderem die Identifizierung der Vertragspartner und ein Risikomanagement. Die Schwelle steht im Gesetz;
+    Amtlos führt sie nach fachlicher Prüfung als Regelwert.
+rechtsgrundlage:
+- GwG
+kategorie: produkte
+ausloeser:
+  all:
+  - feld: profil.produkte.arten
+    op: enthaelt_eines
+    wert:
+    - physisch
+    - elektrogeraete
+    - batterien
+    - kosmetik
+    - lebensmittel
+    label:
+      de: Du verkaufst Waren.
+  - feld: profil.handel.hohe_bargeschaefte
+    op: ==
+    wert: true
+    label:
+      de: Du nimmst hohe Barzahlungen für Waren an.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Aufsicht der Länder
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Geldwäschegesetz
+  url: https://www.gesetze-im-internet.de/gwg_2017/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Schwelle für Barzahlungen nicht in der Spezifikation – als Regelwert ergänzen
+- Immobilien- und Finanzbranche als Branchenmodul (H)
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

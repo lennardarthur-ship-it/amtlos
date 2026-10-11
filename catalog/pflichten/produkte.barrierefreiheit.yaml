@@ -1,0 +1,49 @@
+# Katalog G.70 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: produkte.barrierefreiheit
+version: 1
+katalog_nr: G.70
+titel:
+  de: Prüfen, ob deine Produkte unter das BFSG fallen
+kurz:
+  de: Für bestimmte Produkte (z. B. Computer, Smartphones, E-Book-Reader) gelten Barrierefreiheitsanforderungen – die Kleinstunternehmen-Ausnahme
+    gilt dafür nicht verlässlich.
+erklaerung:
+  de: Das BFSG nennt die betroffenen Produkte abschließend. Prüfe, ob deine Produkte dazugehören.
+rechtsgrundlage:
+- BFSG
+kategorie: produkte
+ausloeser:
+  feld: profil.produkte.arten
+  op: enthaelt
+  wert: elektrogeraete
+  label:
+    de: Du verkaufst Elektrogeräte.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Hersteller
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: '2025-06-28'
+gueltig_bis: null
+quellen:
+- titel: Barrierefreiheitsstärkungsgesetz
+  url: https://www.gesetze-im-internet.de/bfsg/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Produktliste (§ 1 BFSG) als Auswahl ergänzen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

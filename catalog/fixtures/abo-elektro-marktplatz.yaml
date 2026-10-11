@@ -1,0 +1,27 @@
+persona: onlinehandel
+beschreibung: Abo-Anbieter mit Elektrogeräten und Batterien, Verkauf auch über Marktplätze, 25 Beschäftigte, 3 Mio. € Umsatz
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: "2017-01-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.beschaeftigte.gesamt: 25
+  profil.umsatz.vorjahr: 3000000
+  profil.kunden.segmente: [b2c, b2b]
+  profil.vertrieb.kanaele: [onlineshop, marktplatz, abo]
+  profil.produkte.arten: [elektrogeraete, batterien, verpackung]
+  profil.online.website: true
+  profil.handel.hohe_bargeschaefte: false
+  profil.bundesland: NW
+  profil.gemeinde_ags: "05111000"
+erwartet:
+  online.kuendigungsbutton: gilt
+  online.widerrufsbutton: gilt
+  online.barrierefreiheit: gilt
+  online.vsbg_hinweis: unbekannt
+  produkte.barrierefreiheit: gilt
+  produkte.elektrogeraete: gilt
+  produkte.batterien: gilt
+  produkte.gpsr: gilt
+  online.marktplatz_angaben: gilt
+  online.dac7: gilt

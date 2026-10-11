@@ -98,6 +98,7 @@ export default async function HeuteSeite() {
         <p className="lesetext flex flex-wrap items-center gap-x-4 gap-y-2">
           <span>{x.heute.melden_frage}</span>
           <Link href="/melden" className="knopf knopf-leise">{x.heute.melden_link}</Link>
+          <Link href="/datenschutz/pannen#melden" className="verweis text-klein">{x.ds.notfall}</Link>
         </p>
       ) : null}
 

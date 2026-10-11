@@ -260,6 +260,15 @@ select set_config('amtlos.unternehmen_id', :'u2', false);
 select pg_temp.ok((select count(*) = 0 from app.datenpanne) and (select count(*) = 0 from app.verarbeitung) and (select count(*) = 0 from app.betroffenenanfrage), 'Datenschutzdaten sind mandantengetrennt');
 reset role;
 
+-- ---------- Online-Check (0011) ----------
+set role api_user;
+select set_config('amtlos.konto_id', :'anna_konto_anmelden', false);
+select set_config('amtlos.unternehmen_id', :'u1', false);
+insert into app.online_check (unternehmen_id, url, status) values (:'u1', 'https://beispiel.de/', 'ok') returning id as oc1 \gset
+select pg_temp.erwarte_fehler(format($$update app.online_check set status = 'fehler' where id = %L$$, :'oc1'), 'permission denied');
+select pg_temp.ok(true, 'Online-Check-Ergebnisse sind unveränderlich');
+reset role;
+
 -- ---------- Audit ----------
 select pg_temp.ok((select count(*) > 10 from audit.ereignis), 'Audit protokolliert Änderungen');
 select pg_temp.ok((select bool_and(vorgaenger_hash is not null) from audit.ereignis where id > (select min(id) from audit.ereignis)), 'Hash-Kette lückenlos');

@@ -12,13 +12,14 @@ import { ELSTER, ElsterController } from "./elster.controller.js";
 import { ABLAGE, FinanzenController } from "./finanzen.controller.js";
 import { KernController, WARTESCHLANGE } from "./kern.controller.js";
 import { KONFIGURATION, type Konfiguration } from "./konfiguration.js";
+import { OnlineCheckController } from "./onlinecheck.controller.js";
 import { PersonalController } from "./personal.controller.js";
 import { PflichtenController } from "./pflichten.controller.js";
 import { TeamController } from "./team.controller.js";
 
 export function appModul(k: Konfiguration) {
   @Module({
-    controllers: [KernController, PflichtenController, TeamController, ElsterController, FinanzenController, PersonalController, ArbeitsschutzController, DatenschutzController, BetriebController],
+    controllers: [KernController, PflichtenController, TeamController, ElsterController, FinanzenController, PersonalController, ArbeitsschutzController, DatenschutzController, OnlineCheckController, BetriebController],
     providers: [
       { provide: KONFIGURATION, useValue: k },
       { provide: METRIKEN, useFactory: erzeugeMetriken },

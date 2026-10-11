@@ -55,6 +55,11 @@ Stand: 2026-10-11 (Bauabschnitt 2)
 | T-25 | KI-Kompetenz (Art. 4 KI-VO): Inhalt und Umfang einer ausreichenden Schulung; Gliederungsvorschlag im Formular prüfen | RA | E-095 |
 | T-26 | NIS2: geführter Betroffenheitscheck (Sektoren, Größenschwellen), Meldestufen und -fristen, Pflichten der Geschäftsleitung | RA/Tech | E-095 |
 | T-27 | Betroffenenanfragen: Verlängerung um zwei Monate, Identitätsprüfung, Speicherdauer der Anfragedaten | DSB | E-095 |
+| T-28 | Online-Check: Handlungshinweise je Befund („was tun“) und ob Musterformulierungen (Impressum, Button-Beschriftungen) angeboten werden dürfen | RA | E-097 |
+| T-29 | Widerrufsbutton (seit 19.6.2026): Fundstelle im BGB, vorgeschriebene Beschriftung; Kündigungsbutton (§ 312k BGB): Beschriftung und Ablauf | RA | Katalog G.68 |
+| T-30 | OS-Plattform: aktueller Status und ob Link oder Hinweis noch nötig ist | RA | Katalog G.69 |
+| T-31 | Geldwäsche (Güterhändler): Schwelle für Barzahlungen als Regelwert; Immobilien- und Finanzbranche als Branchenmodul | RA | Katalog G.75 |
+| T-32 | BFSG: Bilanzsumme als Alternative zum Umsatz, Liste der betroffenen Dienstleistungen und Produkte | RA | Katalog G.70 |
 | G-15 | Sammelbestätigung „vor dem Start erledigt“: Wortlaut und ob ein Hinweis zu Nachholpflichten nötig ist | RA | E-072 |
 
 ## Juristische Grundsatzfragen (blockieren Abschnitte)
@@ -68,7 +73,7 @@ Stand: 2026-10-11 (Bauabschnitt 2)
 
 ## Aus dem Katalog (automatisch aus `fachlich_zu_pruefen`)
 
-Erzeugt mit `scripts/pruefliste.py`; 438 Punkte.
+Erzeugt mit `scripts/pruefliste.py`; 508 Punkte.
 
 | Nr. | Objekt | Katalog-Nr. | Punkt |
 |---|---|---|---|
@@ -278,235 +283,305 @@ Erzeugt mit `scripts/pruefliste.py`; 438 Punkte.
 | K-204 | `ki.transparenz` | F.65 | Welche Fälle des Art. 50 treffen auf Kleinbetriebe zu (Chatbot, Deepfake, generierte Texte)? |
 | K-205 | `ki.transparenz` | F.65 | Nach dem 2.12.2026 auf in_kraft umstellen |
 | K-206 | `ki.transparenz` | F.65 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-207 | `online.cookie_einwilligung` | F.63 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-208 | `online.cookie_einwilligung` | F.63 | URL des Gesetzes nach Umbenennung (TTDSG → TDDDG) prüfen |
-| K-209 | `online.cookie_einwilligung` | F.63 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-210 | `personal.anmeldezeitraum_angeben` | D.40 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-211 | `personal.anmeldezeitraum_angeben` | D.40 | Vorbereitender Schritt – Darstellung bestätigen |
-| K-212 | `personal.anmeldezeitraum_angeben` | D.40 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-213 | `personal.arbeitszeit_aufzeichnung` | D.42 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-214 | `personal.arbeitszeit_aufzeichnung` | D.42 | Fundstelle der BAG-Entscheidung prüfen |
-| K-215 | `personal.arbeitszeit_aufzeichnung` | D.42 | Anforderungen an die Form (bis zur Neuregelung) fachlich formulieren |
-| K-216 | `personal.arbeitszeit_aufzeichnung` | D.42 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-217 | `personal.arbeitszeit_aufzeichnung` | D.42 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-218 | `personal.arbeitszeit_milog` | D.42 | Fristen für Aufzeichnung und Aufbewahrung ergänzen |
-| K-219 | `personal.arbeitszeit_milog` | D.42 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-220 | `personal.arbeitszeit_neuregelung` | D.42 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-221 | `personal.arbeitszeit_neuregelung` | D.42 | Status offen – Radar |
-| K-222 | `personal.arbeitszeit_neuregelung` | D.42 | Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „mittel“) |
-| K-223 | `personal.arbeitszeit_neuregelung` | D.42 | Schwelle 10 als Regelwert führen, sobald beschlossen |
-| K-224 | `personal.aushangpflichtige_gesetze` | D.48 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-225 | `personal.aushangpflichtige_gesetze` | D.48 | Liste je Belegschaft (z. B. MuSchG ab wie vielen Frauen?) fachlich festlegen |
-| K-226 | `personal.aushangpflichtige_gesetze` | D.48 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-227 | `personal.beitragsnachweis` | D.40 | „Arbeitstage“ als Bankarbeitstage umgesetzt – bestätigen (G-13) |
-| K-228 | `personal.beitragsnachweis` | D.40 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-229 | `personal.beitragsnachweis` | D.40 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-230 | `personal.betriebsnummer` | D.37 | „vor der ersten Einstellung“ als spätestens am Tag vor Arbeitsbeginn umgesetzt – bestätigen |
-| K-231 | `personal.betriebsnummer` | D.37 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-232 | `personal.betriebsnummer` | D.37 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-233 | `personal.entgelttransparenz_bericht` | D.47 | Status offen – Radar |
-| K-234 | `personal.entgelttransparenz_bericht` | D.47 | Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „hoch“, weil EU-Richtlinie) |
-| K-235 | `personal.entgelttransparenz_bericht` | D.47 | Zählweise und Inhalt des Berichts nach Umsetzungsgesetz |
-| K-236 | `personal.hinweisgeber_meldestelle` | D.46 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-237 | `personal.hinweisgeber_meldestelle` | D.46 | Zählweise (G-05) |
-| K-238 | `personal.hinweisgeber_meldestelle` | D.46 | Übergangsregeln für 50–249 Beschäftigte noch relevant? |
-| K-239 | `personal.hinweisgeber_meldestelle` | D.46 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-240 | `personal.hinweisgeber_meldestelle` | D.46 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-241 | `personal.jugendarbeitsschutz` | D.44 | Erstuntersuchung als eigene Pflicht je Einstellung mit Frist? |
-| K-242 | `personal.jugendarbeitsschutz` | D.44 | Arbeitszeitgrenzen als Regelwerte |
-| K-243 | `personal.jugendarbeitsschutz` | D.44 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-244 | `personal.jugendarbeitsschutz` | D.44 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-245 | `personal.lohnabrechnung` | D.49 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-246 | `personal.lohnabrechnung` | D.49 | Partner noch nicht gewählt (Abschnitt 5, Integration offen) |
-| K-247 | `personal.lohnabrechnung` | D.49 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-248 | `personal.lohnsteuer_anmeldung` | D.40 | Grenzen für den Anmeldezeitraum (nach Vorjahres-Lohnsteuer) stehen nicht in der Spezifikation – deshalb Angabe des Nutzers |
-| K-249 | `personal.lohnsteuer_anmeldung` | D.40 | Verschiebung bei Fristende am Wochenende/Feiertag bestätigen |
-| K-250 | `personal.lohnsteuer_anmeldung` | D.40 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-251 | `personal.lohnsteuer_anmeldung` | D.40 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-252 | `personal.mindestlohn` | D.39 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-253 | `personal.mindestlohn` | D.39 | Ausnahmen (z. B. Azubis, Praktika) als Hinweis ergänzen? |
-| K-254 | `personal.mindestlohn` | D.39 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-255 | `personal.mindestlohn` | D.39 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-256 | `personal.minijob_grenze` | D.39 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-257 | `personal.minijob_grenze` | D.39 | Folgen bei Überschreiten (gelegentliches Überschreiten) ergänzen |
-| K-258 | `personal.minijob_grenze` | D.39 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-259 | `personal.minijob_grenze` | D.39 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-260 | `personal.mutterschutz_gefaehrdungsbeurteilung` | D.43 | Frist „vor Arbeitsbeginn“ wie E.50 – bestätigen |
-| K-261 | `personal.mutterschutz_gefaehrdungsbeurteilung` | D.43 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-262 | `personal.mutterschutz_gefaehrdungsbeurteilung` | D.43 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-263 | `personal.nachweisgesetz` | D.41 | Frist (je Angabe unterschiedlich) steht nicht in der Spezifikation – als spätestens bei Beginn eingetragen, fachlich ersetzen |
-| K-264 | `personal.nachweisgesetz` | D.41 | Zulässige Form (Schriftform/elektronisch) aktuell? |
-| K-265 | `personal.nachweisgesetz` | D.41 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-266 | `personal.schwangerschaft_mitteilung` | D.43 | Frist („unverzüglich“) steht nicht in der Spezifikation – als am Tag der Mitteilung eingetragen, fachlich ersetzen |
-| K-267 | `personal.schwangerschaft_mitteilung` | D.43 | Zuständige Behörde je Land |
-| K-268 | `personal.schwangerschaft_mitteilung` | D.43 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-269 | `personal.schwangerschaft_mitteilung` | D.43 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-270 | `personal.schwerbehinderte_anzeige` | D.45 | Quote und Höhe der Abgabe als Regelwerte |
-| K-271 | `personal.schwerbehinderte_anzeige` | D.45 | Zählweise der Arbeitsplätze (G-05); wer insgesamt weniger als 20 beschäftigt, gilt als unter der Schwelle – bestätigen |
-| K-272 | `personal.schwerbehinderte_anzeige` | D.45 | Verschiebung bei 31.3. am Wochenende |
-| K-273 | `personal.schwerbehinderte_anzeige` | D.45 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-274 | `personal.schwerbehinderte_anzeige` | D.45 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-275 | `personal.sofortmeldung` | D.38 | „Bei Arbeitsbeginn“ als spätestens am Tag des Beginns umgesetzt – bestätigen |
-| K-276 | `personal.sofortmeldung` | D.38 | Branchenliste vollständig (§ 28a Abs. 4 SGB IV)? |
-| K-277 | `personal.sofortmeldung` | D.38 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-278 | `personal.sv_abmeldung` | D.38 | Frist der Abmeldung steht nicht in der Spezifikation – als spätestens am Ende der Beschäftigung eingetragen, fachlich ersetzen |
-| K-279 | `personal.sv_abmeldung` | D.38 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-280 | `personal.sv_abmeldung` | D.38 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-281 | `personal.sv_anmeldung` | D.38 | Frist der Anmeldung steht nicht in der Spezifikation – als spätestens bei Beschäftigungsbeginn eingetragen, fachlich ersetzen |
-| K-282 | `personal.sv_anmeldung` | D.38 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-283 | `personal.sv_anmeldung` | D.38 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-284 | `personal.sv_beitraege` | D.40 | Minijobs: Fälligkeit bei der Minijob-Zentrale gleich? |
-| K-285 | `personal.sv_beitraege` | D.40 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-286 | `personal.sv_beitraege` | D.40 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-287 | `personal.sv_jahresmeldung` | D.38 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-288 | `personal.sv_jahresmeldung` | D.38 | Termin der Jahresmeldung als Regeldaten ergänzen (für den Jahreskalender I) |
-| K-289 | `personal.sv_jahresmeldung` | D.38 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-290 | `personal.sv_jahresmeldung` | D.38 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-291 | `personal.umlagen_eau` | D.40 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-292 | `personal.umlagen_eau` | D.40 | Welche Umlage gilt für wen (z. B. U1 nach Betriebsgröße) – fachlich ergänzen |
-| K-293 | `personal.umlagen_eau` | D.40 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-294 | `personal.umlagen_eau` | D.40 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-295 | `steuern.aufbewahrung` | C.32 | Fristbeginn (Ende des Kalenderjahres) und Aufbewahrungsdauern als Regelwerte führen |
-| K-296 | `steuern.aufbewahrung` | C.32 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-297 | `steuern.aufbewahrung` | C.32 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-298 | `steuern.bauabzugsteuer_freistellung` | C.35 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-299 | `steuern.bauabzugsteuer_freistellung` | C.35 | Auch Handwerksbetriebe mit Bauleistungen erfassen (Branche handwerk)? |
-| K-300 | `steuern.bauabzugsteuer_freistellung` | C.35 | Gültigkeitsdauer der Bescheinigung und Erneuerung ergänzen |
-| K-301 | `steuern.bauabzugsteuer_freistellung` | C.35 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-302 | `steuern.buchfuehrungspflicht` | C.28 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-303 | `steuern.buchfuehrungspflicht` | C.28 | e.K. und GmbH & Co. KG als HGB-buchführungspflichtig angenommen – bestätigen |
-| K-304 | `steuern.buchfuehrungspflicht` | C.28 | Im Gründungsjahr und vor dem Start gibt es keine Vorjahreswerte – § 141-Grenzen dann als nicht überschritten behandelt |
-| K-305 | `steuern.buchfuehrungspflicht` | C.28 | § 141 AO: Pflicht beginnt erst nach Mitteilung des Finanzamts – berücksichtigen |
-| K-306 | `steuern.buchfuehrungspflicht` | C.28 | Grenze inklusive/exklusive |
-| K-307 | `steuern.buchfuehrungspflicht` | C.28 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-308 | `steuern.e_bilanz` | B.18 | Frist (gekoppelt an die Steuererklärung) als Regeldaten ergänzen |
-| K-309 | `steuern.e_bilanz` | B.18 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-310 | `steuern.e_bilanz` | B.18 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-311 | `steuern.e_rechnung_empfang` | C.30 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-312 | `steuern.e_rechnung_empfang` | C.30 | Gilt für alle Unternehmen, auch Kleinunternehmer – bestätigen |
-| K-313 | `steuern.e_rechnung_empfang` | C.30 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-314 | `steuern.e_rechnung_versand_2027` | C.30 | Maßgeblich ist der Umsatz 2026: bis 2026 wird auch die Prognose herangezogen – bestätigen |
-| K-315 | `steuern.e_rechnung_versand_2027` | C.30 | Rechtsstatus und gueltig_ab festlegen |
-| K-316 | `steuern.e_rechnung_versand_2027` | C.30 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-317 | `steuern.e_rechnung_versand_2028` | C.30 | Rechtsstatus und gueltig_ab festlegen |
-| K-318 | `steuern.e_rechnung_versand_2028` | C.30 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-319 | `steuern.est_erklaerung` | C.27 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-320 | `steuern.est_erklaerung` | C.27 | Abgabefristen (mit und ohne Steuerberatung) fehlen in der Spezifikation – als jährliche Regeldaten ergänzen (Jahreskalender I) |
-| K-321 | `steuern.est_erklaerung` | C.27 | Personengesellschaften: Feststellungserklärung der Gesellschaft zusätzlich? |
-| K-322 | `steuern.est_erklaerung` | C.27 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-323 | `steuern.est_erklaerung` | C.27 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-324 | `steuern.euer` | C.27 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-325 | `steuern.euer` | C.27 | Abgabefristen (mit und ohne Steuerberatung) fehlen in der Spezifikation – als jährliche Regeldaten ergänzen (Jahreskalender I) |
-| K-326 | `steuern.euer` | C.27 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-327 | `steuern.euer` | C.27 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-328 | `steuern.gewst_erklaerung` | C.27 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-329 | `steuern.gewst_erklaerung` | C.27 | Abgabefristen (mit und ohne Steuerberatung) fehlen in der Spezifikation – als jährliche Regeldaten ergänzen (Jahreskalender I) |
-| K-330 | `steuern.gewst_erklaerung` | C.27 | Freibetrag (C.34) als Regelwert führen |
-| K-331 | `steuern.gewst_erklaerung` | C.27 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-332 | `steuern.gewst_erklaerung` | C.27 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-333 | `steuern.gobd_verfahrensdokumentation` | C.31 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-334 | `steuern.gobd_verfahrensdokumentation` | C.31 | Fundstelle des aktuellen GoBD-Schreibens ergänzen |
-| K-335 | `steuern.gobd_verfahrensdokumentation` | C.31 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-336 | `steuern.gobd_verfahrensdokumentation` | C.31 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-337 | `steuern.kasse_tse_belegausgabe` | C.33 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-338 | `steuern.kasse_tse_belegausgabe` | C.33 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-339 | `steuern.kassenmeldung` | C.33 | Bestandskassen (Meldefrist 31.7.2025): Pflicht für Kassen ohne gemeldetes Anschaffungsdatum abbilden |
-| K-340 | `steuern.kassenmeldung` | C.33 | Verschiebung bei Fristende am Wochenende festlegen |
-| K-341 | `steuern.kassenmeldung` | C.33 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-342 | `steuern.kassenmeldung_ausserbetriebnahme` | C.33 | Mehrere Kassen: je Ereignis eine Meldung (derzeit Bezug auf die erste Außerbetriebnahme) |
-| K-343 | `steuern.kassenmeldung_ausserbetriebnahme` | C.33 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-344 | `steuern.kleinunternehmer_grenze_ueberschritten` | C.23 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-345 | `steuern.kleinunternehmer_grenze_ueberschritten` | C.23 | Vor dem Start gibt es keinen Vorjahresumsatz – Vorjahresgrenze dann nicht geprüft |
-| K-346 | `steuern.kleinunternehmer_grenze_ueberschritten` | C.23 | Prognose statt tatsächlicher Umsatz: bis Abschnitt 4 nur Profilangaben – Formulierung „nach deinen Angaben“ bestätigen |
-| K-347 | `steuern.kleinunternehmer_grenze_ueberschritten` | C.23 | Grenze inklusive/exklusive (K-18) |
-| K-348 | `steuern.kleinunternehmer_warnung_80` | C.23 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-349 | `steuern.kleinunternehmer_warnung_80` | C.23 | Umsatzbegriff für die Grenze (G-06): Summe der gestellten Rechnungen (netto, abzüglich Stornos) im Kalenderjahr nach Rechnungsdatum – bestätigen |
-| K-350 | `steuern.kleinunternehmer_warnung_80` | C.23 | Warnstufen 80 % und 95 % aus der Spezifikation |
-| K-351 | `steuern.kleinunternehmer_warnung_95` | C.23 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-352 | `steuern.kleinunternehmer_warnung_95` | C.23 | Umsatzbegriff für die Grenze (G-06): Summe der gestellten Rechnungen (netto, abzüglich Stornos) im Kalenderjahr nach Rechnungsdatum – bestätigen |
-| K-353 | `steuern.kleinunternehmer_warnung_95` | C.23 | Warnstufen 80 % und 95 % aus der Spezifikation |
-| K-354 | `steuern.kleinunternehmerregelung` | C.23 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-355 | `steuern.kleinunternehmerregelung` | C.23 | Echtzeit-Warnungen bei 80 % und 95 % (Spezifikation C.23) folgen in Abschnitt 4 mit Finanzdaten |
-| K-356 | `steuern.kst_erklaerung` | B.19 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-357 | `steuern.kst_erklaerung` | B.19 | Abgabefristen mit und ohne Steuerberatung als Regeldaten (wie G-18) |
-| K-358 | `steuern.kst_erklaerung` | B.19 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-359 | `steuern.kst_erklaerung` | B.19 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-360 | `steuern.rechnungen_pflichtangaben` | C.29 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-361 | `steuern.rechnungen_pflichtangaben` | C.29 | Liste der Pflichtangaben und Kleinbetragsgrenze als Inhalt ergänzen |
-| K-362 | `steuern.rechnungen_pflichtangaben` | C.29 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-363 | `steuern.ust_jahreserklaerung` | C.27 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-364 | `steuern.ust_jahreserklaerung` | C.27 | Abgabefristen (mit und ohne Steuerberatung) fehlen in der Spezifikation – als jährliche Regeldaten ergänzen (Jahreskalender I) |
-| K-365 | `steuern.ust_jahreserklaerung` | C.27 | Kleinunternehmer: Erklärungspflicht prüfen |
-| K-366 | `steuern.ust_jahreserklaerung` | C.27 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-367 | `steuern.ust_sondervorauszahlung` | C.24 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-368 | `steuern.ust_sondervorauszahlung` | C.24 | Fälligkeitstermin und Bemessungsgrundlage der Sondervorauszahlung ergänzen (K-08) |
-| K-369 | `steuern.ust_sondervorauszahlung` | C.24 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-370 | `steuern.ust_voranmeldung` | C.24 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen (früherer Text war nicht belegt) |
-| K-371 | `steuern.ust_voranmeldung` | C.24 | Befreiung bis Grenze ist laut Spezifikation 'möglich' (Ermessen Finanzamt?) – Auslöser bildet das als 'gilt nicht' ab; Formulierung prüfen |
-| K-372 | `steuern.ust_voranmeldung` | C.24 | Neugründer: Aussetzung der monatlichen Pflicht 2021–2026 (Radar) – Rhythmus im Gründungs- und Folgejahr festlegen |
-| K-373 | `steuern.ust_voranmeldung` | C.24 | Sondervorauszahlung 1/11 bei monatlicher Dauerfristverlängerung als eigene Pflicht anlegen |
-| K-374 | `steuern.ust_voranmeldung` | C.24 | Verschiebung auf nächsten Werktag und Feiertagskalender (Bundesland) bestätigen |
-| K-375 | `steuern.ust_voranmeldung` | C.24 | gueltig_ab: Datum der heutigen Fassung der Grenzen eintragen |
-| K-376 | `steuern.vorauszahlung_est_kst` | C.26 | Verschiebung auf den nächsten Werktag bei Zahlungsterminen bestätigen |
-| K-377 | `steuern.vorauszahlung_est_kst` | C.26 | Schonfrist bei Überweisung erwähnen? |
-| K-378 | `steuern.vorauszahlung_est_kst` | C.26 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-379 | `steuern.vorauszahlung_est_kst` | C.26 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-380 | `steuern.vorauszahlung_gewst` | C.26 | Verschiebung und Kalender (Gemeinde) bestätigen |
-| K-381 | `steuern.vorauszahlung_gewst` | C.26 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-382 | `steuern.vorauszahlung_gewst` | C.26 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-383 | `steuern.zusammenfassende_meldung` | C.25 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
-| K-384 | `steuern.zusammenfassende_meldung` | C.25 | Meldezeitraum und Abgabefrist ergänzen |
-| K-385 | `steuern.zusammenfassende_meldung` | C.25 | Kleinunternehmer ausgenommen? |
-| K-386 | `steuern.zusammenfassende_meldung` | C.25 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
-| K-387 | `steuern.zusammenfassende_meldung` | C.25 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-388 | `datenschutz.dsb.schwelle_personen@1` | F.61 | gueltig_ab ist Platzhalter |
-| K-389 | `datenschutz.dsb.schwelle_personen@1` | F.61 | Geplante Streichung bis Ende 2026 (Radar F.61) – gueltig_bis setzen, sobald beschlossen |
-| K-390 | `gesellschaft.gmbh.stammkapital_mindest@1` | B.14 | gueltig_ab ist Platzhalter |
-| K-391 | `gesellschaft.gmbh.stammkapital_mindest@1` | B.14 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
-| K-392 | `gesellschaft.gmbh.mindesteinzahlung_anteil@1` | B.14 | Spezifikation: „mindestens Hälfte einzuzahlen“ – Bezug (Mindeststammkapital oder Summe der Anteile) und Einzahlung je Geschäftsanteil prüfen |
-| K-393 | `gesellschaft.gmbh.mindesteinzahlung_anteil@1` | B.14 | Rechtsgrundlage ergänzt |
-| K-394 | `gesellschaft.ug.stammkapital_mindest@1` | B.14 | gueltig_ab ist Platzhalter |
-| K-395 | `gesellschaft.ug.stammkapital_mindest@1` | B.14 | Rechtsgrundlage ergänzt |
-| K-396 | `gesellschaft.ug.ruecklage_anteil@1` | B.14 | gueltig_ab ist Platzhalter |
-| K-397 | `gesellschaft.ug.ruecklage_anteil@1` | B.14 | Rechtsgrundlage ergänzt |
-| K-398 | `gesellschaft.ug.ruecklage_anteil@1` | B.14 | Berechnungsbasis (Jahresüberschuss abzüglich Verlustvortrag) prüfen |
-| K-399 | `personal.mindestlohn.stunde@1` | D.39 | Rechtsgrundlage (aktuelle Anpassungsverordnung) ergänzen |
-| K-400 | `personal.mindestlohn.stunde@2` | D.39 | Status „beschlossen“ – Verordnung prüfen |
-| K-401 | `personal.minijob.grenze_monat@1` | D.39 | Rechtsgrundlage ergänzt |
-| K-402 | `personal.minijob.grenze_monat@2` | D.39 | Dynamische Kopplung an den Mindestlohn – Wert für 2027 bestätigen |
-| K-403 | `personal.schwerbehinderte.schwelle_arbeitsplaetze@1` | D.45 | gueltig_ab ist Platzhalter |
-| K-404 | `personal.schwerbehinderte.schwelle_arbeitsplaetze@1` | D.45 | Rechtsgrundlage ergänzt |
-| K-405 | `personal.hinschg.schwelle@1` | D.46 | gueltig_ab ist Platzhalter |
-| K-406 | `personal.hinschg.schwelle@1` | D.46 | Rechtsgrundlage ergänzt |
-| K-407 | `personal.entgelttransparenz.berichtspflicht_schwelle@1` | D.47 | Spezifikation: „über 150 Beschäftigte“ – Vergleich > umgesetzt |
-| K-408 | `personal.entgelttransparenz.berichtspflicht_schwelle@1` | D.47 | Deutsches Umsetzungsgesetz abwarten |
-| K-409 | `arbeitsschutz.ersthelfer.schwelle_versicherte@1` | E.53 | gueltig_ab ist Platzhalter |
-| K-410 | `arbeitsschutz.ersthelfer.schwelle_versicherte@1` | E.53 | Rechtsgrundlage ergänzt |
-| K-411 | `arbeitsschutz.ersthelfer.schwelle_versicherte@1` | E.53 | Versicherte vs. Beschäftigte |
-| K-412 | `steuern.ust_va.grenze_befreiung@1` | C.24 | gueltig_ab ist Platzhalter (Beginn Betrachtungszeitraum), tatsächliches Inkrafttreten der Grenze eintragen |
-| K-413 | `steuern.ust_va.grenze_monatlich@1` | C.24 | gueltig_ab ist Platzhalter |
-| K-414 | `steuern.ust_va.grenze_monatlich@1` | C.24 | Spezifikation: 'über 9.000 € monatlich' – Vergleich '>' bestätigen |
-| K-415 | `steuern.ustg19.grenze_vorjahr@1` | C.23 | gueltig_ab ist Platzhalter |
-| K-416 | `steuern.ustg19.grenze_vorjahr@1` | C.23 | Grenze inklusive oder exklusive ('max. 25.000 €')? |
-| K-417 | `steuern.ustg19.grenze_laufendes_jahr@1` | C.23 | gueltig_ab ist Platzhalter |
-| K-418 | `steuern.ustg19.grenze_laufendes_jahr@1` | C.23 | Gründungsjahr: abweichende Grenze 25.000 € als eigener Regelwert |
-| K-419 | `steuern.ustg19.grenze_gruendungsjahr@1` | C.23 | gueltig_ab ist Platzhalter |
-| K-420 | `steuern.ustg19.grenze_gruendungsjahr@1` | C.23 | Grenze inklusive oder exklusive? |
-| K-421 | `steuern.ao141.grenze_umsatz@1` | C.28 | gueltig_ab ist Platzhalter |
-| K-422 | `steuern.ao141.grenze_umsatz@1` | C.28 | Bezugsjahr und Vergleich (> oder ≥) bestätigen |
-| K-423 | `steuern.ao141.grenze_gewinn@1` | C.28 | gueltig_ab ist Platzhalter |
-| K-424 | `steuern.ao141.grenze_gewinn@1` | C.28 | Bezugsjahr und Vergleich (> oder ≥) bestätigen |
-| K-425 | `steuern.e_rechnung.grenze_vorjahresumsatz_2027@1` | C.30 | Übergangsregel-Fundstelle (§ 27 Abs. 38 UStG) ergänzt, nicht aus Spezifikation |
-| K-426 | `steuern.e_rechnung.grenze_vorjahresumsatz_2027@1` | C.30 | gueltig_ab/gueltig_bis als Übergangszeitraum bestätigen |
-| K-427 | `steuern.aufbewahrung.belege_jahre@1` | C.32 | gueltig_ab ist Platzhalter |
-| K-428 | `steuern.aufbewahrung.belege_jahre@1` | C.32 | Rechtsgrundlagen ergänzt |
-| K-429 | `steuern.aufbewahrung.belege_jahre@1` | C.32 | Fristbeginn (Ende des Kalenderjahres) als Regel ergänzen |
-| K-430 | `steuern.aufbewahrung.buecher_jahre@1` | C.32 | gueltig_ab ist Platzhalter |
-| K-431 | `steuern.aufbewahrung.buecher_jahre@1` | C.32 | Rechtsgrundlagen ergänzt |
-| K-432 | `steuern.aufbewahrung.geschaeftsbriefe_jahre@1` | C.32 | gueltig_ab ist Platzhalter |
-| K-433 | `steuern.aufbewahrung.geschaeftsbriefe_jahre@1` | C.32 | Rechtsgrundlagen ergänzt |
-| K-434 | `steuern.ust.satz_regel@1` |  | [FACHLICH ZU PRÜFEN] Steuersatz steht nicht in der Spezifikation – vor Freigabe gegen das Gesetz prüfen |
-| K-435 | `steuern.ust.satz_regel@1` |  | gueltig_ab ist Platzhalter |
-| K-436 | `steuern.ust.satz_ermaessigt@1` |  | [FACHLICH ZU PRÜFEN] Steuersatz steht nicht in der Spezifikation – vor Freigabe gegen das Gesetz prüfen |
-| K-437 | `steuern.ust.satz_ermaessigt@1` |  | Welche Leistungen ermäßigt sind, entscheidet der Nutzer – Hinweis/Hilfe fachlich formulieren |
-| K-438 | `steuern.ust.satz_ermaessigt@1` |  | gueltig_ab ist Platzhalter |
+| K-207 | `online.barrierefreiheit` | G.70 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-208 | `online.barrierefreiheit` | G.70 | Bilanzsumme als Alternative zum Umsatz fehlt im Profil |
+| K-209 | `online.barrierefreiheit` | G.70 | Zählweise (G-05) |
+| K-210 | `online.barrierefreiheit` | G.70 | Welche Dienstleistungen genau (Buchungstools, Bankdienste …) – Liste ergänzen |
+| K-211 | `online.barrierefreiheit` | G.70 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-212 | `online.button_loesung` | G.68 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-213 | `online.button_loesung` | G.68 | Zulässige Beschriftungen als Beispiele ergänzen |
+| K-214 | `online.button_loesung` | G.68 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-215 | `online.cookie_einwilligung` | F.63 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-216 | `online.cookie_einwilligung` | F.63 | URL des Gesetzes nach Umbenennung (TTDSG → TDDDG) prüfen |
+| K-217 | `online.cookie_einwilligung` | F.63 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-218 | `online.dac7` | G.74 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-219 | `online.dac7` | G.74 | Meldeschwellen der Plattformen nicht in der Spezifikation |
+| K-220 | `online.dac7` | G.74 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-221 | `online.datenschutzerklaerung` | G.66 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-222 | `online.datenschutzerklaerung` | G.66 | Vorlage erst nach fachlicher Prüfung (6.4) |
+| K-223 | `online.datenschutzerklaerung` | G.66 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-224 | `online.datenschutzerklaerung` | G.66 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-225 | `online.impressum` | G.66 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-226 | `online.impressum` | G.66 | Pflichtangaben je Rechtsform als Checkliste fachlich ergänzen |
+| K-227 | `online.impressum` | G.66 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-228 | `online.kuendigungsbutton` | G.68 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-229 | `online.kuendigungsbutton` | G.68 | Vorgeschriebene Beschriftung und Ablauf (Bestätigungsseite) fachlich ergänzen |
+| K-230 | `online.kuendigungsbutton` | G.68 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-231 | `online.marktplatz_angaben` | G.74 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-232 | `online.marktplatz_angaben` | G.74 | Rechtsgrundlagen ergänzt – prüfen |
+| K-233 | `online.marktplatz_angaben` | G.74 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-234 | `online.marktplatz_angaben` | G.74 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-235 | `online.os_link` | G.69 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-236 | `online.os_link` | G.69 | Aktueller Status der OS-Plattform und der Linkpflicht – fachlich prüfen und Text anpassen |
+| K-237 | `online.os_link` | G.69 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-238 | `online.os_link` | G.69 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-239 | `online.preisangaben` | G.67 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-240 | `online.preisangaben` | G.67 | Ausnahmen und Einzelheiten (z. B. Grundpreis-Einheiten) fachlich ergänzen |
+| K-241 | `online.preisangaben` | G.67 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-242 | `online.vsbg_hinweis` | G.69 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-243 | `online.vsbg_hinweis` | G.69 | Zählweise (G-05) |
+| K-244 | `online.vsbg_hinweis` | G.69 | Auslöser „Website oder AGB“ – AGB sind nicht im Profil |
+| K-245 | `online.vsbg_hinweis` | G.69 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-246 | `online.widerrufsbelehrung` | G.68 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-247 | `online.widerrufsbelehrung` | G.68 | Muster-Widerrufsbelehrung erst nach Prüfung |
+| K-248 | `online.widerrufsbelehrung` | G.68 | Ausnahmen vom Widerrufsrecht als Hinweis |
+| K-249 | `online.widerrufsbelehrung` | G.68 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-250 | `online.widerrufsbelehrung` | G.68 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-251 | `online.widerrufsbutton` | G.68 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-252 | `online.widerrufsbutton` | G.68 | Fundstelle im BGB nach Umsetzung ergänzen |
+| K-253 | `online.widerrufsbutton` | G.68 | Beschriftung des Buttons fachlich ergänzen |
+| K-254 | `online.widerrufsbutton` | G.68 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-255 | `online.widerrufsbutton` | G.68 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-256 | `personal.anmeldezeitraum_angeben` | D.40 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-257 | `personal.anmeldezeitraum_angeben` | D.40 | Vorbereitender Schritt – Darstellung bestätigen |
+| K-258 | `personal.anmeldezeitraum_angeben` | D.40 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-259 | `personal.arbeitszeit_aufzeichnung` | D.42 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-260 | `personal.arbeitszeit_aufzeichnung` | D.42 | Fundstelle der BAG-Entscheidung prüfen |
+| K-261 | `personal.arbeitszeit_aufzeichnung` | D.42 | Anforderungen an die Form (bis zur Neuregelung) fachlich formulieren |
+| K-262 | `personal.arbeitszeit_aufzeichnung` | D.42 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-263 | `personal.arbeitszeit_aufzeichnung` | D.42 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-264 | `personal.arbeitszeit_milog` | D.42 | Fristen für Aufzeichnung und Aufbewahrung ergänzen |
+| K-265 | `personal.arbeitszeit_milog` | D.42 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-266 | `personal.arbeitszeit_neuregelung` | D.42 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-267 | `personal.arbeitszeit_neuregelung` | D.42 | Status offen – Radar |
+| K-268 | `personal.arbeitszeit_neuregelung` | D.42 | Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „mittel“) |
+| K-269 | `personal.arbeitszeit_neuregelung` | D.42 | Schwelle 10 als Regelwert führen, sobald beschlossen |
+| K-270 | `personal.aushangpflichtige_gesetze` | D.48 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-271 | `personal.aushangpflichtige_gesetze` | D.48 | Liste je Belegschaft (z. B. MuSchG ab wie vielen Frauen?) fachlich festlegen |
+| K-272 | `personal.aushangpflichtige_gesetze` | D.48 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-273 | `personal.beitragsnachweis` | D.40 | „Arbeitstage“ als Bankarbeitstage umgesetzt – bestätigen (G-13) |
+| K-274 | `personal.beitragsnachweis` | D.40 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-275 | `personal.beitragsnachweis` | D.40 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-276 | `personal.betriebsnummer` | D.37 | „vor der ersten Einstellung“ als spätestens am Tag vor Arbeitsbeginn umgesetzt – bestätigen |
+| K-277 | `personal.betriebsnummer` | D.37 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-278 | `personal.betriebsnummer` | D.37 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-279 | `personal.entgelttransparenz_bericht` | D.47 | Status offen – Radar |
+| K-280 | `personal.entgelttransparenz_bericht` | D.47 | Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „hoch“, weil EU-Richtlinie) |
+| K-281 | `personal.entgelttransparenz_bericht` | D.47 | Zählweise und Inhalt des Berichts nach Umsetzungsgesetz |
+| K-282 | `personal.hinweisgeber_meldestelle` | D.46 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-283 | `personal.hinweisgeber_meldestelle` | D.46 | Zählweise (G-05) |
+| K-284 | `personal.hinweisgeber_meldestelle` | D.46 | Übergangsregeln für 50–249 Beschäftigte noch relevant? |
+| K-285 | `personal.hinweisgeber_meldestelle` | D.46 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-286 | `personal.hinweisgeber_meldestelle` | D.46 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-287 | `personal.jugendarbeitsschutz` | D.44 | Erstuntersuchung als eigene Pflicht je Einstellung mit Frist? |
+| K-288 | `personal.jugendarbeitsschutz` | D.44 | Arbeitszeitgrenzen als Regelwerte |
+| K-289 | `personal.jugendarbeitsschutz` | D.44 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-290 | `personal.jugendarbeitsschutz` | D.44 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-291 | `personal.lohnabrechnung` | D.49 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-292 | `personal.lohnabrechnung` | D.49 | Partner noch nicht gewählt (Abschnitt 5, Integration offen) |
+| K-293 | `personal.lohnabrechnung` | D.49 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-294 | `personal.lohnsteuer_anmeldung` | D.40 | Grenzen für den Anmeldezeitraum (nach Vorjahres-Lohnsteuer) stehen nicht in der Spezifikation – deshalb Angabe des Nutzers |
+| K-295 | `personal.lohnsteuer_anmeldung` | D.40 | Verschiebung bei Fristende am Wochenende/Feiertag bestätigen |
+| K-296 | `personal.lohnsteuer_anmeldung` | D.40 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-297 | `personal.lohnsteuer_anmeldung` | D.40 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-298 | `personal.mindestlohn` | D.39 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-299 | `personal.mindestlohn` | D.39 | Ausnahmen (z. B. Azubis, Praktika) als Hinweis ergänzen? |
+| K-300 | `personal.mindestlohn` | D.39 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-301 | `personal.mindestlohn` | D.39 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-302 | `personal.minijob_grenze` | D.39 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-303 | `personal.minijob_grenze` | D.39 | Folgen bei Überschreiten (gelegentliches Überschreiten) ergänzen |
+| K-304 | `personal.minijob_grenze` | D.39 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-305 | `personal.minijob_grenze` | D.39 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-306 | `personal.mutterschutz_gefaehrdungsbeurteilung` | D.43 | Frist „vor Arbeitsbeginn“ wie E.50 – bestätigen |
+| K-307 | `personal.mutterschutz_gefaehrdungsbeurteilung` | D.43 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-308 | `personal.mutterschutz_gefaehrdungsbeurteilung` | D.43 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-309 | `personal.nachweisgesetz` | D.41 | Frist (je Angabe unterschiedlich) steht nicht in der Spezifikation – als spätestens bei Beginn eingetragen, fachlich ersetzen |
+| K-310 | `personal.nachweisgesetz` | D.41 | Zulässige Form (Schriftform/elektronisch) aktuell? |
+| K-311 | `personal.nachweisgesetz` | D.41 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-312 | `personal.schwangerschaft_mitteilung` | D.43 | Frist („unverzüglich“) steht nicht in der Spezifikation – als am Tag der Mitteilung eingetragen, fachlich ersetzen |
+| K-313 | `personal.schwangerschaft_mitteilung` | D.43 | Zuständige Behörde je Land |
+| K-314 | `personal.schwangerschaft_mitteilung` | D.43 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-315 | `personal.schwangerschaft_mitteilung` | D.43 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-316 | `personal.schwerbehinderte_anzeige` | D.45 | Quote und Höhe der Abgabe als Regelwerte |
+| K-317 | `personal.schwerbehinderte_anzeige` | D.45 | Zählweise der Arbeitsplätze (G-05); wer insgesamt weniger als 20 beschäftigt, gilt als unter der Schwelle – bestätigen |
+| K-318 | `personal.schwerbehinderte_anzeige` | D.45 | Verschiebung bei 31.3. am Wochenende |
+| K-319 | `personal.schwerbehinderte_anzeige` | D.45 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-320 | `personal.schwerbehinderte_anzeige` | D.45 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-321 | `personal.sofortmeldung` | D.38 | „Bei Arbeitsbeginn“ als spätestens am Tag des Beginns umgesetzt – bestätigen |
+| K-322 | `personal.sofortmeldung` | D.38 | Branchenliste vollständig (§ 28a Abs. 4 SGB IV)? |
+| K-323 | `personal.sofortmeldung` | D.38 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-324 | `personal.sv_abmeldung` | D.38 | Frist der Abmeldung steht nicht in der Spezifikation – als spätestens am Ende der Beschäftigung eingetragen, fachlich ersetzen |
+| K-325 | `personal.sv_abmeldung` | D.38 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-326 | `personal.sv_abmeldung` | D.38 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-327 | `personal.sv_anmeldung` | D.38 | Frist der Anmeldung steht nicht in der Spezifikation – als spätestens bei Beschäftigungsbeginn eingetragen, fachlich ersetzen |
+| K-328 | `personal.sv_anmeldung` | D.38 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-329 | `personal.sv_anmeldung` | D.38 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-330 | `personal.sv_beitraege` | D.40 | Minijobs: Fälligkeit bei der Minijob-Zentrale gleich? |
+| K-331 | `personal.sv_beitraege` | D.40 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-332 | `personal.sv_beitraege` | D.40 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-333 | `personal.sv_jahresmeldung` | D.38 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-334 | `personal.sv_jahresmeldung` | D.38 | Termin der Jahresmeldung als Regeldaten ergänzen (für den Jahreskalender I) |
+| K-335 | `personal.sv_jahresmeldung` | D.38 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-336 | `personal.sv_jahresmeldung` | D.38 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-337 | `personal.umlagen_eau` | D.40 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-338 | `personal.umlagen_eau` | D.40 | Welche Umlage gilt für wen (z. B. U1 nach Betriebsgröße) – fachlich ergänzen |
+| K-339 | `personal.umlagen_eau` | D.40 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-340 | `personal.umlagen_eau` | D.40 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-341 | `produkte.barrierefreiheit` | G.70 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-342 | `produkte.barrierefreiheit` | G.70 | Produktliste (§ 1 BFSG) als Auswahl ergänzen |
+| K-343 | `produkte.barrierefreiheit` | G.70 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-344 | `produkte.batterien` | G.72 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-345 | `produkte.batterien` | G.72 | Zuständige Stelle und Registrierungsweg ergänzen |
+| K-346 | `produkte.batterien` | G.72 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-347 | `produkte.elektrogeraete` | G.72 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-348 | `produkte.elektrogeraete` | G.72 | Wer gilt als Hersteller (Import, Eigenmarke)? |
+| K-349 | `produkte.elektrogeraete` | G.72 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-350 | `produkte.geldwaesche_gueterhaendler` | G.75 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-351 | `produkte.geldwaesche_gueterhaendler` | G.75 | Schwelle für Barzahlungen nicht in der Spezifikation – als Regelwert ergänzen |
+| K-352 | `produkte.geldwaesche_gueterhaendler` | G.75 | Immobilien- und Finanzbranche als Branchenmodul (H) |
+| K-353 | `produkte.geldwaesche_gueterhaendler` | G.75 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-354 | `produkte.gpsr` | G.73 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-355 | `produkte.gpsr` | G.73 | Pflichten für Händler vs. Hersteller trennen |
+| K-356 | `produkte.gpsr` | G.73 | Lebensmittel und Kosmetik haben eigene Regeln – Abgrenzung |
+| K-357 | `produkte.gpsr` | G.73 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-358 | `produkte.verpackung` | G.71 | „Vor dem ersten Inverkehrbringen“ als Frist mit Ereignis abbilden? |
+| K-359 | `produkte.verpackung` | G.71 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-360 | `steuern.aufbewahrung` | C.32 | Fristbeginn (Ende des Kalenderjahres) und Aufbewahrungsdauern als Regelwerte führen |
+| K-361 | `steuern.aufbewahrung` | C.32 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-362 | `steuern.aufbewahrung` | C.32 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-363 | `steuern.bauabzugsteuer_freistellung` | C.35 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-364 | `steuern.bauabzugsteuer_freistellung` | C.35 | Auch Handwerksbetriebe mit Bauleistungen erfassen (Branche handwerk)? |
+| K-365 | `steuern.bauabzugsteuer_freistellung` | C.35 | Gültigkeitsdauer der Bescheinigung und Erneuerung ergänzen |
+| K-366 | `steuern.bauabzugsteuer_freistellung` | C.35 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-367 | `steuern.buchfuehrungspflicht` | C.28 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-368 | `steuern.buchfuehrungspflicht` | C.28 | e.K. und GmbH & Co. KG als HGB-buchführungspflichtig angenommen – bestätigen |
+| K-369 | `steuern.buchfuehrungspflicht` | C.28 | Im Gründungsjahr und vor dem Start gibt es keine Vorjahreswerte – § 141-Grenzen dann als nicht überschritten behandelt |
+| K-370 | `steuern.buchfuehrungspflicht` | C.28 | § 141 AO: Pflicht beginnt erst nach Mitteilung des Finanzamts – berücksichtigen |
+| K-371 | `steuern.buchfuehrungspflicht` | C.28 | Grenze inklusive/exklusive |
+| K-372 | `steuern.buchfuehrungspflicht` | C.28 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-373 | `steuern.e_bilanz` | B.18 | Frist (gekoppelt an die Steuererklärung) als Regeldaten ergänzen |
+| K-374 | `steuern.e_bilanz` | B.18 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-375 | `steuern.e_bilanz` | B.18 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-376 | `steuern.e_rechnung_empfang` | C.30 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-377 | `steuern.e_rechnung_empfang` | C.30 | Gilt für alle Unternehmen, auch Kleinunternehmer – bestätigen |
+| K-378 | `steuern.e_rechnung_empfang` | C.30 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-379 | `steuern.e_rechnung_versand_2027` | C.30 | Maßgeblich ist der Umsatz 2026: bis 2026 wird auch die Prognose herangezogen – bestätigen |
+| K-380 | `steuern.e_rechnung_versand_2027` | C.30 | Rechtsstatus und gueltig_ab festlegen |
+| K-381 | `steuern.e_rechnung_versand_2027` | C.30 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-382 | `steuern.e_rechnung_versand_2028` | C.30 | Rechtsstatus und gueltig_ab festlegen |
+| K-383 | `steuern.e_rechnung_versand_2028` | C.30 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-384 | `steuern.est_erklaerung` | C.27 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-385 | `steuern.est_erklaerung` | C.27 | Abgabefristen (mit und ohne Steuerberatung) fehlen in der Spezifikation – als jährliche Regeldaten ergänzen (Jahreskalender I) |
+| K-386 | `steuern.est_erklaerung` | C.27 | Personengesellschaften: Feststellungserklärung der Gesellschaft zusätzlich? |
+| K-387 | `steuern.est_erklaerung` | C.27 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-388 | `steuern.est_erklaerung` | C.27 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-389 | `steuern.euer` | C.27 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-390 | `steuern.euer` | C.27 | Abgabefristen (mit und ohne Steuerberatung) fehlen in der Spezifikation – als jährliche Regeldaten ergänzen (Jahreskalender I) |
+| K-391 | `steuern.euer` | C.27 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-392 | `steuern.euer` | C.27 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-393 | `steuern.gewst_erklaerung` | C.27 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-394 | `steuern.gewst_erklaerung` | C.27 | Abgabefristen (mit und ohne Steuerberatung) fehlen in der Spezifikation – als jährliche Regeldaten ergänzen (Jahreskalender I) |
+| K-395 | `steuern.gewst_erklaerung` | C.27 | Freibetrag (C.34) als Regelwert führen |
+| K-396 | `steuern.gewst_erklaerung` | C.27 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-397 | `steuern.gewst_erklaerung` | C.27 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-398 | `steuern.gobd_verfahrensdokumentation` | C.31 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-399 | `steuern.gobd_verfahrensdokumentation` | C.31 | Fundstelle des aktuellen GoBD-Schreibens ergänzen |
+| K-400 | `steuern.gobd_verfahrensdokumentation` | C.31 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-401 | `steuern.gobd_verfahrensdokumentation` | C.31 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-402 | `steuern.kasse_tse_belegausgabe` | C.33 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-403 | `steuern.kasse_tse_belegausgabe` | C.33 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-404 | `steuern.kassenmeldung` | C.33 | Bestandskassen (Meldefrist 31.7.2025): Pflicht für Kassen ohne gemeldetes Anschaffungsdatum abbilden |
+| K-405 | `steuern.kassenmeldung` | C.33 | Verschiebung bei Fristende am Wochenende festlegen |
+| K-406 | `steuern.kassenmeldung` | C.33 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-407 | `steuern.kassenmeldung_ausserbetriebnahme` | C.33 | Mehrere Kassen: je Ereignis eine Meldung (derzeit Bezug auf die erste Außerbetriebnahme) |
+| K-408 | `steuern.kassenmeldung_ausserbetriebnahme` | C.33 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-409 | `steuern.kleinunternehmer_grenze_ueberschritten` | C.23 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-410 | `steuern.kleinunternehmer_grenze_ueberschritten` | C.23 | Vor dem Start gibt es keinen Vorjahresumsatz – Vorjahresgrenze dann nicht geprüft |
+| K-411 | `steuern.kleinunternehmer_grenze_ueberschritten` | C.23 | Prognose statt tatsächlicher Umsatz: bis Abschnitt 4 nur Profilangaben – Formulierung „nach deinen Angaben“ bestätigen |
+| K-412 | `steuern.kleinunternehmer_grenze_ueberschritten` | C.23 | Grenze inklusive/exklusive (K-18) |
+| K-413 | `steuern.kleinunternehmer_warnung_80` | C.23 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-414 | `steuern.kleinunternehmer_warnung_80` | C.23 | Umsatzbegriff für die Grenze (G-06): Summe der gestellten Rechnungen (netto, abzüglich Stornos) im Kalenderjahr nach Rechnungsdatum – bestätigen |
+| K-415 | `steuern.kleinunternehmer_warnung_80` | C.23 | Warnstufen 80 % und 95 % aus der Spezifikation |
+| K-416 | `steuern.kleinunternehmer_warnung_95` | C.23 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-417 | `steuern.kleinunternehmer_warnung_95` | C.23 | Umsatzbegriff für die Grenze (G-06): Summe der gestellten Rechnungen (netto, abzüglich Stornos) im Kalenderjahr nach Rechnungsdatum – bestätigen |
+| K-418 | `steuern.kleinunternehmer_warnung_95` | C.23 | Warnstufen 80 % und 95 % aus der Spezifikation |
+| K-419 | `steuern.kleinunternehmerregelung` | C.23 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-420 | `steuern.kleinunternehmerregelung` | C.23 | Echtzeit-Warnungen bei 80 % und 95 % (Spezifikation C.23) folgen in Abschnitt 4 mit Finanzdaten |
+| K-421 | `steuern.kst_erklaerung` | B.19 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-422 | `steuern.kst_erklaerung` | B.19 | Abgabefristen mit und ohne Steuerberatung als Regeldaten (wie G-18) |
+| K-423 | `steuern.kst_erklaerung` | B.19 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-424 | `steuern.kst_erklaerung` | B.19 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-425 | `steuern.rechnungen_pflichtangaben` | C.29 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-426 | `steuern.rechnungen_pflichtangaben` | C.29 | Liste der Pflichtangaben und Kleinbetragsgrenze als Inhalt ergänzen |
+| K-427 | `steuern.rechnungen_pflichtangaben` | C.29 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-428 | `steuern.ust_jahreserklaerung` | C.27 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-429 | `steuern.ust_jahreserklaerung` | C.27 | Abgabefristen (mit und ohne Steuerberatung) fehlen in der Spezifikation – als jährliche Regeldaten ergänzen (Jahreskalender I) |
+| K-430 | `steuern.ust_jahreserklaerung` | C.27 | Kleinunternehmer: Erklärungspflicht prüfen |
+| K-431 | `steuern.ust_jahreserklaerung` | C.27 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-432 | `steuern.ust_sondervorauszahlung` | C.24 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-433 | `steuern.ust_sondervorauszahlung` | C.24 | Fälligkeitstermin und Bemessungsgrundlage der Sondervorauszahlung ergänzen (K-08) |
+| K-434 | `steuern.ust_sondervorauszahlung` | C.24 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-435 | `steuern.ust_voranmeldung` | C.24 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen (früherer Text war nicht belegt) |
+| K-436 | `steuern.ust_voranmeldung` | C.24 | Befreiung bis Grenze ist laut Spezifikation 'möglich' (Ermessen Finanzamt?) – Auslöser bildet das als 'gilt nicht' ab; Formulierung prüfen |
+| K-437 | `steuern.ust_voranmeldung` | C.24 | Neugründer: Aussetzung der monatlichen Pflicht 2021–2026 (Radar) – Rhythmus im Gründungs- und Folgejahr festlegen |
+| K-438 | `steuern.ust_voranmeldung` | C.24 | Sondervorauszahlung 1/11 bei monatlicher Dauerfristverlängerung als eigene Pflicht anlegen |
+| K-439 | `steuern.ust_voranmeldung` | C.24 | Verschiebung auf nächsten Werktag und Feiertagskalender (Bundesland) bestätigen |
+| K-440 | `steuern.ust_voranmeldung` | C.24 | gueltig_ab: Datum der heutigen Fassung der Grenzen eintragen |
+| K-441 | `steuern.vorauszahlung_est_kst` | C.26 | Verschiebung auf den nächsten Werktag bei Zahlungsterminen bestätigen |
+| K-442 | `steuern.vorauszahlung_est_kst` | C.26 | Schonfrist bei Überweisung erwähnen? |
+| K-443 | `steuern.vorauszahlung_est_kst` | C.26 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-444 | `steuern.vorauszahlung_est_kst` | C.26 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-445 | `steuern.vorauszahlung_gewst` | C.26 | Verschiebung und Kalender (Gemeinde) bestätigen |
+| K-446 | `steuern.vorauszahlung_gewst` | C.26 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-447 | `steuern.vorauszahlung_gewst` | C.26 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-448 | `steuern.zusammenfassende_meldung` | C.25 | Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen |
+| K-449 | `steuern.zusammenfassende_meldung` | C.25 | Meldezeitraum und Abgabefrist ergänzen |
+| K-450 | `steuern.zusammenfassende_meldung` | C.25 | Kleinunternehmer ausgenommen? |
+| K-451 | `steuern.zusammenfassende_meldung` | C.25 | Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen |
+| K-452 | `steuern.zusammenfassende_meldung` | C.25 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-453 | `datenschutz.dsb.schwelle_personen@1` | F.61 | gueltig_ab ist Platzhalter |
+| K-454 | `datenschutz.dsb.schwelle_personen@1` | F.61 | Geplante Streichung bis Ende 2026 (Radar F.61) – gueltig_bis setzen, sobald beschlossen |
+| K-455 | `gesellschaft.gmbh.stammkapital_mindest@1` | B.14 | gueltig_ab ist Platzhalter |
+| K-456 | `gesellschaft.gmbh.stammkapital_mindest@1` | B.14 | Rechtsgrundlage ergänzt, steht nicht in der Spezifikation |
+| K-457 | `gesellschaft.gmbh.mindesteinzahlung_anteil@1` | B.14 | Spezifikation: „mindestens Hälfte einzuzahlen“ – Bezug (Mindeststammkapital oder Summe der Anteile) und Einzahlung je Geschäftsanteil prüfen |
+| K-458 | `gesellschaft.gmbh.mindesteinzahlung_anteil@1` | B.14 | Rechtsgrundlage ergänzt |
+| K-459 | `gesellschaft.ug.stammkapital_mindest@1` | B.14 | gueltig_ab ist Platzhalter |
+| K-460 | `gesellschaft.ug.stammkapital_mindest@1` | B.14 | Rechtsgrundlage ergänzt |
+| K-461 | `gesellschaft.ug.ruecklage_anteil@1` | B.14 | gueltig_ab ist Platzhalter |
+| K-462 | `gesellschaft.ug.ruecklage_anteil@1` | B.14 | Rechtsgrundlage ergänzt |
+| K-463 | `gesellschaft.ug.ruecklage_anteil@1` | B.14 | Berechnungsbasis (Jahresüberschuss abzüglich Verlustvortrag) prüfen |
+| K-464 | `online.vsbg.schwelle_beschaeftigte@1` | G.69 | gueltig_ab ist Platzhalter |
+| K-465 | `online.vsbg.schwelle_beschaeftigte@1` | G.69 | „mehr als 10“: Vergleich > 10 in den Regeln |
+| K-466 | `online.bfsg.kleinst_beschaeftigte@1` | G.70 | Rechtsgrundlage ergänzt |
+| K-467 | `online.bfsg.kleinst_umsatz@1` | G.70 | Alternative Bilanzsumme fehlt im Profil |
+| K-468 | `online.bfsg.kleinst_umsatz@1` | G.70 | Rechtsgrundlage ergänzt |
+| K-469 | `personal.mindestlohn.stunde@1` | D.39 | Rechtsgrundlage (aktuelle Anpassungsverordnung) ergänzen |
+| K-470 | `personal.mindestlohn.stunde@2` | D.39 | Status „beschlossen“ – Verordnung prüfen |
+| K-471 | `personal.minijob.grenze_monat@1` | D.39 | Rechtsgrundlage ergänzt |
+| K-472 | `personal.minijob.grenze_monat@2` | D.39 | Dynamische Kopplung an den Mindestlohn – Wert für 2027 bestätigen |
+| K-473 | `personal.schwerbehinderte.schwelle_arbeitsplaetze@1` | D.45 | gueltig_ab ist Platzhalter |
+| K-474 | `personal.schwerbehinderte.schwelle_arbeitsplaetze@1` | D.45 | Rechtsgrundlage ergänzt |
+| K-475 | `personal.hinschg.schwelle@1` | D.46 | gueltig_ab ist Platzhalter |
+| K-476 | `personal.hinschg.schwelle@1` | D.46 | Rechtsgrundlage ergänzt |
+| K-477 | `personal.entgelttransparenz.berichtspflicht_schwelle@1` | D.47 | Spezifikation: „über 150 Beschäftigte“ – Vergleich > umgesetzt |
+| K-478 | `personal.entgelttransparenz.berichtspflicht_schwelle@1` | D.47 | Deutsches Umsetzungsgesetz abwarten |
+| K-479 | `arbeitsschutz.ersthelfer.schwelle_versicherte@1` | E.53 | gueltig_ab ist Platzhalter |
+| K-480 | `arbeitsschutz.ersthelfer.schwelle_versicherte@1` | E.53 | Rechtsgrundlage ergänzt |
+| K-481 | `arbeitsschutz.ersthelfer.schwelle_versicherte@1` | E.53 | Versicherte vs. Beschäftigte |
+| K-482 | `steuern.ust_va.grenze_befreiung@1` | C.24 | gueltig_ab ist Platzhalter (Beginn Betrachtungszeitraum), tatsächliches Inkrafttreten der Grenze eintragen |
+| K-483 | `steuern.ust_va.grenze_monatlich@1` | C.24 | gueltig_ab ist Platzhalter |
+| K-484 | `steuern.ust_va.grenze_monatlich@1` | C.24 | Spezifikation: 'über 9.000 € monatlich' – Vergleich '>' bestätigen |
+| K-485 | `steuern.ustg19.grenze_vorjahr@1` | C.23 | gueltig_ab ist Platzhalter |
+| K-486 | `steuern.ustg19.grenze_vorjahr@1` | C.23 | Grenze inklusive oder exklusive ('max. 25.000 €')? |
+| K-487 | `steuern.ustg19.grenze_laufendes_jahr@1` | C.23 | gueltig_ab ist Platzhalter |
+| K-488 | `steuern.ustg19.grenze_laufendes_jahr@1` | C.23 | Gründungsjahr: abweichende Grenze 25.000 € als eigener Regelwert |
+| K-489 | `steuern.ustg19.grenze_gruendungsjahr@1` | C.23 | gueltig_ab ist Platzhalter |
+| K-490 | `steuern.ustg19.grenze_gruendungsjahr@1` | C.23 | Grenze inklusive oder exklusive? |
+| K-491 | `steuern.ao141.grenze_umsatz@1` | C.28 | gueltig_ab ist Platzhalter |
+| K-492 | `steuern.ao141.grenze_umsatz@1` | C.28 | Bezugsjahr und Vergleich (> oder ≥) bestätigen |
+| K-493 | `steuern.ao141.grenze_gewinn@1` | C.28 | gueltig_ab ist Platzhalter |
+| K-494 | `steuern.ao141.grenze_gewinn@1` | C.28 | Bezugsjahr und Vergleich (> oder ≥) bestätigen |
+| K-495 | `steuern.e_rechnung.grenze_vorjahresumsatz_2027@1` | C.30 | Übergangsregel-Fundstelle (§ 27 Abs. 38 UStG) ergänzt, nicht aus Spezifikation |
+| K-496 | `steuern.e_rechnung.grenze_vorjahresumsatz_2027@1` | C.30 | gueltig_ab/gueltig_bis als Übergangszeitraum bestätigen |
+| K-497 | `steuern.aufbewahrung.belege_jahre@1` | C.32 | gueltig_ab ist Platzhalter |
+| K-498 | `steuern.aufbewahrung.belege_jahre@1` | C.32 | Rechtsgrundlagen ergänzt |
+| K-499 | `steuern.aufbewahrung.belege_jahre@1` | C.32 | Fristbeginn (Ende des Kalenderjahres) als Regel ergänzen |
+| K-500 | `steuern.aufbewahrung.buecher_jahre@1` | C.32 | gueltig_ab ist Platzhalter |
+| K-501 | `steuern.aufbewahrung.buecher_jahre@1` | C.32 | Rechtsgrundlagen ergänzt |
+| K-502 | `steuern.aufbewahrung.geschaeftsbriefe_jahre@1` | C.32 | gueltig_ab ist Platzhalter |
+| K-503 | `steuern.aufbewahrung.geschaeftsbriefe_jahre@1` | C.32 | Rechtsgrundlagen ergänzt |
+| K-504 | `steuern.ust.satz_regel@1` |  | [FACHLICH ZU PRÜFEN] Steuersatz steht nicht in der Spezifikation – vor Freigabe gegen das Gesetz prüfen |
+| K-505 | `steuern.ust.satz_regel@1` |  | gueltig_ab ist Platzhalter |
+| K-506 | `steuern.ust.satz_ermaessigt@1` |  | [FACHLICH ZU PRÜFEN] Steuersatz steht nicht in der Spezifikation – vor Freigabe gegen das Gesetz prüfen |
+| K-507 | `steuern.ust.satz_ermaessigt@1` |  | Welche Leistungen ermäßigt sind, entscheidet der Nutzer – Hinweis/Hilfe fachlich formulieren |
+| K-508 | `steuern.ust.satz_ermaessigt@1` |  | gueltig_ab ist Platzhalter |

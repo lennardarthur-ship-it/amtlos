@@ -1,0 +1,61 @@
+# Katalog G.69 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: online.vsbg_hinweis
+version: 1
+katalog_nr: G.69
+titel:
+  de: Hinweis zur Verbraucherstreitbeilegung
+kurz:
+  de: Mit mehr als 10 Beschäftigten informierst du auf Website und in AGB, ob du an Streitbeilegungsverfahren teilnimmst.
+erklaerung:
+  de: Die Hinweispflicht nach § 36 VSBG gilt für Unternehmer mit mehr als 10 Beschäftigten, die eine Website unterhalten oder
+    AGB verwenden.
+rechtsgrundlage:
+- § 36 VSBG
+kategorie: online
+ausloeser:
+  all:
+  - feld: profil.kunden.segmente
+    op: enthaelt
+    wert: b2c
+    label:
+      de: Du verkaufst an Verbraucher.
+  - feld: profil.beschaeftigte.gesamt
+    op: '>'
+    wert:
+      regelwert: online.vsbg.schwelle_beschaeftigte
+  - feld: abgeleitet.beschaeftigte.zaehlung_vsbg
+    op: '>'
+    wert:
+      regelwert: online.vsbg.schwelle_beschaeftigte
+    label:
+      de: Du hast mehr als 10 Beschäftigte im Sinne des VSBG.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Verbraucherstreitbeilegungsgesetz § 36
+  url: https://www.gesetze-im-internet.de/vsbg/__36.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Zählweise (G-05)
+- Auslöser „Website oder AGB“ – AGB sind nicht im Profil
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

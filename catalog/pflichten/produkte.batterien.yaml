@@ -1,0 +1,48 @@
+# Katalog G.72 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: produkte.batterien
+version: 1
+katalog_nr: G.72
+titel:
+  de: Batterien registrieren (BattDG)
+kurz:
+  de: Bevor du Batterien oder Geräte mit Batterien verkaufst, registrierst du dich nach dem Batteriegesetz.
+erklaerung:
+  de: Hersteller von Batterien müssen sich vor dem Inverkehrbringen registrieren.
+rechtsgrundlage:
+- BattDG
+kategorie: produkte
+ausloeser:
+  feld: profil.produkte.arten
+  op: enthaelt
+  wert: batterien
+  label:
+    de: Du verkaufst Batterien oder Geräte mit Batterien.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Zuständige Stelle nach BattDG
+kanal: portal
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Batterierecht-Durchführungsgesetz
+  url: https://www.gesetze-im-internet.de/battdg/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Zuständige Stelle und Registrierungsweg ergänzen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

@@ -1,0 +1,16 @@
+persona: grenzfall
+beschreibung: Genau 10 Beschäftigte – Hinweispflicht nach VSBG gilt nicht (erst „mehr als 10“)
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: "2018-01-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.beschaeftigte.gesamt: 10
+  profil.umsatz.vorjahr: 500000
+  profil.kunden.segmente: [b2c]
+  profil.vertrieb.kanaele: [onlineshop]
+  profil.bundesland: BW
+  profil.gemeinde_ags: "08111000"
+erwartet:
+  online.vsbg_hinweis: gilt_nicht
+  online.barrierefreiheit: unbekannt

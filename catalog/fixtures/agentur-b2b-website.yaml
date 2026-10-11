@@ -1,0 +1,23 @@
+persona: agentur
+beschreibung: Agentur nur für Geschäftskunden mit Website, ohne Shop – Impressum ja, Verbraucherpflichten nein
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: "2019-01-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.beschaeftigte.gesamt: 6
+  profil.kunden.segmente: [b2b]
+  profil.vertrieb.kanaele: [vor_ort_beim_kunden]
+  profil.produkte.arten: [dienstleistung]
+  profil.online.website: true
+  profil.bundesland: HH
+  profil.gemeinde_ags: "02000000"
+erwartet:
+  online.impressum: gilt
+  online.datenschutzerklaerung: gilt
+  online.preisangaben: gilt_nicht
+  online.widerrufsbelehrung: gilt_nicht
+  online.widerrufsbutton: gilt_nicht
+  online.barrierefreiheit: gilt_nicht
+  produkte.gpsr: gilt_nicht
+  produkte.verpackung: gilt_nicht

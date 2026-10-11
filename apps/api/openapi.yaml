@@ -31,6 +31,7 @@ tags:
   - name: Personal
   - name: Arbeitsschutz
   - name: Datenschutz
+  - name: Online
 
 paths:
   /v1/gesundheit:
@@ -1196,6 +1197,33 @@ paths:
         "201": { description: Abgeschlossen }
         "409": { description: Schon abgeschlossen }
         "422": { description: Bewertung oder Meldung fehlt }
+
+  /v1/onlinecheck:
+    get:
+      tags: [Online]
+      summary: Letzte Online-Checks mit Befunden
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK }
+    post:
+      tags: [Online]
+      summary: Website prüfen (technischer Check, kein Rechtsgutachten); höchstens wenige Seiten, Schutz gegen interne Ziele
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [url], properties: { url: { type: string, maxLength: 500 } } } } } }
+      responses:
+        "201": { description: Ergebnis (status ok oder fehler mit Code) }
+        "422": { description: Ungültige Adresse }
+        "429": { description: Tageslimit erreicht }
+
+  /v1/onlinecheck/{id}:
+    get:
+      tags: [Online]
+      summary: Ein Online-Check
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "200": { description: OK }
+        "404": { description: Nicht gefunden }
 
   /v1/glossar:
     get:

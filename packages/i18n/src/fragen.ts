@@ -323,6 +323,13 @@ export const SCHRITTE: Schritt[] = [
           digital: { de: "Digitale Produkte", en: "Digital products" },
         },
       },
+      { feld: "online.website", art: "janein", frage: { de: "Hast du eine eigene Website?", en: "Do you have your own website?" } },
+      {
+        feld: "handel.hohe_bargeschaefte",
+        art: "janein",
+        frage: { de: "Nimmst du für Waren hohe Barzahlungen an (in Höhe der Schwelle des Geldwäschegesetzes)?", en: "Do you accept large cash payments for goods (at the threshold of the Anti-Money Laundering Act)?" },
+        hilfe: { de: "Wenn du nur Dienstleistungen verkaufst oder keine großen Beträge bar annimmst: Nein.", en: "If you only sell services or don't accept large amounts in cash: No." },
+      },
       { feld: "kasse.elektronisch", art: "janein", frage: { de: "Nutzt du eine elektronische Kasse?", en: "Do you use an electronic till?" } },
     ],
   },

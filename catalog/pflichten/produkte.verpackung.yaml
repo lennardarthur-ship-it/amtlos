@@ -1,0 +1,49 @@
+# Katalog G.71 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: produkte.verpackung
+version: 1
+katalog_nr: G.71
+titel:
+  de: Verpackungen registrieren und lizenzieren
+kurz:
+  de: Bevor du verpackte Waren erstmals in Verkehr bringst, registrierst du dich im LUCID-Register und beteiligst dich an
+    einem System.
+erklaerung:
+  de: Das Verpackungsgesetz verlangt Registrierung bei der Zentralen Stelle Verpackungsregister (LUCID) und Systembeteiligung
+    vor dem ersten Inverkehrbringen.
+rechtsgrundlage:
+- VerpackG
+kategorie: produkte
+ausloeser:
+  feld: profil.produkte.arten
+  op: enthaelt
+  wert: verpackung
+  label:
+    de: Du bringst verpackte Waren in Verkehr.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Zentrale Stelle Verpackungsregister (LUCID)
+kanal: portal
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Verpackungsgesetz
+  url: https://www.gesetze-im-internet.de/verpackg/
+  abgerufen: null
+fachlich_zu_pruefen:
+- „Vor dem ersten Inverkehrbringen“ als Frist mit Ereignis abbilden?
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

@@ -1,5 +1,7 @@
 import "reflect-metadata";
 import fs from "node:fs";
+import nodeHttp from "node:http";
+import type { AddressInfo } from "node:net";
 import os from "node:os";
 import path from "node:path";
 import type { NestExpressApplication } from "@nestjs/platform-express";
@@ -37,6 +39,7 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
     app = await erzeugeApp({
       UMGEBUNG: "test", PORT: 0, DATABASE_URL: urls.api, AUTH_MODUS: "dev", DEV_JWT_SECRET: GEHEIM,
       WEB_URL: "https://app.amtlos.test", API_URL: "https://api.amtlos.test", OIDC_ISSUER: undefined, OIDC_AUDIENCE: undefined, METRIKEN_TOKEN: METRIK_TOKEN, RATE_ANGEMELDET: 10_000, RATE_ANONYM: 1_000, ABLAGE_VERZEICHNIS: fs.mkdtempSync(path.join(os.tmpdir(), "ablage-")),
+      ONLINECHECK_PRIVATE_NETZE: "erlaubt", ONLINECHECK_JE_TAG: 3,
     });
     await app.init();
     [anna, ben, mia] = await Promise.all([token("anna"), token("ben"), token("mia")]);
@@ -703,6 +706,54 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       expect((await alsDana(http().get("/v1/unterweisungen?art=ki_kompetenz")).expect(200)).body).toHaveLength(1);
       expect((await alsDana(http().get("/v1/unterweisungen?art=arbeitsschutz")).expect(200)).body).toHaveLength(0);
       await alsDana(http().get("/v1/unterweisungen?art=quatsch")).expect(400);
+    });
+  });
+
+  describe("Online-Check", () => {
+    let otto: string;
+    let u: string;
+    let server: nodeHttp.Server;
+    let basis: string;
+    const alsOtto = (x: request.Test) => x.set("Authorization", `Bearer ${otto}`).set("X-Unternehmen-Id", u);
+
+    beforeAll(async () => {
+      server = nodeHttp.createServer((req, res) => {
+        if (req.url === "/impressum") return res.writeHead(200, { "Content-Type": "text/html" }).end("<html lang=de><title>Impressum</title><p>Ottos Shop UG, Amtsgericht Köln HRB 9, otto@shop.example</p></html>");
+        if (req.url !== "/") return res.writeHead(404, { "Content-Type": "text/html" }).end("nicht gefunden");
+        res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+        res.end(`<html lang="de"><title>Ottos Shop</title><body><a href="/impressum">Impressum</a><a href="/agb">Verträge hier kündigen</a><p>Kaffee 8,50 € inkl. MwSt.</p></body></html>`);
+      });
+      await new Promise<void>((r) => server.listen(0, "127.0.0.1", r));
+      basis = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+      otto = await token("otto");
+      u = (await http().post("/v1/unternehmen").set("Authorization", `Bearer ${otto}`).send({ name: "Ottos Shop" }).expect(201)).body.id;
+      await alsOtto(http().put("/v1/profil")).send({ daten: { rechtsform: "ug", gruendungsdatum: "2023-01-01", "taetigkeit.einordnung": "gewerbe", gemeinde_ags: "05315000", "kunden.segmente": ["b2c"], "vertrieb.kanaele": ["onlineshop", "abo"], "produkte.arten": ["physisch"] } }).expect(200);
+    });
+    afterAll(() => new Promise<void>((r) => server.close(() => r())));
+
+    it("prüft die Website nach dem Profil, speichert das Ergebnis und setzt die Profilangabe", async () => {
+      await alsOtto(http().post("/v1/onlinecheck")).send({ url: "ftp://shop.example" }).expect(422);
+      const r = (await alsOtto(http().post("/v1/onlinecheck")).send({ url: basis }).expect(201)).body;
+      expect(r.status).toBe("ok");
+      const b = (id: string) => (r.befunde as { id: string; status: string }[]).find((x) => x.id === id);
+      expect(b("impressum")?.status).toBe("ok");
+      expect(b("impressum_register")?.status).toBe("ok");
+      expect(b("datenschutz")?.status).toBe("fehlt");
+      expect(b("kuendigungsbutton")?.status).toBe("ok");
+      expect(b("widerrufsbutton")?.status).toBe("fehlt");
+      expect(b("preisangaben")?.status).toBe("ok");
+      expect(b("gpsr")?.status).toBe("nicht_geprueft");
+      expect(r.befunde[0].status).toBe("fehlt");
+      expect((await alsOtto(http().get("/v1/profil")).expect(200)).body.daten["online.website"]).toBe(true);
+      expect((await alsOtto(http().get(`/v1/onlinecheck/${r.id}`)).expect(200)).body.url).toBe(`${basis}/`);
+    });
+
+    it("meldet nicht erreichbare Seiten als Ergebnis und begrenzt die Checks je Tag", async () => {
+      const f = (await alsOtto(http().post("/v1/onlinecheck")).send({ url: "http://127.0.0.1:9/" }).expect(201)).body;
+      expect(f).toMatchObject({ status: "fehler", fehler: "nicht_erreichbar" });
+      await alsOtto(http().post("/v1/onlinecheck")).send({ url: basis }).expect(201);
+      await alsOtto(http().post("/v1/onlinecheck")).send({ url: basis }).expect(429);
+      expect((await alsOtto(http().get("/v1/onlinecheck")).expect(200)).body).toHaveLength(3);
     });
   });
 });

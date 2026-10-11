@@ -15,7 +15,7 @@ export const metadata = { title: "Änderung melden" };
 const MELDBAR = [
   "neuer_arbeitsplatz", "neue_taetigkeit", "arbeitsunfall",
   "schwangerschaft_mitgeteilt", "neuer_vertriebskanal", "kasse_angeschafft", "kasse_ausser_betrieb",
-  "rechtsformwechsel", "sitzverlegung", "gesellschafterwechsel", "datenpanne", "betriebsaufgabe",
+  "rechtsformwechsel", "sitzverlegung", "gesellschafterwechsel", "betriebsaufgabe",
 ] as const;
 
 interface Ereignis { id: string; typ: string; datum: string; storniert: boolean; storniert_ereignis_id: string | null }
@@ -48,6 +48,9 @@ export default async function MeldenSeite({ searchParams }: { searchParams: Prom
         <p className="mt-2">{x.melden.text}</p>
         <p className="mt-2 text-klein">
           {x.melden.personal_hinweis} <Link href="/personal" className="verweis">{x.nav.personal}</Link>
+        </p>
+        <p className="mt-1 text-klein">
+          {x.melden.panne_hinweis} <Link href="/datenschutz/pannen#melden" className="verweis">{x.ds.notfall}</Link>
         </p>
       </header>
       {gemeldet ? (

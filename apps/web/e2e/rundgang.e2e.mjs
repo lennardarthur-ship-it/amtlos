@@ -6,6 +6,7 @@
  * Bildschirmfotos landen in E2E_BILDER (optional).
  */
 import fs from "node:fs";
+import http from "node:http";
 import path from "node:path";
 import AxeBuilder from "@axe-core/playwright";
 import { chromium } from "playwright-core";
@@ -15,6 +16,15 @@ const BILDER = process.env.E2E_BILDER;
 const kennung = `e2e-${Date.now()}`;
 const fehler = [];
 const pruefe = (bedingung, text) => { if (!bedingung) fehler.push(text); };
+
+// Kleine Testseite für den Online-Check (die API muss private Netze dafür erlauben: ONLINECHECK_PRIVATE_NETZE=erlaubt)
+const testseite = http.createServer((req, res) => {
+  if (req.url === "/impressum") return res.writeHead(200, { "Content-Type": "text/html" }).end("<html lang=de><title>Impressum</title><p>Testbetrieb, test@example.org</p></html>");
+  if (req.url !== "/") return res.writeHead(404, { "Content-Type": "text/html" }).end("nicht gefunden");
+  res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" }).end('<html lang="de"><title>Testshop</title><script src="https://www.googletagmanager.com/gtag/js?id=G-1"></script><a href="/impressum">Impressum</a><p>Tasse 9,90 €</p></html>');
+});
+await new Promise((r) => testseite.listen(0, "127.0.0.1", r));
+const TESTSEITE = `http://127.0.0.1:${testseite.address().port}/`;
 
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PFAD || undefined, headless: true, args: ["--no-sandbox"] });
 
@@ -278,6 +288,22 @@ async function rundgang(farbschema, breite) {
     }
   }
 
+  // Online-Check gegen die lokale Testseite; mobil: „Mehr“ führt zu den übrigen Bereichen
+  if (farbschema === "light") {
+    await p.goto(`${B}/online`);
+    await barrierefrei(p, name("online-leer"));
+    await p.fill("#url", TESTSEITE);
+    await Promise.all([p.waitForURL(/check=/), p.getByRole("button", { name: "Jetzt prüfen" }).click()]);
+    pruefe(await p.getByText("Datenschutzerklärung verlinkt").count(), `${name("online")}: Befund Datenschutzerklärung fehlt`);
+    pruefe(await p.getByText(/Google Tag Manager/).count(), `${name("online")}: Tracker nicht erkannt`);
+    await barrierefrei(p, name("online"));
+  } else {
+    await p.goto(`${B}/mehr`);
+    await barrierefrei(p, name("mehr"));
+    await Promise.all([p.waitForURL(/\/online/), p.getByRole("link", { name: /^Online/ }).first().click()]);
+    await barrierefrei(p, name("online"));
+  }
+
   // Team: einladen, Link nur einmal sichtbar; Eingeladene meldet sich über den Link an und nimmt an
   const gast = `${kennung}-gast-${farbschema}`;
   await p.goto(`${B}/team`);
@@ -318,6 +344,7 @@ try {
   await rundgang("dark", 390);
 } finally {
   await browser.close();
+  testseite.close();
 }
 if (fehler.length) {
   console.error(`✗ ${fehler.length} Befunde:\n- ${fehler.join("\n- ")}`);

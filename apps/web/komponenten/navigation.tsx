@@ -6,9 +6,11 @@ import { usePathname } from "next/navigation";
 export interface NavEintrag {
   href: string;
   text: string;
-  symbol: "heute" | "pflichten" | "kalender" | "finanzen" | "personal" | "datenschutz" | "melden" | "einstellungen";
+  symbol: "heute" | "pflichten" | "kalender" | "finanzen" | "personal" | "datenschutz" | "online" | "mehr" | "melden" | "einstellungen";
   /** Mobil nicht in der Leiste (dort im Kopf), damit die Ziele groß genug bleiben. */
   nurDesktop?: boolean;
+  /** Nur mobil („Mehr“ führt zu den Bereichen, die mobil nicht in der Leiste stehen). */
+  nurMobil?: boolean;
 }
 
 function Symbol({ art }: { art: NavEintrag["symbol"] }) {
@@ -26,6 +28,10 @@ function Symbol({ art }: { art: NavEintrag["symbol"] }) {
       return <svg {...p}><circle cx="9" cy="8" r="3" /><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" /><circle cx="17" cy="9" r="2.2" /><path d="M16 14.2c2.9.4 5 2.9 5 5.8" /></svg>;
     case "datenschutz":
       return <svg {...p}><path d="M12 3l7 3v5c0 4.5-3 8.2-7 10-4-1.8-7-5.5-7-10V6l7-3z" /><rect x="9" y="11" width="6" height="5" rx="1" /><path d="M10.5 11V9.5a1.5 1.5 0 013 0V11" /></svg>;
+    case "online":
+      return <svg {...p}><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z" /></svg>;
+    case "mehr":
+      return <svg {...p}><circle cx="5" cy="12" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="19" cy="12" r="1.5" /></svg>;
     case "melden":
       return <svg {...p}><circle cx="12" cy="12" r="8" /><path d="M12 8v8M8 12h8" /></svg>;
     case "einstellungen":
@@ -36,12 +42,14 @@ function Symbol({ art }: { art: NavEintrag["symbol"] }) {
 /** Desktop: Seitenleiste links. Mobil: Leiste unten mit großen Zielen. */
 export function Navigation({ eintraege, beschriftung }: { eintraege: NavEintrag[]; beschriftung: string }) {
   const pfad = usePathname();
-  const aktiv = (href: string) => pfad === href || pfad.startsWith(`${href}/`);
+  const mobilVersteckt = eintraege.filter((e) => e.nurDesktop).map((e) => e.href);
+  const aktiv = (href: string) =>
+    pfad === href || pfad.startsWith(`${href}/`) || (href === "/mehr" && mobilVersteckt.some((h) => pfad === h || pfad.startsWith(`${h}/`)));
   return (
     <nav aria-label={beschriftung}>
       <ul className="fixed inset-x-0 bottom-0 z-20 flex border-t border-linie bg-blatt pb-[env(safe-area-inset-bottom)] md:static md:flex-col md:gap-1 md:border-0 md:bg-transparent md:pb-0">
         {eintraege.map((e) => (
-          <li key={e.href} className={`flex-1 md:flex-none ${e.nurDesktop ? "hidden md:list-item" : ""}`}>
+          <li key={e.href} className={`flex-1 md:flex-none ${e.nurDesktop ? "hidden md:list-item" : ""} ${e.nurMobil ? "md:hidden" : ""}`}>
             <Link
               href={e.href}
               aria-current={aktiv(e.href) ? "page" : undefined}

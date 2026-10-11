@@ -1,0 +1,48 @@
+# Werte unverändert aus Spezifikation Abschnitt 4, Katalog G (E-054). Fachlich zu prüfen.
+- schema_version: 1
+  id: online.vsbg.schwelle_beschaeftigte
+  version: 1
+  katalog_nr: G.69
+  bezeichnung: { de: "Beschäftigte, ab deren Überschreiten die Hinweispflicht nach § 36 VSBG gilt", en: "Employees above which the § 36 VSBG notice applies" }
+  einheit: anzahl
+  wert: 10
+  gueltig_ab: "2026-01-01"
+  gueltig_bis: null
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 36 Abs. 3 VSBG"]
+  quellen:
+    - { titel: Verbraucherstreitbeilegungsgesetz § 36, url: "https://www.gesetze-im-internet.de/vsbg/__36.html", abgerufen: null }
+  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "„mehr als 10“: Vergleich > 10 in den Regeln"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+
+- schema_version: 1
+  id: online.bfsg.kleinst_beschaeftigte
+  version: 1
+  katalog_nr: G.70
+  bezeichnung: { de: "Beschäftigte, ab denen die Kleinstunternehmen-Ausnahme des BFSG nicht mehr gilt", en: "Employees from which the BFSG micro-enterprise exemption no longer applies" }
+  einheit: anzahl
+  wert: 10
+  gueltig_ab: "2025-06-28"
+  gueltig_bis: null
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 2 Nr. 17 BFSG", "§ 3 Abs. 3 BFSG"]
+  quellen:
+    - { titel: Barrierefreiheitsstärkungsgesetz, url: "https://www.gesetze-im-internet.de/bfsg/", abgerufen: null }
+  fachlich_zu_pruefen: ["Rechtsgrundlage ergänzt"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+
+- schema_version: 1
+  id: online.bfsg.kleinst_umsatz
+  version: 1
+  katalog_nr: G.70
+  bezeichnung: { de: "Jahresumsatz, bis zu dem die Kleinstunternehmen-Ausnahme des BFSG gilt", en: "Annual turnover up to which the BFSG micro-enterprise exemption applies" }
+  einheit: EUR
+  wert: 2000000
+  gueltig_ab: "2025-06-28"
+  gueltig_bis: null
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 2 Nr. 17 BFSG"]
+  quellen:
+    - { titel: Barrierefreiheitsstärkungsgesetz, url: "https://www.gesetze-im-internet.de/bfsg/", abgerufen: null }
+  fachlich_zu_pruefen: ["Alternative Bilanzsumme fehlt im Profil", "Rechtsgrundlage ergänzt"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }

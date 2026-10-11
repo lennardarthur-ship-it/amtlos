@@ -1,0 +1,80 @@
+# Katalog G.70 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: online.barrierefreiheit
+version: 1
+katalog_nr: G.70
+titel:
+  de: Barrierefreiheit von Onlineshop und Buchungstools (BFSG)
+kurz:
+  de: Seit 28.6.2025 müssen bestimmte Dienstleistungen wie Onlineshops barrierefrei sein – mit Barrierefreiheitserklärung.
+erklaerung:
+  de: Ausgenommen sind Kleinstunternehmen mit weniger als 10 Beschäftigten und höchstens 2 Mio. € Umsatz oder Bilanzsumme
+    – diese Ausnahme gilt für Dienstleistungen. Der Online-Check macht automatisierte Basistests nach WCAG.
+rechtsgrundlage:
+- BFSG
+kategorie: online
+ausloeser:
+  all:
+  - feld: profil.kunden.segmente
+    op: enthaelt
+    wert: b2c
+    label:
+      de: Du verkaufst an Verbraucher.
+  - feld: profil.vertrieb.kanaele
+    op: enthaelt_eines
+    wert:
+    - onlineshop
+    - app
+    label:
+      de: Du verkaufst über einen Onlineshop oder eine App.
+  - any:
+    - all:
+      - feld: profil.beschaeftigte.gesamt
+        op: '>='
+        wert:
+          regelwert: online.bfsg.kleinst_beschaeftigte
+      - feld: abgeleitet.beschaeftigte.zaehlung_bfsg
+        op: '>='
+        wert:
+          regelwert: online.bfsg.kleinst_beschaeftigte
+        label:
+          de: Du hast mindestens 10 Beschäftigte im Sinne des BFSG.
+    - feld: profil.umsatz.vorjahr
+      op: '>'
+      wert:
+        regelwert: online.bfsg.kleinst_umsatz
+      label:
+        de: Dein Umsatz lag über 2 Mio. €.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Marktüberwachung der Länder
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+aktion:
+  art: link
+  ziel: app.onlinecheck
+status_recht: in_kraft
+gueltig_ab: '2025-06-28'
+gueltig_bis: null
+quellen:
+- titel: Barrierefreiheitsstärkungsgesetz
+  url: https://www.gesetze-im-internet.de/bfsg/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Bilanzsumme als Alternative zum Umsatz fehlt im Profil
+- Zählweise (G-05)
+- Welche Dienstleistungen genau (Buchungstools, Bankdienste …) – Liste ergänzen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

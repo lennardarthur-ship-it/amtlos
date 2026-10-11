@@ -1,0 +1,15 @@
+persona: grenzfall
+beschreibung: Onlineshop mit 9 Beschäftigten und 2.000.000,01 € Umsatz – Ausnahme greift nicht mehr
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: "2018-01-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.beschaeftigte.gesamt: 9
+  profil.umsatz.vorjahr: 2000000.01
+  profil.kunden.segmente: [b2c]
+  profil.vertrieb.kanaele: [onlineshop]
+  profil.bundesland: BW
+  profil.gemeinde_ags: "08111000"
+erwartet:
+  online.barrierefreiheit: gilt

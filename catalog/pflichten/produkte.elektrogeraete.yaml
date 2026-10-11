@@ -1,0 +1,48 @@
+# Katalog G.72 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: produkte.elektrogeraete
+version: 1
+katalog_nr: G.72
+titel:
+  de: Elektrogeräte bei der stiftung ear registrieren
+kurz:
+  de: Bevor du Elektrogeräte verkaufst, registrierst du dich bei der stiftung ear.
+erklaerung:
+  de: Hersteller und Händler, die als Hersteller gelten, müssen sich nach dem ElektroG vor dem Verkauf registrieren.
+rechtsgrundlage:
+- ElektroG
+kategorie: produkte
+ausloeser:
+  feld: profil.produkte.arten
+  op: enthaelt
+  wert: elektrogeraete
+  label:
+    de: Du verkaufst Elektrogeräte.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: stiftung elektro-altgeräte register (ear)
+kanal: portal
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Elektro- und Elektronikgerätegesetz
+  url: https://www.gesetze-im-internet.de/elektrog_2015/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Wer gilt als Hersteller (Import, Eigenmarke)?
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

@@ -1,0 +1,58 @@
+# Katalog G.68 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: online.kuendigungsbutton
+version: 1
+katalog_nr: G.68
+titel:
+  de: Kündigungsbutton bei Abos
+kurz:
+  de: Können Verbraucher auf deiner Website Abos abschließen, brauchst du einen Kündigungsbutton.
+erklaerung:
+  de: § 312k BGB verlangt eine einfache Kündigungsmöglichkeit über die Website für Dauerschuldverhältnisse, die online geschlossen
+    werden können.
+rechtsgrundlage:
+- § 312k BGB
+kategorie: online
+ausloeser:
+  all:
+  - feld: profil.kunden.segmente
+    op: enthaelt
+    wert: b2c
+    label:
+      de: Du verkaufst an Verbraucher.
+  - feld: profil.vertrieb.kanaele
+    op: enthaelt
+    wert: abo
+    label:
+      de: Du bietest Abos an.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+aktion:
+  art: link
+  ziel: app.onlinecheck
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Bürgerliches Gesetzbuch § 312k
+  url: https://www.gesetze-im-internet.de/bgb/__312k.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Vorgeschriebene Beschriftung und Ablauf (Bestätigungsseite) fachlich ergänzen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

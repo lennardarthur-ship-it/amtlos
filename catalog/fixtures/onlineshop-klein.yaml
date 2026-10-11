@@ -1,0 +1,32 @@
+persona: onlinehandel
+beschreibung: Kleiner Onlineshop (3 Beschäftigte, 300.000 € Umsatz) mit verpackten Waren an Verbraucher – BFSG-Ausnahme für Kleinstunternehmen greift
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2022-01-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.beschaeftigte.gesamt: 3
+  profil.umsatz.vorjahr: 300000
+  profil.kunden.segmente: [b2c]
+  profil.vertrieb.kanaele: [onlineshop]
+  profil.produkte.arten: [physisch, verpackung]
+  profil.online.website: true
+  profil.handel.hohe_bargeschaefte: false
+  profil.bundesland: SN
+  profil.gemeinde_ags: "14612000"
+erwartet:
+  online.impressum: gilt
+  online.datenschutzerklaerung: gilt
+  online.preisangaben: gilt
+  online.widerrufsbelehrung: gilt
+  online.button_loesung: gilt
+  online.widerrufsbutton: gilt
+  online.kuendigungsbutton: gilt_nicht
+  online.vsbg_hinweis: gilt_nicht
+  online.os_link: gilt
+  online.barrierefreiheit: gilt_nicht
+  produkte.verpackung: gilt
+  produkte.elektrogeraete: gilt_nicht
+  produkte.gpsr: gilt
+  produkte.geldwaesche_gueterhaendler: gilt_nicht
+  online.dac7: gilt_nicht

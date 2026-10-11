@@ -352,6 +352,17 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Datum:** 2026-10-11 · **Status:** angenommen
 - „Datenschutz“ kommt als eigener Navigationspunkt hinzu (Spezifikation 6.7). Damit die Ziele in der mobilen Leiste groß genug bleiben (≥ 44 px Höhe, ≥ 55 px Breite bei 390 px), steht „Einstellungen“ mobil im Kopf statt in der Leiste; am Desktop bleibt es in der Seitenleiste.
 
+### E-097 · Online-Check: synchron, eng begrenzt, SSRF-geschützt, nur Heuristiken
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Der Check läuft in der API synchron (Startseite + Impressum + Datenschutz, je ≤ 2 MB, ≤ 8 s, ≤ 3 Weiterleitungen, nur `text/html`). Ein Worker-Job lohnt erst mit tieferem Crawling (Produktseiten, GPSR) oder echtem Browser-Test.
+- **SSRF-Schutz:** nur http/https, keine Zugangsdaten in der URL, nur Ports 80/443, jede DNS-Antwort wird vor dem Verbinden geprüft (eigene `lookup`-Funktion, keine Lücke durch DNS-Rebinding zwischen Prüfung und Verbindung), IP-Literale und `localhost` vorab, jede Weiterleitung erneut. Private Netze nur mit `ONLINECHECK_PRIVATE_NETZE=erlaubt` – in staging/prod verboten (Konfigurationsprüfung). Tageslimit je Unternehmen (`ONLINECHECK_JE_TAG`, Standard 20).
+- **Prüfung:** reine Funktion über die abgerufenen Seiten, Ergebnis je Befund „ok / fehlt / prüfen / nicht automatisch prüfbar“ mit Schwere und Verweis auf die Pflicht; sortiert nach Dringlichkeit. Tracking wird statisch erkannt (Skripte bekannter Dienste, die ohne Einwilligung geladen werden; durch Consent-Tools blockierte Skripte mit `type="text/plain"` zählen nicht). Barrierefreiheit nur als Basistests (Sprache, Titel, Alternativtexte, Beschriftungen) – keine vollständige WCAG-Prüfung. Die „Korrekturvorlagen“ sind Handlungshinweise, keine Rechtstexte (T-28). Der Prüfumfang folgt dem Profil (z. B. Kündigungsbutton nur bei Abos).
+- Ergebnisse sind unveränderlich gespeichert (Verlauf); ein erfolgreicher Check setzt die Profilangabe „Website“.
+
+### E-098 · Mobile Navigation mit „Mehr“
+- **Datum:** 2026-10-11 · **Status:** angenommen (ersetzt den mobilen Teil von E-096)
+- Mit „Online“ hat die App acht Bereiche. Am Desktop stehen alle in der Seitenleiste. Mobil zeigt die Leiste fünf Bereiche (Heute, Pflichten, Kalender, Finanzen, Personal) und „Mehr“; dort stehen Datenschutz, Online, Änderung melden, Team, Hilfe und Einstellungen. „Mehr“ ist aktiv markiert, wenn man sich in einem dieser Bereiche befindet. Der Notfallknopf für Datenpannen ist zusätzlich von „Heute“ und „Änderung melden“ aus erreichbar.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

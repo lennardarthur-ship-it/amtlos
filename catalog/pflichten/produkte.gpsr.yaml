@@ -1,0 +1,65 @@
+# Katalog G.73 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: produkte.gpsr
+version: 1
+katalog_nr: G.73
+titel:
+  de: 'Produktsicherheit (GPSR): Angaben und verantwortliche Person'
+kurz:
+  de: Für Verbraucherprodukte brauchst du eine verantwortliche Person in der EU, Herstellerangaben und Sicherheitsinformationen
+    – auch im Onlineshop.
+erklaerung:
+  de: Die Produktsicherheitsverordnung gilt seit 13.12.2024. Im Onlineshop müssen Herstellerangaben und Sicherheitsinformationen
+    beim Angebot stehen.
+rechtsgrundlage:
+- Verordnung (EU) 2023/988 (GPSR)
+kategorie: produkte
+ausloeser:
+  all:
+  - feld: profil.kunden.segmente
+    op: enthaelt
+    wert: b2c
+    label:
+      de: Du verkaufst an Verbraucher.
+  - feld: profil.produkte.arten
+    op: enthaelt_eines
+    wert:
+    - physisch
+    - elektrogeraete
+    - batterien
+    - kosmetik
+    - lebensmittel
+    label:
+      de: Du verkaufst Waren.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Hersteller
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+aktion:
+  art: link
+  ziel: app.onlinecheck
+status_recht: in_kraft
+gueltig_ab: '2024-12-13'
+gueltig_bis: null
+quellen:
+- titel: Verordnung (EU) 2023/988
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32023R0988
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Pflichten für Händler vs. Hersteller trennen
+- Lebensmittel und Kosmetik haben eigene Regeln – Abgrenzung
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

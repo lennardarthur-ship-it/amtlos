@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Erzeugt catalog/pflichten/*.yaml für die Kataloge A–F aus Spezifikation Abschnitt 4.
+Erzeugt catalog/pflichten/*.yaml für die Kataloge A–G aus Spezifikation Abschnitt 4.
 
 Regeln (E-054, Spezifikation 14.4):
 - Inhalte (Fristen, Beträge, Auslöser) nur aus der Spezifikation.
@@ -1148,5 +1148,171 @@ pflicht("ki.hochrisiko", "F.65", "Pflichten für Hochrisiko-KI (verschoben)",
   [KI_VO],
   ["Status und Daten nach dem Digital Omnibus prüfen", "Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „hoch“)", "Welcher der beiden Termine gilt wofür?"],
   status_recht="beschlossen", radar={"wahrscheinlichkeit": "hoch", "erwartet_ab": "2027-12-02"}, sanktion="Noch keine – Pflichten gelten später.", schwere="mittel")
+
+
+# ============================================================ G. Online, Handel und Produkte (Bauabschnitt 7)
+
+B2C = v("profil.kunden.segmente", "enthaelt", "b2c", "Du verkaufst an Verbraucher.")
+WEBSITE = {"any": [v("profil.online.website", "==", True, "Du hast eine Website."),
+                   v("profil.vertrieb.kanaele", "enthaelt_eines", ["onlineshop", "app"], "Du verkaufst über einen Onlineshop oder eine App.")]}
+FERNABSATZ = v("profil.vertrieb.kanaele", "enthaelt_eines", ["onlineshop", "marktplatz", "abo", "app"], "Du schließt Verträge online oder per App.")
+ONLINESHOP = v("profil.vertrieb.kanaele", "enthaelt_eines", ["onlineshop", "app"], "Du verkaufst über einen Onlineshop oder eine App.")
+PRODUKT = lambda art, text: v("profil.produkte.arten", "enthaelt", art, text)
+WARE = v("profil.produkte.arten", "enthaelt_eines", ["physisch", "elektrogeraete", "batterien", "kosmetik", "lebensmittel"], "Du verkaufst Waren.")
+
+pflicht("online.impressum", "G.66", "Impressum auf der Website",
+  "Auf deiner Website stellst du ein Impressum mit den Pflichtangaben bereit – leicht erkennbar und immer erreichbar.",
+  "Das Impressum nennt unter anderem Name, Anschrift und Kontakt, bei Gesellschaften auch Vertretung und Register. Der Online-Check prüft, ob es verlinkt ist.",
+  ["§ 5 DDG"], "online",
+  WEBSITE, "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
+  [q("Digitale-Dienste-Gesetz § 5", "ddg/__5.html")],
+  ["Pflichtangaben je Rechtsform als Checkliste fachlich ergänzen"], schwere="hoch",
+  aktion={"art": "link", "ziel": "app.onlinecheck"})
+
+pflicht("online.datenschutzerklaerung", "G.66", "Datenschutzerklärung auf der Website",
+  "Auf deiner Website informierst du in einer Datenschutzerklärung über die Verarbeitung von Daten.",
+  "Die Datenschutzerklärung muss von jeder Seite erreichbar sein. Inhaltlich folgt sie den Informationspflichten der DSGVO (Katalog F).",
+  ["Art. 13 DSGVO"], "online",
+  WEBSITE, "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
+  [DSGVO(13)],
+  ["Vorlage erst nach fachlicher Prüfung (6.4)"], rg_ergaenzt=True, schwere="hoch",
+  aktion={"art": "link", "ziel": "app.onlinecheck"})
+
+pflicht("online.preisangaben", "G.67", "Preise richtig angeben",
+  "Gegenüber Verbrauchern gibst du Gesamtpreise an, bei Waren nach Gewicht, Volumen oder Länge auch den Grundpreis.",
+  "Die Preisangabenverordnung regelt, wie Preise gegenüber Verbrauchern anzugeben sind.",
+  ["PAngV"], "online",
+  B2C, "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
+  [q("Preisangabenverordnung", "pangv_2022/")],
+  ["Ausnahmen und Einzelheiten (z. B. Grundpreis-Einheiten) fachlich ergänzen"], schwere="mittel")
+
+pflicht("online.widerrufsbelehrung", "G.68", "Über das Widerrufsrecht belehren",
+  "Bei Verträgen mit Verbrauchern über Fernabsatz belehrst du über das Widerrufsrecht.",
+  "Verbraucher haben bei Fernabsatzverträgen in der Regel ein Widerrufsrecht, über das du vor Vertragsschluss informieren musst.",
+  ["§ 312d BGB", "§ 355 BGB"], "online",
+  {"all": [B2C, FERNABSATZ]}, "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
+  [q("Bürgerliches Gesetzbuch § 312d", "bgb/__312d.html")],
+  ["Muster-Widerrufsbelehrung erst nach Prüfung", "Ausnahmen vom Widerrufsrecht als Hinweis"], rg_ergaenzt=True, schwere="hoch")
+
+pflicht("online.button_loesung", "G.68", "Bestellbutton eindeutig beschriften (Button-Lösung)",
+  "Der Button, mit dem Verbraucher kostenpflichtig bestellen, muss eindeutig auf die Zahlungspflicht hinweisen.",
+  "Nach § 312j BGB kommt ohne eindeutige Beschriftung kein wirksamer Vertrag zustande.",
+  ["§ 312j BGB"], "online",
+  {"all": [B2C, ONLINESHOP]}, "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
+  [q("Bürgerliches Gesetzbuch § 312j", "bgb/__312j.html")],
+  ["Zulässige Beschriftungen als Beispiele ergänzen"], schwere="hoch")
+
+pflicht("online.kuendigungsbutton", "G.68", "Kündigungsbutton bei Abos",
+  "Können Verbraucher auf deiner Website Abos abschließen, brauchst du einen Kündigungsbutton.",
+  "§ 312k BGB verlangt eine einfache Kündigungsmöglichkeit über die Website für Dauerschuldverhältnisse, die online geschlossen werden können.",
+  ["§ 312k BGB"], "online",
+  {"all": [B2C, v("profil.vertrieb.kanaele", "enthaelt", "abo", "Du bietest Abos an.")]}, "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
+  [q("Bürgerliches Gesetzbuch § 312k", "bgb/__312k.html")],
+  ["Vorgeschriebene Beschriftung und Ablauf (Bestätigungsseite) fachlich ergänzen"], schwere="hoch",
+  aktion={"art": "link", "ziel": "app.onlinecheck"})
+
+pflicht("online.widerrufsbutton", "G.68", "Widerrufsbutton für Online-Verträge",
+  "Seit 19.6.2026 brauchen B2C-Online-Verträge mit Widerrufsrecht einen Widerrufsbutton – zweistufig, ohne Login, mit Eingangsbestätigung auf einem dauerhaften Datenträger.",
+  "Verbraucher müssen den Widerruf online so einfach erklären können wie den Vertragsschluss.",
+  ["BGB (Umsetzung der Richtlinie (EU) 2023/2673)"], "online",
+  {"all": [B2C, FERNABSATZ]}, "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
+  [q("Richtlinie (EU) 2023/2673", "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32023L2673")],
+  ["Fundstelle im BGB nach Umsetzung ergänzen", "Beschriftung des Buttons fachlich ergänzen"], rg_ergaenzt=True, gueltig_ab="2026-06-19", schwere="hoch",
+  aktion={"art": "link", "ziel": "app.onlinecheck"})
+
+pflicht("online.vsbg_hinweis", "G.69", "Hinweis zur Verbraucherstreitbeilegung",
+  "Mit mehr als 10 Beschäftigten informierst du auf Website und in AGB, ob du an Streitbeilegungsverfahren teilnimmst.",
+  "Die Hinweispflicht nach § 36 VSBG gilt für Unternehmer mit mehr als 10 Beschäftigten, die eine Website unterhalten oder AGB verwenden.",
+  ["§ 36 VSBG"], "online",
+  {"all": [B2C, v("profil.beschaeftigte.gesamt", ">", rw("online.vsbg.schwelle_beschaeftigte")), v("abgeleitet.beschaeftigte.zaehlung_vsbg", ">", rw("online.vsbg.schwelle_beschaeftigte"), "Du hast mehr als 10 Beschäftigte im Sinne des VSBG.")]},
+  "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
+  [q("Verbraucherstreitbeilegungsgesetz § 36", "vsbg/__36.html")],
+  ["Zählweise (G-05)", "Auslöser „Website oder AGB“ – AGB sind nicht im Profil"], schwere="mittel")
+
+pflicht("online.os_link", "G.69", "Link zur OS-Plattform prüfen",
+  "Prüfe, ob der frühere Link zur Online-Streitbeilegungsplattform der EU auf deiner Website noch aktuell ist.",
+  "Die Spezifikation verlangt, den Status des früheren OS-Plattform-Links zu prüfen und aktuell zu halten. Der Online-Check meldet, ob der Link auf deiner Website steht.",
+  ["Verordnung (EU) Nr. 524/2013"], "online",
+  {"all": [B2C, ONLINESHOP]}, "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
+  [q("Verordnung (EU) Nr. 524/2013", "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32013R0524")],
+  ["Aktueller Status der OS-Plattform und der Linkpflicht – fachlich prüfen und Text anpassen"], rg_ergaenzt=True, schwere="niedrig",
+  aktion={"art": "link", "ziel": "app.onlinecheck"})
+
+pflicht("online.barrierefreiheit", "G.70", "Barrierefreiheit von Onlineshop und Buchungstools (BFSG)",
+  "Seit 28.6.2025 müssen bestimmte Dienstleistungen wie Onlineshops barrierefrei sein – mit Barrierefreiheitserklärung.",
+  "Ausgenommen sind Kleinstunternehmen mit weniger als 10 Beschäftigten und höchstens 2 Mio. € Umsatz oder Bilanzsumme – diese Ausnahme gilt für Dienstleistungen. Der Online-Check macht automatisierte Basistests nach WCAG.",
+  ["BFSG"], "online",
+  {"all": [B2C, ONLINESHOP, {"any": [
+     {"all": [v("profil.beschaeftigte.gesamt", ">=", rw("online.bfsg.kleinst_beschaeftigte")), v("abgeleitet.beschaeftigte.zaehlung_bfsg", ">=", rw("online.bfsg.kleinst_beschaeftigte"), "Du hast mindestens 10 Beschäftigte im Sinne des BFSG.")]},
+     v("profil.umsatz.vorjahr", ">", rw("online.bfsg.kleinst_umsatz"), "Dein Umsatz lag über 2 Mio. €.")]}]},
+  "dauerhaft", "Marktüberwachung der Länder", "intern_dokumentieren", "hinweis",
+  [q("Barrierefreiheitsstärkungsgesetz", "bfsg/")],
+  ["Bilanzsumme als Alternative zum Umsatz fehlt im Profil", "Zählweise (G-05)", "Welche Dienstleistungen genau (Buchungstools, Bankdienste …) – Liste ergänzen"],
+  gueltig_ab="2025-06-28", schwere="hoch", aktion={"art": "link", "ziel": "app.onlinecheck"})
+
+pflicht("produkte.barrierefreiheit", "G.70", "Prüfen, ob deine Produkte unter das BFSG fallen",
+  "Für bestimmte Produkte (z. B. Computer, Smartphones, E-Book-Reader) gelten Barrierefreiheitsanforderungen – die Kleinstunternehmen-Ausnahme gilt dafür nicht verlässlich.",
+  "Das BFSG nennt die betroffenen Produkte abschließend. Prüfe, ob deine Produkte dazugehören.",
+  ["BFSG"], "produkte",
+  PRODUKT("elektrogeraete", "Du verkaufst Elektrogeräte."), "dauerhaft", "Du selbst; Hersteller", "intern_dokumentieren", "hinweis",
+  [q("Barrierefreiheitsstärkungsgesetz", "bfsg/")],
+  ["Produktliste (§ 1 BFSG) als Auswahl ergänzen"], gueltig_ab="2025-06-28", schwere="mittel")
+
+pflicht("produkte.verpackung", "G.71", "Verpackungen registrieren und lizenzieren",
+  "Bevor du verpackte Waren erstmals in Verkehr bringst, registrierst du dich im LUCID-Register und beteiligst dich an einem System.",
+  "Das Verpackungsgesetz verlangt Registrierung bei der Zentralen Stelle Verpackungsregister (LUCID) und Systembeteiligung vor dem ersten Inverkehrbringen.",
+  ["VerpackG"], "produkte",
+  PRODUKT("verpackung", "Du bringst verpackte Waren in Verkehr."), "dauerhaft", "Zentrale Stelle Verpackungsregister (LUCID)", "portal", "hinweis",
+  [q("Verpackungsgesetz", "verpackg/")],
+  ["„Vor dem ersten Inverkehrbringen“ als Frist mit Ereignis abbilden?"], schwere="hoch")
+
+pflicht("produkte.elektrogeraete", "G.72", "Elektrogeräte bei der stiftung ear registrieren",
+  "Bevor du Elektrogeräte verkaufst, registrierst du dich bei der stiftung ear.",
+  "Hersteller und Händler, die als Hersteller gelten, müssen sich nach dem ElektroG vor dem Verkauf registrieren.",
+  ["ElektroG"], "produkte",
+  PRODUKT("elektrogeraete", "Du verkaufst Elektrogeräte."), "dauerhaft", "stiftung elektro-altgeräte register (ear)", "portal", "hinweis",
+  [q("Elektro- und Elektronikgerätegesetz", "elektrog_2015/")],
+  ["Wer gilt als Hersteller (Import, Eigenmarke)?"], schwere="hoch")
+
+pflicht("produkte.batterien", "G.72", "Batterien registrieren (BattDG)",
+  "Bevor du Batterien oder Geräte mit Batterien verkaufst, registrierst du dich nach dem Batteriegesetz.",
+  "Hersteller von Batterien müssen sich vor dem Inverkehrbringen registrieren.",
+  ["BattDG"], "produkte",
+  PRODUKT("batterien", "Du verkaufst Batterien oder Geräte mit Batterien."), "dauerhaft", "Zuständige Stelle nach BattDG", "portal", "hinweis",
+  [q("Batterierecht-Durchführungsgesetz", "battdg/")],
+  ["Zuständige Stelle und Registrierungsweg ergänzen"], schwere="hoch")
+
+pflicht("produkte.gpsr", "G.73", "Produktsicherheit (GPSR): Angaben und verantwortliche Person",
+  "Für Verbraucherprodukte brauchst du eine verantwortliche Person in der EU, Herstellerangaben und Sicherheitsinformationen – auch im Onlineshop.",
+  "Die Produktsicherheitsverordnung gilt seit 13.12.2024. Im Onlineshop müssen Herstellerangaben und Sicherheitsinformationen beim Angebot stehen.",
+  ["Verordnung (EU) 2023/988 (GPSR)"], "produkte",
+  {"all": [B2C, WARE]}, "dauerhaft", "Du selbst; Hersteller", "intern_dokumentieren", "hinweis",
+  [q("Verordnung (EU) 2023/988", "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32023R0988")],
+  ["Pflichten für Händler vs. Hersteller trennen", "Lebensmittel und Kosmetik haben eigene Regeln – Abgrenzung"], gueltig_ab="2024-12-13", schwere="hoch",
+  aktion={"art": "link", "ziel": "app.onlinecheck"})
+
+pflicht("online.marktplatz_angaben", "G.74", "Händlerangaben auf Marktplätzen",
+  "Auf Online-Marktplätzen stellst du deine Händlerangaben vollständig bereit.",
+  "Marktplätze verlangen Angaben zu deinem Unternehmen und zeigen sie Kunden an; viele davon sind gesetzlich vorgeschrieben.",
+  ["§ 5 DDG", "Art. 30 DSA"], "online",
+  v("profil.vertrieb.kanaele", "enthaelt", "marktplatz", "Du verkaufst über Online-Marktplätze."), "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
+  [q("Digitale-Dienste-Gesetz § 5", "ddg/__5.html")],
+  ["Rechtsgrundlagen ergänzt – prüfen"], rg_ergaenzt=True, schwere="mittel")
+
+pflicht("online.dac7", "G.74", "Meldungen der Plattformen an das Finanzamt (DAC7) verstehen",
+  "Marktplätze melden Verkäufer und Umsätze an das Bundeszentralamt für Steuern – deine Angaben in der Steuererklärung sollten dazu passen.",
+  "Nach dem Plattformen-Steuertransparenzgesetz (DAC7) melden Plattformen bestimmte Verkäufer. Amtlos erklärt, was gemeldet wird.",
+  ["PStTG"], "online",
+  v("profil.vertrieb.kanaele", "enthaelt", "marktplatz", "Du verkaufst über Online-Marktplätze."), "dauerhaft", "–", "intern_dokumentieren", "hinweis",
+  [q("Plattformen-Steuertransparenzgesetz", "psttg/")],
+  ["Meldeschwellen der Plattformen nicht in der Spezifikation"], rg_ergaenzt=True, sanktion="Keine eigene Pflicht – Erklärung der Plattformmeldungen.", schwere="niedrig")
+
+pflicht("produkte.geldwaesche_gueterhaendler", "G.75", "Geldwäschegesetz bei hohen Bargeschäften",
+  "Als Güterhändler hast du bei Bargeschäften ab der Schwelle des Geldwäschegesetzes Sorgfaltspflichten.",
+  "Dazu gehören unter anderem die Identifizierung der Vertragspartner und ein Risikomanagement. Die Schwelle steht im Gesetz; Amtlos führt sie nach fachlicher Prüfung als Regelwert.",
+  ["GwG"], "produkte",
+  {"all": [WARE, v("profil.handel.hohe_bargeschaefte", "==", True, "Du nimmst hohe Barzahlungen für Waren an.")]}, "dauerhaft", "Du selbst; Aufsicht der Länder", "intern_dokumentieren", "hinweis",
+  [q("Geldwäschegesetz", "gwg_2017/")],
+  ["Schwelle für Barzahlungen nicht in der Spezifikation – als Regelwert ergänzen", "Immobilien- und Finanzbranche als Branchenmodul (H)"], schwere="hoch")
 
 print("geschrieben:", len(list(ZIEL.glob("*.yaml"))))

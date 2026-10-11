@@ -1,0 +1,48 @@
+# Katalog G.67 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: online.preisangaben
+version: 1
+katalog_nr: G.67
+titel:
+  de: Preise richtig angeben
+kurz:
+  de: Gegenüber Verbrauchern gibst du Gesamtpreise an, bei Waren nach Gewicht, Volumen oder Länge auch den Grundpreis.
+erklaerung:
+  de: Die Preisangabenverordnung regelt, wie Preise gegenüber Verbrauchern anzugeben sind.
+rechtsgrundlage:
+- PAngV
+kategorie: online
+ausloeser:
+  feld: profil.kunden.segmente
+  op: enthaelt
+  wert: b2c
+  label:
+    de: Du verkaufst an Verbraucher.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Preisangabenverordnung
+  url: https://www.gesetze-im-internet.de/pangv_2022/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Ausnahmen und Einzelheiten (z. B. Grundpreis-Einheiten) fachlich ergänzen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

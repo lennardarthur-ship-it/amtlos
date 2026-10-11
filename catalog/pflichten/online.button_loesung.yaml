@@ -1,0 +1,56 @@
+# Katalog G.68 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: online.button_loesung
+version: 1
+katalog_nr: G.68
+titel:
+  de: Bestellbutton eindeutig beschriften (Button-Lösung)
+kurz:
+  de: Der Button, mit dem Verbraucher kostenpflichtig bestellen, muss eindeutig auf die Zahlungspflicht hinweisen.
+erklaerung:
+  de: Nach § 312j BGB kommt ohne eindeutige Beschriftung kein wirksamer Vertrag zustande.
+rechtsgrundlage:
+- § 312j BGB
+kategorie: online
+ausloeser:
+  all:
+  - feld: profil.kunden.segmente
+    op: enthaelt
+    wert: b2c
+    label:
+      de: Du verkaufst an Verbraucher.
+  - feld: profil.vertrieb.kanaele
+    op: enthaelt_eines
+    wert:
+    - onlineshop
+    - app
+    label:
+      de: Du verkaufst über einen Onlineshop oder eine App.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Bürgerliches Gesetzbuch § 312j
+  url: https://www.gesetze-im-internet.de/bgb/__312j.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Zulässige Beschriftungen als Beispiele ergänzen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

@@ -222,6 +222,18 @@
       "ab": 2
     },
     {
+      "pfad": "profil.online.website",
+      "typ": "bool",
+      "herleitung": "Onboarding: eigene Website (auch ohne Shop)",
+      "ab": 7
+    },
+    {
+      "pfad": "profil.handel.hohe_bargeschaefte",
+      "typ": "bool",
+      "herleitung": "Onboarding: Barzahlungen für Waren in Höhe der Schwelle des GwG",
+      "ab": 7
+    },
+    {
       "pfad": "profil.kasse.elektronisch",
       "typ": "bool",
       "herleitung": "Onboarding",

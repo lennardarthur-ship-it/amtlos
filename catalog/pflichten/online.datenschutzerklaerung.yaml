@@ -1,0 +1,61 @@
+# Katalog G.66 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: online.datenschutzerklaerung
+version: 1
+katalog_nr: G.66
+titel:
+  de: Datenschutzerklärung auf der Website
+kurz:
+  de: Auf deiner Website informierst du in einer Datenschutzerklärung über die Verarbeitung von Daten.
+erklaerung:
+  de: Die Datenschutzerklärung muss von jeder Seite erreichbar sein. Inhaltlich folgt sie den Informationspflichten der DSGVO
+    (Katalog F).
+rechtsgrundlage:
+- Art. 13 DSGVO
+kategorie: online
+ausloeser:
+  any:
+  - feld: profil.online.website
+    op: ==
+    wert: true
+    label:
+      de: Du hast eine Website.
+  - feld: profil.vertrieb.kanaele
+    op: enthaelt_eines
+    wert:
+    - onlineshop
+    - app
+    label:
+      de: Du verkaufst über einen Onlineshop oder eine App.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+aktion:
+  art: link
+  ziel: app.onlinecheck
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: DSGVO Art. 13
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Vorlage erst nach fachlicher Prüfung (6.4)
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null
