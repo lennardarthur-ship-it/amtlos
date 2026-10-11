@@ -5,6 +5,7 @@ import { datumLang, fuelle } from "@amtlos/i18n";
 import { senden } from "@/lib/aktion";
 import { api, aktivesUnternehmen } from "@/lib/api";
 import { t } from "@/lib/sprache";
+import { pfadSichtbar } from "@/lib/umfang";
 
 export const metadata = { title: "Personal" };
 
@@ -52,6 +53,7 @@ export default async function PersonalSeite({ searchParams }: { searchParams: Pr
         <li><Link href="/personal/zeiten" className="block rounded-md border border-linie bg-blatt p-4 hover:border-amt"><span className="font-bold">{x.personal.zeiten}</span><span className="mt-1 block text-klein text-tinte-leise">{x.personal.zeiten_text}</span></Link></li>
       </ul>
 
+      {pfadSichtbar("/personal/gefaehrdungsbeurteilungen") ? (
       <section aria-labelledby="arbeitsschutz">
         <h2 id="arbeitsschutz" className="text-gross font-bold">{x.personal.arbeitsschutz}</h2>
         <ul className="mt-3 grid gap-3 sm:grid-cols-3">
@@ -60,6 +62,7 @@ export default async function PersonalSeite({ searchParams }: { searchParams: Pr
           ))}
         </ul>
       </section>
+      ) : null}
 
       <section aria-labelledby="team">
         <div className="flex flex-wrap items-baseline justify-between gap-2">

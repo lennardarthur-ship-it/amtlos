@@ -7,6 +7,7 @@ import { api, aktivesUnternehmen } from "@/lib/api";
 import { t } from "@/lib/sprache";
 import type { Karte } from "@/lib/typen";
 import type { Brief } from "../page";
+import { pfadSichtbar } from "@/lib/umfang";
 
 export const metadata = { title: "Behördenbrief" };
 
@@ -51,7 +52,7 @@ export default async function BriefSeite({ params, searchParams }: { params: Pro
       <section aria-labelledby="erklaerung" className="rounded-md border border-linie bg-blatt p-4">
         <h2 id="erklaerung" className="font-bold">{x.postfach.erklaerung} {x.postfach.arten[b.art]}</h2>
         <p className="mt-1 text-klein">{x.postfach.erklaerungen[b.art]}</p>
-        <p className="mt-2 text-klein text-tinte-leise">{x.postfach.hinweis} <Link href="/experten" className="verweis">{x.frag.experten}</Link></p>
+        <p className="mt-2 text-klein text-tinte-leise">{x.postfach.hinweis}{pfadSichtbar("/experten") ? <> <Link href="/experten" className="verweis">{x.frag.experten}</Link></> : null}</p>
       </section>
       {darf ? (
         <section aria-labelledby="einordnen">

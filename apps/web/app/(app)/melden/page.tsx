@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { datumLang } from "@amtlos/i18n";
 import { api } from "@/lib/api";
 import { t } from "@/lib/sprache";
+import { pfadSichtbar } from "@/lib/umfang";
 
 export const metadata = { title: "Änderung melden" };
 
@@ -49,9 +50,11 @@ export default async function MeldenSeite({ searchParams }: { searchParams: Prom
         <p className="mt-2 text-klein">
           {x.melden.personal_hinweis} <Link href="/personal" className="verweis">{x.nav.personal}</Link>
         </p>
-        <p className="mt-1 text-klein">
-          {x.melden.panne_hinweis} <Link href="/datenschutz/pannen#melden" className="verweis">{x.ds.notfall}</Link>
-        </p>
+        {pfadSichtbar("/datenschutz") ? (
+          <p className="mt-1 text-klein">
+            {x.melden.panne_hinweis} <Link href="/datenschutz/pannen#melden" className="verweis">{x.ds.notfall}</Link>
+          </p>
+        ) : null}
       </header>
       {gemeldet ? (
         <p role="status" className="lesetext rounded-md bg-amt-hauch p-4 font-bold text-amt">

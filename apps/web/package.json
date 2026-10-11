@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint app lib komponenten",
     "test": "vitest run",
-    "e2e": "node e2e/rundgang.e2e.mjs"
+    "e2e": "node e2e/rundgang.e2e.mjs",
+    "e2e:kern": "node e2e/kern.e2e.mjs"
   },
   "dependencies": {
     "@amtlos/i18n": "workspace:*",

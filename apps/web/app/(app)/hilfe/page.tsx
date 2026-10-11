@@ -1,12 +1,16 @@
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { t } from "@/lib/sprache";
+import { pfadSichtbar } from "@/lib/umfang";
 
 export const metadata = { title: "Hilfe" };
 
 interface Begriff { begriff: string; erklaerung: string; pflichten: { id: string; titel: string }[] }
 
 /** Glossar aus allen Fachbegriffen des Katalogs (Prinzip 5). */
+/** Anleitungen, die zu einem Modul gehören, erscheinen nur, wenn das Modul sichtbar ist (E-110). */
+const ANLEITUNG_PFAD: Record<string, string> = { gefaehrdung: "/personal/gefaehrdungsbeurteilungen", datenpanne: "/datenschutz", anfrage: "/datenschutz", onlinecheck: "/online", eigenkontrollen: "/branche", kanzlei: "/kanzlei" };
+
 export default async function Hilfe() {
   const [{ t: x }, begriffe] = await Promise.all([t(), api<Begriff[]>("/v1/glossar")]);
   return (
@@ -17,7 +21,7 @@ export default async function Hilfe() {
       <section aria-labelledby="anleitungen">
         <h2 id="anleitungen" className="text-gross font-bold">{x.hilfe.anleitungen_titel}</h2>
         <div className="mt-2 border-t border-linie">
-          {x.hilfe.anleitungen.map((a) => (
+          {x.hilfe.anleitungen.filter((a) => !ANLEITUNG_PFAD[a.id] || pfadSichtbar(ANLEITUNG_PFAD[a.id]!)).map((a) => (
             <details key={a.id} id={a.id} className="border-b border-linie py-3">
               <summary className="cursor-pointer font-bold">{a.titel}</summary>
               <ol className="mt-2 list-decimal space-y-1 pl-5">

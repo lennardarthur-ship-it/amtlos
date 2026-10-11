@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { t } from "@/lib/sprache";
+import { pfadSichtbar } from "@/lib/umfang";
 
 export const metadata = { title: "Mehr" };
 
@@ -20,11 +21,12 @@ export default async function MehrSeite() {
     ["/hilfe", x.hilfe.titel, "", false],
     ["/einstellungen", x.nav.einstellungen, "", true],
   ] as const;
+  const eintraegeSichtbar = eintraege.filter(([href]) => pfadSichtbar(href));
   return (
     <div className="lesetext space-y-6">
       <h1 className="text-titel font-bold">{x.mehr.titel}</h1>
       <ul className="border-t border-linie">
-        {eintraege.map(([href, titel, text, nurMobil]) => (
+        {eintraegeSichtbar.map(([href, titel, text, nurMobil]) => (
           <li key={href} className={`border-b border-linie ${nurMobil ? "md:hidden" : ""}`}>
             <Link href={href} className="block min-h-14 py-3 hover:bg-blatt">
               <span className="font-bold">{titel}</span>

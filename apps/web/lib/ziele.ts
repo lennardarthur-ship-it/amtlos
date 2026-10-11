@@ -1,3 +1,4 @@
+import { pfadSichtbar } from "./umfang";
 /**
  * Wo eine Pflicht in Amtlos selbst erledigt wird: aus dem Aktionsziel des Katalogs (`aktion.ziel`) oder,
  * wo der Katalog noch kein Ziel nennt, aus der Pflicht-ID. Unbekannte Ziele → kein Link.
@@ -26,7 +27,9 @@ const NACH_PFLICHT: Record<string, string> = {
   "steuern.kassenmeldung": "/finanzen/kassen",
 };
 
-export function zielPfad(pflichtId: string, ziel: string | undefined | null): string | null {
+export function zielPfad(pflichtId: string, ziel: string | undefined | null, umfang?: string): string | null {
   if (ziel?.startsWith("onboarding.")) return `/onboarding/${ziel.slice("onboarding.".length)}`;
-  return (ziel ? NACH_ZIEL[ziel] : undefined) ?? NACH_PFLICHT[pflichtId] ?? null;
+  const pfad = (ziel ? NACH_ZIEL[ziel] : undefined) ?? NACH_PFLICHT[pflichtId] ?? null;
+  // Werkzeuge versteckter Module (E-110): kein Link, die Pflicht bleibt mit Erklärung sichtbar
+  return pfad && pfadSichtbar(pfad, umfang) ? pfad : null;
 }

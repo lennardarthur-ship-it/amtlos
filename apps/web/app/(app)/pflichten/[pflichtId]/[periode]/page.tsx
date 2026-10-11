@@ -88,9 +88,9 @@ export default async function PflichtSeite({ params }: { params: Params }) {
         </section>
       ) : offen && d.ergebnis === "gilt" ? (
         <>
-        {zielPfad(pflichtId, d.aktion?.ziel) ? (
+        {zielPfad(pflichtId, d.aktion?.ziel, process.env.AMTLOS_UMFANG) ? (
           <p>
-            <Link href={zielPfad(pflichtId, d.aktion?.ziel)!} className="knopf">{x.karte.in_amtlos}</Link>
+            <Link href={zielPfad(pflichtId, d.aktion?.ziel, process.env.AMTLOS_UMFANG)!} className="knopf">{x.karte.in_amtlos}</Link>
           </p>
         ) : null}
         <form action={erledigen.bind(null, pflichtId, periode)} className="lesetext space-y-3">

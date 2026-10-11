@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { ich } from "@/lib/api";
 import { unternehmenWaehlen } from "@/lib/sitzung";
 import { t } from "@/lib/sprache";
+import { pfadSichtbar } from "@/lib/umfang";
 
 export const metadata = { title: "Unternehmen wechseln" };
 
@@ -32,9 +33,11 @@ export default async function UnternehmenWechseln() {
         <Link href="/unternehmen/neu" className="verweis">
           {x.unternehmen.neu_titel}
         </Link>
-        <Link href="/kanzlei" className="verweis">
-          {x.kanzlei.zur_uebersicht}
-        </Link>
+        {pfadSichtbar("/kanzlei") ? (
+          <Link href="/kanzlei" className="verweis">
+            {x.kanzlei.zur_uebersicht}
+          </Link>
+        ) : null}
       </p>
     </main>
   );

@@ -8,6 +8,7 @@ import { branchenAusProfil } from "@/lib/branchen";
 import { t } from "@/lib/sprache";
 import { ZONE } from "@/lib/zeit";
 import type { Bereich, Gruendung, Heute } from "@/lib/typen";
+import { pfadSichtbar } from "@/lib/umfang";
 
 export const metadata = { title: "Heute" };
 
@@ -108,7 +109,7 @@ export default async function HeuteSeite() {
         </section>
       ) : null}
 
-      {branchen.length ? (
+      {branchen.length && pfadSichtbar("/branche") ? (
         <p className="lesetext">
           <Link href="/branche" className="verweis">{fuelle(x.branche.heute_karte, { namen: branchen.map((b) => x.branche.namen[b]).join(", ") })}</Link>
         </p>
@@ -156,14 +157,14 @@ export default async function HeuteSeite() {
         </section>
       ) : null}
 
-      {!ohneProfil ? (
+      {!ohneProfil && pfadSichtbar("/frag") ? (
         <form action="/frag" method="get" role="search" className="lesetext flex flex-wrap items-end gap-2">
           <div className="min-w-0 flex-1">
             <label htmlFor="heute-frage" className="block font-bold">{x.heute.frag_link}</label>
             <input id="heute-frage" name="f" minLength={3} maxLength={500} placeholder={x.frag.platzhalter} className="feld mt-1 w-full" />
           </div>
           <button className="knopf knopf-leise">{x.frag.fragen}</button>
-          <Link href="/radar" className="verweis w-full text-klein">{x.heute.radar_link}</Link>
+          {pfadSichtbar("/radar") ? <Link href="/radar" className="verweis w-full text-klein">{x.heute.radar_link}</Link> : null}
         </form>
       ) : null}
 
@@ -171,7 +172,7 @@ export default async function HeuteSeite() {
         <p className="lesetext flex flex-wrap items-center gap-x-4 gap-y-2">
           <span>{x.heute.melden_frage}</span>
           <Link href="/melden" className="knopf knopf-leise">{x.heute.melden_link}</Link>
-          <Link href="/datenschutz/pannen#melden" className="verweis text-klein">{x.ds.notfall}</Link>
+          {pfadSichtbar("/datenschutz") ? <Link href="/datenschutz/pannen#melden" className="verweis text-klein">{x.ds.notfall}</Link> : null}
         </p>
       ) : null}
 

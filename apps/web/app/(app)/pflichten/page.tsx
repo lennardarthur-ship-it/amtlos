@@ -4,6 +4,7 @@ import { api } from "@/lib/api";
 import { monatsname } from "@/lib/periode";
 import { t } from "@/lib/sprache";
 import type { AnzeigeStatus, Karte } from "@/lib/typen";
+import { pfadSichtbar } from "@/lib/umfang";
 
 export const metadata = { title: "Pflichten" };
 
@@ -54,10 +55,14 @@ export default async function PflichtenSeite({ searchParams }: { searchParams: P
           <Link href="/kalender" className="verweis">
             {x.pflichten.alle_termine}
           </Link>
-          {" · "}
-          <Link href="/radar" className="verweis">
-            {x.radar.link}
-          </Link>
+          {pfadSichtbar("/radar") ? (
+            <>
+              {" · "}
+              <Link href="/radar" className="verweis">
+                {x.radar.link}
+              </Link>
+            </>
+          ) : null}
         </p>
       ) : null}
       {sichtbar.length === 0 ? <p className="lesetext">{x.pflichten.leer}</p> : null}

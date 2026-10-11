@@ -1,12 +1,13 @@
 import { Markenname } from "@/komponenten/markenname";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { Navigation } from "@/komponenten/navigation";
+import { Navigation, type NavEintrag } from "@/komponenten/navigation";
 import { aktivesUnternehmen, ich } from "@/lib/api";
 import { t } from "@/lib/sprache";
+import { pfadSichtbar } from "@/lib/umfang";
 
 /** Seiten, die über „Mehr“ erreicht werden (dort ist „Mehr“ aktiv). */
-const MEHR = ["/radar", "/frag", "/experten", "/team", "/hilfe", "/melden"];
+const MEHR = ["/radar", "/frag", "/experten", "/team", "/hilfe", "/melden", "/kanzlei"];
 
 export default async function AppRahmen({ children }: { children: ReactNode }) {
   const [{ s, t: x }, u, i] = await Promise.all([t(), aktivesUnternehmen(), ich()]);
@@ -34,7 +35,7 @@ export default async function AppRahmen({ children }: { children: ReactNode }) {
         </div>
         <Navigation
           beschriftung={x.nav.hauptnavigation}
-          eintraege={[
+          eintraege={([
             { href: "/heute", text: x.nav.heute, symbol: "heute" },
             { href: "/pflichten", text: x.nav.pflichten, symbol: "pflichten" },
             { href: "/kalender", text: x.nav.kalender, symbol: "kalender" },
@@ -46,7 +47,7 @@ export default async function AppRahmen({ children }: { children: ReactNode }) {
             { href: "/postfach", text: x.nav.postfach, symbol: "postfach", nurDesktop: true },
             { href: "/einstellungen", text: x.nav.einstellungen, symbol: "einstellungen", nurDesktop: true },
             { href: "/mehr", text: x.nav.mehr, symbol: "mehr", auch: MEHR },
-          ]}
+          ] satisfies NavEintrag[]).filter((e) => pfadSichtbar(e.href))}
         />
       </aside>
       <main id="inhalt" className="min-w-0 flex-1 px-4 pb-28 pt-2 md:px-0 md:py-8">
