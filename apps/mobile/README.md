@@ -1,6 +1,6 @@
 # Amtlos – mobile App (Expo)
 
-React Native mit Expo SDK 54, geteilte Texte aus `@amtlos/i18n` (Deutsch/Englisch), dieselbe API wie die Web-App (E-108).
+React Native mit Expo SDK 57, geteilte Texte aus `@amtlos/i18n` (Deutsch/Englisch), dieselbe API wie die Web-App (E-108).
 
 Zuerst für iPhone gebaut (E-117): Fristblatt, SF Symbols, Tableiste mit Unschärfe, Erledigt-Stempel mit Haptik.
 
@@ -16,7 +16,11 @@ cd apps/mobile && npx expo export --platform ios       # Bündel prüfen (CI: an
 cd apps/web && node ../mobile/e2e/schau.mjs <web-export> <bilder> <kennung>   # Bildschirmfotos über den Web-Export, siehe Kopf der Datei
 ```
 
-**Konfiguration** (`app.json` → `expo.extra`): `apiUrl`, `authModus` (`dev` = Anmeldung mit Kennung über
+**Auf dem iPhone testen (ohne Server):** `bash werkzeuge/testpaket.sh <ordner>` baut ein eigenständiges Paket mit
+Anleitung (`LIESMICH.txt`): Node installieren, `npm install`, `npx expo start`, QR-Code mit Expo Go öffnen, „Ohne Konto
+ausprobieren“. Demo-Daten neu holen: `node werkzeuge/demo-schnappschuss.mjs http://localhost:3901 <kennung>` (E-119).
+
+**Konfiguration** (`app.json` → `expo.extra`): `apiUrl`, `authModus` (`demo` = nur Demo ohne Server; `dev` = Anmeldung mit Kennung über
 `POST /v1/dev/token`, nur wenn die API mit `AUTH_MODUS=dev` läuft; `oidc` = Identity-Provider mit PKCE),
 `oidcIssuer`, `oidcClientId`, `eas.projectId` (für Push-Tokens).
 

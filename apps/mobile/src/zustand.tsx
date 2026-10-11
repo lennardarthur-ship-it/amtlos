@@ -5,7 +5,8 @@ import * as SecureStore from "expo-secure-store";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { AppState } from "react-native";
 import { texte, type Texte } from "@amtlos/i18n";
-import { ApiFehler, ApiKlient, NetzFehler, type Ich, type Sprache } from "./kern/api";
+import { DEMO_TOKEN, demoAbruf, type DemoDaten } from "./demo/demo";
+import { ApiFehler, ApiKlient, NetzFehler, type Abruf, type Ich, type Sprache } from "./kern/api";
 import { StempelWarteschlange, uuidAus, type Fehlgeschlagen, type Stempel } from "./kern/warteschlange";
 import { KONFIG } from "./konfig";
 
@@ -27,6 +28,9 @@ interface Zustand {
   offeneStempel: Stempel[];
   fehlgeschlagen: Fehlgeschlagen[];
   anmelden(token: string): Promise<void>;
+  /** Demo mit Beispieldaten, ohne Server (E-119) */
+  demo: boolean;
+  demoStarten(): Promise<void>;
   /** Konto und Unternehmen neu laden (z. B. nach dem Anlegen) und ein Unternehmen wählen */
   anmeldenAktualisieren(unternehmenId?: string): Promise<void>;
   /** Profil noch nie ausgefüllt → Schnellstart */
@@ -70,10 +74,20 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
   const zustand = useRef({ unternehmenId, sprache });
   zustand.current = { unternehmenId, sprache };
 
-  const klient = useMemo(
-    () => new ApiKlient({ basis: KONFIG.apiUrl, token: async () => token.current, unternehmen: () => zustand.current.unternehmenId, sprache: () => zustand.current.sprache }),
-    [],
-  );
+  // Demo: dieselbe Klasse, nur die Antworten kommen aus dem Schnappschuss im Gerät
+  const demoAntworten = useRef<Abruf | null>(null);
+  const klient = useMemo(() => {
+    const echt: Abruf = (url, init) => fetch(url, init as RequestInit) as unknown as ReturnType<Abruf>;
+    const abruf: Abruf = (url, init) => {
+      if (token.current !== DEMO_TOKEN) return echt(url, init);
+      // Schnappschuss erst laden, wenn die Demo gebraucht wird (gut 0,7 MB) – deshalb require statt import
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      demoAntworten.current ??= demoAbruf(require("./demo/daten.json") as DemoDaten);
+      return demoAntworten.current(url, init);
+    };
+    return new ApiKlient({ basis: KONFIG.apiUrl, token: async () => token.current, unternehmen: () => zustand.current.unternehmenId, sprache: () => zustand.current.sprache, abruf });
+  }, []);
+  const [demo, setDemo] = useState(false);
   const schlange = useMemo(() => new StempelWarteschlange(speicher), []);
 
   const standLaden = useCallback(async () => {
@@ -117,6 +131,7 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       if (s === "de" || s === "en") setSprache(s);
       try {
         token.current = await geheim.lesen(TOKEN);
+        setDemo(token.current === DEMO_TOKEN);
         if (token.current) await ichLaden();
         await standLaden();
       } finally {
@@ -153,7 +168,16 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
     fehlgeschlagen,
     async anmelden(t) {
       token.current = t;
+      setDemo(false);
       await geheim.schreiben(TOKEN, t);
+      await ichLaden();
+    },
+    demo,
+    async demoStarten() {
+      token.current = DEMO_TOKEN;
+      demoAntworten.current = null; // jede Demo beginnt frisch
+      setDemo(true);
+      await geheim.schreiben(TOKEN, DEMO_TOKEN);
       await ichLaden();
     },
     async anmeldenAktualisieren(id) {
@@ -164,6 +188,8 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
     profilFehltSetzen: setProfilFehlt,
     async abmelden() {
       token.current = null;
+      setDemo(false);
+      demoAntworten.current = null;
       await geheim.loeschen(TOKEN);
       setIch(null);
       setUnternehmenId(null);

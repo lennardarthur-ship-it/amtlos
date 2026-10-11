@@ -6,7 +6,11 @@
     "version": "0.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
-    "splash": { "backgroundColor": "#136f5b", "image": "./assets/icon.png", "resizeMode": "contain" },
+    "splash": {
+      "backgroundColor": "#136f5b",
+      "image": "./assets/icon.png",
+      "resizeMode": "contain"
+    },
     "icon": "./assets/icon.png",
     "ios": {
       "bundleIdentifier": "de.amtlos.app",
@@ -18,13 +22,30 @@
     },
     "android": {
       "package": "de.amtlos.app",
-      "permissions": ["CAMERA", "POST_NOTIFICATIONS"]
+      "permissions": [
+        "CAMERA",
+        "POST_NOTIFICATIONS"
+      ]
     },
     "plugins": [
       "expo-secure-store",
-      ["expo-notifications", { "color": "#136f5b" }],
-      ["expo-image-picker", { "cameraPermission": "Amtlos nutzt die Kamera, um Belege zu fotografieren.", "photosPermission": "Amtlos nutzt deine Fotos, um Belege hochzuladen." }],
-      "expo-localization"
+      [
+        "expo-notifications",
+        {
+          "color": "#136f5b"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Amtlos nutzt die Kamera, um Belege zu fotografieren.",
+          "photosPermission": "Amtlos nutzt deine Fotos, um Belege hochzuladen."
+        }
+      ],
+      "expo-localization",
+      "expo-web-browser",
+      "expo-font",
+      "expo-splash-screen"
     ],
     "extra": {
       "apiUrl": "http://localhost:3001",

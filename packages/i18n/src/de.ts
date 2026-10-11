@@ -902,6 +902,12 @@ export const de = {
     weitere_fristen: "Weitere Fristen",
   },
   mobil: {
+    demo_starten: "Ohne Konto ausprobieren",
+    demo_text: "Mit Beispieldaten, nichts wird gespeichert.",
+    demo_hinweis: "Demo mit Beispieldaten. Was du erledigst oder stempelst, ist nach dem Beenden wieder weg.",
+    demo_beenden: "Demo beenden",
+    demo_push: "In der Demo gibt es keine Erinnerungen. Mit einem Konto erinnert dich Amtlos rechtzeitig.",
+    oder: "oder",
     anmelden_text: "Melde dich an, um deine Pflichten zu sehen, zu stempeln und Belege zu fotografieren.",
     anmelden_dev: "Entwicklungsumgebung: Anmeldung mit frei wählbarer Kennung.",
     kennung: "Kennung",

@@ -25,7 +25,7 @@ function Auswahl({ optionen, aktiv, waehlen, label }: { optionen: { wert: string
 }
 
 export function Mehr() {
-  const { t, sprache, ich, unternehmenId, unternehmenWaehlen, spracheSetzen, abmelden, klient } = useAmtlos();
+  const { t, sprache, ich, unternehmenId, unternehmenWaehlen, spracheSetzen, abmelden, klient, demo } = useAmtlos();
   const f = useFarben();
   const [push, setPush] = useState<PushErgebnis | null>(null);
   const { daten: abo } = useLaden(() => klient.abo(), [unternehmenId]);
@@ -47,8 +47,14 @@ export function Mehr() {
       <View style={{ marginTop: -16 }} />
       <Abschnitt titel={t.mobil.push}>
         <T v="klein" leise>{t.mobil.push_text}</T>
-        {push ? <Hinweis art={PUSH_TEXT[push].art} text={PUSH_TEXT[push].text} /> : null}
-        <Knopf leise symbol="bell" text={t.mobil.push_aktivieren} onPress={() => void pushEinschalten(klient).then(setPush)} stil={{ marginTop: 10, alignSelf: "flex-start" }} />
+        {demo ? (
+          <Hinweis text={t.mobil.demo_push} symbol="bell" />
+        ) : (
+          <>
+            {push ? <Hinweis art={PUSH_TEXT[push].art} text={PUSH_TEXT[push].text} /> : null}
+            <Knopf leise symbol="bell" text={t.mobil.push_aktivieren} onPress={() => void pushEinschalten(klient).then(setPush)} stil={{ marginTop: 10, alignSelf: "flex-start" }} />
+          </>
+        )}
       </Abschnitt>
 
       <Abschnitt titel={t.mobil.sprache}>
@@ -57,26 +63,27 @@ export function Mehr() {
 
       <Abschnitt titel={t.mobil.konto}>
         <View style={{ backgroundColor: f.blatt, borderRadius: RADIUS.karte, borderWidth: 1, borderColor: f.linie, paddingHorizontal: 14 }}>
-          {abo ? (
+          {abo && !demo ? (
             <Zeile
               links={<Symbol name="checkmark" groesse={20} farbe={abo.schreibbar ? f.amt : f.frist} />}
               titel={(t.abo.status as Record<string, string>)[abo.status] ?? abo.status}
               text={abo.status === "test" ? fuelle(t.mobil.test_bis, { datum: datumLang(abo.test_bis, sprache) }) : t.mobil.abo_web}
             />
           ) : null}
-          <Zeile links={<Symbol name="globe" groesse={20} />} titel={t.mobil.am_computer} text={web.replace(/^https?:\/\//, "")} onPress={() => void Linking.openURL(web)} />
+          {demo ? null : <Zeile links={<Symbol name="globe" groesse={20} />} titel={t.mobil.am_computer} text={web.replace(/^https?:\/\//, "")} onPress={() => void Linking.openURL(web)} />}
           <Zeile links={<Symbol name="person.2" groesse={20} />} titel={ich?.konto.anzeigename ?? ""} text={ich?.konto.email} letzte />
         </View>
-        <Knopf leise gefahr symbol="rectangle.portrait.and.arrow.right" text={t.mobil.abmelden} onPress={() => void abmelden()} stil={{ marginTop: 16, alignSelf: "flex-start" }} />
+        <Knopf leise gefahr symbol="rectangle.portrait.and.arrow.right" text={demo ? t.mobil.demo_beenden : t.mobil.abmelden} onPress={() => void abmelden()} stil={{ marginTop: 16, alignSelf: "flex-start" }} />
       </Abschnitt>
 
-      <View style={{ marginTop: 32, flexDirection: "row", gap: 16, flexWrap: "wrap" }}>
+      {/* Rechtsseiten liegen im Web; die Demo hat keine Website dahinter */}
+      {demo ? null : <View style={{ marginTop: 32, flexDirection: "row", gap: 16, flexWrap: "wrap" }}>
         {(["impressum", "datenschutz", "agb"] as const).map((seite) => (
           <Pressable key={seite} accessibilityRole="link" onPress={() => void Linking.openURL(`${web}/recht/${seite}`)} style={{ minHeight: 32, justifyContent: "center" }}>
             <T v="caption" leise stil={{ textDecorationLine: "underline" }}>{t.recht[seite]}</T>
           </Pressable>
         ))}
-      </View>
+      </View>}
     </Seite>
   );
 }

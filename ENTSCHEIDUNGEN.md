@@ -479,6 +479,13 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - „Pflichten“ ohne Filter zeigt nur Pflichten mit klarem Stand. Pflichten mit fehlender Angabe erscheinen als ein Hinweis mit Weg zu den Nachfragen (einzeln über den Filter „Angabe fehlt“); laufende Pflichten ohne Termin stehen eingeklappt am Ende. Auf „Heute“ haben Nebenkarten (Gründung, Nachfragen, vor dem Start) dieselbe ruhige Form; nur „Jetzt dran“ trägt die Statusfarbe als Rahmen.
 - Zeilen, die irgendwohin führen, haben Pfeil und Erklärung (`VerweisZeile`); Kästchen und Optionsfelder in der Handlungsfarbe (`accent-color`). Anmeldeseite mit Versprechen und Fristblatt des Tages statt nur einem Formular.
 
+### E-119 · Demo-Modus und Testpaket für Expo Go
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Die App hat einen Demo-Modus ohne Server: „Ohne Konto ausprobieren“ auf der Anmeldeseite. Die Antworten kommen aus einem Schnappschuss echter API-Antworten (`werkzeuge/demo-schnappschuss.mjs` → `src/demo/daten.json`); Inhalte bleiben unverändert aus dem Katalog (auch der Hinweis „noch nicht fachlich geprüft“), nur Firmen- und Kontoname sind ersetzt. Fristen werden auf das heutige Datum verschoben, Status nach derselben Regel wie in der Datenbank (überfällig vor heute, bald fällig bis 14 Tage). Erledigen, Stempeln und Angaben wirken nur im Speicher. Push, Abo, Web-Links und Rechtsseiten sind in der Demo ausgeblendet.
+- Nutzen: Tests auf dem iPhone ohne Server, Nutzertests, App-Store-Prüfung.
+- Expo SDK auf 57 angehoben (React Native 0.86, React 19.2), weil die aktuelle Expo-Go-App nur das neueste SDK lädt.
+- Testpaket für Expo Go (`werkzeuge/testpaket.sh`): die App ohne Monorepo, Übersetzungen über einen tsconfig-Pfad eingebettet, `authModus: "demo"` (nur die Demo-Anmeldung).
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

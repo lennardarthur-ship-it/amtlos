@@ -30,7 +30,7 @@ export function PflichtZeile({ k, onPress, letzte }: { k: KarteT; onPress: () =>
 }
 
 export function Heute() {
-  const { t, sprache, klient, unternehmenId, wartend, fehlgeschlagen, online } = useAmtlos();
+  const { t, sprache, klient, unternehmenId, wartend, fehlgeschlagen, online, demo } = useAmtlos();
   const f = useFarben();
   const { daten, fehler, laedt, neu } = useLaden(async () => {
     const [h, p] = await Promise.all([klient.heute(), klient.profil()]);
@@ -46,6 +46,7 @@ export function Heute() {
 
   return (
     <Seite titel={t.heute.titel} unterzeile={heuteInWorten(sprache)} laedt={laedt} neu={neu}>
+      {demo ? <Hinweis text={t.mobil.demo_hinweis} symbol="sparkles" /> : null}
       {!online ? <Hinweis text={t.mobil.offline} symbol="wifi.slash" /> : null}
       {wartend ? <Hinweis text={fuelle(t.mobil.wartend, { n: wartend })} symbol="arrow.triangle.2.circlepath" /> : null}
       {fehlgeschlagen.length ? <Hinweis art="fehler" text={fuelle(t.mobil.fehlgeschlagen, { n: fehlgeschlagen.length })} /> : null}

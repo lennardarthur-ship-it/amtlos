@@ -903,6 +903,12 @@ export const en: Texte = {
     weitere_fristen: "Further deadlines",
   },
   mobil: {
+    demo_starten: "Try without an account",
+    demo_text: "With sample data, nothing is saved.",
+    demo_hinweis: "Demo with sample data. Whatever you complete or clock is gone once you end the demo.",
+    demo_beenden: "End demo",
+    demo_push: "The demo has no reminders. With an account, Amtlos reminds you in time.",
+    oder: "or",
     anmelden_text: "Sign in to see your obligations, clock in and out and photograph receipts.",
     anmelden_dev: "Development environment: sign in with any identifier.",
     kennung: "Identifier",

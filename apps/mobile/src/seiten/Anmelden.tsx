@@ -12,7 +12,7 @@ WebBrowser.maybeCompleteAuthSession();
 
 /** Anmeldung: in dev mit Kennung (Token von der API), sonst OIDC mit PKCE beim Identity-Provider (E-061). */
 export function Anmelden() {
-  const { t, klient, anmelden } = useAmtlos();
+  const { t, klient, anmelden, demoStarten } = useAmtlos();
   const f = useFarben();
   const [kennung, setKennung] = useState("");
   const [fehler, setFehler] = useState<string | null>(null);
@@ -58,7 +58,7 @@ export function Anmelden() {
       <T v="grossTitel" accessibilityRole="header">{t.app.name}</T>
       <T leise stil={{ marginTop: 8, maxWidth: 360 }}>{t.mobil.anmelden_text}</T>
       {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
-      {KONFIG.authModus === "dev" ? (
+      {KONFIG.authModus === "demo" ? null : KONFIG.authModus === "dev" ? (
         <View style={{ marginTop: 28 }}>
           <Hinweis text={t.mobil.anmelden_dev} />
           <T v="klein" fett nativeID="kennung" stil={{ marginTop: 12 }}>{t.mobil.kennung}</T>
@@ -78,6 +78,17 @@ export function Anmelden() {
       ) : (
         <Knopf text={t.mobil.anmelden} onPress={oidc} deaktiviert={!anfrage} stil={{ marginTop: 28 }} />
       )}
+      {KONFIG.authModus === "demo" ? (
+        <View style={{ height: 28 }} />
+      ) : (
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginTop: 28, marginBottom: 16 }} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+          <View style={{ flex: 1, height: 1, backgroundColor: f.linie }} />
+          <T v="caption" leise>{t.mobil.oder}</T>
+          <View style={{ flex: 1, height: 1, backgroundColor: f.linie }} />
+        </View>
+      )}
+      <Knopf leise={KONFIG.authModus !== "demo"} text={t.mobil.demo_starten} symbol="sparkles" onPress={() => void demoStarten()} />
+      <T v="caption" leise stil={{ marginTop: 8, textAlign: "center" }}>{t.mobil.demo_text}</T>
     </ScrollView>
   );
 }
