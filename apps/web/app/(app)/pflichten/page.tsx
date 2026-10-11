@@ -10,14 +10,17 @@ export const metadata = { title: "Pflichten" };
 const FILTER: (AnzeigeStatus | "alle")[] = ["alle", "ueberfaellig", "faellig_bald", "angabe_fehlt", "offen", "erledigt"];
 
 
-export default async function PflichtenSeite({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
-  const { status } = await searchParams;
+export default async function PflichtenSeite({ searchParams }: { searchParams: Promise<{ status?: string; pflicht?: string }> }) {
+  const { status, pflicht } = await searchParams;
   const filter = FILTER.includes(status as AnzeigeStatus) ? (status as AnzeigeStatus | "alle") : "alle";
   const [{ s, t: x }, karten] = await Promise.all([t(), api<Karte[]>(`/v1/pflichten?status=${filter}`)]);
   // „Gilt nicht“ steht auf einer eigenen Seite, damit die Liste das Zu-Tuende zeigt
   // Ohne Filter: nur die nächsten 90 Tage (wiederkehrende Pflichten würden sonst die Liste fluten); alles im Kalender
   const grenze = new Date(Date.now() + 90 * 86_400_000).toISOString().slice(0, 10);
-  const sichtbar = karten.filter((k) => k.status !== "nicht_zutreffend" && (filter !== "alle" || !k.faellig_am || k.faellig_am <= grenze));
+  // ?pflicht=<id> (z. B. aus dem Glossar): alle Termine dieser einen Pflicht, inklusive „gilt nicht“
+  const sichtbar = pflicht
+    ? karten.filter((k) => k.pflicht_id === pflicht)
+    : karten.filter((k) => k.status !== "nicht_zutreffend" && (filter !== "alle" || (k.status !== "erledigt" && (!k.faellig_am || k.faellig_am <= grenze))));
 
   // Nach Monat der Fälligkeit gruppieren – Zeitfolge ist hier die tatsächliche Ordnung
   const gruppen = new Map<string, Karte[]>();
@@ -45,7 +48,7 @@ export default async function PflichtenSeite({ searchParams }: { searchParams: P
         </ul>
       </nav>
 
-      {filter === "alle" ? (
+      {filter === "alle" && !pflicht ? (
         <p className="text-klein text-tinte-leise">
           {x.pflichten.naechste_90}{" "}
           <Link href="/kalender" className="verweis">

@@ -4,7 +4,7 @@ import type { Response } from "express";
 import type PgBoss from "pg-boss";
 import { z } from "zod";
 import { entscheidendeSaetze, type Knoten } from "@amtlos/rules-engine";
-import { Datenbank, heute, neuberechnungEinreihen, type Tx } from "@amtlos/server";
+import { Datenbank, heute, ladeAktivenKatalog, neuberechnungEinreihen, type Tx } from "@amtlos/server";
 import { Kontext, MitUnternehmen, Oeffentlich, type Anfragekontext } from "./auth.js";
 import { BEREICH_JE_KATEGORIE, heuteUebersicht } from "./heute.js";
 import { pruefe, t, uebersetzeDbFehler, type Text } from "./hilfen.js";
@@ -208,6 +208,23 @@ export class PflichtenController {
         return { erledigt: ids.length };
       })
       .catch(uebersetzeDbFehler);
+  }
+
+  /** Fachbegriffe aus dem aktiven Katalog (Prinzip 5: jeder Fachbegriff hat eine Ein-Satz-Erklärung). */
+  @MitUnternehmen()
+  @Get("glossar")
+  async glossar(@Kontext() k: Anfragekontext) {
+    const aktiv = await this.db.imKontext({ kontoId: k.kontoId, unternehmenId: k.unternehmenId }, (tx) => ladeAktivenKatalog(tx));
+    const begriffe = new Map<string, { begriff: string; erklaerung: string; pflichten: { id: string; titel: string }[] }>();
+    for (const p of aktiv?.katalog.pflichten ?? []) {
+      for (const b of (p.begriffe as { begriff: Text; erklaerung: Text }[] | undefined) ?? []) {
+        const name = t(b.begriff, k.sprache)!;
+        const eintrag = begriffe.get(name.toLowerCase()) ?? { begriff: name, erklaerung: t(b.erklaerung, k.sprache)!, pflichten: [] };
+        eintrag.pflichten.push({ id: p.id, titel: t(p.titel, k.sprache)! });
+        begriffe.set(name.toLowerCase(), eintrag);
+      }
+    }
+    return [...begriffe.values()].sort((a, b) => a.begriff.localeCompare(b.begriff, k.sprache));
   }
 
   /** Legt ein Kalender-Abo an; das Token wird nur jetzt im Klartext gezeigt (gespeichert als SHA-256). */

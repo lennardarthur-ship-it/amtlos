@@ -48,6 +48,10 @@ export default async function Einstellungen() {
         </form>
       </section>
 
+      <p>
+        <Link href="/hilfe" className="verweis">{x.hilfe.link}</Link>
+      </p>
+
       <form action="/auth/abmelden" method="post">
         <button className="knopf knopf-leise">{x.anmelden.abmelden}</button>
       </form>

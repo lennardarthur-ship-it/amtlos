@@ -19,6 +19,8 @@ const pruefe = (bedingung, text) => { if (!bedingung) fehler.push(text); };
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PFAD || undefined, headless: true, args: ["--no-sandbox"] });
 
 async function barrierefrei(seite, name) {
+  // Nach Navigation per Server-Aktion setzt Next.js den Titel einen Moment später – nicht den Zwischenzustand prüfen
+  await seite.waitForFunction(() => document.title.length > 0, null, { timeout: 5000 }).catch(() => undefined);
   const r = await new AxeBuilder({ page: seite }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();
   for (const v of r.violations) fehler.push(`${name}: axe ${v.id} (${v.impact}) – ${v.help} [${v.nodes.length}×]`);
   if (BILDER) await seite.screenshot({ path: path.join(BILDER, `${name}.png`), fullPage: true });
@@ -80,7 +82,7 @@ async function rundgang(farbschema, breite) {
     pruefe(await p.locator(".stempel").count(), `${name("pflicht")}: kein Erledigt-Stempel`);
   }
 
-  for (const seite of ["kalender", "melden", "einstellungen", "pflichten/nicht-zutreffend"]) {
+  for (const seite of ["kalender", "melden", "einstellungen", "hilfe", "pflichten/nicht-zutreffend"]) {
     await p.goto(`${B}/${seite}`);
     await barrierefrei(p, name(seite.replace("/", "-")));
   }

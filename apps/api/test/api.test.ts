@@ -157,6 +157,15 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
     expect(liste.body.find((e: { id: string }) => e.id === e1.body.id).storniert).toBe(true);
   });
 
+  it("Glossar sammelt Fachbegriffe aus dem Katalog, ohne Doppelte", async () => {
+    const r = await alsAnna(http().get("/v1/glossar")).expect(200);
+    const kl = r.body.filter((b: { begriff: string }) => b.begriff === "Kleinunternehmerregelung");
+    expect(kl).toHaveLength(1);
+    expect(kl[0].pflichten.length).toBeGreaterThanOrEqual(2);
+    const namen = r.body.map((b: { begriff: string }) => b.begriff);
+    expect(namen).toEqual([...namen].sort((a: string, b: string) => a.localeCompare(b, "de")));
+  });
+
   it("Kalender-Abo liefert ICS nur mit gültigem Token", async () => {
     const r = await alsAnna(http().post("/v1/kalender/abo")).expect(201);
     const pfad = new URL(r.body.url).pathname;

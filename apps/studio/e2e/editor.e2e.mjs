@@ -14,6 +14,7 @@ const pruefe = (ok, text) => { if (!ok) fehler.push(text); };
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PFAD || undefined, headless: true, args: ["--no-sandbox"] });
 const p = await (await browser.newContext({ viewport: { width: 1360, height: 900 } })).newPage();
 const axe = async (name) => {
+  await p.waitForFunction(() => document.title.length > 0, null, { timeout: 5000 }).catch(() => undefined);
   const r = await new AxeBuilder({ page: p }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
   for (const v of r.violations) fehler.push(`${name}: axe ${v.id} – ${v.help} [${v.nodes.length}×]`);
 };
