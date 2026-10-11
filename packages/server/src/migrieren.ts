@@ -60,7 +60,7 @@ export async function migrieren(verbindung: string, verzeichnis: string): Promis
   const c2 = new pg.Client({ connectionString: verbindung });
   await c2.connect();
   try {
-    for (const rolle of ["amtlos_app", "amtlos_worker"]) {
+    for (const rolle of ["amtlos_app", "amtlos_worker", "amtlos_studio"]) {
       await c2.query(`grant usage on schema ${PGBOSS_SCHEMA} to ${rolle}`);
       await c2.query(`grant select, insert, update, delete on all tables in schema ${PGBOSS_SCHEMA} to ${rolle}`);
       await c2.query(`grant usage, select on all sequences in schema ${PGBOSS_SCHEMA} to ${rolle}`);

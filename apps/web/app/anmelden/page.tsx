@@ -1,26 +1,15 @@
 import { redirect } from "next/navigation";
-import { SignJWT } from "jose";
+import { devAnmelden } from "@amtlos/web-kern/auth-routen";
 import { konfig } from "@/lib/konfig";
-import { sitzung, sitzungSetzen } from "@/lib/sitzung";
+import { sitzung } from "@/lib/sitzung";
 import { t } from "@/lib/sprache";
 
 export const metadata = { title: "Anmelden" };
 
 /** Nur AUTH_MODUS=dev (E-062): Anmeldung mit frei wählbarer Kennung, Token wie vom Identity-Provider. */
-async function devAnmelden(formular: FormData) {
+async function devLogin(formular: FormData) {
   "use server";
-  const k = konfig();
-  if (k.authModus !== "dev") throw new Error("Entwicklungs-Login ist deaktiviert");
-  const sub = String(formular.get("kennung") ?? "").trim().toLowerCase().replace(/[^a-z0-9._-]/g, "");
-  if (!sub) redirect("/anmelden?fehler=1");
-  const ablauf = Math.floor(Date.now() / 1000) + 12 * 3600;
-  const token = await new SignJWT({ email: `${sub}@example.org`, name: sub })
-    .setProtectedHeader({ alg: "HS256" })
-    .setSubject(sub)
-    .setIssuer("amtlos-dev")
-    .setExpirationTime(ablauf)
-    .sign(new TextEncoder().encode(k.devJwtSecret!));
-  await sitzungSetzen({ token, ablauf, sub });
+  if (!(await devAnmelden(String(formular.get("kennung") ?? "")))) redirect("/anmelden?fehler=1");
   redirect("/heute");
 }
 
@@ -39,7 +28,7 @@ export default async function Anmelden({ searchParams }: { searchParams: Promise
         </p>
       ) : null}
       {dev ? (
-        <form action={devAnmelden} className="mt-6 space-y-4">
+        <form action={devLogin} className="mt-6 space-y-4">
           <p className="rounded-md border-2 border-bald bg-bald-hauch p-3 text-klein">{x.anmelden.dev_hinweis}</p>
           <label htmlFor="kennung" className="block font-bold">
             {x.anmelden.dev_kennung}

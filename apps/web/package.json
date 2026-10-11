@@ -14,13 +14,10 @@
   },
   "dependencies": {
     "@amtlos/i18n": "workspace:*",
-    "@fontsource/atkinson-hyperlegible": "^5.3.0",
-    "jose": "^6.2.0",
     "next": "^16.0.0",
-    "openid-client": "^6.8.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "server-only": "^0.0.1"
+    "@amtlos/web-kern": "workspace:*"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.0",

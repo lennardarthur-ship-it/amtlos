@@ -2,30 +2,34 @@
 
 Das Bürokratie-Betriebssystem für Kleinunternehmer und Startups in Deutschland.
 
-**Stand:** Architekturpaket freigegeben (2026-10-11). Bauabschnitt 1 (Fundament) in Arbeit.
+**Stand:** Bauabschnitt 1 (Fundament) umgesetzt, siehe [Testbericht](docs/testberichte/abschnitt-1.md). Fachliche Inhalte sind ungeprüft und erscheinen in prod erst nach Freigabe (E-002).
 
-## Inhalt
+## Aufbau
+
+| Pfad | Inhalt |
+|---|---|
+| `apps/web` | Nutzer-App (Next.js, PWA) |
+| `apps/studio` | Experten-Backend: Katalog bearbeiten, prüfen, veröffentlichen |
+| `apps/api` | REST-API (NestJS) |
+| `apps/worker` | Neuberechnung, Tageswechsel, Erinnerungen |
+| `packages/rules-engine` | Regel-Engine (rein, deterministisch, dreiwertig) |
+| `packages/fristen` | Fristen, Feiertage, Perioden |
+| `packages/rules-schema` | JSON-Schemas, Fakten- und Ereignis-Katalog, Validator |
+| `packages/server` | Datenbankzugriff, Neuberechnung, Erinnerungen, Studio-Logik, Migrationen, CLI |
+| `packages/i18n` | Texte Deutsch/Englisch, Onboarding-Fragen |
+| `packages/web-kern` | Sitzung, Anmeldung, Designsystem für Web und Studio |
+| `catalog/` | Pflichten, Regelwerte, Fixtures (YAML) |
+| `db/` | Migrationen und Schema-Tests |
+
+## Dokumentation
 
 | Datei | Inhalt |
 |---|---|
-| `ENTSCHEIDUNGEN.md` | alle Architektur- und Produktentscheidungen mit Status |
-| `PRUEFLISTE.md` | zentrale Liste aller fachlich zu prüfenden Punkte |
-| `docs/01-architektur.md` | Systemarchitektur, Diagramme, Komponenten, Monorepo |
-| `docs/02-datenmodell.md` | Datenmodell: Kern physisch, Fachmodule logisch |
-| `docs/03-regel-schema.md` | Regel-DSL, Fristen, Engine-Ausgabe, Fixtures |
-| `docs/04-seitenstruktur.md` | Routen der Nutzer-App und des Studios |
-| `docs/05-risiken.md` | Risikoregister |
-| `db/migrations/` | PostgreSQL-Migrationen (0001 = Referenzschema Abschnitt 1–2 inkl. RLS) |
-| `db/tests/` | Schema-Tests (30 Prüfungen) |
-| `packages/rules-schema/` | JSON-Schemas, Fakten- und Ereignis-Katalog, Katalog-Validator |
-| `catalog/` | Beispiel-Pflichten, Regelwerte, Fixture |
+| `ENTSCHEIDUNGEN.md` | alle Architektur- und Produktentscheidungen |
+| `PRUEFLISTE.md` | offene fachliche Prüfpunkte |
+| `docs/01-architektur.md` … `docs/07-betrieb.md` | Architektur, Datenmodell, Regel-Schema, Seiten, Risiken, Design, Betrieb |
+| `docs/testberichte/` | Testberichte je Bauabschnitt |
 
-## Prüfen
+## Schnellstart
 
-```bash
-# Katalog validieren
-cd packages/rules-schema && npm install && npm run validate
-
-# Schema-Tests (PostgreSQL ≥ 16 mit Superuser, PGHOST/PGPORT/PGUSER gesetzt)
-db/tests/run.sh
-```
+Siehe [docs/07-betrieb.md](docs/07-betrieb.md).

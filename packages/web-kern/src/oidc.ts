@@ -11,5 +11,5 @@ export function oidc(): Promise<client.Configuration> {
   return konfiguration;
 }
 
-export const OIDC_COOKIE = "amtlos_oidc";
+export const OIDC_COOKIE = "amtlos_oidc_anmeldung";
 export const RUECKRUF = "/auth/rueckruf";

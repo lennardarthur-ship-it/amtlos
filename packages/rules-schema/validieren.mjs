@@ -7,6 +7,87 @@ import addFormats from "ajv-formats";
 import YAML from "yaml";
 
 const schemaDir = path.dirname(fileURLToPath(import.meta.url));
+const ajv = new Ajv2020({ allErrors: true, strict: true, strictRequired: false, strictTypes: false });
+addFormats(ajv);
+const pruefePflicht = ajv.compile(JSON.parse(fs.readFileSync(path.join(schemaDir, "pflicht.schema.json"), "utf8")));
+const pruefeRegelwert = ajv.compile(JSON.parse(fs.readFileSync(path.join(schemaDir, "regelwert.schema.json"), "utf8")));
+const fakten = new Map(JSON.parse(fs.readFileSync(path.join(schemaDir, "fakten.json"), "utf8")).fakten.map((f) => [f.pfad, f]));
+const ereignisse = new Set(JSON.parse(fs.readFileSync(path.join(schemaDir, "ereignisse.json"), "utf8")).ereignisse.map((e) => e.typ));
+
+const OPS_FUER_TYP = {
+  zahl: ["==", "!=", ">", ">=", "<", "<=", "in", "nicht_in"],
+  betrag: ["==", "!=", ">", ">=", "<", "<="],
+  ganzzahl: ["==", "!=", ">", ">=", "<", "<=", "in", "nicht_in"],
+  bool: ["=="],
+  datum: ["==", "!=", ">", ">=", "<", "<="],
+  enum: ["==", "!=", "in", "nicht_in"],
+  enum_liste: ["enthaelt", "enthaelt_eines"],
+  text: ["==", "!=", "in", "nicht_in"],
+};
+const IMMER_ERLAUBT = ["vorhanden", "nicht_vorhanden"];
+
+/**
+ * Prüft eine einzelne Pflichtversion: JSON-Schema, Fakten, Operatoren, Enum-Werte, Regelwerte, Ereignisse, Verweise.
+ * Genutzt vom Katalog-Validator und vom Studio beim Speichern.
+ * @param {any} p
+ * @param {{ regelwertIds: Set<string>, pflichtIds: Set<string>, prod?: boolean }} kontext
+ * @returns {string[]} Fehlermeldungen (leer = gültig)
+ */
+export function pruefePflichtObjekt(p, kontext) {
+  const fehler = [];
+  if (!pruefePflicht(p)) {
+    for (const e of pruefePflicht.errors) fehler.push(`${e.instancePath || "/"} ${e.message}${e.params?.additionalProperty ? ` (${e.params.additionalProperty})` : ""}`);
+    return fehler;
+  }
+  const pruefeWert = (fakt, op, wert, pfad) => {
+    if (wert && typeof wert === "object" && !Array.isArray(wert) && "regelwert" in wert) {
+      if (!kontext.regelwertIds.has(wert.regelwert)) fehler.push(`${pfad}: unbekannter Regelwert '${wert.regelwert}'`);
+      if (!["zahl", "betrag", "ganzzahl"].includes(fakt.typ)) fehler.push(`${pfad}: Regelwert-Vergleich auf Nicht-Zahl '${fakt.pfad}'`);
+      return;
+    }
+    if (fakt.typ === "bool" && typeof wert !== "boolean") fehler.push(`${pfad}: '${fakt.pfad}' erwartet true/false`);
+    if (["zahl", "betrag", "ganzzahl"].includes(fakt.typ) && !["in", "nicht_in"].includes(op) && typeof wert !== "number")
+      fehler.push(`${pfad}: '${fakt.pfad}' erwartet eine Zahl`);
+    if (fakt.werte) for (const w of Array.isArray(wert) ? wert : [wert]) if (!fakt.werte.includes(w)) fehler.push(`${pfad}: '${w}' ist kein gültiger Wert für '${fakt.pfad}'`);
+    if (["in", "nicht_in", "enthaelt_eines"].includes(op) && !Array.isArray(wert)) fehler.push(`${pfad}: Operator '${op}' erwartet eine Liste`);
+  };
+  const pruefeBedingung = (b, pfad) => {
+    if (!b || typeof b !== "object") return;
+    if (b.all) return b.all.forEach((x, i) => pruefeBedingung(x, `${pfad}.all[${i}]`));
+    if (b.any) return b.any.forEach((x, i) => pruefeBedingung(x, `${pfad}.any[${i}]`));
+    if (b.not) return pruefeBedingung(b.not, `${pfad}.not`);
+    if (b.ereignis) {
+      if (!ereignisse.has(b.ereignis)) fehler.push(`${pfad}: unbekanntes Ereignis '${b.ereignis}'`);
+      return;
+    }
+    if (b.feld) {
+      const fakt = fakten.get(b.feld);
+      if (!fakt) return fehler.push(`${pfad}: unbekannter Fakt '${b.feld}'`);
+      if (!IMMER_ERLAUBT.includes(b.op) && !OPS_FUER_TYP[fakt.typ]?.includes(b.op)) fehler.push(`${pfad}: Operator '${b.op}' passt nicht zu Typ '${fakt.typ}' von '${b.feld}'`);
+      if ("wert" in b) pruefeWert(fakt, b.op, b.wert, pfad);
+    }
+  };
+  pruefeBedingung(p.ausloeser, "ausloeser");
+  const f = p.frist;
+  if (f.bezug?.ereignis && !ereignisse.has(f.bezug.ereignis)) fehler.push(`frist.bezug: unbekanntes Ereignis '${f.bezug.ereignis}'`);
+  if (f.bezug?.fakt && fakten.get(f.bezug.fakt)?.typ !== "datum") fehler.push(`frist.bezug: '${f.bezug.fakt}' ist kein Datums-Fakt`);
+  if (f.bezug?.pflicht_erledigt && !kontext.pflichtIds.has(f.bezug.pflicht_erledigt)) fehler.push(`frist.bezug: unbekannte Pflicht '${f.bezug.pflicht_erledigt}'`);
+  f.rhythmus?.waehle?.forEach((w, i) => pruefeBedingung(w.wenn, `frist.rhythmus.waehle[${i}]`));
+  if (f.verlaengerung) pruefeBedingung(f.verlaengerung.wenn, "frist.verlaengerung");
+  for (const n of p.wiederholung.neu_ausloesen_bei ?? []) {
+    if (n.ereignis && !ereignisse.has(n.ereignis)) fehler.push(`wiederholung: unbekanntes Ereignis '${n.ereignis}'`);
+    if (n.fakt && !fakten.has(n.fakt)) fehler.push(`wiederholung: unbekannter Fakt '${n.fakt}'`);
+  }
+  for (const v of p.voraussetzungen ?? []) if (!kontext.pflichtIds.has(v)) fehler.push(`voraussetzungen: unbekannte Pflicht '${v}'`);
+  if (kontext.prod) {
+    if (p.pruefung?.status !== "freigegeben") fehler.push("prod: nicht freigegeben");
+    for (const k of ["titel", "kurz", "erklaerung", "stelle"]) if (!p[k].en) fehler.push(`prod: englischer Text fehlt in '${k}'`);
+    for (const q of p.quellen) if (!q.abgerufen) fehler.push(`prod: Quelle '${q.titel}' nie abgerufen`);
+    if (p.status_recht === "in_kraft" && !p.gueltig_ab) fehler.push("prod: in Kraft, aber gueltig_ab fehlt");
+    if (p.fachlich_zu_pruefen?.length) fehler.push(`prod: ${p.fachlich_zu_pruefen.length} offene Prüfpunkte`);
+  }
+  return fehler;
+}
 
 /**
  * @param {string} katalogDir Pfad zu catalog/
@@ -15,12 +96,6 @@ const schemaDir = path.dirname(fileURLToPath(import.meta.url));
  */
 export function validiereKatalog(katalogDir, optionen = {}) {
   const prod = optionen.prod === true;
-  const ajv = new Ajv2020({ allErrors: true, strict: true, strictRequired: false, strictTypes: false });
-  addFormats(ajv);
-  const pruefePflicht = ajv.compile(JSON.parse(fs.readFileSync(path.join(schemaDir, "pflicht.schema.json"), "utf8")));
-  const pruefeRegelwert = ajv.compile(JSON.parse(fs.readFileSync(path.join(schemaDir, "regelwert.schema.json"), "utf8")));
-  const fakten = new Map(JSON.parse(fs.readFileSync(path.join(schemaDir, "fakten.json"), "utf8")).fakten.map((f) => [f.pfad, f]));
-  const ereignisse = new Set(JSON.parse(fs.readFileSync(path.join(schemaDir, "ereignisse.json"), "utf8")).ereignisse.map((e) => e.typ));
 
   const fehler = [];
   const fehlerAus = (datei, msg) => fehler.push(`${datei}: ${msg}`);
@@ -55,81 +130,11 @@ export function validiereKatalog(katalogDir, optionen = {}) {
   }
 
   // ---------- Pflichten ----------
-  const OPS_FUER_TYP = {
-    zahl: ["==", "!=", ">", ">=", "<", "<=", "in", "nicht_in"],
-    betrag: ["==", "!=", ">", ">=", "<", "<="],
-    ganzzahl: ["==", "!=", ">", ">=", "<", "<=", "in", "nicht_in"],
-    bool: ["=="],
-    datum: ["==", "!=", ">", ">=", "<", "<="],
-    enum: ["==", "!=", "in", "nicht_in"],
-    enum_liste: ["enthaelt", "enthaelt_eines"],
-    text: ["==", "!=", "in", "nicht_in"],
-  };
-  const IMMER_ERLAUBT = ["vorhanden", "nicht_vorhanden"];
-
   const pflichten = ladeYaml(path.join(katalogDir, "pflichten"));
   const pflichtIds = new Set(pflichten.map((p) => p.inhalt?.id));
-
-  function pruefeWert(datei, fakt, op, wert, pfad) {
-    if (wert && typeof wert === "object" && !Array.isArray(wert) && "regelwert" in wert) {
-      if (!regelwerte.has(wert.regelwert)) fehlerAus(datei, `${pfad}: unbekannter Regelwert '${wert.regelwert}'`);
-      if (!["zahl", "betrag", "ganzzahl"].includes(fakt.typ)) fehlerAus(datei, `${pfad}: Regelwert-Vergleich auf Nicht-Zahl '${fakt.pfad}'`);
-      return;
-    }
-    if (fakt.typ === "bool" && typeof wert !== "boolean") fehlerAus(datei, `${pfad}: '${fakt.pfad}' erwartet true/false`);
-    if (["zahl", "betrag", "ganzzahl"].includes(fakt.typ) && !["in", "nicht_in"].includes(op) && typeof wert !== "number")
-      fehlerAus(datei, `${pfad}: '${fakt.pfad}' erwartet eine Zahl`);
-    if (fakt.werte) {
-      const liste = Array.isArray(wert) ? wert : [wert];
-      for (const w of liste) if (!fakt.werte.includes(w)) fehlerAus(datei, `${pfad}: '${w}' ist kein gültiger Wert für '${fakt.pfad}'`);
-    }
-    if (["in", "nicht_in", "enthaelt_eines"].includes(op) && !Array.isArray(wert)) fehlerAus(datei, `${pfad}: Operator '${op}' erwartet eine Liste`);
-  }
-
-  function pruefeBedingung(datei, b, pfad) {
-    if (!b || typeof b !== "object") return;
-    if (b.all) return b.all.forEach((x, i) => pruefeBedingung(datei, x, `${pfad}.all[${i}]`));
-    if (b.any) return b.any.forEach((x, i) => pruefeBedingung(datei, x, `${pfad}.any[${i}]`));
-    if (b.not) return pruefeBedingung(datei, b.not, `${pfad}.not`);
-    if (b.ereignis) {
-      if (!ereignisse.has(b.ereignis)) fehlerAus(datei, `${pfad}: unbekanntes Ereignis '${b.ereignis}'`);
-      return;
-    }
-    if (b.feld) {
-      const fakt = fakten.get(b.feld);
-      if (!fakt) return fehlerAus(datei, `${pfad}: unbekannter Fakt '${b.feld}'`);
-      if (!IMMER_ERLAUBT.includes(b.op) && !OPS_FUER_TYP[fakt.typ]?.includes(b.op))
-        fehlerAus(datei, `${pfad}: Operator '${b.op}' passt nicht zu Typ '${fakt.typ}' von '${b.feld}'`);
-      if ("wert" in b) pruefeWert(datei, fakt, b.op, b.wert, pfad);
-    }
-  }
-
   for (const { datei, inhalt: p } of pflichten) {
-    if (!pruefePflicht(p)) {
-      for (const e of pruefePflicht.errors) fehlerAus(datei, `${e.instancePath || "/"} ${e.message}${e.params?.additionalProperty ? ` (${e.params.additionalProperty})` : ""}`);
-      continue;
-    }
-    if (path.basename(datei).replace(/\.ya?ml$/, "") !== p.id) fehlerAus(datei, `Dateiname muss der ID '${p.id}' entsprechen`);
-    pruefeBedingung(datei, p.ausloeser, "ausloeser");
-    const f = p.frist;
-    if (f.bezug?.ereignis && !ereignisse.has(f.bezug.ereignis)) fehlerAus(datei, `frist.bezug: unbekanntes Ereignis '${f.bezug.ereignis}'`);
-    if (f.bezug?.fakt && fakten.get(f.bezug.fakt)?.typ !== "datum") fehlerAus(datei, `frist.bezug: '${f.bezug.fakt}' ist kein Datums-Fakt`);
-    if (f.bezug?.pflicht_erledigt && !pflichtIds.has(f.bezug.pflicht_erledigt)) fehlerAus(datei, `frist.bezug: unbekannte Pflicht '${f.bezug.pflicht_erledigt}'`);
-    f.rhythmus?.waehle?.forEach((w, i) => pruefeBedingung(datei, w.wenn, `frist.rhythmus.waehle[${i}]`));
-    if (f.verlaengerung) pruefeBedingung(datei, f.verlaengerung.wenn, "frist.verlaengerung");
-    for (const n of p.wiederholung.neu_ausloesen_bei ?? []) {
-      if (n.ereignis && !ereignisse.has(n.ereignis)) fehlerAus(datei, `wiederholung: unbekanntes Ereignis '${n.ereignis}'`);
-      if (n.fakt && !fakten.has(n.fakt)) fehlerAus(datei, `wiederholung: unbekannter Fakt '${n.fakt}'`);
-    }
-    for (const v of p.voraussetzungen ?? []) if (!pflichtIds.has(v)) fehlerAus(datei, `voraussetzungen: unbekannte Pflicht '${v}'`);
-
-    if (prod) {
-      if (p.pruefung?.status !== "freigegeben") fehlerAus(datei, "prod: nicht freigegeben");
-      for (const k of ["titel", "kurz", "erklaerung", "stelle"]) if (!p[k].en) fehlerAus(datei, `prod: englischer Text fehlt in '${k}'`);
-      for (const q of p.quellen) if (!q.abgerufen) fehlerAus(datei, `prod: Quelle '${q.titel}' nie abgerufen`);
-      if (p.status_recht === "in_kraft" && !p.gueltig_ab) fehlerAus(datei, "prod: in Kraft, aber gueltig_ab fehlt");
-      if (p.fachlich_zu_pruefen?.length) fehlerAus(datei, `prod: ${p.fachlich_zu_pruefen.length} offene Prüfpunkte`);
-    }
+    for (const f of pruefePflichtObjekt(p, { regelwertIds: new Set(regelwerte.keys()), pflichtIds, prod })) fehlerAus(datei, f);
+    if (p?.id && path.basename(datei).replace(/\.ya?ml$/, "") !== p.id) fehlerAus(datei, `Dateiname muss der ID '${p.id}' entsprechen`);
   }
 
   // ---------- Fixtures ----------

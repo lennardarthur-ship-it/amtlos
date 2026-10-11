@@ -5,3 +5,4 @@ export * from "./berechnung.js";
 export * from "./erinnerungen.js";
 export * from "./warteschlange.js";
 export * from "./migrieren.js";
+export * from "./studio.js";

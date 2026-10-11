@@ -2,7 +2,7 @@ import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { datumLang, frageFuerFakt, fuelle, schrittFuerFakt } from "@amtlos/i18n";
 import { Fristblatt } from "@/komponenten/fristblatt";
-import { periodeText } from "@/komponenten/pflicht-zeile";
+import { periodeText } from "@/lib/periode";
 import { StatusText } from "@/komponenten/status";
 import { api } from "@/lib/api";
 import { t } from "@/lib/sprache";

@@ -1,0 +1,42 @@
+# 07 · Lokal starten und betreiben
+
+## Lokal
+
+```bash
+pnpm install
+docker compose up -d                                   # PostgreSQL 16
+export PGHOST=localhost PGPORT=5432 PGUSER=postgres PGPASSWORD=postgres
+scripts/dev-datenbank.sh                               # Rollen, Migrationen, Katalog-Import
+pnpm build
+
+# API (Port 3001), Worker, Web (Port 3000) – Werte aus .env.example
+UMGEBUNG=dev AUTH_MODUS=dev DEV_JWT_SECRET=… DATABASE_URL=postgresql://api_user:amtlos@localhost:5432/amtlos node apps/api/dist/main.js
+UMGEBUNG=dev WORKER_DATABASE_URL=postgresql://worker_user:amtlos@localhost:5432/amtlos node apps/worker/dist/main.js
+cd apps/web && UMGEBUNG=dev AUTH_MODUS=dev DEV_JWT_SECRET=… SITZUNG_SCHLUESSEL=… API_INTERN_URL=http://localhost:3001 pnpm start
+
+# Studio (Port 3100): erst Konten mit Plattformrolle anlegen
+MIGRATION_DATABASE_URL=postgresql://amtlos_owner:amtlos@localhost:5432/amtlos \
+  node packages/server/dist/cli.js plattformrolle redakteurin r@example.org "Rita" redaktion
+MIGRATION_DATABASE_URL=… node packages/server/dist/cli.js plattformrolle stb s@example.org "Stefan" experte "steuerberater=StBK 4711"
+cd apps/studio && STUDIO_DATABASE_URL=postgresql://studio_user:amtlos@localhost:5432/amtlos COOKIE_PRAEFIX=amtlos_studio … pnpm start
+```
+
+## Tests
+
+| Was | Befehl |
+|---|---|
+| Alles ohne Datenbank | `pnpm test` |
+| Katalog | `pnpm katalog:pruefen` |
+| Schema, RLS, Freigaben | `db/tests/run.sh` (PG-Superuser in `PGHOST`…) |
+| Integration (Server, API, Worker) | mit `PGHOST` gesetzt: `pnpm --filter @amtlos/server --filter @amtlos/api --filter @amtlos/worker test` |
+| E2E + Barrierefreiheit | laufende Dienste, dann `E2E_URL=http://localhost:3000 pnpm --filter @amtlos/web e2e` |
+
+## Deploy (Reihenfolge)
+
+1. Rollen und Erweiterungen durch die Plattform anlegen (`amtlos_owner`, `amtlos_app`, `amtlos_worker`, `amtlos_studio`, Login-Rollen je Dienst; `pgcrypto`, `citext`, `btree_gist`).
+2. `amtlos-server migrieren` als Eigentümer (bricht bei veränderten Migrationen ab).
+3. `amtlos-server umgebung prod` (einmalig; E-067).
+4. API, Worker, Web, Studio ausrollen. Web und Studio mit `AUTH_MODUS=oidc`; die Konfiguration verweigert `dev` in staging und prod.
+5. Katalog nur über das Studio (Vier-Augen-Freigabe), nicht über `katalog-importieren`.
+
+Infrastruktur als Code (OpenTofu, STACKIT) folgt, sobald der Hosting-Vertrag steht (E-013).

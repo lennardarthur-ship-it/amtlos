@@ -1,0 +1,7 @@
+@import "tailwindcss";
+@import "@amtlos/web-kern/designsystem.css";
+
+/* Studio: dichtere Tabellen für die Arbeit am Katalog */
+.tabelle { width: 100%; border-collapse: collapse; font-size: var(--text-klein); }
+.tabelle th { text-align: left; font-weight: 700; border-bottom: 2px solid var(--color-tinte); padding: 0.5rem 0.75rem 0.5rem 0; }
+.tabelle td { border-bottom: 1px solid var(--color-linie); padding: 0.5rem 0.75rem 0.5rem 0; vertical-align: top; }

@@ -1,0 +1,184 @@
+@import "@fontsource/atkinson-hyperlegible/400.css";
+@import "@fontsource/atkinson-hyperlegible/700.css";
+@import "@fontsource/atkinson-hyperlegible/400-italic.css";
+
+/*
+ * Amtlos-Designsystem (docs/06-design.md)
+ * Papier und Tinte: ruhig, behördennah, ohne Behördenhärte.
+ * Ein prägendes Element: das Fristblatt. Statusfarben nur zusammen mit Text oder Form.
+ */
+@theme {
+  --font-sans: "Atkinson Hyperlegible", ui-sans-serif, system-ui, sans-serif;
+
+  --color-papier: #f2f3ef;      /* Seitenfläche: kühles Recyclingpapier */
+  --color-blatt: #ffffff;       /* Flächen, auf denen gelesen wird */
+  --color-tinte: #1b2a3a;       /* Text */
+  --color-tinte-leise: #4a5868; /* Nebeninformation, ≥ 7:1 auf Blatt */
+  --color-linie: #d3d8d0;       /* Trennlinien */
+  --color-amt: #136f5b;         /* Handeln: Knöpfe, Links, Erledigt-Stempel */
+  --color-amt-tief: #0d5143;
+  --color-amt-hauch: #e3efeb;
+  --color-frist: #b42318;       /* überfällig */
+  --color-frist-hauch: #fbe9e7;
+  --color-bald: #a84a06;        /* bald fällig, als Text kontraststark */
+  --color-bald-hauch: #fdf0d9;
+  --color-fokus: #2457c5;
+
+  --text-klein: 0.8125rem;
+  --text-klein--line-height: 1.4;
+  --text-basis: 1rem;
+  --text-basis--line-height: 1.55;
+  --text-gross: 1.25rem;
+  --text-gross--line-height: 1.35;
+  --text-titel: 1.5625rem;
+  --text-titel--line-height: 1.2;
+  --text-blatt: 2.4375rem;
+  --text-blatt--line-height: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-papier: #11171d;
+    --color-blatt: #19212a;
+    --color-tinte: #e6eae3;
+    --color-tinte-leise: #aeb8c2;
+    --color-linie: #2f3a45;
+    --color-amt: #5cc2a6;
+    --color-amt-tief: #8ad8c2;
+    --color-amt-hauch: #183a33;
+    --color-frist: #ff8a7a;
+    --color-frist-hauch: #3d1d1a;
+    --color-bald: #f5b453;
+    --color-bald-hauch: #3a2a12;
+    --color-fokus: #8fb2ff;
+  }
+}
+
+html {
+  background: var(--color-papier);
+  color: var(--color-tinte);
+  font-family: var(--font-sans);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100dvh;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-fokus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Lesetext: Zeilenlänge unter 80 Zeichen */
+.lesetext {
+  max-width: 68ch;
+}
+
+/* Knöpfe: große Ziele (mind. 44 px), eindeutige Benennung */
+.knopf {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.625rem 1.125rem;
+  border-radius: 6px;
+  font-weight: 700;
+  background: var(--color-amt);
+  color: var(--color-blatt);
+  cursor: pointer;
+}
+.knopf:hover { background: var(--color-amt-tief); }
+.knopf-leise {
+  background: transparent;
+  color: var(--color-amt);
+  box-shadow: inset 0 0 0 2px var(--color-amt);
+}
+.knopf-leise:hover { background: var(--color-amt-hauch); }
+
+.feld {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border: 2px solid var(--color-linie);
+  background: var(--color-blatt);
+  color: var(--color-tinte);
+}
+.feld:focus { border-color: var(--color-amt); outline: none; box-shadow: 0 0 0 3px var(--color-amt-hauch); }
+
+.verweis {
+  color: var(--color-amt);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.verweis:hover { text-decoration-thickness: 2px; }
+
+/* ---------- Fristblatt ---------- */
+.fristblatt {
+  --streifen: var(--color-tinte);
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  width: 4.25rem;
+  padding: 0.75rem 0 0.5rem;
+  background: var(--color-blatt);
+  border: 1px solid var(--color-linie);
+  border-radius: 3px 3px 6px 6px;
+  font-variant-numeric: tabular-nums lining-nums;
+  text-align: center;
+  flex: none;
+  align-self: flex-start;
+}
+/* Bindestreifen wie beim Abreißkalender; Farbe = Status */
+.fristblatt::before {
+  content: "";
+  position: absolute;
+  inset: -1px -1px auto -1px;
+  height: 6px;
+  border-radius: 3px 3px 0 0;
+  background: var(--streifen);
+}
+.fristblatt[data-status="ueberfaellig"] { --streifen: var(--color-frist); background: var(--color-frist-hauch); border-color: var(--color-frist); }
+.fristblatt[data-status="faellig_bald"] { --streifen: var(--color-bald); background: var(--color-bald-hauch); }
+.fristblatt[data-status="erledigt"] { --streifen: var(--color-amt); color: var(--color-tinte-leise); }
+.fristblatt[data-status="angabe_fehlt"],
+.fristblatt[data-ohne-datum] { --streifen: transparent; border-style: dashed; border-width: 2px; }
+.fristblatt-wochentag { font-size: var(--text-klein); color: var(--color-tinte-leise); }
+.fristblatt-tag { font-size: var(--text-blatt); font-weight: 700; line-height: 1; letter-spacing: -0.02em; }
+.fristblatt-monat { font-size: var(--text-klein); font-weight: 700; }
+
+/* Erledigt-Stempel: einmal, leicht gedreht, wie ein Amtsstempel */
+.stempel {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border: 2px solid var(--color-amt);
+  border-radius: 4px;
+  color: var(--color-amt);
+  font-weight: 700;
+  transform: rotate(-4deg);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .stempel[data-neu] { animation: stempeln 260ms cubic-bezier(0.2, 0.9, 0.3, 1.2); }
+}
+@keyframes stempeln {
+  from { transform: rotate(-12deg) scale(1.6); opacity: 0; }
+  to { transform: rotate(-4deg) scale(1); opacity: 1; }
+}
+
+/* Fortschritt im Onboarding */
+progress { appearance: none; border: 0; border-radius: 999px; background: var(--color-linie); overflow: hidden; }
+progress::-webkit-progress-bar { background: var(--color-linie); }
+progress::-webkit-progress-value { background: var(--color-amt); border-radius: 999px; }
+progress::-moz-progress-bar { background: var(--color-amt); }

@@ -4,7 +4,7 @@ const config: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   output: "standalone",
-  transpilePackages: ["@amtlos/i18n"],
+  transpilePackages: ["@amtlos/i18n", "@amtlos/web-kern"],
   async headers() {
     return [
       {

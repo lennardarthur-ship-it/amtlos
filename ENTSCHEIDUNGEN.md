@@ -197,6 +197,38 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Datum:** 2026-10-11 · **Status:** angenommen
 - Alle Pakete sind ES-Module; NestJS läuft ebenfalls als ESM. Vitest nutzt swc, weil esbuild keine Decorator-Metadaten erzeugt. Abhängigkeiten werden explizit mit `@Inject(...)` aufgelöst.
 
+### E-067 · Umgebung fest in der Datenbank
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Ob die Datenbank im prod-Modus läuft, steht in `katalog.plattform` (Migration 0003), änderbar nur durch den Eigentümer (`amtlos-server umgebung prod`). Ersetzt die Sitzungsvariable aus E-038, die jeder Dienst selbst hätte setzen können.
+
+### E-068 · Studio spricht direkt mit der Datenbank
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Das Studio (apps/studio) nutzt die Rolle `amtlos_studio` direkt statt über die Nutzer-API. Sie kann Katalogdaten schreiben, aber keine Mandantendaten lesen. Zugang nur mit Plattformrolle (`amtlos-server plattformrolle …`).
+
+### E-069 · Release nur konsistent
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Ein Release wird abgelehnt, wenn eine enthaltene Pflicht auf einen Regelwert verweist, von dem keine Version im Release ist (in prod: keine freigegebene). Sonst würde die Engine für alle Nutzer „unbekannt“ liefern.
+
+### E-070 · Neue Version zieht ältere ungeprüfte zurück
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Beim Anlegen einer Version werden ältere Versionen derselben Pflicht mit Status „Entwurf“ oder „In Prüfung“ auf „Zurückgezogen“ gesetzt. Geprüft wird immer nur der neueste Stand; Freigegebenes bleibt unberührt.
+
+### E-071 · Gemeinsamer Web-Kern
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Sitzung (verschlüsseltes Cookie), OIDC-Anmeldung, Entwicklungs-Login und Designsystem liegen in `packages/web-kern` und werden von Web-App und Studio genutzt. Cookie-Namen je Anwendung über `COOKIE_PRAEFIX`.
+
+### E-072 · Erster Start: Fristen vor Amtlos gesammelt bestätigen
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Offene Pflichten, die vor dem ersten Profil fällig waren, bietet „Heute“ zur Sammelbestätigung an („Ja, alle erledigt“ oder „Einzeln ansehen“). Jede bestätigte Pflicht bekommt einen Nachweis mit dem Vermerk „Sammelbestätigung“. Sonst begänne jede Nutzung mit einer Wand aus Überfälligem.
+
+### E-073 · Pflichtenliste zeigt 90 Tage, der Kalender alles
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Wiederkehrende Pflichten erzeugen zwölf Termine im Jahr. Die Pflichtenliste ohne Filter zeigt deshalb die nächsten 90 Tage und alles ohne Termin; der Kalender und die Filter zeigen alles.
+
+### E-074 · Statusfarbe nie allein
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Jeder Status hat Form und Wort: gefüllter Kreis = überfällig, halber Kreis = bald, gestrichelter Kreis = Angabe fehlt, Haken = erledigt, leerer Kreis = offen (WCAG 1.4.1). Offene Pflichten ohne Termin färben den Bereich gelb.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

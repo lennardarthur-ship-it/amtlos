@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { PflichtZeile } from "@/komponenten/pflicht-zeile";
 import { api } from "@/lib/api";
+import { monatsname } from "@/lib/periode";
 import { t } from "@/lib/sprache";
 import type { AnzeigeStatus, Karte } from "@/lib/typen";
 
@@ -8,10 +9,6 @@ export const metadata = { title: "Pflichten" };
 
 const FILTER: (AnzeigeStatus | "alle")[] = ["alle", "ueberfaellig", "faellig_bald", "angabe_fehlt", "offen", "erledigt"];
 
-const MONATE = {
-  de: ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
-  en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-};
 
 export default async function PflichtenSeite({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
   const { status } = await searchParams;
@@ -59,7 +56,7 @@ export default async function PflichtenSeite({ searchParams }: { searchParams: P
       {sichtbar.length === 0 ? <p className="lesetext">{x.pflichten.leer}</p> : null}
 
       {[...gruppen.entries()].map(([monat, liste]) => {
-        const titel = monat === "ohne" ? x.pflichten.ohne_termin : `${MONATE[s][Number(monat.slice(5)) - 1]} ${monat.slice(0, 4)}`;
+        const titel = monat === "ohne" ? x.pflichten.ohne_termin : `${monatsname(Number(monat.slice(5)), s)} ${monat.slice(0, 4)}`;
         return (
           <section key={monat} aria-labelledby={`m-${monat}`}>
             <h2 id={`m-${monat}`} className="border-b-2 border-tinte pb-1 font-bold">

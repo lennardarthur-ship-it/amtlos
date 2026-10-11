@@ -73,11 +73,20 @@ select pg_temp.ok(true, 'Überlappende freigegebene Regelwerte werden abgelehnt'
 
 -- prod-Gate für Releases
 insert into katalog.release (nummer, erstellt_von) values (1, :'anna_konto_anmelden') returning id as rel_id \gset
-select set_config('amtlos.umgebung', 'prod', false);
+reset role;
+update katalog.plattform set umgebung = 'prod';
+set role studio_user;
 select pg_temp.erwarte_fehler(format($$insert into katalog.release_inhalt values (%L, 'regelwert_version', %L)$$, :'rel_id', :'rw2'), 'nicht freigegeben');
 select pg_temp.ok(true, 'prod: ungeprüfter Inhalt kann nicht ins Release');
-insert into katalog.release_inhalt values (:'rel_id', 'pflicht_version', :'pv_id');
+-- Dienst kann die Umgebung weder per Sitzungsvariable noch per Update umgehen (0003)
 select set_config('amtlos.umgebung', 'dev', false);
+select pg_temp.erwarte_fehler(format($$insert into katalog.release_inhalt values (%L, 'regelwert_version', %L)$$, :'rel_id', :'rw2'), 'nicht freigegeben');
+select pg_temp.erwarte_fehler($$update katalog.plattform set umgebung = 'dev'$$, 'permission denied');
+select pg_temp.ok(true, 'Umgebung lässt sich von Diensten nicht umstellen');
+insert into katalog.release_inhalt values (:'rel_id', 'pflicht_version', :'pv_id');
+reset role;
+update katalog.plattform set umgebung = 'dev';
+set role studio_user;
 insert into katalog.release_inhalt values (:'rel_id', 'regelwert_version', :'rw2');
 select pg_temp.ok(true, 'dev: ungeprüfter Inhalt erlaubt (E-038)');
 update katalog.release set veroeffentlicht_am = now() where id = :'rel_id';

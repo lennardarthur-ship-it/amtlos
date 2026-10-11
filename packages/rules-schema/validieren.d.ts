@@ -7,3 +7,4 @@ export interface KatalogPruefung {
   ereignisse: number;
 }
 export function validiereKatalog(katalogDir: string, optionen?: { prod?: boolean }): KatalogPruefung;
+export function pruefePflichtObjekt(p: unknown, kontext: { regelwertIds: Set<string>; pflichtIds: Set<string>; prod?: boolean }): string[];
