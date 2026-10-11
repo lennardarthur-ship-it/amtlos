@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PflichtZeile } from "@/komponenten/pflicht-zeile";
+import { fuelle, offeneFragen, schritteJePhase } from "@amtlos/i18n";
 import { api } from "@/lib/api";
 import { monatsname } from "@/lib/periode";
 import { t } from "@/lib/sprache";
@@ -14,14 +15,18 @@ const FILTER: (AnzeigeStatus | "alle")[] = ["alle", "ueberfaellig", "faellig_bal
 export default async function PflichtenSeite({ searchParams }: { searchParams: Promise<{ status?: string; pflicht?: string }> }) {
   const { status, pflicht } = await searchParams;
   const filter = FILTER.includes(status as AnzeigeStatus) ? (status as AnzeigeStatus | "alle") : "alle";
-  const [{ s, t: x }, karten] = await Promise.all([t(), api<Karte[]>(`/v1/pflichten?status=${filter}`)]);
+  const [{ s, t: x }, karten, profil] = await Promise.all([t(), api<Karte[]>(`/v1/pflichten?status=${filter}`), api<{ daten?: Record<string, unknown> }>("/v1/profil")]);
   // „Gilt nicht“ steht auf einer eigenen Seite, damit die Liste das Zu-Tuende zeigt
   // Ohne Filter: nur die nächsten 90 Tage (wiederkehrende Pflichten würden sonst die Liste fluten); alles im Kalender
   const grenze = new Date(Date.now() + 90 * 86_400_000).toISOString().slice(0, 10);
   // ?pflicht=<id> (z. B. aus dem Glossar): alle Termine dieser einen Pflicht, inklusive „gilt nicht“
+  // Ohne Filter stehen Pflichten mit fehlender Angabe nicht in der Liste: ein Hinweis mit Weg zu den Nachfragen statt einer Flut aus „?“
   const sichtbar = pflicht
     ? karten.filter((k) => k.pflicht_id === pflicht)
-    : karten.filter((k) => k.status !== "nicht_zutreffend" && (filter !== "alle" || (k.status !== "erledigt" && (!k.faellig_am || k.faellig_am <= grenze))));
+    : karten.filter((k) => k.status !== "nicht_zutreffend" && (filter !== "alle" || (k.status !== "erledigt" && k.status !== "angabe_fehlt" && (!k.faellig_am || k.faellig_am <= grenze))));
+  const unklar = filter === "alle" && !pflicht ? karten.filter((k) => k.status === "angabe_fehlt").length : 0;
+  const daten = profil.daten ?? {};
+  const naechsteRunde = unklar && offeneFragen(daten) ? schritteJePhase("nachfragen", daten)[0] : undefined;
 
   // Nach Monat der Fälligkeit gruppieren – Zeitfolge ist hier die tatsächliche Ordnung
   const gruppen = new Map<string, Karte[]>();
@@ -67,18 +72,40 @@ export default async function PflichtenSeite({ searchParams }: { searchParams: P
       ) : null}
       {sichtbar.length === 0 ? <p className="lesetext">{x.pflichten.leer}</p> : null}
 
+      {unklar ? (
+        <aside aria-label={x.status.angabe_fehlt} className="rounded-md border border-dashed border-tinte-leise bg-blatt p-5">
+          <p className="font-bold">{fuelle(x.pflichten.unklar_titel, { n: unklar })}</p>
+          <p className="lesetext mt-1 text-klein text-tinte-leise">{x.pflichten.unklar_text}</p>
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            {naechsteRunde ? <Link href={`/onboarding/${naechsteRunde.id}?phase=nachfragen`} className="knopf knopf-leise">{x.onboarding.nachfragen_knopf}</Link> : null}
+            <Link href="/pflichten?status=angabe_fehlt" className="verweis text-klein">{x.pflichten.unklar_einzeln}</Link>
+          </div>
+        </aside>
+      ) : null}
+
       {[...gruppen.entries()].map(([monat, liste]) => {
         const titel = monat === "ohne" ? x.pflichten.ohne_termin : `${monatsname(Number(monat.slice(5)), s)} ${monat.slice(0, 4)}`;
+        const zeilen = liste.map((k) => <PflichtZeile key={`${k.pflicht_id}|${k.periode}`} karte={k} sprache={s} />);
+        // Laufende Pflichten ohne Termin: eingeklappt, damit die Liste das Terminierte zeigt
+        if (monat === "ohne" && !pflicht && filter === "alle") {
+          return (
+            <details key={monat} className="group border-b-2 border-tinte">
+              <summary className="flex min-h-11 cursor-pointer list-none items-baseline justify-between gap-4 py-2 font-bold marker:hidden [&::-webkit-details-marker]:hidden">
+                <span>{fuelle(x.pflichten.laufend_titel, { n: liste.length })}</span>
+                <span className="text-klein text-tinte-leise group-open:hidden">{x.pflichten.laufend_zeigen}</span>
+                <span className="hidden text-klein text-tinte-leise group-open:inline">{x.pflichten.laufend_verbergen}</span>
+              </summary>
+              <p className="lesetext text-klein text-tinte-leise">{x.pflichten.laufend_text}</p>
+              <ul className="border-t border-linie">{zeilen}</ul>
+            </details>
+          );
+        }
         return (
           <section key={monat} aria-labelledby={`m-${monat}`}>
             <h2 id={`m-${monat}`} className="border-b-2 border-tinte pb-1 font-bold">
               {titel}
             </h2>
-            <ul>
-              {liste.map((k) => (
-                <PflichtZeile key={`${k.pflicht_id}|${k.periode}`} karte={k} sprache={s} />
-              ))}
-            </ul>
+            <ul>{zeilen}</ul>
           </section>
         );
       })}

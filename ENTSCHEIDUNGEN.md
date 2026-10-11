@@ -474,6 +474,11 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Abo nicht in der App:** Die App zeigt nur den Stand (Testphase, aktiv) und verweist zum Computer – kein Bezahlen und kein Link zum Abschluss in der App, bis die Store-Regeln geklärt sind (T-49).
 - Prüfung ohne Simulator über den Web-Export (`apps/mobile/e2e/schau.mjs`); die iOS-Darstellung wird vor dem Store auf echten Geräten geprüft.
 
+### E-118 · Web: Listen zeigen das Terminierte, Unklares gebündelt
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- „Pflichten“ ohne Filter zeigt nur Pflichten mit klarem Stand. Pflichten mit fehlender Angabe erscheinen als ein Hinweis mit Weg zu den Nachfragen (einzeln über den Filter „Angabe fehlt“); laufende Pflichten ohne Termin stehen eingeklappt am Ende. Auf „Heute“ haben Nebenkarten (Gründung, Nachfragen, vor dem Start) dieselbe ruhige Form; nur „Jetzt dran“ trägt die Statusfarbe als Rahmen.
+- Zeilen, die irgendwohin führen, haben Pfeil und Erklärung (`VerweisZeile`); Kästchen und Optionsfelder in der Handlungsfarbe (`accent-color`). Anmeldeseite mit Versprechen und Fristblatt des Tages statt nur einem Formular.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

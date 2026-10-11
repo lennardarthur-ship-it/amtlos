@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { VerweisZeile } from "@/komponenten/verweis-zeile";
 import { fuelle } from "@amtlos/i18n";
 import { api } from "@/lib/api";
 import { euroText } from "@/lib/geld";
@@ -20,11 +20,11 @@ export default async function FinanzenSeite() {
   const prozent = u.grenze ? Math.floor(u.grenze.anteil * 1000) / 10 : 0;
   const stufe = u.grenze ? (u.grenze.anteil >= 0.95 ? "95" : u.grenze.anteil >= 0.8 ? "80" : null) : null;
   const links = [
-    { href: "/finanzen/rechnungen", text: x.finanzen.rechnungen, info: u.entwuerfe ? fuelle(x.finanzen.entwuerfe, { n: u.entwuerfe }) : null },
-    { href: "/finanzen/belege", text: x.finanzen.belege, info: fuelle(x.finanzen.belege_anzahl, { n: u.belege }) },
-    { href: "/finanzen/ust", text: x.finanzen.ust, info: null },
-    { href: "/finanzen/kassen", text: x.finanzen.kassen, info: null },
-    { href: "/finanzen/angaben", text: x.finanzen.angaben, info: null },
+    { href: "/finanzen/rechnungen", text: x.finanzen.rechnungen, erklaerung: x.finanzen.rechnungen_text, info: u.entwuerfe ? fuelle(x.finanzen.entwuerfe, { n: u.entwuerfe }) : null },
+    { href: "/finanzen/belege", text: x.finanzen.belege, erklaerung: x.finanzen.belege_text, info: fuelle(x.finanzen.belege_anzahl, { n: u.belege }) },
+    { href: "/finanzen/ust", text: x.finanzen.ust, erklaerung: x.finanzen.ust_text, info: null },
+    { href: "/finanzen/kassen", text: x.finanzen.kassen, erklaerung: x.finanzen.kassen_text, info: null },
+    { href: "/finanzen/angaben", text: x.finanzen.angaben, erklaerung: x.finanzen.angaben_text, info: null },
   ];
   return (
     <div className="lesetext space-y-8">
@@ -59,12 +59,7 @@ export default async function FinanzenSeite() {
 
       <ul className="border-t border-linie">
         {links.map((l) => (
-          <li key={l.href} className="border-b border-linie">
-            <Link href={l.href} className="flex min-h-14 items-center justify-between gap-4 hover:underline">
-              <span className="font-bold">{l.text}</span>
-              {l.info ? <span className="text-klein text-tinte-leise">{l.info}</span> : null}
-            </Link>
-          </li>
+          <VerweisZeile key={l.href} href={l.href} titel={l.text} text={l.erklaerung} info={l.info} />
         ))}
       </ul>
     </div>

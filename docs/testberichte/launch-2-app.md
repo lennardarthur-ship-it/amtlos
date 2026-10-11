@@ -1,4 +1,4 @@
-# Testbericht Launch-Fokus 2 · App für iPhone
+# Testbericht Launch-Fokus 2 · App für iPhone und Web-Feinschliff
 
 Stand: 2026-10-11 · Ziel: die App so ruhig und klar wie möglich, zuerst für iOS (E-117)
 
@@ -20,6 +20,18 @@ Die App ist neu gestaltet: Fristblatt in jeder Zeile, eine klare nächste Handlu
 | Beleg | Kamera als Fläche, Fotos als zweiter Weg |
 | Mehr | Konto mit Abo-Stand (nur Hinweis, kein Kauf – T-49), Push, Sprache, Unternehmen, Rechtsseiten, Abmelden |
 | Technik | SF Symbols (`expo-symbols`) mit Ionicons-Ersatz, Tableiste mit Unschärfe, Haptik, Schriften über `expo-font`, Splash; SecureStore mit AsyncStorage-Ersatz im Web-Export |
+
+## Web-Feinschliff (E-118)
+
+| Seite | Änderung |
+|---|---|
+| Anmelden | Versprechen in einem Satz, Fristblatt des Tages, drei kurze Punkte, dann das Formular |
+| Heute | „Danach“ ohne Großbuchstaben; Nebenkarten gleich breit und ruhig; nur „Jetzt dran“ trägt Statusfarbe |
+| Pflichten | 57 „Angabe fehlt“ als ein Hinweis mit Weg zu den Nachfragen statt Flut aus „?“; laufende Pflichten ohne Termin eingeklappt |
+| Finanzen, Mehr, Einstellungen | Zeilen mit Pfeil und Erklärung (`VerweisZeile`) |
+| überall | Kästchen und Optionsfelder in der Handlungsfarbe |
+
+Geprüft: Rundgang hell/dunkel, Desktop/mobil mit axe (WCAG 2.2 AA) grün, Kern-Umfang grün, Leistungsbudget eingehalten.
 
 ## Tests
 

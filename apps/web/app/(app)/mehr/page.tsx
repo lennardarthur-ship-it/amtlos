@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { VerweisZeile } from "@/komponenten/verweis-zeile";
 import { t } from "@/lib/sprache";
 import { pfadSichtbar } from "@/lib/umfang";
 
@@ -27,12 +27,7 @@ export default async function MehrSeite() {
       <h1 className="text-titel font-bold">{x.mehr.titel}</h1>
       <ul className="border-t border-linie">
         {eintraegeSichtbar.map(([href, titel, text, nurMobil]) => (
-          <li key={href} className={`border-b border-linie ${nurMobil ? "md:hidden" : ""}`}>
-            <Link href={href} className="block min-h-14 py-3 hover:bg-blatt">
-              <span className="font-bold">{titel}</span>
-              {text ? <span className="block text-klein text-tinte-leise">{text}</span> : null}
-            </Link>
-          </li>
+          <VerweisZeile key={href} href={href} titel={titel} text={text} className={nurMobil ? "md:hidden" : ""} />
         ))}
       </ul>
     </div>

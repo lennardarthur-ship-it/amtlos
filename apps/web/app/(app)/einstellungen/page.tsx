@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { VerweisZeile } from "@/komponenten/verweis-zeile";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { datumLang, fuelle, sichtbareSchritte } from "@amtlos/i18n";
@@ -66,11 +67,7 @@ export default async function Einstellungen({ searchParams }: { searchParams: Pr
         <p className="mt-1 text-tinte-leise">{x.einstellungen.profil_text}</p>
         <ul className="mt-3 border-t border-linie">
           {sichtbareSchritte(profil.daten).map((schritt) => (
-            <li key={schritt.id} className="border-b border-linie">
-              <Link href={`/onboarding/${schritt.id}?zurueck=/einstellungen`} className="flex min-h-12 items-center hover:underline">
-                {schritt.titel[s]}
-              </Link>
-            </li>
+            <VerweisZeile key={schritt.id} href={`/onboarding/${schritt.id}?zurueck=/einstellungen`} titel={schritt.titel[s]} />
           ))}
         </ul>
       </section>

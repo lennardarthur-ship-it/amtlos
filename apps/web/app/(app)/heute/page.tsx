@@ -148,7 +148,7 @@ export default async function HeuteSeite({ searchParams }: { searchParams: Promi
           )}
           {danach.length ? (
             <>
-              <h3 className="mt-6 text-klein font-bold uppercase tracking-wide text-tinte-leise">{x.heute.danach}</h3>
+              <h3 className="mt-6 text-klein font-bold text-tinte-leise">{x.heute.danach}</h3>
               <ul className="mt-1 border-t border-linie">
                 {danach.map((k) => (
                   <PflichtZeile key={`${k.pflicht_id}|${k.periode}`} karte={k} sprache={s} />
@@ -166,7 +166,7 @@ export default async function HeuteSeite({ searchParams }: { searchParams: Promi
       ) : null}
 
       {gruendungOffen ? (
-        <section aria-labelledby="gruendung" className="lesetext rounded-md border-2 border-amt bg-blatt p-6">
+        <section aria-labelledby="gruendung" className="rounded-md border border-linie bg-blatt p-5">
           <h2 id="gruendung" className="text-gross font-bold">
             {fuelle(x.gruendung.heute_karte, { n: g.fortschritt.erledigt, gesamt: g.fortschritt.gesamt })}
           </h2>
@@ -178,9 +178,9 @@ export default async function HeuteSeite({ searchParams }: { searchParams: Promi
       ) : null}
 
       {naechsteRunde && !nochNichtBerechnet ? (
-        <section aria-labelledby="nachfragen" className="lesetext rounded-md border border-linie bg-blatt p-5">
+        <section aria-labelledby="nachfragen" className="rounded-md border border-linie bg-blatt p-5">
           <h2 id="nachfragen" className="font-bold">{x.onboarding.nachfragen_titel}</h2>
-          <p className="mt-1">
+          <p className="lesetext mt-1">
             {fuelle(x.heute.nachfragen_runde, { thema: naechsteRunde.titel[s], n: fragenJePhase(naechsteRunde, "nachfragen", daten).length })}
             {" "}
             <span className="text-tinte-leise">{fuelle(x.heute.nachfragen_rest, { n: nachfragen, pflichten: h.zaehler.angabe_fehlt })}</span>
@@ -192,11 +192,11 @@ export default async function HeuteSeite({ searchParams }: { searchParams: Promi
       ) : null}
 
       {h.vor_start.anzahl > 0 && h.vor_start.seit ? (
-        <section aria-labelledby="vorstart" className="lesetext rounded-md border border-linie bg-blatt p-5">
+        <section aria-labelledby="vorstart" className="rounded-md border border-linie bg-blatt p-5">
           <h2 id="vorstart" className="font-bold">
             {x.heute.vor_start_titel}
           </h2>
-          <p className="mt-1 text-klein">{fuelle(x.heute.vor_start_text, { n: h.vor_start.anzahl, datum: datumLang(h.vor_start.seit, s) })}</p>
+          <p className="lesetext mt-1 text-klein">{fuelle(x.heute.vor_start_text, { n: h.vor_start.anzahl, datum: datumLang(h.vor_start.seit, s) })}</p>
           <div className="mt-3 flex flex-wrap gap-3">
             <form action={vorStartErledigt}>
               <button className="knopf knopf-leise">{x.heute.vor_start_ja}</button>
