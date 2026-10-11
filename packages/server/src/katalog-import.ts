@@ -117,7 +117,7 @@ async function versionAnlegen(
   return { id: neu!.id, neu: true };
 }
 
-async function quellenVerknuepfen(tx: Tx, art: "pflicht_version" | "regelwert_version", versionId: string, quellen: Quelle[]) {
+export async function quellenVerknuepfen(tx: Tx, art: "pflicht_version" | "regelwert_version", versionId: string, quellen: Quelle[]) {
   for (const q of quellen) {
     let quelle = await tx.eine<{ id: string }>(
       "select id from katalog.quelle where url = $1 and abgerufen_am is not distinct from $2::date",

@@ -33,6 +33,7 @@ const OPS_FUER_TYP = {
 const IMMER_ERLAUBT = ["vorhanden", "nicht_vorhanden"];
 
 const FELDNAMEN = {
+  bezeichnung: "Bezeichnung", einheit: "Einheit", wert: "Wert", katalog_nr: "Katalog-Nr.", fundstelle: "Fundstelle",
   titel: "Titel", kurz: "In einem Satz", erklaerung: "Erklärung", stelle: "Zuständige Stelle", sanktion: "Folgen", text: "Text",
   rechtsgrundlage: "Rechtsgrundlagen", quellen: "Quellen", ausloeser: "Auslöser", frist: "Frist", wiederholung: "Wiederholung",
   kategorie: "Kategorie", kanal: "Kanal", automatisierung: "Automatisierung", status_recht: "Rechtsstatus", gueltig_ab: "Gültig ab",
@@ -102,6 +103,20 @@ function erklaere(validator, daten, praefix = "") {
     ];
   }
   return errs;
+}
+
+/**
+ * Prüft eine einzelne Regelwertversion (Schema und Plausibilität), deutsche Meldungen. Genutzt vom Studio.
+ * @param {any} rw
+ * @returns {string[]}
+ */
+export function pruefeRegelwertObjekt(rw) {
+  if (!pruefeRegelwert(rw)) return [...new Set(pruefeRegelwert.errors.map(meldungDeutsch).filter(Boolean).map((m) => m.replace(/^Pflicht:/, "Regelwert:")))];
+  const fehler = [];
+  if (rw.gueltig_bis && rw.gueltig_bis < rw.gueltig_ab) fehler.push("Gültig bis: liegt vor „Gültig ab“");
+  if (["EUR", "EUR_pro_stunde", "EUR_pro_monat", "anzahl", "tage", "monate", "jahre"].includes(rw.einheit) && rw.wert < 0) fehler.push("Wert: darf nicht negativ sein");
+  if (rw.einheit === "prozent" && (rw.wert < 0 || rw.wert > 100)) fehler.push("Wert: Prozent zwischen 0 und 100");
+  return fehler;
 }
 
 /**

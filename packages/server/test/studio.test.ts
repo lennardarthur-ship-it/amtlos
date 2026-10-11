@@ -96,6 +96,25 @@ describe.skipIf(!DB_VERFUEGBAR)("Studio: Versionen, Vier-Augen-Freigabe, Release
     await owner.imKontext({}, (tx) => tx.abfrage("update katalog.plattform set umgebung = 'dev'"));
   });
 
+  it("legt Regelwertversionen nur gültig an; Einheit fest, Überholtes zurückgezogen", async () => {
+    const { neueRegelwertversion, regelwertVersionen } = await import("../src/studio.js");
+    const [v1] = await regelwertVersionen(studio, "steuern.ustg19.grenze_vorjahr");
+    const basis = { ...(v1!.daten as Record<string, unknown>) };
+    await expect(neueRegelwertversion(studio, k.redakteurin!, { ...basis, quellen: [] })).rejects.toThrow(/Quellen: braucht mindestens 1 Eintrag/);
+    await expect(neueRegelwertversion(studio, k.redakteurin!, { ...basis, einheit: "anzahl" })).rejects.toThrow(/Einheit/);
+    await expect(neueRegelwertversion(studio, k.redakteurin!, { ...basis, gueltig_bis: "2020-01-01" })).rejects.toThrow(/liegt vor/);
+    await expect(neueRegelwertversion(studio, k.stb!, basis)).rejects.toThrow(/Redaktion/);
+    const r = await neueRegelwertversion(studio, k.redakteurin!, { ...basis, version: 42, fachlich_zu_pruefen: ["Test"] });
+    expect(r.version).toBe(2);
+    expect((await regelwertVersionen(studio, "steuern.ustg19.grenze_vorjahr")).map((v) => [v.version, v.pruef_status])).toEqual([
+      [2, "in_pruefung"],
+      [1, "zurueckgezogen"],
+    ]);
+    // Neuer Regelwert mit eigener Einheit
+    const n = await neueRegelwertversion(studio, k.redakteurin!, { ...basis, id: "test.neuer_wert", einheit: "anzahl", wert: 10, bezeichnung: { de: "Test" } });
+    expect(n.version).toBe(1);
+  });
+
   // Hilfen
   async function neuePflichtversionImport(daten: Record<string, unknown>) {
     return neuePflichtversionAls(k.redakteurin!, daten);

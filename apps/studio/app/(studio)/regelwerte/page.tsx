@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { PASSENDE_QUALIFIKATION, StudioFehler, pruefentscheidung, regelwertUebersicht, type Qualifikation } from "@amtlos/server";
-import { darfPruefen, datenbank, ich } from "@/lib/studio";
+import Link from "next/link";
+import { darfPruefen, darfRedigieren, datenbank, ich } from "@/lib/studio";
 
 export const metadata = { title: "Regelwerte" };
 const STATUS: Record<string, string> = { entwurf: "Entwurf", in_pruefung: "In Prüfung", freigegeben: "Freigegeben", abgelehnt: "Abgelehnt", zurueckgezogen: "Zurückgezogen" };
@@ -29,6 +30,11 @@ export default async function Regelwerte({ searchParams }: { searchParams: Promi
       <p className="lesetext text-tinte-leise">
         Schwellen und Beträge mit Gültigkeitszeitraum (E-034). Eine Pflicht kommt nur in ein prod-Release, wenn ihre Regelwerte freigegeben sind.
       </p>
+      {darfRedigieren(k) ? (
+        <p>
+          <Link href="/regelwerte/neu" className="verweis">Neuen Regelwert anlegen</Link>
+        </p>
+      ) : null}
       {fehler ? (
         <p role="alert" className="rounded-md border-2 border-frist bg-frist-hauch p-4">
           {fehler}
@@ -54,7 +60,9 @@ export default async function Regelwerte({ searchParams }: { searchParams: Promi
             const passend = (PASSENDE_QUALIFIKATION[r.regelwert_id.split(".")[0]!] ?? []).filter((q) => k.qualifikationen.includes(q));
             return (
               <tr key={r.id}>
-                <td className="font-bold">{r.regelwert_id}</td>
+                <td className="font-bold">
+                  <Link href={`/regelwerte/${encodeURIComponent(r.regelwert_id)}`} className="verweis">{r.regelwert_id}</Link>
+                </td>
                 <td>{r.version}</td>
                 <td>
                   {r.wert} {r.einheit}

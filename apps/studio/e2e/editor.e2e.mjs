@@ -49,6 +49,22 @@ try {
     await p.getByLabel(feld).fill(wert);
   await p.getByLabel("Titel", { exact: true }).fill("Testquelle");
   pruefe((await speichern("Pflicht anlegen und zur Prüfung geben", /ok=|fehler=/)).includes("ok=Pflicht angelegt"), "Neue Pflicht konnte nicht angelegt werden");
+
+  // Regelwerte: neue Version im Formular, Fehlermeldung, neuer Regelwert
+  await p.goto(`${B}/regelwerte`);
+  await axe("regelwerte");
+  await p.goto(`${B}/regelwerte/steuern.ust_va.grenze_monatlich`);
+  await axe("regelwert");
+  await p.getByLabel("Wert").fill("9.000");
+  pruefe(/ok=Version \d+ gespeichert/.test(await speichern("Als neue Version speichern", /ok=|fehler=/)), "Regelwert-Version konnte nicht gespeichert werden");
+  pruefe((await p.locator("table tbody tr").first().innerText()).includes("9000"), "Neue Regelwert-Version zeigt nicht 9000");
+  await p.getByLabel("Rechtsgrundlagen").fill("");
+  pruefe((await speichern("Als neue Version speichern", /fehler=/)).includes("Rechtsgrundlagen: braucht mindestens 1 Eintrag"), "Keine verständliche Meldung bei fehlender Rechtsgrundlage");
+  await p.goto(`${B}/regelwerte/neu`);
+  await axe("regelwert-neu");
+  for (const [feld, wert] of [["ID", `test.e2e_${Date.now()}`], ["Bezeichnung (Deutsch)", "E2E-Wert"], ["Wert", "13,90"], ["Gültig ab", "2026-01-01"], ["Rechtsgrundlagen", "§ 1 Test"], ["Quelle 1: Titel", "Test"], ["Quelle 1: Adresse", "https://example.org"]])
+    await p.getByLabel(feld, { exact: true }).fill(wert);
+  pruefe((await speichern("Regelwert anlegen und zur Prüfung geben", /ok=|fehler=/)).includes("ok=Regelwert angelegt"), "Neuer Regelwert konnte nicht angelegt werden");
 } finally {
   await browser.close();
 }
@@ -56,4 +72,4 @@ if (fehler.length) {
   console.error(`✗ ${fehler.length} Befunde:\n- ${fehler.join("\n- ")}`);
   process.exit(1);
 }
-console.log("✓ Studio-Editor: Bearbeiten, Fehlermeldung, Neuanlage, axe ohne Befunde");
+console.log("✓ Studio: Pflicht- und Regelwert-Formulare (Bearbeiten, Fehlermeldung, Neuanlage), axe ohne Befunde");

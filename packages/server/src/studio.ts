@@ -3,9 +3,10 @@ import path from "node:path";
 import YAML from "yaml";
 import { StandardKalender } from "@amtlos/fristen";
 import { auswerten, type Ergebnis, type Katalog, type Pflicht } from "@amtlos/rules-engine";
-import { pruefePflichtObjekt } from "@amtlos/rules-schema";
+import { pruefePflichtObjekt, pruefeRegelwertObjekt } from "@amtlos/rules-schema";
 import type { Datenbank, Tx } from "./datenbank.js";
 import { katalogCacheLeeren, ladeAktivenKatalog } from "./katalog.js";
+import { quellenVerknuepfen } from "./katalog-import.js";
 
 export type Qualifikation = "steuerberater" | "rechtsanwalt" | "fachkraft_arbeitssicherheit" | "datenschutzbeauftragter" | "sonstige";
 export type PlattformRolle = "plattform_admin" | "redaktion" | "experte" | "support";
@@ -240,6 +241,52 @@ export async function testlauf(db: Datenbank, kandidat: Pflicht, fixtureVerzeich
     const nachher = auswerten({ ...eingabe, katalog: neu }).find((e) => e.pflicht_id === kandidat.id)?.ergebnis;
     return { datei, persona: fx.persona, pflicht_id: kandidat.id, erwartet: fx.erwartet[kandidat.id], vorher, nachher };
   });
+}
+
+/**
+ * Neue Regelwertversion (nie überschreiben, E-034). Status „in Prüfung“; offene ältere Versionen desselben
+ * Regelwerts mit überlappendem Zeitraum gelten als überholt. Ein neuer Regelwert wird mit Einheit und Bezeichnung angelegt;
+ * die Einheit eines bestehenden Regelwerts ist fest (Regeln vergleichen sonst Äpfel mit Birnen).
+ */
+export async function neueRegelwertversion(db: Datenbank, autor: StudioKonto, daten: Record<string, unknown>): Promise<{ id: string; version: number }> {
+  if (!autor.rollen.some((r) => r === "redaktion" || r === "plattform_admin")) throw new StudioFehler("Nur die Redaktion legt Versionen an");
+  return db.imKontext({ kontoId: autor.id }, async (tx) => {
+    const id = String(daten.id ?? "");
+    const max = await tx.eine<{ v: number | null }>("select max(version) as v from katalog.regelwert_version where regelwert_id = $1", [id]);
+    const version = (max?.v ?? 0) + 1;
+    const rw = { ...daten, schema_version: 1, version } as Record<string, unknown> & { einheit: string; bezeichnung: unknown; wert: number; gueltig_ab: string; gueltig_bis?: string | null; status_recht: string; quellen?: unknown };
+    delete rw.pruefung;
+    const fehler = pruefeRegelwertObjekt(rw);
+    if (fehler.length) throw new StudioFehler(fehler.join("\n"));
+    const vorhanden = await tx.eine<{ einheit: string }>("select einheit from katalog.regelwert where id = $1", [id]);
+    if (vorhanden && vorhanden.einheit !== rw.einheit) throw new StudioFehler(`Einheit: ${id} hat die Einheit „${vorhanden.einheit}“ und kann sie nicht wechseln`);
+    if (!vorhanden) await tx.abfrage("insert into katalog.regelwert (id, einheit, bezeichnung) values ($1, $2, $3)", [id, rw.einheit, rw.bezeichnung]);
+    const r = await tx.eine<{ id: string }>(
+      `insert into katalog.regelwert_version (regelwert_id, version, wert, gueltig_ab, gueltig_bis, status_recht, daten, pruef_status, erstellt_von)
+       values ($1, $2, $3, $4, $5, $6, $7, 'in_pruefung', $8) returning id`,
+      [id, version, rw.wert, rw.gueltig_ab, rw.gueltig_bis ?? null, rw.status_recht, rw, autor.id],
+    );
+    await quellenVerknuepfen(tx, "regelwert_version", r!.id, (rw.quellen as { titel: string; url: string; abgerufen?: string | null; fundstelle?: string }[]) ?? []);
+    await tx.abfrage(
+      `update katalog.regelwert_version set pruef_status = 'zurueckgezogen'
+        where regelwert_id = $1 and version < $2 and pruef_status in ('entwurf', 'in_pruefung')
+          and daterange(gueltig_ab, gueltig_bis, '[]') && daterange($3::date, $4::date, '[]')`,
+      [id, version, rw.gueltig_ab, rw.gueltig_bis ?? null],
+    );
+    return { id: r!.id, version };
+  });
+}
+
+/** Alle Versionen eines Regelwerts, neueste zuerst. */
+export async function regelwertVersionen(db: Datenbank, regelwertId: string) {
+  return db.imKontext({}, (tx) =>
+    tx.abfrage<{ id: string; version: number; daten: Record<string, unknown>; pruef_status: string; freigaben: number; erstellt_am: string }>(
+      `select rv.id, rv.version, rv.daten, rv.pruef_status, rv.erstellt_am,
+              (select count(*)::int from katalog.freigabe f where f.objekt_id = rv.id and f.entscheidung = 'freigegeben') as freigaben
+         from katalog.regelwert_version rv where rv.regelwert_id = $1 order by rv.version desc`,
+      [regelwertId],
+    ),
+  );
 }
 
 export async function regelwertUebersicht(db: Datenbank) {

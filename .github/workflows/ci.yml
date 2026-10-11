@@ -174,14 +174,16 @@ jobs:
           docker run -d --name studio --network host -e UMGEBUNG=dev -e AUTH_MODUS=dev -e DEV_JWT_SECRET=$G -e WEB_URL=http://localhost:3100 \
             -e COOKIE_PRAEFIX=amtlos_studio -e SITZUNG_SCHLUESSEL=ci-studio-schluessel-mindestens-32-zeichen-lang \
             -e STUDIO_DATABASE_URL=postgresql://studio_user:amtlos@localhost:5432/amtlos amtlos-studio:ci
-          for i in $(seq 1 30); do curl -sf localhost:3001/v1/gesundheit && break; sleep 1; done
-          curl -sf localhost:3001/v1/openapi.json | head -c 40; echo
-          curl -sf -o /dev/null -w "web %{http_code}\n" localhost:3000/anmelden
-          curl -sf -o /dev/null -w "studio %{http_code}\n" localhost:3100/anmelden
+          warte() { for i in $(seq 1 40); do c=$(curl -s -o antwort.txt -w "%{http_code}" "$1"); [ "$c" = "200" ] && echo "$1 200" && return 0; sleep 1; done
+                    echo "::error title=Rauchtest::$1 antwortet $c: $(head -c 300 antwort.txt | tr '\n' ' ')"; return 1; }
+          warte localhost:3001/v1/gesundheit
+          warte localhost:3001/v1/openapi.json
+          warte localhost:3000/anmelden
+          warte localhost:3100/anmelden
           sleep 3; docker ps --format '{{.Names}} {{.Status}}'
           test "$(docker ps -q | wc -l)" = "4"
           # Läuft als Nicht-Root?
           test "$(docker exec api id -u)" != "0"
       - if: failure()
-        run: for c in api worker web studio; do docker logs $c 2>&1 | tail -n 3 | sed "s/^/::error title=$c::/" || true; done
+        run: for c in api worker web studio; do docker logs $c 2>&1 | grep -iE "error|fehler|warn" | tail -n 4 | sed "s/^/::error title=$c::/" || true; done
 
