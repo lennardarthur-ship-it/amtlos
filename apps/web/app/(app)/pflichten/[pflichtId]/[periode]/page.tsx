@@ -6,6 +6,7 @@ import { periodeText } from "@/lib/periode";
 import { StatusText } from "@/komponenten/status";
 import { api } from "@/lib/api";
 import { t } from "@/lib/sprache";
+import { zielPfad } from "@/lib/ziele";
 import type { KartenDetail } from "@/lib/typen";
 
 type Params = Promise<{ pflichtId: string; periode: string }>;
@@ -86,6 +87,12 @@ export default async function PflichtSeite({ params }: { params: Params }) {
           </form>
         </section>
       ) : offen && d.ergebnis === "gilt" ? (
+        <>
+        {zielPfad(pflichtId, d.aktion?.ziel) ? (
+          <p>
+            <Link href={zielPfad(pflichtId, d.aktion?.ziel)!} className="knopf">{x.karte.in_amtlos}</Link>
+          </p>
+        ) : null}
         <form action={erledigen.bind(null, pflichtId, periode)} className="lesetext space-y-3">
           <label className="block text-klein" htmlFor="notiz">
             {x.karte.notiz}
@@ -93,6 +100,7 @@ export default async function PflichtSeite({ params }: { params: Params }) {
           <textarea id="notiz" name="notiz" rows={2} maxLength={2000} className="feld" />
           <button className="knopf">{x.karte.erledigen}</button>
         </form>
+        </>
       ) : null}
 
       {/* Warum / was fehlt */}

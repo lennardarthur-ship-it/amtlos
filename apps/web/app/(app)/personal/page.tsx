@@ -52,6 +52,15 @@ export default async function PersonalSeite({ searchParams }: { searchParams: Pr
         <li><Link href="/personal/zeiten" className="block rounded-md border border-linie bg-blatt p-4 hover:border-amt"><span className="font-bold">{x.personal.zeiten}</span><span className="mt-1 block text-klein text-tinte-leise">{x.personal.zeiten_text}</span></Link></li>
       </ul>
 
+      <section aria-labelledby="arbeitsschutz">
+        <h2 id="arbeitsschutz" className="text-gross font-bold">{x.personal.arbeitsschutz}</h2>
+        <ul className="mt-3 grid gap-3 sm:grid-cols-3">
+          {([["/personal/gefaehrdungsbeurteilungen", x.gb.titel, x.personal.gb_text], ["/personal/arbeitsmittel", x.arbeitsmittel.titel, x.personal.arbeitsmittel_text], ["/personal/gefahrstoffe", x.gefahrstoff.titel, x.personal.gefahrstoffe_text]] as const).map(([href, titel, text]) => (
+            <li key={href}><Link href={href} className="block h-full rounded-md border border-linie bg-blatt p-4 hover:border-amt"><span className="font-bold">{titel}</span><span className="mt-1 block text-klein text-tinte-leise">{text}</span></Link></li>
+          ))}
+        </ul>
+      </section>
+
       <section aria-labelledby="team">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h2 id="team" className="text-gross font-bold">{x.personal.team}</h2>

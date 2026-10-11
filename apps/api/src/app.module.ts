@@ -4,6 +4,7 @@ import { Inject } from "@nestjs/common";
 import type PgBoss from "pg-boss";
 import path from "node:path";
 import { DateiAblage, Datenbank, NichtVerfuegbaresElster, erzeugeWarteschlange } from "@amtlos/server";
+import { ArbeitsschutzController } from "./arbeitsschutz.controller.js";
 import { AuthGuard } from "./auth.js";
 import { BetriebController, METRIKEN, erzeugeMetriken } from "./betrieb.js";
 import { ELSTER, ElsterController } from "./elster.controller.js";
@@ -16,7 +17,7 @@ import { TeamController } from "./team.controller.js";
 
 export function appModul(k: Konfiguration) {
   @Module({
-    controllers: [KernController, PflichtenController, TeamController, ElsterController, FinanzenController, PersonalController, BetriebController],
+    controllers: [KernController, PflichtenController, TeamController, ElsterController, FinanzenController, PersonalController, ArbeitsschutzController, BetriebController],
     providers: [
       { provide: KONFIGURATION, useValue: k },
       { provide: METRIKEN, useFactory: erzeugeMetriken },

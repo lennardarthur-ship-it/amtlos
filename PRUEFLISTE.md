@@ -45,6 +45,10 @@ Stand: 2026-10-11 (Bauabschnitt 2)
 | T-15 | `je_ereignis`: mehrere Einstellungen am selben Tag ergeben eine Instanz – genügt das für SV-Anmeldung/Sofortmeldung, oder je Person getrennt? | StB | E-091 |
 | T-16 | Zählweise der Beschäftigten für das Profil (Azubis, Minijobs, Teilzeit anteilig?) je Gesetz – derzeit zählt jede Person voll | RA | E-090, G-05 |
 | T-17 | Schwellenwert-Wächter: Wortlaut „zu prüfen“ und ob ein Hinweis zur Zählweise je Pflicht nötig ist | RA | E-093 |
+| T-18 | Gefährdungsfaktoren: Gliederung und Wortlaut nach § 5 Abs. 3 ArbSchG; ergänzende Faktoren (z. B. Brand- und Explosionsgefährdung) | Sifa | E-094 |
+| T-19 | Risikoeinstufung gering/mittel/hoch: genügt das, oder eine anerkannte Methode (z. B. Risikomatrix)? | Sifa | E-094 |
+| T-20 | Branchenvorlagen für die Gefährdungsbeurteilung (Gastronomie, Handwerk, Büro, Handel) – Inhalte und Quellen (BG-Handlungshilfen) | Sifa/BG | E-094 |
+| T-21 | Verbandbuch, Ersthelfer-Ausbildung, Unfallanzeige ab mehr als drei Tagen Arbeitsunfähigkeit: Unfallanzeige wird derzeit bei jedem gemeldeten Arbeitsunfall ausgelöst | Sifa/RA | Katalog E.57 |
 | G-15 | Sammelbestätigung „vor dem Start erledigt“: Wortlaut und ob ein Hinweis zu Nachholpflichten nötig ist | RA | E-072 |
 
 ## Juristische Grundsatzfragen (blockieren Abschnitte)

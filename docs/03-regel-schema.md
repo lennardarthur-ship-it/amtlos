@@ -88,7 +88,7 @@ Jeder Fakt hat einen Typ. Der Validator lehnt unbekannte Fakten, unpassende Oper
 
 Fälligkeitsregeln bei `wiederkehrend`: `tag_nach_periodenende` (USt-VA, Lohnsteuer), `feste_termine` (Vorauszahlungen `03-10`, `06-10`, …), `n_letzter_bankarbeitstag` (SV-Beiträge, mit `arbeitstage_vorher` für den Beitragsnachweis).
 
-**Relative Fristen:** Fehlt das Bezugsereignis, gilt die Pflicht trotzdem, aber ohne Termin; die Karte zeigt „Termin hängt von … ab“. Bei `zeitpunkt: vor_beginn` ist der Termin der Tag vor dem Bezugstag. Mehrere Ereignisse gleichen Typs: Bezug ist das früheste nicht stornierte.
+**Relative Fristen:** Fehlt das Bezugsereignis, gilt die Pflicht trotzdem, aber ohne Termin; die Karte zeigt „Termin hängt von … ab“. Bei `zeitpunkt: vor_beginn` ist der Termin der Tag vor dem Bezugstag. Mehrere Ereignisse gleichen Typs: Bezug ist das früheste nicht stornierte. Mit `je_ereignis: true` entsteht stattdessen je Ereignis eine eigene Instanz mit der Periode `aenderung-JJJJMMTT` (z. B. SV-Anmeldung je Einstellung, E-091).
 
 **Berechnungsreihenfolge:** Rohtermin → Verlängerung (`verlaengerung.versatz`, falls Bedingung gilt) → Verschiebung (`verschiebung.regel` mit `kalender`). Monatsende-Regel: Ein Versatz von einem Monat ab dem 31. landet auf dem letzten Tag des Folgemonats. Jeder Termin hat eine `periode` (`2026-10`, `2026-Q3`, `2026`, `einmalig`); zusammen mit Pflicht-ID und Unternehmen ist sie eindeutig.
 

@@ -124,3 +124,13 @@ describe("Gründungsassistent: Reihenfolge", () => {
     expect(fortschritt([...nachElster, s("x", "A.1", [], null, "nicht_zutreffend")])).toEqual({ erledigt: 1, gesamt: 9, fertig: false });
   });
 });
+
+describe("Monate addieren (Prüftermine)", async () => {
+  const { plusMonate } = await import("../src/arbeitsschutz.controller.js");
+  it("beachtet Monatsende und Schaltjahr", () => {
+    expect(plusMonate("2026-01-31", 1)).toBe("2026-02-28");
+    expect(plusMonate("2028-01-31", 1)).toBe("2028-02-29");
+    expect(plusMonate("2026-01-31", 12)).toBe("2027-01-31");
+    expect(plusMonate("2026-11-15", 3)).toBe("2027-02-15");
+  });
+});

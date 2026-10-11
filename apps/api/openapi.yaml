@@ -29,6 +29,7 @@ tags:
   - name: Gründung und ELSTER
   - name: Finanzen
   - name: Personal
+  - name: Arbeitsschutz
 
 paths:
   /v1/gesundheit:
@@ -707,6 +708,231 @@ paths:
       responses:
         "200": { description: CSV, content: { text/csv: { schema: { type: string } } } }
 
+  /v1/gefaehrdungsfaktoren:
+    get:
+      tags: [Arbeitsschutz]
+      summary: Gefährdungsfaktoren (Gliederung nach § 5 Abs. 3 ArbSchG)
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: array, items: { type: object, properties: { id: { type: string }, titel: { type: string } } } } } } }
+
+  /v1/gefaehrdungsbeurteilungen:
+    get:
+      tags: [Arbeitsschutz]
+      summary: Gefährdungsbeurteilungen mit Zahl der Gefährdungen und offenen Maßnahmen
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK }
+    post:
+      tags: [Arbeitsschutz]
+      summary: Gefährdungsbeurteilung für einen Arbeitsbereich anlegen
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/GefaehrdungsbeurteilungEingabe" } } } }
+      responses:
+        "201": { description: Angelegt }
+
+  /v1/gefaehrdungsbeurteilungen/{id}:
+    get:
+      tags: [Arbeitsschutz]
+      summary: Gefährdungsbeurteilung mit Gefährdungen und Maßnahmen
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "200": { description: OK }
+        "404": { description: Nicht gefunden }
+    put:
+      tags: [Arbeitsschutz]
+      summary: Angaben ändern (nur vor dem Abschluss)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/GefaehrdungsbeurteilungEingabe" } } } }
+      responses:
+        "200": { description: Geändert }
+        "409": { description: Abgeschlossen }
+    delete:
+      tags: [Arbeitsschutz]
+      summary: Entwurf löschen
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "204": { description: Gelöscht }
+        "409": { description: Abgeschlossen }
+
+  /v1/gefaehrdungsbeurteilungen/{id}/gefaehrdungen:
+    post:
+      tags: [Arbeitsschutz]
+      summary: Gefährdung mit Maßnahme erfassen
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/GefaehrdungEingabe" } } } }
+      responses:
+        "201": { description: Erfasst }
+        "409": { description: Abgeschlossen }
+
+  /v1/gefaehrdungsbeurteilungen/{id}/abschliessen:
+    post:
+      tags: [Arbeitsschutz]
+      summary: Abschließen – PDF ablegen, Pflicht Gefährdungsbeurteilung (und ggf. Mutterschutz) mit Nachweis erledigen
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "201": { description: Abgeschlossen, content: { application/json: { schema: { type: object, properties: { id: { type: string }, dokument_id: { type: string }, erledigte_pflichten: { type: integer } } } } } }
+        "409": { description: Schon abgeschlossen }
+        "422": { description: Keine Gefährdung erfasst }
+
+  /v1/gefaehrdungen/{id}:
+    put:
+      tags: [Arbeitsschutz]
+      summary: Gefährdung ändern (nur vor dem Abschluss)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/GefaehrdungEingabe" } } } }
+      responses:
+        "200": { description: Geändert }
+        "409": { description: Abgeschlossen }
+    delete:
+      tags: [Arbeitsschutz]
+      summary: Gefährdung löschen (nur vor dem Abschluss)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "204": { description: Gelöscht }
+        "409": { description: Abgeschlossen }
+
+  /v1/gefaehrdungen/{id}/umsetzung:
+    post:
+      tags: [Arbeitsschutz]
+      summary: Umsetzung und Wirksamkeit der Maßnahme eintragen (auch nach dem Abschluss)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                umgesetzt_am: { type: [string, "null"], format: date }
+                wirksam_geprueft_am: { type: [string, "null"], format: date }
+                wirksamkeit_notiz: { type: [string, "null"] }
+      responses:
+        "201": { description: Eingetragen }
+        "404": { description: Nicht gefunden }
+
+  /v1/arbeitsmittel:
+    get:
+      tags: [Arbeitsschutz]
+      summary: Elektrische Arbeitsmittel mit letzter und nächster Prüfung
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK }
+    post:
+      tags: [Arbeitsschutz]
+      summary: Arbeitsmittel erfassen (Prüfintervall legt der Betrieb fest); setzt die Profilangabe „elektrische Geräte“
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [bezeichnung]
+              properties:
+                bezeichnung: { type: string }
+                standort: { type: [string, "null"] }
+                kennung: { type: [string, "null"] }
+                pruefintervall_monate: { type: [integer, "null"], minimum: 1, maximum: 120 }
+                naechste_pruefung: { type: [string, "null"], format: date }
+      responses:
+        "201": { description: Erfasst }
+
+  /v1/arbeitsmittel/{id}/pruefungen:
+    get:
+      tags: [Arbeitsschutz]
+      summary: Prüfhistorie
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "200": { description: OK }
+    post:
+      tags: [Arbeitsschutz]
+      summary: Prüfung eintragen – nächster Termin angegeben oder aus dem Intervall
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [datum, ergebnis, pruefer]
+              properties:
+                datum: { type: string, format: date }
+                ergebnis: { type: string, enum: [bestanden, maengel, ausgesondert] }
+                pruefer: { type: string }
+                bemerkung: { type: [string, "null"] }
+                naechste_pruefung: { type: [string, "null"], format: date }
+      responses:
+        "201": { description: Eingetragen }
+        "409": { description: Ausgesondert }
+
+  /v1/gefahrstoffe:
+    get:
+      tags: [Arbeitsschutz]
+      summary: Gefahrstoffverzeichnis
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK }
+    post:
+      tags: [Arbeitsschutz]
+      summary: Gefahrstoff erfassen; setzt die Profilangabe „Gefahrstoffe“
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/GefahrstoffEingabe" } } } }
+      responses:
+        "201": { description: Erfasst }
+
+  /v1/gefahrstoffe/{id}:
+    put:
+      tags: [Arbeitsschutz]
+      summary: Gefahrstoff ändern
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/GefahrstoffEingabe" } } } }
+      responses:
+        "200": { description: Geändert }
+        "404": { description: Nicht gefunden }
+
+  /v1/gefahrstoffe/{id}/sicherheitsdatenblatt:
+    post:
+      tags: [Arbeitsschutz]
+      summary: Sicherheitsdatenblatt (PDF) hochladen
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { multipart/form-data: { schema: { type: object, required: [datei], properties: { datei: { type: string, format: binary } } } } } }
+      responses:
+        "201": { description: Abgelegt }
+        "422": { description: Kein PDF }
+
+  /v1/gefahrstoffe/{id}/entfernen:
+    post:
+      tags: [Arbeitsschutz]
+      summary: Gefahrstoff wird nicht mehr verwendet (bleibt im Verlauf)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [datum], properties: { datum: { type: string, format: date } } } } } }
+      responses:
+        "201": { description: Entfernt }
+        "404": { description: Nicht gefunden }
+
+  /v1/gefahrstoffe/verzeichnis:
+    get:
+      tags: [Arbeitsschutz]
+      summary: Aktuelles Gefahrstoffverzeichnis als PDF
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: PDF, content: { application/pdf: { schema: { type: string, format: binary } } } }
+
   /v1/glossar:
     get:
       tags: [Pflichten]
@@ -885,6 +1111,35 @@ components:
           schema: { type: object, properties: { meldung: { type: string }, fehler: { type: array, items: { type: object, properties: { feld: { type: string }, meldung: { type: string } } } } } }
 
   schemas:
+    GefaehrdungsbeurteilungEingabe:
+      type: object
+      required: [arbeitsbereich, beurteilt_von, datum]
+      properties:
+        arbeitsbereich: { type: string, maxLength: 200 }
+        taetigkeiten: { type: string, maxLength: 5000 }
+        beurteilt_von: { type: string }
+        datum: { type: string, format: date }
+        mutterschutz: { type: boolean, description: anlassunabhängige Beurteilung nach MuSchG mit erfasst }
+    GefaehrdungEingabe:
+      type: object
+      required: [faktor, beschreibung, risiko, massnahme]
+      properties:
+        faktor: { type: string, enum: [arbeitsstaette, einwirkungen, arbeitsmittel, ablaeufe_arbeitszeit, qualifikation, psychisch, sonstiges] }
+        beschreibung: { type: string }
+        risiko: { type: string, enum: [gering, mittel, hoch] }
+        massnahme: { type: string }
+        verantwortlich: { type: [string, "null"] }
+        umsetzen_bis: { type: [string, "null"], format: date }
+    GefahrstoffEingabe:
+      type: object
+      required: [bezeichnung]
+      properties:
+        bezeichnung: { type: string }
+        hersteller: { type: [string, "null"] }
+        verwendung: { type: [string, "null"] }
+        arbeitsbereich: { type: [string, "null"] }
+        menge: { type: [string, "null"] }
+        sdb_stand: { type: [string, "null"], format: date }
     Beschaeftigter:
       type: object
       properties:

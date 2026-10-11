@@ -213,6 +213,31 @@ select set_config('amtlos.unternehmen_id', :'u2', false);
 select pg_temp.ok((select count(*) = 0 from app.beschaeftigter) and (select count(*) = 0 from app.zeiteintrag) and (select count(*) = 0 from app.unterweisung), 'Personaldaten sind mandantengetrennt');
 reset role;
 
+-- ---------- Arbeitsschutz (0009) ----------
+set role api_user;
+select set_config('amtlos.konto_id', :'anna_konto_anmelden', false);
+select set_config('amtlos.unternehmen_id', :'u1', false);
+insert into app.gefaehrdungsbeurteilung (unternehmen_id, arbeitsbereich, beurteilt_von, datum) values (:'u1', 'Backstube', 'Anna', '2026-11-01') returning id as gb1 \gset
+insert into app.gefaehrdung (unternehmen_id, beurteilung_id, faktor, beschreibung, risiko, massnahme) values (:'u1', :'gb1', 'einwirkungen', 'Hitze', 'mittel', 'Handschuhe') returning id as gf1 \gset
+select pg_temp.erwarte_fehler(format($$insert into app.gefaehrdung (unternehmen_id, beurteilung_id, faktor, beschreibung, risiko, massnahme) values (%L, %L, 'laerm', 'x', 'mittel', 'y')$$, :'u1', :'gb1'), 'check constraint');
+select pg_temp.ok(true, 'Gefährdungsfaktor nur aus der festen Liste');
+update app.gefaehrdungsbeurteilung set abgeschlossen_am = now() where id = :'gb1';
+select pg_temp.erwarte_fehler(format($$update app.gefaehrdungsbeurteilung set arbeitsbereich = 'neu' where id = %L$$, :'gb1'), 'beurteilung_unveraenderlich');
+select pg_temp.erwarte_fehler(format($$delete from app.gefaehrdungsbeurteilung where id = %L$$, :'gb1'), 'beurteilung_unveraenderlich');
+select pg_temp.erwarte_fehler(format($$update app.gefaehrdung set massnahme = 'nichts' where id = %L$$, :'gf1'), 'beurteilung_unveraenderlich');
+select pg_temp.erwarte_fehler(format($$insert into app.gefaehrdung (unternehmen_id, beurteilung_id, faktor, beschreibung, risiko, massnahme) values (%L, %L, 'psychisch', 'x', 'gering', 'y')$$, :'u1', :'gb1'), 'beurteilung_unveraenderlich');
+select pg_temp.erwarte_fehler(format($$delete from app.gefaehrdung where id = %L$$, :'gf1'), 'beurteilung_unveraenderlich');
+update app.gefaehrdung set umgesetzt_am = '2026-11-05', wirksamkeit_notiz = 'wirkt' where id = :'gf1';
+select pg_temp.ok((select umgesetzt_am = '2026-11-05' from app.gefaehrdung where id = :'gf1'), 'Abgeschlossene Beurteilung: nur Umsetzung und Wirksamkeit nachtragbar');
+insert into app.arbeitsmittel (unternehmen_id, bezeichnung) values (:'u1', 'Ofen') returning id as am1 \gset
+insert into app.arbeitsmittel_pruefung (unternehmen_id, arbeitsmittel_id, datum, ergebnis, pruefer) values (:'u1', :'am1', '2026-11-01', 'bestanden', 'Meier') returning id as ap1 \gset
+select pg_temp.erwarte_fehler(format($$update app.arbeitsmittel_pruefung set ergebnis = 'maengel' where id = %L$$, :'ap1'), 'append-only');
+select pg_temp.ok(true, 'Prüfprotokolle sind unveränderlich');
+select set_config('amtlos.konto_id', :'ben_konto_anmelden', false);
+select set_config('amtlos.unternehmen_id', :'u2', false);
+select pg_temp.ok((select count(*) = 0 from app.gefaehrdungsbeurteilung) and (select count(*) = 0 from app.arbeitsmittel) and (select count(*) = 0 from app.gefahrstoff), 'Arbeitsschutzdaten sind mandantengetrennt');
+reset role;
+
 -- ---------- Audit ----------
 select pg_temp.ok((select count(*) > 10 from audit.ereignis), 'Audit protokolliert Änderungen');
 select pg_temp.ok((select bool_and(vorgaenger_hash is not null) from audit.ereignis where id > (select min(id) from audit.ereignis)), 'Hash-Kette lückenlos');

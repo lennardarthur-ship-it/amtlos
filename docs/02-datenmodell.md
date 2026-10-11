@@ -141,6 +141,8 @@ Alle Tabellen mit `unternehmen_id` und RLS, sofern nicht anders vermerkt.
 
 ### Abschnitt 5 · Personal und Arbeitsschutz
 
+**Umgesetzt (Migrationen 0008, 0009):** `beschaeftigter` (ohne besondere Gruppen je Person, E-090), `unterweisung` + `unterweisung_teilnahme`, `zeiteintrag` (+ Sicht `zeiteintrag_gueltig`), `gefaehrdungsbeurteilung` + `gefaehrdung`, `arbeitsmittel` + `arbeitsmittel_pruefung`, `gefahrstoff`. Offen: `arbeitsvertrag_nachweis` (Vorlage braucht fachliche Freigabe), `ersthelfer`/`unfall` (T-21), `lohn_partner_verbindung` (T-12).
+
 | Entität | Schlüsselattribute | Bemerkung |
 |---|---|---|
 | `beschaeftigte_person` | Stammdaten (minimiert), Beschäftigungsart, Beginn, Ende, Wochenstunden, besondere Gruppen (schwanger, jugendlich, schwerbehindert) **nur mit Zweckbindung** | sensible Felder anwendungsseitig verschlüsselt |

@@ -539,5 +539,61 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       await expect(apiDb.imKontext({ kontoId: leaKonto, unternehmenId: u }, (tx) => tx.abfrage("update app.unterweisung_teilnahme set name_bestaetigt = 'x'"))).rejects.toThrow();
       await apiDb.schliessen();
     });
+
+    it("Gefährdungsbeurteilung: Gefährdungen mit Maßnahmen, Abschluss mit PDF erledigt die Pflichten, danach nur Umsetzung", async () => {
+      const b = (await alsLea(http().post("/v1/gefaehrdungsbeurteilungen")).send({ arbeitsbereich: "Backstube", taetigkeiten: "Teig, Ofen", beurteilt_von: "Lea", datum: heuteIso, mutterschutz: true }).expect(201)).body;
+      await alsLea(http().post(`/v1/gefaehrdungsbeurteilungen/${b.id}/abschliessen`)).expect(422);
+      await alsLea(http().post(`/v1/gefaehrdungsbeurteilungen/${b.id}/gefaehrdungen`)).send({ faktor: "laerm", beschreibung: "x", risiko: "hoch", massnahme: "y" }).expect(422);
+      const g = (await alsLea(http().post(`/v1/gefaehrdungsbeurteilungen/${b.id}/gefaehrdungen`)).send({ faktor: "einwirkungen", beschreibung: "Heiße Bleche", risiko: "mittel", massnahme: "Hitzeschutzhandschuhe", verantwortlich: "Lea", umsetzen_bis: heuteIso }).expect(201)).body;
+      await alsLea(http().put(`/v1/gefaehrdungen/${g.id}`)).send({ faktor: "einwirkungen", beschreibung: "Heiße Bleche und Öfen", risiko: "hoch", massnahme: "Hitzeschutzhandschuhe", verantwortlich: "Lea" }).expect(200);
+      const vorher = (await alsLea(http().get("/v1/pflichten")).expect(200)).body.filter((x: { pflicht_id: string; status: string; ergebnis: string }) =>
+        ["arbeitsschutz.gefaehrdungsbeurteilung", "personal.mutterschutz_gefaehrdungsbeurteilung"].includes(x.pflicht_id) && x.status === "offen" && x.ergebnis === "gilt");
+      expect(vorher.length).toBeGreaterThanOrEqual(2);
+      const r = (await alsLea(http().post(`/v1/gefaehrdungsbeurteilungen/${b.id}/abschliessen`)).expect(201)).body;
+      expect(r.erledigte_pflichten).toBe(vorher.length);
+      const pdf = await alsLea(http().get(`/v1/dokumente/${r.dokument_id}/datei`)).expect(200);
+      expect(pdf.body.subarray(0, 5).toString()).toBe("%PDF-");
+      await alsLea(http().post(`/v1/gefaehrdungsbeurteilungen/${b.id}/abschliessen`)).expect(409);
+      await alsLea(http().put(`/v1/gefaehrdungsbeurteilungen/${b.id}`)).send({ arbeitsbereich: "neu", beurteilt_von: "Lea", datum: heuteIso }).expect(409);
+      await alsLea(http().post(`/v1/gefaehrdungsbeurteilungen/${b.id}/gefaehrdungen`)).send({ faktor: "psychisch", beschreibung: "Zeitdruck", risiko: "gering", massnahme: "Pausen" }).expect(409);
+      await alsLea(http().delete(`/v1/gefaehrdungen/${g.id}`)).expect(409);
+      const u = (await alsLea(http().post(`/v1/gefaehrdungen/${g.id}/umsetzung`)).send({ umgesetzt_am: heuteIso, wirksamkeit_notiz: "Handschuhe werden getragen" }).expect(201)).body;
+      expect(u.umgesetzt_am).toBe(heuteIso);
+      const liste = (await alsLea(http().get("/v1/gefaehrdungsbeurteilungen")).expect(200)).body;
+      expect(liste[0]).toMatchObject({ gefaehrdungen: 1, offen: 0, ueberfaellig: 0 });
+      expect((await alsLea(http().get("/v1/gefaehrdungsfaktoren")).expect(200)).body).toHaveLength(7);
+      // Entwurf lässt sich samt Gefährdungen löschen
+      const e = (await alsLea(http().post("/v1/gefaehrdungsbeurteilungen")).send({ arbeitsbereich: "Laden", beurteilt_von: "Lea", datum: heuteIso }).expect(201)).body;
+      await alsLea(http().post(`/v1/gefaehrdungsbeurteilungen/${e.id}/gefaehrdungen`)).send({ faktor: "arbeitsstaette", beschreibung: "Stufe", risiko: "gering", massnahme: "Markierung" }).expect(201);
+      await alsLea(http().delete(`/v1/gefaehrdungsbeurteilungen/${e.id}`)).expect(204);
+    });
+
+    it("Elektrische Arbeitsmittel: Prüfungen mit nächstem Termin aus dem Intervall, Aussonderung", async () => {
+      const a = (await alsLea(http().post("/v1/arbeitsmittel")).send({ bezeichnung: "Teigmaschine", standort: "Backstube", pruefintervall_monate: 12 }).expect(201)).body;
+      expect((await alsLea(http().get("/v1/profil")).expect(200)).body.daten["arbeitsschutz.elektrische_geraete"]).toBe(true);
+      const p = (await alsLea(http().post(`/v1/arbeitsmittel/${a.id}/pruefungen`)).send({ datum: "2026-01-31", ergebnis: "bestanden", pruefer: "Elektro Meier" }).expect(201)).body;
+      expect(p.naechste_pruefung).toBe("2027-01-31");
+      const q = (await alsLea(http().post(`/v1/arbeitsmittel/${a.id}/pruefungen`)).send({ datum: "2026-03-01", ergebnis: "maengel", pruefer: "Elektro Meier", naechste_pruefung: "2026-04-01", bemerkung: "Kabel tauschen" }).expect(201)).body;
+      expect(q.naechste_pruefung).toBe("2026-04-01");
+      const l = (await alsLea(http().get("/v1/arbeitsmittel")).expect(200)).body;
+      expect(l[0]).toMatchObject({ bezeichnung: "Teigmaschine", letzte_pruefung: "2026-03-01", letztes_ergebnis: "maengel", naechste_pruefung: "2026-04-01", ueberfaellig: heuteIso > "2026-04-01" });
+      await alsLea(http().post(`/v1/arbeitsmittel/${a.id}/pruefungen`)).send({ datum: "2026-04-01", ergebnis: "ausgesondert", pruefer: "Elektro Meier" }).expect(201);
+      await alsLea(http().post(`/v1/arbeitsmittel/${a.id}/pruefungen`)).send({ datum: "2026-05-01", ergebnis: "bestanden", pruefer: "x" }).expect(409);
+      expect((await alsLea(http().get(`/v1/arbeitsmittel/${a.id}/pruefungen`)).expect(200)).body).toHaveLength(3);
+    });
+
+    it("Gefahrstoffe: Verzeichnis mit Sicherheitsdatenblatt, PDF, Entfernen", async () => {
+      const g = (await alsLea(http().post("/v1/gefahrstoffe")).send({ bezeichnung: "Ofenreiniger", hersteller: "Putz GmbH", verwendung: "Reinigung Backofen", menge: "ca. 5 l im Jahr" }).expect(201)).body;
+      expect((await alsLea(http().get("/v1/profil")).expect(200)).body.daten["arbeitsschutz.gefahrstoffe"]).toBe(true);
+      await alsLea(http().post(`/v1/gefahrstoffe/${g.id}/sicherheitsdatenblatt`)).attach("datei", Buffer.from("kein pdf"), { filename: "sdb.pdf", contentType: "application/pdf" }).expect(422);
+      const s = (await alsLea(http().post(`/v1/gefahrstoffe/${g.id}/sicherheitsdatenblatt`)).attach("datei", Buffer.from("%PDF-1.4\n% SDB\n"), { filename: "sdb.pdf", contentType: "application/pdf" }).expect(201)).body;
+      expect(s.sdb_dokument_id).toMatch(/^[0-9a-f-]{36}$/);
+      const v = await alsLea(http().get("/v1/gefahrstoffe/verzeichnis")).buffer(true).parse((res, cb) => { const t: Buffer[] = []; res.on("data", (c: Buffer) => t.push(c)); res.on("end", () => cb(null, Buffer.concat(t))); }).expect(200);
+      expect(v.headers["content-type"]).toContain("application/pdf");
+      expect((v.body as Buffer).subarray(0, 5).toString()).toBe("%PDF-");
+      await alsLea(http().post(`/v1/gefahrstoffe/${g.id}/entfernen`)).send({ datum: heuteIso }).expect(201);
+      await alsLea(http().put(`/v1/gefahrstoffe/${g.id}`)).send({ bezeichnung: "x" }).expect(404);
+      expect((await alsLea(http().get("/v1/gefahrstoffe")).expect(200)).body[0].entfernt_am).toBe(heuteIso);
+    });
   });
 });

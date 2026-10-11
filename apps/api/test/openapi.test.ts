@@ -7,6 +7,7 @@ import { TeamController } from "../src/team.controller.js";
 import { ElsterController } from "../src/elster.controller.js";
 import { FinanzenController } from "../src/finanzen.controller.js";
 import { PersonalController } from "../src/personal.controller.js";
+import { ArbeitsschutzController } from "../src/arbeitsschutz.controller.js";
 
 // Schlüssel wie in @nestjs/common/constants (nicht als Typ exportiert)
 const PATH_METADATA = "path";
@@ -16,7 +17,7 @@ const METHOD_METADATA = "method";
 function routen() {
   const liste: { schluessel: string; rollen: string[] | null; oeffentlich: boolean; unternehmen: boolean }[] = [];
   // BetriebController (/metriken) ist bewusst nicht beschrieben: intern, nur für Prometheus.
-  for (const c of [KernController, PflichtenController, TeamController, ElsterController, FinanzenController, PersonalController]) {
+  for (const c of [KernController, PflichtenController, TeamController, ElsterController, FinanzenController, PersonalController, ArbeitsschutzController]) {
     const basis = Reflect.getMetadata(PATH_METADATA, c) as string;
     for (const name of Object.getOwnPropertyNames(c.prototype)) {
       const f = (c.prototype as unknown as Record<string, object>)[name]!;

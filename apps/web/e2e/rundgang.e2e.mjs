@@ -178,8 +178,46 @@ async function rundgang(farbschema, breite) {
     pruefe((await p.getByText("08:00–12:30").count()) === 0, `${name("zeiten")}: ersetzter Eintrag wird noch als gültig gezeigt`);
     pruefe(await p.getByText("4 Std. 30 Min.").count(), `${name("zeiten")}: Dauer der Korrektur falsch`);
     await barrierefrei(p, name("zeiten"));
+
+    // Arbeitsschutz: Gefährdungsbeurteilung abschließen, Gerät mit Prüfung, Gefahrstoff mit Sicherheitsdatenblatt
+    await p.goto(`${B}/personal/gefaehrdungsbeurteilungen`);
+    await p.fill("#arbeitsbereich", "Backstube");
+    await p.fill("#beurteilt_von", "Inhaberin");
+    await p.check('input[name="mutterschutz"]');
+    await Promise.all([p.waitForURL(/gefaehrdungsbeurteilungen\/[0-9a-f-]{36}/), p.getByRole("button", { name: "Anlegen" }).click()]);
+    await p.selectOption("#faktor", "einwirkungen");
+    await p.fill("#beschreibung", "Heiße Bleche");
+    await p.check('input[name="risiko"][value="mittel"]');
+    await p.fill("#massnahme", "Hitzeschutzhandschuhe");
+    await p.getByRole("button", { name: "Erfassen" }).click();
+    await p.getByText("Heiße Bleche").waitFor({ timeout: 10000 });
+    await barrierefrei(p, name("gefaehrdungsbeurteilung"));
+    await Promise.all([p.waitForURL(/erledigt=/), p.getByRole("button", { name: "Abschließen und Dokument ablegen" }).click()]);
+    const gbPdf = p.getByRole("link", { name: "Dokument (PDF)" });
+    pruefe(await gbPdf.count(), `${name("gefaehrdungsbeurteilung")}: kein PDF-Link`);
+    await barrierefrei(p, name("gefaehrdungsbeurteilung-abgeschlossen"));
+    await p.goto(`${B}/personal/arbeitsmittel`);
+    await p.fill("#bezeichnung", "Teigmaschine");
+    await p.fill("#pruefintervall_monate", "12");
+    await p.getByRole("button", { name: "Erfassen" }).click();
+    await p.getByText("Teigmaschine").first().waitFor({ timeout: 10000 });
+    await p.locator("summary", { hasText: "Prüfung eintragen" }).first().click();
+    await p.locator('input[name="pruefer"]').first().fill("Elektro Meier");
+    await p.getByRole("button", { name: "Eintragen" }).first().click();
+    await p.getByText(/Zuletzt geprüft am/).waitFor({ timeout: 10000 }).catch(() => pruefe(false, `${name("arbeitsmittel")}: Prüfung fehlt`));
+    await barrierefrei(p, name("arbeitsmittel"));
+    await p.goto(`${B}/personal/gefahrstoffe`);
+    await p.fill("#bezeichnung", "Ofenreiniger");
+    await p.getByRole("button", { name: "Erfassen" }).click();
+    await p.getByText("Sicherheitsdatenblatt fehlt").waitFor({ timeout: 10000 });
+    await p.setInputFiles('input[type="file"]', { name: "sdb.pdf", mimeType: "application/pdf", buffer: Buffer.from(`%PDF-1.4\n% SDB ${Date.now()}\n`) });
+    await p.getByRole("button", { name: "Hochladen", exact: true }).click();
+    await p.getByRole("link", { name: /^Sicherheitsdatenblatt/ }).waitFor({ timeout: 10000 }).catch(() => pruefe(false, `${name("gefahrstoffe")}: SDB fehlt (${p.url()})`));
+    const verzeichnis = await p.request.get(`${B}/personal/gefahrstoffe/verzeichnis`);
+    pruefe(verzeichnis.ok() && (await verzeichnis.body()).subarray(0, 5).toString() === "%PDF-", `${name("gefahrstoffe")}: Verzeichnis nicht abrufbar`);
+    await barrierefrei(p, name("gefahrstoffe"));
   } else {
-    for (const seite of ["personal", "personal/unterweisungen", "personal/zeiten"]) {
+    for (const seite of ["personal", "personal/unterweisungen", "personal/zeiten", "personal/gefaehrdungsbeurteilungen", "personal/arbeitsmittel", "personal/gefahrstoffe"]) {
       await p.goto(`${B}/${seite}`);
       await barrierefrei(p, name(seite.replaceAll("/", "-")));
     }

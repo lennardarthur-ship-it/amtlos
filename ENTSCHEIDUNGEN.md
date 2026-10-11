@@ -332,6 +332,14 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Datum:** 2026-10-11 · **Status:** angenommen
 - Für 10, 20, 50, 150, 250 Beschäftigte (Spezifikation 6.6) und zusätzlich „eine Person mehr“ wertet die API den aktiven Katalog mit dem heutigen Profil aus, nur die Beschäftigtenzahl verändert, und zeigt je Stufe die Pflichten, die neu hinzukämen. Hängt eine Pflicht von einer noch nicht erfassten Zählweise ab (Ergebnis „unbekannt“), steht sie als „zu prüfen“ da (G-05). Keine eigene Schwellenlogik im Code – die Schwellen sind Regelwerte der Pflichten.
 
+### E-094 · Arbeitsschutz-Dokumentation ohne fachliche Vorgaben im Code
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- **Gefährdungsbeurteilung** als strukturierte Daten je Arbeitsbereich: Gefährdung (gegliedert nach den Faktoren des § 5 Abs. 3 ArbSchG, Wortlaut zu prüfen T-18) → Risiko (gering/mittel/hoch, Methode zu prüfen T-19) → Maßnahme, Verantwortliche, Termin → Umsetzung → Wirksamkeit. Abschließen erzeugt ein PDF als unveränderliches Dokument und erledigt die Pflicht (mit Häkchen „Mutterschutz“ auch die anlassunabhängige Beurteilung nach MuSchG). Danach ist die Beurteilung gesperrt (Trigger); Umsetzung und Wirksamkeit bleiben nachtragbar, weil Maßnahmen erst danach umgesetzt werden. Änderungen im Betrieb → neue Beurteilung. **Branchenvorlagen** (Spezifikation E.50) sind fachlicher Inhalt und werden nicht erfunden – sie folgen nach Prüfung durch eine Fachkraft (T-20).
+- **Elektrische Arbeitsmittel:** Verzeichnis mit Prüfhistorie (nur anhängend). Das Prüfintervall legt der Betrieb fest; Amtlos rechnet nur den nächsten Termin aus (Monatsende beachtet) und zeigt Überfälliges. Keine Standard-Prüffristen im Code.
+- **Gefahrstoffe:** Verzeichnis mit Sicherheitsdatenblatt (PDF, unveränderlich abgelegt) und Verzeichnis-PDF auf Abruf. Entfernte Stoffe bleiben im Verlauf.
+- Erfassen eines Geräts bzw. Gefahrstoffs setzt die passende Profilangabe (`arbeitsschutz.elektrische_geraete`, `arbeitsschutz.gefahrstoffe`), damit die Pflichten ohne erneutes Onboarding erscheinen.
+- Pflicht-Details verlinken auf die Stelle in Amtlos, an der die Pflicht erledigt wird („In Amtlos erledigen“), über `aktion.ziel` bzw. die Pflicht-ID.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

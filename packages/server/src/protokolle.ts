@@ -90,3 +90,137 @@ export async function unterweisungsprotokollPdf(p: UnterweisungsProtokoll): Prom
   }
   return Buffer.from(await doc.save({ useObjectStreams: false }));
 }
+
+// ------------------------------------------------------------ gemeinsamer Satz für weitere Protokolle
+
+async function satz(titel: string, autor: string) {
+  const doc = await PDFDocument.create();
+  doc.registerFontkit(fontkit);
+  const normal = await doc.embedFont(fs.readFileSync(path.join(SCHRIFTEN, "DejaVuSans.ttf")), { subset: true });
+  const fett = await doc.embedFont(fs.readFileSync(path.join(SCHRIFTEN, "DejaVuSans-Bold.ttf")), { subset: true });
+  doc.setTitle(titel);
+  doc.setAuthor(autor);
+  doc.setProducer("Amtlos");
+  const s = { seite: doc.addPage([595.28, 841.89]) as PDFPage, y: 790 };
+  const text = (t: string, x: number, g = 10, f: PDFFont = normal) => s.seite.drawText(t, { x, y: s.y, size: g, font: f, color: rgb(0.1, 0.12, 0.15) });
+  const zeile = (a = 14) => {
+    s.y -= a;
+    if (s.y < 70) {
+      s.seite = doc.addPage([595.28, 841.89]);
+      s.y = 790;
+    }
+  };
+  /** Absatz mit Umbruch ab x, Breite bis zum rechten Rand. */
+  const absatz = (t: string, x = 50, g = 10, f: PDFFont = normal, abstand = g + 4) => {
+    for (const z of umbrechen(t, f, g, 545 - x)) {
+      text(z, x, g, f);
+      zeile(abstand);
+    }
+  };
+  const platz = (benoetigt: number) => {
+    if (s.y - benoetigt < 70) {
+      s.seite = doc.addPage([595.28, 841.89]);
+      s.y = 790;
+    }
+  };
+  const fertig = async () => Buffer.from(await doc.save({ useObjectStreams: false }));
+  return { text, zeile, absatz, platz, fertig, normal, fett };
+}
+
+/** Gefährdungsfaktoren in der Reihenfolge von § 5 Abs. 3 ArbSchG (Wortlaut fachlich zu prüfen, T-18). */
+export const GEFAEHRDUNGSFAKTOREN: Record<string, string> = {
+  arbeitsstaette: "Gestaltung und Einrichtung der Arbeitsstätte und des Arbeitsplatzes",
+  einwirkungen: "Physikalische, chemische und biologische Einwirkungen",
+  arbeitsmittel: "Arbeitsmittel, Maschinen, Geräte und Anlagen und der Umgang damit",
+  ablaeufe_arbeitszeit: "Arbeitsverfahren, Arbeitsabläufe und Arbeitszeit",
+  qualifikation: "Unzureichende Qualifikation und Unterweisung",
+  psychisch: "Psychische Belastungen bei der Arbeit",
+  sonstiges: "Sonstige Gefährdungen",
+};
+const RISIKO: Record<string, string> = { gering: "gering", mittel: "mittel", hoch: "hoch" };
+
+export interface GefaehrdungsbeurteilungDaten {
+  unternehmen: string;
+  arbeitsbereich: string;
+  taetigkeiten: string;
+  beurteilt_von: string;
+  datum: string;
+  mutterschutz: boolean;
+  gefaehrdungen: { faktor: string; beschreibung: string; risiko: string; massnahme: string; verantwortlich: string | null; umsetzen_bis: string | null; umgesetzt_am: string | null }[];
+}
+
+export async function gefaehrdungsbeurteilungPdf(g: GefaehrdungsbeurteilungDaten): Promise<Buffer> {
+  const s = await satz(`Gefährdungsbeurteilung: ${g.arbeitsbereich}`, g.unternehmen);
+  s.text(g.unternehmen, 50, 9, s.fett);
+  s.zeile(30);
+  s.text("Gefährdungsbeurteilung", 50, 16, s.fett);
+  s.zeile(24);
+  for (const [k, v] of [["Arbeitsbereich", g.arbeitsbereich], ["Datum", datumDe(g.datum)], ["Beurteilt von", g.beurteilt_von], ["Mutterschutz", g.mutterschutz ? "berücksichtigt (anlassunabhängige Beurteilung)" : "nicht gesondert erfasst"]] as const) {
+    s.text(k, 50);
+    s.text(v, 170);
+    s.zeile();
+  }
+  if (g.taetigkeiten.trim()) {
+    s.zeile(6);
+    s.text("Tätigkeiten", 50, 11, s.fett);
+    s.zeile(16);
+    s.absatz(g.taetigkeiten);
+  }
+  for (const [faktor, titel] of Object.entries(GEFAEHRDUNGSFAKTOREN)) {
+    const liste = g.gefaehrdungen.filter((x) => x.faktor === faktor);
+    if (!liste.length) continue;
+    s.zeile(8);
+    s.platz(60);
+    s.text(titel, 50, 11, s.fett);
+    s.zeile(18);
+    for (const x of liste) {
+      s.platz(70);
+      s.absatz(`Gefährdung: ${x.beschreibung}`, 60, 10, s.normal);
+      s.absatz(`Risiko: ${RISIKO[x.risiko] ?? x.risiko}`, 60, 9);
+      s.absatz(`Maßnahme: ${x.massnahme}`, 60, 10);
+      const wer = [x.verantwortlich ? `verantwortlich: ${x.verantwortlich}` : null, x.umsetzen_bis ? `bis ${datumDe(x.umsetzen_bis)}` : null, x.umgesetzt_am ? `umgesetzt am ${datumDe(x.umgesetzt_am)}` : "noch nicht umgesetzt"].filter(Boolean).join(" · ");
+      s.absatz(wer, 60, 9);
+      s.zeile(6);
+    }
+  }
+  if (!g.gefaehrdungen.length) {
+    s.zeile(8);
+    s.absatz("Keine Gefährdungen erfasst.");
+  }
+  s.zeile(10);
+  s.absatz("Die Umsetzung und Wirksamkeit der Maßnahmen wird in Amtlos weiter dokumentiert. Bei neuen Arbeitsplätzen, Tätigkeiten oder nach Unfällen ist die Beurteilung zu überprüfen.", 50, 8, s.normal, 11);
+  return s.fertig();
+}
+
+export interface GefahrstoffVerzeichnis {
+  unternehmen: string;
+  stand: string;
+  stoffe: { bezeichnung: string; hersteller: string | null; verwendung: string | null; arbeitsbereich: string | null; menge: string | null; sdb_stand: string | null; sdb_vorhanden: boolean }[];
+}
+
+export async function gefahrstoffverzeichnisPdf(v: GefahrstoffVerzeichnis): Promise<Buffer> {
+  const s = await satz("Gefahrstoffverzeichnis", v.unternehmen);
+  s.text(v.unternehmen, 50, 9, s.fett);
+  s.zeile(30);
+  s.text("Gefahrstoffverzeichnis", 50, 16, s.fett);
+  s.zeile(20);
+  s.text(`Stand: ${datumDe(v.stand)}`, 50, 9);
+  s.zeile(24);
+  for (const x of v.stoffe) {
+    s.platz(60);
+    s.text(x.bezeichnung, 50, 11, s.fett);
+    s.zeile(15);
+    const zeilen = [
+      ["Hersteller", x.hersteller], ["Verwendung", x.verwendung], ["Arbeitsbereich", x.arbeitsbereich], ["Menge", x.menge],
+      ["Sicherheitsdatenblatt", x.sdb_vorhanden ? `liegt vor${x.sdb_stand ? ` (Stand ${datumDe(x.sdb_stand)})` : ""}` : "fehlt"],
+    ] as const;
+    for (const [k, w] of zeilen) {
+      if (!w) continue;
+      s.text(k, 60, 9);
+      s.absatz(w, 170, 9, s.normal, 12);
+    }
+    s.zeile(8);
+  }
+  if (!v.stoffe.length) s.absatz("Keine Gefahrstoffe erfasst.");
+  return s.fertig();
+}
