@@ -129,3 +129,59 @@ jobs:
             e2e-bilder
             *.log
             e2e-*.txt
+
+  container:
+    name: Container-Images bauen und starten (Rauchtest)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Images bauen
+        run: |
+          for ziel in werkzeug api worker web studio; do
+            docker buildx build -f docker/Dockerfile --target $ziel -t amtlos-$ziel:ci --load \
+              --cache-from type=gha,scope=amtlos --cache-to type=gha,mode=max,scope=amtlos .
+          done
+          docker images --format '{{.Repository}}:{{.Tag}} {{.Size}}' | grep amtlos
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+      - name: Datenbank mit dem Werkzeug-Image einrichten
+        run: |
+          NUR_ROLLEN=1 scripts/dev-datenbank.sh
+          docker run --rm --network host -e MIGRATION_DATABASE_URL=postgresql://amtlos_owner:amtlos@localhost:5432/amtlos amtlos-werkzeug:ci migrieren
+          docker run --rm --network host -e STUDIO_DATABASE_URL=postgresql://studio_user:amtlos@localhost:5432/amtlos amtlos-werkzeug:ci katalog-importieren
+      - name: Dienste starten und prüfen
+        run: |
+          G=ci-entwicklungs-geheimnis-mindestens-32-zeichen
+          docker run -d --name api --network host -e UMGEBUNG=dev -e AUTH_MODUS=dev -e DEV_JWT_SECRET=$G -e WEB_URL=http://localhost:3000 \
+            -e DATABASE_URL=postgresql://api_user:amtlos@localhost:5432/amtlos amtlos-api:ci
+          docker run -d --name worker --network host -e UMGEBUNG=dev -e WORKER_DATABASE_URL=postgresql://worker_user:amtlos@localhost:5432/amtlos amtlos-worker:ci
+          docker run -d --name web --network host -e UMGEBUNG=dev -e AUTH_MODUS=dev -e DEV_JWT_SECRET=$G -e WEB_URL=http://localhost:3000 \
+            -e API_INTERN_URL=http://localhost:3001 -e SITZUNG_SCHLUESSEL=ci-sitzung-schluessel-mindestens-32-zeichen-lang amtlos-web:ci
+          docker run -d --name studio --network host -e UMGEBUNG=dev -e AUTH_MODUS=dev -e DEV_JWT_SECRET=$G -e WEB_URL=http://localhost:3100 \
+            -e COOKIE_PRAEFIX=amtlos_studio -e SITZUNG_SCHLUESSEL=ci-studio-schluessel-mindestens-32-zeichen-lang \
+            -e STUDIO_DATABASE_URL=postgresql://studio_user:amtlos@localhost:5432/amtlos amtlos-studio:ci
+          for i in $(seq 1 30); do curl -sf localhost:3001/v1/gesundheit && break; sleep 1; done
+          curl -sf localhost:3001/v1/openapi.json | head -c 40; echo
+          curl -sf -o /dev/null -w "web %{http_code}\n" localhost:3000/anmelden
+          curl -sf -o /dev/null -w "studio %{http_code}\n" localhost:3100/anmelden
+          sleep 3; docker ps --format '{{.Names}} {{.Status}}'
+          test "$(docker ps -q | wc -l)" = "4"
+          # Läuft als Nicht-Root?
+          test "$(docker exec api id -u)" != "0"
+      - if: failure()
+        run: for c in api worker web studio; do docker logs $c 2>&1 | tail -n 3 | sed "s/^/::error title=$c::/" || true; done
+

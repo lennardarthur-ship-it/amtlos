@@ -274,6 +274,10 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Datum:** 2026-10-11 · **Status:** angenommen
 - Inhaber und Admins ändern Rollen; Inhaber ernennen oder ändern darf nur ein Inhaber. Jedes Mitglied kann selbst austreten (SECURITY-DEFINER-Funktion, weil die Lösch-Policy nur Inhabern/Admins erlaubt). Der letzte Inhaber kann weder herabgestuft werden noch austreten. Die Einladungs-E-Mail geht in der Sprache des Einladenden.
 
+### E-084 · Container: ein Dockerfile, fünf Ziele, Rauchtest in der CI
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- `docker/Dockerfile` baut api, worker, web, studio und werkzeug (Migrationen, Katalog-Import, Betriebskommandos). Node-Dienste als `pnpm deploy --prod`-Bündel (Workspace-Pakete mit `files: ["dist"]`), Next.js als standalone; das Studio nimmt die Schemas ausdrücklich ins Bündel (`outputFileTracingIncludes`). Ohne Root, ohne Paketmanager. Die CI baut alle Images und startet sie gegen PostgreSQL. Infrastruktur als Code (OpenTofu) folgt mit dem Hosting-Vertrag (E-013).
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

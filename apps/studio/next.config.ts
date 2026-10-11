@@ -3,6 +3,9 @@ import type { NextConfig } from "next";
 const config: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  output: "standalone",
+  // Schemas werden zur Laufzeit per Dateipfad gelesen – für das Container-Bundle ausdrücklich mitnehmen
+  outputFileTracingIncludes: { "/**": ["../../packages/rules-schema/*.json", "../../packages/rules-schema/*.mjs"] },
   transpilePackages: ["@amtlos/web-kern"],
   serverExternalPackages: ["pg", "pg-boss", "@amtlos/server", "@amtlos/rules-schema"],
   async headers() {

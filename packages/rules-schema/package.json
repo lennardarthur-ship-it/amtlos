@@ -23,5 +23,10 @@
     "./regelwert.schema.json": "./regelwert.schema.json",
     "./fakten.json": "./fakten.json",
     "./ereignisse.json": "./ereignisse.json"
-  }
+  },
+  "files": [
+    "validieren.mjs",
+    "validieren.d.ts",
+    "*.json"
+  ]
 }

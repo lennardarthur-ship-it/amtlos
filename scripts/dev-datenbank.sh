@@ -20,6 +20,8 @@ alter role studio_user password '$PW'; alter role worker_user password '$PW';
 SQL
 psql -q -d postgres -tc "select 1 from pg_database where datname = '$DB'" | grep -q 1 || psql -q -d postgres -c "create database $DB"
 psql -v ON_ERROR_STOP=1 -q -d "$DB" -c "create extension if not exists pgcrypto; create extension if not exists citext; create extension if not exists btree_gist; grant create on database $DB to amtlos_owner;"
+# NUR_ROLLEN=1: nur Rollen, Datenbank und Erweiterungen (Migrationen dann z. B. mit dem Werkzeug-Container)
+if [[ "${NUR_ROLLEN:-}" == "1" ]]; then echo "Rollen und Datenbank $DB bereit."; exit 0; fi
 H=${PGHOST:-localhost}; P=${PGPORT:-5432}
 if [[ "$H" == /* ]]; then basis="localhost:$P/$DB?host=$H"; else basis="$H:$P/$DB"; fi
 pnpm --filter @amtlos/server build >/dev/null

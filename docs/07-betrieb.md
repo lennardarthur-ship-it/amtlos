@@ -31,6 +31,18 @@ cd apps/studio && STUDIO_DATABASE_URL=postgresql://studio_user:amtlos@localhost:
 | Integration (Server, API, Worker) | mit `PGHOST` gesetzt: `pnpm --filter @amtlos/server --filter @amtlos/api --filter @amtlos/worker test` |
 | E2E + Barrierefreiheit | laufende Dienste, dann `E2E_URL=http://localhost:3000 pnpm --filter @amtlos/web e2e` |
 
+## Container
+
+Ein Dockerfile mit einem Ziel je Dienst (`docker/Dockerfile`, E-084):
+
+```bash
+docker build -f docker/Dockerfile --target api -t amtlos-api .      # ebenso: worker, web, studio, werkzeug
+docker run --rm -e MIGRATION_DATABASE_URL=… amtlos-werkzeug migrieren
+docker run --rm -e STUDIO_DATABASE_URL=… amtlos-werkzeug katalog-importieren   # nur dev/test
+```
+
+Alle Images laufen als Nutzer `node`, enthalten nur Produktionsabhängigkeiten und keinen Paketmanager. Web und Studio sind Next.js-„standalone“-Bündel. Die CI baut alle fünf Images, richtet damit eine leere Datenbank ein und startet die Dienste (Rauchtest).
+
 ## Beobachten
 
 | Was | Wo |

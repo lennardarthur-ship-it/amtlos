@@ -38,5 +38,8 @@
   },
   "bin": {
     "amtlos-server": "./dist/cli.js"
-  }
+  },
+  "files": [
+    "dist"
+  ]
 }

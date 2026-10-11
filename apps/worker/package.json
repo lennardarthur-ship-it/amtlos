@@ -19,5 +19,8 @@
   },
   "devDependencies": {
     "@types/nodemailer": "^6.4.17"
-  }
+  },
+  "files": [
+    "dist"
+  ]
 }
