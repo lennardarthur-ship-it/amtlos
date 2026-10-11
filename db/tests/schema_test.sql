@@ -180,6 +180,39 @@ select pg_temp.erwarte_fehler(format($$insert into app.pflicht_instanz (unterneh
 select pg_temp.ok(true, 'Worker kann nicht in fremdes Unternehmen schreiben');
 reset role;
 
+-- ---------- Personal (0008) ----------
+set role api_user;
+select set_config('amtlos.konto_id', :'anna_konto_anmelden', false);
+select set_config('amtlos.unternehmen_id', :'u1', false);
+insert into app.beschaeftigter (unternehmen_id, vorname, nachname, art, eintritt) values (:'u1', 'Tom', 'Teig', 'minijob', '2026-11-01') returning id as b1 \gset
+insert into app.zeiteintrag (unternehmen_id, beschaeftigter_id, beginn, quelle) values (:'u1', :'b1', '2026-11-02 08:00+01', 'stempel') returning id as z1 \gset
+select pg_temp.erwarte_fehler(format($$insert into app.zeiteintrag (unternehmen_id, beschaeftigter_id, beginn, quelle) values (%L, %L, now(), 'stempel')$$, :'u1', :'b1'), 'zeiteintrag_offen');
+select pg_temp.ok(true, 'Höchstens ein offener Stempel je Person');
+update app.zeiteintrag set ende = '2026-11-02 12:00+01', pause_minuten = 15 where id = :'z1';
+select pg_temp.ok((select ende is not null from app.zeiteintrag where id = :'z1'), 'Offenen Stempel einmal schließen ist erlaubt');
+select pg_temp.erwarte_fehler(format($$update app.zeiteintrag set pause_minuten = 0 where id = %L$$, :'z1'), 'zeiteintrag_unveraenderlich');
+select pg_temp.erwarte_fehler(format($$update app.zeiteintrag set beginn = beginn - interval '1 hour', ende = null where id = %L$$, :'z1'), 'zeiteintrag_unveraenderlich');
+select pg_temp.erwarte_fehler(format($$delete from app.zeiteintrag where id = %L$$, :'z1'), 'permission denied');
+select pg_temp.ok(true, 'Geschlossene Zeiteinträge sind unveränderlich und nicht löschbar');
+select pg_temp.erwarte_fehler(format($$insert into app.zeiteintrag (unternehmen_id, beschaeftigter_id, beginn, ende, quelle) values (%L, %L, now() - interval '1 hour', now(), 'nachtrag')$$, :'u1', :'b1'), 'check constraint');
+select pg_temp.ok(true, 'Nachtrag ohne Grund abgelehnt');
+insert into app.zeiteintrag (unternehmen_id, beschaeftigter_id, beginn, ende, quelle, ersetzt_id, grund) values (:'u1', :'b1', '2026-11-02 08:00+01', '2026-11-02 12:30+01', 'korrektur', :'z1', 'Ende falsch');
+select pg_temp.ok((select count(*) = 1 from app.zeiteintrag_gueltig) and (select count(*) = 2 from app.zeiteintrag), 'Korrektur ersetzt in der Sicht, Verlauf bleibt');
+insert into app.unterweisung (unternehmen_id, thema, inhalt, datum, durchgefuehrt_von, inhalt_sha256) values (:'u1', 'Backstube', 'Ofen', '2026-11-01', 'Anna', sha256(convert_to('Backstube' || chr(10) || 'Ofen', 'UTF8'))) returning id as w1 \gset
+update app.unterweisung set inhalt = 'Ofen und Fluchtwege', inhalt_sha256 = sha256('\x78'::bytea) where id = :'w1';
+select pg_temp.ok(true, 'Unbestätigte Unterweisung ist änderbar');
+insert into app.unterweisung_teilnahme (unternehmen_id, unterweisung_id, beschaeftigter_id, name_bestaetigt, inhalt_sha256) values (:'u1', :'w1', :'b1', 'Tom Teig', sha256('\x78'::bytea));
+select pg_temp.erwarte_fehler(format($$update app.unterweisung set inhalt_sha256 = sha256('\x79'::bytea) where id = %L$$, :'w1'), 'Inhalt bereits bestätigt');
+select pg_temp.erwarte_fehler(format($$delete from app.unterweisung where id = %L$$, :'w1'), 'unterweisung_unveraenderlich');
+select pg_temp.erwarte_fehler('update app.unterweisung_teilnahme set name_bestaetigt = $$x$$', 'append-only');
+update app.unterweisung set abgeschlossen_am = now() where id = :'w1';
+select pg_temp.erwarte_fehler(format($$update app.unterweisung set thema = 'neu' where id = %L$$, :'w1'), 'unterweisung_unveraenderlich');
+select pg_temp.ok(true, 'Bestätigte/abgeschlossene Unterweisungen und Bestätigungen sind geschützt');
+select set_config('amtlos.konto_id', :'ben_konto_anmelden', false);
+select set_config('amtlos.unternehmen_id', :'u2', false);
+select pg_temp.ok((select count(*) = 0 from app.beschaeftigter) and (select count(*) = 0 from app.zeiteintrag) and (select count(*) = 0 from app.unterweisung), 'Personaldaten sind mandantengetrennt');
+reset role;
+
 -- ---------- Audit ----------
 select pg_temp.ok((select count(*) > 10 from audit.ereignis), 'Audit protokolliert Änderungen');
 select pg_temp.ok((select bool_and(vorgaenger_hash is not null) from audit.ereignis where id > (select min(id) from audit.ereignis)), 'Hash-Kette lückenlos');

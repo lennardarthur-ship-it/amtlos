@@ -125,6 +125,66 @@ async function rundgang(farbschema, breite) {
     await barrierefrei(p, name("kassen"));
   }
 
+  // Personal: einstellen, Checkliste, Unterweisung bestätigen und abschließen, Zeiten stempeln
+  if (farbschema === "light") {
+    await p.goto(`${B}/personal`);
+    await barrierefrei(p, name("personal-leer"));
+    await p.fill("#vorname", "Tom");
+    await p.fill("#nachname", "Teig");
+    await p.selectOption("#art", "minijob");
+    await p.getByRole("button", { name: "Erfassen" }).click();
+    await p.getByText("Tom Teig").first().waitFor({ timeout: 10000 });
+    await barrierefrei(p, name("personal"));
+    await p.getByRole("link", { name: "Checkliste" }).first().click();
+    await p.getByRole("heading", { name: /Checkliste für Tom Teig/ }).waitFor({ timeout: 10000 });
+    await barrierefrei(p, name("personal-checkliste"));
+    await p.goto(`${B}/personal/unterweisungen`);
+    await p.fill("#thema", "Backstube");
+    await p.fill("#u-inhalt", "Ofen, Teigmaschine, Fluchtwege");
+    await p.fill("#durchgefuehrt_von", "Inhaberin");
+    await Promise.all([p.waitForURL(/unterweisungen\/[0-9a-f-]{36}/), p.getByRole("button", { name: "Anlegen" }).click()]);
+    await p.fill("#name", "Tom Teig");
+    await p.getByRole("button", { name: "Gelesen und verstanden" }).click();
+    await p.getByRole("button", { name: "Abschließen und Protokoll ablegen" }).waitFor({ timeout: 10000 });
+    await barrierefrei(p, name("unterweisung"));
+    await Promise.all([p.waitForURL(/erledigt=/), p.getByRole("button", { name: "Abschließen und Protokoll ablegen" }).click()]);
+    const protokoll = p.getByRole("link", { name: "Protokoll (PDF)" });
+    pruefe(await protokoll.count(), `${name("unterweisung")}: kein Protokoll-Link`);
+    if (await protokoll.count()) {
+      const pdf = await p.request.get(`${B}${await protokoll.getAttribute("href")}`);
+      pruefe(pdf.ok() && (await pdf.body()).subarray(0, 5).toString() === "%PDF-", `${name("unterweisung")}: Protokoll nicht abrufbar`);
+    }
+    await barrierefrei(p, name("unterweisung-abgeschlossen"));
+    await p.goto(`${B}/personal/zeiten`);
+    await p.getByRole("button", { name: "Kommen" }).click();
+    await p.getByRole("button", { name: "Gehen" }).waitFor({ timeout: 10000 });
+    await barrierefrei(p, name("zeiten-laeuft"));
+    await p.getByRole("button", { name: "Gehen" }).click();
+    await p.getByRole("button", { name: "Kommen" }).waitFor({ timeout: 10000 });
+    pruefe(await p.locator("table.tabelle tbody tr").count(), `${name("zeiten")}: kein Eintrag nach dem Stempeln`);
+    // Nachtrag in Ortszeit, dann Korrektur: der korrigierte Eintrag ersetzt den alten
+    await p.fill("#n-von", "08:00");
+    await p.fill("#n-bis", "12:30");
+    await p.fill("#n-pause", "30");
+    await p.fill("#n-grund", "Stempeln vergessen");
+    await p.getByRole("button", { name: "Nachtragen" }).click();
+    await p.getByText("08:00–12:30").waitFor({ timeout: 10000 }).catch(() => pruefe(false, `${name("zeiten")}: Nachtrag fehlt (${p.url()})`));
+    const zeile = p.locator("tr", { hasText: "08:00–12:30" });
+    await zeile.locator("summary").click();
+    await zeile.locator('input[name="bis"]').fill("13:00");
+    await zeile.locator('input[name="grund"]').fill("Ende falsch");
+    await zeile.getByRole("button", { name: "Korrigieren" }).click();
+    await p.getByText("08:00–13:00").waitFor({ timeout: 10000 }).catch(() => pruefe(false, `${name("zeiten")}: Korrektur fehlt (${p.url()})`));
+    pruefe((await p.getByText("08:00–12:30").count()) === 0, `${name("zeiten")}: ersetzter Eintrag wird noch als gültig gezeigt`);
+    pruefe(await p.getByText("4 Std. 30 Min.").count(), `${name("zeiten")}: Dauer der Korrektur falsch`);
+    await barrierefrei(p, name("zeiten"));
+  } else {
+    for (const seite of ["personal", "personal/unterweisungen", "personal/zeiten"]) {
+      await p.goto(`${B}/${seite}`);
+      await barrierefrei(p, name(seite.replaceAll("/", "-")));
+    }
+  }
+
   // Team: einladen, Link nur einmal sichtbar; Eingeladene meldet sich über den Link an und nimmt an
   const gast = `${kennung}-gast-${farbschema}`;
   await p.goto(`${B}/team`);

@@ -471,7 +471,8 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
     it("Schwellenwert-Wächter zeigt, was bei mehr Beschäftigten hinzukäme", async () => {
       const s = (await alsLea(http().get("/v1/personal/schwellen")).expect(200)).body;
       expect(s.aktuell).toBe(2);
-      expect(s.schwellen.map((x: { ab: number }) => x.ab)).toEqual([10, 20, 50, 150, 250]);
+      expect(s.schwellen.map((x: { ab: number }) => x.ab)).toEqual(expect.arrayContaining([10, 20, 50, 150, 250]));
+      expect(s.schwellen[0].ab).toBeGreaterThan(2);
       const alle = s.schwellen.flatMap((x: { neu: { pflicht_id: string }[]; zu_pruefen: { pflicht_id: string }[] }) => [...x.neu, ...x.zu_pruefen].map((p) => p.pflicht_id));
       expect(alle).toContain("personal.hinweisgeber_meldestelle");
     });

@@ -35,7 +35,7 @@ export default async function AppRahmen({ children }: { children: ReactNode }) {
             { href: "/pflichten", text: x.nav.pflichten, symbol: "pflichten" },
             { href: "/kalender", text: x.nav.kalender, symbol: "kalender" },
             { href: "/finanzen", text: x.nav.finanzen, symbol: "finanzen" },
-            { href: "/melden", text: x.nav.melden, symbol: "melden" },
+            { href: "/personal", text: x.nav.personal, symbol: "personal" },
             { href: "/einstellungen", text: x.nav.einstellungen, symbol: "einstellungen" },
           ]}
         />

@@ -310,6 +310,28 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Datum:** 2026-10-11 · **Status:** angenommen
 - Amtlos summiert Umsätze je Steuersatz und Umsatzsteuer aus den Rechnungen (nach Rechnungsdatum) und die Vorsteuer aus den Belegen (nach Belegdatum). Die Kennzahlen des amtlichen Formulars und die Zuordnung (z. B. Leistungs- statt Rechnungsdatum, Soll-/Ist-Versteuerung) stehen nicht in der Spezifikation – Prüfpunkte T-08/T-09. Übermitteln geht erst mit dem ELSTER-Gateway (E-086).
 
+### E-090 · Personal datensparsam, Lohn bleibt beim Partner
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Je beschäftigter Person speichert Amtlos nur Vor- und Nachname, Beschäftigungsart, Eintritt, Austritt und (freiwillig) Wochenstunden. Keine Geburtsdaten, Adressen, Sozialversicherungs- oder Steuer-IDs, Bankdaten; Schwangerschaft und Schwerbehinderung nur als Anzahl im Profil, nie je Person (Art. 9 DSGVO).
+- Die Profilanzahlen (`beschaeftigte.gesamt`, `…vollzeit` usw.) werden aus der Personalliste nachgezogen (neue Profilversion mit Audit), damit Pflichten, Schwellen und Ampel nicht von Hand gepflegt werden müssen. Gezählt wird, wer nicht vor heute ausgeschieden ist.
+- Lohnabrechnung, SV-Meldungen und Lohnsteuer-Anmeldung macht Amtlos nicht selbst (Spezifikation 6.6: Lohnpartner). Bis zur Partnerwahl gibt es einen CSV-Export der Stammdaten und der Arbeitszeiten. Prüfpunkt T-12.
+- Einstellung und Austritt laufen über „Personal“ und erzeugen die Ereignisse `einstellung` (beim ersten Mal zusätzlich `erste_einstellung`) und `austritt`; das freie Melden dieser Ereignisse entfällt in der Web-App (sonst Ereignis ohne Person). Navigation: „Personal“ ersetzt „Melden“; „Änderung melden“ steht auf „Heute“.
+
+### E-091 · Pflichten je Ereignis (`je_ereignis`)
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Pflichten wie SV-Anmeldung, Sofortmeldung, Nachweisgesetz, Erstunterweisung, Unfallanzeige entstehen je Person bzw. je Vorfall. Neue Fristoption `frist.je_ereignis: true` bei relativen Fristen: die Engine erzeugt eine Instanz je Ereignis mit Periode `aenderung-JJJJMMTT` (Datum des Ereignisses). Mehrere Ereignisse am selben Tag ergeben eine Instanz (eine Erledigung für alle) – bewusst einfach, Prüfpunkt T-15.
+- Die Checkliste zur Einstellung ist keine eigene Datenstruktur, sondern die Sicht auf die Instanzen mit der Periode des Eintrittstags.
+
+### E-092 · Unterweisung mit einfacher elektronischer Signatur, Zeiterfassung nur anhängend
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- **Unterweisung:** Thema und Inhalt werden gehasht (SHA-256); jede Bestätigung speichert den eingetippten Namen, Zeitpunkt und den Hash des bestätigten Inhalts. Der Name muss zur Person passen (ohne Groß-/Kleinschreibung, Leerzeichen normalisiert). Nach der ersten Bestätigung ist der Inhalt gesperrt, nach dem Abschließen die ganze Unterweisung (Trigger). Abschließen legt ein PDF-Protokoll als unveränderliches Dokument ab, meldet `unterweisung_durchgefuehrt` (→ Wiederholung nach einem Jahr) und erledigt offene Unterweisungspflichten mit dem Protokoll als Nachweis. Ob die einfache elektronische Signatur als Nachweis genügt: T-13.
+- **Zeiterfassung:** Einträge sind nur anhängbar; einzige Änderung ist das einmalige Schließen eines offenen Stempels. Nachträge und Korrekturen brauchen einen Grund; eine Korrektur ist ein neuer Eintrag mit Verweis auf den ersetzten (oder eine Stornierung). Gültig ist, was weder ersetzt noch storniert ist (View). Höchstens ein offener Stempel je Person (Unique-Index). Die konkreten Aufzeichnungspflichten (MiLoG, ArbZG nach BAG/EuGH, geplante Neuregelung) sind als Katalogpflichten markiert; T-14.
+- Mitarbeitende können stempeln und bestätigen; Nachträge, Korrekturen, Exporte und Stammdaten nur Inhaber, Admin, Steuerberatung.
+
+### E-093 · Schwellenwert-Wächter rechnet mit der Engine
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Für 10, 20, 50, 150, 250 Beschäftigte (Spezifikation 6.6) und zusätzlich „eine Person mehr“ wertet die API den aktiven Katalog mit dem heutigen Profil aus, nur die Beschäftigtenzahl verändert, und zeigt je Stufe die Pflichten, die neu hinzukämen. Hängt eine Pflicht von einer noch nicht erfassten Zählweise ab (Ergebnis „unbekannt“), steht sie als „zu prüfen“ da (G-05). Keine eigene Schwellenlogik im Code – die Schwellen sind Regelwerte der Pflichten.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

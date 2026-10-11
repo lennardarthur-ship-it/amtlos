@@ -95,6 +95,13 @@ export default async function HeuteSeite() {
       ) : null}
 
       {!ohneProfil ? (
+        <p className="lesetext flex flex-wrap items-center gap-x-4 gap-y-2">
+          <span>{x.heute.melden_frage}</span>
+          <Link href="/melden" className="knopf knopf-leise">{x.heute.melden_link}</Link>
+        </p>
+      ) : null}
+
+      {!ohneProfil ? (
         <section aria-labelledby="bereiche">
           <h2 id="bereiche" className="text-gross font-bold">
             {x.heute.bereiche}

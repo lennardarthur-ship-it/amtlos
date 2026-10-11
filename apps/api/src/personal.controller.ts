@@ -158,7 +158,7 @@ export class PersonalController {
   }
 
   /**
-   * Schwellenwert-Wächter (6.6): Welche Pflichten kämen bei 10, 20, 50, 150, 250 Beschäftigten hinzu?
+   * Schwellenwert-Wächter (6.6): Welche Pflichten kämen bei 10, 20, 50, 150, 250 Beschäftigten hinzu (je Stufe nur die neuen)? Die erste Stufe ist immer „eine Person mehr“, damit niedrige Schwellen (z. B. Ersthelfer) nicht erst bei 10 auftauchen.
    * Berechnet mit dem aktiven Katalog und dem heutigen Profil, nur die Beschäftigtenzahl verändert.
    * Pflichten, deren Zählweise offen ist, erscheinen als „zu prüfen“.
    */
@@ -176,17 +176,20 @@ export class PersonalController {
         new Map(auswerten({ katalog: aktiv.katalog, fakten: profilZuFakten({ ...profil.daten, "beschaeftigte.gesamt": gesamt }), ereignisse: [], stichtag, kalender }).map((e) => [e.pflicht_id, e]));
       const basis = lauf(aktuell);
       const titel = new Map(aktiv.katalog.pflichten.map((p) => [p.id, t(p.titel, k.sprache)]));
+      // Je Schwelle nur, was gegenüber der vorigen Stufe neu hinzukommt; leere Zwischenstufe „eine Person mehr“ entfällt
+      let vorher = basis;
       return {
         aktuell,
-        schwellen: SCHWELLEN.filter((s) => s > aktuell).map((s) => {
+        schwellen: [...new Set([aktuell + 1, ...SCHWELLEN])].filter((s) => s > aktuell).sort((a, b) => a - b).map((s) => {
           const neu = lauf(s);
-          const kommen = [...neu.values()].filter((e) => !e.radar && e.ergebnis !== "gilt_nicht" && basis.get(e.pflicht_id)?.ergebnis === "gilt_nicht");
+          const kommen = [...neu.values()].filter((e) => !e.radar && e.ergebnis !== "gilt_nicht" && vorher.get(e.pflicht_id)?.ergebnis === "gilt_nicht");
+          vorher = neu;
           return {
             ab: s,
             neu: kommen.filter((e) => e.ergebnis === "gilt").map((e) => ({ pflicht_id: e.pflicht_id, titel: titel.get(e.pflicht_id) })),
             zu_pruefen: kommen.filter((e) => e.ergebnis === "unbekannt").map((e) => ({ pflicht_id: e.pflicht_id, titel: titel.get(e.pflicht_id) })),
           };
-        }),
+        }).filter((x) => SCHWELLEN.includes(x.ab) || x.neu.length + x.zu_pruefen.length > 0),
       };
     });
   }

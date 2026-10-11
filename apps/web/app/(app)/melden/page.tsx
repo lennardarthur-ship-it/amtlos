@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -7,9 +8,12 @@ import { t } from "@/lib/sprache";
 
 export const metadata = { title: "Änderung melden" };
 
-/** Ereignisse, die Nutzer selbst melden; system-erzeugte (Schwellen) und Gründung (aus dem Profil) nicht. */
+/**
+ * Ereignisse, die Nutzer selbst melden; system-erzeugte (Schwellen) und Gründung (aus dem Profil) nicht.
+ * Einstellung und Austritt laufen über „Personal“ (dort entsteht zugleich der Eintrag in der Personalliste).
+ */
 const MELDBAR = [
-  "erste_einstellung", "einstellung", "austritt", "neuer_arbeitsplatz", "neue_taetigkeit", "arbeitsunfall",
+  "neuer_arbeitsplatz", "neue_taetigkeit", "arbeitsunfall",
   "schwangerschaft_mitgeteilt", "neuer_vertriebskanal", "kasse_angeschafft", "kasse_ausser_betrieb",
   "rechtsformwechsel", "sitzverlegung", "gesellschafterwechsel", "datenpanne", "betriebsaufgabe",
 ] as const;
@@ -42,6 +46,9 @@ export default async function MeldenSeite({ searchParams }: { searchParams: Prom
       <header className="lesetext">
         <h1 className="text-titel font-bold">{x.melden.titel}</h1>
         <p className="mt-2">{x.melden.text}</p>
+        <p className="mt-2 text-klein">
+          {x.melden.personal_hinweis} <Link href="/personal" className="verweis">{x.nav.personal}</Link>
+        </p>
       </header>
       {gemeldet ? (
         <p role="status" className="lesetext rounded-md bg-amt-hauch p-4 font-bold text-amt">
