@@ -89,3 +89,23 @@ Eine Marke (E-105) gilt für die Hostnamen, die im Studio unter „Marken“ ein
 ## Skalierung
 
 Lasttest: `PGHOST=… node scripts/lasttest-neuberechnung.mjs 10000 8` (Ergebnisse in docs/testberichte/lasttest.md). Mehrere API- und Worker-Instanzen sind möglich (Caches je Prozess sind unkritisch). Die Ratenbegrenzung zählt je Instanz (G-23).
+
+## Identity-Provider (Zitadel)
+
+Lokal: `docker compose --profile auth up -d`, Konsole unter http://localhost:8080/ui/console (Zugang steht in docker-compose.yml). Dort ein Projekt „Amtlos“ anlegen mit einer Web-Anwendung (PKCE, Redirect `http://localhost:3000/auth/rueckruf`) und einer nativen Anwendung für die App (Redirect `amtlos://anmelden`). Dann `AUTH_MODUS=oidc`, `OIDC_ISSUER=http://localhost:8080`, `OIDC_CLIENT_ID` (Web) bzw. `OIDC_AUDIENCE` (API) setzen. Passkeys sind in der Standardinstanz erlaubt. In Produktion läuft Zitadel hinter TLS unter `login.<domain>` auf derselben Datenbank (eigene DB `zitadel`).
+
+## Abo (Stripe)
+
+`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PREIS_ID` (ein wiederkehrender Preis; `lookup_key` wird als Plan gespeichert) und optional `ABO_TESTTAGE`. Webhook-Endpunkt: `POST <API_URL>/v1/stripe/webhook` mit den Ereignissen `checkout.session.completed`, `customer.subscription.*`, `invoice.paid`, `invoice.payment_failed`. Im Stripe-Dashboard: automatische Steuer und USt-IdNr.-Erfassung einschalten (die Checkout-Session verlangt beides), Kundenportal mit Kündigung freigeben. Ohne Schlüssel läuft nur die Testphase; nach ihrem Ende ist Schreiben gesperrt (402), Lesen nicht.
+
+## Löschen und Export
+
+Täglicher Job `loeschlauf` (03:30) ruft `app.endgueltig_loeschen()` für Unternehmen, die vor mehr als 30 Tagen gelöscht wurden. Export: `GET /v1/export` (JSON) bzw. in den Einstellungen.
+
+## Rechtsseiten
+
+`RECHT_*` (siehe .env.example) füllen die Platzhalter; `RECHT_FREIGEGEBEN=ja` erst nach anwaltlicher Prüfung – vorher steht der Entwurfshinweis auf den Seiten.
+
+## Umfang
+
+`AMTLOS_UMFANG` (Web): leer = Kernmodule für Gründer (E-110), `alles` = alle Module, oder Liste wie `radar,frag`. CI prüft beide.

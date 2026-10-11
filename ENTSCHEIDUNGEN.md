@@ -429,6 +429,41 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - Jede Mandantentabelle braucht einen Index mit `unternehmen_id` vorne. Migration 0017 ergänzt 24 fehlende, ein Schematest erzwingt die Regel. Die Erinnerungsplanung schreibt nur noch Unterschiede. Lasttest mit 10.000 Unternehmen und 146 Pflichten: Tageswechsel hochgerechnet 14,8 Minuten für 100.000 Unternehmen, Durchsatz unabhängig von der Mandantenzahl (docs/testberichte/lasttest.md).
 - Horizontal: API und Worker sind zustandslos bis auf Prozess-Caches (Katalog je Release, Konten fünf Minuten). Diese Caches sind unkritisch, weil ein neues Release eine neue ID hat. Die Ratenbegrenzung zählt je Prozess (E-082). Bei mehreren API-Instanzen wirkt das Limit also je Instanz; vor dem Livegang gehört sie an den Ingress oder in einen gemeinsamen Speicher (G-23). Worker skalieren über pg-boss (je Unternehmen ein Singleton-Job).
 
+### E-110 · Launch-Umfang: Kernmodule für Gründer, Breite hinter einem Schalter
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Zielgruppe der ersten zehn Wochen sind Gründer und Solo-Selbstständige. Sichtbar sind nur Heute, Pflichten, Kalender, Gründung, Finanzen, Personal (ohne Arbeitsschutz-Werkzeuge), Postfach, Team, Einstellungen, Hilfe. Datenschutz-Werkzeuge, Arbeitsschutz-Werkzeuge, Online-Check, Branchen-Werkzeuge, Marktplatz, Frag Amtlos, Radar und Kanzlei sind mit `AMTLOS_UMFANG` (leer = Kern, `alles`, oder Liste) abgeschaltet: keine Navigation, keine Links, Seiten antworten mit 404. Der Code bleibt, die API bleibt. Pflichten dieser Bereiche bleiben im Katalog sichtbar, nur ohne „In Amtlos erledigen“.
+- Grund: Jede sichtbare Funktion kostet Erklärung, Support und Prüfaufwand. Für den Aha-Moment zählt nur der Kern. CI testet beide Umfänge (voller Rundgang mit `alles`, Kern-Rundgang mit Standard).
+
+### E-111 · Schnellstart mit fünf Schritten, alles Weitere als Nachfragen
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Das Onboarding stellt nur noch die Kernfragen (`schnell: true`): Rechtsform (+ Handelsregister bei Kapitalgesellschaften), Tätigkeit und Branche, Start und **Bundesland** (statt Gemeindeschlüssel), Kleinunternehmerregelung, Beschäftigte. Fünf Schritte, etwa zwei Minuten. Der Gemeindeschlüssel bleibt optional (nur für örtliche Feiertage) und bestimmt das Bundesland, wenn er angegeben ist.
+- Alle übrigen Fragen bleiben im Katalog der Fragen und werden als **Nachfragen** gestellt: auf „Heute“ als eine Fragerunde je Thema („Nächste Runde: Steuern – 4 Fragen“), in der Reihenfolge der Schritte, nur unbeantwortete Fragen. Fehlende Angaben erscheinen nicht mehr als einzelne Aufgaben, sondern als diese Runden; in der Dringlichkeit stehen sie hinter allen Fristen eines Jahres.
+- Nach dem letzten Schritt aktualisiert sich „Heute“ selbst, bis die erste Berechnung fertig ist, und zeigt dann die Willkommenskarte mit den Zahlen, die zählen: geltende Pflichten und Fristen in den nächsten 90 Tagen.
+
+### E-112 · Heute: eine klare nächste Handlung
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Reihenfolge auf „Heute“: Willkommen (einmal) · Erledigt-Bestätigung · Meldungen · **Jetzt dran** (eine Karte mit Knopf) · Danach (zwei Zeilen) · Zähler mit Fortschritt (erledigt in Prozent) · Gründung · Nachfragen · Fristen vor dem Start (leise) · weitere Termine · Melden · Bereiche. Erledigen führt mit Bestätigung zurück auf „Heute“, wo sofort das Nächste steht; die Notiz ist eingeklappt. Fehlerseite innerhalb der App behält die Navigation und sagt, dass die Daten sicher sind.
+- Bewusst ohne Lade-Skelett: Die Seiten antworten serverseitig in unter 150 ms; ein aufblitzendes Skelett wäre schlechter als nichts (und machte die E2E-Prüfung unzuverlässig).
+
+### E-113 · Abo: Testphase, dann Stripe; Lesen bleibt immer möglich
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Jedes Unternehmen beginnt mit einer Testphase (`ABO_TESTTAGE`, Standard 14; Trigger beim Anlegen). Danach sperrt die API **nur das Schreiben** (HTTP 402 mit Abo-Stand); Lesen, Export, Abo abschließen, Team verlassen und Unternehmen löschen gehen immer. Die Web-App leitet bei 402 auf die Abo-Seite; sieben Tage vor Ende erscheint ein Hinweis. Bei Zahlungsproblemen 14 Tage Kulanz.
+- Stripe ohne SDK: Checkout-Session (Abo, automatische Steuer, USt-IdNr.-Erfassung), Kundenportal, Webhook mit Signaturprüfung über den rohen Body und Idempotenz über die Ereignis-ID (`app.abrechnungsereignis`). Der Abo-Status ändert sich nur über Systemfunktionen, nie direkt aus der App. Preis und Plan sind Konfiguration (`STRIPE_PREIS_ID`), ohne Schlüssel ist Bezahlen abgeschaltet (nur Testphase). In staging/prod sind die Stripe-Variablen Pflicht.
+
+### E-114 · Löschen und Export (DSGVO Art. 17 und 20)
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- **Export:** alle Tabellen des Unternehmens als eine JSON-Datei (Inhaber/Admin); Dateien bleiben einzeln abrufbar.
+- **Unternehmen löschen** (nur Inhaber, Name zur Bestätigung): sofort für alle unsichtbar (RLS-Policy prüft `geloescht_am`), Erinnerungen weg, Abo beendet. Nach 30 Tagen löscht der Worker personenbezogene Daten ohne Aufbewahrungspflicht und macht Namen unkenntlich. Belege, Rechnungen, Nachweise, Zeiten und Unterweisungen bleiben bis zur Klärung der Aufbewahrungsfristen (G-09) – ohne Unternehmensnamen und ohne Personennamen.
+- **Konto löschen:** nur ohne aktives Unternehmen; E-Mail, Name und Identitätskennung werden unkenntlich (das Konto bleibt als Zeile für Audit und Nachweise, ist aber niemandem mehr zuzuordnen).
+
+### E-115 · Rechtsseiten als Konfiguration mit sichtbarem Entwurfshinweis
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Impressum, Datenschutzerklärung und Nutzungsbedingungen liegen als strukturierte Texte in den Übersetzungen; Betreiberangaben kommen aus `RECHT_*`. Solange `RECHT_FREIGEGEBEN` nicht `ja` ist, steht oben der Hinweis, dass die Seite ein Entwurf ist (T-46). Links stehen im Fuß jeder Seite und auf der Anmeldeseite.
+
+### E-116 · Leistungsbudget
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Kernseiten antworten serverseitig in unter 1,5 s und sind in unter 3 s vollständig geladen (auf dem CI-Läufer geprüft; lokal unter 150 ms). Die E2E-Prüfung misst das bei jedem Lauf. JavaScript nur, wo es Interaktion braucht (Kopierfeld, Auto-Aktualisierung, Navigation).
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

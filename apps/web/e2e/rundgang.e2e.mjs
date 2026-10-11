@@ -469,6 +469,16 @@ async function rundgang(farbschema, breite) {
   await p.selectOption('select[name="sprache"]', "de");
   await Promise.all([p.waitForLoadState("networkidle"), p.getByRole("button", { name: "Save language" }).click()]);
 
+  // Leistungsbudget (E-116): Serverantwort der Kernseiten unter 1,5 s, Seite komplett unter 3 s – auch auf dem CI-Läufer
+  if (farbschema === "light") {
+    for (const seite of ["heute", "pflichten", "kalender"]) {
+      await p.goto(`${B}/${seite}`, { waitUntil: "load" });
+      const z = await p.evaluate(() => { const n = performance.getEntriesByType("navigation")[0]; return { ttfb: Math.round(n.responseStart - n.requestStart), load: Math.round(n.loadEventEnd - n.startTime) }; });
+      console.log(`Leistung ${seite}: TTFB ${z.ttfb} ms, geladen ${z.load} ms`);
+      pruefe(z.ttfb < 1500 && z.load < 3000, `${name(seite)}: Leistungsbudget verfehlt (TTFB ${z.ttfb} ms, geladen ${z.load} ms)`);
+    }
+  }
+
   // Abo-Stand und Datenexport; Unternehmen löschen mit Namensbestätigung (eigenes Wegwerf-Konto)
   if (farbschema === "light") {
     await p.goto(`${B}/einstellungen`);
