@@ -6,7 +6,7 @@
   "scripts": {
     "validate": "node scripts/validate-katalog.mjs ../../catalog",
     "validate:prod": "node scripts/validate-katalog.mjs ../../catalog --prod",
-    "test": "node scripts/validate-katalog.mjs ../../catalog",
+    "test": "node --test test/meldungen.test.mjs && node scripts/validate-katalog.mjs ../../catalog",
     "lint": "echo 'kein TS-Code'"
   },
   "devDependencies": {

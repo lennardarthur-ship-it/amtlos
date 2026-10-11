@@ -1,7 +1,8 @@
 import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { PASSENDE_QUALIFIKATION, StudioFehler, neuePflichtversion, pflichtVersionen, pruefentscheidung, testlauf, type Qualifikation } from "@amtlos/server";
-import { darfPruefen, darfRedigieren, datenbank, fixtureVerzeichnis, ich } from "@/lib/studio";
+import { darfPruefen, darfRedigieren, datenbank, editorDaten, fixtureVerzeichnis, ich } from "@/lib/studio";
+import { PflichtEditor } from "../editor";
 
 type Params = Promise<{ id: string }>;
 const STATUS: Record<string, string> = { entwurf: "Entwurf", in_pruefung: "In Prüfung", freigegeben: "Freigegeben", abgelehnt: "Abgelehnt", zurueckgezogen: "Zurückgezogen" };
@@ -151,15 +152,10 @@ export default async function PflichtStudio({ params, searchParams }: { params: 
       ) : null}
 
       {darfRedigieren(k) ? (
-        <section aria-labelledby="bearbeiten">
-          <h2 id="bearbeiten" className="text-gross font-bold">Neue Version anlegen</h2>
-          <p className="lesetext text-klein text-tinte-leise">
-            Inhalt der neuesten Version als JSON nach pflicht.schema.json. Gespeichert wird immer eine neue Version, die erst nach Vier-Augen-Prüfung freigegeben ist. Ein Formular-Editor ohne JSON folgt.
-          </p>
-          <form action={speichern.bind(null, id)} className="mt-3 space-y-3">
-            <textarea name="daten" rows={28} spellCheck={false} className="feld font-mono text-klein" defaultValue={JSON.stringify(neueste.daten, null, 2)} aria-label="Pflicht als JSON" />
-            <button className="knopf">Als neue Version speichern</button>
-          </form>
+        <section aria-labelledby="bearbeiten" className="space-y-3">
+          <h2 id="bearbeiten" className="text-titel font-bold">Neue Version bearbeiten</h2>
+          <p className="lesetext text-klein text-tinte-leise">Startet mit dem Inhalt von Version {neueste.version}. Beim Speichern prüft das System Schema, Fakten, Operatoren, Regelwerte und Verweise.</p>
+          <PflichtEditor start={neueste.daten} daten={await editorDaten()} aktion={speichern.bind(null, id)} knopf="Als neue Version speichern" />
         </section>
       ) : null}
 

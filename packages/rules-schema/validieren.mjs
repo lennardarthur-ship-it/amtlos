@@ -7,9 +7,15 @@ import addFormats from "ajv-formats";
 import YAML from "yaml";
 
 const schemaDir = path.dirname(fileURLToPath(import.meta.url));
-const ajv = new Ajv2020({ allErrors: true, strict: true, strictRequired: false, strictTypes: false });
+const ajv = new Ajv2020({ allErrors: true, strict: true, strictRequired: false, strictTypes: false, verbose: true });
 addFormats(ajv);
-const pruefePflicht = ajv.compile(JSON.parse(fs.readFileSync(path.join(schemaDir, "pflicht.schema.json"), "utf8")));
+const pflichtSchema = JSON.parse(fs.readFileSync(path.join(schemaDir, "pflicht.schema.json"), "utf8"));
+const pruefePflicht = ajv.compile(pflichtSchema);
+/** Schema-Objekt → Pfad, um oneOf-Fehler ihrer Stelle im Schema zuzuordnen (Ajv liefert relative schemaPaths). */
+const SCHEMA_PFAD = new Map([
+  ...Object.entries(pflichtSchema.$defs).map(([k, v]) => [v, `/$defs/${k}`]),
+  [pflichtSchema.$defs.fristWiederkehrend.properties.faellig, "/$defs/fristWiederkehrend/properties/faellig"],
+]);
 const pruefeRegelwert = ajv.compile(JSON.parse(fs.readFileSync(path.join(schemaDir, "regelwert.schema.json"), "utf8")));
 const fakten = new Map(JSON.parse(fs.readFileSync(path.join(schemaDir, "fakten.json"), "utf8")).fakten.map((f) => [f.pfad, f]));
 const ereignisse = new Set(JSON.parse(fs.readFileSync(path.join(schemaDir, "ereignisse.json"), "utf8")).ereignisse.map((e) => e.typ));
@@ -26,6 +32,78 @@ const OPS_FUER_TYP = {
 };
 const IMMER_ERLAUBT = ["vorhanden", "nicht_vorhanden"];
 
+const FELDNAMEN = {
+  titel: "Titel", kurz: "In einem Satz", erklaerung: "Erklärung", stelle: "Zuständige Stelle", sanktion: "Folgen", text: "Text",
+  rechtsgrundlage: "Rechtsgrundlagen", quellen: "Quellen", ausloeser: "Auslöser", frist: "Frist", wiederholung: "Wiederholung",
+  kategorie: "Kategorie", kanal: "Kanal", automatisierung: "Automatisierung", status_recht: "Rechtsstatus", gueltig_ab: "Gültig ab",
+  gueltig_bis: "Gültig bis", begriffe: "Fachbegriffe", begriff: "Begriff", titel_quelle: "Titel", url: "Adresse", abgerufen: "Abgerufen am",
+  de: "Deutsch", en: "Englisch", radar: "Radar", wahrscheinlichkeit: "Wahrscheinlichkeit", versatz: "Versatz", datum: "Datum",
+  verschiebung: "Verschiebung", faellig: "Fälligkeit", termine: "Termine", rhythmus: "Rhythmus", id: "ID", schwere: "Schwere",
+};
+
+/** Ajv-Meldungen in verständliches Deutsch für die Redaktion. */
+export function meldungDeutsch(e) {
+  const pfad = (e.instancePath || "").split("/").filter(Boolean).map((t) => (/^\d+$/.test(t) ? `Nr. ${Number(t) + 1}` : FELDNAMEN[t] ?? t)).join(" › ");
+  const wo = pfad || "Pflicht";
+  switch (e.keyword) {
+    case "required": return `${wo}: „${FELDNAMEN[e.params.missingProperty] ?? e.params.missingProperty}“ fehlt`;
+    case "minLength": return `${wo}: darf nicht leer sein`;
+    case "minItems": return `${wo}: braucht mindestens ${e.params.limit} Eintrag${e.params.limit === 1 ? "" : "e"}`;
+    case "enum": return `${wo}: muss einer dieser Werte sein: ${e.params.allowedValues.join(", ")}`;
+    case "const": return `${wo}: muss „${e.params.allowedValue}“ sein`;
+    case "format": return `${wo}: hat nicht das richtige Format (${e.params.format === "date" ? "Datum JJJJ-MM-TT" : e.params.format === "uri" ? "vollständige Adresse mit https://" : e.params.format})`;
+    case "pattern": return `${wo}: hat nicht die erlaubte Form`;
+    case "type": return `${wo}: falscher Typ (erwartet ${e.params.type})`;
+    case "additionalProperties": return `${wo}: unbekanntes Feld „${e.params.additionalProperty}“`;
+    case "minimum": case "maximum": case "exclusiveMinimum": return `${wo}: Wert außerhalb des erlaubten Bereichs`;
+    case "oneOf": case "anyOf": return `${wo}: passt zu keiner erlaubten Variante`;
+    case "if": return null; // Folgemeldung, die eigentliche Ursache steht separat
+    case "variante": return `${wo}: unbekannte Art – ${e.params.art.endsWith("bedingung") ? "erlaubt sind all, any, not, immer, ereignis oder feld" : e.params.art.endsWith("frist") ? "typ muss dauerhaft, absolut, relativ oder wiederkehrend sein" : "art passt zu keiner erlaubten Fälligkeit"}`;
+    default: return `${wo}: ${e.message}`;
+  }
+}
+
+/**
+ * Bei oneOf (Bedingung, Frist, …) meldet Ajv die Fehler aller Varianten – für Menschen unlesbar.
+ * Hier wird die gemeinte Variante am Unterscheidungsmerkmal erkannt (Schlüssel bzw. typ/art) und nur
+ * gegen diese erneut geprüft, rekursiv. Ohne erkennbares Merkmal bleibt „passt zu keiner Variante“.
+ */
+const SCHEMA_ID = "https://amtlos.de/schemas/pflicht/1.json";
+const VARIANTE = {
+  "/$defs/bedingung": (d) => (d && typeof d === "object" ? ({ all: "alle", any: "eine", not: "nicht", immer: "immer", ereignis: "ereignistest", feld: "vergleich" })[["all", "any", "not", "immer", "ereignis", "feld"].find((k) => k in d)] : undefined)?.replace(/^/, "/$defs/"),
+  "/$defs/frist": (d) => ({ dauerhaft: "/$defs/fristDauerhaft", absolut: "/$defs/fristAbsolut", relativ: "/$defs/fristRelativ", wiederkehrend: "/$defs/fristWiederkehrend" })[d?.typ],
+  "/$defs/fristWiederkehrend/properties/faellig": (d) => {
+    const i = ["tag_nach_periodenende", "feste_termine", "n_letzter_bankarbeitstag"].indexOf(d?.art);
+    return i < 0 ? undefined : `/$defs/fristWiederkehrend/properties/faellig/oneOf/${i}`;
+  },
+};
+const liesPfad = (d, pfad) => pfad.split("/").filter(Boolean).reduce((x, k) => (x == null ? x : x[k.replace(/~1/g, "/").replace(/~0/g, "~")]), d);
+
+function erklaere(validator, daten, praefix = "") {
+  if (validator(daten)) return [];
+  let errs = validator.errors.map((e) => ({ ...e, instancePath: praefix + e.instancePath }));
+  const oneOfs = errs.filter((e) => e.keyword === "oneOf").sort((a, b) => a.instancePath.length - b.instancePath.length);
+  const erledigt = [];
+  for (const o of oneOfs) {
+    if (erledigt.some((p) => o.instancePath.startsWith(p))) continue;
+    const wahl = VARIANTE[SCHEMA_PFAD.get(o.parentSchema)]?.(liesPfad(daten, o.instancePath.slice(praefix.length)));
+    const art = SCHEMA_PFAD.get(o.parentSchema);
+    if (!VARIANTE[art]) continue;
+    erledigt.push(o.instancePath);
+    const unter = wahl ? ajv.getSchema(`${SCHEMA_ID}#${wahl}`) : undefined;
+    if (!unter) {
+      // Unterscheidungsmerkmal fehlt: eine klare Meldung statt der Fehler aller Varianten
+      errs = [...errs.filter((e) => !(e.instancePath === o.instancePath || e.instancePath.startsWith(`${o.instancePath}/`))), { keyword: "variante", instancePath: o.instancePath, params: { art }, schemaPath: "" }];
+      continue;
+    }
+    errs = [
+      ...errs.filter((e) => !(e.instancePath === o.instancePath || e.instancePath.startsWith(`${o.instancePath}/`))),
+      ...erklaere(unter, liesPfad(daten, o.instancePath.slice(praefix.length)), o.instancePath),
+    ];
+  }
+  return errs;
+}
+
 /**
  * Prüft eine einzelne Pflichtversion: JSON-Schema, Fakten, Operatoren, Enum-Werte, Regelwerte, Ereignisse, Verweise.
  * Genutzt vom Katalog-Validator und vom Studio beim Speichern.
@@ -36,8 +114,7 @@ const IMMER_ERLAUBT = ["vorhanden", "nicht_vorhanden"];
 export function pruefePflichtObjekt(p, kontext) {
   const fehler = [];
   if (!pruefePflicht(p)) {
-    for (const e of pruefePflicht.errors) fehler.push(`${e.instancePath || "/"} ${e.message}${e.params?.additionalProperty ? ` (${e.params.additionalProperty})` : ""}`);
-    return fehler;
+    return [...new Set(erklaere(pruefePflicht, p).map(meldungDeutsch).filter(Boolean))];
   }
   const pruefeWert = (fakt, op, wert, pfad) => {
     if (wert && typeof wert === "object" && !Array.isArray(wert) && "regelwert" in wert) {

@@ -3,7 +3,9 @@ import path from "node:path";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 import type PgBoss from "pg-boss";
+import { createRequire } from "node:module";
 import { Datenbank, JOBS, erzeugeWarteschlange, studioKonto, type StudioKonto, type Tx } from "@amtlos/server";
+import type { EditorDaten } from "@/app/(studio)/pflichten/editor";
 import { sitzung } from "@amtlos/web-kern/sitzung";
 
 /**
@@ -50,3 +52,16 @@ export const ich = cache(async (): Promise<StudioKonto> => {
 
 export const darfRedigieren = (k: StudioKonto) => k.rollen.includes("redaktion") || k.rollen.includes("plattform_admin");
 export const darfPruefen = (k: StudioKonto) => k.rollen.includes("experte") || k.rollen.includes("plattform_admin");
+
+const require = createRequire(import.meta.url);
+
+/** Auswahllisten für den Formular-Editor: Fakten und Ereignisse aus dem Schema-Paket, IDs aus der Datenbank. */
+export async function editorDaten(): Promise<EditorDaten> {
+  const fakten = (require("@amtlos/rules-schema/fakten.json") as { fakten: EditorDaten["fakten"] }).fakten;
+  const ereignisse = (require("@amtlos/rules-schema/ereignisse.json") as { ereignisse: { typ: string }[] }).ereignisse.map((e) => e.typ);
+  const { regelwerte, pflichten } = await datenbank().imKontext({}, async (tx) => ({
+    regelwerte: (await tx.abfrage<{ id: string }>("select id from katalog.regelwert order by id")).map((r) => r.id),
+    pflichten: (await tx.abfrage<{ id: string }>("select id from katalog.pflicht order by id")).map((r) => r.id),
+  }));
+  return { fakten, ereignisse, regelwerte, pflichten };
+}

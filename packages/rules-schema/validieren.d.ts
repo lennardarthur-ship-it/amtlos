@@ -8,3 +8,4 @@ export interface KatalogPruefung {
 }
 export function validiereKatalog(katalogDir: string, optionen?: { prod?: boolean }): KatalogPruefung;
 export function pruefePflichtObjekt(p: unknown, kontext: { regelwertIds: Set<string>; pflichtIds: Set<string>; prod?: boolean }): string[];
+export function meldungDeutsch(e: { keyword: string; instancePath: string; params: Record<string, unknown>; message?: string }): string | null;

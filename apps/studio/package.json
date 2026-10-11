@@ -8,7 +8,9 @@
     "build": "next build",
     "start": "next start -p 3100",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint app lib"
+    "lint": "eslint app lib",
+    "test": "vitest run",
+    "e2e": "node e2e/editor.e2e.mjs"
   },
   "dependencies": {
     "@amtlos/rules-engine": "workspace:*",
@@ -19,12 +21,15 @@
     "pg-boss": "^10.1.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "server-only": "^0.0.1"
+    "server-only": "^0.0.1",
+    "@amtlos/rules-schema": "workspace:*"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
-    "tailwindcss": "^4.1.0"
+    "tailwindcss": "^4.1.0",
+    "playwright-core": "^1.56.0",
+    "@axe-core/playwright": "^4.10.0"
   }
 }

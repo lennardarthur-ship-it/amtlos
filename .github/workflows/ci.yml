@@ -67,7 +67,7 @@ jobs:
         run: pnpm --filter @amtlos/server --filter @amtlos/api --filter @amtlos/worker test
 
   e2e:
-    name: End-to-End und Barrierefreiheit (WCAG 2.2 AA)
+    name: End-to-End Web und Studio, Barrierefreiheit (WCAG 2.2 AA)
     runs-on: ubuntu-latest
     timeout-minutes: 25
     services:
@@ -104,9 +104,16 @@ jobs:
           UMGEBUNG=dev WORKER_DATABASE_URL=postgresql://worker_user:amtlos@localhost:5432/amtlos nohup node apps/worker/dist/main.js > worker.log 2>&1 &
           UMGEBUNG=dev AUTH_MODUS=dev WEB_URL=http://localhost:3000 API_INTERN_URL=http://localhost:3001 \
             SITZUNG_SCHLUESSEL=ci-sitzung-schluessel-mindestens-32-zeichen-lang nohup pnpm --filter @amtlos/web start > web.log 2>&1 &
-          for i in $(seq 1 60); do curl -sf localhost:3001/v1/gesundheit >/dev/null && curl -s -o /dev/null localhost:3000/anmelden && break; sleep 1; done
-      - name: Rundgang
+          MIGRATION_DATABASE_URL=postgresql://amtlos_owner:amtlos@localhost:5432/amtlos \
+            node packages/server/dist/cli.js plattformrolle redakteurin r@example.org "Rita Redaktion" redaktion
+          UMGEBUNG=dev AUTH_MODUS=dev WEB_URL=http://localhost:3100 COOKIE_PRAEFIX=amtlos_studio \
+            SITZUNG_SCHLUESSEL=ci-studio-schluessel-mindestens-32-zeichen-lang \
+            STUDIO_DATABASE_URL=postgresql://studio_user:amtlos@localhost:5432/amtlos nohup pnpm --filter @amtlos/studio start > studio.log 2>&1 &
+          for i in $(seq 1 60); do curl -sf localhost:3001/v1/gesundheit >/dev/null && curl -s -o /dev/null localhost:3000/anmelden && curl -s -o /dev/null localhost:3100/anmelden && break; sleep 1; done
+      - name: Rundgang Web-App
         run: E2E_URL=http://localhost:3000 E2E_BILDER=$PWD/e2e-bilder pnpm --filter @amtlos/web e2e
+      - name: Rundgang Studio-Editor
+        run: STUDIO_URL=http://localhost:3100 pnpm --filter @amtlos/studio e2e
       - if: always()
         uses: actions/upload-artifact@v4
         with:

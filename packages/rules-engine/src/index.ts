@@ -5,3 +5,4 @@ export * from "./bedingung.js";
 export * from "./fakten.js";
 export * from "./auswerten.js";
 export * from "./erklaerung.js";
+export * from "./klartext.js";

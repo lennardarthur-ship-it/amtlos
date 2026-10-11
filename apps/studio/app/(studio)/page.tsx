@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { pflichtUebersicht } from "@amtlos/server";
-import { datenbank, ich } from "@/lib/studio";
+import { darfRedigieren, datenbank, ich } from "@/lib/studio";
 
 export const metadata = { title: "Pflichten" };
 
 const STATUS: Record<string, string> = { entwurf: "Entwurf", in_pruefung: "In Prüfung", freigegeben: "Freigegeben", abgelehnt: "Abgelehnt", zurueckgezogen: "Zurückgezogen" };
 
 export default async function Uebersicht() {
-  await ich();
+  const k = await ich();
   const liste = await pflichtUebersicht(datenbank());
   const freigegeben = liste.filter((p) => p.pruef_status === "freigegeben").length;
   const kategorien = [...new Set(liste.map((p) => p.kategorie))].sort();
@@ -19,6 +19,7 @@ export default async function Uebersicht() {
           {freigegeben} von {liste.length} Pflichten fachlich freigegeben
         </h1>
         <p className="mt-1 text-tinte-leise">Ohne Freigabe erscheint eine Pflicht in prod nicht (E-002, E-038).</p>
+        {darfRedigieren(k) ? <Link href="/pflichten/neu" className="knopf mt-4">Neue Pflicht anlegen</Link> : null}
         <dl className="mt-4 grid grid-cols-2 gap-x-8 sm:grid-cols-4">
           {kategorien.map((k) => {
             const alle = liste.filter((p) => p.kategorie === k);
