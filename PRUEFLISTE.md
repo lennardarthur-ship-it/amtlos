@@ -37,6 +37,7 @@ Stand: 2026-10-11 (Bauabschnitt 2)
 | T-08 | USt-Voranmeldung: Zuordnung der Summen zu den Kennzahlen des Formulars; Leistungs- oder Rechnungsdatum; Soll-/Ist-Versteuerung | StB | E-089 |
 | T-09 | Pflichtangaben auf Rechnungen (§ 14 UStG) vollständig? Kleinbetragsrechnungen (C.29) sind noch nicht abgebildet | StB | E-088 |
 | T-10 | Umsatzsteuersätze (Regelwerte `steuern.ust.satz_regel`, `…_ermaessigt`) stehen nicht in der Spezifikation – gegen das Gesetz prüfen | StB | E-088 |
+| T-11 | XRechnung ohne USt-IdNr.: die Steuernummer wird als Verkäuferkennung (BT-29) eingesetzt, damit BR-CO-26 erfüllt ist – fachlich bestätigen | StB/Tech | E-088 |
 | G-21 | Aufbewahrung (C.32): Fristbeginn und Lösch-/Freigabefristen für Belege und Rechnungen; bis zur Klärung wird nichts gelöscht | StB | E-088 |
 | G-15 | Sammelbestätigung „vor dem Start erledigt“: Wortlaut und ob ein Hinweis zu Nachholpflichten nötig ist | RA | E-072 |
 

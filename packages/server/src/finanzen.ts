@@ -164,6 +164,8 @@ export function eRechnungsDaten(r: RechnungsDaten, kuHinweis: string): Invoice {
     "cac:AccountingSupplierParty": {
       "cac:Party": {
         "cbc:EndpointID": r.steller.email, "cbc:EndpointID@schemeID": "EM",
+        // BR-CO-26: ohne USt-IdNr. braucht der Verkäufer eine Kennung (BT-29) – wir setzen die Steuernummer ein (Prüfpunkt T-11)
+        ...(!r.steller.ust_idnr && r.steller.steuernummer ? { "cac:PartyIdentification": [{ "cbc:ID": r.steller.steuernummer }] } : {}),
         "cac:PostalAddress": { "cbc:StreetName": r.steller.strasse, "cbc:CityName": r.steller.ort, "cbc:PostalZone": r.steller.plz, "cac:Country": { "cbc:IdentificationCode": r.steller.land } },
         ...(steuerSchemas.length ? { "cac:PartyTaxScheme": steuerSchemas } : {}),
         "cac:PartyLegalEntity": { "cbc:RegistrationName": r.steller.name },
