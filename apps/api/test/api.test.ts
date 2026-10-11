@@ -107,6 +107,25 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
     expect(r.body.als_naechstes[0]).toHaveProperty("titel");
   });
 
+  it("bietet Fristen vor dem Start zur Sammelbestätigung an", async () => {
+    // Profil künstlich in die Vergangenheit legen: erstes Profil am 1.10.2026, Stichtag 11.10.
+    const owner = new Datenbank(urls.owner);
+    await owner.imKontext({}, async (tx) => {
+      await tx.abfrage("alter table app.profil_version no force row level security");
+      await tx.abfrage("update app.profil_version set erstellt_am = '2026-10-01' where unternehmen_id = $1", [firma]);
+      await tx.abfrage("alter table app.profil_version force row level security");
+    });
+    await owner.schliessen();
+    const h = await alsAnna(http().get("/v1/heute")).expect(200);
+    // Fällig vor dem 1.10.: USt-VA Juni (10.8.) und Juli (10.9.) sowie die BG-Anmeldung von 2019
+    expect(h.body.vor_start).toEqual({ anzahl: 3, seit: "2026-10-01" });
+    const r = await alsAnna(http().post("/v1/pflichten/vor-start-erledigt")).expect(201);
+    expect(r.body).toEqual({ erledigt: 3 });
+    expect((await alsAnna(http().get("/v1/heute")).expect(200)).body.vor_start.anzahl).toBe(0);
+    const juli = await alsAnna(http().get("/v1/pflichten/steuern.ust_voranmeldung/2026-07")).expect(200);
+    expect(juli.body.nachweise[0].notiz).toMatch(/Sammelbestätigung/);
+  });
+
   it("Erledigen mit Nachweis, wieder öffnen, Rollenprüfung", async () => {
     await alsAnna(http().post("/v1/pflichten/steuern.ust_voranmeldung/2026-09/erledigen")).send({ notiz: "über ELSTER übermittelt" }).expect(201);
     await alsAnna(http().post("/v1/pflichten/steuern.ust_voranmeldung/2026-09/erledigen")).send({}).expect(404);

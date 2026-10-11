@@ -174,7 +174,40 @@ export class PflichtenController {
       zeilen.map((z) => ({ pflicht_id: z.pflicht_id, periode: z.periode, kategorie: z.daten.kategorie, anzeige_status: z.anzeige_status, faellig_am: z.faellig_am, schwere: z.daten.sanktion.schwere })),
       heute(),
     );
-    return { ...u, als_naechstes: u.als_naechstes.map((a) => karten.get(`${a.pflicht_id}|${a.periode}`)) };
+    // Fristen vor dem Start bei Amtlos: beim ersten Profil oft längst erledigt – gesammelt bestätigen lassen
+    const vorStart = await this.db.imKontext({ kontoId: k.kontoId, unternehmenId: k.unternehmenId }, (tx) =>
+      tx.eine<{ anzahl: number; seit: string | null }>(
+        `select count(*)::int as anzahl, (select min(erstellt_am)::date::text from app.profil_version where unternehmen_id = $1) as seit
+           from app.pflicht_instanz
+          where unternehmen_id = $1 and status = 'offen' and faellig_am < (select min(erstellt_am)::date from app.profil_version where unternehmen_id = $1)`,
+        [k.unternehmenId],
+      ),
+    );
+    return { ...u, als_naechstes: u.als_naechstes.map((a) => karten.get(`${a.pflicht_id}|${a.periode}`)), vor_start: vorStart };
+  }
+
+  /** Sammelbestätigung: alle offenen Pflichten, die vor dem ersten Profil fällig waren, als erledigt markieren. */
+  @MitUnternehmen("inhaber", "admin", "steuerberater")
+  @Post("pflichten/vor-start-erledigt")
+  async vorStartErledigt(@Kontext() k: Anfragekontext) {
+    return this.db
+      .imKontext({ kontoId: k.kontoId, unternehmenId: k.unternehmenId }, async (tx) => {
+        const ids = await tx.abfrage<{ id: string }>(
+          `update app.pflicht_instanz set status = 'erledigt', erledigt_am = now(), erledigt_von = $2, erledigt_mit_version_id = pflicht_version_id, aktualisiert_am = now()
+            where unternehmen_id = $1 and status = 'offen'
+              and faellig_am < (select min(erstellt_am)::date from app.profil_version where unternehmen_id = $1)
+            returning id`,
+          [k.unternehmenId, k.kontoId],
+        );
+        for (const { id } of ids)
+          await tx.abfrage(
+            "insert into app.nachweis (unternehmen_id, pflicht_instanz_id, art, notiz, erstellt_von) values ($1, $2, 'bestaetigung', 'Vor dem Start bei Amtlos erledigt (Sammelbestätigung)', $3)",
+            [k.unternehmenId, id, k.kontoId],
+          );
+        if (ids.length) await neuberechnungEinreihen(this.boss, tx, { unternehmenId: k.unternehmenId!, ausgeloestDurch: "vor-start-erledigt" });
+        return { erledigt: ids.length };
+      })
+      .catch(uebersetzeDbFehler);
   }
 
   /** Legt ein Kalender-Abo an; das Token wird nur jetzt im Klartext gezeigt (gespeichert als SHA-256). */

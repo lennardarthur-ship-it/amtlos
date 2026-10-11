@@ -50,6 +50,8 @@ describe("Heute", () => {
     expect(u.als_naechstes.map((x) => x.pflicht_id)).toEqual(["ueber", "bald-niedrig", "angabe"]);
     expect(u.ampel.steuern).toBe("rot");
     expect(u.ampel.personal).toBe("gruen");
+    expect(heuteUebersicht([a({ kategorie: "arbeitsschutz", anzeige_status: "offen", faellig_am: null })], heute).ampel.arbeitsschutz).toBe("gelb");
+    expect(heuteUebersicht([a({ kategorie: "arbeitsschutz", anzeige_status: "offen", faellig_am: "2027-06-01" })], heute).ampel.arbeitsschutz).toBe("gruen");
     expect(u.zaehler).toEqual({ offen: 4, ueberfaellig: 1, angabe_fehlt: 1, erledigt: 1 });
     expect(dringlichkeit(a({ faellig_am: "2026-10-21", schwere: "hoch" }), heute)).toBeLessThan(dringlichkeit(a({ faellig_am: "2026-10-21", schwere: "niedrig" }), heute));
   });

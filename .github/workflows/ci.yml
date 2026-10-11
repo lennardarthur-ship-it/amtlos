@@ -65,3 +65,52 @@ jobs:
         env:
           AMTLOS_DB_TESTS: pflicht
         run: pnpm --filter @amtlos/server --filter @amtlos/api --filter @amtlos/worker test
+
+  e2e:
+    name: End-to-End und Barrierefreiheit (WCAG 2.2 AA)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      DEV_JWT_SECRET: ci-entwicklungs-geheimnis-mindestens-32-zeichen
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: scripts/dev-datenbank.sh
+      - run: pnpm --filter @amtlos/web exec playwright-core install --with-deps chromium
+      - name: Dienste starten
+        run: |
+          UMGEBUNG=dev PORT=3001 AUTH_MODUS=dev WEB_URL=http://localhost:3000 \
+            DATABASE_URL=postgresql://api_user:amtlos@localhost:5432/amtlos nohup node apps/api/dist/main.js > api.log 2>&1 &
+          UMGEBUNG=dev WORKER_DATABASE_URL=postgresql://worker_user:amtlos@localhost:5432/amtlos nohup node apps/worker/dist/main.js > worker.log 2>&1 &
+          UMGEBUNG=dev AUTH_MODUS=dev WEB_URL=http://localhost:3000 API_INTERN_URL=http://localhost:3001 \
+            SITZUNG_SCHLUESSEL=ci-sitzung-schluessel-mindestens-32-zeichen-lang nohup pnpm --filter @amtlos/web start > web.log 2>&1 &
+          for i in $(seq 1 60); do curl -sf localhost:3001/v1/gesundheit >/dev/null && curl -s -o /dev/null localhost:3000/anmelden && break; sleep 1; done
+      - name: Rundgang
+        run: E2E_URL=http://localhost:3000 E2E_BILDER=$PWD/e2e-bilder pnpm --filter @amtlos/web e2e
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-ergebnisse
+          path: |
+            e2e-bilder
+            *.log

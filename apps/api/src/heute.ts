@@ -51,7 +51,8 @@ export function heuteUebersicht(aufgaben: Aufgabe[], heute: Datum, max = 3) {
   for (const a of offen) {
     const b = BEREICH_JE_KATEGORIE[a.kategorie] ?? "gesellschaft";
     if (a.anzeige_status === "ueberfaellig") ampel[b] = "rot";
-    else if ((a.anzeige_status === "faellig_bald" || a.anzeige_status === "angabe_fehlt") && ampel[b] !== "rot") ampel[b] = "gelb";
+    // Gelb auch für offene Pflichten ohne Termin: sie gelten, sind aber nicht erledigt
+    else if ((a.anzeige_status === "faellig_bald" || a.anzeige_status === "angabe_fehlt" || (a.anzeige_status === "offen" && !a.faellig_am)) && ampel[b] !== "rot") ampel[b] = "gelb";
   }
   const als_naechstes = [...offen]
     .sort((x, y) => dringlichkeit(x, heute) - dringlichkeit(y, heute) || x.pflicht_id.localeCompare(y.pflicht_id) || x.periode.localeCompare(y.periode))
