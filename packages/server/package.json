@@ -27,8 +27,12 @@
     "@amtlos/fristen": "workspace:*",
     "@amtlos/rules-engine": "workspace:*",
     "@amtlos/rules-schema": "workspace:*",
+    "@cantoo/fontkit": "2.0.12",
+    "@cantoo/pdf-lib": "2.11.1",
+    "@e-invoice-eu/core": "3.3.0",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
+    "fast-xml-parser": "4.5.7",
     "pg": "^8.13.0",
     "pg-boss": "^10.1.0",
     "yaml": "^2.6.0"
@@ -40,6 +44,7 @@
     "amtlos-server": "./dist/cli.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "schriften"
   ]
 }

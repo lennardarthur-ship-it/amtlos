@@ -1,0 +1,96 @@
+# Katalog C.23 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: steuern.kleinunternehmer_warnung_80
+version: 1
+katalog_nr: C.23
+titel:
+  de: Kleinunternehmergrenze zu 80 % erreicht
+kurz:
+  de: Nach deinen Rechnungen in Amtlos hast du 80 % der Kleinunternehmergrenze erreicht.
+erklaerung:
+  de: Die Kleinunternehmerregelung endet ab dem Umsatz, der die Grenze überschreitet. Amtlos zählt dafür die Rechnungen, die
+    du in Amtlos gestellt hast. Rechnungen außerhalb von Amtlos sind nicht enthalten.
+rechtsgrundlage:
+- § 19 UStG
+kategorie: steuern
+ausloeser:
+  all:
+  - feld: profil.ust.kleinunternehmer
+    op: ==
+    wert: true
+    label:
+      de: Du nutzt die Kleinunternehmerregelung.
+  - any:
+    - all:
+      - feld: abgeleitet.ist_gruendungsjahr
+        op: ==
+        wert: true
+        label:
+          de: Du hast dein Unternehmen in diesem Jahr gegründet.
+      - all:
+        - &id001
+          feld: finanzen.umsatz.laufendes_jahr
+          op: vorhanden
+          label:
+            de: Du stellst Rechnungen mit Amtlos.
+        - feld: finanzen.umsatz.laufendes_jahr
+          op: '>='
+          wert:
+            regelwert: steuern.ustg19.grenze_gruendungsjahr
+            faktor: 0.8
+          label:
+            de: Dein Umsatz im Gründungsjahr hat 80 % der Grenze erreicht.
+        - feld: finanzen.umsatz.laufendes_jahr
+          op: <
+          wert:
+            regelwert: steuern.ustg19.grenze_gruendungsjahr
+            faktor: 0.95
+    - all:
+      - feld: abgeleitet.ist_gruendungsjahr
+        op: ==
+        wert: false
+      - all:
+        - *id001
+        - feld: finanzen.umsatz.laufendes_jahr
+          op: '>='
+          wert:
+            regelwert: steuern.ustg19.grenze_laufendes_jahr
+            faktor: 0.8
+          label:
+            de: Dein Umsatz in diesem Jahr hat 80 % der Grenze erreicht.
+        - feld: finanzen.umsatz.laufendes_jahr
+          op: <
+          wert:
+            regelwert: steuern.ustg19.grenze_laufendes_jahr
+            faktor: 0.95
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Noch keine Folge – eine Warnung, damit du rechtzeitig planen kannst.
+  schwere: mittel
+automatisierung: hinweis
+aktion:
+  art: abhaken
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Umsatzsteuergesetz § 19
+  url: https://www.gesetze-im-internet.de/ustg_1980/__19.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- 'Umsatzbegriff für die Grenze (G-06): Summe der gestellten Rechnungen (netto, abzüglich Stornos) im Kalenderjahr nach Rechnungsdatum
+  – bestätigen'
+- Warnstufen 80 % und 95 % aus der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

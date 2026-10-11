@@ -4,6 +4,7 @@ import { ENGINE_VERSION, auswerten, entscheidendeSaetze, type Ereignis, type Pfl
 import type { Datenbank, Tx } from "./datenbank.js";
 import { kanonisch } from "./katalog-import.js";
 import { ladeAktivenKatalog } from "./katalog.js";
+import { umsatzLaufendesJahr } from "./finanzen.js";
 
 export interface BerechnungsErgebnis {
   status: "berechnet" | "kein_profil" | "kein_katalog";
@@ -96,6 +97,9 @@ export async function neuberechnenInTx(
   for (const i of bestand) if (i.status === "erledigt" && i.erledigt_am && !(i.pflicht_id in erledigt)) erledigt[i.pflicht_id] = i.erledigt_am;
 
   const fakten = profilZuFakten(profil.daten);
+  // Kleinunternehmer-Wächter (C.23): Umsatz aus den Rechnungen in Amtlos, nur wenn welche gestellt wurden
+  const umsatz = await umsatzLaufendesJahr(tx, unternehmenId, Number(stichtag.slice(0, 4)));
+  if (umsatz !== null) fakten["finanzen.umsatz.laufendes_jahr"] = umsatz;
   const fenster = { von: plusMonate(stichtag, -3), bis: plusMonate(stichtag, 12) };
   const ergebnisse = auswerten({ katalog: aktiv.katalog, fakten, ereignisse, stichtag, kalender, erledigt, fenster });
 

@@ -1,0 +1,16 @@
+persona: grenzfall
+beschreibung: 'Kleinunternehmer-Wächter (C.23): Umsatz aus Rechnungen in Amtlos 80000
+  € bei Grenze 100.000 € (Warnstufen 80 %/95 %)'
+stichtag: '2026-10-11'
+fakten:
+  profil.rechtsform: freiberuf
+  profil.gruendungsdatum: '2022-01-01'
+  profil.taetigkeit.einordnung: freiberuf
+  profil.ust.kleinunternehmer: true
+  profil.umsatz.vorjahr: 20000
+  profil.bundesland: BY
+  profil.gemeinde_ags: 09162000
+  finanzen.umsatz.laufendes_jahr: 80000
+erwartet:
+  steuern.kleinunternehmer_warnung_80: gilt
+  steuern.kleinunternehmer_warnung_95: gilt_nicht

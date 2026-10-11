@@ -52,6 +52,34 @@ ausloeser:
         regelwert: steuern.ustg19.grenze_laufendes_jahr
       label:
         de: Dein erwarteter Umsatz in diesem Jahr liegt über der Grenze.
+    - all:
+      - feld: abgeleitet.ist_gruendungsjahr
+        op: ==
+        wert: true
+        label:
+          de: Du hast dein Unternehmen in diesem Jahr gegründet.
+      - &id001
+        feld: finanzen.umsatz.laufendes_jahr
+        op: vorhanden
+        label:
+          de: Du stellst Rechnungen mit Amtlos.
+      - feld: finanzen.umsatz.laufendes_jahr
+        op: '>'
+        wert:
+          regelwert: steuern.ustg19.grenze_gruendungsjahr
+        label:
+          de: Nach deinen Rechnungen in Amtlos liegt dein Umsatz im Gründungsjahr über der Grenze.
+    - all:
+      - feld: abgeleitet.ist_gruendungsjahr
+        op: ==
+        wert: false
+      - *id001
+      - feld: finanzen.umsatz.laufendes_jahr
+        op: '>'
+        wert:
+          regelwert: steuern.ustg19.grenze_laufendes_jahr
+        label:
+          de: Nach deinen Rechnungen in Amtlos liegt dein Umsatz in diesem Jahr über der Grenze.
 frist:
   typ: dauerhaft
 wiederholung:

@@ -209,6 +209,9 @@ pflicht("gruendung.gruendungszuschuss", "A.13", "Gründungszuschuss beantragen",
 GESTARTET = v("abgeleitet.noch_nicht_gestartet", "==", False)
 VORJAHR_VORHANDEN = {"all": [v("abgeleitet.ist_gruendungsjahr", "==", False), GESTARTET]}
 KU = lambda wert, label: v("profil.ust.kleinunternehmer", "==", wert, label)
+# Umsatz aus den Rechnungen in Amtlos: nur vorhanden, wenn das Unternehmen in Amtlos Rechnungen stellt.
+# Fehlt er, ist der Zweig „trifft nicht zu“ statt „Angabe fehlt“ (wer außerhalb fakturiert, bekommt keine Frage-Karte).
+FIN = v("finanzen.umsatz.laufendes_jahr", "vorhanden", label="Du stellst Rechnungen mit Amtlos.")
 GJ = lambda wert: v("abgeleitet.ist_gruendungsjahr", "==", wert, "Du hast dein Unternehmen in diesem Jahr gegründet." if wert else None)
 
 pflicht("steuern.kleinunternehmerregelung", "C.23", "Kleinunternehmergrenzen im Blick behalten",
@@ -231,12 +234,37 @@ pflicht("steuern.kleinunternehmer_grenze_ueberschritten", "C.23", "Kleinunterneh
              {"all": [GJ(True), v("profil.umsatz.prognose_laufendes_jahr", ">", rw("steuern.ustg19.grenze_gruendungsjahr"), "Dein erwarteter Umsatz im Gründungsjahr liegt über der Grenze für das Gründungsjahr.")]},
              {"all": [GJ(False), GESTARTET, v("profil.umsatz.vorjahr", ">", rw("steuern.ustg19.grenze_vorjahr"), "Dein Umsatz im Vorjahr lag über der Grenze.")]},
              v("profil.umsatz.prognose_laufendes_jahr", ">", rw("steuern.ustg19.grenze_laufendes_jahr"), "Dein erwarteter Umsatz in diesem Jahr liegt über der Grenze."),
+             {"all": [GJ(True), FIN, v("finanzen.umsatz.laufendes_jahr", ">", rw("steuern.ustg19.grenze_gruendungsjahr"), "Nach deinen Rechnungen in Amtlos liegt dein Umsatz im Gründungsjahr über der Grenze.")]},
+             {"all": [GJ(False), FIN, v("finanzen.umsatz.laufendes_jahr", ">", rw("steuern.ustg19.grenze_laufendes_jahr"), "Nach deinen Rechnungen in Amtlos liegt dein Umsatz in diesem Jahr über der Grenze.")]},
            ]}]},
   "dauerhaft", "Finanzamt", "intern_dokumentieren", "hinweis",
   [q("Umsatzsteuergesetz § 19", "ustg_1980/__19.html")],
   ["Vor dem Start gibt es keinen Vorjahresumsatz – Vorjahresgrenze dann nicht geprüft", "Prognose statt tatsächlicher Umsatz: bis Abschnitt 4 nur Profilangaben – Formulierung „nach deinen Angaben“ bestätigen", "Grenze inklusive/exklusive (K-18)"],
   sanktion="Ab dem Umsatz über der Grenze fällt Umsatzsteuer an, auch wenn du sie nicht berechnet hast.", schwere="hoch",
   aktion={"art": "abhaken"})
+
+# Spezifikation C.23: Echtzeit-Überwachung mit Warnungen bei 80 % und 95 % der Grenze (Umsatz aus den Rechnungen in Amtlos)
+def ku_warnung(stufe, ab, bis, bis_op="<"):
+    grenze_gj = lambda f: rw("steuern.ustg19.grenze_gruendungsjahr", f)
+    grenze_lj = lambda f: rw("steuern.ustg19.grenze_laufendes_jahr", f)
+    bereich = lambda g, text: {"all": [FIN, v("finanzen.umsatz.laufendes_jahr", ">=", g(ab), text),
+                                       *([v("finanzen.umsatz.laufendes_jahr", bis_op, g(bis))] if bis else [])]}
+    pflicht(f"steuern.kleinunternehmer_warnung_{stufe}", "C.23", f"Kleinunternehmergrenze zu {stufe} % erreicht",
+      f"Nach deinen Rechnungen in Amtlos hast du {stufe} % der Kleinunternehmergrenze erreicht.",
+      "Die Kleinunternehmerregelung endet ab dem Umsatz, der die Grenze überschreitet. Amtlos zählt dafür die Rechnungen, die du in Amtlos gestellt hast. Rechnungen außerhalb von Amtlos sind nicht enthalten.",
+      ["§ 19 UStG"], "steuern",
+      {"all": [KU(True, "Du nutzt die Kleinunternehmerregelung."),
+               {"any": [{"all": [GJ(True), bereich(grenze_gj, f"Dein Umsatz im Gründungsjahr hat {stufe} % der Grenze erreicht.")]},
+                        {"all": [GJ(False), bereich(grenze_lj, f"Dein Umsatz in diesem Jahr hat {stufe} % der Grenze erreicht.")]}]}]},
+      "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
+      [q("Umsatzsteuergesetz § 19", "ustg_1980/__19.html")],
+      ["Umsatzbegriff für die Grenze (G-06): Summe der gestellten Rechnungen (netto, abzüglich Stornos) im Kalenderjahr nach Rechnungsdatum – bestätigen",
+       "Warnstufen 80 % und 95 % aus der Spezifikation"],
+      sanktion="Noch keine Folge – eine Warnung, damit du rechtzeitig planen kannst.", schwere="mittel" if stufe == 80 else "hoch",
+      aktion={"art": "abhaken"})
+
+ku_warnung(80, 0.8, 0.95)
+ku_warnung(95, 0.95, 1.0, "<=")  # genau an der Grenze noch Warnung; darüber gilt „Grenze überschritten“
 
 pflicht("steuern.ust_sondervorauszahlung", "C.24", "Sondervorauszahlung zur Umsatzsteuer leisten",
   "Wenn du die Voranmeldung monatlich abgibst und eine Dauerfristverlängerung hast, zahlst du einmal im Jahr eine Sondervorauszahlung von einem Elftel.",
