@@ -15,7 +15,7 @@ Das Bürokratie-Betriebssystem für Kleinunternehmer und Startups in Deutschland
 | `docs/03-regel-schema.md` | Regel-DSL, Fristen, Engine-Ausgabe, Fixtures |
 | `docs/04-seitenstruktur.md` | Routen der Nutzer-App und des Studios |
 | `docs/05-risiken.md` | Risikoregister |
-| `db/schema.sql` | PostgreSQL-Referenzschema Abschnitt 1–2 inkl. RLS |
+| `db/migrations/` | PostgreSQL-Migrationen (0001 = Referenzschema Abschnitt 1–2 inkl. RLS) |
 | `db/tests/` | Schema-Tests (30 Prüfungen) |
 | `packages/rules-schema/` | JSON-Schemas, Fakten- und Ereignis-Katalog, Katalog-Validator |
 | `catalog/` | Beispiel-Pflichten, Regelwerte, Fixture |

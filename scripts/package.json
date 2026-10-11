@@ -1,0 +1,1 @@
+{ "name": "@amtlos/scripts", "private": true, "type": "module", "dependencies": { "jose": "^5.9.0" } }

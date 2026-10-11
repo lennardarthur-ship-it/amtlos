@@ -13,14 +13,18 @@ do \$\$ begin
   if not exists (select from pg_roles where rolname='amtlos_studio') then create role amtlos_studio nologin; end if;
   if not exists (select from pg_roles where rolname='api_user')      then create role api_user login in role amtlos_app; end if;
   if not exists (select from pg_roles where rolname='studio_user')   then create role studio_user login in role amtlos_studio; end if;
+  if not exists (select from pg_roles where rolname='amtlos_worker') then create role amtlos_worker nologin; end if;
+  if not exists (select from pg_roles where rolname='worker_user')   then create role worker_user login in role amtlos_worker; end if;
 end \$\$;
 \c $DB
 create extension pgcrypto; create extension citext; create extension btree_gist;
 grant create on database $DB to amtlos_owner;
-grant api_user, studio_user to amtlos_owner;   -- nur Test: Owner wechselt in die Rollen
+grant api_user, studio_user, worker_user to amtlos_owner;   -- nur Test: Owner wechselt in die Rollen
 SQL
 # In CI (Passwort-Authentifizierung) braucht der Owner dasselbe Passwort wie der Superuser.
 if [ -n "${PGPASSWORD:-}" ]; then psql -q -d postgres -c "alter role amtlos_owner password '$PGPASSWORD'"; fi
-psql -v ON_ERROR_STOP=1 -q -U amtlos_owner -d "$DB" -f schema.sql 2>&1 | { grep -v 'already exists' || true; }
-echo "Schema eingespielt."
+for m in migrations/*.sql; do
+  psql -v ON_ERROR_STOP=1 -q -U amtlos_owner -d "$DB" -f "$m" 2>&1 | { grep -v 'already exists' || true; }
+done
+echo "Migrationen eingespielt: $(ls migrations/*.sql | wc -l)"
 psql -v ON_ERROR_STOP=1 -U amtlos_owner -d "$DB" -f tests/schema_test.sql 2>&1 | { sed -n 's/^psql:[^ ]* NOTICE:  //p; /ALLE\|FEHL\|ERROR/p'; }

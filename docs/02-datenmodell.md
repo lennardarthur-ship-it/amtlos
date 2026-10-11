@@ -4,7 +4,7 @@ Stand: 2026-10-11 · Entscheidungen: E-012, E-018, E-030 bis E-039
 
 Das Modell hat zwei Ebenen:
 
-1. **Physisch, ausführbar und getestet** für Abschnitt 1–2: `db/schema.sql` (PostgreSQL 16) mit 30 automatisierten Prüfungen in `db/tests/` (Mandantentrennung, Rollen, Vier-Augen-Freigabe, prod-Gate, Unveränderlichkeit, Audit).
+1. **Physisch, ausführbar und getestet** für Abschnitt 1–2: `db/migrations/0001_basis.sql` (PostgreSQL 16) mit 30 automatisierten Prüfungen in `db/tests/` (Mandantentrennung, Rollen, Vier-Augen-Freigabe, prod-Gate, Unveränderlichkeit, Audit).
 2. **Logisch** für alle Module ab Abschnitt 3: Entitäten, Schlüsselattribute und Beziehungen. Sie werden im jeweiligen Abschnitt als Migration umgesetzt, nach denselben Mustern.
 
 ## Muster, die überall gelten

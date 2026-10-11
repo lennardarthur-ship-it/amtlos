@@ -166,6 +166,39 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 
 ---
 
+## Bauabschnitt 1
+
+### E-060 · Worker-Rolle mit eigenen Policies statt Systemkonto
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Rolle `amtlos_worker` (Migration 0002) sieht genau das Unternehmen in `amtlos.unternehmen_id`, ohne Mitgliedschaft. Ohne Kontext sieht sie nichts; mandantenübergreifend gibt es nur IDs über `SECURITY DEFINER`-Funktionen (`aktive_unternehmen_ids`, `faellige_erinnerungen`). Profile und Ereignisse darf sie nur lesen.
+- **Begründung:** Ein Systemkonto mit Mitgliedschaften in allen Unternehmen wäre ein Generalschlüssel. So bleibt jeder Job auf ein Unternehmen begrenzt; durch Schema-Tests abgesichert.
+
+### E-061 · Profil-Daten ohne Präfix gespeichert
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- `profil_version.daten` = `{ "rechtsform": …, "ust.kleinunternehmer": … }`; die Engine bekommt daraus `profil.*`-Fakten. Validierung (Typen, Enum-Werte, unbekannte Schlüssel) wird aus `fakten.json` erzeugt; `null` löscht eine Angabe (→ unbekannt). Das Bundesland wird aus dem Gemeindeschlüssel abgeleitet.
+
+### E-062 · Entwicklungs-Login nur außerhalb von staging/prod
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- `AUTH_MODUS=dev` (HS256, `scripts/dev-token.mjs`) für lokale Entwicklung und Tests. Die Konfigurationsprüfung verweigert den Start mit `dev` in staging und prod.
+
+### E-063 · Sofort-Erinnerung bei sehr nahen Fristen
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Liegen alle Vorlauf-Zeitpunkte einer offenen Pflicht schon in der Vergangenheit, wird einmal sofort erinnert, aber nie doppelt (Prüfung auf bereits gesendete Erinnerung).
+
+### E-064 · Migrationen mit Prüfsumme, eigenes Schema `betrieb`
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- `amtlos-server migrieren` spielt `db/migrations/*.sql` je in einer Transaktion ein, speichert SHA-256 in `betrieb.schema_migration` und bricht ab, wenn eine eingespielte Migration verändert wurde. `db/schema.sql` ist jetzt `db/migrations/0001_basis.sql`.
+
+### E-065 · Neuberechnung transaktional eingereiht und gebündelt
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Profiländerung, Ereignis und Erledigung reihen die Neuberechnung in derselben Transaktion ein (pg-boss mit `db`-Option). Queue-Policy `stately` mit Unternehmens-ID als Schlüssel: höchstens ein wartender Job je Unternehmen. Neuberechnung und Erinnerungsplanung laufen im Worker in einer Transaktion.
+
+### E-066 · API: NestJS als ESM, Tests mit swc
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Alle Pakete sind ES-Module; NestJS läuft ebenfalls als ESM. Vitest nutzt swc, weil esbuild keine Decorator-Metadaten erzeugt. Abhängigkeiten werden explizit mit `@Inject(...)` aufgelöst.
+
+---
+
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)
 
 | Nr. | Frage | blockiert |

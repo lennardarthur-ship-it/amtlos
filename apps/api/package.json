@@ -1,0 +1,36 @@
+{
+  "name": "@amtlos/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/main.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/main.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "eslint src test"
+  },
+  "dependencies": {
+    "@amtlos/fristen": "workspace:*",
+    "@amtlos/rules-engine": "workspace:*",
+    "@amtlos/rules-schema": "workspace:*",
+    "@amtlos/server": "workspace:*",
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/core": "^11.0.0",
+    "@nestjs/platform-express": "^11.0.0",
+    "helmet": "^8.0.0",
+    "jose": "^5.9.0",
+    "pg-boss": "^10.1.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@swc/core": "^1.10.0",
+    "@types/express": "^5.0.0",
+    "@types/supertest": "^6.0.2",
+    "supertest": "^7.0.0",
+    "unplugin-swc": "^1.5.1"
+  }
+}

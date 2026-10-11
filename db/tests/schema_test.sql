@@ -156,6 +156,21 @@ select pg_temp.erwarte_fehler('select count(*) from audit.ereignis', 'permission
 select pg_temp.ok(true, 'App-Rolle kann Audit nicht lesen');
 reset role;
 
+-- ---------- Worker (0002) ----------
+set role worker_user;
+select set_config('amtlos.konto_id', '', false);
+select set_config('amtlos.unternehmen_id', '', false);
+select pg_temp.ok((select count(*) = 0 from app.profil_version) and (select count(*) = 0 from app.unternehmen), 'Worker ohne Kontext sieht nichts');
+select pg_temp.ok((select count(*) = 2 from app.aktive_unternehmen_ids()), 'Worker kennt die Unternehmens-IDs');
+select set_config('amtlos.unternehmen_id', :'u1', false);
+select pg_temp.ok((select count(*) = 1 from app.profil_version) and (select bool_and(unternehmen_id = :'u1') from app.pflicht_instanz), 'Worker sieht genau das Unternehmen im Kontext');
+select pg_temp.ok((select count(*) = 2 from app.konto), 'Worker sieht nur Konten der Mitglieder dieses Unternehmens');
+select pg_temp.erwarte_fehler(format($$insert into app.profil_version (unternehmen_id, version, daten, erstellt_von) values (%L, 9, '{}', %L)$$, :'u1', :'anna_konto_anmelden'), 'permission denied');
+select pg_temp.ok(true, 'Worker kann Profile nicht ändern');
+select pg_temp.erwarte_fehler(format($$insert into app.pflicht_instanz (unternehmen_id, pflicht_id, pflicht_version_id, periode, ergebnis, begruendung, letzter_lauf_id) values (%L, 'steuern.ust_voranmeldung', %L, '2027-01', 'gilt', '{}', %L)$$, :'u2', :'pv_id', :'lauf1'), 'row-level security');
+select pg_temp.ok(true, 'Worker kann nicht in fremdes Unternehmen schreiben');
+reset role;
+
 -- ---------- Audit ----------
 select pg_temp.ok((select count(*) > 10 from audit.ereignis), 'Audit protokolliert Änderungen');
 select pg_temp.ok((select bool_and(vorgaenger_hash is not null) from audit.ereignis where id > (select min(id) from audit.ereignis)), 'Hash-Kette lückenlos');

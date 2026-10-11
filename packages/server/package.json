@@ -1,0 +1,42 @@
+{
+  "name": "@amtlos/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./testhilfen": {
+      "types": "./dist/testhilfen.d.ts",
+      "default": "./dist/testhilfen.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "eslint src test",
+    "migrieren": "node dist/cli.js migrieren",
+    "katalog:importieren": "node dist/cli.js katalog-importieren"
+  },
+  "dependencies": {
+    "@amtlos/fristen": "workspace:*",
+    "@amtlos/rules-engine": "workspace:*",
+    "@amtlos/rules-schema": "workspace:*",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "pg": "^8.13.0",
+    "pg-boss": "^10.1.0",
+    "yaml": "^2.6.0"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.11.0"
+  },
+  "bin": {
+    "amtlos-server": "./dist/cli.js"
+  }
+}

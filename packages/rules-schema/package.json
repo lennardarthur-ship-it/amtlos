@@ -15,6 +15,10 @@
     "yaml": "^2.6.0"
   },
   "exports": {
+    ".": {
+      "types": "./validieren.d.ts",
+      "default": "./validieren.mjs"
+    },
     "./pflicht.schema.json": "./pflicht.schema.json",
     "./regelwert.schema.json": "./regelwert.schema.json",
     "./fakten.json": "./fakten.json",

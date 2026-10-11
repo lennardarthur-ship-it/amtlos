@@ -28,9 +28,9 @@ jobs:
       - run: pnpm test
 
   datenbank:
-    name: Schema-Tests (PostgreSQL 16)
+    name: Datenbank- und Integrationstests (PostgreSQL 16)
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     services:
       postgres:
         image: postgres:16
@@ -54,3 +54,14 @@ jobs:
           set -o pipefail
           db/tests/run.sh | tee ergebnis.txt
           grep -q "ALLE SCHEMA-TESTS BESTANDEN" ergebnis.txt
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - name: Integrationstests (Server-Kern, API, Worker)
+        env:
+          AMTLOS_DB_TESTS: pflicht
+        run: pnpm --filter @amtlos/server --filter @amtlos/api --filter @amtlos/worker test

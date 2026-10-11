@@ -188,8 +188,9 @@ amtlos/
 │  ├─ fixtures/       Profil-Fixtures je Persona und Grenzfall
 │  └─ quellen.yaml
 ├─ db/
-│  ├─ schema.sql      Referenzschema (siehe 02-datenmodell)
-│  └─ migrations/
+│  ├─ migrations/     SQL-Migrationen, 0001 = Referenzschema (siehe 02-datenmodell)
+│  ├─ migrieren.mjs   Migrations-Runner mit Prüfsummen
+│  └─ tests/
 ├─ infra/             OpenTofu, Helm-Charts
 ├─ docs/
 ├─ ENTSCHEIDUNGEN.md

@@ -1,0 +1,32 @@
+import { z } from "zod";
+
+const Schema = z
+  .object({
+    UMGEBUNG: z.enum(["dev", "test", "staging", "prod"]).default("dev"),
+    PORT: z.coerce.number().int().positive().default(3001),
+    DATABASE_URL: z.string().min(1),
+    AUTH_MODUS: z.enum(["oidc", "dev"]).default("oidc"),
+    OIDC_ISSUER: z.string().url().optional(),
+    OIDC_AUDIENCE: z.string().min(1).optional(),
+    DEV_JWT_SECRET: z.string().min(32).optional(),
+    WEB_URL: z.string().url().default("http://localhost:3000"),
+    API_URL: z.string().url().default("http://localhost:3001"),
+  })
+  .superRefine((k, ctx) => {
+    if (k.AUTH_MODUS === "oidc" && (!k.OIDC_ISSUER || !k.OIDC_AUDIENCE))
+      ctx.addIssue({ code: "custom", message: "AUTH_MODUS=oidc braucht OIDC_ISSUER und OIDC_AUDIENCE" });
+    if (k.AUTH_MODUS === "dev") {
+      if (!k.DEV_JWT_SECRET) ctx.addIssue({ code: "custom", message: "AUTH_MODUS=dev braucht DEV_JWT_SECRET (≥ 32 Zeichen)" });
+      if (k.UMGEBUNG === "prod" || k.UMGEBUNG === "staging")
+        ctx.addIssue({ code: "custom", message: "AUTH_MODUS=dev ist in staging und prod verboten" });
+    }
+  });
+
+export type Konfiguration = z.infer<typeof Schema>;
+export const KONFIGURATION = Symbol("KONFIGURATION");
+
+export function ladeKonfiguration(env: NodeJS.ProcessEnv = process.env): Konfiguration {
+  const r = Schema.safeParse(env);
+  if (!r.success) throw new Error(`Konfiguration ungültig:\n- ${r.error.issues.map((i) => `${i.path.join(".") || "allgemein"}: ${i.message}`).join("\n- ")}`);
+  return r.data;
+}
