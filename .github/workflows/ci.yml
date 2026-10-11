@@ -182,10 +182,13 @@ jobs:
           warte localhost:3001/v1/openapi.json
           warte localhost:3000/anmelden
           warte localhost:3100/anmelden
-          sleep 3; docker ps --format '{{.Names}} {{.Status}}'
-          test "$(docker ps -q | wc -l)" = "4"
+          sleep 3
+          laufend=$(docker ps --format '{{.Names}}' | sort | tr '\n' ' ')
+          echo "laufend: $laufend"
+          [ "$laufend" = "api studio web worker " ] || { echo "::error title=Rauchtest::Nicht alle Container laufen: $(docker ps -a --format '{{.Names}}={{.Status}}' | tr '\n' ' ')"; exit 1; }
           # Läuft als Nicht-Root?
-          test "$(docker exec api id -u)" != "0"
+          uid=$(docker exec api id -u)
+          [ "$uid" != "0" ] || { echo "::error title=Rauchtest::API-Container läuft als root"; exit 1; }
       - if: failure()
-        run: for c in api worker web studio; do docker logs $c 2>&1 | grep -iE "error|fehler|warn" | tail -n 4 | sed "s/^/::error title=$c::/" || true; done
+        run: for c in api worker web studio; do docker logs $c 2>&1 | tail -n 4 | sed "s/^/::error title=$c::/" || true; done
 
