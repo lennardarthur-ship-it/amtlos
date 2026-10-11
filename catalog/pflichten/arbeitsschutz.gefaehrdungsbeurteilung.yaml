@@ -1,0 +1,63 @@
+# Beispiel aus Spezifikation 3.2 / Katalog E.50, in das Schema v1 überführt.
+schema_version: 1
+id: arbeitsschutz.gefaehrdungsbeurteilung
+version: 1
+katalog_nr: E.50
+titel:
+  de: Gefährdungsbeurteilung erstellen
+kurz:
+  de: Bevor jemand bei dir arbeitet, schreibst du auf, welche Gefahren es an den Arbeitsplätzen gibt und was du dagegen tust.
+erklaerung:
+  de: >-
+    Sobald du mindestens eine Person beschäftigst, musst du die Gefährdungen an jedem
+    Arbeitsplatz beurteilen, Schutzmaßnahmen festlegen und das dokumentieren.
+    Amtlos erstellt dir dafür eine Vorlage passend zu deiner Branche.
+begriffe:
+  - begriff: { de: Gefährdungsbeurteilung }
+    erklaerung: { de: "Eine schriftliche Liste, welche Gefahren es bei der Arbeit gibt und wie du sie verringerst." }
+rechtsgrundlage: ["§ 5 ArbSchG", "§ 6 ArbSchG"]
+kategorie: arbeitsschutz
+ausloeser:
+  all:
+    - feld: profil.beschaeftigte.gesamt
+      op: ">="
+      wert: 1
+      label: { de: Du beschäftigst mindestens eine Person. }
+frist:
+  typ: relativ
+  bezug: { ereignis: erste_einstellung }
+  versatz: P0D
+  zeitpunkt: vor_beginn
+  verschiebung: { regel: keine, kalender: bundeseinheitlich }
+  erinnerung: [P14D, P3D]
+wiederholung:
+  art: bei_aenderung
+  neu_ausloesen_bei:
+    - ereignis: neuer_arbeitsplatz
+    - ereignis: neue_taetigkeit
+    - ereignis: arbeitsunfall
+stelle:
+  de: Arbeitgeber selbst; Kontrolle durch Berufsgenossenschaft und Gewerbeaufsicht
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text: { de: Bußgeld möglich; Haftungsrisiko bei Arbeitsunfällen. }
+  schwere: hoch
+automatisierung: dokument_generator
+dokumente: [vorlage.gefaehrdungsbeurteilung.<branche>]
+aktion: { art: dokument, ziel: vorlage.gefaehrdungsbeurteilung, nachweis_erforderlich: true }
+status_recht: in_kraft
+gueltig_ab: "1996-08-21"
+gueltig_bis: null
+quellen:
+  - titel: Arbeitsschutzgesetz § 5
+    url: https://www.gesetze-im-internet.de/arbschg/__5.html
+    abgerufen: null
+  - titel: Arbeitsschutzgesetz § 6
+    url: https://www.gesetze-im-internet.de/arbschg/__6.html
+    abgerufen: null
+fachlich_zu_pruefen:
+  - "Frist: 'vor Arbeitsbeginn' als Auslegung bestätigen"
+  - "Auslöser neu_ausloesen_bei: Liste der Anlässe vollständig?"
+  - "gueltig_ab 1996-08-21 aus Spezifikation übernommen"
+pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }

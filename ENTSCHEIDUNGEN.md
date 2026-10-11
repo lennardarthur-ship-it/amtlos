@@ -1,0 +1,178 @@
+# ENTSCHEIDUNGEN
+
+Laufendes Entscheidungsprotokoll für Amtlos. Jede Entscheidung hat eine Nummer, ein Datum, einen Status und eine Begründung. Entscheidungen werden nicht gelöscht, sondern durch neue ersetzt (`ersetzt durch E-xxx`).
+
+Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wartet auf OK) · **ersetzt**
+
+---
+
+## Rahmen
+
+### E-001 · Monorepo auf GitHub
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Ein Monorepo mit pnpm-Workspaces und Turborepo. Der Product Owner legt das Repo an und gibt es frei.
+- **Begründung:** Regel-Engine, Fristberechnung, Typen und Designsystem werden von Web, API, Worker, Studio und später der App geteilt. Getrennte Repos würden Versionsdrift zwischen Server- und Client-Auswertung erzeugen.
+
+### E-002 · Fachliche Freigabe ist der kritische Pfad
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Ohne Freigabe durch qualifizierte Prüfer wird keine Regel in prod ausgespielt (Spezifikation 8.3). Bauabschnitte werden technisch fertiggestellt; der Livegang hängt zusätzlich an der Prüfquote des Katalogs.
+- Prüfer-Partner (Steuerberater, Rechtsanwalt, Fachkraft für Arbeitssicherheit) sind noch zu gewinnen → Risiko R-01.
+
+### E-003 · Fachsprache im Code
+- **Datum:** 2026-10-11 · **Status:** vorgeschlagen
+- Domänenbegriffe (Tabellen, Spalten, Regel-Felder) auf Deutsch in ASCII (`ausloeser`, `pflicht_instanz`), technische Infrastruktur auf Englisch (`createdAt` nur in Framework-Code, `logger`, `queue`).
+- **Begründung:** Die Spezifikation und alle Rechtsquellen sind deutsch. Rechtsbegriffe wie „Betriebsstätte“ oder „Anmeldezeitraum“ verlieren beim Übersetzen Präzision, und Prüfer müssen Regeln ohne Übersetzungsschritt lesen können.
+
+---
+
+## Architektur
+
+### E-010 · Backend: TypeScript mit NestJS
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- **Begründung:**
+  1. Die Regel-Engine und die Fristberechnung sind ein einziges TS-Paket und laufen identisch auf Server, Web und App (offline). Mit Python bräuchten wir zwei Implementierungen und Abgleichstests.
+  2. Geteilte Typen (zod) von der Datenbank bis zur UI.
+  3. NestJS bietet Module, DI und Guards für eine saubere Modulgrenze je Fachbereich in einem modularen Monolithen.
+- **Abgelehnt:** FastAPI (gute Wahl für ML, aber doppelte Engine). Python bleibt für isolierte Worker erlaubt, falls OCR/ML es erfordern.
+
+### E-011 · Modularer Monolith plus wenige isolierte Dienste
+- **Datum:** 2026-10-11 · **Status:** vorgeschlagen
+- Ein API-Prozess und ein Worker-Prozess aus derselben Codebasis. Separat isoliert nur, was andere Sicherheits- oder Laufzeitanforderungen hat:
+  - **ERiC-Gateway** (native ELSTER-Bibliothek, eigener Container ohne Internetzugang außer ELSTER, ab Abschnitt 3)
+  - **Dokument-Renderer** (HTML→PDF, ab Abschnitt 1)
+  - **Crawler** (Headless-Browser, eigenes Netzsegment, ab Abschnitt 7)
+  - **KI-Gateway** (einziger Ausgang zum LLM-Anbieter, Protokollierung, PII-Filter, ab Abschnitt 4)
+- **Begründung:** Microservices wären für das Team und die Last überdimensioniert. Die Isolation dort, wo fremder Code oder fremde Inhalte verarbeitet werden, ist aber aus Sicherheitsgründen nötig.
+
+### E-012 · Mandantenmodell: Konto → n Unternehmen → Rolle je Unternehmen
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Ein Konto kann Mitglied mehrerer Unternehmen sein (Nebengewerbe plus GmbH, Steuerberater mit vielen Mandanten). Rollen gelten pro Unternehmen: `inhaber`, `mitarbeiter`, `steuerberater`, `admin`. Plattformrollen (`experte`, `redaktion`, `plattform_admin`, `support`) sind global und geben **keinen** Zugriff auf Mandantendaten.
+- Mandantentrennung durch PostgreSQL Row Level Security. Die API setzt pro Transaktion `amtlos.konto_id` und `amtlos.unternehmen_id`. Die App-Datenbankrolle ist nicht Tabelleneigentümer, sodass RLS auch nicht versehentlich umgangen wird (`FORCE ROW LEVEL SECURITY`).
+
+### E-013 · Hosting bei einem deutschen Cloud-Anbieter
+- **Datum:** 2026-10-11 · **Status:** angenommen (Anbieterwahl vorgeschlagen)
+- Vorschlag: **STACKIT** (Kubernetes, Managed PostgreSQL, Object Storage, Rechenzentren in Deutschland). Fallback: IONOS Cloud.
+- Infrastruktur als Code mit OpenTofu. Umgebungen dev, staging, prod in getrennten Projekten.
+- **Technisch zu prüfen vor Abschnitt 1:** Object-Lock/WORM für GoBD-Archiv, Managed-Postgres-Version ≥ 16 mit `btree_gist`, Backup-Wiederherstellung je Zeitpunkt.
+
+### E-014 · Identität: selbst gehosteter OIDC-Identity-Provider
+- **Datum:** 2026-10-11 · **Status:** vorgeschlagen
+- Vorschlag: **Zitadel**, selbst gehostet in derselben Umgebung. Passkeys, TOTP, Organisationen, Audit-Log, OIDC. Später SSO für Steuerberater-Kanzleien und White-Label-Partner.
+- Alternative: Keycloak (reifer, schwerer im Betrieb). Abgelehnt: SaaS-IdP außerhalb der EU.
+- Die Anwendung speichert nur `idp_subject`, E-Mail und Anzeigename.
+
+### E-015 · Warteschlange in PostgreSQL
+- **Datum:** 2026-10-11 · **Status:** vorgeschlagen
+- Hintergrundjobs (Neuberechnung, Erinnerungen, Benachrichtigungen, Exporte) über **pg-boss** in derselben Datenbank.
+- **Begründung:** Transaktionale Konsistenz (Ereignis speichern und Neuberechnung einreihen in einer Transaktion), keine zusätzliche Komponente wie Redis. Die zu erwartende Last (Zehntausende Unternehmen, Fristen auf Tagesbasis) liegt weit unter der Grenze.
+
+### E-016 · Objektspeicher für Dokumente, WORM für GoBD
+- **Datum:** 2026-10-11 · **Status:** vorgeschlagen
+- Dateien liegen S3-kompatibel, verschlüsselt, mit SHA-256 in der Datenbank. Aufbewahrungspflichtige Dokumente in einem Bucket mit Object Lock bis `aufbewahrung_bis`.
+
+### E-017 · Beobachtbarkeit
+- **Datum:** 2026-10-11 · **Status:** vorgeschlagen
+- OpenTelemetry → selbst gehosteter Grafana-Stack (Logs, Metriken, Traces). Fehler-Tracking mit selbst gehostetem GlitchTip (Sentry-kompatibel). Keine personenbezogenen Daten in Logs (strukturierte Logs mit Allowlist von Feldern).
+
+### E-018 · Offline-Sync nur anhängend
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Offline erfasste Belege, Zeitbuchungen und Unterschriften werden als unveränderliche Ereignisse mit Client-ID und Gerätezeit hochgeladen. Korrekturen sind neue Ereignisse (Storno + Neubuchung), nie Überschreibungen.
+
+### E-019 · Mobile: PWA bis Abschnitt 10, Expo-Gerüst ab Abschnitt 1
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Die Web-App ist von Beginn an PWA (installierbar, offline für Belege und Zeiterfassung). `apps/mobile` (Expo) wird in Abschnitt 1 angelegt, nutzt die geteilten Pakete, wird aber erst in Abschnitt 10 im Store veröffentlicht.
+
+### E-020 · KI-Anbieter über austauschbares Gateway
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Anbieter mit Datenverarbeitung in der EU und AVV. Alle LLM-Aufrufe laufen über das KI-Gateway (E-011), das den Anbieter austauschbar macht. Auswahl vor Abschnitt 4 (Belegerkennung). Kein LLM in Entscheidungslogik (Spezifikation 10).
+
+---
+
+## Regel-Engine und Katalog
+
+### E-030 · Datenbank ist Quelle der Wahrheit, Repo enthält den Export
+- **Datum:** 2026-10-11 · **Status:** vorgeschlagen
+- Experten bearbeiten Pflichten im Studio (Datenbank). Jede Veröffentlichung eines Katalog-Releases exportiert den vollständigen Katalog als YAML nach `catalog/` und öffnet automatisch einen Pull Request.
+- **Begründung:** Experten arbeiten ohne Git. Entwickler bekommen trotzdem lesbare Diffs, CI-Tests gegen Fixtures und eine Historie im Repo. Der Startbestand wird einmalig aus YAML importiert.
+
+### E-031 · Eigenes Regel-DSL in JSON/YAML mit JSON-Schema
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Bausteine: `all`, `any`, `not`, Vergleich über einen **Fakt** (`feld`), Ereignistest, Verweis auf Regelwerte. Details in `docs/03-regel-schema.md`.
+- **Abgelehnt:** JSONLogic (zu generisch, keine Typprüfung gegen Fakten, schlechte Erklärbarkeit).
+
+### E-032 · Fakten-Katalog als Schnittstelle zwischen Profil und Regeln
+- **Datum:** 2026-10-11 · **Status:** vorgeschlagen
+- Regeln greifen nie direkt auf Profil-JSON zu, sondern auf typisierte **Fakten** (`profil.beschaeftigte.gesamt`, `abgeleitet.ist_kapitalgesellschaft`). Jeder Fakt ist im Code definiert (Typ, Herleitung, Beschreibung) und als Liste exportiert. Das Schema prüft, dass jede Regel nur bekannte Fakten mit passendem Operator nutzt.
+- **Begründung:** Profiländerungen brechen keine Regeln unbemerkt; Zählweisen (z. B. Beschäftigte je Gesetz) werden an einer Stelle definiert.
+
+### E-033 · Dreiwertige Logik: gilt / gilt nicht / unbekannt
+- **Datum:** 2026-10-11 · **Status:** vorgeschlagen
+- Fehlt ein Fakt, ist das Ergebnis `unbekannt`, nicht `gilt_nicht`. Unbekannte Pflichten erscheinen als Karte „Angabe fehlt“ mit der konkreten Frage.
+- **Begründung:** „Nicht zutreffend“ ist haftungsrechtlich die gefährlichste Aussage (Spezifikation 8, Rückfrage 22). Die Engine darf fehlende Angaben nie als Entlastung werten.
+
+### E-034 · Regelwerte getrennt von Pflichten
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Schwellen und Beträge (Mindestlohn, Minijob-Grenze, Kleinunternehmergrenzen, USt-VA-Grenzen) sind eigene versionierte `regelwert`-Datensätze mit Gültigkeitszeitraum, Quelle und Freigabe. Pflichten verweisen per `{ regelwert: id }`. Überlappende freigegebene Gültigkeiten sind in der Datenbank technisch ausgeschlossen.
+
+### E-035 · Gespeicherter Status vs. angezeigter Status
+- **Datum:** 2026-10-11 · **Status:** vorgeschlagen
+- Gespeichert werden nur `offen`, `erledigt`, `nicht_zutreffend`, `entfallen`. „Fällig bald“ und „überfällig“ werden zur Anzeigezeit aus `faellig_am` und heute berechnet.
+- **Begründung:** Zeitabhängige Status in der Datenbank veralten über Nacht und brauchen sonst einen fehleranfälligen Batch.
+
+### E-036 · Erledigung bindet an die Regelversion
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Jede Erledigung speichert die Pflichtversion, die zu diesem Zeitpunkt galt. Eine neue Version erzeugt nur dann eine neue Aufgabe, wenn sie `erneut_erledigen: true` setzt (z. B. „Datenschutzerklärung muss angepasst werden“).
+
+### E-037 · Fristverschiebung als Attribut je Pflicht
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Jede Frist trägt `verschiebung` (z. B. auf nächsten Werktag) und `kalender` (bundeseinheitlich, Bundesland, Gemeinde, Bankarbeitstage). Feiertage auf Gemeindeebene. Die konkrete Verschiebungsregel ist für jede Pflicht `[FACHLICH ZU PRÜFEN]`.
+
+### E-038 · Ungeprüfte Regeln nur außerhalb von prod
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- In dev und staging können ungeprüfte Versionen mit Banner „ungeprüft“ angezeigt werden. In prod verhindert ein Datenbank-Trigger, dass ein Release ungeprüfte Inhalte enthält; die API prüft zusätzlich.
+
+### E-039 · Vier-Augen-Freigabe mit Qualifikation
+- **Datum:** 2026-10-11 · **Status:** vorgeschlagen
+- Freigabe braucht zwei verschiedene Prüfer, beide nicht Autor der Version, mindestens einer mit zur Kategorie passender Qualifikation (Steuern → Steuerberater; Personal, Datenschutz, Online, Gesellschaft → Rechtsanwalt; Arbeitsschutz → Fachkraft für Arbeitssicherheit oder Rechtsanwalt). Die Zuordnung ist selbst `[FACHLICH ZU PRÜFEN]`.
+- `geprueft_von` und `geprueft_am` aus der Spezifikation werden aus den Freigaben abgeleitet, nicht frei eingetragen.
+
+### E-040 · Texte im Katalog zweisprachig, Englisch als Release-Bedingung
+- **Datum:** 2026-10-11 · **Status:** vorgeschlagen
+- Textfelder sind `{ de, en }`. Das Schema verlangt `de`; ein prod-Release verlangt zusätzlich `en`.
+
+---
+
+## Umfang
+
+### E-050 · Rechtsformen in v1
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Voll unterstützt: Einzelunternehmen, Freiberuf, GbR, e.K., UG, GmbH, GmbH & Co. KG, PartG/PartG mbB. Alle anderen werden erkannt und an Partner verwiesen; ihr Profil ist erfassbar, Pflichten werden nur aus rechtsformunabhängigen Regeln abgeleitet und deutlich als unvollständig markiert.
+
+### E-051 · Kapitalgesellschaften: Übergabe statt eigener Bilanzierung
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Amtlos erfasst Belege und Rechnungen auch für UG/GmbH und übergibt per DATEV-Export an den Steuerberater. Doppelte Buchführung, Jahresabschluss und E-Bilanz macht Amtlos in v1 nicht selbst; es führt Fristen und Prüfliste.
+
+### E-052 · Lohn-Partner per Vergleich in Abschnitt 5
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Vergleichskriterien: API für Stammdaten und Status, Systemprüfung für SV-Meldungen, Preis pro Abrechnung, EU-Hosting, White-Label-Fähigkeit.
+
+### E-053 · Online-Check nur für verifizierte Domains
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Vollprüfung erst nach Nachweis der Domain-Kontrolle (DNS-TXT oder Meta-Tag). Unverifiziert nur eine stark verkürzte, öffentliche Basisprüfung ohne Detailbericht, mit Ratenlimit.
+
+### E-054 · Katalogwerte unverändert übernehmen
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Zahlen und Fristen aus Spezifikation Abschnitt 4 werden wörtlich übernommen, mit `pruef_status: entwurf`. Keine eigenmächtige Nachrecherche oder Korrektur; Abweichungen und Zweifel gehen in `PRUEFLISTE.md`.
+
+---
+
+## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)
+
+| Nr. | Frage | blockiert |
+|---|---|---|
+| J-1 | ELSTER-Übermittlung über unseren Server mit Nutzerzertifikat noch „Selbsthilfe“ nach StBerG? Darf das Zertifikat kurzzeitig serverseitig verarbeitet werden? | Abschnitt 3, 4 |
+| J-2 | Behörden-Postfach: Grenze allgemeine Erklärung ↔ Einzelfallprüfung (RDG) | Abschnitt 9 |
+| J-3 | Darstellung „nicht zutreffend“ und „trotzdem prüfen lassen“ | Abschnitt 2 (Livegang) |
+| J-4 | Marktplatz: zulässiges Vergütungsmodell nach Berufsrecht | Abschnitt 9 |
+
+Bis zur Klärung: ERiC-Gateway wird so gebaut, dass beide Varianten (serverseitig, lokal beim Nutzer) möglich bleiben; der Marktplatz wird mit Festpreis-Listung/Partner-Abo geplant.

@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://amtlos.de/schemas/regelwert/1.json",
+  "title": "Regelwert – eine Version",
+  "description": "Schwelle, Betrag oder Satz mit Gültigkeitszeitraum (E-034). Überlappende freigegebene Zeiträume sind in der Datenbank ausgeschlossen.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "version", "bezeichnung", "einheit", "wert", "gueltig_ab", "status_recht", "rechtsgrundlage", "quellen"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*(\\.[a-z0-9_]+)+$" },
+    "version": { "type": "integer", "minimum": 1 },
+    "bezeichnung": {
+      "type": "object", "additionalProperties": false, "required": ["de"],
+      "properties": { "de": { "type": "string" }, "en": { "type": "string" } }
+    },
+    "einheit": { "enum": ["EUR", "EUR_pro_stunde", "EUR_pro_monat", "prozent", "anzahl", "tage", "monate", "jahre"] },
+    "wert": { "type": "number" },
+    "gueltig_ab": { "type": "string", "format": "date" },
+    "gueltig_bis": { "type": ["string", "null"], "format": "date" },
+    "status_recht": { "enum": ["in_kraft", "beschlossen", "entwurf", "geplant", "ausgelaufen"] },
+    "rechtsgrundlage": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "katalog_nr": { "type": "string" },
+    "quellen": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["titel", "url", "abgerufen"],
+        "properties": {
+          "titel": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "abgerufen": { "type": ["string", "null"], "format": "date", "description": "null = noch nicht abgerufen; prod-Release verlangt ein Datum" },
+          "fundstelle": { "type": "string" }
+        }
+      }
+    },
+    "fachlich_zu_pruefen": { "type": "array", "items": { "type": "string" } },
+    "pruefung": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "status": { "enum": ["entwurf", "in_pruefung", "freigegeben", "abgelehnt", "zurueckgezogen"] },
+        "geprueft_von": { "type": ["array", "null"], "items": { "type": "string" } },
+        "geprueft_am": { "type": ["string", "null"], "format": "date" }
+      }
+    }
+  }
+}

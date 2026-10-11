@@ -1,0 +1,75 @@
+# Katalog C.24. Zeigt: Rhythmus abhängig von Fakten, Regelwerte, Dauerfristverlängerung.
+schema_version: 1
+id: steuern.ust_voranmeldung
+version: 1
+katalog_nr: C.24
+titel:
+  de: Umsatzsteuer-Voranmeldung abgeben
+kurz:
+  de: Du meldest dem Finanzamt regelmäßig, wie viel Umsatzsteuer du eingenommen und gezahlt hast, und überweist die Differenz.
+erklaerung:
+  de: >-
+    Wer Umsatzsteuer auf Rechnungen ausweist, gibt je nach Höhe der Steuer im Vorjahr
+    monatlich oder vierteljährlich eine Voranmeldung über ELSTER ab. Amtlos bereitet die
+    Zahlen vor; du übermittelst selbst.
+rechtsgrundlage: ["§ 18 UStG"]
+kategorie: steuern
+ausloeser:
+  all:
+    - feld: profil.ust.kleinunternehmer
+      op: "=="
+      wert: false
+      label: { de: Du nutzt die Kleinunternehmerregelung nicht. }
+    - any:
+        - feld: profil.ust.zahllast_vorjahr
+          op: ">"
+          wert: { regelwert: steuern.ust_va.grenze_befreiung }
+          label: { de: Deine Umsatzsteuer im Vorjahr lag über der Grenze für eine Befreiung. }
+        - feld: abgeleitet.ist_gruendungsjahr
+          op: "=="
+          wert: true
+          label: { de: Du hast dein Unternehmen in diesem Jahr gegründet. }
+        - feld: abgeleitet.ist_vorjahr_gruendungsjahr
+          op: "=="
+          wert: true
+          label: { de: Du hast dein Unternehmen im Vorjahr gegründet. }
+frist:
+  typ: wiederkehrend
+  rhythmus:
+    waehle:
+      - wenn:
+          feld: profil.ust.zahllast_vorjahr
+          op: ">"
+          wert: { regelwert: steuern.ust_va.grenze_monatlich }
+        dann: monatlich
+    sonst: quartalsweise
+  faellig: { art: tag_nach_periodenende, monate_nach: 1, tag: 10 }
+  verlaengerung:
+    wenn: { feld: profil.ust.dauerfristverlaengerung, op: "==", wert: true }
+    versatz: P1M
+  verschiebung: { regel: naechster_werktag, kalender: bundesland }
+  erinnerung: [P7D, P2D]
+wiederholung: { art: periodisch }
+stelle:
+  de: Finanzamt
+kanal: elster
+kosten: null
+sanktion:
+  text: { de: Verspätungszuschlag und Säumniszuschläge möglich. }
+  schwere: mittel
+automatisierung: formular_vorausfuellen
+aktion: { art: uebermittlung, ziel: elster.ust_va, nachweis_erforderlich: true }
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+  - titel: Umsatzsteuergesetz § 18
+    url: https://www.gesetze-im-internet.de/ustg_1980/__18.html
+    abgerufen: null
+fachlich_zu_pruefen:
+  - "Befreiung bis Grenze ist laut Spezifikation 'möglich' (Ermessen Finanzamt?) – Auslöser bildet das als 'gilt nicht' ab; Formulierung prüfen"
+  - "Neugründer: Aussetzung der monatlichen Pflicht 2021–2026 (Radar) – Rhythmus im Gründungs- und Folgejahr festlegen"
+  - "Sondervorauszahlung 1/11 bei monatlicher Dauerfristverlängerung als eigene Pflicht anlegen"
+  - "Verschiebung auf nächsten Werktag und Feiertagskalender (Bundesland) bestätigen"
+  - "gueltig_ab: Datum der heutigen Fassung der Grenzen eintragen"
+pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }

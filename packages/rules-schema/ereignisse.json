@@ -1,0 +1,23 @@
+{
+  "$comment": "Ereignis-Katalog v1. Ereignisse sind unveränderlich (append-only) und lösen Neuberechnung aus.",
+  "version": 1,
+  "ereignisse": [
+    { "typ": "gruendung", "beschreibung": "Aufnahme der Tätigkeit", "payload": ["datum"] },
+    { "typ": "erste_einstellung", "beschreibung": "Erste beschäftigte Person beginnt (vom System aus 'einstellung' abgeleitet)", "payload": ["arbeitsbeginn"] },
+    { "typ": "einstellung", "beschreibung": "Neue beschäftigte Person", "payload": ["arbeitsbeginn", "beschaeftigungsart"] },
+    { "typ": "austritt", "beschreibung": "Beschäftigung endet", "payload": ["ende"] },
+    { "typ": "neuer_arbeitsplatz", "beschreibung": "Neuer oder wesentlich veränderter Arbeitsplatz", "payload": [] },
+    { "typ": "neue_taetigkeit", "beschreibung": "Neue Tätigkeit im Unternehmen", "payload": [] },
+    { "typ": "arbeitsunfall", "beschreibung": "Arbeitsunfall", "payload": ["datum", "au_tage"] },
+    { "typ": "schwangerschaft_mitgeteilt", "beschreibung": "Beschäftigte teilt Schwangerschaft mit", "payload": ["datum"] },
+    { "typ": "rechtsformwechsel", "beschreibung": "Wechsel der Rechtsform", "payload": ["von", "nach", "wirksam_ab"] },
+    { "typ": "sitzverlegung", "beschreibung": "Neuer Sitz / neue Gemeinde", "payload": ["gemeinde_ags", "wirksam_ab"] },
+    { "typ": "neuer_vertriebskanal", "beschreibung": "Neuer Vertriebskanal", "payload": ["kanal"] },
+    { "typ": "kasse_angeschafft", "beschreibung": "Elektronische Kasse angeschafft", "payload": ["datum", "betriebsstaette"] },
+    { "typ": "kasse_ausser_betrieb", "beschreibung": "Elektronische Kasse außer Betrieb genommen", "payload": ["datum", "betriebsstaette"] },
+    { "typ": "umsatzschwelle_ueberschritten", "beschreibung": "Vom System erkannt (ab Abschnitt 4)", "payload": ["regelwert", "datum"] },
+    { "typ": "gesellschafterwechsel", "beschreibung": "Änderung im Gesellschafterkreis", "payload": ["wirksam_ab"] },
+    { "typ": "datenpanne", "beschreibung": "Verletzung des Schutzes personenbezogener Daten bekannt geworden", "payload": ["bekannt_seit"] },
+    { "typ": "betriebsaufgabe", "beschreibung": "Aufgabe der Tätigkeit", "payload": ["datum"] }
+  ]
+}

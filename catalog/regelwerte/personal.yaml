@@ -1,0 +1,63 @@
+# Werte unverändert aus Spezifikation D.39 (E-054). Zeigt zeitlich aufeinanderfolgende Versionen desselben Regelwerts.
+- schema_version: 1
+  id: personal.mindestlohn.stunde
+  version: 1
+  katalog_nr: D.39
+  bezeichnung: { de: Gesetzlicher Mindestlohn je Zeitstunde }
+  einheit: EUR_pro_stunde
+  wert: 13.90
+  gueltig_ab: "2026-01-01"
+  gueltig_bis: "2026-12-31"
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 1 MiLoG", "Mindestlohnanpassungsverordnung"]
+  quellen:
+    - { titel: Mindestlohngesetz § 1, url: "https://www.gesetze-im-internet.de/milog/__1.html", abgerufen: null }
+  fachlich_zu_pruefen: ["Fundstelle der geltenden Anpassungsverordnung ergänzen"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+
+- schema_version: 1
+  id: personal.mindestlohn.stunde
+  version: 2
+  katalog_nr: D.39
+  bezeichnung: { de: Gesetzlicher Mindestlohn je Zeitstunde }
+  einheit: EUR_pro_stunde
+  wert: 14.60
+  gueltig_ab: "2027-01-01"
+  gueltig_bis: null
+  status_recht: beschlossen
+  rechtsgrundlage: ["§ 1 MiLoG", "Mindestlohnanpassungsverordnung"]
+  quellen:
+    - { titel: Mindestlohngesetz § 1, url: "https://www.gesetze-im-internet.de/milog/__1.html", abgerufen: null }
+  fachlich_zu_pruefen: ["status_recht 'beschlossen' vs. 'in_kraft' (Verordnung bereits erlassen?)"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+
+- schema_version: 1
+  id: personal.minijob.grenze_monat
+  version: 1
+  katalog_nr: D.39
+  bezeichnung: { de: Geringfügigkeitsgrenze (Minijob) je Monat }
+  einheit: EUR_pro_monat
+  wert: 603
+  gueltig_ab: "2026-01-01"
+  gueltig_bis: "2026-12-31"
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 8 SGB IV"]
+  quellen:
+    - { titel: SGB IV § 8, url: "https://www.gesetze-im-internet.de/sgb_4/__8.html", abgerufen: null }
+  fachlich_zu_pruefen: ["Dynamische Kopplung an Mindestlohn: als Berechnung oder als gepflegter Wert führen?"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+
+- schema_version: 1
+  id: personal.minijob.grenze_monat
+  version: 2
+  katalog_nr: D.39
+  bezeichnung: { de: Geringfügigkeitsgrenze (Minijob) je Monat }
+  einheit: EUR_pro_monat
+  wert: 633
+  gueltig_ab: "2027-01-01"
+  gueltig_bis: null
+  status_recht: beschlossen
+  rechtsgrundlage: ["§ 8 SGB IV"]
+  quellen:
+    - { titel: SGB IV § 8, url: "https://www.gesetze-im-internet.de/sgb_4/__8.html", abgerufen: null }
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }

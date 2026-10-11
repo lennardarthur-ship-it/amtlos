@@ -1,0 +1,1020 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://amtlos.de/schemas/pflicht/1.json",
+  "title": "Pflicht (Obligation) – eine Version",
+  "description": "Eine versionierte Pflicht im Amtlos-Katalog. Felder auf Deutsch (E-003). Fakten in 'feld' müssen im Fakten-Katalog existieren (wird zusätzlich vom Katalog-Validator geprüft, E-032).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "version",
+    "titel",
+    "kurz",
+    "erklaerung",
+    "rechtsgrundlage",
+    "kategorie",
+    "ausloeser",
+    "frist",
+    "wiederholung",
+    "stelle",
+    "kanal",
+    "automatisierung",
+    "sanktion",
+    "status_recht",
+    "gueltig_ab",
+    "quellen"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$",
+      "description": "Stabile ID: kategorie.name, z. B. arbeitsschutz.gefaehrdungsbeurteilung"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "katalog_nr": {
+      "type": "string",
+      "description": "Verweis auf die Nummer im Startkatalog der Spezifikation, z. B. 'E.50'"
+    },
+    "titel": {
+      "$ref": "#/$defs/text"
+    },
+    "kurz": {
+      "$ref": "#/$defs/text",
+      "description": "Ein Satz: was zu tun ist und warum"
+    },
+    "erklaerung": {
+      "$ref": "#/$defs/text"
+    },
+    "begriffe": {
+      "type": "array",
+      "description": "Fachbegriffe mit Ein-Satz-Erklärung (Prinzip 5)",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "begriff",
+          "erklaerung"
+        ],
+        "properties": {
+          "begriff": {
+            "$ref": "#/$defs/text"
+          },
+          "erklaerung": {
+            "$ref": "#/$defs/text"
+          }
+        }
+      }
+    },
+    "rechtsgrundlage": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 2
+      }
+    },
+    "kategorie": {
+      "enum": [
+        "gruendung",
+        "gesellschaft",
+        "steuern",
+        "personal",
+        "arbeitsschutz",
+        "datenschutz",
+        "it_sicherheit",
+        "ki",
+        "online",
+        "produkte",
+        "branche"
+      ]
+    },
+    "branchen": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Branchenmodule (H), in denen diese Pflicht hervorgehoben wird"
+    },
+    "ausloeser": {
+      "$ref": "#/$defs/bedingung"
+    },
+    "voraussetzungen": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/pflichtId"
+      },
+      "description": "Pflichten, die vorher erledigt sein müssen (Reihenfolge im Gründungsassistenten)"
+    },
+    "frist": {
+      "$ref": "#/$defs/frist"
+    },
+    "wiederholung": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "art"
+      ],
+      "properties": {
+        "art": {
+          "enum": [
+            "einmalig",
+            "periodisch",
+            "bei_aenderung",
+            "dauerhaft"
+          ]
+        },
+        "neu_ausloesen_bei": {
+          "type": "array",
+          "description": "Bei art=bei_aenderung: Fakten oder Ereignistypen, deren Änderung eine neue Instanz erzeugt",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "fakt"
+                ],
+                "properties": {
+                  "fakt": {
+                    "$ref": "#/$defs/faktPfad"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "ereignis"
+                ],
+                "properties": {
+                  "ereignis": {
+                    "$ref": "#/$defs/ereignisTyp"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "art": {
+                "const": "bei_aenderung"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "neu_ausloesen_bei"
+            ]
+          }
+        }
+      ]
+    },
+    "stelle": {
+      "$ref": "#/$defs/text",
+      "description": "Zuständige Stelle bzw. wer handelt"
+    },
+    "kanal": {
+      "enum": [
+        "elster",
+        "portal",
+        "post",
+        "notar",
+        "intern_dokumentieren",
+        "partner"
+      ]
+    },
+    "kosten": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "text"
+          ],
+          "properties": {
+            "text": {
+              "$ref": "#/$defs/text"
+            },
+            "betrag": {
+              "$ref": "#/$defs/wert"
+            }
+          }
+        }
+      ]
+    },
+    "sanktion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "text",
+        "schwere"
+      ],
+      "properties": {
+        "text": {
+          "$ref": "#/$defs/text"
+        },
+        "schwere": {
+          "enum": [
+            "niedrig",
+            "mittel",
+            "hoch"
+          ],
+          "description": "Für die Priorisierung 'Als Nächstes tun'"
+        }
+      }
+    },
+    "automatisierung": {
+      "enum": [
+        "hinweis",
+        "formular_vorausfuellen",
+        "direkt_uebermitteln",
+        "dokument_generator",
+        "partner"
+      ]
+    },
+    "dokumente": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^vorlage\\.[a-z0-9_.<>]+$"
+      }
+    },
+    "aktion": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Was der 'Erledigen'-Knopf tut",
+      "properties": {
+        "art": {
+          "enum": [
+            "link",
+            "formular",
+            "dokument",
+            "uebermittlung",
+            "partner",
+            "abhaken"
+          ]
+        },
+        "ziel": {
+          "type": "string"
+        },
+        "nachweis_erforderlich": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "erneut_erledigen": {
+      "type": "boolean",
+      "default": false,
+      "description": "E-036: true, wenn diese Version eine bereits erledigte Pflicht wieder öffnet"
+    },
+    "aenderungsnotiz": {
+      "$ref": "#/$defs/text",
+      "description": "Was sich gegenüber der Vorversion geändert hat (für 'Was ändert sich für dich?')"
+    },
+    "status_recht": {
+      "enum": [
+        "in_kraft",
+        "beschlossen",
+        "entwurf",
+        "geplant",
+        "ausgelaufen"
+      ]
+    },
+    "gueltig_ab": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "gueltig_bis": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "radar": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Nur bei status_recht entwurf/beschlossen/geplant",
+      "required": [
+        "wahrscheinlichkeit"
+      ],
+      "properties": {
+        "wahrscheinlichkeit": {
+          "enum": [
+            "niedrig",
+            "mittel",
+            "hoch",
+            "sicher"
+          ]
+        },
+        "erwartet_ab": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "vorbereitung": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/text"
+          }
+        }
+      }
+    },
+    "quellen": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "titel",
+          "url",
+          "abgerufen"
+        ],
+        "properties": {
+          "titel": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "abgerufen": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "null = noch nicht abgerufen; prod-Release verlangt ein Datum"
+          },
+          "fundstelle": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "fachlich_zu_pruefen": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Konkrete offene Punkte; jeder erscheint in PRUEFLISTE.md"
+    },
+    "pruefung": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Nur lesend im Export. Wird aus den Freigaben abgeleitet (E-039).",
+      "properties": {
+        "status": {
+          "enum": [
+            "entwurf",
+            "in_pruefung",
+            "freigegeben",
+            "abgelehnt",
+            "zurueckgezogen"
+          ]
+        },
+        "geprueft_von": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "geprueft_am": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status_recht": {
+            "enum": [
+              "entwurf",
+              "beschlossen",
+              "geplant"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "radar"
+        ]
+      }
+    }
+  ],
+  "$defs": {
+    "text": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "de"
+      ],
+      "properties": {
+        "de": {
+          "type": "string",
+          "minLength": 1
+        },
+        "en": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "pflichtId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"
+    },
+    "faktPfad": {
+      "type": "string",
+      "pattern": "^(profil|abgeleitet|finanzen|personal|ereignis)\\.[a-z0-9_.]+$"
+    },
+    "ereignisTyp": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "regelwertId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z0-9_]+)+$"
+    },
+    "dauer": {
+      "type": "string",
+      "pattern": "^-?P(?!$)(\\d+Y)?(\\d+M)?(\\d+W)?(\\d+D)?$",
+      "description": "ISO-8601-Dauer ohne Uhrzeit, optional negativ (P1M, P7D, -P2D)"
+    },
+    "wert": {
+      "description": "Literal oder Verweis auf einen Regelwert (E-034)",
+      "oneOf": [
+        {
+          "type": [
+            "number",
+            "string",
+            "boolean"
+          ]
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": [
+              "number",
+              "string"
+            ]
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "regelwert"
+          ],
+          "properties": {
+            "regelwert": {
+              "$ref": "#/$defs/regelwertId"
+            },
+            "faktor": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "z. B. 0.8 für Warnung bei 80 %"
+            }
+          }
+        }
+      ]
+    },
+    "bedingung": {
+      "description": "Dreiwertig ausgewertet: gilt / gilt_nicht / unbekannt (E-033)",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/alle"
+        },
+        {
+          "$ref": "#/$defs/eine"
+        },
+        {
+          "$ref": "#/$defs/nicht"
+        },
+        {
+          "$ref": "#/$defs/vergleich"
+        },
+        {
+          "$ref": "#/$defs/ereignistest"
+        },
+        {
+          "$ref": "#/$defs/immer"
+        }
+      ]
+    },
+    "alle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "all"
+      ],
+      "properties": {
+        "all": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/bedingung"
+          }
+        },
+        "label": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "eine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "any"
+      ],
+      "properties": {
+        "any": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/bedingung"
+          }
+        },
+        "label": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "nicht": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "not"
+      ],
+      "properties": {
+        "not": {
+          "$ref": "#/$defs/bedingung"
+        },
+        "label": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "immer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "immer"
+      ],
+      "properties": {
+        "immer": {
+          "const": true
+        }
+      }
+    },
+    "vergleich": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "feld",
+        "op"
+      ],
+      "properties": {
+        "feld": {
+          "$ref": "#/$defs/faktPfad"
+        },
+        "op": {
+          "enum": [
+            "==",
+            "!=",
+            ">",
+            ">=",
+            "<",
+            "<=",
+            "in",
+            "nicht_in",
+            "enthaelt",
+            "enthaelt_eines",
+            "vorhanden",
+            "nicht_vorhanden"
+          ]
+        },
+        "wert": {
+          "$ref": "#/$defs/wert"
+        },
+        "label": {
+          "$ref": "#/$defs/text",
+          "description": "Menschlicher Satz für 'gilt für dich, weil …'"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "op": {
+                "enum": [
+                  "vorhanden",
+                  "nicht_vorhanden"
+                ]
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "required": [
+                "wert"
+              ]
+            }
+          },
+          "else": {
+            "required": [
+              "wert"
+            ]
+          }
+        }
+      ]
+    },
+    "ereignistest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ereignis",
+        "op"
+      ],
+      "properties": {
+        "ereignis": {
+          "$ref": "#/$defs/ereignisTyp"
+        },
+        "op": {
+          "enum": [
+            "eingetreten",
+            "nicht_eingetreten",
+            "geplant"
+          ]
+        },
+        "innerhalb": {
+          "$ref": "#/$defs/dauer",
+          "description": "Nur Ereignisse im Zeitraum (Stichtag − Dauer, Stichtag]"
+        },
+        "label": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "frist": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/fristDauerhaft"
+        },
+        {
+          "$ref": "#/$defs/fristAbsolut"
+        },
+        {
+          "$ref": "#/$defs/fristRelativ"
+        },
+        {
+          "$ref": "#/$defs/fristWiederkehrend"
+        }
+      ]
+    },
+    "verschiebung": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "regel",
+        "kalender"
+      ],
+      "properties": {
+        "regel": {
+          "enum": [
+            "keine",
+            "naechster_werktag",
+            "naechster_bankarbeitstag",
+            "vorheriger_werktag",
+            "vorheriger_bankarbeitstag"
+          ]
+        },
+        "kalender": {
+          "enum": [
+            "bundeseinheitlich",
+            "bundesland",
+            "gemeinde",
+            "bankarbeitstage"
+          ]
+        },
+        "samstag_ist_werktag": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "erinnerung": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/dauer"
+      },
+      "description": "Vorlauf für Erinnerungen, z. B. [P14D, P3D]. Nutzer kann ergänzen."
+    },
+    "fristDauerhaft": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "typ"
+      ],
+      "description": "Laufende Pflicht ohne Termin (z. B. Impressum vorhalten)",
+      "properties": {
+        "typ": {
+          "const": "dauerhaft"
+        },
+        "erinnerung": {
+          "$ref": "#/$defs/erinnerung"
+        }
+      }
+    },
+    "fristAbsolut": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "typ",
+        "datum",
+        "verschiebung"
+      ],
+      "properties": {
+        "typ": {
+          "const": "absolut"
+        },
+        "datum": {
+          "type": "string",
+          "format": "date"
+        },
+        "verschiebung": {
+          "$ref": "#/$defs/verschiebung"
+        },
+        "erinnerung": {
+          "$ref": "#/$defs/erinnerung"
+        }
+      }
+    },
+    "fristRelativ": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "typ",
+        "bezug",
+        "versatz",
+        "verschiebung"
+      ],
+      "properties": {
+        "typ": {
+          "const": "relativ"
+        },
+        "bezug": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "ereignis"
+              ],
+              "properties": {
+                "ereignis": {
+                  "$ref": "#/$defs/ereignisTyp"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "fakt"
+              ],
+              "properties": {
+                "fakt": {
+                  "$ref": "#/$defs/faktPfad"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "pflicht_erledigt"
+              ],
+              "properties": {
+                "pflicht_erledigt": {
+                  "$ref": "#/$defs/pflichtId"
+                }
+              }
+            }
+          ]
+        },
+        "versatz": {
+          "$ref": "#/$defs/dauer",
+          "description": "P0D = am Bezugstag; -P1D = Tag davor"
+        },
+        "zeitpunkt": {
+          "enum": [
+            "spaetestens",
+            "vor_beginn"
+          ],
+          "default": "spaetestens",
+          "description": "vor_beginn: muss vor dem Bezugsereignis erledigt sein"
+        },
+        "verschiebung": {
+          "$ref": "#/$defs/verschiebung"
+        },
+        "erinnerung": {
+          "$ref": "#/$defs/erinnerung"
+        }
+      }
+    },
+    "fristWiederkehrend": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "typ",
+        "rhythmus",
+        "faellig",
+        "verschiebung"
+      ],
+      "properties": {
+        "typ": {
+          "const": "wiederkehrend"
+        },
+        "rhythmus": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/rhythmusWert"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "waehle",
+                "sonst"
+              ],
+              "description": "Rhythmus abhängig von Fakten (z. B. USt-VA monatlich/vierteljährlich nach Vorjahres-Zahllast)",
+              "properties": {
+                "waehle": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "wenn",
+                      "dann"
+                    ],
+                    "properties": {
+                      "wenn": {
+                        "$ref": "#/$defs/bedingung"
+                      },
+                      "dann": {
+                        "$ref": "#/$defs/rhythmusWert"
+                      }
+                    }
+                  }
+                },
+                "sonst": {
+                  "$ref": "#/$defs/rhythmusWert"
+                }
+              }
+            }
+          ]
+        },
+        "faellig": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "art",
+                "tag"
+              ],
+              "description": "Tag 'tag' in dem Monat, der 'monate_nach' Monate nach dem Monat des Periodenendes liegt. Beispiel Periode Q3 (Ende September), monate_nach 1, tag 10 → 10. Oktober.",
+              "properties": {
+                "art": {
+                  "const": "tag_nach_periodenende"
+                },
+                "monate_nach": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "default": 1
+                },
+                "tag": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 31
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "art",
+                "termine"
+              ],
+              "description": "Feste Kalendertermine je Jahr, z. B. Vorauszahlungen",
+              "properties": {
+                "art": {
+                  "const": "feste_termine"
+                },
+                "termine": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "art",
+                "n"
+              ],
+              "description": "n-letzter Bankarbeitstag des Monats (+ Versatz in Arbeitstagen)",
+              "properties": {
+                "art": {
+                  "const": "n_letzter_bankarbeitstag"
+                },
+                "n": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 10
+                },
+                "arbeitstage_vorher": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "default": 0
+                }
+              }
+            }
+          ]
+        },
+        "verlaengerung": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "wenn",
+            "versatz"
+          ],
+          "description": "z. B. Dauerfristverlängerung",
+          "properties": {
+            "wenn": {
+              "$ref": "#/$defs/bedingung"
+            },
+            "versatz": {
+              "$ref": "#/$defs/dauer"
+            }
+          }
+        },
+        "verschiebung": {
+          "$ref": "#/$defs/verschiebung"
+        },
+        "erinnerung": {
+          "$ref": "#/$defs/erinnerung"
+        }
+      }
+    },
+    "rhythmusWert": {
+      "enum": [
+        "monatlich",
+        "quartalsweise",
+        "halbjaehrlich",
+        "jaehrlich",
+        "keiner"
+      ]
+    }
+  }
+}

@@ -1,0 +1,19 @@
+persona: solo_freiberufler
+beschreibung: Designerin, Freiberuf, Kleinunternehmerin, keine Beschäftigten
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: freiberuf
+  profil.gruendungsdatum: "2025-03-01"
+  profil.taetigkeit.einordnung: freiberuf
+  profil.erwerb: haupt
+  profil.ust.kleinunternehmer: true
+  profil.ust.zahllast_vorjahr: 0
+  profil.beschaeftigte.gesamt: 0
+  profil.bundesland: BE
+  profil.gemeinde_ags: "11000000"
+ereignisse:
+  - { typ: gruendung, datum: "2025-03-01" }
+erwartet:
+  steuern.ust_voranmeldung: gilt_nicht
+  arbeitsschutz.gefaehrdungsbeurteilung: gilt_nicht
+  gruendung.berufsgenossenschaft: gilt

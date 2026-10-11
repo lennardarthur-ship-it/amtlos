@@ -1,0 +1,64 @@
+# Werte unverändert aus Spezifikation Abschnitt 4 (E-054). Jede Datei: Liste von Regelwert-Versionen.
+- schema_version: 1
+  id: steuern.ust_va.grenze_befreiung
+  version: 1
+  katalog_nr: C.24
+  bezeichnung: { de: "Vorjahres-Zahllast, bis zu der eine Befreiung von der USt-Voranmeldung möglich ist" }
+  einheit: EUR
+  wert: 2000
+  gueltig_ab: "2026-01-01"
+  gueltig_bis: null
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 18 Abs. 2 UStG"]
+  quellen:
+    - { titel: Umsatzsteuergesetz § 18, url: "https://www.gesetze-im-internet.de/ustg_1980/__18.html", abgerufen: null }
+  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter (Beginn Betrachtungszeitraum), tatsächliches Inkrafttreten der Grenze eintragen"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+
+- schema_version: 1
+  id: steuern.ust_va.grenze_monatlich
+  version: 1
+  katalog_nr: C.24
+  bezeichnung: { de: "Vorjahres-Zahllast, ab der die USt-Voranmeldung monatlich abzugeben ist" }
+  einheit: EUR
+  wert: 9000
+  gueltig_ab: "2026-01-01"
+  gueltig_bis: null
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 18 Abs. 2 UStG"]
+  quellen:
+    - { titel: Umsatzsteuergesetz § 18, url: "https://www.gesetze-im-internet.de/ustg_1980/__18.html", abgerufen: null }
+  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Spezifikation: 'über 9.000 € monatlich' – Vergleich '>' bestätigen"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+
+- schema_version: 1
+  id: steuern.ustg19.grenze_vorjahr
+  version: 1
+  katalog_nr: C.23
+  bezeichnung: { de: Kleinunternehmer – Umsatzgrenze Vorjahr }
+  einheit: EUR
+  wert: 25000
+  gueltig_ab: "2026-01-01"
+  gueltig_bis: null
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 19 Abs. 1 UStG"]
+  quellen:
+    - { titel: Umsatzsteuergesetz § 19, url: "https://www.gesetze-im-internet.de/ustg_1980/__19.html", abgerufen: null }
+  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Grenze inklusive oder exklusive ('max. 25.000 €')?"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+
+- schema_version: 1
+  id: steuern.ustg19.grenze_laufendes_jahr
+  version: 1
+  katalog_nr: C.23
+  bezeichnung: { de: Kleinunternehmer – Umsatzgrenze laufendes Jahr }
+  einheit: EUR
+  wert: 100000
+  gueltig_ab: "2026-01-01"
+  gueltig_bis: null
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 19 Abs. 1 UStG"]
+  quellen:
+    - { titel: Umsatzsteuergesetz § 19, url: "https://www.gesetze-im-internet.de/ustg_1980/__19.html", abgerufen: null }
+  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Gründungsjahr: abweichende Grenze 25.000 € als eigener Regelwert"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
