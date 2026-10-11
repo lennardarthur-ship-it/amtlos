@@ -1,0 +1,44 @@
+persona: nebenberuflich
+beschreibung: Angestellte mit Nebengewerbe (Handgemachter Schmuck, Marktplatz), Gründung am 1.12.2026 geplant, Kleinunternehmerin, bezieht kein ALG I
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2026-12-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [onlinehandel]
+  profil.erwerb: neben
+  profil.alg1_bezug: false
+  profil.rentenversicherung.pflichtgruppe: [keine]
+  profil.erlaubnis.gewo_paragraphen: [keine]
+  profil.erlaubnis.gaststaette: false
+  profil.handwerk.anlage: keine
+  profil.umsatz.prognose_laufendes_jahr: 1500
+  profil.ust.kleinunternehmer: true
+  profil.vorauszahlung.est_kst: false
+  profil.vorauszahlung.gewst: false
+  profil.kunden.segmente: [b2c]
+  profil.kunden.regionen: [inland]
+  profil.kasse.elektronisch: false
+  profil.betriebsstaetten.anzahl: 0
+  profil.beschaeftigte.gesamt: 0
+  profil.bundesland: NW
+  profil.gemeinde_ags: "05315000"
+erwartet:
+  gruendung.gewerbeanzeige: gilt
+  gruendung.elster_konto: gilt
+  gruendung.fragebogen_steuerliche_erfassung: gilt
+  gruendung.berufsgenossenschaft: gilt
+  gruendung.krankenversicherung: gilt
+  gruendung.rundfunkbeitrag: gilt_nicht
+  gruendung.gruendungszuschuss: gilt_nicht
+  # Gründungsjahr 2026 (Gründung 1.12.2026 liegt im Stichtagsjahr)
+  steuern.kleinunternehmerregelung: gilt
+  steuern.kleinunternehmer_grenze_ueberschritten: gilt_nicht
+  # Gründungsjahr: keine Vorjahreswerte → § 141 AO greift nicht → EÜR
+  steuern.euer: gilt
+  steuern.buchfuehrungspflicht: gilt_nicht
+termine_enthaelt:
+  # Anmeldung bei Beginn, Fragebogen einen Monat danach, Berufsgenossenschaft eine Woche danach
+  gruendung.gewerbeanzeige: [["einmalig", "2026-12-01"]]
+  gruendung.fragebogen_steuerliche_erfassung: [["einmalig", "2027-01-01"]]
+  gruendung.berufsgenossenschaft: [["einmalig", "2026-12-08"]]

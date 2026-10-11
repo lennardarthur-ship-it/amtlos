@@ -1,0 +1,48 @@
+# Katalog C.29 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: steuern.rechnungen_pflichtangaben
+version: 1
+katalog_nr: C.29
+titel:
+  de: Rechnungen mit allen Pflichtangaben schreiben
+kurz:
+  de: Deine Rechnungen müssen bestimmte Angaben enthalten. Als Kleinunternehmer brauchst du einen Hinweis auf § 19 UStG.
+erklaerung:
+  de: Welche Angaben eine Rechnung braucht, regelt § 14 UStG. Für Kleinbetragsrechnungen gelten Erleichterungen. Kleinunternehmer
+    weisen auf die Steuerbefreiung nach § 19 UStG hin.
+rechtsgrundlage:
+- § 14 UStG
+- § 19 UStG
+kategorie: steuern
+ausloeser:
+  immer: true
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+aktion:
+  art: abhaken
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Umsatzsteuergesetz § 14
+  url: https://www.gesetze-im-internet.de/ustg_1980/__14.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Liste der Pflichtangaben und Kleinbetragsgrenze als Inhalt ergänzen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

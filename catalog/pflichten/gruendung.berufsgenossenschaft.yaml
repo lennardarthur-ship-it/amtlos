@@ -32,7 +32,7 @@ stelle:
 kanal: portal
 kosten: null
 sanktion:
-  text: { de: Bußgeld möglich. }
+  text: { de: Die Folgen sind noch nicht fachlich erfasst. }
   schwere: mittel
 automatisierung: hinweis
 aktion: { art: link, ziel: bg.zustaendigkeit, nachweis_erforderlich: true }
@@ -44,6 +44,7 @@ quellen:
     url: https://www.gesetze-im-internet.de/sgb_7/__192.html
     abgerufen: null
 fachlich_zu_pruefen:
+  - "Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen (früherer Text war nicht belegt)"
   - "Auslöser 'immer': gilt das für alle Rechtsformen und Freiberufler ohne Beschäftigte? Ausnahmen (z. B. andere Unfallversicherungsträger) erfassen"
   - "Fristbeginn: Gründungsdatum vs. Aufnahme der Tätigkeit"
 pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }

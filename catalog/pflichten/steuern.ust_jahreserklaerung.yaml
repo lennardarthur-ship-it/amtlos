@@ -1,0 +1,50 @@
+# Katalog C.27 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: steuern.ust_jahreserklaerung
+version: 1
+katalog_nr: C.27
+titel:
+  de: Umsatzsteuer-Jahreserklärung abgeben
+kurz:
+  de: Einmal im Jahr gibst du elektronisch die Umsatzsteuer-Jahreserklärung ab.
+erklaerung:
+  de: Die Jahreserklärung fasst die Umsatzsteuer des ganzen Jahres zusammen.
+rechtsgrundlage:
+- § 18 UStG
+kategorie: steuern
+ausloeser:
+  feld: profil.ust.kleinunternehmer
+  op: ==
+  wert: false
+  label:
+    de: Du nutzt die Kleinunternehmerregelung nicht.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: periodisch
+stelle:
+  de: Finanzamt
+kanal: elster
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: formular_vorausfuellen
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Umsatzsteuergesetz § 18
+  url: https://www.gesetze-im-internet.de/ustg_1980/__18.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Abgabefristen (mit und ohne Steuerberatung) fehlen in der Spezifikation – als jährliche Regeldaten ergänzen (Jahreskalender
+  I)
+- 'Kleinunternehmer: Erklärungspflicht prüfen'
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

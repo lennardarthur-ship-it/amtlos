@@ -1,0 +1,13 @@
+persona: grenzfall
+beschreibung: Umsatz im Vorjahr 800.000,01 € bei geringem Gewinn – buchführungspflichtig
+stichtag: '2026-10-11'
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: '2018-01-01'
+  profil.taetigkeit.einordnung: gewerbe
+  profil.umsatz.vorjahr: 800000.01
+  profil.bundesland: BE
+  profil.gewinn.vorjahr: 20000
+erwartet:
+  steuern.buchfuehrungspflicht: gilt
+  steuern.euer: gilt_nicht

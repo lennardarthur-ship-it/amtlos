@@ -62,3 +62,67 @@
     - { titel: Umsatzsteuergesetz § 19, url: "https://www.gesetze-im-internet.de/ustg_1980/__19.html", abgerufen: null }
   fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Gründungsjahr: abweichende Grenze 25.000 € als eigener Regelwert"]
   pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+
+- schema_version: 1
+  id: steuern.ustg19.grenze_gruendungsjahr
+  version: 1
+  katalog_nr: C.23
+  bezeichnung: { de: Kleinunternehmer – Umsatzgrenze für das laufende Jahr im Gründungsjahr }
+  einheit: EUR
+  wert: 25000
+  gueltig_ab: "2026-01-01"
+  gueltig_bis: null
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 19 Abs. 1 UStG"]
+  quellen:
+    - { titel: Umsatzsteuergesetz § 19, url: "https://www.gesetze-im-internet.de/ustg_1980/__19.html", abgerufen: null }
+  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Grenze inklusive oder exklusive?"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+
+- schema_version: 1
+  id: steuern.ao141.grenze_umsatz
+  version: 1
+  katalog_nr: C.28
+  bezeichnung: { de: Buchführungspflicht nach § 141 AO – Umsatzgrenze }
+  einheit: EUR
+  wert: 800000
+  gueltig_ab: "2026-01-01"
+  gueltig_bis: null
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 141 AO"]
+  quellen:
+    - { titel: Abgabenordnung § 141, url: "https://www.gesetze-im-internet.de/ao_1977/__141.html", abgerufen: null }
+  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Bezugsjahr und Vergleich (> oder ≥) bestätigen"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+
+- schema_version: 1
+  id: steuern.ao141.grenze_gewinn
+  version: 1
+  katalog_nr: C.28
+  bezeichnung: { de: Buchführungspflicht nach § 141 AO – Gewinngrenze }
+  einheit: EUR
+  wert: 80000
+  gueltig_ab: "2026-01-01"
+  gueltig_bis: null
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 141 AO"]
+  quellen:
+    - { titel: Abgabenordnung § 141, url: "https://www.gesetze-im-internet.de/ao_1977/__141.html", abgerufen: null }
+  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Bezugsjahr und Vergleich (> oder ≥) bestätigen"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+
+- schema_version: 1
+  id: steuern.e_rechnung.grenze_vorjahresumsatz_2027
+  version: 1
+  katalog_nr: C.30
+  bezeichnung: { de: E-Rechnungs-Versandpflicht ab 2027 – Grenze Vorjahresumsatz }
+  einheit: EUR
+  wert: 800000
+  gueltig_ab: "2026-01-01"
+  gueltig_bis: "2027-12-31"
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 14 UStG", "§ 27 Abs. 38 UStG"]
+  quellen:
+    - { titel: Umsatzsteuergesetz § 27, url: "https://www.gesetze-im-internet.de/ustg_1980/__27.html", abgerufen: null }
+  fachlich_zu_pruefen: ["Übergangsregel-Fundstelle (§ 27 Abs. 38 UStG) ergänzt, nicht aus Spezifikation", "gueltig_ab/gueltig_bis als Übergangszeitraum bestätigen"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }

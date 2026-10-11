@@ -1,0 +1,56 @@
+persona: kleingewerbe_ohne_personal
+beschreibung: Onlinehändler in Leipzig, Einzelunternehmen seit 2023, regelbesteuert (vierteljährlich), Kunden auch in der EU, B2B und B2C, ohne Personal
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2023-05-15"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [onlinehandel]
+  profil.erwerb: haupt
+  profil.alg1_bezug: false
+  profil.rentenversicherung.pflichtgruppe: [keine]
+  profil.erlaubnis.gewo_paragraphen: [keine]
+  profil.erlaubnis.gaststaette: false
+  profil.handwerk.anlage: keine
+  profil.umsatz.vorjahr: 95000
+  profil.umsatz.prognose_laufendes_jahr: 110000
+  profil.gewinn.vorjahr: 28000
+  profil.ust.kleinunternehmer: false
+  profil.ust.zahllast_vorjahr: 6500
+  profil.ust.dauerfristverlaengerung: false
+  profil.vorauszahlung.est_kst: true
+  profil.vorauszahlung.gewst: false
+  profil.kunden.segmente: [b2b, b2c]
+  profil.kunden.regionen: [inland, eu]
+  profil.vertrieb.kanaele: [onlineshop, marktplatz]
+  profil.kasse.elektronisch: false
+  profil.betriebsstaetten.anzahl: 1
+  profil.beschaeftigte.gesamt: 0
+  profil.bundesland: SN
+  profil.gemeinde_ags: "14713000"
+erwartet:
+  gruendung.taetigkeit_einordnen: gilt_nicht
+  gruendung.gewerbeanzeige: gilt
+  gruendung.erlaubnis_pruefen: gilt_nicht
+  gruendung.handwerksrolle: gilt_nicht
+  gruendung.ust_idnr: gilt
+  gruendung.ihk_hwk_mitgliedschaft: gilt
+  gruendung.rundfunkbeitrag: gilt
+  gruendung.gruendungszuschuss: gilt_nicht
+  steuern.kleinunternehmerregelung: gilt_nicht
+  steuern.ust_voranmeldung: gilt
+  steuern.ust_sondervorauszahlung: gilt_nicht
+  steuern.zusammenfassende_meldung: gilt
+  steuern.vorauszahlung_est_kst: gilt
+  steuern.vorauszahlung_gewst: gilt_nicht
+  steuern.gewst_erklaerung: gilt
+  steuern.buchfuehrungspflicht: gilt_nicht
+  steuern.euer: gilt
+  steuern.e_rechnung_versand_2027: gilt_nicht
+  steuern.e_rechnung_versand_2028: gilt
+  steuern.kassenmeldung: gilt_nicht
+  arbeitsschutz.gefaehrdungsbeurteilung: gilt_nicht
+termine_enthaelt:
+  # Q3: 10.10.2026 ist Samstag → Montag 12.10.
+  steuern.ust_voranmeldung: [["2026-Q3", "2026-10-12"]]
+  steuern.e_rechnung_versand_2028: [["einmalig", "2028-01-01"]]

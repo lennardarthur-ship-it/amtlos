@@ -1,0 +1,75 @@
+# Katalog C.26 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: steuern.vorauszahlung_gewst
+version: 1
+katalog_nr: C.26
+titel:
+  de: Gewerbesteuer-Vorauszahlungen zahlen
+kurz:
+  de: Wenn die Gemeinde Gewerbesteuer-Vorauszahlungen festgesetzt hat, zahlst du sie am 15. Februar, 15. Mai, 15. August und
+    15. November.
+erklaerung:
+  de: Die Höhe steht im Bescheid deiner Gemeinde.
+rechtsgrundlage:
+- § 19 GewStG
+kategorie: steuern
+ausloeser:
+  all:
+  - any:
+    - feld: abgeleitet.ist_gewerbe
+      op: ==
+      wert: true
+    - feld: abgeleitet.ist_kapitalgesellschaft
+      op: ==
+      wert: true
+    label:
+      de: Du zahlst Gewerbesteuer.
+  - feld: profil.vorauszahlung.gewst
+    op: ==
+    wert: true
+    label:
+      de: Die Gemeinde hat Gewerbesteuer-Vorauszahlungen festgesetzt.
+frist:
+  typ: wiederkehrend
+  rhythmus: keiner
+  faellig:
+    art: feste_termine
+    termine:
+    - 02-15
+    - 05-15
+    - 08-15
+    - 11-15
+  verschiebung:
+    regel: naechster_werktag
+    kalender: gemeinde
+  erinnerung:
+  - P7D
+  - P2D
+wiederholung:
+  art: periodisch
+stelle:
+  de: Gemeinde (Steueramt)
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+aktion:
+  art: abhaken
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Gewerbesteuergesetz § 19
+  url: https://www.gesetze-im-internet.de/gewstg/__19.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Verschiebung und Kalender (Gemeinde) bestätigen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

@@ -1,0 +1,85 @@
+# Katalog C.23 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: steuern.kleinunternehmer_grenze_ueberschritten
+version: 1
+katalog_nr: C.23
+titel:
+  de: 'Kleinunternehmergrenze überschritten: Umsatzsteuer prüfen'
+kurz:
+  de: Nach deinen Angaben liegt dein Umsatz über einer Kleinunternehmergrenze. Dann musst du Umsatzsteuer berechnen.
+erklaerung:
+  de: Die Kleinunternehmerregelung endet ab dem Umsatz, der die Grenze überschreitet. Prüfe mit dem Finanzamt oder deiner
+    Steuerberatung, ab wann du Umsatzsteuer ausweisen und anmelden musst.
+rechtsgrundlage:
+- § 19 UStG
+kategorie: steuern
+ausloeser:
+  all:
+  - feld: profil.ust.kleinunternehmer
+    op: ==
+    wert: true
+    label:
+      de: Du nutzt die Kleinunternehmerregelung.
+  - any:
+    - all:
+      - feld: abgeleitet.ist_gruendungsjahr
+        op: ==
+        wert: true
+        label:
+          de: Du hast dein Unternehmen in diesem Jahr gegründet.
+      - feld: profil.umsatz.prognose_laufendes_jahr
+        op: '>'
+        wert:
+          regelwert: steuern.ustg19.grenze_gruendungsjahr
+        label:
+          de: Dein erwarteter Umsatz im Gründungsjahr liegt über der Grenze für das Gründungsjahr.
+    - all:
+      - feld: abgeleitet.ist_gruendungsjahr
+        op: ==
+        wert: false
+      - feld: abgeleitet.noch_nicht_gestartet
+        op: ==
+        wert: false
+      - feld: profil.umsatz.vorjahr
+        op: '>'
+        wert:
+          regelwert: steuern.ustg19.grenze_vorjahr
+        label:
+          de: Dein Umsatz im Vorjahr lag über der Grenze.
+    - feld: profil.umsatz.prognose_laufendes_jahr
+      op: '>'
+      wert:
+        regelwert: steuern.ustg19.grenze_laufendes_jahr
+      label:
+        de: Dein erwarteter Umsatz in diesem Jahr liegt über der Grenze.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Finanzamt
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Ab dem Umsatz über der Grenze fällt Umsatzsteuer an, auch wenn du sie nicht berechnet hast.
+  schwere: hoch
+automatisierung: hinweis
+aktion:
+  art: abhaken
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Umsatzsteuergesetz § 19
+  url: https://www.gesetze-im-internet.de/ustg_1980/__19.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Vor dem Start gibt es keinen Vorjahresumsatz – Vorjahresgrenze dann nicht geprüft
+- 'Prognose statt tatsächlicher Umsatz: bis Abschnitt 4 nur Profilangaben – Formulierung „nach deinen Angaben“ bestätigen'
+- Grenze inklusive/exklusive (K-18)
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

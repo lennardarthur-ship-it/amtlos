@@ -1,0 +1,66 @@
+# Katalog C.26 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: steuern.vorauszahlung_est_kst
+version: 1
+katalog_nr: C.26
+titel:
+  de: Vorauszahlungen zur Einkommen- oder Körperschaftsteuer zahlen
+kurz:
+  de: Wenn das Finanzamt Vorauszahlungen festgesetzt hat, zahlst du sie am 10. März, 10. Juni, 10. September und 10. Dezember.
+erklaerung:
+  de: Vorauszahlungen sind Abschläge auf die Steuer des laufenden Jahres. Die Höhe steht im Vorauszahlungsbescheid.
+rechtsgrundlage:
+- § 37 EStG
+- § 31 KStG
+kategorie: steuern
+ausloeser:
+  feld: profil.vorauszahlung.est_kst
+  op: ==
+  wert: true
+  label:
+    de: Das Finanzamt hat Vorauszahlungen festgesetzt.
+frist:
+  typ: wiederkehrend
+  rhythmus: keiner
+  faellig:
+    art: feste_termine
+    termine:
+    - 03-10
+    - 06-10
+    - 09-10
+    - 12-10
+  verschiebung:
+    regel: naechster_werktag
+    kalender: bundesland
+  erinnerung:
+  - P7D
+  - P2D
+wiederholung:
+  art: periodisch
+stelle:
+  de: Finanzamt
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+aktion:
+  art: abhaken
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Einkommensteuergesetz § 37
+  url: https://www.gesetze-im-internet.de/estg/__37.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Verschiebung auf den nächsten Werktag bei Zahlungsterminen bestätigen
+- Schonfrist bei Überweisung erwähnen?
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

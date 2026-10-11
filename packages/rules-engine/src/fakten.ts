@@ -23,6 +23,7 @@ export function mitAbgeleitetenFakten(profil: Fakten, stichtag: Datum): Fakten {
     const s = jahrVon(stichtag);
     f["abgeleitet.ist_gruendungsjahr"] = j === s;
     f["abgeleitet.ist_vorjahr_gruendungsjahr"] = j === s - 1;
+    f["abgeleitet.noch_nicht_gestartet"] = gruendung > stichtag; // ISO-Daten sind lexikographisch vergleichbar
   }
   if (typeof beschaeftigte === "number") f["abgeleitet.hat_beschaeftigte"] = beschaeftigte >= 1;
   return f;
@@ -34,6 +35,7 @@ export const QUELLFAKTEN: Readonly<Record<string, readonly string[]>> = {
   "abgeleitet.ist_gewerbe": ["profil.taetigkeit.einordnung"],
   "abgeleitet.ist_gruendungsjahr": ["profil.gruendungsdatum"],
   "abgeleitet.ist_vorjahr_gruendungsjahr": ["profil.gruendungsdatum"],
+  "abgeleitet.noch_nicht_gestartet": ["profil.gruendungsdatum"],
   "abgeleitet.hat_beschaeftigte": ["profil.beschaeftigte.gesamt"],
 };
 

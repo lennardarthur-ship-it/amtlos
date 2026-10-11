@@ -1,0 +1,17 @@
+persona: grenzfall
+beschreibung: Kleinunternehmer im B2B-Geschäft – von der Versandpflicht befreit, Empfang
+  bleibt Pflicht
+stichtag: '2026-10-11'
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: '2015-01-01'
+  profil.ust.kleinunternehmer: true
+  profil.kunden.segmente:
+  - b2b
+  profil.umsatz.prognose_laufendes_jahr: 700000
+  profil.bundesland: BE
+  profil.umsatz.vorjahr: 20000
+erwartet:
+  steuern.e_rechnung_versand_2027: gilt_nicht
+  steuern.e_rechnung_versand_2028: gilt_nicht
+  steuern.e_rechnung_empfang: gilt

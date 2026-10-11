@@ -1,0 +1,81 @@
+# Katalog A.3 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: gruendung.erlaubnis_pruefen
+version: 1
+katalog_nr: A.3
+titel:
+  de: Erlaubnis für dein Gewerbe einholen
+kurz:
+  de: Für manche Gewerbe brauchst du eine Erlaubnis, bevor du anfängst – zum Beispiel als Makler, im Bewachungsgewerbe oder
+    in der Gastronomie.
+erklaerung:
+  de: Erlaubnispflichtig sind unter anderem Makler, Bewachung, Versicherungs- und Finanzanlagenvermittlung (§§ 30–34i GewO),
+    Gaststätten nach dem Gaststättenrecht der Länder und das Reisegewerbe (Reisegewerbekarte). Die Erlaubnis muss vor Aufnahme
+    der Tätigkeit vorliegen.
+rechtsgrundlage:
+- §§ 30–34i GewO
+- Gaststättenrecht der Länder
+kategorie: gruendung
+ausloeser:
+  any:
+  - feld: profil.erlaubnis.gewo_paragraphen
+    op: enthaelt_eines
+    wert:
+    - '30'
+    - '31'
+    - 33a
+    - 33c
+    - 33d
+    - 33i
+    - '34'
+    - 34a
+    - 34b
+    - 34c
+    - 34d
+    - 34e
+    - 34f
+    - 34h
+    - 34i
+    - '55'
+    label:
+      de: Deine Tätigkeit fällt unter eine erlaubnispflichtige Vorschrift der Gewerbeordnung.
+  - feld: profil.erlaubnis.gaststaette
+    op: ==
+    wert: true
+    label:
+      de: Du betreibst eine Gaststätte.
+frist:
+  typ: relativ
+  bezug:
+    fakt: profil.gruendungsdatum
+  versatz: P0D
+  zeitpunkt: vor_beginn
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Zuständige Erlaubnisbehörde (je nach Gewerbe und Land)
+kanal: portal
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Gewerbeordnung
+  url: https://www.gesetze-im-internet.de/gewo/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Reisegewerbekarte (§ 55 GewO) als eigene Pflicht führen?
+- 'Gaststättenrecht je Land: Zuständigkeit und Erlaubnisfreiheit einzelner Länder prüfen'
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

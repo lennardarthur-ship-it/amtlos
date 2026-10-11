@@ -1,0 +1,53 @@
+# Katalog C.31 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: steuern.gobd_verfahrensdokumentation
+version: 1
+katalog_nr: C.31
+titel:
+  de: GoBD einhalten und Verfahrensdokumentation führen
+kurz:
+  de: Bewahre Belege nachvollziehbar und unveränderbar auf und beschreibe in einer Verfahrensdokumentation, wie du das machst.
+erklaerung:
+  de: Die GoBD regeln, wie Bücher und Belege elektronisch geführt und aufbewahrt werden. Die Verfahrensdokumentation beschreibt
+    deine Abläufe.
+begriffe:
+- begriff:
+    de: GoBD
+  erklaerung:
+    de: Regeln der Finanzverwaltung, wie Bücher und Belege elektronisch geführt und aufbewahrt werden.
+rechtsgrundlage:
+- GoBD (BMF-Schreiben)
+- § 146 AO
+- § 147 AO
+kategorie: steuern
+ausloeser:
+  immer: true
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: dokument_generator
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Bundesministerium der Finanzen
+  url: https://www.bundesfinanzministerium.de/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Fundstelle des aktuellen GoBD-Schreibens ergänzen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

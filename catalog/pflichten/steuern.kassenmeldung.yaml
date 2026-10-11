@@ -1,0 +1,58 @@
+# Katalog C.33 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: steuern.kassenmeldung
+version: 1
+katalog_nr: C.33
+titel:
+  de: Elektronische Kasse beim Finanzamt melden
+kurz:
+  de: Melde jede elektronische Kasse innerhalb eines Monats nach der Anschaffung über ELSTER – je Betriebsstätte.
+erklaerung:
+  de: Elektronische Kassen müssen dem Finanzamt gemeldet werden, innerhalb eines Monats nach Anschaffung oder Außerbetriebnahme.
+    Bestandskassen waren bis 31.7.2025 zu melden.
+rechtsgrundlage:
+- § 146a AO
+kategorie: steuern
+ausloeser:
+  feld: profil.kasse.elektronisch
+  op: ==
+  wert: true
+  label:
+    de: Du nutzt eine elektronische Kasse.
+frist:
+  typ: relativ
+  bezug:
+    ereignis: kasse_angeschafft
+  versatz: P1M
+  zeitpunkt: spaetestens
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: bei_aenderung
+  neu_ausloesen_bei:
+  - ereignis: kasse_angeschafft
+stelle:
+  de: Finanzamt
+kanal: elster
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: formular_vorausfuellen
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Abgabenordnung § 146a
+  url: https://www.gesetze-im-internet.de/ao_1977/__146a.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Bestandskassen (Meldefrist 31.7.2025): Pflicht für Kassen ohne gemeldetes Anschaffungsdatum abbilden'
+- Verschiebung bei Fristende am Wochenende festlegen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

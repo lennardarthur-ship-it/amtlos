@@ -1,0 +1,16 @@
+persona: grenzfall
+beschreibung: Vorjahresumsatz exakt 800.000 €, Prognose darunter – keine Versandpflicht
+  2027
+stichtag: '2026-10-11'
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: '2015-01-01'
+  profil.ust.kleinunternehmer: false
+  profil.kunden.segmente:
+  - b2b
+  profil.umsatz.prognose_laufendes_jahr: 700000
+  profil.bundesland: BE
+  profil.umsatz.vorjahr: 800000
+erwartet:
+  steuern.e_rechnung_versand_2027: gilt_nicht
+  steuern.e_rechnung_versand_2028: gilt

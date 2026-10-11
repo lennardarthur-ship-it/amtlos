@@ -1,0 +1,13 @@
+persona: grenzfall
+beschreibung: Vorjahresumsatz 25.000,01 € – Kleinunternehmerregelung endet
+stichtag: '2026-10-11'
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: '2022-01-01'
+  profil.taetigkeit.einordnung: gewerbe
+  profil.ust.kleinunternehmer: true
+  profil.bundesland: BE
+  profil.umsatz.vorjahr: 25000.01
+  profil.umsatz.prognose_laufendes_jahr: 50000
+erwartet:
+  steuern.kleinunternehmer_grenze_ueberschritten: gilt

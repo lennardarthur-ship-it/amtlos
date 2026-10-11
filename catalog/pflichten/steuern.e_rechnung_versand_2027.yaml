@@ -1,0 +1,77 @@
+# Katalog C.30 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: steuern.e_rechnung_versand_2027
+version: 1
+katalog_nr: C.30
+titel:
+  de: E-Rechnungen versenden (ab 2027)
+kurz:
+  de: Ab dem 1. Januar 2027 musst du an Unternehmen E-Rechnungen schicken, wenn dein Vorjahresumsatz über 800.000 € liegt.
+erklaerung:
+  de: Die Pflicht zum Versand strukturierter E-Rechnungen (XRechnung oder ZUGFeRD) gilt ab 1.1.2027 für Unternehmen mit mehr
+    als 800.000 € Vorjahresumsatz. Kleinunternehmer sind befreit. Eine PDF-Rechnung ist keine E-Rechnung.
+rechtsgrundlage:
+- § 14 UStG
+kategorie: steuern
+ausloeser:
+  all:
+  - feld: profil.kunden.segmente
+    op: enthaelt
+    wert: b2b
+    label:
+      de: Du verkaufst an Unternehmen.
+  - feld: profil.ust.kleinunternehmer
+    op: ==
+    wert: false
+    label:
+      de: Du nutzt die Kleinunternehmerregelung nicht.
+  - any:
+    - feld: profil.umsatz.vorjahr
+      op: '>'
+      wert:
+        regelwert: steuern.e_rechnung.grenze_vorjahresumsatz_2027
+      label:
+        de: Dein Umsatz im Vorjahr lag über 800.000 €.
+    - feld: profil.umsatz.prognose_laufendes_jahr
+      op: '>'
+      wert:
+        regelwert: steuern.e_rechnung.grenze_vorjahresumsatz_2027
+      label:
+        de: Dein erwarteter Umsatz in diesem Jahr liegt über 800.000 €.
+frist:
+  typ: absolut
+  datum: '2027-01-01'
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+  erinnerung:
+  - P90D
+  - P30D
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+aktion:
+  art: abhaken
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Umsatzsteuergesetz § 14
+  url: https://www.gesetze-im-internet.de/ustg_1980/__14.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Maßgeblich ist der Umsatz 2026: bis 2026 wird auch die Prognose herangezogen – bestätigen'
+- Rechtsstatus und gueltig_ab festlegen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

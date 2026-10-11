@@ -231,6 +231,26 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 
 ---
 
+## Bauabschnitt 2
+
+### E-075 · Startbestand nur aus der Spezifikation, Lücken sichtbar
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Katalog A und C (34 Pflichten) stammen aus Spezifikation Abschnitt 4, erzeugt mit `scripts/katalog_startbestand.py`. Nennt die Spezifikation keine Frist, ist die Pflicht „laufend ohne Termin“; nennt sie keine Folgen, steht ein Platzhalter; jeweils mit Prüfpunkt. Rechtsgrundlagen außerhalb der Spezifikation sind einzeln markiert. Zwei früher ohne Beleg eingetragene Sanktionstexte (USt-VA, Berufsgenossenschaft) wurden durch den Platzhalter ersetzt.
+
+### E-076 · Vor dem Start und im Gründungsjahr keine Vorjahreswerte
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Neuer abgeleiteter Fakt `abgeleitet.noch_nicht_gestartet`. Grenzen, die sich auf das Vorjahr beziehen (Kleinunternehmer, § 141 AO), werden vor dem Start und im Gründungsjahr nicht geprüft, statt dauerhaft „Angabe fehlt“ zu zeigen. Optionen, die nur vor dem Start möglich sind (Gründungszuschuss), entfallen nach dem Start. Fachlich zu bestätigen (Prüfpunkte an den Pflichten).
+
+### E-077 · Eine Frage-Karte statt vieler bei unklaren wiederkehrenden Pflichten
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Ist offen, ob eine wiederkehrende Pflicht gilt (z. B. Vorauszahlungen), entsteht eine einzige Karte „Angabe fehlt“ ohne Termin statt einer je Termin.
+
+### E-078 · Formular-Editor im Studio, JSON nur noch optional
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Die Redaktion bearbeitet Pflichten in Formularen; Auslöser als Baum mit nur passenden Operatoren je Fakt-Typ und Klartext-Vorschau. Prüfmeldungen sind deutsch und nennen bei Varianten (Bedingung, Frist) nur die Fehler der gemeinten Variante.
+
+---
+
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)
 
 | Nr. | Frage | blockiert |

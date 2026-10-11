@@ -1,0 +1,50 @@
+persona: startup
+beschreibung: Software-Startup als GmbH in Hamburg, gegründet 2025, B2B in EU und Drittland, Investor aus dem Ausland, 4 Beschäftigte
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: "2025-09-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [it_agentur_freelancer]
+  profil.erwerb: haupt
+  profil.alg1_bezug: false
+  profil.rentenversicherung.pflichtgruppe: [keine]
+  profil.erlaubnis.gewo_paragraphen: [keine]
+  profil.erlaubnis.gaststaette: false
+  profil.handwerk.anlage: keine
+  profil.umsatz.vorjahr: 60000
+  profil.umsatz.prognose_laufendes_jahr: 900000
+  profil.gewinn.vorjahr: -150000
+  profil.ust.kleinunternehmer: false
+  profil.ust.zahllast_vorjahr: 3000
+  profil.ust.dauerfristverlaengerung: false
+  profil.vorauszahlung.est_kst: false
+  profil.vorauszahlung.gewst: false
+  profil.kunden.segmente: [b2b]
+  profil.kunden.regionen: [inland, eu, drittland]
+  profil.kasse.elektronisch: false
+  profil.betriebsstaetten.anzahl: 1
+  profil.beschaeftigte.gesamt: 4
+  profil.gesellschafter.auslaendische_investoren: true
+  profil.bundesland: HH
+  profil.gemeinde_ags: "02000000"
+erwartet:
+  gruendung.gewerbeanzeige: gilt
+  gruendung.ust_idnr: gilt
+  gruendung.ihk_hwk_mitgliedschaft: gilt
+  gruendung.krankenversicherung: gilt
+  steuern.est_erklaerung: gilt_nicht
+  steuern.gewst_erklaerung: gilt
+  steuern.ust_voranmeldung: gilt
+  steuern.zusammenfassende_meldung: gilt
+  # Kapitalgesellschaft: buchführungspflichtig nach HGB, keine EÜR – unabhängig vom negativen Gewinn
+  steuern.buchfuehrungspflicht: gilt
+  steuern.euer: gilt_nicht
+  # Vorjahr 60.000 €, aber Prognose 2026 über 800.000 € → Versandpflicht 2027 (Prüfpunkt: Bezugsjahr)
+  steuern.e_rechnung_versand_2027: gilt
+  steuern.e_rechnung_versand_2028: gilt
+  arbeitsschutz.gefaehrdungsbeurteilung: gilt
+termine_enthaelt:
+  # Vorjahr Gründungsjahr → Voranmeldung gilt; Zahllast 3.000 € ≤ 9.000 € → vierteljährlich
+  steuern.ust_voranmeldung: [["2026-Q3", "2026-10-12"]]
+  steuern.e_rechnung_versand_2027: [["einmalig", "2027-01-01"]]

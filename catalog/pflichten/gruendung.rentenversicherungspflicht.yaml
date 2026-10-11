@@ -1,0 +1,66 @@
+# Katalog A.11 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: gruendung.rentenversicherungspflicht
+version: 1
+katalog_nr: A.11
+titel:
+  de: Rentenversicherungspflicht melden
+kurz:
+  de: Bestimmte Selbstständige sind rentenversicherungspflichtig und müssen sich innerhalb von drei Monaten bei der Deutschen
+    Rentenversicherung melden.
+erklaerung:
+  de: Pflichtversichert sind zum Beispiel Lehrende, Pflegepersonen, Handwerker in der Handwerksrolle und Selbstständige mit
+    nur einem Auftraggeber. Die Meldung an die Deutsche Rentenversicherung muss innerhalb von drei Monaten erfolgen.
+rechtsgrundlage:
+- § 2 SGB VI
+- § 190a SGB VI
+kategorie: gruendung
+ausloeser:
+  feld: profil.rentenversicherung.pflichtgruppe
+  op: enthaelt_eines
+  wert:
+  - lehrende
+  - pflege
+  - handwerk_rolle
+  - ein_auftraggeber
+  - sonstige
+  label:
+    de: Du gehörst zu einer Gruppe von Selbstständigen, die rentenversicherungspflichtig sein kann.
+frist:
+  typ: relativ
+  bezug:
+    fakt: profil.gruendungsdatum
+  versatz: P3M
+  zeitpunkt: spaetestens
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Deutsche Rentenversicherung
+kanal: post
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Sozialgesetzbuch VI § 2
+  url: https://www.gesetze-im-internet.de/sgb_6/__2.html
+  abgerufen: null
+- titel: Sozialgesetzbuch VI § 190a
+  url: https://www.gesetze-im-internet.de/sgb_6/__190a.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Liste der Gruppen vollständig (§ 2 SGB VI)?
+- 'Fristbeginn: Aufnahme der Tätigkeit = Gründungsdatum?'
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

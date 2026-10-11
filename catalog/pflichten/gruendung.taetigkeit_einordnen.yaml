@@ -1,0 +1,61 @@
+# Katalog A.1 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: gruendung.taetigkeit_einordnen
+version: 1
+katalog_nr: A.1
+titel:
+  de: 'Tätigkeit einordnen: freier Beruf oder Gewerbe'
+kurz:
+  de: Kläre, ob deine Tätigkeit ein freier Beruf oder ein Gewerbe ist – davon hängt ab, welche Anmeldungen du brauchst.
+erklaerung:
+  de: Ob du freiberuflich oder gewerblich tätig bist, entscheidet über die Gewerbeanzeige, die Gewerbesteuer und die Mitgliedschaft
+    in IHK oder Handwerkskammer. Solange das offen ist, kann Amtlos diese Pflichten nicht sicher bestimmen.
+begriffe:
+- begriff:
+    de: Freier Beruf
+  erklaerung:
+    de: Bestimmte Tätigkeiten wie Ärztin, Architekt oder Journalistin, die kein Gewerbe sind.
+rechtsgrundlage:
+- § 18 EStG
+kategorie: gruendung
+ausloeser:
+  any:
+  - feld: profil.taetigkeit.einordnung
+    op: nicht_vorhanden
+    label:
+      de: Du hast noch nicht angegeben, ob deine Tätigkeit ein Gewerbe oder ein freier Beruf ist.
+  - feld: profil.taetigkeit.einordnung
+    op: ==
+    wert: unklar
+    label:
+      de: Du bist unsicher, ob deine Tätigkeit ein Gewerbe oder ein freier Beruf ist.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; im Zweifel Finanzamt oder Steuerberatung
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Ohne diese Einordnung bleibt offen, welche Anmeldungen du brauchst.
+  schwere: hoch
+automatisierung: hinweis
+aktion:
+  art: formular
+  ziel: onboarding.taetigkeit
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Einkommensteuergesetz § 18
+  url: https://www.gesetze-im-internet.de/estg/__18.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Ist das eine Pflicht oder ein vorbereitender Schritt? Darstellung als Aufgabe bestätigen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

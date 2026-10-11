@@ -1,24 +1,80 @@
 persona: kleiner_betrieb
-beschreibung: Café in Baden-Württemberg, regelbesteuert, Dauerfristverlängerung, erste Mitarbeiterin ab 2.11.2026
+beschreibung: Café in Stuttgart, Einzelunternehmen seit 2019, regelbesteuert mit Dauerfristverlängerung, elektronische Kasse, erste Mitarbeiterin ab 2.11.2026
 stichtag: "2026-10-11"
 fakten:
   profil.rechtsform: einzelunternehmen
   profil.gruendungsdatum: "2019-04-01"
   profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [gastronomie_lebensmittel]
   profil.erwerb: haupt
+  profil.alg1_bezug: false
+  profil.rentenversicherung.pflichtgruppe: [keine]
+  profil.erlaubnis.gewo_paragraphen: [keine]
+  profil.erlaubnis.gaststaette: true
+  profil.handwerk.anlage: keine
+  profil.umsatz.vorjahr: 240000
+  profil.umsatz.prognose_laufendes_jahr: 250000
+  profil.gewinn.vorjahr: 45000
   profil.ust.kleinunternehmer: false
   profil.ust.zahllast_vorjahr: 12400
   profil.ust.dauerfristverlaengerung: true
+  profil.vorauszahlung.est_kst: true
+  profil.vorauszahlung.gewst: true
+  profil.kunden.segmente: [b2c]
+  profil.kunden.regionen: [inland]
+  profil.kasse.elektronisch: true
+  profil.betriebsstaetten.anzahl: 1
   profil.beschaeftigte.gesamt: 1
   profil.bundesland: BW
+  profil.gemeinde_ags: "08111000"
 ereignisse:
+  - { typ: kasse_angeschafft, datum: "2024-02-15" }
   - { typ: erste_einstellung, datum: "2026-11-02" }
 erwartet:
-  steuern.ust_voranmeldung: gilt
-  arbeitsschutz.gefaehrdungsbeurteilung: gilt
+  gruendung.taetigkeit_einordnen: gilt_nicht
+  gruendung.gewerbeanzeige: gilt
+  gruendung.erlaubnis_pruefen: gilt
+  gruendung.handwerksrolle: gilt_nicht
+  gruendung.elster_konto: gilt
+  gruendung.fragebogen_steuerliche_erfassung: gilt
+  gruendung.ust_idnr: gilt_nicht
+  gruendung.ihk_hwk_mitgliedschaft: gilt
   gruendung.berufsgenossenschaft: gilt
+  gruendung.rundfunkbeitrag: gilt
+  gruendung.krankenversicherung: gilt
+  gruendung.rentenversicherungspflicht: gilt_nicht
+  gruendung.statusfeststellung: gilt_nicht
+  gruendung.gruendungszuschuss: gilt_nicht
+  steuern.kleinunternehmerregelung: gilt_nicht
+  steuern.kleinunternehmer_grenze_ueberschritten: gilt_nicht
+  steuern.ust_voranmeldung: gilt
+  steuern.ust_sondervorauszahlung: gilt
+  steuern.zusammenfassende_meldung: gilt_nicht
+  steuern.vorauszahlung_est_kst: gilt
+  steuern.vorauszahlung_gewst: gilt
+  steuern.est_erklaerung: gilt
+  steuern.ust_jahreserklaerung: gilt
+  steuern.gewst_erklaerung: gilt
+  steuern.buchfuehrungspflicht: gilt_nicht
+  steuern.euer: gilt
+  steuern.rechnungen_pflichtangaben: gilt
+  steuern.e_rechnung_empfang: gilt
+  steuern.e_rechnung_versand_2027: gilt_nicht
+  steuern.e_rechnung_versand_2028: gilt_nicht
+  steuern.gobd_verfahrensdokumentation: gilt
+  steuern.aufbewahrung: gilt
+  steuern.kassenmeldung: gilt
+  steuern.kassenmeldung_ausserbetriebnahme: gilt_nicht
+  steuern.kasse_tse_belegausgabe: gilt
+  steuern.bauabzugsteuer_freistellung: gilt_nicht
+  arbeitsschutz.gefaehrdungsbeurteilung: gilt
 termine_enthaelt:
   # September: 10.10. + 1 Monat Dauerfristverlängerung = 10.11.2026 (Dienstag)
   steuern.ust_voranmeldung: [["2026-09", "2026-11-10"], ["2026-10", "2026-12-10"]]
   # vor Arbeitsbeginn am 2.11. → spätestens 1.11. (Verschiebung: keine)
   arbeitsschutz.gefaehrdungsbeurteilung: [["einmalig", "2026-11-01"]]
+  # Vorauszahlungen: 10.12.2026 (Donnerstag); Gewerbesteuer 15.11.2026 ist Sonntag → Montag 16.11.
+  steuern.vorauszahlung_est_kst: [["2026-12", "2026-12-10"]]
+  steuern.vorauszahlung_gewst: [["2026-11", "2026-11-16"]]
+  # Kasse angeschafft 15.2.2024 → Meldung bis 15.3.2024
+  steuern.kassenmeldung: [["einmalig", "2024-03-15"]]

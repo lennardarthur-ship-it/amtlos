@@ -1,0 +1,61 @@
+# Katalog C.24 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: steuern.ust_sondervorauszahlung
+version: 1
+katalog_nr: C.24
+titel:
+  de: Sondervorauszahlung zur Umsatzsteuer leisten
+kurz:
+  de: Wenn du die Voranmeldung monatlich abgibst und eine Dauerfristverlängerung hast, zahlst du einmal im Jahr eine Sondervorauszahlung
+    von einem Elftel.
+erklaerung:
+  de: Bei monatlicher Abgabe mit Dauerfristverlängerung wird eine Sondervorauszahlung von 1/11 fällig.
+rechtsgrundlage:
+- § 18 UStG
+kategorie: steuern
+ausloeser:
+  all:
+  - feld: profil.ust.kleinunternehmer
+    op: ==
+    wert: false
+    label:
+      de: Du nutzt die Kleinunternehmerregelung nicht.
+  - feld: profil.ust.dauerfristverlaengerung
+    op: ==
+    wert: true
+    label:
+      de: Du hast eine Dauerfristverlängerung.
+  - feld: profil.ust.zahllast_vorjahr
+    op: '>'
+    wert:
+      regelwert: steuern.ust_va.grenze_monatlich
+    label:
+      de: Du gibst die Voranmeldung monatlich ab.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: periodisch
+stelle:
+  de: Finanzamt
+kanal: elster
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: formular_vorausfuellen
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Umsatzsteuergesetz § 18
+  url: https://www.gesetze-im-internet.de/ustg_1980/__18.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Fälligkeitstermin und Bemessungsgrundlage der Sondervorauszahlung ergänzen (K-08)
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

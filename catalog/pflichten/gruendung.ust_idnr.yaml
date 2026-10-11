@@ -1,0 +1,49 @@
+# Katalog A.6 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: gruendung.ust_idnr
+version: 1
+katalog_nr: A.6
+titel:
+  de: Umsatzsteuer-Identifikationsnummer beantragen
+kurz:
+  de: Wenn du Geschäfte mit Kunden in anderen EU-Ländern machst, beantragst du eine USt-IdNr. beim Bundeszentralamt für Steuern.
+erklaerung:
+  de: Die Umsatzsteuer-Identifikationsnummer brauchst du für Geschäfte innerhalb der EU.
+rechtsgrundlage:
+- § 27a UStG
+kategorie: gruendung
+ausloeser:
+  feld: profil.kunden.regionen
+  op: enthaelt
+  wert: eu
+  label:
+    de: Du hast Kunden in anderen EU-Ländern.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Bundeszentralamt für Steuern (BZSt)
+kanal: portal
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Umsatzsteuergesetz § 27a
+  url: https://www.gesetze-im-internet.de/ustg_1980/__27a.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Nur bei B2B-Geschäft oder bei jedem EU-Geschäft?
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

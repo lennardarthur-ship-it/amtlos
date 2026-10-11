@@ -1,0 +1,55 @@
+# Katalog A.12 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: gruendung.statusfeststellung
+version: 1
+katalog_nr: A.12
+titel:
+  de: Statusfeststellung erwägen (Scheinselbstständigkeit)
+kurz:
+  de: Wenn du nur einen Auftraggeber hast, kannst du bei der Clearingstelle der Rentenversicherung klären lassen, ob du wirklich
+    selbstständig bist.
+erklaerung:
+  de: Die Statusfeststellung ist eine Möglichkeit, keine Pflicht. Sie schafft Sicherheit, wenn das Risiko der Scheinselbstständigkeit
+    besteht.
+begriffe:
+- begriff:
+    de: Scheinselbstständigkeit
+  erklaerung:
+    de: Wenn jemand formal selbstständig ist, tatsächlich aber wie ein Angestellter arbeitet.
+rechtsgrundlage:
+- § 7a SGB IV
+kategorie: gruendung
+ausloeser:
+  feld: profil.rentenversicherung.pflichtgruppe
+  op: enthaelt
+  wert: ein_auftraggeber
+  label:
+    de: Du arbeitest überwiegend für einen Auftraggeber.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Deutsche Rentenversicherung, Clearingstelle
+kanal: post
+kosten: null
+sanktion:
+  text:
+    de: Keine Pflicht. Ohne Klärung bleibt das Risiko einer späteren Einstufung als Beschäftigung.
+  schwere: niedrig
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Sozialgesetzbuch IV § 7a
+  url: https://www.gesetze-im-internet.de/sgb_4/__7a.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- 'Option mit Risiko-Check (Spezifikation): Kriterien des Risiko-Checks fachlich festlegen'
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

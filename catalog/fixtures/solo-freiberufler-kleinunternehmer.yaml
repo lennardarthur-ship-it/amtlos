@@ -1,19 +1,71 @@
 persona: solo_freiberufler
-beschreibung: Designerin, Freiberuf, Kleinunternehmerin, keine Beschäftigten
+beschreibung: Designerin in Berlin, Freiberuf, Kleinunternehmerin, keine Beschäftigten, arbeitet von zu Hause, Kunden in Deutschland (B2B und B2C)
 stichtag: "2026-10-11"
 fakten:
   profil.rechtsform: freiberuf
   profil.gruendungsdatum: "2025-03-01"
   profil.taetigkeit.einordnung: freiberuf
+  profil.taetigkeit.branchen: [it_agentur_freelancer]
   profil.erwerb: haupt
+  profil.alg1_bezug: false
+  profil.rentenversicherung.pflichtgruppe: [keine]
+  profil.erlaubnis.gewo_paragraphen: [keine]
+  profil.erlaubnis.gaststaette: false
+  profil.handwerk.anlage: keine
+  profil.umsatz.vorjahr: 18000
+  profil.umsatz.prognose_laufendes_jahr: 22000
+  profil.gewinn.vorjahr: 12000
   profil.ust.kleinunternehmer: true
   profil.ust.zahllast_vorjahr: 0
+  profil.vorauszahlung.est_kst: false
+  profil.vorauszahlung.gewst: false
+  profil.kunden.segmente: [b2b, b2c]
+  profil.kunden.regionen: [inland]
+  profil.kasse.elektronisch: false
+  profil.betriebsstaetten.anzahl: 0
   profil.beschaeftigte.gesamt: 0
   profil.bundesland: BE
   profil.gemeinde_ags: "11000000"
 ereignisse:
   - { typ: gruendung, datum: "2025-03-01" }
 erwartet:
-  steuern.ust_voranmeldung: gilt_nicht
-  arbeitsschutz.gefaehrdungsbeurteilung: gilt_nicht
+  gruendung.taetigkeit_einordnen: gilt_nicht
+  gruendung.gewerbeanzeige: gilt_nicht
+  gruendung.erlaubnis_pruefen: gilt_nicht
+  gruendung.handwerksrolle: gilt_nicht
+  gruendung.elster_konto: gilt
+  gruendung.fragebogen_steuerliche_erfassung: gilt
+  gruendung.ust_idnr: gilt_nicht
+  gruendung.ihk_hwk_mitgliedschaft: gilt_nicht
   gruendung.berufsgenossenschaft: gilt
+  gruendung.rundfunkbeitrag: gilt_nicht
+  gruendung.krankenversicherung: gilt
+  gruendung.rentenversicherungspflicht: gilt_nicht
+  gruendung.statusfeststellung: gilt_nicht
+  gruendung.gruendungszuschuss: gilt_nicht
+  steuern.kleinunternehmerregelung: gilt
+  steuern.kleinunternehmer_grenze_ueberschritten: gilt_nicht
+  steuern.ust_voranmeldung: gilt_nicht
+  steuern.ust_sondervorauszahlung: gilt_nicht
+  steuern.zusammenfassende_meldung: gilt_nicht
+  steuern.vorauszahlung_est_kst: gilt_nicht
+  steuern.vorauszahlung_gewst: gilt_nicht
+  steuern.est_erklaerung: gilt
+  steuern.ust_jahreserklaerung: gilt_nicht
+  steuern.gewst_erklaerung: gilt_nicht
+  steuern.buchfuehrungspflicht: gilt_nicht
+  steuern.euer: gilt
+  steuern.rechnungen_pflichtangaben: gilt
+  steuern.e_rechnung_empfang: gilt
+  steuern.e_rechnung_versand_2027: gilt_nicht
+  steuern.e_rechnung_versand_2028: gilt_nicht
+  steuern.gobd_verfahrensdokumentation: gilt
+  steuern.aufbewahrung: gilt
+  steuern.kassenmeldung: gilt_nicht
+  steuern.kassenmeldung_ausserbetriebnahme: gilt_nicht
+  steuern.kasse_tse_belegausgabe: gilt_nicht
+  steuern.bauabzugsteuer_freistellung: gilt_nicht
+  arbeitsschutz.gefaehrdungsbeurteilung: gilt_nicht
+termine_enthaelt:
+  # Fragebogen: 1 Monat nach Start 1.3.2025
+  gruendung.fragebogen_steuerliche_erfassung: [["einmalig", "2025-04-01"]]

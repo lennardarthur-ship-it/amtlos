@@ -1,0 +1,88 @@
+# Katalog C.28 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: steuern.buchfuehrungspflicht
+version: 1
+katalog_nr: C.28
+titel:
+  de: Doppelte Buchführung
+kurz:
+  de: Du musst Bücher nach den Regeln der doppelten Buchführung führen und einen Jahresabschluss machen.
+erklaerung:
+  de: Buchführungspflichtig ist, wer nach dem Handelsgesetzbuch dazu verpflichtet ist oder die Grenzen nach § 141 AO überschreitet
+    (800.000 € Umsatz oder 80.000 € Gewinn). Amtlos erstellt keine Bilanz selbst, sondern übergibt an deine Steuerberatung
+    (E-051).
+rechtsgrundlage:
+- HGB
+- § 141 AO
+kategorie: steuern
+ausloeser:
+  any:
+  - feld: abgeleitet.ist_kapitalgesellschaft
+    op: ==
+    wert: true
+    label:
+      de: Dein Unternehmen ist eine Kapitalgesellschaft.
+  - feld: profil.rechtsform
+    op: in
+    wert:
+    - ek
+    - gmbh_co_kg
+    label:
+      de: Dein Unternehmen ist im Handelsregister eingetragen.
+  - all:
+    - &id001
+      all:
+      - feld: abgeleitet.ist_gruendungsjahr
+        op: ==
+        wert: false
+      - feld: abgeleitet.noch_nicht_gestartet
+        op: ==
+        wert: false
+    - feld: profil.umsatz.vorjahr
+      op: '>'
+      wert:
+        regelwert: steuern.ao141.grenze_umsatz
+      label:
+        de: Dein Umsatz im Vorjahr lag über der Grenze für die Buchführungspflicht.
+  - all:
+    - *id001
+    - feld: profil.gewinn.vorjahr
+      op: '>'
+      wert:
+        regelwert: steuern.ao141.grenze_gewinn
+      label:
+        de: Dein Gewinn im Vorjahr lag über der Grenze für die Buchführungspflicht.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst bzw. deine Steuerberatung
+kanal: partner
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: partner
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Abgabenordnung § 141
+  url: https://www.gesetze-im-internet.de/ao_1977/__141.html
+  abgerufen: null
+- titel: Handelsgesetzbuch § 238
+  url: https://www.gesetze-im-internet.de/hgb/__238.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- e.K. und GmbH & Co. KG als HGB-buchführungspflichtig angenommen – bestätigen
+- Im Gründungsjahr und vor dem Start gibt es keine Vorjahreswerte – § 141-Grenzen dann als nicht überschritten behandelt
+- '§ 141 AO: Pflicht beginnt erst nach Mitteilung des Finanzamts – berücksichtigen'
+- Grenze inklusive/exklusive
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

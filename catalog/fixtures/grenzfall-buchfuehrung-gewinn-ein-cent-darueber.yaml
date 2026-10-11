@@ -1,0 +1,13 @@
+persona: grenzfall
+beschreibung: Gewinn im Vorjahr 80.000,01 € – buchführungspflichtig, keine EÜR
+stichtag: '2026-10-11'
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: '2018-01-01'
+  profil.taetigkeit.einordnung: gewerbe
+  profil.umsatz.vorjahr: 300000
+  profil.bundesland: BE
+  profil.gewinn.vorjahr: 80000.01
+erwartet:
+  steuern.buchfuehrungspflicht: gilt
+  steuern.euer: gilt_nicht

@@ -1,0 +1,53 @@
+# Katalog C.35 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: steuern.bauabzugsteuer_freistellung
+version: 1
+katalog_nr: C.35
+titel:
+  de: Freistellungsbescheinigung für Bauleistungen beantragen
+kurz:
+  de: Wenn du Bauleistungen erbringst, beantragst du beim Finanzamt eine Freistellungsbescheinigung, damit deine Auftraggeber
+    keine Bauabzugsteuer einbehalten.
+erklaerung:
+  de: Ohne Freistellungsbescheinigung müssen Auftraggeber einen Teil deiner Rechnung als Bauabzugsteuer einbehalten.
+rechtsgrundlage:
+- § 48b EStG
+kategorie: steuern
+branchen:
+- bau
+- handwerk
+ausloeser:
+  feld: profil.taetigkeit.branchen
+  op: enthaelt
+  wert: bau
+  label:
+    de: Du erbringst Bauleistungen.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Finanzamt
+kanal: post
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Einkommensteuergesetz § 48b
+  url: https://www.gesetze-im-internet.de/estg/__48b.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Auch Handwerksbetriebe mit Bauleistungen erfassen (Branche handwerk)?
+- Gültigkeitsdauer der Bescheinigung und Erneuerung ergänzen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

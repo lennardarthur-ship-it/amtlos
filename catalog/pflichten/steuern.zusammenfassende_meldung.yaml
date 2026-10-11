@@ -1,0 +1,56 @@
+# Katalog C.25 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: steuern.zusammenfassende_meldung
+version: 1
+katalog_nr: C.25
+titel:
+  de: Zusammenfassende Meldung abgeben
+kurz:
+  de: Wenn du Leistungen an Unternehmen in anderen EU-Ländern erbringst, meldest du sie in der Zusammenfassenden Meldung.
+erklaerung:
+  de: Die Zusammenfassende Meldung ist bei innergemeinschaftlichen Leistungen an Unternehmen (B2B) abzugeben.
+rechtsgrundlage:
+- § 18a UStG
+kategorie: steuern
+ausloeser:
+  all:
+  - feld: profil.kunden.segmente
+    op: enthaelt
+    wert: b2b
+    label:
+      de: Du verkaufst an Unternehmen.
+  - feld: profil.kunden.regionen
+    op: enthaelt
+    wert: eu
+    label:
+      de: Du hast Kunden in anderen EU-Ländern.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: periodisch
+stelle:
+  de: Bundeszentralamt für Steuern
+kanal: elster
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: formular_vorausfuellen
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Umsatzsteuergesetz § 18a
+  url: https://www.gesetze-im-internet.de/ustg_1980/__18a.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Meldezeitraum und Abgabefrist ergänzen
+- Kleinunternehmer ausgenommen?
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

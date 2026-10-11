@@ -1,0 +1,62 @@
+# Katalog C.27 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: steuern.gewst_erklaerung
+version: 1
+katalog_nr: C.27
+titel:
+  de: Gewerbesteuererklärung abgeben
+kurz:
+  de: Einmal im Jahr gibst du elektronisch die Gewerbesteuererklärung ab.
+erklaerung:
+  de: Die Gewerbesteuer hängt vom Hebesatz deiner Gemeinde ab. Einzelunternehmen und Personengesellschaften haben einen Freibetrag.
+begriffe:
+- begriff:
+    de: Hebesatz
+  erklaerung:
+    de: Ein Prozentsatz, den jede Gemeinde selbst festlegt und der die Höhe der Gewerbesteuer bestimmt.
+rechtsgrundlage:
+- GewStG
+kategorie: steuern
+ausloeser:
+  any:
+  - feld: abgeleitet.ist_gewerbe
+    op: ==
+    wert: true
+    label:
+      de: Deine Tätigkeit ist ein Gewerbe.
+  - feld: abgeleitet.ist_kapitalgesellschaft
+    op: ==
+    wert: true
+    label:
+      de: Dein Unternehmen ist eine Kapitalgesellschaft.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: periodisch
+stelle:
+  de: Finanzamt
+kanal: elster
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: formular_vorausfuellen
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Gewerbesteuergesetz
+  url: https://www.gesetze-im-internet.de/gewstg/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Abgabefristen (mit und ohne Steuerberatung) fehlen in der Spezifikation – als jährliche Regeldaten ergänzen (Jahreskalender
+  I)
+- Freibetrag (C.34) als Regelwert führen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

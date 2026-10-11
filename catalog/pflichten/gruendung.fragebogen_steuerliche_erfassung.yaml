@@ -1,0 +1,63 @@
+# Katalog A.5 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: gruendung.fragebogen_steuerliche_erfassung
+version: 1
+katalog_nr: A.5
+titel:
+  de: Fragebogen zur steuerlichen Erfassung abgeben
+kurz:
+  de: Innerhalb eines Monats nach dem Start meldest du dich über ELSTER beim Finanzamt an.
+erklaerung:
+  de: Im Fragebogen gibst du unter anderem an, ob du die Kleinunternehmerregelung nutzt, und schätzt Umsatz und Gewinn. Danach
+    bekommst du deine Steuernummer.
+begriffe:
+- begriff:
+    de: Kleinunternehmerregelung
+  erklaerung:
+    de: Wer wenig Umsatz macht, kann ohne Umsatzsteuer abrechnen.
+rechtsgrundlage:
+- § 138 AO
+kategorie: gruendung
+ausloeser:
+  immer: true
+voraussetzungen:
+- gruendung.elster_konto
+frist:
+  typ: relativ
+  bezug:
+    fakt: profil.gruendungsdatum
+  versatz: P1M
+  zeitpunkt: spaetestens
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Finanzamt
+kanal: elster
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: formular_vorausfuellen
+aktion:
+  art: uebermittlung
+  ziel: elster.fragebogen
+  nachweis_erforderlich: true
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Abgabenordnung § 138
+  url: https://www.gesetze-im-internet.de/ao_1977/__138.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Fristbeginn: Aufnahme der Tätigkeit = Gründungsdatum im Profil? bestätigen'
+- Verschiebung bei Fristende am Wochenende/Feiertag festlegen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

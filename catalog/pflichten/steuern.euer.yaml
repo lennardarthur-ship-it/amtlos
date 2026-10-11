@@ -1,0 +1,84 @@
+# Katalog C.27 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: steuern.euer
+version: 1
+katalog_nr: C.27
+titel:
+  de: Einnahmen-Überschuss-Rechnung (Anlage EÜR) abgeben
+kurz:
+  de: Einmal im Jahr ermittelst du deinen Gewinn mit der Anlage EÜR und übermittelst sie elektronisch.
+erklaerung:
+  de: Wer nicht zur doppelten Buchführung verpflichtet ist, ermittelt den Gewinn mit der Einnahmen-Überschuss-Rechnung.
+rechtsgrundlage:
+- § 4 Abs. 3 EStG
+kategorie: steuern
+ausloeser:
+  not:
+    any:
+    - feld: abgeleitet.ist_kapitalgesellschaft
+      op: ==
+      wert: true
+      label:
+        de: Dein Unternehmen ist eine Kapitalgesellschaft.
+    - feld: profil.rechtsform
+      op: in
+      wert:
+      - ek
+      - gmbh_co_kg
+      label:
+        de: Dein Unternehmen ist im Handelsregister eingetragen.
+    - all:
+      - &id001
+        all:
+        - feld: abgeleitet.ist_gruendungsjahr
+          op: ==
+          wert: false
+        - feld: abgeleitet.noch_nicht_gestartet
+          op: ==
+          wert: false
+      - feld: profil.umsatz.vorjahr
+        op: '>'
+        wert:
+          regelwert: steuern.ao141.grenze_umsatz
+        label:
+          de: Dein Umsatz im Vorjahr lag über der Grenze für die Buchführungspflicht.
+    - all:
+      - *id001
+      - feld: profil.gewinn.vorjahr
+        op: '>'
+        wert:
+          regelwert: steuern.ao141.grenze_gewinn
+        label:
+          de: Dein Gewinn im Vorjahr lag über der Grenze für die Buchführungspflicht.
+  label:
+    de: Du bist nicht zur doppelten Buchführung verpflichtet.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: periodisch
+stelle:
+  de: Finanzamt
+kanal: elster
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: formular_vorausfuellen
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Einkommensteuergesetz § 4
+  url: https://www.gesetze-im-internet.de/estg/__4.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Abgabefristen (mit und ohne Steuerberatung) fehlen in der Spezifikation – als jährliche Regeldaten ergänzen (Jahreskalender
+  I)
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

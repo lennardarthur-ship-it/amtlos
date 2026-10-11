@@ -1,0 +1,59 @@
+# Katalog A.4 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: gruendung.handwerksrolle
+version: 1
+katalog_nr: A.4
+titel:
+  de: In die Handwerksrolle eintragen
+kurz:
+  de: Wenn du ein Handwerk betreibst, musst du dich bei der Handwerkskammer eintragen lassen.
+erklaerung:
+  de: Zulassungspflichtige Handwerke (Anlage A der Handwerksordnung) brauchen einen Meisterbrief oder eine Ausnahme. Zulassungsfreie
+    Handwerke (Anlage B) müssen ebenfalls eingetragen werden.
+begriffe:
+- begriff:
+    de: Handwerksrolle
+  erklaerung:
+    de: Das Verzeichnis der Handwerkskammer, in dem Handwerksbetriebe eingetragen sind.
+rechtsgrundlage:
+- HwO
+kategorie: gruendung
+branchen:
+- handwerk
+ausloeser:
+  feld: profil.handwerk.anlage
+  op: in
+  wert:
+  - a
+  - b1
+  - b2
+  label:
+    de: Dein Betrieb ist ein Handwerk nach Anlage A oder B der Handwerksordnung.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Handwerkskammer
+kanal: portal
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Handwerksordnung
+  url: https://www.gesetze-im-internet.de/hwo/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- 'Anlage B2 (handwerksähnliche Gewerbe): ebenfalls eintragungspflichtig im Sinne der Spezifikation? Verzeichnis statt Rolle?'
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

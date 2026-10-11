@@ -55,7 +55,7 @@ stelle:
 kanal: elster
 kosten: null
 sanktion:
-  text: { de: Verspätungszuschlag und Säumniszuschläge möglich. }
+  text: { de: Die Folgen sind noch nicht fachlich erfasst. }
   schwere: mittel
 automatisierung: formular_vorausfuellen
 aktion: { art: uebermittlung, ziel: elster.ust_va, nachweis_erforderlich: true }
@@ -67,6 +67,7 @@ quellen:
     url: https://www.gesetze-im-internet.de/ustg_1980/__18.html
     abgerufen: null
 fachlich_zu_pruefen:
+  - "Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen (früherer Text war nicht belegt)"
   - "Befreiung bis Grenze ist laut Spezifikation 'möglich' (Ermessen Finanzamt?) – Auslöser bildet das als 'gilt nicht' ab; Formulierung prüfen"
   - "Neugründer: Aussetzung der monatlichen Pflicht 2021–2026 (Radar) – Rhythmus im Gründungs- und Folgejahr festlegen"
   - "Sondervorauszahlung 1/11 bei monatlicher Dauerfristverlängerung als eigene Pflicht anlegen"

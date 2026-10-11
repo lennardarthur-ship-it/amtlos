@@ -1,0 +1,37 @@
+persona: international
+beschreibung: Internationale Gründerin, freiberufliche Übersetzerin in München, gründet am 1.1.2027, bezieht ALG I, Kunden in EU und Drittland, Angaben teilweise noch offen
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: freiberuf
+  profil.gruendungsdatum: "2027-01-01"
+  profil.taetigkeit.einordnung: freiberuf
+  profil.erwerb: haupt
+  profil.alg1_bezug: true
+  profil.rentenversicherung.pflichtgruppe: [ein_auftraggeber]
+  profil.ust.kleinunternehmer: true
+  profil.umsatz.prognose_laufendes_jahr: 30000
+  profil.kunden.segmente: [b2b]
+  profil.kunden.regionen: [eu, drittland]
+  profil.bundesland: BY
+  profil.gemeinde_ags: "09162000"
+erwartet:
+  gruendung.taetigkeit_einordnen: gilt_nicht
+  gruendung.gewerbeanzeige: gilt_nicht
+  gruendung.gruendungszuschuss: gilt
+  gruendung.rentenversicherungspflicht: gilt
+  gruendung.statusfeststellung: gilt
+  gruendung.ust_idnr: gilt
+  steuern.zusammenfassende_meldung: gilt
+  # Noch nicht gestartet: keine Vorjahresgrenze; Prognose 30.000 € < 100.000 € → nicht überschritten
+  steuern.kleinunternehmer_grenze_ueberschritten: gilt_nicht
+  steuern.euer: gilt
+  # Fehlende Angaben werden nie als Entlastung gewertet
+  gruendung.rundfunkbeitrag: unbekannt
+  steuern.kassenmeldung: unbekannt
+termine_enthaelt:
+  # Gründungszuschuss vor Beginn: spätestens 31.12.2026
+  gruendung.gruendungszuschuss: [["einmalig", "2026-12-31"]]
+  # Rentenversicherung: drei Monate nach Beginn
+  gruendung.rentenversicherungspflicht: [["einmalig", "2027-04-01"]]
+fehlende_fakten:
+  gruendung.rundfunkbeitrag: [profil.betriebsstaetten.anzahl]

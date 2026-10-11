@@ -1,0 +1,12 @@
+persona: grenzfall
+beschreibung: 'Gründungsjahr: erwarteter Umsatz exakt 25.000 € – nicht überschritten'
+stichtag: '2026-10-11'
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: '2026-03-01'
+  profil.taetigkeit.einordnung: gewerbe
+  profil.ust.kleinunternehmer: true
+  profil.bundesland: BE
+  profil.umsatz.prognose_laufendes_jahr: 25000
+erwartet:
+  steuern.kleinunternehmer_grenze_ueberschritten: gilt_nicht

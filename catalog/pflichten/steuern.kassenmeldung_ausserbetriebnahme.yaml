@@ -1,0 +1,55 @@
+# Katalog C.33 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: steuern.kassenmeldung_ausserbetriebnahme
+version: 1
+katalog_nr: C.33
+titel:
+  de: Außerbetriebnahme einer Kasse melden
+kurz:
+  de: Wenn du eine elektronische Kasse nicht mehr nutzt, meldest du das innerhalb eines Monats über ELSTER.
+erklaerung:
+  de: Auch die Außerbetriebnahme einer elektronischen Kasse muss dem Finanzamt innerhalb eines Monats gemeldet werden.
+rechtsgrundlage:
+- § 146a AO
+kategorie: steuern
+ausloeser:
+  ereignis: kasse_ausser_betrieb
+  op: eingetreten
+  label:
+    de: Du hast eine Kasse außer Betrieb genommen.
+frist:
+  typ: relativ
+  bezug:
+    ereignis: kasse_ausser_betrieb
+  versatz: P1M
+  zeitpunkt: spaetestens
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: bei_aenderung
+  neu_ausloesen_bei:
+  - ereignis: kasse_ausser_betrieb
+stelle:
+  de: Finanzamt
+kanal: elster
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: formular_vorausfuellen
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Abgabenordnung § 146a
+  url: https://www.gesetze-im-internet.de/ao_1977/__146a.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Mehrere Kassen: je Ereignis eine Meldung (derzeit Bezug auf die erste Außerbetriebnahme)'
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

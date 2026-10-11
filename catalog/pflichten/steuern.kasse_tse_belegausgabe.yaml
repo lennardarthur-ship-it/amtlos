@@ -1,0 +1,55 @@
+# Katalog C.33 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: steuern.kasse_tse_belegausgabe
+version: 1
+katalog_nr: C.33
+titel:
+  de: Kasse mit TSE betreiben und Belege ausgeben
+kurz:
+  de: Deine elektronische Kasse braucht eine technische Sicherheitseinrichtung (TSE), und du musst Belege ausgeben.
+erklaerung:
+  de: Elektronische Aufzeichnungssysteme müssen durch eine zertifizierte technische Sicherheitseinrichtung geschützt sein.
+    Zu jedem Geschäftsvorfall ist ein Beleg auszugeben.
+begriffe:
+- begriff:
+    de: TSE
+  erklaerung:
+    de: Technische Sicherheitseinrichtung, die Kassendaten gegen Manipulation schützt.
+rechtsgrundlage:
+- § 146a AO
+kategorie: steuern
+ausloeser:
+  feld: profil.kasse.elektronisch
+  op: ==
+  wert: true
+  label:
+    de: Du nutzt eine elektronische Kasse.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+aktion:
+  art: abhaken
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Abgabenordnung § 146a
+  url: https://www.gesetze-im-internet.de/ao_1977/__146a.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

@@ -1,0 +1,50 @@
+# Katalog A.9 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: gruendung.rundfunkbeitrag
+version: 1
+katalog_nr: A.9
+titel:
+  de: Rundfunkbeitrag für die Betriebsstätte anmelden
+kurz:
+  de: Melde deine Betriebsstätte beim Beitragsservice für den Rundfunkbeitrag an.
+erklaerung:
+  de: Für Betriebsstätten fällt der Rundfunkbeitrag an. Die Anmeldung machst du beim Beitragsservice.
+rechtsgrundlage:
+- Rundfunkbeitragsstaatsvertrag
+kategorie: gruendung
+ausloeser:
+  feld: profil.betriebsstaetten.anzahl
+  op: '>='
+  wert: 1
+  label:
+    de: Du hast mindestens eine Betriebsstätte.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: ARD ZDF Deutschlandradio Beitragsservice
+kanal: portal
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Rundfunkbeitrag für Unternehmen
+  url: https://www.rundfunkbeitrag.de/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Gilt auch für Arbeitsräume in der eigenen Wohnung?
+- Höhe nach Zahl der Beschäftigten – Staffel als Regelwert?
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

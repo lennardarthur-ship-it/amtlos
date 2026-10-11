@@ -1,0 +1,49 @@
+# Katalog C.32 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: steuern.aufbewahrung
+version: 1
+katalog_nr: C.32
+titel:
+  de: Unterlagen aufbewahren
+kurz:
+  de: Bewahre Belege und Rechnungen 8 Jahre, Jahresabschlüsse und Bücher 10 Jahre und Geschäftsbriefe 6 Jahre auf.
+erklaerung:
+  de: 'Buchungsbelege einschließlich Rechnungen: 8 Jahre. Jahresabschlüsse, Bücher und Organisationsunterlagen: 10 Jahre.
+    Handels- und Geschäftsbriefe: 6 Jahre. Amtlos zeigt dir, wann du Unterlagen löschen darfst.'
+rechtsgrundlage:
+- § 147 AO
+- § 257 HGB
+kategorie: steuern
+ausloeser:
+  immer: true
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Abgabenordnung § 147
+  url: https://www.gesetze-im-internet.de/ao_1977/__147.html
+  abgerufen: null
+- titel: Handelsgesetzbuch § 257
+  url: https://www.gesetze-im-internet.de/hgb/__257.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Fristbeginn (Ende des Kalenderjahres) und Aufbewahrungsdauern als Regelwerte führen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

@@ -1,0 +1,14 @@
+persona: grenzfall
+beschreibung: Laufendes Jahr erwartet 100.000,01 € – Grenze überschritten, Vorjahr
+  unauffällig
+stichtag: '2026-10-11'
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: '2022-01-01'
+  profil.taetigkeit.einordnung: gewerbe
+  profil.ust.kleinunternehmer: true
+  profil.bundesland: BE
+  profil.umsatz.vorjahr: 20000
+  profil.umsatz.prognose_laufendes_jahr: 100000.01
+erwartet:
+  steuern.kleinunternehmer_grenze_ueberschritten: gilt

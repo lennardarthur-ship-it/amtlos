@@ -151,3 +151,15 @@ npm run validate:prod   # zusätzlich: freigegeben, Englisch vorhanden, Quellen 
 ```
 
 Er prüft auch, dass sich Versionen eines Regelwerts zeitlich nicht überlappen und dass Dateiname und ID übereinstimmen.
+
+## Startbestand und Lücken (E-075)
+
+Der Startbestand wird aus der Spezifikation erzeugt (`scripts/katalog_startbestand.py`), danach im Studio gepflegt. Lücken werden nicht gefüllt, sondern sichtbar gemacht:
+
+| Spezifikation nennt nicht … | Im Katalog | Prüfpunkt |
+|---|---|---|
+| eine Frist | `frist: { typ: dauerhaft }` | „Frist nicht in der Spezifikation genannt …“ |
+| Folgen | „Die Folgen sind noch nicht fachlich erfasst.“ | „Folgen … nicht in der Spezifikation genannt …“ |
+| die Rechtsgrundlage | ergänzt | „Rechtsgrundlage ergänzt, steht nicht in der Spezifikation“ |
+
+Mit offenen Prüfpunkten kann eine Version in kein prod-Release (Validator `--prod`).

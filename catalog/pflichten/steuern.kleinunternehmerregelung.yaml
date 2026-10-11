@@ -1,0 +1,54 @@
+# Katalog C.23 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: steuern.kleinunternehmerregelung
+version: 1
+katalog_nr: C.23
+titel:
+  de: Kleinunternehmergrenzen im Blick behalten
+kurz:
+  de: Als Kleinunternehmer darfst du bestimmte Umsatzgrenzen nicht überschreiten – sonst endet die Regelung.
+erklaerung:
+  de: 'Die Kleinunternehmerregelung gilt, wenn dein Umsatz im Vorjahr höchstens 25.000 € betrug und im laufenden Jahr 100.000
+    € nicht übersteigt. Im Gründungsjahr gilt 25.000 € für das laufende Jahr. Die Grenze ist hart: Ab dem Umsatz, der sie
+    überschreitet, endet der Status. Wer auf die Regelung verzichtet, ist fünf Jahre daran gebunden.'
+begriffe:
+- begriff:
+    de: Kleinunternehmerregelung
+  erklaerung:
+    de: Wer wenig Umsatz macht, kann ohne Umsatzsteuer abrechnen.
+rechtsgrundlage:
+- § 19 UStG
+kategorie: steuern
+ausloeser:
+  feld: profil.ust.kleinunternehmer
+  op: ==
+  wert: true
+  label:
+    de: Du nutzt die Kleinunternehmerregelung.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Finanzamt
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Wird eine Grenze überschritten, fällt ab diesem Umsatz Umsatzsteuer an.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Umsatzsteuergesetz § 19
+  url: https://www.gesetze-im-internet.de/ustg_1980/__19.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Echtzeit-Warnungen bei 80 % und 95 % (Spezifikation C.23) folgen in Abschnitt 4 mit Finanzdaten
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

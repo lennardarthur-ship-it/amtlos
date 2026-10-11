@@ -1,0 +1,63 @@
+# Katalog A.2 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: gruendung.gewerbeanzeige
+version: 1
+katalog_nr: A.2
+titel:
+  de: Gewerbe anmelden
+kurz:
+  de: Melde dein Gewerbe bei der Gemeinde an, wenn du anfängst – und ebenso, wenn du umziehst oder aufhörst.
+erklaerung:
+  de: Die Gewerbeanzeige machst du bei deiner Gemeinde, meist online. Die Gebühr hängt von der Gemeinde ab. Das Gewerbeamt
+    informiert danach Finanzamt, IHK oder Handwerkskammer und weitere Stellen.
+rechtsgrundlage:
+- § 14 GewO
+kategorie: gruendung
+ausloeser:
+  feld: abgeleitet.ist_gewerbe
+  op: ==
+  wert: true
+  label:
+    de: Deine Tätigkeit ist ein Gewerbe.
+frist:
+  typ: relativ
+  bezug:
+    fakt: profil.gruendungsdatum
+  versatz: P0D
+  zeitpunkt: spaetestens
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: bei_aenderung
+  neu_ausloesen_bei:
+  - ereignis: sitzverlegung
+  - ereignis: betriebsaufgabe
+stelle:
+  de: Gewerbeamt der Gemeinde
+kanal: portal
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: formular_vorausfuellen
+aktion:
+  art: link
+  ziel: portal.gewerbeanzeige
+  nachweis_erforderlich: true
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Gewerbeordnung § 14
+  url: https://www.gesetze-im-internet.de/gewo/__14.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Frist „bei Beginn“: als spätestens am Tag des Beginns umgesetzt – bestätigen'
+- 'Ummeldung und Abmeldung: Fristen ergänzen'
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

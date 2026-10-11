@@ -1,0 +1,63 @@
+# Katalog C.30 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: steuern.e_rechnung_versand_2028
+version: 1
+katalog_nr: C.30
+titel:
+  de: E-Rechnungen versenden (ab 2028)
+kurz:
+  de: Ab dem 1. Januar 2028 schickst du an Unternehmen nur noch E-Rechnungen – Kleinunternehmer sind befreit.
+erklaerung:
+  de: Ab 1.1.2028 gilt die Pflicht zum Versand strukturierter E-Rechnungen für alle Unternehmen im B2B-Geschäft, außer Kleinunternehmern
+    nach § 19 UStG.
+rechtsgrundlage:
+- § 14 UStG
+kategorie: steuern
+ausloeser:
+  all:
+  - feld: profil.kunden.segmente
+    op: enthaelt
+    wert: b2b
+    label:
+      de: Du verkaufst an Unternehmen.
+  - feld: profil.ust.kleinunternehmer
+    op: ==
+    wert: false
+    label:
+      de: Du nutzt die Kleinunternehmerregelung nicht.
+frist:
+  typ: absolut
+  datum: '2028-01-01'
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+  erinnerung:
+  - P180D
+  - P60D
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+aktion:
+  art: abhaken
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Umsatzsteuergesetz § 14
+  url: https://www.gesetze-im-internet.de/ustg_1980/__14.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Rechtsstatus und gueltig_ab festlegen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

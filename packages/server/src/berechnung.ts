@@ -138,7 +138,10 @@ function sollInstanzen(
         nicht_zutreffend_grund: entscheidendeSaetze(e.begruendung).join(" ") || null });
       continue;
     }
-    if (e.termine.length) {
+    if (e.ergebnis === "unbekannt" && p.frist.typ === "wiederkehrend") {
+      // Ob die Pflicht gilt, ist offen: eine Frage-Karte statt einer „Angabe fehlt“-Karte je Termin
+      soll.push({ ...basis, periode: "einmalig", status: "offen", faellig_am: null, faellig_roh: null, nicht_zutreffend_grund: null });
+    } else if (e.termine.length) {
       for (const t of e.termine)
         soll.push({ ...basis, periode: t.periode, status: "offen", faellig_am: t.faellig_am, faellig_roh: t.verlaengert ?? t.roh, nicht_zutreffend_grund: null });
     } else if (p.frist.typ !== "wiederkehrend" || e.hinweise.includes("rhythmus_unbekannt")) {

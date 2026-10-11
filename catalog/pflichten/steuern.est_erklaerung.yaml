@@ -1,0 +1,58 @@
+# Katalog C.27 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: steuern.est_erklaerung
+version: 1
+katalog_nr: C.27
+titel:
+  de: Einkommensteuererklärung abgeben
+kurz:
+  de: Einmal im Jahr gibst du elektronisch deine Einkommensteuererklärung ab.
+erklaerung:
+  de: Die Einkommensteuererklärung übermittelst du elektronisch. Die Frist ist mit und ohne Steuerberatung unterschiedlich.
+rechtsgrundlage:
+- EStG
+kategorie: steuern
+ausloeser:
+  feld: profil.rechtsform
+  op: in
+  wert:
+  - einzelunternehmen
+  - freiberuf
+  - ek
+  - gbr
+  - partg
+  - partg_mbb
+  - gmbh_co_kg
+  label:
+    de: Du bist als Person oder über eine Personengesellschaft unternehmerisch tätig.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: periodisch
+stelle:
+  de: Finanzamt
+kanal: elster
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: formular_vorausfuellen
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Einkommensteuergesetz
+  url: https://www.gesetze-im-internet.de/estg/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Abgabefristen (mit und ohne Steuerberatung) fehlen in der Spezifikation – als jährliche Regeldaten ergänzen (Jahreskalender
+  I)
+- 'Personengesellschaften: Feststellungserklärung der Gesellschaft zusätzlich?'
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null
