@@ -100,7 +100,7 @@ export async function stripeEreignis(db: Datenbank, roh: Ereignis): Promise<"ver
   let unternehmen: string | null = null;
   let status: string | null = null;
   let laeuftBis: string | null = null;
-  let kunde: string | null = typeof o.customer === "string" ? o.customer : null;
+  const kunde: string | null = typeof o.customer === "string" ? o.customer : null;
   let abo: string | null = null;
   let plan: string | null = null;
   if (roh.type === "checkout.session.completed") {
