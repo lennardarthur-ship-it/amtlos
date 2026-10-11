@@ -65,6 +65,22 @@ try {
   for (const [feld, wert] of [["ID", `test.e2e_${Date.now()}`], ["Bezeichnung (Deutsch)", "E2E-Wert"], ["Wert", "13,90"], ["Gültig ab", "2026-01-01"], ["Rechtsgrundlagen", "§ 1 Test"], ["Quelle 1: Titel", "Test"], ["Quelle 1: Adresse", "https://example.org"]])
     await p.getByLabel(feld, { exact: true }).fill(wert);
   pruefe((await speichern("Regelwert anlegen und zur Prüfung geben", /ok=|fehler=/)).includes("ok=Regelwert angelegt"), "Neuer Regelwert konnte nicht angelegt werden");
+
+  // Marktplatz-Partner: ohne geprüfte Zulassung nicht sichtbar schaltbar; mit Zulassung angelegt (für den Web-Rundgang)
+  await p.goto(`${B}/partner`);
+  await axe("partner");
+  const neu = p.locator('section[aria-labelledby="neu"]');
+  await neu.locator('input[name="name"]').fill("E2E Steuerkanzlei");
+  await neu.locator('input[name="email"]').fill("kanzlei@example.org");
+  await neu.locator('textarea[name="pakete"]').fill("Erstberatung | 30 Minuten per Video | 90 € laut Kanzlei");
+  await neu.locator('input[name="aktiv"]').check();
+  pruefe(/zulassung/i.test(await speichern("Speichern", /fehler=/)), "Partner ohne geprüfte Zulassung wurde sichtbar geschaltet");
+  await neu.locator('input[name="name"]').fill("E2E Steuerkanzlei");
+  await neu.locator('input[name="email"]').fill("kanzlei@example.org");
+  await neu.locator('textarea[name="pakete"]').fill("Erstberatung | 30 Minuten per Video | 90 € laut Kanzlei");
+  await neu.locator('input[name="zulassung_geprueft_am"]').fill("2026-01-15");
+  await neu.locator('input[name="aktiv"]').check();
+  pruefe((await speichern("Speichern", /ok=|fehler=/)).includes("ok=1"), "Partner konnte nicht angelegt werden");
 } finally {
   await browser.close();
 }
@@ -72,4 +88,4 @@ if (fehler.length) {
   console.error(`✗ ${fehler.length} Befunde:\n- ${fehler.join("\n- ")}`);
   process.exit(1);
 }
-console.log("✓ Studio: Pflicht- und Regelwert-Formulare (Bearbeiten, Fehlermeldung, Neuanlage), axe ohne Befunde");
+console.log("✓ Studio: Pflicht-, Regelwert- und Partner-Formulare (Bearbeiten, Fehlermeldung, Neuanlage), axe ohne Befunde");

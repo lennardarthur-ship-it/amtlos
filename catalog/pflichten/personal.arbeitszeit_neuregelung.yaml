@@ -1,7 +1,7 @@
 # Katalog D.42 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.arbeitszeit_neuregelung
-version: 1
+version: 2
 katalog_nr: D.42
 titel:
   de: Elektronische Arbeitszeiterfassung (geplante Neuregelung)
@@ -42,6 +42,10 @@ status_recht: entwurf
 radar:
   wahrscheinlichkeit: mittel
   erwartet_ab: '2027-01-01'
+  vorbereitung:
+  - de: 'Arbeitszeiten jetzt schon elektronisch erfassen (Amtlos: Personal → Arbeitszeiten)'
+  - de: Beschäftigte über die geplante Pflicht informieren
+  - de: Prüfen, welche Übergangsfrist für eure Betriebsgröße gelten würde
 gueltig_ab: '2027-01-01'
 gueltig_bis: null
 quellen:
@@ -53,6 +57,7 @@ fachlich_zu_pruefen:
 - Status offen – Radar
 - Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „mittel“)
 - Schwelle 10 als Regelwert führen, sobald beschlossen
+- Vorbereitungs-Checkliste fachlich prüfen
 pruefung:
   status: entwurf
   geprueft_von: null

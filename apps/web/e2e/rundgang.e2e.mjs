@@ -126,7 +126,7 @@ async function rundgang(farbschema, breite) {
     }
     await p.goto(`${B}/finanzen/belege`);
     await p.setInputFiles("#datei", { name: "quittung.pdf", mimeType: "application/pdf", buffer: Buffer.from(`%PDF-1.4\n% e2e ${Date.now()}\n`) });
-    await Promise.all([p.waitForURL(/ok=1|fehler=/), p.getByRole("button", { name: "Hochladen" }).click()]);
+    await Promise.all([p.waitForURL(/ok=1|fehler=/), p.getByRole("button", { name: "Hochladen", exact: true }).click()]);
     pruefe(p.url().includes("ok=1"), `${name("belege")}: Upload fehlgeschlagen (${p.url()})`);
     await barrierefrei(p, name("belege"));
     await p.goto(`${B}/finanzen/ust?periode=2026-10`);
@@ -336,6 +336,53 @@ async function rundgang(farbschema, breite) {
     for (const seite of ["branche", "branche/eigenkontrollen", "branche/allergene"]) {
       await p.goto(`${B}/${seite}`);
       await barrierefrei(p, name(seite.replaceAll("/", "-")));
+    }
+  }
+
+  // Abschnitt 9: Radar, Frag Amtlos, Behörden-Postfach, Experten
+  await p.goto(`${B}/radar`);
+  await barrierefrei(p, name("radar"));
+  await p.goto(`${B}/heute`);
+  await p.fill("#heute-frage", "Wie hoch ist der Mindestlohn?");
+  await Promise.all([p.waitForURL(/\/frag\?f=/), p.getByRole("button", { name: "Fragen" }).click()]);
+  await p.getByText("Das steht im Katalog").first().waitFor({ timeout: 10000 }).catch(() => pruefe(false, `${name("frag")}: keine Antwort aus dem Katalog`));
+  pruefe(await p.getByText(/Mindestlohn/).count(), `${name("frag")}: Mindestlohn nicht gefunden`);
+  await barrierefrei(p, name("frag"));
+  if (farbschema === "light") {
+    await p.goto(`${B}/postfach`);
+    await barrierefrei(p, name("postfach"));
+    await p.setInputFiles("#datei", { name: "bescheid.pdf", mimeType: "application/pdf", buffer: Buffer.from(`%PDF-1.4\n% e2e ${kennung}\n%%EOF\n`) });
+    await Promise.all([p.waitForURL(/\/postfach\/[0-9a-f-]{36}/, { timeout: 15000 }), p.getByRole("button", { name: "Hochladen", exact: true }).click()]);
+    await barrierefrei(p, name("postfach-brief"));
+    await p.fill("#absender", "Finanzamt Teststadt");
+    await p.selectOption("#art", "bescheid");
+    await p.fill("#aktenzeichen", "12/345/67890");
+    const frist = new Date(Date.now() + 20 * 864e5).toISOString().slice(0, 10);
+    await p.fill("#frist_am", frist);
+    await p.selectOption("#frist_art", "einspruch");
+    const vorher = p.url();
+    await Promise.all([p.waitForURL((u) => u.href !== vorher, { timeout: 10000 }), p.getByRole("button", { name: "Speichern" }).click()]);
+    pruefe(!p.url().includes("fehler="), `${name("postfach")}: Einordnen abgelehnt (${decodeURIComponent(p.url())})`);
+    await p.goto(`${B}/heute`);
+    pruefe(await p.getByText(/Frist aus Behördenbrief: Finanzamt Teststadt/).count(), `${name("heute")}: Brieffrist fehlt auf Heute`);
+    await p.goto(`${B}/kalender`);
+    pruefe(await p.getByText(/Frist aus Behördenbrief: Finanzamt Teststadt/).count(), `${name("kalender")}: Brieffrist fehlt im Kalender`);
+    await p.goto(`${B}/experten`);
+    await barrierefrei(p, name("experten"));
+    const kanzlei = p.getByRole("link", { name: "E2E Steuerkanzlei" }).first();
+    if (await kanzlei.count()) {
+      await Promise.all([p.waitForURL(/\/experten\/[0-9a-f-]{36}/), kanzlei.click()]);
+      await barrierefrei(p, name("experten-partner"));
+      await p.fill("#nachricht", "Wir brauchen Hilfe bei der Umsatzsteuer-Voranmeldung.");
+      await p.check('input[name="teilen_pflichten"]');
+      await p.check('input[name="einwilligung"]');
+      await Promise.all([p.waitForURL(/gesendet=1/, { timeout: 10000 }), p.getByRole("button", { name: "Anfrage senden" }).last().click()]);
+      pruefe(await p.getByText(/an E2E Steuerkanzlei am/).count(), `${name("experten")}: eigene Anfrage fehlt`);
+    } else console.log("Hinweis: kein Partner „E2E Steuerkanzlei“ (Studio-Rundgang vorher ausführen) – Anfrage übersprungen");
+  } else {
+    for (const seite of ["postfach", "experten", "mehr"]) {
+      await p.goto(`${B}/${seite}`);
+      await barrierefrei(p, name(`${seite}-9`));
     }
   }
 

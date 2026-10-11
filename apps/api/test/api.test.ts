@@ -9,7 +9,7 @@ import { SignJWT } from "jose";
 import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { StandardKalender } from "@amtlos/fristen";
-import { Datenbank, JOBS, erzeugeWarteschlange, importiereKatalog, neuberechnen } from "@amtlos/server";
+import { Datenbank, JOBS, ProtokollVersand, erzeugeWarteschlange, importiereKatalog, neuberechnen, versendeMarktplatzAnfrage } from "@amtlos/server";
 import { DB_VERFUEGBAR, WURZEL, frischeDatenbank } from "@amtlos/server/testhilfen";
 import { erzeugeApp } from "../src/main.js";
 
@@ -823,6 +823,105 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       expect((await alsGina(http().post(`/v1/unterweisungen/${w.id}/abschliessen`)).expect(201)).body.erledigte_pflichten).toBe(1);
       const nach = ((await alsGina(http().get("/v1/pflichten")).expect(200)).body as { pflicht_id: string; periode: string; status: string }[]).find((x) => x.pflicht_id === "branche.gastro_ifsg_belehrung" && x.periode === periode);
       expect(nach?.status).toBe("erledigt");
+    });
+  });
+
+  describe("Radar, Frag Amtlos, Postfach, Marktplatz", () => {
+    let rosa: string;
+    let u: string;
+    const alsRosa = (x: request.Test) => x.set("Authorization", `Bearer ${rosa}`).set("X-Unternehmen-Id", u);
+    const jahr = new Date().getFullYear();
+
+    beforeAll(async () => {
+      rosa = await token("rosa");
+      u = (await http().post("/v1/unternehmen").set("Authorization", `Bearer ${rosa}`).send({ name: "Rosas Start-up" }).expect(201)).body.id;
+      await alsRosa(http().put("/v1/profil")).send({ daten: { rechtsform: "ug", gruendungsdatum: `${jahr}-02-01`, "taetigkeit.einordnung": "gewerbe", gemeinde_ags: "11000000", "ki.nutzung": true, "ki.eigene_produkte": true, "beschaeftigte.gesamt": 2 } }).expect(200);
+      await neuberechnen(worker, u, "test", { kalender: new StandardKalender() });
+    });
+
+    it("Radar zeigt geplante Regeln, die dich betreffen würden, mit Wahrscheinlichkeit und Vorbereitung", async () => {
+      const r = (await alsRosa(http().get("/v1/radar")).expect(200)).body as { eintraege: { pflicht_id: string; art: string; betroffen: string; wahrscheinlichkeit: string; vorbereitung: string[]; erwartet_ab: string | null }[]; werte: unknown[] };
+      const neugruender = r.eintraege.find((e) => e.pflicht_id === "steuern.ust_va_neugruender_radar");
+      expect(neugruender).toMatchObject({ art: "radar", betroffen: "ja", erwartet_ab: "2027-01-01" });
+      expect(neugruender!.vorbereitung.length).toBeGreaterThan(0);
+      expect(r.eintraege.find((e) => e.pflicht_id === "ki.transparenz")).toMatchObject({ wahrscheinlichkeit: "sicher" });
+      expect(r.eintraege.some((e) => e.pflicht_id === "gruendung.berufsgenossenschaft")).toBe(false); // keine normalen Pflichten
+      expect(Array.isArray(r.werte)).toBe(true);
+    });
+
+    it("Frag Amtlos antwortet aus dem Katalog mit Quelle, erkennt Beratungsfragen und Unsicherheit", async () => {
+      await alsRosa(http().post("/v1/frage")).send({ frage: "?" }).expect(422);
+      const a = (await alsRosa(http().post("/v1/frage")).send({ frage: "Brauche ich eine Gefährdungsbeurteilung?" }).expect(201)).body;
+      expect(a.art).toBe("antwort");
+      expect(a.treffer[0]).toMatchObject({ pflicht_id: "arbeitsschutz.gefaehrdungsbeurteilung", gilt_fuer_dich: true });
+      expect(a.treffer[0].quellen.length).toBeGreaterThan(0);
+      expect(a.ki_formuliert).toBe(false);
+      const m = (await alsRosa(http().post("/v1/frage")).send({ frage: "Wie hoch ist der Mindestlohn pro Stunde?" }).expect(201)).body;
+      expect(m.regelwerte[0]).toMatchObject({ id: "personal.mindestlohn.stunde" });
+      expect((await alsRosa(http().post("/v1/frage")).send({ frage: "Soll ich lieber eine GmbH gründen?" }).expect(201)).body.art).toBe("beratung");
+      expect((await alsRosa(http().post("/v1/frage")).send({ frage: "Wie backe ich ein Sauerteigbrot?" }).expect(201)).body.art).toBe("unsicher");
+    });
+
+    it("Benachrichtigungen: nur eigene, gelesen markieren", async () => {
+      const rosaKonto = (await http().get("/v1/ich").set("Authorization", `Bearer ${rosa}`).expect(200)).body.konto.id;
+      const owner = new Datenbank(urls.owner);
+      await owner.imKontext({ kontoId: rosaKonto, unternehmenId: u }, async (tx) => {
+        for (const titel of ["Neu für dich: A", "Geändert: B"])
+          await tx.abfrage("insert into app.benachrichtigung (unternehmen_id, konto_id, art, titel, text, link) values ($1, $2, 'rechtsaenderung', $3, 'x', '/pflichten')", [u, rosaKonto, titel]);
+      });
+      await owner.schliessen();
+      const liste = (await alsRosa(http().get("/v1/benachrichtigungen")).expect(200)).body as { id: string; gelesen_am: string | null }[];
+      expect(liste).toHaveLength(2);
+      expect((await alsRosa(http().post("/v1/benachrichtigungen/gelesen")).send({ ids: [liste[0]!.id] }).expect(201)).body).toEqual({ gelesen: 1 });
+      expect((await alsRosa(http().post("/v1/benachrichtigungen/gelesen")).send({}).expect(201)).body).toEqual({ gelesen: 1 });
+    });
+
+    it("Behörden-Postfach: Brief hochladen, einordnen mit Frist aus dem Brief, erledigen", async () => {
+      await alsRosa(http().post("/v1/briefe")).attach("datei", Buffer.from("kein pdf"), { filename: "brief.pdf", contentType: "application/pdf" }).expect(422);
+      const b = (await alsRosa(http().post("/v1/briefe")).attach("datei", Buffer.from(`%PDF-1.4\n% Bescheid ${Date.now()}\n`), { filename: "bescheid.pdf", contentType: "application/pdf" }).expect(201)).body;
+      expect(b.art).toBe("sonstiges");
+      const frist = `${jahr + 1}-01-15`;
+      await alsRosa(http().put(`/v1/briefe/${b.id}`)).send({ eingang_am: b.eingang_am, art: "bescheid", frist_am: frist }).expect(422); // Fristart fehlt
+      await alsRosa(http().put(`/v1/briefe/${b.id}`)).send({ eingang_am: b.eingang_am, art: "bescheid", frist_am: frist, frist_art: "einspruch", pflicht_id: "gibt.es_nicht" }).expect(422);
+      const e = (await alsRosa(http().put(`/v1/briefe/${b.id}`)).send({ eingang_am: b.eingang_am, absender: "Finanzamt Mitte", art: "bescheid", aktenzeichen: "12/345", frist_am: frist, frist_art: "einspruch", betrag_cent: 12345, pflicht_id: "steuern.ust_voranmeldung" }).expect(200)).body;
+      expect(e).toMatchObject({ art: "bescheid", frist_art: "einspruch", betrag_cent: 12345 });
+      const liste = (await alsRosa(http().get("/v1/briefe")).expect(200)).body;
+      expect(liste[0].tage_bis_frist).toBeGreaterThan(0);
+      const termine = (await alsRosa(http().get("/v1/termine")).expect(200)).body;
+      expect(termine).toContainEqual(expect.objectContaining({ art: "brief", datum: frist, titel: "Frist aus Behördenbrief: Finanzamt Mitte · 12/345" }));
+      const abo = (await alsRosa(http().post("/v1/kalender/abo")).expect(201)).body;
+      const ics = (await http().get(new URL(abo.url).pathname).expect(200)).text;
+      expect(ics).toContain("SUMMARY:Frist aus Behördenbrief: Finanzamt Mitte · 12/345");
+      expect(ics).toContain(`DTSTART;VALUE=DATE:${frist.replaceAll("-", "")}`);
+      await alsRosa(http().post(`/v1/briefe/${b.id}/erledigt`)).send({ datum: new Date().toISOString().slice(0, 10) }).expect(201);
+      expect((await alsRosa(http().get("/v1/termine")).expect(200)).body.some((x: { art: string }) => x.art === "brief")).toBe(false);
+    });
+
+    it("Marktplatz: nur geprüfte Partner, Anfrage nur mit Einwilligung, geteilt wird genau das Gewählte", async () => {
+      const owner = new Datenbank(urls.owner);
+      const [ok, ungeprueft] = await owner.imKontext({}, async (tx) => [
+        (await tx.eine<{ id: string }>("insert into katalog.partner (name, qualifikation, regionen, email, zulassung_geprueft_am, pakete) values ('Kanzlei Klar', 'steuerberater', '{BE}', 'klar@kanzlei.example', '2026-09-01', $1) returning id", [JSON.stringify([{ titel: "Gründungspaket", preis_text: "Festpreis laut Kanzlei" }])]))!.id,
+        (await tx.eine<{ id: string }>("insert into katalog.partner (name, qualifikation, email) values ('Ungeprüft', 'rechtsanwalt', 'x@example.org') returning id"))!.id,
+      ]);
+      await owner.schliessen();
+      const p = (await alsRosa(http().get("/v1/partner")).expect(200)).body as { id: string; in_der_naehe: boolean }[];
+      expect(p.map((x) => x.id)).toContain(ok);
+      expect(p.map((x) => x.id)).not.toContain(ungeprueft);
+      expect(p.find((x) => x.id === ok)?.in_der_naehe).toBe(true);
+      await alsRosa(http().get("/v1/partner?qualifikation=koch")).expect(422);
+      await alsRosa(http().post(`/v1/partner/${ok}/anfrage`)).send({ nachricht: "Bitte um Unterstützung bei der Gründung.", einwilligung: false }).expect(422);
+      await alsRosa(http().post(`/v1/partner/${ungeprueft}/anfrage`)).send({ nachricht: "Bitte um Unterstützung bei der Gründung.", einwilligung: true }).expect(404);
+      await alsRosa(http().post(`/v1/partner/${ok}/anfrage`)).send({ nachricht: "Bitte um Unterstützung bei der Gründung.", paket: "Luxus", einwilligung: true }).expect(422);
+      const a = (await alsRosa(http().post(`/v1/partner/${ok}/anfrage`)).send({ nachricht: "Bitte um Unterstützung bei der Gründung.", paket: "Gründungspaket", teilen: { unternehmen: true }, einwilligung: true }).expect(201)).body;
+      expect(a.geteilte_daten).toMatchObject({ kontakt: { email: "rosa@example.org" }, unternehmen: { name: "Rosas Start-up", rechtsform: "ug" } });
+      expect(a.geteilte_daten.offene_pflichten).toBeUndefined();
+      const versand = new ProtokollVersand();
+      expect(await versendeMarktplatzAnfrage(worker, versand, { unternehmenId: u, anfrageId: a.id })).toBe("gesendet");
+      expect(versand.gesendet[0]).toMatchObject({ an: "klar@kanzlei.example" });
+      expect(versand.gesendet[0]!.text).toContain("Gründungspaket");
+      expect(versand.gesendet[0]!.text).toContain("Rosas Start-up");
+      expect(await versendeMarktplatzAnfrage(worker, versand, { unternehmenId: u, anfrageId: a.id })).toBe("uebersprungen");
+      expect((await alsRosa(http().get("/v1/marktplatz/anfragen")).expect(200)).body[0]).toMatchObject({ partner: "Kanzlei Klar" });
     });
   });
 });

@@ -327,3 +327,54 @@ export async function pruefpunkte(db: Datenbank) {
       order by 1, 2, 3`),
   );
 }
+
+// ------------------------------------------------------------ Marktplatz-Partner (6.12, E-102)
+
+export interface PartnerDaten {
+  name: string;
+  qualifikation: string;
+  kanzlei?: string;
+  regionen?: string[];
+  beschreibung?: string;
+  pakete?: { titel: string; umfang?: string; preis_text?: string }[];
+  email: string;
+  website?: string | null;
+  zulassung_geprueft_am?: string | null;
+  aktiv?: boolean;
+}
+
+const LAENDER = ["BW", "BY", "BE", "BB", "HB", "HH", "HE", "MV", "NI", "NW", "RP", "SL", "SN", "ST", "SH", "TH"];
+
+/** Prüft Partnerdaten; gibt Fehlermeldungen zurück (leer = gültig). */
+export function pruefePartner(d: PartnerDaten): string[] {
+  const f: string[] = [];
+  if (!d.name?.trim()) f.push("Name fehlt");
+  if (!["steuerberater", "rechtsanwalt", "fachkraft_arbeitssicherheit", "datenschutzbeauftragter"].includes(d.qualifikation)) f.push("Qualifikation unbekannt");
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email ?? "")) f.push("E-Mail-Adresse ungültig");
+  if (d.website && !/^https:\/\//.test(d.website)) f.push("Website muss mit https:// beginnen");
+  for (const r of d.regionen ?? []) if (!LAENDER.includes(r)) f.push(`Bundesland unbekannt: ${r}`);
+  for (const p of d.pakete ?? []) if (!p.titel?.trim()) f.push("Jedes Paket braucht einen Titel");
+  if (d.zulassung_geprueft_am && !/^\d{4}-\d{2}-\d{2}$/.test(d.zulassung_geprueft_am)) f.push("Datum der Zulassungsprüfung ungültig");
+  return f;
+}
+
+export async function partnerListe(db: Datenbank) {
+  return db.imKontext({}, (tx) => tx.abfrage("select * from katalog.partner order by not aktiv, qualifikation, name"));
+}
+
+/** Anlegen oder ändern; nur Plattform-Admin oder Redaktion. Aktiv schalten nur mit geprüfter Zulassung. */
+export async function partnerSpeichern(db: Datenbank, wer: StudioKonto, d: PartnerDaten, id?: string) {
+  if (!wer.rollen.some((r) => r === "plattform_admin" || r === "redaktion")) throw new StudioFehler("Nur Plattform-Admin oder Redaktion pflegt Partner");
+  const fehler = pruefePartner(d);
+  if (d.aktiv !== false && !d.zulassung_geprueft_am) fehler.push("Aktiv nur mit geprüfter Berufszulassung");
+  if (fehler.length) throw new StudioFehler(fehler.join("; "));
+  const werte = [d.name.trim(), d.qualifikation, d.kanzlei ?? "", d.regionen ?? [], d.beschreibung ?? "", JSON.stringify(d.pakete ?? []), d.email.trim(), d.website ?? null, d.zulassung_geprueft_am ?? null, d.aktiv !== false];
+  return db.imKontext({ kontoId: wer.id }, async (tx) => {
+    if (id) {
+      const r = await tx.eine("update katalog.partner set name = $2, qualifikation = $3, kanzlei = $4, regionen = $5, beschreibung = $6, pakete = $7, email = $8, website = $9, zulassung_geprueft_am = $10, aktiv = $11 where id = $1 returning *", [id, ...werte]);
+      if (!r) throw new StudioFehler("Partner nicht gefunden");
+      return r;
+    }
+    return tx.eine("insert into katalog.partner (name, qualifikation, kanzlei, regionen, beschreibung, pakete, email, website, zulassung_geprueft_am, aktiv) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) returning *", werte);
+  });
+}

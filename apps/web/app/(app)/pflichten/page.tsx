@@ -54,6 +54,10 @@ export default async function PflichtenSeite({ searchParams }: { searchParams: P
           <Link href="/kalender" className="verweis">
             {x.pflichten.alle_termine}
           </Link>
+          {" · "}
+          <Link href="/radar" className="verweis">
+            {x.radar.link}
+          </Link>
         </p>
       ) : null}
       {sichtbar.length === 0 ? <p className="lesetext">{x.pflichten.leer}</p> : null}

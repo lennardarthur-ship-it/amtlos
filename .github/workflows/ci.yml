@@ -112,14 +112,14 @@ jobs:
             SITZUNG_SCHLUESSEL=ci-studio-schluessel-mindestens-32-zeichen-lang \
             STUDIO_DATABASE_URL=postgresql://studio_user:amtlos@localhost:5432/amtlos nohup pnpm --filter @amtlos/studio start > studio.log 2>&1 &
           for i in $(seq 1 60); do curl -sf localhost:3001/v1/gesundheit >/dev/null && curl -s -o /dev/null localhost:3000/anmelden && curl -s -o /dev/null localhost:3100/anmelden && break; sleep 1; done
+      - name: Rundgang Studio-Editor (legt den Marktplatz-Partner für den Web-Rundgang an)
+        run: |
+          set -o pipefail
+          STUDIO_URL=http://localhost:3100 pnpm --filter @amtlos/studio e2e 2>&1 | tee e2e-studio.txt
       - name: Rundgang Web-App
         run: |
           set -o pipefail
           E2E_URL=http://localhost:3000 E2E_BILDER=$PWD/e2e-bilder pnpm --filter @amtlos/web e2e 2>&1 | tee e2e-web.txt
-      - name: Rundgang Studio-Editor
-        run: |
-          set -o pipefail
-          STUDIO_URL=http://localhost:3100 pnpm --filter @amtlos/studio e2e 2>&1 | tee e2e-studio.txt
       # Fehler als Annotationen ausgeben – lesbar auch ohne Log-Download
       - if: failure()
         run: for f in e2e-web.txt e2e-studio.txt api.log web.log; do [ -f "$f" ] && tail -n 4 "$f" | sed "s/^/::error title=$f::/" || true; done

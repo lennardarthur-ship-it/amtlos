@@ -1,7 +1,7 @@
 # Katalog F.61 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: datenschutz.dsb_streichung
-version: 1
+version: 2
 katalog_nr: F.61
 titel:
   de: Wegfall der Schwelle nach § 38 BDSG (geplant)
@@ -41,6 +41,9 @@ status_recht: geplant
 radar:
   wahrscheinlichkeit: mittel
   erwartet_ab: '2026-12-31'
+  vorbereitung:
+  - de: Bis zur Änderung gilt § 38 BDSG weiter – Benennung nicht vorschnell aufheben
+  - de: Prüfen, ob die Benennungspflicht nach Art. 37 DSGVO unabhängig davon besteht
 gueltig_ab: null
 gueltig_bis: null
 quellen:
@@ -52,6 +55,7 @@ fachlich_zu_pruefen:
 - Status offen – Radar
 - Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „mittel“)
 - „bis Ende 2026“ als erwartet ab 31.12.2026 eingetragen
+- Vorbereitungs-Checkliste fachlich prüfen
 pruefung:
   status: entwurf
   geprueft_von: null

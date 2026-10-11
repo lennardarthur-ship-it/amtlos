@@ -1,7 +1,7 @@
 # Katalog F.65 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: ki.transparenz
-version: 2
+version: 3
 katalog_nr: F.65
 titel:
   de: KI-Inhalte und KI-Interaktion kennzeichnen
@@ -42,6 +42,9 @@ status_recht: beschlossen
 radar:
   wahrscheinlichkeit: sicher
   erwartet_ab: '2026-12-02'
+  vorbereitung:
+  - de: Auflisten, wo ihr KI-Inhalte veröffentlicht oder Chatbots einsetzt
+  - de: Kennzeichnung für Chatbots und KI-erzeugte Inhalte vorbereiten
 gueltig_ab: '2026-12-02'
 gueltig_bis: null
 quellen:
@@ -52,6 +55,7 @@ fachlich_zu_pruefen:
 - Welche Fälle des Art. 50 treffen auf Kleinbetriebe zu (Chatbot, Deepfake, generierte Texte)?
 - Nach dem 2.12.2026 auf in_kraft umstellen
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Vorbereitungs-Checkliste fachlich prüfen
 pruefung:
   status: entwurf
   geprueft_von: null

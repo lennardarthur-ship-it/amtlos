@@ -1,0 +1,12 @@
+persona: gruenderin
+beschreibung: Gründung im laufenden Jahr – Radar zur USt-Voranmeldung für Neugründer und zum Gründungsbeschleunigungsgesetz
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2026-08-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.bundesland: BY
+  profil.gemeinde_ags: "09162000"
+erwartet:
+  steuern.ust_va_neugruender_radar: gilt
+  gruendung.gruendungsbeschleunigung_radar: gilt

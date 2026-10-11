@@ -1,6 +1,6 @@
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { Datenbank, StudioFehler, importiereKatalog, pflichtUebersicht, pflichtVersionen, pruefentscheidung, releaseVeroeffentlichen, studioKonto, testlauf, type StudioKonto } from "../src/index.js";
+import { Datenbank, StudioFehler, importiereKatalog, partnerListe, partnerSpeichern, pflichtUebersicht, pflichtVersionen, pruefentscheidung, releaseVeroeffentlichen, studioKonto, testlauf, type StudioKonto } from "../src/index.js";
 import { DB_VERFUEGBAR, WURZEL, frischeDatenbank } from "../src/testhilfen.js";
 
 describe.skipIf(!DB_VERFUEGBAR)("Studio: Versionen, Vier-Augen-Freigabe, Releases", () => {
@@ -123,4 +123,14 @@ describe.skipIf(!DB_VERFUEGBAR)("Studio: Versionen, Vier-Augen-Freigabe, Release
     const { neuePflichtversion } = await import("../src/studio.js");
     return neuePflichtversion(studio, wer, daten);
   }
+
+  it("pflegt Marktplatz-Partner: nur Redaktion/Admin, sichtbar nur mit geprüfter Zulassung, Daten geprüft", async () => {
+    const basis = { name: "Kanzlei Test", qualifikation: "steuerberater", email: "info@kanzlei.example", regionen: ["BE"], pakete: [{ titel: "Gründung", preis_text: "Festpreis" }] };
+    await expect(partnerSpeichern(studio, k.stb!, basis)).rejects.toThrow(/Redaktion/);
+    await expect(partnerSpeichern(studio, k.redakteurin!, basis)).rejects.toThrow(/geprüfter Berufszulassung/);
+    await expect(partnerSpeichern(studio, k.redakteurin!, { ...basis, email: "kaputt", regionen: ["XX"], zulassung_geprueft_am: "2026-09-01" })).rejects.toThrow(/E-Mail.*Bundesland unbekannt: XX/);
+    const p = (await partnerSpeichern(studio, k.redakteurin!, { ...basis, zulassung_geprueft_am: "2026-09-01" })) as { id: string };
+    await partnerSpeichern(studio, k.redakteurin!, { ...basis, name: "Kanzlei Test & Partner", aktiv: false }, p.id);
+    expect((await partnerListe(studio)).find((x) => x.id === p.id)).toMatchObject({ name: "Kanzlei Test & Partner", aktiv: false });
+  });
 });

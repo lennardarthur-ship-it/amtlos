@@ -301,10 +301,11 @@ export class PflichtenController {
       tx.eine<{ konto_id: string; unternehmen_id: string }>("select * from app.kalender_abo_aufloesen($1)", [createHash("sha256").update(token).digest()]),
     );
     if (!abo) throw new NotFoundException();
-    const { name, zeilen, sprache } = await this.db.imKontext({ kontoId: abo.konto_id, unternehmenId: abo.unternehmen_id }, async (tx) => ({
+    const { name, zeilen, sprache, weitere } = await this.db.imKontext({ kontoId: abo.konto_id, unternehmenId: abo.unternehmen_id }, async (tx) => ({
       name: (await tx.eine<{ name: string }>("select name from app.unternehmen where id = $1", [abo.unternehmen_id]))?.name ?? "Amtlos",
       sprache: (await tx.eine<{ sprache: "de" | "en" }>("select sprache from app.konto where id = $1", [abo.konto_id]))?.sprache ?? "de",
       zeilen: await tx.abfrage<Zeile>(`${ABFRAGE} and pi.status = 'offen' and pi.faellig_am is not null order by pi.faellig_am`, [abo.unternehmen_id]),
+      weitere: await weitereTermine(tx, abo.unternehmen_id),
     }));
     const ics = erzeugeIcs(
       `Amtlos – ${name}`,
@@ -314,8 +315,30 @@ export class PflichtenController {
         titel: t(z.daten.titel, sprache)!,
         beschreibung: t(z.daten.kurz, sprache),
         url: `${this.k.WEB_URL}/pflichten/${encodeURIComponent(z.pflicht_id)}/${encodeURIComponent(z.periode)}`,
-      })),
+      })).concat(weitere.map((w) => ({ uid: `${w.id}@amtlos`, datum: w.datum, titel: terminTitel(w, sprache), beschreibung: undefined, url: `${this.k.WEB_URL}${w.link}` }))),
     );
     res.type("text/calendar; charset=utf-8").send(ics);
   }
+}
+
+/** Termine außerhalb des Katalogs: Fristen aus Behördenbriefen und nächste Geräteprüfungen (Spezifikation 4.I, 6.11). */
+export interface WeitererTermin { id: string; art: "brief" | "pruefung"; datum: string; titel: string; link: string }
+export async function weitereTermine(tx: Tx, unternehmenId: string): Promise<WeitererTermin[]> {
+  const briefe = await tx.abfrage<{ id: string; frist_am: string; absender: string; art: string; aktenzeichen: string; frist_art: string }>(
+    "select id, frist_am, absender, art, aktenzeichen, frist_art from app.behoerdenbrief where unternehmen_id = $1 and erledigt_am is null and frist_am is not null",
+    [unternehmenId],
+  );
+  const geraete = await tx.abfrage<{ id: string; naechste_pruefung: string; bezeichnung: string }>(
+    "select id, naechste_pruefung, bezeichnung from app.arbeitsmittel where unternehmen_id = $1 and ausgesondert_am is null and naechste_pruefung is not null",
+    [unternehmenId],
+  );
+  return [
+    ...briefe.map((b) => ({ id: b.id, art: "brief" as const, datum: b.frist_am, titel: [b.absender, b.aktenzeichen].filter(Boolean).join(" · ") || b.art, link: `/postfach/${b.id}` })),
+    ...geraete.map((g) => ({ id: g.id, art: "pruefung" as const, datum: g.naechste_pruefung, titel: g.bezeichnung, link: "/personal/arbeitsmittel" })),
+  ].sort((a, b) => a.datum.localeCompare(b.datum));
+}
+
+export function terminTitel(w: WeitererTermin, s: "de" | "en"): string {
+  if (w.art === "pruefung") return s === "en" ? `Equipment test: ${w.titel}` : `Geräteprüfung: ${w.titel}`;
+  return s === "en" ? `Deadline (letter): ${w.titel}` : `Frist aus Behördenbrief: ${w.titel}`;
 }

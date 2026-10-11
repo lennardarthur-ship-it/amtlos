@@ -6,8 +6,10 @@ import {
   planeErinnerungen,
   versendeFaelligeErinnerungen,
   versendeEinladung,
+  versendeMarktplatzAnfrage,
   type Datenbank,
   type EinladungsJob,
+  type MarktplatzJob,
   type NeuberechnungsJob,
   type Versand,
 } from "@amtlos/server";
@@ -53,6 +55,12 @@ export async function arbeiterStarten(boss: PgBoss, db: Datenbank, versand: Vers
     for (const job of jobs) {
       const r = await versendeEinladung(db, versand, appUrl, job.data);
       log.info("einladung", { einladung: job.data.einladungId, ergebnis: r }); // kein Token, keine Adresse im Log
+    }
+  });
+  await boss.work<MarktplatzJob>(JOBS.marktplatzAnfrage, async (jobs) => {
+    for (const job of jobs) {
+      const r = await versendeMarktplatzAnfrage(db, versand, job.data);
+      log.info("marktplatz_anfrage", { anfrage: job.data.anfrageId, ergebnis: r }); // keine Inhalte im Log
     }
   });
   // Zeitpläne (Europe/Berlin): Tageswechsel kurz nach Mitternacht, Erinnerungen alle 15 Minuten

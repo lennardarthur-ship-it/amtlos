@@ -4,6 +4,9 @@ import { Navigation } from "@/komponenten/navigation";
 import { aktivesUnternehmen, ich } from "@/lib/api";
 import { t } from "@/lib/sprache";
 
+/** Seiten, die über „Mehr“ erreicht werden (dort ist „Mehr“ aktiv). */
+const MEHR = ["/radar", "/frag", "/experten", "/team", "/hilfe", "/melden"];
+
 export default async function AppRahmen({ children }: { children: ReactNode }) {
   const [{ t: x }, u, i] = await Promise.all([t(), aktivesUnternehmen(), ich()]);
   return (
@@ -39,8 +42,9 @@ export default async function AppRahmen({ children }: { children: ReactNode }) {
             { href: "/datenschutz", text: x.nav.datenschutz, symbol: "datenschutz", nurDesktop: true },
             { href: "/online", text: x.nav.online, symbol: "online", nurDesktop: true },
             { href: "/branche", text: x.nav.branche, symbol: "branche", nurDesktop: true },
+            { href: "/postfach", text: x.nav.postfach, symbol: "postfach", nurDesktop: true },
             { href: "/einstellungen", text: x.nav.einstellungen, symbol: "einstellungen", nurDesktop: true },
-            { href: "/mehr", text: x.nav.mehr, symbol: "mehr", nurMobil: true },
+            { href: "/mehr", text: x.nav.mehr, symbol: "mehr", auch: MEHR },
           ]}
         />
       </aside>

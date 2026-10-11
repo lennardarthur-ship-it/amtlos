@@ -22,7 +22,7 @@ KEINE = {"regel": "keine", "kalender": "bundeseinheitlich"}
 NATUERLICHE = ["einzelunternehmen", "freiberuf", "ek", "gbr", "partg", "partg_mbb", "gmbh_co_kg"]
 
 # Bereits veröffentlichte Pflichten, deren Inhalt sich geändert hat, bekommen eine neue Version (Versionen sind unveränderlich, E-019).
-VERSION = {"arbeitsschutz.dguv_v3": 2, "datenschutz.avv": 2, "datenschutz.dsfa": 2, "gruendung.erlaubnis_pruefen": 2, "gruendung.rentenversicherungspflicht": 2, "ki.kompetenz": 2, "ki.transparenz": 2, "online.barrierefreiheit": 2, "online.button_loesung": 2, "online.cookie_einwilligung": 2, "online.dac7": 2, "online.datenschutzerklaerung": 2, "online.impressum": 2, "online.kuendigungsbutton": 2, "online.marktplatz_angaben": 2, "online.os_link": 2, "online.preisangaben": 2, "online.vsbg_hinweis": 2, "online.widerrufsbelehrung": 2, "online.widerrufsbutton": 2, "produkte.batterien": 2, "produkte.elektrogeraete": 2, "produkte.geldwaesche_gueterhaendler": 2, "produkte.gpsr": 2, "produkte.verpackung": 2}  # Abschnitt 8: Branchenpakete zugeordnet
+VERSION = {"arbeitsschutz.dguv_v3": 2, "datenschutz.avv": 2, "datenschutz.dsfa": 2, "gruendung.erlaubnis_pruefen": 2, "gruendung.rentenversicherungspflicht": 2, "ki.kompetenz": 2, "ki.transparenz": 3, "online.barrierefreiheit": 2, "online.button_loesung": 2, "online.cookie_einwilligung": 2, "online.dac7": 2, "online.datenschutzerklaerung": 2, "online.impressum": 2, "online.kuendigungsbutton": 2, "online.marktplatz_angaben": 2, "online.os_link": 2, "online.preisangaben": 2, "online.vsbg_hinweis": 2, "online.widerrufsbelehrung": 2, "online.widerrufsbutton": 2, "produkte.batterien": 2, "produkte.elektrogeraete": 2, "produkte.geldwaesche_gueterhaendler": 2, "produkte.gpsr": 2, "produkte.verpackung": 2, "personal.arbeitszeit_neuregelung": 2, "personal.entgelttransparenz_bericht": 2, "datenschutz.dsb_streichung": 2, "ki.hochrisiko": 2}  # Abschnitt 8: Branchenpakete zugeordnet
 
 def t(de): return {"de": de}
 def q(titel, pfad): return {"titel": titel, "url": pfad if pfad.startswith("http") else GII + pfad, "abgerufen": None}
@@ -43,6 +43,7 @@ def pflicht(id, nr, titel, kurz, erklaerung, rechtsgrundlage, kategorie, ausloes
     if frist["typ"] == "dauerhaft" and not any("Frist" in x for x in pp): pp.insert(0, OHNE_FRIST)
     if sanktion is None: sanktion = FOLGEN_PLATZHALTER; pp.append(OHNE_FOLGEN)
     if rg_ergaenzt: pp.append("Rechtsgrundlage ergänzt, steht nicht in der Spezifikation")
+    if radar and radar.get("vorbereitung") and not any("Vorbereitungs-Checkliste" in x for x in pp): pp.append("Vorbereitungs-Checkliste fachlich prüfen")
     p = {
         "schema_version": 1, "id": id, "version": VERSION.get(id, 1), "katalog_nr": nr,
         "titel": t(titel), "kurz": t(kurz), "erklaerung": t(erklaerung),
@@ -814,7 +815,7 @@ pflicht("personal.arbeitszeit_neuregelung", "D.42", "Elektronische Arbeitszeiter
   {"all": [HAT_B, v("profil.beschaeftigte.gesamt", ">", 10, "Du beschäftigst mehr als 10 Personen.")]}, "dauerhaft", "–", "intern_dokumentieren", "hinweis",
   [q("Arbeitszeitgesetz", "arbzg/")],
   ["Status offen – Radar", "Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „mittel“)", "Schwelle 10 als Regelwert führen, sobald beschlossen"], status_recht="entwurf", gueltig_ab="2027-01-01",
-  radar={"wahrscheinlichkeit": "mittel", "erwartet_ab": "2027-01-01"},
+  radar={"wahrscheinlichkeit": "mittel", "erwartet_ab": "2027-01-01", "vorbereitung": [t('Arbeitszeiten jetzt schon elektronisch erfassen (Amtlos: Personal → Arbeitszeiten)'), t('Beschäftigte über die geplante Pflicht informieren'), t('Prüfen, welche Übergangsfrist für eure Betriebsgröße gelten würde')]},
   sanktion="Noch keine – geplante Regelung.", schwere="mittel")
 
 pflicht("personal.mutterschutz_gefaehrdungsbeurteilung", "D.43", "Mutterschutz in der Gefährdungsbeurteilung",
@@ -871,7 +872,7 @@ pflicht("personal.entgelttransparenz_bericht", "D.47", "Bericht zur Entgelttrans
   {"typ": "absolut", "datum": "2027-06-07", "verschiebung": KEINE}, "–", "intern_dokumentieren", "hinweis",
   [q("Entgelttransparenzgesetz", "entgtranspg/")],
   ["Status offen – Radar", "Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „hoch“, weil EU-Richtlinie)", "Zählweise und Inhalt des Berichts nach Umsetzungsgesetz"], status_recht="geplant",
-  radar={"wahrscheinlichkeit": "hoch", "erwartet_ab": "2027-06-07"}, sanktion="Noch keine – geplante Regelung.")
+  radar={"wahrscheinlichkeit": "hoch", "erwartet_ab": "2027-06-07", "vorbereitung": [t('Entgeltstruktur nach Geschlecht auswerten (mit Lohnbüro)'), t('Kriterien für gleiche und gleichwertige Arbeit festhalten')]}, sanktion="Noch keine – geplante Regelung.")
 
 pflicht("personal.aushangpflichtige_gesetze", "D.48", "Aushangpflichtige Gesetze aushängen",
   "Je nach Belegschaft hängst du bestimmte Gesetze im Betrieb aus, zum Beispiel ArbZG, AGG, MuSchG und JArbSchG.",
@@ -1059,7 +1060,7 @@ pflicht("datenschutz.dsb_streichung", "F.61", "Wegfall der Schwelle nach § 38 B
   "dauerhaft", "–", "intern_dokumentieren", "hinweis",
   [q("Bundesdatenschutzgesetz § 38", "bdsg_2018/__38.html")],
   ["Status offen – Radar", "Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „mittel“)", "„bis Ende 2026“ als erwartet ab 31.12.2026 eingetragen"],
-  status_recht="geplant", radar={"wahrscheinlichkeit": "mittel", "erwartet_ab": "2026-12-31"}, sanktion="Keine – geplante Erleichterung.", schwere="niedrig")
+  status_recht="geplant", radar={"wahrscheinlichkeit": "mittel", "erwartet_ab": "2026-12-31", "vorbereitung": [t('Bis zur Änderung gilt § 38 BDSG weiter – Benennung nicht vorschnell aufheben'), t('Prüfen, ob die Benennungspflicht nach Art. 37 DSGVO unabhängig davon besteht')]}, sanktion="Keine – geplante Erleichterung.", schwere="niedrig")
 
 pflicht("datenschutz.dsfa", "F.62", "Prüfen, ob eine Datenschutz-Folgenabschätzung nötig ist",
   "Verarbeitest du besonders sensible Daten oder überwachst du mit Video, prüfst du, ob eine Datenschutz-Folgenabschätzung nötig ist.",
@@ -1141,7 +1142,7 @@ pflicht("ki.transparenz", "F.65", "KI-Inhalte und KI-Interaktion kennzeichnen",
   KI_EIGEN, {"typ": "absolut", "datum": "2026-12-02", "verschiebung": KEINE}, "Du selbst", "intern_dokumentieren", "hinweis",
   [KI_VO],
   ["Welche Fälle des Art. 50 treffen auf Kleinbetriebe zu (Chatbot, Deepfake, generierte Texte)?", "Nach dem 2.12.2026 auf in_kraft umstellen"], gueltig_ab="2026-12-02",
-  status_recht="beschlossen", radar={"wahrscheinlichkeit": "sicher", "erwartet_ab": "2026-12-02"}, schwere="mittel", branchen=['it_agentur_freelancer'])
+  status_recht="beschlossen", radar={"wahrscheinlichkeit": "sicher", "erwartet_ab": "2026-12-02", "vorbereitung": [t('Auflisten, wo ihr KI-Inhalte veröffentlicht oder Chatbots einsetzt'), t('Kennzeichnung für Chatbots und KI-erzeugte Inhalte vorbereiten')]}, schwere="mittel", branchen=['it_agentur_freelancer'])
 
 pflicht("ki.hochrisiko", "F.65", "Pflichten für Hochrisiko-KI (verschoben)",
   "Für Hochrisiko-KI-Systeme gelten umfangreiche Pflichten – verschoben auf 2.12.2027 bzw. 2.8.2028.",
@@ -1150,7 +1151,7 @@ pflicht("ki.hochrisiko", "F.65", "Pflichten für Hochrisiko-KI (verschoben)",
   KI_EIGEN, "dauerhaft", "–", "intern_dokumentieren", "hinweis",
   [KI_VO],
   ["Status und Daten nach dem Digital Omnibus prüfen", "Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „hoch“)", "Welcher der beiden Termine gilt wofür?"],
-  status_recht="beschlossen", radar={"wahrscheinlichkeit": "hoch", "erwartet_ab": "2027-12-02"}, sanktion="Noch keine – Pflichten gelten später.", schwere="mittel")
+  status_recht="beschlossen", radar={"wahrscheinlichkeit": "hoch", "erwartet_ab": "2027-12-02", "vorbereitung": [t('Prüfen, ob eure KI-Produkte in einen Hochrisiko-Bereich fallen'), t('Dokumentation und Risikomanagement der Produkte sichten')]}, sanktion="Noch keine – Pflichten gelten später.", schwere="mittel")
 
 
 # ============================================================ G. Online, Handel und Produkte (Bauabschnitt 7)
@@ -1486,5 +1487,29 @@ pflicht("branche.immo_gwg", "H.8", "Geldwäschegesetz für Immobilien- und Finan
   IMMO, "dauerhaft", "Du selbst; Aufsicht der Länder bzw. BaFin", "intern_dokumentieren", "hinweis",
   [q("Geldwäschegesetz § 2", "gwg_2017/__2.html")],
   ["Welche Tätigkeiten genau (Makler, Vermittler) – Auslöser verfeinern"], schwere="hoch", branchen=["immobilien_finanzen"])
+
+
+# ============================================================ Radar (Spezifikation 5, Bauabschnitt 9)
+
+pflicht("steuern.ust_va_neugruender_radar", "C.21", "Monatliche USt-Voranmeldung für Neugründer ab 2027",
+  "Die Aussetzung der monatlichen Voranmeldung für Neugründer endet am 31.12.2026 – ob sie verlängert wird, ist offen.",
+  "Ohne Verlängerung müssten Gründer im Gründungsjahr und im Folgejahr wieder monatlich Voranmeldungen abgeben.",
+  ["§ 18 Abs. 2 UStG"], "steuern",
+  {"any": [v("abgeleitet.ist_gruendungsjahr", "==", True, "Du bist im Gründungsjahr."), v("abgeleitet.noch_nicht_gestartet", "==", True, "Du gründest gerade."), v("abgeleitet.ist_vorjahr_gruendungsjahr", "==", True, "Du hast im Vorjahr gegründet.")]},
+  "dauerhaft", "Finanzamt", "elster", "hinweis",
+  [q("Umsatzsteuergesetz § 18", "ustg_1980/__18.html")],
+  ["Status offen – Radar", "Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „mittel“)", "Vorbereitungs-Checkliste fachlich prüfen"],
+  status_recht="geplant", radar={"wahrscheinlichkeit": "mittel", "erwartet_ab": "2027-01-01", "vorbereitung": [t("Belege und Rechnungen monatlich vollständig halten"), t("Mit der Steuerberatung klären, welcher Rhythmus ab 2027 gilt")]},
+  sanktion="Noch keine – mögliche Änderung.", schwere="mittel")
+
+pflicht("gruendung.gruendungsbeschleunigung_radar", "A.0", "Gründung in 24 Stunden (Gründungsbeschleunigungsgesetz, geplant)",
+  "Geplant ist, Gründungen digital und deutlich schneller zu ermöglichen.",
+  "Ein Gesetzentwurf liegt noch nicht vor. Amtlos beobachtet das Vorhaben und passt den Gründungsassistenten an, sobald es konkret wird.",
+  ["Gründungsbeschleunigungsgesetz (geplant)"], "gruendung",
+  {"any": [v("abgeleitet.noch_nicht_gestartet", "==", True, "Du gründest gerade."), v("abgeleitet.ist_gruendungsjahr", "==", True, "Du bist im Gründungsjahr.")]},
+  "dauerhaft", "–", "intern_dokumentieren", "hinweis",
+  [q("Gewerbeordnung", "gewo/")],
+  ["Status offen – Radar", "Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „niedrig“)", "Quelle (Vorhaben der Bundesregierung) ergänzen"],
+  status_recht="geplant", radar={"wahrscheinlichkeit": "niedrig", "erwartet_ab": None}, sanktion="Keine – geplante Erleichterung.", schwere="niedrig", phase="gruendung")
 
 print("geschrieben:", len(list(ZIEL.glob("*.yaml"))))

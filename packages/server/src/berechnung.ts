@@ -10,6 +10,8 @@ export interface BerechnungsErgebnis {
   status: "berechnet" | "kein_profil" | "kein_katalog";
   laufId?: string;
   instanzen?: { neu: number; aktualisiert: number; entfallen: number; nicht_zutreffend: number };
+  /** Benachrichtigungen „Was ändert sich für dich?“ (nur beim Release-Rollout) */
+  benachrichtigt?: number;
 }
 
 /** Profil-Daten werden ohne Präfix gespeichert ({ "rechtsform": … }); die Engine erwartet Fakten-Pfade. */
@@ -29,6 +31,7 @@ interface Instanz {
   faellig_am: Datum | null;
   erledigt_am: string | null;
   erledigt_mit_version_id: string | null;
+  pflicht_version_id?: string;
 }
 
 interface Soll {
@@ -79,17 +82,10 @@ export async function neuberechnenInTx(
   );
   if (!profil) return { status: "kein_profil" };
 
-  const ereignisZeilen = await tx.abfrage<{ id: string; typ: string; eingetreten_am: Datum; storniert_ereignis_id: string | null }>(
-    "select id, typ, eingetreten_am, storniert_ereignis_id from app.ereignis where unternehmen_id = $1 order by eingetreten_am, erfasst_am",
-    [unternehmenId],
-  );
-  const storniert = new Set(ereignisZeilen.map((e) => e.storniert_ereignis_id).filter(Boolean));
-  const ereignisse: Ereignis[] = ereignisZeilen
-    .filter((e) => !e.storniert_ereignis_id) // Storno-Einträge selbst sind keine fachlichen Ereignisse
-    .map((e) => ({ typ: e.typ, datum: e.eingetreten_am, ...(storniert.has(e.id) ? { storniert: true } : {}) }));
+  const ereignisse = await ladeEreignisse(tx, unternehmenId);
 
   const bestand = await tx.abfrage<Instanz>(
-    `select id, pflicht_id, periode, status, faellig_am, erledigt_am::date::text as erledigt_am, erledigt_mit_version_id
+    `select id, pflicht_id, periode, status, faellig_am, erledigt_am::date::text as erledigt_am, erledigt_mit_version_id, pflicht_version_id
        from app.pflicht_instanz where unternehmen_id = $1`,
     [unternehmenId],
   );
@@ -111,10 +107,12 @@ export async function neuberechnenInTx(
 
   const pflichtNachId = new Map(aktiv.katalog.pflichten.map((p) => [p.id, p]));
   const soll = sollInstanzen(ergebnisse, pflichtNachId, aktiv.versionIds, bestand, ereignisse);
+  // Rechtsänderung (Release-Rollout): betroffene Mitglieder benachrichtigen – „Was ändert sich für dich?“ (Spezifikation 5)
+  const benachrichtigt = ausgeloestDurch.startsWith("release:") ? await rechtsaenderungenMelden(tx, unternehmenId, soll, bestand, pflichtNachId) : 0;
   const zaehler = await abgleichen(tx, unternehmenId, lauf!.id, soll, bestand, fenster.von);
 
   await tx.abfrage("update app.berechnungslauf set dauer_ms = $2 where id = $1", [lauf!.id, Date.now() - start]);
-  return { status: "berechnet", laufId: lauf!.id, instanzen: zaehler };
+  return { status: "berechnet", laufId: lauf!.id, instanzen: zaehler, benachrichtigt };
 }
 
 function sollInstanzen(
@@ -231,4 +229,66 @@ async function abgleichen(tx: Tx, unternehmenId: string, laufId: string, soll: S
     z.entfallen = weg.length;
   }
   return z;
+}
+
+/** Ereignisse eines Unternehmens für die Engine (Storno-Einträge entfernt, stornierte markiert). */
+export async function ladeEreignisse(tx: Tx, unternehmenId: string): Promise<Ereignis[]> {
+  const zeilen = await tx.abfrage<{ id: string; typ: string; eingetreten_am: Datum; storniert_ereignis_id: string | null }>(
+    "select id, typ, eingetreten_am, storniert_ereignis_id from app.ereignis where unternehmen_id = $1 order by eingetreten_am, erfasst_am",
+    [unternehmenId],
+  );
+  const storniert = new Set(zeilen.map((e) => e.storniert_ereignis_id).filter(Boolean));
+  return zeilen
+    .filter((e) => !e.storniert_ereignis_id) // Storno-Einträge selbst sind keine fachlichen Ereignisse
+    .map((e) => ({ typ: e.typ, datum: e.eingetreten_am, ...(storniert.has(e.id) ? { storniert: true } : {}) }));
+}
+
+/** Höchstens so viele Einzelmeldungen je Rollout; darüber eine Sammelmeldung (keine Benachrichtigungsflut). */
+const MAX_MELDUNGEN = 10;
+
+/**
+ * Vergleicht Soll und Bestand: neu geltende Pflichten (für die es noch keine Instanz gab) und Pflichten, die mit einer
+ * neuen Katalogversion weiter gelten. Je Mitglied eine Benachrichtigung in seiner Sprache.
+ */
+async function rechtsaenderungenMelden(tx: Tx, unternehmenId: string, soll: Soll[], bestand: Instanz[], pflichten: Map<string, Pflicht>): Promise<number> {
+  // „Neu“ = galt bisher nicht (keine oder nur nicht zutreffende/entfallene Instanzen)
+  const bekannt = new Set(bestand.filter((b) => b.status === "offen" || b.status === "erledigt").map((b) => b.pflicht_id));
+  // Geändert = offene Instanz mit älterer Version (Erledigtes behält seine Version, E-036; erneut zu erledigen → neue Instanz)
+  const versionAlt = new Map(bestand.filter((b) => b.status === "offen").map((b) => [`${b.pflicht_id}|${b.periode}`, b.pflicht_version_id]));
+  const vorhanden = new Set(bestand.map((b) => `${b.pflicht_id}|${b.periode}`));
+  const meldungen = new Map<string, { art: "neue_pflicht" | "rechtsaenderung"; periode: string }>();
+  for (const s of soll) {
+    if (s.ergebnis !== "gilt" || meldungen.has(s.pflicht_id)) continue;
+    const alt = versionAlt.get(`${s.pflicht_id}|${s.periode}`);
+    if (!bekannt.has(s.pflicht_id)) meldungen.set(s.pflicht_id, { art: "neue_pflicht", periode: s.periode });
+    else if (alt && alt !== s.pflicht_version_id) meldungen.set(s.pflicht_id, { art: "rechtsaenderung", periode: s.periode });
+    else if (pflichten.get(s.pflicht_id)?.erneut_erledigen && s.periode === `aenderung-${pflichten.get(s.pflicht_id)!.version}` && !vorhanden.has(`${s.pflicht_id}|${s.periode}`))
+      meldungen.set(s.pflicht_id, { art: "rechtsaenderung", periode: s.periode });
+  }
+  if (!meldungen.size || !bestand.length) return 0; // erste Berechnung eines Unternehmens: keine Meldungen
+  const mitglieder = await tx.abfrage<{ konto_id: string; sprache: "de" | "en" }>(
+    "select m.konto_id, k.sprache from app.mitgliedschaft m join app.konto k on k.id = m.konto_id where m.unternehmen_id = $1",
+    [unternehmenId],
+  );
+  const TEXTE = {
+    de: { neue_pflicht: "Neu für dich", rechtsaenderung: "Geändert", sammel: (n: number) => `${n} Pflichten sind neu oder geändert`, sammelText: "Sieh dir die Änderungen in deiner Pflichtenliste an." },
+    en: { neue_pflicht: "New for you", rechtsaenderung: "Changed", sammel: (n: number) => `${n} obligations are new or changed`, sammelText: "Review the changes in your list of obligations." },
+  } as const;
+  const tt = (x: { de: string; en?: string }, s: "de" | "en") => (s === "en" && x.en ? x.en : x.de);
+  const eintraege = [...meldungen.entries()];
+  let n = 0;
+  for (const m of mitglieder) {
+    const T = TEXTE[m.sprache];
+    const zeilen = eintraege.length > MAX_MELDUNGEN
+      ? [{ art: "rechtsaenderung", titel: T.sammel(eintraege.length), text: T.sammelText, link: "/pflichten" }]
+      : eintraege.map(([id, x]) => {
+          const p = pflichten.get(id)!;
+          return { art: x.art, titel: `${T[x.art]}: ${tt(p.titel, m.sprache)}`, text: tt(p.kurz, m.sprache), link: `/pflichten/${id}/${x.periode}` };
+        });
+    for (const z of zeilen) {
+      await tx.abfrage("insert into app.benachrichtigung (unternehmen_id, konto_id, art, titel, text, link) values ($1, $2, $3, $4, $5, $6)", [unternehmenId, m.konto_id, z.art, z.titel, z.text, z.link]);
+      n++;
+    }
+  }
+  return n;
 }

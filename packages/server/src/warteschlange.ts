@@ -7,7 +7,14 @@ export const JOBS = {
   tageswechsel: "tageswechsel",
   erinnerungenVersenden: "erinnerungen-versenden",
   einladungVersenden: "einladung-versenden",
+  marktplatzAnfrage: "marktplatz-anfrage",
 } as const;
+
+/** Anfrage an einen Marktplatz-Partner (E-102): der Worker liest sie im Kontext des Unternehmens. */
+export interface MarktplatzJob {
+  unternehmenId: string;
+  anfrageId: string;
+}
 
 /**
  * Das Token steht im Job (für den Link in der E-Mail), in app.einladung nur als SHA-256.
@@ -44,6 +51,7 @@ export async function queuesAnlegen(boss: PgBoss): Promise<void> {
     [JOBS.tageswechsel, "singleton"],
     [JOBS.erinnerungenVersenden, "singleton"],
     [JOBS.einladungVersenden, "standard"],
+    [JOBS.marktplatzAnfrage, "standard"],
   ] as const) {
     if (!(await boss.getQueue(name))) await boss.createQueue(name, { name, policy, retryLimit: 3, retryDelay: 30, retryBackoff: true });
   }
@@ -66,4 +74,9 @@ export async function einladungEinreihen(boss: PgBoss, tx: Tx, job: EinladungsJo
     expireInSeconds: 3600,
     db: { executeSql: (text: string, values: unknown[]) => tx.client.query(text, values) },
   });
+}
+
+/** Marktplatz-Anfrage in derselben Transaktion einreihen wie die Anfrage selbst. */
+export async function marktplatzAnfrageEinreihen(boss: PgBoss, tx: Tx, job: MarktplatzJob): Promise<void> {
+  await boss.send(JOBS.marktplatzAnfrage, job, { db: { executeSql: (text: string, values: unknown[]) => tx.client.query(text, values) } });
 }

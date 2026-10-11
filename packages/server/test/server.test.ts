@@ -8,7 +8,11 @@ import {
   erzeugeWarteschlange,
   importiereKatalog,
   migrieren,
+  neuePflichtversion,
   neuberechnen,
+  pflichtVersionen,
+  releaseVeroeffentlichen,
+  studioKonto,
   neuberechnungEinreihen,
   planeErinnerungen,
   versendeFaelligeErinnerungen,
@@ -179,5 +183,29 @@ describe.skipIf(!DB_VERFUEGBAR)("Server-Kern gegen PostgreSQL", () => {
     } finally {
       await boss.stop({ graceful: false, wait: true });
     }
+  });
+
+  it("Release-Rollout meldet geänderte Pflichten an die Mitglieder („Was ändert sich für dich?“)", async () => {
+    const owner = new Datenbank(urls.owner);
+    await owner.imKontext({}, async (tx) => {
+      const r = await tx.eine<{ id: string }>("select app.konto_anmelden('redaktion-test', 'red@example.org', 'Red') as id");
+      await tx.abfrage("insert into app.konto_plattform_rolle values ($1, 'redaktion')", [r!.id]);
+    });
+    await owner.schliessen();
+    const red = (await studioKonto(studio, "redaktion-test"))!;
+    const meldungen = () => api.imKontext({ kontoId, unternehmenId }, (tx) => tx.abfrage<{ art: string; titel: string; link: string }>("select art, titel, link from app.benachrichtigung order by erstellt_am"));
+
+    expect((await neuberechnen(worker, unternehmenId, "tageswechsel:2026-10-11", { stichtag: STICHTAG, kalender })).benachrichtigt).toBe(0);
+    const offen = (await instanzen()).find((x) => x.status === "offen" && x.ergebnis === "gilt" && x.periode === "einmalig")!;
+    const [v] = await pflichtVersionen(studio, offen.pflicht_id);
+    await neuePflichtversion(studio, red, { ...v!.daten, kurz: { de: "Neu formuliert für den Test." } });
+    const rel = await releaseVeroeffentlichen(studio, red, "Test-Rollout");
+    const r = await neuberechnen(worker, unternehmenId, `release:${rel.nummer}`, { stichtag: STICHTAG, kalender });
+    expect(r.benachrichtigt).toBeGreaterThanOrEqual(1);
+    const m = await meldungen();
+    expect(m).toContainEqual(expect.objectContaining({ art: "rechtsaenderung", link: `/pflichten/${offen.pflicht_id}/einmalig` }));
+    expect(m.find((x) => x.link.includes(offen.pflicht_id))?.titel).toMatch(/^Geändert: /);
+    // Erneuter Lauf desselben Releases meldet nichts mehr
+    expect((await neuberechnen(worker, unternehmenId, `release:${rel.nummer}`, { stichtag: STICHTAG, kalender })).benachrichtigt).toBe(0);
   });
 });

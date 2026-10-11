@@ -1,0 +1,12 @@
+persona: bestand
+beschreibung: Etablierter Betrieb – die Gründungs-Radarpunkte betreffen ihn nicht
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: "2010-01-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.bundesland: BY
+  profil.gemeinde_ags: "09162000"
+erwartet:
+  steuern.ust_va_neugruender_radar: gilt_nicht
+  gruendung.gruendungsbeschleunigung_radar: gilt_nicht

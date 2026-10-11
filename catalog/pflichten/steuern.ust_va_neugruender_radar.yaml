@@ -1,0 +1,66 @@
+# Katalog C.21 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: steuern.ust_va_neugruender_radar
+version: 1
+katalog_nr: C.21
+titel:
+  de: Monatliche USt-Voranmeldung für Neugründer ab 2027
+kurz:
+  de: Die Aussetzung der monatlichen Voranmeldung für Neugründer endet am 31.12.2026 – ob sie verlängert wird, ist offen.
+erklaerung:
+  de: Ohne Verlängerung müssten Gründer im Gründungsjahr und im Folgejahr wieder monatlich Voranmeldungen abgeben.
+rechtsgrundlage:
+- § 18 Abs. 2 UStG
+kategorie: steuern
+ausloeser:
+  any:
+  - feld: abgeleitet.ist_gruendungsjahr
+    op: ==
+    wert: true
+    label:
+      de: Du bist im Gründungsjahr.
+  - feld: abgeleitet.noch_nicht_gestartet
+    op: ==
+    wert: true
+    label:
+      de: Du gründest gerade.
+  - feld: abgeleitet.ist_vorjahr_gruendungsjahr
+    op: ==
+    wert: true
+    label:
+      de: Du hast im Vorjahr gegründet.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Finanzamt
+kanal: elster
+kosten: null
+sanktion:
+  text:
+    de: Noch keine – mögliche Änderung.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: geplant
+radar:
+  wahrscheinlichkeit: mittel
+  erwartet_ab: '2027-01-01'
+  vorbereitung:
+  - de: Belege und Rechnungen monatlich vollständig halten
+  - de: Mit der Steuerberatung klären, welcher Rhythmus ab 2027 gilt
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Umsatzsteuergesetz § 18
+  url: https://www.gesetze-im-internet.de/ustg_1980/__18.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Status offen – Radar
+- Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „mittel“)
+- Vorbereitungs-Checkliste fachlich prüfen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

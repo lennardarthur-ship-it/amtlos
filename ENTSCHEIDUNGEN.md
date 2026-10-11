@@ -369,6 +369,35 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - Katalog H (18 neue Pflichten) für alle neun Branchen der Spezifikation; ausgebaut mit eigenen Werkzeugen ist zuerst die **Gastronomie**: HACCP-Eigenkontrollen (Messpunkte mit vom Betrieb festgelegten Grenzwerten, Messungen nur anhängend, Abweichung nur mit Maßnahme, Grenzwerte je Messung mitgespeichert, Monatsprotokoll), **Allergenliste** je Gericht mit den 14 Hauptallergenen nach Anhang II LMIV (Liste als feste Auswahl, fachlich zu prüfen T-33) und Aushang-PDF, **Belehrung nach § 43 IfSG** als Unterweisungsart, die die Pflicht je Einstellung erledigt. Handwerk, Bau und Beauty nutzen die vorhandenen Arbeitsschutz-Werkzeuge; Onlinehandel den Online-Check; IT die Dienstleister- und KI-Werkzeuge.
 - Keine Grenzwerte, Kontrollfrequenzen, Prüffristen oder Verjährungsfristen im Code – wo die Spezifikation sie nicht nennt, sind sie Prüfpunkte.
 
+### E-100 · Frag Amtlos: reine Suche im Katalog, kein Sprachmodell
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- „Frag Amtlos“ (6.10) antwortet in dieser Stufe **ausschließlich mit den Texten gefundener Katalogobjekte**: bis zu drei Pflichten (Titel, Kurztext, Erklärung, Rechtsgrundlage, Quellen, Prüfstatus mit Datum, „gilt für dich“ aus den Instanzen) und bis zu zwei Regelwerte (die am Stichtag gültige Version). Die Suche ist eine gewichtete Wortsuche (Titel > Fachbegriffe > Kurztext/Rechtsgrundlage > Erklärung) mit Umlaut-Normalisierung und groben Wortstämmen; Pflichten, die für das Unternehmen gelten, werden leicht bevorzugt. Unter einer Mindestpunktzahl antwortet Amtlos „weiß ich nicht sicher“.
+- Fragen, die individuelle Steuer- oder Rechtsberatung wären („Soll ich …“, „lohnt sich“, „in meinem Fall“, „Einspruch einlegen“), werden erkannt und auf den Marktplatz verwiesen (StBerG/RDG). Die gefundenen allgemeinen Katalogtexte werden trotzdem gezeigt.
+- **Kein Sprachmodell**, solange Anbieter, AVV und EU-Hosting nicht geklärt sind. Die Schnittstelle `KiGateway` ist vorbereitet; ein Modell darf später **nur die gefundenen Passagen umformulieren**, Quellen bleiben die gefundenen Katalogobjekte, `ki_formuliert` wird dann `true` und angezeigt. Fragen werden nicht gespeichert.
+
+### E-101 · Behörden-Postfach: Hochladen und Einordnen von Hand
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Briefe werden als unveränderliches Dokument abgelegt (PDF, JPG, PNG bis 15 MB, Dateityp am Inhalt geprüft, doppelte Briefe über den Hash abgewiesen) und **von Hand** eingeordnet: Absender, Art (Bescheid, Mahnung, Anhörung, Auskunftsersuchen, Sonstiges), Aktenzeichen, Betrag, Verknüpfung mit einer Pflicht und die **Frist so, wie sie im Brief steht**. Amtlos berechnet keine Einspruchs- oder Zahlungsfristen aus dem Zugang (Bekanntgabefiktion usw. → T-37).
+- Offene Brieffristen und Geräteprüfungen erscheinen als „weitere Termine“ auf „Heute“ (nächste 60 Tage), im Kalender und im ICS-Abo.
+- Zu jeder Briefart gibt es eine **allgemeine** Erklärung, nie eine Bewertung des konkreten Bescheids (J-2). Für Einspruch oder Widerspruch verweist die Seite auf den Marktplatz.
+- Noch nicht gebaut: Texterkennung (OCR) mit Vorschlag der Felder, KI-Zusammenfassung, Weiterleitung per E-Mail-Adresse je Unternehmen. Sie brauchen einen Anbieter mit AVV, und die Grenze nach J-2 muss geklärt sein.
+
+### E-102 · Experten-Marktplatz ohne Zahlung und Provision
+- **Datum:** 2026-10-11 · **Status:** angenommen (bis J-4 geklärt ist)
+- Partner (Steuerberatung, Rechtsanwalt, Fachkraft für Arbeitssicherheit, Datenschutzbeauftragte) pflegt die Plattform im Studio (`katalog.partner`). Nur Plattform-Admin oder Redaktion darf das. **Sichtbar sind Partner nur mit eingetragenem Datum der Zulassungsprüfung.** Pakete und Preise sind Angaben des Partners.
+- Eine Anfrage braucht eine **ausdrückliche Einwilligung**. Weitergegeben werden immer Name und E-Mail-Adresse (sonst ist keine Antwort möglich), dazu nur die angehakten Angaben zum Unternehmen und die offenen Pflichten. Gespeichert wird genau diese Momentaufnahme. Der Versand läuft über die Warteschlange per E-Mail an den Partner, die Antwort geht direkt an die Nutzerin.
+- Amtlos ist an Beauftragung und Bezahlung nicht beteiligt: keine Provision, kein Checkout, keine Bewertungen, bis das Vergütungsmodell nach Berufsrecht geklärt ist (J-4). Partner aus dem eigenen Bundesland oder bundesweit stehen oben.
+
+### E-103 · Rechtsänderungs-Radar und „Was ändert sich für dich?“
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Geplante und beschlossene Regeln stehen als normale Pflichten im Katalog, mit `status_recht` entwurf/geplant/beschlossen und einem Block `radar` (Wahrscheinlichkeit, erwartet ab, Checkliste zur Vorbereitung). Die Engine wertet sie wie jede Regel aus, markiert sie aber als Radar. Sie erzeugen **keine Instanzen, Fristen oder Erinnerungen**. Das Radar wird bei jedem Aufruf neu berechnet und nicht gespeichert.
+- Zusätzlich zeigt das Radar in Kraft gesetzte Regeln, die in den nächsten 24 Monaten zu gelten beginnen (ausgewertet am Tag des Inkrafttretens), und neue Werte für Regelwerte, die eine geltende Pflicht nutzt (z. B. Mindestlohn alt → neu).
+- Benachrichtigungen: Nach einer Neuberechnung, die ein **Release** ausgelöst hat, meldet Amtlos jeder Person des Unternehmens neue zutreffende Pflichten und offene Pflichten, die jetzt in neuer Version gelten. Bis zu 10 Einzelmeldungen, darüber eine Sammelmeldung. Bei der ersten Berechnung eines Unternehmens gibt es keine Meldungen. Meldungen sieht nur die eigene Person (restriktive RLS-Policy). Sie erscheinen auf „Heute“ und lassen sich als gelesen markieren. E-Mail-Versand der Meldungen folgt mit den Benachrichtigungseinstellungen.
+
+### E-104 · Navigation: Postfach in der Seitenleiste, „Mehr“ auch am Desktop
+- **Datum:** 2026-10-11 · **Status:** angenommen (ergänzt E-098)
+- Am Desktop steht „Postfach“ in der Seitenleiste. „Mehr“ gibt es jetzt auch am Desktop: Es führt zu Frag Amtlos, Radar, Experten, Änderung melden, Team und Hilfe. Mobil zeigt „Mehr“ zusätzlich die Bereiche, die nur am Desktop in der Leiste stehen. Frag Amtlos ist außerdem als Suchfeld auf „Heute“ erreichbar, das Radar von „Heute“ und „Pflichten“.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

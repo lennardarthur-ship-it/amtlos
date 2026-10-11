@@ -1,7 +1,7 @@
 # Katalog F.65 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: ki.hochrisiko
-version: 1
+version: 2
 katalog_nr: F.65
 titel:
   de: Pflichten für Hochrisiko-KI (verschoben)
@@ -36,6 +36,9 @@ status_recht: beschlossen
 radar:
   wahrscheinlichkeit: hoch
   erwartet_ab: '2027-12-02'
+  vorbereitung:
+  - de: Prüfen, ob eure KI-Produkte in einen Hochrisiko-Bereich fallen
+  - de: Dokumentation und Risikomanagement der Produkte sichten
 gueltig_ab: null
 gueltig_bis: null
 quellen:
@@ -47,6 +50,7 @@ fachlich_zu_pruefen:
 - Status und Daten nach dem Digital Omnibus prüfen
 - Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „hoch“)
 - Welcher der beiden Termine gilt wofür?
+- Vorbereitungs-Checkliste fachlich prüfen
 pruefung:
   status: entwurf
   geprueft_von: null

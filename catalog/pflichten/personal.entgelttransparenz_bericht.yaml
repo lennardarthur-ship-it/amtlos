@@ -1,7 +1,7 @@
 # Katalog D.47 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.entgelttransparenz_bericht
-version: 1
+version: 2
 katalog_nr: D.47
 titel:
   de: Bericht zur Entgelttransparenz (geplant)
@@ -43,6 +43,9 @@ status_recht: geplant
 radar:
   wahrscheinlichkeit: hoch
   erwartet_ab: '2027-06-07'
+  vorbereitung:
+  - de: Entgeltstruktur nach Geschlecht auswerten (mit Lohnbüro)
+  - de: Kriterien für gleiche und gleichwertige Arbeit festhalten
 gueltig_ab: null
 gueltig_bis: null
 quellen:
@@ -53,6 +56,7 @@ fachlich_zu_pruefen:
 - Status offen – Radar
 - Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „hoch“, weil EU-Richtlinie)
 - Zählweise und Inhalt des Berichts nach Umsetzungsgesetz
+- Vorbereitungs-Checkliste fachlich prüfen
 pruefung:
   status: entwurf
   geprueft_von: null

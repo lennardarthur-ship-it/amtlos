@@ -6,11 +6,13 @@ import { usePathname } from "next/navigation";
 export interface NavEintrag {
   href: string;
   text: string;
-  symbol: "heute" | "pflichten" | "kalender" | "finanzen" | "personal" | "datenschutz" | "online" | "branche" | "mehr" | "melden" | "einstellungen";
+  symbol: "heute" | "pflichten" | "kalender" | "finanzen" | "personal" | "datenschutz" | "online" | "branche" | "postfach" | "mehr" | "melden" | "einstellungen";
   /** Mobil nicht in der Leiste (dort im Kopf), damit die Ziele groß genug bleiben. */
   nurDesktop?: boolean;
   /** Nur mobil („Mehr“ führt zu den Bereichen, die mobil nicht in der Leiste stehen). */
   nurMobil?: boolean;
+  /** Weitere Pfade, auf denen der Eintrag als aktiv gilt. */
+  auch?: string[];
 }
 
 function Symbol({ art }: { art: NavEintrag["symbol"] }) {
@@ -32,6 +34,8 @@ function Symbol({ art }: { art: NavEintrag["symbol"] }) {
       return <svg {...p}><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z" /></svg>;
     case "branche":
       return <svg {...p}><path d="M4 20V9l8-5 8 5v11" /><path d="M9 20v-6h6v6" /><path d="M4 20h16" /></svg>;
+    case "postfach":
+      return <svg {...p}><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 7l9 6 9-6" /></svg>;
     case "mehr":
       return <svg {...p}><circle cx="5" cy="12" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="19" cy="12" r="1.5" /></svg>;
     case "melden":
@@ -45,8 +49,10 @@ function Symbol({ art }: { art: NavEintrag["symbol"] }) {
 export function Navigation({ eintraege, beschriftung }: { eintraege: NavEintrag[]; beschriftung: string }) {
   const pfad = usePathname();
   const mobilVersteckt = eintraege.filter((e) => e.nurDesktop).map((e) => e.href);
-  const aktiv = (href: string) =>
-    pfad === href || pfad.startsWith(`${href}/`) || (href === "/mehr" && mobilVersteckt.some((h) => pfad === h || pfad.startsWith(`${h}/`)));
+  const unter = (h: string) => pfad === h || pfad.startsWith(`${h}/`);
+  // „Mehr“ ist aktiv auf seinen Unterseiten und – nur mobil sichtbar markiert – auf den mobil versteckten Bereichen.
+  const aktiv = (e: NavEintrag) => unter(e.href) || (e.auch ?? []).some(unter);
+  const mobilAktiv = (e: NavEintrag) => aktiv(e) || (e.href === "/mehr" && mobilVersteckt.some(unter));
   return (
     <nav aria-label={beschriftung}>
       <ul className="fixed inset-x-0 bottom-0 z-20 flex border-t border-linie bg-blatt pb-[env(safe-area-inset-bottom)] md:static md:flex-col md:gap-1 md:border-0 md:bg-transparent md:pb-0">
@@ -54,8 +60,9 @@ export function Navigation({ eintraege, beschriftung }: { eintraege: NavEintrag[
           <li key={e.href} className={`flex-1 md:flex-none ${e.nurDesktop ? "hidden md:list-item" : ""} ${e.nurMobil ? "md:hidden" : ""}`}>
             <Link
               href={e.href}
-              aria-current={aktiv(e.href) ? "page" : undefined}
-              className="flex min-h-14 flex-col items-center justify-center gap-0.5 px-0.5 text-[0.625rem] text-tinte-leise aria-[current=page]:text-amt md:min-h-11 md:flex-row md:justify-start md:gap-3 md:rounded-md md:px-3 md:text-basis md:aria-[current=page]:bg-amt-hauch md:aria-[current=page]:font-bold md:hover:bg-blatt"
+              aria-current={aktiv(e) ? "page" : undefined}
+              data-mobil-aktiv={mobilAktiv(e) && !aktiv(e) ? "" : undefined}
+              className="data-[mobil-aktiv]:text-amt md:data-[mobil-aktiv]:text-tinte-leise flex min-h-14 flex-col items-center justify-center gap-0.5 px-0.5 text-[0.625rem] text-tinte-leise aria-[current=page]:text-amt md:min-h-11 md:flex-row md:justify-start md:gap-3 md:rounded-md md:px-3 md:text-basis md:aria-[current=page]:bg-amt-hauch md:aria-[current=page]:font-bold md:hover:bg-blatt"
             >
               <Symbol art={e.symbol} />
               <span>{e.text}</span>

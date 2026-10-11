@@ -24,7 +24,7 @@ async function aboErzeugen() {
 
 /** Jahreskalender (Spezifikation 4.I): alle zutreffenden Pflichten mit Termin, Monat für Monat. */
 export default async function KalenderSeite() {
-  const [{ s, t: x }, karten] = await Promise.all([t(), api<Karte[]>("/v1/pflichten?status=alle")]);
+  const [{ s, t: x }, karten, termine] = await Promise.all([t(), api<Karte[]>("/v1/pflichten?status=alle"), api<{ id: string; art: string; datum: string; titel: string; link: string }[]>("/v1/termine")]);
   const neueAdresse = (await cookies()).get(ABO_COOKIE)?.value;
 
   const heute = new Date();
@@ -51,12 +51,14 @@ export default async function KalenderSeite() {
         <ol className="grid gap-x-8 gap-y-6 sm:grid-cols-2 xl:grid-cols-3">
           {monate.map((m) => {
             const liste = mitTermin.filter((k) => monatVon(k) === m).sort((a, b) => a.faellig_am!.localeCompare(b.faellig_am!));
+            // Brieffristen und Geräteprüfungen (nicht aus dem Katalog); Überfälliges in den aktuellen Monat
+            const weitere = termine.filter((w) => (w.datum.slice(0, 7) < dieserMonat ? dieserMonat : w.datum.slice(0, 7)) === m);
             return (
               <li key={m} aria-labelledby={`monat-${m}`} className="min-w-0">
                 <h3 id={`monat-${m}`} className={`border-b-2 pb-1 font-bold ${m === dieserMonat ? "border-amt text-amt" : "border-tinte"}`}>
                   {monatsname(Number(m.slice(5)), s)} {m.slice(0, 4) !== jahr || m === dieserMonat ? m.slice(0, 4) : ""}
                 </h3>
-                {liste.length ? (
+                {liste.length || weitere.length ? (
                   <ul>
                     {liste.map((k) => {
                       const d = datumTeile(k.faellig_am!, s);
@@ -74,6 +76,19 @@ export default async function KalenderSeite() {
                                 <span className="sr-only"> ({x.status[k.status]})</span>
                               </span>
                             </span>
+                          </Link>
+                        </li>
+                      );
+                    })}
+                    {weitere.map((w) => {
+                      const d = datumTeile(w.datum, s);
+                      return (
+                        <li key={`${w.art}|${w.id}`} className="border-b border-linie">
+                          <Link href={w.link} className="flex gap-3 py-2 hover:underline">
+                            <span className={`w-16 flex-none whitespace-nowrap text-right font-bold tabular-nums ${w.datum.slice(0, 7) < dieserMonat ? "text-frist" : ""}`}>
+                              {w.datum.slice(0, 7) !== m ? `${d.tag}.${w.datum.slice(5, 7)}.` : `${d.wochentag} ${d.tag}.`}
+                            </span>
+                            <span className="min-w-0">{w.titel}</span>
                           </Link>
                         </li>
                       );

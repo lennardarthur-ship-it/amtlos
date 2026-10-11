@@ -72,8 +72,9 @@ Module erscheinen nur, wenn das Profil sie aktiviert (z. B. „Personal“ erst 
 /produkte                           Registrierungen (Verpackung, Elektro, Batterien), GPSR           (7)
 
 /frag                               „Frag Amtlos“ mit Quellen und Prüfdatum                          (9)
-/post                               Behörden-Postfach, Upload, erkannte Fristen bestätigen           (9)
-/experten                           Marktplatz, Pakete, Aufträge, Datenfreigaben                      (9)
+/postfach[/[id]]                    Behörden-Postfach: Upload, Einordnen mit Frist aus dem Brief      (9)
+/experten[/[id]]                    Marktplatz: geprüfte Partner, Pakete, Anfrage mit Einwilligung    (9)
+/mehr                               Frag, Radar, Experten, Melden, Team, Hilfe (mobil auch Bereiche)  (9)
 /radar                              Rechtsänderungen, die dich betreffen würden                       (9)
 
 /einstellungen/profil               Profil bearbeiten (neue Version), Änderungshistorie             (2)
@@ -107,6 +108,7 @@ Module erscheinen nur, wenn das Profil sie aktiviert (z. B. „Personal“ erst 
 /mitteilungen                       „Was ändert sich für dich?“ je Release
 /pruefliste                         alle [FACHLICH ZU PRÜFEN]-Punkte aus Katalog und PRUEFLISTE.md
 /experten                           Prüfer und Qualifikationen verwalten (nur plattform_admin)
+/partner                            Marktplatz-Partner pflegen, Zulassungsprüfung (Admin/Redaktion) (9)
 ```
 
 ## Seitenvertrag „Pflicht-Karte“ (Spezifikation 11)

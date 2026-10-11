@@ -6,12 +6,23 @@ import { StatusForm } from "@/komponenten/status";
 import { api } from "@/lib/api";
 import { branchenAusProfil } from "@/lib/branchen";
 import { t } from "@/lib/sprache";
+import { ZONE } from "@/lib/zeit";
 import type { Bereich, Gruendung, Heute } from "@/lib/typen";
 
 export const metadata = { title: "Heute" };
 
 const BEREICHE: Bereich[] = ["steuern", "personal", "arbeitsschutz", "datenschutz", "online", "gesellschaft"];
 const AMPEL_FARBE = { gruen: "text-amt", gelb: "text-bald", rot: "text-frist" } as const;
+
+interface Meldung { id: string; titel: string; text: string; link: string | null; gelesen_am: string | null; erstellt_am: string }
+interface Termin { id: string; art: "brief" | "pruefung"; datum: string; titel: string; link: string }
+
+async function gelesen(f: FormData) {
+  "use server";
+  const id = f.get("id");
+  await api("/v1/benachrichtigungen/gelesen", { method: "POST", body: JSON.stringify(id ? { ids: [String(id)] } : {}) });
+  revalidatePath("/heute");
+}
 
 async function vorStartErledigt() {
   "use server";
@@ -21,6 +32,12 @@ async function vorStartErledigt() {
 
 export default async function HeuteSeite() {
   const [{ s, t: x }, h, profil, g] = await Promise.all([t(), api<Heute>("/v1/heute"), api<{ version: number; daten?: Record<string, unknown> }>("/v1/profil"), api<Gruendung>("/v1/gruendung")]);
+  const [meldungen, termine] = await Promise.all([api<Meldung[]>("/v1/benachrichtigungen"), api<Termin[]>("/v1/termine")]);
+  const ungelesen = meldungen.filter((m) => !m.gelesen_am).slice(0, 5);
+  const ortsdatum = (d: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: ZONE }).format(d);
+  const bis = ortsdatum(new Date(Date.now() + 60 * 864e5));
+  const naheTermine = termine.filter((w) => w.datum <= bis).slice(0, 5);
+  const heuteIso = ortsdatum(new Date());
   const gruendungOffen = g.fortschritt.gesamt > 0 && !g.fortschritt.fertig;
   const branchen = branchenAusProfil((profil as { daten?: Record<string, unknown> }).daten ?? {});
   const ohneProfil = profil.version === 0;
@@ -36,6 +53,29 @@ export default async function HeuteSeite() {
           <Link href="/onboarding/rechtsform" className="knopf mt-5">
             {x.heute.profil_starten}
           </Link>
+        </section>
+      ) : null}
+
+      {ungelesen.length ? (
+        <section aria-labelledby="meldungen" className="lesetext rounded-md border-2 border-amt bg-blatt p-6">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 id="meldungen" className="text-gross font-bold">{x.meldungen.titel}</h2>
+            <form action={gelesen}>
+              <button className="verweis text-klein">{x.meldungen.alle_gelesen}</button>
+            </form>
+          </div>
+          <ul className="mt-3 space-y-3">
+            {ungelesen.map((m) => (
+              <li key={m.id} className="border-t border-linie pt-3">
+                <p className="font-bold">{m.link ? <Link href={m.link} className="verweis">{m.titel}</Link> : m.titel}</p>
+                <p className="text-klein">{m.text}</p>
+                <form action={gelesen} className="mt-1">
+                  <input type="hidden" name="id" value={m.id} />
+                  <button className="text-klein text-tinte-leise underline">{x.meldungen.gelesen}</button>
+                </form>
+              </li>
+            ))}
+          </ul>
         </section>
       ) : null}
 
@@ -100,6 +140,31 @@ export default async function HeuteSeite() {
             <p className="lesetext mt-4">{x.heute.nichts_offen}</p>
           )}
         </section>
+      ) : null}
+
+      {naheTermine.length ? (
+        <section aria-labelledby="weitere">
+          <h2 id="weitere" className="text-gross font-bold">{x.heute.weitere_fristen}</h2>
+          <ul className="mt-3 border-t border-linie">
+            {naheTermine.map((w) => (
+              <li key={`${w.art}|${w.id}`} className="flex flex-wrap items-baseline justify-between gap-2 border-b border-linie py-3">
+                <Link href={w.link} className="verweis">{w.titel}</Link>
+                <span className={`text-klein font-bold ${w.datum < heuteIso ? "text-frist" : ""}`}>{fuelle(x.pflichten.bis, { datum: datumLang(w.datum, s) })}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {!ohneProfil ? (
+        <form action="/frag" method="get" role="search" className="lesetext flex flex-wrap items-end gap-2">
+          <div className="min-w-0 flex-1">
+            <label htmlFor="heute-frage" className="block font-bold">{x.heute.frag_link}</label>
+            <input id="heute-frage" name="f" minLength={3} maxLength={500} placeholder={x.frag.platzhalter} className="feld mt-1 w-full" />
+          </div>
+          <button className="knopf knopf-leise">{x.frag.fragen}</button>
+          <Link href="/radar" className="verweis w-full text-klein">{x.heute.radar_link}</Link>
+        </form>
       ) : null}
 
       {!ohneProfil ? (

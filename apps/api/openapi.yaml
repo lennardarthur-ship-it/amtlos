@@ -33,6 +33,9 @@ tags:
   - name: Datenschutz
   - name: Online
   - name: Branchen
+  - name: Assistent
+  - name: Postfach
+  - name: Marktplatz
 
 paths:
   /v1/gesundheit:
@@ -1325,6 +1328,182 @@ paths:
       parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
       responses:
         "200": { description: PDF, content: { application/pdf: { schema: { type: string, format: binary } } } }
+
+  /v1/radar:
+    get:
+      tags: [Assistent]
+      summary: Rechtsänderungs-Radar – geplante Regeln, die dich betreffen würden, kommende Pflichten und Werte
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  eintraege:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        art: { type: string, enum: [radar, kommend] }
+                        pflicht_id: { type: string }
+                        titel: { type: string }
+                        status_recht: { type: string }
+                        wahrscheinlichkeit: { type: [string, "null"] }
+                        erwartet_ab: { type: [string, "null"], format: date }
+                        vorbereitung: { type: array, items: { type: string } }
+                        betroffen: { type: string, enum: [ja, vielleicht] }
+                  werte:
+                    type: array
+                    items: { type: object, properties: { id: { type: string }, bezeichnung: { type: string }, wert_bisher: {}, wert_neu: {}, gueltig_ab: { type: string, format: date } } }
+
+  /v1/benachrichtigungen:
+    get:
+      tags: [Assistent]
+      summary: Eigene Benachrichtigungen (ungelesene zuerst) – z. B. „Was ändert sich für dich?“
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK }
+
+  /v1/benachrichtigungen/gelesen:
+    post:
+      tags: [Assistent]
+      summary: Als gelesen markieren (bestimmte oder alle)
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody: { required: false, content: { application/json: { schema: { type: object, properties: { ids: { type: array, items: { type: string, format: uuid } } } } } } }
+      responses:
+        "201": { description: OK, content: { application/json: { schema: { type: object, properties: { gelesen: { type: integer } } } } } }
+
+  /v1/frage:
+    post:
+      tags: [Assistent]
+      summary: Frag Amtlos – Antwort nur aus dem Katalog (Pflichten, Regelwerte) mit Quelle und Prüfstatus; erkennt Beratungsfragen
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [frage], properties: { frage: { type: string, minLength: 3, maxLength: 500 } } } } } }
+      responses:
+        "201":
+          description: Antwort
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  art: { type: string, enum: [antwort, beratung, unsicher] }
+                  treffer: { type: array, items: { type: object } }
+                  regelwerte: { type: array, items: { type: object } }
+                  ki_formuliert: { type: boolean, const: false }
+
+  /v1/termine:
+    get:
+      tags: [Postfach]
+      summary: Termine außerhalb des Katalogs – Fristen aus Behördenbriefen, nächste Geräteprüfungen
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: array, items: { type: object, properties: { id: { type: string }, art: { type: string, enum: [brief, pruefung] }, datum: { type: string, format: date }, titel: { type: string }, link: { type: string } } } } } } }
+
+  /v1/briefe:
+    get:
+      tags: [Postfach]
+      summary: Behördenbriefe mit Fristen
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK }
+    post:
+      tags: [Postfach]
+      summary: Brief hochladen (PDF, JPG, PNG bis 15 MB)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody: { required: true, content: { multipart/form-data: { schema: { type: object, required: [datei], properties: { datei: { type: string, format: binary } } } } } }
+      responses:
+        "201": { description: Hochgeladen }
+        "422": { description: Dateityp nicht erlaubt oder doppelt }
+
+  /v1/briefe/{id}:
+    get:
+      tags: [Postfach]
+      summary: Ein Brief
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "200": { description: OK }
+        "404": { description: Nicht gefunden }
+    put:
+      tags: [Postfach]
+      summary: Einordnen – Absender, Art, Aktenzeichen, Frist aus dem Brief, Betrag, Pflicht
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [eingang_am]
+              properties:
+                eingang_am: { type: string, format: date }
+                absender: { type: string }
+                art: { type: string, enum: [bescheid, mahnung, anhoerung, auskunftsersuchen, sonstiges] }
+                aktenzeichen: { type: string }
+                frist_am: { type: [string, "null"], format: date }
+                frist_art: { type: [string, "null"], enum: [einspruch, zahlung, antwort, sonstige, null] }
+                betrag_cent: { type: [integer, "null"] }
+                pflicht_id: { type: [string, "null"] }
+                notiz: { type: [string, "null"] }
+      responses:
+        "200": { description: Eingeordnet }
+        "422": { description: Eingabe ungültig }
+
+  /v1/briefe/{id}/erledigt:
+    post:
+      tags: [Postfach]
+      summary: Als erledigt markieren (oder mit null wieder öffnen)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [datum], properties: { datum: { type: [string, "null"], format: date } } } } } }
+      responses:
+        "201": { description: OK }
+        "404": { description: Nicht gefunden }
+
+  /v1/partner:
+    get:
+      tags: [Marktplatz]
+      summary: Geprüfte Partner (aktiv, Zulassung geprüft), aus dem eigenen Bundesland zuerst
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: qualifikation, in: query, required: false, schema: { type: string, enum: [steuerberater, rechtsanwalt, fachkraft_arbeitssicherheit, datenschutzbeauftragter] } }]
+      responses:
+        "200": { description: OK }
+        "422": { description: Qualifikation unbekannt }
+
+  /v1/partner/{id}/anfrage:
+    post:
+      tags: [Marktplatz]
+      summary: Anfrage senden – nur mit Einwilligung, geteilt werden genau die gewählten Daten
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nachricht, einwilligung]
+              properties:
+                nachricht: { type: string, minLength: 10 }
+                paket: { type: [string, "null"] }
+                teilen: { type: object, properties: { unternehmen: { type: boolean }, offene_pflichten: { type: boolean } } }
+                einwilligung: { type: boolean, const: true }
+      responses:
+        "201": { description: Gesendet (E-Mail wird eingereiht) }
+        "404": { description: Partner nicht gefunden }
+        "422": { description: Einwilligung fehlt oder Paket unbekannt }
+
+  /v1/marktplatz/anfragen:
+    get:
+      tags: [Marktplatz]
+      summary: Gesendete Anfragen mit geteilten Daten
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK }
 
   /v1/glossar:
     get:

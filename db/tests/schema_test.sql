@@ -283,6 +283,20 @@ select pg_temp.erwarte_fehler(format($$insert into app.gericht (unternehmen_id, 
 select pg_temp.ok(true, 'Nur die 14 Hauptallergene');
 reset role;
 
+-- ---------- Benachrichtigungen, Postfach, Marktplatz (0013) ----------
+set role api_user;
+select set_config('amtlos.konto_id', :'anna_konto_anmelden', false);
+select set_config('amtlos.unternehmen_id', :'u1', false);
+insert into app.benachrichtigung (unternehmen_id, konto_id, art, titel, text) values (:'u1', :'anna_konto_anmelden', 'system', 'Für Anna', 'x');
+select pg_temp.erwarte_fehler(format($$insert into app.benachrichtigung (unternehmen_id, konto_id, art, titel, text) values (%L, %L, 'system', 'Für Ben', 'x')$$, :'u1', :'ben_konto_anmelden'), 'row-level security');
+select pg_temp.ok(true, 'Benachrichtigungen nur für das eigene Konto');
+select set_config('amtlos.konto_id', :'ben_konto_anmelden', false);
+select pg_temp.ok((select count(*) = 0 from app.benachrichtigung where titel = 'Für Anna'), 'Andere Mitglieder sehen fremde Benachrichtigungen nicht');
+select set_config('amtlos.konto_id', :'anna_konto_anmelden', false);
+select pg_temp.erwarte_fehler($$insert into katalog.partner (name, qualifikation, email) values ('X', 'steuerberater', 'x@example.org')$$, 'permission denied');
+select pg_temp.ok(true, 'Partner pflegt nur das Studio');
+reset role;
+
 -- ---------- Audit ----------
 select pg_temp.ok((select count(*) > 10 from audit.ereignis), 'Audit protokolliert Änderungen');
 select pg_temp.ok((select bool_and(vorgaenger_hash is not null) from audit.ereignis where id > (select min(id) from audit.ereignis)), 'Hash-Kette lückenlos');
