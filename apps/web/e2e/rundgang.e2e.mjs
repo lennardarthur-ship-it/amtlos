@@ -66,8 +66,8 @@ async function rundgang(farbschema, breite) {
   // Sammelbestätigung vor dem Start
   if (await p.locator("#vorstart").count()) {
     await p.click("#vorstart ~ div button, section[aria-labelledby=vorstart] button");
-    await p.waitForLoadState("networkidle");
-    pruefe(!(await p.locator("#vorstart").count()), `${name("heute")}: Sammelbestätigung bleibt sichtbar`);
+    const weg = await p.locator("#vorstart").waitFor({ state: "detached", timeout: 15000 }).then(() => true, () => false);
+    pruefe(weg, `${name("heute")}: Sammelbestätigung bleibt sichtbar`);
   }
 
   await p.goto(`${B}/pflichten`);
@@ -78,8 +78,8 @@ async function rundgang(farbschema, breite) {
   await barrierefrei(p, name("pflicht"));
   if (await p.getByRole("button", { name: "Als erledigt markieren" }).count()) {
     await p.getByRole("button", { name: "Als erledigt markieren" }).click();
-    await p.waitForLoadState("networkidle");
-    pruefe(await p.locator(".stempel").count(), `${name("pflicht")}: kein Erledigt-Stempel`);
+    const gestempelt = await p.locator(".stempel").first().waitFor({ timeout: 15000 }).then(() => true, () => false);
+    pruefe(gestempelt, `${name("pflicht")}: kein Erledigt-Stempel`);
   }
 
   for (const seite of ["kalender", "melden", "einstellungen", "hilfe", "pflichten/nicht-zutreffend"]) {

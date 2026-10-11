@@ -14,6 +14,10 @@ describe("Einladungstext", () => {
     expect(r.text).toContain("18. Oktober 2026");
     expect(r.text).toContain("nur, wenn du dich mit dieser E-Mail-Adresse anmeldest");
     expect(einladungsText({ unternehmen: "U", rolle: "admin", eingeladen_von: null, laeuft_ab: new Date() }, "l").text).toMatch(/^Du bist eingeladen, bei U/);
+    const en = einladungsText({ unternehmen: "U", rolle: "steuerberater", eingeladen_von: "Anna", laeuft_ab: new Date("2026-10-18T10:00:00Z"), sprache: "en" }, "l");
+    expect(en.betreff).toBe("Invitation to U on Amtlos");
+    expect(en.text).toContain("Anna invites you to work on U in Amtlos (role: Tax adviser)");
+    expect(en.text).toContain("18 October 2026");
   });
 });
 

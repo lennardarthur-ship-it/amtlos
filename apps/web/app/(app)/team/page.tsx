@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { datumLang, fuelle } from "@amtlos/i18n";
 import { KopierFeld } from "@/komponenten/kopier-feld";
-import { EingabeFehler, api, apiAntwort } from "@/lib/api";
+import { EingabeFehler, aktivesUnternehmen, api, apiAntwort } from "@/lib/api";
 import { t } from "@/lib/sprache";
 
 export const metadata = { title: "Team" };
@@ -44,6 +44,22 @@ async function widerrufen(id: string) {
   revalidatePath("/team");
 }
 
+async function rolleAendern(kontoId: string, formular: FormData) {
+  "use server";
+  const r = await apiAntwort(`/v1/team/${kontoId}`, { method: "PUT", body: JSON.stringify({ rolle: formular.get("rolle") }) });
+  if (r.status === 409) redirect("/team?fehler=letzter");
+  if (!r.ok && r.status !== 404) throw new Error(`Rolle ändern: ${r.status}`);
+  revalidatePath("/team");
+}
+
+async function verlassen() {
+  "use server";
+  const r = await apiAntwort("/v1/team/verlassen", { method: "POST" });
+  if (r.status === 409) redirect("/team?fehler=letzter");
+  if (!r.ok) throw new Error(`Verlassen: ${r.status}`);
+  redirect("/unternehmen");
+}
+
 async function entfernen(kontoId: string) {
   "use server";
   const r = await apiAntwort(`/v1/team/${kontoId}`, { method: "DELETE" });
@@ -53,7 +69,9 @@ async function entfernen(kontoId: string) {
 }
 
 export default async function TeamSeite({ searchParams }: { searchParams: Promise<{ fehler?: string }> }) {
-  const [{ s, t: x }, team, { fehler }] = await Promise.all([t(), api<Team>("/v1/team"), searchParams]);
+  const [{ s, t: x }, team, { fehler }, u] = await Promise.all([t(), api<Team>("/v1/team"), searchParams, aktivesUnternehmen()]);
+  const binInhaber = u.rolle === "inhaber";
+  const ROLLEN = ["inhaber", "admin", "steuerberater", "mitarbeiter"] as const;
   const neu = (await cookies()).get(LINK_COOKIE)?.value;
   const neuDaten = neu ? (JSON.parse(neu) as { email: string; link: string }) : null;
   const meldung = fehler === "schon_da" ? x.team.fehler_schon_da : fehler === "letzter" ? x.team.fehler_letzter : null;
@@ -83,12 +101,24 @@ export default async function TeamSeite({ searchParams }: { searchParams: Promis
                 {x.team.rollen[m.rolle]} · {m.email}
               </p>
             </div>
-            {team.darf_verwalten && !m.ich ? (
-              <form action={entfernen.bind(null, m.konto_id)}>
-                <button className="knopf knopf-leise" aria-label={fuelle(x.team.entfernen_von, { name: m.anzeigename })}>
-                  {x.team.entfernen}
-                </button>
-              </form>
+            {team.darf_verwalten && !m.ich && (binInhaber || m.rolle !== "inhaber") ? (
+              <div className="flex flex-wrap items-center gap-2">
+                <form action={rolleAendern.bind(null, m.konto_id)} className="flex items-center gap-2">
+                  <select name="rolle" defaultValue={m.rolle} className="feld min-h-11 w-auto py-1" aria-label={fuelle(x.team.rolle_von, { name: m.anzeigename })}>
+                    {ROLLEN.filter((r) => binInhaber || r !== "inhaber").map((r) => (
+                      <option key={r} value={r}>
+                        {x.team.rollen[r]}
+                      </option>
+                    ))}
+                  </select>
+                  <button className="knopf knopf-leise">{x.team.rolle_aendern}</button>
+                </form>
+                <form action={entfernen.bind(null, m.konto_id)}>
+                  <button className="knopf knopf-leise" aria-label={fuelle(x.team.entfernen_von, { name: m.anzeigename })}>
+                    {x.team.entfernen}
+                  </button>
+                </form>
+              </div>
             ) : null}
           </li>
         ))}
@@ -161,6 +191,16 @@ export default async function TeamSeite({ searchParams }: { searchParams: Promis
       ) : (
         <p className="text-tinte-leise">{x.team.nur_lesen}</p>
       )}
+
+      <section aria-labelledby="verlassen" className="border-t border-linie pt-6">
+        <h2 id="verlassen" className="text-gross font-bold">
+          {x.team.verlassen_titel}
+        </h2>
+        <p className="mt-1">{x.team.verlassen_text}</p>
+        <form action={verlassen} className="mt-3">
+          <button className="knopf knopf-leise">{x.team.verlassen}</button>
+        </form>
+      </section>
     </div>
   );
 }

@@ -2,10 +2,29 @@ import type { Datenbank } from "./datenbank.js";
 import type { Versand } from "./erinnerungen.js";
 import type { EinladungsJob } from "./warteschlange.js";
 
-const ROLLEN_DE: Record<string, string> = { mitarbeiter: "Mitarbeiter:in", steuerberater: "Steuerberatung", admin: "Admin" };
+const ROLLEN: Record<"de" | "en", Record<string, string>> = {
+  de: { mitarbeiter: "Mitarbeiter:in", steuerberater: "Steuerberatung", admin: "Admin" },
+  en: { mitarbeiter: "Employee", steuerberater: "Tax adviser", admin: "Admin" },
+};
+const ROLLEN_DE = ROLLEN.de;
 
 /** Text der Einladungs-E-Mail. Kein Tracking, keine Bilder; nur das Nötige und der Link. */
-export function einladungsText(e: { unternehmen: string; rolle: string; eingeladen_von: string | null; laeuft_ab: Date }, link: string) {
+export function einladungsText(
+  e: { unternehmen: string; rolle: string; eingeladen_von: string | null; laeuft_ab: Date; sprache?: string },
+  link: string,
+) {
+  if (e.sprache === "en") {
+    const bis = new Intl.DateTimeFormat("en-GB", { dateStyle: "long", timeZone: "Europe/Berlin" }).format(e.laeuft_ab);
+    const einstieg = e.eingeladen_von ? `${e.eingeladen_von} invites you` : "You are invited";
+    return {
+      betreff: `Invitation to ${e.unternehmen} on Amtlos`,
+      text:
+        `${einstieg} to work on ${e.unternehmen} in Amtlos (role: ${ROLLEN.en[e.rolle] ?? e.rolle}).\n\n` +
+        `Accept the invitation:\n${link}\n\n` +
+        `The link is valid until ${bis} and only if you sign in with this email address.\n` +
+        `If you don't know anyone at ${e.unternehmen}, you can ignore this email.`,
+    };
+  }
   const bis = new Intl.DateTimeFormat("de-DE", { dateStyle: "long", timeZone: "Europe/Berlin" }).format(e.laeuft_ab);
   const einstieg = e.eingeladen_von ? `${e.eingeladen_von} lädt dich ein` : "Du bist eingeladen";
   return {
@@ -21,7 +40,7 @@ export function einladungsText(e: { unternehmen: string; rolle: string; eingelad
 /** Worker: Einladungs-E-Mail senden. Widerrufene, angenommene oder abgelaufene Einladungen werden still übersprungen. */
 export async function versendeEinladung(db: Datenbank, versand: Versand, appUrl: string, job: EinladungsJob): Promise<"gesendet" | "uebersprungen"> {
   const e = await db.imKontext({}, (tx) =>
-    tx.eine<{ email: string; rolle: string; unternehmen: string; eingeladen_von: string | null; laeuft_ab: Date }>(
+    tx.eine<{ email: string; rolle: string; unternehmen: string; eingeladen_von: string | null; laeuft_ab: Date; sprache: string }>(
       "select * from app.einladung_fuer_versand($1)",
       [job.einladungId],
     ),

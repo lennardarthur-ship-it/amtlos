@@ -266,7 +266,29 @@ paths:
                   einladungen: { type: array, items: { $ref: "#/components/schemas/Einladung" } }
                   darf_verwalten: { type: boolean }
 
+  /v1/team/verlassen:
+    post:
+      tags: [Team]
+      summary: Selbst austreten (jede Rolle; der letzte Inhaber kann nicht austreten)
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "204": { description: Ausgetreten }
+        "409": { description: Das Unternehmen braucht mindestens einen Inhaber }
+
   /v1/team/{kontoId}:
+    put:
+      tags: [Team]
+      summary: Rolle ändern (Inhaber ernennen oder ändern nur durch Inhaber; der letzte Inhaber bleibt)
+      x-rollen: [inhaber, admin]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: kontoId, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [rolle], additionalProperties: false, properties: { rolle: { $ref: "#/components/schemas/Rolle" } } } } }
+      responses:
+        "200": { description: Geändert, content: { application/json: { schema: { type: object, properties: { konto_id: { type: string }, rolle: { $ref: "#/components/schemas/Rolle" } } } } } }
+        "403": { $ref: "#/components/responses/KeineBerechtigung" }
+        "404": { $ref: "#/components/responses/NichtGefunden" }
+        "409": { description: Das Unternehmen braucht mindestens einen Inhaber }
     delete:
       tags: [Team]
       summary: Mitglied entfernen (Inhaber nur durch Inhaber; der letzte Inhaber bleibt)

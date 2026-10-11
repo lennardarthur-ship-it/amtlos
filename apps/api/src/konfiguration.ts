@@ -13,6 +13,9 @@ const Schema = z
     API_URL: z.string().url().default("http://localhost:3001"),
     /** Bearer-Token für GET /metriken (Prometheus). Ohne Token ist die Route abgeschaltet. */
     METRIKEN_TOKEN: z.string().min(32).optional(),
+    /** Anfragen je Minute und Instanz: angemeldet bzw. ohne Login/mit Einladungs- oder Kalender-Token (E-082). */
+    RATE_ANGEMELDET: z.coerce.number().int().positive().default(600),
+    RATE_ANONYM: z.coerce.number().int().positive().default(60),
   })
   .superRefine((k, ctx) => {
     if (k.AUTH_MODUS === "oidc" && (!k.OIDC_ISSUER || !k.OIDC_AUDIENCE))

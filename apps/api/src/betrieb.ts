@@ -1,4 +1,4 @@
-import { randomUUID, timingSafeEqual } from "node:crypto";
+import { createHash, randomUUID, timingSafeEqual } from "node:crypto";
 import { Controller, Get, Header, Headers, Inject, NotFoundException } from "@nestjs/common";
 import type { NextFunction, Request, Response } from "express";
 import type PgBoss from "pg-boss";
@@ -25,7 +25,8 @@ export function erzeugeMetriken() {
     registers: [register],
   });
   const warteschlange = new Gauge({ name: "amtlos_warteschlange_wartend", help: "Wartende Jobs je Warteschlange", labelNames: ["queue"], registers: [register] });
-  return { register, anfragen, dauer, warteschlange };
+  const begrenzt = new Counter({ name: "amtlos_http_begrenzt_total", help: "Wegen Ratenbegrenzung abgewiesene Anfragen", registers: [register] });
+  return { register, anfragen, dauer, warteschlange, begrenzt };
 }
 export type Metriken = ReturnType<typeof erzeugeMetriken>;
 export const METRIKEN = Symbol("METRIKEN");
@@ -68,5 +69,49 @@ export class BetriebController {
     if (!soll || ist.length !== soll.length || !timingSafeEqual(Buffer.from(ist), Buffer.from(soll))) throw new NotFoundException();
     for (const q of Object.values(JOBS)) this.m.warteschlange.set({ queue: q }, await this.boss.getQueueSize(q).catch(() => -1));
     return this.m.register.metrics();
+  }
+}
+
+/**
+ * Ratenbegrenzung (E-082): gleitendes Fenster je Schlüssel, im Speicher der Instanz.
+ * Schlüssel: Hash des Bearer-Tokens, sonst die IP (nur flüchtig im Speicher, nie geloggt).
+ * Strenger für Routen ohne Login und für Einladungs-Tokens (Ausprobieren erschweren).
+ */
+export interface Grenzen {
+  angemeldet: number;
+  anonym: number;
+  fensterMs: number;
+}
+
+export class Ratenbegrenzer {
+  private readonly zaehler = new Map<string, { start: number; anzahl: number }>();
+  constructor(private readonly g: Grenzen, private readonly jetzt: () => number = Date.now) {}
+
+  /** true = erlaubt; sonst Sekunden bis zum nächsten Fenster. */
+  pruefe(schluessel: string, grenze: number): true | number {
+    const t = this.jetzt();
+    if (this.zaehler.size > 50_000) for (const [k, v] of this.zaehler) if (t - v.start >= this.g.fensterMs) this.zaehler.delete(k);
+    const e = this.zaehler.get(schluessel);
+    if (!e || t - e.start >= this.g.fensterMs) {
+      this.zaehler.set(schluessel, { start: t, anzahl: 1 });
+      return true;
+    }
+    if (e.anzahl >= grenze) return Math.max(1, Math.ceil((e.start + this.g.fensterMs - t) / 1000));
+    e.anzahl++;
+    return true;
+  }
+
+  middleware(m: Metriken) {
+    return (req: Request, res: Response, weiter: NextFunction) => {
+      if (req.path === "/v1/gesundheit" || req.path === "/metriken") return weiter();
+      const token = /^Bearer (.+)$/.exec(req.headers.authorization ?? "")?.[1];
+      const streng = !token || req.path.startsWith("/v1/einladungen/") || req.path.startsWith("/v1/kalender/");
+      const schluessel = token ? `t:${createHash("sha256").update(token).digest("base64url").slice(0, 22)}` : `ip:${req.ip ?? "?"}`;
+      const r = this.pruefe(`${streng ? "s" : "n"}|${schluessel}`, streng ? this.g.anonym : this.g.angemeldet);
+      if (r === true) return weiter();
+      m.begrenzt.inc();
+      res.setHeader("Retry-After", String(r));
+      res.status(429).json({ statusCode: 429, message: "Zu viele Anfragen. Bitte warte einen Moment." });
+    };
   }
 }

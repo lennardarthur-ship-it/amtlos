@@ -73,3 +73,30 @@ describe("ICS", () => {
     expect(gefaltet.split("\r\n").map((x, i) => (i ? x.slice(1) : x)).join("")).toBe(zeile);
   });
 });
+
+describe("Ratenbegrenzung", () => {
+  it("lässt bis zur Grenze durch, dann 429 mit Retry-After, neues Fenster gibt frei", async () => {
+    const { Ratenbegrenzer, erzeugeMetriken } = await import("../src/betrieb.js");
+    let t = 0;
+    const r = new Ratenbegrenzer({ angemeldet: 3, anonym: 1, fensterMs: 60_000 }, () => t);
+    const mw = r.middleware(erzeugeMetriken());
+    const aufruf = (pfad: string, auth?: string) => {
+      const kopf: Record<string, string> = {};
+      const res = { setHeader: (k: string, v: string) => { kopf[k] = v; }, status: () => res, json: () => res };
+      let durch = false;
+      mw({ path: pfad, headers: auth ? { authorization: `Bearer ${auth}` } : {}, ip: "10.0.0.1" } as never, res as never, () => { durch = true; });
+      return { durch, kopf };
+    };
+    expect([1, 2, 3].map(() => aufruf("/v1/heute", "tok").durch)).toEqual([true, true, true]);
+    const viert = aufruf("/v1/heute", "tok");
+    expect(viert.durch).toBe(false);
+    expect(viert.kopf["Retry-After"]).toBe("60");
+    expect(aufruf("/v1/heute", "anderes").durch).toBe(true); // je Token getrennt
+    expect(aufruf("/v1/einladungen/annehmen", "tok2").durch).toBe(true);
+    expect(aufruf("/v1/einladungen/annehmen", "tok2").durch).toBe(false); // streng: 1
+    expect(aufruf("/v1/gesundheit").durch).toBe(true);
+    expect(aufruf("/v1/gesundheit").durch).toBe(true); // nie begrenzt
+    t = 60_000;
+    expect(aufruf("/v1/heute", "tok").durch).toBe(true);
+  });
+});

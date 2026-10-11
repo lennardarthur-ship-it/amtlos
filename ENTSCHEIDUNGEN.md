@@ -266,6 +266,14 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - `GET /metriken` liefert Prometheus-Metriken (Anfragen, Antwortzeiten, wartende Jobs je Warteschlange, Prozesswerte) nur mit `METRIKEN_TOKEN`; ohne Token gibt es die Route nicht.
 - OpenTelemetry-Tracing folgt, wenn Hosting und Observability-Anbieter feststehen (dann ohne Codeumbau über den OTLP-Exporter). Bis dahin: Logs + Metriken.
 
+### E-082 · Ratenbegrenzung in der API, je Instanz
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Gleitendes Minutenfenster im Speicher: angemeldet 600/min je Token, ohne Login sowie für Einladungs- und Kalender-Tokens 60/min je IP (konfigurierbar). 429 mit `Retry-After`, Zähler `amtlos_http_begrenzt_total`. IPs nur flüchtig im Speicher, nie im Log. Bei mehreren Instanzen gilt die Grenze je Instanz; eine globale Grenze gehört an den Ingress (mit dem Hosting).
+
+### E-083 · Team: Rollen ändern und austreten
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Inhaber und Admins ändern Rollen; Inhaber ernennen oder ändern darf nur ein Inhaber. Jedes Mitglied kann selbst austreten (SECURITY-DEFINER-Funktion, weil die Lösch-Policy nur Inhabern/Admins erlaubt). Der letzte Inhaber kann weder herabgestuft werden noch austreten. Die Einladungs-E-Mail geht in der Sprache des Einladenden.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

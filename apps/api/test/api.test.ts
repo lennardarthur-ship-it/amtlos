@@ -34,7 +34,7 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
     worker = new Datenbank(urls.worker);
     app = await erzeugeApp({
       UMGEBUNG: "test", PORT: 0, DATABASE_URL: urls.api, AUTH_MODUS: "dev", DEV_JWT_SECRET: GEHEIM,
-      WEB_URL: "https://app.amtlos.test", API_URL: "https://api.amtlos.test", OIDC_ISSUER: undefined, OIDC_AUDIENCE: undefined, METRIKEN_TOKEN: METRIK_TOKEN,
+      WEB_URL: "https://app.amtlos.test", API_URL: "https://api.amtlos.test", OIDC_ISSUER: undefined, OIDC_AUDIENCE: undefined, METRIKEN_TOKEN: METRIK_TOKEN, RATE_ANGEMELDET: 10_000, RATE_ANONYM: 1_000,
     });
     await app.init();
     [anna, ben, mia] = await Promise.all([token("anna"), token("ben"), token("mia")]);
@@ -231,10 +231,29 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
     const alsMia = (r: request.Test) => r.set("Authorization", `Bearer ${mia}`).set("X-Unternehmen-Id", firma);
     await alsMia(http().delete(`/v1/team/${lena.konto_id}`)).expect(403);
     await alsAnna(http().delete(`/v1/team/${ich.konto_id}`)).expect(409);
+    // Rolle ändern: Mia darf nicht, Anna schon; letzter Inhaber kann sich nicht herabstufen
+    await alsMia(http().put(`/v1/team/${lena.konto_id}`)).send({ rolle: "admin" }).expect(403);
+    await alsAnna(http().put(`/v1/team/${lena.konto_id}`)).send({ rolle: "admin" }).expect(200, { konto_id: lena.konto_id, rolle: "admin" });
+    await alsAnna(http().put(`/v1/team/${ich.konto_id}`)).send({ rolle: "admin" }).expect(409);
+    // Lena (jetzt Admin) darf niemanden zum Inhaber machen und Anna nicht herabstufen
+    const lenaAdmin = await token("lena");
+    const alsLena = (r: request.Test) => r.set("Authorization", `Bearer ${lenaAdmin}`).set("X-Unternehmen-Id", firma);
+    await alsLena(http().put(`/v1/team/${lena.konto_id}`)).send({ rolle: "inhaber" }).expect(403);
+    await alsLena(http().put(`/v1/team/${ich.konto_id}`)).send({ rolle: "mitarbeiter" }).expect(403);
     await alsAnna(http().delete(`/v1/team/${lena.konto_id}`)).expect(204);
     await alsAnna(http().delete(`/v1/team/${lena.konto_id}`)).expect(404);
     const lenaTok = await token("lena");
     await http().get("/v1/profil").set("Authorization", `Bearer ${lenaTok}`).set("X-Unternehmen-Id", firma).expect(404);
+
+    // Austreten: Mia (Mitarbeiterin) darf, Anna als letzte Inhaberin nicht
+    await alsAnna(http().post("/v1/team/verlassen")).expect(409);
+    await alsMia(http().post("/v1/team/verlassen")).expect(204);
+    await alsMia(http().get("/v1/heute")).expect(404);
+    // Für die folgenden Tests wieder aufnehmen
+    const owner = new Datenbank(urls.owner);
+    const miaKonto = (await http().get("/v1/ich").set("Authorization", `Bearer ${mia}`).expect(200)).body.konto.id;
+    await owner.imKontext({}, (tx) => tx.abfrage("insert into app.mitgliedschaft values ($1, $2, 'mitarbeiter')", [firma, miaKonto]));
+    await owner.schliessen();
   });
 
   it("Betrieb: OpenAPI öffentlich, Request-ID, Metriken nur mit Token und ohne Geheimnisse in Labels", async () => {
