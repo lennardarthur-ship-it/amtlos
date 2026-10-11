@@ -2,7 +2,11 @@ import { useState } from "react";
 import { Modal, Pressable, View } from "react-native";
 import { datumLang, fuelle, offeneFragen } from "@amtlos/i18n";
 import type { Karte as KarteT } from "../kern/api";
-import { Fristblatt, Hinweis, Status, Symbol, T, Zeile } from "../ui/bausteine";
+import type { Gruendung as GruendungT, Termin } from "../kern/typen";
+import { useNav } from "../ui/navigation";
+import { Gruendung } from "./mehr/Gruendung";
+import { Postfach } from "./mehr/Postfach";
+import { Fristblatt, Hinweis, Knopf, Status, Symbol, T, Zeile } from "../ui/bausteine";
 import { RADIUS, useFarben } from "../ui/thema";
 import { useAmtlos } from "../zustand";
 import { Leer, Seite, useLaden } from "./gemeinsam";
@@ -33,11 +37,19 @@ export function Heute() {
   const { t, sprache, klient, unternehmenId, wartend, fehlgeschlagen, online, demo } = useAmtlos();
   const f = useFarben();
   const { daten, fehler, laedt, neu } = useLaden(async () => {
-    const [h, p] = await Promise.all([klient.heute(), klient.profil()]);
-    return { h, profil: p.daten ?? {}, nachfragen: offeneFragen(p.daten ?? {}) };
+    const [h, p, g, termine] = await Promise.all([
+      klient.heute(),
+      klient.profil(),
+      klient.holen<GruendungT>("/v1/gruendung").catch(() => null),
+      klient.holen<Termin[]>("/v1/termine").catch(() => [] as Termin[]),
+    ]);
+    return { h, profil: p.daten ?? {}, nachfragen: offeneFragen(p.daten ?? {}), gruendung: g?.fortschritt ?? null, termine };
   }, [unternehmenId]);
   const [gewaehlt, setGewaehlt] = useState<KarteT | null>(null);
   const [fragebogen, setFragebogen] = useState(false);
+  const nav = useNav();
+  const [vorStartLaedt, setVorStartLaedt] = useState(false);
+  const bis60 = new Date(Date.now() + 60 * 864e5).toISOString().slice(0, 10);
   const h = daten?.h;
   const [jetzt, ...danach] = h?.als_naechstes ?? [];
   const gesamt = h ? h.zaehler.klar + h.zaehler.erledigt : 0;
@@ -100,6 +112,57 @@ export function Heute() {
           {gesamt ? (
             <View accessible accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: 100, now: anteil }} style={{ marginTop: 8, height: 4, borderRadius: 2, backgroundColor: f.linieLeise, overflow: "hidden" }}>
               <View style={{ width: `${anteil}%`, height: 4, backgroundColor: f.amt }} />
+            </View>
+          ) : null}
+
+          {daten?.gruendung && daten.gruendung.gesamt > 0 && !daten.gruendung.fertig ? (
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => nav.oeffnen("gruendung", () => <Gruendung geaendert={() => void neu()} />)}
+              style={({ pressed }) => ({ marginTop: 24, borderRadius: RADIUS.karte, backgroundColor: f.blatt, borderWidth: 1.5, borderColor: f.amt, padding: 14, opacity: pressed ? 0.85 : 1 })}
+            >
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                <Symbol name="flag" groesse={22} farbe={f.amt} />
+                <View style={{ flex: 1 }}>
+                  <T fett>{fuelle(t.gruendung.heute_karte, { n: daten.gruendung.erledigt, gesamt: daten.gruendung.gesamt })}</T>
+                  <T v="klein" farbe={f.amt}>{t.gruendung.heute_link}</T>
+                </View>
+                <Symbol name="chevron.right" groesse={16} />
+              </View>
+              <View style={{ marginTop: 10, height: 4, borderRadius: 2, backgroundColor: f.linieLeise, overflow: "hidden" }}>
+                <View style={{ width: `${Math.round((daten.gruendung.erledigt / daten.gruendung.gesamt) * 100)}%`, height: 4, backgroundColor: f.amt }} />
+              </View>
+            </Pressable>
+          ) : null}
+
+          {daten?.termine.filter((w) => w.datum <= bis60).length ? (
+            <View style={{ marginTop: 24 }}>
+              <T v="klein" fett leise>{t.postfach.weitere_fristen}</T>
+              {daten.termine.filter((w) => w.datum <= bis60).slice(0, 5).map((w, i, liste) => (
+                <Zeile key={w.id} links={<Fristblatt datum={w.datum} status={w.datum < new Date().toISOString().slice(0, 10) ? "ueberfaellig" : "offen"} sprache={sprache} />} titel={w.titel} onPress={() => nav.oeffnen("postfach", () => <Postfach geaendert={() => void neu()} />)} letzte={i === liste.length - 1} />
+              ))}
+            </View>
+          ) : null}
+
+          {h.vor_start && h.vor_start.anzahl > 0 && h.vor_start.seit ? (
+            <View style={{ marginTop: 24, borderRadius: RADIUS.karte, backgroundColor: f.blatt, borderWidth: 1, borderColor: f.linie, padding: 14 }}>
+              <T fett>{t.heute.vor_start_titel}</T>
+              <T v="klein" leise stil={{ marginTop: 4 }}>{fuelle(t.heute.vor_start_text, { n: h.vor_start.anzahl, datum: datumLang(h.vor_start.seit, sprache) })}</T>
+              <Knopf
+                leise
+                text={t.heute.vor_start_ja}
+                laedt={vorStartLaedt}
+                onPress={async () => {
+                  setVorStartLaedt(true);
+                  try {
+                    await klient.schicken("/v1/pflichten/vor-start-erledigt", "POST");
+                    await neu();
+                  } finally {
+                    setVorStartLaedt(false);
+                  }
+                }}
+                stil={{ marginTop: 12, alignSelf: "flex-start" }}
+              />
             </View>
           ) : null}
 

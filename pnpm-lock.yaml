@@ -102,6 +102,9 @@ importers:
 
   apps/mobile:
     dependencies:
+      '@amtlos/fachlogik':
+        specifier: workspace:*
+        version: link:../../packages/fachlogik
       '@amtlos/fristen':
         specifier: workspace:*
         version: link:../../packages/fristen

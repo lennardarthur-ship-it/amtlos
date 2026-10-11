@@ -5,17 +5,17 @@ import { dauerSeit, uhrzeit } from "../kern/zeit";
 import { Hinweis, Knopf, Symbol, T } from "../ui/bausteine";
 import { RADIUS, SCHRIFT, ZIEL, useFarben } from "../ui/thema";
 import { useAmtlos } from "../zustand";
-import { Leer, Seite, useLaden } from "./gemeinsam";
+import { Leer, useLaden } from "./gemeinsam";
 
-/** Zeiterfassung am Handy (6.6): Person wählen, ein großer Knopf. Geht auch ohne Netz (E-108). */
-export function Stempeln() {
+/** Zeiterfassung am Handy (6.6): Person wählen, ein großer Knopf. Geht auch ohne Netz (E-108). Oben im Personal-Tab (E-120). */
+export function StempelKarte({ wartendNeu }: { wartendNeu?: unknown } = {}) {
   const { t, sprache, klient, unternehmenId, stempeln, wartend, offeneStempel, fehlgeschlagen, online, fehlgeschlageneVerwerfen } = useAmtlos();
   const f = useFarben();
   const monat = new Date().toISOString().slice(0, 7);
-  const { daten, fehler, laedt, neu } = useLaden(async () => {
+  const { daten, fehler, neu } = useLaden(async () => {
     const [personen, laufend] = await Promise.all([klient.beschaeftigte(), klient.laufend(monat)]);
     return { personen: personen.filter((p) => !p.austritt), laufend };
-  }, [unternehmenId, wartend]);
+  }, [unternehmenId, wartend, wartendNeu]);
   const [gewaehlt, setGewaehlt] = useState<string | null>(null);
   const [pause, setPause] = useState("0");
   const [meldung, setMeldung] = useState<string | null>(null);
@@ -37,7 +37,7 @@ export function Stempeln() {
   }
 
   return (
-    <Seite titel={t.zeit.titel} laedt={laedt} neu={neu}>
+    <View>
       {!online ? <Hinweis text={t.mobil.offline} symbol="wifi.slash" /> : null}
       {wartend ? <Hinweis text={fuelle(t.mobil.wartend, { n: wartend })} symbol="arrow.triangle.2.circlepath" /> : null}
       {fehlgeschlagen.length ? (
@@ -99,6 +99,6 @@ export function Stempeln() {
           )}
         </View>
       ) : null}
-    </Seite>
+    </View>
   );
 }

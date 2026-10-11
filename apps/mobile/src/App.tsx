@@ -7,30 +7,33 @@ import { ActivityIndicator, Platform, Pressable, View, useColorScheme } from "re
 import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { beiTippen } from "./push";
 import { Anmelden } from "./seiten/Anmelden";
-import { Beleg } from "./seiten/Beleg";
+import { FinanzenStart } from "./seiten/finanzen/FinanzenStart";
 import { Heute } from "./seiten/Heute";
 import { Mehr } from "./seiten/Mehr";
+import { PersonalStart } from "./seiten/personal/PersonalStart";
 import { Pflichten } from "./seiten/Pflichten";
 import { Schnellstart } from "./seiten/Schnellstart";
-import { Stempeln } from "./seiten/Stempeln";
 import { Symbol, T } from "./ui/bausteine";
+import { Stapel } from "./ui/navigation";
 import { ZIEL, istIos, useFarben } from "./ui/thema";
 import { AmtlosAnbieter, useAmtlos } from "./zustand";
 
 void SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
-type Tab = "heute" | "pflichten" | "stempeln" | "beleg" | "mehr";
+/** Tabs (E-120): was täglich gebraucht wird; alles Weitere unter „Mehr“. Stempeln liegt bei Personal, Beleg bei Finanzen. */
+type Tab = "heute" | "pflichten" | "finanzen" | "personal" | "mehr";
 const TABS: { id: Tab; symbol: string }[] = [
   { id: "heute", symbol: "calendar" },
   { id: "pflichten", symbol: "checklist" },
-  { id: "stempeln", symbol: "clock" },
-  { id: "beleg", symbol: "doc.viewfinder" },
+  { id: "finanzen", symbol: "eurosign" },
+  { id: "personal", symbol: "person.2" },
   { id: "mehr", symbol: "ellipsis.circle" },
 ];
-const SEITE: Record<Tab, () => React.JSX.Element> = { heute: Heute, pflichten: Pflichten, stempeln: Stempeln, beleg: Beleg, mehr: Mehr };
+const SEITE: Record<Tab, () => React.JSX.Element> = { heute: Heute, pflichten: Pflichten, finanzen: FinanzenStart, personal: PersonalStart, mehr: Mehr };
 
 /** Tab-Leiste: unscharfer Hintergrund (iOS), SF Symbols, der aktive Tab in Handlungsfarbe. */
 function Leiste({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
+  // Erneutes Tippen auf den aktiven Tab führt zur ersten Seite (setTab erkennt das)
   const { t } = useAmtlos();
   const f = useFarben();
   const dunkel = useColorScheme() === "dark";
@@ -55,8 +58,15 @@ function Leiste({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
 function Rahmen() {
   const { bereit, ich, profilFehlt, profilFehltSetzen, t } = useAmtlos();
   const f = useFarben();
-  const [tab, setTab] = useState<Tab>("heute");
-  useEffect(() => beiTippen((link) => setTab(link.startsWith("/pflichten") ? "pflichten" : "heute")), []);
+  const [tab, setTabRoh] = useState<Tab>("heute");
+  const [zurueck, setZurueck] = useState<Record<Tab, number>>({ heute: 0, pflichten: 0, finanzen: 0, personal: 0, mehr: 0 });
+  const [besucht, setBesucht] = useState<Set<Tab>>(new Set(["heute"]));
+  const setTab = (t: Tab) => {
+    if (t === tab) setZurueck((z) => ({ ...z, [t]: z[t] + 1 }));
+    setBesucht((b) => (b.has(t) ? b : new Set([...b, t])));
+    setTabRoh(t);
+  };
+  useEffect(() => beiTippen((link) => setTabRoh(link.startsWith("/pflichten") ? "pflichten" : "heute")), []);
   useEffect(() => {
     if (bereit) void SplashScreen.hideAsync().catch(() => undefined);
   }, [bereit]);
@@ -74,12 +84,25 @@ function Rahmen() {
       </SafeAreaView>
     );
   if (profilFehlt) return <Schnellstart fertig={() => profilFehltSetzen(false)} />;
-  const Aktiv = SEITE[tab];
+  // Besuchte Tabs bleiben eingehängt, damit Unterseiten und Scrollposition beim Wechseln erhalten bleiben
   return (
     <View style={{ flex: 1, backgroundColor: f.papier }}>
-      <SafeAreaView style={{ flex: 1 }} edges={["top", "left", "right"]}>
-        <Aktiv />
-      </SafeAreaView>
+      {TABS.filter((x) => besucht.has(x.id)).map((x) => {
+        const Wurzel = SEITE[x.id];
+        const an = x.id === tab;
+        return (
+          <View key={x.id} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, opacity: an ? 1 : 0 }} pointerEvents={an ? "auto" : "none"} importantForAccessibility={an ? "auto" : "no-hide-descendants"} accessibilityElementsHidden={!an}>
+            <Stapel
+              zuruecksetzen={zurueck[x.id]}
+              wurzel={
+                <SafeAreaView style={{ flex: 1 }} edges={["top", "left", "right"]}>
+                  <Wurzel />
+                </SafeAreaView>
+              }
+            />
+          </View>
+        );
+      })}
       <Leiste tab={tab} setTab={setTab} />
     </View>
   );

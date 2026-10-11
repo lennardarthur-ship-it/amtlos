@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { KeyboardAvoidingView, Pressable, ScrollView, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { fragenJePhase, fuelle, schritteJePhase, type Frage } from "@amtlos/i18n";
+import { SCHRITTE, fragenJePhase, fuelle, schritteJePhase, type Frage } from "@amtlos/i18n";
 import { ApiFehler, NetzFehler } from "../kern/api";
 import { Hinweis, Knopf, Symbol, T } from "../ui/bausteine";
 import { RADIUS, RAND, SCHRIFT, ZIEL, useFarben } from "../ui/thema";
@@ -27,22 +27,43 @@ function wertAus(f: Frage, roh: string | string[] | undefined, sprache: "de" | "
   }
 }
 
+/** Profilwert → Formularwert (zum Bearbeiten vorhandener Angaben). null = „weiß ich nicht“. */
+function formAus(f: Frage, wert: unknown, sprache: "de" | "en"): string | string[] | undefined {
+  if (wert === undefined) return undefined;
+  if (wert === null) return UNBEKANNT;
+  if (f.art === "mehrfach") return Array.isArray(wert) ? wert.map(String) : undefined;
+  if (f.art === "janein") return wert === true ? "ja" : wert === false ? "nein" : undefined;
+  if ((f.art === "zahl" || f.art === "betrag") && typeof wert === "number") return sprache === "en" ? String(wert) : String(wert).replace(".", ",");
+  return String(wert);
+}
+
 /**
  * Schnellstart in der App (E-111, E-117): Unternehmen anlegen, dann fünf Schritte mit den Kernfragen.
  * Eine Frage je Bildschirmabschnitt, große Antwortflächen, Fortschritt oben. Nach dem letzten Schritt: Heute.
  */
-export function Schnellstart({ fertig, phase = "schnell", profilStart = {}, abbrechen }: { fertig: () => void; phase?: "schnell" | "nachfragen"; profilStart?: Record<string, unknown>; abbrechen?: () => void }) {
+export function Schnellstart({ fertig, phase = "schnell", profilStart = {}, abbrechen, nurSchritt }: { fertig: () => void; phase?: "schnell" | "nachfragen" | "alle"; profilStart?: Record<string, unknown>; abbrechen?: () => void; /** genau einen Schritt bearbeiten (Angabe ergänzen, Einstellungen) */ nurSchritt?: string }) {
   const { t, sprache, klient, ich, anmeldenAktualisieren, demo, abmelden } = useAmtlos();
   const f = useFarben();
   const [name, setName] = useState("");
   const [profil, setProfil] = useState<Record<string, unknown>>(profilStart);
   // Nachfragen: die Schrittfolge steht beim Start fest (sonst verschwänden beantwortete Fragen aus der Zählung)
   const [basis] = useState<Record<string, unknown>>(profilStart);
-  const [antworten, setAntworten] = useState<Record<string, string | string[]>>({});
-  const [pos, setPos] = useState(phase === "nachfragen" || ich?.unternehmen.length ? 0 : -1); // -1 = Unternehmen anlegen
+  // Vorhandene Antworten vorausfüllen – beim Bearbeiten sieht man, was schon gilt
+  const [antworten, setAntworten] = useState<Record<string, string | string[]>>(() => {
+    const a: Record<string, string | string[]> = {};
+    for (const sch of SCHRITTE) for (const fr of sch.fragen) {
+      const w = formAus(fr, profilStart[fr.feld], sprache);
+      if (w !== undefined) a[fr.feld] = w;
+    }
+    return a;
+  });
+  const [pos, setPos] = useState(phase !== "schnell" || ich?.unternehmen.length ? 0 : -1); // -1 = Unternehmen anlegen
   const [fehler, setFehler] = useState<string | null>(null);
   const [laedt, setLaedt] = useState(false);
-  const schritte = useMemo(() => schritteJePhase(phase, phase === "nachfragen" ? basis : profil), [phase, basis, profil]);
+  const schritte = useMemo(
+    () => (nurSchritt ? SCHRITTE.filter((x) => x.id === nurSchritt) : schritteJePhase(phase, phase === "nachfragen" ? basis : profil)),
+    [phase, basis, profil, nurSchritt],
+  );
   const schritt = schritte[pos];
   const fragen = schritt ? fragenJePhase(schritt, phase, basis) : [];
   const gesamt = schritte.reduce((n, s) => n + fragenJePhase(s, phase, basis).length, 0);
@@ -71,7 +92,7 @@ export function Schnellstart({ fertig, phase = "schnell", profilStart = {}, abbr
     try {
       const p = await klient.profilSpeichern(daten);
       setProfil(p.daten ?? daten);
-      const naechste = schritteJePhase(phase, phase === "nachfragen" ? basis : (p.daten ?? daten));
+      const naechste = nurSchritt ? schritte : schritteJePhase(phase, phase === "nachfragen" ? basis : (p.daten ?? daten));
       const i = naechste.findIndex((s) => s.id === schritt.id);
       if (i + 1 < naechste.length) setPos(i + 1);
       else fertig();
@@ -125,16 +146,16 @@ export function Schnellstart({ fertig, phase = "schnell", profilStart = {}, abbr
           ) : schritt ? (
             <>
               <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                <T v="klein" leise>{phase === "schnell" ? t.onboarding.schnellstart : t.onboarding.nachfragen_titel} · {fuelle(t.onboarding.schritt, { n: pos + 1, gesamt: schritte.length })}</T>
+                <T v="klein" leise>{nurSchritt ? t.einstellungen.profil : `${phase === "schnell" ? t.onboarding.schnellstart : phase === "alle" ? t.einstellungen.profil : t.onboarding.nachfragen_titel} · ${fuelle(t.onboarding.schritt, { n: pos + 1, gesamt: schritte.length })}`}</T>
                 {abbrechen ? (
                   <Pressable accessibilityRole="button" accessibilityLabel={t.onboarding.spaeter_weiter} onPress={abbrechen} style={{ width: ZIEL - 8, height: ZIEL - 8, alignItems: "center", justifyContent: "center", borderRadius: ZIEL, backgroundColor: f.blatt }}>
                     <Symbol name="xmark" groesse={15} farbe={f.tinte} />
                   </Pressable>
                 ) : null}
               </View>
-              <View accessible accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: gesamt, now: bisher }} style={{ marginTop: 8, height: 4, borderRadius: 2, backgroundColor: f.linieLeise, overflow: "hidden" }}>
+              {nurSchritt ? null : <View accessible accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: gesamt, now: bisher }} style={{ marginTop: 8, height: 4, borderRadius: 2, backgroundColor: f.linieLeise, overflow: "hidden" }}>
                 <View style={{ width: `${gesamt ? Math.round((bisher / gesamt) * 100) : 0}%`, height: 4, backgroundColor: f.amt }} />
-              </View>
+              </View>}
               <T v="grossTitel" accessibilityRole="header" stil={{ marginTop: 14 }}>{schritt.titel[sprache]}</T>
               {fehler ? <Hinweis art="fehler" text={fuelle(t.fehler.eingabe, { details: fehler })} /> : null}
               {fragen.map((fr) => (
@@ -168,9 +189,9 @@ export function Schnellstart({ fertig, phase = "schnell", profilStart = {}, abbr
                   )}
                 </View>
               ))}
-              <Knopf text={pos + 1 < schritte.length ? t.onboarding.weiter : t.onboarding.fertig} symbol="arrow.right" onPress={() => void weiter()} laedt={laedt} stil={{ marginTop: 28 }} />
+              <Knopf text={nurSchritt ? t.gemeinsam.speichern : pos + 1 < schritte.length ? t.onboarding.weiter : t.onboarding.fertig} symbol={nurSchritt ? "checkmark" : "arrow.right"} onPress={() => void weiter()} laedt={laedt} stil={{ marginTop: 28 }} />
               {pos > 0 ? <Knopf leise text={t.onboarding.zurueck} onPress={() => setPos(pos - 1)} stil={{ marginTop: 10 }} /> : null}
-              <T v="caption" leise stil={{ marginTop: 16 }}>{phase === "schnell" ? t.onboarding.schnell_hinweis : t.onboarding.unterbrechen}</T>
+              {nurSchritt ? null : <T v="caption" leise stil={{ marginTop: 16 }}>{phase === "schnell" ? t.onboarding.schnell_hinweis : t.onboarding.unterbrechen}</T>}
             </>
           ) : null}
         </ScrollView>

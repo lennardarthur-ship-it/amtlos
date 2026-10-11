@@ -13,6 +13,7 @@
     "web": "expo export --platform web --output-dir web-export"
   },
   "dependencies": {
+    "@amtlos/fachlogik": "workspace:*",
     "@amtlos/fristen": "workspace:*",
     "@amtlos/i18n": "workspace:*",
     "@amtlos/rules-engine": "workspace:*",

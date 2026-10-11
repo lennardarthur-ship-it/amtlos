@@ -10,6 +10,8 @@ export class ApiFehler extends Error {
   constructor(
     readonly status: number,
     meldung: string,
+    /** Antwortkörper, z. B. { fehlend: [...] } beim Stellen einer Rechnung */
+    readonly daten: Record<string, unknown> = {},
   ) {
     super(meldung);
   }
@@ -27,11 +29,16 @@ export interface KartenDetail extends Karte {
   begriffe: { begriff: string; erklaerung: string }[];
   erledigt_am?: string | null;
   fehlende_fakten: string[];
+  zu_klaeren?: string[];
+  nicht_zutreffend_grund?: string | null;
+  kosten?: string | null;
+  verschoben_von?: string | null;
+  nachweise?: { id: string; art: string; notiz: string | null; erstellt_am: string }[];
   pruefung: { status: string; geprueft_am: string | null };
   ungeprueft?: boolean;
 }
 export interface Profil { version: number; daten: Record<string, unknown> }
-export interface Heute { als_naechstes: Karte[]; zaehler: { offen: number; ueberfaellig: number; angabe_fehlt: number; erledigt: number; klar: number; naechste_90: number }; ampel: Record<string, "gruen" | "gelb" | "rot"> }
+export interface Heute { als_naechstes: Karte[]; zaehler: { offen: number; ueberfaellig: number; angabe_fehlt: number; erledigt: number; klar: number; naechste_90: number }; ampel: Record<string, "gruen" | "gelb" | "rot">; vor_start?: { anzahl: number; seit: string | null } }
 export interface Beschaeftigter { id: string; vorname: string; nachname: string; austritt: string | null }
 export interface Zeiteintrag { id: string; beschaeftigter_id: string; beginn: string; ende: string | null; offline?: boolean }
 
@@ -71,8 +78,17 @@ export class ApiKlient {
     }
     if (r.status === 204) return undefined as T;
     const j = (await r.json().catch(() => ({}))) as { meldung?: string; message?: string | string[]; fehler?: { meldung: string }[] };
-    if (!r.ok) throw new ApiFehler(r.status, j.fehler?.map((f) => f.meldung).join("; ") ?? j.meldung ?? (Array.isArray(j.message) ? j.message.join("; ") : j.message) ?? `Fehler ${r.status}`);
+    if (!r.ok) throw new ApiFehler(r.status, j.fehler?.map((f) => f.meldung).join("; ") ?? j.meldung ?? (Array.isArray(j.message) ? j.message.join("; ") : j.message) ?? `Fehler ${r.status}`, j as Record<string, unknown>);
     return j as T;
+  }
+
+  /** Allgemeiner Lesezugriff für die Bereiche (Finanzen, Personal, Postfach …); Typen in kern/typen.ts. */
+  holen<T>(pfad: string) {
+    return this.anfrage<T>(pfad);
+  }
+  /** Allgemeiner Schreibzugriff: POST/PUT/DELETE mit JSON oder FormData. */
+  schicken<T>(pfad: string, methode: "POST" | "PUT" | "DELETE", koerper?: unknown) {
+    return this.anfrage<T>(pfad, methode, koerper ?? (methode === "DELETE" ? undefined : {}));
   }
 
   devToken(kennung: string) {
@@ -90,7 +106,7 @@ export class ApiKlient {
   pflicht(id: string, periode: string) {
     return this.anfrage<KartenDetail>(`/v1/pflichten/${encodeURIComponent(id)}/${encodeURIComponent(periode)}`);
   }
-  erledigen(id: string, periode: string, notiz?: string) {
+  erledigen(id: string, periode: string, notiz?: string | null) {
     return this.anfrage<unknown>(`/v1/pflichten/${encodeURIComponent(id)}/${encodeURIComponent(periode)}/erledigen`, "POST", notiz ? { notiz } : {});
   }
   wiederOeffnen(id: string, periode: string) {

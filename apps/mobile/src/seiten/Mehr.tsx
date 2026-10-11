@@ -2,11 +2,20 @@ import { useState } from "react";
 import { Linking, Pressable, View } from "react-native";
 import { datumLang, fuelle } from "@amtlos/i18n";
 import { pushEinschalten, type PushErgebnis } from "../push";
-import { Abschnitt, Hinweis, Knopf, Symbol, T, Zeile } from "../ui/bausteine";
+import type { Brief, Gruendung as GruendungT } from "../kern/typen";
+import { Abschnitt, Hinweis, Karte, Knopf, Symbol, T, Zeile } from "../ui/bausteine";
+import { useNav } from "../ui/navigation";
 import { RADIUS, ZIEL, useFarben } from "../ui/thema";
 import { useAmtlos } from "../zustand";
 import { Seite, useLaden } from "./gemeinsam";
 import { KONFIG } from "../konfig";
+import { Einstellungen } from "./mehr/Einstellungen";
+import { Gruendung } from "./mehr/Gruendung";
+import { Hilfe } from "./mehr/Hilfe";
+import { Kalender } from "./mehr/Kalender";
+import { Melden } from "./mehr/Melden";
+import { Postfach } from "./mehr/Postfach";
+import { Team } from "./mehr/Team";
 
 function Auswahl({ optionen, aktiv, waehlen, label }: { optionen: { wert: string; text: string }[]; aktiv: string | null; waehlen: (w: string) => void; label: string }) {
   const f = useFarben();
@@ -29,6 +38,12 @@ export function Mehr() {
   const f = useFarben();
   const [push, setPush] = useState<PushErgebnis | null>(null);
   const { daten: abo } = useLaden(() => klient.abo(), [unternehmenId]);
+  const nav = useNav();
+  // Kleine Zähler an den Zeilen: offene Gründungsschritte und Briefe mit Frist
+  const { daten: zahlen, neu: zahlenNeu } = useLaden(async () => {
+    const [g, briefe] = await Promise.all([klient.holen<GruendungT>("/v1/gruendung").catch(() => null), klient.holen<Brief[]>("/v1/briefe").catch(() => [])]);
+    return { gruendung: g?.fortschritt ?? null, briefe: briefe.filter((b) => !b.erledigt_am && b.frist_am).length };
+  }, [unternehmenId]);
   const PUSH_TEXT: Record<PushErgebnis, { art: "erfolg" | "fehler" | "info"; text: string }> = {
     aktiv: { art: "erfolg", text: t.mobil.push_aktiv },
     verweigert: { art: "info", text: t.mobil.push_verweigert },
@@ -38,13 +53,25 @@ export function Mehr() {
   const web = KONFIG.webUrl;
   return (
     <Seite titel={t.mobil.tabs.mehr}>
+      <Karte>
+        {zahlen?.gruendung?.gesamt ? (
+          <Zeile links={<Symbol name="flag" groesse={20} farbe={f.amt} />} titel={t.gruendung.titel} text={fuelle(t.gruendung.fortschritt, { n: zahlen.gruendung.erledigt, gesamt: zahlen.gruendung.gesamt })} onPress={() => nav.oeffnen("gruendung", () => <Gruendung geaendert={() => void zahlenNeu()} />)} />
+        ) : null}
+        <Zeile links={<Symbol name="envelope" groesse={20} farbe={f.amt} />} titel={t.mobil.postfach_kurz} text={zahlen?.briefe ? fuelle(t.mobil.briefe_mit_frist, { n: zahlen.briefe }) : t.mobil.postfach_text} onPress={() => nav.oeffnen("postfach", () => <Postfach geaendert={() => void zahlenNeu()} />)} />
+        <Zeile links={<Symbol name="calendar" groesse={20} farbe={f.amt} />} titel={t.kalender.titel} text={t.mobil.kalender_text} onPress={() => nav.oeffnen("kalender", () => <Kalender />)} />
+        <Zeile links={<Symbol name="megaphone" groesse={20} farbe={f.amt} />} titel={t.mobil.melden_kurz} text={t.mobil.melden_text} onPress={() => nav.oeffnen("melden", () => <Melden />)} letzte />
+      </Karte>
+      <Karte stil={{ marginTop: 16 }}>
+        <Zeile links={<Symbol name="person.3" groesse={20} farbe={f.amt} />} titel={t.team.titel} text={t.team.text} onPress={() => nav.oeffnen("team", () => <Team />)} />
+        <Zeile links={<Symbol name="gearshape" groesse={20} farbe={f.amt} />} titel={t.einstellungen.titel} text={t.mobil.einstellungen_text} onPress={() => nav.oeffnen("einstellungen", () => <Einstellungen />)} />
+        <Zeile links={<Symbol name="questionmark.circle" groesse={20} farbe={f.amt} />} titel={t.hilfe.titel} onPress={() => nav.oeffnen("hilfe", () => <Hilfe />)} letzte />
+      </Karte>
       {ich && ich.unternehmen.length > 1 ? (
         <Abschnitt titel={t.mobil.unternehmen}>
           <Auswahl label={t.mobil.unternehmen} aktiv={unternehmenId} waehlen={(id) => void unternehmenWaehlen(id)} optionen={ich.unternehmen.map((u) => ({ wert: u.id, text: u.name }))} />
         </Abschnitt>
       ) : null}
 
-      <View style={{ marginTop: -16 }} />
       <Abschnitt titel={t.mobil.push}>
         <T v="klein" leise>{t.mobil.push_text}</T>
         {demo ? (

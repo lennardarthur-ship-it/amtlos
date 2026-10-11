@@ -2,12 +2,13 @@ import * as Haptics from "expo-haptics";
 import { useEffect, useRef, useState } from "react";
 import { Animated, Easing, Linking, Modal, Pressable, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { datumLang, fuelle } from "@amtlos/i18n";
+import { datumLang, fuelle, schrittFuerFakt } from "@amtlos/i18n";
 import { ApiFehler, NetzFehler, type Karte } from "../kern/api";
-import { Fristblatt, Hinweis, Knopf, Status, Stempel, Symbol, T } from "../ui/bausteine";
+import { Feld, Fristblatt, Hinweis, Knopf, Status, Stempel, Symbol, T } from "../ui/bausteine";
 import { RADIUS, RAND, ZIEL, istIos, useFarben } from "../ui/thema";
 import { useAmtlos } from "../zustand";
 import { useLaden } from "./gemeinsam";
+import { Schnellstart } from "./Schnellstart";
 
 /**
  * Pflicht-Karte als Blatt von unten (Seitenvertrag docs/04): Was · Bis wann · Erledigen · Warum · Was sonst · Mehr · Quellen.
@@ -19,6 +20,18 @@ export function PflichtBlatt({ karte, offen, schliessen, geaendert }: { karte: K
   const { daten: d, fehler, neu } = useLaden(() => (karte ? klient.pflicht(karte.pflicht_id, karte.periode) : Promise.resolve(null)), [karte?.pflicht_id, karte?.periode]);
   const [laedt, setLaedt] = useState(false);
   const [meldung, setMeldung] = useState<string | null>(null);
+  const [notizOffen, setNotizOffen] = useState(false);
+  const [notiz, setNotiz] = useState("");
+  // Fehlende Angabe direkt hier beantworten (E-120): der passende Fragen-Schritt öffnet sich als Blatt
+  const [frageSchritt, setFrageSchritt] = useState<string | null>(null);
+  const [profil, setProfil] = useState<Record<string, unknown>>({});
+  async function angabeErgaenzen() {
+    const fakt = d?.fehlende_fakten.find((x) => schrittFuerFakt(x));
+    const schritt = fakt ? schrittFuerFakt(fakt) : undefined;
+    if (!schritt) return;
+    setProfil((await klient.profil().catch(() => ({ daten: {} }))).daten ?? {});
+    setFrageSchritt(schritt);
+  }
   const stempel = useRef(new Animated.Value(0)).current;
   const erledigt = d?.status === "erledigt";
   // Alle Rollen dürfen erledigen (Rollenmodell: erledigen ja, Angaben ändern nein – deshalb „am Computer“ bei zu klärenden Angaben)
@@ -32,7 +45,9 @@ export function PflichtBlatt({ karte, offen, schliessen, geaendert }: { karte: K
     setLaedt(true);
     setMeldung(null);
     try {
-      await klient.erledigen(karte.pflicht_id, karte.periode);
+      await klient.erledigen(karte.pflicht_id, karte.periode, notiz.trim() || null);
+      setNotiz("");
+      setNotizOffen(false);
       if (istIos) void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       stempel.setValue(0);
       Animated.spring(stempel, { toValue: 1, useNativeDriver: true, friction: 5, tension: 90 }).start();
@@ -100,12 +115,33 @@ export function PflichtBlatt({ karte, offen, schliessen, geaendert }: { karte: K
               <View>
                 <Knopf text={t.karte.erledigen} symbol="checkmark" onPress={() => void erledigen()} laedt={laedt} />
                 <T v="caption" leise stil={{ marginTop: 8 }}>{t.karte.erledigen_hinweis}</T>
+                {notizOffen ? (
+                  <Feld label={t.karte.notiz} wert={notiz} aendern={setNotiz} mehrzeilig />
+                ) : (
+                  <Pressable accessibilityRole="button" onPress={() => setNotizOffen(true)} style={{ minHeight: 40, justifyContent: "center", alignSelf: "flex-start" }}>
+                    <T v="klein" farbe={f.amt}>{t.karte.notiz_zeigen}</T>
+                  </Pressable>
+                )}
               </View>
             ) : d && d.ergebnis === "unbekannt" ? (
               <View style={{ borderRadius: RADIUS.karte, borderWidth: 1, borderStyle: "dashed", borderColor: f.tinteLeise, padding: 14 }}>
                 <T fett>{t.karte.zu_klaeren}</T>
-                <T v="klein" leise stil={{ marginTop: 4 }}>{t.mobil.angabe_am_computer}</T>
+                {d.zu_klaeren?.length ? (
+                  <>
+                    <T v="klein" leise stil={{ marginTop: 4 }}>{t.karte.zu_klaeren_text}</T>
+                    {d.zu_klaeren.map((z) => (
+                      <T key={z} v="klein" stil={{ marginTop: 4 }}>• {z}</T>
+                    ))}
+                  </>
+                ) : null}
+                {d.fehlende_fakten.some((x) => schrittFuerFakt(x)) ? (
+                  <Knopf text={t.karte.angabe_ergaenzen} onPress={() => void angabeErgaenzen()} stil={{ marginTop: 12, alignSelf: "flex-start" }} />
+                ) : (
+                  <T v="klein" leise stil={{ marginTop: 4 }}>{t.mobil.angabe_am_computer}</T>
+                )}
               </View>
+            ) : d && d.status === "nicht_zutreffend" && d.nicht_zutreffend_grund ? (
+              <Hinweis art="erfolg" text={d.nicht_zutreffend_grund} />
             ) : null}
           </View>
 
@@ -145,6 +181,15 @@ export function PflichtBlatt({ karte, offen, schliessen, geaendert }: { karte: K
             </View>
           ) : null}
 
+          {d?.nachweise?.length ? (
+            <View style={{ marginTop: 24 }}>
+              <T v="gross" accessibilityRole="header">{t.karte.nachweise}</T>
+              {d.nachweise.map((n) => (
+                <T key={n.id} v="klein" stil={{ marginTop: 6 }}>{datumLang(n.erstellt_am.slice(0, 10), sprache)}{n.notiz ? ` · ${n.notiz}` : ""}</T>
+              ))}
+            </View>
+          ) : null}
+
           {d ? (
             <View style={{ marginTop: 24, paddingTop: 16, borderTopWidth: 1, borderColor: f.linie }}>
               <T v="klein" fett>{t.karte.quellen}</T>
@@ -160,6 +205,22 @@ export function PflichtBlatt({ karte, offen, schliessen, geaendert }: { karte: K
           ) : null}
         </ScrollView>
       </SafeAreaView>
+      <Modal visible={Boolean(frageSchritt)} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setFrageSchritt(null)}>
+        {frageSchritt ? (
+          <Schnellstart
+            phase="alle"
+            nurSchritt={frageSchritt}
+            profilStart={profil}
+            abbrechen={() => setFrageSchritt(null)}
+            fertig={() => {
+              setFrageSchritt(null);
+              // Mit der neuen Angabe ist neu gerechnet: Karte neu laden, Listen dahinter auch
+              void neu();
+              geaendert();
+            }}
+          />
+        ) : null}
+      </Modal>
     </Modal>
   );
 }
