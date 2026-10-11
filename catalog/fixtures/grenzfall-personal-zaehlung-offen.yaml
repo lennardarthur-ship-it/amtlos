@@ -1,0 +1,16 @@
+persona: grenzfall
+beschreibung: 49 Beschäftigte ohne Zählung (unter jeder Zählweise unter 50) bzw. 52 ohne Zählung (offen); Lohnsteuer-Anmeldezeitraum fehlt
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: "2015-01-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.beschaeftigte.gesamt: 49
+  profil.bundesland: HE
+  profil.gemeinde_ags: "06412000"
+erwartet:
+  personal.hinweisgeber_meldestelle: gilt_nicht
+  personal.schwerbehinderte_anzeige: unbekannt
+  personal.anmeldezeitraum_angeben: gilt
+  personal.lohnsteuer_anmeldung: gilt_nicht
+  personal.arbeitszeit_neuregelung: gilt

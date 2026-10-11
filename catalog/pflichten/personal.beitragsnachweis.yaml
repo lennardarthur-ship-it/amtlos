@@ -1,0 +1,57 @@
+# Katalog D.40 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: personal.beitragsnachweis
+version: 1
+katalog_nr: D.40
+titel:
+  de: Beitragsnachweis übermitteln
+kurz:
+  de: Zwei Arbeitstage vor Fälligkeit der Beiträge übermittelst du den Beitragsnachweis an die Krankenkassen.
+erklaerung:
+  de: Der Beitragsnachweis kündigt der Krankenkasse die Beiträge an. Er muss zwei Arbeitstage vor dem Fälligkeitstag vorliegen
+    und wird vom Lohnprogramm übermittelt.
+rechtsgrundlage:
+- § 28f SGB IV
+kategorie: personal
+ausloeser:
+  feld: abgeleitet.hat_beschaeftigte
+  op: ==
+  wert: true
+  label:
+    de: Du beschäftigst mindestens eine Person.
+frist:
+  typ: wiederkehrend
+  rhythmus: monatlich
+  faellig:
+    art: n_letzter_bankarbeitstag
+    n: 3
+    arbeitstage_vorher: 2
+  verschiebung:
+    regel: keine
+    kalender: bankarbeitstage
+wiederholung:
+  art: periodisch
+stelle:
+  de: Krankenkassen (über Lohnprogramm)
+kanal: partner
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: partner
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Sozialgesetzbuch IV § 28f
+  url: https://www.gesetze-im-internet.de/sgb_4/__28f.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- „Arbeitstage“ als Bankarbeitstage umgesetzt – bestätigen (G-13)
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

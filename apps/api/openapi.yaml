@@ -28,6 +28,7 @@ tags:
   - name: Team
   - name: Gründung und ELSTER
   - name: Finanzen
+  - name: Personal
 
 paths:
   /v1/gesundheit:
@@ -479,6 +480,233 @@ paths:
         "404": { description: Keine aktive Kasse }
         "422": { description: Datum vor der Anschaffung }
 
+  /v1/beschaeftigte:
+    get:
+      tags: [Personal]
+      summary: Beschäftigte (aktive zuerst). Datensparsam – nur Name, Art, Eintritt/Austritt, Wochenstunden
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Beschaeftigter" } } } } }
+    post:
+      tags: [Personal]
+      summary: Einstellung erfassen – meldet „Einstellung“ (beim ersten Mal auch „erste Einstellung“) und zieht die Anzahlen im Profil nach
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/BeschaeftigterEingabe" } } } }
+      responses:
+        "201": { description: Erfasst, content: { application/json: { schema: { $ref: "#/components/schemas/Beschaeftigter" } } } }
+        "422": { description: Eingabe ungültig }
+
+  /v1/beschaeftigte/{id}:
+    put:
+      tags: [Personal]
+      summary: Stammdaten ändern (Eintritt bleibt; Art und Wochenstunden lösen Neuberechnung aus)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/BeschaeftigterEingabe" } } } }
+      responses:
+        "200": { description: Geändert }
+        "404": { description: Nicht gefunden }
+
+  /v1/beschaeftigte/{id}/austritt:
+    post:
+      tags: [Personal]
+      summary: Austritt erfassen – meldet „Austritt“ (Abmeldung usw.)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [datum], properties: { datum: { type: string, format: date } } } } } }
+      responses:
+        "201": { description: Erfasst }
+        "404": { description: Keine aktive Beschäftigung }
+
+  /v1/beschaeftigte/{id}/checkliste:
+    get:
+      tags: [Personal]
+      summary: Checkliste zu Einstellung und Austritt – die Pflichten, die dafür entstanden sind
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "200": { description: OK }
+        "404": { description: Nicht gefunden }
+
+  /v1/personal/schwellen:
+    get:
+      tags: [Personal]
+      summary: Schwellenwert-Wächter – welche Pflichten bei 10, 20, 50, 150, 250 Beschäftigten hinzukämen (Zählweise offen → „zu prüfen“)
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  aktuell: { type: integer }
+                  schwellen:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        ab: { type: integer }
+                        neu: { type: array, items: { type: object, properties: { pflicht_id: { type: string }, titel: { type: string } } } }
+                        zu_pruefen: { type: array, items: { type: object, properties: { pflicht_id: { type: string }, titel: { type: string } } } }
+
+  /v1/personal/export:
+    get:
+      tags: [Personal]
+      summary: Stammdaten als CSV (für Lohnpartner oder Steuerberatung)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: CSV, content: { text/csv: { schema: { type: string } } } }
+
+  /v1/unterweisungen:
+    get:
+      tags: [Personal]
+      summary: Unterweisungen mit Zahl der Bestätigungen
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK }
+    post:
+      tags: [Personal]
+      summary: Unterweisung anlegen (Inhalt wird gehasht – das belegt, was bestätigt wurde)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [thema, inhalt, datum, durchgefuehrt_von]
+              properties:
+                thema: { type: string, maxLength: 200 }
+                inhalt: { type: string, maxLength: 20000 }
+                datum: { type: string, format: date }
+                durchgefuehrt_von: { type: string }
+      responses:
+        "201": { description: Angelegt }
+
+  /v1/unterweisungen/{id}:
+    get:
+      tags: [Personal]
+      summary: Unterweisung mit Bestätigungen
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "200": { description: OK }
+        "404": { description: Nicht gefunden }
+    delete:
+      tags: [Personal]
+      summary: Entwurf löschen (nur ohne Bestätigungen)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "204": { description: Gelöscht }
+        "409": { description: Bestätigt oder abgeschlossen }
+
+  /v1/unterweisungen/{id}/bestaetigen:
+    post:
+      tags: [Personal]
+      summary: Bestätigung durch die unterwiesene Person (eigener Name als einfache elektronische Signatur)
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [beschaeftigter_id, name], properties: { beschaeftigter_id: { type: string, format: uuid }, name: { type: string } } } } } }
+      responses:
+        "201": { description: Bestätigt }
+        "409": { description: Schon bestätigt oder abgeschlossen }
+        "422": { description: Name passt nicht }
+
+  /v1/unterweisungen/{id}/abschliessen:
+    post:
+      tags: [Personal]
+      summary: Abschließen – Protokoll (PDF) ablegen, Ereignis melden, offene Unterweisungspflichten erledigen
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "201": { description: Abgeschlossen, content: { application/json: { schema: { type: object, properties: { id: { type: string }, dokument_id: { type: string }, erledigte_pflichten: { type: integer } } } } } }
+        "409": { description: Schon abgeschlossen }
+        "422": { description: Keine Bestätigung }
+
+  /v1/zeiten:
+    get:
+      tags: [Personal]
+      summary: Arbeitszeiten eines Monats (gültige Einträge) mit Summen je Person
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: monat, in: query, required: true, schema: { type: string, pattern: "^\\d{4}-\\d{2}$" } }]
+      responses:
+        "200": { description: OK }
+        "400": { description: Monat fehlt }
+    post:
+      tags: [Personal]
+      summary: Nachtrag mit Grund (wird als Nachtrag gekennzeichnet)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [beschaeftigter_id, beginn, ende, grund]
+              properties:
+                beschaeftigter_id: { type: string, format: uuid }
+                beginn: { type: string, format: date-time }
+                ende: { type: string, format: date-time }
+                pause_minuten: { type: integer, minimum: 0 }
+                grund: { type: string }
+      responses:
+        "201": { description: Erfasst }
+
+  /v1/zeiten/kommen:
+    post:
+      tags: [Personal]
+      summary: Kommen stempeln
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [beschaeftigter_id], properties: { beschaeftigter_id: { type: string, format: uuid } } } } } }
+      responses:
+        "201": { description: Gestempelt }
+        "409": { description: Läuft schon }
+
+  /v1/zeiten/gehen:
+    post:
+      tags: [Personal]
+      summary: Gehen stempeln (schließt den offenen Eintrag)
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [beschaeftigter_id], properties: { beschaeftigter_id: { type: string, format: uuid }, pause_minuten: { type: integer, minimum: 0 } } } } } }
+      responses:
+        "201": { description: Gestempelt }
+        "404": { description: Nichts offen }
+
+  /v1/zeiten/{id}/korrigieren:
+    post:
+      tags: [Personal]
+      summary: Korrektur als neuer Eintrag (der alte bleibt im Verlauf)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [grund]
+              properties:
+                beginn: { type: string, format: date-time }
+                ende: { type: string, format: date-time }
+                pause_minuten: { type: integer, minimum: 0 }
+                storniert: { type: boolean }
+                grund: { type: string }
+      responses:
+        "201": { description: Korrigiert }
+        "404": { description: Kein gültiger Eintrag }
+
+  /v1/zeiten/export:
+    get:
+      tags: [Personal]
+      summary: Arbeitszeiten eines Monats als CSV
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: monat, in: query, required: true, schema: { type: string } }]
+      responses:
+        "200": { description: CSV, content: { text/csv: { schema: { type: string } } } }
+
   /v1/glossar:
     get:
       tags: [Pflichten]
@@ -657,6 +885,25 @@ components:
           schema: { type: object, properties: { meldung: { type: string }, fehler: { type: array, items: { type: object, properties: { feld: { type: string }, meldung: { type: string } } } } } }
 
   schemas:
+    Beschaeftigter:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        vorname: { type: string }
+        nachname: { type: string }
+        art: { type: string, enum: [vollzeit, teilzeit, minijob, azubi, werkstudent] }
+        eintritt: { type: string, format: date }
+        austritt: { type: [string, "null"], format: date }
+        wochenstunden: { type: [number, "null"] }
+    BeschaeftigterEingabe:
+      type: object
+      required: [vorname, nachname, art]
+      properties:
+        vorname: { type: string, maxLength: 100 }
+        nachname: { type: string, maxLength: 100 }
+        art: { type: string, enum: [vollzeit, teilzeit, minijob, azubi, werkstudent] }
+        eintritt: { type: string, format: date, description: nur beim Anlegen }
+        wochenstunden: { type: [number, "null"], maximum: 80 }
     Rechnungssteller:
       type: object
       required: [name, strasse, plz, ort, email]

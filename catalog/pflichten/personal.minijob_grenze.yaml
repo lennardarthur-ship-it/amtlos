@@ -1,0 +1,51 @@
+# Katalog D.39 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: personal.minijob_grenze
+version: 1
+katalog_nr: D.39
+titel:
+  de: Minijob-Grenze beachten
+kurz:
+  de: 'Minijobber dürfen im Monat nicht mehr als die Minijob-Grenze verdienen: 603 € (2026), 633 € (2027).'
+erklaerung:
+  de: Die Minijob-Grenze ist an den Mindestlohn gekoppelt. Amtlos führt die Werte mit Gültigkeitszeitraum.
+rechtsgrundlage:
+- § 8 SGB IV
+kategorie: personal
+ausloeser:
+  feld: profil.beschaeftigte.minijob
+  op: '>='
+  wert: 1
+  label:
+    de: Du beschäftigst Minijobber.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Minijob-Zentrale
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+aktion:
+  art: abhaken
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Sozialgesetzbuch IV § 8
+  url: https://www.gesetze-im-internet.de/sgb_4/__8.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Folgen bei Überschreiten (gelegentliches Überschreiten) ergänzen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

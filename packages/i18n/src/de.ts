@@ -357,6 +357,7 @@ export const de = {
     gesellschafterwechsel: "Gesellschafter haben sich geändert",
     datenpanne: "Datenpanne entdeckt",
     betriebsaufgabe: "Tätigkeit aufgegeben",
+    unterweisung_durchgefuehrt: "Unterweisung durchgeführt",
   },
   einstellungen: { titel: "Einstellungen", profil: "Angaben zu deinem Unternehmen", profil_text: "Ändere deine Angaben. Jede Änderung wird gespeichert, ältere Stände bleiben nachvollziehbar.", sprache: "Sprache", sprache_speichern: "Sprache speichern" },
   onboarding: {

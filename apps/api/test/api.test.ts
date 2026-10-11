@@ -434,4 +434,109 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       await alsAnna(http().post(`/v1/kassen/${k.id}/ausser-betrieb`)).send({ datum: `${jahr}-12-02` }).expect(404);
     });
   });
+
+  describe("Personal und Arbeitsschutz", () => {
+    let lea: string;
+    let u: string;
+    let person: string;
+    const alsLea = (x: request.Test) => x.set("Authorization", `Bearer ${lea}`).set("X-Unternehmen-Id", u);
+    const jahr = new Date().getFullYear();
+    const heuteIso = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Berlin" }).format(new Date());
+
+    beforeAll(async () => {
+      lea = await token("lea");
+      u = (await http().post("/v1/unternehmen").set("Authorization", `Bearer ${lea}`).send({ name: "Leas Bäckerei" }).expect(201)).body.id;
+      await alsLea(http().put("/v1/profil")).send({ daten: { rechtsform: "einzelunternehmen", gruendungsdatum: "2020-01-01", "taetigkeit.einordnung": "gewerbe", "beschaeftigte.gesamt": 0, gemeinde_ags: "09162000" } }).expect(200);
+    });
+
+    it("Einstellung: Ereignisse, Anzahlen im Profil, Checkliste aus den entstandenen Pflichten", async () => {
+      await alsLea(http().post("/v1/beschaeftigte")).send({ vorname: "Tom", nachname: "Teig", art: "kellner" }).expect(422);
+      const b = (await alsLea(http().post("/v1/beschaeftigte")).send({ vorname: "Tom", nachname: "Teig", art: "minijob", eintritt: `${jahr}-11-01`, wochenstunden: 8 }).expect(201)).body;
+      person = b.id;
+      expect(b).toMatchObject({ vorname: "Tom", art: "minijob", wochenstunden: 8, austritt: null });
+      await alsLea(http().post("/v1/beschaeftigte")).send({ vorname: "Ute", nachname: "Ofen", art: "vollzeit", eintritt: `${jahr}-01-15` }).expect(201);
+      const profil = (await alsLea(http().get("/v1/profil")).expect(200)).body.daten;
+      expect(profil).toMatchObject({ "beschaeftigte.gesamt": 2, "beschaeftigte.minijob": 1, "beschaeftigte.vollzeit": 1 });
+      const ereignisse = (await alsLea(http().get("/v1/ereignisse")).expect(200)).body.map((e: { typ: string }) => e.typ).sort();
+      expect(ereignisse).toEqual(["einstellung", "einstellung", "erste_einstellung"]);
+      await neuberechnen(worker, u, "test", { kalender: new StandardKalender() });
+      const c = (await alsLea(http().get(`/v1/beschaeftigte/${person}/checkliste`)).expect(200)).body;
+      const ids = c.schritte.map((x: { pflicht_id: string }) => x.pflicht_id);
+      expect(ids).toEqual(expect.arrayContaining(["personal.sv_anmeldung", "arbeitsschutz.erstunterweisung"]));
+      expect(c.schritte.every((x: { anlass: string }) => x.anlass === "einstellung")).toBe(true);
+      // Schreibrechte: fremdes Konto sieht nichts
+      await http().get("/v1/beschaeftigte").set("Authorization", `Bearer ${ben}`).set("X-Unternehmen-Id", u).expect(404);
+    });
+
+    it("Schwellenwert-Wächter zeigt, was bei mehr Beschäftigten hinzukäme", async () => {
+      const s = (await alsLea(http().get("/v1/personal/schwellen")).expect(200)).body;
+      expect(s.aktuell).toBe(2);
+      expect(s.schwellen.map((x: { ab: number }) => x.ab)).toEqual([10, 20, 50, 150, 250]);
+      const alle = s.schwellen.flatMap((x: { neu: { pflicht_id: string }[]; zu_pruefen: { pflicht_id: string }[] }) => [...x.neu, ...x.zu_pruefen].map((p) => p.pflicht_id));
+      expect(alle).toContain("personal.hinweisgeber_meldestelle");
+    });
+
+    it("Export als CSV, Austritt meldet das Ereignis", async () => {
+      const csv = (await alsLea(http().get("/v1/personal/export")).expect(200)).text;
+      expect(csv).toContain('"Teig";"Tom";"minijob"');
+      await alsLea(http().post(`/v1/beschaeftigte/${person}/austritt`)).send({ datum: `${jahr}-10-01` }).expect(422); // vor dem Eintritt
+      const a = (await alsLea(http().post(`/v1/beschaeftigte/${person}/austritt`)).send({ datum: `${jahr + 1}-03-31` }).expect(201)).body;
+      expect(a.austritt).toBe(`${jahr + 1}-03-31`);
+      await alsLea(http().post(`/v1/beschaeftigte/${person}/austritt`)).send({ datum: `${jahr + 1}-04-30` }).expect(404);
+    });
+
+    it("Unterweisung: Bestätigung mit eigenem Namen, Protokoll als PDF, Pflicht erledigt, danach unveränderlich", async () => {
+      const w = (await alsLea(http().post("/v1/unterweisungen")).send({ thema: "Backstube", inhalt: "Ofen, Teigmaschine, Fluchtwege", datum: heuteIso, durchgefuehrt_von: "Lea" }).expect(201)).body;
+      await alsLea(http().post(`/v1/unterweisungen/${w.id}/abschliessen`)).expect(422); // noch keine Bestätigung
+      await alsLea(http().post(`/v1/unterweisungen/${w.id}/bestaetigen`)).send({ beschaeftigter_id: person, name: "Jemand Anders" }).expect(422);
+      const t = (await alsLea(http().post(`/v1/unterweisungen/${w.id}/bestaetigen`)).send({ beschaeftigter_id: person, name: "  tom   TEIG " }).expect(201)).body;
+      expect(t.name_bestaetigt).toBe("tom   TEIG");
+      await alsLea(http().post(`/v1/unterweisungen/${w.id}/bestaetigen`)).send({ beschaeftigter_id: person, name: "Tom Teig" }).expect(409);
+      await alsLea(http().delete(`/v1/unterweisungen/${w.id}`)).expect(409);
+      const r = (await alsLea(http().post(`/v1/unterweisungen/${w.id}/abschliessen`)).expect(201)).body;
+      expect(r.erledigte_pflichten).toBeGreaterThanOrEqual(1);
+      const pdf = await alsLea(http().get(`/v1/dokumente/${r.dokument_id}/datei`)).expect(200);
+      expect(pdf.headers["content-type"]).toContain("application/pdf");
+      await alsLea(http().post(`/v1/unterweisungen/${w.id}/abschliessen`)).expect(409);
+      const d = (await alsLea(http().get(`/v1/unterweisungen/${w.id}`)).expect(200)).body;
+      expect(d.teilnahmen).toHaveLength(1);
+      expect(d.inhalt_sha256).toMatch(/^[0-9a-f]{64}$/);
+      const c = (await alsLea(http().get(`/v1/beschaeftigte/${person}/checkliste`)).expect(200)).body;
+      expect(c.schritte.find((x: { pflicht_id: string }) => x.pflicht_id === "arbeitsschutz.erstunterweisung").status).toBe("erledigt");
+      await neuberechnen(worker, u, "test", { kalender: new StandardKalender() });
+      const p = (await alsLea(http().get("/v1/pflichten")).expect(200)).body;
+      const w2 = p.find((x: { pflicht_id: string; ergebnis: string }) => x.pflicht_id === "arbeitsschutz.unterweisung_wiederholen" && x.ergebnis === "gilt");
+      expect(w2).toMatchObject({ periode: `aenderung-${heuteIso.replaceAll("-", "")}`, faellig_am: `${Number(heuteIso.slice(0, 4)) + 1}${heuteIso.slice(4)}` });
+      // Entwürfe ohne Bestätigung lassen sich löschen
+      const e = (await alsLea(http().post("/v1/unterweisungen")).send({ thema: "Entwurf", inhalt: "x", datum: `${jahr}-11-01`, durchgefuehrt_von: "Lea" }).expect(201)).body;
+      await alsLea(http().delete(`/v1/unterweisungen/${e.id}`)).expect(204);
+    });
+
+    it("Zeiterfassung: stempeln, Nachtrag, Korrektur als neuer Eintrag, Monat und CSV; Datenbank schützt den Verlauf", async () => {
+      await alsLea(http().post("/v1/zeiten/gehen")).send({ beschaeftigter_id: person }).expect(404);
+      await alsLea(http().post("/v1/zeiten/kommen")).send({ beschaeftigter_id: person }).expect(201);
+      await alsLea(http().post("/v1/zeiten/kommen")).send({ beschaeftigter_id: person }).expect(409);
+      const g = (await alsLea(http().post("/v1/zeiten/gehen")).send({ beschaeftigter_id: person, pause_minuten: 0 }).expect(201)).body;
+      expect(g.ende).toBeTruthy();
+      await alsLea(http().post("/v1/zeiten")).send({ beschaeftigter_id: person, beginn: `${jahr}-10-05T08:00:00+02:00`, ende: `${jahr}-10-05T12:30:00+02:00`, pause_minuten: 30 }).expect(422); // Grund fehlt
+      const n = (await alsLea(http().post("/v1/zeiten")).send({ beschaeftigter_id: person, beginn: `${jahr}-10-05T08:00:00+02:00`, ende: `${jahr}-10-05T12:30:00+02:00`, pause_minuten: 30, grund: "Stempeln vergessen" }).expect(201)).body;
+      const k = (await alsLea(http().post(`/v1/zeiten/${n.id}/korrigieren`)).send({ ende: `${jahr}-10-05T13:00:00+02:00`, grund: "Ende falsch" }).expect(201)).body;
+      expect(k).toMatchObject({ quelle: "korrektur", ersetzt_id: n.id, pause_minuten: 30 });
+      await alsLea(http().post(`/v1/zeiten/${n.id}/korrigieren`)).send({ grund: "nochmal" }).expect(404); // schon ersetzt
+      await alsLea(http().get("/v1/zeiten?monat=2026-13")).expect(400);
+      const m = (await alsLea(http().get(`/v1/zeiten?monat=${jahr}-10`)).expect(200)).body;
+      const okt5 = m.eintraege.filter((e: { quelle: string }) => e.quelle !== "stempel");
+      expect(okt5).toHaveLength(1);
+      expect(okt5[0]).toMatchObject({ id: k.id, minuten: 270 });
+      const csv = (await alsLea(http().get(`/v1/zeiten/export?monat=${jahr}-10`)).expect(200)).text;
+      expect(csv).toContain('"Teig, Tom"');
+      expect(csv).toContain('"Ende falsch"');
+      const leaKonto = (await http().get("/v1/ich").set("Authorization", `Bearer ${lea}`).expect(200)).body.konto.id;
+      const apiDb = new Datenbank(urls.api);
+      await expect(apiDb.imKontext({ kontoId: leaKonto, unternehmenId: u }, (tx) => tx.abfrage("update app.zeiteintrag set pause_minuten = 0 where id = $1", [k.id]))).rejects.toThrow(/zeiteintrag_unveraenderlich/);
+      await expect(apiDb.imKontext({ kontoId: leaKonto, unternehmenId: u }, (tx) => tx.abfrage("delete from app.zeiteintrag where id = $1", [n.id]))).rejects.toThrow(/permission denied|zeiteintrag_unveraenderlich/);
+      await expect(apiDb.imKontext({ kontoId: leaKonto, unternehmenId: u }, (tx) => tx.abfrage("update app.unterweisung_teilnahme set name_bestaetigt = 'x'"))).rejects.toThrow();
+      await apiDb.schliessen();
+    });
+  });
 });

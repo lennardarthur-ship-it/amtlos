@@ -181,3 +181,30 @@ describe("Termine", () => {
     expect(r[0]!.termine.every((t) => !t.vorlaeufig)).toBe(true);
   });
 });
+
+describe("Eine Instanz je Ereignis (je_ereignis)", () => {
+  const p = {
+    schema_version: 1, id: "test.je_ereignis", version: 1, titel: { de: "T" }, kurz: { de: "K" }, erklaerung: { de: "E" }, rechtsgrundlage: ["x"], kategorie: "personal",
+    ausloeser: { ereignis: "einstellung", op: "eingetreten" },
+    frist: { typ: "relativ", bezug: { ereignis: "einstellung" }, versatz: "P3D", je_ereignis: true, verschiebung: { regel: "keine", kalender: "bundeseinheitlich" } },
+    wiederholung: { art: "einmalig" }, stelle: { de: "S" }, kanal: "post", kosten: null, sanktion: { text: { de: "S" }, schwere: "mittel" }, automatisierung: "hinweis",
+    status_recht: "in_kraft", gueltig_ab: null, gueltig_bis: null, quellen: [], fachlich_zu_pruefen: [],
+  } as unknown as Pflicht;
+  const lauf = (ereignisse: { typ: string; datum: string; storniert?: boolean }[]) =>
+    auswerten({ katalog: { pflichten: [p], regelwerte: [] }, fakten: { "profil.bundesland": "BE" }, ereignisse, stichtag: "2026-10-11", kalender: new StandardKalender() })[0]!;
+
+  it("erzeugt je Ereignis einen Termin, stornierte und doppelte Tage zählen nicht", () => {
+    const r = lauf([
+      { typ: "einstellung", datum: "2026-09-01" },
+      { typ: "einstellung", datum: "2026-09-01" },
+      { typ: "einstellung", datum: "2026-10-01", storniert: true },
+      { typ: "einstellung", datum: "2026-11-02" },
+    ]);
+    expect(r.termine.map((t) => [t.periode, t.faellig_am])).toEqual([["aenderung-20260901", "2026-09-04"], ["aenderung-20261102", "2026-11-05"]]);
+  });
+
+  it("ohne Ereignis: kein Termin und ein Hinweis", () => {
+    const r = lauf([]);
+    expect(r.termine).toEqual([]);
+  });
+});

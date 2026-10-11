@@ -47,6 +47,8 @@ export type Frist =
       bezug: { ereignis: string } | { fakt: string } | { pflicht_erledigt: string };
       versatz: string;
       zeitpunkt?: "spaetestens" | "vor_beginn";
+      /** Nur mit bezug.ereignis: eine Instanz je Ereignis (Periode aenderung-JJJJMMTT) */
+      je_ereignis?: boolean;
       verschiebung: Verschiebung;
       erinnerung?: string[];
     }

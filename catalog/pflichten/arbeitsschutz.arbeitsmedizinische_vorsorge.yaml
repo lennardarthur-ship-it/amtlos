@@ -1,0 +1,48 @@
+# Katalog E.56 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: arbeitsschutz.arbeitsmedizinische_vorsorge
+version: 1
+katalog_nr: E.56
+titel:
+  de: Arbeitsmedizinische Vorsorge anbieten
+kurz:
+  de: Du bietest arbeitsmedizinische Vorsorge an, zum Beispiel die Angebotsvorsorge bei Bildschirmarbeit.
+erklaerung:
+  de: Die Verordnung zur arbeitsmedizinischen Vorsorge regelt Pflicht-, Angebots- und Wunschvorsorge. Bei Bildschirmarbeit
+    ist Vorsorge anzubieten.
+rechtsgrundlage:
+- ArbMedVV
+kategorie: arbeitsschutz
+ausloeser:
+  feld: abgeleitet.hat_beschaeftigte
+  op: ==
+  wert: true
+  label:
+    de: Du beschäftigst mindestens eine Person.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Betriebsarzt
+kanal: partner
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Verordnung zur arbeitsmedizinischen Vorsorge
+  url: https://www.gesetze-im-internet.de/arbmedvv/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Anlässe und Fristen je Vorsorgeart fachlich ergänzen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

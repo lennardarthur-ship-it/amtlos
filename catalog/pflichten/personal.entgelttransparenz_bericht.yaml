@@ -1,0 +1,59 @@
+# Katalog D.47 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: personal.entgelttransparenz_bericht
+version: 1
+katalog_nr: D.47
+titel:
+  de: Bericht zur Entgelttransparenz (geplant)
+kurz:
+  de: Arbeitgeber mit mehr als 150 Beschäftigten sollen zum 7.6.2027 über die Entgeltgleichheit berichten.
+erklaerung:
+  de: Die EU-Entgelttransparenzrichtlinie war bis 7.6.2026 umzusetzen; das deutsche Gesetz steht aus. Bis dahin gilt das bisherige
+    Entgelttransparenzgesetz weiter.
+rechtsgrundlage:
+- Richtlinie (EU) 2023/970
+- EntgTranspG
+kategorie: personal
+ausloeser:
+  all:
+  - feld: profil.beschaeftigte.gesamt
+    op: '>'
+    wert:
+      regelwert: personal.entgelttransparenz.berichtspflicht_schwelle
+    label:
+      de: Du beschäftigst mehr als 150 Personen.
+frist:
+  typ: absolut
+  datum: '2027-06-07'
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: –
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Noch keine – geplante Regelung.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: geplant
+radar:
+  wahrscheinlichkeit: hoch
+  erwartet_ab: '2027-06-07'
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Entgelttransparenzgesetz
+  url: https://www.gesetze-im-internet.de/entgtranspg/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Status offen – Radar
+- Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „hoch“, weil EU-Richtlinie)
+- Zählweise und Inhalt des Berichts nach Umsetzungsgesetz
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

@@ -1,9 +1,9 @@
-# Werte unverändert aus Spezifikation D.39 (E-054). Zeigt zeitlich aufeinanderfolgende Versionen desselben Regelwerts.
+# Werte unverändert aus Spezifikation Abschnitt 4, Katalog D und E (E-054). Rechtsgrundlagen ergänzt – fachlich zu prüfen.
 - schema_version: 1
   id: personal.mindestlohn.stunde
   version: 1
   katalog_nr: D.39
-  bezeichnung: { de: Gesetzlicher Mindestlohn je Zeitstunde }
+  bezeichnung: { de: "Gesetzlicher Mindestlohn je Stunde", en: "Statutory minimum wage per hour" }
   einheit: EUR_pro_stunde
   wert: 13.90
   gueltig_ab: "2026-01-01"
@@ -11,15 +11,15 @@
   status_recht: in_kraft
   rechtsgrundlage: ["§ 1 MiLoG", "Mindestlohnanpassungsverordnung"]
   quellen:
-    - { titel: Mindestlohngesetz § 1, url: "https://www.gesetze-im-internet.de/milog/__1.html", abgerufen: null }
-  fachlich_zu_pruefen: ["Fundstelle der geltenden Anpassungsverordnung ergänzen"]
+    - { titel: Mindestlohngesetz, url: "https://www.gesetze-im-internet.de/milog/", abgerufen: null }
+  fachlich_zu_pruefen: ["Rechtsgrundlage (aktuelle Anpassungsverordnung) ergänzen"]
   pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
 
 - schema_version: 1
   id: personal.mindestlohn.stunde
   version: 2
   katalog_nr: D.39
-  bezeichnung: { de: Gesetzlicher Mindestlohn je Zeitstunde }
+  bezeichnung: { de: "Gesetzlicher Mindestlohn je Stunde", en: "Statutory minimum wage per hour" }
   einheit: EUR_pro_stunde
   wert: 14.60
   gueltig_ab: "2027-01-01"
@@ -27,37 +27,102 @@
   status_recht: beschlossen
   rechtsgrundlage: ["§ 1 MiLoG", "Mindestlohnanpassungsverordnung"]
   quellen:
-    - { titel: Mindestlohngesetz § 1, url: "https://www.gesetze-im-internet.de/milog/__1.html", abgerufen: null }
-  fachlich_zu_pruefen: ["status_recht 'beschlossen' vs. 'in_kraft' (Verordnung bereits erlassen?)"]
+    - { titel: Mindestlohngesetz, url: "https://www.gesetze-im-internet.de/milog/", abgerufen: null }
+  fachlich_zu_pruefen: ["Status „beschlossen“ – Verordnung prüfen"]
   pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
 
 - schema_version: 1
   id: personal.minijob.grenze_monat
   version: 1
   katalog_nr: D.39
-  bezeichnung: { de: Geringfügigkeitsgrenze (Minijob) je Monat }
+  bezeichnung: { de: "Minijob-Grenze je Monat", en: "Mini-job earnings limit per month" }
   einheit: EUR_pro_monat
   wert: 603
   gueltig_ab: "2026-01-01"
   gueltig_bis: "2026-12-31"
   status_recht: in_kraft
-  rechtsgrundlage: ["§ 8 SGB IV"]
+  rechtsgrundlage: ["§ 8 Abs. 1a SGB IV"]
   quellen:
-    - { titel: SGB IV § 8, url: "https://www.gesetze-im-internet.de/sgb_4/__8.html", abgerufen: null }
-  fachlich_zu_pruefen: ["Dynamische Kopplung an Mindestlohn: als Berechnung oder als gepflegter Wert führen?"]
+    - { titel: Sozialgesetzbuch IV § 8, url: "https://www.gesetze-im-internet.de/sgb_4/__8.html", abgerufen: null }
+  fachlich_zu_pruefen: ["Rechtsgrundlage ergänzt"]
   pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
 
 - schema_version: 1
   id: personal.minijob.grenze_monat
   version: 2
   katalog_nr: D.39
-  bezeichnung: { de: Geringfügigkeitsgrenze (Minijob) je Monat }
+  bezeichnung: { de: "Minijob-Grenze je Monat", en: "Mini-job earnings limit per month" }
   einheit: EUR_pro_monat
   wert: 633
   gueltig_ab: "2027-01-01"
   gueltig_bis: null
   status_recht: beschlossen
-  rechtsgrundlage: ["§ 8 SGB IV"]
+  rechtsgrundlage: ["§ 8 Abs. 1a SGB IV"]
   quellen:
-    - { titel: SGB IV § 8, url: "https://www.gesetze-im-internet.de/sgb_4/__8.html", abgerufen: null }
+    - { titel: Sozialgesetzbuch IV § 8, url: "https://www.gesetze-im-internet.de/sgb_4/__8.html", abgerufen: null }
+  fachlich_zu_pruefen: ["Dynamische Kopplung an den Mindestlohn – Wert für 2027 bestätigen"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+
+- schema_version: 1
+  id: personal.schwerbehinderte.schwelle_arbeitsplaetze
+  version: 1
+  katalog_nr: D.45
+  bezeichnung: { de: "Arbeitsplätze, ab denen die Beschäftigungsquote gilt", en: "Jobs from which the employment quota applies" }
+  einheit: anzahl
+  wert: 20
+  gueltig_ab: "2026-01-01"
+  gueltig_bis: null
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 154 SGB IX"]
+  quellen:
+    - { titel: Sozialgesetzbuch IX § 154, url: "https://www.gesetze-im-internet.de/sgb_9_2018/__154.html", abgerufen: null }
+  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Rechtsgrundlage ergänzt"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+
+- schema_version: 1
+  id: personal.hinschg.schwelle
+  version: 1
+  katalog_nr: D.46
+  bezeichnung: { de: "Beschäftigte, ab denen eine interne Meldestelle Pflicht ist", en: "Employees from which an internal reporting channel is required" }
+  einheit: anzahl
+  wert: 50
+  gueltig_ab: "2026-01-01"
+  gueltig_bis: null
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 12 HinSchG"]
+  quellen:
+    - { titel: Hinweisgeberschutzgesetz § 12, url: "https://www.gesetze-im-internet.de/hinschg/__12.html", abgerufen: null }
+  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Rechtsgrundlage ergänzt"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+
+- schema_version: 1
+  id: personal.entgelttransparenz.berichtspflicht_schwelle
+  version: 1
+  katalog_nr: D.47
+  bezeichnung: { de: "Beschäftigte, ab denen die Berichtspflicht zur Entgelttransparenz geplant ist", en: "Employees from which pay transparency reporting is planned" }
+  einheit: anzahl
+  wert: 150
+  gueltig_ab: "2026-06-07"
+  gueltig_bis: null
+  status_recht: geplant
+  rechtsgrundlage: ["Richtlinie (EU) 2023/970"]
+  quellen:
+    - { titel: "Richtlinie (EU) 2023/970", url: "https://eur-lex.europa.eu/eli/dir/2023/970/oj", abgerufen: null }
+  fachlich_zu_pruefen: ["Spezifikation: „über 150 Beschäftigte“ – Vergleich > umgesetzt", "Deutsches Umsetzungsgesetz abwarten"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+
+- schema_version: 1
+  id: arbeitsschutz.ersthelfer.schwelle_versicherte
+  version: 1
+  katalog_nr: E.53
+  bezeichnung: { de: "Versicherte, ab denen Ersthelfer nötig sind", en: "Insured persons from which first aiders are required" }
+  einheit: anzahl
+  wert: 2
+  gueltig_ab: "2026-01-01"
+  gueltig_bis: null
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 26 DGUV Vorschrift 1"]
+  quellen:
+    - { titel: DGUV Vorschrift 1, url: "https://publikationen.dguv.de/regelwerk/dguv-vorschriften/", abgerufen: null }
+  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter", "Rechtsgrundlage ergänzt", "Versicherte vs. Beschäftigte"]
   pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }

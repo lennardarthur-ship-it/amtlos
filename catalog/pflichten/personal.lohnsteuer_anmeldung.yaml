@@ -1,0 +1,75 @@
+# Katalog D.40 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: personal.lohnsteuer_anmeldung
+version: 1
+katalog_nr: D.40
+titel:
+  de: Lohnsteuer anmelden
+kurz:
+  de: Bis zum 10. nach Ende des Anmeldezeitraums meldest du die Lohnsteuer beim Finanzamt an.
+erklaerung:
+  de: Den Anmeldezeitraum (monatlich, vierteljährlich oder jährlich) bestimmt das Finanzamt nach der Lohnsteuer des Vorjahres.
+    Trag ihn in deinem Profil ein; Amtlos berechnet daraus die Termine.
+rechtsgrundlage:
+- § 41a EStG
+kategorie: personal
+ausloeser:
+  all:
+  - feld: abgeleitet.hat_beschaeftigte
+    op: ==
+    wert: true
+    label:
+      de: Du beschäftigst mindestens eine Person.
+  - feld: profil.personal.lohnsteuer_anmeldezeitraum
+    op: vorhanden
+    label:
+      de: Du hast deinen Anmeldezeitraum angegeben.
+frist:
+  typ: wiederkehrend
+  rhythmus:
+    waehle:
+    - wenn:
+        feld: profil.personal.lohnsteuer_anmeldezeitraum
+        op: ==
+        wert: monatlich
+      dann: monatlich
+    - wenn:
+        feld: profil.personal.lohnsteuer_anmeldezeitraum
+        op: ==
+        wert: quartalsweise
+      dann: quartalsweise
+    sonst: jaehrlich
+  faellig:
+    art: tag_nach_periodenende
+    monate_nach: 1
+    tag: 10
+  verschiebung:
+    regel: naechster_werktag
+    kalender: bundesland
+wiederholung:
+  art: periodisch
+stelle:
+  de: Finanzamt
+kanal: elster
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Einkommensteuergesetz § 41a
+  url: https://www.gesetze-im-internet.de/estg/__41a.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Grenzen für den Anmeldezeitraum (nach Vorjahres-Lohnsteuer) stehen nicht in der Spezifikation – deshalb Angabe des Nutzers
+- Verschiebung bei Fristende am Wochenende/Feiertag bestätigen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

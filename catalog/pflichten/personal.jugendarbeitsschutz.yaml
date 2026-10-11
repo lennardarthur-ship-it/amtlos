@@ -1,0 +1,50 @@
+# Katalog D.44 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: personal.jugendarbeitsschutz
+version: 1
+katalog_nr: D.44
+titel:
+  de: Jugendarbeitsschutz beachten
+kurz:
+  de: Für Jugendliche gelten Erstuntersuchung, Arbeitszeitgrenzen und eine Aushangpflicht.
+erklaerung:
+  de: Wer Jugendliche beschäftigt, braucht vorab eine ärztliche Erstuntersuchung, muss besondere Arbeitszeitgrenzen einhalten
+    und das Jugendarbeitsschutzgesetz aushängen.
+rechtsgrundlage:
+- JArbSchG
+kategorie: personal
+ausloeser:
+  feld: profil.beschaeftigte.jugendlich
+  op: '>='
+  wert: 1
+  label:
+    de: Du beschäftigst Jugendliche.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Gewerbeaufsicht
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Jugendarbeitsschutzgesetz
+  url: https://www.gesetze-im-internet.de/jarbschg/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Erstuntersuchung als eigene Pflicht je Einstellung mit Frist?
+- Arbeitszeitgrenzen als Regelwerte
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

@@ -1,0 +1,20 @@
+persona: grenzfall
+beschreibung: Handwerksbetrieb mit 60 Beschäftigten; Zählung nach HinSchG und Arbeitsplätze nach SGB IX angegeben – Quote und Meldestelle gelten
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: "2010-01-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.beschaeftigte.gesamt: 60
+  abgeleitet.beschaeftigte.zaehlung_hinschg: 55
+  abgeleitet.beschaeftigte.arbeitsplaetze_sgb9: 58
+  profil.personal.lohnsteuer_anmeldezeitraum: monatlich
+  profil.bundesland: BY
+  profil.gemeinde_ags: "09162000"
+erwartet:
+  personal.schwerbehinderte_anzeige: gilt
+  personal.hinweisgeber_meldestelle: gilt
+  personal.entgelttransparenz_bericht: gilt_nicht
+  personal.arbeitszeit_neuregelung: gilt
+termine_enthaelt:
+  personal.schwerbehinderte_anzeige: [["2027-03", "2027-03-31"]]

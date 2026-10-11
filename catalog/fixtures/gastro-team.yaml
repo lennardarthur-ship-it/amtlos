@@ -1,0 +1,72 @@
+persona: kleiner_betrieb
+beschreibung: Restaurant in Köln mit 12 Beschäftigten (2 Minijobs, 1 Jugendliche), Sofortmeldebranche Gastronomie, Lohnsteuer monatlich; Einstellungen, Unterweisung, Unfall und Schwangerschaft gemeldet
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2018-05-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [gastronomie_lebensmittel]
+  profil.beschaeftigte.gesamt: 12
+  profil.beschaeftigte.minijob: 2
+  profil.beschaeftigte.jugendlich: 1
+  profil.personal.sofortmeldebranchen: [gastronomie]
+  profil.personal.lohnsteuer_anmeldezeitraum: monatlich
+  profil.arbeitsschutz.elektrische_geraete: true
+  profil.arbeitsschutz.gefahrstoffe: false
+  profil.bundesland: NW
+  profil.gemeinde_ags: "05315000"
+ereignisse:
+  - { typ: erste_einstellung, datum: "2018-06-01" }
+  - { typ: einstellung, datum: "2026-09-01" }
+  - { typ: einstellung, datum: "2026-11-02" }
+  - { typ: unterweisung_durchgefuehrt, datum: "2025-11-15" }
+  - { typ: arbeitsunfall, datum: "2026-10-05" }
+  - { typ: schwangerschaft_mitgeteilt, datum: "2026-10-01" }
+erwartet:
+  personal.betriebsnummer: gilt
+  personal.sv_anmeldung: gilt
+  personal.sv_abmeldung: gilt_nicht
+  personal.sv_jahresmeldung: gilt
+  personal.sofortmeldung: gilt
+  personal.mindestlohn: gilt
+  personal.minijob_grenze: gilt
+  personal.lohnsteuer_anmeldung: gilt
+  personal.anmeldezeitraum_angeben: gilt_nicht
+  personal.sv_beitraege: gilt
+  personal.beitragsnachweis: gilt
+  personal.umlagen_eau: gilt
+  personal.nachweisgesetz: gilt
+  personal.arbeitszeit_aufzeichnung: gilt
+  personal.arbeitszeit_milog: gilt
+  personal.arbeitszeit_neuregelung: gilt
+  personal.mutterschutz_gefaehrdungsbeurteilung: gilt
+  personal.schwangerschaft_mitteilung: gilt
+  personal.jugendarbeitsschutz: gilt
+  # 12 Beschäftigte: unter jeder Zählweise unter 20 bzw. 50
+  personal.schwerbehinderte_anzeige: gilt_nicht
+  personal.hinweisgeber_meldestelle: gilt_nicht
+  personal.entgelttransparenz_bericht: gilt_nicht
+  personal.aushangpflichtige_gesetze: gilt
+  personal.lohnabrechnung: gilt
+  arbeitsschutz.erstunterweisung: gilt
+  arbeitsschutz.unterweisung_wiederholen: gilt
+  arbeitsschutz.fasi_betriebsarzt: gilt
+  arbeitsschutz.erste_hilfe: gilt
+  arbeitsschutz.dguv_v3: gilt
+  arbeitsschutz.gefahrstoffe: gilt_nicht
+  arbeitsschutz.arbeitsmedizinische_vorsorge: gilt
+  arbeitsschutz.unfallanzeige: gilt
+termine_enthaelt:
+  # je Einstellung eine Instanz (je_ereignis)
+  personal.sofortmeldung: [["aenderung-20260901", "2026-09-01"], ["aenderung-20261102", "2026-11-02"]]
+  personal.sv_anmeldung: [["aenderung-20260901", "2026-09-01"], ["aenderung-20261102", "2026-11-02"]]
+  # vor Arbeitsaufnahme: spätestens am Tag davor
+  arbeitsschutz.erstunterweisung: [["aenderung-20261102", "2026-11-01"]]
+  arbeitsschutz.unterweisung_wiederholen: [["aenderung-20251115", "2026-11-15"]]
+  arbeitsschutz.unfallanzeige: [["aenderung-20261005", "2026-10-08"]]
+  personal.schwangerschaft_mitteilung: [["aenderung-20261001", "2026-10-01"]]
+  # 10.10.2026 ist ein Samstag → Montag 12.10.
+  personal.lohnsteuer_anmeldung: [["2026-09", "2026-10-12"]]
+  # Oktober 2026: drittletzter Bankarbeitstag Mi 28.10.; zwei Arbeitstage davor Mo 26.10.
+  personal.sv_beitraege: [["2026-10", "2026-10-28"]]
+  personal.beitragsnachweis: [["2026-10", "2026-10-26"]]

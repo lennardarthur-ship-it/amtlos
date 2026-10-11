@@ -1,0 +1,52 @@
+# Katalog E.53 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: arbeitsschutz.erste_hilfe
+version: 1
+katalog_nr: E.53
+titel:
+  de: Erste Hilfe und Brandschutz organisieren
+kurz:
+  de: Ab 2 Versicherten brauchst du Ersthelfer, Verbandmaterial und ein Verbandbuch; außerdem Brandschutzhelfer.
+erklaerung:
+  de: Ersthelfer ab 2 Versicherten, Erste-Hilfe-Material, Verbandbuch und Brandschutzhelfer nach ASR A2.2.
+rechtsgrundlage:
+- DGUV Vorschrift 1
+- ASR A2.2
+kategorie: arbeitsschutz
+ausloeser:
+  feld: profil.beschaeftigte.gesamt
+  op: '>='
+  wert:
+    regelwert: arbeitsschutz.ersthelfer.schwelle_versicherte
+  label:
+    de: Du hast mindestens 2 Versicherte.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: ASR A2.2
+  url: https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A2-2.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- „Versicherte“ = Beschäftigte? (Unternehmer zählt mit?)
+- Anzahl Ersthelfer und Brandschutzhelfer je Betriebsgröße als Regelwerte
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

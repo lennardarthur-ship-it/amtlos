@@ -1,0 +1,50 @@
+# Katalog D.38 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: personal.sv_jahresmeldung
+version: 1
+katalog_nr: D.38
+titel:
+  de: Jahresmeldung zur Sozialversicherung
+kurz:
+  de: Für jede beschäftigte Person geht einmal im Jahr eine Jahresmeldung an die Krankenkasse.
+erklaerung:
+  de: Die Jahresmeldung (DEÜV) übermittelt das Lohnprogramm für alle, die über den Jahreswechsel beschäftigt sind.
+rechtsgrundlage:
+- § 28a SGB IV
+- DEÜV
+kategorie: personal
+ausloeser:
+  feld: abgeleitet.hat_beschaeftigte
+  op: ==
+  wert: true
+  label:
+    de: Du beschäftigst mindestens eine Person.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Krankenkasse (über Lohnprogramm)
+kanal: partner
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: partner
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Sozialgesetzbuch IV § 28a
+  url: https://www.gesetze-im-internet.de/sgb_4/__28a.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Termin der Jahresmeldung als Regeldaten ergänzen (für den Jahreskalender I)
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

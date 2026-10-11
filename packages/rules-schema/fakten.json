@@ -294,6 +294,45 @@
       "ab": 2
     },
     {
+      "pfad": "profil.personal.sofortmeldebranchen",
+      "typ": "enum_liste",
+      "werte": [
+        "bau",
+        "gastronomie",
+        "personenbefoerderung",
+        "gebaeudereinigung",
+        "messebau",
+        "fleischwirtschaft",
+        "sicherheitsgewerbe",
+        "keine"
+      ],
+      "herleitung": "Onboarding; Liste aus Spezifikation D.38 (§ 28a Abs. 4 SGB IV)",
+      "ab": 5
+    },
+    {
+      "pfad": "profil.personal.lohnsteuer_anmeldezeitraum",
+      "typ": "enum",
+      "werte": [
+        "monatlich",
+        "quartalsweise",
+        "jaehrlich"
+      ],
+      "herleitung": "Angabe des Nutzers (vom Finanzamt festgelegt; Grenzen nicht in der Spezifikation)",
+      "ab": 5
+    },
+    {
+      "pfad": "profil.arbeitsschutz.elektrische_geraete",
+      "typ": "bool",
+      "herleitung": "Onboarding",
+      "ab": 5
+    },
+    {
+      "pfad": "profil.arbeitsschutz.gefahrstoffe",
+      "typ": "bool",
+      "herleitung": "Onboarding",
+      "ab": 5
+    },
+    {
       "pfad": "abgeleitet.beschaeftigte.zaehlung_bdsg38",
       "typ": "ganzzahl",
       "herleitung": "[FACHLICH ZU PRÜFEN] Zählweise für § 38 BDSG",

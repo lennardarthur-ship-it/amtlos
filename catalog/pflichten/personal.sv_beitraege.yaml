@@ -1,0 +1,56 @@
+# Katalog D.40 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: personal.sv_beitraege
+version: 1
+katalog_nr: D.40
+titel:
+  de: Sozialversicherungsbeiträge zahlen
+kurz:
+  de: Die Beiträge zur Sozialversicherung sind am drittletzten Bankarbeitstag des Monats fällig.
+erklaerung:
+  de: Fällig sind die Beiträge am drittletzten Bankarbeitstag des laufenden Monats. Das Lohnprogramm berechnet sie; die Krankenkassen
+    ziehen sie in der Regel ein.
+rechtsgrundlage:
+- § 23 SGB IV
+kategorie: personal
+ausloeser:
+  feld: abgeleitet.hat_beschaeftigte
+  op: ==
+  wert: true
+  label:
+    de: Du beschäftigst mindestens eine Person.
+frist:
+  typ: wiederkehrend
+  rhythmus: monatlich
+  faellig:
+    art: n_letzter_bankarbeitstag
+    n: 3
+  verschiebung:
+    regel: keine
+    kalender: bankarbeitstage
+wiederholung:
+  art: periodisch
+stelle:
+  de: Krankenkassen
+kanal: partner
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: partner
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Sozialgesetzbuch IV § 23
+  url: https://www.gesetze-im-internet.de/sgb_4/__23.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Minijobs: Fälligkeit bei der Minijob-Zentrale gleich?'
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

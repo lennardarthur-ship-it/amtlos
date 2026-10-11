@@ -33,7 +33,7 @@ GRUENDUNGSDATUM = lambda versatz, zeitpunkt="spaetestens", vs=KEINE: {"typ": "re
 
 def pflicht(id, nr, titel, kurz, erklaerung, rechtsgrundlage, kategorie, ausloeser, frist, stelle, kanal, automatisierung,
             quellen, pruefpunkte, wiederholung=None, sanktion=None, schwere="mittel", begriffe=None, aktion=None,
-            voraussetzungen=None, gueltig_ab=None, rg_ergaenzt=False, branchen=None, phase=None):
+            voraussetzungen=None, gueltig_ab=None, rg_ergaenzt=False, branchen=None, phase=None, status_recht="in_kraft", radar=None):
     pp = list(pruefpunkte)
     if phase is None and nr.startswith("A."): phase = "gruendung"  # Katalog A = Gründung und Registrierung
     if frist == "dauerhaft": frist = {"typ": "dauerhaft"}
@@ -55,7 +55,7 @@ def pflicht(id, nr, titel, kurz, erklaerung, rechtsgrundlage, kategorie, ausloes
         "sanktion": {"text": t(sanktion), "schwere": schwere},
         "automatisierung": automatisierung,
         **({"aktion": aktion} if aktion else {}),
-        "status_recht": "in_kraft", "gueltig_ab": gueltig_ab, "gueltig_bis": None,
+        "status_recht": status_recht, **({"radar": radar} if radar else {}), "gueltig_ab": gueltig_ab, "gueltig_bis": None,
         "quellen": quellen,
         "fachlich_zu_pruefen": pp,
         "pruefung": {"status": "entwurf", "geprueft_von": None, "geprueft_am": None},
@@ -652,5 +652,310 @@ pflicht("gesellschaft.foerderprogramme", "B.22", "Förderprogramme prüfen (Opti
   [q("Förderdatenbank des Bundes", "https://www.foerderdatenbank.de/")],
   ["Option, keine Pflicht", "Matching-Kriterien und Fristen je Programm fachlich hinterlegen"],
   sanktion="Keine Pflicht.", schwere="niedrig")
+
+# ============================================================ D. Personal und Lohn
+
+HAT_B = v("abgeleitet.hat_beschaeftigte", "==", True, "Du beschäftigst mindestens eine Person.")
+EINSTELLUNG = {"ereignis": "einstellung", "op": "eingetreten", "label": t("Du stellst jemanden ein.")}
+AUSTRITT = {"ereignis": "austritt", "op": "eingetreten", "label": t("Eine Beschäftigung endet.")}
+JE = lambda ereignis, versatz="P0D", zeitpunkt="spaetestens", vs=KEINE: {"typ": "relativ", "bezug": {"ereignis": ereignis}, "versatz": versatz, "zeitpunkt": zeitpunkt, "je_ereignis": True, "verschiebung": vs}
+SOFORT = v("profil.personal.sofortmeldebranchen", "enthaelt_eines", ["bau", "gastronomie", "personenbefoerderung", "gebaeudereinigung", "messebau", "fleischwirtschaft", "sicherheitsgewerbe"], "Dein Betrieb gehört zu einer Branche mit Sofortmeldepflicht.")
+MINIJOB = v("profil.beschaeftigte.minijob", ">=", 1, "Du beschäftigst Minijobber.")
+# Zählweisen je Gesetz sind offen (G-05). Wer insgesamt unter der Schwelle liegt, liegt auch nach jeder Zählweise darunter.
+SCHWELLE = lambda zaehlung, regelwert, text: {"all": [v("profil.beschaeftigte.gesamt", ">=", rw(regelwert), None), v(zaehlung, ">=", rw(regelwert), text)]}
+
+pflicht("personal.betriebsnummer", "D.37", "Betriebsnummer beantragen",
+  "Bevor du die erste Person einstellst, brauchst du eine Betriebsnummer von der Bundesagentur für Arbeit.",
+  "Die Betriebsnummer identifiziert deinen Betrieb in allen Meldungen zur Sozialversicherung. Du beantragst sie beim Betriebsnummern-Service der Bundesagentur für Arbeit, bevor die erste Person bei dir anfängt.",
+  ["§ 18i SGB IV"], "personal",
+  {"any": [HAT_B, {"ereignis": "erste_einstellung", "op": "geplant", "label": t("Du planst die erste Einstellung.")}, {"ereignis": "erste_einstellung", "op": "eingetreten", "label": t("Du hast die erste Person eingestellt.")}]},
+  {"typ": "relativ", "bezug": {"ereignis": "erste_einstellung"}, "versatz": "P0D", "zeitpunkt": "vor_beginn", "verschiebung": KEINE},
+  "Bundesagentur für Arbeit, Betriebsnummern-Service", "portal", "hinweis",
+  [q("Sozialgesetzbuch IV § 18i", "sgb_4/__18i.html")],
+  ["„vor der ersten Einstellung“ als spätestens am Tag vor Arbeitsbeginn umgesetzt – bestätigen"], rg_ergaenzt=True, schwere="hoch", phase="gruendung",
+  begriffe=[("Betriebsnummer", "Eine achtstellige Nummer, unter der dein Betrieb bei der Sozialversicherung geführt wird.")])
+
+pflicht("personal.sv_anmeldung", "D.38", "Beschäftigte bei der Sozialversicherung anmelden",
+  "Jede neue beschäftigte Person meldest du bei der Krankenkasse an.",
+  "Die Anmeldung zur Sozialversicherung (DEÜV) geht an die Krankenkasse der beschäftigten Person, bei Minijobs an die Minijob-Zentrale. Die Meldung läuft über ein systemgeprüftes Lohnprogramm.",
+  ["§ 28a SGB IV", "DEÜV"], "personal",
+  EINSTELLUNG, JE("einstellung"), "Krankenkasse bzw. Minijob-Zentrale (über Lohnprogramm)", "partner", "partner",
+  [q("Sozialgesetzbuch IV § 28a", "sgb_4/__28a.html")],
+  ["Frist der Anmeldung steht nicht in der Spezifikation – als spätestens bei Beschäftigungsbeginn eingetragen, fachlich ersetzen"],
+  voraussetzungen=["personal.betriebsnummer"], schwere="hoch", rg_ergaenzt=True)
+
+pflicht("personal.sv_abmeldung", "D.38", "Beschäftigte bei der Sozialversicherung abmelden",
+  "Endet eine Beschäftigung, meldest du die Person bei der Krankenkasse ab.",
+  "Die Abmeldung (DEÜV) geht an die Krankenkasse bzw. die Minijob-Zentrale, über das Lohnprogramm.",
+  ["§ 28a SGB IV", "DEÜV"], "personal",
+  AUSTRITT, JE("austritt"), "Krankenkasse bzw. Minijob-Zentrale (über Lohnprogramm)", "partner", "partner",
+  [q("Sozialgesetzbuch IV § 28a", "sgb_4/__28a.html")],
+  ["Frist der Abmeldung steht nicht in der Spezifikation – als spätestens am Ende der Beschäftigung eingetragen, fachlich ersetzen"], schwere="hoch", rg_ergaenzt=True)
+
+pflicht("personal.sv_jahresmeldung", "D.38", "Jahresmeldung zur Sozialversicherung",
+  "Für jede beschäftigte Person geht einmal im Jahr eine Jahresmeldung an die Krankenkasse.",
+  "Die Jahresmeldung (DEÜV) übermittelt das Lohnprogramm für alle, die über den Jahreswechsel beschäftigt sind.",
+  ["§ 28a SGB IV", "DEÜV"], "personal",
+  HAT_B, "dauerhaft", "Krankenkasse (über Lohnprogramm)", "partner", "partner",
+  [q("Sozialgesetzbuch IV § 28a", "sgb_4/__28a.html")],
+  ["Termin der Jahresmeldung als Regeldaten ergänzen (für den Jahreskalender I)"], rg_ergaenzt=True)
+
+pflicht("personal.sofortmeldung", "D.38", "Sofortmeldung bei Arbeitsbeginn",
+  "In deiner Branche meldest du neue Beschäftigte spätestens bei Arbeitsbeginn sofort an.",
+  "In den Branchen nach § 28a Abs. 4 SGB IV – unter anderem Bau, Gastronomie, Personenbeförderung, Gebäudereinigung, Messebau, Fleischwirtschaft und Sicherheitsgewerbe – ist eine Sofortmeldung bei Arbeitsbeginn Pflicht.",
+  ["§ 28a Abs. 4 SGB IV"], "personal",
+  {"all": [SOFORT, EINSTELLUNG]}, JE("einstellung"), "Deutsche Rentenversicherung (über Lohnprogramm)", "partner", "partner",
+  [q("Sozialgesetzbuch IV § 28a", "sgb_4/__28a.html")],
+  ["„Bei Arbeitsbeginn“ als spätestens am Tag des Beginns umgesetzt – bestätigen", "Branchenliste vollständig (§ 28a Abs. 4 SGB IV)?"],
+  voraussetzungen=["personal.betriebsnummer"], schwere="hoch", branchen=["bau", "gastronomie_lebensmittel", "transport_logistik"])
+
+pflicht("personal.mindestlohn", "D.39", "Mindestlohn zahlen",
+  "Du zahlst allen Beschäftigten mindestens den gesetzlichen Mindestlohn.",
+  "Der Mindestlohn beträgt 13,90 € je Stunde ab 1.1.2026 und 14,60 € ab 1.1.2027. Amtlos führt die Werte mit Gültigkeitszeitraum.",
+  ["MiLoG"], "personal",
+  HAT_B, "dauerhaft", "Du selbst; Kontrolle durch den Zoll (Finanzkontrolle Schwarzarbeit)", "intern_dokumentieren", "hinweis",
+  [q("Mindestlohngesetz", "milog/")],
+  ["Ausnahmen (z. B. Azubis, Praktika) als Hinweis ergänzen?"], rg_ergaenzt=True, schwere="hoch", aktion={"art": "abhaken"})
+
+pflicht("personal.minijob_grenze", "D.39", "Minijob-Grenze beachten",
+  "Minijobber dürfen im Monat nicht mehr als die Minijob-Grenze verdienen: 603 € (2026), 633 € (2027).",
+  "Die Minijob-Grenze ist an den Mindestlohn gekoppelt. Amtlos führt die Werte mit Gültigkeitszeitraum.",
+  ["§ 8 SGB IV"], "personal",
+  MINIJOB, "dauerhaft", "Minijob-Zentrale", "intern_dokumentieren", "hinweis",
+  [q("Sozialgesetzbuch IV § 8", "sgb_4/__8.html")],
+  ["Folgen bei Überschreiten (gelegentliches Überschreiten) ergänzen"], rg_ergaenzt=True, aktion={"art": "abhaken"})
+
+pflicht("personal.lohnsteuer_anmeldung", "D.40", "Lohnsteuer anmelden",
+  "Bis zum 10. nach Ende des Anmeldezeitraums meldest du die Lohnsteuer beim Finanzamt an.",
+  "Den Anmeldezeitraum (monatlich, vierteljährlich oder jährlich) bestimmt das Finanzamt nach der Lohnsteuer des Vorjahres. Trag ihn in deinem Profil ein; Amtlos berechnet daraus die Termine.",
+  ["§ 41a EStG"], "personal",
+  {"all": [HAT_B, v("profil.personal.lohnsteuer_anmeldezeitraum", "vorhanden", label="Du hast deinen Anmeldezeitraum angegeben.")]},
+  {"typ": "wiederkehrend",
+   "rhythmus": {"waehle": [
+     {"wenn": v("profil.personal.lohnsteuer_anmeldezeitraum", "==", "monatlich"), "dann": "monatlich"},
+     {"wenn": v("profil.personal.lohnsteuer_anmeldezeitraum", "==", "quartalsweise"), "dann": "quartalsweise"},
+   ], "sonst": "jaehrlich"},
+   "faellig": {"art": "tag_nach_periodenende", "monate_nach": 1, "tag": 10}, "verschiebung": WERKTAG_LAND},
+  "Finanzamt", "elster", "hinweis",
+  [q("Einkommensteuergesetz § 41a", "estg/__41a.html")],
+  ["Grenzen für den Anmeldezeitraum (nach Vorjahres-Lohnsteuer) stehen nicht in der Spezifikation – deshalb Angabe des Nutzers", "Verschiebung bei Fristende am Wochenende/Feiertag bestätigen"],
+  rg_ergaenzt=True, schwere="hoch", wiederholung={"art": "periodisch"})
+
+pflicht("personal.anmeldezeitraum_angeben", "D.40", "Anmeldezeitraum der Lohnsteuer angeben",
+  "Damit Amtlos die Termine der Lohnsteuer-Anmeldung berechnen kann, brauchst du den Anmeldezeitraum.",
+  "Den Anmeldezeitraum teilt dir das Finanzamt mit. Du findest ihn in deinen Unterlagen zur Lohnsteuer oder fragst deine Steuerberatung.",
+  ["§ 41a EStG"], "personal",
+  {"all": [HAT_B, v("profil.personal.lohnsteuer_anmeldezeitraum", "nicht_vorhanden", label="Der Anmeldezeitraum fehlt noch.")]},
+  "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
+  [q("Einkommensteuergesetz § 41a", "estg/__41a.html")],
+  ["Vorbereitender Schritt – Darstellung bestätigen"], rg_ergaenzt=True, sanktion="Ohne Anmeldezeitraum kann Amtlos keine Termine berechnen.",
+  aktion={"art": "formular", "ziel": "onboarding.beschaeftigte"})
+
+pflicht("personal.sv_beitraege", "D.40", "Sozialversicherungsbeiträge zahlen",
+  "Die Beiträge zur Sozialversicherung sind am drittletzten Bankarbeitstag des Monats fällig.",
+  "Fällig sind die Beiträge am drittletzten Bankarbeitstag des laufenden Monats. Das Lohnprogramm berechnet sie; die Krankenkassen ziehen sie in der Regel ein.",
+  ["§ 23 SGB IV"], "personal",
+  HAT_B, {"typ": "wiederkehrend", "rhythmus": "monatlich", "faellig": {"art": "n_letzter_bankarbeitstag", "n": 3}, "verschiebung": {"regel": "keine", "kalender": "bankarbeitstage"}},
+  "Krankenkassen", "partner", "partner",
+  [q("Sozialgesetzbuch IV § 23", "sgb_4/__23.html")],
+  ["Minijobs: Fälligkeit bei der Minijob-Zentrale gleich?"], rg_ergaenzt=True, schwere="hoch", wiederholung={"art": "periodisch"})
+
+pflicht("personal.beitragsnachweis", "D.40", "Beitragsnachweis übermitteln",
+  "Zwei Arbeitstage vor Fälligkeit der Beiträge übermittelst du den Beitragsnachweis an die Krankenkassen.",
+  "Der Beitragsnachweis kündigt der Krankenkasse die Beiträge an. Er muss zwei Arbeitstage vor dem Fälligkeitstag vorliegen und wird vom Lohnprogramm übermittelt.",
+  ["§ 28f SGB IV"], "personal",
+  HAT_B, {"typ": "wiederkehrend", "rhythmus": "monatlich", "faellig": {"art": "n_letzter_bankarbeitstag", "n": 3, "arbeitstage_vorher": 2}, "verschiebung": {"regel": "keine", "kalender": "bankarbeitstage"}},
+  "Krankenkassen (über Lohnprogramm)", "partner", "partner",
+  [q("Sozialgesetzbuch IV § 28f", "sgb_4/__28f.html")],
+  ["„Arbeitstage“ als Bankarbeitstage umgesetzt – bestätigen (G-13)"], rg_ergaenzt=True, schwere="hoch", wiederholung={"art": "periodisch"})
+
+pflicht("personal.umlagen_eau", "D.40", "Umlagen U1/U2/U3 und eAU-Abruf",
+  "Für Beschäftigte zahlst du Umlagen (U1, U2, U3) und rufst Arbeitsunfähigkeitsbescheinigungen elektronisch ab.",
+  "Die Umlagen finanzieren die Erstattung von Entgeltfortzahlung, Mutterschaftsleistungen und das Insolvenzgeld. Die eAU rufst du bei der Krankenkasse ab, meist über das Lohnprogramm.",
+  ["AAG", "§ 109 SGB IV"], "personal",
+  HAT_B, "dauerhaft", "Krankenkassen", "partner", "hinweis",
+  [q("Aufwendungsausgleichsgesetz", "aag/")],
+  ["Welche Umlage gilt für wen (z. B. U1 nach Betriebsgröße) – fachlich ergänzen"], rg_ergaenzt=True,
+  begriffe=[("eAU", "Elektronische Arbeitsunfähigkeitsbescheinigung, die du bei der Krankenkasse abrufst.")])
+
+pflicht("personal.nachweisgesetz", "D.41", "Arbeitsbedingungen schriftlich festhalten",
+  "Für jede neue beschäftigte Person hältst du die wesentlichen Arbeitsbedingungen schriftlich oder in zulässiger Form fest.",
+  "Das Nachweisgesetz verlangt, dass die wesentlichen Arbeitsbedingungen dokumentiert und der beschäftigten Person ausgehändigt werden.",
+  ["NachwG"], "personal",
+  EINSTELLUNG, JE("einstellung"), "Du selbst", "intern_dokumentieren", "dokument_generator",
+  [q("Nachweisgesetz", "nachwg/")],
+  ["Frist (je Angabe unterschiedlich) steht nicht in der Spezifikation – als spätestens bei Beginn eingetragen, fachlich ersetzen", "Zulässige Form (Schriftform/elektronisch) aktuell?"],
+  schwere="mittel", aktion={"art": "dokument", "ziel": "vorlage.nachweis_arbeitsbedingungen"})
+
+pflicht("personal.arbeitszeit_aufzeichnung", "D.42", "Arbeitszeit aufzeichnen",
+  "Du zeichnest die Arbeitszeit deiner Beschäftigten auf.",
+  "Nach der Rechtsprechung des Bundesarbeitsgerichts besteht bereits eine Pflicht zur Arbeitszeiterfassung. Amtlos bietet eine Zeiterfassung, die auf die geplante Neuregelung vorbereitet ist.",
+  ["§ 3 Abs. 2 Nr. 1 ArbSchG (BAG, 13.9.2022 – 1 ABR 22/21)"], "personal",
+  HAT_B, "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
+  [q("Arbeitsschutzgesetz § 3", "arbschg/__3.html")],
+  ["Fundstelle der BAG-Entscheidung prüfen", "Anforderungen an die Form (bis zur Neuregelung) fachlich formulieren"], rg_ergaenzt=True,
+  aktion={"art": "link", "ziel": "app.zeiterfassung"})
+
+pflicht("personal.arbeitszeit_milog", "D.42", "Arbeitszeit nach § 17 MiLoG aufzeichnen",
+  "Für Minijobber und in Sofortmeldebranchen musst du Beginn, Ende und Dauer der Arbeitszeit aufzeichnen.",
+  "§ 17 MiLoG verlangt Aufzeichnungen für geringfügig Beschäftigte und für Beschäftigte in den Branchen mit Sofortmeldepflicht.",
+  ["§ 17 MiLoG"], "personal",
+  {"all": [HAT_B, {"any": [MINIJOB, SOFORT]}]}, "dauerhaft", "Du selbst; Kontrolle durch den Zoll", "intern_dokumentieren", "hinweis",
+  [q("Mindestlohngesetz § 17", "milog/__17.html")],
+  ["Fristen für Aufzeichnung und Aufbewahrung ergänzen"], schwere="hoch", aktion={"art": "link", "ziel": "app.zeiterfassung"})
+
+pflicht("personal.arbeitszeit_neuregelung", "D.42", "Elektronische Arbeitszeiterfassung (geplante Neuregelung)",
+  "Geplant ist eine Pflicht zur elektronischen Arbeitszeiterfassung, mit Übergangsfristen nach Betriebsgröße.",
+  "Laut Entwurf (Juni 2026) soll ab 1.1.2027 elektronisch erfasst werden, mit Übergangsfristen nach Betriebsgröße; Betriebe bis 10 Beschäftigte sollen keine elektronische Pflicht haben. Noch kein Gesetz.",
+  ["Entwurf zur Änderung des ArbZG (Juni 2026)"], "personal",
+  {"all": [HAT_B, v("profil.beschaeftigte.gesamt", ">", 10, "Du beschäftigst mehr als 10 Personen.")]}, "dauerhaft", "–", "intern_dokumentieren", "hinweis",
+  [q("Arbeitszeitgesetz", "arbzg/")],
+  ["Status offen – Radar", "Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „mittel“)", "Schwelle 10 als Regelwert führen, sobald beschlossen"], status_recht="entwurf", gueltig_ab="2027-01-01",
+  radar={"wahrscheinlichkeit": "mittel", "erwartet_ab": "2027-01-01"},
+  sanktion="Noch keine – geplante Regelung.", schwere="mittel")
+
+pflicht("personal.mutterschutz_gefaehrdungsbeurteilung", "D.43", "Mutterschutz in der Gefährdungsbeurteilung",
+  "Unabhängig davon, ob jemand schwanger ist, beurteilst du die Arbeitsplätze auch nach dem Mutterschutzgesetz.",
+  "Die anlassunabhängige Gefährdungsbeurteilung nach dem Mutterschutzgesetz ist Teil der allgemeinen Gefährdungsbeurteilung.",
+  ["§ 10 MuSchG"], "personal",
+  HAT_B, {"typ": "relativ", "bezug": {"ereignis": "erste_einstellung"}, "versatz": "P0D", "zeitpunkt": "vor_beginn", "verschiebung": KEINE},
+  "Du selbst", "intern_dokumentieren", "dokument_generator",
+  [q("Mutterschutzgesetz § 10", "muschg_2018/__10.html")],
+  ["Frist „vor Arbeitsbeginn“ wie E.50 – bestätigen"], rg_ergaenzt=True, voraussetzungen=["arbeitsschutz.gefaehrdungsbeurteilung"])
+
+pflicht("personal.schwangerschaft_mitteilung", "D.43", "Schwangerschaft der Aufsichtsbehörde mitteilen",
+  "Teilt dir eine Beschäftigte ihre Schwangerschaft mit, informierst du die Aufsichtsbehörde.",
+  "Die Mitteilung an die zuständige Aufsichtsbehörde ist Pflicht des Arbeitgebers.",
+  ["§ 27 MuSchG"], "personal",
+  {"ereignis": "schwangerschaft_mitgeteilt", "op": "eingetreten", "label": t("Eine Beschäftigte hat dir ihre Schwangerschaft mitgeteilt.")},
+  JE("schwangerschaft_mitgeteilt"), "Aufsichtsbehörde für Mutterschutz (je Land)", "post", "hinweis",
+  [q("Mutterschutzgesetz § 27", "muschg_2018/__27.html")],
+  ["Frist („unverzüglich“) steht nicht in der Spezifikation – als am Tag der Mitteilung eingetragen, fachlich ersetzen", "Zuständige Behörde je Land"], rg_ergaenzt=True, schwere="hoch")
+
+pflicht("personal.jugendarbeitsschutz", "D.44", "Jugendarbeitsschutz beachten",
+  "Für Jugendliche gelten Erstuntersuchung, Arbeitszeitgrenzen und eine Aushangpflicht.",
+  "Wer Jugendliche beschäftigt, braucht vorab eine ärztliche Erstuntersuchung, muss besondere Arbeitszeitgrenzen einhalten und das Jugendarbeitsschutzgesetz aushängen.",
+  ["JArbSchG"], "personal",
+  v("profil.beschaeftigte.jugendlich", ">=", 1, "Du beschäftigst Jugendliche."), "dauerhaft", "Du selbst; Gewerbeaufsicht", "intern_dokumentieren", "hinweis",
+  [q("Jugendarbeitsschutzgesetz", "jarbschg/")],
+  ["Erstuntersuchung als eigene Pflicht je Einstellung mit Frist?", "Arbeitszeitgrenzen als Regelwerte"], rg_ergaenzt=True, schwere="hoch")
+
+pflicht("personal.schwerbehinderte_anzeige", "D.45", "Anzeige und Ausgleichsabgabe (Schwerbehinderte)",
+  "Ab 20 Arbeitsplätzen zeigst du jedes Jahr bis 31.3. die Beschäftigung schwerbehinderter Menschen an und zahlst gegebenenfalls die Ausgleichsabgabe.",
+  "Betriebe ab 20 Arbeitsplätzen haben eine Beschäftigungsquote. Die Anzeige und die Ausgleichsabgabe sind bis zum 31. März für das Vorjahr fällig.",
+  ["SGB IX"], "personal",
+  SCHWELLE("abgeleitet.beschaeftigte.arbeitsplaetze_sgb9", "personal.schwerbehinderte.schwelle_arbeitsplaetze", "Du hast mindestens 20 Arbeitsplätze im Sinne des SGB IX."),
+  {"typ": "wiederkehrend", "rhythmus": "jaehrlich", "faellig": {"art": "feste_termine", "termine": ["03-31"]}, "verschiebung": WERKTAG_LAND},
+  "Agentur für Arbeit / Integrationsamt", "portal", "hinweis",
+  [q("Sozialgesetzbuch IX", "sgb_9_2018/")],
+  ["Quote und Höhe der Abgabe als Regelwerte", "Zählweise der Arbeitsplätze (G-05); wer insgesamt weniger als 20 beschäftigt, gilt als unter der Schwelle – bestätigen", "Verschiebung bei 31.3. am Wochenende"],
+  rg_ergaenzt=True, schwere="hoch", wiederholung={"art": "periodisch"})
+
+pflicht("personal.hinweisgeber_meldestelle", "D.46", "Interne Meldestelle einrichten (Hinweisgeberschutz)",
+  "Ab 50 Beschäftigten richtest du eine interne Meldestelle für Hinweisgeber ein.",
+  "Das Hinweisgeberschutzgesetz verlangt ab 50 Beschäftigten eine interne Meldestelle.",
+  ["HinSchG"], "personal",
+  SCHWELLE("abgeleitet.beschaeftigte.zaehlung_hinschg", "personal.hinschg.schwelle", "Du hast mindestens 50 Beschäftigte im Sinne des HinSchG."),
+  "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
+  [q("Hinweisgeberschutzgesetz", "hinschg/")],
+  ["Zählweise (G-05)", "Übergangsregeln für 50–249 Beschäftigte noch relevant?"], rg_ergaenzt=True, schwere="hoch")
+
+pflicht("personal.entgelttransparenz_bericht", "D.47", "Bericht zur Entgelttransparenz (geplant)",
+  "Arbeitgeber mit mehr als 150 Beschäftigten sollen zum 7.6.2027 über die Entgeltgleichheit berichten.",
+  "Die EU-Entgelttransparenzrichtlinie war bis 7.6.2026 umzusetzen; das deutsche Gesetz steht aus. Bis dahin gilt das bisherige Entgelttransparenzgesetz weiter.",
+  ["Richtlinie (EU) 2023/970", "EntgTranspG"], "personal",
+  {"all": [v("profil.beschaeftigte.gesamt", ">", rw("personal.entgelttransparenz.berichtspflicht_schwelle"), "Du beschäftigst mehr als 150 Personen.")]},
+  {"typ": "absolut", "datum": "2027-06-07", "verschiebung": KEINE}, "–", "intern_dokumentieren", "hinweis",
+  [q("Entgelttransparenzgesetz", "entgtranspg/")],
+  ["Status offen – Radar", "Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „hoch“, weil EU-Richtlinie)", "Zählweise und Inhalt des Berichts nach Umsetzungsgesetz"], status_recht="geplant",
+  radar={"wahrscheinlichkeit": "hoch", "erwartet_ab": "2027-06-07"}, sanktion="Noch keine – geplante Regelung.")
+
+pflicht("personal.aushangpflichtige_gesetze", "D.48", "Aushangpflichtige Gesetze aushängen",
+  "Je nach Belegschaft hängst du bestimmte Gesetze im Betrieb aus, zum Beispiel ArbZG, AGG, MuSchG und JArbSchG.",
+  "Welche Gesetze auszuhängen sind, hängt von der Belegschaft ab. Amtlos stellt die Liste zusammen.",
+  ["ArbZG", "AGG", "MuSchG", "JArbSchG"], "personal",
+  HAT_B, "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
+  [q("Arbeitszeitgesetz", "arbzg/")],
+  ["Liste je Belegschaft (z. B. MuSchG ab wie vielen Frauen?) fachlich festlegen"], schwere="niedrig", aktion={"art": "abhaken"})
+
+pflicht("personal.lohnabrechnung", "D.49", "Lohnabrechnung über geprüfte Software",
+  "Meldungen zur Sozialversicherung erfordern zertifizierte Software – Amtlos arbeitet dafür mit einem Lohnpartner.",
+  "Die Lohnabrechnung selbst macht ein systemgeprüfter Partner; Amtlos liefert Stammdaten und Fristen.",
+  ["§ 18 DEÜV (Systemprüfung)"], "personal",
+  HAT_B, "dauerhaft", "Lohnpartner oder Steuerberatung", "partner", "partner",
+  [q("Datenerfassungs- und -übermittlungsverordnung", "de_v/")],
+  ["Partner noch nicht gewählt (Abschnitt 5, Integration offen)"], rg_ergaenzt=True, sanktion="Ohne geprüfte Software sind die Meldungen nicht möglich.")
+
+# ============================================================ E. Arbeitsschutz (E.50 Gefährdungsbeurteilung besteht bereits)
+
+pflicht("arbeitsschutz.erstunterweisung", "E.51", "Vor Arbeitsbeginn unterweisen",
+  "Jede neue Person unterweist du vor dem ersten Arbeitstag zu den Gefahren und Schutzmaßnahmen.",
+  "Die Unterweisung erklärt die Gefährdungen am Arbeitsplatz und die Schutzmaßnahmen aus der Gefährdungsbeurteilung. Amtlos protokolliert sie digital mit Unterschrift.",
+  ["§ 12 ArbSchG", "DGUV Vorschrift 1"], "arbeitsschutz",
+  EINSTELLUNG, JE("einstellung", zeitpunkt="vor_beginn"), "Du selbst", "intern_dokumentieren", "dokument_generator",
+  [q("Arbeitsschutzgesetz § 12", "arbschg/__12.html")],
+  ["„vor Arbeitsaufnahme“ als spätestens am Tag davor umgesetzt – bestätigen"], schwere="hoch",
+  voraussetzungen=["arbeitsschutz.gefaehrdungsbeurteilung"], aktion={"art": "link", "ziel": "app.unterweisungen", "nachweis_erforderlich": True})
+
+pflicht("arbeitsschutz.unterweisung_wiederholen", "E.51", "Unterweisung jährlich wiederholen",
+  "Mindestens einmal im Jahr wiederholst du die Unterweisung.",
+  "Ein Jahr nach jeder Unterweisung erinnert Amtlos an die Wiederholung. Mit der neuen Unterweisung ist die alte erledigt.",
+  ["§ 12 ArbSchG", "DGUV Vorschrift 1"], "arbeitsschutz",
+  {"all": [HAT_B, {"ereignis": "unterweisung_durchgefuehrt", "op": "eingetreten", "label": t("Du hast eine Unterweisung durchgeführt.")}]},
+  JE("unterweisung_durchgefuehrt", "P1Y"), "Du selbst", "intern_dokumentieren", "dokument_generator",
+  [q("Arbeitsschutzgesetz § 12", "arbschg/__12.html")],
+  ["„Mindestens jährlich“ als ein Jahr nach der letzten Unterweisung umgesetzt – bestätigen", "Kürzere Fristen für Jugendliche (JArbSchG) ergänzen"], schwere="mittel",
+  aktion={"art": "link", "ziel": "app.unterweisungen", "nachweis_erforderlich": True})
+
+pflicht("arbeitsschutz.fasi_betriebsarzt", "E.52", "Fachkraft für Arbeitssicherheit und Betriebsarzt",
+  "Du brauchst eine sicherheitstechnische und betriebsärztliche Betreuung – für Kleinbetriebe auch im Unternehmermodell.",
+  "Das Arbeitssicherheitsgesetz und die DGUV Vorschrift 2 verlangen eine Betreuung durch eine Fachkraft für Arbeitssicherheit und einen Betriebsarzt. Kleinbetriebe können das Unternehmermodell der Berufsgenossenschaft nutzen.",
+  ["ASiG", "DGUV Vorschrift 2"], "arbeitsschutz",
+  HAT_B, "dauerhaft", "Berufsgenossenschaft; Betreuungsdienst", "partner", "partner",
+  [q("Arbeitssicherheitsgesetz", "asig/")],
+  ["Grenzen für das Unternehmermodell je BG ergänzen"], rg_ergaenzt=True, schwere="hoch")
+
+pflicht("arbeitsschutz.erste_hilfe", "E.53", "Erste Hilfe und Brandschutz organisieren",
+  "Ab 2 Versicherten brauchst du Ersthelfer, Verbandmaterial und ein Verbandbuch; außerdem Brandschutzhelfer.",
+  "Ersthelfer ab 2 Versicherten, Erste-Hilfe-Material, Verbandbuch und Brandschutzhelfer nach ASR A2.2.",
+  ["DGUV Vorschrift 1", "ASR A2.2"], "arbeitsschutz",
+  v("profil.beschaeftigte.gesamt", ">=", rw("arbeitsschutz.ersthelfer.schwelle_versicherte"), "Du hast mindestens 2 Versicherte."),
+  "dauerhaft", "Du selbst", "intern_dokumentieren", "hinweis",
+  [q("ASR A2.2", "https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A2-2.html")],
+  ["„Versicherte“ = Beschäftigte? (Unternehmer zählt mit?)", "Anzahl Ersthelfer und Brandschutzhelfer je Betriebsgröße als Regelwerte"], rg_ergaenzt=True, schwere="mittel")
+
+pflicht("arbeitsschutz.dguv_v3", "E.54", "Elektrische Geräte prüfen lassen",
+  "Elektrische Geräte und Anlagen lässt du regelmäßig prüfen (DGUV Vorschrift 3).",
+  "Elektrische Betriebsmittel müssen in bestimmten Abständen geprüft werden. Amtlos erinnert an die Prüffristen, sobald sie als Regeldaten hinterlegt sind.",
+  ["DGUV Vorschrift 3"], "arbeitsschutz",
+  {"all": [HAT_B, v("profil.arbeitsschutz.elektrische_geraete", "==", True, "Ihr nutzt elektrische Geräte im Betrieb.")]}, "dauerhaft", "Elektrofachkraft", "partner", "hinweis",
+  [q("DGUV Vorschrift 3", "https://publikationen.dguv.de/regelwerk/dguv-vorschriften/")],
+  ["Prüffristen je Geräteart als Regelwerte (nicht in der Spezifikation)"], schwere="mittel")
+
+pflicht("arbeitsschutz.gefahrstoffe", "E.55", "Gefahrstoffverzeichnis und Betriebsanweisungen",
+  "Wenn ihr mit Gefahrstoffen arbeitet, führst du ein Verzeichnis und schreibst Betriebsanweisungen.",
+  "Die Gefahrstoffverordnung verlangt ein Verzeichnis der Gefahrstoffe und Betriebsanweisungen für die Beschäftigten.",
+  ["GefStoffV"], "arbeitsschutz",
+  {"all": [HAT_B, v("profil.arbeitsschutz.gefahrstoffe", "==", True, "Ihr arbeitet mit Gefahrstoffen.")]}, "dauerhaft", "Du selbst", "intern_dokumentieren", "dokument_generator",
+  [q("Gefahrstoffverordnung", "gefstoffv_2010/")],
+  [], rg_ergaenzt=False, schwere="hoch", branchen=["beauty_kosmetik", "handwerk", "bau"])
+
+pflicht("arbeitsschutz.arbeitsmedizinische_vorsorge", "E.56", "Arbeitsmedizinische Vorsorge anbieten",
+  "Du bietest arbeitsmedizinische Vorsorge an, zum Beispiel die Angebotsvorsorge bei Bildschirmarbeit.",
+  "Die Verordnung zur arbeitsmedizinischen Vorsorge regelt Pflicht-, Angebots- und Wunschvorsorge. Bei Bildschirmarbeit ist Vorsorge anzubieten.",
+  ["ArbMedVV"], "arbeitsschutz",
+  HAT_B, "dauerhaft", "Betriebsarzt", "partner", "hinweis",
+  [q("Verordnung zur arbeitsmedizinischen Vorsorge", "arbmedvv/")],
+  ["Anlässe und Fristen je Vorsorgeart fachlich ergänzen"], rg_ergaenzt=False, schwere="mittel")
+
+pflicht("arbeitsschutz.unfallanzeige", "E.57", "Arbeitsunfall der Berufsgenossenschaft anzeigen",
+  "Ist jemand nach einem Arbeitsunfall mehr als drei Tage arbeitsunfähig, zeigst du den Unfall binnen drei Tagen der BG an.",
+  "Die Unfallanzeige ist nötig, wenn die Arbeitsunfähigkeit mehr als drei Tage dauert. Amtlos legt die Frist ab dem Unfalltag an; ob die Grenze erreicht ist, entscheidest du beim Erledigen.",
+  ["§ 193 SGB VII"], "arbeitsschutz",
+  {"ereignis": "arbeitsunfall", "op": "eingetreten", "label": t("Es gab einen Arbeitsunfall.")},
+  JE("arbeitsunfall", "P3D"), "Berufsgenossenschaft", "portal", "hinweis",
+  [q("Sozialgesetzbuch VII § 193", "sgb_7/__193.html")],
+  ["Fristbeginn: Unfalltag oder Kenntnis der AU über drei Tage? bestätigen", "AU-Tage aus dem Ereignis (Payload au_tage) in die Bedingung aufnehmen, sobald Ereignis-Payload auswertbar ist"],
+  rg_ergaenzt=True, schwere="hoch")
 
 print("geschrieben:", len(list(ZIEL.glob("*.yaml"))))

@@ -130,6 +130,23 @@ function termineFuer(
     }
 
     case "relativ": {
+      const termin = (bezug: Datum, periode: string): Termin => {
+        const r = relativerTermin(bezug, { versatz: f.versatz, verschiebung: f.verschiebung }, ort, e.kalender);
+        // "vor_beginn": spätestens am Tag vor dem Bezugstag erledigt (docs/03, Fristen)
+        if (f.zeitpunkt === "vor_beginn") {
+          const roh = plusTage(r.roh, -1);
+          const v = verschiebe(roh, f.verschiebung, ort, e.kalender);
+          return { periode, roh, faellig_am: v.datum, uebersprungen: v.uebersprungen };
+        }
+        return { periode, ...r };
+      };
+      if ("ereignis" in f.bezug && f.je_ereignis) {
+        // Eine Instanz je Ereignis (z. B. je Einstellung, je Unfall); gleiche Tage zählen einmal
+        const typ = f.bezug.ereignis;
+        const tage = [...new Set(e.ereignisse.filter((x) => x.typ === typ && !x.storniert).map((x) => x.datum))].sort();
+        if (!tage.length) hinweise.push(`termin_abhaengig_von_ereignis:${typ}`);
+        return tage.map((d) => termin(d, `aenderung-${d.replaceAll("-", "")}`));
+      }
       let bezug: Datum | undefined;
       if ("ereignis" in f.bezug) {
         const typ = f.bezug.ereignis;
@@ -147,14 +164,7 @@ function termineFuer(
         if (!bezug) hinweise.push(`termin_abhaengig_von_pflicht:${f.bezug.pflicht_erledigt}`);
       }
       if (!bezug) return [];
-      const t = relativerTermin(bezug, { versatz: f.versatz, verschiebung: f.verschiebung }, ort, e.kalender);
-      // "vor_beginn": spätestens am Tag vor dem Bezugstag erledigt (docs/03, Fristen)
-      if (f.zeitpunkt === "vor_beginn") {
-        const roh = plusTage(t.roh, -1);
-        const v = verschiebe(roh, f.verschiebung, ort, e.kalender);
-        return [{ periode: "einmalig", roh, faellig_am: v.datum, uebersprungen: v.uebersprungen }];
-      }
-      return [{ periode: "einmalig", ...t }];
+      return [termin(bezug, "einmalig")];
     }
 
     case "wiederkehrend": {

@@ -1,0 +1,59 @@
+# Katalog D.42 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: personal.arbeitszeit_neuregelung
+version: 1
+katalog_nr: D.42
+titel:
+  de: Elektronische Arbeitszeiterfassung (geplante Neuregelung)
+kurz:
+  de: Geplant ist eine Pflicht zur elektronischen Arbeitszeiterfassung, mit Übergangsfristen nach Betriebsgröße.
+erklaerung:
+  de: Laut Entwurf (Juni 2026) soll ab 1.1.2027 elektronisch erfasst werden, mit Übergangsfristen nach Betriebsgröße; Betriebe
+    bis 10 Beschäftigte sollen keine elektronische Pflicht haben. Noch kein Gesetz.
+rechtsgrundlage:
+- Entwurf zur Änderung des ArbZG (Juni 2026)
+kategorie: personal
+ausloeser:
+  all:
+  - feld: abgeleitet.hat_beschaeftigte
+    op: ==
+    wert: true
+    label:
+      de: Du beschäftigst mindestens eine Person.
+  - feld: profil.beschaeftigte.gesamt
+    op: '>'
+    wert: 10
+    label:
+      de: Du beschäftigst mehr als 10 Personen.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: –
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Noch keine – geplante Regelung.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: entwurf
+radar:
+  wahrscheinlichkeit: mittel
+  erwartet_ab: '2027-01-01'
+gueltig_ab: '2027-01-01'
+gueltig_bis: null
+quellen:
+- titel: Arbeitszeitgesetz
+  url: https://www.gesetze-im-internet.de/arbzg/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Status offen – Radar
+- Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „mittel“)
+- Schwelle 10 als Regelwert führen, sobald beschlossen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

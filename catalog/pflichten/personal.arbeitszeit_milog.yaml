@@ -1,0 +1,69 @@
+# Katalog D.42 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: personal.arbeitszeit_milog
+version: 1
+katalog_nr: D.42
+titel:
+  de: Arbeitszeit nach § 17 MiLoG aufzeichnen
+kurz:
+  de: Für Minijobber und in Sofortmeldebranchen musst du Beginn, Ende und Dauer der Arbeitszeit aufzeichnen.
+erklaerung:
+  de: § 17 MiLoG verlangt Aufzeichnungen für geringfügig Beschäftigte und für Beschäftigte in den Branchen mit Sofortmeldepflicht.
+rechtsgrundlage:
+- § 17 MiLoG
+kategorie: personal
+ausloeser:
+  all:
+  - feld: abgeleitet.hat_beschaeftigte
+    op: ==
+    wert: true
+    label:
+      de: Du beschäftigst mindestens eine Person.
+  - any:
+    - feld: profil.beschaeftigte.minijob
+      op: '>='
+      wert: 1
+      label:
+        de: Du beschäftigst Minijobber.
+    - feld: profil.personal.sofortmeldebranchen
+      op: enthaelt_eines
+      wert:
+      - bau
+      - gastronomie
+      - personenbefoerderung
+      - gebaeudereinigung
+      - messebau
+      - fleischwirtschaft
+      - sicherheitsgewerbe
+      label:
+        de: Dein Betrieb gehört zu einer Branche mit Sofortmeldepflicht.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Kontrolle durch den Zoll
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+aktion:
+  art: link
+  ziel: app.zeiterfassung
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Mindestlohngesetz § 17
+  url: https://www.gesetze-im-internet.de/milog/__17.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Fristen für Aufzeichnung und Aufbewahrung ergänzen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

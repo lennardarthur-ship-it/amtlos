@@ -1,0 +1,60 @@
+# Katalog D.41 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: personal.nachweisgesetz
+version: 1
+katalog_nr: D.41
+titel:
+  de: Arbeitsbedingungen schriftlich festhalten
+kurz:
+  de: Für jede neue beschäftigte Person hältst du die wesentlichen Arbeitsbedingungen schriftlich oder in zulässiger Form
+    fest.
+erklaerung:
+  de: Das Nachweisgesetz verlangt, dass die wesentlichen Arbeitsbedingungen dokumentiert und der beschäftigten Person ausgehändigt
+    werden.
+rechtsgrundlage:
+- NachwG
+kategorie: personal
+ausloeser:
+  ereignis: einstellung
+  op: eingetreten
+  label:
+    de: Du stellst jemanden ein.
+frist:
+  typ: relativ
+  bezug:
+    ereignis: einstellung
+  versatz: P0D
+  zeitpunkt: spaetestens
+  je_ereignis: true
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: dokument_generator
+aktion:
+  art: dokument
+  ziel: vorlage.nachweis_arbeitsbedingungen
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Nachweisgesetz
+  url: https://www.gesetze-im-internet.de/nachwg/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist (je Angabe unterschiedlich) steht nicht in der Spezifikation – als spätestens bei Beginn eingetragen, fachlich ersetzen
+- Zulässige Form (Schriftform/elektronisch) aktuell?
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

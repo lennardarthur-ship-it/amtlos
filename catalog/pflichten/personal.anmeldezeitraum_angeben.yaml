@@ -1,0 +1,57 @@
+# Katalog D.40 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: personal.anmeldezeitraum_angeben
+version: 1
+katalog_nr: D.40
+titel:
+  de: Anmeldezeitraum der Lohnsteuer angeben
+kurz:
+  de: Damit Amtlos die Termine der Lohnsteuer-Anmeldung berechnen kann, brauchst du den Anmeldezeitraum.
+erklaerung:
+  de: Den Anmeldezeitraum teilt dir das Finanzamt mit. Du findest ihn in deinen Unterlagen zur Lohnsteuer oder fragst deine
+    Steuerberatung.
+rechtsgrundlage:
+- § 41a EStG
+kategorie: personal
+ausloeser:
+  all:
+  - feld: abgeleitet.hat_beschaeftigte
+    op: ==
+    wert: true
+    label:
+      de: Du beschäftigst mindestens eine Person.
+  - feld: profil.personal.lohnsteuer_anmeldezeitraum
+    op: nicht_vorhanden
+    label:
+      de: Der Anmeldezeitraum fehlt noch.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Ohne Anmeldezeitraum kann Amtlos keine Termine berechnen.
+  schwere: mittel
+automatisierung: hinweis
+aktion:
+  art: formular
+  ziel: onboarding.beschaeftigte
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Einkommensteuergesetz § 41a
+  url: https://www.gesetze-im-internet.de/estg/__41a.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Vorbereitender Schritt – Darstellung bestätigen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

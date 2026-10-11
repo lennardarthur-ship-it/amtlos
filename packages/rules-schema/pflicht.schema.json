@@ -106,7 +106,9 @@
       "$ref": "#/$defs/bedingung"
     },
     "phase": {
-      "enum": ["gruendung"],
+      "enum": [
+        "gruendung"
+      ],
       "description": "Teil des Gründungsassistenten (Spezifikation 6.2). Reihenfolge über voraussetzungen."
     },
     "voraussetzungen": {
@@ -855,6 +857,11 @@
         },
         "erinnerung": {
           "$ref": "#/$defs/erinnerung"
+        },
+        "je_ereignis": {
+          "type": "boolean",
+          "default": false,
+          "description": "Nur mit bezug.ereignis: eine Instanz je eingetretenem Ereignis (Periode aenderung-JJJJMMTT), z. B. Sofortmeldung je Einstellung, Unfallanzeige je Unfall. Ohne: Bezug auf das erste Ereignis."
         }
       }
     },

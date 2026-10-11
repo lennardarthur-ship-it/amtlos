@@ -1,0 +1,56 @@
+# Katalog D.43 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: personal.schwangerschaft_mitteilung
+version: 1
+katalog_nr: D.43
+titel:
+  de: Schwangerschaft der Aufsichtsbehörde mitteilen
+kurz:
+  de: Teilt dir eine Beschäftigte ihre Schwangerschaft mit, informierst du die Aufsichtsbehörde.
+erklaerung:
+  de: Die Mitteilung an die zuständige Aufsichtsbehörde ist Pflicht des Arbeitgebers.
+rechtsgrundlage:
+- § 27 MuSchG
+kategorie: personal
+ausloeser:
+  ereignis: schwangerschaft_mitgeteilt
+  op: eingetreten
+  label:
+    de: Eine Beschäftigte hat dir ihre Schwangerschaft mitgeteilt.
+frist:
+  typ: relativ
+  bezug:
+    ereignis: schwangerschaft_mitgeteilt
+  versatz: P0D
+  zeitpunkt: spaetestens
+  je_ereignis: true
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Aufsichtsbehörde für Mutterschutz (je Land)
+kanal: post
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Mutterschutzgesetz § 27
+  url: https://www.gesetze-im-internet.de/muschg_2018/__27.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist („unverzüglich“) steht nicht in der Spezifikation – als am Tag der Mitteilung eingetragen, fachlich ersetzen
+- Zuständige Behörde je Land
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

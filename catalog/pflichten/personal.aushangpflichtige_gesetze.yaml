@@ -1,0 +1,53 @@
+# Katalog D.48 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: personal.aushangpflichtige_gesetze
+version: 1
+katalog_nr: D.48
+titel:
+  de: Aushangpflichtige Gesetze aushängen
+kurz:
+  de: Je nach Belegschaft hängst du bestimmte Gesetze im Betrieb aus, zum Beispiel ArbZG, AGG, MuSchG und JArbSchG.
+erklaerung:
+  de: Welche Gesetze auszuhängen sind, hängt von der Belegschaft ab. Amtlos stellt die Liste zusammen.
+rechtsgrundlage:
+- ArbZG
+- AGG
+- MuSchG
+- JArbSchG
+kategorie: personal
+ausloeser:
+  feld: abgeleitet.hat_beschaeftigte
+  op: ==
+  wert: true
+  label:
+    de: Du beschäftigst mindestens eine Person.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: niedrig
+automatisierung: hinweis
+aktion:
+  art: abhaken
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Arbeitszeitgesetz
+  url: https://www.gesetze-im-internet.de/arbzg/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Liste je Belegschaft (z. B. MuSchG ab wie vielen Frauen?) fachlich festlegen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

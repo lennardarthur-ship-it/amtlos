@@ -1,0 +1,48 @@
+# Katalog D.49 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: personal.lohnabrechnung
+version: 1
+katalog_nr: D.49
+titel:
+  de: Lohnabrechnung über geprüfte Software
+kurz:
+  de: Meldungen zur Sozialversicherung erfordern zertifizierte Software – Amtlos arbeitet dafür mit einem Lohnpartner.
+erklaerung:
+  de: Die Lohnabrechnung selbst macht ein systemgeprüfter Partner; Amtlos liefert Stammdaten und Fristen.
+rechtsgrundlage:
+- § 18 DEÜV (Systemprüfung)
+kategorie: personal
+ausloeser:
+  feld: abgeleitet.hat_beschaeftigte
+  op: ==
+  wert: true
+  label:
+    de: Du beschäftigst mindestens eine Person.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Lohnpartner oder Steuerberatung
+kanal: partner
+kosten: null
+sanktion:
+  text:
+    de: Ohne geprüfte Software sind die Meldungen nicht möglich.
+  schwere: mittel
+automatisierung: partner
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Datenerfassungs- und -übermittlungsverordnung
+  url: https://www.gesetze-im-internet.de/de_v/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Partner noch nicht gewählt (Abschnitt 5, Integration offen)
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

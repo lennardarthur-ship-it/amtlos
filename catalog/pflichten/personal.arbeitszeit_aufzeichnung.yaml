@@ -1,0 +1,54 @@
+# Katalog D.42 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: personal.arbeitszeit_aufzeichnung
+version: 1
+katalog_nr: D.42
+titel:
+  de: Arbeitszeit aufzeichnen
+kurz:
+  de: Du zeichnest die Arbeitszeit deiner Beschäftigten auf.
+erklaerung:
+  de: Nach der Rechtsprechung des Bundesarbeitsgerichts besteht bereits eine Pflicht zur Arbeitszeiterfassung. Amtlos bietet
+    eine Zeiterfassung, die auf die geplante Neuregelung vorbereitet ist.
+rechtsgrundlage:
+- § 3 Abs. 2 Nr. 1 ArbSchG (BAG, 13.9.2022 – 1 ABR 22/21)
+kategorie: personal
+ausloeser:
+  feld: abgeleitet.hat_beschaeftigte
+  op: ==
+  wert: true
+  label:
+    de: Du beschäftigst mindestens eine Person.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+aktion:
+  art: link
+  ziel: app.zeiterfassung
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Arbeitsschutzgesetz § 3
+  url: https://www.gesetze-im-internet.de/arbschg/__3.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Fundstelle der BAG-Entscheidung prüfen
+- Anforderungen an die Form (bis zur Neuregelung) fachlich formulieren
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

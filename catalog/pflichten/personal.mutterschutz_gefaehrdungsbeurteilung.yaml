@@ -1,0 +1,57 @@
+# Katalog D.43 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: personal.mutterschutz_gefaehrdungsbeurteilung
+version: 1
+katalog_nr: D.43
+titel:
+  de: Mutterschutz in der Gefährdungsbeurteilung
+kurz:
+  de: Unabhängig davon, ob jemand schwanger ist, beurteilst du die Arbeitsplätze auch nach dem Mutterschutzgesetz.
+erklaerung:
+  de: Die anlassunabhängige Gefährdungsbeurteilung nach dem Mutterschutzgesetz ist Teil der allgemeinen Gefährdungsbeurteilung.
+rechtsgrundlage:
+- § 10 MuSchG
+kategorie: personal
+ausloeser:
+  feld: abgeleitet.hat_beschaeftigte
+  op: ==
+  wert: true
+  label:
+    de: Du beschäftigst mindestens eine Person.
+voraussetzungen:
+- arbeitsschutz.gefaehrdungsbeurteilung
+frist:
+  typ: relativ
+  bezug:
+    ereignis: erste_einstellung
+  versatz: P0D
+  zeitpunkt: vor_beginn
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: dokument_generator
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Mutterschutzgesetz § 10
+  url: https://www.gesetze-im-internet.de/muschg_2018/__10.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist „vor Arbeitsbeginn“ wie E.50 – bestätigen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

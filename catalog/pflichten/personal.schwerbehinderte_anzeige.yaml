@@ -1,0 +1,66 @@
+# Katalog D.45 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: personal.schwerbehinderte_anzeige
+version: 1
+katalog_nr: D.45
+titel:
+  de: Anzeige und Ausgleichsabgabe (Schwerbehinderte)
+kurz:
+  de: Ab 20 Arbeitsplätzen zeigst du jedes Jahr bis 31.3. die Beschäftigung schwerbehinderter Menschen an und zahlst gegebenenfalls
+    die Ausgleichsabgabe.
+erklaerung:
+  de: Betriebe ab 20 Arbeitsplätzen haben eine Beschäftigungsquote. Die Anzeige und die Ausgleichsabgabe sind bis zum 31.
+    März für das Vorjahr fällig.
+rechtsgrundlage:
+- SGB IX
+kategorie: personal
+ausloeser:
+  all:
+  - feld: profil.beschaeftigte.gesamt
+    op: '>='
+    wert:
+      regelwert: personal.schwerbehinderte.schwelle_arbeitsplaetze
+  - feld: abgeleitet.beschaeftigte.arbeitsplaetze_sgb9
+    op: '>='
+    wert:
+      regelwert: personal.schwerbehinderte.schwelle_arbeitsplaetze
+    label:
+      de: Du hast mindestens 20 Arbeitsplätze im Sinne des SGB IX.
+frist:
+  typ: wiederkehrend
+  rhythmus: jaehrlich
+  faellig:
+    art: feste_termine
+    termine:
+    - 03-31
+  verschiebung:
+    regel: naechster_werktag
+    kalender: bundesland
+wiederholung:
+  art: periodisch
+stelle:
+  de: Agentur für Arbeit / Integrationsamt
+kanal: portal
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Sozialgesetzbuch IX
+  url: https://www.gesetze-im-internet.de/sgb_9_2018/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Quote und Höhe der Abgabe als Regelwerte
+- Zählweise der Arbeitsplätze (G-05); wer insgesamt weniger als 20 beschäftigt, gilt als unter der Schwelle – bestätigen
+- Verschiebung bei 31.3. am Wochenende
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

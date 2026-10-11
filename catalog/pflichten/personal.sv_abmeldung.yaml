@@ -1,0 +1,56 @@
+# Katalog D.38 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: personal.sv_abmeldung
+version: 1
+katalog_nr: D.38
+titel:
+  de: Beschäftigte bei der Sozialversicherung abmelden
+kurz:
+  de: Endet eine Beschäftigung, meldest du die Person bei der Krankenkasse ab.
+erklaerung:
+  de: Die Abmeldung (DEÜV) geht an die Krankenkasse bzw. die Minijob-Zentrale, über das Lohnprogramm.
+rechtsgrundlage:
+- § 28a SGB IV
+- DEÜV
+kategorie: personal
+ausloeser:
+  ereignis: austritt
+  op: eingetreten
+  label:
+    de: Eine Beschäftigung endet.
+frist:
+  typ: relativ
+  bezug:
+    ereignis: austritt
+  versatz: P0D
+  zeitpunkt: spaetestens
+  je_ereignis: true
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Krankenkasse bzw. Minijob-Zentrale (über Lohnprogramm)
+kanal: partner
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: partner
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Sozialgesetzbuch IV § 28a
+  url: https://www.gesetze-im-internet.de/sgb_4/__28a.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist der Abmeldung steht nicht in der Spezifikation – als spätestens am Ende der Beschäftigung eingetragen, fachlich ersetzen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

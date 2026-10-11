@@ -358,6 +358,7 @@ export const en: Texte = {
     gesellschafterwechsel: "Shareholders changed",
     datenpanne: "Data breach discovered",
     betriebsaufgabe: "Stopped trading",
+    unterweisung_durchgefuehrt: "Safety briefing held",
   },
   einstellungen: { titel: "Settings", profil: "Information about your business", profil_text: "Change your answers. Every change is saved; earlier versions stay traceable.", sprache: "Language", sprache_speichern: "Save language" },
   onboarding: {

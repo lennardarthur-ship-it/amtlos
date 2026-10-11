@@ -1,0 +1,56 @@
+# Katalog D.40 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: personal.umlagen_eau
+version: 1
+katalog_nr: D.40
+titel:
+  de: Umlagen U1/U2/U3 und eAU-Abruf
+kurz:
+  de: Für Beschäftigte zahlst du Umlagen (U1, U2, U3) und rufst Arbeitsunfähigkeitsbescheinigungen elektronisch ab.
+erklaerung:
+  de: Die Umlagen finanzieren die Erstattung von Entgeltfortzahlung, Mutterschaftsleistungen und das Insolvenzgeld. Die eAU
+    rufst du bei der Krankenkasse ab, meist über das Lohnprogramm.
+begriffe:
+- begriff:
+    de: eAU
+  erklaerung:
+    de: Elektronische Arbeitsunfähigkeitsbescheinigung, die du bei der Krankenkasse abrufst.
+rechtsgrundlage:
+- AAG
+- § 109 SGB IV
+kategorie: personal
+ausloeser:
+  feld: abgeleitet.hat_beschaeftigte
+  op: ==
+  wert: true
+  label:
+    de: Du beschäftigst mindestens eine Person.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Krankenkassen
+kanal: partner
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Aufwendungsausgleichsgesetz
+  url: https://www.gesetze-im-internet.de/aag/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Welche Umlage gilt für wen (z. B. U1 nach Betriebsgröße) – fachlich ergänzen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

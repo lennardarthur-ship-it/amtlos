@@ -170,6 +170,7 @@ export function pruefePflichtObjekt(p, kontext) {
     if (n.ereignis && !ereignisse.has(n.ereignis)) fehler.push(`wiederholung: unbekanntes Ereignis '${n.ereignis}'`);
     if (n.fakt && !fakten.has(n.fakt)) fehler.push(`wiederholung: unbekannter Fakt '${n.fakt}'`);
   }
+  if (f?.je_ereignis && !f?.bezug?.ereignis) fehler.push("frist.je_ereignis: nur mit Bezug auf ein Ereignis möglich");
   for (const v of p.voraussetzungen ?? []) if (!kontext.pflichtIds.has(v)) fehler.push(`voraussetzungen: unbekannte Pflicht '${v}'`);
   if (kontext.prod) {
     if (p.pruefung?.status !== "freigegeben") fehler.push("prod: nicht freigegeben");

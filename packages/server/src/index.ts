@@ -9,3 +9,4 @@ export * from "./warteschlange.js";
 export * from "./migrieren.js";
 export * from "./studio.js";
 export * from "./finanzen.js";
+export * from "./protokolle.js";

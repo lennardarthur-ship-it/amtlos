@@ -1,0 +1,66 @@
+# Katalog E.51 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: arbeitsschutz.unterweisung_wiederholen
+version: 1
+katalog_nr: E.51
+titel:
+  de: Unterweisung jährlich wiederholen
+kurz:
+  de: Mindestens einmal im Jahr wiederholst du die Unterweisung.
+erklaerung:
+  de: Ein Jahr nach jeder Unterweisung erinnert Amtlos an die Wiederholung. Mit der neuen Unterweisung ist die alte erledigt.
+rechtsgrundlage:
+- § 12 ArbSchG
+- DGUV Vorschrift 1
+kategorie: arbeitsschutz
+ausloeser:
+  all:
+  - feld: abgeleitet.hat_beschaeftigte
+    op: ==
+    wert: true
+    label:
+      de: Du beschäftigst mindestens eine Person.
+  - ereignis: unterweisung_durchgefuehrt
+    op: eingetreten
+    label:
+      de: Du hast eine Unterweisung durchgeführt.
+frist:
+  typ: relativ
+  bezug:
+    ereignis: unterweisung_durchgefuehrt
+  versatz: P1Y
+  zeitpunkt: spaetestens
+  je_ereignis: true
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: dokument_generator
+aktion:
+  art: link
+  ziel: app.unterweisungen
+  nachweis_erforderlich: true
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Arbeitsschutzgesetz § 12
+  url: https://www.gesetze-im-internet.de/arbschg/__12.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- „Mindestens jährlich“ als ein Jahr nach der letzten Unterweisung umgesetzt – bestätigen
+- Kürzere Fristen für Jugendliche (JArbSchG) ergänzen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

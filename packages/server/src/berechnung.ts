@@ -170,7 +170,10 @@ function sollInstanzen(
           .map((x) => x.datum)
           .sort()
           .at(-1);
-        if (ausloeser) soll.push({ ...basis, periode: `aenderung-${ausloeser.replaceAll("-", "")}`, status: "offen", faellig_am: null, faellig_roh: null, nicht_zutreffend_grund: null });
+        const periode = `aenderung-${ausloeser?.replaceAll("-", "")}`;
+        // Gibt es für dieses Ereignis schon eine Instanz mit Termin (je_ereignis), nicht durch eine ohne Termin ersetzen
+        if (ausloeser && !soll.some((s) => s.pflicht_id === e.pflicht_id && s.periode === periode))
+          soll.push({ ...basis, periode, status: "offen", faellig_am: null, faellig_roh: null, nicht_zutreffend_grund: null });
       }
     }
   }

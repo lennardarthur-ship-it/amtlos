@@ -1,0 +1,57 @@
+# Katalog E.55 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: arbeitsschutz.gefahrstoffe
+version: 1
+katalog_nr: E.55
+titel:
+  de: Gefahrstoffverzeichnis und Betriebsanweisungen
+kurz:
+  de: Wenn ihr mit Gefahrstoffen arbeitet, führst du ein Verzeichnis und schreibst Betriebsanweisungen.
+erklaerung:
+  de: Die Gefahrstoffverordnung verlangt ein Verzeichnis der Gefahrstoffe und Betriebsanweisungen für die Beschäftigten.
+rechtsgrundlage:
+- GefStoffV
+kategorie: arbeitsschutz
+branchen:
+- beauty_kosmetik
+- handwerk
+- bau
+ausloeser:
+  all:
+  - feld: abgeleitet.hat_beschaeftigte
+    op: ==
+    wert: true
+    label:
+      de: Du beschäftigst mindestens eine Person.
+  - feld: profil.arbeitsschutz.gefahrstoffe
+    op: ==
+    wert: true
+    label:
+      de: Ihr arbeitet mit Gefahrstoffen.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: dokument_generator
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Gefahrstoffverordnung
+  url: https://www.gesetze-im-internet.de/gefstoffv_2010/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

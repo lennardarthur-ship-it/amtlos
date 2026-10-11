@@ -18,6 +18,7 @@
     { "typ": "umsatzschwelle_ueberschritten", "beschreibung": "Vom System erkannt (ab Abschnitt 4)", "payload": ["regelwert", "datum"] },
     { "typ": "gesellschafterwechsel", "beschreibung": "Änderung im Gesellschafterkreis", "payload": ["wirksam_ab"] },
     { "typ": "datenpanne", "beschreibung": "Verletzung des Schutzes personenbezogener Daten bekannt geworden", "payload": ["bekannt_seit"] },
+    { "typ": "unterweisung_durchgefuehrt", "beschreibung": "Unterweisung durchgeführt (aus dem Unterweisungsmodul)", "payload": ["datum", "thema"] },
     { "typ": "betriebsaufgabe", "beschreibung": "Aufgabe der Tätigkeit", "payload": ["datum"] }
   ]
 }

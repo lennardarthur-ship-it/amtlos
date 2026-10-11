@@ -1,0 +1,58 @@
+# Katalog E.57 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: arbeitsschutz.unfallanzeige
+version: 1
+katalog_nr: E.57
+titel:
+  de: Arbeitsunfall der Berufsgenossenschaft anzeigen
+kurz:
+  de: Ist jemand nach einem Arbeitsunfall mehr als drei Tage arbeitsunfähig, zeigst du den Unfall binnen drei Tagen der BG
+    an.
+erklaerung:
+  de: Die Unfallanzeige ist nötig, wenn die Arbeitsunfähigkeit mehr als drei Tage dauert. Amtlos legt die Frist ab dem Unfalltag
+    an; ob die Grenze erreicht ist, entscheidest du beim Erledigen.
+rechtsgrundlage:
+- § 193 SGB VII
+kategorie: arbeitsschutz
+ausloeser:
+  ereignis: arbeitsunfall
+  op: eingetreten
+  label:
+    de: Es gab einen Arbeitsunfall.
+frist:
+  typ: relativ
+  bezug:
+    ereignis: arbeitsunfall
+  versatz: P3D
+  zeitpunkt: spaetestens
+  je_ereignis: true
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Berufsgenossenschaft
+kanal: portal
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Sozialgesetzbuch VII § 193
+  url: https://www.gesetze-im-internet.de/sgb_7/__193.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Fristbeginn: Unfalltag oder Kenntnis der AU über drei Tage? bestätigen'
+- AU-Tage aus dem Ereignis (Payload au_tage) in die Bedingung aufnehmen, sobald Ereignis-Payload auswertbar ist
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

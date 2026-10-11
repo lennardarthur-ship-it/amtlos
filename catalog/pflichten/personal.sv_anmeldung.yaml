@@ -1,0 +1,59 @@
+# Katalog D.38 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+schema_version: 1
+id: personal.sv_anmeldung
+version: 1
+katalog_nr: D.38
+titel:
+  de: Beschäftigte bei der Sozialversicherung anmelden
+kurz:
+  de: Jede neue beschäftigte Person meldest du bei der Krankenkasse an.
+erklaerung:
+  de: Die Anmeldung zur Sozialversicherung (DEÜV) geht an die Krankenkasse der beschäftigten Person, bei Minijobs an die Minijob-Zentrale.
+    Die Meldung läuft über ein systemgeprüftes Lohnprogramm.
+rechtsgrundlage:
+- § 28a SGB IV
+- DEÜV
+kategorie: personal
+ausloeser:
+  ereignis: einstellung
+  op: eingetreten
+  label:
+    de: Du stellst jemanden ein.
+voraussetzungen:
+- personal.betriebsnummer
+frist:
+  typ: relativ
+  bezug:
+    ereignis: einstellung
+  versatz: P0D
+  zeitpunkt: spaetestens
+  je_ereignis: true
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Krankenkasse bzw. Minijob-Zentrale (über Lohnprogramm)
+kanal: partner
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: partner
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Sozialgesetzbuch IV § 28a
+  url: https://www.gesetze-im-internet.de/sgb_4/__28a.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Frist der Anmeldung steht nicht in der Spezifikation – als spätestens bei Beschäftigungsbeginn eingetragen, fachlich ersetzen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null
