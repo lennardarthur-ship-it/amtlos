@@ -12,6 +12,7 @@
     "lint": "eslint src test"
   },
   "dependencies": {
+    "@amtlos/fachlogik": "workspace:*",
     "@amtlos/fristen": "workspace:*",
     "@amtlos/rules-engine": "workspace:*",
     "@amtlos/rules-schema": "workspace:*",

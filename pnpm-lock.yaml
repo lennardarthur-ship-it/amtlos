@@ -35,6 +35,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@amtlos/fachlogik':
+        specifier: workspace:*
+        version: link:../../packages/fachlogik
       '@amtlos/fristen':
         specifier: workspace:*
         version: link:../../packages/fristen
@@ -293,6 +296,12 @@ importers:
         specifier: ^6.4.17
         version: 6.4.24
 
+  packages/fachlogik:
+    dependencies:
+      '@amtlos/fristen':
+        specifier: workspace:*
+        version: link:../fristen
+
   packages/fristen: {}
 
   packages/i18n: {}
@@ -321,6 +330,9 @@ importers:
 
   packages/server:
     dependencies:
+      '@amtlos/fachlogik':
+        specifier: workspace:*
+        version: link:../fachlogik
       '@amtlos/fristen':
         specifier: workspace:*
         version: link:../fristen

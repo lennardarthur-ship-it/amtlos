@@ -39,6 +39,7 @@ import {
   type RechnungsDaten,
   type Tx,
 } from "@amtlos/server";
+import { umsaetzeNachSatz, ustZeitraum } from "@amtlos/fachlogik";
 import { Kontext, MitUnternehmen, type Anfragekontext } from "./auth.js";
 import { ELSTER } from "./elster.controller.js";
 import { pruefe, uebersetzeDbFehler } from "./hilfen.js";
@@ -109,8 +110,6 @@ const KasseEingabe = z
     betriebsstaette: OPT(), angeschafft_am: DATUM,
   })
   .strict();
-
-const PERIODE = /^(\d{4})-(0[1-9]|1[0-2]|Q[1-4])$/;
 
 /** Minimaler Typ für hochgeladene Dateien (multer). */
 interface Datei {
@@ -536,39 +535,24 @@ export class FinanzenController {
   @MitUnternehmen()
   @Get("finanzen/ust-voranmeldung")
   async ustVoranmeldung(@Kontext() k: Anfragekontext, @Query("periode") periode = "") {
-    const m = PERIODE.exec(periode);
-    if (!m) throw new BadRequestException("periode im Format JJJJ-MM oder JJJJ-Qn");
-    const jahr = Number(m[1]);
-    const [von, bis] = m[2]!.startsWith("Q")
-      ? [new Date(Date.UTC(jahr, (Number(m[2]![1]) - 1) * 3, 1)), new Date(Date.UTC(jahr, Number(m[2]![1]) * 3, 0))]
-      : [new Date(Date.UTC(jahr, Number(m[2]) - 1, 1)), new Date(Date.UTC(jahr, Number(m[2]), 0))];
-    const iso = (d: Date) => d.toISOString().slice(0, 10);
+    const zeitraum = ustZeitraum(periode);
+    if (!zeitraum) throw new BadRequestException("periode im Format JJJJ-MM oder JJJJ-Qn");
+    const { von, bis } = zeitraum;
     return this.db.imKontext(this.kontext(k), async (tx) => {
       const rechnungen = await tx.abfrage<{ art: string; kleinunternehmer: boolean; positionen: Position[] }>(
         "select art, kleinunternehmer, positionen from app.rechnung where unternehmen_id = $1 and status <> 'entwurf' and rechnungsdatum between $2 and $3",
-        [k.unternehmenId, iso(von), iso(bis)],
+        [k.unternehmenId, von, bis],
       );
-      const nachSatz = new Map<string, { satz: number | null; netto_cent: number; ust_cent: number }>();
-      for (const r of rechnungen) {
-        const vz = r.art === "storno" ? -1 : 1;
-        for (const g of summen(r.positionen, r.kleinunternehmer).gruppen) {
-          const key = String(g.satz);
-          const e = nachSatz.get(key) ?? { satz: g.satz, netto_cent: 0, ust_cent: 0 };
-          e.netto_cent += vz * g.netto_cent;
-          e.ust_cent += vz * g.ust_cent;
-          nachSatz.set(key, e);
-        }
-      }
       const vorsteuer = await tx.eine<{ summe: string | null; anzahl: number; ohne_angabe: number }>(
         `select sum(ust_cent)::text as summe, count(*)::int as anzahl, count(*) filter (where ust_cent is null)::int as ohne_angabe
            from app.beleg where unternehmen_id = $1 and not storniert and belegdatum between $2 and $3`,
-        [k.unternehmenId, iso(von), iso(bis)],
+        [k.unternehmenId, von, bis],
       );
-      const umsaetze = [...nachSatz.values()].sort((a, b) => (b.satz ?? -1) - (a.satz ?? -1));
+      const umsaetze = umsaetzeNachSatz(rechnungen);
       const ust = umsaetze.reduce((a, g) => a + g.ust_cent, 0);
       const vst = Number(vorsteuer?.summe ?? 0);
       return {
-        periode, von: iso(von), bis: iso(bis),
+        periode, von, bis,
         umsaetze, umsatzsteuer_cent: ust, vorsteuer_cent: vst, zahllast_cent: ust - vst,
         rechnungen: rechnungen.length, belege: vorsteuer?.anzahl ?? 0, belege_ohne_steuerangabe: vorsteuer?.ohne_angabe ?? 0,
         uebermittlung: this.elster.status(),

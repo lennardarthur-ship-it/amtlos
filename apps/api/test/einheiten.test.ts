@@ -104,7 +104,7 @@ describe("Ratenbegrenzung", () => {
 
 describe("Gründungsassistent: Reihenfolge", () => {
   it("ordnet nach Voraussetzungen, dann Frist, dann Katalognummer; sperrt bis zur Erledigung", async () => {
-    const { ordne, offeneVoraussetzungen, fortschritt } = await import("../src/gruendung.js");
+    const { ordne, offeneVoraussetzungen, fortschritt } = await import("@amtlos/fachlogik");
     const s = (pflicht_id: string, katalog_nr: string, voraussetzungen: string[] = [], faellig_am: string | null = null, status = "offen") =>
       ({ pflicht_id, periode: "einmalig", status, faellig_am, katalog_nr, voraussetzungen });
     const liste = [

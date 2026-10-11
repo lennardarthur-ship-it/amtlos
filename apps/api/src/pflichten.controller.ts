@@ -9,7 +9,7 @@ import { Kontext, MitUnternehmen, Oeffentlich, type Anfragekontext } from "./aut
 import { BEREICH_JE_KATEGORIE, heuteUebersicht } from "./heute.js";
 import { pruefe, t, uebersetzeDbFehler, type Text } from "./hilfen.js";
 import { erzeugeIcs } from "./ics.js";
-import { fortschritt, offeneVoraussetzungen, ordne } from "./gruendung.js";
+import { fortschritt, offeneVoraussetzungen, ordne } from "@amtlos/fachlogik";
 import { KONFIGURATION, type Konfiguration } from "./konfiguration.js";
 import { WARTESCHLANGE } from "./kern.controller.js";
 

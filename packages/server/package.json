@@ -24,6 +24,7 @@
     "katalog:importieren": "node dist/cli.js katalog-importieren"
   },
   "dependencies": {
+    "@amtlos/fachlogik": "workspace:*",
     "@amtlos/fristen": "workspace:*",
     "@amtlos/rules-engine": "workspace:*",
     "@amtlos/rules-schema": "workspace:*",

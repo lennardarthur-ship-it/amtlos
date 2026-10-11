@@ -1,7 +1,7 @@
 import { Body, Controller, Get, HttpException, Inject, NotFoundException, Param, Post } from "@nestjs/common";
 import { Datenbank, ElsterNichtVerfuegbar, type ElsterGateway, type ElsterVorgang } from "@amtlos/server";
 import { Kontext, MitUnternehmen, type Anfragekontext } from "./auth.js";
-import { fragebogenVorbereitung } from "./fragebogen.js";
+import { fragebogenVorbereitung } from "@amtlos/fachlogik";
 
 export const ELSTER = Symbol("ELSTER");
 const VORGAENGE: ElsterVorgang[] = ["fragebogen_steuerliche_erfassung", "ust_voranmeldung", "zusammenfassende_meldung", "kassenmeldung"];
