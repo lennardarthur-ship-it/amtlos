@@ -12,8 +12,8 @@ const pruefe = (x) => pruefePflichtObjekt({ ...basis, ...x }, ctx);
 test("gültige Pflicht hat keine Meldungen", () => assert.deepEqual(pruefe({}), []));
 test("leere Pflichttexte", () => assert.deepEqual(pruefe({ titel: { de: "" } }), ["Titel › Deutsch: darf nicht leer sein"]));
 test("Bedingung: nur die gemeinte Variante wird gemeldet", () => {
-  assert.deepEqual(pruefe({ ausloeser: { feld: "profil.beschaeftigte.gesamt", op: ">=" } }), ["Auslöser: „wert“ fehlt"]);
-  assert.deepEqual(pruefe({ ausloeser: { all: [{ feld: "profil.beschaeftigte.gesamt", op: ">=" }] } }), ["Auslöser › all › Nr. 1: „wert“ fehlt"]);
+  assert.deepEqual(pruefe({ ausloeser: { feld: "profil.beschaeftigte.gesamt", op: ">=" } }), ["Auslöser: „Wert“ fehlt"]);
+  assert.deepEqual(pruefe({ ausloeser: { all: [{ feld: "profil.beschaeftigte.gesamt", op: ">=" }] } }), ["Auslöser › all › Nr. 1: „Wert“ fehlt"]);
   assert.deepEqual(pruefe({ ausloeser: { gibts: 1 } }), ["Auslöser: unbekannte Art – erlaubt sind all, any, not, immer, ereignis oder feld"]);
 });
 test("Frist: Variante nach typ, Format in Klartext", () => {

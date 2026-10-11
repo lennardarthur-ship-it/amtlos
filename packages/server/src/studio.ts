@@ -254,7 +254,7 @@ export async function neueRegelwertversion(db: Datenbank, autor: StudioKonto, da
     const id = String(daten.id ?? "");
     const max = await tx.eine<{ v: number | null }>("select max(version) as v from katalog.regelwert_version where regelwert_id = $1", [id]);
     const version = (max?.v ?? 0) + 1;
-    const rw = { ...daten, schema_version: 1, version } as Record<string, unknown> & { einheit: string; bezeichnung: unknown; wert: number; gueltig_ab: string; gueltig_bis?: string | null; status_recht: string; quellen?: unknown };
+    const rw = { ...daten, schema_version: 1, version } as unknown as Record<string, unknown> & { einheit: string; bezeichnung: unknown; wert: number; gueltig_ab: string; gueltig_bis?: string | null; status_recht: string; quellen?: unknown };
     delete rw.pruefung;
     const fehler = pruefeRegelwertObjekt(rw);
     if (fehler.length) throw new StudioFehler(fehler.join("\n"));
