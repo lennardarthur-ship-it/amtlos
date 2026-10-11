@@ -118,7 +118,7 @@ export class AssistentController {
       const pruefung = await tx.abfrage<{ pflicht_id: string; pruef_status: string; geprueft_am: string | null }>(
         `select pv.pflicht_id, pv.pruef_status, pr.geprueft_am::text
            from katalog.aktives_release r join katalog.release_inhalt ri on ri.release_id = r.id and ri.objekt_art = 'pflicht_version'
-           join katalog.pflicht_version pv on pv.id = ri.objekt_id join katalog.pflicht_version_pruefung pr on pr.id = pv.id`,
+           join katalog.pflicht_version_anzeige pv on pv.id = ri.objekt_id join katalog.pflicht_version_pruefung pr on pr.id = pv.id`,
       );
       const status = new Map(pruefung.map((p) => [p.pflicht_id, p]));
       const instanzen = await tx.abfrage<{ pflicht_id: string; ergebnis: string }>(

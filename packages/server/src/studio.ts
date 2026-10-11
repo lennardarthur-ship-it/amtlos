@@ -457,3 +457,41 @@ export async function markeSpeichern(db: Datenbank, wer: StudioKonto, d: MarkeDa
       throw e;
     });
 }
+
+// ------------------------------------------------------------ Übersetzungen (Abschnitt 10, E-107)
+
+export interface UebersetzungZeile { schluessel: string; de: string; text: string; status: "maschinell" | "geprueft"; geprueft_am: string | null; benutzt: boolean }
+
+/** Übersetzungen mit Filter; `benutzt` = der deutsche Text kommt in einer aktuellen Version vor. */
+export async function uebersetzungListe(db: Datenbank, filter: { status?: string; suche?: string } = {}): Promise<{ zeilen: UebersetzungZeile[]; gesamt: number; geprueft: number }> {
+  return db.imKontext({}, async (tx) => {
+    const zeilen = await tx.abfrage<UebersetzungZeile>(
+      `select encode(u.de_hash, 'hex') as schluessel, u.de, u.text, u.status, u.geprueft_am::text,
+              exists (select 1 from katalog.pflicht_version pv where pv.daten::text like '%' || replace(replace(to_json(u.de)::text, '\\', '\\\\'), '%', '\\%') || '%') as benutzt
+         from katalog.uebersetzung u
+        where u.sprache = 'en' and ($1::text is null or u.status = $1) and ($2::text is null or u.de ilike '%' || $2 || '%' or u.text ilike '%' || $2 || '%')
+        order by u.status, u.de limit 200`,
+      [filter.status || null, filter.suche?.trim() || null],
+    );
+    const z = (await tx.eine<{ gesamt: number; geprueft: number }>("select count(*)::int as gesamt, count(*) filter (where status = 'geprueft')::int as geprueft from katalog.uebersetzung where sprache = 'en'"))!;
+    return { zeilen, ...z };
+  });
+}
+
+/** Text ändern und/oder als geprüft markieren (Redaktion oder Admin); danach werden die Dokumente neu lokalisiert. */
+export async function uebersetzungSpeichern(db: Datenbank, wer: StudioKonto, schluessel: string, text: string, geprueft: boolean) {
+  if (!wer.rollen.some((r) => r === "plattform_admin" || r === "redaktion")) throw new StudioFehler("Nur Redaktion oder Admin prüft Übersetzungen");
+  if (!/^[0-9a-f]{32}$/.test(schluessel)) throw new StudioFehler("Übersetzung unbekannt");
+  if (!text.trim()) throw new StudioFehler("Text darf nicht leer sein");
+  return db.imKontext({ kontoId: wer.id }, async (tx) => {
+    const r = await tx.eine(
+      `update katalog.uebersetzung set text = $2, status = $3, geprueft_von = case when $3 = 'geprueft' then $4::uuid end,
+              geprueft_am = case when $3 = 'geprueft' then current_date end, geaendert_am = now()
+        where sprache = 'en' and de_hash = decode($1, 'hex') returning de`,
+      [schluessel, text.trim(), geprueft ? "geprueft" : "maschinell", wer.id],
+    );
+    if (!r) throw new StudioFehler("Übersetzung unbekannt");
+    await tx.abfrage("select katalog.lokal_auffrischen()");
+    return r;
+  });
+}

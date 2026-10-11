@@ -9,7 +9,7 @@ import { t } from "@/lib/sprache";
 const MEHR = ["/radar", "/frag", "/experten", "/team", "/hilfe", "/melden"];
 
 export default async function AppRahmen({ children }: { children: ReactNode }) {
-  const [{ t: x }, u, i] = await Promise.all([t(), aktivesUnternehmen(), ich()]);
+  const [{ s, t: x }, u, i] = await Promise.all([t(), aktivesUnternehmen(), ich()]);
   return (
     <div className="mx-auto flex min-h-dvh max-w-6xl flex-col md:flex-row md:gap-10 md:px-6">
       <a href="#inhalt" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-30 focus:bg-blatt focus:p-3">
@@ -51,6 +51,7 @@ export default async function AppRahmen({ children }: { children: ReactNode }) {
       </aside>
       <main id="inhalt" className="min-w-0 flex-1 px-4 pb-28 pt-2 md:px-0 md:py-8">
         {children}
+        {s === "en" ? <p className="mt-16 border-t border-linie pt-4 text-klein text-tinte-leise">{x.app.uebersetzung_hinweis}</p> : null}
       </main>
     </div>
   );

@@ -974,4 +974,29 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       expect(liste.find((x) => x.id === b.id)?.marke).toBeNull();
     });
   });
+
+  describe("Abschnitt 10: Englisch", () => {
+    it("Katalogtexte auf Englisch über X-Sprache, Kontosprache für E-Mails", async () => {
+      const de = (await alsAnna(http().get("/v1/pflichten")).expect(200)).body as { pflicht_id: string; titel: string }[];
+      const en = (await alsAnna(http().get("/v1/pflichten")).set("X-Sprache", "en").expect(200)).body as { pflicht_id: string; titel: string }[];
+      const ustDe = de.find((k) => k.pflicht_id === "steuern.ust_voranmeldung");
+      const ustEn = en.find((k) => k.pflicht_id === "steuern.ust_voranmeldung");
+      expect(ustDe?.titel).toBe("Umsatzsteuer-Voranmeldung abgeben");
+      expect(ustEn?.titel).toMatch(/advance VAT return/i);
+      // Unbekannte Sprache im Header: Kontosprache
+      expect((await alsAnna(http().get("/v1/pflichten")).set("X-Sprache", "fr").expect(200)).body[0].titel).toBe(de[0]!.titel);
+      await http().put("/v1/ich/sprache").set("Authorization", `Bearer ${anna}`).send({ sprache: "fr" }).expect(422);
+      await http().put("/v1/ich/sprache").set("Authorization", `Bearer ${anna}`).send({ sprache: "en" }).expect(204);
+      const owner = new Datenbank(urls.owner);
+      expect((await owner.imKontext({}, (tx) => tx.eine<{ sprache: string }>("select sprache from app.konto where idp_subject = 'anna'")))!.sprache).toBe("en");
+      await owner.imKontext({}, (tx) => tx.abfrage("update app.konto set sprache = 'de' where idp_subject = 'anna'"));
+      await owner.schliessen();
+    });
+
+    it("Frag Amtlos findet auch englische Fragen", async () => {
+      const a = (await alsAnna(http().post("/v1/frage")).set("X-Sprache", "en").send({ frage: "Do I have to submit an advance VAT return?" }).expect(201)).body;
+      expect(a.treffer[0]).toMatchObject({ pflicht_id: "steuern.ust_voranmeldung" });
+      expect(a.treffer[0].titel).toMatch(/VAT/);
+    });
+  });
 });

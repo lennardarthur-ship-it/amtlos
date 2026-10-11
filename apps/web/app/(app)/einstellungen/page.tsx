@@ -2,7 +2,7 @@ import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { sichtbareSchritte } from "@amtlos/i18n";
-import { api } from "@/lib/api";
+import { api, apiAntwort } from "@/lib/api";
 import { SPRACH_COOKIE, t } from "@/lib/sprache";
 
 export const metadata = { title: "Einstellungen" };
@@ -11,6 +11,8 @@ async function spracheSetzen(formular: FormData) {
   "use server";
   const s = formular.get("sprache") === "en" ? "en" : "de";
   (await cookies()).set(SPRACH_COOKIE, s, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
+  // Auch fürs Konto speichern: E-Mails und Benachrichtigungen kommen dann in dieser Sprache
+  await apiAntwort("/v1/ich/sprache", { method: "PUT", ohneUnternehmen: true, body: JSON.stringify({ sprache: s }) }).catch(() => undefined);
   revalidatePath("/", "layout");
 }
 

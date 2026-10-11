@@ -79,7 +79,10 @@ export class AuthGuard implements CanActivate {
     if (!claims.sub) throw new UnauthorizedException("Token ohne Subjekt");
 
     const konto = await this.konto(claims);
-    const kontext: Anfragekontext = { kontoId: konto.id, sub: claims.sub, sprache: konto.sprache };
+    // Die Oberfläche schickt ihre Sprache mit (X-Sprache); sonst gilt die Sprache des Kontos
+    const gewuenscht = req.headers["x-sprache"];
+    const sprache = gewuenscht === "de" || gewuenscht === "en" ? gewuenscht : konto.sprache;
+    const kontext: Anfragekontext = { kontoId: konto.id, sub: claims.sub, sprache };
 
     const unternehmenNoetig = this.reflector.getAllAndOverride<boolean>(UNTERNEHMEN_NOETIG, ziele);
     const header = req.headers["x-unternehmen-id"];

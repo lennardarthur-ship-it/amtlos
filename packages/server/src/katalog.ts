@@ -18,19 +18,22 @@ const cache = new Map<string, AktiverKatalog>();
 export async function ladeAktivenKatalog(tx: Tx): Promise<AktiverKatalog | undefined> {
   const release = await tx.eine<{ id: string; nummer: number }>("select id, nummer from katalog.aktives_release");
   if (!release) return undefined;
-  const vorhanden = cache.get(release.id);
+  // Übersetzungen ändern sich ohne neues Release (E-107): ihr Stand gehört zum Cache-Schlüssel
+  const stand = await tx.eine<{ stand: string | null }>("select max(geaendert_am)::text as stand from katalog.uebersetzung");
+  const schluessel = `${release.id}|${stand?.stand ?? ""}`;
+  const vorhanden = cache.get(schluessel);
   if (vorhanden) return vorhanden;
 
   const pflichten = await tx.abfrage<{ id: string; pflicht_id: string; daten: Pflicht }>(
     `select pv.id, pv.pflicht_id, pv.daten
-       from katalog.release_inhalt ri join katalog.pflicht_version pv on pv.id = ri.objekt_id
+       from katalog.release_inhalt ri join katalog.pflicht_version_anzeige pv on pv.id = ri.objekt_id
       where ri.release_id = $1 and ri.objekt_art = 'pflicht_version'
       order by pv.pflicht_id`,
     [release.id],
   );
   const regelwerte = await tx.abfrage<{ daten: RegelwertVersion }>(
-    `select rv.daten
-       from katalog.release_inhalt ri join katalog.regelwert_version rv on rv.id = ri.objekt_id
+    `select rv.daten_lokal as daten
+       from katalog.release_inhalt ri join katalog.regelwert_version_anzeige rv on rv.id = ri.objekt_id
       where ri.release_id = $1 and ri.objekt_art = 'regelwert_version'
       order by rv.regelwert_id, rv.version`,
     [release.id],
@@ -41,7 +44,8 @@ export async function ladeAktivenKatalog(tx: Tx): Promise<AktiverKatalog | undef
     katalog: { pflichten: pflichten.map((p) => p.daten), regelwerte: regelwerte.map((r) => r.daten) },
     versionIds: new Map(pflichten.map((p) => [p.pflicht_id, p.id])),
   };
-  cache.set(release.id, aktiv);
+  if (cache.size >= 8) cache.clear(); // alte Releases/Übersetzungsstände nicht ansammeln
+  cache.set(schluessel, aktiv);
   return aktiv;
 }
 

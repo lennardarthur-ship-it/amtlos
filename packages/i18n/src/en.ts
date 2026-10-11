@@ -1,7 +1,7 @@
 import type { Texte } from "./de";
 
 export const en: Texte = {
-  app: { name: "Amtlos", mit_amtlos: "powered by Amtlos" },
+  app: { name: "Amtlos", mit_amtlos: "powered by Amtlos", uebersetzung_hinweis: "Texts about obligations are machine-translated and not yet reviewed. The German version is binding." },
   nav: { postfach: "Mailbox", branche: "Industry", online: "Online", mehr: "More", datenschutz: "Privacy", heute: "Today", pflichten: "Obligations", kalender: "Calendar", melden: "Report", einstellungen: "Settings", finanzen: "Finances", personal: "Staff", hauptnavigation: "Main navigation", zum_inhalt: "Skip to content" },
   anmelden: {
     titel: "Sign in",

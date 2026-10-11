@@ -1,0 +1,1516 @@
+# Englische Übersetzungen der Katalogtexte (E-107).
+# Schlüssel ist der deutsche Text: Ändert sich der deutsche Text, gilt die Übersetzung nicht mehr (Anzeige auf Deutsch).
+# status: maschinell = mit KI übersetzt, sprachlich und fachlich ungeprüft; verbindlich ist immer der deutsche Text.
+# Prüfen: scripts/uebersetzung_abdeckung.py zeigt fehlende und überzählige Einträge.
+sprache: en
+status: maschinell
+eintraege:
+- de: ARD ZDF Deutschlandradio Beitragsservice
+  en: ARD ZDF Deutschlandradio Beitragsservice
+- de: Ab 1.1.2028 gilt die Pflicht zum Versand strukturierter E-Rechnungen für alle Unternehmen im B2B-Geschäft, außer Kleinunternehmern nach § 19 UStG.
+  en: From 1.1.2028, the obligation to send structured e-invoices applies to all businesses in B2B trade, except small businesses under § 19 UStG.
+- de: Ab 2 Versicherten brauchst du Ersthelfer, Verbandmaterial und ein Verbandbuch; außerdem Brandschutzhelfer.
+  en: From 2 insured persons, you need first aiders, first-aid supplies and a first-aid log; you also need fire safety assistants.
+- de: Ab 2.12.2026 gelten Transparenz- und Kennzeichnungspflichten, etwa für Chatbots und KI-erzeugte Inhalte.
+  en: From 2.12.2026, transparency and labelling obligations apply, for example to chatbots and AI-generated content.
+- de: Ab 20 Arbeitsplätzen zeigst du jedes Jahr bis 31.3. die Beschäftigung schwerbehinderter Menschen an und zahlst gegebenenfalls die Ausgleichsabgabe.
+  en: If you have 20 or more workplaces, you report the employment of severely disabled persons every year by 31.3. and pay the compensatory levy (Ausgleichsabgabe) if applicable.
+- de: Ab 50 Beschäftigten richtest du eine interne Meldestelle für Hinweisgeber ein.
+  en: If you have 50 or more employees, you set up an internal reporting channel for whistleblowers.
+- de: Ab dem 1. Januar 2027 musst du an Unternehmen E-Rechnungen schicken, wenn dein Vorjahresumsatz über 800.000 € liegt.
+  en: From 1 January 2027, you must send e-invoices to businesses if your previous year's revenue is above €800,000.
+- de: Ab dem 1. Januar 2028 schickst du an Unternehmen nur noch E-Rechnungen – Kleinunternehmer sind befreit.
+  en: From 1 January 2028, you send only e-invoices to businesses – small businesses under the small business scheme are exempt.
+- de: Ab dem Umsatz über der Grenze fällt Umsatzsteuer an, auch wenn du sie nicht berechnet hast.
+  en: VAT is due from the sale above the limit, even if you have not charged it.
+- de: Agentur für Arbeit
+  en: Employment agency (Agentur für Arbeit)
+- de: Agentur für Arbeit / Integrationsamt
+  en: Federal Employment Agency (Agentur für Arbeit) / Integration Office (Integrationsamt)
+- de: Allergene kennzeichnen
+  en: Label allergens
+- de: Als Geschäftsführerin oder Geschäftsführer hast du besondere Pflichten und kannst persönlich haften.
+  en: As a managing director (Geschäftsführer), you have special duties and can be personally liable.
+- de: Als Gewerbetreibender bist du automatisch Mitglied der IHK oder Handwerkskammer und zahlst einen Beitrag nach deinem Ertrag.
+  en: As a trader, you are automatically a member of the IHK or Chamber of Crafts and pay a fee based on your earnings.
+- de: Als Güterhändler hast du bei Bargeschäften ab der Schwelle des Geldwäschegesetzes Sorgfaltspflichten.
+  en: As a dealer in goods, you have due diligence obligations for cash transactions at or above the threshold of the Anti-Money Laundering Act (Geldwäschegesetz).
+- de: Als Kleinunternehmer darfst du bestimmte Umsatzgrenzen nicht überschreiten – sonst endet die Regelung.
+  en: Under the small business scheme, you must not exceed certain revenue limits – otherwise the scheme ends.
+- de: Amtlos zeigt passende Förderprogramme, sobald das Matching nach Profil fachlich hinterlegt ist. Fristen und Antragsunterlagen hängen vom Programm ab.
+  en: Amtlos shows suitable funding programmes as soon as profile-based matching has been set up by experts. Deadlines and application documents depend on the programme.
+- de: Anfrage einer betroffenen Person beantworten
+  en: Respond to a request from a data subject
+- de: Anmeldezeitraum der Lohnsteuer angeben
+  en: Enter the payroll tax filing period
+- de: Anzeige und Ausgleichsabgabe (Schwerbehinderte)
+  en: Report and compensatory levy (severely disabled persons)
+- de: Arbeitest du überwiegend für einen Auftraggeber und eingebunden wie Angestellte, droht Scheinselbstständigkeit. Ein Statusfeststellungsverfahren schafft Klarheit.
+  en: If you work mainly for one client and are integrated like an employee, there is a risk of false self-employment (Scheinselbstständigkeit). A status determination procedure provides clarity.
+- de: Arbeitgeber mit mehr als 150 Beschäftigten sollen zum 7.6.2027 über die Entgeltgleichheit berichten.
+  en: Employers with more than 150 employees are to report on equal pay by 7.6.2027.
+- de: Arbeitgeber selbst; Kontrolle durch Berufsgenossenschaft und Gewerbeaufsicht
+  en: The employer; checked by the employers' liability insurance association (Berufsgenossenschaft) and the trade supervisory authority (Gewerbeaufsicht)
+- de: Arbeitsbedingungen schriftlich festhalten
+  en: Record working conditions in writing
+- de: Arbeitsmedizinische Vorsorge anbieten
+  en: Offer occupational health check-ups
+- de: Arbeitsplätze, ab denen die Beschäftigungsquote gilt
+  en: Workplaces from which the employment quota applies
+- de: Arbeitsunfall der Berufsgenossenschaft anzeigen
+  en: Report a workplace accident to the employers' liability insurance association
+- de: Arbeitszeit aufzeichnen
+  en: Record working hours
+- de: Arbeitszeit nach § 17 MiLoG aufzeichnen
+  en: Record working hours under § 17 MiLoG
+- de: 'Arbeitszeiten jetzt schon elektronisch erfassen (Amtlos: Personal → Arbeitszeiten)'
+  en: 'Start recording working hours electronically now (Amtlos: Staff → Working hours)'
+- de: Auch die Außerbetriebnahme einer elektronischen Kasse muss dem Finanzamt innerhalb eines Monats gemeldet werden.
+  en: The decommissioning of an electronic cash register must also be reported to the tax office (Finanzamt) within one month.
+- de: Auf Baustellen gelten zusätzliche Pflichten zum Arbeitsschutz, etwa Vorankündigung, Koordination und Sicherheitsplan.
+  en: On construction sites, additional occupational safety obligations apply, such as advance notice, coordination and a safety plan.
+- de: Auf Online-Marktplätzen stellst du deine Händlerangaben vollständig bereit.
+  en: On online marketplaces, you provide your full seller information.
+- de: Auf deiner Website informierst du in einer Datenschutzerklärung über die Verarbeitung von Daten.
+  en: On your website, you provide a privacy policy (Datenschutzerklärung) explaining how data is processed.
+- de: Auf deiner Website stellst du ein Impressum mit den Pflichtangaben bereit – leicht erkennbar und immer erreichbar.
+  en: On your website, you provide a legal notice (Impressum) with the mandatory information, easy to find and always accessible.
+- de: Aufbewahrungsfrist für Buchungsbelege einschließlich Rechnungen
+  en: Retention period for accounting vouchers including invoices
+- de: Aufbewahrungsfrist für Handels- und Geschäftsbriefe
+  en: Retention period for commercial and business letters
+- de: Aufbewahrungsfrist für Jahresabschlüsse, Bücher und Organisationsunterlagen
+  en: Retention period for annual financial statements, books and organisational documents
+- de: Auflisten, wo ihr KI-Inhalte veröffentlicht oder Chatbots einsetzt
+  en: List where you publish AI content or use chatbots
+- de: Aufsichtsbehörde für Mutterschutz (je Land)
+  en: Supervisory authority for maternity protection (per federal state)
+- de: Auftragsverarbeitung
+  en: Processing on behalf
+- de: Auftragsverarbeitungsverträge abschließen
+  en: Conclude data processing agreements
+- de: Ausgenommen sind Kleinstunternehmen mit weniger als 10 Beschäftigten und höchstens 2 Mio. € Umsatz oder Bilanzsumme – diese Ausnahme gilt für Dienstleistungen. Der Online-Check macht automatisierte
+    Basistests nach WCAG.
+  en: Micro-enterprises with fewer than 10 employees and no more than €2 million in revenue or balance sheet total are exempt; this exemption applies to services. The online check runs automated basic tests
+    based on WCAG.
+- de: Aushangpflichtige Gesetze aushängen
+  en: Post the laws that must be displayed
+- de: Auslandszahlungen nach AWV melden
+  en: Report foreign payments under the AWV
+- de: Außerbetriebnahme einer Kasse melden
+  en: Report decommissioning of a cash register
+- de: BSI
+  en: BSI
+- de: Barrierefreiheit von Onlineshop und Buchungstools (BFSG)
+  en: Accessibility of online shops and booking tools (BFSG)
+- de: Batterien registrieren (BattDG)
+  en: Register batteries (BattDG)
+- de: Baubetriebe mit gewerblichen Beschäftigten nehmen an den Sozialkassenverfahren der Bauwirtschaft (SOKA-BAU) teil.
+  en: Construction businesses with industrial employees take part in the social fund procedures of the construction industry (SOKA-BAU).
+- de: Bauherr bzw. Koordinator
+  en: Client (Bauherr) or coordinator
+- de: Baustellenverordnung beachten
+  en: Follow the Construction Site Ordinance (Baustellenverordnung)
+- de: Beantrage frühzeitig ein ELSTER-Konto – die Aktivierung kommt per Post und dauert einige Tage.
+  en: 'Apply for an ELSTER account early: the activation comes by post and takes a few days.'
+- de: Bei Beteiligungen ausländischer Investoren an Unternehmen in sensiblen Sektoren kann der Staat die Investition prüfen. Amtlos gibt hier nur einen allgemeinen Hinweis.
+  en: If foreign investors take stakes in companies in sensitive sectors, the state may review the investment. Amtlos only gives a general note here.
+- de: Bei Verträgen mit Verbrauchern über Fernabsatz belehrst du über das Widerrufsrecht.
+  en: For distance contracts with consumers, you inform them about the right of withdrawal.
+- de: Bei Zahlungsunfähigkeit oder Überschuldung muss die Geschäftsführung rechtzeitig Insolvenz beantragen.
+  en: In case of insolvency or over-indebtedness, the management must file for insolvency in good time.
+- de: Bei der Berufsgenossenschaft anmelden
+  en: Register with the employers' liability insurance association (BG)
+- de: Bei der GmbH ist mindestens die Hälfte des Mindeststammkapitals von 25.000 € einzuzahlen. Bei der UG ab 1 € wird das Stammkapital voll eingezahlt.
+  en: For a GmbH, at least half of the minimum share capital of €25,000 must be paid in. For a UG, which can start from €1, the share capital is paid in full.
+- de: Bei der Lebensmittelüberwachung registrieren
+  en: Register with the food control authority
+- de: Bei einem vom Kalenderjahr abweichenden Geschäftsjahr berechnet Amtlos den Termin noch nicht; die Frist beträgt zwölf Monate nach Ende des Geschäftsjahres.
+  en: If your financial year differs from the calendar year, Amtlos does not calculate the date yet; the deadline is twelve months after the end of the financial year.
+- de: Bei einer Datenpanne meldest du sie binnen 72 Stunden der Datenschutz-Aufsichtsbehörde.
+  en: If there is a data breach, you report it to the data protection supervisory authority within 72 hours.
+- de: Bei grenzüberschreitenden Zahlungen über der Meldegrenze – zum Beispiel Investorengeld aus dem Ausland – besteht eine Meldepflicht.
+  en: For cross-border payments above the reporting threshold – for example investor money from abroad – there is a reporting obligation.
+- de: Bei monatlicher Abgabe mit Dauerfristverlängerung wird eine Sondervorauszahlung von 1/11 fällig.
+  en: For monthly filing with a permanent deadline extension, a special advance payment of 1/11 is due.
+- de: Bei voraussichtlich hohem Risiko für die Betroffenen ist vorab eine Folgenabschätzung durchzuführen und zu dokumentieren.
+  en: If there is likely to be a high risk to the people affected, an impact assessment must be carried out and documented in advance.
+- de: Beim BSI registrieren (NIS2)
+  en: Register with the BSI (NIS2)
+- de: Beitragsnachweis übermitteln
+  en: Submit the contribution statement
+- de: Belege und Rechnungen monatlich vollständig halten
+  en: Keep receipts and invoices complete every month
+- de: Belehrung nach § 43 Infektionsschutzgesetz
+  en: Instruction under § 43 Infektionsschutzgesetz
+- de: Bericht zur Entgelttransparenz (geplant)
+  en: Pay transparency report (planned)
+- de: Berufserlaubnis und Zulassung
+  en: Professional licence and approval
+- de: Berufsgenossenschaft
+  en: Employers' liability insurance association (Berufsgenossenschaft)
+- de: Berufsgenossenschaft; Betreuungsdienst
+  en: Employers' liability insurance association (BG); occupational health and safety service
+- de: Beschäftigte bei der Sozialversicherung abmelden
+  en: Deregister employees from social security
+- de: Beschäftigte bei der Sozialversicherung anmelden
+  en: Register employees for social security
+- de: Beschäftigte über die geplante Pflicht informieren
+  en: Inform employees about the planned obligation
+- de: Beschäftigte, ab denen die Berichtspflicht zur Entgelttransparenz geplant ist
+  en: Employees from which the pay transparency reporting obligation is planned
+- de: Beschäftigte, ab denen die Kleinstunternehmen-Ausnahme des BFSG nicht mehr gilt
+  en: Employees from which the BFSG micro-enterprise exemption no longer applies
+- de: Beschäftigte, ab denen eine interne Meldestelle Pflicht ist
+  en: Employees from which an internal reporting channel is an obligation
+- de: Beschäftigte, ab deren Überschreiten die Hinweispflicht nach § 36 VSBG gilt
+  en: Employees above which the information obligation under § 36 VSBG applies
+- de: Beschäftigtendaten schützen
+  en: Protect employee data
+- de: Bestellbutton eindeutig beschriften (Button-Lösung)
+  en: Label the order button clearly (button solution)
+- de: Bestimmte Selbstständige sind rentenversicherungspflichtig und müssen sich innerhalb von drei Monaten bei der Deutschen Rentenversicherung melden.
+  en: Certain self-employed people are subject to mandatory pension insurance and must register with the German Pension Insurance (Deutsche Rentenversicherung) within three months.
+- de: Bestimmte Tätigkeiten wie Ärztin, Architekt oder Journalistin, die kein Gewerbe sind.
+  en: Certain activities, such as doctor, architect or journalist, that are not a trade.
+- de: Betriebe ab 20 Arbeitsplätzen haben eine Beschäftigungsquote. Die Anzeige und die Ausgleichsabgabe sind bis zum 31. März für das Vorjahr fällig.
+  en: Businesses with 20 or more workplaces have an employment quota. The report and the compensatory levy are due by 31 March for the previous year.
+- de: Betriebsarzt
+  en: Company doctor
+- de: Betriebsnummer
+  en: Establishment number (Betriebsnummer)
+- de: Betriebsnummer beantragen
+  en: Apply for an establishment number
+- de: Betroffen sind etwa Immobilienmakler, Wohnimmobilienverwalter und Versicherungsvermittler. Umfang und Nachweis regelt die jeweilige Vorschrift.
+  en: This affects, for example, real estate agents, residential property managers and insurance intermediaries. The scope and proof are set by the relevant regulation.
+- de: Betroffene haben unter anderem Rechte auf Auskunft, Berichtigung, Löschung und Widerspruch. Amtlos zeigt die Frist ab Eingang und führt die Anfrage bis zur Antwort.
+  en: Data subjects have rights including access, rectification, erasure and objection. Amtlos shows the deadline from receipt and tracks the request until it is answered.
+- de: Bevor du Batterien oder Geräte mit Batterien verkaufst, registrierst du dich nach dem Batteriegesetz.
+  en: Before you sell batteries or devices with batteries, you register under the Battery Act (BattDG).
+- de: Bevor du Elektrogeräte verkaufst, registrierst du dich bei der stiftung ear.
+  en: Before you sell electrical devices, you register with stiftung ear.
+- de: Bevor du Lebensmittel herstellst, behandelst oder verkaufst, registrierst du deinen Betrieb bei der Lebensmittelüberwachung.
+  en: Before you produce, handle or sell food, you register your business with the food control authority (Lebensmittelüberwachung).
+- de: Bevor du die erste Person einstellst, brauchst du eine Betriebsnummer von der Bundesagentur für Arbeit.
+  en: Before you hire your first person, you need an establishment number (Betriebsnummer) from the Federal Employment Agency (Bundesagentur für Arbeit).
+- de: Bevor du verpackte Waren erstmals in Verkehr bringst, registrierst du dich im LUCID-Register und beteiligst dich an einem System.
+  en: Before you place packaged goods on the market for the first time, you register in the LUCID register and join a system.
+- de: Bevor jemand bei dir arbeitet, schreibst du auf, welche Gefahren es an den Arbeitsplätzen gibt und was du dagegen tust.
+  en: Before anyone works for you, you write down what hazards exist at the workplaces and what you do about them.
+- de: Bewahre Belege nachvollziehbar und unveränderbar auf und beschreibe in einer Verfahrensdokumentation, wie du das machst.
+  en: Keep receipts in a traceable and unalterable way and describe in a process documentation (Verfahrensdokumentation) how you do this.
+- de: Bewahre Belege und Rechnungen 8 Jahre, Jahresabschlüsse und Bücher 10 Jahre und Geschäftsbriefe 6 Jahre auf.
+  en: Keep receipts and invoices for 8 years, annual financial statements and books for 10 years and business letters for 6 years.
+- de: Bis zum 10. nach Ende des Anmeldezeitraums meldest du die Lohnsteuer beim Finanzamt an.
+  en: By the 10th after the end of the filing period, you file the wage tax return (Lohnsteuer-Anmeldung) with the tax office (Finanzamt).
+- de: Bis zur Änderung gilt § 38 BDSG weiter – Benennung nicht vorschnell aufheben
+  en: Until the change, § 38 BDSG continues to apply – do not revoke the appointment prematurely
+- de: Buchführungspflicht nach § 141 AO – Gewinngrenze
+  en: Mandatory bookkeeping under § 141 AO – profit limit
+- de: Buchführungspflicht nach § 141 AO – Umsatzgrenze
+  en: Mandatory bookkeeping under § 141 AO – revenue limit
+- de: Buchführungspflichtig ist, wer nach dem Handelsgesetzbuch dazu verpflichtet ist oder die Grenzen nach § 141 AO überschreitet (800.000 € Umsatz oder 80.000 € Gewinn). Amtlos erstellt keine Bilanz selbst,
+    sondern übergibt an deine Steuerberatung (E-051).
+  en: You are required to keep books if the German Commercial Code (HGB) requires it or if you exceed the limits under § 141 AO (€800,000 revenue or €80,000 profit). Amtlos does not prepare a balance sheet
+    itself but hands over to your tax adviser (E-051).
+- de: 'Buchungsbelege einschließlich Rechnungen: 8 Jahre. Jahresabschlüsse, Bücher und Organisationsunterlagen: 10 Jahre. Handels- und Geschäftsbriefe: 6 Jahre. Amtlos zeigt dir, wann du Unterlagen löschen
+    darfst.'
+  en: 'Accounting vouchers including invoices: 8 years. Annual financial statements, books and organisational documents: 10 years. Commercial and business letters: 6 years. Amtlos shows you when you may
+    delete records.'
+- de: Bundesagentur für Arbeit, Betriebsnummern-Service
+  en: Federal Employment Agency (Bundesagentur für Arbeit), establishment number service
+- de: Bundesamt für Sicherheit in der Informationstechnik (BSI)
+  en: Federal Office for Information Security (BSI)
+- de: Bundesministerium für Wirtschaft und Klimaschutz
+  en: Federal Ministry for Economic Affairs and Climate Action
+- de: Bundeszentralamt für Steuern
+  en: Federal Central Tax Office (Bundeszentralamt für Steuern)
+- de: Bundeszentralamt für Steuern (BZSt)
+  en: Federal Central Tax Office (BZSt)
+- de: Bußgeld möglich; Haftungsrisiko bei Arbeitsunfällen.
+  en: Fine possible; liability risk in case of workplace accidents.
+- de: Bußgelder bis 10 Mio. € bzw. 2 % des Umsatzes sind möglich.
+  en: Fines of up to €10 million or 2% of revenue are possible.
+- de: Damit Amtlos die Termine der Lohnsteuer-Anmeldung berechnen kann, brauchst du den Anmeldezeitraum.
+  en: So that Amtlos can calculate the dates for the payroll tax return (Lohnsteuer-Anmeldung), you need the filing period.
+- de: Das Arbeitssicherheitsgesetz und die DGUV Vorschrift 2 verlangen eine Betreuung durch eine Fachkraft für Arbeitssicherheit und einen Betriebsarzt. Kleinbetriebe können das Unternehmermodell der Berufsgenossenschaft
+    nutzen.
+  en: The Occupational Safety Act (Arbeitssicherheitsgesetz) and DGUV Vorschrift 2 require support from an occupational safety specialist and a company doctor. Small businesses can use the employer model
+    (Unternehmermodell) of the employers' liability insurance association (Berufsgenossenschaft).
+- de: Das BFSG nennt die betroffenen Produkte abschließend. Prüfe, ob deine Produkte dazugehören.
+  en: The BFSG lists the affected products exhaustively. Check whether your products are among them.
+- de: Das Finanzamt hat Vorauszahlungen festgesetzt.
+  en: The tax office has set prepayments.
+- de: Das Hinweisgeberschutzgesetz verlangt ab 50 Beschäftigten eine interne Meldestelle.
+  en: The Whistleblower Protection Act (HinSchG) requires an internal reporting channel from 50 employees.
+- de: Das Impressum nennt unter anderem Name, Anschrift und Kontakt, bei Gesellschaften auch Vertretung und Register. Der Online-Check prüft, ob es verlinkt ist.
+  en: The legal notice includes, among other things, name, address and contact details, and for companies also the legal representatives and register details. The online check verifies that it is linked.
+- de: Das Kapital, das die Gesellschafter bei der Gründung einer GmbH oder UG mindestens aufbringen.
+  en: The minimum capital that the shareholders contribute when founding a GmbH or UG.
+- de: Das Nachweisgesetz verlangt, dass die wesentlichen Arbeitsbedingungen dokumentiert und der beschäftigten Person ausgehändigt werden.
+  en: The Verification Act (Nachweisgesetz) requires that the essential working conditions are documented and handed to the employee.
+- de: Das Verpackungsgesetz verlangt Registrierung bei der Zentralen Stelle Verpackungsregister (LUCID) und Systembeteiligung vor dem ersten Inverkehrbringen.
+  en: The Packaging Act (Verpackungsgesetz) requires registration with the Central Agency Packaging Register (Zentrale Stelle Verpackungsregister, LUCID) and system participation before first placing on
+    the market.
+- de: Das Verzeichnis beschreibt je Verarbeitung Zweck, betroffene Personen, Datenarten, Empfänger und Löschfristen. Amtlos hilft beim Anlegen und erzeugt das Verzeichnis als PDF.
+  en: For each processing activity, the record describes the purpose, people affected, types of data, recipients and deletion periods. Amtlos helps you set it up and generates the record as a PDF.
+- de: Das Verzeichnis der Handwerkskammer, in dem Handwerksbetriebe eingetragen sind.
+  en: The Chamber of Crafts' register in which craft businesses are entered.
+- de: Daten deiner Beschäftigten verarbeitest du nur, soweit es für das Arbeitsverhältnis nötig ist.
+  en: You process your employees' data only as far as necessary for the employment relationship.
+- de: Daten dürfen nur so lange gespeichert werden, wie es für den Zweck nötig ist. Gesetzliche Aufbewahrungspflichten (z. B. für Rechnungen) gehen vor.
+  en: Data may only be stored as long as necessary for the purpose. Statutory retention obligations (e.g. for invoices) take precedence.
+- de: Datenpanne der Aufsichtsbehörde melden
+  en: Report a data breach to the supervisory authority
+- de: Datenschutz-Aufsichtsbehörde des Landes
+  en: State data protection supervisory authority
+- de: Datenschutzbeauftragten benennen
+  en: Appoint a data protection officer
+- de: Datenschutzerklärung auf der Website
+  en: Privacy policy on your website
+- de: Dazu gehören Risikoanalyse, Identifizierung der Vertragspartner und Verdachtsmeldungen.
+  en: This includes a risk analysis, identifying contracting parties and reporting suspicious activity.
+- de: Dazu gehören eine verantwortliche Person, eine Sicherheitsbewertung und eine Produktinformationsdatei.
+  en: These include a responsible person, a safety assessment and a product information file.
+- de: Dazu gehören unter anderem die Identifizierung der Vertragspartner und ein Risikomanagement. Die Schwelle steht im Gesetz; Amtlos führt sie nach fachlicher Prüfung als Regelwert.
+  en: These include, among other things, identifying your contractual partners and risk management. The threshold is set out in the law; Amtlos keeps it as a standard value after expert review.
+- de: Dein Betrieb gehört zu Gesundheit und Pflege.
+  en: Your business is in health and care.
+- de: Dein Betrieb gehört zu Transport und Logistik.
+  en: Your business is in transport and logistics.
+- de: Dein Betrieb gehört zu einer Branche mit Sofortmeldepflicht.
+  en: Your business belongs to an industry with an immediate reporting obligation.
+- de: Dein Betrieb gehört zur Baubranche.
+  en: Your business is in the construction industry.
+- de: Dein Betrieb gehört zur Beauty- und Kosmetikbranche.
+  en: Your business is in the beauty and cosmetics industry.
+- de: Dein Betrieb gehört zur Gastronomie oder Lebensmittelbranche.
+  en: Your business is in the hospitality or food industry.
+- de: Dein Betrieb gehört zur Immobilien- oder Finanzbranche.
+  en: Your business is in the real estate or finance industry.
+- de: Dein Betrieb ist ein Handwerk nach Anlage A oder B der Handwerksordnung.
+  en: Your business is a craft under Annex A or B of the Handwerksordnung.
+- de: Dein Betrieb ist ein Handwerksbetrieb.
+  en: Your business is a skilled trade business (Handwerksbetrieb).
+- de: Dein Geschäftsjahr ist das Kalenderjahr.
+  en: Your financial year is the calendar year.
+- de: Dein Geschäftsjahr weicht vom Kalenderjahr ab.
+  en: Your financial year differs from the calendar year.
+- de: Dein Gewinn im Vorjahr lag über der Grenze für die Buchführungspflicht.
+  en: Your profit in the previous year was above the limit for mandatory bookkeeping.
+- de: Dein Umsatz im Gründungsjahr hat 80 % der Grenze erreicht.
+  en: Your revenue in your founding year has reached 80% of the limit.
+- de: Dein Umsatz im Gründungsjahr hat 95 % der Grenze erreicht.
+  en: Your revenue in your founding year has reached 95% of the limit.
+- de: Dein Umsatz im Vorjahr lag über 800.000 €.
+  en: Your revenue in the previous year was above €800,000.
+- de: Dein Umsatz im Vorjahr lag über der Grenze für die Buchführungspflicht.
+  en: Your revenue in the previous year was above the limit for mandatory bookkeeping.
+- de: Dein Umsatz im Vorjahr lag über der Grenze.
+  en: Your revenue in the previous year was above the limit.
+- de: Dein Umsatz in diesem Jahr hat 80 % der Grenze erreicht.
+  en: Your revenue this year has reached 80% of the limit.
+- de: Dein Umsatz in diesem Jahr hat 95 % der Grenze erreicht.
+  en: Your revenue this year has reached 95% of the limit.
+- de: Dein Umsatz lag über 2 Mio. €.
+  en: Your revenue was over €2 million.
+- de: Dein Unternehmen fällt unter NIS2.
+  en: Your company falls under NIS2.
+- de: Dein Unternehmen ist eine Kapitalgesellschaft.
+  en: Your company is a corporation (Kapitalgesellschaft).
+- de: Dein Unternehmen ist eine UG (haftungsbeschränkt).
+  en: Your company is a UG (haftungsbeschränkt).
+- de: Dein Unternehmen ist eine UG oder GmbH.
+  en: Your company is a UG or GmbH.
+- de: Dein Unternehmen ist im Handelsregister eingetragen.
+  en: Your company is registered in the commercial register (Handelsregister).
+- de: Dein erwarteter Umsatz im Gründungsjahr liegt über der Grenze für das Gründungsjahr.
+  en: Your expected revenue in your founding year is above the limit for the founding year.
+- de: Dein erwarteter Umsatz in diesem Jahr liegt über 800.000 €.
+  en: Your expected revenue this year is above €800,000.
+- de: Dein erwarteter Umsatz in diesem Jahr liegt über der Grenze.
+  en: Your expected revenue this year is above the limit.
+- de: Deine Gesellschaft ist noch nicht im Handelsregister eingetragen.
+  en: Your company is not yet entered in the commercial register (Handelsregister).
+- de: Deine Krankenversicherung
+  en: Your health insurance
+- de: Deine Rechnungen müssen bestimmte Angaben enthalten. Als Kleinunternehmer brauchst du einen Hinweis auf § 19 UStG.
+  en: Your invoices must contain certain details. Under the small business scheme, you need a reference to § 19 UStG.
+- de: Deine Selbstständigkeit hat noch nicht begonnen.
+  en: Your self-employment has not started yet.
+- de: Deine Tätigkeit fällt unter eine erlaubnispflichtige Vorschrift der Gewerbeordnung.
+  en: Your activity falls under a provision of the Trade Regulation Act (Gewerbeordnung) that requires a permit.
+- de: Deine Tätigkeit ist ein Gewerbe.
+  en: Your activity is a trade (Gewerbe).
+- de: Deine Umsatzsteuer im Vorjahr lag über der Grenze für eine Befreiung.
+  en: Your VAT in the previous year was above the limit for an exemption.
+- de: Deine Website nutzt Tracking.
+  en: Your website uses tracking.
+- de: Deine elektronische Kasse braucht eine technische Sicherheitseinrichtung (TSE), und du musst Belege ausgeben.
+  en: Your electronic cash register needs a technical security device (TSE), and you must issue receipts.
+- de: Den Anmeldezeitraum (monatlich, vierteljährlich oder jährlich) bestimmt das Finanzamt nach der Lohnsteuer des Vorjahres. Trag ihn in deinem Profil ein; Amtlos berechnet daraus die Termine.
+  en: The filing period (monthly, quarterly or annually) is set by the tax office (Finanzamt) based on the previous year's wage tax. Enter it in your profile; Amtlos calculates the dates from it.
+- de: Den Anmeldezeitraum teilt dir das Finanzamt mit. Du findest ihn in deinen Unterlagen zur Lohnsteuer oder fragst deine Steuerberatung.
+  en: The tax office (Finanzamt) tells you the filing period. You can find it in your payroll tax documents or ask your tax adviser.
+- de: Den Jahresabschluss reichst du spätestens zwölf Monate nach Ende deines Geschäftsjahres beim Unternehmensregister ein.
+  en: You file the annual financial statements with the company register (Unternehmensregister) no later than twelve months after the end of your financial year.
+- de: Den Jahresabschluss reichst du spätestens zwölf Monate nach Ende des Geschäftsjahres beim Unternehmensregister ein.
+  en: You submit the annual financial statements to the company register (Unternehmensregister) no later than twelve months after the end of the financial year.
+- de: Der Anmeldezeitraum fehlt noch.
+  en: The filing period is still missing.
+- de: Der Beitragsnachweis kündigt der Krankenkasse die Beiträge an. Er muss zwei Arbeitstage vor dem Fälligkeitstag vorliegen und wird vom Lohnprogramm übermittelt.
+  en: The contribution statement notifies the health insurance fund of the contributions. It must be received two working days before the due date and is submitted by your payroll software.
+- de: Der Button, mit dem Verbraucher kostenpflichtig bestellen, muss eindeutig auf die Zahlungspflicht hinweisen.
+  en: The button consumers use to place a paid order must clearly indicate the obligation to pay.
+- de: Der Gründungszuschuss ist eine Förderung der Agentur für Arbeit. Er muss vor Beginn der Selbstständigkeit beantragt werden.
+  en: The start-up grant (Gründungszuschuss) is funding from the Federal Employment Agency (Agentur für Arbeit). You must apply for it before you start your self-employment.
+- de: Der Hautschutzplan ergänzt die Gefährdungsbeurteilung und die Unterweisung.
+  en: The skin protection plan supplements the risk assessment and the safety briefing.
+- de: Der Jahresabschluss wird öffentlich zugänglich beim Unternehmensregister eingereicht.
+  en: The annual financial statements are filed with the company register (Unternehmensregister), where they are publicly accessible.
+- de: Der Mindestlohn beträgt 13,90 € je Stunde ab 1.1.2026 und 14,60 € ab 1.1.2027. Amtlos führt die Werte mit Gültigkeitszeitraum.
+  en: The minimum wage is €13.90 per hour from 1.1.2026 and €14.60 from 1.1.2027. Amtlos keeps the values with their validity period.
+- de: Der Notar meldet die Gesellschaft zum Handelsregister an; mit der Eintragung entsteht die GmbH oder UG.
+  en: The notary registers the company with the commercial register (Handelsregister); the GmbH or UG comes into existence upon entry.
+- de: Der Vertrag regelt, wie der Dienstleister die Daten nach deinen Weisungen verarbeitet. Amtlos führt die Liste deiner Dienstleister und legt die Verträge ab.
+  en: The agreement sets out how the service provider processes the data according to your instructions. Amtlos keeps the list of your service providers and files the agreements.
+- de: Der „Digital Omnibus“ hat die Hochrisiko-Pflichten verschoben. Betroffen sind vor allem Anbieter und Betreiber von KI in sensiblen Bereichen.
+  en: The "Digital Omnibus" postponed the high-risk obligations. They mainly affect providers and deployers of AI in sensitive areas.
+- de: Deutsche Bundesbank
+  en: Deutsche Bundesbank
+- de: Deutsche Rentenversicherung
+  en: German Pension Insurance (Deutsche Rentenversicherung)
+- de: Deutsche Rentenversicherung (Clearingstelle)
+  en: German Pension Insurance (Deutsche Rentenversicherung), clearing office (Clearingstelle)
+- de: Deutsche Rentenversicherung (über Lohnprogramm)
+  en: German Pension Insurance (Deutsche Rentenversicherung) (via payroll software)
+- de: Deutsche Rentenversicherung, Clearingstelle
+  en: German Pension Insurance (Deutsche Rentenversicherung), clearing office (Clearingstelle)
+- de: Die Abmeldung (DEÜV) geht an die Krankenkasse bzw. die Minijob-Zentrale, über das Lohnprogramm.
+  en: The deregistration (DEÜV) goes to the health insurance fund (Krankenkasse) or the mini-job centre (Minijob-Zentrale), via the payroll software.
+- de: Die Anforderungen ergeben sich aus dem Infektionsschutz und den Hygieneverordnungen der Länder.
+  en: The requirements come from infection protection law and the hygiene ordinances of the federal states.
+- de: Die Anmeldung zur Sozialversicherung (DEÜV) geht an die Krankenkasse der beschäftigten Person, bei Minijobs an die Minijob-Zentrale. Die Meldung läuft über ein systemgeprüftes Lohnprogramm.
+  en: The social security registration (DEÜV) goes to the employee's health insurance fund (Krankenkasse), or to the mini-job centre (Minijob-Zentrale) for mini-jobs. The notification is sent via system-certified
+    payroll software.
+- de: Die Aussetzung der monatlichen Voranmeldung für Neugründer endet am 31.12.2026 – ob sie verlängert wird, ist offen.
+  en: The suspension of the monthly advance return for new founders ends on 31.12.2026 – whether it will be extended is open.
+- de: Die Außenwirtschaftsverordnung verlangt Meldungen bei grenzüberschreitenden Zahlungen über einer Meldegrenze. Die Grenze steht als Regelwert in Amtlos, sobald sie fachlich freigegeben ist.
+  en: The Foreign Trade and Payments Ordinance (Außenwirtschaftsverordnung) requires reports for cross-border payments above a reporting threshold. The threshold will be stored as a rule value in Amtlos
+    as soon as it has been approved by experts.
+- de: Die Beiträge zur Sozialversicherung sind am drittletzten Bankarbeitstag des Monats fällig.
+  en: Social security contributions are due on the third-to-last bank working day of the month.
+- de: Die Berufsgenossenschaft ist die gesetzliche Unfallversicherung für Betriebe. Welche zuständig ist, hängt von deiner Branche ab. Ob du dich selbst als Unternehmer versichern musst, hängt ebenfalls
+    von der Branche ab.
+  en: The employers' liability insurance association (Berufsgenossenschaft) is the statutory accident insurance for businesses. Which one is responsible depends on your industry. Whether you must insure
+    yourself as a business owner also depends on the industry.
+- de: Die Betriebsnummer identifiziert deinen Betrieb in allen Meldungen zur Sozialversicherung. Du beantragst sie beim Betriebsnummern-Service der Bundesagentur für Arbeit, bevor die erste Person bei dir
+    anfängt.
+  en: The establishment number identifies your business in all social security reports. You apply for it at the establishment number service of the Federal Employment Agency (Bundesagentur für Arbeit) before
+    your first person starts working for you.
+- de: Die Bilanz deiner Gesellschaft übermittelst du elektronisch ans Finanzamt.
+  en: You submit your company's balance sheet electronically to the tax office (Finanzamt).
+- de: Die Bilanz in elektronischer Form, die ans Finanzamt übermittelt wird.
+  en: The balance sheet in electronic form, submitted to the tax office (Finanzamt).
+- de: Die Bundesregierung plant, die Benennungspflicht ab 20 Personen nach § 38 BDSG zu streichen.
+  en: The federal government plans to remove the obligation to appoint a data protection officer from 20 people under § 38 BDSG.
+- de: Die Datenschutzerklärung muss von jeder Seite erreichbar sein. Inhaltlich folgt sie den Informationspflichten der DSGVO (Katalog F).
+  en: The privacy policy must be reachable from every page. Its content follows the GDPR information obligations (catalogue F).
+- de: Die E-Bilanz ist die elektronische Übermittlung von Bilanz und Gewinn- und Verlustrechnung an das Finanzamt.
+  en: The E-Bilanz is the electronic submission of the balance sheet and profit and loss statement to the tax office (Finanzamt).
+- de: Die EU-Entgelttransparenzrichtlinie war bis 7.6.2026 umzusetzen; das deutsche Gesetz steht aus. Bis dahin gilt das bisherige Entgelttransparenzgesetz weiter.
+  en: The EU Pay Transparency Directive had to be transposed by 7.6.2026; the German law is still pending. Until then, the existing Pay Transparency Act (Entgelttransparenzgesetz) continues to apply.
+- de: Die Einkommensteuererklärung übermittelst du elektronisch. Die Frist ist mit und ohne Steuerberatung unterschiedlich.
+  en: You submit your income tax return electronically. The deadline differs depending on whether you use a tax adviser.
+- de: Die Erstbelehrung macht das Gesundheitsamt oder ein beauftragter Arzt; die Bescheinigung bewahrst du auf. Danach belehrst du selbst in Abständen. Amtlos dokumentiert die Belehrung im Unterweisungsmodul.
+  en: The initial instruction is given by the public health office (Gesundheitsamt) or an appointed doctor; you keep the certificate. After that, you give the instruction yourself at intervals. Amtlos documents
+    the instruction in the safety briefing module.
+- de: Die Folgen sind noch nicht fachlich erfasst.
+  en: The consequences have not yet been reviewed by experts.
+- de: Die Frist beginnt, sobald du von der Panne erfährst. Keine Meldung ist nötig, wenn voraussichtlich kein Risiko für die Betroffenen besteht – das entscheidest und dokumentierst du. Amtlos zeigt einen
+    Countdown und erstellt einen Meldeentwurf.
+  en: The deadline starts as soon as you become aware of the breach. No report is required if there is likely no risk to the people affected – you decide and document this. Amtlos shows a countdown and
+    creates a draft report.
+- de: Die Gefahrstoffverordnung verlangt ein Verzeichnis der Gefahrstoffe und Betriebsanweisungen für die Beschäftigten.
+  en: The Hazardous Substances Ordinance (Gefahrstoffverordnung) requires a register of hazardous substances and operating instructions for employees.
+- de: Die Gemeinde hat Gewerbesteuer-Vorauszahlungen festgesetzt.
+  en: The municipality has set trade tax prepayments.
+- de: Die Geschäftsführung einer GmbH oder UG hat gesetzliche Pflichten. Wer sie verletzt, kann persönlich haften. Amtlos erklärt die Pflichten allgemein; für deinen Einzelfall hilft eine Rechtsberatung.
+  en: The management of a GmbH or UG has statutory duties. Anyone who breaches them can be personally liable. Amtlos explains the duties in general; for your individual case, legal advice can help.
+- de: Die Gewerbeanzeige machst du bei deiner Gemeinde, meist online. Die Gebühr hängt von der Gemeinde ab. Das Gewerbeamt informiert danach Finanzamt, IHK oder Handwerkskammer und weitere Stellen.
+  en: You submit the trade registration (Gewerbeanzeige) to your municipality, usually online. The fee depends on the municipality. The trade office (Gewerbeamt) then informs the tax office, the IHK or
+    Chamber of Crafts and other bodies.
+- de: Die Gewerbesteuer hängt vom Hebesatz deiner Gemeinde ab. Einzelunternehmen und Personengesellschaften haben einen Freibetrag.
+  en: Trade tax depends on your municipality's multiplier (Hebesatz). Sole proprietorships and partnerships have a tax-free allowance.
+- de: Die GoBD regeln, wie Bücher und Belege elektronisch geführt und aufbewahrt werden. Die Verfahrensdokumentation beschreibt deine Abläufe.
+  en: The GoBD set out how books and receipts are kept and stored electronically. The process documentation describes your procedures.
+- de: Die Gründung einer GmbH oder UG beginnt mit dem Gesellschaftsvertrag, den ein Notar beurkundet. Die Beurkundung ist auch online möglich. Für die GmbH beträgt das Stammkapital mindestens 25.000 €,
+    davon ist mindestens die Hälfte einzuzahlen. Eine UG kann ab 1 € gegründet werden.
+  en: Founding a GmbH or UG starts with the articles of association, which are notarised by a notary. Notarisation is also possible online. For a GmbH, the share capital is at least €25,000, of which at
+    least half must be paid in. A UG can be founded from €1.
+- de: Die Hinweispflicht nach § 36 VSBG gilt für Unternehmer mit mehr als 10 Beschäftigten, die eine Website unterhalten oder AGB verwenden.
+  en: The notice obligation under § 36 VSBG applies to businesses with more than 10 employees that run a website or use terms and conditions.
+- de: Die Höhe steht im Bescheid deiner Gemeinde.
+  en: The amount is stated in your municipality's tax notice.
+- de: Die Information nennt unter anderem Zweck, Rechtsgrundlage, Empfänger, Speicherdauer und die Rechte der Betroffenen.
+  en: The information includes, among other things, the purpose, legal basis, recipients, storage period and the rights of the people affected.
+- de: Die Insolvenzantragspflicht nach § 15a InsO trifft die Geschäftsführung. Die genauen Fristen stehen als geprüfte Regeldaten in Amtlos, sobald sie fachlich freigegeben sind.
+  en: The obligation to file for insolvency under § 15a InsO applies to the management. The exact deadlines will be stored as verified rule data in Amtlos as soon as they have been approved by experts.
+- de: Die Jahreserklärung fasst die Umsatzsteuer des ganzen Jahres zusammen.
+  en: The annual return summarises the VAT for the whole year.
+- de: Die Jahresmeldung (DEÜV) übermittelt das Lohnprogramm für alle, die über den Jahreswechsel beschäftigt sind.
+  en: The payroll software sends the annual notification (DEÜV) for everyone employed over the turn of the year.
+- de: Die Kleinunternehmerregelung endet ab dem Umsatz, der die Grenze überschreitet. Amtlos zählt dafür die Rechnungen, die du in Amtlos gestellt hast. Rechnungen außerhalb von Amtlos sind nicht enthalten.
+  en: The small business scheme (Kleinunternehmerregelung) ends from the sale that exceeds the limit. For this, Amtlos counts the invoices you issued in Amtlos. Invoices outside Amtlos are not included.
+- de: Die Kleinunternehmerregelung endet ab dem Umsatz, der die Grenze überschreitet. Prüfe mit dem Finanzamt oder deiner Steuerberatung, ab wann du Umsatzsteuer ausweisen und anmelden musst.
+  en: The small business scheme (Kleinunternehmerregelung) ends from the sale that exceeds the limit. Check with the tax office (Finanzamt) or your tax adviser from when you must show and declare VAT.
+- de: 'Die Kleinunternehmerregelung gilt, wenn dein Umsatz im Vorjahr höchstens 25.000 € betrug und im laufenden Jahr 100.000 € nicht übersteigt. Im Gründungsjahr gilt 25.000 € für das laufende Jahr. Die
+    Grenze ist hart: Ab dem Umsatz, der sie überschreitet, endet der Status. Wer auf die Regelung verzichtet, ist fünf Jahre daran gebunden.'
+  en: 'The small business scheme (Kleinunternehmerregelung) applies if your revenue in the previous year was no more than €25,000 and does not exceed €100,000 in the current year. In the founding year,
+    €25,000 applies for the current year. The limit is strict: your status ends from the sale that exceeds it. If you opt out of the scheme, you are bound by that choice for five years.'
+- de: Die Lebensmittelinformationsverordnung verlangt Angaben zu Allergenen. Amtlos führt eine Allergenliste je Gericht und erstellt daraus eine Übersicht zum Aushängen.
+  en: The Food Information Regulation (LMIV) requires information on allergens. Amtlos keeps an allergen list per dish and creates an overview from it for you to post.
+- de: Die Lohnabrechnung selbst macht ein systemgeprüfter Partner; Amtlos liefert Stammdaten und Fristen.
+  en: The payroll itself is done by a system-certified partner; Amtlos provides master data and deadlines.
+- de: Die Maßnahmen (TOM) müssen dem Risiko angemessen sein. Amtlos gliedert sie nach den Schutzzielen der DSGVO; du trägst ein, was umgesetzt ist.
+  en: The measures (TOM) must be appropriate to the risk. Amtlos organises them according to the protection goals of the GDPR; you enter what has been implemented.
+- de: Die Menschen, denen eine Gesellschaft letztlich gehört oder die sie kontrollieren.
+  en: The people who ultimately own or control a company.
+- de: Die Minijob-Grenze ist an den Mindestlohn gekoppelt. Amtlos führt die Werte mit Gültigkeitszeitraum.
+  en: The mini-job limit is linked to the minimum wage. Amtlos keeps the values with their validity period.
+- de: Die Mitgliedschaft entsteht automatisch mit dem Gewerbe; du musst dich nicht selbst anmelden. Die Kammer meldet sich bei dir und setzt den Beitrag fest.
+  en: Membership starts automatically with your trade; you do not have to register yourself. The chamber will contact you and set the fee.
+- de: Die Mitteilung an die zuständige Aufsichtsbehörde ist Pflicht des Arbeitgebers.
+  en: Notifying the competent supervisory authority is the employer's obligation.
+- de: Die Pflicht folgt aus § 38 BDSG bzw. Art. 37 DSGVO. Die Bundesregierung plant, § 38 BDSG bis Ende 2026 zu streichen; ein Gesetz gibt es noch nicht.
+  en: The obligation follows from § 38 BDSG or Art. 37 GDPR. The federal government plans to remove § 38 BDSG by the end of 2026; there is no law yet.
+- de: Die Pflicht nach Art. 4 KI-Verordnung gilt seit 2.2.2025, durchgesetzt wird sie ab August 2026. Amtlos bietet Schulungen mit Bestätigung als Nachweis.
+  en: The obligation under Art. 4 of the AI Act has applied since 2.2.2025 and will be enforced from August 2026. Amtlos offers training with a confirmation as proof.
+- de: Die Pflicht zum Versand strukturierter E-Rechnungen (XRechnung oder ZUGFeRD) gilt ab 1.1.2027 für Unternehmen mit mehr als 800.000 € Vorjahresumsatz. Kleinunternehmer sind befreit. Eine PDF-Rechnung
+    ist keine E-Rechnung.
+  en: The obligation to send structured e-invoices (XRechnung or ZUGFeRD) applies from 1.1.2027 to businesses with more than €800,000 in previous year's revenue. Small businesses under the small business
+    scheme (Kleinunternehmerregelung) are exempt. A PDF invoice is not an e-invoice.
+- de: Die Preisangabenverordnung regelt, wie Preise gegenüber Verbrauchern anzugeben sind.
+  en: The Price Indication Ordinance (Preisangabenverordnung) governs how prices must be stated to consumers.
+- de: Die Produktsicherheitsverordnung gilt seit 13.12.2024. Im Onlineshop müssen Herstellerangaben und Sicherheitsinformationen beim Angebot stehen.
+  en: The General Product Safety Regulation has applied since 13.12.2024. In an online shop, manufacturer information and safety information must be shown with the offer.
+- de: Die Regeln gelten für bestimmte Fahrzeugklassen. Daten aus Fahrtenschreibern müssen ausgelesen und aufbewahrt werden.
+  en: The rules apply to certain vehicle classes. Tachograph data must be downloaded and retained.
+- de: Die Registrierung ist Voraussetzung für die Meldewege bei Sicherheitsvorfällen.
+  en: Registration is a prerequisite for the reporting channels for security incidents.
+- de: Die Sozialkassen regeln unter anderem Urlaub und Berufsbildung in der Bauwirtschaft. Ob dein Betrieb erfasst ist, hängt von den überwiegenden Tätigkeiten ab.
+  en: Among other things, the social funds cover holidays and vocational training in the construction industry. Whether your business is covered depends on its predominant activities.
+- de: Die Spezifikation verlangt, den Status des früheren OS-Plattform-Links zu prüfen und aktuell zu halten. Der Online-Check meldet, ob der Link auf deiner Website steht.
+  en: The specification requires checking the status of the former ODR platform link and keeping it up to date. The online check reports whether the link is on your website.
+- de: Die Statusfeststellung ist eine Möglichkeit, keine Pflicht. Sie schafft Sicherheit, wenn das Risiko der Scheinselbstständigkeit besteht.
+  en: The status determination is an option, not an obligation. It gives you certainty if there is a risk of bogus self-employment.
+- de: Die UG (haftungsbeschränkt) muss 25 % ihres Jahresüberschusses in eine gesetzliche Rücklage einstellen.
+  en: A UG (haftungsbeschränkt) must transfer 25% of its annual net profit to a statutory reserve.
+- de: Die Umlagen finanzieren die Erstattung von Entgeltfortzahlung, Mutterschaftsleistungen und das Insolvenzgeld. Die eAU rufst du bei der Krankenkasse ab, meist über das Lohnprogramm.
+  en: The levies fund reimbursement of continued pay during illness, maternity benefits and insolvency pay. You retrieve the eAU from the health insurance fund (Krankenkasse), usually via the payroll software.
+- de: Die Umsatzsteuer-Identifikationsnummer brauchst du für Geschäfte innerhalb der EU.
+  en: You need the VAT identification number for business within the EU.
+- de: Die Unfallanzeige ist nötig, wenn die Arbeitsunfähigkeit mehr als drei Tage dauert. Amtlos legt die Frist ab dem Unfalltag an; ob die Grenze erreicht ist, entscheidest du beim Erledigen.
+  en: The accident report is required if the inability to work lasts more than three days. Amtlos sets the deadline from the day of the accident; you decide whether the threshold has been reached when you
+    complete the task.
+- de: Die Unfallversicherung für Arbeitsunfälle und Berufskrankheiten in deiner Branche.
+  en: The accident insurance for workplace accidents and occupational diseases in your industry.
+- de: Die Unterweisung erklärt die Gefährdungen am Arbeitsplatz und die Schutzmaßnahmen aus der Gefährdungsbeurteilung. Amtlos protokolliert sie digital mit Unterschrift.
+  en: The safety briefing explains the workplace hazards and the protective measures from the risk assessment. Amtlos records it digitally with a signature.
+- de: Die Verordnung zur arbeitsmedizinischen Vorsorge regelt Pflicht-, Angebots- und Wunschvorsorge. Bei Bildschirmarbeit ist Vorsorge anzubieten.
+  en: The Ordinance on Occupational Health Care (Verordnung zur arbeitsmedizinischen Vorsorge) covers mandatory, offered and requested check-ups. For screen work, a check-up must be offered.
+- de: Die Zusammenfassende Meldung ist bei innergemeinschaftlichen Leistungen an Unternehmen (B2B) abzugeben.
+  en: The EC sales list must be submitted for intra-Community services to businesses (B2B).
+- de: Die allgemeine Gefährdungsbeurteilung (E.50) wird im Handwerk je Gewerk und Tätigkeit konkretisiert. Branchenvorlagen folgen nach fachlicher Prüfung.
+  en: In skilled trades, the general risk assessment (E.50) is made specific per trade and activity. Industry templates will follow after expert review.
+- de: Die anlassunabhängige Gefährdungsbeurteilung nach dem Mutterschutzgesetz ist Teil der allgemeinen Gefährdungsbeurteilung.
+  en: The general risk assessment under the Maternity Protection Act, carried out regardless of any specific occasion, is part of the overall risk assessment.
+- de: Dokumentation und Risikomanagement der Produkte sichten
+  en: Review the documentation and risk management of your products
+- de: Doppelte Buchführung
+  en: Double-entry bookkeeping
+- de: Du arbeitest im IT-, Agentur- oder Freelancer-Bereich.
+  en: You work in IT, as an agency or as a freelancer.
+- de: Du arbeitest im Wesentlichen für einen Auftraggeber.
+  en: You work mainly for one client.
+- de: Du arbeitest überwiegend für einen Auftraggeber.
+  en: You mainly work for one client.
+- de: Du bekommst Arbeitslosengeld I.
+  en: You receive unemployment benefit I (Arbeitslosengeld I).
+- de: Du beschäftigst Jugendliche.
+  en: You employ young people.
+- de: Du beschäftigst Minijobber.
+  en: You employ mini-jobbers.
+- de: Du beschäftigst mehr als 10 Personen.
+  en: You employ more than 10 people.
+- de: Du beschäftigst mehr als 150 Personen.
+  en: You employ more than 150 people.
+- de: Du beschäftigst mindestens eine Person.
+  en: You employ at least one person.
+- de: Du betreibst eine Gaststätte.
+  en: You run a restaurant or bar.
+- de: Du bietest Abos an.
+  en: You offer subscriptions.
+- de: Du bietest arbeitsmedizinische Vorsorge an, zum Beispiel die Angebotsvorsorge bei Bildschirmarbeit.
+  en: You offer occupational health check-ups, for example the offered check-up for screen work.
+- de: Du bist als Person oder über eine Personengesellschaft unternehmerisch tätig.
+  en: You are self-employed as an individual or through a partnership.
+- de: Du bist im Gründungsjahr.
+  en: You are in your founding year.
+- de: Du bist nicht zur doppelten Buchführung verpflichtet.
+  en: You are not required to use double-entry bookkeeping.
+- de: Du bist unsicher, ob NIS2 für dich gilt.
+  en: You are unsure whether NIS2 applies to you.
+- de: Du bist unsicher, ob deine Tätigkeit ein Gewerbe oder ein freier Beruf ist.
+  en: You are unsure whether your activity is a trade or a liberal profession.
+- de: Du brauchst eine sicherheitstechnische und betriebsärztliche Betreuung – für Kleinbetriebe auch im Unternehmermodell.
+  en: You need occupational safety and company doctor support – small businesses can also use the employer model (Unternehmermodell).
+- de: Du bringst verpackte Waren in Verkehr.
+  en: You place packaged goods on the market.
+- de: Du erbringst Bauleistungen.
+  en: You provide construction services.
+- de: Du führst ein Verzeichnis, welche Daten über Menschen du wofür verarbeitest.
+  en: You keep a record of which data about people you process and for what purpose.
+- de: Du gehörst zu einer Gruppe von Selbstständigen, die rentenversicherungspflichtig sein kann.
+  en: You belong to a group of self-employed people who may be subject to mandatory pension insurance.
+- de: Du gibst die Voranmeldung monatlich ab.
+  en: You file the advance return monthly.
+- de: Du gründest gerade.
+  en: You are currently founding a company.
+- de: Du hast Beschäftigte.
+  en: You have employees.
+- de: Du hast Investoren aus dem Ausland.
+  en: You have investors from abroad.
+- de: Du hast Kunden in anderen EU-Ländern.
+  en: You have customers in other EU countries.
+- de: Du hast dein Unternehmen im Vorjahr gegründet.
+  en: You founded your business in the previous year.
+- de: Du hast dein Unternehmen in diesem Jahr gegründet.
+  en: You founded your business this year.
+- de: Du hast deinen Anmeldezeitraum angegeben.
+  en: You have entered your filing period.
+- de: Du hast die erste Person eingestellt.
+  en: You have hired your first person.
+- de: Du hast eine Datenpanne entdeckt.
+  en: You have discovered a data breach.
+- de: Du hast eine Dauerfristverlängerung.
+  en: You have a permanent deadline extension (Dauerfristverlängerung).
+- de: Du hast eine Erlaubnis nach § 34c, § 34d oder § 34f GewO.
+  en: You have a permit under § 34c, § 34d or § 34f GewO.
+- de: Du hast eine Kasse außer Betrieb genommen.
+  en: You have decommissioned a cash register.
+- de: Du hast eine Unterweisung durchgeführt.
+  en: You have given a safety briefing.
+- de: Du hast eine Website.
+  en: You have a website.
+- de: Du hast im Vorjahr gegründet.
+  en: You founded your business in the previous year.
+- de: Du hast mehr als 10 Beschäftigte im Sinne des VSBG.
+  en: You have more than 10 employees as defined by the VSBG.
+- de: Du hast mindestens 10 Beschäftigte im Sinne des BFSG.
+  en: You have at least 10 employees as defined by the BFSG.
+- de: Du hast mindestens 2 Versicherte.
+  en: You have at least 2 insured persons.
+- de: Du hast mindestens 20 Arbeitsplätze im Sinne des SGB IX.
+  en: You have at least 20 workplaces within the meaning of SGB IX.
+- de: Du hast mindestens 50 Beschäftigte im Sinne des HinSchG.
+  en: You have at least 50 employees within the meaning of the HinSchG.
+- de: Du hast mindestens eine Betriebsstätte.
+  en: You have at least one business premises.
+- de: Du hast noch nicht angegeben, ob NIS2 für dich gilt.
+  en: You have not yet stated whether NIS2 applies to you.
+- de: Du hast noch nicht angegeben, ob deine Tätigkeit ein Gewerbe oder ein freier Beruf ist.
+  en: You have not yet stated whether your activity is a trade or a liberal profession.
+- de: Du informierst deine Gäste über die 14 Hauptallergene in deinen Speisen und Getränken – auch bei loser Ware.
+  en: You inform your guests about the 14 main allergens in your food and drinks – including unpackaged goods.
+- de: Du kontrollierst und dokumentierst regelmäßig die kritischen Punkte deiner Lebensmittelhygiene, zum Beispiel Kühltemperaturen.
+  en: You regularly check and document the critical points of your food hygiene, for example refrigeration temperatures.
+- de: Du legst fest und dokumentierst, wie du die Daten schützt, zum Beispiel mit Verschlüsselung, Zugriffsrechten und Datensicherung.
+  en: You define and document how you protect the data, for example with encryption, access rights and backups.
+- de: Du legst fest, wann welche Daten gelöscht werden – unter Beachtung der Aufbewahrungsfristen.
+  en: You define when which data is deleted – taking the retention periods into account.
+- de: Du meldest dem Finanzamt regelmäßig, wie viel Umsatzsteuer du eingenommen und gezahlt hast, und überweist die Differenz.
+  en: You regularly report to the tax office (Finanzamt) how much VAT you have collected and paid, and transfer the difference.
+- de: Du musst Bücher nach den Regeln der doppelten Buchführung führen und einen Jahresabschluss machen.
+  en: You must keep books according to the rules of double-entry bookkeeping and prepare annual financial statements.
+- de: Du nimmst hohe Barzahlungen für Waren an.
+  en: You accept large cash payments for goods.
+- de: Du nutzt Dienstleister, die für dich Daten verarbeiten.
+  en: You use service providers that process data for you.
+- de: Du nutzt die Kleinunternehmerregelung nicht.
+  en: You do not use the small business scheme (Kleinunternehmerregelung).
+- de: Du nutzt die Kleinunternehmerregelung.
+  en: You use the small business scheme (Kleinunternehmerregelung).
+- de: Du nutzt eine elektronische Kasse.
+  en: You use an electronic cash register.
+- de: Du planst die erste Einstellung.
+  en: You are planning your first hire.
+- de: Du schließt Verträge online oder per App.
+  en: You conclude contracts online or via an app.
+- de: Du selbst
+  en: You
+- de: Du selbst (im Jahresabschluss)
+  en: You (in the annual financial statements)
+- de: Du selbst bzw. deine Steuerberatung
+  en: You or your tax adviser
+- de: Du selbst mit dem Dienstleister
+  en: You together with the service provider
+- de: Du selbst; Aufsicht der Länder
+  en: You; supervisory authorities of the federal states
+- de: Du selbst; Aufsicht der Länder bzw. BaFin
+  en: You; supervision by the federal states or BaFin
+- de: Du selbst; Finanzamt
+  en: You; tax office (Finanzamt)
+- de: Du selbst; Gesundheitsamt
+  en: You; public health office (Gesundheitsamt)
+- de: Du selbst; Gewerbeaufsicht
+  en: You; trade supervisory authority (Gewerbeaufsicht)
+- de: Du selbst; Hersteller
+  en: You; manufacturer
+- de: Du selbst; Hilfe beim BSI
+  en: You; help from the BSI
+- de: Du selbst; Kontrolle durch BALM und Polizei
+  en: You; checked by BALM and the police
+- de: Du selbst; Kontrolle durch den Zoll
+  en: You; inspections by customs (Zoll)
+- de: Du selbst; Kontrolle durch den Zoll (Finanzkontrolle Schwarzarbeit)
+  en: You; inspections by customs (Finanzkontrolle Schwarzarbeit)
+- de: Du selbst; Kontrolle durch die Lebensmittelüberwachung
+  en: You; checked by the food control authority (Lebensmittelüberwachung)
+- de: Du selbst; Meldung der Kontaktdaten an die Aufsichtsbehörde
+  en: You; report contact details to the supervisory authority
+- de: Du selbst; Nachweis gegenüber der Erlaubnisbehörde
+  en: You; proof to the permit authority
+- de: Du selbst; Steuerberatung
+  en: You; tax adviser
+- de: Du selbst; ggf. Datenschutzbeauftragter
+  en: You; data protection officer if applicable
+- de: Du selbst; im Zweifel Finanzamt oder Steuerberatung
+  en: You; if in doubt, the tax office (Finanzamt) or a tax adviser
+- de: Du selbst; verantwortliche Person
+  en: You; responsible person
+- de: Du setzt Videoüberwachung ein.
+  en: You use video surveillance.
+- de: Du stellst Rechnungen mit Amtlos.
+  en: You issue invoices with Amtlos.
+- de: Du stellst jemanden ein.
+  en: You are hiring someone.
+- de: Du und deine Mitgesellschafter; Bank
+  en: You and your co-shareholders; bank
+- de: Du und die Gesellschafter; Finanzamt (E-Bilanz)
+  en: You and the shareholders; tax office (Finanzamt) (E-Bilanz)
+- de: Du verarbeitest Daten von Beschäftigten.
+  en: You process employee data.
+- de: Du verarbeitest Daten über Menschen (z. B. Kunden oder Beschäftigte).
+  en: You process data about people (e.g. customers or employees).
+- de: Du verarbeitest Gesundheitsdaten.
+  en: You process health data.
+- de: Du verkaufst Batterien oder Geräte mit Batterien.
+  en: You sell batteries or devices with batteries.
+- de: Du verkaufst Elektrogeräte.
+  en: You sell electrical devices.
+- de: Du verkaufst Kosmetik.
+  en: You sell cosmetics.
+- de: Du verkaufst Waren.
+  en: You sell goods.
+- de: Du verkaufst an Unternehmen.
+  en: You sell to businesses.
+- de: Du verkaufst an Verbraucher.
+  en: You sell to consumers.
+- de: Du verkaufst über Online-Marktplätze.
+  en: You sell via online marketplaces.
+- de: Du verkaufst über einen Onlineshop oder eine App.
+  en: You sell via an online shop or an app.
+- de: Du zahlst Gewerbesteuer.
+  en: You pay trade tax (Gewerbesteuer).
+- de: Du zahlst allen Beschäftigten mindestens den gesetzlichen Mindestlohn.
+  en: You pay all employees at least the statutory minimum wage.
+- de: Du zeichnest die Arbeitszeit deiner Beschäftigten auf.
+  en: You record your employees' working hours.
+- de: E-Bilanz
+  en: E-Bilanz
+- de: E-Bilanz ans Finanzamt übermitteln
+  en: Submit the E-Bilanz to the tax office
+- de: E-Rechnung
+  en: E-invoice
+- de: E-Rechnungen empfangen können
+  en: Be able to receive e-invoices
+- de: E-Rechnungen versenden (ab 2027)
+  en: Send e-invoices (from 2027)
+- de: E-Rechnungen versenden (ab 2028)
+  en: Send e-invoices (from 2028)
+- de: E-Rechnungs-Versandpflicht ab 2027 – Grenze Vorjahresumsatz
+  en: E-invoice sending obligation from 2027 – previous year's revenue limit
+- de: ELSTER (Finanzverwaltung)
+  en: ELSTER (tax administration)
+- de: ELSTER-Konto beantragen
+  en: Apply for an ELSTER account
+- de: Eigenkontrollen nach HACCP
+  en: Self-monitoring (HACCP)
+- de: Ein Dienstleister verarbeitet Daten in deinem Auftrag und nach deinen Weisungen.
+  en: A service provider processes data on your behalf and according to your instructions.
+- de: Ein Gesetzentwurf liegt noch nicht vor. Amtlos beobachtet das Vorhaben und passt den Gründungsassistenten an, sobald es konkret wird.
+  en: There is no draft bill yet. Amtlos is following the plan and will update the founding assistant as soon as it becomes concrete.
+- de: Ein Jahr nach jeder Unterweisung erinnert Amtlos an die Wiederholung. Mit der neuen Unterweisung ist die alte erledigt.
+  en: One year after each safety briefing, Amtlos reminds you to repeat it. The new safety briefing completes the old one.
+- de: Ein Prozentsatz, den jede Gemeinde selbst festlegt und der die Höhe der Gewerbesteuer bestimmt.
+  en: A percentage that each municipality sets itself and that determines the amount of trade tax.
+- de: Ein Vorgang, bei dem du Daten über Menschen nutzt, z. B. Kundenverwaltung oder Lohnabrechnung.
+  en: An activity in which you use data about people, e.g. customer management or payroll.
+- de: Eine Beschäftigte hat dir ihre Schwangerschaft mitgeteilt.
+  en: An employee has told you she is pregnant.
+- de: Eine Beschäftigung endet.
+  en: An employment ends.
+- de: Eine E-Rechnung ist ein strukturierter Datensatz. Eine PDF-Rechnung ist keine E-Rechnung.
+  en: An e-invoice is a structured data record. A PDF invoice is not an e-invoice.
+- de: Eine Rechnung als strukturierter Datensatz, den Software automatisch lesen kann.
+  en: An invoice as a structured data record that software can read automatically.
+- de: Eine UG muss jedes Jahr ein Viertel ihres Jahresüberschusses in eine Rücklage stellen.
+  en: A UG must put a quarter of its annual net profit into a reserve every year.
+- de: Eine achtstellige Nummer, unter der dein Betrieb bei der Sozialversicherung geführt wird.
+  en: An eight-digit number under which your business is registered with social security.
+- de: Eine betroffene Person hat eine Anfrage gestellt.
+  en: A data subject has made a request.
+- de: Eine schriftliche Liste, welche Gefahren es bei der Arbeit gibt und wie du sie verringerst.
+  en: A written list of the hazards at work and how you reduce them.
+- de: Einkommensteuererklärung abgeben
+  en: File your income tax return
+- de: Einmal im Jahr ermittelst du deinen Gewinn mit der Anlage EÜR und übermittelst sie elektronisch.
+  en: Once a year, you calculate your profit with the Anlage EÜR and submit it electronically.
+- de: Einmal im Jahr gibst du elektronisch deine Einkommensteuererklärung ab.
+  en: Once a year, you file your income tax return electronically.
+- de: Einmal im Jahr gibst du elektronisch die Gewerbesteuererklärung ab.
+  en: Once a year, you file the trade tax (Gewerbesteuer) return electronically.
+- de: Einmal im Jahr gibst du elektronisch die Umsatzsteuer-Jahreserklärung ab.
+  en: Once a year, you file the annual VAT return electronically.
+- de: Einmal im Jahr gibst du für deine Gesellschaft elektronisch die Körperschaftsteuererklärung ab.
+  en: Once a year, you file the corporate income tax (Körperschaftsteuer) return for your company electronically.
+- de: Einnahmen-Überschuss-Rechnung (Anlage EÜR) abgeben
+  en: Submit the cash-basis profit statement (Anlage EÜR)
+- de: Einwilligung für Cookies und Tracking einholen
+  en: Get consent for cookies and tracking
+- de: Elektrische Betriebsmittel müssen in bestimmten Abständen geprüft werden. Amtlos erinnert an die Prüffristen, sobald sie als Regeldaten hinterlegt sind.
+  en: Electrical equipment must be inspected at certain intervals. Amtlos reminds you of the inspection deadlines as soon as they are stored as rule data.
+- de: Elektrische Geräte prüfen lassen
+  en: Have electrical equipment inspected
+- de: Elektrische Geräte und Anlagen lässt du regelmäßig prüfen (DGUV Vorschrift 3).
+  en: You have electrical equipment and installations inspected regularly (DGUV Vorschrift 3).
+- de: Elektrofachkraft
+  en: Qualified electrician
+- de: Elektrogeräte bei der stiftung ear registrieren
+  en: Register electrical devices with stiftung ear
+- de: Elektronische Arbeitsunfähigkeitsbescheinigung, die du bei der Krankenkasse abrufst.
+  en: Electronic certificate of incapacity for work (sick note) that you retrieve from the health insurance fund.
+- de: Elektronische Arbeitszeiterfassung (geplante Neuregelung)
+  en: Electronic time recording (planned new rules)
+- de: Elektronische Aufzeichnungssysteme müssen durch eine zertifizierte technische Sicherheitseinrichtung geschützt sein. Zu jedem Geschäftsvorfall ist ein Beleg auszugeben.
+  en: Electronic recording systems must be protected by a certified technical security device. A receipt must be issued for every business transaction.
+- de: Elektronische Kasse beim Finanzamt melden
+  en: Register your electronic cash register with the tax office
+- de: Elektronische Kassen müssen dem Finanzamt gemeldet werden, innerhalb eines Monats nach Anschaffung oder Außerbetriebnahme. Bestandskassen waren bis 31.7.2025 zu melden.
+  en: Electronic cash registers must be reported to the tax office (Finanzamt) within one month of purchase or decommissioning. Existing cash registers had to be reported by 31.7.2025.
+- de: Endet eine Beschäftigung, meldest du die Person bei der Krankenkasse ab.
+  en: When an employment ends, you deregister the person with the health insurance fund (Krankenkasse).
+- de: Entgeltstruktur nach Geschlecht auswerten (mit Lohnbüro)
+  en: Analyse the pay structure by gender (with your payroll office)
+- de: Entscheidend ist das Gesamtbild der Tätigkeit. Die Deutsche Rentenversicherung prüft den Status auf Antrag.
+  en: What matters is the overall picture of the activity. The German Pension Insurance (Deutsche Rentenversicherung) checks the status on application.
+- de: Erhebliche Sicherheitsvorfälle meldest du dem BSI in festen Stufen und Fristen.
+  en: You report significant security incidents to the BSI in fixed stages and deadlines.
+- de: Erlaubnis für Güter- oder Personenbeförderung
+  en: Permit for transporting goods or passengers
+- de: Erlaubnis für dein Gewerbe einholen
+  en: Get a permit for your trade
+- de: Erlaubnispflichtig sind unter anderem Makler, Bewachung, Versicherungs- und Finanzanlagenvermittlung (§§ 30–34i GewO), Gaststätten nach dem Gaststättenrecht der Länder und das Reisegewerbe (Reisegewerbekarte).
+    Die Erlaubnis muss vor Aufnahme der Tätigkeit vorliegen.
+  en: Trades requiring a permit include brokers, security services, insurance and financial investment brokerage (§§ 30–34i GewO), restaurants and bars under the federal states' hospitality law, and itinerant
+    trade (Reisegewerbekarte). You must have the permit before you start the activity.
+- de: Erste Hilfe und Brandschutz organisieren
+  en: Organise first aid and fire safety
+- de: Ersthelfer ab 2 Versicherten, Erste-Hilfe-Material, Verbandbuch und Brandschutzhelfer nach ASR A2.2.
+  en: First aiders from 2 insured persons, first-aid supplies, first-aid log and fire safety assistants according to ASR A2.2.
+- de: Es gab einen Arbeitsunfall.
+  en: There was a workplace accident.
+- de: Fachkraft für Arbeitssicherheit und Betriebsarzt
+  en: Occupational safety specialist and company doctor
+- de: Finanzamt
+  en: Tax office (Finanzamt)
+- de: Fragebogen zur steuerlichen Erfassung abgeben
+  en: Submit the tax registration questionnaire
+- de: Fragt jemand nach seinen Daten oder verlangt Löschung, antwortest du innerhalb eines Monats.
+  en: If someone asks about their data or requests deletion, you respond within one month.
+- de: Freier Beruf
+  en: Liberal profession (freier Beruf)
+- de: Freistellungsbescheinigung für Bauleistungen beantragen
+  en: Apply for an exemption certificate for construction work
+- de: Fällig sind die Beiträge am drittletzten Bankarbeitstag des laufenden Monats. Das Lohnprogramm berechnet sie; die Krankenkassen ziehen sie in der Regel ein.
+  en: The contributions are due on the third-to-last bank working day of the current month. The payroll software calculates them; the health insurance funds usually collect them by direct debit.
+- de: Fällt dein Unternehmen unter NIS2, registrierst du es beim BSI. Die Nachfrist endete am 31.7.2026.
+  en: If your company falls under NIS2, you register it with the BSI. The grace period ended on 31.7.2026.
+- de: Fördergeber (z. B. BMWK, KfW, Länder)
+  en: Funding bodies (e.g. BMWK, KfW, federal states)
+- de: Förderprogramme prüfen (Option)
+  en: Check funding programmes (optional)
+- de: Für Beschäftigte zahlst du Umlagen (U1, U2, U3) und rufst Arbeitsunfähigkeitsbescheinigungen elektronisch ab.
+  en: For employees, you pay levies (U1, U2, U3) and retrieve sick notes electronically.
+- de: Für Beschäftigtendaten gelten besondere Regeln. Amtlos selbst speichert nur das Nötigste (Name, Beschäftigungsart, Eintritt und Austritt).
+  en: Special rules apply to employee data. Amtlos itself stores only what is necessary (name, type of employment, start and end date).
+- de: Für Betriebsstätten fällt der Rundfunkbeitrag an. Die Anmeldung machst du beim Beitragsservice.
+  en: The broadcasting fee (Rundfunkbeitrag) applies to business premises. You register with the Beitragsservice.
+- de: Für Fahrerinnen und Fahrer gelten Lenk- und Ruhezeiten, die mit dem Fahrtenschreiber aufgezeichnet werden.
+  en: Drivers must follow driving and rest times, which are recorded with the tachograph.
+- de: Für Hochrisiko-KI-Systeme gelten umfangreiche Pflichten – verschoben auf 2.12.2027 bzw. 2.8.2028.
+  en: Extensive obligations apply to high-risk AI systems, postponed to 2.12.2027 or 2.8.2028.
+- de: Für Jugendliche gelten Erstuntersuchung, Arbeitszeitgrenzen und eine Aushangpflicht.
+  en: For young people, an initial medical examination, working time limits and a notice posting obligation apply.
+- de: Für Minijobber und in Sofortmeldebranchen musst du Beginn, Ende und Dauer der Arbeitszeit aufzeichnen.
+  en: For mini-jobbers and in industries with immediate reporting obligations, you must record the start, end and duration of working time.
+- de: Für Mitarbeiterbeteiligungen gibt es steuerliche Sonderregeln (§ 19a EStG) und virtuelle Modelle (VSOP). Amtlos erklärt die Modelle; Vorlagen folgen mit dem Dokumentengenerator.
+  en: For employee participation, there are special tax rules (§ 19a EStG) and virtual models (VSOP). Amtlos explains the models; templates will follow with the document generator.
+- de: Für Startups gibt es Förderprogramme wie EXIST, INVEST, KfW-Programme und Programme der Länder.
+  en: There are funding programmes for startups such as EXIST, INVEST, KfW programmes and programmes of the federal states.
+- de: Für Tätigkeiten mit Feuchtarbeit oder hautbelastenden Stoffen legst du in einem Hautschutzplan Schutz, Reinigung und Pflege fest.
+  en: For work involving wet work or substances that stress the skin, you set out protection, cleaning and care in a skin protection plan.
+- de: Für Verbraucherprodukte brauchst du eine verantwortliche Person in der EU, Herstellerangaben und Sicherheitsinformationen – auch im Onlineshop.
+  en: For consumer products, you need a responsible person in the EU, manufacturer information and safety information – in your online shop too.
+- de: Für bestimmte Produkte (z. B. Computer, Smartphones, E-Book-Reader) gelten Barrierefreiheitsanforderungen – die Kleinstunternehmen-Ausnahme gilt dafür nicht verlässlich.
+  en: Accessibility requirements apply to certain products (e.g. computers, smartphones, e-book readers) – the micro-enterprise exemption does not reliably apply to them.
+- de: Für bestimmte erlaubnispflichtige Tätigkeiten gilt eine regelmäßige Weiterbildungspflicht – nur wo sie noch gilt.
+  en: For certain activities that require a permit, a regular continuing education obligation applies – only where it still applies.
+- de: Für deine Werkleistungen haftest du für Mängel. Dokumentiere Abnahmen und behalte die Fristen im Blick.
+  en: You are liable for defects in your work. Document acceptances and keep the deadlines in mind.
+- de: Für eine UG oder GmbH lässt du den Gesellschaftsvertrag notariell beurkunden – auch online möglich.
+  en: For a UG or GmbH, you have the articles of association (Gesellschaftsvertrag) notarised – this is also possible online.
+- de: Für gewerblichen Güterkraftverkehr oder die Beförderung von Personen brauchst du in der Regel eine Erlaubnis oder Lizenz.
+  en: For commercial road haulage or passenger transport, you usually need a permit or licence.
+- de: Für jede beschäftigte Person geht einmal im Jahr eine Jahresmeldung an die Krankenkasse.
+  en: Once a year, an annual notification goes to the health insurance fund (Krankenkasse) for each employee.
+- de: Für jede neue beschäftigte Person hältst du die wesentlichen Arbeitsbedingungen schriftlich oder in zulässiger Form fest.
+  en: For every new employee, you record the essential working conditions in writing or in another permitted form.
+- de: Für manche Gewerbe brauchst du eine Erlaubnis, bevor du anfängst – zum Beispiel als Makler, im Bewachungsgewerbe oder in der Gastronomie.
+  en: Some trades need a permit before you start, for example as a broker, in the security business or in hospitality.
+- de: Gefahrstoffverzeichnis und Betriebsanweisungen
+  en: Hazardous substances register and operating instructions
+- de: Gefährdungsbeurteilung
+  en: Risk assessment
+- de: Gefährdungsbeurteilung erstellen
+  en: Create a risk assessment
+- de: Gefährdungsbeurteilung je Gewerk
+  en: Risk assessment per trade
+- de: Gegenüber Verbrauchern gibst du Gesamtpreise an, bei Waren nach Gewicht, Volumen oder Länge auch den Grundpreis.
+  en: To consumers, you state total prices, and for goods sold by weight, volume or length also the unit price.
+- de: Geldwäschegesetz bei hohen Bargeschäften
+  en: Anti-Money Laundering Act for large cash transactions
+- de: Geldwäschegesetz für Immobilien- und Finanzbranche
+  en: Anti-Money Laundering Act for real estate and finance
+- de: Gemeinde (Steueramt)
+  en: Municipality (tax office, Steueramt)
+- de: Geplant bis Ende 2026, noch kein Gesetz. Die Pflichten nach Art. 37 DSGVO blieben bestehen.
+  en: Planned by the end of 2026, no law yet. The obligations under Art. 37 GDPR would remain.
+- de: Geplant ist eine Pflicht zur elektronischen Arbeitszeiterfassung, mit Übergangsfristen nach Betriebsgröße.
+  en: An obligation to record working time electronically is planned, with transition periods depending on company size.
+- de: Geplant ist, Gründungen digital und deutlich schneller zu ermöglichen.
+  en: The plan is to make founding a company digital and much faster.
+- de: Gesellschaft im Handelsregister eintragen lassen
+  en: Have the company entered in the commercial register
+- de: Gesellschaften müssen ihre wirtschaftlich Berechtigten dem Transparenzregister mitteilen und die Angaben bei Änderungen aktualisieren.
+  en: Companies must report their beneficial owners to the transparency register (Transparenzregister) and update the information when it changes.
+- de: Gesellschafterliste aktualisieren
+  en: Update the list of shareholders
+- de: Gesellschaftsvertrag beim Notar beurkunden
+  en: Have the articles of association notarised
+- de: Gesetzlicher Mindestlohn je Stunde
+  en: Statutory minimum wage per hour
+- de: Gesundheits- und Pflegeberufe brauchen je nach Tätigkeit eine Approbation, Erlaubnis oder Zulassung.
+  en: Depending on the activity, health and care professions need a licence to practise (Approbation), a permit or an approval.
+- de: Gesundheitsamt bzw. zuständige Kammer oder Behörde
+  en: Public health office (Gesundheitsamt) or the competent chamber or authority
+- de: Gesundheitsamt; danach du selbst
+  en: Public health office (Gesundheitsamt); after that, you
+- de: Gewerbe anmelden
+  en: Register your trade
+- de: Gewerbeamt der Gemeinde
+  en: Municipal trade office (Gewerbeamt)
+- de: Gewerbesteuer-Vorauszahlungen zahlen
+  en: Pay trade tax prepayments
+- de: Gewerbesteuererklärung abgeben
+  en: File the trade tax return
+- de: Gewährleistung im Blick behalten
+  en: Keep warranty in mind
+- de: GoBD
+  en: GoBD
+- de: GoBD einhalten und Verfahrensdokumentation führen
+  en: Comply with GoBD and keep process documentation
+- de: Gründung in 24 Stunden (Gründungsbeschleunigungsgesetz, geplant)
+  en: Founding in 24 hours (Gründungsbeschleunigungsgesetz, planned)
+- de: Gründungszuschuss beantragen
+  en: Apply for the start-up grant
+- de: Haftung begrenzen und absichern
+  en: Limit and cover liability
+- de: Handwerkskammer
+  en: Chamber of Crafts (Handwerkskammer)
+- de: Handwerksrolle
+  en: Register of craftspeople (Handwerksrolle)
+- de: Hautschutzplan aushängen
+  en: Post a skin protection plan
+- de: Hebesatz
+  en: Multiplier (Hebesatz)
+- de: Hersteller und Händler, die als Hersteller gelten, müssen sich nach dem ElektroG vor dem Verkauf registrieren.
+  en: Manufacturers, and retailers who count as manufacturers, must register under the ElektroG before selling.
+- de: Hersteller von Batterien müssen sich vor dem Inverkehrbringen registrieren.
+  en: Battery manufacturers must register before placing products on the market.
+- de: Hinweis zur Verbraucherstreitbeilegung
+  en: Notice on consumer dispute resolution
+- de: Hygieneplan führen
+  en: Keep a hygiene plan
+- de: Händlerangaben auf Marktplätzen
+  en: Seller information on marketplaces
+- de: IHK oder Handwerkskammer
+  en: IHK or Chamber of Crafts (Handwerkskammer)
+- de: Ihr arbeitet mit Gefahrstoffen.
+  en: You work with hazardous substances.
+- de: Ihr bietet eigene KI-Produkte an.
+  en: You offer your own AI products.
+- de: Ihr bietet eigene KI-Produkte oder -Funktionen an.
+  en: You offer your own AI products or features.
+- de: Ihr nutzt KI-Werkzeuge.
+  en: You use AI tools.
+- de: Ihr nutzt elektrische Geräte im Betrieb.
+  en: You use electrical equipment in your business.
+- de: Im Fragebogen gibst du unter anderem an, ob du die Kleinunternehmerregelung nutzt, und schätzt Umsatz und Gewinn. Danach bekommst du deine Steuernummer.
+  en: In the questionnaire you state, among other things, whether you use the small business scheme (Kleinunternehmerregelung), and estimate your revenue and profit. After that you receive your tax number.
+- de: Im Gesellschafterkreis hat sich etwas geändert.
+  en: Something has changed among the shareholders.
+- de: Im Handwerk beurteilst du die Gefährdungen je Gewerk und Einsatzort – auch auf Baustellen beim Kunden.
+  en: In skilled trades, you assess the hazards per trade and place of work – including at customers' construction sites.
+- de: Immobilienmakler und viele Finanzdienstleister sind Verpflichtete nach dem Geldwäschegesetz.
+  en: Real estate agents and many financial service providers are obliged entities under the Anti-Money Laundering Act (Geldwäschegesetz).
+- de: Impressum auf der Website
+  en: Legal notice (Impressum) on your website
+- de: In Beauty- und Kosmetikbetrieben legst du in einem Hygieneplan fest, wie Geräte, Flächen und Hände gereinigt und desinfiziert werden.
+  en: In beauty and cosmetics businesses, you set out in a hygiene plan how equipment, surfaces and hands are cleaned and disinfected.
+- de: In IT- und Agenturprojekten können Fehler teuer werden. Haftungsregeln in Verträgen und eine passende Versicherung begrenzen das Risiko.
+  en: In IT and agency projects, mistakes can be expensive. Liability clauses in contracts and suitable insurance limit the risk.
+- de: In deiner Branche meldest du neue Beschäftigte spätestens bei Arbeitsbeginn sofort an.
+  en: In your industry, you register new employees immediately, at the latest when they start work.
+- de: In den Branchen nach § 28a Abs. 4 SGB IV – unter anderem Bau, Gastronomie, Personenbeförderung, Gebäudereinigung, Messebau, Fleischwirtschaft und Sicherheitsgewerbe – ist eine Sofortmeldung bei Arbeitsbeginn
+    Pflicht.
+  en: In the industries under § 28a Abs. 4 SGB IV – including construction, hospitality, passenger transport, building cleaning, trade fair construction, the meat industry and the security industry – an
+    immediate notification (Sofortmeldung) when work starts is an obligation.
+- de: In die Handwerksrolle eintragen
+  en: Register in the register of craftspeople
+- de: Innerhalb einer Woche nach Gründung meldest du dein Unternehmen bei der zuständigen Berufsgenossenschaft an – auch ohne Mitarbeiter.
+  en: Within one week of founding, you register your business with the responsible employers' liability insurance association (Berufsgenossenschaft), even without employees.
+- de: Innerhalb eines Monats nach dem Start meldest du dich über ELSTER beim Finanzamt an.
+  en: Within one month of starting, you register with the tax office (Finanzamt) via ELSTER.
+- de: Insolvenzantragspflicht kennen
+  en: Know the obligation to file for insolvency
+- de: Insolvenzgericht
+  en: Insolvency court
+- de: Interne Meldestelle einrichten (Hinweisgeberschutz)
+  en: Set up an internal reporting channel (whistleblower protection)
+- de: Investitionsprüfung in sensiblen Sektoren beachten
+  en: Note investment screening in sensitive sectors
+- de: Ist jemand nach einem Arbeitsunfall mehr als drei Tage arbeitsunfähig, zeigst du den Unfall binnen drei Tagen der BG an.
+  en: If someone is unable to work for more than three days after a workplace accident, you report the accident to the BG within three days.
+- de: Jahresabschluss aufstellen und feststellen
+  en: Prepare and approve the annual financial statements
+- de: Jahresabschluss offenlegen
+  en: Publish the annual financial statements
+- de: Jahresabschluss offenlegen (abweichendes Geschäftsjahr)
+  en: Publish the annual financial statements (non-calendar financial year)
+- de: Jahresmeldung zur Sozialversicherung
+  en: Annual social security notification
+- de: Jahresumsatz, bis zu dem die Kleinstunternehmen-Ausnahme des BFSG gilt
+  en: Annual revenue up to which the BFSG micro-enterprise exemption applies
+- de: Je nach Belegschaft hängst du bestimmte Gesetze im Betrieb aus, zum Beispiel ArbZG, AGG, MuSchG und JArbSchG.
+  en: Depending on your workforce, you display certain laws at your workplace, for example ArbZG, AGG, MuSchG and JArbSchG.
+- de: Jede neue Person unterweist du vor dem ersten Arbeitstag zu den Gefahren und Schutzmaßnahmen.
+  en: You give every new person a safety briefing on hazards and protective measures before their first working day.
+- de: Jede neue beschäftigte Person meldest du bei der Krankenkasse an.
+  en: You register every new employee with the health insurance fund (Krankenkasse).
+- de: Jugendarbeitsschutz beachten
+  en: Follow youth employment protection rules
+- de: KI-Inhalte und KI-Interaktion kennzeichnen
+  en: Label AI content and AI interaction
+- de: KI-Kompetenz
+  en: AI literacy
+- de: KI-Kompetenz der Beschäftigten sicherstellen
+  en: Ensure your employees' AI literacy
+- de: Kapitalgesellschaften müssen ihren Jahresabschluss beim Unternehmensregister offenlegen, binnen zwölf Monaten nach Ende des Geschäftsjahres. Kleinstkapitalgesellschaften können ihn stattdessen hinterlegen.
+  en: Corporations must publish their annual financial statements in the company register (Unternehmensregister) within twelve months after the end of the financial year. Micro corporations can deposit
+    them instead.
+- de: Kapitalgesellschaften zahlen Körperschaftsteuer und geben dafür jährlich eine Erklärung ab. Die Fristen stehen als Regeldaten in Amtlos, sobald sie fachlich freigegeben sind.
+  en: Corporations pay corporate income tax and file an annual return for it. The deadlines will appear as standard dates in Amtlos once they have been approved by experts.
+- de: Kasse mit TSE betreiben und Belege ausgeben
+  en: Operate a cash register with TSE and issue receipts
+- de: Keine Handlung nötig; der Beitrag wird festgesetzt.
+  en: No action needed; the fee will be set for you.
+- de: Keine Pflicht.
+  en: No obligation.
+- de: Keine Pflicht. Nach dem Start ist ein Antrag nicht mehr möglich.
+  en: Not an obligation. Once you have started, you can no longer apply.
+- de: Keine Pflicht. Ohne Klärung bleibt das Risiko einer späteren Einstufung als Beschäftigung.
+  en: Not an obligation. Without clarification, the risk remains that you will later be classified as an employee.
+- de: Keine eigene Handlung, solange kein sensibler Sektor betroffen ist.
+  en: No action of your own as long as no sensitive sector is affected.
+- de: Keine eigene Pflicht – Erklärung der Plattformmeldungen.
+  en: No obligation of your own; explanation of the platform reports.
+- de: Keine eigene Pflicht – Hinweis zum Risiko.
+  en: No obligation of its own – note on risk.
+- de: Keine – geplante Erleichterung.
+  en: None – planned relief.
+- de: Kennzeichnung für Chatbots und KI-erzeugte Inhalte vorbereiten
+  en: Prepare labelling for chatbots and AI-generated content
+- de: Kleinunternehmer – Umsatzgrenze Vorjahr
+  en: Small business scheme – revenue limit previous year
+- de: Kleinunternehmer – Umsatzgrenze für das laufende Jahr im Gründungsjahr
+  en: Small business scheme – revenue limit for the current year in the founding year
+- de: Kleinunternehmer – Umsatzgrenze laufendes Jahr
+  en: Small business scheme – revenue limit current year
+- de: Kleinunternehmergrenze zu 80 % erreicht
+  en: Small business limit 80% reached
+- de: Kleinunternehmergrenze zu 95 % erreicht
+  en: Small business limit 95% reached
+- de: 'Kleinunternehmergrenze überschritten: Umsatzsteuer prüfen'
+  en: 'Small business limit exceeded: check VAT'
+- de: Kleinunternehmergrenzen im Blick behalten
+  en: Keep an eye on the small business limits
+- de: Kleinunternehmerregelung
+  en: Small business scheme (Kleinunternehmerregelung)
+- de: Kläre, ob Geschäftsführerinnen und Geschäftsführer sozialversicherungspflichtig sind – zum Beispiel mit einer Statusfeststellung.
+  en: Clarify whether managing directors are subject to social security contributions – for example with a status determination.
+- de: Kläre, ob dein Unternehmen nach Sektor und Größe unter die NIS2-Regeln fällt.
+  en: Find out whether your company falls under the NIS2 rules based on sector and size.
+- de: Kläre, ob deine Tätigkeit ein freier Beruf oder ein Gewerbe ist – davon hängt ab, welche Anmeldungen du brauchst.
+  en: 'Find out whether your activity is a liberal profession (freier Beruf) or a trade (Gewerbe): this determines which registrations you need.'
+- de: Kosmetikverordnung bei eigenen Produkten
+  en: Cosmetics Regulation for your own products
+- de: Krankenkasse (über Lohnprogramm)
+  en: Health insurance fund (Krankenkasse) (via payroll software)
+- de: Krankenkasse bzw. Minijob-Zentrale (über Lohnprogramm)
+  en: Health insurance fund (Krankenkasse) or mini-job centre (Minijob-Zentrale) (via payroll software)
+- de: Krankenkassen
+  en: Health insurance funds (Krankenkassen)
+- de: Krankenkassen (über Lohnprogramm)
+  en: Health insurance funds (via payroll software)
+- de: Krankenversicherung über die Selbstständigkeit informieren
+  en: Tell your health insurance about your self-employment
+- de: Kriterien für gleiche und gleichwertige Arbeit festhalten
+  en: Record criteria for equal work and work of equal value
+- de: Können Verbraucher auf deiner Website Abos abschließen, brauchst du einen Kündigungsbutton.
+  en: If consumers can take out subscriptions on your website, you need a cancellation button.
+- de: Körperschaftsteuererklärung abgeben
+  en: File the corporate income tax return
+- de: Kündigungsbutton bei Abos
+  en: Cancellation button for subscriptions
+- de: Laut Entwurf (Juni 2026) soll ab 1.1.2027 elektronisch erfasst werden, mit Übergangsfristen nach Betriebsgröße; Betriebe bis 10 Beschäftigte sollen keine elektronische Pflicht haben. Noch kein Gesetz.
+  en: According to the draft (June 2026), time is to be recorded electronically from 1.1.2027, with transition periods depending on company size; businesses with up to 10 employees are not to have an electronic
+    obligation. Not yet law.
+- de: Lebensmittelunternehmen müssen ein Verfahren nach den HACCP-Grundsätzen einrichten und die Kontrollen dokumentieren. Amtlos bietet Kontrolllisten mit Grenzwerten, die du festlegst.
+  en: Food businesses must set up a procedure based on HACCP principles and document the checks. Amtlos provides checklists with limit values that you set.
+- de: Lebensmittelunternehmen müssen jeden Betrieb bei der zuständigen Behörde registrieren lassen – meist beim Veterinär- und Lebensmittelüberwachungsamt des Kreises.
+  en: Food businesses must register every establishment with the competent authority – usually the district's veterinary and food control office (Veterinär- und Lebensmittelüberwachungsamt).
+- de: Lebensmittelüberwachung des Kreises bzw. der Stadt
+  en: Food control authority (Lebensmittelüberwachung) of the district or city
+- de: Lenk- und Ruhezeiten einhalten und aufzeichnen
+  en: Comply with and record driving and rest times
+- de: Link zur OS-Plattform prüfen
+  en: Check the link to the ODR platform
+- de: Lohnabrechnung über geprüfte Software
+  en: Payroll via certified software
+- de: Lohnpartner oder Steuerberatung
+  en: Payroll partner or tax adviser
+- de: Lohnsteuer anmelden
+  en: File the wage tax return
+- de: Löschkonzept festlegen
+  en: Set up a deletion concept
+- de: Marktplätze melden Verkäufer und Umsätze an das Bundeszentralamt für Steuern – deine Angaben in der Steuererklärung sollten dazu passen.
+  en: Marketplaces report sellers and sales to the Federal Central Tax Office (Bundeszentralamt für Steuern); the information in your tax return should match.
+- de: Marktplätze verlangen Angaben zu deinem Unternehmen und zeigen sie Kunden an; viele davon sind gesetzlich vorgeschrieben.
+  en: Marketplaces ask for information about your business and show it to customers; much of it is required by law.
+- de: Marktüberwachung der Länder
+  en: Market surveillance authorities of the federal states
+- de: Melde dein Gewerbe bei der Gemeinde an, wenn du anfängst – und ebenso, wenn du umziehst oder aufhörst.
+  en: Register your trade with your municipality when you start, and also when you move or stop.
+- de: Melde deine Betriebsstätte beim Beitragsservice für den Rundfunkbeitrag an.
+  en: Register your business premises with the Beitragsservice for the broadcasting fee (Rundfunkbeitrag).
+- de: Melde jede elektronische Kasse innerhalb eines Monats nach der Anschaffung über ELSTER – je Betriebsstätte.
+  en: Register every electronic cash register via ELSTER within one month of purchase – per business premises.
+- de: Melde, wer hinter deiner Gesellschaft steht, und halte die Angaben aktuell.
+  en: Report who is behind your company and keep the information up to date.
+- de: Meldungen der Plattformen an das Finanzamt (DAC7) verstehen
+  en: Understand platform reports to the tax office (DAC7)
+- de: Meldungen zur Sozialversicherung erfordern zertifizierte Software – Amtlos arbeitet dafür mit einem Lohnpartner.
+  en: Social security notifications require certified software – Amtlos works with a payroll partner for this.
+- de: Mindestens 20 Personen sind ständig mit automatisierter Datenverarbeitung beschäftigt.
+  en: At least 20 people are constantly involved in automated data processing.
+- de: Mindestens einmal im Jahr wiederholst du die Unterweisung.
+  en: You repeat the safety briefing at least once a year.
+- de: Mindestens einzuzahlender Anteil des Stammkapitals (GmbH)
+  en: Minimum portion of share capital to be paid in (GmbH)
+- de: Mindestlohn zahlen
+  en: Pay the minimum wage
+- de: Mindeststammkapital der GmbH
+  en: Minimum share capital of a GmbH
+- de: Mindeststammkapital der UG (haftungsbeschränkt)
+  en: Minimum share capital of a UG (haftungsbeschränkt)
+- de: Minijob-Grenze beachten
+  en: Observe the mini-job limit
+- de: Minijob-Grenze je Monat
+  en: Mini-job limit per month
+- de: Minijob-Zentrale
+  en: Mini-job centre (Minijob-Zentrale)
+- de: 'Minijobber dürfen im Monat nicht mehr als die Minijob-Grenze verdienen: 603 € (2026), 633 € (2027).'
+  en: 'Mini-jobbers may not earn more per month than the mini-job limit: €603 (2026), €633 (2027).'
+- de: Mit Dienstleistern, die für dich Daten verarbeiten (z. B. Cloud, Lohnbüro, Newsletter-Tool), schließt du einen Auftragsverarbeitungsvertrag.
+  en: You conclude a data processing agreement (DPA) with service providers that process data for you (e.g. cloud, payroll office, newsletter tool).
+- de: Mit der Selbstständigkeit kann sich deine Krankenversicherung ändern. Wer hauptberuflich selbstständig ist, kümmert sich selbst um seine Versicherung und die Beiträge.
+  en: Becoming self-employed can change your health insurance. If self-employment is your main occupation, you take care of your own insurance and contributions.
+- de: Mit der Steuerberatung klären, welcher Rhythmus ab 2027 gilt
+  en: Clarify with your tax adviser which filing frequency applies from 2027
+- de: Mit mehr als 10 Beschäftigten informierst du auf Website und in AGB, ob du an Streitbeilegungsverfahren teilnimmst.
+  en: With more than 10 employees, you state on your website and in your terms and conditions (AGB) whether you take part in dispute resolution proceedings.
+- de: Mitarbeiterbeteiligung prüfen (Option)
+  en: Check employee participation (optional)
+- de: Mitgliedschaft in IHK oder Handwerkskammer
+  en: Membership in the IHK or Chamber of Crafts
+- de: Monatliche USt-Voranmeldung für Neugründer ab 2027
+  en: Monthly advance VAT return for new founders from 2027
+- de: Mutterschutz in der Gefährdungsbeurteilung
+  en: Maternity protection in the risk assessment
+- de: NIS2 betrifft Unternehmen bestimmter Sektoren ab einer bestimmten Größe. Wer betroffen ist, muss sich beim BSI registrieren und Sicherheitsvorfälle melden. Beantworte die Frage im Profil, sobald du
+    es weißt.
+  en: NIS2 affects companies in certain sectors above a certain size. If you are affected, you must register with the BSI and report security incidents. Answer the question in your profile as soon as you
+    know.
+- de: Nach Art. 50 KI-Verordnung müssen Menschen erkennen können, dass sie mit einer KI interagieren oder Inhalte KI-erzeugt sind.
+  en: Under Art. 50 of the AI Act, people must be able to recognise that they are interacting with an AI or that content is AI-generated.
+- de: Nach deinen Angaben liegt dein Umsatz über einer Kleinunternehmergrenze. Dann musst du Umsatzsteuer berechnen.
+  en: According to your information, your revenue is above a small business limit. In that case you must charge VAT.
+- de: Nach deinen Rechnungen in Amtlos hast du 80 % der Kleinunternehmergrenze erreicht.
+  en: According to your invoices in Amtlos, you have reached 80% of the small business limit.
+- de: Nach deinen Rechnungen in Amtlos hast du 95 % der Kleinunternehmergrenze erreicht.
+  en: According to your invoices in Amtlos, you have reached 95% of the small business limit.
+- de: Nach deinen Rechnungen in Amtlos liegt dein Umsatz im Gründungsjahr über der Grenze.
+  en: According to your invoices in Amtlos, your revenue in your founding year is above the limit.
+- de: Nach deinen Rechnungen in Amtlos liegt dein Umsatz in diesem Jahr über der Grenze.
+  en: According to your invoices in Amtlos, your revenue this year is above the limit.
+- de: Nach dem Plattformen-Steuertransparenzgesetz (DAC7) melden Plattformen bestimmte Verkäufer. Amtlos erklärt, was gemeldet wird.
+  en: Under the Platform Tax Transparency Act (Plattformen-Steuertransparenzgesetz, DAC7), platforms report certain sellers. Amtlos explains what is reported.
+- de: Nach der Rechtsprechung des Bundesarbeitsgerichts besteht bereits eine Pflicht zur Arbeitszeiterfassung. Amtlos bietet eine Zeiterfassung, die auf die geplante Neuregelung vorbereitet ist.
+  en: According to rulings of the Federal Labour Court (Bundesarbeitsgericht), there is already an obligation to record working time. Amtlos offers time tracking that is prepared for the planned new rules.
+- de: Nach jedem Geschäftsjahr erstellst du Bilanz und Gewinn- und Verlustrechnung; die Gesellschafter stellen den Abschluss fest.
+  en: After each financial year, you prepare a balance sheet and profit and loss statement; the shareholders approve the financial statements.
+- de: Nach § 25 TDDDG ist für das Speichern und Auslesen von Informationen auf dem Endgerät grundsätzlich eine Einwilligung nötig, außer es ist unbedingt erforderlich. Der Consent-Check deiner Website folgt
+    mit dem Online-Check (Abschnitt 7).
+  en: Under § 25 TDDDG, storing and reading information on a user's device generally requires consent unless it is strictly necessary. The consent check for your website will follow with the online check
+    (section 7).
+- de: Nach § 312j BGB kommt ohne eindeutige Beschriftung kein wirksamer Vertrag zustande.
+  en: Under § 312j BGB, no valid contract is concluded without clear labelling.
+- de: Noch keine Folge – eine Warnung, damit du rechtzeitig planen kannst.
+  en: No consequence yet – a warning so you can plan in time.
+- de: Noch keine – Pflichten gelten später.
+  en: None yet; obligations apply later.
+- de: Noch keine – geplante Regelung.
+  en: None yet; planned rules.
+- de: Noch keine – mögliche Änderung.
+  en: None yet – possible change.
+- de: Notarin oder Notar
+  en: Notary
+- de: Notarin oder Notar; Registergericht
+  en: Notary; registry court (Registergericht)
+- de: Ob du freiberuflich oder gewerblich tätig bist, entscheidet über die Gewerbeanzeige, die Gewerbesteuer und die Mitgliedschaft in IHK oder Handwerkskammer. Solange das offen ist, kann Amtlos diese
+    Pflichten nicht sicher bestimmen.
+  en: Whether you work as a freelancer or a trader determines the trade registration, trade tax and membership in the IHK or Chamber of Crafts. As long as this is open, Amtlos cannot reliably determine
+    these obligations.
+- de: Ob eine Geschäftsführerin oder ein Geschäftsführer sozialversicherungspflichtig beschäftigt ist, hängt vom Einzelfall ab. Sicherheit schafft eine Statusfeststellung bei der Deutschen Rentenversicherung.
+  en: Whether a managing director is employed subject to social security depends on the individual case. A status determination by the German Pension Insurance (Deutsche Rentenversicherung) provides certainty.
+- de: Ob und welche Erlaubnis nötig ist, hängt von Fahrzeuggewicht, Art der Beförderung und Gebiet ab.
+  en: Whether a permit is needed, and which one, depends on vehicle weight, type of transport and area.
+- de: Offenlegung
+  en: Publication
+- de: Ohne Anmeldezeitraum kann Amtlos keine Termine berechnen.
+  en: Without the filing period, Amtlos cannot calculate any dates.
+- de: Ohne Freistellungsbescheinigung müssen Auftraggeber einen Teil deiner Rechnung als Bauabzugsteuer einbehalten.
+  en: Without an exemption certificate, clients must withhold part of your invoice as construction withholding tax.
+- de: Ohne Konto kannst du den Fragebogen zur steuerlichen Erfassung nicht elektronisch übermitteln.
+  en: Without an account, you cannot submit the tax registration questionnaire electronically.
+- de: Ohne Verlängerung müssten Gründer im Gründungsjahr und im Folgejahr wieder monatlich Voranmeldungen abgeben.
+  en: Without an extension, founders would again have to file advance returns monthly in the founding year and the following year.
+- de: Ohne diese Einordnung bleibt offen, welche Anmeldungen du brauchst.
+  en: Without this classification, it remains unclear which registrations you need.
+- de: Ohne diese Klärung bleibt offen, ob Registrierung und Meldepflichten gelten.
+  en: Without this clarification, it remains unclear whether registration and reporting obligations apply.
+- de: Ohne geprüfte Software sind die Meldungen nicht möglich.
+  en: Without certified software, the notifications are not possible.
+- de: Personen mit ständiger automatisierter Verarbeitung, ab denen ein Datenschutzbeauftragter zu benennen ist
+  en: Persons constantly involved in automated processing from which a data protection officer must be appointed
+- de: Pflichten für Hochrisiko-KI (verschoben)
+  en: Obligations for high-risk AI (postponed)
+- de: Pflichten und Haftung der Geschäftsführung kennen
+  en: Know the duties and liability of managing directors
+- de: Pflichtversichert sind zum Beispiel Lehrende, Pflegepersonen, Handwerker in der Handwerksrolle und Selbstständige mit nur einem Auftraggeber. Die Meldung an die Deutsche Rentenversicherung muss innerhalb
+    von drei Monaten erfolgen.
+  en: Mandatorily insured are, for example, teachers, carers, craftspeople in the register of craftspeople and self-employed people with only one client. You must register with the German Pension Insurance
+    (Deutsche Rentenversicherung) within three months.
+- de: Preise richtig angeben
+  en: State prices correctly
+- de: 'Produktsicherheit (GPSR): Angaben und verantwortliche Person'
+  en: 'Product safety (GPSR): information and responsible person'
+- de: Prüfe in deinen Verträgen die Haftung und ob eine Berufs- oder Betriebshaftpflicht passt.
+  en: Check the liability in your contracts and whether professional or business liability insurance is right for you.
+- de: Prüfe, ob der frühere Link zur Online-Streitbeilegungsplattform der EU auf deiner Website noch aktuell ist.
+  en: Check whether the former link to the EU online dispute resolution platform on your website is still up to date.
+- de: Prüfen, ob NIS2 für dich gilt
+  en: Check whether NIS2 applies to you
+- de: Prüfen, ob deine Produkte unter das BFSG fallen
+  en: Check whether your products fall under the BFSG
+- de: Prüfen, ob die Benennungspflicht nach Art. 37 DSGVO unabhängig davon besteht
+  en: Check whether the obligation to appoint under Art. 37 GDPR applies regardless
+- de: Prüfen, ob eine Datenschutz-Folgenabschätzung nötig ist
+  en: Check whether a data protection impact assessment is needed
+- de: Prüfen, ob eure KI-Produkte in einen Hochrisiko-Bereich fallen
+  en: Check whether your AI products fall into a high-risk area
+- de: Prüfen, welche Übergangsfrist für eure Betriebsgröße gelten würde
+  en: Check which transition period would apply to your company size
+- de: Rechnungen mit allen Pflichtangaben schreiben
+  en: Write invoices with all mandatory details
+- de: Regeln der Finanzverwaltung, wie Bücher und Belege elektronisch geführt und aufbewahrt werden.
+  en: Rules of the tax authorities on how books and receipts are kept and stored electronically.
+- de: Registergericht (über den Notar)
+  en: Registry court (Registergericht) (via the notary)
+- de: Rentenversicherungspflicht melden
+  en: Report mandatory pension insurance
+- de: Rundfunkbeitrag für die Betriebsstätte anmelden
+  en: Register your business premises for the broadcasting fee
+- de: Rücklage der UG bilden
+  en: Build up the UG reserve
+- de: 'Rücklage der UG: Anteil am Jahresüberschuss'
+  en: 'UG reserve: share of annual net profit'
+- de: SOKA-BAU
+  en: SOKA-BAU
+- de: Sag deiner Krankenversicherung, dass du selbstständig bist. Hauptberuflich Selbstständige versichern sich selbst.
+  en: Tell your health insurance that you are self-employed. If self-employment is your main occupation, you insure yourself.
+- de: Scheinselbstständigkeit
+  en: Bogus self-employment (Scheinselbstständigkeit)
+- de: Scheinselbstständigkeit vermeiden
+  en: Avoid false self-employment
+- de: Schwangerschaft der Aufsichtsbehörde mitteilen
+  en: Notify the supervisory authority of a pregnancy
+- de: Seit 19.6.2026 brauchen B2C-Online-Verträge mit Widerrufsrecht einen Widerrufsbutton – zweistufig, ohne Login, mit Eingangsbestätigung auf einem dauerhaften Datenträger.
+  en: 'Since 19.6.2026, B2C online contracts with a right of withdrawal need a withdrawal button: two-step, without login, with confirmation of receipt on a durable medium.'
+- de: Seit 2025 musst du elektronische Rechnungen (XRechnung, ZUGFeRD) von anderen Unternehmen empfangen können.
+  en: Since 2025, you must be able to receive electronic invoices (XRechnung, ZUGFeRD) from other businesses.
+- de: Seit 28.6.2025 müssen bestimmte Dienstleistungen wie Onlineshops barrierefrei sein – mit Barrierefreiheitserklärung.
+  en: Since 28.6.2025, certain services such as online shops must be accessible, with an accessibility statement.
+- de: Setzt deine Website Tracking oder nicht notwendige Cookies ein, holst du vorher die Einwilligung der Besucher ein.
+  en: If your website uses tracking or non-essential cookies, you get visitors' consent first.
+- de: Sicherheitsvorfälle melden (NIS2)
+  en: Report security incidents (NIS2)
+- de: Sind in der Regel mindestens 20 Personen ständig mit der automatisierten Verarbeitung von Daten beschäftigt, benennst du einen Datenschutzbeauftragten.
+  en: If, as a rule, at least 20 people are constantly involved in the automated processing of data, you appoint a data protection officer.
+- de: Sobald du mindestens eine Person beschäftigst, musst du die Gefährdungen an jedem Arbeitsplatz beurteilen, Schutzmaßnahmen festlegen und das dokumentieren. Amtlos erstellt dir dafür eine Vorlage passend
+    zu deiner Branche.
+  en: As soon as you employ at least one person, you must assess the hazards at every workplace, define protective measures and document this. Amtlos creates a template for you that fits your industry.
+- de: Sofortmeldung bei Arbeitsbeginn
+  en: Immediate notification when work starts
+- de: Sondervorauszahlung zur Umsatzsteuer leisten
+  en: Make the special advance VAT payment
+- de: Sozialversicherungsbeiträge zahlen
+  en: Pay social security contributions
+- de: Sozialversicherungsstatus der Geschäftsführung klären
+  en: Clarify the social security status of managing directors
+- de: Stammkapital
+  en: Share capital
+- de: Stammkapital einzahlen
+  en: Pay in the share capital
+- de: Statusfeststellung erwägen (Scheinselbstständigkeit)
+  en: Consider a status determination (bogus self-employment)
+- de: Stellst du eigene Kosmetikprodukte her oder bringst sie unter deinem Namen in Verkehr, gelten die Pflichten der EU-Kosmetikverordnung.
+  en: If you make your own cosmetic products or place them on the market under your name, the obligations of the EU Cosmetics Regulation apply.
+- de: TOM
+  en: TOM
+- de: TSE
+  en: TSE
+- de: Technische Sicherheitseinrichtung, die Kassendaten gegen Manipulation schützt.
+  en: Technical security device that protects cash register data against tampering.
+- de: Technische und organisatorische Maßnahmen festlegen
+  en: Define technical and organisational measures
+- de: Technische und organisatorische Maßnahmen zum Schutz personenbezogener Daten.
+  en: Technical and organisational measures to protect personal data.
+- de: Teilnahme an SOKA-BAU
+  en: Participation in SOKA-BAU
+- de: Teilt dir eine Beschäftigte ihre Schwangerschaft mit, informierst du die Aufsichtsbehörde.
+  en: If an employee tells you she is pregnant, you inform the supervisory authority.
+- de: Transparenzregister (Bundesanzeiger Verlag)
+  en: Transparency register (Transparenzregister, Bundesanzeiger Verlag)
+- de: 'Tätigkeit einordnen: freier Beruf oder Gewerbe'
+  en: 'Classify your activity: liberal profession or trade'
+- de: Umlagen U1/U2/U3 und eAU-Abruf
+  en: U1/U2/U3 levies and eAU retrieval
+- de: Umsatzsteuer-Identifikationsnummer beantragen
+  en: Apply for a VAT identification number
+- de: Umsatzsteuer-Jahreserklärung abgeben
+  en: File the annual VAT return
+- de: Umsatzsteuer-Voranmeldung abgeben
+  en: Submit the advance VAT return
+- de: 'Umsatzsteuer: Regelsteuersatz'
+  en: 'VAT: standard rate'
+- de: 'Umsatzsteuer: ermäßigter Steuersatz'
+  en: 'VAT: reduced rate'
+- de: Unabhängig davon, ob jemand schwanger ist, beurteilst du die Arbeitsplätze auch nach dem Mutterschutzgesetz.
+  en: Regardless of whether anyone is pregnant, you also assess workplaces under the Maternity Protection Act (Mutterschutzgesetz).
+- de: Unterlagen aufbewahren
+  en: Keep records
+- de: Unternehmensregister
+  en: Company register (Unternehmensregister)
+- de: Unterweisung jährlich wiederholen
+  en: Repeat the safety briefing every year
+- de: VSOP
+  en: VSOP
+- de: Verarbeitest du besonders sensible Daten oder überwachst du mit Video, prüfst du, ob eine Datenschutz-Folgenabschätzung nötig ist.
+  en: If you process particularly sensitive data or use video surveillance, you check whether a data protection impact assessment is needed.
+- de: Verarbeitungstätigkeit
+  en: Processing activity
+- de: Verbraucher haben bei Fernabsatzverträgen in der Regel ein Widerrufsrecht, über das du vor Vertragsschluss informieren musst.
+  en: Consumers usually have a right of withdrawal for distance contracts, which you must inform them about before the contract is concluded.
+- de: Verbraucher müssen den Widerruf online so einfach erklären können wie den Vertragsschluss.
+  en: Consumers must be able to declare withdrawal online as easily as concluding the contract.
+- de: Verpackungen registrieren und lizenzieren
+  en: Register and license packaging
+- de: Versicherte, ab denen Ersthelfer nötig sind
+  en: Insured persons from which first aiders are required
+- de: Verzeichnis der Verarbeitungstätigkeiten führen
+  en: Keep a record of processing activities
+- de: Videoüberwachung braucht einen berechtigten Zweck, muss erkennbar sein (Hinweisschild) und gehört ins Verzeichnis der Verarbeitungstätigkeiten.
+  en: Video surveillance needs a legitimate purpose, must be recognisable (sign) and belongs in the record of processing activities.
+- de: Videoüberwachung kennzeichnen und begründen
+  en: Label and justify video surveillance
+- de: 'Virtuelles Beteiligungsprogramm: Mitarbeitende werden wirtschaftlich beteiligt, ohne echte Anteile zu bekommen.'
+  en: 'Virtual stock option plan: employees share in the company financially without receiving real shares.'
+- de: Vor Arbeitsbeginn unterweisen
+  en: Give a safety briefing before work starts
+- de: Vorauszahlungen sind Abschläge auf die Steuer des laufenden Jahres. Die Höhe steht im Vorauszahlungsbescheid.
+  en: Prepayments are instalments on the current year's tax. The amount is stated in the prepayment notice (Vorauszahlungsbescheid).
+- de: Vorauszahlungen zur Einkommen- oder Körperschaftsteuer zahlen
+  en: Pay income tax or corporate income tax prepayments
+- de: Vorjahres-Zahllast, ab der die USt-Voranmeldung monatlich abzugeben ist
+  en: Previous year's VAT liability from which the advance VAT return must be filed monthly
+- de: Vorjahres-Zahllast, bis zu der eine Befreiung von der USt-Voranmeldung möglich ist
+  en: Previous year's VAT liability up to which an exemption from the advance VAT return is possible
+- de: Wegfall der Schwelle nach § 38 BDSG (geplant)
+  en: Removal of the threshold under § 38 BDSG (planned)
+- de: Weiterbildungspflicht (Immobilien und Finanzen)
+  en: Continuing education obligation (real estate and finance)
+- de: Welche Angaben eine Rechnung braucht, regelt § 14 UStG. Für Kleinbetragsrechnungen gelten Erleichterungen. Kleinunternehmer weisen auf die Steuerbefreiung nach § 19 UStG hin.
+  en: § 14 UStG sets out which details an invoice needs. Simplified rules apply to small-amount invoices. Small businesses under the small business scheme refer to the tax exemption under § 19 UStG.
+- de: Welche Erlaubnis nötig ist, hängt vom Beruf ab (z. B. Heilpraktiker, Pflege, Physiotherapie). Ohne sie darfst du die Tätigkeit nicht ausüben.
+  en: Which permit you need depends on the profession (e.g. alternative practitioner (Heilpraktiker), nursing, physiotherapy). Without it, you may not carry out the activity.
+- de: Welche Gesetze auszuhängen sind, hängt von der Belegschaft ab. Amtlos stellt die Liste zusammen.
+  en: Which laws must be displayed depends on your workforce. Amtlos compiles the list.
+- de: Welche Pflichten greifen, hängt von Größe und Dauer der Baustelle und der Zahl der beteiligten Firmen ab; meist trifft sie den Bauherrn.
+  en: Which obligations apply depends on the size and duration of the construction site and the number of companies involved; they usually fall on the client (Bauherr).
+- de: Wenn ausländische Investoren in ein Unternehmen in einem sensiblen Sektor einsteigen, kann eine Investitionsprüfung nötig sein.
+  en: If foreign investors invest in a company in a sensitive sector, an investment screening may be required.
+- de: Wenn das Finanzamt Vorauszahlungen festgesetzt hat, zahlst du sie am 10. März, 10. Juni, 10. September und 10. Dezember.
+  en: If the tax office (Finanzamt) has set prepayments, you pay them on 10 March, 10 June, 10 September and 10 December.
+- de: Wenn die Gemeinde Gewerbesteuer-Vorauszahlungen festgesetzt hat, zahlst du sie am 15. Februar, 15. Mai, 15. August und 15. November.
+  en: If the municipality has set trade tax prepayments, you pay them on 15 February, 15 May, 15 August and 15 November.
+- de: Wenn du Arbeitslosengeld I bekommst, kannst du einen Gründungszuschuss beantragen – vor dem Start.
+  en: If you receive unemployment benefit I (Arbeitslosengeld I), you can apply for a start-up grant (Gründungszuschuss), before you start.
+- de: Wenn du Bauleistungen erbringst, beantragst du beim Finanzamt eine Freistellungsbescheinigung, damit deine Auftraggeber keine Bauabzugsteuer einbehalten.
+  en: If you provide construction services, you apply to the tax office (Finanzamt) for an exemption certificate (Freistellungsbescheinigung) so that your clients do not withhold construction withholding
+    tax (Bauabzugsteuer).
+- de: Wenn du Daten erhebst, informierst du die Menschen darüber – etwa in einer Datenschutzerklärung oder einem Informationsblatt.
+  en: When you collect data, you inform the people concerned – for example in a privacy policy or an information sheet.
+- de: Wenn du Geschäfte mit Kunden in anderen EU-Ländern machst, beantragst du eine USt-IdNr. beim Bundeszentralamt für Steuern.
+  en: If you do business with customers in other EU countries, you apply for a VAT ID number (USt-IdNr.) from the Federal Central Tax Office (Bundeszentralamt für Steuern).
+- de: Wenn du Leistungen an Unternehmen in anderen EU-Ländern erbringst, meldest du sie in der Zusammenfassenden Meldung.
+  en: If you provide services to businesses in other EU countries, you report them in the EC sales list (Zusammenfassende Meldung).
+- de: Wenn du Mitarbeitende am Unternehmen beteiligen willst, gibt es dafür besondere Regeln und Modelle wie VSOP.
+  en: If you want to give employees a stake in the company, there are special rules and models such as VSOP.
+- de: Wenn du Videoüberwachung einsetzt, machst du sie erkennbar und dokumentierst den Zweck.
+  en: If you use video surveillance, you make it recognisable and document the purpose.
+- de: Wenn du die Voranmeldung monatlich abgibst und eine Dauerfristverlängerung hast, zahlst du einmal im Jahr eine Sondervorauszahlung von einem Elftel.
+  en: If you file the advance return monthly and have a permanent deadline extension (Dauerfristverlängerung), you make a special advance payment (Sondervorauszahlung) of one eleventh once a year.
+- de: Wenn du ein Handwerk betreibst, musst du dich bei der Handwerkskammer eintragen lassen.
+  en: If you run a craft business, you must register with the Chamber of Crafts (Handwerkskammer).
+- de: Wenn du eine elektronische Kasse nicht mehr nutzt, meldest du das innerhalb eines Monats über ELSTER.
+  en: If you stop using an electronic cash register, you report this via ELSTER within one month.
+- de: Wenn du nur einen Auftraggeber hast, kannst du bei der Clearingstelle der Rentenversicherung klären lassen, ob du wirklich selbstständig bist.
+  en: If you only have one client, you can ask the clearing office of the pension insurance (Clearingstelle) to determine whether you are really self-employed.
+- de: Wenn ihr mit Gefahrstoffen arbeitet, führst du ein Verzeichnis und schreibst Betriebsanweisungen.
+  en: If you work with hazardous substances, you keep a register and write operating instructions.
+- de: Wenn jemand formal selbstständig ist, tatsächlich aber wie ein Angestellter arbeitet.
+  en: When someone is formally self-employed but actually works like an employee.
+- de: Wenn sich im Gesellschafterkreis etwas ändert, muss eine neue Gesellschafterliste zum Handelsregister – über den Notar.
+  en: If anything changes among the shareholders, a new list of shareholders (Gesellschafterliste) must be submitted to the commercial register (Handelsregister) – via the notary.
+- de: Wer Jugendliche beschäftigt, braucht vorab eine ärztliche Erstuntersuchung, muss besondere Arbeitszeitgrenzen einhalten und das Jugendarbeitsschutzgesetz aushängen.
+  en: If you employ young people, they need an initial medical examination beforehand, you must comply with special working time limits and you must post the Youth Employment Protection Act (Jugendarbeitsschutzgesetz).
+- de: Wer Umsatzsteuer auf Rechnungen ausweist, gibt je nach Höhe der Steuer im Vorjahr monatlich oder vierteljährlich eine Voranmeldung über ELSTER ab. Amtlos bereitet die Zahlen vor; du übermittelst selbst.
+  en: If you show VAT on invoices, you file an advance return via ELSTER monthly or quarterly, depending on the amount of tax in the previous year. Amtlos prepares the figures; you submit them yourself.
+- de: Wer bei dir mit Lebensmitteln arbeitet, braucht vor dem ersten Arbeitstag die Belehrung nach § 43 IfSG.
+  en: Anyone who works with food in your business needs the instruction under § 43 IfSG before their first working day.
+- de: Wer im Unternehmen mit KI arbeitet, braucht ausreichende KI-Kompetenz – sorge für Schulung und halte sie fest.
+  en: 'Anyone in your company who works with AI needs sufficient AI literacy: provide training and keep a record of it.'
+- de: Wer nicht zur doppelten Buchführung verpflichtet ist, ermittelt den Gewinn mit der Einnahmen-Überschuss-Rechnung.
+  en: If you are not required to use double-entry bookkeeping, you calculate your profit with the cash-basis profit statement (Einnahmen-Überschuss-Rechnung).
+- de: Wer unter NIS2 fällt, muss erhebliche Sicherheitsvorfälle melden und Risikomanagement-Maßnahmen umsetzen. Die Geschäftsleitung haftet für die Umsetzung.
+  en: If NIS2 applies to you, you must report significant security incidents and implement risk management measures. Management is liable for implementation.
+- de: Wer wenig Umsatz macht, kann ohne Umsatzsteuer abrechnen.
+  en: If you have low revenue, you can invoice without VAT.
+- de: Widerrufsbutton für Online-Verträge
+  en: Withdrawal button for online contracts
+- de: Wie lange Mängelansprüche bestehen, hängt von der Art des Werks ab. Amtlos erinnert nach fachlicher Freigabe an das Ende der Fristen.
+  en: How long claims for defects last depends on the type of work. After expert approval, Amtlos will remind you when the deadlines end.
+- de: Wird eine Grenze überschritten, fällt ab diesem Umsatz Umsatzsteuer an.
+  en: If a limit is exceeded, VAT is due from that sale onwards.
+- de: Wirtschaftlich Berechtigte
+  en: Beneficial owners
+- de: Wirtschaftlich Berechtigte ans Transparenzregister melden
+  en: Report beneficial owners to the transparency register
+- de: Wissen und Fähigkeiten, um KI-Systeme sachkundig einzusetzen und ihre Chancen und Risiken zu kennen.
+  en: Knowledge and skills to use AI systems competently and to understand their opportunities and risks.
+- de: Zahl das Stammkapital auf das Geschäftskonto ein, bevor die Gesellschaft zum Handelsregister angemeldet wird.
+  en: Pay the share capital into the business account before the company is registered with the commercial register (Handelsregister).
+- de: Zentrale Stelle Verpackungsregister (LUCID)
+  en: Central Agency Packaging Register (Zentrale Stelle Verpackungsregister, LUCID)
+- de: Zulassungspflichtige Handwerke (Anlage A der Handwerksordnung) brauchen einen Meisterbrief oder eine Ausnahme. Zulassungsfreie Handwerke (Anlage B) müssen ebenfalls eingetragen werden.
+  en: Crafts that require a licence (Annex A of the Handwerksordnung) need a master craftsman's certificate (Meisterbrief) or an exemption. Licence-free crafts (Annex B) must also be registered.
+- de: Zum Jahresabschluss gehören Bilanz und Gewinn- und Verlustrechnung. Die Gesellschafter stellen ihn fest. Die Bilanz geht außerdem elektronisch als E-Bilanz ans Finanzamt.
+  en: The annual financial statements include the balance sheet and profit and loss statement. The shareholders approve them. The balance sheet is also sent electronically to the tax office (Finanzamt)
+    as an E-Bilanz.
+- de: Zur Anmeldung gehört die Gesellschafterliste. Spätere Änderungen, etwa im Gesellschaftsvertrag oder bei der Geschäftsführung, werden ebenfalls notariell angemeldet.
+  en: The registration includes the list of shareholders. Later changes, for example to the articles of association or the management, are also registered via a notary.
+- de: Zusammenfassende Meldung abgeben
+  en: Submit the EC sales list
+- de: Zuständige Berufsgenossenschaft (nach Branche)
+  en: Responsible employers' liability insurance association (by industry)
+- de: Zuständige Erlaubnisbehörde (je nach Gewerbe und Land)
+  en: Responsible permit authority (depends on trade and federal state)
+- de: Zuständige Stelle nach BattDG
+  en: Competent body under the BattDG
+- de: Zuständige Verkehrsbehörde
+  en: Competent transport authority
+- de: Zwei Arbeitstage vor Fälligkeit der Beiträge übermittelst du den Beitragsnachweis an die Krankenkassen.
+  en: Two working days before the contributions are due, you submit the contribution statement (Beitragsnachweis) to the health insurance funds.
+- de: eAU
+  en: eAU
+- de: stiftung elektro-altgeräte register (ear)
+  en: stiftung elektro-altgeräte register (ear)
+- de: § 17 MiLoG verlangt Aufzeichnungen für geringfügig Beschäftigte und für Beschäftigte in den Branchen mit Sofortmeldepflicht.
+  en: § 17 MiLoG requires records for marginally employed persons and for employees in industries with an immediate reporting obligation (Sofortmeldepflicht).
+- de: § 312k BGB verlangt eine einfache Kündigungsmöglichkeit über die Website für Dauerschuldverhältnisse, die online geschlossen werden können.
+  en: § 312k BGB requires an easy way to cancel via the website for continuing obligations that can be concluded online.
+- de: Änderungen im Gesellschafterkreis werden notariell abgewickelt; die aktualisierte Gesellschafterliste wird beim Handelsregister eingereicht.
+  en: Changes among the shareholders are handled by a notary; the updated list of shareholders is filed with the commercial register (Handelsregister).
+- de: Über ELSTER übermittelst du Steuererklärungen und Anmeldungen ans Finanzamt, als Erstes den Fragebogen zur steuerlichen Erfassung. Weil die Aktivierungsdaten per Post kommen, solltest du das Konto
+    früh beantragen.
+  en: You use ELSTER to submit tax returns and filings to the tax office (Finanzamt), starting with the tax registration questionnaire (Fragebogen zur steuerlichen Erfassung). Because the activation data
+    comes by post, you should apply for the account early.
+- de: Über das Widerrufsrecht belehren
+  en: Inform customers about the right of withdrawal
+- de: Über die Datenverarbeitung informieren
+  en: Inform people about data processing
+- de: –
+  en: –

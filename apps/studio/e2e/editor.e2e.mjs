@@ -82,6 +82,18 @@ try {
   await neu.locator('input[name="aktiv"]').check();
   pruefe((await speichern("Speichern", /ok=|fehler=/)).includes("ok=1"), "Partner konnte nicht angelegt werden");
 
+  // Übersetzungen: Redaktion prüft einen englischen Text
+  await p.goto(`${B}/uebersetzungen?suche=${encodeURIComponent("Gefährdungsbeurteilung erstellen")}`);
+  await axe("uebersetzungen");
+  const eintrag = p.locator("li", { hasText: "Gefährdungsbeurteilung erstellen" }).first();
+  if (await eintrag.count()) {
+    await eintrag.locator('input[name="geprueft"]').check();
+    const vorher = p.url();
+    await Promise.all([p.waitForURL((u) => u.href !== vorher || true), eintrag.getByRole("button", { name: "Speichern" }).click()]);
+    await p.waitForLoadState("networkidle");
+    pruefe(await p.getByText(/geprüft am \d{4}-\d{2}-\d{2}/).count(), "Übersetzung wurde nicht als geprüft markiert");
+  } else pruefe(false, "Übersetzung „Gefährdungsbeurteilung erstellen“ fehlt");
+
   // White-Label-Marken: Redaktion darf nicht, Plattform-Admin legt eine Marke für 127.0.0.1 an (für den Web-Rundgang)
   await p.goto(`${B}/marken`);
   pruefe((await p.locator('section[aria-labelledby="neu"]').count()) === 0, "Redaktion sieht das Formular für Marken");

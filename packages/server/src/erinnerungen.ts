@@ -110,7 +110,7 @@ export async function versendeFaelligeErinnerungen(db: Datenbank, versand: Versa
            from app.erinnerung e
            join app.konto k on k.id = e.konto_id
            join app.pflicht_instanz pi on pi.id = e.pflicht_instanz_id
-           join katalog.pflicht_version pv on pv.id = pi.pflicht_version_id
+           join katalog.pflicht_version_anzeige pv on pv.id = pi.pflicht_version_id
           where e.id = any($1) and e.status = 'geplant' and pi.status = 'offen'
           for update of e skip locked`,
         [ids],

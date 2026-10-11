@@ -80,7 +80,7 @@ export class MarktplatzController {
         }
         if (d.teilen.offene_pflichten) {
           const offen = await tx.abfrage<{ titel: Text }>(
-            `select distinct on (pi.pflicht_id) pv.daten->'titel' as titel from app.pflicht_instanz pi join katalog.pflicht_version pv on pv.id = pi.pflicht_version_id
+            `select distinct on (pi.pflicht_id) pv.daten->'titel' as titel from app.pflicht_instanz pi join katalog.pflicht_version_anzeige pv on pv.id = pi.pflicht_version_id
               where pi.unternehmen_id = $1 and pi.status = 'offen' and pi.ergebnis = 'gilt' order by pi.pflicht_id limit 30`,
             [k.unternehmenId],
           );

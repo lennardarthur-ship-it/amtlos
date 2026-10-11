@@ -1,6 +1,6 @@
 /** Alle Oberflächentexte (Prinzip 5: einfache Sprache, Satzanfang groß, keine Füllwörter). */
 export const de = {
-  app: { name: "Amtlos", mit_amtlos: "mit Amtlos" },
+  app: { name: "Amtlos", mit_amtlos: "mit Amtlos", uebersetzung_hinweis: "Die englischen Texte zu Pflichten sind maschinell übersetzt und noch nicht geprüft. Verbindlich ist die deutsche Fassung." },
   nav: { postfach: "Postfach", branche: "Branche", online: "Online", mehr: "Mehr", datenschutz: "Datenschutz", heute: "Heute", pflichten: "Pflichten", kalender: "Kalender", melden: "Melden", einstellungen: "Einstellungen", finanzen: "Finanzen", personal: "Personal", hauptnavigation: "Hauptnavigation", zum_inhalt: "Zum Inhalt springen" },
   anmelden: {
     titel: "Anmelden",

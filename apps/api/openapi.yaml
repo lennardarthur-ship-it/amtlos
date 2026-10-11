@@ -72,6 +72,15 @@ paths:
                   unternehmen: { type: array, items: { $ref: "#/components/schemas/UnternehmenMitRolle" } }
         "401": { $ref: "#/components/responses/NichtAngemeldet" }
 
+  /v1/ich/sprache:
+    put:
+      tags: [Konto]
+      summary: Sprache des Kontos für E-Mails und Benachrichtigungen (die Oberfläche schickt ihre Sprache je Anfrage im Header X-Sprache)
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [sprache], additionalProperties: false, properties: { sprache: { type: string, enum: [de, en] } } } } } }
+      responses:
+        "204": { description: Gespeichert }
+        "422": { $ref: "#/components/responses/Eingabefehler" }
+
   /v1/unternehmen:
     post:
       tags: [Konto]

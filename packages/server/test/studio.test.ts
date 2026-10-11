@@ -1,6 +1,6 @@
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { Datenbank, StudioFehler, importiereKatalog, kontrast, markeSpeichern, markenListe, pruefeMarke, partnerListe, partnerSpeichern, pflichtUebersicht, pflichtVersionen, pruefentscheidung, releaseVeroeffentlichen, studioKonto, testlauf, type StudioKonto } from "../src/index.js";
+import { Datenbank, StudioFehler, importiereKatalog, kontrast, uebersetzungListe, uebersetzungSpeichern, markeSpeichern, markenListe, pruefeMarke, partnerListe, partnerSpeichern, pflichtUebersicht, pflichtVersionen, pruefentscheidung, releaseVeroeffentlichen, studioKonto, testlauf, type StudioKonto } from "../src/index.js";
 import { DB_VERFUEGBAR, WURZEL, frischeDatenbank } from "../src/testhilfen.js";
 
 describe.skipIf(!DB_VERFUEGBAR)("Studio: Versionen, Vier-Augen-Freigabe, Releases", () => {
@@ -143,6 +143,43 @@ describe.skipIf(!DB_VERFUEGBAR)("Studio: Versionen, Vier-Augen-Freigabe, Release
     expect(m.hosts).toEqual(["pflichten.kanzlei-test.example"]);
     await expect(markeSpeichern(studio, k.admin!, { ...basis, schluessel: "andere" })).rejects.toThrow(/Host ist schon/);
     expect((await markenListe(studio)).find((x) => x.id === m.id)).toMatchObject({ name: "Kanzlei Test", unternehmen: 0 });
+  });
+});
+
+describe.skipIf(!DB_VERFUEGBAR)("Studio: Übersetzungen prüfen", () => {
+  let urls: Awaited<ReturnType<typeof frischeDatenbank>>;
+  let owner: Datenbank;
+  let studio: Datenbank;
+  beforeAll(async () => {
+    urls = await frischeDatenbank("amtlos_studio_ue_test");
+    owner = new Datenbank(urls.owner);
+    studio = new Datenbank(urls.studio);
+    await importiereKatalog(studio, path.join(WURZEL, "catalog"));
+  });
+  afterAll(async () => {
+    await owner?.schliessen();
+    await studio?.schliessen();
+  });
+
+  it("importiert, lokalisiert, prüft; erneuter Import lässt Geprüftes stehen", async () => {
+    const l = await uebersetzungListe(studio, { suche: "Umsatzsteuer-Voranmeldung abgeben" });
+    expect(l.gesamt).toBeGreaterThan(700);
+    const z = l.zeilen.find((x) => x.de === "Umsatzsteuer-Voranmeldung abgeben")!;
+    expect(z).toMatchObject({ status: "maschinell", benutzt: true });
+    const konto = await owner.imKontext({}, async (tx) => {
+      const r = await tx.eine<{ id: string }>("select app.konto_anmelden('red', 'red@example.org', 'Red') as id");
+      await tx.abfrage("insert into app.konto_plattform_rolle values ($1, 'redaktion')", [r!.id]);
+      return { id: r!.id, sub: "red", rollen: ["redaktion"] } as unknown as StudioKonto;
+    });
+    await expect(uebersetzungSpeichern(studio, { ...konto, rollen: ["experte"] } as StudioKonto, z.schluessel, "x", true)).rejects.toThrow(/Redaktion/);
+    await uebersetzungSpeichern(studio, konto, z.schluessel, "Submit the advance VAT return (UStVA)", true);
+    const titel = await owner.imKontext({}, (tx) =>
+      tx.eine<{ en: string }>("select daten->'titel'->>'en' as en from katalog.pflicht_version_anzeige where pflicht_id = 'steuern.ust_voranmeldung' order by version desc limit 1"),
+    );
+    expect(titel!.en).toBe("Submit the advance VAT return (UStVA)");
+    const r = await importiereKatalog(studio, path.join(WURZEL, "catalog"));
+    expect(r.uebersetzungen).toBe(0); // Geprüftes aus dem Studio gewinnt gegen die Datei (E-030)
+    expect((await uebersetzungListe(studio, { suche: "Umsatzsteuer-Voranmeldung abgeben" })).zeilen.find((x) => x.de === z.de)).toMatchObject({ status: "geprueft", text: "Submit the advance VAT return (UStVA)" });
   });
 });
 

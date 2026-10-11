@@ -1,4 +1,5 @@
 import "server-only";
+import { aktuelleSprache } from "./sprache";
 import { notFound, redirect } from "next/navigation";
 import { cache } from "react";
 import { konfig } from "./konfig";
@@ -22,6 +23,7 @@ async function roh(pfad: string, init: RequestInit & { unternehmen?: string | fa
   kopf.set("Authorization", `Bearer ${s.token}`);
   if (typeof init.body === "string") kopf.set("Content-Type", "application/json"); // FormData setzt den Typ selbst (multipart)
   if (init.unternehmen) kopf.set("X-Unternehmen-Id", init.unternehmen);
+  kopf.set("X-Sprache", await aktuelleSprache()); // Katalogtexte und Meldungen in der Sprache der Oberfläche
   const r = await fetch(`${konfig().apiUrl}${pfad}`, { ...init, headers: kopf, cache: "no-store" });
   if (r.status === 401) redirect("/anmelden?abgelaufen=1");
   return r;

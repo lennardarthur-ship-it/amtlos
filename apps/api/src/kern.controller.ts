@@ -57,6 +57,14 @@ export class KernController {
     }));
   }
 
+  /** Sprache des Kontos für E-Mails und Benachrichtigungen. */
+  @Put("ich/sprache")
+  @HttpCode(204)
+  async spracheSetzen(@Kontext() k: Anfragekontext, @Body() body: unknown) {
+    const { sprache } = pruefe(z.object({ sprache: z.enum(["de", "en"]) }).strict(), body);
+    await this.db.imKontext({ kontoId: k.kontoId }, (tx) => tx.abfrage("select app.konto_sprache_setzen($1)", [sprache]));
+  }
+
   @Post("unternehmen")
   async unternehmenAnlegen(@Kontext() k: Anfragekontext, @Body() body: unknown) {
     const { name, marke } = pruefe(UnternehmenNeu, body);

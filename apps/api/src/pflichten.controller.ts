@@ -42,7 +42,7 @@ const ABFRAGE = `
          pi.fehlende_fakten, pi.nicht_zutreffend_grund, pi.erledigt_am, pv.version, pv.pruef_status, pv.daten,
          pr.geprueft_von, pr.geprueft_am
     from app.pflicht_instanz_anzeige pi
-    join katalog.pflicht_version pv on pv.id = pi.pflicht_version_id
+    join katalog.pflicht_version_anzeige pv on pv.id = pi.pflicht_version_id
     join katalog.pflicht_version_pruefung pr on pr.id = pv.id
    where pi.unternehmen_id = $1`;
 

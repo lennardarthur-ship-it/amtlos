@@ -430,6 +430,21 @@ async function rundgang(farbschema, breite) {
     await p.goto(`${B}/team`);
       pruefe(await p.getByText(gast, { exact: true }).count(), `${name("team")}: neues Mitglied fehlt`);
   }
+  // Englisch (Abschnitt 10): Oberfläche und Katalogtexte, Hinweis auf maschinelle Übersetzung; danach zurück auf Deutsch
+  await p.goto(`${B}/einstellungen`);
+  await p.selectOption('select[name="sprache"]', "en");
+  await Promise.all([p.waitForLoadState("networkidle"), p.getByRole("button", { name: "Sprache speichern" }).click()]);
+  await p.goto(`${B}/pflichten`);
+  await p.getByRole("heading", { level: 1, name: "Obligations" }).waitFor({ timeout: 10000 }).catch(() => pruefe(false, `${name("englisch")}: Überschrift nicht englisch`));
+  pruefe(await p.getByText(/advance VAT return|safety briefing|risk assessment/i).count(), `${name("englisch")}: Katalogtexte nicht englisch`);
+  pruefe(await p.getByText("The German version is binding.", { exact: false }).count(), `${name("englisch")}: Hinweis auf maschinelle Übersetzung fehlt`);
+  pruefe((await p.locator("html").getAttribute("lang")) === "en", `${name("englisch")}: html lang nicht en`);
+  await barrierefrei(p, name("englisch-pflichten"));
+  await p.goto(`${B}/heute`);
+  await barrierefrei(p, name("englisch-heute"));
+  await p.goto(`${B}/einstellungen`);
+  await p.selectOption('select[name="sprache"]', "de");
+  await Promise.all([p.waitForLoadState("networkidle"), p.getByRole("button", { name: "Save language" }).click()]);
   await ctx.close();
 }
 

@@ -149,7 +149,7 @@ export class PersonalController {
       const perioden = [`aenderung-${b.eintritt.replaceAll("-", "")}`, ...(b.austritt ? [`aenderung-${b.austritt.replaceAll("-", "")}`] : [])];
       const zeilen = await tx.abfrage<{ pflicht_id: string; periode: string; anzeige_status: string; faellig_am: string | null; titel: Text; kurz: Text }>(
         `select pi.pflicht_id, pi.periode, pi.anzeige_status, pi.faellig_am, pv.daten->'titel' as titel, pv.daten->'kurz' as kurz
-           from app.pflicht_instanz_anzeige pi join katalog.pflicht_version pv on pv.id = pi.pflicht_version_id
+           from app.pflicht_instanz_anzeige pi join katalog.pflicht_version_anzeige pv on pv.id = pi.pflicht_version_id
           where pi.unternehmen_id = $1 and pi.periode = any($2) and pi.status <> 'entfallen'
           order by pi.faellig_am nulls last, pi.pflicht_id`,
         [k.unternehmenId, perioden],

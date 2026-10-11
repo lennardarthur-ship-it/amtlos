@@ -1,4 +1,7 @@
+import fs from "node:fs";
+import path from "node:path";
 import { validiereKatalog } from "@amtlos/rules-schema";
+import { parse } from "yaml";
 import type { Datenbank, Tx } from "./datenbank.js";
 import { katalogCacheLeeren } from "./katalog.js";
 
@@ -9,6 +12,8 @@ export interface ImportErgebnis {
   neuePflichtversionen: number;
   neueRegelwertversionen: number;
   unveraendert: boolean;
+  /** neu angelegte oder geänderte Übersetzungen (E-107) */
+  uebersetzungen: number;
 }
 
 interface Quelle {
@@ -81,8 +86,10 @@ export async function importiereKatalog(db: Datenbank, katalogDir: string): Prom
       "select ri.objekt_id from katalog.aktives_release r join katalog.release_inhalt ri on ri.release_id = r.id",
     );
     const aktivIds = new Set(aktiv.map((a) => a.objekt_id));
+    const uebersetzungen = await importiereUebersetzungen(tx, katalogDir);
+    if (uebersetzungen) katalogCacheLeeren();
     if (aktiv.length === inhalt.length && inhalt.every((i) => aktivIds.has(i.id))) {
-      return { release: null, neuePflichtversionen, neueRegelwertversionen, unveraendert: true };
+      return { release: null, neuePflichtversionen, neueRegelwertversionen, unveraendert: true, uebersetzungen };
     }
 
     const r = await tx.eine<{ id: string; nummer: number }>(
@@ -93,7 +100,7 @@ export async function importiereKatalog(db: Datenbank, katalogDir: string): Prom
     for (const i of inhalt) await tx.abfrage("insert into katalog.release_inhalt values ($1, $2, $3)", [r!.id, i.art, i.id]);
     await tx.abfrage("update katalog.release set veroeffentlicht_am = now() where id = $1", [r!.id]);
     katalogCacheLeeren();
-    return { release: r!.nummer, neuePflichtversionen, neueRegelwertversionen, unveraendert: false };
+    return { release: r!.nummer, neuePflichtversionen, neueRegelwertversionen, unveraendert: false, uebersetzungen };
   });
 }
 
@@ -144,4 +151,50 @@ export function kanonisch(x: unknown): string {
       .map((k) => `${JSON.stringify(k)}:${kanonisch((x as Record<string, unknown>)[k])}`)
       .join(",")}}`;
   return JSON.stringify(x);
+}
+
+interface UebersetzungsDatei { sprache: string; status?: string; eintraege: { de: string; en: string }[] }
+
+/** Prüft eine Übersetzungsdatei; gibt Fehlermeldungen zurück (leer = gültig). */
+export function pruefeUebersetzungen(d: unknown, datei: string): string[] {
+  const f: string[] = [];
+  const u = d as Partial<UebersetzungsDatei> | null;
+  if (!u || u.sprache !== "en") f.push(`${datei}: sprache muss "en" sein`);
+  if (u?.status && !["maschinell", "geprueft"].includes(u.status)) f.push(`${datei}: status unbekannt`);
+  if (!Array.isArray(u?.eintraege)) return [...f, `${datei}: eintraege fehlt`];
+  const gesehen = new Set<string>();
+  u.eintraege.forEach((e, i) => {
+    if (typeof e?.de !== "string" || !e.de.trim() || typeof e?.en !== "string" || !e.en.trim()) f.push(`${datei}: Eintrag ${i + 1} braucht de und en`);
+    else if (gesehen.has(e.de)) f.push(`${datei}: doppelter deutscher Text in Eintrag ${i + 1}`);
+    else gesehen.add(e.de);
+  });
+  return f;
+}
+
+/**
+ * Übersetzungen aus catalog/uebersetzungen/*.yaml übernehmen. Im Studio geprüfte Einträge gewinnen (die Datenbank ist
+ * Quelle der Wahrheit, E-030); sonst übernimmt ein geänderter Text Text und Status der Datei. Danach werden die lokalisierten Dokumente neu berechnet.
+ */
+async function importiereUebersetzungen(tx: Tx, katalogDir: string): Promise<number> {
+  const ordner = path.join(katalogDir, "uebersetzungen");
+  if (!fs.existsSync(ordner)) return 0;
+  let geaendert = 0;
+  for (const name of fs.readdirSync(ordner).filter((n) => n.endsWith(".yaml")).sort()) {
+    const d = parse(fs.readFileSync(path.join(ordner, name), "utf8")) as UebersetzungsDatei;
+    const fehler = pruefeUebersetzungen(d, name);
+    if (fehler.length) throw new Error(`Übersetzungen ungültig:\n- ${fehler.join("\n- ")}`);
+    const status = d.status ?? "maschinell";
+    for (const e of d.eintraege) {
+      const r = await tx.abfrage(
+        `insert into katalog.uebersetzung (sprache, de, text, status) values ($1, $2, $3, $4)
+         on conflict (sprache, de_hash) do update set text = excluded.text, status = excluded.status, geprueft_von = null, geprueft_am = null, geaendert_am = now()
+           where katalog.uebersetzung.text is distinct from excluded.text and katalog.uebersetzung.status <> 'geprueft' 
+         returning 1`,
+        [d.sprache, e.de, e.en.trim(), status],
+      );
+      geaendert += r.length;
+    }
+  }
+  if (geaendert) await tx.abfrage("select katalog.lokal_auffrischen()");
+  return geaendert;
 }

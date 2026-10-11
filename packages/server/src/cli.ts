@@ -34,6 +34,7 @@ async function main() {
       try {
         const e = await importiereKatalog(db, process.env.KATALOG ?? path.join(wurzel, "catalog"));
         console.warn(e.unveraendert ? "Katalog unverändert – kein neues Release" : `Release ${e.release} veröffentlicht (${e.neuePflichtversionen} Pflicht-, ${e.neueRegelwertversionen} Regelwertversionen neu)`);
+        if (e.uebersetzungen) console.warn(`${e.uebersetzungen} Übersetzungen übernommen`);
       } finally {
         await db.schliessen();
       }
