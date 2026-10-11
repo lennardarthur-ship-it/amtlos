@@ -21,6 +21,7 @@ export default async function StudioRahmen({ children }: { children: ReactNode }
               <li><Link className="verweis" href="/releases">Releases</Link></li>
               <li><Link className="verweis" href="/pruefliste">Prüfliste</Link></li>
               <li><Link className="verweis" href="/partner">Partner</Link></li>
+              <li><Link className="verweis" href="/marken">Marken</Link></li>
             </ul>
           </nav>
         </div>

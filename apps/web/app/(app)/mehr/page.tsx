@@ -16,6 +16,7 @@ export default async function MehrSeite() {
     ["/branche", x.nav.branche, x.branche.text, true],
     ["/melden", x.mehr.melden, x.melden.text, false],
     ["/team", x.team.titel, "", false],
+    ["/kanzlei", x.kanzlei.titel, x.kanzlei.text, false],
     ["/hilfe", x.hilfe.titel, "", false],
     ["/einstellungen", x.nav.einstellungen, "", true],
   ] as const;

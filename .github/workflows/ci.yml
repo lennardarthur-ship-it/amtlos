@@ -108,6 +108,8 @@ jobs:
             SITZUNG_SCHLUESSEL=ci-sitzung-schluessel-mindestens-32-zeichen-lang nohup pnpm --filter @amtlos/web start > web.log 2>&1 &
           MIGRATION_DATABASE_URL=postgresql://amtlos_owner:amtlos@localhost:5432/amtlos \
             node packages/server/dist/cli.js plattformrolle redakteurin r@example.org "Rita Redaktion" redaktion
+          MIGRATION_DATABASE_URL=postgresql://amtlos_owner:amtlos@localhost:5432/amtlos \
+            node packages/server/dist/cli.js plattformrolle plattformadmin a@example.org "Ada Admin" plattform_admin
           UMGEBUNG=dev AUTH_MODUS=dev WEB_URL=http://localhost:3100 COOKIE_PRAEFIX=amtlos_studio \
             SITZUNG_SCHLUESSEL=ci-studio-schluessel-mindestens-32-zeichen-lang \
             STUDIO_DATABASE_URL=postgresql://studio_user:amtlos@localhost:5432/amtlos nohup pnpm --filter @amtlos/studio start > studio.log 2>&1 &

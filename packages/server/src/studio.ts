@@ -378,3 +378,82 @@ export async function partnerSpeichern(db: Datenbank, wer: StudioKonto, d: Partn
     return tx.eine("insert into katalog.partner (name, qualifikation, kanzlei, regionen, beschreibung, pakete, email, website, zulassung_geprueft_am, aktiv) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) returning *", werte);
   });
 }
+
+// ------------------------------------------------------------ White-Label-Marken (Abschnitt 10, E-105)
+
+export interface MarkeDaten {
+  schluessel: string;
+  name: string;
+  hosts?: string[];
+  farbe_hell: string;
+  farbe_dunkel: string;
+  logo_url?: string | null;
+  support_email?: string | null;
+  aktiv?: boolean;
+}
+
+/** Relative Leuchtdichte nach WCAG 2.x für #rrggbb. */
+function leuchtdichte(hex: string): number {
+  const k = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * k[0]! + 0.7152 * k[1]! + 0.0722 * k[2]!;
+}
+
+/** Kontrastverhältnis nach WCAG (1 bis 21). */
+export function kontrast(a: string, b: string): number {
+  const [x, y] = [leuchtdichte(a), leuchtdichte(b)].sort((p, q) => q - p);
+  return (x! + 0.05) / (y! + 0.05);
+}
+
+/**
+ * Flächen des Designsystems, auf denen die Markenfarbe stehen muss (Links auf Papier und Blatt, Knopftext in
+ * Blattfarbe auf der Markenfarbe). Mindestens 4,5 : 1 (WCAG 2.2 AA, normaler Text).
+ */
+export const MARKEN_FLAECHEN = { hell: ["#ffffff", "#f2f3ef"], dunkel: ["#19212a", "#11171d"] } as const;
+export const MINDESTKONTRAST = 4.5;
+
+export function pruefeMarke(d: MarkeDaten): string[] {
+  const f: string[] = [];
+  if (!/^[a-z0-9][a-z0-9-]{1,39}$/.test(d.schluessel ?? "")) f.push("Schlüssel: 2–40 Zeichen, Kleinbuchstaben, Ziffern, Bindestrich");
+  if (!d.name?.trim() || d.name.trim().length < 2 || d.name.trim().length > 80) f.push("Name: 2–80 Zeichen");
+  for (const h of d.hosts ?? []) if (!/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/.test(h)) f.push(`Hostname ungültig: ${h}`);
+  for (const [art, farbe] of [["hell", d.farbe_hell], ["dunkel", d.farbe_dunkel]] as const) {
+    if (!/^#[0-9a-f]{6}$/.test(farbe ?? "")) {
+      f.push(`Farbe ${art}: Format #rrggbb (Kleinbuchstaben)`);
+      continue;
+    }
+    const schlechtester = Math.min(...MARKEN_FLAECHEN[art].map((g) => kontrast(farbe, g)));
+    if (schlechtester < MINDESTKONTRAST) f.push(`Farbe ${art}: Kontrast ${schlechtester.toFixed(2).replace(".", ",")} : 1 – mindestens 4,5 : 1 nötig`);
+  }
+  if (d.logo_url && !/^https:\/\/[^\s"'<>]+$/.test(d.logo_url)) f.push("Logo: nur https-Adresse");
+  if (d.support_email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.support_email)) f.push("Support-E-Mail ungültig");
+  return f;
+}
+
+export async function markenListe(db: Datenbank) {
+  return db.imKontext({}, (tx) =>
+    tx.abfrage("select m.*, coalesce(n.unternehmen, 0)::int as unternehmen from katalog.marke m left join katalog.marken_nutzung() n on n.marke_id = m.id order by not m.aktiv, m.name"),
+  );
+}
+
+/** Anlegen oder ändern; nur Plattform-Admin (Marken sind Verträge mit Partnern, keine Redaktionsinhalte). */
+export async function markeSpeichern(db: Datenbank, wer: StudioKonto, d: MarkeDaten, id?: string) {
+  if (!wer.rollen.includes("plattform_admin")) throw new StudioFehler("Nur Plattform-Admin pflegt Marken");
+  const normal = { ...d, hosts: (d.hosts ?? []).map((h) => h.trim().toLowerCase()).filter(Boolean), farbe_hell: d.farbe_hell?.toLowerCase(), farbe_dunkel: d.farbe_dunkel?.toLowerCase() };
+  const fehler = pruefeMarke(normal);
+  if (fehler.length) throw new StudioFehler(fehler.join("; "));
+  const werte = [normal.schluessel, normal.name.trim(), normal.hosts, normal.farbe_hell, normal.farbe_dunkel, normal.logo_url || null, normal.support_email || null, normal.aktiv !== false];
+  return db
+    .imKontext({ kontoId: wer.id }, async (tx) => {
+      if (id) {
+        const r = await tx.eine("update katalog.marke set schluessel = $2, name = $3, hosts = $4, farbe_hell = $5, farbe_dunkel = $6, logo_url = $7, support_email = $8, aktiv = $9 where id = $1 returning *", [id, ...werte]);
+        if (!r) throw new StudioFehler("Marke nicht gefunden");
+        return r;
+      }
+      return tx.eine("insert into katalog.marke (schluessel, name, hosts, farbe_hell, farbe_dunkel, logo_url, support_email, aktiv) values ($1, $2, $3, $4, $5, $6, $7, $8) returning *", werte);
+    })
+    .catch((e: unknown) => {
+      const code = (e as { code?: string }).code;
+      if (code === "23505") throw new StudioFehler((e as Error).message.includes("Host") ? "Ein Host ist schon einer anderen Marke zugeordnet" : "Schlüssel ist schon vergeben");
+      throw e;
+    });
+}

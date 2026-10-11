@@ -1,6 +1,6 @@
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { Datenbank, StudioFehler, importiereKatalog, partnerListe, partnerSpeichern, pflichtUebersicht, pflichtVersionen, pruefentscheidung, releaseVeroeffentlichen, studioKonto, testlauf, type StudioKonto } from "../src/index.js";
+import { Datenbank, StudioFehler, importiereKatalog, kontrast, markeSpeichern, markenListe, pruefeMarke, partnerListe, partnerSpeichern, pflichtUebersicht, pflichtVersionen, pruefentscheidung, releaseVeroeffentlichen, studioKonto, testlauf, type StudioKonto } from "../src/index.js";
 import { DB_VERFUEGBAR, WURZEL, frischeDatenbank } from "../src/testhilfen.js";
 
 describe.skipIf(!DB_VERFUEGBAR)("Studio: Versionen, Vier-Augen-Freigabe, Releases", () => {
@@ -27,6 +27,7 @@ describe.skipIf(!DB_VERFUEGBAR)("Studio: Versionen, Vier-Augen-Freigabe, Release
     await konto("stb", "experte", "steuerberater");
     await konto("ra", "experte", "rechtsanwalt");
     await konto("pruefer", "experte");
+    await konto("admin", "plattform_admin");
   });
   afterAll(async () => {
     await owner?.schliessen();
@@ -132,5 +133,29 @@ describe.skipIf(!DB_VERFUEGBAR)("Studio: Versionen, Vier-Augen-Freigabe, Release
     const p = (await partnerSpeichern(studio, k.redakteurin!, { ...basis, zulassung_geprueft_am: "2026-09-01" })) as { id: string };
     await partnerSpeichern(studio, k.redakteurin!, { ...basis, name: "Kanzlei Test & Partner", aktiv: false }, p.id);
     expect((await partnerListe(studio)).find((x) => x.id === p.id)).toMatchObject({ name: "Kanzlei Test & Partner", aktiv: false });
+  });
+
+  it("pflegt White-Label-Marken: nur Admin, Farben mit ausreichendem Kontrast, Hosts eindeutig", async () => {
+    const basis = { schluessel: "kanzlei-test", name: "Kanzlei Test", hosts: ["Pflichten.Kanzlei-Test.example"], farbe_hell: "#1f4e8c", farbe_dunkel: "#8fb8ff" };
+    await expect(markeSpeichern(studio, k.redakteurin!, basis)).rejects.toThrow(/Plattform-Admin/);
+    await expect(markeSpeichern(studio, k.admin!, { ...basis, farbe_hell: "#7fd1ff" })).rejects.toThrow(/Farbe hell: Kontrast 1,[0-9]+ : 1/);
+    const m = (await markeSpeichern(studio, k.admin!, basis)) as { id: string; hosts: string[] };
+    expect(m.hosts).toEqual(["pflichten.kanzlei-test.example"]);
+    await expect(markeSpeichern(studio, k.admin!, { ...basis, schluessel: "andere" })).rejects.toThrow(/Host ist schon/);
+    expect((await markenListe(studio)).find((x) => x.id === m.id)).toMatchObject({ name: "Kanzlei Test", unternehmen: 0 });
+  });
+});
+
+describe("Markenfarben: Kontrast nach WCAG", () => {
+  it("berechnet das Kontrastverhältnis", () => {
+    expect(kontrast("#000000", "#ffffff")).toBeCloseTo(21, 5);
+    expect(kontrast("#ffffff", "#ffffff")).toBeCloseTo(1, 5);
+  });
+  it("die Amtlos-Farben selbst bestehen die Prüfung", () => {
+    expect(pruefeMarke({ schluessel: "amtlos", name: "Amtlos", farbe_hell: "#136f5b", farbe_dunkel: "#5cc2a6" })).toEqual([]);
+  });
+  it("lehnt zu helle oder zu dunkle Farben und unsichere Logos ab", () => {
+    const f = pruefeMarke({ schluessel: "X", name: "A", farbe_hell: "#ffcc00", farbe_dunkel: "#203040", logo_url: "javascript:alert(1)" });
+    expect(f.join(" | ")).toMatch(/Schlüssel.*Name.*Farbe hell.*Farbe dunkel.*Logo/);
   });
 });

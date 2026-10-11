@@ -1,6 +1,6 @@
 /** Alle Oberflächentexte (Prinzip 5: einfache Sprache, Satzanfang groß, keine Füllwörter). */
 export const de = {
-  app: { name: "Amtlos" },
+  app: { name: "Amtlos", mit_amtlos: "mit Amtlos" },
   nav: { postfach: "Postfach", branche: "Branche", online: "Online", mehr: "Mehr", datenschutz: "Datenschutz", heute: "Heute", pflichten: "Pflichten", kalender: "Kalender", melden: "Melden", einstellungen: "Einstellungen", finanzen: "Finanzen", personal: "Personal", hauptnavigation: "Hauptnavigation", zum_inhalt: "Zum Inhalt springen" },
   anmelden: {
     titel: "Anmelden",
@@ -110,6 +110,7 @@ export const de = {
     du: "du",
     rollen: { inhaber: "Inhaber:in", mitarbeiter: "Mitarbeiter:in", steuerberater: "Steuerberatung", admin: "Admin" },
     rollen_text: {
+      inhaber: "verantwortet das Unternehmen und kann alles ändern",
       mitarbeiter: "sieht Pflichten und kann sie erledigen, ändert aber keine Angaben zum Unternehmen",
       steuerberater: "sieht alles und kann Angaben ändern und Pflichten erledigen",
       admin: "kann alles ändern, auch einladen und entfernen",
@@ -868,6 +869,26 @@ export const de = {
       sonstiges: "Ordne den Brief ein, damit du die Frist nicht verpasst.",
     },
     weitere_fristen: "Weitere Fristen",
+  },
+  kanzlei: {
+    titel: "Mandantenübersicht",
+    text: "Alle Unternehmen, in denen du Mitglied bist – Dringendes zuerst.",
+    leer: "Noch keine Unternehmen.",
+    oeffnen: "Öffnen",
+    rolle: "deine Rolle: {rolle}",
+    marke: "über {marke}",
+    ohne_profil: "Profil noch nicht ausgefüllt",
+    naechste: "Als Nächstes: {titel}",
+    bis: "bis {datum}",
+    nichts_offen: "Nichts offen",
+    neu_titel: "Mandanten anlegen",
+    neu_text: "Du wirst als Steuerberatung Mitglied. Die Mandantin oder der Mandant bekommt eine Einladung als Inhaber:in und kann danach selbst einladen und entscheiden.",
+    name: "Name des Unternehmens",
+    email: "E-Mail-Adresse der Inhaberin oder des Inhabers",
+    anlegen: "Anlegen und einladen",
+    angelegt: "Angelegt. Die Einladung ist per E-Mail unterwegs. Du kannst den Link auch selbst weitergeben – er wird nur jetzt angezeigt:",
+    link: "Einladungslink",
+    zur_uebersicht: "Mandantenübersicht",
   },
   experten: {
     titel: "Expertinnen und Experten",

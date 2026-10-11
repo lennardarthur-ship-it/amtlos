@@ -1,3 +1,4 @@
+import { Markenname } from "@/komponenten/markenname";
 import { redirect } from "next/navigation";
 import { devAnmelden } from "@amtlos/web-kern/auth-routen";
 import { sichererPfad } from "@amtlos/web-kern/pfad";
@@ -22,7 +23,7 @@ export default async function Anmelden({ searchParams }: { searchParams: Promise
   const dev = konfig().authModus === "dev";
   return (
     <main className="mx-auto max-w-md px-4 py-16">
-      <p className="text-titel font-bold">{x.app.name}</p>
+      <p><Markenname /></p>
       <h1 className="mt-10 text-titel font-bold">{x.anmelden.titel}</h1>
       <p className="mt-2">{x.anmelden.text}</p>
       {fehler ? (

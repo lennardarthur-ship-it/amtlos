@@ -22,6 +22,7 @@ security:
 
 tags:
   - name: Konto
+  - name: Kanzlei
   - name: Profil und Ereignisse
   - name: Pflichten
   - name: Kalender
@@ -77,7 +78,7 @@ paths:
       summary: Unternehmen anlegen (der Anlegende wird Inhaber)
       requestBody:
         required: true
-        content: { application/json: { schema: { type: object, required: [name], additionalProperties: false, properties: { name: { type: string, minLength: 1, maxLength: 200 } } } } }
+        content: { application/json: { schema: { type: object, required: [name], additionalProperties: false, properties: { name: { type: string, minLength: 1, maxLength: 200 }, marke: { type: string, nullable: true, description: "Schlüssel der White-Label-Marke (aus dem Hostnamen); unbekannte Marken werden ignoriert" } } } } }
       responses:
         "201": { description: Angelegt, content: { application/json: { schema: { $ref: "#/components/schemas/UnternehmenMitRolle" } } } }
         "422": { $ref: "#/components/responses/Eingabefehler" }
@@ -1657,6 +1658,46 @@ paths:
         "200": { description: Beigetreten, content: { application/json: { schema: { type: object, properties: { unternehmen_id: { type: string, format: uuid } } } } } }
         "403": { description: Einladung gilt für eine andere E-Mail-Adresse }
         "404": { description: Einladung ungültig, schon benutzt, zurückgezogen oder abgelaufen }
+
+  /v1/mandanten:
+    get:
+      tags: [Kanzlei]
+      summary: Alle eigenen Unternehmen mit Ampel, Zählern und dringendster Pflicht (Kanzlei-Übersicht)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id: { type: string, format: uuid }
+                    name: { type: string }
+                    rolle: { type: string }
+                    marke: { type: string, nullable: true }
+                    profil_vorhanden: { type: boolean }
+                    zaehler: { type: object }
+                    ampel: { type: object }
+                    naechste: { type: object, nullable: true }
+    post:
+      tags: [Kanzlei]
+      summary: Mandant anlegen – die Kanzlei wird Steuerberatung, der Mandant erhält eine Einladung als Inhaber (Link nur in dieser Antwort)
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [name, email], additionalProperties: false, properties: { name: { type: string, maxLength: 200 }, email: { type: string, format: email }, marke: { type: string, nullable: true } } } } } }
+      responses:
+        "201": { description: Angelegt }
+        "422": { $ref: "#/components/responses/Eingabefehler" }
+
+  /v1/marke:
+    get:
+      tags: [Kanzlei]
+      summary: White-Label-Marke zum Hostnamen (öffentlich, nur Darstellungsangaben)
+      security: []
+      parameters: [{ name: host, in: query, required: true, schema: { type: string } }]
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: object, properties: { schluessel: { type: string }, name: { type: string }, farbe_hell: { type: string }, farbe_dunkel: { type: string }, logo_url: { type: string, nullable: true }, support_email: { type: string, nullable: true } } } } } }
+        "404": { description: Keine Marke }
 
 components:
   securitySchemes:

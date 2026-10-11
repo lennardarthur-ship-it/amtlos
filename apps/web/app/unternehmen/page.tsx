@@ -28,9 +28,12 @@ export default async function UnternehmenWechseln() {
           </li>
         ))}
       </ul>
-      <p className="mt-6">
+      <p className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
         <Link href="/unternehmen/neu" className="verweis">
           {x.unternehmen.neu_titel}
+        </Link>
+        <Link href="/kanzlei" className="verweis">
+          {x.kanzlei.zur_uebersicht}
         </Link>
       </p>
     </main>

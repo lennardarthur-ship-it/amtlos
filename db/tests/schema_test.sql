@@ -297,6 +297,25 @@ select pg_temp.erwarte_fehler($$insert into katalog.partner (name, qualifikation
 select pg_temp.ok(true, 'Partner pflegt nur das Studio');
 reset role;
 
+-- ---------- Kanzlei und Marken (0014) ----------
+set role api_user;
+select set_config('amtlos.konto_id', :'anna_konto_anmelden', false);
+select set_config('amtlos.unternehmen_id', :'u1', false);
+select pg_temp.erwarte_fehler(format($$insert into app.einladung (unternehmen_id, email, rolle, token_hash, laeuft_ab) values (%L, 'x@example.org', 'inhaber', '\x01', now() + interval '1 day')$$, :'u1'), 'einladung_nicht_inhaber');
+select pg_temp.ok(true, 'Inhaber-Einladungen nur über die Mandantenanlage');
+select pg_temp.erwarte_fehler($$insert into katalog.marke (schluessel, name, farbe_hell, farbe_dunkel) values ('x1', 'X', '#000000', '#ffffff')$$, 'permission denied');
+select pg_temp.ok(true, 'Marken pflegt nur das Studio');
+reset role;
+set role studio_user;
+insert into katalog.marke (schluessel, name, hosts, farbe_hell, farbe_dunkel) values ('m-eins', 'Eins', '{a.example.org}', '#1f4e8c', '#8fb8ff');
+select pg_temp.erwarte_fehler($$insert into katalog.marke (schluessel, name, hosts, farbe_hell, farbe_dunkel) values ('m-zwei', 'Zwei', '{a.example.org}', '#1f4e8c', '#8fb8ff')$$, 'anderen Marke');
+select pg_temp.ok(true, 'Ein Host gehört höchstens einer aktiven Marke');
+select pg_temp.erwarte_fehler($$insert into katalog.marke (schluessel, name, hosts, farbe_hell, farbe_dunkel) values ('m-drei', 'Drei', '{"evil host"}', '#1f4e8c', '#8fb8ff')$$, 'Hostname');
+select pg_temp.ok(true, 'Hostnamen werden geprüft');
+select pg_temp.erwarte_fehler($$insert into katalog.marke (schluessel, name, farbe_hell, farbe_dunkel) values ('m-vier', 'Vier', 'red', '#8fb8ff')$$, 'check');
+select pg_temp.ok(true, 'Farben nur als #rrggbb');
+reset role;
+
 -- ---------- Audit ----------
 select pg_temp.ok((select count(*) > 10 from audit.ereignis), 'Audit protokolliert Änderungen');
 select pg_temp.ok((select bool_and(vorgaenger_hash is not null) from audit.ereignis where id > (select min(id) from audit.ereignis)), 'Hash-Kette lückenlos');

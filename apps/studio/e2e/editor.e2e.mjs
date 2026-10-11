@@ -3,7 +3,7 @@
  * Studio-Rundgang: Redaktion bearbeitet eine Pflicht im Formular-Editor, Fehlermeldung bei leerem Titel,
  * neue Pflicht anlegen; axe (WCAG 2.2 AA) auf Übersicht und Editor.
  * Erwartet laufendes Studio (STUDIO_URL, Standard http://localhost:3100) mit AUTH_MODUS=dev und ein Konto
- * „redakteurin“ mit Plattformrolle redaktion. Browser: CHROMIUM_PFAD oder Playwright-Chromium.
+ * „redakteurin“ mit Plattformrolle redaktion und ein Konto „plattformadmin“ mit Plattformrolle plattform_admin. Browser: CHROMIUM_PFAD oder Playwright-Chromium.
  */
 import AxeBuilder from "@axe-core/playwright";
 import { chromium } from "playwright-core";
@@ -81,6 +81,39 @@ try {
   await neu.locator('input[name="zulassung_geprueft_am"]').fill("2026-01-15");
   await neu.locator('input[name="aktiv"]').check();
   pruefe((await speichern("Speichern", /ok=|fehler=/)).includes("ok=1"), "Partner konnte nicht angelegt werden");
+
+  // White-Label-Marken: Redaktion darf nicht, Plattform-Admin legt eine Marke für 127.0.0.1 an (für den Web-Rundgang)
+  await p.goto(`${B}/marken`);
+  pruefe((await p.locator('section[aria-labelledby="neu"]').count()) === 0, "Redaktion sieht das Formular für Marken");
+  const admin = await (await browser.newContext({ viewport: { width: 1360, height: 900 } })).newPage();
+  await admin.goto(`${B}/anmelden`);
+  await admin.fill("#kennung", "plattformadmin");
+  await admin.click("button");
+  await admin.waitForSelector("header");
+  await admin.goto(`${B}/marken`);
+  if (!(await admin.getByText("Kanzlei Beispiel").count())) {
+    const form = admin.locator('section[aria-labelledby="neu"]');
+    await form.locator('input[name="schluessel"]').fill("kanzlei-beispiel");
+    await form.locator('input[name="name"]').fill("Kanzlei Beispiel");
+    await form.locator('input[name="hosts"]').fill("127.0.0.1");
+    await form.locator('input[name="farbe_hell"]').fill("#ffd400");
+    const vorher = admin.url();
+    await Promise.all([admin.waitForURL((u) => u.href !== vorher), form.getByRole("button", { name: "Speichern" }).click()]);
+    pruefe(/Kontrast/.test(decodeURIComponent(admin.url())), "Marke mit zu hellem Gelb wurde nicht abgewiesen");
+    await form.locator('input[name="schluessel"]').fill("kanzlei-beispiel");
+    await form.locator('input[name="name"]').fill("Kanzlei Beispiel");
+    await form.locator('input[name="hosts"]').fill("127.0.0.1");
+    await form.locator('input[name="farbe_hell"]').fill("#1f4e8c");
+    await form.locator('input[name="farbe_dunkel"]').fill("#8fb8ff");
+    const vorher2 = admin.url();
+    await Promise.all([admin.waitForURL((u) => u.href !== vorher2), form.getByRole("button", { name: "Speichern" }).click()]);
+    pruefe(admin.url().includes("ok=1"), `Marke konnte nicht angelegt werden (${decodeURIComponent(admin.url())})`);
+  }
+  {
+    await admin.waitForFunction(() => document.title.length > 0, null, { timeout: 5000 }).catch(() => undefined);
+    const r = await new AxeBuilder({ page: admin }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
+    for (const v of r.violations) fehler.push(`marken: axe ${v.id} – ${v.help} [${v.nodes.length}×]`);
+  }
 } finally {
   await browser.close();
 }
@@ -88,4 +121,4 @@ if (fehler.length) {
   console.error(`✗ ${fehler.length} Befunde:\n- ${fehler.join("\n- ")}`);
   process.exit(1);
 }
-console.log("✓ Studio: Pflicht-, Regelwert- und Partner-Formulare (Bearbeiten, Fehlermeldung, Neuanlage), axe ohne Befunde");
+console.log("✓ Studio: Pflicht-, Regelwert-, Partner- und Marken-Formulare (Bearbeiten, Fehlermeldung, Neuanlage), axe ohne Befunde");

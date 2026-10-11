@@ -1,7 +1,7 @@
 import type { Texte } from "./de";
 
 export const en: Texte = {
-  app: { name: "Amtlos" },
+  app: { name: "Amtlos", mit_amtlos: "powered by Amtlos" },
   nav: { postfach: "Mailbox", branche: "Industry", online: "Online", mehr: "More", datenschutz: "Privacy", heute: "Today", pflichten: "Obligations", kalender: "Calendar", melden: "Report", einstellungen: "Settings", finanzen: "Finances", personal: "Staff", hauptnavigation: "Main navigation", zum_inhalt: "Skip to content" },
   anmelden: {
     titel: "Sign in",
@@ -111,6 +111,7 @@ export const en: Texte = {
     du: "you",
     rollen: { inhaber: "Owner", mitarbeiter: "Employee", steuerberater: "Tax adviser", admin: "Admin" },
     rollen_text: {
+      inhaber: "is responsible for the business and can change everything",
       mitarbeiter: "sees obligations and can complete them, but cannot change business details",
       steuerberater: "sees everything and can change details and complete obligations",
       admin: "can change everything, including inviting and removing people",
@@ -869,6 +870,26 @@ export const en: Texte = {
       sonstiges: "Categorise the letter so you don't miss the deadline.",
     },
     weitere_fristen: "Further deadlines",
+  },
+  kanzlei: {
+    titel: "Client overview",
+    text: "All businesses you are a member of – urgent ones first.",
+    leer: "No businesses yet.",
+    oeffnen: "Open",
+    rolle: "your role: {rolle}",
+    marke: "via {marke}",
+    ohne_profil: "Profile not filled in yet",
+    naechste: "Next: {titel}",
+    bis: "by {datum}",
+    nichts_offen: "Nothing open",
+    neu_titel: "Add a client",
+    neu_text: "You become a member as tax adviser. The client receives an invitation as owner and can then invite others and decide.",
+    name: "Business name",
+    email: "Email address of the owner",
+    anlegen: "Create and invite",
+    angelegt: "Created. The invitation is on its way by email. You can also pass on the link yourself – it is only shown now:",
+    link: "Invitation link",
+    zur_uebersicht: "Client overview",
   },
   experten: {
     titel: "Experts",

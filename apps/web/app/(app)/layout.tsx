@@ -1,3 +1,4 @@
+import { Markenname } from "@/komponenten/markenname";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Navigation } from "@/komponenten/navigation";
@@ -16,8 +17,8 @@ export default async function AppRahmen({ children }: { children: ReactNode }) {
       </a>
       <aside className="md:sticky md:top-0 md:h-dvh md:w-56 md:flex-none md:py-8">
         <div className="flex items-baseline justify-between gap-4 px-4 pb-2 pt-5 md:block md:px-3 md:pb-8 md:pt-0">
-          <Link href="/heute" className="text-titel font-bold tracking-tight">
-            {x.app.name}
+          <Link href="/heute" className="tracking-tight">
+            <Markenname />
           </Link>
           <p className="truncate text-klein text-tinte-leise md:mt-1" title={u.name}>
             {u.name}

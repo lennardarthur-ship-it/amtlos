@@ -924,4 +924,54 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       expect((await alsRosa(http().get("/v1/marktplatz/anfragen")).expect(200)).body[0]).toMatchObject({ partner: "Kanzlei Klar" });
     });
   });
+
+  describe("Abschnitt 10: Kanzlei und White-Label", () => {
+    it("Marke zum Hostnamen ist öffentlich und enthält nur Darstellungsangaben", async () => {
+      const owner = new Datenbank(urls.owner);
+      await owner.imKontext({}, (tx) => tx.abfrage("insert into katalog.marke (schluessel, name, hosts, farbe_hell, farbe_dunkel) values ('kanzlei-kurz', 'Kanzlei Kurz', '{pflichten.kanzlei-kurz.example}', '#1f4e8c', '#8fb8ff')"));
+      await owner.schliessen();
+      const m = (await http().get("/v1/marke?host=Pflichten.Kanzlei-Kurz.example:443").expect(200)).body;
+      expect(m).toEqual({ schluessel: "kanzlei-kurz", name: "Kanzlei Kurz", farbe_hell: "#1f4e8c", farbe_dunkel: "#8fb8ff", logo_url: null, support_email: null });
+      await http().get("/v1/marke?host=app.amtlos.test").expect(404);
+      await http().get("/v1/marke?host=<script>").expect(422);
+    });
+
+    it("Kanzlei legt Mandanten an; die Mandantin wird per Einladung Inhaberin; Übersicht je Mandant", async () => {
+      const kanzlei = await token("kanzlei");
+      const mandantin = await token("mandantin");
+      const als = (t: string) => (r: request.Test) => r.set("Authorization", `Bearer ${t}`);
+      await als(kanzlei)(http().post("/v1/mandanten")).send({ name: "Bäckerei Korn", email: "kaputt" }).expect(422);
+      const r = (await als(kanzlei)(http().post("/v1/mandanten")).send({ name: "Bäckerei Korn", email: "Mandantin@Example.org", marke: "kanzlei-kurz" }).expect(201)).body;
+      expect(r).toMatchObject({ name: "Bäckerei Korn", rolle: "steuerberater", einladung: { email: "mandantin@example.org" } });
+      const liste = (await als(kanzlei)(http().get("/v1/mandanten")).expect(200)).body;
+      expect(liste).toEqual([expect.objectContaining({ id: r.id, name: "Bäckerei Korn", rolle: "steuerberater", marke: "Kanzlei Kurz", profil_vorhanden: false, naechste: null })]);
+      // Steuerberatung darf das Profil des Mandanten pflegen (wie in jedem Unternehmen)
+      await als(kanzlei)(http().put("/v1/profil")).set("X-Unternehmen-Id", r.id)
+        .send({ daten: { rechtsform: "einzelunternehmen", gruendungsdatum: "2019-04-01", "taetigkeit.einordnung": "gewerbe", "ust.kleinunternehmer": false, "ust.zahllast_vorjahr": 12400, "beschaeftigte.gesamt": 0, gemeinde_ags: "11000000" } })
+        .expect(200);
+      await neuberechnen(worker, r.id, "test", { kalender: new StandardKalender() });
+      const nachher = (await als(kanzlei)(http().get("/v1/mandanten")).expect(200)).body[0];
+      expect(nachher.profil_vorhanden).toBe(true);
+      expect(nachher.zaehler.offen).toBeGreaterThan(0);
+      expect(nachher.naechste).toMatchObject({ titel: expect.any(String) });
+      // Fremde sehen den Mandanten nicht
+      expect((await alsAnna(http().get("/v1/mandanten")).expect(200)).body.map((x: { id: string }) => x.id)).not.toContain(r.id);
+      const einladungsToken = new URL(r.einladung.link).pathname.split("/").pop();
+      await als(mandantin)(http().post("/v1/einladungen/annehmen")).send({ token: einladungsToken }).expect(200);
+      const ich = (await als(mandantin)(http().get("/v1/ich")).expect(200)).body;
+      expect(ich.unternehmen).toEqual([{ id: r.id, name: "Bäckerei Korn", rolle: "inhaber" }]);
+      // Die Inhaberin sieht die Kanzlei im Team
+      const team = (await als(mandantin)(http().get("/v1/team")).set("X-Unternehmen-Id", r.id).expect(200)).body;
+      expect(JSON.stringify(team)).toContain("kanzlei@example.org");
+    });
+
+    it("Unternehmen unter einer Marke anlegen; unbekannte Marke wird ignoriert", async () => {
+      const t = await token("markenkundin");
+      const a = (await http().post("/v1/unternehmen").set("Authorization", `Bearer ${t}`).send({ name: "Mit Marke", marke: "kanzlei-kurz" }).expect(201)).body;
+      const b = (await http().post("/v1/unternehmen").set("Authorization", `Bearer ${t}`).send({ name: "Ohne Marke", marke: "gibt-es-nicht" }).expect(201)).body;
+      const liste = (await http().get("/v1/mandanten").set("Authorization", `Bearer ${t}`).expect(200)).body as { id: string; marke: string | null }[];
+      expect(liste.find((x) => x.id === a.id)?.marke).toBe("Kanzlei Kurz");
+      expect(liste.find((x) => x.id === b.id)?.marke).toBeNull();
+    });
+  });
 });

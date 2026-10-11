@@ -10,7 +10,7 @@ import { EREIGNISTYPEN, ProfilSchema } from "./profil-schema.js";
 
 export const WARTESCHLANGE = Symbol("WARTESCHLANGE");
 
-const UnternehmenNeu = z.object({ name: z.string().trim().min(1).max(200) }).strict();
+const UnternehmenNeu = z.object({ name: z.string().trim().min(1).max(200), marke: z.string().regex(/^[a-z0-9][a-z0-9-]{1,39}$/).nullable().optional() }).strict();
 const ProfilEingabe = z.object({ daten: z.unknown() }).strict();
 const EreignisNeu = z
   .object({
@@ -59,8 +59,14 @@ export class KernController {
 
   @Post("unternehmen")
   async unternehmenAnlegen(@Kontext() k: Anfragekontext, @Body() body: unknown) {
-    const { name } = pruefe(UnternehmenNeu, body);
-    const id = await this.db.imKontext({ kontoId: k.kontoId }, async (tx) => (await tx.eine<{ id: string }>("select app.unternehmen_anlegen($1) as id", [name]))!.id);
+    const { name, marke } = pruefe(UnternehmenNeu, body);
+    const id = await this.db
+      .imKontext({ kontoId: k.kontoId }, async (tx) => {
+        // Unbekannte oder inaktive Marke: ohne Marke anlegen (die Marke kommt aus dem Hostnamen, nicht von der Nutzerin)
+        const m = marke ? await tx.eine<{ id: string }>("select id from katalog.marke where schluessel = $1 and aktiv", [marke]) : undefined;
+        return (await tx.eine<{ id: string }>("select app.unternehmen_anlegen($1, $2) as id", [name, m?.id ?? null]))!.id;
+      })
+      .catch(uebersetzeDbFehler);
     return { id, name, rolle: "inhaber" };
   }
 

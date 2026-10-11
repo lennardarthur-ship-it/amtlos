@@ -1,3 +1,4 @@
+import { Markenname } from "@/komponenten/markenname";
 import { redirect } from "next/navigation";
 import { datumLang, fuelle } from "@amtlos/i18n";
 import { apiAntwort, ich } from "@/lib/api";
@@ -23,7 +24,7 @@ export default async function EinladungSeite({ params, searchParams }: { params:
   const [{ s, t: x }, { token }, { fehler }] = await Promise.all([t(), params, searchParams]);
   const rahmen = (inhalt: React.ReactNode) => (
     <main className="mx-auto max-w-md px-4 py-16">
-      <p className="text-titel font-bold">{x.app.name}</p>
+      <p><Markenname /></p>
       <h1 className="mt-10 text-titel font-bold">{x.einladung.titel}</h1>
       {inhalt}
     </main>

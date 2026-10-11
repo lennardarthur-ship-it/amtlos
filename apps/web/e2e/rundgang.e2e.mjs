@@ -386,6 +386,19 @@ async function rundgang(farbschema, breite) {
     }
   }
 
+  // Abschnitt 10: Mandantenübersicht, Mandant anlegen (Link nur einmal sichtbar)
+  await p.goto(`${B}/kanzlei`);
+  await barrierefrei(p, name("kanzlei"));
+  if (farbschema === "light") {
+    await p.fill("#name", "Mandant Muster");
+    await p.fill("#email", `${kennung}-mandant@example.org`);
+    await p.getByRole("button", { name: "Anlegen und einladen" }).click();
+    const mandantLink = await p.locator('div[role="status"] input').inputValue({ timeout: 15000 }).catch(() => "");
+    pruefe(/\/einladung\/[A-Za-z0-9_-]{43}$/.test(mandantLink), `${name("kanzlei")}: kein Einladungslink für den Mandanten`);
+    pruefe(await p.getByRole("heading", { name: "Mandant Muster" }).count(), `${name("kanzlei")}: Mandant fehlt in der Übersicht`);
+    await barrierefrei(p, name("kanzlei-angelegt"));
+  }
+
   // Team: einladen, Link nur einmal sichtbar; Eingeladene meldet sich über den Link an und nimmt an
   const gast = `${kennung}-gast-${farbschema}`;
   await p.goto(`${B}/team`);
@@ -421,9 +434,30 @@ async function rundgang(farbschema, breite) {
 }
 
 if (BILDER) fs.mkdirSync(BILDER, { recursive: true });
+// White-Label: unter dem Host der Marke (vom Studio-Rundgang für 127.0.0.1 angelegt) erscheinen Name und Farben der Marke
+async function marke() {
+  const url = new URL(B);
+  if (url.hostname !== "localhost") return;
+  url.hostname = "127.0.0.1";
+  for (const farbschema of ["light", "dark"]) {
+    const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, colorScheme: farbschema, locale: "de-DE" });
+    const p = await ctx.newPage();
+    await p.goto(`${url.origin}/anmelden`);
+    if (await p.getByText("Kanzlei Beispiel").count()) {
+      pruefe(await p.getByText("mit Amtlos").count(), `${farbschema}-marke: Zusatz „mit Amtlos“ fehlt`);
+      pruefe((await p.title()).endsWith("· Kanzlei Beispiel"), `${farbschema}-marke: Seitentitel ohne Marke (${await p.title()})`);
+      const farbe = await p.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--color-amt").trim());
+      pruefe(farbe === (farbschema === "light" ? "#1f4e8c" : "#8fb8ff"), `${farbschema}-marke: Markenfarbe nicht gesetzt (${farbe})`);
+      await barrierefrei(p, `${farbschema}-marke-anmelden`);
+    } else console.log("Hinweis: keine Marke für 127.0.0.1 (Studio-Rundgang vorher ausführen) – Markenprüfung übersprungen");
+    await ctx.close();
+  }
+}
+
 try {
   await rundgang("light", 1280);
   await rundgang("dark", 390);
+  await marke();
 } finally {
   await browser.close();
   testseite.close();

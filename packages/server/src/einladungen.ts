@@ -3,8 +3,8 @@ import type { Versand } from "./erinnerungen.js";
 import type { EinladungsJob } from "./warteschlange.js";
 
 const ROLLEN: Record<"de" | "en", Record<string, string>> = {
-  de: { mitarbeiter: "Mitarbeiter:in", steuerberater: "Steuerberatung", admin: "Admin" },
-  en: { mitarbeiter: "Employee", steuerberater: "Tax adviser", admin: "Admin" },
+  de: { inhaber: "Inhaber:in", mitarbeiter: "Mitarbeiter:in", steuerberater: "Steuerberatung", admin: "Admin" },
+  en: { inhaber: "Owner", mitarbeiter: "Employee", steuerberater: "Tax adviser", admin: "Admin" },
 };
 const ROLLEN_DE = ROLLEN.de;
 
