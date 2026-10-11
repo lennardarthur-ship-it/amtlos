@@ -2,7 +2,7 @@
 
 Das Bürokratie-Betriebssystem für Kleinunternehmer und Startups in Deutschland.
 
-**Stand:** Bauabschnitt 1 (Fundament) umgesetzt, siehe [Testbericht](docs/testberichte/abschnitt-1.md). Fachliche Inhalte sind ungeprüft und erscheinen in prod erst nach Freigabe (E-002).
+**Stand:** Bauabschnitt 1 (Fundament) und 2 (Katalog Gründung und Steuern, Jahreskalender) umgesetzt, siehe Testberichte [Abschnitt 1](docs/testberichte/abschnitt-1.md) und [Abschnitt 2](docs/testberichte/abschnitt-2.md). API-Beschreibung: [`apps/api/openapi.yaml`](apps/api/openapi.yaml). Fachliche Inhalte sind ungeprüft und erscheinen in prod erst nach Freigabe (E-002).
 
 ## Aufbau
 
