@@ -27,6 +27,7 @@ tags:
   - name: Kalender
   - name: Team
   - name: Gründung und ELSTER
+  - name: Finanzen
 
 paths:
   /v1/gesundheit:
@@ -284,6 +285,200 @@ paths:
         "404": { description: Unbekannter Vorgang }
         "501": { description: Übermittlung nicht verfügbar, content: { application/json: { schema: { $ref: "#/components/schemas/ElsterStatus" } } } }
 
+  /v1/rechnungssteller:
+    get:
+      tags: [Finanzen]
+      summary: Eigene Angaben für Rechnungen (Anschrift, Steuernummer/USt-IdNr., Bank)
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK (leer, wenn noch nicht erfasst) }
+    put:
+      tags: [Finanzen]
+      summary: Eigene Angaben speichern
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/Rechnungssteller" } } } }
+      responses:
+        "200": { description: Gespeichert }
+        "422": { $ref: "#/components/responses/Eingabefehler" }
+
+  /v1/kunden:
+    get:
+      tags: [Finanzen]
+      summary: Kunden
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK }
+    post:
+      tags: [Finanzen]
+      summary: Kunden anlegen
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/KundeEingabe" } } } }
+      responses:
+        "201": { description: Angelegt }
+        "422": { $ref: "#/components/responses/Eingabefehler" }
+
+  /v1/rechnungen:
+    get:
+      tags: [Finanzen]
+      summary: Rechnungen (Entwürfe zuerst, dann nach Datum)
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Rechnung" } } } } }
+    post:
+      tags: [Finanzen]
+      summary: Rechnungsentwurf anlegen
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody: { content: { application/json: { schema: { $ref: "#/components/schemas/RechnungEingabe" } } } }
+      responses:
+        "201": { description: Entwurf, content: { application/json: { schema: { $ref: "#/components/schemas/Rechnung" } } } }
+
+  /v1/rechnungen/{id}:
+    get:
+      tags: [Finanzen]
+      summary: Eine Rechnung
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Rechnung" } } } }
+        "404": { $ref: "#/components/responses/NichtGefunden" }
+    put:
+      tags: [Finanzen]
+      summary: Entwurf ändern (gestellte Rechnungen sind unveränderlich → 409)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { content: { application/json: { schema: { $ref: "#/components/schemas/RechnungEingabe" } } } }
+      responses:
+        "200": { description: Gespeichert }
+        "409": { description: Rechnung ist gestellt }
+    delete:
+      tags: [Finanzen]
+      summary: Entwurf löschen
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "204": { description: Gelöscht }
+        "404": { description: Kein Entwurf mit dieser ID }
+
+  /v1/rechnungen/{id}/stellen:
+    post:
+      tags: [Finanzen]
+      summary: Rechnung stellen – Nummer, Steuersätze aus Regelwerten, PDF/ZUGFeRD und XRechnung (Geschäftskunden)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "201": { description: Gestellt, content: { application/json: { schema: { $ref: "#/components/schemas/Rechnung" } } } }
+        "409": { description: Schon gestellt }
+        "422": { description: "Angaben fehlen: { meldung, fehlend: [...] }" }
+
+  /v1/rechnungen/{id}/stornieren:
+    post:
+      tags: [Finanzen]
+      summary: Gestellte Rechnung stornieren (neue Rechnungskorrektur mit eigener Nummer)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "201": { description: Stornorechnung, content: { application/json: { schema: { $ref: "#/components/schemas/Rechnung" } } } }
+        "409": { description: Nicht stornierbar }
+
+  /v1/dokumente/{id}/datei:
+    get:
+      tags: [Finanzen]
+      summary: Datei eines Dokuments (PDF, XRechnung, Beleg) mit Prüfsumme im Header X-Content-SHA256
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "200": { description: Datei }
+        "404": { $ref: "#/components/responses/NichtGefunden" }
+
+  /v1/belege:
+    get:
+      tags: [Finanzen]
+      summary: Belege
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK }
+    post:
+      tags: [Finanzen]
+      summary: Beleg hochladen (PDF, JPG, PNG oder E-Rechnung als XML; höchstens 15 MB). E-Rechnungen werden gelesen.
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody:
+        required: true
+        content: { multipart/form-data: { schema: { type: object, required: [datei], properties: { datei: { type: string, format: binary } } } } }
+      responses:
+        "201": { description: Erfasst }
+        "409": { description: Beleg schon erfasst (gleiche Datei) }
+        "422": { description: Dateityp oder Inhalt nicht erlaubt }
+
+  /v1/belege/{id}:
+    put:
+      tags: [Finanzen]
+      summary: Angaben zum Beleg ändern (Datei bleibt unverändert)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/BelegEingabe" } } } }
+      responses:
+        "200": { description: Gespeichert }
+        "404": { $ref: "#/components/responses/NichtGefunden" }
+
+  /v1/belege/{id}/stornieren:
+    post:
+      tags: [Finanzen]
+      summary: Beleg stornieren (statt löschen)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        "201": { description: Storniert }
+        "404": { $ref: "#/components/responses/NichtGefunden" }
+
+  /v1/finanzen/uebersicht:
+    get:
+      tags: [Finanzen]
+      summary: Umsatz des Jahres aus den Rechnungen, Stand zur Kleinunternehmergrenze, Entwürfe und Belege
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK }
+
+  /v1/finanzen/ust-voranmeldung:
+    get:
+      tags: [Finanzen]
+      summary: Vorbereitung der USt-Voranmeldung (Umsätze je Satz, Umsatzsteuer, Vorsteuer, Zahllast) – ohne Formular-Kennzahlen
+      parameters:
+        - { $ref: "#/components/parameters/Unternehmen" }
+        - { name: periode, in: query, required: true, schema: { type: string, pattern: "^\\d{4}-(0[1-9]|1[0-2]|Q[1-4])$" } }
+      responses:
+        "200": { description: OK }
+        "400": { description: Periode ungültig }
+
+  /v1/kassen:
+    get:
+      tags: [Finanzen]
+      summary: Elektronische Kassen
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      responses:
+        "200": { description: OK }
+    post:
+      tags: [Finanzen]
+      summary: Kasse erfassen – meldet „Kasse angeschafft“ und zieht die Profilangaben nach (Meldefrist)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/KasseEingabe" } } } }
+      responses:
+        "201": { description: Erfasst }
+
+  /v1/kassen/{id}/ausser-betrieb:
+    post:
+      tags: [Finanzen]
+      summary: Kasse außer Betrieb nehmen (löst die Meldepflicht aus)
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [datum], properties: { datum: { type: string, format: date } } } } } }
+      responses:
+        "201": { description: Außer Betrieb }
+        "404": { description: Keine aktive Kasse }
+        "422": { description: Datum vor der Anschaffung }
+
   /v1/glossar:
     get:
       tags: [Pflichten]
@@ -462,6 +657,88 @@ components:
           schema: { type: object, properties: { meldung: { type: string }, fehler: { type: array, items: { type: object, properties: { feld: { type: string }, meldung: { type: string } } } } } }
 
   schemas:
+    Rechnungssteller:
+      type: object
+      required: [name, strasse, plz, ort, email]
+      properties:
+        name: { type: string }
+        strasse: { type: string }
+        plz: { type: string }
+        ort: { type: string }
+        land: { type: string, default: DE }
+        email: { type: string, format: email }
+        telefon: { type: [string, "null"] }
+        steuernummer: { type: [string, "null"] }
+        ust_idnr: { type: [string, "null"] }
+        iban: { type: [string, "null"] }
+        bic: { type: [string, "null"] }
+    KundeEingabe:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
+        strasse: { type: [string, "null"] }
+        plz: { type: [string, "null"] }
+        ort: { type: [string, "null"] }
+        land: { type: string, default: DE }
+        email: { type: [string, "null"], format: email }
+        ust_idnr: { type: [string, "null"] }
+        kaeufer_referenz: { type: [string, "null"], description: "z. B. Leitweg-ID oder Bestellnummer (XRechnung BT-10)" }
+        geschaeftskunde: { type: boolean, default: true, description: Geschäftskunden erhalten eine E-Rechnung }
+    RechnungEingabe:
+      type: object
+      properties:
+        kunde_id: { type: [string, "null"], format: uuid }
+        leistungsdatum: { type: [string, "null"], format: date }
+        faellig_am: { type: [string, "null"], format: date }
+        hinweis: { type: [string, "null"], maxLength: 1000 }
+        positionen:
+          type: array
+          items:
+            type: object
+            required: [bezeichnung, menge, einheit, preis_cent]
+            properties:
+              bezeichnung: { type: string }
+              menge: { type: number, exclusiveMinimum: 0 }
+              einheit: { enum: [stueck, stunde, tag, monat, pauschal, kilogramm] }
+              preis_cent: { type: integer, minimum: 0, description: Nettopreis je Einheit in Cent }
+              ust_art: { enum: [regel, ermaessigt, null], description: Steuersatz kommt beim Stellen aus den Regelwerten; Kleinunternehmer immer null }
+    Rechnung:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        nummer: { type: [string, "null"] }
+        status: { enum: [entwurf, gestellt, storniert] }
+        art: { enum: [rechnung, storno] }
+        rechnungsdatum: { type: [string, "null"], format: date }
+        netto_cent: { type: integer }
+        ust_cent: { type: integer }
+        brutto_cent: { type: integer }
+        kleinunternehmer: { type: boolean }
+        pdf_dokument_id: { type: [string, "null"], format: uuid }
+        xml_dokument_id: { type: [string, "null"], format: uuid }
+    BelegEingabe:
+      type: object
+      properties:
+        belegdatum: { type: [string, "null"], format: date }
+        lieferant: { type: [string, "null"] }
+        belegnummer: { type: [string, "null"] }
+        brutto_cent: { type: [integer, "null"] }
+        ust_cent: { type: [integer, "null"], description: Vorsteuer laut Beleg }
+        kategorie: { type: [string, "null"] }
+        notiz: { type: [string, "null"] }
+    KasseEingabe:
+      type: object
+      required: [bezeichnung, angeschafft_am]
+      properties:
+        bezeichnung: { type: string }
+        art: { type: [string, "null"] }
+        hersteller: { type: [string, "null"] }
+        modell: { type: [string, "null"] }
+        seriennummer: { type: [string, "null"] }
+        tse_seriennummer: { type: [string, "null"] }
+        betriebsstaette: { type: [string, "null"] }
+        angeschafft_am: { type: string, format: date }
     ElsterStatus:
       type: object
       properties:

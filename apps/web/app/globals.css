@@ -1,2 +1,9 @@
 @import "tailwindcss";
 @import "@amtlos/web-kern/designsystem.css";
+
+/* Tabellen (Rechnungen, Umsatzsteuer) – Zahlen rechtsbündig über .text-right */
+.tabelle { width: 100%; border-collapse: collapse; }
+.tabelle th { text-align: left; font-weight: 700; border-bottom: 2px solid var(--color-tinte); padding: 0.5rem 0.75rem 0.5rem 0; }
+.tabelle td, .tabelle tbody th { border-bottom: 1px solid var(--color-linie); padding: 0.625rem 0.75rem 0.625rem 0; vertical-align: top; }
+.tabelle .text-right { text-align: right; }
+.tabelle :is(th, td):last-child { padding-right: 0; }

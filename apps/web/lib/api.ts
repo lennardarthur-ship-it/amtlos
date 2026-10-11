@@ -20,7 +20,7 @@ async function roh(pfad: string, init: RequestInit & { unternehmen?: string | fa
   if (!s) redirect("/anmelden");
   const kopf = new Headers(init.headers);
   kopf.set("Authorization", `Bearer ${s.token}`);
-  if (init.body) kopf.set("Content-Type", "application/json");
+  if (typeof init.body === "string") kopf.set("Content-Type", "application/json"); // FormData setzt den Typ selbst (multipart)
   if (init.unternehmen) kopf.set("X-Unternehmen-Id", init.unternehmen);
   const r = await fetch(`${konfig().apiUrl}${pfad}`, { ...init, headers: kopf, cache: "no-store" });
   if (r.status === 401) redirect("/anmelden?abgelaufen=1");

@@ -87,6 +87,44 @@ async function rundgang(farbschema, breite) {
     await barrierefrei(p, name(seite.replace("/", "-")));
   }
 
+  // Finanzen (nur im ersten Durchlauf): Angaben, Kunde, Rechnung stellen, Beleg hochladen, USt vorbereiten
+  if (farbschema === "light") {
+    await p.goto(`${B}/finanzen`);
+    await barrierefrei(p, name("finanzen"));
+    await p.goto(`${B}/finanzen/angaben`);
+    for (const [id, v] of [["name", "Testbetrieb"], ["strasse", "Weg 1"], ["plz", "10115"], ["ort", "Berlin"], ["email", "test@example.org"], ["telefon", "+49 30 1"], ["steuernummer", "11/222/33333"], ["iban", "DE02120300000000202051"]]) await p.fill(`#${id}`, v);
+    await Promise.all([p.waitForURL(/ok=1/), p.getByRole("button", { name: "Angaben speichern" }).click()]);
+    await p.locator("summary").click();
+    for (const [id, v] of [["k_name", "Kunde AG"], ["k_strasse", "Ring 2"], ["k_plz", "20095"], ["k_ort", "Hamburg"], ["k_email", "rechnung@kunde.example"]]) await p.fill(`#${id}`, v);
+    await p.getByRole("button", { name: "Kunden anlegen" }).click();
+    await p.getByText("Kunde AG").first().waitFor({ timeout: 10000 });
+    await barrierefrei(p, name("finanzen-angaben"));
+    await p.goto(`${B}/finanzen/rechnungen`);
+    await Promise.all([p.waitForURL(/rechnungen\/[0-9a-f-]{36}/), p.getByRole("button", { name: "Neue Rechnung" }).click()]);
+    await p.selectOption("#kunde_id", { label: "Kunde AG" });
+    await p.fill("#leistungsdatum", "2026-10-01");
+    await p.fill("#p0_bezeichnung", "Beratung");
+    await p.fill("#p0_preis", "100,00");
+    await barrierefrei(p, name("rechnung-entwurf"));
+    await p.getByRole("button", { name: "Rechnung stellen" }).click();
+    const gestellt = await p.getByRole("link", { name: "PDF herunterladen" }).waitFor({ timeout: 20000 }).then(() => true, () => false);
+    pruefe(gestellt, `${name("rechnung")}: Rechnung wurde nicht gestellt (${p.url()})`);
+    if (gestellt) {
+      await barrierefrei(p, name("rechnung-gestellt"));
+      const pdf = await p.request.get(`${B}${await p.getByRole("link", { name: "PDF herunterladen" }).getAttribute("href")}`);
+      pruefe(pdf.ok() && (await pdf.body()).subarray(0, 5).toString() === "%PDF-", `${name("rechnung")}: PDF nicht abrufbar`);
+    }
+    await p.goto(`${B}/finanzen/belege`);
+    await p.setInputFiles("#datei", { name: "quittung.pdf", mimeType: "application/pdf", buffer: Buffer.from(`%PDF-1.4\n% e2e ${Date.now()}\n`) });
+    await Promise.all([p.waitForURL(/ok=1|fehler=/), p.getByRole("button", { name: "Hochladen" }).click()]);
+    pruefe(p.url().includes("ok=1"), `${name("belege")}: Upload fehlgeschlagen (${p.url()})`);
+    await barrierefrei(p, name("belege"));
+    await p.goto(`${B}/finanzen/ust?periode=2026-10`);
+    await barrierefrei(p, name("ust"));
+    await p.goto(`${B}/finanzen/kassen`);
+    await barrierefrei(p, name("kassen"));
+  }
+
   // Team: einladen, Link nur einmal sichtbar; Eingeladene meldet sich über den Link an und nimmt an
   const gast = `${kennung}-gast-${farbschema}`;
   await p.goto(`${B}/team`);

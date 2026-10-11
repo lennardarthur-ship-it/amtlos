@@ -1,4 +1,6 @@
 import "reflect-metadata";
+import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import type { NestExpressApplication } from "@nestjs/platform-express";
 import { SignJWT } from "jose";
@@ -34,7 +36,7 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
     worker = new Datenbank(urls.worker);
     app = await erzeugeApp({
       UMGEBUNG: "test", PORT: 0, DATABASE_URL: urls.api, AUTH_MODUS: "dev", DEV_JWT_SECRET: GEHEIM,
-      WEB_URL: "https://app.amtlos.test", API_URL: "https://api.amtlos.test", OIDC_ISSUER: undefined, OIDC_AUDIENCE: undefined, METRIKEN_TOKEN: METRIK_TOKEN, RATE_ANGEMELDET: 10_000, RATE_ANONYM: 1_000,
+      WEB_URL: "https://app.amtlos.test", API_URL: "https://api.amtlos.test", OIDC_ISSUER: undefined, OIDC_AUDIENCE: undefined, METRIKEN_TOKEN: METRIK_TOKEN, RATE_ANGEMELDET: 10_000, RATE_ANONYM: 1_000, ABLAGE_VERZEICHNIS: fs.mkdtempSync(path.join(os.tmpdir(), "ablage-")),
     });
     await app.init();
     [anna, ben, mia] = await Promise.all([token("anna"), token("ben"), token("mia")]);
@@ -309,5 +311,127 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
     await alsAnna(http().post("/v1/elster/gibt_es_nicht")).send({}).expect(404);
     const alsMia = (x: request.Test) => x.set("Authorization", `Bearer ${mia}`).set("X-Unternehmen-Id", firma);
     await alsMia(http().post("/v1/elster/fragebogen_steuerliche_erfassung")).send({}).expect(403);
+  });
+
+  describe("Finanzen", () => {
+    const jahr = new Date().getFullYear();
+    let rechnungId: string;
+    let pdfId: string;
+    let xmlId: string;
+
+    it("Rechnungssteller und Kunden", async () => {
+      expect((await alsAnna(http().get("/v1/rechnungssteller")).expect(200)).body).toEqual({});
+      await alsAnna(http().put("/v1/rechnungssteller")).send({ name: "Annas Café", strasse: "Hauptstr. 1", plz: "70173", ort: "Stuttgart", email: "kaputt" }).expect(422);
+      const st = await alsAnna(http().put("/v1/rechnungssteller"))
+        .send({ name: "Annas Café", strasse: "Hauptstr. 1", plz: "70173", ort: "Stuttgart", email: "anna@example.org", telefon: "+49 711 123", steuernummer: "93815/08152", ust_idnr: "DE123456789", iban: "DE02 1203 0000 0000 2020 51" })
+        .expect(200);
+      expect(st.body.iban).toBe("DE02120300000000202051");
+      const ku = await alsAnna(http().post("/v1/kunden")).send({ name: "Kunde GmbH", strasse: "Ring 5", plz: "10115", ort: "Berlin", email: "einkauf@kunde.example", kaeufer_referenz: "PO-77" }).expect(201);
+      expect(ku.body.geschaeftskunde).toBe(true);
+      const alsMia = (x: request.Test) => x.set("Authorization", `Bearer ${mia}`).set("X-Unternehmen-Id", firma);
+      await alsMia(http().post("/v1/rechnungen")).send({}).expect(403);
+      const e = await alsAnna(http().post("/v1/rechnungen"))
+        .send({ kunde_id: ku.body.id, positionen: [{ bezeichnung: "Beratung", menge: 2.5, einheit: "stunde", preis_cent: 8000, ust_art: "regel" }, { bezeichnung: "Fachbuch", menge: 1, einheit: "stueck", preis_cent: 2999, ust_art: "ermaessigt" }] })
+        .expect(201);
+      expect(e.body).toMatchObject({ status: "entwurf", nummer: null, kleinunternehmer: false });
+      rechnungId = e.body.id;
+    });
+
+    it("stellen: fehlende Angaben, Nummer, Steuersätze aus Regelwerten, PDF/ZUGFeRD und XRechnung", async () => {
+      const f = await alsAnna(http().post(`/v1/rechnungen/${rechnungId}/stellen`)).expect(422);
+      expect(f.body.fehlend).toEqual(["leistungsdatum"]);
+      const entwurf = (await alsAnna(http().get(`/v1/rechnungen/${rechnungId}`)).expect(200)).body;
+      await alsAnna(http().put(`/v1/rechnungen/${rechnungId}`)).send({ kunde_id: entwurf.kunde_id, positionen: entwurf.positionen, leistungsdatum: `${jahr}-10-01` }).expect(200);
+      const r = (await alsAnna(http().post(`/v1/rechnungen/${rechnungId}/stellen`)).expect(201)).body;
+      expect(r).toMatchObject({ status: "gestellt", nummer: `${jahr}-0001`, netto_cent: 22999, ust_cent: 4010, brutto_cent: 27009 });
+      expect(r.regelwerte.map((x: { id: string }) => x.id).sort()).toEqual(["steuern.ust.satz_ermaessigt", "steuern.ust.satz_regel"]);
+      expect(r.steller.name).toBe("Annas Café");
+      pdfId = r.pdf_dokument_id;
+      xmlId = r.xml_dokument_id;
+      const pdf = await alsAnna(http().get(`/v1/dokumente/${pdfId}/datei`)).buffer(true).parse((res, cb) => { const t: Buffer[] = []; res.on("data", (c: Buffer) => t.push(c)); res.on("end", () => cb(null, Buffer.concat(t))); }).expect(200);
+      expect(pdf.headers["content-type"]).toBe("application/pdf");
+      expect((pdf.body as Buffer).subarray(0, 5).toString()).toBe("%PDF-");
+      expect((pdf.body as Buffer).toString("latin1")).toMatch(/pdfaid:part/);
+      const xml = await alsAnna(http().get(`/v1/dokumente/${xmlId}/datei`)).expect(200);
+      expect(xml.text).toContain("urn:xeinkauf.de:kosit:xrechnung_3.0");
+      expect(xml.text).toContain(`<ram:ID>${jahr}-0001</ram:ID>`);
+    });
+
+    it("gestellte Rechnungen sind unveränderlich; Storno mit eigener Nummer", async () => {
+      await alsAnna(http().put(`/v1/rechnungen/${rechnungId}`)).send({ positionen: [] }).expect(409);
+      await alsAnna(http().delete(`/v1/rechnungen/${rechnungId}`)).expect(404);
+      await alsAnna(http().post(`/v1/rechnungen/${rechnungId}/stellen`)).expect(409);
+      const s = (await alsAnna(http().post(`/v1/rechnungen/${rechnungId}/stornieren`)).expect(201)).body;
+      expect(s).toMatchObject({ art: "storno", status: "gestellt", nummer: `${jahr}-0002`, storniert_rechnung_id: rechnungId, netto_cent: 22999 });
+      expect((await alsAnna(http().get(`/v1/rechnungen/${rechnungId}`)).expect(200)).body.status).toBe("storniert");
+      await alsAnna(http().post(`/v1/rechnungen/${rechnungId}/stornieren`)).expect(409);
+      const liste = (await alsAnna(http().get("/v1/rechnungen")).expect(200)).body;
+      expect(liste.map((x: { nummer: string }) => x.nummer)).toEqual([`${jahr}-0002`, `${jahr}-0001`]);
+      // Die Datenbank schützt zusätzlich: direkter Eingriff in eine gestellte Rechnung scheitert
+      const annaKonto = (await http().get("/v1/ich").set("Authorization", `Bearer ${anna}`).expect(200)).body.konto.id;
+      const apiDb = new Datenbank(urls.api);
+      await expect(apiDb.imKontext({ kontoId: annaKonto, unternehmenId: firma }, (tx) => tx.abfrage("update app.rechnung set netto_cent = 1, brutto_cent = 1 + ust_cent where id = $1", [rechnungId]))).rejects.toThrow(/rechnung_unveraenderlich/);
+      await expect(apiDb.imKontext({ kontoId: annaKonto, unternehmenId: firma }, (tx) => tx.abfrage("delete from app.rechnung where id = $1", [rechnungId]))).rejects.toThrow(/rechnung_unveraenderlich/);
+      await apiDb.schliessen();
+    });
+
+    it("Belege: Upload mit Inhaltsprüfung, E-Rechnung wird gelesen, Doppelte erkannt, Storno statt Löschen", async () => {
+      const pdf = Buffer.from("%PDF-1.4\n% Testbeleg\n");
+      const b = (await alsAnna(http().post("/v1/belege")).attach("datei", pdf, { filename: "tankquittung.pdf", contentType: "application/pdf" }).expect(201)).body;
+      expect(b).toMatchObject({ quelle: "upload", belegdatum: null });
+      await alsAnna(http().post("/v1/belege")).attach("datei", pdf, { filename: "nochmal.pdf", contentType: "application/pdf" }).expect(409);
+      await alsAnna(http().post("/v1/belege")).attach("datei", Buffer.from("kein pdf"), { filename: "falsch.pdf", contentType: "application/pdf" }).expect(422);
+      await alsAnna(http().post("/v1/belege")).attach("datei", Buffer.from("MZ..."), { filename: "virus.exe", contentType: "application/octet-stream" }).expect(422);
+      const xml = (await alsAnna(http().get(`/v1/dokumente/${xmlId}/datei`)).expect(200)).text.replace(`${jahr}-0001`, "FREMD-1");
+      const e = (await alsAnna(http().post("/v1/belege")).attach("datei", Buffer.from(xml), { filename: "eingang.xml", contentType: "application/xml" }).expect(201)).body;
+      expect(e).toMatchObject({ quelle: "e_rechnung", belegnummer: "FREMD-1", lieferant: "Annas Café", brutto_cent: 27009, ust_cent: 4010 });
+      const g = (await alsAnna(http().put(`/v1/belege/${b.id}`)).send({ belegdatum: `${jahr}-10-02`, lieferant: "Tankstelle", brutto_cent: 11900, ust_cent: 1900 }).expect(200)).body;
+      expect(g).toMatchObject({ lieferant: "Tankstelle", ust_cent: 1900 });
+      await alsAnna(http().post(`/v1/belege/${e.id}/stornieren`)).expect(201);
+      await alsAnna(http().put(`/v1/belege/${e.id}`)).send({ lieferant: "x" }).expect(404);
+      expect((await alsAnna(http().get("/v1/belege")).expect(200)).body).toHaveLength(2);
+    });
+
+    it("USt-Voranmeldung vorbereiten: Umsätze je Satz, Storno saldiert, Vorsteuer aus Belegen", async () => {
+      const monat = `${jahr}-${String(new Date().getMonth() + 1).padStart(2, "0")}`;
+      await alsAnna(http().get("/v1/finanzen/ust-voranmeldung?periode=2026-13")).expect(400);
+      const v = (await alsAnna(http().get(`/v1/finanzen/ust-voranmeldung?periode=${monat}`)).expect(200)).body;
+      expect(v.rechnungen).toBe(2);
+      expect(v.umsatzsteuer_cent).toBe(0); // Rechnung und Storno im selben Monat
+      const okt = (await alsAnna(http().get(`/v1/finanzen/ust-voranmeldung?periode=${jahr}-10`)).expect(200)).body;
+      expect(okt.vorsteuer_cent).toBe(1900);
+      expect(okt.uebermittlung.verfuegbar).toBe(false);
+    });
+
+    it("Kleinunternehmer-Wächter: Warnung bei 80 % aus dem Umsatz der Rechnungen", async () => {
+      const kim = await token("kim");
+      const u = (await http().post("/v1/unternehmen").set("Authorization", `Bearer ${kim}`).send({ name: "Kims Atelier" }).expect(201)).body.id;
+      const alsKim = (x: request.Test) => x.set("Authorization", `Bearer ${kim}`).set("X-Unternehmen-Id", u);
+      await alsKim(http().put("/v1/profil")).send({ daten: { rechtsform: "freiberuf", gruendungsdatum: "2022-01-01", "taetigkeit.einordnung": "freiberuf", "ust.kleinunternehmer": true, "umsatz.vorjahr": 20000, gemeinde_ags: "09162000" } }).expect(200);
+      await alsKim(http().put("/v1/rechnungssteller")).send({ name: "Kims Atelier", strasse: "Weg 1", plz: "80331", ort: "München", email: "kim@example.org", steuernummer: "143/123/12345" }).expect(200);
+      const ku = (await alsKim(http().post("/v1/kunden")).send({ name: "Privatkundin", strasse: "Allee 2", plz: "80333", ort: "München", geschaeftskunde: false }).expect(201)).body;
+      const e = (await alsKim(http().post("/v1/rechnungen")).send({ kunde_id: ku.id, leistungsdatum: `${jahr}-09-01`, positionen: [{ bezeichnung: "Wandbild", menge: 1, einheit: "stueck", preis_cent: 8_500_000, ust_art: "regel" }] }).expect(201)).body;
+      expect(e.kleinunternehmer).toBe(true);
+      expect(e.positionen[0].ust_art).toBeNull();
+      const r = (await alsKim(http().post(`/v1/rechnungen/${e.id}/stellen`)).expect(201)).body;
+      expect(r).toMatchObject({ ust_cent: 0, brutto_cent: 8_500_000, xml_dokument_id: null }); // Privatkunde: nur PDF
+      const ue = (await alsKim(http().get("/v1/finanzen/uebersicht")).expect(200)).body;
+      expect(ue).toMatchObject({ umsatz_eur: 85000, kleinunternehmer: true, grenze: { wert_eur: 100000, anteil: 0.85 } });
+      await neuberechnen(worker, u, "test", { kalender: new StandardKalender() });
+      const p = (await alsKim(http().get("/v1/pflichten")).expect(200)).body;
+      expect(p.find((x: { pflicht_id: string }) => x.pflicht_id === "steuern.kleinunternehmer_warnung_80")?.ergebnis).toBe("gilt");
+      expect(p.find((x: { pflicht_id: string }) => x.pflicht_id === "steuern.kleinunternehmer_warnung_95")?.ergebnis).toBe("gilt_nicht");
+    });
+
+    it("Kassen: Erfassen löst die Meldepflicht mit Frist aus", async () => {
+      const k = (await alsAnna(http().post("/v1/kassen")).send({ bezeichnung: "Theke", seriennummer: "SN-1", tse_seriennummer: "TSE-9", angeschafft_am: `${jahr}-10-05` }).expect(201)).body;
+      await neuberechnen(worker, firma, "test", { kalender: new StandardKalender() });
+      const m = (await alsAnna(http().get("/v1/pflichten")).expect(200)).body.find((x: { pflicht_id: string }) => x.pflicht_id === "steuern.kassenmeldung");
+      expect(m).toMatchObject({ ergebnis: "gilt", faellig_am: `${jahr}-11-05` });
+      expect((await alsAnna(http().get("/v1/profil")).expect(200)).body.daten).toMatchObject({ "kasse.elektronisch": true, "kasse.anzahl": 1 });
+      await alsAnna(http().post(`/v1/kassen/${k.id}/ausser-betrieb`)).send({ datum: `${jahr}-01-01` }).expect(422); // vor der Anschaffung
+      await alsAnna(http().post(`/v1/kassen/${k.id}/ausser-betrieb`)).send({ datum: `${jahr}-12-01` }).expect(201);
+      await alsAnna(http().post(`/v1/kassen/${k.id}/ausser-betrieb`)).send({ datum: `${jahr}-12-02` }).expect(404);
+    });
   });
 });

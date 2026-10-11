@@ -293,6 +293,23 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - Welche Pflichten zum Assistenten gehören, steht im Katalog (`phase: gruendung`, Katalog A und die Gründungsschritte aus B), die Reihenfolge ergibt sich aus `voraussetzungen` (topologisch), danach Frist und Katalognummer. Offene Voraussetzungen sperren den Erledigen-Knopf („Erst erledigen: …“). Der Validator verbietet Kreise. Eine darüber hinausgehende Reihenfolge (z. B. Notar vor Gewerbeanzeige) nennt die Spezifikation nicht – Prüfpunkt T-04.
 - Katalog B (B.14–B.22) als 19 Pflichten aus der Spezifikation; fehlende Fristen sind „laufend ohne Termin“ mit Prüfpunkt, Werte aus B.14 als Regelwerte (Stammkapital, Einzahlung, UG-Rücklage). Neue Fakten `gesellschaft.handelsregister` und `gesellschaft.geschaeftsjahr`; der Onboarding-Schritt „Gesellschaft“ erscheint nur für UG/GmbH. Gewinnangaben dürfen negativ sein; Beträge werden je Sprache gelesen (12.400,50 / 12,400.50).
 
+## Bauabschnitt 4
+
+### E-088 · Finanzen light: GoBD-Grundsätze im Datenmodell, E-Rechnung über eine geprüfte Bibliothek
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- **Unveränderlich:** Dateien liegen in einer WORM-Ablage (Schlüssel = Unternehmen + SHA-256, nie überschreiben); Dokumente sind in der Datenbank weder änder- noch löschbar (Trigger). Gestellte Rechnungen sind unveränderlich (Trigger), Korrektur nur über eine Stornorechnung mit eigener Nummer und Bezug. Belege werden storniert statt gelöscht. Alles im Audit.
+- **Nummern:** fortlaufend je Unternehmen und Jahr (JJJJ-NNNN), vergeben beim Stellen unter Zeilensperre – keine Lücken durch abgebrochene Entwürfe.
+- **Rechnen:** Beträge in Cent; Positionen auf Cent gerundet, Steuer je Satz auf die Summe (EN 16931). Steuersätze sind Regelwerte (`steuern.ust.satz_*`), nicht Code; sie stehen nicht in der Spezifikation und sind markiert – ohne Freigabe lässt sich in prod keine Rechnung mit Umsatzsteuer stellen.
+- **E-Rechnung:** XRechnung (CII) und ZUGFeRD/Factur-X (Profil XRechnung, PDF/A-3 mit eingebetteter Schrift) über `@e-invoice-eu/core` (gepinnt 3.3.0) statt eigener XML-Erzeugung. Geschäftskunden erhalten beides, Privatkunden ein PDF. Die CI prüft Beispielrechnungen mit dem offiziellen KoSIT-Validator und der XRechnung-Konfiguration.
+- **Empfang:** Hochgeladene E-Rechnungen (CII/UBL) werden gelesen und befüllen den Beleg; DOCTYPE/Entitäten werden abgelehnt. Eine vollständige Prüfung beim Empfang braucht den KoSIT-Validator als Dienst (Java) – offen.
+- **Kleinunternehmer-Wächter:** Umsatz des Jahres aus den gestellten Rechnungen (netto, Stornos abgezogen) als Fakt `finanzen.umsatz.laufendes_jahr`, nur wenn in Amtlos fakturiert wird; Warnungen bei 80 % und 95 % (Spezifikation C.23) als Katalogpflichten mit Grenzfall-Fixtures.
+- **Kassen:** Erfassen einer Kasse meldet „Kasse angeschafft“ und zieht die Profilangaben (elektronische Kasse, Anzahl) als neue Profilversion nach; daraus folgen Meldefrist und TSE-Pflicht.
+- **Ablage in Produktion:** Verzeichnis auf verschlüsseltem Volume (`ABLAGE_VERZEICHNIS`, in staging/prod Pflicht); ein S3-kompatibler Objektspeicher mit Object Lock folgt mit dem Hosting.
+
+### E-089 · USt-Voranmeldung nur vorbereiten, ohne Formular-Kennzahlen
+- **Datum:** 2026-10-11 · **Status:** angenommen
+- Amtlos summiert Umsätze je Steuersatz und Umsatzsteuer aus den Rechnungen (nach Rechnungsdatum) und die Vorsteuer aus den Belegen (nach Belegdatum). Die Kennzahlen des amtlichen Formulars und die Zuordnung (z. B. Leistungs- statt Rechnungsdatum, Soll-/Ist-Versteuerung) stehen nicht in der Spezifikation – Prüfpunkte T-08/T-09. Übermitteln geht erst mit dem ELSTER-Gateway (E-086).
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

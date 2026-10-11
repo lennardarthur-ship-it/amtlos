@@ -43,6 +43,10 @@ docker run --rm -e STUDIO_DATABASE_URL=… amtlos-werkzeug katalog-importieren  
 
 Alle Images laufen als Nutzer `node`, enthalten nur Produktionsabhängigkeiten und keinen Paketmanager. Web und Studio sind Next.js-„standalone“-Bündel. Die CI baut alle fünf Images, richtet damit eine leere Datenbank ein und startet die Dienste (Rauchtest).
 
+## Dateiablage
+
+Belege und Rechnungen liegen unveränderlich in `ABLAGE_VERZEICHNIS` (API). In staging/prod ist die Variable Pflicht; das Verzeichnis gehört auf ein verschlüsseltes, gesichertes Volume. Dateien werden nie überschrieben oder gelöscht (E-088). Ein S3-kompatibler Speicher mit Object Lock folgt mit dem Hosting.
+
 ## Beobachten
 
 | Was | Wo |

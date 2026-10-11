@@ -2,10 +2,12 @@ import { Module, type OnApplicationShutdown } from "@nestjs/common";
 import { APP_GUARD } from "@nestjs/core";
 import { Inject } from "@nestjs/common";
 import type PgBoss from "pg-boss";
-import { Datenbank, NichtVerfuegbaresElster, erzeugeWarteschlange } from "@amtlos/server";
+import path from "node:path";
+import { DateiAblage, Datenbank, NichtVerfuegbaresElster, erzeugeWarteschlange } from "@amtlos/server";
 import { AuthGuard } from "./auth.js";
 import { BetriebController, METRIKEN, erzeugeMetriken } from "./betrieb.js";
 import { ELSTER, ElsterController } from "./elster.controller.js";
+import { ABLAGE, FinanzenController } from "./finanzen.controller.js";
 import { KernController, WARTESCHLANGE } from "./kern.controller.js";
 import { KONFIGURATION, type Konfiguration } from "./konfiguration.js";
 import { PflichtenController } from "./pflichten.controller.js";
@@ -13,11 +15,12 @@ import { TeamController } from "./team.controller.js";
 
 export function appModul(k: Konfiguration) {
   @Module({
-    controllers: [KernController, PflichtenController, TeamController, ElsterController, BetriebController],
+    controllers: [KernController, PflichtenController, TeamController, ElsterController, FinanzenController, BetriebController],
     providers: [
       { provide: KONFIGURATION, useValue: k },
       { provide: METRIKEN, useFactory: erzeugeMetriken },
       { provide: ELSTER, useClass: NichtVerfuegbaresElster },
+      { provide: ABLAGE, useFactory: () => new DateiAblage(path.resolve(k.ABLAGE_VERZEICHNIS ?? "ablage")) },
       { provide: Datenbank, useFactory: () => new Datenbank({ connectionString: k.DATABASE_URL, max: 20 }) },
       {
         provide: WARTESCHLANGE,

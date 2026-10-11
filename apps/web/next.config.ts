@@ -5,6 +5,8 @@ const config: NextConfig = {
   poweredByHeader: false,
   output: "standalone",
   transpilePackages: ["@amtlos/i18n", "@amtlos/web-kern"],
+  // Belege bis 15 MB (die API begrenzt ebenfalls auf 15 MB)
+  experimental: { serverActions: { bodySizeLimit: "16mb" } },
   async headers() {
     return [
       {

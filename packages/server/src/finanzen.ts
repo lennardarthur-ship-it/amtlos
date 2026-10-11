@@ -285,17 +285,28 @@ export async function rechnungPdf(r: RechnungsDaten, kuHinweis: string): Promise
     zeile();
   }
   zeile(16);
-  text("Pos.", 50, 9, fett); text("Bezeichnung", 80, 9, fett); text("Menge", 360, 9, fett, true); text("Einzelpreis", 440, 9, fett, true); if (!r.kleinunternehmer) text("USt", 470, 9, fett); text("Betrag", 545, 9, fett, true);
+  text("Pos.", 50, 9, fett); text("Bezeichnung", 80, 9, fett); text("Menge", 330, 9, fett, true); text("Einzelpreis", 410, 9, fett, true); if (!r.kleinunternehmer) text("USt", 428, 9, fett); text("Betrag", 545, 9, fett, true);
   zeile(6);
   seite.drawLine({ start: { x: 50, y }, end: { x: 545, y }, thickness: 0.5, color: rgb(0.6, 0.6, 0.6) });
   zeile(14);
   r.positionen.forEach((p, i) => {
     text(String(i + 1), 50, 9);
-    text(p.bezeichnung.length > 55 ? `${p.bezeichnung.slice(0, 54)}…` : p.bezeichnung, 80, 9);
-    text(`${new Intl.NumberFormat("de-DE").format(vz * p.menge)} ${EINHEIT_TEXT[p.einheit]}`, 360, 9, normal, true);
-    text(euro(p.preis_cent), 440, 9, normal, true);
+    // Bezeichnung umbrechen statt abschneiden (die Leistung muss vollständig auf der Rechnung stehen)
+    const zeilenText: string[] = [];
+    for (const wort of p.bezeichnung.split(/\s+/)) {
+      const letzte = zeilenText.at(-1);
+      if (letzte !== undefined && normal.widthOfTextAtSize(`${letzte} ${wort}`, 9) <= 190) zeilenText[zeilenText.length - 1] = `${letzte} ${wort}`;
+      else zeilenText.push(wort);
+    }
+    text(zeilenText[0] ?? "", 80, 9);
+    text(`${new Intl.NumberFormat("de-DE").format(vz * p.menge)} ${EINHEIT_TEXT[p.einheit]}`, 330, 9, normal, true);
+    text(euro(p.preis_cent), 410, 9, normal, true);
     text(euro(vz * s.zeilen[i]!), 545, 9, normal, true);
-    if (!r.kleinunternehmer && p.ust_satz !== null) text(`${p.ust_satz} %`, 470, 9, normal);
+    if (!r.kleinunternehmer && p.ust_satz !== null) text(`${p.ust_satz} %`, 428, 9, normal);
+    for (const weitere of zeilenText.slice(1)) {
+      zeile(12);
+      text(weitere, 80, 9);
+    }
     zeile();
   });
   seite.drawLine({ start: { x: 300, y: y + 6 }, end: { x: 545, y: y + 6 }, thickness: 0.5, color: rgb(0.6, 0.6, 0.6) });

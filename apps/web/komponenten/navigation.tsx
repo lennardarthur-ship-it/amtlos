@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 export interface NavEintrag {
   href: string;
   text: string;
-  symbol: "heute" | "pflichten" | "kalender" | "melden" | "einstellungen";
+  symbol: "heute" | "pflichten" | "kalender" | "finanzen" | "melden" | "einstellungen";
 }
 
 function Symbol({ art }: { art: NavEintrag["symbol"] }) {
@@ -18,6 +18,8 @@ function Symbol({ art }: { art: NavEintrag["symbol"] }) {
       return <svg {...p}><path d="M9 6h11M9 12h11M9 18h11" /><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2" /></svg>;
     case "kalender":
       return <svg {...p}><rect x="4" y="5" width="16" height="15" rx="2" /><path d="M4 9h16M9 3v4M15 3v4M8 13h2M12 13h2M16 13h0M8 16h2M12 16h2" /></svg>;
+    case "finanzen":
+      return <svg {...p}><rect x="3" y="6" width="18" height="13" rx="2" /><path d="M3 10h18M7 15h4" /></svg>;
     case "melden":
       return <svg {...p}><circle cx="12" cy="12" r="8" /><path d="M12 8v8M8 12h8" /></svg>;
     case "einstellungen":
@@ -37,7 +39,7 @@ export function Navigation({ eintraege, beschriftung }: { eintraege: NavEintrag[
             <Link
               href={e.href}
               aria-current={aktiv(e.href) ? "page" : undefined}
-              className="flex min-h-14 flex-col items-center justify-center gap-0.5 text-[0.6875rem] text-tinte-leise aria-[current=page]:text-amt md:min-h-11 md:flex-row md:justify-start md:gap-3 md:rounded-md md:px-3 md:text-basis md:aria-[current=page]:bg-amt-hauch md:aria-[current=page]:font-bold md:hover:bg-blatt"
+              className="flex min-h-14 flex-col items-center justify-center gap-0.5 px-0.5 text-[0.625rem] text-tinte-leise aria-[current=page]:text-amt md:min-h-11 md:flex-row md:justify-start md:gap-3 md:rounded-md md:px-3 md:text-basis md:aria-[current=page]:bg-amt-hauch md:aria-[current=page]:font-bold md:hover:bg-blatt"
             >
               <Symbol art={e.symbol} />
               <span>{e.text}</span>

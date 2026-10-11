@@ -16,10 +16,14 @@ const Schema = z
     /** Anfragen je Minute und Instanz: angemeldet bzw. ohne Login/mit Einladungs- oder Kalender-Token (E-082). */
     RATE_ANGEMELDET: z.coerce.number().int().positive().default(600),
     RATE_ANONYM: z.coerce.number().int().positive().default(60),
+    /** Unveränderliche Dateiablage (Belege, Rechnungen). Verzeichnis auf verschlüsseltem Volume; S3-kompatibel folgt (E-088). */
+    ABLAGE_VERZEICHNIS: z.string().min(1).optional(),
   })
   .superRefine((k, ctx) => {
     if (k.AUTH_MODUS === "oidc" && (!k.OIDC_ISSUER || !k.OIDC_AUDIENCE))
       ctx.addIssue({ code: "custom", message: "AUTH_MODUS=oidc braucht OIDC_ISSUER und OIDC_AUDIENCE" });
+    if ((k.UMGEBUNG === "prod" || k.UMGEBUNG === "staging") && !k.ABLAGE_VERZEICHNIS)
+      ctx.addIssue({ code: "custom", message: "ABLAGE_VERZEICHNIS ist in staging/prod Pflicht (Belege und Rechnungen müssen dauerhaft liegen)" });
     if (k.AUTH_MODUS === "dev") {
       if (!k.DEV_JWT_SECRET) ctx.addIssue({ code: "custom", message: "AUTH_MODUS=dev braucht DEV_JWT_SECRET (≥ 32 Zeichen)" });
       if (k.UMGEBUNG === "prod" || k.UMGEBUNG === "staging")
