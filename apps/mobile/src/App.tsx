@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Platform, Pressable, View, useColorScheme } from "react-native";
 import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Betrieb } from "./seiten/Betrieb";
+import { ErinnerungsPlaner } from "./seiten/Pflichten";
 import { Meine } from "./seiten/Meine";
 import { Unterlagen } from "./seiten/Unterlagen";
 import { T as TEXT } from "./texte";
@@ -48,7 +49,7 @@ function Leiste({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
 }
 
 function Rahmen() {
-  const { bereit, tab, tabWechseln } = useAmtlos();
+  const { bereit, ladefehler, tab, tabWechseln } = useAmtlos();
   const f = useFarben();
   const [zurueck, setZurueck] = useState<Record<Tab, number>>({ unterlagen: 0, meine: 0, betrieb: 0 });
   const [besucht, setBesucht] = useState<Set<Tab>>(new Set(["unterlagen"]));
@@ -93,6 +94,13 @@ function Rahmen() {
         );
       })}
       {voll[tab] ? null : <Leiste tab={tab} setTab={setTab} />}
+      {ladefehler ? (
+        <SafeAreaView edges={["top"]} style={{ position: "absolute", top: 0, left: 0, right: 0 }} pointerEvents="box-none">
+          <View accessibilityRole="alert" style={{ margin: 12, padding: 12, borderRadius: 10, backgroundColor: f.fristHauch }}>
+            <T v="klein" fett farbe={f.frist}>{TEXT.ladefehler}</T>
+          </View>
+        </SafeAreaView>
+      ) : null}
     </View>
   );
 }
@@ -105,6 +113,7 @@ export default function App() {
     <SafeAreaProvider>
       <AmtlosAnbieter>
         <StatusBar style={dunkel ? "light" : "dark"} />
+        <ErinnerungsPlaner />
         <Rahmen />
       </AmtlosAnbieter>
     </SafeAreaProvider>

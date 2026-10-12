@@ -146,6 +146,10 @@ export interface Vorlage {
   kundendokument?: boolean;
   /** wird beim ersten Teilen oder Drucken festgeschrieben (GoBD): danach nicht mehr änderbar oder löschbar (E-127) */
   festschreiben?: boolean;
+  /** Umsätze lassen sich aus festgeschriebenen Rechnungen übernehmen (Umsatzsteuer-Voranmeldung, E-128) */
+  ausRechnungen?: boolean;
+  /** lässt sich zusätzlich als E-Rechnung (XRechnung) teilen (E-128) */
+  eRechnung?: boolean;
   /** Korrektur einer festgeschriebenen Unterlage nur per Storno (Rechnung) */
   storno?: boolean;
   /** Startwerte aus dem Pflichten-Check: Feld der Vorlage → Profilfeld (z. B. kleinunternehmer → ust.kleinunternehmer) */

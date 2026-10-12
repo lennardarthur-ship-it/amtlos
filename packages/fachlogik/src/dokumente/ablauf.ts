@@ -84,6 +84,7 @@ export const PERSONEN_FELDER: Record<PersonenArt, EinfachesFeld[]> = {
   kunde: [
     { id: "name", art: "text", label: "Name oder Firma", pflicht: true },
     { id: "anschrift", art: "mehrzeilig", label: "Anschrift" },
+    { id: "email", art: "text", label: "E-Mail", hilfe: "für die E-Rechnung" },
     { id: "ust_idnr", art: "text", label: "USt-IdNr.", hilfe: "nur bei Unternehmen im EU-Ausland oder Steuerschuldnerschaft", selten: true },
   ],
 };

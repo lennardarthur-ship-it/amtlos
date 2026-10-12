@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { ANLAESSE, KURZ, PERSONEN_FELDER, kurztitel, naechsteNummer, personAus, personIn, personMerken, BEREICHE, bausteinText, eintragAusVorschlag, mindestlohnAm, mindesturlaub, stundenlohn, LEERER_BETRIEB, PRUEFHINWEIS, VORLAGEN, dokumentHtml, arbeitsminuten, aufbewahrenBis, berlinZuUtc, cent, dateiname, fehlendeAngaben, leereDaten, neuerEintrag, sichtbar, unterlagenName, vorlageFuer, type Betrieb, type Daten, type Feld } from "../src/index.js";
+import { KU_HINWEIS, eRechnungAus, xrechnungUbl, ANLAESSE, KURZ, PERSONEN_FELDER, kurztitel, naechsteNummer, personAus, personIn, personMerken, BEREICHE, bausteinText, eintragAusVorschlag, mindestlohnAm, mindesturlaub, stundenlohn, LEERER_BETRIEB, PRUEFHINWEIS, VORLAGEN, dokumentHtml, arbeitsminuten, aufbewahrenBis, berlinZuUtc, cent, dateiname, fehlendeAngaben, leereDaten, neuerEintrag, sichtbar, unterlagenName, vorlageFuer, type Betrieb, type Daten, type Feld } from "../src/index.js";
 
 const KATALOG = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../catalog/pflichten");
 const BETRIEB: Betrieb = { name: "Salon Sonne", strasse: "Hauptstr. 1", plz: "12345", ort: "Musterstadt", verantwortlich: "Alex Muster", telefon: "0123 456", email: "info@example.de", steuernummer: "12/345/67890", ust_idnr: "", iban: "DE00 1234", bundesland: "Bayern" };
@@ -324,5 +324,22 @@ describe("Dokumentvorlagen", () => {
     expect(kurztitel("Unzureichende Frischluftzufuhr, dadurch Belastung durch Dämpfe")).toBe("Unzureichende Frischluftzufuhr");
     expect(kurztitel("Hautkontakt mit Friseurchemikalien (Färbe-, Blondiermittel)")).toBe("Hautkontakt mit Friseurchemikalien");
     expect(kurztitel("Kühlschrank")).toBe("Kühlschrank");
+  });
+
+  it("macht aus einer Rechnung der App eine E-Rechnung (XRechnung, UBL) und nennt, was fehlt", () => {
+    const b = { ...BETRIEB, email: "info@salon.example", telefon: "089 1", iban: "DE02120300000000202051" };
+    const d = { nummer: "2026-014", datum: "2026-10-12", leistung_gleich: true, zahlungsziel: "14", kunde_name: "Agentur Nord GmbH", kunde_anschrift: "Hafenstraße 12\n20457 Hamburg", kunde_email: "a@b.example", positionen: [{ bezeichnung: "Haarschnitt", menge: "2", einheit: "Stunde", preis: "25,00", satz: "19" }] };
+    const { daten, fehlt } = eRechnungAus(d, b);
+    expect(fehlt).toEqual([]);
+    expect(daten.kunde).toMatchObject({ strasse: "Hafenstraße 12", plz: "20457", ort: "Hamburg" });
+    expect(daten.faellig_am).toBe("2026-10-26");
+    const xml = xrechnungUbl(daten, KU_HINWEIS);
+    expect(xml).toContain("<cbc:CustomizationID>urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0</cbc:CustomizationID>");
+    expect(xml).toContain('<cbc:InvoicedQuantity unitCode="HUR">2</cbc:InvoicedQuantity>');
+    expect(xml).toContain('<cbc:PayableAmount currencyID="EUR">59.50</cbc:PayableAmount>');
+    expect(xml).toContain("Hafenstraße 12");
+    const ohne = eRechnungAus({ ...d, kunde_anschrift: "Hamburg", kunde_email: "", positionen: [{ ...d.positionen[0], satz: "0" }] }, { ...b, iban: "" }).fehlt;
+    expect(ohne).toEqual(expect.arrayContaining(["IBAN (Mein Betrieb)", "E-Mail des Empfängers", "Anschrift des Empfängers: Straße in der ersten, PLZ und Ort in der letzten Zeile"]));
+    expect(ohne.some((x) => x.includes("0 %"))).toBe(true);
   });
 });

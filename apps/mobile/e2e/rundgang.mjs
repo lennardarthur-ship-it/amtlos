@@ -180,6 +180,12 @@ try {
   await warte(600);
   pruefe((await sichtbar("Festgeschrieben am")) && (await knopf("Stornieren").count()) > 0 && (await p.getByRole("button", { name: "Löschen", exact: true }).locator("visible=true").count()) === 0, "Rechnung nach dem Teilen nicht festgeschrieben");
   await foto("festgeschrieben");
+  // E-Rechnung (E-128): fehlen Angaben für XRechnung (hier E-Mail, Telefon, IBAN), nennt Amtlos sie statt einer ungültigen Datei
+  await knopf("Als E-Rechnung teilen (XRechnung)").click();
+  await warte(600);
+  await foto("e-rechnung-fehlt");
+  pruefe((await sichtbar("Für die E-Rechnung fehlt noch")) && (await sichtbar("E-Mail des Empfängers")) && (await sichtbar("IBAN (Mein Betrieb)")), "E-Rechnung nennt fehlende Angaben nicht");
+  await warte(400);
   await knopf("Vorschau groß ansehen").click();
   await warte(1200);
   await foto("vorschau");

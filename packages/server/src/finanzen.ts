@@ -14,7 +14,7 @@ import { PDFDocument, rgb, type PDFFont, type PDFPage } from "@cantoo/pdf-lib";
 import { InvoiceService, type Invoice } from "@e-invoice-eu/core";
 import { XMLParser } from "fast-xml-parser";
 import type { Tx } from "./datenbank.js";
-import { EINHEIT_CODE, summen, type Einheit, type RechnungsDaten } from "@amtlos/fachlogik";
+import { eRechnungsDokument, summen, type Einheit, type RechnungsDaten } from "@amtlos/fachlogik";
 export { EINHEIT_CODE, fehlendFuerERechnung, rundeCent, summen, type Einheit, type KundeDaten, type Position, type RechnungsDaten, type Steller, type Summen } from "@amtlos/fachlogik";
 
 // ---------------------------------------------------------------- Ablage (Objektspeicher)
@@ -72,79 +72,10 @@ export async function dokumentAblegen(
 
 // ---------------------------------------------------------------- E-Rechnung erzeugen
 
-const betrag = (cent: number) => (cent / 100).toFixed(2);
-const geld = (cent: number) => ({ "@currencyID": "EUR" as const, wert: betrag(cent) });
 
-/** Rechnung → internes Format der Bibliothek (UBL-Struktur als JSON). */
+/** Rechnung → internes Format der Bibliothek (UBL-Struktur als JSON) – gemeinsam mit der App in @amtlos/fachlogik (E-128). */
 export function eRechnungsDaten(r: RechnungsDaten, kuHinweis: string): Invoice {
-  const s = summen(r.positionen, r.kleinunternehmer);
-  const kategorie = (satz: number | null) => (satz === null ? { "cbc:ID": "E", "cbc:Percent": "0" } : { "cbc:ID": "S", "cbc:Percent": String(satz) });
-  const vz = r.art === "storno" ? -1 : 1; // Storno: Rechnungskorrektur mit negativen Beträgen (Typ 384)
-  const m = (cent: number) => geld(vz * cent);
-  const steuerSchemas = [
-    ...(r.steller.ust_idnr ? [{ "cbc:CompanyID": r.steller.ust_idnr, "cac:TaxScheme": { "cbc:ID": "VAT" } }] : []),
-    ...(r.steller.steuernummer ? [{ "cbc:CompanyID": r.steller.steuernummer, "cac:TaxScheme": { "cbc:ID": "FC" } }] : []),
-  ];
-  const doc: Record<string, unknown> = {
-    "cbc:CustomizationID": "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0",
-    "cbc:ProfileID": "urn:fdc:peppol.eu:2017:poacc:billing:01:1.0",
-    "cbc:ID": r.nummer,
-    "cbc:IssueDate": r.rechnungsdatum,
-    ...(r.faellig_am ? { "cbc:DueDate": r.faellig_am } : {}),
-    "cbc:InvoiceTypeCode": r.art === "storno" ? "384" : "380",
-    ...(r.hinweis || r.kleinunternehmer ? { "cbc:Note": [r.kleinunternehmer ? kuHinweis : null, r.hinweis].filter(Boolean) } : {}),
-    "cbc:DocumentCurrencyCode": "EUR",
-    // BT-10 ist in der XRechnung Pflicht; ohne Käuferreferenz verwenden wir die Rechnungsnummer (Prüfpunkt T-07)
-    "cbc:BuyerReference": r.kunde.kaeufer_referenz || r.nummer,
-    ...(r.art === "storno" && r.storniert_nummer ? { "cac:BillingReference": [{ "cac:InvoiceDocumentReference": { "cbc:ID": r.storniert_nummer } }] } : {}),
-    "cac:AccountingSupplierParty": {
-      "cac:Party": {
-        "cbc:EndpointID": r.steller.email, "cbc:EndpointID@schemeID": "EM",
-        // BR-CO-26: ohne USt-IdNr. braucht der Verkäufer eine Kennung (BT-29) – wir setzen die Steuernummer ein (Prüfpunkt T-11)
-        ...(!r.steller.ust_idnr && r.steller.steuernummer ? { "cac:PartyIdentification": [{ "cbc:ID": r.steller.steuernummer }] } : {}),
-        "cac:PostalAddress": { "cbc:StreetName": r.steller.strasse, "cbc:CityName": r.steller.ort, "cbc:PostalZone": r.steller.plz, "cac:Country": { "cbc:IdentificationCode": r.steller.land } },
-        ...(steuerSchemas.length ? { "cac:PartyTaxScheme": steuerSchemas } : {}),
-        "cac:PartyLegalEntity": { "cbc:RegistrationName": r.steller.name },
-        "cac:Contact": { "cbc:Name": r.steller.name, "cbc:Telephone": r.steller.telefon ?? "", "cbc:ElectronicMail": r.steller.email },
-      },
-    },
-    "cac:AccountingCustomerParty": {
-      "cac:Party": {
-        ...(r.kunde.email ? { "cbc:EndpointID": r.kunde.email, "cbc:EndpointID@schemeID": "EM" } : {}),
-        "cac:PostalAddress": { "cbc:StreetName": r.kunde.strasse ?? "", "cbc:CityName": r.kunde.ort ?? "", "cbc:PostalZone": r.kunde.plz ?? "", "cac:Country": { "cbc:IdentificationCode": r.kunde.land } },
-        ...(r.kunde.ust_idnr ? { "cac:PartyTaxScheme": [{ "cbc:CompanyID": r.kunde.ust_idnr, "cac:TaxScheme": { "cbc:ID": "VAT" } }] } : {}),
-        "cac:PartyLegalEntity": { "cbc:RegistrationName": r.kunde.name },
-      },
-    },
-    ...(r.leistungsdatum ? { "cac:Delivery": { "cbc:ActualDeliveryDate": r.leistungsdatum } } : {}),
-    ...(r.steller.iban
-      ? { "cac:PaymentMeans": [{ "cbc:PaymentMeansCode": "58", "cac:PayeeFinancialAccount": { "cbc:ID": r.steller.iban.replace(/\s/g, ""), ...(r.steller.bic ? { "cac:FinancialInstitutionBranch": { "cbc:ID": r.steller.bic } } : {}) } }] }
-      : {}),
-    "cac:TaxTotal": [
-      {
-        "cbc:TaxAmount": m(s.ust_cent).wert, "cbc:TaxAmount@currencyID": "EUR",
-        "cac:TaxSubtotal": s.gruppen.map((g) => ({
-          "cbc:TaxableAmount": m(g.netto_cent).wert, "cbc:TaxableAmount@currencyID": "EUR",
-          "cbc:TaxAmount": m(g.ust_cent).wert, "cbc:TaxAmount@currencyID": "EUR",
-          "cac:TaxCategory": { ...kategorie(g.satz), ...(g.satz === null ? { "cbc:TaxExemptionReason": kuHinweis } : {}), "cac:TaxScheme": { "cbc:ID": "VAT" } },
-        })),
-      },
-    ],
-    "cac:LegalMonetaryTotal": {
-      "cbc:LineExtensionAmount": m(s.netto_cent).wert, "cbc:LineExtensionAmount@currencyID": "EUR",
-      "cbc:TaxExclusiveAmount": m(s.netto_cent).wert, "cbc:TaxExclusiveAmount@currencyID": "EUR",
-      "cbc:TaxInclusiveAmount": m(s.brutto_cent).wert, "cbc:TaxInclusiveAmount@currencyID": "EUR",
-      "cbc:PayableAmount": m(s.brutto_cent).wert, "cbc:PayableAmount@currencyID": "EUR",
-    },
-    "cac:InvoiceLine": r.positionen.map((p, i) => ({
-      "cbc:ID": String(i + 1),
-      "cbc:InvoicedQuantity": String(vz * p.menge), "cbc:InvoicedQuantity@unitCode": EINHEIT_CODE[p.einheit],
-      "cbc:LineExtensionAmount": m(s.zeilen[i]!).wert, "cbc:LineExtensionAmount@currencyID": "EUR",
-      "cac:Item": { "cbc:Name": p.bezeichnung, "cac:ClassifiedTaxCategory": { ...kategorie(r.kleinunternehmer ? null : p.ust_satz), "cac:TaxScheme": { "cbc:ID": "VAT" } } },
-      "cac:Price": { "cbc:PriceAmount": betrag(p.preis_cent), "cbc:PriceAmount@currencyID": "EUR" },
-    })),
-  };
-  return { "ubl:Invoice": doc } as unknown as Invoice;
+  return eRechnungsDokument(r, kuHinweis) as unknown as Invoice;
 }
 
 const stumm = { log: () => undefined, warn: () => undefined, error: () => undefined } as unknown as Console;

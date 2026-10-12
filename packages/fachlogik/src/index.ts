@@ -5,4 +5,5 @@
 export * from "./gruendung.js";
 export * from "./fragebogen.js";
 export * from "./rechnung.js";
+export * from "./erechnung.js";
 export * from "./dokumente/index.js";

@@ -30,6 +30,7 @@ interface Zustand {
   erledigtSetzen(pflichtId: string, datum: string | null, termin?: string | null): void;
   /** PDF geteilt oder gedruckt (schreibt Rechnungen fest) */
   ausgeben(id: string): void;
+  erinnerungenSetzen(an: boolean): void;
   stornieren(id: string): Unterlage | null;
   kopieren(id: string): Unterlage | null;
   loeschen(id: string): void;
@@ -123,6 +124,7 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       profilSetzen: (werte, bl) => setzen(profilSetzen(aktuell.current, werte, bl)),
       erledigtSetzen: (pid, datum, termin) => setzen(erledigtSetzen(aktuell.current, pid, datum, termin)),
       ausgeben: (id) => setzen(ausgeben(aktuell.current, id, new Date())),
+      erinnerungenSetzen: (an) => setzen({ ...aktuell.current, erinnerungen: an }),
       stornieren: (id) => {
         const [s, u] = stornieren(aktuell.current, id, new Date());
         setzen(s);

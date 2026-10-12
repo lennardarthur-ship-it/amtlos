@@ -578,6 +578,15 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Daten:** Beim Wechsel in den Hintergrund wird sofort gespeichert; sind gespeicherte Daten unlesbar oder schlägt das Laden fehl, überschreibt die App nichts (bis „Alle Daten löschen“).
 - Nicht entschieden (Gründer, Termine mit F. Steinmeyer und L. Reiche): Konto, Server, Synchronisierung, Bezahlung (K1, K6), E-Rechnung in der App (K4), Rechnungen → USt-Voranmeldung → ELSTER-Export (K8).
 
+### E-128 · E-Rechnung, Umsätze für die Voranmeldung, „Jetzt dran“ und Erinnerungen
+- **Datum:** 2026-10-13 · **Status:** angenommen vorbehaltlich Termin (Review L. Reiche K4, K7, K8; Review F. Steinmeyer Punkt 6 „lokale Erinnerungen ohne Server“) – kein Server, kein Konto, keine Bezahlung (K1/K6 weiter offen)
+- **E-Rechnung (XRechnung 3.0, UBL):** Im Abschluss einer Rechnung „Als E-Rechnung teilen (XRechnung)“. Die Zuordnung Rechnung → UBL liegt jetzt in `@amtlos/fachlogik` (`eRechnungsDokument`, `xrechnungUbl`) und wird von Server und App gemeinsam genutzt. Fehlen Angaben, die XRechnung verlangt (E-Mail und Telefon des Betriebs, IBAN, E-Mail des Empfängers, Anschrift mit PLZ/Ort in der letzten Zeile), nennt die App sie, statt eine ungültige Datei zu erzeugen. 0 % Umsatzsteuer außerhalb der Kleinunternehmerregelung (z. B. Reverse Charge) erzeugt bewusst noch keine E-Rechnung. Die Beispiel-Rechnungen (Server und App, inkl. Storno und Kleinunternehmer) bestehen den KoSIT-Validator mit der XRechnung-3.0.2-Konfiguration. Teilen der E-Rechnung zählt wie das PDF als ausgegeben (festgeschrieben). ZUGFeRD (PDF mit eingebettetem XML) ist nicht enthalten.
+- **Kunde:** Rechnungsempfänger und gespeicherte Kunden haben ein Feld E-Mail.
+- **Rechnungen → Voranmeldung:** In der Vorlage „Umsatzsteuer-Voranmeldung“ übernimmt eine Karte im ersten Schritt Zeitraum und Umsätze je Steuersatz (19 %, 7 %, steuerfrei/0 %) aus den festgeschriebenen Rechnungen eines Monats oder Quartals; Stornorechnungen zählen negativ, Entwürfe nicht. Zugeordnet wird nach Rechnungsdatum (fachlich zu prüfen, T-69). Eine ELSTER-Übermittlung gibt es weiter nicht.
+- **„Jetzt dran“:** „Deine Pflichten“ beginnt mit „Jetzt dran“ (offene Pflichten mit Termin in den nächsten 14 Tagen und wichtige Pflichten ohne Termin) und „Diesen Monat“ (Termin in 15–45 Tagen); darunter alle Pflichten nach Bereich. Die Startseite zeigt die ersten drei aus „Jetzt dran“.
+- **Erinnerungen (lokal):** Schalter in „Deine Pflichten“. Die App plant Mitteilungen auf dem Gerät (expo-notifications), 3 Tage vor jedem Termin offener Pflichten um 9 Uhr, höchstens 30, und plant bei jeder Änderung neu (abgehakte Pflichten fallen heraus). Kein Server, keine Push-Dienste; im Web ohne Funktion.
+- **Ladefehler sichtbar:** Sind gespeicherte Daten unlesbar, zeigt die App oben einen Hinweis (statt still nichts zu speichern).
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

@@ -224,7 +224,7 @@ jobs:
           distribution: temurin
           java-version: "17"
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @amtlos/server... build
+      - run: pnpm --filter @amtlos/server... --filter @amtlos/fachlogik build
       - run: node scripts/e-rechnung-beispiele.mjs e-rechnungen
       - name: KoSIT-Validator und XRechnung-Konfiguration laden (offizielle Releases)
         env:

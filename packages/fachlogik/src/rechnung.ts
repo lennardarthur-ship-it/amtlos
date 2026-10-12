@@ -9,6 +9,8 @@ export interface Position {
   einheit: Einheit;
   preis_cent: number; // Nettopreis je Einheit
   ust_satz: number | null; // Prozent; null bei Kleinunternehmern
+  /** UN/ECE-Code der Einheit, wenn die Einheit frei eingegeben wurde (App, E-128) – sonst aus `einheit` */
+  einheit_code?: string;
 }
 export type Einheit = "stueck" | "stunde" | "tag" | "monat" | "pauschal" | "kilogramm";
 /** UN/ECE Recommendation 20 – technische Codes für die E-Rechnung */

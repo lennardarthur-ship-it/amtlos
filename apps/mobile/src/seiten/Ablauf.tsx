@@ -7,6 +7,7 @@ import { Fuss, Knopf, Symbol, T, TextKnopf, Wahl } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { RAND, ZIEL, istIos, useFarben } from "../ui/thema";
 import { PERSONEN_LISTE, personenSortiert } from "../unterlagen/speicher";
+import { periodeText, perioden, umsaetzeFuer } from "../unterlagen/ustAusRechnungen";
 import { useAmtlos } from "../zustand";
 import { Abschluss, useTeilen } from "./Abschluss";
 import { Felder } from "./felder";
@@ -44,6 +45,33 @@ function PersonenWahl({ v, id, daten }: { v: Vorlage; id: string; daten: Daten }
   );
 }
 
+/** Umsatzsteuer-Voranmeldung: Umsätze aus den geteilten Rechnungen eines Monats oder Quartals übernehmen (E-128). */
+function AusRechnungen({ id }: { id: string }) {
+  const z = useAmtlos();
+  const f = useFarben();
+  const [uebernommen, setUebernommen] = useState<{ periode: string; anzahl: number } | null>(null);
+  const liste = perioden(z.stand.unterlagen);
+  if (!liste.length) return <T v="caption" leise stil={{ marginTop: 10 }}>{TEXT.aus_rechnungen_leer}</T>;
+  return (
+    <View style={{ marginTop: 14, padding: 14, borderRadius: 14, backgroundColor: f.amtHauch }}>
+      <T v="klein" fett farbe={f.amtTief}>{TEXT.aus_rechnungen_titel}</T>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 6 }}>
+        <Wahl
+          wert={uebernommen?.periode ?? null}
+          aendern={(p) => {
+            const r = umsaetzeFuer(z.stand.unterlagen, p, z.stand.betrieb);
+            if (!r) return;
+            z.setzen(id, r.werte);
+            setUebernommen({ periode: p, anzahl: r.anzahl });
+          }}
+          optionen={liste.map((p) => ({ wert: p, text: periodeText(p) }))}
+        />
+      </ScrollView>
+      {uebernommen ? <T v="caption" farbe={f.amtTief} stil={{ marginTop: 8 }}>{TEXT.aus_rechnungen_ok(uebernommen.anzahl)}</T> : null}
+    </View>
+  );
+}
+
 function Schritt({ v, a, index, id, daten, fehlt }: { v: Vorlage; a: VorlagenAbschnitt; index: number; id: string; daten: Daten; fehlt: string[] }) {
   const z = useAmtlos();
   const nav = useNav();
@@ -54,6 +82,7 @@ function Schritt({ v, a, index, id, daten, fehlt }: { v: Vorlage; a: VorlagenAbs
       {a.hilfe ? <T leise stil={{ marginTop: 6 }}>{a.hilfe}</T> : null}
       {index === 0 ? <TextKnopf symbol="questionmark.circle" text={TEXT.wozu_link} onPress={() => nav.oeffnen(`info-${v.id}`, () => <InfoSeite id={v.id} />, true)} stil={{ marginTop: 4 }} /> : null}
       {mitPerson ? <PersonenWahl v={v} id={id} daten={daten} /> : null}
+      {v.ausRechnungen && index === 0 ? <AusRechnungen id={id} /> : null}
       <Felder felder={a.felder} werte={daten} fehlt={fehlt} setze={(k, w) => z.setzen(id, { [k]: w })} liste={(f) => <ListenSchritt feld={f} id={id} />} />
     </View>
   );
@@ -141,7 +170,7 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
       <KeyboardAvoidingView behavior={istIos ? "padding" : undefined} style={{ flex: 1 }}>
         <ScrollView key={schritt} contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 8, paddingBottom: 32 }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive">
           {amAbschluss ? (
-            <Abschluss id={id} springen={gehe} fehler={teilen.fehler} drucken={teilen.drucken} />
+            <Abschluss id={id} springen={gehe} fehler={teilen.fehler} drucken={teilen.drucken} eRechnung={teilen.eRechnung} eFehlt={teilen.eFehlt} />
           ) : (
             <Schritt v={vorlage} a={vorlage.abschnitte[schritt]!} index={schritt} id={id} daten={daten} fehlt={fehlt} />
           )}

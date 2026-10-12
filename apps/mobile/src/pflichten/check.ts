@@ -193,3 +193,45 @@ export const VORSCHLAG_GRUPPE: Record<string, string[]> = {
   it_agentur_freelancer: ["Büro / Laden"],
   immobilien_finanzen: ["Büro / Laden"],
 };
+
+const plusTage = (iso: string, n: number) => {
+  const [j, m, t] = iso.split("-").map(Number) as [number, number, number];
+  return new Date(Date.UTC(j, m - 1, t + n)).toISOString().slice(0, 10);
+};
+
+/**
+ * Was jetzt dran ist (E-128, Review K7): offene Pflichten mit Termin in den nächsten 14 Tagen (auch überfällige)
+ * und die wichtigsten offenen ohne Termin; „Diesen Monat“ mit Termin in 15 bis 45 Tagen; der Rest „Im Blick“.
+ */
+export function dringlichkeit(a: Auswertung, e: Erledigt, heute: string) {
+  const offen = a.gilt.filter((p) => !istErledigt(p, e));
+  const bald = plusTage(heute, 14);
+  const monat = plusTage(heute, 45);
+  const mitTermin = offen.filter((p) => p.naechsterTermin).sort((x, y) => x.naechsterTermin!.localeCompare(y.naechsterTermin!));
+  const terminBald = mitTermin.filter((p) => p.naechsterTermin! <= bald);
+  const wichtigOhne = offen.filter((p) => !p.naechsterTermin && p.schwere === "hoch");
+  const jetzt = [...terminBald, ...wichtigOhne];
+  const diesenMonat = mitTermin.filter((p) => p.naechsterTermin! > bald && p.naechsterTermin! <= monat);
+  const imBlick = offen.filter((p) => !jetzt.includes(p) && !diesenMonat.includes(p));
+  return { jetzt, diesenMonat, imBlick };
+}
+
+export interface Erinnerung {
+  pflichtId: string;
+  titel: string;
+  termin: string;
+  /** Tag der Benachrichtigung (ISO), morgens zugestellt */
+  am: string;
+}
+
+/** Lokale Erinnerungen: für offene Pflichten mit Termin, `vorlauf` Tage vorher (nicht in der Vergangenheit), höchstens `max`. */
+export function erinnerungsPlan(a: Auswertung, e: Erledigt, heute: string, vorlauf = 3, max = 30): Erinnerung[] {
+  return a.gilt
+    .filter((p) => p.naechsterTermin && p.naechsterTermin >= heute && !istErledigt(p, e))
+    .map((p) => {
+      const frueh = plusTage(p.naechsterTermin!, -vorlauf);
+      return { pflichtId: p.id, titel: p.titel, termin: p.naechsterTermin!, am: frueh > heute ? frueh : heute };
+    })
+    .sort((x, y) => x.am.localeCompare(y.am) || x.titel.localeCompare(y.titel, "de"))
+    .slice(0, max);
+}

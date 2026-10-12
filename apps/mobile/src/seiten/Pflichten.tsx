@@ -1,10 +1,11 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Linking, Pressable, View } from "react-native";
 import { T as TEXT } from "../texte";
-import { Fuss, Hinweis, Karte, Knopf, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
+import { Fuss, Hinweis, Karte, Knopf, Schalter, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { RADIUS, RAND, useFarben } from "../ui/thema";
-import { KATEGORIE_TITEL, auswertung, beantwortet, fortschritt, istErledigt, type PflichtInfo } from "../pflichten/check";
+import { KATEGORIE_TITEL, auswertung, beantwortet, dringlichkeit, erinnerungsPlan, fortschritt, istErledigt, type PflichtInfo } from "../pflichten/check";
+import { allesAbsagen, erinnerungenMoeglich, erlaubnisAnfragen, planen } from "../pflichten/erinnerungen";
 import { heute } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { CheckAblauf } from "./Check";
@@ -124,6 +125,7 @@ export function PflichtenSeite() {
   const offeneFragen = [...new Set(a.unbekannt.flatMap((p) => p.offeneFragen))].filter((f) => !beantwortet(z.stand.profil, f));
   const kategorien = Object.keys(KATEGORIE_TITEL).filter((k) => a.gilt.some((p) => p.kategorie === k));
   const sonst = a.gilt.filter((p) => !KATEGORIE_TITEL[p.kategorie]);
+  const d = dringlichkeit(a, z.stand, heute());
   return (
     <Unterseite titel={TEXT.pflichten_titel}>
       <Inhalt>
@@ -136,6 +138,26 @@ export function PflichtenSeite() {
           <Balken prozent={fs.prozent} />
           <T v="caption" leise>{TEXT.pflichten_quelle}</T>
         </View>
+        <ErinnerungsSchalter />
+        {d.jetzt.length ? (
+          <Gruppe titel={TEXT.jetzt_dran(d.jetzt.length)}>
+            <Karte>
+              {d.jetzt.map((p, i) => (
+                <PflichtZeile key={p.id} p={p} erledigt={false} letzte={i === d.jetzt.length - 1} />
+              ))}
+            </Karte>
+          </Gruppe>
+        ) : null}
+        {d.diesenMonat.length ? (
+          <Gruppe titel={TEXT.diesen_monat(d.diesenMonat.length)}>
+            <Karte>
+              {d.diesenMonat.map((p, i) => (
+                <PflichtZeile key={p.id} p={p} erledigt={false} letzte={i === d.diesenMonat.length - 1} />
+              ))}
+            </Karte>
+          </Gruppe>
+        ) : null}
+        <T v="klein" fett leise accessibilityRole="header" stil={{ marginTop: 28, marginLeft: 4 }}>{TEXT.alle_nach_bereich}</T>
         {kategorien.map((k) => {
           const l = a.gilt.filter((p) => p.kategorie === k);
           return (
@@ -207,6 +229,7 @@ export function PflichtenKarte() {
       </View>
     );
   const fs = fortschritt(a, z.stand);
+  const jetzt = dringlichkeit(a, z.stand, heute()).jetzt;
   return (
     <Karte stil={{ marginTop: 16, paddingVertical: 14, gap: 10 }}>
       <Pressable accessibilityRole="button" accessibilityLabel={`${TEXT.pflichten_titel}: ${TEXT.fortschritt_text(fs.fertig, fs.gesamt)}`} onPress={() => nav.oeffnen("pflichten", () => <PflichtenSeite />)} style={({ pressed }) => ({ gap: 10, opacity: pressed ? 0.7 : 1 })}>
@@ -219,9 +242,58 @@ export function PflichtenKarte() {
         </View>
         <Balken prozent={fs.prozent} />
         <T v="klein" leise>{TEXT.fortschritt_text(fs.fertig, fs.gesamt)}</T>
+        {jetzt.length ? (
+          <View style={{ marginTop: 4, gap: 6 }}>
+            <T v="klein" fett>{TEXT.jetzt_dran(jetzt.length)}</T>
+            {jetzt.slice(0, 3).map((p) => (
+              <View key={p.id} style={{ flexDirection: "row", gap: 8, alignItems: "flex-start" }}>
+                <Symbol name={p.naechsterTermin ? "calendar" : "exclamationmark.circle"} groesse={16} farbe={p.naechsterTermin ? f.amt : f.bald} />
+                <T v="klein" stil={{ flex: 1 }} numberOfLines={2}>{p.titel}</T>
+                {p.naechsterTermin ? <T v="caption" leise stil={{ fontVariant: ["tabular-nums"] }}>{datumDe(p.naechsterTermin)}</T> : null}
+              </View>
+            ))}
+          </View>
+        ) : null}
       </Pressable>
     </Karte>
   );
+}
+
+/** Lokale Erinnerungen an Fristen einschalten (ohne Server). */
+function ErinnerungsSchalter() {
+  const z = useAmtlos();
+  const [fehler, setFehler] = useState(false);
+  if (!erinnerungenMoeglich) return null;
+  return (
+    <View style={{ marginTop: 8 }}>
+      <Schalter
+        label={TEXT.erinnern}
+        hilfe={TEXT.erinnern_hilfe}
+        wert={z.stand.erinnerungen}
+        aendern={(an) => {
+          setFehler(false);
+          if (!an) return z.erinnerungenSetzen(false);
+          void erlaubnisAnfragen().then((ok) => (ok ? z.erinnerungenSetzen(true) : setFehler(true)));
+        }}
+      />
+      {fehler ? <Hinweis art="fehler" text={TEXT.erinnern_verweigert} /> : null}
+    </View>
+  );
+}
+
+/** Setzt die lokalen Erinnerungen neu, wenn sich Antworten, Haken oder Unterlagen ändern (rendert nichts). */
+export function ErinnerungsPlaner() {
+  const z = useAmtlos();
+  const a = useAuswertung();
+  const plan = useMemo(() => (z.stand.erinnerungen ? erinnerungsPlan(a, z.stand, heute()) : []), [a, z.stand]);
+  const schluessel = JSON.stringify(plan);
+  useEffect(() => {
+    if (!erinnerungenMoeglich || !z.bereit) return;
+    const zeit = setTimeout(() => void (z.stand.erinnerungen ? planen(plan) : allesAbsagen()).catch(() => undefined), 800);
+    return () => clearTimeout(zeit);
+    // nur bei geändertem Plan neu setzen (der Plan steckt im Schlüssel)
+  }, [schluessel, z.stand.erinnerungen, z.bereit]);
+  return null;
 }
 
 /** Zeile unter „Mein Betrieb“: Antworten im Check ansehen und ändern. */

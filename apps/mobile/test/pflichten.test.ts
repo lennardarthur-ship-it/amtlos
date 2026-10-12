@@ -5,7 +5,7 @@ import { parse } from "yaml";
 import { describe, expect, it } from "vitest";
 import { VORLAGEN } from "@amtlos/fachlogik";
 import { LEERER_STAND, anlegen, erledigtSetzen, profilSetzen, standAus } from "../src/unterlagen/speicher";
-import { CHECK_FELDER, KATALOG, auswertung, checkFragen, fortschritt, frageZu, istErledigt, zusatzFragen, type Profil } from "../src/pflichten/check";
+import { CHECK_FELDER, KATALOG, auswertung, checkFragen, dringlichkeit, erinnerungsPlan, fortschritt, frageZu, istErledigt, zusatzFragen, type Profil } from "../src/pflichten/check";
 
 const FIXTURES = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../catalog/fixtures");
 const salon: Profil = { "taetigkeit.branchen": ["beauty_kosmetik"], rechtsform: "einzelunternehmen", "taetigkeit.einordnung": "gewerbe", bundesland: "BY", "beschaeftigte.gesamt": 3, "kasse.elektronisch": true, "online.website": false, "ust.kleinunternehmer": false, gruendungsdatum: "2024-03-01" };
@@ -78,6 +78,34 @@ describe("Pflichten-Check", () => {
     expect(fuer("2020-01-10")).toBe(false);
     // wiederkehrende Pflichten erledigt keine Unterlage auf Dauer
     expect(a.gilt.filter((x) => x.wiederkehrend).every((x) => !istErledigt(x, { erledigt: {}, unterlagen: [], betrieb: LEERER_STAND.betrieb }))).toBe(true);
+  });
+
+  it("ordnet offene Pflichten nach Dringlichkeit (14 / 45 Tage) und plant Erinnerungen", () => {
+    const heute = "2026-10-12";
+    const a = auswertung(salon, heute);
+    const leer = { erledigt: {}, unterlagen: [], betrieb: LEERER_STAND.betrieb };
+    const d = dringlichkeit(a, leer, heute);
+    // jede offene Pflicht steht in genau einem Abschnitt
+    expect(d.jetzt.length + d.diesenMonat.length + d.imBlick.length).toBe(a.gilt.length);
+    expect(new Set([...d.jetzt, ...d.diesenMonat, ...d.imBlick].map((p) => p.id)).size).toBe(a.gilt.length);
+    for (const p of d.jetzt) expect(p.naechsterTermin ? p.naechsterTermin <= "2026-10-26" : p.schwere === "hoch", p.id).toBe(true);
+    for (const p of d.diesenMonat) expect(p.naechsterTermin! > "2026-10-26" && p.naechsterTermin! <= "2026-11-26", p.id).toBe(true);
+    // Erinnerungen: nur mit Termin, nie vor heute, höchstens 3 Tage vorher, sortiert und begrenzt
+    const plan = erinnerungsPlan(a, leer, heute);
+    expect(plan.length).toBeGreaterThan(0);
+    expect(plan.length).toBeLessThanOrEqual(30);
+    for (const e of plan) {
+      expect(e.am >= heute && e.am <= e.termin, e.pflichtId).toBe(true);
+      expect(e.am === heute || e.am === new Date(Date.parse(e.termin + "T00:00:00Z") - 3 * 864e5).toISOString().slice(0, 10)).toBe(true);
+    }
+    expect([...plan].map((e) => e.am)).toEqual([...plan].map((e) => e.am).sort());
+    expect(erinnerungsPlan(a, leer, heute, 3, 2)).toHaveLength(Math.min(2, plan.length));
+    // abgehakte Pflicht verschwindet aus „Jetzt dran“ und aus den Erinnerungen
+    const erste = plan[0]!;
+    const p = a.gilt.find((x) => x.id === erste.pflichtId)!;
+    const s = { ...erledigtSetzen(LEERER_STAND, p.id, heute, p.naechsterTermin), unterlagen: [] };
+    expect(erinnerungsPlan(a, s, heute).some((e) => e.pflichtId === p.id)).toBe(false);
+    expect(dringlichkeit(a, s, heute).jetzt.some((x) => x.id === p.id)).toBe(false);
   });
 
   it("trennt Gründungsschritte bei bestehenden Betrieben ab und nennt Gründe", () => {

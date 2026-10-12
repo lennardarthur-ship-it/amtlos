@@ -29,9 +29,11 @@ export interface Stand {
   profil: Record<string, string | number | boolean | string[] | null>;
   /** abgehakte Pflichten: Pflicht-ID → Datum */
   erledigt: Record<string, string>;
+  /** lokale Erinnerungen an Fristen eingeschaltet (E-128) */
+  erinnerungen: boolean;
 }
 
-export const LEERER_STAND: Stand = { version: 1, betrieb: LEERER_BETRIEB, unterlagen: [], mitarbeiter: [], kunden: [], profil: {}, erledigt: {} };
+export const LEERER_STAND: Stand = { version: 1, betrieb: LEERER_BETRIEB, unterlagen: [], mitarbeiter: [], kunden: [], profil: {}, erledigt: {}, erinnerungen: false };
 
 function profilAus(roh: unknown): Stand["profil"] {
   if (!roh || typeof roh !== "object" || Array.isArray(roh)) return {};
@@ -68,7 +70,7 @@ export function standAus(json: string | null): Stand {
       (u): u is Unterlage => Boolean(u && typeof u.id === "string" && typeof u.vorlage === "string" && vorlageFuer(u.vorlage) && u.daten && typeof u.daten === "object"),
     );
     const r = roh as Record<string, unknown>;
-    return { version: 1, betrieb, unterlagen, mitarbeiter: personenAus(r.mitarbeiter), kunden: personenAus(r.kunden), profil: profilAus(r.profil), erledigt: erledigtAus(r.erledigt) };
+    return { version: 1, betrieb, unterlagen, mitarbeiter: personenAus(r.mitarbeiter), kunden: personenAus(r.kunden), profil: profilAus(r.profil), erledigt: erledigtAus(r.erledigt), erinnerungen: r.erinnerungen === true };
   } catch {
     return LEERER_STAND;
   }

@@ -6,12 +6,12 @@ import * as Sharing from "expo-sharing";
 
 export const zufall = (n: number) => Crypto.getRandomBytes(n);
 
-export async function dateiTeilen(name: string, text: string): Promise<void> {
+export async function dateiTeilen(name: string, text: string, mimeType = "application/octet-stream"): Promise<void> {
   const ziel = new File(Paths.cache, name);
   if (ziel.exists) ziel.delete();
   ziel.create();
   ziel.write(text);
-  await Sharing.shareAsync(ziel.uri, { mimeType: "application/octet-stream", dialogTitle: name });
+  await Sharing.shareAsync(ziel.uri, { mimeType, dialogTitle: name, UTI: mimeType === "application/xml" ? "public.xml" : undefined });
   // die Datei ist verschlüsselt; trotzdem nicht im Cache liegen lassen
   try {
     ziel.delete();

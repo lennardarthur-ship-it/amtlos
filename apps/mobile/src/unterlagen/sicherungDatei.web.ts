@@ -4,9 +4,9 @@ import * as DocumentPicker from "expo-document-picker";
 
 export const zufall = (n: number) => Crypto.getRandomBytes(n);
 
-export async function dateiTeilen(name: string, text: string): Promise<void> {
+export async function dateiTeilen(name: string, text: string, mimeType = "application/octet-stream"): Promise<void> {
   const g = globalThis as unknown as { document: { createElement(t: string): { href: string; download: string; click(): void } }; URL: { createObjectURL(b: unknown): string; revokeObjectURL(u: string): void }; Blob: new (t: string[], o: { type: string }) => unknown };
-  const url = g.URL.createObjectURL(new g.Blob([text], { type: "application/octet-stream" }));
+  const url = g.URL.createObjectURL(new g.Blob([text], { type: mimeType }));
   const a = g.document.createElement("a");
   a.href = url;
   a.download = name;

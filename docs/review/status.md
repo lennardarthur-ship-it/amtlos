@@ -11,7 +11,7 @@ Das Review wurde am Stand vor E-124 erstellt. Antworten von Frida vom 12.10. (We
 | 3 | Kritisch | 0 von 43 Pflichten geprüft | Offen | Prüfpunkte für den Fachbeirat liegen vor: PRUEFLISTE T-52 bis T-66. |
 | 4 | Kritisch | Kein Preis, keine Bezahlfunktion | Entscheidung | Hängt an 1 und 6. |
 | 5 | Kritisch | Sicherung verschickt Personaldaten im Klartext | **Erledigt** | E-125: AES-256-GCM, Passwort ≥ 10 Zeichen, nichts im Klartext. Tests und Rundgang prüfen das. |
-| 6 | Kritisch | Kein Grund zum Wiederkommen | Offen | Nächster Schritt: lokale Erinnerungen ohne Server für 3–4 wiederkehrende Pflichten (spätestens Woche 5). Termine rechnet die Engine schon. |
+| 6 | Kritisch | Kein Grund zum Wiederkommen | **Erledigt (Prototyp)** | E-128: lokale Erinnerungen ohne Server (3 Tage vor jedem Termin offener Pflichten, 9 Uhr), „Jetzt dran / Diesen Monat“ in „Deine Pflichten“ und auf der Startseite. Auf dem iPhone noch zu testen (Expo Go: Mitteilungen erlauben). |
 | 7 | Kritisch | Kein Vertriebskanal belegt | Offen | Gründerseite (Kanzleien, Kammern, Verband). |
 | 8 | Hoch | Nutzer muss selbst wissen, was gilt | **Erledigt (Prototyp)** | E-126: Pflichten-Check mit bis zu 10 Fragen, Katalog und Regel-Engine auf dem Gerät, „Deine Pflichten“ mit Unterlage je Pflicht. |
 | 9 | Hoch | Betriebsprofil ohne Branche, Rechtsform, Mitarbeiterzahl | **Erledigt** | E-126: Profil aus dem Check, änderbar unter „Mein Betrieb“. |
@@ -19,7 +19,7 @@ Das Review wurde am Stand vor E-124 erstellt. Antworten von Frida vom 12.10. (We
 | 11 | Hoch | App behauptet Prüfhinweis auf jedem PDF | **Erledigt** | E-124: Satz korrigiert. Der Hinweis steht in der App (Abschluss, „Wozu“), nicht im PDF. |
 | 12 | Hoch | „Nicht geprüft“ auf jeder Vorlage | In Arbeit | Hinweis steht fest in der Einleitung des Checks, beim Ergebnis, bei jeder Pflicht und im Abschluss jeder Unterlage (nicht im PDF). AGB folgen; Siegel nach Prüfung. |
 | 13 | Hoch | RDG/StBerG ungeklärt | Offen | Kurzgutachten einer Kanzlei; vor einem Pflichten-Check besonders wichtig. |
-| 14 | Hoch | Rechnung nur als PDF | Offen | Hinweis „keine E-Rechnung“ steht in der App. XRechnung-Prüfung liegt im Fachlogik-Paket. |
+| 14 | Hoch | Rechnung nur als PDF | **Erledigt (XRechnung)** | E-128: „Als E-Rechnung teilen (XRechnung)“, KoSIT-geprüft; fehlende Angaben werden genannt. ZUGFeRD fehlt; fachlich T-69. |
 | 15 | Hoch | Kein Analytics, kein Crash-Reporting | Entscheidung | Verträgt sich nur datenschutzfreundlich mit „alles bleibt auf dem iPhone“; Anbieter wählen. |
 | 16 | Hoch | 4 Ordnerkopien, 5 ZIPs, kein Git | **Erledigt** | Das GitHub-Repo mit CI ist die einzige Quelle; der Desktop-Ordner war nur das Testpaket. Alte Kopien liegen im Ordner „Amtlos-Archiv“; das Testpaket nennt Repo und Commit. Release-Tags: offen (lassen sich aus dieser Umgebung nicht pushen). |
 | 17 | Hoch | Roter CI-Lauf | **Kein Befund** | Rote Läufe stammen vom 11.10. vormittags. Seitdem sind alle Läufe grün. |
@@ -33,7 +33,7 @@ Das Review wurde am Stand vor E-124 erstellt. Antworten von Frida vom 12.10. (We
 | 25 | Mittel | Kein Fortschrittswert | **Erledigt** | E-126: „Deine Pflichten“ mit Prozent auf der Startseite. |
 | 26 | Mittel | Inhalte nur per App-Update änderbar | Offen | Braucht einen Server, also eine Rücknahme von E-121. |
 | 27 | Mittel | Unverschlüsselte lokale Ablage | Offen | Nächster Schritt nach 5 (Schlüssel im Schlüsselbund). |
-| 28 | Mittel | Keine Tests im App-Ordner | **Kein Befund** | Die Tests liegen im Repo: Fachlogik 28, App 14, Rundgang hell/dunkel. Das Testpaket enthält sie bewusst nicht. |
+| 28 | Mittel | Keine Tests im App-Ordner | **Kein Befund** | Die Tests liegen im Repo: Fachlogik 29, App 31, Rundgang hell/dunkel. Das Testpaket enthält sie bewusst nicht. |
 | 29 | Mittel | iPad aktiv ohne Tablet-Layout | **Erledigt** | E-125: abgeschaltet. |
 | 30 | Mittel | Web gibt nur HTML aus | Offen | Der Web-Export dient heute nur Tests. Vorschlag: nicht veröffentlichen. |
 | 31 | Mittel | Marke und Domains | Offen | DPMA/EUIPO, Gründerseite. |
@@ -46,8 +46,8 @@ Das Review wurde am Stand vor E-124 erstellt. Antworten von Frida vom 12.10. (We
 | K1 | Kein Geschäftsmodell (kein Konto, Server, Bezahlung) | Entscheidung | Widerspricht der Empfehlung von F. Steinmeyer (kein Server in den ersten drei Wochen). Gründer entscheidet. |
 | K2 | Keine messbare Traktion | Offen | TestFlight braucht ein Apple-Developer-Konto (Gründer); Messung datenschutzfreundlich, Anbieter offen. |
 | K3 | Inhalte ungeprüft | Offen | Prüfliste T-52 bis T-68 als Arbeitsgrundlage für den Fachbeirat. |
-| K4 | Rechnung nur als PDF | Offen | XRechnung-Prüfung liegt im Fachlogik-Paket; ZUGFeRD/XRechnung in der App ist der nächste große Baustein. |
+| K4 | Rechnung nur als PDF | **Erledigt (XRechnung)** | E-128: XRechnung 3.0 (UBL) aus der App, gleiche Zuordnung wie der Server, Beispiele inkl. Storno und Kleinunternehmer bestehen den KoSIT-Validator. ZUGFeRD offen. |
 | K5 | GoBD-Risiken bei Rechnung und Kassenbuch | **Erledigt** | E-127: Festschreiben beim Teilen, Storno, keine Wiedervergabe geteilter Nummern, doppelte Nummer blockiert, nur vollständig teilen, Kassenbuch als Vorlage zum Ausdrucken gekennzeichnet. Fachlich: T-68. |
 | K6 | Alles nur auf dem iPhone | Teilweise | Verschlüsselte Sicherung mit Wiederherstellen (E-125); sofort speichern beim Wechsel in den Hintergrund, kein Überschreiben unlesbarer Daten (E-127). Automatische Sicherung/Sync: Entscheidung (K1). |
-| K7 | Pflichten-Check für Bestandsbetriebe | **Erledigt** | E-127: Gründungsschritte abgetrennt, Zusatzfragen, Begründung für jede Pflicht, wiederkehrende Pflichten nur bis zum Termin erledigt, Unterlagen zählen erst nach dem Teilen. Ansicht „Jetzt dran / Diesen Monat“ folgt mit den Erinnerungen. |
-| K8 | „Amtlos“ erzeugt nur PDFs | Offen | Nächster Wow-Fall: Rechnungen → USt-Voranmeldung → Export. |
+| K7 | Pflichten-Check für Bestandsbetriebe | **Erledigt** | E-127: Gründungsschritte abgetrennt, Zusatzfragen, Begründung für jede Pflicht, wiederkehrende Pflichten nur bis zum Termin erledigt, Unterlagen zählen erst nach dem Teilen. Seit E-128 zusätzlich „Jetzt dran / Diesen Monat“ und lokale Erinnerungen. |
+| K8 | „Amtlos“ erzeugt nur PDFs | Teilweise | E-128: Rechnungen → Umsätze der USt-Voranmeldung mit einem Tipp (Stornos negativ); E-Rechnung als Datei. ELSTER-Übermittlung offen (J-1, braucht Zertifikat/ERiC). |

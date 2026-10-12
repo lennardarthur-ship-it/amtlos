@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Pressable, Share, View } from "react-native";
-import { PRUEFHINWEIS, dateiname, dokumentHtml, vorlageFuer } from "@amtlos/fachlogik";
+import { KU_HINWEIS, PRUEFHINWEIS, dateiname, dokumentHtml, eRechnungAus, vorlageFuer, xrechnungUbl } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { Fuss, Hinweis, Karte, Knopf, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
@@ -8,6 +8,7 @@ import { RADIUS, useFarben } from "../ui/thema";
 import { Vorschau } from "../ui/Vorschau";
 import { drucken, pdfTeilen } from "../unterlagen/pdf";
 import { NUMMER_DOPPELT, fehltFuer } from "../unterlagen/pruefung";
+import { dateiTeilen } from "../unterlagen/sicherungDatei";
 import { heute } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { Ablauf, fehltJeSchritt } from "./Ablauf";
@@ -40,7 +41,25 @@ export function useTeilen(id: string) {
       setLaedt(false);
     }
   };
-  return { laedt, fehler, los: () => ausgabe("teilen"), drucken: () => ausgabe("drucken") };
+  const [eFehlt, setEFehlt] = useState<string[]>([]);
+  /** E-Rechnung (XRechnung, UBL) als Datei teilen – nur vollständig; zählt wie das PDF als ausgegeben (E-128). */
+  const eRechnung = async () => {
+    const u = z.stand.unterlagen.find((x) => x.id === id);
+    const v = u ? vorlageFuer(u.vorlage) : undefined;
+    if (!u || !v?.eRechnung) return;
+    setFehler(null);
+    const { daten, fehlt } = eRechnungAus(u.daten, z.stand.betrieb);
+    const alle = [...new Set([...fehltFuer(z.stand, u), ...fehlt])];
+    setEFehlt(alle);
+    if (alle.length) return;
+    try {
+      await dateiTeilen(`E-Rechnung-${daten.nummer.replace(/[^A-Za-z0-9-]+/g, "-")}.xml`, xrechnungUbl(daten, KU_HINWEIS), "application/xml");
+      z.ausgeben(id);
+    } catch {
+      setFehler(TEXT.pdf_fehler);
+    }
+  };
+  return { laedt, fehler, eFehlt, los: () => ausgabe("teilen"), drucken: () => ausgabe("drucken"), eRechnung };
 }
 
 function VorschauSeite({ id }: { id: string }) {
@@ -75,7 +94,7 @@ function BetriebSeite() {
  * Abschluss eines Ablaufs (E-124): Stand („Fertig“ bzw. was fehlt, mit Sprung zum Schritt), Ergebnis, Vorschau des
  * Dokuments, Übersicht der Schritte und weitere Möglichkeiten. Der Hauptknopf „PDF teilen“ steht im Fuß des Ablaufs.
  */
-export function Abschluss({ id, springen, fehler, drucken: druckenLos }: { id: string; springen: (schritt: number) => void; fehler: string | null; drucken: () => Promise<void> }) {
+export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung, eFehlt = [] }: { id: string; springen: (schritt: number) => void; fehler: string | null; drucken: () => Promise<void>; eRechnung?: () => Promise<void>; eFehlt?: string[] }) {
   const z = useAmtlos();
   const nav = useNav();
   const f = useFarben();
@@ -164,6 +183,15 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos }: { id: s
 
       <T v="klein" fett leise accessibilityRole="header" stil={{ marginTop: 28, marginBottom: 2, marginLeft: 4 }}>{TEXT.mehr}</T>
       <View style={{ marginLeft: 4 }}>
+        {v.eRechnung && eRechnung ? <TextKnopf symbol="doc.text" text={TEXT.e_rechnung} onPress={() => void eRechnung()} /> : null}
+        {eFehlt.length ? (
+          <View style={{ backgroundColor: f.baldHauch, borderRadius: RADIUS.klein, padding: 12, marginVertical: 4 }}>
+            <T v="klein" fett>{TEXT.e_rechnung_fehlt}</T>
+            {eFehlt.map((x) => (
+              <T key={x} v="klein" stil={{ marginTop: 2 }}>• {x}</T>
+            ))}
+          </View>
+        ) : null}
         <TextKnopf symbol="printer" text={TEXT.drucken} onPress={() => void druckenLos()} />
         {v.alsText ? <TextKnopf symbol="doc.on.doc" text={TEXT.als_text} onPress={() => void Share.share({ message: v.alsText!(d, z.stand.betrieb) }).catch(() => undefined)} /> : null}
         <TextKnopf

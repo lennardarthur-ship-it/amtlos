@@ -3,8 +3,9 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "jose": "^5.9.0",
+    "@amtlos/fachlogik": "workspace:*",
     "@amtlos/server": "workspace:*",
+    "jose": "^5.9.0",
     "pg": "^8.13.0",
     "yaml": "^2.6.0"
   }

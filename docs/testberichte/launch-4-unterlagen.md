@@ -115,3 +115,16 @@ Auf dem iPhone noch zu messen: Dauer der Verschlüsselung (PBKDF2 in JavaScript)
 | Monorepo mit Datenbank (ohne Cache) | 42/42 |
 | Rundgang hell und dunkel: zusätzlich Zusatzfragen, „Weiter“ ohne Antwort gesperrt, „Aus der Gründung“, Rechnung nach dem Teilen festgeschrieben mit „Stornieren“ statt „Löschen“ | ohne Befunde |
 | Alle 33 Vorlagen durchgeklickt, iOS-Bündel | ohne Seitenfehler, gebaut |
+
+## Nachtrag: E-Rechnung, Voranmeldung aus Rechnungen, Erinnerungen (E-128)
+
+| Prüfung | Ergebnis |
+|---|---|
+| KoSIT-Validator 1.6.3, XRechnung-3.0.2-Konfiguration: 8 Server-Beispiele + 3 App-Fälle (Rechnung, Storno, Kleinunternehmer) | 11/11 gültig |
+| Fachlogik: Rechnung aus der App → UBL, fehlende Angaben auf Deutsch | 29 grün |
+| App: „Jetzt dran“ (14/45 Tage, jede offene Pflicht genau einmal), Erinnerungsplan (nie vor heute, 3 Tage vorher, sortiert, begrenzt, abgehakt fällt heraus), Umsätze je Steuersatz aus festgeschriebenen Rechnungen mit Storno | 31 grün |
+| Monorepo mit Datenbank | 42/42 |
+| Rundgang hell und dunkel: zusätzlich „Jetzt dran“ auf der Startseite, E-Rechnung nennt fehlende Angaben (E-Mail, Telefon, IBAN) | ohne Befunde |
+| Alle 33 Vorlagen durchgeklickt, iOS-Bündel mit expo-notifications | ohne Seitenfehler, gebaut (3,7 MB) |
+
+Auf dem iPhone noch zu prüfen: Erlaubnisdialog und Zustellung der Erinnerungen in Expo Go; Teilen der XML-Datei (Mail, Dateien).

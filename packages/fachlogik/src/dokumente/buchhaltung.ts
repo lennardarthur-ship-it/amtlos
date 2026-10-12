@@ -4,11 +4,12 @@
  * E-Bilanz, Kassenmeldung), erstellt die App als ausgefüllte Unterlage zum Übertragen – sie übermittelt nichts.
  * Gliederungen fachlich zu prüfen (T-58).
  */
-import { KU_HINWEIS, rundeCent, summen, type Position } from "../rechnung.js";
+import { KU_HINWEIS, fehlendFuerERechnung, rundeCent, summen, type Position, type RechnungsDaten } from "../rechnung.js";
+import { einheitCode } from "../erechnung.js";
 import { AUFBEWAHRUNG, EINHEITEN, EUER_AUSGABEN, EUER_EINNAHMEN, KASSEN_ARTEN, RECHNUNGS_HINWEISE, TSE_ARTEN } from "./bausteine.js";
 import { LINIE, abschnitt, absatz, angaben, anschrift, auswahl, cent, datumDe, dokument, esc, euro, ja, liste, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
 import { optionen } from "./konstanten.js";
-import type { Daten, Eintrag, Vorlage } from "./typen.js";
+import type { Betrieb, Daten, Eintrag, Vorlage } from "./typen.js";
 
 /** ISO-Datum plus Tage als TT.MM.JJJJ. */
 function plusTage(iso: string, tage: number): string {
@@ -32,23 +33,83 @@ function positionen(d: Daten): { e: Eintrag; p: Position }[] {
     .map((e) => ({ e, p: { bezeichnung: text(e, "bezeichnung"), menge: zahl(text(e, "menge")) ?? 1, einheit: "stueck", preis_cent: cent(text(e, "preis")) ?? 0, ust_satz: Number(text(e, "satz") || "19") } }));
 }
 
+/** Verständliche Bezeichnungen für fehlendFuerERechnung */
+const E_FEHLT: Record<string, string> = {
+  "steller.anschrift": "Name und Anschrift des Betriebs (Mein Betrieb)",
+  "steller.email": "E-Mail des Betriebs (Mein Betrieb)",
+  "steller.telefon": "Telefon des Betriebs (Mein Betrieb)",
+  "steller.steuernummer_oder_ust_idnr": "Steuernummer oder USt-IdNr. (Mein Betrieb)",
+  "steller.iban": "IBAN (Mein Betrieb)",
+  "kunde.anschrift": "Anschrift des Empfängers: Straße in der ersten, PLZ und Ort in der letzten Zeile",
+  "kunde.email": "E-Mail des Empfängers",
+  positionen: "mindestens eine Position",
+  "positionen.ungueltig": "Positionen mit Bezeichnung, Menge und Preis",
+  "positionen.steuersatz": "Umsatzsteuersatz je Position",
+  leistungsdatum: "Leistungsdatum als Datum (TT.MM.JJJJ)",
+};
+
+const isoAus = (t: string) => {
+  const m = /^\s*(\d{1,2})\.(\d{1,2})\.(\d{4})\s*$/.exec(t);
+  return m ? `${m[3]}-${m[2]!.padStart(2, "0")}-${m[1]!.padStart(2, "0")}` : /^\d{4}-\d{2}-\d{2}$/.test(t.trim()) ? t.trim() : null;
+};
+
+/**
+ * Rechnung aus der App → Daten für die E-Rechnung (E-128) und was dafür noch fehlt. Unterstützt 19 %, 7 % und
+ * Kleinunternehmer; 0 % aus anderen Gründen (z. B. Reverse Charge) noch nicht.
+ */
+export function eRechnungAus(d: Daten, b: Betrieb): { daten: RechnungsDaten; fehlt: string[] } {
+  const zeilen = text(d, "kunde_anschrift").split("\n").map((z) => z.trim()).filter(Boolean);
+  const ort = /^(?:D-|DE-)?(\d{5})\s+(.+)$/.exec(zeilen.at(-1) ?? "");
+  const ku = ja(d, "kleinunternehmer");
+  const storno = text(d, "storno_zu");
+  const pos = liste(d, "positionen").filter((e) => text(e, "bezeichnung") || text(e, "preis"));
+  const datum = text(d, "datum");
+  const ziel = text(d, "zahlungsziel");
+  const daten: RechnungsDaten = {
+    nummer: text(d, "nummer"),
+    rechnungsdatum: datum,
+    leistungsdatum: ja(d, "leistung_gleich") ? datum || null : isoAus(text(d, "leistung")),
+    faellig_am: datum && ziel && ziel !== "sofort" ? plusTageIso(datum, Number(ziel)) : null,
+    steller: { name: b.name.trim(), strasse: b.strasse.trim(), plz: b.plz.trim(), ort: b.ort.trim(), land: "DE", email: b.email.trim(), telefon: b.telefon.trim() || null, steuernummer: b.steuernummer.trim() || null, ust_idnr: b.ust_idnr.trim() || null, iban: b.iban.trim() || null },
+    kunde: { name: text(d, "kunde_name"), strasse: zeilen.length > 1 ? zeilen[0]! : null, plz: ort?.[1] ?? null, ort: ort?.[2] ?? null, land: "DE", email: text(d, "kunde_email") || null, ust_idnr: text(d, "kunde_ust_idnr") || null, geschaeftskunde: true },
+    positionen: pos.map((e) => {
+      const preis = cent(text(e, "preis")) ?? 0;
+      return { bezeichnung: text(e, "bezeichnung"), menge: zahl(text(e, "menge")) ?? 1, einheit: "stueck" as const, einheit_code: einheitCode(text(e, "einheit")), preis_cent: storno ? Math.abs(preis) : preis, ust_satz: ku ? null : Number(text(e, "satz") || "19") };
+    }),
+    kleinunternehmer: ku,
+    hinweis: [text(d, "befreiung"), text(d, "hinweis")].filter(Boolean).join("\n") || null,
+    ...(storno ? { art: "storno" as const, storniert_nummer: storno } : {}),
+  };
+  const fehlt = fehlendFuerERechnung(daten).map((c) => E_FEHLT[c] ?? c);
+  if (!ku && daten.positionen.some((p) => p.ust_satz === 0)) fehlt.push("E-Rechnung mit 0 % Umsatzsteuer (außer Kleinunternehmer) unterstützt Amtlos noch nicht");
+  if (!daten.nummer) fehlt.unshift("Rechnungsnummer");
+  if (!datum) fehlt.unshift("Rechnungsdatum");
+  return { daten, fehlt };
+}
+
+function plusTageIso(iso: string, tage: number): string {
+  const [j, m, t] = iso.split("-").map(Number) as [number, number, number];
+  return new Date(Date.UTC(j, m - 1, t + tage)).toISOString().slice(0, 10);
+}
+
 export const rechnung: Vorlage = {
   id: "rechnung",
   titel: "Rechnung",
   beschreibung: "Rechnung mit allen Pflichtangaben nach § 14 Abs. 4 UStG – Positionen, Steuersätze, Zahlungsziel und Pflichthinweise zum Auswählen.",
   bereich: "steuern",
   pflichten: ["steuern.rechnungen_pflichtangaben"],
-  person: { art: "kunde", felder: { name: "kunde_name", anschrift: "kunde_anschrift", ust_idnr: "kunde_ust_idnr" } },
+  person: { art: "kunde", felder: { name: "kunde_name", anschrift: "kunde_anschrift", email: "kunde_email", ust_idnr: "kunde_ust_idnr" } },
   fortlaufend: "nummer",
   kundendokument: true,
   festschreiben: true,
   storno: true,
+  eRechnung: true,
   ausProfil: { kleinunternehmer: "ust.kleinunternehmer" },
   grundlage: "§ 14 Abs. 4 UStG",
   namensFeld: "nummer",
   abschnitte: [
     { titel: "Rechnung",
-      hilfe: "Dieses PDF ist keine E-Rechnung. Für Rechnungen an Unternehmen gelten Übergangsfristen bis zur E-Rechnungspflicht.",
+      hilfe: "Am Ende teilst du die Rechnung als PDF – an Unternehmen zusätzlich als E-Rechnung (XRechnung).",
       felder: [
         { id: "nummer", art: "text", label: "Rechnungsnummer", hilfe: "fortlaufend und nur einmal vergeben, z. B. 2026-001", pflicht: true },
         { id: "datum", art: "datum", label: "Rechnungsdatum", vorbelegung: "heute", pflicht: true },
@@ -62,6 +123,7 @@ export const rechnung: Vorlage = {
       felder: [
         { id: "kunde_name", art: "text", label: "Name oder Firma", pflicht: true },
         { id: "kunde_anschrift", art: "mehrzeilig", label: "Anschrift", hilfe: "Straße und Hausnummer, PLZ und Ort", pflicht: true },
+        { id: "kunde_email", art: "text", label: "E-Mail des Empfängers", hilfe: "nötig für die E-Rechnung an Unternehmen" },
         { id: "kunde_ust_idnr", selten: true, art: "text", label: "USt-IdNr. des Empfängers", hilfe: "nur bei innergemeinschaftlichen Leistungen oder Steuerschuldnerschaft des Empfängers" },
       ],
     },
@@ -297,11 +359,12 @@ export const ustVoranmeldung: Vorlage = {
   beschreibung: "Umsätze nach Steuersatz und Vorsteuer – die App rechnet Umsatzsteuer und Zahllast aus, du überträgst die Zahlen in ELSTER.",
   bereich: "steuern",
   pflichten: ["steuern.ust_voranmeldung"],
+  ausRechnungen: true,
   grundlage: "§ 18 Abs. 1 UStG",
   namensFeld: "zeitraum",
   abschnitte: [
     { titel: "Zeitraum",
-      hilfe: "Die Voranmeldung übermittelst du elektronisch über ELSTER. Diese Unterlage rechnet die Zahlen dafür aus und bleibt bei deinen Unterlagen.",
+      hilfe: "Die Voranmeldung übermittelst du elektronisch über ELSTER. Diese Unterlage rechnet die Zahlen dafür aus – aus deinen Rechnungen in Amtlos oder von Hand – und bleibt bei deinen Unterlagen.",
       felder: [{ id: "zeitraum", art: "text", label: "Zeitraum", hilfe: "z. B. Oktober 2026 oder 3. Quartal 2026", pflicht: true }],
     },
     {
