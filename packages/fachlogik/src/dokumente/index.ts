@@ -169,7 +169,7 @@ export function eintragAusVorschlag(f: Extract<Feld, { art: "liste" }>, vorschla
 
 /** Das fertige Dokument: Vorlage + Rechtsgrundlage und Bereich im Kopf. Die App erstellt das PDF hieraus. */
 export function dokumentHtml(v: Vorlage, d: Daten, b: Betrieb): string {
-  const grundlage = v.grundlage ? `<div><dt>Rechtsgrundlage</dt><dd>${esc(v.grundlage)}</dd></div>` : "";
-  const art = BEREICHE.find((x) => x.id === v.bereich)?.titel ?? "";
+  const grundlage = v.grundlage && !v.kundendokument ? `<div><dt>Rechtsgrundlage</dt><dd>${esc(v.grundlage)}</dd></div>` : "";
+  const art = v.kundendokument ? "" : (BEREICHE.find((x) => x.id === v.bereich)?.titel ?? "");
   return v.html(d, b).replace(GRUNDLAGE_MARKE, grundlage).replace('<div class="art"></div>', `<div class="art">${esc(art)}</div>`);
 }

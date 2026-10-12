@@ -542,6 +542,16 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Eingaben:** Einzeilige Felder mit Vorschlägen sind eine Auswahl mit „Andere …“ statt Textfeld plus Chips; mehrzeilige sind Zeilen zum Ankreuzen plus „Eigenen Text ergänzen“ (gespeichert weiter als Text). Listeneinträge auf eigener Seite statt aufgeklappter Karten. Vorschläge mit kurzem Titel (`kurztitel`) und Details zum Aufklappen, ein Knopf „N übernehmen“ unten.
 - **Optik:** ein Hauptknopf je Bildschirm, zweitrangige Handlungen als ruhige Flächen oder Textknöpfe, Felder ohne Karten, mehr Abstand. Neues Paket: react-native-webview 13.16.1 (Version aus Expo SDK 57, läuft in Expo Go).
 
+
+### E-125 · Verschlüsselte Datensicherung mit Wiederherstellen; Kundenrechnung ohne Rechtsgrundlage im Kopf
+- **Datum:** 2026-10-12 · **Status:** angenommen (Investor-Readiness-Review von F. Steinmeyer, Punkte 5, 10, 22, 29; „sofort angehen“)
+- **Befund:** „Daten sichern“ gab den ganzen Stand als Text ins Teilen-Menü – mit SV-Nummern, Steuer-IDs und IBANs der Mitarbeiter. Ein Tipp auf Mail oder Messenger hätte eine meldepflichtige Datenpanne sein können. Zurückspielen ging nicht.
+- **Jetzt:** Sicherung als Datei, mit einem Passwort (mindestens 10 Zeichen, zweimal eingeben) verschlüsselt: AES-256-GCM (@noble/ciphers), Schlüssel per PBKDF2-SHA256 (@noble/hashes) mit zufälligem Salz und Nonce (expo-crypto). In der Datei steht nichts im Klartext außer Format und Verfahren; die Iterationszahl steht in der Datei (heute 150.000 – rein in JavaScript, weil Expo Go kein natives PBKDF2 hat; auf dem iPhone messen, später erhöhen oder nativ). Die Datei wird nach dem Teilen aus dem Cache gelöscht.
+- **Wiederherstellen:** Datei wählen (expo-document-picker), Passwort, Inhalt ansehen („Salon Sonne · 5 Unterlagen · 1 Mitarbeiter · 1 Kunde“), dann alles ersetzen. Falsches Passwort und veränderte Dateien werden erkannt (GCM-Prüfung), fremde Dateien ebenso.
+- **Kundendokumente** (`kundendokument`, heute die Rechnung): ohne „Rechtsgrundlage“ und Bereich im Kopf – das gehört in eigene Unterlagen, nicht auf ein Dokument an Kunden. Ersetzt für die Rechnung die Kopfzeile aus E-123.
+- **iPad** abgeschaltet (`supportsTablet: false`), bis es ein Tablet-Layout gibt.
+- Offen aus dem Review: verschlüsselte lokale Ablage (Punkt 27), alle strategischen Punkte (1–4, 6–9) – siehe `docs/review/status.md`.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

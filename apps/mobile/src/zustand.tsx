@@ -26,6 +26,8 @@ interface Zustand {
   kopieren(id: string): Unterlage | null;
   loeschen(id: string): void;
   allesLoeschen(): Promise<void>;
+  /** alles durch einen wiederhergestellten Stand ersetzen (Datensicherung) */
+  ersetzen(s: Stand): void;
 }
 
 const Kontext = createContext<Zustand | null>(null);
@@ -86,6 +88,7 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         return u;
       },
       loeschen: (id) => setzen(loeschen(aktuell.current, id)),
+      ersetzen: (s) => setzen(s),
       allesLoeschen: async () => {
         if (zeit.current) clearTimeout(zeit.current);
         aktuell.current = LEERER_STAND;

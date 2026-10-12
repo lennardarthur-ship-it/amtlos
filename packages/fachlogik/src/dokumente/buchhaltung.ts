@@ -40,6 +40,7 @@ export const rechnung: Vorlage = {
   pflichten: ["steuern.rechnungen_pflichtangaben"],
   person: { art: "kunde", felder: { name: "kunde_name", anschrift: "kunde_anschrift", ust_idnr: "kunde_ust_idnr" } },
   fortlaufend: "nummer",
+  kundendokument: true,
   grundlage: "§ 14 Abs. 4 UStG",
   namensFeld: "nummer",
   abschnitte: [

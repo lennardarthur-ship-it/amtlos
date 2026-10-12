@@ -2,7 +2,7 @@
  * Rundgang durch die Unterlagen-App (E-121, E-124) über den Web-Export, Rahmen 393×852 wie iPhone, hell oder dunkel.
  * Prüft die Wege eines neuen Nutzers: Betrieb eintragen, Rechnung im geführten Ablauf (Nummer zählt hoch, Kunde wird
  * gemerkt), Abschluss mit Vorschau und PDF, Anlass „Sicherheit“ mit Vorschlägen, Mitarbeiter übernehmen, Neustart,
- * Kopie, Löschen. Bildschirmfotos zur Sichtprüfung. Bricht beim ersten Befund ab.
+ * Kopie, Löschen, verschlüsselte Sicherung und Wiederherstellen. Bildschirmfotos zur Sichtprüfung. Bricht beim ersten Befund ab.
  *
  *   cd apps/mobile && CI=1 npx expo export --platform web --output-dir /tmp/expo-web
  *   node e2e/rundgang.mjs /tmp/expo-web /tmp/bilder        # DUNKEL=1 für Dunkelmodus, CHROMIUM_PFAD optional
@@ -262,10 +262,26 @@ try {
   await warte(900);
   pruefe((await p.getByRole("button", { name: /^Gefährdungsbeurteilung · Salon/ }).locator("visible=true").count()) === 1, "Kopie nicht angelegt oder nicht gelöscht");
 
-  // Mein Betrieb: Daten bleiben, alles löschen
+  // Mein Betrieb: verschlüsselt sichern, alles löschen, wiederherstellen (E-125)
   await p.getByRole("tab", { name: "Mein Betrieb" }).click();
   await warte(800);
   pruefe((await feld("Name des Betriebs").inputValue()) === "Salon Sonne", "Betrieb nach Neustart verloren");
+  await tippe(knopf("Daten sichern"));
+  await warte(800);
+  await feld("Passwort").fill("kurz");
+  pruefe(await sichtbar("Mindestens 10 Zeichen"), "kurzes Passwort nicht angemahnt");
+  await feld("Passwort").fill("sonnenschein-2026");
+  await feld("Passwort wiederholen").fill("sonnenschein-2026");
+  await foto("sicherung");
+  const [download] = await Promise.all([p.waitForEvent("download"), knopf("Sicherung erstellen").click()]);
+  const sicherung = `${OUT}/${download.suggestedFilename()}`;
+  await download.saveAs(sicherung);
+  const inhalt = fs.readFileSync(sicherung, "utf8");
+  pruefe(inhalt.includes('"AES-256-GCM"') && !inhalt.includes("Salon Sonne") && !inhalt.includes("Sam Muster") && !inhalt.includes("143/123"), "Sicherung nicht verschlüsselt oder mit Klartext");
+  await warte(600);
+  pruefe(await sichtbar("Sicherung erstellt."), "keine Bestätigung nach dem Sichern");
+  await knopf("Zurück").click();
+  await warte(800);
   await tippe(knopf("Alle Daten löschen"));
   await tippe(knopf("Ja, löschen"));
   await warte(800);
@@ -275,6 +291,28 @@ try {
   await warte(800);
   pruefe(await sichtbar("Noch keine Unterlagen"), "Unterlagen nach „alles löschen“ noch da");
   await foto("leer");
+  await p.getByRole("tab", { name: "Mein Betrieb" }).click();
+  await warte(800);
+  await tippe(knopf("Sicherung wiederherstellen"));
+  await warte(800);
+  const [auswahl] = await Promise.all([p.waitForEvent("filechooser"), knopf("Sicherungsdatei auswählen").click()]);
+  await auswahl.setFiles(sicherung);
+  await warte(800);
+  await feld("Passwort").fill("falsches-passwort");
+  await knopf("Öffnen").click();
+  await warte(1500);
+  pruefe(await sichtbar("Das Passwort passt nicht"), "falsches Passwort nicht erkannt");
+  await feld("Passwort").fill("sonnenschein-2026");
+  await knopf("Öffnen").click();
+  await warte(2500);
+  pruefe(await sichtbar("Salon Sonne · 5 Unterlagen · 1 Mitarbeiter · 1 Kunde"), "Inhalt der Sicherung nicht angezeigt");
+  await foto("wiederherstellen");
+  await knopf("Jetzt wiederherstellen").click();
+  await warte(1000);
+  pruefe((await feld("Name des Betriebs").inputValue()) === "Salon Sonne" && (await sichtbar("Sam Muster")), "Betrieb oder Mitarbeiter nicht wiederhergestellt");
+  await p.getByRole("tab", { name: "Meine" }).click();
+  await warte(800);
+  pruefe((await sichtbar("Gefährdungsbeurteilung · Salon")) && (await sichtbar("Rechnung · 2026-002")), "Unterlagen nicht wiederhergestellt");
   if (befunde.length) throw new Error(befunde.join("\n"));
   console.log(`✓ Rundgang ${schema} ohne Befunde (${n} Bilder in ${OUT})`);
 } catch (e) {

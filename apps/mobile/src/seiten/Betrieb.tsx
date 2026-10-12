@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Share, View } from "react-native";
+import { View } from "react-native";
 import { BUNDESLAENDER, PERSONEN_FELDER, type Betrieb as BetriebDaten, type PersonenArt } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { Auswahl, Feld, Fuss, Karte, Knopf, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
@@ -9,6 +9,7 @@ import { neueId, personenSortiert, PERSONEN_LISTE } from "../unterlagen/speicher
 import { useAmtlos } from "../zustand";
 import { Felder } from "./felder";
 import { Gruppe, Inhalt, Seite } from "./gemeinsam";
+import { SicherungSeite, WiederherstellenSeite } from "./Sicherung";
 
 /** Eine gespeicherte Person bearbeiten (E-124). Eine neue Person ohne Namen verschwindet beim Verlassen wieder. */
 function PersonSeite({ art, id, neu }: { art: PersonenArt; id: string; neu?: boolean }) {
@@ -123,7 +124,8 @@ export function BetriebFormular() {
 
 /** Tab „Mein Betrieb“: Angaben, Datensicherung, alles löschen. */
 export function Betrieb() {
-  const { stand, allesLoeschen } = useAmtlos();
+  const { allesLoeschen } = useAmtlos();
+  const nav = useNav();
   const [frage, setFrage] = useState(false);
   const [zaehler, setZaehler] = useState(0);
   return (
@@ -133,7 +135,8 @@ export function Betrieb() {
       <Personen art="mitarbeiter" />
       <Personen art="kunde" />
       <Gruppe titel={TEXT.daten_titel} fuss={TEXT.daten_text}>
-        <Knopf ton symbol="square.and.arrow.up" text={TEXT.sichern} onPress={() => void Share.share({ title: "Amtlos-Daten", message: JSON.stringify(stand, null, 2) }).catch(() => undefined)} />
+        <Knopf ton symbol="lock" text={TEXT.sichern} onPress={() => nav.oeffnen("sicherung", () => <SicherungSeite />, true)} />
+        <TextKnopf symbol="arrow.clockwise" text={TEXT.wiederherstellen} onPress={() => nav.oeffnen("wiederherstellen", () => <WiederherstellenSeite fertig={() => setZaehler((x) => x + 1)} />, true)} stil={{ marginLeft: 4, marginTop: 4 }} />
       </Gruppe>
       <Gruppe fuss={TEXT.alles_loeschen_text}>
         {frage ? (

@@ -136,6 +136,8 @@ export interface Vorlage {
   person?: PersonenBezug;
   /** Feld mit fortlaufender Nummer (z. B. Rechnungsnummer): neue Unterlagen zählen hoch */
   fortlaufend?: string;
+  /** geht an Kunden (Rechnung): ohne Rechtsgrundlage und Bereich im Kopf – das ist für die eigenen Unterlagen */
+  kundendokument?: boolean;
   /** Querformat (breite Tabellen, Aushänge) */
   querformat?: boolean;
   html(daten: Daten, betrieb: Betrieb): string;

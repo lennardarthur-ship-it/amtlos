@@ -71,7 +71,8 @@ describe("Dokumentvorlagen", () => {
       expect(leer).not.toContain(PRUEFHINWEIS);
       expect(leer).not.toContain("noch nicht angegeben");
       expect(leer).toContain('name="amtlos-fuss-links" content="Salon Sonne');
-      if (v.grundlage) expect(leer, v.id).toContain(`<dt>Rechtsgrundlage</dt><dd>${v.grundlage.replace(/&/g, "&amp;")}</dd>`);
+      if (v.kundendokument) expect(leer, v.id).not.toMatch(/Rechtsgrundlage|Steuern und Buchhaltung/);
+      else if (v.grundlage) expect(leer, v.id).toContain(`<dt>Rechtsgrundlage</dt><dd>${v.grundlage.replace(/&/g, "&amp;")}</dd>`);
       expect(leer).toContain("Salon Sonne");
       expect(leer.includes("A4 landscape"), v.id).toBe(Boolean(v.querformat));
       const voll = v.html(alles(v.abschnitte.flatMap((a) => a.felder)), BETRIEB);

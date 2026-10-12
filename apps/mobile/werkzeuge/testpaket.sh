@@ -39,6 +39,9 @@ JS
 cat > "$P/LIESMICH.txt" <<'TXT'
 Amtlos – Unterlagen für deinen Betrieb (Testversion fürs iPhone)
 
+Dies ist nur ein Testpaket zum Ausprobieren in Expo Go – nicht der Quellcode. Quellcode, Tests, CI und
+Entscheidungen liegen im Git-Repository (GitHub: lennardarthur-ship-it/amtlos); dort ist dieser Stand als Tag markiert.
+
 1. Auf dem iPhone: „Expo Go“ aus dem App Store laden.
 2. Auf dem Mac: Node.js installieren (https://nodejs.org, Knopf „LTS“, Installer öffnen, durchklicken).
 3. Auf dem Mac das Programm „Terminal“ öffnen und eintippen (Ordnerpfad anpassen, falls woanders):
@@ -56,7 +59,8 @@ Amtlos – Unterlagen für deinen Betrieb (Testversion fürs iPhone)
    - „Rechnung schreiben“ oder unter „Wofür brauchst du etwas?“ den Anlass wählen (z. B. „Ich stelle jemanden ein“).
    - Schritt für Schritt ausfüllen, unten „Weiter“. Am Ende siehst du das Dokument und tippst „PDF teilen“.
    - Unter „Meine“ findest du alles wieder; unter „Mein Betrieb“ stehen Mitarbeiter und Kunden.
-     Alles bleibt nur auf dem iPhone.
+     Alles bleibt nur auf dem iPhone. „Daten sichern“ erstellt eine mit deinem Passwort verschlüsselte Datei,
+     „Sicherung wiederherstellen“ spielt sie zurück.
 
 Beenden: im Terminal Ctrl + C. Nächstes Mal reichen die Befehle „cd …“ und „npx expo start“.
 TXT
