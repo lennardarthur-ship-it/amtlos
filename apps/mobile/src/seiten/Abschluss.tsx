@@ -1,38 +1,46 @@
 import { useState } from "react";
 import { Pressable, Share, View } from "react-native";
-import { PRUEFHINWEIS, dateiname, dokumentHtml, fehlendeAngaben, vorlageFuer } from "@amtlos/fachlogik";
+import { PRUEFHINWEIS, dateiname, dokumentHtml, vorlageFuer } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { Fuss, Hinweis, Karte, Knopf, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { RADIUS, useFarben } from "../ui/thema";
 import { Vorschau } from "../ui/Vorschau";
 import { drucken, pdfTeilen } from "../unterlagen/pdf";
+import { NUMMER_DOPPELT, fehltFuer } from "../unterlagen/pruefung";
 import { heute } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { Ablauf, fehltJeSchritt } from "./Ablauf";
 import { BetriebFormular } from "./Betrieb";
 import { Inhalt } from "./gemeinsam";
 
-/** PDF erstellen und teilen – mit Ladezustand und Fehlermeldung. */
+/**
+ * PDF teilen oder drucken – mit Ladezustand und Fehlermeldung. Dokumente an Kunden (Rechnung) gehen nur vollständig
+ * raus; nach dem Teilen bzw. Drucken gilt die Unterlage als ausgegeben und wird ggf. festgeschrieben (E-127).
+ */
 export function useTeilen(id: string) {
   const z = useAmtlos();
   const [laedt, setLaedt] = useState(false);
   const [fehler, setFehler] = useState<string | null>(null);
-  const los = async () => {
+  const ausgabe = async (art: "teilen" | "drucken") => {
     const u = z.stand.unterlagen.find((x) => x.id === id);
     const v = u ? vorlageFuer(u.vorlage) : undefined;
     if (!u || !v) return;
     setFehler(null);
-    setLaedt(true);
+    if (v.kundendokument && fehltFuer(z.stand, u).length) return setFehler(TEXT.erst_vollstaendig);
+    setLaedt(art === "teilen");
     try {
-      await pdfTeilen(dokumentHtml(v, u.daten, z.stand.betrieb), dateiname(v, u.daten, heute()), v.querformat);
+      const html = dokumentHtml(v, u.daten, z.stand.betrieb);
+      if (art === "teilen") await pdfTeilen(html, dateiname(v, u.daten, heute()), v.querformat);
+      else await drucken(html, dateiname(v, u.daten, heute()), v.querformat);
+      z.ausgeben(id);
     } catch {
       setFehler(TEXT.pdf_fehler);
     } finally {
       setLaedt(false);
     }
   };
-  return { laedt, fehler, los };
+  return { laedt, fehler, los: () => ausgabe("teilen"), drucken: () => ausgabe("drucken") };
 }
 
 function VorschauSeite({ id }: { id: string }) {
@@ -67,28 +75,37 @@ function BetriebSeite() {
  * Abschluss eines Ablaufs (E-124): Stand („Fertig“ bzw. was fehlt, mit Sprung zum Schritt), Ergebnis, Vorschau des
  * Dokuments, Übersicht der Schritte und weitere Möglichkeiten. Der Hauptknopf „PDF teilen“ steht im Fuß des Ablaufs.
  */
-export function Abschluss({ id, springen, fehler }: { id: string; springen: (schritt: number) => void; fehler: string | null }) {
+export function Abschluss({ id, springen, fehler, drucken: druckenLos }: { id: string; springen: (schritt: number) => void; fehler: string | null; drucken: () => Promise<void> }) {
   const z = useAmtlos();
   const nav = useNav();
   const f = useFarben();
   const [loeschFrage, setLoeschFrage] = useState(false);
-  const [druckFehler, setDruckFehler] = useState<string | null>(null);
+  const [stornoFrage, setStornoFrage] = useState(false);
   const u = z.stand.unterlagen.find((x) => x.id === id);
   const v = u ? vorlageFuer(u.vorlage) : undefined;
   if (!u || !v) return null;
   const d = u.daten;
   const jeSchritt = fehltJeSchritt(v, d);
-  const alle = fehlendeAngaben(v, d, z.stand.betrieb);
+  const alle = fehltFuer(z.stand, u);
+  const fest = Boolean(u.festgeschrieben);
+  const nummerSchritt = v.fortlaufend ? v.abschnitte.findIndex((a) => a.felder.some((x) => x.id === v.fortlaufend)) : -1;
+  const storno = u.storniertDurch ? z.stand.unterlagen.find((x) => x.id === u.storniertDurch) : undefined;
   const imFormular = new Set(jeSchritt.flat());
   // Prüfungen außerhalb der Schritte: einem Schritt zuordnen, wenn ein Feld dort so heißt; sonst „Mein Betrieb“ bzw. ohne Sprung
-  const extra = alle.filter((x) => !imFormular.has(x)).map((x) => ({ text: x, schritt: v.abschnitte.findIndex((a) => a.felder.some((feld) => feld.label === x)), betrieb: x.includes("(Mein Betrieb)") }));
+  const extra = alle.filter((x) => !imFormular.has(x)).map((x) => ({ text: x, schritt: x === NUMMER_DOPPELT ? nummerSchritt : v.abschnitte.findIndex((a) => a.felder.some((feld) => feld.label === x)), betrieb: x.includes("(Mein Betrieb)") }));
   const html = dokumentHtml(v, d, z.stand.betrieb);
   const ergebnis = v.ergebnis?.(d) ?? [];
   const fertig = alle.length === 0;
   return (
     <View>
-      <T v="titel" accessibilityRole="header" stil={{ fontSize: 28, lineHeight: 34 }}>{fertig ? TEXT.fertig : TEXT.fast_fertig}</T>
-      {fertig ? (
+      <T v="titel" accessibilityRole="header" stil={{ fontSize: 28, lineHeight: 34 }}>{fest ? TEXT.festgeschrieben_titel : fertig ? TEXT.fertig : TEXT.fast_fertig}</T>
+      {fest ? (
+        <View style={{ marginTop: 10 }}>
+          <Hinweis symbol="lock" text={TEXT.festgeschrieben_text(new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(u.festgeschrieben!)), Boolean(v.storno))} />
+          {storno ? <Hinweis art="erfolg" text={TEXT.storniert_durch(String(storno.daten.nummer ?? ""))} /> : null}
+          {typeof d.storno_zu === "string" && d.storno_zu ? <Hinweis text={TEXT.storniert_zu(d.storno_zu)} /> : null}
+        </View>
+      ) : fertig ? (
         <View style={{ marginTop: 10 }}>
           <Hinweis art="erfolg" text={TEXT.alles_drin} />
         </View>
@@ -105,10 +122,11 @@ export function Abschluss({ id, springen, fehler }: { id: string; springen: (sch
               ) : null}
             </View>
           ))}
-          <T v="caption" leise stil={{ marginTop: 6 }}>{TEXT.fehlt_text}</T>
+          <T v="caption" leise stil={{ marginTop: 6 }}>{v.kundendokument ? TEXT.fehlt_kunde : TEXT.fehlt_text}</T>
         </View>
       )}
-      {fehler ?? druckFehler ? <Hinweis art="fehler" text={(fehler ?? druckFehler)!} /> : null}
+      {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
+      {v.festschreiben && !fest ? <T v="caption" leise stil={{ marginTop: 8 }}>{TEXT.wird_festgeschrieben}</T> : null}
 
       {ergebnis.length ? (
         <Karte stil={{ marginTop: 18 }}>
@@ -130,7 +148,7 @@ export function Abschluss({ id, springen, fehler }: { id: string; springen: (sch
       </Pressable>
       <T v="caption" leise>{PRUEFHINWEIS}</T>
 
-      <T v="klein" fett leise accessibilityRole="header" stil={{ marginTop: 28, marginBottom: 8, marginLeft: 4 }}>{TEXT.angaben_bearbeiten}</T>
+      <T v="klein" fett leise accessibilityRole="header" stil={{ marginTop: 28, marginBottom: 8, marginLeft: 4 }}>{fest ? TEXT.angaben : TEXT.angaben_bearbeiten}</T>
       <Karte>
         {v.abschnitte.map((a, i) => (
           <Zeile
@@ -138,7 +156,7 @@ export function Abschluss({ id, springen, fehler }: { id: string; springen: (sch
             links={<Symbol name={jeSchritt[i]!.length ? "exclamationmark.circle" : "checkmark.circle.fill"} groesse={20} farbe={jeSchritt[i]!.length ? f.bald : f.amt} />}
             titel={a.titel ?? ""}
             text={jeSchritt[i]!.length ? TEXT.eintrag_fehlt(jeSchritt[i]!.length) : TEXT.schritt_fertig}
-            onPress={() => springen(i)}
+            onPress={fest ? undefined : () => springen(i)}
             letzte={i === v.abschnitte.length - 1}
           />
         ))}
@@ -146,7 +164,7 @@ export function Abschluss({ id, springen, fehler }: { id: string; springen: (sch
 
       <T v="klein" fett leise accessibilityRole="header" stil={{ marginTop: 28, marginBottom: 2, marginLeft: 4 }}>{TEXT.mehr}</T>
       <View style={{ marginLeft: 4 }}>
-        <TextKnopf symbol="printer" text={TEXT.drucken} onPress={() => void drucken(html, dateiname(v, d, heute()), v.querformat).catch(() => setDruckFehler(TEXT.pdf_fehler))} />
+        <TextKnopf symbol="printer" text={TEXT.drucken} onPress={() => void druckenLos()} />
         {v.alsText ? <TextKnopf symbol="doc.on.doc" text={TEXT.als_text} onPress={() => void Share.share({ message: v.alsText!(d, z.stand.betrieb) }).catch(() => undefined)} /> : null}
         <TextKnopf
           symbol="plus.circle"
@@ -156,7 +174,31 @@ export function Abschluss({ id, springen, fehler }: { id: string; springen: (sch
             if (k) nav.oeffnen(`ablauf-${k.id}`, () => <Ablauf id={k.id} />, true);
           }}
         />
-        {loeschFrage ? (
+        {fest ? (
+          v.storno && !u.storniertDurch && !d.storno_zu ? (
+            stornoFrage ? (
+              <Karte stil={{ paddingVertical: 14, gap: 10, marginTop: 6 }}>
+                <T fett>{TEXT.storno_wirklich}</T>
+                <T v="klein" leise>{TEXT.storno_text}</T>
+                <View style={{ flexDirection: "row", gap: 10 }}>
+                  <Knopf
+                    gefahr
+                    text={TEXT.storno_ja}
+                    onPress={() => {
+                      setStornoFrage(false);
+                      const neu = z.stornieren(id);
+                      if (neu) nav.oeffnen(`ablauf-${neu.id}`, () => <Ablauf id={neu.id} amEnde />, true);
+                    }}
+                    stil={{ flex: 1 }}
+                  />
+                  <Knopf ton text={TEXT.abbrechen} onPress={() => setStornoFrage(false)} stil={{ flex: 1 }} />
+                </View>
+              </Karte>
+            ) : (
+              <TextKnopf symbol="arrow.uturn.backward" gefahr text={TEXT.stornieren} onPress={() => setStornoFrage(true)} />
+            )
+          ) : null
+        ) : loeschFrage ? (
           <Karte stil={{ paddingVertical: 14, gap: 10, marginTop: 6 }}>
             <T fett>{TEXT.loeschen_wirklich}</T>
             <View style={{ flexDirection: "row", gap: 10 }}>

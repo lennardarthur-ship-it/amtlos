@@ -18,9 +18,15 @@ export interface Betrieb {
   iban: string;
   /** für die zuständige Datenschutz-Aufsichtsbehörde u. a. */
   bundesland: string;
+  /** Angaben auf Geschäftsbriefen von Gesellschaften (§ 35a GmbHG, § 37a HGB) – nur ausgefüllt, wenn zutreffend */
+  rechtsform?: string;
+  registergericht?: string;
+  registernummer?: string;
+  /** Geschäftsführung bzw. vertretungsberechtigte Personen */
+  vertretung?: string;
 }
 
-export const LEERER_BETRIEB: Betrieb = { name: "", strasse: "", plz: "", ort: "", verantwortlich: "", telefon: "", email: "", steuernummer: "", ust_idnr: "", iban: "", bundesland: "" };
+export const LEERER_BETRIEB: Betrieb = { name: "", strasse: "", plz: "", ort: "", verantwortlich: "", telefon: "", email: "", steuernummer: "", ust_idnr: "", iban: "", bundesland: "", rechtsform: "", registergericht: "", registernummer: "", vertretung: "" };
 
 /** Ein Wert in einem Listeneintrag. */
 export type EintragWert = string | boolean | string[] | null;
@@ -138,6 +144,12 @@ export interface Vorlage {
   fortlaufend?: string;
   /** geht an Kunden (Rechnung): ohne Rechtsgrundlage und Bereich im Kopf – das ist für die eigenen Unterlagen */
   kundendokument?: boolean;
+  /** wird beim ersten Teilen oder Drucken festgeschrieben (GoBD): danach nicht mehr änderbar oder löschbar (E-127) */
+  festschreiben?: boolean;
+  /** Korrektur einer festgeschriebenen Unterlage nur per Storno (Rechnung) */
+  storno?: boolean;
+  /** Startwerte aus dem Pflichten-Check: Feld der Vorlage → Profilfeld (z. B. kleinunternehmer → ust.kleinunternehmer) */
+  ausProfil?: Record<string, string>;
   /** Querformat (breite Tabellen, Aushänge) */
   querformat?: boolean;
   html(daten: Daten, betrieb: Betrieb): string;

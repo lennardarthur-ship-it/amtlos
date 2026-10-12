@@ -41,6 +41,9 @@ export const rechnung: Vorlage = {
   person: { art: "kunde", felder: { name: "kunde_name", anschrift: "kunde_anschrift", ust_idnr: "kunde_ust_idnr" } },
   fortlaufend: "nummer",
   kundendokument: true,
+  festschreiben: true,
+  storno: true,
+  ausProfil: { kleinunternehmer: "ust.kleinunternehmer" },
   grundlage: "§ 14 Abs. 4 UStG",
   namensFeld: "nummer",
   abschnitte: [
@@ -121,7 +124,7 @@ export const rechnung: Vorlage = {
       ...(ku ? [] : s.gruppen.map((g) => `<tr><td>${g.satz === 0 ? "Steuerfrei bzw. 0 %" : `Umsatzsteuer ${g.satz} %`} auf ${euro(g.netto_cent)}</td><td>${euro(g.ust_cent)}</td></tr>`)),
       `<tr class="gesamt"><td>Rechnungsbetrag</td><td>${euro(s.brutto_cent)}</td></tr>`,
     ].join("");
-    const leistung = ja(d, "leistung_gleich") ? "Leistungsdatum entspricht dem Rechnungsdatum" : text(d, "leistung");
+    const leistung = text(d, "leistung");
     const hinweise = [
       ...(ku ? [KU_HINWEIS] : []),
       ...auswahl(d, "hinweise").map((w) => (w === "grundstueck" ? GRUNDSTUECK_HINWEIS : (RECHNUNGS_HINWEISE.find((h) => h.wert === w)?.text ?? ""))),
@@ -130,14 +133,18 @@ export const rechnung: Vorlage = {
       ...text(d, "hinweis").split("\n"),
     ].filter((x) => x.trim());
     const steuer = [b.steuernummer.trim() ? `Steuernummer ${b.steuernummer.trim()}` : "", b.ust_idnr.trim() ? `USt-IdNr. ${b.ust_idnr.trim()}` : ""].filter(Boolean).join(" · ");
-    const fuss = [steuer, b.iban.trim() ? `IBAN ${b.iban.trim()}` : ""].filter(Boolean);
+    // Gesellschaften: Rechtsform, Sitz, Registergericht und -nummer, Geschäftsführung (§ 35a GmbHG, § 37a HGB), wenn eingetragen
+    const register = [b.rechtsform?.trim() && b.registergericht?.trim() ? `Sitz ${b.ort.trim()}` : "", [b.registergericht?.trim(), b.registernummer?.trim()].filter(Boolean).join(" "), b.vertretung?.trim() ? `Geschäftsführung: ${b.vertretung.trim()}` : ""].filter(Boolean).join(" · ");
+    const fuss = [steuer, b.iban.trim() ? `IBAN ${b.iban.trim()}` : "", register].filter(Boolean);
+    const storno = text(d, "storno_zu");
     return dokument({
-      titel: `Rechnung ${text(d, "nummer")}`.trim(),
+      titel: `${storno ? "Stornorechnung" : "Rechnung"} ${text(d, "nummer")}`.trim(),
       betrieb: b,
-      meta: `Rechnungsnummer: ${text(d, "nummer")}\nRechnungsdatum: ${datumDe(text(d, "datum"))}\nLeistung: ${ja(d, "leistung_gleich") ? "= Rechnungsdatum" : text(d, "leistung")}`,
+      meta: `Rechnungsnummer: ${text(d, "nummer")}\nRechnungsdatum: ${datumDe(text(d, "datum"))}\n${ja(d, "leistung_gleich") ? `Leistungsdatum: ${datumDe(text(d, "datum"))}` : `Leistung: ${text(d, "leistung")}`}`,
       vorTitel: `<div class="empfaenger"><div class="absender">${esc([b.name, anschrift(b)].filter((x) => x.trim()).join(" · "))}</div><strong>${text(d, "kunde_name") ? esc(text(d, "kunde_name")) : LINIE}</strong><br>${text(d, "kunde_anschrift") ? esc(text(d, "kunde_anschrift")).replace(/\n/g, "<br>") : LINIE}${text(d, "kunde_ust_idnr") ? `<br>USt-IdNr. ${esc(text(d, "kunde_ust_idnr"))}` : ""}</div>`,
       inhalt:
-        `<p>${esc(ja(d, "leistung_gleich") ? "Leistungsdatum entspricht dem Rechnungsdatum." : leistung ? `Leistungszeitraum: ${leistung}` : "")}</p>` +
+        (storno ? `<p><strong>${esc(`Diese Rechnung storniert die Rechnung Nr. ${storno}${text(d, "storno_zu_datum") ? ` vom ${datumDe(text(d, "storno_zu_datum"))}` : ""}.`)}</strong></p>` : "") +
+        (!ja(d, "leistung_gleich") && leistung ? `<p>${esc(`Leistungszeitraum: ${leistung}`)}</p>` : "") +
         `<section style="margin-top:3mm">${tabelle(["Pos.", "Leistung", "Menge", "Einzelpreis", ...(ku ? [] : ["USt"]), "Betrag"], zeilenHtml, { breiten: ku ? ["7%", "48%", "15%", "15%", "15%"] : ["7%", "41%", "14%", "14%", "9%", "15%"] })}</section>` +
         `<table class="summen">${summenZeilen}</table>` +
         (hinweise.length ? `<div style="margin-top:7mm">${hinweise.map((h) => `<p>${esc(h)}</p>`).join("")}</div>` : "") +
@@ -436,13 +443,15 @@ export const kassenbuch: Vorlage = {
   id: "kassenbuch",
   grundlage: "§ 146 Abs. 1 AO",
   querformat: true,
-  titel: "Kassenbuch",
-  beschreibung: "Bargeld-Einnahmen und -Ausgaben mit laufendem Bestand – für Betriebe mit offener Ladenkasse.",
+  titel: "Kassenbuch (Vorlage zum Ausdrucken)",
+  beschreibung: "Bargeld-Einnahmen und -Ausgaben mit laufendem Bestand – für Betriebe mit offener Ladenkasse. Ausgedruckt bzw. geteilt wird es festgeschrieben; ein laufend geführtes elektronisches Kassenbuch ersetzt es nicht.",
+  festschreiben: true,
   bereich: "steuern",
   pflichten: [],
   namensFeld: "zeitraum",
   abschnitte: [
     { titel: "Zeitraum und Anfangsbestand",
+      hilfe: "Vorlage zum Ausdrucken: Sobald du das Kassenbuch teilst oder druckst, schreibt Amtlos es fest – danach lässt es sich nicht mehr ändern. Ein laufend geführtes, unveränderbares elektronisches Kassenbuch ist es nicht.",
       felder: [
         { id: "zeitraum", art: "text", label: "Zeitraum", hilfe: "z. B. Oktober 2026", pflicht: true },
         { id: "anfang", art: "betrag", label: "Anfangsbestand (€)", pflicht: true },
@@ -480,7 +489,7 @@ export const kassenbuch: Vorlage = {
     return dokument({
       titel: "Kassenbuch",
       betrieb: b,
-      unter: text(d, "zeitraum") || undefined,
+      unter: [text(d, "zeitraum"), "Vorlage zum Ausdrucken"].filter(Boolean).join(" · "),
       quer: true,
       inhalt:
         tabelle(

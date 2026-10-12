@@ -102,11 +102,19 @@ try {
   await feld("Wann hast du angefangen oder wann willst du anfangen?").fill("01.03.2024");
   await knopf("Weiter").click();
   await warte(1200);
+  // Zusatzfragen für ein genaueres Ergebnis (E-127) – hier übersprungen; „Weiter“ ist ohne Antwort nicht aktiv
+  pruefe(await sichtbar("Noch ein paar Fragen"), "Zusatzfragen fehlen");
+  pruefe(await knopf("Weiter").isDisabled(), "„Weiter“ ohne Antwort aktiv");
+  for (let k = 0; k < 6 && !(await sichtbar("Für deinen Betrieb gelten")); k++) {
+    await knopf("Überspringen").click();
+    await warte(500);
+  }
   pruefe(await sichtbar("Für deinen Betrieb gelten"), "Ergebnis des Checks fehlt");
   await foto("check-ergebnis");
   await knopf("Deine Pflichten ansehen").click();
   await warte(1200);
   pruefe((await sichtbar("Hautschutzplan aushängen")) && (await sichtbar("Elektronische Kasse beim Finanzamt melden")) && !(await sichtbar("Impressum auf der Website")), "Pflichten passen nicht zum Profil (Beauty, Kasse, keine Website)");
+  pruefe(await sichtbar("Aus der Gründung"), "Gründungsschritte des bestehenden Betriebs nicht abgetrennt");
   pruefe(await sichtbar("0 von"), "Fortschritt fehlt");
   await foto("pflichten");
   await tippe(p.getByRole("button", { name: /^Hautschutzplan aushängen/ }).locator("visible=true").last());
@@ -169,6 +177,9 @@ try {
   await fenster.setViewportSize({ width: 794, height: 1123 });
   await fenster.screenshot({ path: `${OUT}/${String(++n).padStart(2, "0")}-${schema}-dokument.png` });
   await fenster.close();
+  await warte(600);
+  pruefe((await sichtbar("Festgeschrieben am")) && (await knopf("Stornieren").count()) > 0 && (await p.getByRole("button", { name: "Löschen", exact: true }).locator("visible=true").count()) === 0, "Rechnung nach dem Teilen nicht festgeschrieben");
+  await foto("festgeschrieben");
   await knopf("Vorschau groß ansehen").click();
   await warte(1200);
   await foto("vorschau");

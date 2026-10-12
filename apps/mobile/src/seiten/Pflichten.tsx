@@ -37,11 +37,13 @@ function PflichtDetail({ id }: { id: string }) {
   const f = useFarben();
   const starten = useStarten();
   const a = useAuswertung();
-  const p = [...a.gilt, ...a.unbekannt].find((x) => x.id === id);
+  const p = [...a.gilt, ...a.gruendung, ...a.unbekannt].find((x) => x.id === id);
   if (!p) return <Unterseite titel="">{null}</Unterseite>;
-  const gilt = a.gilt.includes(p);
-  const abgehakt = Boolean(z.stand.erledigt[p.id]);
-  const durchUnterlage = !abgehakt && istErledigt(p, {}, z.stand.unterlagen, z.stand.betrieb);
+  const gilt = a.gilt.includes(p) || a.gruendung.includes(p);
+  const abgehakt = istErledigt(p, { ...z.stand, unterlagen: [] });
+  // wiederkehrend: der Haken gilt für den nächsten Termin, danach ist die Pflicht wieder offen
+  const abhaken = () => z.erledigtSetzen(p.id, abgehakt ? null : heute(), abgehakt ? null : p.wiederkehrend ? p.naechsterTermin : null);
+  const durchUnterlage = !abgehakt && istErledigt(p, { ...z.stand, erledigt: {} });
   const zeile = (titel: string, wert: string) => (
     <View style={{ paddingVertical: 10, borderTopWidth: 1, borderColor: f.linieLeise }}>
       <T v="caption" fett leise>{titel}</T>
@@ -55,6 +57,7 @@ function PflichtDetail({ id }: { id: string }) {
         <T v="titel" accessibilityRole="header" stil={{ marginTop: 4 }}>{p.titel}</T>
         <T stil={{ marginTop: 8 }}>{p.kurz}</T>
         {durchUnterlage ? <Hinweis art="erfolg" text={TEXT.erledigt_durch_unterlage} /> : null}
+        {p.wiederkehrend && p.naechsterTermin ? <Hinweis text={TEXT.wiederkehrend_hinweis(datumDe(p.naechsterTermin))} /> : null}
         <Karte stil={{ marginTop: 16, paddingTop: 0 }}>
           {p.grund ? zeile(TEXT.warum, p.grund) : null}
           {p.naechsterTermin ? zeile(TEXT.naechster_termin("").trim(), datumDe(p.naechsterTermin)) : null}
@@ -78,7 +81,7 @@ function PflichtDetail({ id }: { id: string }) {
         ) : null}
         <T v="caption" leise stil={{ marginTop: 16 }}>{TEXT.pflichten_quelle}</T>
         {gilt && p.vorlage ? (
-          <TextKnopf symbol={abgehakt ? "xmark.circle" : "checkmark.circle"} text={abgehakt ? TEXT.haken_entfernen : TEXT.als_erledigt} onPress={() => z.erledigtSetzen(p.id, abgehakt ? null : heute())} stil={{ marginTop: 8 }} />
+          <TextKnopf symbol={abgehakt ? "xmark.circle" : "checkmark.circle"} text={abgehakt ? TEXT.haken_entfernen : TEXT.als_erledigt} onPress={abhaken} stil={{ marginTop: 8 }} />
         ) : null}
       </Inhalt>
       {gilt ? (
@@ -86,7 +89,7 @@ function PflichtDetail({ id }: { id: string }) {
           {p.vorlage ? (
             <Knopf text={TEXT.unterlage_erstellen} symbol="plus" onPress={() => starten(p.vorlage!)} stil={{ flex: 1 }} />
           ) : (
-            <Knopf ton={abgehakt} text={abgehakt ? TEXT.haken_entfernen : TEXT.als_erledigt} symbol={abgehakt ? undefined : "checkmark"} onPress={() => z.erledigtSetzen(p.id, abgehakt ? null : heute())} stil={{ flex: 1 }} />
+            <Knopf ton={abgehakt} text={abgehakt ? TEXT.haken_entfernen : TEXT.als_erledigt} symbol={abgehakt ? undefined : "checkmark"} onPress={abhaken} stil={{ flex: 1 }} />
           )}
         </Fuss>
       ) : null}
@@ -115,8 +118,9 @@ export function PflichtenSeite() {
   const nav = useNav();
   const a = useAuswertung();
   const [zeigen, setZeigen] = useState(false);
-  const fs = fortschritt(a, z.stand.erledigt, z.stand.unterlagen, z.stand.betrieb);
-  const fertig = (p: PflichtInfo) => istErledigt(p, z.stand.erledigt, z.stand.unterlagen, z.stand.betrieb);
+  const [gruendungZeigen, setGruendungZeigen] = useState(false);
+  const fs = fortschritt(a, z.stand);
+  const fertig = (p: PflichtInfo) => istErledigt(p, z.stand);
   const offeneFragen = [...new Set(a.unbekannt.flatMap((p) => p.offeneFragen))].filter((f) => !beantwortet(z.stand.profil, f));
   const kategorien = Object.keys(KATEGORIE_TITEL).filter((k) => a.gilt.some((p) => p.kategorie === k));
   const sonst = a.gilt.filter((p) => !KATEGORIE_TITEL[p.kategorie]);
@@ -151,6 +155,19 @@ export function PflichtenSeite() {
                 <PflichtZeile key={p.id} p={p} erledigt={fertig(p)} letzte={i === sonst.length - 1} />
               ))}
             </Karte>
+          </Gruppe>
+        ) : null}
+        {a.gruendung.length ? (
+          <Gruppe titel={TEXT.gruendung_titel(a.gruendung.length)} fuss={TEXT.gruendung_text}>
+            {a.gruendung.some((p) => !fertig(p)) ? <Knopf ton symbol="checkmark" text={TEXT.gruendung_alle} onPress={() => a.gruendung.filter((p) => !fertig(p)).forEach((p) => z.erledigtSetzen(p.id, heute()))} /> : null}
+            <TextKnopf symbol={gruendungZeigen ? "chevron.up" : "chevron.down"} text={gruendungZeigen ? TEXT.liste_verbergen : TEXT.liste_zeigen} onPress={() => setGruendungZeigen(!gruendungZeigen)} stil={{ marginLeft: 4 }} />
+            {gruendungZeigen ? (
+              <Karte>
+                {a.gruendung.map((p, i) => (
+                  <PflichtZeile key={p.id} p={p} erledigt={fertig(p)} letzte={i === a.gruendung.length - 1} />
+                ))}
+              </Karte>
+            ) : null}
           </Gruppe>
         ) : null}
         {a.unbekannt.length ? (
@@ -189,7 +206,7 @@ export function PflichtenKarte() {
         <Knopf text={TEXT.pflichten_check_starten} onPress={() => nav.oeffnen("check", () => <CheckAblauf />, true)} />
       </View>
     );
-  const fs = fortschritt(a, z.stand.erledigt, z.stand.unterlagen, z.stand.betrieb);
+  const fs = fortschritt(a, z.stand);
   return (
     <Karte stil={{ marginTop: 16, paddingVertical: 14, gap: 10 }}>
       <Pressable accessibilityRole="button" accessibilityLabel={`${TEXT.pflichten_titel}: ${TEXT.fortschritt_text(fs.fertig, fs.gesamt)}`} onPress={() => nav.oeffnen("pflichten", () => <PflichtenSeite />)} style={({ pressed }) => ({ gap: 10, opacity: pressed ? 0.7 : 1 })}>

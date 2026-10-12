@@ -83,7 +83,8 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
   const unterlage = z.stand.unterlagen.find((u) => u.id === id);
   const vorlage = unterlage ? vorlageFuer(unterlage.vorlage) : undefined;
   const n = vorlage?.abschnitte.length ?? 0;
-  const [schritt, setSchritt] = useState(amEnde ? n : 0);
+  const fest = Boolean(unterlage?.festgeschrieben);
+  const [schritt, setSchritt] = useState(amEnde || fest ? n : 0);
   const teilen = useTeilen(id);
   const anfang = useRef(unterlage ? JSON.stringify(unterlage.daten) : "");
   const zRef = useRef(z);
@@ -112,8 +113,10 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
   const daten = unterlage.daten;
   const fehlt = fehlendeAngaben(vorlage, daten, z.stand.betrieb);
   const ergebnis = vorlage.ergebnis?.(daten) ?? [];
-  const amAbschluss = schritt >= n;
+  // festgeschriebene Unterlagen zeigen nur noch den Abschluss (GoBD, E-127)
+  const amAbschluss = schritt >= n || fest;
   const gehe = (i: number) => {
+    if (fest) return;
     merken(vorlage, z.daten(id), z);
     setSchritt(Math.max(0, Math.min(n, i)));
   };
@@ -127,18 +130,18 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
         </Pressable>
         <T v="klein" fett numberOfLines={1} stil={{ flex: 1, textAlign: "center" }}>{vorlage.titel}</T>
         <View style={{ minWidth: ZIEL, alignItems: "flex-end" }}>
-          {amAbschluss ? null : (
+          {amAbschluss || fest ? null : (
             <Pressable accessibilityRole="button" onPress={() => gehe(n)} hitSlop={8} style={{ height: ZIEL, justifyContent: "center", paddingHorizontal: 4 }}>
               <T v="klein" fett farbe={f.amt}>{TEXT.uebersicht}</T>
             </Pressable>
           )}
         </View>
       </View>
-      <Fortschritt n={n + 1} aktuell={schritt} />
+      <Fortschritt n={n + 1} aktuell={fest ? n : schritt} />
       <KeyboardAvoidingView behavior={istIos ? "padding" : undefined} style={{ flex: 1 }}>
         <ScrollView key={schritt} contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 8, paddingBottom: 32 }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive">
           {amAbschluss ? (
-            <Abschluss id={id} springen={gehe} fehler={teilen.fehler} />
+            <Abschluss id={id} springen={gehe} fehler={teilen.fehler} drucken={teilen.drucken} />
           ) : (
             <Schritt v={vorlage} a={vorlage.abschnitte[schritt]!} index={schritt} id={id} daten={daten} fehlt={fehlt} />
           )}
@@ -153,7 +156,7 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
             ) : null
           }
         >
-          {schritt > 0 ? (
+          {schritt > 0 && !fest ? (
             <Pressable accessibilityRole="button" accessibilityLabel={TEXT.vorheriger_schritt} onPress={() => gehe(schritt - 1)} style={({ pressed }) => ({ width: ZIEL, height: ZIEL, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: f.amtHauch, opacity: pressed ? 0.7 : 1 })}>
               <Symbol name="chevron.left" groesse={20} farbe={f.amtTief} gewicht="semibold" />
             </Pressable>

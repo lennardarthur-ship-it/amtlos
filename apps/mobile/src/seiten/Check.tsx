@@ -3,10 +3,10 @@ import { KeyboardAvoidingView, Pressable, ScrollView, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { Frage } from "@amtlos/i18n";
 import { T as TEXT } from "../texte";
-import { Auswahl, DatumFeld, Feld, Fuss, Hinweis, Knopf, MehrfachWahl, Symbol, T } from "../ui/bausteine";
+import { Auswahl, DatumFeld, Feld, Fuss, Hinweis, Knopf, MehrfachWahl, Symbol, T, TextKnopf } from "../ui/bausteine";
 import { useNav } from "../ui/navigation";
 import { RAND, ZIEL, istIos, useFarben } from "../ui/thema";
-import { CHECK_FELDER, auswertung, beantwortet, checkFragen, type Profil } from "../pflichten/check";
+import { CHECK_FELDER, auswertung, beantwortet, checkFragen, zusatzFragen, type Profil } from "../pflichten/check";
 import { heute } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { PflichtenSeite } from "./Pflichten";
@@ -35,6 +35,7 @@ function Antwort({ f, wert, setzen }: { f: Frage; wert: Wert | undefined; setzen
         />
       );
     case "zahl":
+    case "betrag":
       return <ZahlFeld label={f.frage.de} wert={typeof wert === "number" ? wert : null} setzen={(n) => setzen(n)} />;
     case "datum":
       return <DatumFeld ohneLabel label={f.frage.de} wert={typeof wert === "string" ? wert : null} aendern={(d) => setzen(d)} />;
@@ -82,7 +83,9 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
   const f = useFarben();
   const voll = !felder;
   // Nachfragen: nur, was beim Öffnen noch fehlte – beantwortete Fragen verschwinden nicht mitten im Ablauf
-  const liste = useRef(felder ?? [...CHECK_FELDER]).current;
+  const [liste, setListe] = useState<string[]>(() => felder ?? [...CHECK_FELDER]);
+  const [zusatz, setZusatz] = useState(false);
+  const [extra, setExtra] = useState<string[]>([]);
   const fragen = checkFragen(z.stand.profil, liste);
   const [i, setI] = useState(voll && einleitung ? -1 : 0);
   const zeit = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -104,7 +107,17 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
       zeit.current = setTimeout(weiter, 280);
     }
   };
-  const a = useMemo(() => (amEnde && voll ? auswertung(z.stand.profil, heute()) : null), [amEnde, voll, z.stand.profil]);
+  // nach den Grundfragen: bis zu fünf Zusatzfragen, die die meisten unklaren Pflichten klären (E-127)
+  useEffect(() => {
+    if (!voll || !amEnde || zusatz) return;
+    setZusatz(true);
+    const neu = zusatzFragen(z.stand.profil, heute()).filter((f) => !liste.includes(f));
+    if (neu.length) {
+      setExtra(neu);
+      setListe((l) => [...l, ...neu]);
+    }
+  }, [voll, amEnde, zusatz, z.stand.profil, liste]);
+  const a = useMemo(() => (amEnde && voll && zusatz ? auswertung(z.stand.profil, heute()) : null), [amEnde, voll, zusatz, z.stand.profil]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: f.papier }} edges={["top", "left", "right"]}>
@@ -128,6 +141,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
             </View>
           ) : frage ? (
             <View>
+              {extra.includes(frage.feld) ? <T v="klein" fett farbe={f.amt} stil={{ marginBottom: 4 }}>{TEXT.zusatz_titel}</T> : null}
               <T v="caption" leise>{TEXT.schritt(i + 1, fragen.length)}</T>
               <T v="titel" accessibilityRole="header" stil={{ fontSize: 26, lineHeight: 32, marginTop: 4 }}>{frage.frage.de}</T>
               {frage.hilfe ? <T leise stil={{ marginTop: 8 }}>{frage.hilfe.de}</T> : null}
@@ -142,6 +156,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
               <View style={{ marginTop: 12, gap: 6 }}>
                 <T>{TEXT.ergebnis_vorlagen(a.gilt.filter((p) => p.vorlage).length)}</T>
                 {a.gilt.some((p) => p.schwere === "hoch") ? <T>{TEXT.ergebnis_wichtig(a.gilt.filter((p) => p.schwere === "hoch").length)}</T> : null}
+                {a.gruendung.length ? <T leise>{TEXT.ergebnis_gruendung(a.gruendung.length)}</T> : null}
                 {a.unbekannt.length ? <T leise>{TEXT.ergebnis_unbekannt(a.unbekannt.length)}</T> : null}
               </View>
               <View style={{ marginTop: 18 }}>
@@ -150,7 +165,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
             </View>
           ) : null}
         </ScrollView>
-        <Fuss>
+        <Fuss ueber={frage ? <TextKnopf text={TEXT.check_ueberspringen} onPress={weiter} leise stil={{ alignSelf: "center" }} /> : undefined}>
           {i > 0 ? (
             <Pressable accessibilityRole="button" accessibilityLabel={TEXT.vorheriger_schritt} onPress={() => setI(i - 1)} style={({ pressed }) => ({ width: ZIEL, height: ZIEL, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: f.amtHauch, opacity: pressed ? 0.7 : 1 })}>
               <Symbol name="chevron.left" groesse={20} farbe={f.amtTief} gewicht="semibold" />
@@ -159,7 +174,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
           {i < 0 ? (
             <Knopf text={TEXT.check_starten} onPress={() => setI(0)} stil={{ flex: 1 }} />
           ) : frage ? (
-            <Knopf text={beantwortet(z.stand.profil, frage.feld) ? TEXT.weiter : TEXT.check_ueberspringen} onPress={weiter} stil={{ flex: 1 }} />
+            <Knopf text={TEXT.weiter} deaktiviert={!beantwortet(z.stand.profil, frage.feld)} onPress={weiter} stil={{ flex: 1 }} />
           ) : (
             <Knopf
               text={TEXT.pflichten_ansehen}

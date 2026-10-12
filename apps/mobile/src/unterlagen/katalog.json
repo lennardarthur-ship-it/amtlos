@@ -380,21 +380,6 @@
   "geprueft": false
  },
  {
-  "id": "personal.lohnabrechnung",
-  "titel": "Lohnabrechnung über geprüfte Software",
-  "kurz": "Meldungen zur Sozialversicherung erfordern zertifizierte Software – Amtlos arbeitet dafür mit einem Lohnpartner.",
-  "rechtsgrundlage": [
-   "§ 18 DEÜV (Systemprüfung)"
-  ],
-  "quellen": [
-   {
-    "titel": "Datenerfassungs- und -übermittlungsverordnung",
-    "url": "https://www.gesetze-im-internet.de/de_v/"
-   }
-  ],
-  "geprueft": false
- },
- {
   "id": "personal.lohnsteuer_anmeldung",
   "titel": "Lohnsteuer anmelden",
   "kurz": "Bis zum 10. nach Ende des Anmeldezeitraums meldest du die Lohnsteuer beim Finanzamt an.",

@@ -38,3 +38,16 @@ Das Review wurde am Stand vor E-124 erstellt. Antworten von Frida vom 12.10. (We
 | 30 | Mittel | Web gibt nur HTML aus | Offen | Der Web-Export dient heute nur Tests. Vorschlag: nicht veröffentlichen. |
 | 31 | Mittel | Marke und Domains | Offen | DPMA/EUIPO, Gründerseite. |
 | 32 | Mittel | Nur Deutsch | Entscheidung | Englisch gab es bis E-121. |
+
+## Review L. Reiche vom 12.10.2026 (acht Dealbreaker)
+
+| # | Dealbreaker | Status | Notiz |
+|---|---|---|---|
+| K1 | Kein Geschäftsmodell (kein Konto, Server, Bezahlung) | Entscheidung | Widerspricht der Empfehlung von F. Steinmeyer (kein Server in den ersten drei Wochen). Gründer entscheidet. |
+| K2 | Keine messbare Traktion | Offen | TestFlight braucht ein Apple-Developer-Konto (Gründer); Messung datenschutzfreundlich, Anbieter offen. |
+| K3 | Inhalte ungeprüft | Offen | Prüfliste T-52 bis T-68 als Arbeitsgrundlage für den Fachbeirat. |
+| K4 | Rechnung nur als PDF | Offen | XRechnung-Prüfung liegt im Fachlogik-Paket; ZUGFeRD/XRechnung in der App ist der nächste große Baustein. |
+| K5 | GoBD-Risiken bei Rechnung und Kassenbuch | **Erledigt** | E-127: Festschreiben beim Teilen, Storno, keine Wiedervergabe geteilter Nummern, doppelte Nummer blockiert, nur vollständig teilen, Kassenbuch als Vorlage zum Ausdrucken gekennzeichnet. Fachlich: T-68. |
+| K6 | Alles nur auf dem iPhone | Teilweise | Verschlüsselte Sicherung mit Wiederherstellen (E-125); sofort speichern beim Wechsel in den Hintergrund, kein Überschreiben unlesbarer Daten (E-127). Automatische Sicherung/Sync: Entscheidung (K1). |
+| K7 | Pflichten-Check für Bestandsbetriebe | **Erledigt** | E-127: Gründungsschritte abgetrennt, Zusatzfragen, Begründung für jede Pflicht, wiederkehrende Pflichten nur bis zum Termin erledigt, Unterlagen zählen erst nach dem Teilen. Ansicht „Jetzt dran / Diesen Monat“ folgt mit den Erinnerungen. |
+| K8 | „Amtlos“ erzeugt nur PDFs | Offen | Nächster Wow-Fall: Rechnungen → USt-Voranmeldung → Export. |

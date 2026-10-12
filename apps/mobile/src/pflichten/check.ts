@@ -7,7 +7,7 @@
 import { VORLAGEN, fehlendeAngaben, vorlageFuer, type Betrieb } from "@amtlos/fachlogik";
 import { StandardKalender } from "@amtlos/fristen";
 import { SCHRITTE, type Frage } from "@amtlos/i18n";
-import { auswerten, zuErfragendeFakten, type Katalog, type Pflicht } from "@amtlos/rules-engine";
+import { auswerten, entscheidendeSaetze, zuErfragendeFakten, type Katalog, type Pflicht } from "@amtlos/rules-engine";
 import roh from "./katalog.json";
 
 export const KATALOG = roh as unknown as Katalog;
@@ -55,13 +55,23 @@ export interface PflichtInfo {
   naechsterTermin: string | null;
   /** Fragen, die für eine unklare Pflicht noch fehlen (Profilfelder) */
   offeneFragen: string[];
+  /** wiederkehrend (z. B. jährlich): „erledigt“ gilt nur bis zum nächsten Termin */
+  wiederkehrend: boolean;
   geprueft: boolean;
 }
 
 export interface Auswertung {
   gilt: PflichtInfo[];
+  /** Gründungsschritte eines Betriebs, der seit mehr als sechs Monaten läuft – vermutlich längst erledigt */
+  gruendung: PflichtInfo[];
   unbekannt: PflichtInfo[];
 }
+
+/** Grund für Pflichten, deren Auslöser im Katalog „immer“ ist */
+const IMMER = "Gilt für jedes Unternehmen, unabhängig von deinen Angaben.";
+
+/** Ab wann ein Betrieb als „bestehend“ gilt: Gründungsschritte stehen dann nicht mehr bei den offenen Pflichten. */
+export const BESTAND_AB_MONATEN = 6;
 
 const text = (t: unknown) => (t && typeof t === "object" && typeof (t as { de?: unknown }).de === "string" ? (t as { de: string }).de : "");
 const VORLAGE_JE_PFLICHT = new Map<string, string>();
@@ -80,7 +90,7 @@ export function auswertung(profil: Profil, stichtag: string): Auswertung {
   const ergebnisse = auswerten({ katalog: KATALOG, fakten, ereignisse: [], stichtag, kalender: new StandardKalender(), fenster: { von: stichtag, bis: plusMonate(stichtag, 12) } });
   const nachId = new Map(KATALOG.pflichten.map((p) => [p.id, p]));
   const info = (e: (typeof ergebnisse)[number]): PflichtInfo => {
-    const p = nachId.get(e.pflicht_id) as Pflicht & { stelle?: unknown; quellen?: { titel: string; url?: string }[]; pruefung?: { status?: string }; ausloeser: { label?: unknown } };
+    const p = nachId.get(e.pflicht_id) as Pflicht & { stelle?: unknown; quellen?: { titel: string; url?: string }[]; pruefung?: { status?: string } };
     const termin = e.termine.map((t) => t.faellig_am).filter((d) => d >= stichtag).sort()[0] ?? null;
     return {
       id: p.id,
@@ -92,7 +102,8 @@ export function auswertung(profil: Profil, stichtag: string): Auswertung {
       stelle: text(p.stelle),
       rechtsgrundlage: p.rechtsgrundlage ?? [],
       quellen: (p.quellen ?? []).filter((q): q is { titel: string; url: string } => Boolean(q.url)),
-      grund: text((p.ausloeser as { label?: unknown }).label),
+      // die Sätze, die das Ergebnis tragen – auch bei zusammengesetzten Auslösern („weil du … und …“)
+      grund: entscheidendeSaetze(e.begruendung).join(" ") || ("immer" in (p.ausloeser as object) ? IMMER : ""),
       vorlage: VORLAGE_JE_PFLICHT.get(p.id) ?? null,
       naechsterTermin: termin,
       offeneFragen: zuErfragendeFakten(e.fehlende_fakten)
@@ -100,28 +111,60 @@ export function auswertung(profil: Profil, stichtag: string): Auswertung {
         .map((f) => f.slice("profil.".length))
         .filter((f) => FRAGE.has(f)),
       geprueft: p.pruefung?.status === "freigegeben",
+      wiederkehrend: p.wiederholung?.art === "periodisch" || e.termine.length > 1,
     };
   };
   const sortiert = (l: PflichtInfo[]) => l.sort((a, b) => SCHWERE[a.schwere] - SCHWERE[b.schwere] || (a.naechsterTermin ?? "9999").localeCompare(b.naechsterTermin ?? "9999") || a.titel.localeCompare(b.titel, "de"));
   const aktiv = ergebnisse.filter((e) => !e.radar);
+  const beginn = typeof profil.gruendungsdatum === "string" ? profil.gruendungsdatum : null;
+  const bestehend = Boolean(beginn && beginn <= plusMonate(stichtag, -BESTAND_AB_MONATEN));
+  const ausGruendung = (e: (typeof ergebnisse)[number]) => bestehend && nachId.get(e.pflicht_id)?.phase === "gruendung";
+  const gilt = aktiv.filter((e) => e.ergebnis === "gilt");
   return {
-    gilt: sortiert(aktiv.filter((e) => e.ergebnis === "gilt").map(info)),
-    unbekannt: sortiert(aktiv.filter((e) => e.ergebnis === "unbekannt").map(info)),
+    gilt: sortiert(gilt.filter((e) => !ausGruendung(e)).map(info)),
+    gruendung: sortiert(gilt.filter(ausGruendung).map(info)),
+    unbekannt: sortiert(aktiv.filter((e) => e.ergebnis === "unbekannt" && !ausGruendung(e)).map(info)),
   };
 }
 
-/** Eine Pflicht gilt als erledigt, wenn sie abgehakt ist oder es eine vollständige Unterlage der passenden Vorlage gibt. */
-export function istErledigt(p: PflichtInfo, erledigt: Record<string, string>, unterlagen: { vorlage: string; daten: Record<string, unknown> }[], betrieb: Betrieb): boolean {
-  if (erledigt[p.id]) return true;
-  if (!p.vorlage) return false;
-  const v = vorlageFuer(p.vorlage);
-  return Boolean(v && unterlagen.some((u) => u.vorlage === p.vorlage && fehlendeAngaben(v, u.daten as never, betrieb).length === 0));
+/**
+ * Zusatzfragen für ein genaueres Ergebnis: die Profilfelder, die die meisten unklaren Pflichten klären – höchstens `n`.
+ */
+export function zusatzFragen(profil: Profil, stichtag: string, n = 5): string[] {
+  const zaehler = new Map<string, number>();
+  for (const p of auswertung(profil, stichtag).unbekannt) for (const f of p.offeneFragen) if (!beantwortet(profil, f)) zaehler.set(f, (zaehler.get(f) ?? 0) + 1);
+  return [...zaehler.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, n).map(([f]) => f);
 }
 
-/** Fortschritt über die geltenden Pflichten. */
-export function fortschritt(a: Auswertung, erledigt: Record<string, string>, unterlagen: { vorlage: string; daten: Record<string, unknown> }[], betrieb: Betrieb) {
+export interface Erledigt {
+  erledigt: Record<string, string>;
+  unterlagen: { vorlage: string; daten: Record<string, unknown>; ausgegeben?: string; storniertDurch?: string }[];
+  betrieb: Betrieb;
+}
+
+/** Haken einer Pflicht: Datum und – bei wiederkehrenden Pflichten – der Termin, für den er gilt. */
+export function haken(wert: string | undefined): { datum: string; termin: string | null } | null {
+  if (!wert) return null;
+  const [datum, termin] = wert.split("|");
+  return { datum: datum!, termin: termin || null };
+}
+
+/**
+ * Erledigt (E-127): abgehakt – bei wiederkehrenden Pflichten nur für den nächsten Termin – oder, bei einmaligen bzw.
+ * dauerhaften Pflichten, durch eine vollständige Unterlage, die tatsächlich als PDF geteilt oder gedruckt wurde.
+ */
+export function istErledigt(p: PflichtInfo, e: Erledigt): boolean {
+  const h = haken(e.erledigt[p.id]);
+  if (h) return !p.wiederkehrend || !p.naechsterTermin || h.termin === p.naechsterTermin;
+  if (!p.vorlage || p.wiederkehrend) return false;
+  const v = vorlageFuer(p.vorlage);
+  return Boolean(v && e.unterlagen.some((u) => u.vorlage === p.vorlage && u.ausgegeben && !u.storniertDurch && fehlendeAngaben(v, u.daten as never, e.betrieb).length === 0));
+}
+
+/** Fortschritt über die geltenden Pflichten (ohne Gründungsschritte eines bestehenden Betriebs). */
+export function fortschritt(a: Auswertung, e: Erledigt) {
   const gesamt = a.gilt.length;
-  const fertig = a.gilt.filter((p) => istErledigt(p, erledigt, unterlagen, betrieb)).length;
+  const fertig = a.gilt.filter((p) => istErledigt(p, e)).length;
   return { gesamt, fertig, prozent: gesamt ? Math.round((fertig / gesamt) * 100) : 0 };
 }
 

@@ -10,6 +10,12 @@ export interface Unterlage {
   daten: Daten;
   erstellt: string;
   geaendert: string;
+  /** zuerst als PDF geteilt oder gedruckt (E-127) – erst dann zählt die Unterlage für eine Pflicht */
+  ausgegeben?: string;
+  /** festgeschrieben (Vorlagen mit `festschreiben`, z. B. Rechnung): nicht mehr änderbar oder löschbar */
+  festgeschrieben?: string;
+  /** storniert durch diese Unterlage (Stornorechnung) */
+  storniertDurch?: string;
 }
 
 export interface Stand {
@@ -73,26 +79,86 @@ export const heute = (jetzt = new Date()) => new Intl.DateTimeFormat("sv-SE", { 
 
 export const neueId = () => `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
 
+/** Ist der gespeicherte Text lesbar? Unlesbares darf nicht durch einen leeren Stand überschrieben werden. */
+export function istLesbar(json: string | null): boolean {
+  if (!json) return true;
+  try {
+    const roh = JSON.parse(json) as unknown;
+    return Boolean(roh && typeof roh === "object");
+  } catch {
+    return false;
+  }
+}
+
+/** Nächste fortlaufende Nummer einer Vorlage aus allen vorhandenen Unterlagen (festgeschriebene lassen sich nicht löschen). */
+function naechste(s: Stand, vorlageId: string, feld: string, jetzt: Date): string {
+  const vorhanden = s.unterlagen.filter((u) => u.vorlage === vorlageId).map((u) => u.daten[feld]).filter((n): n is string => typeof n === "string");
+  return naechsteNummer(vorhanden, heute(jetzt).slice(0, 4));
+}
+
+/** Gibt es dieselbe Nummer schon in einer anderen Unterlage derselben Vorlage? */
+export function nummerDoppelt(s: Stand, u: Unterlage): boolean {
+  const v = vorlageFuer(u.vorlage);
+  const n = v?.fortlaufend && typeof u.daten[v.fortlaufend] === "string" ? (u.daten[v.fortlaufend] as string).trim() : "";
+  return Boolean(n) && s.unterlagen.some((x) => x.id !== u.id && x.vorlage === u.vorlage && typeof x.daten[v!.fortlaufend!] === "string" && (x.daten[v!.fortlaufend!] as string).trim() === n);
+}
+
+export const istFest = (u: Unterlage | undefined) => Boolean(u?.festgeschrieben);
+
 export function anlegen(s: Stand, vorlageId: string, jetzt: Date, id = neueId()): [Stand, Unterlage] {
   const v = vorlageFuer(vorlageId);
   if (!v) throw new Error(`Unbekannte Vorlage: ${vorlageId}`);
   const daten = leereDaten(v, s.betrieb, heute(jetzt));
   // fortlaufende Nummer (Rechnung): aus den vorhandenen Unterlagen derselben Vorlage weiterzählen
-  if (v.fortlaufend) {
-    const vorhanden = s.unterlagen.filter((u) => u.vorlage === v.id).map((u) => u.daten[v.fortlaufend!]).filter((n): n is string => typeof n === "string");
-    daten[v.fortlaufend] = naechsteNummer(vorhanden, heute(jetzt).slice(0, 4));
+  if (v.fortlaufend) daten[v.fortlaufend] = naechste(s, v.id, v.fortlaufend, jetzt);
+  // Startwerte aus dem Pflichten-Check (z. B. Kleinunternehmer), pro Unterlage überschreibbar
+  for (const [feld, profilFeld] of Object.entries(v.ausProfil ?? {})) {
+    const w = s.profil[profilFeld];
+    if (w !== undefined && w !== null && !Array.isArray(w)) daten[feld] = typeof w === "number" ? String(w) : w;
   }
   const u: Unterlage = { id, vorlage: v.id, daten, erstellt: jetzt.toISOString(), geaendert: jetzt.toISOString() };
   return [{ ...s, unterlagen: [u, ...s.unterlagen] }, u];
 }
 
+/** Festgeschriebene Unterlagen bleiben, wie sie sind (GoBD, E-127). */
 export function aendern(s: Stand, id: string, daten: Daten, jetzt: Date): Stand {
-  return { ...s, unterlagen: s.unterlagen.map((u) => (u.id === id ? { ...u, daten, geaendert: jetzt.toISOString() } : u)) };
+  return { ...s, unterlagen: s.unterlagen.map((u) => (u.id === id && !u.festgeschrieben ? { ...u, daten, geaendert: jetzt.toISOString() } : u)) };
 }
 
 /** Ein Feld setzen (bzw. mehrere) – liest den aktuellen Stand, damit schnelles Tippen nichts verliert. */
 export function felderSetzen(s: Stand, id: string, werte: Daten, jetzt: Date): Stand {
-  return { ...s, unterlagen: s.unterlagen.map((u) => (u.id === id ? { ...u, daten: { ...u.daten, ...werte }, geaendert: jetzt.toISOString() } : u)) };
+  return { ...s, unterlagen: s.unterlagen.map((u) => (u.id === id && !u.festgeschrieben ? { ...u, daten: { ...u.daten, ...werte }, geaendert: jetzt.toISOString() } : u)) };
+}
+
+/** Als PDF geteilt oder gedruckt: merken, und Vorlagen mit `festschreiben` festschreiben. */
+export function ausgeben(s: Stand, id: string, jetzt: Date): Stand {
+  return {
+    ...s,
+    unterlagen: s.unterlagen.map((u) => {
+      if (u.id !== id) return u;
+      const fest = vorlageFuer(u.vorlage)?.festschreiben;
+      return { ...u, ausgegeben: u.ausgegeben ?? jetzt.toISOString(), ...(fest && !u.festgeschrieben ? { festgeschrieben: jetzt.toISOString() } : {}) };
+    }),
+  };
+}
+
+/**
+ * Storno (E-127): eine festgeschriebene Rechnung wird nicht geändert, sondern durch eine Stornorechnung mit neuer
+ * Nummer und negativen Beträgen aufgehoben; die Stornorechnung verweist auf Nummer und Datum der ursprünglichen.
+ */
+export function stornieren(s: Stand, id: string, jetzt: Date, neu = neueId()): [Stand, Unterlage | null] {
+  const alt = s.unterlagen.find((u) => u.id === id);
+  const v = alt ? vorlageFuer(alt.vorlage) : undefined;
+  if (!alt || !v?.storno || !alt.festgeschrieben || alt.storniertDurch || alt.daten.storno_zu) return [s, null];
+  const daten = JSON.parse(JSON.stringify(alt.daten)) as Daten;
+  const negativ = (p: unknown) => (typeof p === "string" && p.trim() ? (p.trim().startsWith("-") ? p.trim().slice(1) : `-${p.trim()}`) : p);
+  if (Array.isArray(daten.positionen)) daten.positionen = (daten.positionen as Record<string, unknown>[]).map((e) => ({ ...e, preis: negativ(e.preis) })) as Daten[string];
+  daten.storno_zu = typeof alt.daten.nummer === "string" ? alt.daten.nummer : "";
+  daten.storno_zu_datum = typeof alt.daten.datum === "string" ? alt.daten.datum : null;
+  daten.datum = heute(jetzt);
+  if (v.fortlaufend) daten[v.fortlaufend] = naechste(s, v.id, v.fortlaufend, jetzt);
+  const u: Unterlage = { id: neu, vorlage: v.id, daten, erstellt: jetzt.toISOString(), geaendert: jetzt.toISOString() };
+  return [{ ...s, unterlagen: [u, ...s.unterlagen.map((x) => (x.id === id ? { ...x, storniertDurch: neu } : x))] }, u];
 }
 
 /** Kopie, z. B. für den nächsten Monat oder einen weiteren Arbeitsbereich. */
@@ -102,16 +168,20 @@ export function kopieren(s: Stand, id: string, jetzt: Date, neu = neueId()): [St
   const daten = JSON.parse(JSON.stringify(alt.daten)) as Daten;
   const v = vorlageFuer(alt.vorlage);
   // eine kopierte Rechnung bekommt die nächste Nummer – Nummern dürfen nur einmal vorkommen
-  if (v?.fortlaufend) {
-    const vorhanden = s.unterlagen.filter((u) => u.vorlage === v.id).map((u) => u.daten[v.fortlaufend!]).filter((n): n is string => typeof n === "string");
-    daten[v.fortlaufend] = naechsteNummer(vorhanden, heute(jetzt).slice(0, 4));
-  }
-  const u: Unterlage = { ...alt, id: neu, daten, erstellt: jetzt.toISOString(), geaendert: jetzt.toISOString() };
+  if (v?.fortlaufend) daten[v.fortlaufend] = naechste(s, v.id, v.fortlaufend, jetzt);
+  // die Kopie ist ein neuer Entwurf: kein Storno-Bezug, nicht ausgegeben, nicht festgeschrieben
+  delete daten.storno_zu;
+  delete daten.storno_zu_datum;
+  const u: Unterlage = { id: neu, vorlage: alt.vorlage, daten, erstellt: jetzt.toISOString(), geaendert: jetzt.toISOString() };
   return [{ ...s, unterlagen: [u, ...s.unterlagen] }, u];
 }
 
+/** Löschen – außer festgeschriebene Unterlagen (Korrektur nur per Storno). */
 export function loeschen(s: Stand, id: string): Stand {
-  return { ...s, unterlagen: s.unterlagen.filter((u) => u.id !== id) };
+  const weg = s.unterlagen.find((u) => u.id === id && !u.festgeschrieben);
+  if (!weg) return s;
+  // ein verworfener Storno-Entwurf gibt die ursprüngliche Rechnung wieder frei
+  return { ...s, unterlagen: s.unterlagen.filter((u) => u.id !== id).map((u) => (u.storniertDurch === id ? { ...u, storniertDurch: undefined } : u)) };
 }
 
 /** Person aus einer Unterlage merken (gleicher Name ergänzt den vorhandenen Eintrag). */
@@ -140,10 +210,10 @@ export function profilSetzen(s: Stand, werte: Stand["profil"], bundeslandName?: 
   return { ...s, betrieb, profil: { ...s.profil, ...werte } };
 }
 
-/** Pflicht abhaken bzw. den Haken entfernen. */
-export function erledigtSetzen(s: Stand, pflichtId: string, datum: string | null): Stand {
+/** Pflicht abhaken bzw. den Haken entfernen. Wiederkehrende Pflichten gelten nur für einen Termin („Datum|Termin“). */
+export function erledigtSetzen(s: Stand, pflichtId: string, datum: string | null, termin?: string | null): Stand {
   const erledigt = { ...s.erledigt };
-  if (datum) erledigt[pflichtId] = datum;
+  if (datum) erledigt[pflichtId] = termin ? `${datum}|${termin}` : datum;
   else delete erledigt[pflichtId];
   return { ...s, erledigt };
 }

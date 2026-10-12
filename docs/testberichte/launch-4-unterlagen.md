@@ -104,3 +104,14 @@ Fachlich zu prüfen: T-66. Auf dem iPhone noch anzusehen: Vorschau (WebView), Ta
 | iOS-Bündel mit Katalog und Regel-Engine | gebaut (3,6 MB) |
 
 Auf dem iPhone noch zu messen: Dauer der Verschlüsselung (PBKDF2 in JavaScript) und der Auswertung des Katalogs.
+
+## Nachtrag: GoBD und genauerer Check (E-127)
+
+| Prüfung | Ergebnis |
+|---|---|
+| GoBD (neu): Festschreiben beim Teilen, kein Ändern/Löschen danach, keine Wiedervergabe geteilter Nummern, Storno mit neuer Nummer und negativen Beträgen, Verweis im PDF, verworfener Storno-Entwurf gibt frei, Angaben der Gesellschaft auf der Rechnung, doppelte Nummer, Kleinunternehmer aus dem Check, Kopie als Entwurf, unlesbare Daten nicht überschreiben | 7 grün |
+| Check (neu): Haken für wiederkehrende Pflichten nur bis zum Termin, Gründungsschritte bei Bestandsbetrieben abgetrennt, Grund für jede Pflicht, Zusatzfragen klären unklare Pflichten | 4 grün |
+| App-Tests gesamt / Vorlagen-Tests | 29 / 28 grün |
+| Monorepo mit Datenbank (ohne Cache) | 42/42 |
+| Rundgang hell und dunkel: zusätzlich Zusatzfragen, „Weiter“ ohne Antwort gesperrt, „Aus der Gründung“, Rechnung nach dem Teilen festgeschrieben mit „Stornieren“ statt „Löschen“ | ohne Befunde |
+| Alle 33 Vorlagen durchgeklickt, iOS-Bündel | ohne Seitenfehler, gebaut |

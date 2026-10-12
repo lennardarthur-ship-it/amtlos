@@ -86,7 +86,7 @@ export function BetriebFormular() {
   const { stand, betriebSpeichern } = useAmtlos();
   const [b, setB] = useState<BetriebDaten>(stand.betrieb);
   const feld = (k: keyof BetriebDaten) => ({
-    wert: b[k],
+    wert: b[k] ?? "",
     aendern: (w: string) => {
       const neu = { ...b, [k]: w };
       setB(neu);
@@ -117,6 +117,14 @@ export function BetriebFormular() {
         <Feld label={TEXT.b_steuernummer} {...feld("steuernummer")} keyboardType="numbers-and-punctuation" />
         <Feld label={TEXT.b_ust_idnr} {...feld("ust_idnr")} autoCapitalize="characters" />
         <Feld label={TEXT.b_iban} {...feld("iban")} autoCapitalize="characters" />
+      </Karte>
+      <T v="klein" fett leise stil={{ marginTop: 20, marginLeft: 4 }}>{TEXT.b_gesellschaft}</T>
+      <T v="caption" leise stil={{ marginTop: 2, marginBottom: 8, marginLeft: 4 }}>{TEXT.b_gesellschaft_text}</T>
+      <Karte stil={{ paddingBottom: 14 }}>
+        <Feld label={TEXT.b_rechtsform} {...feld("rechtsform")} placeholder="z. B. GmbH" />
+        <Feld label={TEXT.b_registergericht} {...feld("registergericht")} placeholder="z. B. Amtsgericht München" />
+        <Feld label={TEXT.b_registernummer} {...feld("registernummer")} placeholder="z. B. HRB 123456" autoCapitalize="characters" />
+        <Feld label={TEXT.b_vertretung} {...feld("vertretung")} placeholder="Vor- und Nachname, mehrere mit Komma" />
       </Karte>
       <T v="caption" leise stil={{ marginTop: 6, marginLeft: 4 }}>{TEXT.gespeichert_auto}</T>
     </View>

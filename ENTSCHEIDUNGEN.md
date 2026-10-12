@@ -563,6 +563,21 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Profil:** Antworten liegen in `stand.profil` (Schlüssel wie im Server-Profil), änderbar unter „Mein Betrieb → Pflichten-Check“; das Bundesland füllt „Mein Betrieb“, solange dort keins steht. Die Branche wählt in den Vorschlägen die passenden Gruppen vor („Passend für dich“), damit ein Malerbetrieb keine Friseurchemikalien sieht.
 - **Startseite:** vor dem Check die Einladung „Welche Pflichten gelten für dich?“ als Hauptknopf (Rechnung dann zweitrangig), danach „Deine Pflichten“ mit Fortschritt in Prozent.
 
+
+### E-127 · Rechnungen festschreiben und stornieren; Pflichten-Check genauer
+- **Datum:** 2026-10-12 · **Status:** angenommen (Review L. Reiche vom 12.10., Punkte K5 und K7; beide Reviews einig)
+- **Festschreiben (GoBD):** Rechnung und Kassenbuch (`festschreiben`) werden beim ersten Teilen oder Drucken festgeschrieben. Danach lassen sie sich weder ändern noch löschen; die App öffnet sie nur noch im Abschluss („Festgeschrieben am …“). Jede Unterlage merkt sich, wann sie zuerst ausgegeben wurde (`ausgegeben`).
+- **Storno statt Ändern:** Eine festgeschriebene Rechnung wird nur per Stornorechnung aufgehoben – neue Nummer, gleiche Positionen mit negativen Preisen, Verweis „storniert die Rechnung Nr. … vom …“; die ursprüngliche bleibt unverändert und zeigt „storniert durch …“. Ein verworfener Storno-Entwurf gibt die Rechnung wieder frei.
+- **Nummern:** Eine geteilte Rechnung lässt sich nicht löschen, also wird ihre Nummer nie wieder vergeben. Gelöscht werden können nur Entwürfe, die nie rausgingen. Eine doppelte Nummer (von Hand eingetragen) wird als fehlend gemeldet und blockiert das Teilen.
+- **Nur vollständig an Kunden:** Kundendokumente (Rechnung) lassen sich erst teilen oder drucken, wenn alle Pflichtangaben drin sind.
+- **Kassenbuch:** heißt jetzt „Kassenbuch (Vorlage zum Ausdrucken)“ und sagt im ersten Schritt und im PDF, dass es kein laufend geführtes, unveränderbares elektronisches Kassenbuch ist; es wird beim Teilen festgeschrieben.
+- **Gesellschaften:** „Mein Betrieb“ hat Rechtsform, Registergericht, Registernummer und Geschäftsführung; bei Gesellschaften stehen Sitz, Register und Geschäftsführung unten auf jeder Rechnung (§ 35a GmbHG, § 37a HGB). Leistungsdatum ausgeschrieben statt „= Rechnungsdatum“.
+- **Pflichten-Check:** Gründungsschritte (Katalog `phase: gruendung`) stehen bei Betrieben, die seit mehr als sechs Monaten laufen, unter „Aus der Gründung“ (vermutlich erledigt, zählen nicht zu den offenen); nach den Grundfragen bis zu fünf Zusatzfragen, die die meisten unklaren Pflichten klären; „Warum für dich“ aus den tragenden Sätzen der Regel (Engine `entscheidendeSaetze`), bei Pflichten für alle Unternehmen „Gilt für jedes Unternehmen“. „Weiter“ erst mit Antwort, „Überspringen“ als Textknopf.
+- **Erledigt:** wiederkehrende Pflichten nur für den nächsten Termin abhaken; durch eine Unterlage nur einmalige bzw. dauerhafte Pflichten und nur, wenn die Unterlage vollständig ist und als PDF geteilt oder gedruckt wurde. Das Lohnkonto zählt nicht mehr als „Lohnabrechnung über geprüfte Software“.
+- **Kleinunternehmer** aus dem Check als Startwert jeder Rechnung (`ausProfil`), pro Rechnung änderbar.
+- **Daten:** Beim Wechsel in den Hintergrund wird sofort gespeichert; sind gespeicherte Daten unlesbar oder schlägt das Laden fehl, überschreibt die App nichts (bis „Alle Daten löschen“).
+- Nicht entschieden (Gründer, Termine mit F. Steinmeyer und L. Reiche): Konto, Server, Synchronisierung, Bezahlung (K1, K6), E-Rechnung in der App (K4), Rechnungen → USt-Voranmeldung → ELSTER-Export (K8).
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

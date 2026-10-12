@@ -104,7 +104,8 @@ export const lohnkonto: Vorlage = {
   titel: "Lohnkonto",
   beschreibung: "Je beschäftigte Person die Stammdaten und für jeden Monat Lohn, Steuern und Beiträge – mit Jahressummen.",
   bereich: "personal",
-  pflichten: ["personal.lohnabrechnung", "personal.lohnsteuer_anmeldung"],
+  // nicht „Lohnabrechnung über geprüfte Software“ (personal.lohnabrechnung): das Lohnkonto ersetzt keine Lohnsoftware
+  pflichten: ["personal.lohnsteuer_anmeldung"],
   person: { art: "mitarbeiter", felder: { name: "name", geburtsdatum: "geburtsdatum", anschrift: "anschrift", steuer_id: "steuer_id", steuerklasse: "steuerklasse", sv_nummer: "sv_nummer", krankenkasse: "krankenkasse", beginn: "eintritt" } },
   grundlage: "§ 41 EStG; § 4 LStDV",
   namensFeld: "name",

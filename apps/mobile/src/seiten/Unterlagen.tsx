@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { TextInput, View } from "react-native";
-import { ANLAESSE, BEREICHE, KURZ, VORLAGEN, fehlendeAngaben, unterlagenName, vorlageFuer, type Anlass, type Vorlage } from "@amtlos/fachlogik";
+import { ANLAESSE, BEREICHE, KURZ, VORLAGEN, unterlagenName, vorlageFuer, type Anlass, type Vorlage } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { Karte, Knopf, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { GROESSE, RAND, SCHRIFT, useFarben } from "../ui/thema";
+import { fehltFuer } from "../unterlagen/pruefung";
 import { betriebFehlt, sortiert, type Unterlage } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { BetriebFormular } from "./Betrieb";
@@ -31,12 +32,12 @@ export function UnterlageZeile({ u, letzte, onPress }: { u: Unterlage; letzte: b
   const f = useFarben();
   const { stand } = useAmtlos();
   const v = vorlageFuer(u.vorlage)!;
-  const n = fehlendeAngaben(v, u.daten, stand.betrieb).length;
+  const n = fehltFuer(stand, u).length;
   return (
     <Zeile
       links={<Symbol name="doc.richtext" groesse={22} farbe={n ? f.bald : f.amt} />}
       titel={unterlagenName(v, u.daten)}
-      text={`${TEXT.geaendert(datumKurz(u.geaendert))} · ${n ? TEXT.fehlen(n) : TEXT.vollstaendig}`}
+      text={`${TEXT.geaendert(datumKurz(u.geaendert))} · ${u.storniertDurch ? TEXT.storniert : u.festgeschrieben ? TEXT.festgeschrieben_kurz : n ? TEXT.fehlen(n) : TEXT.vollstaendig}`}
       onPress={onPress}
       letzte={letzte}
     />
