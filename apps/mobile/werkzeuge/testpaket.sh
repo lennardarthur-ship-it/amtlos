@@ -74,6 +74,10 @@ Entscheidungen liegen im Git-Repository (GitHub: lennardarthur-ship-it/amtlos). 
    - Unter „Meine“ findest du alles wieder; unter „Mein Betrieb“ stehen Mitarbeiter und Kunden.
      Alles bleibt nur auf dem iPhone. „Daten sichern“ erstellt eine mit deinem Passwort verschlüsselte Datei,
      „Sicherung wiederherstellen“ spielt sie zurück.
+   - „Deine Pflichten“ zeigt oben, was jetzt dran ist. Dort „Erinnerungen“ einschalten (Mitteilungen erlauben):
+     Die App erinnert 3 Tage vor jedem Termin – ganz ohne Server.
+   - Rechnung an eine Firma: im Abschluss „Als E-Rechnung teilen (XRechnung)“. Fehlt dafür etwas, sagt die App was.
+   - „Umsatzsteuer-Voranmeldung“: übernimmt die Umsätze aus deinen geteilten Rechnungen mit einem Tipp.
 
 Beenden: im Terminal Ctrl + C. Nächstes Mal reichen die Befehle „cd …“ und „npx expo start“.
 TXT
