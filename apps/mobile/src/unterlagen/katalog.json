@@ -1,0 +1,285 @@
+[
+ {
+  "id": "arbeitsschutz.erstunterweisung",
+  "titel": "Vor Arbeitsbeginn unterweisen",
+  "kurz": "Jede neue Person unterweist du vor dem ersten Arbeitstag zu den Gefahren und Schutzmaßnahmen.",
+  "rechtsgrundlage": [
+   "§ 12 ArbSchG",
+   "DGUV Vorschrift 1"
+  ],
+  "quellen": [
+   {
+    "titel": "Arbeitsschutzgesetz § 12",
+    "url": "https://www.gesetze-im-internet.de/arbschg/__12.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "arbeitsschutz.gefaehrdungsbeurteilung",
+  "titel": "Gefährdungsbeurteilung erstellen",
+  "kurz": "Bevor jemand bei dir arbeitet, schreibst du auf, welche Gefahren es an den Arbeitsplätzen gibt und was du dagegen tust.",
+  "rechtsgrundlage": [
+   "§ 5 ArbSchG",
+   "§ 6 ArbSchG"
+  ],
+  "quellen": [
+   {
+    "titel": "Arbeitsschutzgesetz § 5",
+    "url": "https://www.gesetze-im-internet.de/arbschg/__5.html"
+   },
+   {
+    "titel": "Arbeitsschutzgesetz § 6",
+    "url": "https://www.gesetze-im-internet.de/arbschg/__6.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "arbeitsschutz.gefahrstoffe",
+  "titel": "Gefahrstoffverzeichnis und Betriebsanweisungen",
+  "kurz": "Wenn ihr mit Gefahrstoffen arbeitet, führst du ein Verzeichnis und schreibst Betriebsanweisungen.",
+  "rechtsgrundlage": [
+   "GefStoffV"
+  ],
+  "quellen": [
+   {
+    "titel": "Gefahrstoffverordnung",
+    "url": "https://www.gesetze-im-internet.de/gefstoffv_2010/"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "arbeitsschutz.unterweisung_wiederholen",
+  "titel": "Unterweisung jährlich wiederholen",
+  "kurz": "Mindestens einmal im Jahr wiederholst du die Unterweisung.",
+  "rechtsgrundlage": [
+   "§ 12 ArbSchG",
+   "DGUV Vorschrift 1"
+  ],
+  "quellen": [
+   {
+    "titel": "Arbeitsschutzgesetz § 12",
+    "url": "https://www.gesetze-im-internet.de/arbschg/__12.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "branche.beauty_hautschutzplan",
+  "titel": "Hautschutzplan aushängen",
+  "kurz": "Für Tätigkeiten mit Feuchtarbeit oder hautbelastenden Stoffen legst du in einem Hautschutzplan Schutz, Reinigung und Pflege fest.",
+  "rechtsgrundlage": [
+   "TRGS 401",
+   "GefStoffV"
+  ],
+  "quellen": [
+   {
+    "titel": "TRGS 401",
+    "url": "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-401.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "branche.beauty_hygieneplan",
+  "titel": "Hygieneplan führen",
+  "kurz": "In Beauty- und Kosmetikbetrieben legst du in einem Hygieneplan fest, wie Geräte, Flächen und Hände gereinigt und desinfiziert werden.",
+  "rechtsgrundlage": [
+   "IfSG",
+   "Hygieneverordnungen der Länder"
+  ],
+  "quellen": [
+   {
+    "titel": "Infektionsschutzgesetz",
+    "url": "https://www.gesetze-im-internet.de/ifsg/"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "branche.gastro_allergene",
+  "titel": "Allergene kennzeichnen",
+  "kurz": "Du informierst deine Gäste über die 14 Hauptallergene in deinen Speisen und Getränken – auch bei loser Ware.",
+  "rechtsgrundlage": [
+   "Art. 9 und 44 Verordnung (EU) Nr. 1169/2011",
+   "LMIDV"
+  ],
+  "quellen": [
+   {
+    "titel": "Verordnung (EU) Nr. 1169/2011",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32011R1169"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "branche.gastro_haccp",
+  "titel": "Eigenkontrollen nach HACCP",
+  "kurz": "Du kontrollierst und dokumentierst regelmäßig die kritischen Punkte deiner Lebensmittelhygiene, zum Beispiel Kühltemperaturen.",
+  "rechtsgrundlage": [
+   "Art. 5 Verordnung (EG) Nr. 852/2004"
+  ],
+  "quellen": [
+   {
+    "titel": "Verordnung (EG) Nr. 852/2004",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32004R0852"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "branche.gastro_ifsg_belehrung",
+  "titel": "Belehrung nach § 43 Infektionsschutzgesetz",
+  "kurz": "Wer bei dir mit Lebensmitteln arbeitet, braucht vor dem ersten Arbeitstag die Belehrung nach § 43 IfSG.",
+  "rechtsgrundlage": [
+   "§ 43 IfSG"
+  ],
+  "quellen": [
+   {
+    "titel": "Infektionsschutzgesetz § 43",
+    "url": "https://www.gesetze-im-internet.de/ifsg/__43.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "branche.handwerk_gefaehrdung_gewerk",
+  "titel": "Gefährdungsbeurteilung je Gewerk",
+  "kurz": "Im Handwerk beurteilst du die Gefährdungen je Gewerk und Einsatzort – auch auf Baustellen beim Kunden.",
+  "rechtsgrundlage": [
+   "§§ 5, 6 ArbSchG"
+  ],
+  "quellen": [
+   {
+    "titel": "Arbeitsschutzgesetz § 5",
+    "url": "https://www.gesetze-im-internet.de/arbschg/__5.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "datenschutz.datenpanne_meldung",
+  "titel": "Datenpanne der Aufsichtsbehörde melden",
+  "kurz": "Bei einer Datenpanne meldest du sie binnen 72 Stunden der Datenschutz-Aufsichtsbehörde.",
+  "rechtsgrundlage": [
+   "Art. 33 DSGVO"
+  ],
+  "quellen": [
+   {
+    "titel": "DSGVO Art. 33",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "datenschutz.informationspflichten",
+  "titel": "Über die Datenverarbeitung informieren",
+  "kurz": "Wenn du Daten erhebst, informierst du die Menschen darüber – etwa in einer Datenschutzerklärung oder einem Informationsblatt.",
+  "rechtsgrundlage": [
+   "Art. 13 DSGVO",
+   "Art. 14 DSGVO"
+  ],
+  "quellen": [
+   {
+    "titel": "DSGVO Art. 13",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "datenschutz.tom",
+  "titel": "Technische und organisatorische Maßnahmen festlegen",
+  "kurz": "Du legst fest und dokumentierst, wie du die Daten schützt, zum Beispiel mit Verschlüsselung, Zugriffsrechten und Datensicherung.",
+  "rechtsgrundlage": [
+   "Art. 32 DSGVO"
+  ],
+  "quellen": [
+   {
+    "titel": "DSGVO Art. 32",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "datenschutz.vvt",
+  "titel": "Verzeichnis der Verarbeitungstätigkeiten führen",
+  "kurz": "Du führst ein Verzeichnis, welche Daten über Menschen du wofür verarbeitest.",
+  "rechtsgrundlage": [
+   "Art. 30 DSGVO"
+  ],
+  "quellen": [
+   {
+    "titel": "DSGVO Art. 30",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "ki.kompetenz",
+  "titel": "KI-Kompetenz der Beschäftigten sicherstellen",
+  "kurz": "Wer im Unternehmen mit KI arbeitet, braucht ausreichende KI-Kompetenz – sorge für Schulung und halte sie fest.",
+  "rechtsgrundlage": [
+   "Art. 4 KI-VO"
+  ],
+  "quellen": [
+   {
+    "titel": "KI-Verordnung (EU) 2024/1689",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32024R1689"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "personal.mutterschutz_gefaehrdungsbeurteilung",
+  "titel": "Mutterschutz in der Gefährdungsbeurteilung",
+  "kurz": "Unabhängig davon, ob jemand schwanger ist, beurteilst du die Arbeitsplätze auch nach dem Mutterschutzgesetz.",
+  "rechtsgrundlage": [
+   "§ 10 MuSchG"
+  ],
+  "quellen": [
+   {
+    "titel": "Mutterschutzgesetz § 10",
+    "url": "https://www.gesetze-im-internet.de/muschg_2018/__10.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "personal.nachweisgesetz",
+  "titel": "Arbeitsbedingungen schriftlich festhalten",
+  "kurz": "Für jede neue beschäftigte Person hältst du die wesentlichen Arbeitsbedingungen schriftlich oder in zulässiger Form fest.",
+  "rechtsgrundlage": [
+   "NachwG"
+  ],
+  "quellen": [
+   {
+    "titel": "Nachweisgesetz",
+    "url": "https://www.gesetze-im-internet.de/nachwg/"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "steuern.gobd_verfahrensdokumentation",
+  "titel": "GoBD einhalten und Verfahrensdokumentation führen",
+  "kurz": "Bewahre Belege nachvollziehbar und unveränderbar auf und beschreibe in einer Verfahrensdokumentation, wie du das machst.",
+  "rechtsgrundlage": [
+   "GoBD (BMF-Schreiben)",
+   "§ 146 AO",
+   "§ 147 AO"
+  ],
+  "quellen": [
+   {
+    "titel": "Bundesministerium der Finanzen",
+    "url": "https://www.bundesfinanzministerium.de/"
+   }
+  ],
+  "geprueft": false
+ }
+]

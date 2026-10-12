@@ -3,8 +3,7 @@ import * as Haptics from "expo-haptics";
 import { SymbolView, type SymbolViewProps } from "expo-symbols";
 import { useEffect, useState, type ReactNode } from "react";
 import { ActivityIndicator, Pressable, Text as RNText, Switch, TextInput, View, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
-import { datumTeile, type Sprache } from "@amtlos/i18n";
-import { useAmtlos } from "../zustand";
+import { T as TEXT } from "../texte";
 import { GROESSE, RADIUS, SCHRIFT, ZIEL, istIos, useFarben } from "./thema";
 
 type Variante = "grossTitel" | "titel" | "gross" | "basis" | "klein" | "caption";
@@ -39,6 +38,9 @@ const FALLBACK: Record<string, keyof typeof Ionicons.glyphMap> = {
   "flag": "flag-outline", "graduationcap": "school-outline", "chart.bar": "bar-chart-outline", "magnifyingglass": "search-outline", "briefcase": "briefcase-outline",
   "person.badge.plus": "person-add-outline", "list.bullet": "list-outline", "calendar.badge.clock": "calendar-outline", "checkmark.circle": "checkmark-circle-outline",
   "exclamationmark.circle": "alert-circle-outline", "person": "person-outline", "lock": "lock-closed-outline", "percent": "calculator-outline",
+  "folder": "folder-outline", "doc.on.doc": "copy-outline", "printer": "print-outline", "lock.shield": "shield-checkmark-outline", "fork.knife": "restaurant-outline",
+  "scissors": "cut-outline", "cross.case": "medkit-outline", "checkmark.square.fill": "checkbox", "square": "square-outline", "chevron.down": "chevron-down", "chevron.up": "chevron-up",
+  "doc.richtext": "document-text-outline", "hammer": "hammer-outline",
 };
 export function Symbol({ name, groesse = 22, farbe, gewicht = "medium" }: { name: string; groesse?: number; farbe?: string; gewicht?: SymbolViewProps["weight"] }) {
   const f = useFarben();
@@ -48,31 +50,6 @@ export function Symbol({ name, groesse = 22, farbe, gewicht = "medium" }: { name
   return (
     <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden>
       <Ionicons name={FALLBACK[name] ?? "ellipse-outline"} size={groesse} color={c} />
-    </View>
-  );
-}
-
-/**
- * Das Fristblatt – das eine prägende Element (docs/06): ein Abreißkalender-Blatt mit Wochentag, Tag und Monat.
- * Der Farbstreifen oben sagt, was Sache ist: rot = überfällig, orange = bald, grün = erledigt, sonst Tinte.
- */
-export function Fristblatt({ datum, status, sprache, gross }: { datum: string | null; status: string; sprache: Sprache; gross?: boolean }) {
-  const f = useFarben();
-  const streifen = status === "ueberfaellig" ? f.frist : status === "faellig_bald" ? f.bald : status === "erledigt" ? f.amt : f.tinte;
-  const b = gross ? 84 : 56;
-  const t = datum ? datumTeile(datum, sprache) : null;
-  return (
-    <View style={{ width: b, borderRadius: RADIUS.blatt, backgroundColor: f.blatt, borderWidth: 1, borderColor: f.linie, overflow: "hidden", alignItems: "center", paddingBottom: gross ? 8 : 5 }} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-      <View style={{ height: gross ? 6 : 4, alignSelf: "stretch", backgroundColor: streifen }} />
-      {t ? (
-        <>
-          <RNText style={{ fontFamily: SCHRIFT.regular, fontSize: gross ? 13 : 11, color: f.tinteLeise, marginTop: gross ? 6 : 3 }}>{t.wochentag}</RNText>
-          <RNText style={{ fontFamily: SCHRIFT.bold, fontSize: gross ? GROESSE.blatt : 22, lineHeight: gross ? 40 : 26, color: f.tinte, fontVariant: ["tabular-nums"] }}>{t.tag}</RNText>
-          <RNText style={{ fontFamily: SCHRIFT.bold, fontSize: gross ? 14 : 11, color: f.tinte }}>{t.monat}</RNText>
-        </>
-      ) : (
-        <RNText style={{ fontFamily: SCHRIFT.bold, fontSize: gross ? 26 : 18, color: f.tinteLeise, marginVertical: gross ? 20 : 10 }}>–</RNText>
-      )}
     </View>
   );
 }
@@ -163,16 +140,6 @@ export function Status({ status, text }: { status: string; text: string }) {
   );
 }
 
-/** Gestempelt: der Erfolgsmoment (E-117). Leicht gedreht, in Handlungsfarbe. */
-export function Stempel({ text }: { text: string }) {
-  const f = useFarben();
-  return (
-    <View style={{ alignSelf: "flex-start", transform: [{ rotate: "-6deg" }], borderWidth: 2.5, borderColor: f.amt, borderRadius: 6, paddingHorizontal: 10, paddingVertical: 3 }}>
-      <RNText style={{ fontFamily: SCHRIFT.bold, fontSize: GROESSE.gross, color: f.amt, letterSpacing: 1 }}>{text}</RNText>
-    </View>
-  );
-}
-
 // ---------------------------------------------------------------- Formulare (E-120)
 
 /** Karte: weiße Fläche mit Haarlinie, für zusammengehörige Zeilen oder ein Formular. */
@@ -216,7 +183,7 @@ export const textAus = (iso: string | null | undefined) => (iso ? `${iso.slice(8
 /** Datumsfeld ohne zusätzliches Paket: Eingabe als TT.MM.JJJJ, „Heute“ als Abkürzung. Liefert ISO oder null. */
 export function DatumFeld({ label, wert, aendern, hilfe, ohneHeute }: { label: string; wert: string | null; aendern: (iso: string | null) => void; hilfe?: string; ohneHeute?: boolean }) {
   const f = useFarben();
-  const heuteText = useAmtlos().t.mobil.heute;
+  const heuteText = TEXT.heute;
   const [text, setText] = useState(textAus(wert));
   useEffect(() => setText(textAus(wert)), [wert]);
   const heute = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Berlin" }).format(new Date());
@@ -249,34 +216,6 @@ export function DatumFeld({ label, wert, aendern, hilfe, ohneHeute }: { label: s
   );
 }
 
-/** Euro-Betrag ↔ Cent. „12,50“ → 1250. Leer → null. */
-export function centAus(text: string): number | null {
-  const t = text.replace(/\s|€/g, "").replace(/\.(?=\d{3}(\D|$))/g, "").replace(",", ".");
-  if (t === "") return null;
-  const n = Number(t);
-  return Number.isFinite(n) ? Math.round(n * 100) : null;
-}
-export const euroText = (cent: number | null | undefined, sprache: "de" | "en" = "de") =>
-  cent === null || cent === undefined ? "–" : new Intl.NumberFormat(sprache === "en" ? "en-GB" : "de-DE", { style: "currency", currency: "EUR" }).format(cent / 100);
-
-export function BetragFeld({ label, cent, aendern, hilfe }: { label: string; cent: number | null; aendern: (c: number | null) => void; hilfe?: string }) {
-  const [text, setText] = useState(cent === null ? "" : (cent / 100).toFixed(2).replace(".", ","));
-  return (
-    <Feld
-      label={label}
-      hilfe={hilfe}
-      wert={text}
-      aendern={(w) => {
-        setText(w);
-        aendern(centAus(w));
-      }}
-      keyboardType="decimal-pad"
-      placeholder="0,00"
-      fehler={text.trim() !== "" && centAus(text) === null ? "0,00" : null}
-    />
-  );
-}
-
 /** Auswahl als Chips (wenige Optionen) – Radio-Semantik für VoiceOver. */
 export function Wahl<W extends string>({ label, wert, aendern, optionen }: { label?: string; wert: W | null; aendern: (w: W) => void; optionen: { wert: W; text: string }[] }) {
   const f = useFarben();
@@ -291,6 +230,7 @@ export function Wahl<W extends string>({ label, wert, aendern, optionen }: { lab
               key={o.wert}
               accessibilityRole="radio"
               accessibilityState={{ checked: an }}
+              aria-checked={an}
               onPress={() => {
                 if (istIos) void Haptics.selectionAsync();
                 aendern(o.wert);
@@ -318,4 +258,73 @@ export function Schalter({ label, wert, aendern, hilfe }: { label: string; wert:
       <Switch accessibilityLabel={label} value={wert} onValueChange={aendern} trackColor={{ true: f.amt, false: f.linie }} thumbColor="#ffffff" />
     </View>
   );
+}
+
+/** Auswahl als Liste untereinander – für lange oder viele Optionen (Radio-Semantik). */
+export function Auswahl<W extends string>({ label, wert, aendern, optionen }: { label: string; wert: W | null; aendern: (w: W) => void; optionen: { wert: W; text: string }[] }) {
+  const f = useFarben();
+  return (
+    <View style={{ marginTop: 14 }}>
+      <T v="klein" fett>{label}</T>
+      <View accessibilityRole="radiogroup" accessibilityLabel={label} style={{ marginTop: 6, borderWidth: 1.5, borderColor: f.linie, borderRadius: RADIUS.klein, overflow: "hidden" }}>
+        {optionen.map((o, i) => {
+          const an = o.wert === wert;
+          return (
+            <Pressable
+              key={o.wert}
+              accessibilityRole="radio"
+              accessibilityState={{ checked: an }}
+              aria-checked={an}
+              onPress={() => {
+                if (istIos) void Haptics.selectionAsync();
+                aendern(o.wert);
+              }}
+              style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 10, minHeight: ZIEL, paddingHorizontal: 14, paddingVertical: 8, borderTopWidth: i ? 1 : 0, borderColor: f.linieLeise, backgroundColor: an ? f.amtHauch : pressed ? f.papier : f.blatt })}
+            >
+              <T v="klein" fett={an} stil={{ flex: 1 }}>{o.text}</T>
+              {an ? <Symbol name="checkmark" groesse={16} farbe={f.amt} gewicht="semibold" /> : null}
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
+/** Mehrfachauswahl als Chips mit Häkchen (Checkbox-Semantik), z. B. Allergene. */
+export function MehrfachWahl({ label, werte, aendern, optionen }: { label: string; werte: string[]; aendern: (w: string[]) => void; optionen: { wert: string; text: string }[] }) {
+  const f = useFarben();
+  return (
+    <View style={{ marginTop: 14 }}>
+      <T v="klein" fett>{label}</T>
+      <View accessibilityLabel={label} style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8 }}>
+        {optionen.map((o) => {
+          const an = werte.includes(o.wert);
+          return (
+            <Pressable
+              key={o.wert}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: an }}
+              aria-checked={an}
+              accessibilityLabel={o.text}
+              onPress={() => {
+                if (istIos) void Haptics.selectionAsync();
+                aendern(an ? werte.filter((x) => x !== o.wert) : [...werte, o.wert]);
+              }}
+              style={{ minHeight: ZIEL - 8, paddingHorizontal: 12, borderRadius: 20, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: an ? f.amtHauch : f.blatt, borderWidth: 1.5, borderColor: an ? f.amt : f.linie }}
+            >
+              <Symbol name={an ? "checkmark.square.fill" : "square"} groesse={16} farbe={an ? f.amt : f.tinteLeise} />
+              <T v="klein" fett={an} farbe={an ? f.amtTief : f.tinte}>{o.text}</T>
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
+/** Uhrzeit als HH:MM. */
+export function UhrzeitFeld({ label, wert, aendern, hilfe }: { label: string; wert: string; aendern: (w: string) => void; hilfe?: string }) {
+  const falsch = wert.trim() !== "" && !/^([01]?\d|2[0-3]):[0-5]\d$/.test(wert.trim());
+  return <Feld label={label} hilfe={hilfe} wert={wert} aendern={aendern} placeholder="HH:MM" keyboardType="numbers-and-punctuation" fehler={falsch ? TEXT.uhrzeit_falsch : null} />;
 }

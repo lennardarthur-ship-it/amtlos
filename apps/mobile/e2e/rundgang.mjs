@@ -1,76 +1,169 @@
 /**
- * Rundgang durch die App im Demo-Modus (E-119, E-120): Web-Export der App, iPhone-Format, alle Bereiche einmal –
- * Demo starten, Schnellstart, Pflichten (Angabe ergänzen), Finanzen (Angaben, Rechnung, USt, Kassen), Personal
- * (Einstellung mit Checkliste, Zeiten, Unterweisung, Schwellen), Mehr (Gründung, Fragebogen, Postfach, Melden, Team,
- * Hilfe, Einstellungen). Braucht keinen Server. Bildschirmfotos landen im Ausgabeordner; Befunde stehen am Ende.
+ * Rundgang durch die Unterlagen-App (E-121) über den Web-Export, Rahmen 393×852 wie iPhone, hell oder dunkel.
+ * Prüft die Wege eines neuen Nutzers: Betrieb eintragen, Vorlage wählen, ausfüllen, PDF, Meine Unterlagen,
+ * Neustart (Daten bleiben), Kopie, Löschen. Bildschirmfotos zur Sichtprüfung. Bricht beim ersten Befund ab.
  *
  *   cd apps/mobile && CI=1 npx expo export --platform web --output-dir /tmp/expo-web
- *   cd apps/web && node ../mobile/e2e/rundgang.mjs /tmp/expo-web /tmp/rundgang   # DUNKEL=1 für Dunkelmodus
- * (aus apps/web, weil dort playwright-core liegt; CHROMIUM_PFAD wie bei den Web-Tests)
+ *   node e2e/rundgang.mjs /tmp/expo-web /tmp/bilder        # DUNKEL=1 für Dunkelmodus, CHROMIUM_PFAD optional
  */
-import http from "node:http"; import fs from "node:fs"; import path from "node:path";
-import { chromium } from "playwright-core";
+import http from "node:http";
+import fs from "node:fs";
+import path from "node:path";
+import { createRequire } from "node:module";
+
+const require = createRequire(path.resolve(path.dirname(new URL(import.meta.url).pathname), "../../web/package.json"));
+const { chromium } = require("playwright-core");
 const [DIR, OUT] = process.argv.slice(2);
-const srv = http.createServer((req, res) => { let p = path.join(DIR, decodeURIComponent(req.url.split("?")[0])); if (!fs.existsSync(p) || fs.statSync(p).isDirectory()) p = path.join(DIR, "index.html"); const ext = path.extname(p); res.writeHead(200, { "Content-Type": ext === ".js" ? "text/javascript" : ext === ".ttf" ? "font/ttf" : ext === ".json" ? "application/json" : "text/html" }); fs.createReadStream(p).pipe(res); });
-await new Promise((r) => srv.listen(4997, r));
-const b = await chromium.launch({ executablePath: process.env.CHROMIUM_PFAD || "/tmp/chromium", args: ["--no-sandbox"] });
-const p = await (await b.newContext({ viewport: { width: 393, height: 852 }, deviceScaleFactor: 2, locale: "de-DE", colorScheme: process.env.DUNKEL ? "dark" : "light" })).newPage();
-const fehler = [];
-p.on("pageerror", (e) => fehler.push(e.message));
-p.on("console", (m) => { if (m.type() === "error") fehler.push(m.text().slice(0, 200)); });
+fs.mkdirSync(OUT, { recursive: true });
+const srv = http.createServer((req, res) => {
+  let p = path.join(DIR, decodeURIComponent(req.url.split("?")[0]));
+  if (!fs.existsSync(p) || fs.statSync(p).isDirectory()) p = path.join(DIR, "index.html");
+  const ext = path.extname(p);
+  res.writeHead(200, { "Content-Type": ext === ".js" ? "text/javascript" : ext === ".css" ? "text/css" : ext === ".ttf" ? "font/ttf" : "text/html" });
+  fs.createReadStream(p).pipe(res);
+});
+await new Promise((r) => srv.listen(4998, r));
+const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PFAD || "/opt/pw-browsers/chromium", headless: true, args: ["--no-sandbox"] });
+const schema = process.env.DUNKEL ? "dark" : "light";
+const ctx = await browser.newContext({ viewport: { width: 393, height: 852 }, deviceScaleFactor: 2, colorScheme: schema, locale: "de-DE" });
+const p = await ctx.newPage();
+const befunde = [];
+p.on("pageerror", (e) => befunde.push(`Seitenfehler: ${e.message}`));
+p.on("console", (m) => {
+  if (m.type() === "error") befunde.push(`Konsole: ${m.text().slice(0, 200)}`);
+});
 let n = 0;
-const foto = async (name, voll = false) => { await p.waitForTimeout(700); await p.screenshot({ path: `${OUT}/${String(++n).padStart(2, "0")}-${name}.png`, fullPage: voll }); };
-const knopf = (name) => p.getByRole("button", { name, exact: false }).last();
-const tab = (name) => p.getByRole("tab", { name });
-const zurueck = async () => { await p.getByRole("button", { name: "Zurück", exact: true }).last().click(); await p.waitForTimeout(500); };
-const schritt = async (name, f) => { try { await f(); } catch (e) { fehler.push(`${name}: ${e.message.split("\n")[0]}`); await foto(`FEHLER-${name}`); } };
-
-await p.goto("http://localhost:4997"); await p.waitForTimeout(2500);
-await knopf("Ohne Konto ausprobieren").click(); await p.waitForTimeout(1000);
-await p.getByLabel("Name des Unternehmens").fill("Lena Design");
-await knopf("Unternehmen anlegen").click(); await p.waitForTimeout(1000);
-for (let i = 0; i < 8; i++) {
-  for (const g of await p.getByRole("radiogroup").all()) { if (!(await g.getByRole("radio", { checked: true }).count())) await g.getByRole("radio").first().click(); }
-  const felder = p.locator("input"); for (let j = 0; j < await felder.count(); j++) { const f = felder.nth(j); if (!(await f.inputValue())) await f.fill("2026-09-01").catch(() => {}); }
-  const fertig = p.getByRole("button", { name: "Fertig" });
-  if (await fertig.count()) { await fertig.click(); break; }
-  await knopf("Weiter").click(); await p.waitForTimeout(500);
+const foto = async (name) => p.screenshot({ path: `${OUT}/${String(++n).padStart(2, "0")}-${schema}-${name}.png` });
+const warte = (ms = 600) => p.waitForTimeout(ms);
+function pruefe(bed, text) {
+  if (!bed) throw new Error(`Befund: ${text}`);
 }
-await p.waitForTimeout(1500); await foto("heute", true);
+/** Die oberste Ebene eines Stapels ist die zuletzt eingehängte; Elemente darunter sind verdeckt. */
+const knopf = (name) => p.getByRole("button", { name, exact: true }).locator("visible=true").last();
+const feld = (label) => p.getByLabel(label, { exact: true }).locator("visible=true").last();
+/** Tippen nach Scrollen in die Mitte – sonst liegt die Tab-Leiste über Elementen am unteren Rand. */
+async function tippe(l) {
+  await l.evaluate((el) => el.scrollIntoView({ block: "center" }));
+  await l.click();
+}
+const sichtbar = async (text) => (await p.getByText(text, { exact: false }).locator("visible=true").count()) > 0;
 
-await schritt("pflichten", async () => { await tab("Pflichten").click(); await foto("pflichten", true); });
-await schritt("kalender", async () => { await knopf("Kalender").first().click(); await foto("kalender"); await zurueck(); });
-await schritt("unklar", async () => { await p.getByRole("button", { name: /warten auf eine Angabe/ }).click(); await foto("unklar"); const z = p.getByRole("button", { name: /./ }).filter({ hasText: /Angabe fehlt/ }).first(); await z.click(); await p.waitForTimeout(1200); await foto("pflicht-unklar"); await knopf("Angabe ergänzen").click(); await p.waitForTimeout(1000); await foto("angabe-ergaenzen"); await p.getByLabel("Später weitermachen").click(); await p.waitForTimeout(600); await p.getByLabel("Schließen").last().click(); await p.waitForTimeout(600); await zurueck(); });
+try {
+  await p.goto("http://localhost:4998/");
+  await warte(2500);
+  pruefe(await sichtbar("Wähle aus, was du brauchst"), "Startseite zeigt keine Auswahl");
+  pruefe(await sichtbar("Betrieb eintragen"), "Hinweis „Betrieb eintragen“ fehlt bei leerem Betrieb");
+  await foto("start");
 
-await schritt("finanzen", async () => { await tab("Finanzen").click(); await foto("finanzen", true); });
-await schritt("angaben", async () => { await knopf("Angaben und Kunden").click(); await foto("angaben"); 
-  const fill = async (label, wert) => p.getByLabel(label, { exact: true }).last().fill(wert);
-  await fill("Straße und Hausnummer", "Torstraße 1"); await fill("PLZ", "10119"); await fill("Ort", "Berlin"); await fill("E-Mail-Adresse", "lena@example.org"); await fill("Steuernummer", "13/123/45678");
-  await knopf("Angaben speichern").click(); await p.waitForTimeout(500);
-  await knopf("Kunden anlegen").click(); await fill("Name", "Studio Nord"); await knopf("Kunden anlegen").click(); await p.waitForTimeout(600); await foto("angaben-gespeichert", true); await zurueck(); });
-await schritt("rechnung", async () => { await p.getByRole("button", { name: /^Rechnungen/ }).last().click(); await foto("rechnungen"); await knopf("Neue Rechnung").click(); await p.waitForTimeout(800);
-  await p.getByRole("radio", { name: "Studio Nord" }).click();
-  await p.getByLabel("Leistungsdatum").last().fill("01.10.2026");
-  await p.getByLabel("Bezeichnung").last().fill("Logo-Entwurf"); await p.getByLabel("Einzelpreis netto (€)").last().fill("850");
-  await foto("rechnung-entwurf", true); await knopf("Rechnung stellen").click(); await p.waitForTimeout(1200); await foto("rechnung-gestellt", true); await zurueck(); await foto("rechnungen-liste"); await zurueck(); });
-await schritt("ust", async () => { await p.getByRole("button", { name: /^Umsatzsteuer-Voranmeldung/ }).last().click(); await p.getByRole("radio").nth(1).click(); await foto("ust", true); await zurueck(); });
-await schritt("kassen", async () => { await p.getByRole("button", { name: /^Kassen/ }).last().click(); await foto("kassen"); await zurueck(); });
+  // Betrieb eintragen (aus dem Hinweis)
+  await knopf("Betrieb eintragen").click();
+  await warte();
+  await feld("Name des Betriebs").fill("Salon Sonne");
+  await feld("Ort").fill("Musterstadt");
+  await feld("Inhaber/in oder verantwortliche Person").fill("Alex Muster");
+  await foto("betrieb");
+  await knopf("Zurück").click();
+  await warte(800);
+  pruefe(!(await sichtbar("Trag einmal deinen Betrieb ein")), "Hinweis bleibt nach dem Eintragen stehen");
 
-await schritt("personal", async () => { await tab("Personal").click(); await foto("personal"); await knopf("Jemand Neues fängt an").click(); await p.waitForTimeout(600);
-  await p.getByLabel("Vorname").last().fill("Tom"); await p.getByLabel("Nachname").last().fill("Teig"); await p.getByRole("radio", { name: "Minijob" }).click(); await knopf("Heute").last().click();
-  await foto("person-neu"); await knopf("Erfassen").click(); await p.waitForTimeout(1500); await foto("person-checkliste", true); await zurueck(); await foto("personal-mit-team", true); });
-await schritt("zeiten", async () => { await knopf("Arbeitszeiten").first().click(); await foto("zeiten"); await zurueck(); });
-await schritt("unterweisung", async () => { await knopf("Unterweisungen").first().click(); await knopf("Neue Unterweisung").click(); await p.getByLabel("Thema").last().fill("Brandschutz"); await p.getByLabel("Inhalt (was wurde erklärt?)").last().fill("Fluchtwege, Feuerlöscher, Sammelplatz."); await knopf("Anlegen").click(); await p.waitForTimeout(1200); await foto("unterweisung", true); await zurueck(); await zurueck(); });
-await schritt("schwellen", async () => { await knopf("Wenn dein Team wächst").first().click(); await foto("schwellen", true); await zurueck(); });
+  // Vorlage wählen
+  await p.getByRole("button", { name: /^Gefährdungsbeurteilung/ }).first().click();
+  await warte();
+  pruefe(await sichtbar("§ 5 ArbSchG"), "Rechtsgrundlage fehlt auf der Vorlagenseite");
+  await foto("vorlage");
+  await tippe(knopf("Jetzt ausfüllen"));
+  await warte(800);
+  pruefe((await feld("Beurteilt von").inputValue()) === "Alex Muster", "„Beurteilt von“ nicht aus dem Betrieb vorausgefüllt");
+  pruefe(await sichtbar("Fehlt noch"), "„Fehlt noch“ fehlt bei leerer Unterlage");
+  await feld("Arbeitsbereich oder Gewerk").fill("Salon");
+  await feld("Gefährdung").fill("Rutschgefahr durch nassen Boden");
+  await feld("Maßnahme").fill("Boden nach jedem Kunden fegen");
+  await p.getByRole("radio", { name: "hoch" }).locator("visible=true").last().click();
+  await warte();
+  await foto("formular");
+  pruefe(await sichtbar("Alle Pflichtangaben ausgefüllt"), "Unterlage trotz aller Angaben nicht vollständig");
+  // zweite Gefährdung: hinzufügen klappt sie auf, Entfernen nimmt sie wieder weg
+  await tippe(knopf("Gefährdung hinzufügen"));
+  await warte();
+  pruefe(await sichtbar("Gefährdung 2 (noch leer)"), "neuer Eintrag nicht aufgeklappt");
+  await tippe(knopf("Entfernen"));
+  await warte();
+  pruefe(await sichtbar("Alle Pflichtangaben ausgefüllt"), "Entfernen des leeren Eintrags hat nicht geklappt");
 
-await schritt("mehr", async () => { await tab("Mehr").click(); await foto("mehr", true); });
-await schritt("gruendung", async () => { await knopf("Gründung").first().click(); await foto("gruendung", true); const fb = p.getByRole("button", { name: "Fragebogen vorbereiten" }); if (await fb.count()) { await fb.click(); await foto("fragebogen", true); await zurueck(); } await zurueck(); });
-await schritt("postfach", async () => { await knopf("Behördenbriefe").first().click(); await foto("postfach"); await zurueck(); });
-await schritt("melden", async () => { await knopf("Änderung melden").first().click(); await foto("melden"); await zurueck(); });
-await schritt("team", async () => { await p.getByRole("button", { name: /^Team/ }).last().click(); await foto("team"); await zurueck(); });
-await schritt("hilfe", async () => { await knopf("Hilfe und Fachbegriffe").first().click(); await foto("hilfe"); await zurueck(); });
-await schritt("einstellungen", async () => { await knopf("Einstellungen").first().click(); await foto("einstellungen", true); await zurueck(); });
-await schritt("heute-ende", async () => { await tab("Heute").click(); await foto("heute-ende", true); });
-console.log(fehler.length ? `BEFUNDE:\n${fehler.join("\n")}` : "ohne Befunde");
-await b.close(); srv.close();
-if (fehler.length) process.exit(1);
+  // PDF (im Web: neues Fenster mit dem Dokument)
+  const [fenster] = await Promise.all([ctx.waitForEvent("page"), knopf("PDF teilen").click()]);
+  await fenster.waitForLoadState();
+  const html = await fenster.content();
+  pruefe(html.includes("Salon Sonne") && html.includes("Rutschgefahr durch nassen Boden") && html.includes("noch nicht fachlich geprüft"), "PDF-Inhalt unvollständig");
+  await fenster.setViewportSize({ width: 794, height: 1123 });
+  await fenster.screenshot({ path: `${OUT}/${String(++n).padStart(2, "0")}-${schema}-dokument.png` });
+  await fenster.close();
+
+  // Meine Unterlagen
+  await p.getByRole("tab", { name: "Meine" }).click();
+  await warte(800);
+  pruefe(await sichtbar("Gefährdungsbeurteilung · Salon"), "Unterlage fehlt unter „Meine“");
+  await foto("meine");
+
+  // Allergene (Mehrfachauswahl), neu aus der Startseite
+  // erneutes Tippen auf den aktiven Tab führt zur Startseite zurück
+  await p.getByRole("tab", { name: "Unterlagen" }).click();
+  await warte();
+  pruefe(await sichtbar("Rutschgefahr durch nassen Boden"), "Tab hat die offene Unterlage nicht behalten");
+  await p.getByRole("tab", { name: "Unterlagen" }).click();
+  await warte(800);
+  await tippe(p.getByRole("button", { name: /^Allergenliste/ }).first());
+  await warte();
+  await tippe(knopf("Jetzt ausfüllen"));
+  await warte(800);
+  await feld("Name").fill("Apfelkuchen");
+  await p.getByRole("checkbox", { name: "Eier" }).locator("visible=true").last().click();
+  await p.getByRole("checkbox", { name: "Milch (einschließlich Laktose)" }).locator("visible=true").last().click();
+  await warte();
+  pruefe(await p.getByRole("checkbox", { name: "Eier" }).locator("visible=true").last().isChecked(), "Allergen nicht ausgewählt");
+  await foto("allergene");
+
+  // Neustart: Daten bleiben
+  await warte(800);
+  await p.reload();
+  await warte(2500);
+  await p.getByRole("tab", { name: "Meine" }).click();
+  await warte(800);
+  pruefe(await sichtbar("Gefährdungsbeurteilung · Salon") && (await sichtbar("Allergenliste")), "Unterlagen nach Neustart verloren");
+
+  // Kopie und Löschen
+  await p.getByRole("button", { name: /^Gefährdungsbeurteilung · Salon/ }).first().click();
+  await warte(800);
+  await tippe(knopf("Kopie anlegen"));
+  await warte(800);
+  await tippe(knopf("Löschen"));
+  await tippe(knopf("Ja, löschen"));
+  await warte(900);
+  await knopf("Zurück").click();
+  await warte(900);
+  pruefe((await p.getByRole("button", { name: /^Gefährdungsbeurteilung · Salon/ }).locator("visible=true").count()) === 1, "Kopie nicht angelegt oder nicht gelöscht");
+
+  // Mein Betrieb: Daten bleiben, alles löschen
+  await p.getByRole("tab", { name: "Mein Betrieb" }).click();
+  await warte(800);
+  pruefe((await feld("Name des Betriebs").inputValue()) === "Salon Sonne", "Betrieb nach Neustart verloren");
+  await foto("mein-betrieb");
+  await tippe(knopf("Alle Daten löschen"));
+  await tippe(knopf("Ja, löschen"));
+  await warte(800);
+  pruefe((await feld("Name des Betriebs").inputValue()) === "", "Betrieb nach „alles löschen“ nicht leer");
+  await p.getByRole("tab", { name: "Meine" }).click();
+  await warte(800);
+  pruefe(await sichtbar("Noch keine Unterlagen"), "Unterlagen nach „alles löschen“ noch da");
+  await foto("leer");
+  if (befunde.length) throw new Error(befunde.join("\n"));
+  console.log(`✓ Rundgang ${schema} ohne Befunde (${n} Bilder in ${OUT})`);
+} catch (e) {
+  await foto("befund").catch(() => undefined);
+  console.error(e.message);
+  if (befunde.length) console.error(befunde.join("\n"));
+  process.exitCode = 1;
+} finally {
+  await browser.close();
+  srv.close();
+}

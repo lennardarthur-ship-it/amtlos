@@ -1,31 +1,29 @@
-# Amtlos – mobile App (Expo)
+# Amtlos – iPhone-App: Unterlagen (Expo)
 
-React Native mit Expo SDK 57, geteilte Texte aus `@amtlos/i18n` (Deutsch/Englisch), dieselbe API wie die Web-App (E-108).
+**Welche Unterlage brauchst du? → ausfüllen → fertiges PDF.** Keine Erinnerungen, kein Fragebogen, kein Konto (E-121).
 
-Zuerst für iPhone gebaut (E-117): Fristblatt, SF Symbols, Tableiste mit Unschärfe, Erledigt-Stempel mit Haptik.
+- **Unterlagen:** 15 Vorlagen für Dokumente, die kleine Betriebe vorweisen können müssen – Arbeitsschutz, Datenschutz,
+  Personal, Steuern, Gastronomie, Beauty. Je Vorlage: wozu, Rechtsgrundlage und Quellen aus dem Katalog.
+- **Meine:** angelegte Unterlagen bearbeiten, als PDF teilen oder drucken, kopieren (z. B. nächster Monat), löschen.
+- **Mein Betrieb:** einmal eintragen – steht im Kopf jeder Unterlage und füllt Namen und Kontakt vor.
 
-**Funktionen (E-120):** alles aus dem Kernumfang der Web-App – Heute, Pflichten (mit Kalender und „Angabe ergänzen“),
-Finanzen (Beleg fotografieren, Rechnungen, Belege, USt-Voranmeldung, Kassen, Angaben und Kunden), Personal (Stempeln
-auch offline, Team mit Checklisten, Arbeitszeiten, Unterweisungen, Schwellenwerte), Mehr (Gründung mit Fragebogen,
-Behördenbriefe, Kalender, Änderung melden, Team, Hilfe, Einstellungen). Nicht in der App: Dateien herunterladen und Abo.
-Rundgang durch alle Bereiche ohne Server: `e2e/rundgang.mjs` (Kopf der Datei).
+Alles bleibt auf dem Gerät (AsyncStorage). Die Vorlagen (Formular und HTML-Dokument) liegen in
+`@amtlos/fachlogik` (`src/dokumente`), die PDF-Erzeugung macht expo-print, das Teilen expo-sharing.
+Jedes PDF trägt „Vorlage noch nicht fachlich geprüft“, bis die Vorlagen freigegeben sind (PRUEFLISTE T-52 bis T-57).
 
 ```bash
-pnpm --filter @amtlos/mobile start          # Expo Dev Server (Expo Go oder Development Build)
-pnpm --filter @amtlos/mobile test           # Kernlogik: API-Client, Offline-Warteschlange, Zeit
+pnpm --filter @amtlos/mobile start          # Expo Dev Server (Expo Go)
+pnpm --filter @amtlos/mobile test           # Speicher, Katalogauszug
+pnpm --filter @amtlos/fachlogik test        # Vorlagen: Katalogabdeckung, Pflichtangaben, Dokumente, 72-h-Frist
 pnpm --filter @amtlos/mobile typecheck
-cd apps/mobile && npx expo export --platform ios       # Bündel prüfen (CI: android)
-cd apps/web && node ../mobile/e2e/schau.mjs <web-export> <bilder> <kennung>   # Bildschirmfotos über den Web-Export, siehe Kopf der Datei
+cd apps/mobile && npx expo export --platform ios                                # Bündel prüfen
+cd apps/mobile && node e2e/rundgang.mjs <web-export> <bilder>                   # Rundgang, siehe Kopf der Datei
+node werkzeuge/katalog-buendel.mjs          # nach Katalogänderungen: Katalogauszug neu schreiben
 ```
 
-**Auf dem iPhone testen (ohne Server):** `bash werkzeuge/testpaket.sh <ordner>` baut ein eigenständiges Paket mit
-Anleitung (`LIESMICH.txt`): Node installieren, `npm install`, `npx expo start`, QR-Code mit Expo Go öffnen, „Ohne Konto
-ausprobieren“. Die Demo startet leer und rechnet auf dem Gerät mit Engine und Katalog (E-119); nach Katalogänderungen
-`node werkzeuge/katalog-buendel.mjs` ausführen.
+**Auf dem iPhone testen:** `bash werkzeuge/testpaket.sh <ordner>` (vorher `pnpm build`) baut ein eigenständiges Paket
+mit Anleitung (`LIESMICH.txt`): Node installieren, `npm install`, `npx expo start`, QR-Code mit Expo Go öffnen.
 
-**Konfiguration** (`app.json` → `expo.extra`): `apiUrl`, `authModus` (`demo` = nur Demo ohne Server; `dev` = Anmeldung mit Kennung über
-`POST /v1/dev/token`, nur wenn die API mit `AUTH_MODUS=dev` läuft; `oidc` = Identity-Provider mit PKCE),
-`oidcIssuer`, `oidcClientId`, `eas.projectId` (für Push-Tokens).
-
-**Offen vor Store-Veröffentlichung:** Identity-Provider (Zitadel, E-061), EAS-Projekt und Signierschlüssel,
-Push-Anbieter und AVV (T-41), Store-Regeln zum Abo-Hinweis (T-49), Store-Texte und Datenschutzangaben, Tests auf echten Geräten (VoiceOver/TalkBack).
+**Offen vor Store-Veröffentlichung:** fachliche Freigabe der Vorlagen (T-52 ff.), EAS-Projekt und Signierschlüssel,
+Store-Texte und Datenschutzangaben, Test auf echten Geräten (PDF-Ränder und Querformat, VoiceOver), Datensicherung
+wiederherstellen (bisher nur exportieren).

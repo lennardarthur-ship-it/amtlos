@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Animated, Dimensions, Easing, PanResponder, Pressable, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useAmtlos } from "../zustand";
+import { T as TEXT } from "../texte";
 import { Symbol, T } from "./bausteine";
 import { RAND, ZIEL, useFarben } from "./thema";
 
@@ -100,15 +100,14 @@ export function Stapel({ wurzel, zuruecksetzen }: { wurzel: ReactNode; zurueckse
 
 /** Kopf einer Unterseite: Zurück links, Titel in der Mitte, optional eine Handlung rechts. */
 export function Unterseite({ titel, children, rechts }: { titel: string; children: ReactNode; rechts?: ReactNode }) {
-  const { t } = useAmtlos();
   const f = useFarben();
   const nav = useNav();
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: f.papier }} edges={["top", "left", "right"]}>
       <View style={{ height: 48, flexDirection: "row", alignItems: "center", paddingHorizontal: RAND - 12, borderBottomWidth: 0.5, borderColor: f.linie }}>
-        <Pressable accessibilityRole="button" accessibilityLabel={t.mobil.zurueck} onPress={nav.zurueck} hitSlop={8} style={{ minWidth: ZIEL + 40, height: ZIEL, flexDirection: "row", alignItems: "center", gap: 2 }}>
+        <Pressable accessibilityRole="button" accessibilityLabel={TEXT.zurueck} onPress={nav.zurueck} hitSlop={8} style={{ minWidth: ZIEL + 40, height: ZIEL, flexDirection: "row", alignItems: "center", gap: 2 }}>
           <Symbol name="chevron.left" groesse={20} farbe={f.amt} gewicht="semibold" />
-          <T farbe={f.amt}>{t.mobil.zurueck}</T>
+          <T farbe={f.amt}>{TEXT.zurueck}</T>
         </Pressable>
         <T fett numberOfLines={1} accessibilityRole="header" stil={{ flex: 1, textAlign: "center", marginHorizontal: 4 }}>{titel}</T>
         <View style={{ minWidth: ZIEL + 40, alignItems: "flex-end" }}>{rechts}</View>

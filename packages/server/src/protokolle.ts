@@ -4,6 +4,10 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import fontkit from "@cantoo/fontkit";
 import { PDFDocument, rgb, type PDFFont, type PDFPage } from "@cantoo/pdf-lib";
+import { ALLERGENE, DATENPANNE_RISIKO, GEFAEHRDUNGSFAKTOREN, RISIKO_STUFEN, SCHUTZZIELE } from "@amtlos/fachlogik";
+
+/** Bezeichnungen liegen in @amtlos/fachlogik und werden mit den Dokumentvorlagen der App geteilt (E-121). */
+export { ALLERGENE, GEFAEHRDUNGSFAKTOREN, SCHUTZZIELE };
 
 const SCHRIFTEN = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../schriften");
 const datumDe = (d: string) => d.slice(0, 10).split("-").reverse().join(".");
@@ -127,17 +131,7 @@ async function satz(titel: string, autor: string) {
   return { text, zeile, absatz, platz, fertig, normal, fett };
 }
 
-/** Gefährdungsfaktoren in der Reihenfolge von § 5 Abs. 3 ArbSchG (Wortlaut fachlich zu prüfen, T-18). */
-export const GEFAEHRDUNGSFAKTOREN: Record<string, string> = {
-  arbeitsstaette: "Gestaltung und Einrichtung der Arbeitsstätte und des Arbeitsplatzes",
-  einwirkungen: "Physikalische, chemische und biologische Einwirkungen",
-  arbeitsmittel: "Arbeitsmittel, Maschinen, Geräte und Anlagen und der Umgang damit",
-  ablaeufe_arbeitszeit: "Arbeitsverfahren, Arbeitsabläufe und Arbeitszeit",
-  qualifikation: "Unzureichende Qualifikation und Unterweisung",
-  psychisch: "Psychische Belastungen bei der Arbeit",
-  sonstiges: "Sonstige Gefährdungen",
-};
-const RISIKO: Record<string, string> = { gering: "gering", mittel: "mittel", hoch: "hoch" };
+const RISIKO = RISIKO_STUFEN;
 
 export interface GefaehrdungsbeurteilungDaten {
   unternehmen: string;
@@ -227,16 +221,6 @@ export async function gefahrstoffverzeichnisPdf(v: GefahrstoffVerzeichnis): Prom
 
 // ------------------------------------------------------------ Datenschutz (Abschnitt 6)
 
-/** Schutzziele nach Art. 32 Abs. 1 DSGVO (Wortlaut fachlich zu prüfen, T-22). */
-export const SCHUTZZIELE: Record<string, string> = {
-  pseudonymisierung_verschluesselung: "Pseudonymisierung und Verschlüsselung",
-  vertraulichkeit: "Vertraulichkeit",
-  integritaet: "Integrität",
-  verfuegbarkeit_belastbarkeit: "Verfügbarkeit und Belastbarkeit",
-  wiederherstellung: "Rasche Wiederherstellung nach einem Zwischenfall",
-  ueberpruefung: "Regelmäßige Überprüfung der Wirksamkeit",
-  sonstiges: "Sonstige Maßnahmen",
-};
 
 export interface DatenschutzDokumentation {
   unternehmen: string;
@@ -314,7 +298,7 @@ export interface DatenpanneMeldung {
  */
 export async function datenpanneMeldungPdf(m: DatenpanneMeldung): Promise<Buffer> {
   const s = await satz("Datenpanne", m.unternehmen);
-  const RISIKO: Record<string, string> = { kein_risiko: "voraussichtlich kein Risiko – keine Meldung, nur Dokumentation", risiko: "Risiko – Meldung an die Aufsichtsbehörde", hohes_risiko: "hohes Risiko – Meldung und Benachrichtigung der Betroffenen prüfen" };
+  const RISIKO = DATENPANNE_RISIKO;
   s.text(m.unternehmen, 50, 9, s.fett);
   s.zeile(30);
   s.text(m.gemeldet_am ? "Meldung einer Datenpanne (Dokumentation)" : "Datenpanne – Meldeentwurf und Dokumentation", 50, 15, s.fett);
@@ -349,23 +333,6 @@ export async function datenpanneMeldungPdf(m: DatenpanneMeldung): Promise<Buffer
 
 // ------------------------------------------------------------ Branchen (Abschnitt 8)
 
-/** Die 14 Hauptallergene nach Anhang II der LMIV (Bezeichnungen fachlich zu prüfen, E-099). */
-export const ALLERGENE: Record<string, string> = {
-  gluten: "Glutenhaltiges Getreide",
-  krebstiere: "Krebstiere",
-  eier: "Eier",
-  fische: "Fische",
-  erdnuesse: "Erdnüsse",
-  soja: "Soja",
-  milch: "Milch (einschließlich Laktose)",
-  schalenfruechte: "Schalenfrüchte",
-  sellerie: "Sellerie",
-  senf: "Senf",
-  sesam: "Sesamsamen",
-  schwefeldioxid: "Schwefeldioxid und Sulphite",
-  lupinen: "Lupinen",
-  weichtiere: "Weichtiere",
-};
 
 export interface AllergenAushang {
   unternehmen: string;

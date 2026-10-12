@@ -1,63 +1,16 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { RefreshControl, ScrollView, View, type ScrollViewProps } from "react-native";
-import { ApiFehler, NetzFehler } from "../kern/api";
+import type { ReactNode } from "react";
+import { ScrollView, View, type ScrollViewProps } from "react-native";
+import type { Bereich } from "@amtlos/fachlogik";
 import { T } from "../ui/bausteine";
 import { RAND, useFarben } from "../ui/thema";
-import { useAmtlos } from "../zustand";
 
-/** Lädt Daten von der API, mit Ziehen zum Aktualisieren und verständlichen Fehlern. */
-export function useLaden<T>(laden: () => Promise<T>, abh: unknown[]) {
-  const { t, stand } = useAmtlos();
-  const [daten, setDaten] = useState<T | null>(null);
-  const [fehler, setFehler] = useState<string | null>(null);
-  const [laedt, setLaedt] = useState(false);
-  const neu = useCallback(async () => {
-    setLaedt(true);
-    try {
-      setDaten(await laden());
-      setFehler(null);
-    } catch (e) {
-      setFehler(e instanceof NetzFehler ? t.mobil.fehler_netz : e instanceof ApiFehler ? e.message : String(e));
-    } finally {
-      setLaedt(false);
-    }
-    // abh: bewusst vom Aufrufer bestimmt (z. B. Unternehmen), nicht die Ladefunktion selbst
-  }, abh);
-  useEffect(() => {
-    void neu();
-  }, [neu]);
-  // Nach Änderungen irgendwo in der App still neu laden (ohne Ladekreisel), damit nichts veraltet
-  const erstes = useRef(true);
-  useEffect(() => {
-    if (erstes.current) {
-      erstes.current = false;
-      return;
-    }
-    laden().then(
-      (d) => setDaten(d),
-      () => undefined,
-    );
-    // bewusst nur bei Änderungen des Stands
-  }, [stand]);
-  return { daten, fehler, laedt, neu };
-}
-
-/** Seitenrahmen mit großem Titel (iOS-Stil) und optionaler Unterzeile, z. B. dem heutigen Datum. */
-export function Seite({ titel, unterzeile, laedt, neu, children, kopfRechts, ...rest }: ScrollViewProps & { titel: string; unterzeile?: string; laedt?: boolean; neu?: () => void; kopfRechts?: ReactNode }) {
-  const f = useFarben();
+/** Seitenrahmen mit großem Titel (iOS-Stil) und optionaler Unterzeile. */
+export function Seite({ titel, unterzeile, children, ...rest }: ScrollViewProps & { titel: string; unterzeile?: string }) {
   return (
-    <ScrollView
-      contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 8, paddingBottom: 120 }}
-      contentInsetAdjustmentBehavior="automatic"
-      refreshControl={neu ? <RefreshControl refreshing={Boolean(laedt)} onRefresh={neu} tintColor={f.tinteLeise} /> : undefined}
-      {...rest}
-    >
-      <View style={{ flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 20 }}>
-        <View style={{ flex: 1 }}>
-          {unterzeile ? <T v="klein" leise>{unterzeile}</T> : null}
-          <T v="grossTitel" accessibilityRole="header">{titel}</T>
-        </View>
-        {kopfRechts}
+    <ScrollView contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 8, paddingBottom: 120 }} contentInsetAdjustmentBehavior="automatic" keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets {...rest}>
+      <View style={{ marginBottom: 16 }}>
+        <T v="grossTitel" accessibilityRole="header">{titel}</T>
+        {unterzeile ? <T leise stil={{ marginTop: 4 }}>{unterzeile}</T> : null}
       </View>
       {children}
     </ScrollView>
@@ -65,73 +18,46 @@ export function Seite({ titel, unterzeile, laedt, neu, children, kopfRechts, ...
 }
 
 /** Leerer Zustand als Einladung: ein Satz, was jetzt sinnvoll ist. */
-export function Leer({ text }: { text: string }) {
+export function Leer({ text, children }: { text: string; children?: ReactNode }) {
   const f = useFarben();
   return (
-    <View style={{ paddingVertical: 28, paddingHorizontal: 16, borderRadius: 14, backgroundColor: f.amtHauch }}>
-      <T fett farbe={f.amt}>{text}</T>
+    <View style={{ paddingVertical: 24, paddingHorizontal: 16, borderRadius: 14, backgroundColor: f.amtHauch, gap: 14 }}>
+      <T fett farbe={f.amtTief}>{text}</T>
+      {children}
     </View>
   );
 }
 
-/** Inhalt einer Unterseite: scrollbar, Ziehen zum Aktualisieren, Platz für die Tab-Leiste. */
-export function Inhalt({ laedt, neu, children, ...rest }: ScrollViewProps & { laedt?: boolean; neu?: () => void }) {
-  const f = useFarben();
+/** Inhalt einer Unterseite: scrollbar, Platz für die Tab-Leiste, Tastatur schiebt mit. */
+export function Inhalt({ children, ...rest }: ScrollViewProps) {
   return (
-    <ScrollView
-      contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 16, paddingBottom: 120 }}
-      keyboardShouldPersistTaps="handled"
-      keyboardDismissMode="interactive"
-      automaticallyAdjustKeyboardInsets
-      refreshControl={neu ? <RefreshControl refreshing={Boolean(laedt)} onRefresh={neu} tintColor={f.tinteLeise} /> : undefined}
-      {...rest}
-    >
+    <ScrollView contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 16, paddingBottom: 140 }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" automaticallyAdjustKeyboardInsets {...rest}>
       {children}
     </ScrollView>
   );
 }
 
-/** Fehler der API in einen Satz: Meldung und, falls vorhanden, die fehlenden Angaben. */
-export function fehlerText(e: unknown, netz: string): string {
-  if (e instanceof NetzFehler) return netz;
-  if (e instanceof ApiFehler) return e.message;
-  return String(e);
-}
-
-/** Eine Handlung mit Ladezustand und Fehlermeldung (Speichern, Stellen, Löschen …). */
-export function useAktion() {
-  const { t } = useAmtlos();
-  const [laedt, setLaedt] = useState(false);
-  const [fehler, setFehler] = useState<string | null>(null);
-  const [meldung, setMeldung] = useState<string | null>(null);
-  const ausfuehren = useCallback(
-    async <T,>(f: () => Promise<T>, erfolg?: string): Promise<T | undefined> => {
-      setLaedt(true);
-      setFehler(null);
-      setMeldung(null);
-      try {
-        const r = await f();
-        if (erfolg) setMeldung(erfolg);
-        return r;
-      } catch (e) {
-        setFehler(fehlerText(e, t.mobil.fehler_netz));
-        return undefined;
-      } finally {
-        setLaedt(false);
-      }
-    },
-    [t],
-  );
-  return { laedt, fehler, meldung, ausfuehren, setFehler, setMeldung };
-}
-
 /** Abschnittstitel klein über einer Karte, wie in iOS-Einstellungen. */
-export function Gruppe({ titel, children, fuss }: { titel?: string; children: ReactNode; fuss?: string }) {
+export function Gruppe({ titel, children, fuss, hilfe }: { titel?: string; children: ReactNode; fuss?: string; hilfe?: string }) {
   return (
     <View style={{ marginTop: 24 }}>
-      {titel ? <T v="klein" fett leise stil={{ marginBottom: 8, marginLeft: 4 }}>{titel}</T> : null}
+      {titel ? <T v="klein" fett leise accessibilityRole="header" stil={{ marginBottom: hilfe ? 2 : 8, marginLeft: 4 }}>{titel}</T> : null}
+      {hilfe ? <T v="caption" leise stil={{ marginBottom: 8, marginLeft: 4 }}>{hilfe}</T> : null}
       {children}
       {fuss ? <T v="caption" leise stil={{ marginTop: 6, marginLeft: 4 }}>{fuss}</T> : null}
     </View>
   );
 }
+
+/** Symbol je Bereich. */
+export const BEREICH_SYMBOL: Record<Bereich, string> = {
+  arbeitsschutz: "hammer",
+  datenschutz: "lock.shield",
+  personal: "person.2",
+  steuern: "building.columns",
+  gastro: "fork.knife",
+  beauty: "scissors",
+};
+
+/** ISO-Zeitpunkt → TT.MM.JJJJ (deutsche Ortszeit). */
+export const datumKurz = (iso: string) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(iso));
