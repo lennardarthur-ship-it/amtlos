@@ -2,10 +2,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { BEREICHE, PRUEFHINWEIS, VORLAGEN, berlinZuUtc, dateiname, fehlendeAngaben, leereDaten, neuerEintrag, sichtbar, unterlagenName, vorlageFuer, type Betrieb, type Daten, type Feld } from "../src/index.js";
+import { BEREICHE, LEERER_BETRIEB, PRUEFHINWEIS, VORLAGEN, arbeitsminuten, aufbewahrenBis, berlinZuUtc, cent, dateiname, fehlendeAngaben, leereDaten, neuerEintrag, sichtbar, unterlagenName, vorlageFuer, type Betrieb, type Daten, type Feld } from "../src/index.js";
 
 const KATALOG = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../catalog/pflichten");
-const BETRIEB: Betrieb = { name: "Salon Sonne", strasse: "Hauptstr. 1", plz: "12345", ort: "Musterstadt", verantwortlich: "Alex Muster", telefon: "0123 456", email: "info@example.de" };
+const BETRIEB: Betrieb = { name: "Salon Sonne", strasse: "Hauptstr. 1", plz: "12345", ort: "Musterstadt", verantwortlich: "Alex Muster", telefon: "0123 456", email: "info@example.de", steuernummer: "12/345/67890", ust_idnr: "", iban: "DE00 1234" };
 
 function generatorPflichten(): string[] {
   return fs
@@ -14,6 +14,10 @@ function generatorPflichten(): string[] {
     .map((f) => f.replace(/\.yaml$/, ""));
 }
 
+/** Geldbeträge enthalten ein geschütztes Leerzeichen vor „€“. */
+const n = <T,>(x: T): T => JSON.parse(JSON.stringify(x).replace(/\u00a0/g, " ")) as T;
+const erg = (v: { ergebnis?: (d: Daten) => [string, string][] }, d: Daten) => n(v.ergebnis!(d));
+
 /** Füllt jedes Feld mit einem Beispielwert (Listen mit zwei Einträgen). */
 function alles(felder: Feld[], tiefe = 0): Daten {
   const d: Daten = {};
@@ -21,6 +25,8 @@ function alles(felder: Feld[], tiefe = 0): Daten {
     if (f.art === "liste") d[f.id] = [0, 1].map(() => alles(f.felder, tiefe + 1) as Record<string, string>);
     else if (f.art === "datum") d[f.id] = "2026-10-12";
     else if (f.art === "uhrzeit") d[f.id] = "09:30";
+    else if (f.art === "betrag") d[f.id] = "1.234,50";
+    else if (f.art === "zahl") d[f.id] = "2";
     else if (f.art === "schalter") d[f.id] = true;
     else if (f.art === "wahl") d[f.id] = f.optionen[0]!.wert;
     else if (f.art === "mehrfach") d[f.id] = f.optionen.slice(0, 2).map((o) => o.wert);
@@ -127,5 +133,60 @@ describe("Dokumentvorlagen", () => {
     expect((uh.match(/<tr><td>/g) ?? []).length).toBe(8); // Kim + 7 freie Zeilen
     const h = vorlageFuer("haccp")!;
     expect((h.html({ zeitraum: "Okt", leerzeilen: true, messungen: [] }, BETRIEB).match(/<tr><td>/g) ?? []).length).toBe(14);
+  });
+
+  it("liest Beträge deutsch und englisch geschrieben", () => {
+    expect(cent("1.234,56")).toBe(123456);
+    expect(cent("12,5")).toBe(1250);
+    expect(cent("12.50")).toBe(1250);
+    expect(cent("1.000")).toBe(100000);
+    expect(cent("12 €")).toBe(1200);
+    expect(cent("")).toBeNull();
+    expect(cent("abc")).toBeNull();
+  });
+
+  it("Rechnung: Summen je Steuersatz, Kleinunternehmer-Hinweis, fehlende Steuernummer im Betrieb", () => {
+    const r = vorlageFuer("rechnung")!;
+    const d = { ...leereDaten(r, BETRIEB, "2026-10-12"), nummer: "2026-001", leistung: "Oktober 2026", kunde_name: "Kim", kunde_anschrift: "Weg 1",
+      positionen: [{ bezeichnung: "Haarschnitt", menge: "2", einheit: "", preis: "25,00", satz: "19" }, { bezeichnung: "Buch", menge: "1", einheit: "", preis: "10", satz: "7" }] };
+    expect(erg(r, d)).toEqual([["Netto", "60,00 €"], ["Umsatzsteuer", "10,20 €"], ["Gesamt", "70,20 €"]]);
+    expect(fehlendeAngaben(r, d, BETRIEB)).toEqual([]);
+    expect(fehlendeAngaben(r, d, { ...BETRIEB, steuernummer: "" })).toEqual(["Steuernummer oder USt-IdNr. (Mein Betrieb)"]);
+    const ku = r.html({ ...d, kleinunternehmer: true }, BETRIEB);
+    expect(ku).toContain("§ 19 UStG");
+    expect(n(ku)).toContain("60,00 €");
+    expect(ku).not.toContain("Umsatzsteuer 19 %");
+  });
+
+  it("USt-Voranmeldung, EÜR und Kassenbuch rechnen", () => {
+    const u = vorlageFuer("ust_voranmeldung")!;
+    expect(erg(u, { umsatz_19: "1.000", umsatz_7: "100", vorsteuer: "50" })).toEqual([["Umsatzsteuer", "197,00 €"], ["Vorsteuer", "50,00 €"], ["Zahllast", "147,00 €"]]);
+    expect(erg(u, { umsatz_19: "", vorsteuer: "30" })[2]).toEqual(["Erstattung", "30,00 €"]);
+    const e = vorlageFuer("euer")!;
+    expect(erg(e, { einnahmen: [{ text: "a", betrag: "5000" }], ausgaben: [{ text: "b", betrag: "1200,50" }], afa: [{ text: "c", betrag: "300" }] })).toEqual([["Einnahmen", "5.000,00 €"], ["Ausgaben", "1.500,50 €"], ["Überschuss", "3.499,50 €"]]);
+    const k = vorlageFuer("kassenbuch")!;
+    expect(erg(k, { anfang: "100", eintraege: [{ text: "Einnahmen", einnahme: "50" }, { text: "Einkauf", ausgabe: "30" }] })).toEqual([["Endbestand", "120,00 €"]]);
+    expect(erg(k, { anfang: "10", eintraege: [{ text: "Einkauf", ausgabe: "30" }, { text: "Einnahme", einnahme: "50" }] })[1]![0]).toBe("Achtung");
+  });
+
+  it("Arbeitszeit und Aufbewahrung", () => {
+    expect(arbeitsminuten("08:00", "16:30", "30")).toBe(480);
+    expect(arbeitsminuten("22:00", "06:00", "")).toBe(480);
+    expect(arbeitsminuten("8", "16:00", "")).toBeNull();
+    expect(erg(vorlageFuer("arbeitszeitnachweis")!, { tage: [{ beginn: "08:00", ende: "12:15", pause: "" }, { beginn: "13:00", ende: "17:00", pause: "15" }] })).toEqual([["Arbeitszeit im Monat", "8:00 h"]]);
+    expect(aufbewahrenBis("2025", "8")).toBe("31.12.2033");
+    expect(aufbewahrenBis("", "8")).toBeNull();
+    const a = leereDaten(vorlageFuer("aufbewahrung")!, BETRIEB, "2026-10-12");
+    expect((a.eintraege as { jahre: string }[]).map((x) => x.jahre)).toEqual(["10", "8", "6"]);
+  });
+
+  it("Impressum und Datenschutzerklärung als Text zum Einfügen", () => {
+    const i = vorlageFuer("impressum")!;
+    const t = i.alsText!({ rechtsform: "Einzelunternehmen", vertreten: "Alex Muster", register: "" }, BETRIEB);
+    expect(t).toContain("Impressum\n\nAngaben zum Anbieter\nSalon Sonne\nHauptstr. 1\n12345 Musterstadt");
+    expect(t).toContain("E-Mail: info@example.de");
+    expect(t).not.toContain("Registereintrag");
+    expect(fehlendeAngaben(i, {}, LEERER_BETRIEB)).toContain("E-Mail (Mein Betrieb)");
+    expect(vorlageFuer("datenschutzerklaerung_website")!.alsText!({ hosting: "Anbieter X" }, BETRIEB)).toContain("Hosting\nAnbieter X");
   });
 });

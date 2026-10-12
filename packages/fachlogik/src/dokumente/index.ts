@@ -1,5 +1,9 @@
 /** Dokumentvorlagen (E-121): Verzeichnis und Hilfen für Formulare. */
-import { betriebsanweisung, gefaehrdungsbeurteilung, gefahrstoffverzeichnis, unterweisung } from "./arbeitsschutz.js";
+import { betriebsanweisung, elektroPruefung, gefaehrdungsbeurteilung, gefahrstoffverzeichnis, unterweisung } from "./arbeitsschutz.js";
+import { gewerbeanmeldung, handelsregister, transparenzregister } from "./betrieb.js";
+import { aufbewahrung, bilanzGuv, euer, kassenbuch, kassenmeldung, rechnung, steuererklaerung, ustVoranmeldung } from "./buchhaltung.js";
+import { arbeitszeitnachweis, lohnkonto, svMeldedaten } from "./lohn.js";
+import { auftragsverarbeitung, datenschutzerklaerungWebsite, impressum } from "./website.js";
 import { allergenAushang, haccp, hautschutzplan, hygieneplan, ifsgBelehrung } from "./branchen.js";
 import { datenpanne, datenschutzDokumentation, datenschutzinformation } from "./datenschutz.js";
 import { kiKompetenz, nachweisArbeitsbedingungen } from "./personal.js";
@@ -10,27 +14,55 @@ export * from "./typen.js";
 export { ALLERGENE, DATENPANNE_RISIKO, GEFAEHRDUNGSFAKTOREN, RISIKO_STUFEN, SCHUTZZIELE } from "./konstanten.js";
 export { PRUEFHINWEIS } from "./html.js";
 export { berlinZuUtc } from "./datenschutz.js";
+export { aufbewahrenBis } from "./buchhaltung.js";
+export { arbeitsminuten } from "./lohn.js";
+export { cent } from "./html.js";
 
 export const BEREICHE: { id: Bereich; titel: string }[] = [
-  { id: "arbeitsschutz", titel: "Arbeitsschutz" },
+  { id: "steuern", titel: "Steuern und Buchhaltung" },
   { id: "datenschutz", titel: "Datenschutz" },
   { id: "personal", titel: "Personal" },
-  { id: "steuern", titel: "Steuern" },
+  { id: "arbeitsschutz", titel: "Arbeitsschutz" },
+  { id: "betrieb", titel: "Betrieb, Register und Website" },
   { id: "gastro", titel: "Gastronomie und Lebensmittel" },
   { id: "beauty", titel: "Beauty und Kosmetik" },
 ];
 
 export const VORLAGEN: Vorlage[] = [
+  // Steuern und Buchhaltung
+  rechnung,
+  euer,
+  bilanzGuv,
+  ustVoranmeldung,
+  steuererklaerung,
+  verfahrensdokumentation,
+  kassenbuch,
+  kassenmeldung,
+  aufbewahrung,
+  // Datenschutz
+  datenschutzDokumentation,
+  datenschutzerklaerungWebsite,
+  auftragsverarbeitung,
+  datenschutzinformation,
+  datenpanne,
+  // Personal
+  arbeitszeitnachweis,
+  nachweisArbeitsbedingungen,
+  svMeldedaten,
+  lohnkonto,
+  kiKompetenz,
+  // Arbeitsschutz
   gefaehrdungsbeurteilung,
   unterweisung,
   gefahrstoffverzeichnis,
   betriebsanweisung,
-  datenschutzDokumentation,
-  datenschutzinformation,
-  datenpanne,
-  nachweisArbeitsbedingungen,
-  kiKompetenz,
-  verfahrensdokumentation,
+  elektroPruefung,
+  // Betrieb, Register, Website
+  impressum,
+  gewerbeanmeldung,
+  handelsregister,
+  transparenzregister,
+  // Branchen
   ifsgBelehrung,
   allergenAushang,
   haccp,
@@ -59,6 +91,9 @@ function startwert(f: EinfachesFeld, b: Betrieb, heute: string): string | boolea
       return f.vorbelegung === "heute" ? heute : null;
     case "uhrzeit":
       return "";
+    case "betrag":
+    case "zahl":
+      return f.vorbelegung ?? "";
     case "wahl":
       return f.vorbelegung ?? null;
     case "schalter":
@@ -76,27 +111,34 @@ export function neuerEintrag(f: Extract<Feld, { art: "liste" }>, b: Betrieb, heu
 /** Startwerte einer neuen Unterlage, mit Angaben aus „Mein Betrieb“ und dem heutigen Datum. Listen beginnen mit einem Eintrag. */
 export function leereDaten(v: Vorlage, b: Betrieb, heute: string): Daten {
   const d: Daten = {};
-  for (const a of v.abschnitte) for (const f of a.felder) d[f.id] = f.art === "liste" ? [neuerEintrag(f, b, heute)] : startwert(f, b, heute);
+  for (const a of v.abschnitte)
+    for (const f of a.felder) d[f.id] = f.art === "liste" ? (f.start ? f.start.map((e) => ({ ...neuerEintrag(f, b, heute), ...e })) : [neuerEintrag(f, b, heute)]) : startwert(f, b, heute);
   return d;
 }
 
 const gefuellt = (w: unknown) => (typeof w === "string" ? w.trim() !== "" : Array.isArray(w) ? w.length > 0 : w !== null && w !== undefined);
 
+/** Hat der Nutzer in einem Listeneintrag etwas eingetragen? Vorbelegte Felder (Datum, Auswahl, Menge …) zählen nicht. */
+function benutzt(f: Extract<Feld, { art: "liste" }>, e: Eintrag): boolean {
+  return f.felder.some((x) => (x.art === "text" || x.art === "mehrzeilig" || x.art === "betrag" || x.art === "zahl" || x.art === "uhrzeit" || x.art === "mehrfach") && !("vorbelegung" in x && x.vorbelegung) && gefuellt(e[x.id]));
+}
+
 /** Fehlende Pflichtangaben als lesbare Bezeichnungen („Gefährdung 2: Maßnahme“). Hindert das Erstellen nicht. */
-export function fehlendeAngaben(v: Vorlage, d: Daten): string[] {
+export function fehlendeAngaben(v: Vorlage, d: Daten, b?: Betrieb): string[] {
   const fehlt: string[] = [];
   for (const a of v.abschnitte)
     for (const f of a.felder) {
       if (!sichtbar(f, d)) continue;
       if (f.art === "liste") {
         const eintraege = (Array.isArray(d[f.id]) ? d[f.id] : []) as Eintrag[];
-        const benutzt = eintraege.filter((e) => f.felder.some((x) => x.art !== "wahl" && x.art !== "schalter" && x.art !== "datum" && gefuellt(e[x.id])));
-        if (f.pflicht && !benutzt.length) fehlt.push(`mindestens ein Eintrag: ${f.eintrag}`);
-        benutzt.forEach((e, i) => {
-          for (const x of f.felder) if (x.pflicht && sichtbar(x, e) && !gefuellt(e[x.id])) fehlt.push(`${f.eintrag}${benutzt.length > 1 ? ` ${i + 1}` : ""}: ${x.label}`);
+        const genutzt = eintraege.filter((e) => benutzt(f, e));
+        if (f.pflicht && !genutzt.length) fehlt.push(`mindestens ein Eintrag: ${f.eintrag}`);
+        genutzt.forEach((e, i) => {
+          for (const x of f.felder) if (x.pflicht && sichtbar(x, e) && !gefuellt(e[x.id])) fehlt.push(`${f.eintrag}${genutzt.length > 1 ? ` ${i + 1}` : ""}: ${x.label}`);
         });
       } else if (f.pflicht && !gefuellt(d[f.id])) fehlt.push(f.label);
     }
+  if (b && v.pruefen) fehlt.push(...v.pruefen(d, b));
   return fehlt;
 }
 

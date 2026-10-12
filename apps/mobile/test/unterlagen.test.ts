@@ -3,7 +3,7 @@ import { VORLAGEN, fehlendeAngaben, vorlageFuer } from "@amtlos/fachlogik";
 import { pflichtenFuer, rechtsgrundlagen } from "../src/unterlagen/katalog";
 import { LEERER_STAND, aendern, anlegen, betriebFehlt, betriebSetzen, heute, kopieren, loeschen, sortiert, standAus } from "../src/unterlagen/speicher";
 
-const B = { name: "Café Mond", strasse: "Markt 2", plz: "54321", ort: "Beispielstadt", verantwortlich: "Robin Beispiel", telefon: "", email: "" };
+const B = { name: "Café Mond", strasse: "Markt 2", plz: "54321", ort: "Beispielstadt", verantwortlich: "Robin Beispiel", telefon: "", email: "", steuernummer: "", ust_idnr: "", iban: "" };
 const t = (s: string) => new Date(`2026-10-12T${s}:00Z`);
 
 describe("Unterlagen auf dem Gerät", () => {
@@ -38,7 +38,7 @@ describe("Unterlagen auf dem Gerät", () => {
   it("findet zu jeder Vorlage die Pflichten im Katalogauszug mit Rechtsgrundlage", () => {
     for (const v of VORLAGEN) {
       expect(pflichtenFuer(v).length, v.id).toBe(v.pflichten.length);
-      expect(rechtsgrundlagen(v).length, v.id).toBeGreaterThan(0);
+      if (v.pflichten.length) expect(rechtsgrundlagen(v).length, v.id).toBeGreaterThan(0);
     }
     expect(rechtsgrundlagen(vorlageFuer("gefaehrdungsbeurteilung")!)).toContain("§ 5 ArbSchG");
   });

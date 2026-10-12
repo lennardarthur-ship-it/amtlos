@@ -249,3 +249,64 @@ export const betriebsanweisung: Vorlage = {
     });
   },
 };
+
+const ERGEBNIS: Record<string, string> = { bestanden: "bestanden", maengel: "Mängel – nicht verwenden" };
+
+export const elektroPruefung: Vorlage = {
+  id: "pruefprotokoll_elektro",
+  titel: "Prüfprotokoll elektrische Geräte (DGUV V3)",
+  beschreibung: "Verzeichnis der geprüften Geräte mit Ergebnis und nächstem Prüftermin – zum Ausfüllen durch die Elektrofachkraft oder nach ihrem Bericht.",
+  bereich: "arbeitsschutz",
+  pflichten: ["arbeitsschutz.dguv_v3"],
+  querformat: true,
+  namensFeld: "datum",
+  abschnitte: [
+    {
+      hilfe: "Prüfen darf nur eine Elektrofachkraft (bzw. unter ihrer Leitung). Wie oft geprüft wird, legst du in der Gefährdungsbeurteilung fest.",
+      felder: [
+        { id: "pruefer", art: "text", label: "Prüfende Elektrofachkraft / Firma", pflicht: true },
+        { id: "datum", art: "datum", label: "Prüfdatum", vorbelegung: "heute", pflicht: true },
+        { id: "messgeraet", art: "text", label: "Verwendetes Prüfgerät" },
+        { id: "leerzeilen", art: "schalter", label: "Leere Zeilen zum Ausfüllen von Hand anhängen", vorbelegung: false },
+      ],
+    },
+    {
+      titel: "Geräte",
+      felder: [
+        {
+          id: "geraete",
+          art: "liste",
+          label: "Geräte",
+          eintrag: "Gerät",
+          titelFeld: "bezeichnung",
+          felder: [
+            { id: "bezeichnung", art: "text", label: "Gerät", hilfe: "z. B. Föhn, Kaffeemaschine, Verlängerungskabel", pflicht: true },
+            { id: "typ", art: "text", label: "Hersteller / Typ" },
+            { id: "inventar", art: "text", label: "Inventar-Nr." },
+            { id: "standort", art: "text", label: "Standort" },
+            { id: "ergebnis", art: "wahl", label: "Ergebnis", optionen: optionen(ERGEBNIS), vorbelegung: "bestanden" },
+            { id: "maengel", art: "text", label: "Mängel", wenn: { feld: "ergebnis", ist: "maengel" }, pflicht: true },
+            { id: "naechste", art: "datum", label: "Nächste Prüfung" },
+          ],
+        },
+      ],
+    },
+  ],
+  html(d, b) {
+    const g = liste(d, "geraete").filter((x) => text(x, "bezeichnung"));
+    return dokument({
+      titel: "Prüfprotokoll elektrische Geräte",
+      betrieb: b,
+      quer: true,
+      meta: `Prüfdatum: ${datumDe(text(d, "datum")) || "–"}`,
+      inhalt:
+        angaben([["Geprüft von", text(d, "pruefer")], ["Prüfgerät", text(d, "messgeraet") || null]]) +
+        `<section class="abschnitt">${tabelle(
+          ["Gerät", "Hersteller / Typ", "Inventar-Nr.", "Standort", "Ergebnis", "Nächste Prüfung"],
+          g.map((x) => [`<strong>${zelle(text(x, "bezeichnung"))}</strong>`, zelle(text(x, "typ")), zelle(text(x, "inventar")), zelle(text(x, "standort")), text(x, "ergebnis") === "maengel" ? `<strong>Mängel:</strong> ${zelle(text(x, "maengel"))}` : "bestanden", datumDe(text(x, "naechste"))]),
+          { breiten: ["20%", "18%", "12%", "15%", "20%", "15%"], leerzeilen: ja(d, "leerzeilen") ? 12 : 0, hoch: ja(d, "leerzeilen") },
+        )}</section>` +
+        unterschriften(["Ort, Datum", "Unterschrift Elektrofachkraft"]),
+    });
+  },
+};

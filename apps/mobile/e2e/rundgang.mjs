@@ -61,13 +61,18 @@ try {
   await feld("Name des Betriebs").fill("Salon Sonne");
   await feld("Ort").fill("Musterstadt");
   await feld("Inhaber/in oder verantwortliche Person").fill("Alex Muster");
+  await feld("Straße und Hausnummer").fill("Hauptstraße 1");
+  await feld("Steuernummer").fill("12/345/67890");
   await foto("betrieb");
   await knopf("Zurück").click();
   await warte(800);
   pruefe(!(await sichtbar("Trag einmal deinen Betrieb ein")), "Hinweis bleibt nach dem Eintragen stehen");
 
-  // Vorlage wählen
-  await p.getByRole("button", { name: /^Gefährdungsbeurteilung/ }).first().click();
+  // Suchen und Vorlage wählen
+  await feld("Unterlage suchen").fill("gefährdung");
+  await warte();
+  pruefe(!(await sichtbar("Kassenbuch")), "Suche filtert nicht");
+  await tippe(p.getByRole("button", { name: /^Gefährdungsbeurteilung/ }).first());
   await warte();
   pruefe(await sichtbar("§ 5 ArbSchG"), "Rechtsgrundlage fehlt auf der Vorlagenseite");
   await foto("vorlage");
@@ -112,6 +117,8 @@ try {
   pruefe(await sichtbar("Rutschgefahr durch nassen Boden"), "Tab hat die offene Unterlage nicht behalten");
   await p.getByRole("tab", { name: "Unterlagen" }).click();
   await warte(800);
+  await feld("Unterlage suchen").fill("allergen");
+  await warte();
   await tippe(p.getByRole("button", { name: /^Allergenliste/ }).first());
   await warte();
   await tippe(knopf("Jetzt ausfüllen"));
@@ -123,13 +130,36 @@ try {
   pruefe(await p.getByRole("checkbox", { name: "Eier" }).locator("visible=true").last().isChecked(), "Allergen nicht ausgewählt");
   await foto("allergene");
 
+  // Rechnung: Ergebnis wird gerechnet, Betrieb liefert Steuernummer
+  await p.getByRole("tab", { name: "Unterlagen" }).click();
+  await warte();
+  await p.getByRole("tab", { name: "Unterlagen" }).click();
+  await warte(800);
+  await feld("Unterlage suchen").fill("rechnung");
+  await warte();
+  await tippe(p.getByRole("button", { name: /^Rechnung Rechnung mit/ }).first());
+  await warte();
+  await tippe(knopf("Jetzt ausfüllen"));
+  await warte(800);
+  await feld("Rechnungsnummer").fill("2026-001");
+  await feld("Datum oder Zeitraum der Leistung").fill("Oktober 2026");
+  await feld("Name oder Firma").fill("Kim Beispiel");
+  await feld("Anschrift").fill("Gartenweg 3, 12345 Musterstadt");
+  await feld("Leistung oder Ware").fill("Haarschnitt");
+  await feld("Menge").fill("2");
+  await feld("Einzelpreis netto (€)").fill("25");
+  await warte();
+  pruefe(await sichtbar("59,50"), "Rechnungsbetrag nicht gerechnet (2 × 25 € + 19 %)");
+  pruefe(await sichtbar("Alle Pflichtangaben ausgefüllt"), "Rechnung trotz aller Angaben nicht vollständig");
+  await foto("rechnung");
+
   // Neustart: Daten bleiben
   await warte(800);
   await p.reload();
   await warte(2500);
   await p.getByRole("tab", { name: "Meine" }).click();
   await warte(800);
-  pruefe(await sichtbar("Gefährdungsbeurteilung · Salon") && (await sichtbar("Allergenliste")), "Unterlagen nach Neustart verloren");
+  pruefe(await sichtbar("Gefährdungsbeurteilung · Salon") && (await sichtbar("Allergenliste")) && (await sichtbar("Rechnung · 2026-001")), "Unterlagen nach Neustart verloren");
 
   // Kopie und Löschen
   await p.getByRole("button", { name: /^Gefährdungsbeurteilung · Salon/ }).first().click();

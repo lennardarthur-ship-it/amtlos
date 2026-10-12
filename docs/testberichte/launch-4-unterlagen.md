@@ -48,3 +48,16 @@ T-52 alle Vorlagen · T-53 Nachweisgesetz (Liste, Form) · T-54 Verfahrensdokume
 | Inhalte | die App gibt Gliederung und Beispiele, schreibt aber keine Rechtstexte – der Nutzer füllt aus | nach Freigabe (T-52 ff.) fachlich geprüfte Textbausteine je Branche anbieten |
 | Datensicherung | „Daten sichern“ exportiert, Wiederherstellen fehlt | mit dem nächsten Schritt (Datei importieren) |
 | Web-App und Server | unverändert – zeigen weiter Pflichtenplan und Erinnerungen | entscheiden, ob die Web-App denselben Weg geht |
+
+## Nachtrag: alle Unterlagen zum Auswählen (E-122)
+
+18 weitere Vorlagen, zusammen 33, mit Suche. Neu: Rechnung, EÜR, Bilanz und GuV, Umsatzsteuer-Voranmeldung, Unterlagen zur Steuererklärung, Kassenbuch, Kassenmeldung, Aufbewahrungsplan, Datenschutzerklärung für die Website, AV-Vertrag, Arbeitszeitnachweis, Personalfragebogen, Lohnkonto, Prüfprotokoll elektrische Geräte, Impressum, Gewerbeanmeldung, Handelsregister, Transparenzregister. Die App zeigt Ergebnisse direkt an (Rechnungsbetrag, Zahllast, Überschuss, Kassenbestand, Arbeitsstunden); Impressum und Datenschutzerklärung lassen sich als Text für die Website teilen.
+
+| Prüfung | Ergebnis |
+|---|---|
+| Vorlagen-Tests (neu: Beträge lesen, Rechnungssummen je Steuersatz und Kleinunternehmer, Steuernummer aus „Mein Betrieb“, USt-Zahllast und Erstattung, EÜR, Kassenbestand inkl. negativ, Arbeitszeit über Mitternacht, Aufbewahrungsende, Text für Impressum/Datenschutzerklärung) | 15 grün |
+| Monorepo / Server und API mit Datenbank | 42/42 · 54 / 72 |
+| Rundgang hell und dunkel (neu: Suche, Rechnung mit gerechnetem Betrag 59,50 €, Neustart mit drei Unterlagen) | ohne Befunde |
+| Neue PDFs in Chromium angesehen (Rechnung, Voranmeldung, Kassenbuch, Arbeitszeit, Impressum, Lohnkonto) | lesbar |
+
+Fachlich zu prüfen: T-58 bis T-61. Grenze: Was elektronisch übermittelt werden muss, überträgt der Nutzer weiter selbst (ELSTER, sv.net, Portale).

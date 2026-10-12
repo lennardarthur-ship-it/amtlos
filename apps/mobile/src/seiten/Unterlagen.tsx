@@ -1,9 +1,10 @@
-import { Linking, View } from "react-native";
+import { useState } from "react";
+import { Linking, TextInput, View } from "react-native";
 import { BEREICHE, VORLAGEN, fehlendeAngaben, unterlagenName, vorlageFuer, type Vorlage } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { Hinweis, Karte, Knopf, Symbol, T, Zeile } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
-import { useFarben } from "../ui/thema";
+import { GROESSE, SCHRIFT, useFarben } from "../ui/thema";
 import { pflichtenFuer, rechtsgrundlagen } from "../unterlagen/katalog";
 import { betriebFehlt, sortiert, type Unterlage } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
@@ -14,8 +15,9 @@ import { BEREICH_SYMBOL, Gruppe, Inhalt, Seite, datumKurz } from "./gemeinsam";
 /** Zeile für eine eigene Unterlage: Name, wann geändert, was noch fehlt. */
 export function UnterlageZeile({ u, letzte, onPress }: { u: Unterlage; letzte: boolean; onPress: () => void }) {
   const f = useFarben();
+  const { stand } = useAmtlos();
   const v = vorlageFuer(u.vorlage)!;
-  const n = fehlendeAngaben(v, u.daten).length;
+  const n = fehlendeAngaben(v, u.daten, stand.betrieb).length;
   return (
     <Zeile
       links={<Symbol name="doc.richtext" groesse={22} farbe={n ? f.bald : f.amt} />}
@@ -58,19 +60,23 @@ function VorlageSeite({ id }: { id: string }) {
           </Gruppe>
         ) : null}
 
-        <Gruppe titel={TEXT.wozu}>
-          <Karte stil={{ paddingVertical: 4 }}>
-            {pflichten.map((p, i) => (
-              <View key={p.id} style={{ paddingVertical: 10, borderTopWidth: i ? 1 : 0, borderColor: f.linieLeise }}>
-                <T fett>{p.titel}</T>
-                <T v="klein" leise stil={{ marginTop: 2 }}>{p.kurz}</T>
-              </View>
-            ))}
-          </Karte>
-        </Gruppe>
-        <Gruppe titel={TEXT.grundlage}>
-          <T>{rechtsgrundlagen(v).join(" · ")}</T>
-        </Gruppe>
+        {pflichten.length ? (
+          <Gruppe titel={TEXT.wozu}>
+            <Karte stil={{ paddingVertical: 4 }}>
+              {pflichten.map((p, i) => (
+                <View key={p.id} style={{ paddingVertical: 10, borderTopWidth: i ? 1 : 0, borderColor: f.linieLeise }}>
+                  <T fett>{p.titel}</T>
+                  <T v="klein" leise stil={{ marginTop: 2 }}>{p.kurz}</T>
+                </View>
+              ))}
+            </Karte>
+          </Gruppe>
+        ) : null}
+        {rechtsgrundlagen(v).length ? (
+          <Gruppe titel={TEXT.grundlage}>
+            <T>{rechtsgrundlagen(v).join(" · ")}</T>
+          </Gruppe>
+        ) : null}
         {quellen.length ? (
           <Gruppe titel={TEXT.quellen}>
             <Karte>
@@ -115,6 +121,10 @@ export function Unterlagen() {
   const { stand } = useAmtlos();
   const nav = useNav();
   const f = useFarben();
+  const [suche, setSuche] = useState("");
+  const s = suche.trim().toLowerCase();
+  const passt = (v: Vorlage) => !s || `${v.titel} ${v.beschreibung}`.toLowerCase().includes(s);
+  const treffer = VORLAGEN.filter(passt).length;
   return (
     <Seite titel={TEXT.unterlagen_titel} unterzeile={TEXT.unterlagen_unter}>
       {betriebFehlt(stand.betrieb) ? (
@@ -137,8 +147,24 @@ export function Unterlagen() {
           />
         </Karte>
       ) : null}
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginTop: 14, paddingHorizontal: 12, minHeight: 44, borderRadius: 12, backgroundColor: f.blatt, borderWidth: 1, borderColor: f.linie }}>
+        <Symbol name="magnifyingglass" groesse={18} />
+        <TextInput
+          accessibilityLabel={TEXT.suchen}
+          placeholder={TEXT.suchen}
+          placeholderTextColor={f.tinteLeise}
+          value={suche}
+          onChangeText={setSuche}
+          autoCorrect={false}
+          clearButtonMode="while-editing"
+          returnKeyType="search"
+          style={{ flex: 1, minHeight: 44, color: f.tinte, fontFamily: SCHRIFT.regular, fontSize: GROESSE.basis }}
+        />
+      </View>
+      {s && !treffer ? <T leise stil={{ marginTop: 16 }}>{TEXT.nichts_gefunden}</T> : null}
       {BEREICHE.map((b) => {
-        const liste = VORLAGEN.filter((v) => v.bereich === b.id);
+        const liste = VORLAGEN.filter((v) => v.bereich === b.id && passt(v));
+        if (!liste.length) return null;
         return (
           <View key={b.id} style={{ marginTop: 22 }}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 8, marginLeft: 2 }}>

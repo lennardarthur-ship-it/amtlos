@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Pressable, View } from "react-native";
-import { dateiname, fehlendeAngaben, neuerEintrag, sichtbar, unterlagenName, vorlageFuer, type Daten, type EinfachesFeld, type Eintrag, type EintragWert, type ListenFeld } from "@amtlos/fachlogik";
+import { Pressable, Share, View } from "react-native";
+import { cent, dateiname, fehlendeAngaben, neuerEintrag, sichtbar, unterlagenName, vorlageFuer, type Daten, type EinfachesFeld, type Eintrag, type EintragWert, type ListenFeld } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { Auswahl, DatumFeld, Feld, Hinweis, Karte, Knopf, MehrfachWahl, Schalter, Symbol, T, UhrzeitFeld, Wahl } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
@@ -22,6 +22,10 @@ function Eingabe({ feld, wert, setzen }: { feld: EinfachesFeld; wert: EintragWer
       return <DatumFeld label={feld.label} hilfe={feld.hilfe} wert={text || null} aendern={setzen} />;
     case "uhrzeit":
       return <UhrzeitFeld label={feld.label} hilfe={feld.hilfe} wert={text} aendern={setzen} />;
+    case "betrag":
+      return <Feld label={feld.label} hilfe={feld.hilfe} wert={text} aendern={setzen} keyboardType="decimal-pad" placeholder="0,00" fehler={text.trim() && cent(text) === null ? TEXT.betrag_falsch : null} />;
+    case "zahl":
+      return <Feld label={feld.label} hilfe={feld.hilfe} wert={text} aendern={setzen} keyboardType="decimal-pad" fehler={text.trim() && cent(text) === null ? TEXT.zahl_falsch : null} />;
     case "schalter":
       return <Schalter label={feld.label} hilfe={feld.hilfe} wert={wert === true} aendern={setzen} />;
     case "mehrfach":
@@ -40,7 +44,8 @@ function ListenEingabe({ feld, eintraege, setzen }: { feld: ListenFeld; eintraeg
   const { stand } = useAmtlos();
   const [offen, setOffen] = useState<number | null>(eintraege.length === 1 ? 0 : null);
   const titelVon = (e: Eintrag, i: number) => {
-    const t = typeof e[feld.titelFeld] === "string" ? (e[feld.titelFeld] as string).trim().split("\n")[0] : "";
+    const roh = typeof e[feld.titelFeld] === "string" ? (e[feld.titelFeld] as string).trim().split("\n")[0]! : "";
+    const t = /^\d{4}-\d{2}-\d{2}$/.test(roh) ? roh.split("-").reverse().join(".") : roh;
     return t || `${feld.eintrag} ${i + 1} ${TEXT.eintrag_leer}`;
   };
   return (
@@ -120,7 +125,8 @@ export function Formular({ id }: { id: string }) {
     setDaten(neu);
     aendern(id, neu);
   };
-  const fehlt = fehlendeAngaben(vorlage, daten);
+  const fehlt = fehlendeAngaben(vorlage, daten, stand.betrieb);
+  const ergebnis = vorlage.ergebnis?.(daten) ?? [];
   const html = () => vorlage.html(daten, stand.betrieb);
   const teilen = async () => {
     setFehler(null);
@@ -165,6 +171,19 @@ export function Formular({ id }: { id: string }) {
           </Gruppe>
         ))}
 
+        {ergebnis.length ? (
+          <Gruppe titel={TEXT.ergebnis}>
+            <Karte>
+              {ergebnis.map(([k, w], i) => (
+                <View key={k} style={{ flexDirection: "row", justifyContent: "space-between", gap: 12, paddingVertical: 12, borderTopWidth: i ? 1 : 0, borderColor: f.linieLeise }}>
+                  <T stil={{ flex: 1 }}>{k}</T>
+                  <T fett={i === ergebnis.length - 1} stil={{ fontVariant: ["tabular-nums"], flexShrink: 1, textAlign: "right" }}>{w}</T>
+                </View>
+              ))}
+            </Karte>
+          </Gruppe>
+        ) : null}
+
         <View style={{ marginTop: 28 }}>
           {fehlt.length ? (
             <View accessibilityRole="summary" style={{ backgroundColor: f.baldHauch, borderRadius: RADIUS.klein, padding: 14, marginBottom: 12 }}>
@@ -185,6 +204,7 @@ export function Formular({ id }: { id: string }) {
           {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
           <Knopf text={TEXT.pdf_teilen} symbol="square.and.arrow.up" laedt={pdfLaedt} onPress={() => void teilen()} />
           <Knopf leise text={TEXT.drucken} symbol="printer" onPress={() => void drucken(html(), vorlage.querformat).catch(() => setFehler(TEXT.pdf_fehler))} stil={{ marginTop: 10 }} />
+          {vorlage.alsText ? <Knopf leise text={TEXT.als_text} symbol="doc.on.doc" onPress={() => void Share.share({ message: vorlage.alsText!(daten, stand.betrieb) }).catch(() => undefined)} stil={{ marginTop: 10 }} /> : null}
         </View>
 
         <Gruppe fuss={TEXT.kopie_text}>

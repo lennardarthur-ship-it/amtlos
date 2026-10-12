@@ -116,3 +116,25 @@ ${o.inhalt}
 <footer class="pruef">${esc(PRUEFHINWEIS)} Erstellt mit Amtlos.</footer>
 </body></html>`;
 }
+
+// ---------------------------------------------------------------- Geld und Zahlen
+
+/** „1.234,56“ / „1234.56“ / „12“ → Cent; leer oder unlesbar → null. */
+export function cent(t: string | null | undefined): number | null {
+  if (typeof t !== "string") return null;
+  let s = t.replace(/\s|€/g, "");
+  if (s === "") return null;
+  if (/,\d{1,2}$/.test(s) || s.includes(",")) s = s.replace(/\./g, "").replace(",", ".");
+  else if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, "");
+  const n = Number(s);
+  return Number.isFinite(n) ? Math.round(n * 100) : null;
+}
+/** Zahl wie „1,5“ → 1.5; leer oder unlesbar → null. */
+export function zahl(t: string | null | undefined): number | null {
+  const c = cent(t);
+  return c === null ? null : c / 100;
+}
+export const euro = (c: number) => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(c / 100);
+export const zahlText = (n: number, stellen = 2) => new Intl.NumberFormat("de-DE", { maximumFractionDigits: stellen }).format(n);
+/** Summe eines Betragsfelds über Listeneinträge (Cent). */
+export const summe = (l: Eintrag[], k: string) => l.reduce((a, e) => a + (cent(text(e, k)) ?? 0), 0);

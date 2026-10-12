@@ -36,6 +36,12 @@ export function BetriebFormular() {
         <Feld label={TEXT.b_telefon} {...feld("telefon")} keyboardType="phone-pad" textContentType="telephoneNumber" />
         <Feld label={TEXT.b_email} {...feld("email")} keyboardType="email-address" autoCapitalize="none" textContentType="emailAddress" />
       </Karte>
+      <T v="klein" fett leise stil={{ marginTop: 20, marginBottom: 8, marginLeft: 4 }}>{TEXT.b_steuer}</T>
+      <Karte stil={{ paddingBottom: 14 }}>
+        <Feld label={TEXT.b_steuernummer} {...feld("steuernummer")} keyboardType="numbers-and-punctuation" />
+        <Feld label={TEXT.b_ust_idnr} {...feld("ust_idnr")} autoCapitalize="characters" />
+        <Feld label={TEXT.b_iban} {...feld("iban")} autoCapitalize="characters" />
+      </Karte>
       <T v="caption" leise stil={{ marginTop: 6, marginLeft: 4 }}>{TEXT.gespeichert_auto}</T>
     </View>
   );

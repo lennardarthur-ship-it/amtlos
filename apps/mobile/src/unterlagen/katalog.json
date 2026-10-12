@@ -1,5 +1,20 @@
 [
  {
+  "id": "arbeitsschutz.dguv_v3",
+  "titel": "Elektrische Geräte prüfen lassen",
+  "kurz": "Elektrische Geräte und Anlagen lässt du regelmäßig prüfen (DGUV Vorschrift 3).",
+  "rechtsgrundlage": [
+   "DGUV Vorschrift 3"
+  ],
+  "quellen": [
+   {
+    "titel": "DGUV Vorschrift 3",
+    "url": "https://publikationen.dguv.de/regelwerk/dguv-vorschriften/"
+   }
+  ],
+  "geprueft": false
+ },
+ {
   "id": "arbeitsschutz.erstunterweisung",
   "titel": "Vor Arbeitsbeginn unterweisen",
   "kurz": "Jede neue Person unterweist du vor dem ersten Arbeitstag zu den Gefahren und Schutzmaßnahmen.",
@@ -160,6 +175,21 @@
   "geprueft": false
  },
  {
+  "id": "datenschutz.avv",
+  "titel": "Auftragsverarbeitungsverträge abschließen",
+  "kurz": "Mit Dienstleistern, die für dich Daten verarbeiten (z. B. Cloud, Lohnbüro, Newsletter-Tool), schließt du einen Auftragsverarbeitungsvertrag.",
+  "rechtsgrundlage": [
+   "Art. 28 DSGVO"
+  ],
+  "quellen": [
+   {
+    "titel": "DSGVO Art. 28",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679"
+   }
+  ],
+  "geprueft": false
+ },
+ {
   "id": "datenschutz.datenpanne_meldung",
   "titel": "Datenpanne der Aufsichtsbehörde melden",
   "kurz": "Bei einer Datenpanne meldest du sie binnen 72 Stunden der Datenschutz-Aufsichtsbehörde.",
@@ -221,6 +251,60 @@
   "geprueft": false
  },
  {
+  "id": "gesellschaft.handelsregister_anmeldung",
+  "titel": "Gesellschaft im Handelsregister eintragen lassen",
+  "kurz": "Der Notar meldet die Gesellschaft zum Handelsregister an; mit der Eintragung entsteht die GmbH oder UG.",
+  "rechtsgrundlage": [
+   "HGB",
+   "GmbHG"
+  ],
+  "quellen": [
+   {
+    "titel": "GmbH-Gesetz",
+    "url": "https://www.gesetze-im-internet.de/gmbhg/"
+   },
+   {
+    "titel": "Handelsgesetzbuch",
+    "url": "https://www.gesetze-im-internet.de/hgb/"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "gesellschaft.transparenzregister",
+  "titel": "Wirtschaftlich Berechtigte ans Transparenzregister melden",
+  "kurz": "Melde, wer hinter deiner Gesellschaft steht, und halte die Angaben aktuell.",
+  "rechtsgrundlage": [
+   "GwG"
+  ],
+  "quellen": [
+   {
+    "titel": "Transparenzregister",
+    "url": "https://www.transparenzregister.de/"
+   },
+   {
+    "titel": "Geldwäschegesetz",
+    "url": "https://www.gesetze-im-internet.de/gwg_2017/"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "gruendung.gewerbeanzeige",
+  "titel": "Gewerbe anmelden",
+  "kurz": "Melde dein Gewerbe bei der Gemeinde an, wenn du anfängst – und ebenso, wenn du umziehst oder aufhörst.",
+  "rechtsgrundlage": [
+   "§ 14 GewO"
+  ],
+  "quellen": [
+   {
+    "titel": "Gewerbeordnung § 14",
+    "url": "https://www.gesetze-im-internet.de/gewo/__14.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
   "id": "ki.kompetenz",
   "titel": "KI-Kompetenz der Beschäftigten sicherstellen",
   "kurz": "Wer im Unternehmen mit KI arbeitet, braucht ausreichende KI-Kompetenz – sorge für Schulung und halte sie fest.",
@@ -231,6 +315,96 @@
    {
     "titel": "KI-Verordnung (EU) 2024/1689",
     "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32024R1689"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "online.datenschutzerklaerung",
+  "titel": "Datenschutzerklärung auf der Website",
+  "kurz": "Auf deiner Website informierst du in einer Datenschutzerklärung über die Verarbeitung von Daten.",
+  "rechtsgrundlage": [
+   "Art. 13 DSGVO"
+  ],
+  "quellen": [
+   {
+    "titel": "DSGVO Art. 13",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "online.impressum",
+  "titel": "Impressum auf der Website",
+  "kurz": "Auf deiner Website stellst du ein Impressum mit den Pflichtangaben bereit – leicht erkennbar und immer erreichbar.",
+  "rechtsgrundlage": [
+   "§ 5 DDG"
+  ],
+  "quellen": [
+   {
+    "titel": "Digitale-Dienste-Gesetz § 5",
+    "url": "https://www.gesetze-im-internet.de/ddg/__5.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "personal.arbeitszeit_aufzeichnung",
+  "titel": "Arbeitszeit aufzeichnen",
+  "kurz": "Du zeichnest die Arbeitszeit deiner Beschäftigten auf.",
+  "rechtsgrundlage": [
+   "§ 3 Abs. 2 Nr. 1 ArbSchG (BAG, 13.9.2022 – 1 ABR 22/21)"
+  ],
+  "quellen": [
+   {
+    "titel": "Arbeitsschutzgesetz § 3",
+    "url": "https://www.gesetze-im-internet.de/arbschg/__3.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "personal.arbeitszeit_milog",
+  "titel": "Arbeitszeit nach § 17 MiLoG aufzeichnen",
+  "kurz": "Für Minijobber und in Sofortmeldebranchen musst du Beginn, Ende und Dauer der Arbeitszeit aufzeichnen.",
+  "rechtsgrundlage": [
+   "§ 17 MiLoG"
+  ],
+  "quellen": [
+   {
+    "titel": "Mindestlohngesetz § 17",
+    "url": "https://www.gesetze-im-internet.de/milog/__17.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "personal.lohnabrechnung",
+  "titel": "Lohnabrechnung über geprüfte Software",
+  "kurz": "Meldungen zur Sozialversicherung erfordern zertifizierte Software – Amtlos arbeitet dafür mit einem Lohnpartner.",
+  "rechtsgrundlage": [
+   "§ 18 DEÜV (Systemprüfung)"
+  ],
+  "quellen": [
+   {
+    "titel": "Datenerfassungs- und -übermittlungsverordnung",
+    "url": "https://www.gesetze-im-internet.de/de_v/"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "personal.lohnsteuer_anmeldung",
+  "titel": "Lohnsteuer anmelden",
+  "kurz": "Bis zum 10. nach Ende des Anmeldezeitraums meldest du die Lohnsteuer beim Finanzamt an.",
+  "rechtsgrundlage": [
+   "§ 41a EStG"
+  ],
+  "quellen": [
+   {
+    "titel": "Einkommensteuergesetz § 41a",
+    "url": "https://www.gesetze-im-internet.de/estg/__41a.html"
    }
   ],
   "geprueft": false
@@ -266,6 +440,137 @@
   "geprueft": false
  },
  {
+  "id": "personal.sofortmeldung",
+  "titel": "Sofortmeldung bei Arbeitsbeginn",
+  "kurz": "In deiner Branche meldest du neue Beschäftigte spätestens bei Arbeitsbeginn sofort an.",
+  "rechtsgrundlage": [
+   "§ 28a Abs. 4 SGB IV"
+  ],
+  "quellen": [
+   {
+    "titel": "Sozialgesetzbuch IV § 28a",
+    "url": "https://www.gesetze-im-internet.de/sgb_4/__28a.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "personal.sv_anmeldung",
+  "titel": "Beschäftigte bei der Sozialversicherung anmelden",
+  "kurz": "Jede neue beschäftigte Person meldest du bei der Krankenkasse an.",
+  "rechtsgrundlage": [
+   "§ 28a SGB IV",
+   "DEÜV"
+  ],
+  "quellen": [
+   {
+    "titel": "Sozialgesetzbuch IV § 28a",
+    "url": "https://www.gesetze-im-internet.de/sgb_4/__28a.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "steuern.aufbewahrung",
+  "titel": "Unterlagen aufbewahren",
+  "kurz": "Bewahre Belege und Rechnungen 8 Jahre, Jahresabschlüsse und Bücher 10 Jahre und Geschäftsbriefe 6 Jahre auf.",
+  "rechtsgrundlage": [
+   "§ 147 AO",
+   "§ 257 HGB"
+  ],
+  "quellen": [
+   {
+    "titel": "Abgabenordnung § 147",
+    "url": "https://www.gesetze-im-internet.de/ao_1977/__147.html"
+   },
+   {
+    "titel": "Handelsgesetzbuch § 257",
+    "url": "https://www.gesetze-im-internet.de/hgb/__257.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "steuern.buchfuehrungspflicht",
+  "titel": "Doppelte Buchführung",
+  "kurz": "Du musst Bücher nach den Regeln der doppelten Buchführung führen und einen Jahresabschluss machen.",
+  "rechtsgrundlage": [
+   "HGB",
+   "§ 141 AO"
+  ],
+  "quellen": [
+   {
+    "titel": "Abgabenordnung § 141",
+    "url": "https://www.gesetze-im-internet.de/ao_1977/__141.html"
+   },
+   {
+    "titel": "Handelsgesetzbuch § 238",
+    "url": "https://www.gesetze-im-internet.de/hgb/__238.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "steuern.e_bilanz",
+  "titel": "E-Bilanz ans Finanzamt übermitteln",
+  "kurz": "Die Bilanz deiner Gesellschaft übermittelst du elektronisch ans Finanzamt.",
+  "rechtsgrundlage": [
+   "§ 5b EStG"
+  ],
+  "quellen": [
+   {
+    "titel": "Einkommensteuergesetz § 5b",
+    "url": "https://www.gesetze-im-internet.de/estg/__5b.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "steuern.est_erklaerung",
+  "titel": "Einkommensteuererklärung abgeben",
+  "kurz": "Einmal im Jahr gibst du elektronisch deine Einkommensteuererklärung ab.",
+  "rechtsgrundlage": [
+   "EStG"
+  ],
+  "quellen": [
+   {
+    "titel": "Einkommensteuergesetz",
+    "url": "https://www.gesetze-im-internet.de/estg/"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "steuern.euer",
+  "titel": "Einnahmen-Überschuss-Rechnung (Anlage EÜR) abgeben",
+  "kurz": "Einmal im Jahr ermittelst du deinen Gewinn mit der Anlage EÜR und übermittelst sie elektronisch.",
+  "rechtsgrundlage": [
+   "§ 4 Abs. 3 EStG"
+  ],
+  "quellen": [
+   {
+    "titel": "Einkommensteuergesetz § 4",
+    "url": "https://www.gesetze-im-internet.de/estg/__4.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "steuern.gewst_erklaerung",
+  "titel": "Gewerbesteuererklärung abgeben",
+  "kurz": "Einmal im Jahr gibst du elektronisch die Gewerbesteuererklärung ab.",
+  "rechtsgrundlage": [
+   "GewStG"
+  ],
+  "quellen": [
+   {
+    "titel": "Gewerbesteuergesetz",
+    "url": "https://www.gesetze-im-internet.de/gewstg/"
+   }
+  ],
+  "geprueft": false
+ },
+ {
   "id": "steuern.gobd_verfahrensdokumentation",
   "titel": "GoBD einhalten und Verfahrensdokumentation führen",
   "kurz": "Bewahre Belege nachvollziehbar und unveränderbar auf und beschreibe in einer Verfahrensdokumentation, wie du das machst.",
@@ -278,6 +583,97 @@
    {
     "titel": "Bundesministerium der Finanzen",
     "url": "https://www.bundesfinanzministerium.de/"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "steuern.kassenmeldung",
+  "titel": "Elektronische Kasse beim Finanzamt melden",
+  "kurz": "Melde jede elektronische Kasse innerhalb eines Monats nach der Anschaffung über ELSTER – je Betriebsstätte.",
+  "rechtsgrundlage": [
+   "§ 146a AO"
+  ],
+  "quellen": [
+   {
+    "titel": "Abgabenordnung § 146a",
+    "url": "https://www.gesetze-im-internet.de/ao_1977/__146a.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "steuern.kassenmeldung_ausserbetriebnahme",
+  "titel": "Außerbetriebnahme einer Kasse melden",
+  "kurz": "Wenn du eine elektronische Kasse nicht mehr nutzt, meldest du das innerhalb eines Monats über ELSTER.",
+  "rechtsgrundlage": [
+   "§ 146a AO"
+  ],
+  "quellen": [
+   {
+    "titel": "Abgabenordnung § 146a",
+    "url": "https://www.gesetze-im-internet.de/ao_1977/__146a.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "steuern.kst_erklaerung",
+  "titel": "Körperschaftsteuererklärung abgeben",
+  "kurz": "Einmal im Jahr gibst du für deine Gesellschaft elektronisch die Körperschaftsteuererklärung ab.",
+  "rechtsgrundlage": [
+   "KStG"
+  ],
+  "quellen": [
+   {
+    "titel": "Körperschaftsteuergesetz",
+    "url": "https://www.gesetze-im-internet.de/kstg_1977/"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "steuern.rechnungen_pflichtangaben",
+  "titel": "Rechnungen mit allen Pflichtangaben schreiben",
+  "kurz": "Deine Rechnungen müssen bestimmte Angaben enthalten. Als Kleinunternehmer brauchst du einen Hinweis auf § 19 UStG.",
+  "rechtsgrundlage": [
+   "§ 14 UStG",
+   "§ 19 UStG"
+  ],
+  "quellen": [
+   {
+    "titel": "Umsatzsteuergesetz § 14",
+    "url": "https://www.gesetze-im-internet.de/ustg_1980/__14.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "steuern.ust_jahreserklaerung",
+  "titel": "Umsatzsteuer-Jahreserklärung abgeben",
+  "kurz": "Einmal im Jahr gibst du elektronisch die Umsatzsteuer-Jahreserklärung ab.",
+  "rechtsgrundlage": [
+   "§ 18 UStG"
+  ],
+  "quellen": [
+   {
+    "titel": "Umsatzsteuergesetz § 18",
+    "url": "https://www.gesetze-im-internet.de/ustg_1980/__18.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "steuern.ust_voranmeldung",
+  "titel": "Umsatzsteuer-Voranmeldung abgeben",
+  "kurz": "Du meldest dem Finanzamt regelmäßig, wie viel Umsatzsteuer du eingenommen und gezahlt hast, und überweist die Differenz.",
+  "rechtsgrundlage": [
+   "§ 18 UStG"
+  ],
+  "quellen": [
+   {
+    "titel": "Umsatzsteuergesetz § 18",
+    "url": "https://www.gesetze-im-internet.de/ustg_1980/__18.html"
    }
   ],
   "geprueft": false

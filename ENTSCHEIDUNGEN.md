@@ -510,6 +510,16 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - Katalogauszug fürs Gerät: `werkzeuge/katalog-buendel.mjs` schreibt nur noch die 18 Pflichten (Titel, Kurztext, Rechtsgrundlage, Quellen, Prüfstand) nach `src/unterlagen/katalog.json`; CI prüft die Aktualität.
 - Entfernt aus der App (bleibt in der Git-Historie): Demo-Server, API-Client, Anmeldung, Push, alle Seiten aus E-120; Pakete expo-auth-session, -notifications, -secure-store, -image-picker, -web-browser, -crypto, -device, -localization, -constants. Web-App, API und Server bleiben unverändert.
 
+### E-122 · Alle Unterlagen zum Auswählen – auch solche, die über andere Wege ans Amt gehen
+- **Datum:** 2026-10-12 · **Status:** angenommen (Wunsch des Gründers: „alles, auch was bei anderen Tools geht – man kann ja selbst auswählen“)
+- 18 weitere Vorlagen, zusammen 33: Rechnung, EÜR, Bilanz und GuV, Umsatzsteuer-Voranmeldung, Unterlagen zur Steuererklärung, Kassenbuch, Kassenmeldung (Datenblatt), Aufbewahrungsplan, Datenschutzerklärung für die Website, Vertrag zur Auftragsverarbeitung, Arbeitszeitnachweis (auch Minijob), Personalfragebogen (Daten für die SV-Anmeldung), Lohnkonto, Prüfprotokoll elektrische Geräte, Impressum, Gewerbeanmeldung (Datenblatt), Handelsregister (Vorbereitung), Transparenzregister (wirtschaftlich Berechtigte). KI-Nachweis und Hautschutzplan bleiben.
+- Was elektronisch übermittelt werden muss (Voranmeldung, Anlage EÜR, Erklärungen, E-Bilanz, SV-Meldungen, Kassenmeldung), erstellt die App als ausgefüllte bzw. ausgerechnete Unterlage zum Übertragen; sie übermittelt nichts (ELSTER/ERiC bleibt offen, J-1). Gewerbe-, Handels- und Transparenzregister: Datenblätter für Amt, Notar bzw. Portal.
+- Amtlos rechnet keine Lohnsteuer und keine Sozialversicherungsbeiträge (Beträge aus der Lohnabrechnung). Die Umsatzsteuer rechnet die App nur aus eingegebenen Nettoumsätzen zu 19 %/7 %; keine Kennzahlen des amtlichen Formulars (T-08).
+- Neue Feldarten Betrag und Zahl, „Ergebnis“ in der App (Summen, Zahllast, Überschuss, Endbestand, Arbeitszeit), „Als Text teilen“ für Impressum und Datenschutzerklärung, Prüfungen gegen „Mein Betrieb“ (z. B. Steuernummer auf der Rechnung). „Mein Betrieb“ hat dafür Steuernummer, USt-IdNr. und IBAN. Suche über alle Vorlagen.
+- Die Vorlagen verweisen auf die vorhandenen Katalogpflichten (Wozu, Rechtsgrundlage, Quellen); der Katalogauszug enthält jetzt alle Pflichten, die eine Vorlage belegt (43). Das Kassenbuch hat keine eigene Katalogpflicht.
+- Der Hinweis für Kleinunternehmer auf Rechnungen liegt jetzt in `@amtlos/fachlogik` (`KU_HINWEIS`) und wird von API und App geteilt.
+- Aufbewahrungsfristen 10/8/6 Jahre als Vorschlag im Aufbewahrungsplan (Rechtsstand ab 2025 nach Angabe des Gründers und eigenem Stand, T-58). Der Referentenentwurf zur elektronischen Zeiterfassung (Juni 2026) wird nicht übernommen, solange er nicht geprüft ist.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

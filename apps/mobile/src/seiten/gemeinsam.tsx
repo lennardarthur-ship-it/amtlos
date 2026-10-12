@@ -55,6 +55,7 @@ export const BEREICH_SYMBOL: Record<Bereich, string> = {
   datenschutz: "lock.shield",
   personal: "person.2",
   steuern: "building.columns",
+  betrieb: "building.2",
   gastro: "fork.knife",
   beauty: "scissors",
 };

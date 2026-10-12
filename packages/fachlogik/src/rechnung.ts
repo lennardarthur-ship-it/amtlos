@@ -14,6 +14,9 @@ export type Einheit = "stueck" | "stunde" | "tag" | "monat" | "pauschal" | "kilo
 /** UN/ECE Recommendation 20 – technische Codes für die E-Rechnung */
 export const EINHEIT_CODE: Record<Einheit, string> = { stueck: "C62", stunde: "HUR", tag: "DAY", monat: "MON", pauschal: "LS", kilogramm: "KGM" };
 
+/** Hinweis für Kleinunternehmer auf Rechnungen (Server, API, App). */
+export const KU_HINWEIS = "Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.";
+
 export const rundeCent = (x: number) => Math.sign(x) * Math.round(Math.abs(x)); // kaufmännisch, symmetrisch
 
 export interface Summen {

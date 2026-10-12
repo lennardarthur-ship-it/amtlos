@@ -39,7 +39,7 @@ import {
   type RechnungsDaten,
   type Tx,
 } from "@amtlos/server";
-import { umsaetzeNachSatz, ustZeitraum } from "@amtlos/fachlogik";
+import { KU_HINWEIS, umsaetzeNachSatz, ustZeitraum } from "@amtlos/fachlogik";
 import { Kontext, MitUnternehmen, type Anfragekontext } from "./auth.js";
 import { ELSTER } from "./elster.controller.js";
 import { pruefe, uebersetzeDbFehler } from "./hilfen.js";
@@ -48,7 +48,7 @@ import { WARTESCHLANGE } from "./kern.controller.js";
 export const ABLAGE = Symbol("ABLAGE");
 
 /** Text auf Rechnungen von Kleinunternehmern. Wortlaut steht nicht in der Spezifikation – PRUEFLISTE T-06. */
-export const KU_HINWEIS = "Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.";
+export { KU_HINWEIS };
 
 const SCHREIBEN = ["inhaber", "admin", "steuerberater"] as const;
 const Uuid = z.string().uuid();

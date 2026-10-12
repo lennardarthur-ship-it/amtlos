@@ -13,9 +13,12 @@ export interface Betrieb {
   verantwortlich: string;
   telefon: string;
   email: string;
+  steuernummer: string;
+  ust_idnr: string;
+  iban: string;
 }
 
-export const LEERER_BETRIEB: Betrieb = { name: "", strasse: "", plz: "", ort: "", verantwortlich: "", telefon: "", email: "" };
+export const LEERER_BETRIEB: Betrieb = { name: "", strasse: "", plz: "", ort: "", verantwortlich: "", telefon: "", email: "", steuernummer: "", ust_idnr: "", iban: "" };
 
 /** Ein Wert in einem Listeneintrag. */
 export type EintragWert = string | boolean | string[] | null;
@@ -47,6 +50,10 @@ export type EinfachesFeld =
   | (FeldBasis & { art: "text" | "mehrzeilig"; vorbelegung?: "verantwortlich" | "betrieb_kontakt" })
   | (FeldBasis & { art: "datum"; vorbelegung?: "heute" })
   | (FeldBasis & { art: "uhrzeit" })
+  /** Euro-Betrag, gespeichert wie eingegeben („1.234,50“) */
+  | (FeldBasis & { art: "betrag"; vorbelegung?: string })
+  /** Zahl, gespeichert wie eingegeben („1,5“) */
+  | (FeldBasis & { art: "zahl"; vorbelegung?: string })
   | (FeldBasis & { art: "wahl"; optionen: Option[]; vorbelegung?: string })
   | (FeldBasis & { art: "schalter"; vorbelegung?: boolean })
   | (FeldBasis & { art: "mehrfach"; optionen: Option[] });
@@ -59,6 +66,8 @@ export type ListenFeld = FeldBasis & {
   /** Feld, dessen Wert einen Eintrag in der Übersicht benennt */
   titelFeld: string;
   felder: EinfachesFeld[];
+  /** Einträge einer neuen Unterlage (sonst ein leerer Eintrag) */
+  start?: Eintrag[];
 };
 
 export type Feld = EinfachesFeld | ListenFeld;
@@ -69,7 +78,7 @@ export interface VorlagenAbschnitt {
   felder: Feld[];
 }
 
-export type Bereich = "arbeitsschutz" | "datenschutz" | "personal" | "steuern" | "gastro" | "beauty";
+export type Bereich = "steuern" | "datenschutz" | "personal" | "arbeitsschutz" | "betrieb" | "gastro" | "beauty";
 
 export interface Vorlage {
   id: string;
@@ -86,4 +95,10 @@ export interface Vorlage {
   /** Querformat (breite Tabellen, Aushänge) */
   querformat?: boolean;
   html(daten: Daten, betrieb: Betrieb): string;
+  /** Ergebnis zum Anzeigen in der App (Summen, Zahllast …) */
+  ergebnis?(daten: Daten): [string, string][];
+  /** Fehlende Angaben außerhalb des Formulars, z. B. in „Mein Betrieb“ */
+  pruefen?(daten: Daten, betrieb: Betrieb): string[];
+  /** Reiner Text zum Kopieren, z. B. für die Website */
+  alsText?(daten: Daten, betrieb: Betrieb): string;
 }
