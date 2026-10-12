@@ -40,7 +40,7 @@ cat > "$P/LIESMICH.txt" <<'TXT'
 Amtlos – Unterlagen für deinen Betrieb (Testversion fürs iPhone)
 
 Dies ist nur ein Testpaket zum Ausprobieren in Expo Go – nicht der Quellcode. Quellcode, Tests, CI und
-Entscheidungen liegen im Git-Repository (GitHub: lennardarthur-ship-it/amtlos); dort ist dieser Stand als Tag markiert.
+Entscheidungen liegen im Git-Repository (GitHub: lennardarthur-ship-it/amtlos). Stand: Commit STAND_COMMIT.
 
 1. Auf dem iPhone: „Expo Go“ aus dem App Store laden.
 2. Auf dem Mac: Node.js installieren (https://nodejs.org, Knopf „LTS“, Installer öffnen, durchklicken).
@@ -64,5 +64,7 @@ Entscheidungen liegen im Git-Repository (GitHub: lennardarthur-ship-it/amtlos); 
 
 Beenden: im Terminal Ctrl + C. Nächstes Mal reichen die Befehle „cd …“ und „npx expo start“.
 TXT
+STAND="$(git -C "$APP" rev-parse --short HEAD 2>/dev/null || echo unbekannt)"
+sed -i.bak "s/STAND_COMMIT/$STAND/" "$P/LIESMICH.txt" && rm -f "$P/LIESMICH.txt.bak"
 (cd "$ZIEL" && zip -qr amtlos-app.zip amtlos-app -x 'amtlos-app/node_modules/*' 'amtlos-app/.expo/*')
 echo "✓ $P"
