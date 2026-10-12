@@ -36,11 +36,11 @@ export const datenschutzDokumentation: Vorlage = {
   pflichten: ["datenschutz.vvt", "datenschutz.tom"],
   grundlage: "Art. 30 Abs. 1, Art. 32 DSGVO",
   abschnitte: [
-    {
+    { titel: "Verantwortlich",
       felder: [
         { id: "stand", art: "datum", label: "Stand", vorbelegung: "heute", pflicht: true },
         { id: "verantwortlich", art: "text", label: "Ansprechperson Datenschutz", vorbelegung: "verantwortlich", pflicht: true },
-        { id: "dsb", art: "text", label: "Datenschutzbeauftragte/r", hilfe: "nur falls benannt: Name und Kontakt" },
+        { id: "dsb", selten: true, art: "text", label: "Datenschutzbeauftragte/r", hilfe: "nur falls benannt: Name und Kontakt" },
       ],
     },
     {
@@ -63,8 +63,8 @@ export const datenschutzDokumentation: Vorlage = {
             { id: "betroffene", art: "text", label: "Kategorien betroffener Personen", pflicht: true, vorschlaege: BETROFFENE },
             { id: "datenarten", art: "mehrzeilig", label: "Kategorien personenbezogener Daten", pflicht: true },
             { id: "empfaenger", art: "mehrzeilig", label: "Kategorien von Empfängern" },
-            { id: "drittland", art: "text", label: "Übermittlung in Drittländer", vorschlaege: ["keine Übermittlung in Drittländer"] },
-            { id: "gemeinsam", art: "text", label: "Gemeinsam Verantwortliche (Art. 26 DSGVO)", hilfe: "nur falls zutreffend, z. B. Betreiber einer Social-Media-Plattform" },
+            { id: "drittland", selten: true, art: "text", label: "Übermittlung in Drittländer", vorschlaege: ["keine Übermittlung in Drittländer"] },
+            { id: "gemeinsam", selten: true, art: "text", label: "Gemeinsam Verantwortliche (Art. 26 DSGVO)", hilfe: "nur falls zutreffend, z. B. Betreiber einer Social-Media-Plattform" },
             { id: "loeschfrist", art: "mehrzeilig", label: "Fristen für die Löschung", pflicht: true, vorschlaege: LOESCHFRISTEN },
             { id: "tom_hinweis", art: "text", label: "Technische und organisatorische Maßnahmen", vorschlaege: ["siehe Abschnitt Technische und organisatorische Maßnahmen"] },
           ],
@@ -111,7 +111,7 @@ export const datenschutzDokumentation: Vorlage = {
             { id: "auftragsverarbeitung", art: "schalter", label: "Verarbeitet Daten in meinem Auftrag", vorbelegung: true },
             { id: "avv_vorhanden", art: "schalter", label: "Vertrag zur Auftragsverarbeitung liegt vor", wenn: { feld: "auftragsverarbeitung" } },
             { id: "avv_datum", art: "datum", label: "Vertrag vom", wenn: { feld: "avv_vorhanden" } },
-            { id: "drittland", art: "text", label: "Drittland", vorschlaege: ["keine Übermittlung in Drittländer"] },
+            { id: "drittland", selten: true, art: "text", label: "Drittland", vorschlaege: ["keine Übermittlung in Drittländer"] },
           ],
         },
       ],
@@ -292,14 +292,14 @@ export const datenschutzinformation: Vorlage = {
   grundlage: "Art. 13 DSGVO",
   namensFeld: "fuer_wen",
   abschnitte: [
-    {
+    { titel: "Inhalt der Information",
       felder: [
         { id: "fuer_wen", art: "text", label: "Für wen", pflicht: true, vorschlaege: ZIELGRUPPE },
         { id: "verarbeitungen", art: "bausteine", label: "Welche Verarbeitungen betreffen diese Personen?", optionen: VVT.map((v) => ({ wert: v.titel, text: v.titel, quelle: v.quelle })), pflicht: true },
-        { id: "dsb", art: "text", label: "Datenschutzbeauftragte/r", hilfe: "nur falls benannt: Name und Kontakt" },
+        { id: "dsb", selten: true, art: "text", label: "Datenschutzbeauftragte/r", hilfe: "nur falls benannt: Name und Kontakt" },
         { id: "interessen", art: "mehrzeilig", label: "Berechtigte Interessen", hilfe: "nötig, wenn eine Verarbeitung auf Art. 6 Abs. 1 lit. f DSGVO beruht – z. B. Schutz vor Diebstahl, Durchsetzung von Ansprüchen, sichere IT", vorschlaege: ["Sicherer und störungsfreier Betrieb unserer IT", "Durchsetzung und Abwehr von Ansprüchen", "Schutz vor Diebstahl und Vandalismus (Videoüberwachung)", "Information unserer Bestandskundschaft über eigene Angebote"] },
         { id: "bereitstellung", art: "wahl", label: "Pflicht zur Bereitstellung der Daten", optionen: optionen(BEREITSTELLUNG), vorbelegung: "vertrag" },
-        { id: "ergaenzung", art: "mehrzeilig", label: "Ergänzungen", hilfe: "z. B. besondere Verarbeitungen in deinem Betrieb" },
+        { id: "ergaenzung", selten: true, art: "mehrzeilig", label: "Ergänzungen", hilfe: "z. B. besondere Verarbeitungen in deinem Betrieb" },
         { id: "stand", art: "datum", label: "Stand", vorbelegung: "heute" },
       ],
     },

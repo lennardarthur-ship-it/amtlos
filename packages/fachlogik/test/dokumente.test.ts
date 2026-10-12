@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { BEREICHE, bausteinText, eintragAusVorschlag, mindestlohnAm, mindesturlaub, stundenlohn, LEERER_BETRIEB, PRUEFHINWEIS, VORLAGEN, dokumentHtml, arbeitsminuten, aufbewahrenBis, berlinZuUtc, cent, dateiname, fehlendeAngaben, leereDaten, neuerEintrag, sichtbar, unterlagenName, vorlageFuer, type Betrieb, type Daten, type Feld } from "../src/index.js";
+import { ANLAESSE, KURZ, PERSONEN_FELDER, kurztitel, naechsteNummer, personAus, personIn, personMerken, BEREICHE, bausteinText, eintragAusVorschlag, mindestlohnAm, mindesturlaub, stundenlohn, LEERER_BETRIEB, PRUEFHINWEIS, VORLAGEN, dokumentHtml, arbeitsminuten, aufbewahrenBis, berlinZuUtc, cent, dateiname, fehlendeAngaben, leereDaten, neuerEintrag, sichtbar, unterlagenName, vorlageFuer, type Betrieb, type Daten, type Feld } from "../src/index.js";
 
 const KATALOG = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../catalog/pflichten");
 const BETRIEB: Betrieb = { name: "Salon Sonne", strasse: "Hauptstr. 1", plz: "12345", ort: "Musterstadt", verantwortlich: "Alex Muster", telefon: "0123 456", email: "info@example.de", steuernummer: "12/345/67890", ust_idnr: "", iban: "DE00 1234", bundesland: "Bayern" };
@@ -261,5 +261,67 @@ describe("Dokumentvorlagen", () => {
     expect(v.pruefen!({ positionen: pos }, BETRIEB)).toContain("Hinweis auf die Steuerbefreiung (bei 0 %)");
     expect(v.pruefen!({ positionen: pos, befreiung: "steuerfrei nach § 4 Nr. 14 UStG" }, BETRIEB)).toEqual([]);
     expect(v.pruefen!({ positionen: pos }, { ...BETRIEB, steuernummer: "" })).toContain("Steuernummer oder USt-IdNr. (Mein Betrieb)");
+  });
+
+  it("ordnet jede Vorlage mindestens einem Anlass zu und beschreibt sie ohne Paragrafen", () => {
+    const ids = new Set(VORLAGEN.map((v) => v.id));
+    for (const a of ANLAESSE) for (const id of a.vorlagen) expect(ids.has(id), `${a.id}: ${id}`).toBe(true);
+    for (const v of VORLAGEN) {
+      expect(ANLAESSE.some((a) => a.vorlagen.includes(v.id)), v.id).toBe(true);
+      expect(KURZ[v.id], v.id).toBeTruthy();
+      expect(KURZ[v.id]).not.toMatch(/§|Art\. \d/);
+    }
+    expect(Object.keys(KURZ).sort()).toEqual([...ids].sort());
+  });
+
+  it("gibt jedem Schritt einen Titel und kennzeichnet nur vorhandene Felder als selten", () => {
+    for (const v of VORLAGEN) for (const a of v.abschnitte) expect(a.titel, v.id).toBeTruthy();
+    // seltene Felder sind nie Pflicht – sonst wären sie versteckt und trotzdem gefordert
+    for (const v of VORLAGEN)
+      for (const a of v.abschnitte)
+        for (const f of a.felder) {
+          if (f.selten) expect(f.pflicht, `${v.id}.${f.id}`).toBeFalsy();
+          if (f.art === "liste") for (const x of f.felder) if (x.selten) expect(x.pflicht, `${v.id}.${f.id}.${x.id}`).toBeFalsy();
+        }
+  });
+
+  it("verbindet Vorlagen mit gespeicherten Mitarbeitern und Kunden", () => {
+    const felderVon = (v: (typeof VORLAGEN)[number]) => new Set(v.abschnitte.flatMap((a) => a.felder.map((f) => f.id)));
+    for (const v of VORLAGEN.filter((x) => x.person)) {
+      const arten = new Set(PERSONEN_FELDER[v.person!.art].map((f) => f.id));
+      for (const [k, feld] of Object.entries(v.person!.felder)) {
+        expect(arten.has(k), `${v.id}: ${k}`).toBe(true);
+        expect(felderVon(v).has(feld), `${v.id}: ${feld}`).toBe(true);
+      }
+    }
+    const r = vorlageFuer("rechnung")!;
+    expect(personAus(r, { kunde_name: "  ", kunde_anschrift: "x" })).toBeNull();
+    expect(personAus(r, { kunde_name: "Kim Beispiel", kunde_anschrift: "Gartenweg 3", kunde_ust_idnr: "" })).toEqual({ name: "Kim Beispiel", anschrift: "Gartenweg 3" });
+    expect(personIn(r, { name: "Kim Beispiel", anschrift: "Gartenweg 3", ust_idnr: "" })).toEqual({ kunde_name: "Kim Beispiel", kunde_anschrift: "Gartenweg 3" });
+    const l = vorlageFuer("lohnkonto")!;
+    expect(personIn(l, { name: "Sam", beginn: "2026-01-01", steuerklasse: "I" })).toEqual({ name: "Sam", eintritt: "2026-01-01", steuerklasse: "I" });
+    // gleicher Name ergänzt, leere Werte überschreiben nichts
+    let liste = personMerken([], { name: "Kim Beispiel", anschrift: "Gartenweg 3" }, "a");
+    liste = personMerken(liste, { name: "kim beispiel ", anschrift: "", ust_idnr: "DE1" }, "b");
+    expect(liste).toEqual([{ id: "a", name: "Kim Beispiel", anschrift: "Gartenweg 3", ust_idnr: "DE1" }]);
+    liste = personMerken(liste, { name: "Robin" }, "c");
+    expect(liste.map((p) => p.id)).toEqual(["a", "c"]);
+  });
+
+  it("zählt Rechnungsnummern fortlaufend weiter", () => {
+    expect(vorlageFuer("rechnung")!.fortlaufend).toBe("nummer");
+    expect(naechsteNummer([], "2026")).toBe("2026-001");
+    expect(naechsteNummer(["2026-014", "2026-009", "2025-120"], "2026")).toBe("2026-015");
+    expect(naechsteNummer(["2025-120"], "2026")).toBe("2026-001");
+    expect(naechsteNummer(["RE-2026-0099"], "2026")).toBe("RE-2026-0100");
+    expect(naechsteNummer(["17", "R18", ""], "2026")).toBe("R19");
+  });
+
+  it("kürzt lange Vorschläge zu einem lesbaren Titel", () => {
+    expect(kurztitel("Ausrutschen, Stolpern und Stürzen durch glatte Böden, Schmierfilme oder Fußmatten.")).toBe("Ausrutschen, Stolpern und Stürzen");
+    expect(kurztitel("Versperrte Verkehrs- und Fluchtwege, zu enge Bewegungsflächen")).toBe("Versperrte Verkehrs- und Fluchtwege");
+    expect(kurztitel("Unzureichende Frischluftzufuhr, dadurch Belastung durch Dämpfe")).toBe("Unzureichende Frischluftzufuhr");
+    expect(kurztitel("Hautkontakt mit Friseurchemikalien (Färbe-, Blondiermittel)")).toBe("Hautkontakt mit Friseurchemikalien");
+    expect(kurztitel("Kühlschrank")).toBe("Kühlschrank");
   });
 });

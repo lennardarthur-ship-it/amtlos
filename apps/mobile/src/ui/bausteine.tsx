@@ -3,6 +3,7 @@ import * as Haptics from "expo-haptics";
 import { SymbolView, type SymbolViewProps } from "expo-symbols";
 import { useEffect, useState, type ReactNode } from "react";
 import { ActivityIndicator, Pressable, Text as RNText, Switch, TextInput, View, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { T as TEXT } from "../texte";
 import { GROESSE, RADIUS, SCHRIFT, ZIEL, istIos, useFarben } from "./thema";
 
@@ -40,7 +41,9 @@ const FALLBACK: Record<string, keyof typeof Ionicons.glyphMap> = {
   "exclamationmark.circle": "alert-circle-outline", "person": "person-outline", "lock": "lock-closed-outline", "percent": "calculator-outline",
   "folder": "folder-outline", "doc.on.doc": "copy-outline", "printer": "print-outline", "lock.shield": "shield-checkmark-outline", "fork.knife": "restaurant-outline",
   "scissors": "cut-outline", "cross.case": "medkit-outline", "checkmark.square.fill": "checkbox", "square": "square-outline", "chevron.down": "chevron-down", "chevron.up": "chevron-up",
-  "doc.richtext": "document-text-outline", "hammer": "hammer-outline",
+  "doc.richtext": "document-text-outline", "hammer": "hammer-outline", "info.circle.fill": "information-circle", "xmark.circle": "close-circle-outline",
+  "person.crop.circle": "person-circle-outline", "eye": "eye-outline", "arrow.left": "arrow-back", "list.number": "list-outline", "checkmark.circle.fill": "checkmark-circle", "person.badge.clock": "person-outline",
+  "figure.wave": "body-outline", "storefront": "storefront-outline", "calendar.badge.checkmark": "calendar-outline", "laptopcomputer": "laptop-outline", "exclamationmark.shield": "shield-outline", "cup.and.saucer": "cafe-outline", "sparkle": "sparkles-outline", "arrow.clockwise": "refresh-outline", "pencil": "create-outline", "plus.circle": "add-circle-outline",
 };
 export function Symbol({ name, groesse = 22, farbe, gewicht = "medium" }: { name: string; groesse?: number; farbe?: string; gewicht?: SymbolViewProps["weight"] }) {
   const f = useFarben();
@@ -55,9 +58,10 @@ export function Symbol({ name, groesse = 22, farbe, gewicht = "medium" }: { name
 }
 
 /** Primärer und leiser Knopf: 48 pt hoch, Haptik beim Tippen. */
-export function Knopf({ text, onPress, leise, gefahr, deaktiviert, laedt, symbol, stil }: { text: string; onPress: () => void; leise?: boolean; gefahr?: boolean; deaktiviert?: boolean; laedt?: boolean; symbol?: string; stil?: StyleProp<ViewStyle> }) {
+export function Knopf({ text, onPress, leise, ton, gefahr, deaktiviert, laedt, symbol, stil }: { text: string; onPress: () => void; leise?: boolean; ton?: boolean; gefahr?: boolean; deaktiviert?: boolean; laedt?: boolean; symbol?: string; stil?: StyleProp<ViewStyle> }) {
   const f = useFarben();
   const farbe = gefahr ? f.frist : f.amt;
+  if (ton) return <TonKnopf text={text} onPress={onPress} symbol={symbol} stil={stil} deaktiviert={deaktiviert} />;
   return (
     <Pressable
       accessibilityRole="button"
@@ -78,6 +82,72 @@ export function Knopf({ text, onPress, leise, gefahr, deaktiviert, laedt, symbol
     </Pressable>
   );
 }
+
+/** Zweitrangige Handlung als ruhige Fläche (Hauch der Handlungsfarbe) – neben dem einen Hauptknopf eines Bildschirms. */
+function TonKnopf({ text, onPress, symbol, stil, deaktiviert }: { text: string; onPress: () => void; symbol?: string; stil?: StyleProp<ViewStyle>; deaktiviert?: boolean }) {
+  const f = useFarben();
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ disabled: Boolean(deaktiviert) }}
+      disabled={deaktiviert}
+      onPress={() => {
+        if (istIos) void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        onPress();
+      }}
+      style={({ pressed }) => [{ minHeight: ZIEL, paddingHorizontal: 18, borderRadius: 12, flexDirection: "row", gap: 8, alignItems: "center", justifyContent: "center", backgroundColor: f.amtHauch, opacity: deaktiviert ? 0.45 : pressed ? 0.75 : 1 }, stil]}
+    >
+      {symbol ? <Symbol name={symbol} groesse={18} farbe={f.amtTief} /> : null}
+      <RNText style={{ fontFamily: SCHRIFT.bold, fontSize: GROESSE.basis, color: f.amtTief }}>{text}</RNText>
+    </Pressable>
+  );
+}
+
+/** Handlung als Text (Links, „Entfernen“, „Weitere Angaben“) – ohne Rahmen, 44 pt Tippfläche. */
+export function TextKnopf({ text, onPress, symbol, gefahr, leise, stil, label }: { text: string; onPress: () => void; symbol?: string; gefahr?: boolean; leise?: boolean; stil?: StyleProp<ViewStyle>; label?: string }) {
+  const f = useFarben();
+  const farbe = gefahr ? f.frist : leise ? f.tinteLeise : f.amt;
+  return (
+    <Pressable accessibilityRole="button" accessibilityLabel={label ?? text} onPress={onPress} hitSlop={4} style={({ pressed }) => [{ minHeight: 44, flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-start", opacity: pressed ? 0.6 : 1 }, stil]}>
+      {symbol ? <Symbol name={symbol} groesse={17} farbe={farbe} /> : null}
+      <T v="klein" fett farbe={farbe}>{text}</T>
+    </Pressable>
+  );
+}
+
+/** Feste Leiste am unteren Rand eines Ablaufs: der eine Hauptknopf, optional davor ein Zurück. */
+export function Fuss({ children, ueber }: { children: ReactNode; ueber?: ReactNode }) {
+  const f = useFarben();
+  const inset = useSafeAreaInsets();
+  return (
+    <View style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: Math.max(inset.bottom, 12) + 4, borderTopWidth: 0.5, borderColor: f.linie, backgroundColor: f.papier, gap: 8 }}>
+      {ueber}
+      <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>{children}</View>
+    </View>
+  );
+}
+
+/** Beschriftung eines Felds; Hilfe hinter einem (i), damit Formulare ruhig bleiben. */
+export function FeldKopf({ label, hilfe }: { label: string; hilfe?: string }) {
+  const f = useFarben();
+  const [offen, setOffen] = useState(false);
+  return (
+    <View>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+        <T v="klein" fett stil={{ flexShrink: 1 }}>{label}</T>
+        {hilfe ? (
+          <Pressable accessibilityRole="button" accessibilityLabel={`${TEXT.hilfe_zu} ${label}`} accessibilityState={{ expanded: offen }} onPress={() => setOffen(!offen)} hitSlop={12} style={{ padding: 2 }}>
+            <Symbol name={offen ? "info.circle.fill" : "info.circle"} groesse={17} farbe={f.amt} />
+          </Pressable>
+        ) : null}
+      </View>
+      {hilfe && offen ? <T v="caption" leise stil={{ marginTop: 3 }}>{hilfe}</T> : null}
+    </View>
+  );
+}
+
+/** Kurze Hilfe (passt ins Feld) steht als Platzhalter darin; längere Erklärungen hinter dem (i). */
+export const istBeispiel = (hilfe?: string, mehrzeilig?: boolean) => Boolean(hilfe && hilfe.trim().length <= (mehrzeilig ? 80 : 34));
 
 /** Abschnittsüberschrift wie in iOS-Listen: ruhig, klein, in Tinte – keine Großbuchstaben. */
 export function Abschnitt({ titel, rechts, children }: { titel?: string; rechts?: ReactNode; children: ReactNode }) {
@@ -149,13 +219,14 @@ export function Karte({ children, stil, rahmen }: { children: ReactNode; stil?: 
 }
 
 /** Beschriftetes Textfeld; die Beschriftung steht darüber und ist mit dem Feld verbunden. */
-export function Feld({ label, wert, aendern, hilfe, fehler, mehrzeilig, ...rest }: { label: string; wert: string; aendern: (w: string) => void; hilfe?: string; fehler?: string | null; mehrzeilig?: boolean } & Omit<React.ComponentProps<typeof TextInput>, "value" | "onChangeText" | "style">) {
+export function Feld({ label, wert, aendern, hilfe, fehler, mehrzeilig, ohneLabel, ...rest }: { label: string; wert: string; aendern: (w: string) => void; hilfe?: string; fehler?: string | null; mehrzeilig?: boolean; ohneLabel?: boolean } & Omit<React.ComponentProps<typeof TextInput>, "value" | "onChangeText" | "style">) {
   const f = useFarben();
+  const beispiel = istBeispiel(hilfe, mehrzeilig) && !rest.placeholder;
   return (
-    <View style={{ marginTop: 14 }}>
-      <T v="klein" fett>{label}</T>
-      {hilfe ? <T v="caption" leise stil={{ marginTop: 2 }}>{hilfe}</T> : null}
+    <View style={{ marginTop: ohneLabel ? 8 : 20 }}>
+      {ohneLabel ? null : <FeldKopf label={label} hilfe={beispiel ? undefined : hilfe} />}
       <TextInput
+        placeholder={beispiel ? hilfe : undefined}
         accessibilityLabel={label}
         value={wert}
         onChangeText={aendern}
@@ -189,9 +260,8 @@ export function DatumFeld({ label, wert, aendern, hilfe, ohneHeute }: { label: s
   const heute = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Berlin" }).format(new Date());
   const falsch = text.trim() !== "" && !isoAus(text);
   return (
-    <View style={{ marginTop: 14 }}>
-      <T v="klein" fett>{label}</T>
-      {hilfe ? <T v="caption" leise stil={{ marginTop: 2 }}>{hilfe}</T> : null}
+    <View style={{ marginTop: 20 }}>
+      <FeldKopf label={label} hilfe={hilfe} />
       <View style={{ flexDirection: "row", gap: 8, marginTop: 6, alignItems: "center" }}>
         <TextInput
           accessibilityLabel={label}
@@ -217,11 +287,11 @@ export function DatumFeld({ label, wert, aendern, hilfe, ohneHeute }: { label: s
 }
 
 /** Auswahl als Chips (wenige Optionen) – Radio-Semantik für VoiceOver. */
-export function Wahl<W extends string>({ label, wert, aendern, optionen }: { label?: string; wert: W | null; aendern: (w: W) => void; optionen: { wert: W; text: string }[] }) {
+export function Wahl<W extends string>({ label, wert, aendern, optionen, hilfe }: { label?: string; wert: W | null; aendern: (w: W) => void; optionen: { wert: W; text: string }[]; hilfe?: string }) {
   const f = useFarben();
   return (
-    <View style={{ marginTop: label ? 14 : 0 }}>
-      {label ? <T v="klein" fett>{label}</T> : null}
+    <View style={{ marginTop: label ? 20 : 0 }}>
+      {label ? <FeldKopf label={label} hilfe={hilfe} /> : null}
       <View accessibilityRole="radiogroup" accessibilityLabel={label} style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: label ? 8 : 0 }}>
         {optionen.map((o) => {
           const an = o.wert === wert;
@@ -250,22 +320,39 @@ export function Wahl<W extends string>({ label, wert, aendern, optionen }: { lab
 export function Schalter({ label, wert, aendern, hilfe }: { label: string; wert: boolean; aendern: (w: boolean) => void; hilfe?: string }) {
   const f = useFarben();
   return (
-    <View style={{ flexDirection: "row", alignItems: "center", gap: 12, minHeight: ZIEL, marginTop: 10 }}>
+    <View style={{ flexDirection: "row", alignItems: "center", gap: 12, minHeight: ZIEL, marginTop: 16 }}>
       <View style={{ flex: 1 }}>
-        <T>{label}</T>
-        {hilfe ? <T v="caption" leise>{hilfe}</T> : null}
+        <SchalterText label={label} hilfe={hilfe} />
       </View>
       <Switch accessibilityLabel={label} value={wert} onValueChange={aendern} trackColor={{ true: f.amt, false: f.linie }} thumbColor="#ffffff" />
     </View>
   );
 }
 
+function SchalterText({ label, hilfe }: { label: string; hilfe?: string }) {
+  const f = useFarben();
+  const [offen, setOffen] = useState(false);
+  return (
+    <View>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+        <T stil={{ flexShrink: 1 }}>{label}</T>
+        {hilfe ? (
+          <Pressable accessibilityRole="button" accessibilityLabel={`${TEXT.hilfe_zu} ${label}`} accessibilityState={{ expanded: offen }} onPress={() => setOffen(!offen)} hitSlop={12} style={{ padding: 2 }}>
+            <Symbol name={offen ? "info.circle.fill" : "info.circle"} groesse={17} farbe={f.amt} />
+          </Pressable>
+        ) : null}
+      </View>
+      {hilfe && offen ? <T v="caption" leise stil={{ marginTop: 3 }}>{hilfe}</T> : null}
+    </View>
+  );
+}
+
 /** Auswahl als Liste untereinander – für lange oder viele Optionen (Radio-Semantik). */
-export function Auswahl<W extends string>({ label, wert, aendern, optionen }: { label: string; wert: W | null; aendern: (w: W) => void; optionen: { wert: W; text: string }[] }) {
+export function Auswahl<W extends string>({ label, wert, aendern, optionen, hilfe }: { label: string; wert: W | null; aendern: (w: W) => void; optionen: { wert: W; text: string }[]; hilfe?: string }) {
   const f = useFarben();
   return (
-    <View style={{ marginTop: 14 }}>
-      <T v="klein" fett>{label}</T>
+    <View style={{ marginTop: 20 }}>
+      <FeldKopf label={label} hilfe={hilfe} />
       <View accessibilityRole="radiogroup" accessibilityLabel={label} style={{ marginTop: 6, borderWidth: 1.5, borderColor: f.linie, borderRadius: RADIUS.klein, overflow: "hidden" }}>
         {optionen.map((o, i) => {
           const an = o.wert === wert;
@@ -292,11 +379,11 @@ export function Auswahl<W extends string>({ label, wert, aendern, optionen }: { 
 }
 
 /** Mehrfachauswahl als Chips mit Häkchen (Checkbox-Semantik), z. B. Allergene. */
-export function MehrfachWahl({ label, werte, aendern, optionen }: { label: string; werte: string[]; aendern: (w: string[]) => void; optionen: { wert: string; text: string }[] }) {
+export function MehrfachWahl({ label, werte, aendern, optionen, hilfe }: { label: string; werte: string[]; aendern: (w: string[]) => void; optionen: { wert: string; text: string }[]; hilfe?: string }) {
   const f = useFarben();
   return (
-    <View style={{ marginTop: 14 }}>
-      <T v="klein" fett>{label}</T>
+    <View style={{ marginTop: 20 }}>
+      <FeldKopf label={label} hilfe={hilfe} />
       <View accessibilityLabel={label} style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8 }}>
         {optionen.map((o) => {
           const an = werte.includes(o.wert);
@@ -326,16 +413,15 @@ export function MehrfachWahl({ label, werte, aendern, optionen }: { label: strin
 /** Uhrzeit als HH:MM. */
 export function UhrzeitFeld({ label, wert, aendern, hilfe }: { label: string; wert: string; aendern: (w: string) => void; hilfe?: string }) {
   const falsch = wert.trim() !== "" && !/^([01]?\d|2[0-3]):[0-5]\d$/.test(wert.trim());
-  return <Feld label={label} hilfe={hilfe} wert={wert} aendern={aendern} placeholder="HH:MM" keyboardType="numbers-and-punctuation" fehler={falsch ? TEXT.uhrzeit_falsch : null} />;
+  return <Feld label={label} hilfe={hilfe === "HH:MM" ? undefined : hilfe} wert={wert} aendern={aendern} placeholder="HH:MM" keyboardType="numbers-and-punctuation" fehler={falsch ? TEXT.uhrzeit_falsch : null} />;
 }
 
 /** Textbausteine zum Ankreuzen – untereinander, mit Quelle (Checkbox-Semantik). */
 export function BausteinListe({ label, hilfe, werte, aendern, optionen }: { label: string; hilfe?: string; werte: string[]; aendern: (w: string[]) => void; optionen: { wert: string; text: string; quelle?: string }[] }) {
   const f = useFarben();
   return (
-    <View style={{ marginTop: 14 }}>
-      <T v="klein" fett>{label}</T>
-      {hilfe ? <T v="caption" leise stil={{ marginTop: 2 }}>{hilfe}</T> : null}
+    <View style={{ marginTop: 20 }}>
+      <FeldKopf label={label} hilfe={hilfe} />
       <View accessibilityLabel={label} style={{ marginTop: 6, borderWidth: 1.5, borderColor: f.linie, borderRadius: RADIUS.klein, overflow: "hidden" }}>
         {optionen.map((o, i) => {
           const an = werte.includes(o.wert);

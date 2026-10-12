@@ -53,9 +53,10 @@ Amtlos – Unterlagen für deinen Betrieb (Testversion fürs iPhone)
    iPhone und Mac müssen im selben WLAN sein. Fragt der Mac, ob „node“ Verbindungen annehmen darf: Erlauben.
 5. In der App:
    - „Betrieb eintragen“ – einmal Name, Adresse, verantwortliche Person.
-   - Unter „Unterlagen“ auswählen, was du brauchst (z. B. Gefährdungsbeurteilung), „Jetzt ausfüllen“.
-   - „PDF teilen“: in Dateien sichern, per Mail schicken oder drucken.
-   - Unter „Meine“ findest du alles wieder. Alles bleibt nur auf dem iPhone.
+   - „Rechnung schreiben“ oder unter „Wofür brauchst du etwas?“ den Anlass wählen (z. B. „Ich stelle jemanden ein“).
+   - Schritt für Schritt ausfüllen, unten „Weiter“. Am Ende siehst du das Dokument und tippst „PDF teilen“.
+   - Unter „Meine“ findest du alles wieder; unter „Mein Betrieb“ stehen Mitarbeiter und Kunden.
+     Alles bleibt nur auf dem iPhone.
 
 Beenden: im Terminal Ctrl + C. Nächstes Mal reichen die Befehle „cd …“ und „npx expo start“.
 TXT

@@ -11,8 +11,8 @@ import { RAND, ZIEL, useFarben } from "./thema";
  * führt zur ersten Seite zurück.
  */
 interface Nav {
-  /** Unterseite öffnen; gleicher Schlüssel wird nicht doppelt geöffnet. */
-  oeffnen(schluessel: string, inhalt: () => ReactNode): void;
+  /** Unterseite öffnen; gleicher Schlüssel wird nicht doppelt geöffnet. `vollbild` blendet die Tab-Leiste aus (geführte Abläufe). */
+  oeffnen(schluessel: string, inhalt: () => ReactNode, vollbild?: boolean): void;
   zurueck(): void;
 }
 const NavKontext = createContext<Nav | null>(null);
@@ -29,6 +29,7 @@ interface Eintrag {
   schluessel: string;
   inhalt: () => ReactNode;
   geht: boolean;
+  vollbild: boolean;
 }
 
 function Ebene({ eintrag, oben, zurueck, weg }: { eintrag: Eintrag; oben: boolean; zurueck: () => void; weg: () => void }) {
@@ -66,9 +67,11 @@ function Ebene({ eintrag, oben, zurueck, weg }: { eintrag: Eintrag; oben: boolea
 }
 
 /** Ein Stapel für einen Tab. `wurzel` ist die erste Seite; ändert sich `zuruecksetzen`, schließen alle Unterseiten. */
-export function Stapel({ wurzel, zuruecksetzen }: { wurzel: ReactNode; zuruecksetzen: number }) {
+export function Stapel({ wurzel, zuruecksetzen, vollbild }: { wurzel: ReactNode; zuruecksetzen: number; vollbild?: (an: boolean) => void }) {
   const [stapel, setStapel] = useState<Eintrag[]>([]);
   useEffect(() => setStapel([]), [zuruecksetzen]);
+  const istVoll = stapel.some((e) => e.vollbild && !e.geht);
+  useEffect(() => vollbild?.(istVoll), [istVoll, vollbild]);
 
   const zurueck = useCallback(() => {
     setStapel((s) => {
@@ -78,7 +81,7 @@ export function Stapel({ wurzel, zuruecksetzen }: { wurzel: ReactNode; zurueckse
   }, []);
   const nav = useMemo<Nav>(
     () => ({
-      oeffnen: (schluessel, inhalt) => setStapel((s) => (s.some((e) => e.schluessel === schluessel && !e.geht) ? s : [...s.filter((e) => e.schluessel !== schluessel), { schluessel, inhalt, geht: false }])),
+      oeffnen: (schluessel, inhalt, voll = false) => setStapel((s) => (s.some((e) => e.schluessel === schluessel && !e.geht) ? s : [...s.filter((e) => e.schluessel !== schluessel), { schluessel, inhalt, geht: false, vollbild: voll }])),
       zurueck,
     }),
     [zurueck],

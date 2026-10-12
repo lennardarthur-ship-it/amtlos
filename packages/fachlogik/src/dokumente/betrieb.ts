@@ -26,7 +26,7 @@ export const gewerbeanmeldung: Vorlage = {
       hilfe: "Angemeldet wird beim Gewerbeamt deiner Stadt oder Gemeinde, oft auch online.",
       felder: [
         { id: "name", art: "text", label: "Vor- und Nachname", vorbelegung: "verantwortlich", pflicht: true },
-        { id: "geburtsname", art: "text", label: "Geburtsname", hilfe: "falls abweichend" },
+        { id: "geburtsname", selten: true, art: "text", label: "Geburtsname", hilfe: "falls abweichend" },
         { id: "geburtsdatum", art: "datum", label: "Geburtsdatum", pflicht: true },
         { id: "geburtsort", art: "text", label: "Geburtsort", pflicht: true },
         { id: "staatsangehoerigkeit", art: "text", label: "Staatsangehörigkeit", pflicht: true, vorschlaege: ["deutsch"] },
@@ -42,7 +42,7 @@ export const gewerbeanmeldung: Vorlage = {
         { id: "beginn", art: "datum", label: "Beginn der Tätigkeit", pflicht: true },
         { id: "erwerb", art: "wahl", label: "Haupt- oder Nebenerwerb", optionen: [{ wert: "haupt", text: "Haupterwerb" }, { wert: "neben", text: "Nebenerwerb" }], vorbelegung: "haupt" },
         { id: "beschaeftigte", art: "text", label: "Zahl der Beschäftigten", hilfe: "z. B. 1 Vollzeit, 2 Teilzeit – oder keine" },
-        { id: "erlaubnis", art: "text", label: "Erlaubnis oder Handwerkskarte", hilfe: "nur falls nötig: welche, von wem, vom" },
+        { id: "erlaubnis", selten: true, art: "text", label: "Erlaubnis oder Handwerkskarte", hilfe: "nur falls nötig: welche, von wem, vom" },
       ],
     },
   ],
@@ -91,7 +91,7 @@ export const handelsregister: Vorlage = {
   pflichten: ["gesellschaft.handelsregister_anmeldung"],
   namensFeld: "firma",
   abschnitte: [
-    {
+    { titel: "Gesellschaft",
       hilfe: "Die Anmeldung zum Handelsregister macht der Notar. Mit diesem Blatt hast du alle Angaben beisammen.",
       felder: [
         { id: "firma", art: "text", label: "Firma (Name im Register)", pflicht: true },
@@ -137,7 +137,7 @@ export const transparenzregister: Vorlage = {
   pflichten: ["gesellschaft.transparenzregister"],
   grundlage: "§§ 19, 20 GwG",
   abschnitte: [
-    {
+    { titel: "Gesellschaft",
       hilfe: "Gemeldet wird online beim Transparenzregister. Dieses Blatt hält fest, was du gemeldet hast.",
       felder: [
         { id: "rechtsform", art: "text", label: "Rechtsform", hilfe: "z. B. GmbH" },
@@ -159,7 +159,7 @@ export const transparenzregister: Vorlage = {
         },
       ],
     },
-    { felder: [{ id: "gemeldet", art: "datum", label: "Gemeldet am" }] },
+    { titel: "Meldung", felder: [{ id: "gemeldet", art: "datum", label: "Gemeldet am" }] },
   ],
   html(d, b) {
     const l = liste(d, "berechtigte").filter((x) => text(x, "name"));

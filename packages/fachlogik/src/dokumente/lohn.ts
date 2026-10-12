@@ -33,14 +33,15 @@ export const arbeitszeitnachweis: Vorlage = {
   beschreibung: "Beginn, Ende und Dauer der täglichen Arbeitszeit je Person und Monat – auch für Minijobs. Ausgefüllt oder als Blatt zum Eintragen von Hand.",
   bereich: "personal",
   pflichten: ["personal.arbeitszeit_aufzeichnung", "personal.arbeitszeit_milog"],
+  person: { art: "mitarbeiter", felder: { name: "name" } },
   grundlage: "§ 3 Abs. 2 Nr. 1 ArbSchG (BAG 13.09.2022 – 1 ABR 22/21); § 17 MiLoG",
   namensFeld: "name",
   abschnitte: [
-    {
+    { titel: "Person und Monat",
       felder: [
         { id: "name", art: "text", label: "Name der beschäftigten Person", pflicht: true },
         { id: "monat", art: "text", label: "Monat", hilfe: "z. B. Oktober 2026", pflicht: true },
-        { id: "leerzeilen", art: "schalter", label: "Leere Zeilen zum Eintragen von Hand anhängen", vorbelegung: false },
+        { id: "leerzeilen", selten: true, art: "schalter", label: "Leere Zeilen zum Eintragen von Hand anhängen", vorbelegung: false },
       ],
     },
     {
@@ -57,7 +58,7 @@ export const arbeitszeitnachweis: Vorlage = {
             { id: "beginn", art: "uhrzeit", label: "Beginn", pflicht: true },
             { id: "ende", art: "uhrzeit", label: "Ende", pflicht: true },
             { id: "pause", art: "zahl", label: "Pause (Minuten)" },
-            { id: "bemerkung", art: "text", label: "Bemerkung", hilfe: "z. B. Urlaub, krank" },
+            { id: "bemerkung", selten: true, art: "text", label: "Bemerkung", hilfe: "z. B. Urlaub, krank" },
           ],
         },
       ],
@@ -83,6 +84,8 @@ export const arbeitszeitnachweis: Vorlage = {
   },
 };
 
+export const STEUERKLASSEN = ["I", "II", "III", "IV", "IV mit Faktor", "V", "VI"].map((k) => ({ wert: k, text: k }));
+
 const BETRAEGE: [string, string][] = [
   ["brutto", "Bruttolohn"],
   ["sachbezuege", "Sachbezüge"],
@@ -102,6 +105,7 @@ export const lohnkonto: Vorlage = {
   beschreibung: "Je beschäftigte Person die Stammdaten und für jeden Monat Lohn, Steuern und Beiträge – mit Jahressummen.",
   bereich: "personal",
   pflichten: ["personal.lohnabrechnung", "personal.lohnsteuer_anmeldung"],
+  person: { art: "mitarbeiter", felder: { name: "name", geburtsdatum: "geburtsdatum", anschrift: "anschrift", steuer_id: "steuer_id", steuerklasse: "steuerklasse", sv_nummer: "sv_nummer", krankenkasse: "krankenkasse", beginn: "eintritt" } },
   grundlage: "§ 41 EStG; § 4 LStDV",
   namensFeld: "name",
   abschnitte: [
@@ -114,7 +118,7 @@ export const lohnkonto: Vorlage = {
         { id: "geburtsdatum", art: "datum", label: "Geburtsdatum", pflicht: true },
         { id: "anschrift", art: "mehrzeilig", label: "Anschrift", pflicht: true },
         { id: "steuer_id", art: "text", label: "Steuer-Identifikationsnummer", pflicht: true },
-        { id: "steuerklasse", art: "wahl", label: "Steuerklasse", optionen: ["I", "II", "III", "IV", "IV mit Faktor", "V", "VI"].map((k) => ({ wert: k, text: k })), pflicht: true },
+        { id: "steuerklasse", art: "wahl", label: "Steuerklasse", optionen: STEUERKLASSEN, pflicht: true },
         { id: "kinder", art: "text", label: "Kinderfreibeträge" },
         { id: "religion", art: "text", label: "Kirchensteuermerkmal", vorschlaege: ["keine Kirchensteuerpflicht", "ev (evangelisch)", "rk (römisch-katholisch)"] },
         { id: "sv_nummer", art: "text", label: "Sozialversicherungsnummer", pflicht: true },
@@ -134,8 +138,8 @@ export const lohnkonto: Vorlage = {
           felder: [
             { id: "monat", art: "text", label: "Lohnzahlungszeitraum", hilfe: "z. B. Oktober 2026", pflicht: true },
             { id: "zahltag", art: "datum", label: "Tag der Lohnzahlung", pflicht: true },
-            ...BETRAEGE.map(([id, label]) => ({ id, art: "betrag" as const, label: `${label} (€)`, pflicht: id === "brutto" })),
-            { id: "unterbrechung", art: "schalter", label: "Unterbrechung ohne Lohnanspruch (Großbuchstabe U)", hilfe: "z. B. mindestens fünf Arbeitstage ohne Lohn" },
+            ...BETRAEGE.map(([id, label]) => ({ id, art: "betrag" as const, label: `${label} (€)`, pflicht: id === "brutto", selten: ["sachbezuege", "steuerfrei", "soli"].includes(id) })),
+            { id: "unterbrechung", selten: true, art: "schalter", label: "Unterbrechung ohne Lohnanspruch (Großbuchstabe U)", hilfe: "z. B. mindestens fünf Arbeitstage ohne Lohn" },
           ],
         },
       ],
@@ -190,6 +194,7 @@ export const svMeldedaten: Vorlage = {
   beschreibung: "Alle Angaben einer neuen beschäftigten Person, die du für die Anmeldung zur Sozialversicherung und die Lohnabrechnung brauchst – zum Unterschreiben.",
   bereich: "personal",
   pflichten: ["personal.sv_anmeldung", "personal.sofortmeldung"],
+  person: { art: "mitarbeiter", felder: { name: "name", geburtsname: "geburtsname", geburtsdatum: "geburtsdatum", geburtsort: "geburtsort", staatsangehoerigkeit: "staatsangehoerigkeit", anschrift: "anschrift", sv_nummer: "sv_nummer", steuer_id: "steuer_id", krankenkasse: "krankenkasse", iban: "iban", beginn: "beginn", taetigkeit: "taetigkeit" } },
   grundlage: "§ 28a SGB IV; DEÜV",
   namensFeld: "name",
   abschnitte: [
@@ -198,7 +203,7 @@ export const svMeldedaten: Vorlage = {
       hilfe: "Die Meldung selbst geht elektronisch über dein Lohnprogramm oder sv.net.",
       felder: [
         { id: "name", art: "text", label: "Vor- und Nachname", pflicht: true },
-        { id: "geburtsname", art: "text", label: "Geburtsname", hilfe: "falls abweichend" },
+        { id: "geburtsname", selten: true, art: "text", label: "Geburtsname", hilfe: "falls abweichend" },
         { id: "geburtsdatum", art: "datum", label: "Geburtsdatum", pflicht: true },
         { id: "geburtsort", art: "text", label: "Geburtsort", pflicht: true },
         { id: "staatsangehoerigkeit", art: "text", label: "Staatsangehörigkeit", pflicht: true },

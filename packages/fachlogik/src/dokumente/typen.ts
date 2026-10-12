@@ -59,6 +59,8 @@ interface FeldBasis {
   /** fehlt die Angabe, nennt die App sie unter „Fehlt noch“ (das PDF lässt sich trotzdem erstellen) */
   pflicht?: boolean;
   wenn?: Bedingung;
+  /** selten nötig: die App zeigt das Feld erst unter „Weitere Angaben“ (oder wenn es schon ausgefüllt ist) */
+  selten?: boolean;
 }
 
 export type EinfachesFeld =
@@ -92,6 +94,8 @@ export type ListenFeld = FeldBasis & {
   vorschlaege?: Vorschlag[];
   /** Bezeichnung der Gruppen, z. B. „Branche“ */
   gruppenLabel?: string;
+  /** Einträge lassen sich aus den gespeicherten Mitarbeitern übernehmen (Feld `titelFeld` = Name) */
+  ausMitarbeitern?: boolean;
 };
 
 export type Feld = EinfachesFeld | ListenFeld;
@@ -100,6 +104,16 @@ export interface VorlagenAbschnitt {
   titel?: string;
   hilfe?: string;
   felder: Feld[];
+}
+
+/** Gespeicherte Personen, die Vorlagen vorausfüllen (E-124): Mitarbeiter und Kunden. */
+export type PersonenArt = "mitarbeiter" | "kunde";
+export type PersonAngaben = { name: string } & Record<string, string | null>;
+export type Person = PersonAngaben & { id: string };
+/** Zuordnung Personenfeld → Feld der Vorlage, z. B. { name: "kunde_name", anschrift: "kunde_anschrift" } */
+export interface PersonenBezug {
+  art: PersonenArt;
+  felder: Record<string, string>;
 }
 
 export type Bereich = "steuern" | "datenschutz" | "personal" | "arbeitsschutz" | "betrieb" | "gastro" | "beauty";
@@ -118,6 +132,10 @@ export interface Vorlage {
   abschnitte: VorlagenAbschnitt[];
   /** Rechtsgrundlage für den Dokumentkopf, z. B. „§§ 5, 6 ArbSchG“ */
   grundlage?: string;
+  /** Unterlage betrifft eine gespeicherte Person (Mitarbeiter, Kunde): Auswahl füllt diese Felder */
+  person?: PersonenBezug;
+  /** Feld mit fortlaufender Nummer (z. B. Rechnungsnummer): neue Unterlagen zählen hoch */
+  fortlaufend?: string;
   /** Querformat (breite Tabellen, Aushänge) */
   querformat?: boolean;
   html(daten: Daten, betrieb: Betrieb): string;

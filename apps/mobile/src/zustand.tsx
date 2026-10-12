@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import type { Betrieb, Daten } from "@amtlos/fachlogik";
-import { LEERER_STAND, aendern, anlegen, betriebSetzen, kopieren, loeschen, standAus, type Stand, type Unterlage } from "./unterlagen/speicher";
+import type { Betrieb, Daten, Person, PersonAngaben, PersonenArt } from "@amtlos/fachlogik";
+import { LEERER_STAND, aendern, anlegen, betriebSetzen, felderSetzen, kopieren, loeschen, personLoeschen, personMerken, personSetzen, standAus, type Stand, type Unterlage } from "./unterlagen/speicher";
 
 /** Alles liegt nur auf dem Gerät (E-121): kein Konto, kein Server. */
 const SCHLUESSEL = "amtlos.unterlagen.v1";
@@ -16,6 +16,13 @@ interface Zustand {
   betriebSpeichern(b: Betrieb): void;
   anlegen(vorlageId: string): Unterlage;
   aendern(id: string, daten: Daten): void;
+  /** Felder setzen – auf Basis des aktuellen Stands (auch aus Unterseiten heraus sicher) */
+  setzen(id: string, werte: Daten): void;
+  /** aktuelle Daten einer Unterlage (für Handlungen nach schnellen Eingaben) */
+  daten(id: string): Daten | undefined;
+  personMerken(art: PersonenArt, angaben: PersonAngaben): void;
+  personSetzen(art: PersonenArt, p: Person): void;
+  personLoeschen(art: PersonenArt, id: string): void;
   kopieren(id: string): Unterlage | null;
   loeschen(id: string): void;
   allesLoeschen(): Promise<void>;
@@ -68,6 +75,11 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         return u;
       },
       aendern: (id, daten) => setzen(aendern(aktuell.current, id, daten, new Date())),
+      setzen: (id, werte) => setzen(felderSetzen(aktuell.current, id, werte, new Date())),
+      daten: (id) => aktuell.current.unterlagen.find((u) => u.id === id)?.daten,
+      personMerken: (art, angaben) => setzen(personMerken(aktuell.current, art, angaben)),
+      personSetzen: (art, p) => setzen(personSetzen(aktuell.current, art, p)),
+      personLoeschen: (art, id) => setzen(personLoeschen(aktuell.current, art, id)),
       kopieren: (id) => {
         const [s, u] = kopieren(aktuell.current, id, new Date());
         setzen(s);

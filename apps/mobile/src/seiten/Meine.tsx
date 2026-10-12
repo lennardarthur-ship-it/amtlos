@@ -1,23 +1,22 @@
 import { T as TEXT } from "../texte";
 import { Karte, Knopf } from "../ui/bausteine";
-import { useNav } from "../ui/navigation";
 import { sortiert } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
-import { Formular } from "./Formular";
 import { Leer, Seite } from "./gemeinsam";
+import { useOeffnen } from "./starten";
 import { UnterlageZeile } from "./Unterlagen";
 
-/** Alle angelegten Unterlagen, zuletzt bearbeitete zuerst. */
+/** Alle angelegten Unterlagen, zuletzt bearbeitete zuerst. Antippen öffnet den Abschluss mit Vorschau. */
 export function Meine() {
   const { stand, tabWechseln } = useAmtlos();
-  const nav = useNav();
+  const oeffnen = useOeffnen();
   const liste = sortiert(stand);
   return (
     <Seite titel={TEXT.meine_titel}>
       {liste.length ? (
         <Karte>
           {liste.map((u, i) => (
-            <UnterlageZeile key={u.id} u={u} letzte={i === liste.length - 1} onPress={() => nav.oeffnen(`formular-${u.id}`, () => <Formular id={u.id} />)} />
+            <UnterlageZeile key={u.id} u={u} letzte={i === liste.length - 1} onPress={() => oeffnen(u.id)} />
           ))}
         </Karte>
       ) : (

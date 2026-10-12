@@ -38,10 +38,12 @@ export const rechnung: Vorlage = {
   beschreibung: "Rechnung mit allen Pflichtangaben nach § 14 Abs. 4 UStG – Positionen, Steuersätze, Zahlungsziel und Pflichthinweise zum Auswählen.",
   bereich: "steuern",
   pflichten: ["steuern.rechnungen_pflichtangaben"],
+  person: { art: "kunde", felder: { name: "kunde_name", anschrift: "kunde_anschrift", ust_idnr: "kunde_ust_idnr" } },
+  fortlaufend: "nummer",
   grundlage: "§ 14 Abs. 4 UStG",
   namensFeld: "nummer",
   abschnitte: [
-    {
+    { titel: "Rechnung",
       hilfe: "Dieses PDF ist keine E-Rechnung. Für Rechnungen an Unternehmen gelten Übergangsfristen bis zur E-Rechnungspflicht.",
       felder: [
         { id: "nummer", art: "text", label: "Rechnungsnummer", hilfe: "fortlaufend und nur einmal vergeben, z. B. 2026-001", pflicht: true },
@@ -56,7 +58,7 @@ export const rechnung: Vorlage = {
       felder: [
         { id: "kunde_name", art: "text", label: "Name oder Firma", pflicht: true },
         { id: "kunde_anschrift", art: "mehrzeilig", label: "Anschrift", hilfe: "Straße und Hausnummer, PLZ und Ort", pflicht: true },
-        { id: "kunde_ust_idnr", art: "text", label: "USt-IdNr. des Empfängers", hilfe: "nur bei innergemeinschaftlichen Leistungen oder Steuerschuldnerschaft des Empfängers" },
+        { id: "kunde_ust_idnr", selten: true, art: "text", label: "USt-IdNr. des Empfängers", hilfe: "nur bei innergemeinschaftlichen Leistungen oder Steuerschuldnerschaft des Empfängers" },
       ],
     },
     {
@@ -83,8 +85,8 @@ export const rechnung: Vorlage = {
       titel: "Steuer und Hinweise",
       felder: [
         { id: "kleinunternehmer", art: "schalter", label: "Kleinunternehmer (§ 19 UStG)", hilfe: "Dann wird keine Umsatzsteuer ausgewiesen; der Hinweis auf die Steuerbefreiung steht auf der Rechnung." },
-        { id: "hinweise", art: "bausteine", label: "Pflichthinweise, falls zutreffend", optionen: [...RECHNUNGS_HINWEISE.filter((h) => h.wert !== "steuerfrei").map((h) => ({ wert: h.wert, text: h.text, quelle: h.quelle })), { wert: "grundstueck", text: GRUNDSTUECK_HINWEIS, quelle: "§ 14 Abs. 4 Nr. 9, § 14b Abs. 1 Satz 5 UStG" }] },
-        { id: "befreiung", art: "text", label: "Hinweis auf die Steuerbefreiung (bei 0 %)", hilfe: "Pflicht, wenn eine Position steuerfrei ist – mit der Vorschrift", vorschlaege: ["Steuerfreie Leistung nach § 4 Nr. … UStG"] },
+        { id: "hinweise", selten: true, art: "bausteine", label: "Pflichthinweise, falls zutreffend", optionen: [...RECHNUNGS_HINWEISE.filter((h) => h.wert !== "steuerfrei").map((h) => ({ wert: h.wert, text: h.text, quelle: h.quelle })), { wert: "grundstueck", text: GRUNDSTUECK_HINWEIS, quelle: "§ 14 Abs. 4 Nr. 9, § 14b Abs. 1 Satz 5 UStG" }] },
+        { id: "befreiung", selten: true, art: "text", label: "Hinweis auf die Steuerbefreiung (bei 0 %)", hilfe: "Pflicht, wenn eine Position steuerfrei ist – mit der Vorschrift", vorschlaege: ["Steuerfreie Leistung nach § 4 Nr. … UStG"] },
         { id: "hinweis", art: "mehrzeilig", label: "Weitere Hinweise", vorschlaege: ["Vielen Dank für Ihren Auftrag.", "Bitte geben Sie bei der Zahlung die Rechnungsnummer an."] },
       ],
     },
@@ -154,7 +156,7 @@ export const euer: Vorlage = {
   grundlage: "§ 4 Abs. 3 EStG; § 60 Abs. 4 EStDV",
   namensFeld: "jahr",
   abschnitte: [
-    {
+    { titel: "Jahr",
       hilfe: "Die Anlage EÜR übermittelst du elektronisch über ELSTER. Diese Aufstellung sammelt die Zahlen dafür.",
       felder: [{ id: "jahr", art: "text", label: "Jahr", hilfe: "z. B. 2026", pflicht: true }],
     },
@@ -236,7 +238,7 @@ export const bilanzGuv: Vorlage = {
   grundlage: "§§ 238, 242 HGB; § 5b EStG",
   namensFeld: "stichtag",
   abschnitte: [
-    {
+    { titel: "Stichtag",
       hilfe: "Die Zahlen kommen aus deiner Buchführung. Die E-Bilanz geht elektronisch ans Finanzamt, meist über Buchhaltungsprogramm oder Steuerberatung.",
       felder: [{ id: "stichtag", art: "datum", label: "Bilanzstichtag", pflicht: true }],
     },
@@ -290,7 +292,7 @@ export const ustVoranmeldung: Vorlage = {
   grundlage: "§ 18 Abs. 1 UStG",
   namensFeld: "zeitraum",
   abschnitte: [
-    {
+    { titel: "Zeitraum",
       hilfe: "Die Voranmeldung übermittelst du elektronisch über ELSTER. Diese Unterlage rechnet die Zahlen dafür aus und bleibt bei deinen Unterlagen.",
       felder: [{ id: "zeitraum", art: "text", label: "Zeitraum", hilfe: "z. B. Oktober 2026 oder 3. Quartal 2026", pflicht: true }],
     },
@@ -299,14 +301,14 @@ export const ustVoranmeldung: Vorlage = {
       felder: [
         { id: "umsatz_19", art: "betrag", label: "Umsätze zu 19 % (€)" },
         { id: "umsatz_7", art: "betrag", label: "Umsätze zu 7 % (€)", hilfe: "seit 2026 auch Speisen in Restaurant und Café (ohne Getränke)" },
-        { id: "umsatz_frei", art: "betrag", label: "Umsätze ohne Umsatzsteuer (€)", hilfe: "z. B. steuerfreie Umsätze – welche Zeile in ELSTER gilt, hängt von der Art ab" },
+        { id: "umsatz_frei", selten: true, art: "betrag", label: "Umsätze ohne Umsatzsteuer (€)", hilfe: "z. B. steuerfreie Umsätze – welche Zeile in ELSTER gilt, hängt von der Art ab" },
       ],
     },
     {
       titel: "Vorsteuer",
       felder: [
         { id: "vorsteuer", art: "betrag", label: "Vorsteuer aus Eingangsrechnungen (€)", pflicht: true },
-        { id: "notiz", art: "mehrzeilig", label: "Notiz", hilfe: "z. B. Besonderheiten in diesem Zeitraum" },
+        { id: "notiz", selten: true, art: "mehrzeilig", label: "Notiz", hilfe: "z. B. Besonderheiten in diesem Zeitraum" },
       ],
     },
   ],
@@ -361,7 +363,7 @@ export const steuererklaerung: Vorlage = {
   grundlage: "§ 25 EStG; § 31 KStG; § 14a GewStG; § 18 Abs. 3 UStG",
   namensFeld: "jahr",
   abschnitte: [
-    {
+    { titel: "Jahr und Erklärungen",
       hilfe: "Die Erklärungen übermittelst du elektronisch über ELSTER. Diese Zusammenstellung sammelt, was du dafür brauchst.",
       felder: [
         { id: "jahr", art: "text", label: "Jahr", pflicht: true },
@@ -439,7 +441,7 @@ export const kassenbuch: Vorlage = {
   pflichten: [],
   namensFeld: "zeitraum",
   abschnitte: [
-    {
+    { titel: "Zeitraum und Anfangsbestand",
       felder: [
         { id: "zeitraum", art: "text", label: "Zeitraum", hilfe: "z. B. Oktober 2026", pflicht: true },
         { id: "anfang", art: "betrag", label: "Anfangsbestand (€)", pflicht: true },
@@ -502,7 +504,7 @@ export const kassenmeldung: Vorlage = {
   pflichten: ["steuern.kassenmeldung", "steuern.kassenmeldung_ausserbetriebnahme"],
   grundlage: "§ 146a Abs. 4 AO",
   abschnitte: [
-    {
+    { titel: "Stand",
       hilfe: "Die Meldung selbst geht elektronisch über „Mein ELSTER“. Die Angaben stehen auf der Kasse, in der Rechnung und in den Unterlagen zur TSE.",
       felder: [{ id: "stand", art: "datum", label: "Stand", vorbelegung: "heute" }],
     },
@@ -521,13 +523,13 @@ export const kassenmeldung: Vorlage = {
             { id: "hersteller", art: "text", label: "Hersteller", pflicht: true },
             { id: "modell", art: "text", label: "Modell", pflicht: true },
             { id: "seriennummer", art: "text", label: "Seriennummer der Kasse", pflicht: true },
-            { id: "software", art: "text", label: "Software und Version" },
+            { id: "software", selten: true, art: "text", label: "Software und Version" },
             { id: "anschaffung", art: "datum", label: "Angeschafft am", pflicht: true },
             { id: "tse_art", art: "text", label: "Art der zertifizierten technischen Sicherheitseinrichtung (TSE)", pflicht: true, vorschlaege: TSE_ARTEN },
             { id: "tse_seriennummer", art: "text", label: "Seriennummer der TSE", pflicht: true },
-            { id: "tse_zertifikat", art: "text", label: "Zertifizierungs-ID der TSE", hilfe: "z. B. BSI-K-TR-…" },
-            { id: "ausser_betrieb", art: "datum", label: "Außer Betrieb genommen am", hilfe: "nur bei Außerbetriebnahme" },
-            { id: "grund", art: "text", label: "Grund der Außerbetriebnahme", wenn: { feld: "ausser_betrieb" } },
+            { id: "tse_zertifikat", selten: true, art: "text", label: "Zertifizierungs-ID der TSE", hilfe: "z. B. BSI-K-TR-…" },
+            { id: "ausser_betrieb", selten: true, art: "datum", label: "Außer Betrieb genommen am", hilfe: "nur bei Außerbetriebnahme" },
+            { id: "grund", selten: true, art: "text", label: "Grund der Außerbetriebnahme", wenn: { feld: "ausser_betrieb" } },
           ],
         },
       ],

@@ -26,13 +26,13 @@ export const gefaehrdungsbeurteilung: Vorlage = {
   grundlage: "§§ 5, 6 ArbSchG; § 10 MuSchG",
   namensFeld: "arbeitsbereich",
   abschnitte: [
-    {
+    { titel: "Arbeitsbereich",
       felder: [
         { id: "arbeitsbereich", art: "text", label: "Arbeitsbereich oder Gewerk", hilfe: "Je Bereich eine eigene Beurteilung; gleichartige Arbeitsplätze dürfen zusammen beurteilt werden.", pflicht: true, vorschlaege: BEREICHE_VORSCHLAG },
         { id: "taetigkeiten", art: "mehrzeilig", label: "Tätigkeiten in diesem Bereich", hilfe: "z. B. Haare waschen, schneiden, färben" },
-        { id: "beschaeftigte", art: "zahl", label: "Beschäftigte in diesem Bereich" },
+        { id: "beschaeftigte", selten: true, art: "zahl", label: "Beschäftigte in diesem Bereich" },
         { id: "beurteilt_von", art: "text", label: "Beurteilt von", vorbelegung: "verantwortlich", pflicht: true },
-        { id: "mitwirkung", art: "mehrzeilig", label: "Mitgewirkt haben", vorschlaege: ["Fachkraft für Arbeitssicherheit", "Betriebsärztin / Betriebsarzt", "Beschäftigte des Bereichs"] },
+        { id: "mitwirkung", selten: true, art: "mehrzeilig", label: "Mitgewirkt haben", vorschlaege: ["Fachkraft für Arbeitssicherheit", "Betriebsärztin / Betriebsarzt", "Beschäftigte des Bereichs"] },
         { id: "datum", art: "datum", label: "Datum der Beurteilung", vorbelegung: "heute", pflicht: true },
       ],
     },
@@ -57,7 +57,7 @@ export const gefaehrdungsbeurteilung: Vorlage = {
             { id: "faktor", art: "wahl", label: "Gefährdungsfaktor (§ 5 Abs. 3 ArbSchG)", optionen: optionen(GEFAEHRDUNGSFAKTOREN), vorbelegung: "arbeitsstaette" },
             { id: "verantwortlich", art: "text", label: "Verantwortlich", vorbelegung: "verantwortlich" },
             { id: "umsetzen_bis", art: "datum", label: "Umsetzen bis" },
-            { id: "umgesetzt_am", art: "datum", label: "Umgesetzt am" },
+            { id: "umgesetzt_am", selten: true, art: "datum", label: "Umgesetzt am" },
           ],
         },
       ],
@@ -144,7 +144,7 @@ export const unterweisung: Vorlage = {
   grundlage: "§ 12 ArbSchG; § 4 Abs. 1 DGUV Vorschrift 1",
   namensFeld: "thema",
   abschnitte: [
-    {
+    { titel: "Unterweisung",
       felder: [
         { id: "thema", art: "text", label: "Bezeichnung", pflicht: true, vorschlaege: ["Jährliche Unterweisung Arbeitsschutz", "Erstunterweisung neuer Beschäftigter", "Unterweisung Gefahrstoffe", "Unterweisung Brandschutz und Erste Hilfe"] },
         { id: "anlass", art: "wahl", label: "Anlass", optionen: optionen(ANLASS), vorbelegung: "wiederholung" },
@@ -163,7 +163,7 @@ export const unterweisung: Vorlage = {
     {
       titel: "Teilnehmende",
       hilfe: "Namen eintragen – im PDF unterschreibt jede Person daneben. Freie Zeilen kommen automatisch dazu.",
-      felder: [{ id: "teilnehmer", art: "liste", label: "Teilnehmende", eintrag: "Person", titelFeld: "name", felder: [{ id: "name", art: "text", label: "Name", pflicht: true }] }],
+      felder: [{ id: "teilnehmer", art: "liste", ausMitarbeitern: true, label: "Teilnehmende", eintrag: "Person", titelFeld: "name", felder: [{ id: "name", art: "text", label: "Name", pflicht: true }] }],
     },
   ],
   html(d, b) {
@@ -193,7 +193,7 @@ export const gefahrstoffverzeichnis: Vorlage = {
   grundlage: "§ 6 Abs. 12 GefStoffV",
   querformat: true,
   abschnitte: [
-    { felder: [{ id: "stand", art: "datum", label: "Stand", vorbelegung: "heute", pflicht: true }, { id: "verantwortlich", art: "text", label: "Verantwortlich", vorbelegung: "verantwortlich" }] },
+    { titel: "Stand", felder: [{ id: "stand", art: "datum", label: "Stand", vorbelegung: "heute", pflicht: true }, { id: "verantwortlich", art: "text", label: "Verantwortlich", vorbelegung: "verantwortlich" }] },
     {
       titel: "Gefahrstoffe",
       hilfe: "Die Angaben stehen auf dem Etikett und im Sicherheitsdatenblatt (Abschnitte 1, 2 und 16).",
@@ -213,7 +213,7 @@ export const gefahrstoffverzeichnis: Vorlage = {
             { id: "arbeitsbereich", art: "text", label: "Arbeitsbereiche mit möglicher Exposition", pflicht: true },
             { id: "verwendung", art: "text", label: "Verwendung" },
             { id: "sdb_vorhanden", art: "schalter", label: "Sicherheitsdatenblatt liegt vor" },
-            { id: "sdb_stand", art: "datum", label: "Stand des Sicherheitsdatenblatts", wenn: { feld: "sdb_vorhanden" } },
+            { id: "sdb_stand", selten: true, art: "datum", label: "Stand des Sicherheitsdatenblatts", wenn: { feld: "sdb_vorhanden" } },
           ],
         },
       ],
@@ -259,11 +259,11 @@ export const betriebsanweisung: Vorlage = {
   grundlage: "§ 14 Abs. 1 GefStoffV; TRGS 555",
   namensFeld: "stoff",
   abschnitte: [
-    {
+    { titel: "Gefahrstoff",
       felder: [
         { id: "stoff", art: "text", label: "Gefahrstoff (Handelsname)", hilfe: "Die im Betrieb geläufige Bezeichnung", pflicht: true },
         { id: "arbeitsbereich", art: "text", label: "Arbeitsbereich, Arbeitsplatz, Tätigkeit", pflicht: true, vorschlaege: BEREICHE_VORSCHLAG },
-        { id: "nummer", art: "text", label: "Nummer der Betriebsanweisung", hilfe: "z. B. BA-01" },
+        { id: "nummer", selten: true, art: "text", label: "Nummer der Betriebsanweisung", hilfe: "z. B. BA-01" },
       ],
     },
     {
@@ -271,7 +271,7 @@ export const betriebsanweisung: Vorlage = {
       hilfe: "Die stoffbezogenen Angaben stehen im Sicherheitsdatenblatt; die Bausteine sind allgemeine Regeln.",
       felder: BA_TEILE.map((t) => ({ id: t.id, art: "mehrzeilig" as const, label: t.label, hilfe: t.hilfe, pflicht: true, ...(t.bausteine ? { vorschlaege: (BA_BAUSTEINE[t.bausteine] ?? []).map((o) => o.text) } : {}) })),
     },
-    {
+    { titel: "Notruf und Freigabe",
       felder: [
         { id: "notruf", art: "text", label: "Notruf und Ersthelfer/in", hilfe: "z. B. Notruf 112 · Ersthelfer/in: Name, Telefon", vorschlaege: ["Notruf 112"] },
         { id: "erstellt_von", art: "text", label: "Freigegeben von", vorbelegung: "verantwortlich", pflicht: true },
@@ -307,17 +307,17 @@ export const elektroPruefung: Vorlage = {
   querformat: true,
   namensFeld: "datum",
   abschnitte: [
-    {
+    { titel: "Prüfung",
       hilfe: "Prüfen darf eine Elektrofachkraft; eine elektrotechnisch unterwiesene Person nur unter Leitung und Aufsicht einer Elektrofachkraft. Die Prüffrist legst du in der Gefährdungsbeurteilung fest.",
       felder: [
         { id: "pruefer", art: "text", label: "Prüfende Elektrofachkraft / Firma", pflicht: true },
         { id: "datum", art: "datum", label: "Prüfdatum", vorbelegung: "heute", pflicht: true },
-        { id: "messgeraet", art: "text", label: "Verwendetes Prüfgerät" },
+        { id: "messgeraet", selten: true, art: "text", label: "Verwendetes Prüfgerät" },
         { id: "pruefart", art: "wahl", label: "Art der Prüfung", optionen: [{ wert: "Wiederholungsprüfung", text: "Wiederholungsprüfung" }, { wert: "Erstprüfung", text: "Erstprüfung" }, { wert: "Prüfung nach Instandsetzung", text: "nach Instandsetzung" }], vorbelegung: "Wiederholungsprüfung", pflicht: true },
         { id: "umfang", art: "bausteine", label: "Umfang der Prüfung", optionen: ["Sichtprüfung", "Messung des Schutzleiterwiderstands", "Messung des Isolationswiderstands", "Messung des Schutzleiter- bzw. Berührungsstroms", "Funktionsprüfung"].map((t) => ({ wert: t, text: t })), vorbelegung: ["Sichtprüfung", "Messung des Schutzleiterwiderstands", "Messung des Isolationswiderstands", "Funktionsprüfung"], pflicht: true },
         { id: "norm", art: "text", label: "Prüfgrundlage", vorschlaege: ["DIN EN 50678 (VDE 0701) / DIN EN 50699 (VDE 0702)"] },
         { id: "einsatz", art: "wahl", label: "Einsatzbedingungen (Richtwert für die Prüffrist)", optionen: ELEKTRO_FRISTEN.slice(0, 4).map((o) => ({ wert: o.wert, text: o.text, quelle: o.quelle })) },
-        { id: "leerzeilen", art: "schalter", label: "Leere Zeilen zum Ausfüllen von Hand anhängen" },
+        { id: "leerzeilen", selten: true, art: "schalter", label: "Leere Zeilen zum Ausfüllen von Hand anhängen" },
       ],
     },
     {

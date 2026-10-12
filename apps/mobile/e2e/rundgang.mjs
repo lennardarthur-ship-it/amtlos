@@ -1,7 +1,8 @@
 /**
- * Rundgang durch die Unterlagen-App (E-121) über den Web-Export, Rahmen 393×852 wie iPhone, hell oder dunkel.
- * Prüft die Wege eines neuen Nutzers: Betrieb eintragen, Vorlage wählen, ausfüllen, PDF, Meine Unterlagen,
- * Neustart (Daten bleiben), Kopie, Löschen. Bildschirmfotos zur Sichtprüfung. Bricht beim ersten Befund ab.
+ * Rundgang durch die Unterlagen-App (E-121, E-124) über den Web-Export, Rahmen 393×852 wie iPhone, hell oder dunkel.
+ * Prüft die Wege eines neuen Nutzers: Betrieb eintragen, Rechnung im geführten Ablauf (Nummer zählt hoch, Kunde wird
+ * gemerkt), Abschluss mit Vorschau und PDF, Anlass „Sicherheit“ mit Vorschlägen, Mitarbeiter übernehmen, Neustart,
+ * Kopie, Löschen. Bildschirmfotos zur Sichtprüfung. Bricht beim ersten Befund ab.
  *
  *   cd apps/mobile && CI=1 npx expo export --platform web --output-dir /tmp/expo-web
  *   node e2e/rundgang.mjs /tmp/expo-web /tmp/bilder        # DUNKEL=1 für Dunkelmodus, CHROMIUM_PFAD optional
@@ -51,39 +52,110 @@ const sichtbar = async (text) => (await p.getByText(text, { exact: false }).loca
 try {
   await p.goto("http://localhost:4998/");
   await warte(2500);
-  pruefe(await sichtbar("Wähle aus, was du brauchst"), "Startseite zeigt keine Auswahl");
+  pruefe(await sichtbar("Ausfüllen, prüfen, als PDF teilen"), "Startseite fehlt");
+  pruefe(await sichtbar("Wofür brauchst du etwas?"), "Anlässe fehlen auf der Startseite");
   pruefe(await sichtbar("Betrieb eintragen"), "Hinweis „Betrieb eintragen“ fehlt bei leerem Betrieb");
   await foto("start");
 
-  // Betrieb eintragen (aus dem Hinweis)
-  await knopf("Betrieb eintragen").click();
+  // Betrieb eintragen (aus der Zeile auf der Startseite)
+  await p.getByRole("button", { name: /^Betrieb eintragen/ }).first().click();
   await warte();
   await feld("Name des Betriebs").fill("Salon Sonne");
-  await feld("Ort").fill("Musterstadt");
-  await feld("Inhaber/in oder verantwortliche Person").fill("Alex Muster");
   await feld("Straße und Hausnummer").fill("Hauptstraße 1");
-  await feld("Steuernummer").fill("12/345/67890");
+  await feld("PLZ").fill("80331");
+  await feld("Ort").fill("München");
+  await feld("Inhaber/in oder verantwortliche Person").fill("Alex Muster");
+  await feld("Steuernummer").fill("143/123/45678");
   await tippe(p.getByRole("radio", { name: "Bayern" }).locator("visible=true").last());
   await foto("betrieb");
   await knopf("Zurück").click();
   await warte(800);
-  pruefe(!(await sichtbar("Trag einmal deinen Betrieb ein")), "Hinweis bleibt nach dem Eintragen stehen");
+  pruefe(!(await sichtbar("Steht dann auf jeder Unterlage")), "Hinweis bleibt nach dem Eintragen stehen");
 
-  // Suchen und Vorlage wählen
-  await feld("Unterlage suchen").fill("gefährdung");
-  await warte();
-  pruefe(!(await sichtbar("Kassenbuch")), "Suche filtert nicht");
-  await tippe(p.getByRole("button", { name: /^Gefährdungsbeurteilung/ }).first());
-  await warte();
-  pruefe(await sichtbar("§ 5 ArbSchG"), "Rechtsgrundlage fehlt auf der Vorlagenseite");
-  await foto("vorlage");
-  await tippe(knopf("Jetzt ausfüllen"));
+  // Rechnung im geführten Ablauf
+  await knopf("Rechnung schreiben").click();
+  await warte(900);
+  pruefe((await feld("Rechnungsnummer").inputValue()) === "2026-001" || /^\d{4}-001$/.test(await feld("Rechnungsnummer").inputValue()), "Rechnungsnummer nicht vorbelegt");
+  pruefe((await p.getByRole("tab").locator("visible=true").count()) === 0, "Tab-Leiste im Ablauf sichtbar");
+  await tippe(knopf("Wozu brauche ich das?"));
   await warte(800);
+  pruefe(await sichtbar("§ 14 Abs. 4 UStG"), "Rechtsgrundlage fehlt unter „Wozu“");
+  await knopf("Zurück").click();
+  await warte(700);
+  await foto("rechnung-1");
+  await knopf("Weiter").click();
+  await warte();
+  await feld("Name oder Firma").fill("Kim Beispiel");
+  await feld("Anschrift").fill("Gartenweg 3\n80333 München");
+  pruefe(await sichtbar("Weitere Angaben (1)"), "seltene Felder nicht hinter „Weitere Angaben“");
+  await knopf("Weiter").click();
+  await warte();
+  await tippe(p.getByRole("button", { name: /^Position 1/ }).locator("visible=true").last());
+  await warte(800);
+  await feld("Leistung oder Ware").fill("Haarschnitt");
+  await feld("Menge").fill("2");
+  await tippe(p.getByRole("radio", { name: "Stück" }).locator("visible=true").last());
+  await feld("Einzelpreis netto (€)").fill("25");
+  await foto("position");
+  await knopf("Fertig").click();
+  await warte(800);
+  pruefe(await sichtbar("59,50"), "Rechnungsbetrag nicht gerechnet (2 × 25 € + 19 %)");
+  await knopf("Weiter").click();
+  await warte();
+  await tippe(p.getByRole("checkbox", { name: "Vielen Dank für Ihren Auftrag." }).locator("visible=true").last());
+  await knopf("Zum Dokument").click();
+  await warte(1500);
+  pruefe(await sichtbar("Alle Pflichtangaben sind drin."), "Rechnung trotz aller Angaben nicht vollständig");
+  await foto("abschluss");
+  const [fenster] = await Promise.all([ctx.waitForEvent("page"), knopf("PDF teilen").click()]);
+  await fenster.waitForLoadState();
+  const html = await fenster.content();
+  pruefe(html.includes("Salon Sonne") && html.includes("Kim Beispiel") && html.includes("Haarschnitt") && html.includes("59,50") && html.includes("Vielen Dank für Ihren Auftrag."), "PDF-Inhalt der Rechnung unvollständig");
+  await fenster.setViewportSize({ width: 794, height: 1123 });
+  await fenster.screenshot({ path: `${OUT}/${String(++n).padStart(2, "0")}-${schema}-dokument.png` });
+  await fenster.close();
+  await knopf("Vorschau groß ansehen").click();
+  await warte(1200);
+  await foto("vorschau");
+  await knopf("Zurück").click();
+  await warte(700);
+  await knopf("Schließen").click();
+  await warte(900);
+  pruefe(await sichtbar("Rechnung · 2026-001"), "Rechnung fehlt unter „Zuletzt bearbeitet“");
+
+  // zweite Rechnung: Nummer zählt hoch, gespeicherter Kunde füllt die Anschrift
+  await knopf("Rechnung schreiben").click();
+  await warte(900);
+  pruefe((await feld("Rechnungsnummer").inputValue()) === "2026-002", "Rechnungsnummer zählt nicht hoch");
+  await knopf("Weiter").click();
+  await warte();
+  await tippe(p.getByRole("radio", { name: "Kim Beispiel" }).locator("visible=true").last());
+  pruefe((await feld("Anschrift").inputValue()).includes("Gartenweg 3"), "gespeicherter Kunde füllt die Anschrift nicht");
+  await foto("kunde-gewaehlt");
+  await knopf("Schließen").click();
+  await warte(900);
+  // dritte Rechnung sofort schließen: unveränderte neue Unterlagen verschwinden
+  await knopf("Rechnung schreiben").click();
+  await warte(900);
+  await knopf("Schließen").click();
+  await warte(900);
+  await p.getByRole("tab", { name: "Meine" }).click();
+  await warte(800);
+  pruefe((await p.getByRole("button", { name: /^Rechnung · / }).locator("visible=true").count()) === 2, "leere Rechnung nicht verworfen oder zweite fehlt");
+  await p.getByRole("tab", { name: "Unterlagen" }).click();
+  await warte(700);
+
+  // Anlass „Sicherheit am Arbeitsplatz“ → Gefährdungsbeurteilung mit Vorschlägen
+  await tippe(p.getByRole("button", { name: /^Sicherheit am Arbeitsplatz/ }).first());
+  await warte(800);
+  await foto("anlass");
+  await tippe(p.getByRole("button", { name: /^Gefährdungsbeurteilung/ }).locator("visible=true").last());
+  await warte(900);
   pruefe((await feld("Beurteilt von").inputValue()) === "Alex Muster", "„Beurteilt von“ nicht aus dem Betrieb vorausgefüllt");
-  pruefe(await sichtbar("Fehlt noch"), "„Fehlt noch“ fehlt bei leerer Unterlage");
-  // Arbeitsbereich per Vorschlag-Chip, Gefährdungen aus den Vorschlägen der Branche übernehmen
-  await tippe(p.getByRole("button", { name: "Übernehmen: Salon" }).locator("visible=true").last());
-  pruefe((await feld("Arbeitsbereich oder Gewerk").inputValue()) === "Salon", "Vorschlag-Chip setzt den Text nicht");
+  await tippe(p.getByRole("radio", { name: "Salon" }).locator("visible=true").last());
+  await foto("gefaehrdung-1");
+  await knopf("Weiter").click();
+  await warte();
   await tippe(p.getByRole("button", { name: /^Aus \d+ Vorschlägen wählen/ }).locator("visible=true").last());
   await warte(800);
   await p.getByRole("radio", { name: "Friseur" }).locator("visible=true").last().click();
@@ -91,50 +163,68 @@ try {
   const vorschlaege = p.getByRole("checkbox").locator("visible=true");
   await tippe(vorschlaege.nth(0));
   await tippe(vorschlaege.nth(1));
+  await tippe(p.getByRole("button", { name: /^Details: / }).locator("visible=true").nth(0));
+  await warte(400);
   await foto("vorschlaege");
-  await tippe(knopf("2 Einträge übernehmen"));
+  await knopf("2 Einträge übernehmen").click();
   await warte(900);
   pruefe(await sichtbar("Ausrutschen, Stolpern und Stürzen"), "Vorschlag nicht als Gefährdung übernommen");
-  // Mutterschutz-Ergebnis (Auswahl nach § 10 MuSchG)
-  await tippe(p.getByRole("radio", { name: /keine Schutzmaßnahmen erforderlich/ }).locator("visible=true").last());
-  await warte();
-  await foto("formular");
-  pruefe(await sichtbar("Alle Pflichtangaben ausgefüllt"), "Unterlage trotz aller Angaben nicht vollständig");
-  // eigener Eintrag: hinzufügen klappt ihn auf, Entfernen nimmt ihn wieder weg
+  // eigener Eintrag ohne Angaben verschwindet wieder
   await tippe(knopf("Eigene Gefährdung hinzufügen"));
-  await warte();
-  pruefe(await sichtbar("Gefährdung 3 (noch leer)"), "neuer Eintrag nicht aufgeklappt");
-  await tippe(knopf("Entfernen"));
-  await warte();
-  pruefe(await sichtbar("Alle Pflichtangaben ausgefüllt"), "Entfernen des leeren Eintrags hat nicht geklappt");
-
-  // PDF (im Web: neues Fenster mit dem Dokument)
-  const [fenster] = await Promise.all([ctx.waitForEvent("page"), knopf("PDF teilen").click()]);
-  await fenster.waitForLoadState();
-  const html = await fenster.content();
-  pruefe(html.includes("Salon Sonne") && html.includes("Ausrutschen, Stolpern und Stürzen") && html.includes("§§ 5, 6 ArbSchG") && !html.includes("noch nicht fachlich"), "PDF-Inhalt unvollständig");
-  await fenster.setViewportSize({ width: 794, height: 1123 });
-  await fenster.screenshot({ path: `${OUT}/${String(++n).padStart(2, "0")}-${schema}-dokument.png` });
-  await fenster.close();
-
-  // Meine Unterlagen
-  await p.getByRole("tab", { name: "Meine" }).click();
   await warte(800);
-  pruefe(await sichtbar("Gefährdungsbeurteilung · Salon"), "Unterlage fehlt unter „Meine“");
-  await foto("meine");
-
-  // Allergene (Mehrfachauswahl), neu aus der Startseite
-  // erneutes Tippen auf den aktiven Tab führt zur Startseite zurück
-  await p.getByRole("tab", { name: "Unterlagen" }).click();
-  await warte();
-  pruefe(await sichtbar("Ausrutschen, Stolpern und Stürzen"), "Tab hat die offene Unterlage nicht behalten");
-  await p.getByRole("tab", { name: "Unterlagen" }).click();
+  await knopf("Fertig").click();
   await warte(800);
+  pruefe((await p.getByRole("button", { name: /^Gefährdung \d/ }).locator("visible=true").count()) === 2, "leerer eigener Eintrag nicht verworfen");
+  await knopf("Weiter").click();
+  await warte();
+  await tippe(p.getByRole("radio", { name: /keine Schutzmaßnahmen erforderlich/ }).locator("visible=true").last());
+  await knopf("Weiter").click();
+  await warte();
+  await knopf("Zum Dokument").click();
+  await warte(1200);
+  pruefe(await sichtbar("Alle Pflichtangaben sind drin."), "Gefährdungsbeurteilung trotz aller Angaben nicht vollständig");
+  await knopf("Schließen").click();
+  await warte(800);
+  await knopf("Zurück").click();
+  await warte(800);
+
+  // Mitarbeiter anlegen und in eine Unterweisung übernehmen
+  await p.getByRole("tab", { name: "Mein Betrieb" }).click();
+  await warte(800);
+  await tippe(knopf("Mitarbeiter hinzufügen"));
+  await warte(800);
+  await feld("Vor- und Nachname").fill("Sam Muster");
+  await feld("Tätigkeit").fill("Friseur/in");
+  await knopf("Fertig").click();
+  await warte(800);
+  pruefe(await sichtbar("Sam Muster"), "Mitarbeiter nicht gespeichert");
+  pruefe(await sichtbar("Kim Beispiel"), "Kunde aus der Rechnung nicht gemerkt");
+  await foto("mein-betrieb");
+  await p.getByRole("tab", { name: "Unterlagen" }).click();
+  await warte(700);
+  await feld("Unterlage suchen").fill("unterweisung");
+  await warte();
+  await tippe(p.getByRole("button", { name: /^Unterweisungsnachweis/ }).first());
+  await warte(900);
+  await knopf("Weiter").click();
+  await warte();
+  await knopf("Weiter").click();
+  await warte();
+  await tippe(knopf("Mitarbeiter eintragen (1)"));
+  await warte();
+  pruefe(await sichtbar("Sam Muster"), "Mitarbeiter nicht als Teilnehmende übernommen");
+  await foto("teilnehmende");
+  await knopf("Schließen").click();
+  await warte(800);
+
+  // Allergene: Mehrfachauswahl in einem Eintrag
   await feld("Unterlage suchen").fill("allergen");
   await warte();
   await tippe(p.getByRole("button", { name: /^Allergenliste/ }).first());
+  await warte(900);
+  await knopf("Weiter").click();
   await warte();
-  await tippe(knopf("Jetzt ausfüllen"));
+  await tippe(p.getByRole("button", { name: /^Gericht 1/ }).locator("visible=true").last());
   await warte(800);
   await feld("Name").fill("Apfelkuchen");
   await p.getByRole("checkbox", { name: "Eier" }).locator("visible=true").last().click();
@@ -142,28 +232,11 @@ try {
   await warte();
   pruefe(await p.getByRole("checkbox", { name: "Eier" }).locator("visible=true").last().isChecked(), "Allergen nicht ausgewählt");
   await foto("allergene");
-
-  // Rechnung: Ergebnis wird gerechnet, Betrieb liefert Steuernummer
-  await p.getByRole("tab", { name: "Unterlagen" }).click();
-  await warte();
-  await p.getByRole("tab", { name: "Unterlagen" }).click();
+  await knopf("Fertig").click();
+  await warte(700);
+  await knopf("Schließen").click();
   await warte(800);
-  await feld("Unterlage suchen").fill("rechnung");
-  await warte();
-  await tippe(p.getByRole("button", { name: /^Rechnung Rechnung mit/ }).first());
-  await warte();
-  await tippe(knopf("Jetzt ausfüllen"));
-  await warte(800);
-  await feld("Rechnungsnummer").fill("2026-001");
-  await feld("Name oder Firma").fill("Kim Beispiel");
-  await feld("Anschrift").fill("Gartenweg 3, 12345 Musterstadt");
-  await feld("Leistung oder Ware").fill("Haarschnitt");
-  await feld("Menge").fill("2");
-  await feld("Einzelpreis netto (€)").fill("25");
-  await warte();
-  pruefe(await sichtbar("59,50"), "Rechnungsbetrag nicht gerechnet (2 × 25 € + 19 %)");
-  pruefe(await sichtbar("Alle Pflichtangaben ausgefüllt"), "Rechnung trotz aller Angaben nicht vollständig");
-  await foto("rechnung");
+  await feld("Unterlage suchen").fill("");
 
   // Neustart: Daten bleiben
   await warte(800);
@@ -171,17 +244,21 @@ try {
   await warte(2500);
   await p.getByRole("tab", { name: "Meine" }).click();
   await warte(800);
-  pruefe(await sichtbar("Gefährdungsbeurteilung · Salon") && (await sichtbar("Allergenliste")) && (await sichtbar("Rechnung · 2026-001")), "Unterlagen nach Neustart verloren");
+  pruefe((await sichtbar("Gefährdungsbeurteilung · Salon")) && (await sichtbar("Allergenliste")) && (await sichtbar("Rechnung · 2026-001")) && (await sichtbar("Unterweisungsnachweis")), "Unterlagen nach Neustart verloren");
+  await foto("meine");
 
-  // Kopie und Löschen
+  // bestehende Unterlage öffnet beim Abschluss; Kopie anlegen und wieder löschen
   await p.getByRole("button", { name: /^Gefährdungsbeurteilung · Salon/ }).first().click();
-  await warte(800);
+  await warte(1200);
+  pruefe(await sichtbar("Angaben bearbeiten"), "bestehende Unterlage öffnet nicht beim Abschluss");
   await tippe(knopf("Kopie anlegen"));
-  await warte(800);
+  await warte(900);
+  await knopf("Übersicht").click();
+  await warte(900);
   await tippe(knopf("Löschen"));
   await tippe(knopf("Ja, löschen"));
-  await warte(900);
-  await knopf("Zurück").click();
+  await warte(1000);
+  await knopf("Schließen").click();
   await warte(900);
   pruefe((await p.getByRole("button", { name: /^Gefährdungsbeurteilung · Salon/ }).locator("visible=true").count()) === 1, "Kopie nicht angelegt oder nicht gelöscht");
 
@@ -189,11 +266,11 @@ try {
   await p.getByRole("tab", { name: "Mein Betrieb" }).click();
   await warte(800);
   pruefe((await feld("Name des Betriebs").inputValue()) === "Salon Sonne", "Betrieb nach Neustart verloren");
-  await foto("mein-betrieb");
   await tippe(knopf("Alle Daten löschen"));
   await tippe(knopf("Ja, löschen"));
   await warte(800);
   pruefe((await feld("Name des Betriebs").inputValue()) === "", "Betrieb nach „alles löschen“ nicht leer");
+  pruefe(!(await sichtbar("Sam Muster")), "Mitarbeiter nach „alles löschen“ noch da");
   await p.getByRole("tab", { name: "Meine" }).click();
   await warte(800);
   pruefe(await sichtbar("Noch keine Unterlagen"), "Unterlagen nach „alles löschen“ noch da");

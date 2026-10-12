@@ -1,0 +1,155 @@
+/**
+ * Hilfen für den geführten Ablauf der App (E-124): Anlässe statt Rechtsgebiete, kurze Beschreibungen in Alltagssprache,
+ * gespeicherte Personen (Mitarbeiter, Kunden), fortlaufende Nummern, kurze Titel für Vorschläge.
+ */
+import { STEUERKLASSEN } from "./lohn.js";
+import type { Daten, EinfachesFeld, Person, PersonAngaben, PersonenArt, Vorlage } from "./typen.js";
+
+/** Ein Satz je Vorlage, ohne Paragrafen – für Listen in der App. */
+export const KURZ: Record<string, string> = {
+  rechnung: "Rechnung an Kunden – mit allen Angaben, die das Finanzamt verlangt.",
+  euer: "Einnahmen und Ausgaben eines Jahres – ergibt deinen Gewinn.",
+  bilanz_guv: "Jahresabschluss für Kaufleute und Gesellschaften.",
+  ust_voranmeldung: "Rechnet aus, wie viel Umsatzsteuer du ans Finanzamt zahlst.",
+  steuererklaerung: "Alle Zahlen und Belege für die Steuererklärung an einem Ort.",
+  verfahrensdokumentation: "Beschreibt, wie du Belege sammelst, buchst und aufbewahrst.",
+  kassenbuch: "Bargeld-Einnahmen und -Ausgaben Tag für Tag.",
+  kassenmeldung: "Angaben zu deiner Kasse für die Meldung ans Finanzamt.",
+  aufbewahrung: "Welche Unterlagen du wie lange aufheben musst.",
+  datenschutz_dokumentation: "Welche Daten du wofür nutzt und wie du sie schützt.",
+  datenschutzerklaerung_website: "Text für deine Website: was mit den Daten der Besucher passiert.",
+  avv: "Vertrag mit Dienstleistern, die für dich mit Kundendaten arbeiten.",
+  datenschutzinformation: "Info-Blatt für Kunden oder Mitarbeiter, was du mit ihren Daten machst.",
+  datenpanne: "Wenn Daten verloren gehen oder in falsche Hände geraten.",
+  arbeitszeitnachweis: "Arbeitszeiten deiner Mitarbeiter – auch für Minijobs.",
+  nachweis_arbeitsbedingungen: "Die wichtigsten Arbeitsbedingungen schriftlich für neue Mitarbeiter.",
+  sv_meldedaten: "Alle Angaben, die du für die Anmeldung neuer Mitarbeiter brauchst.",
+  lohnkonto: "Lohn und Abzüge je Mitarbeiter über das Jahr.",
+  ki_kompetenz: "Nachweis, dass dein Team im Umgang mit KI-Werkzeugen geschult ist.",
+  gefaehrdungsbeurteilung: "Welche Gefahren es am Arbeitsplatz gibt und was du dagegen tust.",
+  unterweisung: "Nachweis, dass du dein Team über Sicherheit informiert hast.",
+  gefahrstoffverzeichnis: "Liste aller gefährlichen Stoffe im Betrieb.",
+  betriebsanweisung: "Aushang zum sicheren Umgang mit einem Gefahrstoff.",
+  pruefprotokoll_elektro: "Prüfung der elektrischen Geräte im Betrieb.",
+  impressum: "Pflichtangaben für deine Website.",
+  gewerbeanmeldung: "Alle Angaben für die Anmeldung beim Gewerbeamt.",
+  handelsregister: "Angaben für den Termin beim Notar.",
+  transparenzregister: "Wer hinter deiner Gesellschaft steht.",
+  ifsg_belehrung: "Wiederholte Hygiene-Belehrung für alle, die mit Lebensmitteln arbeiten.",
+  allergene: "Welche Allergene in deinen Speisen und Getränken stecken.",
+  haccp: "Kontrollen von Temperatur, Sauberkeit und Lieferungen.",
+  hautschutzplan: "Wie dein Team die Haut bei der Arbeit schützt.",
+  hygieneplan: "Was wann womit gereinigt und desinfiziert wird.",
+};
+
+export interface Anlass {
+  id: string;
+  titel: string;
+  /** was dazugehört, in wenigen Worten */
+  text: string;
+  vorlagen: string[];
+}
+
+/** Anlässe auf der Startseite: so denken Gründer – nicht in Rechtsgebieten. Eine Vorlage darf in mehreren stehen. */
+export const ANLAESSE: Anlass[] = [
+  { id: "einstellen", titel: "Ich stelle jemanden ein", text: "Arbeitsbedingungen, Anmeldung, Lohn, Unterweisung", vorlagen: ["nachweis_arbeitsbedingungen", "sv_meldedaten", "lohnkonto", "arbeitszeitnachweis", "unterweisung", "gefaehrdungsbeurteilung", "datenschutzinformation", "ki_kompetenz", "ifsg_belehrung"] },
+  { id: "gruenden", titel: "Ich gründe oder eröffne", text: "Gewerbe, Register, Kasse, Belege", vorlagen: ["gewerbeanmeldung", "handelsregister", "transparenzregister", "kassenmeldung", "verfahrensdokumentation", "aufbewahrung", "datenschutz_dokumentation", "gefaehrdungsbeurteilung"] },
+  { id: "laufend", titel: "Im laufenden Betrieb", text: "Rechnungen, Kasse, Umsatzsteuer, Arbeitszeit", vorlagen: ["rechnung", "kassenbuch", "ust_voranmeldung", "arbeitszeitnachweis", "lohnkonto", "haccp"] },
+  { id: "steuern", titel: "Jahresabschluss und Steuern", text: "EÜR, Bilanz, Steuererklärung, Aufbewahrung", vorlagen: ["euer", "bilanz_guv", "steuererklaerung", "ust_voranmeldung", "aufbewahrung"] },
+  { id: "website", titel: "Ich mache eine Website", text: "Impressum, Datenschutzerklärung, Verträge", vorlagen: ["impressum", "datenschutzerklaerung_website", "avv"] },
+  { id: "datenschutz", titel: "Kundendaten und Datenschutz", text: "Verzeichnis, Info-Blatt, Verträge", vorlagen: ["datenschutz_dokumentation", "datenschutzinformation", "avv", "datenschutzerklaerung_website", "datenpanne"] },
+  { id: "sicherheit", titel: "Sicherheit am Arbeitsplatz", text: "Gefahren, Unterweisung, Gefahrstoffe, Geräte", vorlagen: ["gefaehrdungsbeurteilung", "unterweisung", "betriebsanweisung", "gefahrstoffverzeichnis", "pruefprotokoll_elektro", "hautschutzplan"] },
+  { id: "gastro", titel: "Café, Restaurant, Lebensmittel", text: "Allergene, Eigenkontrollen, Hygiene", vorlagen: ["allergene", "haccp", "ifsg_belehrung", "hygieneplan"] },
+  { id: "beauty", titel: "Salon und Kosmetik", text: "Hautschutz, Hygiene, Gefahrstoffe", vorlagen: ["hautschutzplan", "hygieneplan", "gefaehrdungsbeurteilung", "gefahrstoffverzeichnis", "betriebsanweisung"] },
+  { id: "panne", titel: "Daten verloren oder gestohlen", text: "Datenpanne festhalten und melden", vorlagen: ["datenpanne"] },
+];
+
+/** Felder der gespeicherten Personen – dieselben Feldarten wie in den Vorlagen. */
+export const PERSONEN_FELDER: Record<PersonenArt, EinfachesFeld[]> = {
+  mitarbeiter: [
+    { id: "name", art: "text", label: "Vor- und Nachname", pflicht: true },
+    { id: "anschrift", art: "mehrzeilig", label: "Anschrift" },
+    { id: "geburtsdatum", art: "datum", label: "Geburtsdatum" },
+    { id: "geburtsort", art: "text", label: "Geburtsort" },
+    { id: "geburtsname", art: "text", label: "Geburtsname", hilfe: "falls abweichend", selten: true },
+    { id: "staatsangehoerigkeit", art: "text", label: "Staatsangehörigkeit", vorschlaege: ["deutsch"] },
+    { id: "taetigkeit", art: "text", label: "Tätigkeit" },
+    { id: "beginn", art: "datum", label: "Beschäftigt seit" },
+    { id: "steuer_id", art: "text", label: "Steuer-Identifikationsnummer" },
+    { id: "steuerklasse", art: "wahl", label: "Steuerklasse", optionen: STEUERKLASSEN },
+    { id: "sv_nummer", art: "text", label: "Sozialversicherungsnummer" },
+    { id: "krankenkasse", art: "text", label: "Krankenkasse" },
+    { id: "iban", art: "text", label: "IBAN für das Gehalt" },
+  ],
+  kunde: [
+    { id: "name", art: "text", label: "Name oder Firma", pflicht: true },
+    { id: "anschrift", art: "mehrzeilig", label: "Anschrift" },
+    { id: "ust_idnr", art: "text", label: "USt-IdNr.", hilfe: "nur bei Unternehmen im EU-Ausland oder Steuerschuldnerschaft", selten: true },
+  ],
+};
+
+const wert = (d: Daten, k: string) => (typeof d[k] === "string" ? (d[k] as string).trim() : "");
+
+/** Person aus einer ausgefüllten Unterlage (für „Mitarbeiter“ bzw. „Kunden“); null, wenn kein Name eingetragen ist. */
+export function personAus(v: Vorlage, d: Daten): PersonAngaben | null {
+  if (!v.person) return null;
+  const name = wert(d, v.person.felder.name ?? "");
+  if (!name) return null;
+  const p: Record<string, string> = { name };
+  for (const [k, feld] of Object.entries(v.person.felder)) if (k !== "name" && wert(d, feld)) p[k] = wert(d, feld);
+  return p as PersonAngaben;
+}
+
+/** Angaben einer gespeicherten Person für die Felder der Vorlage (nur vorhandene Werte). */
+export function personIn(v: Vorlage, p: Partial<Person>): Daten {
+  const d: Daten = {};
+  if (!v.person) return d;
+  for (const [k, feld] of Object.entries(v.person.felder)) {
+    const w = p[k];
+    if (typeof w === "string" && w.trim()) d[feld] = w;
+  }
+  return d;
+}
+
+const gleicherName = (a: string, b: string) => a.trim().toLocaleLowerCase("de") === b.trim().toLocaleLowerCase("de");
+
+/** Person merken: gleicher Name ergänzt den vorhandenen Eintrag (neue Werte gewinnen, leere überschreiben nichts). */
+export function personMerken(liste: Person[], neu: PersonAngaben, id: string): Person[] {
+  const alt = liste.find((p) => gleicherName(p.name, neu.name));
+  const werte = Object.fromEntries(Object.entries(neu).filter(([, w]) => typeof w === "string" && w.trim()));
+  if (!alt) return [...liste, { ...werte, id, name: neu.name.trim() } as Person];
+  return liste.map((p) => (p === alt ? ({ ...p, ...werte, id: p.id, name: p.name } as Person) : p));
+}
+
+/**
+ * Nächste fortlaufende Nummer, z. B. „2026-014“ → „2026-015“. Zählt im Schema der höchsten Nummer des Jahres weiter;
+ * gibt es im Jahr noch keine, beginnt sie mit „JJJJ-001“. Nummern ohne Jahreszahl zählen weiter, wenn es nur solche gibt.
+ */
+export function naechsteNummer(vorhandene: string[], jahr: string): string {
+  const teile = vorhandene
+    .map((n) => /^(.*?)(\d+)$/.exec(n.trim()))
+    .filter((m): m is RegExpExecArray => Boolean(m))
+    .map((m) => ({ vor: m[1]!, zahl: Number(m[2]), breite: m[2]!.length }));
+  const imJahr = teile.filter((t) => t.vor.includes(jahr));
+  const pool = imJahr.length ? imJahr : teile.some((t) => /(19|20)\d\d/.test(t.vor)) ? [] : teile;
+  if (!pool.length) return `${jahr}-001`;
+  const max = pool.reduce((a, b) => (b.zahl > a.zahl ? b : a));
+  return `${max.vor}${String(max.zahl + 1).padStart(max.breite, "0")}`;
+}
+
+/** Kurzer Titel für lange Vorschläge, z. B. „Ausrutschen, Stolpern und Stürzen durch glatte Böden …“ → „Ausrutschen, Stolpern und Stürzen“. */
+export function kurztitel(t: string): string {
+  const s = t.trim().replace(/\.$/, "");
+  // frühester Trenner ab dem 12. Zeichen – davor wäre der Titel zu knapp
+  let ende = -1;
+  for (const trenner of [" durch ", " (", ": ", " – ", ", "]) {
+    for (let i = s.indexOf(trenner); i >= 0; i = s.indexOf(trenner, i + 1))
+      if (i >= 12) {
+        if (ende < 0 || i < ende) ende = i;
+        break;
+      }
+  }
+  if (ende > 0) return s.slice(0, ende);
+  if (s.length <= 70) return s;
+  return `${s.slice(0, 60).replace(/\s+\S*$/, "")} …`;
+}

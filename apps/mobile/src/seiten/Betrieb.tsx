@@ -1,10 +1,83 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Share, View } from "react-native";
-import { BUNDESLAENDER, type Betrieb as BetriebDaten } from "@amtlos/fachlogik";
+import { BUNDESLAENDER, PERSONEN_FELDER, type Betrieb as BetriebDaten, type PersonenArt } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { Auswahl, Feld, Karte, Knopf, T } from "../ui/bausteine";
+import { Auswahl, Feld, Fuss, Karte, Knopf, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
+import { Unterseite, useNav } from "../ui/navigation";
+import { RAND, useFarben } from "../ui/thema";
+import { neueId, personenSortiert, PERSONEN_LISTE } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
-import { Gruppe, Seite } from "./gemeinsam";
+import { Felder } from "./felder";
+import { Gruppe, Inhalt, Seite } from "./gemeinsam";
+
+/** Eine gespeicherte Person bearbeiten (E-124). Eine neue Person ohne Namen verschwindet beim Verlassen wieder. */
+function PersonSeite({ art, id, neu }: { art: PersonenArt; id: string; neu?: boolean }) {
+  const z = useAmtlos();
+  const nav = useNav();
+  const [frage, setFrage] = useState(false);
+  const p = z.stand[PERSONEN_LISTE[art]].find((x) => x.id === id);
+  const zRef = useRef(z);
+  zRef.current = z;
+  useEffect(
+    () => () => {
+      const jetzt = zRef.current.stand[PERSONEN_LISTE[art]].find((x) => x.id === id);
+      if (neu && jetzt && !jetzt.name.trim()) zRef.current.personLoeschen(art, id);
+    },
+    [art, id, neu],
+  );
+  if (!p) return <Unterseite titel="">{null}</Unterseite>;
+  return (
+    <Unterseite titel={p.name.trim() || TEXT.person_neu[art]}>
+      <Inhalt contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 4, paddingBottom: 32 }}>
+        <Felder felder={PERSONEN_FELDER[art]} werte={p} fehlt={[]} setze={(k, w) => z.personSetzen(art, { ...p, [k]: typeof w === "string" ? w : null })} />
+        {frage ? (
+          <Karte stil={{ paddingVertical: 14, gap: 10, marginTop: 24 }}>
+            <T fett>{TEXT.loeschen_wirklich}</T>
+            <View style={{ flexDirection: "row", gap: 10 }}>
+              <Knopf gefahr text={TEXT.loeschen_ja} onPress={() => { z.personLoeschen(art, id); nav.zurueck(); }} stil={{ flex: 1 }} />
+              <Knopf ton text={TEXT.abbrechen} onPress={() => setFrage(false)} stil={{ flex: 1 }} />
+            </View>
+          </Karte>
+        ) : (
+          <TextKnopf symbol="trash" gefahr text={TEXT.loeschen} onPress={() => setFrage(true)} stil={{ marginTop: 24 }} />
+        )}
+      </Inhalt>
+      <Fuss>
+        <Knopf text={TEXT.fertig} onPress={nav.zurueck} stil={{ flex: 1 }} />
+      </Fuss>
+    </Unterseite>
+  );
+}
+
+/** Gespeicherte Mitarbeiter bzw. Kunden unter „Mein Betrieb“. */
+function Personen({ art }: { art: PersonenArt }) {
+  const z = useAmtlos();
+  const nav = useNav();
+  const f = useFarben();
+  const liste = personenSortiert(z.stand[PERSONEN_LISTE[art]]);
+  const oeffnen = (id: string, neu = false) => nav.oeffnen(`person-${id}`, () => <PersonSeite art={art} id={id} neu={neu} />, true);
+  return (
+    <Gruppe titel={art === "mitarbeiter" ? TEXT.mitarbeiter_titel : TEXT.kunden_titel} fuss={liste.length ? undefined : TEXT.personen_leer[art]}>
+      {liste.length ? (
+        <Karte>
+          {liste.map((p, i) => (
+            <Zeile key={p.id} links={<Symbol name="person.crop.circle" groesse={22} farbe={f.tinteLeise} />} titel={p.name} text={(art === "mitarbeiter" ? p.taetigkeit : p.anschrift)?.split("\n")[0] || undefined} onPress={() => oeffnen(p.id)} letzte={i === liste.length - 1} />
+          ))}
+        </Karte>
+      ) : null}
+      <TextKnopf
+        symbol="plus"
+        text={TEXT.person_hinzufuegen[art]}
+        onPress={() => {
+          const id = neueId();
+          z.personSetzen(art, { id, name: "" });
+          oeffnen(id, true);
+        }}
+        stil={{ marginLeft: 4 }}
+      />
+    </Gruppe>
+  );
+}
 
 /** Angaben zum Betrieb – speichern sich bei jeder Eingabe. */
 export function BetriebFormular() {
@@ -57,8 +130,10 @@ export function Betrieb() {
     <Seite titel={TEXT.betrieb_titel}>
       {/* nach „alles löschen“ neu einhängen, damit die Felder leer sind */}
       <BetriebFormular key={zaehler} />
+      <Personen art="mitarbeiter" />
+      <Personen art="kunde" />
       <Gruppe titel={TEXT.daten_titel} fuss={TEXT.daten_text}>
-        <Knopf leise symbol="square.and.arrow.up" text={TEXT.sichern} onPress={() => void Share.share({ title: "Amtlos-Daten", message: JSON.stringify(stand, null, 2) }).catch(() => undefined)} />
+        <Knopf ton symbol="square.and.arrow.up" text={TEXT.sichern} onPress={() => void Share.share({ title: "Amtlos-Daten", message: JSON.stringify(stand, null, 2) }).catch(() => undefined)} />
       </Gruppe>
       <Gruppe fuss={TEXT.alles_loeschen_text}>
         {frage ? (
@@ -76,11 +151,11 @@ export function Betrieb() {
                 }
                 stil={{ flex: 1 }}
               />
-              <Knopf leise text={TEXT.abbrechen} onPress={() => setFrage(false)} stil={{ flex: 1 }} />
+              <Knopf ton text={TEXT.abbrechen} onPress={() => setFrage(false)} stil={{ flex: 1 }} />
             </View>
           </Karte>
         ) : (
-          <Knopf leise gefahr symbol="trash" text={TEXT.alles_loeschen} onPress={() => setFrage(true)} />
+          <TextKnopf gefahr symbol="trash" text={TEXT.alles_loeschen} onPress={() => setFrage(true)} />
         )}
       </Gruppe>
       <T v="caption" leise stil={{ marginTop: 24 }}>{TEXT.ueber}</T>

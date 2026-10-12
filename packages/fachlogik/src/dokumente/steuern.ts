@@ -18,10 +18,10 @@ export const verfahrensdokumentation: Vorlage = {
   pflichten: ["steuern.gobd_verfahrensdokumentation"],
   grundlage: "§§ 145–147 AO; GoBD",
   abschnitte: [
-    {
+    { titel: "Stand und Verantwortung",
       felder: [
         { id: "stand", art: "datum", label: "Stand", vorbelegung: "heute", pflicht: true },
-        { id: "version", art: "text", label: "Version", vorschlaege: ["1.0", "1.1", "2.0"] },
+        { id: "version", selten: true, art: "text", label: "Version", vorschlaege: ["1.0", "1.1", "2.0"] },
         { id: "verantwortlich", art: "text", label: "Verantwortlich", vorbelegung: "verantwortlich", pflicht: true },
       ],
     },

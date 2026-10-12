@@ -17,7 +17,7 @@ export const ifsgBelehrung: Vorlage = {
   pflichten: ["branche.gastro_ifsg_belehrung"],
   grundlage: "§ 43 Abs. 4 und 5 IfSG",
   abschnitte: [
-    {
+    { titel: "Belehrung",
       hilfe: "Die Erstbelehrung macht das Gesundheitsamt oder eine beauftragte Ärztin bzw. ein beauftragter Arzt; die Bescheinigung darf bei Arbeitsbeginn höchstens drei Monate alt sein. Bescheinigung und letzte Dokumentation bewahrst du im Betrieb auf.",
       felder: [
         { id: "datum", art: "datum", label: "Datum der Belehrung", vorbelegung: "heute", pflicht: true },
@@ -31,7 +31,7 @@ export const ifsgBelehrung: Vorlage = {
       felder: [
         {
           id: "teilnehmer",
-          art: "liste",
+          art: "liste", ausMitarbeitern: true,
           label: "Teilnehmende",
           eintrag: "Person",
           titelFeld: "name",
@@ -76,7 +76,7 @@ export const allergenAushang: Vorlage = {
   pflichten: ["branche.gastro_allergene"],
   grundlage: "Art. 9, 44 LMIV; § 4 LMIDV",
   abschnitte: [
-    { felder: [{ id: "stand", art: "datum", label: "Stand", vorbelegung: "heute" }, { id: "legende", art: "schalter", label: "Erläuterung der 14 Allergene anfügen", vorbelegung: true }] },
+    { titel: "Stand", felder: [{ id: "stand", art: "datum", label: "Stand", vorbelegung: "heute" }, { id: "legende", art: "schalter", label: "Erläuterung der 14 Allergene anfügen", vorbelegung: true }] },
     {
       titel: "Speisen und Getränke",
       felder: [
@@ -132,10 +132,10 @@ export const haccp: Vorlage = {
   querformat: true,
   namensFeld: "zeitraum",
   abschnitte: [
-    {
+    { titel: "Zeitraum",
       felder: [
         { id: "zeitraum", art: "text", label: "Zeitraum", hilfe: "z. B. Oktober 2026", pflicht: true },
-        { id: "leerzeilen", art: "schalter", label: "Leere Zeilen zum Eintragen von Hand anhängen", vorbelegung: true },
+        { id: "leerzeilen", selten: true, art: "schalter", label: "Leere Zeilen zum Eintragen von Hand anhängen", vorbelegung: true },
       ],
     },
     {
@@ -178,7 +178,7 @@ export const haccp: Vorlage = {
             { id: "wert", art: "text", label: "Messwert", hilfe: "z. B. 5 °C", pflicht: true },
             { id: "in_ordnung", art: "wahl", label: "In Ordnung", optionen: [{ wert: "ja", text: "ja" }, { wert: "nein", text: "nein" }], vorbelegung: "ja" },
             { id: "massnahme", art: "text", label: "Korrekturmaßnahme", wenn: { feld: "in_ordnung", ist: "nein" }, pflicht: true },
-            { id: "kuerzel", art: "text", label: "Kürzel" },
+            { id: "kuerzel", selten: true, art: "text", label: "Kürzel" },
           ],
         },
       ],
@@ -240,7 +240,7 @@ export const hautschutzplan: Vorlage = {
   querformat: true,
   namensFeld: "bereich",
   abschnitte: [
-    { felder: [{ id: "bereich", art: "text", label: "Bereich", vorschlaege: ["Salon", "Kosmetikkabine", "Nagelstudio"] }] },
+    { titel: "Bereich", felder: [{ id: "bereich", art: "text", label: "Bereich", vorschlaege: ["Salon", "Kosmetikkabine", "Nagelstudio"] }] },
     {
       titel: "Tätigkeiten",
       hilfe: "Wähle die Tätigkeiten aus dem Muster und trage die Produkte ein, die bei dir verwendet werden.",
@@ -264,7 +264,7 @@ export const hautschutzplan: Vorlage = {
         },
       ],
     },
-    {
+    { titel: "Verantwortlich und Stand",
       felder: [
         { id: "erstellt_von", art: "text", label: "Verantwortlich", vorbelegung: "verantwortlich" },
         { id: "datum", art: "datum", label: "Stand", vorbelegung: "heute" },
@@ -292,7 +292,7 @@ export const hygieneplan: Vorlage = {
   querformat: true,
   namensFeld: "bereich",
   abschnitte: [
-    { hilfe: "Welche Anforderungen genau gelten, regelt die Hygieneverordnung deines Bundeslands. Desinfektionsmittel nach Herstellerangabe bzw. VAH-Liste einsetzen.", felder: [{ id: "bereich", art: "text", label: "Bereich", vorschlaege: ["Friseursalon", "Kosmetik", "Nagelstudio", "Fußpflege"] }] },
+    { titel: "Bereich", hilfe: "Welche Anforderungen genau gelten, regelt die Hygieneverordnung deines Bundeslands. Desinfektionsmittel nach Herstellerangabe bzw. VAH-Liste einsetzen.", felder: [{ id: "bereich", art: "text", label: "Bereich", vorschlaege: ["Friseursalon", "Kosmetik", "Nagelstudio", "Fußpflege"] }] },
     {
       titel: "Einträge",
       felder: [
@@ -315,7 +315,7 @@ export const hygieneplan: Vorlage = {
         },
       ],
     },
-    {
+    { titel: "Verantwortlich und Stand",
       felder: [
         { id: "erstellt_von", art: "text", label: "Verantwortlich", vorbelegung: "verantwortlich" },
         { id: "datum", art: "datum", label: "Stand", vorbelegung: "heute" },

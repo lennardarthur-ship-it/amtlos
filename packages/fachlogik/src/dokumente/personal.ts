@@ -44,6 +44,7 @@ export const nachweisArbeitsbedingungen: Vorlage = {
   beschreibung: "Niederschrift aller Angaben nach § 2 Abs. 1 NachwG zum Unterschreiben und Aushändigen – mit Kündigungsregeln aus dem Gesetz und Prüfung gegen Mindestlohn und Mindesturlaub.",
   bereich: "personal",
   pflichten: ["personal.nachweisgesetz"],
+  person: { art: "mitarbeiter", felder: { name: "name", anschrift: "anschrift", beginn: "beginn", taetigkeit: "taetigkeit" } },
   grundlage: "§ 2 Abs. 1 NachwG",
   namensFeld: "name",
   abschnitte: [
@@ -175,7 +176,7 @@ export const kiKompetenz: Vorlage = {
   grundlage: "Art. 4 KI-VO (VO (EU) 2024/1689)",
   namensFeld: "thema",
   abschnitte: [
-    {
+    { titel: "Schulung",
       felder: [
         { id: "thema", art: "text", label: "Bezeichnung", pflicht: true, vorschlaege: ["Grundschulung KI-Kompetenz", "Sicherer Umgang mit KI-Assistenten im Betrieb"] },
         { id: "ki_systeme", art: "mehrzeilig", label: "Eingesetzte KI-Werkzeuge", pflicht: true, vorschlaege: ["Textassistent (Chatbot)", "Übersetzungsprogramm", "Bildbearbeitung mit KI", "KI-Funktionen in der Buchhaltungs- oder Kassensoftware", "Online-Terminbuchung mit KI-Assistent"] },
@@ -193,7 +194,7 @@ export const kiKompetenz: Vorlage = {
     },
     {
       titel: "Teilnehmende",
-      felder: [{ id: "teilnehmer", art: "liste", label: "Teilnehmende", eintrag: "Person", titelFeld: "name", felder: [{ id: "name", art: "text", label: "Name", pflicht: true }] }],
+      felder: [{ id: "teilnehmer", art: "liste", ausMitarbeitern: true, label: "Teilnehmende", eintrag: "Person", titelFeld: "name", felder: [{ id: "name", art: "text", label: "Name", pflicht: true }] }],
     },
   ],
   html(d, b) {

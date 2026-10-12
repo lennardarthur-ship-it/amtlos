@@ -79,7 +79,7 @@ export const datenschutzerklaerungWebsite: Vorlage = {
   pflichten: ["online.datenschutzerklaerung"],
   grundlage: "Art. 13 DSGVO; § 25 TDDDG",
   abschnitte: [
-    {
+    { titel: "Deine Website",
       hilfe: "Verantwortliche Stelle, Kontakt und Aufsichtsbehörde übernimmt Amtlos aus „Mein Betrieb“.",
       felder: [
         { id: "website", art: "text", label: "Adresse der Website", hilfe: "z. B. www.salon-sonne.de" },
@@ -100,8 +100,8 @@ export const datenschutzerklaerungWebsite: Vorlage = {
         { id: "newsletter_themen", art: "text", label: "Inhalt des Newsletters", vorschlaege: ["Angebote und Neuigkeiten aus unserem Betrieb"], wenn: { feld: "module", ist: "newsletter" } },
         { id: "newsletter_dienst", art: "text", label: "Versanddienstleister des Newsletters", wenn: { feld: "module", ist: "newsletter" } },
         { id: "netzwerke", art: "text", label: "Verlinkte Netzwerke", vorschlaege: ["Instagram", "Facebook", "Instagram und Facebook", "LinkedIn"], wenn: { feld: "module", ist: "social_media_links" } },
-        { id: "dsb", art: "text", label: "Datenschutzbeauftragte/r (falls benannt)" },
-        { id: "ergaenzung", art: "mehrzeilig", label: "Weitere Verarbeitungen", hilfe: "nur falls deine Website noch etwas anderes nutzt" },
+        { id: "dsb", selten: true, art: "text", label: "Datenschutzbeauftragte/r (falls benannt)" },
+        { id: "ergaenzung", selten: true, art: "mehrzeilig", label: "Weitere Verarbeitungen", hilfe: "nur falls deine Website noch etwas anderes nutzt" },
         { id: "stand", art: "datum", label: "Stand", vorbelegung: "heute" },
       ],
     },
@@ -154,28 +154,28 @@ export const impressum: Vorlage = {
   pflichten: ["online.impressum"],
   grundlage: "§ 5 DDG; § 36 VSBG",
   abschnitte: [
-    {
+    { titel: "Angaben zum Unternehmen",
       hilfe: "Name, Anschrift, Telefon, E-Mail und USt-IdNr. übernimmt Amtlos aus „Mein Betrieb“. Die Steuernummer gehört nicht ins Impressum.",
       felder: [
         { id: "rechtsform", art: "wahl", label: "Rechtsform", optionen: RECHTSFORMEN_IMP.map((r) => ({ wert: r, text: r })), vorbelegung: "Einzelunternehmen" },
         { id: "vertreten", art: "text", label: "Inhaber/in bzw. vertretungsberechtigte Person", vorbelegung: "verantwortlich", pflicht: true },
-        { id: "kapital", art: "text", label: "Stammkapital", hilfe: "nur bei GmbH/UG und nur, wenn du es angeben möchtest" },
-        { id: "ausstehend", art: "text", label: "Ausstehende Einlagen", hilfe: "Pflicht, wenn Kapital angegeben und nicht voll eingezahlt", wenn: { feld: "kapital" } },
+        { id: "kapital", selten: true, art: "text", label: "Stammkapital", hilfe: "nur bei GmbH/UG und nur, wenn du es angeben möchtest" },
+        { id: "ausstehend", selten: true, art: "text", label: "Ausstehende Einlagen", hilfe: "Pflicht, wenn Kapital angegeben und nicht voll eingezahlt", wenn: { feld: "kapital" } },
         { id: "register_gericht", art: "text", label: "Registergericht", hilfe: "nur bei Eintragung, z. B. Amtsgericht München" },
         { id: "register_nr", art: "text", label: "Registernummer", hilfe: "z. B. HRB 123456" },
-        { id: "wirtschafts_id", art: "text", label: "Wirtschafts-Identifikationsnummer", hilfe: "nur falls vorhanden" },
+        { id: "wirtschafts_id", selten: true, art: "text", label: "Wirtschafts-Identifikationsnummer", hilfe: "nur falls vorhanden" },
       ],
     },
     {
       titel: "Nur falls zutreffend",
       felder: [
-        { id: "aufsicht", art: "text", label: "Zuständige Aufsichtsbehörde", hilfe: "wenn deine Tätigkeit eine behördliche Zulassung braucht" },
+        { id: "aufsicht", selten: true, art: "text", label: "Zuständige Aufsichtsbehörde", hilfe: "wenn deine Tätigkeit eine behördliche Zulassung braucht" },
         { id: "reglementiert", art: "schalter", label: "Reglementierter Beruf", hilfe: "z. B. zulassungspflichtiges Handwerk mit Meisterpflicht" },
         { id: "kammer", art: "text", label: "Kammer", wenn: { feld: "reglementiert" }, vorschlaege: ["Handwerkskammer"] },
         { id: "berufsbezeichnung", art: "text", label: "Gesetzliche Berufsbezeichnung", wenn: { feld: "reglementiert" }, vorschlaege: ["Friseurmeister/in", "Elektrotechnikermeister/in"] },
         { id: "verleihung", art: "text", label: "Staat der Verleihung", wenn: { feld: "reglementiert" }, vorschlaege: ["Deutschland"] },
         { id: "regelungen", art: "text", label: "Berufsrechtliche Regelungen und wo sie zu finden sind", wenn: { feld: "reglementiert" }, vorschlaege: ["Handwerksordnung (HwO), abrufbar unter www.gesetze-im-internet.de"] },
-        { id: "redaktion", art: "text", label: "Verantwortlich für redaktionelle Inhalte (Name, Anschrift)", hilfe: "nur bei journalistisch-redaktionellen Inhalten, z. B. Blog" },
+        { id: "redaktion", selten: true, art: "text", label: "Verantwortlich für redaktionelle Inhalte (Name, Anschrift)", hilfe: "nur bei journalistisch-redaktionellen Inhalten, z. B. Blog" },
         { id: "vsbg", art: "wahl", label: "Verbraucherstreitbeilegung (§ 36 VSBG)", hilfe: "Pflicht ab mehr als 10 Beschäftigten oder wenn du teilnimmst", optionen: [{ wert: "keine_angabe", text: "keine Angabe" }, { wert: "nicht_bereit", text: "nicht bereit" }, { wert: "bereit", text: "bereit" }], vorbelegung: "keine_angabe" },
         { id: "schlichtungsstelle", art: "mehrzeilig", label: "Verbraucherschlichtungsstelle (Name, Anschrift, Website)", wenn: { feld: "vsbg", ist: "bereit" } },
       ],
@@ -212,7 +212,7 @@ export const auftragsverarbeitung: Vorlage = {
   grundlage: "Art. 28 Abs. 3 DSGVO",
   namensFeld: "partner",
   abschnitte: [
-    {
+    { titel: "Vertragspartner",
       hilfe: "Viele Anbieter stellen einen eigenen Vertrag bereit – dann den unterschreiben und ablegen. Als Muster eignen sich auch die EU-Standardvertragsklauseln (Durchführungsbeschluss (EU) 2021/915).",
       felder: [
         { id: "rolle", art: "wahl", label: "Wer ist wer", optionen: optionen(ROLLE), vorbelegung: "auftraggeber" },

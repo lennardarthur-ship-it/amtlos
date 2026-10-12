@@ -2,7 +2,7 @@ import { AtkinsonHyperlegible_400Regular, AtkinsonHyperlegible_700Bold, useFonts
 import { BlurView } from "expo-blur";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Platform, Pressable, View, useColorScheme } from "react-native";
 import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Betrieb } from "./seiten/Betrieb";
@@ -52,6 +52,9 @@ function Rahmen() {
   const f = useFarben();
   const [zurueck, setZurueck] = useState<Record<Tab, number>>({ unterlagen: 0, meine: 0, betrieb: 0 });
   const [besucht, setBesucht] = useState<Set<Tab>>(new Set(["unterlagen"]));
+  // geführte Abläufe laufen im Vollbild – ohne Tab-Leiste, mit eigenem Knopf unten
+  const [voll, setVoll] = useState<Record<Tab, boolean>>({ unterlagen: false, meine: false, betrieb: false });
+  const vollSetzer = useMemo(() => Object.fromEntries(TABS.map((x) => [x.id, (an: boolean) => setVoll((v) => (v[x.id] === an ? v : { ...v, [x.id]: an }))])) as Record<Tab, (an: boolean) => void>, []);
   const setTab = (t: Tab) => {
     if (t === tab) setZurueck((z) => ({ ...z, [t]: z[t] + 1 }));
     tabWechseln(t);
@@ -79,6 +82,7 @@ function Rahmen() {
           <View key={x.id} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, opacity: an ? 1 : 0, display: Platform.OS === "web" && !an ? "none" : "flex" }} pointerEvents={an ? "auto" : "none"} importantForAccessibility={an ? "auto" : "no-hide-descendants"} accessibilityElementsHidden={!an}>
             <Stapel
               zuruecksetzen={zurueck[x.id]}
+              vollbild={vollSetzer[x.id]}
               wurzel={
                 <SafeAreaView style={{ flex: 1 }} edges={["top", "left", "right"]}>
                   <Wurzel />
@@ -88,7 +92,7 @@ function Rahmen() {
           </View>
         );
       })}
-      <Leiste tab={tab} setTab={setTab} />
+      {voll[tab] ? null : <Leiste tab={tab} setTab={setTab} />}
     </View>
   );
 }

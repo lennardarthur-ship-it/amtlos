@@ -3,7 +3,7 @@ import { PDFDocument } from "pdf-lib";
 import { VORLAGEN, dokumentHtml, fehlendeAngaben, leereDaten, vorlageFuer } from "@amtlos/fachlogik";
 import { fussAngaben, fusszeileStempeln } from "../src/unterlagen/fusszeile";
 import { pflichtenFuer, rechtsgrundlagen } from "../src/unterlagen/katalog";
-import { LEERER_STAND, aendern, anlegen, betriebFehlt, betriebSetzen, heute, kopieren, loeschen, sortiert, standAus } from "../src/unterlagen/speicher";
+import { LEERER_STAND, aendern, anlegen, betriebFehlt, betriebSetzen, felderSetzen, heute, kopieren, loeschen, personLoeschen, personMerken, personSetzen, personenSortiert, sortiert, standAus } from "../src/unterlagen/speicher";
 
 const B = { name: "Café Mond", strasse: "Markt 2", plz: "54321", ort: "Beispielstadt", verantwortlich: "Robin Beispiel", telefon: "", email: "", steuernummer: "", ust_idnr: "", iban: "", bundesland: "Hessen" };
 const t = (s: string) => new Date(`2026-10-12T${s}:00Z`);
@@ -32,6 +32,8 @@ describe("Unterlagen auf dem Gerät", () => {
     expect(standAus("{kaputt")).toEqual(LEERER_STAND);
     const s = standAus(JSON.stringify({ version: 1, betrieb: { name: "X", boese: 1, plz: 5 }, unterlagen: [{ id: "1", vorlage: "haccp", daten: {}, erstellt: "", geaendert: "" }, { id: "2", vorlage: "weg", daten: {} }, null] }));
     expect(s.betrieb).toEqual({ ...LEERER_STAND.betrieb, name: "X" });
+    expect(s.mitarbeiter).toEqual([]);
+    expect(standAus(JSON.stringify({ mitarbeiter: [{ id: "m", name: "Sam", taetigkeit: "Friseur/in", boese: 1 }, { name: "ohne id" }] })).mitarbeiter).toEqual([{ id: "m", name: "Sam", taetigkeit: "Friseur/in" }]);
     expect(s.unterlagen.map((u) => u.id)).toEqual(["1"]);
     expect(betriebFehlt(s.betrieb)).toBe(false);
     expect(betriebFehlt(LEERER_STAND.betrieb)).toBe(true);
@@ -67,5 +69,41 @@ describe("Unterlagen auf dem Gerät", () => {
     const neu = await PDFDocument.load(nachher);
     expect(neu.getPageCount()).toBe(2);
     expect(nachher.length).toBeGreaterThan(vorher.length);
+  });
+
+  it("zählt Rechnungsnummern beim Anlegen und Kopieren weiter", () => {
+    const jetzt = new Date("2026-10-12T08:00:00Z");
+    const [s0, a] = anlegen(LEERER_STAND, "rechnung", jetzt, "a");
+    let s = s0;
+    expect(a.daten.nummer).toBe("2026-001");
+    s = felderSetzen(s, "a", { nummer: "2026-041" }, jetzt);
+    const [s2, b] = anlegen(s, "rechnung", jetzt, "b");
+    expect(b.daten.nummer).toBe("2026-042");
+    const [, k] = kopieren(s2, "a", jetzt, "k");
+    expect(k!.daten.nummer).toBe("2026-043");
+    // andere Vorlagen bekommen keine Nummer
+    expect(anlegen(s, "kassenbuch", jetzt, "c")[1].daten.nummer).toBeUndefined();
+  });
+
+  it("setzt Felder auf Basis des aktuellen Stands, ohne andere Angaben zu verlieren", () => {
+    const [s0] = anlegen(betriebSetzen(LEERER_STAND, B), "unterweisung", t("08:00"), "a");
+    const s1 = felderSetzen(s0, "a", { thema: "Hygiene" }, t("09:00"));
+    const s2 = felderSetzen(s1, "a", { dauer: "30 Minuten" }, t("09:01"));
+    expect(s2.unterlagen[0]!.daten).toMatchObject({ thema: "Hygiene", dauer: "30 Minuten", durchgefuehrt_von: "Robin Beispiel" });
+    expect(s2.unterlagen[0]!.geaendert).toBe(t("09:01").toISOString());
+  });
+
+  it("merkt sich Mitarbeiter und Kunden, ergänzt bei gleichem Namen und sortiert alphabetisch", () => {
+    let s = personMerken(LEERER_STAND, "kunde", { name: "Kim Beispiel", anschrift: "Gartenweg 3" }, "k1");
+    s = personMerken(s, "kunde", { name: "kim beispiel", ust_idnr: "DE1" }, "k2");
+    expect(s.kunden).toEqual([{ id: "k1", name: "Kim Beispiel", anschrift: "Gartenweg 3", ust_idnr: "DE1" }]);
+    s = personSetzen(s, "mitarbeiter", { id: "m2", name: "Zoe" });
+    s = personSetzen(s, "mitarbeiter", { id: "m1", name: "Ali" });
+    s = personSetzen(s, "mitarbeiter", { id: "m3", name: "" });
+    expect(personenSortiert(s.mitarbeiter).map((p) => p.name)).toEqual(["Ali", "Zoe"]);
+    s = personSetzen(s, "mitarbeiter", { id: "m1", name: "Ali Muster" });
+    expect(s.mitarbeiter.find((p) => p.id === "m1")!.name).toBe("Ali Muster");
+    s = personLoeschen(s, "mitarbeiter", "m2");
+    expect(s.mitarbeiter.map((p) => p.id)).toEqual(["m1", "m3"]);
   });
 });

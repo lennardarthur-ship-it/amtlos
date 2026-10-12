@@ -75,3 +75,18 @@ Neue Gestaltung (Briefkopf, Kopfzeile mit Rechtsgrundlage, nummerierte Abschnitt
 | Alle 33 PDFs in Chromium erzeugt, u. a. Gefährdungsbeurteilung, Rechnung, Datenschutzinformation, Prüfprotokoll und Lohnkonto (Querformat) angesehen | lesbar, Fußzeile auf jeder Seite |
 
 Fachlich zu prüfen: T-62 bis T-65. Auf dem iPhone noch anzusehen: Ränder und Fußzeile aus expo-print.
+
+## Nachtrag: geführter Ablauf und neue Startseite (E-124)
+
+Jede Unterlage läuft Schritt für Schritt mit einem Hauptknopf und endet bei einem Abschluss mit Vorschau und „PDF teilen“. Startseite nach Anlässen, Rechnung oben, zuletzt bearbeitete Unterlagen. Mitarbeiter und Kunden werden gemerkt und wieder angeboten, Rechnungsnummern zählen hoch.
+
+| Prüfung | Ergebnis |
+|---|---|
+| Vorlagen-Tests (neu: jede Vorlage in einem Anlass und mit Kurzbeschreibung ohne Paragrafen, jeder Schritt mit Titel, seltene Felder nie Pflicht, Personen-Zuordnung, Rechnungsnummern, Kurztitel) | 28 grün |
+| App-Tests (neu: Nummer beim Anlegen und Kopieren, Felder setzen, Mitarbeiter/Kunden merken und sortieren, tolerant lesen) | 9 grün |
+| Monorepo mit Datenbank | 42/42 |
+| Rundgang hell und dunkel neu: Betrieb, Rechnung im Ablauf (2026-001, 59,50 €, PDF-Inhalt), Vorschau, zweite Rechnung (2026-002, Kunde gewählt), leere dritte verworfen, Anlass „Sicherheit“ mit Vorschlägen und Details, leerer Eintrag verworfen, Mitarbeiter anlegen und in Unterweisung übernehmen, Allergene, Neustart, Kopie und Löschen, alles löschen | ohne Befunde |
+| Alle 33 Vorlagen einmal durch alle Schritte bis zum Abschluss (inkl. „Weitere Angaben“) | ohne Seitenfehler |
+| iOS-Bündel mit react-native-webview | gebaut |
+
+Fachlich zu prüfen: T-66. Auf dem iPhone noch anzusehen: Vorschau (WebView), Tastatur über dem „Weiter“-Knopf.

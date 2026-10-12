@@ -530,6 +530,18 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - Hinweis für Kleinunternehmer jetzt „Der Umsatz ist nach § 19 Abs. 1 UStG steuerfrei.“ (Wortlaut nach Neufassung ab 2025, T-63).
 - „Mein Betrieb“ hat ein Bundesland (Aufsichtsbehörde Datenschutz).
 
+
+### E-124 · Geführter Ablauf statt Formularseite, Startseite nach Anlässen, Mitarbeiter und Kunden
+- **Datum:** 2026-10-12 · **Status:** angenommen (Kritik des Gründers: „die UX ist extrem schlecht“; Umsetzung der Punkte 1–7)
+- **Geführter Ablauf:** Jede Unterlage läuft Schritt für Schritt – ein Abschnitt je Bildschirm, Fortschrittsbalken, unten ein Hauptknopf („Weiter“, im letzten Schritt „Zum Dokument“), Zurück-Pfeil daneben. Der Ablauf läuft im Vollbild ohne Tab-Leiste; „Übersicht“ springt zum Abschluss. Jeder Abschnitt hat jetzt einen Titel.
+- **Seltene Felder** (`selten` in der Vorlage, nie Pflicht) stehen hinter „Weitere Angaben (n)“ – außer sie sind ausgefüllt oder werden als fehlend genannt. **Hilfetexte:** kurze als Platzhalter im Feld, längere hinter einem (i).
+- **Abschluss:** „Fertig“ bzw. „Fast fertig“ mit den fehlenden Angaben und „Ergänzen“ (springt zum Schritt bzw. zu „Mein Betrieb“), Ergebnis (z. B. Rechnungsbetrag), Vorschau des Dokuments (WebView, im Web iframe; groß ansehen), Übersicht der Schritte, Drucken/Als Text/Kopie/Löschen als Textknöpfe. Hauptknopf „PDF teilen“. Bestehende Unterlagen öffnen beim Abschluss.
+- **Direkt loslegen:** Antippen einer Vorlage legt die Unterlage an und startet den Ablauf; die Infoseite (Zweck, Rechtsgrundlage, Quellen) gibt es über „Wozu brauche ich das?“ im ersten Schritt. Eine neue, unveränderte Unterlage verschwindet beim Schließen wieder (ebenso leere neue Listeneinträge).
+- **Startseite:** Suche, „Rechnung schreiben“ als Hauptknopf, „Zuletzt bearbeitet“, zehn Anlässe („Ich stelle jemanden ein“, „Ich gründe oder eröffne“, „Im laufenden Betrieb“ …, `ANLAESSE` in `@amtlos/fachlogik`), darunter „Alle 33 Unterlagen“ nach Bereich. Jede Vorlage hat einen Satz in Alltagssprache ohne Paragrafen (`KURZ`).
+- **Mitarbeiter und Kunden** (`stand.mitarbeiter`, `stand.kunden`, unter „Mein Betrieb“ bearbeitbar): Vorlagen mit `person` (Rechnung → Kunde; Nachweis, Personalfragebogen, Lohnkonto, Arbeitszeitnachweis → Mitarbeiter) zeigen gespeicherte Personen zur Auswahl und merken neue Angaben beim Weitergehen und Schließen (gleicher Name ergänzt den Eintrag, leere Werte überschreiben nichts). Teilnehmerlisten (Unterweisung, KI-Schulung, IfSG) übernehmen alle Mitarbeiter auf Tipp. **Rechnungsnummern** zählen fortlaufend weiter (`fortlaufend`, `naechsteNummer`), auch beim Kopieren.
+- **Eingaben:** Einzeilige Felder mit Vorschlägen sind eine Auswahl mit „Andere …“ statt Textfeld plus Chips; mehrzeilige sind Zeilen zum Ankreuzen plus „Eigenen Text ergänzen“ (gespeichert weiter als Text). Listeneinträge auf eigener Seite statt aufgeklappter Karten. Vorschläge mit kurzem Titel (`kurztitel`) und Details zum Aufklappen, ein Knopf „N übernehmen“ unten.
+- **Optik:** ein Hauptknopf je Bildschirm, zweitrangige Handlungen als ruhige Flächen oder Textknöpfe, Felder ohne Karten, mehr Abstand. Neues Paket: react-native-webview 13.16.1 (Version aus Expo SDK 57, läuft in Expo Go).
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)
