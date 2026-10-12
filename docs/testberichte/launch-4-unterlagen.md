@@ -61,3 +61,17 @@ T-52 alle Vorlagen · T-53 Nachweisgesetz (Liste, Form) · T-54 Verfahrensdokume
 | Neue PDFs in Chromium angesehen (Rechnung, Voranmeldung, Kassenbuch, Arbeitszeit, Impressum, Lohnkonto) | lesbar |
 
 Fachlich zu prüfen: T-58 bis T-61. Grenze: Was elektronisch übermittelt werden muss, überträgt der Nutzer weiter selbst (ELSTER, sv.net, Portale).
+
+## Nachtrag: Produktqualität und Auswahl statt Freitext (E-123)
+
+Neue Gestaltung (Briefkopf, Kopfzeile mit Rechtsgrundlage, nummerierte Abschnitte, Linien zum Ausfüllen, Fußzeile mit Seitenzahlen) und vorformulierte Inhalte aus vier Recherchen und einem Prüfbericht. In der App: Vorschläge mit Filter übernehmen, Chips und Bausteine statt Freitext, Prüfungen gegen Mindestlohn, Mindesturlaub, Minijob-Grenze, Befreiungshinweis bei 0 % und berechtigte Interessen (lit. f).
+
+| Prüfung | Ergebnis |
+|---|---|
+| Vorlagen-Tests (neu: Mindestlohn/-urlaub, Minijob, Vorschlag als Eintrag, „nicht“-Bedingung und Mehrfachauswahl, Bausteine mit Platzhaltern, AVV lit. a–h, lit. f in der Datenschutzinformation, 0 % ohne Befreiungshinweis) | 23 grün |
+| App-Tests (inkl. Fußzeile mit Seitenzahlen) | 6 grün |
+| Monorepo mit Datenbank | 42/42 |
+| Rundgang hell und dunkel (Bundesland, Vorschläge-Auswahl Friseur, Mutterschutz, Rechnung 59,50 €) | ohne Befunde |
+| Alle 33 PDFs in Chromium erzeugt, u. a. Gefährdungsbeurteilung, Rechnung, Datenschutzinformation, Prüfprotokoll und Lohnkonto (Querformat) angesehen | lesbar, Fußzeile auf jeder Seite |
+
+Fachlich zu prüfen: T-62 bis T-65. Auf dem iPhone noch anzusehen: Ränder und Fußzeile aus expo-print.

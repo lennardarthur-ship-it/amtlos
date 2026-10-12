@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Pressable, Share, View } from "react-native";
-import { cent, dateiname, fehlendeAngaben, neuerEintrag, sichtbar, unterlagenName, vorlageFuer, type Daten, type EinfachesFeld, type Eintrag, type EintragWert, type ListenFeld } from "@amtlos/fachlogik";
+import { PRUEFHINWEIS, cent, dateiname, dokumentHtml, eintragAusVorschlag, fehlendeAngaben, neuerEintrag, sichtbar, unterlagenName, vorlageFuer, type Daten, type EinfachesFeld, type Eintrag, type EintragWert, type ListenFeld, type Vorschlag } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { Auswahl, DatumFeld, Feld, Hinweis, Karte, Knopf, MehrfachWahl, Schalter, Symbol, T, UhrzeitFeld, Wahl } from "../ui/bausteine";
+import { Auswahl, BausteinListe, DatumFeld, Feld, Hinweis, Karte, Knopf, MehrfachWahl, Schalter, Symbol, T, UhrzeitFeld, Wahl } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { RADIUS, ZIEL, useFarben } from "../ui/thema";
 import { heute } from "../unterlagen/speicher";
@@ -10,14 +10,56 @@ import { drucken, pdfTeilen } from "../unterlagen/pdf";
 import { useAmtlos } from "../zustand";
 import { Gruppe, Inhalt } from "./gemeinsam";
 
+/** Antippbare Formulierungen unter einem Textfeld: ersetzen (einzeilig) oder als neue Zeile anhängen (mehrzeilig). */
+function Vorschlaege({ liste, wert, mehrzeilig, setzen }: { liste: string[]; wert: string; mehrzeilig: boolean; setzen: (w: string) => void }) {
+  const f = useFarben();
+  const [alle, setAlle] = useState(false);
+  const zeilen = wert.split("\n").map((z) => z.trim());
+  const sichtbar = alle ? liste : liste.slice(0, 6);
+  return (
+    <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 8 }}>
+      {sichtbar.map((v) => {
+        const drin = mehrzeilig ? zeilen.includes(v) : wert.trim() === v;
+        return (
+          <Pressable
+            key={v}
+            accessibilityRole="button"
+            accessibilityState={{ selected: drin }}
+            accessibilityLabel={`${drin ? TEXT.vorschlag_entfernen : TEXT.vorschlag_uebernehmen}: ${v}`}
+            onPress={() => {
+              if (!mehrzeilig) return setzen(drin ? "" : v);
+              setzen(drin ? zeilen.filter((z) => z !== v).join("\n") : [wert.trim(), v].filter(Boolean).join("\n"));
+            }}
+            style={{ maxWidth: "100%", paddingHorizontal: 10, paddingVertical: 7, borderRadius: 14, flexDirection: "row", alignItems: "center", gap: 5, backgroundColor: drin ? f.amtHauch : f.papier, borderWidth: 1, borderColor: drin ? f.amt : f.linie }}
+          >
+            <Symbol name={drin ? "checkmark" : "plus"} groesse={12} farbe={drin ? f.amt : f.tinteLeise} />
+            <T v="caption" farbe={drin ? f.amtTief : f.tinte} numberOfLines={2} stil={{ flexShrink: 1 }}>{v}</T>
+          </Pressable>
+        );
+      })}
+      {liste.length > 6 && !alle ? (
+        <Pressable accessibilityRole="button" onPress={() => setAlle(true)} style={{ paddingHorizontal: 10, paddingVertical: 7 }}>
+          <T v="caption" fett farbe={f.amt}>{TEXT.mehr_vorschlaege(liste.length - 6)}</T>
+        </Pressable>
+      ) : null}
+    </View>
+  );
+}
+
 /** Ein Eingabefeld je Feldart. */
 function Eingabe({ feld, wert, setzen }: { feld: EinfachesFeld; wert: EintragWert | undefined; setzen: (w: EintragWert) => void }) {
   const text = typeof wert === "string" ? wert : "";
   switch (feld.art) {
     case "text":
-      return <Feld label={feld.label} hilfe={feld.hilfe} wert={text} aendern={setzen} />;
     case "mehrzeilig":
-      return <Feld label={feld.label} hilfe={feld.hilfe} wert={text} aendern={setzen} mehrzeilig />;
+      return (
+        <View>
+          <Feld label={feld.label} hilfe={feld.hilfe} wert={text} aendern={setzen} mehrzeilig={feld.art === "mehrzeilig"} />
+          {feld.vorschlaege?.length ? <Vorschlaege liste={feld.vorschlaege} wert={text} mehrzeilig={feld.art === "mehrzeilig"} setzen={setzen} /> : null}
+        </View>
+      );
+    case "bausteine":
+      return <BausteinListe label={feld.label} hilfe={feld.hilfe} werte={Array.isArray(wert) ? wert : []} aendern={setzen} optionen={feld.optionen} />;
     case "datum":
       return <DatumFeld label={feld.label} hilfe={feld.hilfe} wert={text || null} aendern={setzen} />;
     case "uhrzeit":
@@ -38,10 +80,85 @@ function Eingabe({ feld, wert, setzen }: { feld: EinfachesFeld; wert: EintragWer
   }
 }
 
+const titelText = (feld: ListenFeld, e: Eintrag) => (typeof e[feld.titelFeld] === "string" ? (e[feld.titelFeld] as string).trim() : "");
+
+/** Vorschläge für eine Liste: nach Gruppe filtern, ankreuzen, übernehmen. Schon übernommene sind markiert. */
+function VorschlagSeite({ feld, vorhanden, uebernehmen }: { feld: ListenFeld; vorhanden: string[]; uebernehmen: (v: Vorschlag[]) => void }) {
+  const f = useFarben();
+  const nav = useNav();
+  const alle = feld.vorschlaege ?? [];
+  const gruppen = [...new Set(alle.map((v) => v.gruppe).filter((g): g is string => Boolean(g)))];
+  const [gruppe, setGruppe] = useState<string | null>(gruppen.length > 1 ? null : (gruppen[0] ?? null));
+  const [gewaehlt, setGewaehlt] = useState<Set<string>>(new Set());
+  const liste = alle.filter((v) => !gruppe || v.gruppe === gruppe);
+  const istDa = (v: Vorschlag) => vorhanden.includes(titelText(feld, v.werte) || v.titel);
+  return (
+    <Unterseite titel={TEXT.vorschlaege_titel}>
+      <Inhalt>
+        <T v="titel" accessibilityRole="header">{feld.label}</T>
+        <T leise stil={{ marginTop: 4 }}>{TEXT.vorschlaege_text}</T>
+        {gruppen.length > 1 ? (
+          <View style={{ marginTop: 6 }}>
+            <Wahl label={feld.gruppenLabel ?? TEXT.gruppe} wert={gruppe ?? ""} aendern={(g) => setGruppe(g || null)} optionen={[{ wert: "", text: TEXT.alle }, ...gruppen.map((g) => ({ wert: g, text: g }))]} />
+          </View>
+        ) : null}
+        {gewaehlt.size ? (
+          <Knopf
+            text={TEXT.uebernehmen(gewaehlt.size)}
+            symbol="plus"
+            onPress={() => {
+              uebernehmen(alle.filter((v) => gewaehlt.has(v.titel)));
+              nav.zurueck();
+            }}
+            stil={{ marginTop: 16 }}
+          />
+        ) : null}
+        <Karte stil={{ marginTop: 16 }}>
+          {liste.map((v, i) => {
+            const da = istDa(v);
+            const an = da || gewaehlt.has(v.titel);
+            return (
+              <Pressable
+                key={`${v.gruppe}-${v.titel}`}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: an, disabled: da }}
+                aria-checked={an}
+                disabled={da}
+                onPress={() => setGewaehlt((g) => { const n = new Set(g); if (n.has(v.titel)) n.delete(v.titel); else n.add(v.titel); return n; })}
+                style={({ pressed }) => ({ flexDirection: "row", gap: 12, paddingVertical: 12, borderTopWidth: i ? 1 : 0, borderColor: f.linieLeise, opacity: da ? 0.55 : pressed ? 0.7 : 1 })}
+              >
+                <Symbol name={an ? "checkmark.square.fill" : "square"} groesse={20} farbe={an ? f.amt : f.tinteLeise} />
+                <View style={{ flex: 1 }}>
+                  <T v="klein" fett={an}>{v.titel}</T>
+                  <T v="caption" leise stil={{ marginTop: 2 }}>{[da ? TEXT.schon_drin : null, !gruppe && v.gruppe ? v.gruppe : null, v.quelle ? `${TEXT.quelle}: ${v.quelle}` : null].filter(Boolean).join(" · ")}</T>
+                </View>
+              </Pressable>
+            );
+          })}
+        </Karte>
+        <Knopf
+          text={gewaehlt.size ? TEXT.uebernehmen(gewaehlt.size) : TEXT.nichts_gewaehlt}
+          deaktiviert={!gewaehlt.size}
+          symbol="plus"
+          onPress={() => {
+            uebernehmen(alle.filter((v) => gewaehlt.has(v.titel)));
+            nav.zurueck();
+          }}
+          stil={{ marginTop: 18 }}
+        />
+      </Inhalt>
+    </Unterseite>
+  );
+}
+
 /** Liste von Einträgen: zugeklappt mit Titel, der bearbeitete Eintrag aufgeklappt. */
 function ListenEingabe({ feld, eintraege, setzen }: { feld: ListenFeld; eintraege: Eintrag[]; setzen: (e: Eintrag[]) => void }) {
   const f = useFarben();
+  const nav = useNav();
   const { stand } = useAmtlos();
+  // aktuelle Einträge für die Vorschlagsseite, die später übernimmt
+  const aktuell = useRef(eintraege);
+  aktuell.current = eintraege;
   const [offen, setOffen] = useState<number | null>(eintraege.length === 1 ? 0 : null);
   const titelVon = (e: Eintrag, i: number) => {
     const roh = typeof e[feld.titelFeld] === "string" ? (e[feld.titelFeld] as string).trim().split("\n")[0]! : "";
@@ -86,10 +203,30 @@ function ListenEingabe({ feld, eintraege, setzen }: { feld: ListenFeld; eintraeg
           </Karte>
         );
       })}
+      {feld.vorschlaege?.length ? (
+        <Knopf
+          symbol="checklist"
+          text={TEXT.aus_vorschlaegen(feld.vorschlaege.length)}
+          onPress={() =>
+            nav.oeffnen(`vorschlaege-${feld.id}`, () => (
+              <VorschlagSeite
+                feld={feld}
+                vorhanden={aktuell.current.map((e) => titelText(feld, e))}
+                uebernehmen={(neu) => {
+                  // leere Einträge (nur Startwerte) ersetzen, damit keine leere Zeile übrig bleibt
+                  const behalten = aktuell.current.filter((e) => feld.felder.some((x) => (x.art === "text" || x.art === "mehrzeilig") && typeof e[x.id] === "string" && (e[x.id] as string).trim()));
+                  setzen([...behalten, ...neu.map((v) => eintragAusVorschlag(feld, v, stand.betrieb, heute()))]);
+                  setOffen(null);
+                }}
+              />
+            ))
+          }
+        />
+      ) : null}
       <Knopf
         leise
         symbol="plus"
-        text={TEXT.hinzufuegen(feld.eintrag)}
+        text={feld.vorschlaege?.length ? TEXT.eigener_eintrag(feld.eintrag) : TEXT.hinzufuegen(feld.eintrag)}
         onPress={() => {
           setzen([...eintraege, neuerEintrag(feld, stand.betrieb, heute())]);
           setOffen(eintraege.length);
@@ -127,7 +264,7 @@ export function Formular({ id }: { id: string }) {
   };
   const fehlt = fehlendeAngaben(vorlage, daten, stand.betrieb);
   const ergebnis = vorlage.ergebnis?.(daten) ?? [];
-  const html = () => vorlage.html(daten, stand.betrieb);
+  const html = () => dokumentHtml(vorlage, daten, stand.betrieb);
   const teilen = async () => {
     setFehler(null);
     setPdfLaedt(true);
@@ -202,8 +339,9 @@ export function Formular({ id }: { id: string }) {
             <Hinweis art="erfolg" text={TEXT.vollstaendig} />
           )}
           {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
+          <T v="caption" leise stil={{ marginBottom: 10 }}>{PRUEFHINWEIS}</T>
           <Knopf text={TEXT.pdf_teilen} symbol="square.and.arrow.up" laedt={pdfLaedt} onPress={() => void teilen()} />
-          <Knopf leise text={TEXT.drucken} symbol="printer" onPress={() => void drucken(html(), vorlage.querformat).catch(() => setFehler(TEXT.pdf_fehler))} stil={{ marginTop: 10 }} />
+          <Knopf leise text={TEXT.drucken} symbol="printer" onPress={() => void drucken(html(), dateiname(vorlage, daten, heute()), vorlage.querformat).catch(() => setFehler(TEXT.pdf_fehler))} stil={{ marginTop: 10 }} />
           {vorlage.alsText ? <Knopf leise text={TEXT.als_text} symbol="doc.on.doc" onPress={() => void Share.share({ message: vorlage.alsText!(daten, stand.betrieb) }).catch(() => undefined)} stil={{ marginTop: 10 }} /> : null}
         </View>
 

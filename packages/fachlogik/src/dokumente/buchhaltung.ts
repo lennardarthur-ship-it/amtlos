@@ -5,14 +5,26 @@
  * Gliederungen fachlich zu prüfen (T-58).
  */
 import { KU_HINWEIS, rundeCent, summen, type Position } from "../rechnung.js";
-import { abschnitt, absatz, angaben, anschrift, auswahl, cent, datumDe, dokument, esc, euro, ja, liste, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
+import { AUFBEWAHRUNG, EINHEITEN, EUER_AUSGABEN, EUER_EINNAHMEN, KASSEN_ARTEN, RECHNUNGS_HINWEISE, TSE_ARTEN } from "./bausteine.js";
+import { LINIE, abschnitt, absatz, angaben, anschrift, auswahl, cent, datumDe, dokument, esc, euro, ja, liste, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
+import { optionen } from "./konstanten.js";
 import type { Daten, Eintrag, Vorlage } from "./typen.js";
+
+/** ISO-Datum plus Tage als TT.MM.JJJJ. */
+function plusTage(iso: string, tage: number): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  if (!m || !Number.isFinite(tage)) return "";
+  return datumDe(new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3]) + tage)).toISOString().slice(0, 10));
+}
 
 const SAETZE = [
   { wert: "19", text: "19 %" },
   { wert: "7", text: "7 %" },
-  { wert: "0", text: "0 %" },
+  { wert: "0", text: "0 % / steuerfrei" },
 ];
+/** Hinweis bei steuerpflichtigen Leistungen im Zusammenhang mit einem Grundstück an Privatpersonen (§ 14 Abs. 4 Nr. 9 UStG). */
+const GRUNDSTUECK_HINWEIS = "Sie sind gesetzlich verpflichtet, diese Rechnung, einen Zahlungsbeleg oder eine andere beweiskräftige Unterlage zwei Jahre aufzubewahren (§ 14b Abs. 1 Satz 5 UStG).";
+const ZIEL: Record<string, string> = { sofort: "sofort ohne Abzug", "7": "innerhalb von 7 Tagen", "14": "innerhalb von 14 Tagen", "30": "innerhalb von 30 Tagen" };
 
 function positionen(d: Daten): { e: Eintrag; p: Position }[] {
   return liste(d, "positionen")
@@ -23,26 +35,28 @@ function positionen(d: Daten): { e: Eintrag; p: Position }[] {
 export const rechnung: Vorlage = {
   id: "rechnung",
   titel: "Rechnung",
-  beschreibung: "Rechnung mit den Pflichtangaben: Nummer, Datum, Leistung, Steuernummer, Beträge nach Steuersatz – als PDF.",
+  beschreibung: "Rechnung mit allen Pflichtangaben nach § 14 Abs. 4 UStG – Positionen, Steuersätze, Zahlungsziel und Pflichthinweise zum Auswählen.",
   bereich: "steuern",
   pflichten: ["steuern.rechnungen_pflichtangaben"],
+  grundlage: "§ 14 Abs. 4 UStG",
   namensFeld: "nummer",
   abschnitte: [
     {
-      hilfe: "Dieses PDF ist keine E-Rechnung. Für Rechnungen an Unternehmen gilt künftig die E-Rechnungspflicht.",
+      hilfe: "Dieses PDF ist keine E-Rechnung. Für Rechnungen an Unternehmen gelten Übergangsfristen bis zur E-Rechnungspflicht.",
       felder: [
         { id: "nummer", art: "text", label: "Rechnungsnummer", hilfe: "fortlaufend und nur einmal vergeben, z. B. 2026-001", pflicht: true },
         { id: "datum", art: "datum", label: "Rechnungsdatum", vorbelegung: "heute", pflicht: true },
-        { id: "leistung", art: "text", label: "Datum oder Zeitraum der Leistung", hilfe: "z. B. 12.10.2026 oder Oktober 2026", pflicht: true },
-        { id: "faellig", art: "datum", label: "Zahlbar bis" },
+        { id: "leistung_gleich", art: "schalter", label: "Leistungsdatum entspricht dem Rechnungsdatum", vorbelegung: true },
+        { id: "leistung", art: "text", label: "Datum oder Zeitraum der Leistung", hilfe: "z. B. 12.10.2026 oder Oktober 2026", pflicht: true, wenn: { feld: "leistung_gleich", nicht: true } },
+        { id: "zahlungsziel", art: "wahl", label: "Zahlungsziel", optionen: optionen(ZIEL), vorbelegung: "14" },
       ],
     },
     {
-      titel: "Kunde",
+      titel: "Rechnungsempfänger",
       felder: [
         { id: "kunde_name", art: "text", label: "Name oder Firma", pflicht: true },
-        { id: "kunde_anschrift", art: "mehrzeilig", label: "Anschrift", pflicht: true },
-        { id: "kunde_ust_idnr", art: "text", label: "USt-IdNr. des Kunden", hilfe: "nur falls nötig, z. B. bei Kunden im EU-Ausland" },
+        { id: "kunde_anschrift", art: "mehrzeilig", label: "Anschrift", hilfe: "Straße und Hausnummer, PLZ und Ort", pflicht: true },
+        { id: "kunde_ust_idnr", art: "text", label: "USt-IdNr. des Empfängers", hilfe: "nur bei innergemeinschaftlichen Leistungen oder Steuerschuldnerschaft des Empfängers" },
       ],
     },
     {
@@ -56,9 +70,9 @@ export const rechnung: Vorlage = {
           titelFeld: "bezeichnung",
           pflicht: true,
           felder: [
-            { id: "bezeichnung", art: "text", label: "Leistung oder Ware", hilfe: "Menge und Art genau bezeichnen", pflicht: true },
+            { id: "bezeichnung", art: "text", label: "Leistung oder Ware", hilfe: "handelsübliche Bezeichnung bzw. Art und Umfang der Leistung", pflicht: true },
             { id: "menge", art: "zahl", label: "Menge", vorbelegung: "1" },
-            { id: "einheit", art: "text", label: "Einheit", hilfe: "z. B. Stück, Stunden" },
+            { id: "einheit", art: "text", label: "Einheit", vorschlaege: EINHEITEN.slice(0, 8) },
             { id: "preis", art: "betrag", label: "Einzelpreis netto (€)", pflicht: true },
             { id: "satz", art: "wahl", label: "Umsatzsteuer", optionen: SAETZE, vorbelegung: "19" },
           ],
@@ -66,57 +80,65 @@ export const rechnung: Vorlage = {
       ],
     },
     {
+      titel: "Steuer und Hinweise",
       felder: [
-        { id: "kleinunternehmer", art: "schalter", label: "Kleinunternehmer – keine Umsatzsteuer", hilfe: "Dann steht der Hinweis auf § 19 UStG auf der Rechnung." },
-        { id: "hinweis", art: "mehrzeilig", label: "Weitere Hinweise", hilfe: "z. B. Zahlungsbedingungen, Dank" },
+        { id: "kleinunternehmer", art: "schalter", label: "Kleinunternehmer (§ 19 UStG)", hilfe: "Dann wird keine Umsatzsteuer ausgewiesen; der Hinweis auf die Steuerbefreiung steht auf der Rechnung." },
+        { id: "hinweise", art: "bausteine", label: "Pflichthinweise, falls zutreffend", optionen: [...RECHNUNGS_HINWEISE.filter((h) => h.wert !== "steuerfrei").map((h) => ({ wert: h.wert, text: h.text, quelle: h.quelle })), { wert: "grundstueck", text: GRUNDSTUECK_HINWEIS, quelle: "§ 14 Abs. 4 Nr. 9, § 14b Abs. 1 Satz 5 UStG" }] },
+        { id: "befreiung", art: "text", label: "Hinweis auf die Steuerbefreiung (bei 0 %)", hilfe: "Pflicht, wenn eine Position steuerfrei ist – mit der Vorschrift", vorschlaege: ["Steuerfreie Leistung nach § 4 Nr. … UStG"] },
+        { id: "hinweis", art: "mehrzeilig", label: "Weitere Hinweise", vorschlaege: ["Vielen Dank für Ihren Auftrag.", "Bitte geben Sie bei der Zahlung die Rechnungsnummer an."] },
       ],
     },
   ],
-  pruefen(_d, b) {
+  pruefen(d, b) {
     const f: string[] = [];
     if (!b.name.trim() || !anschrift(b)) f.push("Name und Anschrift des Betriebs (Mein Betrieb)");
     if (!b.steuernummer.trim() && !b.ust_idnr.trim()) f.push("Steuernummer oder USt-IdNr. (Mein Betrieb)");
+    const nullProzent = positionen(d).some((x) => x.p.ust_satz === 0);
+    if (nullProzent && !ja(d, "kleinunternehmer") && !text(d, "befreiung") && !auswahl(d, "hinweise").some((h) => h === "reverse_charge" || h === "igl")) f.push("Hinweis auf die Steuerbefreiung (bei 0 %)");
     return f;
   },
   ergebnis(d) {
     const s = summen(positionen(d).map((x) => x.p), ja(d, "kleinunternehmer"));
-    return [["Netto", euro(s.netto_cent)], ...(ja(d, "kleinunternehmer") ? [] : ([["Umsatzsteuer", euro(s.ust_cent)]] as [string, string][])), ["Gesamt", euro(s.brutto_cent)]];
+    return [["Netto", euro(s.netto_cent)], ...(ja(d, "kleinunternehmer") ? [] : ([["Umsatzsteuer", euro(s.ust_cent)]] as [string, string][])), ["Rechnungsbetrag", euro(s.brutto_cent)]];
   },
   html(d, b) {
     const ku = ja(d, "kleinunternehmer");
     const pos = positionen(d);
     const s = summen(pos.map((x) => x.p), ku);
-    const zeilen = pos.map(({ e, p }, i) => [
+    const zeilenHtml = pos.map(({ e, p }, i) => [
       String(i + 1),
       zelle(p.bezeichnung),
       `${zahlText(p.menge)}${text(e, "einheit") ? ` ${esc(text(e, "einheit"))}` : ""}`,
       euro(p.preis_cent),
-      ...(ku ? [] : [`${p.ust_satz} %`]),
+      ...(ku ? [] : [p.ust_satz === 0 ? "0 %" : `${p.ust_satz} %`]),
       euro(s.zeilen[i]!),
     ]);
     const summenZeilen = [
-      `<tr><td>Summe netto</td><td style="text-align:right">${euro(s.netto_cent)}</td></tr>`,
-      ...(ku ? [] : s.gruppen.map((g) => `<tr><td>Umsatzsteuer ${g.satz} % auf ${euro(g.netto_cent)}</td><td style="text-align:right">${euro(g.ust_cent)}</td></tr>`)),
-      `<tr><td><strong>Gesamtbetrag</strong></td><td style="text-align:right"><strong>${euro(s.brutto_cent)}</strong></td></tr>`,
+      `<tr><td>Summe netto</td><td>${euro(s.netto_cent)}</td></tr>`,
+      ...(ku ? [] : s.gruppen.map((g) => `<tr><td>${g.satz === 0 ? "Steuerfrei bzw. 0 %" : `Umsatzsteuer ${g.satz} %`} auf ${euro(g.netto_cent)}</td><td>${euro(g.ust_cent)}</td></tr>`)),
+      `<tr class="gesamt"><td>Rechnungsbetrag</td><td>${euro(s.brutto_cent)}</td></tr>`,
     ].join("");
-    const steuer = [b.steuernummer.trim() ? `Steuernummer: ${b.steuernummer.trim()}` : "", b.ust_idnr.trim() ? `USt-IdNr.: ${b.ust_idnr.trim()}` : ""].filter(Boolean).join(" · ");
+    const leistung = ja(d, "leistung_gleich") ? "Leistungsdatum entspricht dem Rechnungsdatum" : text(d, "leistung");
+    const hinweise = [
+      ...(ku ? [KU_HINWEIS] : []),
+      ...auswahl(d, "hinweise").map((w) => (w === "grundstueck" ? GRUNDSTUECK_HINWEIS : (RECHNUNGS_HINWEISE.find((h) => h.wert === w)?.text ?? ""))),
+      text(d, "befreiung"),
+      text(d, "zahlungsziel") ? `Zahlbar ${ZIEL[text(d, "zahlungsziel")]}${text(d, "zahlungsziel") !== "sofort" && text(d, "datum") ? ` (bis ${plusTage(text(d, "datum"), Number(text(d, "zahlungsziel")))})` : ""}.` : "",
+      ...text(d, "hinweis").split("\n"),
+    ].filter((x) => x.trim());
+    const steuer = [b.steuernummer.trim() ? `Steuernummer ${b.steuernummer.trim()}` : "", b.ust_idnr.trim() ? `USt-IdNr. ${b.ust_idnr.trim()}` : ""].filter(Boolean).join(" · ");
+    const fuss = [steuer, b.iban.trim() ? `IBAN ${b.iban.trim()}` : ""].filter(Boolean);
     return dokument({
       titel: `Rechnung ${text(d, "nummer")}`.trim(),
       betrieb: b,
-      meta: `Rechnungsdatum: ${datumDe(text(d, "datum")) || "–"}`,
+      meta: `Rechnungsnummer: ${text(d, "nummer")}\nRechnungsdatum: ${datumDe(text(d, "datum"))}\nLeistung: ${ja(d, "leistung_gleich") ? "= Rechnungsdatum" : text(d, "leistung")}`,
+      vorTitel: `<div class="empfaenger"><div class="absender">${esc([b.name, anschrift(b)].filter((x) => x.trim()).join(" · "))}</div><strong>${text(d, "kunde_name") ? esc(text(d, "kunde_name")) : LINIE}</strong><br>${text(d, "kunde_anschrift") ? esc(text(d, "kunde_anschrift")).replace(/\n/g, "<br>") : LINIE}${text(d, "kunde_ust_idnr") ? `<br>USt-IdNr. ${esc(text(d, "kunde_ust_idnr"))}` : ""}</div>`,
       inhalt:
-        `<div class="abschnitt"><p><strong>${esc(text(d, "kunde_name")) || '<span class="leer">Kunde (noch nicht angegeben)</span>'}</strong><br>${esc(text(d, "kunde_anschrift")).replace(/\n/g, "<br>")}${text(d, "kunde_ust_idnr") ? `<br>USt-IdNr.: ${esc(text(d, "kunde_ust_idnr"))}` : ""}</p></div>` +
-        angaben([
-          ["Rechnungsnummer", text(d, "nummer")],
-          ["Rechnungsdatum", datumDe(text(d, "datum"))],
-          ["Leistung", text(d, "leistung")],
-          ["Zahlbar bis", text(d, "faellig") ? datumDe(text(d, "faellig")) : null],
-        ]) +
-        `<section class="abschnitt">${tabelle(["Pos.", "Leistung", "Menge", "Einzelpreis", ...(ku ? [] : ["USt"]), "Betrag"], zeilen, { breiten: ku ? ["7%", "48%", "15%", "15%", "15%"] : ["7%", "41%", "14%", "14%", "9%", "15%"] })}</section>` +
-        `<table class="angaben" style="width:60%;margin-left:40%;margin-top:3mm">${summenZeilen}</table>` +
-        (ku ? `<p style="margin-top:4mm">${esc(KU_HINWEIS)}</p>` : "") +
-        (text(d, "hinweis") ? `<div class="abschnitt">${absatz(text(d, "hinweis"))}</div>` : "") +
-        `<div class="abschnitt" style="font-size:8.5pt;color:#4a5868">${[steuer, b.iban.trim() ? `Bankverbindung: IBAN ${esc(b.iban.trim())}` : ""].filter(Boolean).map((x) => `<p>${esc(x)}</p>`).join("")}</div>`,
+        `<p>${esc(ja(d, "leistung_gleich") ? "Leistungsdatum entspricht dem Rechnungsdatum." : leistung ? `Leistungszeitraum: ${leistung}` : "")}</p>` +
+        `<section style="margin-top:3mm">${tabelle(["Pos.", "Leistung", "Menge", "Einzelpreis", ...(ku ? [] : ["USt"]), "Betrag"], zeilenHtml, { breiten: ku ? ["7%", "48%", "15%", "15%", "15%"] : ["7%", "41%", "14%", "14%", "9%", "15%"] })}</section>` +
+        `<table class="summen">${summenZeilen}</table>` +
+        (hinweise.length ? `<div style="margin-top:7mm">${hinweise.map((h) => `<p>${esc(h)}</p>`).join("")}</div>` : "") +
+        (fuss.length ? `<p class="klein" style="margin-top:8mm">${esc(fuss.join(" · "))}</p>` : ""),
     });
   },
 };
@@ -129,6 +151,7 @@ export const euer: Vorlage = {
   beschreibung: "Einnahmen und Ausgaben eines Jahres mit Überschuss – als Aufstellung für deine Unterlagen und zum Übertragen in die Anlage EÜR.",
   bereich: "steuern",
   pflichten: ["steuern.euer"],
+  grundlage: "§ 4 Abs. 3 EStG; § 60 Abs. 4 EStDV",
   namensFeld: "jahr",
   abschnitte: [
     {
@@ -138,7 +161,7 @@ export const euer: Vorlage = {
     {
       titel: "Einnahmen",
       hilfe: "Was im Jahr eingegangen ist.",
-      felder: [{ id: "einnahmen", art: "liste", label: "Einnahmen", eintrag: "Einnahme", titelFeld: "text", pflicht: true, felder: [{ id: "datum", art: "datum", label: "Datum" }, { id: "text", art: "text", label: "Bezeichnung", hilfe: "z. B. Umsätze Oktober", pflicht: true }, { id: "betrag", art: "betrag", label: "Betrag (€)", pflicht: true }] }],
+      felder: [{ id: "einnahmen", art: "liste", label: "Einnahmen", eintrag: "Einnahme", titelFeld: "text", pflicht: true, felder: [{ id: "datum", art: "datum", label: "Datum" }, { id: "text", art: "text", label: "Bezeichnung", hilfe: "z. B. Umsätze Oktober", pflicht: true }, { id: "kategorie", art: "text", label: "Zeile der Anlage EÜR", vorschlaege: EUER_EINNAHMEN }, { id: "betrag", art: "betrag", label: "Betrag (€)", pflicht: true }] }],
     },
     {
       titel: "Ausgaben",
@@ -153,7 +176,7 @@ export const euer: Vorlage = {
           felder: [
             { id: "datum", art: "datum", label: "Datum" },
             { id: "text", art: "text", label: "Bezeichnung", hilfe: "z. B. Miete Oktober", pflicht: true },
-            { id: "kategorie", art: "text", label: "Kategorie", hilfe: "z. B. Miete, Wareneinkauf, Telefon" },
+            { id: "kategorie", art: "text", label: "Zeile der Anlage EÜR", vorschlaege: EUER_AUSGABEN },
             { id: "betrag", art: "betrag", label: "Betrag (€)", pflicht: true },
           ],
         },
@@ -210,6 +233,7 @@ export const bilanzGuv: Vorlage = {
   beschreibung: "Jahresabschluss für Kaufleute: Erträge und Aufwendungen, Vermögen und Kapital – mit Prüfung, ob Aktiva und Passiva aufgehen.",
   bereich: "steuern",
   pflichten: ["steuern.buchfuehrungspflicht", "steuern.e_bilanz"],
+  grundlage: "§§ 238, 242 HGB; § 5b EStG",
   namensFeld: "stichtag",
   abschnitte: [
     {
@@ -263,6 +287,7 @@ export const ustVoranmeldung: Vorlage = {
   beschreibung: "Umsätze nach Steuersatz und Vorsteuer – die App rechnet Umsatzsteuer und Zahllast aus, du überträgst die Zahlen in ELSTER.",
   bereich: "steuern",
   pflichten: ["steuern.ust_voranmeldung"],
+  grundlage: "§ 18 Abs. 1 UStG",
   namensFeld: "zeitraum",
   abschnitte: [
     {
@@ -273,7 +298,7 @@ export const ustVoranmeldung: Vorlage = {
       titel: "Umsätze (netto)",
       felder: [
         { id: "umsatz_19", art: "betrag", label: "Umsätze zu 19 % (€)" },
-        { id: "umsatz_7", art: "betrag", label: "Umsätze zu 7 % (€)" },
+        { id: "umsatz_7", art: "betrag", label: "Umsätze zu 7 % (€)", hilfe: "seit 2026 auch Speisen in Restaurant und Café (ohne Getränke)" },
         { id: "umsatz_frei", art: "betrag", label: "Umsätze ohne Umsatzsteuer (€)", hilfe: "z. B. steuerfreie Umsätze – welche Zeile in ELSTER gilt, hängt von der Art ab" },
       ],
     },
@@ -333,6 +358,7 @@ export const steuererklaerung: Vorlage = {
   beschreibung: "Alle Zahlen und Belege für die Jahreserklärungen an einem Ort – zum Übertragen in ELSTER oder für die Steuerberatung.",
   bereich: "steuern",
   pflichten: ["steuern.est_erklaerung", "steuern.gewst_erklaerung", "steuern.ust_jahreserklaerung", "steuern.kst_erklaerung"],
+  grundlage: "§ 25 EStG; § 31 KStG; § 14a GewStG; § 18 Abs. 3 UStG",
   namensFeld: "jahr",
   abschnitte: [
     {
@@ -405,6 +431,7 @@ function kasse(d: Daten) {
 
 export const kassenbuch: Vorlage = {
   id: "kassenbuch",
+  grundlage: "§ 146 Abs. 1 AO",
   querformat: true,
   titel: "Kassenbuch",
   beschreibung: "Bargeld-Einnahmen und -Ausgaben mit laufendem Bestand – für Betriebe mit offener Ladenkasse.",
@@ -473,6 +500,7 @@ export const kassenmeldung: Vorlage = {
   beschreibung: "Alle Angaben zu deinen elektronischen Kassen und Sicherheitseinrichtungen (TSE) für die Meldung ans Finanzamt – auch bei Außerbetriebnahme.",
   bereich: "steuern",
   pflichten: ["steuern.kassenmeldung", "steuern.kassenmeldung_ausserbetriebnahme"],
+  grundlage: "§ 146a Abs. 4 AO",
   abschnitte: [
     {
       hilfe: "Die Meldung selbst geht elektronisch über „Mein ELSTER“. Die Angaben stehen auf der Kasse, in der Rechnung und in den Unterlagen zur TSE.",
@@ -489,13 +517,13 @@ export const kassenmeldung: Vorlage = {
           titelFeld: "modell",
           pflicht: true,
           felder: [
-            { id: "art", art: "text", label: "Art des Systems", hilfe: "z. B. Registrierkasse, PC-Kasse, App-Kasse auf dem Tablet", pflicht: true },
+            { id: "art", art: "text", label: "Art des elektronischen Aufzeichnungssystems", pflicht: true, vorschlaege: KASSEN_ARTEN },
             { id: "hersteller", art: "text", label: "Hersteller", pflicht: true },
             { id: "modell", art: "text", label: "Modell", pflicht: true },
             { id: "seriennummer", art: "text", label: "Seriennummer der Kasse", pflicht: true },
             { id: "software", art: "text", label: "Software und Version" },
             { id: "anschaffung", art: "datum", label: "Angeschafft am", pflicht: true },
-            { id: "tse_art", art: "text", label: "Art der TSE", hilfe: "z. B. USB-Stick, SD-Karte, Cloud-TSE" },
+            { id: "tse_art", art: "text", label: "Art der zertifizierten technischen Sicherheitseinrichtung (TSE)", pflicht: true, vorschlaege: TSE_ARTEN },
             { id: "tse_seriennummer", art: "text", label: "Seriennummer der TSE", pflicht: true },
             { id: "tse_zertifikat", art: "text", label: "Zertifizierungs-ID der TSE", hilfe: "z. B. BSI-K-TR-…" },
             { id: "ausser_betrieb", art: "datum", label: "Außer Betrieb genommen am", hilfe: "nur bei Außerbetriebnahme" },
@@ -540,12 +568,8 @@ export const kassenmeldung: Vorlage = {
 
 // ---------------------------------------------------------------- Aufbewahrung
 
-/** Fristen nach § 147 AO in der Fassung ab 2025 (Bürokratieentlastungsgesetz IV) – fachlich zu prüfen (T-58). */
-const AUFBEWAHRUNG_START: Eintrag[] = [
-  { art: "Bücher, Inventare, Jahresabschlüsse", jahre: "10" },
-  { art: "Buchungsbelege (z. B. Rechnungen, Quittungen)", jahre: "8" },
-  { art: "Empfangene und versandte Geschäftsbriefe", jahre: "6" },
-];
+/** Fristen nach § 147 AO / § 257 HGB in der Fassung ab 2025 (BEG IV), aus der Recherche (T-58). */
+const AUFBEWAHRUNG_START: Eintrag[] = AUFBEWAHRUNG.map((x) => ({ art: x.art.replace(/^§[^:]*:\s*/, ""), jahre: x.jahre }));
 
 /** Aufbewahren bis Ende des Jahres „letzte Eintragung + Frist“ (Frist beginnt mit Ende des Kalenderjahres). */
 export function aufbewahrenBis(letzteJahr: string, jahre: string): string | null {
@@ -561,6 +585,7 @@ export const aufbewahrung: Vorlage = {
   beschreibung: "Welche Unterlagen wie lange aufzubewahren sind, wo sie liegen und ab wann sie frühestens weg dürfen.",
   bereich: "steuern",
   pflichten: ["steuern.aufbewahrung"],
+  grundlage: "§ 147 AO; § 257 HGB",
   abschnitte: [
     {
       titel: "Unterlagen",
@@ -577,7 +602,7 @@ export const aufbewahrung: Vorlage = {
           felder: [
             { id: "art", art: "text", label: "Unterlagen", pflicht: true },
             { id: "jahre", art: "zahl", label: "Aufbewahrungsfrist (Jahre)", pflicht: true },
-            { id: "letzte", art: "text", label: "Jahr der letzten Eintragung", hilfe: "z. B. 2026" },
+            { id: "letzte", art: "text", label: "Jahr, in dem die Frist beginnt", hilfe: "Jahr der letzten Eintragung, der Aufstellung, des Belegs oder des Briefs, z. B. 2026" },
             { id: "ort", art: "text", label: "Wo aufbewahrt", hilfe: "z. B. Ordner im Büro, Buchhaltungsprogramm" },
           ],
         },
@@ -590,8 +615,8 @@ export const aufbewahrung: Vorlage = {
       titel: "Aufbewahrungsplan",
       betrieb: b,
       inhalt:
-        tabelle(["Unterlagen", "Frist", "Letzte Eintragung", "Aufbewahren bis", "Wo"], l.map((x) => [zelle(text(x, "art")), text(x, "jahre") ? `${esc(text(x, "jahre"))} Jahre` : "", zelle(text(x, "letzte")), aufbewahrenBis(text(x, "letzte"), text(x, "jahre")) ?? "", zelle(text(x, "ort"))]), { breiten: ["32%", "12%", "16%", "16%", "24%"] }) +
-        `<p style="margin-top:4mm">Die Frist beginnt mit dem Ende des Kalenderjahres, in dem die letzte Eintragung gemacht wurde.</p>`,
+        tabelle(["Unterlagen", "Frist", "Fristbeginn (Jahr)", "Aufbewahren mindestens bis", "Wo"], l.map((x) => [zelle(text(x, "art")), text(x, "jahre") ? `${esc(text(x, "jahre"))} Jahre` : "", zelle(text(x, "letzte")), aufbewahrenBis(text(x, "letzte"), text(x, "jahre")) ?? "", zelle(text(x, "ort"))]), { breiten: ["32%", "12%", "16%", "16%", "24%"] }) +
+        `<p style="margin-top:4mm">Die Frist beginnt mit dem Schluss des Kalenderjahres, in dem die letzte Eintragung gemacht, das Inventar aufgestellt, der Jahresabschluss festgestellt, der Brief empfangen oder abgesandt oder der Buchungsbeleg entstanden ist (§ 147 Abs. 4 AO). Sie läuft nicht ab, solange die Unterlagen für Steuern von Bedeutung sind, deren Festsetzungsfrist noch nicht abgelaufen ist (§ 147 Abs. 3 AO).</p>`,
     });
   },
 };

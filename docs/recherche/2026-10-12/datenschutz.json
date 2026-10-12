@@ -1,0 +1,601 @@
+{
+  "_meta": {
+    "stand": "2026-10-12",
+    "hinweis": "Recherche für Bausteine kleiner Betriebe. Gesetzeswortlaute 'nah' wiedergegeben (keine amtliche Fassung). gesetze-im-internet.de und Teile von eur-lex konnten in dieser Umgebung nicht direkt abgerufen werden (Robots/Proxy); Normtexte von dort beruhen auf Fachkenntnis und sind vor Produktivsetzung gegen die verlinkte amtliche Fassung abzugleichen. Behördenquellen (BayLDA-Muster, DSK-Kurzpapiere/Orientierungshilfen, Durchführungsbeschluss (EU) 2021/915, VO (EU) 2024/3228) wurden abgerufen und inhaltlich geprüft.",
+    "quellen_basis": {
+      "dsgvo": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679",
+      "ao_147": "https://www.gesetze-im-internet.de/ao_1977/__147.html",
+      "hgb_257": "https://www.gesetze-im-internet.de/hgb/__257.html",
+      "bayLDA_kleine_unternehmen": "https://www.lda.bayern.de/de/kleine-unternehmen.html",
+      "dsk_kp1_vvt": "https://www.datenschutzkonferenz-online.de/media/kp/dsk_kpnr_1.pdf",
+      "dsk_hinweise_vvt": "https://www.datenschutzkonferenz-online.de/media/ah/201802_ah_verzeichnis_verarbeitungstaetigkeiten.pdf"
+    },
+    "aufbewahrung_allgemein": {
+      "text": "Seit 01.01.2025 (Viertes Bürokratieentlastungsgesetz): Bücher, Aufzeichnungen, Inventare, Jahresabschlüsse, Lageberichte, Eröffnungsbilanz: 10 Jahre; Buchungsbelege (z. B. Rechnungen, Kassenbelege, Lohnbelege): 8 Jahre; empfangene und abgesandte Handels- und Geschäftsbriefe sowie sonstige steuerlich bedeutsame Unterlagen: 6 Jahre (§ 147 Abs. 1, 3 AO; § 257 Abs. 1, 4 HGB). Die verkürzte 8-Jahres-Frist gilt für Buchungsbelege, deren Frist zu Beginn 2025 noch nicht abgelaufen war. Fristbeginn: mit Schluss des Kalenderjahres, in dem die letzte Eintragung gemacht, der Beleg entstanden bzw. der Brief empfangen/abgesandt wurde (§ 147 Abs. 4 AO, § 257 Abs. 5 HGB). Die Frist kann sich verlängern, solange die Unterlagen für noch nicht verjährte Steuern von Bedeutung sind (z. B. laufende Außenprüfung).",
+      "quellen": [
+        "https://www.gesetze-im-internet.de/ao_1977/__147.html",
+        "https://www.gesetze-im-internet.de/hgb/__257.html",
+        "https://www.frankfurt-main.ihk.de/recht/steuerrecht/abgabenordnung/aufbewahrungsfristen/"
+      ],
+      "achtung": "Die BayLDA-Muster-VVT (Stand vor 2025) nennen pauschal '10 Jahre (gesetzliche Aufbewahrungsfrist)'; für Buchungsbelege ist das durch die AO/HGB-Änderung ab 2025 überholt (jetzt 8 Jahre)."
+    }
+  },
+
+  "vvt_verarbeitungen": [
+    {
+      "id": "kundenverwaltung",
+      "bezeichnung": "Kundenverwaltung / Kundenkartei",
+      "zweck": "Bearbeitung von Aufträgen und Kundenbeziehungen einschließlich Rechnungsstellung; ggf. postalische Werbung an Bestandskunden",
+      "rechtsgrundlage": "Art. 6 Abs. 1 lit. b DSGVO (Vertrag/vorvertragliche Maßnahmen); Art. 6 Abs. 1 lit. c DSGVO i. V. m. § 147 AO, § 257 HGB (Aufbewahrung); Art. 6 Abs. 1 lit. f DSGVO (postalische Bestandskundenwerbung). Bei Gesundheitsangaben (z. B. Allergien/Unverträglichkeiten in der Friseur-Kundenkartei) ausdrückliche Einwilligung nach Art. 9 Abs. 2 lit. a DSGVO.",
+      "betroffene": ["Kunden", "Interessenten"],
+      "datenarten": ["Name", "Anschrift", "Kontaktdaten (Telefon, E-Mail)", "Angaben zum Auftrag / Leistungshistorie", "ggf. Bankverbindung", "ggf. Gesundheitsdaten (nur mit ausdrücklicher Einwilligung)"],
+      "empfaenger": ["Steuerberater (eigenständiger Verantwortlicher)", "IT-/Software-Dienstleister (Auftragsverarbeiter)"],
+      "loeschfrist": "Kundenstammdaten löschen, sobald kein Zweck und keine Aufbewahrungspflicht mehr besteht (z. B. Kunde erteilt über mehrere Jahre keine Aufträge mehr). Rechnungsrelevante Unterlagen: Buchungsbelege 8 Jahre (§ 147 Abs. 1 Nr. 4, Abs. 3 AO; § 257 Abs. 1 Nr. 4, Abs. 4 HGB), Geschäftsbriefe 6 Jahre (§ 147 Abs. 1 Nr. 2, 3 AO; § 257 Abs. 1 Nr. 2, 3 HGB), jeweils ab Ende des Kalenderjahres.",
+      "quelle": [
+        "https://www.lda.bayern.de/media/muster/muster_3_handwerksbetrieb_verzeichnis.pdf",
+        "https://www.lda.bayern.de/media/muster/muster_3_handwerksbetrieb.pdf",
+        "https://www.gesetze-im-internet.de/ao_1977/__147.html"
+      ],
+      "hinweis_unsicher": "Die konkrete Inaktivitätsdauer bis zur Löschung der Stammdaten ist nicht behördlich festgelegt."
+    },
+    {
+      "id": "terminvereinbarung",
+      "bezeichnung": "Terminvereinbarung (telefonisch, vor Ort oder Online-Buchung)",
+      "zweck": "Planung, Bestätigung und Erinnerung von Kundenterminen",
+      "rechtsgrundlage": "Art. 6 Abs. 1 lit. b DSGVO; Terminerinnerung per SMS/E-Mail: Art. 6 Abs. 1 lit. b DSGVO, soweit vertragsbezogen, sonst Art. 6 Abs. 1 lit. a DSGVO",
+      "betroffene": ["Kunden", "Interessenten"],
+      "datenarten": ["Name", "Telefonnummer / E-Mail", "Termin (Datum, Uhrzeit, gewünschte Leistung)", "ggf. Notizen"],
+      "empfaenger": ["Anbieter des Online-Terminbuchungssystems (Auftragsverarbeiter)"],
+      "loeschfrist": "Keine spezielle gesetzliche Frist. Löschung nach Wegfall des Zwecks (nach Terminwahrnehmung), soweit die Daten nicht in die Kundenkartei oder Rechnung übernommen werden (Art. 5 Abs. 1 lit. e, Art. 17 Abs. 1 lit. a DSGVO).",
+      "quelle": ["https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679"],
+      "unsicher": true,
+      "hinweis_unsicher": "Kein behördliches Muster für diese Verarbeitung gefunden; Einordnung aus DSGVO-Systematik abgeleitet."
+    },
+    {
+      "id": "buchhaltung",
+      "bezeichnung": "Rechnungsstellung und Buchhaltung",
+      "zweck": "Erstellung von Rechnungen, Finanzbuchhaltung, Erfüllung steuer- und handelsrechtlicher Pflichten",
+      "rechtsgrundlage": "Art. 6 Abs. 1 lit. b DSGVO; Art. 6 Abs. 1 lit. c DSGVO i. V. m. §§ 140 ff., 147 AO, §§ 238, 257 HGB, § 14 UStG",
+      "betroffene": ["Kunden", "Lieferanten", "Geschäftspartner (Ansprechpersonen)"],
+      "datenarten": ["Name, Anschrift", "Rechnungs- und Zahlungsdaten", "Bankverbindung", "ggf. USt-IdNr."],
+      "empfaenger": ["Steuerberater (eigenständiger Verantwortlicher)", "Finanzamt", "Kreditinstitute", "Buchhaltungssoftware-Anbieter (Auftragsverarbeiter)"],
+      "loeschfrist": "Bücher, Aufzeichnungen, Jahresabschlüsse, Inventare: 10 Jahre; Buchungsbelege: 8 Jahre (seit 01.01.2025); Handels-/Geschäftsbriefe: 6 Jahre – jeweils ab Ende des Kalenderjahres (§ 147 Abs. 1, 3, 4 AO; § 257 Abs. 1, 4, 5 HGB).",
+      "quelle": [
+        "https://www.gesetze-im-internet.de/ao_1977/__147.html",
+        "https://www.gesetze-im-internet.de/hgb/__257.html",
+        "https://www.datenschutzkonferenz-online.de/media/kp/dsk_kpnr_13.pdf"
+      ]
+    },
+    {
+      "id": "lohnabrechnung",
+      "bezeichnung": "Lohn- und Gehaltsabrechnung",
+      "zweck": "Auszahlung der Löhne/Gehälter; Abführung von Sozialabgaben und Steuern",
+      "rechtsgrundlage": "Art. 6 Abs. 1 lit. b und lit. c DSGVO (Arbeitsvertrag; Pflichten aus EStG, SGB IV, AO); für Religionszugehörigkeit (Kirchensteuer) Art. 9 Abs. 2 lit. b DSGVO; ergänzend Art. 88 DSGVO i. V. m. § 26 BDSG",
+      "betroffene": ["Beschäftigte", "Auszubildende", "Minijobber"],
+      "datenarten": ["Name, Geburtsdatum", "Anschrift", "Bankverbindung", "Lohn-/Entgeltdaten", "ggf. Religionszugehörigkeit", "Sozialversicherungsdaten", "Steuerdaten (Steuer-ID, Steuerklasse, Freibeträge)", "Angaben zur Berufsgenossenschaft"],
+      "empfaenger": ["Steuerberater / Lohnbüro", "Finanzamt", "Sozialversicherungsträger / Krankenkassen", "Berufsgenossenschaft", "Kreditinstitut"],
+      "loeschfrist": "Lohnbelege als Buchungsbelege 8 Jahre (§ 147 Abs. 1 Nr. 4, Abs. 3 AO); Lohnkonto bis zum Ablauf des sechsten Kalenderjahres nach der letzten Eintragung (§ 41 Abs. 1 EStG).",
+      "quelle": [
+        "https://www.lda.bayern.de/media/muster/muster_11_beherbergungsbetrieb_verzeichnis.pdf",
+        "https://www.gesetze-im-internet.de/ao_1977/__147.html",
+        "https://www.gesetze-im-internet.de/estg/__41.html"
+      ],
+      "hinweis_unsicher": "Das BayLDA-Muster nennt 10 Jahre (vor BEG IV). Die Lohnkonto-Frist aus § 41 EStG wurde in dieser Recherche nicht live gegen den Gesetzestext abgeglichen. § 26 Abs. 1 BDSG ist nach EuGH, Urt. v. 30.03.2023 – C-34/21 nur eingeschränkt als eigenständige Rechtsgrundlage tragfähig; deshalb primär Art. 6 Abs. 1 lit. b/c DSGVO."
+    },
+    {
+      "id": "personalverwaltung",
+      "bezeichnung": "Personalverwaltung (Personalakte, Arbeitszeit)",
+      "zweck": "Personaladministration, Personalführung, Arbeitszeitverwaltung",
+      "rechtsgrundlage": "Art. 6 Abs. 1 lit. b und lit. c DSGVO (Arbeitsvertrag; arbeitsrechtliche Pflichten, z. B. Arbeitszeitaufzeichnung); Art. 88 DSGVO i. V. m. § 26 BDSG",
+      "betroffene": ["Beschäftigte", "Auszubildende"],
+      "datenarten": ["Name, Anschrift", "Vertragsdaten", "Zeitwirtschaftsdaten", "Daten zur Arbeitsleistung", "Leistungsbeurteilungen", "Urlaubs- und Krankheitszeiten (ohne Diagnosen)"],
+      "empfaenger": ["Steuerberater / Lohnbüro", "ggf. Anbieter der Zeiterfassungssoftware (Auftragsverarbeiter)"],
+      "loeschfrist": "Personalakte in der Regel ca. 3 Jahre nach Ausscheiden (BayLDA-Muster; Orientierung an regelmäßiger Verjährung § 195 BGB); steuer-/sozialversicherungsrelevante Unterlagen nach den gesetzlichen Fristen.",
+      "quelle": [
+        "https://www.lda.bayern.de/media/muster/muster_3_handwerksbetrieb_verzeichnis.pdf",
+        "https://www.lda.bayern.de/media/muster/muster_11_beherbergungsbetrieb_verzeichnis.pdf"
+      ]
+    },
+    {
+      "id": "bewerbungen",
+      "bezeichnung": "Bewerbungsverfahren",
+      "zweck": "Durchführung von Bewerbungsverfahren und Auswahl von Beschäftigten",
+      "rechtsgrundlage": "Art. 6 Abs. 1 lit. b DSGVO (Anbahnung des Beschäftigungsverhältnisses), Art. 88 DSGVO i. V. m. § 26 Abs. 1 BDSG; Aufbewahrung nach Absage zur Abwehr von Ansprüchen: Art. 6 Abs. 1 lit. f DSGVO; Aufnahme in einen Bewerberpool nur mit Einwilligung (Art. 6 Abs. 1 lit. a DSGVO)",
+      "betroffene": ["Bewerberinnen und Bewerber"],
+      "datenarten": ["Name, Kontaktdaten", "Lebenslauf", "Zeugnisse, Qualifikationen", "Anschreiben", "ggf. Gesprächsnotizen"],
+      "empfaenger": ["intern: an der Auswahl beteiligte Personen", "ggf. Anbieter einer Bewerbungsplattform (Auftragsverarbeiter)"],
+      "loeschfrist": "Abgelehnte Bewerber: 6 Monate nach Abschluss des Bewerbungsverfahrens (BayLDA-Muster). Hintergrund: Geltendmachung von Ansprüchen nach § 15 Abs. 4 AGG binnen 2 Monaten ab Zugang der Ablehnung, Klagefrist § 61b Abs. 1 ArbGG 3 Monate nach schriftlicher Geltendmachung.",
+      "quelle": [
+        "https://www.lda.bayern.de/media/muster/muster_3_handwerksbetrieb_verzeichnis.pdf",
+        "https://www.gesetze-im-internet.de/agg/__15.html",
+        "https://www.gesetze-im-internet.de/arbgg/__61b.html"
+      ]
+    },
+    {
+      "id": "website",
+      "bezeichnung": "Betrieb der Website (Hosting, Server-Logfiles)",
+      "zweck": "Darstellung des Unternehmens im Internet; technische Bereitstellung und Sicherheit der Website",
+      "rechtsgrundlage": "Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an sicherer, funktionsfähiger Bereitstellung); Zugriff auf Endgeräte (Cookies u. Ä.) nur mit Einwilligung nach § 25 Abs. 1 TDDDG, es sei denn unbedingt erforderlich (§ 25 Abs. 2 Nr. 2 TDDDG)",
+      "betroffene": ["Website-Besucher"],
+      "datenarten": ["IP-Adresse", "Datum und Uhrzeit des Abrufs", "abgerufene Seite/Datei", "Browser- und Betriebssysteminformationen", "Referrer-URL"],
+      "empfaenger": ["Hosting-Dienstleister (Auftragsverarbeiter, AV-Vertrag erforderlich)"],
+      "loeschfrist": "IP-Adressen in Logfiles nach 30 Tagen (BayLDA-Muster).",
+      "quelle": [
+        "https://www.lda.bayern.de/media/muster/muster_3_handwerksbetrieb_verzeichnis.pdf",
+        "https://www.lda.bayern.de/media/muster/muster_3_handwerksbetrieb.pdf",
+        "https://datenschutzkonferenz-online.de/media/oh/OH_Digitale_Dienste.pdf"
+      ]
+    },
+    {
+      "id": "kontaktanfragen",
+      "bezeichnung": "Kontaktanfragen (Kontaktformular, E-Mail, Telefon)",
+      "zweck": "Bearbeitung und Beantwortung von Anfragen",
+      "rechtsgrundlage": "Art. 6 Abs. 1 lit. b DSGVO (vorvertragliche Anfragen); im Übrigen Art. 6 Abs. 1 lit. f DSGVO (Interesse an der Beantwortung von Anfragen)",
+      "betroffene": ["Interessenten", "Kunden", "sonstige anfragende Personen"],
+      "datenarten": ["Name", "E-Mail-Adresse / Telefonnummer", "Inhalt der Anfrage", "Zeitpunkt"],
+      "empfaenger": ["Hosting-/E-Mail-Dienstleister (Auftragsverarbeiter)"],
+      "loeschfrist": "Nach abschließender Bearbeitung, sofern keine Aufbewahrungspflicht besteht; führt die Anfrage zu einem Geschäft, sind Geschäftsbriefe 6 Jahre aufzubewahren (§ 257 Abs. 1 Nr. 2, 3, Abs. 4 HGB; § 147 Abs. 1 Nr. 2, 3, Abs. 3 AO).",
+      "quelle": [
+        "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679",
+        "https://www.gesetze-im-internet.de/hgb/__257.html"
+      ],
+      "hinweis_unsicher": "Frist 'nach Bearbeitung' ist aus Art. 5 Abs. 1 lit. e DSGVO abgeleitet, keine konkrete Behördenvorgabe."
+    },
+    {
+      "id": "email_kommunikation",
+      "bezeichnung": "Geschäftliche E-Mail-Kommunikation",
+      "zweck": "Kommunikation mit Kunden, Lieferanten, Behörden und Geschäftspartnern",
+      "rechtsgrundlage": "Art. 6 Abs. 1 lit. b DSGVO; Art. 6 Abs. 1 lit. f DSGVO; Aufbewahrung von Handelsbriefen: Art. 6 Abs. 1 lit. c DSGVO i. V. m. § 257 HGB, § 147 AO",
+      "betroffene": ["Kunden", "Lieferanten", "Geschäftspartner", "Beschäftigte"],
+      "datenarten": ["Name", "E-Mail-Adresse", "Inhalte der Korrespondenz", "Metadaten (Zeit, Absender, Empfänger)"],
+      "empfaenger": ["E-Mail-Provider (Auftragsverarbeiter)", "ggf. IT-Dienstleister"],
+      "loeschfrist": "Handels- und Geschäftsbriefe (auch per E-Mail): 6 Jahre; E-Mails mit Belegfunktion (z. B. Rechnung): 8 Jahre (§ 257 Abs. 1, 4 HGB; § 147 Abs. 1, 3 AO). Übrige E-Mails nach Zweckerfüllung.",
+      "quelle": [
+        "https://www.gesetze-im-internet.de/hgb/__257.html",
+        "https://www.gesetze-im-internet.de/ao_1977/__147.html"
+      ]
+    },
+    {
+      "id": "newsletter",
+      "bezeichnung": "E-Mail-Newsletter / E-Mail-Werbung",
+      "zweck": "Information über Angebote und Neuigkeiten per E-Mail",
+      "rechtsgrundlage": "Art. 6 Abs. 1 lit. a DSGVO i. V. m. § 7 Abs. 2 Nr. 2 UWG (Einwilligung, Double-Opt-in); Bestandskunden unter den Voraussetzungen des § 7 Abs. 3 UWG: Art. 6 Abs. 1 lit. f DSGVO",
+      "betroffene": ["Newsletter-Abonnenten", "Bestandskunden"],
+      "datenarten": ["E-Mail-Adresse", "ggf. Name", "Einwilligungsnachweis (Zeitpunkt, Wortlaut, Bestätigung)", "ggf. Öffnungs-/Klickdaten (nur mit Einwilligung)"],
+      "empfaenger": ["Newsletter-Versanddienstleister (Auftragsverarbeiter)"],
+      "loeschfrist": "Löschung der Adresse aus dem Verteiler unverzüglich nach Abmeldung/Widerspruch; der Einwilligungsnachweis darf zur Rechtsverteidigung aufbewahrt werden – Richtwert 3 Jahre (Verjährung § 31 OWiG, § 195 BGB) laut DSK.",
+      "quelle": [
+        "https://datenschutzkonferenz-online.de/media/oh/OH-Werbung_Februar%202022_final.pdf",
+        "https://www.gesetze-im-internet.de/uwg_2004/__7.html"
+      ]
+    },
+    {
+      "id": "videoueberwachung",
+      "bezeichnung": "Videoüberwachung (z. B. Verkaufsraum, Eingang, Lager)",
+      "zweck": "Schutz vor Einbruch, Diebstahl und Vandalismus; Beweissicherung",
+      "rechtsgrundlage": "Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse; Interessenabwägung im Einzelfall)",
+      "betroffene": ["Kunden", "Besucher", "ggf. Beschäftigte", "Lieferanten"],
+      "datenarten": ["Bildaufnahmen (ggf. Zeitstempel)"],
+      "empfaenger": ["im Anlassfall Polizei / Strafverfolgungsbehörden", "ggf. Wartungs- oder Sicherheitsdienstleister (Auftragsverarbeiter)"],
+      "loeschfrist": "Speicherdauer von 72 Stunden ist in der Regel zulässig; längere Speicherung nur mit besonderer Begründung (z. B. Sicherung eines konkreten Vorfalls).",
+      "quelle": ["https://datenschutzkonferenz-online.de/media/oh/20200903_oh_vü_dsk.pdf"],
+      "zusatz": "Vorgelagertes Hinweisschild (Kamerasymbol, Verantwortlicher, Zwecke, Rechtsgrundlage, berechtigtes Interesse, Speicherdauer, Hinweis auf vollständiges Informationsblatt) – DSK-OH Videoüberwachung, Kap. 3.3 und Anlagen 1/2."
+    },
+    {
+      "id": "lieferanten",
+      "bezeichnung": "Lieferanten- und Dienstleisterverwaltung",
+      "zweck": "Bestellung, Abwicklung und Bezahlung von Waren und Leistungen",
+      "rechtsgrundlage": "Art. 6 Abs. 1 lit. b DSGVO (bei Einzelunternehmern als Vertragspartner); Art. 6 Abs. 1 lit. f DSGVO (Ansprechpersonen bei Unternehmen); Art. 6 Abs. 1 lit. c DSGVO i. V. m. § 147 AO, § 257 HGB",
+      "betroffene": ["Ansprechpersonen bei Lieferanten und Dienstleistern", "Einzelunternehmer"],
+      "datenarten": ["Name", "geschäftliche Kontaktdaten", "Bestell- und Rechnungsdaten", "Bankverbindung"],
+      "empfaenger": ["Steuerberater (eigenständiger Verantwortlicher)", "Kreditinstitut"],
+      "loeschfrist": "Buchungsbelege 8 Jahre, Geschäftsbriefe 6 Jahre (§ 147 Abs. 1, 3 AO; § 257 Abs. 1, 4 HGB); Kontaktdaten nach Ende der Geschäftsbeziehung.",
+      "quelle": [
+        "https://www.gesetze-im-internet.de/ao_1977/__147.html",
+        "https://www.gesetze-im-internet.de/hgb/__257.html"
+      ]
+    },
+    {
+      "id": "kasse_zahlung",
+      "bezeichnung": "Kassensystem und Zahlungsabwicklung (inkl. EC-/Kartenzahlung)",
+      "zweck": "Erfassung von Verkäufen, ordnungsgemäße Kassenführung, Abwicklung unbarer Zahlungen",
+      "rechtsgrundlage": "Art. 6 Abs. 1 lit. b DSGVO; Art. 6 Abs. 1 lit. c DSGVO i. V. m. §§ 146, 146a, 147 AO",
+      "betroffene": ["Kunden (bei Kartenzahlung/Kundenkonto)", "Beschäftigte (Bediener-Kennung)"],
+      "datenarten": ["Kassenbuchungen/Einzelaufzeichnungen", "Bediener-ID", "bei Kartenzahlung: gekürzte Karten-/Kontodaten, Transaktionsdaten"],
+      "empfaenger": ["Zahlungsdienstleister / Netzbetreiber", "Kassensystem-Anbieter (Auftragsverarbeiter bei Cloud-Kassen)", "Steuerberater", "Finanzamt (Kassennachschau/Außenprüfung)"],
+      "loeschfrist": "Buchungsbelege (Kassenbons, Z-Bons): 8 Jahre; Aufzeichnungen (Kassen-Einzelaufzeichnungen/Journal): 10 Jahre (§ 147 Abs. 1 Nr. 1, 4, Abs. 3 AO).",
+      "quelle": [
+        "https://www.lda.bayern.de/media/muster/muster_12_einzelhaendler_verzeichnis.pdf",
+        "https://www.gesetze-im-internet.de/ao_1977/__147.html"
+      ],
+      "unsicher": true,
+      "hinweis_unsicher": "Einordnung der Kassen-Einzelaufzeichnungen als 'Aufzeichnungen' (10 Jahre) vs. 'Buchungsbelege' (8 Jahre) vor Verwendung mit Steuerberater/BMF-Schreiben abklären."
+    },
+    {
+      "id": "social_media",
+      "bezeichnung": "Unternehmensauftritt in sozialen Netzwerken (z. B. Facebook-/Instagram-Seite)",
+      "zweck": "Öffentlichkeitsarbeit und Kommunikation mit Interessenten",
+      "rechtsgrundlage": "Art. 6 Abs. 1 lit. f DSGVO bzw. Art. 6 Abs. 1 lit. a DSGVO; gemeinsame Verantwortlichkeit mit dem Plattformbetreiber nach Art. 26 DSGVO (EuGH C-210/16)",
+      "betroffene": ["Besucher und Follower der Seite", "Kommentierende"],
+      "datenarten": ["öffentliche Profilangaben", "Kommentare, Nachrichten, Reaktionen", "von der Plattform bereitgestellte Statistiken (Insights)"],
+      "empfaenger": ["Plattformbetreiber (gemeinsam Verantwortlicher), ggf. mit Übermittlung in die USA"],
+      "loeschfrist": "Nachrichten nach Erledigung; im Übrigen nach den Einstellungen der Plattform.",
+      "quelle": [
+        "https://www.datenschutzkonferenz-online.de/media/dskb/DSK_Beschluss_Facebook_Fanpages.pdf",
+        "https://www.datenschutzkonferenz-online.de/media/oh/20221121_oh_Fanpages_FAQ_Stand2022_11_21.pdf"
+      ],
+      "unsicher": true,
+      "hinweis_unsicher": "Die DSK hält den datenschutzkonformen Betrieb von Facebook-Fanpages nach ihrem Beschluss/Kurzgutachten von 2022 für nicht nachgewiesen; eine tragfähige Rechtsgrundlage ist strittig. Löschfrist nicht behördlich belegt."
+    }
+  ],
+
+  "vvt_pflichtangaben": {
+    "norm": "Art. 30 Abs. 1 DSGVO – Verzeichnis des Verantwortlichen",
+    "einleitung": "Jeder Verantwortliche und gegebenenfalls sein Vertreter führen ein Verzeichnis aller Verarbeitungstätigkeiten, die ihrer Zuständigkeit unterliegen. Dieses Verzeichnis enthält sämtliche folgenden Angaben:",
+    "angaben": [
+      {"lit": "a", "text": "den Namen und die Kontaktdaten des Verantwortlichen und gegebenenfalls des gemeinsam mit ihm Verantwortlichen, des Vertreters des Verantwortlichen sowie eines etwaigen Datenschutzbeauftragten"},
+      {"lit": "b", "text": "die Zwecke der Verarbeitung"},
+      {"lit": "c", "text": "eine Beschreibung der Kategorien betroffener Personen und der Kategorien personenbezogener Daten"},
+      {"lit": "d", "text": "die Kategorien von Empfängern, gegenüber denen die personenbezogenen Daten offengelegt worden sind oder noch offengelegt werden, einschließlich Empfänger in Drittländern oder internationalen Organisationen"},
+      {"lit": "e", "text": "gegebenenfalls Übermittlungen von personenbezogenen Daten an ein Drittland oder an eine internationale Organisation, einschließlich der Angabe des betreffenden Drittlands oder der betreffenden internationalen Organisation, sowie bei den in Art. 49 Abs. 1 Unterabsatz 2 genannten Datenübermittlungen die Dokumentierung geeigneter Garantien"},
+      {"lit": "f", "text": "wenn möglich, die vorgesehenen Fristen für die Löschung der verschiedenen Datenkategorien"},
+      {"lit": "g", "text": "wenn möglich, eine allgemeine Beschreibung der technischen und organisatorischen Maßnahmen gemäß Art. 32 Abs. 1"}
+    ],
+    "empfohlene_zusatzangaben": ["Rechtsgrundlage der Verarbeitung", "Datenquelle", "zugriffsberechtigte Rollen/Personen"],
+    "form": "Schriftlich, auch in elektronischem Format (Art. 30 Abs. 3); der Aufsichtsbehörde auf Anfrage zur Verfügung zu stellen (Art. 30 Abs. 4); nicht öffentlich.",
+    "ausnahme_art30_abs5": "Die Pflicht gilt nicht für Unternehmen mit weniger als 250 Mitarbeitern, es sei denn, die Verarbeitung birgt ein Risiko für die Rechte und Freiheiten der Betroffenen, erfolgt nicht nur gelegentlich oder umfasst besondere Kategorien (Art. 9 Abs. 1) bzw. Daten über Straftaten (Art. 10). Nach DSK ist die regelmäßige Verarbeitung von Kunden- oder Beschäftigtendaten 'nicht nur gelegentlich' – kleine Betriebe brauchen daher praktisch immer ein VVT.",
+    "quelle": [
+      "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679",
+      "https://www.datenschutzkonferenz-online.de/media/ah/201802_ah_verzeichnis_verarbeitungstaetigkeiten.pdf",
+      "https://www.datenschutzkonferenz-online.de/media/kp/dsk_kpnr_1.pdf"
+    ]
+  },
+
+  "tom": {
+    "_quellen": {
+      "art32": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679",
+      "bayLDA_muster_tom": "https://www.lda.bayern.de/media/muster/muster_3_handwerksbetrieb_verzeichnis.pdf",
+      "bayLDA_anforderungen": "https://www.lda.bayern.de/media/muster/muster_3_handwerksbetrieb.pdf",
+      "bsi_kompendium": "https://www.bsi.bund.de/DE/Themen/Unternehmen-und-Organisationen/Standards-und-Zertifizierung/IT-Grundschutz/IT-Grundschutz-Kompendium/it-grundschutz-kompendium_node.html",
+      "dsk_sdm": "https://www.datenschutzzentrum.de/uploads/sdm/SDM-Methode.pdf",
+      "hinweis": "BayLDA: Für kleine Betriebe reichen im Regelfall etablierte Standardmaßnahmen (aktuelle Systeme, Passwortschutz, regelmäßige Datensicherung, Virenschutz, abgestuftes Berechtigungskonzept, Verpflichtung der Beschäftigten). BSI-Bausteinkennungen beziehen sich auf das IT-Grundschutz-Kompendium Edition 2023; Bausteinnummern aus Fachkenntnis, nicht einzeln live geprüft."
+    },
+    "pseudonymisierung_verschluesselung": [
+      {"massnahme": "Festplattenverschlüsselung auf allen Laptops (z. B. BitLocker/FileVault)", "quelle": "BSI IT-Grundschutz SYS.3.1 Laptops / CON.1 Kryptokonzept"},
+      {"massnahme": "Geräteverschlüsselung und Bildschirmsperre mit PIN auf dienstlichen Smartphones und Tablets", "quelle": "BSI IT-Grundschutz SYS.3.2.1 Allgemeine Smartphones und Tablets"},
+      {"massnahme": "Verschlüsselte USB-Sticks/externe Datenträger für personenbezogene Daten", "quelle": "BSI IT-Grundschutz CON.1 Kryptokonzept"},
+      {"massnahme": "Website ausschließlich über HTTPS (TLS) erreichbar, insbesondere Kontaktformulare", "quelle": "BayLDA Muster-VVT Handwerksbetrieb (TOM: HTTPS-Verschlüsselung)"},
+      {"massnahme": "Transportverschlüsselung (TLS) beim E-Mail-Versand; vertrauliche Unterlagen nur verschlüsselt versenden", "quelle": "BSI IT-Grundschutz APP.5.3 Allgemeiner E-Mail-Client und -Server"},
+      {"massnahme": "WLAN mit aktueller Verschlüsselung (WPA2/WPA3) und starkem Passwort; separates Gäste-WLAN", "quelle": "BSI IT-Grundschutz NET.2.1 WLAN-Betrieb"}
+    ],
+    "vertraulichkeit": [
+      {"massnahme": "Persönliche Benutzerkonten für alle Beschäftigten; keine gemeinsam genutzten Zugänge", "quelle": "BSI IT-Grundschutz ORP.4 Identitäts- und Berechtigungsmanagement"},
+      {"massnahme": "Starke, individuelle Passwörter; Einsatz eines Passwort-Managers", "quelle": "BayLDA Anforderungen Handwerksbetrieb (Passwortschutz); BSI ORP.4"},
+      {"massnahme": "Zwei-Faktor-Authentisierung für E-Mail, Cloud-Dienste und Online-Banking", "quelle": "BSI IT-Grundschutz ORP.4"},
+      {"massnahme": "Abgestuftes Berechtigungskonzept: Zugriff nur auf die für die Aufgabe nötigen Daten", "quelle": "BayLDA Anforderungen Handwerksbetrieb (abgestuftes Berechtigungskonzept)"},
+      {"massnahme": "Normale Arbeit mit Standard-Benutzerkonten; Administratorrechte nur für Verwaltungsaufgaben", "quelle": "BayLDA Muster-VVT (Standard-Gruppenverwaltung); BSI SYS.2.1 Allgemeiner Client"},
+      {"massnahme": "Automatische Bildschirmsperre nach kurzer Inaktivität", "quelle": "BSI IT-Grundschutz SYS.2.1 Allgemeiner Client"},
+      {"massnahme": "Abschließbare Räume/Schränke für Personal- und Kundenakten", "quelle": "BSI IT-Grundschutz INF.7 Büroarbeitsplatz / INF.1 Allgemeines Gebäude"},
+      {"massnahme": "Clean-Desk: keine Kundenunterlagen offen im Kundenbereich; Bildschirme nicht von Kunden einsehbar", "quelle": "BSI IT-Grundschutz INF.7 Büroarbeitsplatz"},
+      {"massnahme": "Verpflichtung aller Beschäftigten auf Vertraulichkeit/Datenschutz bei Tätigkeitsbeginn", "quelle": "BayLDA Anforderungen Handwerksbetrieb; Art. 29, 32 Abs. 4 DSGVO"},
+      {"massnahme": "Akten- und Datenträgervernichtung mit Aktenvernichter bzw. zertifiziertem Entsorger", "quelle": "BayLDA Muster-VVT (Papieraktenvernichtung mit Standard-Shredder); BSI CON.6 Löschen und Vernichten"},
+      {"massnahme": "Sicheres Löschen bzw. physische Vernichtung von Festplatten vor Entsorgung oder Weitergabe von Geräten", "quelle": "BSI IT-Grundschutz CON.6 Löschen und Vernichten"},
+      {"massnahme": "Auftragsverarbeitungsverträge mit allen Dienstleistern, die Zugriff auf personenbezogene Daten haben (Hosting, Cloud, Fernwartung)", "quelle": "Art. 28 DSGVO; DSK Kurzpapier Nr. 13"},
+      {"massnahme": "Fernwartung nur nach Freigabe im Einzelfall und unter Aufsicht", "quelle": "BSI IT-Grundschutz OPS.1.2.5 Fernwartung; DSK Kurzpapier Nr. 13"}
+    ],
+    "integritaet": [
+      {"massnahme": "Automatische Sicherheitsupdates für Betriebssystem, Browser und Programme aktivieren", "quelle": "BayLDA Muster-VVT (automatische Updates); BSI OPS.1.1.3 Patch- und Änderungsmanagement"},
+      {"massnahme": "Aktuelle Virenschutz-/Sicherheitssoftware auf allen Rechnern", "quelle": "BayLDA Muster-VVT; BSI OPS.1.1.4 Schutz vor Schadprogrammen"},
+      {"massnahme": "Firewall des Routers und der Endgeräte aktiviert; Router-Firmware aktuell, Standardpasswort geändert", "quelle": "BSI IT-Grundschutz NET.3.2 Firewall"},
+      {"massnahme": "Keine Nutzung privater Geräte und Datenträger für Betriebsdaten ohne Regelung", "quelle": "BSI IT-Grundschutz SYS.3.2.1 / ORP.1 Organisation"},
+      {"massnahme": "Software nur aus vertrauenswürdigen Quellen; nicht mehr unterstützte Systeme ersetzen", "quelle": "BSI IT-Grundschutz SYS.2.1 / OPS.1.1.3"},
+      {"massnahme": "Protokollierung von Änderungen in Kassen- und Buchhaltungssystemen (manipulationssichere Aufzeichnung, TSE)", "quelle": "§ 146a AO", "unsicher": true}
+    ],
+    "verfuegbarkeit_belastbarkeit": [
+      {"massnahme": "Regelmäßige Datensicherung (mindestens wöchentlich), z. B. auf externe Festplatte", "quelle": "BayLDA Muster-VVT (regelmäßige Backups, z. B. einmal wöchentlich auf einer externen Festplatte); BSI CON.3 Datensicherungskonzept"},
+      {"massnahme": "Mindestens eine Sicherungskopie getrennt vom Netzwerk bzw. außer Haus aufbewahren (Schutz vor Ransomware, Brand, Diebstahl)", "quelle": "BSI IT-Grundschutz CON.3 Datensicherungskonzept"},
+      {"massnahme": "Unterbrechungsfreie Stromversorgung oder Überspannungsschutz für zentrale Geräte", "quelle": "BSI IT-Grundschutz INF.1 Allgemeines Gebäude", "unsicher": true},
+      {"massnahme": "Sorgfältige Auswahl von Hosting-/Cloud-Anbietern mit Rechenzentrum in der EU", "quelle": "Art. 28 Abs. 1 DSGVO; Kapitel V DSGVO"}
+    ],
+    "wiederherstellung": [
+      {"massnahme": "Wiederherstellung aus der Datensicherung regelmäßig testen", "quelle": "BSI IT-Grundschutz CON.3 Datensicherungskonzept"},
+      {"massnahme": "Notfall-Kontaktliste (IT-Dienstleister, Bank, Aufsichtsbehörde, Polizei) und Ablauf für Sicherheitsvorfälle bereithalten", "quelle": "BSI IT-Grundschutz DER.2.1 Behandlung von Sicherheitsvorfällen"},
+      {"massnahme": "Dokumentierte Zugangsdaten für Notfälle sicher hinterlegen (z. B. versiegelter Umschlag im Tresor)", "quelle": "BSI IT-Grundschutz ORP.4", "unsicher": true}
+    ],
+    "ueberpruefung": [
+      {"massnahme": "Jährliche Überprüfung des Verzeichnisses der Verarbeitungstätigkeiten und der TOM", "quelle": "Art. 24 Abs. 1 Satz 2, Art. 32 Abs. 1 lit. d DSGVO"},
+      {"massnahme": "Regelmäßige Sensibilisierung der Beschäftigten (z. B. Phishing, Passwörter, Umgang mit Kundendaten)", "quelle": "BSI IT-Grundschutz ORP.3 Sensibilisierung und Schulung zur Informationssicherheit"},
+      {"massnahme": "Regelmäßige Kontrolle der vergebenen Benutzerkonten und Berechtigungen; Konten ausgeschiedener Beschäftigter sofort sperren", "quelle": "BSI IT-Grundschutz ORP.4 / ORP.2 Personal"},
+      {"massnahme": "Überprüfung der Auftragsverarbeiter (z. B. Nachweise/Zertifikate anfordern)", "quelle": "Art. 28 Abs. 3 lit. h DSGVO"},
+      {"massnahme": "Dokumentation aller Datenschutzverletzungen (auch nicht meldepflichtiger)", "quelle": "Art. 33 Abs. 5 DSGVO"},
+      {"massnahme": "Nutzung des BSI-CyberRisikoCheck (DIN SPEC 27076) als Standortbestimmung", "quelle": "https://www.bsi.bund.de/DE/Themen/Unternehmen-und-Organisationen/Informationen-und-Empfehlungen/KMU/CyberRisikoCheck/CyberRisikoCheck.html", "unsicher": true}
+    ]
+  },
+
+  "dse_bausteine": {
+    "_hinweis": "Keine Datenschutzbehörde veröffentlicht einen allgemeinen Mustertext für Website-Datenschutzerklärungen (BayLDA-Seite 'Kleine Unternehmen' enthält kein DSE-Muster). Texte sind daher aus den Pflichtinhalten der Art. 13, 21, 77 DSGVO und § 25 TDDDG sowie DSK-Orientierungshilfen abgeleitet; 'unsicher': true markiert Bausteine ohne direkte Behördenvorlage.",
+    "verantwortlicher": {
+      "titel": "Verantwortliche Stelle",
+      "text": "Verantwortlich für die Verarbeitung personenbezogener Daten auf dieser Website ist {firmenname}, {strasse_hausnr}, {plz} {ort}. Sie erreichen uns per E-Mail unter {email} und telefonisch unter {telefon}. {optional: Unseren Datenschutzbeauftragten erreichen Sie unter {dsb_kontakt}.} Nachfolgend informieren wir Sie darüber, welche personenbezogenen Daten wir zu welchen Zwecken und auf welcher Rechtsgrundlage verarbeiten.",
+      "quelle": "Art. 13 Abs. 1 lit. a, b DSGVO – https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679",
+      "unsicher": true
+    },
+    "hosting": {
+      "titel": "Hosting",
+      "text": "Diese Website wird bei {hoster_name}, {hoster_anschrift}, gehostet. Der Anbieter verarbeitet die beim Besuch der Website anfallenden Daten in unserem Auftrag; mit ihm haben wir einen Vertrag zur Auftragsverarbeitung nach Art. 28 DSGVO geschlossen. Rechtsgrundlage ist unser berechtigtes Interesse an einer sicheren und zuverlässigen Bereitstellung unserer Website (Art. 6 Abs. 1 lit. f DSGVO).",
+      "quelle": "BayLDA Anforderungen Handwerksbetrieb (Hosting = Auftragsverarbeitung, AV-Vertrag erforderlich) – https://www.lda.bayern.de/media/muster/muster_3_handwerksbetrieb.pdf; DSK Kurzpapier Nr. 13 – https://www.datenschutzkonferenz-online.de/media/kp/dsk_kpnr_13.pdf",
+      "unsicher": true
+    },
+    "server_logfiles": {
+      "titel": "Server-Logfiles",
+      "text": "Beim Aufruf unserer Website werden durch den von Ihrem Browser übermittelten Datenaustausch automatisch folgende Daten in Server-Logfiles gespeichert: IP-Adresse, Datum und Uhrzeit des Abrufs, aufgerufene Seite bzw. Datei, übertragene Datenmenge, Browsertyp und -version, Betriebssystem sowie die zuvor besuchte Seite (Referrer). Die Verarbeitung dient der Auslieferung der Website sowie der Gewährleistung von Stabilität und Sicherheit. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO; unser berechtigtes Interesse liegt in diesen Zwecken. Die Logfiles werden nach {30} Tagen gelöscht.",
+      "quelle": "BayLDA Muster-VVT Handwerksbetrieb (IP-Adresse nach 30 Tagen) – https://www.lda.bayern.de/media/muster/muster_3_handwerksbetrieb_verzeichnis.pdf; Art. 13 Abs. 1 lit. c, d, Abs. 2 lit. a DSGVO",
+      "unsicher": true
+    },
+    "kontakt": {
+      "titel": "Kontakt per E-Mail, Telefon oder Kontaktformular",
+      "text": "Wenn Sie uns per E-Mail, telefonisch oder über das Kontaktformular kontaktieren, verarbeiten wir Ihre Angaben (z. B. Name, Kontaktdaten, Inhalt der Anfrage) zur Bearbeitung Ihres Anliegens. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO, sofern Ihre Anfrage mit einem Vertrag oder vorvertraglichen Maßnahmen zusammenhängt, im Übrigen unser berechtigtes Interesse an der Beantwortung von Anfragen (Art. 6 Abs. 1 lit. f DSGVO). Wir löschen Ihre Daten, sobald Ihre Anfrage abschließend bearbeitet ist, sofern keine gesetzlichen Aufbewahrungspflichten (z. B. für Geschäftsbriefe, § 257 HGB, § 147 AO) entgegenstehen.",
+      "quelle": "Art. 6 Abs. 1 lit. b, f, Art. 13 DSGVO; § 257 HGB – https://www.gesetze-im-internet.de/hgb/__257.html",
+      "unsicher": true
+    },
+    "cookies_einwilligung": {
+      "titel": "Cookies und Einwilligung (§ 25 TDDDG)",
+      "text": "Unsere Website verwendet Cookies und ähnliche Technologien. Das Speichern von Informationen auf Ihrem Endgerät oder der Zugriff auf dort bereits gespeicherte Informationen erfolgt nur mit Ihrer Einwilligung (§ 25 Abs. 1 TDDDG), soweit dies nicht unbedingt erforderlich ist, um den von Ihnen ausdrücklich gewünschten Dienst bereitzustellen (§ 25 Abs. 2 Nr. 2 TDDDG). Ihre Einwilligung holen wir über unser Einwilligungsbanner ein; dort können Sie nicht erforderliche Dienste ebenso einfach ablehnen wie annehmen. Soweit dabei personenbezogene Daten verarbeitet werden, ist Rechtsgrundlage Art. 6 Abs. 1 lit. a DSGVO. Sie können Ihre Einwilligung jederzeit mit Wirkung für die Zukunft über {link_cookie_einstellungen} widerrufen.",
+      "quelle": "DSK Orientierungshilfe für Anbieter:innen von digitalen Diensten, Version 1.2 (Nov. 2024), Kap. III – https://datenschutzkonferenz-online.de/media/oh/OH_Digitale_Dienste.pdf; § 25 TDDDG – https://www.gesetze-im-internet.de/ttdsg/__25.html"
+    },
+    "technisch_notwendige_cookies": {
+      "titel": "Technisch notwendige Cookies",
+      "text": "Einige Cookies sind unbedingt erforderlich, damit die Website bzw. von Ihnen ausdrücklich gewünschte Funktionen (z. B. {Speicherung Ihrer Cookie-Auswahl, Warenkorb, Login}) funktionieren. Für diese Cookies ist nach § 25 Abs. 2 Nr. 2 TDDDG keine Einwilligung erforderlich. Soweit dabei personenbezogene Daten verarbeitet werden, beruht dies auf unserem berechtigten Interesse an einer funktionsfähigen Website (Art. 6 Abs. 1 lit. f DSGVO). Diese Cookies werden {nach Ende der Sitzung / nach {dauer}} gelöscht.",
+      "quelle": "DSK OH Digitale Dienste Rz. 73–84 (strenge Auslegung, Speicherung meist auf Session beschränken, Einwilligungsnachweis-Cookie ohne UID) – https://datenschutzkonferenz-online.de/media/oh/OH_Digitale_Dienste.pdf"
+    },
+    "google_maps": {
+      "titel": "Google Maps",
+      "text": "Auf unserer Website können Sie eine Karte von Google Maps (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland) anzeigen lassen. Die Karte wird erst geladen, wenn Sie dem zuvor zugestimmt haben; dabei werden u. a. Ihre IP-Adresse und Informationen zu Ihrem Browser an Google übermittelt, auch an Server in den USA. Rechtsgrundlage ist Ihre Einwilligung (§ 25 Abs. 1 TDDDG, Art. 6 Abs. 1 lit. a DSGVO), die Sie jederzeit widerrufen können. Für Übermittlungen in die USA stützt sich Google auf den Angemessenheitsbeschluss zum EU-US Data Privacy Framework (Durchführungsbeschluss (EU) 2023/1795). Weitere Informationen: https://policies.google.com/privacy.",
+      "quelle": "DSK OH Digitale Dienste Rz. 74, 76 (Kartendienste als Zusatzfunktion, nicht unbedingt erforderlich) – https://datenschutzkonferenz-online.de/media/oh/OH_Digitale_Dienste.pdf; Art. 45 DSGVO",
+      "unsicher": true,
+      "hinweis": "Anbieterdaten und DPF-Status vor Verwendung prüfen (Rechtsmittel gegen das EuG-Urteil Latombe v. 03.09.2025 beim EuGH anhängig)."
+    },
+    "youtube": {
+      "titel": "Eingebettete YouTube-Videos",
+      "text": "Wir binden Videos der Plattform YouTube (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland) im erweiterten Datenschutzmodus ein. Die Videos werden erst geladen, wenn Sie dem zustimmen bzw. das Video aktiv starten; erst dann werden Daten wie Ihre IP-Adresse an YouTube/Google übermittelt und ggf. Cookies auf Ihrem Endgerät gespeichert, auch mit Übermittlung in die USA. Rechtsgrundlage ist Ihre Einwilligung (§ 25 Abs. 1 TDDDG, Art. 6 Abs. 1 lit. a DSGVO), die Sie jederzeit widerrufen können. Weitere Informationen: https://policies.google.com/privacy.",
+      "quelle": "DSK OH Digitale Dienste Rz. 74, 76 (Videos als Zusatzfunktion) – https://datenschutzkonferenz-online.de/media/oh/OH_Digitale_Dienste.pdf",
+      "unsicher": true
+    },
+    "google_fonts_lokal": {
+      "titel": "Schriftarten (lokal eingebunden)",
+      "text": "Wir verwenden auf unserer Website Schriftarten (z. B. Google Fonts), die lokal auf unserem eigenen Server gespeichert sind. Beim Aufruf der Website wird keine Verbindung zu Servern von Google oder anderen Drittanbietern hergestellt.",
+      "quelle": "Grundlage: Art. 5 Abs. 1 lit. c, Art. 6 DSGVO (keine Übermittlung an Dritte). Keine Behördenquelle gefunden.",
+      "unsicher": true
+    },
+    "google_fonts_extern": {
+      "titel": "Google Fonts (extern eingebunden)",
+      "text": "Wir binden Schriftarten von Google Fonts (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland) ein. Dabei stellt Ihr Browser eine Verbindung zu Servern von Google her, wobei insbesondere Ihre IP-Adresse übermittelt wird. Dies erfolgt nur, wenn Sie zuvor eingewilligt haben (Art. 6 Abs. 1 lit. a DSGVO); die Einwilligung können Sie jederzeit widerrufen. Empfehlung: Schriftarten lokal einbinden, dann entfällt die Übermittlung.",
+      "quelle": "Grundlage: Art. 6 Abs. 1 DSGVO. Keine Behördenquelle gefunden (die DSK-OH Digitale Dienste behandelt Google Fonts nicht); verbreitete Praxis geht auf LG München I, Urt. v. 20.01.2022 – 3 O 17493/20 zurück.",
+      "unsicher": true
+    },
+    "newsletter": {
+      "titel": "Newsletter (Double-Opt-in)",
+      "text": "Wenn Sie sich für unseren Newsletter anmelden, verwenden wir Ihre E-Mail-Adresse {und Ihren Namen}, um Ihnen regelmäßig Informationen über {themen} zu senden. Nach der Anmeldung erhalten Sie eine E-Mail mit einem Bestätigungslink; erst nach Bestätigung werden Sie in den Verteiler aufgenommen (Double-Opt-in). Wir protokollieren Anmeldung und Bestätigung (Zeitpunkt, Wortlaut der Einwilligung), um die Einwilligung nachweisen zu können. Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Sie können den Newsletter jederzeit über den Abmeldelink in jeder E-Mail oder per Nachricht an {email} abbestellen; den Nachweis Ihrer Einwilligung bewahren wir danach bis zu drei Jahre auf. Der Versand erfolgt über {versanddienstleister}, mit dem wir einen Auftragsverarbeitungsvertrag geschlossen haben.",
+      "quelle": "DSK Orientierungshilfe Direktwerbung (Feb. 2022), Kap. 3.1, 3.3, 3.7, 5.3 – https://datenschutzkonferenz-online.de/media/oh/OH-Werbung_Februar%202022_final.pdf; Art. 7 Abs. 1 DSGVO"
+    },
+    "social_media_links": {
+      "titel": "Links zu sozialen Netzwerken",
+      "text": "Auf unserer Website finden Sie Links zu unseren Auftritten bei {netzwerke}. Es handelt sich um einfache Verlinkungen; beim Besuch unserer Website werden keine Daten an diese Netzwerke übertragen. Erst wenn Sie einen Link anklicken, gelangen Sie auf die Seite des jeweiligen Anbieters, der dann eigenständig Daten verarbeitet; es gelten dessen Datenschutzhinweise.",
+      "quelle": "Grundlage: Art. 13 DSGVO; zur gemeinsamen Verantwortlichkeit beim Betrieb eigener Fanpages DSK Beschluss Facebook Fanpages – https://www.datenschutzkonferenz-online.de/media/dskb/DSK_Beschluss_Facebook_Fanpages.pdf",
+      "unsicher": true
+    },
+    "online_terminbuchung": {
+      "titel": "Online-Terminbuchung über einen Drittanbieter",
+      "text": "Für die Online-Terminbuchung nutzen wir den Dienst {anbieter_name}, {anbieter_anschrift}. Dabei verarbeiten wir die von Ihnen eingegebenen Daten (z. B. Name, Kontaktdaten, gewünschter Termin und Leistung), um Ihren Termin zu planen, zu bestätigen und Sie ggf. daran zu erinnern. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO. Der Anbieter verarbeitet die Daten in unserem Auftrag auf Grundlage eines Vertrags nach Art. 28 DSGVO. Die Daten werden gelöscht, wenn sie für die Terminabwicklung nicht mehr erforderlich sind und keine gesetzlichen Aufbewahrungspflichten bestehen.",
+      "quelle": "Art. 6 Abs. 1 lit. b, Art. 28 DSGVO; DSK Kurzpapier Nr. 13 – https://www.datenschutzkonferenz-online.de/media/kp/dsk_kpnr_13.pdf",
+      "unsicher": true
+    },
+    "betroffenenrechte": {
+      "titel": "Ihre Rechte",
+      "text": "Sie haben das Recht, Auskunft über die von uns verarbeiteten personenbezogenen Daten zu verlangen (Art. 15 DSGVO). Sie können die Berichtigung unrichtiger oder die Vervollständigung unvollständiger Daten verlangen (Art. 16 DSGVO). Sie können die Löschung Ihrer Daten verlangen, soweit keine gesetzliche Aufbewahrungspflicht oder ein anderer Grund nach Art. 17 Abs. 3 DSGVO entgegensteht (Art. 17 DSGVO). Sie können die Einschränkung der Verarbeitung verlangen, etwa solange die Richtigkeit Ihrer Daten geprüft wird (Art. 18 DSGVO). Sie haben das Recht, Daten, die Sie uns auf Grundlage einer Einwilligung oder eines Vertrags bereitgestellt haben, in einem strukturierten, gängigen und maschinenlesbaren Format zu erhalten oder übermitteln zu lassen (Art. 20 DSGVO). Sie haben das Recht, aus Gründen, die sich aus Ihrer besonderen Situation ergeben, einer auf Art. 6 Abs. 1 lit. e oder f DSGVO gestützten Verarbeitung zu widersprechen (Art. 21 DSGVO). Zur Ausübung Ihrer Rechte genügt eine Nachricht an {email}.",
+      "quelle": "Art. 15–18, 20, 21 DSGVO; Art. 13 Abs. 2 lit. b DSGVO – https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679",
+      "hinweis": "Art. 19 DSGVO (Mitteilungspflicht des Verantwortlichen gegenüber Empfängern) ist eine Pflicht des Verantwortlichen, kein eigenständiges Betroffenenrecht; optionaler Satz: 'Über Berichtigungen, Löschungen oder Einschränkungen informieren wir die Empfänger Ihrer Daten, sofern dies nicht unmöglich ist oder unverhältnismäßigen Aufwand erfordert; auf Wunsch teilen wir Ihnen diese Empfänger mit (Art. 19 DSGVO).'"
+    },
+    "widerruf_einwilligung": {
+      "titel": "Widerruf Ihrer Einwilligung",
+      "text": "Soweit eine Verarbeitung auf Ihrer Einwilligung beruht, können Sie diese jederzeit mit Wirkung für die Zukunft widerrufen (Art. 7 Abs. 3 DSGVO). Die Rechtmäßigkeit der bis zum Widerruf erfolgten Verarbeitung bleibt davon unberührt. Der Widerruf ist so einfach möglich wie die Erteilung, z. B. per E-Mail an {email} oder über {link_einstellungen}.",
+      "quelle": "Art. 7 Abs. 3, Art. 13 Abs. 2 lit. c DSGVO; DSK OH Digitale Dienste (Widerruf so einfach wie Erteilung) – https://datenschutzkonferenz-online.de/media/oh/OH_Digitale_Dienste.pdf"
+    },
+    "widerspruchsrecht": {
+      "titel": "Widerspruchsrecht (Art. 21 DSGVO)",
+      "text": "Sie haben das Recht, aus Gründen, die sich aus Ihrer besonderen Situation ergeben, jederzeit gegen die Verarbeitung Sie betreffender personenbezogener Daten, die auf Grundlage von Art. 6 Abs. 1 lit. e oder f DSGVO erfolgt, Widerspruch einzulegen. Wir verarbeiten die Daten dann nicht mehr, es sei denn, wir können zwingende schutzwürdige Gründe für die Verarbeitung nachweisen, die Ihre Interessen, Rechte und Freiheiten überwiegen, oder die Verarbeitung dient der Geltendmachung, Ausübung oder Verteidigung von Rechtsansprüchen. Werden Ihre Daten für Direktwerbung verarbeitet, können Sie dieser Verarbeitung jederzeit ohne Angabe von Gründen widersprechen; die Daten werden dann nicht mehr für diese Zwecke verarbeitet. Der Widerspruch ist formfrei möglich, z. B. an {email}.",
+      "quelle": "Art. 21 Abs. 1–4 DSGVO; DSK OH Direktwerbung Kap. 5.2–5.4 (Hinweis getrennt von anderen Informationen, formfrei) – https://datenschutzkonferenz-online.de/media/oh/OH-Werbung_Februar%202022_final.pdf",
+      "hinweis": "Art. 21 Abs. 4 DSGVO: Hinweis muss in einer verständlichen und von anderen Informationen getrennten Form erfolgen – Baustein optisch hervorheben."
+    },
+    "beschwerderecht": {
+      "titel": "Beschwerderecht bei einer Aufsichtsbehörde",
+      "text": "Sie haben unbeschadet anderer Rechtsbehelfe das Recht auf Beschwerde bei einer Datenschutz-Aufsichtsbehörde, insbesondere in dem Mitgliedstaat Ihres Aufenthaltsorts, Ihres Arbeitsplatzes oder des Orts des mutmaßlichen Verstoßes, wenn Sie der Ansicht sind, dass die Verarbeitung Ihrer personenbezogenen Daten gegen die DSGVO verstößt (Art. 77 DSGVO). Die für uns zuständige Aufsichtsbehörde ist: {aufsichtsbehoerde_name}, {aufsichtsbehoerde_ort}, {aufsichtsbehoerde_url}.",
+      "quelle": "Art. 77 Abs. 1, Art. 13 Abs. 2 lit. d DSGVO – https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679"
+    }
+  },
+
+  "aufsichtsbehoerden": {
+    "_quelle": "https://www.datenschutzkonferenz-online.de/datenschutzaufsichtsbehoerden.html",
+    "_hinweis": "Namen und URLs laut DSK-Übersicht; Sitz (Ort) aus Fachkenntnis, nicht aus der DSK-Seite. In Bayern ist für nicht-öffentliche Stellen ausschließlich das BayLDA zuständig (der Bayerische Landesbeauftragte für den Datenschutz ist nur für öffentliche Stellen zuständig). In allen anderen Ländern ist die Landesbehörde für beide Bereiche zuständig.",
+    "liste": [
+      {"land": "Baden-Württemberg", "name": "Der Landesbeauftragte für den Datenschutz und die Informationsfreiheit Baden-Württemberg", "ort": "Stuttgart", "url": "https://www.baden-wuerttemberg.datenschutz.de"},
+      {"land": "Bayern", "name": "Bayerisches Landesamt für Datenschutzaufsicht (BayLDA)", "ort": "Ansbach", "url": "https://www.lda.bayern.de"},
+      {"land": "Berlin", "name": "Berliner Beauftragte für Datenschutz und Informationsfreiheit", "ort": "Berlin", "url": "https://www.datenschutz-berlin.de"},
+      {"land": "Brandenburg", "name": "Die Landesbeauftragte für den Datenschutz und für das Recht auf Akteneinsicht Brandenburg", "ort": "Kleinmachnow", "url": "https://www.lda.brandenburg.de"},
+      {"land": "Bremen", "name": "Die Landesbeauftragte für Datenschutz und Informationsfreiheit der Freien Hansestadt Bremen", "ort": "Bremen", "url": "https://www.datenschutz.bremen.de"},
+      {"land": "Hamburg", "name": "Der Hamburgische Beauftragte für Datenschutz und Informationsfreiheit", "ort": "Hamburg", "url": "https://www.datenschutz-hamburg.de"},
+      {"land": "Hessen", "name": "Der Hessische Beauftragte für Datenschutz und Informationsfreiheit", "ort": "Wiesbaden", "url": "https://www.datenschutz.hessen.de", "unsicher": true, "hinweis": "DSK-Liste führt noch 'Der Hessische Datenschutzbeauftragte'; seit 2018 lautet die Bezeichnung 'Hessischer Beauftragter für Datenschutz und Informationsfreiheit' (HBDI) – auf der Behördenseite prüfen."},
+      {"land": "Mecklenburg-Vorpommern", "name": "Der Landesbeauftragte für Datenschutz und Informationsfreiheit Mecklenburg-Vorpommern", "ort": "Schwerin", "url": "https://www.datenschutz-mv.de"},
+      {"land": "Niedersachsen", "name": "Der Landesbeauftragte für den Datenschutz Niedersachsen", "ort": "Hannover", "url": "https://www.lfd.niedersachsen.de"},
+      {"land": "Nordrhein-Westfalen", "name": "Landesbeauftragte für Datenschutz und Informationsfreiheit Nordrhein-Westfalen", "ort": "Düsseldorf", "url": "https://www.ldi.nrw.de"},
+      {"land": "Rheinland-Pfalz", "name": "Der Landesbeauftragte für den Datenschutz und die Informationsfreiheit Rheinland-Pfalz", "ort": "Mainz", "url": "https://www.datenschutz.rlp.de"},
+      {"land": "Saarland", "name": "Unabhängiges Datenschutzzentrum Saarland – Landesbeauftragte für Datenschutz und Informationsfreiheit", "ort": "Saarbrücken", "url": "https://datenschutz.saarland.de"},
+      {"land": "Sachsen", "name": "Sächsische Datenschutz- und Transparenzbeauftragte", "ort": "Dresden", "url": "https://www.datenschutz.sachsen.de"},
+      {"land": "Sachsen-Anhalt", "name": "Landesbeauftragte für den Datenschutz Sachsen-Anhalt", "ort": "Magdeburg", "url": "https://datenschutz.sachsen-anhalt.de"},
+      {"land": "Schleswig-Holstein", "name": "Unabhängiges Landeszentrum für Datenschutz Schleswig-Holstein (ULD)", "ort": "Kiel", "url": "https://www.datenschutzzentrum.de"},
+      {"land": "Thüringen", "name": "Thüringer Landesbeauftragter für den Datenschutz und die Informationsfreiheit", "ort": "Erfurt", "url": "https://www.tlfdi.de"}
+    ]
+  },
+
+  "art13": {
+    "quelle": [
+      "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679",
+      "https://www.datenschutzkonferenz-online.de/media/kp/dsk_kpnr_10.pdf"
+    ],
+    "zeitpunkt": "Zum Zeitpunkt der Erhebung der Daten (Art. 13 Abs. 1). Bei persönlicher Erhebung bzw. Papierkorrespondenz in der Regel nicht bloß Verweis auf Internetinformationen (DSK Kurzpapier Nr. 10).",
+    "abs1": [
+      {"lit": "a", "text": "den Namen und die Kontaktdaten des Verantwortlichen sowie gegebenenfalls seines Vertreters", "pflicht": "immer (Vertreter nur falls zutreffend)"},
+      {"lit": "b", "text": "gegebenenfalls die Kontaktdaten des Datenschutzbeauftragten", "pflicht": "nur falls zutreffend (wenn ein DSB benannt ist)"},
+      {"lit": "c", "text": "die Zwecke, für die die personenbezogenen Daten verarbeitet werden sollen, sowie die Rechtsgrundlage für die Verarbeitung", "pflicht": "immer"},
+      {"lit": "d", "text": "wenn die Verarbeitung auf Artikel 6 Absatz 1 Buchstabe f beruht, die berechtigten Interessen, die von dem Verantwortlichen oder einem Dritten verfolgt werden", "pflicht": "nur falls zutreffend (bei Art. 6 Abs. 1 lit. f)"},
+      {"lit": "e", "text": "gegebenenfalls die Empfänger oder Kategorien von Empfängern der personenbezogenen Daten", "pflicht": "nur falls zutreffend"},
+      {"lit": "f", "text": "gegebenenfalls die Absicht des Verantwortlichen, die personenbezogenen Daten an ein Drittland oder eine internationale Organisation zu übermitteln, sowie das Vorhandensein oder das Fehlen eines Angemessenheitsbeschlusses der Kommission oder im Falle von Übermittlungen gemäß Artikel 46 oder 47 oder Artikel 49 Absatz 1 Unterabsatz 2 einen Verweis auf die geeigneten oder angemessenen Garantien und die Möglichkeit, wie eine Kopie von ihnen zu erhalten ist, oder wo sie verfügbar sind", "pflicht": "nur falls zutreffend (Drittlandübermittlung)"}
+    ],
+    "abs2_einleitung": "Zusätzlich stellt der Verantwortliche zum Zeitpunkt der Erhebung folgende weitere Informationen zur Verfügung, die notwendig sind, um eine faire und transparente Verarbeitung zu gewährleisten:",
+    "abs2": [
+      {"lit": "a", "text": "die Dauer, für die die personenbezogenen Daten gespeichert werden oder, falls dies nicht möglich ist, die Kriterien für die Festlegung dieser Dauer", "pflicht": "immer"},
+      {"lit": "b", "text": "das Bestehen eines Rechts auf Auskunft seitens des Verantwortlichen über die betreffenden personenbezogenen Daten sowie auf Berichtigung oder Löschung oder auf Einschränkung der Verarbeitung oder eines Widerspruchsrechts gegen die Verarbeitung sowie des Rechts auf Datenübertragbarkeit", "pflicht": "immer (Widerspruch/Datenübertragbarkeit, soweit nach der Rechtsgrundlage einschlägig)"},
+      {"lit": "c", "text": "wenn die Verarbeitung auf Artikel 6 Absatz 1 Buchstabe a oder Artikel 9 Absatz 2 Buchstabe a beruht, das Bestehen eines Rechts, die Einwilligung jederzeit zu widerrufen, ohne dass die Rechtmäßigkeit der aufgrund der Einwilligung bis zum Widerruf erfolgten Verarbeitung berührt wird", "pflicht": "nur falls zutreffend (bei Einwilligung)"},
+      {"lit": "d", "text": "das Bestehen eines Beschwerderechts bei einer Aufsichtsbehörde", "pflicht": "immer"},
+      {"lit": "e", "text": "ob die Bereitstellung der personenbezogenen Daten gesetzlich oder vertraglich vorgeschrieben oder für einen Vertragsabschluss erforderlich ist, ob die betroffene Person verpflichtet ist, die personenbezogenen Daten bereitzustellen, und welche mögliche Folgen die Nichtbereitstellung hätte", "pflicht": "immer"},
+      {"lit": "f", "text": "das Bestehen einer automatisierten Entscheidungsfindung einschließlich Profiling gemäß Artikel 22 Absätze 1 und 4 und – zumindest in diesen Fällen – aussagekräftige Informationen über die involvierte Logik sowie die Tragweite und die angestrebten Auswirkungen einer derartigen Verarbeitung für die betroffene Person", "pflicht": "nur falls zutreffend (bei automatisierter Entscheidungsfindung)"}
+    ],
+    "abs3": {"text": "Beabsichtigt der Verantwortliche, die personenbezogenen Daten für einen anderen Zweck weiterzuverarbeiten als den, für den sie erhoben wurden, so stellt er der betroffenen Person vor dieser Weiterverarbeitung Informationen über diesen anderen Zweck und alle anderen maßgeblichen Informationen gemäß Absatz 2 zur Verfügung.", "pflicht": "nur falls zutreffend (Zweckänderung)"},
+    "abs4": {"text": "Die Absätze 1, 2 und 3 finden keine Anwendung, wenn und soweit die betroffene Person bereits über die Informationen verfügt.", "pflicht": "Ausnahme"},
+    "hinweis_unsicher": "Die Einstufung 'immer' bei Abs. 2 lit. a, b, d, e folgt der herrschenden Praxis (Abs. 2 ist trotz der Formulierung 'notwendig ... für faire und transparente Verarbeitung' als Pflichtinformation zu verstehen; DSK KP 10 unterscheidet nur 'mitzuteilen' (Abs. 1) und 'zur Verfügung zu stellen' (Abs. 2))."
+  },
+
+  "avv": {
+    "quelle": [
+      "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679",
+      "https://www.datenschutzkonferenz-online.de/media/kp/dsk_kpnr_13.pdf"
+    ],
+    "angaben": {
+      "_norm": "Art. 28 Abs. 3 Satz 1 DSGVO: Die Verarbeitung durch einen Auftragsverarbeiter erfolgt auf der Grundlage eines Vertrags oder eines anderen Rechtsinstruments, der bzw. das den Auftragsverarbeiter in Bezug auf den Verantwortlichen bindet und in dem Folgendes festgelegt sind:",
+      "liste": [
+        {"id": "gegenstand", "text": "Gegenstand der Verarbeitung"},
+        {"id": "dauer", "text": "Dauer der Verarbeitung"},
+        {"id": "art", "text": "Art der Verarbeitung"},
+        {"id": "zweck", "text": "Zweck der Verarbeitung"},
+        {"id": "datenarten", "text": "Art der personenbezogenen Daten"},
+        {"id": "betroffene", "text": "Kategorien betroffener Personen"},
+        {"id": "pflichten_rechte", "text": "Pflichten und Rechte des Verantwortlichen"}
+      ],
+      "form": "Schriftlich; dies kann auch in einem elektronischen Format erfolgen (Art. 28 Abs. 9 DSGVO)."
+    },
+    "klauseln": [
+      {"lit": "a", "norm_nah": "Der Auftragsverarbeiter verarbeitet die personenbezogenen Daten nur auf dokumentierte Weisung des Verantwortlichen – auch in Bezug auf die Übermittlung an ein Drittland oder eine internationale Organisation –, sofern er nicht durch das Unionsrecht oder das Recht der Mitgliedstaaten, dem er unterliegt, hierzu verpflichtet ist; in einem solchen Fall teilt er dem Verantwortlichen diese rechtlichen Anforderungen vor der Verarbeitung mit, sofern das betreffende Recht eine solche Mitteilung nicht wegen eines wichtigen öffentlichen Interesses verbietet.", "klausel": "Der Auftragnehmer verarbeitet die personenbezogenen Daten ausschließlich auf dokumentierte Weisung des Auftraggebers, auch hinsichtlich Übermittlungen in Drittländer. Ist er gesetzlich zu einer anderen Verarbeitung verpflichtet, teilt er dies dem Auftraggeber vorab mit, soweit das Gesetz dies nicht verbietet. Hält der Auftragnehmer eine Weisung für rechtswidrig, informiert er den Auftraggeber unverzüglich (Art. 28 Abs. 3 UAbs. 2 DSGVO)."},
+      {"lit": "b", "norm_nah": "Der Auftragsverarbeiter gewährleistet, dass sich die zur Verarbeitung der personenbezogenen Daten befugten Personen zur Vertraulichkeit verpflichtet haben oder einer angemessenen gesetzlichen Verschwiegenheitspflicht unterliegen.", "klausel": "Der Auftragnehmer stellt sicher, dass alle mit der Verarbeitung befassten Personen zur Vertraulichkeit verpflichtet sind oder einer angemessenen gesetzlichen Verschwiegenheitspflicht unterliegen."},
+      {"lit": "c", "norm_nah": "Der Auftragsverarbeiter ergreift alle gemäß Artikel 32 erforderlichen Maßnahmen.", "klausel": "Der Auftragnehmer trifft alle nach Art. 32 DSGVO erforderlichen technischen und organisatorischen Maßnahmen; diese sind in Anlage {nr} beschrieben."},
+      {"lit": "d", "norm_nah": "Der Auftragsverarbeiter hält die in Artikel 28 Absätze 2 und 4 genannten Bedingungen für die Inanspruchnahme der Dienste eines weiteren Auftragsverarbeiters ein.", "klausel": "Der Auftragnehmer setzt weitere Auftragsverarbeiter (Unterauftragsverarbeiter) nur mit vorheriger gesonderter oder allgemeiner schriftlicher Genehmigung des Auftraggebers ein; bei allgemeiner Genehmigung informiert er über beabsichtigte Änderungen, sodass der Auftraggeber Einspruch erheben kann. Er erlegt Unterauftragsverarbeitern vertraglich dieselben Datenschutzpflichten auf und haftet für deren Einhaltung."},
+      {"lit": "e", "norm_nah": "Der Auftragsverarbeiter unterstützt angesichts der Art der Verarbeitung den Verantwortlichen nach Möglichkeit mit geeigneten technischen und organisatorischen Maßnahmen dabei, seiner Pflicht zur Beantwortung von Anträgen auf Wahrnehmung der in Kapitel III genannten Rechte der betroffenen Person nachzukommen.", "klausel": "Der Auftragnehmer unterstützt den Auftraggeber nach Möglichkeit mit geeigneten technischen und organisatorischen Maßnahmen bei der Beantwortung von Anträgen betroffener Personen (Art. 12–22 DSGVO) und leitet an ihn gerichtete Anträge unverzüglich weiter."},
+      {"lit": "f", "norm_nah": "Der Auftragsverarbeiter unterstützt unter Berücksichtigung der Art der Verarbeitung und der ihm zur Verfügung stehenden Informationen den Verantwortlichen bei der Einhaltung der in den Artikeln 32 bis 36 genannten Pflichten.", "klausel": "Der Auftragnehmer unterstützt den Auftraggeber bei der Einhaltung der Pflichten aus Art. 32 bis 36 DSGVO (Sicherheit, Meldung und Benachrichtigung bei Datenschutzverletzungen, Datenschutz-Folgenabschätzung, vorherige Konsultation). Datenschutzverletzungen meldet er dem Auftraggeber unverzüglich (Art. 33 Abs. 2 DSGVO)."},
+      {"lit": "g", "norm_nah": "Der Auftragsverarbeiter löscht nach Abschluss der Erbringung der Verarbeitungsleistungen alle personenbezogenen Daten nach Wahl des Verantwortlichen entweder oder gibt sie zurück und löscht die vorhandenen Kopien, sofern nicht nach dem Unionsrecht oder dem Recht der Mitgliedstaaten eine Verpflichtung zur Speicherung der personenbezogenen Daten besteht.", "klausel": "Nach Beendigung des Auftrags löscht der Auftragnehmer nach Wahl des Auftraggebers sämtliche personenbezogenen Daten oder gibt sie zurück und löscht vorhandene Kopien, soweit keine gesetzliche Speicherpflicht besteht. Die Löschung ist auf Verlangen zu bestätigen."},
+      {"lit": "h", "norm_nah": "Der Auftragsverarbeiter stellt dem Verantwortlichen alle erforderlichen Informationen zum Nachweis der Einhaltung der in diesem Artikel niedergelegten Pflichten zur Verfügung und ermöglicht Überprüfungen – einschließlich Inspektionen –, die vom Verantwortlichen oder einem anderen von diesem beauftragten Prüfer durchgeführt werden, und trägt dazu bei.", "klausel": "Der Auftragnehmer stellt dem Auftraggeber alle zum Nachweis der Einhaltung dieser Pflichten erforderlichen Informationen zur Verfügung und ermöglicht und unterstützt Überprüfungen einschließlich Inspektionen durch den Auftraggeber oder einen von ihm beauftragten Prüfer."}
+    ],
+    "standardvertragsklauseln": {
+      "nutzbar": true,
+      "rechtsakt": "Durchführungsbeschluss (EU) 2021/915 der Kommission vom 4. Juni 2021 über Standardvertragsklauseln zwischen Verantwortlichen und Auftragsverarbeitern gemäß Art. 28 Abs. 7 DSGVO und Art. 29 Abs. 7 VO (EU) 2018/1725",
+      "aussage": "Nach Art. 1 des Beschlusses erfüllen die Standardvertragsklauseln die Anforderungen an Verträge nach Art. 28 Abs. 3 und 4 DSGVO. Sie dürfen nicht geändert werden, außer zur Ergänzung/Aktualisierung der Anhänge (Klausel 2 lit. a); sie dürfen in einen umfassenderen Vertrag aufgenommen und um weitere, nicht widersprechende Klauseln ergänzt werden (Klausel 2 lit. b); bei Widerspruch haben sie Vorrang (Klausel 4). Anhänge: I Liste der Parteien, II Beschreibung der Verarbeitung, III technische und organisatorische Maßnahmen (konkret, keine allgemeine Beschreibung), IV Liste der Unterauftragsverarbeiter. Sie sind KEIN Instrument für Drittlandübermittlungen nach Kapitel V DSGVO (Klausel 1 lit. f, ErwG 10) – dafür gelten die gesonderten SCC nach Durchführungsbeschluss (EU) 2021/914.",
+      "quelle": [
+        "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32021D0915",
+        "https://www.datenschutzkonferenz-online.de/media/kp/dsk_kpnr_13.pdf"
+      ],
+      "hinweis_praxis": "Steuerberater gelten nach DSK Kurzpapier Nr. 13 (Anhang B) und BayLDA in der Regel nicht als Auftragsverarbeiter, sondern als eigenständige Verantwortliche – kein AV-Vertrag nötig. Hosting, Cloud, externe Datensicherung und Fernwartung mit Datenzugriff sind dagegen Auftragsverarbeitung."
+    }
+  },
+
+  "datenpanne": {
+    "quelle": [
+      "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679",
+      "https://www.edpb.europa.eu/system/files/2024-10/edpb_guidelines_202209_personal_data_breach_notification_v2.0_de_0.pdf",
+      "https://www.edpb.europa.eu/node/2613_de"
+    ],
+    "fristen_pflichten": {
+      "art33_abs1": "Meldung an die zuständige Aufsichtsbehörde unverzüglich und möglichst binnen 72 Stunden, nachdem die Verletzung bekannt wurde, es sei denn, die Verletzung führt voraussichtlich nicht zu einem Risiko für die Rechte und Freiheiten natürlicher Personen. Bei späterer Meldung ist eine Begründung für die Verzögerung beizufügen.",
+      "art33_abs2": "Der Auftragsverarbeiter meldet dem Verantwortlichen eine Verletzung unverzüglich, nachdem sie ihm bekannt wurde.",
+      "art33_abs4": "Können die Informationen nicht zur gleichen Zeit bereitgestellt werden, können sie ohne unangemessene weitere Verzögerung schrittweise zur Verfügung gestellt werden.",
+      "art33_abs5": "Der Verantwortliche dokumentiert Verletzungen einschließlich aller damit zusammenhängenden Fakten, ihrer Auswirkungen und der ergriffenen Abhilfemaßnahmen – auch wenn keine Meldung erforderlich ist.",
+      "art34": "Hat die Verletzung voraussichtlich ein hohes Risiko für die persönlichen Rechte und Freiheiten zur Folge, sind die betroffenen Personen unverzüglich in klarer und einfacher Sprache zu benachrichtigen (mindestens Angaben nach Art. 33 Abs. 3 lit. b, c und d). Ausnahmen nach Art. 34 Abs. 3: wirksame Schutzvorkehrungen (z. B. Verschlüsselung), nachträgliche Maßnahmen, die das hohe Risiko beseitigen, oder unverhältnismäßiger Aufwand (dann öffentliche Bekanntmachung)."
+    },
+    "mindestangaben": [
+      {"lit": "a", "text": "eine Beschreibung der Art der Verletzung des Schutzes personenbezogener Daten, soweit möglich mit Angabe der Kategorien und der ungefähren Zahl der betroffenen Personen, der betroffenen Kategorien und der ungefähren Zahl der betroffenen personenbezogenen Datensätze"},
+      {"lit": "b", "text": "den Namen und die Kontaktdaten des Datenschutzbeauftragten oder einer sonstigen Anlaufstelle für weitere Informationen"},
+      {"lit": "c", "text": "eine Beschreibung der wahrscheinlichen Folgen der Verletzung des Schutzes personenbezogener Daten"},
+      {"lit": "d", "text": "eine Beschreibung der von dem Verantwortlichen ergriffenen oder vorgeschlagenen Maßnahmen zur Behebung der Verletzung des Schutzes personenbezogener Daten und gegebenenfalls Maßnahmen zur Abmilderung ihrer möglichen nachteiligen Auswirkungen"}
+    ],
+    "arten": [
+      {"art": "Ransomware-/Schadsoftware-Angriff (Verschlüsselung, ggf. Abfluss von Daten)", "quelle": "EDSA Leitlinien 01/2021, Kap. 2"},
+      {"art": "Datenabfluss durch Hackerangriff (z. B. auf Website, Online-Shop, Server)", "quelle": "EDSA Leitlinien 01/2021, Kap. 3"},
+      {"art": "Unbefugter Zugriff oder Datenmitnahme durch (ehemalige) Beschäftigte", "quelle": "EDSA Leitlinien 01/2021, Kap. 4 (internes menschliches Risiko)"},
+      {"art": "Verlust oder Diebstahl von Laptop, Smartphone, USB-Stick oder Papierunterlagen", "quelle": "EDSA Leitlinien 01/2021, Kap. 5"},
+      {"art": "Fehlversand (Brief oder E-Mail an falschen Empfänger, offener E-Mail-Verteiler statt BCC)", "quelle": "EDSA Leitlinien 01/2021, Kap. 6"},
+      {"art": "Social Engineering / Phishing (z. B. kompromittiertes E-Mail-Konto, Identitätsdiebstahl)", "quelle": "EDSA Leitlinien 01/2021, Kap. 7"},
+      {"art": "Unsachgemäße Entsorgung von Akten oder Datenträgern", "quelle": "Art. 4 Nr. 12 DSGVO", "unsicher": true},
+      {"art": "Datenverlust ohne Sicherung (z. B. Hardwaredefekt, versehentliches Löschen) – Verletzung der Verfügbarkeit", "quelle": "EDSA Leitlinien 9/2022 (Vertraulichkeits-, Integritäts- und Verfügbarkeitsverletzung)"},
+      {"art": "Falsch konfigurierte Freigaben (z. B. öffentlich abrufbarer Cloud-Ordner)", "quelle": "Art. 4 Nr. 12 DSGVO", "unsicher": true}
+    ],
+    "sofortmassnahmen": [
+      {"massnahme": "Vorfall intern melden und Zeitpunkt der Kenntnisnahme festhalten (Beginn der 72-Stunden-Frist)", "quelle": "Art. 33 Abs. 1 DSGVO"},
+      {"massnahme": "Betroffene Geräte vom Netz trennen (nicht ausschalten, wenn Spurensicherung nötig), bei Ransomware keine Lösegeldzahlung ohne Beratung", "quelle": "EDSA Leitlinien 01/2021 (Ransomware-Fälle)", "unsicher": true},
+      {"massnahme": "Kompromittierte Passwörter sofort ändern, Konten sperren, Zwei-Faktor-Authentisierung aktivieren", "quelle": "EDSA Leitlinien 01/2021 (Phishing/Social Engineering)", "unsicher": true},
+      {"massnahme": "Verlorene/gestohlene Geräte per Fernzugriff sperren oder löschen; Diebstahl bei der Polizei anzeigen", "quelle": "EDSA Leitlinien 01/2021, Kap. 5", "unsicher": true},
+      {"massnahme": "Bei Fehlversand: Empfänger zur Löschung auffordern und Löschung bestätigen lassen; ggf. Rückruf der E-Mail", "quelle": "EDSA Leitlinien 01/2021, Kap. 6"},
+      {"massnahme": "IT-Dienstleister bzw. Auftragsverarbeiter einbinden; Ursache ermitteln und Lücke schließen", "quelle": "Art. 33 Abs. 3 lit. d DSGVO"},
+      {"massnahme": "Daten aus Datensicherung wiederherstellen, nachdem die Systeme bereinigt sind", "quelle": "Art. 32 Abs. 1 lit. c DSGVO"},
+      {"massnahme": "Risiko für Betroffene bewerten und über Meldung an die Aufsichtsbehörde (72 h) bzw. Benachrichtigung der Betroffenen (hohes Risiko) entscheiden", "quelle": "Art. 33, 34 DSGVO; EDSA Leitlinien 9/2022"},
+      {"massnahme": "Vorfall, Auswirkungen und Maßnahmen dokumentieren – auch wenn keine Meldepflicht besteht", "quelle": "Art. 33 Abs. 5 DSGVO"}
+    ],
+    "meldewege": "Die meisten Aufsichtsbehörden bieten Online-Meldeformulare an, z. B. BayLDA: https://www.lda.bayern.de/de/datenpanne.html"
+  },
+
+  "impressum": {
+    "pflichtangaben": {
+      "norm": "§ 5 Abs. 1 DDG (Digitale-Dienste-Gesetz, seit 14.05.2024; ersetzt § 5 TMG)",
+      "quelle": "https://www.gesetze-im-internet.de/ddg/__5.html",
+      "anwendungsbereich": "Diensteanbieter haben für geschäftsmäßige, in der Regel gegen Entgelt angebotene digitale Dienste folgende Informationen leicht erkennbar, unmittelbar erreichbar und ständig verfügbar zu halten:",
+      "liste": [
+        {"nr": "1", "text": "den Namen und die Anschrift, unter der sie niedergelassen sind, bei juristischen Personen zusätzlich die Rechtsform, den Vertretungsberechtigten und, sofern Angaben über das Kapital der Gesellschaft gemacht werden, das Stamm- oder Grundkapital sowie, wenn nicht alle in Geld zu leistenden Einlagen eingezahlt sind, den Gesamtbetrag der ausstehenden Einlagen", "pflicht": "immer (Kapitalangaben nur falls Kapital genannt wird)"},
+        {"nr": "2", "text": "Angaben, die eine schnelle elektronische Kontaktaufnahme und unmittelbare Kommunikation mit ihnen ermöglichen, einschließlich der Adresse der elektronischen Post", "pflicht": "immer"},
+        {"nr": "3", "text": "soweit der Dienst im Rahmen einer Tätigkeit angeboten oder erbracht wird, die der behördlichen Zulassung bedarf, Angaben zur zuständigen Aufsichtsbehörde", "pflicht": "nur falls zutreffend (zulassungspflichtige Tätigkeit)"},
+        {"nr": "4", "text": "das Handelsregister, Vereinsregister, Partnerschaftsregister oder Genossenschaftsregister, in das sie eingetragen sind, und die entsprechende Registernummer", "pflicht": "nur falls zutreffend (Registereintragung)"},
+        {"nr": "5", "text": "soweit der Dienst in Ausübung eines reglementierten Berufs im Sinne von Art. 3 Abs. 1 lit. a der Richtlinie 2005/36/EG angeboten oder erbracht wird, Angaben über a) die Kammer, welcher die Diensteanbieter angehören, b) die gesetzliche Berufsbezeichnung und den Staat, in dem die Berufsbezeichnung verliehen worden ist, c) die Bezeichnung der berufsrechtlichen Regelungen und dazu, wie diese zugänglich sind", "pflicht": "nur falls zutreffend (z. B. zulassungspflichtiges Handwerk mit Meisterpflicht, Architekten, Steuerberater)"},
+        {"nr": "6", "text": "in Fällen, in denen sie eine Umsatzsteuer-Identifikationsnummer nach § 27a des Umsatzsteuergesetzes oder eine Wirtschafts-Identifikationsnummer nach § 139c der Abgabenordnung besitzen, die Angabe dieser Nummer", "pflicht": "nur falls vorhanden (Steuernummer gehört NICHT ins Impressum)"},
+        {"nr": "7", "text": "bei Aktiengesellschaften, Kommanditgesellschaften auf Aktien und Gesellschaften mit beschränkter Haftung, die sich in Abwicklung oder Liquidation befinden, die Angabe hierüber", "pflicht": "nur falls zutreffend"}
+      ],
+      "abs2": "Weitergehende Informationspflichten nach anderen Rechtsvorschriften bleiben unberührt.",
+      "ergaenzend_mstv": {"text": "Bei journalistisch-redaktionell gestalteten Angeboten (z. B. Blog mit Nachrichten) zusätzlich ein Verantwortlicher mit Namen und Anschrift nach § 18 Abs. 2 Medienstaatsvertrag.", "unsicher": true},
+      "hinweis_unsicher": "Wortlaut aus Fachkenntnis wiedergegeben; gesetze-im-internet.de war in dieser Umgebung nicht abrufbar – vor Verwendung abgleichen. Die Wirtschafts-ID wird seit November 2024 schrittweise vergeben."
+    },
+    "os_plattform": {
+      "noch_noetig": false,
+      "ergebnis": "Nein. Die Verordnung (EU) 2024/3228 hebt die ODR-Verordnung (EU) Nr. 524/2013 mit Wirkung zum 20.07.2025 auf; damit ist auch die Linkpflicht aus Art. 14 VO 524/2013 entfallen. Die Einreichung von Beschwerden war bereits seit 20.03.2025 eingestellt. Im Oktober 2026 ist kein Hinweis auf die OS-Plattform mehr erforderlich; IHKs empfehlen, bestehende Hinweise/Links zu entfernen, da ein Verweis auf eine nicht mehr existierende Plattform als irreführend gewertet werden könnte.",
+      "quelle": [
+        "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32024R3228",
+        "https://www.ihk.de/schwaben/produktmarken/recht-und-steuern/onlinerecht/neue-informationspflichten-fuer-online-haendler-3067566",
+        "https://www.ihk.de/bayreuth/hauptnavigation/service/recht/allgemeine-rechtsthemen/anpassung-des-internet-impressums-erforderlich--6512524"
+      ],
+      "hinweis_unsicher": "Abmahnrisiko eines veralteten Links ist eine Einschätzung der IHK/Fachpresse, nicht gerichtlich geklärt."
+    },
+    "vsbg": {
+      "norm": "§ 36 VSBG (Allgemeine Informationspflicht)",
+      "quelle": [
+        "https://www.gesetze-im-internet.de/vsbg/__36.html",
+        "https://www.ihk.de/schwaben/produktmarken/recht-und-steuern/onlinerecht/neue-informationspflichten-fuer-online-haendler-3067566"
+      ],
+      "wortlaut_nah": [
+        "Abs. 1: Ein Unternehmer, der eine Webseite unterhält oder Allgemeine Geschäftsbedingungen verwendet, hat den Verbraucher leicht zugänglich, klar und verständlich 1. in Kenntnis zu setzen davon, inwieweit er bereit ist oder verpflichtet ist, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen, und 2. auf die zuständige Verbraucherschlichtungsstelle hinzuweisen, wenn sich der Unternehmer zur Teilnahme verpflichtet hat oder wenn er auf Grund von Rechtsvorschriften zur Teilnahme verpflichtet ist; der Hinweis muss Angaben zu Anschrift und Webseite der Verbraucherschlichtungsstelle sowie eine Erklärung des Unternehmers enthalten, an einem Streitbeilegungsverfahren vor dieser Stelle teilzunehmen.",
+        "Abs. 2: Die Informationen müssen auf der Webseite erscheinen, wenn der Unternehmer eine Webseite unterhält, und zusammen mit den AGB gegeben werden, wenn er AGB verwendet.",
+        "Abs. 3: Von der Informationspflicht nach Abs. 1 Nr. 1 ausgenommen ist ein Unternehmer, der am 31. Dezember des vorangegangenen Jahres zehn oder weniger Personen beschäftigt hat."
+      ],
+      "regel_fuer_app": "Pflicht zur Angabe der Teilnahmebereitschaft (Abs. 1 Nr. 1) erst ab mehr als 10 Beschäftigten (Stichtag 31.12. des Vorjahres). Unabhängig von der Betriebsgröße gilt: Wer sich freiwillig zur Teilnahme verpflichtet hat oder gesetzlich verpflichtet ist, muss die zuständige Schlichtungsstelle nennen (Abs. 1 Nr. 2). Die Pflicht trifft nur Unternehmer gegenüber Verbrauchern (B2C). Freiwillige Angabe für kleine Betriebe zulässig.",
+      "mustertext": {
+        "text": "Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.",
+        "quelle": "Formulierungsbeispiel sinngemäß nach onlinemarktplatz.de/IHK; abgeleitet aus § 36 Abs. 1 Nr. 1 VSBG",
+        "unsicher": true
+      },
+      "ergaenzend_37": {"text": "§ 37 VSBG: Nach Entstehen einer Streitigkeit, die nicht beigelegt werden konnte, muss der Unternehmer den Verbraucher in Textform auf eine zuständige Verbraucherschlichtungsstelle hinweisen und angeben, ob er teilnimmt – diese Pflicht gilt unabhängig von der Beschäftigtenzahl.", "quelle": "https://www.gesetze-im-internet.de/vsbg/__37.html", "unsicher": true},
+      "hinweis_unsicher": "Die überarbeitete ADR-Richtlinie der EU kann künftig Änderungen am VSBG auslösen; zum Stand 12.10.2026 nicht verifiziert."
+    }
+  }
+}

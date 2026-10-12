@@ -328,3 +328,39 @@ export function UhrzeitFeld({ label, wert, aendern, hilfe }: { label: string; we
   const falsch = wert.trim() !== "" && !/^([01]?\d|2[0-3]):[0-5]\d$/.test(wert.trim());
   return <Feld label={label} hilfe={hilfe} wert={wert} aendern={aendern} placeholder="HH:MM" keyboardType="numbers-and-punctuation" fehler={falsch ? TEXT.uhrzeit_falsch : null} />;
 }
+
+/** Textbausteine zum Ankreuzen – untereinander, mit Quelle (Checkbox-Semantik). */
+export function BausteinListe({ label, hilfe, werte, aendern, optionen }: { label: string; hilfe?: string; werte: string[]; aendern: (w: string[]) => void; optionen: { wert: string; text: string; quelle?: string }[] }) {
+  const f = useFarben();
+  return (
+    <View style={{ marginTop: 14 }}>
+      <T v="klein" fett>{label}</T>
+      {hilfe ? <T v="caption" leise stil={{ marginTop: 2 }}>{hilfe}</T> : null}
+      <View accessibilityLabel={label} style={{ marginTop: 6, borderWidth: 1.5, borderColor: f.linie, borderRadius: RADIUS.klein, overflow: "hidden" }}>
+        {optionen.map((o, i) => {
+          const an = werte.includes(o.wert);
+          return (
+            <Pressable
+              key={o.wert}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: an }}
+              aria-checked={an}
+              accessibilityLabel={o.text}
+              onPress={() => {
+                if (istIos) void Haptics.selectionAsync();
+                aendern(an ? werte.filter((x) => x !== o.wert) : [...werte, o.wert]);
+              }}
+              style={({ pressed }) => ({ flexDirection: "row", gap: 10, paddingHorizontal: 12, paddingVertical: 10, borderTopWidth: i ? 1 : 0, borderColor: f.linieLeise, backgroundColor: an ? f.amtHauch : pressed ? f.papier : f.blatt })}
+            >
+              <Symbol name={an ? "checkmark.square.fill" : "square"} groesse={18} farbe={an ? f.amt : f.tinteLeise} />
+              <View style={{ flex: 1 }}>
+                <T v="klein">{o.text}</T>
+                {o.quelle ? <T v="caption" leise stil={{ marginTop: 2 }}>{o.quelle}</T> : null}
+              </View>
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
+  );
+}

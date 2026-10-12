@@ -63,6 +63,7 @@ try {
   await feld("Inhaber/in oder verantwortliche Person").fill("Alex Muster");
   await feld("Straße und Hausnummer").fill("Hauptstraße 1");
   await feld("Steuernummer").fill("12/345/67890");
+  await tippe(p.getByRole("radio", { name: "Bayern" }).locator("visible=true").last());
   await foto("betrieb");
   await knopf("Zurück").click();
   await warte(800);
@@ -80,17 +81,29 @@ try {
   await warte(800);
   pruefe((await feld("Beurteilt von").inputValue()) === "Alex Muster", "„Beurteilt von“ nicht aus dem Betrieb vorausgefüllt");
   pruefe(await sichtbar("Fehlt noch"), "„Fehlt noch“ fehlt bei leerer Unterlage");
-  await feld("Arbeitsbereich oder Gewerk").fill("Salon");
-  await feld("Gefährdung").fill("Rutschgefahr durch nassen Boden");
-  await feld("Maßnahme").fill("Boden nach jedem Kunden fegen");
-  await p.getByRole("radio", { name: "hoch" }).locator("visible=true").last().click();
+  // Arbeitsbereich per Vorschlag-Chip, Gefährdungen aus den Vorschlägen der Branche übernehmen
+  await tippe(p.getByRole("button", { name: "Übernehmen: Salon" }).locator("visible=true").last());
+  pruefe((await feld("Arbeitsbereich oder Gewerk").inputValue()) === "Salon", "Vorschlag-Chip setzt den Text nicht");
+  await tippe(p.getByRole("button", { name: /^Aus \d+ Vorschlägen wählen/ }).locator("visible=true").last());
+  await warte(800);
+  await p.getByRole("radio", { name: "Friseur" }).locator("visible=true").last().click();
+  await warte();
+  const vorschlaege = p.getByRole("checkbox").locator("visible=true");
+  await tippe(vorschlaege.nth(0));
+  await tippe(vorschlaege.nth(1));
+  await foto("vorschlaege");
+  await tippe(knopf("2 Einträge übernehmen"));
+  await warte(900);
+  pruefe(await sichtbar("Ausrutschen, Stolpern und Stürzen"), "Vorschlag nicht als Gefährdung übernommen");
+  // Mutterschutz-Ergebnis (Auswahl nach § 10 MuSchG)
+  await tippe(p.getByRole("radio", { name: /keine Schutzmaßnahmen erforderlich/ }).locator("visible=true").last());
   await warte();
   await foto("formular");
   pruefe(await sichtbar("Alle Pflichtangaben ausgefüllt"), "Unterlage trotz aller Angaben nicht vollständig");
-  // zweite Gefährdung: hinzufügen klappt sie auf, Entfernen nimmt sie wieder weg
-  await tippe(knopf("Gefährdung hinzufügen"));
+  // eigener Eintrag: hinzufügen klappt ihn auf, Entfernen nimmt ihn wieder weg
+  await tippe(knopf("Eigene Gefährdung hinzufügen"));
   await warte();
-  pruefe(await sichtbar("Gefährdung 2 (noch leer)"), "neuer Eintrag nicht aufgeklappt");
+  pruefe(await sichtbar("Gefährdung 3 (noch leer)"), "neuer Eintrag nicht aufgeklappt");
   await tippe(knopf("Entfernen"));
   await warte();
   pruefe(await sichtbar("Alle Pflichtangaben ausgefüllt"), "Entfernen des leeren Eintrags hat nicht geklappt");
@@ -99,7 +112,7 @@ try {
   const [fenster] = await Promise.all([ctx.waitForEvent("page"), knopf("PDF teilen").click()]);
   await fenster.waitForLoadState();
   const html = await fenster.content();
-  pruefe(html.includes("Salon Sonne") && html.includes("Rutschgefahr durch nassen Boden") && html.includes("noch nicht fachlich geprüft"), "PDF-Inhalt unvollständig");
+  pruefe(html.includes("Salon Sonne") && html.includes("Ausrutschen, Stolpern und Stürzen") && html.includes("§§ 5, 6 ArbSchG") && !html.includes("noch nicht fachlich"), "PDF-Inhalt unvollständig");
   await fenster.setViewportSize({ width: 794, height: 1123 });
   await fenster.screenshot({ path: `${OUT}/${String(++n).padStart(2, "0")}-${schema}-dokument.png` });
   await fenster.close();
@@ -114,7 +127,7 @@ try {
   // erneutes Tippen auf den aktiven Tab führt zur Startseite zurück
   await p.getByRole("tab", { name: "Unterlagen" }).click();
   await warte();
-  pruefe(await sichtbar("Rutschgefahr durch nassen Boden"), "Tab hat die offene Unterlage nicht behalten");
+  pruefe(await sichtbar("Ausrutschen, Stolpern und Stürzen"), "Tab hat die offene Unterlage nicht behalten");
   await p.getByRole("tab", { name: "Unterlagen" }).click();
   await warte(800);
   await feld("Unterlage suchen").fill("allergen");
@@ -142,7 +155,6 @@ try {
   await tippe(knopf("Jetzt ausfüllen"));
   await warte(800);
   await feld("Rechnungsnummer").fill("2026-001");
-  await feld("Datum oder Zeitraum der Leistung").fill("Oktober 2026");
   await feld("Name oder Firma").fill("Kim Beispiel");
   await feld("Anschrift").fill("Gartenweg 3, 12345 Musterstadt");
   await feld("Leistung oder Ware").fill("Haarschnitt");

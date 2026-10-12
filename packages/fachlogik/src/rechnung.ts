@@ -14,8 +14,11 @@ export type Einheit = "stueck" | "stunde" | "tag" | "monat" | "pauschal" | "kilo
 /** UN/ECE Recommendation 20 – technische Codes für die E-Rechnung */
 export const EINHEIT_CODE: Record<Einheit, string> = { stueck: "C62", stunde: "HUR", tag: "DAY", monat: "MON", pauschal: "LS", kilogramm: "KGM" };
 
-/** Hinweis für Kleinunternehmer auf Rechnungen (Server, API, App). */
-export const KU_HINWEIS = "Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.";
+/**
+ * Hinweis für Kleinunternehmer auf Rechnungen (Server, API, App). Seit 2025 sind die Umsätze steuerfrei; Wortlaut
+ * nach den Hinweisen des LfSt Bayern (Stand Januar 2026), E-123.
+ */
+export const KU_HINWEIS = "Der Umsatz ist nach § 19 Abs. 1 UStG steuerfrei.";
 
 export const rundeCent = (x: number) => Math.sign(x) * Math.round(Math.abs(x)); // kaufmännisch, symmetrisch
 

@@ -2,10 +2,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { BEREICHE, LEERER_BETRIEB, PRUEFHINWEIS, VORLAGEN, arbeitsminuten, aufbewahrenBis, berlinZuUtc, cent, dateiname, fehlendeAngaben, leereDaten, neuerEintrag, sichtbar, unterlagenName, vorlageFuer, type Betrieb, type Daten, type Feld } from "../src/index.js";
+import { BEREICHE, bausteinText, eintragAusVorschlag, mindestlohnAm, mindesturlaub, stundenlohn, LEERER_BETRIEB, PRUEFHINWEIS, VORLAGEN, dokumentHtml, arbeitsminuten, aufbewahrenBis, berlinZuUtc, cent, dateiname, fehlendeAngaben, leereDaten, neuerEintrag, sichtbar, unterlagenName, vorlageFuer, type Betrieb, type Daten, type Feld } from "../src/index.js";
 
 const KATALOG = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../catalog/pflichten");
-const BETRIEB: Betrieb = { name: "Salon Sonne", strasse: "Hauptstr. 1", plz: "12345", ort: "Musterstadt", verantwortlich: "Alex Muster", telefon: "0123 456", email: "info@example.de", steuernummer: "12/345/67890", ust_idnr: "", iban: "DE00 1234" };
+const BETRIEB: Betrieb = { name: "Salon Sonne", strasse: "Hauptstr. 1", plz: "12345", ort: "Musterstadt", verantwortlich: "Alex Muster", telefon: "0123 456", email: "info@example.de", steuernummer: "12/345/67890", ust_idnr: "", iban: "DE00 1234", bundesland: "Bayern" };
 
 function generatorPflichten(): string[] {
   return fs
@@ -64,11 +64,14 @@ describe("Dokumentvorlagen", () => {
     }
   });
 
-  it("erzeugen aus leeren und vollen Eingaben ein Dokument mit Prüfhinweis, Betrieb und maskierten Eingaben", () => {
+  it("erzeugen aus leeren und vollen Eingaben ein vorzeigbares Dokument: Briefkopf, Rechtsgrundlage, Fußzeilendaten, maskierte Eingaben, kein Prüfstempel", () => {
     for (const v of VORLAGEN) {
-      const leer = v.html(leereDaten(v, BETRIEB, "2026-10-12"), BETRIEB);
+      const leer = dokumentHtml(v, leereDaten(v, BETRIEB, "2026-10-12"), BETRIEB);
       expect(leer, v.id).toContain("<!doctype html>");
-      expect(leer).toContain(PRUEFHINWEIS);
+      expect(leer).not.toContain(PRUEFHINWEIS);
+      expect(leer).not.toContain("noch nicht angegeben");
+      expect(leer).toContain('name="amtlos-fuss-links" content="Salon Sonne');
+      if (v.grundlage) expect(leer, v.id).toContain(`<dt>Rechtsgrundlage</dt><dd>${v.grundlage.replace(/&/g, "&amp;")}</dd>`);
       expect(leer).toContain("Salon Sonne");
       expect(leer.includes("A4 landscape"), v.id).toBe(Boolean(v.querformat));
       const voll = v.html(alles(v.abschnitte.flatMap((a) => a.felder)), BETRIEB);
@@ -82,8 +85,8 @@ describe("Dokumentvorlagen", () => {
     const d = leereDaten(g, BETRIEB, "2026-10-12");
     expect(d.beurteilt_von).toBe("Alex Muster");
     expect(d.datum).toBe("2026-10-12");
-    expect(d.mutterschutz).toBe(false);
-    expect(Array.isArray(d.gefaehrdungen) && d.gefaehrdungen.length).toBe(1);
+    expect(d.gefaehrdungen).toEqual([]); // Start über Vorschläge
+    expect(Array.isArray(leereDaten(vorlageFuer("rechnung")!, BETRIEB, "2026-10-12").positionen) && (leereDaten(vorlageFuer("rechnung")!, BETRIEB, "2026-10-12").positionen as unknown[]).length).toBe(1);
     const liste = g.abschnitte[1]!.felder[0]!;
     expect(liste.art === "liste" && neuerEintrag(liste, BETRIEB, "2026-10-12").risiko).toBe("mittel");
     expect(vorlageFuer("datenpanne") && leereDaten(vorlageFuer("datenpanne")!, BETRIEB, "2026-10-12").kontakt).toBe("Alex Muster, 0123 456, info@example.de");
@@ -92,12 +95,11 @@ describe("Dokumentvorlagen", () => {
   it("nennt fehlende Pflichtangaben – auch in Listeneinträgen und nur für sichtbare Felder", () => {
     const g = vorlageFuer("gefaehrdungsbeurteilung")!;
     const d = leereDaten(g, BETRIEB, "2026-10-12");
-    expect(fehlendeAngaben(g, d)).toEqual(["Arbeitsbereich oder Gewerk", "mindestens ein Eintrag: Gefährdung"]);
+    expect(fehlendeAngaben(g, d)).toEqual(["Arbeitsbereich oder Gewerk", "mindestens ein Eintrag: Gefährdung", "Ergebnis für schwangere oder stillende Frauen"]);
     d.arbeitsbereich = "Küche";
     d.gefaehrdungen = [{ faktor: "arbeitsstaette", beschreibung: "Rutschgefahr", risiko: "mittel", massnahme: "", verantwortlich: "", umsetzen_bis: null, umgesetzt_am: null }];
-    expect(fehlendeAngaben(g, d)).toEqual(["Gefährdung: Maßnahme"]);
-    d.mutterschutz = true;
-    expect(fehlendeAngaben(g, d)).toEqual(["Gefährdung: Maßnahme"]);
+    d.mutterschutz_ergebnis = "keine_massnahmen";
+    expect(fehlendeAngaben(g, d)).toEqual(["Gefährdung: Schutzmaßnahmen"]);
 
     const p = vorlageFuer("datenpanne")!;
     const dp = leereDaten(p, BETRIEB, "2026-10-12");
@@ -149,11 +151,11 @@ describe("Dokumentvorlagen", () => {
     const r = vorlageFuer("rechnung")!;
     const d = { ...leereDaten(r, BETRIEB, "2026-10-12"), nummer: "2026-001", leistung: "Oktober 2026", kunde_name: "Kim", kunde_anschrift: "Weg 1",
       positionen: [{ bezeichnung: "Haarschnitt", menge: "2", einheit: "", preis: "25,00", satz: "19" }, { bezeichnung: "Buch", menge: "1", einheit: "", preis: "10", satz: "7" }] };
-    expect(erg(r, d)).toEqual([["Netto", "60,00 €"], ["Umsatzsteuer", "10,20 €"], ["Gesamt", "70,20 €"]]);
+    expect(erg(r, d)).toEqual([["Netto", "60,00 €"], ["Umsatzsteuer", "10,20 €"], ["Rechnungsbetrag", "70,20 €"]]);
     expect(fehlendeAngaben(r, d, BETRIEB)).toEqual([]);
     expect(fehlendeAngaben(r, d, { ...BETRIEB, steuernummer: "" })).toEqual(["Steuernummer oder USt-IdNr. (Mein Betrieb)"]);
     const ku = r.html({ ...d, kleinunternehmer: true }, BETRIEB);
-    expect(ku).toContain("§ 19 UStG");
+    expect(ku).toContain("Der Umsatz ist nach § 19 Abs. 1 UStG steuerfrei.");
     expect(n(ku)).toContain("60,00 €");
     expect(ku).not.toContain("Umsatzsteuer 19 %");
   });
@@ -183,10 +185,81 @@ describe("Dokumentvorlagen", () => {
   it("Impressum und Datenschutzerklärung als Text zum Einfügen", () => {
     const i = vorlageFuer("impressum")!;
     const t = i.alsText!({ rechtsform: "Einzelunternehmen", vertreten: "Alex Muster", register: "" }, BETRIEB);
-    expect(t).toContain("Impressum\n\nAngaben zum Anbieter\nSalon Sonne\nHauptstr. 1\n12345 Musterstadt");
+    expect(t).toContain("Impressum\n\nAngaben gemäß § 5 DDG\nSalon Sonne\nHauptstr. 1\n12345 Musterstadt\n\nInhaber/in\nAlex Muster");
     expect(t).toContain("E-Mail: info@example.de");
     expect(t).not.toContain("Registereintrag");
     expect(fehlendeAngaben(i, {}, LEERER_BETRIEB)).toContain("E-Mail (Mein Betrieb)");
-    expect(vorlageFuer("datenschutzerklaerung_website")!.alsText!({ hosting: "Anbieter X" }, BETRIEB)).toContain("Hosting\nAnbieter X");
+    const dse = vorlageFuer("datenschutzerklaerung_website")!.alsText!({ module: ["hosting"], hoster_name: "Anbieter X", hoster_anschrift: "Weg 1, Berlin" }, BETRIEB);
+    expect(dse).toContain("Diese Website wird bei Anbieter X, Weg 1, Berlin, gehostet.");
+    expect(dse).toContain("Bayerisches Landesamt für Datenschutzaufsicht");
+    expect(dse).not.toContain("{");
+    expect(vorlageFuer("datenschutzerklaerung_website")!.alsText!({ module: ["hosting"] }, BETRIEB)).toContain("[bitte ergänzen]");
+  });
+
+  it("prüft Mindestlohn und Mindesturlaub im Nachweis", () => {
+    expect(mindestlohnAm("2026-10-12")).toBe(1390);
+    expect(mindestlohnAm("2027-01-01")).toBe(1460);
+    expect(mindesturlaub(5)).toBe(20);
+    expect(mindesturlaub(3)).toBe(12);
+    expect(stundenlohn({ entgelt_art: "stunde", entgelt_betrag: "13,00" })).toBe(1300);
+    // 2.600 € bei 40 Stunden: 2600 · 3 / (13 · 40) = 15 €
+    expect(stundenlohn({ entgelt_art: "monat", entgelt_betrag: "2.600,00", wochenstunden: "40" })).toBe(1500);
+    const v = vorlageFuer("nachweis_arbeitsbedingungen")!;
+    const zuWenig = n(v.pruefen!({ beginn: "2026-10-12", entgelt_art: "stunde", entgelt_betrag: "12,00", urlaub: "18", tage_pro_woche: "5" }, BETRIEB));
+    expect(zuWenig).toEqual(["Entgelt liegt unter dem gesetzlichen Mindestlohn von 13,90 € je Stunde (rechnerisch 12,00 €)", "Urlaub liegt unter dem gesetzlichen Mindesturlaub von 20 Arbeitstagen"]);
+    expect(v.pruefen!({ beginn: "2026-10-12", entgelt_art: "stunde", entgelt_betrag: "14,00", urlaub: "20", tage_pro_woche: "5" }, BETRIEB)).toEqual([]);
+  });
+
+  it("warnt bei Minijob über der Grenze", () => {
+    const v = vorlageFuer("sv_meldedaten")!;
+    expect(n(v.pruefen!({ art: "minijob", beginn: "2026-10-12", entgelt: "650,00" }, BETRIEB))).toEqual(["Entgelt über der Minijob-Grenze von 603,00 € im Monat"]);
+    expect(v.pruefen!({ art: "minijob", beginn: "2026-10-12", entgelt: "600,00" }, BETRIEB)).toEqual([]);
+    expect(v.pruefen!({ art: "vollzeit", beginn: "2026-10-12", entgelt: "3.000,00" }, BETRIEB)).toEqual([]);
+  });
+
+  it("übernimmt Vorschläge als vollständige Listeneinträge", () => {
+    const g = vorlageFuer("gefaehrdungsbeurteilung")!;
+    const f = g.abschnitte.flatMap((a) => a.felder).find((x) => x.id === "gefaehrdungen");
+    if (f?.art !== "liste" || !f.vorschlaege?.length) throw new Error("Vorschläge fehlen");
+    const e = eintragAusVorschlag(f, f.vorschlaege[0]!, BETRIEB, "2026-10-12");
+    for (const feld of f.felder) expect(e).toHaveProperty(feld.id);
+    for (const [k, w] of Object.entries(f.vorschlaege[0]!.werte)) expect(e[k]).toBe(w);
+  });
+
+  it("blendet Felder mit „nicht“-Bedingung und Mehrfachauswahl richtig ein", () => {
+    const nicht = { id: "x", art: "text", label: "x", wenn: { feld: "a", nicht: true } } as Feld;
+    expect(sichtbar(nicht, { a: true })).toBe(false);
+    expect(sichtbar(nicht, { a: false })).toBe(true);
+    const ist = { id: "y", art: "text", label: "y", wenn: { feld: "m", ist: "hosting" } } as Feld;
+    expect(sichtbar(ist, { m: ["kontakt", "hosting"] })).toBe(true);
+    expect(sichtbar(ist, { m: ["kontakt"] })).toBe(false);
+  });
+
+  it("füllt Platzhalter in Bausteinen und markiert Fehlendes", () => {
+    const t = bausteinText("{firmenname}, {plz} {ort} – Logfiles {logfile_tage} Tage", {}, BETRIEB);
+    expect(t.startsWith("Salon Sonne, 12345 Musterstadt")).toBe(true);
+    expect(t).toContain("");
+    expect(bausteinText("{logfile_tage}", { logfile_tage: "14" }, BETRIEB)).toBe("14");
+  });
+
+  it("enthält im AVV alle acht Pflichten nach Art. 28 Abs. 3 lit. a–h", () => {
+    const html = dokumentHtml(vorlageFuer("avv")!, {}, BETRIEB);
+    for (const lit of ["a", "b", "c", "d", "e", "f", "g", "h"]) expect(html).toContain(`<strong>(${lit})</strong>`);
+    expect(html).not.toContain("{nr}");
+  });
+
+  it("verlangt berechtigte Interessen, sobald eine Verarbeitung auf lit. f beruht", () => {
+    const v = vorlageFuer("datenschutzinformation")!;
+    expect(v.pruefen!({ verarbeitungen: ["Rechnungsstellung und Buchhaltung"] }, BETRIEB).some((x) => x.includes("lit. f"))).toBe(false);
+    expect(v.pruefen!({ verarbeitungen: ["Betrieb der Website (Hosting, Server-Logfiles)"] }, BETRIEB)).toContain("Berechtigte Interessen (bei Art. 6 Abs. 1 lit. f DSGVO)");
+    expect(v.pruefen!({ verarbeitungen: ["Betrieb der Website (Hosting, Server-Logfiles)"], interessen: "sicherer Betrieb" }, BETRIEB)).toEqual([]);
+  });
+
+  it("verlangt bei 0 % Umsatzsteuer einen Hinweis auf die Befreiung", () => {
+    const v = vorlageFuer("rechnung")!;
+    const pos = [{ bezeichnung: "Leistung", menge: "1", einheit: "", preis: "100,00", satz: "0" }];
+    expect(v.pruefen!({ positionen: pos }, BETRIEB)).toContain("Hinweis auf die Steuerbefreiung (bei 0 %)");
+    expect(v.pruefen!({ positionen: pos, befreiung: "steuerfrei nach § 4 Nr. 14 UStG" }, BETRIEB)).toEqual([]);
+    expect(v.pruefen!({ positionen: pos }, { ...BETRIEB, steuernummer: "" })).toContain("Steuernummer oder USt-IdNr. (Mein Betrieb)");
   });
 });

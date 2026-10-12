@@ -1,5 +1,9 @@
-/** Arbeitsschutz: Gefährdungsbeurteilung, Unterweisung, Gefahrstoffverzeichnis, Betriebsanweisung. */
-import { abschnitt, absatz, angaben, datumDe, dokument, esc, ja, liste, tabelle, text, unterschriften, zelle } from "./html.js";
+/**
+ * Arbeitsschutz: Gefährdungsbeurteilung, Unterweisung, Gefahrstoffverzeichnis, Betriebsanweisung, Prüfprotokoll
+ * elektrische Geräte (E-121, E-123). Vorschläge und Bausteine aus der Recherche (bausteine.ts, Quellen dort).
+ */
+import { BA_BAUSTEINE, ELEKTRO_FRISTEN, GEFAEHRDUNGEN, GEFAHRSTOFF_ANGABEN, MUTTERSCHUTZ, UNTERWEISUNGSTHEMEN } from "./bausteine.js";
+import { abschnitt, absatz, angaben, auswahl, datumDe, dokument, esc, ja, liste, plusMonate, punkte, tabelle, text, unterschriften, zelle, zellePunkte, zeilen } from "./html.js";
 import { GEFAEHRDUNGSFAKTOREN, RISIKO_STUFEN, optionen } from "./konstanten.js";
 import type { Daten, Eintrag, Vorlage } from "./typen.js";
 
@@ -10,25 +14,31 @@ export function teilnahmeTabelle(eintraege: Eintrag[], extra?: { kopf: string; f
   return tabelle(kopf, zeilen, { breiten: extra ? ["38%", "22%", "40%"] : ["45%", "55%"], mindestens: 8, hoch: true });
 }
 
+const BEREICHE_VORSCHLAG = ["Salon", "Kosmetikkabine", "Küche", "Gastraum und Service", "Verkaufsraum", "Lager", "Werkstatt", "Baustelle beim Kunden", "Büro"];
+const WIRKSAM: Record<string, string> = { wirksam: "Die Maßnahmen sind umgesetzt und wirksam.", teilweise: "Die Maßnahmen sind teilweise wirksam; Nachbesserung siehe Bemerkung.", offen: "Die Wirksamkeit ist noch zu überprüfen." };
+
 export const gefaehrdungsbeurteilung: Vorlage = {
   id: "gefaehrdungsbeurteilung",
   titel: "Gefährdungsbeurteilung",
-  beschreibung: "Welche Gefahren es an einem Arbeitsplatz gibt, wie hoch das Risiko ist und was du dagegen tust – auch für Mutterschutz und je Gewerk.",
+  beschreibung: "Welche Gefahren es an einem Arbeitsplatz gibt, wie hoch das Risiko ist und was du dagegen tust – mit Vorschlägen je Branche, Mutterschutz und Wirksamkeitskontrolle.",
   bereich: "arbeitsschutz",
   pflichten: ["arbeitsschutz.gefaehrdungsbeurteilung", "personal.mutterschutz_gefaehrdungsbeurteilung", "branche.handwerk_gefaehrdung_gewerk"],
+  grundlage: "§§ 5, 6 ArbSchG; § 10 MuSchG",
   namensFeld: "arbeitsbereich",
   abschnitte: [
     {
       felder: [
-        { id: "arbeitsbereich", art: "text", label: "Arbeitsbereich oder Gewerk", hilfe: "z. B. Salon, Küche, Werkstatt, Baustelle – je Bereich eine eigene Beurteilung", pflicht: true },
-        { id: "taetigkeiten", art: "mehrzeilig", label: "Tätigkeiten in diesem Bereich" },
+        { id: "arbeitsbereich", art: "text", label: "Arbeitsbereich oder Gewerk", hilfe: "Je Bereich eine eigene Beurteilung; gleichartige Arbeitsplätze dürfen zusammen beurteilt werden.", pflicht: true, vorschlaege: BEREICHE_VORSCHLAG },
+        { id: "taetigkeiten", art: "mehrzeilig", label: "Tätigkeiten in diesem Bereich", hilfe: "z. B. Haare waschen, schneiden, färben" },
+        { id: "beschaeftigte", art: "zahl", label: "Beschäftigte in diesem Bereich" },
         { id: "beurteilt_von", art: "text", label: "Beurteilt von", vorbelegung: "verantwortlich", pflicht: true },
-        { id: "datum", art: "datum", label: "Datum", vorbelegung: "heute", pflicht: true },
+        { id: "mitwirkung", art: "mehrzeilig", label: "Mitgewirkt haben", vorschlaege: ["Fachkraft für Arbeitssicherheit", "Betriebsärztin / Betriebsarzt", "Beschäftigte des Bereichs"] },
+        { id: "datum", art: "datum", label: "Datum der Beurteilung", vorbelegung: "heute", pflicht: true },
       ],
     },
     {
       titel: "Gefährdungen und Maßnahmen",
-      hilfe: "Je Gefahr ein Eintrag: was passieren kann, wie wahrscheinlich und schwer, und was du dagegen tust.",
+      hilfe: "Wähle typische Gefährdungen deiner Branche aus und passe sie an. Maßnahmen in der Reihenfolge: technisch vor organisatorisch vor persönlich.",
       felder: [
         {
           id: "gefaehrdungen",
@@ -37,12 +47,15 @@ export const gefaehrdungsbeurteilung: Vorlage = {
           eintrag: "Gefährdung",
           titelFeld: "beschreibung",
           pflicht: true,
+          leerStarten: true,
+          vorschlaege: GEFAEHRDUNGEN,
+          gruppenLabel: "Branche",
           felder: [
-            { id: "beschreibung", art: "mehrzeilig", label: "Gefährdung", hilfe: "z. B. Rutschgefahr durch nassen Boden", pflicht: true },
-            { id: "massnahme", art: "mehrzeilig", label: "Maßnahme", hilfe: "z. B. rutschfeste Matten, Schuhe mit rutschhemmender Sohle", pflicht: true },
+            { id: "beschreibung", art: "mehrzeilig", label: "Gefährdung", pflicht: true },
+            { id: "massnahme", art: "mehrzeilig", label: "Schutzmaßnahmen", hilfe: "Eine Maßnahme je Zeile", pflicht: true },
             { id: "risiko", art: "wahl", label: "Risiko", optionen: optionen(RISIKO_STUFEN), vorbelegung: "mittel" },
-            { id: "faktor", art: "wahl", label: "Art der Gefährdung", optionen: optionen(GEFAEHRDUNGSFAKTOREN), vorbelegung: "arbeitsstaette" },
-            { id: "verantwortlich", art: "text", label: "Verantwortlich" },
+            { id: "faktor", art: "wahl", label: "Gefährdungsfaktor (§ 5 Abs. 3 ArbSchG)", optionen: optionen(GEFAEHRDUNGSFAKTOREN), vorbelegung: "arbeitsstaette" },
+            { id: "verantwortlich", art: "text", label: "Verantwortlich", vorbelegung: "verantwortlich" },
             { id: "umsetzen_bis", art: "datum", label: "Umsetzen bis" },
             { id: "umgesetzt_am", art: "datum", label: "Umgesetzt am" },
           ],
@@ -51,74 +64,100 @@ export const gefaehrdungsbeurteilung: Vorlage = {
     },
     {
       titel: "Mutterschutz",
+      hilfe: "Die Beurteilung nach dem Mutterschutzgesetz ist für jeden Arbeitsplatz nötig – unabhängig davon, ob gerade jemand schwanger ist.",
       felder: [
-        { id: "mutterschutz", art: "schalter", label: "Mutterschutz mitbeurteilt", hilfe: "Unabhängig davon, ob gerade jemand schwanger ist." },
-        { id: "mutterschutz_ergebnis", art: "mehrzeilig", label: "Ergebnis für schwangere und stillende Frauen", hilfe: "Welche Gefährdungen es für sie gibt und welche Schutzmaßnahmen nötig wären", wenn: { feld: "mutterschutz" } },
+        { id: "mutterschutz_ergebnis", art: "wahl", label: "Ergebnis für schwangere oder stillende Frauen", optionen: MUTTERSCHUTZ, pflicht: true },
+        { id: "mutterschutz_details", art: "mehrzeilig", label: "Gefährdungen und erforderliche Schutzmaßnahmen", hilfe: "z. B. kein Umgang mit bestimmten Chemikalien, Sitzgelegenheit, keine Nachtarbeit" },
       ],
     },
     {
-      titel: "Wirksamkeit",
+      titel: "Wirksamkeit und Fortschreibung",
       felder: [
-        { id: "wirksamkeit_am", art: "datum", label: "Wirksamkeit überprüft am" },
-        { id: "wirksamkeit", art: "mehrzeilig", label: "Ergebnis der Überprüfung" },
+        { id: "wirksamkeit", art: "wahl", label: "Wirksamkeit der Maßnahmen", optionen: optionen(WIRKSAM), vorbelegung: "offen" },
+        { id: "wirksamkeit_am", art: "datum", label: "Überprüft am" },
+        { id: "bemerkung", art: "mehrzeilig", label: "Bemerkung" },
+        { id: "fortschreibung", art: "text", label: "Überprüfung der Beurteilung", vorschlaege: ["bei Änderungen von Tätigkeiten, Arbeitsmitteln oder Arbeitsstoffen, nach Unfällen sowie jährlich", "bei Änderungen von Tätigkeiten, Arbeitsmitteln oder Arbeitsstoffen und nach Unfällen"] },
       ],
     },
   ],
   html(d, b) {
     const g = liste(d, "gefaehrdungen").filter((x) => text(x, "beschreibung") || text(x, "massnahme"));
+    const umsetzung = (x: Eintrag) =>
+      [text(x, "verantwortlich"), text(x, "umsetzen_bis") ? `bis ${datumDe(text(x, "umsetzen_bis"))}` : "", text(x, "umgesetzt_am") ? `umgesetzt ${datumDe(text(x, "umgesetzt_am"))}` : "offen"].filter(Boolean).map(esc).join("<br>");
     const teile = Object.entries(GEFAEHRDUNGSFAKTOREN)
       .map(([faktor, titel]) => {
         const l = g.filter((x) => (text(x, "faktor") || "sonstiges") === faktor);
         if (!l.length) return "";
         return abschnitt(
           titel,
-          l
-            .map((x) => {
-              const wer = [text(x, "verantwortlich") ? `verantwortlich: ${text(x, "verantwortlich")}` : "", text(x, "umsetzen_bis") ? `bis ${datumDe(text(x, "umsetzen_bis"))}` : "", text(x, "umgesetzt_am") ? `umgesetzt am ${datumDe(text(x, "umgesetzt_am"))}` : "noch nicht umgesetzt"].filter(Boolean).join(" · ");
-              return `<div class="eintrag">${angaben([["Gefährdung", text(x, "beschreibung")], ["Risiko", RISIKO_STUFEN[text(x, "risiko")] ?? text(x, "risiko")], ["Maßnahme", text(x, "massnahme")], ["Umsetzung", wer]])}</div>`;
-            })
-            .join(""),
+          tabelle(["Gefährdung", "Risiko", "Schutzmaßnahmen", "Umsetzung"], l.map((x) => [zelle(text(x, "beschreibung")), esc(RISIKO_STUFEN[text(x, "risiko")] ?? text(x, "risiko")), zellePunkte(text(x, "massnahme")), umsetzung(x)]), { breiten: ["28%", "10%", "42%", "20%"] }),
         );
       })
       .join("");
+    const musch = MUTTERSCHUTZ.find((m) => m.wert === text(d, "mutterschutz_ergebnis"));
     return dokument({
       titel: "Gefährdungsbeurteilung",
       betrieb: b,
       unter: text(d, "arbeitsbereich") || undefined,
-      meta: `Datum: ${datumDe(text(d, "datum")) || "–"}`,
+      meta: `Arbeitsbereich: ${text(d, "arbeitsbereich")}\nBeurteilt von: ${text(d, "beurteilt_von")}\nStand: ${datumDe(text(d, "datum"))}`,
       inhalt:
-        angaben([
-          ["Arbeitsbereich", text(d, "arbeitsbereich")],
-          ["Beurteilt von", text(d, "beurteilt_von")],
-          ["Datum", datumDe(text(d, "datum"))],
-          ["Mutterschutz", ja(d, "mutterschutz") ? "mitbeurteilt (anlassunabhängig)" : "nicht gesondert beurteilt"],
-        ]) +
-        (text(d, "taetigkeiten") ? abschnitt("Tätigkeiten", absatz(text(d, "taetigkeiten"))) : "") +
-        (teile || abschnitt("Gefährdungen", absatz(""))) +
-        (ja(d, "mutterschutz") ? abschnitt("Mutterschutz: Ergebnis für schwangere und stillende Frauen", absatz(text(d, "mutterschutz_ergebnis"))) : "") +
-        (text(d, "wirksamkeit_am") || text(d, "wirksamkeit") ? abschnitt("Überprüfung der Wirksamkeit", angaben([["Überprüft am", datumDe(text(d, "wirksamkeit_am"))], ["Ergebnis", text(d, "wirksamkeit")]])) : "") +
+        abschnitt(
+          "Allgemeine Angaben",
+          angaben([
+            ["Arbeitsbereich / Gewerk", text(d, "arbeitsbereich")],
+            ["Tätigkeiten", text(d, "taetigkeiten")],
+            ["Beschäftigte", text(d, "beschaeftigte") || null],
+            ["Beurteilt von", text(d, "beurteilt_von")],
+            ["Mitgewirkt haben", text(d, "mitwirkung").split("\n").filter(Boolean).join(", ") || null],
+            ["Datum", datumDe(text(d, "datum"))],
+          ]),
+        ) +
+        (teile || abschnitt("Gefährdungen und Maßnahmen", absatz(""))) +
+        (d.mutterschutz !== false
+          ? abschnitt(
+              "Mutterschutz (§ 10 MuSchG)",
+              `<p>Ergebnis der anlassunabhängigen Beurteilung für schwangere oder stillende Frauen:</p>${musch ? `<p><strong>${esc(musch.text)}</strong></p>` : absatz("")}${text(d, "mutterschutz_details") ? zeilen(text(d, "mutterschutz_details")) : ""}`,
+            )
+          : "") +
+        abschnitt(
+          "Wirksamkeit und Fortschreibung",
+          angaben([
+            ["Wirksamkeit", WIRKSAM[text(d, "wirksamkeit")] ?? ""],
+            ["Überprüft am", datumDe(text(d, "wirksamkeit_am"))],
+            ["Bemerkung", text(d, "bemerkung") || null],
+            ["Überprüfung der Beurteilung", text(d, "fortschreibung")],
+          ]),
+        ) +
         unterschriften(["Ort, Datum", "Unterschrift Arbeitgeber/in"]),
     });
   },
 };
 
-const ANLASS: Record<string, string> = { erst: "vor Arbeitsbeginn (Erstunterweisung)", wiederholung: "Wiederholung", anlass: "aus besonderem Anlass" };
+const ANLASS: Record<string, string> = { erst: "Erstunterweisung vor Aufnahme der Tätigkeit", wiederholung: "Wiederholungsunterweisung (mindestens jährlich)", anlass: "Unterweisung aus besonderem Anlass (z. B. neue Arbeitsmittel, Unfall)" };
 
 export const unterweisung: Vorlage = {
   id: "unterweisung",
   titel: "Unterweisungsnachweis",
-  beschreibung: "Wann du wen zu welchen Gefahren und Schutzmaßnahmen unterwiesen hast – mit Unterschriften der Teilnehmenden.",
+  beschreibung: "Wann du wen zu welchen Gefahren und Schutzmaßnahmen unterwiesen hast – Themen zum Ankreuzen, mit Unterschriften und nächstem Termin.",
   bereich: "arbeitsschutz",
   pflichten: ["arbeitsschutz.erstunterweisung", "arbeitsschutz.unterweisung_wiederholen"],
+  grundlage: "§ 12 ArbSchG; § 4 Abs. 1 DGUV Vorschrift 1",
   namensFeld: "thema",
   abschnitte: [
     {
       felder: [
-        { id: "thema", art: "text", label: "Thema", hilfe: "z. B. Arbeitsschutz im Salon, Umgang mit Reinigungsmitteln", pflicht: true },
-        { id: "anlass", art: "wahl", label: "Anlass", optionen: optionen(ANLASS), vorbelegung: "erst" },
+        { id: "thema", art: "text", label: "Bezeichnung", pflicht: true, vorschlaege: ["Jährliche Unterweisung Arbeitsschutz", "Erstunterweisung neuer Beschäftigter", "Unterweisung Gefahrstoffe", "Unterweisung Brandschutz und Erste Hilfe"] },
+        { id: "anlass", art: "wahl", label: "Anlass", optionen: optionen(ANLASS), vorbelegung: "wiederholung" },
         { id: "datum", art: "datum", label: "Datum", vorbelegung: "heute", pflicht: true },
+        { id: "dauer", art: "text", label: "Dauer", vorschlaege: ["30 Minuten", "45 Minuten", "60 Minuten", "90 Minuten"] },
         { id: "durchgefuehrt_von", art: "text", label: "Durchgeführt von", vorbelegung: "verantwortlich", pflicht: true },
-        { id: "inhalt", art: "mehrzeilig", label: "Inhalt der Unterweisung", hilfe: "Die Gefährdungen und Schutzmaßnahmen aus deiner Gefährdungsbeurteilung, Verhalten im Notfall, Erste Hilfe", pflicht: true },
+      ],
+    },
+    {
+      titel: "Inhalte",
+      felder: [
+        { id: "themen", art: "bausteine", label: "Themen der Unterweisung", optionen: UNTERWEISUNGSTHEMEN.map((t) => ({ wert: t.wert, text: t.text, quelle: t.quelle })), vorbelegung: [UNTERWEISUNGSTHEMEN[0]!.wert, UNTERWEISUNGSTHEMEN[1]!.wert, UNTERWEISUNGSTHEMEN[2]!.wert], pflicht: true },
+        { id: "inhalt", art: "mehrzeilig", label: "Betriebsspezifische Ergänzungen", hilfe: "z. B. konkrete Geräte, Mittel, Abläufe in deinem Betrieb" },
       ],
     },
     {
@@ -128,37 +167,36 @@ export const unterweisung: Vorlage = {
     },
   ],
   html(d, b) {
+    const themen = auswahl(d, "themen").map((w) => UNTERWEISUNGSTHEMEN.find((t) => t.wert === w)?.text ?? w);
+    const naechste = plusMonate(text(d, "datum"), 12);
     return dokument({
       titel: "Unterweisungsnachweis",
       betrieb: b,
       unter: text(d, "thema") || undefined,
-      meta: `Datum: ${datumDe(text(d, "datum")) || "–"}`,
+      meta: `Datum: ${datumDe(text(d, "datum"))}\nDurchgeführt von: ${text(d, "durchgefuehrt_von")}\nNächste Unterweisung: ${naechste ? `bis ${naechste}` : ""}`,
       inhalt:
-        angaben([
-          ["Thema", text(d, "thema")],
-          ["Anlass", ANLASS[text(d, "anlass")] ?? ""],
-          ["Datum", datumDe(text(d, "datum"))],
-          ["Durchgeführt von", text(d, "durchgefuehrt_von")],
-        ]) +
-        abschnitt("Inhalt", absatz(text(d, "inhalt"))) +
-        abschnitt("Teilnahme", `<p>Mit meiner Unterschrift bestätige ich, dass ich an der Unterweisung teilgenommen und den Inhalt verstanden habe.</p>${teilnahmeTabelle(liste(d, "teilnehmer"))}`) +
-        unterschriften(["Unterschrift der unterweisenden Person"]),
+        abschnitt("Angaben", angaben([["Bezeichnung", text(d, "thema")], ["Anlass", ANLASS[text(d, "anlass")] ?? ""], ["Datum", datumDe(text(d, "datum"))], ["Dauer", text(d, "dauer") || null], ["Durchgeführt von", text(d, "durchgefuehrt_von")]])) +
+        abschnitt("Inhalte der Unterweisung", (themen.length ? punkte(themen) : absatz("")) + (text(d, "inhalt") ? `<h3>Betriebsspezifische Ergänzungen</h3>${zeilen(text(d, "inhalt"))}` : "")) +
+        abschnitt("Teilnahme", `<p>Mit meiner Unterschrift bestätige ich, dass ich an der Unterweisung teilgenommen und die Inhalte verstanden habe.</p>${teilnahmeTabelle(liste(d, "teilnehmer"))}`) +
+        `<p class="klein" style="margin-top:4mm">Die Unterweisung ist mindestens einmal jährlich zu wiederholen (§ 4 Abs. 1 DGUV Vorschrift 1)${naechste ? ` – nächster Termin spätestens am ${naechste}` : ""}.</p>` +
+        unterschriften(["Ort, Datum", "Unterschrift der unterweisenden Person"]),
     });
   },
 };
 
 export const gefahrstoffverzeichnis: Vorlage = {
   id: "gefahrstoffverzeichnis",
-  querformat: true,
   titel: "Gefahrstoffverzeichnis",
-  beschreibung: "Alle Gefahrstoffe im Betrieb mit Verwendung, Menge, Arbeitsbereich und Sicherheitsdatenblatt.",
+  beschreibung: "Alle Gefahrstoffe im Betrieb mit Einstufung, Mengenbereich, Arbeitsbereich und Verweis auf das Sicherheitsdatenblatt.",
   bereich: "arbeitsschutz",
   pflichten: ["arbeitsschutz.gefahrstoffe"],
+  grundlage: "§ 6 Abs. 12 GefStoffV",
+  querformat: true,
   abschnitte: [
-    { felder: [{ id: "stand", art: "datum", label: "Stand", vorbelegung: "heute", pflicht: true }] },
+    { felder: [{ id: "stand", art: "datum", label: "Stand", vorbelegung: "heute", pflicht: true }, { id: "verantwortlich", art: "text", label: "Verantwortlich", vorbelegung: "verantwortlich" }] },
     {
       titel: "Gefahrstoffe",
-      hilfe: "Die Angaben stehen auf dem Etikett und im Sicherheitsdatenblatt des Herstellers.",
+      hilfe: "Die Angaben stehen auf dem Etikett und im Sicherheitsdatenblatt (Abschnitte 1, 2 und 16).",
       felder: [
         {
           id: "stoffe",
@@ -168,12 +206,12 @@ export const gefahrstoffverzeichnis: Vorlage = {
           titelFeld: "bezeichnung",
           pflicht: true,
           felder: [
-            { id: "bezeichnung", art: "text", label: "Produkt / Bezeichnung", pflicht: true },
+            { id: "bezeichnung", art: "text", label: "Bezeichnung (Handelsname)", pflicht: true },
             { id: "hersteller", art: "text", label: "Hersteller" },
-            { id: "gefahren", art: "text", label: "Gefahrenhinweise / Piktogramme", hilfe: "laut Etikett oder Sicherheitsdatenblatt" },
+            { id: "gefahren", art: "text", label: "Einstufung / gefährliche Eigenschaften", hilfe: "H-Sätze oder Piktogramme laut Etikett, z. B. H315, H319", pflicht: true },
+            { id: "menge", art: "text", label: "Mengenbereich im Betrieb", pflicht: true, vorschlaege: ["bis 1 kg bzw. 1 l", "1 bis 10 kg bzw. l", "10 bis 100 kg bzw. l", "über 100 kg bzw. l"] },
+            { id: "arbeitsbereich", art: "text", label: "Arbeitsbereiche mit möglicher Exposition", pflicht: true },
             { id: "verwendung", art: "text", label: "Verwendung" },
-            { id: "arbeitsbereich", art: "text", label: "Arbeitsbereich" },
-            { id: "menge", art: "text", label: "Menge im Betrieb", hilfe: "ungefähr, z. B. 2 × 1 Liter" },
             { id: "sdb_vorhanden", art: "schalter", label: "Sicherheitsdatenblatt liegt vor" },
             { id: "sdb_stand", art: "datum", label: "Stand des Sicherheitsdatenblatts", wenn: { feld: "sdb_vorhanden" } },
           ],
@@ -183,69 +221,76 @@ export const gefahrstoffverzeichnis: Vorlage = {
   ],
   html(d, b) {
     const s = liste(d, "stoffe").filter((x) => text(x, "bezeichnung"));
-    const zeilen = s.map((x) => [
-      `<strong>${zelle(text(x, "bezeichnung"))}</strong>${text(x, "hersteller") ? `<br>${zelle(text(x, "hersteller"))}` : ""}`,
+    const zeilenHtml = s.map((x) => [
+      `<strong>${zelle(text(x, "bezeichnung"))}</strong>${text(x, "hersteller") ? `<br><span class="klein">${zelle(text(x, "hersteller"))}</span>` : ""}`,
       zelle(text(x, "gefahren")),
-      zelle(text(x, "verwendung")),
-      zelle(text(x, "arbeitsbereich")),
       zelle(text(x, "menge")),
+      zelle(text(x, "arbeitsbereich")),
+      zelle(text(x, "verwendung")),
       ja(x, "sdb_vorhanden") ? `liegt vor${text(x, "sdb_stand") ? `<br>Stand ${datumDe(text(x, "sdb_stand"))}` : ""}` : "<strong>fehlt</strong>",
     ]);
     return dokument({
       titel: "Gefahrstoffverzeichnis",
       betrieb: b,
       quer: true,
-      meta: `Stand: ${datumDe(text(d, "stand")) || "–"}`,
-      inhalt: s.length
-        ? tabelle(["Produkt / Hersteller", "Gefahrenhinweise", "Verwendung", "Arbeitsbereich", "Menge", "Sicherheitsdatenblatt"], zeilen, { breiten: ["22%", "20%", "18%", "15%", "10%", "15%"] })
-        : absatz("", "Keine Gefahrstoffe erfasst."),
+      meta: `Stand: ${datumDe(text(d, "stand"))}\nVerantwortlich: ${text(d, "verantwortlich")}\nAnzahl Gefahrstoffe: ${s.length}`,
+      inhalt:
+        `<p class="klein">Verzeichnis nach § 6 Abs. 12 GefStoffV mit ${GEFAHRSTOFF_ANGABEN.length} Pflichtangaben: ${esc(GEFAHRSTOFF_ANGABEN.join("; "))}.</p>` +
+        tabelle(["Bezeichnung / Hersteller", "Einstufung / gefährliche Eigenschaften", "Mengenbereich", "Arbeitsbereiche", "Verwendung", "Sicherheitsdatenblatt"], zeilenHtml, { breiten: ["20%", "22%", "12%", "18%", "14%", "14%"], mindestens: s.length ? 0 : 6 }),
     });
   },
 };
 
-const BA_TEILE: [string, string, string][] = [
-  ["gefahren", "Gefahren für Mensch und Umwelt", "z. B. reizt die Haut, gesundheitsschädlich beim Einatmen – laut Sicherheitsdatenblatt"],
-  ["schutz", "Schutzmaßnahmen und Verhaltensregeln", "z. B. Handschuhe tragen, für Lüftung sorgen, nicht essen und trinken"],
-  ["gefahrfall", "Verhalten im Gefahrfall", "z. B. bei Verschütten: aufnehmen mit …, Raum lüften"],
-  ["erste_hilfe", "Erste Hilfe", "nach Hautkontakt, Augenkontakt, Einatmen, Verschlucken – laut Sicherheitsdatenblatt"],
-  ["entsorgung", "Sachgerechte Entsorgung", "z. B. Reste und Gebinde – laut Sicherheitsdatenblatt"],
+/** Abschnitte nach TRGS 555 Nr. 3.2.4–3.2.8 (3.2.2/3.2.3 stehen im Kopf). */
+const BA_TEILE: { id: string; label: string; hilfe: string; bausteine?: string }[] = [
+  { id: "gefahren", label: "Gefahren für Mensch und Umwelt", hilfe: "H-Sätze aus dem Sicherheitsdatenblatt (Abschnitt 2), z. B. „Verursacht schwere Augenreizung“" },
+  { id: "schutz", label: "Schutzmaßnahmen und Verhaltensregeln", hilfe: "Technisch, organisatorisch, Hygiene, persönliche Schutzausrüstung", bausteine: "schutzmassnahmen" },
+  { id: "gefahrfall", label: "Verhalten im Gefahrfall", hilfe: "Bei Verschütten, Brand, Unfall – laut Sicherheitsdatenblatt (Abschnitte 5 und 6)", bausteine: "gefahrfall" },
+  { id: "erste_hilfe", label: "Erste Hilfe", hilfe: "Nach Augen-, Hautkontakt, Einatmen, Verschlucken – laut Sicherheitsdatenblatt (Abschnitt 4)", bausteine: "erste_hilfe" },
+  { id: "entsorgung", label: "Sachgerechte Entsorgung", hilfe: "Laut Sicherheitsdatenblatt (Abschnitt 13)", bausteine: "entsorgung" },
 ];
 
 export const betriebsanweisung: Vorlage = {
   id: "betriebsanweisung",
   titel: "Betriebsanweisung",
-  beschreibung: "Aushang für einen Gefahrstoff oder eine Tätigkeit: Gefahren, Schutzmaßnahmen, Verhalten im Notfall, Erste Hilfe, Entsorgung.",
+  beschreibung: "Aushang für einen Gefahrstoff nach TRGS 555: Gefahren, Schutzmaßnahmen, Verhalten im Gefahrfall, Erste Hilfe, Entsorgung – mit Bausteinen zum Antippen.",
   bereich: "arbeitsschutz",
   pflichten: ["arbeitsschutz.gefahrstoffe"],
+  grundlage: "§ 14 Abs. 1 GefStoffV; TRGS 555",
   namensFeld: "stoff",
   abschnitte: [
     {
       felder: [
-        { id: "stoff", art: "text", label: "Gefahrstoff oder Tätigkeit", hilfe: "z. B. Blondiermittel, Desinfektionsmittel XY", pflicht: true },
-        { id: "arbeitsbereich", art: "text", label: "Arbeitsbereich" },
+        { id: "stoff", art: "text", label: "Gefahrstoff (Handelsname)", hilfe: "Die im Betrieb geläufige Bezeichnung", pflicht: true },
+        { id: "arbeitsbereich", art: "text", label: "Arbeitsbereich, Arbeitsplatz, Tätigkeit", pflicht: true, vorschlaege: BEREICHE_VORSCHLAG },
+        { id: "nummer", art: "text", label: "Nummer der Betriebsanweisung", hilfe: "z. B. BA-01" },
       ],
     },
     {
-      titel: "Inhalt",
-      hilfe: "Die Angaben findest du im Sicherheitsdatenblatt des Herstellers.",
-      felder: BA_TEILE.map(([id, label, hilfe]) => ({ id, art: "mehrzeilig" as const, label, hilfe, pflicht: true })),
+      titel: "Inhalt nach TRGS 555",
+      hilfe: "Die stoffbezogenen Angaben stehen im Sicherheitsdatenblatt; die Bausteine sind allgemeine Regeln.",
+      felder: BA_TEILE.map((t) => ({ id: t.id, art: "mehrzeilig" as const, label: t.label, hilfe: t.hilfe, pflicht: true, ...(t.bausteine ? { vorschlaege: (BA_BAUSTEINE[t.bausteine] ?? []).map((o) => o.text) } : {}) })),
     },
     {
       felder: [
-        { id: "notruf", art: "text", label: "Notruf und Ansprechperson", hilfe: "z. B. Ersthelfer/in im Betrieb mit Telefonnummer" },
-        { id: "erstellt_von", art: "text", label: "Erstellt von", vorbelegung: "verantwortlich" },
-        { id: "datum", art: "datum", label: "Datum", vorbelegung: "heute" },
+        { id: "notruf", art: "text", label: "Notruf und Ersthelfer/in", hilfe: "z. B. Notruf 112 · Ersthelfer/in: Name, Telefon", vorschlaege: ["Notruf 112"] },
+        { id: "erstellt_von", art: "text", label: "Freigegeben von", vorbelegung: "verantwortlich", pflicht: true },
+        { id: "datum", art: "datum", label: "Stand", vorbelegung: "heute", pflicht: true },
       ],
     },
   ],
   html(d: Daten, b) {
-    const kaesten = BA_TEILE.map(([id, label]) => `<section class="kasten"><h2>${esc(label)}</h2><div class="inhalt">${absatz(text(d, id))}${id === "gefahrfall" && text(d, "notruf") ? `<p><strong>Notruf / Ansprechperson:</strong> ${esc(text(d, "notruf"))}</p>` : ""}</div></section>`).join("");
+    const kaesten = BA_TEILE.map(
+      (t) => `<section class="kasten"><h2>${esc(t.label)}</h2><div class="inhalt">${zeilen(text(d, t.id))}${t.id === "gefahrfall" && text(d, "notruf") ? `<p><strong>${esc(text(d, "notruf"))}</strong></p>` : ""}</div></section>`,
+    ).join("");
     return dokument({
       titel: "Betriebsanweisung",
       betrieb: b,
-      unter: [text(d, "stoff"), text(d, "arbeitsbereich") ? `Arbeitsbereich: ${text(d, "arbeitsbereich")}` : ""].filter(Boolean).join(" · ") || undefined,
-      meta: `Stand: ${datumDe(text(d, "datum")) || "–"}`,
-      inhalt: `<section class="kasten"><h2>Anwendungsbereich</h2><div class="inhalt">${angaben([["Gefahrstoff / Tätigkeit", text(d, "stoff")], ["Arbeitsbereich", text(d, "arbeitsbereich")]])}</div></section>${kaesten}${unterschriften([`Erstellt: ${text(d, "erstellt_von") || "…"}`, "Unterschrift"])}`,
+      unter: text(d, "stoff") || undefined,
+      meta: `Nummer: ${text(d, "nummer")}\nArbeitsbereich: ${text(d, "arbeitsbereich")}\nStand: ${datumDe(text(d, "datum"))}`,
+      inhalt:
+        `<section class="kasten"><h2>Arbeitsbereich, Arbeitsplatz, Tätigkeit · Gefahrstoff</h2><div class="inhalt">${angaben([["Arbeitsbereich / Tätigkeit", text(d, "arbeitsbereich")], ["Gefahrstoff", text(d, "stoff")]])}</div></section>${kaesten}` +
+        unterschriften([`Freigegeben: ${text(d, "erstellt_von")}`, "Datum, Unterschrift"]),
     });
   },
 };
@@ -255,19 +300,24 @@ const ERGEBNIS: Record<string, string> = { bestanden: "bestanden", maengel: "Mä
 export const elektroPruefung: Vorlage = {
   id: "pruefprotokoll_elektro",
   titel: "Prüfprotokoll elektrische Geräte (DGUV V3)",
-  beschreibung: "Verzeichnis der geprüften Geräte mit Ergebnis und nächstem Prüftermin – zum Ausfüllen durch die Elektrofachkraft oder nach ihrem Bericht.",
+  beschreibung: "Verzeichnis der geprüften Geräte mit Ergebnis und nächstem Termin – mit den Richtwerten für Prüffristen aus der DGUV Vorschrift 3.",
   bereich: "arbeitsschutz",
   pflichten: ["arbeitsschutz.dguv_v3"],
+  grundlage: "§ 5 DGUV Vorschrift 3; § 14 BetrSichV",
   querformat: true,
   namensFeld: "datum",
   abschnitte: [
     {
-      hilfe: "Prüfen darf nur eine Elektrofachkraft (bzw. unter ihrer Leitung). Wie oft geprüft wird, legst du in der Gefährdungsbeurteilung fest.",
+      hilfe: "Prüfen darf eine Elektrofachkraft; eine elektrotechnisch unterwiesene Person nur unter Leitung und Aufsicht einer Elektrofachkraft. Die Prüffrist legst du in der Gefährdungsbeurteilung fest.",
       felder: [
         { id: "pruefer", art: "text", label: "Prüfende Elektrofachkraft / Firma", pflicht: true },
         { id: "datum", art: "datum", label: "Prüfdatum", vorbelegung: "heute", pflicht: true },
         { id: "messgeraet", art: "text", label: "Verwendetes Prüfgerät" },
-        { id: "leerzeilen", art: "schalter", label: "Leere Zeilen zum Ausfüllen von Hand anhängen", vorbelegung: false },
+        { id: "pruefart", art: "wahl", label: "Art der Prüfung", optionen: [{ wert: "Wiederholungsprüfung", text: "Wiederholungsprüfung" }, { wert: "Erstprüfung", text: "Erstprüfung" }, { wert: "Prüfung nach Instandsetzung", text: "nach Instandsetzung" }], vorbelegung: "Wiederholungsprüfung", pflicht: true },
+        { id: "umfang", art: "bausteine", label: "Umfang der Prüfung", optionen: ["Sichtprüfung", "Messung des Schutzleiterwiderstands", "Messung des Isolationswiderstands", "Messung des Schutzleiter- bzw. Berührungsstroms", "Funktionsprüfung"].map((t) => ({ wert: t, text: t })), vorbelegung: ["Sichtprüfung", "Messung des Schutzleiterwiderstands", "Messung des Isolationswiderstands", "Funktionsprüfung"], pflicht: true },
+        { id: "norm", art: "text", label: "Prüfgrundlage", vorschlaege: ["DIN EN 50678 (VDE 0701) / DIN EN 50699 (VDE 0702)"] },
+        { id: "einsatz", art: "wahl", label: "Einsatzbedingungen (Richtwert für die Prüffrist)", optionen: ELEKTRO_FRISTEN.slice(0, 4).map((o) => ({ wert: o.wert, text: o.text, quelle: o.quelle })) },
+        { id: "leerzeilen", art: "schalter", label: "Leere Zeilen zum Ausfüllen von Hand anhängen" },
       ],
     },
     {
@@ -280,7 +330,7 @@ export const elektroPruefung: Vorlage = {
           eintrag: "Gerät",
           titelFeld: "bezeichnung",
           felder: [
-            { id: "bezeichnung", art: "text", label: "Gerät", hilfe: "z. B. Föhn, Kaffeemaschine, Verlängerungskabel", pflicht: true },
+            { id: "bezeichnung", art: "text", label: "Gerät", pflicht: true, vorschlaege: ["Föhn", "Glätteisen", "Haarschneidemaschine", "Kaffeemaschine", "Wasserkocher", "Mikrowelle", "Verlängerungskabel", "Mehrfachsteckdose", "Bohrmaschine", "Akku-Ladegerät", "Computer mit Netzteil"] },
             { id: "typ", art: "text", label: "Hersteller / Typ" },
             { id: "inventar", art: "text", label: "Inventar-Nr." },
             { id: "standort", art: "text", label: "Standort" },
@@ -294,19 +344,21 @@ export const elektroPruefung: Vorlage = {
   ],
   html(d, b) {
     const g = liste(d, "geraete").filter((x) => text(x, "bezeichnung"));
+    const einsatz = ELEKTRO_FRISTEN.find((o) => o.wert === text(d, "einsatz"));
     return dokument({
       titel: "Prüfprotokoll elektrische Geräte",
       betrieb: b,
       quer: true,
-      meta: `Prüfdatum: ${datumDe(text(d, "datum")) || "–"}`,
+      meta: `Prüfdatum: ${datumDe(text(d, "datum"))}\nGeprüft von: ${text(d, "pruefer")}\nArt der Prüfung: ${text(d, "pruefart")}`,
       inhalt:
-        angaben([["Geprüft von", text(d, "pruefer")], ["Prüfgerät", text(d, "messgeraet") || null]]) +
+        angaben([["Umfang der Prüfung", auswahl(d, "umfang").join(", ")], ["Prüfgrundlage", text(d, "norm") || null], ["Prüfgerät", text(d, "messgeraet") || null]]) +
+        (einsatz ? `<p class="klein">Richtwert nach DGUV Vorschrift 3 (${esc(einsatz.quelle ?? "")}): ${esc(einsatz.text)}</p>` : "") +
         `<section class="abschnitt">${tabelle(
           ["Gerät", "Hersteller / Typ", "Inventar-Nr.", "Standort", "Ergebnis", "Nächste Prüfung"],
           g.map((x) => [`<strong>${zelle(text(x, "bezeichnung"))}</strong>`, zelle(text(x, "typ")), zelle(text(x, "inventar")), zelle(text(x, "standort")), text(x, "ergebnis") === "maengel" ? `<strong>Mängel:</strong> ${zelle(text(x, "maengel"))}` : "bestanden", datumDe(text(x, "naechste"))]),
           { breiten: ["20%", "18%", "12%", "15%", "20%", "15%"], leerzeilen: ja(d, "leerzeilen") ? 12 : 0, hoch: ja(d, "leerzeilen") },
         )}</section>` +
-        unterschriften(["Ort, Datum", "Unterschrift Elektrofachkraft"]),
+        unterschriften(["Ort, Datum", "Unterschrift der prüfenden Person"]),
     });
   },
 };

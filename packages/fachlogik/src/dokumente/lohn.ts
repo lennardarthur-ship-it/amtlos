@@ -3,6 +3,7 @@
  * Lohnsteuer und keine Beiträge – die Beträge kommen aus der Lohnabrechnung. Gliederungen fachlich zu prüfen (T-61).
  */
 import { abschnitt, absatz, angaben, cent, datumDe, dokument, esc, euro, ja, liste, summe, tabelle, text, unterschriften, zelle } from "./html.js";
+import { MINIJOB, SV } from "./bausteine.js";
 import type { Daten, Eintrag, Vorlage } from "./typen.js";
 
 const minuten = (hhmm: string): number | null => {
@@ -32,6 +33,7 @@ export const arbeitszeitnachweis: Vorlage = {
   beschreibung: "Beginn, Ende und Dauer der täglichen Arbeitszeit je Person und Monat – auch für Minijobs. Ausgefüllt oder als Blatt zum Eintragen von Hand.",
   bereich: "personal",
   pflichten: ["personal.arbeitszeit_aufzeichnung", "personal.arbeitszeit_milog"],
+  grundlage: "§ 3 Abs. 2 Nr. 1 ArbSchG (BAG 13.09.2022 – 1 ABR 22/21); § 17 MiLoG",
   namensFeld: "name",
   abschnitte: [
     {
@@ -75,6 +77,7 @@ export const arbeitszeitnachweis: Vorlage = {
           { breiten: ["15%", "12%", "12%", "13%", "13%", "35%"], leerzeilen: ja(d, "leerzeilen") ? 31 - z.length : 0, hoch: ja(d, "leerzeilen") },
         ) +
         angaben([["Summe", stunden(gesamt)]]) +
+        `<p class="klein" style="margin-top:3mm">Für Minijobs und die Branchen nach § 2a SchwarzArbG (u. a. Gastronomie, Friseur- und Kosmetikgewerbe, Bau): Beginn, Ende und Dauer der täglichen Arbeitszeit spätestens bis zum Ablauf des siebten auf den Arbeitstag folgenden Kalendertages aufzeichnen und mindestens zwei Jahre aufbewahren (§ 17 Abs. 1 MiLoG).</p>` +
         unterschriften(["Unterschrift beschäftigte Person", "Unterschrift Arbeitgeber/in"]),
     });
   },
@@ -82,6 +85,8 @@ export const arbeitszeitnachweis: Vorlage = {
 
 const BETRAEGE: [string, string][] = [
   ["brutto", "Bruttolohn"],
+  ["sachbezuege", "Sachbezüge"],
+  ["steuerfrei", "Steuerfreie Bezüge"],
   ["lohnsteuer", "Lohnsteuer"],
   ["soli", "Solidaritätszuschlag"],
   ["kirchensteuer", "Kirchensteuer"],
@@ -97,6 +102,7 @@ export const lohnkonto: Vorlage = {
   beschreibung: "Je beschäftigte Person die Stammdaten und für jeden Monat Lohn, Steuern und Beiträge – mit Jahressummen.",
   bereich: "personal",
   pflichten: ["personal.lohnabrechnung", "personal.lohnsteuer_anmeldung"],
+  grundlage: "§ 41 EStG; § 4 LStDV",
   namensFeld: "name",
   abschnitte: [
     {
@@ -108,9 +114,9 @@ export const lohnkonto: Vorlage = {
         { id: "geburtsdatum", art: "datum", label: "Geburtsdatum", pflicht: true },
         { id: "anschrift", art: "mehrzeilig", label: "Anschrift", pflicht: true },
         { id: "steuer_id", art: "text", label: "Steuer-Identifikationsnummer", pflicht: true },
-        { id: "steuerklasse", art: "text", label: "Steuerklasse und Faktor", pflicht: true },
+        { id: "steuerklasse", art: "wahl", label: "Steuerklasse", optionen: ["I", "II", "III", "IV", "IV mit Faktor", "V", "VI"].map((k) => ({ wert: k, text: k })), pflicht: true },
         { id: "kinder", art: "text", label: "Kinderfreibeträge" },
-        { id: "religion", art: "text", label: "Religionsgemeinschaft (Kirchensteuer)" },
+        { id: "religion", art: "text", label: "Kirchensteuermerkmal", vorschlaege: ["keine Kirchensteuerpflicht", "ev (evangelisch)", "rk (römisch-katholisch)"] },
         { id: "sv_nummer", art: "text", label: "Sozialversicherungsnummer", pflicht: true },
         { id: "krankenkasse", art: "text", label: "Krankenkasse", pflicht: true },
         { id: "eintritt", art: "datum", label: "Beschäftigt seit", pflicht: true },
@@ -125,7 +131,12 @@ export const lohnkonto: Vorlage = {
           label: "Monate",
           eintrag: "Monat",
           titelFeld: "monat",
-          felder: [{ id: "monat", art: "text", label: "Monat", hilfe: "z. B. Oktober", pflicht: true }, ...BETRAEGE.map(([id, label]) => ({ id, art: "betrag" as const, label: `${label} (€)`, pflicht: id === "brutto" }))],
+          felder: [
+            { id: "monat", art: "text", label: "Lohnzahlungszeitraum", hilfe: "z. B. Oktober 2026", pflicht: true },
+            { id: "zahltag", art: "datum", label: "Tag der Lohnzahlung", pflicht: true },
+            ...BETRAEGE.map(([id, label]) => ({ id, art: "betrag" as const, label: `${label} (€)`, pflicht: id === "brutto" })),
+            { id: "unterbrechung", art: "schalter", label: "Unterbrechung ohne Lohnanspruch (Großbuchstabe U)", hilfe: "z. B. mindestens fünf Arbeitstage ohne Lohn" },
+          ],
         },
       ],
     },
@@ -158,7 +169,7 @@ export const lohnkonto: Vorlage = {
         abschnitt(
           "Monate",
           m.length
-            ? tabelle(["Monat", ...BETRAEGE.map(([, l]) => l)], [...m.map((e) => [zelle(text(e, "monat")), ...BETRAEGE.map(([k]) => betrag(e, k))]), ["<strong>Summe</strong>", ...BETRAEGE.map(([k]) => `<strong>${euro(summe(m, k))}</strong>`)]], { breiten: ["12%", ...BETRAEGE.map(() => `${88 / BETRAEGE.length}%`)] })
+            ? tabelle(["Zeitraum", "Zahltag", ...BETRAEGE.map(([, l]) => l), "U"], [...m.map((e) => [zelle(text(e, "monat")), datumDe(text(e, "zahltag")), ...BETRAEGE.map(([k]) => betrag(e, k)), ja(e, "unterbrechung") ? "U" : ""]), ["<strong>Summe</strong>", "", ...BETRAEGE.map(([k]) => `<strong>${euro(summe(m, k))}</strong>`), ""]], { breiten: ["10%", "9%", ...BETRAEGE.map(() => `${77 / BETRAEGE.length}%`), "4%"] })
             : absatz("", "Noch keine Monate erfasst."),
         ),
     });
@@ -179,6 +190,7 @@ export const svMeldedaten: Vorlage = {
   beschreibung: "Alle Angaben einer neuen beschäftigten Person, die du für die Anmeldung zur Sozialversicherung und die Lohnabrechnung brauchst – zum Unterschreiben.",
   bereich: "personal",
   pflichten: ["personal.sv_anmeldung", "personal.sofortmeldung"],
+  grundlage: "§ 28a SGB IV; DEÜV",
   namensFeld: "name",
   abschnitte: [
     {
@@ -202,15 +214,23 @@ export const svMeldedaten: Vorlage = {
       felder: [
         { id: "beginn", art: "datum", label: "Beginn der Beschäftigung", pflicht: true },
         { id: "art", art: "wahl", label: "Art", optionen: ARTEN, vorbelegung: "vollzeit" },
+        { id: "personengruppe", art: "wahl", label: "Personengruppe (Schlüssel für die Meldung)", optionen: SV.personengruppen, vorbelegung: "101" },
+        { id: "vertragsform", art: "wahl", label: "Vertragsform", optionen: SV.vertragsform, vorbelegung: "1" },
         { id: "stunden", art: "zahl", label: "Wochenstunden", pflicht: true },
         { id: "entgelt", art: "betrag", label: "Monatliches Entgelt (€)", pflicht: true },
         { id: "taetigkeit", art: "text", label: "Tätigkeit", pflicht: true },
-        { id: "abschluss", art: "text", label: "Schul- und Berufsabschluss" },
+        { id: "schulabschluss", art: "wahl", label: "Höchster Schulabschluss", optionen: SV.schulabschluss },
+        { id: "ausbildung", art: "wahl", label: "Höchster Berufsabschluss", optionen: SV.ausbildung },
         { id: "weitere", art: "schalter", label: "Hat weitere Beschäftigungen" },
         { id: "weitere_welche", art: "text", label: "Welche (Arbeitgeber, Umfang)", wenn: { feld: "weitere" }, pflicht: true },
       ],
     },
   ],
+  pruefen(d) {
+    const grenze = MINIJOB.filter((m) => m.ab <= (text(d, "beginn") || "9999")).sort((a, b) => b.ab.localeCompare(a.ab))[0];
+    const e = cent(text(d, "entgelt"));
+    return (text(d, "art") === "minijob" || text(d, "personengruppe") === "109") && grenze && e !== null && e > grenze.cent ? [`Entgelt über der Minijob-Grenze von ${euro(grenze.cent)} im Monat`] : [];
+  },
   html(d, b) {
     return dokument({
       titel: "Personalfragebogen",
@@ -240,7 +260,10 @@ export const svMeldedaten: Vorlage = {
             ["Wochenstunden", text(d, "stunden")],
             ["Monatliches Entgelt", text(d, "entgelt") ? euro(cent(text(d, "entgelt")) ?? 0) : ""],
             ["Tätigkeit", text(d, "taetigkeit")],
-            ["Schul- und Berufsabschluss", text(d, "abschluss") || null],
+            ["Personengruppe", SV.personengruppen.find((o) => o.wert === text(d, "personengruppe"))?.text ?? ""],
+            ["Vertragsform", SV.vertragsform.find((o) => o.wert === text(d, "vertragsform"))?.text ?? ""],
+            ["Schulabschluss", SV.schulabschluss.find((o) => o.wert === text(d, "schulabschluss"))?.text ?? ""],
+            ["Berufsabschluss", SV.ausbildung.find((o) => o.wert === text(d, "ausbildung"))?.text ?? ""],
             ["Weitere Beschäftigungen", ja(d, "weitere") ? text(d, "weitere_welche") || "ja" : "keine"],
           ]),
         ) +

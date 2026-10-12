@@ -1,13 +1,13 @@
 /** Feste Bezeichnungen, die Server (PDF) und App (Vorlagen) teilen. */
 import type { Option } from "./typen.js";
 
-/** Gefährdungsfaktoren in der Reihenfolge von § 5 Abs. 3 ArbSchG (Wortlaut fachlich zu prüfen, T-18). */
+/** Gefährdungsfaktoren nach § 5 Abs. 3 Nr. 1–6 ArbSchG, Wortlaut nah am Gesetz (Prüfbericht E-123), „sonstige“ ergänzt. */
 export const GEFAEHRDUNGSFAKTOREN: Record<string, string> = {
   arbeitsstaette: "Gestaltung und Einrichtung der Arbeitsstätte und des Arbeitsplatzes",
   einwirkungen: "Physikalische, chemische und biologische Einwirkungen",
-  arbeitsmittel: "Arbeitsmittel, Maschinen, Geräte und Anlagen und der Umgang damit",
-  ablaeufe_arbeitszeit: "Arbeitsverfahren, Arbeitsabläufe und Arbeitszeit",
-  qualifikation: "Unzureichende Qualifikation und Unterweisung",
+  arbeitsmittel: "Gestaltung, Auswahl und Einsatz von Arbeitsmitteln (Arbeitsstoffe, Maschinen, Geräte, Anlagen) und der Umgang damit",
+  ablaeufe_arbeitszeit: "Gestaltung von Arbeits- und Fertigungsverfahren, Arbeitsabläufen und Arbeitszeit und deren Zusammenwirken",
+  qualifikation: "Unzureichende Qualifikation und Unterweisung der Beschäftigten",
   psychisch: "Psychische Belastungen bei der Arbeit",
   sonstiges: "Sonstige Gefährdungen",
 };

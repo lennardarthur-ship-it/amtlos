@@ -1,25 +1,51 @@
-/** Datenschutz: Verzeichnis der Verarbeitungstätigkeiten mit TOM, Datenpanne, Datenschutzinformation. */
-import { abschnitt, absatz, angaben, anschrift, datumDe, dokument, esc, ja, liste, tabelle, text, zelle } from "./html.js";
+/**
+ * Datenschutz: Verzeichnis der Verarbeitungstätigkeiten mit TOM, Datenpanne, Datenschutzinformation nach Art. 13
+ * (E-121, E-123). Vorschläge aus Muster-Verzeichnissen der Aufsichtsbehörden, DSK und BSI (bausteine.ts).
+ */
+import { AUFSICHT, DSE, PANNEN_ARTEN, PANNEN_SOFORT, TOM, VVT } from "./bausteine.js";
+import { abschnitt, absatz, angaben, anschrift, auswahl, datumDe, dokument, esc, ja, liste, tabelle, text, zelle, zeilen } from "./html.js";
 import { DATENPANNE_RISIKO, SCHUTZZIELE, optionen } from "./konstanten.js";
-import type { Vorlage } from "./typen.js";
+import type { Betrieb, Vorlage } from "./typen.js";
+
+export const BUNDESLAENDER = AUFSICHT.map((a) => a.land);
+/** Zuständige Datenschutz-Aufsichtsbehörde für nicht-öffentliche Stellen nach Bundesland (DSK-Liste). */
+export const aufsichtFuer = (b: Betrieb) => AUFSICHT.find((a) => a.land === b.bundesland);
+
+const RECHTSGRUNDLAGEN = [
+  "Art. 6 Abs. 1 lit. a DSGVO (Einwilligung)",
+  "Art. 6 Abs. 1 lit. b DSGVO (Vertrag oder vorvertragliche Maßnahmen)",
+  "Art. 6 Abs. 1 lit. c DSGVO (rechtliche Verpflichtung)",
+  "Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse)",
+  "Art. 88 DSGVO i. V. m. § 26 BDSG (Beschäftigungsverhältnis)",
+  "Art. 9 Abs. 2 lit. a DSGVO (ausdrückliche Einwilligung bei Gesundheitsdaten)",
+];
+const BETROFFENE = ["Kundinnen und Kunden", "Interessenten", "Beschäftigte", "Bewerberinnen und Bewerber", "Lieferanten und Dienstleister", "Besucherinnen und Besucher der Website"];
+const LOESCHFRISTEN = [
+  "Buchungsbelege und Rechnungen: 8 Jahre (§ 147 AO, § 257 HGB), ab Ende des Kalenderjahres",
+  "Handels- und Geschäftsbriefe: 6 Jahre (§ 147 AO, § 257 HGB), ab Ende des Kalenderjahres",
+  "Bücher, Inventare, Jahresabschlüsse: 10 Jahre (§ 147 AO, § 257 HGB)",
+  "Löschung nach Wegfall des Zwecks (Art. 17 Abs. 1 lit. a DSGVO)",
+];
+const DIENSTLEISTUNGEN = ["Website-Hosting", "E-Mail-Anbieter", "Online-Terminbuchung", "Kassensystem", "Cloud-Speicher", "Lohnabrechnung (Lohnbüro)", "IT-Betreuung"];
 
 export const datenschutzDokumentation: Vorlage = {
   id: "datenschutz_dokumentation",
   titel: "Verzeichnis der Verarbeitungstätigkeiten mit TOM",
-  beschreibung: "Welche Daten über Menschen du wofür verarbeitest, wie du sie schützt (TOM) und welche Dienstleister Daten für dich verarbeiten.",
+  beschreibung: "Welche Daten über Menschen du wofür verarbeitest, wie du sie schützt (TOM) und welche Dienstleister beteiligt sind – mit Vorschlägen aus Muster-Verzeichnissen der Aufsichtsbehörden.",
   bereich: "datenschutz",
   pflichten: ["datenschutz.vvt", "datenschutz.tom"],
+  grundlage: "Art. 30 Abs. 1, Art. 32 DSGVO",
   abschnitte: [
     {
       felder: [
         { id: "stand", art: "datum", label: "Stand", vorbelegung: "heute", pflicht: true },
-        { id: "verantwortlich", art: "text", label: "Verantwortliche Person", vorbelegung: "verantwortlich", pflicht: true },
+        { id: "verantwortlich", art: "text", label: "Ansprechperson Datenschutz", vorbelegung: "verantwortlich", pflicht: true },
         { id: "dsb", art: "text", label: "Datenschutzbeauftragte/r", hilfe: "nur falls benannt: Name und Kontakt" },
       ],
     },
     {
       titel: "Verarbeitungstätigkeiten",
-      hilfe: "Je Zweck ein Eintrag, z. B. Kundenkartei, Terminbuchung, Lohnabrechnung, Videoüberwachung.",
+      hilfe: "Wähle aus, was bei dir vorkommt, und passe die Angaben an deinen Betrieb an.",
       felder: [
         {
           id: "verarbeitungen",
@@ -28,23 +54,26 @@ export const datenschutzDokumentation: Vorlage = {
           eintrag: "Verarbeitung",
           titelFeld: "bezeichnung",
           pflicht: true,
+          leerStarten: true,
+          vorschlaege: VVT,
           felder: [
-            { id: "bezeichnung", art: "text", label: "Bezeichnung", hilfe: "z. B. Kundenkartei", pflicht: true },
-            { id: "zweck", art: "mehrzeilig", label: "Zweck", pflicht: true },
-            { id: "rechtsgrundlage", art: "text", label: "Rechtsgrundlage", pflicht: true },
-            { id: "betroffene", art: "text", label: "Betroffene Personen", hilfe: "z. B. Kundinnen und Kunden, Beschäftigte", pflicht: true },
-            { id: "datenarten", art: "mehrzeilig", label: "Datenarten", hilfe: "z. B. Name, Telefonnummer, Termine", pflicht: true },
-            { id: "empfaenger", art: "text", label: "Empfänger", hilfe: "wer die Daten bekommt, z. B. Steuerberatung, Lohnbüro" },
-            { id: "drittland", art: "text", label: "Übermittlung in Drittländer", hilfe: "falls Daten das EU-Ausland verlassen, z. B. durch einen Cloud-Dienst" },
-            { id: "loeschfrist", art: "text", label: "Löschfrist", pflicht: true },
-            { id: "tom_hinweis", art: "text", label: "Schutzmaßnahmen", hilfe: "kurz oder Verweis auf die TOM unten" },
+            { id: "bezeichnung", art: "text", label: "Bezeichnung", pflicht: true },
+            { id: "zweck", art: "mehrzeilig", label: "Zwecke der Verarbeitung", pflicht: true },
+            { id: "rechtsgrundlage", art: "mehrzeilig", label: "Rechtsgrundlage", pflicht: true, vorschlaege: RECHTSGRUNDLAGEN },
+            { id: "betroffene", art: "text", label: "Kategorien betroffener Personen", pflicht: true, vorschlaege: BETROFFENE },
+            { id: "datenarten", art: "mehrzeilig", label: "Kategorien personenbezogener Daten", pflicht: true },
+            { id: "empfaenger", art: "mehrzeilig", label: "Kategorien von Empfängern" },
+            { id: "drittland", art: "text", label: "Übermittlung in Drittländer", vorschlaege: ["keine Übermittlung in Drittländer"] },
+            { id: "gemeinsam", art: "text", label: "Gemeinsam Verantwortliche (Art. 26 DSGVO)", hilfe: "nur falls zutreffend, z. B. Betreiber einer Social-Media-Plattform" },
+            { id: "loeschfrist", art: "mehrzeilig", label: "Fristen für die Löschung", pflicht: true, vorschlaege: LOESCHFRISTEN },
+            { id: "tom_hinweis", art: "text", label: "Technische und organisatorische Maßnahmen", vorschlaege: ["siehe Abschnitt Technische und organisatorische Maßnahmen"] },
           ],
         },
       ],
     },
     {
       titel: "Technische und organisatorische Maßnahmen (TOM)",
-      hilfe: "Wie du die Daten schützt – z. B. Passwörter, Verschlüsselung, abschließbarer Schrank, Datensicherung.",
+      hilfe: "Maßnahmen nach Art. 32 DSGVO, vorbereitet aus BSI IT-Grundschutz und Mustern der Aufsichtsbehörden.",
       felder: [
         {
           id: "tom",
@@ -53,9 +82,12 @@ export const datenschutzDokumentation: Vorlage = {
           eintrag: "Maßnahme",
           titelFeld: "massnahme",
           pflicht: true,
+          leerStarten: true,
+          vorschlaege: TOM,
+          gruppenLabel: "Schutzziel",
           felder: [
-            { id: "schutzziel", art: "wahl", label: "Schutzziel", optionen: optionen(SCHUTZZIELE), vorbelegung: "vertraulichkeit" },
             { id: "massnahme", art: "mehrzeilig", label: "Maßnahme", pflicht: true },
+            { id: "schutzziel", art: "wahl", label: "Schutzziel", optionen: optionen(SCHUTZZIELE), vorbelegung: "vertraulichkeit" },
             { id: "umgesetzt_am", art: "datum", label: "Umgesetzt am", hilfe: "leer lassen, wenn noch geplant" },
             { id: "verantwortlich", art: "text", label: "Verantwortlich" },
           ],
@@ -64,7 +96,7 @@ export const datenschutzDokumentation: Vorlage = {
     },
     {
       titel: "Dienstleister",
-      hilfe: "Wer für dich Daten verarbeitet, z. B. Buchungssystem, Cloud-Speicher, Lohnbüro.",
+      hilfe: "Wer für dich Daten verarbeitet. Steuerberatung ist in der Regel selbst verantwortlich und braucht keinen Vertrag zur Auftragsverarbeitung.",
       felder: [
         {
           id: "dienstleister",
@@ -72,13 +104,14 @@ export const datenschutzDokumentation: Vorlage = {
           label: "Dienstleister",
           eintrag: "Dienstleister",
           titelFeld: "name",
+          leerStarten: true,
           felder: [
             { id: "name", art: "text", label: "Name", pflicht: true },
-            { id: "leistung", art: "text", label: "Leistung" },
-            { id: "auftragsverarbeitung", art: "schalter", label: "Verarbeitet Daten in meinem Auftrag" },
+            { id: "leistung", art: "text", label: "Leistung", vorschlaege: DIENSTLEISTUNGEN },
+            { id: "auftragsverarbeitung", art: "schalter", label: "Verarbeitet Daten in meinem Auftrag", vorbelegung: true },
             { id: "avv_vorhanden", art: "schalter", label: "Vertrag zur Auftragsverarbeitung liegt vor", wenn: { feld: "auftragsverarbeitung" } },
             { id: "avv_datum", art: "datum", label: "Vertrag vom", wenn: { feld: "avv_vorhanden" } },
-            { id: "drittland", art: "text", label: "Drittland", hilfe: "falls außerhalb der EU" },
+            { id: "drittland", art: "text", label: "Drittland", vorschlaege: ["keine Übermittlung in Drittländer"] },
           ],
         },
       ],
@@ -91,16 +124,17 @@ export const datenschutzDokumentation: Vorlage = {
     const verarbeitungen = v.length
       ? v
           .map(
-            (x) =>
-              `<div class="eintrag"><h3>${esc(text(x, "bezeichnung"))}</h3>${angaben([
-                ["Zweck", text(x, "zweck")],
+            (x, i) =>
+              `<div class="eintrag"><h3>${i + 1}. ${esc(text(x, "bezeichnung"))}</h3>${angaben([
+                ["Zwecke (lit. b)", text(x, "zweck")],
                 ["Rechtsgrundlage", text(x, "rechtsgrundlage")],
-                ["Betroffene Personen", text(x, "betroffene")],
-                ["Datenarten", text(x, "datenarten")],
-                ["Empfänger", text(x, "empfaenger") || "keine angegeben"],
-                ["Drittland", text(x, "drittland") || "keine Übermittlung angegeben"],
-                ["Löschfrist", text(x, "loeschfrist")],
-                ["Schutzmaßnahmen", text(x, "tom_hinweis") || "siehe TOM"],
+                ["Betroffene Personen (lit. c)", text(x, "betroffene")],
+                ["Datenkategorien (lit. c)", text(x, "datenarten")],
+                ["Empfänger (lit. d)", text(x, "empfaenger") || "keine"],
+                ["Drittlandübermittlung (lit. e)", text(x, "drittland") || "keine"],
+                ["Gemeinsam Verantwortliche", text(x, "gemeinsam") || null],
+                ["Löschfristen (lit. f)", text(x, "loeschfrist")],
+                ["TOM (lit. g)", text(x, "tom_hinweis") || "siehe Abschnitt Technische und organisatorische Maßnahmen"],
               ])}</div>`,
           )
           .join("")
@@ -110,37 +144,36 @@ export const datenschutzDokumentation: Vorlage = {
           .map(([ziel, titel]) => {
             const l = tom.filter((x) => (text(x, "schutzziel") || "sonstiges") === ziel);
             if (!l.length) return "";
-            return `<h3>${esc(titel)}</h3>${tabelle(["Maßnahme", "Stand", "Verantwortlich"], l.map((m) => [zelle(text(m, "massnahme")), text(m, "umgesetzt_am") ? `umgesetzt ${datumDe(text(m, "umgesetzt_am"))}` : "geplant", zelle(text(m, "verantwortlich"))]), { breiten: ["60%", "20%", "20%"] })}`;
+            return `<h3>${esc(titel)}</h3>${tabelle(["Maßnahme", "Stand", "Verantwortlich"], l.map((m) => [zelle(text(m, "massnahme")), text(m, "umgesetzt_am") ? `umgesetzt ${datumDe(text(m, "umgesetzt_am"))}` : "geplant", zelle(text(m, "verantwortlich"))]), { breiten: ["62%", "18%", "20%"] })}`;
           })
           .join("")
       : absatz("", "Keine Maßnahmen erfasst.");
     const dienstleister = dl.length
       ? tabelle(
-          ["Dienstleister", "Leistung", "Auftragsverarbeitung", "Drittland"],
-          dl.map((x) => [
-            `<strong>${zelle(text(x, "name"))}</strong>`,
-            zelle(text(x, "leistung")),
-            ja(x, "auftragsverarbeitung") ? (ja(x, "avv_vorhanden") ? `Vertrag liegt vor${text(x, "avv_datum") ? ` (vom ${datumDe(text(x, "avv_datum"))})` : ""}` : "<strong>Vertrag fehlt</strong>") : "nein",
-            zelle(text(x, "drittland")) || "–",
-          ]),
-          { breiten: ["25%", "30%", "28%", "17%"] },
+          ["Dienstleister", "Leistung", "Auftragsverarbeitung (Art. 28 DSGVO)", "Drittland"],
+          dl.map((x) => [`<strong>${zelle(text(x, "name"))}</strong>`, zelle(text(x, "leistung")), ja(x, "auftragsverarbeitung") ? (ja(x, "avv_vorhanden") ? `Vertrag liegt vor${text(x, "avv_datum") ? ` (vom ${datumDe(text(x, "avv_datum"))})` : ""}` : "<strong>Vertrag fehlt</strong>") : "nein (eigenständig verantwortlich)", zelle(text(x, "drittland")) || "keine"]),
+          { breiten: ["24%", "26%", "32%", "18%"] },
         )
       : absatz("", "Keine Dienstleister erfasst.");
     return dokument({
       titel: "Verzeichnis der Verarbeitungstätigkeiten",
       betrieb: b,
-      unter: "mit technischen und organisatorischen Maßnahmen und Dienstleistern",
-      meta: `Stand: ${datumDe(text(d, "stand")) || "–"}`,
+      unter: "nach Art. 30 Abs. 1 DSGVO, mit technischen und organisatorischen Maßnahmen nach Art. 32 DSGVO",
+      meta: `Stand: ${datumDe(text(d, "stand"))}\nAnsprechperson: ${text(d, "verantwortlich")}\nVerarbeitungen: ${v.length}`,
       inhalt:
-        angaben([
-          ["Verantwortlicher", [b.name, anschrift(b)].filter((x) => x.trim()).join(", ")],
-          ["Verantwortliche Person", text(d, "verantwortlich")],
-          ["Datenschutzbeauftragte/r", text(d, "dsb") || null],
-          ["Kontakt", [b.telefon, b.email].filter((x) => x.trim()).join(" · ") || null],
-        ]) +
+        abschnitt(
+          "Verantwortlicher (Art. 30 Abs. 1 lit. a DSGVO)",
+          angaben([
+            ["Verantwortlicher", [b.name, anschrift(b)].filter((x) => x.trim()).join(", ")],
+            ["Kontakt", [b.telefon, b.email].filter((x) => x.trim()).join(" · ")],
+            ["Ansprechperson Datenschutz", text(d, "verantwortlich")],
+            ["Datenschutzbeauftragte/r", text(d, "dsb") || "nicht benannt"],
+          ]),
+        ) +
         abschnitt("Verarbeitungstätigkeiten", verarbeitungen) +
-        abschnitt("Technische und organisatorische Maßnahmen", massnahmen) +
-        abschnitt("Dienstleister", dienstleister),
+        abschnitt("Technische und organisatorische Maßnahmen (Art. 32 DSGVO)", massnahmen) +
+        abschnitt("Dienstleister und Auftragsverarbeiter", dienstleister) +
+        `<p class="klein" style="margin-top:5mm">Das Verzeichnis wird bei Änderungen der Verarbeitungen und mindestens jährlich überprüft.</p>`,
     });
   },
 };
@@ -166,12 +199,15 @@ export function berlinText(t: Date): string {
   return `${new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(t)} Uhr`;
 }
 
+const BENACHRICHTIGUNG: Record<string, string> = { nicht_erforderlich: "nicht erforderlich (kein hohes Risiko)", erfolgt: "erfolgt", geplant: "geplant" };
+
 export const datenpanne: Vorlage = {
   id: "datenpanne",
   titel: "Datenpanne: Dokumentation und Meldeentwurf",
   beschreibung: "Alles, was bei einer Datenpanne festzuhalten ist – als Dokumentation und als Vorlage für die Meldung an die Aufsichtsbehörde.",
   bereich: "datenschutz",
   pflichten: ["datenschutz.datenpanne_meldung"],
+  grundlage: "Art. 33, 34 DSGVO",
   namensFeld: "beschreibung",
   abschnitte: [
     {
@@ -185,11 +221,11 @@ export const datenpanne: Vorlage = {
     {
       titel: "Was ist passiert",
       felder: [
-        { id: "beschreibung", art: "mehrzeilig", label: "Art der Verletzung", hilfe: "z. B. Laptop mit Kundendaten gestohlen, E-Mail an falschen Empfänger", pflicht: true },
+        { id: "beschreibung", art: "mehrzeilig", label: "Art der Verletzung", hilfe: "Was ist passiert? Typische Fälle zum Antippen, danach ergänzen.", pflicht: true, vorschlaege: PANNEN_ARTEN.map((o) => o.text) },
         { id: "datenarten", art: "mehrzeilig", label: "Betroffene Datenarten", pflicht: true },
         { id: "betroffene_anzahl", art: "text", label: "Betroffene Personen und Datensätze (ungefähre Zahl)", pflicht: true },
         { id: "folgen", art: "mehrzeilig", label: "Wahrscheinliche Folgen", pflicht: true },
-        { id: "massnahmen", art: "mehrzeilig", label: "Ergriffene und geplante Maßnahmen", pflicht: true },
+        { id: "massnahmen", art: "mehrzeilig", label: "Ergriffene und geplante Maßnahmen", pflicht: true, vorschlaege: PANNEN_SOFORT.map((o) => o.text) },
         { id: "kontakt", art: "text", label: "Kontakt für Rückfragen", vorbelegung: "betrieb_kontakt", pflicht: true },
       ],
     },
@@ -201,6 +237,10 @@ export const datenpanne: Vorlage = {
         { id: "gemeldet", art: "schalter", label: "Bereits gemeldet", wenn: { feld: "risiko" } },
         { id: "gemeldet_am", art: "datum", label: "Gemeldet am", wenn: { feld: "gemeldet" } },
         { id: "aktenzeichen", art: "text", label: "Aktenzeichen der Behörde", wenn: { feld: "gemeldet" } },
+        { id: "verspaetung", art: "mehrzeilig", label: "Begründung, falls die Meldung später als 72 Stunden erfolgt", wenn: { feld: "gemeldet" } },
+        { id: "benachrichtigung", art: "wahl", label: "Benachrichtigung der betroffenen Personen (Art. 34 DSGVO)", optionen: optionen(BENACHRICHTIGUNG), vorbelegung: "nicht_erforderlich" },
+        { id: "benachrichtigt_am", art: "datum", label: "Benachrichtigt am", wenn: { feld: "benachrichtigung", ist: "erfolgt" } },
+        { id: "benachrichtigung_text", art: "mehrzeilig", label: "Wie und mit welchem Inhalt benachrichtigt wurde", wenn: { feld: "benachrichtigung", ist: "erfolgt" } },
       ],
     },
   ],
@@ -227,58 +267,78 @@ export const datenpanne: Vorlage = {
           ["Frist (72 Stunden)", beginn ? berlinText(new Date(beginn.getTime() + 72 * 3600_000)) : ""],
           ["Bewertung", DATENPANNE_RISIKO[risiko] ?? "noch offen"],
           ["Gemeldet", gemeldet ? `${datumDe(text(d, "gemeldet_am")) || "ja"}${text(d, "aktenzeichen") ? ` · Aktenzeichen ${text(d, "aktenzeichen")}` : ""}` : "noch nicht gemeldet"],
+          ["Begründung der späteren Meldung", text(d, "verspaetung") || null],
+          ["Benachrichtigung der Betroffenen", `${BENACHRICHTIGUNG[text(d, "benachrichtigung")] ?? "noch offen"}${text(d, "benachrichtigt_am") ? ` am ${datumDe(text(d, "benachrichtigt_am"))}` : ""}${text(d, "benachrichtigung_text") ? ` – ${text(d, "benachrichtigung_text")}` : ""}`],
         ]) + teile.map(([t, w]) => abschnitt(t, absatz(w))).join(""),
     });
   },
 };
 
-const INFO_TEILE: { id: string; label: string; hilfe: string; nurFalls?: boolean }[] = [
-  { id: "dsb", label: "Kontakt der/des Datenschutzbeauftragten", hilfe: "nur falls benannt", nurFalls: true },
-  { id: "zwecke", label: "Zwecke der Verarbeitung", hilfe: "Wofür du die Daten verwendest" },
-  { id: "rechtsgrundlagen", label: "Rechtsgrundlagen", hilfe: "Auf welcher Grundlage du die Daten verarbeitest" },
-  { id: "interessen", label: "Berechtigte Interessen", hilfe: "nur falls du dich auf berechtigte Interessen stützt", nurFalls: true },
-  { id: "empfaenger", label: "Empfänger der Daten", hilfe: "Wer die Daten bekommt, z. B. Steuerberatung, Buchungssystem" },
-  { id: "drittland", label: "Übermittlung in Drittländer", hilfe: "nur falls Daten das EU-Ausland verlassen", nurFalls: true },
-  { id: "speicherdauer", label: "Speicherdauer", hilfe: "Wie lange du die Daten aufbewahrst" },
-  { id: "rechte", label: "Rechte der betroffenen Personen", hilfe: "Welche Rechte die Menschen haben und wie sie sie ausüben" },
-  { id: "widerruf", label: "Widerruf einer Einwilligung", hilfe: "nur falls du Daten mit Einwilligung verarbeitest", nurFalls: true },
-  { id: "beschwerde", label: "Beschwerderecht bei einer Aufsichtsbehörde", hilfe: "Welche Behörde zuständig ist" },
-  { id: "bereitstellung", label: "Pflicht zur Bereitstellung der Daten", hilfe: "Ob die Menschen die Daten angeben müssen und was passiert, wenn nicht" },
-  { id: "automatisiert", label: "Automatisierte Entscheidungen", hilfe: "nur falls Entscheidungen automatisch getroffen werden", nurFalls: true },
-];
+const BEREITSTELLUNG: Record<string, string> = {
+  vertrag: "Die Bereitstellung der Daten ist für den Abschluss und die Durchführung des Vertrags erforderlich. Ohne diese Daten können wir den Vertrag nicht abschließen oder durchführen.",
+  gesetz: "Die Bereitstellung der Daten ist teilweise gesetzlich vorgeschrieben (z. B. für Steuer und Sozialversicherung) und im Übrigen für die Durchführung des Vertrags erforderlich. Ohne diese Daten können wir unsere gesetzlichen Pflichten nicht erfüllen und das Vertragsverhältnis nicht durchführen.",
+  freiwillig: "Die Bereitstellung der Daten ist freiwillig. Ohne die Daten können wir das jeweilige Angebot nicht oder nur eingeschränkt bereitstellen.",
+};
+/** Stützt sich eine der gewählten Verarbeitungen auf berechtigte Interessen? */
+const mitLitF = (d: Parameters<Vorlage["html"]>[0]) => auswahl(d, "verarbeitungen").some((t) => /lit\. f/.test(String(VVT.find((v) => v.titel === t)?.werte.rechtsgrundlage ?? "")));
+const ZIELGRUPPE = ["Kundinnen und Kunden", "Beschäftigte", "Bewerberinnen und Bewerber", "Lieferanten und Geschäftspartner"];
 
 export const datenschutzinformation: Vorlage = {
   id: "datenschutzinformation",
-  titel: "Datenschutzinformation",
-  beschreibung: "Informationsblatt für Kundschaft, Beschäftigte oder Bewerbende: wer Daten verarbeitet, wofür, wie lange und welche Rechte bestehen.",
+  titel: "Datenschutzinformation (Art. 13 DSGVO)",
+  beschreibung: "Informationsblatt für Kundschaft, Beschäftigte oder Bewerbende – Verarbeitungen ankreuzen, Zwecke, Rechtsgrundlagen und Speicherdauer kommen automatisch.",
   bereich: "datenschutz",
   pflichten: ["datenschutz.informationspflichten"],
+  grundlage: "Art. 13 DSGVO",
   namensFeld: "fuer_wen",
   abschnitte: [
     {
       felder: [
-        { id: "fuer_wen", art: "text", label: "Für wen", hilfe: "z. B. Kundinnen und Kunden, Beschäftigte, Bewerbende", pflicht: true },
+        { id: "fuer_wen", art: "text", label: "Für wen", pflicht: true, vorschlaege: ZIELGRUPPE },
+        { id: "verarbeitungen", art: "bausteine", label: "Welche Verarbeitungen betreffen diese Personen?", optionen: VVT.map((v) => ({ wert: v.titel, text: v.titel, quelle: v.quelle })), pflicht: true },
+        { id: "dsb", art: "text", label: "Datenschutzbeauftragte/r", hilfe: "nur falls benannt: Name und Kontakt" },
+        { id: "interessen", art: "mehrzeilig", label: "Berechtigte Interessen", hilfe: "nötig, wenn eine Verarbeitung auf Art. 6 Abs. 1 lit. f DSGVO beruht – z. B. Schutz vor Diebstahl, Durchsetzung von Ansprüchen, sichere IT", vorschlaege: ["Sicherer und störungsfreier Betrieb unserer IT", "Durchsetzung und Abwehr von Ansprüchen", "Schutz vor Diebstahl und Vandalismus (Videoüberwachung)", "Information unserer Bestandskundschaft über eigene Angebote"] },
+        { id: "bereitstellung", art: "wahl", label: "Pflicht zur Bereitstellung der Daten", optionen: optionen(BEREITSTELLUNG), vorbelegung: "vertrag" },
+        { id: "ergaenzung", art: "mehrzeilig", label: "Ergänzungen", hilfe: "z. B. besondere Verarbeitungen in deinem Betrieb" },
         { id: "stand", art: "datum", label: "Stand", vorbelegung: "heute" },
       ],
     },
-    {
-      titel: "Inhalt",
-      hilfe: "Die verantwortliche Stelle übernimmt Amtlos aus „Mein Betrieb“. Abschnitte mit „nur falls“ entfallen im Dokument, wenn sie leer sind.",
-      felder: INFO_TEILE.map((x) => ({ id: x.id, art: "mehrzeilig" as const, label: x.label, hilfe: x.hilfe, pflicht: !x.nurFalls })),
-    },
+  ],
+  pruefen: (d, b) => [
+    ...(b.bundesland ? [] : ["Bundesland (Mein Betrieb) – für die zuständige Aufsichtsbehörde"]),
+    ...(b.email.trim() ? [] : ["E-Mail (Mein Betrieb)"]),
+    ...(mitLitF(d) && !text(d, "interessen") ? ["Berechtigte Interessen (bei Art. 6 Abs. 1 lit. f DSGVO)"] : []),
   ],
   html(d, b) {
-    const verantwortlich = [b.name, anschrift(b), [b.telefon, b.email].filter((x) => x.trim()).join(" · ")].filter((x) => x.trim()).join("\n");
+    const gewaehlt = auswahl(d, "verarbeitungen").map((t) => VVT.find((v) => v.titel === t)).filter((v): v is (typeof VVT)[number] => Boolean(v));
+    const a = aufsichtFuer(b);
+    const ersetze = (t: string) => t.replace(/\{email\}/g, b.email.trim() || "____").replace(/\{link_einstellungen\}/g, "die angegebenen Kontaktwege");
     return dokument({
-      titel: "Datenschutzinformation",
+      titel: "Information zur Datenverarbeitung",
       betrieb: b,
-      unter: text(d, "fuer_wen") ? `für ${text(d, "fuer_wen")}` : undefined,
-      meta: `Stand: ${datumDe(text(d, "stand")) || "–"}`,
+      unter: text(d, "fuer_wen") ? `für ${text(d, "fuer_wen")} nach Art. 13 DSGVO` : "nach Art. 13 DSGVO",
+      meta: `Stand: ${datumDe(text(d, "stand"))}`,
       inhalt:
-        abschnitt("Verantwortliche Stelle", absatz(verantwortlich)) +
-        INFO_TEILE.filter((x) => !x.nurFalls || text(d, x.id))
-          .map((x) => abschnitt(x.label, absatz(text(d, x.id))))
-          .join(""),
+        abschnitt("Verantwortlicher", angaben([["Verantwortlicher", [b.name, anschrift(b)].filter((x) => x.trim()).join(", ")], ["Kontakt", [b.telefon, b.email].filter((x) => x.trim()).join(" · ")], ["Datenschutzbeauftragte/r", text(d, "dsb") || null]])) +
+        abschnitt(
+          "Zwecke, Rechtsgrundlagen, Empfänger und Speicherdauer",
+          gewaehlt.length
+            ? gewaehlt
+                .map((v) => `<div class="eintrag"><h3>${esc(v.titel)}</h3>${angaben([["Zweck", String(v.werte.zweck ?? "")], ["Rechtsgrundlage", String(v.werte.rechtsgrundlage ?? "")], ["Empfänger", String(v.werte.empfaenger ?? "") || "keine"], ["Übermittlung in Drittländer", String(v.werte.drittland ?? "") || "keine"], ["Speicherdauer", String(v.werte.loeschfrist ?? "")]])}</div>`)
+                .join("")
+            : absatz(""),
+        ) +
+        (mitLitF(d) ? abschnitt("Berechtigte Interessen", text(d, "interessen") ? zeilen(text(d, "interessen")) : absatz("")) : "") +
+        abschnitt(DSE.betroffenenrechte!.titel, `<p>${esc(ersetze(DSE.betroffenenrechte!.text))}</p>`) +
+        abschnitt(DSE.widerspruchsrecht!.titel, `<p>${esc(ersetze(DSE.widerspruchsrecht!.text))}</p>`) +
+        abschnitt(DSE.widerruf_einwilligung!.titel, `<p>${esc(ersetze(DSE.widerruf_einwilligung!.text))}</p>`) +
+        abschnitt(
+          DSE.beschwerderecht!.titel,
+          `<p>${esc(DSE.beschwerderecht!.text.replace("{aufsichtsbehoerde_name}", a?.name ?? "____").replace("{aufsichtsbehoerde_ort}", a?.ort ?? "____").replace("{aufsichtsbehoerde_url}", a?.url ?? "____"))}</p>`,
+        ) +
+        abschnitt("Pflicht zur Bereitstellung", `<p>${esc(BEREITSTELLUNG[text(d, "bereitstellung")] ?? "")}</p>`) +
+        abschnitt("Automatisierte Entscheidungen", "<p>Eine automatisierte Entscheidungsfindung einschließlich Profiling findet nicht statt.</p>") +
+        (text(d, "ergaenzung") ? abschnitt("Ergänzungen", zeilen(text(d, "ergaenzung"))) : ""),
     });
   },
 };

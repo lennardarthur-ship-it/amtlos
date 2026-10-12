@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { VORLAGEN, fehlendeAngaben, vorlageFuer } from "@amtlos/fachlogik";
+import { PDFDocument } from "pdf-lib";
+import { VORLAGEN, dokumentHtml, fehlendeAngaben, leereDaten, vorlageFuer } from "@amtlos/fachlogik";
+import { fussAngaben, fusszeileStempeln } from "../src/unterlagen/fusszeile";
 import { pflichtenFuer, rechtsgrundlagen } from "../src/unterlagen/katalog";
 import { LEERER_STAND, aendern, anlegen, betriebFehlt, betriebSetzen, heute, kopieren, loeschen, sortiert, standAus } from "../src/unterlagen/speicher";
 
-const B = { name: "Café Mond", strasse: "Markt 2", plz: "54321", ort: "Beispielstadt", verantwortlich: "Robin Beispiel", telefon: "", email: "", steuernummer: "", ust_idnr: "", iban: "" };
+const B = { name: "Café Mond", strasse: "Markt 2", plz: "54321", ort: "Beispielstadt", verantwortlich: "Robin Beispiel", telefon: "", email: "", steuernummer: "", ust_idnr: "", iban: "", bundesland: "Hessen" };
 const t = (s: string) => new Date(`2026-10-12T${s}:00Z`);
 
 describe("Unterlagen auf dem Gerät", () => {
@@ -46,10 +48,24 @@ describe("Unterlagen auf dem Gerät", () => {
   it("eine neu angelegte Unterlage nennt, was fehlt – ein leerer Betrieb füllt nichts vor", () => {
     const [, u] = anlegen(LEERER_STAND, "unterweisung", t("08:00"));
     expect(u.daten.durchgefuehrt_von).toBe("");
-    expect(fehlendeAngaben(vorlageFuer("unterweisung")!, u.daten)).toEqual(["Thema", "Durchgeführt von", "Inhalt der Unterweisung"]);
+    expect(fehlendeAngaben(vorlageFuer("unterweisung")!, u.daten)).toEqual(["Bezeichnung", "Durchgeführt von"]);
   });
 
   it("nimmt das Datum in deutscher Zeit", () => {
     expect(heute(new Date("2026-10-12T22:30:00Z"))).toBe("2026-10-13");
+  });
+
+  it("setzt die Fußzeile mit Seitenzahlen auf jede Seite und liest die Angaben aus dem Dokument", async () => {
+    const v = vorlageFuer("gefaehrdungsbeurteilung")!;
+    const html = dokumentHtml(v, { ...leereDaten(v, B, "2026-10-12"), arbeitsbereich: "Küche" }, B);
+    expect(fussAngaben(html)).toEqual({ links: "Café Mond · Gefährdungsbeurteilung", rechts: "Stand 12.10.2026" });
+    const roh = await PDFDocument.create();
+    roh.addPage([595, 842]);
+    roh.addPage([595, 842]);
+    const vorher = await roh.save();
+    const nachher = await fusszeileStempeln(vorher, "Café Mond · Gefährdungsbeurteilung 🙂", "Stand 12.10.2026");
+    const neu = await PDFDocument.load(nachher);
+    expect(neu.getPageCount()).toBe(2);
+    expect(nachher.length).toBeGreaterThan(vorher.length);
   });
 });

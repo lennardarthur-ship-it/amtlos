@@ -12,7 +12,7 @@ Das Bürokratie-Betriebssystem für Kleinunternehmer und Startups in Deutschland
 | `apps/studio` | Experten-Backend: Katalog bearbeiten, prüfen, veröffentlichen |
 | `apps/api` | REST-API (NestJS) |
 | `apps/worker` | Neuberechnung, Tageswechsel, Erinnerungen (E-Mail, Push), Einladungen, Marktplatz-Anfragen |
-| `apps/mobile` | Mobile App (Expo): Heute, Pflichten, Stempeln auch offline, Belege, Push |
+| `apps/mobile` | Mobile App (Expo): 33 Unterlagen zum Auswählen und Ausfüllen, PDF auf dem Gerät (E-121 bis E-123) |
 | `packages/rules-engine` | Regel-Engine (rein, deterministisch, dreiwertig) |
 | `packages/fristen` | Fristen, Feiertage, Perioden |
 | `packages/rules-schema` | JSON-Schemas, Fakten- und Ereignis-Katalog, Validator |

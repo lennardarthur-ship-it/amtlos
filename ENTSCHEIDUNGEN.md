@@ -520,6 +520,16 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - Der Hinweis für Kleinunternehmer auf Rechnungen liegt jetzt in `@amtlos/fachlogik` (`KU_HINWEIS`) und wird von API und App geteilt.
 - Aufbewahrungsfristen 10/8/6 Jahre als Vorschlag im Aufbewahrungsplan (Rechtsstand ab 2025 nach Angabe des Gründers und eigenem Stand, T-58). Der Referentenentwurf zur elektronischen Zeiterfassung (Juni 2026) wird nicht übernommen, solange er nicht geprüft ist.
 
+
+### E-123 · Unterlagen in Produktqualität: vorgeschriebene Inhalte zum Auswählen, Gestaltung wie ein Dokument aus der Kanzlei
+- **Datum:** 2026-10-12 · **Status:** angenommen (Kritik des Gründers: Dokumente sahen nach Prototyp aus; zu viel Freitext, wo es nur wenige Möglichkeiten gibt). Ersetzt in E-121 den Punkt „Amtlos schreibt keine Rechtstexte“ und den PDF-Hinweis „Vorlage noch nicht fachlich geprüft“.
+- **Inhalte vorformuliert, Nutzer prüft:** Wo das Gesetz oder eine Regel die Möglichkeiten vorgibt, wählt man aus (Wahl-Felder, Chips, Bausteine) statt zu tippen. Vorformulierte Einträge kommen aus vier Recherchen vom 12.10.2026 (`docs/recherche/2026-10-12/*.json`) und einem unabhängigen Prüfbericht; `packages/fachlogik/werkzeuge/bausteine-erzeugen.mjs` erzeugt daraus `src/dokumente/bausteine.ts` (nicht von Hand bearbeiten). Jeder Baustein trägt eine kurze Quelle und ein Kennzeichen „unsicher“; erfundene Inhalte, Fristen oder Beträge gibt es nicht.
+- **Beispiele:** Gefährdungsbeurteilung mit 70 Gefährdungen je Branche (Auswahl mit Filter, übernommen als vollständige Zeile mit Maßnahmen); Mutterschutz-Ergebnis als Pflichtwahl nach § 10 MuSchG; Unterweisungsthemen und nächster Termin nach 12 Monaten; Betriebsanweisung in den TRGS-555-Kästen; Verzeichnis der Verarbeitungstätigkeiten mit 14 Verarbeitungen und 38 TOM; Datenschutzinformation aus den gewählten Verarbeitungen (berechtigte Interessen werden Pflicht, sobald lit. f vorkommt); Datenschutzerklärung aus 17 Modulen mit der zuständigen Aufsichtsbehörde nach Bundesland; AV-Vertrag mit allen acht Pflichten aus Art. 28 Abs. 3 lit. a–h; Nachweis nach § 2 NachwG Nr. 1–15 mit Prüfung gegen Mindestlohn (13,90 € ab 2026, 14,60 € ab 2027) und Mindesturlaub; Personalfragebogen mit SV-Schlüsseln und Minijob-Grenze (603 €); Rechnung mit Pflichtangaben nach § 14 Abs. 4 UStG und Prüfung des Befreiungshinweises bei 0 %; Impressum nach § 5 DDG (zweiter Kontaktweg Pflicht).
+- **Gestaltung:** Briefkopf des Betriebs, Titel, Kopfzeile mit Rechtsgrundlage und Stand, nummerierte Abschnitte, Serifenschrift für Text, Linien zum Ausfüllen statt „(noch nicht angegeben)“. Fußzeile mit Betrieb, Dokument, Stand und „Seite x von y“ setzt die App nach dem Drucken mit pdf-lib auf jede Seite (iOS-Druck kennt keine Seitenzahlen).
+- **Kein Hinweis „nicht fachlich geprüft“ mehr im PDF** – das Dokument soll so verwendbar sein. Der Hinweis, die Angaben vor Gebrauch zu prüfen, steht in der App am Formular. Offene fachliche Prüfungen bleiben in der Prüfliste (T-62 ff.).
+- Hinweis für Kleinunternehmer jetzt „Der Umsatz ist nach § 19 Abs. 1 UStG steuerfrei.“ (Wortlaut nach Neufassung ab 2025, T-63).
+- „Mein Betrieb“ hat ein Bundesland (Aufsichtsbehörde Datenschutz).
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

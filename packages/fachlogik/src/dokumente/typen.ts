@@ -16,9 +16,11 @@ export interface Betrieb {
   steuernummer: string;
   ust_idnr: string;
   iban: string;
+  /** für die zuständige Datenschutz-Aufsichtsbehörde u. a. */
+  bundesland: string;
 }
 
-export const LEERER_BETRIEB: Betrieb = { name: "", strasse: "", plz: "", ort: "", verantwortlich: "", telefon: "", email: "", steuernummer: "", ust_idnr: "", iban: "" };
+export const LEERER_BETRIEB: Betrieb = { name: "", strasse: "", plz: "", ort: "", verantwortlich: "", telefon: "", email: "", steuernummer: "", ust_idnr: "", iban: "", bundesland: "" };
 
 /** Ein Wert in einem Listeneintrag. */
 export type EintragWert = string | boolean | string[] | null;
@@ -29,12 +31,25 @@ export type Daten = Record<string, Wert>;
 export interface Option {
   wert: string;
   text: string;
+  /** Kurzbeleg, z. B. „BGW“ oder „§ 622 BGB“ – in der App unter dem Baustein angezeigt */
+  quelle?: string;
+}
+
+/** Vorbereiteter Listeneintrag zum Übernehmen, z. B. eine typische Gefährdung mit Maßnahmen. */
+export interface Vorschlag {
+  /** Gruppe zum Filtern, z. B. Branche */
+  gruppe?: string;
+  titel: string;
+  werte: Eintrag;
+  quelle?: string;
 }
 
 /** Bedingung: Feld nur zeigen, wenn ein anderes Feld gesetzt ist (Schalter an) bzw. einen bestimmten Wert hat. */
 export interface Bedingung {
   feld: string;
   ist?: string;
+  /** Bedingung umkehren: Feld zeigen, wenn die Bedingung NICHT erfüllt ist */
+  nicht?: boolean;
 }
 
 interface FeldBasis {
@@ -47,7 +62,8 @@ interface FeldBasis {
 }
 
 export type EinfachesFeld =
-  | (FeldBasis & { art: "text" | "mehrzeilig"; vorbelegung?: "verantwortlich" | "betrieb_kontakt" })
+  /** `vorschlaege`: antippbare Formulierungen – bei „text“ ersetzen sie den Inhalt, bei „mehrzeilig“ kommen sie als neue Zeile dazu */
+  | (FeldBasis & { art: "text" | "mehrzeilig"; vorbelegung?: "verantwortlich" | "betrieb_kontakt"; vorschlaege?: string[] })
   | (FeldBasis & { art: "datum"; vorbelegung?: "heute" })
   | (FeldBasis & { art: "uhrzeit" })
   /** Euro-Betrag, gespeichert wie eingegeben („1.234,50“) */
@@ -56,7 +72,9 @@ export type EinfachesFeld =
   | (FeldBasis & { art: "zahl"; vorbelegung?: string })
   | (FeldBasis & { art: "wahl"; optionen: Option[]; vorbelegung?: string })
   | (FeldBasis & { art: "schalter"; vorbelegung?: boolean })
-  | (FeldBasis & { art: "mehrfach"; optionen: Option[] });
+  | (FeldBasis & { art: "mehrfach"; optionen: Option[] })
+  /** Textbausteine zum Ankreuzen (Liste untereinander, mit Quelle); gespeichert werden die Werte */
+  | (FeldBasis & { art: "bausteine"; optionen: Option[]; vorbelegung?: string[] });
 
 /** Wiederholbare Gruppe, z. B. Gefährdungen, Gefahrstoffe, Teilnehmende. */
 export type ListenFeld = FeldBasis & {
@@ -68,6 +86,12 @@ export type ListenFeld = FeldBasis & {
   felder: EinfachesFeld[];
   /** Einträge einer neuen Unterlage (sonst ein leerer Eintrag) */
   start?: Eintrag[];
+  /** Neue Unterlage beginnt ohne Eintrag (z. B. wenn Vorschläge der bessere Start sind) */
+  leerStarten?: boolean;
+  /** Vorbereitete Einträge zum Übernehmen */
+  vorschlaege?: Vorschlag[];
+  /** Bezeichnung der Gruppen, z. B. „Branche“ */
+  gruppenLabel?: string;
 };
 
 export type Feld = EinfachesFeld | ListenFeld;
@@ -92,6 +116,8 @@ export interface Vorlage {
   /** Feld, das eine einzelne Unterlage in „Meine Unterlagen“ benennt (z. B. Arbeitsbereich) */
   namensFeld?: string;
   abschnitte: VorlagenAbschnitt[];
+  /** Rechtsgrundlage für den Dokumentkopf, z. B. „§§ 5, 6 ArbSchG“ */
+  grundlage?: string;
   /** Querformat (breite Tabellen, Aushänge) */
   querformat?: boolean;
   html(daten: Daten, betrieb: Betrieb): string;

@@ -1,0 +1,802 @@
+{
+  "_meta": {
+    "stand_recherche": "2026-10-12",
+    "hinweise": [
+      "gesetze-im-internet.de war aus der Rechercheumgebung nicht abrufbar (robots/Proxy). Gesetzestexte (IfSG, LMHV, LMIDV) wurden über Spiegel (lexmea.de, lxgesetze.de, dejure.org) und behördliche Merkblätter geprüft; als Primärquelle ist jeweils die amtliche URL angegeben, die Prüfquelle unter 'quelle_pruefung'. Vor Produktivnutzung Wortlaut gegen gesetze-im-internet.de abgleichen.",
+      "Wortlaute sind 'nah am Text' formuliert; echte Zitate stehen in Anführungszeichen.",
+      "Temperatur-Richtwerte variieren je nach Quelle/Betriebsart (zugelassener Betrieb vs. Einzelhandel/Gastronomie). Die App sollte Herstellerangaben Vorrang geben (so auch Merkblatt Mainz)."
+    ]
+  },
+
+  "haccp": {
+    "rechtsgrundlage": {
+      "text": "Art. 5 VO (EG) Nr. 852/2004: Pflicht zu einem betrieblichen Eigenkontrollsystem nach HACCP-Grundsätzen; Maßnahmen nachweisbar dokumentieren und der Überwachung auf Verlangen vorlegen. Umfang und Ausgestaltung hängen von Art und Größe des Betriebs ab.",
+      "quelle": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32004R0852",
+      "quelle_pruefung": "https://www.mainz.de/vv/medien/internet/Merkblatt-fuer-Betriebseigene-Massnahmen-und-Kontrollen.pdf"
+    },
+    "kontrollpunkte": [
+      {
+        "punkt": "Kühllagerung allgemein – Temperaturkontrolle Kühleinrichtungen",
+        "grenzwert": "Soll-Temperaturen je Kühleinrichtung festlegen; Kühlschrank +4 bis +7",
+        "einheit": "°C",
+        "haeufigkeit": "Ist-Temperatur mindestens einmal täglich messen und dokumentieren",
+        "korrektur": "Bei Abweichung bzw. sensorischer Veränderung: Ware entnehmen und ggf. verwerfen, Verantwortliche informieren, Kühltemperatur korrigieren oder Reparaturauftrag an Fachfirma; Korrekturmaßnahme dokumentieren.",
+        "quelle": "https://www.mainz.de/vv/medien/internet/Merkblatt-fuer-Betriebseigene-Massnahmen-und-Kontrollen.pdf; https://www.mainz.de/vv/medien/internet/HACCP-Lagerung-Kuehltemperaturen.pdf"
+      },
+      {
+        "punkt": "Kühlung Fleisch und Fleischerzeugnisse (frisch)",
+        "grenzwert": "max. +7",
+        "einheit": "°C",
+        "haeufigkeit": "täglich (Temperaturkontrolle)",
+        "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren.",
+        "quelle": "https://www.mainz.de/vv/medien/internet/Merkblatt-fuer-Betriebseigene-Massnahmen-und-Kontrollen.pdf; https://www.laves.niedersachsen.de/download/209574/Merkblatt_Lagertemperaturen_fuer_Lebensmittel.pdf",
+        "rechtsbezug": "VO (EG) Nr. 853/2004 Anhang III Abschnitt I (Fleisch ≤ 7 °C, Nebenprodukte der Schlachtung ≤ 3 °C) – gilt unmittelbar für zugelassene Betriebe: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32004R0853"
+      },
+      {
+        "punkt": "Kühlung Innereien / Nebenprodukte der Schlachtung (frisch)",
+        "grenzwert": "max. +3",
+        "einheit": "°C",
+        "haeufigkeit": "täglich",
+        "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren.",
+        "quelle": "https://www.laves.niedersachsen.de/download/209574/Merkblatt_Lagertemperaturen_fuer_Lebensmittel.pdf; https://www.mainz.de/vv/medien/internet/Merkblatt-fuer-Betriebseigene-Massnahmen-und-Kontrollen.pdf"
+      },
+      {
+        "punkt": "Kühlung Hackfleisch",
+        "grenzwert": "vorverpackt (SB) bzw. nicht am Ort der Abgabe hergestellt: max. +2; am Ort der Abgabe hergestellt / lose: max. +7 (LAVES: +7 bzw. +4 je nach Abgabezeitpunkt)",
+        "einheit": "°C",
+        "haeufigkeit": "täglich",
+        "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren.",
+        "quelle": "https://www.mainz.de/vv/medien/internet/Merkblatt-fuer-Betriebseigene-Massnahmen-und-Kontrollen.pdf; https://www.laves.niedersachsen.de/download/209574/Merkblatt_Lagertemperaturen_fuer_Lebensmittel.pdf",
+        "rechtsbezug": "VO (EG) Nr. 853/2004 Anhang III Abschnitt V (Hackfleisch ≤ 2 °C, Fleischzubereitungen ≤ 4 °C); Tier-LMHV für Einzelhandel"
+      },
+      {
+        "punkt": "Kühlung Fleischzubereitungen",
+        "grenzwert": "SB-verpackt max. +4; lose oder selbst verpackt (Einzelhandel) max. +7",
+        "einheit": "°C",
+        "haeufigkeit": "täglich",
+        "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren.",
+        "quelle": "https://www.laves.niedersachsen.de/download/209574/Merkblatt_Lagertemperaturen_fuer_Lebensmittel.pdf"
+      },
+      {
+        "punkt": "Kühlung Geflügelfleisch (auch Federwild, Kleinwild/Hasen)",
+        "grenzwert": "max. +4 (LAVES: −2 bis max. +4)",
+        "einheit": "°C",
+        "haeufigkeit": "täglich",
+        "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren.",
+        "quelle": "https://www.mainz.de/vv/medien/internet/Merkblatt-fuer-Betriebseigene-Massnahmen-und-Kontrollen.pdf; https://www.laves.niedersachsen.de/download/209574/Merkblatt_Lagertemperaturen_fuer_Lebensmittel.pdf",
+        "rechtsbezug": "VO (EG) Nr. 853/2004 Anhang III Abschnitt II (Geflügelfleisch ≤ 4 °C)"
+      },
+      {
+        "punkt": "Kühlung Fisch frisch, gekochte Krebs- und Weichtiere",
+        "grenzwert": "max. +2 bzw. in schmelzendem Eis (annähernd Schmelzeistemperatur)",
+        "einheit": "°C",
+        "haeufigkeit": "täglich",
+        "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren.",
+        "quelle": "https://www.mainz.de/vv/medien/internet/Merkblatt-fuer-Betriebseigene-Massnahmen-und-Kontrollen.pdf; https://www.laves.niedersachsen.de/download/209574/Merkblatt_Lagertemperaturen_fuer_Lebensmittel.pdf",
+        "rechtsbezug": "VO (EG) Nr. 853/2004 Anhang III Abschnitt VIII (Temperatur schmelzenden Eises)"
+      },
+      {
+        "punkt": "Kühlung Räucherfisch, Marinaden, Fischerzeugnisse",
+        "grenzwert": "max. +7",
+        "einheit": "°C",
+        "haeufigkeit": "täglich",
+        "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren.",
+        "quelle": "https://www.mainz.de/vv/medien/internet/Merkblatt-fuer-Betriebseigene-Massnahmen-und-Kontrollen.pdf"
+      },
+      {
+        "punkt": "Kühlung Milch (Konsummilch)",
+        "grenzwert": "max. +8",
+        "einheit": "°C",
+        "haeufigkeit": "täglich",
+        "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren.",
+        "quelle": "https://www.mainz.de/vv/medien/internet/Merkblatt-fuer-Betriebseigene-Massnahmen-und-Kontrollen.pdf; https://www.laves.niedersachsen.de/download/209574/Merkblatt_Lagertemperaturen_fuer_Lebensmittel.pdf"
+      },
+      {
+        "punkt": "Kühlung Milcherzeugnisse, Käse (außer Hartkäse), Butter, Frischkäse",
+        "grenzwert": "max. +10 (sofern Hersteller nichts anderes angibt)",
+        "einheit": "°C",
+        "haeufigkeit": "täglich",
+        "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren.",
+        "quelle": "https://www.mainz.de/vv/medien/internet/Merkblatt-fuer-Betriebseigene-Massnahmen-und-Kontrollen.pdf; https://www.laves.niedersachsen.de/download/209574/Merkblatt_Lagertemperaturen_fuer_Lebensmittel.pdf"
+      },
+      {
+        "punkt": "Kühlung Eiprodukte / roheihaltige Lebensmittel",
+        "grenzwert": "Eiprodukte max. +4; roheihaltige Lebensmittel: Mainz +7, LAVES +4",
+        "einheit": "°C",
+        "haeufigkeit": "täglich",
+        "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren.",
+        "quelle": "https://www.mainz.de/vv/medien/internet/Merkblatt-fuer-Betriebseigene-Massnahmen-und-Kontrollen.pdf; https://www.laves.niedersachsen.de/download/209574/Merkblatt_Lagertemperaturen_fuer_Lebensmittel.pdf",
+        "unsicher": true,
+        "anmerkung": "Quellen weichen für roheihaltige Lebensmittel ab (+4 vs. +7 °C); strengeren Wert empfehlen."
+      },
+      {
+        "punkt": "Kühlung feine Backwaren / Konditorwaren mit nicht durcherhitzter Füllung oder Auflage; Feinkost-, Obst-/Gemüsesalate, belegte Brötchen, Desserts",
+        "grenzwert": "max. +7",
+        "einheit": "°C",
+        "haeufigkeit": "täglich",
+        "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren.",
+        "quelle": "https://www.mainz.de/vv/medien/internet/Merkblatt-fuer-Betriebseigene-Massnahmen-und-Kontrollen.pdf; https://www.laves.niedersachsen.de/download/209574/Merkblatt_Lagertemperaturen_fuer_Lebensmittel.pdf"
+      },
+      {
+        "punkt": "Tiefkühlung (Tiefkühltruhe/-raum, tiefgefrorene Lebensmittel)",
+        "grenzwert": "−18 oder kälter; kurzfristig bis −15 zulässig",
+        "einheit": "°C",
+        "haeufigkeit": "täglich",
+        "korrektur": "Ware prüfen, ggf. verwerfen (nicht wieder einfrieren, wenn angetaut), Gerät korrigieren/Reparatur, dokumentieren.",
+        "quelle": "https://www.mainz.de/vv/medien/internet/HACCP-Lagerung-Kuehltemperaturen.pdf; https://www.laves.niedersachsen.de/download/209574/Merkblatt_Lagertemperaturen_fuer_Lebensmittel.pdf",
+        "anmerkung": "Korrekturmaßnahme 'nicht wieder einfrieren' ist fachüblich, in den zitierten Merkblättern nicht ausdrücklich genannt.",
+        "unsicher": true
+      },
+      {
+        "punkt": "Speiseeis",
+        "grenzwert": "Lagerung als Tiefkühlware −18; Speiseeis zum Ausportionieren / Eistresen zur Ausgabe max. −10",
+        "einheit": "°C",
+        "haeufigkeit": "täglich",
+        "korrektur": "Ware prüfen, angetautes Eis verwerfen, Gerät korrigieren/Reparatur, dokumentieren.",
+        "quelle": "https://www.laves.niedersachsen.de/download/209574/Merkblatt_Lagertemperaturen_fuer_Lebensmittel.pdf; https://www.mainz.de/vv/medien/internet/HACCP-Lagerung-Kuehltemperaturen.pdf"
+      },
+      {
+        "punkt": "Heißhalten / Ausgabetemperatur warmer Speisen",
+        "grenzwert": "mindestens +60 an allen Stellen bzw. im Kern (BfR 2020, LAVES, Mainz). Älterer Wert +65 (BfR 2008, BgVV, DIN-Normen, LAVES-Merkblatt B. cereus: mind. +65 °C für max. 3 Stunden)",
+        "einheit": "°C",
+        "haeufigkeit": "stichprobenartig bei Ausgabe (Mainz)",
+        "korrektur": "Zu kalte warme Speisen bis zum Aufkochen nacherhitzen; sonst verwerfen; dokumentieren.",
+        "quelle": "https://www.bfr.bund.de/cm/343/schutz-vor-lebensmittelbedingten-erkrankungen-beim-heisshalten-von-speisen.pdf; https://www.mainz.de/vv/medien/internet/HACCP-Ausgabetemperatur-stichprobenartig.pdf; https://www.laves.niedersachsen.de/download/209574/Merkblatt_Lagertemperaturen_fuer_Lebensmittel.pdf",
+        "anmerkung": "BfR-Stellungnahme Nr. 037/2020 vom 27.08.2020 senkt die Empfehlung von 65 °C auf 60 °C. Wer 65 °C als betriebliche Grenze setzt, ist auf der sicheren Seite. Heißhaltedauer max. ca. 3 Stunden nur aus BgVV 1999/LAVES-B.-cereus-Merkblatt belegt (https://www.laves.niedersachsen.de/download/95540/Bacillus_cereus.pdf)."
+      },
+      {
+        "punkt": "Ausgabetemperatur Kaltspeisen und Salate",
+        "grenzwert": "max. +7",
+        "einheit": "°C",
+        "haeufigkeit": "stichprobenartig",
+        "korrektur": "Bei Unterbrechung der Kühlkette > 30 Minuten Lebensmittel entsorgen (Mainz); dokumentieren.",
+        "quelle": "https://www.mainz.de/vv/medien/internet/HACCP-Ausgabetemperatur-stichprobenartig.pdf"
+      },
+      {
+        "punkt": "Abkühlen heißer Speisen",
+        "grenzwert": "Bereich von +65 auf +10 innerhalb von 3 Stunden durchschreiten",
+        "einheit": "°C / h",
+        "haeufigkeit": null,
+        "korrektur": "Bei Überschreitung: Speise nicht weiter lagern, verwerfen; Abkühlverfahren (flache Behälter, Schnellkühler) anpassen.",
+        "quelle": "https://www.oberallgaeu.org/fileadmin/eigene_dateien/Dateien_Verbraucherschutz/Temperaturempfehlungen_BGVV-1.pdf",
+        "unsicher": true,
+        "anmerkung": "Einzige gefundene deutsche Behördenquelle ist die BgVV-Temperaturempfehlung (Stand 01/1999, nicht rechtsverbindlich, Rechtsgrundlagen veraltet). Die BfR-Stellungnahme 037/2020 nennt keinen Abkühl-Zielwert, zeigt aber, dass unkontrolliertes Abkühlen unter 57 °C über 4 h zu deutlichem Keimwachstum führt. DIN 10508/10536 nicht frei zitierbar. Korrekturmaßnahme fachüblich, nicht quellenbelegt."
+      },
+      {
+        "punkt": "Wareneingangskontrolle",
+        "grenzwert": "Temperatur bei Anlieferung: Tiefkühlware −18 (kurzfristig −15); Fleisch/Fleischerzeugnisse +4 (Mainz-Formular); Fisch +2; Hackfleisch +2; Geflügel/Wild +4. Außerdem: keine Verunreinigungen, einwandfreie Verpackung, einwandfreier Geruch, gültiges MHD, Beschaffenheit des Lieferfahrzeugs, Kennzeichnung",
+        "einheit": "°C / Sichtprüfung",
+        "haeufigkeit": "stichprobenartig bei jeder Lieferung; Dokumentation z. B. durch Vermerk auf Lieferschein oder Rechnung",
+        "korrektur": "Zurückweisung der Ware; Mängel und Maßnahme dokumentieren (Datum, Lieferung, Mangel, Korrekturmaßnahme, Handzeichen).",
+        "quelle": "https://www.mainz.de/vv/medien/internet/HACCP-Wareneingangskontrolle.pdf; https://www.mainz.de/vv/medien/internet/Merkblatt-fuer-Betriebseigene-Massnahmen-und-Kontrollen.pdf"
+      },
+      {
+        "punkt": "Frittierfett – polare Anteile",
+        "grenzwert": "24 % polare Anteile = Grenze der Genusstauglichkeit (DGF-Empfehlung) → Fett wechseln; Frittiertemperatur mind. +160 °C, max. +175 °C",
+        "einheit": "% polare Anteile",
+        "haeufigkeit": "keine feste Frequenz belegt; Wechselzeitpunkt nach Durchsatz über Eigenkontrollen ermitteln; Temperaturkontrollen und Fettwechsel dokumentieren",
+        "korrektur": "Fett wechseln bei Erreichen des Grenzwerts oder Verderbsmerkmalen (stechender, kratziger Geruch/Geschmack, bläulicher Rauch, verstärkte Schaumbildung); nach Gebrauch filtrieren, in Ruhephasen abdecken; Fritteuse entleeren und reinigen; Altfett in verschließbaren Behältern bis zur Abholung durch Fachfirma lagern.",
+        "quelle": "https://zvl.jena.de/system/files/2025-03/11%20sachgerechtes%20Frittieren.pdf"
+      },
+      {
+        "punkt": "Reinigung und Desinfektion (Reinigungsplan Küche)",
+        "grenzwert": "Reinigungsplan vorhanden und ausgehängt; Intervalle eingehalten",
+        "einheit": "Sichtkontrolle",
+        "haeufigkeit": "Fußböden, Arbeitstische, Theken, Behälter, Waschbecken: täglich (Waschbecken-Desinfektion wöchentlich); Schneidebretter, Geräte, Abfallbehälter: nach Benutzung; Tische nach Fleisch/Geflügel/Fisch/Ei: sofort nach Gebrauch; Türen: wöchentlich; Abzugshaube/Filter: mind. monatlich; Kühlräume/-einrichtungen: mind. wöchentlich; Tiefkühleinrichtungen: mind. vierteljährlich; Trockenlager: wöchentlich; Grundreinigung: vierteljährlich; Personal-WC: täglich (Desinfektion wöchentlich)",
+        "korrektur": "Nachreinigen; Plan/Intervalle anpassen; Personal unterweisen.",
+        "quelle": "https://www.mainz.de/vv/medien/internet/Merkblatt-fuer-Betriebseigene-Massnahmen-und-Kontrollen.pdf",
+        "anmerkung": "Intervalle stammen aus einem Musterplan der Lebensmittelüberwachung Mainz (Stand 12.05.2025); betriebsindividuell anpassen. Korrekturmaßnahmen fachüblich, nicht ausdrücklich belegt."
+      },
+      {
+        "punkt": "Schädlingsmonitoring",
+        "grenzwert": "kein Befall",
+        "einheit": "Sichtkontrolle",
+        "haeufigkeit": "regelmäßige vorbeugende optische Kontrollen, mindestens einmal pro Quartal, dokumentiert",
+        "korrektur": "Bekämpfung (ggf. Fachfirma); Datum, Bereich, Feststellung, Art der Bekämpfung, Ausführender dokumentieren.",
+        "quelle": "https://www.mainz.de/vv/medien/internet/Merkblatt-fuer-Betriebseigene-Massnahmen-und-Kontrollen.pdf"
+      }
+    ]
+  },
+
+  "allergene": {
+    "rechtsgrundlage": "VO (EU) Nr. 1169/2011 (LMIV) Art. 9 Abs. 1 Buchst. c, Art. 21, Art. 44, Anhang II; LMIDV § 4",
+    "liste": [
+      {
+        "id": 1,
+        "bezeichnung": "Glutenhaltiges Getreide",
+        "umfasst": "namentlich Weizen (wie Dinkel und Khorasan-Weizen), Roggen, Gerste, Hafer oder Hybridstämme davon, sowie daraus hergestellte Erzeugnisse",
+        "ausnahmen": [
+          "Glukosesirupe auf Weizenbasis einschließlich Dextrose",
+          "Maltodextrine auf Weizenbasis",
+          "Glukosesirupe auf Gerstenbasis",
+          "Getreide zur Herstellung von alkoholischen Destillaten einschließlich Ethylalkohol landwirtschaftlichen Ursprungs"
+        ],
+        "hinweis": "Die konkrete Getreideart ist zu nennen (z. B. 'Weizen'); bei Dinkel, Khorasan, Durum zusätzlich 'Weizen' angeben (z. B. 'Weizen (Dinkel)').",
+        "quelle": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:02011R1169-20180101 (Anhang II Nr. 1); geprüft an https://www.dresden.de/media/pdf/veterinaer/lebensmittel/Merkblatt_Allergene_2023.pdf"
+      },
+      {
+        "id": 2,
+        "bezeichnung": "Krebstiere",
+        "umfasst": "Krebstiere und daraus gewonnene Erzeugnisse",
+        "ausnahmen": [],
+        "quelle": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:02011R1169-20180101 (Anhang II Nr. 2)"
+      },
+      {
+        "id": 3,
+        "bezeichnung": "Eier",
+        "umfasst": "Eier und daraus gewonnene Erzeugnisse",
+        "ausnahmen": [],
+        "quelle": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:02011R1169-20180101 (Anhang II Nr. 3)"
+      },
+      {
+        "id": 4,
+        "bezeichnung": "Fische",
+        "umfasst": "Fische und daraus gewonnene Erzeugnisse",
+        "ausnahmen": [
+          "Fischgelatine, die als Trägerstoff für Vitamin- oder Karotinoidzubereitungen verwendet wird",
+          "Fischgelatine oder Hausenblase, die als Klärhilfsmittel in Bier und Wein verwendet wird"
+        ],
+        "quelle": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:02011R1169-20180101 (Anhang II Nr. 4)"
+      },
+      {
+        "id": 5,
+        "bezeichnung": "Erdnüsse",
+        "umfasst": "Erdnüsse und daraus gewonnene Erzeugnisse",
+        "ausnahmen": [],
+        "quelle": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:02011R1169-20180101 (Anhang II Nr. 5)"
+      },
+      {
+        "id": 6,
+        "bezeichnung": "Sojabohnen",
+        "umfasst": "Sojabohnen und daraus gewonnene Erzeugnisse",
+        "ausnahmen": [
+          "vollständig raffiniertes Sojabohnenöl und -fett",
+          "natürliche gemischte Tocopherole (E306), natürliches D-alpha-Tocopherol, natürliches D-alpha-Tocopherolacetat, natürliches D-alpha-Tocopherolsukzinat aus Sojabohnenquellen",
+          "aus pflanzlichen Ölen gewonnene Phytosterine und Phytosterinester aus Sojabohnenquellen",
+          "aus Pflanzenölsterinen gewonnene Phytostanolester aus Sojabohnenquellen"
+        ],
+        "quelle": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:02011R1169-20180101 (Anhang II Nr. 6)"
+      },
+      {
+        "id": 7,
+        "bezeichnung": "Milch",
+        "umfasst": "Milch und daraus gewonnene Erzeugnisse (einschließlich Laktose)",
+        "ausnahmen": [
+          "Molke zur Herstellung von alkoholischen Destillaten einschließlich Ethylalkohol landwirtschaftlichen Ursprungs",
+          "Lactit"
+        ],
+        "quelle": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:02011R1169-20180101 (Anhang II Nr. 7)"
+      },
+      {
+        "id": 8,
+        "bezeichnung": "Schalenfrüchte",
+        "umfasst": "namentlich Mandeln (Amygdalus communis L.), Haselnüsse (Corylus avellana), Walnüsse (Juglans regia), Kaschunüsse (Anacardium occidentale), Pecannüsse (Carya illinoiesis (Wangenh.) K. Koch), Paranüsse (Bertholletia excelsa), Pistazien (Pistacia vera), Macadamia- oder Queenslandnüsse (Macadamia ternifolia) sowie daraus gewonnene Erzeugnisse",
+        "ausnahmen": [
+          "Nüsse zur Herstellung von alkoholischen Destillaten einschließlich Ethylalkohol landwirtschaftlichen Ursprungs"
+        ],
+        "hinweis": "Die konkrete Nussart ist zu nennen; der Oberbegriff 'Schalenfrüchte' allein reicht nicht.",
+        "quelle": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:02011R1169-20180101 (Anhang II Nr. 8); https://www.dresden.de/media/pdf/veterinaer/lebensmittel/Merkblatt_Allergene_2023.pdf"
+      },
+      {
+        "id": 9,
+        "bezeichnung": "Sellerie",
+        "umfasst": "Sellerie und daraus gewonnene Erzeugnisse",
+        "ausnahmen": [],
+        "quelle": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:02011R1169-20180101 (Anhang II Nr. 9)"
+      },
+      {
+        "id": 10,
+        "bezeichnung": "Senf",
+        "umfasst": "Senf und daraus gewonnene Erzeugnisse",
+        "ausnahmen": [],
+        "quelle": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:02011R1169-20180101 (Anhang II Nr. 10)"
+      },
+      {
+        "id": 11,
+        "bezeichnung": "Sesamsamen",
+        "umfasst": "Sesamsamen und daraus gewonnene Erzeugnisse",
+        "ausnahmen": [],
+        "quelle": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:02011R1169-20180101 (Anhang II Nr. 11)"
+      },
+      {
+        "id": 12,
+        "bezeichnung": "Schwefeldioxid und Sulphite",
+        "umfasst": "in Konzentrationen von mehr als 10 mg/kg oder 10 mg/l als insgesamt vorhandenes SO2, die für verzehrfertige oder gemäß den Anweisungen des Herstellers in den ursprünglichen Zustand zurückgeführte Erzeugnisse zu berechnen sind",
+        "ausnahmen": [],
+        "quelle": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:02011R1169-20180101 (Anhang II Nr. 12)"
+      },
+      {
+        "id": 13,
+        "bezeichnung": "Lupinen",
+        "umfasst": "Lupinen und daraus gewonnene Erzeugnisse",
+        "ausnahmen": [],
+        "quelle": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:02011R1169-20180101 (Anhang II Nr. 13)"
+      },
+      {
+        "id": 14,
+        "bezeichnung": "Weichtiere",
+        "umfasst": "Weichtiere und daraus gewonnene Erzeugnisse",
+        "ausnahmen": [],
+        "quelle": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:02011R1169-20180101 (Anhang II Nr. 14)"
+      }
+    ],
+    "liste_hinweis": "Wortlaut Anhang II aus Kenntnis des amtlichen Texts; der EUR-Lex-Volltext war im Abruf abgeschnitten. Inhalt (Nummern, Unterarten, Ausnahmen, lateinische Namen) wurde gegen das Merkblatt Allergene 2023 der Lebensmittelüberwachung Dresden abgeglichen. Vor Veröffentlichung einmal Wort für Wort gegen EUR-Lex prüfen.",
+    "unsicher_wortlaut": true,
+    "lose_ware": {
+      "rechtsgrundlage": "Art. 44 LMIV i. V. m. § 4 LMIDV (Lebensmittelinformations-Durchführungsverordnung)",
+      "zeitpunkt": "Die Angaben müssen vor Kaufabschluss und vor Übergabe des Lebensmittels zur Kenntnis genommen werden können.",
+      "schriftlich_formen": [
+        "Schild auf oder in der Nähe des Lebensmittels (auch Buffet)",
+        "Speise- und Getränkekarten oder Preisverzeichnisse, auch in Fußnoten oder Endnoten",
+        "Aushang in der Verkaufsstätte",
+        "sonstige schriftliche oder elektronische Information, sofern unmittelbar und leicht zugänglich und beim Lebensmittel oder auf einem Aushang darauf hingewiesen wird, wie/wo die Information erfolgt"
+      ],
+      "schriftlich_anforderung": "bezogen auf das jeweilige Lebensmittel „gut sichtbar, deutlich und gut lesbar“; bei schriftlicher Information ist den Allergenen das Wort „Enthält“ voranzustellen.",
+      "muendlich_voraussetzungen": [
+        "Hinweis beim Lebensmittel oder in einem Aushang, deutlich und gut lesbar, dass die Information mündlich auf Nachfrage erfolgt und eine schriftliche Aufzeichnung auf Nachfrage eingesehen werden kann",
+        "Information wird vor Übergabe bzw. Kaufabschluss gegeben",
+        "auskunftsfähiges (unterwiesenes) Personal ist anwesend",
+        "für jedes Lebensmittel existiert eine schriftliche Aufzeichnung (Dokumentation) der enthaltenen Allergene, die für Verbraucher und die zuständige Behörde leicht zugänglich ist"
+      ],
+      "beispiel_hinweistext": "Informationen über enthaltene Allergene erhalten Sie auf Nachfrage beim Personal. Eine schriftliche Dokumentation liegt zur Einsicht bereit.",
+      "beispiel_hinweistext_status": "eigene Formulierung nach den belegten Voraussetzungen; ähnlicher behördlicher Mustertext (Rhein-Pfalz-Kreis): „Informationen über enthaltene Allergene und Zusatzstoffe, auf Anfrage einsehbar.“",
+      "spuren": "Hinweise auf mögliche Spuren (unbeabsichtigte Einträge) müssen nicht übernommen werden.",
+      "absatzangabe": "Schriftliche Formen = § 4 Abs. 3 LMIDV, mündliche Information = § 4 Abs. 4 LMIDV (laut Merkblatt Stadt Münster).",
+      "quelle": "https://www.dresden.de/media/pdf/veterinaer/lebensmittel/Merkblatt_Allergene_2023.pdf; https://www.stadt-muenster.de/fileadmin/user_upload/stadt-muenster/53_verbraucherschutz/pdf/MB_75_Kennzeichnung_Allergene_Zusatzstoffe_2021-09.pdf; https://www.rhein-pfalz-kreis.de/gesundheit-tierwohl/veterinaerwesen/fleischhygiene-lebensmittel/downloadcenter/kennzeichnung-allergene-und-zusatzstoffe-lose-ware-stand-23-11.pdf; amtlich: https://www.gesetze-im-internet.de/lmidv/__4.html",
+      "unsicher": true,
+      "unsicher_grund": "Gesetzeswortlaut § 4 LMIDV nicht direkt abrufbar; Inhalt aus übereinstimmenden behördlichen Merkblättern rekonstruiert."
+    }
+  },
+
+  "ifsg": {
+    "quelle_amtlich": "https://www.gesetze-im-internet.de/ifsg/__42.html; https://www.gesetze-im-internet.de/ifsg/__43.html",
+    "quelle_pruefung": "https://lexmea.de/en/gesetz/ifsg/42; https://lexmea.de/en/gesetz/ifsg/43; https://lxgesetze.de/ifsg/43; https://dejure.org/gesetze/IfSG/42.html",
+    "inhalte": {
+      "text": "Die Belehrung umfasst die Tätigkeitsverbote nach § 42 Abs. 1 IfSG und die Verpflichtungen nach § 43 Abs. 2, 4 und 5 IfSG (§ 43 Abs. 1 Satz 1 Nr. 1).",
+      "punkte": [
+        "Tätigkeitsverbote und Beschäftigungsverbote nach § 42 Abs. 1 (Krankheiten, Symptome, Ausscheider – siehe taetigkeitsverbote)",
+        "betroffene Lebensmittel nach § 42 Abs. 2 und Tätigkeit in Küchen von Gaststätten und Gemeinschaftsverpflegung",
+        "Pflicht, Hinderungsgründe nach Aufnahme der Tätigkeit dem Arbeitgeber unverzüglich mitzuteilen (§ 43 Abs. 2)",
+        "Pflicht des Arbeitgebers zur Belehrung nach Aufnahme der Tätigkeit und danach alle zwei Jahre, mit Dokumentation (§ 43 Abs. 4)",
+        "Aufbewahrungs- und Vorlagepflicht für Bescheinigung und letzte Dokumentation (§ 43 Abs. 5)",
+        "bei Krankheitszeichen ärztlichen Rat einholen und mitteilen, dass man mit Lebensmitteln arbeitet (Merkblatt Gesundheitsamt)"
+      ],
+      "quelle": "https://lxgesetze.de/ifsg/43; https://www.rhein-sieg-kreis.de/vv/ressourcen/medien/downloads/Dezernat_2/Amt_53_-_Gesundheitsamt/2026-06-22-Merkblatt-mit-Informationen-zur-Belehrung.pdf"
+    },
+    "taetigkeitsverbote": {
+      "rechtsgrundlage": "§ 42 Abs. 1 IfSG",
+      "personen": [
+        {
+          "nr": "§ 42 Abs. 1 Satz 1 Nr. 1",
+          "text": "Personen, die an Typhus abdominalis, Paratyphus, Cholera, Shigellenruhr, Salmonellose, einer anderen infektiösen Gastroenteritis oder Virushepatitis A oder E erkrankt oder dessen verdächtig sind"
+        },
+        {
+          "nr": "§ 42 Abs. 1 Satz 1 Nr. 2",
+          "text": "Personen, die an infizierten Wunden oder an Hautkrankheiten erkrankt sind, bei denen die Möglichkeit besteht, dass deren Krankheitserreger über Lebensmittel übertragen werden können"
+        },
+        {
+          "nr": "§ 42 Abs. 1 Satz 1 Nr. 3",
+          "text": "Personen, die die Krankheitserreger Shigellen, Salmonellen, enterohämorrhagische Escherichia coli oder Choleravibrionen ausscheiden"
+        }
+      ],
+      "verbotene_taetigkeiten": [
+        "a) beim Herstellen, Behandeln oder Inverkehrbringen der in § 42 Abs. 2 genannten Lebensmittel, wenn sie dabei mit diesen in Berührung kommen",
+        "b) in Küchen von Gaststätten und sonstigen Einrichtungen mit oder zur Gemeinschaftsverpflegung",
+        "entsprechend für Personen, die mit Bedarfsgegenständen, die für diese Tätigkeiten verwendet werden, so in Berührung kommen, dass eine Übertragung von Krankheitserregern auf die Lebensmittel zu befürchten ist (Satz 2)",
+        "nicht im privaten hauswirtschaftlichen Bereich (Satz 3)"
+      ],
+      "lebensmittel_abs2": [
+        "1. Fleisch, Geflügelfleisch und Erzeugnisse daraus",
+        "2. Milch und Erzeugnisse auf Milchbasis",
+        "3. Fische, Krebse oder Weichtiere und Erzeugnisse daraus",
+        "4. Eiprodukte",
+        "5. Säuglings- und Kleinkindernahrung",
+        "6. Speiseeis und Speiseeishalberzeugnisse",
+        "7. Backwaren mit nicht durchgebackener oder durcherhitzter Füllung oder Auflage",
+        "8. Feinkost-, Rohkost- und Kartoffelsalate, Marinaden, Mayonnaisen, andere emulgierte Soßen, Nahrungshefen",
+        "9. Sprossen und Keimlinge zum Rohverzehr sowie Samen zur Herstellung von Sprossen und Keimlingen zum Rohverzehr"
+      ],
+      "symptome_merkblatt": [
+        "Durchfall (mehr als zwei dünnflüssige Stühle pro Tag), ggf. mit Übelkeit, Erbrechen und Fieber (akute infektiöse Gastroenteritis)",
+        "hohes Fieber mit schweren Kopf-, Bauch- oder Gelenkschmerzen und Verstopfung, nach einigen Tagen schwerer Durchfall (Typhus/Paratyphus)",
+        "Schwäche, Appetitlosigkeit, Gelbfärbung der Haut und der Augäpfel (Virushepatitis A oder E)",
+        "Wunden oder offene Hautstellen, die gerötet, schmierig belegt, nässend oder geschwollen sind (infizierte Wunden/Hauterkrankungen)",
+        "Nachweis von Salmonellen, Shigellen, EHEC oder Choleravibrionen im Stuhl, auch ohne Krankheitszeichen (Ausscheider)"
+      ],
+      "symptome_quelle": "https://www.rhein-sieg-kreis.de/vv/ressourcen/medien/downloads/Dezernat_2/Amt_53_-_Gesundheitsamt/2026-06-22-Merkblatt-mit-Informationen-zur-Belehrung.pdf",
+      "ausnahmen_abs4": "Das Gesundheitsamt kann Ausnahmen von den Verboten zulassen, wenn Maßnahmen durchgeführt werden, mit denen eine Übertragung der Krankheitserreger verhütet werden kann (§ 42 Abs. 4).",
+      "quelle": "https://www.gesetze-im-internet.de/ifsg/__42.html; geprüft: https://lexmea.de/en/gesetz/ifsg/42; https://lxgesetze.de/ifsg/42"
+    },
+    "erstbelehrung": {
+      "rechtsgrundlage": "§ 43 Abs. 1 IfSG",
+      "text": "Personen, die gewerbsmäßig eine Tätigkeit nach § 42 Abs. 1 erstmalig ausüben oder dort beschäftigt werden, benötigen vorher eine „nicht mehr als drei Monate alte Bescheinigung“ des Gesundheitsamtes oder eines vom Gesundheitsamt beauftragten Arztes. Darin wird bestätigt, dass sie (Nr. 1) über die Tätigkeitsverbote nach § 42 Abs. 1 und die Verpflichtungen nach § 43 Abs. 2, 4 und 5 belehrt wurden und (Nr. 2) nach der Belehrung in Textform erklärt haben, dass ihnen keine Tatsachen für ein Tätigkeitsverbot bekannt sind. Liegen Anhaltspunkte für ein Tätigkeitsverbot vor, darf die Bescheinigung erst nach Vorlage eines ärztlichen Zeugnisses ausgestellt werden.",
+      "gueltigkeit": "Die Bescheinigung darf am ersten Arbeitstag höchstens drei Monate alt sein; danach gilt sie unbefristet, auch bei Arbeitsplatzwechsel. Alte Gesundheitszeugnisse nach § 18 BSeuchG bleiben gültig.",
+      "gueltigkeit_quelle": "https://www.rhein-sieg-kreis.de/vv/ressourcen/medien/downloads/Dezernat_2/Amt_53_-_Gesundheitsamt/2026-06-22-Merkblatt-mit-Informationen-zur-Belehrung.pdf",
+      "form_hinweis": "Die geltende Fassung des § 43 Abs. 1 Nr. 1 schreibt laut geprüftem Spiegeltext keine bestimmte Form (mündlich/schriftlich) der Erstbelehrung vor; nur die Erklärung nach Nr. 2 erfolgt in Textform.",
+      "form_unsicher": true,
+      "quelle": "https://www.gesetze-im-internet.de/ifsg/__43.html; geprüft: https://lxgesetze.de/ifsg/43; https://lexmea.de/en/gesetz/ifsg/43"
+    },
+    "folgebelehrung": {
+      "rechtsgrundlage": "§ 43 Abs. 4 IfSG",
+      "text": "Der Arbeitgeber hat Personen, die eine Tätigkeit nach § 42 Abs. 1 ausüben, nach Aufnahme ihrer Tätigkeit und im Weiteren alle zwei Jahre über die Tätigkeitsverbote und über die Verpflichtung nach § 43 Abs. 2 zu belehren. „Die Teilnahme an der Belehrung ist zu dokumentieren.“ Für Dienstherren gilt dies entsprechend; für Selbständige gelten die Arbeitgeberpflichten entsprechend (§ 43 Abs. 6).",
+      "form_merkblatt": "Merkblatt Rhein-Sieg-Kreis: Folgebelehrung „mündlich und schriftlich“, dokumentiert.",
+      "quelle": "https://www.gesetze-im-internet.de/ifsg/__43.html; geprüft: https://lxgesetze.de/ifsg/43; https://www.rhein-sieg-kreis.de/vv/ressourcen/medien/downloads/Dezernat_2/Amt_53_-_Gesundheitsamt/2026-06-22-Merkblatt-mit-Informationen-zur-Belehrung.pdf"
+    },
+    "mitteilungspflicht_beschaeftigte": {
+      "rechtsgrundlage": "§ 43 Abs. 2 und 3 IfSG",
+      "text": "Treten nach Aufnahme der Tätigkeit Hinderungsgründe nach § 42 Abs. 1 auf, sind diese dem Arbeitgeber oder Dienstherrn unverzüglich mitzuteilen (Abs. 2). Werden dem Arbeitgeber Anhaltspunkte oder Tatsachen bekannt, die ein Tätigkeitsverbot begründen, hat er unverzüglich die zur Verhinderung der Weiterverbreitung der Krankheitserreger erforderlichen Maßnahmen einzuleiten (Abs. 3).",
+      "quelle": "https://www.gesetze-im-internet.de/ifsg/__43.html; geprüft: https://lxgesetze.de/ifsg/43"
+    },
+    "dokumentation": {
+      "rechtsgrundlage": "§ 43 Abs. 4 Satz 2 und Abs. 5 IfSG",
+      "text": [
+        "Abs. 4: Die Teilnahme an der (Folge-)Belehrung durch den Arbeitgeber ist zu dokumentieren.",
+        "Abs. 5: Die Bescheinigung nach Abs. 1 und die letzte Dokumentation der Belehrung nach Abs. 4 sind beim Arbeitgeber aufzubewahren. Der Arbeitgeber hat die Nachweise an der Betriebsstätte verfügbar zu halten und der zuständigen Behörde auf Verlangen vorzulegen. Übt der Arbeitgeber selbst eine solche Tätigkeit aus, gilt das auch für seine eigene Bescheinigung. „Bei Tätigkeiten an wechselnden Standorten genügt die Vorlage einer beglaubigten Abschrift oder einer beglaubigten Kopie.“"
+      ],
+      "bussgeld": "Bis zu 25.000 € (laut Merkblatt Rhein-Sieg-Kreis).",
+      "quelle": "https://www.gesetze-im-internet.de/ifsg/__43.html; geprüft: https://lxgesetze.de/ifsg/43; https://lexmea.de/en/gesetz/ifsg/43"
+    }
+  },
+
+  "hygieneplan": {
+    "laender": {
+      "rechtsgrundlage_allgemein": "Landesverordnungen auf Grundlage von § 17 Abs. 4 IfSG (bzw. § 36 IfSG) für Tätigkeiten am Menschen ohne ärztliche Approbation, bei denen Krankheitserreger durch Blut übertragen werden können.",
+      "mit_verordnung": [
+        {
+          "land": "Bayern",
+          "name": "Verordnung zur Verhütung übertragbarer Krankheiten (Hygiene-Verordnung – BayHygV)",
+          "datum": "11.08.1987 (GVBl. S. 291), BayRS 2126-1-1-G, zuletzt geändert 24.02.2026",
+          "geltung": "Haarschneiden und Rasieren, Maniküre und Pediküre, Tätowieren, Ohrlochstechen/Piercing, invasive Kosmetik, nichtärztliche Heilkunde inkl. Akupunktur – soweit Haut oder Schleimhaut verletzt werden kann",
+          "kerninhalte": [
+            "allgemein anerkannte Regeln der Hygiene beachten (§ 2 Abs. 1)",
+            "vor verletzenden Tätigkeiten Hautdesinfektion beim Kunden, unmittelbar vorher Händedesinfektion, Einmalhandschuhe je Kunde, nur sterile Geräte (§ 2 Abs. 2, 3)",
+            "mehrfach verwendete Geräte (z. B. Maniküre-/Pediküregeräte, Rasiermesser) nach jeder Anwendung reinigen, desinfizieren, sachgerecht lagern (§ 2 Abs. 4)",
+            "Wunddesinfektion nach unbeabsichtigter Verletzung (§ 2 Abs. 5)",
+            "Wischdesinfektion der Arbeits- und Kontaktflächen unverzüglich nach verletzender Tätigkeit oder Blutkontamination (§ 2 Abs. 6)",
+            "Arbeitsflächen mind. täglich reinigen, vor jedem invasiven Eingriff reinigen und desinfizieren (§ 3)",
+            "Desinfektionsmittel mind. „begrenzt viruzid“; Aufbereitung entsprechend KRINKO/BfArM-Empfehlung 2012; Sterilisation vorzugsweise Dampf (§ 4)",
+            "spitze/scharfe/zerbrechliche Gegenstände nur in verletzungssicheren Behältern über Hausmüll (§ 4)"
+          ],
+          "url": "https://www.gesetze-bayern.de/Content/Document/BayHygV/true"
+        },
+        {
+          "land": "Baden-Württemberg",
+          "name": "Verordnung der Landesregierung und des Sozialministeriums zur Verhütung übertragbarer Krankheiten (Hygiene-Verordnung)",
+          "datum": "11.06.2002 (GBl. S. 219), geändert 11.02.2020 (GBl. S. 37)",
+          "geltung": "u. a. Akupunktur, Friseurhandwerk, Podologie und Fußpflege, Kosmetik, Pflege, Ohrlochstechen, Piercing, Tätowieren",
+          "kerninhalte": [
+            "Hände reinigen, dann Hände und Behandlungsfläche desinfizieren vor hautverletzenden Eingriffen (§ 2 Abs. 2)",
+            "sterile Gegenstände für hautverletzende Handlungen; Mehrweggegenstände nach Gebrauch desinfizieren, reinigen, sterilisieren, steril aufbewahren; nach Blutkontakt Desinfektion vor Reinigung (§ 2 Abs. 3)",
+            "blutende Verletzungen nicht mit ungeschützten Händen berühren; keimfreies Verbandmaterial (§ 2 Abs. 4)",
+            "geeignete Räume; Handwaschplatz mit fließendem Wasser, Seifen- und Desinfektionsmittelspender, hygienische Trockenmöglichkeit (§ 2 Abs. 5)",
+            "Hygieneplan: Verfahren zu Reinigung, Desinfektion, Sterilisation und deren Funktionsprüfung schriftlich oder elektronisch festhalten (§ 2 Abs. 6)",
+            "nur geprüfte, gelistete Desinfektionsmittel und -verfahren (§ 3)",
+            "spitze/scharfe Gegenstände in verletzungssicheren Behältern (§ 4)"
+          ],
+          "url": "https://umwelt-online.de/recht/gefstoff/gen_tech/bw/hygv.htm",
+          "url_hinweis": "Spiegel; amtlich über landesrecht-bw.de"
+        },
+        {
+          "land": "Nordrhein-Westfalen",
+          "name": "Verordnung zur Verhütung übertragbarer Krankheiten (Hygiene-Verordnung), SGV. NRW. 2121",
+          "datum": "10.05.1988, geändert 1994",
+          "geltung": "Friseurhandwerk, Kosmetik, Fußpflege, Tätowieren, Ohrlochstechen, Akupunktur",
+          "kerninhalte": [
+            "vor hautverletzenden Eingriffen Hände und Hautfläche desinfizieren (§ 2 Abs. 2)",
+            "mehrfach verwendete, potenziell hautverletzende Geräte nach jeder Anwendung desinfizieren, danach reinigen (§ 2 Abs. 3)",
+            "nur virusinaktivierende Mittel/Verfahren aus der amtlichen Liste (§ 3)",
+            "spitze/scharfe Gegenstände nur in verletzungssicherer Verpackung entsorgen (§ 4)"
+          ],
+          "url": "https://recht.nrw.de/system/files/BH/5429-1786.pdf",
+          "aktualitaet": "Von der Stadt Köln (Gesundheitsamt) neben § 36 IfSG und § 17 ÖGDG NRW als geltende Grundlage genannt: https://www.stadt-koeln.de/service/produkt/hygieneueberwachung-der-nichtaerztlichen-einrichtungen",
+          "unsicher": true
+        },
+        {
+          "land": "Berlin",
+          "name": "Verordnung zur Verhütung übertragbarer Krankheiten bei bestimmten gewerblichen Tätigkeiten (Infektionsverhütungs-Verordnung – IfVerhV)",
+          "datum": "05.05.2017 (GVBl. S. 306)",
+          "geltung": "u. a. Akupunktur, Haarpflege, Kosmetik, Maniküre, Pediküre, Tätowieren, Ohrlochstechen, Piercing",
+          "url": "https://umwelt-online.de/recht/gefstoff/gen_tech/bln/infverhvo.htm"
+        },
+        {
+          "land": "Hamburg",
+          "name": "Verordnung zur Verhütung übertragbarer Krankheiten (Hygiene-Verordnung)",
+          "datum": "24.05.2005 (GVBl. S. 217), geändert 25.11.2025",
+          "geltung": "Friseur, Kosmetik, Fußpflege, Tätowieren, Piercen, Ohrlochstechen u. a.",
+          "kerninhalte": ["Hygieneplan schriftlich (§ 2 Abs. 5)", "Hände- und Hautdesinfektion, Einmalhandschuhe (§ 2 Abs. 2)", "validierte Aufbereitungsverfahren (§ 3)", "verletzungssichere Entsorgung (§ 4)"],
+          "url": "https://www.umwelt-online.de/recht/gefstoff/gen_tech/hh/hygv.htm"
+        },
+        {
+          "land": "Saarland",
+          "name": "Verordnung zur Verhütung übertragbarer Krankheiten (Hygiene-Verordnung)",
+          "datum": "16.04.2014 (Amtsbl. I S. 147)",
+          "kerninhalte": ["einrichtungsspezifischer Hygieneplan, jährlich prüfen; Mitarbeitende mind. jährlich belehren, schriftlich dokumentieren (§ 2 Abs. 2)", "Einmalhandschuhe pro Kunde wechseln (§ 2 Abs. 3)", "Hände-/Hautdesinfektionsmittel nicht umfüllen (§ 3)"],
+          "url": "https://umwelt-online.de/recht/gefstoff/gen_tech/srl/hygvo.htm"
+        },
+        {
+          "land": "Schleswig-Holstein",
+          "name": "Landesverordnung zur Verhütung übertragbarer Krankheiten (HygieneVO)",
+          "datum": null,
+          "kerninhalte": ["schriftlicher Hygieneplan inkl. Zuständigkeiten und Desinfektionsmitteln", "Wäsche (Handtücher, Umhänge) bei mind. 60 °C", "nur Desinfektionsmittel aus VAH- oder RKI-Liste", "Aufbereitung dokumentieren"],
+          "url": "https://www.kiel.de/de/gesundheit_soziales/gesundheit_vorsorgen_heilen/infektionsschutz/Merkblatt_Taetigkeiten_gemaess_HygieneVO.pdf",
+          "unsicher": true,
+          "anmerkung": "Datum der Verordnung nicht ermittelt; Inhalte aus Merkblatt Amt für Gesundheit Kiel (07.11.2023)."
+        },
+        {
+          "land": "Niedersachsen",
+          "name": "Verordnung zur Verhütung übertragbarer Krankheiten (HygieneVO NI)",
+          "datum": null,
+          "geltung": "u. a. Fußpflege, Tätowieren, Piercing, Ohrlochstechen, Rasieren, Haarschneiden, Maniküre, Pediküre, Kosmetik inkl. Permanent-Make-up",
+          "url": "https://www.landtag-niedersachsen.de/Drucksachen/Drucksachen_19_12500/10501-11000/19-10918.pdf",
+          "unsicher": true,
+          "anmerkung": "Nur über Landtagsdrucksache 19/10918 (16.06.2026) belegt; Datum/Fundstelle der VO nicht ermittelt."
+        }
+      ],
+      "rahmenhygieneplan_ost": {
+        "text": "Brandenburg, Sachsen, Mecklenburg-Vorpommern, Thüringen und Sachsen-Anhalt: gemeinsamer 'Rahmenhygieneplan gemäß § 36 IfSG für Piercing-, Tätowierungs-, Kosmetik- und Fußpflegeeinrichtungen' (Länder-Arbeitskreis, Stand April 2007) – keine Verordnung. Ob diese Länder zusätzlich eigene Hygieneverordnungen haben, wurde nicht ermittelt.",
+        "url": "https://www.gesunde.sachsen.de/download/Rahmenhygieneplan-Tatoo-Kosmetik-Fusspflege.pdf",
+        "quelle_status": "https://www.bundestag.de/resource/blob/592496/761cf0d47a67e0b22b71624903e52757/WD-9-066-18-pdf-data.pdf"
+      },
+      "nicht_ermittelt": ["Bremen", "Hessen (dort Anzeigepflicht nach § 9 HGöGD, Formular Wiesbaden: https://www.wiesbaden.de/vv/medien/merk/53/Anzeigeformular-9HGoeGD_Feb2026.pdf)", "Rheinland-Pfalz", "eigene VOen BB/SN/MV/TH/ST"],
+      "unsicher": true
+    },
+    "zeilen": [
+      {
+        "was": "Händewaschen",
+        "wann": "Arbeitsbeginn, nach Pausen/Essen, nach Toilettenbesuch, bei sichtbarer Verschmutzung",
+        "womit": "Flüssigseife aus Spender (keine Stückseife), Einmalhandtücher",
+        "wie": "Hände gründlich waschen, abspülen und sorgfältig abtrocknen",
+        "wer": "alle Beschäftigten",
+        "branchen": ["friseur", "kosmetik", "nagelstudio", "fusspflege"],
+        "quelle": "https://www.gesunde.sachsen.de/download/Rahmenhygieneplan-Tatoo-Kosmetik-Fusspflege.pdf"
+      },
+      {
+        "was": "Hygienische Händedesinfektion",
+        "wann": "vor hautverletzenden oder hautnahen Behandlungen (z. B. Nagelhautbearbeitung, Fußpflege, invasive Kosmetik), nach Ausziehen der Handschuhe, nach Kontakt mit Blut/Körperflüssigkeiten, nach Stich-/Schnittverletzung",
+        "womit": "VAH-gelistetes alkoholisches Händedesinfektionsmittel",
+        "wie": "ca. 3–5 ml auf trockene Hände geben, alle Handpartien einreiben und Hände während der gesamten Einwirkzeit feucht halten; Einwirkzeit nach Herstellerangabe/VAH-Liste (meist 30 Sekunden)",
+        "wer": "behandelnde Person",
+        "branchen": ["friseur", "kosmetik", "nagelstudio", "fusspflege"],
+        "quelle": "https://www.gesunde.sachsen.de/download/Rahmenhygieneplan-Tatoo-Kosmetik-Fusspflege.pdf; https://www.gesetze-bayern.de/Content/Document/BayHygV/true"
+      },
+      {
+        "was": "Einmalhandschuhe (Infektionsschutz)",
+        "wann": "bei möglichem Kontakt mit Blut, Wundsekret oder verletzter Haut; bei verletzenden Tätigkeiten",
+        "womit": "allergenarme Einmalhandschuhe",
+        "wie": "für jeden Kunden neue Handschuhe; bei Beschädigung sofort wechseln; danach Händedesinfektion",
+        "wer": "behandelnde Person",
+        "branchen": ["friseur", "kosmetik", "nagelstudio", "fusspflege"],
+        "quelle": "https://www.gesunde.sachsen.de/download/Rahmenhygieneplan-Tatoo-Kosmetik-Fusspflege.pdf; https://www.gesetze-bayern.de/Content/Document/BayHygV/true"
+      },
+      {
+        "was": "Hautdesinfektion beim Kunden",
+        "wann": "vor hautverletzenden Eingriffen",
+        "womit": "VAH-gelistetes, viruswirksames Hautdesinfektionsmittel (Originalgebinde, nicht umfüllen)",
+        "wie": "auf trockene Haut sprühen oder mit sterilem Tupfer auftragen; Einwirkzeit nach Herstellerangabe einhalten (Rahmenhygieneplan: > 1 Minute); nicht ins Gesicht sprühen",
+        "wer": "behandelnde Person",
+        "branchen": ["kosmetik", "fusspflege", "nagelstudio"],
+        "quelle": "https://www.gesunde.sachsen.de/download/Rahmenhygieneplan-Tatoo-Kosmetik-Fusspflege.pdf; https://umwelt-online.de/recht/gefstoff/gen_tech/srl/hygvo.htm"
+      },
+      {
+        "was": "Instrumente ohne Verletzungsrisiko (Kämme, Bürsten, Wickler, Scheren, Rasierpinsel)",
+        "wann": "nach Behandlung bei Bedarf und am Arbeitstagsende; bei Kontakt mit Blut, Sekreten oder unklaren Hautveränderungen sofort",
+        "womit": "Wasser und fettlösender Reiniger; bei Kontamination VAH-gelistetes Instrumentendesinfektionsmittel nach Herstellerangabe",
+        "wie": "Haare/Hautschuppen entfernen, nass reinigen, trocknen; bei Blut/Sekret zuerst Tauchdesinfektion (Einwirkzeit abwarten), dann reinigen",
+        "wer": "Beschäftigte",
+        "branchen": ["friseur", "kosmetik", "nagelstudio", "fusspflege"],
+        "quelle": "https://www.bgw-online.de/resource/blob/20260/30088b250f534f8e8b1bc1b984badf2b/bgw06-12-090-hygiene-im-friseursalon-plan-data.pdf; https://www.gesunde.sachsen.de/download/Rahmenhygieneplan-Tatoo-Kosmetik-Fusspflege.pdf"
+      },
+      {
+        "was": "Instrumente mit Verletzungsrisiko (Rasiermesser, Klingen, Scherköpfe, Nagelhautschere/-zange, Pinzetten, Hautraspeln, Maniküre-/Pediküreinstrumente)",
+        "wann": "nach jeder Kundin / jedem Kunden",
+        "womit": "vorzugsweise Einwegklingen; sonst VAH-gelistetes, viruswirksames Instrumentendesinfektionsmittel nach Herstellerangabe (Bayern: mind. begrenzt viruzid)",
+        "wie": "Einwegartikel nach einmaliger Verwendung entsorgen; Mehrweginstrumente zerlegt vollständig einlegen (Einwirkzeit ab letztem eingelegten Teil), abspülen, reinigen, trocknen, trocken und geschützt lagern; Lösung bei sichtbarer Verschmutzung sofort, sonst täglich wechseln",
+        "wer": "Beschäftigte",
+        "branchen": ["friseur", "kosmetik", "nagelstudio", "fusspflege"],
+        "quelle": "https://www.bgw-online.de/resource/blob/20260/30088b250f534f8e8b1bc1b984badf2b/bgw06-12-090-hygiene-im-friseursalon-plan-data.pdf; https://www.gesetze-bayern.de/Content/Document/BayHygV/true; https://www.gesunde.sachsen.de/download/Rahmenhygieneplan-Tatoo-Kosmetik-Fusspflege.pdf"
+      },
+      {
+        "was": "Instrumente, die die Haut bestimmungsgemäß verletzen bzw. in/unter die Haut gelangen (z. B. Lanzetten, Komedonenheber bei invasiver Anwendung, Fräser bei Wundkontakt)",
+        "wann": "vor jeder Wiederverwendung",
+        "womit": "sterile Einwegprodukte oder validiertes Sterilisationsverfahren (vorzugsweise Dampfsterilisation 121 °C oder 134 °C)",
+        "wie": "reinigen, desinfizieren, spülen, trocknen, prüfen, verpacken (Sterilgutverpackung, Chargen-/Datumskennzeichnung), sterilisieren, geschützt lagern; Sterilisationsparameter dokumentieren",
+        "wer": "unterwiesene Beschäftigte",
+        "branchen": ["kosmetik", "fusspflege", "nagelstudio"],
+        "quelle": "https://www.gesetze-bayern.de/Content/Document/BayHygV/true; https://www.gesunde.sachsen.de/download/Rahmenhygieneplan-Tatoo-Kosmetik-Fusspflege.pdf; https://umwelt-online.de/recht/gefstoff/gen_tech/bw/hygv.htm"
+      },
+      {
+        "was": "Arbeitsplatz / Arbeits- und Ablageflächen",
+        "wann": "nach jeder Behandlung reinigen; vor jedem hautverletzenden Eingriff reinigen und desinfizieren; mind. täglich; bei Blut-/Sekretkontamination sofort",
+        "womit": "Reinigungslösung; VAH-gelistetes Flächendesinfektionsmittel nach Herstellerangabe",
+        "wie": "aufräumen, grobe Verschmutzung entfernen, abwischen; Wischdesinfektion (keine Sprühdesinfektion)",
+        "wer": "Beschäftigte",
+        "branchen": ["friseur", "kosmetik", "nagelstudio", "fusspflege"],
+        "quelle": "https://www.gesetze-bayern.de/Content/Document/BayHygV/true; https://www.bgw-online.de/resource/blob/20260/30088b250f534f8e8b1bc1b984badf2b/bgw06-12-090-hygiene-im-friseursalon-plan-data.pdf; https://www.gesunde.sachsen.de/download/Rahmenhygieneplan-Tatoo-Kosmetik-Fusspflege.pdf"
+      },
+      {
+        "was": "Behandlungsliege / Behandlungsstuhl / Kopfstützen",
+        "wann": "nach jedem Kunden",
+        "womit": "Reinigungsmittel, frische Einmal- oder Stoffunterlage; bei Kunden mit Hautinfektion bzw. Kontamination VAH-gelistetes Flächendesinfektionsmittel",
+        "wie": "Unterlage wechseln, Flächen abwischen; bei Kontamination wischdesinfizieren",
+        "wer": "Beschäftigte",
+        "branchen": ["friseur", "kosmetik", "nagelstudio", "fusspflege"],
+        "quelle": "https://www.gesunde.sachsen.de/download/Rahmenhygieneplan-Tatoo-Kosmetik-Fusspflege.pdf; https://www.bgw-online.de/resource/blob/20260/30088b250f534f8e8b1bc1b984badf2b/bgw06-12-090-hygiene-im-friseursalon-plan-data.pdf"
+      },
+      {
+        "was": "Waschbecken (Haarwaschbecken, Handwaschbecken, Sanitär)",
+        "wann": "nach jeder Behandlung bzw. mind. arbeitstäglich; nach Kontamination",
+        "womit": "Reinigungslösung; bei Kontamination mit Körperflüssigkeiten Desinfektionsmittel",
+        "wie": "reinigen; nach Kontakt mit Körperflüssigkeiten desinfizieren",
+        "wer": "Beschäftigte",
+        "branchen": ["friseur", "kosmetik", "nagelstudio", "fusspflege"],
+        "quelle": "https://www.bgw-online.de/resource/blob/20260/30088b250f534f8e8b1bc1b984badf2b/bgw06-12-090-hygiene-im-friseursalon-plan-data.pdf; https://www.gesunde.sachsen.de/download/Rahmenhygieneplan-Tatoo-Kosmetik-Fusspflege.pdf"
+      },
+      {
+        "was": "Fußboden",
+        "wann": "täglich nach Arbeitsende (Friseur: grob nach jeder Behandlung); bei Blutkontamination sofort",
+        "womit": "Reinigungslösung, sauberer Wischbezug; bei Kontamination Flächendesinfektionsmittel",
+        "wie": "ausfegen, feucht wischen; Blut zuerst mit getränktem Einmaltuch/Zellstoff aufnehmen, dann wischdesinfizieren",
+        "wer": "Beschäftigte / Reinigungskraft",
+        "branchen": ["friseur", "kosmetik", "nagelstudio", "fusspflege"],
+        "quelle": "https://www.bgw-online.de/resource/blob/20260/30088b250f534f8e8b1bc1b984badf2b/bgw06-12-090-hygiene-im-friseursalon-plan-data.pdf; https://www.gesunde.sachsen.de/download/Rahmenhygieneplan-Tatoo-Kosmetik-Fusspflege.pdf"
+      },
+      {
+        "was": "Wäsche: Handtücher, Kundenumhänge, Abdecktücher, Arbeitskleidung",
+        "wann": "nach jeder Kundin / jedem Kunden",
+        "womit": "Vollwaschmittel bzw. desinfizierendes Waschverfahren",
+        "wie": "in Wäschebeutel/-behälter sammeln, getrennt von Reinigungstüchern; bei mindestens 60 °C waschen (bewährt: 60 °C plus Maschinentrocknung); Umhänge nur mit Papierhalskrause; bei Blut-/Sekretverschmutzung bei 60 °C waschen oder entsorgen",
+        "wer": "Beschäftigte",
+        "branchen": ["friseur", "kosmetik", "nagelstudio", "fusspflege"],
+        "quelle": "https://www.bgw-online.de/resource/blob/20260/30088b250f534f8e8b1bc1b984badf2b/bgw06-12-090-hygiene-im-friseursalon-plan-data.pdf; https://www.gesunde.sachsen.de/download/Rahmenhygieneplan-Tatoo-Kosmetik-Fusspflege.pdf; https://www.kiel.de/de/gesundheit_soziales/gesundheit_vorsorgen_heilen/infektionsschutz/Merkblatt_Taetigkeiten_gemaess_HygieneVO.pdf"
+      },
+      {
+        "was": "Reinigungsutensilien (Wischlappen, Bodentücher, Wischbezüge)",
+        "wann": "täglich nach der Reinigung",
+        "womit": "Vollwaschmittel; Haushalts- oder langstulpige Handschuhe",
+        "wie": "bei mindestens 60 °C waschen; Besen von Haaren befreien",
+        "wer": "Beschäftigte",
+        "branchen": ["friseur", "kosmetik", "nagelstudio", "fusspflege"],
+        "quelle": "https://www.bgw-online.de/resource/blob/20260/30088b250f534f8e8b1bc1b984badf2b/bgw06-12-090-hygiene-im-friseursalon-plan-data.pdf"
+      },
+      {
+        "was": "Abfall allgemein",
+        "wann": "laufend; Behälter täglich leeren",
+        "womit": "Abfallbehälter mit Deckel (fußbedient bzw. berührungsfrei) und flüssigkeitsdichtem Kunststoffsack",
+        "wie": "am Arbeitsplatz sammeln; blutbehaftete Abfälle in feuchtigkeitsdichten Behältern",
+        "wer": "Beschäftigte",
+        "branchen": ["friseur", "kosmetik", "nagelstudio", "fusspflege"],
+        "quelle": "https://www.gesunde.sachsen.de/download/Rahmenhygieneplan-Tatoo-Kosmetik-Fusspflege.pdf; https://www.bgw-online.de/resource/blob/20260/30088b250f534f8e8b1bc1b984badf2b/bgw06-12-090-hygiene-im-friseursalon-plan-data.pdf",
+        "anmerkung": "'Behälter täglich leeren' ist nicht ausdrücklich belegt.",
+        "unsicher": true
+      },
+      {
+        "was": "Spitze, scharfe, zerbrechliche Gegenstände (Klingen, Lanzetten, Kanülen)",
+        "wann": "unmittelbar nach Gebrauch",
+        "womit": "stich-, bruch- und durchstichfester, verschließbarer Behälter",
+        "wie": "direkt einwerfen, nicht zurückstecken; Behälter fest verschließen und über den Hausmüll entsorgen",
+        "wer": "behandelnde Person",
+        "branchen": ["friseur", "kosmetik", "nagelstudio", "fusspflege"],
+        "quelle": "https://www.gesetze-bayern.de/Content/Document/BayHygV/true; https://www.bgw-online.de/resource/blob/20260/30088b250f534f8e8b1bc1b984badf2b/bgw06-12-090-hygiene-im-friseursalon-plan-data.pdf; https://www.gesunde.sachsen.de/download/Rahmenhygieneplan-Tatoo-Kosmetik-Fusspflege.pdf"
+      },
+      {
+        "was": "Umgang mit Blut – Verletzung des Kunden",
+        "wann": "bei unbeabsichtigter Verletzung",
+        "womit": "Einmalhandschuhe, steriler Tupfer, zugelassenes Wund-/Hautantiseptikum, Pflaster",
+        "wie": "Blutung nicht mit ungeschützten Händen berühren; mit sterilem Tupfer und leichtem Druck stillen, Wunde desinfizieren, Pflaster; bei größeren Wunden Arzt; kontaminierte Flächen und Instrumente sofort desinfizieren",
+        "wer": "behandelnde Person",
+        "branchen": ["friseur", "kosmetik", "nagelstudio", "fusspflege"],
+        "quelle": "https://www.gesunde.sachsen.de/download/Rahmenhygieneplan-Tatoo-Kosmetik-Fusspflege.pdf; https://www.gesetze-bayern.de/Content/Document/BayHygV/true; https://umwelt-online.de/recht/gefstoff/gen_tech/bw/hygv.htm"
+      },
+      {
+        "was": "Umgang mit Blut – Stich-/Schnittverletzung der beschäftigten Person",
+        "wann": "sofort nach Verletzung",
+        "womit": "Hautantiseptikum (VAH-gelistet), Verbandmaterial, Verbandbuch",
+        "wie": "Blutfluss fördern, Wunde mind. 1 Minute desinfizieren, abdecken; Infektionsstatus des Kunden erfragen (Hepatitis, HIV); unverzüglich Hausarzt bzw. Durchgangsarzt (ggf. Postexpositionsprophylaxe); Unfall im Verbandbuch dokumentieren",
+        "wer": "betroffene Person / Arbeitgeber",
+        "branchen": ["friseur", "kosmetik", "nagelstudio", "fusspflege"],
+        "quelle": "https://www.gesunde.sachsen.de/download/Rahmenhygieneplan-Tatoo-Kosmetik-Fusspflege.pdf"
+      },
+      {
+        "was": "Hygieneplan pflegen und Personal unterweisen",
+        "wann": "jährlich überprüfen und aktualisieren; Unterweisung mind. jährlich",
+        "womit": "schriftlicher bzw. elektronischer Hygieneplan, Unterweisungsnachweis",
+        "wie": "Plan jederzeit einsehbar halten; Belehrung der Mitarbeitenden schriftlich dokumentieren",
+        "wer": "Inhaber/in",
+        "branchen": ["friseur", "kosmetik", "nagelstudio", "fusspflege"],
+        "quelle": "https://www.gesunde.sachsen.de/download/Rahmenhygieneplan-Tatoo-Kosmetik-Fusspflege.pdf; https://umwelt-online.de/recht/gefstoff/gen_tech/srl/hygvo.htm; https://umwelt-online.de/recht/gefstoff/gen_tech/bw/hygv.htm"
+      }
+    ]
+  },
+
+  "hautschutz_friseur": {
+    "quelle": "https://www.bgw-online.de/resource/blob/8772/b76996f027809fa44f358d7abe1516a4/SichereSeitenFuerDasFriseurhandwerk_Hautschutz_Stand_07_2026_bf.pdf",
+    "titel": "BGW Hautschutz- und Händehygieneplan Friseurhandwerk (BGW 06-13-090), Stand 07/2026",
+    "zeilen": [
+      {
+        "taetigkeit": "Arbeitsbeginn, nach Pausen, nach dem Händewaschen",
+        "hautschutz": "Hautschutzcreme auftragen",
+        "handschuhe": null,
+        "hautreinigung": null,
+        "hautpflege": null
+      },
+      {
+        "taetigkeit": "Haare waschen",
+        "hautschutz": "Hautschutzcreme vor Arbeitsbeginn und nach Pausen",
+        "handschuhe": "Einmalhandschuhe aus Nitril oder Vinyl mit langen Stulpen",
+        "hautreinigung": "Hände nur waschen, wenn nötig; gut abspülen, mit sauberen Tüchern abtrocknen",
+        "hautpflege": "Hautpflegecreme am Arbeitsende"
+      },
+      {
+        "taetigkeit": "Feuchte Haare behandeln, schneiden oder legen (Nassschneiden)",
+        "hautschutz": "Hautschutzcreme vor Arbeitsbeginn, nach Pausen und nach dem Händewaschen",
+        "handschuhe": "geeignete Handschuhe (Material in der Quelle nicht näher genannt)",
+        "hautreinigung": "nur wenn nötig waschen, gut abspülen, abtrocknen",
+        "hautpflege": "Hautpflegecreme am Arbeitsende und in der Freizeit"
+      },
+      {
+        "taetigkeit": "Färben, Tönen, Dauerwelle (Umgang mit Friseurchemikalien)",
+        "hautschutz": "Hautschutzcreme vor Arbeitsbeginn, nach Pausen",
+        "handschuhe": "Einmalhandschuhe nach DIN EN 374-6 („Friseurhandschuh-Norm“) mit Friseur-Symbol",
+        "hautreinigung": "bei Hautkontakt mit Friseurchemikalien Hände waschen, gut abspülen, abtrocknen",
+        "hautpflege": "Hautpflegecreme am Arbeitsende"
+      },
+      {
+        "taetigkeit": "Reinigungsarbeiten",
+        "hautschutz": "Hautschutzcreme vor Arbeitsbeginn, nach Pausen",
+        "handschuhe": "chemikalienbeständige Schutzhandschuhe nach DIN EN ISO 374, ggf. mit längerem Schaft",
+        "hautreinigung": "Hände waschen bei sichtbarer Verschmutzung oder Chemikalienkontakt",
+        "hautpflege": "Hautpflegecreme am Arbeitsende"
+      },
+      {
+        "taetigkeit": "Desinfektionsarbeiten (Instrumente, Flächen)",
+        "hautschutz": null,
+        "handschuhe": "chemikalienbeständige Schutzhandschuhe (wie Reinigungsarbeiten)",
+        "hautreinigung": "wie Reinigungsarbeiten",
+        "hautpflege": "Hautpflegecreme am Arbeitsende"
+      },
+      {
+        "taetigkeit": "Arbeitsende / Freizeit",
+        "hautschutz": null,
+        "handschuhe": null,
+        "hautreinigung": null,
+        "hautpflege": "Hautpflegecreme auftragen"
+      }
+    ],
+    "allgemeine_regeln": [
+      "Feuchtarbeit: regelmäßig mehr als zwei Stunden Hautkontakt mit Wasser pro Arbeitstag bzw. häufiger Wechsel zwischen Handschuhtragen und Händewaschen",
+      "Handschuhe in passender Größe bereitstellen; nur auf vollständig trockene Hände ziehen; beschädigte Handschuhe sofort ersetzen",
+      "bei längeren Tragezeiten nahtlose Baumwoll-Unterziehhandschuhe bereitstellen",
+      "Schmuck an Händen und Unterarmen während der Arbeit ablegen",
+      "Handwaschplatz: hautneutrale, möglichst unparfümierte Waschpräparate (pH 5,5), regulierbare Wassertemperatur, Einmalhandtücher, Pflegecremes",
+      "möglichst duft- und konservierungsstofffreie Produkte wählen und im Hautschutzplan eintragen (Produktnamen betrieblich ergänzen)"
+    ],
+    "nicht_belegt": "Blondieren ist im BGW-Dokument nicht gesondert aufgeführt (fachlich wie Färben einzuordnen – unsicher)."
+  },
+
+  "lmhv_schulung": {
+    "rechtsgrundlage": "§ 4 LMHV i. V. m. Anlage 1; Art. 4 und Anhang II Kapitel XII VO (EG) Nr. 852/2004",
+    "quelle_amtlich": "https://www.gesetze-im-internet.de/lmhv_2007/__4.html",
+    "wer": "Wer leicht verderbliche Lebensmittel herstellt, behandelt oder in Verkehr bringt, muss auf Grund einer Schulung über Fachkenntnisse nach Anlage 1 verfügen (§ 4 Abs. 1). Bei Personen mit abgeschlossener einschlägiger Berufsausbildung (z. B. Koch, Bäcker, Fleischer) oder einschlägigem Studium wird vermutet, dass sie die Fachkenntnisse besitzen (§ 4 Abs. 2). Ausgenommen sind Betriebe, die ausschließlich verpackte Lebensmittel wiegen, messen, stempeln, bedrucken oder in Verkehr bringen, sowie die Primärproduktion.",
+    "inhalte_anlage1": [
+      "Eigenschaften und Zusammensetzung des jeweiligen Lebensmittels",
+      "hygienische Anforderungen an die Herstellung und Verarbeitung des jeweiligen Lebensmittels",
+      "lebensmittelrechtliche Vorschriften",
+      "Warenkontrolle, Haltbarkeitsprüfung und Kennzeichnung",
+      "betriebliche Eigenkontrollen und Rückverfolgbarkeit",
+      "Notfallplan (Korrektur- und Vorbeugemaßnahmen) und Krisenmanagement",
+      "hygienische Behandlung des jeweiligen Lebensmittels",
+      "Anforderungen an Kühlung und Lagerung",
+      "Vermeidung nachteiliger Beeinflussung durch Lebensmittelabfälle, nicht genießbare Nebenerzeugnisse und andere Abfälle",
+      "Reinigung und Desinfektion"
+    ],
+    "inhalte_hinweis": "Sinngemäß nach Merkblatt Landkreis Aurich; Wortlaut der Anlage 1 nicht direkt geprüft. Merkblatt Mülheim nennt ergänzend Grundlagen der Mikrobiologie, Betriebs- und Personalhygiene, Gefahren bei der Lebensmittelherstellung.",
+    "inhalte_unsicher": true,
+    "nachweis": {
+      "gesetzlich": "Die Fachkenntnisse sind der zuständigen Behörde auf Verlangen nachzuweisen. Eine bestimmte Form (schriftlich) oder eine feste Wiederholungsfrist schreibt § 4 LMHV nach den geprüften Quellen nicht ausdrücklich vor.",
+      "behoerdliche_praxis": "Lebensmittelüberwachung Mülheim an der Ruhr: „Die erfolgte Durchführung ist dabei zu protokollieren“; das Protokoll ist bei Kontrollen auf Verlangen vorzulegen. Lebensmittelüberwachung Mainz empfiehlt, Schulung zusammen mit der Belehrung nach IfSG durchzuführen und zu dokumentieren. Empfehlung für die App: schriftlicher Nachweis (Datum, Inhalte, Schulende/r, Teilnehmende mit Unterschrift).",
+      "wiederholung": "Keine gesetzliche Wiederholungsfrist für die Schulung nach § 4 LMHV; die allgemeine Pflicht des Lebensmittelunternehmers zur regelmäßigen Schulung und Unterweisung des Personals nach Art. 4 i. V. m. Anhang II Kap. XII VO (EG) Nr. 852/2004 bleibt unberührt.",
+      "quelle": "https://www.landkreis-aurich.de/fileadmin/dateiablage/buergerservice/Merkblatt_Personalschulung_in_Lebensmittelbetrieben.pdf; https://cms.muelheim-ruhr.de/sites/default/files/2026-06/Merkblatt%20Schulung%20nach%20%C2%A7%204%20LMHV%20.pdf; https://www.mainz.de/vv/medien/internet/Merkblatt-fuer-Betriebseigene-Massnahmen-und-Kontrollen.pdf"
+    },
+    "quelle": "https://www.landkreis-aurich.de/fileadmin/dateiablage/buergerservice/Merkblatt_Personalschulung_in_Lebensmittelbetrieben.pdf; https://cms.muelheim-ruhr.de/sites/default/files/2026-06/Merkblatt%20Schulung%20nach%20%C2%A7%204%20LMHV%20.pdf"
+  }
+}

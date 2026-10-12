@@ -1,0 +1,2136 @@
+{
+  "meta": {
+    "stand_recherche": "2026-10-12",
+    "hinweise": [
+      "gesetze-im-internet.de war aus der Recherche-Umgebung nicht abrufbar (Proxy/robots). Gesetzestexte wurden ueber dejure.org bzw. vorschriften.bgn-branchenwissen.de (Vorschriftensammlung der BGN) gegengeprueft; als 'quelle' ist trotzdem die amtliche URL auf gesetze-im-internet.de angegeben, die Pruefquelle steht in 'geprueft_ueber'. Vor Produktivnutzung Wortlaut einmal gegen gesetze-im-internet.de abgleichen.",
+      "Das Abruf-Werkzeug liefert teilweise Zusammenfassungen statt Volltext. Wo 'wortlaut': 'woertlich' steht, wurde der Text als Zitat bestaetigt; 'sinngemaess' heisst: inhaltlich belegt, Formulierung aber nicht zeichengenau verifiziert.",
+      "Massnahmen sind als Objekte {text, stop} angelegt; stop = S (Substitution), T (technisch), O (organisatorisch), P (personenbezogen). Reihenfolge innerhalb einer Gefaehrdung folgt STOP.",
+      "faktor-Zuordnung nach § 5 Abs. 3 ArbSchG: arbeitsstaette = Nr. 1, einwirkungen = Nr. 2, arbeitsmittel = Nr. 3, ablaeufe_arbeitszeit = Nr. 4, qualifikation = Nr. 5, psychisch = Nr. 6, sonstiges = nicht ausdruecklich genannt (z. B. Brand, Notfall). Die Zuordnung der einzelnen Gefaehrdung zum Faktor ist redaktionell (nicht aus der Quelle)."
+    ],
+    "faktoren_par5_abs3_arbschg": {
+      "wortlaut": "woertlich",
+      "quelle": "https://www.gesetze-im-internet.de/arbschg/__5.html",
+      "geprueft_ueber": "https://dejure.org/gesetze/ArbSchG/5.html",
+      "eintraege": [
+        {
+          "faktor": "arbeitsstaette",
+          "nr": 1,
+          "text": "die Gestaltung und die Einrichtung der Arbeitsstätte und des Arbeitsplatzes"
+        },
+        {
+          "faktor": "einwirkungen",
+          "nr": 2,
+          "text": "physikalische, chemische und biologische Einwirkungen"
+        },
+        {
+          "faktor": "arbeitsmittel",
+          "nr": 3,
+          "text": "die Gestaltung, die Auswahl und den Einsatz von Arbeitsmitteln, insbesondere von Arbeitsstoffen, Maschinen, Geräten und Anlagen sowie den Umgang damit"
+        },
+        {
+          "faktor": "ablaeufe_arbeitszeit",
+          "nr": 4,
+          "text": "die Gestaltung von Arbeits- und Fertigungsverfahren, Arbeitsabläufen und Arbeitszeit und deren Zusammenwirken"
+        },
+        {
+          "faktor": "qualifikation",
+          "nr": 5,
+          "text": "unzureichende Qualifikation und Unterweisung der Beschäftigten"
+        },
+        {
+          "faktor": "psychisch",
+          "nr": 6,
+          "text": "psychische Belastungen bei der Arbeit"
+        }
+      ]
+    },
+    "dokumentation_par6_arbschg": {
+      "text": "Der Arbeitgeber muss über Unterlagen verfügen, aus denen das Ergebnis der Gefährdungsbeurteilung, die von ihm festgelegten Maßnahmen des Arbeitsschutzes und das Ergebnis ihrer Überprüfung ersichtlich sind (§ 6 Abs. 1 Satz 1 ArbSchG).",
+      "wortlaut": "sinngemaess",
+      "quelle": "https://www.gesetze-im-internet.de/arbschg/__6.html",
+      "geprueft_ueber": "https://dejure.org/gesetze/ArbSchG/6.html"
+    }
+  },
+  "gefaehrdungen": {
+    "friseur": [
+      {
+        "faktor": "arbeitsstaette",
+        "gefaehrdung": "Ausrutschen, Stolpern und Stürzen durch glatte Böden, Schmierfilme, Unebenheiten oder verrutschende Fußmatten.",
+        "massnahmen": [
+          {
+            "text": "Rutschhemmenden, leicht zu reinigenden Bodenbelag verwenden (mindestens Bewertungsgruppe R 9).",
+            "stop": "T"
+          },
+          {
+            "text": "Fußmatten gegen Verrutschen sichern; Bodenschäden sofort beseitigen.",
+            "stop": "T"
+          },
+          {
+            "text": "Reinigungsmittel ohne Schmierfilm und sparsam einsetzen.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/8762/a84a247984add6fe140a7eef63ae6f1f/SichereSeitenFuerDasFriseurhandwerk_Arbeitsplatz_Stand_01_2025_bf.pdf"
+      },
+      {
+        "faktor": "arbeitsstaette",
+        "gefaehrdung": "Versperrte Verkehrs- und Fluchtwege, zu enge Bewegungsflächen, herumstehende bewegliche Geräte.",
+        "massnahmen": [
+          {
+            "text": "Geeignete Abstellflächen für bewegliche Geräte (z. B. Climazone) schaffen; ausreichend Bewegungsfläche am Arbeitsplatz.",
+            "stop": "T"
+          },
+          {
+            "text": "Fluchtwege und Notausgänge dauerhaft frei halten und kennzeichnen; Flucht- und Rettungsplan erstellen.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/8762/a84a247984add6fe140a7eef63ae6f1f/SichereSeitenFuerDasFriseurhandwerk_Arbeitsplatz_Stand_01_2025_bf.pdf"
+      },
+      {
+        "faktor": "arbeitsstaette",
+        "gefaehrdung": "Unzureichende Frischluftzufuhr, dadurch Belastung durch Dämpfe und Aerosole von Friseurchemikalien.",
+        "massnahmen": [
+          {
+            "text": "Lüftung mit Richtwert 100 m³ Frischluft pro Stunde und Beschäftigtem sicherstellen, auch im Winter (Abluftventilatoren, RLT-Anlage oder Querlüftung).",
+            "stop": "T"
+          },
+          {
+            "text": "Haarspray nur in ausreichend belüfteten Räumen versprühen.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/5.htm",
+        "quelle_zusatz": "https://www.bgw-online.de/resource/blob/8762/a84a247984add6fe140a7eef63ae6f1f/SichereSeitenFuerDasFriseurhandwerk_Arbeitsplatz_Stand_01_2025_bf.pdf"
+      },
+      {
+        "faktor": "einwirkungen",
+        "gefaehrdung": "Feuchtarbeit (Haare waschen, Arbeiten an feuchtem Haar, häufiges Händewaschen) als Hauptrisikofaktor für Handekzeme.",
+        "massnahmen": [
+          {
+            "text": "Unvermeidbare Feuchtarbeit auf mehrere Beschäftigte verteilen; hautbelastende und nicht belastende Tätigkeiten abwechseln.",
+            "stop": "O"
+          },
+          {
+            "text": "Feuchtarbeit möglichst unter 4 Stunden täglich halten, angestrebt unter 2 Stunden.",
+            "stop": "O"
+          },
+          {
+            "text": "Beim Haarewaschen langstulpige Einmalhandschuhe (Nitril oder Vinyl) tragen; Hautschutz- und Händehygieneplan anwenden.",
+            "stop": "P"
+          }
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/8772/b76996f027809fa44f358d7abe1516a4/SichereSeitenFuerDasFriseurhandwerk_Hautschutz_Stand_07_2026_bf.pdf",
+        "quelle_zusatz": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/5.htm"
+      },
+      {
+        "faktor": "einwirkungen",
+        "gefaehrdung": "Hautkontakt mit Friseurchemikalien (Färbe-, Blondier-, Dauerwellmittel) kann zu Allergien und Hautreizungen führen.",
+        "massnahmen": [
+          {
+            "text": "Fertig portionierte Packungen bevorzugen; sorgfältig dosieren.",
+            "stop": "S"
+          },
+          {
+            "text": "Eigener Misch- und Umfüllplatz mit flüssigkeitsdichter, abwaschbarer Arbeitsfläche (entfällt bei geschlossenen Systemen).",
+            "stop": "T"
+          },
+          {
+            "text": "Mischen und Auftragen nur mit geeigneten Applikatoren.",
+            "stop": "O"
+          },
+          {
+            "text": "Beim Färben, Blondieren, Dauerwellen und Mischen Friseur-Einmalhandschuhe (DIN EN ISO 374-6) tragen und nach einmaligem Gebrauch entsorgen.",
+            "stop": "P"
+          }
+        ],
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/5.htm",
+        "quelle_zusatz": "https://www.bgw-online.de/resource/blob/8770/0ecbc02ae74e4d6121dd81b574e08108/SichereSeitenFuerDasFriseurhandwerk_Gefahrstoffe_Stand_01_2025_bf.pdf"
+      },
+      {
+        "faktor": "einwirkungen",
+        "gefaehrdung": "Einatmen von Stäuben (Blondiermittel), Dämpfen (Dauerwelle) und Sprühnebel (Haarspray) reizt die Atemwege.",
+        "massnahmen": [
+          {
+            "text": "Für ausreichende Lüftung sorgen.",
+            "stop": "T"
+          },
+          {
+            "text": "Sprühnebel, Stäube und Dämpfe nicht einatmen; nicht in Richtung Augen sprühen.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/anl_2.htm"
+      },
+      {
+        "faktor": "einwirkungen",
+        "gefaehrdung": "Hautschäden durch Reinigungs- und Desinfektionsmittel.",
+        "massnahmen": [
+          {
+            "text": "Desinfektion im Wischverfahren statt Sprühen oder Vernebeln; Desinfektionsmittelbäder abdecken.",
+            "stop": "O"
+          },
+          {
+            "text": "Chemikalienbeständige Schutzhandschuhe (DIN EN ISO 374), ggf. mit längerem Schaft, bei Reinigung und Desinfektion tragen.",
+            "stop": "P"
+          }
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/8770/0ecbc02ae74e4d6121dd81b574e08108/SichereSeitenFuerDasFriseurhandwerk_Gefahrstoffe_Stand_01_2025_bf.pdf",
+        "quelle_zusatz": "https://www.bgw-online.de/resource/blob/8772/b76996f027809fa44f358d7abe1516a4/SichereSeitenFuerDasFriseurhandwerk_Hautschutz_Stand_07_2026_bf.pdf"
+      },
+      {
+        "faktor": "sonstiges",
+        "gefaehrdung": "Brand- und Explosionsgefahr durch alkoholische Desinfektionsmittel, Spraydosen und entzündbare Flüssigkeiten.",
+        "massnahmen": [
+          {
+            "text": "Brennbare Flüssigkeiten nicht an Arbeitsplätzen, unter Treppen oder in Fluchtwegen lagern; am Arbeitsplatz höchstens den Tagesbedarf.",
+            "stop": "O"
+          },
+          {
+            "text": "Spraydosen nicht über 50 °C erwärmen, nicht in offene Flammen oder beim Rauchen sprühen.",
+            "stop": "O"
+          },
+          {
+            "text": "Feuerlöscher bereitstellen (bis 50 m² Grundfläche Schaumlöscher A/B mit 6 LE), alle zwei Jahre prüfen lassen.",
+            "stop": "T"
+          }
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/8770/0ecbc02ae74e4d6121dd81b574e08108/SichereSeitenFuerDasFriseurhandwerk_Gefahrstoffe_Stand_01_2025_bf.pdf",
+        "quelle_zusatz": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/5.htm; https://www.bgw-online.de/resource/blob/8762/a84a247984add6fe140a7eef63ae6f1f/SichereSeitenFuerDasFriseurhandwerk_Arbeitsplatz_Stand_01_2025_bf.pdf"
+      },
+      {
+        "faktor": "arbeitsmittel",
+        "gefaehrdung": "Absturz von Leitern oder Tritten, umkippende Regale, herabfallende Kartons.",
+        "massnahmen": [
+          {
+            "text": "Nur geeignete Aufstiegshilfen verwenden; schadhafte Leitern sofort aussortieren.",
+            "stop": "T"
+          },
+          {
+            "text": "Leitern im Bestands- und Wartungsplan erfassen und regelmäßig prüfen; Standsicherheit von Regalen regelmäßig prüfen.",
+            "stop": "O"
+          },
+          {
+            "text": "Schwere Lasten unten, leichte oben lagern.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/8762/a84a247984add6fe140a7eef63ae6f1f/SichereSeitenFuerDasFriseurhandwerk_Arbeitsplatz_Stand_01_2025_bf.pdf"
+      },
+      {
+        "faktor": "arbeitsmittel",
+        "gefaehrdung": "Elektrische Gefährdung durch nicht geprüfte oder beschädigte Elektrogeräte und Anlagen.",
+        "massnahmen": [
+          {
+            "text": "Alle Geräte und Anlagen in einem Bestands- und Wartungsplan erfassen und Prüftermine festlegen.",
+            "stop": "O"
+          },
+          {
+            "text": "Prüfungen termin- und fachgerecht durchführen lassen und Ergebnisse dokumentieren.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/8764/95770285c5eac5d109a4184815d91136/SichereSeitenFuerDasFriseurhandwerk_Arbeitsschutzorganisation_Stand_01_2025_bf.pdf",
+        "hinweis": "Die BGW-Seite benennt die Gefährdung nicht ausdrücklich, nur die Maßnahmen; Prüffristen siehe pruefung_elektro."
+      },
+      {
+        "faktor": "ablaeufe_arbeitszeit",
+        "gefaehrdung": "Ungünstige Körperhaltung und langes Stehen bei der Arbeit am Kunden.",
+        "massnahmen": [
+          {
+            "text": "Frisierstühle und Haarwaschbecken individuell und einfach einstellbar ausführen.",
+            "stop": "T"
+          },
+          {
+            "text": "Sitzhocker für Beschäftigte bereitstellen.",
+            "stop": "T"
+          }
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/8762/a84a247984add6fe140a7eef63ae6f1f/SichereSeitenFuerDasFriseurhandwerk_Arbeitsplatz_Stand_01_2025_bf.pdf"
+      },
+      {
+        "faktor": "ablaeufe_arbeitszeit",
+        "gefaehrdung": "Stress und Hektik in Stoßzeiten, zu lange Arbeitszeiten, fehlende oder zu kurze Pausen und Ruhezeiten.",
+        "massnahmen": [
+          {
+            "text": "In Spitzenzeiten ausreichend Personal einsetzen; Zeitpuffer für Übergaben und Pausen einplanen.",
+            "stop": "O"
+          },
+          {
+            "text": "Dienstplanung unter Einbeziehung der Wünsche der Beschäftigten.",
+            "stop": "O"
+          },
+          {
+            "text": "Höchstarbeitszeit, Pausen und Ruhezeiten einhalten; Mehrarbeit dokumentieren.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/8766/1aab59f2713bf8d25dab49fd7f6be0c0/SichereSeitenFuerDasFriseurhandwerk_Arbeitszeit_Stand_01_2025_bf.pdf"
+      },
+      {
+        "faktor": "psychisch",
+        "gefaehrdung": "Zeitdruck, Konflikte im Team, unzufriedene Kundschaft sowie Aggressionen und Übergriffe.",
+        "massnahmen": [
+          {
+            "text": "Aufgaben, Zuständigkeiten und Entscheidungskompetenzen klar regeln, dokumentieren und kommunizieren.",
+            "stop": "O"
+          },
+          {
+            "text": "Verhalten in Notsituationen festlegen; Arbeitspläne so gestalten, dass niemand allein arbeitet.",
+            "stop": "O"
+          },
+          {
+            "text": "Bei Konflikten mit Kundschaft Rückendeckung geben und Vermittlungsgespräche anbieten.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/8782/5e7eb29bb62a8048c679a74e7886813a/SichereSeitenFuerDasFriseurhandwerk_PsychischeBelastung_Stand_01_2025_bf.pdf"
+      },
+      {
+        "faktor": "qualifikation",
+        "gefaehrdung": "Fehlende Kenntnisse über Gefahrstoffe, Hautschutz und Hygieneregeln.",
+        "massnahmen": [
+          {
+            "text": "Regelmäßig unterweisen und die Unterweisung mit Betriebsanweisung, Reinigungs- und Desinfektionsplan sowie Hautschutzplan verknüpfen.",
+            "stop": "O"
+          },
+          {
+            "text": "Unterweisung dokumentieren (z. B. BGW-Dokumentationshilfe „Nachweis über Schulung/Unterweisung/Einweisung“).",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/8770/0ecbc02ae74e4d6121dd81b574e08108/SichereSeitenFuerDasFriseurhandwerk_Gefahrstoffe_Stand_01_2025_bf.pdf"
+      },
+      {
+        "faktor": "sonstiges",
+        "gefaehrdung": "Verzögerte Hilfe bei Unfällen und Notfällen.",
+        "massnahmen": [
+          {
+            "text": "Verbandkasten nach DIN 13157 (Typ C) bereitstellen; Standort allen Beschäftigten bekannt machen.",
+            "stop": "T"
+          },
+          {
+            "text": "Anschrift und Telefonnummer des Rettungsdienstes deutlich aushängen.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/8762/a84a247984add6fe140a7eef63ae6f1f/SichereSeitenFuerDasFriseurhandwerk_Arbeitsplatz_Stand_01_2025_bf.pdf"
+      }
+    ],
+    "kosmetik": [
+      {
+        "faktor": "arbeitsstaette",
+        "gefaehrdung": "Stolpern, Ausrutschen und Stürzen durch nasse Böden, Schmierfilme, Stufen oder Kabel.",
+        "massnahmen": [
+          {
+            "text": "Rutschhemmende Böden und Schmutzfangmatten; Kabel bündeln; Stufenkanten markieren.",
+            "stop": "T"
+          },
+          {
+            "text": "Grundreinigung außerhalb des Publikumsverkehrs; nasse Bereiche mit Warnschildern kennzeichnen.",
+            "stop": "O"
+          },
+          {
+            "text": "Flache, rutschhemmende Schuhe tragen.",
+            "stop": "P"
+          }
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/20172/553d420e3d5ffd11d407fb1eec855939/bgw04-05-080-gefaehrdungsbeurteilung-in-beauty-und-wellnessbetrieben-data.pdf",
+        "fundstelle": "BGW 04-05-080, Stand 03/2023, S. 27–28"
+      },
+      {
+        "faktor": "arbeitsstaette",
+        "gefaehrdung": "Unzureichende Beleuchtung bei Präzisionsarbeiten sowie an Eingang und Treppen.",
+        "massnahmen": [
+          {
+            "text": "Arbeitsplätze für Kosmetik- und Sticharbeiten mit mindestens 750 Lux beleuchten (ASR A3.4 beachten).",
+            "stop": "T"
+          },
+          {
+            "text": "Eingang und Treppen ausreichend ausleuchten.",
+            "stop": "T"
+          }
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/20172/553d420e3d5ffd11d407fb1eec855939/bgw04-05-080-gefaehrdungsbeurteilung-in-beauty-und-wellnessbetrieben-data.pdf",
+        "fundstelle": "BGW 04-05-080, S. 28, 31, 36, 39; ebenso BGW Sichere Seiten Friseur/Arbeitsplatz (Kosmetik 750 Lux)"
+      },
+      {
+        "faktor": "einwirkungen",
+        "gefaehrdung": "Hautbelastung durch Feuchtarbeit, häufiges Händewaschen, langes Handschuhtragen sowie Desinfektions- und Reinigungsmittel.",
+        "massnahmen": [
+          {
+            "text": "Feucht- und Trockenarbeit wechseln und zeitlich begrenzen.",
+            "stop": "O"
+          },
+          {
+            "text": "pH-neutrale, farb- und duftstofffreie Waschmittel und rückfettende Händedesinfektion bereitstellen; Handschutz- und Händehygieneplan aufstellen.",
+            "stop": "O"
+          },
+          {
+            "text": "Latexfreie Schutzhandschuhe verwenden.",
+            "stop": "P"
+          }
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/20172/553d420e3d5ffd11d407fb1eec855939/bgw04-05-080-gefaehrdungsbeurteilung-in-beauty-und-wellnessbetrieben-data.pdf",
+        "fundstelle": "BGW 04-05-080, S. 21–22"
+      },
+      {
+        "faktor": "einwirkungen",
+        "gefaehrdung": "Kleber, Aktivatoren und Reiniger bei der Nagelmodellage reizen Haut, Augen und Atemwege.",
+        "massnahmen": [
+          {
+            "text": "Weniger gefährliche Produkte einsetzen; Mengen minimieren.",
+            "stop": "S"
+          },
+          {
+            "text": "Absaugung am Arbeitsplatz; mindestens Fensterlüftung.",
+            "stop": "T"
+          },
+          {
+            "text": "Entzündbare Mittel kühl und trocken lagern.",
+            "stop": "O"
+          },
+          {
+            "text": "Einmalhandschuhe und Schutzbrille tragen.",
+            "stop": "P"
+          }
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/20172/553d420e3d5ffd11d407fb1eec855939/bgw04-05-080-gefaehrdungsbeurteilung-in-beauty-und-wellnessbetrieben-data.pdf",
+        "fundstelle": "BGW 04-05-080, S. 41"
+      },
+      {
+        "faktor": "einwirkungen",
+        "gefaehrdung": "Einatmen von Stäuben beim Feilen und Fräsen von Kunstnägeln oder Hornhaut.",
+        "massnahmen": [
+          {
+            "text": "Absaugung oder Nass-/Sprühtechnik einsetzen.",
+            "stop": "T"
+          },
+          {
+            "text": "FFP2-Maske und Schutzbrille tragen.",
+            "stop": "P"
+          }
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/20172/553d420e3d5ffd11d407fb1eec855939/bgw04-05-080-gefaehrdungsbeurteilung-in-beauty-und-wellnessbetrieben-data.pdf",
+        "fundstelle": "BGW 04-05-080, S. 18, 41"
+      },
+      {
+        "faktor": "einwirkungen",
+        "gefaehrdung": "Infektionsgefahr (z. B. Hepatitis, HIV) durch Blutkontakt sowie Stich- und Schnittverletzungen.",
+        "massnahmen": [
+          {
+            "text": "Einweglanzetten bzw. Instrumente mit Sicherheitssystem und durchstichsichere Entsorgungsbehälter verwenden.",
+            "stop": "T"
+          },
+          {
+            "text": "Instrumente nach jedem Hautkontakt desinfizieren bzw. aufbereiten; Hygieneplan aufstellen; Verletzungen im Verbandbuch dokumentieren.",
+            "stop": "O"
+          },
+          {
+            "text": "Einmalhandschuhe tragen und beschädigte sofort wechseln.",
+            "stop": "P"
+          }
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/20172/553d420e3d5ffd11d407fb1eec855939/bgw04-05-080-gefaehrdungsbeurteilung-in-beauty-und-wellnessbetrieben-data.pdf",
+        "fundstelle": "BGW 04-05-080, S. 35–36, 39–40, 42"
+      },
+      {
+        "faktor": "einwirkungen",
+        "gefaehrdung": "Sensibilisierung durch Konservierungs- und Duftstoffe in Kosmetikprodukten (z. B. Massageöle, Cremes, Nagellack).",
+        "massnahmen": [
+          {
+            "text": "Nur zugelassene, EU-kosmetikkonforme Produkte verwenden; Mengen gering halten.",
+            "stop": "S"
+          },
+          {
+            "text": "Betriebsanweisung erstellen; arbeitsmedizinische Vorsorge berücksichtigen.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/20172/553d420e3d5ffd11d407fb1eec855939/bgw04-05-080-gefaehrdungsbeurteilung-in-beauty-und-wellnessbetrieben-data.pdf",
+        "fundstelle": "BGW 04-05-080, S. 33, 37"
+      },
+      {
+        "faktor": "einwirkungen",
+        "gefaehrdung": "Augenschäden durch optische Strahlung bei Laser- und IPL-Anwendungen.",
+        "massnahmen": [
+          {
+            "text": "Nur zugelassene Geräte einsetzen; Anwendung nur durch fachkundige Personen (NiSV beachten).",
+            "stop": "O"
+          },
+          {
+            "text": "Geeignete Laser- bzw. Lichtschutzbrille tragen.",
+            "stop": "P"
+          }
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/20172/553d420e3d5ffd11d407fb1eec855939/bgw04-05-080-gefaehrdungsbeurteilung-in-beauty-und-wellnessbetrieben-data.pdf",
+        "fundstelle": "BGW 04-05-080, S. 40"
+      },
+      {
+        "faktor": "arbeitsmittel",
+        "gefaehrdung": "Stromschlag und Brandgefahr durch beschädigte Geräte, Leitungen oder Lampen, besonders bei Feuchtigkeit.",
+        "massnahmen": [
+          {
+            "text": "Geräte mit CE-/GS-Kennzeichnung beschaffen; Fehlerstrom-Schutzschalter (FI/RCD) einsetzen.",
+            "stop": "T"
+          },
+          {
+            "text": "Sicht- und Funktionskontrolle vor Benutzung; defekte Geräte sofort aus dem Verkehr ziehen.",
+            "stop": "O"
+          },
+          {
+            "text": "Wiederkehrende Prüfung ortsveränderlicher Geräte (je nach Fehlerquote 6 Monate bis 2 Jahre) durch Elektrofachkraft oder befähigte Person.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/20172/553d420e3d5ffd11d407fb1eec855939/bgw04-05-080-gefaehrdungsbeurteilung-in-beauty-und-wellnessbetrieben-data.pdf",
+        "fundstelle": "BGW 04-05-080, S. 25–26"
+      },
+      {
+        "faktor": "arbeitsmittel",
+        "gefaehrdung": "Quetsch- und Scherstellen an höhenverstellbaren Behandlungsliegen, unbeabsichtigtes Auslösen der Verstellung.",
+        "massnahmen": [
+          {
+            "text": "Scherstellen abschirmen; Fußtaste gegen Fehlbedienung sichern; Bewegung nur bei gedrückter Taste.",
+            "stop": "T"
+          },
+          {
+            "text": "Liege bei Reinigung gegen Verstellen sichern; Unterweisung auch für Reinigungskräfte.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/20172/553d420e3d5ffd11d407fb1eec855939/bgw04-05-080-gefaehrdungsbeurteilung-in-beauty-und-wellnessbetrieben-data.pdf",
+        "fundstelle": "BGW 04-05-080, S. 26–27, 29–30"
+      },
+      {
+        "faktor": "ablaeufe_arbeitszeit",
+        "gefaehrdung": "Belastung des Muskel-Skelett-Systems durch langes Stehen oder Sitzen, ungünstige Haltung und enge Platzverhältnisse.",
+        "massnahmen": [
+          {
+            "text": "Höhen- und neigungsverstellbare Liegen, einstellbare Stühle und Stehhilfen bereitstellen.",
+            "stop": "T"
+          },
+          {
+            "text": "Arbeitsmittel körpernah bereitstellen; Wechsel von Stehen und Sitzen sowie Lockerungspausen einplanen.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/20172/553d420e3d5ffd11d407fb1eec855939/bgw04-05-080-gefaehrdungsbeurteilung-in-beauty-und-wellnessbetrieben-data.pdf",
+        "fundstelle": "BGW 04-05-080, S. 23–24"
+      },
+      {
+        "faktor": "psychisch",
+        "gefaehrdung": "Zeit- und Leistungsdruck, häufige Unterbrechungen, Alleinarbeit sowie Aggression oder Überfälle.",
+        "massnahmen": [
+          {
+            "text": "Gut beleuchteten Eingang und ggf. Alarmanlage vorsehen.",
+            "stop": "T"
+          },
+          {
+            "text": "Möglichst zu zweit arbeiten; Notfallplan; Bargeldbestand gering halten, Kassenabschluss ohne Publikum.",
+            "stop": "O"
+          },
+          {
+            "text": "Dienstplanung mit Wünschen der Beschäftigten; Handlungsspielräume einräumen.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/20172/553d420e3d5ffd11d407fb1eec855939/bgw04-05-080-gefaehrdungsbeurteilung-in-beauty-und-wellnessbetrieben-data.pdf",
+        "fundstelle": "BGW 04-05-080, S. 30–31"
+      },
+      {
+        "faktor": "sonstiges",
+        "gefaehrdung": "Brand durch elektrische Defekte, überhitzte Geräte und entzündbare Desinfektions- und Reinigungsmittel.",
+        "massnahmen": [
+          {
+            "text": "Geeignete Feuerlöscher und Rauchmelder; Fluchtwege kennzeichnen und freihalten.",
+            "stop": "T"
+          },
+          {
+            "text": "Brennbare Stoffe getrennt lagern; Brandschutzhelfer benennen; Unterweisung und Räumungsübungen.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/20172/553d420e3d5ffd11d407fb1eec855939/bgw04-05-080-gefaehrdungsbeurteilung-in-beauty-und-wellnessbetrieben-data.pdf",
+        "fundstelle": "BGW 04-05-080, S. 19–20"
+      }
+    ],
+    "gastro_cafe": [
+      {
+        "faktor": "arbeitsstaette",
+        "gefaehrdung": "Ausrutschen und Stürzen auf nassen oder fettigen Böden.",
+        "massnahmen": [
+          {
+            "text": "Ablaufrinnen bzw. Abläufe unter Kippbratpfannen, Kochkesseln und Entleerungsöffnungen.",
+            "stop": "T"
+          },
+          {
+            "text": "Nach der Reinigung möglichst trockenwischen; nasse Bereiche sperren oder kennzeichnen; Speisereste sofort entfernen.",
+            "stop": "O"
+          },
+          {
+            "text": "Rutschhemmende Schuhe tragen.",
+            "stop": "P"
+          }
+        ],
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/dguv/110_003/3.htm",
+        "fundstelle": "DGUV Regel 110-003, Abschn. 3.3.2, 3.5, 3.7"
+      },
+      {
+        "faktor": "arbeitsstaette",
+        "gefaehrdung": "Hohe Temperatur und Feuchte sowie Schadstoffe in der Atemluft durch unzureichende Küchenlüftung; Brandlast im Abluftsystem.",
+        "massnahmen": [
+          {
+            "text": "Abluftanlage mit ausreichend dimensionierter Haube und Aerosolabscheidern; Gasgeräte mit der Lüftung koppeln.",
+            "stop": "T"
+          },
+          {
+            "text": "Küchenlüftung vor den Kochgeräten einschalten; Abscheider je nach Verschmutzung, spätestens alle 14 Tage reinigen.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/dguv/110_003/3.htm",
+        "fundstelle": "DGUV Regel 110-003, Abschn. 3.3.3"
+      },
+      {
+        "faktor": "arbeitsstaette",
+        "gefaehrdung": "Eingeschlossenwerden und Kälteeinwirkung in Kühl- und Tiefkühlräumen.",
+        "massnahmen": [
+          {
+            "text": "Kühlraumtüren von innen entriegelbar; Ausgänge mit Sicherheitsbeleuchtung oder nachleuchtender Markierung.",
+            "stop": "T"
+          },
+          {
+            "text": "Vor dem Abschließen prüfen, dass sich niemand mehr im Kühlraum befindet.",
+            "stop": "O"
+          },
+          {
+            "text": "Warme Kleidung bzw. Kälteschutzkleidung bei längerem Aufenthalt.",
+            "stop": "P"
+          }
+        ],
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/dguv/110_003/3.htm",
+        "fundstelle": "DGUV Regel 110-003, Abschn. 3.1"
+      },
+      {
+        "faktor": "arbeitsmittel",
+        "gefaehrdung": "Schnittverletzungen an Messern, Aufschnittmaschinen und Gemüseschneidern.",
+        "massnahmen": [
+          {
+            "text": "Schutzeinrichtungen (Messerschutzring, Restehalter, Fingerschutz, Schutztrichter) funktionsfähig halten.",
+            "stop": "T"
+          },
+          {
+            "text": "Stopfer statt Hand verwenden; Maschine vor dem Abstreifen ausschalten; Messer passend zum Einsatzzweck.",
+            "stop": "O"
+          },
+          {
+            "text": "Schnitthemmende Handschuhe bei Schneidwerkzeugen und beim Messerwechsel.",
+            "stop": "P"
+          }
+        ],
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/dguv/110_003/3.htm",
+        "fundstelle": "DGUV Regel 110-003, Abschn. 3.2"
+      },
+      {
+        "faktor": "arbeitsmittel",
+        "gefaehrdung": "Schnittverletzungen durch Glasbruch, Scherben und Dosen beim Spülen und Entsorgen.",
+        "massnahmen": [
+          {
+            "text": "Sammelbehälter und Hilfsmittel (Schaufel, Besen) für scharfe Abfälle; keine Müllbeutel.",
+            "stop": "T"
+          },
+          {
+            "text": "Scharfe Messer nicht in der Spülmaschine reinigen.",
+            "stop": "O"
+          },
+          {
+            "text": "Schnitthemmende Handschuhe beim Umgang mit Glas und scharfen Abfällen.",
+            "stop": "P"
+          }
+        ],
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/dguv/110_003/3.htm",
+        "fundstelle": "DGUV Regel 110-003, Abschn. 3.5, 3.6"
+      },
+      {
+        "faktor": "einwirkungen",
+        "gefaehrdung": "Verbrennungen und Verbrühungen an heißen Oberflächen, durch Dampf und heiße Flüssigkeiten.",
+        "massnahmen": [
+          {
+            "text": "Druckgargeräte mit sicherer Dampf- und Heißwasserableitung; Deckelgriffe seitlich.",
+            "stop": "T"
+          },
+          {
+            "text": "Vor dem Öffnen von Druckgarern Druckausgleich herstellen; Behälter an den schmalen Seiten fassen.",
+            "stop": "O"
+          },
+          {
+            "text": "Hitzeschutzhandschuhe tragen.",
+            "stop": "P"
+          }
+        ],
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/dguv/110_003/3.htm",
+        "fundstelle": "DGUV Regel 110-003, Abschn. 3.3.1, 3.3.2"
+      },
+      {
+        "faktor": "sonstiges",
+        "gefaehrdung": "Fettbrand und Fettexplosion an Fritteusen durch Überhitzung oder Wassereintrag.",
+        "massnahmen": [
+          {
+            "text": "Abstand bzw. Abtrennung zu wasserführenden Geräten; keine Wasserzapfstelle in der Nähe.",
+            "stop": "T"
+          },
+          {
+            "text": "Feuerlöscher der Brandklasse F bereitstellen (bis 50 l Fett mindestens ein geeigneter Löscher).",
+            "stop": "T"
+          },
+          {
+            "text": "Fritteusen nie unbeaufsichtigt betreiben; Fett rechtzeitig wechseln; eine im Löschen geübte Person muss anwesend sein.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/dguv/110_003/3.htm",
+        "fundstelle": "DGUV Regel 110-003, Abschn. 3.3.1"
+      },
+      {
+        "faktor": "einwirkungen",
+        "gefaehrdung": "Hautbelastung durch Wasser und Reinigungsmittel (Feuchtarbeit), insbesondere in der Spülküche.",
+        "massnahmen": [
+          {
+            "text": "Wasserkontakt und Handschuhtragezeiten begrenzen.",
+            "stop": "O"
+          },
+          {
+            "text": "Hautschutzplan aufstellen (wann welche Handschuhe und Pflege).",
+            "stop": "O"
+          },
+          {
+            "text": "Baumwoll-Unterziehhandschuhe unter flüssigkeitsdichten Handschuhen; pH-hautneutrales Flüssigsyndet.",
+            "stop": "P"
+          }
+        ],
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/dguv/110_003/3.htm",
+        "fundstelle": "DGUV Regel 110-003, Abschn. 3.2, 3.5"
+      },
+      {
+        "faktor": "einwirkungen",
+        "gefaehrdung": "Verätzungen und Reizungen durch Reinigungsmittel sowie Dämpfe und Aerosole beim Reinigen.",
+        "massnahmen": [
+          {
+            "text": "Reiniger mit möglichst geringem Gefährdungspotenzial einsetzen.",
+            "stop": "S"
+          },
+          {
+            "text": "Ausreichende Belüftung; Sprühlanze statt Hochdruckreiniger.",
+            "stop": "T"
+          },
+          {
+            "text": "Nach Anleitung dosieren; Betriebsanweisung und Unterweisung zu Reinigungsmitteln.",
+            "stop": "O"
+          },
+          {
+            "text": "Schutzhandschuhe tragen.",
+            "stop": "P"
+          }
+        ],
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/dguv/110_003/3.htm",
+        "fundstelle": "DGUV Regel 110-003, Abschn. 3.7"
+      },
+      {
+        "faktor": "einwirkungen",
+        "gefaehrdung": "Lärm in der Spülküche durch Geschirr und Geschirrwagen.",
+        "massnahmen": [
+          {
+            "text": "Lärmarme Geschirrwagen und Räder; raumakustische Maßnahmen.",
+            "stop": "T"
+          },
+          {
+            "text": "Arbeitsmedizinische Vorsorge anbieten, wenn 80 dB(A) erreicht werden.",
+            "stop": "O"
+          },
+          {
+            "text": "Gehörschutz ab einem Expositionspegel von 80 dB(A) bereitstellen.",
+            "stop": "P"
+          }
+        ],
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/dguv/110_003/3.htm",
+        "fundstelle": "DGUV Regel 110-003, Abschn. 3.5"
+      },
+      {
+        "faktor": "ablaeufe_arbeitszeit",
+        "gefaehrdung": "Muskel-Skelett-Belastung durch Heben und Tragen schwerer Gebinde und Kochgeschirre.",
+        "massnahmen": [
+          {
+            "text": "Transporthilfsmittel und Transportwagen nutzen; kleinere Gebinde einkaufen.",
+            "stop": "T"
+          },
+          {
+            "text": "Schwere Lasten zu zweit tragen; Belastung mit der Leitmerkmalmethode beurteilen.",
+            "stop": "O"
+          },
+          {
+            "text": "Sicherheitsschuhe beim Transport schwerer Gebinde.",
+            "stop": "P"
+          }
+        ],
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/dguv/110_003/3.htm",
+        "fundstelle": "DGUV Regel 110-003, Abschn. 3.1, 3.3.2, 3.4"
+      },
+      {
+        "faktor": "arbeitsstaette",
+        "gefaehrdung": "Umkippen oder Herabfallen von Lagergut.",
+        "massnahmen": [
+          {
+            "text": "Regale standsicher aufstellen.",
+            "stop": "T"
+          },
+          {
+            "text": "Schwere Lasten unten, leichtere oben lagern; Lagerbereiche eindeutig zuweisen.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/dguv/110_003/3.htm",
+        "fundstelle": "DGUV Regel 110-003, Abschn. 3.1"
+      },
+      {
+        "faktor": "psychisch",
+        "gefaehrdung": "Psychische Belastung durch Zeitdruck, Gästekontakt, Beschwerden und Aggression.",
+        "massnahmen": [
+          {
+            "text": "Arbeitsabläufe, Aufgaben und Pausen eindeutig festlegen; Arbeitsplatzrotation.",
+            "stop": "O"
+          },
+          {
+            "text": "Schulung im Umgang mit Gästen, Beschwerden und Aggression; Übergriffe melden.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/dguv/110_003/3.htm",
+        "fundstelle": "DGUV Regel 110-003, Abschn. 3.4"
+      },
+      {
+        "faktor": "arbeitsmittel",
+        "gefaehrdung": "Unerkannte Mängel und Verschleiß an Geräten und Schutzeinrichtungen.",
+        "massnahmen": [
+          {
+            "text": "Wartung nach Herstellerangaben; Instandhaltung nur durch fachkundiges Personal.",
+            "stop": "O"
+          },
+          {
+            "text": "Wiederkehrende Prüfungen über die Gefährdungsbeurteilung festlegen (befähigte Personen).",
+            "stop": "O"
+          },
+          {
+            "text": "Sicherheitseinrichtungen arbeitstäglich vor Arbeitsbeginn auf Funktion prüfen.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/dguv/110_003/3.htm",
+        "fundstelle": "DGUV Regel 110-003, Abschn. 3.8"
+      }
+    ],
+    "handwerk_allgemein": [
+      {
+        "faktor": "arbeitsmittel",
+        "gefaehrdung": "Absturz von Anlege- oder Stehleitern durch Standunsicherheit, Abrutschen oder schadhafte Leitern.",
+        "massnahmen": [
+          {
+            "text": "Leitern nur einsetzen, wenn kein sichereres Arbeitsmittel möglich ist.",
+            "stop": "S"
+          },
+          {
+            "text": "Anlegeleitern gegen Ausgleiten sichern (Anlegewinkel 65–75° bei Sprossen), 1 m überstehen lassen; Stehleitern nur mit Spreizsicherung, oberste Stufen nicht betreten.",
+            "stop": "O"
+          },
+          {
+            "text": "Leitern jährlich prüfen und im Prüfbuch dokumentieren; schadhafte Leitern aussondern.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bgbau.de/fileadmin/Medien-Objekte/Medien/Bausteine/403/403.pdf",
+        "quelle_zusatz": "https://medien.bgetem.de/medienportal/artikel/U1owMzA-/s285-einfacher.pdf",
+        "fundstelle": "BG BAU Bausteine B 131, B 132 (Stand 07/2021); BG ETEM S285 (Stand 11/23)"
+      },
+      {
+        "faktor": "arbeitsstaette",
+        "gefaehrdung": "Absturz an Kanten, Öffnungen und Treppenläufen.",
+        "massnahmen": [
+          {
+            "text": "Seitenschutz an Treppenläufen, Wandöffnungen und Verkehrswegen ab 1,00 m, an übrigen Arbeitsplätzen ab 2,00 m Absturzhöhe.",
+            "stop": "T"
+          },
+          {
+            "text": "Öffnungen umwehren oder fest abdecken.",
+            "stop": "T"
+          }
+        ],
+        "quelle": "https://www.bgbau.de/fileadmin/Medien-Objekte/Medien/Bausteine/403/403.pdf",
+        "fundstelle": "BG BAU Baustein B 100"
+      },
+      {
+        "faktor": "einwirkungen",
+        "gefaehrdung": "Gehörschäden durch Lärm von Maschinen und Werkzeugen.",
+        "massnahmen": [
+          {
+            "text": "Lärmarme Verfahren und lärmgeminderte Geräte einsetzen; Maschinen warten (scharfe Werkzeuge, intakte Gehäuse).",
+            "stop": "T"
+          },
+          {
+            "text": "Ab oberem Auslösewert (85 dB(A)) Lärmbereiche kennzeichnen und Lärmminderungsprogramm aufstellen; ab unterem Auslösewert (80 dB(A)) unterweisen und Vorsorge anbieten.",
+            "stop": "O"
+          },
+          {
+            "text": "Gehörschutz ab 80 dB(A) bereitstellen, ab 85 dB(A) tragen.",
+            "stop": "P"
+          }
+        ],
+        "quelle": "https://www.bgbau-medien.de/handlungshilfen_gb/daten/pdf/handlung_laerm.pdf",
+        "fundstelle": "DGUV-Handlungshilfe „Lärm in der Bauwirtschaft“, Stand 02/2011 (Auslösewerte nach LärmVibrationsArbSchV)"
+      },
+      {
+        "faktor": "einwirkungen",
+        "gefaehrdung": "Einatmen von mineralischem, quarzhaltigem Staub beim Schneiden, Schleifen und Bohren.",
+        "massnahmen": [
+          {
+            "text": "Quarzärmere Materialien prüfen.",
+            "stop": "S"
+          },
+          {
+            "text": "Staubarme Verfahren und direkt abgesaugte Geräte mit Entstauber mindestens Klasse M; Nassbearbeitung.",
+            "stop": "T"
+          },
+          {
+            "text": "Mit Industriesaugern (Klasse M oder höher) reinigen statt Kehren oder Abblasen mit Druckluft.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bgbau-medien.de/handlungshilfen_gb/daten/bausteine/c_317/c_317.pdf",
+        "fundstelle": "BG BAU Baustein C 317, Stand 07/2021"
+      },
+      {
+        "faktor": "einwirkungen",
+        "gefaehrdung": "Gesundheitsschäden durch Gefahrstoffe (z. B. Lösemittel, Säuren, Laugen).",
+        "massnahmen": [
+          {
+            "text": "Prüfen, ob Stoffe durch weniger schädliche ersetzt werden können.",
+            "stop": "S"
+          },
+          {
+            "text": "Sicherheitsdatenblatt für jeden Gefahrstoff bereithalten; Betriebsanweisung erstellen.",
+            "stop": "O"
+          },
+          {
+            "text": "Beschäftigte tätigkeitsbezogen anhand der Betriebsanweisung unterweisen.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://medien.bgetem.de/medienportal/artikel/U1owMzA-/s285-einfacher.pdf",
+        "quelle_zusatz": "https://www.bgbau.de/fileadmin/Medien-Objekte/Medien/Bausteine/e_605/e_605.pdf"
+      },
+      {
+        "faktor": "einwirkungen",
+        "gefaehrdung": "Hautgefährdung durch Baustoffe, Reinigungsmittel und Feuchtigkeit.",
+        "massnahmen": [
+          {
+            "text": "Ersatzstoffe bzw. Verfahren mit weniger Hautkontakt prüfen.",
+            "stop": "S"
+          },
+          {
+            "text": "Chemikalienschutzhandschuhe mit passender Durchbruchszeit tragen; bei Schwitzen Baumwoll-Unterziehhandschuhe.",
+            "stop": "P"
+          },
+          {
+            "text": "Hautschutzplan: Hautschutzmittel vor Exposition, schonende Reinigung, Hautpflege in Pausen und nach der Arbeit.",
+            "stop": "P"
+          }
+        ],
+        "quelle": "https://www.bgbau.de/fileadmin/Medien-Objekte/Medien/Bausteine/e_605/e_605.pdf",
+        "quelle_zusatz": "https://www.bgbau.de/fileadmin/Medien-Objekte/Medien/Bausteine/e_604/e_604.pdf"
+      },
+      {
+        "faktor": "einwirkungen",
+        "gefaehrdung": "UV-Strahlung bei Arbeiten im Freien.",
+        "massnahmen": [
+          {
+            "text": "Beschattung des Arbeitsplatzes.",
+            "stop": "T"
+          },
+          {
+            "text": "Arbeiten in der Mittagszeit vermeiden.",
+            "stop": "O"
+          },
+          {
+            "text": "Körperbedeckende Kleidung, Kopfschutz, Sonnenschutzbrille; Sonnenschutzmittel mindestens LSF 30, alle 2 Stunden erneuern.",
+            "stop": "P"
+          }
+        ],
+        "quelle": "https://www.bgbau.de/fileadmin/Medien-Objekte/Medien/Bausteine/e_605/e_605.pdf"
+      },
+      {
+        "faktor": "arbeitsmittel",
+        "gefaehrdung": "Stromschlag durch beschädigte Leitungen und elektrische Betriebsmittel.",
+        "massnahmen": [
+          {
+            "text": "Auf Baustellen Steckdosen bis 32 A über Fehlerstrom-Schutzeinrichtung (RCD) mit höchstens 30 mA absichern.",
+            "stop": "T"
+          },
+          {
+            "text": "Nur regelmäßig geprüfte Betriebsmittel einsetzen; RCD-Funktion arbeitstäglich kontrollieren.",
+            "stop": "O"
+          },
+          {
+            "text": "Arbeiten an elektrischen Anlagen nur durch Elektrofachkräfte.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bgbau.de/fileadmin/Medien-Objekte/Medien/Bausteine/409/409.pdf",
+        "quelle_zusatz": "https://www.bgbau.de/fileadmin/Medien-Objekte/Medien/Bausteine/a_002/a_002.pdf",
+        "fundstelle": "BG BAU Bausteine B 171, B 172; A 002"
+      },
+      {
+        "faktor": "arbeitsmittel",
+        "gefaehrdung": "Unfälle mit Kraftfahrzeugen durch technische Mängel oder ungesicherte Ladung.",
+        "massnahmen": [
+          {
+            "text": "Feste Trennwände, Einbauten und Zurrösen; Ladungssicherung mit Netzen oder Spanngurten.",
+            "stop": "T"
+          },
+          {
+            "text": "Regelmäßige Prüfung durch Fachbetrieb; Fahrerlaubnisse regelmäßig kontrollieren.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://medien.bgetem.de/medienportal/artikel/U1owMzA-/s285-einfacher.pdf"
+      },
+      {
+        "faktor": "ablaeufe_arbeitszeit",
+        "gefaehrdung": "Schwere körperliche Belastung durch Heben, Tragen, Zwangshaltungen und Knien.",
+        "massnahmen": [
+          {
+            "text": "Technische Hilfsmittel für den Materialtransport einsetzen (z. B. Schubkarre, Transportzange, Saugheber); höhenverstellbare Geräte nutzen.",
+            "stop": "T"
+          },
+          {
+            "text": "Lastgewichte und Gebindegrößen reduzieren; Transportwege kurz halten; Haltungswechsel und Kurzpausen einplanen.",
+            "stop": "O"
+          },
+          {
+            "text": "In rückengerechter Hebe- und Tragetechnik unterweisen; Knieschutz verwenden.",
+            "stop": "P"
+          }
+        ],
+        "quelle": "https://www.bgbau.de/fileadmin/Medien-Objekte/Medien/Bausteine/d_506/d_506.pdf",
+        "fundstelle": "BG BAU Baustein D 506, Stand 07/2021"
+      },
+      {
+        "faktor": "sonstiges",
+        "gefaehrdung": "Brand- und Explosionsgefahr durch Druckgasflaschen (z. B. Flüssiggas).",
+        "massnahmen": [
+          {
+            "text": "Flaschen gegen Umfallen sichern, Ventile schützen; Lagerung in Kellern, Fluren und Treppenräumen unzulässig.",
+            "stop": "T"
+          },
+          {
+            "text": "Nur mit geschlossenen Ventilen und Schutzkappen transportieren, auf Fahrzeugen verzurren; Feuerlöscher mitführen.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bgbau.de/fileadmin/Medien-Objekte/Medien/Bausteine/403/403.pdf",
+        "fundstelle": "BG BAU Bausteine A 063, A 064, A 065"
+      },
+      {
+        "faktor": "qualifikation",
+        "gefaehrdung": "Fehlende oder defekte persönliche Schutzausrüstung bzw. fehlende Kenntnis über deren Benutzung.",
+        "massnahmen": [
+          {
+            "text": "Bedarfsgerechte PSA bereitstellen (z. B. Helm, Sicherheitsschuhe, Schutzbrille, Gehörschutz, Handschuhe).",
+            "stop": "P"
+          },
+          {
+            "text": "Beschäftigte im Umgang mit der PSA unterweisen.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://medien.bgetem.de/medienportal/artikel/U1owMzA-/s285-einfacher.pdf"
+      },
+      {
+        "faktor": "psychisch",
+        "gefaehrdung": "Arbeitsbedingte psychische Belastungen (z. B. Über-/Unterforderung, Stress, soziale Konflikte).",
+        "massnahmen": [
+          {
+            "text": "Problembereiche unter Einbindung der Beschäftigten ermitteln (z. B. Befragung).",
+            "stop": "O"
+          },
+          {
+            "text": "Lösungen erarbeiten und umsetzen.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://medien.bgetem.de/medienportal/artikel/U1owMzA-/s285-einfacher.pdf",
+        "quelle_zusatz": "https://www.bgbau.de/fileadmin/Medien-Objekte/Medien/Bausteine/a_002/a_002.pdf"
+      }
+    ],
+    "buero_laden": [
+      {
+        "faktor": "arbeitsstaette",
+        "bereich": "beide",
+        "gefaehrdung": "Stolpern, Ausrutschen und Stürzen auf Böden und Verkehrswegen.",
+        "massnahmen": [
+          {
+            "text": "Ebene, trittsichere Böden; Stolperstellen und Schwellen beseitigen; Sauberlaufzonen.",
+            "stop": "T"
+          },
+          {
+            "text": "Wege frei und sauber halten; rutschhemmende Reinigungsmittel; Schnee und Eis im Außenbereich entfernen.",
+            "stop": "O"
+          },
+          {
+            "text": "Geeignetes Schuhwerk tragen.",
+            "stop": "P"
+          }
+        ],
+        "quelle": "https://www.bghw-medienshop.de/fileadmin/user_upload/BGHW_Medienshop/Website/Medien-Dateien/A/A_131.pdf",
+        "quelle_zusatz": "https://medien.bgetem.de/medienportal/artikel/U1owMzA-/teil-3-buero-und-bildschirmarbeitspl-s286-11-23-bf/@@download/file"
+      },
+      {
+        "faktor": "arbeitsstaette",
+        "bereich": "beide",
+        "gefaehrdung": "Ungünstiges Raumklima (Kälte, Zugluft, Hitze).",
+        "massnahmen": [
+          {
+            "text": "Zugluft vermeiden (Türschleier, Windfang); Sonnenschutz außen.",
+            "stop": "T"
+          },
+          {
+            "text": "Büro: Mindesttemperatur 20 °C; bei mehr als 26 °C Getränke und Trinkpausen anbieten.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bghw-medienshop.de/fileadmin/user_upload/BGHW_Medienshop/Website/Medien-Dateien/A/A_131.pdf",
+        "quelle_zusatz": "https://medien.bgetem.de/medienportal/artikel/U1owMzA-/teil-3-buero-und-bildschirmarbeitspl-s286-11-23-bf/@@download/file"
+      },
+      {
+        "faktor": "arbeitsstaette",
+        "bereich": "beide",
+        "gefaehrdung": "Unzureichende oder blendende Beleuchtung.",
+        "massnahmen": [
+          {
+            "text": "Nennbeleuchtungsstärken einhalten (z. B. Verkaufsraum 300 Lux, Büro 500 Lux); flimmerfreie Leuchten.",
+            "stop": "T"
+          },
+          {
+            "text": "Blendung durch Sonne mit Jalousien oder Rollos vermeiden; Leuchtenabdeckungen reinigen.",
+            "stop": "T"
+          }
+        ],
+        "quelle": "https://www.bghw-medienshop.de/fileadmin/user_upload/BGHW_Medienshop/Website/Medien-Dateien/A/A_131.pdf"
+      },
+      {
+        "faktor": "ablaeufe_arbeitszeit",
+        "bereich": "buero",
+        "gefaehrdung": "Einseitige Körperhaltung bei Bildschirmarbeit.",
+        "massnahmen": [
+          {
+            "text": "Höhenverstellbarer Schreibtisch (mind. 80 × 160 cm) mit ausreichender Beinfreiheit und ergonomischer Stuhl.",
+            "stop": "T"
+          },
+          {
+            "text": "Regelmäßige Unterbrechung des Sitzens ermöglichen.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://medien.bgetem.de/medienportal/artikel/U1owMzA-/teil-3-buero-und-bildschirmarbeitspl-s286-11-23-bf/@@download/file"
+      },
+      {
+        "faktor": "arbeitsmittel",
+        "bereich": "buero",
+        "gefaehrdung": "Visuelle Belastung bei Bildschirmarbeit.",
+        "massnahmen": [
+          {
+            "text": "Ausreichend großer, einstellbarer, reflexionsfreier Bildschirm; Aufstellung 90° zum Lichteinfall.",
+            "stop": "T"
+          },
+          {
+            "text": "Arbeitsmedizinische Vorsorge (Augen/Sehvermögen) anbieten.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://medien.bgetem.de/medienportal/artikel/U1owMzA-/teil-3-buero-und-bildschirmarbeitspl-s286-11-23-bf/@@download/file"
+      },
+      {
+        "faktor": "arbeitsmittel",
+        "bereich": "beide",
+        "gefaehrdung": "Absturz von Leitern und Tritten.",
+        "massnahmen": [
+          {
+            "text": "Ausreichend geeignete Leitern und Tritte bereitstellen; keine Kisten oder Stühle als Ersatz.",
+            "stop": "T"
+          },
+          {
+            "text": "Standsicher aufstellen, nicht übersteigen oder seitlich hinauslehnen; vor Gebrauch auf Mängel prüfen.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bghw-medienshop.de/fileadmin/user_upload/BGHW_Medienshop/Website/Medien-Dateien/A/A_131.pdf"
+      },
+      {
+        "faktor": "arbeitsmittel",
+        "bereich": "laden",
+        "gefaehrdung": "Schnittverletzungen beim Öffnen von Verpackungen mit Messern und Cuttern.",
+        "massnahmen": [
+          {
+            "text": "Sicherheitsmesser mit verdeckter oder selbsttätig zurückgezogener Klinge verwenden.",
+            "stop": "T"
+          },
+          {
+            "text": "Stumpfe Klingen wechseln, schadhafte Messer aussondern.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bghw-medienshop.de/fileadmin/user_upload/BGHW_Medienshop/Website/Medien-Dateien/A/A_131.pdf"
+      },
+      {
+        "faktor": "arbeitsmittel",
+        "bereich": "beide",
+        "gefaehrdung": "Elektrische Gefährdung durch beschädigte Geräte und Leitungen.",
+        "massnahmen": [
+          {
+            "text": "Leitungen nicht durch Tür- oder Fensteröffnungen führen; keine hintereinander gesteckten Mehrfachsteckdosen.",
+            "stop": "T"
+          },
+          {
+            "text": "Geräte und Leitungen vor Gebrauch auf Schäden prüfen; schadhafte Geräte sofort aus dem Verkehr ziehen, Reparatur nur durch Elektrofachkraft.",
+            "stop": "O"
+          },
+          {
+            "text": "Elektrische Geräte regelmäßig prüfen lassen.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bghw-medienshop.de/fileadmin/user_upload/BGHW_Medienshop/Website/Medien-Dateien/A/A_131.pdf"
+      },
+      {
+        "faktor": "arbeitsmittel",
+        "bereich": "laden",
+        "gefaehrdung": "Umstürzende Regale und herabfallendes Lagergut.",
+        "massnahmen": [
+          {
+            "text": "Regale standsicher aufstellen; Anfahrschutz anbringen.",
+            "stop": "T"
+          },
+          {
+            "text": "Zulässige Fach- und Feldlasten einhalten; Regale regelmäßig prüfen, Mängel sofort melden.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bghw-medienshop.de/fileadmin/user_upload/BGHW_Medienshop/Website/Medien-Dateien/A/A_131.pdf"
+      },
+      {
+        "faktor": "ablaeufe_arbeitszeit",
+        "bereich": "laden",
+        "gefaehrdung": "Belastung durch Heben, Tragen, Ziehen und Schieben von Waren.",
+        "massnahmen": [
+          {
+            "text": "Hebe- und Transporthilfen bereitstellen.",
+            "stop": "T"
+          },
+          {
+            "text": "Kleinere Gebinde bestellen; schwere Gebinde unten lagern; schwere Lasten zu zweit tragen oder aufteilen; Tätigkeiten wechseln.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bghw-medienshop.de/fileadmin/user_upload/BGHW_Medienshop/Website/Medien-Dateien/A/A_131.pdf"
+      },
+      {
+        "faktor": "ablaeufe_arbeitszeit",
+        "bereich": "laden",
+        "gefaehrdung": "Fehlbelastung am Kassen- oder Steharbeitsplatz.",
+        "massnahmen": [
+          {
+            "text": "Arbeitsfläche auf Ellbogenhöhe; Kasse ergonomisch gestalten; ausreichender Beinfreiraum; Stehhilfe an Steharbeitsplätzen.",
+            "stop": "T"
+          },
+          {
+            "text": "Stuhl und Fußstütze personenbezogen einstellen.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bghw-medienshop.de/fileadmin/user_upload/BGHW_Medienshop/Website/Medien-Dateien/A/A_131.pdf"
+      },
+      {
+        "faktor": "psychisch",
+        "bereich": "laden",
+        "gefaehrdung": "Überfallgefahr beim Umgang mit Bargeld.",
+        "massnahmen": [
+          {
+            "text": "Tresor oder Zeitschloss; Alarmierungsmöglichkeit sicherstellen.",
+            "stop": "T"
+          },
+          {
+            "text": "Bargeld regelmäßig abschöpfen, Zählen nicht einsehbar; bargeldloses Bezahlen fördern; Geldtransport unauffällig und zu zweit.",
+            "stop": "O"
+          },
+          {
+            "text": "Notfallplan erstellen; Betriebsanweisung zum Verhalten bei Überfällen.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bghw-medienshop.de/fileadmin/user_upload/BGHW_Medienshop/Website/Medien-Dateien/A/A_131.pdf"
+      },
+      {
+        "faktor": "psychisch",
+        "bereich": "beide",
+        "gefaehrdung": "Psychische Belastungen durch Arbeitsinhalt, Arbeitsorganisation oder soziale Beziehungen.",
+        "massnahmen": [
+          {
+            "text": "Belastungen mit anerkannten Verfahren erfassen (Beobachtung, Befragung, Workshop) und Beschäftigte einbinden.",
+            "stop": "O"
+          },
+          {
+            "text": "Maßnahmen ableiten, umsetzen und ihre Wirksamkeit dokumentieren.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bghw-medienshop.de/fileadmin/user_upload/BGHW_Medienshop/Website/Medien-Dateien/A/A_131.pdf",
+        "quelle_zusatz": "https://medien.bgetem.de/medienportal/artikel/U1owMzA-/s285-einfacher.pdf"
+      },
+      {
+        "faktor": "sonstiges",
+        "bereich": "beide",
+        "gefaehrdung": "Brandentstehung und unzureichende Möglichkeiten zur Brandbekämpfung und Flucht.",
+        "massnahmen": [
+          {
+            "text": "Geeignete Feuerlöscher in ausreichender Zahl (Prüfung alle zwei Jahre); Standorte kennzeichnen und freihalten.",
+            "stop": "T"
+          },
+          {
+            "text": "Nicht benötigte Geräte abschalten; Sicherheitsabstand zu brennbarem Material; Brandschutztüren nicht festkeilen.",
+            "stop": "O"
+          },
+          {
+            "text": "Ausreichend Beschäftigte im Umgang mit Feuerlöscheinrichtungen unterweisen und üben lassen.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bghw-medienshop.de/fileadmin/user_upload/BGHW_Medienshop/Website/Medien-Dateien/A/A_131.pdf",
+        "quelle_zusatz": "https://cdn.vbg.de/media/c1d2782713bf49da9a9afe7c27afad8b/dld:attachment/VBG_DGUV%20V1_2024-06_WEB.pdf",
+        "fundstelle": "BGHW A 131 (Stand 06/2022); § 22 Abs. 2 DGUV Vorschrift 1"
+      },
+      {
+        "faktor": "sonstiges",
+        "bereich": "beide",
+        "gefaehrdung": "Unzureichende Erste Hilfe bei Unfällen.",
+        "massnahmen": [
+          {
+            "text": "Verbandmaterial bereitstellen und regelmäßig prüfen.",
+            "stop": "T"
+          },
+          {
+            "text": "Ersthelfer benennen und ausbilden (bei 2 bis 20 anwesenden Versicherten mindestens ein Ersthelfer; darüber in Verwaltungs- und Handelsbetrieben 5 %), alle zwei Jahre fortbilden.",
+            "stop": "O"
+          },
+          {
+            "text": "Jede Erste-Hilfe-Leistung dokumentieren (z. B. Verbandbuch) und fünf Jahre verfügbar halten.",
+            "stop": "O"
+          }
+        ],
+        "quelle": "https://www.bghw-medienshop.de/fileadmin/user_upload/BGHW_Medienshop/Website/Medien-Dateien/A/A_131.pdf",
+        "quelle_zusatz": "https://cdn.vbg.de/media/c1d2782713bf49da9a9afe7c27afad8b/dld:attachment/VBG_DGUV%20V1_2024-06_WEB.pdf",
+        "fundstelle": "§§ 24 Abs. 6, 26 Abs. 1 DGUV Vorschrift 1"
+      }
+    ]
+  },
+  "mutterschutz_ergebnisse": {
+    "einleitung": "Bei der Beurteilung der Arbeitsbedingungen nach § 5 ArbSchG hat der Arbeitgeber für jede Tätigkeit die Gefährdungen nach Art, Ausmaß und Dauer für eine schwangere oder stillende Frau oder ihr Kind zu beurteilen und zu ermitteln, ob für sie oder ihr Kind voraussichtlich",
+    "einleitung_wortlaut": "sinngemaess",
+    "ergebnisse": [
+      {
+        "id": "keine_massnahmen",
+        "text": "keine Schutzmaßnahmen erforderlich sein werden,",
+        "paragraph": "§ 10 Abs. 1 Satz 1 Nr. 2 Buchst. a MuSchG",
+        "wortlaut": "woertlich",
+        "quelle": "https://www.gesetze-im-internet.de/muschg_2018/__10.html",
+        "geprueft_ueber": "https://dejure.org/gesetze/MuSchG/10.html"
+      },
+      {
+        "id": "umgestaltung",
+        "text": "eine Umgestaltung der Arbeitsbedingungen nach § 13 Absatz 1 Nummer 1 erforderlich sein wird oder",
+        "paragraph": "§ 10 Abs. 1 Satz 1 Nr. 2 Buchst. b MuSchG",
+        "wortlaut": "woertlich",
+        "quelle": "https://www.gesetze-im-internet.de/muschg_2018/__10.html",
+        "geprueft_ueber": "https://dejure.org/gesetze/MuSchG/10.html"
+      },
+      {
+        "id": "fortfuehrung_nicht_moeglich",
+        "text": "eine Fortführung der Tätigkeit der Frau an diesem Arbeitsplatz nicht möglich sein wird.",
+        "paragraph": "§ 10 Abs. 1 Satz 1 Nr. 2 Buchst. c MuSchG",
+        "wortlaut": "woertlich",
+        "quelle": "https://www.gesetze-im-internet.de/muschg_2018/__10.html",
+        "geprueft_ueber": "https://dejure.org/gesetze/MuSchG/10.html"
+      }
+    ],
+    "ergaenzende_pflichten": [
+      {
+        "text": "Bei gleichartigen Arbeitsbedingungen ist die Beurteilung eines Arbeitsplatzes oder einer Tätigkeit ausreichend.",
+        "paragraph": "§ 10 Abs. 1 Satz 2 MuSchG",
+        "wortlaut": "sinngemaess",
+        "quelle": "https://www.gesetze-im-internet.de/muschg_2018/__10.html",
+        "geprueft_ueber": "https://dejure.org/gesetze/MuSchG/10.html"
+      },
+      {
+        "text": "Sobald eine Frau mitteilt, dass sie schwanger ist oder stillt, hat der Arbeitgeber unverzüglich die erforderlichen Schutzmaßnahmen festzulegen und ihr ein Gespräch über weitere Anpassungen ihrer Arbeitsbedingungen anzubieten.",
+        "paragraph": "§ 10 Abs. 2 MuSchG",
+        "wortlaut": "sinngemaess",
+        "quelle": "https://www.gesetze-im-internet.de/muschg_2018/__10.html",
+        "geprueft_ueber": "https://dejure.org/gesetze/MuSchG/10.html"
+      },
+      {
+        "text": "Der Arbeitgeber darf eine schwangere oder stillende Frau nur diejenigen Tätigkeiten ausüben lassen, für die er die erforderlichen Schutzmaßnahmen nach Absatz 2 Satz 1 getroffen hat.",
+        "paragraph": "§ 10 Abs. 3 MuSchG",
+        "wortlaut": "sinngemaess",
+        "quelle": "https://www.gesetze-im-internet.de/muschg_2018/__10.html",
+        "geprueft_ueber": "https://dejure.org/gesetze/MuSchG/10.html"
+      }
+    ],
+    "hinweis": "Laut dejure.org gilt die Fassung durch das Vierte Bürokratieentlastungsgesetz (BGBl. I Nr. 323 vom 23.10.2024) seit 01.01.2025; dabei rückte die Aufzählung in Abs. 1 Satz 1 Nr. 2 Buchst. a–c. In älteren Fassungen stand sie in Abs. 1 Satz 2 Nr. 1–3. Ebenfalls laut Quelle: Die Beurteilungspflicht entfällt, wenn der Ausschuss für Mutterschutz eine Regel oder Erkenntnis veröffentlicht hat, nach der die Tätigkeit für Schwangere oder Stillende untersagt ist. Die Paragraphenangaben vor Produktivnutzung gegen gesetze-im-internet.de prüfen.",
+    "unsicher": false
+  },
+  "unterweisung": {
+    "themen": [
+      {
+        "thema": "Gefährdungen am eigenen Arbeitsplatz und festgelegte Schutzmaßnahmen (Ergebnis der Gefährdungsbeurteilung)",
+        "branchen": [
+          "alle"
+        ],
+        "quelle": "https://www.gesetze-im-internet.de/arbschg/__12.html",
+        "geprueft_ueber": "https://dejure.org/gesetze/ArbSchG/12.html"
+      },
+      {
+        "thema": "Erste Hilfe: Ersthelfer, Standort Verbandkasten, Notrufnummer, Dokumentation im Verbandbuch",
+        "branchen": [
+          "alle"
+        ],
+        "quelle": "https://cdn.vbg.de/media/c1d2782713bf49da9a9afe7c27afad8b/dld:attachment/VBG_DGUV%20V1_2024-06_WEB.pdf",
+        "fundstelle": "§§ 24, 26 DGUV Vorschrift 1; BGHW A 131"
+      },
+      {
+        "thema": "Brandschutz: Verhalten im Brandfall, Umgang mit Feuerlöschern, Flucht- und Rettungswege",
+        "branchen": [
+          "alle"
+        ],
+        "quelle": "https://cdn.vbg.de/media/c1d2782713bf49da9a9afe7c27afad8b/dld:attachment/VBG_DGUV%20V1_2024-06_WEB.pdf",
+        "fundstelle": "§ 22 Abs. 2 DGUV Vorschrift 1"
+      },
+      {
+        "thema": "Stolper-, Rutsch- und Sturzgefahren; Ordnung und Sauberkeit auf Verkehrswegen",
+        "branchen": [
+          "alle"
+        ],
+        "quelle": "https://www.bghw-medienshop.de/fileadmin/user_upload/BGHW_Medienshop/Website/Medien-Dateien/A/A_131.pdf"
+      },
+      {
+        "thema": "Sichere Benutzung von Leitern und Tritten",
+        "branchen": [
+          "alle"
+        ],
+        "quelle": "https://medien.bgetem.de/medienportal/artikel/U1owMzA-/s285-einfacher.pdf"
+      },
+      {
+        "thema": "Elektrische Geräte: Sichtprüfung vor Benutzung, Mängel melden, defekte Geräte nicht benutzen",
+        "branchen": [
+          "alle"
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/20172/553d420e3d5ffd11d407fb1eec855939/bgw04-05-080-gefaehrdungsbeurteilung-in-beauty-und-wellnessbetrieben-data.pdf",
+        "quelle_zusatz": "https://www.bghw-medienshop.de/fileadmin/user_upload/BGHW_Medienshop/Website/Medien-Dateien/A/A_131.pdf"
+      },
+      {
+        "thema": "Gefahrstoffe: Inhalt der Betriebsanweisungen, Gefahren, Schutzmaßnahmen, Zugang zu Sicherheitsdatenblättern",
+        "branchen": [
+          "alle"
+        ],
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/gv/gefstoffv/14.htm",
+        "quelle_zusatz": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs555/4.htm"
+      },
+      {
+        "thema": "Hautschutz: Hautschutzplan, richtige Schutzhandschuhe, Hautreinigung und -pflege",
+        "branchen": [
+          "alle"
+        ],
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs401/5.htm"
+      },
+      {
+        "thema": "Persönliche Schutzausrüstung: Auswahl, Benutzung, Pflege",
+        "branchen": [
+          "alle"
+        ],
+        "quelle": "https://medien.bgetem.de/medienportal/artikel/U1owMzA-/s285-einfacher.pdf"
+      },
+      {
+        "thema": "Heben und Tragen: Hilfsmittel, rückengerechte Technik",
+        "branchen": [
+          "gastro_cafe",
+          "handwerk_allgemein",
+          "buero_laden"
+        ],
+        "quelle": "https://www.bgbau.de/fileadmin/Medien-Objekte/Medien/Bausteine/d_506/d_506.pdf",
+        "quelle_zusatz": "https://www.bghw-medienshop.de/fileadmin/user_upload/BGHW_Medienshop/Website/Medien-Dateien/A/A_131.pdf"
+      },
+      {
+        "thema": "Psychische Belastungen: Verhalten bei Konflikten, Aggression und Übergriffen, Unterstützungsangebote",
+        "branchen": [
+          "alle"
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/8782/5e7eb29bb62a8048c679a74e7886813a/SichereSeitenFuerDasFriseurhandwerk_PsychischeBelastung_Stand_01_2025_bf.pdf"
+      },
+      {
+        "thema": "Friseurchemikalien (Färbe-, Blondier-, Dauerwellmittel): Mischen, Anwenden, Handschuhpflicht, Lüftung",
+        "branchen": [
+          "friseur"
+        ],
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/7.htm",
+        "quelle_zusatz": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/anl_2.htm",
+        "unsicher": true,
+        "hinweis": "TRGS 530 Abschnitt 7 (Unterweisung) existiert laut Inhaltsverzeichnis, Inhalt nicht im Detail abgerufen; Thema ist durch Anlage 2 (Muster-Betriebsanweisung) belegt."
+      },
+      {
+        "thema": "Feuchtarbeit und Hautschutz im Salon (Hautschutz- und Händehygieneplan)",
+        "branchen": [
+          "friseur",
+          "kosmetik"
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/8772/b76996f027809fa44f358d7abe1516a4/SichereSeitenFuerDasFriseurhandwerk_Hautschutz_Stand_07_2026_bf.pdf"
+      },
+      {
+        "thema": "Infektionsschutz und Hygiene: Stich- und Schnittverletzungen, Umgang mit Blut, Instrumentenaufbereitung",
+        "branchen": [
+          "kosmetik"
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/20172/553d420e3d5ffd11d407fb1eec855939/bgw04-05-080-gefaehrdungsbeurteilung-in-beauty-und-wellnessbetrieben-data.pdf"
+      },
+      {
+        "thema": "Bedienung höhenverstellbarer Behandlungsliegen (auch für Reinigungskräfte)",
+        "branchen": [
+          "kosmetik"
+        ],
+        "quelle": "https://www.bgw-online.de/resource/blob/20172/553d420e3d5ffd11d407fb1eec855939/bgw04-05-080-gefaehrdungsbeurteilung-in-beauty-und-wellnessbetrieben-data.pdf"
+      },
+      {
+        "thema": "Fritteusen: Verbrühungsrisiko und Fettbrand, Löschen mit Brandklasse-F-Löscher",
+        "branchen": [
+          "gastro_cafe"
+        ],
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/dguv/110_003/3.htm"
+      },
+      {
+        "thema": "Lärm: Gehörschutz ab 80/85 dB(A)",
+        "branchen": [
+          "handwerk_allgemein",
+          "gastro_cafe"
+        ],
+        "quelle": "https://www.bgbau-medien.de/handlungshilfen_gb/daten/pdf/handlung_laerm.pdf"
+      },
+      {
+        "thema": "Staubarmes Arbeiten (Absaugung, Nassbearbeitung, Reinigung mit Industriesauger)",
+        "branchen": [
+          "handwerk_allgemein"
+        ],
+        "quelle": "https://www.bgbau-medien.de/handlungshilfen_gb/daten/bausteine/c_317/c_317.pdf"
+      },
+      {
+        "thema": "Umgang mit Zahlungsmitteln und Verhalten bei Überfällen",
+        "branchen": [
+          "buero_laden"
+        ],
+        "quelle": "https://www.bghw-medienshop.de/fileadmin/user_upload/BGHW_Medienshop/Website/Medien-Dateien/A/A_131.pdf"
+      },
+      {
+        "thema": "Bildschirmarbeit: Einstellung von Tisch, Stuhl und Bildschirm",
+        "branchen": [
+          "buero_laden"
+        ],
+        "quelle": "https://medien.bgetem.de/medienportal/artikel/U1owMzA-/teil-3-buero-und-bildschirmarbeitspl-s286-11-23-bf/@@download/file"
+      }
+    ],
+    "haeufigkeit": [
+      {
+        "regel": "Unterweisung bei der Einstellung, bei Veränderungen im Aufgabenbereich, bei Einführung neuer Arbeitsmittel oder einer neuen Technologie, jeweils vor Aufnahme der Tätigkeit; an die Gefährdungsentwicklung anpassen und erforderlichenfalls regelmäßig wiederholen.",
+        "zitat": "Die Unterweisung muß an die Gefährdungsentwicklung angepaßt sein und erforderlichenfalls regelmäßig wiederholt werden.",
+        "paragraph": "§ 12 Abs. 1 ArbSchG",
+        "wortlaut": "woertlich (Zitat)",
+        "quelle": "https://www.gesetze-im-internet.de/arbschg/__12.html",
+        "geprueft_ueber": "https://dejure.org/gesetze/ArbSchG/12.html"
+      },
+      {
+        "regel": "Mindestens einmal jährlich.",
+        "zitat": "die Unterweisung muss erforderlichenfalls wiederholt werden, mindestens aber einmal jährlich erfolgen; sie muss dokumentiert werden.",
+        "paragraph": "§ 4 Abs. 1 DGUV Vorschrift 1",
+        "wortlaut": "woertlich (Zitat)",
+        "quelle": "https://cdn.vbg.de/media/c1d2782713bf49da9a9afe7c27afad8b/dld:attachment/VBG_DGUV%20V1_2024-06_WEB.pdf"
+      },
+      {
+        "regel": "Tätigkeiten mit Gefahrstoffen: vor Aufnahme der Beschäftigung und danach mindestens jährlich, arbeitsplatzbezogen.",
+        "zitat": "Die Unterweisung muss vor Aufnahme der Beschäftigung und danach mindestens jährlich arbeitsplatzbezogen durchgeführt werden.",
+        "paragraph": "§ 14 Abs. 2 GefStoffV",
+        "wortlaut": "woertlich (Zitat)",
+        "quelle": "https://www.gesetze-im-internet.de/gefstoffv_2010/__14.html",
+        "geprueft_ueber": "https://vorschriften.bgn-branchenwissen.de/daten/gv/gefstoffv/14.htm"
+      },
+      {
+        "regel": "Gefahrstoffe: zusätzlich bei inhaltlichen Änderungen der Betriebsanweisung (z. B. geänderte Arbeitsverfahren, neue Gefahrstoffe).",
+        "paragraph": "TRGS 555 Nr. 5.1",
+        "wortlaut": "sinngemaess",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs555/5.htm"
+      },
+      {
+        "regel": "Jugendliche: mindestens halbjährlich.",
+        "zitat": "Die Unterweisungen sind in angemessenen Zeitabständen, mindestens aber halbjährlich, zu wiederholen.",
+        "paragraph": "§ 29 Abs. 2 JArbSchG",
+        "wortlaut": "woertlich (Zitat)",
+        "quelle": "https://www.gesetze-im-internet.de/jarbschg/__29.html",
+        "geprueft_ueber": "https://vorschriften.bgn-branchenwissen.de/daten/gv/jarbschg/29.htm"
+      }
+    ],
+    "dokumentation": [
+      {
+        "regel": "Die Unterweisung muss dokumentiert werden.",
+        "paragraph": "§ 4 Abs. 1 DGUV Vorschrift 1",
+        "wortlaut": "woertlich (Zitat)",
+        "quelle": "https://cdn.vbg.de/media/c1d2782713bf49da9a9afe7c27afad8b/dld:attachment/VBG_DGUV%20V1_2024-06_WEB.pdf"
+      },
+      {
+        "regel": "Gefahrstoffe: Inhalt und Zeitpunkt der Unterweisung sind schriftlich festzuhalten und von den Unterwiesenen durch Unterschrift zu bestätigen.",
+        "paragraph": "§ 14 Abs. 2 GefStoffV",
+        "wortlaut": "woertlich (Zitatteile)",
+        "quelle": "https://www.gesetze-im-internet.de/gefstoffv_2010/__14.html",
+        "geprueft_ueber": "https://vorschriften.bgn-branchenwissen.de/daten/gv/gefstoffv/14.htm"
+      },
+      {
+        "regel": "Die Dokumentation kann formlos erfolgen (u. a. Themen, Teilnehmende, Name der unterweisenden Person, Datum); der Nachweis ist mindestens zwei Jahre aufzubewahren.",
+        "paragraph": "TRGS 555 Nr. 5.3 Abs. 6 und 7",
+        "wortlaut": "sinngemaess, Teilzitate bestätigt",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs555/5.htm"
+      },
+      {
+        "regel": "§ 12 ArbSchG selbst schreibt keine ausdrückliche schriftliche Dokumentation der Unterweisung vor; die Pflicht ergibt sich aus § 4 Abs. 1 DGUV Vorschrift 1 und, bei Gefahrstoffen, aus § 14 Abs. 2 GefStoffV.",
+        "wortlaut": "Einordnung",
+        "quelle": "https://dejure.org/gesetze/ArbSchG/12.html",
+        "unsicher": true,
+        "hinweis": "Negativbefund (keine Dokumentationspflicht in § 12 ArbSchG) aus der abgerufenen Zusammenfassung abgeleitet; Volltext nicht zeichengenau geprüft."
+      }
+    ]
+  },
+  "wirksamkeit": {
+    "text": "Der Arbeitgeber hat die Maßnahmen des Arbeitsschutzes auf ihre Wirksamkeit zu überprüfen und erforderlichenfalls sich ändernden Gegebenheiten anzupassen.",
+    "zitat": "Er hat die Maßnahmen auf ihre Wirksamkeit zu überprüfen und erforderlichenfalls sich ändernden Gegebenheiten anzupassen.",
+    "paragraph": "§ 3 Abs. 1 Satz 2 ArbSchG",
+    "wortlaut": "woertlich (Zitat)",
+    "quelle": "https://www.gesetze-im-internet.de/arbschg/__3.html",
+    "geprueft_ueber": "https://dejure.org/gesetze/ArbSchG/3.html",
+    "ergaenzung": {
+      "text": "Das Ergebnis der Überprüfung muss aus den Unterlagen nach § 6 Abs. 1 ArbSchG ersichtlich sein.",
+      "quelle": "https://www.gesetze-im-internet.de/arbschg/__6.html",
+      "geprueft_ueber": "https://dejure.org/gesetze/ArbSchG/6.html"
+    }
+  },
+  "betriebsanweisung": {
+    "gliederung": [
+      {
+        "nr": "3.2.2",
+        "abschnitt": "Arbeitsbereich, Arbeitsplatz, Tätigkeit",
+        "inhalt": "Betrieb, Arbeitsbereich, Arbeitsplatz und Tätigkeit, für die die Betriebsanweisung gilt.",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs555/3.htm"
+      },
+      {
+        "nr": "3.2.3",
+        "abschnitt": "Gefahrstoffe (Bezeichnung)",
+        "inhalt": "Bezeichnung, die den Beschäftigten geläufig ist; bei Gemischen in der Regel der Handelsname; Angabe gefahrbestimmender Komponenten empfohlen.",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs555/3.htm"
+      },
+      {
+        "nr": "3.2.4",
+        "abschnitt": "Gefahren für Mensch und Umwelt",
+        "inhalt": "Aus der Gefährdungsbeurteilung abgeleitete Gefahren, H- und EUH-Sätze im Wortlaut oder sinngemäß; weitere Gefährdungen (z. B. Staub, Brand/Explosion); Gefahrenpiktogramme ergänzend.",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs555/3.htm"
+      },
+      {
+        "nr": "3.2.5",
+        "abschnitt": "Schutzmaßnahmen und Verhaltensregeln",
+        "inhalt": "Gegliedert nach technischen und organisatorischen Maßnahmen, Hygiene und Arbeitskleidung sowie persönlicher Schutzausrüstung (Art, Typ, Benutzungshinweise); Hinweise auf Beschäftigungsbeschränkungen empfohlen.",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs555/3.htm"
+      },
+      {
+        "nr": "3.2.6",
+        "abschnitt": "Verhalten im Gefahrfall",
+        "inhalt": "Maßnahmen bei Störungen, Unfällen, Notfällen (z. B. Leckage, Brand); geeignete und ungeeignete Löschmittel; Binde-, Aufsaug- und Neutralisationsmittel; Umweltschutzmaßnahmen; ggf. Hinweis auf Alarm-, Flucht- und Rettungspläne.",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs555/3.htm"
+      },
+      {
+        "nr": "3.2.7",
+        "abschnitt": "Erste Hilfe",
+        "inhalt": "Gegliedert nach Einatmen, Haut- und Augenkontakt, Verschlucken (ggf. Verbrennungen/Erfrierungen); Sofortmaßnahmen, wann ein Arzt hinzuzuziehen ist, was zu unterlassen ist; Ersthelfer, Erste-Hilfe-Einrichtungen, Notrufnummern.",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs555/3.htm"
+      },
+      {
+        "nr": "3.2.8",
+        "abschnitt": "Sachgerechte Entsorgung",
+        "inhalt": "Schutzmaßnahmen für betriebliche und störungsbedingte Abfälle; PSA, Entsorgungsbehälter, Sammelstellen, Aufsaugmittel.",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs555/3.htm"
+      }
+    ],
+    "allgemeine_anforderungen": [
+      {
+        "text": "Die Betriebsanweisung beruht auf der Gefährdungsbeurteilung, ist vor Aufnahme der Tätigkeit schriftlich zugänglich zu machen und bei neuen Erkenntnissen zu aktualisieren.",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs555/3.htm",
+        "fundstelle": "TRGS 555 Nr. 3.1"
+      },
+      {
+        "text": "Muster- und automatisch erzeugte Betriebsanweisungen sind an den Betrieb anzupassen; Sammelbetriebsanweisungen für ähnliche Stoffe sind zulässig.",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs555/3.htm",
+        "fundstelle": "TRGS 555 Nr. 3.1"
+      },
+      {
+        "text": "Verständliche Sprache; unklare Begriffe wie „regelmäßig“ oder „ausreichend“ vermeiden; Gebote mit „müssen“, Verbote mit „dürfen nicht“ formulieren; Sammelbegriffe konkretisieren.",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs555/3.htm"
+      },
+      {
+        "text": "Aushang an geeigneter Stelle, möglichst in Arbeitsplatznähe; eine feste äußere Form ist nicht vorgeschrieben.",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs555/3.htm"
+      }
+    ],
+    "stand_trgs555": "nicht verifiziert (BGN-Seite nennt nur Copyright 2017)",
+    "bausteine": [
+      {
+        "abschnitt": "schutzmassnahmen",
+        "text": "Schutzhandschuhe bei den gekennzeichneten Tätigkeiten tragen.",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/anl_2.htm",
+        "wortlaut": "sinngemaess"
+      },
+      {
+        "abschnitt": "schutzmassnahmen",
+        "text": "Schutzhandschuhe nur mit sauberen, trockenen Händen anziehen.",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs401/5.htm",
+        "quelle_zusatz": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/anl_2.htm",
+        "fundstelle": "TRGS 401 Nr. 5.5.3 Abs. 1",
+        "wortlaut": "sinngemaess"
+      },
+      {
+        "abschnitt": "schutzmassnahmen",
+        "text": "Beschädigte Handschuhe sofort austauschen.",
+        "quelle": "https://www.bgw-online.de/resource/blob/8772/b76996f027809fa44f358d7abe1516a4/SichereSeitenFuerDasFriseurhandwerk_Hautschutz_Stand_07_2026_bf.pdf",
+        "wortlaut": "sinngemaess"
+      },
+      {
+        "abschnitt": "schutzmassnahmen",
+        "text": "Chemikalienschutzhandschuhe regelmäßig, spätestens arbeitstäglich wechseln; maximale Tragedauer beachten.",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs401/5.htm",
+        "fundstelle": "TRGS 401 Nr. 5.5.3 Abs. 4",
+        "wortlaut": "sinngemaess"
+      },
+      {
+        "abschnitt": "schutzmassnahmen",
+        "text": "Bei ätzenden Stoffen Schutzbrille tragen.",
+        "quelle": "https://www.bgw-online.de/resource/blob/20172/553d420e3d5ffd11d407fb1eec855939/bgw04-05-080-gefaehrdungsbeurteilung-in-beauty-und-wellnessbetrieben-data.pdf",
+        "fundstelle": "BGW 04-05-080, S. 21–22",
+        "wortlaut": "sinngemaess"
+      },
+      {
+        "abschnitt": "schutzmassnahmen",
+        "text": "Produkte nur nach Herstellerangaben anwenden; Konzentrate genau nach Anleitung dosieren.",
+        "quelle": "https://www.bgw-online.de/resource/blob/8770/0ecbc02ae74e4d6121dd81b574e08108/SichereSeitenFuerDasFriseurhandwerk_Gefahrstoffe_Stand_01_2025_bf.pdf",
+        "quelle_zusatz": "https://vorschriften.bgn-branchenwissen.de/daten/dguv/110_003/3.htm",
+        "wortlaut": "sinngemaess"
+      },
+      {
+        "abschnitt": "schutzmassnahmen",
+        "text": "Desinfektion im Wischverfahren durchführen; nicht sprühen oder vernebeln.",
+        "quelle": "https://www.bgw-online.de/resource/blob/8770/0ecbc02ae74e4d6121dd81b574e08108/SichereSeitenFuerDasFriseurhandwerk_Gefahrstoffe_Stand_01_2025_bf.pdf",
+        "quelle_zusatz": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/anl_2.htm",
+        "wortlaut": "sinngemaess"
+      },
+      {
+        "abschnitt": "schutzmassnahmen",
+        "text": "Für ausreichende Lüftung sorgen; Sprühnebel, Stäube und Dämpfe nicht einatmen.",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/anl_2.htm",
+        "wortlaut": "sinngemaess"
+      },
+      {
+        "abschnitt": "schutzmassnahmen",
+        "text": "Am Arbeitsplatz nicht essen, trinken oder rauchen.",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/5.htm",
+        "quelle_zusatz": "https://www.bgw-online.de/resource/blob/8770/0ecbc02ae74e4d6121dd81b574e08108/SichereSeitenFuerDasFriseurhandwerk_Gefahrstoffe_Stand_01_2025_bf.pdf",
+        "wortlaut": "sinngemaess"
+      },
+      {
+        "abschnitt": "schutzmassnahmen",
+        "text": "Gefahrstoffe möglichst in Originalbehältern aufbewahren; abgefüllte Stoffe korrekt beschriften; niemals in Lebensmittel- oder Getränkebehälter abfüllen.",
+        "quelle": "https://www.bgw-online.de/resource/blob/8770/0ecbc02ae74e4d6121dd81b574e08108/SichereSeitenFuerDasFriseurhandwerk_Gefahrstoffe_Stand_01_2025_bf.pdf",
+        "quelle_zusatz": "https://www.bghw-medienshop.de/fileadmin/user_upload/BGHW_Medienshop/Website/Medien-Dateien/A/A_131.pdf",
+        "wortlaut": "sinngemaess"
+      },
+      {
+        "abschnitt": "schutzmassnahmen",
+        "text": "Gefahrstoffe getrennt von Lebensmitteln und nicht über Augenhöhe lagern.",
+        "quelle": "https://www.bgw-online.de/resource/blob/8770/0ecbc02ae74e4d6121dd81b574e08108/SichereSeitenFuerDasFriseurhandwerk_Gefahrstoffe_Stand_01_2025_bf.pdf",
+        "wortlaut": "sinngemaess"
+      },
+      {
+        "abschnitt": "schutzmassnahmen",
+        "text": "Am Arbeitsplatz höchstens den Tagesbedarf an entzündbaren Flüssigkeiten bereithalten.",
+        "quelle": "https://www.bgw-online.de/resource/blob/8770/0ecbc02ae74e4d6121dd81b574e08108/SichereSeitenFuerDasFriseurhandwerk_Gefahrstoffe_Stand_01_2025_bf.pdf",
+        "wortlaut": "sinngemaess"
+      },
+      {
+        "abschnitt": "schutzmassnahmen",
+        "text": "Verunreinigte oder mit Chemikalien getränkte Kleidung sofort ablegen und vor dem erneuten Tragen waschen.",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/anl_2.htm",
+        "wortlaut": "sinngemaess"
+      },
+      {
+        "abschnitt": "schutzmassnahmen",
+        "text": "Arm- und Handschmuck bei der Arbeit ablegen.",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/5.htm",
+        "fundstelle": "TRGS 530 Nr. 5.1 Abs. 3",
+        "wortlaut": "sinngemaess"
+      },
+      {
+        "abschnitt": "schutzmassnahmen",
+        "text": "Hautschutzplan beachten.",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs401/5.htm",
+        "fundstelle": "TRGS 401 Nr. 5.5.1 Abs. 6 (Verweis der Betriebsanweisung auf Hand- und Hautschutzplan)",
+        "wortlaut": "sinngemaess"
+      },
+      {
+        "abschnitt": "gefahrfall",
+        "text": "Verschüttete Substanz sofort mit Schutzhandschuhen aufnehmen.",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/anl_2.htm",
+        "wortlaut": "sinngemaess"
+      },
+      {
+        "abschnitt": "gefahrfall",
+        "text": "Verunreinigungen und Behälterrückstände sofort beseitigen; Bindemittel bereithalten.",
+        "quelle": "https://www.bgw-online.de/resource/blob/8770/0ecbc02ae74e4d6121dd81b574e08108/SichereSeitenFuerDasFriseurhandwerk_Gefahrstoffe_Stand_01_2025_bf.pdf",
+        "wortlaut": "sinngemaess"
+      },
+      {
+        "abschnitt": "erste_hilfe",
+        "text": "Nach Augenkontakt: mit viel Wasser spülen und ärztlichen Rat einholen.",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/anl_2.htm",
+        "wortlaut": "sinngemaess"
+      },
+      {
+        "abschnitt": "erste_hilfe",
+        "text": "Nach Hautkontakt: mit viel Wasser spülen; bei Beschwerden ärztlichen Rat einholen.",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/anl_2.htm",
+        "wortlaut": "sinngemaess"
+      },
+      {
+        "abschnitt": "erste_hilfe",
+        "text": "Nach Einatmen: bei Beschwerden ärztlichen Rat einholen.",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/anl_2.htm",
+        "wortlaut": "sinngemaess"
+      },
+      {
+        "abschnitt": "erste_hilfe",
+        "text": "Nach Verschlucken: ärztlichen Rat einholen.",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/anl_2.htm",
+        "wortlaut": "sinngemaess"
+      },
+      {
+        "abschnitt": "erste_hilfe",
+        "text": "Zum Arzt Gebrauchsanweisung oder Packung bzw. Behältnis des Produkts mitnehmen.",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/anl_2.htm",
+        "wortlaut": "sinngemaess"
+      },
+      {
+        "abschnitt": "entsorgung",
+        "text": "Entsorgung mit der örtlichen Gewerbeabfallberatung klären.",
+        "quelle": "https://www.bgw-online.de/resource/blob/8770/0ecbc02ae74e4d6121dd81b574e08108/SichereSeitenFuerDasFriseurhandwerk_Gefahrstoffe_Stand_01_2025_bf.pdf",
+        "wortlaut": "sinngemaess"
+      },
+      {
+        "abschnitt": "entsorgung",
+        "text": "Restentleerte Spraydosen sicher entsorgen; auch geleerte Behälter entzündbarer Flüssigkeiten können Brand- und Explosionsgefahr verursachen.",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/5.htm",
+        "quelle_zusatz": "https://www.bgw-online.de/resource/blob/8770/0ecbc02ae74e4d6121dd81b574e08108/SichereSeitenFuerDasFriseurhandwerk_Gefahrstoffe_Stand_01_2025_bf.pdf",
+        "wortlaut": "sinngemaess"
+      },
+      {
+        "abschnitt": "entsorgung",
+        "text": "Nicht mehr benötigte Produkte fachgerecht entsorgen.",
+        "quelle": "https://www.bghw-medienshop.de/fileadmin/user_upload/BGHW_Medienshop/Website/Medien-Dateien/A/A_131.pdf",
+        "wortlaut": "sinngemaess"
+      }
+    ],
+    "hinweis_bausteine": "Die Bausteine ersetzen nicht die stoffspezifischen Angaben aus dem Sicherheitsdatenblatt (H-/EUH-Sätze, konkreter Handschuhtyp, Löschmittel). Laut TRGS 555 Nr. 3.3 sind SDB-Angaben zu übernehmen, auf Fehler zu prüfen und an den Betrieb anzupassen."
+  },
+  "hautschutz": {
+    "feuchtarbeit": {
+      "definition": {
+        "text": "Feuchtarbeit sind Tätigkeiten, bei denen Beschäftigte einen erheblichen Teil ihrer Arbeitszeit Hautkontakt mit Wasser oder wässrigen Flüssigkeiten haben oder häufig die Hände waschen oder diese Tätigkeiten im Wechsel mit dem Tragen flüssigkeitsdichter Schutzhandschuhe erfolgen. Das ausschließliche Tragen von flüssigkeitsdichten Schutzhandschuhen ist keine Feuchtarbeit.",
+        "fundstelle": "TRGS 401 Nr. 2 Abs. 8 (Ausgabe November 2022, zuletzt geändert GMBl Nr. 36 vom 19.09.2024)",
+        "wortlaut": "woertlich (in Teilzitaten bestätigt)",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs401/2.htm"
+      },
+      "hinweis_zeitgrenzen_trgs401": {
+        "text": "Die aktuelle TRGS 401 (2022) nennt in der Begriffsbestimmung KEINE Stundengrenze, sondern „einen erheblichen Teil ihrer Arbeitszeit“. Alkoholische Händedesinfektionsmittel zählen nach Nr. 2 Abs. 9 zu den wässrigen Flüssigkeiten. Feuchtarbeit wird nicht mit der Gefährdungsmatrix (Tabelle 2) beurteilt (Nr. 4.2 Abs. 6).",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs401/2.htm",
+        "quelle_zusatz": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs401/4.htm"
+      },
+      "zeitgrenzen": [
+        {
+          "grenze": "regelmäßig mehr als zwei Stunden je Tag",
+          "folge": "Angebotsvorsorge",
+          "zitat": "Feuchtarbeit von regelmäßig mehr als zwei Stunden je Tag",
+          "fundstelle": "ArbMedVV Anhang Teil 1 Abs. 2 Nr. 2 Buchst. e; TRGS 401 Nr. 7 Abs. 2 Nr. 2 Buchst. b",
+          "wortlaut": "woertlich (Zitat)",
+          "quelle": "https://www.gesetze-im-internet.de/arbmedvv/anhang.html",
+          "geprueft_ueber": "https://vorschriften.bgn-branchenwissen.de/daten/gv/ArbMedVV/anh.htm",
+          "quelle_zusatz": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs401/7.htm"
+        },
+        {
+          "grenze": "regelmäßig vier Stunden oder mehr je Tag",
+          "folge": "Pflichtvorsorge",
+          "zitat": "Feuchtarbeit von regelmäßig vier Stunden oder mehr je Tag",
+          "fundstelle": "ArbMedVV Anhang Teil 1 Abs. 1 Nr. 2 Buchst. a; TRGS 401 Nr. 7 Abs. 2 Nr. 1 Buchst. b",
+          "wortlaut": "woertlich (Zitat)",
+          "quelle": "https://www.gesetze-im-internet.de/arbmedvv/anhang.html",
+          "geprueft_ueber": "https://vorschriften.bgn-branchenwissen.de/daten/gv/ArbMedVV/anh.htm",
+          "quelle_zusatz": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs401/7.htm"
+        },
+        {
+          "grenze": "Friseurhandwerk: Feuchtarbeit möglichst unter 4 Stunden täglich, angestrebt unter 2 Stunden",
+          "folge": "organisatorische Zielvorgabe",
+          "fundstelle": "TRGS 530 Nr. 5.3 Abs. 2 (Ausgabe März 2007)",
+          "wortlaut": "sinngemaess",
+          "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/5.htm"
+        },
+        {
+          "grenze": "Flüssigkeitsdichte Handschuhe ohne Wechsel über mehr als 4 Stunden pro Arbeitstag gelten als belastend.",
+          "folge": "Hinweis zur Handschuhtragezeit",
+          "fundstelle": "TRGS 401 Nr. 5.5.1 Abs. 9",
+          "wortlaut": "sinngemaess",
+          "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs401/5.htm"
+        }
+      ],
+      "bgw_kriterien_friseur": {
+        "text": "Die BGW nennt für den Friseursalon als Feuchtarbeit: regelmäßig mehr als zwei Stunden Hautkontakt mit Wasser oder wässrigen Flüssigkeiten pro Arbeitstag; häufiger Wechsel zwischen Wasserkontakt und flüssigkeitsdichten Handschuhen (mehr als 10-mal täglich); mindestens 15-mal tägliches Händewaschen; Wechsel zwischen flüssigkeitsdichten Handschuhen und häufigem Händewaschen (mehr als 5-mal täglich). Die BGW empfiehlt, allen Beschäftigten mit Feuchtarbeit unabhängig von der Tagesdauer arbeitsmedizinische Vorsorge anzubieten.",
+        "quelle": "https://www.bgw-online.de/resource/blob/8772/b76996f027809fa44f358d7abe1516a4/SichereSeitenFuerDasFriseurhandwerk_Hautschutz_Stand_07_2026_bf.pdf",
+        "wortlaut": "sinngemaess",
+        "unsicher": true,
+        "hinweis": "Diese Häufigkeitskriterien stammen aus BGW-Material (Stand 07/2026), nicht aus der aktuellen TRGS-401-Definition. Als BGW-Praxiskriterien kennzeichnen, nicht als Rechtsnorm."
+      }
+    },
+    "plan_elemente": [
+      {
+        "element": "Tätigkeit bzw. Gefährdung (z. B. Feuchtarbeit, Umgang mit bestimmten Produkten)",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/anl_1.htm"
+      },
+      {
+        "element": "Zeitpunkt: vor der Tätigkeit / während der Tätigkeit / nach der Tätigkeit / vor Pausen und nach Arbeitsschluss",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/anl_1.htm"
+      },
+      {
+        "element": "Schutzhandschuhe: Art, Material, Norm (z. B. Einmalhandschuhe, Chemikalienschutzhandschuhe nach DIN EN ISO 374), Wechselhäufigkeit",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs401/5.htm",
+        "fundstelle": "TRGS 401 Nr. 5.4 Abs. 2, 5.5.3"
+      },
+      {
+        "element": "Hautschutzmittel (vor hautbelastender Tätigkeit auf saubere, trockene Haut; nicht als Ersatz für Handschuhe)",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs401/5.htm",
+        "fundstelle": "TRGS 401 Nr. 5.5.5 Abs. 1, 7"
+      },
+      {
+        "element": "Hautreinigung (schonend, möglichst ohne Reibekörper und Lösemittel; Häufigkeit auf das notwendige Maß reduzieren)",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs401/5.htm",
+        "fundstelle": "TRGS 401 Nr. 5.2 Abs. 2, 5.5.5 Abs. 8–9"
+      },
+      {
+        "element": "Hautpflege (nach der Reinigung, in arbeitsfreien Zeiten; zur Regeneration nach Tätigkeitsende)",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs401/5.htm",
+        "fundstelle": "TRGS 401 Nr. 5.2 Abs. 3, 5.5.5 Abs. 10"
+      },
+      {
+        "element": "Händedesinfektion (bei Bedarf dem Händewaschen vorziehen; Kombination Waschen + Desinfizieren vermeiden)",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs401/5.htm",
+        "fundstelle": "TRGS 401 Nr. 5.6 Abs. 3"
+      },
+      {
+        "element": "Produktbezeichnungen der eingesetzten Hautmittel und Handschuhe; Verweis aus der Betriebsanweisung auf den Hand- und Hautschutzplan",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs401/5.htm",
+        "fundstelle": "TRGS 401 Nr. 5.5.1 Abs. 6"
+      },
+      {
+        "element": "Gut sichtbarer Aushang, z. B. am Handwasch- bzw. Handpflegeplatz",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/5.htm",
+        "fundstelle": "TRGS 530 Nr. 5.4 Abs. 4"
+      }
+    ],
+    "plan_elemente_hinweis": "Die TRGS 401 schreibt keine abschließende Pflichtgliederung für den Hautschutzplan vor; sie empfiehlt eine tabellarische Übersicht als Hand- und Hautschutzplan (Nr. 5.5.1 Abs. 6). Die Elemente oben sind aus TRGS 401 und dem Muster in TRGS 530 Anlage 1 zusammengestellt.",
+    "friseur_zeilen": [
+      {
+        "taetigkeit": "Shampoonieren, Kopfmassage mit Haarbehandlungsmitteln, Pflegemittel auftragen/auswaschen",
+        "vor_taetigkeit_hautschutz": "Hände mit Hautschutzpräparat eincremen",
+        "handschuhe": "Einmalhandschuhe, langstulpig (alternativ Waschhandschuhe); laut BGW 2026: Einmalhandschuhe aus Nitril oder Vinyl mit langen Stulpen über das Handgelenk",
+        "nach_taetigkeit_reinigung": "Hände nur bei Verschmutzung waschen, ggf. mit pH-hautneutralem Reinigungsmittel; gut abtrocknen; eincremen",
+        "vor_pausen_arbeitsschluss_pflege": "Hände mit Hautpflegepräparat eincremen",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/anl_1.htm",
+        "quelle_zusatz": "https://www.bgw-online.de/resource/blob/8772/b76996f027809fa44f358d7abe1516a4/SichereSeitenFuerDasFriseurhandwerk_Hautschutz_Stand_07_2026_bf.pdf"
+      },
+      {
+        "taetigkeit": "Färben, Dauerwelle, Blondierung: Mischen, Auftragen, Überprüfen, Probewickeln, Fixieren",
+        "vor_taetigkeit_hautschutz": "Hände mit Hautschutzpräparat eincremen",
+        "handschuhe": "Einmalhandschuhe (keine gepuderten Latexhandschuhe); laut BGW 2026: Friseur-Einmalhandschuhe nach DIN EN ISO 374-6 (Friseur-Symbol)",
+        "nach_taetigkeit_reinigung": "Hände nur bei Verschmutzung waschen, ggf. mit pH-hautneutralem Reinigungsmittel; gut abtrocknen; eincremen",
+        "vor_pausen_arbeitsschluss_pflege": "Hände mit Hautpflegepräparat eincremen",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/anl_1.htm",
+        "quelle_zusatz": "https://www.bgw-online.de/resource/blob/8772/b76996f027809fa44f358d7abe1516a4/SichereSeitenFuerDasFriseurhandwerk_Hautschutz_Stand_07_2026_bf.pdf"
+      },
+      {
+        "taetigkeit": "Färben, Dauerwelle, Blondierung: Aufemulgieren, Auswaschen",
+        "vor_taetigkeit_hautschutz": "Hände mit Hautschutzpräparat eincremen",
+        "handschuhe": "Einmalhandschuhe, langstulpig",
+        "nach_taetigkeit_reinigung": "Hände nur bei Verschmutzung waschen, ggf. mit pH-hautneutralem Reinigungsmittel; gut abtrocknen; eincremen",
+        "vor_pausen_arbeitsschluss_pflege": "Hände mit Hautpflegepräparat eincremen",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/anl_1.htm"
+      },
+      {
+        "taetigkeit": "Styling, Kopfmassage ohne Haarbehandlungsmittel",
+        "vor_taetigkeit_hautschutz": "Hände mit Hautschutzpräparat eincremen",
+        "handschuhe": "Einmalhandschuhe bei empfindlicher Haut",
+        "nach_taetigkeit_reinigung": "Hände nur bei Verschmutzung waschen, ggf. mit pH-hautneutralem Reinigungsmittel; gut abtrocknen; eincremen",
+        "vor_pausen_arbeitsschluss_pflege": "Hände mit Hautpflegepräparat eincremen",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/anl_1.htm"
+      },
+      {
+        "taetigkeit": "Reinigung und Desinfektion von Arbeitsgeräten und Räumen",
+        "vor_taetigkeit_hautschutz": "Hände mit Hautschutzpräparat eincremen",
+        "handschuhe": "Haushaltshandschuhe; laut BGW 2026: chemikalienbeständige Schutzhandschuhe nach DIN EN ISO 374, ggf. mit längerem Schaft",
+        "nach_taetigkeit_reinigung": "Hände nur bei Verschmutzung waschen, ggf. mit pH-hautneutralem Reinigungsmittel; gut abtrocknen; eincremen",
+        "vor_pausen_arbeitsschluss_pflege": "Hände mit Hautpflegepräparat eincremen",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/anl_1.htm",
+        "quelle_zusatz": "https://www.bgw-online.de/resource/blob/8772/b76996f027809fa44f358d7abe1516a4/SichereSeitenFuerDasFriseurhandwerk_Hautschutz_Stand_07_2026_bf.pdf"
+      },
+      {
+        "taetigkeit": "Lange Handschuhtragezeiten (alle Tätigkeiten)",
+        "handschuhe": "Nahtlose Baumwoll-Unterziehhandschuhe; Handschuhe nur auf vollständig trockene Hände anziehen; beschädigte Handschuhe sofort austauschen",
+        "quelle": "https://www.bgw-online.de/resource/blob/8772/b76996f027809fa44f358d7abe1516a4/SichereSeitenFuerDasFriseurhandwerk_Hautschutz_Stand_07_2026_bf.pdf"
+      }
+    ],
+    "friseur_zeilen_hinweis": "Die Zeilen 1–5 stammen aus dem Muster-Hautschutzplan TRGS 530 Anlage 1 (Ausgabe März 2007). Abweichungen zu neueren Quellen: (a) TRGS 401 Nr. 5.5.5 Abs. 6 (2022) hält Hautschutzmittel unter Schutzhandschuhen im Allgemeinen nicht für erforderlich und rät von fettenden oder emulgatorreichen Produkten unter Handschuhen ab; die Spalte 'vor_taetigkeit_hautschutz' sollte daher bei Handschuhtätigkeiten produkt- und betriebsbezogen geprüft werden. (b) Die TRGS-530-Muster-Betriebsanweisung (Anl. 2) warnt, dass Baumwollhandschuhe unter Schutzhandschuhen Feuchtigkeit stauen können, während BGW (2026) und TRGS 401 Nr. 5.5.3 Abs. 6 schweißaufnehmende Unterziehhandschuhe empfehlen (bei Feuchtwerden wechseln). Im Zweifel die BGW-Fassung von 07/2026 verwenden.",
+    "unsicher": false
+  },
+  "pruefung_elektro": {
+    "grundlage": {
+      "text": "Ortsveränderliche elektrische Betriebsmittel sind vor der ersten Inbetriebnahme, nach Änderung oder Instandsetzung und in bestimmten Zeitabständen auf ordnungsgemäßen Zustand zu prüfen. Die Fristen sind so zu bemessen, dass zu erwartende Mängel rechtzeitig erkannt werden.",
+      "paragraph": "§ 5 Abs. 1 DGUV Vorschrift 3",
+      "wortlaut": "sinngemaess",
+      "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/dguv/3/5.htm"
+    },
+    "fristen": [
+      {
+        "geltungsbereich": "Ortsveränderliche elektrische Betriebsmittel (soweit benutzt), Verlängerungs- und Geräteanschlussleitungen mit Steckvorrichtungen, Anschlussleitungen mit Stecker, bewegliche Leitungen mit Stecker und Festanschluss – allgemein",
+        "richtwert": "6 Monate",
+        "hinweis": "Bei einer Fehlerquote von weniger als 2 % kann die Prüffrist verlängert werden.",
+        "pruefer": "Elektrofachkraft; bei Verwendung geeigneter Mess- und Prüfgeräte auch elektrotechnisch unterwiesene Person",
+        "fundstelle": "DGUV Vorschrift 3, Durchführungsanweisung zu § 5, Tabelle 1B",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/dguv/3/5.htm"
+      },
+      {
+        "geltungsbereich": "Baustellen",
+        "richtwert": "3 Monate",
+        "maximalwert": "1 Jahr",
+        "hinweis": "Richtwert 3 Monate laut Tabelle 1B (Konkretisierung nach BGI 608); Verlängerung bis höchstens 1 Jahr nur bei Fehlerquote < 2 %.",
+        "fundstelle": "DGUV Vorschrift 3, DA zu § 5, Tabelle 1B",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/dguv/3/5.htm"
+      },
+      {
+        "geltungsbereich": "Fertigungsstätten, Werkstätten oder unter ähnlichen Bedingungen",
+        "richtwert": "6 Monate",
+        "maximalwert": "1 Jahr",
+        "hinweis": "Verlängerung bis höchstens 1 Jahr bei Fehlerquote < 2 %.",
+        "fundstelle": "DGUV Vorschrift 3, DA zu § 5, Tabelle 1B",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/dguv/3/5.htm"
+      },
+      {
+        "geltungsbereich": "Büros oder unter ähnlichen Bedingungen",
+        "richtwert": "6 Monate",
+        "maximalwert": "2 Jahre",
+        "hinweis": "Verlängerung bis höchstens 2 Jahre bei Fehlerquote < 2 %.",
+        "fundstelle": "DGUV Vorschrift 3, DA zu § 5, Tabelle 1B",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/dguv/3/5.htm"
+      },
+      {
+        "geltungsbereich": "Elektrische Anlagen und ortsfeste Betriebsmittel",
+        "richtwert": "4 Jahre",
+        "pruefer": "Elektrofachkraft",
+        "fundstelle": "DGUV Vorschrift 3, DA zu § 5, Tabelle 1A",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/dguv/3/5.htm"
+      },
+      {
+        "geltungsbereich": "Elektrische Anlagen und ortsfeste Betriebsmittel in Betriebsstätten, Räumen und Anlagen besonderer Art (DIN VDE 0100 Gruppe 700)",
+        "richtwert": "1 Jahr",
+        "fundstelle": "DGUV Vorschrift 3, DA zu § 5, Tabelle 1A",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/dguv/3/5.htm"
+      },
+      {
+        "geltungsbereich": "Schutzmaßnahmen mit Fehlerstrom-Schutzeinrichtungen in nichtstationären Anlagen (Prüfung auf Wirksamkeit)",
+        "richtwert": "1 Monat",
+        "pruefer": "Elektrofachkraft oder elektrotechnisch unterwiesene Person bei Verwendung geeigneter Mess- und Prüfgeräte",
+        "fundstelle": "DGUV Vorschrift 3, DA zu § 5, Tabelle 1A",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/dguv/3/5.htm"
+      },
+      {
+        "geltungsbereich": "Fehlerstrom-, Differenzstrom- und Fehlerspannungs-Schutzschalter: Betätigen der Prüfeinrichtung durch den Benutzer",
+        "richtwert": "stationäre Anlagen: 6 Monate; nichtstationäre Anlagen: arbeitstäglich",
+        "fundstelle": "DGUV Vorschrift 3, DA zu § 5, Tabelle 1A",
+        "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/dguv/3/5.htm",
+        "unsicher": true,
+        "hinweis": "Beide Werte (6 Monate / arbeitstäglich) sind in der Quelle belegt; die Zuordnung zu stationär/nichtstationär war im abgerufenen Tabellenlayout nicht eindeutig und folgt der üblichen Lesart der Tabelle 1A. Vor Verwendung am Original prüfen."
+      }
+    ],
+    "fehlerquote": {
+      "text": "Maßstab für die Angemessenheit der Prüffrist ist der Anteil der bei den Prüfungen festgestellten Betriebsmittel mit Abweichungen von den Grenzwerten (Fehlerquote). Beträgt die Fehlerquote höchstens 2 %, kann die Prüffrist als ausreichend angesehen werden.",
+      "wortlaut": "Satz 2 woertlich (Zitat)",
+      "quelle": "https://vorschriften.bgn-branchenwissen.de/daten/dguv/3/5.htm"
+    },
+    "hinweis_dguv_203_071": {
+      "text": "DGUV Information 203-071 (Ausgabe Januar 2020) enthält KEINE eigene Fristentabelle. Sie stellt klar, dass der Unternehmer die Prüffristen in der Gefährdungsbeurteilung festlegt, verweist auf die Richtwerte der Durchführungsanweisungen zu § 5 DGUV Vorschrift 3/4 („Richtwerte für normale Betriebs- und Umgebungsbedingungen“ mit orientierendem Charakter) und betont: „Prüffristen sind keine Wunschfristen!“ Geräte, die bereits die Sichtprüfung nicht bestehen, sind in die Fehlerquote einzurechnen.",
+      "fundstelle": "DGUV Information 203-071, Kap. 7 und 7.1, S. 30–32",
+      "quelle": "https://publikationen.dguv.de/widgets/pdf/download/article/787"
+    }
+  },
+  "gefahrstoffverzeichnis_pflichtangaben": {
+    "einleitung": "Der Arbeitgeber hat ein Verzeichnis der im Betrieb verwendeten Gefahrstoffe zu führen. Das Verzeichnis muss mindestens folgende Angaben enthalten:",
+    "angaben": [
+      {
+        "nr": 1,
+        "text": "Bezeichnung des Gefahrstoffs"
+      },
+      {
+        "nr": 2,
+        "text": "Einstufung des Gefahrstoffs oder Angaben zu den gefährlichen Eigenschaften"
+      },
+      {
+        "nr": 3,
+        "text": "Angaben zu den im Betrieb verwendeten Mengenbereichen"
+      },
+      {
+        "nr": 4,
+        "text": "Bezeichnung der Arbeitsbereiche, in denen Beschäftigte dem Gefahrstoff exponiert sein können"
+      },
+      {
+        "nr": 5,
+        "text": "Verweis auf die entsprechenden Sicherheitsdatenblätter"
+      }
+    ],
+    "ausnahme": "Die Pflicht gilt nicht, wenn nur Tätigkeiten mit geringer Gefährdung nach § 6 Abs. 13 GefStoffV ausgeübt werden.",
+    "zugaenglichkeit": "Die Angaben nach Nr. 1, 2, 4 und 5 müssen allen betroffenen Beschäftigten und ihrer Vertretung zugänglich sein (die Mengenbereiche nicht).",
+    "paragraph": "§ 6 Abs. 12 GefStoffV",
+    "wortlaut": "sinngemaess",
+    "quelle": "https://www.gesetze-im-internet.de/gefstoffv_2010/__6.html",
+    "geprueft_ueber": "https://vorschriften.bgn-branchenwissen.de/daten/gv/gefstoffv/6.htm",
+    "quelle_zusatz": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs555/4.htm",
+    "unsicher": true,
+    "hinweis": "Inhalt (5 Angaben, Ausnahme, Zugänglichkeit) ist über die BGN-Vorschriftensammlung belegt; die genaue Formulierung (insbesondere Nr. 4 „exponiert“ bzw. „ausgesetzt“ und ob der SDB-Verweis als Nr. 5 oder als eigener Satz geführt wird) konnte nicht zeichengenau verifiziert werden. Die GefStoffV wurde Ende 2024 geändert, der Stand der BGN-Seite ist nicht datiert. Vor Produktivnutzung gegen gesetze-im-internet.de abgleichen. Praxishinweis BGW: Friseurkosmetika können in einem gesonderten Verzeichnis nach Produktgruppen geführt werden (BGW Sichere Seiten Gefahrstoffe)."
+  }
+}

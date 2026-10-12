@@ -8,12 +8,15 @@ import { allergenAushang, haccp, hautschutzplan, hygieneplan, ifsgBelehrung } fr
 import { datenpanne, datenschutzDokumentation, datenschutzinformation } from "./datenschutz.js";
 import { kiKompetenz, nachweisArbeitsbedingungen } from "./personal.js";
 import { verfahrensdokumentation } from "./steuern.js";
-import type { Bereich, Betrieb, Daten, EinfachesFeld, Eintrag, Feld, Vorlage } from "./typen.js";
+import { GRUNDLAGE_MARKE, esc } from "./html.js";
+import type { Bereich, Betrieb, Daten, EinfachesFeld, Eintrag, Feld, Vorlage, Vorschlag } from "./typen.js";
 
 export * from "./typen.js";
 export { ALLERGENE, DATENPANNE_RISIKO, GEFAEHRDUNGSFAKTOREN, RISIKO_STUFEN, SCHUTZZIELE } from "./konstanten.js";
 export { PRUEFHINWEIS } from "./html.js";
-export { berlinZuUtc } from "./datenschutz.js";
+export { BUNDESLAENDER, aufsichtFuer, berlinZuUtc } from "./datenschutz.js";
+export { mindestlohnAm, mindesturlaub, stundenlohn } from "./personal.js";
+export { bausteinText } from "./website.js";
 export { aufbewahrenBis } from "./buchhaltung.js";
 export { arbeitsminuten } from "./lohn.js";
 export { cent } from "./html.js";
@@ -78,8 +81,9 @@ export function vorlageFuer(id: string): Vorlage | undefined {
 export function sichtbar(f: Feld, d: Daten | Eintrag): boolean {
   if (!f.wenn) return true;
   const w = d[f.wenn.feld];
-  if (f.wenn.ist !== undefined) return w === f.wenn.ist;
-  return w === true || (typeof w === "string" && w !== "") || (Array.isArray(w) && w.length > 0);
+  const erfuellt =
+    f.wenn.ist !== undefined ? (Array.isArray(w) ? (w as unknown[]).includes(f.wenn.ist) : w === f.wenn.ist) : w === true || (typeof w === "string" && w !== "") || (Array.isArray(w) && w.length > 0);
+  return f.wenn.nicht ? !erfuellt : erfuellt;
 }
 
 function startwert(f: EinfachesFeld, b: Betrieb, heute: string): string | boolean | string[] | null {
@@ -100,6 +104,8 @@ function startwert(f: EinfachesFeld, b: Betrieb, heute: string): string | boolea
       return f.vorbelegung ?? false;
     case "mehrfach":
       return [];
+    case "bausteine":
+      return f.vorbelegung ? [...f.vorbelegung] : [];
   }
 }
 
@@ -112,7 +118,7 @@ export function neuerEintrag(f: Extract<Feld, { art: "liste" }>, b: Betrieb, heu
 export function leereDaten(v: Vorlage, b: Betrieb, heute: string): Daten {
   const d: Daten = {};
   for (const a of v.abschnitte)
-    for (const f of a.felder) d[f.id] = f.art === "liste" ? (f.start ? f.start.map((e) => ({ ...neuerEintrag(f, b, heute), ...e })) : [neuerEintrag(f, b, heute)]) : startwert(f, b, heute);
+    for (const f of a.felder) d[f.id] = f.art === "liste" ? (f.start ? f.start.map((e) => ({ ...neuerEintrag(f, b, heute), ...e })) : f.leerStarten ? [] : [neuerEintrag(f, b, heute)]) : startwert(f, b, heute);
   return d;
 }
 
@@ -120,7 +126,7 @@ const gefuellt = (w: unknown) => (typeof w === "string" ? w.trim() !== "" : Arra
 
 /** Hat der Nutzer in einem Listeneintrag etwas eingetragen? Vorbelegte Felder (Datum, Auswahl, Menge …) zählen nicht. */
 function benutzt(f: Extract<Feld, { art: "liste" }>, e: Eintrag): boolean {
-  return f.felder.some((x) => (x.art === "text" || x.art === "mehrzeilig" || x.art === "betrag" || x.art === "zahl" || x.art === "uhrzeit" || x.art === "mehrfach") && !("vorbelegung" in x && x.vorbelegung) && gefuellt(e[x.id]));
+  return f.felder.some((x) => (x.art === "text" || x.art === "mehrzeilig" || x.art === "betrag" || x.art === "zahl" || x.art === "uhrzeit" || x.art === "mehrfach" || x.art === "bausteine") && !("vorbelegung" in x && x.vorbelegung) && gefuellt(e[x.id]));
 }
 
 /** Fehlende Pflichtangaben als lesbare Bezeichnungen („Gefährdung 2: Maßnahme“). Hindert das Erstellen nicht. */
@@ -155,6 +161,14 @@ export function dateiname(v: Vorlage, d: Daten, datum: string): string {
   return `${s.replace(/[^A-Za-z0-9-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80)}.pdf`;
 }
 
+/** Vorschlag als Listeneintrag mit Startwerten für alle Felder. */
+export function eintragAusVorschlag(f: Extract<Feld, { art: "liste" }>, vorschlag: Vorschlag, b: Betrieb, heute: string): Eintrag {
+  return { ...neuerEintrag(f, b, heute), ...vorschlag.werte };
+}
+
+/** Das fertige Dokument: Vorlage + Rechtsgrundlage und Bereich im Kopf. Die App erstellt das PDF hieraus. */
 export function dokumentHtml(v: Vorlage, d: Daten, b: Betrieb): string {
-  return v.html(d, b);
+  const grundlage = v.grundlage ? `<div><dt>Rechtsgrundlage</dt><dd>${esc(v.grundlage)}</dd></div>` : "";
+  const art = BEREICHE.find((x) => x.id === v.bereich)?.titel ?? "";
+  return v.html(d, b).replace(GRUNDLAGE_MARKE, grundlage).replace('<div class="art"></div>', `<div class="art">${esc(art)}</div>`);
 }

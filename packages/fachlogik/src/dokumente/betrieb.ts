@@ -4,6 +4,7 @@
  * Gliederungen fachlich zu prüfen (T-60).
  */
 import { abschnitt, absatz, angaben, anschrift, cent, datumDe, dokument, euro, liste, tabelle, text, unterschriften, zelle } from "./html.js";
+import { INTERESSE, RECHTSFORMEN } from "./bausteine.js";
 import type { Vorlage } from "./typen.js";
 
 const PERSON = [
@@ -18,6 +19,7 @@ export const gewerbeanmeldung: Vorlage = {
   beschreibung: "Alle Angaben für die Gewerbeanmeldung an einem Ort – zum Übertragen in das Online-Formular deiner Stadt oder zum Mitnehmen aufs Amt.",
   bereich: "betrieb",
   pflichten: ["gruendung.gewerbeanzeige"],
+  grundlage: "§ 14 GewO; Gewerbeanzeigeverordnung (Vordruck GewA 1)",
   abschnitte: [
     {
       titel: "Angaben zur Person",
@@ -27,7 +29,7 @@ export const gewerbeanmeldung: Vorlage = {
         { id: "geburtsname", art: "text", label: "Geburtsname", hilfe: "falls abweichend" },
         { id: "geburtsdatum", art: "datum", label: "Geburtsdatum", pflicht: true },
         { id: "geburtsort", art: "text", label: "Geburtsort", pflicht: true },
-        { id: "staatsangehoerigkeit", art: "text", label: "Staatsangehörigkeit", pflicht: true },
+        { id: "staatsangehoerigkeit", art: "text", label: "Staatsangehörigkeit", pflicht: true, vorschlaege: ["deutsch"] },
         { id: "wohnanschrift", art: "mehrzeilig", label: "Wohnanschrift", pflicht: true },
       ],
     },
@@ -35,7 +37,7 @@ export const gewerbeanmeldung: Vorlage = {
       titel: "Angaben zum Betrieb",
       hilfe: "Name, Anschrift und Kontakt übernimmt Amtlos aus „Mein Betrieb“.",
       felder: [
-        { id: "rechtsform", art: "text", label: "Rechtsform", hilfe: "z. B. Einzelunternehmen", pflicht: true },
+        { id: "rechtsform", art: "wahl", label: "Rechtsform", optionen: RECHTSFORMEN.map((r) => ({ wert: r, text: r })), vorbelegung: "Einzelunternehmen", pflicht: true },
         { id: "taetigkeit", art: "mehrzeilig", label: "Angemeldete Tätigkeit", hilfe: "so genau wie möglich, z. B. „Friseurhandwerk und Verkauf von Haarpflegeprodukten“", pflicht: true },
         { id: "beginn", art: "datum", label: "Beginn der Tätigkeit", pflicht: true },
         { id: "erwerb", art: "wahl", label: "Haupt- oder Nebenerwerb", optionen: [{ wert: "haupt", text: "Haupterwerb" }, { wert: "neben", text: "Nebenerwerb" }], vorbelegung: "haupt" },
@@ -79,13 +81,7 @@ export const gewerbeanmeldung: Vorlage = {
   },
 };
 
-const RECHTSFORMEN = [
-  { wert: "GmbH", text: "GmbH" },
-  { wert: "UG (haftungsbeschränkt)", text: "UG (haftungsbeschränkt)" },
-  { wert: "e. K.", text: "e. K." },
-  { wert: "OHG", text: "OHG" },
-  { wert: "KG", text: "KG" },
-];
+const HR_FORMEN = ["GmbH", "UG (haftungsbeschränkt)", "e. K.", "OHG", "KG", "GmbH & Co. KG"].map((r) => ({ wert: r, text: r }));
 
 export const handelsregister: Vorlage = {
   id: "handelsregister",
@@ -99,7 +95,7 @@ export const handelsregister: Vorlage = {
       hilfe: "Die Anmeldung zum Handelsregister macht der Notar. Mit diesem Blatt hast du alle Angaben beisammen.",
       felder: [
         { id: "firma", art: "text", label: "Firma (Name im Register)", pflicht: true },
-        { id: "rechtsform", art: "wahl", label: "Rechtsform", optionen: RECHTSFORMEN },
+        { id: "rechtsform", art: "wahl", label: "Rechtsform", optionen: HR_FORMEN },
         { id: "sitz", art: "text", label: "Sitz (Ort)", pflicht: true },
         { id: "anschrift", art: "mehrzeilig", label: "Inländische Geschäftsanschrift", pflicht: true },
         { id: "gegenstand", art: "mehrzeilig", label: "Gegenstand des Unternehmens", pflicht: true },
@@ -139,6 +135,7 @@ export const transparenzregister: Vorlage = {
   beschreibung: "Wer hinter der Gesellschaft steht – Name, Geburtsdatum, Wohnort, Staatsangehörigkeit, Art und Umfang des Interesses. Für die Meldung und deine Unterlagen.",
   bereich: "betrieb",
   pflichten: ["gesellschaft.transparenzregister"],
+  grundlage: "§§ 19, 20 GwG",
   abschnitte: [
     {
       hilfe: "Gemeldet wird online beim Transparenzregister. Dieses Blatt hält fest, was du gemeldet hast.",
@@ -158,7 +155,7 @@ export const transparenzregister: Vorlage = {
           eintrag: "Person",
           titelFeld: "name",
           pflicht: true,
-          felder: [...PERSON, { id: "staatsangehoerigkeit", art: "text", label: "Staatsangehörigkeit", pflicht: true }, { id: "interesse", art: "text", label: "Art und Umfang des wirtschaftlichen Interesses", hilfe: "z. B. 60 % der Anteile und Stimmrechte", pflicht: true }],
+          felder: [...PERSON, { id: "staatsangehoerigkeit", art: "text", label: "Alle Staatsangehörigkeiten", pflicht: true }, { id: "interesse_art", art: "wahl", label: "Art des wirtschaftlichen Interesses", optionen: INTERESSE, vorbelegung: "beteiligung" }, { id: "interesse", art: "text", label: "Umfang", hilfe: "z. B. 60 % der Kapitalanteile", pflicht: true }],
         },
       ],
     },
@@ -173,7 +170,7 @@ export const transparenzregister: Vorlage = {
       meta: `Stand: ${datumDe(text(d, "stand")) || "–"}`,
       inhalt:
         angaben([["Gesellschaft", b.name], ["Rechtsform", text(d, "rechtsform")], ["Register", text(d, "register") || null], ["Gemeldet am", datumDe(text(d, "gemeldet")) || "noch nicht gemeldet"]]) +
-        abschnitt("Wirtschaftlich Berechtigte", l.length ? tabelle(["Name", "Geburtsdatum", "Wohnort", "Staatsangeh.", "Interesse"], l.map((x) => [zelle(text(x, "name")), datumDe(text(x, "geburtsdatum")), zelle(text(x, "wohnort")), zelle(text(x, "staatsangehoerigkeit")), zelle(text(x, "interesse"))]), { breiten: ["24%", "14%", "20%", "14%", "28%"] }) : absatz("")) +
+        abschnitt("Wirtschaftlich Berechtigte", l.length ? tabelle(["Name", "Geburtsdatum", "Wohnort", "Staatsangehörigkeiten", "Interesse"], l.map((x) => [zelle(text(x, "name")), datumDe(text(x, "geburtsdatum")), zelle(text(x, "wohnort")), zelle(text(x, "staatsangehoerigkeit")), zelle([INTERESSE.find((o) => o.wert === text(x, "interesse_art"))?.text.split(",")[0] ?? "", text(x, "interesse")].filter(Boolean).join(": "))]), { breiten: ["24%", "14%", "20%", "14%", "28%"] }) : absatz("")) +
         unterschriften(["Ort, Datum", "Unterschrift Geschäftsführung"]),
     });
   },

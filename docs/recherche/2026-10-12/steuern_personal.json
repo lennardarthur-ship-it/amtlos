@@ -1,0 +1,1001 @@
+{
+  "_meta": {
+    "stand_recherche": "2026-10-12",
+    "legende": {
+      "verifiziert": "true = Aussage wurde am 12.10.2026 in der angegebenen Quelle abgerufen und bestätigt; false = Inhalt aus Fachwissen, Quelle (meist gesetze-im-internet.de) konnte nicht abgerufen werden",
+      "unsicher": "true = vor produktiver Verwendung gegen den amtlichen Text prüfen (Wortlaut, Nummerierung oder Aktualität nicht belegt)"
+    },
+    "zugriffsprobleme": [
+      "gesetze-im-internet.de: in dieser Umgebung gesperrt (Egress-Policy 403, robots.txt verbietet WebFetch). Alle Gesetzeswortlaute ohne anderen Beleg sind deshalb 'verifiziert': false.",
+      "bundesfinanzministerium.de inkl. der amtlichen Handbücher (ao./usth./esth./lsth.bundesfinanzministerium.de): robots.txt verbietet den Abruf. BMF-Schreiben (GoBD, E-Rechnung, Anlage EÜR 2026, § 146a-Mitteilung) konnten nur über Landesfinanzverwaltungen, ELSTER oder Bundestagsdrucksachen gegengeprüft werden.",
+      "transparenzregister.de (nur JavaScript) und recht.bund.de (Serverfehler) waren nicht lesbar."
+    ],
+    "wichtige_neuerungen_2026": [
+      {
+        "text": "Seit 01.01.2026 gilt der ermäßigte Steuersatz (7 %) auch für Restaurant- und Verpflegungsdienstleistungen, ausgenommen die Abgabe von Getränken (relevant für Café/Gastronomie).",
+        "quelle": "https://www.lfst.bayern.de/fileadmin/RESSOURCEN/INFORMATIONEN/Steuerinfos/Steuerarten/Umsatzsteuer/Wissenswertes_zur_Umsatzsteuer_Jan_2026.pdf",
+        "verifiziert": true
+      },
+      {
+        "text": "Kabinettsbeschluss vom 23.09.2026 (nur Gesetzentwurf, noch nicht geltendes Recht): Ab 2028 sollen Papierbons entfallen (digitaler Beleg, Papier nur auf Kundenwunsch). Ab 2028 soll eine Kassenpflicht gelten, wenn der jährliche Gesamtumsatz 100.000 Euro erreicht; ausgenommen sind Barumsätze unter 12.000 Euro pro Jahr.",
+        "quelle": "https://www.bundesregierung.de/breg-de/aktuelles/abschaffung-bonpflicht-2453568",
+        "verifiziert": true,
+        "unsicher": true,
+        "hinweis": "Gesetzgebungsverfahren läuft noch; Details und Inkrafttreten nicht veröffentlicht"
+      },
+      {
+        "text": "Entwurf Jahressteuergesetz 2026 (BT-Drs. 21/8283 vom 30.09.2026): u. a. Streichung von § 4 Abs. 3 Satz 1 LStDV und Änderungen an §§ 41, 41b, 41c EStG, teils erst ab 2029. Für den Rechtsstand 2026 hat das keine Auswirkung.",
+        "quelle": "https://dserver.bundestag.de/btd/21/082/2108283.pdf",
+        "verifiziert": true,
+        "unsicher": true
+      },
+      {
+        "text": "Arbeitszeitgesetz: Eine wöchentliche statt tägliche Höchstarbeitszeit und eine Pflicht zur elektronischen Zeiterfassung sind nur geplant (Unterrichtung der Bundesregierung vom 09.09.2026, ohne Termin). Erweiterte Sonn- und Feiertagsarbeit für Bäckereien/Konditoreien ist ab 01.01.2027 angekündigt.",
+        "quelle": "https://dserver.bundestag.de/btd/21/077/2107700.pdf",
+        "verifiziert": true
+      }
+    ]
+  },
+
+  "rechnung": {
+    "pflichtangaben_14_abs4_ustg": {
+      "quelle": "https://www.gesetze-im-internet.de/ustg_1980/__14.html",
+      "gegenpruefung": "https://www.finanzamt.nrw.de/steuerinfos/unternehmen/umsatzsteuer/ordnungsgemaesse-rechnungen",
+      "hinweis": "Wortlaut aus Fachwissen, nah am Gesetz. Der Inhalt aller zehn Punkte deckt sich mit der Checkliste der Finanzverwaltung NRW (abgerufen). Der exakte Wortlaut, besonders die Verweise in Nr. 9 und 10, wurde nicht amtlich geprüft.",
+      "verifiziert": false,
+      "unsicher": true,
+      "liste": [
+        {"nr": 1, "text": "den vollständigen Namen und die vollständige Anschrift des leistenden Unternehmers und des Leistungsempfängers"},
+        {"nr": 2, "text": "die dem leistenden Unternehmer vom Finanzamt erteilte Steuernummer oder die ihm vom Bundeszentralamt für Steuern erteilte Umsatzsteuer-Identifikationsnummer"},
+        {"nr": 3, "text": "das Ausstellungsdatum"},
+        {"nr": 4, "text": "eine fortlaufende Nummer mit einer oder mehreren Zahlenreihen, die zur Identifizierung der Rechnung vom Rechnungsaussteller einmalig vergeben wird (Rechnungsnummer)"},
+        {"nr": 5, "text": "die Menge und die Art (handelsübliche Bezeichnung) der gelieferten Gegenstände oder den Umfang und die Art der sonstigen Leistung"},
+        {"nr": 6, "text": "den Zeitpunkt der Lieferung oder sonstigen Leistung; bei Anzahlungen den Zeitpunkt der Vereinnahmung des Entgelts oder eines Teils davon, sofern er feststeht und nicht mit dem Ausstellungsdatum übereinstimmt"},
+        {"nr": 7, "text": "das nach Steuersätzen und einzelnen Steuerbefreiungen aufgeschlüsselte Entgelt für die Lieferung oder sonstige Leistung sowie jede im Voraus vereinbarte Minderung des Entgelts, sofern sie nicht bereits im Entgelt berücksichtigt ist"},
+        {"nr": 8, "text": "den anzuwendenden Steuersatz sowie den auf das Entgelt entfallenden Steuerbetrag oder im Fall einer Steuerbefreiung einen Hinweis darauf, dass für die Lieferung oder sonstige Leistung eine Steuerbefreiung gilt"},
+        {"nr": 9, "text": "in den Fällen des § 14b Abs. 1 Satz 5 UStG einen Hinweis auf die Aufbewahrungspflicht des Leistungsempfängers (Leistungen im Zusammenhang mit einem Grundstück an Nichtunternehmer)"},
+        {"nr": 10, "text": "bei Ausstellung der Rechnung durch den Leistungsempfänger oder einen von ihm beauftragten Dritten die Angabe „Gutschrift“"}
+      ],
+      "praxis_hinweise_finanzverwaltung": [
+        {"text": "Lieferzeitpunkt angeben, wenn er vom Rechnungsdatum abweicht; der Hinweis „Rechnungsdatum = Lieferdatum“ genügt.", "quelle": "https://www.finanzamt.nrw.de/steuerinfos/unternehmen/umsatzsteuer/ordnungsgemaesse-rechnungen", "verifiziert": true},
+        {"text": "Der Bruttobetrag ist keine Pflichtangabe.", "quelle": "https://www.finanzamt.nrw.de/steuerinfos/unternehmen/umsatzsteuer/ordnungsgemaesse-rechnungen", "verifiziert": true},
+        {"text": "Bei Arbeiten an Grundstücken für Privatkunden ist auf deren zweijährige Aufbewahrungspflicht für Rechnung bzw. Zahlungsbeleg hinzuweisen.", "quelle": "https://www.finanzamt.nrw.de/steuerinfos/unternehmen/umsatzsteuer/ordnungsgemaesse-rechnungen", "verifiziert": true},
+        {"text": "Rechnungen sind innerhalb von sechs Monaten nach Ausführung der Leistung auszustellen.", "quelle": "https://www.lfst.bayern.de/fileadmin/RESSOURCEN/INFORMATIONEN/Steuerinfos/Steuerarten/Umsatzsteuer/Wissenswertes_zur_Umsatzsteuer_Jan_2026.pdf", "verifiziert": true}
+      ]
+    },
+
+    "kleinbetragsrechnung_33_ustdv": {
+      "betragsgrenze": "250 Euro (Gesamtbetrag inkl. Umsatzsteuer)",
+      "quelle": "https://www.gesetze-im-internet.de/ustdv_1980/__33.html",
+      "gegenpruefung": [
+        "https://www.finanzamt.nrw.de/steuerinfos/unternehmen/umsatzsteuer/ordnungsgemaesse-rechnungen",
+        "https://www.lfst.bayern.de/steuerinfos/weitere-themen/e-rechnung"
+      ],
+      "verifiziert": true,
+      "pflichtangaben": [
+        "den vollständigen Namen und die vollständige Anschrift des leistenden Unternehmers",
+        "das Ausstellungsdatum",
+        "die Menge und die Art der gelieferten Gegenstände oder den Umfang und die Art der sonstigen Leistung",
+        "das Entgelt und den darauf entfallenden Steuerbetrag in einer Summe sowie den anzuwendenden Steuersatz oder im Fall einer Steuerbefreiung einen Hinweis darauf, dass für die Lieferung oder sonstige Leistung eine Steuerbefreiung gilt"
+      ],
+      "pflichtangaben_hinweis": "Inhalt von der Finanzverwaltung NRW bestätigt; Wortlaut nah an § 33 UStDV, aber nicht amtlich abgeglichen.",
+      "e_rechnung": "Kleinbetragsrechnungen bis 250 Euro sind von der E-Rechnungspflicht ausgenommen.",
+      "e_rechnung_quelle": "https://www.lfst.bayern.de/steuerinfos/weitere-themen/e-rechnung"
+    },
+
+    "pflichthinweise": {
+      "kleinunternehmer_19_ustg": {
+        "rechtsstand": "ab 01.01.2025: Umsätze von Kleinunternehmern sind steuerfrei, wenn der Gesamtumsatz im Vorjahr 25.000 Euro und im laufenden Jahr 100.000 Euro nicht übersteigt. Schon der Umsatz, mit dem die 100.000 Euro überschritten werden, ist nicht mehr steuerfrei. Im Gründungsjahr gilt die Grenze von 25.000 Euro. Ein Verzicht bindet für fünf Jahre. Ein Kleinunternehmer darf keine Umsatzsteuer gesondert ausweisen und keine Vorsteuer abziehen.",
+        "quelle": [
+          "https://www.lfst.bayern.de/fileadmin/RESSOURCEN/INFORMATIONEN/Steuerinfos/Steuerarten/Umsatzsteuer/Wissenswertes_zur_Umsatzsteuer_Jan_2026.pdf",
+          "https://www.elster.de/elsterweb/helpGlobal?themaGlobal=help_ustva_2026",
+          "https://www.finanzamt.nrw.de/steuerinfos/unternehmen/umsatzsteuer/kleinunternehmerinnen-und-kleinunternehmer"
+        ],
+        "verifiziert": true,
+        "rechnungsangaben_34a_ustdv": {
+          "text": "Kleinunternehmer dürfen vereinfachte Rechnungen ausstellen (§ 34a UStDV). Die Rechnung muss einen Hinweis auf die Steuerbefreiung nach § 19 UStG enthalten.",
+          "quelle": "https://www.lfst.bayern.de/fileadmin/RESSOURCEN/INFORMATIONEN/Steuerinfos/Steuerarten/Umsatzsteuer/Wissenswertes_zur_Umsatzsteuer_Jan_2026.pdf",
+          "verifiziert": true,
+          "angaben_liste_unsicher": [
+            "vollständiger Name und vollständige Anschrift des leistenden Unternehmers und des Leistungsempfängers",
+            "Ausstellungsdatum",
+            "Menge und Art der Gegenstände bzw. Umfang und Art der sonstigen Leistung",
+            "Entgelt (Gesamtbetrag)",
+            "Hinweis auf die Steuerbefreiung für Kleinunternehmer"
+          ],
+          "angaben_liste_quelle": "https://www.gesetze-im-internet.de/ustdv_1980/__34a.html",
+          "angaben_liste_verifiziert": false,
+          "angaben_liste_unsicher_flag": true
+        },
+        "wortlaut_optionen": [
+          {"text": "Der Umsatz ist nach § 19 Abs. 1 UStG steuerfrei.", "quelle": "https://www.lfst.bayern.de/fileadmin/RESSOURCEN/INFORMATIONEN/Steuerinfos/Steuerarten/Umsatzsteuer/Wissenswertes_zur_Umsatzsteuer_Jan_2026.pdf", "verifiziert": true, "empfohlen": true},
+          {"text": "Steuerfreie Leistung als Kleinunternehmer gemäß § 19 UStG.", "quelle": "https://www.gesetze-im-internet.de/ustg_1980/__19.html", "verifiziert": false, "unsicher": true, "hinweis": "Inhaltlich gleichwertige Variante, nicht amtlich vorformuliert"}
+        ],
+        "veraltet_nicht_mehr_verwenden": {
+          "text": "„Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.“ stammt aus der Zeit vor 2025, als die Steuer nur nicht erhoben wurde. Seit 2025 sind die Umsätze steuerfrei, deshalb passt ein Hinweis auf die Steuerbefreiung besser.",
+          "unsicher": true,
+          "quelle": "https://www.lfst.bayern.de/fileadmin/RESSOURCEN/INFORMATIONEN/Steuerinfos/Steuerarten/Umsatzsteuer/Wissenswertes_zur_Umsatzsteuer_Jan_2026.pdf"
+        }
+      },
+      "steuerschuldnerschaft_leistungsempfaenger_14a_abs5": {
+        "wortlaut": "Steuerschuldnerschaft des Leistungsempfängers",
+        "hinweis": "§ 14a Abs. 5 UStG schreibt bei Umsätzen nach § 13b UStG die Angabe „Steuerschuldnerschaft des Leistungsempfängers“ vor. Umsatzsteuer wird nicht ausgewiesen.",
+        "quelle": "https://www.gesetze-im-internet.de/ustg_1980/__14a.html",
+        "verifiziert": false,
+        "unsicher": false,
+        "unsicher_begruendung": "Gesetzlich festgelegte Formulierung, allgemein bekannt; nur nicht abrufbar"
+      },
+      "innergemeinschaftliche_lieferung_14a_abs3": {
+        "pflicht": "Bei einer innergemeinschaftlichen Lieferung muss die Rechnung die Umsatzsteuer-Identifikationsnummer des Unternehmers und die des Leistungsempfängers enthalten (§ 14a Abs. 3 UStG). Zusätzlich ist auf die Steuerbefreiung hinzuweisen (§ 14 Abs. 4 Nr. 8 UStG).",
+        "wortlaut_ueblich": "Steuerfreie innergemeinschaftliche Lieferung (§ 4 Nr. 1 Buchst. b i. V. m. § 6a UStG)",
+        "quelle": "https://www.gesetze-im-internet.de/ustg_1980/__14a.html",
+        "verifiziert": false,
+        "unsicher": true,
+        "zusatz": "Kleinunternehmer können keine steuerfreie innergemeinschaftliche Lieferung ausführen (für sie gilt diese Befreiung nicht).",
+        "zusatz_quelle": "https://www.elster.de/elsterweb/helpGlobal?themaGlobal=help_ustva_2026",
+        "zusatz_verifiziert": true
+      },
+      "steuerfreie_leistungen": {
+        "pflicht": "Bei steuerfreien Leistungen ist anzugeben, dass eine Steuerbefreiung gilt, z. B. mit Verweis auf „§ 4 Nr. … UStG“.",
+        "quelle": "https://www.finanzamt.nrw.de/steuerinfos/unternehmen/umsatzsteuer/ordnungsgemaesse-rechnungen",
+        "verifiziert": true,
+        "wortlaut_vorlage": "Steuerfreie Leistung gemäß § 4 Nr. [Nummer] UStG.",
+        "wortlaut_vorlage_unsicher": true
+      },
+      "gutschrift": {
+        "wortlaut": "Gutschrift",
+        "hinweis": "Stellt der Leistungsempfänger die Rechnung aus (umsatzsteuerliche Gutschrift), ist die Angabe „Gutschrift“ Pflicht (§ 14 Abs. 4 Satz 1 Nr. 10 UStG). Eine kaufmännische Gutschrift (Stornorechnung) sollte nicht so bezeichnet werden.",
+        "quelle": "https://www.gesetze-im-internet.de/ustg_1980/__14.html",
+        "verifiziert": false,
+        "unsicher": true,
+        "unsicher_begruendung": "Gilt für die Pflichtangabe nicht, aber der Rat zur Abgrenzung von der kaufmännischen Gutschrift steht nicht in einer amtlichen Quelle"
+      },
+      "skonto": {
+        "text": "Ein gewährtes Skonto muss auf der Rechnung angegeben werden (im Voraus vereinbarte Minderung des Entgelts).",
+        "quelle": "https://www.finanzamt.nrw.de/steuerinfos/unternehmen/umsatzsteuer/ordnungsgemaesse-rechnungen",
+        "verifiziert": true
+      }
+    },
+
+    "e_rechnung_uebergang_27_abs38_ustg": {
+      "quelle_gesetz": "https://www.gesetze-im-internet.de/ustg_1980/__27.html",
+      "quelle_verifikation": "https://www.lfst.bayern.de/steuerinfos/weitere-themen/e-rechnung",
+      "bmf_schreiben": "BMF-Schreiben vom 15.10.2025 zur Einführung der obligatorischen E-Rechnung: https://www.bundesfinanzministerium.de/Content/DE/Downloads/BMF_Schreiben/Steuerarten/Umsatzsteuer/Umsatzsteuer-Anwendungserlass/2025-10-15-einfuehrung-obligatorische-e-rechnung.pdf (nicht abrufbar)",
+      "phasen": [
+        {"ab": "2025-01-01", "regel": "Alle inländischen Unternehmer müssen E-Rechnungen empfangen können, auch Kleinunternehmer und Land- und Forstwirte. Für inländische B2B-Umsätze darf freiwillig eine E-Rechnung ausgestellt werden.", "verifiziert": true},
+        {"zeitraum": "Umsätze 01.01.2025 bis 31.12.2026", "regel": "Der Aussteller entscheidet selbst: Papierrechnung oder sonstige elektronische Rechnung (z. B. PDF) bleiben zulässig. Für ein anderes elektronisches Format als die E-Rechnung ist die Zustimmung des Empfängers erforderlich.", "verifiziert": true, "unsicher_teil": "Das Zustimmungserfordernis stammt aus Fachwissen"},
+        {"zeitraum": "Umsätze 01.01.2027 bis 31.12.2027", "regel": "E-Rechnungspflicht für Unternehmer mit einem Gesamtumsatz 2026 über 800.000 Euro. Wer 2026 nicht mehr als 800.000 Euro Gesamtumsatz hatte, darf bis Ende 2027 noch sonstige Rechnungen (Papier/PDF) ausstellen.", "verifiziert": true},
+        {"zeitraum": "Umsätze 01.01.2027 bis 31.12.2027", "regel": "Rechnungen im EDI-Verfahren bleiben bis 31.12.2027 zulässig (§ 27 Abs. 38 Nr. 3 UStG).", "verifiziert": false, "unsicher": true},
+        {"ab": "2028-01-01", "regel": "E-Rechnungspflicht für alle inländischen Unternehmer bei inländischen B2B-Umsätzen.", "verifiziert": true}
+      ],
+      "formate": {"text": "XRechnung und ZUGFeRD ab Version 2.0.1 (nicht abschließend); Factur-X, sofern EN 16931 erfüllt ist.", "quelle": "https://www.lfst.bayern.de/steuerinfos/weitere-themen/e-rechnung", "verifiziert": true, "unsicher_teil": "Ob die ZUGFeRD-Profile MINIMUM und BASIC-WL ausgeschlossen sind, war nicht belegbar"},
+      "ausnahmen": [
+        {"text": "Kleinbetragsrechnungen bis 250 Euro (§ 33 UStDV)", "verifiziert": true},
+        {"text": "Fahrausweise (§ 34 UStDV)", "verifiziert": true},
+        {"text": "Rechnungen über nach § 4 Nr. 8 bis 29 UStG steuerfreie Leistungen (§ 34a UStDV)", "verifiziert": true},
+        {"text": "Rechnungen von Kleinunternehmern nach § 19 UStG (§ 34a UStDV)", "verifiziert": true},
+        {"text": "Nicht erfasst sind Umsätze an Endverbraucher (B2C) und nicht inländische B2B-Umsätze", "verifiziert": true}
+      ],
+      "ausnahmen_quelle": "https://www.lfst.bayern.de/steuerinfos/weitere-themen/e-rechnung"
+    },
+
+    "mengeneinheiten": {
+      "hinweis": "Kein Gesetz schreibt Mengeneinheiten vor; § 14 Abs. 4 Nr. 5 UStG verlangt nur Menge und handelsübliche Bezeichnung. Für E-Rechnungen (XRechnung/ZUGFeRD) werden Codes nach UN/ECE Recommendation 20/21 verwendet. Die Codes sind aus Fachwissen und wurden nicht an einer amtlichen Codeliste geprüft.",
+      "quelle": "https://www.xoev.de/ (KoSIT, Codeliste UNECERec20 für XRechnung) – nicht abgerufen",
+      "verifiziert": false,
+      "unsicher": true,
+      "liste": [
+        {"bezeichnung": "Stück", "code": "H87", "alternativ": "C62 (Eins)"},
+        {"bezeichnung": "Stunde", "code": "HUR"},
+        {"bezeichnung": "Minute", "code": "MIN"},
+        {"bezeichnung": "Tag", "code": "DAY"},
+        {"bezeichnung": "Woche", "code": "WEE"},
+        {"bezeichnung": "Monat", "code": "MON"},
+        {"bezeichnung": "Pauschale", "code": "LS"},
+        {"bezeichnung": "Kilogramm", "code": "KGM"},
+        {"bezeichnung": "Gramm", "code": "GRM"},
+        {"bezeichnung": "Liter", "code": "LTR"},
+        {"bezeichnung": "Meter", "code": "MTR"},
+        {"bezeichnung": "Quadratmeter", "code": "MTK"},
+        {"bezeichnung": "Kubikmeter", "code": "MTQ"},
+        {"bezeichnung": "Kilometer", "code": "KMT"},
+        {"bezeichnung": "Satz/Set", "code": "SET"},
+        {"bezeichnung": "Paket", "code": "XPK"},
+        {"bezeichnung": "Kilowattstunde", "code": "KWH"}
+      ]
+    }
+  },
+
+  "umsatzsteuer": {
+    "steuersaetze": [
+      {"satz": "19 %", "bezeichnung": "Regelsteuersatz (§ 12 Abs. 1 UStG)", "quelle": "https://www.lfst.bayern.de/fileadmin/RESSOURCEN/INFORMATIONEN/Steuerinfos/Steuerarten/Umsatzsteuer/Wissenswertes_zur_Umsatzsteuer_Jan_2026.pdf", "verifiziert": true},
+      {"satz": "7 %", "bezeichnung": "ermäßigter Steuersatz (§ 12 Abs. 2 UStG); seit 01.01.2026 auch für Restaurant- und Verpflegungsdienstleistungen, ausgenommen Getränke", "quelle": "https://www.lfst.bayern.de/fileadmin/RESSOURCEN/INFORMATIONEN/Steuerinfos/Steuerarten/Umsatzsteuer/Wissenswertes_zur_Umsatzsteuer_Jan_2026.pdf", "verifiziert": true},
+      {"satz": "0 %", "bezeichnung": "Nullsatz (§ 12 Abs. 3 UStG): Lieferung, Installation und unentgeltliche Wertabgabe von Solarmodulen, wesentlichen Komponenten und Stromspeichern an den Betreiber einer Photovoltaikanlage, u. a. bei einer installierten Bruttoleistung von höchstens 30 kW (peak) laut Marktstammdatenregister", "quelle": "https://www.elster.de/elsterweb/helpGlobal?themaGlobal=help_ustva_2026", "verifiziert": true, "hinweis": "Seit 01.01.2023. Die weiteren Fälle des § 12 Abs. 3 (Wohngebäude, öffentliche Gebäude) sind nicht abgerufen."}
+    ],
+    "voranmeldungszeitraum_18_ustg": {
+      "quelle": [
+        "https://www.finanzamt.nrw.de/steuerinfos/unternehmen/umsatzsteuer/umsatzsteuer-voranmeldungen",
+        "https://www.lfst.bayern.de/fileadmin/RESSOURCEN/INFORMATIONEN/Steuerinfos/Steuerarten/Umsatzsteuer/Wissenswertes_zur_Umsatzsteuer_Jan_2026.pdf"
+      ],
+      "verifiziert": true,
+      "regeln": [
+        {"option": "monatlich", "bedingung": "Die Steuer für das vorangegangene Kalenderjahr betrug mehr als 9.000 Euro (bis 2024: 7.500 Euro)."},
+        {"option": "vierteljährlich", "bedingung": "Die Steuer für das Vorjahr betrug mehr als 2.000 Euro, aber nicht mehr als 9.000 Euro (Regelfall)."},
+        {"option": "Befreiung möglich", "bedingung": "Die Steuer für das Vorjahr betrug nicht mehr als 2.000 Euro (bis 2024: 1.000 Euro); das Finanzamt kann von der Pflicht zur Voranmeldung befreien."},
+        {"option": "monatlich auf Antrag", "bedingung": "Bei einem Überschuss zugunsten des Unternehmers von mehr als 9.000 Euro im Vorjahr kann der Kalendermonat gewählt werden."},
+        {"option": "Neugründung", "bedingung": "Ausnahme für Neugründungen 2021 bis 2026: Die Pflicht richtet sich nach der voraussichtlichen Steuer des laufenden Jahres (statt Pflicht zur monatlichen Abgabe im Gründungs- und Folgejahr)."}
+      ]
+    },
+    "abgabefrist": {
+      "text": "Bis zum 10. Tag nach Ablauf des Voranmeldungszeitraums (z. B. vierteljährlich am 10.04., 10.07., 10.10. und 10.01.). Die Vorauszahlung ist zum selben Zeitpunkt ohne weitere Zahlungsaufforderung fällig. Die Übermittlung erfolgt elektronisch über ELSTER.",
+      "quelle": "https://www.finanzamt.nrw.de/steuerinfos/unternehmen/umsatzsteuer/umsatzsteuer-voranmeldungen",
+      "verifiziert": true
+    },
+    "dauerfristverlaengerung": {
+      "text": "Auf Antrag verlängert das Finanzamt die Abgabe- und Zahlungsfrist um einen Monat (§§ 46–48 UStDV). Monatszahler müssen eine Sondervorauszahlung von 1/11 der Summe der Vorauszahlungen des Vorjahres leisten; sie wird in der Voranmeldung für Dezember angerechnet. Bei Aufnahme der Tätigkeit im laufenden Jahr gilt 1/11 der voraussichtlichen Vorauszahlungen. Der Antrag ist authentifiziert über Mein ELSTER zu stellen.",
+      "quelle": [
+        "https://www.finanzamt.nrw.de/steuerinfos/unternehmen/umsatzsteuer/umsatzsteuer-voranmeldungen",
+        "https://www.elster.de/elsterweb/helpGlobal?themaGlobal=help_ustva_2026",
+        "https://www.lfst.bayern.de/fileadmin/RESSOURCEN/INFORMATIONEN/Steuerinfos/Steuerarten/Umsatzsteuer/Wissenswertes_zur_Umsatzsteuer_Jan_2026.pdf"
+      ],
+      "verifiziert": true,
+      "hinweis": "Vierteljahreszahler leisten keine Sondervorauszahlung (laut LfSt nur bei monatlicher Pflicht). Die Vorschrift § 48 UStDV ist nicht abgerufen."
+    },
+    "jahreserklaerung": {
+      "text": "Abgabe in der Regel bis 31. Juli des Folgejahres; Kleinunternehmer sind seit 2024 grundsätzlich von der Abgabe befreit.",
+      "quelle": "https://www.lfst.bayern.de/fileadmin/RESSOURCEN/INFORMATIONEN/Steuerinfos/Steuerarten/Umsatzsteuer/Wissenswertes_zur_Umsatzsteuer_Jan_2026.pdf",
+      "verifiziert": true
+    }
+  },
+
+  "euer": {
+    "formularjahr": "2025 (zuletzt abrufbar). Hinweis: Die Anlage EÜR 2026 ist mit BMF-Schreiben vom 01.09.2026 veröffentlicht (https://www.bundesfinanzministerium.de/Content/DE/Downloads/BMF_Schreiben/Steuerarten/Einkommensteuer/2026-09-01-anlage-EUER-2026.html), konnte aber nicht abgerufen werden. Zeilennummern können sich 2026 verschieben.",
+    "quelle": "https://www.elster.de/elsterweb/helpGlobal?themaGlobal=help_euer_ufa_77_2025",
+    "verifiziert": true,
+    "betriebseinnahmen": [
+      {"zeile_2025": 12, "bezeichnung": "Umsatzsteuerlicher Kleinunternehmer"},
+      {"zeile_2025": 13, "bezeichnung": "Nicht steuerbare Umsätze sowie Umsätze nach § 19 Absatz 3 Satz 1 Nummer 1 und 2 UStG"},
+      {"zeile_2025": 14, "bezeichnung": "Land- und Forstwirt (Durchschnittssatzbesteuerung)"},
+      {"zeile_2025": 15, "bezeichnung": "Umsatzsteuerpflichtige Betriebseinnahmen"},
+      {"zeile_2025": 16, "bezeichnung": "Umsatzsteuerfreie, nicht umsatzsteuerbare Betriebseinnahmen sowie Betriebseinnahmen, für die der Leistungsempfänger die Umsatzsteuer nach § 13b UStG schuldet"},
+      {"zeile_2025": 17, "bezeichnung": "Vereinnahmte Umsatzsteuer sowie Umsatzsteuer auf unentgeltliche Wertabgaben"},
+      {"zeile_2025": 18, "bezeichnung": "Vom Finanzamt erstattete und gegebenenfalls verrechnete Umsatzsteuer"},
+      {"zeile_2025": 19, "bezeichnung": "Veräußerung oder Entnahme von Anlagevermögen"},
+      {"zeile_2025": 20, "bezeichnung": "Private Kfz-Nutzung"},
+      {"zeile_2025": 21, "bezeichnung": "Sonstige Sach-, Nutzungs- und Leistungsentnahmen"}
+    ],
+    "betriebsausgaben": [
+      {"zeile_2025": 24, "bezeichnung": "Betriebsausgabenpauschalen für bestimmte Berufsgruppen"},
+      {"zeile_2025": 27, "bezeichnung": "Waren, Rohstoffe und Hilfsstoffe einschließlich der Nebenkosten"},
+      {"zeile_2025": 29, "bezeichnung": "Bezogene Leistungen"},
+      {"zeile_2025": 30, "bezeichnung": "Ausgaben für eigenes Personal"},
+      {"zeile_2025": "31-33", "bezeichnung": "AfA auf unbewegliche Wirtschaftsgüter / bewegliche Wirtschaftsgüter / immaterielle Wirtschaftsgüter (Absetzung für Abnutzung)", "unsicher": true, "hinweis": "Abschnitt 'AfA' bestätigt; die Aufteilung auf die drei Zeilen stammt aus Fachwissen"},
+      {"zeile_2025": 34, "bezeichnung": "Sonderabschreibungen nach § 7g EStG"},
+      {"zeile_2025": 35, "bezeichnung": "Herabsetzungsbeträge nach § 7g Absatz 2 EStG"},
+      {"zeile_2025": 36, "bezeichnung": "Aufwendungen für geringwertige Wirtschaftsgüter nach § 6 Absatz 2 EStG"},
+      {"zeile_2025": 37, "bezeichnung": "Auflösung Sammelposten nach § 6 Absatz 2a EStG"},
+      {"zeile_2025": 38, "bezeichnung": "Restbuchwert der ausgeschiedenen Anlagegüter"},
+      {"zeile_2025": "39-42", "bezeichnung": "Raumkosten und sonstige Grundstücksaufwendungen (Abschnitt)"},
+      {"zeile_2025": 40, "bezeichnung": "Miete/Aufwendungen für doppelte Haushaltsführung"},
+      {"zeile_2025": 41, "bezeichnung": "Sonstige Aufwendungen für betrieblich genutzte Grundstücke"},
+      {"zeile_2025": "43-60", "bezeichnung": "Sonstige unbeschränkt abziehbare Betriebsausgaben (Abschnitt)"},
+      {"zeile_2025": 44, "bezeichnung": "Übernachtungs- und Reisenebenkosten bei Geschäftsreisen"},
+      {"zeile_2025": 55, "bezeichnung": "Schuldzinsen zur Finanzierung von Anschaffungs- und Herstellungskosten von Wirtschaftsgütern des Anlagevermögens"},
+      {"zeile_2025": 56, "bezeichnung": "Übrige Schuldzinsen"},
+      {"zeile_2025": 57, "bezeichnung": "Gezahlte Vorsteuerbeträge"},
+      {"zeile_2025": 58, "bezeichnung": "An das Finanzamt gezahlte und gegebenenfalls verrechnete Umsatzsteuer"},
+      {"zeile_2025": 60, "bezeichnung": "Übrige unbeschränkt abziehbare Betriebsausgaben"},
+      {"zeile_2025": "62-67", "bezeichnung": "Beschränkt abziehbare Betriebsausgaben (Abschnitt)"},
+      {"zeile_2025": 62, "bezeichnung": "Geschenke"},
+      {"zeile_2025": 63, "bezeichnung": "Bewirtungsaufwendungen"},
+      {"zeile_2025": 64, "bezeichnung": "Verpflegungsmehraufwendungen"},
+      {"zeile_2025": 65, "bezeichnung": "Aufwendungen für ein häusliches Arbeitszimmer"},
+      {"zeile_2025": 66, "bezeichnung": "Tagespauschale für häusliche Tätigkeit (Abschnitt Arbeitszimmer)"},
+      {"zeile_2025": 67, "bezeichnung": "Sonstige beschränkt abziehbare Betriebsausgaben"},
+      {"zeile_2025": "68-73", "bezeichnung": "Kraftfahrzeugkosten und andere Fahrtkosten (Abschnitt)"},
+      {"zeile_2025": 71, "bezeichnung": "Fahrtkosten für nicht zum Betriebsvermögen gehörende Fahrzeuge"},
+      {"zeile_2025": 72, "bezeichnung": "Kraftfahrzeugkosten für Wege zwischen Wohnung und Betriebsstätte, Familienheimfahrten"},
+      {"zeile_2025": 73, "bezeichnung": "Mindestens abziehbare Kraftfahrzeugkosten für Wege zwischen Wohnung und Betriebsstätte, Familienheimfahrten (Entfernungspauschale)"},
+      {"zeile_2025": 74, "bezeichnung": "Nicht abziehbare Beträge (AfA und Restbuchwerte)"}
+    ],
+    "betriebsausgaben_ohne_zeilennummer_unsicher": {
+      "hinweis": "Diese Zeilen im Abschnitt 'Sonstige unbeschränkt abziehbare Betriebsausgaben' (ca. Zeilen 43–54) und die Kfz-Zeilen 68–70 beschreibt die ELSTER-Hilfe nicht. Die Bezeichnungen stammen aus Fachwissen.",
+      "quelle": "https://www.elster.de/elsterweb/helpGlobal?themaGlobal=help_euer_ufa_77_2025",
+      "verifiziert": false,
+      "unsicher": true,
+      "liste": [
+        "Aufwendungen für Telekommunikation (z. B. Telefon, Internet)",
+        "Fortbildungskosten (ohne Reisekosten)",
+        "Kosten für Rechts- und Steuerberatung, Buchführung",
+        "Miete/Leasing für bewegliche Wirtschaftsgüter (ohne Kraftfahrzeuge)",
+        "Erhaltungsaufwendungen (z. B. Instandhaltung, Wartung, Reparatur; ohne solche für Gebäude und Kraftfahrzeuge)",
+        "Beiträge, Gebühren, Abgaben und Versicherungen (ohne solche für Gebäude und Kraftfahrzeuge)",
+        "Laufende EDV-Kosten (z. B. Beratung, Wartung, Reparatur)",
+        "Arbeitsmittel (z. B. Bürobedarf, Porto, Fachliteratur)",
+        "Kosten für Verpackung und Transport",
+        "Werbekosten (z. B. Inserate, Werbespots, Plakate)",
+        "Kraftfahrzeugkosten: Leasingkosten / Steuern, Versicherungen und Maut / Sonstige tatsächliche Fahrtkosten (Reparaturen, Wartungen, Treibstoff, Kosten für Flugstrecken, öffentliche Verkehrsmittel)"
+      ]
+    },
+    "gwg_6_abs2_estg": {
+      "text": "Abnutzbare bewegliche Wirtschaftsgüter des Anlagevermögens, die selbständig nutzbar sind, können sofort voll abgezogen werden, wenn die Anschaffungs- oder Herstellungskosten (abzüglich Vorsteuer) 800 Euro nicht übersteigen. Wirtschaftsgüter über 250 Euro sind in ein besonderes, laufend zu führendes Verzeichnis aufzunehmen. GWG werden nicht in die Anlage AVEÜR eingetragen.",
+      "grenze": "800 Euro netto",
+      "quelle": ["https://www.elster.de/elsterweb/helpGlobal?themaGlobal=help_euer_ufa_77_2025", "https://www.gesetze-im-internet.de/estg/__6.html"],
+      "verifiziert": true
+    },
+    "sammelposten_6_abs2a_estg": {
+      "text": "Für Wirtschaftsgüter mit Anschaffungs- oder Herstellungskosten über 250 Euro bis 1.000 Euro kann ein Sammelposten gebildet werden. Das Wahlrecht gilt einheitlich für alle in diesem Wirtschaftsjahr angeschafften Wirtschaftsgüter dieser Größenordnung. Der Sammelposten wird über fünf Jahre mit je einem Fünftel aufgelöst. Wer ihn wählt, kann im selben Jahr nur Wirtschaftsgüter bis 250 Euro sofort als GWG abziehen.",
+      "quelle": ["https://www.elster.de/elsterweb/helpGlobal?themaGlobal=help_euer_ufa_77_2025", "https://www.gesetze-im-internet.de/estg/__6.html"],
+      "verifiziert": true
+    }
+  },
+
+  "aufbewahrung": {
+    "rechtsstand": "Fassung ab 01.01.2025 durch das Vierte Bürokratieentlastungsgesetz (BEG IV), BGBl. 2024 I Nr. 323",
+    "quelle_gesetz": ["https://www.gesetze-im-internet.de/ao_1977/__147.html", "https://www.gesetze-im-internet.de/hgb/__257.html"],
+    "quelle_verifikation": [
+      "https://dserver.bundestag.de/btd/20/113/2011306.pdf",
+      "https://dserver.bundestag.de/btd/20/130/2013015.pdf",
+      "https://finanzen.hessen.de/sites/finanzen.hessen.de/files/2026-04/steuerwegweiser_fuer_existenzgruender-stand_april_2026.pdf"
+    ],
+    "fristen": [
+      {
+        "jahre": 10,
+        "unterlagen": "§ 147 Abs. 1 Nr. 1 AO / § 257 Abs. 1 Nr. 1 HGB: Bücher und Aufzeichnungen (Handelsbücher), Inventare, Jahresabschlüsse, Lageberichte, Eröffnungsbilanz sowie die zu ihrem Verständnis erforderlichen Arbeitsanweisungen und sonstigen Organisationsunterlagen (dazu gehört die Verfahrensdokumentation); außerdem § 147 Abs. 1 Nr. 4a AO (Unterlagen nach Art. 15 Abs. 1 und Art. 163 Zollkodex der Union)",
+        "verifiziert": true
+      },
+      {
+        "jahre": 8,
+        "unterlagen": "§ 147 Abs. 1 Nr. 4 AO / § 257 Abs. 1 Nr. 4 HGB: Buchungsbelege, darunter ausgestellte und erhaltene Rechnungen (§ 14b Abs. 1 UStG: acht Jahre)",
+        "verifiziert": true,
+        "quelle_rechnungen": "https://www.finanzamt.nrw.de/steuerinfos/unternehmen/umsatzsteuer/ordnungsgemaesse-rechnungen"
+      },
+      {
+        "jahre": 6,
+        "unterlagen": "Empfangene Handels- oder Geschäftsbriefe, Wiedergaben der abgesandten Handels- oder Geschäftsbriefe, sonstige für die Besteuerung bedeutsame Unterlagen (z. B. Auftrags- und Bestellunterlagen, Preisverzeichnisse, Lohnberechnungsunterlagen)",
+        "verifiziert": true
+      }
+    ],
+    "uebergang": {
+      "text": "Die neuen Fristen gelten erstmals für alle Unterlagen, deren Aufbewahrungsfrist nach bisherigem Recht am 01.01.2025 noch nicht abgelaufen war (Art. 97 § 19a EGAO n. F.).",
+      "quelle": "https://dserver.bundestag.de/btd/20/113/2011306.pdf",
+      "verifiziert": true,
+      "unsicher": true,
+      "unsicher_begruendung": "Inhalt im Entwurf bestätigt; die Paragrafenangabe im EGAO stammt aus Fachwissen"
+    },
+    "sonderfall_banken": {
+      "text": "Für Kreditinstitute, Versicherungen und Wertpapierinstitute hat das Kabinett am 06.08.2025 wieder längere Fristen für Buchungsbelege beschlossen. Das ist für kleine Betriebe nicht relevant.",
+      "quelle": "https://www.bundesfinanzministerium.de/Content/DE/Pressemitteilungen/Finanzpolitik/2025/08/2025-08-06-aufbewahrungsfristen-buchungsbelege.html",
+      "verifiziert": false,
+      "unsicher": true
+    },
+    "fristbeginn_147_abs4_ao": {
+      "text": "Die Aufbewahrungsfrist beginnt mit dem Schluss des Kalenderjahrs, in dem die letzte Eintragung in das Buch gemacht, das Inventar, die Eröffnungsbilanz, der Jahresabschluss oder der Lagebericht aufgestellt, der Handels- oder Geschäftsbrief empfangen oder abgesandt worden oder der Buchungsbeleg entstanden ist, ferner die Aufzeichnung vorgenommen worden ist oder die sonstigen Unterlagen entstanden sind.",
+      "hgb": "§ 257 Abs. 5 HGB regelt den Fristbeginn entsprechend.",
+      "quelle": "https://www.gesetze-im-internet.de/ao_1977/__147.html",
+      "verifiziert": false,
+      "unsicher": true,
+      "beispiel": "Beleg vom 15.03.2026: Frist beginnt am 31.12.2026 (Ablauf des Kalenderjahres), 8 Jahre, Aufbewahrung also bis Ende 2034."
+    },
+    "ablaufhemmung": {
+      "text": "Die Aufbewahrungsfrist läuft jedoch nicht ab, soweit und solange die Unterlagen für Steuern von Bedeutung sind, für welche die Festsetzungsfrist noch nicht abgelaufen ist; § 169 Absatz 2 Satz 2 AO gilt nicht.",
+      "fundstelle": "§ 147 Abs. 3 AO, letzter Satz (die Satznummer 5 aus der Anfrage wurde nicht amtlich geprüft)",
+      "quelle": "https://www.gesetze-im-internet.de/ao_1977/__147.html",
+      "verifiziert": false,
+      "unsicher": true,
+      "bestaetigung_sinngemaess": {
+        "text": "Die Fristen enden nicht, solange die Unterlagen für Steuern von Bedeutung sind (z. B. laufende Rechtsbehelfsverfahren oder Betriebsprüfungen).",
+        "quelle": "https://finanzen.hessen.de/sites/finanzen.hessen.de/files/2026-04/steuerwegweiser_fuer_existenzgruender-stand_april_2026.pdf",
+        "verifiziert": true
+      }
+    },
+    "weitere_fristen_personal": [
+      {"unterlage": "Lohnkonto", "frist": "bis zum Ablauf des sechsten Kalenderjahres, das auf die zuletzt eingetragene Lohnzahlung folgt (§ 41 Abs. 1 Satz 9 EStG)", "quelle": "https://www.gesetze-im-internet.de/estg/__41.html", "verifiziert": false, "unsicher": true},
+      {"unterlage": "Arbeitszeitaufzeichnungen nach § 17 MiLoG", "frist": "mindestens zwei Jahre", "quelle": "https://www.zoll.de/DE/Fachthemen/Arbeit/Mindestarbeitsbedingungen/Sonstige-Pflichten/sonstige-pflichten_node.html", "verifiziert": true},
+      {"unterlage": "Aufzeichnungen über Arbeitszeit über 8 Stunden werktäglich (§ 16 Abs. 2 ArbZG)", "frist": "mindestens zwei Jahre", "quelle": "https://www.gesetze-im-internet.de/arbzg/__16.html", "verifiziert": false, "unsicher": true}
+    ]
+  },
+
+  "gobd": {
+    "bmf_grundlage": {
+      "text": "GoBD, BMF-Schreiben vom 28.11.2019 (BStBl I S. 1269), geändert durch BMF-Schreiben vom 11.03.2024 (GZ IV D 2 - S 0316/21/10001 :002, gültig ab 01.04.2024) und durch das BMF-Schreiben '2. Änderung' vom 14.07.2025",
+      "quelle": [
+        "https://www.lfst.bayern.de/fileadmin/RESSOURCEN/INFORMATIONEN/Steuerinfos/Weitere_Themen/Aussenpruefung/2024-03-11-aenderung-gobd.pdf",
+        "https://www.bundesfinanzministerium.de/Content/DE/Downloads/BMF_Schreiben/Weitere_Steuerthemen/Abgabenordnung/2025-07-14-GoBD-2-aenderung.pdf?__blob=publicationFile&v=4"
+      ],
+      "verifiziert": true,
+      "hinweis": "Das Schreiben vom 11.03.2024 wurde abgerufen; das vom 14.07.2025 ist nur als Suchtreffer auf der BMF-Seite belegt (Inhalt nicht abgerufen)."
+    },
+    "verfahrensdokumentation_rz151ff": {
+      "quelle": "https://www.bundesfinanzministerium.de/Content/DE/Downloads/BMF_Schreiben/Weitere_Steuerthemen/Abgabenordnung/AO-Anwendungserlass/2024-03-11-aenderung-gobd.pdf?__blob=publicationFile&v=3",
+      "verifiziert": false,
+      "unsicher": true,
+      "hinweis": "Rz. 151–155 standen in keiner abrufbaren Quelle. Inhalt aus Fachwissen. Bestätigt sind nur die Querverweise: Rz. 102 (die Beschreibung des IKS gehört zur Verfahrensdokumentation) und Rz. 106 (die Beschreibung der Datensicherung gehört zur Verfahrensdokumentation).",
+      "inhalt": {
+        "rz151": "Für jedes DV-System muss eine übersichtlich gegliederte Verfahrensdokumentation vorhanden sein, aus der Inhalt, Aufbau, Ablauf und Ergebnisse des DV-Verfahrens vollständig und schlüssig ersichtlich sind.",
+        "rz152": "Die Verfahrensdokumentation beschreibt den organisatorisch und technisch gewollten Prozess, bei elektronischen Dokumenten von der Entstehung der Informationen über die Indizierung, Verarbeitung und Speicherung, das eindeutige Wiederfinden und die maschinelle Auswertbarkeit, die Absicherung gegen Verlust und Verfälschung bis zur Reproduktion.",
+        "rz153_bestandteile": [
+          "allgemeine Beschreibung",
+          "Anwenderdokumentation",
+          "technische Systemdokumentation",
+          "Betriebsdokumentation"
+        ],
+        "rz154": "Für die Verfahrensdokumentation gilt die Aufbewahrungsfrist nach § 147 Abs. 3 AO (als Organisationsunterlage 10 Jahre); Änderungen sind zu historisieren (Versionierung).",
+        "rz155": "Ihr Umfang richtet sich nach Komplexität und Diversifikation der Geschäftstätigkeit und der Organisationsstruktur sowie nach dem eingesetzten DV-System."
+      },
+      "querverweise_verifiziert": {
+        "rz102": "Die Beschreibung des IKS ist Bestandteil der Verfahrensdokumentation.",
+        "rz106": "Die Beschreibung der Vorgehensweise zur Datensicherung ist Bestandteil der Verfahrensdokumentation.",
+        "quelle": "https://www.elo.com/files/public/images/blog/2024-11-03_gobd-konsolidierte-fassung-mit-aenderungen.pdf",
+        "quelle_hinweis": "Konsolidierte Fassung des BMF-Textes von einem Softwareanbieter (Sekundärquelle, wortgleich mit dem BMF-Text)"
+      }
+    },
+    "muster_awv_belegablage": {
+      "titel": "Muster-Verfahrensdokumentation zur Belegablage",
+      "herausgeber": "AWV – Arbeitsgemeinschaft für wirtschaftliche Verwaltung e. V. (Eschborn)",
+      "version": "V1.0, Stand 19.10.2015",
+      "quelle": "https://www.psp.eu/assets/pdfs/belegablage_v1_20151026.pdf",
+      "quelle_hinweis": "Abgerufene Kopie des AWV-Originals (https://www.awv-net.de); Word-Vorlage auch bei der HWK Dortmund: https://www.hwk-do.de/wp-content/uploads/2024/04/Belegablage_V1_20151026_Vorlage.doc",
+      "verifiziert": true,
+      "gliederung": [
+        "1 Vorbemerkungen zur Verfahrensdokumentation",
+        "2 Zielsetzung und Überblick",
+        "2.1 Zielsetzung und Anwendungsbereich",
+        "2.2 Unternehmen und organisatorisches Umfeld",
+        "2.3 Rechtliche Grundlagen",
+        "2.4 Relevante Unterlagen mit Belegfunktion",
+        "2.5 Einweisung in die Belegablage",
+        "2.6 Abgrenzung der Bearbeitungsbereiche",
+        "3 Organisation und Sicherheit",
+        "3.1 Eingesetzte Hard- und Software",
+        "3.2 Zuständigkeiten",
+        "3.3 Organisation und Internes Kontrollsystem (IKS)",
+        "3.4 Datenschutz",
+        "4 Verfahren und Maßnahmen",
+        "4.1 Belege, die originär in Papierform vorliegen bzw. empfangen werden",
+        "4.1.1 Posteingang und Vorsortierung",
+        "4.1.2 Identifikation der Belege (Unterlagen mit Belegfunktion) mit Prüfung auf Echtheit",
+        "4.1.3 Erstellung von Ausgangs- und Eigenbelegen",
+        "4.1.4 Ablage der Belege in der vorgesehenen Ordnung",
+        "4.1.5 Turnus der Belegsicherung durch geordnete Ablage",
+        "4.1.6 Maßnahmen zur Sicherung der Belege gegen Verlust, Änderung und Untergang",
+        "4.1.7 Aufbereitung der Belege für die weitere Bearbeitung (insb. Buchung)",
+        "4.1.8 Weitergabe und/oder Entgegennahme/Rücknahme von Belegen an bzw. von Dritte(n) für Zwecke der Aufbereitung, Buchung und/oder Archivierung",
+        "4.1.9 Archivierung der Belege nach der Erfassung in Grund(buch)aufzeichnungen oder Buchungen bzw. sonstigen Aufzeichnungen",
+        "4.1.10 Vernichtung der Papierbelege",
+        "4.2 Belege, die originär in Papierform vorliegen bzw. empfangen werden und gescannt (digitalisiert) werden",
+        "4.2.1 Posteingang und Vorsortierung",
+        "4.2.2 Identifikation der Belege (Unterlagen mit Belegfunktion) mit Prüfung auf Echtheit",
+        "4.2.3 Erstellung von Ausgangs- und Eigenbelegen",
+        "4.2.4 Vorbereitung der zu digitalisierenden Dokumente (technische Prüfung)",
+        "4.2.5 Digitalisierung",
+        "4.2.6 Vollständigkeits-/Lesbarkeits- und Plausibilitätskontrolle",
+        "4.2.7 Ablage der Papierbelege in der vorgesehenen Ordnung",
+        "4.2.8 Ablage der digitalisierten Belege in der vorgesehenen Ordnung",
+        "4.2.9 Turnus der Belegsicherung durch geordnete Ablage",
+        "4.2.10 Maßnahmen zur Sicherung der Belege gegen Verlust, Änderung und Untergang",
+        "4.2.11 Aufbereitung der Belege für die weitere Bearbeitung (insb. Buchung)",
+        "4.2.12 Weitergabe und/oder Entgegennahme/Rücknahme von Belegen an bzw. von Dritte(n) für Zwecke der Aufbereitung, Buchung und/oder Archivierung",
+        "4.2.13 Archivierung der Belege nach der Erfassung in Grund(buch)aufzeichnungen oder Buchungen bzw. sonstigen Aufzeichnungen",
+        "4.2.14 Vernichtung der Papierbelege und der digitalisierten Belege",
+        "4.3 Belege, die in originär digitaler Form vorliegen bzw. empfangen werden",
+        "4.3.1 Posteingang und Vorsortierung",
+        "4.3.2 Identifikation der Belege (Unterlagen mit Belegfunktion) mit Prüfung auf Echtheit",
+        "4.3.3 Erstellung von Ausgangs- und Eigenbelegen",
+        "4.3.4 Ablage der Belege in der vorgesehenen Ordnung",
+        "4.3.5 Turnus der Belegsicherung durch geordnete Ablage",
+        "4.3.6 Maßnahmen zur Sicherung der Belege gegen Verlust, Änderung und Untergang",
+        "4.3.7 Aufbereitung der Belege für die weitere Bearbeitung (insb. Buchung)",
+        "4.3.8 Weitergabe und/oder Entgegennahme/Rücknahme von Belegen an bzw. von Dritte(n) für Zwecke der Aufbereitung, Buchung und/oder Archivierung",
+        "4.3.9 Archivierung der Belege nach der Erfassung in Grund(buch)aufzeichnungen oder Buchungen bzw. sonstigen Aufzeichnungen",
+        "4.3.10 Vernichtung der digitalen Belege",
+        "5 Mitgeltende Unterlagen",
+        "6 Änderungshistorie",
+        "7 Glossar"
+      ]
+    },
+    "muster_bstbk_dstv_ersetzendes_scannen": {
+      "titel": "Muster-Verfahrensdokumentation zur Digitalisierung und elektronischen Aufbewahrung von Belegen inkl. Vernichtung der Papierbelege",
+      "herausgeber": "Bundessteuerberaterkammer (BStBK) und Deutscher Steuerberaterverband e. V. (DStV)",
+      "version": "Stand März 2014",
+      "quelle": "https://dstv.de/download/gemeinsame-verfahrensbeschreibung",
+      "verifiziert": true,
+      "hinweis": "Die Anfrage nennt AWV/DStV; tatsächlich ist das Scan-Muster von BStBK/DStV, das Belegablage-Muster von der AWV. Eine neuere Fassung (z. B. mit Berücksichtigung von TR-RESISCAN) wurde nicht gefunden.",
+      "gliederung": [
+        "0 Hinweise zur Muster-Verfahrensdokumentation",
+        "0.1 Hinweise zum Inhalt und zur Anwendung des Musters",
+        "0.2 Besonderheiten bei der Beteiligung Dritter",
+        "0.3 Weiterführende Hinweise",
+        "1 Vorbemerkungen zur Verfahrensdokumentation",
+        "2 Zielsetzung und Überblick",
+        "2.1 Zielsetzung und Anwendungsbereich",
+        "2.2 Unternehmen und organisatorisches Umfeld",
+        "2.3 Rechtliche Grundlagen",
+        "2.4 Relevante Dokumente",
+        "2.5 Einweisung in die Digitalisierungsverfahren",
+        "2.6 Abgrenzung der Bearbeitungsbereiche",
+        "3 Organisation und Sicherheit des IT-gestützten Verfahrens",
+        "3.1 Eingesetzte Hard- und Software",
+        "3.2 Zuständigkeiten",
+        "3.3 Organisation und Internes Kontrollsystem",
+        "3.4 Datenschutz",
+        "4 Verfahren und Maßnahmen",
+        "4.1 Posteingang und Vorsortierung mit Prüfung auf Echtheit",
+        "4.2 Identifikation der zu scannenden Belege (rechtliche bzw. faktische Prüfung)",
+        "4.3 Vorbereitung der zu digitalisierenden Dokumente (technische Prüfung)",
+        "4.4 Digitalisierung",
+        "4.5 Vollständigkeits-/Lesbarkeits- und Plausibilitätskontrolle",
+        "4.6 Nachverarbeitung und Archivierung mit Integritätssicherung",
+        "4.7 Vernichtung der digitalisierten Papierbelege",
+        "4.8 Löschung der digitalen Archivbestände nicht vor Ablauf der Aufbewahrungsfrist",
+        "5 Mitgeltende Unterlagen",
+        "6 Änderungshistorie",
+        "7 Glossar"
+      ]
+    },
+    "auswahloptionen": {
+      "hinweis": "Redaktionelle Auswahllisten für das Formular, abgeleitet aus den Gliederungspunkten der Muster (Belegarten 4.1/4.2/4.3, Belegsicherung, Weitergabe an Dritte). Sie sind keine Rechtsvorgabe; die konkreten Werte (z. B. Sicherungsintervalle) schreibt die GoBD nicht vor.",
+      "quelle": ["https://www.psp.eu/assets/pdfs/belegablage_v1_20151026.pdf", "https://dstv.de/download/gemeinsame-verfahrensbeschreibung"],
+      "belegeingang": ["Papier (Post/persönlich)", "E-Mail mit PDF-Anhang", "Download aus Kunden-/Lieferantenportal", "E-Rechnung (XRechnung/ZUGFeRD) per E-Mail oder Portal", "Kassensystem/Kassenbericht", "Kontoauszug/Bank-Schnittstelle", "Eigenbeleg"],
+      "belegart_nach_muster": ["originär Papier, Ablage in Papier (Muster 4.1)", "originär Papier, wird gescannt (ersetzendes Scannen, Muster 4.2)", "originär digital (Muster 4.3)"],
+      "ablage": ["Papierordner (chronologisch/nach Belegart)", "Dokumentenmanagementsystem (DMS)", "Buchhaltungssoftware mit Belegarchiv", "Upload an Steuerberater (z. B. Kanzlei-Portal)", "Cloud-Speicher"],
+      "papiervernichtung_nach_scan": ["Papier wird nach dem Scannen vernichtet", "Papier wird zusätzlich aufbewahrt", "Papier wird nur bei Belegen mit Originalpflicht aufbewahrt"],
+      "datensicherung_intervall": ["täglich", "wöchentlich", "monatlich"],
+      "datensicherung_ort": ["externer Datenträger (Festplatte/NAS) außerhalb der Betriebsräume", "Cloud-Backup", "durch Softwareanbieter/Rechenzentrum", "durch Steuerberater"],
+      "e_rechnung_hinweis": {
+        "text": "Bei E-Rechnungen muss der strukturierte Teil unveränderbar in seiner ursprünglichen Form aufbewahrt werden.",
+        "quelle": "https://www.finanzamt.nrw.de/steuerinfos/unternehmen/umsatzsteuer/ordnungsgemaesse-rechnungen",
+        "verifiziert": true
+      }
+    }
+  },
+
+  "kassen": {
+    "mitteilung_146a_abs4_ao": {
+      "quelle": "https://www.gesetze-im-internet.de/ao_1977/__146a.html",
+      "verifiziert": false,
+      "unsicher": true,
+      "hinweis": "Wortlaut der Liste aus Fachwissen. Bestätigt sind: Anschaffung und Außerbetriebnahme sind mitzuteilen (LfSt Bayern); eine Mitteilung je Betriebsstätte mit allen Systemen (Bruttomethode), höchstens 1.000 Systeme je Formular (ELSTER); Fristen (Finanzämter BW).",
+      "einleitung": "Wer aufzeichnungspflichtige Geschäftsvorfälle oder andere Vorgänge mit Hilfe eines elektronischen Aufzeichnungssystems im Sinne des Absatzes 1 Satz 1 erfasst, hat dem zuständigen Finanzamt nach amtlich vorgeschriebenem Vordruck mitzuteilen:",
+      "angaben": [
+        {"nr": 1, "text": "den Namen und die Steuernummer des Steuerpflichtigen"},
+        {"nr": 2, "text": "die Art der zertifizierten technischen Sicherheitseinrichtung"},
+        {"nr": 3, "text": "die Art des verwendeten elektronischen Aufzeichnungssystems"},
+        {"nr": 4, "text": "die Anzahl der verwendeten elektronischen Aufzeichnungssysteme"},
+        {"nr": 5, "text": "die Seriennummer des verwendeten elektronischen Aufzeichnungssystems"},
+        {"nr": 6, "text": "das Datum der Anschaffung des verwendeten elektronischen Aufzeichnungssystems"},
+        {"nr": 7, "text": "das Datum der Außerbetriebnahme des verwendeten elektronischen Aufzeichnungssystems"}
+      ],
+      "zusatzfelder_ausfuellanleitung_unsicher": ["Betriebsstätte (Anschrift, ggf. Bezeichnung)", "Software und Softwareversion", "Seriennummer der TSE", "BSI-Zertifizierungs-ID der TSE", "Grund der Außerbetriebnahme"],
+      "zusatzfelder_quelle": "https://www.bundesfinanzministerium.de/Content/DE/Downloads/Steuern/FAQ-Ausfuellanleitung.pdf?__blob=publicationFile&v=2 (Ausfüllanleitung, Stand 02.12.2024; nicht abrufbar)",
+      "verfahren": {
+        "text": "Die Mitteilung erfolgt elektronisch über ELSTER (Formular 'Mitteilung über elektronische Aufzeichnungssysteme (§ 146a Absatz 4 AO)'). Pro Betriebsstätte eine Mitteilung mit allen Systemen dieser Betriebsstätte; bei Anschaffung, Außerbetriebnahme oder Wechsel der Betriebsstätte ist die Mitteilung zu aktualisieren.",
+        "quelle": ["https://www.elster.de/eportal/formulare-leistungen/alleformulare/aufzeichnung146a", "https://finanzamt-bw.fv-bwl.de/,Lde/5217465_5283529_6218645_6218865_6218901_22792103"],
+        "verifiziert": true
+      },
+      "fristen": {
+        "text": "Vor dem 01.07.2025 angeschaffte Systeme waren bis spätestens 31.07.2025 mitzuteilen. Ab dem 01.07.2025 angeschaffte Systeme sind innerhalb eines Monats nach Anschaffung mitzuteilen (Außerbetriebnahme ebenfalls innerhalb eines Monats). Grundlage ist das BMF-Schreiben vom 28.06.2024.",
+        "quelle": "https://finanzamt-bw.fv-bwl.de/,Lde/5217465_5283529_6218645_6218865_6218901_22792103",
+        "verifiziert": true,
+        "unsicher_teil": "Die Monatsfrist bei Außerbetriebnahme stammt aus Fachwissen"
+      }
+    },
+    "arten_elektronischer_aufzeichnungssysteme": {
+      "quelle": "https://finanzamt-bw.fv-bwl.de/,Lde/5217465_5283529_6218645_6218865_6218901_22792103",
+      "quelle_bmf": "BMF-Schreiben vom 28.06.2024 zum Beginn der Mitteilungsverpflichtung: https://www.bundesfinanzministerium.de/Content/DE/Downloads/BMF_Schreiben/Weitere_Steuerthemen/Abgabenordnung/2024-06-28-mitteilungsverpflichtung-nach-AO.pdf?__blob=publicationFile&v=7 (nicht abrufbar)",
+      "verifiziert": true,
+      "liste": [
+        "Computergestützte Kassensysteme / PC-Kassensysteme",
+        "Tablet-/App-Kassensysteme",
+        "Elektronische Registrierkassen",
+        "Taxameter",
+        "Wegstreckenzähler"
+      ],
+      "hinweis": "Die Systeme sind in der Kassensicherungsverordnung abschließend aufgeführt. Für Kassensysteme gilt die TSE-Pflicht seit 01.01.2020, für Taxameter und Wegstreckenzähler seit 01.01.2024 (Nichtbeanstandung bis 31.12.2025).",
+      "hinweis_quelle": "https://www.lfst.bayern.de/steuerinfos/weitere-themen/elektronische-aufzeichnungssysteme-zb-kassensysteme",
+      "art_tse_optionen_unsicher": ["USB-TSE", "SD-/microSD-TSE", "Cloud-TSE", "Hardware-TSE im Gerät integriert"]
+    },
+    "offene_ladenkasse": {
+      "text": "Ohne elektronisches System müssen bare Zahlungen täglich aufgezeichnet werden, z. B. in einem Kassenbuch.",
+      "quelle": "https://finanzen.hessen.de/sites/finanzen.hessen.de/files/2026-04/steuerwegweiser_fuer_existenzgruender-stand_april_2026.pdf",
+      "verifiziert": true
+    },
+    "geplante_aenderung_2028": {
+      "text": "Gesetzentwurf (Kabinett 23.09.2026): Kassenpflicht ab 2028 bei einem jährlichen Gesamtumsatz von 100.000 Euro, ausgenommen Barumsätze unter 12.000 Euro; digitale Belege statt Papierbon, Papier nur auf Kundenwunsch. Noch kein geltendes Recht.",
+      "quelle": "https://www.bundesregierung.de/breg-de/aktuelles/abschaffung-bonpflicht-2453568",
+      "verifiziert": true
+    }
+  },
+
+  "nachweisgesetz": {
+    "quelle": "https://www.gesetze-im-internet.de/nachwg/__2.html",
+    "rechtsstand": "Fassung seit 01.08.2022 (Arbeitsbedingungenrichtlinie), Form geändert durch BEG IV mit Wirkung zum 01.01.2025",
+    "verifiziert": false,
+    "unsicher": true,
+    "hinweis": "Wortlaut der Nr. 1–15 aus Fachwissen, inhaltlich nah am Gesetz. Gegen den amtlichen Text prüfen, bevor er in Verträge übernommen wird.",
+    "satz1_einleitung": "Der Arbeitgeber hat die wesentlichen Vertragsbedingungen des Arbeitsverhältnisses innerhalb der Fristen des Satzes 4 schriftlich niederzulegen, die Niederschrift zu unterzeichnen und dem Arbeitnehmer auszuhändigen. In die Niederschrift sind mindestens aufzunehmen:",
+    "angaben": [
+      {"nr": 1, "text": "der Name und die Anschrift der Vertragsparteien"},
+      {"nr": 2, "text": "der Zeitpunkt des Beginns des Arbeitsverhältnisses"},
+      {"nr": 3, "text": "bei befristeten Arbeitsverhältnissen: das Enddatum oder die vorhersehbare Dauer des Arbeitsverhältnisses"},
+      {"nr": 4, "text": "der Arbeitsort oder, falls der Arbeitnehmer nicht nur an einem bestimmten Arbeitsort tätig sein soll, ein Hinweis darauf, dass der Arbeitnehmer an verschiedenen Orten beschäftigt werden oder seinen Arbeitsort frei wählen kann"},
+      {"nr": 5, "text": "eine kurze Charakterisierung oder Beschreibung der vom Arbeitnehmer zu leistenden Tätigkeit"},
+      {"nr": 6, "text": "sofern vereinbart, die Dauer der Probezeit"},
+      {"nr": 7, "text": "die Zusammensetzung und die Höhe des Arbeitsentgelts einschließlich der Vergütung von Überstunden, der Zuschläge, der Zulagen, Prämien und Sonderzahlungen sowie anderer Bestandteile des Arbeitsentgelts, die jeweils getrennt anzugeben sind, und deren Fälligkeit sowie die Art der Auszahlung"},
+      {"nr": 8, "text": "die vereinbarte Arbeitszeit, vereinbarte Ruhepausen und Ruhezeiten sowie bei vereinbarter Schichtarbeit das Schichtsystem, der Schichtrhythmus und Voraussetzungen für Schichtänderungen"},
+      {"nr": 9, "text": "bei Arbeit auf Abruf nach § 12 des Teilzeit- und Befristungsgesetzes: a) die Vereinbarung, dass der Arbeitnehmer seine Arbeitsleistung entsprechend dem Arbeitsanfall zu erbringen hat, b) die Zahl der mindestens zu vergütenden Stunden, c) der Zeitrahmen, bestimmt durch Referenztage und Referenzstunden, der für die Erbringung der Arbeitsleistung festgelegt ist, und d) die Frist, innerhalb derer der Arbeitgeber die Lage der Arbeitszeit im Voraus mitzuteilen hat"},
+      {"nr": 10, "text": "sofern vereinbart, die Möglichkeit der Anordnung von Überstunden und deren Voraussetzungen"},
+      {"nr": 11, "text": "die Dauer des jährlichen Erholungsurlaubs"},
+      {"nr": 12, "text": "ein etwaiger Anspruch auf vom Arbeitgeber bereitgestellte Fortbildung"},
+      {"nr": 13, "text": "wenn der Arbeitgeber dem Arbeitnehmer eine betriebliche Altersversorgung über einen Versorgungsträger zusagt, der Name und die Anschrift dieses Versorgungsträgers; die Nachweispflicht entfällt, wenn der Versorgungsträger zu dieser Information verpflichtet ist"},
+      {"nr": 14, "text": "das bei der Kündigung des Arbeitsverhältnisses von Arbeitgeber und Arbeitnehmer einzuhaltende Verfahren, mindestens das Schriftformerfordernis und die Fristen für die Kündigung des Arbeitsverhältnisses, sowie die Frist zur Erhebung einer Kündigungsschutzklage; § 7 des Kündigungsschutzgesetzes ist auch bei einem nicht ordnungsgemäßen Nachweis der Frist zur Erhebung einer Kündigungsschutzklage anzuwenden"},
+      {"nr": 15, "text": "ein in allgemeiner Form gehaltener Hinweis auf die auf das Arbeitsverhältnis anwendbaren Tarifverträge, Betriebs- oder Dienstvereinbarungen sowie Regelungen paritätisch besetzter Kommissionen, die auf der Grundlage kirchlichen Rechts Arbeitsbedingungen für den Bereich kirchlicher Arbeitgeber festlegen"}
+    ],
+    "fristen_satz4": {
+      "text": "Spätestens am ersten Tag der Arbeitsleistung: Nr. 1, 7 und 8. Spätestens am siebten Kalendertag nach dem vereinbarten Beginn: Nr. 2 bis 6, 9 und 10. Die übrigen Angaben spätestens einen Monat nach dem vereinbarten Beginn.",
+      "verifiziert": false,
+      "unsicher": true
+    },
+    "textform_seit_2025": {
+      "bestaetigt": "Seit 01.01.2025 ist im Nachweisgesetz die Textform möglich, mit einer Ausnahme für bestimmte Wirtschaftsbereiche (§ 2a SchwarzArbG). Der Arbeitnehmer kann einen Nachweis verlangen. Das zeigt die Themenübersicht des BMAS, die Einzelheiten aber nicht nennt.",
+      "bestaetigt_quelle": "https://www.bmas.de/DE/Service/Gesetze-und-Gesetzesvorhaben/nachweisgesetz.html",
+      "bestaetigt_verifiziert": true,
+      "bundestag_hinweis": "Laut Bundestag ist der Nachweis in Textform möglich, wenn der Arbeitgeber einen Übermittlungs- oder Empfangsnachweis erhält (Gegenäußerung der Bundesregierung). Der Rechtsausschuss hat den Entwurf vor der Verabschiedung am 26.09.2024 'erheblich' geändert.",
+      "bundestag_quelle": "https://www.bundestag.de/dokumente/textarchiv/2024/kw39-de-buerokratieentlastungsgesetz-1017656",
+      "regelung_nach_fachwissen": {
+        "text": "Die wesentlichen Vertragsbedingungen können dem Arbeitnehmer auch in Textform übermittelt werden. Voraussetzung: Das Dokument ist für den Arbeitnehmer zugänglich, kann gespeichert und ausgedruckt werden, und der Arbeitgeber fordert den Arbeitnehmer bei der Übermittlung auf, einen Empfangsnachweis zu erteilen. Das gilt nicht für Arbeitnehmer in Wirtschaftsbereichen nach § 2a Abs. 1 SchwarzArbG (u. a. Bau, Gastronomie/Beherbergung, Friseur- und Kosmetikgewerbe); für sie bleibt die Schriftform Pflicht. Auf Verlangen des Arbeitnehmers muss der Arbeitgeber den Nachweis unverzüglich schriftlich erteilen. Ein elektronisch nach § 126a BGB geschlossener Arbeitsvertrag in ausdruckbarem Format erfüllt ebenfalls die Nachweispflicht (§ 2 Abs. 5 NachwG).",
+        "verifiziert": false,
+        "unsicher": true,
+        "teilweise_belegt": "Die Regel zum elektronisch geschlossenen Vertrag (§ 2 Abs. 5) und ihre Nichtanwendung auf § 2a-SchwarzArbG-Branchen sind im Regierungsentwurf BT-Drs. 20/11306 (Art. 44) bestätigt: https://dserver.bundestag.de/btd/20/113/2011306.pdf"
+      },
+      "praxis_fuer_app": "Friseur- und Gastronomiebetriebe (Café) fallen unter § 2a SchwarzArbG. Für sie sollte die App immer eine Niederschrift zum Unterschreiben (Schriftform) erzeugen und keine reine Textform-Variante anbieten.",
+      "praxis_quelle": "https://www.zoll.de/DE/Fachthemen/Arbeit/Sozialversicherung/Anmeldung-und-Beitragspflicht/anmeldung-und-beitragspflicht_node.html"
+    },
+    "kuendigungsfristen_622_bgb": {
+      "quelle": "https://www.gesetze-im-internet.de/bgb/__622.html",
+      "verifiziert": false,
+      "unsicher": true,
+      "hinweis": "Werte aus Fachwissen (Standardwissen, sehr wahrscheinlich korrekt); BMAS-Seite ohne Fristenangaben, Broschüre nicht abrufbar.",
+      "grundkuendigungsfrist": "vier Wochen zum Fünfzehnten oder zum Ende eines Kalendermonats (§ 622 Abs. 1 BGB)",
+      "verlaengerte_fristen_arbeitgeber": [
+        {"bestand_jahre": 2, "frist": "1 Monat zum Ende eines Kalendermonats"},
+        {"bestand_jahre": 5, "frist": "2 Monate zum Ende eines Kalendermonats"},
+        {"bestand_jahre": 8, "frist": "3 Monate zum Ende eines Kalendermonats"},
+        {"bestand_jahre": 10, "frist": "4 Monate zum Ende eines Kalendermonats"},
+        {"bestand_jahre": 12, "frist": "5 Monate zum Ende eines Kalendermonats"},
+        {"bestand_jahre": 15, "frist": "6 Monate zum Ende eines Kalendermonats"},
+        {"bestand_jahre": 20, "frist": "7 Monate zum Ende eines Kalendermonats"}
+      ],
+      "verlaengerte_fristen_hinweis": "Die Verlängerung nach § 622 Abs. 2 gilt nur für Kündigungen durch den Arbeitgeber.",
+      "probezeit": "Während einer vereinbarten Probezeit, längstens für die Dauer von sechs Monaten, kann mit einer Frist von zwei Wochen gekündigt werden (§ 622 Abs. 3 BGB).",
+      "kleinbetrieb": "In Betrieben mit in der Regel nicht mehr als 20 Arbeitnehmern (ohne Auszubildende) kann einzelvertraglich eine Frist von vier Wochen ohne festen Endtermin vereinbart werden (§ 622 Abs. 5 Satz 1 Nr. 2 BGB).",
+      "schriftform": {"text": "Die Kündigung muss schriftlich erfolgen (§ 623 BGB; elektronische Form ausgeschlossen).", "quelle": "https://www.bmas.de/DE/Arbeit/Arbeitsrecht/Arbeitnehmerrechte/Kuendigungsschutz/kuendigungsschutz.html", "verifiziert": true, "unsicher_teil": "Ausschluss der elektronischen Form aus Fachwissen"}
+    },
+    "klagefrist_4_kschg": {
+      "text": "Kündigungsschutzklage innerhalb von drei Wochen nach Zugang der schriftlichen Kündigung; wird die Frist versäumt, gilt die Kündigung als von Anfang an wirksam (§ 7 KSchG).",
+      "kleinbetrieb": "Das KSchG gilt in Betrieben mit mehr als zehn Arbeitnehmenden.",
+      "quelle": ["https://www.bmas.de/DE/Arbeit/Arbeitsrecht/Arbeitnehmerrechte/Kuendigungsschutz/kuendigungsschutz.html", "https://www.gesetze-im-internet.de/kschg/__4.html"],
+      "verifiziert": true
+    },
+    "mindesturlaub_3_burlg": {
+      "text": "Mindestens 24 Werktage im Jahr; als Werktage gelten alle Kalendertage, die nicht Sonn- oder gesetzliche Feiertage sind (Basis Sechs-Tage-Woche). Bei einer Fünf-Tage-Woche entspricht das 20 Arbeitstagen.",
+      "umrechnungsformel": "24 Werktage / 6 × Arbeitstage pro Woche (z. B. 3-Tage-Woche = 12 Urlaubstage)",
+      "umrechnungsformel_unsicher": true,
+      "quelle": ["https://www.bmas.de/DE/Service/Gesetze-und-Gesetzesvorhaben/bundesurlaubsgesetz.html", "https://www.gesetze-im-internet.de/burlg/__3.html"],
+      "verifiziert": true
+    },
+    "hoechstarbeitszeit_3_arbzg": {
+      "text": "Die werktägliche Arbeitszeit darf acht Stunden nicht überschreiten. Sie kann auf bis zu zehn Stunden verlängert werden, wenn innerhalb von sechs Kalendermonaten oder 24 Wochen im Durchschnitt acht Stunden werktäglich nicht überschritten werden. Bei einer Sechs-Tage-Woche ergibt das 48 Stunden pro Woche (mit Ausgleich höchstens 60).",
+      "quelle": ["https://www.bundestag.de/resource/blob/1178170/WD-6-010-26.pdf", "https://www.gesetze-im-internet.de/arbzg/__3.html"],
+      "verifiziert": true,
+      "stand": "ArbZG zuletzt geändert durch Art. 52 des Gesetzes vom 23.10.2024 (Stand WD-Gutachten 07.04.2026); bis 09.09.2026 keine beschlossene Reform"
+    },
+    "ruhepausen_4_arbzg": {
+      "text": "Die Arbeit ist durch im Voraus feststehende Ruhepausen zu unterbrechen: mindestens 30 Minuten bei einer Arbeitszeit von mehr als sechs bis zu neun Stunden, 45 Minuten bei mehr als neun Stunden. Die Pausen können in Abschnitte von jeweils mindestens 15 Minuten aufgeteilt werden. Länger als sechs Stunden hintereinander dürfen Arbeitnehmer nicht ohne Ruhepause beschäftigt werden.",
+      "quelle": "https://www.gesetze-im-internet.de/arbzg/__4.html",
+      "verifiziert": false,
+      "unsicher": true
+    },
+    "ruhezeit_5_arbzg": {
+      "text": "Nach Beendigung der täglichen Arbeitszeit ist eine ununterbrochene Ruhezeit von mindestens elf Stunden einzuhalten. In Gaststätten und anderen Einrichtungen zur Bewirtung und Beherbergung kann sie um bis zu eine Stunde verkürzt werden, wenn die Verkürzung innerhalb eines Kalendermonats oder innerhalb von vier Wochen durch Verlängerung einer anderen Ruhezeit auf mindestens zwölf Stunden ausgeglichen wird (§ 5 Abs. 2 ArbZG).",
+      "quelle": "https://www.gesetze-im-internet.de/arbzg/__5.html",
+      "verifiziert": false,
+      "unsicher": true
+    }
+  },
+
+  "mindestlohn_minijob": {
+    "mindestlohn": [
+      {"ab": "2026-01-01", "betrag_brutto_je_stunde": 13.90, "rechtsgrundlage": "Fünfte Mindestlohnanpassungsverordnung (MiLoV5)", "quelle": ["https://www.bundesregierung.de/breg-de/aktuelles/mindestlohn-steigt-2391010", "https://www.minijob-zentrale.de/DE/01_minijobs/02_gewerblich/01_grundlagen/04_arbeitsrecht/02_mindestlohn/node.html"], "verifiziert": true},
+      {"ab": "2027-01-01", "betrag_brutto_je_stunde": 14.60, "status": "per Verordnung festgelegt (zweite Stufe der MiLoV5)", "quelle": "https://www.bundesregierung.de/breg-de/aktuelles/mindestlohn-steigt-2391010", "verifiziert": true, "unsicher_teil": "DRV schreibt 'geplant'; Bundesregierung: 'wird ... steigen'. Dass die Verordnung beide Stufen enthält, stammt aus Fachwissen"}
+    ],
+    "minijob_verdienstgrenze": [
+      {"ab": "2026-01-01", "betrag_monatlich": 603, "quelle": ["https://www.bundesregierung.de/breg-de/aktuelles/mindestlohn-steigt-2391010", "https://www.deutsche-rentenversicherung.de/BadenWuerttemberg/DE/Presse/Pressemitteilungen/2025/251222_Minijob.html"], "verifiziert": true},
+      {"ab": "2027-01-01", "betrag_monatlich": 633, "quelle": "https://www.bundesregierung.de/breg-de/aktuelles/mindestlohn-steigt-2391010", "verifiziert": true}
+    ],
+    "minijob_hinweis": {"text": "Seit Oktober 2022 ist die Verdienstgrenze dynamisch an den Mindestlohn gekoppelt (rund zehn Wochenstunden zum Mindestlohn).", "quelle": "https://www.deutsche-rentenversicherung.de/BadenWuerttemberg/DE/Presse/Pressemitteilungen/2025/251222_Minijob.html", "verifiziert": true},
+    "aufzeichnungspflicht_17_milog": {
+      "inhalt": "Beginn, Ende und Dauer der täglichen Arbeitszeit (Pausen sind herauszurechnen; Lage und Dauer der einzelnen Pausen müssen nicht aufgezeichnet werden).",
+      "frist": "spätestens bis zum Ablauf des siebten auf den Tag der Arbeitsleistung folgenden Kalendertages",
+      "aufbewahrung": "mindestens zwei Jahre",
+      "form": "maschinell oder handschriftlich",
+      "betroffene": [
+        "geringfügig Beschäftigte (Minijob) im gewerblichen Bereich (nicht Privathaushalte)",
+        "Beschäftigte in den Wirtschaftsbereichen nach § 2a SchwarzArbG"
+      ],
+      "quelle": [
+        "https://www.zoll.de/DE/Fachthemen/Arbeit/Mindestarbeitsbedingungen/Sonstige-Pflichten/sonstige-pflichten_node.html",
+        "https://www.bmas.de/DE/Arbeit/Arbeitsrecht/Mindestlohn/dokumentationspflicht.html",
+        "https://www.minijob-zentrale.de/DE/01_minijobs/02_gewerblich/01_grundlagen/04_arbeitsrecht/02_mindestlohn/node.html"
+      ],
+      "verifiziert": true,
+      "branchen_2a_schwarzarbg": {
+        "quelle": "https://www.zoll.de/DE/Fachthemen/Arbeit/Sozialversicherung/Anmeldung-und-Beitragspflicht/anmeldung-und-beitragspflicht_node.html",
+        "verifiziert": true,
+        "liste": [
+          "Baugewerbe",
+          "Gaststätten- und Beherbergungsgewerbe",
+          "Personenbeförderungsgewerbe",
+          "Speditions-, Transport- und damit verbundenes Logistikgewerbe einschließlich der plattformbasierten Lieferdienste",
+          "Schaustellergewerbe",
+          "Gebäudereinigungsgewerbe",
+          "Unternehmen, die sich am Auf- und Abbau von Messen und Ausstellungen beteiligen",
+          "Fleischwirtschaft (mit Ausnahme des Fleischerhandwerks)",
+          "Prostitutionsgewerbe",
+          "Wach- und Sicherheitsgewerbe",
+          "Friseur- und Kosmetikgewerbe"
+        ],
+        "hinweis": "Liste der Wirtschaftsbereiche mit Sofortmeldepflicht beim Zoll; § 17 MiLoG verweist auf diese Bereiche. Das Friseur- und Kosmetikgewerbe ist enthalten (Datum der Aufnahme nicht ermittelt). Ob die Forstwirtschaft (frühere Fassung) noch dazugehört, ist nicht belegt."
+      },
+      "ausnahmen_milodokv": {
+        "text": "Die Aufzeichnungspflicht entfällt, wenn das verstetigte regelmäßige Monatsentgelt 4.461 Euro brutto übersteigt, oder wenn es 2.974 Euro brutto übersteigt und der Arbeitgeber dieses Entgelt für die letzten zwölf vollen Monate nachweislich gezahlt hat. Befreit sind außerdem Ehegatten, Lebenspartner, Kinder und Eltern des Arbeitgebers. Für Pflichten nach AEntG/AÜG gelten diese Ausnahmen nicht.",
+        "quelle": "https://www.zoll.de/DE/Fachthemen/Arbeit/Mindestarbeitsbedingungen/Sonstige-Pflichten/sonstige-pflichten_node.html",
+        "verifiziert": true,
+        "hinweis": "Die Schwellenwerte sind dynamisch; Stand des Zoll-Abrufs vom 12.10.2026"
+      }
+    }
+  },
+
+  "lohnkonto": {
+    "quelle": ["https://www.gesetze-im-internet.de/estg/__41.html", "https://www.gesetze-im-internet.de/lstdv_1990/__4.html"],
+    "verifiziert": false,
+    "unsicher": true,
+    "hinweis": "Keine abrufbare amtliche Quelle für den Wortlaut gefunden. Die Liste fasst § 41 EStG / § 4 LStDV aus Fachwissen zusammen und ist vor Verwendung zu prüfen. Der Entwurf zum JStG 2026 (BT-Drs. 21/8283) sieht u. a. die Streichung von § 4 Abs. 3 Satz 1 LStDV vor; das betrifft den Rechtsstand 2026 nicht.",
+    "allgemein_41_estg": {
+      "text": "Der Arbeitgeber hat am Ort der Betriebsstätte für jeden Arbeitnehmer und jedes Kalenderjahr ein Lohnkonto zu führen. Aufbewahrung bis zum Ablauf des sechsten Kalenderjahres, das auf die zuletzt eingetragene Lohnzahlung folgt."
+    },
+    "stammdaten_4_abs1_lstdv": [
+      "Vorname, Familienname, Geburtsdatum, Wohnort und Wohnung des Arbeitnehmers",
+      "Identifikationsnummer (IdNr)",
+      "die abgerufenen elektronischen Lohnsteuerabzugsmerkmale (ELStAM): Steuerklasse, Zahl der Kinderfreibeträge, Freibetrag/Hinzurechnungsbetrag, Religionszugehörigkeit (Kirchensteuermerkmal), ggf. Faktor",
+      "Zeitraum, für den die Lohnsteuerabzugsmerkmale gelten",
+      "bei einer Bescheinigung über Lohnsteuerabzugsmerkmale bzw. Freistellungsbescheinigung nach DBA/Auslandstätigkeitserlass: Hinweis darauf und Bescheinigung zum Lohnkonto",
+      "Kennzeichnung pauschal besteuerter Minijobs/Teilzeitkräfte (§ 40a EStG) und Angaben zur Pauschalierung"
+    ],
+    "je_lohnabrechnung_4_abs2_lstdv_und_41_estg": [
+      "Tag der Lohnzahlung und Lohnzahlungszeitraum",
+      "Großbuchstabe „U“, wenn der Anspruch auf Arbeitslohn für mindestens fünf aufeinanderfolgende Arbeitstage im Wesentlichen weggefallen ist",
+      "Arbeitslohn ohne Abzug, getrennt nach Barlohn und Sachbezügen (Sachbezüge mit Art, Zeitpunkt, Wert)",
+      "einbehaltene bzw. übernommene Lohnsteuer, Solidaritätszuschlag und Kirchensteuer",
+      "steuerfreie Bezüge (mit Ausnahmen, z. B. bestimmter Trinkgelder)",
+      "Entschädigungen, Arbeitslohn für mehrere Jahre und sonstige Bezüge nach § 34 EStG sowie die davon einbehaltene Lohnsteuer",
+      "außer Ansatz bleibende Bezüge (z. B. nach DBA steuerfreier Arbeitslohn)",
+      "pauschal besteuerte Bezüge und die darauf entfallende pauschale Lohnsteuer",
+      "Lohnersatzleistungen: Kurzarbeitergeld, Zuschuss zum Mutterschaftsgeld, Entschädigungen nach dem Infektionsschutzgesetz, Aufstockungsbeträge nach dem Altersteilzeitgesetz u. a. (Progressionsvorbehalt)"
+    ]
+  },
+
+  "sv_meldung": {
+    "rechtsgrundlage": {
+      "text": "§§ 28a bis 28c SGB IV, Datenerfassungs- und -übermittlungsverordnung (DEÜV), Gemeinsame Grundsätze der Spitzenorganisationen der Sozialversicherung",
+      "quelle": "https://www.deutsche-rentenversicherung.de/SharedDocs/Downloads/DE/Fachliteratur_Kommentare_Gesetzestexte/summa_summarum/e_paper_und_broschueren/broschueren/meldungen.pdf?__blob=publicationFile&v=8",
+      "verifiziert": true,
+      "hinweis": "DRV-Broschüre 'Auf den Punkt gebracht: Meldungen', Stand 23.12.2025 (Auflage 2026, geändert 25.03.2026)"
+    },
+    "anmeldung_angaben_personalfragebogen": {
+      "quelle": "https://www.gesetze-im-internet.de/de_v/__5.html",
+      "verifiziert": false,
+      "unsicher": true,
+      "hinweis": "Datenfelder aus Fachwissen (DEÜV). Für die Sofortmeldung sind die Angaben vom Zoll bestätigt (siehe unten).",
+      "felder": [
+        "Versicherungsnummer (Rentenversicherungsnummer); falls unbekannt: Geburtsname, Geburtsdatum, Geburtsort, Geschlecht, Staatsangehörigkeit",
+        "Familienname, Vorname(n), ggf. Titel/Namenszusatz",
+        "Anschrift",
+        "Staatsangehörigkeit (Schlüssel des Statistischen Bundesamts)",
+        "Krankenkasse (Einzugsstelle; bei Minijob: Minijob-Zentrale); bei privat Versicherten die letzte gesetzliche Kasse bzw. vom Arbeitnehmer gewählte Kasse",
+        "Betriebsnummer des Arbeitgebers",
+        "Beschäftigungsbeginn",
+        "Abgabegrund (10 = Anmeldung wegen Beginn der Beschäftigung)",
+        "Personengruppenschlüssel",
+        "Beitragsgruppenschlüssel",
+        "Tätigkeitsschlüssel (9-stellig)",
+        "Mehrfachbeschäftigung ja/nein",
+        "Rechtskreis (West/Ost)",
+        "Frist: mit der ersten folgenden Entgeltabrechnung, spätestens innerhalb von sechs Wochen nach Beschäftigungsbeginn"
+      ]
+    },
+    "sofortmeldung": {
+      "text": "In den Wirtschaftsbereichen nach § 2a SchwarzArbG (u. a. Gastronomie, Friseur- und Kosmetikgewerbe, Bau) ist spätestens bei Beschäftigungsaufnahme eine Sofortmeldung an die Datenstelle der Rentenversicherung abzugeben. Inhalt: Familien- und Vorname, Versicherungsnummer, Betriebsnummer des Arbeitgebers, Tag der Beschäftigungsaufnahme; ist die Versicherungsnummer unbekannt, stattdessen Geburtstag, Geburtsort und Anschrift.",
+      "quelle": "https://www.zoll.de/DE/Fachthemen/Arbeit/Sozialversicherung/Anmeldung-und-Beitragspflicht/anmeldung-und-beitragspflicht_node.html",
+      "verifiziert": true
+    },
+    "personengruppenschluessel": {
+      "quelle": "https://www.aok.de/fk/sozialversicherung/meldung-zur-sozialversicherung/meldeschluessel-zu-personen-taetigkeiten-und-beitragsgruppen/",
+      "quelle_hinweis": "AOK (gesetzliche Krankenversicherung); Bezeichnungen sinngemäß",
+      "verifiziert": true,
+      "regel": "Grundsätzlich 101. Treffen mehrere besondere Schlüssel zu, gilt der niedrigere; 109 und 110 haben immer Vorrang.",
+      "gaengig": [
+        {"schluessel": "101", "bezeichnung": "Sozialversicherungspflichtig Beschäftigte ohne besondere Merkmale"},
+        {"schluessel": "102", "bezeichnung": "Auszubildende ohne besondere Merkmale"},
+        {"schluessel": "103", "bezeichnung": "Beschäftigte in Altersteilzeit"},
+        {"schluessel": "105", "bezeichnung": "Praktikanten"},
+        {"schluessel": "106", "bezeichnung": "Werkstudenten"},
+        {"schluessel": "109", "bezeichnung": "Geringfügig entlohnte Beschäftigte (Minijob)"},
+        {"schluessel": "110", "bezeichnung": "Kurzfristig Beschäftigte"},
+        {"schluessel": "119", "bezeichnung": "Versicherungsfreie Bezieher einer Altersvollrente oder eines Versorgungsbezugs wegen Alters"},
+        {"schluessel": "120", "bezeichnung": "Versicherungspflichtige Bezieher einer Altersvollrente oder eines Versorgungsbezugs wegen Alters"},
+        {"schluessel": "121", "bezeichnung": "Auszubildende mit Entgelt bis zur Geringverdienergrenze (325 Euro)"},
+        {"schluessel": "123", "bezeichnung": "Freiwilligendienstleistende (FSJ, FÖJ, Bundesfreiwilligendienst)"},
+        {"schluessel": "190", "bezeichnung": "Beschäftigte, die nur in der gesetzlichen Unfallversicherung versichert sind"}
+      ],
+      "weitere": ["104 Hausgewerbetreibende", "107 Menschen mit Behinderung in anerkannten Werkstätten", "108 Bezieher von Vorruhestandsgeld", "111 Personen in Einrichtungen der Jugendhilfe/Berufsbildungswerken", "112 Mitarbeitende Familienangehörige in der Landwirtschaft", "113 Nebenerwerbslandwirte", "114 Nebenerwerbslandwirte saisonal", "116 Ausgleichsgeldempfänger FELEG", "117 Nicht berufsmäßig unständig Beschäftigte", "118 Berufsmäßig unständig Beschäftigte", "122 Auszubildende in außerbetrieblicher Einrichtung", "124 Heimarbeiter ohne Anspruch auf Entgeltfortzahlung", "127 Menschen mit Behinderung im Integrationsprojekt", "140–150 Seefahrt"]
+    },
+    "beitragsgruppenschluessel": {
+      "quelle": "https://www.aok.de/fk/sozialversicherung/meldung-zur-sozialversicherung/meldeschluessel-zu-personen-taetigkeiten-und-beitragsgruppen/",
+      "verifiziert": true,
+      "aufbau": "4 Stellen: KV-RV-AV-PV",
+      "stellen": {
+        "1_krankenversicherung": {"0": "kein Beitrag", "1": "allgemeiner Beitrag", "3": "ermäßigter Beitrag", "4": "Beitrag zur landwirtschaftlichen KV", "5": "Arbeitgeberbeitrag zur landwirtschaftlichen KV", "6": "Pauschalbeitrag für geringfügig Beschäftigte", "9": "freiwillig Versicherte (Firmenzahler)"},
+        "2_rentenversicherung": {"0": "kein Beitrag", "1": "voller Beitrag", "3": "halber Beitrag", "5": "Pauschalbeitrag für geringfügig Beschäftigte"},
+        "3_arbeitslosenversicherung": {"0": "kein Beitrag", "1": "voller Beitrag", "2": "halber Beitrag"},
+        "4_pflegeversicherung": {"0": "kein Beitrag", "1": "voller Beitrag", "2": "halber Beitrag"}
+      },
+      "gaengige_kombinationen_unsicher": [
+        {"schluessel": "1111", "fall": "regulär versicherungspflichtig Beschäftigte"},
+        {"schluessel": "6100", "fall": "Minijob gewerblich, rentenversicherungspflichtig (KV pauschal = 6, RV voller Beitrag = 1; gesetzlich krankenversichert)"},
+        {"schluessel": "6500", "fall": "Minijob gewerblich mit Befreiung von der RV-Pflicht (KV pauschal = 6, RV pauschal = 5)"},
+        {"schluessel": "0500", "fall": "Minijob gewerblich, privat krankenversichert, RV-befreit (KV kein Beitrag = 0)"},
+        {"schluessel": "0000", "fall": "kurzfristig Beschäftigte (Personengruppe 110)"}
+      ],
+      "gaengige_kombinationen_hinweis": "Die Kombinationen sind aus den verifizierten Stellenwerten abgeleitet (6 = KV-Pauschale, 5 = RV-Pauschale, 1 = voller Beitrag), stehen aber nicht als Kombination in der Quelle. Vor Verwendung bei der Minijob-Zentrale prüfen."
+    },
+    "taetigkeitsschluessel": {
+      "quelle": "https://www.aok.de/fk/sozialversicherung/meldung-zur-sozialversicherung/meldeschluessel-zu-personen-taetigkeiten-und-beitragsgruppen/",
+      "verifiziert": true,
+      "aufbau": [
+        {"stellen": "1-5", "inhalt": "Ausgeübte Tätigkeit nach der Klassifikation der Berufe 2010 (KldB 2010, Bundesagentur für Arbeit)"},
+        {"stellen": "6", "inhalt": "Höchster allgemeinbildender Schulabschluss", "werte": {"1": "ohne Schulabschluss", "2": "Haupt-/Volksschulabschluss", "3": "Mittlere Reife oder gleichwertiger Abschluss", "4": "Abitur/Fachabitur", "9": "Abschluss unbekannt"}},
+        {"stellen": "7", "inhalt": "Höchster beruflicher Ausbildungsabschluss", "werte": {"1": "ohne beruflichen Ausbildungsabschluss", "2": "Abschluss einer anerkannten Berufsausbildung", "3": "Meister-/Techniker- oder gleichwertiger Fachschulabschluss", "4": "Bachelor", "5": "Diplom/Magister/Master/Staatsexamen", "6": "Promotion", "9": "Abschluss unbekannt"}},
+        {"stellen": "8", "inhalt": "Arbeitnehmerüberlassung", "werte": {"1": "nein", "2": "ja"}},
+        {"stellen": "9", "inhalt": "Vertragsform", "werte": {"1": "Vollzeit, unbefristet", "2": "Teilzeit, unbefristet", "3": "Vollzeit, befristet", "4": "Teilzeit, befristet"}}
+      ]
+    }
+  },
+
+  "gewerbeanmeldung": {
+    "grundlage": "Vordruck GewA 1 nach § 14 bzw. § 55c GewO (Anlage 1 zur Gewerbeanzeigeverordnung)",
+    "quelle": "https://brandenburg.de/media_fast/4/6_Gewerbeanmeldung_GewA1_2023.pdf",
+    "quelle_gesetz": "https://www.gesetze-im-internet.de/gewanzv/anlage_1.html (nicht abrufbar)",
+    "quelle_hinweis": "Bundeseinheitlicher Vordruck, abgerufen als Formular des Landes Brandenburg (Stand 2023). Die Feldnummern ließen sich nicht zuverlässig zuordnen und fehlen daher; die Reihenfolge entspricht dem Vordruck.",
+    "verifiziert": true,
+    "frist": {"text": "Spätestens innerhalb eines Monats nach Eröffnung bei der Gemeinde, in deren Bezirk der Betrieb liegt; die Gemeinde informiert u. a. Berufsgenossenschaft und IHK/Handwerkskammer.", "quelle": "https://finanzen.hessen.de/sites/finanzen.hessen.de/files/2026-04/steuerwegweiser_fuer_existenzgruender-stand_april_2026.pdf", "verifiziert": true, "unsicher": true, "unsicher_begruendung": "Laut § 14 GewO ist die Anzeige gleichzeitig mit dem Beginn zu erstatten; die Monatsangabe steht so nur im Hessischen Steuerwegweiser"},
+    "kopf": ["Name der entgegennehmenden Stelle", "Gemeindekennzahl der Gemeinde des Sitzes der Betriebsstätte"],
+    "felder": [
+      {"abschnitt": "Angaben zum Betriebsinhaber", "feld": "Im Handels-, Genossenschafts- oder Vereinsregister, ggf. im Stiftungsverzeichnis eingetragener Name mit Rechtsform (bei GbR: Angabe der weiteren Gesellschafter)"},
+      {"abschnitt": "Angaben zum Betriebsinhaber", "feld": "Ort und Nummer des Eintrages im Handels-, Genossenschafts- oder Vereinsregister, ggf. im Stiftungsverzeichnis"},
+      {"abschnitt": "Angaben zum Betriebsinhaber", "feld": "Name des Geschäfts, wenn er vom eingetragenen Namen abweicht"},
+      {"abschnitt": "Angaben zur Person", "feld": "Name"},
+      {"abschnitt": "Angaben zur Person", "feld": "Vorname(n)"},
+      {"abschnitt": "Angaben zur Person", "feld": "Geschlecht", "optionen": ["männlich", "weiblich", "divers", "ohne Angabe"]},
+      {"abschnitt": "Angaben zur Person", "feld": "Geburtsname (nur bei Abweichung vom Namen)"},
+      {"abschnitt": "Angaben zur Person", "feld": "Geburtsdatum"},
+      {"abschnitt": "Angaben zur Person", "feld": "Geburtsort und -land"},
+      {"abschnitt": "Angaben zur Person", "feld": "Staatsangehörigkeit(en)", "optionen": ["deutsch", "andere"]},
+      {"abschnitt": "Angaben zur Person", "feld": "Wohnungsanschrift (Straße, Hausnummer, Postleitzahl, Ort) und Kontaktdaten"},
+      {"abschnitt": "Angaben zum Betrieb", "feld": "Zahl der geschäftsführenden Gesellschafter (nur bei Personengesellschaften) / Zahl der gesetzlichen Vertreter (nur bei juristischen Personen)"},
+      {"abschnitt": "Angaben zum Betrieb", "feld": "Vertretungsberechtigte Person/Betriebsleiter (Name, Vornamen, Anschrift, Kontaktdaten) – nur bei inländischen AG, Zweigniederlassungen ausländischer juristischer Personen oder unselbständigen Zweigstellen"},
+      {"abschnitt": "Angaben zum Betrieb", "feld": "Anschrift der Betriebsstätte (Straße, Hausnummer, PLZ, Ort; Telefon, Fax, E-Mail, Internetadresse)"},
+      {"abschnitt": "Angaben zum Betrieb", "feld": "Anschrift der Hauptniederlassung (falls die Betriebsstätte lediglich Zweigniederlassung oder unselbständige Zweigstelle ist)"},
+      {"abschnitt": "Angaben zum Betrieb", "feld": "Frühere Betriebsstätte", "optionen": ["Anschrift", "nicht bekannt"]},
+      {"abschnitt": "Angaben zum Betrieb", "feld": "Angemeldete Tätigkeit (genau angeben, Schwerpunkt unterstreichen, ggf. Beiblatt)"},
+      {"abschnitt": "Angaben zum Betrieb", "feld": "Wird die Tätigkeit (vorerst) im Nebenerwerb betrieben?", "optionen": ["ja", "nein"]},
+      {"abschnitt": "Angaben zum Betrieb", "feld": "Datum des Beginns der angemeldeten Tätigkeit"},
+      {"abschnitt": "Angaben zum Betrieb", "feld": "Art des angemeldeten Betriebes", "optionen": ["Industrie", "Handwerk", "Handel", "Reisegewerbe", "Sonstiges"], "unsicher_teil": "'Sonstiges' ist in der abgerufenen Feldliste nicht enthalten"},
+      {"abschnitt": "Angaben zum Betrieb", "feld": "Zahl der bei Geschäftsaufnahme tätigen Personen (einschließlich Aushilfen, Ehe- oder Lebenspartner des Inhabers; ohne Inhaber)", "optionen": ["keine", "Vollzeit (Anzahl)", "Teilzeit (Anzahl)"]},
+      {"abschnitt": "Angaben zum Betrieb", "feld": "Die Anmeldung wird erstattet für", "optionen": ["eine Hauptniederlassung", "eine Zweigniederlassung", "eine unselbständige Zweigstelle", "ein Automatenaufstellungsgewerbe", "ein Reisegewerbe"], "unsicher_teil": "Automatenaufstellung und Reisegewerbe aus Fachwissen; abgerufen nur Haupt-/Zweigniederlassung/unselbständige Zweigstelle"},
+      {"abschnitt": "Angaben zum Betrieb", "feld": "Grund der Neuerrichtung/der Übernahme", "optionen": ["Neugründung", "Wechsel der Rechtsform", "Gesellschaftereintritt", "Wiedereröffnung nach Verlegung aus einem anderen Meldebezirk", "Übergang nach dem Umwandlungsgesetz", "Übernahme (Erbfolge, Kauf oder Pacht)", "Sonstiges"]},
+      {"abschnitt": "Angaben zum Betrieb", "feld": "Name des früheren Gewerbetreibenden oder früherer Firmenname (nur bei Übernahme/Rechtsformwechsel/Gesellschaftereintritt)"},
+      {"abschnitt": "Angaben zum Betrieb", "feld": "Außer bei Neugründung: bisheriger gesetzlicher Unfallversicherungsträger und bisherige Unternehmensnummer", "optionen": ["Angabe", "nicht bekannt"]},
+      {"abschnitt": "Erlaubnis/Handwerk/Aufenthalt", "feld": "Liegt eine Erlaubnis vor? (bei erlaubnispflichtigen Tätigkeiten; Ausstellungsdatum und erteilende Behörde)", "optionen": ["ja", "nein"]},
+      {"abschnitt": "Erlaubnis/Handwerk/Aufenthalt", "feld": "Nur für Handwerksbetriebe der Anlage A der Handwerksordnung: Liegt eine Handwerkskarte vor? (Ausstellungsdatum und Name der Handwerkskammer)", "optionen": ["ja", "nein"]},
+      {"abschnitt": "Erlaubnis/Handwerk/Aufenthalt", "feld": "Nur für Ausländer, die einen Aufenthaltstitel benötigen: Liegt ein Aufenthaltstitel vor? (Ausstellungsdatum, erteilende Behörde)", "optionen": ["ja", "nein"]},
+      {"abschnitt": "Erlaubnis/Handwerk/Aufenthalt", "feld": "Enthält der Aufenthaltstitel eine die Erwerbstätigkeit betreffende Auflage und/oder Beschränkung?", "optionen": ["nein", "ja (Angabe der Auflage)"]},
+      {"abschnitt": "Abschluss", "feld": "Datum"},
+      {"abschnitt": "Abschluss", "feld": "Unterschrift"}
+    ],
+    "zusatz_feld_unsicher": {"feld": "Liegt eine Beteiligung der öffentlichen Hand vor?", "optionen": ["ja", "nein"], "hinweis": "Im abgerufenen Formular (Stand 2023) enthalten; Position nicht eindeutig"}
+  },
+
+  "transparenzregister": {
+    "angaben_19_abs1_gwg": {
+      "liste": ["Vor- und Nachname", "Geburtsdatum", "Wohnort", "Art und Umfang des wirtschaftlichen Interesses", "alle Staatsangehörigkeiten"],
+      "quelle": ["https://www.bundestag.de/resource/blob/901300/b5c093b9a9bbe4ed84b9d73bff107886/WD-4-066-22-pdf-data.pdf", "https://www.gesetze-im-internet.de/gwg_2017/__19.html"],
+      "verifiziert": true,
+      "zusatz_unsicher": "Wohnsitzland (laut Fachwissen bei Wohnsitz im Ausland zusätzlich erfasst); nicht belegt"
+    },
+    "art_und_umfang_19_abs3_gwg": {
+      "quelle": "https://www.gesetze-im-internet.de/gwg_2017/__19.html",
+      "verifiziert": false,
+      "unsicher": true,
+      "hinweis": "Der Wortlaut von § 19 Abs. 3 GwG war nicht abrufbar. Die Optionen stammen aus Fachwissen. Belegt ist die Definition in § 3 Abs. 2 GwG: wirtschaftlich berechtigt ist, wer mehr als 25 % der Kapitalanteile hält, mehr als 25 % der Stimmrechte kontrolliert oder auf vergleichbare Weise Kontrolle ausübt (Quelle: WD-4-066-22).",
+      "optionen": [
+        {"wert": "beteiligung", "text": "Beteiligung an der Vereinigung, insbesondere Höhe der Kapitalanteile (in %)"},
+        {"wert": "stimmrechte", "text": "Ausübung von Stimmrechten (Anteil in %)"},
+        {"wert": "kontrolle_sonstige", "text": "Ausübung von Kontrolle auf sonstige Weise, insbesondere aufgrund von Absprachen zwischen Dritten und Anteilseignern oder Stimmrechtsinhabern, aufgrund von Treuhand oder aufgrund der Befugnis zur Ernennung von gesetzlichen Vertretern"},
+        {"wert": "fiktiv", "text": "Fiktiver wirtschaftlich Berechtigter: Funktion als gesetzlicher Vertreter, geschäftsführender Gesellschafter oder Partner (wenn keine natürliche Person die Schwellen erreicht, § 3 Abs. 2 Satz 5 GwG)"}
+      ],
+      "zusatz_kontrollart_unsicher": ["unmittelbar", "mittelbar (über eine andere Vereinigung)"]
+    },
+    "mitteilungspflichtige_rechtsformen_unsicher": {
+      "text": "Seit dem Vollregister (Transparenzregister- und Finanzinformationsgesetz 2021) müssen GmbH, UG (haftungsbeschränkt), OHG, KG und die eingetragene GbR (eGbR) ihre wirtschaftlich Berechtigten aktiv melden; die frühere Mitteilungsfiktion über das Handelsregister ist entfallen. Nicht eingetragene GbR und Einzelunternehmen sind nicht mitteilungspflichtig.",
+      "quelle": "https://www.gesetze-im-internet.de/gwg_2017/__20.html",
+      "verifiziert": false,
+      "unsicher": true
+    }
+  },
+
+  "rechtsformen": {
+    "quelle": "https://finanzen.hessen.de/sites/finanzen.hessen.de/files/2026-04/steuerwegweiser_fuer_existenzgruender-stand_april_2026.pdf",
+    "quelle_hinweis": "Hessisches Ministerium der Finanzen, Steuerwegweiser für Existenzgründer, Stand April 2026, S. 4–9. Die Grundaussagen zur Registerpflicht sind daraus belegt; die Paragrafen stammen aus Fachwissen.",
+    "liste": [
+      {
+        "rechtsform": "Einzelunternehmen (Kleingewerbetreibender)",
+        "handelsregister": "nein (freiwillige Eintragung als Kannkaufmann möglich, § 2 HGB)",
+        "verifiziert": true,
+        "unsicher_teil": "§ 2 HGB aus Fachwissen"
+      },
+      {
+        "rechtsform": "Eingetragener Kaufmann / eingetragene Kauffrau (e. K./e. Kfm./e. Kfr.)",
+        "handelsregister": "ja, Pflicht für Istkaufleute (Gewerbe erfordert nach Art oder Umfang einen in kaufmännischer Weise eingerichteten Geschäftsbetrieb, § 1 HGB)",
+        "verifiziert": true
+      },
+      {
+        "rechtsform": "Gesellschaft bürgerlichen Rechts (GbR)",
+        "handelsregister": "nein; seit 01.01.2024 (MoPeG) freiwillige Eintragung ins Gesellschaftsregister als eGbR möglich (§ 707 BGB), für bestimmte Rechtsgeschäfte (z. B. Grundstückserwerb) faktisch erforderlich",
+        "verifiziert": false,
+        "unsicher": true
+      },
+      {
+        "rechtsform": "Offene Handelsgesellschaft (OHG)",
+        "handelsregister": "ja, Anmeldung durch vertretungsberechtigte Personen",
+        "verifiziert": true
+      },
+      {
+        "rechtsform": "Kommanditgesellschaft (KG), auch GmbH & Co. KG",
+        "handelsregister": "ja",
+        "verifiziert": true
+      },
+      {
+        "rechtsform": "Unternehmergesellschaft (haftungsbeschränkt) – 'Mini-GmbH'",
+        "handelsregister": "ja, Anmeldung durch das vertretungsberechtigte Organ (Geschäftsführer); entsteht als juristische Person erst mit Eintragung",
+        "besonderheit": "Stammkapital ab 1 Euro; 25 % des Jahresüberschusses sind in eine gesetzliche Rücklage einzustellen",
+        "verifiziert": true,
+        "unsicher_teil": "'entsteht erst mit Eintragung' (§ 11 GmbHG) aus Fachwissen"
+      },
+      {
+        "rechtsform": "Gesellschaft mit beschränkter Haftung (GmbH)",
+        "handelsregister": "ja, Anmeldung durch das vertretungsberechtigte Organ",
+        "besonderheit": "Stammkapital mindestens 25.000 Euro (§ 5 GmbHG)",
+        "verifiziert": true,
+        "unsicher_teil": "Mindeststammkapital aus Fachwissen"
+      },
+      {
+        "rechtsform": "Partnerschaftsgesellschaft (PartG/PartG mbB) – nur für Freie Berufe, nicht für Gewerbe (Friseur/Café/Laden)",
+        "handelsregister": "nein, Partnerschaftsregister (Pflicht)",
+        "verifiziert": false,
+        "unsicher": true
+      }
+    ],
+    "app_empfehlung_auswahl": ["Einzelunternehmen", "e. K.", "GbR", "eGbR", "OHG", "KG", "GmbH & Co. KG", "UG (haftungsbeschränkt)", "GmbH"]
+  }
+}

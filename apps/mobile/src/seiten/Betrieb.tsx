@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Share, View } from "react-native";
-import type { Betrieb as BetriebDaten } from "@amtlos/fachlogik";
+import { BUNDESLAENDER, type Betrieb as BetriebDaten } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { Feld, Karte, Knopf, T } from "../ui/bausteine";
+import { Auswahl, Feld, Karte, Knopf, T } from "../ui/bausteine";
 import { useAmtlos } from "../zustand";
 import { Gruppe, Seite } from "./gemeinsam";
 
@@ -32,6 +32,7 @@ export function BetriebFormular() {
             <Feld label={TEXT.b_ort} {...feld("ort")} textContentType="addressCity" />
           </View>
         </View>
+        <Auswahl label={TEXT.b_bundesland} wert={b.bundesland || null} aendern={(w) => feld("bundesland").aendern(w)} optionen={BUNDESLAENDER.map((l) => ({ wert: l, text: l }))} />
         <Feld label={TEXT.b_verantwortlich} {...feld("verantwortlich")} textContentType="name" />
         <Feld label={TEXT.b_telefon} {...feld("telefon")} keyboardType="phone-pad" textContentType="telephoneNumber" />
         <Feld label={TEXT.b_email} {...feld("email")} keyboardType="email-address" autoCapitalize="none" textContentType="emailAddress" />
