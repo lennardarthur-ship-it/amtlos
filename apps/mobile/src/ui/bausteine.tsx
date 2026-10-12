@@ -41,7 +41,7 @@ const FALLBACK: Record<string, keyof typeof Ionicons.glyphMap> = {
   "exclamationmark.circle": "alert-circle-outline", "person": "person-outline", "lock": "lock-closed-outline", "percent": "calculator-outline",
   "folder": "folder-outline", "doc.on.doc": "copy-outline", "printer": "print-outline", "lock.shield": "shield-checkmark-outline", "fork.knife": "restaurant-outline",
   "scissors": "cut-outline", "cross.case": "medkit-outline", "checkmark.square.fill": "checkbox", "square": "square-outline", "chevron.down": "chevron-down", "chevron.up": "chevron-up",
-  "doc.richtext": "document-text-outline", "hammer": "hammer-outline", "info.circle.fill": "information-circle", "xmark.circle": "close-circle-outline",
+  "doc.richtext": "document-text-outline", "hammer": "hammer-outline", "info.circle.fill": "information-circle", "circle": "ellipse-outline", "xmark.circle": "close-circle-outline",
   "person.crop.circle": "person-circle-outline", "eye": "eye-outline", "arrow.left": "arrow-back", "list.number": "list-outline", "checkmark.circle.fill": "checkmark-circle", "person.badge.clock": "person-outline",
   "figure.wave": "body-outline", "storefront": "storefront-outline", "calendar.badge.checkmark": "calendar-outline", "laptopcomputer": "laptop-outline", "exclamationmark.shield": "shield-outline", "cup.and.saucer": "cafe-outline", "sparkle": "sparkles-outline", "arrow.clockwise": "refresh-outline", "pencil": "create-outline", "plus.circle": "add-circle-outline",
 };
@@ -252,7 +252,7 @@ export function isoAus(text: string): string | null {
 export const textAus = (iso: string | null | undefined) => (iso ? `${iso.slice(8, 10)}.${iso.slice(5, 7)}.${iso.slice(0, 4)}` : "");
 
 /** Datumsfeld ohne zusätzliches Paket: Eingabe als TT.MM.JJJJ, „Heute“ als Abkürzung. Liefert ISO oder null. */
-export function DatumFeld({ label, wert, aendern, hilfe, ohneHeute }: { label: string; wert: string | null; aendern: (iso: string | null) => void; hilfe?: string; ohneHeute?: boolean }) {
+export function DatumFeld({ label, wert, aendern, hilfe, ohneHeute, ohneLabel }: { label: string; wert: string | null; aendern: (iso: string | null) => void; hilfe?: string; ohneHeute?: boolean; ohneLabel?: boolean }) {
   const f = useFarben();
   const heuteText = TEXT.heute;
   const [text, setText] = useState(textAus(wert));
@@ -260,8 +260,8 @@ export function DatumFeld({ label, wert, aendern, hilfe, ohneHeute }: { label: s
   const heute = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Berlin" }).format(new Date());
   const falsch = text.trim() !== "" && !isoAus(text);
   return (
-    <View style={{ marginTop: 20 }}>
-      <FeldKopf label={label} hilfe={hilfe} />
+    <View style={{ marginTop: ohneLabel ? 8 : 20 }}>
+      {ohneLabel ? null : <FeldKopf label={label} hilfe={hilfe} />}
       <View style={{ flexDirection: "row", gap: 8, marginTop: 6, alignItems: "center" }}>
         <TextInput
           accessibilityLabel={label}
@@ -348,11 +348,11 @@ function SchalterText({ label, hilfe }: { label: string; hilfe?: string }) {
 }
 
 /** Auswahl als Liste untereinander – für lange oder viele Optionen (Radio-Semantik). */
-export function Auswahl<W extends string>({ label, wert, aendern, optionen, hilfe }: { label: string; wert: W | null; aendern: (w: W) => void; optionen: { wert: W; text: string }[]; hilfe?: string }) {
+export function Auswahl<W extends string>({ label, wert, aendern, optionen, hilfe, ohneLabel }: { label: string; wert: W | null; aendern: (w: W) => void; optionen: { wert: W; text: string }[]; hilfe?: string; ohneLabel?: boolean }) {
   const f = useFarben();
   return (
-    <View style={{ marginTop: 20 }}>
-      <FeldKopf label={label} hilfe={hilfe} />
+    <View style={{ marginTop: ohneLabel ? 8 : 20 }}>
+      {ohneLabel ? null : <FeldKopf label={label} hilfe={hilfe} />}
       <View accessibilityRole="radiogroup" accessibilityLabel={label} style={{ marginTop: 6, borderWidth: 1.5, borderColor: f.linie, borderRadius: RADIUS.klein, overflow: "hidden" }}>
         {optionen.map((o, i) => {
           const an = o.wert === wert;
@@ -379,11 +379,11 @@ export function Auswahl<W extends string>({ label, wert, aendern, optionen, hilf
 }
 
 /** Mehrfachauswahl als Chips mit Häkchen (Checkbox-Semantik), z. B. Allergene. */
-export function MehrfachWahl({ label, werte, aendern, optionen, hilfe }: { label: string; werte: string[]; aendern: (w: string[]) => void; optionen: { wert: string; text: string }[]; hilfe?: string }) {
+export function MehrfachWahl({ label, werte, aendern, optionen, hilfe, ohneLabel }: { label: string; werte: string[]; aendern: (w: string[]) => void; optionen: { wert: string; text: string }[]; hilfe?: string; ohneLabel?: boolean }) {
   const f = useFarben();
   return (
-    <View style={{ marginTop: 20 }}>
-      <FeldKopf label={label} hilfe={hilfe} />
+    <View style={{ marginTop: ohneLabel ? 8 : 20 }}>
+      {ohneLabel ? null : <FeldKopf label={label} hilfe={hilfe} />}
       <View accessibilityLabel={label} style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8 }}>
         {optionen.map((o) => {
           const an = werte.includes(o.wert);

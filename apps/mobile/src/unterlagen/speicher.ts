@@ -19,9 +19,24 @@ export interface Stand {
   /** gespeicherte Personen, die Vorlagen vorausfüllen (E-124) */
   mitarbeiter: Person[];
   kunden: Person[];
+  /** Antworten im Pflichten-Check (E-126), Schlüssel wie im Server-Profil ohne „profil.“ */
+  profil: Record<string, string | number | boolean | string[] | null>;
+  /** abgehakte Pflichten: Pflicht-ID → Datum */
+  erledigt: Record<string, string>;
 }
 
-export const LEERER_STAND: Stand = { version: 1, betrieb: LEERER_BETRIEB, unterlagen: [], mitarbeiter: [], kunden: [] };
+export const LEERER_STAND: Stand = { version: 1, betrieb: LEERER_BETRIEB, unterlagen: [], mitarbeiter: [], kunden: [], profil: {}, erledigt: {} };
+
+function profilAus(roh: unknown): Stand["profil"] {
+  if (!roh || typeof roh !== "object" || Array.isArray(roh)) return {};
+  return Object.fromEntries(
+    Object.entries(roh as Record<string, unknown>).filter(([, w]) => w === null || ["string", "number", "boolean"].includes(typeof w) || (Array.isArray(w) && w.every((x) => typeof x === "string"))),
+  ) as Stand["profil"];
+}
+function erledigtAus(roh: unknown): Record<string, string> {
+  if (!roh || typeof roh !== "object" || Array.isArray(roh)) return {};
+  return Object.fromEntries(Object.entries(roh as Record<string, unknown>).filter((e): e is [string, string] => typeof e[1] === "string"));
+}
 
 /** Liste der Personen einer Art im Stand. */
 export const PERSONEN_LISTE: Record<PersonenArt, "mitarbeiter" | "kunden"> = { mitarbeiter: "mitarbeiter", kunde: "kunden" };
@@ -47,7 +62,7 @@ export function standAus(json: string | null): Stand {
       (u): u is Unterlage => Boolean(u && typeof u.id === "string" && typeof u.vorlage === "string" && vorlageFuer(u.vorlage) && u.daten && typeof u.daten === "object"),
     );
     const r = roh as Record<string, unknown>;
-    return { version: 1, betrieb, unterlagen, mitarbeiter: personenAus(r.mitarbeiter), kunden: personenAus(r.kunden) };
+    return { version: 1, betrieb, unterlagen, mitarbeiter: personenAus(r.mitarbeiter), kunden: personenAus(r.kunden), profil: profilAus(r.profil), erledigt: erledigtAus(r.erledigt) };
   } catch {
     return LEERER_STAND;
   }
@@ -118,6 +133,20 @@ export function personLoeschen(s: Stand, art: PersonenArt, id: string): Stand {
 
 /** Personen alphabetisch. */
 export const personenSortiert = (l: Person[]) => [...l].filter((p) => p.name.trim()).sort((a, b) => a.name.localeCompare(b.name, "de"));
+
+/** Antworten im Pflichten-Check setzen. Das Bundesland übernimmt „Mein Betrieb“, solange dort keins steht. */
+export function profilSetzen(s: Stand, werte: Stand["profil"], bundeslandName?: string): Stand {
+  const betrieb = bundeslandName && !s.betrieb.bundesland ? { ...s.betrieb, bundesland: bundeslandName } : s.betrieb;
+  return { ...s, betrieb, profil: { ...s.profil, ...werte } };
+}
+
+/** Pflicht abhaken bzw. den Haken entfernen. */
+export function erledigtSetzen(s: Stand, pflichtId: string, datum: string | null): Stand {
+  const erledigt = { ...s.erledigt };
+  if (datum) erledigt[pflichtId] = datum;
+  else delete erledigt[pflichtId];
+  return { ...s, erledigt };
+}
 
 export function betriebSetzen(s: Stand, b: Betrieb): Stand {
   return { ...s, betrieb: b };

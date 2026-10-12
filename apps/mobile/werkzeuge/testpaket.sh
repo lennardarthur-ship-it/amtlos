@@ -14,6 +14,15 @@ cp -r "$APP/src" "$APP/assets" "$APP/index.ts" "$P/"
 test -f "$PAKETE/fachlogik/dist/index.js" || { echo "packages/fachlogik/dist fehlt – erst pnpm build"; exit 1; }
 mkdir -p "$P/pakete/fachlogik"
 cp -r "$PAKETE/fachlogik/dist" "$P/pakete/fachlogik/"
+# Pflichten-Check (E-126): Regel-Engine und Fristen gebaut, Fragen (i18n) als Quelltext
+for paket in rules-engine fristen; do
+  test -f "$PAKETE/$paket/dist/index.js" || { echo "packages/$paket/dist fehlt – erst pnpm build"; exit 1; }
+  mkdir -p "$P/pakete/$paket"
+  cp -r "$PAKETE/$paket/dist" "$P/pakete/$paket/"
+done
+mkdir -p "$P/pakete/i18n"
+cp -r "$PAKETE/i18n/src" "$P/pakete/i18n/"
+find "$P/pakete/i18n/src" -name '*.test.ts' -delete
 find "$P/pakete" -name '*.map' -delete
 node - "$APP" "$P" <<'JS'
 const fs = require("node:fs");
@@ -32,6 +41,9 @@ fs.writeFileSync(`${p}/tsconfig.json`, JSON.stringify({
   extends: "expo/tsconfig.base",
   compilerOptions: { strict: true, skipLibCheck: true, paths: {
     "@amtlos/fachlogik": ["./pakete/fachlogik/dist/index.js"],
+    "@amtlos/rules-engine": ["./pakete/rules-engine/dist/index.js"],
+    "@amtlos/fristen": ["./pakete/fristen/dist/index.js"],
+    "@amtlos/i18n": ["./pakete/i18n/src/index.ts"],
   } },
   include: ["index.ts", "src", "pakete"],
 }, null, 2) + "\n");
@@ -55,6 +67,7 @@ Entscheidungen liegen im Git-Repository (GitHub: lennardarthur-ship-it/amtlos). 
 4. Es erscheint ein QR-Code. Mit der normalen Kamera-App des iPhones scannen → „In Expo Go öffnen“.
    iPhone und Mac müssen im selben WLAN sein. Fragt der Mac, ob „node“ Verbindungen annehmen darf: Erlauben.
 5. In der App:
+   - „Pflichten-Check starten“ – ein paar Fragen, dann zeigt die App, welche Pflichten für deinen Betrieb gelten.
    - „Betrieb eintragen“ – einmal Name, Adresse, verantwortliche Person.
    - „Rechnung schreiben“ oder unter „Wofür brauchst du etwas?“ den Anlass wählen (z. B. „Ich stelle jemanden ein“).
    - Schritt für Schritt ausfüllen, unten „Weiter“. Am Ende siehst du das Dokument und tippst „PDF teilen“.

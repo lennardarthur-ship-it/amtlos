@@ -27,7 +27,7 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - name: Katalogauszug der App aktuell (E-121)
-        run: node apps/mobile/werkzeuge/katalog-buendel.mjs && git diff --exit-code apps/mobile/src/unterlagen/katalog.json
+        run: node apps/mobile/werkzeuge/katalog-buendel.mjs && git diff --exit-code apps/mobile/src/unterlagen/katalog.json apps/mobile/src/pflichten/katalog.json
       - name: Mobile App bündeln (Metro, Android und iOS)
         run: |
           cd apps/mobile

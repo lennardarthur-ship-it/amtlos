@@ -9,6 +9,7 @@ import { betriebFehlt, sortiert, type Unterlage } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { BetriebFormular } from "./Betrieb";
 import { BEREICH_SYMBOL, Gruppe, Inhalt, Seite, datumKurz } from "./gemeinsam";
+import { PflichtenKarte, checkGemacht } from "./Pflichten";
 import { useOeffnen, useStarten } from "./starten";
 
 /** Symbol je Anlass. */
@@ -159,7 +160,8 @@ export function Unterlagen() {
               />
             </Karte>
           ) : null}
-          <Knopf text={TEXT.rechnung_schreiben} symbol="plus" onPress={() => starten("rechnung")} stil={{ marginTop: 16 }} />
+          <PflichtenKarte />
+          <Knopf ton={!checkGemacht(stand.profil)} text={TEXT.rechnung_schreiben} symbol="plus" onPress={() => starten("rechnung")} stil={{ marginTop: 16 }} />
 
           {zuletzt.length ? (
             <Gruppe titel={TEXT.zuletzt}>

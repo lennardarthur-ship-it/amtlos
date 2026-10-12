@@ -4,6 +4,9 @@
  * @amtlos/fachlogik – vorher „pnpm build“), und nur die Angaben, die die App zeigt (Titel, Kurztext, Rechtsgrundlage,
  * Quellen, Prüfstand). Inhalte werden nicht verändert. Schreibt src/unterlagen/katalog.json; die CI prüft die Aktualität.
  *
+ * Für den Pflichten-Check (E-126) zusätzlich den ganzen Katalog für die Regel-Engine: alle Pflichten und Regelwerte,
+ * nur deutsch, ohne die Prüfnotizen der Redaktion → src/pflichten/katalog.json.
+ *
  *   node werkzeuge/katalog-buendel.mjs
  */
 import fs from "node:fs";
@@ -36,3 +39,21 @@ const ziel = path.join(hier, "../src/unterlagen/katalog.json");
 fs.mkdirSync(path.dirname(ziel), { recursive: true });
 fs.writeFileSync(ziel, JSON.stringify(pflichten, null, 1) + "\n");
 console.log(`✓ ${pflichten.length} Pflichten → src/unterlagen/katalog.json`);
+
+// Pflichten-Check (E-126): ganzer Katalog für @amtlos/rules-engine, Inhalte unverändert
+const nurDeutsch = (d) => {
+  if (Array.isArray(d)) return d.map(nurDeutsch);
+  if (d && typeof d === "object") {
+    const k = Object.keys(d);
+    if (typeof d.de === "string" && k.every((x) => x === "de" || x === "en")) return { de: d.de };
+    return Object.fromEntries(k.map((x) => [x, nurDeutsch(d[x])]));
+  }
+  return d;
+};
+const lesenAlle = (o) => fs.readdirSync(o).filter((f) => /\.ya?ml$/.test(f)).sort().map((f) => YAML.parse(fs.readFileSync(path.join(o, f), "utf8")));
+const voll = lesenAlle(ordner).map(({ fachlich_zu_pruefen: _weg, ...p }) => nurDeutsch(p));
+const regelwerte = lesenAlle(path.join(wurzel, "catalog/regelwerte")).flatMap((x) => (Array.isArray(x) ? x : [x])).map(nurDeutsch);
+const zielVoll = path.join(hier, "../src/pflichten/katalog.json");
+fs.mkdirSync(path.dirname(zielVoll), { recursive: true });
+fs.writeFileSync(zielVoll, JSON.stringify({ pflichten: voll, regelwerte }) + "\n");
+console.log(`✓ ${voll.length} Pflichten, ${regelwerte.length} Regelwerte (${Math.round(fs.statSync(zielVoll).size / 1024)} KB) → src/pflichten/katalog.json`);

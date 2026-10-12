@@ -6,9 +6,13 @@ import { Fuss, Karte, Knopf, Symbol, T, TextKnopf, Wahl } from "../ui/bausteine"
 import { Unterseite, useNav } from "../ui/navigation";
 import { RAND, ZIEL, useFarben } from "../ui/thema";
 import { heute, personenSortiert } from "../unterlagen/speicher";
+import { VORSCHLAG_GRUPPE } from "../pflichten/check";
 import { useAmtlos } from "../zustand";
 import { Felder, gefuellt } from "./felder";
 import { Inhalt } from "./gemeinsam";
+
+/** Filter „passend zu deinem Betrieb“ (mehrere Gruppen, z. B. Friseur und Kosmetik bei Beauty) */
+const PASSEND = "\u0001passend";
 
 const titelText = (feld: ListenFeld, e: Eintrag) => (typeof e[feld.titelFeld] === "string" ? (e[feld.titelFeld] as string).trim().split("\n")[0]! : "");
 const eintraegeVon = (d: Daten | undefined, feld: ListenFeld) => ((d && Array.isArray(d[feld.id]) ? d[feld.id] : []) as Eintrag[]);
@@ -94,12 +98,14 @@ function VorschlagSeite({ id, feldId }: { id: string; feldId: string }) {
   const feld = u ? feldIn(u.vorlage, feldId) : undefined;
   const alle = feld?.vorschlaege ?? [];
   const gruppen = [...new Set(alle.map((v) => v.gruppe).filter((g): g is string => Boolean(g)))];
-  const [gruppe, setGruppe] = useState<string>("");
+  // Branche aus dem Pflichten-Check: passende Gruppen zuerst („Passend für dich“), damit beim Maler keine Friseurchemikalien stehen
+  const passend = gruppen.filter((g) => (Array.isArray(z.stand.profil["taetigkeit.branchen"]) ? (z.stand.profil["taetigkeit.branchen"] as string[]) : []).some((b) => (VORSCHLAG_GRUPPE[b] ?? []).includes(g)));
+  const [gruppe, setGruppe] = useState<string>(passend.length === 1 ? passend[0]! : passend.length > 1 ? PASSEND : "");
   const [gewaehlt, setGewaehlt] = useState<Set<string>>(new Set());
   const [offen, setOffen] = useState<string | null>(null);
   if (!feld || !u) return <Unterseite titel="">{null}</Unterseite>;
   const vorhanden = eintraegeVon(u.daten, feld).map((e) => titelText(feld, e));
-  const liste = alle.filter((v) => !gruppe || v.gruppe === gruppe);
+  const liste = alle.filter((v) => !gruppe || (gruppe === PASSEND ? passend.includes(v.gruppe ?? "") : v.gruppe === gruppe));
   const istDa = (v: Vorschlag) => vorhanden.includes(titelText(feld, v.werte) || v.titel);
   // erste lange Angabe eines Vorschlags (z. B. Schutzmaßnahmen) als Details
   const details = (v: Vorschlag) => feld.felder.filter((x) => x.id !== feld.titelFeld && (x.art === "text" || x.art === "mehrzeilig") && typeof v.werte[x.id] === "string" && (v.werte[x.id] as string).length > 0).slice(0, 2);
@@ -116,7 +122,7 @@ function VorschlagSeite({ id, feldId }: { id: string; feldId: string }) {
         <T v="klein" leise stil={{ marginTop: 4 }}>{TEXT.vorschlaege_text}</T>
         {gruppen.length > 1 ? (
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -RAND, marginTop: 4 }} contentContainerStyle={{ paddingHorizontal: RAND }}>
-            <Wahl label={feld.gruppenLabel ?? TEXT.gruppe} wert={gruppe} aendern={setGruppe} optionen={[{ wert: "", text: TEXT.alle }, ...gruppen.map((g) => ({ wert: g, text: g }))]} />
+            <Wahl label={feld.gruppenLabel ?? TEXT.gruppe} wert={gruppe} aendern={setGruppe} optionen={[...(passend.length > 1 ? [{ wert: PASSEND, text: TEXT.passend }] : []), { wert: "", text: TEXT.alle }, ...gruppen.map((g) => ({ wert: g, text: g }))]} />
           </ScrollView>
         ) : null}
         <Karte stil={{ marginTop: 16 }}>

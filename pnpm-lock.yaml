@@ -105,6 +105,15 @@ importers:
       '@amtlos/fachlogik':
         specifier: workspace:*
         version: link:../../packages/fachlogik
+      '@amtlos/fristen':
+        specifier: workspace:*
+        version: link:../../packages/fristen
+      '@amtlos/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@amtlos/rules-engine':
+        specifier: workspace:*
+        version: link:../../packages/rules-engine
       '@expo-google-fonts/atkinson-hyperlegible':
         specifier: ^0.4.1
         version: 0.4.1
@@ -181,6 +190,9 @@ importers:
       '@types/react':
         specifier: ~19.2.0
         version: 19.2.18
+      yaml:
+        specifier: ^2.6.0
+        version: 2.9.1
 
   apps/studio:
     dependencies:

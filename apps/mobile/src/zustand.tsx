@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { Betrieb, Daten, Person, PersonAngaben, PersonenArt } from "@amtlos/fachlogik";
-import { LEERER_STAND, aendern, anlegen, betriebSetzen, felderSetzen, kopieren, loeschen, personLoeschen, personMerken, personSetzen, standAus, type Stand, type Unterlage } from "./unterlagen/speicher";
+import { LEERER_STAND, aendern, anlegen, betriebSetzen, erledigtSetzen, felderSetzen, profilSetzen, kopieren, loeschen, personLoeschen, personMerken, personSetzen, standAus, type Stand, type Unterlage } from "./unterlagen/speicher";
 
 /** Alles liegt nur auf dem Gerät (E-121): kein Konto, kein Server. */
 const SCHLUESSEL = "amtlos.unterlagen.v1";
@@ -23,6 +23,8 @@ interface Zustand {
   personMerken(art: PersonenArt, angaben: PersonAngaben): void;
   personSetzen(art: PersonenArt, p: Person): void;
   personLoeschen(art: PersonenArt, id: string): void;
+  profilSetzen(werte: Stand["profil"], bundeslandName?: string): void;
+  erledigtSetzen(pflichtId: string, datum: string | null): void;
   kopieren(id: string): Unterlage | null;
   loeschen(id: string): void;
   allesLoeschen(): Promise<void>;
@@ -82,6 +84,8 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       personMerken: (art, angaben) => setzen(personMerken(aktuell.current, art, angaben)),
       personSetzen: (art, p) => setzen(personSetzen(aktuell.current, art, p)),
       personLoeschen: (art, id) => setzen(personLoeschen(aktuell.current, art, id)),
+      profilSetzen: (werte, bl) => setzen(profilSetzen(aktuell.current, werte, bl)),
+      erledigtSetzen: (pid, datum) => setzen(erledigtSetzen(aktuell.current, pid, datum)),
       kopieren: (id) => {
         const [s, u] = kopieren(aktuell.current, id, new Date());
         setzen(s);

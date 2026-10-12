@@ -90,3 +90,17 @@ Jede Unterlage läuft Schritt für Schritt mit einem Hauptknopf und endet bei ei
 | iOS-Bündel mit react-native-webview | gebaut |
 
 Fachlich zu prüfen: T-66. Auf dem iPhone noch anzusehen: Vorschau (WebView), Tastatur über dem „Weiter“-Knopf.
+
+## Nachtrag: Datensicherung und Pflichten-Check (E-125, E-126)
+
+| Prüfung | Ergebnis |
+|---|---|
+| Sicherung (neu): Wiederherstellen mit Umlauten und Personaldaten, kein Klartext in der Datei, falsches Passwort, veränderte Datei und fremde Datei abgelehnt, neues Salz je Sicherung, Base64 | 5 grün |
+| Pflichten-Check (neu): Fragen aus dem Fragebogen, Bedingung UG/GmbH, Ergebnis je Branche/Beschäftigte/Website, keine Radar-Pflichten, Abgleich mit allen Katalog-Fixtures ohne Ereignisse, Fortschritt durch Haken und vollständige Unterlage, Profil tolerant lesen | 5 grün |
+| App-Tests gesamt / Vorlagen-Tests | 19 / 28 grün |
+| Monorepo mit Datenbank | 42/42 |
+| Rundgang hell und dunkel: zusätzlich Pflichten-Check (Salon, 3 Beschäftigte, Kasse, keine Website) mit Ergebnis, Pflichten, Unterlage zur Pflicht, Abhaken; Sichern mit Passwort, alles löschen, falsches Passwort, Wiederherstellen | ohne Befunde |
+| Alle 33 Vorlagen einmal durchgeklickt | ohne Seitenfehler |
+| iOS-Bündel mit Katalog und Regel-Engine | gebaut (3,6 MB) |
+
+Auf dem iPhone noch zu messen: Dauer der Verschlüsselung (PBKDF2 in JavaScript) und der Auswertung des Katalogs.

@@ -1,6 +1,6 @@
 /**
- * Rundgang durch die Unterlagen-App (E-121, E-124) über den Web-Export, Rahmen 393×852 wie iPhone, hell oder dunkel.
- * Prüft die Wege eines neuen Nutzers: Betrieb eintragen, Rechnung im geführten Ablauf (Nummer zählt hoch, Kunde wird
+ * Rundgang durch die Unterlagen-App (E-121, E-124, E-126) über den Web-Export, Rahmen 393×852 wie iPhone, hell oder dunkel.
+ * Prüft die Wege eines neuen Nutzers: Betrieb eintragen, Pflichten-Check mit Ergebnis und Abhaken, Rechnung im geführten Ablauf (Nummer zählt hoch, Kunde wird
  * gemerkt), Abschluss mit Vorschau und PDF, Anlass „Sicherheit“ mit Vorschlägen, Mitarbeiter übernehmen, Neustart,
  * Kopie, Löschen, verschlüsselte Sicherung und Wiederherstellen. Bildschirmfotos zur Sichtprüfung. Bricht beim ersten Befund ab.
  *
@@ -71,6 +71,61 @@ try {
   await knopf("Zurück").click();
   await warte(800);
   pruefe(!(await sichtbar("Steht dann auf jeder Unterlage")), "Hinweis bleibt nach dem Eintragen stehen");
+
+  // Pflichten-Check (E-126): Fragen beantworten, Ergebnis, Pflichten, Unterlage zur Pflicht
+  pruefe(await sichtbar("Welche Pflichten gelten für dich?"), "Einladung zum Pflichten-Check fehlt");
+  await knopf("Pflichten-Check starten").click();
+  await warte(800);
+  pruefe(await sichtbar("noch nicht von Fachleuten geprüft"), "Prüfhinweis fehlt in der Einleitung des Checks");
+  await foto("check-einleitung");
+  await knopf("Los geht’s").click();
+  await warte();
+  await p.getByRole("checkbox", { name: "Beauty und Kosmetik" }).locator("visible=true").last().click();
+  await knopf("Weiter").click();
+  await warte(400);
+  const radio = (name) => p.getByRole("radio", { name, exact: true }).locator("visible=true").last();
+  await radio("Einzelunternehmen").click();
+  await warte(800);
+  await radio("Gewerbe").click();
+  await warte(800);
+  await radio("Bayern").click();
+  await warte(800);
+  await feld("Wie viele Menschen arbeiten für dich, dich selbst nicht mitgezählt?").fill("3");
+  await knopf("Weiter").click();
+  await warte(400);
+  await radio("Ja").click(); // elektronische Kasse
+  await warte(800);
+  await radio("Nein").click(); // keine Website
+  await warte(800);
+  await radio("Nein").click(); // keine Kleinunternehmerregelung
+  await warte(800);
+  await feld("Wann hast du angefangen oder wann willst du anfangen?").fill("01.03.2024");
+  await knopf("Weiter").click();
+  await warte(1200);
+  pruefe(await sichtbar("Für deinen Betrieb gelten"), "Ergebnis des Checks fehlt");
+  await foto("check-ergebnis");
+  await knopf("Deine Pflichten ansehen").click();
+  await warte(1200);
+  pruefe((await sichtbar("Hautschutzplan aushängen")) && (await sichtbar("Elektronische Kasse beim Finanzamt melden")) && !(await sichtbar("Impressum auf der Website")), "Pflichten passen nicht zum Profil (Beauty, Kasse, keine Website)");
+  pruefe(await sichtbar("0 von"), "Fortschritt fehlt");
+  await foto("pflichten");
+  await tippe(p.getByRole("button", { name: /^Hautschutzplan aushängen/ }).locator("visible=true").last());
+  await warte(900);
+  pruefe(await sichtbar("TRGS 401"), "Rechtsgrundlage fehlt in der Pflicht");
+  await knopf("Unterlage erstellen").click();
+  await warte(900);
+  pruefe(await sichtbar("Hautschutzplan"), "Unterlage zur Pflicht startet nicht");
+  await knopf("Schließen").click();
+  await warte(800);
+  await tippe(knopf("Als erledigt markieren"));
+  await warte(500);
+  await knopf("Zurück").click();
+  await warte(800);
+  pruefe(await sichtbar("1 von"), "Abhaken zählt nicht im Fortschritt");
+  await knopf("Zurück").click();
+  await warte(800);
+  pruefe(await sichtbar("Deine Pflichten"), "Fortschritt fehlt auf der Startseite");
+  await foto("start-mit-pflichten");
 
   // Rechnung im geführten Ablauf
   await knopf("Rechnung schreiben").click();

@@ -9,6 +9,7 @@ import { neueId, personenSortiert, PERSONEN_LISTE } from "../unterlagen/speicher
 import { useAmtlos } from "../zustand";
 import { Felder } from "./felder";
 import { Gruppe, Inhalt, Seite } from "./gemeinsam";
+import { CheckProfilZeile } from "./Pflichten";
 import { SicherungSeite, WiederherstellenSeite } from "./Sicherung";
 
 /** Eine gespeicherte Person bearbeiten (E-124). Eine neue Person ohne Namen verschwindet beim Verlassen wieder. */
@@ -132,6 +133,7 @@ export function Betrieb() {
     <Seite titel={TEXT.betrieb_titel}>
       {/* nach „alles löschen“ neu einhängen, damit die Felder leer sind */}
       <BetriebFormular key={zaehler} />
+      <CheckProfilZeile />
       <Personen art="mitarbeiter" />
       <Personen art="kunde" />
       <Gruppe titel={TEXT.daten_titel} fuss={TEXT.daten_text}>

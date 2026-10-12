@@ -552,6 +552,17 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **iPad** abgeschaltet (`supportsTablet: false`), bis es ein Tablet-Layout gibt.
 - Offen aus dem Review: verschlüsselte lokale Ablage (Punkt 27), alle strategischen Punkte (1–4, 6–9) – siehe `docs/review/status.md`.
 
+
+### E-126 · Pflichten-Check als Einstieg (Mittelweg); Prüfhinweis fest im Check
+- **Datum:** 2026-10-12 · **Status:** angenommen (Empfehlung „Weg b“ aus dem Investor-Readiness-Review, vom Gründer übernommen). Hebt für die App den Teil „kein Fragebogen“ aus E-121 auf; Erinnerungen folgen als nächster Schritt, weiter ohne Server.
+- **Check:** bis zu 10 Fragen, eine je Bildschirm, Auswahl springt gleich weiter, jede Frage lässt sich überspringen: Branche, Rechtsform (bei UG/GmbH: Handelsregister), Gewerbe oder freier Beruf, Bundesland, Beschäftigte, elektronische Kasse, Website, Kleinunternehmerregelung, Beginn. Die Fragen sind die des bestehenden Fragebogens (`@amtlos/i18n`, Schnellstart E-111 plus Kasse und Website) – keine neuen Inhalte.
+- **Rechnen auf dem Gerät:** `@amtlos/rules-engine` wertet den **ganzen Katalog** (146 Pflichten, 29 Regelwerte; `src/pflichten/katalog.json`, erzeugt von `katalog-buendel.mjs`, CI prüft die Aktualität) für das Profil aus – wie der Server. Pflichten im Rechtsänderungs-Radar zählen nicht. Test: Für alle Katalog-Fixtures ohne Ereignisse stimmt das Ergebnis mit den Erwartungen überein.
+- **Ergebnis:** „Für deinen Betrieb gelten N Pflichten“, wie viele davon eine Unterlage in Amtlos haben, wie viele laut Katalog „hoch“ eingestuft sind, wie viele von weiteren Angaben abhängen. „Deine Pflichten“ nach Bereich mit Fortschritt; eine Pflicht gilt als erledigt, wenn sie abgehakt ist oder eine vollständige Unterlage der passenden Vorlage existiert. Jede Pflicht zeigt Grund, Zuständigkeit, nächsten Termin, Einstufung, Erklärung, Rechtsgrundlage und Quellen aus dem Katalog und startet die passende Unterlage. Unklare Pflichten: „N weitere Fragen beantworten“ mit genau den fehlenden Angaben.
+- **Keine erfundenen Zahlen:** Bußgeldbeträge stehen nicht im Katalog („Folgen noch nicht fachlich erfasst“), deshalb zeigt die App keine – nur die Einstufung „hoch/mittel/niedrig“ aus dem Katalog.
+- **Prüfhinweis:** Er steht fest in der Einleitung des Checks („noch nicht von Fachleuten geprüft … ersetzen keine Rechts- oder Steuerberatung“), unter dem Ergebnis, in „Deine Pflichten“, bei jeder Pflicht und im Abschluss jeder Unterlage – nicht im PDF (Rückmeldung F. Steinmeyer zu Punkt 12; AGB folgen).
+- **Profil:** Antworten liegen in `stand.profil` (Schlüssel wie im Server-Profil), änderbar unter „Mein Betrieb → Pflichten-Check“; das Bundesland füllt „Mein Betrieb“, solange dort keins steht. Die Branche wählt in den Vorschlägen die passenden Gruppen vor („Passend für dich“), damit ein Malerbetrieb keine Friseurchemikalien sieht.
+- **Startseite:** vor dem Check die Einladung „Welche Pflichten gelten für dich?“ als Hauptknopf (Rechnung dann zweitrangig), danach „Deine Pflichten“ mit Fortschritt in Prozent.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)
