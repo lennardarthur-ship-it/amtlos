@@ -21,6 +21,8 @@ const gleich = () => new Promise((r) => setTimeout(r, 30));
 /** Daten verschlüsselt sichern (E-125): Passwort zweimal, dann Datei ins Teilen-Menü. Nichts geht im Klartext raus. */
 export function SicherungSeite() {
   const z = useAmtlos();
+  const nav = useNav();
+  const [erledigt, setErledigt] = useState(false);
   const [pw, setPw] = useState("");
   const [pw2, setPw2] = useState("");
   const [laedt, setLaedt] = useState(false);
@@ -39,6 +41,10 @@ export function SicherungSeite() {
       if (!(await dateiTeilen(sicherungsName(heute()), text))) return;
       z.gesichert(gesichert);
       setMeldung({ art: "erfolg", text: TEXT.sicherung_fertig });
+      // fertig: Passwort aus dem Feld, Knopf wird zu „Fertig“ – keine doppelte Sicherung aus Versehen
+      setPw("");
+      setPw2("");
+      setErledigt(true);
     } catch {
       setMeldung({ art: "fehler", text: TEXT.sicherung_fehler });
     } finally {
@@ -52,12 +58,16 @@ export function SicherungSeite() {
         <Feld label={TEXT.passwort} wert={pw} aendern={setPw} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="newPassword" fehler={kurz ? TEXT.passwort_kurz(PASSWORT_MINDESTLAENGE) : null} />
         <Feld label={TEXT.passwort_wiederholen} wert={pw2} aendern={setPw2} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="newPassword" fehler={ungleich ? TEXT.passwort_ungleich : null} />
         <View style={{ marginTop: 18 }}>
-          <Hinweis text={TEXT.sicherung_warnung} symbol="lock" />
+          <Hinweis art="warnung" text={TEXT.sicherung_warnung} symbol="lock" />
           {meldung ? <Hinweis art={meldung.art} text={meldung.text} /> : null}
         </View>
       </Inhalt>
       <Fuss>
-        <Knopf text={laedt ? TEXT.sicherung_laeuft : TEXT.sicherung_erstellen} symbol="lock" laedt={laedt} deaktiviert={!bereit} onPress={() => void los()} stil={{ flex: 1 }} />
+        {erledigt ? (
+          <Knopf text={TEXT.fertig} symbol="checkmark" onPress={nav.zurueck} stil={{ flex: 1 }} />
+        ) : (
+          <Knopf text={laedt ? TEXT.sicherung_laeuft : TEXT.sicherung_erstellen} symbol="lock" laedt={laedt} deaktiviert={!bereit} onPress={() => void los()} stil={{ flex: 1 }} />
+        )}
       </Fuss>
     </Unterseite>
   );
@@ -221,7 +231,7 @@ export function CloudZeile() {
   if (!cloud) return null;
   return (
     <Schalter
-      label={TEXT.icloud_auto}
+      label={TEXT.mitPro(TEXT.icloud_auto, z.pro)}
       hilfe={TEXT.icloud_auto_hilfe}
       wert={z.stand.cloudSicherung}
       aendern={(an) => {
@@ -290,7 +300,7 @@ function CloudSicherungSeite() {
         <Feld label={TEXT.passwort} wert={pw} aendern={setPw} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="newPassword" fehler={pw.length > 0 && pw.length < PASSWORT_MINDESTLAENGE ? TEXT.passwort_kurz(PASSWORT_MINDESTLAENGE) : null} />
         <Feld label={TEXT.passwort_wiederholen} wert={pw2} aendern={setPw2} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="newPassword" fehler={pw2.length > 0 && pw !== pw2 ? TEXT.passwort_ungleich : null} />
         <View style={{ marginTop: 18 }}>
-          <Hinweis text={TEXT.sicherung_warnung} symbol="lock" />
+          <Hinweis art="warnung" text={TEXT.sicherung_warnung} symbol="lock" />
           {fehler ? <Hinweis art="fehler" text={TEXT.icloud_fehler} /> : null}
         </View>
       </Inhalt>

@@ -20,7 +20,7 @@ export { bausteinText } from "./website.js";
 export { VERSTEUERUNG, aufbewahrenBis, eRechnungAus } from "./buchhaltung.js";
 export { STEUERKLASSEN, arbeitsminuten } from "./lohn.js";
 export { ANLAESSE, KURZ, PERSONEN_FELDER, kurztitel, naechsteNummer, personAus, personIn, personMerken, type Anlass } from "./ablauf.js";
-export { cent } from "./html.js";
+export { cent, zahl } from "./html.js";
 
 export const BEREICHE: { id: Bereich; titel: string }[] = [
   { id: "steuern", titel: "Steuern und Buchhaltung" },

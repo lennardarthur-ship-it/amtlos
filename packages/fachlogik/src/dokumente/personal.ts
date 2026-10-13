@@ -128,7 +128,7 @@ export const nachweisArbeitsbedingungen: Vorlage = {
   html(d, b) {
     const ort = text(d, "arbeitsort") === "anders" ? `${ORT.anders} ${text(d, "arbeitsort_text")}` : (ORT[text(d, "arbeitsort")] ?? "");
     const entgelt = text(d, "entgelt_betrag") ? `${ENTGELT[text(d, "entgelt_art")] ?? ""}: ${euro(cent(text(d, "entgelt_betrag")) ?? 0)}` : "";
-    const zeit = [text(d, "wochenstunden") ? `${zahlText(zahl(text(d, "wochenstunden")) ?? 0)} Stunden pro Woche` : "", text(d, "tage_pro_woche") ? `an ${text(d, "tage_pro_woche")} Tagen` : "", text(d, "verteilung")].filter(Boolean).join(", ");
+    const zeit = [text(d, "wochenstunden") ? `${zahlText(zahl(text(d, "wochenstunden")) ?? 0)} Stunden pro Woche` : "", text(d, "wochenstunden") && text(d, "tage_pro_woche") ? `an ${text(d, "tage_pro_woche")} Tagen` : "", text(d, "verteilung")].filter(Boolean).join(", ");
     const zeilenNw: [string, string | null][] = [
       ["1. Vertragsparteien", `Arbeitgeber: ${[b.name, anschrift(b)].filter((x) => x.trim()).join(", ")}\nBeschäftigte Person: ${[text(d, "name"), text(d, "anschrift").replace(/\n/g, ", ")].filter(Boolean).join(", ")}`],
       ["2. Beginn", datumDe(text(d, "beginn"))],

@@ -130,10 +130,12 @@ describe("Dokumentvorlagen", () => {
   it("zeigt Allergene, Unterschriftszeilen und leere HACCP-Zeilen", () => {
     const a = vorlageFuer("allergene")!;
     const html = a.html({ stand: "2026-10-12", gerichte: [{ name: "Apfelkuchen", kategorie: "Kuchen", allergene: ["gluten", "eier", "milch"] }] }, BETRIEB);
-    expect(html).toContain("Glutenhaltiges Getreide, Eier, Milch (einschließlich Laktose)");
+    // Matrix (E-130): eine Spalte je Allergen, × = enthalten
+    expect(html).toContain('<th class="dreh">Milch (einschließlich Laktose)</th>');
+    expect((html.match(/<td class="x">×<\/td>/g) ?? []).length).toBe(3);
     const u = vorlageFuer("unterweisung")!;
     const uh = u.html({ thema: "Test", teilnehmer: [{ name: "Kim" }] }, BETRIEB);
-    expect((uh.match(/<tr><td>/g) ?? []).length).toBe(8); // Kim + 7 freie Zeilen
+    expect((uh.match(/<tr><td>/g) ?? []).length).toBe(3); // Kim + 2 freie Zeilen (ohne Namen: 6 Zeilen zum Ausdrucken)
     const h = vorlageFuer("haccp")!;
     expect((h.html({ zeitraum: "Okt", leerzeilen: true, messungen: [] }, BETRIEB).match(/<tr><td>/g) ?? []).length).toBe(14);
   });

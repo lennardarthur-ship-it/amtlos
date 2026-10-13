@@ -13,6 +13,7 @@ import { ausUtf8, base64 } from "../unterlagen/sicherung";
 import { dateiTeilenBytes, dateiWaehlenBytes } from "../unterlagen/sicherungDatei";
 import { heute, neueId } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
+import { bestaetigen } from "../ui/bestaetigen";
 import { Inhalt, datumKurz } from "./gemeinsam";
 
 const euro = (c: number) => `${new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(c / 100)} €`;
@@ -101,7 +102,8 @@ export function BelegZeile({ b, letzte, onPress }: { b: Beleg; letzte: boolean; 
     <Zeile
       links={<Symbol name={b.quelle === "erechnung" ? "doc.text" : b.datei ? "doc.viewfinder" : "pencil"} groesse={22} farbe={unvollstaendig ? f.bald : f.amt} />}
       titel={b.lieferant.trim() || TEXT.beleg_ohne_lieferant}
-      text={`${datumKurz(`${b.datum}T12:00:00Z`)} · ${euro(s.brutto_cent)} · ${unvollstaendig ? TEXT.beleg_unvollstaendig : kategorieFuer(b.kategorie).titel}`}
+      text={`${datumKurz(`${b.datum}T12:00:00Z`)} · ${unvollstaendig ? TEXT.beleg_unvollstaendig : kategorieFuer(b.kategorie).titel}`}
+      wert={s.brutto_cent ? euro(s.brutto_cent) : undefined}
       onPress={onPress}
       letzte={letzte}
     />
@@ -145,7 +147,6 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
   const nav = useNav();
   const melden = useMeldung();
   const f = useFarben();
-  const [frage, setFrage] = useState(false);
   const b = z.stand.belege.find((x) => x.id === id);
   const zRef = useRef(z);
   zRef.current = z;
@@ -168,7 +169,7 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
     setze({ steuer: b.steuer.map((x, j) => (j === i ? { ...x, brutto_cent: cent(text) ?? 0 } : x)) });
   };
   return (
-    <Unterseite titel={b.lieferant.trim() || TEXT.beleg_neu}>
+    <Unterseite titel={neu ? TEXT.beleg_neu : TEXT.beleg_titel}>
       <Inhalt contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 4, paddingBottom: 32 }}>
         <DateiVorschau b={b} />
         {b.quelle === "erechnung" ? <Hinweis art="erfolg" text={TEXT.beleg_aus_erechnung} /> : null}
@@ -191,7 +192,7 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
           ].map(([a, w], i) => (
             <View key={a} style={{ flexDirection: "row", justifyContent: "space-between", paddingVertical: 6, borderTopWidth: i ? 1 : 0, borderColor: f.linieLeise }}>
               <T fett={i === 2}>{a}</T>
-              <T fett={i === 2} stil={{ fontVariant: ["tabular-nums"] }}>{w}</T>
+              <T fett={i === 2}>{w}</T>
             </View>
           ))}
         </Karte>
@@ -201,30 +202,31 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
         <Wahl label={TEXT.beleg_zahlung} wert={b.zahlung} aendern={(w) => setze({ zahlung: w })} optionen={ZAHLUNGSWEGE} />
         <DatumFeld label={TEXT.beleg_bezahlt} hilfe={TEXT.beleg_bezahlt_hilfe} wert={b.bezahlt ?? null} aendern={(d) => setze({ bezahlt: d })} />
         <Feld label={TEXT.beleg_notiz} wert={b.notiz ?? ""} aendern={(w) => setze({ notiz: w || null })} mehrzeilig />
-        {frage ? (
-          <Karte stil={{ paddingVertical: 14, gap: 10, marginTop: 24 }}>
-            <T fett>{TEXT.loeschen_wirklich}</T>
-            <T v="klein" leise>{TEXT.beleg_loeschen_hinweis(regelwert("steuern.aufbewahrung.belege_jahre") ?? 8)}</T>
-            <View style={{ flexDirection: "row", gap: 10 }}>
-              <Knopf
-                gefahr
-                text={TEXT.loeschen_ja}
-                onPress={() => {
-                  z.belegLoeschen(id);
-                  melden(TEXT.geloescht, "info");
-                  nav.zurueck();
-                }}
-                stil={{ flex: 1 }}
-              />
-              <Knopf ton text={TEXT.abbrechen} onPress={() => setFrage(false)} stil={{ flex: 1 }} />
-            </View>
-          </Karte>
-        ) : (
-          <TextKnopf symbol="trash" gefahr text={TEXT.loeschen} onPress={() => { weich(); setFrage(true); }} stil={{ marginTop: 24 }} />
-        )}
+        <TextKnopf
+          symbol="trash"
+          gefahr
+          text={TEXT.loeschen}
+          onPress={() =>
+            void bestaetigen({ titel: TEXT.loeschen_wirklich, text: TEXT.beleg_loeschen_hinweis(regelwert("steuern.aufbewahrung.belege_jahre") ?? 8), ja: TEXT.loeschen_ja }).then((ok) => {
+              if (!ok) return;
+              z.belegLoeschen(id);
+              melden(TEXT.geloescht, "info");
+              nav.zurueck();
+            })
+          }
+          stil={{ marginTop: 24 }}
+        />
       </Inhalt>
       <Fuss>
-        <Knopf text={TEXT.fertig} onPress={nav.zurueck} stil={{ flex: 1 }} />
+        <Knopf
+          text={TEXT.fertig}
+          onPress={() => {
+            // sagen, dass und was gespeichert ist – man landet sonst ohne Rückmeldung wieder auf „Beleg erfassen“
+            if (b.lieferant.trim() || s.brutto_cent) melden(TEXT.beleg_gespeichert([b.lieferant.trim(), s.brutto_cent ? euro(s.brutto_cent) : ""].filter(Boolean).join(", ")));
+            nav.zurueck();
+          }}
+          stil={{ flex: 1 }}
+        />
       </Fuss>
     </Unterseite>
   );

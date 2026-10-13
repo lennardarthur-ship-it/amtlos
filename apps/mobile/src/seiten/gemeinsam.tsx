@@ -18,11 +18,14 @@ export function Seite({ titel, unterzeile, children, ...rest }: ScrollViewProps 
 }
 
 /** Leerer Zustand als Einladung: ein Satz, was jetzt sinnvoll ist. */
-export function Leer({ text, children }: { text: string; children?: ReactNode }) {
+export function Leer({ text, unter, children }: { text: string; unter?: string; children?: ReactNode }) {
   const f = useFarben();
   return (
     <View style={{ paddingVertical: 24, paddingHorizontal: 16, borderRadius: 14, backgroundColor: f.amtHauch, gap: 14 }}>
-      <T fett farbe={f.amtTief}>{text}</T>
+      <View style={{ gap: 4 }}>
+        <T fett farbe={f.amtTief}>{text}</T>
+        {unter ? <T farbe={f.amtTief}>{unter}</T> : null}
+      </View>
       {children}
     </View>
   );

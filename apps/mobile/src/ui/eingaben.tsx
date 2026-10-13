@@ -84,7 +84,7 @@ export function Eingabe({ feld, wert, setzen }: { feld: EinfachesFeld; wert: Ein
     case "mehrzeilig":
       if (feld.vorschlaege?.length)
         return feld.art === "text" ? <AuswahlMitAnders label={feld.label} hilfe={feld.hilfe} optionen={feld.vorschlaege} wert={text} setzen={setzen} /> : <ZeilenAuswahl label={feld.label} hilfe={feld.hilfe} optionen={feld.vorschlaege} wert={text} setzen={setzen} />;
-      return <Feld label={feld.label} hilfe={feld.hilfe} wert={text} aendern={setzen} mehrzeilig={feld.art === "mehrzeilig"} {...(feld.art === "text" ? tastaturFuer(feld.id) : {})} />;
+      return <Feld label={feld.label} hilfe={feld.hilfe} wert={text} aendern={setzen} mehrzeilig={feld.art === "mehrzeilig"} optional={!feld.pflicht} {...(feld.art === "text" ? tastaturFuer(feld.id) : {})} />;
     case "bausteine":
       return <BausteinListe label={feld.label} hilfe={feld.hilfe} werte={Array.isArray(wert) ? wert : []} aendern={setzen} optionen={feld.optionen} />;
     case "datum":
@@ -93,9 +93,9 @@ export function Eingabe({ feld, wert, setzen }: { feld: EinfachesFeld; wert: Ein
       return <UhrzeitFeld label={feld.label} hilfe={feld.hilfe} wert={text} aendern={setzen} />;
     case "betrag":
       // Preis einer Position darf negativ sein (Nachlass) – die Zifferntastatur hat kein Minus
-      return <Feld label={feld.label} hilfe={feld.hilfe} wert={text} aendern={setzen} keyboardType={feld.id === "preis" ? "numbers-and-punctuation" : "decimal-pad"} placeholder="0,00" fehler={text.trim() && cent(text) === null ? TEXT.betrag_falsch : null} />;
+      return <Feld label={feld.label} hilfe={feld.hilfe} wert={text} aendern={setzen} keyboardType={feld.id === "preis" ? "numbers-and-punctuation" : "decimal-pad"} placeholder="0,00" optional={!feld.pflicht} fehler={text.trim() && cent(text) === null ? TEXT.betrag_falsch : null} />;
     case "zahl":
-      return <Feld label={feld.label} hilfe={feld.hilfe} wert={text} aendern={setzen} keyboardType="decimal-pad" fehler={text.trim() && cent(text) === null ? TEXT.zahl_falsch : null} />;
+      return <Feld label={feld.label} hilfe={feld.hilfe} wert={text} aendern={setzen} keyboardType="decimal-pad" optional={!feld.pflicht} fehler={text.trim() && cent(text) === null ? TEXT.zahl_falsch : null} />;
     case "schalter":
       return <Schalter label={feld.label} hilfe={feld.hilfe} wert={wert === true} aendern={setzen} />;
     case "mehrfach":

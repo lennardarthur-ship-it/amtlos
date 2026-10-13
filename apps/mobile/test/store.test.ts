@@ -21,4 +21,22 @@ describe("Store-Texte (E-132) halten die Grenzen des App Store ein", () => {
     expect(s.bilder.length).toBeGreaterThanOrEqual(3);
     expect(s.bilder.length).toBeLessThanOrEqual(10);
   });
+  it("Link zu den Nutzungsbedingungen (Apple, Abos) und Kennzeichnung der Pro-Funktionen (Richtlinie 2.3.2)", () => {
+    expect(s.beschreibung).toMatch(/Nutzungsbedingungen: https:\/\/www\.apple\.com\/legal\/internet-services\/itunes\/dev\/stdeula\//);
+    expect(s.beschreibung).toMatch(/E-Rechnung \(XRechnung\)[^\n]*\(Pro\)/);
+    expect(s.beschreibung).toMatch(/Steuerberatung[^\n]*\(Pro\)/);
+    // XRechnung an Behörden braucht die Leitweg-ID – die App fragt sie nicht ab, also kein Versprechen
+    expect(JSON.stringify(s)).not.toMatch(/Behörde/);
+    expect((s.neu as string).length).toBeGreaterThan(0);
+  });
+  it("Lupen-Ausschnitte der Bilder liegen im Bildschirm", () => {
+    for (const b of s.bilder as { lupe?: { x: number; y: number; b: number; h: number } }[]) {
+      if (!b.lupe) continue;
+      const { x, y, b: br, h } = b.lupe;
+      expect(x).toBeGreaterThanOrEqual(0);
+      expect(y).toBeGreaterThanOrEqual(0);
+      expect(x + br).toBeLessThanOrEqual(1);
+      expect(y + h).toBeLessThanOrEqual(1);
+    }
+  });
 });

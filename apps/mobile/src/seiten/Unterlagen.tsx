@@ -1,13 +1,14 @@
-import { useState } from "react";
-import { TextInput, View } from "react-native";
-import { ANLAESSE, BEREICHE, KURZ, VORLAGEN, unterlagenName, vorlageFuer, type Anlass, type Vorlage } from "@amtlos/fachlogik";
+import { memo, useMemo, useState } from "react";
+import { View } from "react-native";
+import { ANLAESSE, BEREICHE, KURZ, VORLAGEN, unterlagenName, vorlageFuer, type Anlass, type Betrieb, type Vorlage } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { Karte, Knopf, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
+import { Karte, Knopf, Suchfeld, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
-import { GROESSE, RAND, SCHRIFT, useFarben } from "../ui/thema";
+import { RAND, useFarben } from "../ui/thema";
 import { fehltFuer } from "../unterlagen/pruefung";
 import { betriebFehlt, heute, sortiert, type Unterlage } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
+import { euroText, rechnungBrutto } from "../unterlagen/ablage";
 import { BetriebFormular } from "./Betrieb";
 import { BEREICH_SYMBOL, Gruppe, Inhalt, Seite, datumKurz } from "./gemeinsam";
 import { useOeffnen, useStarten } from "./starten";
@@ -35,21 +36,43 @@ function wann(iso: string): string {
   return datumKurz(iso);
 }
 
-/** Zeile für eine eigene Unterlage: Name, wann geändert, was noch fehlt. */
-export function UnterlageZeile({ u, letzte, onPress }: { u: Unterlage; letzte: boolean; onPress: () => void }) {
+const datumText = (iso: string) => (/^\d{4}-\d{2}-\d{2}$/.test(iso) ? datumKurz(`${iso}T12:00:00Z`) : null);
+
+/**
+ * Zeile für eine eigene Unterlage. Rechnungen zeigen, wonach man sucht: Kunde, Betrag, Nummer, Rechnungsdatum,
+ * Status. Andere Unterlagen: Name, wann geändert, was noch fehlt. `fehlt` rechnet die Liste einmal für alle aus.
+ */
+export const UnterlageZeile = memo(function UnterlageZeile({ u, letzte, fehlt, betrieb, onPress }: { u: Unterlage; letzte: boolean; fehlt: number; betrieb: Betrieb; onPress: (id: string) => void }) {
   const f = useFarben();
-  const { stand } = useAmtlos();
+  // zuletzt bearbeitet oder geteilt
+  const zuletzt = u.ausgegeben && u.ausgegeben > u.geaendert ? u.ausgegeben : u.geaendert;
   const v = vorlageFuer(u.vorlage)!;
-  const n = fehltFuer(stand, u).length;
-  return (
-    <Zeile
-      links={<Symbol name="doc.richtext" groesse={22} farbe={n ? f.bald : f.amt} />}
-      titel={unterlagenName(v, u.daten)}
-      text={`${wann(u.geaendert)} · ${u.storniertDurch ? TEXT.storniert : u.festgeschrieben && v.storno && !u.daten.storno_zu ? (u.bezahlt ? TEXT.bezahlt_kurz : TEXT.offen_kurz) : u.festgeschrieben ? TEXT.festgeschrieben_kurz : n ? TEXT.fehlen(n) : TEXT.vollstaendig}`}
-      onPress={onPress}
-      letzte={letzte}
-    />
-  );
+  const status = u.storniertDurch ? TEXT.storniert : u.festgeschrieben && v.storno && !u.daten.storno_zu ? (u.bezahlt ? TEXT.bezahlt_kurz : TEXT.offen_kurz) : u.festgeschrieben ? TEXT.festgeschrieben_kurz : fehlt ? TEXT.fehlen(fehlt) : TEXT.vollstaendig;
+  const symbol = <Symbol name="doc.richtext" groesse={22} farbe={fehlt && !u.festgeschrieben ? f.bald : f.amt} />;
+  if (v.storno) {
+    const nummer = typeof u.daten.nummer === "string" ? u.daten.nummer.trim() : "";
+    const datum = (typeof u.daten.datum === "string" && datumText(u.daten.datum)) || wann(zuletzt);
+    const storno = typeof u.daten.storno_zu === "string" && u.daten.storno_zu.trim() ? u.daten.storno_zu.trim() : "";
+    const kunde = typeof u.daten.kunde_name === "string" ? u.daten.kunde_name.trim() : "";
+    const brutto = rechnungBrutto(u, betrieb);
+    return (
+      <Zeile
+        links={symbol}
+        titel={storno ? TEXT.storno_titel(nummer, storno) : kunde || TEXT.rechnung_ohne_kunde}
+        text={[storno ? kunde : nummer, datum, status].filter(Boolean).join(" · ")}
+        wert={brutto ? euroText(brutto) : undefined}
+        onPress={() => onPress(u.id)}
+        letzte={letzte}
+      />
+    );
+  }
+  return <Zeile links={symbol} titel={unterlagenName(v, u.daten)} text={`${wann(zuletzt)} · ${status}`} onPress={() => onPress(u.id)} letzte={letzte} />;
+});
+
+/** Fehlende Angaben je Unterlage – einmal je Stand berechnet, nicht in jeder Zeile. */
+export function useFehltJe(): Map<string, number> {
+  const { stand } = useAmtlos();
+  return useMemo(() => new Map(stand.unterlagen.map((u) => [u.id, fehltFuer(stand, u).length])), [stand.unterlagen, stand.betrieb]);
 }
 
 /** Vorlage in einer Liste: Titel und ein Satz in Alltagssprache. Antippen startet sofort. */
@@ -75,25 +98,7 @@ function AnlassSeite({ a }: { a: Anlass }) {
   );
 }
 
-export function Suchfeld({ wert, setzen, label = TEXT.suchen }: { wert: string; setzen: (w: string) => void; label?: string }) {
-  const f = useFarben();
-  return (
-    <View style={{ flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 12, minHeight: 44, borderRadius: 12, backgroundColor: f.blatt, borderWidth: 1, borderColor: f.rahmen }}>
-      <Symbol name="magnifyingglass" groesse={18} />
-      <TextInput
-        accessibilityLabel={label}
-        placeholder={label}
-        placeholderTextColor={f.tinteLeise}
-        value={wert}
-        onChangeText={setzen}
-        autoCorrect={false}
-        clearButtonMode="while-editing"
-        returnKeyType="search"
-        style={{ flex: 1, minHeight: 44, color: f.tinte, fontFamily: SCHRIFT.regular, fontSize: GROESSE.basis }}
-      />
-    </View>
-  );
-}
+export { Suchfeld };
 
 const passt = (s: string) => (v: Vorlage) => !s || `${v.titel} ${KURZ[v.id] ?? ""} ${v.beschreibung}`.toLowerCase().includes(s);
 
@@ -139,6 +144,7 @@ export function Unterlagen() {
   const f = useFarben();
   const starten = useStarten();
   const oeffnen = useOeffnen();
+  const fehltJe = useFehltJe();
   const [suche, setSuche] = useState("");
   const s = suche.trim().toLowerCase();
   const zuletzt = sortiert(stand).slice(0, 3);
@@ -179,7 +185,7 @@ export function Unterlagen() {
             <Gruppe titel={TEXT.zuletzt}>
               <Karte>
                 {zuletzt.map((u, i) => (
-                  <UnterlageZeile key={u.id} u={u} letzte={i === zuletzt.length - 1} onPress={() => oeffnen(u.id)} />
+                  <UnterlageZeile key={u.id} u={u} letzte={i === zuletzt.length - 1} fehlt={fehltJe.get(u.id) ?? 0} betrieb={stand.betrieb} onPress={oeffnen} />
                 ))}
               </Karte>
               {stand.unterlagen.length > zuletzt.length ? <TextKnopf text={TEXT.alle_anzeigen} onPress={() => tabWechseln("meine")} stil={{ marginLeft: 4 }} /> : null}

@@ -96,7 +96,8 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
         <T v="grossTitel" accessibilityRole="header" stil={{ marginTop: 14 }}>{TEXT.pro_titel}</T>
         <T leise stil={{ marginTop: 6 }}>{grund ? TEXT.pro_grund[grund](FREI_JE_MONAT) : TEXT.pro_unter}</T>
         <Karte stil={{ marginTop: 20, paddingVertical: 4 }}>
-          {VORTEILE.map((v, i) => (
+          {/* der Grund, aus dem der Bezahlschirm aufging, steht oben */}
+          {(grund ? [grund, ...VORTEILE.filter((x) => x !== grund)] : VORTEILE).map((v, i) => (
             <View key={v} style={{ flexDirection: "row", gap: 14, paddingVertical: 12, borderTopWidth: i ? 1 : 0, borderColor: f.linieLeise }}>
               <View style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: v === grund ? f.amt : f.amtHauch, alignItems: "center", justifyContent: "center" }}>
                 <Symbol name={VORTEIL_SYMBOL[v]} groesse={18} farbe={v === grund ? f.blatt : f.amt} />
@@ -108,7 +109,10 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
             </View>
           ))}
         </Karte>
-        <T v="caption" leise stil={{ marginTop: 8, marginLeft: 4 }}>{TEXT.pro_frei_bleibt}</T>
+        <Karte stil={{ marginTop: 12, paddingVertical: 12, flexDirection: "row", gap: 10, alignItems: "flex-start" }}>
+          <Symbol name="checkmark.circle" groesse={20} farbe={f.amt} />
+          <T v="klein" stil={{ flex: 1 }}>{TEXT.pro_frei_bleibt}</T>
+        </Karte>
         {!z.pro ? <T v="caption" leise stil={{ marginTop: 4, marginLeft: 4 }}>{TEXT.pro_rest(rest, FREI_JE_MONAT)}</T> : null}
 
         {kaufAktiv ? (
@@ -125,7 +129,7 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
                       <T fett>{a.zeitraum ? TEXT.pro_zeitraum(a.zeitraum) : a.titel}</T>
                       {a.test ? <T v="klein" farbe={f.amt}>{TEXT.pro_test_zeitraum(a.test)}</T> : null}
                     </View>
-                    <T fett stil={{ fontVariant: ["tabular-nums"] }}>{a.preis}</T>
+                    <T fett>{a.preis}</T>
                   </Pressable>
                 );
               })}
@@ -176,13 +180,16 @@ export function ProZeile() {
   const rest = uebrig(z.stand.unterlagen, new Date());
   return (
     <Pressable accessibilityRole="button" onPress={() => nav.oeffnen("pro", () => <ProSeite />, true)} style={({ pressed }) => ({ marginTop: 16, opacity: pressed ? 0.75 : 1 })}>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 14, padding: 14, borderRadius: RADIUS.karte, backgroundColor: z.pro ? f.blatt : f.amt, borderWidth: z.pro ? 1 : 0, borderColor: f.linie }}>
-        <Symbol name="checkmark.seal.fill" groesse={26} farbe={z.pro ? f.amt : f.blatt} />
-        <View style={{ flex: 1 }}>
-          <T fett farbe={z.pro ? undefined : f.blatt}>{z.pro ? TEXT.pro_aktiv : TEXT.pro_titel}</T>
-          <T v="klein" farbe={z.pro ? f.tinteLeise : f.blatt}>{z.pro ? TEXT.pro_aktiv_text : TEXT.pro_rest(rest, FREI_JE_MONAT)}</T>
+      {/* ruhige Karte wie die übrigen – die lauteste Fläche des Bildschirms soll nicht die Werbung sein */}
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 14, padding: 14, borderRadius: RADIUS.karte, backgroundColor: f.blatt, borderWidth: 1, borderColor: f.linie }}>
+        <View style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: z.pro ? f.amtHauch : f.amt, alignItems: "center", justifyContent: "center" }}>
+          <Symbol name="checkmark.seal.fill" groesse={20} farbe={z.pro ? f.amt : f.blatt} />
         </View>
-        <Symbol name="chevron.right" groesse={16} farbe={z.pro ? undefined : f.blatt} />
+        <View style={{ flex: 1 }}>
+          <T fett>{z.pro ? TEXT.pro_aktiv : TEXT.pro_titel}</T>
+          <T v="klein" leise>{z.pro ? TEXT.pro_aktiv_text : TEXT.pro_rest(rest, FREI_JE_MONAT)}</T>
+        </View>
+        <Symbol name="chevron.right" groesse={16} />
       </View>
     </Pressable>
   );

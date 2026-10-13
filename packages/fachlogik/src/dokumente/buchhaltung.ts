@@ -8,7 +8,7 @@ import { KU_HINWEIS, fehlendFuerERechnung, rundeCent, summen, type Position, typ
 import { einheitCode } from "../erechnung.js";
 import { giroCodeSvg } from "../girocode.js";
 import { AUFBEWAHRUNG, EINHEITEN, EUER_AUSGABEN, EUER_EINNAHMEN, KASSEN_ARTEN, RECHNUNGS_HINWEISE, TSE_ARTEN } from "./bausteine.js";
-import { abschnitt, absatz, anschrift, auswahl, brief, cent, datumDe, dokument, esc, euro, felder, kennzahlen, nachsatz, uebertragung, ja, liste, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
+import { ZELLE_LINIE, abschnitt, absatz, anschrift, auswahl, brief, cent, datumDe, dokument, esc, euro, felder, ibanText, kennzahlen, nachsatz, uebertragung, ja, liste, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
 import type { Betrieb, Daten, Eintrag, Option, Vorlage } from "./typen.js";
 
 /** ISO-Datum plus Tage als TT.MM.JJJJ. */
@@ -25,6 +25,14 @@ const SAETZE = [
 ];
 /** Hinweis bei steuerpflichtigen Leistungen im Zusammenhang mit einem Grundstück an Privatpersonen (§ 14 Abs. 4 Nr. 9 UStG). */
 const GRUNDSTUECK_HINWEIS = "Sie sind gesetzlich verpflichtet, diese Rechnung, einen Zahlungsbeleg oder eine andere beweiskräftige Unterlage zwei Jahre aufzubewahren (§ 14b Abs. 1 Satz 5 UStG).";
+const ZAHLUNGS_HINWEIS = "Bitte geben Sie bei der Zahlung die Rechnungsnummer an.";
+/** Bezeichnung der 0-%-Zeile in der Summe: mit dem gewählten Grund statt pauschal „steuerfrei“ (Texte wie in den Pflichthinweisen). */
+function nullProzentText(hinweise: string[], befreiung: string): string {
+  if (hinweise.includes("reverse_charge")) return `Umsatzsteuer 0 % (${RECHNUNGS_HINWEISE.find((h) => h.wert === "reverse_charge")!.text})`;
+  if (hinweise.includes("igl")) return "Umsatzsteuer 0 % (steuerfreie innergemeinschaftliche Lieferung)";
+  if (befreiung) return "Umsatzsteuer 0 % (steuerfrei, siehe Hinweis)";
+  return "Steuerfrei bzw. 0 %";
+}
 const ZIEL: Record<string, string> = { sofort: "sofort ohne Abzug", "7": "innerhalb von 7 Tagen", "14": "innerhalb von 14 Tagen", "30": "innerhalb von 30 Tagen" };
 
 function positionen(d: Daten): { e: Eintrag; p: Position }[] {
@@ -173,7 +181,7 @@ export const rechnung: Vorlage = {
   grundlage: "§ 14 Abs. 4 UStG",
   namensFeld: "nummer",
   abschnitte: [
-    { titel: "Rechnung",
+    { titel: "Eckdaten",
       hilfe: "Am Ende teilst du die Rechnung als PDF – an Unternehmen zusätzlich als E-Rechnung (XRechnung).",
       felder: [
         { id: "nummer", art: "text", label: "Rechnungsnummer", hilfe: "fortlaufend und nur einmal vergeben, z. B. 2026-001", pflicht: true },
@@ -218,7 +226,7 @@ export const rechnung: Vorlage = {
         { id: "kleinunternehmer", art: "schalter", label: "Kleinunternehmer (§ 19 UStG)", hilfe: "Dann wird keine Umsatzsteuer ausgewiesen; der Hinweis auf die Steuerbefreiung steht auf der Rechnung." },
         { id: "hinweise", selten: true, art: "bausteine", label: "Pflichthinweise, falls zutreffend", optionen: [...RECHNUNGS_HINWEISE.filter((h) => h.wert !== "steuerfrei").map((h) => ({ wert: h.wert, text: h.text, quelle: h.quelle })), { wert: "grundstueck", text: GRUNDSTUECK_HINWEIS, quelle: "§ 14 Abs. 4 Nr. 9, § 14b Abs. 1 Satz 5 UStG" }] },
         { id: "befreiung", selten: true, art: "text", label: "Hinweis auf die Steuerbefreiung (bei 0 %)", hilfe: "Pflicht, wenn eine Position steuerfrei ist – mit der Vorschrift", vorschlaege: ["Steuerfreie Leistung nach § 4 Nr. … UStG"] },
-        { id: "hinweis", art: "mehrzeilig", label: "Weitere Hinweise", vorschlaege: ["Vielen Dank für Ihren Auftrag.", "Bitte geben Sie bei der Zahlung die Rechnungsnummer an."] },
+        { id: "hinweis", art: "mehrzeilig", label: "Weitere Hinweise", vorschlaege: ["Vielen Dank für Ihren Auftrag.", ZAHLUNGS_HINWEIS] },
       ],
     },
   ],
@@ -248,7 +256,7 @@ export const rechnung: Vorlage = {
     ]);
     const summenZeilen = [
       `<tr><td>Summe netto</td><td>${euro(s.netto_cent)}</td></tr>`,
-      ...(ku ? [] : s.gruppen.map((g) => `<tr><td>${g.satz === 0 ? "Steuerfrei bzw. 0 %" : `Umsatzsteuer ${g.satz} %`} auf ${euro(g.netto_cent)}</td><td>${euro(g.ust_cent)}</td></tr>`)),
+      ...(ku ? [] : s.gruppen.map((g) => `<tr><td>${g.satz === 0 ? nullProzentText(auswahl(d, "hinweise"), text(d, "befreiung")) : `Umsatzsteuer ${g.satz} %`} auf ${euro(g.netto_cent)}</td><td>${euro(g.ust_cent)}</td></tr>`)),
       `<tr class="gesamt"><td>Rechnungsbetrag</td><td>${euro(s.brutto_cent)}</td></tr>`,
     ].join("");
     const leistung = text(d, "leistung");
@@ -257,7 +265,8 @@ export const rechnung: Vorlage = {
       ...auswahl(d, "hinweise").map((w) => (w === "grundstueck" ? GRUNDSTUECK_HINWEIS : (RECHNUNGS_HINWEISE.find((h) => h.wert === w)?.text ?? ""))),
       text(d, "befreiung"),
       text(d, "zahlungsziel") && !text(d, "storno_zu") && !b.iban.trim() ? `Zahlbar ${ZIEL[text(d, "zahlungsziel")]}${text(d, "zahlungsziel") !== "sofort" && text(d, "datum") ? ` (bis ${plusTage(text(d, "datum"), Number(text(d, "zahlungsziel")))})` : ""}.` : "",
-      ...text(d, "hinweis").split("\n"),
+      // Stornorechnung: der Hinweis zur Zahlung aus der ursprünglichen Rechnung passt nicht mehr
+      ...text(d, "hinweis").split("\n").filter((h) => !(text(d, "storno_zu") && h.trim() === ZAHLUNGS_HINWEIS)),
     ].filter((x) => x.trim());
     const storno = text(d, "storno_zu");
     const datum = text(d, "datum");
@@ -268,14 +277,15 @@ export const rechnung: Vorlage = {
     const qr = !storno && iban && s.brutto_cent > 0 ? giroCodeSvg({ name: b.name.trim(), iban, bic: b.bic ?? null, betragCent: s.brutto_cent, verwendungszweck: `Rechnung ${text(d, "nummer")}` }, 28) : null;
     const zahlung =
       !storno && iban && s.brutto_cent > 0
-        ? `<div class="zahlung">${qr ? `<div class="qr">${qr}<small>GiroCode – mit der Banking-App scannen</small></div>` : ""}<div class="text"><p>Bitte überweisen Sie <strong>${euro(s.brutto_cent)}</strong>${faellig ? ` bis zum <strong>${esc(faellig)}</strong>` : ziel === "sofort" ? " sofort ohne Abzug" : ""} auf das Konto</p><p><strong>IBAN ${esc(iban)}</strong>${b.bic?.trim() ? `<br>BIC ${esc(b.bic.trim())}` : ""}${b.bank?.trim() ? `<br>${esc(b.bank.trim())}` : ""}<br>Verwendungszweck: Rechnung ${esc(text(d, "nummer"))}</p></div></div>`
+        ? `<div class="zahlung">${qr ? `<div class="qr">${qr}<small>GiroCode – mit der Banking-App scannen</small></div>` : ""}<div class="text"><p>Bitte überweisen Sie <strong>${euro(s.brutto_cent)}</strong>${faellig ? ` bis zum <strong>${esc(faellig)}</strong>` : ziel === "sofort" ? " sofort ohne Abzug" : ""} auf das Konto</p><p><strong>IBAN ${esc(ibanText(iban))}</strong>${b.bic?.trim() ? `<br>BIC ${esc(b.bic.trim())}` : ""}${b.bank?.trim() ? `<br>${esc(b.bank.trim())}` : ""}<br>Verwendungszweck: Rechnung ${esc(text(d, "nummer"))}</p></div></div>`
         : "";
     const anrede = text(d, "kunde_name") ? (storno ? `wir stornieren hiermit die unten genannte Rechnung und stellen den Betrag wie folgt gut.` : `wir bedanken uns für Ihren Auftrag und stellen Ihnen folgende Leistungen in Rechnung:`) : "";
     const titel = `${storno ? "Stornorechnung" : "Rechnung"} ${text(d, "nummer")}`.trim();
     return brief({
       titel,
       betreff: titel,
-      unterBetreff: storno ? `Diese Rechnung storniert die Rechnung Nr. ${storno}${text(d, "storno_zu_datum") ? ` vom ${datumDe(text(d, "storno_zu_datum"))}` : ""}.` : !ja(d, "leistung_gleich") && leistung ? `Leistungszeitraum: ${leistung}` : undefined,
+      // der Leistungszeitraum steht im Informationsblock („Leistung“), nicht noch einmal unter dem Betreff
+      unterBetreff: storno ? `Diese Rechnung storniert die Rechnung Nr. ${storno}${text(d, "storno_zu_datum") ? ` vom ${datumDe(text(d, "storno_zu_datum"))}` : ""}.` : undefined,
       betrieb: b,
       stand: datumDe(datum),
       empfaenger: { name: text(d, "kunde_name"), anschrift: text(d, "kunde_anschrift"), zusatz: text(d, "kunde_ust_idnr") ? `USt-IdNr. ${text(d, "kunde_ust_idnr")}` : undefined },
@@ -375,7 +385,7 @@ export const euer: Vorlage = {
             { text: "Summe der Betriebseinnahmen", betrag: euro(e) },
             { text: "Summe der Betriebsausgaben", betrag: euro(a) },
             { text: "Absetzungen für Abnutzung (AfA)", betrag: euro(f) },
-            { text: ergebnis >= 0 ? "Gewinn" : "Verlust", hinweis: "Betriebseinnahmen abzüglich Betriebsausgaben und AfA", betrag: euro(ergebnis), fett: true },
+            { text: ergebnis >= 0 ? "Gewinn" : "Verlust", hinweis: "Betriebseinnahmen abzüglich Betriebsausgaben und AfA", betrag: euro(Math.abs(ergebnis)), fett: true },
           ]),
         ) +
         (kategorien.length > 1 ? abschnitt("Betriebsausgaben nach Zeilen der Anlage EÜR", kennzahlen(kategorien.map((k) => ({ text: k, betrag: euro(summe(aus.filter((x) => (text(x, "kategorie") || "ohne Kategorie") === k), "betrag")) })))) : "") +
@@ -423,9 +433,12 @@ export const bilanzGuv: Vorlage = {
   },
   html(d, b) {
     const l = (k: string) => liste(d, k).filter((x) => text(x, "posten") || text(x, "betrag"));
+    // Aktiva und Passiva gleich lang, damit die Summen auf einer Linie stehen (mit Doppellinie)
+    const bilanzZeilen = Math.max(l("aktiva").length, l("passiva").length);
     const t = (k: string) => {
       const x = l(k);
-      return tabelle(["Posten", "Betrag"], x.map((e) => [zelle(text(e, "posten")), euro(cent(text(e, "betrag")) ?? 0)]), { breiten: ["72%", "28%"], zahlen: [1], summe: ["<strong>Summe</strong>", `<strong>${euro(summe(x, "betrag"))}</strong>`] });
+      const bilanz = k === "aktiva" || k === "passiva";
+      return tabelle(["Posten", "Betrag"], x.map((e) => [zelle(text(e, "posten")), euro(cent(text(e, "betrag")) ?? 0)]), { breiten: ["72%", "28%"], zahlen: [1], summe: ["<strong>Summe</strong>", `<strong>${euro(summe(x, "betrag"))}</strong>`], ...(bilanz ? { mindestens: bilanzZeilen, klasse: "doppelt" } : {}) });
     };
     const j = summe(l("ertraege"), "betrag") - summe(l("aufwendungen"), "betrag");
     const akt = summe(l("aktiva"), "betrag");
@@ -436,7 +449,7 @@ export const bilanzGuv: Vorlage = {
       unter: text(d, "stichtag") ? `Bilanz und Gewinn- und Verlustrechnung zum ${datumDe(text(d, "stichtag"))}` : "Bilanz und Gewinn- und Verlustrechnung",
       meta: [b.steuernummer.trim() ? `Steuernummer: ${b.steuernummer.trim()}` : "", text(d, "stichtag") ? `Stichtag: ${datumDe(text(d, "stichtag"))}` : ""].filter(Boolean).join("\n"),
       inhalt:
-        abschnitt("Gewinn- und Verlustrechnung", `<h3>Erträge</h3>${t("ertraege")}<h3>Aufwendungen</h3>${t("aufwendungen")}${kennzahlen([{ text: j >= 0 ? "Jahresüberschuss" : "Jahresfehlbetrag", betrag: euro(j), fett: true }])}`) +
+        abschnitt("Gewinn- und Verlustrechnung", `<h3>Erträge</h3>${t("ertraege")}<h3>Aufwendungen</h3>${t("aufwendungen")}${kennzahlen([{ text: j >= 0 ? "Jahresüberschuss" : "Jahresfehlbetrag", betrag: euro(Math.abs(j)), fett: true }])}`) +
         abschnitt("Bilanz", `<div class="bilanz"><div><h3>Aktiva</h3>${t("aktiva")}</div><div><h3>Passiva</h3>${t("passiva")}</div></div>${akt !== pas ? `<p class="nachsatz"><strong>Aktiva und Passiva weichen um ${euro(akt - pas)} ab – bitte prüfen.</strong></p>` : ""}`) +
         unterschriften(["Unterschrift"], { ortDatum: true }),
     });
@@ -455,8 +468,8 @@ function ust(d: Daten) {
 }
 
 export const VERSTEUERUNG: Option[] = [
-  { wert: "soll", text: "Nach vereinbarten Entgelten (Soll) – der Normalfall" },
-  { wert: "ist", text: "Nach vereinnahmten Entgelten (Ist) – mit Genehmigung des Finanzamts" },
+  { wert: "soll", text: "Soll – der Normalfall" },
+  { wert: "ist", text: "Ist – nur mit Genehmigung" },
 ];
 
 export const ustVoranmeldung: Vorlage = {
@@ -815,7 +828,7 @@ export const aufbewahrung: Vorlage = {
       titel: "Aufbewahrungsplan",
       betrieb: b,
       inhalt:
-        tabelle(["Unterlagen", "Frist", "Fristbeginn (Jahr)", "Aufbewahren mindestens bis", "Wo"], l.map((x) => [zelle(text(x, "art")), text(x, "jahre") ? `${esc(text(x, "jahre"))} Jahre` : "", zelle(text(x, "letzte")), aufbewahrenBis(text(x, "letzte"), text(x, "jahre")) ?? "", zelle(text(x, "ort"))]), { breiten: ["32%", "12%", "16%", "16%", "24%"] }) +
+        tabelle(["Unterlagen", "Frist", "Fristbeginn (Jahr)", "Aufbewahren mindestens bis", "Wo"], l.map((x) => [zelle(text(x, "art")), text(x, "jahre") ? `${esc(text(x, "jahre"))} Jahre` : ZELLE_LINIE, text(x, "letzte") ? zelle(text(x, "letzte")) : ZELLE_LINIE, aufbewahrenBis(text(x, "letzte"), text(x, "jahre")) ?? ZELLE_LINIE, text(x, "ort") ? zelle(text(x, "ort")) : ZELLE_LINIE]), { breiten: ["46%", "10%", "13%", "14%", "17%"] }) +
         `<p style="margin-top:4mm">Die Frist beginnt mit dem Schluss des Kalenderjahres, in dem die letzte Eintragung gemacht, das Inventar aufgestellt, der Jahresabschluss festgestellt, der Brief empfangen oder abgesandt oder der Buchungsbeleg entstanden ist (§ 147 Abs. 4 AO). Sie läuft nicht ab, solange die Unterlagen für Steuern von Bedeutung sind, deren Festsetzungsfrist noch nicht abgelaufen ist (§ 147 Abs. 3 AO).</p>`,
     });
   },

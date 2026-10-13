@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { devAnmeldung, syncAngeboten } from "../konto/konfig";
 import { useKonto } from "../konto/konto";
@@ -10,6 +10,7 @@ import { Unterseite, useNav } from "../ui/navigation";
 import { RAND, useFarben, weich } from "../ui/thema";
 import { PASSWORT_MINDESTLAENGE } from "../unterlagen/sicherung";
 import { useAmtlos } from "../zustand";
+import { bestaetigen } from "../ui/bestaetigen";
 import { Gruppe, Inhalt } from "./gemeinsam";
 import { ProSeite, useProSperre } from "./Pro";
 
@@ -60,17 +61,20 @@ export function KontoSeite() {
   const [neuPw, setNeuPw] = useState<string | null>(null);
   const [falsch, setFalsch] = useState(false);
   const [aendern, setAendern] = useState(false);
-  const [beenden, setBeenden] = useState(false);
   const [beschaeftigt, setBeschaeftigt] = useState(false);
-  const [loeschen, setLoeschen] = useState(false);
 
+  const laeuft = useRef(false);
   const machen = async (f2: () => Promise<void>) => {
+    // nie zweimal gleichzeitig (z. B. „Konto löschen“ doppelt bestätigt)
+    if (laeuft.current) return;
+    laeuft.current = true;
     setBeschaeftigt(true);
     try {
       await f2();
     } catch {
       // Anzeige über k.fehler bzw. `falsch`
     } finally {
+      laeuft.current = false;
       setBeschaeftigt(false);
     }
   };
@@ -134,7 +138,7 @@ export function KontoSeite() {
           <T leise stil={{ marginTop: 4 }}>{TEXT.konto_einrichten_text}</T>
           <NeuesPasswort label={TEXT.konto_passwort} setzen={setNeuPw} />
           <View style={{ marginTop: 14 }}>
-            <Hinweis text={TEXT.konto_passwort_warnung} symbol="key" />
+            <Hinweis art="warnung" text={TEXT.konto_passwort_warnung} symbol="key" />
             {fehler}
           </View>
         </View>
@@ -204,29 +208,20 @@ export function KontoSeite() {
         </Gruppe>
 
         <Gruppe fuss={TEXT.konto_beenden_text}>
-          {beenden ? (
-            <Karte stil={{ paddingVertical: 14, gap: 10 }}>
-              <T fett>{TEXT.konto_beenden_wirklich}</T>
-              <View style={{ flexDirection: "row", gap: 10 }}>
-                <Knopf
-                  gefahr
-                  text={TEXT.konto_beenden_ja}
-                  laedt={beschaeftigt}
-                  onPress={() =>
-                    void machen(async () => {
-                      await k.beenden();
-                      setBeenden(false);
-                      melden(TEXT.konto_beendet);
-                    })
-                  }
-                  stil={{ flex: 1 }}
-                />
-                <Knopf ton text={TEXT.abbrechen} onPress={() => setBeenden(false)} stil={{ flex: 1 }} />
-              </View>
-            </Karte>
-          ) : (
-            <TextKnopf gefahr symbol="xmark.icloud" text={TEXT.konto_beenden} onPress={() => { weich(); setBeenden(true); }} />
-          )}
+          <TextKnopf
+            gefahr
+            symbol="xmark.icloud"
+            text={TEXT.konto_beenden}
+            onPress={() =>
+              void bestaetigen({ titel: TEXT.konto_beenden_wirklich, text: TEXT.konto_beenden_text, ja: TEXT.konto_beenden_ja }).then((ok) => {
+                if (!ok) return;
+                void machen(async () => {
+                  await k.beenden();
+                  melden(TEXT.konto_beendet);
+                });
+              })
+            }
+          />
         </Gruppe>
       </View>
     );
@@ -250,29 +245,20 @@ export function KontoSeite() {
         ) : null}
         {angemeldet ? (
           <Gruppe fuss={TEXT.konto_loeschen_text}>
-            {loeschen ? (
-              <Karte stil={{ paddingVertical: 14, gap: 10 }}>
-                <T fett>{TEXT.konto_loeschen_wirklich}</T>
-                <View style={{ flexDirection: "row", gap: 10 }}>
-                  <Knopf
-                    gefahr
-                    text={TEXT.konto_loeschen_ja}
-                    laedt={beschaeftigt}
-                    onPress={() =>
-                      void machen(async () => {
-                        await k.kontoLoeschen();
-                        setLoeschen(false);
-                        melden(TEXT.konto_geloescht);
-                      })
-                    }
-                    stil={{ flex: 1 }}
-                  />
-                  <Knopf ton text={TEXT.abbrechen} onPress={() => setLoeschen(false)} stil={{ flex: 1 }} />
-                </View>
-              </Karte>
-            ) : (
-              <TextKnopf gefahr symbol="trash" text={TEXT.konto_loeschen} onPress={() => { weich(); setLoeschen(true); }} />
-            )}
+            <TextKnopf
+              gefahr
+              symbol="trash"
+              text={TEXT.konto_loeschen}
+              onPress={() =>
+                void bestaetigen({ titel: TEXT.konto_loeschen_wirklich, text: TEXT.konto_loeschen_text, ja: TEXT.konto_loeschen_ja }).then((ok) => {
+                  if (!ok) return;
+                  void machen(async () => {
+                    await k.kontoLoeschen();
+                    melden(TEXT.konto_geloescht);
+                  });
+                })
+              }
+            />
           </Gruppe>
         ) : null}
       </Inhalt>

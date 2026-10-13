@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useNav } from "../ui/navigation";
 import { useAmtlos } from "../zustand";
 import { Ablauf } from "./Ablauf";
@@ -15,5 +16,6 @@ export function useStarten() {
 /** Bestehende Unterlage öffnen – beim Abschluss mit Vorschau und Übersicht. */
 export function useOeffnen() {
   const nav = useNav();
-  return (unterlageId: string) => nav.oeffnen(`ablauf-${unterlageId}`, () => <Ablauf id={unterlageId} amEnde />, true);
+  // gleichbleibende Funktion: Listenzeilen (memo) zeichnen sich sonst bei jeder Eingabe neu
+  return useCallback((unterlageId: string) => nav.oeffnen(`ablauf-${unterlageId}`, () => <Ablauf id={unterlageId} amEnde />, true), [nav]);
 }

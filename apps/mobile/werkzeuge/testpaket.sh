@@ -71,7 +71,7 @@ Entscheidungen liegen im Git-Repository (GitHub: lennardarthur-ship-it/amtlos). 
    - „Pflichten-Check starten“ – ein paar Fragen, dann zeigt die App, welche Pflichten für deinen Betrieb gelten.
    - „Mein Betrieb“: oben den Betrieb eintragen (Name, Adresse, verantwortliche Person), darunter Steuer und Bank,
      Briefkopf, Mitarbeiter und Kunden – jede Gruppe auf einer eigenen Seite.
-   - „Vorlagen“: „Rechnung schreiben“ oder unter „Wofür brauchst du etwas?“ den Anlass wählen (z. B. „Ich stelle jemanden ein“).
+   - „Vorlagen“: „Rechnung schreiben“ oder unter „Wofür brauchst du eine Unterlage?“ den Anlass wählen (z. B. „Ich stelle jemanden ein“).
    - Schritt für Schritt ausfüllen, unten „Weiter“. Am Ende siehst du das Dokument und tippst „PDF teilen“.
      Bei Datumsfeldern öffnet der Kalender-Knopf den iPhone-Kalender; über Zahlentastaturen gibt es „Fertig“.
    - „Unterlagen“: alles, was du angelegt hast – mit Summe der offenen Rechnungen, Filtern und Suche.

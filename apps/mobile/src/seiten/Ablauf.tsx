@@ -5,11 +5,14 @@ import { fehlendeAngaben, personAus, personIn, vorlageFuer, type Daten, type Vor
 import { T as TEXT } from "../texte";
 import { Fuss, Knopf, Symbol, T, TextKnopf, Wahl } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
-import { RAND, ZIEL, istIos, useFarben } from "../ui/thema";
-import { PERSONEN_LISTE, personenSortiert } from "../unterlagen/speicher";
+import { RADIUS, RAND, ZIEL, istIos, useFarben } from "../ui/thema";
+import { PERSONEN_LISTE, betriebFehlt, personenSortiert } from "../unterlagen/speicher";
+import { fehltFuer } from "../unterlagen/pruefung";
 import { offeneRechnungen, periodeText, perioden, umsaetzeFuer, type UstUebernahme, type Versteuerung } from "../unterlagen/ustAusRechnungen";
 import { useAmtlos } from "../zustand";
 import { Abschluss, useTeilen } from "./Abschluss";
+import { AuswahlSeite } from "../ui/auswahlseite";
+import { AbsenderSeite } from "./Betrieb";
 import { useProSperre } from "./Pro";
 import { euerUebernahme, jahreMitDaten, type EuerUebernahme } from "../unterlagen/steuerpaket";
 import { Felder } from "./felder";
@@ -30,17 +33,29 @@ function merken(v: Vorlage, d: Daten | undefined, z: ReturnType<typeof useAmtlos
 /** Auswahl gespeicherter Mitarbeiter bzw. Kunden über den Feldern eines Schritts. */
 function PersonenWahl({ v, id, daten }: { v: Vorlage; id: string; daten: Daten }) {
   const z = useAmtlos();
+  const nav = useNav();
   if (!v.person) return null;
   const art = v.person.art;
   const personen = personenSortiert(z.stand[PERSONEN_LISTE[art]]);
   const name = typeof daten[v.person.felder.name ?? ""] === "string" ? (daten[v.person.felder.name!] as string).trim().toLocaleLowerCase("de") : "";
   const gewaehlt = personen.find((p) => p.name.trim().toLocaleLowerCase("de") === name)?.id ?? null;
+  const waehlen = (pid: string) => {
+    const p = personen.find((x) => x.id === pid);
+    if (p) z.setzen(id, personIn(v, p));
+  };
+  // viele Personen: die zuletzt benutzten als Chips, alle über eine Auswahl mit Suche
+  const viele = personen.length > 6;
+  const chips = viele ? [...personen].sort((a, b) => (b.geaendert ?? "").localeCompare(a.geaendert ?? "")).slice(0, 5) : personen;
+  if (viele && gewaehlt && !chips.some((p) => p.id === gewaehlt)) chips.unshift(personen.find((p) => p.id === gewaehlt)!);
   return (
     <View style={{ marginTop: 8 }}>
       {personen.length ? (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -RAND }} contentContainerStyle={{ paddingHorizontal: RAND, paddingVertical: 4 }}>
-          <Wahl label={TEXT.gespeicherte[art]} wert={gewaehlt} aendern={(pid) => { const p = personen.find((x) => x.id === pid); if (p) z.setzen(id, personIn(v, p)); }} optionen={personen.map((p) => ({ wert: p.id, text: p.name }))} />
+          <Wahl label={TEXT.gespeicherte[art]} wert={gewaehlt} aendern={waehlen} optionen={chips.map((p) => ({ wert: p.id, text: p.name }))} />
         </ScrollView>
+      ) : null}
+      {viele ? (
+        <TextKnopf symbol="magnifyingglass" text={TEXT.alle_personen[art](personen.length)} onPress={() => nav.oeffnen(`personen-wahl-${art}`, () => <AuswahlSeite titel={TEXT.gespeicherte[art]} wert={gewaehlt} optionen={personen.map((p) => ({ wert: p.id, text: p.name }))} aendern={waehlen} />)} />
       ) : null}
       <T v="caption" leise stil={{ marginTop: personen.length ? 4 : 0 }}>{TEXT.wird_gemerkt[art]}</T>
     </View>
@@ -64,7 +79,7 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
   const r = uebernommen && uebernommen.v === v ? uebernommen.r : null;
   return (
     <View style={{ marginTop: 14, padding: 14, borderRadius: 14, backgroundColor: f.amtHauch }}>
-      <T v="klein" fett farbe={f.amtTief}>{TEXT.aus_rechnungen_titel}</T>
+      <T v="klein" fett farbe={f.amtTief}>{TEXT.mitPro(TEXT.aus_rechnungen_titel, z.pro)}</T>
       <T v="caption" farbe={f.amtTief}>{v === "ist" ? TEXT.aus_rechnungen_nach_ist : TEXT.aus_rechnungen_nach_soll}</T>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 6 }}>
         <Wahl
@@ -101,7 +116,7 @@ function EuerAusDaten({ id }: { id: string }) {
   if (!jahre.length) return <T v="caption" leise stil={{ marginTop: 10 }}>{TEXT.euer_leer}</T>;
   return (
     <View style={{ marginTop: 14, padding: 14, borderRadius: 14, backgroundColor: f.amtHauch }}>
-      <T v="klein" fett farbe={f.amtTief}>{TEXT.euer_aus_daten_titel}</T>
+      <T v="klein" fett farbe={f.amtTief}>{TEXT.mitPro(TEXT.euer_aus_daten_titel, z.pro)}</T>
       <T v="caption" farbe={f.amtTief}>{TEXT.euer_aus_daten_text}</T>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 6 }}>
         <Wahl
@@ -205,6 +220,8 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
     setSchritt(Math.max(0, Math.min(n, i)));
   };
   const letzteZahl = ergebnis.at(-1);
+  // fehlen Absender-Angaben (Mein Betrieb), führt der Hauptknopf direkt dorthin
+  const absenderFehlt = !fest && Boolean(vorlage.kundendokument) && fehltFuer(z.stand, unterlage).some((x) => x.includes("(Mein Betrieb)"));
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: f.papier }} edges={["top", "left", "right"]} onAccessibilityEscape={nav.zurueck}>
@@ -221,9 +238,17 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
           )}
         </View>
       </View>
-      <Fortschritt n={n + 1} aktuell={fest ? n : schritt} />
+      {fest ? null : <Fortschritt n={n + 1} aktuell={schritt} />}
       <KeyboardAvoidingView behavior={istIos ? "padding" : undefined} style={{ flex: 1 }}>
         <ScrollView key={schritt} contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 8, paddingBottom: 32 }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive">
+          {!amAbschluss && schritt === 0 && vorlage.kundendokument && betriebFehlt(z.stand.betrieb) ? (
+            // ohne Absender wäre die Rechnung am Ende nicht teilbar – das gleich am Anfang sagen
+            <View style={{ padding: 14, borderRadius: RADIUS.karte, backgroundColor: f.amtHauch, gap: 8, marginBottom: 8 }}>
+              <T fett>{TEXT.absender_fehlt_titel}</T>
+              <T v="klein">{TEXT.absender_fehlt_text}</T>
+              <Knopf symbol="building.2" text={TEXT.absender_eintragen} onPress={() => nav.oeffnen("absender", () => <AbsenderSeite />, true)} />
+            </View>
+          ) : null}
           {amAbschluss ? (
             <Abschluss id={id} springen={gehe} fehler={null} drucken={teilen.drucken} eRechnung={teilen.eRechnung} eFehlt={teilen.eFehlt} />
           ) : (
@@ -238,7 +263,7 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
             ) : !amAbschluss && letzteZahl && !/^0,00\s/.test(letzteZahl[1]) ? (
               <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                 <T v="klein" leise>{letzteZahl[0]}</T>
-                <T v="klein" fett stil={{ fontVariant: ["tabular-nums"] }}>{letzteZahl[1]}</T>
+                <T v="klein" fett>{letzteZahl[1]}</T>
               </View>
             ) : null
           }
@@ -248,7 +273,9 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
               <Symbol name="chevron.left" groesse={20} farbe={f.amtTief} gewicht="semibold" />
             </Pressable>
           ) : null}
-          {amAbschluss ? (
+          {amAbschluss && absenderFehlt ? (
+            <Knopf text={TEXT.absender_ergaenzen} symbol="building.2" onPress={() => nav.oeffnen("absender", () => <AbsenderSeite />, true)} stil={{ flex: 1 }} />
+          ) : amAbschluss ? (
             <Knopf text={TEXT.pdf_teilen} symbol="square.and.arrow.up" laedt={teilen.laedt} onPress={() => void teilen.los()} stil={{ flex: 1 }} />
           ) : (
             <Knopf text={schritt === n - 1 ? TEXT.zum_dokument : TEXT.weiter} onPress={() => gehe(schritt + 1)} stil={{ flex: 1 }} />

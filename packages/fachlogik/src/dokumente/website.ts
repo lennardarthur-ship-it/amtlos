@@ -265,7 +265,8 @@ export const auftragsverarbeitung: Vorlage = {
         abschnitt("Unterauftragsverarbeiter", zeilen(text(d, "unterauftrag"))) +
         abschnitt("Technische und organisatorische Maßnahmen", zeilen(text(d, "tom"))) +
         abschnitt("Rechte und Pflichten des Auftraggebers", "<p>Der Auftraggeber ist für die Rechtmäßigkeit der Verarbeitung verantwortlich und erteilt Weisungen in dokumentierter Form. Er ist berechtigt, die Einhaltung dieses Vertrags zu überprüfen.</p>") +
-        unterschriften(["Auftraggeber", "Auftragnehmer"], { ortDatum: true }),
+        // der Ort gilt für die eigene Unterschrift (Betrieb = Auftraggeber bzw. Dienstleister je nach „Wer ist wer“)
+        unterschriften(["Auftraggeber", "Auftragnehmer"], { ortDatum: true, orte: text(d, "rolle") === "dienstleister" ? ["", text(d, "ort_datum")] : [text(d, "ort_datum"), ""] }),
     });
   },
 };

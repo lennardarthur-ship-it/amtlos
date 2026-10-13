@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Pressable, View } from "react-native";
 import * as Haptics from "expo-haptics";
 import { T as TEXT } from "../texte";
-import { FeldKopf, Karte, Symbol, T } from "./bausteine";
+import { FeldKopf, Karte, Suchfeld, Symbol, T } from "./bausteine";
 import { Unterseite, useNav } from "./navigation";
 import { RADIUS, ZIEL, istIos, useFarben } from "./thema";
 import { Inhalt } from "../seiten/gemeinsam";
@@ -13,16 +13,26 @@ interface Option<W extends string> {
 }
 
 /** Liste zum Auswählen auf einer eigenen Seite (wie iOS-Einstellungen): Antippen wählt und geht zurück. */
-function AuswahlSeite<W extends string>({ titel, wert, optionen, aendern }: { titel: string; wert: W | null; optionen: Option<W>[]; aendern: (w: W) => void }) {
+export function AuswahlSeite<W extends string>({ titel, wert, optionen, aendern }: { titel: string; wert: W | null; optionen: Option<W>[]; aendern: (w: W) => void }) {
   const f = useFarben();
   const nav = useNav();
   const [gewaehlt, setGewaehlt] = useState(wert);
+  const [suche, setSuche] = useState("");
+  // lange Listen (viele Kunden): mit Suche
+  const s = suche.trim().toLocaleLowerCase("de");
+  const gezeigt = s ? optionen.filter((o) => o.text.toLocaleLowerCase("de").includes(s)) : optionen;
   return (
     <Unterseite titel={titel}>
       <Inhalt>
+        {optionen.length > 8 ? (
+          <View style={{ marginBottom: 12 }}>
+            <Suchfeld wert={suche} setzen={setSuche} label={TEXT.liste_suchen} />
+          </View>
+        ) : null}
+        {s && !gezeigt.length ? <T leise>{TEXT.keine_treffer}</T> : null}
         <Karte>
           <View accessibilityRole="radiogroup" accessibilityLabel={titel}>
-            {optionen.map((o, i) => {
+            {gezeigt.map((o, i) => {
               const an = o.wert === gewaehlt;
               return (
                 <Pressable

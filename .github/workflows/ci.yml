@@ -34,6 +34,53 @@ jobs:
           CI=1 npx expo export --platform android --output-dir ../../mobile-export/android
           CI=1 npx expo export --platform ios --output-dir ../../mobile-export/ios
 
+  iphone-app:
+    name: iPhone-App – Rundgänge und Dokumente (Web-Export)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm --filter @amtlos/web exec playwright-core install --with-deps chromium
+      - name: Web-Export (ohne und mit Server)
+        run: |
+          cd apps/mobile
+          CI=1 npx expo export --platform web --output-dir /tmp/web
+          CI=1 EXPO_PUBLIC_API_URL=http://localhost:3001 npx expo export --platform web --output-dir /tmp/web-sync
+      - name: Rundgang hell, dunkel, Dokumente, Synchronisation
+        run: |
+          set -o pipefail
+          cd apps/mobile
+          export CHROMIUM_PFAD=$(node -e "const r=require('module').createRequire(require('path').resolve('../web/package.json'));console.log(r('playwright-core').chromium.executablePath())")
+          node e2e/rundgang.mjs /tmp/web /tmp/bilder 2>&1 | tee ../../e2e-app.txt
+          DUNKEL=1 node e2e/rundgang.mjs /tmp/web /tmp/bilder 2>&1 | tee -a ../../e2e-app.txt
+          node werkzeuge/dokumente-pruefen.mjs /tmp/dokumente 2>&1 | tee -a ../../e2e-app.txt
+          nohup node e2e/sync-server.mjs > ../../sync-server.log 2>&1 &
+          for i in $(seq 1 60); do curl -s -o /dev/null -X POST localhost:3001/v1/dev/token -H 'content-type: application/json' -d '{"kennung":"ci"}' && break; sleep 1; done
+          node e2e/sync.mjs /tmp/web-sync /tmp/bilder-sync 2>&1 | tee -a ../../e2e-app.txt
+      - if: failure()
+        run: for f in e2e-app.txt sync-server.log; do [ -f "$f" ] && tail -n 6 "$f" | sed "s/^/::error title=$f::/" || true; done
+
   datenbank:
     name: Datenbank- und Integrationstests (PostgreSQL 16)
     runs-on: ubuntu-latest

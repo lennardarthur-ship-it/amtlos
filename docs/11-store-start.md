@@ -50,11 +50,16 @@ Für Tests auf echten Geräten: `--profile preview` (interne Verteilung) oder Te
 ## 5. Store-Eintrag
 
 - **Texte:** `apps/mobile/store/de.json` (Name, Untertitel, Werbetext, Schlüsselwörter, Beschreibung, „Neu“, Hinweise für die App-Prüfung). Die Grenzen prüft ein Test.
-- **Bilder:** echte Bildschirme mit Demo-Stand, 1290 × 2796:
+- **Bilder:** echte Bildschirme mit Demo-Stand, 1290 × 2796, Reihenfolge und Überschriften aus `store/de.json` (`bilder`; optional `lupe` für einen vergrößerten Ausschnitt desselben Bildschirms, z. B. Summe und GiroCode der Rechnung):
   ```bash
   cd apps/mobile && CI=1 npx expo export --platform web --output-dir /tmp/expo-web
-  node werkzeuge/store-bilder.mjs /tmp/expo-web /tmp/store-bilder
+  node werkzeuge/store-bilder.mjs /tmp/expo-web /tmp/store-bilder            # schreibt auch apps/website/bilder (WEBSITE=0: nicht)
+  DUNKEL=1 node werkzeuge/store-bilder.mjs /tmp/expo-web /tmp/store-bilder   # dunkle Fassung
   ```
+  Die endgültigen Bilder erst nach der fachlichen Freigabe (T-52) erzeugen: Bis dahin zeigt Bild 1 den echten Hinweis „fachlich noch nicht geprüft“.
+- **Pro kennzeichnen:** Was nur mit Pro geht (E-Rechnung, Paket für die Steuerberatung, Übernahme per Tipp, iCloud-Sicherung, Briefkopf, Synchronisation), steht in Beschreibung, Bildtexten und Website mit „Pro“ (Richtlinie 2.3.2). Preise und Testzeitraum nennt kein Text – sie kommen aus dem Store.
+- **„Neu in dieser Version“:** Für 1.0.0 der Text in `neu`; ab dem ersten Update die Änderungen.
+- **Synchronisation:** Wird ein Build mit `EXPO_PUBLIC_API_URL` eingereicht, stimmen „ohne Konto, ohne Server“ in Store-Texten, Bild 6 und Website nicht mehr – vorher anpassen.
 - **Kategorie:** Business (zweite: Finanzen). **Altersfreigabe:** 4+ (keine Inhalte, die eine höhere Einstufung brauchen; im Fragebogen bestätigen).
 - **App Privacy („Datenschutz-Etiketten“):** Der Code erhebt keine Daten auf eigenen Servern und nutzt kein Tracking. Über RevenueCat wird die **Kaufhistorie** verarbeitet: nicht mit der Identität verknüpft, kein Tracking, Zweck „App-Funktionalität“. So steht es auch im Privacy Manifest (`app.json` → `ios.privacyManifests`). Vor dem Absenden mit dem Datenschutzhinweis abgleichen (T-77).
 - **Export-Compliance:** Die App verschlüsselt lokale Daten (AES-256-GCM). Ob die Ausnahme greift, ist **nicht** entschieden (T-77). Erst danach `ios.config.usesNonExemptEncryption` setzen.
@@ -74,3 +79,19 @@ Die App kann ohne Synchronisation veröffentlicht werden – dann zeigt sie nich
 3. **Build-Variablen** (EAS-Secrets bzw. `eas.json` → `env`): `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_OIDC_ISSUER`, `EXPO_PUBLIC_OIDC_CLIENT_ID`, bei Bedarf `EXPO_PUBLIC_OIDC_AUDIENCE`.
 4. **App Privacy und Privacy Manifest ergänzen:** E-Mail-Adresse und Benutzer-ID (mit Identität verknüpft, App-Funktionalität), Kaufhistorie dann ebenfalls verknüpft. Datenschutzhinweis: Abschnitt „Konto und Synchronisation“ erscheint automatisch – fachlich freigeben (T-80).
 5. **App-Prüfung:** Apple verlangt bei Konten das Löschen in der App – vorhanden unter „Mein Betrieb → Auf mehreren Geräten → Konto löschen“. In den Hinweisen für die Prüfung ein Testkonto angeben.
+
+## 8. Website (`apps/website`)
+
+```bash
+node apps/website/bauen.mjs            # → apps/website/dist (index, impressum, datenschutz, Bilder, Schriften, Favicon)
+```
+
+- **Kopf:** Alles in `seite.html` vor `<!-- /kopf -->` kommt in den `<head>`: Title, Description, Open Graph (Vorschaubild `bilder/og.jpg` aus `store-bilder.mjs`), Favicon (`favicon.svg` = App-Symbol, `apple-touch-icon.png` 180 px), strukturierte Daten (`SoftwareApplication`, ohne Preis und Bewertung).
+- **`seite.json`:** `url` (z. B. `https://amtlos.de`) schaltet `canonical`, `og:url` und ein absolutes `og:image` ein; `appStoreId` (Ziffern aus App Store Connect) das Smart-App-Banner. Leer bleiben sie auskommentiert.
+- **Impressum und Datenschutz** entstehen beim Bauen aus `apps/mobile/src/rechtliches.ts`. Fehlende Anbieterangaben stehen als „folgt vor dem Start“ da, der Datenschutzhinweis als „Entwurf“, solange `freigegeben: false`. Für den Abschnitt „Diese Website“ fehlen noch die Angaben zum Hosting (Server-Protokolle) – nach Wahl des Hosters ergänzen. Nicht veröffentlichen, bevor `ANBIETER` vollständig ist.
+- **Schriften** liegen selbst gehostet in `schriften/` (Source Sans 3, Source Serif 4, variabel, Latin; SIL Open Font License, Lizenztexte daneben) – kein Abruf bei Google Fonts.
+- **Bis zum Start** kein nachgebautes App-Store-Badge; danach das offizielle Badge von Apple mit Link zur App-Seite.
+
+## 9. Empfehlung App-Symbol (nicht umgesetzt)
+
+`assets/icon.png` erfüllt Apples Vorgaben (1024 × 1024, RGB, ohne Alpha). Gestalterisch ist „Blatt mit Haken“ ein verbreitetes Motiv, und die grauen Textzeilen (`#c9d0d6` auf Weiß, etwa 1,5 : 1) verschwinden ab 60 px. Vorschlag für eine Überarbeitung: Stempel größer und deutlicher als Amtsstempel, Textzeilen weglassen oder dunkler; Grün und die Idee „Stempel = erledigt, ohne Amt“ behalten. Klein prüfen (40, 60, 120 px, hell und dunkel).

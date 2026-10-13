@@ -29,6 +29,8 @@ const schema = process.env.DUNKEL ? "dark" : "light";
 const ctx = await browser.newContext({ viewport: { width: 393, height: 852 }, deviceScaleFactor: 2, colorScheme: schema, locale: "de-DE" });
 const p = await ctx.newPage();
 const befunde = [];
+// Rückfragen (Löschen, Storno) sind System-Dialoge – im Rundgang bestätigen
+p.on("dialog", (d) => void d.accept());
 p.on("pageerror", (e) => befunde.push(`Seitenfehler: ${e.message}`));
 p.on("console", (m) => {
   if (m.type() === "error") befunde.push(`Konsole: ${m.text().slice(0, 200)}`);
@@ -58,7 +60,7 @@ try {
   await p.getByRole("tab", { name: "Vorlagen" }).click();
   await warte(800);
   pruefe(await sichtbar("Ausfüllen, prüfen, als PDF teilen"), "Startseite fehlt");
-  pruefe(await sichtbar("Wofür brauchst du etwas?"), "Anlässe fehlen auf der Startseite");
+  pruefe(await sichtbar("Wofür brauchst du eine Unterlage?"), "Anlässe fehlen auf der Startseite");
   pruefe(await sichtbar("Betrieb eintragen"), "Hinweis „Betrieb eintragen“ fehlt bei leerem Betrieb");
   await foto("start");
 
@@ -125,9 +127,13 @@ try {
   await feld("Wann hast du angefangen oder wann willst du anfangen?").fill("01.03.2024");
   await knopf("Weiter").click();
   await warte(1200);
-  // Zusatzfragen für ein genaueres Ergebnis (E-127) – hier übersprungen; „Weiter“ ist ohne Antwort nicht aktiv
-  pruefe(await sichtbar("Noch ein paar Fragen"), "Zusatzfragen fehlen");
-  pruefe(await knopf("Weiter").isDisabled(), "„Weiter“ ohne Antwort aktiv");
+  // Zwischenschirm: Ergebnis steht, Zusatzfragen sind freiwillig (E-136); eine Zusatzfrage ansehen, dann überspringen
+  pruefe(await sichtbar("Geschafft – dein Ergebnis steht"), "Zwischenschirm vor den Zusatzfragen fehlt");
+  await foto("check-zwischen");
+  await knopf("Genauer machen").click();
+  await warte(600);
+  pruefe(await sichtbar("Genauer machen · Frage 1 von"), "Zusatzfragen ohne eigenen Fortschritt");
+  pruefe((await knopf("Überspringen").count()) > 0, "ohne Antwort kein „Überspringen“");
   // der Pflichten-Tab darunter zeigt schon „Für deinen Betrieb gelten …“ – das Ende des Checks erkennt man am Knopf
   const amEnde = async () => (await p.getByRole("button", { name: "Deine Pflichten ansehen", exact: true }).locator("visible=true").count()) > 0;
   for (let k = 0; k < 10 && !(await amEnde()); k++) {
@@ -140,6 +146,9 @@ try {
   await warte(1200);
   pruefe(await sichtbar("Jetzt dran"), "„Jetzt dran“ fehlt im Pflichten-Tab");
   pruefe(await sichtbar("Kurz klären"), "„Kurz klären“ mit den wirksamsten Fragen fehlt");
+  // die vollständige Liste ist eingeklappt (E-136): aufklappen
+  await tippe(p.getByRole("button", { name: /^Alle \d+ Pflichten ansehen$/ }).locator("visible=true").last());
+  await warte(500);
   pruefe((await sichtbar("Hautschutzplan aushängen")) && (await sichtbar("Elektronische Kasse beim Finanzamt melden")) && !(await sichtbar("Impressum auf der Website")), "Pflichten passen nicht zum Profil (Beauty, Kasse, keine Website)");
   pruefe(await sichtbar("Aus der Gründung"), "Gründungsschritte des bestehenden Betriebs nicht abgetrennt");
   pruefe(await sichtbar("0 von"), "Fortschritt fehlt");
@@ -147,12 +156,12 @@ try {
   await tippe(p.getByRole("button", { name: /^Hautschutzplan aushängen/ }).locator("visible=true").last());
   await warte(900);
   pruefe(await sichtbar("TRGS 401"), "Rechtsgrundlage fehlt in der Pflicht");
-  await knopf("Unterlage erstellen").click();
+  await knopf("Ausfüllen").click();
   await warte(900);
   pruefe(await sichtbar("Hautschutzplan"), "Unterlage zur Pflicht startet nicht");
   await knopf("Schließen").click();
   await warte(800);
-  await tippe(knopf("Als erledigt markieren"));
+  await tippe(knopf("Erledigt"));
   await warte(500);
   await knopf("Zurück").click();
   await warte(800);
@@ -205,7 +214,7 @@ try {
   await fenster.screenshot({ path: `${OUT}/${String(++n).padStart(2, "0")}-${schema}-dokument.png` });
   await fenster.close();
   await warte(600);
-  pruefe((await sichtbar("Festgeschrieben am")) && (await knopf("Stornieren").count()) > 0 && (await p.getByRole("button", { name: "Löschen", exact: true }).locator("visible=true").count()) === 0, "Rechnung nach dem Teilen nicht festgeschrieben");
+  pruefe((await sichtbar("Geteilt am")) && (await knopf("Stornieren").count()) > 0 && (await p.getByRole("button", { name: "Löschen", exact: true }).locator("visible=true").count()) === 0, "Rechnung nach dem Teilen nicht festgeschrieben");
   await foto("festgeschrieben");
   // Zahlungseingang vermerken (E-129): ändert die festgeschriebene Rechnung nicht
   await tippe(knopf("Zahlung eingegangen – heute"));
@@ -224,7 +233,7 @@ try {
   await warte(700);
   await knopf("Schließen").click();
   await warte(900);
-  pruefe(await sichtbar("Rechnung · 2026-001"), "Rechnung fehlt unter „Zuletzt bearbeitet“");
+  pruefe(await sichtbar("2026-001 · "), "Rechnung fehlt unter „Zuletzt bearbeitet“");
 
   // zweite Rechnung: Nummer zählt hoch, gespeicherter Kunde füllt die Anschrift
   await knopf("Rechnung schreiben").click();
@@ -244,7 +253,7 @@ try {
   await warte(900);
   await p.getByRole("tab", { name: "Unterlagen" }).click();
   await warte(800);
-  pruefe((await p.getByRole("button", { name: /^Rechnung · / }).locator("visible=true").count()) === 2, "leere Rechnung nicht verworfen oder zweite fehlt");
+  pruefe((await p.getByRole("button", { name: /2026-00\d · / }).locator("visible=true").count()) === 2, "leere Rechnung nicht verworfen oder zweite fehlt");
   await p.getByRole("tab", { name: "Vorlagen" }).click();
   await warte(700);
 
@@ -399,7 +408,7 @@ try {
   await warte(2500);
   await p.getByRole("tab", { name: "Unterlagen" }).click();
   await warte(800);
-  pruefe((await sichtbar("Gefährdungsbeurteilung · Salon")) && (await sichtbar("Allergenliste")) && (await sichtbar("Rechnung · 2026-001")) && (await sichtbar("Unterweisungsnachweis")), "Unterlagen nach Neustart verloren");
+  pruefe((await sichtbar("Gefährdungsbeurteilung · Salon")) && (await sichtbar("Allergenliste")) && (await sichtbar("2026-001 · ")) && (await sichtbar("Unterweisungsnachweis")), "Unterlagen nach Neustart verloren");
   await foto("meine");
 
   // bestehende Unterlage öffnet beim Abschluss; Kopie anlegen und wieder löschen
@@ -411,7 +420,6 @@ try {
   await knopf("Übersicht").click();
   await warte(900);
   await tippe(knopf("Löschen"));
-  await tippe(knopf("Ja, löschen"));
   await warte(1000);
   await knopf("Schließen").click();
   await warte(900);
@@ -454,7 +462,7 @@ try {
   pruefe(!(await sichtbar("1 Person")), "Mitarbeiter nach „alles löschen“ noch da");
   await p.getByRole("tab", { name: "Unterlagen" }).click();
   await warte(800);
-  pruefe(await sichtbar("Noch keine Unterlagen"), "Unterlagen nach „alles löschen“ noch da");
+  pruefe(await sichtbar("Noch nichts abgelegt"), "Unterlagen nach „alles löschen“ noch da");
   await foto("leer");
   await p.getByRole("tab", { name: "Mein Betrieb" }).click();
   await warte(800);
@@ -478,7 +486,7 @@ try {
   pruefe((await sichtbar("Salon Sonne")) && (await sichtbar("1 Person")), "Betrieb oder Mitarbeiter nicht wiederhergestellt");
   await p.getByRole("tab", { name: "Unterlagen" }).click();
   await warte(800);
-  pruefe((await sichtbar("Gefährdungsbeurteilung · Salon")) && (await sichtbar("Rechnung · 2026-002")) && (await sichtbar("Friseurbedarf Müller GmbH")), "Unterlagen oder Belege nicht wiederhergestellt");
+  pruefe((await sichtbar("Gefährdungsbeurteilung · Salon")) && (await sichtbar("2026-002 · ")) && (await sichtbar("Friseurbedarf Müller GmbH")), "Unterlagen oder Belege nicht wiederhergestellt");
   if (befunde.length) throw new Error(befunde.join("\n"));
   console.log(`✓ Rundgang ${schema} ohne Befunde (${n} Bilder in ${OUT})`);
 } catch (e) {

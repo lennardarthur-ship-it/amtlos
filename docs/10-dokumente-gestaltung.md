@@ -47,10 +47,23 @@ Acht Hausfarben stehen zur Wahl (Graphit, Marineblau, Petrol, Tannengrün, Borde
 
 ## Seite
 
-- A4, Ränder je Gestalt (siehe `RAENDER`), Brief nach DIN 5008 Form B mit Falz- und Lochmarken.
-- Fußzeile setzt die App nach dem Drucken auf jede Seite: beim Brief die Geschäftsangaben in Spalten, sonst „Betrieb · Dokument“ links und „Stand · Seite x von y“ rechts; ab Seite 2 zusätzlich eine kleine Kopfzeile mit dem Dokumentnamen.
-- Tabellenköpfe wiederholen sich auf Folgeseiten; Unterschriften, Summen und einzelne Einträge werden nicht getrennt.
+- A4, Ränder je Gestalt (siehe `RAENDER`), Brief nach DIN 5008 Form B mit Falz- und Lochmarken. Beim Brief ist der rechte Druckrand 10 mm, damit der Informationsblock wie in der Norm von 125 bis 200 mm reicht; der übrige Text endet über einen Innenabstand bei 190 mm. Kein Element darf über den Satzspiegel ragen – Chromium verkleinert sonst das ganze Blatt, iOS schneidet ab.
+- Brief: Die Anschriftzone fasst bis 6 Zeilen in 10 pt; längere Anschriften werden in 9 bzw. 8 pt gesetzt, nie gekürzt. Was dann noch nicht passt, schiebt den Betreff nach unten (statt ihn zu überdecken). Informationsblock und Anschrift stehen im Fluss nebeneinander.
+- Fußzeile setzt die App nach dem Drucken auf jede Seite: beim Brief die Geschäftsangaben in Spalten, sonst „Betrieb · Dokument“ links und „Stand · Seite x von y“ rechts; ab Seite 2 bei allen Gestalten eine kleine Kopfzeile mit dem Dokumentnamen.
+- Die Geschäftsangaben im Brief werden **nie gekürzt** (Pflichtangaben nach § 35a GmbHG, § 37a HGB): Spaltenbreiten richten sich nach dem Inhalt, lange Zeilen brechen um, ab sechs Zeilen wird die Schrift kleiner (6,4 bzw. 6 pt) und der Block rückt nach oben; passt die Seitenzahl dann nicht mehr darüber, steht sie oben rechts.
+- Tabellenköpfe wiederholen sich auf Folgeseiten; Überschriften, Tabellenzeilen, Summen und die Bilanz werden nicht getrennt. Lange Einträge (z. B. eine Verarbeitungstätigkeit) dürfen umbrechen, nur ihre Überschrift bleibt beim Text.
+- Unterschriften stehen nie allein auf einer Seite: `dokument()` fasst den Unterschriftsblock mit dem kurzen Text davor (Erklärung, Hinweis, Notruf, kurzer letzter Abschnitt) bzw. mit der letzten Zeile einer Listentabelle zu einem Schlussblock zusammen.
+- Bilanz: Aktiva und Passiva gleich lang, die Summen auf einer Linie mit Doppellinie.
+- Aushänge mit viel Text (Hygiene-, Hautschutzplan) werden kompakter gesetzt (8,8 pt), damit sie auf möglichst wenige Blätter passen. Die Allergenliste ist eine Matrix: eine Zeile je Speise, eine Spalte je Allergen, × = enthalten.
 - Leere Angaben zeigen eine Linie zum Ausfüllen – ein Dokument aus Amtlos ist auch halb ausgefüllt ein brauchbares Formular.
+- Prüfung: `node apps/mobile/werkzeuge/dokumente-pruefen.mjs` druckt alle Vorlagen (Startwerte und volle Listen) mit Chromium und meldet Überlauf über den Satzspiegel, Seiten nur mit Unterschrift und mehrseitige Aushänge.
+
+## Offene Entscheidungen
+
+- **GHS-Piktogramme in der Betriebsanweisung:** Die TRGS 555 sieht Gefahrenpiktogramme in der Betriebsanweisung vor; die Regel „keine Symbole“ (unten) schließt sie bisher aus. Bewusst offen – zu entscheiden mit Lizenz der Piktogramme und fachlicher Abnahme (PRUEFLISTE).
+- **Übertrag bei mehrseitigen Rechnungen:** Zwischensumme am Seitenende und „Übertrag“ oben auf der Folgeseite setzen voraus, dass bekannt ist, welche Position auf welcher Seite landet. Das HTML kennt keine Seiten, und expo-print liefert keine Rückmeldung zum Umbruch; ohne zweiten Durchlauf mit Messung nicht sauber machbar. Bis dahin: Tabellenkopf und Dokumentname wiederholen sich auf Folgeseiten.
+- **Typografisches Minus (−) bei negativen Beträgen:** Intl liefert den Bindestrich; eine Umstellung betrifft auch Prüfungen in der App (apps/mobile/test) und wird dort mit umgestellt.
+- **EÜR-Zeilennummern:** Die Kennzahlenkästen der EÜR bleiben ohne Nummer, solange die Zeilen der Anlage EÜR nicht im Katalog belegt sind.
 
 ## Was absichtlich fehlt
 

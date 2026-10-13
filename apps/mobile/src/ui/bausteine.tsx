@@ -133,13 +133,15 @@ export function Fuss({ children, ueber }: { children: ReactNode; ueber?: ReactNo
 }
 
 /** Beschriftung eines Felds; Hilfe hinter einem (i), damit Formulare ruhig bleiben. */
-export function FeldKopf({ label, hilfe }: { label: string; hilfe?: string }) {
+export function FeldKopf({ label, hilfe, optional }: { label: string; hilfe?: string; optional?: boolean }) {
   const f = useFarben();
   const [offen, setOffen] = useState(false);
   return (
     <View>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
         <T v="klein" fett stil={{ flexShrink: 1 }}>{label}</T>
+        {/* freiwillige Angaben kennzeichnen – sonst merkt man erst am Ende, was wirklich fehlt */}
+        {optional ? <T v="caption" leise>{TEXT.optional}</T> : null}
         {hilfe ? (
           <Pressable accessibilityRole="button" accessibilityLabel={`${TEXT.hilfe_zu} ${label}`} accessibilityState={{ expanded: offen }} onPress={() => { weich(); setOffen(!offen); }} hitSlop={12} style={{ padding: 2 }}>
             <Symbol name={offen ? "info.circle.fill" : "info.circle"} groesse={17} farbe={f.amt} />
@@ -170,7 +172,7 @@ export function Abschnitt({ titel, rechts, children }: { titel?: string; rechts?
 }
 
 /** Zeile in einer Liste: tippbar, mit Haarlinie unten. */
-export function Zeile({ links, titel, text, rechts, onPress, letzte }: { links?: ReactNode; titel: string; text?: string; rechts?: ReactNode; onPress?: () => void; letzte?: boolean }) {
+export function Zeile({ links, titel, text, wert, rechts, onPress, letzte }: { links?: ReactNode; titel: string; text?: string; wert?: string; rechts?: ReactNode; onPress?: () => void; letzte?: boolean }) {
   const f = useFarben();
   const inhalt = (
     <View style={{ flexDirection: "row", alignItems: "center", gap: 14, paddingVertical: 12, borderBottomWidth: letzte ? 0 : 1, borderColor: f.linieLeise }}>
@@ -179,6 +181,8 @@ export function Zeile({ links, titel, text, rechts, onPress, letzte }: { links?:
         <T fett numberOfLines={2}>{titel}</T>
         {text ? <T v="klein" leise numberOfLines={2} stil={{ marginTop: 2 }}>{text}</T> : null}
       </View>
+      {/* Betrag rechts (Rechnungen, Belege) – das, wonach man in Listen sucht */}
+      {wert ? <T fett stil={{ marginLeft: 4 }}>{wert}</T> : null}
       {rechts ?? (onPress ? <Symbol name="chevron.right" groesse={16} /> : null)}
     </View>
   );
@@ -191,13 +195,14 @@ export function Zeile({ links, titel, text, rechts, onPress, letzte }: { links?:
 }
 
 /** Hinweis: ruhig, mit Symbol; „fehler“ hat Rolle alert. Farbe nie allein (immer Text). */
-export function Hinweis({ text, art = "info", symbol }: { text: string; art?: "info" | "fehler" | "erfolg"; symbol?: string }) {
+export function Hinweis({ text, art = "info", symbol }: { text: string; art?: "info" | "warnung" | "fehler" | "erfolg"; symbol?: string }) {
   const f = useFarben();
-  const farbe = art === "fehler" ? f.frist : art === "erfolg" ? f.amt : f.bald;
-  const hg = art === "fehler" ? f.fristHauch : art === "erfolg" ? f.amtHauch : f.baldHauch;
+  // Orange nur für echte Warnungen – neutrale Hinweise ruhig, sonst wirkt alles wie eine Warnung
+  const farbe = art === "fehler" ? f.frist : art === "erfolg" ? f.amt : art === "warnung" ? f.bald : f.tinteLeise;
+  const hg = art === "fehler" ? f.fristHauch : art === "erfolg" ? f.amtHauch : art === "warnung" ? f.baldHauch : f.linieLeise;
   // Fehler und Erfolge ansagen (VoiceOver kennt keine Live-Regionen)
   useEffect(() => {
-    if (art !== "info") AccessibilityInfo.announceForAccessibility(text);
+    if (art === "fehler" || art === "erfolg") AccessibilityInfo.announceForAccessibility(text);
   }, [art, text]);
   return (
     <View accessibilityRole={art === "fehler" ? "alert" : "text"} accessibilityLiveRegion="polite" style={{ flexDirection: "row", gap: 10, alignItems: "flex-start", backgroundColor: hg, borderRadius: RADIUS.klein, padding: 12, marginVertical: 6 }}>
@@ -228,13 +233,13 @@ export function Karte({ children, stil, rahmen }: { children: ReactNode; stil?: 
 }
 
 /** Beschriftetes Textfeld; die Beschriftung steht darüber und ist mit dem Feld verbunden. */
-export function Feld({ label, wert, aendern, hilfe, fehler, mehrzeilig, ohneLabel, ...rest }: { label: string; wert: string; aendern: (w: string) => void; hilfe?: string; fehler?: string | null; mehrzeilig?: boolean; ohneLabel?: boolean } & Omit<React.ComponentProps<typeof TextInput>, "value" | "onChangeText" | "style">) {
+export function Feld({ label, wert, aendern, hilfe, fehler, mehrzeilig, ohneLabel, optional, ...rest }: { label: string; wert: string; aendern: (w: string) => void; hilfe?: string; fehler?: string | null; mehrzeilig?: boolean; ohneLabel?: boolean; optional?: boolean } & Omit<React.ComponentProps<typeof TextInput>, "value" | "onChangeText" | "style">) {
   const f = useFarben();
   const beispiel = istBeispiel(hilfe, mehrzeilig) && !rest.placeholder;
   const zahlen = rest.keyboardType === "decimal-pad" || rest.keyboardType === "number-pad" || rest.keyboardType === "numbers-and-punctuation" || rest.keyboardType === "phone-pad";
   return (
     <View style={{ marginTop: ohneLabel ? 8 : 20 }}>
-      {ohneLabel ? null : <FeldKopf label={label} hilfe={beispiel ? undefined : hilfe} />}
+      {ohneLabel ? null : <FeldKopf label={label} hilfe={beispiel ? undefined : hilfe} optional={optional} />}
       <TextInput
         placeholder={beispiel ? hilfe : undefined}
         accessibilityLabel={label}
@@ -289,7 +294,7 @@ export function DatumFeld({ label, wert, aendern, hilfe, ohneHeute, ohneLabel }:
           placeholderTextColor={f.tinteLeise}
           keyboardType="numbers-and-punctuation"
           inputAccessoryViewID={TASTATUR_FERTIG}
-          style={{ flex: 1, minHeight: ZIEL, borderWidth: 1.5, borderColor: falsch ? f.frist : f.rahmen, borderRadius: RADIUS.klein, paddingHorizontal: 14, color: f.tinte, backgroundColor: f.blatt, fontFamily: SCHRIFT.regular, fontSize: GROESSE.basis, fontVariant: ["tabular-nums"] }}
+          style={{ flex: 1, minWidth: 0, minHeight: ZIEL, borderWidth: 1.5, borderColor: falsch ? f.frist : f.rahmen, borderRadius: RADIUS.klein, paddingHorizontal: 14, color: f.tinte, backgroundColor: f.blatt, fontFamily: SCHRIFT.regular, fontSize: GROESSE.basis }}
         />
         {ohneHeute ? null : (
           <Pressable accessibilityRole="button" accessibilityLabel={`${label}: ${heuteText}`} onPress={() => aendern(heute)} style={({ pressed }) => ({ minHeight: ZIEL, paddingHorizontal: 14, borderRadius: RADIUS.klein, justifyContent: "center", backgroundColor: f.amtHauch, opacity: pressed ? 0.7 : 1 })}>
@@ -323,9 +328,11 @@ export function Wahl<W extends string>({ label, wert, aendern, optionen, hilfe }
                 if (istIos) void Haptics.selectionAsync();
                 aendern(o.wert);
               }}
-              style={{ minHeight: ZIEL - 8, paddingHorizontal: 14, borderRadius: 20, justifyContent: "center", backgroundColor: an ? f.tinte : f.blatt, borderWidth: 1, borderColor: an ? f.tinte : f.rahmen }}
+              // derselbe Auswahl-Stil wie Mehrfachwahl und Listen: Hauch der Handlungsfarbe, Rahmen, Häkchen
+              style={{ minHeight: ZIEL - 8, paddingHorizontal: 14, borderRadius: 20, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: an ? f.amtHauch : f.blatt, borderWidth: an ? 1.5 : 1, borderColor: an ? f.amt : f.rahmen, flexShrink: 1 }}
             >
-              <T v="klein" fett farbe={an ? f.papier : f.tinte}>{o.text}</T>
+              {an ? <Symbol name="checkmark" groesse={14} farbe={f.amtTief} gewicht="bold" /> : null}
+              <T v="klein" fett farbe={an ? f.amtTief : f.tinte} stil={{ flexShrink: 1 }}>{o.text}</T>
             </Pressable>
           );
         })}
@@ -466,6 +473,27 @@ export function BausteinListe({ label, hilfe, werte, aendern, optionen }: { labe
           );
         })}
       </View>
+    </View>
+  );
+}
+
+/** Suchfeld für Listen (Unterlagen, Kunden, Auswahl). */
+export function Suchfeld({ wert, setzen, label = TEXT.suchen }: { wert: string; setzen: (w: string) => void; label?: string }) {
+  const f = useFarben();
+  return (
+    <View style={{ flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 12, minHeight: 44, borderRadius: 12, backgroundColor: f.blatt, borderWidth: 1, borderColor: f.rahmen }}>
+      <Symbol name="magnifyingglass" groesse={18} />
+      <TextInput
+        accessibilityLabel={label}
+        placeholder={label}
+        placeholderTextColor={f.tinteLeise}
+        value={wert}
+        onChangeText={setzen}
+        autoCorrect={false}
+        clearButtonMode="while-editing"
+        returnKeyType="search"
+        style={{ flex: 1, minHeight: 44, color: f.tinte, fontFamily: SCHRIFT.regular, fontSize: GROESSE.basis }}
+      />
     </View>
   );
 }

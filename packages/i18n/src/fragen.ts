@@ -385,7 +385,7 @@ export const SCHRITTE: Schritt[] = [
         frage: { de: "Wie viele Menschen arbeiten für dich, dich selbst nicht mitgezählt?", en: "How many people work for you, not counting yourself?" },
         hilfe: { de: "Alle zählen: Vollzeit, Teilzeit, Minijob, Azubis.", en: "Count everyone: full-time, part-time, mini-jobs, apprentices." },
       },
-      { feld: "beschaeftigte.minijob", art: "zahl", frage: { de: "Davon im Minijob?", en: "Of these, on a mini-job?" } },
+      { feld: "beschaeftigte.minijob", art: "zahl", frage: { de: "Wie viele davon arbeiten im Minijob?", en: "How many of them work in a mini-job?" }, hilfe: { de: "Von allen Menschen, die für dich arbeiten.", en: "Out of everyone who works for you." } },
       { feld: "beschaeftigte.azubi", art: "zahl", frage: { de: "Davon Auszubildende?", en: "Of these, apprentices?" } },
       { feld: "beschaeftigte.jugendlich", art: "zahl", frage: { de: "Davon unter 18 Jahren?", en: "Of these, under 18?" } },
       {

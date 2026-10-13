@@ -2512,7 +2512,7 @@ export const HACCP: Vorschlag[] = [
   "titel": "Kühlung Hackfleisch",
   "werte": {
    "punkt": "Kühlung Hackfleisch",
-   "grenzwert": "vorverpackt (SB) bzw. nicht am Ort der Abgabe hergestellt: max. +2; am Ort der Abgabe hergestellt / lose: max. +7 (LAVES: +7 bzw. +4 je nach Abgabezeitpunkt) °C",
+   "grenzwert": "vorverpackt (SB) bzw. nicht am Ort der Abgabe hergestellt: max. +2 °C; am Ort der Abgabe hergestellt / lose: max. +7 °C (LAVES: +7 bzw. +4 °C je nach Abgabezeitpunkt)",
    "haeufigkeit": "täglich",
    "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren."
   },

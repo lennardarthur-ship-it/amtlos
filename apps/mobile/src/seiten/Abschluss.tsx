@@ -5,18 +5,18 @@ import { T as TEXT } from "../texte";
 import { DatumFeld, Fuss, Hinweis, Karte, Knopf, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
-import { RADIUS, useFarben, weich } from "../ui/thema";
+import { RADIUS, useFarben } from "../ui/thema";
 import { Vorschau } from "../ui/Vorschau";
 import { drucken, pdfTeilen } from "../unterlagen/pdf";
 import { NUMMER_DOPPELT, fehltFuer } from "../unterlagen/pruefung";
 import { dateiTeilen } from "../unterlagen/sicherungDatei";
 import { heute } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
+import { bestaetigen } from "../ui/bestaetigen";
+import { AbsenderSeite } from "./Betrieb";
 import { Ablauf, fehltJeSchritt } from "./Ablauf";
 import { useProSperre } from "./Pro";
 import { FREI_JE_MONAT, ausgabeErlaubt, betriebFuerDokument, uebrig } from "../pro/regeln";
-import { BetriebFormular } from "./Betrieb";
-import { Inhalt } from "./gemeinsam";
 
 /**
  * PDF teilen oder drucken – mit Ladezustand und Fehlermeldung. Dokumente an Kunden (Rechnung) gehen nur vollständig
@@ -90,16 +90,6 @@ function VorschauSeite({ id }: { id: string }) {
   );
 }
 
-function BetriebSeite() {
-  return (
-    <Unterseite titel={TEXT.betrieb_titel}>
-      <Inhalt>
-        <BetriebFormular />
-      </Inhalt>
-    </Unterseite>
-  );
-}
-
 /**
  * Abschluss eines Ablaufs (E-124): Stand („Fertig“ bzw. was fehlt, mit Sprung zum Schritt), Ergebnis, Vorschau des
  * Dokuments, Übersicht der Schritte und weitere Möglichkeiten. Der Hauptknopf „PDF teilen“ steht im Fuß des Ablaufs.
@@ -109,8 +99,6 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
   const nav = useNav();
   const f = useFarben();
   const melden = useMeldung();
-  const [loeschFrage, setLoeschFrage] = useState(false);
-  const [stornoFrage, setStornoFrage] = useState(false);
   const u = z.stand.unterlagen.find((x) => x.id === id);
   const v = u ? vorlageFuer(u.vorlage) : undefined;
   if (!u || !v) return null;
@@ -130,10 +118,15 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
   const fertig = alle.length === 0;
   return (
     <View>
-      <T v="titel" accessibilityRole="header" stil={{ fontSize: 28, lineHeight: 34 }}>{fest ? TEXT.festgeschrieben_titel : fertig ? TEXT.fertig : TEXT.fast_fertig}</T>
+      <T v="titel" accessibilityRole="header" stil={{ fontSize: 28, lineHeight: 34 }}>{fest ? (v.storno && !d.storno_zu ? TEXT.geteilt_titel : TEXT.festgeschrieben_titel) : fertig ? TEXT.fertig : TEXT.fast_fertig}</T>
       {fest ? (
         <View style={{ marginTop: 10 }}>
-          <Hinweis symbol="lock" text={TEXT.festgeschrieben_text(new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(u.festgeschrieben!)), Boolean(v.storno))} />
+          {v.storno && !d.storno_zu ? (
+            // der Erfolgsmoment: geteilt – nicht „festgeschrieben“ als Warnung
+            <Hinweis art="erfolg" symbol="checkmark.circle" text={TEXT.geteilt_text(new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(u.festgeschrieben!)))} />
+          ) : (
+            <Hinweis symbol="lock" text={TEXT.festgeschrieben_text(new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(u.festgeschrieben!)), Boolean(v.storno))} />
+          )}
           {storno ? <Hinweis art="erfolg" text={TEXT.storniert_durch(String(storno.daten.nummer ?? ""))} /> : null}
           {typeof d.storno_zu === "string" && d.storno_zu ? <Hinweis text={TEXT.storniert_zu(d.storno_zu)} /> : null}
           {v.storno && !u.storniertDurch ? <Zahlung id={id} /> : null}
@@ -149,7 +142,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
             <View key={`${x.text}-${i}`} style={{ flexDirection: "row", alignItems: "center", gap: 8, minHeight: 40, borderTopWidth: i ? 1 : 0, borderColor: f.linieLeise }}>
               <T v="klein" stil={{ flex: 1 }}>{x.text}</T>
               {x.betrieb ? (
-                <TextKnopf text={TEXT.ergaenzen} label={`${TEXT.im_betrieb}: ${x.text}`} onPress={() => nav.oeffnen("betrieb-aus-ablauf", () => <BetriebSeite />, true)} />
+                <TextKnopf text={TEXT.ergaenzen} label={`${TEXT.im_betrieb}: ${x.text}`} onPress={() => nav.oeffnen("absender", () => <AbsenderSeite />, true)} />
               ) : x.schritt >= 0 ? (
                 <TextKnopf text={TEXT.ergaenzen} label={`${TEXT.ergaenzen}: ${x.text}`} onPress={() => springen(x.schritt)} />
               ) : null}
@@ -167,7 +160,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
           {ergebnis.map(([k, w], i) => (
             <View key={k} style={{ flexDirection: "row", justifyContent: "space-between", gap: 12, paddingVertical: 12, borderTopWidth: i ? 1 : 0, borderColor: f.linieLeise }}>
               <T stil={{ flex: 1 }} fett={i === ergebnis.length - 1}>{k}</T>
-              <T fett={i === ergebnis.length - 1} stil={{ fontVariant: ["tabular-nums"], flexShrink: 1, textAlign: "right" }}>{w}</T>
+              <T fett={i === ergebnis.length - 1} stil={{ flexShrink: 1, textAlign: "right" }}>{w}</T>
             </View>
           ))}
         </Karte>
@@ -198,7 +191,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
 
       <T v="klein" fett leise accessibilityRole="header" stil={{ marginTop: 28, marginBottom: 2, marginLeft: 4 }}>{TEXT.mehr}</T>
       <View style={{ marginLeft: 4 }}>
-        {v.eRechnung && eRechnung ? <TextKnopf symbol="doc.text" text={TEXT.e_rechnung} onPress={() => void eRechnung()} /> : null}
+        {v.eRechnung && eRechnung ? <TextKnopf symbol="doc.text" text={TEXT.mitPro(TEXT.e_rechnung, z.pro)} onPress={() => void eRechnung()} /> : null}
         {eFehlt.length ? (
           <View style={{ backgroundColor: f.baldHauch, borderRadius: RADIUS.klein, padding: 12, marginVertical: 4 }}>
             <T v="klein" fett>{TEXT.e_rechnung_fehlt}</T>
@@ -220,51 +213,38 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
             }
           }}
         />
+        {/* Rückfragen als System-Dialog – eine Karte am Seitenende läge halb unter Fußleiste oder Meldung */}
         {fest ? (
           v.storno && !u.storniertDurch && !d.storno_zu ? (
-            stornoFrage ? (
-              <Karte stil={{ paddingVertical: 14, gap: 10, marginTop: 6 }}>
-                <T fett>{TEXT.storno_wirklich}</T>
-                <T v="klein" leise>{TEXT.storno_text}</T>
-                <View style={{ flexDirection: "row", gap: 10 }}>
-                  <Knopf
-                    gefahr
-                    text={TEXT.storno_ja}
-                    onPress={() => {
-                      setStornoFrage(false);
-                      const neu = z.stornieren(id);
-                      if (neu) {
-                        melden(TEXT.storno_angelegt, "info");
-                        nav.oeffnen(`ablauf-${neu.id}`, () => <Ablauf id={neu.id} amEnde />, true);
-                      }
-                    }}
-                    stil={{ flex: 1 }}
-                  />
-                  <Knopf ton text={TEXT.abbrechen} onPress={() => setStornoFrage(false)} stil={{ flex: 1 }} />
-                </View>
-              </Karte>
-            ) : (
-              <TextKnopf symbol="arrow.uturn.backward" gefahr text={TEXT.stornieren} onPress={() => { weich(); setStornoFrage(true); }} />
-            )
+            <TextKnopf
+              symbol="arrow.uturn.backward"
+              gefahr
+              text={TEXT.stornieren}
+              onPress={() =>
+                void bestaetigen({ titel: TEXT.storno_wirklich, text: TEXT.storno_text, ja: TEXT.storno_ja }).then((ok) => {
+                  if (!ok) return;
+                  const neu = z.stornieren(id);
+                  if (neu) {
+                    melden(TEXT.storno_angelegt, "info");
+                    nav.oeffnen(`ablauf-${neu.id}`, () => <Ablauf id={neu.id} amEnde />, true);
+                  }
+                })
+              }
+            />
           ) : null
-        ) : loeschFrage ? (
-          <Karte stil={{ paddingVertical: 14, gap: 10, marginTop: 6 }}>
-            <T fett>{TEXT.loeschen_wirklich}</T>
-            <View style={{ flexDirection: "row", gap: 10 }}>
-              <Knopf
-                gefahr
-                text={TEXT.loeschen_ja}
-                onPress={() => {
-                  z.loeschen(id);
-                  melden(TEXT.geloescht, "info");
-                }}
-                stil={{ flex: 1 }}
-              />
-              <Knopf ton text={TEXT.abbrechen} onPress={() => setLoeschFrage(false)} stil={{ flex: 1 }} />
-            </View>
-          </Karte>
         ) : (
-          <TextKnopf symbol="trash" gefahr text={TEXT.loeschen} onPress={() => { weich(); setLoeschFrage(true); }} />
+          <TextKnopf
+            symbol="trash"
+            gefahr
+            text={TEXT.loeschen}
+            onPress={() =>
+              void bestaetigen({ titel: TEXT.loeschen_wirklich, ja: TEXT.loeschen_ja }).then((ok) => {
+                if (!ok) return;
+                z.loeschen(id);
+                melden(TEXT.geloescht, "info");
+              })
+            }
+          />
         )}
       </View>
     </View>

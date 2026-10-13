@@ -29,6 +29,8 @@ export const CHECK_FELDER = ["taetigkeit.branchen", "rechtsform", "gesellschaft.
 
 const FRAGE = new Map<string, { frage: Frage; nurWenn?: { feld: string; in: string[] } }>();
 for (const s of SCHRITTE) for (const f of s.fragen) FRAGE.set(f.feld, { frage: f, nurWenn: s.nurWenn });
+/** Reihenfolge im Fragenkatalog – vom Alltäglichen zum Speziellen; entscheidet bei gleicher Wirkung */
+const RANG = new Map([...FRAGE.keys()].map((k, i) => [k, i]));
 
 export const frageZu = (feld: string): Frage | undefined => FRAGE.get(feld)?.frage;
 
@@ -143,8 +145,13 @@ export function zusatzFragen(profil: Profil, stichtag: string, n = 8): string[] 
 /** Offene Fragen, nach der Zahl unklarer Pflichten, die sie klären (E-129) – die wirksamste zuerst. */
 export function offeneFragenNachWirkung(a: Auswertung, profil: Profil): { feld: string; anzahl: number }[] {
   const zaehler = new Map<string, number>();
-  for (const p of a.unbekannt) for (const f of p.offeneFragen) if (!beantwortet(profil, f)) zaehler.set(f, (zaehler.get(f) ?? 0) + 1);
-  return [...zaehler.entries()].sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0])).map(([feld, anzahl]) => ({ feld, anzahl }));
+  // nur Fragen, die für diesen Betrieb überhaupt gestellt werden (z. B. Investoren nur bei UG/GmbH)
+  const passt = (f: string) => {
+    const b = FRAGE.get(f)?.nurWenn;
+    return !b || b.in.includes(String(profil[b.feld]));
+  };
+  for (const p of a.unbekannt) for (const f of p.offeneFragen) if (!beantwortet(profil, f) && passt(f)) zaehler.set(f, (zaehler.get(f) ?? 0) + 1);
+  return [...zaehler.entries()].sort((x, y) => y[1] - x[1] || (RANG.get(x[0]) ?? 999) - (RANG.get(y[0]) ?? 999) || x[0].localeCompare(y[0])).map(([feld, anzahl]) => ({ feld, anzahl }));
 }
 
 export interface Erledigt {

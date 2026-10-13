@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
-import { eintragAusVorschlag, kurztitel, neuerEintrag, sichtbar, vorlageFuer, type Daten, type Eintrag, type EintragWert, type ListenFeld, type Vorschlag } from "@amtlos/fachlogik";
+import { cent, zahl, eintragAusVorschlag, kurztitel, neuerEintrag, sichtbar, vorlageFuer, type Daten, type Eintrag, type EintragWert, type ListenFeld, type Vorschlag } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { Fuss, Karte, Knopf, Symbol, T, TextKnopf, Wahl } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
@@ -180,6 +180,16 @@ function VorschlagSeite({ id, feldId }: { id: string; feldId: string }) {
   );
 }
 
+/** Rechnungsposition: „2 Stunde × 45,00 € = 90,00 €“ – damit man in der Liste sieht, was die Position kostet. */
+function betragszeile(e: Record<string, unknown>): string | null {
+  const preis = typeof e.preis === "string" ? cent(e.preis) : null;
+  if (preis === null) return null;
+  const menge = typeof e.menge === "string" && e.menge.trim() ? (zahl(e.menge) ?? 1) : 1;
+  const einheit = typeof e.einheit === "string" && e.einheit.trim() ? ` ${e.einheit.trim()}` : "";
+  const fmt = (c: number) => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(c / 100);
+  return `${new Intl.NumberFormat("de-DE", { maximumFractionDigits: 4 }).format(menge)}${einheit} × ${fmt(preis)} = ${fmt(Math.round(menge * preis))}`;
+}
+
 /** Liste in einem Schritt: Einträge als ruhige Zeilen, darunter Vorschläge, Mitarbeiter übernehmen, eigener Eintrag. */
 export function ListenSchritt({ feld, id }: { feld: ListenFeld; id: string }) {
   const z = useAmtlos();
@@ -200,7 +210,7 @@ export function ListenSchritt({ feld, id }: { feld: ListenFeld; id: string }) {
                 <T v="caption" fett leise stil={{ width: 18, fontVariant: ["tabular-nums"] }}>{i + 1}</T>
                 <View style={{ flex: 1 }}>
                   <T fett={benutzt(feld, e)} leise={!benutzt(feld, e)} numberOfLines={2}>{anzeigeTitel(feld, e, i)}</T>
-                  {fehlt.length ? <T v="caption" farbe={f.bald}>{TEXT.eintrag_fehlt(fehlt.length)}</T> : null}
+                  {fehlt.length ? <T v="caption" farbe={f.bald}>{TEXT.eintrag_fehlt(fehlt.length)}</T> : betragszeile(e) ? <T v="caption" leise>{betragszeile(e)}</T> : null}
                 </View>
                 <Symbol name="chevron.right" groesse={16} />
               </Pressable>

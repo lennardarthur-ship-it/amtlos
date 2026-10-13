@@ -1,17 +1,18 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { ScrollView, View } from "react-native";
 import { T as TEXT } from "../texte";
 import { RAND } from "../ui/thema";
 import { Karte, Knopf, Symbol, T, TextKnopf, Wahl } from "../ui/bausteine";
 import { useNav } from "../ui/navigation";
 import { useFarben } from "../ui/thema";
-import { belegeFiltern, euroText, filterVerfuegbar, filtern, offeneSumme, type Filter } from "../unterlagen/ablage";
+import { belegeFiltern, euroText, filterVerfuegbar, filtern, offeneSumme, rechnungenSortiert, type Filter } from "../unterlagen/ablage";
 import { sortiert } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { BelegErfassen, BelegSeite, BelegZeile } from "./Belege";
 import { Gruppe, Leer, Seite } from "./gemeinsam";
 import { useOeffnen, useStarten } from "./starten";
-import { Suchfeld, UnterlageZeile } from "./Unterlagen";
+import { Suchfeld, UnterlageZeile, useFehltJe } from "./Unterlagen";
+import { BelegErfassenSeite } from "./Belege";
 
 /** Ab so vielen Unterlagen lohnt sich die Suche. */
 const SUCHE_AB = 6;
@@ -44,14 +45,19 @@ export function Meine() {
   const [suche, setSuche] = useState("");
   // viele Unterlagen: in Schritten zeigen, damit die Liste flüssig bleibt
   const [zeigen, setZeigen] = useState(SCHRITT);
-  const alle = sortiert(stand);
-  const verfuegbar = filterVerfuegbar(alle, stand.belege.length);
+  // nur neu rechnen, wenn sich Unterlagen, Belege, Filter oder Suche ändern – nicht bei jeder Eingabe anderswo
+  const alle = useMemo(() => sortiert(stand), [stand.unterlagen]);
+  const verfuegbar = useMemo(() => filterVerfuegbar(alle, stand.belege.length), [alle, stand.belege.length]);
   const aktiv: Filter = verfuegbar.includes(filter) ? filter : "alle";
-  const liste = filtern(alle, aktiv, suche);
-  const belege = aktiv === "alle" || aktiv === "belege" ? belegeFiltern(stand.belege, suche) : [];
+  const liste = useMemo(() => {
+    const l = filtern(alle, aktiv, suche);
+    return aktiv === "rechnungen" || aktiv === "offen" ? rechnungenSortiert(l) : l;
+  }, [alle, aktiv, suche]);
+  const belege = useMemo(() => (aktiv === "alle" || aktiv === "belege" ? belegeFiltern(stand.belege, suche) : []), [aktiv, stand.belege, suche]);
   const belegeGezeigt = aktiv === "belege" ? belege : belege.slice(0, 5);
-  const offen = offeneSumme(alle, stand.betrieb);
+  const offen = useMemo(() => offeneSumme(alle, stand.betrieb), [alle, stand.betrieb]);
   const hatRechnungen = alle.some((u) => u.vorlage === "rechnung" && u.festgeschrieben);
+  const fehltJe = useFehltJe();
   return (
     <Seite titel={TEXT.meine_titel} unterzeile={alle.length ? TEXT.anzahl_unterlagen(alle.length) : undefined}>
       {alle.length || stand.belege.length ? (
@@ -70,7 +76,7 @@ export function Meine() {
           {liste.length ? (
             <Karte>
               {liste.slice(0, zeigen).map((u, i, l) => (
-                <UnterlageZeile key={u.id} u={u} letzte={i === l.length - 1} onPress={() => oeffnen(u.id)} />
+                <UnterlageZeile key={u.id} u={u} letzte={i === l.length - 1} fehlt={fehltJe.get(u.id) ?? 0} betrieb={stand.betrieb} onPress={oeffnen} />
               ))}
             </Karte>
           ) : !belege.length ? (
@@ -94,10 +100,11 @@ export function Meine() {
           </Gruppe>
         </View>
       ) : (
-        <Leer text={TEXT.meine_leer}>
+        <Leer text={TEXT.meine_leer} unter={TEXT.meine_leer_text}>
           <View style={{ gap: 10 }}>
-            <Knopf text={TEXT.zu_den_unterlagen} onPress={() => tabWechseln("unterlagen")} />
-            <Knopf ton symbol="plus" text={TEXT.rechnung_schreiben} onPress={() => starten("rechnung")} />
+            <Knopf symbol="plus" text={TEXT.rechnung_schreiben} onPress={() => starten("rechnung")} />
+            <Knopf ton symbol="doc.viewfinder" text={TEXT.beleg_erfassen} onPress={() => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />)} />
+            <TextKnopf symbol="doc.text" text={TEXT.zu_den_unterlagen} onPress={() => tabWechseln("unterlagen")} stil={{ alignSelf: "center" }} />
           </View>
         </Leer>
       )}

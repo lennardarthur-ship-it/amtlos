@@ -11,7 +11,7 @@ import type { Betrieb, Daten, Eintrag } from "./typen.js";
  * Hinweis zur fachlichen Abnahme (PRUEFLISTE T-52 ff.). Steht in der App vor dem Erstellen, nicht im Dokument: Die
  * Unterlage ist das Dokument des Betriebs und muss bei einer Prüfung vorzeigbar sein.
  */
-export const PRUEFHINWEIS = "Die Vorlagen sind noch nicht von Fachleuten abgenommen. Prüfe die Inhalte, bevor du sie verwendest.";
+export const PRUEFHINWEIS = "Die Vorlagen sind noch nicht von Fachleuten geprüft. Prüfe die Inhalte, bevor du sie verwendest.";
 /** Platzhalter für Text-Ausgaben (z. B. Website-Text); im Dokument stehen stattdessen Linien zum Ausfüllen. */
 export const LEER = "(noch nicht angegeben)";
 /** Leere Angabe im Dokument: eine Linie zum Ausfüllen von Hand. */
@@ -80,17 +80,20 @@ export interface AbschnittOptionen {
 }
 
 /** Abschnitt mit Überschrift; in Nachweis, Vertrag und Handbuch stehen Nummer und `rand` in der Randspalte. */
+/** Randangabe maskiert; Bereiche wie „lit. b–g“ oder „§§ 145–147“ werden nicht am Strich umbrochen. */
+const randText = (t: string) => esc(t).replace(/(\S+–\S+)/g, '<span class="nb">$1</span>');
+
 export function abschnitt(titel: string, inhalt: string, o: string | AbschnittOptionen = ""): string {
   const opt: AbschnittOptionen = typeof o === "string" ? { klasse: o, ohneNummer: o.includes("ohne-nummer") } : o;
   const klassen = ["abschnitt", opt.klasse ?? "", opt.ohneNummer ? "ohne-nummer" : ""].filter(Boolean).join(" ");
-  const rand = opt.rand ? `<span class="rand">${esc(opt.rand)}</span>` : "";
+  const rand = opt.rand ? `<span class="rand">${randText(opt.rand)}</span>` : "";
   return `<section class="${klassen}"><h2>${rand}${esc(titel)}</h2>${inhalt}</section>`;
 }
 
 /** Einzelner Eintrag innerhalb eines Abschnitts (z. B. eine Verarbeitungstätigkeit): Nummer in der Randspalte. */
 export function eintrag(titel: string, inhalt: string, o: { nummer?: string; rand?: string } = {}): string {
   const nr = o.nummer ? `<span class="nr">${esc(o.nummer)}</span>` : "";
-  const rand = o.rand ? `<span class="rand">${esc(o.rand)}</span>` : "";
+  const rand = o.rand ? `<span class="rand">${randText(o.rand)}</span>` : "";
   return `<div class="eintrag"><h3>${nr}${rand}${esc(titel)}</h3>${inhalt}</div>`;
 }
 
@@ -113,10 +116,23 @@ export const zelle = (t: string) => esc(t).replace(/\n/g, "<br>");
  * Unterschriften nebeneinander. Mit `ortDatum` bekommt jeder Block zusätzlich eine Zeile für Ort und Datum (Verträge,
  * Nachweise); ohne steht nur die Unterschriftslinie mit Beschriftung.
  */
-export function unterschriften(wer: string[], o: { ortDatum?: boolean } = {}): string {
+export function unterschriften(wer: string[], o: { ortDatum?: boolean; orte?: string[] } = {}): string {
   return `<div class="unterschriften${o.ortDatum ? " mit-ort" : ""}">${wer
-    .map((w) => `<div class="unterschrift">${o.ortDatum ? `<div class="linie klein-linie"></div><span>Ort, Datum</span>` : ""}<div class="linie"></div><span>${esc(w)}</span></div>`)
+    .map((w, i) => {
+      // vorbelegter Ort (z. B. aus dem Formular) vor der Linie „Ort, Datum“
+      const ort = (o.orte?.[i] ?? "").trim();
+      return `<div class="unterschrift">${o.ortDatum ? `<div class="linie klein-linie">${ort ? `<b>${esc(ort)},</b>` : ""}</div><span>Ort, Datum</span>` : ""}<div class="linie"></div><span>${esc(w)}</span></div>`;
+    })
     .join("")}</div>`;
+}
+
+/** Leere Tabellenzelle mit Linie zum Ausfüllen. */
+export const ZELLE_LINIE = '<span class="zelle-linie"></span>';
+
+/** IBAN in Vierergruppen (DIN 5008), z. B. „DE89 3704 0044 0532 0130 00“; anderes bleibt unverändert. */
+export function ibanText(iban: string): string {
+  const roh = iban.replace(/\s+/g, "").toUpperCase();
+  return /^[A-Z]{2}\d{2}[A-Z0-9]{8,30}$/.test(roh) ? roh.replace(/(.{4})(?=.)/g, "$1 ") : iban.trim();
 }
 
 export function anschrift(b: Betrieb): string {
@@ -200,7 +216,8 @@ export function hauch(hex: string, anteil: number): string {
 
 /** Ränder je Gestalt in mm (oben, rechts, unten, links) – die App druckt damit; unten Platz für die Fußzeile. */
 export const RAENDER: Record<Gestalt, [number, number, number, number]> = {
-  brief: [12, 20, 30, 20],
+  // Brief: rechts 10 mm, damit der Informationsblock nach DIN 5008 bis 200 mm reicht (der Text endet über das Padding bei 190 mm)
+  brief: [12, 10, 30, 20],
   vertrag: [16, 20, 22, 20],
   aushang: [12, 14, 16, 14],
   nachweis: [14, 18, 20, 18],
@@ -245,8 +262,19 @@ ul.punkte li::marker { color: var(--akzent); }
 table { border-collapse: collapse; width: 100%; }
 td, th { font-variant-numeric: lining-nums tabular-nums; }
 td.zahl, th.zahl { text-align: right; white-space: nowrap; }
-tr, .unterschrift, .kasten, .summen, .zahlung, .eintrag, .parteien { page-break-inside: avoid; break-inside: avoid; }
-h2, h3 { page-break-after: avoid; break-after: avoid; }
+tr, .unterschrift, .kasten, .summen, .zahlung, .parteien, .schlussblock { page-break-inside: avoid; break-inside: avoid; }
+h2, h3 { page-break-after: avoid; break-after: avoid; page-break-inside: avoid; break-inside: avoid; }
+/* Unterschriften bleiben beim Text davor (dokument() fasst sie mit dem letzten kurzen Block zum Schlussblock zusammen) */
+.unterschriften { page-break-before: avoid; break-before: avoid; }
+.nb { white-space: nowrap; }
+table.liste.fortsetzung { margin-top: 0; }
+.schlussblock > table + .unterschriften { margin-top: 7mm; }
+.spalten2 { display: flex; gap: 10mm; }
+.spalten2 > * { flex: 1; }
+.zelle-linie { display: block; border-bottom: 0.5pt solid #8a949c; height: 4.2mm; }
+ol.nummern { margin: 0 0 2mm; padding-left: 6mm; }
+ol.nummern li { margin: 0 0 0.9mm; padding-left: 0.6mm; }
+ol.nummern li::marker { color: var(--akzent); }
 thead { display: table-header-group; }
 tfoot { display: table-row-group; }
 
@@ -288,11 +316,14 @@ table.angaben tr + tr th, table.angaben tr + tr td { border-top: 0.5pt solid #e4
 /* Listen-Tabellen */
 table.liste { font-size: 8.6pt; margin-top: 1mm; }
 table.liste th { text-align: left; font-weight: 600; font-size: 7.6pt; color: #4a535c; padding: 1.6mm 2mm 1.3mm; vertical-align: bottom; border-bottom: 1pt solid var(--akzent); }
+table.liste th.zahl, table.liste td.zahl { text-align: right; }
+table.liste th.zahl { white-space: normal; }
 table.liste td { border-bottom: 0.5pt solid #dde1e5; padding: 1.8mm 2mm; vertical-align: top; }
 table.liste td:first-child, table.liste th:first-child { padding-left: 0; }
 table.liste td:last-child, table.liste th:last-child { padding-right: 0; }
-table.liste.hoch td { height: 9.5mm; }
+table.liste.hoch td { height: 8mm; }
 table.liste tr.summe td { border-bottom: 0; border-top: 1pt solid var(--akzent); font-weight: 600; padding-top: 1.8mm; }
+table.liste.doppelt tr.summe td.zahl { border-bottom: 2.2pt double var(--akzent); }
 table.liste ul.punkte { margin: 0; padding-left: 3.6mm; }
 
 /* Kasten (Betriebsanweisung) */
@@ -307,10 +338,11 @@ table.liste ul.punkte { margin: 0; padding-left: 3.6mm; }
 .summen tr.gesamt td { border-top: 1pt solid var(--akzent); font-weight: 700; font-size: 11pt; padding-top: 2mm; }
 
 /* Unterschriften */
-.unterschriften { display: flex; gap: 12mm; margin-top: 14mm; }
+.unterschriften { display: flex; gap: 12mm; margin-top: 10mm; }
 .unterschrift { flex: 1; font-size: 7.6pt; color: #4a535c; }
-.unterschrift .linie { border-bottom: 0.6pt solid #1a1f24; height: 12mm; margin-bottom: 1.2mm; }
-.unterschrift .linie.klein-linie { height: 8mm; }
+.unterschrift .linie { border-bottom: 0.6pt solid #1a1f24; height: 11mm; margin-bottom: 1.2mm; }
+.unterschrift .linie.klein-linie { height: 8mm; display: flex; align-items: flex-end; }
+.unterschrift .linie.klein-linie b { font-weight: 400; font-size: 9.4pt; color: #1a1f24; padding: 0 0 0.6mm; }
 .unterschrift span { display: block; margin-bottom: 3mm; }
 .unterschrift span:last-child { margin-bottom: 0; }
 .unterschrift:only-child { max-width: 50%; }
@@ -324,7 +356,8 @@ table.liste ul.punkte { margin: 0; padding-left: 3.6mm; }
 .partei .rolle { font-family: ${SANS}; font-size: 8.3pt; color: #4a535c; margin-top: 1.2mm; }
 
 /* Formular-Feldraster */
-table.felder { font-size: 9.4pt; }
+table.felder { font-size: 9.4pt; table-layout: fixed; }
+table.felder td.wert { overflow-wrap: anywhere; }
 table.felder td.nr { width: 7mm; font-size: 6.8pt; color: #7a838c; vertical-align: top; padding: 1.8mm 0 1.2mm; }
 table.felder th { text-align: left; font-weight: 400; font-size: 8.3pt; color: #4a535c; width: 38%; padding: 1.8mm 4mm 1.2mm 0; vertical-align: top; }
 table.felder td.wert { padding: 1.2mm 2mm 1.2mm 2mm; vertical-align: top; font-weight: 600; border-bottom: 0.6pt solid #8a949c; }
@@ -363,8 +396,8 @@ ${r("h3 .nr")} { display: block; position: absolute; left: -${RANDSPALTE}mm; top
 ${r("h3 .rand")} { display: block; position: absolute; left: -${RANDSPALTE}mm; top: 0; width: ${RANDSPALTE - 4}mm; font-size: 6.8pt; line-height: 1.3; font-weight: 400; color: #7a838c; font-family: ${SANS}; }
 ${r("h3 .nr ~ .rand")} { top: 5.2mm; }
 ${r("section.abschnitt > h2 + .eintrag")} { margin-top: 7mm; }
-${r("main:has(section.abschnitt) .unterschriften")} { margin-left: -${RANDSPALTE}mm; }
-${r("main:has(section.abschnitt) .inhalt-uebersicht")} { margin-left: -${RANDSPALTE}mm; }
+${MIT_RAND.split(", ").map((g) => `${g}:not(.quer) main:has(section.abschnitt) .unterschriften`).join(", ")} { margin-left: -${RANDSPALTE}mm; }
+${MIT_RAND.split(", ").map((g) => `${g}:not(.quer) main:has(section.abschnitt) .inhalt-uebersicht`).join(", ")} { margin-left: -${RANDSPALTE}mm; }
 /* Querformat (Verzeichnisse, Protokolle) und Dokumente ohne Abschnitte: volle Breite, Nummern im Text */
 ${r("main:not(:has(section.abschnitt))")}, .quer main { padding-left: 0; }
 .quer section.abschnitt > h2::before { position: static; display: inline-block; min-width: 7mm; width: auto; }
@@ -372,38 +405,42 @@ ${r("main:not(:has(section.abschnitt))")}, .quer main { padding-left: 0; }
 .quer .unterschriften, .quer .inhalt-uebersicht { margin-left: 0; }
 
 /* ---------------- Brief (DIN 5008 Form B) */
-body.g-brief { padding-left: 5mm; }
+body.g-brief { padding-left: 5mm; padding-right: 10mm; }
 .g-brief .kopf { position: relative; height: 33mm; }
 .g-brief .kopf .marke { position: absolute; left: 0; top: 4mm; }
 .g-brief .kopf .marke .name { font-size: 17pt; line-height: 1.05; font-weight: 600; color: var(--akzent); letter-spacing: -0.15pt; }
 .g-brief .kopf .marke .zusatz { font-size: 8pt; color: #4a535c; margin-top: 1.2mm; }
 .g-brief .kopf .logo { position: absolute; right: 0; top: 3mm; max-height: 22mm; max-width: 60mm; }
-.g-brief .fenster { position: relative; height: 45mm; }
-.g-brief .anschrift { position: absolute; left: -5mm; top: 0; width: 85mm; height: 45mm; padding-left: 5mm; }
-.g-brief .anschrift .ruecksendung { height: 5mm; padding-top: 1.4mm; font-size: 6.6pt; color: #4a535c; white-space: nowrap; overflow: hidden; }
+.g-brief .fenster { position: relative; min-height: 45mm; display: flex; align-items: flex-start; }
+/* Anschriftfeld 85 × 45 mm; eine zu lange Anschrift schiebt den Betreff nach unten statt ihn zu überdecken */
+.g-brief .anschrift { position: relative; left: -5mm; flex: none; width: 85mm; min-height: 45mm; padding-left: 5mm; }
+.g-brief .anschrift .ruecksendung { height: 5mm; padding-top: 1.4mm; font-size: 6.6pt; color: #4a535c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .g-brief .anschrift .vermerk { height: 12.7mm; font-size: 7.6pt; color: #4a535c; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 1mm; }
-.g-brief .anschrift .empf { font-size: 10pt; line-height: 1.32; }
-.g-brief .info { position: absolute; left: 100mm; top: 5mm; width: 75mm; font-size: 8.2pt; }
-.g-brief .info table td { padding: 0.45mm 0; vertical-align: top; }
+.g-brief .anschrift .empf { font-size: 10pt; line-height: 1.25; }
+.g-brief .anschrift .empf.eng { font-size: 9pt; line-height: 1.2; }
+.g-brief .anschrift .empf.enger { font-size: 8pt; line-height: 1.18; }
+/* Informationsblock 125–200 mm vom linken Blattrand; im Fluss, damit ein langer Block den Betreff nach unten schiebt */
+.g-brief .info { flex: none; margin: 5mm 0 0 15mm; width: 75mm; font-size: 8.2pt; }
+.g-brief .info table td { padding: 0.3mm 0; line-height: 1.3; vertical-align: top; overflow-wrap: anywhere; }
 .g-brief .info table td:first-child { color: #4a535c; width: 31mm; padding-right: 2mm; }
-.g-brief .betreff { margin: 8.5mm 0 5.5mm; font-size: 12.5pt; font-weight: 700; color: #12161b; }
+.g-brief .betreff { margin: 6mm 0 4.5mm; font-size: 12.5pt; font-weight: 700; color: #12161b; }
 .g-brief .betreff span { display: block; font-size: 9pt; font-weight: 400; color: #4a535c; margin-top: 0.8mm; }
 .g-brief .anrede { margin: 0 0 3.5mm; }
 .g-brief table.liste th { border-bottom-width: 1.2pt; }
-.g-brief table.liste td { padding-top: 2mm; padding-bottom: 2mm; }
-.g-brief .zahlung { margin-top: 6.5mm; display: flex; gap: 5mm; align-items: stretch; background: var(--akzent-hauch); border-left: 2pt solid var(--akzent); padding: 3mm 3.5mm; }
+.g-brief table.liste td { padding-top: 1.6mm; padding-bottom: 1.6mm; }
+.g-brief .zahlung { margin-top: 5mm; display: flex; gap: 5mm; align-items: stretch; background: var(--akzent-hauch); border-left: 2pt solid var(--akzent); padding: 3mm 3.5mm; }
 .g-brief .zahlung .qr { flex: 0 0 auto; background: #fff; padding: 1.5mm; align-self: flex-start; }
 .g-brief .zahlung .qr svg { display: block; }
 .g-brief .zahlung .qr small { display: block; text-align: center; font-size: 6.4pt; color: #4a535c; margin-top: 1mm; }
 .g-brief .zahlung .text { flex: 1; }
 .g-brief .zahlung p:last-child { margin: 0; }
 .g-brief .schluss { page-break-inside: avoid; break-inside: avoid; }
-.g-brief .gruss { margin-top: 5.5mm; }
+.g-brief .gruss { margin-top: 4.5mm; }
 .g-brief .gruss p { margin-bottom: 1.4mm; }
 
 /* ---------------- Vertrag */
 .g-vertrag { font-family: ${SERIF}; font-size: 10pt; line-height: 1.55; }
-.g-vertrag p, .g-vertrag li, .g-vertrag table.angaben td { text-align: justify; }
+.g-vertrag p, .g-vertrag li { text-align: justify; }
 .g-vertrag h1, .g-vertrag h2, .g-vertrag h3, .g-vertrag .kopfzeile, .g-vertrag .kennung, .g-vertrag table.liste, .g-vertrag .unterschrift, .g-vertrag table.angaben th, .g-vertrag .unter, .g-vertrag .nachsatz, .g-vertrag .klein { font-family: ${SANS}; }
 .g-vertrag h1 { text-align: center; margin-top: 9mm; font-size: 18pt; }
 .g-vertrag .unter { text-align: center; }
@@ -451,6 +488,23 @@ body.g-brief { padding-left: 5mm; }
 .g-aushang.ba .kasten.stoff .inhalt dd { margin: 0; font-weight: 600; font-size: 11pt; }
 .g-aushang.ba .notruf { margin-top: 2mm; padding: 2mm 4mm; border: 1.2pt solid #1a1f24; font-weight: 700; font-size: 11pt; }
 .g-aushang .unterschriften { margin-top: 10mm; }
+.g-aushang.ba .unterschriften { margin-top: 4mm; }
+.g-aushang.ba .unterschrift .linie { height: 9mm; }
+/* Aushang mit viel Text: kompakter Satz, damit er auf möglichst wenige Blätter passt */
+.g-aushang.kompakt table.liste { font-size: 8.8pt; line-height: 1.32; }
+.g-aushang.kompakt table.liste th { font-size: 7.8pt; padding: 1.6mm 2mm 1.4mm; }
+.g-aushang.kompakt table.liste td { padding: 1.7mm 2mm; }
+.g-aushang.kompakt h1 { font-size: 22pt; margin-top: 4mm; }
+.g-aushang.kompakt .unter { font-size: 11pt; margin-bottom: 3mm; }
+.g-aushang.kompakt .kennung { margin-bottom: 3.5mm; }
+/* Lohnkonto: viele Betragsspalten im Querformat */
+table.liste.eng { font-size: 7.8pt; }
+table.liste.eng th, table.liste.eng td { padding-left: 1.2mm; padding-right: 1.2mm; }
+/* Allergen-Matrix: eine Zeile je Speise, eine Spalte je Allergen (Bezeichnung senkrecht) */
+.g-aushang table.liste.matrix th.dreh { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; text-align: left; vertical-align: middle; padding: 2mm 0.6mm; font-size: 7.6pt; line-height: 1.1; }
+.g-aushang table.liste.matrix td.x { text-align: center; font-weight: 700; padding-left: 0; padding-right: 0; }
+.g-aushang table.liste.matrix td.x, .g-aushang table.liste.matrix th.dreh { border-left: 0.5pt solid #dde1e5; }
+.g-aushang table.liste.matrix tr.gruppe td { background: var(--akzent-hauch); padding-top: 1.6mm; padding-bottom: 1.4mm; }
 .g-aushang .nachsatz { font-size: 9pt; }
 .g-aushang table.liste.legende { font-size: 8.6pt; }
 .g-aushang table.liste.legende th { font-size: 7.6pt; }
@@ -460,7 +514,7 @@ body.g-brief { padding-left: 5mm; }
 .g-formular h2 { background: var(--akzent-hauch); padding: 1.6mm 2.6mm; border: 0; font-size: 10.8pt; margin-top: 1mm; }
 .g-formular section.abschnitt > h2::before { min-width: 7mm; }
 .g-formular .abschnitt { margin-top: 5.5mm; }
-.g-formular .bilanz { display: flex; gap: 8mm; }
+.g-formular .bilanz { display: flex; gap: 8mm; page-break-inside: avoid; break-inside: avoid; }
 .g-formular .bilanz > div { flex: 1; }
 .g-formular .uebertragung { margin-top: 8mm; padding-top: 2.5mm; border-top: 0.5pt solid #c9d0d6; font-size: 8.3pt; color: #4a535c; display: flex; gap: 10mm; }
 .g-formular .uebertragung div { flex: 1; }
@@ -491,7 +545,7 @@ export function fussSpalten(b: Betrieb): string[][] {
   const spalten = [
     [t(b.name) ? `**${t(b.name)}**` : "", t(b.strasse), [t(b.plz), t(b.ort)].filter(Boolean).join(" "), t(b.verantwortlich) && !t(b.vertretung) ? `Inhaber/in: ${t(b.verantwortlich)}` : ""],
     [t(b.telefon) ? `Tel. ${t(b.telefon)}` : "", t(b.email), t(b.website)],
-    [t(b.bank) ? `**${t(b.bank)}**` : t(b.iban) ? "**Bankverbindung**" : "", t(b.iban) ? `IBAN ${t(b.iban)}` : "", t(b.bic) ? `BIC ${t(b.bic)}` : ""],
+    [t(b.bank) ? `**${t(b.bank)}**` : t(b.iban) ? "**Bankverbindung**" : "", t(b.iban) ? `IBAN ${ibanText(t(b.iban))}` : "", t(b.bic) ? `BIC ${t(b.bic)}` : ""],
     [
       t(b.steuernummer) ? `Steuernr. ${t(b.steuernummer)}` : "",
       t(b.ust_idnr) ? `USt-IdNr. ${t(b.ust_idnr)}` : "",
@@ -544,6 +598,77 @@ export interface DokumentOptionen {
   klasse?: string;
 }
 
+const LEERE_TAGS = new Set(["br", "img", "col", "hr", "meta", "input", "wbr"]);
+
+/** Oberste Elemente eines HTML-Abschnitts als [Anfang, Ende] (für den selbst erzeugten, wohlgeformten Inhalt). */
+function obersteElemente(html: string): [number, number][] {
+  const out: [number, number][] = [];
+  const re = /<(\/?)([a-zA-Z][a-zA-Z0-9]*)[^>]*?(\/?)>/g;
+  let tiefe = 0;
+  let start = -1;
+  for (let m = re.exec(html); m; m = re.exec(html)) {
+    const name = m[2]!.toLowerCase();
+    if (LEERE_TAGS.has(name) || m[3]) {
+      if (tiefe === 0) out.push([m.index, re.lastIndex]);
+      continue;
+    }
+    if (m[1]) {
+      tiefe--;
+      if (tiefe === 0 && start >= 0) out.push([start, re.lastIndex]);
+    } else {
+      if (tiefe === 0) start = m.index;
+      tiefe++;
+    }
+  }
+  return out;
+}
+
+/**
+ * Unterschriften nicht allein auf eine neue Seite: Der Unterschriftsblock wird mit dem kurzen Text davor (Erklärung,
+ * Hinweis, Notruf, letzter Abschnitt ohne Listentabelle) zu einem Schlussblock zusammengefasst, der nicht umbricht.
+ */
+export function schlussZusammen(inhalt: string): string {
+  const i = inhalt.lastIndexOf('<div class="unterschriften');
+  if (i < 0) return inhalt;
+  const davor = inhalt.slice(0, i);
+  const teile = obersteElemente(davor);
+  let ab = i;
+  for (let k = teile.length - 1, genommen = 0; k >= 0 && genommen < 2; k--) {
+    const [a, e] = teile[k]!;
+    if (inhalt.slice(e, ab).trim()) break;
+    const el = davor.slice(a, e);
+    const kurz = /^<(p|div class="notruf)/.test(el) && el.length < 1500;
+    const abschnittOhneListe = /^<section class="abschnitt/.test(el) && (!el.includes('class="liste') || el.includes('class="bilanz"')) && el.length < 6000;
+    // ein kurzer Absatz reicht als Zusammenhang; ein ganzer Abschnitt nur, wenn direkt davor nichts Kurzes steht
+    if (!kurz && !(abschnittOhneListe && genommen === 0)) break;
+    ab = a;
+    genommen++;
+    if (abschnittOhneListe) break;
+  }
+  const rest = inhalt.slice(i);
+  const ende = obersteElemente(rest)[0]?.[1] ?? rest.length;
+  let vorne = inhalt.slice(0, ab);
+  let mit = inhalt.slice(ab, i);
+  // Endet der Text davor mit einer Listentabelle (Teilnahme, Plan), wandert deren letzte Zeile mit in den Schlussblock
+  if (!mit.trim()) {
+    const start = vorne.lastIndexOf('<table class="liste');
+    const t = start >= 0 && /<\/tbody><\/table>(<\/section>)?\s*$/.test(vorne) ? /^<table class="(liste[^"]*)">(<colgroup>.*?<\/colgroup>)?/s.exec(vorne.slice(start)) : null;
+    const tbodyEnde = t ? vorne.lastIndexOf("</tbody>") : -1;
+    // letzte Zeile mit Inhalt samt den leeren Zeilen danach (höchstens drei Zeilen)
+    const tbodyAnfang = vorne.lastIndexOf("<tbody>") + 7;
+    let letzte = t ? vorne.lastIndexOf("<tr>", tbodyEnde) : -1;
+    for (let n = 1; t && letzte > tbodyAnfang && n < 3 && !vorne.slice(letzte, tbodyEnde).replace(/<[^>]*>|&nbsp;|\s/g, ""); n++) letzte = vorne.lastIndexOf("<tr>", letzte - 1);
+    if (t && letzte >= tbodyAnfang && letzte > tbodyAnfang) {
+      mit = `<table class="${t[1]} fortsetzung">${t[2] ?? ""}<tbody>${vorne.slice(letzte, tbodyEnde)}</tbody></table>`;
+      vorne = vorne.slice(0, letzte) + vorne.slice(tbodyEnde);
+    }
+  }
+  return `${vorne}<div class="schlussblock">${mit}${rest.slice(0, ende)}</div>${rest.slice(ende)}`;
+}
+
+/** Zahl und Einheit (%, €) nicht trennen – nur im Text, nicht in Tags. */
+const festeLeerzeichen = (html: string) => html.replace(/(\d) (%|€)(?![^<]*>)/g, "$1&nbsp;$2");
+
 /** Ganzes Dokument: Kopfzeile des Betriebs, Titel, Kennungsleiste, Inhalt. Die Gestalt setzt dokumentHtml(). */
 export function dokument(o: DokumentOptionen): string {
   const b = o.betrieb;
@@ -558,9 +683,14 @@ export function dokument(o: DokumentOptionen): string {
 <header class="kopfzeile"><div><div class="name">${b.name.trim() ? esc(b.name.trim()) : LINIE}</div>${adresse ? `<div class="adresse">${esc(adresse)}</div>` : ""}</div><div class="rechts"><div class="art">${esc(o.art ?? "")}</div>${logoHtml(b)}</div></header>
 ${o.vorTitel ?? ""}<h1>${esc(o.titel)}</h1>${o.unter ? `<p class="unter">${esc(o.unter)}</p>` : ""}
 <dl class="kennung">${GRUNDLAGE_MARKE}${kopfDaten.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
-<main>${o.inhalt}</main>
+<main>${festeLeerzeichen(schlussZusammen(o.inhalt))}</main>
 ${fussHtml(b)}
 </body></html>`;
+}
+
+/** Zeilen der Empfängeranschrift, wie sie im Fenster umbrechen (ca. 44 Zeichen je Zeile bei 10 pt). */
+function anschriftZeilen(t: string[], proZeile: number): number {
+  return t.reduce((n, z) => n + Math.max(1, Math.ceil(z.length / proZeile)), 0);
 }
 
 /**
@@ -572,15 +702,21 @@ export function brief(o: { titel: string; betreff: string; unterBetreff?: string
   const b = o.betrieb;
   const logo = logoHtml(b);
   const zusatz = [anschrift(b)].filter(Boolean).join("");
-  const ruecksendung = [b.name.trim(), b.strasse.trim(), [b.plz.trim(), b.ort.trim()].filter(Boolean).join(" ")].filter(Boolean).join(" · ");
+  // Rücksendeangabe: eine Zeile im 5-mm-Feld; ist sie zu lang, nur Name und Ort
+  const ortZeile = [b.plz.trim(), b.ort.trim()].filter(Boolean).join(" ");
+  const voll = [b.name.trim(), b.strasse.trim(), ortZeile].filter(Boolean).join(" · ");
+  const ruecksendung = voll.length <= 72 ? voll : [b.name.trim(), b.ort.trim()].filter(Boolean).join(" · ");
+  const zeilenEmpf = [o.empfaenger.name.trim(), ...o.empfaenger.anschrift.trim().split("\n"), o.empfaenger.zusatz ?? ""].map((z) => z.trim()).filter(Boolean);
+  // DIN 5008: Anschriftzone 27,3 mm – bis 6 Zeilen in 10 pt, sonst kleiner; die Anschrift wird nie gekürzt
+  const eng = anschriftZeilen(zeilenEmpf, 44) <= 6 ? "" : anschriftZeilen(zeilenEmpf, 49) <= 7 ? " eng" : " enger";
   const empf = `${o.empfaenger.name.trim() ? `${esc(o.empfaenger.name.trim())}<br>` : LINIE}${o.empfaenger.anschrift.trim() ? esc(o.empfaenger.anschrift.trim()).replace(/\n/g, "<br>") : LINIE}${o.empfaenger.zusatz ? `<br><span style="font-size:8pt;color:#4a535c">${esc(o.empfaenger.zusatz)}</span>` : ""}`;
   const info = o.info.filter(([, w]) => w.trim());
   return `${kopf({ titel: o.titel, betrieb: b, fussLinks: [b.name.trim(), o.titel].filter(Boolean).join(" · "), fussRechts: o.stand ? `Stand ${o.stand}` : "", gestalt: "brief" })}<body class="g-brief">
 <header class="kopf">${logo}<div class="marke"${logo ? ' style="right:65mm"' : ""}><div class="name">${b.name.trim() ? esc(b.name.trim()) : LINIE}</div>${zusatz ? `<div class="zusatz">${esc(zusatz)}</div>` : ""}</div></header>
-<div class="fenster"><div class="anschrift"><div class="ruecksendung">${esc(ruecksendung)}</div><div class="vermerk">${o.vermerk ? esc(o.vermerk) : ""}</div><div class="empf">${empf}</div></div>
+<div class="fenster"><div class="anschrift"><div class="ruecksendung">${esc(ruecksendung)}</div><div class="vermerk">${o.vermerk ? esc(o.vermerk) : ""}</div><div class="empf${eng}">${empf}</div></div>
 <div class="info"><table>${info.map(([k, w]) => `<tr><td>${esc(k)}</td><td>${esc(w)}</td></tr>`).join("")}</table></div></div>
 <h1 class="betreff">${esc(o.betreff)}${o.unterBetreff ? `<span>${esc(o.unterBetreff)}</span>` : ""}</h1>
-${o.anrede ? `<p class="anrede">${esc(o.anrede)}</p>` : ""}<main>${o.inhalt}</main>
+${o.anrede ? `<p class="anrede">${esc(o.anrede)}</p>` : ""}<main>${festeLeerzeichen(o.inhalt)}</main>
 ${fussHtml(b)}
 </body></html>`;
 }

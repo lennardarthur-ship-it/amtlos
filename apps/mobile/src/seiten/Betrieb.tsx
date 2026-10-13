@@ -4,7 +4,7 @@ import { BUNDESLAENDER, HAUSFARBEN, PERSONEN_FELDER, VERSTEUERUNG, VORLAGEN, typ
 import { T as TEXT } from "../texte";
 import { logoWaehlen } from "../unterlagen/logo";
 import { AuswahlZeile } from "../ui/auswahlseite";
-import { Feld, Fuss, Karte, Knopf, Schalter, Symbol, T, TextKnopf, Wahl, Zeile } from "../ui/bausteine";
+import { Feld, Fuss, Karte, Knopf, Schalter, Suchfeld, Symbol, T, TextKnopf, Wahl, Zeile } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
 import { RAND, RADIUS, useFarben, weich } from "../ui/thema";
@@ -13,6 +13,7 @@ import { entsperren, sperreMoeglich } from "../unterlagen/sperre";
 import { KATALOG, regelwert } from "../pflichten/check";
 import { APP_VERSION } from "../version";
 import { useAmtlos } from "../zustand";
+import { bestaetigen } from "../ui/bestaetigen";
 import { Felder } from "./felder";
 import { Gruppe, Inhalt, Seite, datumKurz } from "./gemeinsam";
 import { CheckProfilZeile } from "./Pflichten";
@@ -28,7 +29,6 @@ function PersonSeite({ art, id, neu }: { art: PersonenArt; id: string; neu?: boo
   const z = useAmtlos();
   const nav = useNav();
   const melden = useMeldung();
-  const [frage, setFrage] = useState(false);
   const p = z.stand[PERSONEN_LISTE[art]].find((x) => x.id === id);
   const zRef = useRef(z);
   zRef.current = z;
@@ -44,26 +44,20 @@ function PersonSeite({ art, id, neu }: { art: PersonenArt; id: string; neu?: boo
     <Unterseite titel={p.name.trim() || TEXT.person_neu[art]}>
       <Inhalt contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 4, paddingBottom: 32 }}>
         <Felder felder={PERSONEN_FELDER[art]} werte={p} fehlt={[]} setze={(k, w) => z.personSetzen(art, { ...p, [k]: typeof w === "string" ? w : null })} />
-        {frage ? (
-          <Karte stil={{ paddingVertical: 14, gap: 10, marginTop: 24 }}>
-            <T fett>{TEXT.loeschen_wirklich}</T>
-            <View style={{ flexDirection: "row", gap: 10 }}>
-              <Knopf
-                gefahr
-                text={TEXT.loeschen_ja}
-                onPress={() => {
-                  z.personLoeschen(art, id);
-                  melden(TEXT.geloescht);
-                  nav.zurueck();
-                }}
-                stil={{ flex: 1 }}
-              />
-              <Knopf ton text={TEXT.abbrechen} onPress={() => setFrage(false)} stil={{ flex: 1 }} />
-            </View>
-          </Karte>
-        ) : (
-          <TextKnopf symbol="trash" gefahr text={TEXT.loeschen} onPress={() => { weich(); setFrage(true); }} stil={{ marginTop: 24 }} />
-        )}
+        <TextKnopf
+          symbol="trash"
+          gefahr
+          text={TEXT.loeschen}
+          onPress={() =>
+            void bestaetigen({ titel: TEXT.loeschen_wirklich, ja: TEXT.loeschen_ja }).then((ok) => {
+              if (!ok) return;
+              z.personLoeschen(art, id);
+              melden(TEXT.geloescht);
+              nav.zurueck();
+            })
+          }
+          stil={{ marginTop: 24 }}
+        />
       </Inhalt>
       <Fuss>
         <Knopf text={TEXT.fertig} onPress={nav.zurueck} stil={{ flex: 1 }} />
@@ -77,7 +71,10 @@ function PersonenSeite({ art }: { art: PersonenArt }) {
   const z = useAmtlos();
   const nav = useNav();
   const f = useFarben();
-  const liste = personenSortiert(z.stand[PERSONEN_LISTE[art]]);
+  const [suche, setSuche] = useState("");
+  const alle = personenSortiert(z.stand[PERSONEN_LISTE[art]]);
+  const s = suche.trim().toLocaleLowerCase("de");
+  const liste = s ? alle.filter((p) => `${p.name} ${p.anschrift ?? ""} ${p.taetigkeit ?? ""}`.toLocaleLowerCase("de").includes(s)) : alle;
   const oeffnen = (id: string, neu = false) => nav.oeffnen(`person-${id}`, () => <PersonSeite art={art} id={id} neu={neu} />, true);
   const anlegen = () => {
     const id = neueId();
@@ -88,15 +85,21 @@ function PersonenSeite({ art }: { art: PersonenArt }) {
     <Unterseite titel={art === "mitarbeiter" ? TEXT.mitarbeiter_titel : TEXT.kunden_titel} rechts={<TextKnopf symbol="plus" text={TEXT.neu} label={TEXT.person_hinzufuegen[art]} onPress={anlegen} />}>
       <Inhalt>
         <T leise>{TEXT.personen_text[art]}</T>
+        {alle.length > 6 ? (
+          <View style={{ marginTop: 14 }}>
+            <Suchfeld wert={suche} setzen={setSuche} label={TEXT.liste_suchen} />
+          </View>
+        ) : null}
+        {s && !liste.length ? <T v="klein" leise stil={{ marginTop: 14 }}>{TEXT.keine_treffer}</T> : null}
         {liste.length ? (
           <Karte stil={{ marginTop: 14 }}>
             {liste.map((p, i) => (
               <Zeile key={p.id} links={<Symbol name="person.crop.circle" groesse={22} farbe={f.tinteLeise} />} titel={p.name} text={(art === "mitarbeiter" ? p.taetigkeit : p.anschrift)?.split("\n")[0] || undefined} onPress={() => oeffnen(p.id)} letzte={i === liste.length - 1} />
             ))}
           </Karte>
-        ) : (
+        ) : !s ? (
           <T v="klein" leise stil={{ marginTop: 14 }}>{TEXT.personen_leer[art]}</T>
-        )}
+        ) : null}
         <Knopf ton symbol="plus" text={TEXT.person_hinzufuegen[art]} onPress={anlegen} stil={{ marginTop: 16 }} />
       </Inhalt>
     </Unterseite>
@@ -107,10 +110,29 @@ type Teil = "angaben" | "steuer" | "auftritt" | "gesellschaft";
 const TEILE: Teil[] = ["angaben", "steuer", "auftritt", "gesellschaft"];
 
 /**
+ * Absender einer Rechnung eintragen – nur Angaben und Steuer/Bank, mit „Fertig“ zurück in den Ablauf (statt des
+ * ganzen Betriebsformulars). Die Angaben landen wie immer unter „Mein Betrieb“.
+ */
+export function AbsenderSeite() {
+  const nav = useNav();
+  return (
+    <Unterseite titel={TEXT.absender_titel}>
+      <Inhalt>
+        <T leise stil={{ marginBottom: 12 }}>{TEXT.absender_text}</T>
+        <BetriebFormular teile={["angaben", "steuer"]} />
+      </Inhalt>
+      <Fuss>
+        <Knopf text={TEXT.absender_fertig} symbol="checkmark" onPress={nav.zurueck} stil={{ flex: 1 }} />
+      </Fuss>
+    </Unterseite>
+  );
+}
+
+/**
  * Angaben zum Betrieb – speichern sich bei jeder Eingabe. Ohne `teil` das ganze Formular (erster Eintrag), sonst nur
  * ein Abschnitt (Unterseiten von „Mein Betrieb“).
  */
-export function BetriebFormular({ teil }: { teil?: Teil }) {
+export function BetriebFormular({ teil, teile }: { teil?: Teil; teile?: Teil[] }) {
   const { stand, betriebSpeichern, pro } = useAmtlos();
   const sperre = useProSperre();
   const [b, setB] = useState<BetriebDaten>(stand.betrieb);
@@ -122,7 +144,7 @@ export function BetriebFormular({ teil }: { teil?: Teil }) {
       betriebSpeichern(neu);
     },
   });
-  const zeigt = (t: Teil) => !teil || teil === t;
+  const zeigt = (t: Teil) => (teile ? teile.includes(t) : !teil || teil === t);
   const kopf = (t: Teil, titel: string, text?: string) =>
     teil ? (
       <T leise stil={{ marginBottom: 12 }}>{text ?? TEXT.teil_text[t]}</T>
@@ -134,7 +156,7 @@ export function BetriebFormular({ teil }: { teil?: Teil }) {
     );
   return (
     <View>
-      {!teil ? <T leise stil={{ marginBottom: 12 }}>{TEXT.betrieb_text}</T> : null}
+      {!teil && !teile ? <T leise stil={{ marginBottom: 12 }}>{TEXT.betrieb_text}</T> : null}
       {zeigt("angaben") ? (
         <View>
           {teil ? kopf("angaben", "") : null}
@@ -222,7 +244,7 @@ function zusammenfassung(b: BetriebDaten, teil: Teil): string {
       return [anschrift, w("email") || w("telefon")].filter(Boolean).join(" · ") || TEXT.teil_leer.angaben;
     }
     case "steuer": {
-      const da = [w("steuernummer") && TEXT.b_steuernummer, w("ust_idnr") && TEXT.b_ust_idnr, w("iban") && TEXT.b_iban, w("versteuerung") && VERSTEUERUNG.find((v) => v.wert === w("versteuerung"))?.text].filter(Boolean) as string[];
+      const da = [w("steuernummer") && TEXT.b_steuernummer, w("ust_idnr") && TEXT.b_ust_idnr, w("iban") && TEXT.b_iban, w("versteuerung") && (w("versteuerung") === "ist" ? "Ist-Versteuerung" : "Soll-Versteuerung")].filter(Boolean) as string[];
       return da.length ? da.join(" · ") : TEXT.teil_leer.steuer;
     }
     case "auftritt": {
@@ -405,6 +427,7 @@ function Datenschutz() {
 /** Logo für den Briefkopf wählen oder entfernen. */
 function LogoWahl({ logo, setzen }: { logo: string; setzen: (l: string) => void }) {
   const f = useFarben();
+  const { pro } = useAmtlos();
   const [fehler, setFehler] = useState(false);
   const waehlen = () => {
     setFehler(false);
@@ -414,7 +437,7 @@ function LogoWahl({ logo, setzen }: { logo: string; setzen: (l: string) => void 
   };
   return (
     <View style={{ gap: 8 }}>
-      <T v="klein" fett>{TEXT.b_logo}</T>
+      <T v="klein" fett>{TEXT.mitPro(TEXT.b_logo, pro)}</T>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
         <View style={{ width: 120, height: 56, borderRadius: RADIUS.klein, borderWidth: 1, borderColor: f.linie, backgroundColor: "#ffffff", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
           {logo ? <Image source={{ uri: logo }} style={{ width: 112, height: 48 }} resizeMode="contain" accessibilityLabel={TEXT.b_logo} /> : <T v="caption" leise>{TEXT.kein_logo}</T>}
@@ -432,9 +455,10 @@ function LogoWahl({ logo, setzen }: { logo: string; setzen: (l: string) => void 
 /** Hausfarbe aus einer kleinen, für Druck und Lesbarkeit geprüften Auswahl. */
 function FarbWahl({ farbe, setzen }: { farbe: string; setzen: (c: string) => void }) {
   const f = useFarben();
+  const { pro } = useAmtlos();
   return (
     <View style={{ gap: 8 }}>
-      <T v="klein" fett>{TEXT.b_farbe}</T>
+      <T v="klein" fett>{TEXT.mitPro(TEXT.b_farbe, pro)}</T>
       <View accessibilityRole="radiogroup" style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
         {HAUSFARBEN.map((h) => {
           const an = (farbe || HAUSFARBEN[0]!.wert) === h.wert;

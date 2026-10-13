@@ -156,25 +156,27 @@ export const lohnkonto: Vorlage = {
       unter: [text(d, "name"), text(d, "jahr")].filter(Boolean).join(" · ") || undefined,
       quer: true,
       inhalt:
+        // Querformat: Stammdaten in zwei Spalten, damit die Monate möglichst auf Seite 1 beginnen
         abschnitt(
           "Stammdaten",
-          angaben([
+          `<div class="spalten2">${angaben([
             ["Name", text(d, "name")],
             ["Geburtsdatum", datumDe(text(d, "geburtsdatum"))],
             ["Anschrift", text(d, "anschrift")],
+            ["Beschäftigt seit", datumDe(text(d, "eintritt"))],
+            ["Krankenkasse", text(d, "krankenkasse")],
+          ])}${angaben([
             ["Steuer-ID", text(d, "steuer_id")],
             ["Steuerklasse", text(d, "steuerklasse")],
             ["Kinderfreibeträge", text(d, "kinder") || null],
             ["Religionsgemeinschaft", text(d, "religion") || null],
             ["SV-Nummer", text(d, "sv_nummer")],
-            ["Krankenkasse", text(d, "krankenkasse")],
-            ["Beschäftigt seit", datumDe(text(d, "eintritt"))],
-          ]),
+          ])}</div>`,
         ) +
         abschnitt(
           "Monate",
           m.length
-            ? tabelle(["Zeitraum", "Zahltag", ...BETRAEGE.map(([, l]) => l), "U"], [...m.map((e) => [zelle(text(e, "monat")), datumDe(text(e, "zahltag")), ...BETRAEGE.map(([k]) => betrag(e, k)), ja(e, "unterbrechung") ? "U" : ""]), ["<strong>Summe</strong>", "", ...BETRAEGE.map(([k]) => `<strong>${euro(summe(m, k))}</strong>`), ""]], { breiten: ["10%", "9%", ...BETRAEGE.map(() => `${77 / BETRAEGE.length}%`), "4%"] })
+            ? tabelle(["Zeitraum", "Zahltag", ...BETRAEGE.map(([, l]) => l), "U"], m.map((e) => [zelle(text(e, "monat")), datumDe(text(e, "zahltag")), ...BETRAEGE.map(([k]) => betrag(e, k)), ja(e, "unterbrechung") ? "U" : ""]), { summe: ["<strong>Summe</strong>", "", ...BETRAEGE.map(([k]) => `<strong>${euro(summe(m, k))}</strong>`), ""], breiten: ["10%", "8%", ...BETRAEGE.map(() => `${79 / BETRAEGE.length}%`), "3%"], zahlen: BETRAEGE.map((_, i) => i + 2), klasse: "eng" })
             : absatz("", "Noch keine Monate erfasst."),
         ),
     });

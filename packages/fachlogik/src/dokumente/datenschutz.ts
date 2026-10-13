@@ -196,6 +196,12 @@ export function berlinZuUtc(datum: string, zeit: string): Date | null {
   return new Date(t);
 }
 
+/** ISO-Datum plus Tage (Kalendertage), wieder als ISO-Datum. */
+function plusTageIso(iso: string, tage: number): string {
+  const [j, m, t] = iso.split("-").map(Number) as [number, number, number];
+  return new Date(Date.UTC(j, m - 1, t + tage)).toISOString().slice(0, 10);
+}
+
 /** Zeitpunkt in Berliner Ortszeit als „TT.MM.JJJJ, HH:MM Uhr“. */
 export function berlinText(t: Date): string {
   return `${new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(t)} Uhr`;
@@ -266,8 +272,9 @@ export const datenpanne: Vorlage = {
       meta: `Bekannt seit: ${datumDe(text(d, "entdeckt_am")) || "–"}`,
       inhalt:
         angaben([
-          ["Bekannt geworden", beginn ? berlinText(beginn) : datumDe(text(d, "entdeckt_am"))],
-          ["Frist (72 Stunden)", beginn ? berlinText(new Date(beginn.getTime() + 72 * 3600_000)) : ""],
+          // ohne Uhrzeit keine erfundene „00:00 Uhr“: nur das Datum, die Frist endet drei Tage später zur selben Uhrzeit
+          ["Bekannt geworden", beginn && text(d, "entdeckt_um") ? berlinText(beginn) : datumDe(text(d, "entdeckt_am"))],
+          ["Frist (72 Stunden)", beginn ? (text(d, "entdeckt_um") ? berlinText(new Date(beginn.getTime() + 72 * 3600_000)) : `${datumDe(plusTageIso(text(d, "entdeckt_am"), 3))}, zur Uhrzeit des Bekanntwerdens (Uhrzeit ergänzen)`) : ""],
           ["Bewertung", DATENPANNE_RISIKO[risiko] ?? "noch offen"],
           ["Gemeldet", gemeldet ? `${datumDe(text(d, "gemeldet_am")) || "ja"}${text(d, "aktenzeichen") ? ` · Aktenzeichen ${text(d, "aktenzeichen")}` : ""}` : "noch nicht gemeldet"],
           ["Begründung der späteren Meldung", text(d, "verspaetung") || null],

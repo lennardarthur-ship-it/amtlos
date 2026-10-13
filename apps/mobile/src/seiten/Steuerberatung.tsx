@@ -20,7 +20,9 @@ export function SteuerberatungSeite() {
   const z = useAmtlos();
   const melden = useMeldung();
   const sperre = useProSperre();
-  const liste = zeitraeume(heute());
+  // Quartale zuerst – die übliche Wahl ist vorausgewählt und sofort sichtbar; dann Monate, dann Jahre
+  const rang = (n: string) => (/-Q\d$/.test(n) ? 0 : /^\d{4}-\d{2}$/.test(n) ? 1 : 2);
+  const liste = zeitraeume(heute()).sort((a, b) => rang(a.name) - rang(b.name));
   const [wahl, setWahl] = useState(liste.find((x) => /^\d{4}-Q\d$/.test(x.name))?.name ?? liste[0]!.name);
   const [laedt, setLaedt] = useState(false);
   const [fehler, setFehler] = useState<string | null>(null);
@@ -82,7 +84,7 @@ export function SteuerberatungSeite() {
         </View>
       </Inhalt>
       <Fuss>
-        <Knopf text={TEXT.steuerpaket_teilen} symbol="square.and.arrow.up" laedt={laedt} deaktiviert={!anzahlR && !anzahlB} onPress={() => void los()} stil={{ flex: 1 }} />
+        <Knopf text={TEXT.mitPro(TEXT.steuerpaket_teilen, z.pro)} symbol="square.and.arrow.up" laedt={laedt} deaktiviert={!anzahlR && !anzahlB} onPress={() => void los()} stil={{ flex: 1 }} />
       </Fuss>
     </Unterseite>
   );

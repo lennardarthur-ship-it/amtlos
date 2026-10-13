@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- Amtlos: ein Blatt, ein Stempel mit Haken – amtlich erledigt, ohne Amt. -->
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1a8069"/>
+      <stop offset="1" stop-color="#0e5b4a"/>
+    </linearGradient>
+    <filter id="s" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#06302a" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#g)"/>
+  <!-- Blatt mit Eselsohr -->
+  <g filter="url(#s)">
+    <path d="M292 186 h330 l130 130 v522 a26 26 0 0 1 -26 26 H292 a26 26 0 0 1 -26 -26 V212 a26 26 0 0 1 26 -26 z" fill="#ffffff"/>
+    <path d="M622 186 v104 a26 26 0 0 0 26 26 h104 z" fill="#d6ddd8"/>
+  </g>
+  <!-- Textzeilen -->
+  <g fill="#c9d0d6">
+    <rect x="344" y="372" width="300" height="34" rx="17"/>
+    <rect x="344" y="446" width="336" height="34" rx="17"/>
+    <rect x="344" y="520" width="248" height="34" rx="17"/>
+  </g>
+  <!-- Stempel -->
+  <g transform="rotate(-12 672 706)">
+    <circle cx="672" cy="706" r="176" fill="#ffffff"/>
+    <circle cx="672" cy="706" r="176" fill="none" stroke="#0d5143" stroke-width="30"/>
+    <circle cx="672" cy="706" r="132" fill="none" stroke="#0d5143" stroke-width="8"/>
+    <path d="M598 712 l50 50 l104 -118" fill="none" stroke="#0d5143" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

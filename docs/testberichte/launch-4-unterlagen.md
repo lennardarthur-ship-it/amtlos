@@ -214,3 +214,18 @@ Auf dem iPhone noch zu prüfen: Anmeldung über den Systembrowser mit dem gewäh
 | App-Tests gesamt | 73 grün |
 
 Auf dem iPhone noch zu prüfen: Abbrechen im Teilen-Menü (Rechnung bleibt Entwurf, Sicherung gilt nicht als erstellt), VoiceOver-Ansagen, Ladefehler-Bildschirm (nur mit absichtlich beschädigten Daten), iCloud-Sicherung mit vielen Belegfotos.
+
+## Nachtrag: Zweiter Qualitätsdurchgang (E-136)
+
+| Prüfung | Ergebnis |
+|---|---|
+| 33 Vorlagen als PDF (realistisch, Grenzfall, leer): Satzspiegel, Unterschrift allein, Aushang auf einem Blatt | grün (`werkzeuge/dokumente-pruefen.mjs`, auch in der CI) |
+| Fußzeile GmbH ungekürzt, lange Anschrift ohne Überdeckung, Zahlenköpfe rechtsbündig, Bilanz-Summen auf einer Linie | grün, Sichtprüfung vorher/nachher |
+| Erste Rechnung ohne Betrieb: Hinweis in Schritt 1, „Absender ergänzen“ statt Sackgasse, „Rechnung geteilt“ | grün im Rundgang |
+| Pflichten-Check mit Zwischenschirm, eigenem Fortschritt der Zusatzfragen, „Überspringen“; Ergebnis mit den ersten drei Pflichten | grün im Rundgang |
+| „Kurz klären“ ohne Fragen, die für die Rechtsform nicht gelten | grün (pflichten.test.ts) |
+| Rechnungsliste mit Kunde, Betrag, Nummer, Datum; Belege mit Betrag | grün im Rundgang hell und dunkel |
+| Rückfragen als System-Dialog (Löschen, Storno, Beenden, Konto löschen) | grün in Rundgang und Sync-Rundgang |
+| Store-Texte in den Grenzen, Pro-Kennzeichnung, keine Behörden-Aussage | grün (store.test.ts, store-check ohne neue Blocker) |
+
+Auf dem iPhone noch zu prüfen: System-Dialoge, Kundenauswahl mit vielen Kunden, Druck der Allergen-Matrix und der Fußzeile auf echtem A4.

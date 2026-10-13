@@ -11,7 +11,8 @@ import type { Daten, Eintrag, Vorlage } from "./typen.js";
 export function teilnahmeTabelle(eintraege: Eintrag[], extra?: { kopf: string; feld: string; datum?: boolean }): string {
   const kopf = ["Name", ...(extra ? [extra.kopf] : []), "Unterschrift"];
   const zeilen = eintraege.filter((e) => text(e, "name")).map((e) => [zelle(text(e, "name")), ...(extra ? [zelle(extra.datum ? datumDe(text(e, extra.feld)) : text(e, extra.feld))] : []), ""]);
-  return tabelle(kopf, zeilen, { breiten: extra ? ["38%", "22%", "40%"] : ["45%", "55%"], mindestens: 8, hoch: true });
+  // mit Namen: zwei Leerzeilen zum Nachtragen; ohne Namen (Liste zum Ausdrucken): sechs Zeilen
+  return tabelle(kopf, zeilen, { breiten: extra ? ["38%", "22%", "40%"] : ["45%", "55%"], ...(zeilen.length ? { leerzeilen: 2 } : { mindestens: 6 }), hoch: true });
 }
 
 const BEREICHE_VORSCHLAG = ["Salon", "Kosmetikkabine", "Küche", "Gastraum und Service", "Verkaufsraum", "Lager", "Werkstatt", "Baustelle beim Kunden", "Büro"];
@@ -29,7 +30,7 @@ export const gefaehrdungsbeurteilung: Vorlage = {
     { titel: "Arbeitsbereich",
       felder: [
         { id: "arbeitsbereich", art: "text", label: "Arbeitsbereich oder Gewerk", hilfe: "Je Bereich eine eigene Beurteilung; gleichartige Arbeitsplätze dürfen zusammen beurteilt werden.", pflicht: true, vorschlaege: BEREICHE_VORSCHLAG },
-        { id: "taetigkeiten", art: "mehrzeilig", label: "Tätigkeiten in diesem Bereich", hilfe: "z. B. Haare waschen, schneiden, färben" },
+        { id: "taetigkeiten", art: "mehrzeilig", label: "Tätigkeiten in diesem Bereich", hilfe: "Was wird hier gemacht – Tätigkeiten, Geräte, Stoffe" },
         { id: "beschaeftigte", selten: true, art: "zahl", label: "Beschäftigte in diesem Bereich" },
         { id: "beurteilt_von", art: "text", label: "Beurteilt von", vorbelegung: "verantwortlich", pflicht: true },
         { id: "mitwirkung", selten: true, art: "mehrzeilig", label: "Mitgewirkt haben", vorschlaege: ["Fachkraft für Arbeitssicherheit", "Betriebsärztin / Betriebsarzt", "Beschäftigte des Bereichs"] },

@@ -56,7 +56,7 @@ export const ifsgBelehrung: Vorlage = {
         (ja(d, "liste_anhaengen")
           ? abschnitt(
               "Tätigkeitsverbote nach § 42 Abs. 1 IfSG",
-              `<p>Folgende Personen dürfen nicht tätig sein oder beschäftigt werden a) beim Herstellen, Behandeln oder Inverkehrbringen der unten genannten Lebensmittel, wenn sie dabei mit diesen in Berührung kommen, oder b) in Küchen von Gaststätten und sonstigen Einrichtungen mit oder zur Gemeinschaftsverpflegung:</p>${punkte(IFSG.personen)}<h3>Lebensmittel nach § 42 Abs. 2 IfSG</h3>${punkte(IFSG.lebensmittel)}`,
+              `<p>Folgende Personen dürfen nicht tätig sein oder beschäftigt werden a) beim Herstellen, Behandeln oder Inverkehrbringen der unten genannten Lebensmittel, wenn sie dabei mit diesen in Berührung kommen, oder b) in Küchen von Gaststätten und sonstigen Einrichtungen mit oder zur Gemeinschaftsverpflegung:</p>${punkte(IFSG.personen)}<h3>Lebensmittel nach § 42 Abs. 2 IfSG</h3>${nummernListe(IFSG.lebensmittel)}`,
             )
           : "") +
         abschnitt("Teilnahme", `<p>Mit meiner Unterschrift bestätige ich, dass ich belehrt wurde und mir keine Tatsachen für ein Tätigkeitsverbot bekannt sind. Treten Hinderungsgründe auf, teile ich dies unverzüglich mit.</p>${teilnahmeTabelle(liste(d, "teilnehmer"), { kopf: "Erstbelehrung vom", feld: "erstbelehrung_am", datum: true })}`) +
@@ -101,16 +101,18 @@ export const allergenAushang: Vorlage = {
     const g = liste(d, "gerichte").filter((x) => text(x, "name"));
     const kategorien = [...new Set(g.map((x) => text(x, "kategorie")))];
     const nummern = Object.keys(ALLERGENE);
-    const inhalt = kategorien
+    // Matrix: eine Zeile je Speise, eine Spalte je Allergen (× = enthalten); Kategorien als Zwischenzeilen
+    const kopf = `<thead><tr><th>Speise / Getränk</th>${nummern.map((id) => `<th class="dreh">${esc(ALLERGENE[id]!)}</th>`).join("")}</tr></thead>`;
+    const zeilenHtml = kategorien
       .map((k) => {
-        const zeilenHtml = g.filter((x) => text(x, "kategorie") === k).map((x) => {
+        const zeilen = g.filter((x) => text(x, "kategorie") === k).map((x) => {
           const a = auswahl(x, "allergene");
-          return [`<strong>${zelle(text(x, "name"))}</strong>`, a.length ? `Enthält: ${a.map((y) => esc(ALLERGENE[y] ?? y)).join(", ")}` : "keine der 14 Hauptallergene"];
+          return `<tr><td><strong>${zelle(text(x, "name"))}</strong>${a.length ? "" : '<br><span class="klein">keine der 14 Hauptallergene</span>'}</td>${nummern.map((id) => `<td class="x">${a.includes(id) ? "×" : ""}</td>`).join("")}</tr>`;
         });
-        const t = tabelle(["Speise / Getränk", "Allergene"], zeilenHtml, { breiten: ["40%", "60%"] });
-        return k ? abschnitt(k, t) : `<section class="abschnitt">${t}</section>`;
+        return (k ? `<tr class="gruppe"><td colspan="${nummern.length + 1}"><strong>${zelle(k)}</strong></td></tr>` : "") + zeilen.join("");
       })
       .join("");
+    const inhalt = g.length ? `<table class="liste matrix"><colgroup><col style="width:37%">${nummern.map(() => `<col style="width:${(63 / nummern.length).toFixed(2)}%">`).join("")}</colgroup>${kopf}<tbody>${zeilenHtml}</tbody></table>` : "";
     const legende = ja(d, "legende")
       ? abschnitt("Die 14 Hauptallergene nach Anhang II der LMIV", tabelle(["Allergen", "umfasst"], nummern.map((id, i) => [esc(ALLERGENE[id]!), esc(ALLERGENE_UMFANG[i]?.umfasst ?? "")]), { breiten: ["30%", "70%"], klasse: "legende" }))
       : "";
@@ -208,14 +210,21 @@ export const haccp: Vorlage = {
   },
 };
 
-/** Tabelle als Plan zum Aushängen (Hautschutz, Hygiene). */
+/** Nummerierte Liste; Texte, die schon mit „1. “ beginnen, bekommen die Nummer nur einmal. */
+function nummernListe(l: string[]): string {
+  return `<ol class="nummern">${l.map((x) => `<li>${esc(x.replace(/^\d+\.\s*/, ""))}</li>`).join("")}</ol>`;
+}
+
+/** Tabelle als Plan zum Aushängen (Hautschutz, Hygiene). Viel Text → kompakter Satz, damit weniger Blätter nötig sind. */
 function plan(o: { titel: string; unter?: string; d: Parameters<Vorlage["html"]>[0]; b: Parameters<Vorlage["html"]>[1]; spalten: [string, string, string][]; feld: string }): string {
   const eintraege = liste(o.d, o.feld).filter((x) => o.spalten.some(([id]) => text(x, id)));
+  const zeichen = eintraege.reduce((n, x) => n + o.spalten.reduce((m, [id]) => m + text(x, id).length, 0), 0);
   return dokument({
     titel: o.titel,
     betrieb: o.b,
     unter: o.unter,
     quer: true,
+    klasse: zeichen > 900 ? "kompakt" : undefined,
     meta: `Bereich: ${text(o.d, "bereich")}\nStand: ${datumDe(text(o.d, "datum"))}\nVerantwortlich: ${text(o.d, "erstellt_von")}`,
     inhalt:
       (eintraege.length ? tabelle(o.spalten.map(([, k]) => k), eintraege.map((x) => o.spalten.map(([id], i) => (i === 0 ? `<strong>${zelle(text(x, id))}</strong>` : zelle(text(x, id))))), { breiten: o.spalten.map(([, , w]) => w) }) : absatz("", "Noch keine Einträge.")) +

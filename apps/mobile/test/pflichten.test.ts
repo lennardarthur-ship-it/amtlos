@@ -12,6 +12,12 @@ const salon: Profil = { "taetigkeit.branchen": ["beauty_kosmetik"], rechtsform: 
 const ids = (l: { id: string }[]) => l.map((p) => p.id);
 
 describe("Pflichten-Check", () => {
+  it("„Kurz klären“ fragt nur, was für den Betrieb gestellt wird – keine Investoren-Frage beim Einzelunternehmen", () => {
+    const felder = offeneFragenNachWirkung(auswertung(salon, "2026-10-13"), salon).map((o) => o.feld);
+    expect(felder).not.toContain("gesellschafter.auslaendische_investoren");
+    const gmbh = { ...salon, rechtsform: "gmbh" };
+    expect(offeneFragenNachWirkung(auswertung(gmbh, "2026-10-13"), gmbh).map((o) => o.feld)).toContain("gesellschafter.auslaendische_investoren");
+  });
   it("stellt die Fragen aus dem Fragebogen – die Gesellschafts-Frage nur bei UG und GmbH", () => {
     for (const f of CHECK_FELDER) expect(frageZu(f), f).toBeTruthy();
     expect(checkFragen({}).map((f) => f.feld)).not.toContain("gesellschaft.handelsregister");

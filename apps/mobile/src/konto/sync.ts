@@ -117,7 +117,9 @@ export function syncZusammenfuehren(lokal: Stand, entfernt: Stand): SyncZusammen
     const l = um.get(e.id);
     um.set(e.id, l ? unterlageVereinen(l, e) : e);
   }
-  const unterlagen = stornoVerweisePruefen([...um.values()].filter((x) => fest(x) || !geloescht[`u:${x.id}`] || x.geaendert > geloescht[`u:${x.id}`]!));
+  // nach dem Löschvermerk geändert oder geteilt: bleibt
+  const zuletzt = (x: Unterlage) => (x.ausgegeben && x.ausgegeben > x.geaendert ? x.ausgegeben : x.geaendert);
+  const unterlagen = stornoVerweisePruefen([...um.values()].filter((x) => fest(x) || !geloescht[`u:${x.id}`] || zuletzt(x) > geloescht[`u:${x.id}`]!));
   const stand: Stand = {
     ...lokal,
     betrieb: lokalNeuer("betrieb") ? lokal.betrieb : entfernt.betrieb,

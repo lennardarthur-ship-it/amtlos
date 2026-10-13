@@ -41,6 +41,8 @@ async function geraet(name, stand) {
     if (!localStorage.getItem(k)) localStorage.setItem(k, v);
   }, [SCHLUESSEL, JSON.stringify(stand)]);
   const p = await ctx.newPage();
+  // Rückfragen (Beenden, Konto löschen) sind System-Dialoge – bestätigen
+  p.on("dialog", (d) => void d.accept());
   p.on("pageerror", (e) => befunde.push(`${name}: Seitenfehler: ${e.message}`));
   p.on("console", (m) => {
     // erwartete Antworten des Servers (404 vor dem Einrichten, 401 nach dem Löschen) erscheinen als Netzwerkfehler
@@ -129,7 +131,6 @@ try {
   const beenden = b.p.getByText("Synchronisation beenden", { exact: true }).locator("visible=true").last();
   await beenden.evaluate((el) => el.scrollIntoView({ block: "center" }));
   await beenden.click();
-  await b.knopf("Löschen und beenden").click();
   pruefe(await b.warteAuf("Sync-Passwort wählen"), "B: nach dem Beenden nicht wieder „einrichten“");
   pruefe((await b.stand()).kunden.length === 2, "B: Daten nach dem Beenden weg");
   await b.foto("beendet");
@@ -143,8 +144,6 @@ try {
   const loeschen = a.p.getByText("Konto löschen", { exact: true }).locator("visible=true").last();
   await loeschen.evaluate((el) => el.scrollIntoView({ block: "center" }));
   await loeschen.click();
-  await a.foto("konto-loeschen");
-  await a.knopf("Konto löschen").click();
   pruefe(await a.warteAuf("Kennung (Entwicklung)"), "A: nach dem Löschen nicht abgemeldet");
   pruefe((await a.stand()).kunden.length === 2, "A: Daten nach dem Konto-Löschen weg");
   await a.foto("konto-geloescht");

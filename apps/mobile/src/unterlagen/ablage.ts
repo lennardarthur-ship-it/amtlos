@@ -43,14 +43,31 @@ export function belegeFiltern(belege: Beleg[], suche = ""): Beleg[] {
     .sort((a, b) => b.datum.localeCompare(a.datum) || b.geaendert.localeCompare(a.geaendert));
 }
 
+// Bruttobetrag je Rechnungsinhalt zwischengespeichert – Listen fragen ihn für jede Zeile ab
+const bruttoZwischen = new WeakMap<object, number>();
+
+/** Rechnungsbetrag brutto in Cent (bei Storno negativ). */
+export function rechnungBrutto(u: Unterlage, betrieb: Betrieb): number {
+  const da = bruttoZwischen.get(u.daten);
+  if (da !== undefined) return da;
+  const { daten } = eRechnungAus(u.daten, betrieb);
+  const c = summen(daten.positionen, daten.kleinunternehmer).brutto_cent * (daten.art === "storno" ? -1 : 1);
+  bruttoZwischen.set(u.daten, c);
+  return c;
+}
+
 /** Offene (geteilte, unbezahlte, nicht stornierte) Rechnungen: Anzahl und Bruttosumme in Cent. */
 export function offeneSumme(unterlagen: Unterlage[], betrieb: Betrieb): { anzahl: number; cent: number } {
   const offen = offeneRechnungen(unterlagen).filter((u) => !istStorno(u));
-  const cent = offen.reduce((a, u) => {
-    const { daten } = eRechnungAus(u.daten, betrieb);
-    return a + summen(daten.positionen, daten.kleinunternehmer).brutto_cent;
-  }, 0);
+  const cent = offen.reduce((a, u) => a + rechnungBrutto(u, betrieb), 0);
   return { anzahl: offen.length, cent };
+}
+
+/** Rechnungen: neueste Rechnung zuerst (Rechnungsdatum, dann Nummer) – eine Zahlung ändert die Reihenfolge nicht. */
+export function rechnungenSortiert(l: Unterlage[]): Unterlage[] {
+  const d = (u: Unterlage) => (typeof u.daten.datum === "string" ? u.daten.datum : u.erstellt.slice(0, 10));
+  const n = (u: Unterlage) => (typeof u.daten.nummer === "string" ? u.daten.nummer : "");
+  return [...l].sort((a, b) => d(b).localeCompare(d(a)) || n(b).localeCompare(n(a), "de", { numeric: true }));
 }
 
 export const euroText = (cent: number) => `${new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(cent / 100)} €`;

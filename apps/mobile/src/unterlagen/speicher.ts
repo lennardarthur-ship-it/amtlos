@@ -233,7 +233,7 @@ export function ausgeben(s: Stand, id: string, jetzt: Date): Stand {
       if (u.id !== id) return u;
       const fest = vorlageFuer(u.vorlage)?.festschreiben;
       if (u.ausgegeben && (!fest || u.festgeschrieben)) return u;
-      return { ...u, ausgegeben: u.ausgegeben ?? jetzt.toISOString(), geaendert: jetzt.toISOString(), ...(fest && !u.festgeschrieben ? { festgeschrieben: jetzt.toISOString() } : {}) };
+      return { ...u, ausgegeben: u.ausgegeben ?? jetzt.toISOString(), ...(fest && !u.festgeschrieben ? { festgeschrieben: jetzt.toISOString() } : {}) };
     }),
   };
 }
@@ -254,7 +254,7 @@ export function stornieren(s: Stand, id: string, jetzt: Date, neu = neueId()): [
   daten.datum = heute(jetzt);
   if (v.fortlaufend) daten[v.fortlaufend] = naechste(s, v.id, v.fortlaufend, jetzt);
   const u: Unterlage = { id: neu, vorlage: v.id, daten, erstellt: jetzt.toISOString(), geaendert: jetzt.toISOString() };
-  return [{ ...s, unterlagen: [u, ...s.unterlagen.map((x) => (x.id === id ? { ...x, storniertDurch: neu, geaendert: jetzt.toISOString() } : x))] }, u];
+  return [{ ...s, unterlagen: [u, ...s.unterlagen.map((x) => (x.id === id ? { ...x, storniertDurch: neu } : x))] }, u];
 }
 
 /** Kopie, z. B. für den nächsten Monat oder einen weiteren Arbeitsbereich. */
@@ -279,8 +279,7 @@ export function loeschen(s: Stand, id: string): Stand {
   const weg = s.unterlagen.find((u) => u.id === id && !u.festgeschrieben);
   if (!weg) return s;
   // ein verworfener Storno-Entwurf gibt die ursprüngliche Rechnung wieder frei
-  const jetzt = new Date().toISOString();
-  return { ...vermerken(s, `u:${id}`), unterlagen: s.unterlagen.filter((u) => u.id !== id).map((u) => (u.storniertDurch === id ? { ...u, storniertDurch: undefined, geaendert: jetzt } : u)) };
+  return { ...vermerken(s, `u:${id}`), unterlagen: s.unterlagen.filter((u) => u.id !== id).map((u) => (u.storniertDurch === id ? (({ storniertDurch: _weg, ...rest }) => rest)(u) : u)) };
 }
 
 /** Person aus einer Unterlage merken (gleicher Name ergänzt den vorhandenen Eintrag). */
@@ -337,7 +336,7 @@ export const betriebFehlt = (b: Betrieb) => !b.name.trim();
 export function bezahltSetzen(s: Stand, id: string, datum: string | null, jetzt = new Date()): Stand {
   // eigener Zeitstempel: beim Zusammenführen gewinnt so auch das Entfernen einer Zahlung
   const g = jetzt.toISOString();
-  return { ...s, unterlagen: s.unterlagen.map((u) => (u.id === id ? (datum ? { ...u, bezahlt: datum, bezahltGeaendert: g, geaendert: g } : (({ bezahlt: _weg, ...rest }) => ({ ...rest, bezahltGeaendert: g, geaendert: g }))(u)) : u)) };
+  return { ...s, unterlagen: s.unterlagen.map((u) => (u.id === id ? (datum ? { ...u, bezahlt: datum, bezahltGeaendert: g } : (({ bezahlt: _weg, ...rest }) => ({ ...rest, bezahltGeaendert: g }))(u)) : u)) };
 }
 
 /** Unterlagen, die aufbewahrt werden müssen: festgeschriebene (Rechnungen, Kassenbuch) und Belege. */
