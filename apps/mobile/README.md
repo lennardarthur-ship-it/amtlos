@@ -49,6 +49,8 @@ node werkzeuge/schriften.mjs                # nach Schriftänderungen: eingebett
 **Auf dem iPhone testen:** `bash werkzeuge/testpaket.sh <ordner>` (vorher `pnpm build`) baut ein eigenständiges Paket
 mit Anleitung (`LIESMICH.txt`): Node installieren, `npm install`, `npx expo start`, QR-Code mit Expo Go öffnen.
 
+**Amtlos Pro (E-132):** `src/pro/` – Regeln (Freikontingent), Kauf über RevenueCat (nur mit `EXPO_PUBLIC_REVENUECAT_IOS_KEY`, sonst Testmodus), Bewertungsbitte; Bezahlschirm `seiten/Pro.tsx`, Rechtliches `src/rechtliches.ts` + `seiten/Recht.tsx`. Store: `store/de.json`, `werkzeuge/store-bilder.mjs`, `werkzeuge/store-check.mjs`, `eas.json`, Anleitung docs/11-store-start.md.
+
 **Version:** `src/version.ts`, `app.json` und `package.json` tragen dieselbe Nummer (ein Test prüft das).
 
 **Offen vor Store-Veröffentlichung:** fachliche Freigabe der Vorlagen (T-52 ff.), EAS-Projekt und Signierschlüssel,

@@ -87,6 +87,9 @@ Entscheidungen liegen im Git-Repository (GitHub: lennardarthur-ship-it/amtlos). 
    - „Umsatzsteuer-Voranmeldung“: übernimmt die Umsätze aus deinen Rechnungen – nach Leistungsdatum (Soll)
      oder nach Zahlungseingang (Ist).
    - „Mein Betrieb → Deine Daten“: alles liegt verschlüsselt auf dem iPhone, optional mit Face ID gesperrt.
+   - „Amtlos Pro“ (oben unter „Mein Betrieb“): In dieser Testversion gibt es keinen Kauf – „Pro testweise einschalten“
+     zeigt alle Funktionen. Ohne Pro: 5 Unterlagen im Monat als PDF, kein Logo/keine Hausfarbe, keine E-Rechnung.
+   - „Über Amtlos“: Impressum und Datenschutz (Angaben folgen vor dem Start), „Amtlos weiterempfehlen“.
 
 Beenden: im Terminal Ctrl + C. Nächstes Mal reichen die Befehle „cd …“ und „npx expo start“.
 TXT

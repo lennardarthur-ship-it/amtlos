@@ -31,7 +31,7 @@ export function demoStand(heute = "2026-10-13"): Stand {
       versteuerung: "soll",
     },
     profil: {
-      "taetigkeit.branchen": ["beauty"],
+      "taetigkeit.branchen": ["beauty_kosmetik"],
       rechtsform: "einzelunternehmen",
       "taetigkeit.einordnung": "gewerbe",
       bundesland: "BY",

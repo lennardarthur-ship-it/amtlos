@@ -1,0 +1,353 @@
+<title>Amtlos</title>
+<meta name="description" content="Amtlos zeigt dir, welche Pflichten für deinen Betrieb gelten – und erledigt Rechnungen, E-Rechnung und Unterlagen gleich mit. Auf dem iPhone, ohne Konto.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap">
+<style>
+/* Layout: ein Amtsblatt – Text rechts, Randspalte links mit Gesetzesangaben und Nummern wie in den Amtlos-Dokumenten. */
+:root {
+  --papier: #f2f4f1;
+  --blatt: #ffffff;
+  --tinte: #17232e;
+  --tinte-2: #4a5868;
+  --tinte-3: #7a8590;
+  --linie: #d5dbd4;
+  --linie-leise: #e6eae4;
+  --amt: #136f5b;
+  --amt-tief: #0d5143;
+  --amt-hauch: #e2eee9;
+  --amt-text: #ffffff;
+  --serif: "Source Serif 4", "Iowan Old Style", Georgia, serif;
+  --sans: "Source Sans 3", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  --rand: 7.5rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --papier: #0f1519; --blatt: #172026; --tinte: #e6eae3; --tinte-2: #aeb8c2; --tinte-3: #85919c;
+    --linie: #2c3842; --linie-leise: #222c35; --amt: #5cc2a6; --amt-tief: #8ad8c2; --amt-hauch: #173630; --amt-text: #0f1519;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --papier: #0f1519; --blatt: #172026; --tinte: #e6eae3; --tinte-2: #aeb8c2; --tinte-3: #85919c;
+  --linie: #2c3842; --linie-leise: #222c35; --amt: #5cc2a6; --amt-tief: #8ad8c2; --amt-hauch: #173630; --amt-text: #0f1519;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--papier); color: var(--tinte); font: 400 1.0625rem/1.55 var(--sans); padding-inline: 1.25rem; }
+.breite { max-width: 72rem; margin-inline: auto; }
+a { color: var(--amt); }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--amt); outline-offset: 3px; border-radius: 4px; }
+h1, h2, h3 { font-family: var(--serif); font-weight: 600; text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+p { margin: 0; }
+.leise { color: var(--tinte-2); }
+.zahl { font-variant-numeric: tabular-nums; }
+
+/* Kopf */
+.kopf { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-block: 1.25rem; }
+.marke { display: flex; align-items: center; gap: .6rem; font: 700 1.25rem/1 var(--serif); color: var(--tinte); text-decoration: none; }
+.marke svg { width: 2rem; height: 2rem; }
+.bald { font-size: .875rem; color: var(--tinte-2); border: 1px solid var(--linie); border-radius: 999px; padding: .35rem .8rem; white-space: nowrap; }
+
+/* Randspalten-Raster */
+.blatt-zeile { display: grid; grid-template-columns: var(--rand) minmax(0, 1fr); gap: 0 2rem; }
+.rand { font: 600 .8125rem/1.35 var(--sans); color: var(--tinte-3); padding-top: .35rem; font-variant-numeric: tabular-nums; }
+.rand b { display: block; font: 700 1.5rem/1 var(--serif); color: var(--amt); margin-bottom: .3rem; }
+@media (max-width: 48rem) {
+  .blatt-zeile { grid-template-columns: minmax(0, 1fr); }
+  .rand { padding-top: 0; margin-bottom: .5rem; display: flex; gap: .6rem; align-items: baseline; }
+  .rand b { display: inline; font-size: 1.1rem; margin: 0; }
+}
+
+/* Einstieg */
+.einstieg { padding-block: 2.5rem 3.5rem; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 3rem; align-items: start; }
+@media (max-width: 60rem) { .einstieg { grid-template-columns: minmax(0, 1fr); gap: 2rem; padding-block: 1.5rem 2.5rem; } }
+.einstieg h1 { font-size: clamp(2.3rem, 5.4vw, 3.9rem); line-height: 1.04; }
+.einstieg .unter { font-size: 1.2rem; margin-top: 1.25rem; max-width: 34rem; color: var(--tinte-2); }
+.punkte { margin-top: 1.75rem; display: grid; gap: .55rem; padding: 0; list-style: none; }
+.punkte li { display: flex; gap: .65rem; align-items: baseline; }
+.punkte li::before { content: ""; flex: none; width: .55rem; height: .55rem; border-radius: 2px; background: var(--amt); transform: translateY(-.1rem); }
+.store { margin-top: 2rem; display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
+.store-knopf { display: inline-flex; align-items: center; gap: .6rem; background: var(--tinte); color: var(--papier); border-radius: .75rem; padding: .7rem 1.1rem; font-weight: 600; }
+.store-knopf small { display: block; font-weight: 400; font-size: .75rem; opacity: .8; }
+
+/* Check-Blatt */
+.check { background: var(--blatt); border: 1px solid var(--linie); border-radius: .75rem; box-shadow: 0 1.5rem 3rem -1.8rem rgba(23, 35, 46, .35); overflow: hidden; }
+.check-kopf { display: flex; justify-content: space-between; gap: 1rem; padding: .7rem 1.1rem; background: var(--amt-hauch); font-size: .8125rem; color: var(--amt-tief); font-weight: 600; flex-wrap: wrap; }
+.check-inhalt { padding: 1.25rem 1.25rem 1.4rem; display: grid; gap: 1.1rem; }
+.frage { display: grid; gap: .5rem; }
+.frage-titel { font-weight: 600; font-size: .9375rem; }
+.chips { display: flex; flex-wrap: wrap; gap: .45rem; }
+.chip { font: 600 .9375rem/1 var(--sans); padding: .6rem .85rem; border-radius: 999px; border: 1px solid var(--linie); background: var(--blatt); color: var(--tinte); cursor: pointer; min-height: 2.5rem; }
+.chip[aria-checked="true"] { background: var(--tinte); border-color: var(--tinte); color: var(--papier); }
+.ergebnis { border-top: 1px solid var(--linie-leise); padding-top: 1.1rem; display: grid; gap: .9rem; }
+.ergebnis-zahl { display: flex; align-items: baseline; gap: .7rem; flex-wrap: wrap; }
+.ergebnis-zahl strong { font: 700 3.4rem/1 var(--serif); color: var(--amt); font-variant-numeric: tabular-nums; }
+.balken { display: grid; gap: .4rem; }
+.balken div { display: grid; grid-template-columns: 9.5rem minmax(0, 1fr) 2rem; align-items: center; gap: .6rem; font-size: .875rem; }
+.balken span.spur { height: .5rem; border-radius: 999px; background: var(--linie-leise); overflow: hidden; }
+.balken span.spur i { display: block; height: 100%; background: var(--amt); border-radius: 999px; transition: width .35s ease; }
+.beispiele { display: grid; gap: 0; border-top: 1px solid var(--linie-leise); }
+.beispiele div { display: grid; grid-template-columns: 6.2rem minmax(0, 1fr); gap: .8rem; padding: .55rem 0; border-bottom: 1px solid var(--linie-leise); font-size: .9375rem; }
+.beispiele em { font-style: normal; font-size: .8125rem; color: var(--tinte-3); font-variant-numeric: tabular-nums; }
+.fussnote { font-size: .78rem; color: var(--tinte-3); }
+
+/* Abschnitte */
+section.abschnitt { padding-block: 3.5rem; border-top: 1px solid var(--linie); }
+.abschnitt h2 { font-size: clamp(1.75rem, 3.4vw, 2.5rem); line-height: 1.12; }
+.abschnitt .einleitung { margin-top: .9rem; max-width: 40rem; color: var(--tinte-2); font-size: 1.125rem; }
+
+/* Bildschirme */
+.leiste { margin-top: 2rem; display: flex; gap: 1.25rem; overflow-x: auto; padding-bottom: 1rem; scroll-snap-type: x mandatory; }
+.leiste figure { margin: 0; flex: none; width: 14.5rem; scroll-snap-align: start; }
+.leiste img { width: 100%; display: block; border-radius: 1.6rem; border: 6px solid var(--tinte); background: var(--tinte); }
+.leiste figcaption { margin-top: .7rem; font-size: .9375rem; }
+.leiste figcaption b { display: block; font-family: var(--serif); font-size: 1.05rem; }
+
+/* Leistungen mit Randspalte */
+.leistungen { margin-top: 2.25rem; display: grid; gap: 2rem; }
+.leistung h3 { font-size: 1.35rem; }
+.leistung p { margin-top: .4rem; max-width: 42rem; }
+.leistung ul { margin: .6rem 0 0; padding-left: 1.1rem; display: grid; gap: .25rem; max-width: 42rem; }
+
+/* Zeitleiste E-Rechnung */
+.zeit { margin-top: 2rem; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+@media (max-width: 48rem) { .zeit { grid-template-columns: minmax(0, 1fr); } }
+.zeit div { border-top: 3px solid var(--amt); padding-top: .8rem; }
+.zeit b { font: 700 1.8rem/1 var(--serif); font-variant-numeric: tabular-nums; }
+.zeit p { margin-top: .4rem; font-size: .9375rem; }
+
+/* Preise */
+.preise { margin-top: 2rem; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; max-width: 54rem; }
+@media (max-width: 48rem) { .preise { grid-template-columns: minmax(0, 1fr); } }
+.paket { border: 1px solid var(--linie); border-radius: .75rem; padding: 1.4rem; background: var(--blatt); }
+.paket.pro { border: 2px solid var(--amt); }
+.paket h3 { font-size: 1.4rem; }
+.paket .preis { margin-top: .3rem; color: var(--tinte-2); }
+.paket ul { margin: 1rem 0 0; padding-left: 1.1rem; display: grid; gap: .35rem; }
+
+/* Fragen */
+details { border-bottom: 1px solid var(--linie); padding-block: .9rem; max-width: 46rem; }
+details summary { cursor: pointer; font-weight: 600; font-size: 1.0625rem; }
+details p { margin-top: .6rem; color: var(--tinte-2); }
+
+.fuss { border-top: 1px solid var(--linie); padding-block: 2rem 3rem; display: flex; flex-wrap: wrap; gap: 1rem 2rem; justify-content: space-between; font-size: .875rem; color: var(--tinte-2); }
+.fuss nav { display: flex; gap: 1.25rem; flex-wrap: wrap; }
+@media (prefers-reduced-motion: reduce) { .balken span.spur i { transition: none; } .leiste { scroll-snap-type: none; } }
+</style>
+
+<div class="breite">
+  <header class="kopf">
+    <a class="marke" href="#start" aria-label="Amtlos – Startseite">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#136f5b"/><path d="M18 11h21l8 8v32a2 2 0 0 1-2 2H18a2 2 0 0 1-2-2V13a2 2 0 0 1 2-2z" fill="#fff"/><path d="M39 11v6a2 2 0 0 0 2 2h6z" fill="#d6ddd8"/><rect x="21" y="23" width="18" height="2.4" rx="1.2" fill="#c9d0d6"/><rect x="21" y="28" width="20" height="2.4" rx="1.2" fill="#c9d0d6"/><circle cx="42" cy="44" r="11" fill="#fff" stroke="#0d5143" stroke-width="2.2"/><path d="M37.5 44.3l3 3 6.2-7" fill="none" stroke="#0d5143" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Amtlos
+    </a>
+    <span class="bald">Bald im App Store</span>
+  </header>
+
+  <main id="start">
+    <div class="einstieg">
+      <div>
+        <h1>Welche Pflichten gelten für deinen Betrieb?</h1>
+        <p class="unter">Amtlos sagt es dir und erledigt die Unterlagen gleich mit: Rechnungen mit E-Rechnung, Hygieneplan, Gefährdungsbeurteilung, Datenschutz. Auf dem iPhone, ohne Konto.</p>
+        <ul class="punkte">
+          <li>Pflichten-Check mit Begründung, Rechtsgrundlage und Terminen</li>
+          <li>Rechnungen fortlaufend nummeriert, mit GiroCode und XRechnung</li>
+          <li>Über 30 Vorlagen, Schritt für Schritt ausgefüllt, fertig als PDF</li>
+        </ul>
+        <div class="store">
+          <span class="store-knopf" aria-label="Bald im App Store für iPhone">
+            <svg width="18" height="22" viewBox="0 0 18 22" aria-hidden="true"><path fill="currentColor" d="M14.9 11.7c0-2.5 2-3.7 2.1-3.8-1.2-1.7-3-1.9-3.6-2-1.5-.2-3 .9-3.8.9s-2-.9-3.3-.9C4.6 6 3 7 2.1 8.6.3 11.8 1.6 16.5 3.4 19c.8 1.2 1.8 2.6 3.1 2.5 1.3-.1 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8-.1 0-2.3-.9-2.3-4.6zM12.4 4.2c.7-.8 1.1-2 1-3.2-1 0-2.2.7-2.9 1.5-.6.7-1.2 1.9-1 3.1 1.1.1 2.2-.6 2.9-1.4z"/></svg>
+            <span>Bald im App Store<small>für iPhone</small></span>
+          </span>
+          <span class="leise" style="font-size:.9375rem">Kostenlos starten, Pro für alle, die jeden Monat Rechnungen schreiben.</span>
+        </div>
+      </div>
+
+      <div class="check" aria-labelledby="check-titel">
+        <div class="check-kopf"><span id="check-titel">Pflichten-Check · Kurzfassung</span><span>Stand Katalog 2026</span></div>
+        <div class="check-inhalt">
+          <div class="frage">
+            <span class="frage-titel" id="f-branche">Was machst du?</span>
+            <div class="chips" role="radiogroup" aria-labelledby="f-branche" id="branchen"></div>
+          </div>
+          <div class="frage">
+            <span class="frage-titel" id="f-team">Arbeitet jemand für dich?</span>
+            <div class="chips" role="radiogroup" aria-labelledby="f-team" id="team"></div>
+          </div>
+          <div class="ergebnis" aria-live="polite">
+            <div class="ergebnis-zahl"><strong id="anzahl">41</strong><span id="satz">Pflichten gelten für dich.</span></div>
+            <div class="balken" id="balken"></div>
+            <div class="beispiele" id="beispiele"></div>
+            <p class="fussnote" id="fussnote"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="abschnitt" aria-labelledby="s-app">
+      <div class="blatt-zeile">
+        <div class="rand"><b>1</b>Die App</div>
+        <div>
+          <h2 id="s-app">So sieht Amtlos aus</h2>
+          <p class="einleitung">Echte Bildschirme aus der App, mit einem erfundenen Salon als Beispiel.</p>
+        </div>
+      </div>
+      <div class="leiste" tabindex="0" aria-label="Bildschirme der App, seitlich blättern">
+        <figure><img src="bilder/pflichten.jpg" alt="Pflichten-Tab mit Fortschritt, „Jetzt dran“ und „Diesen Monat“" loading="lazy"><figcaption><b>Jetzt dran</b>Was diese Woche fällig ist, mit Termin.</figcaption></figure>
+        <figure><img src="bilder/rechnung.jpg" alt="Vorschau einer Rechnung im Briefformat mit GiroCode" loading="lazy"><figcaption><b>Rechnung als Brief</b>DIN 5008, GiroCode, deine Hausfarbe.</figcaption></figure>
+        <figure><img src="bilder/ablage.jpg" alt="Ablage mit Summe offener Rechnungen und Filtern" loading="lazy"><figcaption><b>Offene Rechnungen</b>Summe auf einen Blick, Zahlung vermerken.</figcaption></figure>
+        <figure><img src="bilder/vorlagen.jpg" alt="Vorlagen nach Anlass, Suche und Rechnung schreiben" loading="lazy"><figcaption><b>Vorlagen nach Anlass</b>„Ich stelle jemanden ein“ statt Paragrafen.</figcaption></figure>
+        <figure><img src="bilder/pflicht.jpg" alt="Detail einer Pflicht mit Grund, Zuständigkeit, Rechtsgrundlage und Quellen" loading="lazy"><figcaption><b>Mit Grund und Quelle</b>Jede Pflicht erklärt, mit Gesetz und Link.</figcaption></figure>
+        <figure><img src="bilder/betrieb.jpg" alt="Mein Betrieb mit Übersicht, Pro-Status und Angaben" loading="lazy"><figcaption><b>Dein Betrieb</b>Einmal eintragen, überall vorausgefüllt.</figcaption></figure>
+      </div>
+    </section>
+
+    <section class="abschnitt" aria-labelledby="s-leistung">
+      <div class="blatt-zeile">
+        <div class="rand"><b>2</b>Leistung</div>
+        <div><h2 id="s-leistung">Was Amtlos für dich erledigt</h2></div>
+      </div>
+      <div class="leistungen">
+        <div class="blatt-zeile leistung">
+          <div class="rand">Katalog mit<br>Rechtsgrundlagen</div>
+          <div>
+            <h3>Pflichten kennen, statt sie zu suchen</h3>
+            <p>Ein paar Fragen zu Branche, Rechtsform, Team und Kasse. Amtlos rechnet auf deinem iPhone aus, was gilt: Steuern, Personal, Arbeitsschutz, Datenschutz, Hygiene. Wiederkehrende Termine kommen als Erinnerung drei Tage vorher.</p>
+          </div>
+        </div>
+        <div class="blatt-zeile leistung">
+          <div class="rand">§ 14 UStG<br>GoBD</div>
+          <div>
+            <h3>Rechnungen, die stimmen</h3>
+            <ul>
+              <li>Fortlaufende Nummer, Pflichtangaben werden vor dem Teilen geprüft</li>
+              <li>Nach dem Teilen festgeschrieben, Korrektur per Stornorechnung</li>
+              <li>GiroCode: Die Banking-App deiner Kunden füllt die Überweisung aus</li>
+              <li>XRechnung für Firmen und Behörden, auch ins EU-Ausland</li>
+              <li>Umsätze für die Umsatzsteuer-Voranmeldung nach Soll oder Ist</li>
+            </ul>
+          </div>
+        </div>
+        <div class="blatt-zeile leistung">
+          <div class="rand">§ 5 ArbSchG<br>Art. 30 DSGVO<br>LMHV</div>
+          <div>
+            <h3>Unterlagen, die Prüfer erwarten</h3>
+            <p>Hygieneplan, Hautschutzplan, Allergenliste, Gefährdungsbeurteilung, Betriebsanweisung, Unterweisung, Nachweis der Arbeitsbedingungen, Verzeichnis der Verarbeitungstätigkeiten, Datenschutzerklärung, Verfahrensdokumentation. Mit Vorschlägen aus offiziellen Quellen, gesetzt wie ein ordentliches Amtsdokument.</p>
+          </div>
+        </div>
+        <div class="blatt-zeile leistung">
+          <div class="rand">AES-256<br>ohne Konto</div>
+          <div>
+            <h3>Deine Daten bleiben bei dir</h3>
+            <p>Alles liegt verschlüsselt auf deinem iPhone. Es gibt kein Konto und keinen Amtlos-Server mit deinen Kunden- oder Mitarbeiterdaten. Sicherung als verschlüsselte Datei oder automatisch in deinem iCloud Drive, auf Wunsch mit Face ID gesperrt.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="abschnitt" aria-labelledby="s-erechnung">
+      <div class="blatt-zeile">
+        <div class="rand"><b>3</b>E-Rechnung</div>
+        <div>
+          <h2 id="s-erechnung">Die E-Rechnung kommt für alle</h2>
+          <p class="einleitung">Seit dem Wachstumschancengesetz gilt zwischen Unternehmen in Deutschland ein fester Fahrplan. Amtlos erstellt XRechnungen, die den offiziellen Validator bestehen.</p>
+          <div class="zeit">
+            <div><b>2025</b><p>Alle Unternehmen müssen E-Rechnungen empfangen können.</p></div>
+            <div><b>2027</b><p>Pflicht zum Ausstellen bei mehr als 800.000 € Vorjahresumsatz.</p></div>
+            <div><b>2028</b><p>Pflicht zum Ausstellen für alle übrigen Unternehmen.</p></div>
+          </div>
+          <p class="fussnote" style="margin-top:1rem">Quelle: Bundesministerium der Finanzen, FAQ zur E-Rechnung. Ausnahmen gelten unter anderem für Kleinunternehmer und Kleinbetragsrechnungen bis 250 €.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="abschnitt" aria-labelledby="s-preise">
+      <div class="blatt-zeile">
+        <div class="rand"><b>4</b>Preise</div>
+        <div>
+          <h2 id="s-preise">Kostenlos starten</h2>
+          <p class="einleitung">Was du brauchst, um deine Pflichten zu kennen und sauber zu bleiben, kostet nichts. Pro ist für alle, die Amtlos jeden Monat für Rechnungen nutzen. Den Preis siehst du zum Start im App Store.</p>
+          <div class="preise">
+            <div class="paket">
+              <h3>Kostenlos</h3>
+              <p class="preis">für immer</p>
+              <ul>
+                <li>Pflichten-Check und Erinnerungen</li>
+                <li>Alle Vorlagen ausfüllen und ansehen</li>
+                <li>Jeden Monat einige Unterlagen als PDF</li>
+                <li>Sicherung, Wiederherstellen, Storno</li>
+              </ul>
+            </div>
+            <div class="paket pro">
+              <h3>Amtlos Pro</h3>
+              <p class="preis">monatlich oder jährlich, mit kostenlosem Testzeitraum</p>
+              <ul>
+                <li>Unbegrenzt Unterlagen teilen</li>
+                <li>E-Rechnung (XRechnung)</li>
+                <li>Umsatzsteuer mit einem Tipp</li>
+                <li>Automatische iCloud-Sicherung</li>
+                <li>Briefkopf mit Logo und Hausfarbe</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="abschnitt" aria-labelledby="s-fragen">
+      <div class="blatt-zeile">
+        <div class="rand"><b>5</b>Fragen</div>
+        <div>
+          <h2 id="s-fragen">Häufige Fragen</h2>
+          <div style="margin-top:1.25rem">
+            <details><summary>Ersetzt Amtlos meine Steuerberatung?</summary><p>Nein. Amtlos zeigt, was gilt, und bereitet Unterlagen vor. Für Beratung im Einzelfall bleibt deine Steuerberaterin oder dein Steuerberater zuständig. Die Inhalte werden derzeit fachlich geprüft.</p></details>
+            <details><summary>Wo liegen meine Daten?</summary><p>Nur auf deinem iPhone, verschlüsselt. Amtlos hat kein Konto und keinen Server mit deinen Unterlagen. Eine Sicherung erstellst du selbst als verschlüsselte Datei oder automatisch in deinem iCloud Drive.</p></details>
+            <details><summary>Für wen ist Amtlos gedacht?</summary><p>Für Einzelunternehmen, Salons, Cafés, Handwerksbetriebe, Freelancer und kleine GmbHs in Deutschland – alle, die keine eigene Buchhaltungsabteilung haben.</p></details>
+            <details><summary>Gibt es Amtlos für Android oder im Browser?</summary><p>Zum Start gibt es Amtlos für das iPhone. Weitere Plattformen folgen.</p></details>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="fuss">
+    <span>© 2026 Amtlos</span>
+    <nav aria-label="Rechtliches"><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a></nav>
+  </footer>
+</div>
+
+<script>
+const DATEN = __PROFILE__;
+const TEAM = [["0", "Nur ich"], ["3", "Ja, ein kleines Team"]];
+let wahl = { branche: "beauty_kosmetik", team: "3" };
+
+function chips(id, optionen, schluessel) {
+  const el = document.getElementById(id);
+  el.innerHTML = "";
+  for (const [wert, text] of optionen) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip";
+    b.setAttribute("role", "radio");
+    b.setAttribute("aria-checked", String(wahl[schluessel] === wert));
+    b.textContent = text;
+    b.addEventListener("click", () => { wahl[schluessel] = wert; zeichnen(); });
+    el.appendChild(b);
+  }
+}
+
+function zeichnen() {
+  chips("branchen", DATEN.branchen, "branche");
+  chips("team", TEAM, "team");
+  const p = DATEN.profile[`${wahl.branche}|${wahl.team}`];
+  document.getElementById("anzahl").textContent = p.gilt;
+  document.getElementById("satz").textContent = `Pflichten gelten für dich – ${p.unklar} weitere hängen von Details ab, die der Check in der App klärt.`;
+  const max = Math.max(...p.kategorien.map((k) => k[1]));
+  document.getElementById("balken").innerHTML = p.kategorien.slice(0, 4).map(([k, n]) => `<div><span>${k}</span><span class="spur"><i style="width:${Math.round((n / max) * 100)}%"></i></span><span class="zahl">${n}</span></div>`).join("");
+  document.getElementById("beispiele").innerHTML = p.beispiele.map((b) => `<div><em>${b.grund}</em><span>${b.titel}</span></div>`).join("");
+  const name = DATEN.branchen.find((b) => b[0] === wahl.branche)[1];
+  document.getElementById("fussnote").textContent = `Beispiel: ${name}, Einzelunternehmen in Bayern, Start im November 2026${wahl.team === "3" ? ", drei Beschäftigte" : ""}. Aus dem Amtlos-Katalog, fachlich noch nicht abschließend geprüft.`;
+}
+zeichnen();
+</script>

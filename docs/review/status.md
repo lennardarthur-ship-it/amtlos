@@ -43,7 +43,7 @@ Das Review wurde am Stand vor E-124 erstellt. Antworten von Frida vom 12.10. (We
 
 | # | Dealbreaker | Status | Notiz |
 |---|---|---|---|
-| K1 | Kein Geschäftsmodell (kein Konto, Server, Bezahlung) | Entscheidung | Widerspricht der Empfehlung von F. Steinmeyer (kein Server in den ersten drei Wochen). Gründer entscheidet. |
+| K1 | Kein Geschäftsmodell (kein Konto, Server, Bezahlung) | **Gebaut (Abo)** | E-132: Amtlos Pro als App-Store-Abo ohne eigenen Server (RevenueCat). Konto und Sync bleiben Ausbaustufe. |
 | K2 | Keine messbare Traktion | Offen | TestFlight braucht ein Apple-Developer-Konto (Gründer); Messung datenschutzfreundlich, Anbieter offen. |
 | K3 | Inhalte ungeprüft | Offen | Prüfliste T-52 bis T-68 als Arbeitsgrundlage für den Fachbeirat. |
 | K4 | Rechnung nur als PDF | **Erledigt (XRechnung)** | E-128: XRechnung 3.0 (UBL) aus der App, gleiche Zuordnung wie der Server, Beispiele inkl. Storno und Kleinunternehmer bestehen den KoSIT-Validator. ZUGFeRD offen. |
@@ -77,3 +77,14 @@ Das Review wurde am Stand vor E-124 erstellt. Antworten von Frida vom 12.10. (We
 | App-Symbol und Paket | **Erledigt** | eigenes Symbol, Startbild, Version 0.2.0, Locale; Export-Compliance und App-Privacy: T-77. |
 | Dokumente | **Erledigt** | E-130 (sechs Gestalten, Randspalte, GiroCode). |
 | Offen für den Store | Offen | EAS/Signierung, Store-Texte, App-Privacy, Rechtstexte in der App, Gerätetests (Kalender, VoiceOver, Druck). |
+
+## Ziel „Unicorn nach Veröffentlichung“ (E-132)
+
+| Baustein | Status | Notiz |
+|---|---|---|
+| Geschäftsmodell | **Gebaut** | Amtlos Pro als App-Store-Abo (RevenueCat), Freikontingent, Testmodus ohne Schlüssel. Preise in App Store Connect. |
+| Store-Reife | **Gebaut, Angaben offen** | EAS, Privacy Manifest, Texte, Bilder, Prüfskript (14 Punkte für Gründer/Fachleute), docs/11. |
+| Wachstum aus dem Produkt | **Gebaut** | Bewertungsbitte, Weiterempfehlen. „Erstellt mit Amtlos“ bewusst nicht (Domain fehlt, Dokumente bleiben werbefrei). |
+| Landingpage | **Gebaut** | apps/website, Mini-Check mit Katalogzahlen. |
+| Wachstumsplan | **Erstellt** | Markt, Wettbewerb, Preis, Phasen, Kennzahlen, Risiken, Schritte – mit Quellen. |
+| Messung | Teilweise | RevenueCat und App Store Connect; eigene Nutzungsdaten nur mit Einwilligung und Server (später). |
