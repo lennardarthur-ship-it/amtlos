@@ -31,6 +31,7 @@ export function T({ v = "basis", fett, leise, farbe, stil, children, ...rest }: 
 /** SF Symbol auf iOS, sonst Ionicons. Immer dekorativ – der Text daneben trägt die Bedeutung. */
 const FALLBACK: Record<string, keyof typeof Ionicons.glyphMap> = {
   "calendar": "calendar-outline", "checklist": "list-outline", "clock": "time-outline", "doc.viewfinder": "camera-outline", "ellipsis.circle": "ellipsis-horizontal-circle-outline",
+  "lock.open": "lock-open-outline", "key": "key-outline", "pause.circle": "pause-circle-outline", "checkmark.seal": "ribbon-outline", "number": "keypad-outline", "xmark.icloud": "cloud-offline-outline",
   "checkmark": "checkmark", "chevron.right": "chevron-forward", "bell": "notifications-outline", "person.2": "people-outline", "globe": "globe-outline", "rectangle.portrait.and.arrow.right": "log-out-outline",
   "building.2": "business-outline", "wifi.slash": "cloud-offline-outline", "arrow.triangle.2.circlepath": "sync-outline", "exclamationmark.triangle": "warning-outline", "camera": "camera-outline", "photo.on.rectangle": "images-outline",
   "play.fill": "play", "stop.fill": "stop", "xmark": "close", "arrow.right": "arrow-forward", "sparkles": "sparkles-outline", "info.circle": "information-circle-outline",

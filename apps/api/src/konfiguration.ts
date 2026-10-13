@@ -28,6 +28,8 @@ const Schema = z
     STRIPE_PREIS_ID: z.string().min(5).optional(),
     /** Länge der Testphase in Tagen (Konfiguration, nicht Code – Spezifikation 9) */
     ABO_TESTTAGE: z.coerce.number().int().min(0).max(365).default(14),
+    /** RevenueCat (Abos der iPhone-App, E-134): mit Schlüssel prüft die Synchronisation, ob Pro aktiv ist */
+    REVENUECAT_SECRET_KEY: z.string().min(10).optional(),
   })
   .superRefine((k, ctx) => {
     if (k.AUTH_MODUS === "oidc" && (!k.OIDC_ISSUER || !k.OIDC_AUDIENCE))

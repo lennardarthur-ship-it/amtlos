@@ -17,6 +17,7 @@ import { entsperren } from "./unterlagen/sperre";
 import { Stapel } from "./ui/navigation";
 import { TASTATUR_FERTIG, ZIEL, istIos, useFarben } from "./ui/thema";
 import { AmtlosAnbieter, useAmtlos, type Tab } from "./zustand";
+import { KontoAnbieter } from "./konto/konto";
 
 void SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
@@ -163,15 +164,17 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <AmtlosAnbieter>
-        <StatusBar style={dunkel ? "light" : "dark"} />
-        <ErinnerungsPlaner />
-        <AutoSicherung />
-        <Sperre>
-          <MeldungAnbieter unten={72}>
-            <Rahmen />
-          </MeldungAnbieter>
-        </Sperre>
-        <TastaturLeiste />
+        <KontoAnbieter>
+          <StatusBar style={dunkel ? "light" : "dark"} />
+          <ErinnerungsPlaner />
+          <AutoSicherung />
+          <Sperre>
+            <MeldungAnbieter unten={72}>
+              <Rahmen />
+            </MeldungAnbieter>
+          </Sperre>
+          <TastaturLeiste />
+        </KontoAnbieter>
       </AmtlosAnbieter>
     </SafeAreaProvider>
   );

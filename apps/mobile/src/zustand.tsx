@@ -9,7 +9,9 @@ import { istTresor, tresorOeffnen, tresorSchliessen } from "./unterlagen/tresor"
 import type { Beleg, Betrieb, Daten, Person, PersonAngaben, PersonenArt } from "@amtlos/fachlogik";
 import { dateiAblegen, dateiEntfernen, dateiHolen } from "./unterlagen/dateien";
 import { base64, ausBase64, type Dateien } from "./unterlagen/sicherung";
-import { LEERER_STAND, belegLoeschen, belegSetzen, neueId, aendern, allesLoeschenErlaubt, anlegen, ausgeben, bezahltSetzen, zusammenfuehren, type Zusammenfuehrung, betriebSetzen, erledigtSetzen, felderSetzen, istLesbar, profilSetzen, stornieren, kopieren, loeschen, personLoeschen, personMerken, personSetzen, standAus, type Stand, type Unterlage } from "./unterlagen/speicher";
+import { kontoVergessen } from "./konto/sitzung";
+import { syncZusammenfuehren } from "./konto/sync";
+import { LEERER_STAND, belegLoeschen, belegSetzen, neueId, steuerberatungSetzen, aendern, allesLoeschenErlaubt, anlegen, ausgeben, bezahltSetzen, zusammenfuehren, type Zusammenfuehrung, betriebSetzen, erledigtSetzen, felderSetzen, istLesbar, profilSetzen, stornieren, kopieren, loeschen, personLoeschen, personMerken, personSetzen, standAus, type Stand, type Unterlage } from "./unterlagen/speicher";
 
 /** Alles liegt nur auf dem Gerät (E-121): kein Konto, kein Server. Seit E-129 verschlüsselt (Schlüssel im Schlüsselbund). */
 const SCHLUESSEL = "amtlos.unterlagen.v1";
@@ -71,6 +73,10 @@ interface Zustand {
   dateienFuerSicherung(s?: Stand): Promise<Dateien>;
   /** Belegdateien aus einer Sicherung ablegen (vorhandene bleiben) */
   dateienEinspielen(d: Dateien): Promise<void>;
+  /** Synchronisation (E-134): aktueller Stand, zusammengeführten Stand übernehmen, Datei unter ihrem Namen ablegen */
+  aktuellerStand(): Stand;
+  syncUebernehmen(s: Stand): void;
+  dateiAblegenUnter(name: string, bytes: Uint8Array): Promise<void>;
 }
 
 const Kontext = createContext<Zustand | null>(null);
@@ -221,7 +227,7 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       pro: storePro || (!kaufAktiv && stand.proTest),
       proAktualisieren: (aktiv) => (aktiv === undefined ? void proAktiv().then(setStorePro) : setStorePro(aktiv)),
       proTestSetzen: (an) => setzen({ ...aktuell.current, proTest: an }),
-      steuerberatungSetzen: (sb) => setzen({ ...aktuell.current, steuerberatung: sb }),
+      steuerberatungSetzen: (sb) => setzen(steuerberatungSetzen(aktuell.current, sb)),
       belegSetzen: (b) => setzen(belegSetzen(aktuell.current, b, new Date())),
       belegLoeschen: (id) => {
         const b = aktuell.current.belege.find((x) => x.id === id);
@@ -249,6 +255,16 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
           await dateiAblegen(name, ausBase64(b64), schluessel.current).catch(() => undefined);
         }
       },
+      aktuellerStand: () => aktuell.current,
+      syncUebernehmen: (entfernt) => {
+        const vorher = aktuell.current;
+        const neu = syncZusammenfuehren(vorher, entfernt).stand;
+        // auf einem anderen Gerät gelöschte Belege: Datei hier auch entfernen
+        const bleiben = new Set(neu.belege.map((b) => b.datei).filter(Boolean));
+        for (const b of vorher.belege) if (b.datei && !bleiben.has(b.datei)) dateiEntfernen(b.datei);
+        setzen(neu);
+      },
+      dateiAblegenUnter: (name, bytes) => dateiAblegen(name, bytes, schluessel.current),
       erfolg: () => {
         const jetzt = new Date();
         const b = { ...aktuell.current.bewertung, erfolge: aktuell.current.bewertung.erfolge + 1 };
@@ -269,6 +285,8 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         setStand(LEERER_STAND);
         await AsyncStorage.removeItem(SCHLUESSEL);
         await schluesselLoeschen().catch(() => undefined);
+        // Synchronisation auf diesem Gerät beenden – sonst kämen die Daten vom Server zurück (E-134)
+        await kontoVergessen();
         schluessel.current = await schluesselHolen(true).catch(() => null);
         return true;
       },

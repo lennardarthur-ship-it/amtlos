@@ -46,4 +46,22 @@ export const DATENSCHUTZ = {
   ],
 };
 
+/**
+ * Zusatz für Builds mit Synchronisation (E-134, `EXPO_PUBLIC_API_URL` gesetzt). Ersetzt „Kurz gesagt“ und kommt nach
+ * „Sicherungen“. Fachlich zu prüfen (T-80): Hoster des Servers, Identity-Provider, Auftragsverarbeitung.
+ */
+export const DATENSCHUTZ_SYNC = {
+  kurz: { titel: "Kurz gesagt", text: "Amtlos speichert deine Angaben verschlüsselt auf deinem iPhone. Nutzt du die Synchronisation, liegen sie zusätzlich auf einem Server von Amtlos – Ende-zu-Ende-verschlüsselt, sodass wir deine Unterlagen, Kunden und Mitarbeiter nicht lesen können." },
+  abschnitt: { titel: "Konto und Synchronisation", text: "Nur wenn du dich anmeldest: Für dein Konto verarbeiten wir deine E-Mail-Adresse, deinen Namen beim Anmeldedienst und eine Konto-Kennung. Was synchronisiert wird (Betrieb, Unterlagen, Belege mit Fotos, Personen), verschlüsselt die App vor dem Senden mit einem Schlüssel, den nur dein Sync-Passwort öffnet; der Server speichert nur diesen verschlüsselten Inhalt, Dateinamen, Größe und Zeitpunkte. „Synchronisation beenden“ löscht alles auf dem Server, „Konto löschen“ zusätzlich dein Konto. Mit Amtlos Pro ordnet RevenueCat deinen Kauf der Konto-Kennung zu." },
+};
+
+/** Abschnitte des Datenschutzhinweises – mit Synchronisation ergänzt. */
+export function datenschutzAbschnitte(sync: boolean) {
+  if (!sync) return DATENSCHUTZ.abschnitte;
+  const l = DATENSCHUTZ.abschnitte.map((a) => (a.titel === "Kurz gesagt" ? DATENSCHUTZ_SYNC.kurz : a));
+  const i = l.findIndex((a) => a.titel === "Sicherungen");
+  l.splice(i + 1, 0, DATENSCHUTZ_SYNC.abschnitt);
+  return l;
+}
+
 export const anbieterVollstaendig = () => Boolean(ANBIETER.name && ANBIETER.anschrift && ANBIETER.email && ANBIETER.vertretung);

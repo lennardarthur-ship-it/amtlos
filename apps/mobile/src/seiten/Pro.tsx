@@ -10,9 +10,13 @@ import { RADIUS, RAND, ZIEL, useFarben } from "../ui/thema";
 import { angebote, kaufAktiv, kaufen, wiederherstellen, type Angebot } from "../pro/kauf";
 import { FREI_JE_MONAT, PRO_VORTEILE, uebrig, type ProFunktion } from "../pro/regeln";
 import { useAmtlos } from "../zustand";
+import { syncAngeboten } from "../konto/konfig";
 import { DatenschutzSeite } from "./Recht";
 
-const VORTEIL_SYMBOL: Record<ProFunktion, string> = { pdf: "doc.on.doc", e_rechnung: "doc.text", ust_uebernahme: "percent", steuerberater: "briefcase", icloud: "icloud", briefkopf: "paintpalette" };
+/** „Synchronisation“ nur zeigen, wenn dieser Build einen Server hat (E-134). */
+const VORTEILE = PRO_VORTEILE.filter((v) => v !== "sync" || syncAngeboten);
+
+const VORTEIL_SYMBOL: Record<ProFunktion, string> = { pdf: "doc.on.doc", e_rechnung: "doc.text", ust_uebernahme: "percent", steuerberater: "briefcase", icloud: "icloud", sync: "arrow.triangle.2.circlepath", briefkopf: "paintpalette" };
 
 /**
  * Bezahlschirm (E-132): warum Pro, was Pro bringt, Angebote aus dem Store. Ohne Store-Anbindung (Testpaket) lässt
@@ -92,7 +96,7 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
         <T v="grossTitel" accessibilityRole="header" stil={{ marginTop: 14 }}>{TEXT.pro_titel}</T>
         <T leise stil={{ marginTop: 6 }}>{grund ? TEXT.pro_grund[grund](FREI_JE_MONAT) : TEXT.pro_unter}</T>
         <Karte stil={{ marginTop: 20, paddingVertical: 4 }}>
-          {PRO_VORTEILE.map((v, i) => (
+          {VORTEILE.map((v, i) => (
             <View key={v} style={{ flexDirection: "row", gap: 14, paddingVertical: 12, borderTopWidth: i ? 1 : 0, borderColor: f.linieLeise }}>
               <View style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: v === grund ? f.amt : f.amtHauch, alignItems: "center", justifyContent: "center" }}>
                 <Symbol name={VORTEIL_SYMBOL[v]} groesse={18} farbe={v === grund ? "#ffffff" : f.amt} />

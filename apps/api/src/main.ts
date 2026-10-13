@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import { NestFactory } from "@nestjs/core";
 import type { NestExpressApplication } from "@nestjs/platform-express";
+import { json } from "express";
 import helmet from "helmet";
 import { appModul } from "./app.module.js";
 import { METRIKEN, Ratenbegrenzer, zugriffsprotokoll, type Metriken } from "./betrieb.js";
@@ -11,6 +12,8 @@ export async function erzeugeApp(k: Konfiguration): Promise<NestExpressApplicati
     logger: k.UMGEBUNG === "test" ? false : ["error", "warn", "log"],
     bodyParser: false,
   });
+  // Synchronisation (E-134): verschlüsselter Stand und Belegdateien sind größer als normale Anfragen
+  app.use("/v1/tresor", json({ limit: "40mb" }));
   // rawBody für Webhook-Signaturen (Stripe prüft über den unveränderten Body)
   app.useBodyParser("json", { limit: "256kb", verify: (req: { rawBody?: Buffer }, _res: unknown, buf: Buffer) => { req.rawBody = buf; } });
   const metriken = app.get<Metriken>(METRIKEN);

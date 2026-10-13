@@ -12,3 +12,5 @@ export const proAktiv = async () => false;
 export const angebote = async (): Promise<Angebot[]> => [];
 export const kaufen = async (_id: string) => false;
 export const wiederherstellen = async () => false;
+export const proKontoVerbinden = async (_kontoId: string) => false;
+export const proKontoTrennen = async () => {};

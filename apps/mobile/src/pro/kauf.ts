@@ -105,3 +105,25 @@ export async function wiederherstellen(): Promise<boolean> {
   const info = await p.restorePurchases();
   return Boolean(info.entitlements.active[PRO_BERECHTIGUNG]);
 }
+
+/**
+ * Mit Konto (E-134): Käufe der Konto-ID zuordnen, damit der Server Pro für die Synchronisation prüfen kann und Pro auf
+ * allen Geräten des Kontos gilt. Liefert, ob Pro danach aktiv ist.
+ */
+export async function proKontoVerbinden(kontoId: string): Promise<boolean> {
+  const p = await laden();
+  if (!p) return false;
+  try {
+    const r = await p.logIn(kontoId);
+    return Boolean(r.customerInfo.entitlements.active[PRO_BERECHTIGUNG]);
+  } catch {
+    return false;
+  }
+}
+
+/** Beim Abmelden die Zuordnung lösen (RevenueCat legt wieder eine anonyme Kennung an). */
+export async function proKontoTrennen(): Promise<void> {
+  const p = await laden();
+  if (!p) return;
+  await p.logOut().catch(() => undefined);
+}

@@ -1,7 +1,8 @@
 # Amtlos – iPhone-App (Expo)
 
 **Welche Pflichten gelten für meinen Betrieb? Welche Unterlage brauche ich? → Schritt für Schritt ausfüllen → fertiges PDF.**
-Kein Konto, kein Server: alles liegt verschlüsselt auf dem iPhone (E-121, E-129).
+Alles liegt verschlüsselt auf dem iPhone (E-121, E-129). Optional, nur in Builds mit Server: Konto und
+Ende-zu-Ende-verschlüsselte Synchronisation zwischen Geräten (E-134).
 
 Vier Tabs (E-131):
 
@@ -50,6 +51,13 @@ node werkzeuge/schriften.mjs                # nach Schriftänderungen: eingebett
 mit Anleitung (`LIESMICH.txt`): Node installieren, `npm install`, `npx expo start`, QR-Code mit Expo Go öffnen.
 
 **Amtlos Pro (E-132):** `src/pro/` – Regeln (Freikontingent), Kauf über RevenueCat (nur mit `EXPO_PUBLIC_REVENUECAT_IOS_KEY`, sonst Testmodus), Bewertungsbitte; Bezahlschirm `seiten/Pro.tsx`, Rechtliches `src/rechtliches.ts` + `seiten/Recht.tsx`. Store: `store/de.json`, `werkzeuge/store-bilder.mjs`, `werkzeuge/store-check.mjs`, `eas.json`, Anleitung docs/11-store-start.md.
+
+**Konto und Synchronisation (E-134):** `src/konto/` – `sync.ts` (Hülle, Verschlüsselung, Zusammenführen, Ablauf; rein und
+getestet), `api.ts` (`/v1/tresor`), `sitzung.ts` (OIDC/PKCE bzw. Entwicklungszugang, Schlüsselbund), `konto.tsx`
+(Zustand, AutoSync); Seite `seiten/Konto.tsx`. Eingeschaltet über `EXPO_PUBLIC_API_URL`, Anmeldung über
+`EXPO_PUBLIC_OIDC_ISSUER`, `EXPO_PUBLIC_OIDC_CLIENT_ID` (optional `EXPO_PUBLIC_OIDC_AUDIENCE`, Weiterleitung
+`amtlos://anmeldung`). Rundgang mit zwei Geräten: `node e2e/sync-server.mjs &`, Web-Export mit
+`EXPO_PUBLIC_API_URL=http://localhost:3001`, dann `node e2e/sync.mjs <export> <bilder>`.
 
 **Version:** `src/version.ts`, `app.json` und `package.json` tragen dieselbe Nummer (ein Test prüft das).
 

@@ -1071,6 +1071,48 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
     });
   });
 
+  describe("Synchronisation der iPhone-App (E-134)", () => {
+    it("Tresor: einrichten, Version mit optimistischem Sperren, Dateien unveränderlich, nur eigenes Konto, löschen", async () => {
+      const t1 = await token("sync-nutzerin");
+      const t2 = await token("sync-fremd");
+      const als = (r: request.Test) => r.set("Authorization", `Bearer ${t1}`);
+      const fremd = (r: request.Test) => r.set("Authorization", `Bearer ${t2}`);
+      const schluessel = JSON.stringify({ format: "amtlos-schluessel", version: 1, kdf: "PBKDF2-SHA256", salz: "AAAA", nonce: "BBBB", daten: "CCCC" });
+      const chiffre = (x: string) => JSON.stringify({ format: "amtlos-tresor", version: 1, nonce: "AAAAAAAAAAAAAAAA", daten: x });
+      await als(http().get("/v1/tresor")).expect(404);
+      await als(http().post("/v1/tresor")).send({ schluessel: "klartext-ist-verboten" }).expect(422);
+      await als(http().post("/v1/tresor")).send({ schluessel }).expect(201).expect((r) => expect(r.body).toMatchObject({ version: 0, konto_id: expect.any(String) }));
+      await als(http().post("/v1/tresor")).send({ schluessel }).expect(409);
+      await als(http().put("/v1/tresor")).send({ version: 0, daten: "{\"betrieb\":\"Klartext\"}" }).expect(422);
+      expect((await als(http().put("/v1/tresor")).send({ version: 0, daten: chiffre("eins") }).expect(200)).body).toEqual({ version: 1 });
+      // ein zweites Gerät mit veralteter Version: 409 mit der aktuellen Version
+      const konflikt = (await als(http().put("/v1/tresor")).send({ version: 0, daten: chiffre("zwei") }).expect(409)).body;
+      expect(konflikt.version).toBe(1);
+      expect((await als(http().put("/v1/tresor")).send({ version: 1, daten: chiffre("zwei") }).expect(200)).body).toEqual({ version: 2 });
+      const t = (await als(http().get("/v1/tresor")).expect(200)).body;
+      expect(t).toMatchObject({ version: 2, schluessel, daten: chiffre("zwei") });
+      // anderes Konto sieht nichts und kann nichts überschreiben
+      await fremd(http().get("/v1/tresor")).expect(404);
+      await fremd(http().put("/v1/tresor")).send({ version: 2, daten: chiffre("fremd") }).expect(404);
+      // Dateien: Name geprüft, zweites Hochladen ändert nichts
+      await als(http().put("/v1/tresor/dateien/..%2Fboese.jpg")).send({ daten: chiffre("x") }).expect(422);
+      await als(http().put("/v1/tresor/dateien/abc123.jpg")).send({ daten: chiffre("foto") }).expect(204);
+      await als(http().put("/v1/tresor/dateien/abc123.jpg")).send({ daten: chiffre("anders") }).expect(204);
+      expect((await als(http().get("/v1/tresor/dateien/abc123.jpg")).expect(200)).body).toEqual({ daten: chiffre("foto") });
+      expect((await als(http().get("/v1/tresor/dateien")).expect(200)).body).toEqual(["abc123.jpg"]);
+      await fremd(http().get("/v1/tresor/dateien/abc123.jpg")).expect(404);
+      // große Stände gehen (Limit 40 MB statt 256 kB)
+      expect((await als(http().put("/v1/tresor")).send({ version: 2, daten: chiffre("A".repeat(2_000_000)) }).expect(200)).body).toEqual({ version: 3 });
+      // Passwort geändert: neuer Schlüssel, Daten bleiben
+      const neu = schluessel.replace("AAAA", "DDDD");
+      await als(http().put("/v1/tresor/schluessel")).send({ schluessel: neu }).expect(204);
+      expect((await als(http().get("/v1/tresor")).expect(200)).body.schluessel).toBe(neu);
+      await als(http().delete("/v1/tresor")).expect(204);
+      await als(http().get("/v1/tresor")).expect(404);
+      expect((await als(http().get("/v1/tresor/dateien")).expect(200)).body).toEqual([]);
+    });
+  });
+
   describe("Launch: Abo, Export, Löschen", () => {
     it("jedes Unternehmen beginnt mit einer Testphase; danach 402 beim Schreiben, Lesen bleibt", async () => {
       const t = await token("abo-kundin");

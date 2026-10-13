@@ -47,11 +47,18 @@ export interface Stand {
   proTest: boolean;
   /** Angaben für das Steuerberater-Paket (E-133) */
   steuerberatung: { kontenrahmen: "SKR03" | "SKR04"; beraternummer: string; mandantennummer: string };
+  /**
+   * Synchronisation (E-134): Löschvermerke („u:“ Unterlage, „b:“ Beleg, „m:“/„k:“ Person → ISO-Zeitpunkt), damit
+   * Gelöschtes nicht von einem anderen Gerät zurückkommt; Zeitpunkte der letzten Änderung je Bereich (betrieb, profil,
+   * erledigt, steuerberatung), damit die neuere Fassung gewinnt.
+   */
+  geloescht: Record<string, string>;
+  zeiten: Record<string, string>;
   /** Bitte um eine Bewertung (E-132): Erfolgsmomente gezählt, zuletzt gefragt am (ISO) */
   bewertung: { erfolge: number; gefragt?: string };
 }
 
-export const LEERER_STAND: Stand = { version: 1, betrieb: LEERER_BETRIEB, unterlagen: [], belege: [], mitarbeiter: [], kunden: [], profil: {}, erledigt: {}, erinnerungen: false, appSperre: false, cloudSicherung: false, proTest: false, bewertung: { erfolge: 0 }, steuerberatung: { kontenrahmen: "SKR03", beraternummer: "", mandantennummer: "" } };
+export const LEERER_STAND: Stand = { version: 1, betrieb: LEERER_BETRIEB, unterlagen: [], belege: [], mitarbeiter: [], kunden: [], profil: {}, erledigt: {}, erinnerungen: false, appSperre: false, cloudSicherung: false, proTest: false, bewertung: { erfolge: 0 }, steuerberatung: { kontenrahmen: "SKR03", beraternummer: "", mandantennummer: "" }, geloescht: {}, zeiten: {} };
 
 function profilAus(roh: unknown): Stand["profil"] {
   if (!roh || typeof roh !== "object" || Array.isArray(roh)) return {};
@@ -63,6 +70,17 @@ function erledigtAus(roh: unknown): Record<string, string> {
   if (!roh || typeof roh !== "object" || Array.isArray(roh)) return {};
   return Object.fromEntries(Object.entries(roh as Record<string, unknown>).filter((e): e is [string, string] => typeof e[1] === "string"));
 }
+
+/** Karte Schlüssel → ISO-Zeitpunkt (Löschvermerke, Zeiten); Unlesbares fällt weg. */
+function isoKarte(roh: unknown): Record<string, string> {
+  if (!roh || typeof roh !== "object" || Array.isArray(roh)) return {};
+  return Object.fromEntries(Object.entries(roh as Record<string, unknown>).filter((e): e is [string, string] => typeof e[1] === "string" && /^\d{4}-\d{2}-\d{2}T/.test(e[1])));
+}
+
+/** Zeitpunkt der letzten Änderung eines Bereichs setzen (Synchronisation, E-134). */
+const mitZeit = (s: Stand, bereich: string, jetzt = new Date()): Stand => ({ ...s, zeiten: { ...s.zeiten, [bereich]: jetzt.toISOString() } });
+/** Löschvermerk setzen. */
+const vermerken = (s: Stand, schluessel: string, jetzt = new Date()): Stand => ({ ...s, geloescht: { ...s.geloescht, [schluessel]: jetzt.toISOString() } });
 
 function steuerberatungAus(roh: unknown): Stand["steuerberatung"] {
   const b = roh && typeof roh === "object" ? (roh as Record<string, unknown>) : {};
@@ -116,6 +134,8 @@ export function standAus(json: string | null): Stand {
       proTest: r.proTest === true,
       bewertung: bewertungAus(r.bewertung),
       steuerberatung: steuerberatungAus(r.steuerberatung),
+      geloescht: isoKarte(r.geloescht),
+      zeiten: isoKarte(r.zeiten),
       ...(iso(r.geaendert) ? { geaendert: iso(r.geaendert) } : {}),
       ...(iso(r.letzteSicherung) ? { letzteSicherung: iso(r.letzteSicherung) } : {}),
     };
@@ -236,7 +256,7 @@ export function loeschen(s: Stand, id: string): Stand {
   const weg = s.unterlagen.find((u) => u.id === id && !u.festgeschrieben);
   if (!weg) return s;
   // ein verworfener Storno-Entwurf gibt die ursprüngliche Rechnung wieder frei
-  return { ...s, unterlagen: s.unterlagen.filter((u) => u.id !== id).map((u) => (u.storniertDurch === id ? { ...u, storniertDurch: undefined } : u)) };
+  return { ...vermerken(s, `u:${id}`), unterlagen: s.unterlagen.filter((u) => u.id !== id).map((u) => (u.storniertDurch === id ? { ...u, storniertDurch: undefined } : u)) };
 }
 
 /** Person aus einer Unterlage merken (gleicher Name ergänzt den vorhandenen Eintrag). */
@@ -246,14 +266,15 @@ export function personMerken(s: Stand, art: PersonenArt, angaben: PersonAngaben,
 }
 
 /** Person anlegen oder ändern (Bearbeiten unter „Mein Betrieb“). */
-export function personSetzen(s: Stand, art: PersonenArt, p: Person): Stand {
+export function personSetzen(s: Stand, art: PersonenArt, p: Person, jetzt = new Date()): Stand {
   const k = PERSONEN_LISTE[art];
-  return { ...s, [k]: s[k].some((x) => x.id === p.id) ? s[k].map((x) => (x.id === p.id ? p : x)) : [...s[k], p] };
+  const neu = { ...p, geaendert: jetzt.toISOString() };
+  return { ...s, [k]: s[k].some((x) => x.id === p.id) ? s[k].map((x) => (x.id === p.id ? neu : x)) : [...s[k], neu] };
 }
 
 export function personLoeschen(s: Stand, art: PersonenArt, id: string): Stand {
   const k = PERSONEN_LISTE[art];
-  return { ...s, [k]: s[k].filter((x) => x.id !== id) };
+  return { ...vermerken(s, `${art === "mitarbeiter" ? "m" : "k"}:${id}`), [k]: s[k].filter((x) => x.id !== id) };
 }
 
 /** Personen alphabetisch. */
@@ -262,7 +283,8 @@ export const personenSortiert = (l: Person[]) => [...l].filter((p) => p.name.tri
 /** Antworten im Pflichten-Check setzen. Das Bundesland übernimmt „Mein Betrieb“, solange dort keins steht. */
 export function profilSetzen(s: Stand, werte: Stand["profil"], bundeslandName?: string): Stand {
   const betrieb = bundeslandName && !s.betrieb.bundesland ? { ...s.betrieb, bundesland: bundeslandName } : s.betrieb;
-  return { ...s, betrieb, profil: { ...s.profil, ...werte } };
+  const mit = mitZeit(betrieb === s.betrieb ? s : mitZeit(s, "betrieb"), "profil");
+  return { ...mit, betrieb, profil: { ...s.profil, ...werte } };
 }
 
 /** Pflicht abhaken bzw. den Haken entfernen. Wiederkehrende Pflichten gelten nur für einen Termin („Datum|Termin“). */
@@ -270,12 +292,14 @@ export function erledigtSetzen(s: Stand, pflichtId: string, datum: string | null
   const erledigt = { ...s.erledigt };
   if (datum) erledigt[pflichtId] = termin ? `${datum}|${termin}` : datum;
   else delete erledigt[pflichtId];
-  return { ...s, erledigt };
+  return { ...mitZeit(s, "erledigt"), erledigt };
 }
 
 export function betriebSetzen(s: Stand, b: Betrieb): Stand {
-  return { ...s, betrieb: b };
+  return { ...mitZeit(s, "betrieb"), betrieb: b };
 }
+
+export const steuerberatungSetzen = (s: Stand, sb: Stand["steuerberatung"]): Stand => ({ ...mitZeit(s, "steuerberatung"), steuerberatung: sb });
 
 /** Zuletzt bearbeitete zuerst. */
 export const sortiert = (s: Stand) => [...s.unterlagen].sort((a, b) => b.geaendert.localeCompare(a.geaendert));
@@ -296,7 +320,7 @@ export function belegSetzen(s: Stand, b: Beleg, jetzt: Date): Stand {
   return { ...s, belege: s.belege.some((x) => x.id === b.id) ? s.belege.map((x) => (x.id === b.id ? neu : x)) : [neu, ...s.belege] };
 }
 
-export const belegLoeschen = (s: Stand, id: string): Stand => ({ ...s, belege: s.belege.filter((b) => b.id !== id) });
+export const belegLoeschen = (s: Stand, id: string): Stand => ({ ...vermerken(s, `b:${id}`), belege: s.belege.filter((b) => b.id !== id) });
 
 /** Belege nach Belegdatum, neueste zuerst. */
 export const belegeSortiert = (s: Stand) => [...s.belege].sort((a, b) => b.datum.localeCompare(a.datum) || b.geaendert.localeCompare(a.geaendert));

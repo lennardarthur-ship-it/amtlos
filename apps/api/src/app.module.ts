@@ -16,6 +16,7 @@ import { KernController, WARTESCHLANGE } from "./kern.controller.js";
 import { KONFIGURATION, type Konfiguration } from "./konfiguration.js";
 import { KanzleiController } from "./kanzlei.controller.js";
 import { MobilController } from "./mobil.controller.js";
+import { TresorController } from "./tresor.controller.js";
 import { KontoController, STRIPE } from "./konto.controller.js";
 import { MarktplatzController } from "./marktplatz.controller.js";
 import { OnlineCheckController } from "./onlinecheck.controller.js";
@@ -26,7 +27,7 @@ import { TeamController } from "./team.controller.js";
 
 export function appModul(k: Konfiguration) {
   @Module({
-    controllers: [KernController, PflichtenController, TeamController, ElsterController, FinanzenController, PersonalController, ArbeitsschutzController, DatenschutzController, OnlineCheckController, BranchenController, AssistentController, PostfachController, MarktplatzController, KanzleiController, MobilController, KontoController, BetriebController],
+    controllers: [KernController, PflichtenController, TeamController, ElsterController, FinanzenController, PersonalController, ArbeitsschutzController, DatenschutzController, OnlineCheckController, BranchenController, AssistentController, PostfachController, MarktplatzController, KanzleiController, MobilController, TresorController, KontoController, BetriebController],
     providers: [
       { provide: KONFIGURATION, useValue: k },
       { provide: METRIKEN, useFactory: erzeugeMetriken },

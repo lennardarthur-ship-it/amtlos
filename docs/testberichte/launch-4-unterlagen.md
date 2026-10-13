@@ -187,3 +187,17 @@ Auf dem iPhone noch zu prüfen: Kalenderbogen (Datumswähler) und „Fertig“-L
 | App-Tests gesamt | 54 grün |
 
 Auf dem iPhone noch zu prüfen: Kamera-Foto eines Belegs, ZUGFeRD-PDF aus Mail/Dateien, Teilen des ZIP, Kauf in der Sandbox.
+
+## Nachtrag: Konto und Synchronisation (E-134)
+
+| Prüfung | Ergebnis |
+|---|---|
+| Sync-Schlüssel in der Hülle: richtiges Passwort öffnet, falsches und veränderte Hülle nicht; kein Klartext im verschlüsselten Stand; Gerätegebundenes bleibt draußen | grün (sync.test.ts) |
+| Zusammenführen: neuere Fassung gewinnt, Gelöschtes kommt nicht zurück (außer danach geändert), festgeschriebene Rechnung wird nie ersetzt, Zahlung wandert mit, doppelte Nummern gemeldet | grün (sync.test.ts) |
+| Synchronisieren gegen Server im Speicher: Belegdatei hin und zurück, Löschen kommt an, 409 → neu zusammenführen ohne Verlust, Abbruch nach drei Konflikten | grün (sync.test.ts) |
+| API: einrichten, Version/409, Dateien unveränderlich, Klartext abgelehnt, fremdes Konto sieht nichts, Beenden und Konto löschen räumen auf | grün (api.test.ts) |
+| Zwei Geräte gegen die echte API (`e2e/sync.mjs`): anmelden, einrichten, falsches Passwort, verbinden, Daten beider Seiten auf beiden Geräten, Server ohne Klartext, Beenden auf B → A hört auf, Konto löschen → abgemeldet, Daten bleiben | grün |
+| Rundgang ohne Server (Testpaket): nichts von Konto/Sync sichtbar | grün hell und dunkel |
+| App-Tests gesamt | 66 grün |
+
+Auf dem iPhone noch zu prüfen: Anmeldung über den Systembrowser mit dem gewählten Identity-Provider, Synchronisation großer Belegfotos über Mobilfunk, Verhalten nach Abo-Ende in der Sandbox.

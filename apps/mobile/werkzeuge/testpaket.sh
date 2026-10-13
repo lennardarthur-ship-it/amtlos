@@ -94,6 +94,8 @@ Entscheidungen liegen im Git-Repository (GitHub: lennardarthur-ship-it/amtlos). 
    - „Amtlos Pro“ (oben unter „Mein Betrieb“): In dieser Testversion gibt es keinen Kauf – „Pro testweise einschalten“
      zeigt alle Funktionen. Ohne Pro: 5 Unterlagen im Monat als PDF, kein Logo/keine Hausfarbe, keine E-Rechnung.
    - „Über Amtlos“: Impressum und Datenschutz (Angaben folgen vor dem Start), „Amtlos weiterempfehlen“.
+   - Synchronisation zwischen Geräten (Konto, Ende-zu-Ende-verschlüsselt) ist eingebaut, in diesem Testpaket aber
+     aus: Sie braucht einen laufenden Amtlos-Server und einen Anmeldedienst. Ohne Server bleibt alles auf dem iPhone.
 
 Beenden: im Terminal Ctrl + C. Nächstes Mal reichen die Befehle „cd …“ und „npx expo start“.
 TXT

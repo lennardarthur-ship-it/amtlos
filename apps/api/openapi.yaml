@@ -24,6 +24,7 @@ tags:
   - name: Konto
   - name: Kanzlei
   - name: Mobil
+  - name: Synchronisation
   - name: Profil und Ereignisse
   - name: Pflichten
   - name: Kalender
@@ -1755,6 +1756,73 @@ paths:
       requestBody: { required: true, content: { application/json: { schema: { type: object, required: [kanaele], properties: { kanaele: { type: array, items: { type: object, properties: { kanal: { type: string, enum: [email, push] }, aktiv: { type: boolean }, vorlauf_tage: { type: array, items: { type: integer } } } } } } } } } }
       responses:
         "200": { description: Gespeichert }
+        "422": { $ref: "#/components/responses/Eingabefehler" }
+
+  /v1/tresor:
+    get:
+      tags: [Synchronisation]
+      summary: Verschlüsselten Stand und verschlüsselten Sync-Schlüssel holen (E-134)
+      responses:
+        "200": { description: OK }
+        "404": { description: Noch nicht eingerichtet }
+    post:
+      tags: [Synchronisation]
+      summary: Synchronisation einrichten (verschlüsselter Sync-Schlüssel)
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [schluessel], additionalProperties: false, properties: { schluessel: { type: string } } } } } }
+      responses:
+        "201": { description: Eingerichtet }
+        "402": { description: Amtlos Pro nötig }
+        "409": { description: Schon eingerichtet }
+        "422": { $ref: "#/components/responses/Eingabefehler" }
+    put:
+      tags: [Synchronisation]
+      summary: Verschlüsselten Stand speichern – nur auf der zuletzt gesehenen Version
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [version, daten], additionalProperties: false, properties: { version: { type: integer, minimum: 0 }, daten: { type: string } } } } } }
+      responses:
+        "200": { description: Gespeichert, neue Version }
+        "402": { description: Amtlos Pro nötig }
+        "404": { description: Noch nicht eingerichtet }
+        "409": { description: Inzwischen geändert – erst holen und zusammenführen }
+        "422": { $ref: "#/components/responses/Eingabefehler" }
+    delete:
+      tags: [Synchronisation]
+      summary: Synchronisation beenden – alles auf dem Server löschen
+      responses:
+        "204": { description: Gelöscht }
+
+  /v1/tresor/schluessel:
+    put:
+      tags: [Synchronisation]
+      summary: Neu verschlüsselten Sync-Schlüssel speichern (Sync-Passwort geändert)
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [schluessel], additionalProperties: false, properties: { schluessel: { type: string } } } } } }
+      responses:
+        "204": { description: Gespeichert }
+        "404": { description: Noch nicht eingerichtet }
+        "422": { $ref: "#/components/responses/Eingabefehler" }
+
+  /v1/tresor/dateien:
+    get:
+      tags: [Synchronisation]
+      summary: Namen der synchronisierten Belegdateien
+      responses:
+        "200": { description: OK }
+
+  /v1/tresor/dateien/{name}:
+    get:
+      tags: [Synchronisation]
+      summary: Verschlüsselte Belegdatei holen
+      parameters: [{ name: name, in: path, required: true, schema: { type: string } }]
+      responses:
+        "200": { description: OK }
+        "404": { description: Nicht gefunden }
+    put:
+      tags: [Synchronisation]
+      summary: Verschlüsselte Belegdatei speichern (Name unveränderlich)
+      parameters: [{ name: name, in: path, required: true, schema: { type: string } }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [daten], additionalProperties: false, properties: { daten: { type: string } } } } } }
+      responses:
+        "204": { description: Gespeichert }
+        "402": { description: Amtlos Pro nötig }
         "422": { $ref: "#/components/responses/Eingabefehler" }
 
   /v1/dev/token:

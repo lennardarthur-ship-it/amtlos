@@ -1,5 +1,6 @@
 import { Linking, Share, View } from "react-native";
-import { ANBIETER, DATENSCHUTZ, LINKS } from "../rechtliches";
+import { ANBIETER, LINKS, datenschutzAbschnitte } from "../rechtliches";
+import { syncAngeboten } from "../konto/konfig";
 import { T as TEXT } from "../texte";
 import { Hinweis, Karte, Symbol, T, Zeile } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
@@ -37,7 +38,7 @@ export function DatenschutzSeite() {
   return (
     <Unterseite titel={TEXT.datenschutz}>
       <Inhalt>
-        {DATENSCHUTZ.abschnitte.map((a) => (
+        {datenschutzAbschnitte(syncAngeboten).map((a) => (
           <View key={a.titel} style={{ marginBottom: 18 }}>
             <T fett accessibilityRole="header">{a.titel}</T>
             <T v="klein" stil={{ marginTop: 4 }}>{a.text}</T>

@@ -20,6 +20,8 @@ import { CloudZeile, SicherungSeite, WiederherstellenSeite } from "./Sicherung";
 import { ProZeile, useProSperre } from "./Pro";
 import { UeberGruppe } from "./Recht";
 import { SteuerberatungSeite } from "./Steuerberatung";
+import { KontoZeile } from "./Konto";
+import { syncAngeboten } from "../konto/konfig";
 
 /** Eine gespeicherte Person bearbeiten (E-124). Eine neue Person ohne Namen verschwindet beim Verlassen wieder. */
 function PersonSeite({ art, id, neu }: { art: PersonenArt; id: string; neu?: boolean }) {
@@ -318,8 +320,9 @@ export function Betrieb() {
           })}
         </Karte>
       </Gruppe>
-      <Gruppe titel={TEXT.daten_titel} fuss={TEXT.daten_text}>
+      <Gruppe titel={TEXT.daten_titel} fuss={syncAngeboten ? TEXT.daten_text_sync : TEXT.daten_text}>
         <Datenschutz />
+        <KontoZeile />
         <CloudZeile />
         <T v="klein" leise stil={{ marginLeft: 4, marginBottom: 8 }}>{TEXT.letzte_sicherung(z.stand.letzteSicherung ? datumKurz(z.stand.letzteSicherung) : null)}</T>
         <Knopf ton symbol="lock" text={TEXT.sichern} onPress={() => nav.oeffnen("sicherung", () => <SicherungSeite />, true)} />

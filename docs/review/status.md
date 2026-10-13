@@ -87,5 +87,6 @@ Das Review wurde am Stand vor E-124 erstellt. Antworten von Frida vom 12.10. (We
 | Wachstum aus dem Produkt | **Gebaut** | Bewertungsbitte, Weiterempfehlen. „Erstellt mit Amtlos“ bewusst nicht (Domain fehlt, Dokumente bleiben werbefrei). |
 | Landingpage | **Gebaut** | apps/website, Mini-Check mit Katalogzahlen. |
 | Betriebs-Abo, Stufe 1 | **Gebaut** | E-133: E-Rechnungen empfangen, Belege, Vorsteuer und EÜR aus Daten, Steuerberater-Paket mit DATEV-Stapel (fachlich offen: T-79). |
+| Konto und Synchronisation | **Gebaut** | E-134: Ende-zu-Ende-verschlüsselt zwischen Geräten, Konto löschen in der App, Pro-Funktion; an, sobald ein Server und ein Identity-Provider betrieben werden (offen: T-80). |
 | Wachstumsplan | **Erstellt** | Markt, Wettbewerb, Preis, Phasen, Kennzahlen, Risiken, Schritte – mit Quellen. |
 | Messung | Teilweise | RevenueCat und App Store Connect; eigene Nutzungsdaten nur mit Einwilligung und Server (später). |
