@@ -82,7 +82,7 @@ async function oeffnen(g) {
 
 try {
   const a = await geraet("A", { version: 1, betrieb: { name: "Salon Sync", ort: "München" }, kunden: [{ id: "ka", name: "Kim von A", geaendert: jetzt }], proTest: true, zeiten: { betrieb: jetzt } });
-  pruefe(await a.sichtbar("Aus – deine Daten liegen nur auf diesem Gerät"), "Zeile „Synchronisation“ fehlt unter „Mein Betrieb“");
+  pruefe(await a.warteAuf("Aus – deine Daten liegen nur auf diesem Gerät"), "Zeile „Synchronisation“ fehlt unter „Mein Betrieb“");
   await a.foto("betrieb-zeile");
   await oeffnen(a);
   pruefe(await a.sichtbar("Ende-zu-Ende-verschlüsselt"), "Hinweis zur Verschlüsselung fehlt");

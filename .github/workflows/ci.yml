@@ -66,7 +66,8 @@ jobs:
         run: |
           cd apps/mobile
           CI=1 npx expo export --platform web --output-dir /tmp/web
-          CI=1 EXPO_PUBLIC_API_URL=http://localhost:3001 npx expo export --platform web --output-dir /tmp/web-sync
+          CI=1 EXPO_PUBLIC_API_URL=http://localhost:3001 npx expo export --platform web --clear --output-dir /tmp/web-sync
+          grep -q "localhost:3001" /tmp/web-sync/_expo/static/js/web/*.js
       - name: Rundgang hell, dunkel, Dokumente, Synchronisation
         run: |
           set -o pipefail
