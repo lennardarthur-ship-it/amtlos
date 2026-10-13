@@ -3,14 +3,30 @@
  * Sicherungen im iCloud-Drive-Ordner „Amtlos“ ab. In Expo Go fehlt das native Modul – dann ist die Funktion
  * unsichtbar. Bibliothek: react-native-cloud-storage (iCloud Documents, Config-Plugin in app.json).
  */
-import { CloudStorage, CloudStorageScope } from "react-native-cloud-storage";
+import type * as Bibliothek from "react-native-cloud-storage";
+
+type Lib = typeof Bibliothek;
+let geladen: Lib | null | undefined;
+/** Erst bei Bedarf laden – in Expo Go fehlt das native Modul, dann bleibt die Funktion aus, statt die App zu stören. */
+function lib(): Lib | null {
+  if (geladen === undefined) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      geladen = require("react-native-cloud-storage") as Lib;
+    } catch {
+      geladen = null;
+    }
+  }
+  return geladen;
+}
 
 const ORDNER = "/Amtlos";
 export const AKTUELL = `${ORDNER}/Amtlos-Sicherung-aktuell.amtlos`;
 
 export async function cloudVerfuegbar(): Promise<boolean> {
   try {
-    return await CloudStorage.isCloudAvailable();
+    const l = lib();
+    return l ? await l.CloudStorage.isCloudAvailable() : false;
   } catch {
     return false;
   }
@@ -27,6 +43,9 @@ export function kalenderwoche(d: Date): string {
 }
 
 export async function cloudSchreiben(text: string, jetzt = new Date()): Promise<void> {
+  const l = lib();
+  if (!l) throw new Error("iCloud nicht verfügbar");
+  const { CloudStorage, CloudStorageScope } = l;
   if (!(await CloudStorage.exists(ORDNER, CloudStorageScope.Documents))) await CloudStorage.mkdir(ORDNER, CloudStorageScope.Documents);
   await CloudStorage.writeFile(AKTUELL, text, CloudStorageScope.Documents);
   await CloudStorage.writeFile(`${ORDNER}/Amtlos-Sicherung-${kalenderwoche(jetzt)}.amtlos`, text, CloudStorageScope.Documents);
@@ -35,6 +54,9 @@ export async function cloudSchreiben(text: string, jetzt = new Date()): Promise<
 /** Letzte Sicherung aus iCloud (oder null). */
 export async function cloudLesen(): Promise<string | null> {
   try {
+    const l = lib();
+    if (!l) return null;
+    const { CloudStorage, CloudStorageScope } = l;
     if (!(await CloudStorage.exists(AKTUELL, CloudStorageScope.Documents))) return null;
     return await CloudStorage.readFile(AKTUELL, CloudStorageScope.Documents);
   } catch {
