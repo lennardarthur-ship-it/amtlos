@@ -18,7 +18,8 @@
     "lint": "eslint src test"
   },
   "dependencies": {
-    "@amtlos/fristen": "workspace:*"
+    "@amtlos/fristen": "workspace:*",
+    "qrcode-generator": "2.0.4"
   },
   "files": [
     "dist"

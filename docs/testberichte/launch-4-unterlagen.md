@@ -146,3 +146,16 @@ Auf dem iPhone noch zu prüfen: Erlaubnisdialog und Zustellung der Erinnerungen 
 | Alle 33 Vorlagen durchgeklickt, iOS-Bündel | ohne Seitenfehler, gebaut (5,4 MB inkl. Schriften) |
 
 Auf dem iPhone noch zu prüfen: Face ID in Expo Go, Logo aus den Fotos, PDF-Druck mit den Rändern je Gestalt (expo-print), Verschlüsselung beim ersten Start mit vorhandenen Daten.
+
+## Nachtrag: Dokumente neu gesetzt (E-130)
+
+| Prüfung | Ergebnis |
+|---|---|
+| Alle 33 Vorlagen plus lange Rechnung (34 Positionen, 2 Seiten) und Storno mit zwei Betrieben (Salon mit Logo und Hausfarbe, GmbH) als Vorschau-Bild und Chromium-PDF, Kontaktbögen durchgesehen | Sichtprüfung ohne Befund nach drei Korrekturrunden (NachwG-Nummerierung, Randspalte im VVT, Aushang ohne Nummern, Querformat volle Breite, Grußformel bleibt beim Dank) |
+| Mehrseitige PDFs (Rechnung, Gefährdungsbeurteilung, Verfahrensdokumentation, VVT) mit gestempelter Fußzeile und Kopfzeile ab Seite 2, Tabellenköpfe wiederholt | grün |
+| GiroCode: Nutzdaten (BCD/002/1/SCT, Name, IBAN, EUR-Betrag, Verwendungszweck) aus dem gerenderten PDF mit zbar dekodiert | byteweise richtig |
+| Ohne IBAN: kein GiroCode, stattdessen „Zahlbar innerhalb von 14 Tagen“ | grün |
+| Fachlogik-Tests (neu: gestaltung.test.ts) / App-Tests / Lint / Typecheck / volle Pipeline mit Datenbank | 32 / 38 grün, 42 Aufgaben grün |
+| Rundgang hell und dunkel, alle 33 Vorlagen durchgeklickt, iOS-Bündel | ohne Befunde, ohne Seitenfehler, gebaut (5,4 MB) |
+
+Auf dem iPhone noch zu prüfen: Druck mit den Rändern je Gestalt (expo-print), GiroCode-Scan mit einer Banking-App, Fensterkuvert (T-75).

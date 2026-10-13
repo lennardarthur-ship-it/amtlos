@@ -97,6 +97,11 @@ export async function fusszeileStempeln(pdf: string | Uint8Array, f: FussAngaben
       if (seiten.length > 1) {
         const t = `Seite ${i + 1} von ${seiten.length}`;
         seite.drawText(t, { x: rechts - normal.widthOfTextAtSize(t, 7.2), y: 26 * MM, size: 7.2, font: normal, color: grau });
+        // Folgeseiten: Dokumentname oben rechts, damit lose Blätter zuzuordnen sind
+        if (i > 0) {
+          const kopf = kuerzen(darstellbar(f.links.split(" · ").slice(1).join(" · ") || f.links, eigen), normal, 7.2, (rechts - links) * 0.6);
+          seite.drawText(kopf, { x: rechts - normal.widthOfTextAtSize(kopf, 7.2), y: height - 9 * MM, size: 7.2, font: normal, color: grau });
+        }
       }
       return;
     }

@@ -4,7 +4,7 @@
  * zur Belegablage (AWV) und zum ersetzenden Scannen (BStBK/DStV). Fachlich zu prüfen (T-54).
  */
 import { GOBD } from "./bausteine.js";
-import { abschnitt, absatz, angaben, auswahl, datumDe, dokument, esc, ja, liste, punkte, tabelle, text, unterschriften, zelle, zeilen } from "./html.js";
+import { abschnitte, absatz, angaben, auswahl, datumDe, dokument, esc, ja, liste, punkte, tabelle, text, unterschriften, zelle, zeilen } from "./html.js";
 import type { Option, Vorlage } from "./typen.js";
 
 const opt = (l: string[]): Option[] => l.map((t) => ({ wert: t, text: t }));
@@ -102,27 +102,31 @@ export const verfahrensdokumentation: Vorlage = {
       unter: "zur ordnungsmäßigen Führung und Aufbewahrung von Büchern, Aufzeichnungen und Unterlagen in elektronischer Form (GoBD)",
       meta: `Stand: ${datumDe(text(d, "stand"))}\nVersion: ${text(d, "version")}\nVerantwortlich: ${text(d, "verantwortlich")}`,
       inhalt:
-        abschnitt("Allgemeine Beschreibung", angaben([["Betrieb", b.name], ["Tätigkeit und Organisation", text(d, "organisation")], ["Steuerberatung", text(d, "steuerberatung") || null], ["Verantwortlich", text(d, "verantwortlich")]])) +
-        abschnitt(
-          "Eingesetzte Programme und Geräte",
-          systeme.length ? tabelle(["Programm / Gerät", "Wofür", "Version / seit"], systeme.map((x) => [zelle(text(x, "name")), zelle(text(x, "zweck")), zelle(text(x, "version"))]), { breiten: ["38%", "38%", "24%"] }) : absatz(""),
-        ) +
-        abschnitt(
-          "Anwenderdokumentation: Belegeingang, Erfassung und Ablage",
-          `<h3>Eingang der Belege</h3>${l("belegeingang")}<h3>Art der Belegablage</h3>${l("belegart")}<h3>Ablage</h3>${l("ablage")}<h3>Erfassung, Prüfung und Verbuchung</h3>${zeilen(text(d, "erfassung"))}` +
-            (ja(d, "scannen") ? `<h3>Ersetzendes Scannen</h3>${text(d, "papier") ? `<p>${esc(text(d, "papier"))}.</p>` : ""}${zeilen(text(d, "scan_ablauf"))}` : ""),
-        ) +
-        abschnitt(
-          "Technische Systemdokumentation und Betriebsdokumentation",
-          `<h3>Datensicherung</h3><p>Die Daten werden ${esc(text(d, "sicherung_intervall") || "____")} gesichert:</p>${l("sicherung_ort")}` +
-            (ja(d, "e_rechnung") ? `<h3>E-Rechnungen</h3><p>${esc(GOBD.eRechnung)}</p>` : "") +
-            `<h3>Zugriffsrechte</h3>${zeilen(text(d, "zugriff"))}<h3>Internes Kontrollsystem</h3>${zeilen(text(d, "kontrollen"))}`,
-        ) +
-        abschnitt(
-          "Aufbewahrung und Änderungen",
-          `<p>Diese Verfahrensdokumentation wird als Organisationsunterlage aufbewahrt; Änderungen werden mit Datum festgehalten.</p>${aenderungen.length ? tabelle(["Datum", "Änderung"], aenderungen.map((x) => [datumDe(text(x, "datum")), zelle(text(x, "aenderung"))]), { breiten: ["18%", "82%"] }) : ""}`,
-        ) +
-        unterschriften(["Ort, Datum", "Unterschrift"]),
+        abschnitte([
+          { titel: "Allgemeine Beschreibung", rand: "GoBD Tz. 10.1", inhalt: angaben([["Betrieb", b.name], ["Tätigkeit und Organisation", text(d, "organisation")], ["Steuerberatung", text(d, "steuerberatung") || null], ["Verantwortlich", text(d, "verantwortlich")]]) },
+          { titel: "Eingesetzte Programme und Geräte", rand: "GoBD Tz. 10.1", inhalt: systeme.length ? tabelle(["Programm, Gerät", "Wofür", "Version, seit"], systeme.map((x) => [zelle(text(x, "name")), zelle(text(x, "zweck")), zelle(text(x, "version"))]), { breiten: ["38%", "38%", "24%"] }) : absatz("") },
+          {
+            titel: "Anwenderdokumentation: Belegeingang, Erfassung und Ablage",
+            rand: "GoBD Tz. 10.1",
+            inhalt:
+              `<h3>Eingang der Belege</h3>${l("belegeingang")}<h3>Art der Belegablage</h3>${l("belegart")}<h3>Ablage</h3>${l("ablage")}<h3>Erfassung, Prüfung und Verbuchung</h3>${zeilen(text(d, "erfassung"))}` +
+              (ja(d, "scannen") ? `<h3>Ersetzendes Scannen</h3>${text(d, "papier") ? `<p>${esc(text(d, "papier"))}.</p>` : ""}${zeilen(text(d, "scan_ablauf"))}` : ""),
+          },
+          {
+            titel: "Technische Systemdokumentation und Betriebsdokumentation",
+            rand: "GoBD Tz. 10.1",
+            inhalt:
+              `<h3>Datensicherung</h3><p>Die Daten werden ${esc(text(d, "sicherung_intervall") || "____")} gesichert:</p>${l("sicherung_ort")}` +
+              (ja(d, "e_rechnung") ? `<h3>E-Rechnungen</h3><p>${esc(GOBD.eRechnung)}</p>` : "") +
+              `<h3>Zugriffsrechte</h3>${zeilen(text(d, "zugriff"))}<h3>Internes Kontrollsystem</h3>${zeilen(text(d, "kontrollen"))}`,
+          },
+          {
+            titel: "Aufbewahrung und Änderungen",
+            rand: "GoBD Tz. 10.1, 10.2",
+            inhalt: `<p>Diese Verfahrensdokumentation wird als Organisationsunterlage aufbewahrt; Änderungen werden mit Datum festgehalten.</p>${aenderungen.length ? tabelle(["Datum", "Änderung"], aenderungen.map((x) => [datumDe(text(x, "datum")), zelle(text(x, "aenderung"))]), { breiten: ["18%", "82%"] }) : ""}`,
+          },
+        ]) +
+        unterschriften(["Unterschrift"], { ortDatum: true }),
     });
   },
 };

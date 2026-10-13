@@ -4,7 +4,7 @@
  */
 import { teilnahmeTabelle } from "./arbeitsschutz.js";
 import { MINDESTLOHN, NACHWG } from "./bausteine.js";
-import { abschnitt, absatz, angaben, anschrift, auswahl, cent, datumDe, dokument, euro, ja, liste, punkte, text, unterschriften, zahl, zahlText, zeilen } from "./html.js";
+import { abschnitt, absatz, angaben, anschrift, auswahl, cent, datumDe, dokument, euro, ja, liste, parteien, punkte, text, unterschriften, zahl, zahlText, zeilen } from "./html.js";
 import { optionen } from "./konstanten.js";
 import type { Daten, Vorlage } from "./typen.js";
 
@@ -146,15 +146,19 @@ export const nachweisArbeitsbedingungen: Vorlage = {
       ["14. Kündigung", kuendigungText(d)],
       ["15. Tarifverträge, Vereinbarungen", text(d, "kollektiv") === "ja" ? `${KOLLEKTIV.ja} ${text(d, "kollektiv_text")}` : KOLLEKTIV.keine!],
     ];
+    // Vertrag: Parteien in zwei Spalten, dann die 15 Punkte des § 2 Abs. 1 NachwG mit Randnummern
+    const punkteNw = zeilenNw.slice(1).map(([t, w]) => abschnitt(t.replace(/^\d+\.\s*/, ""), absatz(w ?? "")));
     return dokument({
       titel: "Nachweis der wesentlichen Arbeitsbedingungen",
       betrieb: b,
-      unter: text(d, "name") ? `für ${text(d, "name")}` : undefined,
-      meta: `Beschäftigte Person: ${text(d, "name")}\nBeginn: ${datumDe(text(d, "beginn"))}\nAusgestellt: ${datumDe(text(d, "ausgestellt_am"))}`,
+      nummerierung: "zahl",
+      unter: "Niederschrift nach § 2 Abs. 1 Nachweisgesetz",
+      meta: `Beginn: ${datumDe(text(d, "beginn"))}\nAusgestellt: ${datumDe(text(d, "ausgestellt_am"))}`,
       inhalt:
-        `<p class="klein">Niederschrift der wesentlichen Vertragsbedingungen nach § 2 Abs. 1 Nachweisgesetz. Sie ersetzt keinen Arbeitsvertrag.</p>` +
-        abschnitt("Wesentliche Arbeitsbedingungen", angaben(zeilenNw), "ohne-nummer") +
-        unterschriften(["Ort, Datum · Arbeitgeber/in", "Erhalten am · beschäftigte Person"]),
+        `<p class="klein">Diese Niederschrift hält die wesentlichen Vertragsbedingungen nach § 2 Abs. 1 Nachweisgesetz fest. Sie ersetzt keinen Arbeitsvertrag; bestehende vertragliche Vereinbarungen gelten weiter.</p>` +
+        abschnitt("Vertragsparteien", parteien({ rolle: "Arbeitgeber", name: b.name, anschrift: anschrift(b) }, { rolle: "beschäftigte Person", name: text(d, "name"), anschrift: text(d, "anschrift") })) +
+        punkteNw.join("") +
+        unterschriften(["Arbeitgeber/in", "Beschäftigte Person (Erhalt bestätigt)"], { ortDatum: true }),
     });
   },
 };

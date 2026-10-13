@@ -619,6 +619,21 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
   - Eingebettete Schriften „Amtlos Sans“ und „Amtlos Serif“: Teilmengen von Source Sans 3 und Source Serif 4, OFL 1.1, wegen des reservierten Namens umbenannt. Damit sieht das PDF auf jedem Gerät gleich aus.
 - **ELSTER:** nicht gebaut. Konzept mit beiden Wegen (Zertifikat des Nutzers oder Übermittlung im Auftrag), Architektur und Aufwand in docs/08-elster-eric.md. Voraussetzung: K1 und J-1.
 
+### E-130 · Jede Vorlage neu gesetzt: sechs Gestalten mit eigenem Aufbau, Randspalte, GiroCode, Kennzahlen
+- **Datum:** 2026-10-13 · **Status:** angenommen (Gründer nach R4: „alles neu gestalten, perfekt und maximal überlegt“; E-129 hatte nur die Gestalten eingeführt, die Vorlagen selbst waren noch gleich gebaut)
+- **Leitbild:** nicht die Software-Oberfläche, sondern das gut gemachte deutsche Amts- und Kanzleidokument – Vordruck mit Feldnummern, Gesetzestext mit Randnummern, DGUV-Betriebsanweisung, Geschäftsbrief nach DIN 5008. Vollständig beschrieben in docs/10-dokumente-gestaltung.md (Zwecke, Farben, Schriftskala, Seitenregeln, „was absichtlich fehlt“).
+- **Das eine prägende Element – die Randspalte:** Bei Nachweis, Vertrag und Handbuch stehen Abschnittsnummer und Rechtsgrundlage links neben dem Text in einer 24 mm breiten Spalte (`h2::before`, `.rand`, `h3 .nr`). Sonst nichts Auffälliges: keine Karten, Schatten, Symbole, Verläufe. Aushänge und Querformat nutzen die volle Breite.
+- **Bausteine in `html.ts`** statt freiem HTML je Vorlage: `brief` (DIN 5008 Form B), `parteien` (zwei Spalten), `abschnitt`/`abschnitte` (mit `rand`, Inhaltsübersicht ab fünf Abschnitten), `eintrag` (nummerierte Einträge), `felder` (Feldraster mit Feldnummern), `kennzahlen` (Kz-Zeilen mit Betrag), `uebertragung` (Vermerkzeile „Übermittelt am / Transferticket / Gezahlt am“), `nachsatz`, `tabelle` mit `summe` und `zahlen`, `unterschriften` mit Ort/Datum, `dokument` mit `nummerierung: "paragraph" | "zahl"`, `band`, `klasse`.
+- **Je Vorlage:**
+  - Rechnung/Storno: Brief mit Anrede, Einleitungssatz, Positionen, Zahlungsblock mit **GiroCode** (EPC069-12 v002, UTF-8, Fehlerkorrektur M; `packages/fachlogik/src/girocode.ts`, `qrcode-generator`), Grußformel; ohne IBAN stattdessen „Zahlbar innerhalb von 14 Tagen“. Folgeseiten mit kleiner Kopfzeile (Dokumentname).
+  - USt-Voranmeldung: Kennzahlen 81, 86, 66, 83 wie im Vordruck USt 1 A, Umsätze ohne USt mit Hinweis (gehören in eigene Kz, T-70), Übertragungsvermerk. EÜR: Kennzahlen Ergebnis plus Tabellen mit Summen. Bilanz: zwei Spalten Aktiva/Passiva. Kassenmeldung, Gewerbeanmeldung, Handelsregister, Transparenzregister: Feldraster mit Übertragungsvermerk.
+  - Nachweis der Arbeitsbedingungen: Nummerierung 1–15 in der Reihenfolge von § 2 Abs. 1 NachwG (1 = Vertragsparteien in zwei Spalten), Unterschrift „Erhalt bestätigt“. AVV: Parteien, Hauptvertrag-Satz. Datenschutzerklärung, Impressum, Datenschutzinformation, Verfahrensdokumentation: Lesetext in Serife mit Randnummern (Verfahrensdokumentation mit „GoBD Tz. 10.1/10.2“ am Rand, bewusst Abschnittsnummern statt Rn).
+  - Verzeichnis der Verarbeitungen: Einträge 2.1, 2.2 … mit „Art. 30 Abs. 1 lit. b–g“ am Rand; Datenpanne: Abschnitte mit „Art. 33 Abs. 3 lit. a … d“.
+  - Betriebsanweisung Gefahrstoffe: Aufbau der DGUV Information 211-010 (Titelband, Stoff-Kasten, Felder Gefahren/Schutz/Verhalten/Erste Hilfe/Entsorgung, Notruf), oranges Band `#e0640c` als übliche Kennfarbe, ohne Piktogramme (Lizenz- und Deutungsfragen).
+  - Arbeitszeitnachweis, Kassenbuch, Lohnkonto: Summenzeile abgesetzt; Personalfragebogen: Feldraster mit Unterschrift.
+- **Prüfstand:** alle 33 Vorlagen plus lange Rechnung (34 Positionen) und Storno mit zwei realistischen Betrieben (Salon mit Logo, GmbH) als Vorschau-Bild und Chromium-PDF gerendert, gestempelte Fußzeilen/Kopfzeilen über `fusszeile.ts` geprüft, GiroCode mit zbar dekodiert (Nutzdaten byteweise richtig). Tests: `packages/fachlogik/test/gestaltung.test.ts`.
+- **Noch nicht:** Angebot, Lieferschein, Mahnung; ZUGFeRD (PDF/A-3 mit eingebettetem XML); Druckprobe auf dem iPhone (expo-print mit Rändern je Gestalt); Fensterkuvert-Probe (T-75).
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

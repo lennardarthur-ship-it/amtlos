@@ -3,7 +3,7 @@
  * elektrische Geräte (E-121, E-123). Vorschläge und Bausteine aus der Recherche (bausteine.ts, Quellen dort).
  */
 import { BA_BAUSTEINE, ELEKTRO_FRISTEN, GEFAEHRDUNGEN, GEFAHRSTOFF_ANGABEN, MUTTERSCHUTZ, UNTERWEISUNGSTHEMEN } from "./bausteine.js";
-import { abschnitt, absatz, angaben, auswahl, datumDe, dokument, esc, ja, liste, plusMonate, punkte, tabelle, text, unterschriften, zelle, zellePunkte, zeilen } from "./html.js";
+import { LINIE, nachsatz, abschnitt, absatz, angaben, auswahl, datumDe, dokument, esc, ja, liste, plusMonate, punkte, tabelle, text, unterschriften, zelle, zellePunkte, zeilen } from "./html.js";
 import { GEFAEHRDUNGSFAKTOREN, RISIKO_STUFEN, optionen } from "./konstanten.js";
 import type { Daten, Eintrag, Vorlage } from "./typen.js";
 
@@ -178,7 +178,7 @@ export const unterweisung: Vorlage = {
         abschnitt("Angaben", angaben([["Bezeichnung", text(d, "thema")], ["Anlass", ANLASS[text(d, "anlass")] ?? ""], ["Datum", datumDe(text(d, "datum"))], ["Dauer", text(d, "dauer") || null], ["Durchgeführt von", text(d, "durchgefuehrt_von")]])) +
         abschnitt("Inhalte der Unterweisung", (themen.length ? punkte(themen) : absatz("")) + (text(d, "inhalt") ? `<h3>Betriebsspezifische Ergänzungen</h3>${zeilen(text(d, "inhalt"))}` : "")) +
         abschnitt("Teilnahme", `<p>Mit meiner Unterschrift bestätige ich, dass ich an der Unterweisung teilgenommen und die Inhalte verstanden habe.</p>${teilnahmeTabelle(liste(d, "teilnehmer"))}`) +
-        `<p class="klein" style="margin-top:4mm">Die Unterweisung ist mindestens einmal jährlich zu wiederholen (§ 4 Abs. 1 DGUV Vorschrift 1)${naechste ? ` – nächster Termin spätestens am ${naechste}` : ""}.</p>` +
+        nachsatz(`Die Unterweisung ist mindestens einmal jährlich zu wiederholen (§ 4 Abs. 1 DGUV Vorschrift 1)${naechste ? `, nächster Termin spätestens am ${naechste}` : ""}.`) +
         unterschriften(["Ort, Datum", "Unterschrift der unterweisenden Person"]),
     });
   },
@@ -235,8 +235,8 @@ export const gefahrstoffverzeichnis: Vorlage = {
       quer: true,
       meta: `Stand: ${datumDe(text(d, "stand"))}\nVerantwortlich: ${text(d, "verantwortlich")}\nAnzahl Gefahrstoffe: ${s.length}`,
       inhalt:
-        `<p class="klein">Verzeichnis nach § 6 Abs. 12 GefStoffV mit ${GEFAHRSTOFF_ANGABEN.length} Pflichtangaben: ${esc(GEFAHRSTOFF_ANGABEN.join("; "))}.</p>` +
-        tabelle(["Bezeichnung / Hersteller", "Einstufung / gefährliche Eigenschaften", "Mengenbereich", "Arbeitsbereiche", "Verwendung", "Sicherheitsdatenblatt"], zeilenHtml, { breiten: ["20%", "22%", "12%", "18%", "14%", "14%"], mindestens: s.length ? 0 : 6 }),
+        tabelle(["Bezeichnung / Hersteller", "Einstufung / gefährliche Eigenschaften", "Mengenbereich", "Arbeitsbereiche", "Verwendung", "Sicherheitsdatenblatt"], zeilenHtml, { breiten: ["20%", "22%", "12%", "18%", "14%", "14%"], mindestens: s.length ? 0 : 6 }) +
+        nachsatz(`Verzeichnis nach § 6 Abs. 12 GefStoffV mit ${GEFAHRSTOFF_ANGABEN.length} Pflichtangaben: ${GEFAHRSTOFF_ANGABEN.join("; ")}.`),
     });
   },
 };
@@ -281,16 +281,20 @@ export const betriebsanweisung: Vorlage = {
     },
   ],
   html(d: Daten, b) {
-    const kaesten = BA_TEILE.map(
-      (t) => `<section class="kasten"><h2>${esc(t.label)}</h2><div class="inhalt">${zeilen(text(d, t.id))}${t.id === "gefahrfall" && text(d, "notruf") ? `<p><strong>${esc(text(d, "notruf"))}</strong></p>` : ""}</div></section>`,
-    ).join("");
+    // Aufbau wie das Muster der DGUV Information 211-010: Titelband mit Nummer, Bereich und Stoff, dann die Abschnitte nach TRGS 555
+    const kaesten = BA_TEILE.map((t) => `<section class="kasten"><h2>${esc(t.label)}</h2><div class="inhalt">${zeilen(text(d, t.id))}</div></section>`).join("");
     return dokument({
       titel: "Betriebsanweisung",
       betrieb: b,
-      unter: text(d, "stoff") || undefined,
-      meta: `Nummer: ${text(d, "nummer")}\nArbeitsbereich: ${text(d, "arbeitsbereich")}\nStand: ${datumDe(text(d, "datum"))}`,
+      gestalt: "aushang",
+      klasse: "ba",
+      band: "#e0640c",
+      meta: `Stand: ${datumDe(text(d, "datum"))}`,
       inhalt:
-        `<section class="kasten"><h2>Arbeitsbereich, Arbeitsplatz, Tätigkeit · Gefahrstoff</h2><div class="inhalt">${angaben([["Arbeitsbereich / Tätigkeit", text(d, "arbeitsbereich")], ["Gefahrstoff", text(d, "stoff")]])}</div></section>${kaesten}` +
+        `<div class="titelband"><div class="t">Betriebsanweisung<small>gemäß § 14 GefStoffV (TRGS 555)</small></div><div class="n">${text(d, "nummer") ? `<span>Nummer<b>${esc(text(d, "nummer"))}</b></span>` : ""}<span>Stand<b>${datumDe(text(d, "datum")) || "&nbsp;"}</b></span></div></div>` +
+        `<section class="kasten stoff"><h2>Arbeitsbereich, Arbeitsplatz, Tätigkeit · Gefahrstoffbezeichnung</h2><div class="inhalt"><div><dt>Arbeitsbereich, Arbeitsplatz, Tätigkeit</dt><dd>${text(d, "arbeitsbereich") ? esc(text(d, "arbeitsbereich")) : LINIE}</dd></div><div><dt>Gefahrstoff</dt><dd>${text(d, "stoff") ? esc(text(d, "stoff")) : LINIE}</dd></div></div></section>` +
+        kaesten +
+        (text(d, "notruf") ? `<div class="notruf">${esc(text(d, "notruf"))}</div>` : "") +
         unterschriften([`Freigegeben: ${text(d, "erstellt_von")}`, "Datum, Unterschrift"]),
     });
   },
@@ -353,12 +357,12 @@ export const elektroPruefung: Vorlage = {
       meta: `Prüfdatum: ${datumDe(text(d, "datum"))}\nGeprüft von: ${text(d, "pruefer")}\nArt der Prüfung: ${text(d, "pruefart")}`,
       inhalt:
         angaben([["Umfang der Prüfung", auswahl(d, "umfang").join(", ")], ["Prüfgrundlage", text(d, "norm") || null], ["Prüfgerät", text(d, "messgeraet") || null]]) +
-        (einsatz ? `<p class="klein">Richtwert nach DGUV Vorschrift 3 (${esc(einsatz.quelle ?? "")}): ${esc(einsatz.text)}</p>` : "") +
-        `<section class="abschnitt">${tabelle(
+        `<section class="abschnitt ohne-nummer">${tabelle(
           ["Gerät", "Hersteller / Typ", "Inventar-Nr.", "Standort", "Ergebnis", "Nächste Prüfung"],
           g.map((x) => [`<strong>${zelle(text(x, "bezeichnung"))}</strong>`, zelle(text(x, "typ")), zelle(text(x, "inventar")), zelle(text(x, "standort")), text(x, "ergebnis") === "maengel" ? `<strong>Mängel:</strong> ${zelle(text(x, "maengel"))}` : "bestanden", datumDe(text(x, "naechste"))]),
           { breiten: ["20%", "18%", "12%", "15%", "20%", "15%"], leerzeilen: ja(d, "leerzeilen") ? 12 : 0, hoch: ja(d, "leerzeilen") },
         )}</section>` +
+        (einsatz ? nachsatz(`Richtwert für die Prüffrist nach DGUV Vorschrift 3 (${einsatz.quelle ?? ""}): ${einsatz.text}`) : "") +
         unterschriften(["Ort, Datum", "Unterschrift der prüfenden Person"]),
     });
   },

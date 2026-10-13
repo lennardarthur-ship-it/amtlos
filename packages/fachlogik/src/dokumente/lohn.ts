@@ -2,7 +2,7 @@
  * Personal (E-121): Arbeitszeitnachweis, Lohnkonto, Daten für die Sozialversicherungsmeldung. Amtlos rechnet keine
  * Lohnsteuer und keine Beiträge – die Beträge kommen aus der Lohnabrechnung. Gliederungen fachlich zu prüfen (T-61).
  */
-import { abschnitt, absatz, angaben, cent, datumDe, dokument, esc, euro, ja, liste, summe, tabelle, text, unterschriften, zelle } from "./html.js";
+import { abschnitt, absatz, angaben, cent, datumDe, dokument, esc, euro, felder, ja, liste, summe, tabelle, text, unterschriften, zelle } from "./html.js";
 import { MINIJOB, SV } from "./bausteine.js";
 import type { Daten, Eintrag, Vorlage } from "./typen.js";
 
@@ -70,15 +70,15 @@ export const arbeitszeitnachweis: Vorlage = {
     return dokument({
       titel: "Arbeitszeitnachweis",
       betrieb: b,
-      unter: [text(d, "name"), text(d, "monat")].filter(Boolean).join(" · ") || undefined,
+      unter: [text(d, "name"), text(d, "monat")].filter(Boolean).join(", ") || undefined,
+      meta: `Beschäftigte Person: ${text(d, "name")}\nMonat: ${text(d, "monat")}`,
       inhalt:
         tabelle(
           ["Datum", "Beginn", "Ende", "Pause (Min.)", "Dauer", "Bemerkung"],
           z.map(({ x, min }) => [datumDe(text(x, "datum")), esc(text(x, "beginn")), esc(text(x, "ende")), esc(text(x, "pause")), min === null ? "" : stunden(min), zelle(text(x, "bemerkung"))]),
-          { breiten: ["15%", "12%", "12%", "13%", "13%", "35%"], leerzeilen: ja(d, "leerzeilen") ? 31 - z.length : 0, hoch: ja(d, "leerzeilen") },
+          { breiten: ["15%", "12%", "12%", "13%", "13%", "35%"], leerzeilen: ja(d, "leerzeilen") ? 31 - z.length : 0, hoch: ja(d, "leerzeilen"), zahlen: [3, 4], summe: ["<strong>Summe</strong>", "", "", "", `<strong>${stunden(gesamt)}</strong>`, ""] },
         ) +
-        angaben([["Summe", stunden(gesamt)]]) +
-        `<p class="klein" style="margin-top:3mm">Für Minijobs und die Branchen nach § 2a SchwarzArbG (u. a. Gastronomie, Friseur- und Kosmetikgewerbe, Bau): Beginn, Ende und Dauer der täglichen Arbeitszeit spätestens bis zum Ablauf des siebten auf den Arbeitstag folgenden Kalendertages aufzeichnen und mindestens zwei Jahre aufbewahren (§ 17 Abs. 1 MiLoG).</p>` +
+        `<p class="nachsatz">Für Minijobs und die Branchen nach § 2a SchwarzArbG (u. a. Gastronomie, Friseur- und Kosmetikgewerbe, Bau): Beginn, Ende und Dauer der täglichen Arbeitszeit spätestens bis zum Ablauf des siebten auf den Arbeitstag folgenden Kalendertages aufzeichnen und mindestens zwei Jahre aufbewahren (§ 17 Abs. 1 MiLoG).</p>` +
         unterschriften(["Unterschrift beschäftigte Person", "Unterschrift Arbeitgeber/in"]),
     });
   },
@@ -242,11 +242,13 @@ export const svMeldedaten: Vorlage = {
     return dokument({
       titel: "Personalfragebogen",
       betrieb: b,
-      unter: text(d, "name") || undefined,
+      unter: text(d, "name") ? `${text(d, "name")}, Angaben für die Anmeldung zur Sozialversicherung` : "Angaben für die Anmeldung zur Sozialversicherung",
+      meta: `Beginn: ${datumDe(text(d, "beginn"))}`,
       inhalt:
+        `<p class="klein">Mit diesen Angaben meldet der Arbeitgeber bzw. das Lohnbüro die Beschäftigung bei der Krankenkasse an (DEÜV). Die Schlüssel für Personengruppe, Vertragsform und Abschlüsse sind die des Meldeverfahrens.</p>` +
         abschnitt(
           "Person",
-          angaben([
+          felder([
             ["Name", text(d, "name")],
             ["Geburtsname", text(d, "geburtsname") || null],
             ["Geburtsdatum", datumDe(text(d, "geburtsdatum"))],
@@ -261,7 +263,7 @@ export const svMeldedaten: Vorlage = {
         ) +
         abschnitt(
           "Beschäftigung",
-          angaben([
+          felder([
             ["Beginn", datumDe(text(d, "beginn"))],
             ["Art", ARTEN.find((a) => a.wert === text(d, "art"))?.text ?? ""],
             ["Wochenstunden", text(d, "stunden")],
@@ -272,10 +274,10 @@ export const svMeldedaten: Vorlage = {
             ["Schulabschluss", SV.schulabschluss.find((o) => o.wert === text(d, "schulabschluss"))?.text ?? ""],
             ["Berufsabschluss", SV.ausbildung.find((o) => o.wert === text(d, "ausbildung"))?.text ?? ""],
             ["Weitere Beschäftigungen", ja(d, "weitere") ? text(d, "weitere_welche") || "ja" : "keine"],
-          ]),
+          ], { start: 11 - (text(d, "geburtsname") ? 0 : 1) }),
         ) +
         `<p style="margin-top:6mm">Ich versichere, dass die Angaben vollständig und richtig sind, und teile Änderungen unverzüglich mit.</p>` +
-        unterschriften(["Ort, Datum", "Unterschrift beschäftigte Person"]),
+        unterschriften(["Beschäftigte Person"], { ortDatum: true }),
     });
   },
 };

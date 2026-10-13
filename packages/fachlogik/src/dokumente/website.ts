@@ -4,7 +4,7 @@
  */
 import { AVV_KLAUSELN, DSE } from "./bausteine.js";
 import { aufsichtFuer } from "./datenschutz.js";
-import { LINIE, abschnitt, angaben, anschrift, auswahl, datumDe, dokument, esc, ja, text, unterschriften, zeilen } from "./html.js";
+import { LINIE, abschnitt, abschnitte, angaben, anschrift, auswahl, datumDe, dokument, esc, ja, parteien, text, unterschriften, zeilen } from "./html.js";
 import { optionen } from "./konstanten.js";
 import type { Betrieb, Daten, Vorlage } from "./typen.js";
 
@@ -115,7 +115,7 @@ export const datenschutzerklaerungWebsite: Vorlage = {
       betrieb: b,
       unter: text(d, "website") || undefined,
       meta: `Website: ${text(d, "website")}\nStand: ${datumDe(text(d, "stand"))}`,
-      inhalt: dseTeile(d, b).map((t) => abschnitt(t.titel, alsHtml(t.text))).join(""),
+      inhalt: abschnitte(dseTeile(d, b).map((t) => ({ titel: t.titel, inhalt: alsHtml(t.text) }))),
     });
   },
 };
@@ -195,7 +195,7 @@ export const impressum: Vorlage = {
     return dokument({
       titel: "Impressum",
       betrieb: b,
-      inhalt: impressumTeile(d, b).map((t) => abschnitt(t.titel, `<p>${esc(t.text).replace(/\n/g, "<br>").replace(/\uE000/g, LINIE)}</p>`)).join(""),
+      inhalt: abschnitte(impressumTeile(d, b).map((t) => ({ titel: t.titel, inhalt: `<p>${esc(t.text).replace(/\n/g, "<br>").replace(/\uE000/g, LINIE)}</p>` }))),
     });
   },
 };
@@ -239,8 +239,6 @@ export const auftragsverarbeitung: Vorlage = {
     },
   ],
   html(d, b) {
-    const wir = [b.name, anschrift(b)].filter((x) => x.trim()).join(", ");
-    const sie = [text(d, "partner"), text(d, "partner_anschrift").replace(/\n/g, ", ")].filter(Boolean).join(", ");
     const ag = text(d, "rolle") !== "dienstleister";
     return dokument({
       titel: "Vertrag zur Auftragsverarbeitung",
@@ -248,14 +246,11 @@ export const auftragsverarbeitung: Vorlage = {
       unter: "gemäß Art. 28 Abs. 3 DSGVO",
       meta: `Auftraggeber: ${ag ? b.name : text(d, "partner")}\nAuftragnehmer: ${ag ? text(d, "partner") : b.name}`,
       inhalt:
-        abschnitt(
-          "Vertragsparteien",
-          angaben([
-            ["Verantwortlicher (Auftraggeber)", ag ? wir : sie],
-            ["Auftragsverarbeiter (Auftragnehmer)", ag ? sie : wir],
-            ["Zugrunde liegender Vertrag", text(d, "hauptvertrag")],
-          ]),
+        parteien(
+          { rolle: "Verantwortlicher, Auftraggeber", name: ag ? b.name : text(d, "partner"), anschrift: ag ? anschrift(b) : text(d, "partner_anschrift") },
+          { rolle: "Auftragsverarbeiter, Auftragnehmer", name: ag ? text(d, "partner") : b.name, anschrift: ag ? text(d, "partner_anschrift") : anschrift(b) },
         ) +
+        (text(d, "hauptvertrag") ? `<p>Dieser Vertrag ergänzt den Vertrag „${esc(text(d, "hauptvertrag"))}“ (Hauptvertrag) und regelt die Verarbeitung personenbezogener Daten im Auftrag nach Art. 28 DSGVO.</p>` : "") +
         abschnitt(
           "Gegenstand, Dauer, Art und Zweck der Verarbeitung",
           angaben([
@@ -270,7 +265,7 @@ export const auftragsverarbeitung: Vorlage = {
         abschnitt("Unterauftragsverarbeiter", zeilen(text(d, "unterauftrag"))) +
         abschnitt("Technische und organisatorische Maßnahmen", zeilen(text(d, "tom"))) +
         abschnitt("Rechte und Pflichten des Auftraggebers", "<p>Der Auftraggeber ist für die Rechtmäßigkeit der Verarbeitung verantwortlich und erteilt Weisungen in dokumentierter Form. Er ist berechtigt, die Einhaltung dieses Vertrags zu überprüfen.</p>") +
-        unterschriften([`${text(d, "ort_datum") ? `${text(d, "ort_datum")}, ` : ""}Datum · Auftraggeber`, "Datum · Auftragnehmer"]),
+        unterschriften(["Auftraggeber", "Auftragnehmer"], { ortDatum: true }),
     });
   },
 };

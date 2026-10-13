@@ -5,7 +5,7 @@
  */
 import { teilnahmeTabelle } from "./arbeitsschutz.js";
 import { ALLERGENE_UMFANG, HACCP, HAUTSCHUTZ_FRISEUR, HYGIENE, IFSG, LOSE_WARE } from "./bausteine.js";
-import { abschnitt, absatz, auswahl, datumDe, dokument, esc, ja, liste, plusMonate, punkte, tabelle, text, unterschriften, zelle } from "./html.js";
+import { abschnitt, absatz, auswahl, datumDe, dokument, esc, ja, liste, nachsatz, plusMonate, punkte, tabelle, text, unterschriften, zelle } from "./html.js";
 import { ALLERGENE, optionen } from "./konstanten.js";
 import type { Vorlage } from "./typen.js";
 
@@ -60,7 +60,7 @@ export const ifsgBelehrung: Vorlage = {
             )
           : "") +
         abschnitt("Teilnahme", `<p>Mit meiner Unterschrift bestätige ich, dass ich belehrt wurde und mir keine Tatsachen für ein Tätigkeitsverbot bekannt sind. Treten Hinderungsgründe auf, teile ich dies unverzüglich mit.</p>${teilnahmeTabelle(liste(d, "teilnehmer"), { kopf: "Erstbelehrung vom", feld: "erstbelehrung_am", datum: true })}`) +
-        `<p class="klein" style="margin-top:4mm">Die Belehrung ist nach Aufnahme der Tätigkeit und danach alle zwei Jahre zu wiederholen und zu dokumentieren (§ 43 Abs. 4 IfSG)${naechste ? ` – nächste Belehrung spätestens am ${naechste}` : ""}.</p>` +
+        nachsatz(`Die Belehrung ist nach Aufnahme der Tätigkeit und danach alle zwei Jahre zu wiederholen und zu dokumentieren (§ 43 Abs. 4 IfSG)${naechste ? `, nächste Belehrung spätestens am ${naechste}` : ""}.`) +
         unterschriften(["Ort, Datum", "Unterschrift der belehrenden Person"]),
     });
   },
@@ -112,13 +112,13 @@ export const allergenAushang: Vorlage = {
       })
       .join("");
     const legende = ja(d, "legende")
-      ? abschnitt("Die 14 Hauptallergene (Anhang II LMIV)", tabelle(["Allergen", "umfasst"], nummern.map((id, i) => [esc(ALLERGENE[id]!), esc(ALLERGENE_UMFANG[i]?.umfasst ?? "")]), { breiten: ["30%", "70%"] }))
+      ? abschnitt("Die 14 Hauptallergene nach Anhang II der LMIV", tabelle(["Allergen", "umfasst"], nummern.map((id, i) => [esc(ALLERGENE[id]!), esc(ALLERGENE_UMFANG[i]?.umfasst ?? "")]), { breiten: ["30%", "70%"], klasse: "legende" }))
       : "";
     return dokument({
       titel: "Allergene in unseren Speisen und Getränken",
       betrieb: b,
       meta: `Stand: ${datumDe(text(d, "stand"))}`,
-      inhalt: (inhalt || absatz("", "Keine Gerichte erfasst.")) + `<p style="margin-top:6mm">${esc(LOSE_HINWEIS)}</p>` + legende + `<p class="klein">${esc(LOSE_WARE.rechtsgrundlage)}</p>`,
+      inhalt: (inhalt || absatz("", "Keine Gerichte erfasst.")) + `<p style="margin-top:6mm">${esc(LOSE_HINWEIS)}</p>` + legende + nachsatz(LOSE_WARE.rechtsgrundlage),
     });
   },
 };

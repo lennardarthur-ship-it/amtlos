@@ -3,7 +3,7 @@
  * Angemeldet wird beim Gewerbeamt, über den Notar bzw. im Transparenzregister; die App übermittelt nichts.
  * Gliederungen fachlich zu prüfen (T-60).
  */
-import { abschnitt, absatz, angaben, anschrift, cent, datumDe, dokument, euro, liste, tabelle, text, unterschriften, zelle } from "./html.js";
+import { abschnitt, absatz, anschrift, cent, datumDe, dokument, euro, felder, liste, tabelle, text, uebertragung, unterschriften, zelle } from "./html.js";
 import { INTERESSE, RECHTSFORMEN } from "./bausteine.js";
 import type { Vorlage } from "./typen.js";
 
@@ -52,9 +52,10 @@ export const gewerbeanmeldung: Vorlage = {
       titel: "Gewerbeanmeldung – Datenblatt",
       betrieb: b,
       inhalt:
+        `<p class="klein">Zum Übertragen in das Formular GewA 1 bzw. das Online-Formular der Gemeinde. Die Feldnummern sind die Reihenfolge dieses Blatts, nicht die des amtlichen Vordrucks.</p>` +
         abschnitt(
           "Angaben zur Person",
-          angaben([
+          felder([
             ["Name", text(d, "name")],
             ["Geburtsname", text(d, "geburtsname") || null],
             ["Geburtsdatum", datumDe(text(d, "geburtsdatum"))],
@@ -65,19 +66,22 @@ export const gewerbeanmeldung: Vorlage = {
         ) +
         abschnitt(
           "Angaben zum Betrieb",
-          angaben([
-            ["Name des Betriebs", b.name],
-            ["Rechtsform", text(d, "rechtsform")],
-            ["Betriebsstätte", anschrift(b)],
-            ["Telefon / E-Mail", [b.telefon, b.email].filter((x) => x.trim()).join(" · ")],
-            ["Angemeldete Tätigkeit", text(d, "taetigkeit")],
-            ["Beginn", datumDe(text(d, "beginn"))],
-            ["Haupt- oder Nebenerwerb", text(d, "erwerb") === "neben" ? "Nebenerwerb" : "Haupterwerb"],
-            ["Beschäftigte", text(d, "beschaeftigte") || null],
-            ["Erlaubnis / Handwerkskarte", text(d, "erlaubnis") || null],
-          ]),
+          felder(
+            [
+              ["Name des Betriebs", b.name],
+              ["Rechtsform", text(d, "rechtsform")],
+              ["Betriebsstätte", anschrift(b)],
+              ["Telefon, E-Mail", [b.telefon, b.email].filter((x) => x.trim()).join(", ")],
+              ["Angemeldete Tätigkeit", text(d, "taetigkeit")],
+              ["Beginn der Tätigkeit", datumDe(text(d, "beginn"))],
+              ["Haupt- oder Nebenerwerb", text(d, "erwerb") === "neben" ? "Nebenerwerb" : "Haupterwerb"],
+              ["Zahl der Beschäftigten", text(d, "beschaeftigte") || null],
+              ["Erlaubnis, Handwerkskarte", text(d, "erlaubnis") || null],
+            ],
+            { start: 7 - (text(d, "geburtsname") ? 0 : 1) },
+          ),
         ) +
-        `<p style="margin-top:6mm;font-size:8.5pt;color:#4a5868">Angemeldet am: ________________ · Gewerbeamt: ______________________</p>`,
+        uebertragung(["Angemeldet am", "Gewerbeamt", "Gebühr, Aktenzeichen"]),
     });
   },
 };
@@ -116,17 +120,22 @@ export const handelsregister: Vorlage = {
       betrieb: b,
       unter: text(d, "firma") || undefined,
       inhalt:
-        angaben([
-          ["Firma", text(d, "firma")],
-          ["Rechtsform", text(d, "rechtsform")],
-          ["Sitz", text(d, "sitz")],
-          ["Geschäftsanschrift", text(d, "anschrift")],
-          ["Gegenstand", text(d, "gegenstand")],
-          ["Kapital", text(d, "kapital") ? euro(cent(text(d, "kapital")) ?? 0) : null],
-        ]) +
+        `<p class="klein">Für den Termin beim Notar: Die Anmeldung zum Handelsregister reicht der Notar elektronisch ein; dieses Blatt hält die nötigen Angaben bereit.</p>` +
+        abschnitt(
+          "Gesellschaft",
+          felder([
+            ["Firma", text(d, "firma")],
+            ["Rechtsform", text(d, "rechtsform")],
+            ["Sitz", text(d, "sitz")],
+            ["Inländische Geschäftsanschrift", text(d, "anschrift")],
+            ["Gegenstand des Unternehmens", text(d, "gegenstand")],
+            ["Stamm- bzw. Grundkapital", text(d, "kapital") ? euro(cent(text(d, "kapital")) ?? 0) : null],
+          ]),
+        ) +
         (ges.length ? abschnitt("Gesellschafter", person(ges, true)) : "") +
         abschnitt("Geschäftsführung bzw. Inhaber/in", gf.length ? person(gf) : absatz("")) +
-        (text(d, "vertretung") ? abschnitt("Vertretungsregelung", absatz(text(d, "vertretung"))) : ""),
+        (text(d, "vertretung") ? abschnitt("Vertretungsregelung", absatz(text(d, "vertretung"))) : "") +
+        uebertragung(["Notartermin am", "Notar/in", "Eingetragen am, Registernummer"]),
     });
   },
 };
@@ -172,9 +181,10 @@ export const transparenzregister: Vorlage = {
       unter: "Angaben zum Transparenzregister",
       meta: `Stand: ${datumDe(text(d, "stand")) || "–"}`,
       inhalt:
-        angaben([["Gesellschaft", b.name], ["Rechtsform", text(d, "rechtsform")], ["Register", text(d, "register") || null], ["Gemeldet am", datumDe(text(d, "gemeldet")) || "noch nicht gemeldet"]]) +
-        abschnitt("Wirtschaftlich Berechtigte", l.length ? tabelle(["Name", "Geburtsdatum", "Wohnort", "Staatsangehörigkeiten", "Interesse"], l.map((x) => [zelle(text(x, "name")), datumDe(text(x, "geburtsdatum")), zelle(text(x, "wohnort")), zelle(text(x, "staatsangehoerigkeit")), zelle([INTERESSE.find((o) => o.wert === text(x, "interesse_art"))?.text.split(",")[0] ?? "", text(x, "interesse")].filter(Boolean).join(": "))]), { breiten: ["24%", "14%", "20%", "14%", "28%"] }) : absatz("")) +
-        unterschriften(["Ort, Datum", "Unterschrift Geschäftsführung"]),
+        abschnitt("Gesellschaft", felder([["Gesellschaft", b.name], ["Rechtsform", text(d, "rechtsform")], ["Registergericht und Nummer", text(d, "register") || null], ["Gemeldet am", datumDe(text(d, "gemeldet")) || "noch nicht gemeldet"]])) +
+        abschnitt("Wirtschaftlich Berechtigte (§ 3 GwG)", l.length ? tabelle(["Name", "Geburtsdatum", "Wohnort", "Staatsangehörigkeiten", "Interesse"], l.map((x) => [zelle(text(x, "name")), datumDe(text(x, "geburtsdatum")), zelle(text(x, "wohnort")), zelle(text(x, "staatsangehoerigkeit")), zelle([INTERESSE.find((o) => o.wert === text(x, "interesse_art"))?.text.split(",")[0] ?? "", text(x, "interesse")].filter(Boolean).join(": "))]), { breiten: ["24%", "14%", "20%", "14%", "28%"] }) : absatz("")) +
+        uebertragung(["Gemeldet am (transparenzregister.de)", "Bestätigung, Vorgangsnummer"]) +
+        unterschriften(["Geschäftsführung"], { ortDatum: true }),
     });
   },
 };

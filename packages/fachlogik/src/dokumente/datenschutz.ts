@@ -3,7 +3,7 @@
  * (E-121, E-123). Vorschläge aus Muster-Verzeichnissen der Aufsichtsbehörden, DSK und BSI (bausteine.ts).
  */
 import { AUFSICHT, DSE, PANNEN_ARTEN, PANNEN_SOFORT, TOM, VVT } from "./bausteine.js";
-import { abschnitt, absatz, angaben, anschrift, auswahl, datumDe, dokument, esc, ja, liste, tabelle, text, zelle, zeilen } from "./html.js";
+import { abschnitt, abschnitte, absatz, angaben, anschrift, auswahl, datumDe, dokument, eintrag, esc, ja, liste, nachsatz, tabelle, text, zelle, zeilen } from "./html.js";
 import { DATENPANNE_RISIKO, SCHUTZZIELE, optionen } from "./konstanten.js";
 import type { Betrieb, Vorlage } from "./typen.js";
 
@@ -126,7 +126,7 @@ export const datenschutzDokumentation: Vorlage = {
       ? v
           .map(
             (x, i) =>
-              `<div class="eintrag"><h3>${i + 1}. ${esc(text(x, "bezeichnung"))}</h3>${angaben([
+              eintrag(text(x, "bezeichnung"), angaben([
                 ["Zwecke (lit. b)", text(x, "zweck")],
                 ["Rechtsgrundlage", text(x, "rechtsgrundlage")],
                 ["Betroffene Personen (lit. c)", text(x, "betroffene")],
@@ -136,7 +136,7 @@ export const datenschutzDokumentation: Vorlage = {
                 ["Gemeinsam Verantwortliche", text(x, "gemeinsam") || null],
                 ["Löschfristen (lit. f)", text(x, "loeschfrist")],
                 ["TOM (lit. g)", text(x, "tom_hinweis") || "siehe Abschnitt Technische und organisatorische Maßnahmen"],
-              ])}</div>`,
+              ]), { nummer: `2.${i + 1}`, rand: "Art. 30 Abs. 1 lit. b–g" }),
           )
           .join("")
       : absatz("", "Keine Verarbeitungstätigkeiten erfasst.");
@@ -163,18 +163,19 @@ export const datenschutzDokumentation: Vorlage = {
       meta: `Stand: ${datumDe(text(d, "stand"))}\nAnsprechperson: ${text(d, "verantwortlich")}\nVerarbeitungen: ${v.length}`,
       inhalt:
         abschnitt(
-          "Verantwortlicher (Art. 30 Abs. 1 lit. a DSGVO)",
+          "Verantwortlicher",
           angaben([
             ["Verantwortlicher", [b.name, anschrift(b)].filter((x) => x.trim()).join(", ")],
-            ["Kontakt", [b.telefon, b.email].filter((x) => x.trim()).join(" · ")],
+            ["Kontakt", [b.telefon, b.email].filter((x) => x.trim()).join(", ")],
             ["Ansprechperson Datenschutz", text(d, "verantwortlich")],
             ["Datenschutzbeauftragte/r", text(d, "dsb") || "nicht benannt"],
           ]),
+          { rand: "Art. 30 Abs. 1 lit. a DSGVO" },
         ) +
-        abschnitt("Verarbeitungstätigkeiten", verarbeitungen) +
-        abschnitt("Technische und organisatorische Maßnahmen (Art. 32 DSGVO)", massnahmen) +
-        abschnitt("Dienstleister und Auftragsverarbeiter", dienstleister) +
-        `<p class="klein" style="margin-top:5mm">Das Verzeichnis wird bei Änderungen der Verarbeitungen und mindestens jährlich überprüft.</p>`,
+        abschnitt("Verarbeitungstätigkeiten", verarbeitungen, { rand: "Art. 30 Abs. 1 DSGVO" }) +
+        abschnitt("Technische und organisatorische Maßnahmen", massnahmen, { rand: "Art. 32 DSGVO" }) +
+        abschnitt("Dienstleister und Auftragsverarbeiter", dienstleister, { rand: "Art. 28 DSGVO" }) +
+        nachsatz("Das Verzeichnis wird bei Änderungen der Verarbeitungen und mindestens jährlich überprüft."),
     });
   },
 };
@@ -249,14 +250,15 @@ export const datenpanne: Vorlage = {
     const beginn = berlinZuUtc(text(d, "entdeckt_am"), text(d, "entdeckt_um"));
     const risiko = text(d, "risiko");
     const gemeldet = ja(d, "gemeldet") && risiko !== "";
-    const teile: [string, string][] = [
-      ["Art der Verletzung", text(d, "beschreibung")],
-      ["Kategorien der Daten", text(d, "datenarten")],
-      ["Betroffene Personen und Datensätze (ungefähre Zahl)", text(d, "betroffene_anzahl")],
-      ["Kontakt für Rückfragen", text(d, "kontakt")],
-      ["Wahrscheinliche Folgen", text(d, "folgen")],
-      ["Ergriffene und vorgeschlagene Maßnahmen", text(d, "massnahmen")],
-      ...(risiko === "kein_risiko" ? ([["Begründung, warum keine Meldung nötig ist", text(d, "begruendung")]] as [string, string][]) : []),
+    // Gliederung wie der Mindestinhalt der Meldung nach Art. 33 Abs. 3 DSGVO (lit. a–d), Randspalte nennt den Buchstaben
+    const teile: [string, string, string][] = [
+      ["Art der Verletzung", text(d, "beschreibung"), "Art. 33 Abs. 3 lit. a"],
+      ["Kategorien der Daten", text(d, "datenarten"), "Art. 33 Abs. 3 lit. a"],
+      ["Betroffene Personen und Datensätze (ungefähre Zahl)", text(d, "betroffene_anzahl"), "Art. 33 Abs. 3 lit. a"],
+      ["Kontakt für Rückfragen", text(d, "kontakt"), "Art. 33 Abs. 3 lit. b"],
+      ["Wahrscheinliche Folgen", text(d, "folgen"), "Art. 33 Abs. 3 lit. c"],
+      ["Ergriffene und vorgeschlagene Maßnahmen", text(d, "massnahmen"), "Art. 33 Abs. 3 lit. d"],
+      ...(risiko === "kein_risiko" ? ([["Begründung, warum keine Meldung nötig ist", text(d, "begruendung"), "Art. 33 Abs. 1 Satz 1"]] as [string, string, string][]) : []),
     ];
     return dokument({
       titel: gemeldet ? "Meldung einer Datenpanne (Dokumentation)" : "Datenpanne – Meldeentwurf und Dokumentation",
@@ -270,7 +272,7 @@ export const datenpanne: Vorlage = {
           ["Gemeldet", gemeldet ? `${datumDe(text(d, "gemeldet_am")) || "ja"}${text(d, "aktenzeichen") ? ` · Aktenzeichen ${text(d, "aktenzeichen")}` : ""}` : "noch nicht gemeldet"],
           ["Begründung der späteren Meldung", text(d, "verspaetung") || null],
           ["Benachrichtigung der Betroffenen", `${BENACHRICHTIGUNG[text(d, "benachrichtigung")] ?? "noch offen"}${text(d, "benachrichtigt_am") ? ` am ${datumDe(text(d, "benachrichtigt_am"))}` : ""}${text(d, "benachrichtigung_text") ? ` – ${text(d, "benachrichtigung_text")}` : ""}`],
-        ]) + teile.map(([t, w]) => abschnitt(t, absatz(w))).join(""),
+        ]) + teile.map(([t, w, rand]) => abschnitt(t, absatz(w), { rand })).join(""),
     });
   },
 };
@@ -320,27 +322,26 @@ export const datenschutzinformation: Vorlage = {
       betrieb: b,
       unter: text(d, "fuer_wen") ? `für ${text(d, "fuer_wen")} nach Art. 13 DSGVO` : "nach Art. 13 DSGVO",
       meta: `Stand: ${datumDe(text(d, "stand"))}`,
-      inhalt:
-        abschnitt("Verantwortlicher", angaben([["Verantwortlicher", [b.name, anschrift(b)].filter((x) => x.trim()).join(", ")], ["Kontakt", [b.telefon, b.email].filter((x) => x.trim()).join(" · ")], ["Datenschutzbeauftragte/r", text(d, "dsb") || null]])) +
-        abschnitt(
-          "Zwecke, Rechtsgrundlagen, Empfänger und Speicherdauer",
-          gewaehlt.length
+      inhalt: abschnitte([
+        { titel: "Verantwortlicher", rand: "Art. 13 Abs. 1 lit. a, b", inhalt: angaben([["Verantwortlicher", [b.name, anschrift(b)].filter((x) => x.trim()).join(", ")], ["Kontakt", [b.telefon, b.email].filter((x) => x.trim()).join(", ")], ["Datenschutzbeauftragte/r", text(d, "dsb") || null]]) },
+        {
+          titel: "Zwecke, Rechtsgrundlagen, Empfänger und Speicherdauer",
+          rand: "Art. 13 Abs. 1 lit. c, e, Abs. 2 lit. a",
+          inhalt: gewaehlt.length
             ? gewaehlt
-                .map((v) => `<div class="eintrag"><h3>${esc(v.titel)}</h3>${angaben([["Zweck", String(v.werte.zweck ?? "")], ["Rechtsgrundlage", String(v.werte.rechtsgrundlage ?? "")], ["Empfänger", String(v.werte.empfaenger ?? "") || "keine"], ["Übermittlung in Drittländer", String(v.werte.drittland ?? "") || "keine"], ["Speicherdauer", String(v.werte.loeschfrist ?? "")]])}</div>`)
+                .map((v) => eintrag(v.titel, angaben([["Zweck", String(v.werte.zweck ?? "")], ["Rechtsgrundlage", String(v.werte.rechtsgrundlage ?? "")], ["Empfänger", String(v.werte.empfaenger ?? "") || "keine"], ["Übermittlung in Drittländer", String(v.werte.drittland ?? "") || "keine"], ["Speicherdauer", String(v.werte.loeschfrist ?? "")]])))
                 .join("")
             : absatz(""),
-        ) +
-        (mitLitF(d) ? abschnitt("Berechtigte Interessen", text(d, "interessen") ? zeilen(text(d, "interessen")) : absatz("")) : "") +
-        abschnitt(DSE.betroffenenrechte!.titel, `<p>${esc(ersetze(DSE.betroffenenrechte!.text))}</p>`) +
-        abschnitt(DSE.widerspruchsrecht!.titel, `<p>${esc(ersetze(DSE.widerspruchsrecht!.text))}</p>`) +
-        abschnitt(DSE.widerruf_einwilligung!.titel, `<p>${esc(ersetze(DSE.widerruf_einwilligung!.text))}</p>`) +
-        abschnitt(
-          DSE.beschwerderecht!.titel,
-          `<p>${esc(DSE.beschwerderecht!.text.replace("{aufsichtsbehoerde_name}", a?.name ?? "____").replace("{aufsichtsbehoerde_ort}", a?.ort ?? "____").replace("{aufsichtsbehoerde_url}", a?.url ?? "____"))}</p>`,
-        ) +
-        abschnitt("Pflicht zur Bereitstellung", `<p>${esc(BEREITSTELLUNG[text(d, "bereitstellung")] ?? "")}</p>`) +
-        abschnitt("Automatisierte Entscheidungen", "<p>Eine automatisierte Entscheidungsfindung einschließlich Profiling findet nicht statt.</p>") +
-        (text(d, "ergaenzung") ? abschnitt("Ergänzungen", zeilen(text(d, "ergaenzung"))) : ""),
+        },
+        ...(mitLitF(d) ? [{ titel: "Berechtigte Interessen", rand: "Art. 13 Abs. 1 lit. d", inhalt: text(d, "interessen") ? zeilen(text(d, "interessen")) : absatz("") }] : []),
+        { titel: DSE.betroffenenrechte!.titel, rand: "Art. 13 Abs. 2 lit. b", inhalt: `<p>${esc(ersetze(DSE.betroffenenrechte!.text))}</p>` },
+        { titel: DSE.widerspruchsrecht!.titel, rand: "Art. 21", inhalt: `<p>${esc(ersetze(DSE.widerspruchsrecht!.text))}</p>` },
+        { titel: DSE.widerruf_einwilligung!.titel, rand: "Art. 13 Abs. 2 lit. c", inhalt: `<p>${esc(ersetze(DSE.widerruf_einwilligung!.text))}</p>` },
+        { titel: DSE.beschwerderecht!.titel, rand: "Art. 13 Abs. 2 lit. d", inhalt: `<p>${esc(DSE.beschwerderecht!.text.replace("{aufsichtsbehoerde_name}", a?.name ?? "____").replace("{aufsichtsbehoerde_ort}", a?.ort ?? "____").replace("{aufsichtsbehoerde_url}", a?.url ?? "____"))}</p>` },
+        { titel: "Pflicht zur Bereitstellung", rand: "Art. 13 Abs. 2 lit. e", inhalt: `<p>${esc(BEREITSTELLUNG[text(d, "bereitstellung")] ?? "")}</p>` },
+        { titel: "Automatisierte Entscheidungen", rand: "Art. 13 Abs. 2 lit. f", inhalt: "<p>Eine automatisierte Entscheidungsfindung einschließlich Profiling findet nicht statt.</p>" },
+        ...(text(d, "ergaenzung") ? [{ titel: "Ergänzungen", inhalt: zeilen(text(d, "ergaenzung")) }] : []),
+      ]),
     });
   },
 };
