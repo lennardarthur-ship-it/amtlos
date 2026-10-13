@@ -77,6 +77,8 @@ Entscheidungen liegen im Git-Repository (GitHub: lennardarthur-ship-it/amtlos). 
    - Der erste Tab „Pflichten“ zeigt nach dem Check, was jetzt dran ist. Dort „Erinnerungen“ einschalten
      (Mitteilungen erlauben): Die App erinnert 3 Tage vor jedem Termin – ganz ohne Server.
    - „Mein Betrieb → Briefkopf“: Logo und Hausfarbe wählen – sie erscheinen auf Rechnung und Unterlagen.
+   - Rechnung mit Bankverbindung: im Zahlungsblock steht ein GiroCode – mit der Banking-App scannen, Überweisung ist vorausgefüllt.
+   - Jede Unterlage hat ihren eigenen Aufbau (Brief, Vertrag, Aushang, Nachweis, Vordruck, Handbuch): Abschnittsnummern und Gesetze am Rand, Vordrucke mit Feldnummern zum Übertragen.
    - Rechnung an eine Firma: im Abschluss „Als E-Rechnung teilen (XRechnung)“, auch ins Ausland.
      Nach dem Teilen „Zahlung eingegangen“ vermerken.
    - „Umsatzsteuer-Voranmeldung“: übernimmt die Umsätze aus deinen Rechnungen – nach Leistungsdatum (Soll)
