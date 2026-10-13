@@ -52,6 +52,11 @@ const sichtbar = async (text) => (await p.getByText(text, { exact: false }).loca
 try {
   await p.goto("http://localhost:4998/");
   await warte(2500);
+  // Start auf „Pflichten“ (E-129): Einladung zum Check
+  pruefe(await sichtbar("Welche Pflichten gelten für dich?"), "Pflichten-Tab mit Einladung fehlt beim Start");
+  await foto("start-pflichten");
+  await p.getByRole("tab", { name: "Unterlagen" }).click();
+  await warte(800);
   pruefe(await sichtbar("Ausfüllen, prüfen, als PDF teilen"), "Startseite fehlt");
   pruefe(await sichtbar("Wofür brauchst du etwas?"), "Anlässe fehlen auf der Startseite");
   pruefe(await sichtbar("Betrieb eintragen"), "Hinweis „Betrieb eintragen“ fehlt bei leerem Betrieb");
@@ -66,6 +71,7 @@ try {
   await feld("Ort").fill("München");
   await feld("Inhaber/in oder verantwortliche Person").fill("Alex Muster");
   await feld("Steuernummer").fill("143/123/45678");
+  await tippe(p.getByRole("radio", { name: "Bordeaux" }).locator("visible=true").last()); // Hausfarbe (E-129)
   await tippe(p.getByRole("radio", { name: "Bayern" }).locator("visible=true").last());
   await foto("betrieb");
   await knopf("Zurück").click();
@@ -73,6 +79,8 @@ try {
   pruefe(!(await sichtbar("Steht dann auf jeder Unterlage")), "Hinweis bleibt nach dem Eintragen stehen");
 
   // Pflichten-Check (E-126): Fragen beantworten, Ergebnis, Pflichten, Unterlage zur Pflicht
+  await p.getByRole("tab", { name: "Pflichten" }).click();
+  await warte(800);
   pruefe(await sichtbar("Welche Pflichten gelten für dich?"), "Einladung zum Pflichten-Check fehlt");
   await knopf("Pflichten-Check starten").click();
   await warte(800);
@@ -99,20 +107,26 @@ try {
   await warte(800);
   await radio("Nein").click(); // keine Kleinunternehmerregelung
   await warte(800);
+  await radio("Nein").click(); // keine Steuerberatung (E-129: Frist der Steuererklärungen)
+  await warte(800);
   await feld("Wann hast du angefangen oder wann willst du anfangen?").fill("01.03.2024");
   await knopf("Weiter").click();
   await warte(1200);
   // Zusatzfragen für ein genaueres Ergebnis (E-127) – hier übersprungen; „Weiter“ ist ohne Antwort nicht aktiv
   pruefe(await sichtbar("Noch ein paar Fragen"), "Zusatzfragen fehlen");
   pruefe(await knopf("Weiter").isDisabled(), "„Weiter“ ohne Antwort aktiv");
-  for (let k = 0; k < 6 && !(await sichtbar("Für deinen Betrieb gelten")); k++) {
+  // der Pflichten-Tab darunter zeigt schon „Für deinen Betrieb gelten …“ – das Ende des Checks erkennt man am Knopf
+  const amEnde = async () => (await p.getByRole("button", { name: "Deine Pflichten ansehen", exact: true }).locator("visible=true").count()) > 0;
+  for (let k = 0; k < 10 && !(await amEnde()); k++) {
     await knopf("Überspringen").click();
     await warte(500);
   }
-  pruefe(await sichtbar("Für deinen Betrieb gelten"), "Ergebnis des Checks fehlt");
+  pruefe((await amEnde()) && (await sichtbar("Für deinen Betrieb gelten")), "Ergebnis des Checks fehlt");
   await foto("check-ergebnis");
   await knopf("Deine Pflichten ansehen").click();
   await warte(1200);
+  pruefe(await sichtbar("Jetzt dran"), "„Jetzt dran“ fehlt im Pflichten-Tab");
+  pruefe(await sichtbar("Kurz klären"), "„Kurz klären“ mit den wirksamsten Fragen fehlt");
   pruefe((await sichtbar("Hautschutzplan aushängen")) && (await sichtbar("Elektronische Kasse beim Finanzamt melden")) && !(await sichtbar("Impressum auf der Website")), "Pflichten passen nicht zum Profil (Beauty, Kasse, keine Website)");
   pruefe(await sichtbar("Aus der Gründung"), "Gründungsschritte des bestehenden Betriebs nicht abgetrennt");
   pruefe(await sichtbar("0 von"), "Fortschritt fehlt");
@@ -130,10 +144,9 @@ try {
   await knopf("Zurück").click();
   await warte(800);
   pruefe(await sichtbar("1 von"), "Abhaken zählt nicht im Fortschritt");
-  await knopf("Zurück").click();
-  await warte(800);
-  pruefe(await sichtbar("Deine Pflichten"), "Fortschritt fehlt auf der Startseite");
   await foto("start-mit-pflichten");
+  await p.getByRole("tab", { name: "Unterlagen" }).click();
+  await warte(800);
 
   // Rechnung im geführten Ablauf
   await knopf("Rechnung schreiben").click();
@@ -173,6 +186,7 @@ try {
   const [fenster] = await Promise.all([ctx.waitForEvent("page"), knopf("PDF teilen").click()]);
   await fenster.waitForLoadState();
   const html = await fenster.content();
+  pruefe(html.includes("--akzent:#702434") && html.includes('class="anschrift"') && html.includes("Amtlos Sans"), "Rechnung nicht als Geschäftsbrief in Hausfarbe mit eingebetteter Schrift (E-129)");
   pruefe(html.includes("Salon Sonne") && html.includes("Kim Beispiel") && html.includes("Haarschnitt") && html.includes("59,50") && html.includes("Vielen Dank für Ihren Auftrag."), "PDF-Inhalt der Rechnung unvollständig");
   await fenster.setViewportSize({ width: 794, height: 1123 });
   await fenster.screenshot({ path: `${OUT}/${String(++n).padStart(2, "0")}-${schema}-dokument.png` });
@@ -180,6 +194,10 @@ try {
   await warte(600);
   pruefe((await sichtbar("Festgeschrieben am")) && (await knopf("Stornieren").count()) > 0 && (await p.getByRole("button", { name: "Löschen", exact: true }).locator("visible=true").count()) === 0, "Rechnung nach dem Teilen nicht festgeschrieben");
   await foto("festgeschrieben");
+  // Zahlungseingang vermerken (E-129): ändert die festgeschriebene Rechnung nicht
+  await tippe(knopf("Zahlung eingegangen – heute"));
+  await warte(500);
+  pruefe(await sichtbar("Bezahlt am"), "Zahlungseingang nicht vermerkt");
   // E-Rechnung (E-128): fehlen Angaben für XRechnung (hier E-Mail, Telefon, IBAN), nennt Amtlos sie statt einer ungültigen Datei
   await knopf("Als E-Rechnung teilen (XRechnung)").click();
   await warte(600);
@@ -338,6 +356,12 @@ try {
   await p.getByRole("tab", { name: "Mein Betrieb" }).click();
   await warte(800);
   pruefe((await feld("Name des Betriebs").inputValue()) === "Salon Sonne", "Betrieb nach Neustart verloren");
+  // „Alle Daten löschen“ ist gesperrt, solange geteilte Rechnungen nicht gesichert sind (E-129)
+  await tippe(knopf("Alle Daten löschen"));
+  await warte(400);
+  pruefe(await sichtbar("Erstelle zuerst eine Sicherung"), "Löschen trotz ungesicherter Rechnungen möglich");
+  await tippe(knopf("Abbrechen"));
+  await warte(300);
   await tippe(knopf("Daten sichern"));
   await warte(800);
   await feld("Passwort").fill("kurz");
@@ -378,6 +402,7 @@ try {
   await knopf("Öffnen").click();
   await warte(2500);
   pruefe(await sichtbar("Salon Sonne · 5 Unterlagen · 1 Mitarbeiter · 1 Kunde"), "Inhalt der Sicherung nicht angezeigt");
+  pruefe(await sichtbar("Nichts Neueres geht verloren"), "Zusammenführen statt Ersetzen nicht erklärt");
   await foto("wiederherstellen");
   await knopf("Jetzt wiederherstellen").click();
   await warte(1000);

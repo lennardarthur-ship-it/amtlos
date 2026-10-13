@@ -12,6 +12,12 @@ import roh from "./katalog.json";
 
 export const KATALOG = roh as unknown as Katalog;
 
+/** Regelwert aus dem Katalog (z. B. Aufbewahrungsfristen) – keine Zahl in der App ist erfunden. */
+export function regelwert(id: string): number | null {
+  const r = (KATALOG as unknown as { regelwerte?: { id: string; wert: unknown }[] }).regelwerte?.find((x) => x.id === id);
+  return typeof r?.wert === "number" ? r.wert : null;
+}
+
 /** Profil wie im Server (Schlüssel ohne „profil.“): Auswahl → Text, Mehrfach → Liste, Ja/Nein → boolean, Zahl → number, Datum → ISO. */
 export type Profil = Record<string, string | number | boolean | string[] | null>;
 
@@ -19,7 +25,7 @@ export type Profil = Record<string, string | number | boolean | string[] | null>
  * Die Fragen des Checks, in dieser Reihenfolge: der Schnellstart (E-111) plus Kasse und Website. Branche zuerst – die
  * kennt jede und jeder; die Gesellschafts-Frage nur bei UG und GmbH (wie im Fragebogen).
  */
-export const CHECK_FELDER = ["taetigkeit.branchen", "rechtsform", "gesellschaft.handelsregister", "taetigkeit.einordnung", "bundesland", "beschaeftigte.gesamt", "kasse.elektronisch", "online.website", "ust.kleinunternehmer", "gruendungsdatum"] as const;
+export const CHECK_FELDER = ["taetigkeit.branchen", "rechtsform", "gesellschaft.handelsregister", "taetigkeit.einordnung", "bundesland", "beschaeftigte.gesamt", "kasse.elektronisch", "online.website", "ust.kleinunternehmer", "steuerberater", "gruendungsdatum"] as const;
 
 const FRAGE = new Map<string, { frage: Frage; nurWenn?: { feld: string; in: string[] } }>();
 for (const s of SCHRITTE) for (const f of s.fragen) FRAGE.set(f.feld, { frage: f, nurWenn: s.nurWenn });
@@ -130,10 +136,15 @@ export function auswertung(profil: Profil, stichtag: string): Auswertung {
 /**
  * Zusatzfragen für ein genaueres Ergebnis: die Profilfelder, die die meisten unklaren Pflichten klären – höchstens `n`.
  */
-export function zusatzFragen(profil: Profil, stichtag: string, n = 5): string[] {
+export function zusatzFragen(profil: Profil, stichtag: string, n = 8): string[] {
+  return offeneFragenNachWirkung(auswertung(profil, stichtag), profil).slice(0, n).map((o) => o.feld);
+}
+
+/** Offene Fragen, nach der Zahl unklarer Pflichten, die sie klären (E-129) – die wirksamste zuerst. */
+export function offeneFragenNachWirkung(a: Auswertung, profil: Profil): { feld: string; anzahl: number }[] {
   const zaehler = new Map<string, number>();
-  for (const p of auswertung(profil, stichtag).unbekannt) for (const f of p.offeneFragen) if (!beantwortet(profil, f)) zaehler.set(f, (zaehler.get(f) ?? 0) + 1);
-  return [...zaehler.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, n).map(([f]) => f);
+  for (const p of a.unbekannt) for (const f of p.offeneFragen) if (!beantwortet(profil, f)) zaehler.set(f, (zaehler.get(f) ?? 0) + 1);
+  return [...zaehler.entries()].sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0])).map(([feld, anzahl]) => ({ feld, anzahl }));
 }
 
 export interface Erledigt {

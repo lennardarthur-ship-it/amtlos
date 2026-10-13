@@ -420,8 +420,8 @@ eintraege:
   en: The E-Bilanz is the electronic submission of the balance sheet and profit and loss statement to the tax office (Finanzamt).
 - de: Die EU-Entgelttransparenzrichtlinie war bis 7.6.2026 umzusetzen; das deutsche Gesetz steht aus. Bis dahin gilt das bisherige Entgelttransparenzgesetz weiter.
   en: The EU Pay Transparency Directive had to be transposed by 7.6.2026; the German law is still pending. Until then, the existing Pay Transparency Act (Entgelttransparenzgesetz) continues to apply.
-- de: Die Einkommensteuererklärung übermittelst du elektronisch. Die Frist ist mit und ohne Steuerberatung unterschiedlich.
-  en: You submit your income tax return electronically. The deadline differs depending on whether you use a tax adviser.
+- de: Die Einkommensteuererklärung übermittelst du elektronisch – ohne Steuerberatung bis 31. Juli des Folgejahres, mit Steuerberatung bis Ende Februar des übernächsten Jahres (§ 149 AO).
+  en: You submit your income tax return electronically – without a tax adviser by 31 July of the following year, with a tax adviser by the end of February of the year after that (§ 149 AO).
 - de: Die Erstbelehrung macht das Gesundheitsamt oder ein beauftragter Arzt; die Bescheinigung bewahrst du auf. Danach belehrst du selbst in Abständen. Amtlos dokumentiert die Belehrung im Unterweisungsmodul.
   en: The initial instruction is given by the public health office (Gesundheitsamt) or an appointed doctor; you keep the certificate. After that, you give the instruction yourself at intervals. Amtlos documents
     the instruction in the safety briefing module.
@@ -440,8 +440,8 @@ eintraege:
 - de: Die Gewerbeanzeige machst du bei deiner Gemeinde, meist online. Die Gebühr hängt von der Gemeinde ab. Das Gewerbeamt informiert danach Finanzamt, IHK oder Handwerkskammer und weitere Stellen.
   en: You submit the trade registration (Gewerbeanzeige) to your municipality, usually online. The fee depends on the municipality. The trade office (Gewerbeamt) then informs the tax office, the IHK or
     Chamber of Crafts and other bodies.
-- de: Die Gewerbesteuer hängt vom Hebesatz deiner Gemeinde ab. Einzelunternehmen und Personengesellschaften haben einen Freibetrag.
-  en: Trade tax depends on your municipality's multiplier (Hebesatz). Sole proprietorships and partnerships have a tax-free allowance.
+- de: Die Gewerbesteuer hängt vom Hebesatz deiner Gemeinde ab. Einzelunternehmen und Personengesellschaften haben einen Freibetrag. Die Erklärung gibst du ohne Steuerberatung bis 31. Juli des Folgejahres ab, mit Steuerberatung bis Ende Februar des übernächsten Jahres (§ 149 AO).
+  en: Trade tax depends on your municipality's multiplier (Hebesatz). Sole proprietorships and partnerships have a tax-free allowance. You file the return without a tax adviser by 31 July of the following year, with a tax adviser by the end of February of the year after that (§ 149 AO).
 - de: Die GoBD regeln, wie Bücher und Belege elektronisch geführt und aufbewahrt werden. Die Verfahrensdokumentation beschreibt deine Abläufe.
   en: The GoBD set out how books and receipts are kept and stored electronically. The process documentation describes your procedures.
 - de: Die Gründung einer GmbH oder UG beginnt mit dem Gesellschaftsvertrag, den ein Notar beurkundet. Die Beurkundung ist auch online möglich. Für die GmbH beträgt das Stammkapital mindestens 25.000 €,
@@ -456,8 +456,8 @@ eintraege:
   en: The information includes, among other things, the purpose, legal basis, recipients, storage period and the rights of the people affected.
 - de: Die Insolvenzantragspflicht nach § 15a InsO trifft die Geschäftsführung. Die genauen Fristen stehen als geprüfte Regeldaten in Amtlos, sobald sie fachlich freigegeben sind.
   en: The obligation to file for insolvency under § 15a InsO applies to the management. The exact deadlines will be stored as verified rule data in Amtlos as soon as they have been approved by experts.
-- de: Die Jahreserklärung fasst die Umsatzsteuer des ganzen Jahres zusammen.
-  en: The annual return summarises the VAT for the whole year.
+- de: Die Jahreserklärung fasst die Umsatzsteuer des ganzen Jahres zusammen – ohne Steuerberatung bis 31. Juli des Folgejahres, mit Steuerberatung bis Ende Februar des übernächsten Jahres (§ 149 AO).
+  en: The annual return summarises the VAT for the whole year – without a tax adviser by 31 July of the following year, with a tax adviser by the end of February of the year after that (§ 149 AO).
 - de: Die Jahresmeldung (DEÜV) übermittelt das Lohnprogramm für alle, die über den Jahreswechsel beschäftigt sind.
   en: The payroll software sends the annual notification (DEÜV) for everyone employed over the turn of the year.
 - de: Die Kleinunternehmerregelung endet ab dem Umsatz, der die Grenze überschreitet. Amtlos zählt dafür die Rechnungen, die du in Amtlos gestellt hast. Rechnungen außerhalb von Amtlos sind nicht enthalten.
@@ -1040,8 +1040,8 @@ eintraege:
 - de: Kapitalgesellschaften müssen ihren Jahresabschluss beim Unternehmensregister offenlegen, binnen zwölf Monaten nach Ende des Geschäftsjahres. Kleinstkapitalgesellschaften können ihn stattdessen hinterlegen.
   en: Corporations must publish their annual financial statements in the company register (Unternehmensregister) within twelve months after the end of the financial year. Micro corporations can deposit
     them instead.
-- de: Kapitalgesellschaften zahlen Körperschaftsteuer und geben dafür jährlich eine Erklärung ab. Die Fristen stehen als Regeldaten in Amtlos, sobald sie fachlich freigegeben sind.
-  en: Corporations pay corporate income tax and file an annual return for it. The deadlines will appear as standard dates in Amtlos once they have been approved by experts.
+- de: Kapitalgesellschaften zahlen Körperschaftsteuer und geben dafür jährlich eine Erklärung ab – ohne Steuerberatung bis 31. Juli des Folgejahres, mit Steuerberatung bis Ende Februar des übernächsten Jahres (§ 149 AO).
+  en: Corporations pay corporate income tax and file an annual return for it – without a tax adviser by 31 July of the following year, with a tax adviser by the end of February of the year after that (§ 149 AO).
 - de: Kasse mit TSE betreiben und Belege ausgeben
   en: Operate a cash register with TSE and issue receipts
 - de: Keine Handlung nötig; der Beitrag wird festgesetzt.

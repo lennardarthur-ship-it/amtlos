@@ -342,4 +342,27 @@ describe("Dokumentvorlagen", () => {
     expect(ohne).toEqual(expect.arrayContaining(["IBAN (Mein Betrieb)", "E-Mail des Empfängers", "Anschrift des Empfängers: Straße in der ersten, PLZ und Ort in der letzten Zeile"]));
     expect(ohne.some((x) => x.includes("0 %"))).toBe(true);
   });
+
+  it("E-Rechnung ins Ausland: Wien mit Steuerschuldnerschaft des Empfängers (AE), Lieferung in die Niederlande (K)", () => {
+    const b = { ...BETRIEB, email: "info@salon.example", telefon: "089 1", iban: "DE02120300000000202051", ust_idnr: "DE123456789" };
+    const wien = { nummer: "2026-020", datum: "2026-10-12", leistung_gleich: true, zahlungsziel: "14", kunde_name: "Studio Wien GmbH", kunde_anschrift: "Mariahilfer Straße 1\n1060 Wien\nÖsterreich", kunde_email: "office@studio.example", kunde_ust_idnr: "ATU12345678", hinweise: ["reverse_charge"], positionen: [{ bezeichnung: "Beratung", menge: "4", einheit: "Stunde", preis: "90,00", satz: "0" }] };
+    const r = eRechnungAus(wien, b);
+    expect(r.fehlt).toEqual([]);
+    expect(r.daten.kunde).toMatchObject({ strasse: "Mariahilfer Straße 1", plz: "1060", ort: "Wien", land: "AT" });
+    const xml = xrechnungUbl(r.daten, KU_HINWEIS);
+    expect(xml).toContain("<cbc:ID>AE</cbc:ID>");
+    expect(xml).toContain("<cbc:TaxExemptionReasonCode>VATEX-EU-AE</cbc:TaxExemptionReasonCode>");
+    expect(xml).toContain("<cbc:IdentificationCode>AT</cbc:IdentificationCode>");
+    // ohne Länderzeile: aus PLZ-Präfix bzw. USt-IdNr.
+    expect(eRechnungAus({ ...wien, kunde_anschrift: "Mariahilfer Straße 1\nA-1060 Wien" }, b).daten.kunde.land).toBe("AT");
+    expect(eRechnungAus({ ...wien, kunde_anschrift: "Mariahilfer Straße 1\n1060 Wien" }, b).daten.kunde.land).toBe("AT");
+    // vierstellige PLZ ohne Land und ohne USt-IdNr.: Amtlos fragt nach dem Land
+    expect(eRechnungAus({ ...wien, kunde_ust_idnr: "", kunde_anschrift: "Mariahilfer Straße 1\n1060 Wien" }, b).fehlt).toEqual(expect.arrayContaining(["Land des Empfängers in der letzten Zeile der Anschrift (z. B. Österreich)", "USt-IdNr. des Empfängers"]));
+    // ohne eigene USt-IdNr. keine Steuerschuldnerschaft des Empfängers
+    expect(eRechnungAus(wien, { ...b, ust_idnr: "" }).fehlt).toContain("USt-IdNr. des Betriebs (Mein Betrieb)");
+    const nl = eRechnungAus({ ...wien, kunde_name: "Winkel BV", kunde_anschrift: "Damrak 1\n1012 LG Amsterdam\nNiederlande", kunde_ust_idnr: "NL123456789B01", hinweise: ["igl"], positionen: [{ bezeichnung: "Shampoo, Karton", menge: "10", einheit: "Stück", preis: "40,00", satz: "0" }] }, b);
+    expect(nl.fehlt).toEqual([]);
+    expect(nl.daten.kunde).toMatchObject({ plz: "1012 LG", ort: "Amsterdam", land: "NL" });
+    expect(xrechnungUbl(nl.daten, KU_HINWEIS)).toContain("<cbc:ID>K</cbc:ID>");
+  });
 });

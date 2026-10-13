@@ -16,6 +16,8 @@ export interface Unterlage {
   festgeschrieben?: string;
   /** storniert durch diese Unterlage (Stornorechnung) */
   storniertDurch?: string;
+  /** Zahlung eingegangen am (YYYY-MM-DD, E-129) – gehört nicht zum Inhalt, ändert also keine festgeschriebene Rechnung */
+  bezahlt?: string;
 }
 
 export interface Stand {
@@ -31,9 +33,17 @@ export interface Stand {
   erledigt: Record<string, string>;
   /** lokale Erinnerungen an Fristen eingeschaltet (E-128) */
   erinnerungen: boolean;
+  /** App nur nach Face ID / Code öffnen (E-129) */
+  appSperre: boolean;
+  /** letzte Änderung am Stand (ISO) */
+  geaendert?: string;
+  /** letzte erstellte Datensicherung (ISO, E-129) – von Hand oder automatisch in iCloud */
+  letzteSicherung?: string;
+  /** automatisch in iCloud sichern (nur im eigenen App-Build, E-129) */
+  cloudSicherung: boolean;
 }
 
-export const LEERER_STAND: Stand = { version: 1, betrieb: LEERER_BETRIEB, unterlagen: [], mitarbeiter: [], kunden: [], profil: {}, erledigt: {}, erinnerungen: false };
+export const LEERER_STAND: Stand = { version: 1, betrieb: LEERER_BETRIEB, unterlagen: [], mitarbeiter: [], kunden: [], profil: {}, erledigt: {}, erinnerungen: false, appSperre: false, cloudSicherung: false };
 
 function profilAus(roh: unknown): Stand["profil"] {
   if (!roh || typeof roh !== "object" || Array.isArray(roh)) return {};
@@ -70,7 +80,21 @@ export function standAus(json: string | null): Stand {
       (u): u is Unterlage => Boolean(u && typeof u.id === "string" && typeof u.vorlage === "string" && vorlageFuer(u.vorlage) && u.daten && typeof u.daten === "object"),
     );
     const r = roh as Record<string, unknown>;
-    return { version: 1, betrieb, unterlagen, mitarbeiter: personenAus(r.mitarbeiter), kunden: personenAus(r.kunden), profil: profilAus(r.profil), erledigt: erledigtAus(r.erledigt), erinnerungen: r.erinnerungen === true };
+    const iso = (w: unknown) => (typeof w === "string" && w ? w : undefined);
+    return {
+      version: 1,
+      betrieb,
+      unterlagen,
+      mitarbeiter: personenAus(r.mitarbeiter),
+      kunden: personenAus(r.kunden),
+      profil: profilAus(r.profil),
+      erledigt: erledigtAus(r.erledigt),
+      erinnerungen: r.erinnerungen === true,
+      appSperre: r.appSperre === true,
+      cloudSicherung: r.cloudSicherung === true,
+      ...(iso(r.geaendert) ? { geaendert: iso(r.geaendert) } : {}),
+      ...(iso(r.letzteSicherung) ? { letzteSicherung: iso(r.letzteSicherung) } : {}),
+    };
   } catch {
     return LEERER_STAND;
   }
@@ -117,6 +141,11 @@ export function anlegen(s: Stand, vorlageId: string, jetzt: Date, id = neueId())
   for (const [feld, profilFeld] of Object.entries(v.ausProfil ?? {})) {
     const w = s.profil[profilFeld];
     if (w !== undefined && w !== null && !Array.isArray(w)) daten[feld] = typeof w === "number" ? String(w) : w;
+  }
+  // Startwerte aus „Mein Betrieb“ (z. B. Soll-/Ist-Versteuerung)
+  for (const [feld, betriebsFeld] of Object.entries(v.ausBetrieb ?? {})) {
+    const w = s.betrieb[betriebsFeld];
+    if (typeof w === "string" && w.trim()) daten[feld] = w;
   }
   const u: Unterlage = { id, vorlage: v.id, daten, erstellt: jetzt.toISOString(), geaendert: jetzt.toISOString() };
   return [{ ...s, unterlagen: [u, ...s.unterlagen] }, u];
@@ -228,3 +257,80 @@ export function betriebSetzen(s: Stand, b: Betrieb): Stand {
 export const sortiert = (s: Stand) => [...s.unterlagen].sort((a, b) => b.geaendert.localeCompare(a.geaendert));
 
 export const betriebFehlt = (b: Betrieb) => !b.name.trim();
+
+/** Zahlungseingang einer Rechnung setzen bzw. entfernen (E-129). */
+export function bezahltSetzen(s: Stand, id: string, datum: string | null): Stand {
+  return { ...s, unterlagen: s.unterlagen.map((u) => (u.id === id ? (datum ? { ...u, bezahlt: datum } : (({ bezahlt: _weg, ...rest }) => rest)(u)) : u)) };
+}
+
+/** Unterlagen, die aufbewahrt werden müssen: festgeschriebene (Rechnungen, Kassenbuch). */
+export const aufbewahrungspflichtig = (s: Stand) => s.unterlagen.filter((u) => u.festgeschrieben);
+
+/** Seit der letzten Datensicherung geändert (oder nie gesichert)? */
+export function ungesichert(s: Stand): boolean {
+  if (!s.letzteSicherung) return s.unterlagen.length > 0 || s.mitarbeiter.length > 0 || s.kunden.length > 0;
+  return Boolean(s.geaendert && s.geaendert > s.letzteSicherung);
+}
+
+/**
+ * „Alle Daten löschen“ (E-129): Liegen aufbewahrungspflichtige Unterlagen auf dem Gerät, nur mit einer Sicherung,
+ * die nach der letzten Änderung erstellt wurde – sonst wären Rechnungen weg, die Jahre aufbewahrt werden müssen.
+ */
+export const allesLoeschenErlaubt = (s: Stand) => aufbewahrungspflichtig(s).length === 0 || !ungesichert(s);
+
+/** Tage seit der letzten Sicherung, wenn eine fällig ist (ungesicherte Änderungen, älter als `nach` Tage), sonst null. */
+export function sicherungFaellig(s: Stand, jetzt: Date, nach = 7): { tage: number | null } | null {
+  if (!ungesichert(s) || s.unterlagen.length === 0) return null;
+  if (!s.letzteSicherung) return { tage: null };
+  const tage = Math.floor((jetzt.getTime() - Date.parse(s.letzteSicherung)) / 864e5);
+  return tage >= nach ? { tage } : null;
+}
+
+export interface Zusammenfuehrung {
+  stand: Stand;
+  neu: number;
+  behalten: number;
+  aktualisiert: number;
+  /** gleiche Nummer in zwei verschiedenen Unterlagen derselben Vorlage */
+  nummernKonflikte: string[];
+}
+
+/**
+ * Sicherung zurückspielen, ohne Neueres zu verlieren (E-129): Unterlagen werden nach ID zusammengeführt. Eine
+ * festgeschriebene Unterlage wird nie ersetzt; sonst gewinnt die zuletzt geänderte Fassung. Was nur auf dem Gerät
+ * existiert, bleibt. Personen, Antworten und Haken werden ergänzt; „Mein Betrieb“ nur übernommen, wenn er leer ist.
+ */
+export function zusammenfuehren(aktuell: Stand, gesichert: Stand): Zusammenfuehrung {
+  const nachId = new Map(aktuell.unterlagen.map((u) => [u.id, u]));
+  let neu = 0;
+  let behalten = 0;
+  let aktualisiert = 0;
+  for (const g of gesichert.unterlagen) {
+    const a = nachId.get(g.id);
+    if (!a) {
+      nachId.set(g.id, g);
+      neu++;
+    } else if (a.festgeschrieben || a.geaendert >= g.geaendert) {
+      // Zahlung oder Storno aus der Sicherung übernehmen, wenn auf dem Gerät noch nicht vermerkt
+      const erg = { ...a, ...(g.bezahlt && !a.bezahlt ? { bezahlt: g.bezahlt } : {}), ...(g.storniertDurch && !a.storniertDurch ? { storniertDurch: g.storniertDurch } : {}) };
+      nachId.set(a.id, erg);
+      behalten++;
+    } else {
+      nachId.set(g.id, g);
+      aktualisiert++;
+    }
+  }
+  const personen = (a: Person[], g: Person[]) => [...a, ...g.filter((p) => !a.some((x) => x.id === p.id))];
+  const erledigt = { ...gesichert.erledigt, ...aktuell.erledigt };
+  const stand: Stand = {
+    ...aktuell,
+    betrieb: betriebFehlt(aktuell.betrieb) ? gesichert.betrieb : aktuell.betrieb,
+    unterlagen: [...nachId.values()],
+    mitarbeiter: personen(aktuell.mitarbeiter, gesichert.mitarbeiter),
+    kunden: personen(aktuell.kunden, gesichert.kunden),
+    profil: { ...gesichert.profil, ...aktuell.profil },
+    erledigt,
+  };
+  const nummernKonflikte = [...new Set(stand.unterlagen.filter((u) => nummerDoppelt(stand, u)).map((u) => String(u.daten[vorlageFuer(u.vorlage)!.fortlaufend!]).trim()))].sort();
+  return { stand, neu, behalten, aktualisiert, nummernKonflikte };
+}

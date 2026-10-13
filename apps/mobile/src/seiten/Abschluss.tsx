@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Pressable, Share, View } from "react-native";
 import { KU_HINWEIS, PRUEFHINWEIS, dateiname, dokumentHtml, eRechnungAus, vorlageFuer, xrechnungUbl } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { Fuss, Hinweis, Karte, Knopf, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
+import { DatumFeld, Fuss, Hinweis, Karte, Knopf, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { RADIUS, useFarben } from "../ui/thema";
 import { Vorschau } from "../ui/Vorschau";
@@ -123,6 +123,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
           <Hinweis symbol="lock" text={TEXT.festgeschrieben_text(new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(u.festgeschrieben!)), Boolean(v.storno))} />
           {storno ? <Hinweis art="erfolg" text={TEXT.storniert_durch(String(storno.daten.nummer ?? ""))} /> : null}
           {typeof d.storno_zu === "string" && d.storno_zu ? <Hinweis text={TEXT.storniert_zu(d.storno_zu)} /> : null}
+          {v.storno && !u.storniertDurch ? <Zahlung id={id} /> : null}
         </View>
       ) : fertig ? (
         <View style={{ marginTop: 10 }}>
@@ -239,5 +240,36 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
         )}
       </View>
     </View>
+  );
+}
+
+/**
+ * Zahlungseingang einer festgeschriebenen Rechnung vermerken (E-129) – für die Ist-Versteuerung und den Überblick.
+ * Bei einer Stornorechnung: die Erstattung. Der Vermerk gehört nicht zum Inhalt, die Rechnung bleibt unverändert.
+ */
+function Zahlung({ id }: { id: string }) {
+  const z = useAmtlos();
+  const f = useFarben();
+  const [anders, setAnders] = useState(false);
+  const u = z.stand.unterlagen.find((x) => x.id === id);
+  if (!u) return null;
+  const erstattung = typeof u.daten.storno_zu === "string" && u.daten.storno_zu !== "";
+  const datumDe = (iso: string) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(`${iso}T12:00:00Z`));
+  return (
+    <Karte stil={{ marginTop: 10, paddingVertical: 12, gap: 8 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+        <Symbol name={u.bezahlt ? "checkmark.circle.fill" : "clock"} groesse={20} farbe={u.bezahlt ? f.amt : f.bald} />
+        <T fett stil={{ flex: 1 }}>{u.bezahlt ? (erstattung ? TEXT.erstattet_am(datumDe(u.bezahlt)) : TEXT.bezahlt_am(datumDe(u.bezahlt))) : TEXT.offen_zahlung}</T>
+      </View>
+      {u.bezahlt ? (
+        <TextKnopf symbol="xmark" text={TEXT.zahlung_entfernen} onPress={() => z.bezahltSetzen(id, null)} />
+      ) : (
+        <View style={{ gap: 4 }}>
+          <Knopf ton symbol="checkmark" text={erstattung ? TEXT.als_erstattet : TEXT.als_bezahlt} onPress={() => z.bezahltSetzen(id, heute())} />
+          {anders ? <DatumFeld label={TEXT.anderes_datum} wert={null} aendern={(d) => d && z.bezahltSetzen(id, d)} /> : <TextKnopf text={TEXT.anderes_datum} onPress={() => setAnders(true)} />}
+        </View>
+      )}
+      <T v="caption" leise>{TEXT.bezahlt_hilfe}</T>
+    </Karte>
   );
 }

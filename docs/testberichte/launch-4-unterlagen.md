@@ -128,3 +128,21 @@ Auf dem iPhone noch zu messen: Dauer der Verschlüsselung (PBKDF2 in JavaScript)
 | Alle 33 Vorlagen durchgeklickt, iOS-Bündel mit expo-notifications | ohne Seitenfehler, gebaut (3,7 MB) |
 
 Auf dem iPhone noch zu prüfen: Erlaubnisdialog und Zustellung der Erinnerungen in Expo Go; Teilen der XML-Datei (Mail, Dateien).
+
+## Nachtrag: Datenschutz, Voranmeldung, Gestaltung, Fristen (E-129)
+
+| Prüfung | Ergebnis |
+|---|---|
+| Verschlüsselte Ablage: kein Klartext (Name, SV-Nummer, Steuer-ID, IBAN), falscher Schlüssel und veränderte Daten werden erkannt | grün |
+| Zusammenführen: festgeschriebene Rechnung bleibt, neuere Fassung gewinnt, fehlende kommt dazu, doppelte Nummer gemeldet | grün |
+| Löschschutz und Sicherungs-Erinnerung (ungesichert / gesichert / danach geändert), automatische Sicherung im selben Format, mit Passwort lesbar | grün |
+| Voranmeldung: Soll nach Leistungsdatum (Leistung September, Rechnung Oktober → September), Storno im Monat des Stornos, Leistungszeitraum als Ersatz gemeldet; Ist nach Zahlungseingang, unbezahlte zählen nicht | grün |
+| E-Rechnung Wien (AE), Niederlande (K), Länder aus Präfix/USt-IdNr., fehlendes Land wird erfragt | grün; KoSIT 13/13 gültig |
+| Fristen: Einzelunternehmen ohne Beratung 02.08.2027, mit Beratung 01.03.2027 (ESt, GewSt, USt-Jahreserklärung), GmbH KSt 01.03.2027 | wie Übersicht der Finanzverwaltung |
+| Rechnung als DIN-5008-Brief: Gestalt „brief“, Hausfarbe, Fußzeilen-Spalten mit Bank, PDF mit gestempelter Fußzeile, Falz- und Lochmarken | grün, Sichtprüfung als PDF |
+| Alle 33 Vorlagen in neuer Gestalt gerendert (Vorschau und Druck) | Sichtprüfung ohne Fehler |
+| App-Tests / Fachlogik-Tests | 38 / 30 grün |
+| Rundgang hell und dunkel: Start auf „Pflichten“, Hausfarbe, Check mit Steuerberatungs-Frage, „Jetzt dran“ und „Kurz klären“, Rechnung als Brief, Zahlung vermerken, Löschen gesperrt bis zur Sicherung, Zusammenführen erklärt | ohne Befunde |
+| Alle 33 Vorlagen durchgeklickt, iOS-Bündel | ohne Seitenfehler, gebaut (5,4 MB inkl. Schriften) |
+
+Auf dem iPhone noch zu prüfen: Face ID in Expo Go, Logo aus den Fotos, PDF-Druck mit den Rändern je Gestalt (expo-print), Verschlüsselung beim ersten Start mit vorhandenen Daten.

@@ -73,6 +73,7 @@ function dseTeile(d: Daten, b: Betrieb): { titel: string; text: string }[] {
 
 export const datenschutzerklaerungWebsite: Vorlage = {
   id: "datenschutzerklaerung_website",
+  gestalt: "handbuch",
   titel: "Datenschutzerklärung für die Website",
   beschreibung: "Datenschutzerklärung aus Bausteinen: ankreuzen, was deine Website nutzt (Hosting, Kontakt, Cookies, Terminbuchung, Karten …) – als PDF und als Text zum Einfügen.",
   bereich: "datenschutz",
@@ -148,6 +149,7 @@ function impressumTeile(d: Daten, b: Betrieb): { titel: string; text: string }[]
 
 export const impressum: Vorlage = {
   id: "impressum",
+  gestalt: "handbuch",
   titel: "Impressum",
   beschreibung: "Die Anbieterangaben nach § 5 DDG für deine Website – Rechtsform wählen, Register und Kammer nur wenn nötig. Als Text zum Einfügen.",
   bereich: "betrieb",
@@ -205,6 +207,7 @@ const DAUER = ["für die Laufzeit des Hauptvertrags", "unbefristet; kündbar mit
 
 export const auftragsverarbeitung: Vorlage = {
   id: "avv",
+  gestalt: "vertrag",
   titel: "Vertrag zur Auftragsverarbeitung (AVV)",
   beschreibung: "Vertrag mit einem Dienstleister, der für dich Daten verarbeitet – mit allen Pflichtklauseln nach Art. 28 Abs. 3 DSGVO.",
   bereich: "datenschutz",

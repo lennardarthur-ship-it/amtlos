@@ -7,7 +7,7 @@ import { Fuss, Knopf, Symbol, T, TextKnopf, Wahl } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { RAND, ZIEL, istIos, useFarben } from "../ui/thema";
 import { PERSONEN_LISTE, personenSortiert } from "../unterlagen/speicher";
-import { periodeText, perioden, umsaetzeFuer } from "../unterlagen/ustAusRechnungen";
+import { offeneRechnungen, periodeText, perioden, umsaetzeFuer, type UstUebernahme, type Versteuerung } from "../unterlagen/ustAusRechnungen";
 import { useAmtlos } from "../zustand";
 import { Abschluss, useTeilen } from "./Abschluss";
 import { Felder } from "./felder";
@@ -45,29 +45,43 @@ function PersonenWahl({ v, id, daten }: { v: Vorlage; id: string; daten: Daten }
   );
 }
 
-/** Umsatzsteuer-Voranmeldung: Umsätze aus den geteilten Rechnungen eines Monats oder Quartals übernehmen (E-128). */
-function AusRechnungen({ id }: { id: string }) {
+/**
+ * Umsatzsteuer-Voranmeldung: Umsätze aus den geteilten Rechnungen eines Monats oder Quartals übernehmen (E-128) –
+ * bei Soll nach Leistungsdatum, bei Ist nach Zahlungseingang (E-129).
+ */
+function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
   const z = useAmtlos();
   const f = useFarben();
-  const [uebernommen, setUebernommen] = useState<{ periode: string; anzahl: number } | null>(null);
-  const liste = perioden(z.stand.unterlagen);
-  if (!liste.length) return <T v="caption" leise stil={{ marginTop: 10 }}>{TEXT.aus_rechnungen_leer}</T>;
+  const v: Versteuerung = daten.versteuerung === "ist" ? "ist" : "soll";
+  const [uebernommen, setUebernommen] = useState<{ periode: string; v: Versteuerung; r: UstUebernahme } | null>(null);
+  const liste = perioden(z.stand.unterlagen, z.stand.betrieb, v);
+  const offen = v === "ist" ? offeneRechnungen(z.stand.unterlagen).length : 0;
+  if (!liste.length)
+    return <T v="caption" leise stil={{ marginTop: 10 }}>{v === "ist" && offen ? TEXT.aus_rechnungen_ist_leer(offen) : TEXT.aus_rechnungen_leer}</T>;
+  const r = uebernommen && uebernommen.v === v ? uebernommen.r : null;
   return (
     <View style={{ marginTop: 14, padding: 14, borderRadius: 14, backgroundColor: f.amtHauch }}>
       <T v="klein" fett farbe={f.amtTief}>{TEXT.aus_rechnungen_titel}</T>
+      <T v="caption" farbe={f.amtTief}>{v === "ist" ? TEXT.aus_rechnungen_nach_ist : TEXT.aus_rechnungen_nach_soll}</T>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 6 }}>
         <Wahl
-          wert={uebernommen?.periode ?? null}
+          wert={uebernommen?.v === v ? uebernommen.periode : null}
           aendern={(p) => {
-            const r = umsaetzeFuer(z.stand.unterlagen, p, z.stand.betrieb);
-            if (!r) return;
-            z.setzen(id, r.werte);
-            setUebernommen({ periode: p, anzahl: r.anzahl });
+            const erg = umsaetzeFuer(z.stand.unterlagen, p, z.stand.betrieb, v);
+            if (!erg) return;
+            z.setzen(id, erg.werte);
+            setUebernommen({ periode: p, v, r: erg });
           }}
           optionen={liste.map((p) => ({ wert: p, text: periodeText(p) }))}
         />
       </ScrollView>
-      {uebernommen ? <T v="caption" farbe={f.amtTief} stil={{ marginTop: 8 }}>{TEXT.aus_rechnungen_ok(uebernommen.anzahl)}</T> : null}
+      {r ? (
+        <View style={{ marginTop: 8, gap: 4 }}>
+          <T v="caption" farbe={f.amtTief}>{TEXT.aus_rechnungen_ok(r.anzahl)}</T>
+          {r.ersatz ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_ersatz(r.ersatz)}</T> : null}
+          {r.offen ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_offen(r.offen)}</T> : null}
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -82,7 +96,7 @@ function Schritt({ v, a, index, id, daten, fehlt }: { v: Vorlage; a: VorlagenAbs
       {a.hilfe ? <T leise stil={{ marginTop: 6 }}>{a.hilfe}</T> : null}
       {index === 0 ? <TextKnopf symbol="questionmark.circle" text={TEXT.wozu_link} onPress={() => nav.oeffnen(`info-${v.id}`, () => <InfoSeite id={v.id} />, true)} stil={{ marginTop: 4 }} /> : null}
       {mitPerson ? <PersonenWahl v={v} id={id} daten={daten} /> : null}
-      {v.ausRechnungen && index === 0 ? <AusRechnungen id={id} /> : null}
+      {v.ausRechnungen && index === 0 ? <AusRechnungen id={id} daten={daten} /> : null}
       <Felder felder={a.felder} werte={daten} fehlt={fehlt} setze={(k, w) => z.setzen(id, { [k]: w })} liste={(f) => <ListenSchritt feld={f} id={id} />} />
     </View>
   );

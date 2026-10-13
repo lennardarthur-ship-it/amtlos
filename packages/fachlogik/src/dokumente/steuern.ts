@@ -12,6 +12,7 @@ const PROGRAMME = ["Buchhaltungsprogramm", "Kassensystem", "Rechnungsprogramm", 
 
 export const verfahrensdokumentation: Vorlage = {
   id: "verfahrensdokumentation",
+  gestalt: "handbuch",
   titel: "Verfahrensdokumentation (GoBD)",
   beschreibung: "Wie in deinem Betrieb Belege ankommen, gebucht, aufbewahrt und gesichert werden – Abläufe zum Ankreuzen nach den Mustern von AWV und Steuerberaterkammer.",
   bereich: "steuern",

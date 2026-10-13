@@ -5,7 +5,7 @@ import { parse } from "yaml";
 import { describe, expect, it } from "vitest";
 import { VORLAGEN } from "@amtlos/fachlogik";
 import { LEERER_STAND, anlegen, erledigtSetzen, profilSetzen, standAus } from "../src/unterlagen/speicher";
-import { CHECK_FELDER, KATALOG, auswertung, checkFragen, dringlichkeit, erinnerungsPlan, fortschritt, frageZu, istErledigt, zusatzFragen, type Profil } from "../src/pflichten/check";
+import { CHECK_FELDER, KATALOG, auswertung, checkFragen, dringlichkeit, erinnerungsPlan, fortschritt, frageZu, istErledigt, offeneFragenNachWirkung, zusatzFragen, type Profil } from "../src/pflichten/check";
 
 const FIXTURES = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../catalog/fixtures");
 const salon: Profil = { "taetigkeit.branchen": ["beauty_kosmetik"], rechtsform: "einzelunternehmen", "taetigkeit.einordnung": "gewerbe", bundesland: "BY", "beschaeftigte.gesamt": 3, "kasse.elektronisch": true, "online.website": false, "ust.kleinunternehmer": false, gruendungsdatum: "2024-03-01" };
@@ -122,7 +122,11 @@ describe("Pflichten-Check", () => {
   it("schlägt Zusatzfragen vor, die unklare Pflichten klären", () => {
     const z = zusatzFragen(salon, "2026-10-12");
     expect(z.length).toBeGreaterThan(0);
-    expect(z.length).toBeLessThanOrEqual(5);
+    expect(z.length).toBeLessThanOrEqual(8);
+    // nach Wirkung sortiert: die erste Frage klärt am meisten
+    const w = offeneFragenNachWirkung(auswertung(salon, "2026-10-12"), salon);
+    expect(w.map((o) => o.anzahl)).toEqual([...w.map((o) => o.anzahl)].sort((x, y) => y - x));
+    expect(z).toEqual(w.slice(0, 8).map((o) => o.feld));
     for (const f of z) expect(frageZu(f), f).toBeTruthy();
     const vorher = auswertung(salon, "2026-10-12").unbekannt.length;
     const antworten: Profil = { ...salon };

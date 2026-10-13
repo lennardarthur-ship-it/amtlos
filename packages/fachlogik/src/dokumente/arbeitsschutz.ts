@@ -252,6 +252,7 @@ const BA_TEILE: { id: string; label: string; hilfe: string; bausteine?: string }
 
 export const betriebsanweisung: Vorlage = {
   id: "betriebsanweisung",
+  gestalt: "aushang",
   titel: "Betriebsanweisung",
   beschreibung: "Aushang für einen Gefahrstoff nach TRGS 555: Gefahren, Schutzmaßnahmen, Verhalten im Gefahrfall, Erste Hilfe, Entsorgung – mit Bausteinen zum Antippen.",
   bereich: "arbeitsschutz",

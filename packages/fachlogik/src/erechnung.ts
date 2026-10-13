@@ -11,7 +11,19 @@ const geld = (cent: number) => ({ "@currencyID": "EUR" as const, wert: betrag(ce
 /** Rechnung → UBL-Struktur als JSON (Format der Bibliothek @e-invoice-eu/core auf dem Server, hier auch Grundlage für das XML der App). */
 export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record<string, unknown> {
   const s = summen(r.positionen, r.kleinunternehmer);
-  const kategorie = (satz: number | null) => (satz === null ? { "cbc:ID": "E", "cbc:Percent": "0" } : { "cbc:ID": "S", "cbc:Percent": String(satz) });
+  // Steuerkategorie (UNTDID 5305): S Normal, E befreit (auch Kleinunternehmer), AE Steuerschuldnerschaft des Empfängers, K innergemeinschaftliche Lieferung
+  const null0 = r.steuerart === "reverse_charge" ? "AE" : r.steuerart === "igl" ? "K" : "E";
+  const kategorie = (satz: number | null) => (satz === null ? { "cbc:ID": "E", "cbc:Percent": "0" } : satz === 0 ? { "cbc:ID": null0, "cbc:Percent": "0" } : { "cbc:ID": "S", "cbc:Percent": String(satz) });
+  const befreiung = (satz: number | null): Record<string, string> =>
+    satz === null
+      ? { "cbc:TaxExemptionReason": kuHinweis }
+      : satz !== 0
+        ? {}
+        : r.steuerart === "reverse_charge"
+          ? { "cbc:TaxExemptionReasonCode": "VATEX-EU-AE", "cbc:TaxExemptionReason": "Steuerschuldnerschaft des Leistungsempfängers" }
+          : r.steuerart === "igl"
+            ? { "cbc:TaxExemptionReasonCode": "VATEX-EU-IC", "cbc:TaxExemptionReason": "Steuerfreie innergemeinschaftliche Lieferung" }
+            : { "cbc:TaxExemptionReason": r.befreiungsgrund ?? "" };
   const vz = r.art === "storno" ? -1 : 1; // Storno: Rechnungskorrektur mit negativen Beträgen (Typ 384)
   const m = (cent: number) => geld(vz * cent);
   const steuerSchemas = [
@@ -49,7 +61,10 @@ export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record
         "cac:PartyLegalEntity": { "cbc:RegistrationName": r.kunde.name },
       },
     },
-    ...(r.leistungsdatum ? { "cac:Delivery": { "cbc:ActualDeliveryDate": r.leistungsdatum } } : {}),
+    // Lieferanschrift mit Land (BT-80) ist bei innergemeinschaftlichen Lieferungen Pflicht (BR-IC-12, BR-DE-10/11): die Anschrift des Empfängers
+    ...(r.leistungsdatum || r.steuerart === "igl"
+      ? { "cac:Delivery": { ...(r.leistungsdatum ? { "cbc:ActualDeliveryDate": r.leistungsdatum } : {}), ...(r.steuerart === "igl" ? { "cac:DeliveryLocation": { "cac:Address": { "cbc:StreetName": r.kunde.strasse ?? "", "cbc:CityName": r.kunde.ort ?? "", "cbc:PostalZone": r.kunde.plz ?? "", "cac:Country": { "cbc:IdentificationCode": r.kunde.land } } } } : {}) } }
+      : {}),
     ...(r.steller.iban
       ? { "cac:PaymentMeans": [{ "cbc:PaymentMeansCode": "58", "cac:PayeeFinancialAccount": { "cbc:ID": r.steller.iban.replace(/\s/g, ""), ...(r.steller.bic ? { "cac:FinancialInstitutionBranch": { "cbc:ID": r.steller.bic } } : {}) } }] }
       : {}),
@@ -59,7 +74,7 @@ export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record
         "cac:TaxSubtotal": s.gruppen.map((g) => ({
           "cbc:TaxableAmount": m(g.netto_cent).wert, "cbc:TaxableAmount@currencyID": "EUR",
           "cbc:TaxAmount": m(g.ust_cent).wert, "cbc:TaxAmount@currencyID": "EUR",
-          "cac:TaxCategory": { ...kategorie(g.satz), ...(g.satz === null ? { "cbc:TaxExemptionReason": kuHinweis } : {}), "cac:TaxScheme": { "cbc:ID": "VAT" } },
+          "cac:TaxCategory": { ...kategorie(g.satz), ...befreiung(g.satz), "cac:TaxScheme": { "cbc:ID": "VAT" } },
         })),
       },
     ],

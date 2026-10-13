@@ -191,6 +191,7 @@ const ARTEN = [
 
 export const svMeldedaten: Vorlage = {
   id: "sv_meldedaten",
+  gestalt: "formular",
   titel: "Personalfragebogen (Daten für die Anmeldung)",
   beschreibung: "Alle Angaben einer neuen beschäftigten Person, die du für die Anmeldung zur Sozialversicherung und die Lohnabrechnung brauchst – zum Unterschreiben.",
   bereich: "personal",

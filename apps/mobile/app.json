@@ -22,7 +22,28 @@
     "plugins": [
       "expo-font",
       "expo-splash-screen",
-      "expo-notifications"
+      "expo-notifications",
+      "expo-secure-store",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Amtlos nutzt Face ID, um deine Unterlagen vor fremdem Zugriff zu schützen."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Amtlos braucht Zugriff auf deine Fotos, damit du dein Logo für Rechnungen und Briefe auswählen kannst.",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
+      ],
+      [
+        "react-native-cloud-storage",
+        {
+          "iCloudContainerEnvironment": "Production"
+        }
+      ]
     ]
   }
 }

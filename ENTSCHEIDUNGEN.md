@@ -587,6 +587,38 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Erinnerungen (lokal):** Schalter in „Deine Pflichten“. Die App plant Mitteilungen auf dem Gerät (expo-notifications), 3 Tage vor jedem Termin offener Pflichten um 9 Uhr, höchstens 30, und plant bei jeder Änderung neu (abgehakte Pflichten fallen heraus). Kein Server, keine Push-Dienste; im Web ohne Funktion.
 - **Ladefehler sichtbar:** Sind gespeicherte Daten unlesbar, zeigt die App oben einen Hinweis (statt still nichts zu speichern).
 
+### E-129 · Daten geschützt, Voranmeldung nach Leistung oder Zahlung, Pflichten zuerst, Dokumente mit eigener Gestalt
+- **Datum:** 2026-10-13 · **Status:** angenommen (Review L. Reiche vom 13.10.2026 nach dem Termin: vier Hauptpunkte, vier kleinere Befunde; Gründer: ELSTER nur als Konzept, iCloud vorbereiten)
+- **Verschlüsselte Ablage:** Der gespeicherte Stand liegt nur noch verschlüsselt in AsyncStorage (AES-256-GCM). Der Schlüssel liegt im Schlüsselbund (expo-secure-store, nur dieses Gerät, nur entsperrt). Ältere Daten werden beim ersten Start verschlüsselt. Fehlt der Schlüssel oder passt er nicht, überschreibt die App nichts (Ladefehler-Hinweis). Im Web (Tests) bleibt es unverschlüsselt.
+- **App-Sperre:** optional „Mit Face ID sperren“ (expo-local-authentication), sperrt nach jedem Wechsel in den Hintergrund.
+- **Löschschutz:** „Alle Daten löschen“ ist gesperrt, solange festgeschriebene Unterlagen (Rechnungen, Kassenbuch) nicht in einer Sicherung nach der letzten Änderung enthalten sind. Die Aufbewahrungsdauer im Hinweis kommt aus dem Katalog-Regelwert `steuern.aufbewahrung.belege_jahre`.
+- **Zusammenführen statt Überschreiben:** Eine Sicherung wird nach ID mit dem Gerät zusammengeführt. Festgeschriebene Unterlagen werden nie ersetzt, sonst gewinnt die zuletzt geänderte Fassung, und nur auf dem Gerät Vorhandenes bleibt. Doppelte Rechnungsnummern werden vor dem Zurückspielen gemeldet.
+- **Erinnerung an die Sicherung:** Gibt es ungesicherte Änderungen und ist die letzte Sicherung älter als eine Woche (oder gab es noch keine), erscheint auf „Pflichten“ der Hinweis „Zeit für eine Sicherung“.
+- **iCloud (vorbereitet):** automatische, verschlüsselte Sicherung nach iCloud Drive im eigenen App-Build (`react-native-cloud-storage`, Config-Plugin). In Expo Go unsichtbar. Einrichtung: docs/09-icloud-sicherung.md.
+- **Voranmeldung nach dem richtigen Zeitpunkt:**
+  - Wahl „Soll“ (vereinbarte Entgelte, § 13 Abs. 1 Nr. 1 a UStG) oder „Ist“ (vereinnahmte Entgelte, § 13 Abs. 1 Nr. 1 b, § 20 UStG), gemerkt unter „Mein Betrieb“.
+  - Soll ordnet nach Leistungsdatum zu, Stornos im Zeitraum des Stornos (§ 17 UStG). Rechnungen mit Leistungszeitraum statt Tag zählen nach Rechnungsdatum und werden gemeldet.
+  - Ist ordnet nach Zahlungseingang zu, den man an der festgeschriebenen Rechnung vermerkt („Zahlung eingegangen – heute“ oder anderes Datum, bei Storno die Erstattung). Der Vermerk ändert die Rechnung nicht.
+- **Pflichten zuerst:** neuer erster Tab „Pflichten“ mit Einladung zum Check bzw. „Jetzt dran“, Fortschritt und allen Pflichten. „Unterlagen“ ist der zweite Tab.
+- **Weniger Unklares:**
+  - Statt einer Liste unklarer Pflichten und „33 weitere Fragen“ stehen in „Kurz klären“ die drei Fragen, die am meisten klären, mit „klärt N Pflichten“ direkt beantwortbar.
+  - Im Check bis zu acht Zusatzfragen, nach Wirkung sortiert. Der Rest steht nur noch als Textknopf darunter.
+  - Neue Grundfrage „Macht eine Steuerberaterin oder ein Steuerberater deine Erklärungen?“ (bestimmt die Fristen).
+- **Fristen der Steuererklärungen:**
+  - ESt, KSt, GewSt und USt-Jahreserklärung jährlich zum 31. Juli des Folgejahres (§ 149 Abs. 2 AO), mit Steuerberatung Ende Februar des übernächsten Jahres (§ 149 Abs. 3 AO), jeweils nächster Werktag (§ 108 Abs. 3 AO).
+  - Ergibt für das Veranlagungsjahr 2026 den 02.08.2027 und für 2025 mit Beratung den 01.03.2027, wie in der Übersicht der Finanzverwaltung Baden-Württemberg.
+  - Übergangsfristen bis 2024 sind nicht abgebildet.
+- **E-Rechnung ins Ausland:**
+  - Anschrift mit Länderzeile („Österreich“) oder Präfix („A-1010“). Ohne beides wird das Land aus der USt-IdNr. des Empfängers bzw. einer fünfstelligen PLZ (Deutschland) bestimmt, sonst fragt die App.
+  - 0 % mit Grund: Steuerschuldnerschaft des Empfängers (Kategorie AE), innergemeinschaftliche Lieferung (K, mit Lieferanschrift) oder Steuerbefreiung (E). AE und K verlangen beide USt-IdNr.
+  - 13 Beispiele bestehen den KoSIT-Validator (XRechnung 3.0.2).
+- **Dokumente mit eigener Gestalt:** Jede Vorlage hat eine Gestalt passend zum Zweck.
+  - Geschäftsbrief nach DIN 5008 Form B (Rechnung): Fenster-Anschrift, Informationsblock, Betreff, Zahlungsaufforderung mit Bankverbindung, Fußzeile in Spalten (Anschrift, Kontakt, Bank, Steuer/Register) auf jeder Seite, Falz- und Lochmarken.
+  - Vertrag (Nachweis der Arbeitsbedingungen, AVV), Aushang (Hygiene-, Hautschutzplan, Allergene, Betriebsanweisung), Nachweis, Formular (Zusammenstellungen für Behörden) und Handbuch (Verfahrensdokumentation, Datenschutz).
+  - „Mein Betrieb“ hat Logo (aus den Fotos, verkleinert), Hausfarbe aus acht druckfesten Farben, Bank, BIC und Website.
+  - Eingebettete Schriften „Amtlos Sans“ und „Amtlos Serif“: Teilmengen von Source Sans 3 und Source Serif 4, OFL 1.1, wegen des reservierten Namens umbenannt. Damit sieht das PDF auf jedem Gerät gleich aus.
+- **ELSTER:** nicht gebaut. Konzept mit beiden Wegen (Zertifikat des Nutzers oder Übermittlung im Auftrag), Architektur und Aufwand in docs/08-elster-eric.md. Voraussetzung: K1 und J-1.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

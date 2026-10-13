@@ -40,6 +40,7 @@ function kuendigungText(d: Daten): string {
 
 export const nachweisArbeitsbedingungen: Vorlage = {
   id: "nachweis_arbeitsbedingungen",
+  gestalt: "vertrag",
   titel: "Nachweis der wesentlichen Arbeitsbedingungen",
   beschreibung: "Niederschrift aller Angaben nach § 2 Abs. 1 NachwG zum Unterschreiben und Aushändigen – mit Kündigungsregeln aus dem Gesetz und Prüfung gegen Mindestlohn und Mindesturlaub.",
   bereich: "personal",
@@ -152,7 +153,7 @@ export const nachweisArbeitsbedingungen: Vorlage = {
       meta: `Beschäftigte Person: ${text(d, "name")}\nBeginn: ${datumDe(text(d, "beginn"))}\nAusgestellt: ${datumDe(text(d, "ausgestellt_am"))}`,
       inhalt:
         `<p class="klein">Niederschrift der wesentlichen Vertragsbedingungen nach § 2 Abs. 1 Nachweisgesetz. Sie ersetzt keinen Arbeitsvertrag.</p>` +
-        abschnitt("Wesentliche Arbeitsbedingungen", angaben(zeilenNw)) +
+        abschnitt("Wesentliche Arbeitsbedingungen", angaben(zeilenNw), "ohne-nummer") +
         unterschriften(["Ort, Datum · Arbeitgeber/in", "Erhalten am · beschäftigte Person"]),
     });
   },

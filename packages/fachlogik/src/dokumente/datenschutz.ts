@@ -30,6 +30,7 @@ const DIENSTLEISTUNGEN = ["Website-Hosting", "E-Mail-Anbieter", "Online-Terminbu
 
 export const datenschutzDokumentation: Vorlage = {
   id: "datenschutz_dokumentation",
+  gestalt: "handbuch",
   titel: "Verzeichnis der Verarbeitungstätigkeiten mit TOM",
   beschreibung: "Welche Daten über Menschen du wofür verarbeitest, wie du sie schützt (TOM) und welche Dienstleister beteiligt sind – mit Vorschlägen aus Muster-Verzeichnissen der Aufsichtsbehörden.",
   bereich: "datenschutz",
@@ -285,6 +286,7 @@ const ZIELGRUPPE = ["Kundinnen und Kunden", "Beschäftigte", "Bewerberinnen und 
 
 export const datenschutzinformation: Vorlage = {
   id: "datenschutzinformation",
+  gestalt: "handbuch",
   titel: "Datenschutzinformation (Art. 13 DSGVO)",
   beschreibung: "Informationsblatt für Kundschaft, Beschäftigte oder Bewerbende – Verarbeitungen ankreuzen, Zwecke, Rechtsgrundlagen und Speicherdauer kommen automatisch.",
   bereich: "datenschutz",

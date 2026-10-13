@@ -8,9 +8,10 @@ titel:
 kurz:
   de: Einmal im Jahr gibst du elektronisch die Umsatzsteuer-Jahreserklärung ab.
 erklaerung:
-  de: Die Jahreserklärung fasst die Umsatzsteuer des ganzen Jahres zusammen.
+  de: Die Jahreserklärung fasst die Umsatzsteuer des ganzen Jahres zusammen – ohne Steuerberatung bis 31. Juli des Folgejahres, mit Steuerberatung bis Ende Februar des übernächsten Jahres (§ 149 AO).
 rechtsgrundlage:
 - § 18 UStG
+- § 149 AO
 kategorie: steuern
 ausloeser:
   feld: profil.ust.kleinunternehmer
@@ -19,7 +20,19 @@ ausloeser:
   label:
     de: Du nutzt die Kleinunternehmerregelung nicht.
 frist:
-  typ: dauerhaft
+  typ: wiederkehrend
+  rhythmus: jaehrlich
+  # § 149 Abs. 2 AO: sieben Monate nach Ablauf des Kalenderjahres (31. Juli); beratene Fälle § 149 Abs. 3 AO: letzter
+  # Tag im Februar des zweitfolgenden Jahres (31. Juli + 7 Monate, Monatsende-Regel); § 108 Abs. 3 AO: nächster Werktag
+  faellig:
+    art: tag_nach_periodenende
+    monate_nach: 7
+    tag: 31
+  verlaengerung:
+    wenn: { feld: profil.steuerberater, op: "==", wert: true }
+    versatz: P7M
+  verschiebung: { regel: naechster_werktag, kalender: bundesland }
+  erinnerung: [P30D, P7D]
 wiederholung:
   art: periodisch
 stelle:
@@ -35,13 +48,23 @@ status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
 quellen:
+- titel: Abgabenordnung § 149 (Abgabe der Steuererklärungen)
+  url: https://dejure.org/gesetze/AO/149.html
+  abgerufen: 2026-10-13
+- titel: Abgabenordnung § 108 (Fristen und Termine)
+  url: https://dejure.org/gesetze/AO/108.html
+  abgerufen: 2026-10-13
+- titel: Finanzamt Baden-Württemberg – Abgabefristen der Steuererklärungen
+  url: https://finanzamt-bw.fv-bwl.de/9361700
+  abgerufen: 2026-10-13
 - titel: Umsatzsteuergesetz § 18
   url: https://www.gesetze-im-internet.de/ustg_1980/__18.html
   abgerufen: null
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Abgabefristen (mit und ohne Steuerberatung) fehlen in der Spezifikation – als jährliche Regeldaten ergänzen (Jahreskalender
-  I)
+- Fristen nach § 149 Abs. 2 und 3 AO ergänzt (E-129, Quelle Recherche 13.10.2026 über dejure.org und Finanzamt BW) – gegen amtliche Fassung prüfen
+- Übergangsfristen Art. 97 § 36 EGAO (Veranlagungszeiträume bis 2024) sind nicht abgebildet – ab Veranlagungszeitraum 2025 gilt § 149 AO regulär
+- Vorabanforderung nach § 149 Abs. 4 AO (frühere Frist im Einzelfall) und Fristverlängerung auf Antrag nicht abgebildet
+- 'Verschiebung auf den nächsten Werktag nach § 108 Abs. 3 AO – Feiertagskalender des Bundeslands prüfen'
 - 'Kleinunternehmer: Erklärungspflicht prüfen'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 pruefung:

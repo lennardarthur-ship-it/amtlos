@@ -36,13 +36,13 @@ interface Datei {
 
 // ---- Kodierung ohne Abhängigkeit von TextEncoder/Buffer (nicht überall in React Native vorhanden)
 
-function utf8(s: string): Uint8Array {
+export function utf8(s: string): Uint8Array {
   const b = unescape(encodeURIComponent(s));
   const out = new Uint8Array(b.length);
   for (let i = 0; i < b.length; i++) out[i] = b.charCodeAt(i);
   return out;
 }
-function ausUtf8(bytes: Uint8Array): string {
+export function ausUtf8(bytes: Uint8Array): string {
   let s = "";
   for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
   return decodeURIComponent(escape(s));
@@ -70,6 +70,30 @@ export function ausBase64(s: string): Uint8Array {
 }
 
 const schluessel = (passwort: string, salz: Uint8Array, iterationen: number) => pbkdf2(sha256, utf8(passwort), salz, { c: iterationen, dkLen: 32 });
+
+/** Abgeleiteter Schlüssel für automatische Sicherungen (E-129): einmal aus dem Passwort, dann im Schlüsselbund. */
+export interface SicherungsSchluessel {
+  schluessel: Uint8Array;
+  salz: Uint8Array;
+  iterationen: number;
+}
+
+export function schluesselAusPasswort(passwort: string, zufall: (n: number) => Uint8Array, iterationen = SICHERUNG_ITERATIONEN): SicherungsSchluessel {
+  if (passwort.length < PASSWORT_MINDESTLAENGE) throw new Error("Passwort zu kurz");
+  const salz = zufall(16);
+  return { schluessel: schluessel(passwort, salz, iterationen), salz, iterationen };
+}
+
+/**
+ * Sicherung mit einem schon abgeleiteten Schlüssel – dasselbe Dateiformat wie `sicherungErstellen`, also mit dem
+ * Passwort wiederherstellbar; ohne die langsame Schlüsselableitung bei jeder automatischen Sicherung.
+ */
+export function sicherungMitSchluessel(stand: Stand, k: SicherungsSchluessel, zufall: (n: number) => Uint8Array, jetzt = new Date()): string {
+  const nonce = zufall(12);
+  const geheim = gcm(k.schluessel, nonce, utf8(ZUSATZ)).encrypt(utf8(JSON.stringify(stand)));
+  const d: Datei = { format: SICHERUNG_FORMAT, version: 1, erstellt: jetzt.toISOString(), kdf: { name: "PBKDF2-SHA256", iterationen: k.iterationen, salz: base64(k.salz) }, chiffre: { name: "AES-256-GCM", nonce: base64(nonce) }, daten: base64(geheim) };
+  return JSON.stringify(d, null, 1);
+}
 
 /** Sicherung als Text (JSON) erstellen. `zufall` liefert kryptografisch sichere Zufallsbytes. */
 export function sicherungErstellen(stand: Stand, passwort: string, zufall: (n: number) => Uint8Array, jetzt = new Date(), iterationen = SICHERUNG_ITERATIONEN): string {

@@ -58,7 +58,9 @@ describe("Rechnungen nach GoBD (E-127)", () => {
   it("setzt die Angaben der Gesellschaft auf die Rechnung und schreibt das Leistungsdatum aus", () => {
     const s = rechnung();
     const html = dokumentHtml(vorlageFuer("rechnung")!, s.unterlagen[0]!.daten, B);
-    expect(html).toContain("Sitz München · Amtsgericht München HRB 123456 · Geschäftsführung: Robin Beispiel");
+    // Fußleiste (im PDF auf jeder Seite, sonst am Ende): Sitz, Register, Geschäftsführung
+    expect(html).toContain("Sitz München · Amtsgericht München HRB 123456");
+    expect(html).toContain("Geschäftsführung: Robin Beispiel");
     expect(html).toContain("Leistungsdatum");
     expect(html).not.toContain("= Rechnungsdatum");
   });

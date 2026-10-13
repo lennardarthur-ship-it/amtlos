@@ -15,6 +15,7 @@ const PERSON = [
 
 export const gewerbeanmeldung: Vorlage = {
   id: "gewerbeanmeldung",
+  gestalt: "formular",
   titel: "Gewerbeanmeldung (Datenblatt)",
   beschreibung: "Alle Angaben für die Gewerbeanmeldung an einem Ort – zum Übertragen in das Online-Formular deiner Stadt oder zum Mitnehmen aufs Amt.",
   bereich: "betrieb",
@@ -85,6 +86,7 @@ const HR_FORMEN = ["GmbH", "UG (haftungsbeschränkt)", "e. K.", "OHG", "KG", "Gm
 
 export const handelsregister: Vorlage = {
   id: "handelsregister",
+  gestalt: "formular",
   titel: "Handelsregister (Vorbereitung)",
   beschreibung: "Die Angaben für die Anmeldung zum Handelsregister – Firma, Sitz, Gegenstand, Kapital, Gesellschafter, Geschäftsführung – zum Termin beim Notar.",
   bereich: "betrieb",
@@ -131,6 +133,7 @@ export const handelsregister: Vorlage = {
 
 export const transparenzregister: Vorlage = {
   id: "transparenzregister",
+  gestalt: "formular",
   titel: "Transparenzregister: wirtschaftlich Berechtigte",
   beschreibung: "Wer hinter der Gesellschaft steht – Name, Geburtsdatum, Wohnort, Staatsangehörigkeit, Art und Umfang des Interesses. Für die Meldung und deine Unterlagen.",
   bereich: "betrieb",

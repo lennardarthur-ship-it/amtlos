@@ -7,9 +7,9 @@
 import { KU_HINWEIS, fehlendFuerERechnung, rundeCent, summen, type Position, type RechnungsDaten } from "../rechnung.js";
 import { einheitCode } from "../erechnung.js";
 import { AUFBEWAHRUNG, EINHEITEN, EUER_AUSGABEN, EUER_EINNAHMEN, KASSEN_ARTEN, RECHNUNGS_HINWEISE, TSE_ARTEN } from "./bausteine.js";
-import { LINIE, abschnitt, absatz, angaben, anschrift, auswahl, cent, datumDe, dokument, esc, euro, ja, liste, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
+import { abschnitt, absatz, angaben, anschrift, auswahl, brief, cent, datumDe, dokument, esc, euro, ja, liste, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
 import { optionen } from "./konstanten.js";
-import type { Betrieb, Daten, Eintrag, Vorlage } from "./typen.js";
+import type { Betrieb, Daten, Eintrag, Option, Vorlage } from "./typen.js";
 
 /** ISO-Datum plus Tage als TT.MM.JJJJ. */
 function plusTage(iso: string, tage: number): string {
@@ -46,6 +46,10 @@ const E_FEHLT: Record<string, string> = {
   "positionen.ungueltig": "Positionen mit Bezeichnung, Menge und Preis",
   "positionen.steuersatz": "Umsatzsteuersatz je Position",
   leistungsdatum: "Leistungsdatum als Datum (TT.MM.JJJJ)",
+  "steuer.grund_null": "Grund für 0 % Umsatzsteuer (Hinweis: Steuerschuldnerschaft des Empfängers, innergemeinschaftliche Lieferung oder Steuerbefreiung)",
+  "steuer.befreiungsgrund": "Hinweis auf die Steuerbefreiung",
+  "steller.ust_idnr": "USt-IdNr. des Betriebs (Mein Betrieb)",
+  "kunde.ust_idnr": "USt-IdNr. des Empfängers",
 };
 
 const isoAus = (t: string) => {
@@ -53,14 +57,71 @@ const isoAus = (t: string) => {
   return m ? `${m[3]}-${m[2]!.padStart(2, "0")}-${m[1]!.padStart(2, "0")}` : /^\d{4}-\d{2}-\d{2}$/.test(t.trim()) ? t.trim() : null;
 };
 
+/** Länder für die Anschrift: Name (deutsch/englisch/landessprachlich) oder Kürzel → ISO 3166-1 alpha-2. */
+const LAENDER: Record<string, string> = {
+  deutschland: "DE", germany: "DE", de: "DE", d: "DE",
+  österreich: "AT", oesterreich: "AT", austria: "AT", at: "AT", a: "AT",
+  schweiz: "CH", switzerland: "CH", suisse: "CH", svizzera: "CH", ch: "CH",
+  liechtenstein: "LI", li: "LI", fl: "LI",
+  belgien: "BE", belgium: "BE", belgique: "BE", belgië: "BE", be: "BE", b: "BE",
+  niederlande: "NL", netherlands: "NL", nederland: "NL", holland: "NL", nl: "NL",
+  luxemburg: "LU", luxembourg: "LU", lu: "LU", l: "LU",
+  frankreich: "FR", france: "FR", fr: "FR", f: "FR",
+  italien: "IT", italy: "IT", italia: "IT", it: "IT", i: "IT",
+  spanien: "ES", spain: "ES", españa: "ES", es: "ES", e: "ES",
+  portugal: "PT", pt: "PT", p: "PT",
+  dänemark: "DK", daenemark: "DK", denmark: "DK", danmark: "DK", dk: "DK",
+  schweden: "SE", sweden: "SE", sverige: "SE", se: "SE", s: "SE",
+  finnland: "FI", finland: "FI", suomi: "FI", fi: "FI",
+  polen: "PL", poland: "PL", polska: "PL", pl: "PL",
+  tschechien: "CZ", czechia: "CZ", "czech republic": "CZ", česko: "CZ", cz: "CZ",
+  slowakei: "SK", slovakia: "SK", slovensko: "SK", sk: "SK",
+  ungarn: "HU", hungary: "HU", magyarország: "HU", hu: "HU",
+  slowenien: "SI", slovenia: "SI", slovenija: "SI", si: "SI",
+  kroatien: "HR", croatia: "HR", hrvatska: "HR", hr: "HR",
+  irland: "IE", ireland: "IE", ie: "IE",
+  griechenland: "GR", greece: "GR", gr: "GR", el: "GR",
+  rumänien: "RO", rumaenien: "RO", romania: "RO", ro: "RO",
+  bulgarien: "BG", bulgaria: "BG", bg: "BG",
+  estland: "EE", estonia: "EE", ee: "EE",
+  lettland: "LV", latvia: "LV", lv: "LV",
+  litauen: "LT", lithuania: "LT", lt: "LT",
+  malta: "MT", mt: "MT",
+  zypern: "CY", cyprus: "CY", cy: "CY",
+  "vereinigtes königreich": "GB", großbritannien: "GB", grossbritannien: "GB", "united kingdom": "GB", uk: "GB", gb: "GB",
+  norwegen: "NO", norway: "NO", norge: "NO", no: "NO",
+};
+/** USt-IdNr.-Präfix → Land (Griechenland: EL). */
+const UST_LAND: Record<string, string> = { EL: "GR", XI: "GB" };
+
+/**
+ * Anschrift aus Zeilen zerlegen (E-129): erste Zeile Straße, dann „PLZ Ort“ (auch „A-1010 Wien“, „1012 AB Amsterdam“),
+ * optional eine letzte Zeile mit dem Land. Ohne Land: aus PLZ-Präfix, USt-IdNr. oder fünfstelliger PLZ (Deutschland).
+ */
+export function anschriftZerlegen(text_: string, ustIdnr = ""): { strasse: string | null; plz: string | null; ort: string | null; land: string | null } {
+  const zeilen = text_.split("\n").map((z) => z.trim()).filter(Boolean);
+  let land: string | null = null;
+  const letzte = (zeilen.at(-1) ?? "").toLocaleLowerCase("de").replace(/\.$/, "");
+  if (zeilen.length > 1 && LAENDER[letzte] && !/\d/.test(letzte)) {
+    land = LAENDER[letzte]!;
+    zeilen.pop();
+  }
+  const m = /^(?:([A-Za-z]{1,3})\s?-\s?)?(\d{4,5}(?:\s?[A-Z]{2})?)\s+(.+)$/.exec(zeilen.at(-1) ?? "");
+  const praefix = m?.[1] ? LAENDER[m[1].toLowerCase()] : undefined;
+  const ust = /^([A-Z]{2})/.exec(ustIdnr.replace(/\s/g, "").toUpperCase())?.[1];
+  land ??= praefix ?? (ust ? (UST_LAND[ust] ?? ust) : null) ?? (m && /^\d{5}$/.test(m[2]!) ? "DE" : null);
+  return { strasse: zeilen.length > 1 ? zeilen[0]! : null, plz: m?.[2] ?? null, ort: m?.[3] ?? null, land };
+}
+
 /**
  * Rechnung aus der App → Daten für die E-Rechnung (E-128) und was dafür noch fehlt. Unterstützt 19 %, 7 % und
  * Kleinunternehmer; 0 % aus anderen Gründen (z. B. Reverse Charge) noch nicht.
  */
 export function eRechnungAus(d: Daten, b: Betrieb): { daten: RechnungsDaten; fehlt: string[] } {
-  const zeilen = text(d, "kunde_anschrift").split("\n").map((z) => z.trim()).filter(Boolean);
-  const ort = /^(?:D-|DE-)?(\d{5})\s+(.+)$/.exec(zeilen.at(-1) ?? "");
+  const a = anschriftZerlegen(text(d, "kunde_anschrift"), text(d, "kunde_ust_idnr"));
   const ku = ja(d, "kleinunternehmer");
+  const hw = auswahl(d, "hinweise");
+  const steuerart = hw.includes("reverse_charge") ? "reverse_charge" : hw.includes("igl") ? "igl" : text(d, "befreiung") ? "befreit" : "standard";
   const storno = text(d, "storno_zu");
   const pos = liste(d, "positionen").filter((e) => text(e, "bezeichnung") || text(e, "preis"));
   const datum = text(d, "datum");
@@ -71,7 +132,7 @@ export function eRechnungAus(d: Daten, b: Betrieb): { daten: RechnungsDaten; feh
     leistungsdatum: ja(d, "leistung_gleich") ? datum || null : isoAus(text(d, "leistung")),
     faellig_am: datum && ziel && ziel !== "sofort" ? plusTageIso(datum, Number(ziel)) : null,
     steller: { name: b.name.trim(), strasse: b.strasse.trim(), plz: b.plz.trim(), ort: b.ort.trim(), land: "DE", email: b.email.trim(), telefon: b.telefon.trim() || null, steuernummer: b.steuernummer.trim() || null, ust_idnr: b.ust_idnr.trim() || null, iban: b.iban.trim() || null },
-    kunde: { name: text(d, "kunde_name"), strasse: zeilen.length > 1 ? zeilen[0]! : null, plz: ort?.[1] ?? null, ort: ort?.[2] ?? null, land: "DE", email: text(d, "kunde_email") || null, ust_idnr: text(d, "kunde_ust_idnr") || null, geschaeftskunde: true },
+    kunde: { name: text(d, "kunde_name"), strasse: a.strasse, plz: a.plz, ort: a.ort, land: a.land ?? "DE", email: text(d, "kunde_email") || null, ust_idnr: text(d, "kunde_ust_idnr") || null, geschaeftskunde: true },
     positionen: pos.map((e) => {
       const preis = cent(text(e, "preis")) ?? 0;
       return { bezeichnung: text(e, "bezeichnung"), menge: zahl(text(e, "menge")) ?? 1, einheit: "stueck" as const, einheit_code: einheitCode(text(e, "einheit")), preis_cent: storno ? Math.abs(preis) : preis, ust_satz: ku ? null : Number(text(e, "satz") || "19") };
@@ -79,9 +140,11 @@ export function eRechnungAus(d: Daten, b: Betrieb): { daten: RechnungsDaten; feh
     kleinunternehmer: ku,
     hinweis: [text(d, "befreiung"), text(d, "hinweis")].filter(Boolean).join("\n") || null,
     ...(storno ? { art: "storno" as const, storniert_nummer: storno } : {}),
+    steuerart,
+    befreiungsgrund: text(d, "befreiung") || null,
   };
   const fehlt = fehlendFuerERechnung(daten).map((c) => E_FEHLT[c] ?? c);
-  if (!ku && daten.positionen.some((p) => p.ust_satz === 0)) fehlt.push("E-Rechnung mit 0 % Umsatzsteuer (außer Kleinunternehmer) unterstützt Amtlos noch nicht");
+  if (!a.land && a.plz) fehlt.push("Land des Empfängers in der letzten Zeile der Anschrift (z. B. Österreich)");
   if (!daten.nummer) fehlt.unshift("Rechnungsnummer");
   if (!datum) fehlt.unshift("Rechnungsdatum");
   return { daten, fehlt };
@@ -94,6 +157,7 @@ function plusTageIso(iso: string, tage: number): string {
 
 export const rechnung: Vorlage = {
   id: "rechnung",
+  gestalt: "brief",
   titel: "Rechnung",
   beschreibung: "Rechnung mit allen Pflichtangaben nach § 14 Abs. 4 UStG – Positionen, Steuersätze, Zahlungsziel und Pflichthinweise zum Auswählen.",
   bereich: "steuern",
@@ -122,7 +186,7 @@ export const rechnung: Vorlage = {
       titel: "Rechnungsempfänger",
       felder: [
         { id: "kunde_name", art: "text", label: "Name oder Firma", pflicht: true },
-        { id: "kunde_anschrift", art: "mehrzeilig", label: "Anschrift", hilfe: "Straße und Hausnummer, PLZ und Ort", pflicht: true },
+        { id: "kunde_anschrift", art: "mehrzeilig", label: "Anschrift", hilfe: "Straße und Hausnummer, PLZ und Ort – im Ausland das Land in die letzte Zeile", pflicht: true },
         { id: "kunde_email", art: "text", label: "E-Mail des Empfängers", hilfe: "nötig für die E-Rechnung an Unternehmen" },
         { id: "kunde_ust_idnr", selten: true, art: "text", label: "USt-IdNr. des Empfängers", hilfe: "nur bei innergemeinschaftlichen Leistungen oder Steuerschuldnerschaft des Empfängers" },
       ],
@@ -191,26 +255,42 @@ export const rechnung: Vorlage = {
       ...(ku ? [KU_HINWEIS] : []),
       ...auswahl(d, "hinweise").map((w) => (w === "grundstueck" ? GRUNDSTUECK_HINWEIS : (RECHNUNGS_HINWEISE.find((h) => h.wert === w)?.text ?? ""))),
       text(d, "befreiung"),
-      text(d, "zahlungsziel") ? `Zahlbar ${ZIEL[text(d, "zahlungsziel")]}${text(d, "zahlungsziel") !== "sofort" && text(d, "datum") ? ` (bis ${plusTage(text(d, "datum"), Number(text(d, "zahlungsziel")))})` : ""}.` : "",
+      text(d, "zahlungsziel") && !text(d, "storno_zu") && !b.iban.trim() ? `Zahlbar ${ZIEL[text(d, "zahlungsziel")]}${text(d, "zahlungsziel") !== "sofort" && text(d, "datum") ? ` (bis ${plusTage(text(d, "datum"), Number(text(d, "zahlungsziel")))})` : ""}.` : "",
       ...text(d, "hinweis").split("\n"),
     ].filter((x) => x.trim());
-    const steuer = [b.steuernummer.trim() ? `Steuernummer ${b.steuernummer.trim()}` : "", b.ust_idnr.trim() ? `USt-IdNr. ${b.ust_idnr.trim()}` : ""].filter(Boolean).join(" · ");
-    // Gesellschaften: Rechtsform, Sitz, Registergericht und -nummer, Geschäftsführung (§ 35a GmbHG, § 37a HGB), wenn eingetragen
-    const register = [b.rechtsform?.trim() && b.registergericht?.trim() ? `Sitz ${b.ort.trim()}` : "", [b.registergericht?.trim(), b.registernummer?.trim()].filter(Boolean).join(" "), b.vertretung?.trim() ? `Geschäftsführung: ${b.vertretung.trim()}` : ""].filter(Boolean).join(" · ");
-    const fuss = [steuer, b.iban.trim() ? `IBAN ${b.iban.trim()}` : "", register].filter(Boolean);
     const storno = text(d, "storno_zu");
-    return dokument({
-      titel: `${storno ? "Stornorechnung" : "Rechnung"} ${text(d, "nummer")}`.trim(),
+    const datum = text(d, "datum");
+    const ziel = text(d, "zahlungsziel");
+    const faellig = ziel && ziel !== "sofort" && datum ? plusTage(datum, Number(ziel)) : "";
+    const iban = b.iban.trim();
+    // Zahlungsaufforderung mit Bankverbindung – nur aus den Angaben in „Mein Betrieb“ und der Rechnung
+    const zahlung =
+      !storno && iban && s.brutto_cent > 0
+        ? `<div class="zahlung"><p>Bitte überweisen Sie <strong>${euro(s.brutto_cent)}</strong>${faellig ? ` bis zum <strong>${esc(faellig)}</strong>` : ziel === "sofort" ? " sofort ohne Abzug" : ""} auf das Konto</p><p><strong>IBAN ${esc(iban)}</strong>${b.bic?.trim() ? ` · BIC ${esc(b.bic.trim())}` : ""}${b.bank?.trim() ? ` · ${esc(b.bank.trim())}` : ""}<br>Verwendungszweck: Rechnung ${esc(text(d, "nummer"))}</p></div>`
+        : "";
+    const titel = `${storno ? "Stornorechnung" : "Rechnung"} ${text(d, "nummer")}`.trim();
+    return brief({
+      titel,
+      betreff: titel,
+      unterBetreff: storno ? `Diese Rechnung storniert die Rechnung Nr. ${storno}${text(d, "storno_zu_datum") ? ` vom ${datumDe(text(d, "storno_zu_datum"))}` : ""}.` : !ja(d, "leistung_gleich") && leistung ? `Leistungszeitraum: ${leistung}` : undefined,
       betrieb: b,
-      meta: `Rechnungsnummer: ${text(d, "nummer")}\nRechnungsdatum: ${datumDe(text(d, "datum"))}\n${ja(d, "leistung_gleich") ? `Leistungsdatum: ${datumDe(text(d, "datum"))}` : `Leistung: ${text(d, "leistung")}`}`,
-      vorTitel: `<div class="empfaenger"><div class="absender">${esc([b.name, anschrift(b)].filter((x) => x.trim()).join(" · "))}</div><strong>${text(d, "kunde_name") ? esc(text(d, "kunde_name")) : LINIE}</strong><br>${text(d, "kunde_anschrift") ? esc(text(d, "kunde_anschrift")).replace(/\n/g, "<br>") : LINIE}${text(d, "kunde_ust_idnr") ? `<br>USt-IdNr. ${esc(text(d, "kunde_ust_idnr"))}` : ""}</div>`,
+      stand: datumDe(datum),
+      empfaenger: { name: text(d, "kunde_name"), anschrift: text(d, "kunde_anschrift"), zusatz: text(d, "kunde_ust_idnr") ? `USt-IdNr. ${text(d, "kunde_ust_idnr")}` : undefined },
+      info: [
+        ["Rechnungsnummer", text(d, "nummer")],
+        ["Rechnungsdatum", datumDe(datum)],
+        [ja(d, "leistung_gleich") ? "Leistungsdatum" : "Leistung", ja(d, "leistung_gleich") ? datumDe(datum) : leistung],
+        ["Steuernummer", b.steuernummer.trim()],
+        ["USt-IdNr.", b.ust_idnr.trim()],
+        ["Ansprechpartner", b.verantwortlich.trim()],
+        ["Telefon", b.telefon.trim()],
+        ["E-Mail", b.email.trim()],
+      ],
       inhalt:
-        (storno ? `<p><strong>${esc(`Diese Rechnung storniert die Rechnung Nr. ${storno}${text(d, "storno_zu_datum") ? ` vom ${datumDe(text(d, "storno_zu_datum"))}` : ""}.`)}</strong></p>` : "") +
-        (!ja(d, "leistung_gleich") && leistung ? `<p>${esc(`Leistungszeitraum: ${leistung}`)}</p>` : "") +
-        `<section style="margin-top:3mm">${tabelle(["Pos.", "Leistung", "Menge", "Einzelpreis", ...(ku ? [] : ["USt"]), "Betrag"], zeilenHtml, { breiten: ku ? ["7%", "48%", "15%", "15%", "15%"] : ["7%", "41%", "14%", "14%", "9%", "15%"] })}</section>` +
+        `<section>${tabelle(["Pos.", "Leistung", "Menge", "Einzelpreis", ...(ku ? [] : ["USt"]), "Betrag"], zeilenHtml, { breiten: ku ? ["7%", "48%", "15%", "15%", "15%"] : ["7%", "41%", "14%", "14%", "9%", "15%"], zahlen: ku ? [2, 3, 4] : [2, 3, 4, 5] })}</section>` +
         `<table class="summen">${summenZeilen}</table>` +
-        (hinweise.length ? `<div style="margin-top:7mm">${hinweise.map((h) => `<p>${esc(h)}</p>`).join("")}</div>` : "") +
-        (fuss.length ? `<p class="klein" style="margin-top:8mm">${esc(fuss.join(" · "))}</p>` : ""),
+        zahlung +
+        (hinweise.length ? `<div class="gruss">${hinweise.map((h) => `<p>${esc(h)}</p>`).join("")}</div>` : ""),
     });
   },
 };
@@ -219,6 +299,7 @@ export const rechnung: Vorlage = {
 
 export const euer: Vorlage = {
   id: "euer",
+  gestalt: "formular",
   titel: "Einnahmen-Überschuss-Rechnung (EÜR)",
   beschreibung: "Einnahmen und Ausgaben eines Jahres mit Überschuss – als Aufstellung für deine Unterlagen und zum Übertragen in die Anlage EÜR.",
   bereich: "steuern",
@@ -301,6 +382,7 @@ const posten = (id: string, label: string, eintrag: string, hilfe: string) => ({
 
 export const bilanzGuv: Vorlage = {
   id: "bilanz_guv",
+  gestalt: "formular",
   titel: "Bilanz und Gewinn- und Verlustrechnung",
   beschreibung: "Jahresabschluss für Kaufleute: Erträge und Aufwendungen, Vermögen und Kapital – mit Prüfung, ob Aktiva und Passiva aufgehen.",
   bereich: "steuern",
@@ -353,19 +435,29 @@ function ust(d: Daten) {
   return { u19, u7, s19, s7, vst, zahllast: s19 + s7 - vst };
 }
 
+export const VERSTEUERUNG: Option[] = [
+  { wert: "soll", text: "Nach vereinbarten Entgelten (Soll) – der Normalfall" },
+  { wert: "ist", text: "Nach vereinnahmten Entgelten (Ist) – mit Genehmigung des Finanzamts" },
+];
+
 export const ustVoranmeldung: Vorlage = {
   id: "ust_voranmeldung",
+  gestalt: "formular",
   titel: "Umsatzsteuer-Voranmeldung",
   beschreibung: "Umsätze nach Steuersatz und Vorsteuer – die App rechnet Umsatzsteuer und Zahllast aus, du überträgst die Zahlen in ELSTER.",
   bereich: "steuern",
   pflichten: ["steuern.ust_voranmeldung"],
   ausRechnungen: true,
+  ausBetrieb: { versteuerung: "versteuerung" },
   grundlage: "§ 18 Abs. 1 UStG",
   namensFeld: "zeitraum",
   abschnitte: [
     { titel: "Zeitraum",
       hilfe: "Die Voranmeldung übermittelst du elektronisch über ELSTER. Diese Unterlage rechnet die Zahlen dafür aus – aus deinen Rechnungen in Amtlos oder von Hand – und bleibt bei deinen Unterlagen.",
-      felder: [{ id: "zeitraum", art: "text", label: "Zeitraum", hilfe: "z. B. Oktober 2026 oder 3. Quartal 2026", pflicht: true }],
+      felder: [
+        { id: "versteuerung", art: "wahl", label: "Wie versteuerst du?", optionen: VERSTEUERUNG, vorbelegung: "soll", hilfe: "Soll: Umsätze zählen im Zeitraum, in dem du die Leistung erbracht hast (§ 13 Abs. 1 Nr. 1 a UStG). Ist: im Zeitraum, in dem das Geld eingegangen ist (§ 13 Abs. 1 Nr. 1 b, § 20 UStG) – nur, wenn das Finanzamt es dir genehmigt hat." },
+        { id: "zeitraum", art: "text", label: "Zeitraum", hilfe: "z. B. Oktober 2026 oder 3. Quartal 2026", pflicht: true },
+      ],
     },
     {
       titel: "Umsätze (netto)",
@@ -393,7 +485,7 @@ export const ustVoranmeldung: Vorlage = {
       titel: "Umsatzsteuer-Voranmeldung",
       betrieb: b,
       unter: text(d, "zeitraum") || undefined,
-      meta: b.steuernummer.trim() ? `Steuernummer: ${b.steuernummer.trim()}` : undefined,
+      meta: [b.steuernummer.trim() ? `Steuernummer: ${b.steuernummer.trim()}` : "", text(d, "versteuerung") === "ist" ? "Besteuerung nach vereinnahmten Entgelten (§ 20 UStG)" : "Besteuerung nach vereinbarten Entgelten"].filter(Boolean).join(" · "),
       inhalt:
         abschnitt(
           "Berechnung",
@@ -427,6 +519,7 @@ const ERKLAERUNGEN = [
 
 export const steuererklaerung: Vorlage = {
   id: "steuererklaerung",
+  gestalt: "formular",
   titel: "Unterlagen zur Steuererklärung",
   beschreibung: "Alle Zahlen und Belege für die Jahreserklärungen an einem Ort – zum Übertragen in ELSTER oder für die Steuerberatung.",
   bereich: "steuern",
@@ -571,6 +664,7 @@ export const kassenbuch: Vorlage = {
 
 export const kassenmeldung: Vorlage = {
   id: "kassenmeldung",
+  gestalt: "formular",
   titel: "Kassenmeldung (Datenblatt)",
   beschreibung: "Alle Angaben zu deinen elektronischen Kassen und Sicherheitseinrichtungen (TSE) für die Meldung ans Finanzamt – auch bei Außerbetriebnahme.",
   bereich: "steuern",
@@ -656,6 +750,7 @@ export function aufbewahrenBis(letzteJahr: string, jahre: string): string | null
 
 export const aufbewahrung: Vorlage = {
   id: "aufbewahrung",
+  gestalt: "handbuch",
   titel: "Aufbewahrungsplan",
   beschreibung: "Welche Unterlagen wie lange aufzubewahren sind, wo sie liegen und ab wann sie frühestens weg dürfen.",
   bereich: "steuern",

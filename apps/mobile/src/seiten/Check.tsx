@@ -9,12 +9,11 @@ import { RAND, ZIEL, istIos, useFarben } from "../ui/thema";
 import { CHECK_FELDER, auswertung, beantwortet, checkFragen, zusatzFragen, type Profil } from "../pflichten/check";
 import { heute } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
-import { PflichtenSeite } from "./Pflichten";
 
 type Wert = Profil[string];
 
 /** Eingabe je Fragenart aus dem Fragebogen (packages/i18n/fragen.ts). */
-function Antwort({ f, wert, setzen }: { f: Frage; wert: Wert | undefined; setzen: (w: Wert, weiter?: boolean) => void }) {
+export function Antwort({ f, wert, setzen }: { f: Frage; wert: Wert | undefined; setzen: (w: Wert, weiter?: boolean) => void }) {
   const optionen = Object.entries(f.optionen ?? {}).map(([k, t]) => ({ wert: k, text: t.de }));
   switch (f.art) {
     case "auswahl":
@@ -179,8 +178,9 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
             <Knopf
               text={TEXT.pflichten_ansehen}
               onPress={() => {
+                // „Pflichten“ ist der erste Tab (E-129): Check schließen und dorthin wechseln
                 nav.zurueck();
-                nav.oeffnen("pflichten", () => <PflichtenSeite />);
+                z.tabWechseln("pflichten");
               }}
               stil={{ flex: 1 }}
             />

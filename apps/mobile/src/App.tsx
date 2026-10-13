@@ -3,27 +3,30 @@ import { BlurView } from "expo-blur";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Platform, Pressable, View, useColorScheme } from "react-native";
+import { ActivityIndicator, AppState, Platform, Pressable, View, useColorScheme } from "react-native";
 import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Betrieb } from "./seiten/Betrieb";
-import { ErinnerungsPlaner } from "./seiten/Pflichten";
+import { ErinnerungsPlaner, PflichtenTab } from "./seiten/Pflichten";
 import { Meine } from "./seiten/Meine";
+import { AutoSicherung } from "./seiten/Sicherung";
 import { Unterlagen } from "./seiten/Unterlagen";
 import { T as TEXT } from "./texte";
-import { Symbol, T } from "./ui/bausteine";
+import { Knopf, Symbol, T } from "./ui/bausteine";
+import { entsperren } from "./unterlagen/sperre";
 import { Stapel } from "./ui/navigation";
 import { ZIEL, istIos, useFarben } from "./ui/thema";
 import { AmtlosAnbieter, useAmtlos, type Tab } from "./zustand";
 
 void SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
-/** Tabs (E-121): Vorlagen wählen, eigene Unterlagen, Betrieb. Keine Erinnerungen, kein Fragebogen. */
+/** Tabs: Pflichten zuerst (E-129, das Alleinstellungsmerkmal), dann Vorlagen, eigene Unterlagen, Betrieb. */
 const TABS: { id: Tab; symbol: string }[] = [
+  { id: "pflichten", symbol: "checklist" },
   { id: "unterlagen", symbol: "doc.text" },
   { id: "meine", symbol: "folder" },
   { id: "betrieb", symbol: "building.2" },
 ];
-const SEITE: Record<Tab, () => React.JSX.Element> = { unterlagen: Unterlagen, meine: Meine, betrieb: Betrieb };
+const SEITE: Record<Tab, () => React.JSX.Element> = { pflichten: PflichtenTab, unterlagen: Unterlagen, meine: Meine, betrieb: Betrieb };
 
 /** Tab-Leiste: unscharfer Hintergrund (iOS), SF Symbols, der aktive Tab in Handlungsfarbe. */
 function Leiste({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
@@ -48,13 +51,45 @@ function Leiste({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
   return <View style={{ position: "absolute", left: 0, right: 0, bottom: 0, backgroundColor: f.blatt }}>{inhalt}</View>;
 }
 
+/** App-Sperre (E-129): bei eingeschalteter Sperre nach dem Start und nach jedem Wechsel in den Hintergrund. */
+function Sperre({ children }: { children: React.ReactNode }) {
+  const { bereit, stand } = useAmtlos();
+  const f = useFarben();
+  const [offen, setOffen] = useState(false);
+  const an = bereit && stand.appSperre;
+  const los = () => void entsperren(TEXT.entsperren_grund).then(setOffen);
+  useEffect(() => {
+    if (bereit) void SplashScreen.hideAsync().catch(() => undefined);
+  }, [bereit]);
+  useEffect(() => {
+    if (!an) return;
+    const abo = AppState.addEventListener("change", (z) => {
+      if (z === "background") setOffen(false);
+    });
+    return () => abo.remove();
+  }, [an]);
+  useEffect(() => {
+    if (an && !offen) los();
+    // nur beim Einschalten bzw. nach dem Sperren einmal fragen
+  }, [an, offen]);
+  if (!an || offen) return <>{children}</>;
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: f.papier, padding: 24, justifyContent: "center", alignItems: "center", gap: 12 }}>
+      <Symbol name="lock.fill" groesse={44} farbe={f.amt} />
+      <T v="titel" accessibilityRole="header">{TEXT.gesperrt_titel}</T>
+      <T leise>{TEXT.gesperrt_text}</T>
+      <Knopf symbol="faceid" text={TEXT.entsperren} onPress={los} stil={{ alignSelf: "stretch", marginTop: 16 }} />
+    </SafeAreaView>
+  );
+}
+
 function Rahmen() {
   const { bereit, ladefehler, tab, tabWechseln } = useAmtlos();
   const f = useFarben();
-  const [zurueck, setZurueck] = useState<Record<Tab, number>>({ unterlagen: 0, meine: 0, betrieb: 0 });
-  const [besucht, setBesucht] = useState<Set<Tab>>(new Set(["unterlagen"]));
+  const [zurueck, setZurueck] = useState<Record<Tab, number>>({ pflichten: 0, unterlagen: 0, meine: 0, betrieb: 0 });
+  const [besucht, setBesucht] = useState<Set<Tab>>(new Set(["pflichten"]));
   // geführte Abläufe laufen im Vollbild – ohne Tab-Leiste, mit eigenem Knopf unten
-  const [voll, setVoll] = useState<Record<Tab, boolean>>({ unterlagen: false, meine: false, betrieb: false });
+  const [voll, setVoll] = useState<Record<Tab, boolean>>({ pflichten: false, unterlagen: false, meine: false, betrieb: false });
   const vollSetzer = useMemo(() => Object.fromEntries(TABS.map((x) => [x.id, (an: boolean) => setVoll((v) => (v[x.id] === an ? v : { ...v, [x.id]: an }))])) as Record<Tab, (an: boolean) => void>, []);
   const setTab = (t: Tab) => {
     if (t === tab) setZurueck((z) => ({ ...z, [t]: z[t] + 1 }));
@@ -114,7 +149,10 @@ export default function App() {
       <AmtlosAnbieter>
         <StatusBar style={dunkel ? "light" : "dark"} />
         <ErinnerungsPlaner />
-        <Rahmen />
+        <AutoSicherung />
+        <Sperre>
+          <Rahmen />
+        </Sperre>
       </AmtlosAnbieter>
     </SafeAreaProvider>
   );

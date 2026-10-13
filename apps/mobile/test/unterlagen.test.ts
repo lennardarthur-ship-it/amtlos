@@ -60,15 +60,32 @@ describe("Unterlagen auf dem Gerät", () => {
   it("setzt die Fußzeile mit Seitenzahlen auf jede Seite und liest die Angaben aus dem Dokument", async () => {
     const v = vorlageFuer("gefaehrdungsbeurteilung")!;
     const html = dokumentHtml(v, { ...leereDaten(v, B, "2026-10-12"), arbeitsbereich: "Küche" }, B);
-    expect(fussAngaben(html)).toEqual({ links: "Café Mond · Gefährdungsbeurteilung", rechts: "Stand 12.10.2026" });
+    expect(fussAngaben(html)).toMatchObject({ gestalt: "nachweis", links: "Café Mond · Gefährdungsbeurteilung", rechts: "Stand 12.10.2026" });
     const roh = await PDFDocument.create();
     roh.addPage([595, 842]);
     roh.addPage([595, 842]);
     const vorher = await roh.save();
-    const nachher = await fusszeileStempeln(vorher, "Café Mond · Gefährdungsbeurteilung 🙂", "Stand 12.10.2026");
+    const nachher = await fusszeileStempeln(vorher, { ...fussAngaben(html), links: "Café Mond · Gefährdungsbeurteilung 🙂" });
     const neu = await PDFDocument.load(nachher);
     expect(neu.getPageCount()).toBe(2);
     expect(nachher.length).toBeGreaterThan(vorher.length);
+  });
+
+  it("gestaltet die Rechnung als Geschäftsbrief mit Fußzeile in Spalten (E-129)", async () => {
+    const r = vorlageFuer("rechnung")!;
+    const b = { ...B, iban: "DE89 3704 0044 0532 0130 00", bic: "COBADEFFXXX", bank: "Commerzbank", farbe: "#702434", website: "www.cafe-mond.de" };
+    const html = dokumentHtml(r, { ...leereDaten(r, b, "2026-10-12"), nummer: "2026-007", kunde_name: "Kim Beispiel", kunde_anschrift: "Gartenweg 3\n80333 München", positionen: [{ bezeichnung: "Torte", menge: "1", einheit: "Stück", preis: "40,00", satz: "7" }] }, b);
+    const f = fussAngaben(html);
+    expect(f.gestalt).toBe("brief");
+    expect(f.farbe).toBe("#702434");
+    expect(f.spalten.flat()).toEqual(expect.arrayContaining(["**Commerzbank**", "IBAN DE89 3704 0044 0532 0130 00", "BIC COBADEFFXXX", "www.cafe-mond.de"]));
+    expect(html).toContain('class="anschrift"');
+    expect(html).toContain("Bitte überweisen Sie");
+    expect(html).toContain("Verwendungszweck: Rechnung 2026-007");
+    const roh = await PDFDocument.create();
+    roh.addPage([595, 842]);
+    const nachher = await fusszeileStempeln(await roh.save(), f);
+    expect((await PDFDocument.load(nachher)).getPageCount()).toBe(1);
   });
 
   it("zählt Rechnungsnummern beim Anlegen und Kopieren weiter", () => {

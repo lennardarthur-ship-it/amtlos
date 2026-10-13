@@ -51,3 +51,17 @@ Das Review wurde am Stand vor E-124 erstellt. Antworten von Frida vom 12.10. (We
 | K6 | Alles nur auf dem iPhone | Teilweise | Verschlüsselte Sicherung mit Wiederherstellen (E-125); sofort speichern beim Wechsel in den Hintergrund, kein Überschreiben unlesbarer Daten (E-127). Automatische Sicherung/Sync: Entscheidung (K1). |
 | K7 | Pflichten-Check für Bestandsbetriebe | **Erledigt** | E-127: Gründungsschritte abgetrennt, Zusatzfragen, Begründung für jede Pflicht, wiederkehrende Pflichten nur bis zum Termin erledigt, Unterlagen zählen erst nach dem Teilen. Seit E-128 zusätzlich „Jetzt dran / Diesen Monat“ und lokale Erinnerungen. |
 | K8 | „Amtlos“ erzeugt nur PDFs | Teilweise | E-128: Rechnungen → Umsätze der USt-Voranmeldung mit einem Tipp (Stornos negativ); E-Rechnung als Datei. ELSTER-Übermittlung offen (J-1, braucht Zertifikat/ERiC). |
+
+## Review L. Reiche vom 13.10.2026 (nach dem Termin)
+
+| # | Befund | Status | Notiz |
+|---|---|---|---|
+| R1 | Daten ungeschützt, Handy weg = Rechnungen weg, alte Sicherung überschreibt neuere | **Erledigt (Gerät)**, iCloud vorbereitet | E-129: verschlüsselte Ablage mit Schlüssel im Schlüsselbund, Face-ID-Sperre, Löschschutz bis zur Sicherung, Zusammenführen statt Überschreiben, Erinnerung an die Sicherung; iCloud-Sicherung für den eigenen Build (docs/09). Ohne eigenen Build/Server bleibt „Handy weg“ nur mit Sicherung lösbar. |
+| R2 | Voranmeldung nach Rechnungsdatum, Zahlungen unbekannt | **Erledigt** | E-129: Soll nach Leistungsdatum, Ist nach Zahlungseingang; Zahlungsvermerk an der Rechnung. Fachlich T-70. |
+| R3 | Nichts geht an ELSTER | Konzept | docs/08-elster-eric.md: zwei Wege, Architektur, 8–11 Wochen; braucht K1 und J-1. |
+| R4 | PDFs sehen computergeneriert aus | **Erledigt (erste Fassung)** | E-129: sechs Gestalten je Zweck, Rechnung als DIN-5008-Brief mit Logo, Hausfarbe, Fußzeile in Spalten; eingebettete Schriften. Feinschliff je Vorlage geht weiter (T-75). |
+| R5 | E-Rechnung nach Wien abgelehnt | **Erledigt** | Länder-Erkennung, Reverse Charge (AE), innergemeinschaftliche Lieferung (K); KoSIT 13/13. |
+| R6 | Pflichten auf der Startseite versteckt | **Erledigt** | Erster Tab „Pflichten“. |
+| R7 | 76 unklare Pflichten, 33 weitere Fragen | **Erledigt** | „Kurz klären“: drei wirksamste Fragen direkt beantwortbar, Rest optional; bis zu acht Zusatzfragen im Check. |
+| R8 | Steuererklärungen ohne Fristen | **Erledigt** | § 149 AO mit und ohne Steuerberatung, nächster Werktag; neue Frage „Steuerberatung?“. Fachlich T-73. |
+

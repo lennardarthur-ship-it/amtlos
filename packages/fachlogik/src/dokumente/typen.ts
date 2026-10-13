@@ -3,6 +3,8 @@
  * den Eingaben ein HTML-Dokument, das die App als PDF ausgibt. Rein, ohne DOM und ohne Node-APIs.
  */
 
+import type { Gestalt } from "./html.js";
+
 /** Angaben zum Betrieb – einmal eingegeben, in allen Unterlagen vorausgefüllt. */
 export interface Betrieb {
   name: string;
@@ -24,9 +26,20 @@ export interface Betrieb {
   registernummer?: string;
   /** Geschäftsführung bzw. vertretungsberechtigte Personen */
   vertretung?: string;
+  /** Umsatzsteuer nach vereinbarten („soll“) oder vereinnahmten („ist“) Entgelten (§§ 16, 20 UStG) */
+  versteuerung?: string;
+  /** Logo als Data-URL (PNG/JPEG), erscheint im Briefkopf */
+  logo?: string;
+  /** Hausfarbe für Briefkopf und Akzente (#rrggbb) */
+  farbe?: string;
+  /** Bankname und BIC (Rechnungen) */
+  bank?: string;
+  bic?: string;
+  /** Website (Briefkopf, Fußzeile) */
+  website?: string;
 }
 
-export const LEERER_BETRIEB: Betrieb = { name: "", strasse: "", plz: "", ort: "", verantwortlich: "", telefon: "", email: "", steuernummer: "", ust_idnr: "", iban: "", bundesland: "", rechtsform: "", registergericht: "", registernummer: "", vertretung: "" };
+export const LEERER_BETRIEB: Betrieb = { name: "", strasse: "", plz: "", ort: "", verantwortlich: "", telefon: "", email: "", steuernummer: "", ust_idnr: "", iban: "", bundesland: "", rechtsform: "", registergericht: "", registernummer: "", vertretung: "", versteuerung: "", logo: "", farbe: "", bank: "", bic: "", website: "" };
 
 /** Ein Wert in einem Listeneintrag. */
 export type EintragWert = string | boolean | string[] | null;
@@ -154,8 +167,12 @@ export interface Vorlage {
   storno?: boolean;
   /** Startwerte aus dem Pflichten-Check: Feld der Vorlage → Profilfeld (z. B. kleinunternehmer → ust.kleinunternehmer) */
   ausProfil?: Record<string, string>;
+  /** Startwerte aus „Mein Betrieb“: Feld → Betriebsfeld (z. B. Soll-/Ist-Versteuerung) */
+  ausBetrieb?: Record<string, keyof Betrieb>;
   /** Querformat (breite Tabellen, Aushänge) */
   querformat?: boolean;
+  /** Gestaltung passend zum Zweck (E-129): Brief, Vertrag, Aushang, Nachweis, Formular, Handbuch – Standard Nachweis */
+  gestalt?: Gestalt;
   html(daten: Daten, betrieb: Betrieb): string;
   /** Ergebnis zum Anzeigen in der App (Summen, Zahllast …) */
   ergebnis?(daten: Daten): [string, string][];

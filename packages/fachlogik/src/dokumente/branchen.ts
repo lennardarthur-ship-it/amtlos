@@ -70,6 +70,7 @@ const LOSE_HINWEIS = "Informationen zu Allergenen erhalten Sie in dieser Übersi
 
 export const allergenAushang: Vorlage = {
   id: "allergene",
+  gestalt: "aushang",
   titel: "Allergenliste",
   beschreibung: "Je Speise und Getränk die enthaltenen 14 Hauptallergene nach Anhang II LMIV – zum Auslegen oder Aushängen, mit Erläuterung der Allergene.",
   bereich: "gastro",
@@ -232,6 +233,7 @@ const HAUT: [string, string, string][] = [
 
 export const hautschutzplan: Vorlage = {
   id: "hautschutzplan",
+  gestalt: "aushang",
   titel: "Hautschutzplan",
   beschreibung: "Aushang: wann welcher Hautschutz, welche Handschuhe, welche Reinigung und Pflege – mit den Zeilen aus dem Muster-Hautschutzplan der TRGS 530 und der BGW.",
   bereich: "beauty",
@@ -284,6 +286,7 @@ const HYGIENE_SPALTEN: [string, string, string][] = [
 
 export const hygieneplan: Vorlage = {
   id: "hygieneplan",
+  gestalt: "aushang",
   titel: "Hygieneplan",
   beschreibung: "Aushang: was wann womit und wie gereinigt und desinfiziert wird und wer es macht – mit Zeilen aus Rahmenhygieneplänen und dem BGW-Hygieneplan.",
   bereich: "beauty",

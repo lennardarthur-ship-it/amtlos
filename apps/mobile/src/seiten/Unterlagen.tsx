@@ -10,7 +10,6 @@ import { betriebFehlt, sortiert, type Unterlage } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { BetriebFormular } from "./Betrieb";
 import { BEREICH_SYMBOL, Gruppe, Inhalt, Seite, datumKurz } from "./gemeinsam";
-import { PflichtenKarte, checkGemacht } from "./Pflichten";
 import { useOeffnen, useStarten } from "./starten";
 
 /** Symbol je Anlass. */
@@ -37,7 +36,7 @@ export function UnterlageZeile({ u, letzte, onPress }: { u: Unterlage; letzte: b
     <Zeile
       links={<Symbol name="doc.richtext" groesse={22} farbe={n ? f.bald : f.amt} />}
       titel={unterlagenName(v, u.daten)}
-      text={`${TEXT.geaendert(datumKurz(u.geaendert))} · ${u.storniertDurch ? TEXT.storniert : u.festgeschrieben ? TEXT.festgeschrieben_kurz : n ? TEXT.fehlen(n) : TEXT.vollstaendig}`}
+      text={`${TEXT.geaendert(datumKurz(u.geaendert))} · ${u.storniertDurch ? TEXT.storniert : u.festgeschrieben && v.storno && !u.daten.storno_zu ? (u.bezahlt ? TEXT.bezahlt_kurz : TEXT.offen_kurz) : u.festgeschrieben ? TEXT.festgeschrieben_kurz : n ? TEXT.fehlen(n) : TEXT.vollstaendig}`}
       onPress={onPress}
       letzte={letzte}
     />
@@ -122,8 +121,8 @@ function AlleSeite() {
 }
 
 /**
- * Startseite (E-124): oben die häufigste Handlung (Rechnung), dann zuletzt bearbeitete Unterlagen und Anlässe in
- * Alltagssprache. Alle Vorlagen gibt es über „Alle Unterlagen“ und die Suche.
+ * Unterlagen (E-124; seit E-129 zweiter Tab hinter „Pflichten“): oben die häufigste Handlung (Rechnung), dann zuletzt
+ * bearbeitete Unterlagen und Anlässe in Alltagssprache. Alle Vorlagen gibt es über „Alle Unterlagen“ und die Suche.
  */
 export function Unterlagen() {
   const { stand, tabWechseln } = useAmtlos();
@@ -161,8 +160,7 @@ export function Unterlagen() {
               />
             </Karte>
           ) : null}
-          <PflichtenKarte />
-          <Knopf ton={!checkGemacht(stand.profil)} text={TEXT.rechnung_schreiben} symbol="plus" onPress={() => starten("rechnung")} stil={{ marginTop: 16 }} />
+          <Knopf text={TEXT.rechnung_schreiben} symbol="plus" onPress={() => starten("rechnung")} stil={{ marginTop: 16 }} />
 
           {zuletzt.length ? (
             <Gruppe titel={TEXT.zuletzt}>

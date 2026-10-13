@@ -8,16 +8,16 @@ import { allergenAushang, haccp, hautschutzplan, hygieneplan, ifsgBelehrung } fr
 import { datenpanne, datenschutzDokumentation, datenschutzinformation } from "./datenschutz.js";
 import { kiKompetenz, nachweisArbeitsbedingungen } from "./personal.js";
 import { verfahrensdokumentation } from "./steuern.js";
-import { GRUNDLAGE_MARKE, esc } from "./html.js";
+import { GESTALT_MARKE, GRUNDLAGE_MARKE, SEITE_MARKE, esc, seiteCss } from "./html.js";
 import type { Bereich, Betrieb, Daten, EinfachesFeld, Eintrag, Feld, Vorlage, Vorschlag } from "./typen.js";
 
 export * from "./typen.js";
 export { ALLERGENE, DATENPANNE_RISIKO, GEFAEHRDUNGSFAKTOREN, RISIKO_STUFEN, SCHUTZZIELE } from "./konstanten.js";
-export { PRUEFHINWEIS } from "./html.js";
+export { HAUSFARBEN, PRUEFHINWEIS, RAENDER, akzent, fussSpalten, type Gestalt } from "./html.js";
 export { BUNDESLAENDER, aufsichtFuer, berlinZuUtc } from "./datenschutz.js";
 export { mindestlohnAm, mindesturlaub, stundenlohn } from "./personal.js";
 export { bausteinText } from "./website.js";
-export { aufbewahrenBis, eRechnungAus } from "./buchhaltung.js";
+export { VERSTEUERUNG, aufbewahrenBis, eRechnungAus } from "./buchhaltung.js";
 export { STEUERKLASSEN, arbeitsminuten } from "./lohn.js";
 export { ANLAESSE, KURZ, PERSONEN_FELDER, kurztitel, naechsteNummer, personAus, personIn, personMerken, type Anlass } from "./ablauf.js";
 export { cent } from "./html.js";
@@ -171,5 +171,5 @@ export function eintragAusVorschlag(f: Extract<Feld, { art: "liste" }>, vorschla
 export function dokumentHtml(v: Vorlage, d: Daten, b: Betrieb): string {
   const grundlage = v.grundlage && !v.kundendokument ? `<div><dt>Rechtsgrundlage</dt><dd>${esc(v.grundlage)}</dd></div>` : "";
   const art = v.kundendokument ? "" : (BEREICHE.find((x) => x.id === v.bereich)?.titel ?? "");
-  return v.html(d, b).replace(GRUNDLAGE_MARKE, grundlage).replace('<div class="art"></div>', `<div class="art">${esc(art)}</div>`);
+  return v.html(d, b).replace(GRUNDLAGE_MARKE, grundlage).replace('<div class="art"></div>', `<div class="art">${esc(art)}</div>`).split(GESTALT_MARKE).join(v.gestalt ?? "nachweis").replace(SEITE_MARKE, seiteCss(v.gestalt ?? "nachweis", v.querformat));
 }

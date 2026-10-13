@@ -515,9 +515,22 @@
   "titel": "Einkommensteuererklärung abgeben",
   "kurz": "Einmal im Jahr gibst du elektronisch deine Einkommensteuererklärung ab.",
   "rechtsgrundlage": [
-   "EStG"
+   "EStG",
+   "§ 149 AO"
   ],
   "quellen": [
+   {
+    "titel": "Abgabenordnung § 149 (Abgabe der Steuererklärungen)",
+    "url": "https://dejure.org/gesetze/AO/149.html"
+   },
+   {
+    "titel": "Abgabenordnung § 108 (Fristen und Termine)",
+    "url": "https://dejure.org/gesetze/AO/108.html"
+   },
+   {
+    "titel": "Finanzamt Baden-Württemberg – Abgabefristen der Steuererklärungen",
+    "url": "https://finanzamt-bw.fv-bwl.de/9361700"
+   },
    {
     "titel": "Einkommensteuergesetz",
     "url": "https://www.gesetze-im-internet.de/estg/"
@@ -545,9 +558,22 @@
   "titel": "Gewerbesteuererklärung abgeben",
   "kurz": "Einmal im Jahr gibst du elektronisch die Gewerbesteuererklärung ab.",
   "rechtsgrundlage": [
-   "GewStG"
+   "GewStG",
+   "§ 149 AO"
   ],
   "quellen": [
+   {
+    "titel": "Abgabenordnung § 149 (Abgabe der Steuererklärungen)",
+    "url": "https://dejure.org/gesetze/AO/149.html"
+   },
+   {
+    "titel": "Abgabenordnung § 108 (Fristen und Termine)",
+    "url": "https://dejure.org/gesetze/AO/108.html"
+   },
+   {
+    "titel": "Finanzamt Baden-Württemberg – Abgabefristen der Steuererklärungen",
+    "url": "https://finanzamt-bw.fv-bwl.de/9361700"
+   },
    {
     "titel": "Gewerbesteuergesetz",
     "url": "https://www.gesetze-im-internet.de/gewstg/"
@@ -607,9 +633,22 @@
   "titel": "Körperschaftsteuererklärung abgeben",
   "kurz": "Einmal im Jahr gibst du für deine Gesellschaft elektronisch die Körperschaftsteuererklärung ab.",
   "rechtsgrundlage": [
-   "KStG"
+   "KStG",
+   "§ 149 AO"
   ],
   "quellen": [
+   {
+    "titel": "Abgabenordnung § 149 (Abgabe der Steuererklärungen)",
+    "url": "https://dejure.org/gesetze/AO/149.html"
+   },
+   {
+    "titel": "Abgabenordnung § 108 (Fristen und Termine)",
+    "url": "https://dejure.org/gesetze/AO/108.html"
+   },
+   {
+    "titel": "Finanzamt Baden-Württemberg – Abgabefristen der Steuererklärungen",
+    "url": "https://finanzamt-bw.fv-bwl.de/9361700"
+   },
    {
     "titel": "Körperschaftsteuergesetz",
     "url": "https://www.gesetze-im-internet.de/kstg_1977/"
@@ -638,9 +677,22 @@
   "titel": "Umsatzsteuer-Jahreserklärung abgeben",
   "kurz": "Einmal im Jahr gibst du elektronisch die Umsatzsteuer-Jahreserklärung ab.",
   "rechtsgrundlage": [
-   "§ 18 UStG"
+   "§ 18 UStG",
+   "§ 149 AO"
   ],
   "quellen": [
+   {
+    "titel": "Abgabenordnung § 149 (Abgabe der Steuererklärungen)",
+    "url": "https://dejure.org/gesetze/AO/149.html"
+   },
+   {
+    "titel": "Abgabenordnung § 108 (Fristen und Termine)",
+    "url": "https://dejure.org/gesetze/AO/108.html"
+   },
+   {
+    "titel": "Finanzamt Baden-Württemberg – Abgabefristen der Steuererklärungen",
+    "url": "https://finanzamt-bw.fv-bwl.de/9361700"
+   },
    {
     "titel": "Umsatzsteuergesetz § 18",
     "url": "https://www.gesetze-im-internet.de/ustg_1980/__18.html"

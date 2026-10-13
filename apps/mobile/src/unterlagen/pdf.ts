@@ -6,34 +6,44 @@ import { File, Paths } from "expo-file-system";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import { Platform } from "react-native";
+import { RAENDER, type Gestalt } from "@amtlos/fachlogik";
 import { fussAngaben, fusszeileStempeln } from "./fusszeile";
+import { mitSchriften } from "./schriften";
 
-/** A4 in Punkt (72 dpi). Ränder wie im Dokument (@page): unten Platz für die Fußzeile. */
+/** A4 in Punkt (72 dpi). Ränder je Gestalt (E-129): unten Platz für die Fußzeile. */
 const A4 = { width: 595, height: 842 };
-const RAND = { top: 54, bottom: 62, left: 54, right: 50 };
+const MM = 72 / 25.4;
+
+export function raender(gestalt: string) {
+  const [oben, rechts, unten, links] = RAENDER[(gestalt in RAENDER ? gestalt : "nachweis") as Gestalt];
+  return { top: Math.round(oben * MM), right: Math.round(rechts * MM), bottom: Math.round(unten * MM), left: Math.round(links * MM) };
+}
 
 function imWebOeffnen(html: string) {
   const w = (globalThis as unknown as { open?: (u: string, n: string) => { document: { write(s: string): void; close(): void } } | null }).open?.("", "_blank");
   if (!w) return;
-  w.document.write(html);
+  w.document.write(mitSchriften(html));
   w.document.close();
 }
 
 /** Erstellt das PDF mit Fußzeile unter einem lesbaren Dateinamen und gibt die Datei-URI zurück. */
-export async function pdfErstellen(html: string, dateiname: string, quer = false): Promise<string> {
+export async function pdfErstellen(roh: string, dateiname: string, quer = false): Promise<string> {
+  const html = mitSchriften(roh);
+  const angaben = fussAngaben(html);
   const seite = quer ? { width: A4.height, height: A4.width } : A4;
-  const { uri, base64 } = await Print.printToFileAsync({ html, ...seite, margins: RAND, base64: true });
+  const margins = raender(angaben.gestalt);
+  const { uri, base64 } = await Print.printToFileAsync({ html, ...seite, margins, base64: true });
   const ziel = new File(Paths.cache, dateiname);
   try {
-    const { links, rechts } = fussAngaben(html);
-    const bytes = await fusszeileStempeln(base64 ?? new File(uri).base64Sync(), links, rechts);
+    const bytes = await fusszeileStempeln(base64 ?? new File(uri).base64Sync(), angaben);
     if (ziel.exists) ziel.delete();
     ziel.create();
     ziel.write(bytes);
     return ziel.uri;
   } catch {
-    // Fußzeile und Umbenennen sind Komfort – notfalls das unveränderte PDF teilen
-    return uri;
+    // Ohne gestempelte Fußzeile stehen die Geschäftsangaben (Steuer, Bank, Register) im Fluss am Dokumentende
+    const ersatz = await Print.printToFileAsync({ html: html.replace(/<body class="([^"]*)">/, '<body class="$1 fuss-im-fluss">'), ...seite, margins });
+    return ersatz.uri;
   }
 }
 
