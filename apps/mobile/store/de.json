@@ -1,0 +1,18 @@
+{
+  "name": "Amtlos – Pflichten & Rechnung",
+  "untertitel": "Unterlagen für deinen Betrieb",
+  "werbetext": "Pflichten-Check, Rechnungen mit E-Rechnung und über 30 Vorlagen von Hygieneplan bis Datenschutz – verschlüsselt auf deinem iPhone, ohne Konto.",
+  "schluesselwoerter": "Rechnung,XRechnung,Hygieneplan,Gefährdungsbeurteilung,GoBD,Selbstständig,DSGVO,Umsatzsteuer",
+  "beschreibung": "Amtlos zeigt dir, welche Pflichten für deinen Betrieb gelten – und erledigt die Unterlagen gleich mit.\n\nFÜR WEN\nEinzelunternehmen, Salons, Cafés, Handwerk, Freelancer und kleine GmbHs in Deutschland.\n\nPFLICHTEN-CHECK\nEin paar Fragen zu deinem Betrieb, dann siehst du, was für dich gilt: Steuern, Arbeitsschutz, Datenschutz, Hygiene, Personal. Mit Begründung, Rechtsgrundlage und Quelle, mit „Jetzt dran“ und Erinnerungen vor jedem Termin.\n\nRECHNUNGEN\n• Fortlaufend nummeriert, nach dem Teilen unveränderbar, Korrektur per Stornorechnung\n• GiroCode auf jeder Rechnung – die Banking-App deiner Kunden füllt die Überweisung aus\n• E-Rechnung (XRechnung) für Firmenkunden und Behörden, auch ins EU-Ausland\n• Zahlungseingang vermerken, offene Rechnungen im Blick\n• Umsätze für die Umsatzsteuer-Voranmeldung nach Soll oder Ist\n\nÜBER 30 VORLAGEN\nHygieneplan, Hautschutzplan, Allergenliste, Gefährdungsbeurteilung, Unterweisung, Betriebsanweisung, Nachweis der Arbeitsbedingungen, Verzeichnis der Verarbeitungstätigkeiten, Datenschutzerklärung, Impressum, Verfahrensdokumentation, EÜR und mehr. Schritt für Schritt ausgefüllt, mit Vorschlägen aus offiziellen Quellen, fertig als sauber gestaltetes PDF.\n\nDEINE DATEN BLEIBEN BEI DIR\nAlles liegt verschlüsselt auf deinem iPhone – kein Konto, kein Server. Sicherung als verschlüsselte Datei oder automatisch in deinem iCloud Drive. Auf Wunsch mit Face ID gesperrt.\n\nAMTLOS PRO\nKostenlos: Pflichten-Check, Erinnerungen, alle Vorlagen ausfüllen, Sicherung, Stornos und jeden Monat einige Unterlagen als PDF. Mit Pro: unbegrenzt teilen, E-Rechnung, Umsatzsteuer mit einem Tipp, automatische iCloud-Sicherung und dein Briefkopf mit Logo und Hausfarbe. Das Abo wird über deinen Apple-Account abgerechnet und verlängert sich automatisch, wenn du es nicht mindestens 24 Stunden vor Ende des Zeitraums kündigst.\n\nWICHTIG\nAmtlos ersetzt keine Rechts- oder Steuerberatung. Prüfe Ergebnisse und Unterlagen, bevor du dich darauf verlässt.",
+  "neu": "Amtlos Pro, neue Übersicht unter „Mein Betrieb“, offene Rechnungen im Blick, iPhone-Kalender in allen Datumsfeldern und neu gestaltete Unterlagen.",
+  "kategorie": ["Business", "Finance"],
+  "pruefhinweise": "Die App braucht kein Konto. Zum Ausprobieren: „Pflichten-Check starten“ beantworten, unter „Vorlagen“ eine Rechnung schreiben und als PDF teilen. Amtlos Pro ist ein automatisch verlängerndes Abo (monatlich/jährlich) über In-App-Kauf; „Käufe wiederherstellen“ steht auf dem Pro-Bildschirm.",
+  "bilder": [
+    { "bildschirm": "pflichten", "titel": "Weiß, was für deinen Betrieb gilt", "text": "Pflichten-Check mit Terminen, „Jetzt dran“ und Erinnerungen" },
+    { "bildschirm": "rechnung", "titel": "Rechnungen in Minuten", "text": "Fortlaufend nummeriert, mit GiroCode und E-Rechnung" },
+    { "bildschirm": "ablage", "titel": "Offene Rechnungen im Blick", "text": "Zahlung vermerken, Umsätze für die Umsatzsteuer übernehmen" },
+    { "bildschirm": "vorlagen", "titel": "Über 30 Vorlagen", "text": "Hygiene, Arbeitsschutz, Datenschutz, Personal – fertig als PDF" },
+    { "bildschirm": "pflicht", "titel": "Mit Grund und Quelle", "text": "Jede Pflicht erklärt – mit Rechtsgrundlage und offizieller Quelle" },
+    { "bildschirm": "betrieb", "titel": "Deine Daten bleiben bei dir", "text": "Verschlüsselt auf dem iPhone – ohne Konto, ohne Server" }
+  ]
+}
