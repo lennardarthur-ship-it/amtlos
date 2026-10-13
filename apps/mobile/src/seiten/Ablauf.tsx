@@ -10,6 +10,7 @@ import { PERSONEN_LISTE, personenSortiert } from "../unterlagen/speicher";
 import { offeneRechnungen, periodeText, perioden, umsaetzeFuer, type UstUebernahme, type Versteuerung } from "../unterlagen/ustAusRechnungen";
 import { useAmtlos } from "../zustand";
 import { Abschluss, useTeilen } from "./Abschluss";
+import { useProSperre } from "./Pro";
 import { Felder } from "./felder";
 import { InfoSeite } from "./InfoSeite";
 import { ListenSchritt } from "./Liste";
@@ -52,6 +53,7 @@ function PersonenWahl({ v, id, daten }: { v: Vorlage; id: string; daten: Daten }
 function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
   const z = useAmtlos();
   const f = useFarben();
+  const sperre = useProSperre();
   const v: Versteuerung = daten.versteuerung === "ist" ? "ist" : "soll";
   const [uebernommen, setUebernommen] = useState<{ periode: string; v: Versteuerung; r: UstUebernahme } | null>(null);
   const liste = perioden(z.stand.unterlagen, z.stand.betrieb, v);
@@ -67,6 +69,7 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
         <Wahl
           wert={uebernommen?.v === v ? uebernommen.periode : null}
           aendern={(p) => {
+            if (!sperre("ust_uebernahme")) return;
             const erg = umsaetzeFuer(z.stand.unterlagen, p, z.stand.betrieb, v);
             if (!erg) return;
             z.setzen(id, erg.werte);

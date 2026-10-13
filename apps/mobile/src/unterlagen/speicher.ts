@@ -41,9 +41,13 @@ export interface Stand {
   letzteSicherung?: string;
   /** automatisch in iCloud sichern (nur im eigenen App-Build, E-129) */
   cloudSicherung: boolean;
+  /** Pro testweise eingeschaltet – nur im Testmodus ohne App-Store-Anbindung (E-132) */
+  proTest: boolean;
+  /** Bitte um eine Bewertung (E-132): Erfolgsmomente gezählt, zuletzt gefragt am (ISO) */
+  bewertung: { erfolge: number; gefragt?: string };
 }
 
-export const LEERER_STAND: Stand = { version: 1, betrieb: LEERER_BETRIEB, unterlagen: [], mitarbeiter: [], kunden: [], profil: {}, erledigt: {}, erinnerungen: false, appSperre: false, cloudSicherung: false };
+export const LEERER_STAND: Stand = { version: 1, betrieb: LEERER_BETRIEB, unterlagen: [], mitarbeiter: [], kunden: [], profil: {}, erledigt: {}, erinnerungen: false, appSperre: false, cloudSicherung: false, proTest: false, bewertung: { erfolge: 0 } };
 
 function profilAus(roh: unknown): Stand["profil"] {
   if (!roh || typeof roh !== "object" || Array.isArray(roh)) return {};
@@ -54,6 +58,12 @@ function profilAus(roh: unknown): Stand["profil"] {
 function erledigtAus(roh: unknown): Record<string, string> {
   if (!roh || typeof roh !== "object" || Array.isArray(roh)) return {};
   return Object.fromEntries(Object.entries(roh as Record<string, unknown>).filter((e): e is [string, string] => typeof e[1] === "string"));
+}
+
+function bewertungAus(roh: unknown): Stand["bewertung"] {
+  const b = roh && typeof roh === "object" ? (roh as Record<string, unknown>) : {};
+  const erfolge = typeof b.erfolge === "number" && Number.isFinite(b.erfolge) ? Math.max(0, Math.floor(b.erfolge)) : 0;
+  return typeof b.gefragt === "string" && b.gefragt ? { erfolge, gefragt: b.gefragt } : { erfolge };
 }
 
 /** Liste der Personen einer Art im Stand. */
@@ -92,6 +102,8 @@ export function standAus(json: string | null): Stand {
       erinnerungen: r.erinnerungen === true,
       appSperre: r.appSperre === true,
       cloudSicherung: r.cloudSicherung === true,
+      proTest: r.proTest === true,
+      bewertung: bewertungAus(r.bewertung),
       ...(iso(r.geaendert) ? { geaendert: iso(r.geaendert) } : {}),
       ...(iso(r.letzteSicherung) ? { letzteSicherung: iso(r.letzteSicherung) } : {}),
     };

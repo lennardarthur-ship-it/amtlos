@@ -12,6 +12,7 @@ import { dateiTeilen, dateiWaehlen, zufall } from "../unterlagen/sicherungDatei"
 import { heute, sicherungFaellig, ungesichert, zusammenfuehren, type Stand } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { Inhalt } from "./gemeinsam";
+import { useProSperre } from "./Pro";
 
 /** Kurz warten, damit der Ladezustand gezeichnet ist, bevor die Schlüsselableitung den Thread belegt. */
 const gleich = () => new Promise((r) => setTimeout(r, 30));
@@ -177,6 +178,7 @@ export function CloudZeile() {
   const z = useAmtlos();
   const nav = useNav();
   const cloud = useCloud();
+  const sperre = useProSperre();
   if (!cloud) return null;
   return (
     <Schalter
@@ -184,7 +186,10 @@ export function CloudZeile() {
       hilfe={TEXT.icloud_auto_hilfe}
       wert={z.stand.cloudSicherung}
       aendern={(an) => {
-        if (an) nav.oeffnen("cloud", () => <CloudSicherungSeite />, true);
+        // einschalten gehört zu Pro; eine laufende Sicherung läuft weiter, auch wenn Pro endet (Daten gehen vor)
+        if (an) {
+          if (sperre("icloud")) nav.oeffnen("cloud", () => <CloudSicherungSeite />, true);
+        }
         else {
           z.cloudSicherungSetzen(false);
           void autoSchluesselLoeschen().catch(() => undefined);

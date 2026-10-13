@@ -1,0 +1,14 @@
+/** Im Web (Tests) gibt es keinen App Store – immer Testmodus. Gleiche Schnittstelle wie kauf.ts. */
+export const PRO_BERECHTIGUNG = "pro";
+export const kaufAktiv = false;
+export interface Angebot {
+  id: string;
+  titel: string;
+  preis: string;
+  zeitraum: string;
+  test: string | null;
+}
+export const proAktiv = async () => false;
+export const angebote = async (): Promise<Angebot[]> => [];
+export const kaufen = async (_id: string) => false;
+export const wiederherstellen = async () => false;

@@ -179,6 +179,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
               text={TEXT.pflichten_ansehen}
               onPress={() => {
                 // „Pflichten“ ist der erste Tab (E-129): Check schließen und dorthin wechseln
+                z.erfolg();
                 nav.zurueck();
                 z.tabWechseln("pflichten");
               }}

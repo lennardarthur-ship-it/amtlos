@@ -17,6 +17,8 @@ import { Felder } from "./felder";
 import { Gruppe, Inhalt, Seite, datumKurz } from "./gemeinsam";
 import { CheckProfilZeile } from "./Pflichten";
 import { CloudZeile, SicherungSeite, WiederherstellenSeite } from "./Sicherung";
+import { ProZeile, useProSperre } from "./Pro";
+import { UeberGruppe } from "./Recht";
 
 /** Eine gespeicherte Person bearbeiten (E-124). Eine neue Person ohne Namen verschwindet beim Verlassen wieder. */
 function PersonSeite({ art, id, neu }: { art: PersonenArt; id: string; neu?: boolean }) {
@@ -106,7 +108,8 @@ const TEILE: Teil[] = ["angaben", "steuer", "auftritt", "gesellschaft"];
  * ein Abschnitt (Unterseiten von „Mein Betrieb“).
  */
 export function BetriebFormular({ teil }: { teil?: Teil }) {
-  const { stand, betriebSpeichern } = useAmtlos();
+  const { stand, betriebSpeichern, pro } = useAmtlos();
+  const sperre = useProSperre();
   const [b, setB] = useState<BetriebDaten>(stand.betrieb);
   const feld = (k: keyof BetriebDaten) => ({
     wert: b[k] ?? "",
@@ -173,8 +176,9 @@ export function BetriebFormular({ teil }: { teil?: Teil }) {
         <View>
           {kopf("auftritt", TEXT.b_auftritt, TEXT.b_auftritt_text)}
           <Karte stil={{ paddingVertical: 14, gap: 12 }}>
-            <LogoWahl logo={b.logo ?? ""} setzen={(l) => feld("logo").aendern(l)} />
-            <FarbWahl farbe={b.farbe ?? ""} setzen={(c) => feld("farbe").aendern(c)} />
+            {!pro ? <T v="caption" leise>{TEXT.pro_grund.briefkopf(0)}</T> : null}
+            <LogoWahl logo={b.logo ?? ""} setzen={(l) => (!l || sperre("briefkopf")) && feld("logo").aendern(l)} />
+            <FarbWahl farbe={b.farbe ?? ""} setzen={(c) => sperre("briefkopf") && feld("farbe").aendern(c)} />
             <Feld label={TEXT.b_website} {...feld("website")} keyboardType="url" autoCapitalize="none" placeholder="z. B. www.salon-sonne.de" />
           </Karte>
         </View>
@@ -282,6 +286,7 @@ export function Betrieb() {
   return (
     <Seite titel={TEXT.betrieb_titel} key={zaehler}>
       <BetriebKopf b={b} onPress={betriebFehlt(b) ? oeffneAlles : () => oeffneTeil("angaben")} />
+      <ProZeile />
       <Gruppe titel={TEXT.betrieb_gruppe}>
         <Karte>
           {TEILE.map((t, i) => (
@@ -344,6 +349,9 @@ export function Betrieb() {
         ) : (
           <TextKnopf gefahr symbol="trash" text={TEXT.alles_loeschen} onPress={() => { weich(); setFrage(true); }} />
         )}
+      </Gruppe>
+      <Gruppe titel={TEXT.ueber_titel}>
+        <UeberGruppe />
       </Gruppe>
       <View style={{ marginTop: 28, gap: 4, paddingHorizontal: 4 }}>
         <T v="caption" leise>{TEXT.ueber_version(APP_VERSION, VORLAGEN.length, KATALOG.pflichten.length)}</T>

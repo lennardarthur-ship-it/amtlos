@@ -1,6 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import * as StoreReview from "expo-store-review";
 import { AppState } from "react-native";
+import { sollFragen } from "./pro/bewertung";
+import { kaufAktiv, proAktiv } from "./pro/kauf";
 import { nonce, schluesselHolen, schluesselLoeschen } from "./unterlagen/schluesselbund";
 import { istTresor, tresorOeffnen, tresorSchliessen } from "./unterlagen/tresor";
 import type { Betrieb, Daten, Person, PersonAngaben, PersonenArt } from "@amtlos/fachlogik";
@@ -47,6 +50,13 @@ interface Zustand {
   bezahltSetzen(id: string, datum: string | null): void;
   appSperreSetzen(an: boolean): void;
   cloudSicherungSetzen(an: boolean): void;
+  /** Amtlos Pro aktiv (Abo im App Store oder – nur im Testmodus – testweise eingeschaltet), E-132 */
+  pro: boolean;
+  /** Abo-Status beim Store neu abfragen (nach Kauf/Wiederherstellen und beim Start) */
+  proAktualisieren(aktiv?: boolean): void;
+  proTestSetzen(an: boolean): void;
+  /** Erfolgsmoment (Rechnung geteilt, Check fertig, Zahlung vermerkt) – fragt ggf. nach einer Bewertung */
+  erfolg(): void;
 }
 
 const Kontext = createContext<Zustand | null>(null);
@@ -67,6 +77,15 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
   const aktuell = useRef(stand);
   const zeit = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const [storePro, setStorePro] = useState(false);
+  useEffect(() => {
+    if (!kaufAktiv) return;
+    void proAktiv().then(setStorePro);
+    const abo = AppState.addEventListener("change", (z) => {
+      if (z === "active") void proAktiv().then(setStorePro);
+    });
+    return () => abo.remove();
+  }, []);
   const schluessel = useRef<Uint8Array | null>(null);
   const [verschluesselt, setVerschluesselt] = useState(false);
 
@@ -185,6 +204,19 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       bezahltSetzen: (id, datum) => setzen(bezahltSetzen(aktuell.current, id, datum)),
       appSperreSetzen: (an) => setzen({ ...aktuell.current, appSperre: an }),
       cloudSicherungSetzen: (an) => setzen({ ...aktuell.current, cloudSicherung: an }),
+      pro: storePro || (!kaufAktiv && stand.proTest),
+      proAktualisieren: (aktiv) => (aktiv === undefined ? void proAktiv().then(setStorePro) : setStorePro(aktiv)),
+      proTestSetzen: (an) => setzen({ ...aktuell.current, proTest: an }),
+      erfolg: () => {
+        const jetzt = new Date();
+        const b = { ...aktuell.current.bewertung, erfolge: aktuell.current.bewertung.erfolge + 1 };
+        const fragen = sollFragen(b, jetzt);
+        setzen({ ...aktuell.current, bewertung: fragen ? { ...b, gefragt: jetzt.toISOString() } : b });
+        if (fragen) {
+          // kurz warten, bis Teilen-Menü oder Meldung weg sind
+          setTimeout(() => void StoreReview.isAvailableAsync().then((ok) => (ok ? StoreReview.requestReview() : undefined)).catch(() => undefined), 1200);
+        }
+      },
       allesLoeschen: async () => {
         if (!sperre.current && !allesLoeschenErlaubt(aktuell.current)) return false;
         if (zeit.current) clearTimeout(zeit.current);
@@ -198,7 +230,7 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         return true;
       },
     }),
-    [bereit, ladefehler, verschluesselt, stand, tab, setzen, schreiben],
+    [bereit, ladefehler, verschluesselt, stand, tab, setzen, schreiben, storePro],
   );
   return <Kontext.Provider value={wert}>{children}</Kontext.Provider>;
 }

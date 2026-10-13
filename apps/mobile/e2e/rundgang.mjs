@@ -71,6 +71,14 @@ try {
   await feld("Ort").fill("München");
   await feld("Inhaber/in oder verantwortliche Person").fill("Alex Muster");
   await feld("Steuernummer").fill("143/123/45678");
+  // Hausfarbe gehört zu Pro (E-132): ohne Pro öffnet sich der Bezahlschirm, im Testpaket testweise einschaltbar
+  await tippe(p.getByRole("radio", { name: "Bordeaux" }).locator("visible=true").last());
+  await warte(800);
+  pruefe((await sichtbar("Logo und Hausfarbe auf Rechnungen und Unterlagen gibt es mit Pro")) && (await sichtbar("Immer kostenlos")) && (await sichtbar("verlängert sich automatisch")), "Bezahlschirm mit Grund, Freiumfang und Abo-Hinweis fehlt");
+  await foto("pro");
+  await knopf("Pro testweise einschalten").click();
+  await warte(900);
+  pruefe(await sichtbar("Pro ist testweise an."), "keine Bestätigung nach dem Einschalten von Pro");
   await tippe(p.getByRole("radio", { name: "Bordeaux" }).locator("visible=true").last()); // Hausfarbe (E-129)
   // Bundesland auf einer eigenen Auswahlseite (E-131) – wählt und geht zurück
   await tippe(knopf("Bundesland"));
@@ -287,6 +295,7 @@ try {
   await p.getByRole("tab", { name: "Mein Betrieb" }).click();
   await warte(800);
   pruefe((await sichtbar("Salon Sonne")) && (await sichtbar("Steuer und Bank")) && (await sichtbar("1 Kunde")), "Übersicht „Mein Betrieb“ fehlt (Kopf, Gruppen, Kundenzahl)");
+  pruefe((await sichtbar("Pro ist aktiv")) && (await sichtbar("Impressum")) && (await sichtbar("Amtlos weiterempfehlen")), "Pro-Status oder „Über Amtlos“ fehlt unter „Mein Betrieb“");
   await foto("mein-betrieb");
   await tippe(p.getByRole("button", { name: /^Mitarbeiter/ }).locator("visible=true").last());
   await warte(800);

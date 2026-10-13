@@ -13,6 +13,8 @@ import { dateiTeilen } from "../unterlagen/sicherungDatei";
 import { heute } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { Ablauf, fehltJeSchritt } from "./Ablauf";
+import { useProSperre } from "./Pro";
+import { FREI_JE_MONAT, ausgabeErlaubt, betriebFuerDokument, uebrig } from "../pro/regeln";
 import { BetriebFormular } from "./Betrieb";
 import { Inhalt } from "./gemeinsam";
 
@@ -22,6 +24,7 @@ import { Inhalt } from "./gemeinsam";
  */
 export function useTeilen(id: string) {
   const z = useAmtlos();
+  const sperre = useProSperre();
   const [laedt, setLaedt] = useState(false);
   const [fehler, setFehler] = useState<string | null>(null);
   const ausgabe = async (art: "teilen" | "drucken") => {
@@ -30,12 +33,16 @@ export function useTeilen(id: string) {
     if (!u || !v) return;
     setFehler(null);
     if (v.kundendokument && fehltFuer(z.stand, u).length) return setFehler(TEXT.erst_vollstaendig);
+    // Freikontingent (E-132): erneutes Teilen und Stornos gehen immer
+    if (!ausgabeErlaubt(z.stand.unterlagen, u, z.pro, new Date()) && !sperre("pdf")) return;
     setLaedt(art === "teilen");
     try {
-      const html = dokumentHtml(v, u.daten, z.stand.betrieb);
+      const html = dokumentHtml(v, u.daten, betriebFuerDokument(z.stand.betrieb, z.pro));
       if (art === "teilen") await pdfTeilen(html, dateiname(v, u.daten, heute()), v.querformat);
       else await drucken(html, dateiname(v, u.daten, heute()), v.querformat);
+      const erstesMal = !u.ausgegeben;
       z.ausgeben(id);
+      if (erstesMal && v.festschreiben) z.erfolg();
     } catch {
       setFehler(TEXT.pdf_fehler);
     } finally {
@@ -49,6 +56,7 @@ export function useTeilen(id: string) {
     const v = u ? vorlageFuer(u.vorlage) : undefined;
     if (!u || !v?.eRechnung) return;
     setFehler(null);
+    if (!sperre("e_rechnung")) return;
     const { daten, fehlt } = eRechnungAus(u.daten, z.stand.betrieb);
     const alle = [...new Set([...fehltFuer(z.stand, u), ...fehlt])];
     setEFehlt(alle);
@@ -72,7 +80,7 @@ function VorschauSeite({ id }: { id: string }) {
   return (
     <Unterseite titel={TEXT.vorschau}>
       <View style={{ flex: 1 }}>
-        <Vorschau html={dokumentHtml(v, u.daten, z.stand.betrieb)} quer={v.querformat} />
+        <Vorschau html={dokumentHtml(v, u.daten, betriebFuerDokument(z.stand.betrieb, z.pro))} quer={v.querformat} />
       </View>
       <Fuss>
         <Knopf text={TEXT.pdf_teilen} symbol="square.and.arrow.up" laedt={teilen.laedt} onPress={() => void teilen.los()} stil={{ flex: 1 }} />
@@ -114,7 +122,9 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
   const imFormular = new Set(jeSchritt.flat());
   // Prüfungen außerhalb der Schritte: einem Schritt zuordnen, wenn ein Feld dort so heißt; sonst „Mein Betrieb“ bzw. ohne Sprung
   const extra = alle.filter((x) => !imFormular.has(x)).map((x) => ({ text: x, schritt: x === NUMMER_DOPPELT ? nummerSchritt : v.abschnitte.findIndex((a) => a.felder.some((feld) => feld.label === x)), betrieb: x.includes("(Mein Betrieb)") }));
-  const html = dokumentHtml(v, d, z.stand.betrieb);
+  const html = dokumentHtml(v, d, betriebFuerDokument(z.stand.betrieb, z.pro));
+  const rest = uebrig(z.stand.unterlagen, new Date());
+  const zaehlt = !z.pro && !u.ausgegeben && !(typeof d.storno_zu === "string" && d.storno_zu);
   const ergebnis = v.ergebnis?.(d) ?? [];
   const fertig = alle.length === 0;
   return (
@@ -149,6 +159,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
       )}
       {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
       {v.festschreiben && !fest ? <T v="caption" leise stil={{ marginTop: 8 }}>{TEXT.wird_festgeschrieben}</T> : null}
+      {zaehlt ? <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.pro_rest(rest, FREI_JE_MONAT)}</T> : null}
 
       {ergebnis.length ? (
         <Karte stil={{ marginTop: 18 }}>
@@ -271,6 +282,7 @@ function Zahlung({ id }: { id: string }) {
   const vermerken = (d: string) => {
     z.bezahltSetzen(id, d);
     melden(TEXT.zahlung_vermerkt);
+    z.erfolg();
   };
   const u = z.stand.unterlagen.find((x) => x.id === id);
   if (!u) return null;
