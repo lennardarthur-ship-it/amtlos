@@ -11,6 +11,7 @@ import { offeneRechnungen, periodeText, perioden, umsaetzeFuer, type UstUebernah
 import { useAmtlos } from "../zustand";
 import { Abschluss, useTeilen } from "./Abschluss";
 import { useProSperre } from "./Pro";
+import { euerUebernahme, jahreMitDaten, type EuerUebernahme } from "../unterlagen/steuerpaket";
 import { Felder } from "./felder";
 import { InfoSeite } from "./InfoSeite";
 import { ListenSchritt } from "./Liste";
@@ -56,7 +57,7 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
   const sperre = useProSperre();
   const v: Versteuerung = daten.versteuerung === "ist" ? "ist" : "soll";
   const [uebernommen, setUebernommen] = useState<{ periode: string; v: Versteuerung; r: UstUebernahme } | null>(null);
-  const liste = perioden(z.stand.unterlagen, z.stand.betrieb, v);
+  const liste = perioden(z.stand.unterlagen, z.stand.betrieb, v, z.stand.belege);
   const offen = v === "ist" ? offeneRechnungen(z.stand.unterlagen).length : 0;
   if (!liste.length)
     return <T v="caption" leise stil={{ marginTop: 10 }}>{v === "ist" && offen ? TEXT.aus_rechnungen_ist_leer(offen) : TEXT.aus_rechnungen_leer}</T>;
@@ -70,7 +71,7 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
           wert={uebernommen?.v === v ? uebernommen.periode : null}
           aendern={(p) => {
             if (!sperre("ust_uebernahme")) return;
-            const erg = umsaetzeFuer(z.stand.unterlagen, p, z.stand.betrieb, v);
+            const erg = umsaetzeFuer(z.stand.unterlagen, p, z.stand.betrieb, v, z.stand.belege);
             if (!erg) return;
             z.setzen(id, erg.werte);
             setUebernommen({ periode: p, v, r: erg });
@@ -83,6 +84,42 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
           <T v="caption" farbe={f.amtTief}>{TEXT.aus_rechnungen_ok(r.anzahl)}</T>
           {r.ersatz ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_ersatz(r.ersatz)}</T> : null}
           {r.offen ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_offen(r.offen)}</T> : null}
+          {r.vorsteuerBelege || r.ohneVorsteuer ? <T v="caption" farbe={f.amtTief}>{TEXT.aus_rechnungen_vorsteuer(r.vorsteuerBelege, r.ohneVorsteuer)}</T> : null}
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
+/** EÜR (E-133): Einnahmen und Ausgaben eines Jahres aus bezahlten Rechnungen und Belegen übernehmen. */
+function EuerAusDaten({ id }: { id: string }) {
+  const z = useAmtlos();
+  const f = useFarben();
+  const sperre = useProSperre();
+  const [ergebnis, setErgebnis] = useState<{ jahr: string; r: EuerUebernahme } | null>(null);
+  const jahre = jahreMitDaten(z.stand);
+  if (!jahre.length) return <T v="caption" leise stil={{ marginTop: 10 }}>{TEXT.euer_leer}</T>;
+  return (
+    <View style={{ marginTop: 14, padding: 14, borderRadius: 14, backgroundColor: f.amtHauch }}>
+      <T v="klein" fett farbe={f.amtTief}>{TEXT.euer_aus_daten_titel}</T>
+      <T v="caption" farbe={f.amtTief}>{TEXT.euer_aus_daten_text}</T>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 6 }}>
+        <Wahl
+          wert={ergebnis?.jahr ?? null}
+          aendern={(jahr) => {
+            if (!sperre("ust_uebernahme")) return;
+            const r = euerUebernahme(z.stand, jahr);
+            z.setzen(id, { jahr, einnahmen: r.einnahmen, ausgaben: r.ausgaben });
+            setErgebnis({ jahr, r });
+          }}
+          optionen={jahre.map((j) => ({ wert: j, text: j }))}
+        />
+      </ScrollView>
+      {ergebnis ? (
+        <View style={{ marginTop: 8, gap: 4 }}>
+          <T v="caption" farbe={f.amtTief}>{TEXT.euer_aus_daten_ok(ergebnis.r.rechnungen, ergebnis.r.belege)}</T>
+          {ergebnis.r.unbezahlt ? <T v="caption" farbe={f.bald}>{TEXT.euer_unbezahlt(ergebnis.r.unbezahlt)}</T> : null}
+          {ergebnis.r.anlagen ? <T v="caption" farbe={f.bald}>{TEXT.euer_anlagen(ergebnis.r.anlagen)}</T> : null}
         </View>
       ) : null}
     </View>
@@ -100,6 +137,7 @@ function Schritt({ v, a, index, id, daten, fehlt }: { v: Vorlage; a: VorlagenAbs
       {index === 0 ? <TextKnopf symbol="questionmark.circle" text={TEXT.wozu_link} onPress={() => nav.oeffnen(`info-${v.id}`, () => <InfoSeite id={v.id} />, true)} stil={{ marginTop: 4 }} /> : null}
       {mitPerson ? <PersonenWahl v={v} id={id} daten={daten} /> : null}
       {v.ausRechnungen && index === 0 ? <AusRechnungen id={id} daten={daten} /> : null}
+      {v.id === "euer" && index === 0 ? <EuerAusDaten id={id} /> : null}
       <Felder felder={a.felder} werte={daten} fehlt={fehlt} setze={(k, w) => z.setzen(id, { [k]: w })} liste={(f) => <ListenSchritt feld={f} id={id} />} />
     </View>
   );

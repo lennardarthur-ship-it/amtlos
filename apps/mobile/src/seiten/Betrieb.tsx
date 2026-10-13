@@ -19,6 +19,7 @@ import { CheckProfilZeile } from "./Pflichten";
 import { CloudZeile, SicherungSeite, WiederherstellenSeite } from "./Sicherung";
 import { ProZeile, useProSperre } from "./Pro";
 import { UeberGruppe } from "./Recht";
+import { SteuerberatungSeite } from "./Steuerberatung";
 
 /** Eine gespeicherte Person bearbeiten (E-124). Eine neue Person ohne Namen verschwindet beim Verlassen wieder. */
 function PersonSeite({ art, id, neu }: { art: PersonenArt; id: string; neu?: boolean }) {
@@ -295,6 +296,11 @@ export function Betrieb() {
         </Karte>
       </Gruppe>
       <CheckProfilZeile />
+      <Gruppe titel={TEXT.steuerpaket_titel}>
+        <Karte>
+          <Zeile links={<Symbol name="briefcase" groesse={22} farbe={f.amt} />} titel={TEXT.steuerpaket_zeile} text={TEXT.steuerpaket_zeile_text} onPress={() => nav.oeffnen("steuerberatung", () => <SteuerberatungSeite />, true)} letzte />
+        </Karte>
+      </Gruppe>
       <Gruppe titel={TEXT.personen_gruppe}>
         <Karte>
           {(["mitarbeiter", "kunde"] as PersonenArt[]).map((art, i) => {

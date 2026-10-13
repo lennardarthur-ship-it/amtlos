@@ -11,6 +11,7 @@ import { useAmtlos } from "../zustand";
 import { BetriebFormular } from "./Betrieb";
 import { BEREICH_SYMBOL, Gruppe, Inhalt, Seite, datumKurz } from "./gemeinsam";
 import { useOeffnen, useStarten } from "./starten";
+import { BelegErfassenSeite } from "./Belege";
 
 /** Symbol je Anlass. */
 const ANLASS_SYMBOL: Record<string, string> = {
@@ -160,7 +161,10 @@ export function Unterlagen() {
               />
             </Karte>
           ) : null}
-          <Knopf text={TEXT.rechnung_schreiben} symbol="plus" onPress={() => starten("rechnung")} stil={{ marginTop: 16 }} />
+          <View style={{ flexDirection: "row", gap: 10, marginTop: 16 }}>
+            <Knopf text={TEXT.rechnung_schreiben} symbol="plus" onPress={() => starten("rechnung")} stil={{ flex: 1.15 }} />
+            <Knopf ton text={TEXT.beleg_erfassen} symbol="doc.viewfinder" onPress={() => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />)} stil={{ flex: 1, paddingHorizontal: 10 }} />
+          </View>
 
           {zuletzt.length ? (
             <Gruppe titel={TEXT.zuletzt}>

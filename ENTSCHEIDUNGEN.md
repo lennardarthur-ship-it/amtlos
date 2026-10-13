@@ -660,6 +660,19 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Wachstumsplan** als Dokument (Recherche mit Quellen): Ziel 67–111 Mio. € ARR für 1 Mrd. € bei 9–15x; Pro allein trägt das nicht, der Weg führt über ein Betriebs-Abo (E-Rechnung empfangen, Belege, Steuerberater-Export, Sync) und den Steuerberater-Kanal. Preisvorschlag 12,99 €/Monat bzw. 99,99 €/Jahr mit 14 Tagen Test; Experimente: E-Rechnung kostenlos, Bezahlschirm nach dem Check.
 - **Korrektur:** Demo-Stand nutzte den Branchenschlüssel `beauty` statt `beauty_kosmetik` (Store-Bilder neu erzeugt).
 
+### E-133 · Belege und E-Rechnungen empfangen, Vorsteuer und EÜR aus Daten, Paket für die Steuerberatung
+- **Datum:** 2026-10-13 · **Status:** angenommen (Wachstumsplan: Umsatz pro Betrieb heben; Gründer: „tu alles, was du tun kannst“)
+- **Herkunft:** Die Fachlogik (`belege.ts`, `erechnungLesen.ts`, `buchungen.ts` mit Tests) kam in Commit ff527fd ins Repo, ohne dass diese Sitzung sie geschrieben hat – vermutlich aus einer parallelen Sitzung im selben Arbeitsverzeichnis. Sie wurde gesichtet und unverändert übernommen (nur Verweise auf E-133/T-79). Ein eigener, doppelter Parser wurde verworfen.
+- **Belege in der App:** `Stand.belege` (geprüft mit `belegAus`), erfassen per Foto (Kamera oder Fotos, 1600 px JPEG), Datei (PDF, Bild, XML) oder von Hand. Eine E-Rechnung – XRechnung (UBL/CII) oder ZUGFeRD/Factur-X-PDF – füllt den Beleg selbst aus; die Originaldatei wird byte-genau und verschlüsselt im App-Ordner abgelegt (`unterlagen/dateien.ts`, gleicher Schlüssel wie der Stand). Bearbeiten mit Beträgen je Steuersatz, Vorsteuer-Schalter, Kategorie (Alltagssprache → Zeile der Anlage EÜR), Zahlungsweg und Zahltag.
+- **Kostenlos:** Belege erfassen und E-Rechnungen empfangen (seit 2025 für jeden Betrieb Pflicht – Einstiegsgrund). **Pro:** Übernahme in Voranmeldung und EÜR und das Steuerberater-Paket.
+- **Aufbewahrung:** Belege zählen als aufbewahrungspflichtig (Löschschutz, Sicherungs-Erinnerung); Löschen eines einzelnen Belegs warnt.
+- **Sicherung Version 2:** enthält die Belegdateien (Base64) im verschlüsselten Inhalt; Version 1 bleibt lesbar. Zusammenführen von Belegen nach ID, Neueres gewinnt. iCloud-Sicherung nimmt die Dateien mit.
+- **Voranmeldung:** Vorsteuer (Kz 66) aus Belegen nach Belegdatum (§ 15 Abs. 1 UStG), Zeiträume auch nur mit Belegen; Belege mit USt, aber ohne Vorsteuerabzug werden genannt.
+- **EÜR:** „Aus Rechnungen und Belegen übernehmen“ je Jahr – Einnahmen netto und vereinnahmte USt nach Zahlungseingang, Ausgaben je Kategorie nach Zahltag, gezahlte Vorsteuer als eigene Zeile; Anschaffungen über 800 € werden als Hinweis genannt (Abschreibung von Hand).
+- **Paket für die Steuerberatung** (`unterlagen/steuerpaket.ts`, Mein Betrieb): Zeitraum (Monat, Quartal, Jahr), Kontenrahmen SKR03/SKR04, Berater- und Mandantennummer; ZIP mit DATEV-Buchungsstapel (EXTF 700, ungeprüft – steht in der LIESMICH), Buchungsliste, Rechnungs- und Belegliste (CSV, Semikolon, UTF-8 mit BOM), XRechnungen der Ausgangsrechnungen (wenn vollständig) und den Beleg-Originalen.
+- **Gefunden im Rundgang:** Die Steuerberater-Seite lag mit ihrem Knopf unter der Tab-Leiste – öffnet jetzt im Vollbild.
+- **Geprüft:** 54 App-Tests (neu: belege.test.ts), Rundgang hell und dunkel mit echtem E-Rechnungs-Empfang über die Dateiauswahl und heruntergeladenem Paket.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

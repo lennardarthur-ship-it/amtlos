@@ -2,7 +2,7 @@
  * Unterlagen und Betrieb – nur auf dem Gerät (E-121). Reine Funktionen über einem unveränderlichen Stand, damit sie
  * ohne Gerät testbar sind; zustand.tsx speichert den Stand in AsyncStorage.
  */
-import { LEERER_BETRIEB, leereDaten, naechsteNummer, personMerken as merken, vorlageFuer, type Betrieb, type Daten, type Person, type PersonAngaben, type PersonenArt } from "@amtlos/fachlogik";
+import { LEERER_BETRIEB, belegAus, leereDaten, type Beleg, naechsteNummer, personMerken as merken, vorlageFuer, type Betrieb, type Daten, type Person, type PersonAngaben, type PersonenArt } from "@amtlos/fachlogik";
 
 export interface Unterlage {
   id: string;
@@ -24,6 +24,8 @@ export interface Stand {
   version: 1;
   betrieb: Betrieb;
   unterlagen: Unterlage[];
+  /** Belege und Eingangsrechnungen (E-133); Dateien liegen verschlüsselt daneben (unterlagen/dateien.ts) */
+  belege: Beleg[];
   /** gespeicherte Personen, die Vorlagen vorausfüllen (E-124) */
   mitarbeiter: Person[];
   kunden: Person[];
@@ -43,11 +45,13 @@ export interface Stand {
   cloudSicherung: boolean;
   /** Pro testweise eingeschaltet – nur im Testmodus ohne App-Store-Anbindung (E-132) */
   proTest: boolean;
+  /** Angaben für das Steuerberater-Paket (E-133) */
+  steuerberatung: { kontenrahmen: "SKR03" | "SKR04"; beraternummer: string; mandantennummer: string };
   /** Bitte um eine Bewertung (E-132): Erfolgsmomente gezählt, zuletzt gefragt am (ISO) */
   bewertung: { erfolge: number; gefragt?: string };
 }
 
-export const LEERER_STAND: Stand = { version: 1, betrieb: LEERER_BETRIEB, unterlagen: [], mitarbeiter: [], kunden: [], profil: {}, erledigt: {}, erinnerungen: false, appSperre: false, cloudSicherung: false, proTest: false, bewertung: { erfolge: 0 } };
+export const LEERER_STAND: Stand = { version: 1, betrieb: LEERER_BETRIEB, unterlagen: [], belege: [], mitarbeiter: [], kunden: [], profil: {}, erledigt: {}, erinnerungen: false, appSperre: false, cloudSicherung: false, proTest: false, bewertung: { erfolge: 0 }, steuerberatung: { kontenrahmen: "SKR03", beraternummer: "", mandantennummer: "" } };
 
 function profilAus(roh: unknown): Stand["profil"] {
   if (!roh || typeof roh !== "object" || Array.isArray(roh)) return {};
@@ -58,6 +62,12 @@ function profilAus(roh: unknown): Stand["profil"] {
 function erledigtAus(roh: unknown): Record<string, string> {
   if (!roh || typeof roh !== "object" || Array.isArray(roh)) return {};
   return Object.fromEntries(Object.entries(roh as Record<string, unknown>).filter((e): e is [string, string] => typeof e[1] === "string"));
+}
+
+function steuerberatungAus(roh: unknown): Stand["steuerberatung"] {
+  const b = roh && typeof roh === "object" ? (roh as Record<string, unknown>) : {};
+  const ziffern = (w: unknown) => (typeof w === "string" ? w.replace(/\D/g, "").slice(0, 7) : "");
+  return { kontenrahmen: b.kontenrahmen === "SKR04" ? "SKR04" : "SKR03", beraternummer: ziffern(b.beraternummer), mandantennummer: ziffern(b.mandantennummer) };
 }
 
 function bewertungAus(roh: unknown): Stand["bewertung"] {
@@ -95,6 +105,7 @@ export function standAus(json: string | null): Stand {
       version: 1,
       betrieb,
       unterlagen,
+      belege: (Array.isArray(r.belege) ? r.belege : []).map(belegAus).filter((b): b is Beleg => b !== null),
       mitarbeiter: personenAus(r.mitarbeiter),
       kunden: personenAus(r.kunden),
       profil: profilAus(r.profil),
@@ -104,6 +115,7 @@ export function standAus(json: string | null): Stand {
       cloudSicherung: r.cloudSicherung === true,
       proTest: r.proTest === true,
       bewertung: bewertungAus(r.bewertung),
+      steuerberatung: steuerberatungAus(r.steuerberatung),
       ...(iso(r.geaendert) ? { geaendert: iso(r.geaendert) } : {}),
       ...(iso(r.letzteSicherung) ? { letzteSicherung: iso(r.letzteSicherung) } : {}),
     };
@@ -275,12 +287,23 @@ export function bezahltSetzen(s: Stand, id: string, datum: string | null): Stand
   return { ...s, unterlagen: s.unterlagen.map((u) => (u.id === id ? (datum ? { ...u, bezahlt: datum } : (({ bezahlt: _weg, ...rest }) => rest)(u)) : u)) };
 }
 
-/** Unterlagen, die aufbewahrt werden müssen: festgeschriebene (Rechnungen, Kassenbuch). */
-export const aufbewahrungspflichtig = (s: Stand) => s.unterlagen.filter((u) => u.festgeschrieben);
+/** Unterlagen, die aufbewahrt werden müssen: festgeschriebene (Rechnungen, Kassenbuch) und Belege. */
+export const aufbewahrungspflichtig = (s: Stand): { id: string }[] => [...s.unterlagen.filter((u) => u.festgeschrieben), ...s.belege];
+
+/** Beleg anlegen oder ändern (E-133). */
+export function belegSetzen(s: Stand, b: Beleg, jetzt: Date): Stand {
+  const neu = { ...b, geaendert: jetzt.toISOString() };
+  return { ...s, belege: s.belege.some((x) => x.id === b.id) ? s.belege.map((x) => (x.id === b.id ? neu : x)) : [neu, ...s.belege] };
+}
+
+export const belegLoeschen = (s: Stand, id: string): Stand => ({ ...s, belege: s.belege.filter((b) => b.id !== id) });
+
+/** Belege nach Belegdatum, neueste zuerst. */
+export const belegeSortiert = (s: Stand) => [...s.belege].sort((a, b) => b.datum.localeCompare(a.datum) || b.geaendert.localeCompare(a.geaendert));
 
 /** Seit der letzten Datensicherung geändert (oder nie gesichert)? */
 export function ungesichert(s: Stand): boolean {
-  if (!s.letzteSicherung) return s.unterlagen.length > 0 || s.mitarbeiter.length > 0 || s.kunden.length > 0;
+  if (!s.letzteSicherung) return s.unterlagen.length > 0 || s.belege.length > 0 || s.mitarbeiter.length > 0 || s.kunden.length > 0;
   return Boolean(s.geaendert && s.geaendert > s.letzteSicherung);
 }
 
@@ -292,7 +315,7 @@ export const allesLoeschenErlaubt = (s: Stand) => aufbewahrungspflichtig(s).leng
 
 /** Tage seit der letzten Sicherung, wenn eine fällig ist (ungesicherte Änderungen, älter als `nach` Tage), sonst null. */
 export function sicherungFaellig(s: Stand, jetzt: Date, nach = 7): { tage: number | null } | null {
-  if (!ungesichert(s) || s.unterlagen.length === 0) return null;
+  if (!ungesichert(s) || (s.unterlagen.length === 0 && s.belege.length === 0)) return null;
   if (!s.letzteSicherung) return { tage: null };
   const tage = Math.floor((jetzt.getTime() - Date.parse(s.letzteSicherung)) / 864e5);
   return tage >= nach ? { tage } : null;
@@ -333,11 +356,24 @@ export function zusammenfuehren(aktuell: Stand, gesichert: Stand): Zusammenfuehr
     }
   }
   const personen = (a: Person[], g: Person[]) => [...a, ...g.filter((p) => !a.some((x) => x.id === p.id))];
+  // Belege: nach ID, die zuletzt geänderte Fassung gewinnt; nur auf dem Gerät Vorhandenes bleibt
+  const belegNachId = new Map(aktuell.belege.map((b) => [b.id, b]));
+  for (const g of gesichert.belege) {
+    const a = belegNachId.get(g.id);
+    if (!a) {
+      belegNachId.set(g.id, g);
+      neu++;
+    } else if (a.geaendert < g.geaendert) {
+      belegNachId.set(g.id, g);
+      aktualisiert++;
+    } else behalten++;
+  }
   const erledigt = { ...gesichert.erledigt, ...aktuell.erledigt };
   const stand: Stand = {
     ...aktuell,
     betrieb: betriebFehlt(aktuell.betrieb) ? gesichert.betrieb : aktuell.betrieb,
     unterlagen: [...nachId.values()],
+    belege: [...belegNachId.values()],
     mitarbeiter: personen(aktuell.mitarbeiter, gesichert.mitarbeiter),
     kunden: personen(aktuell.kunden, gesichert.kunden),
     profil: { ...gesichert.profil, ...aktuell.profil },

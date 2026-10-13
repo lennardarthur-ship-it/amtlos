@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { ScrollView, View } from "react-native";
 import { T as TEXT } from "../texte";
-import { Karte, Knopf, Symbol, T, Wahl } from "../ui/bausteine";
+import { Karte, Knopf, Symbol, T, TextKnopf, Wahl } from "../ui/bausteine";
+import { useNav } from "../ui/navigation";
 import { useFarben } from "../ui/thema";
-import { euroText, filterVerfuegbar, filtern, offeneSumme, type Filter } from "../unterlagen/ablage";
+import { belegeFiltern, euroText, filterVerfuegbar, filtern, offeneSumme, type Filter } from "../unterlagen/ablage";
 import { sortiert } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
-import { Leer, Seite } from "./gemeinsam";
+import { BelegErfassen, BelegSeite, BelegZeile } from "./Belege";
+import { Gruppe, Leer, Seite } from "./gemeinsam";
 import { useOeffnen, useStarten } from "./starten";
 import { Suchfeld, UnterlageZeile } from "./Unterlagen";
 
@@ -31,22 +33,26 @@ function OffeneKarte({ anzahl, cent, aktiv, onPress }: { anzahl: number; cent: n
 /** Alle angelegten Unterlagen, zuletzt bearbeitete zuerst; Filter und Suche, sobald es sich lohnt. */
 export function Meine() {
   const { stand, tabWechseln } = useAmtlos();
+  const nav = useNav();
   const oeffnen = useOeffnen();
+  const belegOeffnen = (id: string) => nav.oeffnen(`beleg-${id}`, () => <BelegSeite id={id} />, true);
   const starten = useStarten();
   const [filter, setFilter] = useState<Filter>("alle");
   const [suche, setSuche] = useState("");
   const alle = sortiert(stand);
-  const verfuegbar = filterVerfuegbar(alle);
+  const verfuegbar = filterVerfuegbar(alle, stand.belege.length);
   const aktiv: Filter = verfuegbar.includes(filter) ? filter : "alle";
   const liste = filtern(alle, aktiv, suche);
+  const belege = aktiv === "alle" || aktiv === "belege" ? belegeFiltern(stand.belege, suche) : [];
+  const belegeGezeigt = aktiv === "belege" ? belege : belege.slice(0, 5);
   const offen = offeneSumme(alle, stand.betrieb);
   const hatRechnungen = alle.some((u) => u.vorlage === "rechnung" && u.festgeschrieben);
   return (
     <Seite titel={TEXT.meine_titel} unterzeile={alle.length ? TEXT.anzahl_unterlagen(alle.length) : undefined}>
-      {alle.length ? (
+      {alle.length || stand.belege.length ? (
         <View>
           {hatRechnungen ? <OffeneKarte anzahl={offen.anzahl} cent={offen.cent} aktiv={aktiv === "offen"} onPress={() => setFilter(aktiv === "offen" ? "alle" : "offen")} /> : null}
-          {alle.length >= SUCHE_AB ? (
+          {alle.length + stand.belege.length >= SUCHE_AB ? (
             <View style={{ marginBottom: 12 }}>
               <Suchfeld wert={suche} setzen={setSuche} label={TEXT.meine_suchen} />
             </View>
@@ -62,9 +68,22 @@ export function Meine() {
                 <UnterlageZeile key={u.id} u={u} letzte={i === liste.length - 1} onPress={() => oeffnen(u.id)} />
               ))}
             </Karte>
-          ) : (
+          ) : !belege.length ? (
             <T leise stil={{ marginTop: 8 }}>{TEXT.meine_nichts}</T>
-          )}
+          ) : null}
+          {belegeGezeigt.length ? (
+            <Gruppe titel={aktiv === "alle" ? TEXT.belege_titel : undefined}>
+              <Karte>
+                {belegeGezeigt.map((b, i) => (
+                  <BelegZeile key={b.id} b={b} letzte={i === belegeGezeigt.length - 1} onPress={() => belegOeffnen(b.id)} />
+                ))}
+              </Karte>
+              {aktiv === "alle" && belege.length > belegeGezeigt.length ? <TextKnopf text={TEXT.alle_belege(belege.length)} onPress={() => setFilter("belege")} stil={{ marginLeft: 4 }} /> : null}
+            </Gruppe>
+          ) : null}
+          <Gruppe titel={TEXT.beleg_erfassen}>
+            <BelegErfassen kompakt />
+          </Gruppe>
         </View>
       ) : (
         <Leer text={TEXT.meine_leer}>

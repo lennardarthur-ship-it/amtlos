@@ -7,7 +7,7 @@
  *   erst, wenn du die Erstattung vermerkst.
  * Nur festgeschriebene (geteilte) Rechnungen zählen – Entwürfe sind nicht raus. Fachlich zu prüfen: T-70.
  */
-import { eRechnungAus, umsaetzeNachSatz, ustZeitraum, type Betrieb } from "@amtlos/fachlogik";
+import { eRechnungAus, umsaetzeNachSatz, ustZeitraum, vorsteuerFuer, type Beleg, type Betrieb } from "@amtlos/fachlogik";
 import type { Unterlage } from "./speicher";
 
 export type Versteuerung = "soll" | "ist";
@@ -44,8 +44,10 @@ function zuordnen(u: Unterlage, v: Versteuerung, betrieb: Betrieb): Zuordnung {
 const periodenVon = (tag: string) => [tag.slice(0, 7), `${tag.slice(0, 4)}-Q${Math.floor((Number(tag.slice(5, 7)) - 1) / 3) + 1}`];
 
 /** Monate und Quartale mit zuordenbaren Rechnungen – neueste zuerst. */
-export function perioden(unterlagen: Unterlage[], betrieb: Betrieb, v: Versteuerung = "soll"): string[] {
+export function perioden(unterlagen: Unterlage[], betrieb: Betrieb, v: Versteuerung = "soll", belege: Beleg[] = []): string[] {
   const set = new Set<string>();
+  // Vorsteuer aus Belegen zählt nach Belegdatum (E-133) – auch Zeiträume nur mit Belegen
+  for (const b of belege) for (const p of periodenVon(b.datum)) set.add(p);
   for (const u of festeRechnungen(unterlagen)) {
     const z = zuordnen(u, v, betrieb);
     if (z.tag) for (const p of periodenVon(z.tag)) set.add(p);
@@ -63,10 +65,13 @@ export interface UstUebernahme {
   ersatz: number;
   /** Ist: so viele geteilte Rechnungen ohne Zahlungseingang (zählen nicht) */
   offen: number;
+  /** Belege mit Vorsteuer im Zeitraum und solche mit Umsatzsteuer, aber ohne Vorsteuerabzug (E-133) */
+  vorsteuerBelege: number;
+  ohneVorsteuer: number;
 }
 
 /** Felder der Voranmeldung für einen Zeitraum („JJJJ-MM“ oder „JJJJ-Qn“). */
-export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: Betrieb, v: Versteuerung = "soll"): UstUebernahme | null {
+export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: Betrieb, v: Versteuerung = "soll", belege: Beleg[] = []): UstUebernahme | null {
   const z = ustZeitraum(periode);
   if (!z) return null;
   const im = festeRechnungen(unterlagen)
@@ -79,10 +84,13 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
     }),
   );
   const summe = (f: (s: number | null) => boolean) => gruppen.filter((g) => f(g.satz)).reduce((a, g) => a + g.netto_cent, 0);
+  const vst = vorsteuerFuer(belege, z.von, z.bis);
   return {
+    vorsteuerBelege: vst.anzahl,
+    ohneVorsteuer: vst.ohne,
     anzahl: im.length,
     ersatz: im.filter((x) => x.ersatz).length,
     offen: v === "ist" ? offeneRechnungen(unterlagen).length : 0,
-    werte: { zeitraum: periodeText(periode), umsatz_19: betragText(summe((s) => s === 19)), umsatz_7: betragText(summe((s) => s === 7)), umsatz_frei: betragText(summe((s) => s === null || s === 0)) },
+    werte: { zeitraum: periodeText(periode), umsatz_19: betragText(summe((s) => s === 19)), umsatz_7: betragText(summe((s) => s === 7)), umsatz_frei: betragText(summe((s) => s === null || s === 0)), ...(belege.length ? { vorsteuer: betragText(vst.cent) } : {}) },
   };
 }

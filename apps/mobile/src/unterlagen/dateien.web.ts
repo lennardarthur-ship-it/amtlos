@@ -1,0 +1,16 @@
+/** Web (Vorschau, Rundgang): Belegdateien unverschlüsselt im localStorage – nur für Tests. */
+import { ausBase64, base64 } from "./sicherung";
+
+const SCHLUESSEL = (name: string) => `amtlos.datei.${name}`;
+const speicher = () => (globalThis as unknown as { localStorage?: { getItem(k: string): string | null; setItem(k: string, v: string): void; removeItem(k: string): void } }).localStorage;
+
+export async function dateiAblegen(name: string, bytes: Uint8Array, _schluessel: Uint8Array | null): Promise<void> {
+  speicher()?.setItem(SCHLUESSEL(name), base64(bytes));
+}
+export async function dateiHolen(name: string, _schluessel: Uint8Array | null): Promise<Uint8Array | null> {
+  const t = speicher()?.getItem(SCHLUESSEL(name));
+  return t ? ausBase64(t) : null;
+}
+export function dateiEntfernen(name: string): void {
+  speicher()?.removeItem(SCHLUESSEL(name));
+}

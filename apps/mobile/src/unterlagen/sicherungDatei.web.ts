@@ -21,3 +21,21 @@ export async function dateiWaehlen(): Promise<{ name: string; text: string } | n
   const text = a.file ? await a.file.text() : await (await fetch(a.uri)).text();
   return { name: a.name, text };
 }
+
+export async function dateiTeilenBytes(name: string, bytes: Uint8Array, mimeType: string): Promise<void> {
+  const g = globalThis as unknown as { document: { createElement(t: string): { href: string; download: string; click(): void } }; URL: { createObjectURL(b: unknown): string; revokeObjectURL(u: string): void }; Blob: new (t: unknown[], o: { type: string }) => unknown };
+  const url = g.URL.createObjectURL(new g.Blob([bytes], { type: mimeType }));
+  const a = g.document.createElement("a");
+  a.href = url;
+  a.download = name;
+  a.click();
+  setTimeout(() => g.URL.revokeObjectURL(url), 1000);
+}
+
+export async function dateiWaehlenBytes(typen: string[]): Promise<{ name: string; bytes: Uint8Array; mime: string } | null> {
+  const r = await DocumentPicker.getDocumentAsync({ type: typen, multiple: false });
+  if (r.canceled || !r.assets[0]) return null;
+  const a = r.assets[0] as DocumentPicker.DocumentPickerAsset & { file?: { arrayBuffer(): Promise<ArrayBuffer> } };
+  const puffer = a.file ? await a.file.arrayBuffer() : await (await fetch(a.uri)).arrayBuffer();
+  return { name: a.name, bytes: new Uint8Array(puffer), mime: a.mimeType ?? "" };
+}

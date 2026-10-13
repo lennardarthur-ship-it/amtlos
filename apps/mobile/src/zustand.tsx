@@ -6,8 +6,10 @@ import { sollFragen } from "./pro/bewertung";
 import { kaufAktiv, proAktiv } from "./pro/kauf";
 import { nonce, schluesselHolen, schluesselLoeschen } from "./unterlagen/schluesselbund";
 import { istTresor, tresorOeffnen, tresorSchliessen } from "./unterlagen/tresor";
-import type { Betrieb, Daten, Person, PersonAngaben, PersonenArt } from "@amtlos/fachlogik";
-import { LEERER_STAND, aendern, allesLoeschenErlaubt, anlegen, ausgeben, bezahltSetzen, zusammenfuehren, type Zusammenfuehrung, betriebSetzen, erledigtSetzen, felderSetzen, istLesbar, profilSetzen, stornieren, kopieren, loeschen, personLoeschen, personMerken, personSetzen, standAus, type Stand, type Unterlage } from "./unterlagen/speicher";
+import type { Beleg, Betrieb, Daten, Person, PersonAngaben, PersonenArt } from "@amtlos/fachlogik";
+import { dateiAblegen, dateiEntfernen, dateiHolen } from "./unterlagen/dateien";
+import { base64, ausBase64, type Dateien } from "./unterlagen/sicherung";
+import { LEERER_STAND, belegLoeschen, belegSetzen, neueId, aendern, allesLoeschenErlaubt, anlegen, ausgeben, bezahltSetzen, zusammenfuehren, type Zusammenfuehrung, betriebSetzen, erledigtSetzen, felderSetzen, istLesbar, profilSetzen, stornieren, kopieren, loeschen, personLoeschen, personMerken, personSetzen, standAus, type Stand, type Unterlage } from "./unterlagen/speicher";
 
 /** Alles liegt nur auf dem Gerät (E-121): kein Konto, kein Server. Seit E-129 verschlüsselt (Schlüssel im Schlüsselbund). */
 const SCHLUESSEL = "amtlos.unterlagen.v1";
@@ -57,6 +59,18 @@ interface Zustand {
   proTestSetzen(an: boolean): void;
   /** Erfolgsmoment (Rechnung geteilt, Check fertig, Zahlung vermerkt) – fragt ggf. nach einer Bewertung */
   erfolg(): void;
+  steuerberatungSetzen(sb: Stand["steuerberatung"]): void;
+  /** Belege (E-133) */
+  belegSetzen(b: Beleg): void;
+  /** löscht den Beleg und seine Datei */
+  belegLoeschen(id: string): void;
+  /** Datei verschlüsselt ablegen; liefert den Dateinamen (mit Endung) */
+  dateiSpeichern(bytes: Uint8Array, endung: string): Promise<string>;
+  dateiLesen(name: string): Promise<Uint8Array | null>;
+  /** alle Belegdateien als Base64 – für die Sicherung */
+  dateienFuerSicherung(s?: Stand): Promise<Dateien>;
+  /** Belegdateien aus einer Sicherung ablegen (vorhandene bleiben) */
+  dateienEinspielen(d: Dateien): Promise<void>;
 }
 
 const Kontext = createContext<Zustand | null>(null);
@@ -207,6 +221,34 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       pro: storePro || (!kaufAktiv && stand.proTest),
       proAktualisieren: (aktiv) => (aktiv === undefined ? void proAktiv().then(setStorePro) : setStorePro(aktiv)),
       proTestSetzen: (an) => setzen({ ...aktuell.current, proTest: an }),
+      steuerberatungSetzen: (sb) => setzen({ ...aktuell.current, steuerberatung: sb }),
+      belegSetzen: (b) => setzen(belegSetzen(aktuell.current, b, new Date())),
+      belegLoeschen: (id) => {
+        const b = aktuell.current.belege.find((x) => x.id === id);
+        if (b?.datei) dateiEntfernen(b.datei);
+        setzen(belegLoeschen(aktuell.current, id));
+      },
+      dateiSpeichern: async (bytes, endung) => {
+        const name = `${neueId()}.${endung.replace(/[^a-z0-9]/gi, "").toLowerCase() || "bin"}`;
+        await dateiAblegen(name, bytes, schluessel.current);
+        return name;
+      },
+      dateiLesen: (name) => dateiHolen(name, schluessel.current).catch(() => null),
+      dateienFuerSicherung: async (s) => {
+        const d: Dateien = {};
+        for (const b of (s ?? aktuell.current).belege) {
+          if (!b.datei) continue;
+          const bytes = await dateiHolen(b.datei, schluessel.current).catch(() => null);
+          if (bytes) d[b.datei] = base64(bytes);
+        }
+        return d;
+      },
+      dateienEinspielen: async (d) => {
+        for (const [name, b64] of Object.entries(d)) {
+          if (await dateiHolen(name, schluessel.current).catch(() => null)) continue;
+          await dateiAblegen(name, ausBase64(b64), schluessel.current).catch(() => undefined);
+        }
+      },
       erfolg: () => {
         const jetzt = new Date();
         const b = { ...aktuell.current.bewertung, erfolge: aktuell.current.bewertung.erfolge + 1 };
@@ -220,6 +262,7 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       allesLoeschen: async () => {
         if (!sperre.current && !allesLoeschenErlaubt(aktuell.current)) return false;
         if (zeit.current) clearTimeout(zeit.current);
+        for (const b of aktuell.current.belege) if (b.datei) dateiEntfernen(b.datei);
         sperre.current = false;
         setLadefehler(false);
         aktuell.current = LEERER_STAND;

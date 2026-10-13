@@ -1,8 +1,8 @@
 /**
- * Belege und Ausgaben (E-132): reine Funktionen ohne Gerät. Ein Beleg ist eine Eingangsrechnung, ein Kassenbon oder
+ * Belege und Ausgaben (E-133): reine Funktionen ohne Gerät. Ein Beleg ist eine Eingangsrechnung, ein Kassenbon oder
  * ein Eigenbeleg – mit Bruttobetrag je Steuersatz, Kategorie (Zeile der Anlage EÜR, Konto SKR03/SKR04) und dem Tag der
  * Zahlung (Abfluss, § 11 Abs. 2 EStG). Daraus entstehen die Vorsteuer der Umsatzsteuer-Voranmeldung (Kz 66) und die
- * Betriebsausgaben der EÜR. Fachlich zu prüfen: PRUEFLISTE T-78.
+ * Betriebsausgaben der EÜR. Fachlich zu prüfen: PRUEFLISTE T-79.
  */
 import { rundeCent } from "./rechnung.js";
 
@@ -56,7 +56,7 @@ export interface Kategorie {
 
 const konto = (k: string) => ({ 19: k, 7: k, 0: k });
 
-/** Kategorien in Alltagssprache mit Zuordnung zur Anlage EÜR und Standardkonten (T-78). */
+/** Kategorien in Alltagssprache mit Zuordnung zur Anlage EÜR und Standardkonten (T-79). */
 export const KATEGORIEN: Kategorie[] = [
   { id: "waren", titel: "Waren und Material", euer: "Waren, Rohstoffe und Hilfsstoffe einschließlich der Nebenkosten", skr03: { 19: "3400", 7: "3300", 0: "3200" }, skr04: { 19: "5400", 7: "5300", 0: "5200" } },
   { id: "fremdleistungen", titel: "Fremdleistungen", euer: "Bezogene Leistungen", skr03: konto("3100"), skr04: konto("5900") },
@@ -116,7 +116,7 @@ export function belegSummen(b: Pick<Beleg, "steuer" | "vorsteuer">): BelegSummen
 /** Tag, nach dem ein Beleg der EÜR zugeordnet wird: Zahlung (Abfluss), sonst Belegdatum. */
 export const zahltag = (b: Pick<Beleg, "datum" | "bezahlt">) => b.bezahlt || b.datum;
 
-/** Vorsteuer eines Zeitraums (nach Belegdatum – die Rechnung liegt vor, § 15 Abs. 1 Nr. 1 UStG; T-78). */
+/** Vorsteuer eines Zeitraums (nach Belegdatum – die Rechnung liegt vor, § 15 Abs. 1 Nr. 1 UStG; T-79). */
 export function vorsteuerFuer(belege: Beleg[], von: string, bis: string): { cent: number; anzahl: number; ohne: number } {
   let cent = 0;
   let anzahl = 0;

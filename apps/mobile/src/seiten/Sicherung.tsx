@@ -5,7 +5,7 @@ import { Feld, Fuss, Hinweis, Karte, Knopf, Schalter, T, TextKnopf } from "../ui
 import { Unterseite, useNav } from "../ui/navigation";
 import { RADIUS, useFarben } from "../ui/thema";
 import { RAND } from "../ui/thema";
-import { PASSWORT_MINDESTLAENGE, SicherungsFehler, schluesselAusPasswort, sicherungErstellen, sicherungLesen, sicherungMitSchluessel, sicherungsName } from "../unterlagen/sicherung";
+import { PASSWORT_MINDESTLAENGE, SicherungsFehler, schluesselAusPasswort, sicherungErstellen, sicherungLesenMitDateien, sicherungMitSchluessel, sicherungsName, type Dateien } from "../unterlagen/sicherung";
 import { cloudLesen, cloudSchreiben, cloudVerfuegbar } from "../unterlagen/cloud";
 import { autoSchluesselHolen, autoSchluesselLoeschen, autoSchluesselSpeichern } from "../unterlagen/schluesselbund";
 import { dateiTeilen, dateiWaehlen, zufall } from "../unterlagen/sicherungDatei";
@@ -33,7 +33,7 @@ export function SicherungSeite() {
     try {
       await gleich();
       const gesichert = z.stand;
-      const text = sicherungErstellen(gesichert, pw, zufall);
+      const text = sicherungErstellen(gesichert, pw, zufall, new Date(), undefined, await z.dateienFuerSicherung(gesichert));
       await dateiTeilen(sicherungsName(heute()), text);
       z.gesichert(gesichert);
       setMeldung({ art: "erfolg", text: TEXT.sicherung_fertig });
@@ -69,6 +69,7 @@ export function WiederherstellenSeite({ fertig }: { fertig?: () => void }) {
   const [pw, setPw] = useState("");
   const [laedt, setLaedt] = useState(false);
   const [gelesen, setGelesen] = useState<Stand | null>(null);
+  const [dateien, setDateien] = useState<Dateien>({});
   const [fehler, setFehler] = useState<string | null>(null);
   const cloud = useCloud();
   const waehlen = async () => {
@@ -83,7 +84,9 @@ export function WiederherstellenSeite({ fertig }: { fertig?: () => void }) {
     setLaedt(true);
     try {
       await gleich();
-      setGelesen(sicherungLesen(datei.text, pw));
+      const r = sicherungLesenMitDateien(datei.text, pw);
+      setDateien(r.dateien);
+      setGelesen(r.stand);
     } catch (e) {
       setFehler(e instanceof SicherungsFehler && e.art === "format" ? TEXT.falsches_format : TEXT.falsches_passwort);
     } finally {
@@ -123,6 +126,7 @@ export function WiederherstellenSeite({ fertig }: { fertig?: () => void }) {
           <Knopf
             text={TEXT.jetzt_wiederherstellen}
             onPress={() => {
+              void z.dateienEinspielen(dateien);
               z.zusammenfuehren(gelesen);
               fertig?.();
               nav.zurueck();
@@ -141,7 +145,7 @@ function Vorschau({ aktuell, gelesen }: { aktuell: Stand; gelesen: Stand }) {
   const z = zusammenfuehren(aktuell, gelesen);
   return (
     <View style={{ marginTop: 16, gap: 6 }}>
-      <Hinweis art="erfolg" text={TEXT.inhalt_sicherung(gelesen.betrieb.name, gelesen.unterlagen.length, gelesen.mitarbeiter.length, gelesen.kunden.length)} />
+      <Hinweis art="erfolg" text={TEXT.inhalt_sicherung(gelesen.betrieb.name, gelesen.unterlagen.length, gelesen.mitarbeiter.length, gelesen.kunden.length, gelesen.belege.length)} />
       <Hinweis text={TEXT.zusammenfuehren_text(z.neu, z.aktualisiert, z.behalten)} />
       {z.nummernKonflikte.length ? <Hinweis art="fehler" text={TEXT.nummern_konflikt(z.nummernKonflikte)} /> : null}
     </View>
@@ -215,7 +219,7 @@ function CloudSicherungSeite() {
       await gleich();
       const k = schluesselAusPasswort(pw, zufall);
       await autoSchluesselSpeichern(k);
-      await cloudSchreiben(sicherungMitSchluessel(z.stand, k, zufall));
+      await cloudSchreiben(sicherungMitSchluessel(z.stand, k, zufall, new Date(), await z.dateienFuerSicherung()));
       z.cloudSicherungSetzen(true);
       z.gesichert();
       nav.zurueck();
@@ -254,7 +258,7 @@ export function AutoSicherung() {
         const k = await autoSchluesselHolen();
         if (!k || !(await cloudVerfuegbar())) return;
         const gesichert = z.stand;
-        await cloudSchreiben(sicherungMitSchluessel(gesichert, k, zufall));
+        await cloudSchreiben(sicherungMitSchluessel(gesichert, k, zufall, new Date(), await z.dateienFuerSicherung(gesichert)));
         z.gesichert(gesichert);
       })().catch(() => undefined);
     }, 20_000);

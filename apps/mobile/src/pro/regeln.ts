@@ -15,10 +15,10 @@ import type { Unterlage } from "../unterlagen/speicher";
 /** Unterlagen, die kostenlos je Kalendermonat zum ersten Mal geteilt oder gedruckt werden dürfen. */
 export const FREI_JE_MONAT = 5;
 
-export type ProFunktion = "pdf" | "e_rechnung" | "ust_uebernahme" | "icloud" | "briefkopf";
+export type ProFunktion = "pdf" | "e_rechnung" | "ust_uebernahme" | "steuerberater" | "icloud" | "briefkopf";
 
 /** Reihenfolge und Inhalt der Vorteile auf dem Bezahlschirm. */
-export const PRO_VORTEILE: ProFunktion[] = ["pdf", "e_rechnung", "ust_uebernahme", "icloud", "briefkopf"];
+export const PRO_VORTEILE: ProFunktion[] = ["pdf", "e_rechnung", "ust_uebernahme", "steuerberater", "icloud", "briefkopf"];
 
 const monat = (iso: string) => iso.slice(0, 7);
 const istStorno = (u: Unterlage) => typeof u.daten.storno_zu === "string" && u.daten.storno_zu.trim() !== "";

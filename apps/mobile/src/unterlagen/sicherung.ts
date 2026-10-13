@@ -25,9 +25,17 @@ export class SicherungsFehler extends Error {
   }
 }
 
+/** Dateien zu Belegen (Name → Base64), seit Version 2 in der Sicherung (E-133) */
+export type Dateien = Record<string, string>;
+
+/** Klartext in der Sicherung: Version 1 = nur der Stand, Version 2 = Stand und Belegdateien */
+function inhalt(stand: Stand, dateien?: Dateien): { version: 1 | 2; text: string } {
+  return dateien && Object.keys(dateien).length ? { version: 2, text: JSON.stringify({ stand, dateien }) } : { version: 1, text: JSON.stringify(stand) };
+}
+
 interface Datei {
   format: typeof SICHERUNG_FORMAT;
-  version: 1;
+  version: 1 | 2;
   erstellt: string;
   kdf: { name: "PBKDF2-SHA256"; iterationen: number; salz: string };
   chiffre: { name: "AES-256-GCM"; nonce: string };
@@ -88,39 +96,51 @@ export function schluesselAusPasswort(passwort: string, zufall: (n: number) => U
  * Sicherung mit einem schon abgeleiteten Schlüssel – dasselbe Dateiformat wie `sicherungErstellen`, also mit dem
  * Passwort wiederherstellbar; ohne die langsame Schlüsselableitung bei jeder automatischen Sicherung.
  */
-export function sicherungMitSchluessel(stand: Stand, k: SicherungsSchluessel, zufall: (n: number) => Uint8Array, jetzt = new Date()): string {
+export function sicherungMitSchluessel(stand: Stand, k: SicherungsSchluessel, zufall: (n: number) => Uint8Array, jetzt = new Date(), dateien?: Dateien): string {
   const nonce = zufall(12);
-  const geheim = gcm(k.schluessel, nonce, utf8(ZUSATZ)).encrypt(utf8(JSON.stringify(stand)));
-  const d: Datei = { format: SICHERUNG_FORMAT, version: 1, erstellt: jetzt.toISOString(), kdf: { name: "PBKDF2-SHA256", iterationen: k.iterationen, salz: base64(k.salz) }, chiffre: { name: "AES-256-GCM", nonce: base64(nonce) }, daten: base64(geheim) };
+  const i = inhalt(stand, dateien);
+  const geheim = gcm(k.schluessel, nonce, utf8(ZUSATZ)).encrypt(utf8(i.text));
+  const d: Datei = { format: SICHERUNG_FORMAT, version: i.version, erstellt: jetzt.toISOString(), kdf: { name: "PBKDF2-SHA256", iterationen: k.iterationen, salz: base64(k.salz) }, chiffre: { name: "AES-256-GCM", nonce: base64(nonce) }, daten: base64(geheim) };
   return JSON.stringify(d, null, 1);
 }
 
 /** Sicherung als Text (JSON) erstellen. `zufall` liefert kryptografisch sichere Zufallsbytes. */
-export function sicherungErstellen(stand: Stand, passwort: string, zufall: (n: number) => Uint8Array, jetzt = new Date(), iterationen = SICHERUNG_ITERATIONEN): string {
+export function sicherungErstellen(stand: Stand, passwort: string, zufall: (n: number) => Uint8Array, jetzt = new Date(), iterationen = SICHERUNG_ITERATIONEN, dateien?: Dateien): string {
   if (passwort.length < PASSWORT_MINDESTLAENGE) throw new Error("Passwort zu kurz");
   const salz = zufall(16);
   const nonce = zufall(12);
-  const geheim = gcm(schluessel(passwort, salz, iterationen), nonce, utf8(ZUSATZ)).encrypt(utf8(JSON.stringify(stand)));
-  const d: Datei = { format: SICHERUNG_FORMAT, version: 1, erstellt: jetzt.toISOString(), kdf: { name: "PBKDF2-SHA256", iterationen, salz: base64(salz) }, chiffre: { name: "AES-256-GCM", nonce: base64(nonce) }, daten: base64(geheim) };
+  const i = inhalt(stand, dateien);
+  const geheim = gcm(schluessel(passwort, salz, iterationen), nonce, utf8(ZUSATZ)).encrypt(utf8(i.text));
+  const d: Datei = { format: SICHERUNG_FORMAT, version: i.version, erstellt: jetzt.toISOString(), kdf: { name: "PBKDF2-SHA256", iterationen, salz: base64(salz) }, chiffre: { name: "AES-256-GCM", nonce: base64(nonce) }, daten: base64(geheim) };
   return JSON.stringify(d, null, 1);
 }
 
 /** Sicherung lesen. Wirft SicherungsFehler „format“ (keine Sicherung) oder „passwort“ (falsch oder verändert). */
 export function sicherungLesen(text: string, passwort: string): Stand {
+  return sicherungLesenMitDateien(text, passwort).stand;
+}
+
+/** Sicherung lesen – mit den Belegdateien (leer bei Version 1). */
+export function sicherungLesenMitDateien(text: string, passwort: string): { stand: Stand; dateien: Dateien } {
   let d: Partial<Datei>;
   try {
     d = JSON.parse(text) as Partial<Datei>;
   } catch {
     throw new SicherungsFehler("format");
   }
-  if (d.format !== SICHERUNG_FORMAT || d.version !== 1 || d.kdf?.name !== "PBKDF2-SHA256" || d.chiffre?.name !== "AES-256-GCM" || typeof d.daten !== "string" || !(d.kdf.iterationen > 0)) throw new SicherungsFehler("format");
+  if (d.format !== SICHERUNG_FORMAT || (d.version !== 1 && d.version !== 2) || d.kdf?.name !== "PBKDF2-SHA256" || d.chiffre?.name !== "AES-256-GCM" || typeof d.daten !== "string" || !(d.kdf.iterationen > 0)) throw new SicherungsFehler("format");
   let klar: Uint8Array;
   try {
     klar = gcm(schluessel(passwort, ausBase64(d.kdf.salz), d.kdf.iterationen), ausBase64(d.chiffre.nonce), utf8(ZUSATZ)).decrypt(ausBase64(d.daten));
   } catch {
     throw new SicherungsFehler("passwort");
   }
-  return standAus(ausUtf8(klar));
+  const klartext = ausUtf8(klar);
+  if (d.version === 1) return { stand: standAus(klartext), dateien: {} };
+  const roh = JSON.parse(klartext) as { stand?: unknown; dateien?: unknown };
+  const dateien: Dateien = {};
+  if (roh.dateien && typeof roh.dateien === "object") for (const [k, v] of Object.entries(roh.dateien as Record<string, unknown>)) if (typeof v === "string" && /^[\w.-]+$/.test(k)) dateien[k] = v;
+  return { stand: standAus(JSON.stringify(roh.stand ?? null)), dateien };
 }
 
 /** Dateiname mit Datum, ohne Angaben zum Betrieb. */

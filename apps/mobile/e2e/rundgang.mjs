@@ -352,6 +352,47 @@ try {
   await warte(800);
   await feld("Vorlage suchen").fill("");
 
+  // E-Rechnung empfangen (E-133): XRechnung über die Dateiauswahl → Beleg, ausgefüllt; danach das Paket für die Steuerberatung
+  const F = await import(new URL("../../../packages/fachlogik/dist/index.js", import.meta.url).href);
+  const eingang = F.xrechnungUbl({ nummer: "L-2026-77", rechnungsdatum: "2026-10-08", leistungsdatum: "2026-10-08", faellig_am: "2026-10-22", steller: { name: "Friseurbedarf Müller GmbH", strasse: "Lagerweg 4", plz: "85748", ort: "Garching", land: "DE", email: "rechnung@mueller.example", telefon: "089 9", steuernummer: null, ust_idnr: "DE811111111", iban: "DE02120300000000202051" }, kunde: { name: "Salon Sonne", strasse: "Hauptstraße 1", plz: "80331", ort: "München", land: "DE", email: "info@salon.example", geschaeftskunde: true }, positionen: [{ bezeichnung: "Farbe 60 ml", menge: 10, einheit: "stueck", preis_cent: 650, ust_satz: 19 }], kleinunternehmer: false }, F.KU_HINWEIS);
+  const xmlPfad = `${OUT}/eingang-xrechnung.xml`;
+  fs.writeFileSync(xmlPfad, eingang);
+  await p.getByRole("tab", { name: "Vorlagen" }).click();
+  await warte(700);
+  await tippe(knopf("Beleg erfassen"));
+  await warte(800);
+  const [xmlWahl] = await Promise.all([p.waitForEvent("filechooser"), tippe(p.getByRole("button", { name: /^Datei oder E-Rechnung/ }).locator("visible=true").last())]);
+  await xmlWahl.setFiles(xmlPfad);
+  await warte(1500);
+  pruefe(await sichtbar("Aus der E-Rechnung übernommen"), "E-Rechnung nicht als Beleg übernommen");
+  pruefe((await feld("Lieferant oder Geschäft").inputValue()) === "Friseurbedarf Müller GmbH" && (await feld("Betrag brutto (€)").inputValue()) === "77,35", "Lieferant oder Betrag aus der E-Rechnung falsch");
+  await foto("beleg-erechnung");
+  await knopf("Fertig").click();
+  await warte(700);
+  await knopf("Zurück").click();
+  await warte(700);
+  await p.getByRole("tab", { name: "Unterlagen" }).click();
+  await warte(800);
+  pruefe((await sichtbar("Friseurbedarf Müller GmbH")) && (await sichtbar("Belege")), "Beleg fehlt in der Ablage");
+  await foto("ablage-belege");
+  await p.getByRole("tab", { name: "Mein Betrieb" }).click();
+  await warte(800);
+  await tippe(p.getByRole("button", { name: /^Paket für die Steuerberatung/ }).locator("visible=true").last());
+  await warte(800);
+  await tippe(p.getByRole("radio", { name: "Jahr 2026" }).locator("visible=true").last());
+  await warte(300);
+  await foto("steuerberatung");
+  const [paket] = await Promise.all([p.waitForEvent("download"), knopf("Paket teilen").click()]);
+  const zipPfad = `${OUT}/${paket.suggestedFilename()}`;
+  await paket.saveAs(zipPfad);
+  const zipText = fs.readFileSync(zipPfad).toString("latin1");
+  pruefe(zipText.includes("EXTF_Buchungsstapel_2026.csv") && zipText.includes("Belege/2026-10-08_Friseurbedarf-Muller-GmbH_L-2026-77.xml") && zipText.includes("Rechnungen_2026.csv"), "Paket für die Steuerberatung unvollständig");
+  // dem Betrieb fehlen E-Mail, Telefon und IBAN – keine E-Rechnung im Paket, und die App sagt es
+  await warte(600);
+  pruefe(await sichtbar("keine E-Rechnung im Paket"), "fehlende E-Rechnung im Paket nicht gemeldet");
+  await knopf("Zurück").click();
+  await warte(700);
+
   // Neustart: Daten bleiben
   await warte(800);
   await p.reload();
@@ -429,7 +470,7 @@ try {
   await feld("Passwort").fill("sonnenschein-2026");
   await knopf("Öffnen").click();
   await warte(2500);
-  pruefe(await sichtbar("Salon Sonne · 5 Unterlagen · 1 Mitarbeiter · 1 Kunde"), "Inhalt der Sicherung nicht angezeigt");
+  pruefe(await sichtbar("Salon Sonne · 5 Unterlagen · 1 Beleg · 1 Mitarbeiter · 1 Kunde"), "Inhalt der Sicherung nicht angezeigt");
   pruefe(await sichtbar("Nichts Neueres geht verloren"), "Zusammenführen statt Ersetzen nicht erklärt");
   await foto("wiederherstellen");
   await knopf("Jetzt wiederherstellen").click();
@@ -437,7 +478,7 @@ try {
   pruefe((await sichtbar("Salon Sonne")) && (await sichtbar("1 Person")), "Betrieb oder Mitarbeiter nicht wiederhergestellt");
   await p.getByRole("tab", { name: "Unterlagen" }).click();
   await warte(800);
-  pruefe((await sichtbar("Gefährdungsbeurteilung · Salon")) && (await sichtbar("Rechnung · 2026-002")), "Unterlagen nicht wiederhergestellt");
+  pruefe((await sichtbar("Gefährdungsbeurteilung · Salon")) && (await sichtbar("Rechnung · 2026-002")) && (await sichtbar("Friseurbedarf Müller GmbH")), "Unterlagen oder Belege nicht wiederhergestellt");
   if (befunde.length) throw new Error(befunde.join("\n"));
   console.log(`✓ Rundgang ${schema} ohne Befunde (${n} Bilder in ${OUT})`);
 } catch (e) {

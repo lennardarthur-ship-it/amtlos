@@ -172,3 +172,18 @@ Auf dem iPhone noch zu prüfen: Druck mit den Rändern je Gestalt (expo-print), 
 | Sichtprüfung der neuen Bildschirme hell und dunkel (Start, Mein Betrieb, Mitarbeiter, Ablage, Rechnung mit kurzen Zahlungsziel-Chips) | wie geplant |
 
 Auf dem iPhone noch zu prüfen: Kalenderbogen (Datumswähler) und „Fertig“-Leiste in Expo Go, Haptik der Meldungen, Startbild, App-Symbol auf dem Home-Bildschirm (nur im eigenen Build sichtbar).
+
+## Nachtrag: Pro, Store-Paket, Belege und Steuerberater-Paket (E-132, E-133)
+
+| Prüfung | Ergebnis |
+|---|---|
+| Bezahlschirm aus der Hausfarbe heraus (Grund, Freiumfang, Abo-Hinweis), Pro testweise einschalten, Pro-Status und „Über Amtlos“ unter „Mein Betrieb“ | grün im Rundgang |
+| Freikontingent: erste Ausgaben je Monat, Stornos und erneutes Teilen frei, Briefkopf nur mit Pro | grün (pro.test.ts) |
+| Store-Texte in den Grenzen, Store-Bilder 1290 × 2796 aus echtem Demo-Stand | grün (store.test.ts), Sichtprüfung |
+| E-Rechnung (XRechnung) über die Dateiauswahl → Beleg mit Lieferant und Betrag 77,35 €, Original abgelegt, in der Ablage unter „Belege“ | grün im Rundgang hell und dunkel |
+| Paket für die Steuerberatung „Jahr 2026“: DATEV-Stapel, Listen, Belegoriginal; fehlende E-Rechnung wegen fehlender Betriebsangaben gemeldet | grün im Rundgang |
+| Sicherung mit Beleg (Version 2), Wiederherstellen bringt Beleg zurück | grün im Rundgang und in belege.test.ts |
+| Vorsteuer nach Belegdatum, EÜR nach Zahlung, Paketinhalt byte-genau | grün (belege.test.ts) |
+| App-Tests gesamt | 54 grün |
+
+Auf dem iPhone noch zu prüfen: Kamera-Foto eines Belegs, ZUGFeRD-PDF aus Mail/Dateien, Teilen des ZIP, Kauf in der Sandbox.

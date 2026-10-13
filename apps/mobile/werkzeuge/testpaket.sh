@@ -87,6 +87,10 @@ Entscheidungen liegen im Git-Repository (GitHub: lennardarthur-ship-it/amtlos). 
    - „Umsatzsteuer-Voranmeldung“: übernimmt die Umsätze aus deinen Rechnungen – nach Leistungsdatum (Soll)
      oder nach Zahlungseingang (Ist).
    - „Mein Betrieb → Deine Daten“: alles liegt verschlüsselt auf dem iPhone, optional mit Face ID gesperrt.
+   - „Beleg erfassen“ (Vorlagen) bzw. unten in „Unterlagen“: Foto, Datei oder E-Rechnung (XRechnung/ZUGFeRD-PDF
+     aus der Dateien-App) – E-Rechnungen füllen sich selbst aus. Die Vorsteuer landet in der Voranmeldung, Einnahmen
+     und Ausgaben in der EÜR („Aus Rechnungen und Belegen übernehmen“).
+   - „Mein Betrieb → Paket für die Steuerberatung“: ZIP mit DATEV-Buchungsstapel, Listen und Belegen.
    - „Amtlos Pro“ (oben unter „Mein Betrieb“): In dieser Testversion gibt es keinen Kauf – „Pro testweise einschalten“
      zeigt alle Funktionen. Ohne Pro: 5 Unterlagen im Monat als PDF, kein Logo/keine Hausfarbe, keine E-Rechnung.
    - „Über Amtlos“: Impressum und Datenschutz (Angaben folgen vor dem Start), „Amtlos weiterempfehlen“.

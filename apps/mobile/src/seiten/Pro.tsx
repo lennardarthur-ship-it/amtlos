@@ -12,7 +12,7 @@ import { FREI_JE_MONAT, PRO_VORTEILE, uebrig, type ProFunktion } from "../pro/re
 import { useAmtlos } from "../zustand";
 import { DatenschutzSeite } from "./Recht";
 
-const VORTEIL_SYMBOL: Record<ProFunktion, string> = { pdf: "doc.on.doc", e_rechnung: "doc.text", ust_uebernahme: "percent", icloud: "icloud", briefkopf: "paintpalette" };
+const VORTEIL_SYMBOL: Record<ProFunktion, string> = { pdf: "doc.on.doc", e_rechnung: "doc.text", ust_uebernahme: "percent", steuerberater: "briefcase", icloud: "icloud", briefkopf: "paintpalette" };
 
 /**
  * Bezahlschirm (E-132): warum Pro, was Pro bringt, Angebote aus dem Store. Ohne Store-Anbindung (Testpaket) lässt

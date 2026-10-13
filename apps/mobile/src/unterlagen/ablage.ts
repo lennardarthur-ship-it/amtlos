@@ -1,17 +1,18 @@
 /**
  * „Meine Unterlagen“ – reine Funktionen für Filter, Suche und die Summe offener Rechnungen (ohne Gerät testbar).
  */
-import { eRechnungAus, summen, unterlagenName, vorlageFuer, type Betrieb } from "@amtlos/fachlogik";
+import { eRechnungAus, kategorieFuer, summen, unterlagenName, vorlageFuer, type Beleg, type Betrieb } from "@amtlos/fachlogik";
 import { offeneRechnungen } from "./ustAusRechnungen";
 import type { Unterlage } from "./speicher";
 
-export type Filter = "alle" | "rechnungen" | "offen" | "entwuerfe";
+export type Filter = "alle" | "rechnungen" | "offen" | "entwuerfe" | "belege";
 
 const istStorno = (u: Unterlage) => typeof u.daten.storno_zu === "string" && u.daten.storno_zu.trim() !== "";
 
 /** Welche Filter sich lohnen: „Rechnungen“ erst, wenn es welche gibt, „Offen“ nur mit offenen Rechnungen, „Entwürfe“ nur mit Entwürfen. */
-export function filterVerfuegbar(unterlagen: Unterlage[]): Filter[] {
+export function filterVerfuegbar(unterlagen: Unterlage[], belege = 0): Filter[] {
   const f: Filter[] = ["alle"];
+  if (belege) f.push("belege");
   if (unterlagen.some((u) => u.vorlage === "rechnung")) f.push("rechnungen");
   if (offeneRechnungen(unterlagen).length) f.push("offen");
   if (unterlagen.some((u) => !u.festgeschrieben)) f.push("entwuerfe");
@@ -26,11 +27,20 @@ export function filtern(unterlagen: Unterlage[], filter: Filter, suche = ""): Un
     if (filter === "rechnungen" && u.vorlage !== "rechnung") return false;
     if (filter === "offen" && !offen.has(u.id)) return false;
     if (filter === "entwuerfe" && u.festgeschrieben) return false;
+    if (filter === "belege") return false;
     if (!s) return true;
     const v = vorlageFuer(u.vorlage);
     const text = [v ? unterlagenName(v, u.daten) : "", u.daten.kunde_name, u.daten.nummer, u.daten.bereich, u.daten.arbeitsbereich].filter((x): x is string => typeof x === "string").join(" ").toLocaleLowerCase("de");
     return text.includes(s);
   });
+}
+
+/** Belege nach Suchtext (Lieferant, Nummer, Kategorie), neueste zuerst. */
+export function belegeFiltern(belege: Beleg[], suche = ""): Beleg[] {
+  const s = suche.trim().toLocaleLowerCase("de");
+  return [...belege]
+    .filter((b) => !s || [b.lieferant, b.nummer ?? "", kategorieFuer(b.kategorie).titel, b.notiz ?? ""].join(" ").toLocaleLowerCase("de").includes(s))
+    .sort((a, b) => b.datum.localeCompare(a.datum) || b.geaendert.localeCompare(a.geaendert));
 }
 
 /** Offene (geteilte, unbezahlte, nicht stornierte) Rechnungen: Anzahl und Bruttosumme in Cent. */

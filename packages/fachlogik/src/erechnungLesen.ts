@@ -1,5 +1,5 @@
 /**
- * Eingehende E-Rechnungen lesen (E-132): XRechnung in UBL-Syntax (Invoice, CreditNote) und UN/CEFACT CII (Factur-X,
+ * Eingehende E-Rechnungen lesen (E-133): XRechnung in UBL-Syntax (Invoice, CreditNote) und UN/CEFACT CII (Factur-X,
  * ZUGFeRD) – rein, ohne XML-Bibliothek und ohne Node-APIs, damit Server und App dasselbe lesen. Dazu das eingebettete
  * XML aus einem ZUGFeRD/Factur-X-PDF (mit eigenem Inflate nach RFC 1951) und der Beleg (belege.ts) aus der Rechnung.
  * Geprüft wird nur die Lesbarkeit – die Prüfung nach EN 16931 macht der KoSIT-Validator.

@@ -1,5 +1,5 @@
 /**
- * Buchungen und DATEV-Export (E-132): aus Ausgangsrechnungen und Belegen entstehen einfache Buchungssätze (Forderung an
+ * Buchungen und DATEV-Export (E-133): aus Ausgangsrechnungen und Belegen entstehen einfache Buchungssätze (Forderung an
  * Erlös, Aufwand an Verbindlichkeit/Kasse/Privateinlage). Sie gehen als DATEV-Format „Buchungsstapel“ (EXTF, Version
  * 700, Kategorie 21) an die Steuerberatung oder als lesbare CSV an Menschen und Tabellenprogramme. Reine Funktionen
  * ohne Gerät; die Kodierung nach Windows-1252 liefert `datevExtfBytes`, das Schreiben der Datei ist Sache des Aufrufers.

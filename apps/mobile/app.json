@@ -84,8 +84,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Amtlos braucht Zugriff auf deine Fotos, damit du dein Logo für Rechnungen und Briefe auswählen kannst.",
-          "cameraPermission": false,
+          "photosPermission": "Amtlos braucht Zugriff auf deine Fotos, damit du dein Logo oder ein Foto eines Belegs auswählen kannst.",
+          "cameraPermission": "Amtlos braucht die Kamera, damit du Kassenbons und Rechnungen als Beleg fotografieren kannst.",
           "microphonePermission": false
         }
       ],
