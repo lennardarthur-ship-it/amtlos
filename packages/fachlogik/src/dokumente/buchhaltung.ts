@@ -9,7 +9,6 @@ import { einheitCode } from "../erechnung.js";
 import { giroCodeSvg } from "../girocode.js";
 import { AUFBEWAHRUNG, EINHEITEN, EUER_AUSGABEN, EUER_EINNAHMEN, KASSEN_ARTEN, RECHNUNGS_HINWEISE, TSE_ARTEN } from "./bausteine.js";
 import { abschnitt, absatz, anschrift, auswahl, brief, cent, datumDe, dokument, esc, euro, felder, kennzahlen, nachsatz, uebertragung, ja, liste, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
-import { optionen } from "./konstanten.js";
 import type { Betrieb, Daten, Eintrag, Option, Vorlage } from "./typen.js";
 
 /** ISO-Datum plus Tage als TT.MM.JJJJ. */
@@ -180,7 +179,7 @@ export const rechnung: Vorlage = {
         { id: "datum", art: "datum", label: "Rechnungsdatum", vorbelegung: "heute", pflicht: true },
         { id: "leistung_gleich", art: "schalter", label: "Leistungsdatum entspricht dem Rechnungsdatum", vorbelegung: true },
         { id: "leistung", art: "text", label: "Datum oder Zeitraum der Leistung", hilfe: "z. B. 12.10.2026 oder Oktober 2026", pflicht: true, wenn: { feld: "leistung_gleich", nicht: true } },
-        { id: "zahlungsziel", art: "wahl", label: "Zahlungsziel", optionen: optionen(ZIEL), vorbelegung: "14" },
+        { id: "zahlungsziel", art: "wahl", label: "Zahlungsziel", optionen: [{ wert: "7", text: "7 Tage" }, { wert: "14", text: "14 Tage" }, { wert: "30", text: "30 Tage" }, { wert: "sofort", text: "Sofort" }], vorbelegung: "14", hilfe: "Steht auf der Rechnung als „Zahlbar innerhalb von … Tagen“ mit dem Datum." },
       ],
     },
     {

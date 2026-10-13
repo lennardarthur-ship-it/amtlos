@@ -5,7 +5,8 @@ import { useEffect, useState, type ReactNode } from "react";
 import { ActivityIndicator, Pressable, Text as RNText, Switch, TextInput, View, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { T as TEXT } from "../texte";
-import { GROESSE, RADIUS, SCHRIFT, ZIEL, istIos, useFarben } from "./thema";
+import { DatumWahl } from "./datumwahl";
+import { GROESSE, RADIUS, SCHRIFT, TASTATUR_FERTIG, ZIEL, istIos, useFarben, weich } from "./thema";
 
 type Variante = "grossTitel" | "titel" | "gross" | "basis" | "klein" | "caption";
 const STIL: Record<Variante, TextStyle> = {
@@ -43,7 +44,7 @@ const FALLBACK: Record<string, keyof typeof Ionicons.glyphMap> = {
   "scissors": "cut-outline", "cross.case": "medkit-outline", "checkmark.square.fill": "checkbox", "square": "square-outline", "chevron.down": "chevron-down", "chevron.up": "chevron-up",
   "doc.richtext": "document-text-outline", "hammer": "hammer-outline", "info.circle.fill": "information-circle", "circle": "ellipse-outline", "arrow.uturn.backward": "arrow-undo-outline", "xmark.circle": "close-circle-outline",
   "person.crop.circle": "person-circle-outline", "eye": "eye-outline", "arrow.left": "arrow-back", "list.number": "list-outline", "checkmark.circle.fill": "checkmark-circle", "person.badge.clock": "person-outline",
-  "figure.wave": "body-outline", "storefront": "storefront-outline", "calendar.badge.checkmark": "calendar-outline", "laptopcomputer": "laptop-outline", "exclamationmark.shield": "shield-outline", "cup.and.saucer": "cafe-outline", "sparkle": "sparkles-outline", "arrow.clockwise": "refresh-outline", "pencil": "create-outline", "plus.circle": "add-circle-outline",
+  "figure.wave": "body-outline", "storefront": "storefront-outline", "calendar.badge.checkmark": "calendar-outline", "laptopcomputer": "laptop-outline", "exclamationmark.shield": "shield-outline", "cup.and.saucer": "cafe-outline", "sparkle": "sparkles-outline", "arrow.clockwise": "refresh-outline", "pencil": "create-outline", "plus.circle": "add-circle-outline", "paintpalette": "color-palette-outline", "eurosign.circle": "logo-euro", "photo": "image-outline", "lock.fill": "lock-closed", "faceid": "scan-outline", "line.3.horizontal.decrease.circle": "funnel-outline",
 };
 export function Symbol({ name, groesse = 22, farbe, gewicht = "medium" }: { name: string; groesse?: number; farbe?: string; gewicht?: SymbolViewProps["weight"] }) {
   const f = useFarben();
@@ -136,7 +137,7 @@ export function FeldKopf({ label, hilfe }: { label: string; hilfe?: string }) {
       <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
         <T v="klein" fett stil={{ flexShrink: 1 }}>{label}</T>
         {hilfe ? (
-          <Pressable accessibilityRole="button" accessibilityLabel={`${TEXT.hilfe_zu} ${label}`} accessibilityState={{ expanded: offen }} onPress={() => setOffen(!offen)} hitSlop={12} style={{ padding: 2 }}>
+          <Pressable accessibilityRole="button" accessibilityLabel={`${TEXT.hilfe_zu} ${label}`} accessibilityState={{ expanded: offen }} onPress={() => { weich(); setOffen(!offen); }} hitSlop={12} style={{ padding: 2 }}>
             <Symbol name={offen ? "info.circle.fill" : "info.circle"} groesse={17} farbe={f.amt} />
           </Pressable>
         ) : null}
@@ -222,6 +223,7 @@ export function Karte({ children, stil, rahmen }: { children: ReactNode; stil?: 
 export function Feld({ label, wert, aendern, hilfe, fehler, mehrzeilig, ohneLabel, ...rest }: { label: string; wert: string; aendern: (w: string) => void; hilfe?: string; fehler?: string | null; mehrzeilig?: boolean; ohneLabel?: boolean } & Omit<React.ComponentProps<typeof TextInput>, "value" | "onChangeText" | "style">) {
   const f = useFarben();
   const beispiel = istBeispiel(hilfe, mehrzeilig) && !rest.placeholder;
+  const zahlen = rest.keyboardType === "decimal-pad" || rest.keyboardType === "number-pad" || rest.keyboardType === "numbers-and-punctuation" || rest.keyboardType === "phone-pad";
   return (
     <View style={{ marginTop: ohneLabel ? 8 : 20 }}>
       {ohneLabel ? null : <FeldKopf label={label} hilfe={beispiel ? undefined : hilfe} />}
@@ -231,6 +233,7 @@ export function Feld({ label, wert, aendern, hilfe, fehler, mehrzeilig, ohneLabe
         value={wert}
         onChangeText={aendern}
         multiline={mehrzeilig}
+        inputAccessoryViewID={zahlen ? TASTATUR_FERTIG : undefined}
         placeholderTextColor={f.tinteLeise}
         style={{ minHeight: mehrzeilig ? 96 : ZIEL, borderWidth: 1.5, borderColor: fehler ? f.frist : f.linie, borderRadius: RADIUS.klein, paddingHorizontal: 14, paddingTop: mehrzeilig ? 12 : 0, textAlignVertical: mehrzeilig ? "top" : "center", color: f.tinte, backgroundColor: f.blatt, fontFamily: SCHRIFT.regular, fontSize: GROESSE.basis, marginTop: 6 }}
         {...rest}
@@ -273,13 +276,15 @@ export function DatumFeld({ label, wert, aendern, hilfe, ohneHeute, ohneLabel }:
           placeholder="TT.MM.JJJJ"
           placeholderTextColor={f.tinteLeise}
           keyboardType="numbers-and-punctuation"
+          inputAccessoryViewID={TASTATUR_FERTIG}
           style={{ flex: 1, minHeight: ZIEL, borderWidth: 1.5, borderColor: falsch ? f.frist : f.linie, borderRadius: RADIUS.klein, paddingHorizontal: 14, color: f.tinte, backgroundColor: f.blatt, fontFamily: SCHRIFT.regular, fontSize: GROESSE.basis, fontVariant: ["tabular-nums"] }}
         />
         {ohneHeute ? null : (
-          <Pressable accessibilityRole="button" onPress={() => aendern(heute)} style={{ minHeight: ZIEL, paddingHorizontal: 14, borderRadius: RADIUS.klein, justifyContent: "center", backgroundColor: f.amtHauch }}>
+          <Pressable accessibilityRole="button" onPress={() => aendern(heute)} style={({ pressed }) => ({ minHeight: ZIEL, paddingHorizontal: 14, borderRadius: RADIUS.klein, justifyContent: "center", backgroundColor: f.amtHauch, opacity: pressed ? 0.7 : 1 })}>
             <T v="klein" fett farbe={f.amt}>{heuteText}</T>
           </Pressable>
         )}
+        <DatumWahl label={label} wert={wert} aendern={aendern} />
       </View>
       {falsch ? <T v="caption" farbe={f.frist} stil={{ marginTop: 4 }}>TT.MM.JJJJ</T> : null}
     </View>
@@ -337,7 +342,7 @@ function SchalterText({ label, hilfe }: { label: string; hilfe?: string }) {
       <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
         <T stil={{ flexShrink: 1 }}>{label}</T>
         {hilfe ? (
-          <Pressable accessibilityRole="button" accessibilityLabel={`${TEXT.hilfe_zu} ${label}`} accessibilityState={{ expanded: offen }} onPress={() => setOffen(!offen)} hitSlop={12} style={{ padding: 2 }}>
+          <Pressable accessibilityRole="button" accessibilityLabel={`${TEXT.hilfe_zu} ${label}`} accessibilityState={{ expanded: offen }} onPress={() => { weich(); setOffen(!offen); }} hitSlop={12} style={{ padding: 2 }}>
             <Symbol name={offen ? "info.circle.fill" : "info.circle"} groesse={17} farbe={f.amt} />
           </Pressable>
         ) : null}

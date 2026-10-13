@@ -634,6 +634,19 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Prüfstand:** alle 33 Vorlagen plus lange Rechnung (34 Positionen) und Storno mit zwei realistischen Betrieben (Salon mit Logo, GmbH) als Vorschau-Bild und Chromium-PDF gerendert, gestempelte Fußzeilen/Kopfzeilen über `fusszeile.ts` geprüft, GiroCode mit zbar dekodiert (Nutzdaten byteweise richtig). Tests: `packages/fachlogik/test/gestaltung.test.ts`.
 - **Noch nicht:** Angebot, Lieferschein, Mahnung; ZUGFeRD (PDF/A-3 mit eingebettetem XML); Druckprobe auf dem iPhone (expo-print mit Rändern je Gestalt); Fensterkuvert-Probe (T-75).
 
+### E-131 · Die App in Profi-Qualität: Übersicht statt Formularwüste, Startseite, Ablage mit Überblick, native Eingaben
+- **Datum:** 2026-10-13 · **Status:** angenommen (Gründer: „die App, die jetzt da ist, in allen Aspekten professionell und unicorn-reif machen“ – kein Ausbau)
+- **Audit:** alle Bildschirme des Rundgangs hell und dunkel gesichtet, jede Bausteindatei gelesen. Befund: solide Basis; was fehlte, waren Struktur bei „Mein Betrieb“, ein echter erster Bildschirm, Überblick in der Ablage, native Eingabehilfen, Rückmeldungen und ein eigenes App-Symbol.
+- **Tabs:** Pflichten · Vorlagen · Unterlagen · Mein Betrieb. „Vorlagen“ ist der Ort zum Erstellen, „Unterlagen“ die eigene Ablage – vorher hießen beide Tabs „Unterlagen/Meine“.
+- **Mein Betrieb** als Übersicht wie in den iOS-Einstellungen: Kopf mit Logo bzw. Anfangsbuchstabe in der Hausfarbe, dann Zeilen „Angaben zum Betrieb“, „Steuer und Bank“, „Briefkopf“, „Gesellschaft“ mit Zusammenfassung des Inhalts, jede auf einer eigenen Seite; Mitarbeiter und Kunden als eigene Listen mit Anzahl; Bundesland auf einer Auswahlseite (`ui/auswahlseite.tsx`) statt 16 Zeilen im Formular. Der erste Eintrag („Betrieb eintragen“ aus Vorlagen) zeigt weiter das ganze Formular.
+- **Startseite** vor dem Check: Einladung zum Check plus „So hilft dir Amtlos“ (Pflichten, Unterlagen, Rechnungen, alles bleibt bei dir) mit direkten Wegen „Rechnung schreiben“ und „Alle Vorlagen ansehen“.
+- **Unterlagen (Ablage):** Karte mit Anzahl und Summe der offenen Rechnungen (brutto, ohne Stornos; antippen filtert), Filter Alle · Rechnungen · Offen · Entwürfe (nur, wenn sie etwas bewirken), Suche ab sechs Unterlagen (Name, Nummer, Kunde). Reine Funktionen in `unterlagen/ablage.ts`.
+- **Eingaben:** nativer iPhone-Kalender hinter einem Kalender-Knopf neben jedem Datumsfeld (`@react-native-community/datetimepicker`, Web bleibt Textfeld); „Fertig“-Leiste über Zahlen-, Telefon- und Datumstastaturen (InputAccessoryView); Zahlungsziel als kurze Chips (7 · 14 · 30 Tage · Sofort), der Rechnungstext bleibt „Zahlbar innerhalb von … Tagen“; Titel von Unterseiten schrumpfen statt abzubrechen.
+- **Rückmeldung:** kurze Meldung am unteren Rand mit Haptik (`ui/meldung.tsx`) nach Kopie, Storno, Löschen, Zahlungsvermerk, übernommenen Vorschlägen; Auf- und Zuklappen (Weitere Angaben, Hilfe, Listen, Rückfragen) weich animiert (`weich()`).
+- **Leistung:** Fortschritt, Dringlichkeit und offene Fragen im Pflichten-Tab werden nur neu gerechnet, wenn sich Haken, Unterlagen oder Antworten ändern (useMemo) – nicht bei jedem Tippen in einem Ablauf.
+- **App-Paket:** eigenes Symbol (Blatt mit Stempel und Haken, `assets/icon.svg` → `icon.png`), Startbild als Glyphe auf Grün (hell) bzw. Dunkel, Version 0.2.0 in `src/version.ts` = `app.json` = `package.json` (Test), `CFBundleDevelopmentRegion` de, Android-Adaptive-Icon. Export-Compliance (`ITSAppUsesNonExemptEncryption`) bewusst nicht gesetzt: T-77.
+- **Geprüft:** Rundgang hell und dunkel ohne Befunde (an die neue Struktur angepasst), alle 33 Vorlagen durchgeklickt, 41 App-Tests, Lint und Typecheck sauber (inkl. entfernter überflüssiger eslint-Direktive im erzeugten Schriftmodul).
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

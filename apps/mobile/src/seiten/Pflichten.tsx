@@ -3,7 +3,7 @@ import { Linking, View } from "react-native";
 import { T as TEXT } from "../texte";
 import { Fuss, Hinweis, Karte, Knopf, Schalter, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
-import { RADIUS, RAND, useFarben } from "../ui/thema";
+import { RADIUS, RAND, useFarben, weich } from "../ui/thema";
 import { KATEGORIE_TITEL, auswertung, beantwortet, dringlichkeit, erinnerungsPlan, fortschritt, frageZu, istErledigt, offeneFragenNachWirkung, type PflichtInfo } from "../pflichten/check";
 import { allesAbsagen, erinnerungenMoeglich, erlaubnisAnfragen, planen } from "../pflichten/erinnerungen";
 import { heute } from "../unterlagen/speicher";
@@ -122,12 +122,20 @@ function PflichtenInhalt() {
   const a = useAuswertung();
   const [zeigen, setZeigen] = useState(false);
   const [gruendungZeigen, setGruendungZeigen] = useState(false);
-  const fs = fortschritt(a, z.stand);
-  const fertig = (p: PflichtInfo) => istErledigt(p, z.stand);
-  const offen = offeneFragenNachWirkung(a, z.stand.profil);
-  const kategorien = Object.keys(KATEGORIE_TITEL).filter((k) => a.gilt.some((p) => p.kategorie === k));
-  const sonst = a.gilt.filter((p) => !KATEGORIE_TITEL[p.kategorie]);
-  const d = dringlichkeit(a, z.stand, heute());
+  const { erledigt, unterlagen, profil, betrieb } = z.stand;
+  const tag = heute();
+  // Fortschritt, Dringlichkeit und offene Fragen nur neu rechnen, wenn sich Haken, Unterlagen oder Antworten ändern – nicht bei jedem Tippen anderswo
+  const { fs, offen, kategorien, sonst, d } = useMemo(() => {
+    const e = { erledigt, unterlagen, betrieb };
+    return {
+      fs: fortschritt(a, e),
+      offen: offeneFragenNachWirkung(a, profil),
+      kategorien: Object.keys(KATEGORIE_TITEL).filter((k) => a.gilt.some((p) => p.kategorie === k)),
+      sonst: a.gilt.filter((p) => !KATEGORIE_TITEL[p.kategorie]),
+      d: dringlichkeit(a, e, tag),
+    };
+  }, [a, erledigt, unterlagen, profil, betrieb, tag]);
+  const fertig = (p: PflichtInfo) => istErledigt(p, { erledigt, unterlagen, betrieb });
   return (
     <View>
       <T v="titel" accessibilityRole="header">{TEXT.ergebnis_titel(a.gilt.length)}</T>
@@ -188,7 +196,7 @@ function PflichtenInhalt() {
       {a.gruendung.length ? (
         <Gruppe titel={TEXT.gruendung_titel(a.gruendung.length)} fuss={TEXT.gruendung_text}>
           {a.gruendung.some((p) => !fertig(p)) ? <Knopf ton symbol="checkmark" text={TEXT.gruendung_alle} onPress={() => a.gruendung.filter((p) => !fertig(p)).forEach((p) => z.erledigtSetzen(p.id, heute()))} /> : null}
-          <TextKnopf symbol={gruendungZeigen ? "chevron.up" : "chevron.down"} text={gruendungZeigen ? TEXT.liste_verbergen : TEXT.liste_zeigen} onPress={() => setGruendungZeigen(!gruendungZeigen)} stil={{ marginLeft: 4 }} />
+          <TextKnopf symbol={gruendungZeigen ? "chevron.up" : "chevron.down"} text={gruendungZeigen ? TEXT.liste_verbergen : TEXT.liste_zeigen} onPress={() => { weich(); setGruendungZeigen(!gruendungZeigen); }} stil={{ marginLeft: 4 }} />
           {gruendungZeigen ? (
             <Karte>
               {a.gruendung.map((p, i) => (
@@ -200,7 +208,7 @@ function PflichtenInhalt() {
       ) : null}
       {a.unbekannt.length ? (
         <Gruppe titel={TEXT.offen_angaben_titel(a.unbekannt.length)} fuss={TEXT.offen_angaben_text}>
-          <TextKnopf symbol={zeigen ? "chevron.up" : "chevron.down"} text={zeigen ? TEXT.liste_verbergen : TEXT.liste_zeigen} onPress={() => setZeigen(!zeigen)} stil={{ marginLeft: 4 }} />
+          <TextKnopf symbol={zeigen ? "chevron.up" : "chevron.down"} text={zeigen ? TEXT.liste_verbergen : TEXT.liste_zeigen} onPress={() => { weich(); setZeigen(!zeigen); }} stil={{ marginLeft: 4 }} />
           {zeigen ? (
             <Karte>
               {a.unbekannt.map((p, i) => (
@@ -254,24 +262,53 @@ export function PflichtenSeite() {
   );
 }
 
-/** Erster Tab (E-129): die Pflichten sind der Kern – vor dem Check die Einladung, danach „Jetzt dran“. */
-export function PflichtenTab() {
+/**
+ * Erster Bildschirm vor dem Check: die Einladung zum Check und in drei Sätzen, was Amtlos tut – mit direkten Wegen
+ * zur Rechnung und zu den Vorlagen, damit niemand vor einer leeren Seite steht.
+ */
+function Start() {
   const z = useAmtlos();
   const nav = useNav();
   const f = useFarben();
+  const starten = useStarten();
+  return (
+    <View>
+      <View style={{ padding: 20, borderRadius: RADIUS.karte, backgroundColor: f.amtHauch, gap: 14 }}>
+        <T v="titel" farbe={f.amtTief} accessibilityRole="header">{TEXT.pflichten_karte_titel}</T>
+        <T farbe={f.amtTief}>{TEXT.pflichten_einladung}</T>
+        <Knopf text={TEXT.pflichten_check_starten} onPress={() => nav.oeffnen("check", () => <CheckAblauf />, true)} />
+      </View>
+      <Gruppe titel={TEXT.start_so_hilft}>
+        <Karte stil={{ paddingVertical: 4 }}>
+          {TEXT.start_punkte.map((p, i) => (
+            <View key={p.titel} style={{ flexDirection: "row", gap: 14, paddingVertical: 12, borderTopWidth: i ? 1 : 0, borderColor: f.linieLeise }}>
+              <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: f.amtHauch, alignItems: "center", justifyContent: "center" }}>
+                <Symbol name={p.symbol} groesse={20} farbe={f.amt} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <T fett>{p.titel}</T>
+                <T v="klein" leise stil={{ marginTop: 2 }}>{p.text}</T>
+              </View>
+            </View>
+          ))}
+        </Karte>
+      </Gruppe>
+      <View style={{ marginTop: 20, gap: 4 }}>
+        <Knopf ton symbol="plus" text={TEXT.start_rechnung} onPress={() => starten("rechnung")} />
+        <TextKnopf symbol="doc.text" text={TEXT.start_vorlagen} onPress={() => z.tabWechseln("unterlagen")} stil={{ marginLeft: 4 }} />
+      </View>
+    </View>
+  );
+}
+
+/** Erster Tab (E-129): die Pflichten sind der Kern – vor dem Check die Einladung, danach „Jetzt dran“. */
+export function PflichtenTab() {
+  const z = useAmtlos();
   const gemacht = checkGemacht(z.stand.profil);
   return (
     <Seite titel={TEXT.tabs.pflichten} unterzeile={gemacht ? TEXT.pflichten_tab_unter : undefined}>
       <SicherungsKarte />
-      {gemacht ? (
-        <PflichtenInhalt />
-      ) : (
-        <View style={{ padding: 20, borderRadius: RADIUS.karte, backgroundColor: f.amtHauch, gap: 14 }}>
-          <T v="titel" farbe={f.amtTief} accessibilityRole="header">{TEXT.pflichten_karte_titel}</T>
-          <T farbe={f.amtTief}>{TEXT.pflichten_einladung}</T>
-          <Knopf text={TEXT.pflichten_check_starten} onPress={() => nav.oeffnen("check", () => <CheckAblauf />, true)} />
-        </View>
-      )}
+      {gemacht ? <PflichtenInhalt /> : <Start />}
     </Seite>
   );
 }
@@ -282,7 +319,7 @@ function ErinnerungsSchalter() {
   const [fehler, setFehler] = useState(false);
   if (!erinnerungenMoeglich) return null;
   return (
-    <View style={{ marginTop: 8 }}>
+    <Karte stil={{ marginTop: 16, paddingBottom: 12 }}>
       <Schalter
         label={TEXT.erinnern}
         hilfe={TEXT.erinnern_hilfe}
@@ -294,7 +331,7 @@ function ErinnerungsSchalter() {
         }}
       />
       {fehler ? <Hinweis art="fehler" text={TEXT.erinnern_verweigert} /> : null}
-    </View>
+    </Karte>
   );
 }
 

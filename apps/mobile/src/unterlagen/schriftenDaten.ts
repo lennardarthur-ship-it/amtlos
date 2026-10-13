@@ -1,4 +1,3 @@
-/* eslint-disable */
 // Erzeugt von werkzeuge/schriften.mjs – nicht von Hand ändern. Schriften: SIL Open Font License 1.1, siehe assets/schriften/LIZENZ.txt
 export interface Schnitt {
   familie: "Amtlos Sans" | "Amtlos Serif";

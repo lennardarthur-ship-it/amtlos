@@ -3,6 +3,7 @@ import { Pressable, ScrollView, View } from "react-native";
 import { eintragAusVorschlag, kurztitel, neuerEintrag, sichtbar, vorlageFuer, type Daten, type Eintrag, type EintragWert, type ListenFeld, type Vorschlag } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { Fuss, Karte, Knopf, Symbol, T, TextKnopf, Wahl } from "../ui/bausteine";
+import { useMeldung } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
 import { RAND, ZIEL, useFarben } from "../ui/thema";
 import { heute, personenSortiert } from "../unterlagen/speicher";
@@ -93,6 +94,7 @@ function EintragSeite({ id, feldId, index, neu }: { id: string; feldId: string; 
 function VorschlagSeite({ id, feldId }: { id: string; feldId: string }) {
   const z = useAmtlos();
   const nav = useNav();
+  const melden = useMeldung();
   const f = useFarben();
   const u = z.stand.unterlagen.find((x) => x.id === id);
   const feld = u ? feldIn(u.vorlage, feldId) : undefined;
@@ -113,6 +115,7 @@ function VorschlagSeite({ id, feldId }: { id: string; feldId: string }) {
     const neu = alle.filter((v) => gewaehlt.has(v.titel)).map((v) => eintragAusVorschlag(feld, v, z.stand.betrieb, heute()));
     const behalten = eintraegeVon(z.daten(id), feld).filter((e) => benutzt(feld, e));
     z.setzen(id, { [feld.id]: [...behalten, ...neu] });
+    melden(TEXT.uebernommen(neu.length));
     nav.zurueck();
   };
   return (

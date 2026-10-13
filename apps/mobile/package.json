@@ -1,6 +1,6 @@
 {
   "name": "@amtlos/mobile",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "main": "index.ts",
   "scripts": {
@@ -23,6 +23,7 @@
     "@noble/hashes": "1.8.0",
     "@pdf-lib/fontkit": "^1.1.1",
     "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-community/datetimepicker": "9.1.0",
     "expo": "~57.0.27",
     "expo-blur": "~57.0.3",
     "expo-crypto": "~57.0.3",

@@ -3,8 +3,9 @@ import { Pressable, Share, View } from "react-native";
 import { KU_HINWEIS, PRUEFHINWEIS, dateiname, dokumentHtml, eRechnungAus, vorlageFuer, xrechnungUbl } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { DatumFeld, Fuss, Hinweis, Karte, Knopf, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
+import { useMeldung } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
-import { RADIUS, useFarben } from "../ui/thema";
+import { RADIUS, useFarben, weich } from "../ui/thema";
 import { Vorschau } from "../ui/Vorschau";
 import { drucken, pdfTeilen } from "../unterlagen/pdf";
 import { NUMMER_DOPPELT, fehltFuer } from "../unterlagen/pruefung";
@@ -98,6 +99,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
   const z = useAmtlos();
   const nav = useNav();
   const f = useFarben();
+  const melden = useMeldung();
   const [loeschFrage, setLoeschFrage] = useState(false);
   const [stornoFrage, setStornoFrage] = useState(false);
   const u = z.stand.unterlagen.find((x) => x.id === id);
@@ -200,7 +202,10 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
           text={TEXT.kopie}
           onPress={() => {
             const k = z.kopieren(id);
-            if (k) nav.oeffnen(`ablauf-${k.id}`, () => <Ablauf id={k.id} />, true);
+            if (k) {
+              melden(TEXT.kopie_angelegt);
+              nav.oeffnen(`ablauf-${k.id}`, () => <Ablauf id={k.id} />, true);
+            }
           }}
         />
         {fest ? (
@@ -216,7 +221,10 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
                     onPress={() => {
                       setStornoFrage(false);
                       const neu = z.stornieren(id);
-                      if (neu) nav.oeffnen(`ablauf-${neu.id}`, () => <Ablauf id={neu.id} amEnde />, true);
+                      if (neu) {
+                        melden(TEXT.storno_angelegt, "info");
+                        nav.oeffnen(`ablauf-${neu.id}`, () => <Ablauf id={neu.id} amEnde />, true);
+                      }
                     }}
                     stil={{ flex: 1 }}
                   />
@@ -224,19 +232,27 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
                 </View>
               </Karte>
             ) : (
-              <TextKnopf symbol="arrow.uturn.backward" gefahr text={TEXT.stornieren} onPress={() => setStornoFrage(true)} />
+              <TextKnopf symbol="arrow.uturn.backward" gefahr text={TEXT.stornieren} onPress={() => { weich(); setStornoFrage(true); }} />
             )
           ) : null
         ) : loeschFrage ? (
           <Karte stil={{ paddingVertical: 14, gap: 10, marginTop: 6 }}>
             <T fett>{TEXT.loeschen_wirklich}</T>
             <View style={{ flexDirection: "row", gap: 10 }}>
-              <Knopf gefahr text={TEXT.loeschen_ja} onPress={() => z.loeschen(id)} stil={{ flex: 1 }} />
+              <Knopf
+                gefahr
+                text={TEXT.loeschen_ja}
+                onPress={() => {
+                  z.loeschen(id);
+                  melden(TEXT.geloescht, "info");
+                }}
+                stil={{ flex: 1 }}
+              />
               <Knopf ton text={TEXT.abbrechen} onPress={() => setLoeschFrage(false)} stil={{ flex: 1 }} />
             </View>
           </Karte>
         ) : (
-          <TextKnopf symbol="trash" gefahr text={TEXT.loeschen} onPress={() => setLoeschFrage(true)} />
+          <TextKnopf symbol="trash" gefahr text={TEXT.loeschen} onPress={() => { weich(); setLoeschFrage(true); }} />
         )}
       </View>
     </View>
@@ -250,7 +266,12 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
 function Zahlung({ id }: { id: string }) {
   const z = useAmtlos();
   const f = useFarben();
+  const melden = useMeldung();
   const [anders, setAnders] = useState(false);
+  const vermerken = (d: string) => {
+    z.bezahltSetzen(id, d);
+    melden(TEXT.zahlung_vermerkt);
+  };
   const u = z.stand.unterlagen.find((x) => x.id === id);
   if (!u) return null;
   const erstattung = typeof u.daten.storno_zu === "string" && u.daten.storno_zu !== "";
@@ -265,8 +286,8 @@ function Zahlung({ id }: { id: string }) {
         <TextKnopf symbol="xmark" text={TEXT.zahlung_entfernen} onPress={() => z.bezahltSetzen(id, null)} />
       ) : (
         <View style={{ gap: 4 }}>
-          <Knopf ton symbol="checkmark" text={erstattung ? TEXT.als_erstattet : TEXT.als_bezahlt} onPress={() => z.bezahltSetzen(id, heute())} />
-          {anders ? <DatumFeld label={TEXT.anderes_datum} wert={null} aendern={(d) => d && z.bezahltSetzen(id, d)} /> : <TextKnopf text={TEXT.anderes_datum} onPress={() => setAnders(true)} />}
+          <Knopf ton symbol="checkmark" text={erstattung ? TEXT.als_erstattet : TEXT.als_bezahlt} onPress={() => vermerken(heute())} />
+          {anders ? <DatumFeld label={TEXT.anderes_datum} wert={null} aendern={(d) => d && vermerken(d)} /> : <TextKnopf text={TEXT.anderes_datum} onPress={() => setAnders(true)} />}
         </View>
       )}
       <T v="caption" leise>{TEXT.bezahlt_hilfe}</T>

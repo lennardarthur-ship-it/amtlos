@@ -112,7 +112,7 @@ export function Unterseite({ titel, children, rechts }: { titel: string; childre
           <Symbol name="chevron.left" groesse={20} farbe={f.amt} gewicht="semibold" />
           <T farbe={f.amt}>{TEXT.zurueck}</T>
         </Pressable>
-        <T fett numberOfLines={1} accessibilityRole="header" stil={{ flex: 1, textAlign: "center", marginHorizontal: 4 }}>{titel}</T>
+        <T fett numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.78} accessibilityRole="header" stil={{ flex: 1, textAlign: "center", marginHorizontal: 4 }}>{titel}</T>
         <View style={{ minWidth: ZIEL + 40, alignItems: "flex-end" }}>{rechts}</View>
       </View>
       <View style={{ flex: 1 }}>{children}</View>

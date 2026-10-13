@@ -67,13 +67,16 @@ Entscheidungen liegen im Git-Repository (GitHub: lennardarthur-ship-it/amtlos). 
 4. Es erscheint ein QR-Code. Mit der normalen Kamera-App des iPhones scannen → „In Expo Go öffnen“.
    iPhone und Mac müssen im selben WLAN sein. Fragt der Mac, ob „node“ Verbindungen annehmen darf: Erlauben.
 5. In der App:
+   - Vier Tabs: Pflichten · Vorlagen · Unterlagen · Mein Betrieb.
    - „Pflichten-Check starten“ – ein paar Fragen, dann zeigt die App, welche Pflichten für deinen Betrieb gelten.
-   - „Betrieb eintragen“ – einmal Name, Adresse, verantwortliche Person.
-   - „Rechnung schreiben“ oder unter „Wofür brauchst du etwas?“ den Anlass wählen (z. B. „Ich stelle jemanden ein“).
+   - „Mein Betrieb“: oben den Betrieb eintragen (Name, Adresse, verantwortliche Person), darunter Steuer und Bank,
+     Briefkopf, Mitarbeiter und Kunden – jede Gruppe auf einer eigenen Seite.
+   - „Vorlagen“: „Rechnung schreiben“ oder unter „Wofür brauchst du etwas?“ den Anlass wählen (z. B. „Ich stelle jemanden ein“).
    - Schritt für Schritt ausfüllen, unten „Weiter“. Am Ende siehst du das Dokument und tippst „PDF teilen“.
-   - Unter „Meine“ findest du alles wieder; unter „Mein Betrieb“ stehen Mitarbeiter und Kunden.
-     Alles bleibt nur auf dem iPhone. „Daten sichern“ erstellt eine mit deinem Passwort verschlüsselte Datei,
-     „Sicherung wiederherstellen“ spielt sie zurück.
+     Bei Datumsfeldern öffnet der Kalender-Knopf den iPhone-Kalender; über Zahlentastaturen gibt es „Fertig“.
+   - „Unterlagen“: alles, was du angelegt hast – mit Summe der offenen Rechnungen, Filtern und Suche.
+     Alles bleibt nur auf dem iPhone. „Daten sichern“ (Mein Betrieb) erstellt eine mit deinem Passwort verschlüsselte
+     Datei, „Sicherung wiederherstellen“ spielt sie zurück.
    - Der erste Tab „Pflichten“ zeigt nach dem Check, was jetzt dran ist. Dort „Erinnerungen“ einschalten
      (Mitteilungen erlauben): Die App erinnert 3 Tage vor jedem Termin – ganz ohne Server.
    - „Mein Betrieb → Briefkopf“: Logo und Hausfarbe wählen – sie erscheinen auf Rechnung und Unterlagen.

@@ -55,7 +55,7 @@ try {
   // Start auf „Pflichten“ (E-129): Einladung zum Check
   pruefe(await sichtbar("Welche Pflichten gelten für dich?"), "Pflichten-Tab mit Einladung fehlt beim Start");
   await foto("start-pflichten");
-  await p.getByRole("tab", { name: "Unterlagen" }).click();
+  await p.getByRole("tab", { name: "Vorlagen" }).click();
   await warte(800);
   pruefe(await sichtbar("Ausfüllen, prüfen, als PDF teilen"), "Startseite fehlt");
   pruefe(await sichtbar("Wofür brauchst du etwas?"), "Anlässe fehlen auf der Startseite");
@@ -72,7 +72,12 @@ try {
   await feld("Inhaber/in oder verantwortliche Person").fill("Alex Muster");
   await feld("Steuernummer").fill("143/123/45678");
   await tippe(p.getByRole("radio", { name: "Bordeaux" }).locator("visible=true").last()); // Hausfarbe (E-129)
+  // Bundesland auf einer eigenen Auswahlseite (E-131) – wählt und geht zurück
+  await tippe(knopf("Bundesland"));
+  await warte(600);
   await tippe(p.getByRole("radio", { name: "Bayern" }).locator("visible=true").last());
+  await warte(600);
+  pruefe((await knopf("Bundesland").textContent()).includes("Bayern"), "Bundesland nach der Auswahl nicht in der Zeile");
   await foto("betrieb");
   await knopf("Zurück").click();
   await warte(800);
@@ -145,7 +150,7 @@ try {
   await warte(800);
   pruefe(await sichtbar("1 von"), "Abhaken zählt nicht im Fortschritt");
   await foto("start-mit-pflichten");
-  await p.getByRole("tab", { name: "Unterlagen" }).click();
+  await p.getByRole("tab", { name: "Vorlagen" }).click();
   await warte(800);
 
   // Rechnung im geführten Ablauf
@@ -229,10 +234,10 @@ try {
   await warte(900);
   await knopf("Schließen").click();
   await warte(900);
-  await p.getByRole("tab", { name: "Meine" }).click();
+  await p.getByRole("tab", { name: "Unterlagen" }).click();
   await warte(800);
   pruefe((await p.getByRole("button", { name: /^Rechnung · / }).locator("visible=true").count()) === 2, "leere Rechnung nicht verworfen oder zweite fehlt");
-  await p.getByRole("tab", { name: "Unterlagen" }).click();
+  await p.getByRole("tab", { name: "Vorlagen" }).click();
   await warte(700);
 
   // Anlass „Sicherheit am Arbeitsplatz“ → Gefährdungsbeurteilung mit Vorschlägen
@@ -281,6 +286,10 @@ try {
   // Mitarbeiter anlegen und in eine Unterweisung übernehmen
   await p.getByRole("tab", { name: "Mein Betrieb" }).click();
   await warte(800);
+  pruefe((await sichtbar("Salon Sonne")) && (await sichtbar("Steuer und Bank")) && (await sichtbar("1 Kunde")), "Übersicht „Mein Betrieb“ fehlt (Kopf, Gruppen, Kundenzahl)");
+  await foto("mein-betrieb");
+  await tippe(p.getByRole("button", { name: /^Mitarbeiter/ }).locator("visible=true").last());
+  await warte(800);
   await tippe(knopf("Mitarbeiter hinzufügen"));
   await warte(800);
   await feld("Vor- und Nachname").fill("Sam Muster");
@@ -288,11 +297,17 @@ try {
   await knopf("Fertig").click();
   await warte(800);
   pruefe(await sichtbar("Sam Muster"), "Mitarbeiter nicht gespeichert");
-  pruefe(await sichtbar("Kim Beispiel"), "Kunde aus der Rechnung nicht gemerkt");
-  await foto("mein-betrieb");
-  await p.getByRole("tab", { name: "Unterlagen" }).click();
+  await foto("mitarbeiter");
+  await knopf("Zurück").click();
   await warte(700);
-  await feld("Unterlage suchen").fill("unterweisung");
+  await tippe(p.getByRole("button", { name: /^Kunden/ }).locator("visible=true").last());
+  await warte(800);
+  pruefe(await sichtbar("Kim Beispiel"), "Kunde aus der Rechnung nicht gemerkt");
+  await knopf("Zurück").click();
+  await warte(700);
+  await p.getByRole("tab", { name: "Vorlagen" }).click();
+  await warte(700);
+  await feld("Vorlage suchen").fill("unterweisung");
   await warte();
   await tippe(p.getByRole("button", { name: /^Unterweisungsnachweis/ }).first());
   await warte(900);
@@ -308,7 +323,7 @@ try {
   await warte(800);
 
   // Allergene: Mehrfachauswahl in einem Eintrag
-  await feld("Unterlage suchen").fill("allergen");
+  await feld("Vorlage suchen").fill("allergen");
   await warte();
   await tippe(p.getByRole("button", { name: /^Allergenliste/ }).first());
   await warte(900);
@@ -326,13 +341,13 @@ try {
   await warte(700);
   await knopf("Schließen").click();
   await warte(800);
-  await feld("Unterlage suchen").fill("");
+  await feld("Vorlage suchen").fill("");
 
   // Neustart: Daten bleiben
   await warte(800);
   await p.reload();
   await warte(2500);
-  await p.getByRole("tab", { name: "Meine" }).click();
+  await p.getByRole("tab", { name: "Unterlagen" }).click();
   await warte(800);
   pruefe((await sichtbar("Gefährdungsbeurteilung · Salon")) && (await sichtbar("Allergenliste")) && (await sichtbar("Rechnung · 2026-001")) && (await sichtbar("Unterweisungsnachweis")), "Unterlagen nach Neustart verloren");
   await foto("meine");
@@ -355,7 +370,11 @@ try {
   // Mein Betrieb: verschlüsselt sichern, alles löschen, wiederherstellen (E-125)
   await p.getByRole("tab", { name: "Mein Betrieb" }).click();
   await warte(800);
+  await tippe(p.getByRole("button", { name: /^Angaben zum Betrieb/ }).locator("visible=true").last());
+  await warte(800);
   pruefe((await feld("Name des Betriebs").inputValue()) === "Salon Sonne", "Betrieb nach Neustart verloren");
+  await knopf("Zurück").click();
+  await warte(700);
   // „Alle Daten löschen“ ist gesperrt, solange geteilte Rechnungen nicht gesichert sind (E-129)
   await tippe(knopf("Alle Daten löschen"));
   await warte(400);
@@ -381,9 +400,9 @@ try {
   await tippe(knopf("Alle Daten löschen"));
   await tippe(knopf("Ja, löschen"));
   await warte(800);
-  pruefe((await feld("Name des Betriebs").inputValue()) === "", "Betrieb nach „alles löschen“ nicht leer");
-  pruefe(!(await sichtbar("Sam Muster")), "Mitarbeiter nach „alles löschen“ noch da");
-  await p.getByRole("tab", { name: "Meine" }).click();
+  pruefe(await sichtbar("Betrieb eintragen"), "Betrieb nach „alles löschen“ nicht leer");
+  pruefe(!(await sichtbar("1 Person")), "Mitarbeiter nach „alles löschen“ noch da");
+  await p.getByRole("tab", { name: "Unterlagen" }).click();
   await warte(800);
   pruefe(await sichtbar("Noch keine Unterlagen"), "Unterlagen nach „alles löschen“ noch da");
   await foto("leer");
@@ -406,8 +425,8 @@ try {
   await foto("wiederherstellen");
   await knopf("Jetzt wiederherstellen").click();
   await warte(1000);
-  pruefe((await feld("Name des Betriebs").inputValue()) === "Salon Sonne" && (await sichtbar("Sam Muster")), "Betrieb oder Mitarbeiter nicht wiederhergestellt");
-  await p.getByRole("tab", { name: "Meine" }).click();
+  pruefe((await sichtbar("Salon Sonne")) && (await sichtbar("1 Person")), "Betrieb oder Mitarbeiter nicht wiederhergestellt");
+  await p.getByRole("tab", { name: "Unterlagen" }).click();
   await warte(800);
   pruefe((await sichtbar("Gefährdungsbeurteilung · Salon")) && (await sichtbar("Rechnung · 2026-002")), "Unterlagen nicht wiederhergestellt");
   if (befunde.length) throw new Error(befunde.join("\n"));

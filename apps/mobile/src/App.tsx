@@ -3,7 +3,7 @@ import { BlurView } from "expo-blur";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, AppState, Platform, Pressable, View, useColorScheme } from "react-native";
+import { ActivityIndicator, AppState, InputAccessoryView, Keyboard, Platform, Pressable, View, useColorScheme } from "react-native";
 import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Betrieb } from "./seiten/Betrieb";
 import { ErinnerungsPlaner, PflichtenTab } from "./seiten/Pflichten";
@@ -12,9 +12,10 @@ import { AutoSicherung } from "./seiten/Sicherung";
 import { Unterlagen } from "./seiten/Unterlagen";
 import { T as TEXT } from "./texte";
 import { Knopf, Symbol, T } from "./ui/bausteine";
+import { MeldungAnbieter } from "./ui/meldung";
 import { entsperren } from "./unterlagen/sperre";
 import { Stapel } from "./ui/navigation";
-import { ZIEL, istIos, useFarben } from "./ui/thema";
+import { TASTATUR_FERTIG, ZIEL, istIos, useFarben } from "./ui/thema";
 import { AmtlosAnbieter, useAmtlos, type Tab } from "./zustand";
 
 void SplashScreen.preventAutoHideAsync().catch(() => undefined);
@@ -140,6 +141,21 @@ function Rahmen() {
   );
 }
 
+/** „Fertig“ über Zahlentastaturen (iOS hat dort keine Eingabetaste) – alle Zahlen- und Datumsfelder hängen daran. */
+function TastaturLeiste() {
+  const f = useFarben();
+  if (!istIos) return null;
+  return (
+    <InputAccessoryView nativeID={TASTATUR_FERTIG} backgroundColor={f.papier}>
+      <View style={{ flexDirection: "row", justifyContent: "flex-end", borderTopWidth: 0.5, borderColor: f.linie }}>
+        <Pressable accessibilityRole="button" onPress={Keyboard.dismiss} style={({ pressed }) => ({ minHeight: 44, paddingHorizontal: 20, justifyContent: "center", opacity: pressed ? 0.6 : 1 })}>
+          <T fett farbe={f.amt}>{TEXT.tastatur_fertig}</T>
+        </Pressable>
+      </View>
+    </InputAccessoryView>
+  );
+}
+
 export default function App() {
   const dunkel = useColorScheme() === "dark";
   const [schriftGeladen] = useFonts({ AtkinsonHyperlegible_400Regular, AtkinsonHyperlegible_700Bold });
@@ -151,8 +167,11 @@ export default function App() {
         <ErinnerungsPlaner />
         <AutoSicherung />
         <Sperre>
-          <Rahmen />
+          <MeldungAnbieter unten={72}>
+            <Rahmen />
+          </MeldungAnbieter>
         </Sperre>
+        <TastaturLeiste />
       </AmtlosAnbieter>
     </SafeAreaProvider>
   );

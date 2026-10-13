@@ -3,6 +3,7 @@ import { View } from "react-native";
 import { sichtbar, type Daten, type EinfachesFeld, type Eintrag, type EintragWert, type Feld, type ListenFeld } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { TextKnopf } from "../ui/bausteine";
+import { weich } from "../ui/thema";
 import { Eingabe } from "../ui/eingaben";
 
 /** Hat ein Feld einen Wert, den jemand eingetragen hat? (Schalter aus, leere Texte und Listen zählen nicht) */
@@ -22,7 +23,7 @@ export function Felder({ felder, werte, setze, fehlt, liste }: { felder: Feld[];
     <View>
       {zeigen.map((x) => (x.art === "liste" ? <View key={x.id}>{liste?.(x)}</View> : <Eingabe key={x.id} feld={x as EinfachesFeld} wert={werte[x.id] as EintragWert} setzen={(w) => setze(x.id, w)} />))}
       {selten.length && (alle || selten.some(versteckt)) ? (
-        <TextKnopf symbol={alle ? "chevron.up" : "chevron.down"} text={alle ? TEXT.weniger_angaben : TEXT.weitere_angaben(selten.filter(versteckt).length)} onPress={() => setAlle(!alle)} stil={{ marginTop: 14 }} />
+        <TextKnopf symbol={alle ? "chevron.up" : "chevron.down"} text={alle ? TEXT.weniger_angaben : TEXT.weitere_angaben(selten.filter(versteckt).length)} onPress={() => { weich(); setAlle(!alle); }} stil={{ marginTop: 14 }} />
       ) : null}
     </View>
   );

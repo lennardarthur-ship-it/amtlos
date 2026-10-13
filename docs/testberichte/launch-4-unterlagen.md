@@ -159,3 +159,16 @@ Auf dem iPhone noch zu prüfen: Face ID in Expo Go, Logo aus den Fotos, PDF-Druc
 | Rundgang hell und dunkel, alle 33 Vorlagen durchgeklickt, iOS-Bündel | ohne Befunde, ohne Seitenfehler, gebaut (5,4 MB) |
 
 Auf dem iPhone noch zu prüfen: Druck mit den Rändern je Gestalt (expo-print), GiroCode-Scan mit einer Banking-App, Fensterkuvert (T-75).
+
+## Nachtrag: Profi-Qualität der App (E-131)
+
+| Prüfung | Ergebnis |
+|---|---|
+| Rundgang hell und dunkel mit neuer Struktur: Betrieb über Vorlagen eintragen (Bundesland auf Auswahlseite), Check, Rechnung, Mein Betrieb als Übersicht (Kopf, Gruppen, „1 Kunde“), Mitarbeiter auf eigener Seite, Ablage mit Filtern, Sichern, alles löschen, Wiederherstellen | ohne Befunde (26 Bilder je Modus) |
+| Alle 33 Vorlagen durchgeklickt | ohne Seitenfehler |
+| Ablage: offene Summe brutto ohne bezahlte, stornierte und Entwürfe; Filter nur, wenn sie etwas bewirken; Suche nach Name, Nummer, Kunde | grün (ablage.test.ts) |
+| Version in App, app.json und package.json gleich | grün |
+| App-Tests / Lint / Typecheck | 41 grün / 0 Fehler, 0 Warnungen / sauber |
+| Sichtprüfung der neuen Bildschirme hell und dunkel (Start, Mein Betrieb, Mitarbeiter, Ablage, Rechnung mit kurzen Zahlungsziel-Chips) | wie geplant |
+
+Auf dem iPhone noch zu prüfen: Kalenderbogen (Datumswähler) und „Fertig“-Leiste in Expo Go, Haptik der Meldungen, Startbild, App-Symbol auf dem Home-Bildschirm (nur im eigenen Build sichtbar).

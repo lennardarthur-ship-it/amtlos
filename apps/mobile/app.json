@@ -3,25 +3,48 @@
     "name": "Amtlos",
     "slug": "amtlos",
     "scheme": "amtlos",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "splash": {
       "backgroundColor": "#136f5b",
-      "image": "./assets/icon.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain"
     },
     "icon": "./assets/icon.png",
     "ios": {
       "bundleIdentifier": "de.amtlos.app",
-      "supportsTablet": false
+      "supportsTablet": false,
+      "infoPlist": {
+        "CFBundleDevelopmentRegion": "de",
+        "CFBundleLocalizations": [
+          "de"
+        ]
+      },
+      "buildNumber": "1"
     },
     "android": {
-      "package": "de.amtlos.app"
+      "package": "de.amtlos.app",
+      "versionCode": 2,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/splash.png",
+        "backgroundColor": "#136f5b"
+      }
     },
     "plugins": [
       "expo-font",
-      "expo-splash-screen",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash.png",
+          "imageWidth": 160,
+          "resizeMode": "contain",
+          "backgroundColor": "#136f5b",
+          "dark": {
+            "backgroundColor": "#11171d"
+          }
+        }
+      ],
       "expo-notifications",
       "expo-secure-store",
       [

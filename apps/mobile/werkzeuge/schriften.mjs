@@ -21,8 +21,7 @@ const SCHNITTE = [
   ["AmtlosSerif_600SemiBold.ttf", "Amtlos Serif", 600, "normal"],
 ];
 const zeilen = SCHNITTE.map(([datei, familie, gewicht, stil]) => `  { familie: ${JSON.stringify(familie)}, gewicht: ${gewicht}, stil: ${JSON.stringify(stil)}, daten: "${fs.readFileSync(path.join(ordner, datei)).toString("base64")}" },`);
-const ts = `/* eslint-disable */
-// Erzeugt von werkzeuge/schriften.mjs – nicht von Hand ändern. Schriften: SIL Open Font License 1.1, siehe assets/schriften/LIZENZ.txt
+const ts = `// Erzeugt von werkzeuge/schriften.mjs – nicht von Hand ändern. Schriften: SIL Open Font License 1.1, siehe assets/schriften/LIZENZ.txt
 export interface Schnitt {
   familie: "Amtlos Sans" | "Amtlos Serif";
   gewicht: number;

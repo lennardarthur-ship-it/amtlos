@@ -65,3 +65,15 @@ Das Review wurde am Stand vor E-124 erstellt. Antworten von Frida vom 12.10. (We
 | R7 | 76 unklare Pflichten, 33 weitere Fragen | **Erledigt** | „Kurz klären“: drei wirksamste Fragen direkt beantwortbar, Rest optional; bis zu acht Zusatzfragen im Check. |
 | R8 | Steuererklärungen ohne Fristen | **Erledigt** | § 149 AO mit und ohne Steuerberatung, nächster Werktag; neue Frage „Steuerberatung?“. Fachlich T-73. |
 
+
+## Gründer-Vorgabe vom 13.10.2026: „in allen Aspekten professionell, unicorn-reif“ (E-131)
+
+| Aspekt | Status | Notiz |
+|---|---|---|
+| Struktur und Orientierung | **Erledigt** | Tabs Pflichten · Vorlagen · Unterlagen · Mein Betrieb; „Mein Betrieb“ als Übersicht mit Unterseiten; Startseite mit „So hilft dir Amtlos“. |
+| Überblick über Rechnungen | **Erledigt** | Ablage mit Summe offener Rechnungen, Filtern und Suche. |
+| Eingaben wie eine native App | **Erledigt** | iPhone-Kalender, „Fertig“-Leiste, kurze Chips, passende Titel. |
+| Rückmeldung und Bewegung | **Erledigt** | Meldungen mit Haptik, weiche Übergänge beim Auf- und Zuklappen. |
+| App-Symbol und Paket | **Erledigt** | eigenes Symbol, Startbild, Version 0.2.0, Locale; Export-Compliance und App-Privacy: T-77. |
+| Dokumente | **Erledigt** | E-130 (sechs Gestalten, Randspalte, GiroCode). |
+| Offen für den Store | Offen | EAS/Signierung, Store-Texte, App-Privacy, Rechtstexte in der App, Gerätetests (Kalender, VoiceOver, Druck). |

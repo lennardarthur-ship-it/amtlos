@@ -1,4 +1,4 @@
-import { Platform, useColorScheme } from "react-native";
+import { LayoutAnimation, Platform, useColorScheme } from "react-native";
 
 /**
  * Designsystem der App (docs/06-design.md, E-117): Papier und Tinte, eine Handlungsfarbe, Statusfarben nur mit Text.
@@ -55,3 +55,11 @@ export function useFarben(): Farben {
 }
 
 export const istIos = Platform.OS === "ios";
+
+/** Nächste Layout-Änderung weich einblenden (Auf- und Zuklappen) – im Web ohne Wirkung. */
+export function weich(): void {
+  if (Platform.OS === "web") return;
+  LayoutAnimation.configureNext(LayoutAnimation.create(200, LayoutAnimation.Types.easeInEaseOut, LayoutAnimation.Properties.opacity));
+}
+/** Kennung der „Fertig“-Leiste über Zahlentastaturen (InputAccessoryView, iOS) */
+export const TASTATUR_FERTIG = "amtlos-tastatur-fertig";

@@ -66,14 +66,14 @@ function AnlassSeite({ a }: { a: Anlass }) {
   );
 }
 
-function Suchfeld({ wert, setzen }: { wert: string; setzen: (w: string) => void }) {
+export function Suchfeld({ wert, setzen, label = TEXT.suchen }: { wert: string; setzen: (w: string) => void; label?: string }) {
   const f = useFarben();
   return (
     <View style={{ flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 12, minHeight: 44, borderRadius: 12, backgroundColor: f.blatt, borderWidth: 1, borderColor: f.linie }}>
       <Symbol name="magnifyingglass" groesse={18} />
       <TextInput
-        accessibilityLabel={TEXT.suchen}
-        placeholder={TEXT.suchen}
+        accessibilityLabel={label}
+        placeholder={label}
         placeholderTextColor={f.tinteLeise}
         value={wert}
         onChangeText={setzen}
