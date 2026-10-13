@@ -25,6 +25,8 @@ interface Konto {
   /** letzte erfolgreiche Synchronisation (ISO) */
   letzte: string | null;
   fehler: FehlerArt | null;
+  /** Fehler kam von einer Handlung (Einrichten, Beenden …), nicht vom automatischen Abgleich */
+  fehlerBeiHandlung: boolean;
   nummernKonflikte: string[];
   /** angemeldet ohne Schlüssel: gibt es auf dem Server schon eine Synchronisation? (null = unbekannt) */
   serverEingerichtet: boolean | null;
@@ -62,6 +64,7 @@ export function KontoAnbieter({ children }: { children: ReactNode }) {
   const [laeuft, setLaeuft] = useState(false);
   const [letzte, setLetzte] = useState<string | null>(null);
   const [fehler, setFehler] = useState<FehlerArt | null>(null);
+  const [fehlerBeiHandlung, setFehlerBeiHandlung] = useState(false);
   const [nummernKonflikte, setNummernKonflikte] = useState<string[]>([]);
   const [serverEingerichtet, setServerEingerichtet] = useState<boolean | null>(null);
   const server = useMemo(() => tresorServer(API_URL, tokenHolen), []);
@@ -82,9 +85,10 @@ export function KontoAnbieter({ children }: { children: ReactNode }) {
   }, [neuLesen]);
 
   /** Fehler auswerten: abgelaufene Anmeldung entfernt nur die Sitzung, der Schlüssel bleibt. */
-  const fehlerMerken = useCallback(async (e: unknown) => {
+  const fehlerMerken = useCallback(async (e: unknown, handlung = false) => {
     const f = alsFehler(e);
     setFehler(f.art);
+    setFehlerBeiHandlung(handlung);
     if (f.art === "anmeldung") await sitzungVergessen();
     return f;
   }, []);
@@ -103,19 +107,14 @@ export function KontoAnbieter({ children }: { children: ReactNode }) {
 
   // AutoSync: nach Änderungen (kurz gewartet) und beim Öffnen der App
   const zuletzt = useRef<string | undefined>(undefined);
-  const laeuftRef = useRef(false);
+  const laeuftRef = useRef<Promise<boolean> | null>(null);
   const nochmal = useRef(false);
 
-  const jetzt = useCallback(async (): Promise<boolean> => {
-    if (laeuftRef.current) {
-      nochmal.current = true;
-      return true;
-    }
-    const k = await syncSchluesselLesen();
-    if (!k) return false;
-    laeuftRef.current = true;
+  const runde = useCallback(async (): Promise<boolean> => {
     setLaeuft(true);
     try {
+      const k = await syncSchluesselLesen();
+      if (!k) return false;
       let gelesen = zRef.current.aktuellerStand();
       const u: SyncUmgebung = {
         api: {
@@ -151,14 +150,30 @@ export function KontoAnbieter({ children }: { children: ReactNode }) {
       await fehlerMerken(e);
       return false;
     } finally {
-      laeuftRef.current = false;
       setLaeuft(false);
       if (nochmal.current) {
         nochmal.current = false;
-        setTimeout(() => void jetzt(), 500);
+        setTimeout(() => void jetztRef.current(), 500);
       }
     }
   }, [server, kontoPruefen, fehlerMerken]);
+
+  /** Synchronisieren; läuft schon eine Runde, deren Ergebnis abwarten – danach folgt eine Runde für inzwischen Geändertes. */
+  const jetzt = useCallback((): Promise<boolean> => {
+    if (laeuftRef.current) {
+      nochmal.current = true;
+      return laeuftRef.current;
+    }
+    const r = runde();
+    laeuftRef.current = r;
+    // aufräumen, wie auch immer die Runde endet – sonst hinge die Synchronisation bis zum Neustart
+    void r.finally(() => {
+      if (laeuftRef.current === r) laeuftRef.current = null;
+    });
+    return r;
+  }, [runde]);
+  const jetztRef = useRef(jetzt);
+  jetztRef.current = jetzt;
 
   const automatisch = status === "aktiv" && z.pro && z.bereit && !z.ladefehler;
   const geaendert = z.stand.geaendert;
@@ -196,6 +211,7 @@ export function KontoAnbieter({ children }: { children: ReactNode }) {
       laeuft,
       letzte,
       fehler,
+      fehlerBeiHandlung,
       nummernKonflikte,
       serverEingerichtet,
       anmelden: async (kennung) => {
@@ -206,6 +222,7 @@ export function KontoAnbieter({ children }: { children: ReactNode }) {
           return Boolean(s);
         } catch (e) {
           setFehler(alsFehler(e).art);
+          setFehlerBeiHandlung(true);
           return false;
         }
       },
@@ -227,7 +244,7 @@ export function KontoAnbieter({ children }: { children: ReactNode }) {
           await kontoPruefen(r.konto_id);
           await syncSchluesselSpeichern(k, r.konto_id ?? "");
         } catch (e) {
-          throw await fehlerMerken(e);
+          throw await fehlerMerken(e, true);
         } finally {
           setLaeuft(false);
         }
@@ -247,7 +264,7 @@ export function KontoAnbieter({ children }: { children: ReactNode }) {
         } catch (e) {
           const f = alsFehler(e);
           // falsches Passwort ist kein Zustand, nur eine Rückmeldung auf der Seite
-          if (f.art !== "passwort") await fehlerMerken(f);
+          if (f.art !== "passwort") await fehlerMerken(f, true);
           throw f;
         } finally {
           setLaeuft(false);
@@ -263,14 +280,14 @@ export function KontoAnbieter({ children }: { children: ReactNode }) {
         try {
           await server.schluesselSetzen(huelleErstellen(k.k, neu, zufall));
         } catch (e) {
-          throw await fehlerMerken(e);
+          throw await fehlerMerken(e, true);
         }
       },
       beenden: async () => {
         try {
           await server.loeschen();
         } catch (e) {
-          throw await fehlerMerken(e);
+          throw await fehlerMerken(e, true);
         }
         await syncSchluesselVergessen();
         setFehler(null);
@@ -283,7 +300,7 @@ export function KontoAnbieter({ children }: { children: ReactNode }) {
         try {
           await server.kontoLoeschen();
         } catch (e) {
-          throw await fehlerMerken(e);
+          throw await fehlerMerken(e, true);
         }
         await kontoVergessen();
         await proKontoTrennen();
@@ -294,7 +311,7 @@ export function KontoAnbieter({ children }: { children: ReactNode }) {
         zuletzt.current = undefined;
       },
     }),
-    [status, name, laeuft, letzte, fehler, nummernKonflikte, serverEingerichtet, server, neuLesen, kontoPruefen, fehlerMerken, jetzt],
+    [status, name, laeuft, letzte, fehler, fehlerBeiHandlung, nummernKonflikte, serverEingerichtet, server, neuLesen, kontoPruefen, fehlerMerken, jetzt],
   );
   return <Kontext.Provider value={wert}>{children}</Kontext.Provider>;
 }

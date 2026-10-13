@@ -85,7 +85,7 @@ function PersonenSeite({ art }: { art: PersonenArt }) {
     oeffnen(id, true);
   };
   return (
-    <Unterseite titel={art === "mitarbeiter" ? TEXT.mitarbeiter_titel : TEXT.kunden_titel} rechts={<TextKnopf symbol="plus" text={TEXT.neu} onPress={anlegen} />}>
+    <Unterseite titel={art === "mitarbeiter" ? TEXT.mitarbeiter_titel : TEXT.kunden_titel} rechts={<TextKnopf symbol="plus" text={TEXT.neu} label={TEXT.person_hinzufuegen[art]} onPress={anlegen} />}>
       <Inhalt>
         <T leise>{TEXT.personen_text[art]}</T>
         {liste.length ? (
@@ -152,7 +152,7 @@ export function BetriebFormular({ teil }: { teil?: Teil }) {
             <AuswahlZeile label={TEXT.b_bundesland} wert={b.bundesland || null} aendern={(w) => feld("bundesland").aendern(w)} optionen={BUNDESLAENDER.map((l) => ({ wert: l, text: l }))} />
             <Feld label={TEXT.b_verantwortlich} {...feld("verantwortlich")} textContentType="name" />
             <Feld label={TEXT.b_telefon} {...feld("telefon")} keyboardType="phone-pad" textContentType="telephoneNumber" />
-            <Feld label={TEXT.b_email} {...feld("email")} keyboardType="email-address" autoCapitalize="none" textContentType="emailAddress" />
+            <Feld label={TEXT.b_email} {...feld("email")} keyboardType="email-address" autoCapitalize="none" textContentType="emailAddress" autoCorrect={false} spellCheck={false} />
           </Karte>
         </View>
       ) : null}
@@ -160,15 +160,15 @@ export function BetriebFormular({ teil }: { teil?: Teil }) {
         <View>
           {kopf("steuer", TEXT.b_steuer)}
           <Karte stil={{ paddingBottom: 14 }}>
-            <Feld label={TEXT.b_steuernummer} {...feld("steuernummer")} keyboardType="numbers-and-punctuation" />
-            <Feld label={TEXT.b_ust_idnr} {...feld("ust_idnr")} autoCapitalize="characters" />
-            <Feld label={TEXT.b_iban} {...feld("iban")} autoCapitalize="characters" />
+            <Feld label={TEXT.b_steuernummer} {...feld("steuernummer")} keyboardType="numbers-and-punctuation" autoCorrect={false} spellCheck={false} />
+            <Feld label={TEXT.b_ust_idnr} {...feld("ust_idnr")} autoCapitalize="characters" autoCorrect={false} spellCheck={false} />
+            <Feld label={TEXT.b_iban} {...feld("iban")} autoCapitalize="characters" autoCorrect={false} spellCheck={false} />
             <View style={{ flexDirection: "row", gap: 10 }}>
               <View style={{ flex: 2 }}>
                 <Feld label={TEXT.b_bank} {...feld("bank")} />
               </View>
               <View style={{ flex: 1.3 }}>
-                <Feld label={TEXT.b_bic} {...feld("bic")} autoCapitalize="characters" />
+                <Feld label={TEXT.b_bic} {...feld("bic")} autoCapitalize="characters" autoCorrect={false} spellCheck={false} />
               </View>
             </View>
             <Wahl label={TEXT.b_versteuerung} hilfe={TEXT.b_versteuerung_hilfe} wert={b.versteuerung || null} aendern={(w) => feld("versteuerung").aendern(w)} optionen={VERSTEUERUNG} />
@@ -182,7 +182,7 @@ export function BetriebFormular({ teil }: { teil?: Teil }) {
             {!pro ? <T v="caption" leise>{TEXT.pro_grund.briefkopf(0)}</T> : null}
             <LogoWahl logo={b.logo ?? ""} setzen={(l) => (!l || sperre("briefkopf")) && feld("logo").aendern(l)} />
             <FarbWahl farbe={b.farbe ?? ""} setzen={(c) => sperre("briefkopf") && feld("farbe").aendern(c)} />
-            <Feld label={TEXT.b_website} {...feld("website")} keyboardType="url" autoCapitalize="none" placeholder="z. B. www.salon-sonne.de" />
+            <Feld label={TEXT.b_website} {...feld("website")} keyboardType="url" autoCapitalize="none" placeholder="z. B. www.salon-sonne.de" autoCorrect={false} spellCheck={false} />
           </Karte>
         </View>
       ) : null}
@@ -192,7 +192,7 @@ export function BetriebFormular({ teil }: { teil?: Teil }) {
           <Karte stil={{ paddingBottom: 14 }}>
             <Feld label={TEXT.b_rechtsform} {...feld("rechtsform")} placeholder="z. B. GmbH" />
             <Feld label={TEXT.b_registergericht} {...feld("registergericht")} placeholder="z. B. Amtsgericht München" />
-            <Feld label={TEXT.b_registernummer} {...feld("registernummer")} placeholder="z. B. HRB 123456" autoCapitalize="characters" />
+            <Feld label={TEXT.b_registernummer} {...feld("registernummer")} placeholder="z. B. HRB 123456" autoCapitalize="characters" autoCorrect={false} spellCheck={false} />
             <Feld label={TEXT.b_vertretung} {...feld("vertretung")} placeholder="Vor- und Nachname, mehrere mit Komma" />
           </Karte>
         </View>
@@ -252,12 +252,12 @@ function BetriebKopf({ b, onPress }: { b: BetriebDaten; onPress: () => void }) {
           </View>
         ) : (
           <View style={{ width: 56, height: 56, borderRadius: 12, backgroundColor: leer ? f.amt : farbe, alignItems: "center", justifyContent: "center" }}>
-            {leer ? <Symbol name="building.2" groesse={26} farbe="#ffffff" /> : <T v="titel" farbe="#ffffff">{b.name.trim().charAt(0).toUpperCase()}</T>}
+            {leer ? <Symbol name="building.2" groesse={26} farbe={f.blatt} /> : <T v="titel" farbe="#ffffff">{b.name.trim().charAt(0).toUpperCase()}</T>}
           </View>
         )}
         <View style={{ flex: 1, minWidth: 0 }}>
-          <T v="gross" numberOfLines={1} farbe={leer ? f.amtTief : undefined}>{leer ? TEXT.betrieb_eintragen : b.name.trim()}</T>
-          <T v="klein" leise numberOfLines={1} farbe={leer ? f.amtTief : undefined}>{leer ? TEXT.betrieb_zeile_text : [b.ort.trim(), b.verantwortlich.trim()].filter(Boolean).join(" · ") || TEXT.teil_leer.angaben}</T>
+          <T v="gross" numberOfLines={2} farbe={leer ? f.amtTief : undefined}>{leer ? TEXT.betrieb_eintragen : b.name.trim()}</T>
+          <T v="klein" leise numberOfLines={2} farbe={leer ? f.amtTief : undefined}>{leer ? TEXT.betrieb_zeile_text : [b.ort.trim(), b.verantwortlich.trim()].filter(Boolean).join(" · ") || TEXT.teil_leer.angaben}</T>
         </View>
         <Symbol name="chevron.right" groesse={16} farbe={leer ? f.amtTief : undefined} />
       </Karte>

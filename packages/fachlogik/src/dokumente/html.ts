@@ -587,20 +587,25 @@ ${fussHtml(b)}
 
 // ---------------------------------------------------------------- Geld und Zahlen
 
-/** „1.234,56“ / „1234.56“ / „12“ → Cent; leer oder unlesbar → null. */
-export function cent(t: string | null | undefined): number | null {
+/** „1.234,56“ / „1234.56“ / „12“ → Zahl; leer oder unlesbar → null. */
+function lesen(t: string | null | undefined): number | null {
   if (typeof t !== "string") return null;
   let s = t.replace(/\s|€/g, "");
   if (s === "") return null;
   if (/,\d{1,2}$/.test(s) || s.includes(",")) s = s.replace(/\./g, "").replace(",", ".");
   else if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, "");
   const n = Number(s);
-  return Number.isFinite(n) ? Math.round(n * 100) : null;
+  return Number.isFinite(n) ? n : null;
 }
-/** Zahl wie „1,5“ → 1.5; leer oder unlesbar → null. */
+/** „1.234,56“ / „1234.56“ / „12“ → Cent; leer oder unlesbar → null. */
+export function cent(t: string | null | undefined): number | null {
+  const n = lesen(t);
+  return n === null ? null : Math.round(n * 100);
+}
+/** Zahl wie „1,5“ oder „2,345“ (Menge in kg) → 1.5 bzw. 2.345 – bis vier Nachkommastellen; leer oder unlesbar → null. */
 export function zahl(t: string | null | undefined): number | null {
-  const c = cent(t);
-  return c === null ? null : c / 100;
+  const n = lesen(t);
+  return n === null ? null : Math.round(n * 10_000) / 10_000;
 }
 export const euro = (c: number) => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(c / 100);
 export const zahlText = (n: number, stellen = 2) => new Intl.NumberFormat("de-DE", { maximumFractionDigits: stellen }).format(n);

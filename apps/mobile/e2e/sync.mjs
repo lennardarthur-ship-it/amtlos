@@ -72,7 +72,7 @@ function pruefe(bed, text) {
   if (!bed) throw new Error(`Befund: ${text}`);
 }
 async function oeffnen(g) {
-  const z = g.p.getByText("Auf mehreren Geräten", { exact: true }).locator("visible=true").last();
+  const z = g.p.getByText("Aus – deine Daten liegen nur auf diesem Gerät", { exact: true }).locator("visible=true").last();
   await z.evaluate((el) => el.scrollIntoView({ block: "center" }));
   await z.click();
   await g.p.waitForTimeout(700);
@@ -80,7 +80,7 @@ async function oeffnen(g) {
 
 try {
   const a = await geraet("A", { version: 1, betrieb: { name: "Salon Sync", ort: "München" }, kunden: [{ id: "ka", name: "Kim von A", geaendert: jetzt }], proTest: true, zeiten: { betrieb: jetzt } });
-  pruefe(await a.sichtbar("Aus – deine Daten liegen nur auf diesem Gerät"), "Zeile „Auf mehreren Geräten“ fehlt unter „Mein Betrieb“");
+  pruefe(await a.sichtbar("Aus – deine Daten liegen nur auf diesem Gerät"), "Zeile „Synchronisation“ fehlt unter „Mein Betrieb“");
   await a.foto("betrieb-zeile");
   await oeffnen(a);
   pruefe(await a.sichtbar("Ende-zu-Ende-verschlüsselt"), "Hinweis zur Verschlüsselung fehlt");
@@ -89,7 +89,7 @@ try {
   await a.knopf("Anmelden").click();
   pruefe(await a.warteAuf("Sync-Passwort wählen"), "Nach der Anmeldung fehlt „Sync-Passwort wählen“");
   pruefe(await a.sichtbar(`Angemeldet als ${KENNUNG}`), "Anmeldename fehlt");
-  await a.feld("Passwort").fill(PW);
+  await a.feld("Sync-Passwort").fill(PW);
   await a.feld("Passwort wiederholen").fill(PW);
   await a.foto("einrichten");
   await a.knopf("Synchronisation einrichten").click();
@@ -101,11 +101,11 @@ try {
   await b.feld("Kennung (Entwicklung)").fill(KENNUNG);
   await b.knopf("Anmelden").click();
   pruefe(await b.warteAuf("Sync-Passwort eingeben"), "B: „Sync-Passwort eingeben“ fehlt (Server schon eingerichtet)");
-  await b.feld("Passwort").fill("falsches-passwort-x");
+  await b.feld("Sync-Passwort").fill("falsches-passwort-x");
   await b.knopf("Verbinden").click();
   pruefe(await b.warteAuf("Das Passwort stimmt nicht."), "B: falsches Passwort nicht erkannt");
   await b.foto("falsches-passwort");
-  await b.feld("Passwort").fill(PW);
+  await b.feld("Sync-Passwort").fill(PW);
   await b.knopf("Verbinden").click();
   pruefe(await b.warteAuf("Zuletzt synchronisiert"), "B: Synchronisation nicht an");
   await b.foto("verbunden");

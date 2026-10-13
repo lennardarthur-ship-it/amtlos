@@ -37,7 +37,7 @@ export const DATENSCHUTZ = {
   freigegeben: false,
   abschnitte: [
     { titel: "Kurz gesagt", text: "Amtlos speichert deine Angaben nur auf deinem iPhone – verschlüsselt, ohne Konto und ohne Server von Amtlos. Wir sehen deine Unterlagen, Kunden und Mitarbeiter nicht." },
-    { titel: "Was auf dem iPhone liegt", text: "Betrieb, Unterlagen, Rechnungen, Mitarbeiter- und Kundendaten sowie deine Antworten im Pflichten-Check. Die Daten sind mit AES-256 verschlüsselt; der Schlüssel liegt im Schlüsselbund dieses iPhones. Wenn du die App löschst, sind die Daten weg – außer in einer Sicherung, die du selbst erstellt hast." },
+    { titel: "Was auf dem iPhone liegt", text: "Betrieb, Unterlagen, Rechnungen, Belege mit Fotos und Dateien, Mitarbeiter- und Kundendaten sowie deine Antworten im Pflichten-Check. Die Daten sind mit AES-256 verschlüsselt; der Schlüssel liegt im Schlüsselbund dieses iPhones. Wenn du die App löschst, sind die Daten weg – außer in einer Sicherung, die du selbst erstellt hast." },
     { titel: "Sicherungen", text: "Eine Sicherung ist eine Datei, die Amtlos mit deinem Passwort verschlüsselt. Du entscheidest, wo du sie ablegst (z. B. Dateien, iCloud Drive). Die automatische iCloud-Sicherung legt dieselbe verschlüsselte Datei in deinem iCloud Drive ab; Apple ist dafür dein Anbieter." },
     { titel: "Erinnerungen", text: "Erinnerungen an Fristen plant das iPhone selbst als lokale Mitteilungen. Dafür wird nichts an Amtlos gesendet." },
     { titel: "Amtlos Pro", text: "Käufe laufen über deinen Apple-Account. Damit die App weiß, ob Pro aktiv ist, verarbeitet unser Dienstleister RevenueCat eine zufällige Kennung und deine Kaufbelege von Apple – keine Unterlagen, keine Namen." },
@@ -52,13 +52,16 @@ export const DATENSCHUTZ = {
  */
 export const DATENSCHUTZ_SYNC = {
   kurz: { titel: "Kurz gesagt", text: "Amtlos speichert deine Angaben verschlüsselt auf deinem iPhone. Nutzt du die Synchronisation, liegen sie zusätzlich auf einem Server von Amtlos – Ende-zu-Ende-verschlüsselt, sodass wir deine Unterlagen, Kunden und Mitarbeiter nicht lesen können." },
+  teilen: { titel: "Was du teilst", text: "PDFs, E-Rechnungen und Sicherungen verlassen das iPhone nur, wenn du sie selbst teilst – an wen, entscheidest du im Teilen-Menü. Mit der Synchronisation gehen deine Daten zusätzlich Ende-zu-Ende-verschlüsselt an den Server von Amtlos." },
+  rechte: { titel: "Deine Rechte", text: "Auskunft, Berichtigung, Löschung, Einschränkung, Widerspruch und Beschwerde bei einer Aufsichtsbehörde (Art. 15 ff. DSGVO). Deine Daten auf dem Gerät löschst du unter „Mein Betrieb“; die Daten auf dem Server löschst du mit „Synchronisation beenden“ oder „Konto löschen“." },
   abschnitt: { titel: "Konto und Synchronisation", text: "Nur wenn du dich anmeldest: Für dein Konto verarbeiten wir deine E-Mail-Adresse, deinen Namen beim Anmeldedienst und eine Konto-Kennung. Was synchronisiert wird (Betrieb, Unterlagen, Belege mit Fotos, Personen), verschlüsselt die App vor dem Senden mit einem Schlüssel, den nur dein Sync-Passwort öffnet; der Server speichert nur diesen verschlüsselten Inhalt, Dateinamen, Größe und Zeitpunkte. „Synchronisation beenden“ löscht alles auf dem Server, „Konto löschen“ zusätzlich dein Konto. Mit Amtlos Pro ordnet RevenueCat deinen Kauf der Konto-Kennung zu." },
 };
 
 /** Abschnitte des Datenschutzhinweises – mit Synchronisation ergänzt. */
 export function datenschutzAbschnitte(sync: boolean) {
   if (!sync) return DATENSCHUTZ.abschnitte;
-  const l = DATENSCHUTZ.abschnitte.map((a) => (a.titel === "Kurz gesagt" ? DATENSCHUTZ_SYNC.kurz : a));
+  const ersatz: Record<string, { titel: string; text: string }> = { "Kurz gesagt": DATENSCHUTZ_SYNC.kurz, "Was du teilst": DATENSCHUTZ_SYNC.teilen, "Deine Rechte": DATENSCHUTZ_SYNC.rechte };
+  const l = DATENSCHUTZ.abschnitte.map((a) => ersatz[a.titel] ?? a);
   const i = l.findIndex((a) => a.titel === "Sicherungen");
   l.splice(i + 1, 0, DATENSCHUTZ_SYNC.abschnitt);
   return l;

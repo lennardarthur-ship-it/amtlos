@@ -2,21 +2,25 @@
 import * as Crypto from "expo-crypto";
 import * as DocumentPicker from "expo-document-picker";
 import { File, Paths } from "expo-file-system";
-import * as Sharing from "expo-sharing";
+import { teilen } from "./teilen";
 
 export const zufall = (n: number) => Crypto.getRandomBytes(n);
 
-export async function dateiTeilen(name: string, text: string, mimeType = "application/octet-stream"): Promise<void> {
+/** Datei ins Teilen-Menü; true, wenn sie weitergegeben wurde (false: abgebrochen). */
+export async function dateiTeilen(name: string, text: string, mimeType = "application/octet-stream"): Promise<boolean> {
   const ziel = new File(Paths.cache, name);
   if (ziel.exists) ziel.delete();
   ziel.create();
   ziel.write(text);
-  await Sharing.shareAsync(ziel.uri, { mimeType, dialogTitle: name, UTI: mimeType === "application/xml" ? "public.xml" : undefined });
-  // die Datei ist verschlüsselt; trotzdem nicht im Cache liegen lassen
   try {
-    ziel.delete();
-  } catch {
-    /* schon weg */
+    return await teilen(ziel.uri, { mimeType, titel: name, UTI: mimeType === "application/xml" ? "public.xml" : undefined });
+  } finally {
+    // die Datei ist verschlüsselt; trotzdem nicht im Cache liegen lassen
+    try {
+      ziel.delete();
+    } catch {
+      /* schon weg */
+    }
   }
 }
 
@@ -36,16 +40,19 @@ export async function dateiWaehlen(): Promise<{ name: string; text: string } | n
 }
 
 /** Binärdatei teilen (Steuerberater-Paket, Originale von Belegen). */
-export async function dateiTeilenBytes(name: string, bytes: Uint8Array, mimeType: string): Promise<void> {
+export async function dateiTeilenBytes(name: string, bytes: Uint8Array, mimeType: string): Promise<boolean> {
   const ziel = new File(Paths.cache, name);
   if (ziel.exists) ziel.delete();
   ziel.create();
   ziel.write(bytes);
-  await Sharing.shareAsync(ziel.uri, { mimeType, dialogTitle: name, UTI: mimeType === "application/zip" ? "public.zip-archive" : mimeType === "application/pdf" ? "com.adobe.pdf" : mimeType === "application/xml" ? "public.xml" : mimeType.startsWith("image/") ? "public.jpeg" : undefined });
   try {
-    ziel.delete();
-  } catch {
-    /* schon weg */
+    return await teilen(ziel.uri, { mimeType, titel: name, UTI: mimeType === "application/zip" ? "public.zip-archive" : mimeType === "application/pdf" ? "com.adobe.pdf" : mimeType === "application/xml" ? "public.xml" : mimeType.startsWith("image/") ? "public.jpeg" : undefined });
+  } finally {
+    try {
+      ziel.delete();
+    } catch {
+      /* schon weg */
+    }
   }
 }
 

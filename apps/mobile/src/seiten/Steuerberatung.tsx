@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ScrollView, View } from "react-native";
 import { T as TEXT } from "../texte";
+import { RAND } from "../ui/thema";
 import { Feld, Fuss, Hinweis, Karte, Knopf, T, Wahl } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { Unterseite } from "../ui/navigation";
@@ -42,11 +43,11 @@ export function SteuerberatungSeite() {
         if (bytes) dateien[b.datei] = bytes;
       }
       const p = steuerpaket(z.stand, zr, sb, dateien, new Date().toISOString());
-      await dateiTeilenBytes(p.dateiname, p.zip, "application/zip");
+      if (!(await dateiTeilenBytes(p.dateiname, p.zip, "application/zip"))) return;
       melden(TEXT.steuerpaket_fertig(p.buchungen));
       if (p.ohneXml) setHinweis(TEXT.steuerpaket_ohne_xml(p.ohneXml));
     } catch {
-      setFehler(TEXT.pdf_fehler);
+      setFehler(TEXT.paket_fehler);
     } finally {
       setLaedt(false);
     }
@@ -56,7 +57,7 @@ export function SteuerberatungSeite() {
       <Inhalt>
         <T leise>{TEXT.steuerpaket_text}</T>
         <T v="klein" fett stil={{ marginTop: 20 }}>{TEXT.steuerpaket_zeitraum}</T>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 8 }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 8, marginHorizontal: -RAND }} contentContainerStyle={{ paddingHorizontal: RAND }}>
           <Wahl wert={wahl} aendern={setWahl} optionen={liste.map((x) => ({ wert: x.name, text: nameVon(x.name) }))} />
         </ScrollView>
         <Karte stil={{ marginTop: 12, paddingVertical: 12 }}>

@@ -38,8 +38,9 @@ export function useTeilen(id: string) {
     setLaedt(art === "teilen");
     try {
       const html = dokumentHtml(v, u.daten, betriebFuerDokument(z.stand.betrieb, z.pro));
-      if (art === "teilen") await pdfTeilen(html, dateiname(v, u.daten, heute()), v.querformat);
-      else await drucken(html, dateiname(v, u.daten, heute()), v.querformat);
+      const ok = art === "teilen" ? await pdfTeilen(html, dateiname(v, u.daten, heute()), v.querformat) : await drucken(html, dateiname(v, u.daten, heute()), v.querformat);
+      // abgebrochen: nichts festschreiben, nichts vom Freikontingent verbrauchen
+      if (!ok) return;
       const erstesMal = !u.ausgegeben;
       z.ausgeben(id);
       if (erstesMal && v.festschreiben) z.erfolg();
@@ -62,10 +63,9 @@ export function useTeilen(id: string) {
     setEFehlt(alle);
     if (alle.length) return;
     try {
-      await dateiTeilen(`E-Rechnung-${daten.nummer.replace(/[^A-Za-z0-9-]+/g, "-")}.xml`, xrechnungUbl(daten, KU_HINWEIS), "application/xml");
-      z.ausgeben(id);
+      if (await dateiTeilen(`E-Rechnung-${daten.nummer.replace(/[^A-Za-z0-9-]+/g, "-")}.xml`, xrechnungUbl(daten, KU_HINWEIS), "application/xml")) z.ausgeben(id);
     } catch {
-      setFehler(TEXT.pdf_fehler);
+      setFehler(TEXT.e_rechnung_fehler);
     }
   };
   return { laedt, fehler, eFehlt, los: () => ausgabe("teilen"), drucken: () => ausgabe("drucken"), eRechnung };
@@ -73,6 +73,7 @@ export function useTeilen(id: string) {
 
 function VorschauSeite({ id }: { id: string }) {
   const z = useAmtlos();
+  const f = useFarben();
   const teilen = useTeilen(id);
   const u = z.stand.unterlagen.find((x) => x.id === id);
   const v = u ? vorlageFuer(u.vorlage) : undefined;
@@ -82,7 +83,7 @@ function VorschauSeite({ id }: { id: string }) {
       <View style={{ flex: 1 }}>
         <Vorschau html={dokumentHtml(v, u.daten, betriebFuerDokument(z.stand.betrieb, z.pro))} quer={v.querformat} />
       </View>
-      <Fuss>
+      <Fuss ueber={teilen.fehler ? <T v="klein" fett farbe={f.frist} accessibilityRole="alert">{teilen.fehler}</T> : null}>
         <Knopf text={TEXT.pdf_teilen} symbol="square.and.arrow.up" laedt={teilen.laedt} onPress={() => void teilen.los()} stil={{ flex: 1 }} />
       </Fuss>
     </Unterseite>
@@ -279,14 +280,14 @@ function Zahlung({ id }: { id: string }) {
   const f = useFarben();
   const melden = useMeldung();
   const [anders, setAnders] = useState(false);
+  const u = z.stand.unterlagen.find((x) => x.id === id);
+  const erstattung = typeof u?.daten.storno_zu === "string" && u.daten.storno_zu !== "";
   const vermerken = (d: string) => {
     z.bezahltSetzen(id, d);
-    melden(TEXT.zahlung_vermerkt);
+    melden(erstattung ? TEXT.erstattung_vermerkt : TEXT.zahlung_vermerkt);
     z.erfolg();
   };
-  const u = z.stand.unterlagen.find((x) => x.id === id);
   if (!u) return null;
-  const erstattung = typeof u.daten.storno_zu === "string" && u.daten.storno_zu !== "";
   const datumDe = (iso: string) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(`${iso}T12:00:00Z`));
   return (
     <Karte stil={{ marginTop: 10, paddingVertical: 12, gap: 8 }}>

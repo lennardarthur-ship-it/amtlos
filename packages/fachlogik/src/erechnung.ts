@@ -86,10 +86,11 @@ export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record
     },
     "cac:InvoiceLine": r.positionen.map((p, i) => ({
       "cbc:ID": String(i + 1),
-      "cbc:InvoicedQuantity": String(vz * p.menge), "cbc:InvoicedQuantity@unitCode": p.einheit_code ?? EINHEIT_CODE[p.einheit],
+      // Nachlass (negativer Preis): Preis bleibt positiv, die Menge wird negativ (BR-27: Preis nie negativ)
+      "cbc:InvoicedQuantity": String(vz * Math.sign(p.preis_cent || 1) * p.menge), "cbc:InvoicedQuantity@unitCode": p.einheit_code ?? EINHEIT_CODE[p.einheit],
       "cbc:LineExtensionAmount": m(s.zeilen[i]!).wert, "cbc:LineExtensionAmount@currencyID": "EUR",
       "cac:Item": { "cbc:Name": p.bezeichnung, "cac:ClassifiedTaxCategory": { ...kategorie(r.kleinunternehmer ? null : p.ust_satz), "cac:TaxScheme": { "cbc:ID": "VAT" } } },
-      "cac:Price": { "cbc:PriceAmount": betrag(p.preis_cent), "cbc:PriceAmount@currencyID": "EUR" },
+      "cac:Price": { "cbc:PriceAmount": betrag(Math.abs(p.preis_cent)), "cbc:PriceAmount@currencyID": "EUR" },
     })),
   };
   return { "ubl:Invoice": doc };

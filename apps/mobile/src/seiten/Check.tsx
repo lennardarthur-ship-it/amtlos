@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { KeyboardAvoidingView, Pressable, ScrollView, View } from "react-native";
+import { AccessibilityInfo, KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { Frage } from "@amtlos/i18n";
 import { T as TEXT } from "../texte";
@@ -88,6 +88,14 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
   const fragen = checkFragen(z.stand.profil, liste);
   const [i, setI] = useState(voll && einleitung ? -1 : 0);
   const zeit = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const vorleser = useRef(false);
+  useEffect(() => {
+    // im Web meldet react-native-web immer „an“ – dort gibt es kein VoiceOver-Problem
+  if (Platform.OS === "web") return;
+  void AccessibilityInfo.isScreenReaderEnabled().then((an) => (vorleser.current = an));
+    const abo = AccessibilityInfo.addEventListener("screenReaderChanged", (an: boolean) => (vorleser.current = an));
+    return () => abo.remove();
+  }, []);
   useEffect(() => () => {
     if (zeit.current) clearTimeout(zeit.current);
   }, []);
@@ -101,7 +109,8 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
   const setzen = (feld: string, w: Wert, springen?: boolean) => {
     const bl = feld === "bundesland" && typeof w === "string" ? frage?.optionen?.[w]?.de : undefined;
     z.profilSetzen({ [feld]: w }, bl);
-    if (springen) {
+    // mit VoiceOver nicht von selbst weiterspringen – sonst verliert man unangekündigt die Frage
+    if (springen && !vorleser.current) {
       if (zeit.current) clearTimeout(zeit.current);
       zeit.current = setTimeout(weiter, 280);
     }
@@ -120,7 +129,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: f.papier }} edges={["top", "left", "right"]}>
-      <View style={{ height: 48, flexDirection: "row", alignItems: "center", paddingHorizontal: RAND - 8 }}>
+      <View style={{ minHeight: 48, flexDirection: "row", alignItems: "center", paddingHorizontal: RAND - 8 }}>
         <Pressable accessibilityRole="button" accessibilityLabel={TEXT.schliessen} onPress={nav.zurueck} hitSlop={8} style={{ width: ZIEL, height: ZIEL, alignItems: "center", justifyContent: "center" }}>
           <Symbol name="xmark" groesse={20} farbe={f.tinte} gewicht="semibold" />
         </Pressable>

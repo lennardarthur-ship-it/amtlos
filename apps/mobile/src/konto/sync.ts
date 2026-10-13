@@ -14,7 +14,7 @@ import { pbkdf2 } from "@noble/hashes/pbkdf2";
 import { sha256 } from "@noble/hashes/sha2";
 import type { Person } from "@amtlos/fachlogik";
 import { PASSWORT_MINDESTLAENGE, SICHERUNG_ITERATIONEN, ausBase64, base64, utf8 } from "../unterlagen/sicherung";
-import { nummerDoppelt, standAus, type Stand, type Unterlage } from "../unterlagen/speicher";
+import { nummerDoppelt, standAus, stornoVerweisePruefen, unterlageVereinen, type Stand, type Unterlage } from "../unterlagen/speicher";
 import { tresorOeffnen, tresorSchliessen } from "../unterlagen/tresor";
 
 export const SCHLUESSEL_FORMAT = "amtlos-schluessel";
@@ -90,7 +90,8 @@ function nachId<T extends { id: string; geaendert?: string }>(lokal: T[], entfer
   for (const e of entfernt) {
     const l = m.get(e.id);
     if (!l) m.set(e.id, e);
-    else if (!fest(l) && (fest(e) || !neuer(l.geaendert, e.geaendert))) m.set(e.id, e);
+    // festgeschrieben schlägt Entwurf; bei gleichem Stand gewinnt die zuletzt geänderte Fassung (Zahlung, Storno setzen `geaendert`)
+    else if (fest(l) !== fest(e) ? fest(e) : !neuer(l.geaendert, e.geaendert)) m.set(e.id, e);
   }
   return [...m.values()].filter((x) => fest(x) || !geloescht[`${praefix}${x.id}`] || (x.geaendert ?? "") > geloescht[`${praefix}${x.id}`]!);
 }
@@ -108,15 +109,15 @@ export function syncZusammenfuehren(lokal: Stand, entfernt: Stand): SyncZusammen
   const zeiten: Record<string, string> = { ...entfernt.zeiten };
   for (const [k, v] of Object.entries(lokal.zeiten)) if (!zeiten[k] || v > zeiten[k]!) zeiten[k] = v;
   const lokalNeuer = (bereich: string) => neuer(lokal.zeiten[bereich], entfernt.zeiten[bereich]);
-  // Unterlage: festgeschrieben schlägt Entwurf; Zahlungs- und Stornovermerke werden übernommen
   const fest = (u: Unterlage) => Boolean(u.festgeschrieben);
-  const unterlagen = nachId(lokal.unterlagen, entfernt.unterlagen, geloescht, "u:", fest).map((u) => {
-    const andere = [...lokal.unterlagen, ...entfernt.unterlagen].filter((x) => x.id === u.id && x !== u);
-    const bezahlt = u.bezahlt ?? andere.find((x) => x.bezahlt)?.bezahlt;
-    const storniertDurch = u.storniertDurch ?? andere.find((x) => x.storniertDurch)?.storniertDurch;
-    const ausgegeben = u.ausgegeben ?? andere.find((x) => x.ausgegeben)?.ausgegeben;
-    return { ...u, ...(bezahlt ? { bezahlt } : {}), ...(storniertDurch ? { storniertDurch } : {}), ...(ausgegeben ? { ausgegeben } : {}) };
-  });
+  // Unterlagen feldweise vereinen (festgeschrieben schlägt Entwurf, Zahlung und Storno gehen nicht verloren);
+  // Löschvermerke wie bei allen anderen; Verweise auf gelöschte Stornos fallen weg
+  const um = new Map(lokal.unterlagen.map((u) => [u.id, u]));
+  for (const e of entfernt.unterlagen) {
+    const l = um.get(e.id);
+    um.set(e.id, l ? unterlageVereinen(l, e) : e);
+  }
+  const unterlagen = stornoVerweisePruefen([...um.values()].filter((x) => fest(x) || !geloescht[`u:${x.id}`] || x.geaendert > geloescht[`u:${x.id}`]!));
   const stand: Stand = {
     ...lokal,
     betrieb: lokalNeuer("betrieb") ? lokal.betrieb : entfernt.betrieb,

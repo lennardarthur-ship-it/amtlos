@@ -1,6 +1,6 @@
 import * as Haptics from "expo-haptics";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { Animated, Easing, View } from "react-native";
+import { AccessibilityInfo, Animated, Easing, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Symbol, T } from "./bausteine";
 import { RADIUS, RAND, istIos, useFarben } from "./thema";
@@ -26,6 +26,8 @@ export function MeldungAnbieter({ children, unten = 0 }: { children: ReactNode; 
   const melden = useCallback((text: string, art: Art = "erfolg") => {
     if (istIos) void Haptics.notificationAsync(art === "erfolg" ? Haptics.NotificationFeedbackType.Success : Haptics.NotificationFeedbackType.Warning).catch(() => undefined);
     setAktuell({ text, art, nr: ++zaehler.current });
+    // VoiceOver: Live-Regionen gibt es nur unter Android – auf dem iPhone ausdrücklich ansagen
+    AccessibilityInfo.announceForAccessibility(text);
   }, []);
   const weg = useCallback((nr: number) => setAktuell((m) => (m?.nr === nr ? null : m)), []);
   const wert = useMemo(() => melden, [melden]);
@@ -51,7 +53,7 @@ function Anzeige({ meldung, weg, unten }: { meldung: Meldung; weg: (nr: number) 
     ]).start();
     const zeit = setTimeout(() => {
       Animated.timing(o, { toValue: 0, duration: 260, useNativeDriver: true }).start(() => weg(meldung.nr));
-    }, 2400);
+    }, Math.min(6000, 2000 + meldung.text.length * 40));
     return () => clearTimeout(zeit);
     // jede neue Meldung (nr) blendet neu ein
   }, [meldung.nr, o, y, weg]);

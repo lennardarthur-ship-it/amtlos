@@ -20,12 +20,14 @@ export type ProFunktion = "pdf" | "e_rechnung" | "ust_uebernahme" | "steuerberat
 /** Reihenfolge und Inhalt der Vorteile auf dem Bezahlschirm. */
 export const PRO_VORTEILE: ProFunktion[] = ["pdf", "e_rechnung", "ust_uebernahme", "steuerberater", "sync", "icloud", "briefkopf"];
 
-const monat = (iso: string) => iso.slice(0, 7);
+/** Kalendermonat in Deutschland (Europe/Berlin) – nicht UTC, sonst wechselt das Kontingent nachts um 1 bzw. 2 Uhr. */
+const BERLIN = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Berlin" });
+const monat = (iso: string | Date) => BERLIN.format(typeof iso === "string" ? new Date(iso) : iso).slice(0, 7);
 const istStorno = (u: Unterlage) => typeof u.daten.storno_zu === "string" && u.daten.storno_zu.trim() !== "";
 
 /** Im Monat von `jetzt` erstmals ausgegebene Unterlagen (ohne Stornorechnungen – Korrekturen zählen nie). */
 export function verbraucht(unterlagen: Unterlage[], jetzt: Date): number {
-  const m = jetzt.toISOString().slice(0, 7);
+  const m = monat(jetzt);
   return unterlagen.filter((u) => u.ausgegeben && monat(u.ausgegeben) === m && !istStorno(u)).length;
 }
 

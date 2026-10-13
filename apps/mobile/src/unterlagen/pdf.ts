@@ -5,6 +5,7 @@
 import { File, Paths } from "expo-file-system";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
+import { teilen } from "./teilen";
 import { Platform } from "react-native";
 import { RAENDER, type Gestalt } from "@amtlos/fachlogik";
 import { fussAngaben, fusszeileStempeln } from "./fusszeile";
@@ -47,16 +48,33 @@ export async function pdfErstellen(roh: string, dateiname: string, quer = false)
   }
 }
 
-/** Erstellt das PDF und öffnet das Teilen-Menü. */
-export async function pdfTeilen(html: string, dateiname: string, quer = false): Promise<void> {
-  if (Platform.OS === "web") return imWebOeffnen(html);
+/** Erstellt das PDF und öffnet das Teilen-Menü; true, wenn es weitergegeben wurde (false: abgebrochen). */
+export async function pdfTeilen(html: string, dateiname: string, quer = false): Promise<boolean> {
+  if (Platform.OS === "web") {
+    imWebOeffnen(html);
+    return true;
+  }
   const uri = await pdfErstellen(html, dateiname, quer);
-  if (!(await Sharing.isAvailableAsync())) return Print.printAsync({ uri });
-  await Sharing.shareAsync(uri, { mimeType: "application/pdf", UTI: "com.adobe.pdf", dialogTitle: dateiname });
+  if (Platform.OS !== "ios" && !(await Sharing.isAvailableAsync())) return druckenUri(uri);
+  return teilen(uri, { mimeType: "application/pdf", UTI: "com.adobe.pdf", titel: dateiname });
 }
 
-/** Druckvorschau des Systems mit dem fertigen PDF (inkl. Fußzeile). */
-export async function drucken(html: string, dateiname: string, quer = false): Promise<void> {
-  if (Platform.OS === "web") return imWebOeffnen(html);
-  await Print.printAsync({ uri: await pdfErstellen(html, dateiname, quer) });
+/** Druckdialog; ein Abbrechen meldet expo-print als Fehler – das ist hier kein Fehler, sondern false. */
+async function druckenUri(uri: string): Promise<boolean> {
+  try {
+    await Print.printAsync({ uri });
+    return true;
+  } catch (e) {
+    if (/did not complete|incomplete|cancel/i.test(String((e as Error)?.message ?? e))) return false;
+    throw e;
+  }
+}
+
+/** Druckvorschau des Systems mit dem fertigen PDF (inkl. Fußzeile); true, wenn gedruckt wurde. */
+export async function drucken(html: string, dateiname: string, quer = false): Promise<boolean> {
+  if (Platform.OS === "web") {
+    imWebOeffnen(html);
+    return true;
+  }
+  return druckenUri(await pdfErstellen(html, dateiname, quer));
 }

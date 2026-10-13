@@ -75,7 +75,7 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
       if (ok) fertig(true, TEXT.pro_wiederhergestellt);
       else setFehler(TEXT.pro_nichts_gefunden);
     } catch {
-      setFehler(TEXT.pro_kauf_fehler);
+      setFehler(TEXT.pro_wiederherstellen_fehler);
     } finally {
       setLaedt(false);
     }
@@ -84,14 +84,14 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
   const rest = uebrig(z.stand.unterlagen, new Date());
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: f.papier }} edges={["top", "left", "right"]}>
-      <View style={{ height: 48, flexDirection: "row", alignItems: "center", paddingHorizontal: RAND - 8 }}>
+      <View style={{ minHeight: 48, flexDirection: "row", alignItems: "center", paddingHorizontal: RAND - 8 }}>
         <Pressable accessibilityRole="button" accessibilityLabel={TEXT.schliessen} onPress={nav.zurueck} hitSlop={8} style={{ width: ZIEL, height: ZIEL, alignItems: "center", justifyContent: "center" }}>
           <Symbol name="xmark" groesse={20} farbe={f.tinte} gewicht="semibold" />
         </Pressable>
       </View>
       <ScrollView contentContainerStyle={{ paddingHorizontal: RAND, paddingBottom: 24 }}>
         <View style={{ width: 56, height: 56, borderRadius: 16, backgroundColor: f.amt, alignItems: "center", justifyContent: "center" }}>
-          <Symbol name="checkmark.seal.fill" groesse={30} farbe="#ffffff" />
+          <Symbol name="checkmark.seal.fill" groesse={30} farbe={f.blatt} />
         </View>
         <T v="grossTitel" accessibilityRole="header" stil={{ marginTop: 14 }}>{TEXT.pro_titel}</T>
         <T leise stil={{ marginTop: 6 }}>{grund ? TEXT.pro_grund[grund](FREI_JE_MONAT) : TEXT.pro_unter}</T>
@@ -99,7 +99,7 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
           {VORTEILE.map((v, i) => (
             <View key={v} style={{ flexDirection: "row", gap: 14, paddingVertical: 12, borderTopWidth: i ? 1 : 0, borderColor: f.linieLeise }}>
               <View style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: v === grund ? f.amt : f.amtHauch, alignItems: "center", justifyContent: "center" }}>
-                <Symbol name={VORTEIL_SYMBOL[v]} groesse={18} farbe={v === grund ? "#ffffff" : f.amt} />
+                <Symbol name={VORTEIL_SYMBOL[v]} groesse={18} farbe={v === grund ? f.blatt : f.amt} />
               </View>
               <View style={{ flex: 1 }}>
                 <T fett>{TEXT.pro_vorteil[v].titel}</T>
@@ -177,12 +177,12 @@ export function ProZeile() {
   return (
     <Pressable accessibilityRole="button" onPress={() => nav.oeffnen("pro", () => <ProSeite />, true)} style={({ pressed }) => ({ marginTop: 16, opacity: pressed ? 0.75 : 1 })}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 14, padding: 14, borderRadius: RADIUS.karte, backgroundColor: z.pro ? f.blatt : f.amt, borderWidth: z.pro ? 1 : 0, borderColor: f.linie }}>
-        <Symbol name="checkmark.seal.fill" groesse={26} farbe={z.pro ? f.amt : "#ffffff"} />
+        <Symbol name="checkmark.seal.fill" groesse={26} farbe={z.pro ? f.amt : f.blatt} />
         <View style={{ flex: 1 }}>
-          <T fett farbe={z.pro ? undefined : "#ffffff"}>{z.pro ? TEXT.pro_aktiv : TEXT.pro_titel}</T>
-          <T v="klein" farbe={z.pro ? f.tinteLeise : "#ffffff"}>{z.pro ? TEXT.pro_aktiv_text : TEXT.pro_rest(rest, FREI_JE_MONAT)}</T>
+          <T fett farbe={z.pro ? undefined : f.blatt}>{z.pro ? TEXT.pro_aktiv : TEXT.pro_titel}</T>
+          <T v="klein" farbe={z.pro ? f.tinteLeise : f.blatt}>{z.pro ? TEXT.pro_aktiv_text : TEXT.pro_rest(rest, FREI_JE_MONAT)}</T>
         </View>
-        <Symbol name="chevron.right" groesse={16} farbe={z.pro ? undefined : "#ffffff"} />
+        <Symbol name="chevron.right" groesse={16} farbe={z.pro ? undefined : f.blatt} />
       </View>
     </Pressable>
   );

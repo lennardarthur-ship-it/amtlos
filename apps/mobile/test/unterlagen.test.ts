@@ -113,7 +113,8 @@ describe("Unterlagen auf dem Gerät", () => {
   it("merkt sich Mitarbeiter und Kunden, ergänzt bei gleichem Namen und sortiert alphabetisch", () => {
     let s = personMerken(LEERER_STAND, "kunde", { name: "Kim Beispiel", anschrift: "Gartenweg 3" }, "k1");
     s = personMerken(s, "kunde", { name: "kim beispiel", ust_idnr: "DE1" }, "k2");
-    expect(s.kunden).toEqual([{ id: "k1", name: "Kim Beispiel", anschrift: "Gartenweg 3", ust_idnr: "DE1" }]);
+    expect(s.kunden).toMatchObject([{ id: "k1", name: "Kim Beispiel", anschrift: "Gartenweg 3", ust_idnr: "DE1" }]);
+    expect(s.kunden[0]!.geaendert).toBeTruthy(); // geänderte Person bekommt einen Zeitstempel (Synchronisation)
     s = personSetzen(s, "mitarbeiter", { id: "m2", name: "Zoe" });
     s = personSetzen(s, "mitarbeiter", { id: "m1", name: "Ali" });
     s = personSetzen(s, "mitarbeiter", { id: "m3", name: "" });

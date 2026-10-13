@@ -6,7 +6,7 @@ import { Karte, Knopf, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { GROESSE, RAND, SCHRIFT, useFarben } from "../ui/thema";
 import { fehltFuer } from "../unterlagen/pruefung";
-import { betriebFehlt, sortiert, type Unterlage } from "../unterlagen/speicher";
+import { betriebFehlt, heute, sortiert, type Unterlage } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { BetriebFormular } from "./Betrieb";
 import { BEREICH_SYMBOL, Gruppe, Inhalt, Seite, datumKurz } from "./gemeinsam";
@@ -27,6 +27,14 @@ const ANLASS_SYMBOL: Record<string, string> = {
   panne: "exclamationmark.triangle",
 };
 
+/** Zuletzt geändert: „Heute“, „Gestern“ oder das Datum – kurz, damit die Zeile nicht umbricht. */
+function wann(iso: string): string {
+  const tag = heute(new Date(iso));
+  if (tag === heute()) return TEXT.heute;
+  if (tag === heute(new Date(Date.now() - 864e5))) return TEXT.gestern;
+  return datumKurz(iso);
+}
+
 /** Zeile für eine eigene Unterlage: Name, wann geändert, was noch fehlt. */
 export function UnterlageZeile({ u, letzte, onPress }: { u: Unterlage; letzte: boolean; onPress: () => void }) {
   const f = useFarben();
@@ -37,7 +45,7 @@ export function UnterlageZeile({ u, letzte, onPress }: { u: Unterlage; letzte: b
     <Zeile
       links={<Symbol name="doc.richtext" groesse={22} farbe={n ? f.bald : f.amt} />}
       titel={unterlagenName(v, u.daten)}
-      text={`${TEXT.geaendert(datumKurz(u.geaendert))} · ${u.storniertDurch ? TEXT.storniert : u.festgeschrieben && v.storno && !u.daten.storno_zu ? (u.bezahlt ? TEXT.bezahlt_kurz : TEXT.offen_kurz) : u.festgeschrieben ? TEXT.festgeschrieben_kurz : n ? TEXT.fehlen(n) : TEXT.vollstaendig}`}
+      text={`${wann(u.geaendert)} · ${u.storniertDurch ? TEXT.storniert : u.festgeschrieben && v.storno && !u.daten.storno_zu ? (u.bezahlt ? TEXT.bezahlt_kurz : TEXT.offen_kurz) : u.festgeschrieben ? TEXT.festgeschrieben_kurz : n ? TEXT.fehlen(n) : TEXT.vollstaendig}`}
       onPress={onPress}
       letzte={letzte}
     />
@@ -70,7 +78,7 @@ function AnlassSeite({ a }: { a: Anlass }) {
 export function Suchfeld({ wert, setzen, label = TEXT.suchen }: { wert: string; setzen: (w: string) => void; label?: string }) {
   const f = useFarben();
   return (
-    <View style={{ flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 12, minHeight: 44, borderRadius: 12, backgroundColor: f.blatt, borderWidth: 1, borderColor: f.linie }}>
+    <View style={{ flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 12, minHeight: 44, borderRadius: 12, backgroundColor: f.blatt, borderWidth: 1, borderColor: f.rahmen }}>
       <Symbol name="magnifyingglass" groesse={18} />
       <TextInput
         accessibilityLabel={label}
@@ -161,9 +169,10 @@ export function Unterlagen() {
               />
             </Karte>
           ) : null}
-          <View style={{ flexDirection: "row", gap: 10, marginTop: 16 }}>
-            <Knopf text={TEXT.rechnung_schreiben} symbol="plus" onPress={() => starten("rechnung")} stil={{ flex: 1.15 }} />
-            <Knopf ton text={TEXT.beleg_erfassen} symbol="doc.viewfinder" onPress={() => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />)} stil={{ flex: 1, paddingHorizontal: 10 }} />
+          {/* untereinander: nebeneinander brachen beide Beschriftungen auf zwei Zeilen um */}
+          <View style={{ gap: 10, marginTop: 16 }}>
+            <Knopf text={TEXT.rechnung_schreiben} symbol="plus" onPress={() => starten("rechnung")} />
+            <Knopf ton text={TEXT.beleg_erfassen} symbol="doc.viewfinder" onPress={() => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />)} />
           </View>
 
           {zuletzt.length ? (

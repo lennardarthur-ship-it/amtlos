@@ -63,3 +63,49 @@ export async function cloudLesen(): Promise<string | null> {
     return null;
   }
 }
+
+/**
+ * Belegdateien liegen einzeln im Unterordner „Belege“ (verschlüsselt mit dem Sicherungsschlüssel) und werden nur
+ * einmal hochgeladen – sonst müsste jede automatische Sicherung alle Fotos neu verpacken (Speicher, Akku, Tempo).
+ */
+// je Sicherungsschlüssel ein eigener Ordner (Kennung aus dem Salz): ein neues Passwort mischt sich nie mit alten Dateien
+const belege = (kennung: string) => `${ORDNER}/Belege-${kennung}`;
+
+/** Namen der schon in iCloud liegenden Belegdateien. */
+export async function cloudDateien(kennung: string): Promise<Set<string>> {
+  const l = lib();
+  if (!l) return new Set();
+  const { CloudStorage, CloudStorageScope } = l;
+  if (!(await CloudStorage.exists(belege(kennung), CloudStorageScope.Documents))) return new Set();
+  return new Set((await CloudStorage.readdir(belege(kennung), CloudStorageScope.Documents)).map((n) => n.replace(/\.amtlos$/, "")));
+}
+
+export async function cloudDateiSchreiben(kennung: string, name: string, text: string): Promise<void> {
+  const l = lib();
+  if (!l) throw new Error("iCloud nicht verfügbar");
+  const { CloudStorage, CloudStorageScope } = l;
+  if (!(await CloudStorage.exists(ORDNER, CloudStorageScope.Documents))) await CloudStorage.mkdir(ORDNER, CloudStorageScope.Documents);
+  if (!(await CloudStorage.exists(belege(kennung), CloudStorageScope.Documents))) await CloudStorage.mkdir(belege(kennung), CloudStorageScope.Documents);
+  await CloudStorage.writeFile(`${belege(kennung)}/${name}.amtlos`, text, CloudStorageScope.Documents);
+}
+
+export async function cloudDateiLesen(kennung: string, name: string): Promise<string | null> {
+  try {
+    const l = lib();
+    if (!l) return null;
+    const { CloudStorage, CloudStorageScope } = l;
+    const pfad = `${belege(kennung)}/${name}.amtlos`;
+    if (!(await CloudStorage.exists(pfad, CloudStorageScope.Documents))) return null;
+    return await CloudStorage.readFile(pfad, CloudStorageScope.Documents);
+  } catch {
+    return null;
+  }
+}
+
+/** Vorhandene Sicherung nicht überschreiben, sondern unter neuem Namen beiseitelegen (z. B. beim Einrichten auf einem neuen iPhone). */
+export async function cloudBeiseitelegen(text: string, jetzt = new Date()): Promise<void> {
+  const l = lib();
+  if (!l) return;
+  const { CloudStorage, CloudStorageScope } = l;
+  await CloudStorage.writeFile(`${ORDNER}/Amtlos-Sicherung-vorher-${jetzt.toISOString().slice(0, 16).replace(":", "-")}.amtlos`, text, CloudStorageScope.Documents);
+}

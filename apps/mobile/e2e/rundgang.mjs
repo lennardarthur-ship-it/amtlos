@@ -192,7 +192,7 @@ try {
   await knopf("Weiter").click();
   await warte();
   await tippe(p.getByRole("checkbox", { name: "Vielen Dank für Ihren Auftrag." }).locator("visible=true").last());
-  await knopf("Zum Dokument").click();
+  await knopf("Zur Unterlage").click();
   await warte(1500);
   pruefe(await sichtbar("Alle Pflichtangaben sind drin."), "Rechnung trotz aller Angaben nicht vollständig");
   await foto("abschluss");
@@ -273,7 +273,7 @@ try {
   await warte(900);
   pruefe(await sichtbar("Ausrutschen, Stolpern und Stürzen"), "Vorschlag nicht als Gefährdung übernommen");
   // eigener Eintrag ohne Angaben verschwindet wieder
-  await tippe(knopf("Eigene Gefährdung hinzufügen"));
+  await tippe(knopf("Gefährdung selbst hinzufügen"));
   await warte(800);
   await knopf("Fertig").click();
   await warte(800);
@@ -283,7 +283,7 @@ try {
   await tippe(p.getByRole("radio", { name: /keine Schutzmaßnahmen erforderlich/ }).locator("visible=true").last());
   await knopf("Weiter").click();
   await warte();
-  await knopf("Zum Dokument").click();
+  await knopf("Zur Unterlage").click();
   await warte(1200);
   pruefe(await sichtbar("Alle Pflichtangaben sind drin."), "Gefährdungsbeurteilung trotz aller Angaben nicht vollständig");
   await knopf("Schließen").click();

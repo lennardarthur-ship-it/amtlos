@@ -201,3 +201,16 @@ Auf dem iPhone noch zu prüfen: Kamera-Foto eines Belegs, ZUGFeRD-PDF aus Mail/D
 | App-Tests gesamt | 66 grün |
 
 Auf dem iPhone noch zu prüfen: Anmeldung über den Systembrowser mit dem gewählten Identity-Provider, Synchronisation großer Belegfotos über Mobilfunk, Verhalten nach Abo-Ende in der Sandbox.
+
+## Nachtrag: Qualitätsdurchgang (E-135)
+
+| Prüfung | Ergebnis |
+|---|---|
+| Storno einer Rechnung mit Rabatt hebt sie in USt und XRechnung genau auf; Preis in der XRechnung nie negativ; Menge 2,345 ungerundet | grün (storno-nachlass.test.ts) |
+| Storno auf Gerät A und Zahlung auf Gerät B bleiben beide erhalten (Sync und Wiederherstellen, alle Richtungen); entfernte Zahlung und verworfener Storno-Entwurf kommen nicht zurück; Zahlung aus alter Sicherung bleibt | grün (sync.test.ts) |
+| Freikontingent am Monatswechsel nach deutscher Zeit, Kopie mit heutigem Datum, doppelte Nummern nach Änderungen | grün (pruefbefunde.test.ts) |
+| Rundgang hell und dunkel mit neuen Texten (gestapelte Knöpfe, kurze Zeilen, sichtbare Feldrahmen, zweizeilige Titel) | grün |
+| Sync-Rundgang mit zwei Geräten | grün |
+| App-Tests gesamt | 73 grün |
+
+Auf dem iPhone noch zu prüfen: Abbrechen im Teilen-Menü (Rechnung bleibt Entwurf, Sicherung gilt nicht als erstellt), VoiceOver-Ansagen, Ladefehler-Bildschirm (nur mit absichtlich beschädigten Daten), iCloud-Sicherung mit vielen Belegfotos.

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Image, View } from "react-native";
 import { KATEGORIEN, STEUERSAETZE, ZAHLUNGSWEGE, belegAusERechnung, belegSummen, cent, eRechnungAusPdf, eRechnungLesen, kategorieFuer, type Beleg } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
+import { regelwert } from "../pflichten/check";
 import { AuswahlZeile } from "../ui/auswahlseite";
 import { DatumFeld, Feld, Fuss, Hinweis, Karte, Knopf, Schalter, Symbol, T, TextKnopf, Wahl, Zeile } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
@@ -203,7 +204,7 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
         {frage ? (
           <Karte stil={{ paddingVertical: 14, gap: 10, marginTop: 24 }}>
             <T fett>{TEXT.loeschen_wirklich}</T>
-            <T v="klein" leise>{TEXT.beleg_loeschen_hinweis}</T>
+            <T v="klein" leise>{TEXT.beleg_loeschen_hinweis(regelwert("steuern.aufbewahrung.belege_jahre") ?? 8)}</T>
             <View style={{ flexDirection: "row", gap: 10 }}>
               <Knopf
                 gefahr

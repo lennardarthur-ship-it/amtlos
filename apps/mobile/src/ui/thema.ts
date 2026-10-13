@@ -11,6 +11,8 @@ const HELL = {
   tinteLeise: "#4a5868",
   linie: "#d3d8d0",
   linieLeise: "#e6e9e3",
+  /** Rahmen von Eingabefeldern und Auswahlchips: mindestens 3:1 zum Hintergrund (WCAG 1.4.11) */
+  rahmen: "#848f87",
   amt: "#136f5b",
   amtTief: "#0d5143",
   amtHauch: "#e3efeb",
@@ -27,6 +29,7 @@ const DUNKEL: typeof HELL = {
   tinteLeise: "#aeb8c2",
   linie: "#2f3a45",
   linieLeise: "#232d38",
+  rahmen: "#66737f",
   amt: "#5cc2a6",
   amtTief: "#8ad8c2",
   amtHauch: "#183a33",

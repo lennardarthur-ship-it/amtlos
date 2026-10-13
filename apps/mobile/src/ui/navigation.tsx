@@ -106,13 +106,14 @@ export function Unterseite({ titel, children, rechts }: { titel: string; childre
   const f = useFarben();
   const nav = useNav();
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: f.papier }} edges={["top", "left", "right"]}>
-      <View style={{ height: 48, flexDirection: "row", alignItems: "center", paddingHorizontal: RAND - 12, borderBottomWidth: 0.5, borderColor: f.linie }}>
+    // Zwei-Finger-Z-Geste von VoiceOver führt zurück
+    <SafeAreaView style={{ flex: 1, backgroundColor: f.papier }} edges={["top", "left", "right"]} onAccessibilityEscape={nav.zurueck}>
+      <View style={{ minHeight: 48, flexDirection: "row", alignItems: "center", paddingHorizontal: RAND - 12, borderBottomWidth: 0.5, borderColor: f.linie }}>
         <Pressable accessibilityRole="button" accessibilityLabel={TEXT.zurueck} onPress={nav.zurueck} hitSlop={8} style={{ minWidth: ZIEL + 40, height: ZIEL, flexDirection: "row", alignItems: "center", gap: 2 }}>
           <Symbol name="chevron.left" groesse={20} farbe={f.amt} gewicht="semibold" />
           <T farbe={f.amt}>{TEXT.zurueck}</T>
         </Pressable>
-        <T fett numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.78} accessibilityRole="header" stil={{ flex: 1, textAlign: "center", marginHorizontal: 4 }}>{titel}</T>
+        <T fett numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.85} accessibilityRole="header" stil={{ flex: 1, textAlign: "center", marginHorizontal: 4, paddingVertical: 4 }}>{titel}</T>
         <View style={{ minWidth: ZIEL + 40, alignItems: "flex-end" }}>{rechts}</View>
       </View>
       <View style={{ flex: 1 }}>{children}</View>

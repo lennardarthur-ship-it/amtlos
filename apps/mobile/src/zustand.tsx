@@ -47,8 +47,11 @@ interface Zustand {
   loeschen(id: string): void;
   /** löscht alles – verweigert (false), solange aufbewahrungspflichtige Unterlagen nicht gesichert sind */
   allesLoeschen(): Promise<boolean>;
+  /** nach einem Ladefehler: noch einmal lesen bzw. ohne die alten Daten neu beginnen (die bleiben beiseitegelegt) */
+  neuLaden(): Promise<void>;
+  neuBeginnen(): Promise<void>;
   /** Sicherung zurückspielen, ohne Neueres zu verlieren (E-129) */
-  zusammenfuehren(s: Stand): Zusammenfuehrung;
+  zusammenfuehren(s: Stand): Promise<Zusammenfuehrung>;
   /** Datensicherung erstellt – `stand` ist der gesicherte Stand (Änderungen danach bleiben ungesichert) */
   gesichert(stand?: Stand): void;
   bezahltSetzen(id: string, datum: string | null): void;
@@ -109,8 +112,8 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
   const schluessel = useRef<Uint8Array | null>(null);
   const [verschluesselt, setVerschluesselt] = useState(false);
 
-  useEffect(() => {
-    const laden = async () => {
+  const laden = useCallback(async () => {
+    const lesen = async () => {
       const json = await AsyncStorage.getItem(SCHLUESSEL);
       if (istTresor(json)) {
         // verschlüsselt: ohne Schlüssel (oder bei falschem) nichts überschreiben
@@ -132,16 +135,41 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       }
       return s;
     };
-    laden()
-      .then((s) => {
-        aktuell.current = s;
-        setStand(s);
-      })
-      .catch(() => {
-        sperre.current = true;
-        setLadefehler(true);
-      })
-      .finally(() => setBereit(true));
+    try {
+      const s = await lesen();
+      aktuell.current = s;
+      setStand(s);
+      sperre.current = false;
+      setLadefehler(false);
+    } catch {
+      sperre.current = true;
+      setLadefehler(true);
+    } finally {
+      setBereit(true);
+    }
+  }, []);
+  useEffect(() => {
+    void laden();
+  }, [laden]);
+
+  /**
+   * Nach einem Ladefehler bewusst neu anfangen (Wiederherstellen oder „Neu beginnen“): die unlesbaren Daten nicht
+   * löschen, sondern beiseitelegen, Schlüssel bei Bedarf neu anlegen, dann wieder speichern.
+   */
+  const ladefehlerAufheben = useCallback(async () => {
+    if (!sperre.current) return;
+    const alt = await AsyncStorage.getItem(SCHLUESSEL).catch(() => null);
+    if (alt) await AsyncStorage.setItem(`${SCHLUESSEL}.unlesbar.${new Date().toISOString()}`, alt);
+    let k = await schluesselHolen(true).catch(() => null);
+    if (!k) {
+      // Schlüssel beschädigt: neu anlegen (die beiseitegelegten Daten bleiben, wie sie sind)
+      await schluesselLoeschen().catch(() => undefined);
+      k = await schluesselHolen(true).catch(() => null);
+    }
+    schluessel.current = k;
+    setVerschluesselt(Boolean(k));
+    sperre.current = false;
+    setLadefehler(false);
   }, []);
 
   const schreiben = useCallback(() => {
@@ -208,10 +236,18 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         return u;
       },
       loeschen: (id) => setzen(loeschen(aktuell.current, id)),
-      zusammenfuehren: (g) => {
+      zusammenfuehren: async (g) => {
+        // Wiederherstellen nach einem Ladefehler: erst die unlesbaren Daten beiseitelegen, dann speichern
+        if (sperre.current) await ladefehlerAufheben();
         const z = zusammenfuehren(aktuell.current, g);
         setzen(z.stand);
         return z;
+      },
+      neuLaden: () => laden(),
+      neuBeginnen: async () => {
+        await ladefehlerAufheben();
+        aktuell.current = LEERER_STAND;
+        setStand(LEERER_STAND);
       },
       gesichert: (gesichertStand) => {
         const jetzt = new Date().toISOString();
@@ -259,6 +295,9 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       syncUebernehmen: (entfernt) => {
         const vorher = aktuell.current;
         const neu = syncZusammenfuehren(vorher, entfernt).stand;
+        // nichts Neues: Stand nicht als geändert markieren (sonst gälte er als ungesichert und die iCloud-Sicherung liefe erneut)
+        const ohneZeit = (x: Stand) => JSON.stringify({ ...x, geaendert: undefined });
+        if (ohneZeit(neu) === ohneZeit(vorher)) return;
         // auf einem anderen Gerät gelöschte Belege: Datei hier auch entfernen
         const bleiben = new Set(neu.belege.map((b) => b.datei).filter(Boolean));
         for (const b of vorher.belege) if (b.datei && !bleiben.has(b.datei)) dateiEntfernen(b.datei);
@@ -291,7 +330,7 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         return true;
       },
     }),
-    [bereit, ladefehler, verschluesselt, stand, tab, setzen, schreiben, storePro],
+    [bereit, ladefehler, verschluesselt, stand, tab, setzen, schreiben, storePro, laden, ladefehlerAufheben],
   );
   return <Kontext.Provider value={wert}>{children}</Kontext.Provider>;
 }

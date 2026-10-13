@@ -63,6 +63,19 @@ export function ZeilenAuswahl({ label, hilfe, optionen, wert, setzen }: { label:
   );
 }
 
+/** Tastatur und Autokorrektur passend zum Feld – E-Mail, IBAN, Steuer-ID & Co. dürfen nicht „verbessert“ werden. */
+function tastaturFuer(id: string): Partial<React.ComponentProps<typeof Feld>> {
+  const roh = { autoCorrect: false, spellCheck: false } as const;
+  if (/email/.test(id)) return { ...roh, keyboardType: "email-address", autoCapitalize: "none", textContentType: "emailAddress", autoComplete: "email" };
+  if (/(^|_)(iban|bic|ust_idnr|ust_id)$/.test(id)) return { ...roh, autoCapitalize: "characters" };
+  if (/(^|_)steuer_id$/.test(id)) return { ...roh, keyboardType: "number-pad" };
+  if (/(^|_)(sv_nummer|steuernummer)$/.test(id)) return { ...roh, autoCapitalize: "characters" };
+  if (/(^|_)(telefon|tel)$/.test(id)) return { ...roh, keyboardType: "phone-pad", textContentType: "telephoneNumber" };
+  if (/(^|_)plz$/.test(id)) return { ...roh, keyboardType: "number-pad", textContentType: "postalCode" };
+  if (/(^|_)(website|url|webseite)$/.test(id)) return { ...roh, keyboardType: "url", autoCapitalize: "none", textContentType: "URL" };
+  return {};
+}
+
 /** Ein Eingabefeld je Feldart. */
 export function Eingabe({ feld, wert, setzen }: { feld: EinfachesFeld; wert: EintragWert | undefined; setzen: (w: EintragWert) => void }) {
   const text = typeof wert === "string" ? wert : "";
@@ -71,7 +84,7 @@ export function Eingabe({ feld, wert, setzen }: { feld: EinfachesFeld; wert: Ein
     case "mehrzeilig":
       if (feld.vorschlaege?.length)
         return feld.art === "text" ? <AuswahlMitAnders label={feld.label} hilfe={feld.hilfe} optionen={feld.vorschlaege} wert={text} setzen={setzen} /> : <ZeilenAuswahl label={feld.label} hilfe={feld.hilfe} optionen={feld.vorschlaege} wert={text} setzen={setzen} />;
-      return <Feld label={feld.label} hilfe={feld.hilfe} wert={text} aendern={setzen} mehrzeilig={feld.art === "mehrzeilig"} />;
+      return <Feld label={feld.label} hilfe={feld.hilfe} wert={text} aendern={setzen} mehrzeilig={feld.art === "mehrzeilig"} {...(feld.art === "text" ? tastaturFuer(feld.id) : {})} />;
     case "bausteine":
       return <BausteinListe label={feld.label} hilfe={feld.hilfe} werte={Array.isArray(wert) ? wert : []} aendern={setzen} optionen={feld.optionen} />;
     case "datum":
@@ -79,7 +92,8 @@ export function Eingabe({ feld, wert, setzen }: { feld: EinfachesFeld; wert: Ein
     case "uhrzeit":
       return <UhrzeitFeld label={feld.label} hilfe={feld.hilfe} wert={text} aendern={setzen} />;
     case "betrag":
-      return <Feld label={feld.label} hilfe={feld.hilfe} wert={text} aendern={setzen} keyboardType="decimal-pad" placeholder="0,00" fehler={text.trim() && cent(text) === null ? TEXT.betrag_falsch : null} />;
+      // Preis einer Position darf negativ sein (Nachlass) – die Zifferntastatur hat kein Minus
+      return <Feld label={feld.label} hilfe={feld.hilfe} wert={text} aendern={setzen} keyboardType={feld.id === "preis" ? "numbers-and-punctuation" : "decimal-pad"} placeholder="0,00" fehler={text.trim() && cent(text) === null ? TEXT.betrag_falsch : null} />;
     case "zahl":
       return <Feld label={feld.label} hilfe={feld.hilfe} wert={text} aendern={setzen} keyboardType="decimal-pad" fehler={text.trim() && cent(text) === null ? TEXT.zahl_falsch : null} />;
     case "schalter":

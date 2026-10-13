@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { SymbolView, type SymbolViewProps } from "expo-symbols";
 import { useEffect, useState, type ReactNode } from "react";
-import { ActivityIndicator, Pressable, Text as RNText, Switch, TextInput, View, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
+import { AccessibilityInfo, ActivityIndicator, Pressable, Text as RNText, Switch, TextInput, View, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { T as TEXT } from "../texte";
 import { DatumWahl } from "./datumwahl";
@@ -63,10 +63,11 @@ export function Symbol({ name, groesse = 22, farbe, gewicht = "medium" }: { name
 export function Knopf({ text, onPress, leise, ton, gefahr, deaktiviert, laedt, symbol, stil }: { text: string; onPress: () => void; leise?: boolean; ton?: boolean; gefahr?: boolean; deaktiviert?: boolean; laedt?: boolean; symbol?: string; stil?: StyleProp<ViewStyle> }) {
   const f = useFarben();
   const farbe = gefahr ? f.frist : f.amt;
-  if (ton) return <TonKnopf text={text} onPress={onPress} symbol={symbol} stil={stil} deaktiviert={deaktiviert} />;
+  if (ton) return <TonKnopf text={text} onPress={onPress} symbol={symbol} stil={stil} deaktiviert={deaktiviert} laedt={laedt} />;
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={text}
       accessibilityState={{ disabled: Boolean(deaktiviert || laedt), busy: Boolean(laedt) }}
       disabled={deaktiviert || laedt}
       onPress={() => {
@@ -80,27 +81,29 @@ export function Knopf({ text, onPress, leise, ton, gefahr, deaktiviert, laedt, s
     >
       {laedt ? <ActivityIndicator color={leise ? farbe : f.blatt} /> : null}
       {!laedt && symbol ? <Symbol name={symbol} groesse={18} farbe={leise ? farbe : f.blatt} /> : null}
-      {!laedt ? <RNText style={{ fontFamily: SCHRIFT.bold, fontSize: GROESSE.basis, color: leise ? farbe : f.blatt }}>{text}</RNText> : null}
+      {/* der Text bleibt beim Laden stehen („Wird verschlüsselt …“) */}
+      <RNText style={{ fontFamily: SCHRIFT.bold, fontSize: GROESSE.basis, color: leise ? farbe : f.blatt, textAlign: "center", flexShrink: 1 }}>{text}</RNText>
     </Pressable>
   );
 }
 
 /** Zweitrangige Handlung als ruhige Fläche (Hauch der Handlungsfarbe) – neben dem einen Hauptknopf eines Bildschirms. */
-function TonKnopf({ text, onPress, symbol, stil, deaktiviert }: { text: string; onPress: () => void; symbol?: string; stil?: StyleProp<ViewStyle>; deaktiviert?: boolean }) {
+function TonKnopf({ text, onPress, symbol, stil, deaktiviert, laedt }: { text: string; onPress: () => void; symbol?: string; stil?: StyleProp<ViewStyle>; deaktiviert?: boolean; laedt?: boolean }) {
   const f = useFarben();
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityState={{ disabled: Boolean(deaktiviert) }}
-      disabled={deaktiviert}
+      accessibilityLabel={text}
+      accessibilityState={{ disabled: Boolean(deaktiviert || laedt), busy: Boolean(laedt) }}
+      disabled={deaktiviert || laedt}
       onPress={() => {
         if (istIos) void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         onPress();
       }}
       style={({ pressed }) => [{ minHeight: ZIEL, paddingHorizontal: 18, borderRadius: 12, flexDirection: "row", gap: 8, alignItems: "center", justifyContent: "center", backgroundColor: f.amtHauch, opacity: deaktiviert ? 0.45 : pressed ? 0.75 : 1 }, stil]}
     >
-      {symbol ? <Symbol name={symbol} groesse={18} farbe={f.amtTief} /> : null}
-      <RNText style={{ fontFamily: SCHRIFT.bold, fontSize: GROESSE.basis, color: f.amtTief }}>{text}</RNText>
+      {laedt ? <ActivityIndicator color={f.amtTief} /> : symbol ? <Symbol name={symbol} groesse={18} farbe={f.amtTief} /> : null}
+      <RNText style={{ fontFamily: SCHRIFT.bold, fontSize: GROESSE.basis, color: f.amtTief, textAlign: "center", flexShrink: 1 }}>{text}</RNText>
     </Pressable>
   );
 }
@@ -192,6 +195,10 @@ export function Hinweis({ text, art = "info", symbol }: { text: string; art?: "i
   const f = useFarben();
   const farbe = art === "fehler" ? f.frist : art === "erfolg" ? f.amt : f.bald;
   const hg = art === "fehler" ? f.fristHauch : art === "erfolg" ? f.amtHauch : f.baldHauch;
+  // Fehler und Erfolge ansagen (VoiceOver kennt keine Live-Regionen)
+  useEffect(() => {
+    if (art !== "info") AccessibilityInfo.announceForAccessibility(text);
+  }, [art, text]);
   return (
     <View accessibilityRole={art === "fehler" ? "alert" : "text"} accessibilityLiveRegion="polite" style={{ flexDirection: "row", gap: 10, alignItems: "flex-start", backgroundColor: hg, borderRadius: RADIUS.klein, padding: 12, marginVertical: 6 }}>
       <Symbol name={symbol ?? (art === "fehler" ? "exclamationmark.triangle" : art === "erfolg" ? "checkmark" : "info.circle")} groesse={18} farbe={farbe} />
@@ -231,12 +238,13 @@ export function Feld({ label, wert, aendern, hilfe, fehler, mehrzeilig, ohneLabe
       <TextInput
         placeholder={beispiel ? hilfe : undefined}
         accessibilityLabel={label}
+        accessibilityHint={fehler ?? undefined}
         value={wert}
         onChangeText={aendern}
         multiline={mehrzeilig}
         inputAccessoryViewID={zahlen ? TASTATUR_FERTIG : undefined}
         placeholderTextColor={f.tinteLeise}
-        style={{ minHeight: mehrzeilig ? 96 : ZIEL, borderWidth: 1.5, borderColor: fehler ? f.frist : f.linie, borderRadius: RADIUS.klein, paddingHorizontal: 14, paddingTop: mehrzeilig ? 12 : 0, textAlignVertical: mehrzeilig ? "top" : "center", color: f.tinte, backgroundColor: f.blatt, fontFamily: SCHRIFT.regular, fontSize: GROESSE.basis, marginTop: 6 }}
+        style={{ minHeight: mehrzeilig ? 96 : ZIEL, borderWidth: 1.5, borderColor: fehler ? f.frist : f.rahmen, borderRadius: RADIUS.klein, paddingHorizontal: 14, paddingTop: mehrzeilig ? 12 : 0, textAlignVertical: mehrzeilig ? "top" : "center", color: f.tinte, backgroundColor: f.blatt, fontFamily: SCHRIFT.regular, fontSize: GROESSE.basis, marginTop: 6 }}
         {...rest}
       />
       {fehler ? <T v="caption" farbe={f.frist} stil={{ marginTop: 4 }}>{fehler}</T> : null}
@@ -246,12 +254,14 @@ export function Feld({ label, wert, aendern, hilfe, fehler, mehrzeilig, ohneLabe
 
 /** ISO-Datum ↔ deutsche Schreibweise TT.MM.JJJJ (bzw. englisch DD/MM/YYYY). */
 export function isoAus(text: string): string | null {
-  const m = /^\s*(\d{1,2})[./-](\d{1,2})[./-](\d{4})\s*$/.exec(text) ?? null;
-  if (m) {
-    const iso = `${m[3]}-${m[2]!.padStart(2, "0")}-${m[1]!.padStart(2, "0")}`;
-    return Number.isNaN(Date.parse(`${iso}T00:00:00Z`)) ? null : iso;
-  }
-  return /^\d{4}-\d{2}-\d{2}$/.test(text.trim()) ? text.trim() : null;
+  const de = /^\s*(\d{1,2})[./-](\d{1,2})[./-](\d{4})\s*$/.exec(text);
+  const iso = /^\s*(\d{4})-(\d{2})-(\d{2})\s*$/.exec(text);
+  const [t, mo, j] = de ? [Number(de[1]), Number(de[2]), Number(de[3])] : iso ? [Number(iso[3]), Number(iso[2]), Number(iso[1])] : [0, 0, 0];
+  if (!j) return null;
+  // nur Tage, die es gibt (kein 31.02.) – zurückgerechnet geprüft
+  const d = new Date(Date.UTC(j, mo - 1, t));
+  if (d.getUTCFullYear() !== j || d.getUTCMonth() !== mo - 1 || d.getUTCDate() !== t) return null;
+  return `${j}-${String(mo).padStart(2, "0")}-${String(t).padStart(2, "0")}`;
 }
 export const textAus = (iso: string | null | undefined) => (iso ? `${iso.slice(8, 10)}.${iso.slice(5, 7)}.${iso.slice(0, 4)}` : "");
 
@@ -275,19 +285,20 @@ export function DatumFeld({ label, wert, aendern, hilfe, ohneHeute, ohneLabel }:
             aendern(w.trim() === "" ? null : isoAus(w));
           }}
           placeholder="TT.MM.JJJJ"
+          accessibilityHint={falsch ? TEXT.datum_falsch : undefined}
           placeholderTextColor={f.tinteLeise}
           keyboardType="numbers-and-punctuation"
           inputAccessoryViewID={TASTATUR_FERTIG}
-          style={{ flex: 1, minHeight: ZIEL, borderWidth: 1.5, borderColor: falsch ? f.frist : f.linie, borderRadius: RADIUS.klein, paddingHorizontal: 14, color: f.tinte, backgroundColor: f.blatt, fontFamily: SCHRIFT.regular, fontSize: GROESSE.basis, fontVariant: ["tabular-nums"] }}
+          style={{ flex: 1, minHeight: ZIEL, borderWidth: 1.5, borderColor: falsch ? f.frist : f.rahmen, borderRadius: RADIUS.klein, paddingHorizontal: 14, color: f.tinte, backgroundColor: f.blatt, fontFamily: SCHRIFT.regular, fontSize: GROESSE.basis, fontVariant: ["tabular-nums"] }}
         />
         {ohneHeute ? null : (
-          <Pressable accessibilityRole="button" onPress={() => aendern(heute)} style={({ pressed }) => ({ minHeight: ZIEL, paddingHorizontal: 14, borderRadius: RADIUS.klein, justifyContent: "center", backgroundColor: f.amtHauch, opacity: pressed ? 0.7 : 1 })}>
+          <Pressable accessibilityRole="button" accessibilityLabel={`${label}: ${heuteText}`} onPress={() => aendern(heute)} style={({ pressed }) => ({ minHeight: ZIEL, paddingHorizontal: 14, borderRadius: RADIUS.klein, justifyContent: "center", backgroundColor: f.amtHauch, opacity: pressed ? 0.7 : 1 })}>
             <T v="klein" fett farbe={f.amt}>{heuteText}</T>
           </Pressable>
         )}
         <DatumWahl label={label} wert={wert} aendern={aendern} />
       </View>
-      {falsch ? <T v="caption" farbe={f.frist} stil={{ marginTop: 4 }}>TT.MM.JJJJ</T> : null}
+      {falsch ? <T v="caption" farbe={f.frist} stil={{ marginTop: 4 }}>{TEXT.datum_falsch}</T> : null}
     </View>
   );
 }
@@ -307,11 +318,12 @@ export function Wahl<W extends string>({ label, wert, aendern, optionen, hilfe }
               accessibilityRole="radio"
               accessibilityState={{ checked: an }}
               aria-checked={an}
+              hitSlop={4}
               onPress={() => {
                 if (istIos) void Haptics.selectionAsync();
                 aendern(o.wert);
               }}
-              style={{ minHeight: ZIEL - 8, paddingHorizontal: 14, borderRadius: 20, justifyContent: "center", backgroundColor: an ? f.tinte : f.blatt, borderWidth: 1, borderColor: an ? f.tinte : f.linie }}
+              style={{ minHeight: ZIEL - 8, paddingHorizontal: 14, borderRadius: 20, justifyContent: "center", backgroundColor: an ? f.tinte : f.blatt, borderWidth: 1, borderColor: an ? f.tinte : f.rahmen }}
             >
               <T v="klein" fett farbe={an ? f.papier : f.tinte}>{o.text}</T>
             </Pressable>
@@ -359,7 +371,7 @@ export function Auswahl<W extends string>({ label, wert, aendern, optionen, hilf
   return (
     <View style={{ marginTop: ohneLabel ? 8 : 20 }}>
       {ohneLabel ? null : <FeldKopf label={label} hilfe={hilfe} />}
-      <View accessibilityRole="radiogroup" accessibilityLabel={label} style={{ marginTop: 6, borderWidth: 1.5, borderColor: f.linie, borderRadius: RADIUS.klein, overflow: "hidden" }}>
+      <View accessibilityRole="radiogroup" accessibilityLabel={label} style={{ marginTop: 6, borderWidth: 1.5, borderColor: f.rahmen, borderRadius: RADIUS.klein, overflow: "hidden" }}>
         {optionen.map((o, i) => {
           const an = o.wert === wert;
           return (
@@ -400,11 +412,12 @@ export function MehrfachWahl({ label, werte, aendern, optionen, hilfe, ohneLabel
               accessibilityState={{ checked: an }}
               aria-checked={an}
               accessibilityLabel={o.text}
+              hitSlop={4}
               onPress={() => {
                 if (istIos) void Haptics.selectionAsync();
                 aendern(an ? werte.filter((x) => x !== o.wert) : [...werte, o.wert]);
               }}
-              style={{ minHeight: ZIEL - 8, paddingHorizontal: 12, borderRadius: 20, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: an ? f.amtHauch : f.blatt, borderWidth: 1.5, borderColor: an ? f.amt : f.linie }}
+              style={{ minHeight: ZIEL - 8, paddingHorizontal: 12, borderRadius: 20, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: an ? f.amtHauch : f.blatt, borderWidth: 1.5, borderColor: an ? f.amt : f.rahmen }}
             >
               <Symbol name={an ? "checkmark.square.fill" : "square"} groesse={16} farbe={an ? f.amt : f.tinteLeise} />
               <T v="klein" fett={an} farbe={an ? f.amtTief : f.tinte}>{o.text}</T>
@@ -428,7 +441,7 @@ export function BausteinListe({ label, hilfe, werte, aendern, optionen }: { labe
   return (
     <View style={{ marginTop: 20 }}>
       <FeldKopf label={label} hilfe={hilfe} />
-      <View accessibilityLabel={label} style={{ marginTop: 6, borderWidth: 1.5, borderColor: f.linie, borderRadius: RADIUS.klein, overflow: "hidden" }}>
+      <View accessibilityLabel={label} style={{ marginTop: 6, borderWidth: 1.5, borderColor: f.rahmen, borderRadius: RADIUS.klein, overflow: "hidden" }}>
         {optionen.map((o, i) => {
           const an = werte.includes(o.wert);
           return (

@@ -18,6 +18,8 @@ export interface Unterlage {
   storniertDurch?: string;
   /** Zahlung eingegangen am (YYYY-MM-DD, E-129) – gehört nicht zum Inhalt, ändert also keine festgeschriebene Rechnung */
   bezahlt?: string;
+  /** wann die Zahlung zuletzt vermerkt oder entfernt wurde (ISO) – entscheidet beim Zusammenführen zweier Fassungen */
+  bezahltGeaendert?: string;
 }
 
 export interface Stand {
@@ -166,11 +168,29 @@ function naechste(s: Stand, vorlageId: string, feld: string, jetzt: Date): strin
   return naechsteNummer(vorhanden, heute(jetzt).slice(0, 4));
 }
 
+const nummerVon = (u: Unterlage) => {
+  const v = vorlageFuer(u.vorlage);
+  return v?.fortlaufend && typeof u.daten[v.fortlaufend] === "string" ? (u.daten[v.fortlaufend] as string).trim() : "";
+};
+// Häufigkeit je „Vorlage|Nummer“, einmal je Liste berechnet – Listen fragen das für jede Zeile ab
+const nummernZaehler = new WeakMap<Unterlage[], Map<string, number>>();
+
 /** Gibt es dieselbe Nummer schon in einer anderen Unterlage derselben Vorlage? */
 export function nummerDoppelt(s: Stand, u: Unterlage): boolean {
-  const v = vorlageFuer(u.vorlage);
-  const n = v?.fortlaufend && typeof u.daten[v.fortlaufend] === "string" ? (u.daten[v.fortlaufend] as string).trim() : "";
-  return Boolean(n) && s.unterlagen.some((x) => x.id !== u.id && x.vorlage === u.vorlage && typeof x.daten[v!.fortlaufend!] === "string" && (x.daten[v!.fortlaufend!] as string).trim() === n);
+  const n = nummerVon(u);
+  if (!n) return false;
+  let z = nummernZaehler.get(s.unterlagen);
+  if (!z) {
+    z = new Map();
+    for (const x of s.unterlagen) {
+      const nx = nummerVon(x);
+      if (nx) z.set(`${x.vorlage}|${nx}`, (z.get(`${x.vorlage}|${nx}`) ?? 0) + 1);
+    }
+    nummernZaehler.set(s.unterlagen, z);
+  }
+  const anzahl = z.get(`${u.vorlage}|${n}`) ?? 0;
+  // u selbst zählt mit, wenn es mit derselben Nummer in der Liste steht
+  return anzahl - (s.unterlagen.some((x) => x.id === u.id && x.vorlage === u.vorlage && nummerVon(x) === n) ? 1 : 0) > 0;
 }
 
 export const istFest = (u: Unterlage | undefined) => Boolean(u?.festgeschrieben);
@@ -212,7 +232,8 @@ export function ausgeben(s: Stand, id: string, jetzt: Date): Stand {
     unterlagen: s.unterlagen.map((u) => {
       if (u.id !== id) return u;
       const fest = vorlageFuer(u.vorlage)?.festschreiben;
-      return { ...u, ausgegeben: u.ausgegeben ?? jetzt.toISOString(), ...(fest && !u.festgeschrieben ? { festgeschrieben: jetzt.toISOString() } : {}) };
+      if (u.ausgegeben && (!fest || u.festgeschrieben)) return u;
+      return { ...u, ausgegeben: u.ausgegeben ?? jetzt.toISOString(), geaendert: jetzt.toISOString(), ...(fest && !u.festgeschrieben ? { festgeschrieben: jetzt.toISOString() } : {}) };
     }),
   };
 }
@@ -233,7 +254,7 @@ export function stornieren(s: Stand, id: string, jetzt: Date, neu = neueId()): [
   daten.datum = heute(jetzt);
   if (v.fortlaufend) daten[v.fortlaufend] = naechste(s, v.id, v.fortlaufend, jetzt);
   const u: Unterlage = { id: neu, vorlage: v.id, daten, erstellt: jetzt.toISOString(), geaendert: jetzt.toISOString() };
-  return [{ ...s, unterlagen: [u, ...s.unterlagen.map((x) => (x.id === id ? { ...x, storniertDurch: neu } : x))] }, u];
+  return [{ ...s, unterlagen: [u, ...s.unterlagen.map((x) => (x.id === id ? { ...x, storniertDurch: neu, geaendert: jetzt.toISOString() } : x))] }, u];
 }
 
 /** Kopie, z. B. für den nächsten Monat oder einen weiteren Arbeitsbereich. */
@@ -247,6 +268,8 @@ export function kopieren(s: Stand, id: string, jetzt: Date, neu = neueId()): [St
   // die Kopie ist ein neuer Entwurf: kein Storno-Bezug, nicht ausgegeben, nicht festgeschrieben
   delete daten.storno_zu;
   delete daten.storno_zu_datum;
+  // fortlaufend nummerierte Unterlagen (Rechnung) bekommen das heutige Datum – sonst passt die Nummernfolge nicht
+  if (v?.fortlaufend && typeof daten.datum === "string") daten.datum = heute(jetzt);
   const u: Unterlage = { id: neu, vorlage: alt.vorlage, daten, erstellt: jetzt.toISOString(), geaendert: jetzt.toISOString() };
   return [{ ...s, unterlagen: [u, ...s.unterlagen] }, u];
 }
@@ -256,13 +279,17 @@ export function loeschen(s: Stand, id: string): Stand {
   const weg = s.unterlagen.find((u) => u.id === id && !u.festgeschrieben);
   if (!weg) return s;
   // ein verworfener Storno-Entwurf gibt die ursprüngliche Rechnung wieder frei
-  return { ...vermerken(s, `u:${id}`), unterlagen: s.unterlagen.filter((u) => u.id !== id).map((u) => (u.storniertDurch === id ? { ...u, storniertDurch: undefined } : u)) };
+  const jetzt = new Date().toISOString();
+  return { ...vermerken(s, `u:${id}`), unterlagen: s.unterlagen.filter((u) => u.id !== id).map((u) => (u.storniertDurch === id ? { ...u, storniertDurch: undefined, geaendert: jetzt } : u)) };
 }
 
 /** Person aus einer Unterlage merken (gleicher Name ergänzt den vorhandenen Eintrag). */
-export function personMerken(s: Stand, art: PersonenArt, angaben: PersonAngaben, id = neueId()): Stand {
+export function personMerken(s: Stand, art: PersonenArt, angaben: PersonAngaben, id = neueId(), jetzt = new Date()): Stand {
   const k = PERSONEN_LISTE[art];
-  return { ...s, [k]: merken(s[k], angaben, id) };
+  const vorher = new Map(s[k].map((p) => [p.id, JSON.stringify(p)]));
+  // geänderte oder neue Einträge bekommen einen Zeitstempel – sonst käme eine neue Anschrift beim Synchronisieren nicht an
+  const liste = merken(s[k], angaben, id).map((p) => (vorher.get(p.id) === JSON.stringify(p) ? p : { ...p, geaendert: jetzt.toISOString() }));
+  return { ...s, [k]: liste };
 }
 
 /** Person anlegen oder ändern (Bearbeiten unter „Mein Betrieb“). */
@@ -307,8 +334,10 @@ export const sortiert = (s: Stand) => [...s.unterlagen].sort((a, b) => b.geaende
 export const betriebFehlt = (b: Betrieb) => !b.name.trim();
 
 /** Zahlungseingang einer Rechnung setzen bzw. entfernen (E-129). */
-export function bezahltSetzen(s: Stand, id: string, datum: string | null): Stand {
-  return { ...s, unterlagen: s.unterlagen.map((u) => (u.id === id ? (datum ? { ...u, bezahlt: datum } : (({ bezahlt: _weg, ...rest }) => rest)(u)) : u)) };
+export function bezahltSetzen(s: Stand, id: string, datum: string | null, jetzt = new Date()): Stand {
+  // eigener Zeitstempel: beim Zusammenführen gewinnt so auch das Entfernen einer Zahlung
+  const g = jetzt.toISOString();
+  return { ...s, unterlagen: s.unterlagen.map((u) => (u.id === id ? (datum ? { ...u, bezahlt: datum, bezahltGeaendert: g, geaendert: g } : (({ bezahlt: _weg, ...rest }) => ({ ...rest, bezahltGeaendert: g, geaendert: g }))(u)) : u)) };
 }
 
 /** Unterlagen, die aufbewahrt werden müssen: festgeschriebene (Rechnungen, Kassenbuch) und Belege. */
@@ -345,6 +374,53 @@ export function sicherungFaellig(s: Stand, jetzt: Date, nach = 7): { tage: numbe
   return tage >= nach ? { tage } : null;
 }
 
+/**
+ * Storno-Verweise abgleichen: Verweise auf eine Stornorechnung, die es nicht (mehr) gibt, entfernen – sonst ließe
+ * sich die Rechnung nie mehr korrigieren; fehlende Verweise aus `storno_zu` der vorhandenen Stornorechnungen ergänzen.
+ */
+export function stornoVerweisePruefen(l: Unterlage[]): Unterlage[] {
+  const ids = new Set(l.map((u) => u.id));
+  const stornoFuer = new Map<string, string>();
+  for (const x of l) {
+    const zu = typeof x.daten.storno_zu === "string" ? x.daten.storno_zu.trim() : "";
+    if (zu) stornoFuer.set(`${x.vorlage}|${zu}`, x.id);
+  }
+  return l.map((u) => {
+    if (u.storniertDurch && !ids.has(u.storniertDurch)) return (({ storniertDurch: _weg, ...rest }) => rest)(u);
+    const st = !u.storniertDurch && !u.daten.storno_zu ? stornoFuer.get(`${u.vorlage}|${nummerVon(u)}`) : undefined;
+    return st && st !== u.id && nummerVon(u) ? { ...u, storniertDurch: st } : u;
+  });
+}
+
+const frueher = (x?: string, y?: string) => (x && y ? (x < y ? x : y) : (x ?? y));
+
+/**
+ * Zwei Fassungen derselben Unterlage vereinen (Synchronisation und Wiederherstellen). Festgeschrieben schlägt
+ * Entwurf, sonst gewinnt die zuletzt geänderte Fassung. Vermerke werden feldweise vereint: erste Ausgabe und
+ * Festschreibung nach dem früheren Datum, ein Storno-Verweis aus jeder Fassung, die Zahlung nach dem Zeitpunkt
+ * ihrer letzten Änderung (ohne Zeitpunkt – ältere Daten – bleibt eine vorhandene Zahlung erhalten).
+ */
+export function unterlageVereinen(lokal: Unterlage, andere: Unterlage): Unterlage {
+  const fl = Boolean(lokal.festgeschrieben);
+  const fa = Boolean(andere.festgeschrieben);
+  const basis = fl !== fa ? (fl ? lokal : andere) : lokal.geaendert >= andere.geaendert ? lokal : andere;
+  const zweite = basis === lokal ? andere : lokal;
+  const r: Unterlage = { ...basis };
+  const ausgegeben = frueher(lokal.ausgegeben, andere.ausgegeben);
+  if (ausgegeben) r.ausgegeben = ausgegeben;
+  if (fl && fa) r.festgeschrieben = frueher(lokal.festgeschrieben, andere.festgeschrieben);
+  const storno = basis.storniertDurch ?? zweite.storniertDurch;
+  if (storno) r.storniertDurch = storno;
+  const zl = lokal.bezahltGeaendert ?? "";
+  const za = andere.bezahltGeaendert ?? "";
+  const quelle = zl || za ? (zl >= za ? lokal : andere) : lokal.bezahlt ? lokal : andere;
+  delete r.bezahlt;
+  delete r.bezahltGeaendert;
+  if (quelle.bezahlt) r.bezahlt = quelle.bezahlt;
+  if (quelle.bezahltGeaendert) r.bezahltGeaendert = quelle.bezahltGeaendert;
+  return r;
+}
+
 export interface Zusammenfuehrung {
   stand: Stand;
   neu: number;
@@ -369,14 +445,11 @@ export function zusammenfuehren(aktuell: Stand, gesichert: Stand): Zusammenfuehr
     if (!a) {
       nachId.set(g.id, g);
       neu++;
-    } else if (a.festgeschrieben || a.geaendert >= g.geaendert) {
-      // Zahlung oder Storno aus der Sicherung übernehmen, wenn auf dem Gerät noch nicht vermerkt
-      const erg = { ...a, ...(g.bezahlt && !a.bezahlt ? { bezahlt: g.bezahlt } : {}), ...(g.storniertDurch && !a.storniertDurch ? { storniertDurch: g.storniertDurch } : {}) };
-      nachId.set(a.id, erg);
-      behalten++;
     } else {
-      nachId.set(g.id, g);
-      aktualisiert++;
+      const v = unterlageVereinen(a, g);
+      nachId.set(a.id, v);
+      if (JSON.stringify(v) === JSON.stringify(a)) behalten++;
+      else aktualisiert++;
     }
   }
   const personen = (a: Person[], g: Person[]) => [...a, ...g.filter((p) => !a.some((x) => x.id === p.id))];
@@ -396,7 +469,7 @@ export function zusammenfuehren(aktuell: Stand, gesichert: Stand): Zusammenfuehr
   const stand: Stand = {
     ...aktuell,
     betrieb: betriebFehlt(aktuell.betrieb) ? gesichert.betrieb : aktuell.betrieb,
-    unterlagen: [...nachId.values()],
+    unterlagen: stornoVerweisePruefen([...nachId.values()]),
     belege: [...belegNachId.values()],
     mitarbeiter: personen(aktuell.mitarbeiter, gesichert.mitarbeiter),
     kunden: personen(aktuell.kunden, gesichert.kunden),

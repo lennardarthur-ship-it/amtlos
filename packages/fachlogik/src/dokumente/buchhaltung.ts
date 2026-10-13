@@ -135,7 +135,8 @@ export function eRechnungAus(d: Daten, b: Betrieb): { daten: RechnungsDaten; feh
     kunde: { name: text(d, "kunde_name"), strasse: a.strasse, plz: a.plz, ort: a.ort, land: a.land ?? "DE", email: text(d, "kunde_email") || null, ust_idnr: text(d, "kunde_ust_idnr") || null, geschaeftskunde: true },
     positionen: pos.map((e) => {
       const preis = cent(text(e, "preis")) ?? 0;
-      return { bezeichnung: text(e, "bezeichnung"), menge: zahl(text(e, "menge")) ?? 1, einheit: "stueck" as const, einheit_code: einheitCode(text(e, "einheit")), preis_cent: storno ? Math.abs(preis) : preis, ust_satz: ku ? null : Number(text(e, "satz") || "19") };
+      // Storno: die Positionen tragen schon das umgedrehte Vorzeichen; `art: "storno"` dreht es für USt und XRechnung zurück
+      return { bezeichnung: text(e, "bezeichnung"), menge: zahl(text(e, "menge")) ?? 1, einheit: "stueck" as const, einheit_code: einheitCode(text(e, "einheit")), preis_cent: storno ? -preis : preis, ust_satz: ku ? null : Number(text(e, "satz") || "19") };
     }),
     kleinunternehmer: ku,
     hinweis: [text(d, "befreiung"), text(d, "hinweis")].filter(Boolean).join("\n") || null,
@@ -240,7 +241,7 @@ export const rechnung: Vorlage = {
     const zeilenHtml = pos.map(({ e, p }, i) => [
       String(i + 1),
       zelle(p.bezeichnung),
-      `${zahlText(p.menge)}${text(e, "einheit") ? ` ${esc(text(e, "einheit"))}` : ""}`,
+      `${zahlText(p.menge, 4)}${text(e, "einheit") ? ` ${esc(text(e, "einheit"))}` : ""}`,
       euro(p.preis_cent),
       ...(ku ? [] : [p.ust_satz === 0 ? "0 %" : `${p.ust_satz} %`]),
       euro(s.zeilen[i]!),

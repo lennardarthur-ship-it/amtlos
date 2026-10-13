@@ -66,7 +66,7 @@ export function AuswahlZeile<W extends string>({ label, wert, optionen, aendern,
         accessibilityLabel={label}
         accessibilityValue={{ text: text ?? platzhalter ?? TEXT.auswaehlen }}
         onPress={() => nav.oeffnen(`auswahl-${label}`, () => <AuswahlSeite titel={label} wert={wert} optionen={optionen} aendern={aendern} />)}
-        style={({ pressed }) => ({ marginTop: 6, minHeight: ZIEL, borderWidth: 1.5, borderColor: f.linie, borderRadius: RADIUS.klein, paddingLeft: 14, paddingRight: 10, flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: pressed ? f.papier : f.blatt })}
+        style={({ pressed }) => ({ marginTop: 6, minHeight: ZIEL, borderWidth: 1.5, borderColor: f.rahmen, borderRadius: RADIUS.klein, paddingLeft: 14, paddingRight: 10, flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: pressed ? f.papier : f.blatt })}
       >
         <T stil={{ flex: 1 }} leise={!text}>{text ?? platzhalter ?? TEXT.auswaehlen}</T>
         <Symbol name="chevron.right" groesse={16} />

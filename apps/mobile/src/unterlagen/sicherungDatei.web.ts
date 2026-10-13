@@ -4,7 +4,7 @@ import * as DocumentPicker from "expo-document-picker";
 
 export const zufall = (n: number) => Crypto.getRandomBytes(n);
 
-export async function dateiTeilen(name: string, text: string, mimeType = "application/octet-stream"): Promise<void> {
+export async function dateiTeilen(name: string, text: string, mimeType = "application/octet-stream"): Promise<boolean> {
   const g = globalThis as unknown as { document: { createElement(t: string): { href: string; download: string; click(): void } }; URL: { createObjectURL(b: unknown): string; revokeObjectURL(u: string): void }; Blob: new (t: string[], o: { type: string }) => unknown };
   const url = g.URL.createObjectURL(new g.Blob([text], { type: mimeType }));
   const a = g.document.createElement("a");
@@ -12,6 +12,7 @@ export async function dateiTeilen(name: string, text: string, mimeType = "applic
   a.download = name;
   a.click();
   setTimeout(() => g.URL.revokeObjectURL(url), 1000);
+  return true;
 }
 
 export async function dateiWaehlen(): Promise<{ name: string; text: string } | null> {
@@ -22,7 +23,7 @@ export async function dateiWaehlen(): Promise<{ name: string; text: string } | n
   return { name: a.name, text };
 }
 
-export async function dateiTeilenBytes(name: string, bytes: Uint8Array, mimeType: string): Promise<void> {
+export async function dateiTeilenBytes(name: string, bytes: Uint8Array, mimeType: string): Promise<boolean> {
   const g = globalThis as unknown as { document: { createElement(t: string): { href: string; download: string; click(): void } }; URL: { createObjectURL(b: unknown): string; revokeObjectURL(u: string): void }; Blob: new (t: unknown[], o: { type: string }) => unknown };
   const url = g.URL.createObjectURL(new g.Blob([bytes], { type: mimeType }));
   const a = g.document.createElement("a");
@@ -30,6 +31,7 @@ export async function dateiTeilenBytes(name: string, bytes: Uint8Array, mimeType
   a.download = name;
   a.click();
   setTimeout(() => g.URL.revokeObjectURL(url), 1000);
+  return true;
 }
 
 export async function dateiWaehlenBytes(typen: string[]): Promise<{ name: string; bytes: Uint8Array; mime: string } | null> {

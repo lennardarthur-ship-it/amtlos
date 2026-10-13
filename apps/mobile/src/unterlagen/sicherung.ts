@@ -120,8 +120,8 @@ export function sicherungLesen(text: string, passwort: string): Stand {
   return sicherungLesenMitDateien(text, passwort).stand;
 }
 
-/** Sicherung lesen – mit den Belegdateien (leer bei Version 1). */
-export function sicherungLesenMitDateien(text: string, passwort: string): { stand: Stand; dateien: Dateien } {
+/** Sicherung lesen – mit den Belegdateien (leer bei Version 1) und dem abgeleiteten Schlüssel (für Belege in iCloud). */
+export function sicherungLesenMitDateien(text: string, passwort: string): { stand: Stand; dateien: Dateien; schluessel: Uint8Array } {
   let d: Partial<Datei>;
   try {
     d = JSON.parse(text) as Partial<Datei>;
@@ -130,17 +130,50 @@ export function sicherungLesenMitDateien(text: string, passwort: string): { stan
   }
   if (d.format !== SICHERUNG_FORMAT || (d.version !== 1 && d.version !== 2) || d.kdf?.name !== "PBKDF2-SHA256" || d.chiffre?.name !== "AES-256-GCM" || typeof d.daten !== "string" || !(d.kdf.iterationen > 0)) throw new SicherungsFehler("format");
   let klar: Uint8Array;
+  const k = schluessel(passwort, ausBase64(d.kdf.salz), d.kdf.iterationen);
   try {
-    klar = gcm(schluessel(passwort, ausBase64(d.kdf.salz), d.kdf.iterationen), ausBase64(d.chiffre.nonce), utf8(ZUSATZ)).decrypt(ausBase64(d.daten));
+    klar = gcm(k, ausBase64(d.chiffre.nonce), utf8(ZUSATZ)).decrypt(ausBase64(d.daten));
   } catch {
     throw new SicherungsFehler("passwort");
   }
   const klartext = ausUtf8(klar);
-  if (d.version === 1) return { stand: standAus(klartext), dateien: {} };
+  if (d.version === 1) return { stand: standAus(klartext), dateien: {}, schluessel: k };
   const roh = JSON.parse(klartext) as { stand?: unknown; dateien?: unknown };
   const dateien: Dateien = {};
   if (roh.dateien && typeof roh.dateien === "object") for (const [k, v] of Object.entries(roh.dateien as Record<string, unknown>)) if (typeof v === "string" && /^[\w.-]+$/.test(k)) dateien[k] = v;
-  return { stand: standAus(JSON.stringify(roh.stand ?? null)), dateien };
+  return { stand: standAus(JSON.stringify(roh.stand ?? null)), dateien, schluessel: k };
+}
+
+/** Kennung eines Sicherungsschlüssels (aus dem Salz) – Ordnername der Belegdateien in iCloud. */
+export const schluesselKennung = (salz: Uint8Array) => Array.from(salz.subarray(0, 6), (b) => b.toString(16).padStart(2, "0")).join("");
+
+/** Salz und Runden aus einer Sicherungsdatei (ohne Passwort) – null, wenn es keine ist. */
+export function sicherungsKdf(text: string): { salz: Uint8Array; iterationen: number } | null {
+  try {
+    const d = JSON.parse(text) as Partial<Datei>;
+    return d.format === SICHERUNG_FORMAT && d.kdf?.salz && d.kdf.iterationen > 0 ? { salz: ausBase64(d.kdf.salz), iterationen: d.kdf.iterationen } : null;
+  } catch {
+    return null;
+  }
+}
+
+const DATEI_ZUSATZ = `${SICHERUNG_FORMAT}-datei:1`;
+
+/** Eine Belegdatei für die iCloud-Sicherung verschlüsseln (Schlüssel der Sicherung, eigener Zusatz). */
+export function sicherungsDatei(bytes: Uint8Array, k: Uint8Array, zufall: (n: number) => Uint8Array): string {
+  const nonce = zufall(12);
+  return JSON.stringify({ format: `${SICHERUNG_FORMAT}-datei`, version: 1, nonce: base64(nonce), daten: base64(gcm(k, nonce, utf8(DATEI_ZUSATZ)).encrypt(bytes)) });
+}
+
+/** Belegdatei aus der iCloud-Sicherung öffnen; null, wenn sie nicht passt. */
+export function sicherungsDateiLesen(text: string, k: Uint8Array): Uint8Array | null {
+  try {
+    const d = JSON.parse(text) as { format?: string; nonce?: string; daten?: string };
+    if (d.format !== `${SICHERUNG_FORMAT}-datei` || !d.nonce || !d.daten) return null;
+    return gcm(k, ausBase64(d.nonce), utf8(DATEI_ZUSATZ)).decrypt(ausBase64(d.daten));
+  } catch {
+    return null;
+  }
 }
 
 /** Dateiname mit Datum, ohne Angaben zum Betrieb. */

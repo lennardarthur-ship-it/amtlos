@@ -106,8 +106,9 @@ function PflichtZeile({ p, letzte, erledigt }: { p: PflichtInfo; letzte: boolean
   return (
     <Zeile
       links={<Symbol name={erledigt ? "checkmark.circle.fill" : p.schwere === "hoch" ? "exclamationmark.circle" : "circle"} groesse={22} farbe={erledigt ? f.amt : p.schwere === "hoch" ? f.bald : f.tinteLeise} />}
+      // „Wichtig“ steckt sonst nur im Symbol – für VoiceOver mit ansagen
       titel={p.titel}
-      text={unter}
+      text={!erledigt && p.schwere === "hoch" && unter !== TEXT.wichtig ? `${TEXT.wichtig} · ${unter}` : unter}
       onPress={() => nav.oeffnen(`pflicht-${p.id}`, () => <PflichtDetail id={p.id} />, true)}
       letzte={letzte}
     />
@@ -185,7 +186,7 @@ function PflichtenInhalt() {
         );
       })}
       {sonst.length ? (
-        <Gruppe titel="Weitere">
+        <Gruppe titel={TEXT.weitere_pflichten}>
           <Karte>
             {sonst.map((p, i) => (
               <PflichtZeile key={p.id} p={p} erledigt={fertig(p)} letzte={i === sonst.length - 1} />

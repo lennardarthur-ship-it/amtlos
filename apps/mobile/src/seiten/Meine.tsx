@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ScrollView, View } from "react-native";
 import { T as TEXT } from "../texte";
+import { RAND } from "../ui/thema";
 import { Karte, Knopf, Symbol, T, TextKnopf, Wahl } from "../ui/bausteine";
 import { useNav } from "../ui/navigation";
 import { useFarben } from "../ui/thema";
@@ -25,10 +26,12 @@ function OffeneKarte({ anzahl, cent, aktiv, onPress }: { anzahl: number; cent: n
         <T fett>{anzahl ? TEXT.offene_summe(anzahl, euroText(cent)) : TEXT.alles_bezahlt}</T>
         {anzahl ? <T v="caption" leise>{TEXT.offene_hilfe}</T> : null}
       </View>
-      {anzahl ? <Knopf ton text={aktiv ? TEXT.filter.alle : TEXT.filter.offen} onPress={onPress} stil={{ minHeight: 36, paddingHorizontal: 12 }} /> : null}
+      {anzahl ? <Knopf ton text={aktiv ? TEXT.filter.alle : TEXT.filter.offen} onPress={onPress} stil={{ minHeight: 44, paddingHorizontal: 12 }} /> : null}
     </Karte>
   );
 }
+
+const SCHRITT = 50;
 
 /** Alle angelegten Unterlagen, zuletzt bearbeitete zuerst; Filter und Suche, sobald es sich lohnt. */
 export function Meine() {
@@ -39,6 +42,8 @@ export function Meine() {
   const starten = useStarten();
   const [filter, setFilter] = useState<Filter>("alle");
   const [suche, setSuche] = useState("");
+  // viele Unterlagen: in Schritten zeigen, damit die Liste flüssig bleibt
+  const [zeigen, setZeigen] = useState(SCHRITT);
   const alle = sortiert(stand);
   const verfuegbar = filterVerfuegbar(alle, stand.belege.length);
   const aktiv: Filter = verfuegbar.includes(filter) ? filter : "alle";
@@ -58,18 +63,21 @@ export function Meine() {
             </View>
           ) : null}
           {verfuegbar.length > 1 ? (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12, marginHorizontal: -RAND }} contentContainerStyle={{ paddingHorizontal: RAND }}>
               <Wahl wert={aktiv} aendern={setFilter} optionen={verfuegbar.map((w) => ({ wert: w, text: TEXT.filter[w] }))} />
             </ScrollView>
           ) : null}
           {liste.length ? (
             <Karte>
-              {liste.map((u, i) => (
-                <UnterlageZeile key={u.id} u={u} letzte={i === liste.length - 1} onPress={() => oeffnen(u.id)} />
+              {liste.slice(0, zeigen).map((u, i, l) => (
+                <UnterlageZeile key={u.id} u={u} letzte={i === l.length - 1} onPress={() => oeffnen(u.id)} />
               ))}
             </Karte>
           ) : !belege.length ? (
             <T leise stil={{ marginTop: 8 }}>{TEXT.meine_nichts}</T>
+          ) : null}
+          {liste.length > zeigen ? (
+            <TextKnopf symbol="chevron.down" text={TEXT.weitere_zeigen(Math.min(SCHRITT, liste.length - zeigen))} onPress={() => setZeigen((n) => n + SCHRITT)} stil={{ marginLeft: 4, marginTop: 4 }} />
           ) : null}
           {belegeGezeigt.length ? (
             <Gruppe titel={aktiv === "alle" ? TEXT.belege_titel : undefined}>

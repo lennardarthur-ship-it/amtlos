@@ -8,13 +8,13 @@ import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from "react-native-
 import { Betrieb } from "./seiten/Betrieb";
 import { ErinnerungsPlaner, PflichtenTab } from "./seiten/Pflichten";
 import { Meine } from "./seiten/Meine";
-import { AutoSicherung } from "./seiten/Sicherung";
+import { AutoSicherung, WiederherstellenSeite } from "./seiten/Sicherung";
 import { Unterlagen } from "./seiten/Unterlagen";
 import { T as TEXT } from "./texte";
-import { Knopf, Symbol, T } from "./ui/bausteine";
+import { Karte, Knopf, Symbol, T, TextKnopf } from "./ui/bausteine";
 import { MeldungAnbieter } from "./ui/meldung";
 import { entsperren } from "./unterlagen/sperre";
-import { Stapel } from "./ui/navigation";
+import { Stapel, useNav } from "./ui/navigation";
 import { TASTATUR_FERTIG, ZIEL, istIos, useFarben } from "./ui/thema";
 import { AmtlosAnbieter, useAmtlos, type Tab } from "./zustand";
 import { KontoAnbieter } from "./konto/konto";
@@ -109,6 +109,13 @@ function Rahmen() {
         <ActivityIndicator color={f.amt} accessibilityLabel={TEXT.app} />
       </View>
     );
+  // Daten unlesbar: nichts bearbeiten lassen, was sich nicht speichern ließe – erst klären (E-129)
+  if (ladefehler)
+    return (
+      <View style={{ flex: 1, backgroundColor: f.papier }}>
+        <Stapel zuruecksetzen={0} wurzel={<SafeAreaView style={{ flex: 1 }}><LadefehlerSeite /></SafeAreaView>} />
+      </View>
+    );
   // Besuchte Tabs bleiben eingehängt, damit Unterseiten und Scrollposition beim Wechseln erhalten bleiben
   return (
     <View style={{ flex: 1, backgroundColor: f.papier }}>
@@ -131,13 +138,36 @@ function Rahmen() {
         );
       })}
       {voll[tab] ? null : <Leiste tab={tab} setTab={setTab} />}
-      {ladefehler ? (
-        <SafeAreaView edges={["top"]} style={{ position: "absolute", top: 0, left: 0, right: 0 }} pointerEvents="box-none">
-          <View accessibilityRole="alert" style={{ margin: 12, padding: 12, borderRadius: 10, backgroundColor: f.fristHauch }}>
-            <T v="klein" fett farbe={f.frist}>{TEXT.ladefehler}</T>
+    </View>
+  );
+}
+
+/** Gespeicherte Daten ließen sich nicht lesen: noch einmal versuchen, Sicherung wiederherstellen oder neu beginnen. */
+function LadefehlerSeite() {
+  const z = useAmtlos();
+  const nav = useNav();
+  const f = useFarben();
+  const [laedt, setLaedt] = useState(false);
+  const [frage, setFrage] = useState(false);
+  return (
+    <View style={{ flex: 1, padding: 20, gap: 14, justifyContent: "center" }}>
+      <Symbol name="exclamationmark.triangle" groesse={36} farbe={f.frist} />
+      <T v="titel" accessibilityRole="header">{TEXT.ladefehler_titel}</T>
+      <T>{TEXT.ladefehler}</T>
+      <Knopf text={TEXT.ladefehler_nochmal} symbol="arrow.clockwise" laedt={laedt} onPress={() => { setLaedt(true); void z.neuLaden().finally(() => setLaedt(false)); }} />
+      <Knopf ton text={TEXT.wiederherstellen} symbol="arrow.clockwise" onPress={() => nav.oeffnen("wiederherstellen", () => <WiederherstellenSeite />, true)} />
+      {frage ? (
+        <Karte stil={{ paddingVertical: 14, gap: 10 }}>
+          <T fett>{TEXT.ladefehler_neu_wirklich}</T>
+          <T v="klein" leise>{TEXT.ladefehler_neu_text}</T>
+          <View style={{ flexDirection: "row", gap: 10 }}>
+            <Knopf gefahr text={TEXT.ladefehler_neu} onPress={() => void z.neuBeginnen()} stil={{ flex: 1 }} />
+            <Knopf ton text={TEXT.abbrechen} onPress={() => setFrage(false)} stil={{ flex: 1 }} />
           </View>
-        </SafeAreaView>
-      ) : null}
+        </Karte>
+      ) : (
+        <TextKnopf gefahr symbol="trash" text={TEXT.ladefehler_neu} onPress={() => setFrage(true)} />
+      )}
     </View>
   );
 }

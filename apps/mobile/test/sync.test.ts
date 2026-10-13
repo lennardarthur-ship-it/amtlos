@@ -4,7 +4,7 @@ import type { Beleg } from "@amtlos/fachlogik";
 import { SyncFehler, huelleErstellen, huelleOeffnen, standEntschluesseln, standVerschluesseln, syncInhalt, syncZusammenfuehren, synchronisieren, zufallsSchluessel, type SyncUmgebung, type TresorApi } from "../src/konto/sync";
 import { fehlerAusStatus, tresorServer } from "../src/konto/api";
 import { DATENSCHUTZ, datenschutzAbschnitte } from "../src/rechtliches";
-import { LEERER_STAND, anlegen, ausgeben, belegLoeschen, belegSetzen, betriebSetzen, felderSetzen, loeschen, personLoeschen, personSetzen, standAus, type Stand } from "../src/unterlagen/speicher";
+import { LEERER_STAND, anlegen, ausgeben, bezahltSetzen, stornieren, zusammenfuehren, belegLoeschen, belegSetzen, betriebSetzen, felderSetzen, loeschen, personLoeschen, personSetzen, standAus, type Stand } from "../src/unterlagen/speicher";
 
 const zufall = (n: number) => new Uint8Array(randomBytes(n));
 const IT = 1000;
@@ -88,9 +88,55 @@ describe("Zusammenführen zweier Geräte (E-134)", () => {
     const z = syncZusammenfuehren(entwurfSpaeter, fest).stand;
     expect(z.unterlagen[0]?.festgeschrieben).toBeTruthy();
     expect(z.unterlagen[0]?.daten.kunde_name).not.toBe("Anders");
-    const bezahlt = { ...fest, unterlagen: fest.unterlagen.map((u) => ({ ...u, bezahlt: "2026-10-06" })) };
+    const bezahlt = bezahltSetzen(fest, "r1", "2026-10-06", t("2026-10-06"));
     expect(syncZusammenfuehren(fest, bezahlt).stand.unterlagen[0]?.bezahlt).toBe("2026-10-06");
     expect(syncZusammenfuehren(bezahlt, fest).stand.unterlagen[0]?.bezahlt).toBe("2026-10-06");
+  });
+
+  it("entfernte Zahlung und verworfener Storno-Entwurf kommen nicht zurück", () => {
+    let s = ausgeben(anlegen(betriebSetzen(LEERER_STAND, B), "rechnung", t("2026-10-01"), "r1")[0], "r1", t("2026-10-02"));
+    s = bezahltSetzen(s, "r1", "2026-10-03", t("2026-10-03"));
+    s = stornieren(s, "r1", t("2026-10-04"), "st")[0];
+    const server = s;
+    // auf dem Gerät: Storno-Entwurf verwerfen, Zahlung entfernen
+    let lokal = loeschen(s, "st");
+    lokal = bezahltSetzen(lokal, "r1", null, new Date(Date.now() + 1000));
+    for (const z of [syncZusammenfuehren(lokal, server).stand, syncZusammenfuehren(server, lokal).stand]) {
+      const r = z.unterlagen.find((u) => u.id === "r1")!;
+      expect(r.bezahlt).toBeUndefined();
+      expect(r.storniertDurch).toBeUndefined();
+      expect(z.unterlagen.some((u) => u.id === "st")).toBe(false);
+    }
+    // Wiederherstellen einer älteren Sicherung bringt sie ebenfalls nicht zurück
+    const w = zusammenfuehren(lokal, server).stand.unterlagen.find((u) => u.id === "r1")!;
+    expect(w.bezahlt).toBeUndefined();
+  });
+
+  it("Storno auf einem Gerät, Zahlung auf dem anderen: beides bleibt erhalten – in jeder Richtung", () => {
+    const basis = ausgeben(anlegen(betriebSetzen(LEERER_STAND, B), "rechnung", t("2026-10-01"), "r1")[0], "r1", t("2026-10-02"));
+    let a = stornieren(basis, "r1", t("2026-10-05"), "st")[0];
+    a = ausgeben(a, "st", t("2026-10-05"));
+    const b = bezahltSetzen(basis, "r1", "2026-10-06", t("2026-10-06"));
+    for (const z of [syncZusammenfuehren(a, b).stand, syncZusammenfuehren(b, a).stand, zusammenfuehren(a, b).stand, zusammenfuehren(b, a).stand]) {
+      const r = z.unterlagen.find((u) => u.id === "r1")!;
+      expect(r.storniertDurch).toBe("st");
+      expect(r.bezahlt).toBe("2026-10-06");
+      expect(z.unterlagen.find((u) => u.id === "st")?.festgeschrieben).toBeTruthy();
+    }
+  });
+
+  it("Zahlung aus einer älteren Sicherung ohne Zeitstempel geht nicht verloren", () => {
+    const fest = ausgeben(anlegen(betriebSetzen(LEERER_STAND, B), "rechnung", t("2026-10-01"), "r1")[0], "r1", t("2026-10-02"));
+    const alt = { ...fest, unterlagen: fest.unterlagen.map((u) => ({ ...u, bezahlt: "2026-10-04" })) };
+    expect(zusammenfuehren(fest, alt).stand.unterlagen[0]?.bezahlt).toBe("2026-10-04");
+    expect(syncZusammenfuehren(fest, alt).stand.unterlagen[0]?.bezahlt).toBe("2026-10-04");
+  });
+
+  it("Wiederherstellen: festgeschriebene Fassung aus der Sicherung schlägt den Entwurf auf dem Gerät", () => {
+    const entwurf = anlegen(betriebSetzen(LEERER_STAND, B), "rechnung", t("2026-10-01"), "r1")[0];
+    const fest = ausgeben(entwurf, "r1", t("2026-10-02"));
+    expect(zusammenfuehren(entwurf, fest).stand.unterlagen[0]?.festgeschrieben).toBeTruthy();
+    expect(zusammenfuehren(fest, entwurf).stand.unterlagen[0]?.festgeschrieben).toBeTruthy();
   });
 
   it("Betrieb geht nach der letzten Änderung; Gerätegebundenes bleibt lokal; doppelte Nummern werden gemeldet", () => {

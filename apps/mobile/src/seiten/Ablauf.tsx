@@ -207,12 +207,12 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
   const letzteZahl = ergebnis.at(-1);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: f.papier }} edges={["top", "left", "right"]}>
-      <View style={{ height: 48, flexDirection: "row", alignItems: "center", paddingHorizontal: RAND - 8 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: f.papier }} edges={["top", "left", "right"]} onAccessibilityEscape={nav.zurueck}>
+      <View style={{ minHeight: 48, flexDirection: "row", alignItems: "center", paddingHorizontal: RAND - 8 }}>
         <Pressable accessibilityRole="button" accessibilityLabel={TEXT.schliessen} onPress={nav.zurueck} hitSlop={8} style={{ width: ZIEL, height: ZIEL, alignItems: "center", justifyContent: "center" }}>
           <Symbol name="xmark" groesse={20} farbe={f.tinte} gewicht="semibold" />
         </Pressable>
-        <T v="klein" fett numberOfLines={1} stil={{ flex: 1, textAlign: "center" }}>{vorlage.titel}</T>
+        <T v="klein" fett numberOfLines={2} accessibilityRole="header" stil={{ flex: 1, textAlign: "center", paddingVertical: 4 }}>{vorlage.titel}</T>
         <View style={{ minWidth: ZIEL, alignItems: "flex-end" }}>
           {amAbschluss || fest ? null : (
             <Pressable accessibilityRole="button" onPress={() => gehe(n)} hitSlop={8} style={{ height: ZIEL, justifyContent: "center", paddingHorizontal: 4 }}>
@@ -225,14 +225,17 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
       <KeyboardAvoidingView behavior={istIos ? "padding" : undefined} style={{ flex: 1 }}>
         <ScrollView key={schritt} contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 8, paddingBottom: 32 }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive">
           {amAbschluss ? (
-            <Abschluss id={id} springen={gehe} fehler={teilen.fehler} drucken={teilen.drucken} eRechnung={teilen.eRechnung} eFehlt={teilen.eFehlt} />
+            <Abschluss id={id} springen={gehe} fehler={null} drucken={teilen.drucken} eRechnung={teilen.eRechnung} eFehlt={teilen.eFehlt} />
           ) : (
             <Schritt v={vorlage} a={vorlage.abschnitte[schritt]!} index={schritt} id={id} daten={daten} fehlt={fehlt} />
           )}
         </ScrollView>
         <Fuss
           ueber={
-            !amAbschluss && letzteZahl ? (
+            amAbschluss && teilen.fehler ? (
+              // direkt über dem Knopf – oben im Inhalt sähe man den Hinweis nach dem Scrollen nicht
+              <T v="klein" fett farbe={f.frist} accessibilityRole="alert">{teilen.fehler}</T>
+            ) : !amAbschluss && letzteZahl && !/^0,00\s/.test(letzteZahl[1]) ? (
               <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                 <T v="klein" leise>{letzteZahl[0]}</T>
                 <T v="klein" fett stil={{ fontVariant: ["tabular-nums"] }}>{letzteZahl[1]}</T>

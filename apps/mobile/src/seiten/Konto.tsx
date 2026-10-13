@@ -75,7 +75,8 @@ export function KontoSeite() {
     }
   };
 
-  const fehler = k.fehler && !(k.fehler === "passwort" && falsch) ? <Hinweis art="fehler" text={TEXT.konto_fehler[k.fehler]} /> : null;
+  const fehlerText = k.fehler === "netz" && k.fehlerBeiHandlung ? TEXT.konto_fehler.netz_aktion : k.fehler ? TEXT.konto_fehler[k.fehler] : "";
+  const fehler = k.fehler && !(k.fehler === "passwort" && falsch) ? <Hinweis art="fehler" text={fehlerText} /> : null;
   let inhalt: React.ReactNode;
   let fuss: React.ReactNode = null;
 
@@ -102,7 +103,7 @@ export function KontoSeite() {
         <View>
           <T fett accessibilityRole="header" stil={{ marginTop: 8 }}>{TEXT.konto_verbinden_titel}</T>
           <T leise stil={{ marginTop: 4 }}>{TEXT.konto_verbinden_text}</T>
-          <Feld label={TEXT.passwort} wert={pw} aendern={(w) => { setPw(w); setFalsch(false); }} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="password" fehler={falsch ? TEXT.konto_fehler.passwort : null} />
+          <Feld label={TEXT.konto_passwort} wert={pw} aendern={(w) => { setPw(w); setFalsch(false); }} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="password" fehler={falsch ? TEXT.konto_fehler.passwort : null} />
           {fehler}
         </View>
       );
@@ -131,7 +132,7 @@ export function KontoSeite() {
         <View>
           <T fett accessibilityRole="header" stil={{ marginTop: 8 }}>{TEXT.konto_einrichten_titel}</T>
           <T leise stil={{ marginTop: 4 }}>{TEXT.konto_einrichten_text}</T>
-          <NeuesPasswort label={TEXT.passwort} setzen={setNeuPw} />
+          <NeuesPasswort label={TEXT.konto_passwort} setzen={setNeuPw} />
           <View style={{ marginTop: 14 }}>
             <Hinweis text={TEXT.konto_passwort_warnung} symbol="key" />
             {fehler}
