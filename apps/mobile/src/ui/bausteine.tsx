@@ -13,7 +13,7 @@ type Variante = "grossTitel" | "titel" | "gross" | "basis" | "klein" | "caption"
 const STIL: Record<Variante, TextStyle> = {
   grossTitel: { fontSize: GROESSE.grossTitel, lineHeight: 37, fontFamily: SCHRIFT.display, letterSpacing: -1 },
   titel: { fontSize: GROESSE.titel, lineHeight: 31, fontFamily: SCHRIFT.bold, letterSpacing: -0.7 },
-  gross: { fontSize: GROESSE.gross, lineHeight: 25, fontFamily: SCHRIFT.bold, letterSpacing: -0.35 },
+  gross: { fontSize: 19, lineHeight: 24, fontFamily: SCHRIFT.bold, letterSpacing: -0.3 },
   basis: { fontSize: GROESSE.basis, lineHeight: 24, fontFamily: SCHRIFT.regular, letterSpacing: -0.1 },
   klein: { fontSize: GROESSE.klein, lineHeight: 21, fontFamily: SCHRIFT.regular },
   caption: { fontSize: GROESSE.caption, lineHeight: 18, fontFamily: SCHRIFT.regular },
@@ -217,7 +217,8 @@ export function Knopf({ text, onPress, leise, ton, gefahr, buehne, deaktiviert, 
         stil,
       ]}
     >
-      {laedt ? <ActivityIndicator color={schrift} /> : symbol ? <Symbol name={symbol} groesse={18} farbe={schrift} gewicht="semibold" /> : null}
+      {/* Knöpfe tragen Text – Symbole nur, wo sie eine feste Bedeutung haben (Teilen, Face ID) */}
+      {laedt ? <ActivityIndicator color={schrift} /> : symbol && KNOPF_SYMBOLE.has(symbol) ? <Symbol name={symbol} groesse={18} farbe={schrift} gewicht="semibold" /> : null}
       {/* der Text bleibt beim Laden stehen („Wird verschlüsselt …“) */}
       <RNText style={{ fontFamily: SCHRIFT.halb, fontSize: GROESSE.basis, letterSpacing: 0.1, color: schrift, textAlign: "center", flexShrink: 1 }}>{text}</RNText>
     </Pressable>
@@ -227,17 +228,17 @@ export function Knopf({ text, onPress, leise, ton, gefahr, buehne, deaktiviert, 
 /** Schnellzugriff als Kachel: Symbol oben, Beschriftung darunter – zwei nebeneinander. */
 export function SchnellKachel({ symbol, text, onPress, ton = "amt" }: { symbol: string; text: string; onPress: () => void; ton?: Ton }) {
   const f = useFarben();
-  const t = tonFarben(f, ton);
-  // farbige Fläche in der Zweitfarbe, Symbol auf weißem Kreis – Kategorien erkennt man an der Farbe, lesen am Wort
+  void ton;
+  // ruhige Fläche, ein Symbol in Amtsgrün, das Wort – keine Bonbonfarben
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={text} onPress={onPress} style={({ pressed }) => ({ flex: 1, minHeight: 112, padding: 14, borderRadius: RADIUS.karte, backgroundColor: t.grund, justifyContent: "space-between", gap: 14, opacity: pressed ? 0.75 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] })}>
-      <View style={{ width: 38, height: 38, borderRadius: 19, backgroundColor: f.papier, alignItems: "center", justifyContent: "center" }}>
-        <Symbol name={symbol} groesse={19} farbe={t.zeichen} gewicht="semibold" />
-      </View>
+    <Pressable accessibilityRole="button" accessibilityLabel={text} onPress={onPress} style={({ pressed }) => ({ flex: 1, minHeight: 104, padding: 16, borderRadius: RADIUS.karte, backgroundColor: pressed ? f.flaeche : f.blatt, justifyContent: "space-between", gap: 14 })}>
+      <Symbol name={symbol} groesse={22} farbe={f.amt} gewicht="medium" />
       <T fett stil={{ letterSpacing: -0.2 }}>{text}</T>
     </Pressable>
   );
 }
+
+const KNOPF_SYMBOLE = new Set(["square.and.arrow.up", "faceid"]);
 
 /** Handlung als Text (Links, „Entfernen“, „Weitere Angaben“) – ohne Rahmen, 44 pt Tippfläche. */
 export function TextKnopf({ text, onPress, symbol, gefahr, leise, stil, label }: { text: string; onPress: () => void; symbol?: string; gefahr?: boolean; leise?: boolean; stil?: StyleProp<ViewStyle>; label?: string }) {
@@ -245,7 +246,7 @@ export function TextKnopf({ text, onPress, symbol, gefahr, leise, stil, label }:
   const farbe = gefahr ? f.frist : leise ? f.tinteLeise : f.amt;
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={label ?? text} onPress={onPress} hitSlop={4} style={({ pressed }) => [{ minHeight: 44, flexDirection: "row", alignItems: "center", gap: 7, alignSelf: "flex-start", opacity: pressed ? 0.55 : 1 }, stil]}>
-      {symbol ? <Symbol name={symbol} groesse={16} farbe={farbe} gewicht="semibold" /> : null}
+      {symbol && symbol.startsWith("chevron") ? <Symbol name={symbol} groesse={13} farbe={farbe} gewicht="bold" /> : null}
       <T v="klein" fett farbe={farbe}>{text}</T>
     </Pressable>
   );
@@ -286,11 +287,11 @@ export function KopfKnopf({ symbol, label, onPress }: { symbol: string; label: s
 }
 
 /** Zeile mit Kennzahl-Symbol und einem Satz – für Ergebnisse („Für 15 davon gibt es eine Vorlage“). */
-export function Fakt({ symbol, ton, text, letzte }: { symbol: string; ton?: Ton; text: string; letzte?: boolean }) {
+export function Fakt({ symbol: _symbol, ton, text, letzte }: { symbol: string; ton?: Ton; text: string; letzte?: boolean }) {
   const f = useFarben();
   return (
     <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
-      <Kachel symbol={symbol} ton={ton} groesse={30} />
+      <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: tonFarben(f, ton ?? "amt").zeichen }} />
       <View style={{ flex: 1, paddingVertical: 12, borderBottomWidth: letzte ? 0 : HAARLINIE, borderColor: f.linie }}>
         <T v="klein">{text}</T>
       </View>
@@ -347,7 +348,10 @@ export function Abschnitt({ titel, rechts, children }: { titel?: string; rechts?
  */
 export function Zeile({ links, symbol, ton, titel, text, wert, marke, rechts, onPress, letzte }: { links?: ReactNode; symbol?: string; ton?: Ton; titel: string; text?: string; wert?: string; marke?: { text: string; ton: Ton }; rechts?: ReactNode; onPress?: () => void; letzte?: boolean }) {
   const f = useFarben();
-  const vorn = symbol ? <Kachel symbol={symbol} ton={ton} /> : links;
+  // keine Symbolkreise vor Listenzeilen – nur, wo das Element selbst Information trägt (Fristblatt, Status, Initialen)
+  void symbol;
+  void ton;
+  const vorn = links;
   const inhalt = (pressed: boolean) => (
     <View style={{ flexDirection: "row", alignItems: "center", opacity: pressed ? 0.55 : 1 }}>
       {vorn ? <View style={{ marginRight: 14, minWidth: 24, alignItems: "center" }}>{vorn}</View> : null}
@@ -396,12 +400,14 @@ export function Hinweis({ text, art = "info", symbol }: { text: string; art?: "i
   useEffect(() => {
     if (art === "fehler" || art === "erfolg") AccessibilityInfo.announceForAccessibility(text);
   }, [art, text]);
+  // neutrale Hinweise ohne Kasten (ruhig, wie eine Fußnote); Warnung, Fehler, Erfolg mit Fläche
+  const kasten = art !== "info";
   return (
-    <View accessibilityRole={art === "fehler" ? "alert" : "text"} accessibilityLiveRegion="polite" style={{ flexDirection: "row", gap: 11, alignItems: "flex-start", backgroundColor: hg, borderRadius: RADIUS.klein, paddingVertical: 12, paddingHorizontal: 14, marginVertical: 6 }}>
+    <View accessibilityRole={art === "fehler" ? "alert" : "text"} accessibilityLiveRegion="polite" style={{ flexDirection: "row", gap: 10, alignItems: "flex-start", backgroundColor: kasten ? hg : "transparent", borderRadius: RADIUS.klein, paddingVertical: kasten ? 12 : 4, paddingHorizontal: kasten ? 14 : 0, marginVertical: 6 }}>
       <View style={{ paddingTop: 2 }}>
         <Symbol name={symbol ?? (art === "fehler" ? "exclamationmark.triangle" : art === "erfolg" ? "checkmark.circle" : art === "warnung" ? "exclamationmark.circle" : "info.circle")} groesse={17} farbe={farbe} gewicht="semibold" />
       </View>
-      <T v="klein" stil={{ flex: 1 }}>{text}</T>
+      <T v="klein" leise={!kasten} stil={{ flex: 1 }}>{text}</T>
     </View>
   );
 }
@@ -548,9 +554,9 @@ function Chip({ text, an, rolle, onPress, kaestchen }: { text: string; an: boole
         if (istIos) void Haptics.selectionAsync();
         onPress();
       }}
-      style={({ pressed }) => ({ minHeight: 40, paddingLeft: an || kaestchen ? 11 : 15, paddingRight: 15, borderRadius: 20, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: an ? f.amt : pressed ? f.flaeche : f.papier, borderWidth: an ? 0 : 1, borderColor: f.rahmen, margin: an ? 1 : 0, flexShrink: 1 })}
+      style={({ pressed }) => ({ minHeight: 40, paddingLeft: kaestchen ? 11 : 16, paddingRight: 16, borderRadius: 20, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: an ? f.amt : pressed ? f.flaeche : f.papier, borderWidth: an ? 0 : 1, borderColor: f.rahmen, margin: an ? 1 : 0, flexShrink: 1 })}
     >
-      {kaestchen ? <Symbol name={an ? "checkmark.square.fill" : "square"} groesse={16} farbe={an ? f.amtText : f.tinteLeise} /> : an ? <Symbol name="checkmark" groesse={13} farbe={f.amtText} gewicht="bold" /> : null}
+      {kaestchen ? <Symbol name={an ? "checkmark.square.fill" : "square"} groesse={16} farbe={an ? f.amtText : f.tinteLeise} /> : null}
       <T v="klein" fett farbe={an ? f.amtText : f.tinte} stil={{ flexShrink: 1 }}>{text}</T>
     </Pressable>
   );

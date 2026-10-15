@@ -287,7 +287,6 @@ function Zahlung({ id }: { id: string }) {
   return (
     <Karte stil={{ marginTop: 12, paddingVertical: 14, gap: 10 }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-        <Kachel symbol={u.bezahlt ? "checkmark.circle.fill" : faellig && faellig < heute() ? "exclamationmark.circle" : "clock"} ton={u.bezahlt ? "amt" : faellig && faellig < heute() ? "frist" : "bald"} groesse={30} />
         <View style={{ flex: 1 }}>
           <T fett>{u.bezahlt ? (erstattung ? TEXT.erstattet_am(datumDe(u.bezahlt)) : TEXT.bezahlt_am(datumDe(u.bezahlt))) : TEXT.offen_zahlung}</T>
           {/* Fälligkeit nach dem Zahlungsziel der Rechnung – überfällig in Rot */}

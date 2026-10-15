@@ -3,7 +3,7 @@ import { ActivityIndicator, Linking, Pressable, ScrollView, View } from "react-n
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LINKS } from "../rechtliches";
 import { T as TEXT } from "../texte";
-import { Betrag, Fuss, Hinweis, Kachel, Karte, Knopf, KopfKnopf, Motiv, Symbol, T, TextKnopf } from "../ui/bausteine";
+import { Betrag, Fuss, Hinweis, Karte, Knopf, KopfKnopf, Motiv, Symbol, T, TextKnopf } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { useNav } from "../ui/navigation";
 import { HAARLINIE, RADIUS, RAND, schattenStil, useFarben } from "../ui/thema";
@@ -16,7 +16,6 @@ import { DatenschutzSeite } from "./Recht";
 /** „Synchronisation“ nur zeigen, wenn dieser Build einen Server hat (E-134). */
 const VORTEILE = PRO_VORTEILE.filter((v) => v !== "sync" || syncAngeboten);
 
-const VORTEIL_SYMBOL: Record<ProFunktion, string> = { pdf: "doc.on.doc", e_rechnung: "doc.text", ust_uebernahme: "percent", steuerberater: "briefcase", icloud: "icloud", sync: "arrow.triangle.2.circlepath", briefkopf: "paintpalette" };
 
 /**
  * Bezahlschirm (E-132): warum Pro, was Pro bringt, Angebote aus dem Store. Ohne Store-Anbindung (Testpaket) lässt
@@ -96,9 +95,9 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
         <Karte stil={{ marginTop: 16 }}>
           {/* der Grund, aus dem der Bezahlschirm aufging, steht oben */}
           {(grund ? [grund, ...VORTEILE.filter((x) => x !== grund)] : VORTEILE).map((v, i, l) => (
-            <View key={v} style={{ flexDirection: "row", gap: 14, alignItems: "flex-start" }}>
-              <View style={{ paddingTop: 14 }}>
-                <Kachel symbol={VORTEIL_SYMBOL[v]} ton={(["amt", "lila", "blau", "gold"] as const)[i % 4]} />
+            <View key={v} style={{ flexDirection: "row", gap: 12, alignItems: "flex-start" }}>
+              <View style={{ paddingTop: 17 }}>
+                <Symbol name="checkmark" groesse={15} farbe={f.amt} gewicht="bold" />
               </View>
               <View style={{ flex: 1, paddingVertical: 14, borderBottomWidth: i === l.length - 1 ? 0 : HAARLINIE, borderColor: f.linie }}>
                 <T fett>{TEXT.pro_vorteil[v].titel}</T>
@@ -179,7 +178,6 @@ export function ProZeile() {
     <Pressable accessibilityRole="button" onPress={() => nav.oeffnen("pro", () => <ProSeite />, true)} style={({ pressed }) => ({ marginTop: 16, opacity: pressed ? 0.75 : 1 })}>
       {/* ruhige Karte wie die übrigen – die lauteste Fläche des Bildschirms soll nicht die Werbung sein */}
       <View style={[{ flexDirection: "row", alignItems: "center", gap: 14, padding: 14, borderRadius: RADIUS.karte, backgroundColor: f.blatt, borderWidth: 0 }, schattenStil(f)]}>
-        <Kachel symbol="checkmark.seal.fill" />
         <View style={{ flex: 1 }}>
           <T fett>{z.pro ? TEXT.pro_aktiv : TEXT.pro_titel}</T>
           <T v="klein" leise>{z.pro ? TEXT.pro_aktiv_text : TEXT.pro_rest(rest, FREI_JE_MONAT)}</T>

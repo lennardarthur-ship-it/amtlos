@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { ScrollView, View } from "react-native";
 import { T as TEXT } from "../texte";
 import { RAND } from "../ui/thema";
-import { Betrag, Kachel, Karte, Knopf, T, TextKnopf, Wahl } from "../ui/bausteine";
+import { Betrag, Karte, Knopf, T, TextKnopf, Wahl } from "../ui/bausteine";
 import { useNav } from "../ui/navigation";
 import { useFarben } from "../ui/thema";
 import { belegeFiltern, euroText, rechnungBrutto, filterVerfuegbar, filtern, offeneSumme, rechnungenSortiert, type Filter } from "../unterlagen/ablage";
@@ -23,7 +23,6 @@ function OffeneKarte({ anzahl, ueberfaellig, cent, aktiv, onPress }: { anzahl: n
   const f = useFarben();
   return (
     <Karte stil={{ marginBottom: 16, paddingVertical: 14, flexDirection: "row", alignItems: "center", gap: 14, backgroundColor: aktiv ? f.baldHauch : f.blatt }}>
-      <Kachel symbol={ueberfaellig ? "exclamationmark.circle" : anzahl ? "clock" : "checkmark.circle.fill"} ton={ueberfaellig ? "frist" : anzahl ? "bald" : "amt"} />
       <View style={{ flex: 1 }}>
         <T fett>{anzahl ? TEXT.offene_summe(anzahl, euroText(cent)) : TEXT.alles_bezahlt}</T>
         {anzahl ? <T v="caption" leise farbe={ueberfaellig ? f.frist : undefined}>{ueberfaellig ? TEXT.davon_ueberfaellig(ueberfaellig) : TEXT.offene_hilfe}</T> : null}

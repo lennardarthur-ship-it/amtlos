@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Linking, View } from "react-native";
 import { T as TEXT } from "../texte";
 import { useMeldung } from "../ui/meldung";
-import { Betrag, Fristblatt, Fuss, Hinweis, Kachel, Karte, Knopf, Motiv, Schalter, SchnellKachel, Symbol, T, TextKnopf, Zeile, tageBis } from "../ui/bausteine";
+import { Betrag, Fristblatt, Fuss, Hinweis, Karte, Knopf, Motiv, Schalter, SchnellKachel, Symbol, T, TextKnopf, Zeile, tageBis } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { HAARLINIE, RADIUS, RAND, SCHRIFT, useFarben, weich } from "../ui/thema";
 import { KATEGORIE_TITEL, auswertung, beantwortet, dringlichkeit, erinnerungsPlan, fortschritt, frageZu, haken, istErledigt, offeneFragenNachWirkung, type PflichtInfo } from "../pflichten/check";
@@ -342,11 +342,8 @@ function Start() {
       <Gruppe titel={TEXT.start_so_hilft}>
         <Karte>
           {TEXT.start_punkte.map((p, i) => (
-            <View key={p.titel} style={{ flexDirection: "row", gap: 14, alignItems: "flex-start" }}>
-              <View style={{ paddingTop: 14 }}>
-                <Kachel symbol={p.symbol} />
-              </View>
-              <View style={{ flex: 1, paddingVertical: 14, borderBottomWidth: i === TEXT.start_punkte.length - 1 ? 0 : HAARLINIE, borderColor: f.linie }}>
+            <View key={p.titel}>
+              <View style={{ paddingVertical: 14, borderBottomWidth: i === TEXT.start_punkte.length - 1 ? 0 : HAARLINIE, borderColor: f.linie }}>
                 <T fett>{p.titel}</T>
                 <T v="klein" leise stil={{ marginTop: 2 }}>{p.text}</T>
               </View>

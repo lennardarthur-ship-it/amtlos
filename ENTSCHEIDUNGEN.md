@@ -773,6 +773,15 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
   - Fußleisten ohne Linie.
 - **Marke:** neues App-Symbol: das § aus Onest Extrafett in Minze auf Dunkelgrün, dasselbe Motiv wie auf der Bühne. Splash, Favicon, Apple-Touch-Icon und Website-Logo nutzen es ebenfalls. Die Website übernimmt Schrift (Onest, selbst gehostet als woff2) und Farben der App. Die Source-Schriften der Website entfallen; die Dokumente behalten Amtlos Sans/Serif.
 - **Bewegung:** Beim Tabwechsel blendet die Seite kurz ein (160 ms). Abläufe zeigen „Schritt x von n“ über dem Titel.
+- **Reduktion:** Rückmeldung des Gründers: „die Elemente müssen cleaner aussehen“.
+  - Keine Symbolkreise mehr vor Listenzeilen. Symbole bleiben nur, wo sie Information tragen: Fristblatt, Status, Initialen, leere Listen.
+  - Knöpfe nur mit Text (Ausnahme: Teilen, Face ID). Textknöpfe ohne Symbol, außer Auf-/Zuklappen.
+  - Einfachauswahl ohne Häkchen; die Fläche zeigt die Wahl.
+  - Neutrale Hinweise ohne Kasten. Kästen nur noch für Warnung, Fehler und Erfolg.
+  - Schnellzugriffe als ruhige graue Flächen statt Pastell, Kennzahlen ohne Symbol.
+  - Pro-Vorteile mit schlichtem Haken.
+  - Abschnittstitel kleiner (19 statt 20 pt).
+  - „Heute“ hat nur noch zwei Schnellzugriffe; Vorlagen gibt es über „+“.
 - **Geprüft:** Rundgang hell und dunkel, Unit-Tests, Store- und Website-Bilder neu. Auf dem iPhone noch offen (→ T-82).
 
 ---

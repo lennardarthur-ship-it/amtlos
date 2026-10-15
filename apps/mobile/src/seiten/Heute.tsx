@@ -1,15 +1,14 @@
 import { useMemo } from "react";
 import { Pressable, View } from "react-native";
 import { T as TEXT } from "../texte";
-import { Betrag, Hinweis, Kachel, Karte, SchnellKachel, T, TextKnopf, type Ton } from "../ui/bausteine";
+import { Betrag, Hinweis, Karte, SchnellKachel, T, TextKnopf, type Ton } from "../ui/bausteine";
 import { useNav } from "../ui/navigation";
-import { RADIUS, schattenStil, useFarben } from "../ui/thema";
+import { RADIUS, SCHRIFT, schattenStil, useFarben } from "../ui/thema";
 import { euroText, monatsSumme, offeneSumme } from "../unterlagen/ablage";
 import { heute, sortiert } from "../unterlagen/speicher";
 import { dringlichkeit, istErledigt } from "../pflichten/check";
 import { useAmtlos } from "../zustand";
 import { BelegErfassenSeite } from "./Belege";
-import { useErstellen } from "./Erstellen";
 import { Gruppe, Seite } from "./gemeinsam";
 import { Einladung, PflichtZeile, checkGemacht, useAuswertung } from "./Pflichten";
 import { SicherungsKarte } from "./Sicherung";
@@ -17,7 +16,7 @@ import { useOeffnen, useStarten } from "./starten";
 import { UnterlageZeile, useFehltJe, useUeberfaellig } from "./Unterlagen";
 
 /** Kennzahl als Kachel: Beschriftung, großer Betrag, eine Zeile dazu – antippen führt zur Liste dahinter. */
-function Kennzahl({ label, wert, text, ton = "amt", symbol, onPress }: { label: string; wert: string; text: string; ton?: Ton; symbol: string; onPress: () => void }) {
+function Kennzahl({ label, wert, text, ton = "amt", symbol: _symbol, onPress }: { label: string; wert: string; text: string; ton?: Ton; symbol: string; onPress: () => void }) {
   const f = useFarben();
   return (
     <Pressable
@@ -26,13 +25,10 @@ function Kennzahl({ label, wert, text, ton = "amt", symbol, onPress }: { label: 
       onPress={onPress}
       style={({ pressed }) => [{ flex: 1, minWidth: 0, padding: 14, gap: 10, borderRadius: RADIUS.karte, backgroundColor: f.blatt, borderWidth: 0, opacity: pressed ? 0.7 : 1 }, schattenStil(f)]}
     >
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-        <Kachel symbol={symbol} ton={ton} groesse={26} />
-        <T v="caption" fett leise numberOfLines={1} stil={{ flex: 1 }}>{label}</T>
-      </View>
+      <T v="caption" fett leise numberOfLines={1}>{label}</T>
       <View>
-        <Betrag v="gross" stil={{ fontSize: 23, lineHeight: 28 }} >{wert}</Betrag>
-        <T v="caption" leise numberOfLines={2}>{text}</T>
+        <Betrag stil={{ fontFamily: SCHRIFT.display, fontSize: 25, lineHeight: 30, letterSpacing: -0.6 }}>{wert}</Betrag>
+        <T v="caption" farbe={ton === "frist" ? f.frist : undefined} leise={ton !== "frist"} numberOfLines={2}>{text}</T>
       </View>
     </Pressable>
   );
@@ -46,7 +42,6 @@ export function Heute() {
   const z = useAmtlos();
   const { stand, tabWechseln } = z;
   const nav = useNav();
-  const erstellen = useErstellen();
   const starten = useStarten();
   const oeffnen = useOeffnen();
   const fehltJe = useFehltJe();
@@ -101,7 +96,6 @@ export function Heute() {
         <View style={{ flexDirection: "row", gap: 12 }}>
           <SchnellKachel symbol="eurosign" text={TEXT.rechnung_schreiben} onPress={() => starten("rechnung")} />
           <SchnellKachel ton="blau" symbol="doc.viewfinder" text={TEXT.beleg_erfassen} onPress={() => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />)} />
-          <SchnellKachel ton="lila" symbol="square.grid.2x2" text={TEXT.vorlage_waehlen} onPress={erstellen.oeffnen} />
         </View>
       </Gruppe>
 
