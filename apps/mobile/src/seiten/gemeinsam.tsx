@@ -5,11 +5,16 @@ import { Stempel, T } from "../ui/bausteine";
 import { RADIUS, RAND, schattenStil, useFarben } from "../ui/thema";
 
 /** Seitenrahmen mit großem Titel (iOS-Stil) und optionaler Unterzeile. */
-export function Seite({ titel, unterzeile, children, ...rest }: ScrollViewProps & { titel: string; unterzeile?: string }) {
+export function Seite({ titel, unterzeile, aktion, ueber, children, ...rest }: ScrollViewProps & { titel: string; unterzeile?: string; aktion?: ReactNode; ueber?: string }) {
   return (
     <ScrollView contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 14, paddingBottom: 128 }} contentInsetAdjustmentBehavior="automatic" keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets {...rest}>
       <View style={{ marginBottom: 20 }}>
-        <T v="grossTitel" accessibilityRole="header">{titel}</T>
+        {/* kleine Zeile über dem Titel (Datum auf „Heute“) */}
+        {ueber ? <T v="caption" fett leise stil={{ marginBottom: 2, letterSpacing: 0.3 }}>{ueber}</T> : null}
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+          <T v="grossTitel" accessibilityRole="header" stil={{ flex: 1 }}>{titel}</T>
+          {aktion ? <View style={{ marginRight: -10 }}>{aktion}</View> : null}
+        </View>
         {unterzeile ? <T leise stil={{ marginTop: 5 }}>{unterzeile}</T> : null}
       </View>
       {children}

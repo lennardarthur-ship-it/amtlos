@@ -733,6 +733,21 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
   - `store-bilder.mjs` wählt die erste Pflicht unter „Jetzt dran“ unabhängig vom Tag.
 - **Geprüft:** Typprüfung, Lint, Unit-Tests; Rundgang hell und dunkel ohne Befunde; Sync-Rundgang. Die Sichtprüfung lief über den Web-Export. SF Symbols, Schatten und Haptik wirken nur auf dem iPhone (→ PRUEFLISTE T-82).
 
+### E-138 · Neuer Aufbau: „Heute“, „+“ zum Erstellen, Fristblatt, Rechnungsstatus
+- **Datum:** 2026-10-15 · **Status:** angenommen. Wunsch des Gründers: „Zweck und Nutzen maximieren, Qualität statt Quantität, maximal Profi-App-Niveau – nicht wie ein Prototyp, sondern wie die beste in dem Bereich“.
+- **Vorbild:** wie die führenden Werkzeug- und Finanz-Apps aufgebaut sind. Ein Startbildschirm mit dem, was zählt. Ein zentraler Ort zum Erstellen. Status auf einen Blick. Termine in Tagen statt nur als Datum.
+- **Tabs:** Heute · Pflichten · (+) · Unterlagen · Mein Betrieb. Der Tab „Vorlagen“ entfällt.
+- **Erstellen (+):** öffnet ein Blatt „Neu erstellen“ mit Suche, Rechnung, Beleg, zuletzt Bearbeitetem und Anlässen. Wer etwas wählt, landet im Ablauf im aktuellen Tab, und das Blatt schließt sich. Jedes Öffnen beginnt auf der ersten Seite.
+- **Heute:** zeigt der Reihe nach:
+  - Datum und Gruß.
+  - Den Sicherungshinweis, falls fällig.
+  - Vor dem Check die Einladung, danach „Als Nächstes“ mit bis zu drei Pflichten.
+  - Zwei Kennzahlen: „Offen“ (brutto, mit „davon überfällig“) und „Im Monat berechnet“. Stornos ziehen ab, es zählt das Rechnungsdatum.
+  - Schnellzugriffe und das zuletzt Bearbeitete.
+- **Fristblatt:** Termine erscheinen als Abreißkalender. Den Status zeigt ein Streifen: rot überfällig, bernstein bis 14 Tage, grün erledigt. Dazu steht ein Text wie „In 11 Tagen fällig“, „Morgen fällig“ oder „Seit 3 Tagen überfällig“. Das gilt für Pflichtenlisten, „Heute“ und die Pflicht-Seite. Für VoiceOver steht das Datum im Text.
+- **Rechnungsstatus:** Rechnungen tragen eine Plakette: Entwurf, Offen, Überfällig, Bezahlt oder Storniert. „Überfällig“ heißt: offen und über dem eigenen Zahlungsziel der Rechnung (Rechnungsdatum plus Tage; „sofort“ = Rechnungsdatum). Es ist keine rechtliche Bewertung, Mahnfristen sind nicht berührt. Die Zahlungskarte zeigt „Fällig bis …“ bzw. „Überfällig – fällig war der …“.
+- **Geprüft:** Unit-Tests für Monatssumme, Fälligkeit und Überfälligkeit; Rundgang hell und dunkel an den neuen Aufbau angepasst; Store- und Website-Bilder neu.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

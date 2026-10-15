@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Linking, View } from "react-native";
 import { T as TEXT } from "../texte";
 import { useMeldung } from "../ui/meldung";
-import { Betrag, Fuss, Hinweis, Kachel, Karte, Knopf, Schalter, SchnellKachel, Stempel, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
+import { Betrag, Fristblatt, Fuss, Hinweis, Kachel, Karte, Knopf, Schalter, SchnellKachel, Stempel, Symbol, T, TextKnopf, Zeile, tageBis } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { HAARLINIE, RADIUS, RAND, schattenStil, useFarben, weich } from "../ui/thema";
 import { KATEGORIE_TITEL, auswertung, beantwortet, dringlichkeit, erinnerungsPlan, fortschritt, frageZu, haken, istErledigt, offeneFragenNachWirkung, type PflichtInfo } from "../pflichten/check";
@@ -13,6 +13,7 @@ import { Antwort, CheckAblauf } from "./Check";
 import { SicherungsKarte } from "./Sicherung";
 import { Gruppe, Inhalt, Seite, datumKurz } from "./gemeinsam";
 import { useStarten } from "./starten";
+import { useErstellen } from "./Erstellen";
 
 const datumDe = (iso: string) => datumKurz(`${iso}T12:00:00Z`);
 
@@ -69,6 +70,16 @@ function PflichtDetail({ id }: { id: string }) {
         <T v="caption" leise>{KATEGORIE_TITEL[p.kategorie] ?? p.kategorie}</T>
         <T v="titel" accessibilityRole="header" stil={{ marginTop: 4 }}>{p.titel}</T>
         <T stil={{ marginTop: 8 }}>{p.kurz}</T>
+        {p.naechsterTermin && !abgehakt ? (
+          // der nächste Termin als Fristblatt mit Abstand in Tagen – das Wichtigste zuerst
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 14, marginTop: 16 }}>
+            <Fristblatt termin={p.naechsterTermin} heute={heute()} groesse={56} />
+            <View style={{ flex: 1 }}>
+              <T fett farbe={tageBis(p.naechsterTermin, heute()) < 0 ? f.frist : undefined}>{fristText(p.naechsterTermin)}</T>
+              <T v="klein" leise>{new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date(`${p.naechsterTermin}T12:00:00Z`))}</T>
+            </View>
+          </View>
+        ) : null}
         {abgehakt ? <Hinweis art="erfolg" symbol="checkmark.circle" text={TEXT.erledigt_am(datumDe(haken(z.stand.erledigt[p.id])?.datum ?? heute()))} /> : null}
         {durchUnterlage ? <Hinweis art="erfolg" text={TEXT.erledigt_durch_unterlage} /> : null}
         {p.wiederkehrend && p.naechsterTermin ? <Hinweis text={TEXT.wiederkehrend_hinweis(datumDe(p.naechsterTermin))} /> : null}
@@ -112,13 +123,26 @@ function PflichtDetail({ id }: { id: string }) {
   );
 }
 
-function PflichtZeile({ p, letzte, erledigt, ohneWichtig }: { p: PflichtInfo; letzte: boolean; erledigt: boolean; ohneWichtig?: boolean }) {
+/** Termin in Alltagssprache: „In 11 Tagen fällig“, „Morgen fällig“, „Seit 3 Tagen überfällig“ – weiter weg mit Datum. */
+export function fristText(termin: string, tag = heute()): string {
+  const n = tageBis(termin, tag);
+  if (n < 0) return TEXT.frist_ueber(-n);
+  if (n === 0) return TEXT.frist_heute;
+  if (n === 1) return TEXT.frist_morgen;
+  if (n <= 30) return TEXT.frist_in(n);
+  return TEXT.naechster_termin(datumDe(termin));
+}
+
+export function PflichtZeile({ p, letzte, erledigt, ohneWichtig }: { p: PflichtInfo; letzte: boolean; erledigt: boolean; ohneWichtig?: boolean }) {
   const f = useFarben();
   const nav = useNav();
-  const unter = erledigt ? TEXT.erledigt : p.naechsterTermin ? TEXT.naechster_termin(datumDe(p.naechsterTermin)) : p.vorlage ? TEXT.unterlage_in_amtlos : p.schwere === "hoch" ? TEXT.wichtig : p.kurz;
+  const termin = !erledigt && p.naechsterTermin ? p.naechsterTermin : null;
+  // das Datum steht im Fristblatt – im Text nur kurz (ohne Jahr, wenn es dieses Jahr ist)
+  const unter = erledigt ? TEXT.erledigt : termin ? `${fristText(termin)} · ${termin.slice(0, 4) === heute().slice(0, 4) ? datumDe(termin).slice(0, 6) : datumDe(termin)}` : p.vorlage ? TEXT.unterlage_in_amtlos : p.schwere === "hoch" ? TEXT.wichtig : p.kurz;
   return (
     <Zeile
-      links={<Symbol name={erledigt ? "checkmark.circle.fill" : p.schwere === "hoch" ? "exclamationmark.circle" : "circle"} groesse={22} farbe={erledigt ? f.amt : p.schwere === "hoch" ? f.bald : f.tinteLeise} />}
+      // mit Termin: das Fristblatt (Datum auf einen Blick); sonst der Status als Form
+      links={termin ? <Fristblatt termin={termin} heute={heute()} /> : <Symbol name={erledigt ? "checkmark.circle.fill" : p.schwere === "hoch" ? "exclamationmark.circle" : "circle"} groesse={22} farbe={erledigt ? f.amt : p.schwere === "hoch" ? f.bald : f.rahmen} />}
       // „Wichtig“ steckt sonst nur im Symbol – für VoiceOver mit ansagen
       titel={p.titel}
       text={!erledigt && !ohneWichtig && p.schwere === "hoch" && unter !== TEXT.wichtig ? `${TEXT.wichtig} · ${unter}` : unter}
@@ -283,19 +307,13 @@ export function PflichtenSeite() {
   );
 }
 
-/**
- * Erster Bildschirm vor dem Check: die Einladung zum Check und in drei Sätzen, was Amtlos tut – mit direkten Wegen
- * zur Rechnung und zu den Vorlagen, damit niemand vor einer leeren Seite steht.
- */
-function Start() {
-  const z = useAmtlos();
+/** Einladung zum Pflichten-Check auf der Bühne – mit dem Stempel aus dem App-Symbol (Start und „Heute“). */
+export function Einladung() {
   const nav = useNav();
   const f = useFarben();
-  const starten = useStarten();
+  // die Bühne: die eine dunkle Fläche der App – mit dem Stempel aus dem App-Symbol
   return (
-    <View>
-      {/* die Bühne: die eine dunkle Fläche der App – mit dem Stempel aus dem App-Symbol */}
-      <View style={[{ padding: 22, paddingTop: 24, borderRadius: RADIUS.buehne, backgroundColor: f.buehne, gap: 14, overflow: "hidden" }, schattenStil(f, 1.4)]}>
+    <View style={[{ padding: 22, paddingTop: 24, borderRadius: RADIUS.buehne, backgroundColor: f.buehne, gap: 14, overflow: "hidden" }, schattenStil(f, 1.4)]}>
         <View style={{ position: "absolute", right: -64, top: -70, opacity: 0.12 }}>
           <Stempel groesse={190} farbe={f.buehneText} />
         </View>
@@ -303,10 +321,24 @@ function Start() {
         <T farbe={f.buehneLeise}>{TEXT.pflichten_einladung}</T>
         <Knopf buehne text={TEXT.pflichten_check_starten} symbol="arrow.right" onPress={() => nav.oeffnen("check", () => <CheckAblauf />, true)} stil={{ marginTop: 6 }} />
       </View>
+  );
+}
+
+/**
+ * Erster Bildschirm vor dem Check: die Einladung zum Check und in drei Sätzen, was Amtlos tut – mit direkten Wegen
+ * zur Rechnung und zu den Vorlagen, damit niemand vor einer leeren Seite steht.
+ */
+function Start() {
+  const erstellen = useErstellen();
+  const f = useFarben();
+  const starten = useStarten();
+  return (
+    <View>
+      <Einladung />
       {/* wer gleich etwas erledigen will, findet es ohne Scrollen */}
       <View style={{ flexDirection: "row", gap: 12, marginTop: 14 }}>
         <SchnellKachel symbol="eurosign" text={TEXT.start_rechnung} onPress={() => starten("rechnung")} />
-        <SchnellKachel symbol="doc.text" text={TEXT.start_vorlagen} onPress={() => z.tabWechseln("unterlagen")} />
+        <SchnellKachel symbol="doc.text" text={TEXT.start_vorlagen} onPress={erstellen.oeffnen} />
       </View>
       <Gruppe titel={TEXT.start_so_hilft}>
         <Karte>

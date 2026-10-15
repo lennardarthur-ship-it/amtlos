@@ -49,15 +49,20 @@ async function tippe(l) {
   await l.evaluate((el) => el.scrollIntoView({ block: "center" }));
   await l.click();
 }
+/** Blatt „Neu erstellen“ über den „+“-Knopf in der Tab-Leiste (E-138) */
+async function neu() {
+  await knopf("Erstellen").click();
+  await warte(900);
+}
 const sichtbar = async (text) => (await p.getByText(text, { exact: false }).locator("visible=true").count()) > 0;
 
 try {
   await p.goto("http://localhost:4998/");
   await warte(2500);
-  // Start auf „Pflichten“ (E-129): Einladung zum Check
-  pruefe(await sichtbar("Welche Pflichten gelten für dich?"), "Pflichten-Tab mit Einladung fehlt beim Start");
+  // Start auf „Heute“ (E-138): Einladung zum Check, schnelle Wege
+  pruefe((await sichtbar("Welche Pflichten gelten für dich?")) && (await sichtbar("Schnell erledigt")), "„Heute“ mit Einladung und schnellen Wegen fehlt beim Start");
   await foto("start-pflichten");
-  await p.getByRole("tab", { name: "Vorlagen" }).click();
+  await neu();
   await warte(800);
   pruefe(await sichtbar("Ausfüllen, prüfen, als PDF teilen"), "Startseite fehlt");
   pruefe(await sichtbar("Wofür brauchst du eine Unterlage?"), "Anlässe fehlen auf der Startseite");
@@ -92,6 +97,8 @@ try {
   await knopf("Zurück").click();
   await warte(800);
   pruefe(!(await sichtbar("Steht dann auf jeder Unterlage")), "Hinweis bleibt nach dem Eintragen stehen");
+  await knopf("Schließen").click();
+  await warte(900);
 
   // Pflichten-Check (E-126): Fragen beantworten, Ergebnis, Pflichten, Unterlage zur Pflicht
   await p.getByRole("tab", { name: "Pflichten" }).click();
@@ -167,7 +174,7 @@ try {
   await warte(800);
   pruefe(await sichtbar("1 von"), "Abhaken zählt nicht im Fortschritt");
   await foto("start-mit-pflichten");
-  await p.getByRole("tab", { name: "Vorlagen" }).click();
+  await neu();
   await warte(800);
 
   // Rechnung im geführten Ablauf
@@ -233,7 +240,11 @@ try {
   await warte(700);
   await knopf("Schließen").click();
   await warte(900);
+  await p.getByRole("tab", { name: "Heute" }).click();
+  await warte(800);
   pruefe(await sichtbar("2026-001 · "), "Rechnung fehlt unter „Zuletzt bearbeitet“");
+  pruefe((await sichtbar("Offen")) && (await sichtbar("berechnet · ")), "Kennzahlen auf „Heute“ fehlen");
+  await foto("heute");
 
   // zweite Rechnung: Nummer zählt hoch, gespeicherter Kunde füllt die Anschrift
   await knopf("Rechnung schreiben").click();
@@ -254,7 +265,7 @@ try {
   await p.getByRole("tab", { name: "Unterlagen" }).click();
   await warte(800);
   pruefe((await p.getByRole("button", { name: /2026-00\d · / }).locator("visible=true").count()) === 2, "leere Rechnung nicht verworfen oder zweite fehlt");
-  await p.getByRole("tab", { name: "Vorlagen" }).click();
+  await neu();
   await warte(700);
 
   // Anlass „Sicherheit am Arbeitsplatz“ → Gefährdungsbeurteilung mit Vorschlägen
@@ -295,9 +306,8 @@ try {
   await knopf("Zur Unterlage").click();
   await warte(1200);
   pruefe(await sichtbar("Alle Pflichtangaben sind drin."), "Gefährdungsbeurteilung trotz aller Angaben nicht vollständig");
+  // das Blatt hat sich beim Start geschlossen – nach dem Ablauf ist man wieder im Tab
   await knopf("Schließen").click();
-  await warte(800);
-  await knopf("Zurück").click();
   await warte(800);
 
   // Mitarbeiter anlegen und in eine Unterweisung übernehmen
@@ -323,7 +333,7 @@ try {
   pruefe(await sichtbar("Kim Beispiel"), "Kunde aus der Rechnung nicht gemerkt");
   await knopf("Zurück").click();
   await warte(700);
-  await p.getByRole("tab", { name: "Vorlagen" }).click();
+  await neu();
   await warte(700);
   await feld("Vorlage suchen").fill("unterweisung");
   await warte();
@@ -341,6 +351,7 @@ try {
   await warte(800);
 
   // Allergene: Mehrfachauswahl in einem Eintrag
+  await neu();
   await feld("Vorlage suchen").fill("allergen");
   await warte();
   await tippe(p.getByRole("button", { name: /^Allergenliste/ }).first());
@@ -359,14 +370,13 @@ try {
   await warte(700);
   await knopf("Schließen").click();
   await warte(800);
-  await feld("Vorlage suchen").fill("");
 
   // E-Rechnung empfangen (E-133): XRechnung über die Dateiauswahl → Beleg, ausgefüllt; danach das Paket für die Steuerberatung
   const F = await import(new URL("../../../packages/fachlogik/dist/index.js", import.meta.url).href);
   const eingang = F.xrechnungUbl({ nummer: "L-2026-77", rechnungsdatum: "2026-10-08", leistungsdatum: "2026-10-08", faellig_am: "2026-10-22", steller: { name: "Friseurbedarf Müller GmbH", strasse: "Lagerweg 4", plz: "85748", ort: "Garching", land: "DE", email: "rechnung@mueller.example", telefon: "089 9", steuernummer: null, ust_idnr: "DE811111111", iban: "DE02120300000000202051" }, kunde: { name: "Salon Sonne", strasse: "Hauptstraße 1", plz: "80331", ort: "München", land: "DE", email: "info@salon.example", geschaeftskunde: true }, positionen: [{ bezeichnung: "Farbe 60 ml", menge: 10, einheit: "stueck", preis_cent: 650, ust_satz: 19 }], kleinunternehmer: false }, F.KU_HINWEIS);
   const xmlPfad = `${OUT}/eingang-xrechnung.xml`;
   fs.writeFileSync(xmlPfad, eingang);
-  await p.getByRole("tab", { name: "Vorlagen" }).click();
+  await neu();
   await warte(700);
   await tippe(knopf("Beleg erfassen"));
   await warte(800);

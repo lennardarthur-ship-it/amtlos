@@ -10,7 +10,7 @@ import { HAARLINIE, RAND, ZIEL, useFarben } from "./thema";
  * Zurück über den Knopf oder durch Wischen vom linken Rand – wie in iOS. Erneutes Tippen auf den aktiven Tab
  * führt zur ersten Seite zurück.
  */
-interface Nav {
+export interface Nav {
   /** Unterseite öffnen; gleicher Schlüssel wird nicht doppelt geöffnet. `vollbild` blendet die Tab-Leiste aus (geführte Abläufe). */
   oeffnen(schluessel: string, inhalt: () => ReactNode, vollbild?: boolean): void;
   zurueck(): void;
@@ -67,7 +67,7 @@ function Ebene({ eintrag, oben, zurueck, weg }: { eintrag: Eintrag; oben: boolea
 }
 
 /** Ein Stapel für einen Tab. `wurzel` ist die erste Seite; ändert sich `zuruecksetzen`, schließen alle Unterseiten. */
-export function Stapel({ wurzel, zuruecksetzen, vollbild }: { wurzel: ReactNode; zuruecksetzen: number; vollbild?: (an: boolean) => void }) {
+export function Stapel({ wurzel, zuruecksetzen, vollbild, navRef }: { wurzel: ReactNode; zuruecksetzen: number; vollbild?: (an: boolean) => void; navRef?: (n: Nav) => void }) {
   const [stapel, setStapel] = useState<Eintrag[]>([]);
   useEffect(() => setStapel([]), [zuruecksetzen]);
   const istVoll = stapel.some((e) => e.vollbild && !e.geht);
@@ -86,6 +86,7 @@ export function Stapel({ wurzel, zuruecksetzen, vollbild }: { wurzel: ReactNode;
     }),
     [zurueck],
   );
+  useEffect(() => navRef?.(nav), [nav, navRef]);
   const offen = stapel.filter((e) => !e.geht);
   return (
     <NavKontext.Provider value={nav}>

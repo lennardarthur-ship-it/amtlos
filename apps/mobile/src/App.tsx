@@ -2,51 +2,71 @@ import { useFonts } from "expo-font";
 import { BlurView } from "expo-blur";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, AppState, InputAccessoryView, Keyboard, Platform, Pressable, View, useColorScheme } from "react-native";
 import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Betrieb } from "./seiten/Betrieb";
 import { ErinnerungsPlaner, PflichtenTab } from "./seiten/Pflichten";
 import { Meine } from "./seiten/Meine";
 import { AutoSicherung, WiederherstellenSeite } from "./seiten/Sicherung";
-import { Unterlagen } from "./seiten/Unterlagen";
+import { Heute } from "./seiten/Heute";
+import { ErstellenAnbieter, useErstellen } from "./seiten/Erstellen";
+import * as Haptics from "expo-haptics";
 import { T as TEXT } from "./texte";
 import { Kachel, Karte, Knopf, Symbol, T, TextKnopf } from "./ui/bausteine";
 import { MeldungAnbieter } from "./ui/meldung";
 import { entsperren } from "./unterlagen/sperre";
-import { Stapel, useNav } from "./ui/navigation";
-import { HAARLINIE, TASTATUR_FERTIG, ZIEL, istIos, useFarben } from "./ui/thema";
+import { Stapel, useNav, type Nav } from "./ui/navigation";
+import { HAARLINIE, TASTATUR_FERTIG, ZIEL, istIos, schattenStil, useFarben } from "./ui/thema";
 import { AmtlosAnbieter, useAmtlos, type Tab } from "./zustand";
 import { KontoAnbieter } from "./konto/konto";
 
 void SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
-/** Tabs: Pflichten zuerst (E-129, das Alleinstellungsmerkmal), dann Vorlagen, eigene Unterlagen, Betrieb. */
+/** Tabs (E-138): „Heute“ als Start, Pflichten, eigene Unterlagen, Betrieb – in der Mitte „+“ zum Erstellen. */
 const TABS: { id: Tab; symbol: string }[] = [
+  { id: "heute", symbol: "house" },
   { id: "pflichten", symbol: "checklist" },
-  { id: "unterlagen", symbol: "doc.text" },
   { id: "meine", symbol: "folder" },
   { id: "betrieb", symbol: "building.2" },
 ];
-const SEITE: Record<Tab, () => React.JSX.Element> = { pflichten: PflichtenTab, unterlagen: Unterlagen, meine: Meine, betrieb: Betrieb };
+const SEITE: Record<Tab, () => React.JSX.Element> = { heute: Heute, pflichten: PflichtenTab, meine: Meine, betrieb: Betrieb };
 
-/** Tab-Leiste: unscharfer Hintergrund (iOS), SF Symbols, der aktive Tab in Handlungsfarbe. */
+/** Tab-Leiste: unscharfer Hintergrund (iOS), SF Symbols, der aktive Tab in Handlungsfarbe; in der Mitte „+“. */
 function Leiste({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
   // Erneutes Tippen auf den aktiven Tab führt zur ersten Seite (setTab erkennt das)
   const f = useFarben();
   const dunkel = useColorScheme() === "dark";
   const inset = useSafeAreaInsets();
+  const erstellen = useErstellen();
+  const reiter = (k: (typeof TABS)[number]) => {
+    const an = k.id === tab;
+    return (
+      <Pressable key={k.id} accessibilityRole="tab" accessibilityLabel={TEXT.tabs[k.id]} accessibilityState={{ selected: an }} onPress={() => setTab(k.id)} style={{ flex: 1, minHeight: ZIEL + 4, alignItems: "center", justifyContent: "center", gap: 4, paddingTop: 7 }}>
+        <Symbol name={an && k.id === "heute" ? "house.fill" : k.symbol} groesse={23} farbe={an ? f.amt : f.tinteLeise} gewicht={an ? "semibold" : "regular"} />
+        <T v="mini" farbe={an ? f.amt : f.tinteLeise}>{TEXT.tabs[k.id]}</T>
+      </Pressable>
+    );
+  };
   const inhalt = (
-    <View accessibilityRole="tablist" style={{ flexDirection: "row", paddingBottom: Math.max(inset.bottom - 6, 4), borderTopWidth: HAARLINIE, borderColor: f.linie }}>
-      {TABS.map((k) => {
-        const an = k.id === tab;
-        return (
-          <Pressable key={k.id} accessibilityRole="tab" accessibilityLabel={TEXT.tabs[k.id]} accessibilityState={{ selected: an }} onPress={() => setTab(k.id)} style={{ flex: 1, minHeight: ZIEL + 4, alignItems: "center", justifyContent: "center", gap: 4, paddingTop: 7 }}>
-            <Symbol name={k.symbol} groesse={23} farbe={an ? f.amt : f.tinteLeise} gewicht={an ? "semibold" : "regular"} />
-            <T v="mini" farbe={an ? f.amt : f.tinteLeise}>{TEXT.tabs[k.id]}</T>
-          </Pressable>
-        );
-      })}
+    <View accessibilityRole="tablist" style={{ flexDirection: "row", alignItems: "center", paddingBottom: Math.max(inset.bottom - 6, 4), borderTopWidth: HAARLINIE, borderColor: f.linie }}>
+      {TABS.slice(0, 2).map(reiter)}
+      {/* der eine Ort zum Anfangen – egal, wo man gerade ist */}
+      <View style={{ flex: 1, alignItems: "center", paddingTop: 6 }}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={TEXT.erstellen}
+          onPress={() => {
+            if (istIos) void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            erstellen.oeffnen();
+          }}
+          hitSlop={6}
+          style={({ pressed }) => [{ width: 50, height: 50, borderRadius: 25, backgroundColor: f.amt, alignItems: "center", justifyContent: "center", transform: [{ scale: pressed ? 0.94 : 1 }] }, schattenStil(f, 1.2)]}
+        >
+          <Symbol name="plus" groesse={24} farbe={f.amtText} gewicht="bold" />
+        </Pressable>
+      </View>
+      {TABS.slice(2).map(reiter)}
     </View>
   );
   if (istIos) return <BlurView intensity={80} tint={dunkel ? "dark" : "light"} style={{ position: "absolute", left: 0, right: 0, bottom: 0 }}>{inhalt}</BlurView>;
@@ -90,11 +110,17 @@ function Sperre({ children }: { children: React.ReactNode }) {
 function Rahmen() {
   const { bereit, ladefehler, tab, tabWechseln } = useAmtlos();
   const f = useFarben();
-  const [zurueck, setZurueck] = useState<Record<Tab, number>>({ pflichten: 0, unterlagen: 0, meine: 0, betrieb: 0 });
-  const [besucht, setBesucht] = useState<Set<Tab>>(new Set(["pflichten"]));
+  const [zurueck, setZurueck] = useState<Record<Tab, number>>({ heute: 0, pflichten: 0, meine: 0, betrieb: 0 });
+  const [besucht, setBesucht] = useState<Set<Tab>>(new Set(["heute"]));
   // geführte Abläufe laufen im Vollbild – ohne Tab-Leiste, mit eigenem Knopf unten
-  const [voll, setVoll] = useState<Record<Tab, boolean>>({ pflichten: false, unterlagen: false, meine: false, betrieb: false });
+  const [voll, setVoll] = useState<Record<Tab, boolean>>({ heute: false, pflichten: false, meine: false, betrieb: false });
   const vollSetzer = useMemo(() => Object.fromEntries(TABS.map((x) => [x.id, (an: boolean) => setVoll((v) => (v[x.id] === an ? v : { ...v, [x.id]: an }))])) as Record<Tab, (an: boolean) => void>, []);
+  // Stapel je Tab: das Blatt „Neu erstellen“ öffnet Abläufe im aktuellen Tab
+  const navs = useRef<Partial<Record<Tab, Nav>>>({});
+  const tabRef = useRef(tab);
+  tabRef.current = tab;
+  const navRefs = useMemo(() => Object.fromEntries(TABS.map((x) => [x.id, (n: Nav) => { navs.current[x.id] = n; }])) as unknown as Record<Tab, (n: Nav) => void>, []);
+  const navFuer = useCallback(() => navs.current[tabRef.current], []);
   const setTab = (t: Tab) => {
     if (t === tab) setZurueck((z) => ({ ...z, [t]: z[t] + 1 }));
     tabWechseln(t);
@@ -120,6 +146,7 @@ function Rahmen() {
     );
   // Besuchte Tabs bleiben eingehängt, damit Unterseiten und Scrollposition beim Wechseln erhalten bleiben
   return (
+    <ErstellenAnbieter navFuer={navFuer}>
     <View style={{ flex: 1, backgroundColor: f.papier }}>
       {TABS.filter((x) => besucht.has(x.id) || x.id === tab).map((x) => {
         const Wurzel = SEITE[x.id];
@@ -128,6 +155,7 @@ function Rahmen() {
           // Im Web greift pointerEvents="none" nicht auf alle Kinder – verborgene Tabs dort ausblenden
           <View key={x.id} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, opacity: an ? 1 : 0, display: Platform.OS === "web" && !an ? "none" : "flex" }} pointerEvents={an ? "auto" : "none"} importantForAccessibility={an ? "auto" : "no-hide-descendants"} accessibilityElementsHidden={!an}>
             <Stapel
+              navRef={navRefs[x.id]}
               zuruecksetzen={zurueck[x.id]}
               vollbild={vollSetzer[x.id]}
               wurzel={
@@ -141,6 +169,7 @@ function Rahmen() {
       })}
       {voll[tab] ? null : <Leiste tab={tab} setTab={setTab} />}
     </View>
+    </ErstellenAnbieter>
   );
 }
 

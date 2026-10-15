@@ -57,7 +57,7 @@ const FALLBACK: Record<string, keyof typeof Ionicons.glyphMap> = {
   "scissors": "cut-outline", "cross.case": "medkit-outline", "checkmark.square.fill": "checkbox", "square": "square-outline", "chevron.down": "chevron-down", "chevron.up": "chevron-up",
   "doc.richtext": "document-text-outline", "hammer": "hammer-outline", "info.circle.fill": "information-circle", "circle": "ellipse-outline", "arrow.uturn.backward": "arrow-undo-outline", "xmark.circle": "close-circle-outline",
   "person.crop.circle": "person-circle-outline", "eye": "eye-outline", "arrow.left": "arrow-back", "list.number": "list-outline", "checkmark.circle.fill": "checkmark-circle", "person.badge.clock": "person-outline",
-  "figure.wave": "body-outline", "storefront": "storefront-outline", "calendar.badge.checkmark": "calendar-outline", "laptopcomputer": "laptop-outline", "exclamationmark.shield": "shield-outline", "cup.and.saucer": "cafe-outline", "sparkle": "sparkles-outline", "arrow.clockwise": "refresh-outline", "pencil": "create-outline", "plus.circle": "add-circle-outline", "paintpalette": "color-palette-outline", "eurosign.circle": "logo-euro", "photo": "image-outline", "lock.fill": "lock-closed", "faceid": "scan-outline", "line.3.horizontal.decrease.circle": "funnel-outline", "icloud": "cloud-outline", "checkmark.seal.fill": "ribbon", "hand.raised": "hand-left-outline", "doc.plaintext": "document-outline",
+  "figure.wave": "body-outline", "storefront": "storefront-outline", "calendar.badge.checkmark": "calendar-outline", "laptopcomputer": "laptop-outline", "exclamationmark.shield": "shield-outline", "cup.and.saucer": "cafe-outline", "sparkle": "sparkles-outline", "arrow.clockwise": "refresh-outline", "pencil": "create-outline", "plus.circle": "add-circle-outline", "paintpalette": "color-palette-outline", "eurosign.circle": "logo-euro", "photo": "image-outline", "lock.fill": "lock-closed", "faceid": "scan-outline", "line.3.horizontal.decrease.circle": "funnel-outline", "icloud": "cloud-outline", "checkmark.seal.fill": "ribbon", "hand.raised": "hand-left-outline", "doc.plaintext": "document-outline", "square.grid.2x2": "grid-outline", "house": "home-outline", "house.fill": "home",
 };
 export function Symbol({ name, groesse = 22, farbe, gewicht = "medium" }: { name: string; groesse?: number; farbe?: string; gewicht?: SymbolViewProps["weight"] }) {
   const f = useFarben();
@@ -94,6 +94,32 @@ export function Initialen({ name, groesse = 34 }: { name: string; groesse?: numb
   return (
     <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={{ width: groesse, height: groesse, borderRadius: groesse / 2, backgroundColor: f.amtHauch, alignItems: "center", justifyContent: "center" }}>
       <T v="caption" farbe={f.amtTief} stil={{ fontFamily: SCHRIFT.bold, fontSize: groesse * 0.38, lineHeight: groesse * 0.5, letterSpacing: 0.4 }}>{kurz}</T>
+    </View>
+  );
+}
+
+/** Tage von `heute` bis `termin` (ISO-Daten, ohne Uhrzeit) – negativ, wenn der Termin vorbei ist. */
+export function tageBis(termin: string, heute: string): number {
+  return Math.round((Date.parse(`${termin}T12:00:00Z`) - Date.parse(`${heute}T12:00:00Z`)) / 864e5);
+}
+
+/**
+ * Fristblatt (docs/06-design.md): Datum wie auf einem Abreißkalender – Wochentag, großer Tag, Monat. Der Streifen
+ * oben trägt den Status (rot überfällig, bernstein bald, grün erledigt). Für VoiceOver verborgen; das Datum steht
+ * immer zusätzlich als Text daneben.
+ */
+export function Fristblatt({ termin, heute, erledigt, groesse = 46 }: { termin: string; heute: string; erledigt?: boolean; groesse?: number }) {
+  const f = useFarben();
+  const d = new Date(`${termin}T12:00:00Z`);
+  const tage = tageBis(termin, heute);
+  const streifen = erledigt ? f.amt : tage < 0 ? f.frist : tage <= 14 ? f.bald : f.linie;
+  const fmt = (o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", ...o }).format(d).replace(".", "");
+  return (
+    <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={[{ width: groesse, borderRadius: 9, backgroundColor: f.blatt, borderWidth: f.schatten ? HAARLINIE : 1, borderColor: f.linie, overflow: "hidden", alignItems: "center" }, schattenStil(f, 0.6)]}>
+      <View style={{ alignSelf: "stretch", height: 5, backgroundColor: streifen }} />
+      <T v="mini" leise stil={{ marginTop: 3, fontSize: 9.5, lineHeight: 11, textTransform: "uppercase", letterSpacing: 0.6 }}>{fmt({ weekday: "short" })}</T>
+      <T v="gross" stil={{ fontSize: groesse * 0.44, lineHeight: groesse * 0.5, fontVariant: ["tabular-nums"] }}>{fmt({ day: "numeric" })}</T>
+      <T v="mini" leise stil={{ marginBottom: 4, fontSize: 9.5, lineHeight: 11, letterSpacing: 0.3 }}>{fmt({ month: "short" })}</T>
     </View>
   );
 }
@@ -281,7 +307,7 @@ export function Abschnitt({ titel, rechts, children }: { titel?: string; rechts?
  * Zeile in einer Liste: tippbar, Haarlinie unten (eingerückt ab dem Text, wie in iOS). `symbol` setzt eine getönte
  * Kachel davor, `links` ein eigenes Element (z. B. Status-Kreis).
  */
-export function Zeile({ links, symbol, ton, titel, text, wert, rechts, onPress, letzte }: { links?: ReactNode; symbol?: string; ton?: Ton; titel: string; text?: string; wert?: string; rechts?: ReactNode; onPress?: () => void; letzte?: boolean }) {
+export function Zeile({ links, symbol, ton, titel, text, wert, marke, rechts, onPress, letzte }: { links?: ReactNode; symbol?: string; ton?: Ton; titel: string; text?: string; wert?: string; marke?: { text: string; ton: Ton }; rechts?: ReactNode; onPress?: () => void; letzte?: boolean }) {
   const f = useFarben();
   const vorn = symbol ? <Kachel symbol={symbol} ton={ton} /> : links;
   const inhalt = (pressed: boolean) => (
@@ -293,7 +319,12 @@ export function Zeile({ links, symbol, ton, titel, text, wert, rechts, onPress, 
           {text ? <T v="klein" leise numberOfLines={2} stil={{ marginTop: 1 }}>{text}</T> : null}
         </View>
         {/* Betrag rechts (Rechnungen, Belege) – das, wonach man in Listen sucht */}
-        {wert ? <Betrag stil={{ marginLeft: 4 }}>{wert}</Betrag> : null}
+        {wert || marke ? (
+          <View style={{ alignItems: "flex-end", gap: 4, marginLeft: 4 }}>
+            {wert ? <Betrag>{wert}</Betrag> : null}
+            {marke ? <Marke text={marke.text} ton={marke.ton} /> : null}
+          </View>
+        ) : null}
         {rechts ?? (onPress ? <Symbol name="chevron.right" groesse={14} farbe={f.zeiger} gewicht="semibold" /> : null)}
       </View>
     </View>
@@ -303,6 +334,17 @@ export function Zeile({ links, symbol, ton, titel, text, wert, rechts, onPress, 
     <Pressable accessibilityRole="button" onPress={onPress}>
       {({ pressed }) => inhalt(pressed)}
     </Pressable>
+  );
+}
+
+/** Status als kleine Plakette („Bezahlt“, „Überfällig“) – getönt, immer mit Wort. */
+export function Marke({ text, ton }: { text: string; ton: Ton }) {
+  const f = useFarben();
+  const t = ton === "amt" ? { grund: f.amtHauch, schrift: f.amtTief } : ton === "bald" ? { grund: f.baldHauch, schrift: f.bald } : ton === "frist" ? { grund: f.fristHauch, schrift: f.frist } : { grund: f.flaeche, schrift: f.tinteLeise };
+  return (
+    <View style={{ paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6, backgroundColor: t.grund }}>
+      <T v="mini" farbe={t.schrift} stil={{ fontSize: 12, lineHeight: 16 }}>{text}</T>
+    </View>
   );
 }
 

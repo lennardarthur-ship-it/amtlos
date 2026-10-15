@@ -11,6 +11,7 @@ import { drucken, pdfTeilen } from "../unterlagen/pdf";
 import { NUMMER_DOPPELT, fehltFuer } from "../unterlagen/pruefung";
 import { dateiTeilen } from "../unterlagen/sicherungDatei";
 import { heute } from "../unterlagen/speicher";
+import { faelligAm } from "../unterlagen/ablage";
 import { useAmtlos } from "../zustand";
 import { bestaetigen } from "../ui/bestaetigen";
 import { AbsenderSeite } from "./Betrieb";
@@ -268,6 +269,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
  */
 function Zahlung({ id }: { id: string }) {
   const z = useAmtlos();
+  const f = useFarben();
   const melden = useMeldung();
   const [anders, setAnders] = useState(false);
   const u = z.stand.unterlagen.find((x) => x.id === id);
@@ -278,12 +280,17 @@ function Zahlung({ id }: { id: string }) {
     z.erfolg();
   };
   if (!u) return null;
+  const faellig = faelligAm(u);
   const datumDe = (iso: string) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(`${iso}T12:00:00Z`));
   return (
     <Karte stil={{ marginTop: 12, paddingVertical: 14, gap: 10 }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-        <Kachel symbol={u.bezahlt ? "checkmark.circle.fill" : "clock"} ton={u.bezahlt ? "amt" : "bald"} groesse={30} />
-        <T fett stil={{ flex: 1 }}>{u.bezahlt ? (erstattung ? TEXT.erstattet_am(datumDe(u.bezahlt)) : TEXT.bezahlt_am(datumDe(u.bezahlt))) : TEXT.offen_zahlung}</T>
+        <Kachel symbol={u.bezahlt ? "checkmark.circle.fill" : faellig && faellig < heute() ? "exclamationmark.circle" : "clock"} ton={u.bezahlt ? "amt" : faellig && faellig < heute() ? "frist" : "bald"} groesse={30} />
+        <View style={{ flex: 1 }}>
+          <T fett>{u.bezahlt ? (erstattung ? TEXT.erstattet_am(datumDe(u.bezahlt)) : TEXT.bezahlt_am(datumDe(u.bezahlt))) : TEXT.offen_zahlung}</T>
+          {/* Fälligkeit nach dem Zahlungsziel der Rechnung – überfällig in Rot */}
+          {!u.bezahlt && !erstattung && faellig ? <T v="klein" farbe={faellig < heute() ? f.frist : undefined} leise={faellig >= heute()}>{faellig < heute() ? TEXT.faellig_war(datumDe(faellig)) : TEXT.faellig_bis(datumDe(faellig))}</T> : null}
+        </View>
       </View>
       {u.bezahlt ? (
         <TextKnopf symbol="xmark" text={TEXT.zahlung_entfernen} onPress={() => z.bezahltSetzen(id, null)} />

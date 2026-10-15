@@ -6,26 +6,27 @@ import { Kachel, Karte, Knopf, T, TextKnopf, Wahl } from "../ui/bausteine";
 import { useNav } from "../ui/navigation";
 import { useFarben } from "../ui/thema";
 import { belegeFiltern, euroText, filterVerfuegbar, filtern, offeneSumme, rechnungenSortiert, type Filter } from "../unterlagen/ablage";
-import { sortiert } from "../unterlagen/speicher";
+import { heute, sortiert } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { BelegErfassen, BelegSeite, BelegZeile } from "./Belege";
 import { Gruppe, Leer, Seite } from "./gemeinsam";
 import { useOeffnen, useStarten } from "./starten";
-import { Suchfeld, UnterlageZeile, useFehltJe } from "./Unterlagen";
+import { useErstellen } from "./Erstellen";
+import { Suchfeld, UnterlageZeile, useFehltJe, useUeberfaellig } from "./Unterlagen";
 import { BelegErfassenSeite } from "./Belege";
 
 /** Ab so vielen Unterlagen lohnt sich die Suche. */
 const SUCHE_AB = 6;
 
 /** Offene Rechnungen auf einen Blick – antippen filtert die Liste. */
-function OffeneKarte({ anzahl, cent, aktiv, onPress }: { anzahl: number; cent: number; aktiv: boolean; onPress: () => void }) {
+function OffeneKarte({ anzahl, ueberfaellig, cent, aktiv, onPress }: { anzahl: number; ueberfaellig: number; cent: number; aktiv: boolean; onPress: () => void }) {
   const f = useFarben();
   return (
     <Karte stil={{ marginBottom: 16, paddingVertical: 14, flexDirection: "row", alignItems: "center", gap: 14, backgroundColor: aktiv ? f.baldHauch : f.blatt }}>
-      <Kachel symbol={anzahl ? "clock" : "checkmark.circle.fill"} ton={anzahl ? "bald" : "amt"} />
+      <Kachel symbol={ueberfaellig ? "exclamationmark.circle" : anzahl ? "clock" : "checkmark.circle.fill"} ton={ueberfaellig ? "frist" : anzahl ? "bald" : "amt"} />
       <View style={{ flex: 1 }}>
         <T fett>{anzahl ? TEXT.offene_summe(anzahl, euroText(cent)) : TEXT.alles_bezahlt}</T>
-        {anzahl ? <T v="caption" leise>{TEXT.offene_hilfe}</T> : null}
+        {anzahl ? <T v="caption" leise farbe={ueberfaellig ? f.frist : undefined}>{ueberfaellig ? TEXT.davon_ueberfaellig(ueberfaellig) : TEXT.offene_hilfe}</T> : null}
       </View>
       {anzahl ? <Knopf ton text={aktiv ? TEXT.filter.alle : TEXT.filter.offen} onPress={onPress} stil={{ minHeight: 44, paddingHorizontal: 12 }} /> : null}
     </Karte>
@@ -36,7 +37,8 @@ const SCHRITT = 50;
 
 /** Alle angelegten Unterlagen, zuletzt bearbeitete zuerst; Filter und Suche, sobald es sich lohnt. */
 export function Meine() {
-  const { stand, tabWechseln } = useAmtlos();
+  const { stand } = useAmtlos();
+  const erstellen = useErstellen();
   const nav = useNav();
   const oeffnen = useOeffnen();
   const belegOeffnen = (id: string) => nav.oeffnen(`beleg-${id}`, () => <BelegSeite id={id} />, true);
@@ -55,14 +57,15 @@ export function Meine() {
   }, [alle, aktiv, suche]);
   const belege = useMemo(() => (aktiv === "alle" || aktiv === "belege" ? belegeFiltern(stand.belege, suche) : []), [aktiv, stand.belege, suche]);
   const belegeGezeigt = aktiv === "belege" ? belege : belege.slice(0, 5);
-  const offen = useMemo(() => offeneSumme(alle, stand.betrieb), [alle, stand.betrieb]);
+  const offen = useMemo(() => offeneSumme(alle, stand.betrieb, heute()), [alle, stand.betrieb]);
   const hatRechnungen = alle.some((u) => u.vorlage === "rechnung" && u.festgeschrieben);
   const fehltJe = useFehltJe();
+  const ueberJe = useUeberfaellig();
   return (
     <Seite titel={TEXT.meine_titel} unterzeile={alle.length ? TEXT.anzahl_unterlagen(alle.length) : undefined}>
       {alle.length || stand.belege.length ? (
         <View>
-          {hatRechnungen ? <OffeneKarte anzahl={offen.anzahl} cent={offen.cent} aktiv={aktiv === "offen"} onPress={() => setFilter(aktiv === "offen" ? "alle" : "offen")} /> : null}
+          {hatRechnungen ? <OffeneKarte anzahl={offen.anzahl} ueberfaellig={offen.ueberfaellig} cent={offen.cent} aktiv={aktiv === "offen"} onPress={() => setFilter(aktiv === "offen" ? "alle" : "offen")} /> : null}
           {alle.length + stand.belege.length >= SUCHE_AB ? (
             <View style={{ marginBottom: 12 }}>
               <Suchfeld wert={suche} setzen={setSuche} label={TEXT.meine_suchen} />
@@ -76,7 +79,7 @@ export function Meine() {
           {liste.length ? (
             <Karte>
               {liste.slice(0, zeigen).map((u, i, l) => (
-                <UnterlageZeile key={u.id} u={u} letzte={i === l.length - 1} fehlt={fehltJe.get(u.id) ?? 0} betrieb={stand.betrieb} onPress={oeffnen} />
+                <UnterlageZeile key={u.id} u={u} ueber={ueberJe.get(u.id) ?? 0} letzte={i === l.length - 1} fehlt={fehltJe.get(u.id) ?? 0} betrieb={stand.betrieb} onPress={oeffnen} />
               ))}
             </Karte>
           ) : !belege.length ? (
@@ -104,7 +107,7 @@ export function Meine() {
           <View style={{ gap: 10 }}>
             <Knopf symbol="plus" text={TEXT.rechnung_schreiben} onPress={() => starten("rechnung")} />
             <Knopf ton symbol="doc.viewfinder" text={TEXT.beleg_erfassen} onPress={() => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />)} />
-            <TextKnopf symbol="doc.text" text={TEXT.zu_den_unterlagen} onPress={() => tabWechseln("unterlagen")} stil={{ alignSelf: "center" }} />
+            <TextKnopf symbol="doc.text" text={TEXT.zu_den_unterlagen} onPress={erstellen.oeffnen} stil={{ alignSelf: "center" }} />
           </View>
         </Leer>
       )}

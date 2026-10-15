@@ -56,11 +56,44 @@ export function rechnungBrutto(u: Unterlage, betrieb: Betrieb): number {
   return c;
 }
 
-/** Offene (geteilte, unbezahlte, nicht stornierte) Rechnungen: Anzahl und Bruttosumme in Cent. */
-export function offeneSumme(unterlagen: Unterlage[], betrieb: Betrieb): { anzahl: number; cent: number } {
+/** Fälligkeit einer Rechnung nach ihrem eigenen Zahlungsziel (Rechnungsdatum + Tage; „sofort“ = Rechnungsdatum). */
+export function faelligAm(u: Unterlage): string | null {
+  const datum = typeof u.daten.datum === "string" && /^\d{4}-\d{2}-\d{2}$/.test(u.daten.datum) ? u.daten.datum : null;
+  const ziel = typeof u.daten.zahlungsziel === "string" ? u.daten.zahlungsziel : "";
+  if (!datum || !ziel) return null;
+  if (ziel === "sofort") return datum;
+  const tage = Number(ziel);
+  if (!Number.isFinite(tage)) return null;
+  const d = new Date(`${datum}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + tage);
+  return d.toISOString().slice(0, 10);
+}
+
+/** Tage, die eine offene Rechnung über ihrem Zahlungsziel ist (0 = nicht überfällig, bezahlt oder ohne Ziel). */
+export function tageUeberfaellig(u: Unterlage, heute: string, offen: Set<string>): number {
+  const am = offen.has(u.id) ? faelligAm(u) : null;
+  if (!am || am >= heute) return 0;
+  return Math.round((Date.parse(`${heute}T12:00:00Z`) - Date.parse(`${am}T12:00:00Z`)) / 864e5);
+}
+
+/** Offene (geteilte, unbezahlte, nicht stornierte) Rechnungen: Anzahl, Bruttosumme in Cent, davon überfällig. */
+export function offeneSumme(unterlagen: Unterlage[], betrieb: Betrieb, heute?: string): { anzahl: number; cent: number; ueberfaellig: number } {
   const offen = offeneRechnungen(unterlagen).filter((u) => !istStorno(u));
   const cent = offen.reduce((a, u) => a + rechnungBrutto(u, betrieb), 0);
-  return { anzahl: offen.length, cent };
+  const ids = new Set(offen.map((u) => u.id));
+  return { anzahl: offen.length, cent, ueberfaellig: heute ? offen.filter((u) => tageUeberfaellig(u, heute, ids) > 0).length : 0 };
+}
+
+/** Ids der offenen Rechnungen (für Listen: einmal berechnen, je Zeile nachschlagen). */
+export const offeneIds = (unterlagen: Unterlage[]) => new Set(offeneRechnungen(unterlagen).filter((u) => !istStorno(u)).map((u) => u.id));
+
+/**
+ * Im Monat berechnet (`monat` = JJJJ-MM, nach Rechnungsdatum): geteilte Rechnungen brutto, Stornorechnungen ziehen ab.
+ * `anzahl` zählt die Rechnungen ohne Stornos.
+ */
+export function monatsSumme(unterlagen: Unterlage[], betrieb: Betrieb, monat: string): { anzahl: number; cent: number } {
+  const im = unterlagen.filter((u) => u.vorlage === "rechnung" && u.festgeschrieben && typeof u.daten.datum === "string" && u.daten.datum.startsWith(monat));
+  return { anzahl: im.filter((u) => !istStorno(u)).length, cent: im.reduce((a, u) => a + rechnungBrutto(u, betrieb), 0) };
 }
 
 /** Rechnungen: neueste Rechnung zuerst (Rechnungsdatum, dann Nummer) – eine Zahlung ändert die Reihenfolge nicht. */

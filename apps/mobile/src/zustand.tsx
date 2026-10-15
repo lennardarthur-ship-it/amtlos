@@ -16,7 +16,7 @@ import { LEERER_STAND, belegLoeschen, belegSetzen, neueId, steuerberatungSetzen,
 /** Alles liegt nur auf dem Gerät (E-121): kein Konto, kein Server. Seit E-129 verschlüsselt (Schlüssel im Schlüsselbund). */
 const SCHLUESSEL = "amtlos.unterlagen.v1";
 
-export type Tab = "pflichten" | "unterlagen" | "meine" | "betrieb";
+export type Tab = "heute" | "pflichten" | "meine" | "betrieb";
 
 interface Zustand {
   bereit: boolean;
@@ -95,7 +95,7 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
   const [ladefehler, setLadefehler] = useState(false);
   const sperre = useRef(false);
   const [stand, setStand] = useState<Stand>(LEERER_STAND);
-  const [tab, tabWechseln] = useState<Tab>("pflichten");
+  const [tab, tabWechseln] = useState<Tab>("heute");
   // aktueller Stand für Handlungen, die sofort ein Ergebnis zurückgeben (anlegen, kopieren)
   const aktuell = useRef(stand);
   const zeit = useRef<ReturnType<typeof setTimeout> | null>(null);

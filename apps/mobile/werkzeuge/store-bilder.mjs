@@ -69,8 +69,8 @@ try {
   await p.goto("http://localhost:4997/");
   await warte(2500);
   await foto("pflichten");
-  // erste Pflicht unter „Jetzt dran“ (welche das ist, hängt vom Tag ab)
-  await p.getByRole("button", { name: /^Gefährdungsbeurteilung erstellen|Nächster Termin/ }).locator("visible=true").first().click();
+  // erste Pflicht unter „Als Nächstes“ auf „Heute“ (welche das ist, hängt vom Tag ab)
+  await p.getByRole("button", { name: /fällig|Nächster Termin/ }).locator("visible=true").first().click();
   await warte(900);
   await foto("pflicht");
   await knopf("Zurück").click();
@@ -86,8 +86,11 @@ try {
   await warte(600);
   await knopf("Schließen").click();
   await warte(700);
-  await tab("Vorlagen");
+  await knopf("Erstellen").click();
+  await warte(1000);
   await foto("vorlagen");
+  await knopf("Schließen").click();
+  await warte(700);
   await tab("Mein Betrieb");
   await foto("betrieb");
 } finally {
