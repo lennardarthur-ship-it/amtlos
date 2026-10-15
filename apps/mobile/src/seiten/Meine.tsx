@@ -2,11 +2,11 @@ import { useState, useMemo } from "react";
 import { ScrollView, View } from "react-native";
 import { T as TEXT } from "../texte";
 import { RAND } from "../ui/thema";
-import { Kachel, Karte, Knopf, T, TextKnopf, Wahl } from "../ui/bausteine";
+import { Betrag, Kachel, Karte, Knopf, T, TextKnopf, Wahl } from "../ui/bausteine";
 import { useNav } from "../ui/navigation";
 import { useFarben } from "../ui/thema";
-import { belegeFiltern, euroText, filterVerfuegbar, filtern, offeneSumme, rechnungenSortiert, type Filter } from "../unterlagen/ablage";
-import { heute, sortiert } from "../unterlagen/speicher";
+import { belegeFiltern, euroText, rechnungBrutto, filterVerfuegbar, filtern, offeneSumme, rechnungenSortiert, type Filter } from "../unterlagen/ablage";
+import { heute, sortiert, type Unterlage } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { BelegErfassen, BelegSeite, BelegZeile } from "./Belege";
 import { Gruppe, Leer, Seite } from "./gemeinsam";
@@ -35,9 +35,27 @@ function OffeneKarte({ anzahl, ueberfaellig, cent, aktiv, onPress }: { anzahl: n
 
 const SCHRITT = 50;
 
+/**
+ * Liste in Monatsgruppen: Rechnungen nach Rechnungsdatum, sonst nach letzter Bearbeitung. Liegt alles in einem Monat
+ * oder sind es nur wenige Einträge, bleibt es eine Gruppe ohne Überschrift.
+ */
+function nachMonat(liste: Unterlage[], rechnungen: boolean) {
+  const schluessel = (u: Unterlage) => (rechnungen && typeof u.daten.datum === "string" && /^\d{4}-\d{2}/.test(u.daten.datum) ? u.daten.datum.slice(0, 7) : (u.ausgegeben && u.ausgegeben > u.geaendert ? u.ausgegeben : u.geaendert).slice(0, 7));
+  const gruppen: { monat: string; titel: string; rechnungen: boolean; liste: Unterlage[] }[] = [];
+  for (const u of liste) {
+    const m = schluessel(u);
+    const g = gruppen.at(-1);
+    if (g && g.monat === m) g.liste.push(u);
+    else gruppen.push({ monat: m, titel: new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", month: "long", year: "numeric" }).format(new Date(`${m}-15T12:00:00Z`)), rechnungen, liste: [u] });
+  }
+  if (gruppen.length < 2 || liste.length < 6) return [{ monat: "alle", titel: "", rechnungen: false, liste }];
+  return gruppen;
+}
+
 /** Alle angelegten Unterlagen, zuletzt bearbeitete zuerst; Filter und Suche, sobald es sich lohnt. */
 export function Meine() {
   const { stand } = useAmtlos();
+  const f = useFarben();
   const erstellen = useErstellen();
   const nav = useNav();
   const oeffnen = useOeffnen();
@@ -77,11 +95,24 @@ export function Meine() {
             </ScrollView>
           ) : null}
           {liste.length ? (
-            <Karte>
-              {liste.slice(0, zeigen).map((u, i, l) => (
-                <UnterlageZeile key={u.id} u={u} ueber={ueberJe.get(u.id) ?? 0} letzte={i === l.length - 1} fehlt={fehltJe.get(u.id) ?? 0} betrieb={stand.betrieb} onPress={oeffnen} />
+            // nach Monaten gegliedert (bei Rechnungen nach Rechnungsdatum, mit Monatssumme) – lange Listen bleiben lesbar
+            <View style={{ gap: 18 }}>
+              {nachMonat(liste.slice(0, zeigen), aktiv === "rechnungen" || aktiv === "offen").map((g) => (
+                <View key={g.monat}>
+                  {g.titel ? (
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8, marginHorizontal: 2 }}>
+                      <T v="klein" fett leise accessibilityRole="header">{g.titel}</T>
+                      {g.rechnungen ? <Betrag v="klein" farbe={f.tinteLeise}>{euroText(g.liste.reduce((a, u) => a + rechnungBrutto(u, stand.betrieb), 0))}</Betrag> : null}
+                    </View>
+                  ) : null}
+                  <Karte>
+                    {g.liste.map((u, i, l) => (
+                      <UnterlageZeile key={u.id} u={u} ueber={ueberJe.get(u.id) ?? 0} letzte={i === l.length - 1} fehlt={fehltJe.get(u.id) ?? 0} betrieb={stand.betrieb} onPress={oeffnen} />
+                    ))}
+                  </Karte>
+                </View>
               ))}
-            </Karte>
+            </View>
           ) : !belege.length ? (
             <T leise stil={{ marginTop: 8 }}>{TEXT.meine_nichts}</T>
           ) : null}
