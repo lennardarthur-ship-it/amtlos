@@ -136,6 +136,16 @@ export function Fristblatt({ termin, heute, erledigt, groesse = 46 }: { termin: 
   );
 }
 
+/** Geschafft: gefüllter grüner Kreis mit Haken – der Moment nach dem Check, nach dem Teilen. */
+export function Erfolg({ groesse = 64 }: { groesse?: number }) {
+  const f = useFarben();
+  return (
+    <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={{ width: groesse, height: groesse, borderRadius: groesse / 2, backgroundColor: f.amt, alignItems: "center", justifyContent: "center" }}>
+      <Symbol name="checkmark" groesse={Math.round(groesse * 0.44)} farbe={f.amtText} gewicht="heavy" />
+    </View>
+  );
+}
+
 /**
  * Bildmotiv (E-139): ein Zeichen aus der Welt der Pflichten und Rechnungen (§, €) als große, angeschnittene Grafik auf
  * der Bühne – das wiederkehrende Bildelement statt Illustrationen. Rein dekorativ.
@@ -246,7 +256,7 @@ export function Fuss({ children, ueber }: { children: ReactNode; ueber?: ReactNo
   const f = useFarben();
   const inset = useSafeAreaInsets();
   return (
-    <View style={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: Math.max(inset.bottom, 14) + 4, borderTopWidth: HAARLINIE, borderColor: f.linie, backgroundColor: f.papier, gap: 8 }}>
+    <View style={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: Math.max(inset.bottom, 14) + 4, backgroundColor: f.papier, gap: 8 }}>
       {ueber}
       <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>{children}</View>
     </View>
@@ -268,8 +278,8 @@ export function KopfKnopf({ symbol, label, onPress }: { symbol: string; label: s
   const f = useFarben();
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} hitSlop={10} style={({ pressed }) => ({ width: ZIEL, height: ZIEL, alignItems: "center", justifyContent: "center", opacity: pressed ? 0.6 : 1 })}>
-      <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: f.flaeche, alignItems: "center", justifyContent: "center" }}>
-        <Symbol name={symbol} groesse={14} farbe={f.tinteLeise} gewicht="bold" />
+      <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: f.blatt, alignItems: "center", justifyContent: "center" }}>
+        <Symbol name={symbol} groesse={15} farbe={f.tinte} gewicht="bold" />
       </View>
     </Pressable>
   );

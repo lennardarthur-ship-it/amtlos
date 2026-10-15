@@ -3,7 +3,7 @@ import { Animated, Dimensions, Easing, PanResponder, Pressable, View } from "rea
 import { SafeAreaView } from "react-native-safe-area-context";
 import { T as TEXT } from "../texte";
 import { Symbol, T } from "./bausteine";
-import { HAARLINIE, RAND, ZIEL, useFarben } from "./thema";
+import { RAND, ZIEL, useFarben } from "./thema";
 
 /**
  * Stapel-Navigation je Tab (E-120), ohne zusätzliche Pakete: Unterseiten schieben sich von rechts herein,
@@ -109,13 +109,17 @@ export function Unterseite({ titel, children, rechts }: { titel: string; childre
   return (
     // Zwei-Finger-Z-Geste von VoiceOver führt zurück
     <SafeAreaView style={{ flex: 1, backgroundColor: f.papier }} edges={["top", "left", "right"]} onAccessibilityEscape={nav.zurueck}>
-      <View style={{ minHeight: 50, flexDirection: "row", alignItems: "center", paddingHorizontal: RAND - 12, borderBottomWidth: HAARLINIE, borderColor: f.linie }}>
-        <Pressable accessibilityRole="button" accessibilityLabel={TEXT.zurueck} onPress={nav.zurueck} hitSlop={8} style={({ pressed }) => ({ minWidth: ZIEL + 40, height: ZIEL, flexDirection: "row", alignItems: "center", gap: 3, opacity: pressed ? 0.5 : 1 })}>
-          <Symbol name="chevron.left" groesse={19} farbe={f.amt} gewicht="semibold" />
-          <T farbe={f.amt}>{TEXT.zurueck}</T>
-        </Pressable>
-        <T fett numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.85} accessibilityRole="header" stil={{ flex: 1, textAlign: "center", marginHorizontal: 4, paddingVertical: 4, letterSpacing: 0.1 }}>{titel}</T>
-        <View style={{ minWidth: ZIEL + 40, alignItems: "flex-end" }}>{rechts}</View>
+      {/* Kopf ohne Trennlinie: runder Zurück-Knopf, Titel mittig – wie in aktuellen iOS-Apps */}
+      <View style={{ minHeight: 54, flexDirection: "row", alignItems: "center", paddingHorizontal: RAND - 14 }}>
+        <View style={{ minWidth: ZIEL + 36, alignItems: "flex-start" }}>
+          <Pressable accessibilityRole="button" accessibilityLabel={TEXT.zurueck} onPress={nav.zurueck} hitSlop={8} style={({ pressed }) => ({ width: ZIEL, height: ZIEL, alignItems: "center", justifyContent: "center", opacity: pressed ? 0.55 : 1 })}>
+            <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: f.blatt, alignItems: "center", justifyContent: "center" }}>
+              <Symbol name="chevron.left" groesse={16} farbe={f.tinte} gewicht="bold" />
+            </View>
+          </Pressable>
+        </View>
+        <T fett numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.85} accessibilityRole="header" stil={{ flex: 1, textAlign: "center", marginHorizontal: 4, paddingVertical: 4, letterSpacing: -0.2 }}>{titel}</T>
+        <View style={{ minWidth: ZIEL + 36, alignItems: "flex-end" }}>{rechts}</View>
       </View>
       <View style={{ flex: 1 }}>{children}</View>
     </SafeAreaView>

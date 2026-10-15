@@ -5,7 +5,7 @@ import { T as TEXT } from "../texte";
 import { Fuss, Karte, Knopf, Symbol, T, TextKnopf, Wahl } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
-import { RAND, ZIEL, useFarben } from "../ui/thema";
+import { HAARLINIE, RADIUS, RAND, ZIEL, useFarben } from "../ui/thema";
 import { heute, personenSortiert } from "../unterlagen/speicher";
 import { VORSCHLAG_GRUPPE } from "../pflichten/check";
 import { useAmtlos } from "../zustand";
@@ -206,13 +206,15 @@ export function ListenSchritt({ feld, id }: { feld: ListenFeld; id: string }) {
           {eintraege.map((e, i) => {
             const fehlt = fehltIn(feld, e);
             return (
-              <Pressable key={i} accessibilityRole="button" accessibilityLabel={`${feld.eintrag} ${i + 1}: ${anzeigeTitel(feld, e, i)}`} onPress={() => oeffnen(i)} style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 12, minHeight: ZIEL + 8, paddingVertical: 10, borderTopWidth: i ? 1 : 0, borderColor: f.linieLeise, opacity: pressed ? 0.6 : 1 })}>
-                <T v="caption" fett leise stil={{ width: 18, fontVariant: ["tabular-nums"] }}>{i + 1}</T>
+              <Pressable key={i} accessibilityRole="button" accessibilityLabel={`${feld.eintrag} ${i + 1}: ${anzeigeTitel(feld, e, i)}`} onPress={() => oeffnen(i)} style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 14, minHeight: ZIEL + 12, paddingVertical: 12, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie, opacity: pressed ? 0.6 : 1 })}>
+                <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: fehlt.length ? f.baldHauch : f.amtHauch, alignItems: "center", justifyContent: "center" }}>
+                  <T v="caption" fett farbe={fehlt.length ? f.bald : f.amt} stil={{ fontVariant: ["tabular-nums"] }}>{i + 1}</T>
+                </View>
                 <View style={{ flex: 1 }}>
                   <T fett={benutzt(feld, e)} leise={!benutzt(feld, e)} numberOfLines={2}>{anzeigeTitel(feld, e, i)}</T>
                   {fehlt.length ? <T v="caption" farbe={f.bald}>{TEXT.eintrag_fehlt(fehlt.length)}</T> : betragszeile(e) ? <T v="caption" leise>{betragszeile(e)}</T> : null}
                 </View>
-                <Symbol name="chevron.right" groesse={16} />
+                <Symbol name="chevron.right" groesse={14} farbe={f.zeiger} gewicht="semibold" />
               </Pressable>
             );
           })}
@@ -232,15 +234,22 @@ export function ListenSchritt({ feld, id }: { feld: ListenFeld; id: string }) {
           }}
         />
       ) : null}
-      <TextKnopf
-        symbol="plus"
-        text={feld.vorschlaege?.length ? TEXT.eigener_eintrag(feld.eintrag) : TEXT.hinzufuegen(feld.eintrag)}
+      {/* Hinzufügen als gestrichelte Zeile – zeigt, wo der nächste Eintrag hinkommt */}
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={feld.vorschlaege?.length ? TEXT.eigener_eintrag(feld.eintrag) : TEXT.hinzufuegen(feld.eintrag)}
         onPress={() => {
           const liste = eintraegeVon(z.daten(id), feld);
           z.setzen(id, { [feld.id]: [...liste, neuerEintrag(feld, z.stand.betrieb, heute())] });
           oeffnen(liste.length, true);
         }}
-      />
+        style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 12, minHeight: 56, paddingHorizontal: 16, borderRadius: RADIUS.karte, borderWidth: 1.5, borderStyle: "dashed", borderColor: f.rahmen, backgroundColor: pressed ? f.blatt : "transparent" })}
+      >
+        <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: f.amt, alignItems: "center", justifyContent: "center" }}>
+          <Symbol name="plus" groesse={15} farbe={f.amtText} gewicht="bold" />
+        </View>
+        <T fett farbe={f.amt}>{feld.vorschlaege?.length ? TEXT.eigener_eintrag(feld.eintrag) : TEXT.hinzufuegen(feld.eintrag)}</T>
+      </Pressable>
     </View>
   );
 }

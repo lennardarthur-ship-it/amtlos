@@ -4,7 +4,7 @@ import { T as TEXT } from "../texte";
 import { useMeldung } from "../ui/meldung";
 import { Betrag, Fristblatt, Fuss, Hinweis, Kachel, Karte, Knopf, Motiv, Schalter, SchnellKachel, Symbol, T, TextKnopf, Zeile, tageBis } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
-import { HAARLINIE, RADIUS, RAND, useFarben, weich } from "../ui/thema";
+import { HAARLINIE, RADIUS, RAND, SCHRIFT, useFarben, weich } from "../ui/thema";
 import { KATEGORIE_TITEL, auswertung, beantwortet, dringlichkeit, erinnerungsPlan, fortschritt, frageZu, haken, istErledigt, offeneFragenNachWirkung, type PflichtInfo } from "../pflichten/check";
 import { allesAbsagen, erinnerungenMoeglich, erlaubnisAnfragen, planen } from "../pflichten/erinnerungen";
 import { heute } from "../unterlagen/speicher";
@@ -27,11 +27,11 @@ export function useAuswertung() {
 /** Hat jemand den Check schon gemacht? (die erste Frage ist beantwortet) */
 export const checkGemacht = (profil: Record<string, unknown>) => beantwortet(profil as never, "taetigkeit.branchen") || beantwortet(profil as never, "rechtsform");
 
-function Balken({ prozent }: { prozent: number }) {
+function Balken({ prozent, grund, farbe }: { prozent: number; grund?: string; farbe?: string }) {
   const f = useFarben();
   return (
-    <View accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: 100, now: prozent }} style={{ height: 6, borderRadius: 3, backgroundColor: f.flaeche, overflow: "hidden" }}>
-      <View style={{ width: `${prozent}%`, height: 6, borderRadius: 3, backgroundColor: f.amt }} />
+    <View accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: 100, now: prozent }} style={{ height: 8, borderRadius: 4, backgroundColor: grund ?? f.flaeche, overflow: "hidden" }}>
+      <View style={{ width: `${Math.max(prozent, 2)}%`, height: 8, borderRadius: 4, backgroundColor: farbe ?? f.amt }} />
     </View>
   );
 }
@@ -179,16 +179,15 @@ function PflichtenInhalt() {
   const fertig = (p: PflichtInfo) => istErledigt(p, { erledigt, unterlagen, betrieb });
   return (
     <View>
-      <Karte stil={{ paddingVertical: 18, gap: 12 }}>
-        <T v="gross" accessibilityRole="header">{TEXT.ergebnis_titel(a.gilt.length)}</T>
-        <View style={{ gap: 8 }}>
-          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "baseline" }}>
-            <T v="klein" leise>{TEXT.fortschritt_text(fs.fertig, fs.gesamt)}</T>
-            <Betrag v="klein" farbe={f.amtTief}>{`${fs.prozent} %`}</Betrag>
-          </View>
-          <Balken prozent={fs.prozent} />
+      {/* Fortschritt auf der Bühne: große Zahl in Minze, darunter der Balken */}
+      <View style={{ padding: 22, borderRadius: RADIUS.buehne, backgroundColor: f.buehne, gap: 14, overflow: "hidden" }}>
+        <T v="gross" farbe={f.buehneText} accessibilityRole="header">{TEXT.ergebnis_titel(a.gilt.length)}</T>
+        <View style={{ flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", gap: 12 }}>
+          <Betrag farbe={f.minze} stil={{ fontFamily: SCHRIFT.display, fontSize: 48, lineHeight: 52, letterSpacing: -1.6 }}>{`${fs.prozent} %`}</Betrag>
+          <T v="klein" farbe={f.buehneLeise} stil={{ marginBottom: 8, textAlign: "right", flexShrink: 1 }}>{TEXT.fortschritt_text(fs.fertig, fs.gesamt)}</T>
         </View>
-      </Karte>
+        <Balken prozent={fs.prozent} grund="rgba(255,255,255,0.14)" farbe={f.minze} />
+      </View>
       <T v="caption" leise stil={{ marginTop: 8, marginLeft: 2 }}>{TEXT.pflichten_quelle}</T>
       <ErinnerungsSchalter />
       {d.jetzt.length ? (

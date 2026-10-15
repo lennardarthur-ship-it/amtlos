@@ -2,10 +2,10 @@ import { useState } from "react";
 import { Pressable, Share, View } from "react-native";
 import { KU_HINWEIS, PRUEFHINWEIS, dateiname, dokumentHtml, eRechnungAus, vorlageFuer, xrechnungUbl } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { Betrag, DatumFeld, Fuss, Hinweis, Kachel, Karte, Knopf, Stempel, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
+import { Betrag, DatumFeld, Fuss, Hinweis, Kachel, Karte, Knopf, Erfolg, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
-import { HAARLINIE, RADIUS, useFarben } from "../ui/thema";
+import { HAARLINIE, RADIUS, SCHRIFT, useFarben } from "../ui/thema";
 import { Vorschau } from "../ui/Vorschau";
 import { drucken, pdfTeilen } from "../unterlagen/pdf";
 import { NUMMER_DOPPELT, fehltFuer } from "../unterlagen/pruefung";
@@ -119,8 +119,25 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
   const fertig = alle.length === 0;
   return (
     <View>
-      {fest || fertig ? <Stempel groesse={52} farbe={fest && !(v.storno && !d.storno_zu) ? f.tinteLeise : f.amt} /> : null}
+      {fest || fertig ? (fest && !(v.storno && !d.storno_zu) ? <Kachel symbol="lock.fill" ton="leise" groesse={60} /> : <Erfolg groesse={60} />) : null}
       <T v="titel" accessibilityRole="header" stil={{ marginTop: fest || fertig ? 14 : 0 }}>{fest ? (v.storno && !d.storno_zu ? TEXT.geteilt_titel : TEXT.festgeschrieben_titel) : fertig ? TEXT.fertig : TEXT.fast_fertig}</T>
+      {ergebnis.length ? (
+        // die Summe groß oben (wie der Betrag in Finanz-Apps), die Bestandteile darunter
+        <Karte stil={{ marginTop: 14, paddingVertical: 18 }}>
+          <T v="klein" fett leise>{ergebnis.at(-1)![0]}</T>
+          <Betrag stil={{ fontFamily: SCHRIFT.display, fontSize: 38, lineHeight: 44, letterSpacing: -1.2, marginTop: 2 }}>{ergebnis.at(-1)![1]}</Betrag>
+          {ergebnis.length > 1 ? (
+            <View style={{ marginTop: 12, borderTopWidth: HAARLINIE, borderColor: f.linie, paddingTop: 8 }}>
+              {ergebnis.slice(0, -1).map(([k, w]) => (
+                <View key={k} style={{ flexDirection: "row", justifyContent: "space-between", gap: 12, paddingVertical: 5 }}>
+                  <T v="klein" leise stil={{ flex: 1 }}>{k}</T>
+                  <T v="klein" stil={{ flexShrink: 1, textAlign: "right", fontVariant: ["tabular-nums"] }}>{w}</T>
+                </View>
+              ))}
+            </View>
+          ) : null}
+        </Karte>
+      ) : null}
       {fest ? (
         <View style={{ marginTop: 10 }}>
           {v.storno && !d.storno_zu ? (
@@ -156,21 +173,6 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
       {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
       {v.festschreiben && !fest ? <T v="caption" leise stil={{ marginTop: 8 }}>{TEXT.wird_festgeschrieben}</T> : null}
       {zaehlt ? <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.pro_rest(rest, FREI_JE_MONAT)}</T> : null}
-
-      {ergebnis.length ? (
-        <Karte stil={{ marginTop: 18 }}>
-          {ergebnis.map(([k, w], i) => {
-            // die letzte Zeile ist die Summe: größer, mit doppelter Linie darüber wie auf dem Dokument
-            const summe = i === ergebnis.length - 1 && ergebnis.length > 1;
-            return (
-              <View key={k} style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "baseline", gap: 12, paddingVertical: summe ? 14 : 11, borderTopWidth: summe ? 2 : i ? HAARLINIE : 0, borderColor: summe ? f.tinte : f.linie }}>
-                <T stil={{ flex: 1 }} fett={summe} leise={!summe}>{k}</T>
-                {summe ? <Betrag v="gross" stil={{ flexShrink: 1, textAlign: "right", fontSize: 22 }}>{w}</Betrag> : <T stil={{ flexShrink: 1, textAlign: "right", fontVariant: ["tabular-nums"] }}>{w}</T>}
-              </View>
-            );
-          })}
-        </Karte>
-      ) : null}
 
       <Pressable accessibilityRole="button" accessibilityLabel={TEXT.vorschau_oeffnen} onPress={() => nav.oeffnen(`vorschau-${id}`, () => <VorschauSeite id={id} />, true)} style={({ pressed }) => ({ marginTop: 18, opacity: pressed ? 0.85 : 1 })}>
         <Vorschau html={html} quer={v.querformat} hoehe={v.querformat ? 260 : 400} />

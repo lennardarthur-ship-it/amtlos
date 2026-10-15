@@ -3,9 +3,9 @@ import { AccessibilityInfo, KeyboardAvoidingView, Platform, ScrollView, View } f
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { Frage } from "@amtlos/i18n";
 import { T as TEXT } from "../texte";
-import { Auswahl, DatumFeld, Fakt, Feld, Fuss, Hinweis, Kachel, Karte, Knopf, KopfKnopf, MehrfachWahl, Stempel, T, TextKnopf, ZurueckKnopf } from "../ui/bausteine";
+import { Auswahl, DatumFeld, Fakt, Feld, Fuss, Hinweis, Motiv, Karte, Knopf, KopfKnopf, MehrfachWahl, Erfolg, T, TextKnopf, ZurueckKnopf } from "../ui/bausteine";
 import { useNav } from "../ui/navigation";
-import { RAND, ZIEL, istIos, useFarben } from "../ui/thema";
+import { RADIUS, RAND, ZIEL, istIos, useFarben } from "../ui/thema";
 import { CHECK_FELDER, auswertung, beantwortet, checkFragen, zusatzFragen, type Profil } from "../pflichten/check";
 import { heute } from "../unterlagen/speicher";
 import { PflichtZeile } from "./Pflichten";
@@ -146,8 +146,11 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
         <ScrollView key={i} contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 12, paddingBottom: 32 }} keyboardShouldPersistTaps="handled">
           {i < 0 ? (
             <View>
-              <Kachel symbol="checklist" groesse={56} />
-              <T v="titel" accessibilityRole="header" stil={{ marginTop: 18 }}>{TEXT.check_einleitung_titel}</T>
+              {/* Bildfläche mit dem §-Motiv – der Auftakt zum Check */}
+              <View style={{ height: 150, borderRadius: RADIUS.buehne, backgroundColor: f.amtHauch, overflow: "hidden" }}>
+                <Motiv zeichen="§" groesse={230} farbe={f.amt} stil={{ right: 24, top: -40 }} />
+              </View>
+              <T v="titel" accessibilityRole="header" stil={{ marginTop: 22 }}>{TEXT.check_einleitung_titel}</T>
               <T stil={{ marginTop: 10 }}>{TEXT.check_einleitung_text}</T>
               <View style={{ marginTop: 18 }}>
                 <Hinweis text={TEXT.check_hinweis} />
@@ -155,7 +158,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
             </View>
           ) : zwischenschirm ? (
             <View>
-              <Stempel groesse={60} />
+              <Erfolg />
               <T v="titel" accessibilityRole="header" stil={{ marginTop: 18 }}>{TEXT.zwischen_titel}</T>
               <T stil={{ marginTop: 10 }}>{TEXT.zwischen_text(extraN)}</T>
             </View>
@@ -170,7 +173,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
             </View>
           ) : a ? (
             <View>
-              <Stempel groesse={60} />
+              <Erfolg />
               <T v="titel" accessibilityRole="header" stil={{ marginTop: 18 }}>{TEXT.ergebnis_titel(a.gilt.length)}</T>
               {a.gilt.length ? (
                 <View style={{ marginTop: 14 }}>

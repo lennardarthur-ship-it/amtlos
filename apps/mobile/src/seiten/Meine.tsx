@@ -134,7 +134,7 @@ export function Meine() {
           </Gruppe>
         </View>
       ) : (
-        <Leer text={TEXT.meine_leer} unter={TEXT.meine_leer_text}>
+        <Leer symbol="folder" text={TEXT.meine_leer} unter={TEXT.meine_leer_text}>
           <View style={{ gap: 10 }}>
             <Knopf symbol="plus" text={TEXT.rechnung_schreiben} onPress={() => starten("rechnung")} />
             <Knopf ton symbol="doc.viewfinder" text={TEXT.beleg_erfassen} onPress={() => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />)} />

@@ -761,6 +761,16 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Motive:** § (Pflichten-Einladung) und € (Pro) erscheinen groß und angeschnitten in Minze auf der Bühne – statt Illustrationen. Der Stempel bleibt für geschaffte Schritte.
 - **Fragen:** Der Pflichten-Check zeigt große Antwortkarten statt Chips: eine Karte je Möglichkeit, gewählt mit grünem Rahmen und Radiokreis bzw. Kästchen. Das Check-Ergebnis zeigt die ersten Pflichten mit Fristblatt.
 - **Store-Bilder:** dunkelgrüne Fläche, Überschrift in Onest extrafett, Untertitel in Minze.
+- **Zweiter Durchgang:**
+  - Unterseiten ohne Trennlinie, mit rundem Zurück-Knopf.
+  - Geschafft als gefüllter grüner Kreis statt dünnem Stempel.
+  - Abschluss zeigt die Summe groß oben (38 pt) mit den Bestandteilen darunter.
+  - Pflichten-Fortschritt auf der Bühne: große Prozentzahl in Minze mit Balken.
+  - Check-Einleitung mit §-Bildfläche.
+  - Sicherungshinweis kompakt als Zeile statt großem Kasten.
+  - Leere Listen mit großem Symbolkreis.
+  - Listeneinträge mit nummerierten Kreisen und gestrichelter „Hinzufügen“-Zeile.
+  - Fußleisten ohne Linie.
 - **Geprüft:** Rundgang hell und dunkel, Unit-Tests, Store- und Website-Bilder neu. Auf dem iPhone noch offen (→ T-82).
 
 ---

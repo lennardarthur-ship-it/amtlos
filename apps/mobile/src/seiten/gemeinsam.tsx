@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { ScrollView, View, type ScrollViewProps } from "react-native";
 import type { Bereich } from "@amtlos/fachlogik";
-import { Stempel, T } from "../ui/bausteine";
+import { Kachel, T } from "../ui/bausteine";
 import { RADIUS, RAND, schattenStil, useFarben } from "../ui/thema";
 
 /** Seitenrahmen mit großem Titel (iOS-Stil) und optionaler Unterzeile. */
@@ -22,13 +22,13 @@ export function Seite({ titel, unterzeile, aktion, ueber, children, ...rest }: S
   );
 }
 
-/** Leerer Zustand als Einladung: der Stempel, ein Satz, was jetzt sinnvoll ist, und die Handlung dazu. */
-export function Leer({ text, unter, children }: { text: string; unter?: string; children?: ReactNode }) {
+/** Leerer Zustand als Einladung: großes Symbol, ein Satz, was jetzt sinnvoll ist, und die Handlung dazu. */
+export function Leer({ text, unter, children, symbol = "tray" }: { text: string; unter?: string; children?: ReactNode; symbol?: string }) {
   const f = useFarben();
   return (
     <View style={[{ paddingTop: 28, paddingBottom: 20, paddingHorizontal: 20, borderRadius: RADIUS.karte, backgroundColor: f.blatt, gap: 18, alignItems: "stretch", borderWidth: 0 }, schattenStil(f)]}>
       <View style={{ alignItems: "center", gap: 8 }}>
-        <Stempel groesse={58} farbe={f.amt} />
+        <Kachel symbol={symbol} groesse={84} />
         <T v="gross" stil={{ textAlign: "center", marginTop: 10 }}>{text}</T>
         {unter ? <T leise stil={{ textAlign: "center", maxWidth: 300 }}>{unter}</T> : null}
       </View>
