@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Pressable, View } from "react-native";
 import * as Haptics from "expo-haptics";
 import { T as TEXT } from "../texte";
-import { FeldKopf, Karte, Suchfeld, Symbol, T, feldRahmen } from "./bausteine";
+import { FeldKopf, Karte, Suchfeld, Symbol, T, feldRahmen, useInKarte } from "./bausteine";
 import { Unterseite, useNav } from "./navigation";
 import { HAARLINIE, istIos, useFarben } from "./thema";
 import { Inhalt } from "../seiten/gemeinsam";
@@ -67,6 +67,7 @@ export function AuswahlSeite<W extends string>({ titel, wert, optionen, aendern 
 export function AuswahlZeile<W extends string>({ label, wert, optionen, aendern, hilfe, platzhalter }: { label: string; wert: W | null; optionen: Option<W>[]; aendern: (w: W) => void; hilfe?: string; platzhalter?: string }) {
   const f = useFarben();
   const nav = useNav();
+  const inKarte = useInKarte();
   const text = optionen.find((o) => o.wert === wert)?.text;
   return (
     <View style={{ marginTop: 20 }}>
@@ -76,7 +77,7 @@ export function AuswahlZeile<W extends string>({ label, wert, optionen, aendern,
         accessibilityLabel={label}
         accessibilityValue={{ text: text ?? platzhalter ?? TEXT.auswaehlen }}
         onPress={() => nav.oeffnen(`auswahl-${label}`, () => <AuswahlSeite titel={label} wert={wert} optionen={optionen} aendern={aendern} />)}
-        style={({ pressed }) => ({ ...feldRahmen(f), marginTop: 7, paddingRight: 12, flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: pressed ? f.flaeche : f.blatt })}
+        style={({ pressed }) => ({ ...feldRahmen(f, { inKarte }), marginTop: 7, paddingRight: 12, flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: pressed ? f.linie : inKarte ? f.flaeche : f.blatt })}
       >
         <T stil={{ flex: 1 }} leise={!text}>{text ?? platzhalter ?? TEXT.auswaehlen}</T>
         <Symbol name="chevron.right" groesse={14} farbe={f.zeiger} gewicht="semibold" />

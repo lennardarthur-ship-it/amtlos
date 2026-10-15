@@ -791,6 +791,12 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Farben:** Grund `#f2f2f7`, Karten Weiß, Nebentext `#6c6c70` (≥ 4,5:1), Trennlinien `#c6c6c8`. Dunkel: Schwarz mit Karten `#1c1c1e`. Amtsgrün bleibt Akzentfarbe, Bühne Dunkelgrün mit Minze.
 - **Symbole:** Listenzeilen tragen wieder Symbole, als gefüllte Quadrate mit weißem Zeichen wie in den Einstellungen (Grün, Blau, Indigo, Orange, Rot, Grau).
 - **Tab-Leiste:** schwebende Kapsel mit Glas (iOS) bzw. fast deckend (Web). Der aktive Tab ist mit einer Pille hinterlegt, rechts daneben sitzt der runde „+“-Knopf.
+- **Zweiter Durchgang:** Rückmeldung des Gründers: „überhaupt nicht clean und nicht wie ein natürlicher Teil des iPhones“.
+  - Eingabefelder gefüllt und ohne Rahmen wie in iOS: grau in Karten, weiß auf grauem Grund. Im Fokus bzw. bei Fehlern erscheint ein farbiger Rand.
+  - Chips und Auswahllisten ohne Rahmen.
+  - Die dunklen Bühnen mit §/€ entfallen in der App. Die Einladung ist eine weiße Karte mit Symbol, Titel, Satz und Knopf. Der Fortschritt steht in einer Karte. Der Check beginnt mit einem großen Symbol mittig, die Pro-Seite mit dem App-Symbol mittig (wie Apples Abo-Seiten).
+  - „Geschafft“ als `checkmark.circle.fill`.
+  - Die Web-Vorschau (Rundgänge, Store-Bilder) nutzt Inter als Ersatz für SF Pro; auf dem iPhone bleibt die Systemschrift.
 - **Geprüft:** Rundgang hell und dunkel, Unit-Tests, Store-Bilder neu. Wie die Systemschrift und das Glas wirken, zeigt nur ein echtes iPhone (→ T-82); der Web-Export nutzt eine Ersatzschrift.
 
 ---

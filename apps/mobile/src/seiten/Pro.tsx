@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Linking, Pressable, ScrollView, View } from "react-native";
+import { ActivityIndicator, Image, Linking, Pressable, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LINKS } from "../rechtliches";
 import { T as TEXT } from "../texte";
-import { Betrag, Fuss, Hinweis, Karte, Knopf, KopfKnopf, Motiv, Symbol, T, TextKnopf } from "../ui/bausteine";
+import { Betrag, Fuss, Hinweis, Karte, Knopf, KopfKnopf, Symbol, T, TextKnopf } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { useNav } from "../ui/navigation";
 import { HAARLINIE, RADIUS, RAND, schattenStil, useFarben } from "../ui/thema";
@@ -87,10 +87,12 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
         <KopfKnopf symbol="xmark" label={TEXT.schliessen} onPress={nav.zurueck} />
       </View>
       <ScrollView contentContainerStyle={{ paddingHorizontal: RAND, paddingBottom: 24 }}>
-        <View style={{ padding: 22, paddingTop: 104, borderRadius: RADIUS.buehne, backgroundColor: f.buehne, overflow: "hidden", gap: 8 }}>
-          <Motiv zeichen="€" groesse={230} farbe={f.minze} stil={{ right: -14, top: -60 }} />
-          <T v="grossTitel" farbe={f.buehneText} accessibilityRole="header">{TEXT.pro_titel}</T>
-          <T farbe={f.buehneLeise} stil={{ maxWidth: 300 }}>{grund ? TEXT.pro_grund[grund](FREI_JE_MONAT) : TEXT.pro_unter}</T>
+        {/* wie Apples eigene Abo-Seiten: App-Symbol, Titel und ein Satz mittig */}
+        <View style={{ alignItems: "center", paddingTop: 8, paddingBottom: 6 }}>
+          {/* eslint-disable-next-line @typescript-eslint/no-require-imports -- Bild aus den Assets */}
+          <Image source={require("../../assets/icon.png")} style={{ width: 84, height: 84, borderRadius: 19 }} accessibilityIgnoresInvertColors />
+          <T v="grossTitel" accessibilityRole="header" stil={{ marginTop: 16, textAlign: "center" }}>{TEXT.pro_titel}</T>
+          <T leise stil={{ marginTop: 6, textAlign: "center", maxWidth: 320 }}>{grund ? TEXT.pro_grund[grund](FREI_JE_MONAT) : TEXT.pro_unter}</T>
         </View>
         <Karte stil={{ marginTop: 16 }}>
           {/* der Grund, aus dem der Bezahlschirm aufging, steht oben */}

@@ -14,6 +14,7 @@ import * as Haptics from "expo-haptics";
 import { T as TEXT } from "./texte";
 import { Kachel, Karte, Knopf, Symbol, T, TextKnopf } from "./ui/bausteine";
 import { MeldungAnbieter } from "./ui/meldung";
+import { useSchrift } from "./ui/schrift";
 import { entsperren } from "./unterlagen/sperre";
 import { Stapel, useNav, type Nav } from "./ui/navigation";
 import { HAARLINIE, TASTATUR_FERTIG, istIos, schattenStil, useFarben } from "./ui/thema";
@@ -236,7 +237,8 @@ function TastaturLeiste() {
 
 export default function App() {
   const dunkel = useColorScheme() === "dark";
-  // Systemschrift (SF Pro) – nichts zu laden (E-140)
+  // Systemschrift (SF Pro) auf dem iPhone; in der Web-Vorschau Inter (E-140)
+  useSchrift();
   return (
     <SafeAreaProvider>
       <AmtlosAnbieter>

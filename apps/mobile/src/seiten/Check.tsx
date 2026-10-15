@@ -3,9 +3,9 @@ import { AccessibilityInfo, KeyboardAvoidingView, Platform, ScrollView, View } f
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { Frage } from "@amtlos/i18n";
 import { T as TEXT } from "../texte";
-import { Auswahl, DatumFeld, Fakt, Feld, Fuss, Hinweis, Motiv, Karte, Knopf, KopfKnopf, MehrfachWahl, Erfolg, T, TextKnopf, ZurueckKnopf } from "../ui/bausteine";
+import { Auswahl, DatumFeld, Fakt, Feld, Fuss, Hinweis, Symbol, Karte, Knopf, KopfKnopf, MehrfachWahl, Erfolg, T, TextKnopf, ZurueckKnopf } from "../ui/bausteine";
 import { useNav } from "../ui/navigation";
-import { RADIUS, RAND, ZIEL, istIos, useFarben } from "../ui/thema";
+import { RAND, ZIEL, istIos, useFarben } from "../ui/thema";
 import { CHECK_FELDER, auswertung, beantwortet, checkFragen, zusatzFragen, type Profil } from "../pflichten/check";
 import { heute } from "../unterlagen/speicher";
 import { PflichtZeile } from "./Pflichten";
@@ -146,12 +146,12 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
         <ScrollView key={i} contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 12, paddingBottom: 32 }} keyboardShouldPersistTaps="handled">
           {i < 0 ? (
             <View>
-              {/* Bildfläche mit dem §-Motiv – der Auftakt zum Check */}
-              <View style={{ height: 150, borderRadius: RADIUS.buehne, backgroundColor: f.amtHauch, overflow: "hidden" }}>
-                <Motiv zeichen="§" groesse={230} farbe={f.amt} stil={{ right: 24, top: -40 }} />
+              {/* Auftakt wie Apples Einführungsbildschirme: großes Symbol, Titel und Text mittig */}
+              <View style={{ alignItems: "center", paddingTop: 24 }}>
+                <Symbol name="checklist" groesse={64} farbe={f.amt} gewicht="regular" />
+                <T v="titel" accessibilityRole="header" stil={{ marginTop: 22, textAlign: "center" }}>{TEXT.check_einleitung_titel}</T>
+                <T leise stil={{ marginTop: 10, textAlign: "center" }}>{TEXT.check_einleitung_text}</T>
               </View>
-              <T v="titel" accessibilityRole="header" stil={{ marginTop: 22 }}>{TEXT.check_einleitung_titel}</T>
-              <T stil={{ marginTop: 10 }}>{TEXT.check_einleitung_text}</T>
               <View style={{ marginTop: 18 }}>
                 <Hinweis text={TEXT.check_hinweis} />
               </View>

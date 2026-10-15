@@ -79,12 +79,14 @@ const DUNKEL: typeof HELL = {
 export type Farben = typeof HELL;
 
 /** Schrift (E-140): die Systemschrift (SF Pro auf dem iPhone) – Gewicht statt eigener Schnitte. */
+// Web-Vorschau (Rundgänge, Store-Bilder): Inter als Ersatz für die Systemschrift, die es dort nicht gibt
+const web = Platform.OS === "web";
 export const SCHRIFT = {
-  regular: { fontWeight: "400" },
-  mittel: { fontWeight: "500" },
-  halb: { fontWeight: "600" },
-  bold: { fontWeight: "700" },
-  display: { fontWeight: "800" },
+  regular: { fontWeight: "400", ...(web ? { fontFamily: "Inter_400Regular" } : null) },
+  mittel: { fontWeight: "500", ...(web ? { fontFamily: "Inter_500Medium" } : null) },
+  halb: { fontWeight: "600", ...(web ? { fontFamily: "Inter_600SemiBold" } : null) },
+  bold: { fontWeight: "700", ...(web ? { fontFamily: "Inter_700Bold" } : null) },
+  display: { fontWeight: "800", ...(web ? { fontFamily: "Inter_800ExtraBold" } : null) },
 } as const;
 /** iOS-Textstile: largeTitle 34, title1 28, title3 20, body 17, subheadline 15, footnote 13, caption 11 */
 export const GROESSE = { mini: 11, caption: 13, klein: 15, basis: 17, gross: 20, titel: 28, grossTitel: 34, blatt: 38 } as const;

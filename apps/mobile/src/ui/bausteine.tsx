@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { SymbolView, type SymbolViewProps } from "expo-symbols";
-import { useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { AccessibilityInfo, ActivityIndicator, Pressable, Text as RNText, Switch, TextInput, View, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { T as TEXT } from "../texte";
@@ -141,8 +141,8 @@ export function Fristblatt({ termin, heute, erledigt, groesse = 46 }: { termin: 
 export function Erfolg({ groesse = 64 }: { groesse?: number }) {
   const f = useFarben();
   return (
-    <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={{ width: groesse, height: groesse, borderRadius: groesse / 2, backgroundColor: f.amt, alignItems: "center", justifyContent: "center" }}>
-      <Symbol name="checkmark" groesse={Math.round(groesse * 0.44)} farbe={f.amtText} gewicht="heavy" />
+    <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden>
+      <Symbol name="checkmark.circle.fill" groesse={groesse} farbe={f.amt} gewicht="regular" />
     </View>
   );
 }
@@ -425,25 +425,34 @@ export function Status({ status, text }: { status: string; text: string }) {
 // ---------------------------------------------------------------- Formulare (E-120)
 
 /** Karte: helle Fläche mit weichem Schatten (dunkel: Haarlinie), für zusammengehörige Zeilen oder ein Formular. */
+/** Liegt ein Element in einer weißen Karte? Felder und Chips wählen danach ihre Füllung (grau in Weiß, weiß auf Grau). */
+const KarteKontext = createContext(false);
+export const useInKarte = () => useContext(KarteKontext);
+
 export function Karte({ children, stil, rahmen }: { children: ReactNode; stil?: StyleProp<ViewStyle>; rahmen?: string }) {
   const f = useFarben();
   return (
-    <View style={[{ backgroundColor: f.blatt, borderRadius: RADIUS.karte, borderWidth: rahmen ? 1.5 : 0, borderColor: rahmen ?? f.linie, paddingHorizontal: 16 }, stil]}>
-      {children}
-    </View>
+    <KarteKontext.Provider value>
+      <View style={[{ backgroundColor: f.blatt, borderRadius: RADIUS.karte, borderWidth: rahmen ? 1.5 : 0, borderColor: rahmen ?? f.linie, paddingHorizontal: 16 }, stil]}>
+        {children}
+      </View>
+    </KarteKontext.Provider>
   );
 }
 
 /** Gemeinsamer Stil für Eingabeflächen (Textfeld, Datum, Auswahlzeile): Rahmen ≥ 3:1, im Fokus Amtsgrün. */
-export function feldRahmen(f: Farben, zustand: { fokus?: boolean; fehler?: boolean } = {}): ViewStyle {
+/**
+ * Eingabefläche wie in iOS: gefüllt, ohne Rahmen (grau in einer Karte, weiß auf grauem Grund); im Fokus und bei
+ * Fehlern ein farbiger Rand. Die Beschriftung steht immer sichtbar darüber (E-140).
+ */
+export function feldRahmen(f: Farben, zustand: { fokus?: boolean; fehler?: boolean; inKarte?: boolean } = {}): ViewStyle {
   return {
     minHeight: 50,
     borderRadius: RADIUS.klein,
-    borderWidth: zustand.fokus || zustand.fehler ? 2 : 1,
-    borderColor: zustand.fehler ? f.frist : zustand.fokus ? f.amt : f.rahmen,
-    // Rahmen wird dicker – Innenabstand gleicht aus, damit der Text nicht springt
-    paddingHorizontal: zustand.fokus || zustand.fehler ? 14 : 15,
-    backgroundColor: f.blatt,
+    borderWidth: 2,
+    borderColor: zustand.fehler ? f.frist : zustand.fokus ? f.amt : "transparent",
+    paddingHorizontal: 14,
+    backgroundColor: zustand.inKarte ? f.flaeche : f.blatt,
   };
 }
 const feldText = (f: Farben): TextStyle => ({ color: f.tinte, ...SCHRIFT.regular, fontSize: GROESSE.basis });
@@ -451,6 +460,7 @@ const feldText = (f: Farben): TextStyle => ({ color: f.tinte, ...SCHRIFT.regular
 /** Beschriftetes Textfeld; die Beschriftung steht darüber und ist mit dem Feld verbunden. */
 export function Feld({ label, wert, aendern, hilfe, fehler, mehrzeilig, ohneLabel, optional, onFocus, onBlur, ...rest }: { label: string; wert: string; aendern: (w: string) => void; hilfe?: string; fehler?: string | null; mehrzeilig?: boolean; ohneLabel?: boolean; optional?: boolean } & Omit<React.ComponentProps<typeof TextInput>, "value" | "onChangeText" | "style">) {
   const f = useFarben();
+  const inKarte = useInKarte();
   const [fokus, setFokus] = useState(false);
   const beispiel = istBeispiel(hilfe, mehrzeilig) && !rest.placeholder;
   const zahlen = rest.keyboardType === "decimal-pad" || rest.keyboardType === "number-pad" || rest.keyboardType === "numbers-and-punctuation" || rest.keyboardType === "phone-pad";
@@ -475,7 +485,7 @@ export function Feld({ label, wert, aendern, hilfe, fehler, mehrzeilig, ohneLabe
           setFokus(false);
           onBlur?.(e);
         }}
-        style={[feldRahmen(f, { fokus, fehler: Boolean(fehler) }), feldText(f), { minHeight: mehrzeilig ? 104 : 50, paddingTop: mehrzeilig ? 13 : 0, paddingBottom: mehrzeilig ? 13 : 0, textAlignVertical: mehrzeilig ? "top" : "center", marginTop: 7 }]}
+        style={[feldRahmen(f, { fokus, fehler: Boolean(fehler), inKarte }), feldText(f), { minHeight: mehrzeilig ? 104 : 50, paddingTop: mehrzeilig ? 13 : 0, paddingBottom: mehrzeilig ? 13 : 0, textAlignVertical: mehrzeilig ? "top" : "center", marginTop: 7 }]}
         {...rest}
       />
       {fehler ? <T v="caption" farbe={f.frist} stil={{ marginTop: 5 }}>{fehler}</T> : null}
@@ -502,6 +512,7 @@ export function DatumFeld({ label, wert, aendern, hilfe, ohneHeute, ohneLabel }:
   const heuteText = TEXT.heute;
   const [text, setText] = useState(textAus(wert));
   const [fokus, setFokus] = useState(false);
+  const inKarte = useInKarte();
   useEffect(() => setText(textAus(wert)), [wert]);
   const heute = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Berlin" }).format(new Date());
   const falsch = text.trim() !== "" && !isoAus(text);
@@ -524,7 +535,7 @@ export function DatumFeld({ label, wert, aendern, hilfe, ohneHeute, ohneLabel }:
           selectionColor={f.amt}
           keyboardType="numbers-and-punctuation"
           inputAccessoryViewID={TASTATUR_FERTIG}
-          style={[feldRahmen(f, { fokus, fehler: falsch }), feldText(f), { flex: 1, minWidth: 0 }]}
+          style={[feldRahmen(f, { fokus, fehler: falsch, inKarte }), feldText(f), { flex: 1, minWidth: 0 }]}
         />
         {ohneHeute ? null : (
           <Pressable accessibilityRole="button" accessibilityLabel={`${label}: ${heuteText}`} onPress={() => aendern(heute)} style={({ pressed }) => ({ minHeight: 50, paddingHorizontal: 15, borderRadius: RADIUS.klein, justifyContent: "center", backgroundColor: f.amtHauch, opacity: pressed ? 0.7 : 1 })}>
@@ -541,6 +552,7 @@ export function DatumFeld({ label, wert, aendern, hilfe, ohneHeute, ohneLabel }:
 /** Chip für Auswahl und Mehrfachauswahl: rund, gewählt in Amtsgrün mit Häkchen (Farbe nie allein). */
 function Chip({ text, an, rolle, onPress, kaestchen }: { text: string; an: boolean; rolle: "radio" | "checkbox"; onPress: () => void; kaestchen?: boolean }) {
   const f = useFarben();
+  const inKarte = useInKarte();
   return (
     <Pressable
       accessibilityRole={rolle}
@@ -552,7 +564,7 @@ function Chip({ text, an, rolle, onPress, kaestchen }: { text: string; an: boole
         if (istIos) void Haptics.selectionAsync();
         onPress();
       }}
-      style={({ pressed }) => ({ minHeight: 40, paddingLeft: kaestchen ? 11 : 16, paddingRight: 16, borderRadius: 20, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: an ? f.amt : pressed ? f.flaeche : f.blatt, borderWidth: an ? 0 : 1, borderColor: f.rahmen, margin: an ? 1 : 0, flexShrink: 1 })}
+      style={({ pressed }) => ({ minHeight: 40, paddingLeft: kaestchen ? 11 : 16, paddingRight: 16, borderRadius: 20, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: an ? f.amt : pressed ? f.linie : inKarte ? f.flaeche : f.blatt, flexShrink: 1 })}
     >
       {kaestchen ? <Symbol name={an ? "checkmark.square.fill" : "square"} groesse={16} farbe={an ? f.amtText : f.tinteLeise} /> : null}
       <T v="klein" fett farbe={an ? f.amtText : f.tinte} stil={{ flexShrink: 1 }}>{text}</T>
@@ -603,8 +615,9 @@ function SchalterText({ label, hilfe }: { label: string; hilfe?: string }) {
 /** Rahmen einer Liste zum Auswählen (Auswahl, Bausteine): eine Fläche, Zeilen mit Haarlinie. */
 function ListenRahmen({ label, rolle, children }: { label: string; rolle?: "radiogroup"; children: ReactNode }) {
   const f = useFarben();
+  const inKarte = useInKarte();
   return (
-    <View accessibilityRole={rolle} accessibilityLabel={label} style={{ marginTop: 7, borderWidth: 1, borderColor: f.rahmen, borderRadius: RADIUS.klein, overflow: "hidden", backgroundColor: f.blatt }}>
+    <View accessibilityRole={rolle} accessibilityLabel={label} style={{ marginTop: 7, borderRadius: RADIUS.klein, overflow: "hidden", backgroundColor: inKarte ? f.flaeche : f.blatt }}>
       {children}
     </View>
   );
@@ -668,7 +681,7 @@ export function Auswahl<W extends string>({ label, wert, aendern, optionen, hilf
                 if (istIos) void Haptics.selectionAsync();
                 aendern(o.wert);
               }}
-              style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 12, minHeight: 50, paddingHorizontal: 14, paddingVertical: 10, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie, backgroundColor: an ? f.amtHauch : pressed ? f.flaeche : f.blatt })}
+              style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 12, minHeight: 50, paddingHorizontal: 14, paddingVertical: 10, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie, backgroundColor: an ? f.amtHauch : pressed ? f.linieLeise : "transparent" })}
             >
               <View style={{ width: 20, height: 20, borderRadius: 10, borderWidth: an ? 6 : 1.5, borderColor: an ? f.amt : f.rahmen, backgroundColor: f.blatt }} />
               <T v="klein" fett={an} farbe={an ? f.amtTief : f.tinte} stil={{ flex: 1 }}>{o.text}</T>
@@ -731,7 +744,7 @@ export function BausteinListe({ label, hilfe, werte, aendern, optionen }: { labe
                 if (istIos) void Haptics.selectionAsync();
                 aendern(an ? werte.filter((x) => x !== o.wert) : [...werte, o.wert]);
               }}
-              style={({ pressed }) => ({ flexDirection: "row", gap: 12, paddingHorizontal: 14, paddingVertical: 12, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie, backgroundColor: an ? f.amtHauch : pressed ? f.flaeche : f.blatt })}
+              style={({ pressed }) => ({ flexDirection: "row", gap: 12, paddingHorizontal: 14, paddingVertical: 12, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie, backgroundColor: an ? f.amtHauch : pressed ? f.linieLeise : "transparent" })}
             >
               <View style={{ paddingTop: 1 }}>
                 <Symbol name={an ? "checkmark.square.fill" : "square"} groesse={19} farbe={an ? f.amt : f.rahmen} />

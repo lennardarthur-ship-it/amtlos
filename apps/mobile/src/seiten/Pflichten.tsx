@@ -2,9 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { Linking, View } from "react-native";
 import { T as TEXT } from "../texte";
 import { useMeldung } from "../ui/meldung";
-import { Betrag, Fristblatt, Fuss, Hinweis, Karte, Knopf, Motiv, Schalter, SchnellKachel, Symbol, T, TextKnopf, Zeile, tageBis } from "../ui/bausteine";
+import { Betrag, Fristblatt, Fuss, Hinweis, Karte, Knopf, Schalter, SchnellKachel, Symbol, T, TextKnopf, Zeile, tageBis } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
-import { HAARLINIE, RADIUS, RAND, SCHRIFT, useFarben, weich } from "../ui/thema";
+import { HAARLINIE, RAND, SCHRIFT, useFarben, weich } from "../ui/thema";
 import { KATEGORIE_TITEL, auswertung, beantwortet, dringlichkeit, erinnerungsPlan, fortschritt, frageZu, haken, istErledigt, offeneFragenNachWirkung, type PflichtInfo } from "../pflichten/check";
 import { allesAbsagen, erinnerungenMoeglich, erlaubnisAnfragen, planen } from "../pflichten/erinnerungen";
 import { heute } from "../unterlagen/speicher";
@@ -180,15 +180,15 @@ function PflichtenInhalt() {
   const fertig = (p: PflichtInfo) => istErledigt(p, { erledigt, unterlagen, betrieb });
   return (
     <View>
-      {/* Fortschritt auf der Bühne: große Zahl in Minze, darunter der Balken */}
-      <View style={{ padding: 22, borderRadius: RADIUS.buehne, backgroundColor: f.buehne, gap: 14, overflow: "hidden" }}>
-        <T v="gross" farbe={f.buehneText} accessibilityRole="header">{TEXT.ergebnis_titel(a.gilt.length)}</T>
+      {/* Fortschritt als Karte: Zahl groß, darunter der Balken – wie die Ringe-Übersicht in Fitness */}
+      <Karte stil={{ paddingVertical: 18, gap: 10 }}>
+        <T v="klein" fett leise accessibilityRole="header">{TEXT.ergebnis_titel(a.gilt.length)}</T>
         <View style={{ flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", gap: 12 }}>
-          <Betrag farbe={f.minze} stil={{ ...SCHRIFT.display, fontSize: 48, lineHeight: 52, letterSpacing: -1.6 }}>{`${fs.prozent} %`}</Betrag>
-          <T v="klein" farbe={f.buehneLeise} stil={{ marginBottom: 8, textAlign: "right", flexShrink: 1 }}>{TEXT.fortschritt_text(fs.fertig, fs.gesamt)}</T>
+          <Betrag farbe={f.amt} stil={{ ...SCHRIFT.bold, fontSize: 40, lineHeight: 46, letterSpacing: 0.2 }}>{`${fs.prozent} %`}</Betrag>
+          <T v="klein" leise stil={{ marginBottom: 7, textAlign: "right", flexShrink: 1 }}>{TEXT.fortschritt_text(fs.fertig, fs.gesamt)}</T>
         </View>
-        <Balken prozent={fs.prozent} grund="rgba(255,255,255,0.14)" farbe={f.minze} />
-      </View>
+        <Balken prozent={fs.prozent} />
+      </Karte>
       <T v="caption" leise stil={{ marginTop: 8, marginLeft: 2 }}>{TEXT.pflichten_quelle}</T>
       <ErinnerungsSchalter />
       {d.jetzt.length ? (
@@ -312,14 +312,14 @@ export function PflichtenSeite() {
 export function Einladung() {
   const nav = useNav();
   const f = useFarben();
-  // die Bühne: die eine dunkle Fläche der App; oben rechts das angeschnittene Motiv, darunter Titel, Text, Knopf
+  // wie die Einstiegskarten in Apples eigenen Apps: weiße Karte, ein Symbol in der Akzentfarbe, Titel, Satz, Knopf
   return (
-    <View style={{ padding: 22, paddingTop: 136, borderRadius: RADIUS.buehne, backgroundColor: f.buehne, gap: 12, overflow: "hidden" }}>
-        <Motiv zeichen="§" groesse={200} farbe={f.minze} stil={{ right: 16, top: -70 }} />
-        <T v="titel" farbe={f.buehneText} accessibilityRole="header" stil={{ maxWidth: 260 }}>{TEXT.pflichten_karte_titel}</T>
-        <T farbe={f.buehneLeise}>{TEXT.pflichten_einladung}</T>
-        <Knopf buehne text={TEXT.pflichten_check_starten} symbol="arrow.right" onPress={() => nav.oeffnen("check", () => <CheckAblauf />, true)} stil={{ marginTop: 6 }} />
-      </View>
+    <Karte stil={{ paddingVertical: 20, gap: 10 }}>
+      <Symbol name="checklist" groesse={30} farbe={f.amt} gewicht="semibold" />
+      <T v="gross" accessibilityRole="header" stil={{ fontSize: 22, lineHeight: 28, marginTop: 4 }}>{TEXT.pflichten_karte_titel}</T>
+      <T v="klein" leise>{TEXT.pflichten_einladung}</T>
+      <Knopf text={TEXT.pflichten_check_starten} onPress={() => nav.oeffnen("check", () => <CheckAblauf />, true)} stil={{ marginTop: 8 }} />
+    </Karte>
   );
 }
 
