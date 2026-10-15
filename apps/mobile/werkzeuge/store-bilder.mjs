@@ -98,9 +98,9 @@ try {
 }
 
 // Setzen: Überschrift oben, Bildschirm darunter (abgerundet, unten angeschnitten wie im Store üblich)
-// dieselben Schnitte wie App, Website und Dokumente (E-137): Überschrift Amtlos Serif, Text Amtlos Sans
-const schrift = (d) => `data:font/ttf;base64,${fs.readFileSync(path.join(APP, "assets/schriften", d)).toString("base64")}`;
-const css = `@font-face{font-family:A;font-weight:400;src:url(${schrift("AmtlosSans_400Regular.ttf")})}@font-face{font-family:A;font-weight:600;src:url(${schrift("AmtlosSans_600SemiBold.ttf")})}@font-face{font-family:S;font-weight:600;src:url(${schrift("AmtlosSerif_600SemiBold.ttf")})}`;
+// dieselbe Schrift wie die App (E-139): Onest, Überschrift extrafett
+const schrift = (d) => `data:font/ttf;base64,${fs.readFileSync(path.join(APP, "node_modules/@expo-google-fonts/onest", d)).toString("base64")}`;
+const css = `@font-face{font-family:A;font-weight:400;src:url(${schrift("400Regular/Onest_400Regular.ttf")})}@font-face{font-family:A;font-weight:600;src:url(${schrift("600SemiBold/Onest_600SemiBold.ttf")})}@font-face{font-family:S;font-weight:800;src:url(${schrift("800ExtraBold/Onest_800ExtraBold.ttf")})}`;
 const png = (name) => `data:image/png;base64,${roh[name].toString("base64")}`;
 
 // Lupe: derselbe echte Bildschirm, Ausschnitt vergrößert (Breite der Lupe 1130 px, mittig über dem Gerät)
@@ -116,10 +116,10 @@ for (const [i, b] of texte.bilder.entries()) {
   if (!roh[b.bildschirm]) throw new Error(`Bildschirm fehlt: ${b.bildschirm}`);
   const html = `<!doctype html><html><head><meta charset="utf-8"><style>${css}
   html,body{margin:0;width:1290px;height:2796px;overflow:hidden}
-  body{background:linear-gradient(180deg,#136f5b 0%,#0d5143 100%);font-family:A;color:#fff;position:relative}
+  body{background:#063b29;font-family:A;color:#fff;position:relative}
   .text{position:absolute;top:150px;left:110px;right:110px}
-  h1{font-family:S;font-weight:600;font-size:106px;line-height:1.06;margin:0;letter-spacing:-2px}
-  p{font-size:52px;line-height:1.3;margin:36px 0 0;color:#cfe8e0}
+  h1{font-family:S;font-weight:800;font-size:104px;line-height:1.04;margin:0;letter-spacing:-3px}
+  p{font-size:52px;line-height:1.3;margin:36px 0 0;color:#7fe3b8}
   .geraet{position:absolute;left:140px;right:140px;top:${b.oben ?? 760}px;border-radius:88px;padding:18px;background:#0b2f28;box-shadow:0 40px 120px rgba(0,0,0,.35)}
   .geraet img{display:block;width:100%;border-radius:72px}
   .lupe{position:absolute;left:80px;border-radius:40px;border:10px solid #fff;background-color:#fff;background-repeat:no-repeat;box-shadow:0 40px 100px rgba(0,0,0,.45)}
@@ -141,11 +141,11 @@ if (WEB) {
   const titel = texte.bilder[0].titel;
   await og.setContent(`<!doctype html><html><head><meta charset="utf-8"><style>${css}
   html,body{margin:0;width:1200px;height:630px;overflow:hidden}
-  body{background:linear-gradient(180deg,#136f5b 0%,#0d5143 100%);font-family:A;color:#fff;position:relative}
+  body{background:#063b29;font-family:A;color:#fff;position:relative}
   .text{position:absolute;left:72px;top:96px;width:600px}
-  .marke{font-weight:600;font-size:34px;color:#cfe8e0;letter-spacing:.5px}
-  h1{font-family:S;font-weight:600;font-size:68px;line-height:1.06;margin:24px 0 0;letter-spacing:-1.2px}
-  p{font-size:30px;line-height:1.35;margin:28px 0 0;color:#cfe8e0}
+  .marke{font-weight:600;font-size:34px;color:#7fe3b8;letter-spacing:.5px}
+  h1{font-family:S;font-weight:800;font-size:66px;line-height:1.04;margin:24px 0 0;letter-spacing:-2px}
+  p{font-size:30px;line-height:1.35;margin:28px 0 0;color:#7fe3b8}
   .geraet{position:absolute;left:760px;top:70px;width:372px;border-radius:44px;padding:10px;background:#0b2f28;box-shadow:0 30px 80px rgba(0,0,0,.35)}
   .geraet img{display:block;width:100%;border-radius:36px}
   </style></head><body><div class="text"><div class="marke">Amtlos</div><h1>${titel}</h1><p>Pflichten-Check, Rechnungen und über 30 Vorlagen für kleine Betriebe – auf dem iPhone.</p></div>

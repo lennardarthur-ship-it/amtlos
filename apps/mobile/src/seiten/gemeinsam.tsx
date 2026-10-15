@@ -26,7 +26,7 @@ export function Seite({ titel, unterzeile, aktion, ueber, children, ...rest }: S
 export function Leer({ text, unter, children }: { text: string; unter?: string; children?: ReactNode }) {
   const f = useFarben();
   return (
-    <View style={[{ paddingTop: 28, paddingBottom: 20, paddingHorizontal: 20, borderRadius: RADIUS.karte, backgroundColor: f.blatt, gap: 18, alignItems: "stretch", borderWidth: f.schatten ? 0 : 1, borderColor: f.linie }, schattenStil(f)]}>
+    <View style={[{ paddingTop: 28, paddingBottom: 20, paddingHorizontal: 20, borderRadius: RADIUS.karte, backgroundColor: f.blatt, gap: 18, alignItems: "stretch", borderWidth: 0 }, schattenStil(f)]}>
       <View style={{ alignItems: "center", gap: 8 }}>
         <Stempel groesse={58} farbe={f.amt} />
         <T v="gross" stil={{ textAlign: "center", marginTop: 10 }}>{text}</T>

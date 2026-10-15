@@ -2,7 +2,7 @@ import { memo, useMemo, useState, type ReactNode } from "react";
 import { View } from "react-native";
 import { ANLAESSE, BEREICHE, KURZ, VORLAGEN, unterlagenName, vorlageFuer, type Anlass, type Betrieb, type Vorlage } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { Karte, SchnellKachel, Suchfeld, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
+import { Karte, SchnellKachel, Suchfeld, Symbol, T, TextKnopf, Zeile, type Ton } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { RAND, useFarben } from "../ui/thema";
 import { fehltFuer } from "../unterlagen/pruefung";
@@ -15,6 +15,9 @@ import { useOeffnen, useStarten, useZiel } from "./starten";
 import { BelegErfassenSeite } from "./Belege";
 
 /** Symbol je Anlass. */
+/** Zweitfarbe je Anlass – Kategorien unterscheiden sich auf einen Blick (Wort und Symbol tragen die Bedeutung). */
+const ANLASS_TON: Record<string, Ton> = { einstellen: "lila", gruenden: "gold", laufend: "amt", steuern: "blau", website: "lila", datenschutz: "blau", sicherheit: "gold", gastro: "amt", beauty: "lila", panne: "bald" };
+
 const ANLASS_SYMBOL: Record<string, string> = {
   einstellen: "person.badge.plus",
   gruenden: "flag",
@@ -203,7 +206,7 @@ export function Unterlagen({ aktion }: { aktion?: ReactNode }) {
           {/* untereinander: nebeneinander brachen beide Beschriftungen auf zwei Zeilen um */}
           <View style={{ flexDirection: "row", gap: 12, marginTop: 16 }}>
             <SchnellKachel symbol="eurosign" text={TEXT.rechnung_schreiben} onPress={() => starten("rechnung")} />
-            <SchnellKachel symbol="doc.viewfinder" text={TEXT.beleg_erfassen} onPress={() => ziel((n) => n.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />))} />
+            <SchnellKachel ton="blau" symbol="doc.viewfinder" text={TEXT.beleg_erfassen} onPress={() => ziel((n) => n.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />))} />
           </View>
 
           {zuletzt.length ? (
@@ -220,7 +223,7 @@ export function Unterlagen({ aktion }: { aktion?: ReactNode }) {
           <Gruppe titel={TEXT.wofuer}>
             <Karte>
               {ANLAESSE.map((a, i) => (
-                <Zeile key={a.id} symbol={ANLASS_SYMBOL[a.id] ?? "doc.text"} titel={a.titel} text={a.text} onPress={() => zuAnlass(a)} letzte={i === ANLAESSE.length - 1} />
+                <Zeile key={a.id} symbol={ANLASS_SYMBOL[a.id] ?? "doc.text"} ton={ANLASS_TON[a.id] ?? "amt"} titel={a.titel} text={a.text} onPress={() => zuAnlass(a)} letzte={i === ANLAESSE.length - 1} />
               ))}
             </Karte>
           </Gruppe>

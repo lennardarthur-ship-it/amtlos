@@ -4,7 +4,7 @@ import { BUNDESLAENDER, HAUSFARBEN, PERSONEN_FELDER, VERSTEUERUNG, VORLAGEN, typ
 import { T as TEXT } from "../texte";
 import { logoWaehlen } from "../unterlagen/logo";
 import { AuswahlZeile } from "../ui/auswahlseite";
-import { Feld, Fuss, Initialen, Karte, Knopf, Schalter, Suchfeld, Symbol, T, TextKnopf, Wahl, Zeile } from "../ui/bausteine";
+import { type Ton, Feld, Fuss, Initialen, Karte, Knopf, Schalter, Suchfeld, Symbol, T, TextKnopf, Wahl, Zeile } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
 import { RAND, RADIUS, useFarben, weich } from "../ui/thema";
@@ -258,6 +258,7 @@ function zusammenfassung(b: BetriebDaten, teil: Teil): string {
 }
 
 const TEIL_SYMBOL: Record<Teil, string> = { angaben: "building.2", steuer: "building.columns", auftritt: "paintpalette", gesellschaft: "doc.text" };
+const TEIL_TON: Record<Teil, Ton> = { angaben: "amt", steuer: "blau", auftritt: "lila", gesellschaft: "gold" };
 
 /** Kopf der Übersicht: Logo oder Anfangsbuchstabe in der Hausfarbe, Name und Ort. */
 function BetriebKopf({ b, onPress }: { b: BetriebDaten; onPress: () => void }) {
@@ -313,14 +314,14 @@ export function Betrieb() {
       <Gruppe titel={TEXT.betrieb_gruppe}>
         <Karte>
           {TEILE.map((t, i) => (
-            <Zeile key={t} symbol={TEIL_SYMBOL[t]} titel={TEXT.teil_titel[t]} text={zusammenfassung(b, t)} onPress={() => oeffneTeil(t)} letzte={i === TEILE.length - 1} />
+            <Zeile key={t} symbol={TEIL_SYMBOL[t]} ton={TEIL_TON[t]} titel={TEXT.teil_titel[t]} text={zusammenfassung(b, t)} onPress={() => oeffneTeil(t)} letzte={i === TEILE.length - 1} />
           ))}
         </Karte>
       </Gruppe>
       <CheckProfilZeile />
       <Gruppe titel={TEXT.steuerpaket_titel}>
         <Karte>
-          <Zeile symbol="briefcase" titel={TEXT.steuerpaket_zeile} text={TEXT.steuerpaket_zeile_text} onPress={() => nav.oeffnen("steuerberatung", () => <SteuerberatungSeite />, true)} letzte />
+          <Zeile symbol="briefcase" ton="gold" titel={TEXT.steuerpaket_zeile} text={TEXT.steuerpaket_zeile_text} onPress={() => nav.oeffnen("steuerberatung", () => <SteuerberatungSeite />, true)} letzte />
         </Karte>
       </Gruppe>
       <Gruppe titel={TEXT.personen_gruppe}>
@@ -330,7 +331,7 @@ export function Betrieb() {
             return (
               <Zeile
                 key={art}
-                symbol={art === "mitarbeiter" ? "person.2" : "person.crop.circle"}
+                symbol={art === "mitarbeiter" ? "person.2" : "person.crop.circle"} ton={art === "mitarbeiter" ? "lila" : "blau"}
                 titel={art === "mitarbeiter" ? TEXT.mitarbeiter_titel : TEXT.kunden_titel}
                 text={l.length ? TEXT.personen_anzahl[art](l.length) : TEXT.personen_leer_kurz[art]}
                 onPress={() => nav.oeffnen(`personen-${art}`, () => <PersonenSeite art={art} />)}

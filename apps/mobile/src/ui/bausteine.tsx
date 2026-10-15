@@ -9,23 +9,23 @@ import { DatumWahl } from "./datumwahl";
 import { GROESSE, HAARLINIE, RADIUS, SCHRIFT, TASTATUR_FERTIG, ZIEL, istIos, schattenStil, useFarben, weich, type Farben } from "./thema";
 
 type Variante = "grossTitel" | "titel" | "gross" | "basis" | "klein" | "caption" | "mini";
-/** Überschriften in Amtlos Serif (wie Website und Dokumente), Lesetext in Amtlos Sans. */
+/** Eine Familie (Onest): Überschriften extra- bzw. dreiviertelfett und eng gesetzt, Lesetext normal. */
 const STIL: Record<Variante, TextStyle> = {
-  grossTitel: { fontSize: GROESSE.grossTitel, lineHeight: 39, fontFamily: SCHRIFT.serif, letterSpacing: -0.6 },
-  titel: { fontSize: GROESSE.titel, lineHeight: 32, fontFamily: SCHRIFT.serif, letterSpacing: -0.4 },
-  gross: { fontSize: GROESSE.gross, lineHeight: 26, fontFamily: SCHRIFT.serif, letterSpacing: -0.2 },
-  basis: { fontSize: GROESSE.basis, lineHeight: 24, fontFamily: SCHRIFT.regular },
+  grossTitel: { fontSize: GROESSE.grossTitel, lineHeight: 37, fontFamily: SCHRIFT.display, letterSpacing: -1 },
+  titel: { fontSize: GROESSE.titel, lineHeight: 31, fontFamily: SCHRIFT.bold, letterSpacing: -0.7 },
+  gross: { fontSize: GROESSE.gross, lineHeight: 25, fontFamily: SCHRIFT.bold, letterSpacing: -0.35 },
+  basis: { fontSize: GROESSE.basis, lineHeight: 24, fontFamily: SCHRIFT.regular, letterSpacing: -0.1 },
   klein: { fontSize: GROESSE.klein, lineHeight: 21, fontFamily: SCHRIFT.regular },
-  caption: { fontSize: GROESSE.caption, lineHeight: 18, fontFamily: SCHRIFT.regular, letterSpacing: 0.1 },
-  mini: { fontSize: GROESSE.mini, lineHeight: 13, fontFamily: SCHRIFT.halb, letterSpacing: 0.2 },
+  caption: { fontSize: GROESSE.caption, lineHeight: 18, fontFamily: SCHRIFT.regular },
+  mini: { fontSize: GROESSE.mini, lineHeight: 13, fontFamily: SCHRIFT.halb, letterSpacing: 0.1 },
 };
-const SERIF = new Set<Variante>(["grossTitel", "titel", "gross"]);
+const UEBERSCHRIFT = new Set<Variante>(["grossTitel", "titel", "gross"]);
 
-/** Text mit Markenschrift. `fett` wählt den Halbfett-Schnitt (keine künstliche Fettung); Überschriften bleiben Serif. */
+/** Text mit Markenschrift. `fett` wählt den Halbfett-Schnitt (keine künstliche Fettung). */
 export function T({ v = "basis", fett, leise, farbe, stil, children, ...rest }: { v?: Variante; fett?: boolean; leise?: boolean; farbe?: string; stil?: StyleProp<TextStyle>; children: ReactNode } & Omit<React.ComponentProps<typeof RNText>, "style">) {
   const f = useFarben();
   return (
-    <RNText {...rest} style={[STIL[v], fett && !SERIF.has(v) ? { fontFamily: SCHRIFT.halb } : null, { color: farbe ?? (leise ? f.tinteLeise : f.tinte) }, stil]}>
+    <RNText {...rest} style={[STIL[v], fett && !UEBERSCHRIFT.has(v) ? { fontFamily: SCHRIFT.halb } : null, { color: farbe ?? (leise ? f.tinteLeise : f.tinte) }, stil]}>
       {children}
     </RNText>
   );
@@ -71,16 +71,28 @@ export function Symbol({ name, groesse = 22, farbe, gewicht = "medium" }: { name
   );
 }
 
-export type Ton = "amt" | "bald" | "frist" | "leise";
-const tonFarben = (f: Farben, ton: Ton) =>
-  ton === "bald" ? { grund: f.baldHauch, zeichen: f.bald } : ton === "frist" ? { grund: f.fristHauch, zeichen: f.frist } : ton === "leise" ? { grund: f.flaeche, zeichen: f.tinteLeise } : { grund: f.amtHauch, zeichen: f.amtTief };
+export type Ton = "amt" | "bald" | "frist" | "leise" | "lila" | "gold" | "blau";
+export const tonFarben = (f: Farben, ton: Ton) =>
+  ton === "bald"
+    ? { grund: f.baldHauch, zeichen: f.bald }
+    : ton === "frist"
+      ? { grund: f.fristHauch, zeichen: f.frist }
+      : ton === "leise"
+        ? { grund: f.flaeche, zeichen: f.tinteLeise }
+        : ton === "lila"
+          ? { grund: f.lilaHauch, zeichen: f.lila }
+          : ton === "gold"
+            ? { grund: f.goldHauch, zeichen: f.gold }
+            : ton === "blau"
+              ? { grund: f.blauHauch, zeichen: f.blau }
+              : { grund: f.amtHauch, zeichen: f.amt };
 
 /** Symbol auf einer getönten Kachel – vor Listenzeilen und Erklärpunkten, wie in den iOS-Einstellungen. */
-export function Kachel({ symbol, ton = "amt", groesse = 34 }: { symbol: string; ton?: Ton; groesse?: number }) {
+export function Kachel({ symbol, ton = "amt", groesse = 36 }: { symbol: string; ton?: Ton; groesse?: number }) {
   const f = useFarben();
   const t = tonFarben(f, ton);
   return (
-    <View style={{ width: groesse, height: groesse, borderRadius: Math.round(groesse * 0.29), backgroundColor: t.grund, alignItems: "center", justifyContent: "center" }}>
+    <View style={{ width: groesse, height: groesse, borderRadius: groesse / 2, backgroundColor: t.grund, alignItems: "center", justifyContent: "center" }}>
       <Symbol name={symbol} groesse={Math.round(groesse * 0.53)} farbe={t.zeichen} gewicht="semibold" />
     </View>
   );
@@ -115,12 +127,24 @@ export function Fristblatt({ termin, heute, erledigt, groesse = 46 }: { termin: 
   const streifen = erledigt ? f.amt : tage < 0 ? f.frist : tage <= 14 ? f.bald : f.linie;
   const fmt = (o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", ...o }).format(d).replace(".", "");
   return (
-    <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={[{ width: groesse, borderRadius: 9, backgroundColor: f.blatt, borderWidth: f.schatten ? HAARLINIE : 1, borderColor: f.linie, overflow: "hidden", alignItems: "center" }, schattenStil(f, 0.6)]}>
+    <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={[{ width: groesse, borderRadius: 10, backgroundColor: f.papier, borderWidth: 1, borderColor: f.linie, overflow: "hidden", alignItems: "center" }, schattenStil(f, 0.6)]}>
       <View style={{ alignSelf: "stretch", height: 5, backgroundColor: streifen }} />
       <T v="mini" leise stil={{ marginTop: 3, fontSize: 9.5, lineHeight: 11, textTransform: "uppercase", letterSpacing: 0.6 }}>{fmt({ weekday: "short" })}</T>
       <T v="gross" stil={{ fontSize: groesse * 0.44, lineHeight: groesse * 0.5, fontVariant: ["tabular-nums"] }}>{fmt({ day: "numeric" })}</T>
       <T v="mini" leise stil={{ marginBottom: 4, fontSize: 9.5, lineHeight: 11, letterSpacing: 0.3 }}>{fmt({ month: "short" })}</T>
     </View>
+  );
+}
+
+/**
+ * Bildmotiv (E-139): ein Zeichen aus der Welt der Pflichten und Rechnungen (§, €) als große, angeschnittene Grafik auf
+ * der Bühne – das wiederkehrende Bildelement statt Illustrationen. Rein dekorativ.
+ */
+export function Motiv({ zeichen, groesse = 220, farbe, stil }: { zeichen: string; groesse?: number; farbe: string; stil?: StyleProp<TextStyle> }) {
+  return (
+    <RNText accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={[{ position: "absolute", fontFamily: SCHRIFT.display, fontSize: groesse, lineHeight: groesse * 1.1, color: farbe, letterSpacing: -groesse * 0.04, includeFontPadding: false }, stil]}>
+      {zeichen}
+    </RNText>
   );
 }
 
@@ -154,7 +178,7 @@ export function Knopf({ text, onPress, leise, ton, gefahr, buehne, deaktiviert, 
   const f = useFarben();
   const haupt = gefahr ? f.frist : f.amt;
   const grund = buehne ? f.buehneKnopf : ton ? f.amtHauch : leise ? "transparent" : haupt;
-  const schrift = buehne ? f.buehneKnopfText : ton ? f.amtTief : leise ? haupt : gefahr ? f.blatt : f.amtText;
+  const schrift = buehne ? f.buehneKnopfText : ton ? f.amtTief : leise ? haupt : gefahr ? "#ffffff" : f.amtText;
   return (
     <Pressable
       accessibilityRole="button"
@@ -167,8 +191,8 @@ export function Knopf({ text, onPress, leise, ton, gefahr, buehne, deaktiviert, 
       }}
       style={({ pressed }) => [
         {
-          minHeight: 52,
-          paddingHorizontal: 20,
+          minHeight: 54,
+          paddingHorizontal: 24,
           borderRadius: RADIUS.knopf,
           flexDirection: "row",
           gap: 8,
@@ -191,12 +215,16 @@ export function Knopf({ text, onPress, leise, ton, gefahr, buehne, deaktiviert, 
 }
 
 /** Schnellzugriff als Kachel: Symbol oben, Beschriftung darunter – zwei nebeneinander. */
-export function SchnellKachel({ symbol, text, onPress }: { symbol: string; text: string; onPress: () => void }) {
+export function SchnellKachel({ symbol, text, onPress, ton = "amt" }: { symbol: string; text: string; onPress: () => void; ton?: Ton }) {
   const f = useFarben();
+  const t = tonFarben(f, ton);
+  // farbige Fläche in der Zweitfarbe, Symbol auf weißem Kreis – Kategorien erkennt man an der Farbe, lesen am Wort
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={text} onPress={onPress} style={({ pressed }) => [{ flex: 1, minHeight: 104, padding: 14, borderRadius: RADIUS.karte, backgroundColor: f.blatt, justifyContent: "space-between", gap: 12, borderWidth: f.schatten ? 0 : 1, borderColor: f.linie, opacity: pressed ? 0.7 : 1 }, schattenStil(f)]}>
-      <Kachel symbol={symbol} />
-      <T fett>{text}</T>
+    <Pressable accessibilityRole="button" accessibilityLabel={text} onPress={onPress} style={({ pressed }) => ({ flex: 1, minHeight: 112, padding: 14, borderRadius: RADIUS.karte, backgroundColor: t.grund, justifyContent: "space-between", gap: 14, opacity: pressed ? 0.75 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] })}>
+      <View style={{ width: 38, height: 38, borderRadius: 19, backgroundColor: f.papier, alignItems: "center", justifyContent: "center" }}>
+        <Symbol name={symbol} groesse={19} farbe={t.zeichen} gewicht="semibold" />
+      </View>
+      <T fett stil={{ letterSpacing: -0.2 }}>{text}</T>
     </Pressable>
   );
 }
@@ -340,10 +368,10 @@ export function Zeile({ links, symbol, ton, titel, text, wert, marke, rechts, on
 /** Status als kleine Plakette („Bezahlt“, „Überfällig“) – getönt, immer mit Wort. */
 export function Marke({ text, ton }: { text: string; ton: Ton }) {
   const f = useFarben();
-  const t = ton === "amt" ? { grund: f.amtHauch, schrift: f.amtTief } : ton === "bald" ? { grund: f.baldHauch, schrift: f.bald } : ton === "frist" ? { grund: f.fristHauch, schrift: f.frist } : { grund: f.flaeche, schrift: f.tinteLeise };
+  const t = tonFarben(f, ton);
   return (
-    <View style={{ paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6, backgroundColor: t.grund }}>
-      <T v="mini" farbe={t.schrift} stil={{ fontSize: 12, lineHeight: 16 }}>{text}</T>
+    <View style={{ paddingHorizontal: 9, paddingVertical: 3, borderRadius: 999, backgroundColor: t.grund }}>
+      <T v="mini" farbe={t.zeichen} stil={{ fontSize: 12, lineHeight: 15 }}>{text}</T>
     </View>
   );
 }
@@ -386,7 +414,7 @@ export function Status({ status, text }: { status: string; text: string }) {
 export function Karte({ children, stil, rahmen }: { children: ReactNode; stil?: StyleProp<ViewStyle>; rahmen?: string }) {
   const f = useFarben();
   return (
-    <View style={[{ backgroundColor: f.blatt, borderRadius: RADIUS.karte, borderWidth: rahmen ? 1.5 : f.schatten ? 0 : 1, borderColor: rahmen ?? f.linie, paddingHorizontal: 14 }, schattenStil(f), stil]}>
+    <View style={[{ backgroundColor: f.blatt, borderRadius: RADIUS.karte, borderWidth: rahmen ? 1.5 : 0, borderColor: rahmen ?? f.linie, paddingHorizontal: 16 }, schattenStil(f), stil]}>
       {children}
     </View>
   );
@@ -400,8 +428,8 @@ export function feldRahmen(f: Farben, zustand: { fokus?: boolean; fehler?: boole
     borderWidth: zustand.fokus || zustand.fehler ? 2 : 1,
     borderColor: zustand.fehler ? f.frist : zustand.fokus ? f.amt : f.rahmen,
     // Rahmen wird dicker – Innenabstand gleicht aus, damit der Text nicht springt
-    paddingHorizontal: zustand.fokus || zustand.fehler ? 13 : 14,
-    backgroundColor: f.blatt,
+    paddingHorizontal: zustand.fokus || zustand.fehler ? 14 : 15,
+    backgroundColor: f.papier,
   };
 }
 const feldText = (f: Farben): TextStyle => ({ color: f.tinte, fontFamily: SCHRIFT.regular, fontSize: GROESSE.basis });
@@ -510,7 +538,7 @@ function Chip({ text, an, rolle, onPress, kaestchen }: { text: string; an: boole
         if (istIos) void Haptics.selectionAsync();
         onPress();
       }}
-      style={({ pressed }) => ({ minHeight: 40, paddingLeft: an || kaestchen ? 11 : 15, paddingRight: 15, borderRadius: 20, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: an ? f.amt : pressed ? f.flaeche : f.blatt, borderWidth: an ? 0 : 1, borderColor: f.rahmen, margin: an ? 1 : 0, flexShrink: 1 })}
+      style={({ pressed }) => ({ minHeight: 40, paddingLeft: an || kaestchen ? 11 : 15, paddingRight: 15, borderRadius: 20, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: an ? f.amt : pressed ? f.flaeche : f.papier, borderWidth: an ? 0 : 1, borderColor: f.rahmen, margin: an ? 1 : 0, flexShrink: 1 })}
     >
       {kaestchen ? <Symbol name={an ? "checkmark.square.fill" : "square"} groesse={16} farbe={an ? f.amtText : f.tinteLeise} /> : an ? <Symbol name="checkmark" groesse={13} farbe={f.amtText} gewicht="bold" /> : null}
       <T v="klein" fett farbe={an ? f.amtText : f.tinte} stil={{ flexShrink: 1 }}>{text}</T>
@@ -562,15 +590,54 @@ function SchalterText({ label, hilfe }: { label: string; hilfe?: string }) {
 function ListenRahmen({ label, rolle, children }: { label: string; rolle?: "radiogroup"; children: ReactNode }) {
   const f = useFarben();
   return (
-    <View accessibilityRole={rolle} accessibilityLabel={label} style={{ marginTop: 7, borderWidth: 1, borderColor: f.rahmen, borderRadius: RADIUS.klein, overflow: "hidden", backgroundColor: f.blatt }}>
+    <View accessibilityRole={rolle} accessibilityLabel={label} style={{ marginTop: 7, borderWidth: 1, borderColor: f.rahmen, borderRadius: RADIUS.klein, overflow: "hidden", backgroundColor: f.papier }}>
       {children}
     </View>
   );
 }
 
-/** Auswahl als Liste untereinander – für lange oder viele Optionen (Radio-Semantik). */
-export function Auswahl<W extends string>({ label, wert, aendern, optionen, hilfe, ohneLabel }: { label: string; wert: W | null; aendern: (w: W) => void; optionen: { wert: W; text: string }[]; hilfe?: string; ohneLabel?: boolean }) {
+/**
+ * Große Antwortkarte (Fragen im Pflichten-Check): eine Karte je Möglichkeit, gewählt mit grünem Rahmen und
+ * Radiokreis bzw. Kästchen – wie in den besten Frage-Antwort-Apps, mit großen Tippflächen.
+ */
+function AntwortKarte({ text, an, rolle, onPress }: { text: string; an: boolean; rolle: "radio" | "checkbox"; onPress: () => void }) {
   const f = useFarben();
+  return (
+    <Pressable
+      accessibilityRole={rolle}
+      accessibilityState={{ checked: an }}
+      aria-checked={an}
+      accessibilityLabel={text}
+      onPress={() => {
+        if (istIos) void Haptics.selectionAsync();
+        onPress();
+      }}
+      style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 14, minHeight: 60, paddingHorizontal: 18, paddingVertical: 14, borderRadius: 18, borderWidth: 2, borderColor: an ? f.amt : "transparent", backgroundColor: an ? f.amtHauch : pressed ? f.flaeche : f.blatt })}
+    >
+      {rolle === "radio" ? (
+        <View style={{ width: 24, height: 24, borderRadius: 12, borderWidth: an ? 7 : 2, borderColor: an ? f.amt : f.rahmen, backgroundColor: f.papier }} />
+      ) : (
+        <View style={{ width: 24, height: 24, borderRadius: 7, borderWidth: an ? 0 : 2, borderColor: f.rahmen, backgroundColor: an ? f.amt : f.papier, alignItems: "center", justifyContent: "center" }}>
+          {an ? <Symbol name="checkmark" groesse={14} farbe={f.amtText} gewicht="bold" /> : null}
+        </View>
+      )}
+      <T fett={an} stil={{ flex: 1 }}>{text}</T>
+    </Pressable>
+  );
+}
+
+/** Auswahl als Liste untereinander – für lange oder viele Optionen (Radio-Semantik). `gross`: Antwortkarten. */
+export function Auswahl<W extends string>({ label, wert, aendern, optionen, hilfe, ohneLabel, gross }: { label: string; wert: W | null; aendern: (w: W) => void; optionen: { wert: W; text: string }[]; hilfe?: string; ohneLabel?: boolean; gross?: boolean }) {
+  const f = useFarben();
+  if (gross)
+    return (
+      <View accessibilityRole="radiogroup" accessibilityLabel={label} style={{ gap: 10, marginTop: ohneLabel ? 8 : 20 }}>
+        {ohneLabel ? null : <FeldKopf label={label} hilfe={hilfe} />}
+        {optionen.map((o) => (
+          <AntwortKarte key={o.wert} text={o.text} an={o.wert === wert} rolle="radio" onPress={() => aendern(o.wert)} />
+        ))}
+      </View>
+    );
   return (
     <View style={{ marginTop: ohneLabel ? 8 : 20 }}>
       {ohneLabel ? null : <FeldKopf label={label} hilfe={hilfe} />}
@@ -587,7 +654,7 @@ export function Auswahl<W extends string>({ label, wert, aendern, optionen, hilf
                 if (istIos) void Haptics.selectionAsync();
                 aendern(o.wert);
               }}
-              style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 12, minHeight: 50, paddingHorizontal: 14, paddingVertical: 10, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie, backgroundColor: an ? f.amtHauch : pressed ? f.flaeche : f.blatt })}
+              style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 12, minHeight: 50, paddingHorizontal: 14, paddingVertical: 10, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie, backgroundColor: an ? f.amtHauch : pressed ? f.flaeche : f.papier })}
             >
               <View style={{ width: 20, height: 20, borderRadius: 10, borderWidth: an ? 6 : 1.5, borderColor: an ? f.amt : f.rahmen, backgroundColor: f.blatt }} />
               <T v="klein" fett={an} farbe={an ? f.amtTief : f.tinte} stil={{ flex: 1 }}>{o.text}</T>
@@ -600,7 +667,17 @@ export function Auswahl<W extends string>({ label, wert, aendern, optionen, hilf
 }
 
 /** Mehrfachauswahl als Chips mit Kästchen (Checkbox-Semantik), z. B. Allergene. */
-export function MehrfachWahl({ label, werte, aendern, optionen, hilfe, ohneLabel }: { label: string; werte: string[]; aendern: (w: string[]) => void; optionen: { wert: string; text: string }[]; hilfe?: string; ohneLabel?: boolean }) {
+export function MehrfachWahl({ label, werte, aendern, optionen, hilfe, ohneLabel, gross }: { label: string; werte: string[]; aendern: (w: string[]) => void; optionen: { wert: string; text: string }[]; hilfe?: string; ohneLabel?: boolean; gross?: boolean }) {
+  if (gross)
+    return (
+      <View accessibilityLabel={label} style={{ gap: 10, marginTop: ohneLabel ? 8 : 20 }}>
+        {ohneLabel ? null : <FeldKopf label={label} hilfe={hilfe} />}
+        {optionen.map((o) => {
+          const an = werte.includes(o.wert);
+          return <AntwortKarte key={o.wert} text={o.text} an={an} rolle="checkbox" onPress={() => aendern(an ? werte.filter((x) => x !== o.wert) : [...werte, o.wert])} />;
+        })}
+      </View>
+    );
   return (
     <View style={{ marginTop: ohneLabel ? 8 : 20 }}>
       {ohneLabel ? null : <FeldKopf label={label} hilfe={hilfe} />}
@@ -640,7 +717,7 @@ export function BausteinListe({ label, hilfe, werte, aendern, optionen }: { labe
                 if (istIos) void Haptics.selectionAsync();
                 aendern(an ? werte.filter((x) => x !== o.wert) : [...werte, o.wert]);
               }}
-              style={({ pressed }) => ({ flexDirection: "row", gap: 12, paddingHorizontal: 14, paddingVertical: 12, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie, backgroundColor: an ? f.amtHauch : pressed ? f.flaeche : f.blatt })}
+              style={({ pressed }) => ({ flexDirection: "row", gap: 12, paddingHorizontal: 14, paddingVertical: 12, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie, backgroundColor: an ? f.amtHauch : pressed ? f.flaeche : f.papier })}
             >
               <View style={{ paddingTop: 1 }}>
                 <Symbol name={an ? "checkmark.square.fill" : "square"} groesse={19} farbe={an ? f.amt : f.rahmen} />

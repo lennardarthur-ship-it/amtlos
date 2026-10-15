@@ -2,9 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { Linking, View } from "react-native";
 import { T as TEXT } from "../texte";
 import { useMeldung } from "../ui/meldung";
-import { Betrag, Fristblatt, Fuss, Hinweis, Kachel, Karte, Knopf, Schalter, SchnellKachel, Stempel, Symbol, T, TextKnopf, Zeile, tageBis } from "../ui/bausteine";
+import { Betrag, Fristblatt, Fuss, Hinweis, Kachel, Karte, Knopf, Motiv, Schalter, SchnellKachel, Symbol, T, TextKnopf, Zeile, tageBis } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
-import { HAARLINIE, RADIUS, RAND, schattenStil, useFarben, weich } from "../ui/thema";
+import { HAARLINIE, RADIUS, RAND, useFarben, weich } from "../ui/thema";
 import { KATEGORIE_TITEL, auswertung, beantwortet, dringlichkeit, erinnerungsPlan, fortschritt, frageZu, haken, istErledigt, offeneFragenNachWirkung, type PflichtInfo } from "../pflichten/check";
 import { allesAbsagen, erinnerungenMoeglich, erlaubnisAnfragen, planen } from "../pflichten/erinnerungen";
 import { heute } from "../unterlagen/speicher";
@@ -138,7 +138,8 @@ export function PflichtZeile({ p, letzte, erledigt, ohneWichtig }: { p: PflichtI
   const nav = useNav();
   const termin = !erledigt && p.naechsterTermin ? p.naechsterTermin : null;
   // das Datum steht im Fristblatt – im Text nur kurz (ohne Jahr, wenn es dieses Jahr ist)
-  const unter = erledigt ? TEXT.erledigt : termin ? `${fristText(termin)} · ${termin.slice(0, 4) === heute().slice(0, 4) ? datumDe(termin).slice(0, 6) : datumDe(termin)}` : p.vorlage ? TEXT.unterlage_in_amtlos : p.schwere === "hoch" ? TEXT.wichtig : p.kurz;
+  const fern = termin ? tageBis(termin, heute()) > 30 : false;
+  const unter = erledigt ? TEXT.erledigt : termin ? (fern ? fristText(termin) : `${fristText(termin)} · ${datumDe(termin).slice(0, 6)}`) : p.vorlage ? TEXT.unterlage_in_amtlos : p.schwere === "hoch" ? TEXT.wichtig : p.kurz;
   return (
     <Zeile
       // mit Termin: das Fristblatt (Datum auf einen Blick); sonst der Status als Form
@@ -279,7 +280,7 @@ function KurzKlaeren({ offen, unklar }: { offen: { feld: string; anzahl: number 
   const oben = offen.slice(0, 3);
   return (
     <Gruppe titel={TEXT.kurz_klaeren_titel} fuss={TEXT.kurz_klaeren_text(unklar)}>
-      <Karte stil={{ paddingVertical: 14, gap: 18 }}>
+      <View style={{ gap: 22 }}>
         {oben.map((o) => {
           const fr = frageZu(o.feld);
           if (!fr) return null;
@@ -291,7 +292,7 @@ function KurzKlaeren({ offen, unklar }: { offen: { feld: string; anzahl: number 
             </View>
           );
         })}
-      </Karte>
+      </View>
       {offen.length > oben.length ? <TextKnopf symbol="questionmark.circle" text={TEXT.weitere_fragen(offen.length - oben.length)} onPress={() => nav.oeffnen("nachfragen", () => <CheckAblauf felder={offen.slice(oben.length).map((o) => o.feld)} />, true)} stil={{ marginLeft: 4 }} /> : null}
     </Gruppe>
   );
@@ -307,17 +308,15 @@ export function PflichtenSeite() {
   );
 }
 
-/** Einladung zum Pflichten-Check auf der Bühne – mit dem Stempel aus dem App-Symbol (Start und „Heute“). */
+/** Einladung zum Pflichten-Check auf der Bühne – mit dem §-Motiv in Minze (Start und „Heute“). */
 export function Einladung() {
   const nav = useNav();
   const f = useFarben();
-  // die Bühne: die eine dunkle Fläche der App – mit dem Stempel aus dem App-Symbol
+  // die Bühne: die eine dunkle Fläche der App; oben rechts das angeschnittene Motiv, darunter Titel, Text, Knopf
   return (
-    <View style={[{ padding: 22, paddingTop: 24, borderRadius: RADIUS.buehne, backgroundColor: f.buehne, gap: 14, overflow: "hidden" }, schattenStil(f, 1.4)]}>
-        <View style={{ position: "absolute", right: -64, top: -70, opacity: 0.12 }}>
-          <Stempel groesse={190} farbe={f.buehneText} />
-        </View>
-        <T v="titel" farbe={f.buehneText} accessibilityRole="header" stil={{ maxWidth: 250 }}>{TEXT.pflichten_karte_titel}</T>
+    <View style={{ padding: 22, paddingTop: 136, borderRadius: RADIUS.buehne, backgroundColor: f.buehne, gap: 12, overflow: "hidden" }}>
+        <Motiv zeichen="§" groesse={220} farbe={f.minze} stil={{ right: 10, top: -66 }} />
+        <T v="titel" farbe={f.buehneText} accessibilityRole="header" stil={{ maxWidth: 260 }}>{TEXT.pflichten_karte_titel}</T>
         <T farbe={f.buehneLeise}>{TEXT.pflichten_einladung}</T>
         <Knopf buehne text={TEXT.pflichten_check_starten} symbol="arrow.right" onPress={() => nav.oeffnen("check", () => <CheckAblauf />, true)} stil={{ marginTop: 6 }} />
       </View>
@@ -338,7 +337,7 @@ function Start() {
       {/* wer gleich etwas erledigen will, findet es ohne Scrollen */}
       <View style={{ flexDirection: "row", gap: 12, marginTop: 14 }}>
         <SchnellKachel symbol="eurosign" text={TEXT.start_rechnung} onPress={() => starten("rechnung")} />
-        <SchnellKachel symbol="doc.text" text={TEXT.start_vorlagen} onPress={erstellen.oeffnen} />
+        <SchnellKachel ton="lila" symbol="doc.text" text={TEXT.start_vorlagen} onPress={erstellen.oeffnen} />
       </View>
       <Gruppe titel={TEXT.start_so_hilft}>
         <Karte>

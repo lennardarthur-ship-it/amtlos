@@ -3,7 +3,7 @@ import { ActivityIndicator, Linking, Pressable, ScrollView, View } from "react-n
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LINKS } from "../rechtliches";
 import { T as TEXT } from "../texte";
-import { Betrag, Fuss, Hinweis, Kachel, Karte, Knopf, KopfKnopf, Stempel, Symbol, T, TextKnopf } from "../ui/bausteine";
+import { Betrag, Fuss, Hinweis, Kachel, Karte, Knopf, KopfKnopf, Motiv, Symbol, T, TextKnopf } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { useNav } from "../ui/navigation";
 import { HAARLINIE, RADIUS, RAND, schattenStil, useFarben } from "../ui/thema";
@@ -88,12 +88,9 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
         <KopfKnopf symbol="xmark" label={TEXT.schliessen} onPress={nav.zurueck} />
       </View>
       <ScrollView contentContainerStyle={{ paddingHorizontal: RAND, paddingBottom: 24 }}>
-        <View style={[{ padding: 22, borderRadius: RADIUS.buehne, backgroundColor: f.buehne, overflow: "hidden", gap: 8 }, schattenStil(f, 1.4)]}>
-          <View style={{ position: "absolute", right: -70, top: -70, opacity: 0.12 }}>
-            <Stempel groesse={190} farbe={f.buehneText} />
-          </View>
-          <Stempel groesse={46} farbe={f.buehneText} />
-          <T v="grossTitel" farbe={f.buehneText} accessibilityRole="header" stil={{ marginTop: 10 }}>{TEXT.pro_titel}</T>
+        <View style={{ padding: 22, paddingTop: 104, borderRadius: RADIUS.buehne, backgroundColor: f.buehne, overflow: "hidden", gap: 8 }}>
+          <Motiv zeichen="€" groesse={230} farbe={f.minze} stil={{ right: -14, top: -60 }} />
+          <T v="grossTitel" farbe={f.buehneText} accessibilityRole="header">{TEXT.pro_titel}</T>
           <T farbe={f.buehneLeise} stil={{ maxWidth: 300 }}>{grund ? TEXT.pro_grund[grund](FREI_JE_MONAT) : TEXT.pro_unter}</T>
         </View>
         <Karte stil={{ marginTop: 16 }}>
@@ -101,7 +98,7 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
           {(grund ? [grund, ...VORTEILE.filter((x) => x !== grund)] : VORTEILE).map((v, i, l) => (
             <View key={v} style={{ flexDirection: "row", gap: 14, alignItems: "flex-start" }}>
               <View style={{ paddingTop: 14 }}>
-                <Kachel symbol={VORTEIL_SYMBOL[v]} />
+                <Kachel symbol={VORTEIL_SYMBOL[v]} ton={(["amt", "lila", "blau", "gold"] as const)[i % 4]} />
               </View>
               <View style={{ flex: 1, paddingVertical: 14, borderBottomWidth: i === l.length - 1 ? 0 : HAARLINIE, borderColor: f.linie }}>
                 <T fett>{TEXT.pro_vorteil[v].titel}</T>
@@ -181,7 +178,7 @@ export function ProZeile() {
   return (
     <Pressable accessibilityRole="button" onPress={() => nav.oeffnen("pro", () => <ProSeite />, true)} style={({ pressed }) => ({ marginTop: 16, opacity: pressed ? 0.75 : 1 })}>
       {/* ruhige Karte wie die übrigen – die lauteste Fläche des Bildschirms soll nicht die Werbung sein */}
-      <View style={[{ flexDirection: "row", alignItems: "center", gap: 14, padding: 14, borderRadius: RADIUS.karte, backgroundColor: f.blatt, borderWidth: f.schatten ? 0 : 1, borderColor: f.linie }, schattenStil(f)]}>
+      <View style={[{ flexDirection: "row", alignItems: "center", gap: 14, padding: 14, borderRadius: RADIUS.karte, backgroundColor: f.blatt, borderWidth: 0 }, schattenStil(f)]}>
         <Kachel symbol="checkmark.seal.fill" />
         <View style={{ flex: 1 }}>
           <T fett>{z.pro ? TEXT.pro_aktiv : TEXT.pro_titel}</T>

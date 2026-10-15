@@ -748,6 +748,21 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Rechnungsstatus:** Rechnungen tragen eine Plakette: Entwurf, Offen, Überfällig, Bezahlt oder Storniert. „Überfällig“ heißt: offen und über dem eigenen Zahlungsziel der Rechnung (Rechnungsdatum plus Tage; „sofort“ = Rechnungsdatum). Es ist keine rechtliche Bewertung, Mahnfristen sind nicht berührt. Die Zahlungskarte zeigt „Fällig bis …“ bzw. „Überfällig – fällig war der …“.
 - **Geprüft:** Unit-Tests für Monatssumme, Fälligkeit und Überfälligkeit; Rundgang hell und dunkel an den neuen Aufbau angepasst; Store- und Website-Bilder neu.
 
+### E-139 · Erscheinungsbild nach dem Maßstab Taxfix: flach, kräftige Grotesk, Motive, Zweitfarben
+- **Datum:** 2026-10-15 · **Status:** angenommen. Gründer: „sieht aus wie gevibecoded, nicht wie beispielsweise Taxfix“. Ersetzt die Gestaltungsteile von E-137 (Serif, Schatten, Stempel-Wasserzeichen).
+- **Maßstab:** die Gestaltung von Taxfix (Rebrand mit Kallan & Co, Schrift ROM von Dinamo). Kräftige, präzise Grotesk mit großen Überschriften. Lebendiges Grün mit dunklem Grün. Zweitfarben Lila, Gold, Blau nach den Euro-Scheinen. Finanzsymbole als angeschnittene Motive. Flache Flächen, eine Frage je Bildschirm.
+- **Schrift:** Onest (OFL 1.1) in fünf Schnitten. Überschriften extra- bzw. dreiviertelfett, eng gesetzt (32 / 26 / 20). Lesetext 17. Gleich breite Ziffern für Beträge. Die erzeugten Dokumente behalten Amtlos Sans/Serif.
+- **Farben:**
+  - Hintergrund Weiß, Karten als hellgrüngraue Flächen ohne Schatten und Rahmen.
+  - Amtsgrün `#0a7d55`, Bühne Dunkelgrün `#063b29`, Akzent Minze `#7fe3b8`.
+  - Zweitfarben Lila, Gold und Blau als Flächen und Symbolfarben für Kategorien (Anlässe, Teile von „Mein Betrieb“, Pro-Vorteile, Schnellzugriffe). Text trägt die Bedeutung, nie die Farbe allein.
+  - Dunkelmodus mit eigenen Werten.
+- **Formen:** Knöpfe und Plaketten als Pillen, Karten mit 22er-, Bühne mit 28er-Ecken. Symbole auf runden, getönten Kreisen. Schnellzugriffe als farbige Flächen.
+- **Motive:** § (Pflichten-Einladung) und € (Pro) erscheinen groß und angeschnitten in Minze auf der Bühne – statt Illustrationen. Der Stempel bleibt für geschaffte Schritte.
+- **Fragen:** Der Pflichten-Check zeigt große Antwortkarten statt Chips: eine Karte je Möglichkeit, gewählt mit grünem Rahmen und Radiokreis bzw. Kästchen. Das Check-Ergebnis zeigt die ersten Pflichten mit Fristblatt.
+- **Store-Bilder:** dunkelgrüne Fläche, Überschrift in Onest extrafett, Untertitel in Minze.
+- **Geprüft:** Rundgang hell und dunkel, Unit-Tests, Store- und Website-Bilder neu. Auf dem iPhone noch offen (→ T-82).
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

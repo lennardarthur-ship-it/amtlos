@@ -3,11 +3,12 @@ import { AccessibilityInfo, KeyboardAvoidingView, Platform, ScrollView, View } f
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { Frage } from "@amtlos/i18n";
 import { T as TEXT } from "../texte";
-import { Auswahl, DatumFeld, Fakt, Feld, Fuss, Hinweis, Kachel, Karte, Knopf, KopfKnopf, MehrfachWahl, Stempel, Symbol, T, TextKnopf, Zeile, ZurueckKnopf } from "../ui/bausteine";
+import { Auswahl, DatumFeld, Fakt, Feld, Fuss, Hinweis, Kachel, Karte, Knopf, KopfKnopf, MehrfachWahl, Stempel, T, TextKnopf, ZurueckKnopf } from "../ui/bausteine";
 import { useNav } from "../ui/navigation";
 import { RAND, ZIEL, istIos, useFarben } from "../ui/thema";
 import { CHECK_FELDER, auswertung, beantwortet, checkFragen, zusatzFragen, type Profil } from "../pflichten/check";
 import { heute } from "../unterlagen/speicher";
+import { PflichtZeile } from "./Pflichten";
 import { useAmtlos } from "../zustand";
 
 type Wert = Profil[string];
@@ -17,12 +18,13 @@ export function Antwort({ f, wert, setzen }: { f: Frage; wert: Wert | undefined;
   const optionen = Object.entries(f.optionen ?? {}).map(([k, t]) => ({ wert: k, text: t.de }));
   switch (f.art) {
     case "auswahl":
-      return <Auswahl ohneLabel label={f.frage.de} wert={typeof wert === "string" ? wert : null} aendern={(w) => setzen(w, true)} optionen={optionen} />;
+      return <Auswahl gross ohneLabel label={f.frage.de} wert={typeof wert === "string" ? wert : null} aendern={(w) => setzen(w, true)} optionen={optionen} />;
     case "mehrfach":
-      return <MehrfachWahl ohneLabel label={f.frage.de} werte={Array.isArray(wert) ? wert : []} aendern={(w) => setzen(w)} optionen={optionen} />;
+      return <MehrfachWahl gross ohneLabel label={f.frage.de} werte={Array.isArray(wert) ? wert : []} aendern={(w) => setzen(w)} optionen={optionen} />;
     case "janein":
       return (
         <Auswahl
+          gross
           ohneLabel
           label={f.frage.de}
           wert={wert === true ? "ja" : wert === false ? "nein" : null}
@@ -175,7 +177,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
                   <T v="gross">{TEXT.ergebnis_anfangen(Math.min(3, a.gilt.length))}</T>
                   <Karte stil={{ marginTop: 10 }}>
                     {a.gilt.slice(0, 3).map((p, k, l) => (
-                      <Zeile key={p.id} links={<Symbol name="circle" groesse={22} farbe={f.rahmen} />} titel={p.titel} text={p.naechsterTermin ? TEXT.naechster_termin(new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(`${p.naechsterTermin}T12:00:00Z`))) : p.kurz} letzte={k === l.length - 1} />
+                      <PflichtZeile key={p.id} p={p} erledigt={false} ohneWichtig letzte={k === l.length - 1} />
                     ))}
                   </Karte>
                 </View>

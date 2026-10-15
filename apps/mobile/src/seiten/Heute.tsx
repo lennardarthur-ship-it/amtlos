@@ -24,7 +24,7 @@ function Kennzahl({ label, wert, text, ton = "amt", symbol, onPress }: { label: 
       accessibilityRole="button"
       accessibilityLabel={`${label}: ${wert}, ${text}`}
       onPress={onPress}
-      style={({ pressed }) => [{ flex: 1, minWidth: 0, padding: 14, gap: 10, borderRadius: RADIUS.karte, backgroundColor: f.blatt, borderWidth: f.schatten ? 0 : 1, borderColor: f.linie, opacity: pressed ? 0.7 : 1 }, schattenStil(f)]}
+      style={({ pressed }) => [{ flex: 1, minWidth: 0, padding: 14, gap: 10, borderRadius: RADIUS.karte, backgroundColor: f.blatt, borderWidth: 0, opacity: pressed ? 0.7 : 1 }, schattenStil(f)]}
     >
       <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
         <Kachel symbol={symbol} ton={ton} groesse={26} />
@@ -100,8 +100,8 @@ export function Heute() {
       <Gruppe titel={TEXT.schnell_titel}>
         <View style={{ flexDirection: "row", gap: 12 }}>
           <SchnellKachel symbol="eurosign" text={TEXT.rechnung_schreiben} onPress={() => starten("rechnung")} />
-          <SchnellKachel symbol="doc.viewfinder" text={TEXT.beleg_erfassen} onPress={() => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />)} />
-          <SchnellKachel symbol="square.grid.2x2" text={TEXT.vorlage_waehlen} onPress={erstellen.oeffnen} />
+          <SchnellKachel ton="blau" symbol="doc.viewfinder" text={TEXT.beleg_erfassen} onPress={() => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />)} />
+          <SchnellKachel ton="lila" symbol="square.grid.2x2" text={TEXT.vorlage_waehlen} onPress={erstellen.oeffnen} />
         </View>
       </Gruppe>
 

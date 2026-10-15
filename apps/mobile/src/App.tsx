@@ -1,4 +1,4 @@
-import { useFonts } from "expo-font";
+import { Onest_400Regular, Onest_500Medium, Onest_600SemiBold, Onest_700Bold, Onest_800ExtraBold, useFonts } from "@expo-google-fonts/onest";
 import { BlurView } from "expo-blur";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -219,15 +219,8 @@ function TastaturLeiste() {
 
 export default function App() {
   const dunkel = useColorScheme() === "dark";
-  // dieselben Schnitte wie Website und Dokumente (assets/schriften, OFL 1.1)
-  /* eslint-disable @typescript-eslint/no-require-imports -- Schriftdateien bindet Metro nur über require ein */
-  const [schriftGeladen] = useFonts({
-    AmtlosSans_400Regular: require("../assets/schriften/AmtlosSans_400Regular.ttf"),
-    AmtlosSans_600SemiBold: require("../assets/schriften/AmtlosSans_600SemiBold.ttf"),
-    AmtlosSans_700Bold: require("../assets/schriften/AmtlosSans_700Bold.ttf"),
-    AmtlosSerif_600SemiBold: require("../assets/schriften/AmtlosSerif_600SemiBold.ttf"),
-  });
-  /* eslint-enable @typescript-eslint/no-require-imports */
+  // Onest (OFL 1.1), E-139 – fünf Schnitte einer Familie
+  const [schriftGeladen] = useFonts({ Onest_400Regular, Onest_500Medium, Onest_600SemiBold, Onest_700Bold, Onest_800ExtraBold });
   if (!schriftGeladen && Platform.OS !== "web") return null;
   return (
     <SafeAreaProvider>
