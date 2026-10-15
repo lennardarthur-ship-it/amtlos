@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
-import { ScrollView, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { T as TEXT } from "../texte";
-import { RAND } from "../ui/thema";
+import { RAND, SCHRIFT } from "../ui/thema";
 import { Betrag, Karte, Knopf, T, TextKnopf, Wahl } from "../ui/bausteine";
 import { useNav } from "../ui/navigation";
 import { useFarben } from "../ui/thema";
@@ -18,17 +18,23 @@ import { BelegErfassenSeite } from "./Belege";
 /** Ab so vielen Unterlagen lohnt sich die Suche. */
 const SUCHE_AB = 6;
 
-/** Offene Rechnungen auf einen Blick – antippen filtert die Liste. */
+/**
+ * Offene Rechnungen auf einen Blick – der Betrag groß wie in Finanz-Apps, darunter Anzahl bzw. „davon überfällig“.
+ * Antippen filtert die Liste auf offene Rechnungen (noch einmal: alle).
+ */
 function OffeneKarte({ anzahl, ueberfaellig, cent, aktiv, onPress }: { anzahl: number; ueberfaellig: number; cent: number; aktiv: boolean; onPress: () => void }) {
   const f = useFarben();
   return (
-    <Karte stil={{ marginBottom: 16, paddingVertical: 14, flexDirection: "row", alignItems: "center", gap: 14, backgroundColor: aktiv ? f.baldHauch : f.blatt }}>
-      <View style={{ flex: 1 }}>
-        <T fett>{anzahl ? TEXT.offene_summe(anzahl, euroText(cent)) : TEXT.alles_bezahlt}</T>
-        {anzahl ? <T v="caption" leise farbe={ueberfaellig ? f.frist : undefined}>{ueberfaellig ? TEXT.davon_ueberfaellig(ueberfaellig) : TEXT.offene_hilfe}</T> : null}
-      </View>
-      {anzahl ? <Knopf ton text={aktiv ? TEXT.filter.alle : TEXT.filter.offen} onPress={onPress} stil={{ minHeight: 44, paddingHorizontal: 12 }} /> : null}
-    </Karte>
+    <Pressable accessibilityRole="button" accessibilityState={{ selected: aktiv }} accessibilityLabel={anzahl ? TEXT.offene_summe(anzahl, euroText(cent)) : TEXT.alles_bezahlt} onPress={anzahl ? onPress : undefined} style={({ pressed }) => ({ marginBottom: 16, opacity: pressed ? 0.7 : 1 })}>
+      <Karte stil={{ paddingVertical: 16, borderWidth: aktiv ? 2 : 0, borderColor: f.amt }}>
+        <T v="klein" fett leise>{TEXT.kachel_offen}</T>
+        <View style={{ flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}>
+          <Betrag stil={{ ...SCHRIFT.bold, fontSize: 30, lineHeight: 36 }}>{euroText(cent)}</Betrag>
+          {anzahl ? <T v="klein" fett farbe={f.amt}>{aktiv ? TEXT.filter.alle : TEXT.nur_offene}</T> : null}
+        </View>
+        <T v="caption" farbe={ueberfaellig ? f.frist : undefined} leise={!ueberfaellig}>{anzahl ? (ueberfaellig ? TEXT.davon_ueberfaellig(ueberfaellig) : TEXT.kachel_offen_text(anzahl)) : TEXT.alles_bezahlt}</T>
+      </Karte>
+    </Pressable>
   );
 }
 

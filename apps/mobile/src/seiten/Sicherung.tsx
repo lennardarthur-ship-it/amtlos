@@ -236,6 +236,7 @@ export function CloudZeile() {
   const sperre = useProSperre();
   if (!cloud) return null;
   return (
+    <Karte stil={{ marginBottom: 10, paddingBottom: 12 }}>
     <Schalter
       label={TEXT.mitPro(TEXT.icloud_auto, z.pro)}
       hilfe={TEXT.icloud_auto_hilfe}
@@ -251,6 +252,7 @@ export function CloudZeile() {
         }
       }}
     />
+    </Karte>
   );
 }
 

@@ -345,9 +345,11 @@ export function Betrieb() {
         <Datenschutz />
         <KontoZeile />
         <CloudZeile />
-        <T v="klein" leise stil={{ marginLeft: 4, marginBottom: 8 }}>{TEXT.letzte_sicherung(z.stand.letzteSicherung ? datumKurz(z.stand.letzteSicherung) : null)}</T>
-        <Knopf ton symbol="lock" text={TEXT.sichern} onPress={() => nav.oeffnen("sicherung", () => <SicherungSeite />, true)} />
-        <TextKnopf symbol="arrow.clockwise" text={TEXT.wiederherstellen} onPress={() => nav.oeffnen("wiederherstellen", () => <WiederherstellenSeite fertig={() => setZaehler((x) => x + 1)} />, true)} stil={{ marginLeft: 4, marginTop: 4 }} />
+        {/* Sichern und Wiederherstellen als Listenzeilen – wie in den iPhone-Einstellungen */}
+        <Karte>
+          <Zeile symbol="lock.fill" titel={TEXT.sichern} label={TEXT.sichern} text={TEXT.letzte_sicherung(z.stand.letzteSicherung ? datumKurz(z.stand.letzteSicherung) : null)} onPress={() => nav.oeffnen("sicherung", () => <SicherungSeite />, true)} />
+          <Zeile symbol="arrow.clockwise" ton="blau" titel={TEXT.wiederherstellen} label={TEXT.wiederherstellen} onPress={() => nav.oeffnen("wiederherstellen", () => <WiederherstellenSeite fertig={() => setZaehler((x) => x + 1)} />, true)} letzte />
+        </Karte>
       </Gruppe>
       <Gruppe fuss={TEXT.alles_loeschen_text}>
         {frage && !darfLoeschen ? (
@@ -377,7 +379,9 @@ export function Betrieb() {
             </View>
           </Karte>
         ) : (
-          <TextKnopf gefahr symbol="trash" text={TEXT.alles_loeschen} onPress={() => { weich(); setFrage(true); }} />
+          <Karte>
+            <Zeile gefahr titel={TEXT.alles_loeschen} label={TEXT.alles_loeschen} onPress={() => { weich(); setFrage(true); }} letzte />
+          </Karte>
         )}
       </Gruppe>
       <Gruppe titel={TEXT.ueber_titel}>

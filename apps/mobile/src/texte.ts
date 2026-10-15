@@ -21,6 +21,7 @@ export const T = {
   alle_pflichten: "Alle Pflichten",
   nichts_dran_kurz: "Nichts ist dringend. Amtlos sagt Bescheid, wenn ein Termin näher rückt.",
   kachel_offen: "Offen",
+  nur_offene: "Nur offene",
   kachel_offen_text: (n: number) => (n === 0 ? "alles bezahlt" : n === 1 ? "1 Rechnung" : `${n} Rechnungen`),
   kachel_monat_text: (n: number) => (n === 1 ? "berechnet · 1 Rechnung" : `berechnet · ${n} Rechnungen`),
   schnell_titel: "Schnell erledigt",

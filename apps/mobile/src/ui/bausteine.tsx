@@ -347,7 +347,7 @@ export function Abschnitt({ titel, rechts, children }: { titel?: string; rechts?
  * Zeile in einer Liste: tippbar, Haarlinie unten (eingerückt ab dem Text, wie in iOS). `symbol` setzt eine getönte
  * Kachel davor, `links` ein eigenes Element (z. B. Status-Kreis).
  */
-export function Zeile({ links, symbol, ton, titel, text, wert, marke, rechts, onPress, letzte }: { links?: ReactNode; symbol?: string; ton?: Ton; titel: string; text?: string; wert?: string; marke?: { text: string; ton: Ton }; rechts?: ReactNode; onPress?: () => void; letzte?: boolean }) {
+export function Zeile({ links, symbol, ton, titel, text, wert, marke, rechts, onPress, letzte, gefahr, label }: { links?: ReactNode; symbol?: string; ton?: Ton; titel: string; text?: string; wert?: string; marke?: { text: string; ton: Ton }; rechts?: ReactNode; onPress?: () => void; letzte?: boolean; gefahr?: boolean; label?: string }) {
   const f = useFarben();
   const vorn = symbol ? <Kachel symbol={symbol} ton={ton} /> : links;
   const inhalt = (pressed: boolean) => (
@@ -355,7 +355,7 @@ export function Zeile({ links, symbol, ton, titel, text, wert, marke, rechts, on
       {vorn ? <View style={{ marginRight: 14, minWidth: 24, alignItems: "center" }}>{vorn}</View> : null}
       <View style={{ flex: 1, minWidth: 0, flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 13, minHeight: 58, borderBottomWidth: letzte ? 0 : HAARLINIE, borderColor: f.linie }}>
         <View style={{ flex: 1, minWidth: 0 }}>
-          <T fett numberOfLines={2}>{titel}</T>
+          <T fett={!gefahr} farbe={gefahr ? f.frist : undefined} numberOfLines={2}>{titel}</T>
           {text ? <T v="klein" leise numberOfLines={2} stil={{ marginTop: 1 }}>{text}</T> : null}
         </View>
         {/* Betrag rechts (Rechnungen, Belege) – das, wonach man in Listen sucht */}
@@ -365,13 +365,13 @@ export function Zeile({ links, symbol, ton, titel, text, wert, marke, rechts, on
             {marke ? <Marke text={marke.text} ton={marke.ton} /> : null}
           </View>
         ) : null}
-        {rechts ?? (onPress ? <Symbol name="chevron.right" groesse={14} farbe={f.zeiger} gewicht="semibold" /> : null)}
+        {rechts ?? (onPress && !gefahr ? <Symbol name="chevron.right" groesse={14} farbe={f.zeiger} gewicht="semibold" /> : null)}
       </View>
     </View>
   );
   if (!onPress) return inhalt(false);
   return (
-    <Pressable accessibilityRole="button" onPress={onPress}>
+    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress}>
       {({ pressed }) => inhalt(pressed)}
     </Pressable>
   );
