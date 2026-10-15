@@ -185,7 +185,8 @@ jobs:
           E2E_KERN_URL=http://localhost:3002 pnpm --filter @amtlos/web e2e:kern 2>&1 | tee e2e-kern.txt
       # Fehler als Annotationen ausgeben – lesbar auch ohne Log-Download
       - if: failure()
-        run: for f in e2e-web.txt e2e-kern.txt e2e-studio.txt api.log web.log web-kern.log; do [ -f "$f" ] && tail -n 4 "$f" | sed "s/^/::error title=$f::/" || true; done
+        # Rundgänge: die letzten Zeilen ohne Zugriffsprotokoll (der Befund steht vor dem Node-Stacktrace)
+        run: for f in e2e-web.txt e2e-kern.txt e2e-studio.txt api.log web.log web-kern.log; do [ -f "$f" ] && grep -v '"stufe":"info"' "$f" | grep -v "^\s*at " | tail -n 10 | sed "s/^/::error title=$f::/" || true; done
       - if: always()
         uses: actions/upload-artifact@v4
         with:
