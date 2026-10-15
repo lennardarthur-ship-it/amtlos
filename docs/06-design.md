@@ -37,12 +37,12 @@ Einmalige, leicht gedrehte Umrandung wie ein Amtsstempel. Die einzige Bewegung i
 
 WCAG 2.2 AA, geprüft mit axe im E2E-Rundgang (hell/dunkel, Desktop/mobil). Ziele mindestens 44 px, sichtbarer Fokus, „Zum Inhalt springen“, Zeilenlänge ≤ 68 Zeichen, Dunkelmodus über `prefers-color-scheme`.
 
-## iPhone-App (E-139, Maßstab Taxfix)
+## iPhone-App (E-140, iOS 26)
 
 Quelle: `apps/mobile/src/ui/thema.ts` und `bausteine.tsx`.
 
-- **Schrift:** Onest, eine Familie. Überschriften 800/700, eng gesetzt (32 / 26 / 20 pt). Text 17 / 15 / 13 pt, Auszeichnung 600. Beträge mit gleich breiten Ziffern (`Betrag`).
-- **Farben:** Weiß als Grund, Karten als Flächen (`blatt`), Amtsgrün für Handlungen, Bühne Dunkelgrün mit Minze. Lila, Gold und Blau sind Kategoriefarben, Rot und Bernstein Status.
-- **Formen:** flach, ohne Schatten und Rahmen. Pillen für Knöpfe und Plaketten, Kreise für Symbole, Ecken 14 / 22 / 28.
-- **Motive:** § und € groß und angeschnitten auf der Bühne. Fristblatt für Termine, Stempel für Geschafftes.
-- **Fragen:** große Antwortkarten, eine Frage je Bildschirm.
+- **Schrift:** Systemschrift (SF Pro), iOS-Textstile 34 / 28 / 20 / 17 / 15 / 13 / 11.
+- **Flächen:** grauer gruppierter Grund, weiße Karten (Ecken 20), Eingabefelder weiß mit Rahmen ≥ 3:1. Pillen für Knöpfe und Chips.
+- **Symbole:** gefüllte farbige Quadrate mit weißem Zeichen vor Listenzeilen (wie Einstellungen); Fristblatt, Status-Plaketten, Initialen.
+- **Navigation:** schwebende Glas-Tab-Leiste mit „+“ daneben, runde Glasknöpfe oben (Zurück, Schließen).
+- **Marke:** Amtsgrün als Akzent, Bühne Dunkelgrün mit Minze und §/€-Motiv, App-Symbol § in Minze.

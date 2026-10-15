@@ -1,103 +1,99 @@
 import { LayoutAnimation, Platform, StyleSheet, useColorScheme } from "react-native";
 
 /**
- * Designsystem der App (docs/06-design.md, E-139): flach und klar wie die besten Finanz-Apps – Weiß, Amtsgrün mit
- * dunkler Bühne und Minze, Zweitfarben Lila/Gold/Blau für Kategorien, eine kräftige Grotesk (Onest), Pillen-Knöpfe.
- * Statusfarben nie allein, immer mit Text.
+ * Designsystem der App (docs/06-design.md, E-140): iOS 26 – wie die beliebtesten Apps heute. Systemschrift (SF Pro),
+ * gruppierter grauer Grund mit weißen Karten, Einstellungs-Symbole (gefüllte Quadrate), schwebende Glas-Tab-Leiste.
+ * Markenfarbe Amtsgrün als Akzent, Dunkelgrün mit Minze für die eine Bühne. Statusfarben nie allein, immer mit Text.
  */
 const HELL = {
-  papier: "#ffffff",
-  /** Kartenfläche: flach, ohne Schatten – Flächen trennen durch Farbe, nicht durch Linien */
-  blatt: "#f3f6f4",
-  /** ruhige Füllung in Karten: Suchfeld, Zurück-Knopf, neutrale Hinweise */
-  flaeche: "#e9eeeb",
-  tinte: "#0d1f18",
-  tinteLeise: "#56675f",
-  linie: "#dfe5e1",
-  linieLeise: "#ebefec",
-  /** Rahmen von Eingabefeldern und Auswahl: mindestens 3:1 zum Hintergrund (WCAG 1.4.11) */
-  rahmen: "#87938c",
-  /** Pfeile in Listen */
-  zeiger: "#a9b4ae",
+  /** Seitengrund (systemGroupedBackground) */
+  papier: "#f2f2f7",
+  /** Karten, Listen, Eingabefelder (secondarySystemGroupedBackground) */
+  blatt: "#ffffff",
+  /** Füllung: Suchfeld, graue Knöpfe, gedrückte Zeilen */
+  flaeche: "#e9e9ee",
+  tinte: "#000000",
+  /** Nebentext (≥ 4,5:1 auf Weiß und Grau) */
+  tinteLeise: "#6c6c70",
+  linie: "#c6c6c8",
+  linieLeise: "#e5e5ea",
+  /** Rahmen von Eingabefeldern: mindestens 3:1 (WCAG 1.4.11) */
+  rahmen: "#8e8e93",
+  zeiger: "#c4c4c7",
   amt: "#0a7d55",
-  amtTief: "#063b29",
-  amtHauch: "#e1f3ea",
-  /** Schrift auf Amtsgrün */
+  amtTief: "#06573b",
+  amtHauch: "#e0f2ea",
   amtText: "#ffffff",
-  /** Minzgrün: Akzent auf dunklem Grün (Bühne) */
   minze: "#7fe3b8",
-  frist: "#c4281c",
-  fristHauch: "#fdeceb",
-  bald: "#9e5200",
-  baldHauch: "#fdf1dc",
-  /** Zweitfarben für Kategorien (wie Euro-Scheine: Lila, Gold, Blau) – nur Flächen und Symbole, nie Text allein */
-  lila: "#5b3db0",
-  lilaHauch: "#eee8fc",
-  gold: "#8a5a00",
-  goldHauch: "#fcf1d2",
-  blau: "#2856c4",
-  blauHauch: "#e4ecfd",
-  /** Bühne: die eine dunkle Fläche je Seite (Einladung, Pro) */
+  frist: "#d70015",
+  fristHauch: "#ffe9ea",
+  bald: "#a05a00",
+  baldHauch: "#fff2dc",
+  lila: "#5e5ce6",
+  lilaHauch: "#ecebfd",
+  gold: "#a05a00",
+  goldHauch: "#fff2dc",
+  blau: "#0a64d6",
+  blauHauch: "#e5effd",
   buehne: "#063b29",
   buehneText: "#ffffff",
   buehneLeise: "rgba(255,255,255,0.78)",
   buehneKnopf: "#7fe3b8",
   buehneKnopfText: "#063b29",
-  leiste: "rgba(255,255,255,0.9)",
-  /** Deckkraft des Kartenschattens – flach: keiner */
-  schatten: 0,
+  leiste: "rgba(255,255,255,0.8)",
+  schatten: 0.08,
 };
 const DUNKEL: typeof HELL = {
-  papier: "#0a110e",
-  blatt: "#141d19",
-  flaeche: "#1d2823",
-  tinte: "#eef3f0",
-  tinteLeise: "#a4b3ac",
-  linie: "#25322c",
-  linieLeise: "#1b2621",
-  rahmen: "#62726a",
-  zeiger: "#55635c",
-  amt: "#3fd49a",
-  amtTief: "#a2f1cf",
-  amtHauch: "#123629",
-  amtText: "#03140d",
+  papier: "#000000",
+  blatt: "#1c1c1e",
+  flaeche: "#2c2c2e",
+  tinte: "#ffffff",
+  tinteLeise: "#aeaeb2",
+  linie: "#38383a",
+  linieLeise: "#2c2c2e",
+  rahmen: "#7c7c80",
+  zeiger: "#5a5a5e",
+  amt: "#30d68b",
+  amtTief: "#8ff0c1",
+  amtHauch: "#0f3324",
+  amtText: "#00180d",
   minze: "#7fe3b8",
-  frist: "#ff8a7d",
-  fristHauch: "#3b1b18",
-  bald: "#f4b75a",
-  baldHauch: "#382a12",
-  lila: "#c6b6fd",
-  lilaHauch: "#272042",
-  gold: "#f2cd78",
-  goldHauch: "#352b12",
-  blau: "#a2c0ff",
-  blauHauch: "#18284a",
-  buehne: "#0f3627",
-  buehneText: "#eef3f0",
-  buehneLeise: "#b3c9bf",
-  buehneKnopf: "#3fd49a",
-  buehneKnopfText: "#03140d",
-  leiste: "rgba(10,17,14,0.9)",
+  frist: "#ff6961",
+  fristHauch: "#3a1514",
+  bald: "#ffb340",
+  baldHauch: "#3a2a10",
+  lila: "#a5a3ff",
+  lilaHauch: "#25243f",
+  gold: "#ffb340",
+  goldHauch: "#3a2a10",
+  blau: "#6eb4ff",
+  blauHauch: "#132a46",
+  buehne: "#0d3626",
+  buehneText: "#ffffff",
+  buehneLeise: "#b8cdc3",
+  buehneKnopf: "#30d68b",
+  buehneKnopfText: "#00180d",
+  leiste: "rgba(28,28,30,0.72)",
   schatten: 0,
 };
 export type Farben = typeof HELL;
 
-/** Schrift (E-139): Onest (OFL 1.1), eine Familie in fünf Schnitten – fett für Überschriften, halbfett zur Auszeichnung. */
+/** Schrift (E-140): die Systemschrift (SF Pro auf dem iPhone) – Gewicht statt eigener Schnitte. */
 export const SCHRIFT = {
-  regular: "Onest_400Regular",
-  mittel: "Onest_500Medium",
-  halb: "Onest_600SemiBold",
-  bold: "Onest_700Bold",
-  display: "Onest_800ExtraBold",
+  regular: { fontWeight: "400" },
+  mittel: { fontWeight: "500" },
+  halb: { fontWeight: "600" },
+  bold: { fontWeight: "700" },
+  display: { fontWeight: "800" },
 } as const;
-/** Typografische Skala */
-export const GROESSE = { mini: 11, caption: 13, klein: 15, basis: 17, gross: 20, titel: 26, grossTitel: 32, blatt: 38 } as const;
+/** iOS-Textstile: largeTitle 34, title1 28, title3 20, body 17, subheadline 15, footnote 13, caption 11 */
+export const GROESSE = { mini: 11, caption: 13, klein: 15, basis: 17, gross: 20, titel: 28, grossTitel: 34, blatt: 38 } as const;
 /** Mindestgröße für Tippziele */
 export const ZIEL = 48;
 /** Seitenrand */
 export const RAND = 20;
-/** Ecken: Felder 14, Karten 22, Bühne 28 – Knöpfe und Chips sind Pillen. */
-export const RADIUS = { klein: 14, karte: 22, buehne: 28, blatt: 10, knopf: 999 } as const;
+/** Ecken: Felder 12, Karten 20, Bühne 26 – Knöpfe und Chips sind Pillen. */
+export const RADIUS = { klein: 12, karte: 20, buehne: 26, blatt: 10, knopf: 999 } as const;
 export const HAARLINIE = StyleSheet.hairlineWidth;
 
 export function useFarben(): Farben {

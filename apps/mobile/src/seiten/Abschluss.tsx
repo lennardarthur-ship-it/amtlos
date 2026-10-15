@@ -125,7 +125,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
         // die Summe groß oben (wie der Betrag in Finanz-Apps), die Bestandteile darunter
         <Karte stil={{ marginTop: 14, paddingVertical: 18 }}>
           <T v="klein" fett leise>{ergebnis.at(-1)![0]}</T>
-          <Betrag stil={{ fontFamily: SCHRIFT.display, fontSize: 38, lineHeight: 44, letterSpacing: -1.2, marginTop: 2 }}>{ergebnis.at(-1)![1]}</Betrag>
+          <Betrag stil={{ ...SCHRIFT.display, fontSize: 38, lineHeight: 44, letterSpacing: -1.2, marginTop: 2 }}>{ergebnis.at(-1)![1]}</Betrag>
           {ergebnis.length > 1 ? (
             <View style={{ marginTop: 12, borderTopWidth: HAARLINIE, borderColor: f.linie, paddingTop: 8 }}>
               {ergebnis.slice(0, -1).map(([k, w]) => (

@@ -9,15 +9,15 @@ import { DatumWahl } from "./datumwahl";
 import { GROESSE, HAARLINIE, RADIUS, SCHRIFT, TASTATUR_FERTIG, ZIEL, istIos, schattenStil, useFarben, weich, type Farben } from "./thema";
 
 type Variante = "grossTitel" | "titel" | "gross" | "basis" | "klein" | "caption" | "mini";
-/** Eine Familie (Onest): Überschriften extra- bzw. dreiviertelfett und eng gesetzt, Lesetext normal. */
+/** iOS-Textstile in der Systemschrift (SF Pro), mit Apples Laufweiten. */
 const STIL: Record<Variante, TextStyle> = {
-  grossTitel: { fontSize: GROESSE.grossTitel, lineHeight: 37, fontFamily: SCHRIFT.display, letterSpacing: -1 },
-  titel: { fontSize: GROESSE.titel, lineHeight: 31, fontFamily: SCHRIFT.bold, letterSpacing: -0.7 },
-  gross: { fontSize: 19, lineHeight: 24, fontFamily: SCHRIFT.bold, letterSpacing: -0.3 },
-  basis: { fontSize: GROESSE.basis, lineHeight: 24, fontFamily: SCHRIFT.regular, letterSpacing: -0.1 },
-  klein: { fontSize: GROESSE.klein, lineHeight: 21, fontFamily: SCHRIFT.regular },
-  caption: { fontSize: GROESSE.caption, lineHeight: 18, fontFamily: SCHRIFT.regular },
-  mini: { fontSize: GROESSE.mini, lineHeight: 13, fontFamily: SCHRIFT.halb, letterSpacing: 0.1 },
+  grossTitel: { fontSize: GROESSE.grossTitel, lineHeight: 41, ...SCHRIFT.bold, letterSpacing: 0.37 },
+  titel: { fontSize: GROESSE.titel, lineHeight: 34, ...SCHRIFT.bold, letterSpacing: 0.36 },
+  gross: { fontSize: GROESSE.gross, lineHeight: 25, ...SCHRIFT.bold, letterSpacing: -0.45 },
+  basis: { fontSize: GROESSE.basis, lineHeight: 22, ...SCHRIFT.regular, letterSpacing: -0.43 },
+  klein: { fontSize: GROESSE.klein, lineHeight: 20, ...SCHRIFT.regular, letterSpacing: -0.23 },
+  caption: { fontSize: GROESSE.caption, lineHeight: 18, ...SCHRIFT.regular, letterSpacing: -0.08 },
+  mini: { fontSize: GROESSE.mini, lineHeight: 13, ...SCHRIFT.mittel, letterSpacing: 0.06 },
 };
 const UEBERSCHRIFT = new Set<Variante>(["grossTitel", "titel", "gross"]);
 
@@ -25,7 +25,7 @@ const UEBERSCHRIFT = new Set<Variante>(["grossTitel", "titel", "gross"]);
 export function T({ v = "basis", fett, leise, farbe, stil, children, ...rest }: { v?: Variante; fett?: boolean; leise?: boolean; farbe?: string; stil?: StyleProp<TextStyle>; children: ReactNode } & Omit<React.ComponentProps<typeof RNText>, "style">) {
   const f = useFarben();
   return (
-    <RNText {...rest} style={[STIL[v], fett && !UEBERSCHRIFT.has(v) ? { fontFamily: SCHRIFT.halb } : null, { color: farbe ?? (leise ? f.tinteLeise : f.tinte) }, stil]}>
+    <RNText {...rest} style={[STIL[v], fett && !UEBERSCHRIFT.has(v) ? { ...SCHRIFT.halb } : null, { color: farbe ?? (leise ? f.tinteLeise : f.tinte) }, stil]}>
       {children}
     </RNText>
   );
@@ -34,7 +34,7 @@ export function T({ v = "basis", fett, leise, farbe, stil, children, ...rest }: 
 /** Beträge und Ziffern: fett, gleich breite Ziffern – Spalten stehen untereinander. */
 export function Betrag({ children, v = "basis", farbe, stil }: { children: ReactNode; v?: Variante; farbe?: string; stil?: StyleProp<TextStyle> }) {
   return (
-    <T v={v} farbe={farbe} stil={[{ fontFamily: SCHRIFT.bold }, stil]}>
+    <T v={v} farbe={farbe} stil={[{ ...SCHRIFT.bold }, stil]}>
       {children}
     </T>
   );
@@ -87,13 +87,14 @@ export const tonFarben = (f: Farben, ton: Ton) =>
               ? { grund: f.blauHauch, zeichen: f.blau }
               : { grund: f.amtHauch, zeichen: f.amt };
 
-/** Symbol auf einer getönten Kachel – vor Listenzeilen und Erklärpunkten, wie in den iOS-Einstellungen. */
-export function Kachel({ symbol, ton = "amt", groesse = 36 }: { symbol: string; ton?: Ton; groesse?: number }) {
-  const f = useFarben();
-  const t = tonFarben(f, ton);
+/** Gefüllte Farbe je Ton für Symbol-Quadrate (wie in den iPhone-Einstellungen) – gleich in Hell und Dunkel. */
+const QUADRAT: Record<Ton, string> = { amt: "#1fa463", bald: "#ff9500", frist: "#ff3b30", leise: "#8e8e93", lila: "#5856d6", gold: "#ff9f0a", blau: "#0a84ff" };
+
+/** Symbol auf einem gefüllten, abgerundeten Quadrat mit weißem Zeichen – vor Listenzeilen, wie in den Einstellungen. */
+export function Kachel({ symbol, ton = "amt", groesse = 30 }: { symbol: string; ton?: Ton; groesse?: number }) {
   return (
-    <View style={{ width: groesse, height: groesse, borderRadius: groesse / 2, backgroundColor: t.grund, alignItems: "center", justifyContent: "center" }}>
-      <Symbol name={symbol} groesse={Math.round(groesse * 0.53)} farbe={t.zeichen} gewicht="semibold" />
+    <View style={{ width: groesse, height: groesse, borderRadius: Math.round(groesse * 0.26), backgroundColor: QUADRAT[ton], alignItems: "center", justifyContent: "center" }}>
+      <Symbol name={symbol} groesse={Math.round(groesse * 0.56)} farbe="#ffffff" gewicht="semibold" />
     </View>
   );
 }
@@ -105,7 +106,7 @@ export function Initialen({ name, groesse = 34 }: { name: string; groesse?: numb
   const kurz = ((teile[0]?.[0] ?? "") + (teile.length > 1 ? teile.at(-1)![0] : "")).toUpperCase() || "?";
   return (
     <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={{ width: groesse, height: groesse, borderRadius: groesse / 2, backgroundColor: f.amtHauch, alignItems: "center", justifyContent: "center" }}>
-      <T v="caption" farbe={f.amtTief} stil={{ fontFamily: SCHRIFT.bold, fontSize: groesse * 0.38, lineHeight: groesse * 0.5, letterSpacing: 0.4 }}>{kurz}</T>
+      <T v="caption" farbe={f.amtTief} stil={{ ...SCHRIFT.bold, fontSize: groesse * 0.38, lineHeight: groesse * 0.5, letterSpacing: 0.4 }}>{kurz}</T>
     </View>
   );
 }
@@ -127,7 +128,7 @@ export function Fristblatt({ termin, heute, erledigt, groesse = 46 }: { termin: 
   const streifen = erledigt ? f.amt : tage < 0 ? f.frist : tage <= 14 ? f.bald : f.linie;
   const fmt = (o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", ...o }).format(d).replace(".", "");
   return (
-    <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={[{ width: groesse, borderRadius: 10, backgroundColor: f.papier, borderWidth: 1, borderColor: f.linie, overflow: "hidden", alignItems: "center" }, schattenStil(f, 0.6)]}>
+    <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={[{ width: groesse, borderRadius: 10, backgroundColor: f.blatt, borderWidth: 1, borderColor: f.linie, overflow: "hidden", alignItems: "center" }, schattenStil(f, 0.6)]}>
       <View style={{ alignSelf: "stretch", height: 5, backgroundColor: streifen }} />
       <T v="mini" leise stil={{ marginTop: 3, fontSize: 9.5, lineHeight: 11, textTransform: "uppercase", letterSpacing: 0.6 }}>{fmt({ weekday: "short" })}</T>
       <T v="gross" stil={{ fontSize: groesse * 0.44, lineHeight: groesse * 0.5 }}>{fmt({ day: "numeric" })}</T>
@@ -152,7 +153,7 @@ export function Erfolg({ groesse = 64 }: { groesse?: number }) {
  */
 export function Motiv({ zeichen, groesse = 220, farbe, stil }: { zeichen: string; groesse?: number; farbe: string; stil?: StyleProp<TextStyle> }) {
   return (
-    <RNText accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={[{ position: "absolute", fontFamily: SCHRIFT.display, fontSize: groesse, lineHeight: groesse * 1.1, color: farbe, letterSpacing: -groesse * 0.04, includeFontPadding: false }, stil]}>
+    <RNText accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={[{ position: "absolute", ...SCHRIFT.display, fontSize: groesse, lineHeight: groesse * 1.1, color: farbe, letterSpacing: -groesse * 0.04, includeFontPadding: false }, stil]}>
       {zeichen}
     </RNText>
   );
@@ -220,7 +221,7 @@ export function Knopf({ text, onPress, leise, ton, gefahr, buehne, deaktiviert, 
       {/* Knöpfe tragen Text – Symbole nur, wo sie eine feste Bedeutung haben (Teilen, Face ID) */}
       {laedt ? <ActivityIndicator color={schrift} /> : symbol && KNOPF_SYMBOLE.has(symbol) ? <Symbol name={symbol} groesse={18} farbe={schrift} gewicht="semibold" /> : null}
       {/* der Text bleibt beim Laden stehen („Wird verschlüsselt …“) */}
-      <RNText style={{ fontFamily: SCHRIFT.halb, fontSize: GROESSE.basis, letterSpacing: 0.1, color: schrift, textAlign: "center", flexShrink: 1 }}>{text}</RNText>
+      <RNText style={{ ...SCHRIFT.halb, fontSize: GROESSE.basis, letterSpacing: 0.1, color: schrift, textAlign: "center", flexShrink: 1 }}>{text}</RNText>
     </Pressable>
   );
 }
@@ -348,10 +349,7 @@ export function Abschnitt({ titel, rechts, children }: { titel?: string; rechts?
  */
 export function Zeile({ links, symbol, ton, titel, text, wert, marke, rechts, onPress, letzte }: { links?: ReactNode; symbol?: string; ton?: Ton; titel: string; text?: string; wert?: string; marke?: { text: string; ton: Ton }; rechts?: ReactNode; onPress?: () => void; letzte?: boolean }) {
   const f = useFarben();
-  // keine Symbolkreise vor Listenzeilen – nur, wo das Element selbst Information trägt (Fristblatt, Status, Initialen)
-  void symbol;
-  void ton;
-  const vorn = links;
+  const vorn = symbol ? <Kachel symbol={symbol} ton={ton} /> : links;
   const inhalt = (pressed: boolean) => (
     <View style={{ flexDirection: "row", alignItems: "center", opacity: pressed ? 0.55 : 1 }}>
       {vorn ? <View style={{ marginRight: 14, minWidth: 24, alignItems: "center" }}>{vorn}</View> : null}
@@ -430,7 +428,7 @@ export function Status({ status, text }: { status: string; text: string }) {
 export function Karte({ children, stil, rahmen }: { children: ReactNode; stil?: StyleProp<ViewStyle>; rahmen?: string }) {
   const f = useFarben();
   return (
-    <View style={[{ backgroundColor: f.blatt, borderRadius: RADIUS.karte, borderWidth: rahmen ? 1.5 : 0, borderColor: rahmen ?? f.linie, paddingHorizontal: 16 }, schattenStil(f), stil]}>
+    <View style={[{ backgroundColor: f.blatt, borderRadius: RADIUS.karte, borderWidth: rahmen ? 1.5 : 0, borderColor: rahmen ?? f.linie, paddingHorizontal: 16 }, stil]}>
       {children}
     </View>
   );
@@ -445,10 +443,10 @@ export function feldRahmen(f: Farben, zustand: { fokus?: boolean; fehler?: boole
     borderColor: zustand.fehler ? f.frist : zustand.fokus ? f.amt : f.rahmen,
     // Rahmen wird dicker – Innenabstand gleicht aus, damit der Text nicht springt
     paddingHorizontal: zustand.fokus || zustand.fehler ? 14 : 15,
-    backgroundColor: f.papier,
+    backgroundColor: f.blatt,
   };
 }
-const feldText = (f: Farben): TextStyle => ({ color: f.tinte, fontFamily: SCHRIFT.regular, fontSize: GROESSE.basis });
+const feldText = (f: Farben): TextStyle => ({ color: f.tinte, ...SCHRIFT.regular, fontSize: GROESSE.basis });
 
 /** Beschriftetes Textfeld; die Beschriftung steht darüber und ist mit dem Feld verbunden. */
 export function Feld({ label, wert, aendern, hilfe, fehler, mehrzeilig, ohneLabel, optional, onFocus, onBlur, ...rest }: { label: string; wert: string; aendern: (w: string) => void; hilfe?: string; fehler?: string | null; mehrzeilig?: boolean; ohneLabel?: boolean; optional?: boolean } & Omit<React.ComponentProps<typeof TextInput>, "value" | "onChangeText" | "style">) {
@@ -554,7 +552,7 @@ function Chip({ text, an, rolle, onPress, kaestchen }: { text: string; an: boole
         if (istIos) void Haptics.selectionAsync();
         onPress();
       }}
-      style={({ pressed }) => ({ minHeight: 40, paddingLeft: kaestchen ? 11 : 16, paddingRight: 16, borderRadius: 20, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: an ? f.amt : pressed ? f.flaeche : f.papier, borderWidth: an ? 0 : 1, borderColor: f.rahmen, margin: an ? 1 : 0, flexShrink: 1 })}
+      style={({ pressed }) => ({ minHeight: 40, paddingLeft: kaestchen ? 11 : 16, paddingRight: 16, borderRadius: 20, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: an ? f.amt : pressed ? f.flaeche : f.blatt, borderWidth: an ? 0 : 1, borderColor: f.rahmen, margin: an ? 1 : 0, flexShrink: 1 })}
     >
       {kaestchen ? <Symbol name={an ? "checkmark.square.fill" : "square"} groesse={16} farbe={an ? f.amtText : f.tinteLeise} /> : null}
       <T v="klein" fett farbe={an ? f.amtText : f.tinte} stil={{ flexShrink: 1 }}>{text}</T>
@@ -606,7 +604,7 @@ function SchalterText({ label, hilfe }: { label: string; hilfe?: string }) {
 function ListenRahmen({ label, rolle, children }: { label: string; rolle?: "radiogroup"; children: ReactNode }) {
   const f = useFarben();
   return (
-    <View accessibilityRole={rolle} accessibilityLabel={label} style={{ marginTop: 7, borderWidth: 1, borderColor: f.rahmen, borderRadius: RADIUS.klein, overflow: "hidden", backgroundColor: f.papier }}>
+    <View accessibilityRole={rolle} accessibilityLabel={label} style={{ marginTop: 7, borderWidth: 1, borderColor: f.rahmen, borderRadius: RADIUS.klein, overflow: "hidden", backgroundColor: f.blatt }}>
       {children}
     </View>
   );
@@ -670,7 +668,7 @@ export function Auswahl<W extends string>({ label, wert, aendern, optionen, hilf
                 if (istIos) void Haptics.selectionAsync();
                 aendern(o.wert);
               }}
-              style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 12, minHeight: 50, paddingHorizontal: 14, paddingVertical: 10, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie, backgroundColor: an ? f.amtHauch : pressed ? f.flaeche : f.papier })}
+              style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 12, minHeight: 50, paddingHorizontal: 14, paddingVertical: 10, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie, backgroundColor: an ? f.amtHauch : pressed ? f.flaeche : f.blatt })}
             >
               <View style={{ width: 20, height: 20, borderRadius: 10, borderWidth: an ? 6 : 1.5, borderColor: an ? f.amt : f.rahmen, backgroundColor: f.blatt }} />
               <T v="klein" fett={an} farbe={an ? f.amtTief : f.tinte} stil={{ flex: 1 }}>{o.text}</T>
@@ -733,7 +731,7 @@ export function BausteinListe({ label, hilfe, werte, aendern, optionen }: { labe
                 if (istIos) void Haptics.selectionAsync();
                 aendern(an ? werte.filter((x) => x !== o.wert) : [...werte, o.wert]);
               }}
-              style={({ pressed }) => ({ flexDirection: "row", gap: 12, paddingHorizontal: 14, paddingVertical: 12, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie, backgroundColor: an ? f.amtHauch : pressed ? f.flaeche : f.papier })}
+              style={({ pressed }) => ({ flexDirection: "row", gap: 12, paddingHorizontal: 14, paddingVertical: 12, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie, backgroundColor: an ? f.amtHauch : pressed ? f.flaeche : f.blatt })}
             >
               <View style={{ paddingTop: 1 }}>
                 <Symbol name={an ? "checkmark.square.fill" : "square"} groesse={19} farbe={an ? f.amt : f.rahmen} />

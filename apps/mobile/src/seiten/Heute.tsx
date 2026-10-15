@@ -27,7 +27,7 @@ function Kennzahl({ label, wert, text, ton = "amt", symbol: _symbol, onPress }: 
     >
       <T v="caption" fett leise numberOfLines={1}>{label}</T>
       <View>
-        <Betrag stil={{ fontFamily: SCHRIFT.display, fontSize: 25, lineHeight: 30, letterSpacing: -0.6 }}>{wert}</Betrag>
+        <Betrag stil={{ ...SCHRIFT.display, fontSize: 25, lineHeight: 30, letterSpacing: -0.6 }}>{wert}</Betrag>
         <T v="caption" farbe={ton === "frist" ? f.frist : undefined} leise={ton !== "frist"} numberOfLines={2}>{text}</T>
       </View>
     </Pressable>

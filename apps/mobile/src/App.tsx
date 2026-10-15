@@ -1,4 +1,3 @@
-import { Onest_400Regular, Onest_500Medium, Onest_600SemiBold, Onest_700Bold, Onest_800ExtraBold, useFonts } from "@expo-google-fonts/onest";
 import { BlurView } from "expo-blur";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -17,7 +16,7 @@ import { Kachel, Karte, Knopf, Symbol, T, TextKnopf } from "./ui/bausteine";
 import { MeldungAnbieter } from "./ui/meldung";
 import { entsperren } from "./unterlagen/sperre";
 import { Stapel, useNav, type Nav } from "./ui/navigation";
-import { HAARLINIE, TASTATUR_FERTIG, ZIEL, istIos, schattenStil, useFarben } from "./ui/thema";
+import { HAARLINIE, TASTATUR_FERTIG, istIos, schattenStil, useFarben } from "./ui/thema";
 import { AmtlosAnbieter, useAmtlos, type Tab } from "./zustand";
 import { KontoAnbieter } from "./konto/konto";
 
@@ -32,45 +31,56 @@ const TABS: { id: Tab; symbol: string }[] = [
 ];
 const SEITE: Record<Tab, () => React.JSX.Element> = { heute: Heute, pflichten: PflichtenTab, meine: Meine, betrieb: Betrieb };
 
-/** Tab-Leiste: unscharfer Hintergrund (iOS), SF Symbols, der aktive Tab in Handlungsfarbe; in der Mitte „+“. */
+/**
+ * Tab-Leiste wie in iOS 26: eine schwebende Glas-Kapsel über dem Inhalt, der aktive Tab mit heller Pille hinterlegt;
+ * daneben ein eigener runder „+“-Knopf zum Erstellen. Erneutes Tippen auf den aktiven Tab führt zur ersten Seite.
+ */
 function Leiste({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
-  // Erneutes Tippen auf den aktiven Tab führt zur ersten Seite (setTab erkennt das)
   const f = useFarben();
   const dunkel = useColorScheme() === "dark";
   const inset = useSafeAreaInsets();
   const erstellen = useErstellen();
-  const reiter = (k: (typeof TABS)[number]) => {
-    const an = k.id === tab;
-    return (
-      <Pressable key={k.id} accessibilityRole="tab" accessibilityLabel={TEXT.tabs[k.id]} accessibilityState={{ selected: an }} onPress={() => setTab(k.id)} style={{ flex: 1, minHeight: ZIEL + 4, alignItems: "center", justifyContent: "center", gap: 4, paddingTop: 7 }}>
-        <Symbol name={an && k.id === "heute" ? "house.fill" : k.symbol} groesse={23} farbe={an ? f.amt : f.tinteLeise} gewicht={an ? "semibold" : "regular"} />
-        <T v="mini" farbe={an ? f.amt : f.tinteLeise}>{TEXT.tabs[k.id]}</T>
-      </Pressable>
+  const glas = (kinder: React.ReactNode, stil: object) =>
+    istIos ? (
+      <BlurView intensity={70} tint={dunkel ? "systemChromeMaterialDark" : "systemChromeMaterialLight"} style={[{ overflow: "hidden" }, stil]}>{kinder}</BlurView>
+    ) : (
+      // ohne Glas (Web, Android): fast deckend, damit nichts durchscheint
+      <View style={[{ backgroundColor: dunkel ? "rgba(28,28,30,0.96)" : "rgba(255,255,255,0.96)" }, stil]}>{kinder}</View>
     );
-  };
-  const inhalt = (
-    <View accessibilityRole="tablist" style={{ flexDirection: "row", alignItems: "center", paddingBottom: Math.max(inset.bottom - 6, 4), borderTopWidth: HAARLINIE, borderColor: f.linie }}>
-      {TABS.slice(0, 2).map(reiter)}
-      {/* der eine Ort zum Anfangen – egal, wo man gerade ist */}
-      <View style={{ flex: 1, alignItems: "center", paddingTop: 6 }}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={TEXT.erstellen}
-          onPress={() => {
-            if (istIos) void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-            erstellen.oeffnen();
-          }}
-          hitSlop={6}
-          style={({ pressed }) => [{ width: 50, height: 50, borderRadius: 25, backgroundColor: f.amt, alignItems: "center", justifyContent: "center", transform: [{ scale: pressed ? 0.94 : 1 }] }, schattenStil(f, 1.2)]}
-        >
-          <Symbol name="plus" groesse={24} farbe={f.amtText} gewicht="bold" />
-        </Pressable>
+  const rand = { borderWidth: HAARLINIE, borderColor: dunkel ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.08)" };
+  return (
+    <View pointerEvents="box-none" style={{ position: "absolute", left: 0, right: 0, bottom: Math.max(inset.bottom - 8, 10), paddingHorizontal: 16, flexDirection: "row", alignItems: "center", gap: 10 }}>
+      <View style={[{ flex: 1, borderRadius: 32 }, schattenStil(f, 1.6)]}>
+        {glas(
+          <View accessibilityRole="tablist" style={{ flexDirection: "row", padding: 4 }}>
+            {TABS.map((k) => {
+              const an = k.id === tab;
+              return (
+                <Pressable key={k.id} accessibilityRole="tab" accessibilityLabel={TEXT.tabs[k.id]} accessibilityState={{ selected: an }} onPress={() => setTab(k.id)} style={{ flex: 1, height: 56, borderRadius: 28, alignItems: "center", justifyContent: "center", gap: 2, backgroundColor: an ? (dunkel ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.06)") : "transparent" }}>
+                  <Symbol name={an && k.id === "heute" ? "house.fill" : k.symbol} groesse={22} farbe={an ? f.amt : f.tinte} gewicht={an ? "semibold" : "regular"} />
+                  <T v="mini" farbe={an ? f.amt : f.tinte} stil={{ fontSize: 10, ...(an ? { fontWeight: "600" } : null) }}>{TEXT.tabs[k.id]}</T>
+                </Pressable>
+              );
+            })}
+          </View>,
+          [{ borderRadius: 32 }, rand],
+        )}
       </View>
-      {TABS.slice(2).map(reiter)}
+      {/* der eine Ort zum Anfangen – als eigener runder Knopf neben der Leiste */}
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={TEXT.erstellen}
+        onPress={() => {
+          if (istIos) void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          erstellen.oeffnen();
+        }}
+        hitSlop={6}
+        style={({ pressed }) => [{ width: 64, height: 64, borderRadius: 32, backgroundColor: f.amt, alignItems: "center", justifyContent: "center", transform: [{ scale: pressed ? 0.94 : 1 }] }, schattenStil(f, 1.6)]}
+      >
+        <Symbol name="plus" groesse={26} farbe={f.amtText} gewicht="semibold" />
+      </Pressable>
     </View>
   );
-  if (istIos) return <BlurView intensity={80} tint={dunkel ? "dark" : "light"} style={{ position: "absolute", left: 0, right: 0, bottom: 0 }}>{inhalt}</BlurView>;
-  return <View style={{ position: "absolute", left: 0, right: 0, bottom: 0, backgroundColor: f.papier }}>{inhalt}</View>;
 }
 
 /** App-Sperre (E-129): bei eingeschalteter Sperre nach dem Start und nach jedem Wechsel in den Hintergrund. */
@@ -226,9 +236,7 @@ function TastaturLeiste() {
 
 export default function App() {
   const dunkel = useColorScheme() === "dark";
-  // Onest (OFL 1.1), E-139 – fünf Schnitte einer Familie
-  const [schriftGeladen] = useFonts({ Onest_400Regular, Onest_500Medium, Onest_600SemiBold, Onest_700Bold, Onest_800ExtraBold });
-  if (!schriftGeladen && Platform.OS !== "web") return null;
+  // Systemschrift (SF Pro) – nichts zu laden (E-140)
   return (
     <SafeAreaProvider>
       <AmtlosAnbieter>
@@ -237,7 +245,7 @@ export default function App() {
           <ErinnerungsPlaner />
           <AutoSicherung />
           <Sperre>
-            <MeldungAnbieter unten={72}>
+            <MeldungAnbieter unten={84}>
               <Rahmen />
             </MeldungAnbieter>
           </Sperre>

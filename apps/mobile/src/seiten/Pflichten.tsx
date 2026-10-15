@@ -184,7 +184,7 @@ function PflichtenInhalt() {
       <View style={{ padding: 22, borderRadius: RADIUS.buehne, backgroundColor: f.buehne, gap: 14, overflow: "hidden" }}>
         <T v="gross" farbe={f.buehneText} accessibilityRole="header">{TEXT.ergebnis_titel(a.gilt.length)}</T>
         <View style={{ flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", gap: 12 }}>
-          <Betrag farbe={f.minze} stil={{ fontFamily: SCHRIFT.display, fontSize: 48, lineHeight: 52, letterSpacing: -1.6 }}>{`${fs.prozent} %`}</Betrag>
+          <Betrag farbe={f.minze} stil={{ ...SCHRIFT.display, fontSize: 48, lineHeight: 52, letterSpacing: -1.6 }}>{`${fs.prozent} %`}</Betrag>
           <T v="klein" farbe={f.buehneLeise} stil={{ marginBottom: 8, textAlign: "right", flexShrink: 1 }}>{TEXT.fortschritt_text(fs.fertig, fs.gesamt)}</T>
         </View>
         <Balken prozent={fs.prozent} grund="rgba(255,255,255,0.14)" farbe={f.minze} />
@@ -315,7 +315,7 @@ export function Einladung() {
   // die Bühne: die eine dunkle Fläche der App; oben rechts das angeschnittene Motiv, darunter Titel, Text, Knopf
   return (
     <View style={{ padding: 22, paddingTop: 136, borderRadius: RADIUS.buehne, backgroundColor: f.buehne, gap: 12, overflow: "hidden" }}>
-        <Motiv zeichen="§" groesse={220} farbe={f.minze} stil={{ right: 10, top: -66 }} />
+        <Motiv zeichen="§" groesse={200} farbe={f.minze} stil={{ right: 16, top: -70 }} />
         <T v="titel" farbe={f.buehneText} accessibilityRole="header" stil={{ maxWidth: 260 }}>{TEXT.pflichten_karte_titel}</T>
         <T farbe={f.buehneLeise}>{TEXT.pflichten_einladung}</T>
         <Knopf buehne text={TEXT.pflichten_check_starten} symbol="arrow.right" onPress={() => nav.oeffnen("check", () => <CheckAblauf />, true)} stil={{ marginTop: 6 }} />

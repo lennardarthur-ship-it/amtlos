@@ -784,6 +784,15 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
   - „Heute“ hat nur noch zwei Schnellzugriffe; Vorlagen gibt es über „+“.
 - **Geprüft:** Rundgang hell und dunkel, Unit-Tests, Store- und Website-Bilder neu. Auf dem iPhone noch offen (→ T-82).
 
+### E-140 · iOS-26-Gestaltung: wie die beliebtesten Apps heute
+- **Datum:** 2026-10-15 · **Status:** angenommen. Gründer zur Reduktion in E-139: „falsche Richtung – schau dir an, wie sehr beliebte Apps heutzutage aussehen und wie die Elemente aussehen“. Ersetzt Schrift, Farben und Flächen aus E-139.
+- **Maßstab:** Apples iOS-26-Gestaltung („Liquid Glass“), die die verbreiteten Apps 2026 übernehmen. Systemschrift. Gruppierter grauer Grund mit weißen Karten. Einstellungs-Symbole als gefüllte Quadrate. Schwebende Glas-Tab-Leiste mit getrenntem runden Aktionsknopf. Runde Glasknöpfe in der Kopfzeile.
+- **Schrift:** SF Pro (Systemschrift) in den iOS-Textstilen: 34 / 28 / 20 / 17 / 15 / 13 / 11 mit Apples Laufweiten. Gewichte statt eigener Schnitte. Onest wird in der App nicht mehr geladen; Website und Store-Bilder behalten Onest.
+- **Farben:** Grund `#f2f2f7`, Karten Weiß, Nebentext `#6c6c70` (≥ 4,5:1), Trennlinien `#c6c6c8`. Dunkel: Schwarz mit Karten `#1c1c1e`. Amtsgrün bleibt Akzentfarbe, Bühne Dunkelgrün mit Minze.
+- **Symbole:** Listenzeilen tragen wieder Symbole, als gefüllte Quadrate mit weißem Zeichen wie in den Einstellungen (Grün, Blau, Indigo, Orange, Rot, Grau).
+- **Tab-Leiste:** schwebende Kapsel mit Glas (iOS) bzw. fast deckend (Web). Der aktive Tab ist mit einer Pille hinterlegt, rechts daneben sitzt der runde „+“-Knopf.
+- **Geprüft:** Rundgang hell und dunkel, Unit-Tests, Store-Bilder neu. Wie die Systemschrift und das Glas wirken, zeigt nur ein echtes iPhone (→ T-82); der Web-Export nutzt eine Ersatzschrift.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)
