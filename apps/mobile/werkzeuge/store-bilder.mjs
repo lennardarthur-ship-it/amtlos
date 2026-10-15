@@ -73,7 +73,7 @@ try {
   await p.getByRole("button", { name: /fällig|Nächster Termin/ }).locator("visible=true").first().click();
   await warte(900);
   await foto("pflicht");
-  await knopf("Zurück").click();
+  await knopf("Schließen").click();
   await warte(700);
   await tab("Unterlagen");
   await foto("ablage");
@@ -82,7 +82,7 @@ try {
   await knopf("Vorschau groß ansehen").click();
   await warte(1800);
   await foto("rechnung");
-  await knopf("Zurück").click();
+  await knopf("Schließen").click();
   await warte(600);
   await knopf("Schließen").click();
   await warte(700);

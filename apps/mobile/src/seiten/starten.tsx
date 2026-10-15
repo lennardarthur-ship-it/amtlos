@@ -4,8 +4,8 @@ import { useAmtlos } from "../zustand";
 import { Ablauf } from "./Ablauf";
 
 /**
- * Wohin ein Ablauf aufgeht: normalerweise in den Stapel der aktuellen Seite. Aus dem Blatt „Neu erstellen“ heraus
- * schließt sich das Blatt, und der Ablauf öffnet im aktuellen Tab – das Blatt ist zum Wählen da, nicht zum Arbeiten.
+ * Wohin ein Ablauf aufgeht: normalerweise als Blatt über der aktuellen Seite. Aus dem Blatt „Neu erstellen“ heraus
+ * ersetzt der Ablauf das Blatt – es ist zum Wählen da, nicht zum Arbeiten.
  */
 export const ZielKontext = createContext<((auf: (nav: Nav) => void) => void) | null>(null);
 

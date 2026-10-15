@@ -1,83 +1,67 @@
-import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
-import { Modal, Platform, View } from "react-native";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { StackActions } from "@react-navigation/native";
+import { useCallback, useContext, useMemo } from "react";
 import { T as TEXT } from "../texte";
-import { KopfKnopf } from "../ui/bausteine";
-import { Stapel, type Nav } from "../ui/navigation";
-import { useFarben } from "../ui/thema";
-import { ZielKontext } from "./starten";
+import { Blatt, WurzelNavKontext, registrieren, useNav, type Nav } from "../ui/navigation";
+import { BelegErfassenSeite } from "./Belege";
+import type { SeitenKnopf } from "./gemeinsam";
+import { ZielKontext, useStarten } from "./starten";
 import { Unterlagen } from "./Unterlagen";
 
-interface Erstellen {
-  /** Blatt „Neu erstellen“ öffnen (Rechnung, Beleg, alle Vorlagen) */
-  oeffnen(): void;
+/** Blatt „Neu erstellen“ öffnen (alle Vorlagen, Suche, Anlässe). */
+export function useErstellen() {
+  const wurzel = useContext(WurzelNavKontext);
+  return useMemo(() => ({ oeffnen: () => wurzel?.navigate("Neu") }), [wurzel]);
 }
-const Kontext = createContext<Erstellen>({ oeffnen: () => undefined });
-export const useErstellen = () => useContext(Kontext);
 
 /**
- * Der zentrale „+“-Knopf öffnet ein Blatt mit allem, was sich erstellen lässt – wie in den besten Werkzeug-Apps:
- * ein Ort zum Anfangen, egal auf welcher Seite man gerade ist. Gewählt wird im Blatt, gearbeitet im Tab:
- * `navFuer` liefert den Stapel des aktuellen Tabs, in dem der Ablauf dann aufgeht.
+ * Der „+“-Knopf oben rechts (E-141): auf dem iPhone ein Menü wie in Notizen oder Dateien – die zwei häufigsten
+ * Handlungen direkt, alles andere im Blatt „Neu erstellen“. Im Web öffnet er das Blatt.
  */
-export function ErstellenAnbieter({ navFuer, children }: { navFuer: () => Nav | undefined; children: ReactNode }) {
-  const [offen, setOffen] = useState(false);
-  // jedes Öffnen beginnt auf der ersten Seite des Blatts (kein halb offener Anlass vom letzten Mal)
-  const [runde, setRunde] = useState(0);
-  const warten = useRef<((nav: Nav) => void) | null>(null);
-  const ziel = useCallback(
-    (auf: (nav: Nav) => void) => {
-      // erst schließen, dann im Tab öffnen – sonst liegt der Ablauf unter dem Blatt
-      setOffen(false);
-      const nav = navFuer();
-      if (!nav) return;
-      if (Platform.OS === "ios") warten.current = auf;
-      else setTimeout(() => auf(nav), 50);
-    },
-    [navFuer],
-  );
-  const wert = useMemo(
+export function useErstellenKnopf(): SeitenKnopf {
+  const starten = useStarten();
+  const nav = useNav();
+  const erstellen = useErstellen();
+  return useMemo(
     () => ({
-      oeffnen: () => {
-        setRunde((r) => r + 1);
-        setOffen(true);
-      },
+      text: TEXT.erstellen,
+      symbol: "plus",
+      onPress: erstellen.oeffnen,
+      menue: [
+        { text: TEXT.rechnung_schreiben, symbol: "eurosign", onPress: () => starten("rechnung") },
+        { text: TEXT.beleg_erfassen, symbol: "doc.viewfinder", onPress: () => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />, true) },
+        { text: TEXT.alle_vorlagen_menue, symbol: "square.grid.2x2", onPress: erstellen.oeffnen },
+      ],
     }),
-    [],
-  );
-  return (
-    <Kontext.Provider value={wert}>
-      {children}
-      <Modal
-        visible={offen}
-        animationType="slide"
-        presentationStyle="pageSheet"
-        onRequestClose={() => setOffen(false)}
-        onDismiss={() => {
-          // iOS: erst nach dem Wegschieben des Blatts öffnen, sonst springt die Animation
-          const auf = warten.current;
-          warten.current = null;
-          const nav = navFuer();
-          if (auf && nav) auf(nav);
-        }}
-      >
-        <SafeAreaProvider>
-          <ZielKontext.Provider value={ziel}>
-            <Blatt key={runde} schliessen={() => setOffen(false)} />
-          </ZielKontext.Provider>
-        </SafeAreaProvider>
-      </Modal>
-    </Kontext.Provider>
+    [starten, nav, erstellen],
   );
 }
 
-function Blatt({ schliessen }: { schliessen: () => void }) {
-  const f = useFarben();
+/**
+ * Das Blatt selbst: gewählt wird hier, gearbeitet im eigenen Blatt – eine gewählte Vorlage ersetzt das Blatt
+ * „Neu erstellen“ durch ihren Ablauf (kein Blatt über dem Blatt).
+ */
+export function NeuBlatt() {
+  const wurzel = useContext(WurzelNavKontext);
+  const ziel = useCallback(
+    (auf: (nav: Nav) => void) => {
+      if (!wurzel) return;
+      let geoeffnet = false;
+      const ersatz: Nav = {
+        oeffnen: (schluessel, inhalt) => {
+          geoeffnet = true;
+          wurzel.dispatch(StackActions.replace("Blatt", { id: registrieren(inhalt), schluessel }));
+        },
+        zurueck: () => wurzel.goBack(),
+      };
+      auf(ersatz);
+      if (!geoeffnet) wurzel.goBack();
+    },
+    [wurzel],
+  );
+  const params = useMemo(() => ({ id: registrieren(() => <Unterlagen schliessen />), schluessel: "neu" }), []);
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: f.papier }} edges={Platform.OS === "ios" ? ["left", "right"] : ["top", "left", "right"]}>
-      {/* Griff oben: zeigt, dass sich das Blatt nach unten wegschieben lässt */}
-      {Platform.OS === "ios" ? <View style={{ alignSelf: "center", width: 36, height: 5, borderRadius: 3, backgroundColor: f.linie, marginTop: 6 }} /> : null}
-      <Stapel zuruecksetzen={0} wurzel={<Unterlagen aktion={<KopfKnopf symbol="xmark" label={TEXT.schliessen} onPress={schliessen} />} />} />
-    </SafeAreaView>
+    <ZielKontext.Provider value={ziel}>
+      <Blatt params={params} />
+    </ZielKontext.Provider>
   );
 }

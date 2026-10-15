@@ -9,6 +9,7 @@ import { heute, sortiert } from "../unterlagen/speicher";
 import { dringlichkeit, istErledigt } from "../pflichten/check";
 import { useAmtlos } from "../zustand";
 import { BelegErfassenSeite } from "./Belege";
+import { useErstellenKnopf } from "./Erstellen";
 import { Gruppe, Seite } from "./gemeinsam";
 import { Einladung, PflichtZeile, checkGemacht, useAuswertung } from "./Pflichten";
 import { SicherungsKarte } from "./Sicherung";
@@ -42,6 +43,7 @@ export function Heute() {
   const z = useAmtlos();
   const { stand, tabWechseln } = z;
   const nav = useNav();
+  const erstellenKnopf = useErstellenKnopf();
   const starten = useStarten();
   const oeffnen = useOeffnen();
   const fehltJe = useFehltJe();
@@ -61,11 +63,10 @@ export function Heute() {
   const zuletzt = sortiert(stand).slice(0, 3);
   const jetzt = new Date();
   const datum = new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", weekday: "long", day: "numeric", month: "long" }).format(jetzt);
-  const stunde = Number(new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", hour: "numeric", hourCycle: "h23" }).format(jetzt));
   const monatsName = new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", month: "long" }).format(jetzt);
 
   return (
-    <Seite titel={TEXT.gruss(stunde)} ueber={datum}>
+    <Seite titel={TEXT.tabs.heute} ueber={datum} rechts={erstellenKnopf}>
       <SicherungsKarte />
       {gemacht ? (
         <View>

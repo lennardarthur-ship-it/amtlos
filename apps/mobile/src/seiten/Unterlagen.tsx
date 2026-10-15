@@ -1,4 +1,4 @@
-import { memo, useMemo, useState, type ReactNode } from "react";
+import { memo, useMemo, useState } from "react";
 import { View } from "react-native";
 import { ANLAESSE, BEREICHE, KURZ, VORLAGEN, unterlagenName, vorlageFuer, type Anlass, type Betrieb, type Vorlage } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
@@ -165,7 +165,7 @@ function AlleSeite() {
  * Unterlagen (E-124; seit E-129 zweiter Tab hinter „Pflichten“): oben die häufigste Handlung (Rechnung), dann zuletzt
  * bearbeitete Unterlagen und Anlässe in Alltagssprache. Alle Vorlagen gibt es über „Alle Unterlagen“ und die Suche.
  */
-export function Unterlagen({ aktion }: { aktion?: ReactNode }) {
+export function Unterlagen({ schliessen }: { schliessen?: boolean }) {
   const { stand, tabWechseln } = useAmtlos();
   const nav = useNav();
   const ziel = useZiel();
@@ -178,7 +178,7 @@ export function Unterlagen({ aktion }: { aktion?: ReactNode }) {
   const zuletzt = sortiert(stand).slice(0, 3);
   const zuAnlass = (a: Anlass) => (a.vorlagen.length === 1 ? starten(a.vorlagen[0]!) : nav.oeffnen(`anlass-${a.id}`, () => <AnlassSeite a={a} />));
   return (
-    <Seite titel={TEXT.neu_titel} unterzeile={TEXT.unterlagen_unter} aktion={aktion}>
+    <Seite titel={TEXT.neu_titel} unterzeile={TEXT.unterlagen_unter} schliessen={schliessen}>
       <Suchfeld wert={suche} setzen={setSuche} />
       {s ? (
         <Treffer s={s} />

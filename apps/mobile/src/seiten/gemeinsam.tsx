@@ -1,24 +1,81 @@
-import type { ReactNode } from "react";
-import { ScrollView, View, type ScrollViewProps } from "react-native";
+import { useNavigation, type NavigationProp, type ParamListBase } from "@react-navigation/native";
+import { useLayoutEffect, useRef, type ReactNode } from "react";
+import { Pressable, ScrollView, View, type ScrollViewProps } from "react-native";
 import type { Bereich } from "@amtlos/fachlogik";
-import { Kachel, T } from "../ui/bausteine";
-import { RADIUS, RAND, schattenStil, useFarben } from "../ui/thema";
+import { T as TEXT } from "../texte";
+import { Kachel, Symbol, T } from "../ui/bausteine";
+import { RundKnopf, useNav } from "../ui/navigation";
+import { RADIUS, RAND, istIos, schattenStil, useFarben } from "../ui/thema";
 
-/** Seitenrahmen mit großem Titel (iOS-Stil) und optionaler Unterzeile. */
-export function Seite({ titel, unterzeile, aktion, ueber, children, ...rest }: ScrollViewProps & { titel: string; unterzeile?: string; aktion?: ReactNode; ueber?: string }) {
+export interface SeitenKnopf {
+  text: string;
+  symbol: string;
+  label?: string;
+  onPress: () => void;
+  /** iPhone: Menü am Knopf (wie „+“ in Notizen/Dateien); im Web öffnet der Knopf `onPress`. */
+  menue?: { text: string; symbol: string; onPress: () => void }[];
+}
+
+/**
+ * Erste Seite eines Tabs (E-141): auf dem iPhone mit dem großen Titel der Systemleiste, der beim Scrollen in die Leiste
+ * wandert, und echten Glasknöpfen; im Web derselbe Aufbau nachgebildet (Titel im Inhalt).
+ */
+export function Seite({ titel, unterzeile, ueber, rechts, schliessen, children, ...rest }: ScrollViewProps & { titel: string; unterzeile?: string; ueber?: string; rechts?: SeitenKnopf; schliessen?: boolean }) {
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const nav = useNav();
+  // Knopf und Menü über eine Referenz – neue Funktionen je Render sollen die Leiste nicht neu setzen
+  const knopf = useRef(rechts);
+  knopf.current = rechts;
+  const zu = useRef(nav.zurueck);
+  zu.current = nav.zurueck;
+  useLayoutEffect(() => {
+    if (!istIos) {
+      navigation.setOptions({ headerShown: false });
+      return;
+    }
+    navigation.setOptions({
+      headerShown: true,
+      title: titel,
+      headerLargeTitle: true,
+      headerTransparent: true,
+      unstable_headerLeftItems: schliessen ? () => [{ type: "button", label: TEXT.schliessen, icon: { type: "sfSymbol", name: "xmark" }, onPress: () => zu.current() }] : undefined,
+      unstable_headerRightItems: rechts
+        ? () => [
+            rechts.menue
+              ? { type: "menu", label: rechts.text, accessibilityLabel: rechts.label ?? rechts.text, icon: { type: "sfSymbol", name: rechts.symbol as never }, variant: "prominent", tintColor: undefined, menu: { items: rechts.menue.map((m, i) => ({ type: "action" as const, label: m.text, icon: { type: "sfSymbol" as const, name: m.symbol as never }, onPress: () => knopf.current?.menue?.[i]?.onPress() })) } }
+              : { type: "button", label: rechts.text, accessibilityLabel: rechts.label ?? rechts.text, icon: { type: "sfSymbol", name: rechts.symbol as never }, onPress: () => knopf.current?.onPress() },
+          ]
+        : undefined,
+    });
+    // Handler stehen in Referenzen; neu setzen nur bei anderem Titel oder anderer Beschriftung
+  }, [navigation, titel, rechts?.text, rechts?.menue?.map((m) => m.text).join(), schliessen]);
   return (
-    <ScrollView contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 14, paddingBottom: 128 }} contentInsetAdjustmentBehavior="automatic" keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets {...rest}>
-      <View style={{ marginBottom: 20 }}>
-        {/* kleine Zeile über dem Titel (Datum auf „Heute“) */}
-        {ueber ? <T v="caption" fett leise stil={{ marginBottom: 2, letterSpacing: 0.3 }}>{ueber}</T> : null}
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-          <T v="grossTitel" accessibilityRole="header" stil={{ flex: 1 }}>{titel}</T>
-          {aktion ? <View style={{ marginRight: -10 }}>{aktion}</View> : null}
+    <ScrollView contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: istIos ? 4 : 14, paddingBottom: 128 }} contentInsetAdjustmentBehavior="automatic" keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets {...rest}>
+      {istIos ? (
+        ueber || unterzeile ? <T leise stil={{ marginBottom: 18 }}>{[ueber, unterzeile].filter(Boolean).join(" · ")}</T> : null
+      ) : (
+        <View style={{ marginBottom: 20 }}>
+          {ueber ? <T v="caption" fett leise stil={{ marginBottom: 2 }}>{ueber}</T> : null}
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+            <T v="grossTitel" accessibilityRole="header" stil={{ flex: 1 }}>{titel}</T>
+            {schliessen ? <RundKnopf symbol="xmark" label={TEXT.schliessen} onPress={nav.zurueck} /> : null}
+            {rechts ? <PlusKnopf k={rechts} /> : null}
+          </View>
+          {unterzeile ? <T leise stil={{ marginTop: 5 }}>{unterzeile}</T> : null}
         </View>
-        {unterzeile ? <T leise stil={{ marginTop: 5 }}>{unterzeile}</T> : null}
-      </View>
+      )}
       {children}
     </ScrollView>
+  );
+}
+
+/** Web: runder, gefüllter Knopf in der Akzentfarbe (auf dem iPhone ein prominenter Glasknopf der Leiste). */
+function PlusKnopf({ k }: { k: SeitenKnopf }) {
+  const f = useFarben();
+  return (
+    <Pressable accessibilityRole="button" accessibilityLabel={k.label ?? k.text} onPress={k.onPress} hitSlop={8} style={({ pressed }) => ({ width: 40, height: 40, borderRadius: 20, backgroundColor: f.amt, alignItems: "center", justifyContent: "center", opacity: pressed ? 0.8 : 1 })}>
+      <Symbol name={k.symbol} groesse={20} farbe={f.amtText} gewicht="semibold" />
+    </Pressable>
   );
 }
 

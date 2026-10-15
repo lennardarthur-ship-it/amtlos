@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AccessibilityInfo, KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import type { Frage } from "@amtlos/i18n";
 import { T as TEXT } from "../texte";
-import { Auswahl, DatumFeld, Fakt, Feld, Fuss, Hinweis, Symbol, Karte, Knopf, KopfKnopf, MehrfachWahl, Erfolg, T, TextKnopf, ZurueckKnopf } from "../ui/bausteine";
-import { useNav } from "../ui/navigation";
-import { RAND, ZIEL, istIos, useFarben } from "../ui/thema";
+import { Auswahl, DatumFeld, Fakt, Feld, Fuss, Hinweis, Symbol, Karte, Knopf,  MehrfachWahl, Erfolg, T, TextKnopf, ZurueckKnopf } from "../ui/bausteine";
+import { useKopf, useNav } from "../ui/navigation";
+import { RAND,  istIos, useFarben } from "../ui/thema";
 import { CHECK_FELDER, auswertung, beantwortet, checkFragen, zusatzFragen, type Profil } from "../pflichten/check";
 import { heute } from "../unterlagen/speicher";
 import { PflichtZeile } from "./Pflichten";
@@ -82,6 +81,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
   const nav = useNav();
   const f = useFarben();
   const voll = !felder;
+  useKopf({ titel: TEXT.check_titel, schliessen: true });
   // Nachfragen: nur, was beim Öffnen noch fehlte – beantwortete Fragen verschwinden nicht mitten im Ablauf
   const [liste, setListe] = useState<string[]>(() => felder ?? [...CHECK_FELDER]);
   const [zusatz, setZusatz] = useState(false);
@@ -135,12 +135,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
   const a = useMemo(() => (amEnde && voll && zusatz ? auswertung(z.stand.profil, heute()) : null), [amEnde, voll, zusatz, z.stand.profil]);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: f.papier }} edges={["top", "left", "right"]}>
-      <View style={{ minHeight: 48, flexDirection: "row", alignItems: "center", paddingHorizontal: RAND - 8 }}>
-        <KopfKnopf symbol="xmark" label={TEXT.schliessen} onPress={nav.zurueck} />
-        <T v="klein" fett stil={{ flex: 1, textAlign: "center" }}>{TEXT.check_titel}</T>
-        <View style={{ width: ZIEL }} />
-      </View>
+    <View style={{ flex: 1, backgroundColor: f.papier }}>
       {i < basisN ? <Fortschritt n={basisN} aktuell={Math.max(0, i)} /> : extraN && !zwischenschirm && !amEnde ? <Fortschritt n={extraN} aktuell={i - basisN} /> : <Fortschritt n={1} aktuell={1} />}
       <KeyboardAvoidingView behavior={istIos ? "padding" : undefined} style={{ flex: 1 }}>
         <ScrollView key={i} contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 12, paddingBottom: 32 }} keyboardShouldPersistTaps="handled">
@@ -229,6 +224,6 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
           )}
         </Fuss>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }

@@ -81,7 +81,7 @@ function PersonenSeite({ art }: { art: PersonenArt }) {
     oeffnen(id, true);
   };
   return (
-    <Unterseite titel={art === "mitarbeiter" ? TEXT.mitarbeiter_titel : TEXT.kunden_titel} rechts={<TextKnopf symbol="plus" text={TEXT.neu} label={TEXT.person_hinzufuegen[art]} onPress={anlegen} />}>
+    <Unterseite titel={art === "mitarbeiter" ? TEXT.mitarbeiter_titel : TEXT.kunden_titel} rechts={{ text: TEXT.neu, symbol: "plus", label: TEXT.person_hinzufuegen[art], onPress: anlegen }}>
       <Inhalt>
         <T leise>{TEXT.personen_text[art]}</T>
         {alle.length > 6 ? (

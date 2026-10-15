@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { KeyboardAvoidingView, Pressable, ScrollView, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { KeyboardAvoidingView,  ScrollView, View } from "react-native";
 import { fehlendeAngaben, personAus, personIn, vorlageFuer, type Daten, type Vorlage, type VorlagenAbschnitt } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { Betrag, Fuss, Knopf, KopfKnopf, T, TextKnopf, Wahl, ZurueckKnopf } from "../ui/bausteine";
-import { Unterseite, useNav } from "../ui/navigation";
-import { RADIUS, RAND, ZIEL, istIos, useFarben } from "../ui/thema";
+import { Betrag, Fuss, Knopf,  T, TextKnopf, Wahl, ZurueckKnopf } from "../ui/bausteine";
+import {  useKopf, useNav } from "../ui/navigation";
+import { RADIUS, RAND,  istIos, useFarben } from "../ui/thema";
 import { PERSONEN_LISTE, betriebFehlt, personenSortiert } from "../unterlagen/speicher";
 import { fehltFuer } from "../unterlagen/pruefung";
 import { offeneRechnungen, periodeText, perioden, umsaetzeFuer, type UstUebernahme, type Versteuerung } from "../unterlagen/ustAusRechnungen";
@@ -209,7 +208,14 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
       nav.zurueck();
     }
   }, [unterlage, nav]);
-  if (!unterlage || !vorlage) return <Unterseite titel="">{null}</Unterseite>;
+  // Kopfzeile des Blatts: Schließen links, Titel, „Übersicht“ rechts (springt zum Abschluss)
+  const amAbschlussKopf = schritt >= n || fest;
+  useKopf({
+    titel: vorlage?.titel ?? "",
+    schliessen: true,
+    rechts: amAbschlussKopf || !vorlage ? null : { text: TEXT.uebersicht, onPress: () => { merken(vorlage, z.daten(id), z); setSchritt(n); } },
+  });
+  if (!unterlage || !vorlage) return null;
 
   const daten = unterlage.daten;
   const fehlt = fehlendeAngaben(vorlage, daten, z.stand.betrieb);
@@ -226,18 +232,7 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
   const absenderFehlt = !fest && Boolean(vorlage.kundendokument) && fehltFuer(z.stand, unterlage).some((x) => x.includes("(Mein Betrieb)"));
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: f.papier }} edges={["top", "left", "right"]} onAccessibilityEscape={nav.zurueck}>
-      <View style={{ minHeight: 48, flexDirection: "row", alignItems: "center", paddingHorizontal: RAND - 8 }}>
-        <KopfKnopf symbol="xmark" label={TEXT.schliessen} onPress={nav.zurueck} />
-        <T v="klein" fett numberOfLines={2} accessibilityRole="header" stil={{ flex: 1, textAlign: "center", paddingVertical: 4 }}>{vorlage.titel}</T>
-        <View style={{ minWidth: ZIEL, alignItems: "flex-end" }}>
-          {amAbschluss || fest ? null : (
-            <Pressable accessibilityRole="button" onPress={() => gehe(n)} hitSlop={8} style={{ height: ZIEL, justifyContent: "center", paddingHorizontal: 4 }}>
-              <T v="klein" fett farbe={f.amt}>{TEXT.uebersicht}</T>
-            </Pressable>
-          )}
-        </View>
-      </View>
+    <View style={{ flex: 1, backgroundColor: f.papier }}>
       {fest ? null : <Fortschritt n={n + 1} aktuell={schritt} />}
       <KeyboardAvoidingView behavior={istIos ? "padding" : undefined} style={{ flex: 1 }}>
         <ScrollView key={schritt} contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 8, paddingBottom: 32 }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive">
@@ -280,6 +275,6 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
           )}
         </Fuss>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }

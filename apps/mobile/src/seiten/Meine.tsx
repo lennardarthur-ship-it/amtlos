@@ -11,7 +11,7 @@ import { useAmtlos } from "../zustand";
 import { BelegErfassen, BelegSeite, BelegZeile } from "./Belege";
 import { Gruppe, Leer, Seite } from "./gemeinsam";
 import { useOeffnen, useStarten } from "./starten";
-import { useErstellen } from "./Erstellen";
+import { useErstellen, useErstellenKnopf } from "./Erstellen";
 import { Suchfeld, UnterlageZeile, useFehltJe, useUeberfaellig } from "./Unterlagen";
 import { BelegErfassenSeite } from "./Belege";
 
@@ -56,6 +56,7 @@ export function Meine() {
   const { stand } = useAmtlos();
   const f = useFarben();
   const erstellen = useErstellen();
+  const erstellenKnopf = useErstellenKnopf();
   const nav = useNav();
   const oeffnen = useOeffnen();
   const belegOeffnen = (id: string) => nav.oeffnen(`beleg-${id}`, () => <BelegSeite id={id} />, true);
@@ -79,7 +80,7 @@ export function Meine() {
   const fehltJe = useFehltJe();
   const ueberJe = useUeberfaellig();
   return (
-    <Seite titel={TEXT.meine_titel} unterzeile={alle.length ? TEXT.anzahl_unterlagen(alle.length) : undefined}>
+    <Seite titel={TEXT.meine_titel} unterzeile={alle.length ? TEXT.anzahl_unterlagen(alle.length) : undefined} rechts={erstellenKnopf}>
       {alle.length || stand.belege.length ? (
         <View>
           {hatRechnungen ? <OffeneKarte anzahl={offen.anzahl} ueberfaellig={offen.ueberfaellig} cent={offen.cent} aktiv={aktiv === "offen"} onPress={() => setFilter(aktiv === "offen" ? "alle" : "offen")} /> : null}

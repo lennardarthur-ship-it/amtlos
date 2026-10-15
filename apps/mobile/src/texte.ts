@@ -14,6 +14,7 @@ export const T = {
   heute: "Heute",
   tabs: { heute: "Heute", pflichten: "Pflichten", meine: "Unterlagen", betrieb: "Mein Betrieb" },
   erstellen: "Erstellen",
+  alle_vorlagen_menue: "Alle Vorlagen …",
   neu_titel: "Neu erstellen",
   gruss: (stunde: number) => (stunde < 11 ? "Guten Morgen" : stunde < 18 ? "Guten Tag" : "Guten Abend"),
   als_naechstes: "Als Nächstes",

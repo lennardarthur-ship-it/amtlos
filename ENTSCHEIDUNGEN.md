@@ -799,6 +799,21 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
   - Die Web-Vorschau (Rundgänge, Store-Bilder) nutzt Inter als Ersatz für SF Pro; auf dem iPhone bleibt die Systemschrift.
 - **Geprüft:** Rundgang hell und dunkel, Unit-Tests, Store-Bilder neu. Wie die Systemschrift und das Glas wirken, zeigt nur ein echtes iPhone (→ T-82); der Web-Export nutzt eine Ersatzschrift.
 
+### E-141 · Echte iOS-Navigation statt nachgezeichneter Bedienelemente
+- **Datum:** 2026-10-15 · **Status:** angenommen. Gründer: „Mach alles mit deinem neuen Wissen radikal komplett neu, so hochqualitativ wie möglich, hinterfrage alles“.
+- **Ursache hinterfragt:** Die App wirkte nicht wie ein Teil des iPhones, weil sie Tab-Leiste, Kopfzeilen, Zurück-Knöpfe, Blätter und die Wisch-Geste selbst zeichnete (eigener Stapel in `ui/navigation.tsx`, eigene Leiste in `App.tsx`). Jede Nachbildung bleibt eine Nachbildung, auch gut gestaltet. Die beliebten Apps nutzen die Systembausteine.
+- **Neu:** `react-native-screens` 4.26 mit React Navigation 7.
+  - **iPhone:**
+    - echte Tab-Leiste (`UITabBarController`, Glas in iOS 26, verkleinert sich beim Scrollen) mit SF Symbols
+    - echte Navigationsleisten (`UINavigationController`) mit großen Titeln, Zurück-Geste und Systemknöpfen (`unstable_headerLeftItems`/`unstable_headerRightItems`, in iOS 26 Glas)
+    - „+“ als prominenter Leistenknopf mit Systemmenü (Rechnung schreiben, Beleg erfassen, Alle Vorlagen …)
+    - Abläufe und Formulare als Blätter (`pageSheet`), wegwischbar und stapelbar
+  - **Web-Vorschau und Android:** dieselbe Struktur mit nachgebildeter Leiste.
+- **Schnittstelle bleibt:** Die Seiten öffnen sich weiter mit `useNav().oeffnen(schlüssel, inhalt, vollbild)`. `vollbild` heißt jetzt „als eigenes Blatt“. Inhalte liegen in einem Verzeichnis, die Route trägt nur ihre Kennung. `Unterseite` und `useKopf` setzen Titel und Leistenknöpfe der Systemleiste. Der „+“-Knopf sitzt auf „Heute“ und „Unterlagen“. Das Blatt „Neu erstellen“ wird beim Wählen durch den Ablauf ersetzt.
+- **Meldungen** liegen auf dem iPhone in einem eigenen Fenster (`FullWindowOverlay`), damit sie auch über Blättern sichtbar sind.
+- **Grenzen der Vorschau:** Glas, große Titel, Systemmenüs und Blatt-Gesten zeigt nur das iPhone. Die Bildschirmfotos (Web-Export) bilden nur die Struktur ab (→ T-82, jetzt mit Prüfpunkten: Tab-Leiste, große Titel beim Scrollen, „+“-Menü, Blätter wegwischen, Meldungen über Blättern, Tastatur in Blättern).
+- **Geprüft:** Typprüfung, Lint, Unit-Tests; Rundgang hell und dunkel an die neue Navigation angepasst (Hilfsfunktion `zurueck()` für „Zurück“ bzw. „Schließen“); Store-Bilder neu.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

@@ -49,8 +49,19 @@ async function tippe(l) {
   await l.evaluate((el) => el.scrollIntoView({ block: "center" }));
   await l.click();
 }
+/** Eine Ebene zurück: „Zurück“ in der Leiste, auf der ersten Seite eines Blatts „Schließen“ (E-141). */
+async function zurueck() {
+  const z = knopf("Zurück");
+  if ((await p.getByRole("button", { name: "Zurück", exact: true }).locator("visible=true").count()) > 0) await z.click();
+  else await knopf("Schließen").click();
+}
 /** Blatt „Neu erstellen“ über den „+“-Knopf in der Tab-Leiste (E-138) */
 async function neu() {
+  // „+“ sitzt auf „Heute“ und „Unterlagen“ oben rechts
+  if ((await p.getByRole("button", { name: "Erstellen", exact: true }).locator("visible=true").count()) === 0) {
+    await p.getByRole("tab", { name: "Heute" }).click();
+    await warte(700);
+  }
   await knopf("Erstellen").click();
   await warte(900);
 }
@@ -94,7 +105,7 @@ try {
   await warte(600);
   pruefe((await knopf("Bundesland").textContent()).includes("Bayern"), "Bundesland nach der Auswahl nicht in der Zeile");
   await foto("betrieb");
-  await knopf("Zurück").click();
+  await zurueck();
   await warte(800);
   pruefe(!(await sichtbar("Steht dann auf jeder Unterlage")), "Hinweis bleibt nach dem Eintragen stehen");
   await knopf("Schließen").click();
@@ -170,7 +181,7 @@ try {
   await warte(800);
   await tippe(knopf("Erledigt"));
   await warte(500);
-  await knopf("Zurück").click();
+  await zurueck();
   await warte(800);
   pruefe(await sichtbar("1 von"), "Abhaken zählt nicht im Fortschritt");
   await foto("start-mit-pflichten");
@@ -185,7 +196,7 @@ try {
   await tippe(knopf("Wozu brauche ich das?"));
   await warte(800);
   pruefe(await sichtbar("§ 14 Abs. 4 UStG"), "Rechtsgrundlage fehlt unter „Wozu“");
-  await knopf("Zurück").click();
+  await zurueck();
   await warte(700);
   await foto("rechnung-1");
   await knopf("Weiter").click();
@@ -236,7 +247,7 @@ try {
   await knopf("Vorschau groß ansehen").click();
   await warte(1200);
   await foto("vorschau");
-  await knopf("Zurück").click();
+  await zurueck();
   await warte(700);
   await knopf("Schließen").click();
   await warte(900);
@@ -326,12 +337,12 @@ try {
   await warte(800);
   pruefe(await sichtbar("Sam Muster"), "Mitarbeiter nicht gespeichert");
   await foto("mitarbeiter");
-  await knopf("Zurück").click();
+  await zurueck();
   await warte(700);
   await tippe(p.getByRole("button", { name: /^Kunden/ }).locator("visible=true").last());
   await warte(800);
   pruefe(await sichtbar("Kim Beispiel"), "Kunde aus der Rechnung nicht gemerkt");
-  await knopf("Zurück").click();
+  await zurueck();
   await warte(700);
   await neu();
   await warte(700);
@@ -388,7 +399,7 @@ try {
   await foto("beleg-erechnung");
   await knopf("Fertig").click();
   await warte(700);
-  await knopf("Zurück").click();
+  await zurueck();
   await warte(700);
   await p.getByRole("tab", { name: "Unterlagen" }).click();
   await warte(800);
@@ -409,7 +420,7 @@ try {
   // dem Betrieb fehlen E-Mail, Telefon und IBAN – keine E-Rechnung im Paket, und die App sagt es
   await warte(600);
   pruefe(await sichtbar("keine E-Rechnung im Paket"), "fehlende E-Rechnung im Paket nicht gemeldet");
-  await knopf("Zurück").click();
+  await zurueck();
   await warte(700);
 
   // Neustart: Daten bleiben
@@ -441,7 +452,7 @@ try {
   await tippe(p.getByRole("button", { name: /^Angaben zum Betrieb/ }).locator("visible=true").last());
   await warte(800);
   pruefe((await feld("Name des Betriebs").inputValue()) === "Salon Sonne", "Betrieb nach Neustart verloren");
-  await knopf("Zurück").click();
+  await zurueck();
   await warte(700);
   // „Alle Daten löschen“ ist gesperrt, solange geteilte Rechnungen nicht gesichert sind (E-129)
   await tippe(knopf("Alle Daten löschen"));
@@ -463,7 +474,7 @@ try {
   pruefe(inhalt.includes('"AES-256-GCM"') && !inhalt.includes("Salon Sonne") && !inhalt.includes("Sam Muster") && !inhalt.includes("143/123"), "Sicherung nicht verschlüsselt oder mit Klartext");
   await warte(600);
   pruefe(await sichtbar("Sicherung erstellt."), "keine Bestätigung nach dem Sichern");
-  await knopf("Zurück").click();
+  await zurueck();
   await warte(800);
   await tippe(knopf("Alle Daten löschen"));
   await tippe(knopf("Ja, löschen"));

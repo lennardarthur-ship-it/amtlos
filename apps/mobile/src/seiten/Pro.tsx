@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Image, Linking, Pressable, ScrollView, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { LINKS } from "../rechtliches";
 import { T as TEXT } from "../texte";
-import { Betrag, Fuss, Hinweis, Karte, Knopf, KopfKnopf, Symbol, T, TextKnopf } from "../ui/bausteine";
+import { Betrag, Fuss, Hinweis, Karte, Knopf,  Symbol, T, TextKnopf } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
-import { useNav } from "../ui/navigation";
+import { useKopf, useNav } from "../ui/navigation";
 import { HAARLINIE, RADIUS, RAND, schattenStil, useFarben } from "../ui/thema";
 import { angebote, kaufAktiv, kaufen, wiederherstellen, type Angebot } from "../pro/kauf";
 import { FREI_JE_MONAT, PRO_VORTEILE, uebrig, type ProFunktion } from "../pro/regeln";
@@ -27,6 +26,7 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
   const nav = useNav();
   const f = useFarben();
   const melden = useMeldung();
+  useKopf({ titel: "", schliessen: true });
   const [liste, setListe] = useState<Angebot[] | null>(kaufAktiv ? null : []);
   const [wahl, setWahl] = useState<string | null>(null);
   const [laedt, setLaedt] = useState(false);
@@ -82,10 +82,7 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
   const gewaehlt = liste?.find((a) => a.id === wahl);
   const rest = uebrig(z.stand.unterlagen, new Date());
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: f.papier }} edges={["top", "left", "right"]}>
-      <View style={{ minHeight: 48, flexDirection: "row", alignItems: "center", paddingHorizontal: RAND - 8 }}>
-        <KopfKnopf symbol="xmark" label={TEXT.schliessen} onPress={nav.zurueck} />
-      </View>
+    <View style={{ flex: 1, backgroundColor: f.papier }}>
       <ScrollView contentContainerStyle={{ paddingHorizontal: RAND, paddingBottom: 24 }}>
         {/* wie Apples eigene Abo-Seiten: App-Symbol, Titel und ein Satz mittig */}
         <View style={{ alignItems: "center", paddingTop: 8, paddingBottom: 6 }}>
@@ -155,7 +152,7 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
           <Knopf text={!kaufAktiv ? TEXT.pro_test_einschalten : gewaehlt?.test ? TEXT.pro_test_starten : TEXT.pro_abonnieren} laedt={laedt} deaktiviert={kaufAktiv && !wahl} onPress={() => void los()} stil={{ flex: 1 }} />
         )}
       </Fuss>
-    </SafeAreaView>
+    </View>
   );
 }
 

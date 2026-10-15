@@ -2,6 +2,7 @@ import * as Haptics from "expo-haptics";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { AccessibilityInfo, Animated, Easing, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { FullWindowOverlay } from "react-native-screens";
 import { Symbol, T } from "./bausteine";
 import { RADIUS, RAND, istIos, useFarben } from "./thema";
 
@@ -34,7 +35,8 @@ export function MeldungAnbieter({ children, unten = 0 }: { children: ReactNode; 
   return (
     <Kontext.Provider value={wert}>
       {children}
-      {aktuell ? <Anzeige meldung={aktuell} weg={weg} unten={unten} /> : null}
+      {/* über allem – auch über Blättern (auf dem iPhone eigenes Fenster, sonst läge die Meldung unter dem Blatt) */}
+      {aktuell ? istIos ? <FullWindowOverlay><Anzeige meldung={aktuell} weg={weg} unten={unten} /></FullWindowOverlay> : <Anzeige meldung={aktuell} weg={weg} unten={unten} /> : null}
     </Kontext.Provider>
   );
 }
