@@ -3,7 +3,7 @@ import { BlurView } from "expo-blur";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, AppState, InputAccessoryView, Keyboard, Platform, Pressable, View, useColorScheme } from "react-native";
+import { ActivityIndicator, Animated, AppState, Easing, InputAccessoryView, Keyboard, Platform, Pressable, View, useColorScheme } from "react-native";
 import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Betrieb } from "./seiten/Betrieb";
 import { ErinnerungsPlaner, PflichtenTab } from "./seiten/Pflichten";
@@ -121,6 +121,13 @@ function Rahmen() {
   tabRef.current = tab;
   const navRefs = useMemo(() => Object.fromEntries(TABS.map((x) => [x.id, (n: Nav) => { navs.current[x.id] = n; }])) as unknown as Record<Tab, (n: Nav) => void>, []);
   const navFuer = useCallback(() => navs.current[tabRef.current], []);
+  // Tabwechsel: die neue Seite blendet kurz ein (160 ms) – ruhig, aber spürbar
+  const einblenden = useMemo(() => Object.fromEntries(TABS.map((x) => [x.id, new Animated.Value(1)])) as Record<Tab, Animated.Value>, []);
+  useEffect(() => {
+    const w = einblenden[tab];
+    w.setValue(0);
+    Animated.timing(w, { toValue: 1, duration: 160, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start();
+  }, [tab, einblenden]);
   const setTab = (t: Tab) => {
     if (t === tab) setZurueck((z) => ({ ...z, [t]: z[t] + 1 }));
     tabWechseln(t);
@@ -153,7 +160,7 @@ function Rahmen() {
         const an = x.id === tab;
         return (
           // Im Web greift pointerEvents="none" nicht auf alle Kinder – verborgene Tabs dort ausblenden
-          <View key={x.id} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, opacity: an ? 1 : 0, display: Platform.OS === "web" && !an ? "none" : "flex" }} pointerEvents={an ? "auto" : "none"} importantForAccessibility={an ? "auto" : "no-hide-descendants"} accessibilityElementsHidden={!an}>
+          <Animated.View key={x.id} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, opacity: an ? einblenden[x.id] : 0, transform: [{ translateY: an ? einblenden[x.id].interpolate({ inputRange: [0, 1], outputRange: [6, 0] }) : 0 }], display: Platform.OS === "web" && !an ? "none" : "flex" }} pointerEvents={an ? "auto" : "none"} importantForAccessibility={an ? "auto" : "no-hide-descendants"} accessibilityElementsHidden={!an}>
             <Stapel
               navRef={navRefs[x.id]}
               zuruecksetzen={zurueck[x.id]}
@@ -164,7 +171,7 @@ function Rahmen() {
                 </SafeAreaView>
               }
             />
-          </View>
+          </Animated.View>
         );
       })}
       {voll[tab] ? null : <Leiste tab={tab} setTab={setTab} />}

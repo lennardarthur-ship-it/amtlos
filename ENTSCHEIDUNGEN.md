@@ -771,6 +771,8 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
   - Leere Listen mit großem Symbolkreis.
   - Listeneinträge mit nummerierten Kreisen und gestrichelter „Hinzufügen“-Zeile.
   - Fußleisten ohne Linie.
+- **Marke:** neues App-Symbol: das § aus Onest Extrafett in Minze auf Dunkelgrün, dasselbe Motiv wie auf der Bühne. Splash, Favicon, Apple-Touch-Icon und Website-Logo nutzen es ebenfalls. Die Website übernimmt Schrift (Onest, selbst gehostet als woff2) und Farben der App. Die Source-Schriften der Website entfallen; die Dokumente behalten Amtlos Sans/Serif.
+- **Bewegung:** Beim Tabwechsel blendet die Seite kurz ein (160 ms). Abläufe zeigen „Schritt x von n“ über dem Titel.
 - **Geprüft:** Rundgang hell und dunkel, Unit-Tests, Store- und Website-Bilder neu. Auf dem iPhone noch offen (→ T-82).
 
 ---

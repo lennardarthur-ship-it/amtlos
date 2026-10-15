@@ -1,31 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-  <!-- Amtlos: ein Blatt, ein Stempel mit Haken – amtlich erledigt, ohne Amt. -->
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#1a8069"/>
-      <stop offset="1" stop-color="#0e5b4a"/>
-    </linearGradient>
-    <filter id="s" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#06302a" flood-opacity="0.35"/>
-    </filter>
-  </defs>
-  <rect width="1024" height="1024" fill="url(#g)"/>
-  <!-- Blatt mit Eselsohr -->
-  <g filter="url(#s)">
-    <path d="M292 186 h330 l130 130 v522 a26 26 0 0 1 -26 26 H292 a26 26 0 0 1 -26 -26 V212 a26 26 0 0 1 26 -26 z" fill="#ffffff"/>
-    <path d="M622 186 v104 a26 26 0 0 0 26 26 h104 z" fill="#d6ddd8"/>
-  </g>
-  <!-- Textzeilen -->
-  <g fill="#c9d0d6">
-    <rect x="344" y="372" width="300" height="34" rx="17"/>
-    <rect x="344" y="446" width="336" height="34" rx="17"/>
-    <rect x="344" y="520" width="248" height="34" rx="17"/>
-  </g>
-  <!-- Stempel -->
-  <g transform="rotate(-12 672 706)">
-    <circle cx="672" cy="706" r="176" fill="#ffffff"/>
-    <circle cx="672" cy="706" r="176" fill="none" stroke="#0d5143" stroke-width="30"/>
-    <circle cx="672" cy="706" r="132" fill="none" stroke="#0d5143" stroke-width="8"/>
-    <path d="M598 712 l50 50 l104 -118" fill="none" stroke="#0d5143" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
-  </g>
+  <!-- Amtlos (E-139): das § in Minze auf Dunkelgrün – dasselbe Motiv wie auf der Bühne der App. -->
+  <rect width="1024" height="1024" rx="0" fill="#063b29"/>
+  <path transform="translate(274.6 805.4) scale(0.8287 -0.8287)" d="M294 -8Q249 -8 206.0 1.0Q163 10 127.5 30.0Q92 50 69.5 84.0Q47 118 43 170H208Q213 152 226.5 139.0Q240 126 258.0 119.5Q276 113 295 113Q314 113 328.5 117.0Q343 121 352.0 129.5Q361 138 361 152Q361 164 356.0 171.0Q351 178 342.0 182.0Q333 186 321 188Q290 194 252.5 201.0Q215 208 179.5 219.0Q144 230 119 246Q87 267 71.5 295.0Q56 323 56 356Q56 390 71.5 418.0Q87 446 116 460Q89 477 76.0 505.5Q63 534 63 563Q63 609 84.5 638.5Q106 668 139.5 685.0Q173 702 213.0 709.0Q253 716 289 716Q348 716 398.0 700.0Q448 684 481.0 647.5Q514 611 519 551H356Q353 568 343.0 578.0Q333 588 319.0 592.5Q305 597 289 597Q273 597 259.0 593.5Q245 590 236.0 582.0Q227 574 227 560Q227 545 240.5 535.5Q254 526 271.0 522.0Q288 518 300 516Q326 511 352.0 506.0Q378 501 403.0 495.5Q428 490 451 480Q494 464 512.0 435.0Q530 406 530 368Q530 335 517.0 305.5Q504 276 482 260Q508 240 518.0 212.5Q528 185 528 158Q528 113 507.5 81.5Q487 50 453.5 30.0Q420 10 378.5 1.0Q337 -8 294 -8ZM358 304Q364 308 368.0 315.5Q372 323 374.5 331.0Q377 339 377 345Q377 366 359.0 375.0Q341 384 322 389Q299 395 275.0 401.0Q251 407 228 410Q219 404 214.5 393.0Q210 382 210 372Q210 361 214.5 352.5Q219 344 230.0 338.0Q241 332 257 327Q275 322 306.0 315.0Q337 308 358 304Z" fill="#7fe3b8"/>
 </svg>

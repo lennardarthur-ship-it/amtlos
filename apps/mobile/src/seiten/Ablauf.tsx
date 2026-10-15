@@ -143,10 +143,12 @@ function EuerAusDaten({ id }: { id: string }) {
 
 function Schritt({ v, a, index, id, daten, fehlt }: { v: Vorlage; a: VorlagenAbschnitt; index: number; id: string; daten: Daten; fehlt: string[] }) {
   const z = useAmtlos();
+  const f = useFarben();
   const nav = useNav();
   const mitPerson = v.person && a.felder.some((x) => x.id === v.person!.felder.name);
   return (
     <View>
+      <T v="caption" fett farbe={f.amt} stil={{ marginBottom: 4 }}>{TEXT.schritt(index + 1, v.abschnitte.length)}</T>
       <T v="titel" accessibilityRole="header">{a.titel}</T>
       {a.hilfe ? <T leise stil={{ marginTop: 6 }}>{a.hilfe}</T> : null}
       {index === 0 ? <TextKnopf symbol="questionmark.circle" text={TEXT.wozu_link} onPress={() => nav.oeffnen(`info-${v.id}`, () => <InfoSeite id={v.id} />, true)} stil={{ marginTop: 4 }} /> : null}
