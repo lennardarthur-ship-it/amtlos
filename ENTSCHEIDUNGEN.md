@@ -811,6 +811,15 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
   - **Web-Vorschau und Android:** dieselbe Struktur mit nachgebildeter Leiste.
 - **Schnittstelle bleibt:** Die Seiten öffnen sich weiter mit `useNav().oeffnen(schlüssel, inhalt, vollbild)`. `vollbild` heißt jetzt „als eigenes Blatt“. Inhalte liegen in einem Verzeichnis, die Route trägt nur ihre Kennung. `Unterseite` und `useKopf` setzen Titel und Leistenknöpfe der Systemleiste. Der „+“-Knopf sitzt auf „Heute“ und „Unterlagen“. Das Blatt „Neu erstellen“ wird beim Wählen durch den Ablauf ersetzt.
 - **Meldungen** liegen auf dem iPhone in einem eigenen Fenster (`FullWindowOverlay`), damit sie auch über Blättern sichtbar sind.
+- **Unabhängige Prüfung** (eigener Prüfer, ohne die Arbeit gesehen zu haben), behoben:
+  - Der Schließen-Knopf der Blätter wurde von `setOptions(undefined)` gelöscht. Ohne Schließen-Knopf auf dem Bezahlschirm droht eine Ablehnung durch Apple.
+  - Die Tastatur verdeckte in Blättern die Fußleiste. Neu ist `TastaturRahmen` mit Abstand aus Fenster- minus eigener Höhe; er gilt für alle Unterseiten und Abläufe.
+  - Meldungen hielten VoiceOver fest (`accessibilityContainerViewIsModal`).
+  - Der Tabwechsel öffnete aus einem Blatt heraus einen zweiten Tab-Stapel (`navigate(..., { pop: true })`).
+  - Große Titel und durchsichtige Leiste wurden erst nach dem Start gesetzt; jetzt stehen sie fest in den Optionen.
+  - Eine eigene Leistenfarbe verdeckte das Glas.
+  - Unten waren 128 pt Leerraum auf dem iPhone.
+  - Das Seitenverzeichnis wuchs ohne Ende.
 - **Grenzen der Vorschau:** Glas, große Titel, Systemmenüs und Blatt-Gesten zeigt nur das iPhone. Die Bildschirmfotos (Web-Export) bilden nur die Struktur ab (→ T-82, jetzt mit Prüfpunkten: Tab-Leiste, große Titel beim Scrollen, „+“-Menü, Blätter wegwischen, Meldungen über Blättern, Tastatur in Blättern).
 - **Geprüft:** Typprüfung, Lint, Unit-Tests; Rundgang hell und dunkel an die neue Navigation angepasst (Hilfsfunktion `zurueck()` für „Zurück“ bzw. „Schließen“); Store-Bilder neu.
 

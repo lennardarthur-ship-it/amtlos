@@ -33,12 +33,10 @@ export function Seite({ titel, unterzeile, ueber, rechts, schliessen, children, 
       navigation.setOptions({ headerShown: false });
       return;
     }
+    // große Titel und durchsichtige Leiste stehen schon in den Optionen des Stapels (kein Umschalten nach dem Start)
     navigation.setOptions({
-      headerShown: true,
       title: titel,
-      headerLargeTitle: true,
-      headerTransparent: true,
-      unstable_headerLeftItems: schliessen ? () => [{ type: "button", label: TEXT.schliessen, icon: { type: "sfSymbol", name: "xmark" }, onPress: () => zu.current() }] : undefined,
+      ...(schliessen ? { unstable_headerLeftItems: () => [{ type: "button", label: TEXT.schliessen, icon: { type: "sfSymbol", name: "xmark" }, onPress: () => zu.current() }] } : null),
       unstable_headerRightItems: rechts
         ? () => [
             rechts.menue
@@ -50,7 +48,7 @@ export function Seite({ titel, unterzeile, ueber, rechts, schliessen, children, 
     // Handler stehen in Referenzen; neu setzen nur bei anderem Titel oder anderer Beschriftung
   }, [navigation, titel, rechts?.text, rechts?.menue?.map((m) => m.text).join(), schliessen]);
   return (
-    <ScrollView contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: istIos ? 4 : 14, paddingBottom: 128 }} contentInsetAdjustmentBehavior="automatic" keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets {...rest}>
+    <ScrollView contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: istIos ? 4 : 14, paddingBottom: istIos ? 32 : 128 }} contentInsetAdjustmentBehavior="automatic" keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets {...rest}>
       {istIos ? (
         ueber || unterzeile ? <T leise stil={{ marginBottom: 18 }}>{[ueber, unterzeile].filter(Boolean).join(" · ")}</T> : null
       ) : (
@@ -97,7 +95,7 @@ export function Leer({ text, unter, children, symbol = "tray" }: { text: string;
 /** Inhalt einer Unterseite: scrollbar, Platz für die Tab-Leiste, Tastatur schiebt mit. */
 export function Inhalt({ children, ...rest }: ScrollViewProps) {
   return (
-    <ScrollView contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 16, paddingBottom: 140 }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" automaticallyAdjustKeyboardInsets {...rest}>
+    <ScrollView contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 16, paddingBottom: istIos ? 32 : 140 }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" automaticallyAdjustKeyboardInsets {...rest}>
       {children}
     </ScrollView>
   );

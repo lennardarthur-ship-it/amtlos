@@ -1,7 +1,7 @@
 import { StackActions, useNavigation, useRoute, type NavigationProp, type ParamListBase } from "@react-navigation/native";
 import { createNativeStackNavigator, type NativeStackNavigationOptions } from "@react-navigation/native-stack";
-import { createContext, useContext, useLayoutEffect, useMemo, useRef, type ReactNode } from "react";
-import { Platform, Pressable, View } from "react-native";
+import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { KeyboardAvoidingView, Platform, Pressable, View, useWindowDimensions } from "react-native";
 import { T as TEXT } from "../texte";
 import { Symbol, T } from "./bausteine";
 import { RAND, ZIEL, istIos, useFarben, type Farben } from "./thema";
@@ -58,6 +58,8 @@ export function useNav(): Nav {
 export function InhaltSeite() {
   const params = useRoute().params as SeitenParams | undefined;
   const inhalt = params ? INHALTE.get(params.id) : undefined;
+  // geschlossene Seiten aus dem Verzeichnis nehmen
+  useEffect(() => () => void (params && INHALTE.delete(params.id)), [params]);
   return <>{inhalt ? inhalt() : null}</>;
 }
 
@@ -67,7 +69,8 @@ export function kopfOptionen(f: Farben): NativeStackNavigationOptions {
     headerTintColor: f.amt,
     headerBackTitle: TEXT.zurueck,
     headerShadowVisible: false,
-    headerStyle: { backgroundColor: f.papier },
+    // iOS: keine eigene Leistenfarbe – sonst verschwindet das Glas von iOS 26
+    ...(istIos ? null : { headerStyle: { backgroundColor: f.papier } }),
     headerTitleStyle: { color: f.tinte, fontWeight: "600" },
     headerLargeTitleStyle: { color: f.tinte },
     contentStyle: { backgroundColor: f.papier },
@@ -124,38 +127,50 @@ export interface KopfKnopfDef {
  */
 export function useKopf({ titel, rechts, schliessen, gross }: { titel: string; rechts?: KopfKnopfDef | null; schliessen?: boolean; gross?: boolean }) {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
-  const nav = useNav();
-  // „Schließen“ setzt der Blatt-Stapel selbst auf seine erste Seite (siehe `Blatt`)
+  // „Schließen“ setzt der Blatt-Stapel selbst auf seine erste Seite (siehe `Blatt`) – hier nichts überschreiben
   void schliessen;
-  const zeigeSchliessen = false;
   // Handler über eine Referenz: neue Funktionen je Render setzen die Kopfzeile nicht ständig neu
   const druck = useRef(rechts?.onPress);
   druck.current = rechts?.onPress;
-  const zu = useRef(nav.zurueck);
-  zu.current = nav.zurueck;
   useLayoutEffect(() => {
     const aufRechts = () => druck.current?.();
-    const schliessenDruck = () => zu.current();
-    const o: NativeStackNavigationOptions = { title: titel, headerLargeTitle: Boolean(gross) && istIos };
+    // nur setzen, was diese Seite bestimmt: ein explizites `undefined` würde den Schließen-Knopf des Blatts löschen
+    const o: NativeStackNavigationOptions = { title: titel };
+    if (gross && istIos) o.headerLargeTitleEnabled = true;
     if (istIos) {
-      o.unstable_headerLeftItems = zeigeSchliessen ? () => [{ type: "button", label: TEXT.schliessen, icon: { type: "sfSymbol", name: "xmark" }, onPress: schliessenDruck }] : undefined;
       o.unstable_headerRightItems = rechts
         ? () => [{ type: "button", label: rechts.text, accessibilityLabel: rechts.label ?? rechts.text, onPress: aufRechts, ...(rechts.symbol ? { icon: { type: "sfSymbol" as const, name: rechts.symbol as never } } : null), ...(rechts.hervor ? { variant: "prominent" as const } : null) }]
         : undefined;
     } else {
-      if (zeigeSchliessen) o.headerLeft = () => <RundKnopf symbol="xmark" label={TEXT.schliessen} onPress={schliessenDruck} />;
       o.headerRight = rechts ? () => (rechts.symbol ? <RundKnopf symbol={rechts.symbol} label={rechts.label ?? rechts.text} onPress={aufRechts} /> : <KopfText text={rechts.text} label={rechts.label} onPress={aufRechts} />) : undefined;
     }
     navigation.setOptions(o);
     // Handler stehen in Referenzen
-  }, [navigation, titel, Boolean(rechts), rechts?.text, rechts?.symbol, rechts?.label, rechts?.hervor, zeigeSchliessen, gross]);
+  }, [navigation, titel, Boolean(rechts), rechts?.text, rechts?.symbol, rechts?.label, rechts?.hervor, gross]);
 }
 
-/** Unterseite: setzt die Kopfzeile (Titel, Knopf rechts) und zeigt den Inhalt. */
+/**
+ * Weicht der Tastatur aus – auch in Blättern unter einer Navigationsleiste. `KeyboardAvoidingView` rechnet mit der
+ * eigenen Lage relativ zum Elternelement; in einem Blatt fehlt dabei der Abstand bis zum Bildschirmrand oben. Der
+ * Abstand ergibt sich aus Fensterhöhe minus eigener Höhe (der untere Rand eines Blatts liegt am Bildschirmrand).
+ */
+export function TastaturRahmen({ children }: { children: ReactNode }) {
+  const f = useFarben();
+  const { height: fenster } = useWindowDimensions();
+  const [hoehe, setHoehe] = useState(0);
+  return (
+    <View style={{ flex: 1, backgroundColor: f.papier }} onLayout={(e) => setHoehe(e.nativeEvent.layout.height)}>
+      <KeyboardAvoidingView behavior={istIos ? "padding" : undefined} keyboardVerticalOffset={hoehe ? fenster - hoehe : 0} style={{ flex: 1 }}>
+        {children}
+      </KeyboardAvoidingView>
+    </View>
+  );
+}
+
+/** Unterseite: setzt die Kopfzeile (Titel, Knopf rechts) und zeigt den Inhalt – Fußleisten bleiben über der Tastatur. */
 export function Unterseite({ titel, children, rechts, schliessen }: { titel: string; children: ReactNode; rechts?: KopfKnopfDef | null; schliessen?: boolean }) {
   useKopf({ titel, rechts, schliessen: schliessen ?? true });
-  const f = useFarben();
-  return <View style={{ flex: 1, backgroundColor: f.papier }}>{children}</View>;
+  return <TastaturRahmen>{children}</TastaturRahmen>;
 }
 
 const BlattStapel = createNativeStackNavigator();

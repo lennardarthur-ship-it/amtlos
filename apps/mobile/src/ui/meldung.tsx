@@ -36,7 +36,7 @@ export function MeldungAnbieter({ children, unten = 0 }: { children: ReactNode; 
     <Kontext.Provider value={wert}>
       {children}
       {/* über allem – auch über Blättern (auf dem iPhone eigenes Fenster, sonst läge die Meldung unter dem Blatt) */}
-      {aktuell ? istIos ? <FullWindowOverlay><Anzeige meldung={aktuell} weg={weg} unten={unten} /></FullWindowOverlay> : <Anzeige meldung={aktuell} weg={weg} unten={unten} /> : null}
+      {aktuell ? istIos ? <FullWindowOverlay unstable_accessibilityContainerViewIsModal={false}><Anzeige meldung={aktuell} weg={weg} unten={unten} /></FullWindowOverlay> : <Anzeige meldung={aktuell} weg={weg} unten={unten} /> : null}
     </Kontext.Provider>
   );
 }

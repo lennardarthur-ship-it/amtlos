@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { KeyboardAvoidingView,  ScrollView, View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { fehlendeAngaben, personAus, personIn, vorlageFuer, type Daten, type Vorlage, type VorlagenAbschnitt } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { Betrag, Fuss, Knopf,  T, TextKnopf, Wahl, ZurueckKnopf } from "../ui/bausteine";
-import {  useKopf, useNav } from "../ui/navigation";
-import { RADIUS, RAND,  istIos, useFarben } from "../ui/thema";
+import { TastaturRahmen, useKopf, useNav } from "../ui/navigation";
+import { RADIUS, RAND,  useFarben } from "../ui/thema";
 import { PERSONEN_LISTE, betriebFehlt, personenSortiert } from "../unterlagen/speicher";
 import { fehltFuer } from "../unterlagen/pruefung";
 import { offeneRechnungen, periodeText, perioden, umsaetzeFuer, type UstUebernahme, type Versteuerung } from "../unterlagen/ustAusRechnungen";
@@ -234,7 +234,7 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
   return (
     <View style={{ flex: 1, backgroundColor: f.papier }}>
       {fest ? null : <Fortschritt n={n + 1} aktuell={schritt} />}
-      <KeyboardAvoidingView behavior={istIos ? "padding" : undefined} style={{ flex: 1 }}>
+      <TastaturRahmen>
         <ScrollView key={schritt} contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 8, paddingBottom: 32 }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive">
           {!amAbschluss && schritt === 0 && vorlage.kundendokument && betriebFehlt(z.stand.betrieb) ? (
             // ohne Absender wäre die Rechnung am Ende nicht teilbar – das gleich am Anfang sagen
@@ -274,7 +274,7 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
             <Knopf text={schritt === n - 1 ? TEXT.zum_dokument : TEXT.weiter} onPress={() => gehe(schritt + 1)} stil={{ flex: 1 }} />
           )}
         </Fuss>
-      </KeyboardAvoidingView>
+      </TastaturRahmen>
     </View>
   );
 }

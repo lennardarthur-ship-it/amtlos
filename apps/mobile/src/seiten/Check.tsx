@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AccessibilityInfo, KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import { AccessibilityInfo, Platform, ScrollView, View } from "react-native";
 import type { Frage } from "@amtlos/i18n";
 import { T as TEXT } from "../texte";
 import { Auswahl, DatumFeld, Fakt, Feld, Fuss, Hinweis, Symbol, Karte, Knopf,  MehrfachWahl, Erfolg, T, TextKnopf, ZurueckKnopf } from "../ui/bausteine";
-import { useKopf, useNav } from "../ui/navigation";
-import { RAND,  istIos, useFarben } from "../ui/thema";
+import { TastaturRahmen, useKopf, useNav } from "../ui/navigation";
+import { RAND,  useFarben } from "../ui/thema";
 import { CHECK_FELDER, auswertung, beantwortet, checkFragen, zusatzFragen, type Profil } from "../pflichten/check";
 import { heute } from "../unterlagen/speicher";
 import { PflichtZeile } from "./Pflichten";
@@ -137,7 +137,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
   return (
     <View style={{ flex: 1, backgroundColor: f.papier }}>
       {i < basisN ? <Fortschritt n={basisN} aktuell={Math.max(0, i)} /> : extraN && !zwischenschirm && !amEnde ? <Fortschritt n={extraN} aktuell={i - basisN} /> : <Fortschritt n={1} aktuell={1} />}
-      <KeyboardAvoidingView behavior={istIos ? "padding" : undefined} style={{ flex: 1 }}>
+      <TastaturRahmen>
         <ScrollView key={i} contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 12, paddingBottom: 32 }} keyboardShouldPersistTaps="handled">
           {i < 0 ? (
             <View>
@@ -223,7 +223,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
             />
           )}
         </Fuss>
-      </KeyboardAvoidingView>
+      </TastaturRahmen>
     </View>
   );
 }

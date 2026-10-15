@@ -81,7 +81,8 @@ function TabSeiten({ route }: { route: { name: string } }) {
   const Erste = SEITE[route.name as Tab];
   return (
     <TabStapel.Navigator screenOptions={kopfOptionen(f)}>
-      <TabStapel.Screen name="Wurzel" component={Erste} options={{ headerShown: istIos }} />
+      {/* iPhone: großer Titel und Glas-Leiste von Anfang an (nicht erst nach dem ersten Rendern umschalten) */}
+      <TabStapel.Screen name="Wurzel" component={Erste} options={{ headerShown: istIos, headerLargeTitleEnabled: istIos, headerTransparent: istIos, title: TEXT.tabs[route.name as Tab] }} />
       <TabStapel.Screen name="Seite" component={InhaltSeite} />
     </TabStapel.Navigator>
   );
@@ -125,7 +126,7 @@ function Navigation({ erste }: { erste: () => React.JSX.Element }) {
   }, [dunkel, f]);
   // Tab aus dem Zustand (z. B. „Zu den Unterlagen“) → Navigation
   useEffect(() => {
-    if (navRef.isReady() && aktiverTab() && aktiverTab() !== tab) navRef.navigate("Tabs", { screen: tab });
+    if (navRef.isReady() && aktiverTab() && aktiverTab() !== tab) navRef.navigate("Tabs", { screen: tab }, { pop: true });
   }, [tab]);
   const wurzelNav = navRef as unknown as NavigationProp<ParamListBase>;
   return (
