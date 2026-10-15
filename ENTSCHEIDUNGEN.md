@@ -711,6 +711,28 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Bewusst offen:** Übertrag/Zwischensumme bei mehrseitigen Rechnungen (braucht Seitenmessung im Druck), GHS-Piktogramme in der Betriebsanweisung (Entscheidung offen, docs/10), typografisches Minus, App-Symbol (Empfehlung in docs/11), Kategorie-Vorbelegung bei Belegen, Ziffernform der Schrift (Atkinson: Null mit Punkt).
 - **Geprüft:** Pipeline grün; Rundgang hell und dunkel (angepasst an die neuen Abläufe), Sync-Rundgang, Dokumentprüfung ohne Befunde; neuer CI-Job „iPhone-App“ führt alle drei aus.
 
+### E-137 · Neues Erscheinungsbild der iPhone-App: eine Marke mit Website, Dokumenten und App-Symbol
+- **Datum:** 2026-10-15 · **Status:** angenommen (Gründer: „das Design muss perfekt sein, als wäre die App von einem 100-köpfigen Team von Grafikdesign-Spezialisten – alles komplett auf Profi-App, nicht zusammengebaut wirken“)
+- **Grundsatz:** keine neuen Funktionen, keine Textänderungen; nur Gestaltung. Die App übernimmt die Gestaltung, die Website, Dokumente und App-Symbol schon hatten. Bisher sprach sie als einziges Teil der Marke eine andere Schrift.
+- **Schrift:** Amtlos Serif (Source Serif 4, Halbfett) für Seitentitel und Abschnittsüberschriften, Amtlos Sans (Source Sans 3) für alles andere – dieselben OFL-Dateien wie in den PDFs (`assets/schriften`). Atkinson Hyperlegible entfällt in der App (das Paket ist entfernt). Grund: Die durchgestrichene Null wirkte in Rechnungsnummern, Beträgen und Daten fremd („2Ø26-ØØ1“). Außerdem passt die App jetzt zu den Dokumenten, die sie erzeugt. Auszeichnung im Text ist Halbfett, Beträge sind fett mit gleich breiten Ziffern. Die Skala ist an die kleinere x-Höhe angepasst (13,5 / 15,5 / 17,5 / 21 / 27 / 34). Die Web-App (`packages/web-kern`) bleibt vorerst bei Atkinson.
+- **Farben:** Werte wie auf der Website (Papier `#f2f4f1`, Tinte `#17232e`, Amtsgrün unverändert). Neue Rollen:
+  - `flaeche`: ruhige Füllung für Suchfeld, neutrale Hinweise und Zurück-Knopf.
+  - `zeiger`: Listenpfeile.
+  - `amtText`: Schrift auf Amtsgrün; im Dunkelmodus dunkel wie auf der Website.
+  - `buehne`: die eine dunkelgrüne Fläche für Einladung und Pro.
+  Rahmen von Eingabefeldern bleiben ≥ 3:1.
+- **Flächen:** Karten hell mit weichem Schatten statt Haarlinie, dunkel mit Rahmen. Ecken: 12 (Felder, Hinweise), 14 (Knöpfe), 18 (Karten), 24 (Bühne); Chips rund. Trennlinien als Haarlinie, in Listen ab dem Text eingerückt wie in iOS.
+- **Bildzeichen:** Der Stempel aus dem App-Symbol (doppelter Ring mit Haken, −12°) ist das eine wiederkehrende Motiv. Er steht als Wasserzeichen auf der Bühne, bei leeren Listen, beim Check-Ergebnis und bei fertigen bzw. geteilten Unterlagen. Listenzeilen tragen getönte Symbol-Kacheln: grün normal, bernstein bei fehlenden Angaben, grau neutral. Personen erscheinen mit Initialen.
+- **Bausteine:** Knöpfe sind 52 pt hoch und geben beim Drücken leicht nach. Gewählte Chips sind amtsgrün gefüllt und tragen weiter ein Häkchen (Farbe nie allein). Listenauswahl mit Radiokreis. Felder zeigen im Fokus einen grünen 2-pt-Rahmen, ohne dass der Text springt. Abläufe haben einen runden Schließen-Knopf und einen ruhigen Zurück-Knopf. Die Summenzeile steht unter doppelter Linie wie auf dem Dokument. Ergebnisse erscheinen als Zeilen mit Symbol. „Weitere Möglichkeiten“ ist eine Liste statt loser Textlinks.
+- **Seiten:**
+  - Pflichten-Start mit Bühne und zwei Schnellzugriff-Kacheln; dieselben Kacheln im Tab „Vorlagen“.
+  - Pflichten-Übersicht mit Fortschrittskarte.
+  - Pro mit Bühne.
+  - Sperre und Ladefehler mit großer Kachel.
+  - Store- und Website-Bilder neu erzeugt, Überschriften dort ebenfalls in Amtlos Serif.
+  - `store-bilder.mjs` wählt die erste Pflicht unter „Jetzt dran“ unabhängig vom Tag.
+- **Geprüft:** Typprüfung, Lint, Unit-Tests; Rundgang hell und dunkel ohne Befunde; Sync-Rundgang. Die Sichtprüfung lief über den Web-Export. SF Symbols, Schatten und Haptik wirken nur auf dem iPhone (→ PRUEFLISTE T-82).
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

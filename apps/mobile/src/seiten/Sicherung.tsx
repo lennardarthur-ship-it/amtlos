@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { T as TEXT } from "../texte";
-import { Feld, Fuss, Hinweis, Karte, Knopf, Schalter, T, TextKnopf } from "../ui/bausteine";
+import { Feld, Fuss, Hinweis, Karte, Knopf, Schalter, Symbol, T, TextKnopf } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { useMeldung } from "../ui/meldung";
 import { RADIUS, useFarben } from "../ui/thema";
@@ -179,9 +179,14 @@ export function SicherungsKarte() {
   const faellig = sicherungFaellig(z.stand, new Date());
   if (!faellig) return null;
   return (
-    <View accessibilityRole="summary" style={{ padding: 16, borderRadius: RADIUS.karte, backgroundColor: f.baldHauch, gap: 10, marginBottom: 16 }}>
-      <T fett>{TEXT.sicherung_faellig_titel}</T>
-      <T v="klein">{TEXT.sicherung_faellig(faellig.tage)}</T>
+    <View accessibilityRole="summary" style={{ padding: 16, borderRadius: RADIUS.karte, backgroundColor: f.baldHauch, gap: 12, marginBottom: 16 }}>
+      <View style={{ flexDirection: "row", gap: 12, alignItems: "flex-start" }}>
+        <Symbol name="exclamationmark.shield" groesse={22} farbe={f.bald} gewicht="semibold" />
+        <View style={{ flex: 1, gap: 3 }}>
+          <T fett>{TEXT.sicherung_faellig_titel}</T>
+          <T v="klein">{TEXT.sicherung_faellig(faellig.tage)}</T>
+        </View>
+      </View>
       <Knopf ton symbol="lock" text={TEXT.jetzt_sichern} onPress={() => nav.oeffnen("sicherung", () => <SicherungSeite />, true)} />
     </View>
   );

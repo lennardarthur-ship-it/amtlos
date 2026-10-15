@@ -2,10 +2,10 @@ import { useState } from "react";
 import { Pressable, Share, View } from "react-native";
 import { KU_HINWEIS, PRUEFHINWEIS, dateiname, dokumentHtml, eRechnungAus, vorlageFuer, xrechnungUbl } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { DatumFeld, Fuss, Hinweis, Karte, Knopf, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
+import { Betrag, DatumFeld, Fuss, Hinweis, Kachel, Karte, Knopf, Stempel, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
-import { RADIUS, useFarben } from "../ui/thema";
+import { HAARLINIE, RADIUS, useFarben } from "../ui/thema";
 import { Vorschau } from "../ui/Vorschau";
 import { drucken, pdfTeilen } from "../unterlagen/pdf";
 import { NUMMER_DOPPELT, fehltFuer } from "../unterlagen/pruefung";
@@ -118,7 +118,8 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
   const fertig = alle.length === 0;
   return (
     <View>
-      <T v="titel" accessibilityRole="header" stil={{ fontSize: 28, lineHeight: 34 }}>{fest ? (v.storno && !d.storno_zu ? TEXT.geteilt_titel : TEXT.festgeschrieben_titel) : fertig ? TEXT.fertig : TEXT.fast_fertig}</T>
+      {fest || fertig ? <Stempel groesse={52} farbe={fest && !(v.storno && !d.storno_zu) ? f.tinteLeise : f.amt} /> : null}
+      <T v="titel" accessibilityRole="header" stil={{ marginTop: fest || fertig ? 14 : 0 }}>{fest ? (v.storno && !d.storno_zu ? TEXT.geteilt_titel : TEXT.festgeschrieben_titel) : fertig ? TEXT.fertig : TEXT.fast_fertig}</T>
       {fest ? (
         <View style={{ marginTop: 10 }}>
           {v.storno && !d.storno_zu ? (
@@ -136,10 +137,10 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
           <Hinweis art="erfolg" text={TEXT.alles_drin} />
         </View>
       ) : (
-        <View accessibilityRole="summary" style={{ marginTop: 12, backgroundColor: f.baldHauch, borderRadius: RADIUS.klein, paddingHorizontal: 14, paddingVertical: 10 }}>
+        <View accessibilityRole="summary" style={{ marginTop: 14, backgroundColor: f.baldHauch, borderRadius: RADIUS.karte, paddingHorizontal: 16, paddingVertical: 12 }}>
           <T v="klein" fett>{TEXT.fehlen(alle.length)}</T>
           {jeSchritt.flatMap((l, i) => l.map((x) => ({ text: x, schritt: i, betrieb: false }))).concat(extra).map((x, i) => (
-            <View key={`${x.text}-${i}`} style={{ flexDirection: "row", alignItems: "center", gap: 8, minHeight: 40, borderTopWidth: i ? 1 : 0, borderColor: f.linieLeise }}>
+            <View key={`${x.text}-${i}`} style={{ flexDirection: "row", alignItems: "center", gap: 8, minHeight: 44, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie }}>
               <T v="klein" stil={{ flex: 1 }}>{x.text}</T>
               {x.betrieb ? (
                 <TextKnopf text={TEXT.ergaenzen} label={`${TEXT.im_betrieb}: ${x.text}`} onPress={() => nav.oeffnen("absender", () => <AbsenderSeite />, true)} />
@@ -157,12 +158,16 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
 
       {ergebnis.length ? (
         <Karte stil={{ marginTop: 18 }}>
-          {ergebnis.map(([k, w], i) => (
-            <View key={k} style={{ flexDirection: "row", justifyContent: "space-between", gap: 12, paddingVertical: 12, borderTopWidth: i ? 1 : 0, borderColor: f.linieLeise }}>
-              <T stil={{ flex: 1 }} fett={i === ergebnis.length - 1}>{k}</T>
-              <T fett={i === ergebnis.length - 1} stil={{ flexShrink: 1, textAlign: "right" }}>{w}</T>
-            </View>
-          ))}
+          {ergebnis.map(([k, w], i) => {
+            // die letzte Zeile ist die Summe: größer, mit doppelter Linie darüber wie auf dem Dokument
+            const summe = i === ergebnis.length - 1 && ergebnis.length > 1;
+            return (
+              <View key={k} style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "baseline", gap: 12, paddingVertical: summe ? 14 : 11, borderTopWidth: summe ? 2 : i ? HAARLINIE : 0, borderColor: summe ? f.tinte : f.linie }}>
+                <T stil={{ flex: 1 }} fett={summe} leise={!summe}>{k}</T>
+                {summe ? <Betrag v="gross" stil={{ flexShrink: 1, textAlign: "right", fontSize: 22 }}>{w}</Betrag> : <T stil={{ flexShrink: 1, textAlign: "right", fontVariant: ["tabular-nums"] }}>{w}</T>}
+              </View>
+            );
+          })}
         </Karte>
       ) : null}
 
@@ -175,7 +180,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
       </Pressable>
       <T v="caption" leise>{PRUEFHINWEIS}</T>
 
-      <T v="klein" fett leise accessibilityRole="header" stil={{ marginTop: 28, marginBottom: 8, marginLeft: 4 }}>{fest ? TEXT.angaben : TEXT.angaben_bearbeiten}</T>
+      <T v="gross" accessibilityRole="header" stil={{ marginTop: 30, marginBottom: 11, marginLeft: 2 }}>{fest ? TEXT.angaben : TEXT.angaben_bearbeiten}</T>
       <Karte>
         {v.abschnitte.map((a, i) => (
           <Zeile
@@ -189,30 +194,36 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
         ))}
       </Karte>
 
-      <T v="klein" fett leise accessibilityRole="header" stil={{ marginTop: 28, marginBottom: 2, marginLeft: 4 }}>{TEXT.mehr}</T>
-      <View style={{ marginLeft: 4 }}>
-        {v.eRechnung && eRechnung ? <TextKnopf symbol="doc.text" text={TEXT.mitPro(TEXT.e_rechnung, z.pro)} onPress={() => void eRechnung()} /> : null}
-        {eFehlt.length ? (
-          <View style={{ backgroundColor: f.baldHauch, borderRadius: RADIUS.klein, padding: 12, marginVertical: 4 }}>
-            <T v="klein" fett>{TEXT.e_rechnung_fehlt}</T>
-            {eFehlt.map((x) => (
-              <T key={x} v="klein" stil={{ marginTop: 2 }}>• {x}</T>
-            ))}
-          </View>
-        ) : null}
-        <TextKnopf symbol="printer" text={TEXT.drucken} onPress={() => void druckenLos()} />
-        {v.alsText ? <TextKnopf symbol="doc.on.doc" text={TEXT.als_text} onPress={() => void Share.share({ message: v.alsText!(d, z.stand.betrieb) }).catch(() => undefined)} /> : null}
-        <TextKnopf
-          symbol="plus.circle"
-          text={TEXT.kopie}
-          onPress={() => {
-            const k = z.kopieren(id);
-            if (k) {
-              melden(TEXT.kopie_angelegt);
-              nav.oeffnen(`ablauf-${k.id}`, () => <Ablauf id={k.id} />, true);
-            }
-          }}
-        />
+      <T v="gross" accessibilityRole="header" stil={{ marginTop: 30, marginBottom: 11, marginLeft: 2 }}>{TEXT.mehr}</T>
+      {eFehlt.length ? (
+        <View style={{ backgroundColor: f.baldHauch, borderRadius: RADIUS.karte, paddingHorizontal: 16, paddingVertical: 12, marginBottom: 10 }}>
+          <T v="klein" fett>{TEXT.e_rechnung_fehlt}</T>
+          {eFehlt.map((x) => (
+            <T key={x} v="klein" stil={{ marginTop: 3 }}>• {x}</T>
+          ))}
+        </View>
+      ) : null}
+      <Karte>
+        {[
+          ...(v.eRechnung && eRechnung ? [{ symbol: "doc.text", titel: TEXT.mitPro(TEXT.e_rechnung, z.pro), los: () => void eRechnung() }] : []),
+          { symbol: "printer", titel: TEXT.drucken, los: () => void druckenLos() },
+          ...(v.alsText ? [{ symbol: "doc.on.doc", titel: TEXT.als_text, los: () => void Share.share({ message: v.alsText!(d, z.stand.betrieb) }).catch(() => undefined) }] : []),
+          {
+            symbol: "plus.circle",
+            titel: TEXT.kopie,
+            los: () => {
+              const k = z.kopieren(id);
+              if (k) {
+                melden(TEXT.kopie_angelegt);
+                nav.oeffnen(`ablauf-${k.id}`, () => <Ablauf id={k.id} />, true);
+              }
+            },
+          },
+        ].map((x, i, l) => (
+          <Zeile key={x.symbol} symbol={x.symbol} titel={x.titel} onPress={x.los} letzte={i === l.length - 1} />
+        ))}
+      </Karte>
+      <View style={{ marginTop: 8, marginLeft: 2 }}>
         {/* Rückfragen als System-Dialog – eine Karte am Seitenende läge halb unter Fußleiste oder Meldung */}
         {fest ? (
           v.storno && !u.storniertDurch && !d.storno_zu ? (
@@ -257,7 +268,6 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
  */
 function Zahlung({ id }: { id: string }) {
   const z = useAmtlos();
-  const f = useFarben();
   const melden = useMeldung();
   const [anders, setAnders] = useState(false);
   const u = z.stand.unterlagen.find((x) => x.id === id);
@@ -270,9 +280,9 @@ function Zahlung({ id }: { id: string }) {
   if (!u) return null;
   const datumDe = (iso: string) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(`${iso}T12:00:00Z`));
   return (
-    <Karte stil={{ marginTop: 10, paddingVertical: 12, gap: 8 }}>
+    <Karte stil={{ marginTop: 12, paddingVertical: 14, gap: 10 }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-        <Symbol name={u.bezahlt ? "checkmark.circle.fill" : "clock"} groesse={20} farbe={u.bezahlt ? f.amt : f.bald} />
+        <Kachel symbol={u.bezahlt ? "checkmark.circle.fill" : "clock"} ton={u.bezahlt ? "amt" : "bald"} groesse={30} />
         <T fett stil={{ flex: 1 }}>{u.bezahlt ? (erstattung ? TEXT.erstattet_am(datumDe(u.bezahlt)) : TEXT.bezahlt_am(datumDe(u.bezahlt))) : TEXT.offen_zahlung}</T>
       </View>
       {u.bezahlt ? (

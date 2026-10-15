@@ -68,7 +68,7 @@ export function SteuerberatungSeite() {
         </Karte>
         {!anzahlR && !anzahlB ? <Hinweis text={TEXT.steuerpaket_leer} /> : null}
         <Wahl label={TEXT.steuerpaket_kontenrahmen} hilfe={TEXT.steuerpaket_kontenrahmen_hilfe} wert={sb.kontenrahmen} aendern={(k) => z.steuerberatungSetzen({ ...sb, kontenrahmen: k })} optionen={[{ wert: "SKR03" as const, text: "SKR03" }, { wert: "SKR04" as const, text: "SKR04" }]} />
-        <View style={{ flexDirection: "row", gap: 10 }}>
+        <View style={{ flexDirection: "row", gap: 10, alignItems: "flex-end" }}>
           <View style={{ flex: 1 }}>
             <Feld label={TEXT.steuerpaket_berater} wert={sb.beraternummer} aendern={(w) => z.steuerberatungSetzen({ ...sb, beraternummer: w.replace(/\D/g, "").slice(0, 7) })} keyboardType="number-pad" />
           </View>

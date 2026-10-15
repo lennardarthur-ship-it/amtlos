@@ -2,9 +2,9 @@ import { useState } from "react";
 import { Pressable, View } from "react-native";
 import * as Haptics from "expo-haptics";
 import { T as TEXT } from "../texte";
-import { FeldKopf, Karte, Suchfeld, Symbol, T } from "./bausteine";
+import { FeldKopf, Karte, Suchfeld, Symbol, T, feldRahmen } from "./bausteine";
 import { Unterseite, useNav } from "./navigation";
-import { RADIUS, ZIEL, istIos, useFarben } from "./thema";
+import { HAARLINIE, istIos, useFarben } from "./thema";
 import { Inhalt } from "../seiten/gemeinsam";
 
 interface Option<W extends string> {
@@ -46,7 +46,7 @@ export function AuswahlSeite<W extends string>({ titel, wert, optionen, aendern 
                     aendern(o.wert);
                     setTimeout(nav.zurueck, 120);
                   }}
-                  style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 10, minHeight: ZIEL, paddingVertical: 10, borderTopWidth: i ? 1 : 0, borderColor: f.linieLeise, opacity: pressed ? 0.6 : 1 })}
+                  style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 10, minHeight: 52, paddingVertical: 10, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie, opacity: pressed ? 0.6 : 1 })}
                 >
                   <T fett={an} stil={{ flex: 1 }}>{o.text}</T>
                   {an ? <Symbol name="checkmark" groesse={18} farbe={f.amt} gewicht="semibold" /> : null}
@@ -76,10 +76,10 @@ export function AuswahlZeile<W extends string>({ label, wert, optionen, aendern,
         accessibilityLabel={label}
         accessibilityValue={{ text: text ?? platzhalter ?? TEXT.auswaehlen }}
         onPress={() => nav.oeffnen(`auswahl-${label}`, () => <AuswahlSeite titel={label} wert={wert} optionen={optionen} aendern={aendern} />)}
-        style={({ pressed }) => ({ marginTop: 6, minHeight: ZIEL, borderWidth: 1.5, borderColor: f.rahmen, borderRadius: RADIUS.klein, paddingLeft: 14, paddingRight: 10, flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: pressed ? f.papier : f.blatt })}
+        style={({ pressed }) => ({ ...feldRahmen(f), marginTop: 7, paddingRight: 12, flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: pressed ? f.flaeche : f.blatt })}
       >
         <T stil={{ flex: 1 }} leise={!text}>{text ?? platzhalter ?? TEXT.auswaehlen}</T>
-        <Symbol name="chevron.right" groesse={16} />
+        <Symbol name="chevron.right" groesse={14} farbe={f.zeiger} gewicht="semibold" />
       </Pressable>
     </View>
   );

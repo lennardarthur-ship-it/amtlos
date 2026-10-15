@@ -20,12 +20,11 @@ const zeitpunkt = (iso: string) => new Intl.DateTimeFormat("de-DE", { timeZone: 
 export function KontoZeile() {
   const k = useKonto();
   const nav = useNav();
-  const f = useFarben();
   if (!syncAngeboten) return null;
   return (
     <Karte stil={{ marginBottom: 10 }}>
       <Zeile
-        links={<Symbol name="arrow.triangle.2.circlepath" groesse={22} farbe={f.amt} />}
+        symbol="arrow.triangle.2.circlepath"
         titel={TEXT.konto_zeile}
         text={k.status === "aktiv" && k.fehler ? TEXT.konto_fehler[k.fehler] : TEXT.konto_zeile_text[k.status]}
         onPress={() => nav.oeffnen("konto", () => <KontoSeite />, true)}

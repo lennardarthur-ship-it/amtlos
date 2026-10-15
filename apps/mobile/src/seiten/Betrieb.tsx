@@ -4,7 +4,7 @@ import { BUNDESLAENDER, HAUSFARBEN, PERSONEN_FELDER, VERSTEUERUNG, VORLAGEN, typ
 import { T as TEXT } from "../texte";
 import { logoWaehlen } from "../unterlagen/logo";
 import { AuswahlZeile } from "../ui/auswahlseite";
-import { Feld, Fuss, Karte, Knopf, Schalter, Suchfeld, Symbol, T, TextKnopf, Wahl, Zeile } from "../ui/bausteine";
+import { Feld, Fuss, Initialen, Karte, Knopf, Schalter, Suchfeld, Symbol, T, TextKnopf, Wahl, Zeile } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
 import { RAND, RADIUS, useFarben, weich } from "../ui/thema";
@@ -70,7 +70,6 @@ function PersonSeite({ art, id, neu }: { art: PersonenArt; id: string; neu?: boo
 function PersonenSeite({ art }: { art: PersonenArt }) {
   const z = useAmtlos();
   const nav = useNav();
-  const f = useFarben();
   const [suche, setSuche] = useState("");
   const alle = personenSortiert(z.stand[PERSONEN_LISTE[art]]);
   const s = suche.trim().toLocaleLowerCase("de");
@@ -94,7 +93,7 @@ function PersonenSeite({ art }: { art: PersonenArt }) {
         {liste.length ? (
           <Karte stil={{ marginTop: 14 }}>
             {liste.map((p, i) => (
-              <Zeile key={p.id} links={<Symbol name="person.crop.circle" groesse={22} farbe={f.tinteLeise} />} titel={p.name} text={(art === "mitarbeiter" ? p.taetigkeit : p.anschrift)?.split("\n")[0] || undefined} onPress={() => oeffnen(p.id)} letzte={i === liste.length - 1} />
+              <Zeile key={p.id} links={<Initialen name={p.name} />} titel={p.name} text={(art === "mitarbeiter" ? p.taetigkeit : p.anschrift)?.split("\n")[0] || undefined} onPress={() => oeffnen(p.id)} letzte={i === liste.length - 1} />
             ))}
           </Karte>
         ) : !s ? (
@@ -163,7 +162,7 @@ export function BetriebFormular({ teil, teile }: { teil?: Teil; teile?: Teil[] }
           <Karte stil={{ paddingBottom: 14 }}>
             <Feld label={TEXT.b_name} {...feld("name")} textContentType="organizationName" />
             <Feld label={TEXT.b_strasse} {...feld("strasse")} textContentType="streetAddressLine1" />
-            <View style={{ flexDirection: "row", gap: 10 }}>
+            <View style={{ flexDirection: "row", gap: 10, alignItems: "flex-end" }}>
               <View style={{ flex: 1 }}>
                 <Feld label={TEXT.b_plz} {...feld("plz")} keyboardType="number-pad" textContentType="postalCode" />
               </View>
@@ -267,21 +266,21 @@ function BetriebKopf({ b, onPress }: { b: BetriebDaten; onPress: () => void }) {
   const leer = betriebFehlt(b);
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={leer ? TEXT.betrieb_eintragen : `${b.name}: ${TEXT.teil_titel.angaben}`} onPress={onPress} style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
-      <Karte stil={{ flexDirection: "row", alignItems: "center", gap: 14, paddingVertical: 14, backgroundColor: leer ? f.amtHauch : f.blatt, borderColor: leer ? f.amtHauch : f.linie }}>
+      <Karte stil={{ flexDirection: "row", alignItems: "center", gap: 14, paddingVertical: 16, backgroundColor: leer ? f.amtHauch : f.blatt, borderColor: leer ? f.amtHauch : f.linie }}>
         {b.logo ? (
-          <View style={{ width: 56, height: 56, borderRadius: 12, backgroundColor: "#ffffff", borderWidth: 1, borderColor: f.linie, alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+          <View style={{ width: 60, height: 60, borderRadius: 16, backgroundColor: "#ffffff", borderWidth: 1, borderColor: f.linie, alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
             <Image source={{ uri: b.logo }} style={{ width: 48, height: 48 }} resizeMode="contain" accessibilityLabel={TEXT.b_logo} />
           </View>
         ) : (
-          <View style={{ width: 56, height: 56, borderRadius: 12, backgroundColor: leer ? f.amt : farbe, alignItems: "center", justifyContent: "center" }}>
-            {leer ? <Symbol name="building.2" groesse={26} farbe={f.blatt} /> : <T v="titel" farbe="#ffffff">{b.name.trim().charAt(0).toUpperCase()}</T>}
+          <View style={{ width: 60, height: 60, borderRadius: 16, backgroundColor: leer ? f.amt : farbe, alignItems: "center", justifyContent: "center" }}>
+            {leer ? <Symbol name="building.2" groesse={26} farbe={f.amtText} /> : <T v="titel" farbe="#ffffff">{b.name.trim().charAt(0).toUpperCase()}</T>}
           </View>
         )}
         <View style={{ flex: 1, minWidth: 0 }}>
           <T v="gross" numberOfLines={2} farbe={leer ? f.amtTief : undefined}>{leer ? TEXT.betrieb_eintragen : b.name.trim()}</T>
           <T v="klein" leise numberOfLines={2} farbe={leer ? f.amtTief : undefined}>{leer ? TEXT.betrieb_zeile_text : [b.ort.trim(), b.verantwortlich.trim()].filter(Boolean).join(" · ") || TEXT.teil_leer.angaben}</T>
         </View>
-        <Symbol name="chevron.right" groesse={16} farbe={leer ? f.amtTief : undefined} />
+        <Symbol name="chevron.right" groesse={14} farbe={leer ? f.amtTief : f.zeiger} gewicht="semibold" />
       </Karte>
     </Pressable>
   );
@@ -292,7 +291,6 @@ export function Betrieb() {
   const z = useAmtlos();
   const { allesLoeschen } = z;
   const nav = useNav();
-  const f = useFarben();
   const [frage, setFrage] = useState(false);
   const [zaehler, setZaehler] = useState(0);
   const fest = aufbewahrungspflichtig(z.stand).length;
@@ -315,14 +313,14 @@ export function Betrieb() {
       <Gruppe titel={TEXT.betrieb_gruppe}>
         <Karte>
           {TEILE.map((t, i) => (
-            <Zeile key={t} links={<Symbol name={TEIL_SYMBOL[t]} groesse={22} farbe={f.amt} />} titel={TEXT.teil_titel[t]} text={zusammenfassung(b, t)} onPress={() => oeffneTeil(t)} letzte={i === TEILE.length - 1} />
+            <Zeile key={t} symbol={TEIL_SYMBOL[t]} titel={TEXT.teil_titel[t]} text={zusammenfassung(b, t)} onPress={() => oeffneTeil(t)} letzte={i === TEILE.length - 1} />
           ))}
         </Karte>
       </Gruppe>
       <CheckProfilZeile />
       <Gruppe titel={TEXT.steuerpaket_titel}>
         <Karte>
-          <Zeile links={<Symbol name="briefcase" groesse={22} farbe={f.amt} />} titel={TEXT.steuerpaket_zeile} text={TEXT.steuerpaket_zeile_text} onPress={() => nav.oeffnen("steuerberatung", () => <SteuerberatungSeite />, true)} letzte />
+          <Zeile symbol="briefcase" titel={TEXT.steuerpaket_zeile} text={TEXT.steuerpaket_zeile_text} onPress={() => nav.oeffnen("steuerberatung", () => <SteuerberatungSeite />, true)} letzte />
         </Karte>
       </Gruppe>
       <Gruppe titel={TEXT.personen_gruppe}>
@@ -332,7 +330,7 @@ export function Betrieb() {
             return (
               <Zeile
                 key={art}
-                links={<Symbol name={art === "mitarbeiter" ? "person.2" : "person.crop.circle"} groesse={22} farbe={f.amt} />}
+                symbol={art === "mitarbeiter" ? "person.2" : "person.crop.circle"}
                 titel={art === "mitarbeiter" ? TEXT.mitarbeiter_titel : TEXT.kunden_titel}
                 text={l.length ? TEXT.personen_anzahl[art](l.length) : TEXT.personen_leer_kurz[art]}
                 onPress={() => nav.oeffnen(`personen-${art}`, () => <PersonenSeite art={art} />)}

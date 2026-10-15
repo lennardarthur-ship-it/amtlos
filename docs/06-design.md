@@ -36,3 +36,14 @@ Einmalige, leicht gedrehte Umrandung wie ein Amtsstempel. Die einzige Bewegung i
 ## Qualitätsboden
 
 WCAG 2.2 AA, geprüft mit axe im E2E-Rundgang (hell/dunkel, Desktop/mobil). Ziele mindestens 44 px, sichtbarer Fokus, „Zum Inhalt springen“, Zeilenlänge ≤ 68 Zeichen, Dunkelmodus über `prefers-color-scheme`.
+
+## iPhone-App (E-137)
+
+Quelle: `apps/mobile/src/ui/thema.ts` und `bausteine.tsx`.
+
+- **Schrift:** Amtlos Serif (Halbfett) für Seitentitel und Abschnittsüberschriften, Amtlos Sans für alles andere. Es sind dieselben Dateien wie in den Dokumenten und auf der Website. Skala: 13,5 / 15,5 / 17,5 / 21 / 27 / 34 pt. Auszeichnung in Halbfett, Beträge fett mit gleich breiten Ziffern (`Betrag`).
+- **Farben:** wie oben, dazu `flaeche` (ruhige Füllung), `zeiger` (Listenpfeile), `amtText` (Schrift auf Grün) und `buehne`, die eine dunkelgrüne Fläche je Seite.
+- **Flächen:** Karten hell mit weichem Schatten, dunkel mit Rahmen. Ecken 12 / 14 / 18 / 24, Chips rund. Haarlinien in Listen sind ab dem Text eingerückt.
+- **Stempel:** das Bildzeichen aus dem App-Symbol. Er erscheint auf der Bühne, bei leeren Listen und bei geschafften Schritten, sonst nicht.
+- **Kacheln:** getönte Symbol-Kacheln vor Listenzeilen. Grün steht für Handeln, Bernstein für fehlende Angaben, Grau für Neutrales. Personen erscheinen mit Initialen.
+- **Knöpfe:** ein gefüllter Hauptknopf je Bildschirm; `ton` für Zweitrangiges, `buehne` auf der Bühne, Textknöpfe für Nebenwege. 52 pt hoch, geben beim Drücken leicht nach.

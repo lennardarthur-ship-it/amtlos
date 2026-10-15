@@ -2,7 +2,7 @@ import { memo, useMemo, useState } from "react";
 import { View } from "react-native";
 import { ANLAESSE, BEREICHE, KURZ, VORLAGEN, unterlagenName, vorlageFuer, type Anlass, type Betrieb, type Vorlage } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { Karte, Knopf, Suchfeld, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
+import { Karte, SchnellKachel, Suchfeld, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { RAND, useFarben } from "../ui/thema";
 import { fehltFuer } from "../unterlagen/pruefung";
@@ -43,12 +43,11 @@ const datumText = (iso: string) => (/^\d{4}-\d{2}-\d{2}$/.test(iso) ? datumKurz(
  * Status. Andere Unterlagen: Name, wann geändert, was noch fehlt. `fehlt` rechnet die Liste einmal für alle aus.
  */
 export const UnterlageZeile = memo(function UnterlageZeile({ u, letzte, fehlt, betrieb, onPress }: { u: Unterlage; letzte: boolean; fehlt: number; betrieb: Betrieb; onPress: (id: string) => void }) {
-  const f = useFarben();
   // zuletzt bearbeitet oder geteilt
   const zuletzt = u.ausgegeben && u.ausgegeben > u.geaendert ? u.ausgegeben : u.geaendert;
   const v = vorlageFuer(u.vorlage)!;
   const status = u.storniertDurch ? TEXT.storniert : u.festgeschrieben && v.storno && !u.daten.storno_zu ? (u.bezahlt ? TEXT.bezahlt_kurz : TEXT.offen_kurz) : u.festgeschrieben ? TEXT.festgeschrieben_kurz : fehlt ? TEXT.fehlen(fehlt) : TEXT.vollstaendig;
-  const symbol = <Symbol name="doc.richtext" groesse={22} farbe={fehlt && !u.festgeschrieben ? f.bald : f.amt} />;
+  const ton = fehlt && !u.festgeschrieben ? "bald" : "amt";
   if (v.storno) {
     const nummer = typeof u.daten.nummer === "string" ? u.daten.nummer.trim() : "";
     const datum = (typeof u.daten.datum === "string" && datumText(u.daten.datum)) || wann(zuletzt);
@@ -57,7 +56,8 @@ export const UnterlageZeile = memo(function UnterlageZeile({ u, letzte, fehlt, b
     const brutto = rechnungBrutto(u, betrieb);
     return (
       <Zeile
-        links={symbol}
+        symbol={v.storno ? "eurosign" : "doc.text"}
+        ton={ton}
         titel={storno ? TEXT.storno_titel(nummer, storno) : kunde || TEXT.rechnung_ohne_kunde}
         text={[storno ? kunde : nummer, datum, status].filter(Boolean).join(" · ")}
         wert={brutto ? euroText(brutto) : undefined}
@@ -66,7 +66,7 @@ export const UnterlageZeile = memo(function UnterlageZeile({ u, letzte, fehlt, b
       />
     );
   }
-  return <Zeile links={symbol} titel={unterlagenName(v, u.daten)} text={`${wann(zuletzt)} · ${status}`} onPress={() => onPress(u.id)} letzte={letzte} />;
+  return <Zeile symbol="doc.text" ton={ton} titel={unterlagenName(v, u.daten)} text={`${wann(zuletzt)} · ${status}`} onPress={() => onPress(u.id)} letzte={letzte} />;
 });
 
 /** Fehlende Angaben je Unterlage – einmal je Stand berechnet, nicht in jeder Zeile. */
@@ -141,7 +141,6 @@ function AlleSeite() {
 export function Unterlagen() {
   const { stand, tabWechseln } = useAmtlos();
   const nav = useNav();
-  const f = useFarben();
   const starten = useStarten();
   const oeffnen = useOeffnen();
   const fehltJe = useFehltJe();
@@ -159,7 +158,7 @@ export function Unterlagen() {
           {betriebFehlt(stand.betrieb) ? (
             <Karte stil={{ marginTop: 16 }}>
               <Zeile
-                links={<Symbol name="building.2" groesse={22} farbe={f.amt} />}
+                symbol="building.2"
                 titel={TEXT.betrieb_eintragen}
                 text={TEXT.betrieb_zeile_text}
                 letzte
@@ -176,9 +175,9 @@ export function Unterlagen() {
             </Karte>
           ) : null}
           {/* untereinander: nebeneinander brachen beide Beschriftungen auf zwei Zeilen um */}
-          <View style={{ gap: 10, marginTop: 16 }}>
-            <Knopf text={TEXT.rechnung_schreiben} symbol="plus" onPress={() => starten("rechnung")} />
-            <Knopf ton text={TEXT.beleg_erfassen} symbol="doc.viewfinder" onPress={() => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />)} />
+          <View style={{ flexDirection: "row", gap: 12, marginTop: 16 }}>
+            <SchnellKachel symbol="eurosign" text={TEXT.rechnung_schreiben} onPress={() => starten("rechnung")} />
+            <SchnellKachel symbol="doc.viewfinder" text={TEXT.beleg_erfassen} onPress={() => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />)} />
           </View>
 
           {zuletzt.length ? (
@@ -195,12 +194,12 @@ export function Unterlagen() {
           <Gruppe titel={TEXT.wofuer}>
             <Karte>
               {ANLAESSE.map((a, i) => (
-                <Zeile key={a.id} links={<Symbol name={ANLASS_SYMBOL[a.id] ?? "doc.text"} groesse={22} farbe={f.amt} />} titel={a.titel} text={a.text} onPress={() => zuAnlass(a)} letzte={i === ANLAESSE.length - 1} />
+                <Zeile key={a.id} symbol={ANLASS_SYMBOL[a.id] ?? "doc.text"} titel={a.titel} text={a.text} onPress={() => zuAnlass(a)} letzte={i === ANLAESSE.length - 1} />
               ))}
             </Karte>
           </Gruppe>
           <Karte stil={{ marginTop: 16 }}>
-            <Zeile links={<Symbol name="list.bullet" groesse={22} farbe={f.tinteLeise} />} titel={TEXT.alle_unterlagen(VORLAGEN.length)} onPress={() => nav.oeffnen("alle", () => <AlleSeite />)} letzte />
+            <Zeile symbol="list.bullet" ton="leise" titel={TEXT.alle_unterlagen(VORLAGEN.length)} onPress={() => nav.oeffnen("alle", () => <AlleSeite />)} letzte />
           </Karte>
         </View>
       )}

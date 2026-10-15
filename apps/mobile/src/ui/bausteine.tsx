@@ -6,25 +6,37 @@ import { AccessibilityInfo, ActivityIndicator, Pressable, Text as RNText, Switch
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { T as TEXT } from "../texte";
 import { DatumWahl } from "./datumwahl";
-import { GROESSE, RADIUS, SCHRIFT, TASTATUR_FERTIG, ZIEL, istIos, useFarben, weich } from "./thema";
+import { GROESSE, HAARLINIE, RADIUS, SCHRIFT, TASTATUR_FERTIG, ZIEL, istIos, schattenStil, useFarben, weich, type Farben } from "./thema";
 
-type Variante = "grossTitel" | "titel" | "gross" | "basis" | "klein" | "caption";
+type Variante = "grossTitel" | "titel" | "gross" | "basis" | "klein" | "caption" | "mini";
+/** Überschriften in Amtlos Serif (wie Website und Dokumente), Lesetext in Amtlos Sans. */
 const STIL: Record<Variante, TextStyle> = {
-  grossTitel: { fontSize: GROESSE.grossTitel, lineHeight: 40, fontFamily: SCHRIFT.bold, letterSpacing: -0.4 },
-  titel: { fontSize: GROESSE.titel, lineHeight: 28, fontFamily: SCHRIFT.bold },
-  gross: { fontSize: GROESSE.gross, lineHeight: 26, fontFamily: SCHRIFT.bold },
+  grossTitel: { fontSize: GROESSE.grossTitel, lineHeight: 39, fontFamily: SCHRIFT.serif, letterSpacing: -0.6 },
+  titel: { fontSize: GROESSE.titel, lineHeight: 32, fontFamily: SCHRIFT.serif, letterSpacing: -0.4 },
+  gross: { fontSize: GROESSE.gross, lineHeight: 26, fontFamily: SCHRIFT.serif, letterSpacing: -0.2 },
   basis: { fontSize: GROESSE.basis, lineHeight: 24, fontFamily: SCHRIFT.regular },
-  klein: { fontSize: GROESSE.klein, lineHeight: 20, fontFamily: SCHRIFT.regular },
-  caption: { fontSize: GROESSE.caption, lineHeight: 18, fontFamily: SCHRIFT.regular },
+  klein: { fontSize: GROESSE.klein, lineHeight: 21, fontFamily: SCHRIFT.regular },
+  caption: { fontSize: GROESSE.caption, lineHeight: 18, fontFamily: SCHRIFT.regular, letterSpacing: 0.1 },
+  mini: { fontSize: GROESSE.mini, lineHeight: 13, fontFamily: SCHRIFT.halb, letterSpacing: 0.2 },
 };
+const SERIF = new Set<Variante>(["grossTitel", "titel", "gross"]);
 
-/** Text mit Markenschrift. `fett` wechselt die Schriftdatei (keine künstliche Fettung). */
+/** Text mit Markenschrift. `fett` wählt den Halbfett-Schnitt (keine künstliche Fettung); Überschriften bleiben Serif. */
 export function T({ v = "basis", fett, leise, farbe, stil, children, ...rest }: { v?: Variante; fett?: boolean; leise?: boolean; farbe?: string; stil?: StyleProp<TextStyle>; children: ReactNode } & Omit<React.ComponentProps<typeof RNText>, "style">) {
   const f = useFarben();
   return (
-    <RNText {...rest} style={[STIL[v], fett ? { fontFamily: SCHRIFT.bold } : null, { color: farbe ?? (leise ? f.tinteLeise : f.tinte) }, stil]}>
+    <RNText {...rest} style={[STIL[v], fett && !SERIF.has(v) ? { fontFamily: SCHRIFT.halb } : null, { color: farbe ?? (leise ? f.tinteLeise : f.tinte) }, stil]}>
       {children}
     </RNText>
+  );
+}
+
+/** Beträge und Ziffern: fett, gleich breite Ziffern – Spalten stehen untereinander. */
+export function Betrag({ children, v = "basis", farbe, stil }: { children: ReactNode; v?: Variante; farbe?: string; stil?: StyleProp<TextStyle> }) {
+  return (
+    <T v={v} farbe={farbe} stil={[{ fontFamily: SCHRIFT.bold, fontVariant: ["tabular-nums"] }, stil]}>
+      {children}
+    </T>
   );
 }
 
@@ -59,11 +71,64 @@ export function Symbol({ name, groesse = 22, farbe, gewicht = "medium" }: { name
   );
 }
 
-/** Primärer und leiser Knopf: 48 pt hoch, Haptik beim Tippen. */
-export function Knopf({ text, onPress, leise, ton, gefahr, deaktiviert, laedt, symbol, stil }: { text: string; onPress: () => void; leise?: boolean; ton?: boolean; gefahr?: boolean; deaktiviert?: boolean; laedt?: boolean; symbol?: string; stil?: StyleProp<ViewStyle> }) {
+export type Ton = "amt" | "bald" | "frist" | "leise";
+const tonFarben = (f: Farben, ton: Ton) =>
+  ton === "bald" ? { grund: f.baldHauch, zeichen: f.bald } : ton === "frist" ? { grund: f.fristHauch, zeichen: f.frist } : ton === "leise" ? { grund: f.flaeche, zeichen: f.tinteLeise } : { grund: f.amtHauch, zeichen: f.amtTief };
+
+/** Symbol auf einer getönten Kachel – vor Listenzeilen und Erklärpunkten, wie in den iOS-Einstellungen. */
+export function Kachel({ symbol, ton = "amt", groesse = 34 }: { symbol: string; ton?: Ton; groesse?: number }) {
   const f = useFarben();
-  const farbe = gefahr ? f.frist : f.amt;
-  if (ton) return <TonKnopf text={text} onPress={onPress} symbol={symbol} stil={stil} deaktiviert={deaktiviert} laedt={laedt} />;
+  const t = tonFarben(f, ton);
+  return (
+    <View style={{ width: groesse, height: groesse, borderRadius: Math.round(groesse * 0.29), backgroundColor: t.grund, alignItems: "center", justifyContent: "center" }}>
+      <Symbol name={symbol} groesse={Math.round(groesse * 0.53)} farbe={t.zeichen} gewicht="semibold" />
+    </View>
+  );
+}
+
+/** Anfangsbuchstaben einer Person im Kreis – in Listen von Mitarbeitern und Kunden. */
+export function Initialen({ name, groesse = 34 }: { name: string; groesse?: number }) {
+  const f = useFarben();
+  const teile = name.trim().split(/\s+/).filter(Boolean);
+  const kurz = ((teile[0]?.[0] ?? "") + (teile.length > 1 ? teile.at(-1)![0] : "")).toUpperCase() || "?";
+  return (
+    <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={{ width: groesse, height: groesse, borderRadius: groesse / 2, backgroundColor: f.amtHauch, alignItems: "center", justifyContent: "center" }}>
+      <T v="caption" farbe={f.amtTief} stil={{ fontFamily: SCHRIFT.bold, fontSize: groesse * 0.38, lineHeight: groesse * 0.5, letterSpacing: 0.4 }}>{kurz}</T>
+    </View>
+  );
+}
+
+/**
+ * Der Amtlos-Stempel (wie im App-Symbol): doppelter Ring mit Haken, leicht gedreht – „amtlich erledigt, ohne Amt“.
+ * Das eine wiederkehrende Bildzeichen: Einladung, leere Listen, geschaffte Schritte. Rein dekorativ.
+ */
+export function Stempel({ groesse = 64, farbe, grund }: { groesse?: number; farbe?: string; grund?: string }) {
+  const f = useFarben();
+  const c = farbe ?? f.amt;
+  const ring = Math.max(2, Math.round(groesse * 0.075));
+  return (
+    <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={{ width: groesse, height: groesse, transform: [{ rotate: "-12deg" }] }}>
+      <View style={{ position: "absolute", inset: 0, borderRadius: groesse / 2, borderWidth: ring, borderColor: c, backgroundColor: grund }} />
+      <View style={{ position: "absolute", top: groesse * 0.13, left: groesse * 0.13, right: groesse * 0.13, bottom: groesse * 0.13, borderRadius: groesse, borderWidth: Math.max(1, ring / 3.5), borderColor: c, alignItems: "center", justifyContent: "center" }}>
+        <Symbol name="checkmark" groesse={Math.round(groesse * 0.4)} farbe={c} gewicht="heavy" />
+      </View>
+    </View>
+  );
+}
+
+const tippen = () => {
+  if (istIos) void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+};
+
+/**
+ * Knöpfe: der eine Hauptknopf (gefüllt), `ton` für Zweitrangiges (Hauch), `leise` als Umriss, `buehne` auf der dunklen
+ * Bühnenfläche. 52 pt hoch, gibt beim Drücken leicht nach, Haptik beim Tippen.
+ */
+export function Knopf({ text, onPress, leise, ton, gefahr, buehne, deaktiviert, laedt, symbol, stil }: { text: string; onPress: () => void; leise?: boolean; ton?: boolean; gefahr?: boolean; buehne?: boolean; deaktiviert?: boolean; laedt?: boolean; symbol?: string; stil?: StyleProp<ViewStyle> }) {
+  const f = useFarben();
+  const haupt = gefahr ? f.frist : f.amt;
+  const grund = buehne ? f.buehneKnopf : ton ? f.amtHauch : leise ? "transparent" : haupt;
+  const schrift = buehne ? f.buehneKnopfText : ton ? f.amtTief : leise ? haupt : gefahr ? f.blatt : f.amtText;
   return (
     <Pressable
       accessibilityRole="button"
@@ -71,39 +136,41 @@ export function Knopf({ text, onPress, leise, ton, gefahr, deaktiviert, laedt, s
       accessibilityState={{ disabled: Boolean(deaktiviert || laedt), busy: Boolean(laedt) }}
       disabled={deaktiviert || laedt}
       onPress={() => {
-        if (istIos) void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        tippen();
         onPress();
       }}
       style={({ pressed }) => [
-        { minHeight: ZIEL, paddingHorizontal: 20, borderRadius: 12, flexDirection: "row", gap: 8, alignItems: "center", justifyContent: "center", backgroundColor: leise ? "transparent" : farbe, borderWidth: leise ? 1.5 : 0, borderColor: farbe, opacity: deaktiviert ? 0.45 : pressed ? 0.8 : 1 },
+        {
+          minHeight: 52,
+          paddingHorizontal: 20,
+          borderRadius: RADIUS.knopf,
+          flexDirection: "row",
+          gap: 8,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: grund,
+          borderWidth: leise ? 1.5 : 0,
+          borderColor: haupt,
+          opacity: deaktiviert ? 0.4 : pressed ? 0.86 : 1,
+          transform: [{ scale: pressed && !deaktiviert ? 0.985 : 1 }],
+        },
         stil,
       ]}
     >
-      {laedt ? <ActivityIndicator color={leise ? farbe : f.blatt} /> : null}
-      {!laedt && symbol ? <Symbol name={symbol} groesse={18} farbe={leise ? farbe : f.blatt} /> : null}
+      {laedt ? <ActivityIndicator color={schrift} /> : symbol ? <Symbol name={symbol} groesse={18} farbe={schrift} gewicht="semibold" /> : null}
       {/* der Text bleibt beim Laden stehen („Wird verschlüsselt …“) */}
-      <RNText style={{ fontFamily: SCHRIFT.bold, fontSize: GROESSE.basis, color: leise ? farbe : f.blatt, textAlign: "center", flexShrink: 1 }}>{text}</RNText>
+      <RNText style={{ fontFamily: SCHRIFT.halb, fontSize: GROESSE.basis, letterSpacing: 0.1, color: schrift, textAlign: "center", flexShrink: 1 }}>{text}</RNText>
     </Pressable>
   );
 }
 
-/** Zweitrangige Handlung als ruhige Fläche (Hauch der Handlungsfarbe) – neben dem einen Hauptknopf eines Bildschirms. */
-function TonKnopf({ text, onPress, symbol, stil, deaktiviert, laedt }: { text: string; onPress: () => void; symbol?: string; stil?: StyleProp<ViewStyle>; deaktiviert?: boolean; laedt?: boolean }) {
+/** Schnellzugriff als Kachel: Symbol oben, Beschriftung darunter – zwei nebeneinander. */
+export function SchnellKachel({ symbol, text, onPress }: { symbol: string; text: string; onPress: () => void }) {
   const f = useFarben();
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={text}
-      accessibilityState={{ disabled: Boolean(deaktiviert || laedt), busy: Boolean(laedt) }}
-      disabled={deaktiviert || laedt}
-      onPress={() => {
-        if (istIos) void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        onPress();
-      }}
-      style={({ pressed }) => [{ minHeight: ZIEL, paddingHorizontal: 18, borderRadius: 12, flexDirection: "row", gap: 8, alignItems: "center", justifyContent: "center", backgroundColor: f.amtHauch, opacity: deaktiviert ? 0.45 : pressed ? 0.75 : 1 }, stil]}
-    >
-      {laedt ? <ActivityIndicator color={f.amtTief} /> : symbol ? <Symbol name={symbol} groesse={18} farbe={f.amtTief} /> : null}
-      <RNText style={{ fontFamily: SCHRIFT.bold, fontSize: GROESSE.basis, color: f.amtTief, textAlign: "center", flexShrink: 1 }}>{text}</RNText>
+    <Pressable accessibilityRole="button" accessibilityLabel={text} onPress={onPress} style={({ pressed }) => [{ flex: 1, minHeight: 104, padding: 14, borderRadius: RADIUS.karte, backgroundColor: f.blatt, justifyContent: "space-between", gap: 12, borderWidth: f.schatten ? 0 : 1, borderColor: f.linie, opacity: pressed ? 0.7 : 1 }, schattenStil(f)]}>
+      <Kachel symbol={symbol} />
+      <T fett>{text}</T>
     </Pressable>
   );
 }
@@ -113,8 +180,8 @@ export function TextKnopf({ text, onPress, symbol, gefahr, leise, stil, label }:
   const f = useFarben();
   const farbe = gefahr ? f.frist : leise ? f.tinteLeise : f.amt;
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={label ?? text} onPress={onPress} hitSlop={4} style={({ pressed }) => [{ minHeight: 44, flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-start", opacity: pressed ? 0.6 : 1 }, stil]}>
-      {symbol ? <Symbol name={symbol} groesse={17} farbe={farbe} /> : null}
+    <Pressable accessibilityRole="button" accessibilityLabel={label ?? text} onPress={onPress} hitSlop={4} style={({ pressed }) => [{ minHeight: 44, flexDirection: "row", alignItems: "center", gap: 7, alignSelf: "flex-start", opacity: pressed ? 0.55 : 1 }, stil]}>
+      {symbol ? <Symbol name={symbol} groesse={16} farbe={farbe} gewicht="semibold" /> : null}
       <T v="klein" fett farbe={farbe}>{text}</T>
     </Pressable>
   );
@@ -125,16 +192,59 @@ export function Fuss({ children, ueber }: { children: ReactNode; ueber?: ReactNo
   const f = useFarben();
   const inset = useSafeAreaInsets();
   return (
-    <View style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: Math.max(inset.bottom, 12) + 4, borderTopWidth: 0.5, borderColor: f.linie, backgroundColor: f.papier, gap: 8 }}>
+    <View style={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: Math.max(inset.bottom, 14) + 4, borderTopWidth: HAARLINIE, borderColor: f.linie, backgroundColor: f.papier, gap: 8 }}>
       {ueber}
       <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>{children}</View>
     </View>
   );
 }
 
+/** Runder Zurück-Knopf im Fuß eines Ablaufs (neben dem Hauptknopf). */
+export function ZurueckKnopf({ onPress, label }: { onPress: () => void; label: string }) {
+  const f = useFarben();
+  return (
+    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} hitSlop={4} style={({ pressed }) => ({ width: 52, height: 52, borderRadius: RADIUS.knopf, alignItems: "center", justifyContent: "center", backgroundColor: pressed ? f.linie : f.flaeche })}>
+      <Symbol name="chevron.left" groesse={19} farbe={f.tinte} gewicht="semibold" />
+    </Pressable>
+  );
+}
+
+/** Runder Knopf oben in Vollbild-Abläufen (Schließen) – ruhige Fläche, klar als Knopf erkennbar. */
+export function KopfKnopf({ symbol, label, onPress }: { symbol: string; label: string; onPress: () => void }) {
+  const f = useFarben();
+  return (
+    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} hitSlop={10} style={({ pressed }) => ({ width: ZIEL, height: ZIEL, alignItems: "center", justifyContent: "center", opacity: pressed ? 0.6 : 1 })}>
+      <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: f.flaeche, alignItems: "center", justifyContent: "center" }}>
+        <Symbol name={symbol} groesse={14} farbe={f.tinteLeise} gewicht="bold" />
+      </View>
+    </Pressable>
+  );
+}
+
+/** Zeile mit Kennzahl-Symbol und einem Satz – für Ergebnisse („Für 15 davon gibt es eine Vorlage“). */
+export function Fakt({ symbol, ton, text, letzte }: { symbol: string; ton?: Ton; text: string; letzte?: boolean }) {
+  const f = useFarben();
+  return (
+    <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
+      <Kachel symbol={symbol} ton={ton} groesse={30} />
+      <View style={{ flex: 1, paddingVertical: 12, borderBottomWidth: letzte ? 0 : HAARLINIE, borderColor: f.linie }}>
+        <T v="klein">{text}</T>
+      </View>
+    </View>
+  );
+}
+
+function HilfeKnopf({ label, offen, umschalten }: { label: string; offen: boolean; umschalten: () => void }) {
+  const f = useFarben();
+  return (
+    <Pressable accessibilityRole="button" accessibilityLabel={`${TEXT.hilfe_zu} ${label}`} accessibilityState={{ expanded: offen }} onPress={umschalten} hitSlop={12} style={{ padding: 2 }}>
+      <Symbol name={offen ? "info.circle.fill" : "info.circle"} groesse={16} farbe={f.amt} />
+    </Pressable>
+  );
+}
+
 /** Beschriftung eines Felds; Hilfe hinter einem (i), damit Formulare ruhig bleiben. */
 export function FeldKopf({ label, hilfe, optional }: { label: string; hilfe?: string; optional?: boolean }) {
-  const f = useFarben();
   const [offen, setOffen] = useState(false);
   return (
     <View>
@@ -142,13 +252,9 @@ export function FeldKopf({ label, hilfe, optional }: { label: string; hilfe?: st
         <T v="klein" fett stil={{ flexShrink: 1 }}>{label}</T>
         {/* freiwillige Angaben kennzeichnen – sonst merkt man erst am Ende, was wirklich fehlt */}
         {optional ? <T v="caption" leise>{TEXT.optional}</T> : null}
-        {hilfe ? (
-          <Pressable accessibilityRole="button" accessibilityLabel={`${TEXT.hilfe_zu} ${label}`} accessibilityState={{ expanded: offen }} onPress={() => { weich(); setOffen(!offen); }} hitSlop={12} style={{ padding: 2 }}>
-            <Symbol name={offen ? "info.circle.fill" : "info.circle"} groesse={17} farbe={f.amt} />
-          </Pressable>
-        ) : null}
+        {hilfe ? <HilfeKnopf label={label} offen={offen} umschalten={() => { weich(); setOffen(!offen); }} /> : null}
       </View>
-      {hilfe && offen ? <T v="caption" leise stil={{ marginTop: 3 }}>{hilfe}</T> : null}
+      {hilfe && offen ? <T v="caption" leise stil={{ marginTop: 4, maxWidth: 520 }}>{hilfe}</T> : null}
     </View>
   );
 }
@@ -156,12 +262,12 @@ export function FeldKopf({ label, hilfe, optional }: { label: string; hilfe?: st
 /** Kurze Hilfe (passt ins Feld) steht als Platzhalter darin; längere Erklärungen hinter dem (i). */
 export const istBeispiel = (hilfe?: string, mehrzeilig?: boolean) => Boolean(hilfe && hilfe.trim().length <= (mehrzeilig ? 80 : 34));
 
-/** Abschnittsüberschrift wie in iOS-Listen: ruhig, klein, in Tinte – keine Großbuchstaben. */
+/** Abschnittsüberschrift: Amtlos Serif, wie eine Zwischenüberschrift im Dokument. */
 export function Abschnitt({ titel, rechts, children }: { titel?: string; rechts?: ReactNode; children: ReactNode }) {
   return (
-    <View style={{ marginTop: 28 }}>
+    <View style={{ marginTop: 32 }}>
       {titel ? (
-        <View style={{ flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", marginBottom: 8 }}>
+        <View style={{ flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", marginBottom: 10 }}>
           <T v="gross" accessibilityRole="header">{titel}</T>
           {rechts}
         </View>
@@ -171,25 +277,31 @@ export function Abschnitt({ titel, rechts, children }: { titel?: string; rechts?
   );
 }
 
-/** Zeile in einer Liste: tippbar, mit Haarlinie unten. */
-export function Zeile({ links, titel, text, wert, rechts, onPress, letzte }: { links?: ReactNode; titel: string; text?: string; wert?: string; rechts?: ReactNode; onPress?: () => void; letzte?: boolean }) {
+/**
+ * Zeile in einer Liste: tippbar, Haarlinie unten (eingerückt ab dem Text, wie in iOS). `symbol` setzt eine getönte
+ * Kachel davor, `links` ein eigenes Element (z. B. Status-Kreis).
+ */
+export function Zeile({ links, symbol, ton, titel, text, wert, rechts, onPress, letzte }: { links?: ReactNode; symbol?: string; ton?: Ton; titel: string; text?: string; wert?: string; rechts?: ReactNode; onPress?: () => void; letzte?: boolean }) {
   const f = useFarben();
-  const inhalt = (
-    <View style={{ flexDirection: "row", alignItems: "center", gap: 14, paddingVertical: 12, borderBottomWidth: letzte ? 0 : 1, borderColor: f.linieLeise }}>
-      {links}
-      <View style={{ flex: 1, minWidth: 0 }}>
-        <T fett numberOfLines={2}>{titel}</T>
-        {text ? <T v="klein" leise numberOfLines={2} stil={{ marginTop: 2 }}>{text}</T> : null}
+  const vorn = symbol ? <Kachel symbol={symbol} ton={ton} /> : links;
+  const inhalt = (pressed: boolean) => (
+    <View style={{ flexDirection: "row", alignItems: "center", opacity: pressed ? 0.55 : 1 }}>
+      {vorn ? <View style={{ marginRight: 14, minWidth: 24, alignItems: "center" }}>{vorn}</View> : null}
+      <View style={{ flex: 1, minWidth: 0, flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 13, minHeight: 58, borderBottomWidth: letzte ? 0 : HAARLINIE, borderColor: f.linie }}>
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <T fett numberOfLines={2}>{titel}</T>
+          {text ? <T v="klein" leise numberOfLines={2} stil={{ marginTop: 1 }}>{text}</T> : null}
+        </View>
+        {/* Betrag rechts (Rechnungen, Belege) – das, wonach man in Listen sucht */}
+        {wert ? <Betrag stil={{ marginLeft: 4 }}>{wert}</Betrag> : null}
+        {rechts ?? (onPress ? <Symbol name="chevron.right" groesse={14} farbe={f.zeiger} gewicht="semibold" /> : null)}
       </View>
-      {/* Betrag rechts (Rechnungen, Belege) – das, wonach man in Listen sucht */}
-      {wert ? <T fett stil={{ marginLeft: 4 }}>{wert}</T> : null}
-      {rechts ?? (onPress ? <Symbol name="chevron.right" groesse={16} /> : null)}
     </View>
   );
-  if (!onPress) return inhalt;
+  if (!onPress) return inhalt(false);
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}>
-      {inhalt}
+    <Pressable accessibilityRole="button" onPress={onPress}>
+      {({ pressed }) => inhalt(pressed)}
     </Pressable>
   );
 }
@@ -199,14 +311,16 @@ export function Hinweis({ text, art = "info", symbol }: { text: string; art?: "i
   const f = useFarben();
   // Orange nur für echte Warnungen – neutrale Hinweise ruhig, sonst wirkt alles wie eine Warnung
   const farbe = art === "fehler" ? f.frist : art === "erfolg" ? f.amt : art === "warnung" ? f.bald : f.tinteLeise;
-  const hg = art === "fehler" ? f.fristHauch : art === "erfolg" ? f.amtHauch : art === "warnung" ? f.baldHauch : f.linieLeise;
+  const hg = art === "fehler" ? f.fristHauch : art === "erfolg" ? f.amtHauch : art === "warnung" ? f.baldHauch : f.flaeche;
   // Fehler und Erfolge ansagen (VoiceOver kennt keine Live-Regionen)
   useEffect(() => {
     if (art === "fehler" || art === "erfolg") AccessibilityInfo.announceForAccessibility(text);
   }, [art, text]);
   return (
-    <View accessibilityRole={art === "fehler" ? "alert" : "text"} accessibilityLiveRegion="polite" style={{ flexDirection: "row", gap: 10, alignItems: "flex-start", backgroundColor: hg, borderRadius: RADIUS.klein, padding: 12, marginVertical: 6 }}>
-      <Symbol name={symbol ?? (art === "fehler" ? "exclamationmark.triangle" : art === "erfolg" ? "checkmark" : "info.circle")} groesse={18} farbe={farbe} />
+    <View accessibilityRole={art === "fehler" ? "alert" : "text"} accessibilityLiveRegion="polite" style={{ flexDirection: "row", gap: 11, alignItems: "flex-start", backgroundColor: hg, borderRadius: RADIUS.klein, paddingVertical: 12, paddingHorizontal: 14, marginVertical: 6 }}>
+      <View style={{ paddingTop: 2 }}>
+        <Symbol name={symbol ?? (art === "fehler" ? "exclamationmark.triangle" : art === "erfolg" ? "checkmark.circle" : art === "warnung" ? "exclamationmark.circle" : "info.circle")} groesse={17} farbe={farbe} gewicht="semibold" />
+      </View>
       <T v="klein" stil={{ flex: 1 }}>{text}</T>
     </View>
   );
@@ -226,15 +340,34 @@ export function Status({ status, text }: { status: string; text: string }) {
 
 // ---------------------------------------------------------------- Formulare (E-120)
 
-/** Karte: weiße Fläche mit Haarlinie, für zusammengehörige Zeilen oder ein Formular. */
+/** Karte: helle Fläche mit weichem Schatten (dunkel: Haarlinie), für zusammengehörige Zeilen oder ein Formular. */
 export function Karte({ children, stil, rahmen }: { children: ReactNode; stil?: StyleProp<ViewStyle>; rahmen?: string }) {
   const f = useFarben();
-  return <View style={[{ backgroundColor: f.blatt, borderRadius: RADIUS.karte, borderWidth: rahmen ? 1.5 : 1, borderColor: rahmen ?? f.linie, paddingHorizontal: 14 }, stil]}>{children}</View>;
+  return (
+    <View style={[{ backgroundColor: f.blatt, borderRadius: RADIUS.karte, borderWidth: rahmen ? 1.5 : f.schatten ? 0 : 1, borderColor: rahmen ?? f.linie, paddingHorizontal: 14 }, schattenStil(f), stil]}>
+      {children}
+    </View>
+  );
 }
 
+/** Gemeinsamer Stil für Eingabeflächen (Textfeld, Datum, Auswahlzeile): Rahmen ≥ 3:1, im Fokus Amtsgrün. */
+export function feldRahmen(f: Farben, zustand: { fokus?: boolean; fehler?: boolean } = {}): ViewStyle {
+  return {
+    minHeight: 50,
+    borderRadius: RADIUS.klein,
+    borderWidth: zustand.fokus || zustand.fehler ? 2 : 1,
+    borderColor: zustand.fehler ? f.frist : zustand.fokus ? f.amt : f.rahmen,
+    // Rahmen wird dicker – Innenabstand gleicht aus, damit der Text nicht springt
+    paddingHorizontal: zustand.fokus || zustand.fehler ? 13 : 14,
+    backgroundColor: f.blatt,
+  };
+}
+const feldText = (f: Farben): TextStyle => ({ color: f.tinte, fontFamily: SCHRIFT.regular, fontSize: GROESSE.basis });
+
 /** Beschriftetes Textfeld; die Beschriftung steht darüber und ist mit dem Feld verbunden. */
-export function Feld({ label, wert, aendern, hilfe, fehler, mehrzeilig, ohneLabel, optional, ...rest }: { label: string; wert: string; aendern: (w: string) => void; hilfe?: string; fehler?: string | null; mehrzeilig?: boolean; ohneLabel?: boolean; optional?: boolean } & Omit<React.ComponentProps<typeof TextInput>, "value" | "onChangeText" | "style">) {
+export function Feld({ label, wert, aendern, hilfe, fehler, mehrzeilig, ohneLabel, optional, onFocus, onBlur, ...rest }: { label: string; wert: string; aendern: (w: string) => void; hilfe?: string; fehler?: string | null; mehrzeilig?: boolean; ohneLabel?: boolean; optional?: boolean } & Omit<React.ComponentProps<typeof TextInput>, "value" | "onChangeText" | "style">) {
   const f = useFarben();
+  const [fokus, setFokus] = useState(false);
   const beispiel = istBeispiel(hilfe, mehrzeilig) && !rest.placeholder;
   const zahlen = rest.keyboardType === "decimal-pad" || rest.keyboardType === "number-pad" || rest.keyboardType === "numbers-and-punctuation" || rest.keyboardType === "phone-pad";
   return (
@@ -249,10 +382,19 @@ export function Feld({ label, wert, aendern, hilfe, fehler, mehrzeilig, ohneLabe
         multiline={mehrzeilig}
         inputAccessoryViewID={zahlen ? TASTATUR_FERTIG : undefined}
         placeholderTextColor={f.tinteLeise}
-        style={{ minHeight: mehrzeilig ? 96 : ZIEL, borderWidth: 1.5, borderColor: fehler ? f.frist : f.rahmen, borderRadius: RADIUS.klein, paddingHorizontal: 14, paddingTop: mehrzeilig ? 12 : 0, textAlignVertical: mehrzeilig ? "top" : "center", color: f.tinte, backgroundColor: f.blatt, fontFamily: SCHRIFT.regular, fontSize: GROESSE.basis, marginTop: 6 }}
+        selectionColor={f.amt}
+        onFocus={(e) => {
+          setFokus(true);
+          onFocus?.(e);
+        }}
+        onBlur={(e) => {
+          setFokus(false);
+          onBlur?.(e);
+        }}
+        style={[feldRahmen(f, { fokus, fehler: Boolean(fehler) }), feldText(f), { minHeight: mehrzeilig ? 104 : 50, paddingTop: mehrzeilig ? 13 : 0, paddingBottom: mehrzeilig ? 13 : 0, textAlignVertical: mehrzeilig ? "top" : "center", marginTop: 7 }]}
         {...rest}
       />
-      {fehler ? <T v="caption" farbe={f.frist} stil={{ marginTop: 4 }}>{fehler}</T> : null}
+      {fehler ? <T v="caption" farbe={f.frist} stil={{ marginTop: 5 }}>{fehler}</T> : null}
     </View>
   );
 }
@@ -275,13 +417,14 @@ export function DatumFeld({ label, wert, aendern, hilfe, ohneHeute, ohneLabel }:
   const f = useFarben();
   const heuteText = TEXT.heute;
   const [text, setText] = useState(textAus(wert));
+  const [fokus, setFokus] = useState(false);
   useEffect(() => setText(textAus(wert)), [wert]);
   const heute = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Berlin" }).format(new Date());
   const falsch = text.trim() !== "" && !isoAus(text);
   return (
     <View style={{ marginTop: ohneLabel ? 8 : 20 }}>
       {ohneLabel ? null : <FeldKopf label={label} hilfe={hilfe} />}
-      <View style={{ flexDirection: "row", gap: 8, marginTop: 6, alignItems: "center" }}>
+      <View style={{ flexDirection: "row", gap: 8, marginTop: 7, alignItems: "center" }}>
         <TextInput
           accessibilityLabel={label}
           value={text}
@@ -289,53 +432,59 @@ export function DatumFeld({ label, wert, aendern, hilfe, ohneHeute, ohneLabel }:
             setText(w);
             aendern(w.trim() === "" ? null : isoAus(w));
           }}
+          onFocus={() => setFokus(true)}
+          onBlur={() => setFokus(false)}
           placeholder="TT.MM.JJJJ"
           accessibilityHint={falsch ? TEXT.datum_falsch : undefined}
           placeholderTextColor={f.tinteLeise}
+          selectionColor={f.amt}
           keyboardType="numbers-and-punctuation"
           inputAccessoryViewID={TASTATUR_FERTIG}
-          style={{ flex: 1, minWidth: 0, minHeight: ZIEL, borderWidth: 1.5, borderColor: falsch ? f.frist : f.rahmen, borderRadius: RADIUS.klein, paddingHorizontal: 14, color: f.tinte, backgroundColor: f.blatt, fontFamily: SCHRIFT.regular, fontSize: GROESSE.basis }}
+          style={[feldRahmen(f, { fokus, fehler: falsch }), feldText(f), { flex: 1, minWidth: 0, fontVariant: ["tabular-nums"] }]}
         />
         {ohneHeute ? null : (
-          <Pressable accessibilityRole="button" accessibilityLabel={`${label}: ${heuteText}`} onPress={() => aendern(heute)} style={({ pressed }) => ({ minHeight: ZIEL, paddingHorizontal: 14, borderRadius: RADIUS.klein, justifyContent: "center", backgroundColor: f.amtHauch, opacity: pressed ? 0.7 : 1 })}>
-            <T v="klein" fett farbe={f.amt}>{heuteText}</T>
+          <Pressable accessibilityRole="button" accessibilityLabel={`${label}: ${heuteText}`} onPress={() => aendern(heute)} style={({ pressed }) => ({ minHeight: 50, paddingHorizontal: 15, borderRadius: RADIUS.klein, justifyContent: "center", backgroundColor: f.amtHauch, opacity: pressed ? 0.7 : 1 })}>
+            <T v="klein" fett farbe={f.amtTief}>{heuteText}</T>
           </Pressable>
         )}
         <DatumWahl label={label} wert={wert} aendern={aendern} />
       </View>
-      {falsch ? <T v="caption" farbe={f.frist} stil={{ marginTop: 4 }}>{TEXT.datum_falsch}</T> : null}
+      {falsch ? <T v="caption" farbe={f.frist} stil={{ marginTop: 5 }}>{TEXT.datum_falsch}</T> : null}
     </View>
+  );
+}
+
+/** Chip für Auswahl und Mehrfachauswahl: rund, gewählt in Amtsgrün mit Häkchen (Farbe nie allein). */
+function Chip({ text, an, rolle, onPress, kaestchen }: { text: string; an: boolean; rolle: "radio" | "checkbox"; onPress: () => void; kaestchen?: boolean }) {
+  const f = useFarben();
+  return (
+    <Pressable
+      accessibilityRole={rolle}
+      accessibilityState={{ checked: an }}
+      aria-checked={an}
+      accessibilityLabel={text}
+      hitSlop={4}
+      onPress={() => {
+        if (istIos) void Haptics.selectionAsync();
+        onPress();
+      }}
+      style={({ pressed }) => ({ minHeight: 40, paddingLeft: an || kaestchen ? 11 : 15, paddingRight: 15, borderRadius: 20, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: an ? f.amt : pressed ? f.flaeche : f.blatt, borderWidth: an ? 0 : 1, borderColor: f.rahmen, margin: an ? 1 : 0, flexShrink: 1 })}
+    >
+      {kaestchen ? <Symbol name={an ? "checkmark.square.fill" : "square"} groesse={16} farbe={an ? f.amtText : f.tinteLeise} /> : an ? <Symbol name="checkmark" groesse={13} farbe={f.amtText} gewicht="bold" /> : null}
+      <T v="klein" fett farbe={an ? f.amtText : f.tinte} stil={{ flexShrink: 1 }}>{text}</T>
+    </Pressable>
   );
 }
 
 /** Auswahl als Chips (wenige Optionen) – Radio-Semantik für VoiceOver. */
 export function Wahl<W extends string>({ label, wert, aendern, optionen, hilfe }: { label?: string; wert: W | null; aendern: (w: W) => void; optionen: { wert: W; text: string }[]; hilfe?: string }) {
-  const f = useFarben();
   return (
     <View style={{ marginTop: label ? 20 : 0 }}>
       {label ? <FeldKopf label={label} hilfe={hilfe} /> : null}
-      <View accessibilityRole="radiogroup" accessibilityLabel={label} style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: label ? 8 : 0 }}>
-        {optionen.map((o) => {
-          const an = o.wert === wert;
-          return (
-            <Pressable
-              key={o.wert}
-              accessibilityRole="radio"
-              accessibilityState={{ checked: an }}
-              aria-checked={an}
-              hitSlop={4}
-              onPress={() => {
-                if (istIos) void Haptics.selectionAsync();
-                aendern(o.wert);
-              }}
-              // derselbe Auswahl-Stil wie Mehrfachwahl und Listen: Hauch der Handlungsfarbe, Rahmen, Häkchen
-              style={{ minHeight: ZIEL - 8, paddingHorizontal: 14, borderRadius: 20, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: an ? f.amtHauch : f.blatt, borderWidth: an ? 1.5 : 1, borderColor: an ? f.amt : f.rahmen, flexShrink: 1 }}
-            >
-              {an ? <Symbol name="checkmark" groesse={14} farbe={f.amtTief} gewicht="bold" /> : null}
-              <T v="klein" fett farbe={an ? f.amtTief : f.tinte} stil={{ flexShrink: 1 }}>{o.text}</T>
-            </Pressable>
-          );
-        })}
+      <View accessibilityRole="radiogroup" accessibilityLabel={label} style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: label ? 9 : 0 }}>
+        {optionen.map((o) => (
+          <Chip key={o.wert} text={o.text} an={o.wert === wert} rolle="radio" onPress={() => aendern(o.wert)} />
+        ))}
       </View>
     </View>
   );
@@ -345,29 +494,34 @@ export function Wahl<W extends string>({ label, wert, aendern, optionen, hilfe }
 export function Schalter({ label, wert, aendern, hilfe }: { label: string; wert: boolean; aendern: (w: boolean) => void; hilfe?: string }) {
   const f = useFarben();
   return (
-    <View style={{ flexDirection: "row", alignItems: "center", gap: 12, minHeight: ZIEL, marginTop: 16 }}>
+    <View style={{ flexDirection: "row", alignItems: "center", gap: 12, minHeight: ZIEL + 4, marginTop: 14 }}>
       <View style={{ flex: 1 }}>
         <SchalterText label={label} hilfe={hilfe} />
       </View>
-      <Switch accessibilityLabel={label} value={wert} onValueChange={aendern} trackColor={{ true: f.amt, false: f.linie }} thumbColor="#ffffff" />
+      <Switch accessibilityLabel={label} value={wert} onValueChange={aendern} trackColor={{ true: f.amt, false: f.linie }} thumbColor="#ffffff" ios_backgroundColor={f.linie} />
     </View>
   );
 }
 
 function SchalterText({ label, hilfe }: { label: string; hilfe?: string }) {
-  const f = useFarben();
   const [offen, setOffen] = useState(false);
   return (
     <View>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
         <T stil={{ flexShrink: 1 }}>{label}</T>
-        {hilfe ? (
-          <Pressable accessibilityRole="button" accessibilityLabel={`${TEXT.hilfe_zu} ${label}`} accessibilityState={{ expanded: offen }} onPress={() => { weich(); setOffen(!offen); }} hitSlop={12} style={{ padding: 2 }}>
-            <Symbol name={offen ? "info.circle.fill" : "info.circle"} groesse={17} farbe={f.amt} />
-          </Pressable>
-        ) : null}
+        {hilfe ? <HilfeKnopf label={label} offen={offen} umschalten={() => { weich(); setOffen(!offen); }} /> : null}
       </View>
-      {hilfe && offen ? <T v="caption" leise stil={{ marginTop: 3 }}>{hilfe}</T> : null}
+      {hilfe && offen ? <T v="caption" leise stil={{ marginTop: 4 }}>{hilfe}</T> : null}
+    </View>
+  );
+}
+
+/** Rahmen einer Liste zum Auswählen (Auswahl, Bausteine): eine Fläche, Zeilen mit Haarlinie. */
+function ListenRahmen({ label, rolle, children }: { label: string; rolle?: "radiogroup"; children: ReactNode }) {
+  const f = useFarben();
+  return (
+    <View accessibilityRole={rolle} accessibilityLabel={label} style={{ marginTop: 7, borderWidth: 1, borderColor: f.rahmen, borderRadius: RADIUS.klein, overflow: "hidden", backgroundColor: f.blatt }}>
+      {children}
     </View>
   );
 }
@@ -378,7 +532,7 @@ export function Auswahl<W extends string>({ label, wert, aendern, optionen, hilf
   return (
     <View style={{ marginTop: ohneLabel ? 8 : 20 }}>
       {ohneLabel ? null : <FeldKopf label={label} hilfe={hilfe} />}
-      <View accessibilityRole="radiogroup" accessibilityLabel={label} style={{ marginTop: 6, borderWidth: 1.5, borderColor: f.rahmen, borderRadius: RADIUS.klein, overflow: "hidden" }}>
+      <ListenRahmen label={label} rolle="radiogroup">
         {optionen.map((o, i) => {
           const an = o.wert === wert;
           return (
@@ -391,45 +545,27 @@ export function Auswahl<W extends string>({ label, wert, aendern, optionen, hilf
                 if (istIos) void Haptics.selectionAsync();
                 aendern(o.wert);
               }}
-              style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 10, minHeight: ZIEL, paddingHorizontal: 14, paddingVertical: 8, borderTopWidth: i ? 1 : 0, borderColor: f.linieLeise, backgroundColor: an ? f.amtHauch : pressed ? f.papier : f.blatt })}
+              style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 12, minHeight: 50, paddingHorizontal: 14, paddingVertical: 10, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie, backgroundColor: an ? f.amtHauch : pressed ? f.flaeche : f.blatt })}
             >
-              <T v="klein" fett={an} stil={{ flex: 1 }}>{o.text}</T>
-              {an ? <Symbol name="checkmark" groesse={16} farbe={f.amt} gewicht="semibold" /> : null}
+              <View style={{ width: 20, height: 20, borderRadius: 10, borderWidth: an ? 6 : 1.5, borderColor: an ? f.amt : f.rahmen, backgroundColor: f.blatt }} />
+              <T v="klein" fett={an} farbe={an ? f.amtTief : f.tinte} stil={{ flex: 1 }}>{o.text}</T>
             </Pressable>
           );
         })}
-      </View>
+      </ListenRahmen>
     </View>
   );
 }
 
-/** Mehrfachauswahl als Chips mit Häkchen (Checkbox-Semantik), z. B. Allergene. */
+/** Mehrfachauswahl als Chips mit Kästchen (Checkbox-Semantik), z. B. Allergene. */
 export function MehrfachWahl({ label, werte, aendern, optionen, hilfe, ohneLabel }: { label: string; werte: string[]; aendern: (w: string[]) => void; optionen: { wert: string; text: string }[]; hilfe?: string; ohneLabel?: boolean }) {
-  const f = useFarben();
   return (
     <View style={{ marginTop: ohneLabel ? 8 : 20 }}>
       {ohneLabel ? null : <FeldKopf label={label} hilfe={hilfe} />}
-      <View accessibilityLabel={label} style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8 }}>
+      <View accessibilityLabel={label} style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 9 }}>
         {optionen.map((o) => {
           const an = werte.includes(o.wert);
-          return (
-            <Pressable
-              key={o.wert}
-              accessibilityRole="checkbox"
-              accessibilityState={{ checked: an }}
-              aria-checked={an}
-              accessibilityLabel={o.text}
-              hitSlop={4}
-              onPress={() => {
-                if (istIos) void Haptics.selectionAsync();
-                aendern(an ? werte.filter((x) => x !== o.wert) : [...werte, o.wert]);
-              }}
-              style={{ minHeight: ZIEL - 8, paddingHorizontal: 12, borderRadius: 20, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: an ? f.amtHauch : f.blatt, borderWidth: 1.5, borderColor: an ? f.amt : f.rahmen }}
-            >
-              <Symbol name={an ? "checkmark.square.fill" : "square"} groesse={16} farbe={an ? f.amt : f.tinteLeise} />
-              <T v="klein" fett={an} farbe={an ? f.amtTief : f.tinte}>{o.text}</T>
-            </Pressable>
-          );
+          return <Chip key={o.wert} text={o.text} an={an} rolle="checkbox" kaestchen onPress={() => aendern(an ? werte.filter((x) => x !== o.wert) : [...werte, o.wert])} />;
         })}
       </View>
     </View>
@@ -448,7 +584,7 @@ export function BausteinListe({ label, hilfe, werte, aendern, optionen }: { labe
   return (
     <View style={{ marginTop: 20 }}>
       <FeldKopf label={label} hilfe={hilfe} />
-      <View accessibilityLabel={label} style={{ marginTop: 6, borderWidth: 1.5, borderColor: f.rahmen, borderRadius: RADIUS.klein, overflow: "hidden" }}>
+      <ListenRahmen label={label}>
         {optionen.map((o, i) => {
           const an = werte.includes(o.wert);
           return (
@@ -462,37 +598,43 @@ export function BausteinListe({ label, hilfe, werte, aendern, optionen }: { labe
                 if (istIos) void Haptics.selectionAsync();
                 aendern(an ? werte.filter((x) => x !== o.wert) : [...werte, o.wert]);
               }}
-              style={({ pressed }) => ({ flexDirection: "row", gap: 10, paddingHorizontal: 12, paddingVertical: 10, borderTopWidth: i ? 1 : 0, borderColor: f.linieLeise, backgroundColor: an ? f.amtHauch : pressed ? f.papier : f.blatt })}
+              style={({ pressed }) => ({ flexDirection: "row", gap: 12, paddingHorizontal: 14, paddingVertical: 12, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie, backgroundColor: an ? f.amtHauch : pressed ? f.flaeche : f.blatt })}
             >
-              <Symbol name={an ? "checkmark.square.fill" : "square"} groesse={18} farbe={an ? f.amt : f.tinteLeise} />
+              <View style={{ paddingTop: 1 }}>
+                <Symbol name={an ? "checkmark.square.fill" : "square"} groesse={19} farbe={an ? f.amt : f.rahmen} />
+              </View>
               <View style={{ flex: 1 }}>
                 <T v="klein">{o.text}</T>
-                {o.quelle ? <T v="caption" leise stil={{ marginTop: 2 }}>{o.quelle}</T> : null}
+                {o.quelle ? <T v="caption" leise stil={{ marginTop: 3 }}>{o.quelle}</T> : null}
               </View>
             </Pressable>
           );
         })}
-      </View>
+      </ListenRahmen>
     </View>
   );
 }
 
-/** Suchfeld für Listen (Unterlagen, Kunden, Auswahl). */
+/** Suchfeld für Listen (Unterlagen, Kunden, Auswahl): gefüllte Fläche wie in iOS. */
 export function Suchfeld({ wert, setzen, label = TEXT.suchen }: { wert: string; setzen: (w: string) => void; label?: string }) {
   const f = useFarben();
+  const [fokus, setFokus] = useState(false);
   return (
-    <View style={{ flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 12, minHeight: 44, borderRadius: 12, backgroundColor: f.blatt, borderWidth: 1, borderColor: f.rahmen }}>
-      <Symbol name="magnifyingglass" groesse={18} />
+    <View style={{ flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 12, minHeight: 44, borderRadius: RADIUS.klein, backgroundColor: f.flaeche, borderWidth: 2, borderColor: fokus ? f.amt : "transparent" }}>
+      <Symbol name="magnifyingglass" groesse={17} farbe={f.tinteLeise} gewicht="semibold" />
       <TextInput
         accessibilityLabel={label}
         placeholder={label}
         placeholderTextColor={f.tinteLeise}
+        selectionColor={f.amt}
         value={wert}
         onChangeText={setzen}
+        onFocus={() => setFokus(true)}
+        onBlur={() => setFokus(false)}
         autoCorrect={false}
         clearButtonMode="while-editing"
         returnKeyType="search"
-        style={{ flex: 1, minHeight: 44, color: f.tinte, fontFamily: SCHRIFT.regular, fontSize: GROESSE.basis }}
+        style={[feldText(f), { flex: 1, minHeight: 40 }]}
       />
     </View>
   );

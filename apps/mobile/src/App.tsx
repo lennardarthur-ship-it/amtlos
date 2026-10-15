@@ -1,4 +1,4 @@
-import { AtkinsonHyperlegible_400Regular, AtkinsonHyperlegible_700Bold, useFonts } from "@expo-google-fonts/atkinson-hyperlegible";
+import { useFonts } from "expo-font";
 import { BlurView } from "expo-blur";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -11,11 +11,11 @@ import { Meine } from "./seiten/Meine";
 import { AutoSicherung, WiederherstellenSeite } from "./seiten/Sicherung";
 import { Unterlagen } from "./seiten/Unterlagen";
 import { T as TEXT } from "./texte";
-import { Karte, Knopf, Symbol, T, TextKnopf } from "./ui/bausteine";
+import { Kachel, Karte, Knopf, Symbol, T, TextKnopf } from "./ui/bausteine";
 import { MeldungAnbieter } from "./ui/meldung";
 import { entsperren } from "./unterlagen/sperre";
 import { Stapel, useNav } from "./ui/navigation";
-import { TASTATUR_FERTIG, ZIEL, istIos, useFarben } from "./ui/thema";
+import { HAARLINIE, TASTATUR_FERTIG, ZIEL, istIos, useFarben } from "./ui/thema";
 import { AmtlosAnbieter, useAmtlos, type Tab } from "./zustand";
 import { KontoAnbieter } from "./konto/konto";
 
@@ -37,20 +37,20 @@ function Leiste({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
   const dunkel = useColorScheme() === "dark";
   const inset = useSafeAreaInsets();
   const inhalt = (
-    <View accessibilityRole="tablist" style={{ flexDirection: "row", paddingBottom: inset.bottom, borderTopWidth: 0.5, borderColor: f.linie }}>
+    <View accessibilityRole="tablist" style={{ flexDirection: "row", paddingBottom: Math.max(inset.bottom - 6, 4), borderTopWidth: HAARLINIE, borderColor: f.linie }}>
       {TABS.map((k) => {
         const an = k.id === tab;
         return (
-          <Pressable key={k.id} accessibilityRole="tab" accessibilityLabel={TEXT.tabs[k.id]} accessibilityState={{ selected: an }} onPress={() => setTab(k.id)} style={{ flex: 1, minHeight: ZIEL + 6, alignItems: "center", justifyContent: "center", gap: 3, paddingTop: 6 }}>
-            <Symbol name={k.symbol} groesse={24} farbe={an ? f.amt : f.tinteLeise} gewicht={an ? "semibold" : "regular"} />
-            <T v="caption" fett={an} farbe={an ? f.amt : f.tinteLeise} stil={{ fontSize: 11, lineHeight: 13 }}>{TEXT.tabs[k.id]}</T>
+          <Pressable key={k.id} accessibilityRole="tab" accessibilityLabel={TEXT.tabs[k.id]} accessibilityState={{ selected: an }} onPress={() => setTab(k.id)} style={{ flex: 1, minHeight: ZIEL + 4, alignItems: "center", justifyContent: "center", gap: 4, paddingTop: 7 }}>
+            <Symbol name={k.symbol} groesse={23} farbe={an ? f.amt : f.tinteLeise} gewicht={an ? "semibold" : "regular"} />
+            <T v="mini" farbe={an ? f.amt : f.tinteLeise}>{TEXT.tabs[k.id]}</T>
           </Pressable>
         );
       })}
     </View>
   );
   if (istIos) return <BlurView intensity={80} tint={dunkel ? "dark" : "light"} style={{ position: "absolute", left: 0, right: 0, bottom: 0 }}>{inhalt}</BlurView>;
-  return <View style={{ position: "absolute", left: 0, right: 0, bottom: 0, backgroundColor: f.blatt }}>{inhalt}</View>;
+  return <View style={{ position: "absolute", left: 0, right: 0, bottom: 0, backgroundColor: f.papier }}>{inhalt}</View>;
 }
 
 /** App-Sperre (E-129): bei eingeschalteter Sperre nach dem Start und nach jedem Wechsel in den Hintergrund. */
@@ -76,11 +76,13 @@ function Sperre({ children }: { children: React.ReactNode }) {
   }, [an, offen]);
   if (!an || offen) return <>{children}</>;
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: f.papier, padding: 24, justifyContent: "center", alignItems: "center", gap: 12 }}>
-      <Symbol name="lock.fill" groesse={44} farbe={f.amt} />
-      <T v="titel" accessibilityRole="header">{TEXT.gesperrt_titel}</T>
-      <T leise>{TEXT.gesperrt_text}</T>
-      <Knopf symbol="faceid" text={TEXT.entsperren} onPress={los} stil={{ alignSelf: "stretch", marginTop: 16 }} />
+    <SafeAreaView style={{ flex: 1, backgroundColor: f.papier, paddingHorizontal: 28, paddingBottom: 24 }}>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 14 }}>
+        <Kachel symbol="lock.fill" groesse={72} />
+        <T v="titel" accessibilityRole="header" stil={{ textAlign: "center", marginTop: 10 }}>{TEXT.gesperrt_titel}</T>
+        <T leise stil={{ textAlign: "center" }}>{TEXT.gesperrt_text}</T>
+      </View>
+      <Knopf symbol="faceid" text={TEXT.entsperren} onPress={los} />
     </SafeAreaView>
   );
 }
@@ -146,12 +148,11 @@ function Rahmen() {
 function LadefehlerSeite() {
   const z = useAmtlos();
   const nav = useNav();
-  const f = useFarben();
   const [laedt, setLaedt] = useState(false);
   const [frage, setFrage] = useState(false);
   return (
-    <View style={{ flex: 1, padding: 20, gap: 14, justifyContent: "center" }}>
-      <Symbol name="exclamationmark.triangle" groesse={36} farbe={f.frist} />
+    <View style={{ flex: 1, padding: 24, gap: 14, justifyContent: "center" }}>
+      <Kachel symbol="exclamationmark.triangle" ton="frist" groesse={60} />
       <T v="titel" accessibilityRole="header">{TEXT.ladefehler_titel}</T>
       <T>{TEXT.ladefehler}</T>
       <Knopf text={TEXT.ladefehler_nochmal} symbol="arrow.clockwise" laedt={laedt} onPress={() => { setLaedt(true); void z.neuLaden().finally(() => setLaedt(false)); }} />
@@ -178,7 +179,7 @@ function TastaturLeiste() {
   if (!istIos) return null;
   return (
     <InputAccessoryView nativeID={TASTATUR_FERTIG} backgroundColor={f.papier}>
-      <View style={{ flexDirection: "row", justifyContent: "flex-end", borderTopWidth: 0.5, borderColor: f.linie }}>
+      <View style={{ flexDirection: "row", justifyContent: "flex-end", borderTopWidth: HAARLINIE, borderColor: f.linie }}>
         <Pressable accessibilityRole="button" onPress={Keyboard.dismiss} style={({ pressed }) => ({ minHeight: 44, paddingHorizontal: 20, justifyContent: "center", opacity: pressed ? 0.6 : 1 })}>
           <T fett farbe={f.amt}>{TEXT.tastatur_fertig}</T>
         </Pressable>
@@ -189,7 +190,15 @@ function TastaturLeiste() {
 
 export default function App() {
   const dunkel = useColorScheme() === "dark";
-  const [schriftGeladen] = useFonts({ AtkinsonHyperlegible_400Regular, AtkinsonHyperlegible_700Bold });
+  // dieselben Schnitte wie Website und Dokumente (assets/schriften, OFL 1.1)
+  /* eslint-disable @typescript-eslint/no-require-imports -- Schriftdateien bindet Metro nur über require ein */
+  const [schriftGeladen] = useFonts({
+    AmtlosSans_400Regular: require("../assets/schriften/AmtlosSans_400Regular.ttf"),
+    AmtlosSans_600SemiBold: require("../assets/schriften/AmtlosSans_600SemiBold.ttf"),
+    AmtlosSans_700Bold: require("../assets/schriften/AmtlosSans_700Bold.ttf"),
+    AmtlosSerif_600SemiBold: require("../assets/schriften/AmtlosSerif_600SemiBold.ttf"),
+  });
+  /* eslint-enable @typescript-eslint/no-require-imports */
   if (!schriftGeladen && Platform.OS !== "web") return null;
   return (
     <SafeAreaProvider>

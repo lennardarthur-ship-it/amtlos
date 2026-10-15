@@ -3,10 +3,10 @@ import { ActivityIndicator, Linking, Pressable, ScrollView, View } from "react-n
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LINKS } from "../rechtliches";
 import { T as TEXT } from "../texte";
-import { Fuss, Hinweis, Karte, Knopf, Symbol, T, TextKnopf } from "../ui/bausteine";
+import { Betrag, Fuss, Hinweis, Kachel, Karte, Knopf, KopfKnopf, Stempel, Symbol, T, TextKnopf } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { useNav } from "../ui/navigation";
-import { RADIUS, RAND, ZIEL, useFarben } from "../ui/thema";
+import { HAARLINIE, RADIUS, RAND, schattenStil, useFarben } from "../ui/thema";
 import { angebote, kaufAktiv, kaufen, wiederherstellen, type Angebot } from "../pro/kauf";
 import { FREI_JE_MONAT, PRO_VORTEILE, uebrig, type ProFunktion } from "../pro/regeln";
 import { useAmtlos } from "../zustand";
@@ -85,34 +85,34 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: f.papier }} edges={["top", "left", "right"]}>
       <View style={{ minHeight: 48, flexDirection: "row", alignItems: "center", paddingHorizontal: RAND - 8 }}>
-        <Pressable accessibilityRole="button" accessibilityLabel={TEXT.schliessen} onPress={nav.zurueck} hitSlop={8} style={{ width: ZIEL, height: ZIEL, alignItems: "center", justifyContent: "center" }}>
-          <Symbol name="xmark" groesse={20} farbe={f.tinte} gewicht="semibold" />
-        </Pressable>
+        <KopfKnopf symbol="xmark" label={TEXT.schliessen} onPress={nav.zurueck} />
       </View>
       <ScrollView contentContainerStyle={{ paddingHorizontal: RAND, paddingBottom: 24 }}>
-        <View style={{ width: 56, height: 56, borderRadius: 16, backgroundColor: f.amt, alignItems: "center", justifyContent: "center" }}>
-          <Symbol name="checkmark.seal.fill" groesse={30} farbe={f.blatt} />
+        <View style={[{ padding: 22, borderRadius: RADIUS.buehne, backgroundColor: f.buehne, overflow: "hidden", gap: 8 }, schattenStil(f, 1.4)]}>
+          <View style={{ position: "absolute", right: -70, top: -70, opacity: 0.12 }}>
+            <Stempel groesse={190} farbe={f.buehneText} />
+          </View>
+          <Stempel groesse={46} farbe={f.buehneText} />
+          <T v="grossTitel" farbe={f.buehneText} accessibilityRole="header" stil={{ marginTop: 10 }}>{TEXT.pro_titel}</T>
+          <T farbe={f.buehneLeise} stil={{ maxWidth: 300 }}>{grund ? TEXT.pro_grund[grund](FREI_JE_MONAT) : TEXT.pro_unter}</T>
         </View>
-        <T v="grossTitel" accessibilityRole="header" stil={{ marginTop: 14 }}>{TEXT.pro_titel}</T>
-        <T leise stil={{ marginTop: 6 }}>{grund ? TEXT.pro_grund[grund](FREI_JE_MONAT) : TEXT.pro_unter}</T>
-        <Karte stil={{ marginTop: 20, paddingVertical: 4 }}>
+        <Karte stil={{ marginTop: 16 }}>
           {/* der Grund, aus dem der Bezahlschirm aufging, steht oben */}
-          {(grund ? [grund, ...VORTEILE.filter((x) => x !== grund)] : VORTEILE).map((v, i) => (
-            <View key={v} style={{ flexDirection: "row", gap: 14, paddingVertical: 12, borderTopWidth: i ? 1 : 0, borderColor: f.linieLeise }}>
-              <View style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: v === grund ? f.amt : f.amtHauch, alignItems: "center", justifyContent: "center" }}>
-                <Symbol name={VORTEIL_SYMBOL[v]} groesse={18} farbe={v === grund ? f.blatt : f.amt} />
+          {(grund ? [grund, ...VORTEILE.filter((x) => x !== grund)] : VORTEILE).map((v, i, l) => (
+            <View key={v} style={{ flexDirection: "row", gap: 14, alignItems: "flex-start" }}>
+              <View style={{ paddingTop: 14 }}>
+                <Kachel symbol={VORTEIL_SYMBOL[v]} />
               </View>
-              <View style={{ flex: 1 }}>
+              <View style={{ flex: 1, paddingVertical: 14, borderBottomWidth: i === l.length - 1 ? 0 : HAARLINIE, borderColor: f.linie }}>
                 <T fett>{TEXT.pro_vorteil[v].titel}</T>
                 <T v="klein" leise stil={{ marginTop: 2 }}>{TEXT.pro_vorteil[v].text(FREI_JE_MONAT)}</T>
               </View>
             </View>
           ))}
         </Karte>
-        <Karte stil={{ marginTop: 12, paddingVertical: 12, flexDirection: "row", gap: 10, alignItems: "flex-start" }}>
-          <Symbol name="checkmark.circle" groesse={20} farbe={f.amt} />
-          <T v="klein" stil={{ flex: 1 }}>{TEXT.pro_frei_bleibt}</T>
-        </Karte>
+        <View style={{ marginTop: 10 }}>
+          <Hinweis art="erfolg" text={TEXT.pro_frei_bleibt} />
+        </View>
         {!z.pro ? <T v="caption" leise stil={{ marginTop: 4, marginLeft: 4 }}>{TEXT.pro_rest(rest, FREI_JE_MONAT)}</T> : null}
 
         {kaufAktiv ? (
@@ -123,13 +123,13 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
               {liste.map((a) => {
                 const an = a.id === wahl;
                 return (
-                  <Pressable key={a.id} accessibilityRole="radio" accessibilityState={{ checked: an }} onPress={() => setWahl(a.id)} style={{ padding: 14, borderRadius: RADIUS.karte, borderWidth: an ? 2 : 1, borderColor: an ? f.amt : f.linie, backgroundColor: an ? f.amtHauch : f.blatt, flexDirection: "row", alignItems: "center", gap: 12 }}>
-                    <Symbol name={an ? "checkmark.circle.fill" : "circle"} groesse={22} farbe={an ? f.amt : f.tinteLeise} />
+                  <Pressable key={a.id} accessibilityRole="radio" accessibilityState={{ checked: an }} onPress={() => setWahl(a.id)} style={{ padding: 16, borderRadius: RADIUS.karte, borderWidth: 2, borderColor: an ? f.amt : f.linie, backgroundColor: an ? f.amtHauch : f.blatt, flexDirection: "row", alignItems: "center", gap: 12 }}>
+                    <View style={{ width: 22, height: 22, borderRadius: 11, borderWidth: an ? 7 : 1.5, borderColor: an ? f.amt : f.rahmen, backgroundColor: f.blatt }} />
                     <View style={{ flex: 1 }}>
                       <T fett>{a.zeitraum ? TEXT.pro_zeitraum(a.zeitraum) : a.titel}</T>
                       {a.test ? <T v="klein" farbe={f.amt}>{TEXT.pro_test_zeitraum(a.test)}</T> : null}
                     </View>
-                    <T fett>{a.preis}</T>
+                    <Betrag>{a.preis}</Betrag>
                   </Pressable>
                 );
               })}
@@ -181,15 +181,13 @@ export function ProZeile() {
   return (
     <Pressable accessibilityRole="button" onPress={() => nav.oeffnen("pro", () => <ProSeite />, true)} style={({ pressed }) => ({ marginTop: 16, opacity: pressed ? 0.75 : 1 })}>
       {/* ruhige Karte wie die übrigen – die lauteste Fläche des Bildschirms soll nicht die Werbung sein */}
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 14, padding: 14, borderRadius: RADIUS.karte, backgroundColor: f.blatt, borderWidth: 1, borderColor: f.linie }}>
-        <View style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: z.pro ? f.amtHauch : f.amt, alignItems: "center", justifyContent: "center" }}>
-          <Symbol name="checkmark.seal.fill" groesse={20} farbe={z.pro ? f.amt : f.blatt} />
-        </View>
+      <View style={[{ flexDirection: "row", alignItems: "center", gap: 14, padding: 14, borderRadius: RADIUS.karte, backgroundColor: f.blatt, borderWidth: f.schatten ? 0 : 1, borderColor: f.linie }, schattenStil(f)]}>
+        <Kachel symbol="checkmark.seal.fill" />
         <View style={{ flex: 1 }}>
           <T fett>{z.pro ? TEXT.pro_aktiv : TEXT.pro_titel}</T>
           <T v="klein" leise>{z.pro ? TEXT.pro_aktiv_text : TEXT.pro_rest(rest, FREI_JE_MONAT)}</T>
         </View>
-        <Symbol name="chevron.right" groesse={16} />
+        <Symbol name="chevron.right" groesse={14} farbe={f.zeiger} gewicht="semibold" />
       </View>
     </Pressable>
   );

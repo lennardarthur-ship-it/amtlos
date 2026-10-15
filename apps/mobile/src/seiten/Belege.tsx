@@ -76,7 +76,6 @@ export function useBelegErfassen() {
 
 /** Möglichkeiten zum Erfassen als Karte – auf „Vorlagen“ und in der Ablage. */
 export function BelegErfassen({ kompakt }: { kompakt?: boolean }) {
-  const f = useFarben();
   const e = useBelegErfassen();
   const zeilen = [
     ...(istIos ? [{ symbol: "camera", titel: TEXT.beleg_foto, text: TEXT.beleg_foto_text, los: () => void e.foto(true) }] : []),
@@ -87,7 +86,7 @@ export function BelegErfassen({ kompakt }: { kompakt?: boolean }) {
   return (
     <Karte>
       {zeilen.map((z, i) => (
-        <Zeile key={z.titel} links={<Symbol name={z.symbol} groesse={22} farbe={f.amt} />} titel={z.titel} text={z.text} onPress={z.los} letzte={i === zeilen.length - 1} />
+        <Zeile key={z.titel} symbol={z.symbol} titel={z.titel} text={z.text} onPress={z.los} letzte={i === zeilen.length - 1} />
       ))}
     </Karte>
   );
@@ -95,12 +94,11 @@ export function BelegErfassen({ kompakt }: { kompakt?: boolean }) {
 
 /** Zeile in Listen: Lieferant, Datum, Betrag, Kategorie bzw. was fehlt. */
 export function BelegZeile({ b, letzte, onPress }: { b: Beleg; letzte: boolean; onPress: () => void }) {
-  const f = useFarben();
   const s = belegSummen(b);
   const unvollstaendig = !b.lieferant.trim() || !s.brutto_cent;
   return (
     <Zeile
-      links={<Symbol name={b.quelle === "erechnung" ? "doc.text" : b.datei ? "doc.viewfinder" : "pencil"} groesse={22} farbe={unvollstaendig ? f.bald : f.amt} />}
+      symbol={b.quelle === "erechnung" ? "doc.text" : b.datei ? "doc.viewfinder" : "pencil"} ton={unvollstaendig ? "bald" : "amt"}
       titel={b.lieferant.trim() || TEXT.beleg_ohne_lieferant}
       text={`${datumKurz(`${b.datum}T12:00:00Z`)} · ${unvollstaendig ? TEXT.beleg_unvollstaendig : kategorieFuer(b.kategorie).titel}`}
       wert={s.brutto_cent ? euro(s.brutto_cent) : undefined}

@@ -3,7 +3,7 @@ import { KeyboardAvoidingView, Pressable, ScrollView, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context";
 import { fehlendeAngaben, personAus, personIn, vorlageFuer, type Daten, type Vorlage, type VorlagenAbschnitt } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { Fuss, Knopf, Symbol, T, TextKnopf, Wahl } from "../ui/bausteine";
+import { Betrag, Fuss, Knopf, KopfKnopf, T, TextKnopf, Wahl, ZurueckKnopf } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { RADIUS, RAND, ZIEL, istIos, useFarben } from "../ui/thema";
 import { PERSONEN_LISTE, betriebFehlt, personenSortiert } from "../unterlagen/speicher";
@@ -78,7 +78,7 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
     return <T v="caption" leise stil={{ marginTop: 10 }}>{v === "ist" && offen ? TEXT.aus_rechnungen_ist_leer(offen) : TEXT.aus_rechnungen_leer}</T>;
   const r = uebernommen && uebernommen.v === v ? uebernommen.r : null;
   return (
-    <View style={{ marginTop: 14, padding: 14, borderRadius: 14, backgroundColor: f.amtHauch }}>
+    <View style={{ marginTop: 16, padding: 16, borderRadius: RADIUS.karte, backgroundColor: f.amtHauch }}>
       <T v="klein" fett farbe={f.amtTief}>{TEXT.mitPro(TEXT.aus_rechnungen_titel, z.pro)}</T>
       <T v="caption" farbe={f.amtTief}>{v === "ist" ? TEXT.aus_rechnungen_nach_ist : TEXT.aus_rechnungen_nach_soll}</T>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 6 }}>
@@ -115,7 +115,7 @@ function EuerAusDaten({ id }: { id: string }) {
   const jahre = jahreMitDaten(z.stand);
   if (!jahre.length) return <T v="caption" leise stil={{ marginTop: 10 }}>{TEXT.euer_leer}</T>;
   return (
-    <View style={{ marginTop: 14, padding: 14, borderRadius: 14, backgroundColor: f.amtHauch }}>
+    <View style={{ marginTop: 16, padding: 16, borderRadius: RADIUS.karte, backgroundColor: f.amtHauch }}>
       <T v="klein" fett farbe={f.amtTief}>{TEXT.mitPro(TEXT.euer_aus_daten_titel, z.pro)}</T>
       <T v="caption" farbe={f.amtTief}>{TEXT.euer_aus_daten_text}</T>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 6 }}>
@@ -147,7 +147,7 @@ function Schritt({ v, a, index, id, daten, fehlt }: { v: Vorlage; a: VorlagenAbs
   const mitPerson = v.person && a.felder.some((x) => x.id === v.person!.felder.name);
   return (
     <View>
-      <T v="titel" accessibilityRole="header" stil={{ fontSize: 28, lineHeight: 34 }}>{a.titel}</T>
+      <T v="titel" accessibilityRole="header">{a.titel}</T>
       {a.hilfe ? <T leise stil={{ marginTop: 6 }}>{a.hilfe}</T> : null}
       {index === 0 ? <TextKnopf symbol="questionmark.circle" text={TEXT.wozu_link} onPress={() => nav.oeffnen(`info-${v.id}`, () => <InfoSeite id={v.id} />, true)} stil={{ marginTop: 4 }} /> : null}
       {mitPerson ? <PersonenWahl v={v} id={id} daten={daten} /> : null}
@@ -226,9 +226,7 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: f.papier }} edges={["top", "left", "right"]} onAccessibilityEscape={nav.zurueck}>
       <View style={{ minHeight: 48, flexDirection: "row", alignItems: "center", paddingHorizontal: RAND - 8 }}>
-        <Pressable accessibilityRole="button" accessibilityLabel={TEXT.schliessen} onPress={nav.zurueck} hitSlop={8} style={{ width: ZIEL, height: ZIEL, alignItems: "center", justifyContent: "center" }}>
-          <Symbol name="xmark" groesse={20} farbe={f.tinte} gewicht="semibold" />
-        </Pressable>
+        <KopfKnopf symbol="xmark" label={TEXT.schliessen} onPress={nav.zurueck} />
         <T v="klein" fett numberOfLines={2} accessibilityRole="header" stil={{ flex: 1, textAlign: "center", paddingVertical: 4 }}>{vorlage.titel}</T>
         <View style={{ minWidth: ZIEL, alignItems: "flex-end" }}>
           {amAbschluss || fest ? null : (
@@ -243,8 +241,8 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
         <ScrollView key={schritt} contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 8, paddingBottom: 32 }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive">
           {!amAbschluss && schritt === 0 && vorlage.kundendokument && betriebFehlt(z.stand.betrieb) ? (
             // ohne Absender wäre die Rechnung am Ende nicht teilbar – das gleich am Anfang sagen
-            <View style={{ padding: 14, borderRadius: RADIUS.karte, backgroundColor: f.amtHauch, gap: 8, marginBottom: 8 }}>
-              <T fett>{TEXT.absender_fehlt_titel}</T>
+            <View style={{ padding: 16, borderRadius: RADIUS.karte, backgroundColor: f.amtHauch, gap: 8, marginBottom: 12 }}>
+              <T fett farbe={f.amtTief}>{TEXT.absender_fehlt_titel}</T>
               <T v="klein">{TEXT.absender_fehlt_text}</T>
               <Knopf symbol="building.2" text={TEXT.absender_eintragen} onPress={() => nav.oeffnen("absender", () => <AbsenderSeite />, true)} />
             </View>
@@ -263,15 +261,13 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
             ) : !amAbschluss && letzteZahl && !/^0,00\s/.test(letzteZahl[1]) ? (
               <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                 <T v="klein" leise>{letzteZahl[0]}</T>
-                <T v="klein" fett>{letzteZahl[1]}</T>
+                <Betrag v="klein">{letzteZahl[1]}</Betrag>
               </View>
             ) : null
           }
         >
           {schritt > 0 && !fest ? (
-            <Pressable accessibilityRole="button" accessibilityLabel={TEXT.vorheriger_schritt} onPress={() => gehe(schritt - 1)} style={({ pressed }) => ({ width: ZIEL, height: ZIEL, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: f.amtHauch, opacity: pressed ? 0.7 : 1 })}>
-              <Symbol name="chevron.left" groesse={20} farbe={f.amtTief} gewicht="semibold" />
-            </Pressable>
+            <ZurueckKnopf label={TEXT.vorheriger_schritt} onPress={() => gehe(schritt - 1)} />
           ) : null}
           {amAbschluss && absenderFehlt ? (
             <Knopf text={TEXT.absender_ergaenzen} symbol="building.2" onPress={() => nav.oeffnen("absender", () => <AbsenderSeite />, true)} stil={{ flex: 1 }} />

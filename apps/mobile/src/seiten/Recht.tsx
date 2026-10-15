@@ -2,7 +2,7 @@ import { Linking, Share, View } from "react-native";
 import { ANBIETER, LINKS, datenschutzAbschnitte } from "../rechtliches";
 import { syncAngeboten } from "../konto/konfig";
 import { T as TEXT } from "../texte";
-import { Hinweis, Karte, Symbol, T, Zeile } from "../ui/bausteine";
+import { Hinweis, Karte, T, Zeile } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { useFarben } from "../ui/thema";
 import { Inhalt } from "./gemeinsam";
@@ -53,7 +53,6 @@ export function DatenschutzSeite() {
 /** Gruppe unter „Mein Betrieb“: Weiterempfehlen, Hilfe, Rechtliches. */
 export function UeberGruppe() {
   const nav = useNav();
-  const f = useFarben();
   const teilen = () => void Share.share({ message: TEXT.empfehlen_text(LINKS.appStore || LINKS.website) }).catch(() => undefined);
   const zeilen = [
     { titel: TEXT.empfehlen, symbol: "square.and.arrow.up", onPress: teilen },
@@ -65,7 +64,7 @@ export function UeberGruppe() {
   return (
     <Karte>
       {zeilen.map((z, i) => (
-        <Zeile key={z.titel} links={<Symbol name={z.symbol} groesse={20} farbe={f.amt} />} titel={z.titel} onPress={z.onPress} letzte={i === zeilen.length - 1} />
+        <Zeile key={z.titel} symbol={z.symbol} titel={z.titel} onPress={z.onPress} letzte={i === zeilen.length - 1} />
       ))}
     </Karte>
   );

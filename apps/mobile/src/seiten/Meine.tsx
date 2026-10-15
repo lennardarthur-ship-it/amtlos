@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { ScrollView, View } from "react-native";
 import { T as TEXT } from "../texte";
 import { RAND } from "../ui/thema";
-import { Karte, Knopf, Symbol, T, TextKnopf, Wahl } from "../ui/bausteine";
+import { Kachel, Karte, Knopf, T, TextKnopf, Wahl } from "../ui/bausteine";
 import { useNav } from "../ui/navigation";
 import { useFarben } from "../ui/thema";
 import { belegeFiltern, euroText, filterVerfuegbar, filtern, offeneSumme, rechnungenSortiert, type Filter } from "../unterlagen/ablage";
@@ -21,8 +21,8 @@ const SUCHE_AB = 6;
 function OffeneKarte({ anzahl, cent, aktiv, onPress }: { anzahl: number; cent: number; aktiv: boolean; onPress: () => void }) {
   const f = useFarben();
   return (
-    <Karte stil={{ marginBottom: 16, paddingVertical: 12, flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: aktiv ? f.baldHauch : f.blatt }}>
-      <Symbol name={anzahl ? "clock" : "checkmark.circle.fill"} groesse={22} farbe={anzahl ? f.bald : f.amt} />
+    <Karte stil={{ marginBottom: 16, paddingVertical: 14, flexDirection: "row", alignItems: "center", gap: 14, backgroundColor: aktiv ? f.baldHauch : f.blatt }}>
+      <Kachel symbol={anzahl ? "clock" : "checkmark.circle.fill"} ton={anzahl ? "bald" : "amt"} />
       <View style={{ flex: 1 }}>
         <T fett>{anzahl ? TEXT.offene_summe(anzahl, euroText(cent)) : TEXT.alles_bezahlt}</T>
         {anzahl ? <T v="caption" leise>{TEXT.offene_hilfe}</T> : null}

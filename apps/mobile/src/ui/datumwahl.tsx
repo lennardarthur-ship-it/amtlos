@@ -29,12 +29,12 @@ export function DatumWahl({ label, wert, aendern }: { label: string; wert: strin
   };
   return (
     <View>
-      <Pressable accessibilityRole="button" accessibilityLabel={`${TEXT.datum_waehlen}: ${label}`} onPress={oeffnen} style={({ pressed }) => ({ width: ZIEL, minHeight: ZIEL, borderRadius: RADIUS.klein, alignItems: "center", justifyContent: "center", backgroundColor: f.amtHauch, opacity: pressed ? 0.7 : 1 })}>
-        <Symbol name="calendar" groesse={20} farbe={f.amt} />
+      <Pressable accessibilityRole="button" accessibilityLabel={`${TEXT.datum_waehlen}: ${label}`} onPress={oeffnen} style={({ pressed }) => ({ width: 50, minHeight: 50, borderRadius: RADIUS.klein, alignItems: "center", justifyContent: "center", backgroundColor: f.amtHauch, opacity: pressed ? 0.7 : 1 })}>
+        <Symbol name="calendar" groesse={20} farbe={f.amtTief} gewicht="semibold" />
       </Pressable>
       <Modal visible={offen} transparent animationType="slide" onRequestClose={() => setOffen(false)}>
         <Pressable accessibilityRole="button" accessibilityLabel={TEXT.abbrechen} onPress={() => setOffen(false)} style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.35)" }} />
-        <View style={{ backgroundColor: f.blatt, borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingHorizontal: 16, paddingTop: 12, paddingBottom: Math.max(inset.bottom, 12) + 8, gap: 8 }}>
+        <View style={{ backgroundColor: f.blatt, borderTopLeftRadius: RADIUS.buehne, borderTopRightRadius: RADIUS.buehne, paddingHorizontal: 16, paddingTop: 12, paddingBottom: Math.max(inset.bottom, 12) + 8, gap: 8 }}>
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
             <T fett accessibilityRole="header">{label}</T>
             <Pressable accessibilityRole="button" accessibilityLabel={TEXT.abbrechen} onPress={() => setOffen(false)} hitSlop={8} style={{ width: ZIEL - 8, height: ZIEL - 8, alignItems: "center", justifyContent: "center" }}>

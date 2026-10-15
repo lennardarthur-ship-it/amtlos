@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AccessibilityInfo, KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from "react-native";
+import { AccessibilityInfo, KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { Frage } from "@amtlos/i18n";
 import { T as TEXT } from "../texte";
-import { Auswahl, DatumFeld, Feld, Fuss, Hinweis, Karte, Knopf, MehrfachWahl, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
+import { Auswahl, DatumFeld, Fakt, Feld, Fuss, Hinweis, Kachel, Karte, Knopf, KopfKnopf, MehrfachWahl, Stempel, Symbol, T, TextKnopf, Zeile, ZurueckKnopf } from "../ui/bausteine";
 import { useNav } from "../ui/navigation";
 import { RAND, ZIEL, istIos, useFarben } from "../ui/thema";
 import { CHECK_FELDER, auswertung, beantwortet, checkFragen, zusatzFragen, type Profil } from "../pflichten/check";
@@ -135,9 +135,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: f.papier }} edges={["top", "left", "right"]}>
       <View style={{ minHeight: 48, flexDirection: "row", alignItems: "center", paddingHorizontal: RAND - 8 }}>
-        <Pressable accessibilityRole="button" accessibilityLabel={TEXT.schliessen} onPress={nav.zurueck} hitSlop={8} style={{ width: ZIEL, height: ZIEL, alignItems: "center", justifyContent: "center" }}>
-          <Symbol name="xmark" groesse={20} farbe={f.tinte} gewicht="semibold" />
-        </Pressable>
+        <KopfKnopf symbol="xmark" label={TEXT.schliessen} onPress={nav.zurueck} />
         <T v="klein" fett stil={{ flex: 1, textAlign: "center" }}>{TEXT.check_titel}</T>
         <View style={{ width: ZIEL }} />
       </View>
@@ -146,7 +144,8 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
         <ScrollView key={i} contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 12, paddingBottom: 32 }} keyboardShouldPersistTaps="handled">
           {i < 0 ? (
             <View>
-              <T v="titel" accessibilityRole="header" stil={{ fontSize: 28, lineHeight: 34 }}>{TEXT.check_einleitung_titel}</T>
+              <Kachel symbol="checklist" groesse={56} />
+              <T v="titel" accessibilityRole="header" stil={{ marginTop: 18 }}>{TEXT.check_einleitung_titel}</T>
               <T stil={{ marginTop: 10 }}>{TEXT.check_einleitung_text}</T>
               <View style={{ marginTop: 18 }}>
                 <Hinweis text={TEXT.check_hinweis} />
@@ -154,14 +153,14 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
             </View>
           ) : zwischenschirm ? (
             <View>
-              <Symbol name="checkmark.circle.fill" groesse={40} farbe={f.amt} />
-              <T v="titel" accessibilityRole="header" stil={{ fontSize: 28, lineHeight: 34, marginTop: 10 }}>{TEXT.zwischen_titel}</T>
+              <Stempel groesse={60} />
+              <T v="titel" accessibilityRole="header" stil={{ marginTop: 18 }}>{TEXT.zwischen_titel}</T>
               <T stil={{ marginTop: 10 }}>{TEXT.zwischen_text(extraN)}</T>
             </View>
           ) : frage ? (
             <View>
               <T v="caption" leise>{extra.includes(frage.feld) ? TEXT.zusatz_schritt(i - basisN + 1, extraN) : TEXT.schritt(i + 1, basisN)}</T>
-              <T v="titel" accessibilityRole="header" stil={{ fontSize: 26, lineHeight: 32, marginTop: 4 }}>{frage.frage.de}</T>
+              <T v="titel" accessibilityRole="header" stil={{ marginTop: 4 }}>{frage.frage.de}</T>
               {frage.hilfe ? <T leise stil={{ marginTop: 8 }}>{frage.hilfe.de}</T> : null}
               <View style={{ marginTop: 12 }}>
                 <Antwort key={frage.feld} f={frage} wert={z.stand.profil[frage.feld]} setzen={(w, s) => setzen(frage.feld, w, s)} />
@@ -169,24 +168,28 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
             </View>
           ) : a ? (
             <View>
-              <Symbol name="checkmark.circle.fill" groesse={40} farbe={f.amt} />
-              <T v="titel" accessibilityRole="header" stil={{ fontSize: 28, lineHeight: 34, marginTop: 10 }}>{TEXT.ergebnis_titel(a.gilt.length)}</T>
+              <Stempel groesse={60} />
+              <T v="titel" accessibilityRole="header" stil={{ marginTop: 18 }}>{TEXT.ergebnis_titel(a.gilt.length)}</T>
               {a.gilt.length ? (
                 <View style={{ marginTop: 14 }}>
-                  <T fett>{TEXT.ergebnis_anfangen(Math.min(3, a.gilt.length))}</T>
-                  <Karte stil={{ marginTop: 8 }}>
+                  <T v="gross">{TEXT.ergebnis_anfangen(Math.min(3, a.gilt.length))}</T>
+                  <Karte stil={{ marginTop: 10 }}>
                     {a.gilt.slice(0, 3).map((p, k, l) => (
-                      <Zeile key={p.id} links={<Symbol name="circle" groesse={20} farbe={f.amt} />} titel={p.titel} text={p.naechsterTermin ? TEXT.naechster_termin(new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(`${p.naechsterTermin}T12:00:00Z`))) : p.kurz} letzte={k === l.length - 1} />
+                      <Zeile key={p.id} links={<Symbol name="circle" groesse={22} farbe={f.rahmen} />} titel={p.titel} text={p.naechsterTermin ? TEXT.naechster_termin(new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(`${p.naechsterTermin}T12:00:00Z`))) : p.kurz} letzte={k === l.length - 1} />
                     ))}
                   </Karte>
                 </View>
               ) : null}
-              <View style={{ marginTop: 12, gap: 6 }}>
-                <T>{TEXT.ergebnis_vorlagen(a.gilt.filter((p) => p.vorlage).length)}</T>
-                {a.gilt.some((p) => p.schwere === "hoch") ? <T>{TEXT.ergebnis_wichtig(a.gilt.filter((p) => p.schwere === "hoch").length)}</T> : null}
-                {a.gruendung.length ? <T leise>{TEXT.ergebnis_gruendung(a.gruendung.length)}</T> : null}
-                {a.unbekannt.length ? <T leise>{TEXT.ergebnis_unbekannt(a.unbekannt.length)}</T> : null}
-              </View>
+              <Karte stil={{ marginTop: 16 }}>
+                {[
+                  { symbol: "doc.text", ton: "amt" as const, text: TEXT.ergebnis_vorlagen(a.gilt.filter((p) => p.vorlage).length) },
+                  ...(a.gilt.some((p) => p.schwere === "hoch") ? [{ symbol: "exclamationmark.circle", ton: "bald" as const, text: TEXT.ergebnis_wichtig(a.gilt.filter((p) => p.schwere === "hoch").length) }] : []),
+                  ...(a.gruendung.length ? [{ symbol: "flag", ton: "leise" as const, text: TEXT.ergebnis_gruendung(a.gruendung.length) }] : []),
+                  ...(a.unbekannt.length ? [{ symbol: "questionmark.circle", ton: "leise" as const, text: TEXT.ergebnis_unbekannt(a.unbekannt.length) }] : []),
+                ].map((x, k, l) => (
+                  <Fakt key={x.symbol} symbol={x.symbol} ton={x.ton} text={x.text} letzte={k === l.length - 1} />
+                ))}
+              </Karte>
               <View style={{ marginTop: 18 }}>
                 <Hinweis text={TEXT.pflichten_quelle} />
               </View>
@@ -195,9 +198,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
         </ScrollView>
         <Fuss ueber={zwischenschirm ? <TextKnopf text={TEXT.zwischen_ergebnis} onPress={() => { setZwischen(false); setI(fragen.length); }} stil={{ alignSelf: "center" }} /> : undefined}>
           {i > 0 ? (
-            <Pressable accessibilityRole="button" accessibilityLabel={TEXT.vorheriger_schritt} onPress={() => { if (zeit.current) clearTimeout(zeit.current); setI(i - 1); }} style={({ pressed }) => ({ width: ZIEL, height: ZIEL, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: f.amtHauch, opacity: pressed ? 0.7 : 1 })}>
-              <Symbol name="chevron.left" groesse={20} farbe={f.amtTief} gewicht="semibold" />
-            </Pressable>
+            <ZurueckKnopf label={TEXT.vorheriger_schritt} onPress={() => { if (zeit.current) clearTimeout(zeit.current); setI(i - 1); }} />
           ) : null}
           {i < 0 ? (
             <Knopf text={TEXT.check_starten} onPress={() => setI(0)} stil={{ flex: 1 }} />

@@ -2,9 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { Linking, View } from "react-native";
 import { T as TEXT } from "../texte";
 import { useMeldung } from "../ui/meldung";
-import { Fuss, Hinweis, Karte, Knopf, Schalter, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
+import { Betrag, Fuss, Hinweis, Kachel, Karte, Knopf, Schalter, SchnellKachel, Stempel, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
-import { RADIUS, RAND, useFarben, weich } from "../ui/thema";
+import { HAARLINIE, RADIUS, RAND, schattenStil, useFarben, weich } from "../ui/thema";
 import { KATEGORIE_TITEL, auswertung, beantwortet, dringlichkeit, erinnerungsPlan, fortschritt, frageZu, haken, istErledigt, offeneFragenNachWirkung, type PflichtInfo } from "../pflichten/check";
 import { allesAbsagen, erinnerungenMoeglich, erlaubnisAnfragen, planen } from "../pflichten/erinnerungen";
 import { heute } from "../unterlagen/speicher";
@@ -29,8 +29,8 @@ export const checkGemacht = (profil: Record<string, unknown>) => beantwortet(pro
 function Balken({ prozent }: { prozent: number }) {
   const f = useFarben();
   return (
-    <View accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: 100, now: prozent }} style={{ height: 8, borderRadius: 4, backgroundColor: f.linieLeise, overflow: "hidden" }}>
-      <View style={{ width: `${prozent}%`, height: 8, borderRadius: 4, backgroundColor: f.amt }} />
+    <View accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: 100, now: prozent }} style={{ height: 6, borderRadius: 3, backgroundColor: f.flaeche, overflow: "hidden" }}>
+      <View style={{ width: `${prozent}%`, height: 6, borderRadius: 3, backgroundColor: f.amt }} />
     </View>
   );
 }
@@ -132,6 +132,7 @@ function PflichtZeile({ p, letzte, erledigt, ohneWichtig }: { p: PflichtInfo; le
 /** Inhalt von „Deine Pflichten“ – als Tab (Start) und als Unterseite. */
 function PflichtenInhalt() {
   const z = useAmtlos();
+  const f = useFarben();
   const nav = useNav();
   const a = useAuswertung();
   const [zeigen, setZeigen] = useState(false);
@@ -153,15 +154,17 @@ function PflichtenInhalt() {
   const fertig = (p: PflichtInfo) => istErledigt(p, { erledigt, unterlagen, betrieb });
   return (
     <View>
-      <T v="titel" accessibilityRole="header">{TEXT.ergebnis_titel(a.gilt.length)}</T>
-      <View style={{ marginTop: 12, gap: 8 }}>
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <T v="klein" fett>{TEXT.fortschritt_text(fs.fertig, fs.gesamt)}</T>
-          {fs.fertig ? <T v="klein" fett>{fs.prozent} %</T> : null}
+      <Karte stil={{ paddingVertical: 18, gap: 12 }}>
+        <T v="gross" accessibilityRole="header">{TEXT.ergebnis_titel(a.gilt.length)}</T>
+        <View style={{ gap: 8 }}>
+          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "baseline" }}>
+            <T v="klein" leise>{TEXT.fortschritt_text(fs.fertig, fs.gesamt)}</T>
+            <Betrag v="klein" farbe={f.amtTief}>{`${fs.prozent} %`}</Betrag>
+          </View>
+          <Balken prozent={fs.prozent} />
         </View>
-        {fs.fertig ? <Balken prozent={fs.prozent} /> : null}
-        <T v="caption" leise>{TEXT.pflichten_quelle}</T>
-      </View>
+      </Karte>
+      <T v="caption" leise stil={{ marginTop: 8, marginLeft: 2 }}>{TEXT.pflichten_quelle}</T>
       <ErinnerungsSchalter />
       {d.jetzt.length ? (
         <Gruppe titel={TEXT.jetzt_dran(d.jetzt.length)}>
@@ -187,7 +190,7 @@ function PflichtenInhalt() {
         </Gruppe>
       ) : null}
       {offen.length ? <KurzKlaeren offen={offen} unklar={a.unbekannt.length} /> : null}
-      <T v="klein" fett leise accessibilityRole="header" stil={{ marginTop: 28, marginLeft: 4 }}>{TEXT.alle_nach_bereich}</T>
+      <T v="gross" accessibilityRole="header" stil={{ marginTop: 30, marginLeft: 2 }}>{TEXT.alle_nach_bereich}</T>
       {/* die vollständige Liste erst auf Wunsch – oben steht, was jetzt zu tun ist */}
       <TextKnopf symbol={alleZeigen ? "chevron.up" : "chevron.down"} text={alleZeigen ? TEXT.liste_verbergen : TEXT.alle_pflichten_zeigen(a.gilt.length)} onPress={() => { weich(); setAlleZeigen(!alleZeigen); }} stil={{ marginLeft: 4 }} />
       {alleZeigen && kategorien.map((k) => {
@@ -291,24 +294,28 @@ function Start() {
   const starten = useStarten();
   return (
     <View>
-      <View style={{ padding: 20, borderRadius: RADIUS.karte, backgroundColor: f.amtHauch, gap: 14 }}>
-        <T v="titel" farbe={f.amtTief} accessibilityRole="header">{TEXT.pflichten_karte_titel}</T>
-        <T farbe={f.amtTief}>{TEXT.pflichten_einladung}</T>
-        <Knopf text={TEXT.pflichten_check_starten} onPress={() => nav.oeffnen("check", () => <CheckAblauf />, true)} />
+      {/* die Bühne: die eine dunkle Fläche der App – mit dem Stempel aus dem App-Symbol */}
+      <View style={[{ padding: 22, paddingTop: 24, borderRadius: RADIUS.buehne, backgroundColor: f.buehne, gap: 14, overflow: "hidden" }, schattenStil(f, 1.4)]}>
+        <View style={{ position: "absolute", right: -64, top: -70, opacity: 0.12 }}>
+          <Stempel groesse={190} farbe={f.buehneText} />
+        </View>
+        <T v="titel" farbe={f.buehneText} accessibilityRole="header" stil={{ maxWidth: 250 }}>{TEXT.pflichten_karte_titel}</T>
+        <T farbe={f.buehneLeise}>{TEXT.pflichten_einladung}</T>
+        <Knopf buehne text={TEXT.pflichten_check_starten} symbol="arrow.right" onPress={() => nav.oeffnen("check", () => <CheckAblauf />, true)} stil={{ marginTop: 6 }} />
       </View>
       {/* wer gleich etwas erledigen will, findet es ohne Scrollen */}
-      <View style={{ marginTop: 20, gap: 4 }}>
-        <Knopf ton symbol="plus" text={TEXT.start_rechnung} onPress={() => starten("rechnung")} />
-        <TextKnopf symbol="doc.text" text={TEXT.start_vorlagen} onPress={() => z.tabWechseln("unterlagen")} stil={{ marginLeft: 4 }} />
+      <View style={{ flexDirection: "row", gap: 12, marginTop: 14 }}>
+        <SchnellKachel symbol="eurosign" text={TEXT.start_rechnung} onPress={() => starten("rechnung")} />
+        <SchnellKachel symbol="doc.text" text={TEXT.start_vorlagen} onPress={() => z.tabWechseln("unterlagen")} />
       </View>
       <Gruppe titel={TEXT.start_so_hilft}>
-        <Karte stil={{ paddingVertical: 4 }}>
+        <Karte>
           {TEXT.start_punkte.map((p, i) => (
-            <View key={p.titel} style={{ flexDirection: "row", gap: 14, paddingVertical: 12, borderTopWidth: i ? 1 : 0, borderColor: f.linieLeise }}>
-              <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: f.amtHauch, alignItems: "center", justifyContent: "center" }}>
-                <Symbol name={p.symbol} groesse={20} farbe={f.amt} />
+            <View key={p.titel} style={{ flexDirection: "row", gap: 14, alignItems: "flex-start" }}>
+              <View style={{ paddingTop: 14 }}>
+                <Kachel symbol={p.symbol} />
               </View>
-              <View style={{ flex: 1 }}>
+              <View style={{ flex: 1, paddingVertical: 14, borderBottomWidth: i === TEXT.start_punkte.length - 1 ? 0 : HAARLINIE, borderColor: f.linie }}>
                 <T fett>{p.titel}</T>
                 <T v="klein" leise stil={{ marginTop: 2 }}>{p.text}</T>
               </View>
@@ -373,12 +380,11 @@ export function ErinnerungsPlaner() {
 export function CheckProfilZeile() {
   const z = useAmtlos();
   const nav = useNav();
-  const f = useFarben();
   const n = Object.values(z.stand.profil).filter((w) => w !== null && w !== undefined).length;
   return (
     <Gruppe titel={TEXT.check_profil_titel}>
       <Karte>
-        <Zeile links={<Symbol name="checklist" groesse={22} farbe={f.amt} />} titel={checkGemacht(z.stand.profil) ? TEXT.angaben_aendern : TEXT.pflichten_check_starten} text={checkGemacht(z.stand.profil) ? TEXT.check_profil_text(n) : TEXT.check_profil_leer} onPress={() => nav.oeffnen("check", () => <CheckAblauf einleitung={!checkGemacht(z.stand.profil)} />, true)} letzte />
+        <Zeile symbol="checklist" titel={checkGemacht(z.stand.profil) ? TEXT.angaben_aendern : TEXT.pflichten_check_starten} text={checkGemacht(z.stand.profil) ? TEXT.check_profil_text(n) : TEXT.check_profil_leer} onPress={() => nav.oeffnen("check", () => <CheckAblauf einleitung={!checkGemacht(z.stand.profil)} />, true)} letzte />
       </Karte>
     </Gruppe>
   );
