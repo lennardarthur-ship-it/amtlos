@@ -34,7 +34,7 @@ export function T({ v = "basis", fett, leise, farbe, stil, children, ...rest }: 
 /** Beträge und Ziffern: fett, gleich breite Ziffern – Spalten stehen untereinander. */
 export function Betrag({ children, v = "basis", farbe, stil }: { children: ReactNode; v?: Variante; farbe?: string; stil?: StyleProp<TextStyle> }) {
   return (
-    <T v={v} farbe={farbe} stil={[{ fontFamily: SCHRIFT.bold, fontVariant: ["tabular-nums"] }, stil]}>
+    <T v={v} farbe={farbe} stil={[{ fontFamily: SCHRIFT.bold }, stil]}>
       {children}
     </T>
   );
@@ -130,7 +130,7 @@ export function Fristblatt({ termin, heute, erledigt, groesse = 46 }: { termin: 
     <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={[{ width: groesse, borderRadius: 10, backgroundColor: f.papier, borderWidth: 1, borderColor: f.linie, overflow: "hidden", alignItems: "center" }, schattenStil(f, 0.6)]}>
       <View style={{ alignSelf: "stretch", height: 5, backgroundColor: streifen }} />
       <T v="mini" leise stil={{ marginTop: 3, fontSize: 9.5, lineHeight: 11, textTransform: "uppercase", letterSpacing: 0.6 }}>{fmt({ weekday: "short" })}</T>
-      <T v="gross" stil={{ fontSize: groesse * 0.44, lineHeight: groesse * 0.5, fontVariant: ["tabular-nums"] }}>{fmt({ day: "numeric" })}</T>
+      <T v="gross" stil={{ fontSize: groesse * 0.44, lineHeight: groesse * 0.5 }}>{fmt({ day: "numeric" })}</T>
       <T v="mini" leise stil={{ marginBottom: 4, fontSize: 9.5, lineHeight: 11, letterSpacing: 0.3 }}>{fmt({ month: "short" })}</T>
     </View>
   );
@@ -520,7 +520,7 @@ export function DatumFeld({ label, wert, aendern, hilfe, ohneHeute, ohneLabel }:
           selectionColor={f.amt}
           keyboardType="numbers-and-punctuation"
           inputAccessoryViewID={TASTATUR_FERTIG}
-          style={[feldRahmen(f, { fokus, fehler: falsch }), feldText(f), { flex: 1, minWidth: 0, fontVariant: ["tabular-nums"] }]}
+          style={[feldRahmen(f, { fokus, fehler: falsch }), feldText(f), { flex: 1, minWidth: 0 }]}
         />
         {ohneHeute ? null : (
           <Pressable accessibilityRole="button" accessibilityLabel={`${label}: ${heuteText}`} onPress={() => aendern(heute)} style={({ pressed }) => ({ minHeight: 50, paddingHorizontal: 15, borderRadius: RADIUS.klein, justifyContent: "center", backgroundColor: f.amtHauch, opacity: pressed ? 0.7 : 1 })}>

@@ -85,7 +85,8 @@ function PflichtDetail({ id }: { id: string }) {
         {p.wiederkehrend && p.naechsterTermin ? <Hinweis text={TEXT.wiederkehrend_hinweis(datumDe(p.naechsterTermin))} /> : null}
         <Karte stil={{ marginTop: 16, paddingTop: 0 }}>
           {p.grund ? zeile(TEXT.warum, p.grund) : null}
-          {p.naechsterTermin ? zeile(TEXT.naechster_termin("").trim(), datumDe(p.naechsterTermin)) : null}
+          {/* der Termin steht oben im Fristblatt – hier nur, wenn die Pflicht abgehakt ist */}
+          {p.naechsterTermin && abgehakt ? zeile(TEXT.naechster_termin("").trim(), datumDe(p.naechsterTermin)) : null}
           {p.stelle ? zeile(TEXT.zustaendig, p.stelle) : null}
           {zeile(TEXT.einstufung, TEXT.schwere[p.schwere])}
         </Karte>

@@ -208,7 +208,7 @@ export function ListenSchritt({ feld, id }: { feld: ListenFeld; id: string }) {
             return (
               <Pressable key={i} accessibilityRole="button" accessibilityLabel={`${feld.eintrag} ${i + 1}: ${anzeigeTitel(feld, e, i)}`} onPress={() => oeffnen(i)} style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 14, minHeight: ZIEL + 12, paddingVertical: 12, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie, opacity: pressed ? 0.6 : 1 })}>
                 <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: fehlt.length ? f.baldHauch : f.amtHauch, alignItems: "center", justifyContent: "center" }}>
-                  <T v="caption" fett farbe={fehlt.length ? f.bald : f.amt} stil={{ fontVariant: ["tabular-nums"] }}>{i + 1}</T>
+                  <T v="caption" fett farbe={fehlt.length ? f.bald : f.amt} stil={{}}>{i + 1}</T>
                 </View>
                 <View style={{ flex: 1 }}>
                   <T fett={benutzt(feld, e)} leise={!benutzt(feld, e)} numberOfLines={2}>{anzeigeTitel(feld, e, i)}</T>

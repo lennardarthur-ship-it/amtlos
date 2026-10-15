@@ -131,7 +131,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
               {ergebnis.slice(0, -1).map(([k, w]) => (
                 <View key={k} style={{ flexDirection: "row", justifyContent: "space-between", gap: 12, paddingVertical: 5 }}>
                   <T v="klein" leise stil={{ flex: 1 }}>{k}</T>
-                  <T v="klein" stil={{ flexShrink: 1, textAlign: "right", fontVariant: ["tabular-nums"] }}>{w}</T>
+                  <T v="klein" stil={{ flexShrink: 1, textAlign: "right" }}>{w}</T>
                 </View>
               ))}
             </View>
