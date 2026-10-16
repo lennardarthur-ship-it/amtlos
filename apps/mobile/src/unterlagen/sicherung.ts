@@ -11,11 +11,12 @@ import { standAus, type Stand } from "./speicher";
 
 export const SICHERUNG_FORMAT = "amtlos-sicherung";
 /**
- * Iterationen für PBKDF2-SHA256 (E-143: 600.000 nach aktueller OWASP-Empfehlung, vorher 150.000). Die Zahl steht in
- * jeder Datei – ältere Sicherungen bleiben lesbar. Beim Öffnen gilt eine Obergrenze, damit eine präparierte Datei die
- * App nicht minutenlang blockiert.
+ * Iterationen für PBKDF2-SHA256. Gerechnet wird rein in JavaScript (kein natives PBKDF2 in Expo) – auf dem iPhone ohne
+ * JIT wären die von OWASP empfohlenen 600.000 viele Sekunden. Deshalb vorerst 150.000; mit einer nativen Ableitung
+ * steigt die Zahl (PRUEFLISTE T-85). Die Zahl steht in jeder Datei – ältere Sicherungen bleiben lesbar. Beim Öffnen gilt
+ * eine Obergrenze, damit eine präparierte Datei die App nicht minutenlang blockiert (E-143).
  */
-export const SICHERUNG_ITERATIONEN = 600_000;
+export const SICHERUNG_ITERATIONEN = 150_000;
 export const ITERATIONEN_HOECHSTENS = 5_000_000;
 export const PASSWORT_MINDESTLAENGE = 10;
 /** bindet Format und Version an den Inhalt – geänderte Kopfdaten fallen beim Entschlüsseln auf */

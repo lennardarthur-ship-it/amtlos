@@ -859,7 +859,7 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
   - „Alle Daten löschen“ entfernt auch verwaiste Belegdateien, den Cache, beiseitegelegte unlesbare Stände und den Schlüssel der Auto-Sicherung.
   - In iCloud bleiben die letzten 12 Wochen-Sicherungen; ältere werden gelöscht.
   - Die Dokumentvorschau läuft ohne JavaScript; Links öffnen sich im Browser.
-  - Sicherungen und Sync-Schlüssel nutzen PBKDF2 mit 600.000 statt 150.000 Iterationen. Ältere Dateien bleiben lesbar; beim Öffnen gilt eine Obergrenze von 5 Mio. gegen präparierte Dateien. Zwei neue Tests.
+  - PBKDF2 bleibt vorerst bei 150.000 Iterationen. Die von OWASP empfohlenen 600.000 dauern in reinem JavaScript zu lange: im CI-Rundgang über 1,5 s, auf dem iPhone ohne JIT deutlich mehr. Mehr Iterationen kommen mit einer nativen Ableitung (→ T-85). Neu ist eine Obergrenze von 5 Mio. Iterationen beim Öffnen gegen präparierte Dateien, mit Test.
 - **Server:**
   - Die Ratenbegrenzung greift vor dem Einlesen der Anfrage, zusätzlich je IP. Große Bodies unter `/v1/tresor` werden ohne Anmeldung gar nicht gelesen (401).
   - Speicher je Konto für die Synchronisation: höchstens `TRESOR_MAX_MB` (1024) und `TRESOR_MAX_DATEIEN` (5000), sonst 413.
