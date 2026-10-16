@@ -1,5 +1,4 @@
 import { createBottomTabNavigator, type BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { createNativeBottomTabNavigator } from "@react-navigation/bottom-tabs/unstable";
 import { DarkTheme, DefaultTheme, NavigationContainer, createNavigationContainerRef, type NavigationProp, type ParamListBase } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as SplashScreen from "expo-splash-screen";
@@ -12,20 +11,20 @@ import { ErinnerungsPlaner, PflichtenTab } from "./seiten/Pflichten";
 import { Meine } from "./seiten/Meine";
 import { AutoSicherung, WiederherstellenSeite } from "./seiten/Sicherung";
 import { Heute } from "./seiten/Heute";
-import { NeuBlatt } from "./seiten/Erstellen";
+import { NeuBlatt, useErstellen } from "./seiten/Erstellen";
 import { T as TEXT } from "./texte";
 import { Kachel, Karte, Knopf, Symbol, T, TextKnopf } from "./ui/bausteine";
 import { MeldungAnbieter } from "./ui/meldung";
 import { useSchrift } from "./ui/schrift";
 import { entsperren } from "./unterlagen/sperre";
 import { Blatt, InhaltSeite, WurzelNavKontext, kopfOptionen, useNav } from "./ui/navigation";
-import { HAARLINIE, TASTATUR_FERTIG, istIos, schattenStil, useFarben } from "./ui/thema";
+import { HAARLINIE, SCHRIFT, TASTATUR_FERTIG, istIos, useFarben } from "./ui/thema";
 import { AmtlosAnbieter, useAmtlos, type Tab } from "./zustand";
 import { KontoAnbieter } from "./konto/konto";
 
 void SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
-/** Tabs (E-141): „Heute“ als Start, Pflichten, eigene Unterlagen, Betrieb – „+“ sitzt oben rechts in der Leiste. */
+/** Tabs (E-142): „Heute“ als Start, Pflichten, eigene Unterlagen, Betrieb – „+“ sitzt rechts in der Tab-Leiste. */
 const TABS: { id: Tab; symbol: string; symbolAn: string }[] = [
   { id: "heute", symbol: "house", symbolAn: "house.fill" },
   { id: "pflichten", symbol: "checklist", symbolAn: "checklist" },
@@ -35,36 +34,45 @@ const TABS: { id: Tab; symbol: string; symbolAn: string }[] = [
 const SEITE: Record<Tab, () => React.JSX.Element> = { heute: Heute, pflichten: PflichtenTab, meine: Meine, betrieb: Betrieb };
 
 /**
- * Web-Vorschau der Tab-Leiste (auf dem iPhone ist es die echte iOS-26-Leiste mit Glas): schwebende Kapsel, der aktive
- * Tab mit Pille hinterlegt. Erneutes Tippen auf den aktiven Tab führt zur ersten Seite.
+ * Tab-Leiste (E-142): eine dunkle, schwebende Kapsel – der aktive Tab als Minze-Pille mit Wort, die anderen als Symbol,
+ * rechts der Minze-Knopf „+“ (Neu erstellen). Erneutes Tippen auf den aktiven Tab führt zur ersten Seite zurück.
  */
-function WebLeiste({ state, navigation }: BottomTabBarProps) {
+function Kapsel({ state, navigation }: BottomTabBarProps) {
   const f = useFarben();
-  const dunkel = useColorScheme() === "dark";
   const inset = useSafeAreaInsets();
+  const erstellen = useErstellen();
   return (
-    <View pointerEvents="box-none" style={{ position: "absolute", left: 0, right: 0, bottom: Math.max(inset.bottom - 8, 10), paddingHorizontal: 22 }}>
-      <View accessibilityRole="tablist" style={[{ flexDirection: "row", padding: 4, borderRadius: 32, backgroundColor: dunkel ? "rgba(28,28,30,0.96)" : "rgba(255,255,255,0.96)", borderWidth: HAARLINIE, borderColor: dunkel ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.08)" }, schattenStil(f, 1.6)]}>
-        {state.routes.map((r, i) => {
-          const k = TABS.find((t) => t.id === r.name)!;
-          const an = i === state.index;
-          return (
-            <Pressable
-              key={r.key}
-              accessibilityRole="tab"
-              accessibilityLabel={TEXT.tabs[k.id]}
-              accessibilityState={{ selected: an }}
-              onPress={() => {
-                const e = navigation.emit({ type: "tabPress", target: r.key, canPreventDefault: true });
-                if (!an && !e.defaultPrevented) navigation.navigate(r.name);
-              }}
-              style={{ flex: 1, height: 56, borderRadius: 28, alignItems: "center", justifyContent: "center", gap: 2, backgroundColor: an ? (dunkel ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.06)") : "transparent" }}
-            >
-              <Symbol name={an ? k.symbolAn : k.symbol} groesse={22} farbe={an ? f.amt : f.tinte} gewicht={an ? "semibold" : "regular"} />
-              <T v="mini" farbe={an ? f.amt : f.tinte} stil={{ fontSize: 10, ...(an ? { fontWeight: "600" } : null) }}>{TEXT.tabs[k.id]}</T>
-            </Pressable>
-          );
-        })}
+    <View pointerEvents="box-none" style={{ position: "absolute", left: 0, right: 0, bottom: Math.max(inset.bottom - 6, 14), paddingHorizontal: 20 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 4, height: 66, paddingLeft: 7, paddingRight: 7, borderRadius: 33, backgroundColor: f.kapsel, shadowColor: "#000", shadowOpacity: 0.25, shadowRadius: 18, shadowOffset: { width: 0, height: 10 }, elevation: 8 }}>
+        <View accessibilityRole="tablist" style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+          {state.routes.map((r, i) => {
+            const k = TABS.find((t) => t.id === r.name)!;
+            const an = i === state.index;
+            return (
+              <Pressable
+                key={r.key}
+                accessibilityRole="tab"
+                accessibilityLabel={TEXT.tabs[k.id]}
+                accessibilityState={{ selected: an }}
+                onPress={() => {
+                  const e = navigation.emit({ type: "tabPress", target: r.key, canPreventDefault: true });
+                  if (!e.defaultPrevented) {
+                    if (an) navigation.navigate(r.name, { screen: "Wurzel" });
+                    else navigation.navigate(r.name);
+                  }
+                }}
+                hitSlop={4}
+                style={({ pressed }) => ({ height: 52, minWidth: 52, paddingHorizontal: an ? 15 : 0, borderRadius: 26, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7, backgroundColor: an ? "rgba(127,227,184,0.16)" : "transparent", opacity: pressed ? 0.7 : 1 })}
+              >
+                <Symbol name={an ? k.symbolAn : k.symbol} groesse={21} farbe={an ? f.minze : "rgba(255,255,255,0.72)"} gewicht={an ? "semibold" : "regular"} />
+                {an ? <T v="klein" farbe={f.minze} stil={{ ...SCHRIFT.bold }} numberOfLines={1}>{TEXT.tabs_kurz[k.id]}</T> : null}
+              </Pressable>
+            );
+          })}
+        </View>
+        <Pressable accessibilityRole="button" accessibilityLabel={TEXT.erstellen} onPress={erstellen.oeffnen} hitSlop={4} style={({ pressed }) => ({ width: 52, height: 52, borderRadius: 26, marginLeft: 6, backgroundColor: f.minze, alignItems: "center", justifyContent: "center", transform: [{ scale: pressed ? 0.94 : 1 }] })}>
+          <Symbol name="plus" groesse={22} farbe={f.buehneKnopfText} gewicht="bold" />
+        </Pressable>
       </View>
     </View>
   );
@@ -72,31 +80,25 @@ function WebLeiste({ state, navigation }: BottomTabBarProps) {
 
 const Wurzel = createNativeStackNavigator();
 const TabStapel = createNativeStackNavigator();
-// iPhone: die echte Tab-Leiste (UITabBarController, Glas in iOS 26); Web/Android: dieselbe Struktur mit Nachbildung
-const Tabs = istIos ? createNativeBottomTabNavigator() : createBottomTabNavigator();
+const Tabs = createBottomTabNavigator();
 
-/** Stapel eines Tabs: erste Seite mit großem Titel, Unterseiten schieben sich herein (Zurück-Geste wie in iOS). */
+/** Stapel eines Tabs: erste Seite mit der Bühne, Unterseiten schieben sich herein (Zurück-Geste wie in iOS). */
 function TabSeiten({ route }: { route: { name: string } }) {
   const f = useFarben();
   const Erste = SEITE[route.name as Tab];
   return (
     <TabStapel.Navigator screenOptions={kopfOptionen(f)}>
-      {/* iPhone: großer Titel und Glas-Leiste von Anfang an (nicht erst nach dem ersten Rendern umschalten) */}
-      <TabStapel.Screen name="Wurzel" component={Erste} options={{ headerShown: istIos, headerLargeTitleEnabled: istIos, headerTransparent: istIos, title: TEXT.tabs[route.name as Tab] }} />
+      <TabStapel.Screen name="Wurzel" component={Erste} options={{ headerShown: false, title: TEXT.tabs[route.name as Tab], contentStyle: { backgroundColor: f.buehne } }} />
       <TabStapel.Screen name="Seite" component={InhaltSeite} />
     </TabStapel.Navigator>
   );
 }
 
 function TabLeiste() {
-  const f = useFarben();
   return (
-    <Tabs.Navigator
-      screenOptions={{ headerShown: false, tabBarActiveTintColor: f.amt, ...(istIos ? { tabBarMinimizeBehavior: "onScrollDown" } : null) } as never}
-      {...(istIos ? {} : { tabBar: (p: BottomTabBarProps) => <WebLeiste {...p} /> })}
-    >
+    <Tabs.Navigator screenOptions={{ headerShown: false }} tabBar={(p: BottomTabBarProps) => <Kapsel {...p} />}>
       {TABS.map((t) => (
-        <Tabs.Screen key={t.id} name={t.id} component={TabSeiten} options={{ title: TEXT.tabs[t.id], ...(istIos ? { tabBarIcon: ({ focused }: { focused: boolean }) => ({ type: "sfSymbol", name: focused ? t.symbolAn : t.symbol }) } : null) } as never} />
+        <Tabs.Screen key={t.id} name={t.id} component={TabSeiten} options={{ title: TEXT.tabs[t.id] }} />
       ))}
     </Tabs.Navigator>
   );
@@ -254,8 +256,9 @@ function TastaturLeiste() {
 
 export default function App() {
   const dunkel = useColorScheme() === "dark";
-  // Systemschrift (SF Pro) auf dem iPhone; in der Web-Vorschau Inter (E-140)
-  useSchrift();
+  // Onest (E-142) – bis sie geladen ist, bleibt der Startbildschirm stehen
+  const schrift = useSchrift();
+  if (!schrift) return null;
   return (
     <SafeAreaProvider>
       <AmtlosAnbieter>
@@ -264,7 +267,7 @@ export default function App() {
           <ErinnerungsPlaner />
           <AutoSicherung />
           <Sperre>
-            <MeldungAnbieter unten={84}>
+            <MeldungAnbieter unten={100}>
               <Rahmen />
             </MeldungAnbieter>
           </Sperre>

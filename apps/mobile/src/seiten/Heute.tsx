@@ -1,49 +1,30 @@
 import { useMemo } from "react";
 import { Pressable, View } from "react-native";
 import { T as TEXT } from "../texte";
-import { Betrag, Hinweis, Karte, SchnellKachel, T, TextKnopf, type Ton } from "../ui/bausteine";
+import { Hinweis, Karte, Knopf, T } from "../ui/bausteine";
 import { useNav } from "../ui/navigation";
-import { RADIUS, SCHRIFT, schattenStil, useFarben } from "../ui/thema";
+import { SCHRIFT, useFarben } from "../ui/thema";
 import { euroText, monatsSumme, offeneSumme } from "../unterlagen/ablage";
 import { heute, sortiert } from "../unterlagen/speicher";
-import { dringlichkeit, istErledigt } from "../pflichten/check";
+import { dringlichkeit, fortschritt, istErledigt } from "../pflichten/check";
 import { useAmtlos } from "../zustand";
 import { BelegErfassenSeite } from "./Belege";
-import { useErstellenKnopf } from "./Erstellen";
-import { Gruppe, Seite } from "./gemeinsam";
-import { Einladung, PflichtZeile, checkGemacht, useAuswertung } from "./Pflichten";
+import { BlattKopf, BuehnenMarke, BuehnenSeite, GrosserBetrag } from "./gemeinsam";
+import { Balken, Einladung, PflichtZeile, checkGemacht, useAuswertung } from "./Pflichten";
 import { SicherungsKarte } from "./Sicherung";
 import { useOeffnen, useStarten } from "./starten";
 import { UnterlageZeile, useFehltJe, useUeberfaellig } from "./Unterlagen";
 
-/** Kennzahl als Kachel: Beschriftung, großer Betrag, eine Zeile dazu – antippen führt zur Liste dahinter. */
-function Kennzahl({ label, wert, text, ton = "amt", symbol: _symbol, onPress }: { label: string; wert: string; text: string; ton?: Ton; symbol: string; onPress: () => void }) {
-  const f = useFarben();
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={`${label}: ${wert}, ${text}`}
-      onPress={onPress}
-      style={({ pressed }) => [{ flex: 1, minWidth: 0, padding: 14, gap: 10, borderRadius: RADIUS.karte, backgroundColor: f.blatt, borderWidth: 0, opacity: pressed ? 0.7 : 1 }, schattenStil(f)]}
-    >
-      <T v="caption" fett leise numberOfLines={1}>{label}</T>
-      <View>
-        <Betrag stil={{ ...SCHRIFT.display, fontSize: 25, lineHeight: 30, letterSpacing: -0.6 }}>{wert}</Betrag>
-        <T v="caption" farbe={ton === "frist" ? f.frist : undefined} leise={ton !== "frist"} numberOfLines={2}>{text}</T>
-      </View>
-    </Pressable>
-  );
-}
-
 /**
- * „Heute“ (E-138): der Startbildschirm. Was als Nächstes ansteht (Fristblatt), was offen ist und was diesen Monat
- * berechnet wurde, die häufigsten Handlungen und das zuletzt Bearbeitete – ein Blick statt vier Tabs.
+ * „Heute“ (E-142): Auf der Bühne steht, was Kunden noch schulden – dazu die zwei häufigsten Handlungen. Auf dem Blatt
+ * darunter: was als Nächstes ansteht (überfällige Rechnungen zuerst, dann Pflichten), der Fortschritt und das zuletzt
+ * Bearbeitete.
  */
 export function Heute() {
   const z = useAmtlos();
+  const f = useFarben();
   const { stand, tabWechseln } = z;
   const nav = useNav();
-  const erstellenKnopf = useErstellenKnopf();
   const starten = useStarten();
   const oeffnen = useOeffnen();
   const fehltJe = useFehltJe();
@@ -53,63 +34,85 @@ export function Heute() {
   const gemacht = checkGemacht(stand.profil);
   const { erledigt, unterlagen, betrieb } = stand;
 
-  const naechste = useMemo(() => {
-    const d = dringlichkeit(a, { erledigt, unterlagen, betrieb }, tag);
-    return [...d.jetzt, ...d.diesenMonat].slice(0, 3);
+  const { naechste, fs } = useMemo(() => {
+    const e = { erledigt, unterlagen, betrieb };
+    const d = dringlichkeit(a, e, tag);
+    return { naechste: [...d.jetzt, ...d.diesenMonat].slice(0, 3), fs: fortschritt(a, e) };
   }, [a, erledigt, unterlagen, betrieb, tag]);
   const offen = useMemo(() => offeneSumme(unterlagen, betrieb, tag), [unterlagen, betrieb, tag]);
   const monat = useMemo(() => monatsSumme(unterlagen, betrieb, tag.slice(0, 7)), [unterlagen, betrieb, tag]);
+  // überfällige Rechnungen gehören zu „Als Nächstes“ – Geld, das fehlt, ist dringender als jede Liste
+  const ueberfaellig = useMemo(() => unterlagen.filter((u) => (ueberJe.get(u.id) ?? 0) > 0).sort((x, y) => (ueberJe.get(y.id) ?? 0) - (ueberJe.get(x.id) ?? 0)).slice(0, 2), [unterlagen, ueberJe]);
   const hatRechnungen = unterlagen.some((u) => u.vorlage === "rechnung" && u.festgeschrieben);
   const zuletzt = sortiert(stand).slice(0, 3);
   const jetzt = new Date();
   const datum = new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", weekday: "long", day: "numeric", month: "long" }).format(jetzt);
   const monatsName = new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", month: "long" }).format(jetzt);
+  const stunde = Number(new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", hour: "numeric", hourCycle: "h23" }).format(jetzt));
+  const zeilen = ueberfaellig.length + naechste.length;
+
+  const buehne = (
+    <View style={{ gap: 26 }}>
+      {hatRechnungen ? (
+        <Pressable accessibilityRole="button" accessibilityLabel={`${TEXT.offen_bei_kunden}: ${euroText(offen.cent)}`} onPress={() => tabWechseln("meine")} style={({ pressed }) => ({ gap: 4, opacity: pressed ? 0.75 : 1 })}>
+          <T v="klein" farbe={f.buehneLeise} stil={{ ...SCHRIFT.mittel }}>{TEXT.offen_bei_kunden}</T>
+          <GrosserBetrag cent={offen.cent} />
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
+            {offen.ueberfaellig ? <BuehnenMarke warnung text={TEXT.davon_ueberfaellig(offen.ueberfaellig)} /> : <BuehnenMarke text={TEXT.kachel_offen_text(offen.anzahl)} />}
+            <BuehnenMarke text={TEXT.monat_summe(monatsName, euroText(monat.cent))} />
+          </View>
+        </Pressable>
+      ) : (
+        <T v="grossTitel" accessibilityRole="header" farbe={f.buehneText} stil={{ fontSize: 40, lineHeight: 44, letterSpacing: -1.4 }}>{TEXT.gruss(stunde)}</T>
+      )}
+      <View style={{ flexDirection: "row", gap: 10 }}>
+        <Knopf buehne symbol="plus" text={TEXT.kurz_rechnung} onPress={() => starten("rechnung")} stil={{ flex: 1, paddingHorizontal: 12 }} />
+        <Knopf glas symbol="doc.viewfinder" text={TEXT.kurz_beleg} onPress={() => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />)} stil={{ flex: 1, paddingHorizontal: 12 }} />
+      </View>
+    </View>
+  );
 
   return (
-    <Seite titel={TEXT.tabs.heute} ueber={datum} rechts={erstellenKnopf}>
+    <BuehnenSeite ueber={datum} buehne={buehne}>
       <SicherungsKarte />
       {gemacht ? (
         <View>
-          <T v="gross" accessibilityRole="header" stil={{ marginBottom: 11, marginLeft: 2 }}>{TEXT.als_naechstes}</T>
-          {naechste.length ? (
+          <BlattKopf erste titel={TEXT.als_naechstes} rechts={TEXT.alle_pflichten} onPress={() => tabWechseln("pflichten")} />
+          {zeilen ? (
             <Karte>
+              {ueberfaellig.map((u, i) => (
+                <UnterlageZeile key={u.id} u={u} ueber={ueberJe.get(u.id) ?? 0} letzte={i === zeilen - 1} fehlt={fehltJe.get(u.id) ?? 0} betrieb={betrieb} onPress={oeffnen} />
+              ))}
               {naechste.map((p, i) => (
-                <PflichtZeile key={p.id} p={p} erledigt={istErledigt(p, { erledigt, unterlagen, betrieb })} ohneWichtig={Boolean(p.naechsterTermin)} letzte={i === naechste.length - 1} />
+                <PflichtZeile key={p.id} p={p} erledigt={istErledigt(p, { erledigt, unterlagen, betrieb })} ohneWichtig={Boolean(p.naechsterTermin)} letzte={ueberfaellig.length + i === zeilen - 1} />
               ))}
             </Karte>
           ) : (
             <Hinweis art="erfolg" text={TEXT.nichts_dran_kurz} />
           )}
-          <TextKnopf text={TEXT.alle_pflichten} symbol="checklist" onPress={() => tabWechseln("pflichten")} stil={{ marginLeft: 2 }} />
+          {fs.gesamt ? (
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginTop: 14, paddingHorizontal: 4 }}>
+              <View style={{ flex: 1 }}>
+                <Balken prozent={fs.prozent} />
+              </View>
+              <T v="caption" leise stil={{ ...SCHRIFT.halb }}>{TEXT.fortschritt_text(fs.fertig, fs.gesamt)}</T>
+            </View>
+          ) : null}
         </View>
       ) : (
         <Einladung />
       )}
 
-      {hatRechnungen ? (
-        <View style={{ flexDirection: "row", gap: 12, marginTop: 18 }}>
-          <Kennzahl label={TEXT.kachel_offen} symbol={offen.ueberfaellig ? "exclamationmark.circle" : offen.anzahl ? "clock" : "checkmark.circle"} ton={offen.ueberfaellig ? "frist" : offen.anzahl ? "bald" : "amt"} wert={euroText(offen.cent)} text={offen.ueberfaellig ? TEXT.davon_ueberfaellig(offen.ueberfaellig) : TEXT.kachel_offen_text(offen.anzahl)} onPress={() => tabWechseln("meine")} />
-          <Kennzahl label={monatsName} symbol="eurosign" wert={euroText(monat.cent)} text={TEXT.kachel_monat_text(monat.anzahl)} onPress={() => tabWechseln("meine")} />
-        </View>
-      ) : null}
-
-      <Gruppe titel={TEXT.schnell_titel}>
-        <View style={{ flexDirection: "row", gap: 12 }}>
-          <SchnellKachel symbol="eurosign" text={TEXT.rechnung_schreiben} onPress={() => starten("rechnung")} />
-          <SchnellKachel ton="blau" symbol="doc.viewfinder" text={TEXT.beleg_erfassen} onPress={() => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />)} />
-        </View>
-      </Gruppe>
-
       {zuletzt.length ? (
-        <Gruppe titel={TEXT.zuletzt}>
+        <View>
+          <BlattKopf titel={TEXT.zuletzt} rechts={unterlagen.length > zuletzt.length ? TEXT.alle_anzeigen : undefined} onPress={() => tabWechseln("meine")} />
           <Karte>
             {zuletzt.map((u, i) => (
               <UnterlageZeile key={u.id} u={u} ueber={ueberJe.get(u.id) ?? 0} letzte={i === zuletzt.length - 1} fehlt={fehltJe.get(u.id) ?? 0} betrieb={betrieb} onPress={oeffnen} />
             ))}
           </Karte>
-          {unterlagen.length > zuletzt.length ? <TextKnopf text={TEXT.alle_anzeigen} onPress={() => tabWechseln("meine")} stil={{ marginLeft: 2 }} /> : null}
-        </Gruppe>
+        </View>
       ) : null}
-    </Seite>
+    </BuehnenSeite>
   );
 }

@@ -6,18 +6,18 @@ import { AccessibilityInfo, ActivityIndicator, Pressable, Text as RNText, Switch
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { T as TEXT } from "../texte";
 import { DatumWahl } from "./datumwahl";
-import { GROESSE, HAARLINIE, RADIUS, SCHRIFT, TASTATUR_FERTIG, ZIEL, istIos, schattenStil, useFarben, weich, type Farben } from "./thema";
+import { GROESSE, HAARLINIE, RADIUS, SCHRIFT, TASTATUR_FERTIG, ZIEL, istIos, useFarben, weich, type Farben } from "./thema";
 
 type Variante = "grossTitel" | "titel" | "gross" | "basis" | "klein" | "caption" | "mini";
-/** iOS-Textstile in der Systemschrift (SF Pro), mit Apples Laufweiten. */
+/** Textstile in Onest (E-142): Titel extrafett und eng gesetzt, Fließtext ruhig. */
 const STIL: Record<Variante, TextStyle> = {
-  grossTitel: { fontSize: GROESSE.grossTitel, lineHeight: 41, ...SCHRIFT.bold, letterSpacing: 0.37 },
-  titel: { fontSize: GROESSE.titel, lineHeight: 34, ...SCHRIFT.bold, letterSpacing: 0.36 },
-  gross: { fontSize: GROESSE.gross, lineHeight: 25, ...SCHRIFT.bold, letterSpacing: -0.45 },
-  basis: { fontSize: GROESSE.basis, lineHeight: 22, ...SCHRIFT.regular, letterSpacing: -0.43 },
-  klein: { fontSize: GROESSE.klein, lineHeight: 20, ...SCHRIFT.regular, letterSpacing: -0.23 },
-  caption: { fontSize: GROESSE.caption, lineHeight: 18, ...SCHRIFT.regular, letterSpacing: -0.08 },
-  mini: { fontSize: GROESSE.mini, lineHeight: 13, ...SCHRIFT.mittel, letterSpacing: 0.06 },
+  grossTitel: { fontSize: GROESSE.grossTitel, lineHeight: 40, ...SCHRIFT.display, letterSpacing: -1 },
+  titel: { fontSize: GROESSE.titel, lineHeight: 34, ...SCHRIFT.display, letterSpacing: -0.7 },
+  gross: { fontSize: GROESSE.gross, lineHeight: 26, ...SCHRIFT.bold, letterSpacing: -0.4 },
+  basis: { fontSize: GROESSE.basis, lineHeight: 23, ...SCHRIFT.regular, letterSpacing: -0.2 },
+  klein: { fontSize: GROESSE.klein, lineHeight: 21, ...SCHRIFT.regular, letterSpacing: -0.1 },
+  caption: { fontSize: GROESSE.caption, lineHeight: 18, ...SCHRIFT.regular, letterSpacing: 0 },
+  mini: { fontSize: GROESSE.mini, lineHeight: 14, ...SCHRIFT.mittel, letterSpacing: 0.1 },
 };
 const UEBERSCHRIFT = new Set<Variante>(["grossTitel", "titel", "gross"]);
 
@@ -57,7 +57,7 @@ const FALLBACK: Record<string, keyof typeof Ionicons.glyphMap> = {
   "scissors": "cut-outline", "cross.case": "medkit-outline", "checkmark.square.fill": "checkbox", "square": "square-outline", "chevron.down": "chevron-down", "chevron.up": "chevron-up",
   "doc.richtext": "document-text-outline", "hammer": "hammer-outline", "info.circle.fill": "information-circle", "circle": "ellipse-outline", "arrow.uturn.backward": "arrow-undo-outline", "xmark.circle": "close-circle-outline",
   "person.crop.circle": "person-circle-outline", "eye": "eye-outline", "arrow.left": "arrow-back", "list.number": "list-outline", "checkmark.circle.fill": "checkmark-circle", "person.badge.clock": "person-outline",
-  "figure.wave": "body-outline", "storefront": "storefront-outline", "calendar.badge.checkmark": "calendar-outline", "laptopcomputer": "laptop-outline", "exclamationmark.shield": "shield-outline", "cup.and.saucer": "cafe-outline", "sparkle": "sparkles-outline", "arrow.clockwise": "refresh-outline", "pencil": "create-outline", "plus.circle": "add-circle-outline", "paintpalette": "color-palette-outline", "eurosign.circle": "logo-euro", "photo": "image-outline", "lock.fill": "lock-closed", "faceid": "scan-outline", "line.3.horizontal.decrease.circle": "funnel-outline", "icloud": "cloud-outline", "checkmark.seal.fill": "ribbon", "hand.raised": "hand-left-outline", "doc.plaintext": "document-outline", "square.grid.2x2": "grid-outline", "house": "home-outline", "house.fill": "home", "folder.fill": "folder", "building.2.fill": "business",
+  "figure.wave": "body-outline", "storefront": "storefront-outline", "calendar.badge.checkmark": "calendar-outline", "laptopcomputer": "laptop-outline", "exclamationmark.shield": "shield-outline", "cup.and.saucer": "cafe-outline", "sparkle": "sparkles-outline", "arrow.clockwise": "refresh-outline", "pencil": "create-outline", "plus.circle": "add-circle-outline", "paintpalette": "color-palette-outline", "eurosign.circle": "logo-euro", "photo": "image-outline", "lock.fill": "lock-closed", "faceid": "scan-outline", "line.3.horizontal.decrease.circle": "funnel-outline", "icloud": "cloud-outline", "checkmark.seal.fill": "ribbon", "hand.raised": "hand-left-outline", "doc.plaintext": "document-outline", "square.grid.2x2": "grid-outline", "exclamationmark": "alert", "house": "home-outline", "house.fill": "home", "folder.fill": "folder", "building.2.fill": "business",
 };
 export function Symbol({ name, groesse = 22, farbe, gewicht = "medium" }: { name: string; groesse?: number; farbe?: string; gewicht?: SymbolViewProps["weight"] }) {
   const f = useFarben();
@@ -87,14 +87,13 @@ export const tonFarben = (f: Farben, ton: Ton) =>
               ? { grund: f.blauHauch, zeichen: f.blau }
               : { grund: f.amtHauch, zeichen: f.amt };
 
-/** Gefüllte Farbe je Ton für Symbol-Quadrate (wie in den iPhone-Einstellungen) – gleich in Hell und Dunkel. */
-const QUADRAT: Record<Ton, string> = { amt: "#1fa463", bald: "#ff9500", frist: "#ff3b30", leise: "#8e8e93", lila: "#5856d6", gold: "#ff9f0a", blau: "#0a84ff" };
-
-/** Symbol auf einem gefüllten, abgerundeten Quadrat mit weißem Zeichen – vor Listenzeilen, wie in den Einstellungen. */
-export function Kachel({ symbol, ton = "amt", groesse = 30 }: { symbol: string; ton?: Ton; groesse?: number }) {
+/** Symbol auf einem getönten, weich abgerundeten Quadrat – vor Listenzeilen und in leeren Zuständen (E-142). */
+export function Kachel({ symbol, ton = "amt", groesse = 40 }: { symbol: string; ton?: Ton; groesse?: number }) {
+  const f = useFarben();
+  const t = tonFarben(f, ton);
   return (
-    <View style={{ width: groesse, height: groesse, borderRadius: Math.round(groesse * 0.26), backgroundColor: QUADRAT[ton], alignItems: "center", justifyContent: "center" }}>
-      <Symbol name={symbol} groesse={Math.round(groesse * 0.56)} farbe="#ffffff" gewicht="semibold" />
+    <View style={{ width: groesse, height: groesse, borderRadius: Math.round(groesse * 0.32), backgroundColor: t.grund, alignItems: "center", justifyContent: "center" }}>
+      <Symbol name={symbol} groesse={Math.round(groesse * 0.5)} farbe={t.zeichen} gewicht="semibold" />
     </View>
   );
 }
@@ -125,14 +124,13 @@ export function Fristblatt({ termin, heute, erledigt, groesse = 46 }: { termin: 
   const f = useFarben();
   const d = new Date(`${termin}T12:00:00Z`);
   const tage = tageBis(termin, heute);
-  const streifen = erledigt ? f.amt : tage < 0 ? f.frist : tage <= 14 ? f.bald : f.linie;
+  // getöntes Quadrat mit Tag und Monat – der Ton trägt den Status (rot überfällig, bernstein bald, grün erledigt)
+  const t = erledigt ? tonFarben(f, "amt") : tage < 0 ? tonFarben(f, "frist") : tage <= 14 ? tonFarben(f, "bald") : { grund: f.flaeche, zeichen: f.tinte };
   const fmt = (o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", ...o }).format(d).replace(".", "");
   return (
-    <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={[{ width: groesse, borderRadius: 10, backgroundColor: f.blatt, borderWidth: 1, borderColor: f.linie, overflow: "hidden", alignItems: "center" }, schattenStil(f, 0.6)]}>
-      <View style={{ alignSelf: "stretch", height: 5, backgroundColor: streifen }} />
-      <T v="mini" leise stil={{ marginTop: 3, fontSize: 9.5, lineHeight: 11, textTransform: "uppercase", letterSpacing: 0.6 }}>{fmt({ weekday: "short" })}</T>
-      <T v="gross" stil={{ fontSize: groesse * 0.44, lineHeight: groesse * 0.5 }}>{fmt({ day: "numeric" })}</T>
-      <T v="mini" leise stil={{ marginBottom: 4, fontSize: 9.5, lineHeight: 11, letterSpacing: 0.3 }}>{fmt({ month: "short" })}</T>
+    <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={{ width: groesse, height: groesse, borderRadius: Math.round(groesse * 0.32), backgroundColor: t.grund, alignItems: "center", justifyContent: "center" }}>
+      <RNText style={{ ...SCHRIFT.display, fontSize: groesse * 0.38, lineHeight: groesse * 0.42, color: t.zeichen, letterSpacing: -0.5 }}>{fmt({ day: "numeric" })}</RNText>
+      <RNText style={{ ...SCHRIFT.bold, fontSize: groesse * 0.21, lineHeight: groesse * 0.26, color: t.zeichen, textTransform: "uppercase", letterSpacing: 0.4 }}>{fmt({ month: "short" })}</RNText>
     </View>
   );
 }
@@ -182,14 +180,15 @@ const tippen = () => {
 };
 
 /**
- * Knöpfe: der eine Hauptknopf (gefüllt), `ton` für Zweitrangiges (Hauch), `leise` als Umriss, `buehne` auf der dunklen
- * Bühnenfläche. 52 pt hoch, gibt beim Drücken leicht nach, Haptik beim Tippen.
+ * Knöpfe (E-142): der eine Hauptknopf (tiefes Grün, dunkel: Minze), `ton` für Zweitrangiges (ruhige Fläche), `leise`
+ * als Umriss, `buehne` als Minze-Knopf auf der Bühne, `glas` als Zweitknopf auf der Bühne. 54 pt hoch, abgerundete
+ * Rechtecke, geben beim Drücken leicht nach, Haptik beim Tippen.
  */
-export function Knopf({ text, onPress, leise, ton, gefahr, buehne, deaktiviert, laedt, symbol, stil }: { text: string; onPress: () => void; leise?: boolean; ton?: boolean; gefahr?: boolean; buehne?: boolean; deaktiviert?: boolean; laedt?: boolean; symbol?: string; stil?: StyleProp<ViewStyle> }) {
+export function Knopf({ text, onPress, leise, ton, gefahr, buehne, glas, deaktiviert, laedt, symbol, stil }: { text: string; onPress: () => void; leise?: boolean; ton?: boolean; gefahr?: boolean; buehne?: boolean; glas?: boolean; deaktiviert?: boolean; laedt?: boolean; symbol?: string; stil?: StyleProp<ViewStyle> }) {
   const f = useFarben();
-  const haupt = gefahr ? f.frist : f.amt;
-  const grund = buehne ? f.buehneKnopf : ton ? f.amtHauch : leise ? "transparent" : haupt;
-  const schrift = buehne ? f.buehneKnopfText : ton ? f.amtTief : leise ? haupt : gefahr ? "#ffffff" : f.amtText;
+  const haupt = gefahr ? f.frist : f.haupt;
+  const grund = buehne ? f.buehneKnopf : glas ? f.buehneFlaeche : ton ? f.flaeche : leise ? "transparent" : haupt;
+  const schrift = buehne ? f.buehneKnopfText : glas ? f.buehneText : ton ? (gefahr ? f.frist : f.tinte) : leise ? haupt : gefahr ? "#ffffff" : f.hauptText;
   return (
     <Pressable
       accessibilityRole="button"
@@ -221,7 +220,7 @@ export function Knopf({ text, onPress, leise, ton, gefahr, buehne, deaktiviert, 
       {/* Knöpfe tragen Text – Symbole nur, wo sie eine feste Bedeutung haben (Teilen, Face ID) */}
       {laedt ? <ActivityIndicator color={schrift} /> : symbol && KNOPF_SYMBOLE.has(symbol) ? <Symbol name={symbol} groesse={18} farbe={schrift} gewicht="semibold" /> : null}
       {/* der Text bleibt beim Laden stehen („Wird verschlüsselt …“) */}
-      <RNText style={{ ...SCHRIFT.halb, fontSize: GROESSE.basis, letterSpacing: 0.1, color: schrift, textAlign: "center", flexShrink: 1 }}>{text}</RNText>
+      <RNText style={{ ...SCHRIFT.bold, fontSize: GROESSE.basis, letterSpacing: -0.2, color: schrift, textAlign: "center", flexShrink: 1 }}>{text}</RNText>
     </Pressable>
   );
 }
@@ -229,17 +228,16 @@ export function Knopf({ text, onPress, leise, ton, gefahr, buehne, deaktiviert, 
 /** Schnellzugriff als Kachel: Symbol oben, Beschriftung darunter – zwei nebeneinander. */
 export function SchnellKachel({ symbol, text, onPress, ton = "amt" }: { symbol: string; text: string; onPress: () => void; ton?: Ton }) {
   const f = useFarben();
-  void ton;
-  // ruhige Fläche, ein Symbol in Amtsgrün, das Wort – keine Bonbonfarben
+  // getöntes Symbol-Quadrat, darunter das Wort – wie die Kacheln in Finanz-Apps
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={text} onPress={onPress} style={({ pressed }) => ({ flex: 1, minHeight: 104, padding: 16, borderRadius: RADIUS.karte, backgroundColor: pressed ? f.flaeche : f.blatt, justifyContent: "space-between", gap: 14 })}>
-      <Symbol name={symbol} groesse={22} farbe={f.amt} gewicht="medium" />
+    <Pressable accessibilityRole="button" accessibilityLabel={text} onPress={onPress} style={({ pressed }) => ({ flex: 1, minHeight: 112, padding: 16, borderRadius: RADIUS.karte, backgroundColor: pressed ? f.flaeche : f.blatt, justifyContent: "space-between", gap: 14 })}>
+      <Kachel symbol={symbol} ton={ton} groesse={40} />
       <T fett stil={{ letterSpacing: -0.2 }}>{text}</T>
     </Pressable>
   );
 }
 
-const KNOPF_SYMBOLE = new Set(["square.and.arrow.up", "faceid"]);
+const KNOPF_SYMBOLE = new Set(["square.and.arrow.up", "faceid", "plus", "doc.viewfinder"]);
 
 /** Handlung als Text (Links, „Entfernen“, „Weitere Angaben“) – ohne Rahmen, 44 pt Tippfläche. */
 export function TextKnopf({ text, onPress, symbol, gefahr, leise, stil, label }: { text: string; onPress: () => void; symbol?: string; gefahr?: boolean; leise?: boolean; stil?: StyleProp<ViewStyle>; label?: string }) {
@@ -254,11 +252,11 @@ export function TextKnopf({ text, onPress, symbol, gefahr, leise, stil, label }:
 }
 
 /** Feste Leiste am unteren Rand eines Ablaufs: der eine Hauptknopf, optional davor ein Zurück. */
-export function Fuss({ children, ueber }: { children: ReactNode; ueber?: ReactNode }) {
+export function Fuss({ children, ueber, buehne }: { children: ReactNode; ueber?: ReactNode; buehne?: boolean }) {
   const f = useFarben();
   const inset = useSafeAreaInsets();
   return (
-    <View style={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: Math.max(inset.bottom, 14) + 4, backgroundColor: f.papier, gap: 8 }}>
+    <View style={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: Math.max(inset.bottom, 14) + 4, backgroundColor: buehne ? f.buehne : f.papier, gap: 8 }}>
       {ueber}
       <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>{children}</View>
     </View>
@@ -266,11 +264,11 @@ export function Fuss({ children, ueber }: { children: ReactNode; ueber?: ReactNo
 }
 
 /** Runder Zurück-Knopf im Fuß eines Ablaufs (neben dem Hauptknopf). */
-export function ZurueckKnopf({ onPress, label }: { onPress: () => void; label: string }) {
+export function ZurueckKnopf({ onPress, label, buehne }: { onPress: () => void; label: string; buehne?: boolean }) {
   const f = useFarben();
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} hitSlop={4} style={({ pressed }) => ({ width: 52, height: 52, borderRadius: RADIUS.knopf, alignItems: "center", justifyContent: "center", backgroundColor: pressed ? f.linie : f.flaeche })}>
-      <Symbol name="chevron.left" groesse={19} farbe={f.tinte} gewicht="semibold" />
+    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} hitSlop={4} style={({ pressed }) => ({ width: 54, height: 54, borderRadius: RADIUS.knopf, alignItems: "center", justifyContent: "center", backgroundColor: buehne ? f.buehneFlaeche : pressed ? f.linie : f.flaeche, opacity: pressed && buehne ? 0.7 : 1 })}>
+      <Symbol name="chevron.left" groesse={19} farbe={buehne ? f.buehneText : f.tinte} gewicht="semibold" />
     </Pressable>
   );
 }

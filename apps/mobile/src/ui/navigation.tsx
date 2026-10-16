@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef,
 import { KeyboardAvoidingView, Platform, Pressable, View, useWindowDimensions } from "react-native";
 import { T as TEXT } from "../texte";
 import { Symbol, T } from "./bausteine";
-import { RAND, ZIEL, istIos, useFarben, type Farben } from "./thema";
+import { RAND, SCHRIFT, ZIEL, istIos, useFarben, type Farben } from "./thema";
 
 /**
  * Navigation (E-141): echte iOS-Navigation mit react-native-screens – UINavigationController mit großen Titeln,
@@ -71,19 +71,26 @@ export function kopfOptionen(f: Farben): NativeStackNavigationOptions {
     headerShadowVisible: false,
     // iOS: keine eigene Leistenfarbe – sonst verschwindet das Glas von iOS 26
     ...(istIos ? null : { headerStyle: { backgroundColor: f.papier } }),
-    headerTitleStyle: { color: f.tinte, fontWeight: "600" },
-    headerLargeTitleStyle: { color: f.tinte },
+    headerTitleStyle: { color: f.tinte, ...SCHRIFT.bold },
+    headerLargeTitleStyle: { color: f.tinte, ...SCHRIFT.display },
+    headerBackTitleStyle: { fontFamily: SCHRIFT.mittel.fontFamily },
     contentStyle: { backgroundColor: f.papier },
     ...(Platform.OS === "web"
       ? {
           headerLeft: (p) => (p.canGoBack ? <WebZurueck /> : null),
           headerTitleAlign: "center",
           // lange Titel kürzen statt mit den Knöpfen zu kollidieren (das iPhone macht das selbst)
-          headerTitle: ({ children }) => <T fett numberOfLines={1} stil={{ maxWidth: 220 }}>{children}</T>,
+          headerTitle: webTitel(f.tinte),
         }
       : null),
   };
 }
+
+/** Web: Titel der Leiste gekürzt, in der passenden Farbe (auf der Bühne weiß). */
+const webTitel = (farbe: string) =>
+  function WebTitel({ children }: { children: string }) {
+    return <T fett numberOfLines={1} farbe={farbe} stil={{ maxWidth: 220 }}>{children}</T>;
+  };
 
 function WebZurueck() {
   const nav = useNav();
@@ -125,8 +132,18 @@ export interface KopfKnopfDef {
  * Kopfzeile der aktuellen Seite setzen: Titel, optional ein Knopf rechts, `schliessen` links (erste Seite eines Blatts).
  * Auf dem iPhone werden daraus echte Leistenknöpfe (Glas, iOS 26).
  */
-export function useKopf({ titel, rechts, schliessen, gross }: { titel: string; rechts?: KopfKnopfDef | null; schliessen?: boolean; gross?: boolean }) {
+export function useKopf({ titel, rechts, schliessen, gross, buehne }: { titel: string; rechts?: KopfKnopfDef | null; schliessen?: boolean; gross?: boolean; buehne?: boolean }) {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const f = useFarben();
+  // Bühne (E-142): Leiste und Grund im tiefen Grün, Schrift weiß, Knöpfe Minze – z. B. der Abschluss einer Rechnung
+  useLayoutEffect(() => {
+    if (buehne === undefined) return;
+    navigation.setOptions(
+      buehne
+        ? { headerStyle: { backgroundColor: f.buehne }, headerTintColor: f.minze, headerTitleStyle: { color: f.buehneText, ...SCHRIFT.bold }, contentStyle: { backgroundColor: f.buehne }, statusBarStyle: "light", ...(istIos ? null : { headerTitle: webTitel(f.buehneText) }) }
+        : { headerStyle: istIos ? undefined : { backgroundColor: f.papier }, headerTintColor: f.amt, headerTitleStyle: { color: f.tinte, ...SCHRIFT.bold }, contentStyle: { backgroundColor: f.papier }, statusBarStyle: undefined, ...(istIos ? null : { headerTitle: webTitel(f.tinte) }) },
+    );
+  }, [navigation, buehne, f]);
   // „Schließen“ setzt der Blatt-Stapel selbst auf seine erste Seite (siehe `Blatt`) – hier nichts überschreiben
   void schliessen;
   // Handler über eine Referenz: neue Funktionen je Render setzen die Kopfzeile nicht ständig neu
@@ -154,12 +171,12 @@ export function useKopf({ titel, rechts, schliessen, gross }: { titel: string; r
  * eigenen Lage relativ zum Elternelement; in einem Blatt fehlt dabei der Abstand bis zum Bildschirmrand oben. Der
  * Abstand ergibt sich aus Fensterhöhe minus eigener Höhe (der untere Rand eines Blatts liegt am Bildschirmrand).
  */
-export function TastaturRahmen({ children }: { children: ReactNode }) {
+export function TastaturRahmen({ children, grund }: { children: ReactNode; grund?: string }) {
   const f = useFarben();
   const { height: fenster } = useWindowDimensions();
   const [hoehe, setHoehe] = useState(0);
   return (
-    <View style={{ flex: 1, backgroundColor: f.papier }} onLayout={(e) => setHoehe(e.nativeEvent.layout.height)}>
+    <View style={{ flex: 1, backgroundColor: grund ?? f.papier }} onLayout={(e) => setHoehe(e.nativeEvent.layout.height)}>
       <KeyboardAvoidingView behavior={istIos ? "padding" : undefined} keyboardVerticalOffset={hoehe ? fenster - hoehe : 0} style={{ flex: 1 }}>
         {children}
       </KeyboardAvoidingView>

@@ -15,7 +15,7 @@ import { APP_VERSION } from "../version";
 import { useAmtlos } from "../zustand";
 import { bestaetigen } from "../ui/bestaetigen";
 import { Felder } from "./felder";
-import { Gruppe, Inhalt, Seite, datumKurz } from "./gemeinsam";
+import { BuehnenSeite, Gruppe, Inhalt, datumKurz } from "./gemeinsam";
 import { CheckProfilZeile } from "./Pflichten";
 import { CloudZeile, SicherungSeite, WiederherstellenSeite } from "./Sicherung";
 import { ProZeile, useProSperre } from "./Pro";
@@ -261,28 +261,35 @@ const TEIL_SYMBOL: Record<Teil, string> = { angaben: "building.2", steuer: "buil
 const TEIL_TON: Record<Teil, Ton> = { angaben: "amt", steuer: "blau", auftritt: "lila", gesellschaft: "gold" };
 
 /** Kopf der Übersicht: Logo oder Anfangsbuchstabe in der Hausfarbe, Name und Ort. */
+/** Kopf auf der Bühne (E-142): Logo bzw. Anfangsbuchstabe, Name groß, Ort und Verantwortliche – antippen bearbeitet. */
 function BetriebKopf({ b, onPress }: { b: BetriebDaten; onPress: () => void }) {
   const f = useFarben();
   const farbe = b.farbe || HAUSFARBEN[0]!.wert;
   const leer = betriebFehlt(b);
+  if (leer)
+    return (
+      <View style={{ gap: 16 }}>
+        <T v="grossTitel" accessibilityRole="header" farbe={f.buehneText}>{TEXT.betrieb_titel}</T>
+        <T farbe={f.buehneLeise}>{TEXT.betrieb_zeile_text}</T>
+        <Knopf buehne text={TEXT.betrieb_eintragen} onPress={onPress} />
+      </View>
+    );
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={leer ? TEXT.betrieb_eintragen : `${b.name}: ${TEXT.teil_titel.angaben}`} onPress={onPress} style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
-      <Karte stil={{ flexDirection: "row", alignItems: "center", gap: 14, paddingVertical: 16, backgroundColor: leer ? f.amtHauch : f.blatt, borderColor: leer ? f.amtHauch : f.linie }}>
-        {b.logo ? (
-          <View style={{ width: 60, height: 60, borderRadius: 16, backgroundColor: "#ffffff", borderWidth: 1, borderColor: f.linie, alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-            <Image source={{ uri: b.logo }} style={{ width: 48, height: 48 }} resizeMode="contain" accessibilityLabel={TEXT.b_logo} />
-          </View>
-        ) : (
-          <View style={{ width: 60, height: 60, borderRadius: 16, backgroundColor: leer ? f.amt : farbe, alignItems: "center", justifyContent: "center" }}>
-            {leer ? <Symbol name="building.2" groesse={26} farbe={f.amtText} /> : <T v="titel" farbe="#ffffff">{b.name.trim().charAt(0).toUpperCase()}</T>}
-          </View>
-        )}
-        <View style={{ flex: 1, minWidth: 0 }}>
-          <T v="gross" numberOfLines={2} farbe={leer ? f.amtTief : undefined}>{leer ? TEXT.betrieb_eintragen : b.name.trim()}</T>
-          <T v="klein" leise numberOfLines={2} farbe={leer ? f.amtTief : undefined}>{leer ? TEXT.betrieb_zeile_text : [b.ort.trim(), b.verantwortlich.trim()].filter(Boolean).join(" · ") || TEXT.teil_leer.angaben}</T>
+    <Pressable accessibilityRole="button" accessibilityLabel={`${b.name}: ${TEXT.teil_titel.angaben}`} onPress={onPress} style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 16, opacity: pressed ? 0.75 : 1 })}>
+      {b.logo ? (
+        <View style={{ width: 68, height: 68, borderRadius: 22, backgroundColor: "#ffffff", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+          <Image source={{ uri: b.logo }} style={{ width: 54, height: 54 }} resizeMode="contain" accessibilityLabel={TEXT.b_logo} />
         </View>
-        <Symbol name="chevron.right" groesse={14} farbe={leer ? f.amtTief : f.zeiger} gewicht="semibold" />
-      </Karte>
+      ) : (
+        <View style={{ width: 68, height: 68, borderRadius: 22, backgroundColor: farbe, alignItems: "center", justifyContent: "center", borderWidth: 2, borderColor: "rgba(255,255,255,0.18)" }}>
+          <T v="titel" farbe="#ffffff">{b.name.trim().charAt(0).toUpperCase()}</T>
+        </View>
+      )}
+      <View style={{ flex: 1, minWidth: 0 }}>
+        <T v="titel" accessibilityRole="header" numberOfLines={2} farbe={f.buehneText}>{b.name.trim()}</T>
+        <T v="klein" numberOfLines={2} farbe={f.buehneLeise} stil={{ marginTop: 2 }}>{[b.ort.trim(), b.verantwortlich.trim()].filter(Boolean).join(" · ") || TEXT.teil_leer.angaben}</T>
+      </View>
+      <Symbol name="chevron.right" groesse={15} farbe={f.buehneLeise} gewicht="semibold" />
     </Pressable>
   );
 }
@@ -308,8 +315,7 @@ export function Betrieb() {
     ));
   const personen = (art: PersonenArt) => personenSortiert(z.stand[PERSONEN_LISTE[art]]);
   return (
-    <Seite titel={TEXT.betrieb_titel} key={zaehler}>
-      <BetriebKopf b={b} onPress={betriebFehlt(b) ? oeffneAlles : () => oeffneTeil("angaben")} />
+    <BuehnenSeite key={zaehler} ueber={betriebFehlt(b) ? undefined : TEXT.betrieb_titel} buehne={<BetriebKopf b={b} onPress={betriebFehlt(b) ? oeffneAlles : () => oeffneTeil("angaben")} />}>
       <ProZeile />
       <Gruppe titel={TEXT.betrieb_gruppe}>
         <Karte>
@@ -391,7 +397,7 @@ export function Betrieb() {
         <T v="caption" leise>{TEXT.ueber_version(APP_VERSION, VORLAGEN.length, KATALOG.pflichten.length)}</T>
         <T v="caption" leise>{TEXT.ueber}</T>
       </View>
-    </Seite>
+    </BuehnenSeite>
   );
 }
 

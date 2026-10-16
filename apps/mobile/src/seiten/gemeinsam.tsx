@@ -1,11 +1,14 @@
-import { useNavigation, type NavigationProp, type ParamListBase } from "@react-navigation/native";
+import { useIsFocused, useNavigation, type NavigationProp, type ParamListBase } from "@react-navigation/native";
+import { StatusBar } from "expo-status-bar";
 import { useLayoutEffect, useRef, type ReactNode } from "react";
 import { Pressable, ScrollView, View, type ScrollViewProps } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Bereich } from "@amtlos/fachlogik";
+import { euroText } from "../unterlagen/ablage";
 import { T as TEXT } from "../texte";
-import { Kachel, Symbol, T } from "../ui/bausteine";
+import { Kachel, Motiv, Symbol, T } from "../ui/bausteine";
 import { RundKnopf, useNav } from "../ui/navigation";
-import { RADIUS, RAND, istIos, schattenStil, useFarben } from "../ui/thema";
+import { RADIUS, RAND, SCHRIFT, istIos, schattenStil, useFarben } from "../ui/thema";
 
 export interface SeitenKnopf {
   text: string;
@@ -67,6 +70,93 @@ export function Seite({ titel, unterzeile, ueber, rechts, schliessen, children, 
   );
 }
 
+/** Platz unter dem Blatt für die schwebende Tab-Leiste. */
+export const UNTEN_FREI = 120;
+
+/**
+ * Tab-Seite (E-142 „Bühne und Papier“): oben die dunkelgrüne Bühne mit Zeile darüber, großem Titel und dem, was auf
+ * dieser Seite zählt (Betrag, Jahr, Knöpfe); darunter schiebt sich das helle Blatt mit dem Rest. Statusleiste hell,
+ * solange die Seite sichtbar ist. Unter dem Blatt geht der helle Grund weiter (kein Grün beim Ziehen nach oben).
+ */
+export function BuehnenSeite({ ueber, titel, rechts, buehne, children, ...rest }: ScrollViewProps & { ueber?: string; titel?: string; rechts?: ReactNode; buehne?: ReactNode }) {
+  const f = useFarben();
+  const inset = useSafeAreaInsets();
+  const sichtbar = useIsFocused();
+  return (
+    <View style={{ flex: 1, backgroundColor: f.buehne }}>
+      {sichtbar ? <StatusBar style="light" /> : null}
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets {...rest}>
+        <View style={{ paddingTop: inset.top + (ueber || rechts ? 14 : 28), paddingHorizontal: RAND + 4, paddingBottom: 30, gap: 22, overflow: "hidden" }}>
+          <Motiv zeichen="§" groesse={380} farbe="rgba(127,227,184,0.06)" stil={{ right: -92, top: -40 }} />
+          {ueber || rechts ? (
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12, minHeight: 40 }}>
+              <T v="klein" fett farbe={f.buehneLeise} stil={{ flex: 1 }} numberOfLines={1}>{ueber ?? ""}</T>
+              {rechts}
+            </View>
+          ) : null}
+          {titel ? <T v="grossTitel" accessibilityRole="header" farbe={f.buehneText}>{titel}</T> : null}
+          {buehne}
+        </View>
+        <View style={{ flexGrow: 1, backgroundColor: f.papier, borderTopLeftRadius: RADIUS.buehne, borderTopRightRadius: RADIUS.buehne, paddingHorizontal: RAND, paddingTop: 24, paddingBottom: UNTEN_FREI }}>
+          {children}
+          {/* heller Grund unter dem Blatt – beim Ziehen über das Ende hinaus kein Grün */}
+          <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: -1000, height: 1000, backgroundColor: f.papier }} />
+        </View>
+      </ScrollView>
+    </View>
+  );
+}
+
+/** Betrag groß wie in Finanz-Apps: Euro weiß, Cent und Zeichen gedämpft. */
+export function GrosserBetrag({ cent, groesse = 60 }: { cent: number; groesse?: number }) {
+  const f = useFarben();
+  const text = euroText(cent);
+  const komma = text.lastIndexOf(",");
+  const vorn = komma > 0 ? text.slice(0, komma) : text;
+  const hinten = komma > 0 ? text.slice(komma) : "";
+  return (
+    <T accessibilityLabel={text} farbe={f.buehneText} stil={{ ...SCHRIFT.display, fontSize: groesse, lineHeight: groesse * 1.07, letterSpacing: -groesse * 0.04, fontVariant: ["tabular-nums"] }}>
+      {vorn}
+      <T farbe={f.buehneLeise} stil={{ ...SCHRIFT.display, fontSize: groesse, lineHeight: groesse * 1.07, letterSpacing: -groesse * 0.04, opacity: 0.7 }}>{hinten}</T>
+    </T>
+  );
+}
+
+/** Kleiner Knopf auf der Bühne (oben rechts): Glasfläche mit weißer Schrift. */
+export function BuehnenKnopf({ text, onPress, label }: { text: string; onPress: () => void; label?: string }) {
+  const f = useFarben();
+  return (
+    <Pressable accessibilityRole="button" accessibilityLabel={label ?? text} onPress={onPress} hitSlop={6} style={({ pressed }) => ({ minHeight: 40, paddingHorizontal: 16, borderRadius: 20, justifyContent: "center", backgroundColor: f.buehneFlaeche, opacity: pressed ? 0.7 : 1 })}>
+      <T v="klein" farbe={f.buehneText} stil={{ ...SCHRIFT.halb }}>{text}</T>
+    </Pressable>
+  );
+}
+
+/** Plakette auf der Bühne („820 € überfällig“, „Oktober 3.860 €“) – `warnung` rot getönt. */
+export function BuehnenMarke({ text, warnung }: { text: string; warnung?: boolean }) {
+  const f = useFarben();
+  return (
+    <View style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, backgroundColor: warnung ? "rgba(255,105,97,0.22)" : f.buehneFlaeche }}>
+      <T v="caption" farbe={warnung ? "#ffc9c4" : f.buehneText} stil={{ ...SCHRIFT.halb }}>{text}</T>
+    </View>
+  );
+}
+
+/** Abschnitt auf dem Blatt: Überschrift links, optional ein Link rechts. */
+export function BlattKopf({ titel, rechts, onPress, erste }: { titel: string; rechts?: string; onPress?: () => void; erste?: boolean }) {
+  const f = useFarben();
+  return (
+    <View style={{ flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", marginTop: erste ? 0 : 30, marginBottom: 12, paddingHorizontal: 4 }}>
+      <T v="gross" accessibilityRole="header">{titel}</T>
+      {rechts && onPress ? (
+        <Pressable accessibilityRole="button" onPress={onPress} hitSlop={10}>
+          {({ pressed }) => <T v="klein" farbe={f.amt} stil={{ ...SCHRIFT.halb, opacity: pressed ? 0.55 : 1 }}>{rechts}</T>}
+        </Pressable>
+      ) : null}
+    </View>
+  );
+}
+
 /** Web: runder, gefüllter Knopf in der Akzentfarbe (auf dem iPhone ein prominenter Glasknopf der Leiste). */
 function PlusKnopf({ k }: { k: SeitenKnopf }) {
   const f = useFarben();
@@ -102,10 +192,10 @@ export function Inhalt({ children, ...rest }: ScrollViewProps) {
 }
 
 /** Abschnitt mit Serif-Überschrift über einer Karte – wie eine Zwischenüberschrift im Dokument. */
-export function Gruppe({ titel, children, fuss, hilfe }: { titel?: string; children: ReactNode; fuss?: string; hilfe?: string }) {
+export function Gruppe({ titel, children, fuss, hilfe, erste }: { titel?: string; children: ReactNode; fuss?: string; hilfe?: string; erste?: boolean }) {
   return (
-    <View style={{ marginTop: 30 }}>
-      {titel ? <T v="gross" accessibilityRole="header" stil={{ marginBottom: hilfe ? 3 : 11, marginLeft: 2 }}>{titel}</T> : null}
+    <View style={{ marginTop: erste ? 0 : 30 }}>
+      {titel ? <T v="gross" accessibilityRole="header" stil={{ marginBottom: hilfe ? 3 : 12, marginLeft: 4 }}>{titel}</T> : null}
       {hilfe ? <T v="caption" leise stil={{ marginBottom: 11, marginLeft: 2 }}>{hilfe}</T> : null}
       {children}
       {fuss ? <T v="caption" leise stil={{ marginTop: 8, marginLeft: 2 }}>{fuss}</T> : null}

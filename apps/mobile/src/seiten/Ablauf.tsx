@@ -213,6 +213,8 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
   useKopf({
     titel: vorlage?.titel ?? "",
     schliessen: true,
+    // Abschluss auf der Bühne (E-142): Leiste und Grund im tiefen Grün
+    buehne: amAbschlussKopf,
     rechts: amAbschlussKopf || !vorlage ? null : { text: TEXT.uebersicht, onPress: () => { merken(vorlage, z.daten(id), z); setSchritt(n); } },
   });
   if (!unterlage || !vorlage) return null;
@@ -232,10 +234,10 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
   const absenderFehlt = !fest && Boolean(vorlage.kundendokument) && fehltFuer(z.stand, unterlage).some((x) => x.includes("(Mein Betrieb)"));
 
   return (
-    <View style={{ flex: 1, backgroundColor: f.papier }}>
-      {fest ? null : <Fortschritt n={n + 1} aktuell={schritt} />}
-      <TastaturRahmen>
-        <ScrollView key={schritt} contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 8, paddingBottom: 32 }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive">
+    <View style={{ flex: 1, backgroundColor: amAbschluss ? f.buehne : f.papier }}>
+      {amAbschluss ? null : <Fortschritt n={n + 1} aktuell={schritt} />}
+      <TastaturRahmen grund={amAbschluss ? f.buehne : undefined}>
+        <ScrollView key={schritt} contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 8, paddingBottom: amAbschluss ? 0 : 32 }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive">
           {!amAbschluss && schritt === 0 && vorlage.kundendokument && betriebFehlt(z.stand.betrieb) ? (
             // ohne Absender wäre die Rechnung am Ende nicht teilbar – das gleich am Anfang sagen
             <View style={{ padding: 16, borderRadius: RADIUS.karte, backgroundColor: f.amtHauch, gap: 8, marginBottom: 12 }}>
@@ -251,10 +253,11 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
           )}
         </ScrollView>
         <Fuss
+          buehne={amAbschluss}
           ueber={
             amAbschluss && teilen.fehler ? (
               // direkt über dem Knopf – oben im Inhalt sähe man den Hinweis nach dem Scrollen nicht
-              <T v="klein" fett farbe={f.frist} accessibilityRole="alert">{teilen.fehler}</T>
+              <T v="klein" fett farbe="#ffc9c4" accessibilityRole="alert">{teilen.fehler}</T>
             ) : !amAbschluss && letzteZahl && !/^0,00\s/.test(letzteZahl[1]) ? (
               <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                 <T v="klein" leise>{letzteZahl[0]}</T>
@@ -264,12 +267,12 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
           }
         >
           {schritt > 0 && !fest ? (
-            <ZurueckKnopf label={TEXT.vorheriger_schritt} onPress={() => gehe(schritt - 1)} />
+            <ZurueckKnopf buehne={amAbschluss} label={TEXT.vorheriger_schritt} onPress={() => gehe(schritt - 1)} />
           ) : null}
           {amAbschluss && absenderFehlt ? (
-            <Knopf text={TEXT.absender_ergaenzen} symbol="building.2" onPress={() => nav.oeffnen("absender", () => <AbsenderSeite />, true)} stil={{ flex: 1 }} />
+            <Knopf buehne text={TEXT.absender_ergaenzen} symbol="building.2" onPress={() => nav.oeffnen("absender", () => <AbsenderSeite />, true)} stil={{ flex: 1 }} />
           ) : amAbschluss ? (
-            <Knopf text={TEXT.pdf_teilen} symbol="square.and.arrow.up" laedt={teilen.laedt} onPress={() => void teilen.los()} stil={{ flex: 1 }} />
+            <Knopf buehne text={TEXT.pdf_teilen} symbol="square.and.arrow.up" laedt={teilen.laedt} onPress={() => void teilen.los()} stil={{ flex: 1 }} />
           ) : (
             <Knopf text={schritt === n - 1 ? TEXT.zum_dokument : TEXT.weiter} onPress={() => gehe(schritt + 1)} stil={{ flex: 1 }} />
           )}

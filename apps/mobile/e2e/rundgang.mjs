@@ -70,8 +70,8 @@ const sichtbar = async (text) => (await p.getByText(text, { exact: false }).loca
 try {
   await p.goto("http://localhost:4998/");
   await warte(2500);
-  // Start auf „Heute“ (E-138): Einladung zum Check, schnelle Wege
-  pruefe((await sichtbar("Welche Pflichten gelten für dich?")) && (await sichtbar("Schnell erledigt")), "„Heute“ mit Einladung und schnellen Wegen fehlt beim Start");
+  // Start auf „Heute“ (E-142): Bühne mit Rechnung und Beleg, auf dem Blatt die Einladung zum Check
+  pruefe((await sichtbar("Welche Pflichten gelten für dich?")) && (await p.getByRole("button", { name: "Rechnung", exact: true }).count()) > 0, "„Heute“ mit Einladung und schnellen Wegen fehlt beim Start");
   await foto("start-pflichten");
   await neu();
   await warte(800);
@@ -162,6 +162,9 @@ try {
   await foto("check-ergebnis");
   await knopf("Deine Pflichten ansehen").click();
   await warte(1200);
+  // Bühne (E-142): das Jahr mit den Terminen je Monat
+  pruefe((await sichtbar("Dein Jahr")) && (await p.getByLabel(/: \d+ Termine?$/).count()) > 0, "Jahresblick fehlt im Pflichten-Tab");
+  await foto("pflichten-jahr");
   pruefe(await sichtbar("Jetzt dran"), "„Jetzt dran“ fehlt im Pflichten-Tab");
   pruefe(await sichtbar("Kurz klären"), "„Kurz klären“ mit den wirksamsten Fragen fehlt");
   // die vollständige Liste ist eingeklappt (E-136): aufklappen
@@ -254,11 +257,11 @@ try {
   await p.getByRole("tab", { name: "Heute" }).click();
   await warte(800);
   pruefe(await sichtbar("2026-001 · "), "Rechnung fehlt unter „Zuletzt bearbeitet“");
-  pruefe((await sichtbar("Offen")) && (await sichtbar("berechnet · ")), "Kennzahlen auf „Heute“ fehlen");
+  pruefe(await sichtbar("Offen bei Kunden"), "Offener Betrag auf „Heute“ fehlt");
   await foto("heute");
 
-  // zweite Rechnung: Nummer zählt hoch, gespeicherter Kunde füllt die Anschrift
-  await knopf("Rechnung schreiben").click();
+  // zweite Rechnung (Knopf auf der Bühne): Nummer zählt hoch, gespeicherter Kunde füllt die Anschrift
+  await knopf("Rechnung").click();
   await warte(900);
   pruefe((await feld("Rechnungsnummer").inputValue()) === "2026-002", "Rechnungsnummer zählt nicht hoch");
   await knopf("Weiter").click();
@@ -269,7 +272,7 @@ try {
   await knopf("Schließen").click();
   await warte(900);
   // dritte Rechnung sofort schließen: unveränderte neue Unterlagen verschwinden
-  await knopf("Rechnung schreiben").click();
+  await knopf("Rechnung").click();
   await warte(900);
   await knopf("Schließen").click();
   await warte(900);

@@ -2,10 +2,10 @@ import { useState } from "react";
 import { Pressable, Share, View } from "react-native";
 import { KU_HINWEIS, PRUEFHINWEIS, dateiname, dokumentHtml, eRechnungAus, vorlageFuer, xrechnungUbl } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { Betrag, DatumFeld, Fuss, Hinweis, Kachel, Karte, Knopf, Erfolg, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
+import { DatumFeld, Fuss, Hinweis, Karte, Knopf, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
-import { HAARLINIE, RADIUS, SCHRIFT, useFarben } from "../ui/thema";
+import { HAARLINIE, RADIUS, RAND, SCHRIFT, useFarben } from "../ui/thema";
 import { Vorschau } from "../ui/Vorschau";
 import { drucken, pdfTeilen } from "../unterlagen/pdf";
 import { NUMMER_DOPPELT, fehltFuer } from "../unterlagen/pruefung";
@@ -117,45 +117,28 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
   const zaehlt = !z.pro && !u.ausgegeben && !(typeof d.storno_zu === "string" && d.storno_zu);
   const ergebnis = v.ergebnis?.(d) ?? [];
   const fertig = alle.length === 0;
+  const datumDe = (iso: string) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(iso));
+  const geteilt = fest && v.storno && !d.storno_zu;
   return (
     <View>
-      {fest || fertig ? (fest && !(v.storno && !d.storno_zu) ? <Kachel symbol="lock.fill" ton="leise" groesse={60} /> : <Erfolg groesse={60} />) : null}
-      <T v="titel" accessibilityRole="header" stil={{ marginTop: fest || fertig ? 14 : 0 }}>{fest ? (v.storno && !d.storno_zu ? TEXT.geteilt_titel : TEXT.festgeschrieben_titel) : fertig ? TEXT.fertig : TEXT.fast_fertig}</T>
-      {ergebnis.length ? (
-        // die Summe groß oben (wie der Betrag in Finanz-Apps), die Bestandteile darunter
-        <Karte stil={{ marginTop: 14, paddingVertical: 18 }}>
-          <T v="klein" fett leise>{ergebnis.at(-1)![0]}</T>
-          <Betrag stil={{ ...SCHRIFT.display, fontSize: 38, lineHeight: 44, letterSpacing: -1.2, marginTop: 2 }}>{ergebnis.at(-1)![1]}</Betrag>
-          {ergebnis.length > 1 ? (
-            <View style={{ marginTop: 12, borderTopWidth: HAARLINIE, borderColor: f.linie, paddingTop: 8 }}>
-              {ergebnis.slice(0, -1).map(([k, w]) => (
-                <View key={k} style={{ flexDirection: "row", justifyContent: "space-between", gap: 12, paddingVertical: 5 }}>
-                  <T v="klein" leise stil={{ flex: 1 }}>{k}</T>
-                  <T v="klein" stil={{ flexShrink: 1, textAlign: "right" }}>{w}</T>
-                </View>
-              ))}
-            </View>
-          ) : null}
-        </Karte>
-      ) : null}
-      {fest ? (
-        <View style={{ marginTop: 10 }}>
-          {v.storno && !d.storno_zu ? (
-            // der Erfolgsmoment: geteilt – nicht „festgeschrieben“ als Warnung
-            <Hinweis art="erfolg" symbol="checkmark.circle" text={TEXT.geteilt_text(new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(u.festgeschrieben!)))} />
-          ) : (
-            <Hinweis symbol="lock" text={TEXT.festgeschrieben_text(new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(u.festgeschrieben!)), Boolean(v.storno))} />
-          )}
-          {storno ? <Hinweis art="erfolg" text={TEXT.storniert_durch(String(storno.daten.nummer ?? ""))} /> : null}
-          {typeof d.storno_zu === "string" && d.storno_zu ? <Hinweis text={TEXT.storniert_zu(d.storno_zu)} /> : null}
-          {v.storno && !u.storniertDurch ? <Zahlung id={id} /> : null}
+      {/* Bühne (E-142): Stand, Summe und das Dokument als Blatt Papier auf dem tiefen Grün */}
+      <View style={{ paddingTop: 8, gap: 6 }}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+          {fertig || fest ? <Symbol name={fest && !geteilt ? "lock.fill" : "checkmark.circle.fill"} groesse={20} farbe={f.minze} gewicht="semibold" /> : null}
+          <T v="klein" farbe={f.buehneLeise} stil={{ ...SCHRIFT.halb }}>{fest ? (geteilt ? TEXT.geteilt_titel : TEXT.festgeschrieben_titel) : fertig ? TEXT.alles_drin : TEXT.fast_fertig}</T>
         </View>
-      ) : fertig ? (
-        <View style={{ marginTop: 10 }}>
-          <Hinweis art="erfolg" text={TEXT.alles_drin} />
-        </View>
-      ) : (
-        <View accessibilityRole="summary" style={{ marginTop: 14, backgroundColor: f.baldHauch, borderRadius: RADIUS.karte, paddingHorizontal: 16, paddingVertical: 12 }}>
+        {ergebnis.length ? (
+          <View>
+            <T v="klein" farbe={f.buehneLeise}>{ergebnis.at(-1)![0]}</T>
+            <T farbe={f.buehneText} stil={{ ...SCHRIFT.display, fontSize: 44, lineHeight: 50, letterSpacing: -1.6, fontVariant: ["tabular-nums"] }}>{ergebnis.at(-1)![1]}</T>
+          </View>
+        ) : (
+          <T v="titel" accessibilityRole="header" farbe={f.buehneText}>{fest ? (geteilt ? TEXT.geteilt_titel : TEXT.festgeschrieben_titel) : fertig ? TEXT.fertig : TEXT.fast_fertig}</T>
+        )}
+      </View>
+
+      {!fest && !fertig ? (
+        <View accessibilityRole="summary" style={{ marginTop: 16, backgroundColor: f.baldHauch, borderRadius: RADIUS.karte, paddingHorizontal: 16, paddingVertical: 12 }}>
           <T v="klein" fett>{TEXT.fehlen(alle.length)}</T>
           {jeSchritt.flatMap((l, i) => l.map((x) => ({ text: x, schritt: i, betrieb: false }))).concat(extra).map((x, i) => (
             <View key={`${x.text}-${i}`} style={{ flexDirection: "row", alignItems: "center", gap: 8, minHeight: 44, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie }}>
@@ -169,97 +152,122 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
           ))}
           <T v="caption" leise stil={{ marginTop: 6 }}>{v.kundendokument ? TEXT.fehlt_kunde : TEXT.fehlt_text}</T>
         </View>
-      )}
-      {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
-      {v.festschreiben && !fest ? <T v="caption" leise stil={{ marginTop: 8 }}>{TEXT.wird_festgeschrieben}</T> : null}
-      {zaehlt ? <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.pro_rest(rest, FREI_JE_MONAT)}</T> : null}
+      ) : null}
 
-      <Pressable accessibilityRole="button" accessibilityLabel={TEXT.vorschau_oeffnen} onPress={() => nav.oeffnen(`vorschau-${id}`, () => <VorschauSeite id={id} />, true)} style={({ pressed }) => ({ marginTop: 18, opacity: pressed ? 0.85 : 1 })}>
-        <Vorschau html={html} quer={v.querformat} hoehe={v.querformat ? 260 : 400} />
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, minHeight: 44 }}>
-          <Symbol name="eye" groesse={17} farbe={f.amt} />
-          <T v="klein" fett farbe={f.amt}>{TEXT.vorschau_oeffnen}</T>
+      <Pressable accessibilityRole="button" accessibilityLabel={TEXT.vorschau_oeffnen} onPress={() => nav.oeffnen(`vorschau-${id}`, () => <VorschauSeite id={id} />, true)} style={({ pressed }) => ({ marginTop: 18, opacity: pressed ? 0.9 : 1, transform: [{ scale: pressed ? 0.99 : 1 }] })}>
+        <View style={{ borderRadius: RADIUS.blatt, backgroundColor: "#ffffff", shadowColor: "#000", shadowOpacity: 0.35, shadowRadius: 24, shadowOffset: { width: 0, height: 14 }, elevation: 10 }}>
+          <Vorschau papier html={html} quer={v.querformat} hoehe={v.querformat ? 260 : 440} />
+        </View>
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, minHeight: 48 }}>
+          <Symbol name="eye" groesse={17} farbe={f.minze} />
+          <T v="klein" farbe={f.minze} stil={{ ...SCHRIFT.halb }}>{TEXT.vorschau_oeffnen}</T>
         </View>
       </Pressable>
-      <T v="caption" leise>{PRUEFHINWEIS}</T>
 
-      <T v="gross" accessibilityRole="header" stil={{ marginTop: 30, marginBottom: 11, marginLeft: 2 }}>{fest ? TEXT.angaben : TEXT.angaben_bearbeiten}</T>
-      <Karte>
-        {v.abschnitte.map((a, i) => (
-          <Zeile
-            key={i}
-            links={<Symbol name={jeSchritt[i]!.length ? "exclamationmark.circle" : "checkmark.circle.fill"} groesse={20} farbe={jeSchritt[i]!.length ? f.bald : f.amt} />}
-            titel={a.titel ?? ""}
-            text={jeSchritt[i]!.length ? TEXT.eintrag_fehlt(jeSchritt[i]!.length) : TEXT.schritt_fertig}
-            onPress={fest ? undefined : () => springen(i)}
-            letzte={i === v.abschnitte.length - 1}
-          />
-        ))}
-      </Karte>
-
-      <T v="gross" accessibilityRole="header" stil={{ marginTop: 30, marginBottom: 11, marginLeft: 2 }}>{TEXT.mehr}</T>
-      {eFehlt.length ? (
-        <View style={{ backgroundColor: f.baldHauch, borderRadius: RADIUS.karte, paddingHorizontal: 16, paddingVertical: 12, marginBottom: 10 }}>
-          <T v="klein" fett>{TEXT.e_rechnung_fehlt}</T>
-          {eFehlt.map((x) => (
-            <T key={x} v="klein" stil={{ marginTop: 3 }}>• {x}</T>
-          ))}
-        </View>
-      ) : null}
-      <Karte>
-        {[
-          ...(v.eRechnung && eRechnung ? [{ symbol: "doc.text", titel: TEXT.mitPro(TEXT.e_rechnung, z.pro), los: () => void eRechnung() }] : []),
-          { symbol: "printer", titel: TEXT.drucken, los: () => void druckenLos() },
-          ...(v.alsText ? [{ symbol: "doc.on.doc", titel: TEXT.als_text, los: () => void Share.share({ message: v.alsText!(d, z.stand.betrieb) }).catch(() => undefined) }] : []),
-          {
-            symbol: "plus.circle",
-            titel: TEXT.kopie,
-            los: () => {
-              const k = z.kopieren(id);
-              if (k) {
-                melden(TEXT.kopie_angelegt);
-                nav.oeffnen(`ablauf-${k.id}`, () => <Ablauf id={k.id} />, true);
-              }
-            },
-          },
-        ].map((x, i, l) => (
-          <Zeile key={x.symbol} symbol={x.symbol} titel={x.titel} onPress={x.los} letzte={i === l.length - 1} />
-        ))}
-      </Karte>
-      <View style={{ marginTop: 8, marginLeft: 2 }}>
-        {/* Rückfragen als System-Dialog – eine Karte am Seitenende läge halb unter Fußleiste oder Meldung */}
+      {/* das Blatt darunter: Zahlung, Hinweise, Angaben und weitere Möglichkeiten */}
+      <View style={{ marginHorizontal: -RAND, marginTop: 10, paddingHorizontal: RAND, paddingTop: 24, paddingBottom: 32, backgroundColor: f.papier, borderTopLeftRadius: RADIUS.buehne, borderTopRightRadius: RADIUS.buehne }}>
         {fest ? (
-          v.storno && !u.storniertDurch && !d.storno_zu ? (
+          <View>
+            {geteilt ? <Hinweis art="erfolg" symbol="checkmark.circle" text={TEXT.geteilt_text(datumDe(u.festgeschrieben!))} /> : <Hinweis symbol="lock" text={TEXT.festgeschrieben_text(datumDe(u.festgeschrieben!), Boolean(v.storno))} />}
+            {storno ? <Hinweis art="erfolg" text={TEXT.storniert_durch(String(storno.daten.nummer ?? ""))} /> : null}
+            {typeof d.storno_zu === "string" && d.storno_zu ? <Hinweis text={TEXT.storniert_zu(d.storno_zu)} /> : null}
+            {v.storno && !u.storniertDurch ? <Zahlung id={id} /> : null}
+          </View>
+        ) : null}
+        {ergebnis.length > 1 ? (
+          <Karte stil={{ marginTop: fest ? 12 : 0, paddingVertical: 8 }}>
+            {ergebnis.map(([k, w], i) => (
+              <View key={k} style={{ flexDirection: "row", justifyContent: "space-between", gap: 12, paddingVertical: 9, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie }}>
+                <T v="klein" leise={i < ergebnis.length - 1} fett={i === ergebnis.length - 1} stil={{ flex: 1 }}>{k}</T>
+                <T v="klein" fett={i === ergebnis.length - 1} stil={{ flexShrink: 1, textAlign: "right", fontVariant: ["tabular-nums"] }}>{w}</T>
+              </View>
+            ))}
+          </Karte>
+        ) : null}
+        {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
+        {v.festschreiben && !fest ? <T v="caption" leise stil={{ marginTop: 10, marginLeft: 4 }}>{TEXT.wird_festgeschrieben}</T> : null}
+        {zaehlt ? <T v="caption" leise stil={{ marginTop: 4, marginLeft: 4 }}>{TEXT.pro_rest(rest, FREI_JE_MONAT)}</T> : null}
+        <T v="caption" leise stil={{ marginTop: 4, marginLeft: 4 }}>{PRUEFHINWEIS}</T>
+
+        <T v="gross" accessibilityRole="header" stil={{ marginTop: 30, marginBottom: 12, marginLeft: 4 }}>{fest ? TEXT.angaben : TEXT.angaben_bearbeiten}</T>
+        <Karte>
+          {v.abschnitte.map((a, i) => (
+            <Zeile
+              key={i}
+              links={<Symbol name={jeSchritt[i]!.length ? "exclamationmark.circle" : "checkmark.circle.fill"} groesse={20} farbe={jeSchritt[i]!.length ? f.bald : f.amt} />}
+              titel={a.titel ?? ""}
+              text={jeSchritt[i]!.length ? TEXT.eintrag_fehlt(jeSchritt[i]!.length) : TEXT.schritt_fertig}
+              onPress={fest ? undefined : () => springen(i)}
+              letzte={i === v.abschnitte.length - 1}
+            />
+          ))}
+        </Karte>
+
+        <T v="gross" accessibilityRole="header" stil={{ marginTop: 30, marginBottom: 11, marginLeft: 2 }}>{TEXT.mehr}</T>
+        {eFehlt.length ? (
+          <View style={{ backgroundColor: f.baldHauch, borderRadius: RADIUS.karte, paddingHorizontal: 16, paddingVertical: 12, marginBottom: 10 }}>
+            <T v="klein" fett>{TEXT.e_rechnung_fehlt}</T>
+            {eFehlt.map((x) => (
+              <T key={x} v="klein" stil={{ marginTop: 3 }}>• {x}</T>
+            ))}
+          </View>
+        ) : null}
+        <Karte>
+          {[
+            ...(v.eRechnung && eRechnung ? [{ symbol: "doc.text", titel: TEXT.mitPro(TEXT.e_rechnung, z.pro), los: () => void eRechnung() }] : []),
+            { symbol: "printer", titel: TEXT.drucken, los: () => void druckenLos() },
+            ...(v.alsText ? [{ symbol: "doc.on.doc", titel: TEXT.als_text, los: () => void Share.share({ message: v.alsText!(d, z.stand.betrieb) }).catch(() => undefined) }] : []),
+            {
+              symbol: "plus.circle",
+              titel: TEXT.kopie,
+              los: () => {
+                const k = z.kopieren(id);
+                if (k) {
+                  melden(TEXT.kopie_angelegt);
+                  nav.oeffnen(`ablauf-${k.id}`, () => <Ablauf id={k.id} />, true);
+                }
+              },
+            },
+          ].map((x, i, l) => (
+            <Zeile key={x.symbol} symbol={x.symbol} titel={x.titel} onPress={x.los} letzte={i === l.length - 1} />
+          ))}
+        </Karte>
+        <View style={{ marginTop: 8, marginLeft: 2 }}>
+          {/* Rückfragen als System-Dialog – eine Karte am Seitenende läge halb unter Fußleiste oder Meldung */}
+          {fest ? (
+            v.storno && !u.storniertDurch && !d.storno_zu ? (
+              <TextKnopf
+                symbol="arrow.uturn.backward"
+                gefahr
+                text={TEXT.stornieren}
+                onPress={() =>
+                  void bestaetigen({ titel: TEXT.storno_wirklich, text: TEXT.storno_text, ja: TEXT.storno_ja }).then((ok) => {
+                    if (!ok) return;
+                    const neu = z.stornieren(id);
+                    if (neu) {
+                      melden(TEXT.storno_angelegt, "info");
+                      nav.oeffnen(`ablauf-${neu.id}`, () => <Ablauf id={neu.id} amEnde />, true);
+                    }
+                  })
+                }
+              />
+            ) : null
+          ) : (
             <TextKnopf
-              symbol="arrow.uturn.backward"
+              symbol="trash"
               gefahr
-              text={TEXT.stornieren}
+              text={TEXT.loeschen}
               onPress={() =>
-                void bestaetigen({ titel: TEXT.storno_wirklich, text: TEXT.storno_text, ja: TEXT.storno_ja }).then((ok) => {
+                void bestaetigen({ titel: TEXT.loeschen_wirklich, ja: TEXT.loeschen_ja }).then((ok) => {
                   if (!ok) return;
-                  const neu = z.stornieren(id);
-                  if (neu) {
-                    melden(TEXT.storno_angelegt, "info");
-                    nav.oeffnen(`ablauf-${neu.id}`, () => <Ablauf id={neu.id} amEnde />, true);
-                  }
+                  z.loeschen(id);
+                  melden(TEXT.geloescht, "info");
                 })
               }
             />
-          ) : null
-        ) : (
-          <TextKnopf
-            symbol="trash"
-            gefahr
-            text={TEXT.loeschen}
-            onPress={() =>
-              void bestaetigen({ titel: TEXT.loeschen_wirklich, ja: TEXT.loeschen_ja }).then((ok) => {
-                if (!ok) return;
-                z.loeschen(id);
-                melden(TEXT.geloescht, "info");
-              })
-            }
-          />
-        )}
+          )}
+        </View>
+        <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: -1000, height: 1000, backgroundColor: f.papier }} />
       </View>
     </View>
   );

@@ -823,6 +823,26 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Grenzen der Vorschau:** Glas, große Titel, Systemmenüs und Blatt-Gesten zeigt nur das iPhone. Die Bildschirmfotos (Web-Export) bilden nur die Struktur ab (→ T-82, jetzt mit Prüfpunkten: Tab-Leiste, große Titel beim Scrollen, „+“-Menü, Blätter wegwischen, Meldungen über Blättern, Tastatur in Blättern).
 - **Geprüft:** Typprüfung, Lint, Unit-Tests; Rundgang hell und dunkel an die neue Navigation angepasst (Hilfsfunktion `zurueck()` für „Zurück“ bzw. „Schließen“); Store-Bilder neu.
 
+
+### E-142 · Neues Design „Bühne und Papier“ (2026-10-16)
+
+- **Anlass:** Der Gründer wollte einen kompletten, mutigen Neuentwurf statt weiterer Überarbeitungen („komplettes Redesign, trau dich“). Auf einer Design-Leinwand wurden drei Richtungen entworfen: A „Klar“ (iOS-Standard), B „Bühne“ (Geld im Mittelpunkt, dunkles Grün) und C „Zeitachse“ (Fristen als Kalender). Gewählt wurde eine Mischung: die Bühne aus B, die Rechnung auf Papier aus C und das Jahr als Kacheln aus C im Stil von B.
+- **Aufbau jeder Tab-Seite:** Oben steht die dunkelgrüne Bühne mit der Zahl, die zählt. Darunter schiebt sich ein helles Blatt (Ecken 32) mit dem Rest.
+  - **Heute:** „Offen bei Kunden“ groß, dazu Plaketten (überfällig, Monatssumme) und die Knöpfe Rechnung und Beleg. Wer noch keine Rechnungen hat, sieht einen Gruß. Auf dem Blatt stehen unter „Als Nächstes“ überfällige Rechnungen vor den Pflichten, dazu Fortschritt und „Zuletzt bearbeitet“.
+  - **Pflichten:** Fortschritt und „Dein Jahr“: zwölf Monatskacheln ab jetzt mit der Zahl der Termine aus den geltenden Pflichten. Die Termine kommen aus der Regel-Engine (`PflichtInfo.termine`, Fenster zwölf Monate) und sind nicht erfunden. Vor dem Check steht die Einladung auf der Bühne.
+  - **Unterlagen:** Der offene Betrag steht auf der Bühne; antippen filtert auf offene Rechnungen.
+  - **Mein Betrieb:** Logo bzw. Anfangsbuchstabe und Name auf der Bühne.
+- **Rechnung abschließen:** Das Blatt wird grün, das Dokument liegt als Papier mit Schatten darauf, darüber Stand und Summe. Der Minze-Knopf „PDF teilen“ sitzt im grünen Fuß. Zahlung, Hinweise, Angaben und weitere Möglichkeiten folgen auf dem hellen Blatt darunter (`useKopf({ buehne })`, `Fuss buehne`, `Vorschau papier`).
+- **Tab-Leiste:** Eine eigene dunkle, schwebende Kapsel ersetzt die System-Tab-Leiste aus E-141. Der aktive Tab ist eine Minze-Pille mit Wort, rechts sitzt der Minze-Knopf „+“ (Neu erstellen). Das „+“-Menü oben rechts entfällt. Navigationsleisten, Zurück-Geste und Blätter bleiben nativ (E-141).
+- **Designsystem** (`thema.ts`, `bausteine.tsx`):
+  - Schrift ist Onest überall (wie App-Symbol und Website) statt SF Pro.
+  - Farben sind grünlich-neutral; der Hauptknopf ist tiefgrün (im Dunkelmodus Minze).
+  - Knöpfe sind abgerundete Rechtecke (18).
+  - Symbole stehen in getönten Quadraten statt in bunten Einstellungs-Quadraten.
+  - Das Fristblatt ist ein getöntes Quadrat mit Tag und Monat.
+  - Der Dunkelmodus hat eine eigene Bühne (#0a2a1e) und ein dunkles Blatt.
+- **Geprüft:** Typprüfung, Lint, 78 Unit-Tests. Rundgang hell und dunkel ohne Befunde, mit neuen Prüfungen: Jahresblick und „Offen bei Kunden“. Store-Bilder und Website-Bilder sind neu. Auf einem echten iPhone fehlt die Prüfung noch (→ T-84).
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

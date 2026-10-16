@@ -1,6 +1,6 @@
 # 06 · Designsystem
 
-Stand: 2026-10-11 · Quelle: `packages/web-kern/src/designsystem.css`
+Stand: 2026-10-16 · Quelle: `packages/web-kern/src/designsystem.css`
 
 ## Haltung
 
@@ -37,12 +37,14 @@ Einmalige, leicht gedrehte Umrandung wie ein Amtsstempel. Die einzige Bewegung i
 
 WCAG 2.2 AA, geprüft mit axe im E2E-Rundgang (hell/dunkel, Desktop/mobil). Ziele mindestens 44 px, sichtbarer Fokus, „Zum Inhalt springen“, Zeilenlänge ≤ 68 Zeichen, Dunkelmodus über `prefers-color-scheme`.
 
-## iPhone-App (E-140, iOS 26)
+## iPhone-App (E-142 „Bühne und Papier“)
 
-Quelle: `apps/mobile/src/ui/thema.ts` und `bausteine.tsx`.
+Quelle: `apps/mobile/src/ui/thema.ts`, `bausteine.tsx` und `seiten/gemeinsam.tsx` (`BuehnenSeite`).
 
-- **Schrift:** Systemschrift (SF Pro), iOS-Textstile 34 / 28 / 20 / 17 / 15 / 13 / 11.
-- **Flächen:** grauer gruppierter Grund, weiße Karten (Ecken 20), Eingabefelder weiß mit Rahmen ≥ 3:1. Pillen für Knöpfe und Chips.
-- **Symbole:** gefüllte farbige Quadrate mit weißem Zeichen vor Listenzeilen (wie Einstellungen); Fristblatt, Status-Plaketten, Initialen.
-- **Navigation:** schwebende Glas-Tab-Leiste mit „+“ daneben, runde Glasknöpfe oben (Zurück, Schließen).
-- **Marke:** Amtsgrün als Akzent, Bühne Dunkelgrün mit Minze und §/€-Motiv, App-Symbol § in Minze.
+- **Aufbau:** Jede Tab-Seite beginnt auf der dunkelgrünen Bühne (`#063b29`, dunkel `#0a2a1e`) mit weißer Schrift und Minze (`#7fe3b8`). Darunter liegt ein helles Blatt (`#f4f6f5`, dunkel `#0b0f0d`, Ecken 32) mit weißen Karten (Ecken 24). Auf der Bühne steht nur, was zählt: ein Betrag, das Jahr, ein bis zwei Knöpfe.
+- **Schrift:** Onest in fünf Schnitten. Titel extrafett und eng gesetzt (34 / 28), Überschrift 20, Fließtext 17, klein 15, Fußnote 13.
+- **Knöpfe:** Abgerundete Rechtecke (18), 54 pt hoch. Der Hauptknopf ist tiefgrün (dunkel: Minze). Auf der Bühne gibt es den Minze-Knopf und den Glasknopf (Weiß 12 %).
+- **Symbole:** Getönte Quadrate (Hauch-Farbe, Zeichen in der Tonfarbe). Das Fristblatt ist ein getöntes Quadrat mit Tag und Monat, der Ton trägt den Status.
+- **Navigation:** Eine dunkle, schwebende Kapsel. Der aktive Tab ist eine Minze-Pille mit Wort, rechts sitzt der Minze-Knopf „+“. Unterseiten und Blätter nutzen die nativen Leisten.
+- **Rechnung:** Der Abschluss zeigt das Dokument als Blatt Papier auf der Bühne.
+- **Marke:** Das §-Motiv groß und angeschnitten auf der Bühne; App-Symbol § in Minze.

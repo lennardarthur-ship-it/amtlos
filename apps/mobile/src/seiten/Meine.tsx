@@ -9,9 +9,9 @@ import { belegeFiltern, euroText, rechnungBrutto, filterVerfuegbar, filtern, off
 import { heute, sortiert, type Unterlage } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { BelegErfassen, BelegSeite, BelegZeile } from "./Belege";
-import { Gruppe, Leer, Seite } from "./gemeinsam";
+import { BuehnenMarke, BuehnenSeite, GrosserBetrag, Gruppe, Leer } from "./gemeinsam";
 import { useOeffnen, useStarten } from "./starten";
-import { useErstellen, useErstellenKnopf } from "./Erstellen";
+import { useErstellen } from "./Erstellen";
 import { Suchfeld, UnterlageZeile, useFehltJe, useUeberfaellig } from "./Unterlagen";
 import { BelegErfassenSeite } from "./Belege";
 
@@ -19,21 +19,19 @@ import { BelegErfassenSeite } from "./Belege";
 const SUCHE_AB = 6;
 
 /**
- * Offene Rechnungen auf einen Blick – der Betrag groß wie in Finanz-Apps, darunter Anzahl bzw. „davon überfällig“.
- * Antippen filtert die Liste auf offene Rechnungen (noch einmal: alle).
+ * Offene Rechnungen auf der Bühne (E-142): der Betrag groß, darunter Anzahl bzw. „davon überfällig“. Antippen filtert
+ * die Liste auf offene Rechnungen (noch einmal: alle) – die Plakette sagt, was der nächste Tipp tut.
  */
-function OffeneKarte({ anzahl, ueberfaellig, cent, aktiv, onPress }: { anzahl: number; ueberfaellig: number; cent: number; aktiv: boolean; onPress: () => void }) {
+function OffenAufBuehne({ anzahl, ueberfaellig, cent, aktiv, onPress }: { anzahl: number; ueberfaellig: number; cent: number; aktiv: boolean; onPress: () => void }) {
   const f = useFarben();
   return (
-    <Pressable accessibilityRole="button" accessibilityState={{ selected: aktiv }} accessibilityLabel={anzahl ? TEXT.offene_summe(anzahl, euroText(cent)) : TEXT.alles_bezahlt} onPress={anzahl ? onPress : undefined} style={({ pressed }) => ({ marginBottom: 16, opacity: pressed ? 0.7 : 1 })}>
-      <Karte stil={{ paddingVertical: 16, borderWidth: aktiv ? 2 : 0, borderColor: f.amt }}>
-        <T v="klein" fett leise>{TEXT.kachel_offen}</T>
-        <View style={{ flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}>
-          <Betrag stil={{ ...SCHRIFT.bold, fontSize: 30, lineHeight: 36 }}>{euroText(cent)}</Betrag>
-          {anzahl ? <T v="klein" fett farbe={f.amt}>{aktiv ? TEXT.filter.alle : TEXT.nur_offene}</T> : null}
-        </View>
-        <T v="caption" farbe={ueberfaellig ? f.frist : undefined} leise={!ueberfaellig}>{anzahl ? (ueberfaellig ? TEXT.davon_ueberfaellig(ueberfaellig) : TEXT.kachel_offen_text(anzahl)) : TEXT.alles_bezahlt}</T>
-      </Karte>
+    <Pressable accessibilityRole="button" accessibilityState={{ selected: aktiv }} accessibilityLabel={anzahl ? TEXT.offene_summe(anzahl, euroText(cent)) : TEXT.alles_bezahlt} onPress={anzahl ? onPress : undefined} style={({ pressed }) => ({ gap: 4, opacity: pressed ? 0.75 : 1 })}>
+      <T v="klein" farbe={f.buehneLeise} stil={{ ...SCHRIFT.mittel }}>{TEXT.offen_bei_kunden}</T>
+      <GrosserBetrag cent={cent} groesse={48} />
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8 }}>
+        <BuehnenMarke warnung={Boolean(ueberfaellig)} text={anzahl ? (ueberfaellig ? TEXT.davon_ueberfaellig(ueberfaellig) : TEXT.kachel_offen_text(anzahl)) : TEXT.alles_bezahlt} />
+        {anzahl ? <BuehnenMarke text={aktiv ? TEXT.filter.alle : TEXT.nur_offene} /> : null}
+      </View>
     </Pressable>
   );
 }
@@ -62,7 +60,6 @@ export function Meine() {
   const { stand } = useAmtlos();
   const f = useFarben();
   const erstellen = useErstellen();
-  const erstellenKnopf = useErstellenKnopf();
   const nav = useNav();
   const oeffnen = useOeffnen();
   const belegOeffnen = (id: string) => nav.oeffnen(`beleg-${id}`, () => <BelegSeite id={id} />, true);
@@ -86,10 +83,13 @@ export function Meine() {
   const fehltJe = useFehltJe();
   const ueberJe = useUeberfaellig();
   return (
-    <Seite titel={TEXT.meine_titel} unterzeile={alle.length ? TEXT.anzahl_unterlagen(alle.length) : undefined} rechts={erstellenKnopf}>
+    <BuehnenSeite
+      ueber={alle.length ? TEXT.anzahl_unterlagen(alle.length) : undefined}
+      titel={TEXT.meine_titel}
+      buehne={hatRechnungen ? <OffenAufBuehne anzahl={offen.anzahl} ueberfaellig={offen.ueberfaellig} cent={offen.cent} aktiv={aktiv === "offen"} onPress={() => setFilter(aktiv === "offen" ? "alle" : "offen")} /> : undefined}
+    >
       {alle.length || stand.belege.length ? (
         <View>
-          {hatRechnungen ? <OffeneKarte anzahl={offen.anzahl} ueberfaellig={offen.ueberfaellig} cent={offen.cent} aktiv={aktiv === "offen"} onPress={() => setFilter(aktiv === "offen" ? "alle" : "offen")} /> : null}
           {alle.length + stand.belege.length >= SUCHE_AB ? (
             <View style={{ marginBottom: 12 }}>
               <Suchfeld wert={suche} setzen={setSuche} label={TEXT.meine_suchen} />
@@ -148,6 +148,6 @@ export function Meine() {
           </View>
         </Leer>
       )}
-    </Seite>
+    </BuehnenSeite>
   );
 }

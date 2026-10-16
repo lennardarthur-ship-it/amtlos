@@ -61,6 +61,8 @@ export interface PflichtInfo {
   vorlage: string | null;
   /** nächster Termin aus dem Katalog (wiederkehrende Pflichten) */
   naechsterTermin: string | null;
+  /** alle Termine ab heute in den nächsten zwölf Monaten (ISO, aufsteigend) – für den Jahresblick */
+  termine: string[];
   /** Fragen, die für eine unklare Pflicht noch fehlen (Profilfelder) */
   offeneFragen: string[];
   /** wiederkehrend (z. B. jährlich): „erledigt“ gilt nur bis zum nächsten Termin */
@@ -99,7 +101,8 @@ export function auswertung(profil: Profil, stichtag: string): Auswertung {
   const nachId = new Map(KATALOG.pflichten.map((p) => [p.id, p]));
   const info = (e: (typeof ergebnisse)[number]): PflichtInfo => {
     const p = nachId.get(e.pflicht_id) as Pflicht & { stelle?: unknown; quellen?: { titel: string; url?: string }[]; pruefung?: { status?: string } };
-    const termin = e.termine.map((t) => t.faellig_am).filter((d) => d >= stichtag).sort()[0] ?? null;
+    const termine = e.termine.map((t) => t.faellig_am).filter((d) => d >= stichtag).sort();
+    const termin = termine[0] ?? null;
     return {
       id: p.id,
       titel: text(p.titel),
@@ -114,6 +117,7 @@ export function auswertung(profil: Profil, stichtag: string): Auswertung {
       grund: entscheidendeSaetze(e.begruendung).join(" ") || ("immer" in (p.ausloeser as object) ? IMMER : ""),
       vorlage: VORLAGE_JE_PFLICHT.get(p.id) ?? null,
       naechsterTermin: termin,
+      termine,
       offeneFragen: zuErfragendeFakten(e.fehlende_fakten)
         .filter((f) => f.startsWith("profil."))
         .map((f) => f.slice("profil.".length))

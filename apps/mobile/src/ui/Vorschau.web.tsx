@@ -3,8 +3,8 @@ import { View } from "react-native";
 import { RADIUS, useFarben } from "./thema";
 import { BLATT_BREITE, BLATT_BREITE_QUER, vorschauHtml } from "./vorschauHtml";
 
-/** Web (Vorschau, Rundgang): iframe auf Blattbreite, verkleinert auf die verfügbare Breite. */
-export function Vorschau({ html, quer, hoehe }: { html: string; quer?: boolean; hoehe?: number }) {
+/** Web (Vorschau, Rundgang; `papier`: ohne Rahmen): iframe auf Blattbreite, verkleinert auf die verfügbare Breite. */
+export function Vorschau({ html, quer, hoehe, papier }: { html: string; quer?: boolean; hoehe?: number; papier?: boolean }) {
   const f = useFarben();
   const [breite, setBreite] = useState(0);
   const blatt = quer ? BLATT_BREITE_QUER : BLATT_BREITE;
@@ -13,7 +13,7 @@ export function Vorschau({ html, quer, hoehe }: { html: string; quer?: boolean; 
     <View
       onLayout={(e) => setBreite(e.nativeEvent.layout.width)}
       pointerEvents={hoehe ? "none" : "auto"}
-      style={hoehe ? { height: hoehe, borderRadius: RADIUS.blatt, overflow: "hidden", borderWidth: 1, borderColor: f.linie, backgroundColor: "#ffffff" } : { flex: 1, overflow: "hidden", backgroundColor: "#ffffff" }}
+      style={hoehe ? { height: hoehe, borderRadius: RADIUS.blatt, overflow: "hidden", borderWidth: papier ? 0 : 1, borderColor: f.linie, backgroundColor: "#ffffff" } : { flex: 1, overflow: "hidden", backgroundColor: "#ffffff" }}
     >
       {faktor
         ? createElement("iframe", {

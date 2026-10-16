@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Linking, View } from "react-native";
 import { T as TEXT } from "../texte";
 import { useMeldung } from "../ui/meldung";
-import { Betrag, Fristblatt, Fuss, Hinweis, Karte, Knopf, Schalter, SchnellKachel, Symbol, T, TextKnopf, Zeile, tageBis } from "../ui/bausteine";
+import { Fristblatt, Fuss, Hinweis, Kachel, Karte, Knopf, Schalter, SchnellKachel, Symbol, T, TextKnopf, Zeile, tageBis } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { HAARLINIE, RAND, SCHRIFT, useFarben, weich } from "../ui/thema";
 import { KATEGORIE_TITEL, auswertung, beantwortet, dringlichkeit, erinnerungsPlan, fortschritt, frageZu, haken, istErledigt, offeneFragenNachWirkung, type PflichtInfo } from "../pflichten/check";
@@ -11,7 +11,7 @@ import { heute } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { Antwort, CheckAblauf } from "./Check";
 import { SicherungsKarte } from "./Sicherung";
-import { Gruppe, Inhalt, Seite, datumKurz } from "./gemeinsam";
+import { BuehnenKnopf, BuehnenSeite, Gruppe, Inhalt, datumKurz } from "./gemeinsam";
 import { useStarten } from "./starten";
 import { useErstellen } from "./Erstellen";
 
@@ -27,10 +27,10 @@ export function useAuswertung() {
 /** Hat jemand den Check schon gemacht? (die erste Frage ist beantwortet) */
 export const checkGemacht = (profil: Record<string, unknown>) => beantwortet(profil as never, "taetigkeit.branchen") || beantwortet(profil as never, "rechtsform");
 
-function Balken({ prozent, grund, farbe }: { prozent: number; grund?: string; farbe?: string }) {
+export function Balken({ prozent, grund, farbe }: { prozent: number; grund?: string; farbe?: string }) {
   const f = useFarben();
   return (
-    <View accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: 100, now: prozent }} style={{ height: 8, borderRadius: 4, backgroundColor: grund ?? f.flaeche, overflow: "hidden" }}>
+    <View accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: 100, now: prozent }} style={{ height: 8, borderRadius: 4, backgroundColor: grund ?? f.linie, overflow: "hidden" }}>
       <View style={{ width: `${Math.max(prozent, 2)}%`, height: 8, borderRadius: 4, backgroundColor: farbe ?? f.amt }} />
     </View>
   );
@@ -134,8 +134,10 @@ export function fristText(termin: string, tag = heute()): string {
   return TEXT.naechster_termin(datumDe(termin));
 }
 
+/** Symbol je Bereich des Katalogs – vor Pflichten ohne Termin. */
+const BEREICH_SYMBOL_KAT: Record<string, string> = { gruendung: "flag", gesellschaft: "building.columns", steuern: "eurosign", personal: "person.2", arbeitsschutz: "hammer", datenschutz: "lock.shield", it_sicherheit: "lock", ki: "sparkles", online: "globe", produkte: "tray", branche: "storefront" };
+
 export function PflichtZeile({ p, letzte, erledigt, ohneWichtig }: { p: PflichtInfo; letzte: boolean; erledigt: boolean; ohneWichtig?: boolean }) {
-  const f = useFarben();
   const nav = useNav();
   const termin = !erledigt && p.naechsterTermin ? p.naechsterTermin : null;
   // das Datum steht im Fristblatt – im Text nur kurz (ohne Jahr, wenn es dieses Jahr ist)
@@ -144,7 +146,7 @@ export function PflichtZeile({ p, letzte, erledigt, ohneWichtig }: { p: PflichtI
   return (
     <Zeile
       // mit Termin: das Fristblatt (Datum auf einen Blick); sonst der Status als Form
-      links={termin ? <Fristblatt termin={termin} heute={heute()} /> : <Symbol name={erledigt ? "checkmark.circle.fill" : p.schwere === "hoch" ? "exclamationmark.circle" : "circle"} groesse={22} farbe={erledigt ? f.amt : p.schwere === "hoch" ? f.bald : f.rahmen} />}
+      links={termin ? <Fristblatt termin={termin} heute={heute()} /> : <Kachel symbol={erledigt ? "checkmark" : p.schwere === "hoch" ? "exclamationmark" : BEREICH_SYMBOL_KAT[p.kategorie] ?? "doc.text"} ton={erledigt ? "amt" : p.schwere === "hoch" ? "bald" : "leise"} groesse={46} />}
       // „Wichtig“ steckt sonst nur im Symbol – für VoiceOver mit ansagen
       titel={p.titel}
       text={!erledigt && !ohneWichtig && p.schwere === "hoch" && unter !== TEXT.wichtig ? `${TEXT.wichtig} · ${unter}` : unter}
@@ -158,7 +160,6 @@ export function PflichtZeile({ p, letzte, erledigt, ohneWichtig }: { p: PflichtI
 /** Inhalt von „Deine Pflichten“ – als Tab (Start) und als Unterseite. */
 function PflichtenInhalt() {
   const z = useAmtlos();
-  const f = useFarben();
   const nav = useNav();
   const a = useAuswertung();
   const [zeigen, setZeigen] = useState(false);
@@ -166,11 +167,10 @@ function PflichtenInhalt() {
   const [alleZeigen, setAlleZeigen] = useState(false);
   const { erledigt, unterlagen, profil, betrieb } = z.stand;
   const tag = heute();
-  // Fortschritt, Dringlichkeit und offene Fragen nur neu rechnen, wenn sich Haken, Unterlagen oder Antworten ändern – nicht bei jedem Tippen anderswo
-  const { fs, offen, kategorien, sonst, d } = useMemo(() => {
+  // Dringlichkeit und offene Fragen nur neu rechnen, wenn sich Haken, Unterlagen oder Antworten ändern – nicht bei jedem Tippen anderswo
+  const { offen, kategorien, sonst, d } = useMemo(() => {
     const e = { erledigt, unterlagen, betrieb };
     return {
-      fs: fortschritt(a, e),
       offen: offeneFragenNachWirkung(a, profil),
       kategorien: Object.keys(KATEGORIE_TITEL).filter((k) => a.gilt.some((p) => p.kategorie === k)),
       sonst: a.gilt.filter((p) => !KATEGORIE_TITEL[p.kategorie]),
@@ -180,19 +180,8 @@ function PflichtenInhalt() {
   const fertig = (p: PflichtInfo) => istErledigt(p, { erledigt, unterlagen, betrieb });
   return (
     <View>
-      {/* Fortschritt als Karte: Zahl groß, darunter der Balken – wie die Ringe-Übersicht in Fitness */}
-      <Karte stil={{ paddingVertical: 18, gap: 10 }}>
-        <T v="klein" fett leise accessibilityRole="header">{TEXT.ergebnis_titel(a.gilt.length)}</T>
-        <View style={{ flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", gap: 12 }}>
-          <Betrag farbe={f.amt} stil={{ ...SCHRIFT.bold, fontSize: 40, lineHeight: 46, letterSpacing: 0.2 }}>{`${fs.prozent} %`}</Betrag>
-          <T v="klein" leise stil={{ marginBottom: 7, textAlign: "right", flexShrink: 1 }}>{TEXT.fortschritt_text(fs.fertig, fs.gesamt)}</T>
-        </View>
-        <Balken prozent={fs.prozent} />
-      </Karte>
-      <T v="caption" leise stil={{ marginTop: 8, marginLeft: 2 }}>{TEXT.pflichten_quelle}</T>
-      <ErinnerungsSchalter />
       {d.jetzt.length ? (
-        <Gruppe titel={TEXT.jetzt_dran(d.jetzt.length)}>
+        <Gruppe erste titel={TEXT.jetzt_dran(d.jetzt.length)}>
           <Karte>
             {d.jetzt.map((p, i) => (
               // sind alle „wichtig“, sagt das Wort nichts – dann zählt der Termin
@@ -201,7 +190,7 @@ function PflichtenInhalt() {
           </Karte>
         </Gruppe>
       ) : (
-        <Gruppe titel={TEXT.jetzt_dran(0)}>
+        <Gruppe erste titel={TEXT.jetzt_dran(0)}>
           <Hinweis art="erfolg" text={TEXT.nichts_dran} />
         </Gruppe>
       )}
@@ -214,6 +203,7 @@ function PflichtenInhalt() {
           </Karte>
         </Gruppe>
       ) : null}
+      <ErinnerungsSchalter />
       {offen.length ? <KurzKlaeren offen={offen} unklar={a.unbekannt.length} /> : null}
       <T v="gross" accessibilityRole="header" stil={{ marginTop: 30, marginLeft: 2 }}>{TEXT.alle_nach_bereich}</T>
       {/* die vollständige Liste erst auf Wunsch – oben steht, was jetzt zu tun ist */}
@@ -265,6 +255,7 @@ function PflichtenInhalt() {
         </Gruppe>
       ) : null}
       <TextKnopf symbol="pencil" text={TEXT.angaben_aendern} onPress={() => nav.oeffnen("check", () => <CheckAblauf einleitung={false} />, true)} stil={{ marginTop: 20, marginLeft: 4 }} />
+      <T v="caption" leise stil={{ marginTop: 8, marginLeft: 4 }}>{TEXT.pflichten_quelle}</T>
     </View>
   );
 }
@@ -308,14 +299,12 @@ export function PflichtenSeite() {
   );
 }
 
-/** Einladung zum Pflichten-Check auf der Bühne – mit dem §-Motiv in Minze (Start und „Heute“). */
+/** Einladung zum Pflichten-Check auf dem Blatt von „Heute“: getöntes Symbol, Titel, Satz, Knopf. */
 export function Einladung() {
   const nav = useNav();
-  const f = useFarben();
-  // wie die Einstiegskarten in Apples eigenen Apps: weiße Karte, ein Symbol in der Akzentfarbe, Titel, Satz, Knopf
   return (
     <Karte stil={{ paddingVertical: 20, gap: 10 }}>
-      <Symbol name="checklist" groesse={30} farbe={f.amt} gewicht="semibold" />
+      <Kachel symbol="checklist" groesse={48} />
       <T v="gross" accessibilityRole="header" stil={{ fontSize: 22, lineHeight: 28, marginTop: 4 }}>{TEXT.pflichten_karte_titel}</T>
       <T v="klein" leise>{TEXT.pflichten_einladung}</T>
       <Knopf text={TEXT.pflichten_check_starten} onPress={() => nav.oeffnen("check", () => <CheckAblauf />, true)} stil={{ marginTop: 8 }} />
@@ -333,9 +322,8 @@ function Start() {
   const starten = useStarten();
   return (
     <View>
-      <Einladung />
       {/* wer gleich etwas erledigen will, findet es ohne Scrollen */}
-      <View style={{ flexDirection: "row", gap: 12, marginTop: 14 }}>
+      <View style={{ flexDirection: "row", gap: 12 }}>
         <SchnellKachel symbol="eurosign" text={TEXT.start_rechnung} onPress={() => starten("rechnung")} />
         <SchnellKachel ton="lila" symbol="doc.text" text={TEXT.start_vorlagen} onPress={erstellen.oeffnen} />
       </View>
@@ -355,15 +343,71 @@ function Start() {
   );
 }
 
-/** Erster Tab (E-129): die Pflichten sind der Kern – vor dem Check die Einladung, danach „Jetzt dran“. */
+/** Monatskürzel und Termine je Monat für die nächsten zwölf Monate (ab dem laufenden Monat). */
+function jahresblick(gilt: PflichtInfo[], tag: string) {
+  const [j, m] = tag.split("-").map(Number) as [number, number];
+  return Array.from({ length: 12 }, (_, i) => {
+    const d = new Date(Date.UTC(j, m - 1 + i, 15));
+    const schluessel = d.toISOString().slice(0, 7);
+    const termine = gilt.reduce((n, p) => n + p.termine.filter((t) => t.startsWith(schluessel)).length, 0);
+    const fmt = (o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", ...o }).format(d);
+    return { schluessel, kurz: fmt({ month: "short" }).replace(".", ""), lang: fmt({ month: "long", year: "numeric" }), termine, jetzt: i === 0 };
+  });
+}
+
+/**
+ * Jahresblick auf der Bühne (E-142): zwölf Monatskacheln ab jetzt, je Monat die Zahl der Termine aus den geltenden
+ * Pflichten. Der laufende Monat in Minze, Monate mit Terminen getönt, ruhige Monate gestrichelt.
+ */
+function Jahresblick({ gilt, tag }: { gilt: PflichtInfo[]; tag: string }) {
+  const f = useFarben();
+  const monate = useMemo(() => jahresblick(gilt, tag), [gilt, tag]);
+  return (
+    <View accessibilityLabel={TEXT.jahr_hinweis} style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
+      {monate.map((mo) => (
+        <View
+          key={mo.schluessel}
+          accessible
+          accessibilityLabel={TEXT.monat_termine(mo.lang, mo.termine)}
+          style={{ width: "15.2%", flexGrow: 1, height: 54, borderRadius: 14, padding: 7, justifyContent: "space-between", backgroundColor: mo.jetzt ? f.minze : mo.termine ? "rgba(127,227,184,0.16)" : "transparent", borderWidth: mo.jetzt || mo.termine ? 0 : 1.5, borderStyle: "dashed", borderColor: "rgba(255,255,255,0.3)" }}
+        >
+          <T v="caption" farbe={mo.jetzt ? f.buehneKnopfText : f.buehneLeise} stil={{ ...SCHRIFT.halb, fontSize: 12, lineHeight: 14 }}>{mo.kurz}</T>
+          {mo.termine ? <T farbe={mo.jetzt ? f.buehneKnopfText : f.buehneText} stil={{ ...SCHRIFT.display, fontSize: 17, lineHeight: 19 }}>{String(mo.termine)}</T> : null}
+        </View>
+      ))}
+    </View>
+  );
+}
+
+/** Erster Tab (E-129, E-142): auf der Bühne der Fortschritt und das Jahr; vor dem Check die Einladung dazu. */
 export function PflichtenTab() {
   const z = useAmtlos();
+  const f = useFarben();
+  const nav = useNav();
+  const a = useAuswertung();
   const gemacht = checkGemacht(z.stand.profil);
+  const { erledigt, unterlagen, betrieb } = z.stand;
+  const fs = useMemo(() => fortschritt(a, { erledigt, unterlagen, betrieb }), [a, erledigt, unterlagen, betrieb]);
+  const check = () => nav.oeffnen("check", () => <CheckAblauf einleitung={!gemacht} />, true);
   return (
-    <Seite titel={TEXT.tabs.pflichten} unterzeile={gemacht ? TEXT.pflichten_tab_unter : undefined}>
+    <BuehnenSeite
+      ueber={gemacht ? TEXT.fortschritt_text(fs.fertig, fs.gesamt) : TEXT.tabs.pflichten}
+      rechts={gemacht ? <BuehnenKnopf text={TEXT.jahr_neu_pruefen} label={TEXT.angaben_aendern} onPress={check} /> : undefined}
+      titel={gemacht ? TEXT.jahr_titel : TEXT.pflichten_karte_titel}
+      buehne={
+        gemacht ? (
+          <Jahresblick gilt={a.gilt} tag={heute()} />
+        ) : (
+          <View style={{ gap: 18 }}>
+            <T farbe={f.buehneLeise}>{TEXT.pflichten_einladung}</T>
+            <Knopf buehne text={TEXT.pflichten_check_starten} onPress={check} />
+          </View>
+        )
+      }
+    >
       <SicherungsKarte />
       {gemacht ? <PflichtenInhalt /> : <Start />}
-    </Seite>
+    </BuehnenSeite>
   );
 }
 
