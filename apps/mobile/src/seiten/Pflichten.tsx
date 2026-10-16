@@ -4,14 +4,14 @@ import { T as TEXT } from "../texte";
 import { useMeldung } from "../ui/meldung";
 import { Fristblatt, Fuss, Hinweis, Kachel, Karte, Knopf, Schalter, SchnellKachel, Symbol, T, TextKnopf, Zeile, tageBis } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
-import { HAARLINIE, RAND, SCHRIFT, useFarben, weich } from "../ui/thema";
+import { HAARLINIE, SCHRIFT, useFarben, weich } from "../ui/thema";
 import { KATEGORIE_TITEL, auswertung, beantwortet, dringlichkeit, erinnerungsPlan, fortschritt, frageZu, haken, istErledigt, offeneFragenNachWirkung, type PflichtInfo } from "../pflichten/check";
 import { allesAbsagen, erinnerungenMoeglich, erlaubnisAnfragen, planen } from "../pflichten/erinnerungen";
 import { heute } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { Antwort, CheckAblauf } from "./Check";
 import { SicherungsKarte } from "./Sicherung";
-import { BuehnenKnopf, BuehnenSeite, Gruppe, Inhalt, datumKurz } from "./gemeinsam";
+import { BuehnenBlatt, BuehnenKnopf, BuehnenSeite, Gruppe, Inhalt, datumKurz } from "./gemeinsam";
 import { useStarten } from "./starten";
 import { useErstellen } from "./Erstellen";
 
@@ -64,63 +64,72 @@ function PflichtDetail({ id }: { id: string }) {
     </View>
     );
   };
+  const termin = p.naechsterTermin && !abgehakt ? p.naechsterTermin : null;
+  const tage = termin ? tageBis(termin, heute()) : 0;
+  const fuss = gilt ? (
+    <Fuss>
+      {p.vorlage ? (
+        // Haken als zweiter Knopf im Fuß – nicht als Textlink halb unter der Leiste
+        <>
+          <Knopf ton text={abgehakt ? TEXT.haken_entfernen_kurz : TEXT.als_erledigt_kurz} symbol={abgehakt ? "xmark" : "checkmark"} onPress={abhaken} stil={{ flex: 1 }} />
+          <Knopf text={TEXT.unterlage_erstellen_kurz} symbol="plus" onPress={() => starten(p.vorlage!)} stil={{ flex: 1.3 }} />
+        </>
+      ) : (
+        <Knopf ton={abgehakt} text={abgehakt ? TEXT.haken_entfernen : TEXT.als_erledigt} symbol={abgehakt ? undefined : "checkmark"} onPress={abhaken} stil={{ flex: 1 }} />
+      )}
+    </Fuss>
+  ) : null;
   return (
-    <Unterseite titel={TEXT.pflicht_titel}>
-      <Inhalt contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 16, paddingBottom: 32 }}>
-        <T v="caption" leise>{KATEGORIE_TITEL[p.kategorie] ?? p.kategorie}</T>
-        <T v="titel" accessibilityRole="header" stil={{ marginTop: 4 }}>{p.titel}</T>
-        <T stil={{ marginTop: 8 }}>{p.kurz}</T>
-        {p.naechsterTermin && !abgehakt ? (
-          // der nächste Termin als Fristblatt mit Abstand in Tagen – das Wichtigste zuerst
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 14, marginTop: 16 }}>
-            <Fristblatt termin={p.naechsterTermin} heute={heute()} groesse={56} />
-            <View style={{ flex: 1 }}>
-              <T fett farbe={tageBis(p.naechsterTermin, heute()) < 0 ? f.frist : undefined}>{fristText(p.naechsterTermin)}</T>
-              <T v="klein" leise>{new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date(`${p.naechsterTermin}T12:00:00Z`))}</T>
+    <BuehnenBlatt
+      kopf={TEXT.pflicht_titel}
+      ueber={KATEGORIE_TITEL[p.kategorie] ?? p.kategorie}
+      titel={p.titel}
+      unter={p.kurz}
+      fuss={fuss}
+      buehne={
+        termin ? (
+          // der nächste Termin groß: Tage bis dahin und das Datum – das Wichtigste zuerst
+          <View style={{ flexDirection: "row", alignItems: "flex-end", gap: 12, marginTop: 6 }}>
+            <T farbe={tage < 0 ? "#ffc9c4" : f.minze} stil={{ ...SCHRIFT.display, fontSize: 52, lineHeight: 54, letterSpacing: -2 }}>{String(Math.abs(tage))}</T>
+            <View style={{ paddingBottom: 6, flex: 1 }}>
+              <T fett farbe={f.buehneText}>{fristText(termin)}</T>
+              <T v="klein" farbe={f.buehneLeise}>{new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date(`${termin}T12:00:00Z`))}</T>
             </View>
           </View>
-        ) : null}
-        {abgehakt ? <Hinweis art="erfolg" symbol="checkmark.circle" text={TEXT.erledigt_am(datumDe(haken(z.stand.erledigt[p.id])?.datum ?? heute()))} /> : null}
-        {durchUnterlage ? <Hinweis art="erfolg" text={TEXT.erledigt_durch_unterlage} /> : null}
-        {p.wiederkehrend && p.naechsterTermin ? <Hinweis text={TEXT.wiederkehrend_hinweis(datumDe(p.naechsterTermin))} /> : null}
-        <Karte stil={{ marginTop: 16, paddingTop: 0 }}>
-          {p.grund ? zeile(TEXT.warum, p.grund) : null}
-          {/* der Termin steht oben im Fristblatt – hier nur, wenn die Pflicht abgehakt ist */}
-          {p.naechsterTermin && abgehakt ? zeile(TEXT.naechster_termin("").trim(), datumDe(p.naechsterTermin)) : null}
-          {p.stelle ? zeile(TEXT.zustaendig, p.stelle) : null}
-          {zeile(TEXT.einstufung, TEXT.schwere[p.schwere])}
-        </Karte>
-        {p.erklaerung ? <T v="klein" stil={{ marginTop: 16 }}>{p.erklaerung}</T> : null}
-        {p.rechtsgrundlage.length ? (
-          <Gruppe titel={TEXT.grundlage}>
-            <T v="klein">{p.rechtsgrundlage.join(" · ")}</T>
-          </Gruppe>
-        ) : null}
-        {p.quellen.length ? (
-          <Gruppe titel={TEXT.quellen}>
-            <Karte>
-              {p.quellen.map((q, i) => (
-                <Zeile key={q.url} titel={q.titel} text={q.url.replace(/^https?:\/\//, "").split("/")[0]} rechts={<Symbol name="arrow.right" groesse={16} />} onPress={() => void Linking.openURL(q.url)} letzte={i === p.quellen.length - 1} />
-              ))}
-            </Karte>
-          </Gruppe>
-        ) : null}
-        <T v="caption" leise stil={{ marginTop: 16 }}>{TEXT.pflichten_quelle}</T>
-      </Inhalt>
-      {gilt ? (
-        <Fuss>
-          {p.vorlage ? (
-            // Haken als zweiter Knopf im Fuß – nicht als Textlink halb unter der Leiste
-            <>
-              <Knopf ton text={abgehakt ? TEXT.haken_entfernen_kurz : TEXT.als_erledigt_kurz} symbol={abgehakt ? "xmark" : "checkmark"} onPress={abhaken} stil={{ flex: 1 }} />
-              <Knopf text={TEXT.unterlage_erstellen_kurz} symbol="plus" onPress={() => starten(p.vorlage!)} stil={{ flex: 1.3 }} />
-            </>
-          ) : (
-            <Knopf ton={abgehakt} text={abgehakt ? TEXT.haken_entfernen : TEXT.als_erledigt} symbol={abgehakt ? undefined : "checkmark"} onPress={abhaken} stil={{ flex: 1 }} />
-          )}
-        </Fuss>
+        ) : abgehakt ? (
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginTop: 4 }}>
+            <Symbol name="checkmark.circle.fill" groesse={20} farbe={f.minze} />
+            <T fett farbe={f.buehneText}>{TEXT.erledigt_am(datumDe(haken(z.stand.erledigt[p.id])?.datum ?? heute()))}</T>
+          </View>
+        ) : undefined
+      }
+    >
+      {durchUnterlage ? <Hinweis art="erfolg" text={TEXT.erledigt_durch_unterlage} /> : null}
+      {p.wiederkehrend && p.naechsterTermin ? <Hinweis text={TEXT.wiederkehrend_hinweis(datumDe(p.naechsterTermin))} /> : null}
+      <Karte stil={{ marginTop: 8, paddingTop: 0 }}>
+        {p.grund ? zeile(TEXT.warum, p.grund) : null}
+        {/* der Termin steht oben auf der Bühne – hier nur, wenn die Pflicht abgehakt ist */}
+        {p.naechsterTermin && abgehakt ? zeile(TEXT.naechster_termin("").trim(), datumDe(p.naechsterTermin)) : null}
+        {p.stelle ? zeile(TEXT.zustaendig, p.stelle) : null}
+        {zeile(TEXT.einstufung, TEXT.schwere[p.schwere])}
+      </Karte>
+      {p.erklaerung ? <T v="klein" stil={{ marginTop: 16, marginHorizontal: 4 }}>{p.erklaerung}</T> : null}
+      {p.rechtsgrundlage.length ? (
+        <Gruppe titel={TEXT.grundlage}>
+          <T v="klein" stil={{ marginHorizontal: 4 }}>{p.rechtsgrundlage.join(" · ")}</T>
+        </Gruppe>
       ) : null}
-    </Unterseite>
+      {p.quellen.length ? (
+        <Gruppe titel={TEXT.quellen}>
+          <Karte>
+            {p.quellen.map((q, i) => (
+              <Zeile key={q.url} titel={q.titel} text={q.url.replace(/^https?:\/\//, "").split("/")[0]} rechts={<Symbol name="arrow.right" groesse={16} />} onPress={() => void Linking.openURL(q.url)} letzte={i === p.quellen.length - 1} />
+            ))}
+          </Karte>
+        </Gruppe>
+      ) : null}
+      <T v="caption" leise stil={{ marginTop: 16, marginHorizontal: 4 }}>{TEXT.pflichten_quelle}</T>
+    </BuehnenBlatt>
   );
 }
 

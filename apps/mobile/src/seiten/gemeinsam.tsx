@@ -1,74 +1,13 @@
-import { useIsFocused, useNavigation, type NavigationProp, type ParamListBase } from "@react-navigation/native";
+import { useIsFocused } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
-import { useLayoutEffect, useRef, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { Pressable, ScrollView, View, type ScrollViewProps } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Bereich } from "@amtlos/fachlogik";
 import { euroText } from "../unterlagen/ablage";
-import { T as TEXT } from "../texte";
-import { Kachel, Motiv, Symbol, T } from "../ui/bausteine";
-import { RundKnopf, useNav } from "../ui/navigation";
+import { Kachel, Motiv, T } from "../ui/bausteine";
+import { TastaturRahmen, useImBlatt, useKopf, type KopfKnopfDef } from "../ui/navigation";
 import { RADIUS, RAND, SCHRIFT, istIos, schattenStil, useFarben } from "../ui/thema";
-
-export interface SeitenKnopf {
-  text: string;
-  symbol: string;
-  label?: string;
-  onPress: () => void;
-  /** iPhone: Menü am Knopf (wie „+“ in Notizen/Dateien); im Web öffnet der Knopf `onPress`. */
-  menue?: { text: string; symbol: string; onPress: () => void }[];
-}
-
-/**
- * Erste Seite eines Tabs (E-141): auf dem iPhone mit dem großen Titel der Systemleiste, der beim Scrollen in die Leiste
- * wandert, und echten Glasknöpfen; im Web derselbe Aufbau nachgebildet (Titel im Inhalt).
- */
-export function Seite({ titel, unterzeile, ueber, rechts, schliessen, children, ...rest }: ScrollViewProps & { titel: string; unterzeile?: string; ueber?: string; rechts?: SeitenKnopf; schliessen?: boolean }) {
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
-  const nav = useNav();
-  // Knopf und Menü über eine Referenz – neue Funktionen je Render sollen die Leiste nicht neu setzen
-  const knopf = useRef(rechts);
-  knopf.current = rechts;
-  const zu = useRef(nav.zurueck);
-  zu.current = nav.zurueck;
-  useLayoutEffect(() => {
-    if (!istIos) {
-      navigation.setOptions({ headerShown: false });
-      return;
-    }
-    // große Titel und durchsichtige Leiste stehen schon in den Optionen des Stapels (kein Umschalten nach dem Start)
-    navigation.setOptions({
-      title: titel,
-      ...(schliessen ? { unstable_headerLeftItems: () => [{ type: "button", label: TEXT.schliessen, icon: { type: "sfSymbol", name: "xmark" }, onPress: () => zu.current() }] } : null),
-      unstable_headerRightItems: rechts
-        ? () => [
-            rechts.menue
-              ? { type: "menu", label: rechts.text, accessibilityLabel: rechts.label ?? rechts.text, icon: { type: "sfSymbol", name: rechts.symbol as never }, variant: "prominent", tintColor: undefined, menu: { items: rechts.menue.map((m, i) => ({ type: "action" as const, label: m.text, icon: { type: "sfSymbol" as const, name: m.symbol as never }, onPress: () => knopf.current?.menue?.[i]?.onPress() })) } }
-              : { type: "button", label: rechts.text, accessibilityLabel: rechts.label ?? rechts.text, icon: { type: "sfSymbol", name: rechts.symbol as never }, onPress: () => knopf.current?.onPress() },
-          ]
-        : undefined,
-    });
-    // Handler stehen in Referenzen; neu setzen nur bei anderem Titel oder anderer Beschriftung
-  }, [navigation, titel, rechts?.text, rechts?.menue?.map((m) => m.text).join(), schliessen]);
-  return (
-    <ScrollView contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: istIos ? 4 : 14, paddingBottom: istIos ? 32 : 128 }} contentInsetAdjustmentBehavior="automatic" keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets {...rest}>
-      {istIos ? (
-        ueber || unterzeile ? <T leise stil={{ marginBottom: 18 }}>{[ueber, unterzeile].filter(Boolean).join(" · ")}</T> : null
-      ) : (
-        <View style={{ marginBottom: 20 }}>
-          {ueber ? <T v="caption" fett leise stil={{ marginBottom: 2 }}>{ueber}</T> : null}
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-            <T v="grossTitel" accessibilityRole="header" stil={{ flex: 1 }}>{titel}</T>
-            {schliessen ? <RundKnopf symbol="xmark" label={TEXT.schliessen} onPress={nav.zurueck} /> : null}
-            {rechts ? <PlusKnopf k={rechts} /> : null}
-          </View>
-          {unterzeile ? <T leise stil={{ marginTop: 5 }}>{unterzeile}</T> : null}
-        </View>
-      )}
-      {children}
-    </ScrollView>
-  );
-}
 
 /** Platz unter dem Blatt für die schwebende Tab-Leiste. */
 export const UNTEN_FREI = 120;
@@ -86,7 +25,7 @@ export function BuehnenSeite({ ueber, titel, rechts, buehne, children, ...rest }
     <View style={{ flex: 1, backgroundColor: f.buehne }}>
       {sichtbar ? <StatusBar style="light" /> : null}
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets {...rest}>
-        <View style={{ paddingTop: inset.top + (ueber || rechts ? 14 : 28), paddingHorizontal: RAND + 4, paddingBottom: 30, gap: 22, overflow: "hidden" }}>
+        <View style={{ paddingTop: inset.top + (ueber || rechts ? 14 : 28), paddingHorizontal: RAND, paddingBottom: 30, gap: 22, overflow: "hidden" }}>
           <Motiv zeichen="§" groesse={380} farbe="rgba(127,227,184,0.06)" stil={{ right: -92, top: -40 }} />
           {ueber || rechts ? (
             <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12, minHeight: 40 }}>
@@ -117,8 +56,36 @@ export function GrosserBetrag({ cent, groesse = 60 }: { cent: number; groesse?: 
   return (
     <T accessibilityLabel={text} farbe={f.buehneText} stil={{ ...SCHRIFT.display, fontSize: groesse, lineHeight: groesse * 1.07, letterSpacing: -groesse * 0.04, fontVariant: ["tabular-nums"] }}>
       {vorn}
-      <T farbe={f.buehneLeise} stil={{ ...SCHRIFT.display, fontSize: groesse, lineHeight: groesse * 1.07, letterSpacing: -groesse * 0.04, opacity: 0.7 }}>{hinten}</T>
+      <T farbe="rgba(255,255,255,0.72)" stil={{ ...SCHRIFT.display, fontSize: groesse, lineHeight: groesse * 1.07, letterSpacing: -groesse * 0.04 }}>{hinten}</T>
     </T>
+  );
+}
+
+/**
+ * Unterseite oder Blatt im Bühnen-Aufbau (E-144): Die Navigationsleiste wird grün, darunter setzt sich die Bühne fort
+ * mit Titel, einem Satz und dem, was zählt; das helle Blatt trägt den Rest. Ein Fuß (Hauptknopf) bleibt unten stehen.
+ */
+export function BuehnenBlatt({ kopf = "", ueber, titel, unter, buehne, rechts, fuss, children }: { kopf?: string; ueber?: string; titel?: string; unter?: string; buehne?: ReactNode; rechts?: KopfKnopfDef | null; fuss?: ReactNode; children?: ReactNode }) {
+  const f = useFarben();
+  const imBlatt = useImBlatt();
+  useKopf({ titel: kopf, buehne: true, rechts });
+  return (
+    <TastaturRahmen grund={f.buehne}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" automaticallyAdjustKeyboardInsets>
+        <View style={{ paddingHorizontal: RAND, paddingTop: 6, paddingBottom: 28, gap: 14, overflow: "hidden" }}>
+          <Motiv zeichen="§" groesse={300} farbe="rgba(127,227,184,0.06)" stil={{ right: -70, top: -60 }} />
+          {ueber ? <T v="klein" fett farbe={f.buehneLeise}>{ueber}</T> : null}
+          {titel ? <T v="titel" accessibilityRole="header" farbe={f.buehneText}>{titel}</T> : null}
+          {unter ? <T farbe={f.buehneLeise}>{unter}</T> : null}
+          {buehne}
+        </View>
+        <View style={{ flexGrow: 1, backgroundColor: f.papier, borderTopLeftRadius: RADIUS.buehne, borderTopRightRadius: RADIUS.buehne, paddingHorizontal: RAND, paddingTop: 24, paddingBottom: fuss ? 24 : imBlatt ? 40 : UNTEN_FREI }}>
+          {children}
+          <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: -1000, height: 1000, backgroundColor: f.papier }} />
+        </View>
+      </ScrollView>
+      {fuss}
+    </TastaturRahmen>
   );
 }
 
@@ -154,16 +121,6 @@ export function BlattKopf({ titel, rechts, onPress, erste }: { titel: string; re
         </Pressable>
       ) : null}
     </View>
-  );
-}
-
-/** Web: runder, gefüllter Knopf in der Akzentfarbe (auf dem iPhone ein prominenter Glasknopf der Leiste). */
-function PlusKnopf({ k }: { k: SeitenKnopf }) {
-  const f = useFarben();
-  return (
-    <Pressable accessibilityRole="button" accessibilityLabel={k.label ?? k.text} onPress={k.onPress} hitSlop={8} style={({ pressed }) => ({ width: 40, height: 40, borderRadius: 20, backgroundColor: f.amt, alignItems: "center", justifyContent: "center", opacity: pressed ? 0.8 : 1 })}>
-      <Symbol name={k.symbol} groesse={20} farbe={f.amtText} gewicht="semibold" />
-    </Pressable>
   );
 }
 

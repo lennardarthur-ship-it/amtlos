@@ -119,10 +119,9 @@ function VorschlagSeite({ id, feldId }: { id: string; feldId: string }) {
     nav.zurueck();
   };
   return (
-    <Unterseite titel={TEXT.vorschlaege_titel}>
-      <Inhalt contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 12, paddingBottom: 32 }}>
-        <T v="titel" accessibilityRole="header">{feld.label}</T>
-        <T v="klein" leise stil={{ marginTop: 4 }}>{TEXT.vorschlaege_text}</T>
+    <Unterseite titel={`${TEXT.vorschlaege_titel}: ${feld.label}`}>
+      <Inhalt contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 16, paddingBottom: 32 }}>
+        <T v="klein" leise>{TEXT.vorschlaege_text}</T>
         {gruppen.length > 1 ? (
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -RAND, marginTop: 4 }} contentContainerStyle={{ paddingHorizontal: RAND }}>
             <Wahl label={feld.gruppenLabel ?? TEXT.gruppe} wert={gruppe} aendern={setGruppe} optionen={[...(passend.length > 1 ? [{ wert: PASSEND, text: TEXT.passend }] : []), { wert: "", text: TEXT.alle }, ...gruppen.map((g) => ({ wert: g, text: g }))]} />

@@ -6,12 +6,12 @@ import { SyncFehler } from "../konto/sync";
 import { T as TEXT } from "../texte";
 import { Feld, Fuss, Hinweis, Karte, Knopf, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
-import { Unterseite, useNav } from "../ui/navigation";
-import { RAND, useFarben, weich } from "../ui/thema";
+import { useNav } from "../ui/navigation";
+import { useFarben, weich } from "../ui/thema";
 import { PASSWORT_MINDESTLAENGE } from "../unterlagen/sicherung";
 import { useAmtlos } from "../zustand";
 import { bestaetigen } from "../ui/bestaetigen";
-import { Gruppe, Inhalt } from "./gemeinsam";
+import { BuehnenBlatt, Gruppe } from "./gemeinsam";
 import { ProSeite, useProSperre } from "./Pro";
 
 const zeitpunkt = (iso: string) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
@@ -229,13 +229,17 @@ export function KontoSeite() {
 
   const angemeldet = k.status === "ohneSchluessel" || k.status === "aktiv";
   return (
-    <Unterseite titel={TEXT.konto_titel}>
-      <Inhalt contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 12, paddingBottom: 32 }}>
-        {k.status !== "aktiv" ? <T>{TEXT.konto_intro}</T> : null}
-        <View style={{ flexDirection: "row", gap: 10, alignItems: "flex-start", marginTop: k.status !== "aktiv" ? 14 : 0, marginBottom: 14 }}>
-          <Symbol name="lock.shield" groesse={20} farbe={f.amt} />
-          <T v="klein" leise stil={{ flex: 1 }}>{TEXT.konto_e2e}</T>
+    <BuehnenBlatt
+      titel={TEXT.konto_titel}
+      unter={k.status !== "aktiv" ? TEXT.konto_intro : undefined}
+      fuss={fuss ? <Fuss>{fuss}</Fuss> : null}
+      buehne={
+        <View style={{ flexDirection: "row", gap: 10, alignItems: "flex-start" }}>
+          <Symbol name="lock.shield" groesse={20} farbe={f.minze} />
+          <T v="klein" farbe={f.buehneLeise} stil={{ flex: 1 }}>{TEXT.konto_e2e}</T>
         </View>
+      }
+    >
         {inhalt}
         {angemeldet ? (
           <Gruppe titel={TEXT.konto_angemeldet_als(k.name)} fuss={`${TEXT.konto_abmelden_text} ${TEXT.konto_lokal_bleibt}`}>
@@ -260,8 +264,6 @@ export function KontoSeite() {
             />
           </Gruppe>
         ) : null}
-      </Inhalt>
-      {fuss ? <Fuss>{fuss}</Fuss> : null}
-    </Unterseite>
+    </BuehnenBlatt>
   );
 }

@@ -2,9 +2,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AccessibilityInfo, Platform, ScrollView, View } from "react-native";
 import type { Frage } from "@amtlos/i18n";
 import { T as TEXT } from "../texte";
-import { Auswahl, DatumFeld, Fakt, Feld, Fuss, Hinweis, Symbol, Karte, Knopf,  MehrfachWahl, Erfolg, T, TextKnopf, ZurueckKnopf } from "../ui/bausteine";
+import { Auswahl, DatumFeld, Fakt, Feld, Fuss, Hinweis, Symbol, Karte, Knopf, MehrfachWahl, T, TextKnopf, ZurueckKnopf } from "../ui/bausteine";
 import { TastaturRahmen, useKopf, useNav } from "../ui/navigation";
-import { RAND,  useFarben } from "../ui/thema";
+import { RADIUS, RAND, useFarben } from "../ui/thema";
 import { CHECK_FELDER, auswertung, beantwortet, checkFragen, zusatzFragen, type Profil } from "../pflichten/check";
 import { heute } from "../unterlagen/speicher";
 import { PflichtZeile } from "./Pflichten";
@@ -81,7 +81,6 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
   const nav = useNav();
   const f = useFarben();
   const voll = !felder;
-  useKopf({ titel: TEXT.check_titel, schliessen: true });
   // Nachfragen: nur, was beim Öffnen noch fehlte – beantwortete Fragen verschwinden nicht mitten im Ablauf
   const [liste, setListe] = useState<string[]>(() => felder ?? [...CHECK_FELDER]);
   const [zusatz, setZusatz] = useState(false);
@@ -133,29 +132,33 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
     }
   }, [voll, amEnde, zusatz, z.stand.profil, liste]);
   const a = useMemo(() => (amEnde && voll && zusatz ? auswertung(z.stand.profil, heute()) : null), [amEnde, voll, zusatz, z.stand.profil]);
+  // Auftakt, Zwischenstand und Ergebnis auf der Bühne (E-144); die Fragen selbst auf hellem Grund
+  const buehne = i < 0 || zwischenschirm || Boolean(a);
+  useKopf({ titel: TEXT.check_titel, schliessen: true, buehne });
 
   return (
-    <View style={{ flex: 1, backgroundColor: f.papier }}>
-      {i < basisN ? <Fortschritt n={basisN} aktuell={Math.max(0, i)} /> : extraN && !zwischenschirm && !amEnde ? <Fortschritt n={extraN} aktuell={i - basisN} /> : <Fortschritt n={1} aktuell={1} />}
-      <TastaturRahmen>
-        <ScrollView key={i} contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 12, paddingBottom: 32 }} keyboardShouldPersistTaps="handled">
+    <View style={{ flex: 1, backgroundColor: buehne ? f.buehne : f.papier }}>
+      {buehne ? null : i < basisN ? <Fortschritt n={basisN} aktuell={Math.max(0, i)} /> : extraN && !zwischenschirm && !amEnde ? <Fortschritt n={extraN} aktuell={i - basisN} /> : <Fortschritt n={1} aktuell={1} />}
+      <TastaturRahmen grund={buehne ? f.buehne : undefined}>
+        <ScrollView key={i} contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 12, paddingBottom: a ? 0 : 32, flexGrow: 1 }} keyboardShouldPersistTaps="handled">
           {i < 0 ? (
             <View>
               {/* Auftakt wie Apples Einführungsbildschirme: großes Symbol, Titel und Text mittig */}
               <View style={{ alignItems: "center", paddingTop: 24 }}>
-                <Symbol name="checklist" groesse={64} farbe={f.amt} gewicht="regular" />
-                <T v="titel" accessibilityRole="header" stil={{ marginTop: 22, textAlign: "center" }}>{TEXT.check_einleitung_titel}</T>
-                <T leise stil={{ marginTop: 10, textAlign: "center" }}>{TEXT.check_einleitung_text}</T>
+                <Symbol name="checklist" groesse={64} farbe={f.minze} gewicht="regular" />
+                <T v="titel" accessibilityRole="header" farbe={f.buehneText} stil={{ marginTop: 22, textAlign: "center" }}>{TEXT.check_einleitung_titel}</T>
+                <T farbe={f.buehneLeise} stil={{ marginTop: 10, textAlign: "center" }}>{TEXT.check_einleitung_text}</T>
               </View>
-              <View style={{ marginTop: 18 }}>
-                <Hinweis text={TEXT.check_hinweis} />
+              <View style={{ marginTop: 26, flexDirection: "row", gap: 10, padding: 14, borderRadius: 18, backgroundColor: f.buehneFlaeche }}>
+                <Symbol name="info.circle" groesse={17} farbe={f.minze} gewicht="semibold" />
+                <T v="klein" farbe={f.buehneLeise} stil={{ flex: 1 }}>{TEXT.check_hinweis}</T>
               </View>
             </View>
           ) : zwischenschirm ? (
-            <View>
-              <Erfolg />
-              <T v="titel" accessibilityRole="header" stil={{ marginTop: 18 }}>{TEXT.zwischen_titel}</T>
-              <T stil={{ marginTop: 10 }}>{TEXT.zwischen_text(extraN)}</T>
+            <View style={{ paddingTop: 16 }}>
+              <Symbol name="checkmark.circle.fill" groesse={60} farbe={f.minze} gewicht="regular" />
+              <T v="titel" accessibilityRole="header" farbe={f.buehneText} stil={{ marginTop: 18 }}>{TEXT.zwischen_titel}</T>
+              <T farbe={f.buehneLeise} stil={{ marginTop: 10 }}>{TEXT.zwischen_text(extraN)}</T>
             </View>
           ) : frage ? (
             <View>
@@ -167,11 +170,14 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
               </View>
             </View>
           ) : a ? (
-            <View>
-              <Erfolg />
-              <T v="titel" accessibilityRole="header" stil={{ marginTop: 18 }}>{TEXT.ergebnis_titel(a.gilt.length)}</T>
+            <View style={{ flexGrow: 1 }}>
+              <View style={{ paddingTop: 12, paddingBottom: 28 }}>
+                <Symbol name="checkmark.circle.fill" groesse={60} farbe={f.minze} gewicht="regular" />
+                <T v="titel" accessibilityRole="header" farbe={f.buehneText} stil={{ marginTop: 18 }}>{TEXT.ergebnis_titel(a.gilt.length)}</T>
+              </View>
+              <View style={{ flexGrow: 1, marginHorizontal: -RAND, paddingHorizontal: RAND, paddingTop: 24, paddingBottom: 32, backgroundColor: f.papier, borderTopLeftRadius: RADIUS.buehne, borderTopRightRadius: RADIUS.buehne }}>
               {a.gilt.length ? (
-                <View style={{ marginTop: 14 }}>
+                <View>
                   <T v="gross">{TEXT.ergebnis_anfangen(Math.min(3, a.gilt.length))}</T>
                   <Karte stil={{ marginTop: 10 }}>
                     {a.gilt.slice(0, 3).map((p, k, l) => (
@@ -193,17 +199,19 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
               <View style={{ marginTop: 18 }}>
                 <Hinweis text={TEXT.pflichten_quelle} />
               </View>
+              <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: -1000, height: 1000, backgroundColor: f.papier }} />
+              </View>
             </View>
           ) : null}
         </ScrollView>
-        <Fuss ueber={zwischenschirm ? <TextKnopf text={TEXT.zwischen_ergebnis} onPress={() => { setZwischen(false); setI(fragen.length); }} stil={{ alignSelf: "center" }} /> : undefined}>
+        <Fuss buehne={buehne && !a} ueber={zwischenschirm ? <TextKnopf buehne text={TEXT.zwischen_ergebnis} onPress={() => { setZwischen(false); setI(fragen.length); }} stil={{ alignSelf: "center" }} /> : undefined}>
           {i > 0 ? (
-            <ZurueckKnopf label={TEXT.vorheriger_schritt} onPress={() => { if (zeit.current) clearTimeout(zeit.current); setI(i - 1); }} />
+            <ZurueckKnopf buehne={buehne && !a} label={TEXT.vorheriger_schritt} onPress={() => { if (zeit.current) clearTimeout(zeit.current); setI(i - 1); }} />
           ) : null}
           {i < 0 ? (
-            <Knopf text={TEXT.check_starten} onPress={() => setI(0)} stil={{ flex: 1 }} />
+            <Knopf buehne text={TEXT.check_starten} onPress={() => setI(0)} stil={{ flex: 1 }} />
           ) : zwischenschirm ? (
-            <Knopf text={TEXT.zwischen_genauer} onPress={() => setZwischen(false)} stil={{ flex: 1 }} />
+            <Knopf buehne text={TEXT.zwischen_genauer} onPress={() => setZwischen(false)} stil={{ flex: 1 }} />
           ) : frage ? (
             // ohne Antwort heißt der Knopf „Überspringen“ – nie ein grauer, scheinbar gesperrter „Weiter“-Knopf
             <Knopf ton={!beantwortet(z.stand.profil, frage.feld)} text={beantwortet(z.stand.profil, frage.feld) ? TEXT.weiter : TEXT.check_ueberspringen} onPress={weiter} stil={{ flex: 1 }} />

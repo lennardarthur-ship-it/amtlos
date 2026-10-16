@@ -867,6 +867,32 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Prüfpaket für die fachliche Freigabe:** `scripts/pruefpaket.py` erzeugt eine Excel-Tabelle mit allen 146 Pflichten und 29 Regelwerten. Sie enthält Auslöser in Klartext, Fristen, Rechtsgrundlagen, Quellen und offene Prüfpunkte, nach Priorität sortiert, dazu gelbe Spalten für Ergebnis und Anmerkung. Damit kann der Gründer Anwalt oder Steuerberatung beauftragen (T-52 ff.). Inhalte wurden dabei nicht verändert.
 - **Bleibt beim Gründer:** Impressum und Anbieterdaten, Datenschutzerklärung und Support-URL im Netz, Apple-Team und App Store Connect, RevenueCat-Schlüssel, EAS-Projekt, Entscheidung zur Export-Compliance, fachliche Freigabe des Katalogs, Test auf dem iPhone.
 
+
+### E-144 · Bühne auf allen Bildschirmen, Rechnung auf dem Papier bearbeiten (2026-10-16)
+
+- **Anlass:** Die Regel des Gründers zum Satz „(nicht alles getan)“ hatte ich falsch verstanden: Er soll ehrlich sagen, ob alles getan ist, was in meiner Hand liegt. Danach gemessen war noch Arbeit übrig, die ich ohne den Gründer erledigen kann.
+- **Bühne überall:**
+  - `BuehnenBlatt` für Unterseiten und Blätter: Die Leiste wird grün, Titel, Satz und Kennzahl stehen auf der Bühne, der Rest auf dem Blatt. So gebaut sind Neu erstellen (Suche und Knöpfe auf der Bühne), Pflicht-Detail (Tage bis zur Frist groß), Bezahlschirm, Beleg (Betrag groß), Beleg erfassen, Sicherung, Wiederherstellen, iCloud und Konto.
+  - `Unterseite` hat für alle übrigen Seiten ein grünes Titelband über dem Blatt.
+  - Pflichten-Check: Auftakt, Zwischenstand und Ergebnis liegen auf der Bühne, die Fragen auf hellem Grund.
+  - Geführte Abläufe: Fortschritt, „Schritt x von y“, Titel und Hilfe stehen auf der Bühne, die Felder auf dem Blatt. Der Fortschritt zählt jetzt genau die Schritte.
+- **Rechnung auf dem Papier bearbeiten (`Papier.tsx`):** Beim Abschluss erscheint das Dokument als Blatt Papier mit seinen Abschnitten (Eckdaten, Empfänger, Positionen mit „2 × 25,00 €“, Hinweise) und der Summe. Jeder Abschnitt lässt sich antippen und springt zu seinen Feldern; Fehlendes steht bernsteinfarben im Abschnitt. Das gilt für alle Vorlagen. Festgeschriebene Unterlagen zeigen weiter das echte Dokument. Die Liste „Angaben bearbeiten“ entfällt. Der Rundgang prüft Positionen auf dem Papier und den Sprung zum Empfänger.
+- **Nach unabhängiger Sichtprüfung behoben** (66 Bildschirmfotos, hell und dunkel):
+  - Kopfknöpfe als Glasflächen mit weißem Zeichen; im Dunkelmodus waren sie unsichtbar.
+  - Fuß beim Abschluss hell statt grün; der grüne Fuß schnitt das Blatt.
+  - Große Vorschau als Papierkarte mit Rand.
+  - Cent-Beträge auf der Bühne kontrastreicher.
+  - Kein Browser-Fokusrahmen in der Web-Vorschau.
+  - Gewählte Chips und Schalter im Hauptton (dunkel: Minze statt grellem Grün).
+  - Gerade Trennlinien auf dem Papier.
+  - Einheitlicher Rand von 20 pt auf Bühne und Blatt.
+  - Doppelte Titel bei „Wozu“ und Vorschlägen entfernt.
+  - Kürzere DATEV-Beschriftungen.
+  - Tab heißt wieder „Unterlagen“ wie die Seite.
+- **Store-Bilder:** Die Telefone haben einen hellen Rahmen und heben sich vom grünen Grund ab.
+- **Aufgeräumt:** Schrift Inter, das alte `Seite`-Bauteil und das „+“-Menü-Hilfsmittel sind entfernt.
+- **Nicht gemacht – native Schlüsselableitung:** Dafür bräuchte es ein natives Modul (z. B. react-native-quick-crypto). Das lässt sich hier weder bauen noch auf einem iPhone prüfen, und im Testpaket (Expo Go) läuft es nicht. Ein ungeprüftes natives Paket könnte den Store-Build brechen. Es kommt mit dem ersten eigenen Build (EAS/TestFlight), → T-85.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Image, Linking, Pressable, ScrollView, View } from "react-native";
+import { ActivityIndicator, Image, Linking, Pressable, View } from "react-native";
 import { LINKS } from "../rechtliches";
 import { T as TEXT } from "../texte";
 import { Betrag, Fuss, Hinweis, Kachel, Karte, Knopf, Symbol, T, TextKnopf } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
-import { useKopf, useNav } from "../ui/navigation";
-import { HAARLINIE, RADIUS, RAND, useFarben } from "../ui/thema";
+import { useNav } from "../ui/navigation";
+import { BuehnenBlatt } from "./gemeinsam";
+import { HAARLINIE, RADIUS, useFarben } from "../ui/thema";
 import { angebote, kaufAktiv, kaufen, testmodus, wiederherstellen, type Angebot } from "../pro/kauf";
 import { FREI_JE_MONAT, PRO_VORTEILE, uebrig, type ProFunktion } from "../pro/regeln";
 import { useAmtlos } from "../zustand";
@@ -26,7 +27,6 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
   const nav = useNav();
   const f = useFarben();
   const melden = useMeldung();
-  useKopf({ titel: "", schliessen: true });
   const [liste, setListe] = useState<Angebot[] | null>(kaufAktiv ? null : []);
   const [wahl, setWahl] = useState<string | null>(null);
   const [laedt, setLaedt] = useState(false);
@@ -88,78 +88,81 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
   const gewaehlt = liste?.find((a) => a.id === wahl);
   const rest = uebrig(z.stand.unterlagen, new Date());
   return (
-    <View style={{ flex: 1, backgroundColor: f.papier }}>
-      <ScrollView contentContainerStyle={{ paddingHorizontal: RAND, paddingBottom: 24 }}>
-        {/* wie Apples eigene Abo-Seiten: App-Symbol, Titel und ein Satz mittig */}
-        <View style={{ alignItems: "center", paddingTop: 8, paddingBottom: 6 }}>
-          {/* eslint-disable-next-line @typescript-eslint/no-require-imports -- Bild aus den Assets */}
-          <Image source={require("../../assets/icon.png")} style={{ width: 84, height: 84, borderRadius: 19 }} accessibilityIgnoresInvertColors />
-          <T v="grossTitel" accessibilityRole="header" stil={{ marginTop: 16, textAlign: "center" }}>{TEXT.pro_titel}</T>
-          <T leise stil={{ marginTop: 6, textAlign: "center", maxWidth: 320 }}>{grund ? TEXT.pro_grund[grund](FREI_JE_MONAT) : TEXT.pro_unter}</T>
-        </View>
-        <Karte stil={{ marginTop: 16 }}>
-          {/* der Grund, aus dem der Bezahlschirm aufging, steht oben */}
-          {(grund ? [grund, ...VORTEILE.filter((x) => x !== grund)] : VORTEILE).map((v, i, l) => (
-            <View key={v} style={{ flexDirection: "row", gap: 12, alignItems: "flex-start" }}>
-              <View style={{ paddingTop: 17 }}>
-                <Symbol name="checkmark" groesse={15} farbe={f.amt} gewicht="bold" />
-              </View>
-              <View style={{ flex: 1, paddingVertical: 14, borderBottomWidth: i === l.length - 1 ? 0 : HAARLINIE, borderColor: f.linie }}>
-                <T fett>{TEXT.pro_vorteil[v].titel}</T>
-                <T v="klein" leise stil={{ marginTop: 2 }}>{TEXT.pro_vorteil[v].text(FREI_JE_MONAT)}</T>
-              </View>
-            </View>
-          ))}
-        </Karte>
-        <View style={{ marginTop: 10 }}>
-          <Hinweis art="erfolg" text={TEXT.pro_frei_bleibt} />
-        </View>
-        {!z.pro ? <T v="caption" leise stil={{ marginTop: 4, marginLeft: 4 }}>{TEXT.pro_rest(rest, FREI_JE_MONAT)}</T> : null}
-
-        {kaufAktiv ? (
-          liste === null ? (
-            <ActivityIndicator color={f.amt} style={{ marginTop: 24 }} accessibilityLabel={TEXT.pro_laedt} />
+    <BuehnenBlatt
+      fuss={
+        <Fuss ueber={gewaehlt?.test ? <T v="caption" leise stil={{ textAlign: "center" }}>{TEXT.pro_danach(gewaehlt.preis, gewaehlt.zeitraum)}</T> : null}>
+          {z.pro ? (
+            <Knopf ton text={TEXT.pro_aktiv} symbol="checkmark" onPress={nav.zurueck} stil={{ flex: 1 }} />
           ) : (
-            <View accessibilityRole="radiogroup" style={{ marginTop: 20, gap: 10 }}>
-              {liste.map((a) => {
-                const an = a.id === wahl;
-                return (
-                  <Pressable key={a.id} accessibilityRole="radio" accessibilityState={{ checked: an }} onPress={() => setWahl(a.id)} style={{ padding: 16, borderRadius: RADIUS.karte, borderWidth: 2, borderColor: an ? f.amt : f.linie, backgroundColor: an ? f.amtHauch : f.blatt, flexDirection: "row", alignItems: "center", gap: 12 }}>
-                    <View style={{ width: 22, height: 22, borderRadius: 11, borderWidth: an ? 7 : 1.5, borderColor: an ? f.amt : f.rahmen, backgroundColor: f.blatt }} />
-                    <View style={{ flex: 1 }}>
-                      <T fett>{a.zeitraum ? TEXT.pro_zeitraum(a.zeitraum) : a.titel}</T>
-                      {a.test ? <T v="klein" farbe={f.amt}>{TEXT.pro_test_zeitraum(a.test)}</T> : null}
-                    </View>
-                    <Betrag>{a.preis}</Betrag>
-                  </Pressable>
-                );
-              })}
-            </View>
-          )
-        ) : (
-          <View style={{ marginTop: 16 }}>
-            <Hinweis text={testmodus ? TEXT.pro_testmodus : TEXT.pro_nicht_verfuegbar} symbol="info.circle" />
-          </View>
-        )}
-        {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
-        {kaufAktiv && liste !== null && !liste.length ? <TextKnopf symbol="arrow.clockwise" text={TEXT.erneut_laden} onPress={angeboteLaden} /> : null}
-        {z.pro && testmodus ? <TextKnopf symbol="xmark.circle" text={TEXT.pro_test_aus} onPress={() => z.proTestSetzen(false)} stil={{ marginTop: 8 }} /> : null}
-
-        <T v="caption" leise stil={{ marginTop: 18 }}>{TEXT.pro_abo_text}</T>
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 16, marginTop: 4 }}>
-          <TextKnopf text={TEXT.nutzungsbedingungen} leise onPress={() => void Linking.openURL(LINKS.nutzung)} />
-          <TextKnopf text={TEXT.datenschutz} leise onPress={() => nav.oeffnen("datenschutz", () => <DatenschutzSeite />)} />
-          {kaufAktiv ? <TextKnopf text={TEXT.pro_wiederherstellen} leise onPress={() => void zurueckholen()} /> : null}
+            <Knopf text={!kaufAktiv ? TEXT.pro_test_einschalten : gewaehlt?.test ? TEXT.pro_test_starten : TEXT.pro_abonnieren} laedt={laedt} deaktiviert={kaufAktiv ? !wahl : !testmodus} onPress={() => void los()} stil={{ flex: 1 }} />
+          )}
+        </Fuss>
+      }
+      buehne={
+        // wie Apples eigene Abo-Seiten: App-Symbol, Titel und ein Satz mittig – hier auf der Bühne
+        <View style={{ alignItems: "center", paddingTop: 4, gap: 6 }}>
+          {/* eslint-disable-next-line @typescript-eslint/no-require-imports -- Bild aus den Assets */}
+          <Image source={require("../../assets/icon.png")} style={{ width: 84, height: 84, borderRadius: 19, borderWidth: 1, borderColor: "rgba(255,255,255,0.18)" }} accessibilityIgnoresInvertColors />
+          <T v="grossTitel" accessibilityRole="header" farbe={f.buehneText} stil={{ marginTop: 10, textAlign: "center" }}>{TEXT.pro_titel}</T>
+          <T farbe={f.buehneLeise} stil={{ textAlign: "center", maxWidth: 320 }}>{grund ? TEXT.pro_grund[grund](FREI_JE_MONAT) : TEXT.pro_unter}</T>
         </View>
-      </ScrollView>
-      <Fuss ueber={gewaehlt?.test ? <T v="caption" leise stil={{ textAlign: "center" }}>{TEXT.pro_danach(gewaehlt.preis, gewaehlt.zeitraum)}</T> : null}>
-        {z.pro ? (
-          <Knopf ton text={TEXT.pro_aktiv} symbol="checkmark" onPress={nav.zurueck} stil={{ flex: 1 }} />
+      }
+    >
+      <Karte>
+        {/* der Grund, aus dem der Bezahlschirm aufging, steht oben */}
+        {(grund ? [grund, ...VORTEILE.filter((x) => x !== grund)] : VORTEILE).map((v, i, l) => (
+          <View key={v} style={{ flexDirection: "row", gap: 12, alignItems: "flex-start" }}>
+            <View style={{ paddingTop: 17 }}>
+              <Symbol name="checkmark" groesse={15} farbe={f.amt} gewicht="bold" />
+            </View>
+            <View style={{ flex: 1, paddingVertical: 14, borderBottomWidth: i === l.length - 1 ? 0 : HAARLINIE, borderColor: f.linie }}>
+              <T fett>{TEXT.pro_vorteil[v].titel}</T>
+              <T v="klein" leise stil={{ marginTop: 2 }}>{TEXT.pro_vorteil[v].text(FREI_JE_MONAT)}</T>
+            </View>
+          </View>
+        ))}
+      </Karte>
+      <View style={{ marginTop: 10 }}>
+        <Hinweis art="erfolg" text={TEXT.pro_frei_bleibt} />
+      </View>
+      {!z.pro ? <T v="caption" leise stil={{ marginTop: 4, marginLeft: 4 }}>{TEXT.pro_rest(rest, FREI_JE_MONAT)}</T> : null}
+
+      {kaufAktiv ? (
+        liste === null ? (
+          <ActivityIndicator color={f.amt} style={{ marginTop: 24 }} accessibilityLabel={TEXT.pro_laedt} />
         ) : (
-          <Knopf text={!kaufAktiv ? TEXT.pro_test_einschalten : gewaehlt?.test ? TEXT.pro_test_starten : TEXT.pro_abonnieren} laedt={laedt} deaktiviert={kaufAktiv ? !wahl : !testmodus} onPress={() => void los()} stil={{ flex: 1 }} />
-        )}
-      </Fuss>
-    </View>
+          <View accessibilityRole="radiogroup" style={{ marginTop: 20, gap: 10 }}>
+            {liste.map((a) => {
+              const an = a.id === wahl;
+              return (
+                <Pressable key={a.id} accessibilityRole="radio" accessibilityState={{ checked: an }} onPress={() => setWahl(a.id)} style={{ padding: 16, borderRadius: RADIUS.karte, borderWidth: 2, borderColor: an ? f.amt : f.linie, backgroundColor: an ? f.amtHauch : f.blatt, flexDirection: "row", alignItems: "center", gap: 12 }}>
+                  <View style={{ width: 22, height: 22, borderRadius: 11, borderWidth: an ? 7 : 1.5, borderColor: an ? f.amt : f.rahmen, backgroundColor: f.blatt }} />
+                  <View style={{ flex: 1 }}>
+                    <T fett>{a.zeitraum ? TEXT.pro_zeitraum(a.zeitraum) : a.titel}</T>
+                    {a.test ? <T v="klein" farbe={f.amt}>{TEXT.pro_test_zeitraum(a.test)}</T> : null}
+                  </View>
+                  <Betrag>{a.preis}</Betrag>
+                </Pressable>
+              );
+            })}
+          </View>
+        )
+      ) : (
+        <View style={{ marginTop: 16 }}>
+          <Hinweis text={testmodus ? TEXT.pro_testmodus : TEXT.pro_nicht_verfuegbar} symbol="info.circle" />
+        </View>
+      )}
+      {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
+      {kaufAktiv && liste !== null && !liste.length ? <TextKnopf symbol="arrow.clockwise" text={TEXT.erneut_laden} onPress={angeboteLaden} /> : null}
+      {z.pro && testmodus ? <TextKnopf symbol="xmark.circle" text={TEXT.pro_test_aus} onPress={() => z.proTestSetzen(false)} stil={{ marginTop: 8 }} /> : null}
+
+      <T v="caption" leise stil={{ marginTop: 18 }}>{TEXT.pro_abo_text}</T>
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 16, marginTop: 4 }}>
+        <TextKnopf text={TEXT.nutzungsbedingungen} leise onPress={() => void Linking.openURL(LINKS.nutzung)} />
+        <TextKnopf text={TEXT.datenschutz} leise onPress={() => nav.oeffnen("datenschutz", () => <DatenschutzSeite />)} />
+        {kaufAktiv ? <TextKnopf text={TEXT.pro_wiederherstellen} leise onPress={() => void zurueckholen()} /> : null}
+      </View>
+    </BuehnenBlatt>
   );
 }
 

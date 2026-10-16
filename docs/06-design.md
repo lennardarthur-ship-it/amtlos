@@ -46,5 +46,6 @@ Quelle: `apps/mobile/src/ui/thema.ts`, `bausteine.tsx` und `seiten/gemeinsam.tsx
 - **Knöpfe:** Abgerundete Rechtecke (18), 54 pt hoch. Der Hauptknopf ist tiefgrün (dunkel: Minze). Auf der Bühne gibt es den Minze-Knopf und den Glasknopf (Weiß 12 %).
 - **Symbole:** Getönte Quadrate (Hauch-Farbe, Zeichen in der Tonfarbe). Das Fristblatt ist ein getöntes Quadrat mit Tag und Monat, der Ton trägt den Status.
 - **Navigation:** Eine dunkle, schwebende Kapsel. Der aktive Tab ist eine Minze-Pille mit Wort, rechts sitzt der Minze-Knopf „+“. Unterseiten und Blätter nutzen die nativen Leisten.
-- **Rechnung:** Der Abschluss zeigt das Dokument als Blatt Papier auf der Bühne.
+- **Unterseiten und Blätter:** `BuehnenBlatt` (Titel, Satz, Kennzahl auf der Bühne) bzw. `Unterseite` (grünes Titelband); alle Leisten grün mit Glasknöpfen. Abläufe: Fortschritt und Schritt-Titel auf der Bühne, Felder auf dem Blatt.
+- **Rechnung:** Der Abschluss zeigt das Dokument als Blatt Papier auf der Bühne; jeder Abschnitt ist antippbar und führt zu seinen Feldern (E-144).
 - **Marke:** Das §-Motiv groß und angeschnitten auf der Bühne; App-Symbol § in Minze.

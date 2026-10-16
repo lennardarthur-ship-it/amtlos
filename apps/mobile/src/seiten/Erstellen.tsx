@@ -1,39 +1,13 @@
 import { StackActions } from "@react-navigation/native";
 import { useCallback, useContext, useMemo } from "react";
-import { T as TEXT } from "../texte";
-import { Blatt, WurzelNavKontext, registrieren, useNav, type Nav } from "../ui/navigation";
-import { BelegErfassenSeite } from "./Belege";
-import type { SeitenKnopf } from "./gemeinsam";
-import { ZielKontext, useStarten } from "./starten";
+import { Blatt, WurzelNavKontext, registrieren, type Nav } from "../ui/navigation";
+import { ZielKontext } from "./starten";
 import { Unterlagen } from "./Unterlagen";
 
 /** Blatt „Neu erstellen“ öffnen (alle Vorlagen, Suche, Anlässe). */
 export function useErstellen() {
   const wurzel = useContext(WurzelNavKontext);
   return useMemo(() => ({ oeffnen: () => wurzel?.navigate("Neu") }), [wurzel]);
-}
-
-/**
- * Der „+“-Knopf oben rechts (E-141): auf dem iPhone ein Menü wie in Notizen oder Dateien – die zwei häufigsten
- * Handlungen direkt, alles andere im Blatt „Neu erstellen“. Im Web öffnet er das Blatt.
- */
-export function useErstellenKnopf(): SeitenKnopf {
-  const starten = useStarten();
-  const nav = useNav();
-  const erstellen = useErstellen();
-  return useMemo(
-    () => ({
-      text: TEXT.erstellen,
-      symbol: "plus",
-      onPress: erstellen.oeffnen,
-      menue: [
-        { text: TEXT.rechnung_schreiben, symbol: "eurosign", onPress: () => starten("rechnung") },
-        { text: TEXT.beleg_erfassen, symbol: "doc.viewfinder", onPress: () => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />, true) },
-        { text: TEXT.alle_vorlagen_menue, symbol: "square.grid.2x2", onPress: erstellen.oeffnen },
-      ],
-    }),
-    [starten, nav, erstellen],
-  );
 }
 
 /**

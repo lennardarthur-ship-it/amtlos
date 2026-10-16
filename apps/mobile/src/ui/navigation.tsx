@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef,
 import { KeyboardAvoidingView, Platform, Pressable, View, useWindowDimensions } from "react-native";
 import { T as TEXT } from "../texte";
 import { Symbol, T } from "./bausteine";
-import { RAND, SCHRIFT, ZIEL, istIos, useFarben, type Farben } from "./thema";
+import { RADIUS, RAND, SCHRIFT, ZIEL, istIos, useFarben, type Farben } from "./thema";
 
 /**
  * Navigation (E-141): echte iOS-Navigation mit react-native-screens – UINavigationController mit großen Titeln,
@@ -30,6 +30,8 @@ export type SeitenParams = { id: string; schluessel: string };
 /** Navigator der obersten Ebene (für Blätter), in einem Blatt: ob wir darin sind. */
 export const WurzelNavKontext = createContext<NavigationProp<ParamListBase> | null>(null);
 const BlattKontext = createContext(false);
+/** Liegt die Seite in einem Blatt (ohne Tab-Leiste darunter)? */
+export const useImBlatt = () => useContext(BlattKontext);
 
 const offen = (nav: NavigationProp<ParamListBase> | null, schluessel: string) => Boolean(nav?.getState()?.routes.some((r) => (r.params as Partial<SeitenParams> | undefined)?.schluessel === schluessel));
 
@@ -102,8 +104,9 @@ export function RundKnopf({ symbol, label, onPress }: { symbol: string; label: s
   const f = useFarben();
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} hitSlop={8} style={({ pressed }) => ({ width: ZIEL, height: ZIEL, alignItems: "center", justifyContent: "center", marginHorizontal: RAND - 18, opacity: pressed ? 0.55 : 1 })}>
-      <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: f.blatt, alignItems: "center", justifyContent: "center" }}>
-        <Symbol name={symbol} groesse={15} farbe={f.tinte} gewicht="bold" />
+      {/* alle Leisten liegen auf der Bühne (E-144): Glasfläche mit weißem Zeichen */}
+      <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: f.buehneFlaeche, alignItems: "center", justifyContent: "center" }}>
+        <Symbol name={symbol} groesse={15} farbe={f.buehneText} gewicht="bold" />
       </View>
     </Pressable>
   );
@@ -114,7 +117,7 @@ export function KopfText({ text, onPress, label }: { text: string; onPress: () =
   const f = useFarben();
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={label ?? text} onPress={onPress} hitSlop={8} style={({ pressed }) => ({ minHeight: ZIEL, justifyContent: "center", paddingHorizontal: RAND - 6, opacity: pressed ? 0.55 : 1 })}>
-      <T fett farbe={f.amt}>{text}</T>
+      <T fett farbe={f.minze}>{text}</T>
     </Pressable>
   );
 }
@@ -184,10 +187,23 @@ export function TastaturRahmen({ children, grund }: { children: ReactNode; grund
   );
 }
 
-/** Unterseite: setzt die Kopfzeile (Titel, Knopf rechts) und zeigt den Inhalt – Fußleisten bleiben über der Tastatur. */
+/**
+ * Unterseite (E-144): grüne Leiste mit dem Titel groß darunter auf der Bühne, der Inhalt auf dem hellen Blatt –
+ * Fußleisten bleiben über der Tastatur. Ohne Titel (z. B. gelöschter Eintrag) nur das Blatt.
+ */
 export function Unterseite({ titel, children, rechts, schliessen }: { titel: string; children: ReactNode; rechts?: KopfKnopfDef | null; schliessen?: boolean }) {
-  useKopf({ titel, rechts, schliessen: schliessen ?? true });
-  return <TastaturRahmen>{children}</TastaturRahmen>;
+  const f = useFarben();
+  useKopf({ titel: "", rechts, schliessen: schliessen ?? true, buehne: true });
+  return (
+    <TastaturRahmen grund={f.buehne}>
+      {titel ? (
+        <View style={{ paddingHorizontal: RAND, paddingTop: 2, paddingBottom: 20 }}>
+          <T v="titel" accessibilityRole="header" farbe={f.buehneText} numberOfLines={3}>{titel}</T>
+        </View>
+      ) : null}
+      <View style={{ flex: 1, backgroundColor: f.papier, borderTopLeftRadius: RADIUS.buehne, borderTopRightRadius: RADIUS.buehne, overflow: "hidden" }}>{children}</View>
+    </TastaturRahmen>
+  );
 }
 
 const BlattStapel = createNativeStackNavigator();

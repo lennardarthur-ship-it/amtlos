@@ -2,17 +2,16 @@ import { useEffect, useState } from "react";
 import { Pressable, View } from "react-native";
 import { T as TEXT } from "../texte";
 import { Feld, Fuss, Hinweis, Karte, Knopf, Schalter, Symbol, T, TextKnopf } from "../ui/bausteine";
-import { Unterseite, useNav } from "../ui/navigation";
+import { useNav } from "../ui/navigation";
 import { useMeldung } from "../ui/meldung";
 import { RADIUS, useFarben } from "../ui/thema";
-import { RAND } from "../ui/thema";
 import { PASSWORT_MINDESTLAENGE, SicherungsFehler, base64, schluesselAusPasswort, schluesselKennung, sicherungErstellen, sicherungLesenMitDateien, sicherungMitSchluessel, sicherungsDatei, sicherungsDateiLesen, sicherungsKdf, sicherungsName, type Dateien, type SicherungsSchluessel } from "../unterlagen/sicherung";
 import { cloudBeiseitelegen, cloudDateiLesen, cloudDateiSchreiben, cloudDateien, cloudLesen, cloudSchreiben, cloudVerfuegbar } from "../unterlagen/cloud";
 import { autoSchluesselHolen, autoSchluesselLoeschen, autoSchluesselSpeichern } from "../unterlagen/schluesselbund";
 import { dateiTeilen, dateiWaehlen, zufall } from "../unterlagen/sicherungDatei";
 import { heute, sicherungFaellig, ungesichert, zusammenfuehren, type Stand } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
-import { Inhalt } from "./gemeinsam";
+import { BuehnenBlatt } from "./gemeinsam";
 import { useProSperre } from "./Pro";
 
 /** Kurz warten, damit der Ladezustand gezeichnet ist, bevor die Schlüsselableitung den Thread belegt. */
@@ -52,24 +51,26 @@ export function SicherungSeite() {
     }
   };
   return (
-    <Unterseite titel={TEXT.sicherung_titel}>
-      <Inhalt contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 12, paddingBottom: 32 }}>
-        <T>{TEXT.sicherung_text}</T>
-        <Feld label={TEXT.passwort} wert={pw} aendern={setPw} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="newPassword" fehler={kurz ? TEXT.passwort_kurz(PASSWORT_MINDESTLAENGE) : null} />
-        <Feld label={TEXT.passwort_wiederholen} wert={pw2} aendern={setPw2} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="newPassword" fehler={ungleich ? TEXT.passwort_ungleich : null} />
-        <View style={{ marginTop: 18 }}>
-          <Hinweis art="warnung" text={TEXT.sicherung_warnung} symbol="lock" />
-          {meldung ? <Hinweis art={meldung.art} text={meldung.text} /> : null}
-        </View>
-      </Inhalt>
-      <Fuss>
-        {erledigt ? (
-          <Knopf text={TEXT.fertig} symbol="checkmark" onPress={nav.zurueck} stil={{ flex: 1 }} />
-        ) : (
-          <Knopf text={laedt ? TEXT.sicherung_laeuft : TEXT.sicherung_erstellen} symbol="lock" laedt={laedt} deaktiviert={!bereit} onPress={() => void los()} stil={{ flex: 1 }} />
-        )}
-      </Fuss>
-    </Unterseite>
+    <BuehnenBlatt
+      titel={TEXT.sicherung_titel}
+      unter={TEXT.sicherung_text}
+      fuss={
+          <Fuss>
+            {erledigt ? (
+              <Knopf text={TEXT.fertig} symbol="checkmark" onPress={nav.zurueck} stil={{ flex: 1 }} />
+            ) : (
+              <Knopf text={laedt ? TEXT.sicherung_laeuft : TEXT.sicherung_erstellen} symbol="lock" laedt={laedt} deaktiviert={!bereit} onPress={() => void los()} stil={{ flex: 1 }} />
+            )}
+          </Fuss>
+      }
+    >
+      <Feld label={TEXT.passwort} wert={pw} aendern={setPw} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="newPassword" fehler={kurz ? TEXT.passwort_kurz(PASSWORT_MINDESTLAENGE) : null} />
+      <Feld label={TEXT.passwort_wiederholen} wert={pw2} aendern={setPw2} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="newPassword" fehler={ungleich ? TEXT.passwort_ungleich : null} />
+      <View style={{ marginTop: 18 }}>
+        <Hinweis art="warnung" text={TEXT.sicherung_warnung} symbol="lock" />
+        {meldung ? <Hinweis art={meldung.art} text={meldung.text} /> : null}
+      </View>
+    </BuehnenBlatt>
   );
 }
 
@@ -110,53 +111,55 @@ export function WiederherstellenSeite({ fertig }: { fertig?: () => void }) {
     }
   };
   return (
-    <Unterseite titel={TEXT.wiederherstellen_titel}>
-      <Inhalt contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 12, paddingBottom: 32 }}>
-        <T>{TEXT.wiederherstellen_text}</T>
-        {datei ? (
-          <Karte stil={{ marginTop: 16, paddingVertical: 12 }}>
-            <T fett numberOfLines={1}>{datei.name}</T>
-          </Karte>
-        ) : null}
-        <Knopf ton symbol="folder" text={datei ? TEXT.andere_datei : TEXT.datei_waehlen} onPress={() => void waehlen()} stil={{ marginTop: 12 }} />
-        {cloud ? (
-          <TextKnopf
-            symbol="icloud"
-            text={TEXT.aus_icloud}
-            onPress={() =>
-              void cloudLesen().then((text) => {
-                setGelesen(null);
-                if (text) setDatei({ name: TEXT.icloud_sicherung_name, text });
-                else setHinweis(TEXT.icloud_leer);
-              })
-            }
-            stil={{ marginLeft: 4, marginTop: 4 }}
-          />
-        ) : null}
-        {datei && !gelesen ? <Feld label={TEXT.passwort} wert={pw} aendern={setPw} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="password" onSubmitEditing={() => void oeffnen()} /> : null}
-        {hinweis ? <Hinweis text={hinweis} symbol="icloud" /> : null}
-        {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
-        {gelesen ? <Vorschau aktuell={z.stand} gelesen={gelesen} /> : null}
-      </Inhalt>
-      <Fuss>
-        {gelesen ? (
-          <Knopf
-            text={TEXT.jetzt_wiederherstellen}
-            onPress={() =>
-              void z.zusammenfuehren(gelesen).then(async (r) => {
-                await z.dateienEinspielen(dateien);
-                melden(TEXT.wiederhergestellt_text(r.neu, r.aktualisiert));
-                fertig?.();
-                nav.zurueck();
-              })
-            }
-            stil={{ flex: 1 }}
-          />
-        ) : (
-          <Knopf text={laedt ? TEXT.wird_geoeffnet : TEXT.oeffnen} laedt={laedt} deaktiviert={!datei || !pw} onPress={() => void oeffnen()} stil={{ flex: 1 }} />
-        )}
-      </Fuss>
-    </Unterseite>
+    <BuehnenBlatt
+      titel={TEXT.wiederherstellen_titel}
+      unter={TEXT.wiederherstellen_text}
+      fuss={
+          <Fuss>
+            {gelesen ? (
+              <Knopf
+                text={TEXT.jetzt_wiederherstellen}
+                onPress={() =>
+                  void z.zusammenfuehren(gelesen).then(async (r) => {
+                    await z.dateienEinspielen(dateien);
+                    melden(TEXT.wiederhergestellt_text(r.neu, r.aktualisiert));
+                    fertig?.();
+                    nav.zurueck();
+                  })
+                }
+                stil={{ flex: 1 }}
+              />
+            ) : (
+              <Knopf text={laedt ? TEXT.wird_geoeffnet : TEXT.oeffnen} laedt={laedt} deaktiviert={!datei || !pw} onPress={() => void oeffnen()} stil={{ flex: 1 }} />
+            )}
+          </Fuss>
+      }
+    >
+      {datei ? (
+        <Karte stil={{ marginTop: 16, paddingVertical: 12 }}>
+          <T fett numberOfLines={1}>{datei.name}</T>
+        </Karte>
+      ) : null}
+      <Knopf ton symbol="folder" text={datei ? TEXT.andere_datei : TEXT.datei_waehlen} onPress={() => void waehlen()} stil={{ marginTop: 12 }} />
+      {cloud ? (
+        <TextKnopf
+          symbol="icloud"
+          text={TEXT.aus_icloud}
+          onPress={() =>
+            void cloudLesen().then((text) => {
+              setGelesen(null);
+              if (text) setDatei({ name: TEXT.icloud_sicherung_name, text });
+              else setHinweis(TEXT.icloud_leer);
+            })
+          }
+          stil={{ marginLeft: 4, marginTop: 4 }}
+        />
+      ) : null}
+      {datei && !gelesen ? <Feld label={TEXT.passwort} wert={pw} aendern={setPw} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="password" onSubmitEditing={() => void oeffnen()} /> : null}
+      {hinweis ? <Hinweis text={hinweis} symbol="icloud" /> : null}
+      {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
+      {gelesen ? <Vorschau aktuell={z.stand} gelesen={gelesen} /> : null}
+    </BuehnenBlatt>
   );
 }
 
@@ -302,20 +305,22 @@ function CloudSicherungSeite() {
     }
   };
   return (
-    <Unterseite titel={TEXT.icloud_auto}>
-      <Inhalt contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 12, paddingBottom: 32 }}>
-        <T>{TEXT.icloud_einrichten_text}</T>
-        <Feld label={TEXT.passwort} wert={pw} aendern={setPw} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="newPassword" fehler={pw.length > 0 && pw.length < PASSWORT_MINDESTLAENGE ? TEXT.passwort_kurz(PASSWORT_MINDESTLAENGE) : null} />
-        <Feld label={TEXT.passwort_wiederholen} wert={pw2} aendern={setPw2} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="newPassword" fehler={pw2.length > 0 && pw !== pw2 ? TEXT.passwort_ungleich : null} />
-        <View style={{ marginTop: 18 }}>
-          <Hinweis art="warnung" text={TEXT.sicherung_warnung} symbol="lock" />
-          {fehler ? <Hinweis art="fehler" text={TEXT.icloud_fehler} /> : null}
-        </View>
-      </Inhalt>
-      <Fuss>
-        <Knopf text={laedt ? TEXT.sicherung_laeuft : TEXT.icloud_einschalten} symbol="icloud" laedt={laedt} deaktiviert={!bereit} onPress={() => void los()} stil={{ flex: 1 }} />
-      </Fuss>
-    </Unterseite>
+    <BuehnenBlatt
+      titel={TEXT.icloud_auto}
+      unter={TEXT.icloud_einrichten_text}
+      fuss={
+          <Fuss>
+            <Knopf text={laedt ? TEXT.sicherung_laeuft : TEXT.icloud_einschalten} symbol="icloud" laedt={laedt} deaktiviert={!bereit} onPress={() => void los()} stil={{ flex: 1 }} />
+          </Fuss>
+      }
+    >
+      <Feld label={TEXT.passwort} wert={pw} aendern={setPw} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="newPassword" fehler={pw.length > 0 && pw.length < PASSWORT_MINDESTLAENGE ? TEXT.passwort_kurz(PASSWORT_MINDESTLAENGE) : null} />
+      <Feld label={TEXT.passwort_wiederholen} wert={pw2} aendern={setPw2} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="newPassword" fehler={pw2.length > 0 && pw !== pw2 ? TEXT.passwort_ungleich : null} />
+      <View style={{ marginTop: 18 }}>
+        <Hinweis art="warnung" text={TEXT.sicherung_warnung} symbol="lock" />
+        {fehler ? <Hinweis art="fehler" text={TEXT.icloud_fehler} /> : null}
+      </View>
+    </BuehnenBlatt>
   );
 }
 

@@ -14,13 +14,12 @@ export function InfoSeite({ id }: { id: string }) {
   const pflichten = pflichtenFuer(v);
   const quellen = pflichten.flatMap((p) => p.quellen).filter((q, i, a) => a.findIndex((x) => x.url === q.url) === i);
   return (
-    <Unterseite titel={TEXT.info_titel}>
-      <Inhalt contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 48 }}>
+    <Unterseite titel={v.titel}>
+      <Inhalt contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 20, paddingBottom: 48 }}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
           <Symbol name={BEREICH_SYMBOL[v.bereich]} groesse={18} farbe={f.tinteLeise} />
           <T v="klein" leise>{BEREICHE.find((b) => b.id === v.bereich)?.titel}</T>
         </View>
-        <T v="titel" accessibilityRole="header" stil={{ marginTop: 6 }}>{v.titel}</T>
         <T stil={{ marginTop: 8 }}>{KURZ[v.id] ?? v.beschreibung}</T>
         <T leise stil={{ marginTop: 8 }}>{v.beschreibung}</T>
         {pflichten.length ? (

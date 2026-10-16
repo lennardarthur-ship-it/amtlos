@@ -192,7 +192,7 @@ try {
   await warte(800);
 
   // Rechnung im geführten Ablauf
-  await knopf("Rechnung schreiben").click();
+  await knopf("Rechnung").click();
   await warte(900);
   pruefe((await feld("Rechnungsnummer").inputValue()) === "2026-001" || /^\d{4}-001$/.test(await feld("Rechnungsnummer").inputValue()), "Rechnungsnummer nicht vorbelegt");
   pruefe((await p.getByRole("tab").locator("visible=true").count()) === 0, "Tab-Leiste im Ablauf sichtbar");
@@ -225,7 +225,14 @@ try {
   await knopf("Zur Unterlage").click();
   await warte(1500);
   pruefe(await sichtbar("Alle Pflichtangaben sind drin."), "Rechnung trotz aller Angaben nicht vollständig");
+  // auf dem Papier (E-144): Positionen und Summe stehen da; Antippen springt zum Schritt und zurück
+  pruefe((await sichtbar("Haarschnitt")) && (await sichtbar("2 × 25,00 €")), "Positionen fehlen auf dem Papier");
   await foto("abschluss");
+  await tippe(p.getByRole("button", { name: /^Rechnungsempfänger bearbeiten/ }).locator("visible=true").last());
+  await warte(800);
+  pruefe((await feld("Name oder Firma").inputValue()) === "Kim Beispiel", "Antippen auf dem Papier springt nicht zum Empfänger");
+  await knopf("Übersicht").click();
+  await warte(900);
   const [fenster] = await Promise.all([ctx.waitForEvent("page"), knopf("PDF teilen").click()]);
   await fenster.waitForLoadState();
   const html = await fenster.content();
@@ -392,7 +399,7 @@ try {
   fs.writeFileSync(xmlPfad, eingang);
   await neu();
   await warte(700);
-  await tippe(knopf("Beleg erfassen"));
+  await tippe(knopf("Beleg"));
   await warte(800);
   const [xmlWahl] = await Promise.all([p.waitForEvent("filechooser"), tippe(p.getByRole("button", { name: /^Datei oder E-Rechnung/ }).locator("visible=true").last())]);
   await xmlWahl.setFiles(xmlPfad);
@@ -438,7 +445,7 @@ try {
   // bestehende Unterlage öffnet beim Abschluss; Kopie anlegen und wieder löschen
   await p.getByRole("button", { name: /^Gefährdungsbeurteilung · Salon/ }).first().click();
   await warte(1200);
-  pruefe(await sichtbar("Angaben bearbeiten"), "bestehende Unterlage öffnet nicht beim Abschluss");
+  pruefe(await sichtbar("Zum Bearbeiten antippen"), "bestehende Unterlage öffnet nicht beim Abschluss (Papier)");
   await tippe(knopf("Kopie anlegen"));
   await warte(900);
   await knopf("Übersicht").click();

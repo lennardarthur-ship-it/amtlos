@@ -2,7 +2,7 @@ import { memo, useMemo, useState } from "react";
 import { View } from "react-native";
 import { ANLAESSE, BEREICHE, KURZ, VORLAGEN, unterlagenName, vorlageFuer, type Anlass, type Betrieb, type Vorlage } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { Karte, SchnellKachel, Suchfeld, Symbol, T, TextKnopf, Zeile, type Ton } from "../ui/bausteine";
+import { Karte, Knopf, Suchfeld, Symbol, T, TextKnopf, Zeile, type Ton } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { RAND, useFarben } from "../ui/thema";
 import { fehltFuer } from "../unterlagen/pruefung";
@@ -10,7 +10,7 @@ import { betriebFehlt, heute, sortiert, type Unterlage } from "../unterlagen/spe
 import { useAmtlos } from "../zustand";
 import { euroText, offeneIds, rechnungBrutto, tageUeberfaellig } from "../unterlagen/ablage";
 import { BetriebFormular } from "./Betrieb";
-import { BEREICH_SYMBOL, Gruppe, Inhalt, Seite, datumKurz } from "./gemeinsam";
+import { BEREICH_SYMBOL, BuehnenBlatt, Gruppe, Inhalt, datumKurz } from "./gemeinsam";
 import { useOeffnen, useStarten, useZiel } from "./starten";
 import { BelegErfassenSeite } from "./Belege";
 
@@ -165,7 +165,7 @@ function AlleSeite() {
  * Unterlagen (E-124; seit E-129 zweiter Tab hinter „Pflichten“): oben die häufigste Handlung (Rechnung), dann zuletzt
  * bearbeitete Unterlagen und Anlässe in Alltagssprache. Alle Vorlagen gibt es über „Alle Unterlagen“ und die Suche.
  */
-export function Unterlagen({ schliessen }: { schliessen?: boolean }) {
+export function Unterlagen(_: { schliessen?: boolean }) {
   const { stand, tabWechseln } = useAmtlos();
   const nav = useNav();
   const ziel = useZiel();
@@ -178,14 +178,27 @@ export function Unterlagen({ schliessen }: { schliessen?: boolean }) {
   const zuletzt = sortiert(stand).slice(0, 3);
   const zuAnlass = (a: Anlass) => (a.vorlagen.length === 1 ? starten(a.vorlagen[0]!) : nav.oeffnen(`anlass-${a.id}`, () => <AnlassSeite a={a} />));
   return (
-    <Seite titel={TEXT.neu_titel} unterzeile={TEXT.unterlagen_unter} schliessen={schliessen}>
-      <Suchfeld wert={suche} setzen={setSuche} />
+    <BuehnenBlatt
+      titel={TEXT.neu_titel}
+      unter={TEXT.unterlagen_unter}
+      buehne={
+        <View style={{ gap: 12, marginTop: 4 }}>
+          <Suchfeld buehne wert={suche} setzen={setSuche} />
+          {s ? null : (
+            <View style={{ flexDirection: "row", gap: 10 }}>
+              <Knopf buehne symbol="plus" text={TEXT.kurz_rechnung} onPress={() => starten("rechnung")} stil={{ flex: 1, paddingHorizontal: 12 }} />
+              <Knopf glas symbol="doc.viewfinder" text={TEXT.kurz_beleg} onPress={() => ziel((n) => n.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />))} stil={{ flex: 1, paddingHorizontal: 12 }} />
+            </View>
+          )}
+        </View>
+      }
+    >
       {s ? (
         <Treffer s={s} />
       ) : (
         <View>
           {betriebFehlt(stand.betrieb) ? (
-            <Karte stil={{ marginTop: 16 }}>
+            <Karte stil={{ marginBottom: 6 }}>
               <Zeile
                 symbol="building.2"
                 titel={TEXT.betrieb_eintragen}
@@ -203,14 +216,8 @@ export function Unterlagen({ schliessen }: { schliessen?: boolean }) {
               />
             </Karte>
           ) : null}
-          {/* untereinander: nebeneinander brachen beide Beschriftungen auf zwei Zeilen um */}
-          <View style={{ flexDirection: "row", gap: 12, marginTop: 16 }}>
-            <SchnellKachel symbol="eurosign" text={TEXT.rechnung_schreiben} onPress={() => starten("rechnung")} />
-            <SchnellKachel ton="blau" symbol="doc.viewfinder" text={TEXT.beleg_erfassen} onPress={() => ziel((n) => n.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />))} />
-          </View>
-
           {zuletzt.length ? (
-            <Gruppe titel={TEXT.zuletzt}>
+            <Gruppe erste={!betriebFehlt(stand.betrieb)} titel={TEXT.zuletzt}>
               <Karte>
                 {zuletzt.map((u, i) => (
                   <UnterlageZeile key={u.id} u={u} ueber={ueberJe.get(u.id) ?? 0} letzte={i === zuletzt.length - 1} fehlt={fehltJe.get(u.id) ?? 0} betrieb={stand.betrieb} onPress={oeffnen} />
@@ -220,7 +227,7 @@ export function Unterlagen({ schliessen }: { schliessen?: boolean }) {
             </Gruppe>
           ) : null}
 
-          <Gruppe titel={TEXT.wofuer}>
+          <Gruppe erste={!zuletzt.length && !betriebFehlt(stand.betrieb)} titel={TEXT.wofuer}>
             <Karte>
               {ANLAESSE.map((a, i) => (
                 <Zeile key={a.id} symbol={ANLASS_SYMBOL[a.id] ?? "doc.text"} ton={ANLASS_TON[a.id] ?? "amt"} titel={a.titel} text={a.text} onPress={() => zuAnlass(a)} letzte={i === ANLAESSE.length - 1} />
@@ -233,6 +240,6 @@ export function Unterlagen({ schliessen }: { schliessen?: boolean }) {
         </View>
       )}
       <T v="caption" leise stil={{ marginTop: 24, paddingHorizontal: RAND / 5 }}>{TEXT.ueber}</T>
-    </Seite>
+    </BuehnenBlatt>
   );
 }

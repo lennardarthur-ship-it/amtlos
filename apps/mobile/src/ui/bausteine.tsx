@@ -240,9 +240,9 @@ export function SchnellKachel({ symbol, text, onPress, ton = "amt" }: { symbol: 
 const KNOPF_SYMBOLE = new Set(["square.and.arrow.up", "faceid", "plus", "doc.viewfinder"]);
 
 /** Handlung als Text (Links, „Entfernen“, „Weitere Angaben“) – ohne Rahmen, 44 pt Tippfläche. */
-export function TextKnopf({ text, onPress, symbol, gefahr, leise, stil, label }: { text: string; onPress: () => void; symbol?: string; gefahr?: boolean; leise?: boolean; stil?: StyleProp<ViewStyle>; label?: string }) {
+export function TextKnopf({ text, onPress, symbol, gefahr, leise, buehne, stil, label }: { text: string; onPress: () => void; symbol?: string; gefahr?: boolean; leise?: boolean; buehne?: boolean; stil?: StyleProp<ViewStyle>; label?: string }) {
   const f = useFarben();
-  const farbe = gefahr ? f.frist : leise ? f.tinteLeise : f.amt;
+  const farbe = buehne ? f.minze : gefahr ? f.frist : leise ? f.tinteLeise : f.amt;
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={label ?? text} onPress={onPress} hitSlop={4} style={({ pressed }) => [{ minHeight: 44, flexDirection: "row", alignItems: "center", gap: 7, alignSelf: "flex-start", opacity: pressed ? 0.55 : 1 }, stil]}>
       {symbol && symbol.startsWith("chevron") ? <Symbol name={symbol} groesse={13} farbe={farbe} gewicht="bold" /> : null}
@@ -453,7 +453,8 @@ export function feldRahmen(f: Farben, zustand: { fokus?: boolean; fehler?: boole
     backgroundColor: zustand.inKarte ? f.flaeche : f.blatt,
   };
 }
-const feldText = (f: Farben): TextStyle => ({ color: f.tinte, ...SCHRIFT.regular, fontSize: GROESSE.basis });
+// Web-Vorschau: kein Browser-Fokusrahmen (der eigene Rahmen in Amtsgrün zeigt den Fokus)
+const feldText = (f: Farben): TextStyle => ({ color: f.tinte, ...SCHRIFT.regular, fontSize: GROESSE.basis, ...(istIos ? null : ({ outlineStyle: "none" } as unknown as TextStyle)) });
 
 /** Beschriftetes Textfeld; die Beschriftung steht darüber und ist mit dem Feld verbunden. */
 export function Feld({ label, wert, aendern, hilfe, fehler, mehrzeilig, ohneLabel, optional, onFocus, onBlur, ...rest }: { label: string; wert: string; aendern: (w: string) => void; hilfe?: string; fehler?: string | null; mehrzeilig?: boolean; ohneLabel?: boolean; optional?: boolean } & Omit<React.ComponentProps<typeof TextInput>, "value" | "onChangeText" | "style">) {
@@ -562,10 +563,10 @@ function Chip({ text, an, rolle, onPress, kaestchen }: { text: string; an: boole
         if (istIos) void Haptics.selectionAsync();
         onPress();
       }}
-      style={({ pressed }) => ({ minHeight: 40, paddingLeft: kaestchen ? 11 : 16, paddingRight: 16, borderRadius: 20, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: an ? f.amt : pressed ? f.linie : inKarte ? f.flaeche : f.blatt, flexShrink: 1 })}
+      style={({ pressed }) => ({ minHeight: 40, paddingLeft: kaestchen ? 11 : 16, paddingRight: 16, borderRadius: 20, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: an ? f.haupt : pressed ? f.linie : inKarte ? f.flaeche : f.blatt, flexShrink: 1 })}
     >
-      {kaestchen ? <Symbol name={an ? "checkmark.square.fill" : "square"} groesse={16} farbe={an ? f.amtText : f.tinteLeise} /> : null}
-      <T v="klein" fett farbe={an ? f.amtText : f.tinte} stil={{ flexShrink: 1 }}>{text}</T>
+      {kaestchen ? <Symbol name={an ? "checkmark.square.fill" : "square"} groesse={16} farbe={an ? f.hauptText : f.tinteLeise} /> : null}
+      <T v="klein" fett farbe={an ? f.hauptText : f.tinte} stil={{ flexShrink: 1 }}>{text}</T>
     </Pressable>
   );
 }
@@ -592,7 +593,7 @@ export function Schalter({ label, wert, aendern, hilfe }: { label: string; wert:
       <View style={{ flex: 1 }}>
         <SchalterText label={label} hilfe={hilfe} />
       </View>
-      <Switch accessibilityLabel={label} value={wert} onValueChange={aendern} trackColor={{ true: f.amt, false: f.linie }} thumbColor="#ffffff" ios_backgroundColor={f.linie} />
+      <Switch accessibilityLabel={label} value={wert} onValueChange={aendern} trackColor={{ true: f.haupt, false: f.linie }} thumbColor="#ffffff" ios_backgroundColor={f.linie} />
     </View>
   );
 }
@@ -760,17 +761,19 @@ export function BausteinListe({ label, hilfe, werte, aendern, optionen }: { labe
 }
 
 /** Suchfeld für Listen (Unterlagen, Kunden, Auswahl): gefüllte Fläche wie in iOS. */
-export function Suchfeld({ wert, setzen, label = TEXT.suchen }: { wert: string; setzen: (w: string) => void; label?: string }) {
+export function Suchfeld({ wert, setzen, label = TEXT.suchen, buehne }: { wert: string; setzen: (w: string) => void; label?: string; buehne?: boolean }) {
   const f = useFarben();
   const [fokus, setFokus] = useState(false);
+  // auf der Bühne: Glasfläche, weiße Schrift, Fokus in Minze
+  const leise = buehne ? f.buehneLeise : f.tinteLeise;
   return (
-    <View style={{ flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 12, minHeight: 44, borderRadius: RADIUS.klein, backgroundColor: f.flaeche, borderWidth: 2, borderColor: fokus ? f.amt : "transparent" }}>
-      <Symbol name="magnifyingglass" groesse={17} farbe={f.tinteLeise} gewicht="semibold" />
+    <View style={{ flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 12, minHeight: 46, borderRadius: RADIUS.klein, backgroundColor: buehne ? f.buehneFlaeche : f.flaeche, borderWidth: 2, borderColor: fokus ? (buehne ? f.minze : f.amt) : "transparent" }}>
+      <Symbol name="magnifyingglass" groesse={17} farbe={leise} gewicht="semibold" />
       <TextInput
         accessibilityLabel={label}
         placeholder={label}
-        placeholderTextColor={f.tinteLeise}
-        selectionColor={f.amt}
+        placeholderTextColor={leise}
+        selectionColor={buehne ? f.minze : f.amt}
         value={wert}
         onChangeText={setzen}
         onFocus={() => setFokus(true)}
@@ -778,7 +781,7 @@ export function Suchfeld({ wert, setzen, label = TEXT.suchen }: { wert: string; 
         autoCorrect={false}
         clearButtonMode="while-editing"
         returnKeyType="search"
-        style={[feldText(f), { flex: 1, minHeight: 40 }]}
+        style={[feldText(f), { flex: 1, minHeight: 40 }, buehne ? { color: f.buehneText } : null]}
       />
     </View>
   );

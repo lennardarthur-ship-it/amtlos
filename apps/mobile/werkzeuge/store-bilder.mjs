@@ -120,7 +120,7 @@ for (const [i, b] of texte.bilder.entries()) {
   .text{position:absolute;top:150px;left:110px;right:110px}
   h1{font-family:S;font-weight:800;font-size:104px;line-height:1.04;margin:0;letter-spacing:-3px}
   p{font-size:52px;line-height:1.3;margin:36px 0 0;color:#7fe3b8}
-  .geraet{position:absolute;left:140px;right:140px;top:${b.oben ?? 760}px;border-radius:88px;padding:18px;background:#0b2f28;box-shadow:0 40px 120px rgba(0,0,0,.35)}
+  .geraet{position:absolute;left:140px;right:140px;top:${b.oben ?? 760}px;border-radius:88px;padding:16px;background:linear-gradient(#f4f7f5,#cfd9d4);box-shadow:0 0 0 3px rgba(255,255,255,.18),0 50px 140px rgba(0,0,0,.45)}
   .geraet img{display:block;width:100%;border-radius:72px}
   .lupe{position:absolute;left:80px;border-radius:40px;border:10px solid #fff;background-color:#fff;background-repeat:no-repeat;box-shadow:0 40px 100px rgba(0,0,0,.45)}
   </style></head><body><div class="text"><h1>${b.titel}</h1><p>${b.text}</p></div>
@@ -146,7 +146,7 @@ if (WEB) {
   .marke{font-weight:600;font-size:34px;color:#7fe3b8;letter-spacing:.5px}
   h1{font-family:S;font-weight:800;font-size:66px;line-height:1.04;margin:24px 0 0;letter-spacing:-2px}
   p{font-size:30px;line-height:1.35;margin:28px 0 0;color:#7fe3b8}
-  .geraet{position:absolute;left:760px;top:70px;width:372px;border-radius:44px;padding:10px;background:#0b2f28;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+  .geraet{position:absolute;left:760px;top:70px;width:372px;border-radius:44px;padding:8px;background:linear-gradient(#f4f7f5,#cfd9d4);box-shadow:0 0 0 2px rgba(255,255,255,.18),0 30px 80px rgba(0,0,0,.45)}
   .geraet img{display:block;width:100%;border-radius:36px}
   </style></head><body><div class="text"><div class="marke">Amtlos</div><h1>${titel}</h1><p>Pflichten-Check, Rechnungen und über 30 Vorlagen für kleine Betriebe – auf dem iPhone.</p></div>
   <div class="geraet"><img src="${png(texte.bilder[0].bildschirm)}"></div></body></html>`, { waitUntil: "load" });

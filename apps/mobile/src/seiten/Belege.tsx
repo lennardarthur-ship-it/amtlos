@@ -7,14 +7,14 @@ import { AuswahlZeile } from "../ui/auswahlseite";
 import { DatumFeld, Feld, Fuss, Hinweis, Karte, Knopf, Schalter, Symbol, T, TextKnopf, Wahl, Zeile } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
-import { RAND, istIos, useFarben, weich } from "../ui/thema";
+import { istIos, useFarben, weich } from "../ui/thema";
 import { belegFoto } from "../unterlagen/belegfoto";
 import { ausUtf8, base64 } from "../unterlagen/sicherung";
 import { dateiTeilenBytes, dateiWaehlenBytes } from "../unterlagen/sicherungDatei";
 import { heute, neueId } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { bestaetigen } from "../ui/bestaetigen";
-import { Inhalt, datumKurz } from "./gemeinsam";
+import { BuehnenBlatt, GrosserBetrag, datumKurz } from "./gemeinsam";
 
 const euro = (c: number) => `${new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(c / 100)} €`;
 const betragText = (c: number) => (c ? new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false }).format(c / 100) : "");
@@ -167,8 +167,28 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
     setze({ steuer: b.steuer.map((x, j) => (j === i ? { ...x, brutto_cent: cent(text) ?? 0 } : x)) });
   };
   return (
-    <Unterseite titel={neu ? TEXT.beleg_neu : TEXT.beleg_titel}>
-      <Inhalt contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 4, paddingBottom: 32 }}>
+    <BuehnenBlatt
+      titel={neu ? TEXT.beleg_neu : TEXT.beleg_titel}
+      buehne={
+        <View style={{ gap: 2 }}>
+          <T v="klein" farbe={f.buehneLeise}>{b.lieferant.trim() || TEXT.brutto}</T>
+          <GrosserBetrag cent={s.brutto_cent} groesse={44} />
+        </View>
+      }
+      fuss={
+        <Fuss>
+          <Knopf
+            text={TEXT.fertig}
+            onPress={() => {
+              // sagen, dass und was gespeichert ist – man landet sonst ohne Rückmeldung wieder auf „Beleg erfassen“
+              if (b.lieferant.trim() || s.brutto_cent) melden(TEXT.beleg_gespeichert([b.lieferant.trim(), s.brutto_cent ? euro(s.brutto_cent) : ""].filter(Boolean).join(", ")));
+              nav.zurueck();
+            }}
+            stil={{ flex: 1 }}
+          />
+        </Fuss>
+      }
+    >
         <DateiVorschau b={b} />
         {b.quelle === "erechnung" ? <Hinweis art="erfolg" text={TEXT.beleg_aus_erechnung} /> : null}
         <Feld label={TEXT.beleg_lieferant} wert={b.lieferant} aendern={(w) => setze({ lieferant: w })} placeholder="z. B. Friseurbedarf Müller" />
@@ -214,30 +234,15 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
           }
           stil={{ marginTop: 24 }}
         />
-      </Inhalt>
-      <Fuss>
-        <Knopf
-          text={TEXT.fertig}
-          onPress={() => {
-            // sagen, dass und was gespeichert ist – man landet sonst ohne Rückmeldung wieder auf „Beleg erfassen“
-            if (b.lieferant.trim() || s.brutto_cent) melden(TEXT.beleg_gespeichert([b.lieferant.trim(), s.brutto_cent ? euro(s.brutto_cent) : ""].filter(Boolean).join(", ")));
-            nav.zurueck();
-          }}
-          stil={{ flex: 1 }}
-        />
-      </Fuss>
-    </Unterseite>
+    </BuehnenBlatt>
   );
 }
 
 /** Seite „Beleg erfassen“ – von „Vorlagen“ aus. */
 export function BelegErfassenSeite() {
   return (
-    <Unterseite titel={TEXT.beleg_erfassen}>
-      <Inhalt>
-        <T leise stil={{ marginBottom: 14 }}>{TEXT.beleg_erfassen_text}</T>
-        <BelegErfassen />
-      </Inhalt>
-    </Unterseite>
+    <BuehnenBlatt titel={TEXT.beleg_erfassen} unter={TEXT.beleg_erfassen_text}>
+      <BelegErfassen />
+    </BuehnenBlatt>
   );
 }

@@ -7,6 +7,7 @@ import { useMeldung } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
 import { HAARLINIE, RADIUS, RAND, SCHRIFT, useFarben } from "../ui/thema";
 import { Vorschau } from "../ui/Vorschau";
+import { PapierBlatt } from "./Papier";
 import { drucken, pdfTeilen } from "../unterlagen/pdf";
 import { NUMMER_DOPPELT, fehltFuer } from "../unterlagen/pruefung";
 import { dateiTeilen } from "../unterlagen/sicherungDatei";
@@ -81,8 +82,11 @@ function VorschauSeite({ id }: { id: string }) {
   if (!u || !v) return <Unterseite titel="">{null}</Unterseite>;
   return (
     <Unterseite titel={TEXT.vorschau}>
-      <View style={{ flex: 1 }}>
-        <Vorschau html={dokumentHtml(v, u.daten, betriebFuerDokument(z.stand.betrieb, z.pro))} quer={v.querformat} />
+      {/* das Dokument als Blatt Papier mit Rand und Schatten (E-144) */}
+      <View style={{ flex: 1, padding: 16 }}>
+        <View style={{ flex: 1, borderRadius: RADIUS.blatt, overflow: "hidden", backgroundColor: "#ffffff", shadowColor: "#063b29", shadowOpacity: 0.18, shadowRadius: 16, shadowOffset: { width: 0, height: 6 }, elevation: 6 }}>
+          <Vorschau html={dokumentHtml(v, u.daten, betriebFuerDokument(z.stand.betrieb, z.pro))} quer={v.querformat} />
+        </View>
       </View>
       <Fuss ueber={teilen.fehler ? <T v="klein" fett farbe={f.frist} accessibilityRole="alert">{teilen.fehler}</T> : null}>
         <Knopf text={TEXT.pdf_teilen} symbol="square.and.arrow.up" laedt={teilen.laedt} onPress={() => void teilen.los()} stil={{ flex: 1 }} />
@@ -154,15 +158,27 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
         </View>
       ) : null}
 
-      <Pressable accessibilityRole="button" accessibilityLabel={TEXT.vorschau_oeffnen} onPress={() => nav.oeffnen(`vorschau-${id}`, () => <VorschauSeite id={id} />, true)} style={({ pressed }) => ({ marginTop: 18, opacity: pressed ? 0.9 : 1, transform: [{ scale: pressed ? 0.99 : 1 }] })}>
-        <View style={{ borderRadius: RADIUS.blatt, backgroundColor: "#ffffff", shadowColor: "#000", shadowOpacity: 0.35, shadowRadius: 24, shadowOffset: { width: 0, height: 14 }, elevation: 10 }}>
-          <Vorschau papier html={html} quer={v.querformat} hoehe={v.querformat ? 260 : 440} />
+      {fest ? (
+        // festgeschrieben: das echte Dokument, nicht mehr bearbeitbar
+        <Pressable accessibilityRole="button" accessibilityLabel={TEXT.vorschau_oeffnen} onPress={() => nav.oeffnen(`vorschau-${id}`, () => <VorschauSeite id={id} />, true)} style={({ pressed }) => ({ marginTop: 18, opacity: pressed ? 0.9 : 1, transform: [{ scale: pressed ? 0.99 : 1 }] })}>
+          <View style={{ borderRadius: RADIUS.blatt, backgroundColor: "#ffffff", shadowColor: "#000", shadowOpacity: 0.35, shadowRadius: 24, shadowOffset: { width: 0, height: 14 }, elevation: 10 }}>
+            <Vorschau papier html={html} quer={v.querformat} hoehe={v.querformat ? 260 : 440} />
+          </View>
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, minHeight: 48 }}>
+            <Symbol name="eye" groesse={17} farbe={f.minze} />
+            <T v="klein" farbe={f.minze} stil={{ ...SCHRIFT.halb }}>{TEXT.vorschau_oeffnen}</T>
+          </View>
+        </Pressable>
+      ) : (
+        // noch offen (E-144): das Dokument als Papier – jeder Bereich antippbar; das echte PDF eine Tipp weiter
+        <View style={{ marginTop: 18 }}>
+          <PapierBlatt v={v} d={d} jeSchritt={jeSchritt} ergebnis={ergebnis} springen={springen} />
+          <Pressable accessibilityRole="button" onPress={() => nav.oeffnen(`vorschau-${id}`, () => <VorschauSeite id={id} />, true)} style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, minHeight: 48, opacity: pressed ? 0.6 : 1 })}>
+            <Symbol name="eye" groesse={17} farbe={f.minze} />
+            <T v="klein" farbe={f.minze} stil={{ ...SCHRIFT.halb }}>{TEXT.vorschau_oeffnen}</T>
+          </Pressable>
         </View>
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, minHeight: 48 }}>
-          <Symbol name="eye" groesse={17} farbe={f.minze} />
-          <T v="klein" farbe={f.minze} stil={{ ...SCHRIFT.halb }}>{TEXT.vorschau_oeffnen}</T>
-        </View>
-      </Pressable>
+      )}
 
       {/* das Blatt darunter: Zahlung, Hinweise, Angaben und weitere Möglichkeiten */}
       <View style={{ marginHorizontal: -RAND, marginTop: 10, paddingHorizontal: RAND, paddingTop: 24, paddingBottom: 32, backgroundColor: f.papier, borderTopLeftRadius: RADIUS.buehne, borderTopRightRadius: RADIUS.buehne }}>
@@ -189,19 +205,6 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
         {zaehlt ? <T v="caption" leise stil={{ marginTop: 4, marginLeft: 4 }}>{TEXT.pro_rest(rest, FREI_JE_MONAT)}</T> : null}
         <T v="caption" leise stil={{ marginTop: 4, marginLeft: 4 }}>{PRUEFHINWEIS}</T>
 
-        <T v="gross" accessibilityRole="header" stil={{ marginTop: 30, marginBottom: 12, marginLeft: 4 }}>{fest ? TEXT.angaben : TEXT.angaben_bearbeiten}</T>
-        <Karte>
-          {v.abschnitte.map((a, i) => (
-            <Zeile
-              key={i}
-              links={<Symbol name={jeSchritt[i]!.length ? "exclamationmark.circle" : "checkmark.circle.fill"} groesse={20} farbe={jeSchritt[i]!.length ? f.bald : f.amt} />}
-              titel={a.titel ?? ""}
-              text={jeSchritt[i]!.length ? TEXT.eintrag_fehlt(jeSchritt[i]!.length) : TEXT.schritt_fertig}
-              onPress={fest ? undefined : () => springen(i)}
-              letzte={i === v.abschnitte.length - 1}
-            />
-          ))}
-        </Karte>
 
         <T v="gross" accessibilityRole="header" stil={{ marginTop: 30, marginBottom: 11, marginLeft: 2 }}>{TEXT.mehr}</T>
         {eFehlt.length ? (
