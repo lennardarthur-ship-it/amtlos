@@ -19,7 +19,8 @@ export async function erzeugeApp(k: Konfiguration): Promise<NestExpressApplicati
   app.use(new Ratenbegrenzer({ angemeldet: k.RATE_ANGEMELDET, anonym: k.RATE_ANONYM, fensterMs: 60_000 }).middleware(metriken));
   // Synchronisation (E-134): verschlüsselter Stand und Belegdateien sind größer als normale Anfragen – nur mit Anmeldung
   app.use("/v1/tresor", (req: Request, res: Response, weiter: NextFunction) => {
-    if (!/^Bearer .{20,}$/.test(req.headers.authorization ?? "")) return void res.status(401).json({ statusCode: 401, message: "Anmeldung nötig" });
+    // nur Anfragen mit Body (Hochladen) – CORS-Vorabfragen und Lesen laufen normal weiter
+    if ((req.method === "PUT" || req.method === "POST") && !/^Bearer .{20,}$/.test(req.headers.authorization ?? "")) return void res.status(401).json({ statusCode: 401, message: "Anmeldung nötig" });
     weiter();
   });
   app.use("/v1/tresor", json({ limit: "40mb" }));

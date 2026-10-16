@@ -28,6 +28,8 @@ const app = await erzeugeApp({
   ONLINECHECK_PRIVATE_NETZE: "verboten",
   ONLINECHECK_JE_TAG: 20,
   ABO_TESTTAGE: 14,
+  TRESOR_MAX_MB: 1024,
+  TRESOR_MAX_DATEIEN: 5000,
 });
 await app.listen(3001);
 console.warn("API für den Sync-Rundgang auf http://localhost:3001");
