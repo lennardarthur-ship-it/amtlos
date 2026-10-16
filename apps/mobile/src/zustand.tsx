@@ -3,11 +3,12 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import * as StoreReview from "expo-store-review";
 import { AppState } from "react-native";
 import { sollFragen } from "./pro/bewertung";
-import { kaufAktiv, proAktiv } from "./pro/kauf";
-import { nonce, schluesselHolen, schluesselLoeschen } from "./unterlagen/schluesselbund";
+import { kaufAktiv, proAktiv, testmodus } from "./pro/kauf";
+import { autoSchluesselLoeschen, nonce, schluesselHolen, schluesselLoeschen, schluesselbundMoeglich } from "./unterlagen/schluesselbund";
+import { cacheLeeren } from "./unterlagen/aufraeumen";
 import { istTresor, tresorOeffnen, tresorSchliessen } from "./unterlagen/tresor";
 import type { Beleg, Betrieb, Daten, Person, PersonAngaben, PersonenArt } from "@amtlos/fachlogik";
-import { dateiAblegen, dateiEntfernen, dateiHolen } from "./unterlagen/dateien";
+import { alleDateienEntfernen, dateiAblegen, dateiEntfernen, dateiHolen } from "./unterlagen/dateien";
 import { base64, ausBase64, type Dateien } from "./unterlagen/sicherung";
 import { kontoVergessen } from "./konto/sitzung";
 import { syncZusammenfuehren } from "./konto/sync";
@@ -24,6 +25,8 @@ interface Zustand {
   ladefehler: boolean;
   /** gespeicherte Daten liegen verschlüsselt (auf iPhone/Android; im Web nicht) */
   verschluesselt: boolean;
+  /** Schlüsselbund nicht erreichbar: es wird nichts gespeichert (nie unverschlüsselt), bis er wieder da ist */
+  speicherFehler: boolean;
   stand: Stand;
   tab: Tab;
   tabWechseln(t: Tab): void;
@@ -111,6 +114,7 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
   }, []);
   const schluessel = useRef<Uint8Array | null>(null);
   const [verschluesselt, setVerschluesselt] = useState(false);
+  const [speicherFehler, setSpeicherFehler] = useState(false);
 
   const laden = useCallback(async () => {
     const lesen = async () => {
@@ -178,7 +182,25 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
     if (sperre.current) return;
     const json = JSON.stringify(aktuell.current);
     const k = schluessel.current;
-    void AsyncStorage.setItem(SCHLUESSEL, k ? tresorSchliessen(json, k, nonce()) : json).catch(() => undefined);
+    if (k) {
+      void AsyncStorage.setItem(SCHLUESSEL, tresorSchliessen(json, k, nonce())).catch(() => undefined);
+      return;
+    }
+    // nur die Web-Vorschau hat keinen Schlüsselbund – dort liegt alles im Browser
+    if (!schluesselbundMoeglich) {
+      void AsyncStorage.setItem(SCHLUESSEL, json).catch(() => undefined);
+      return;
+    }
+    // auf dem Gerät nie unverschlüsselt speichern (E-143): Schlüssel noch einmal holen, sonst Bescheid geben
+    void schluesselHolen(true)
+      .then((neu) => {
+        if (!neu) throw new Error("Schlüssel fehlt");
+        schluessel.current = neu;
+        setVerschluesselt(true);
+        setSpeicherFehler(false);
+        return AsyncStorage.setItem(SCHLUESSEL, tresorSchliessen(JSON.stringify(aktuell.current), neu, nonce()));
+      })
+      .catch(() => setSpeicherFehler(true));
   }, []);
 
   /** Neuen Stand übernehmen und kurz danach speichern (Tippen erzeugt viele Änderungen). */
@@ -206,6 +228,7 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       bereit,
       ladefehler,
       verschluesselt,
+      speicherFehler,
       stand,
       tab,
       tabWechseln,
@@ -260,7 +283,7 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       bezahltSetzen: (id, datum) => setzen(bezahltSetzen(aktuell.current, id, datum)),
       appSperreSetzen: (an) => setzen({ ...aktuell.current, appSperre: an }),
       cloudSicherungSetzen: (an) => setzen({ ...aktuell.current, cloudSicherung: an }),
-      pro: storePro || (!kaufAktiv && stand.proTest),
+      pro: storePro || (testmodus && stand.proTest),
       proAktualisieren: (aktiv) => (aktiv === undefined ? void proAktiv().then(setStorePro) : setStorePro(aktiv)),
       proTestSetzen: (an) => setzen({ ...aktuell.current, proTest: an }),
       steuerberatungSetzen: (sb) => setzen(steuerberatungSetzen(aktuell.current, sb)),
@@ -318,6 +341,12 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         if (!sperre.current && !allesLoeschenErlaubt(aktuell.current)) return false;
         if (zeit.current) clearTimeout(zeit.current);
         for (const b of aktuell.current.belege) if (b.datei) dateiEntfernen(b.datei);
+        // auch Reste: verwaiste Belegdateien, Zwischendateien, beiseitegelegte unlesbare Stände, Schlüssel der Auto-Sicherung (E-143)
+        alleDateienEntfernen();
+        cacheLeeren();
+        const reste = (await AsyncStorage.getAllKeys().catch(() => [] as readonly string[])).filter((k) => k.startsWith(`${SCHLUESSEL}.unlesbar.`));
+        if (reste.length) await AsyncStorage.multiRemove(reste).catch(() => undefined);
+        await autoSchluesselLoeschen().catch(() => undefined);
         sperre.current = false;
         setLadefehler(false);
         aktuell.current = LEERER_STAND;
@@ -330,7 +359,7 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         return true;
       },
     }),
-    [bereit, ladefehler, verschluesselt, stand, tab, setzen, schreiben, storePro, laden, ladefehlerAufheben],
+    [bereit, ladefehler, verschluesselt, speicherFehler, stand, tab, setzen, schreiben, storePro, laden, ladefehlerAufheben],
   );
   return <Kontext.Provider value={wert}>{children}</Kontext.Provider>;
 }

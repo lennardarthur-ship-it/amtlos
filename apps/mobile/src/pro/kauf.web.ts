@@ -1,6 +1,7 @@
 /** Im Web (Tests) gibt es keinen App Store – immer Testmodus. Gleiche Schnittstelle wie kauf.ts. */
 export const PRO_BERECHTIGUNG = "pro";
 export const kaufAktiv = false;
+export const testmodus = true;
 export interface Angebot {
   id: string;
   titel: string;

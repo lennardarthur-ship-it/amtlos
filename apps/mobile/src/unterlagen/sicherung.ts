@@ -11,10 +11,12 @@ import { standAus, type Stand } from "./speicher";
 
 export const SICHERUNG_FORMAT = "amtlos-sicherung";
 /**
- * Iterationen für PBKDF2. Rein in JavaScript (Expo Go hat kein natives PBKDF2) ist mehr auf dem iPhone spürbar langsam;
- * die Zahl steht in jeder Datei, ältere Sicherungen bleiben lesbar, wenn sie später steigt.
+ * Iterationen für PBKDF2-SHA256 (E-143: 600.000 nach aktueller OWASP-Empfehlung, vorher 150.000). Die Zahl steht in
+ * jeder Datei – ältere Sicherungen bleiben lesbar. Beim Öffnen gilt eine Obergrenze, damit eine präparierte Datei die
+ * App nicht minutenlang blockiert.
  */
-export const SICHERUNG_ITERATIONEN = 150_000;
+export const SICHERUNG_ITERATIONEN = 600_000;
+export const ITERATIONEN_HOECHSTENS = 5_000_000;
 export const PASSWORT_MINDESTLAENGE = 10;
 /** bindet Format und Version an den Inhalt – geänderte Kopfdaten fallen beim Entschlüsseln auf */
 const ZUSATZ = `${SICHERUNG_FORMAT}:1`;
@@ -128,7 +130,7 @@ export function sicherungLesenMitDateien(text: string, passwort: string): { stan
   } catch {
     throw new SicherungsFehler("format");
   }
-  if (d.format !== SICHERUNG_FORMAT || (d.version !== 1 && d.version !== 2) || d.kdf?.name !== "PBKDF2-SHA256" || d.chiffre?.name !== "AES-256-GCM" || typeof d.daten !== "string" || !(d.kdf.iterationen > 0)) throw new SicherungsFehler("format");
+  if (d.format !== SICHERUNG_FORMAT || (d.version !== 1 && d.version !== 2) || d.kdf?.name !== "PBKDF2-SHA256" || d.chiffre?.name !== "AES-256-GCM" || typeof d.daten !== "string" || !(d.kdf.iterationen > 0) || d.kdf.iterationen > ITERATIONEN_HOECHSTENS) throw new SicherungsFehler("format");
   let klar: Uint8Array;
   const k = schluessel(passwort, ausBase64(d.kdf.salz), d.kdf.iterationen);
   try {

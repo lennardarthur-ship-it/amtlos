@@ -47,7 +47,7 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       UMGEBUNG: "test", PORT: 0, DATABASE_URL: urls.api, AUTH_MODUS: "dev", DEV_JWT_SECRET: GEHEIM,
       WEB_URL: "https://app.amtlos.test", API_URL: "https://api.amtlos.test", OIDC_ISSUER: undefined, OIDC_AUDIENCE: undefined, METRIKEN_TOKEN: METRIK_TOKEN, RATE_ANGEMELDET: 10_000, RATE_ANONYM: 1_000, ABLAGE_VERZEICHNIS: fs.mkdtempSync(path.join(os.tmpdir(), "ablage-")),
       ONLINECHECK_PRIVATE_NETZE: "erlaubt", ONLINECHECK_JE_TAG: 3,
-      STRIPE_WEBHOOK_SECRET: WEBHOOK_GEHEIM, ABO_TESTTAGE: 14,
+      STRIPE_WEBHOOK_SECRET: WEBHOOK_GEHEIM, ABO_TESTTAGE: 14, TRESOR_MAX_MB: 1024, TRESOR_MAX_DATEIEN: 3,
     });
     await app.init();
     [anna, ben, mia] = await Promise.all([token("anna"), token("ben"), token("mia")]);
@@ -1100,6 +1100,12 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       await als(http().put("/v1/tresor/dateien/abc123.jpg")).send({ daten: chiffre("anders") }).expect(204);
       expect((await als(http().get("/v1/tresor/dateien/abc123.jpg")).expect(200)).body).toEqual({ daten: chiffre("foto") });
       expect((await als(http().get("/v1/tresor/dateien")).expect(200)).body).toEqual(["abc123.jpg"]);
+      // Speicher je Konto begrenzt (E-143): die vierte Datei passt nicht mehr
+      await als(http().put("/v1/tresor/dateien/abc124.jpg")).send({ daten: chiffre("foto") }).expect(204);
+      await als(http().put("/v1/tresor/dateien/abc125.jpg")).send({ daten: chiffre("foto") }).expect(204);
+      await als(http().put("/v1/tresor/dateien/abc126.jpg")).send({ daten: chiffre("foto") }).expect(413);
+      // ohne Anmeldung wird ein großer Body gar nicht erst gelesen
+      await http().put("/v1/tresor").send({ version: 0, daten: chiffre("x") }).expect(401);
       await fremd(http().get("/v1/tresor/dateien/abc123.jpg")).expect(404);
       // große Stände gehen (Limit 40 MB statt 256 kB)
       expect((await als(http().put("/v1/tresor")).send({ version: 2, daten: chiffre("A".repeat(2_000_000)) }).expect(200)).body).toEqual({ version: 3 });

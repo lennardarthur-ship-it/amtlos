@@ -30,6 +30,9 @@ const Schema = z
     ABO_TESTTAGE: z.coerce.number().int().min(0).max(365).default(14),
     /** RevenueCat (Abos der iPhone-App, E-134): mit Schlüssel prüft die Synchronisation, ob Pro aktiv ist */
     REVENUECAT_SECRET_KEY: z.string().min(10).optional(),
+    /** Speicher je Konto für die Synchronisation (E-143): höchstens so viele MB und Dateien */
+    TRESOR_MAX_MB: z.coerce.number().int().positive().default(1024),
+    TRESOR_MAX_DATEIEN: z.coerce.number().int().positive().default(5000),
   })
   .superRefine((k, ctx) => {
     if (k.AUTH_MODUS === "oidc" && (!k.OIDC_ISSUER || !k.OIDC_AUDIENCE))

@@ -843,6 +843,30 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
   - Der Dunkelmodus hat eine eigene Bühne (#0a2a1e) und ein dunkles Blatt.
 - **Geprüft:** Typprüfung, Lint, 78 Unit-Tests. Rundgang hell und dunkel ohne Befunde, mit neuen Prüfungen: Jahresblick und „Offen bei Kunden“. Store-Bilder und Website-Bilder sind neu. Auf einem echten iPhone fehlt die Prüfung noch (→ T-84).
 
+
+### E-143 · App-Store-Reife und Datenschutz-Härtung (2026-10-16)
+
+- **Anlass:** Der Gründer fragte, ob die App „dem großen Markt würdig“ ist, und gab den Auftrag: „Mache alles, was du machen kannst.“ Eine unabhängige Prüfung (eigener Prüfer, ohne die Arbeit gesehen zu haben) suchte nach Gründen für eine Ablehnung im App Store und nach Datenschutzmängeln.
+- **App Store:**
+  - Den Pro-Testmodus gibt es nur noch in Entwicklung, in der Web-Vorschau und in Builds mit `EXPO_PUBLIC_PRO_TESTMODUS=1` (EAS-Profil `preview` für TestFlight). Ein Store-Build ohne RevenueCat-Schlüssel schenkt Pro nie; Käufe sind dort „noch nicht verfügbar“.
+  - Liefert der Store keine Angebote, zeigt der Bezahlschirm einen Hinweis und „Erneut laden“ statt einer leeren Seite.
+  - Den Entwicklungszugang (Kennung statt Anmeldung) gibt es nur in Entwicklung und Web-Vorschau; ein Store-Build mit Server, aber ohne Anmeldedienst, bietet kein Konto an.
+  - Datenschutz-Manifest: E-Mail, Name und Konto-ID sind als verknüpft erklärt, Kaufhistorie ebenfalls; als Gründe für Gerätezugriffe stehen Systemstartzeit (35F9.1) und Speicherplatz (E174.1) neu darin (→ T-85).
+  - `store-check.mjs` prüft zusätzlich: Store-Build ohne Testmodus und Anmeldedienst, sobald ein Server gesetzt ist.
+- **Auf dem Gerät:**
+  - Zwischendateien werden gelöscht: PDFs nach dem Teilen oder Drucken, Belegfotos und Logo nach dem Einlesen (`aufraeumen.ts`). Vorher lagen Kundendaten, IBAN und Belegfotos unverschlüsselt im Cache.
+  - Antwortet der Schlüsselbund nicht, speichert die App nichts mehr unverschlüsselt. Sie versucht es erneut und zeigt auf „Heute“ einen Hinweis.
+  - „Alle Daten löschen“ entfernt auch verwaiste Belegdateien, den Cache, beiseitegelegte unlesbare Stände und den Schlüssel der Auto-Sicherung.
+  - In iCloud bleiben die letzten 12 Wochen-Sicherungen; ältere werden gelöscht.
+  - Die Dokumentvorschau läuft ohne JavaScript; Links öffnen sich im Browser.
+  - Sicherungen und Sync-Schlüssel nutzen PBKDF2 mit 600.000 statt 150.000 Iterationen. Ältere Dateien bleiben lesbar; beim Öffnen gilt eine Obergrenze von 5 Mio. gegen präparierte Dateien. Zwei neue Tests.
+- **Server:**
+  - Die Ratenbegrenzung greift vor dem Einlesen der Anfrage, zusätzlich je IP. Große Bodies unter `/v1/tresor` werden ohne Anmeldung gar nicht gelesen (401).
+  - Speicher je Konto für die Synchronisation: höchstens `TRESOR_MAX_MB` (1024) und `TRESOR_MAX_DATEIEN` (5000), sonst 413.
+  - Ist RevenueCat nicht erreichbar, bleibt der letzte bekannte Pro-Stand gültig, nur kurz gemerkt. Tests ergänzt.
+- **Prüfpaket für die fachliche Freigabe:** `scripts/pruefpaket.py` erzeugt eine Excel-Tabelle mit allen 146 Pflichten und 29 Regelwerten. Sie enthält Auslöser in Klartext, Fristen, Rechtsgrundlagen, Quellen und offene Prüfpunkte, nach Priorität sortiert, dazu gelbe Spalten für Ergebnis und Anmerkung. Damit kann der Gründer Anwalt oder Steuerberatung beauftragen (T-52 ff.). Inhalte wurden dabei nicht verändert.
+- **Bleibt beim Gründer:** Impressum und Anbieterdaten, Datenschutzerklärung und Support-URL im Netz, Apple-Team und App Store Connect, RevenueCat-Schlüssel, EAS-Projekt, Entscheidung zur Export-Compliance, fachliche Freigabe des Katalogs, Test auf dem iPhone.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

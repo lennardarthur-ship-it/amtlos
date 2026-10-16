@@ -9,8 +9,14 @@ import { Platform } from "react-native";
 export const PRO_BERECHTIGUNG = "pro";
 const SCHLUESSEL = process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY ?? "";
 
-/** Echte Käufe möglich (eigener Build mit Schlüssel)? Sonst Testmodus. */
+/** Echte Käufe möglich (eigener Build mit Schlüssel)? */
 export const kaufAktiv = Platform.OS === "ios" && SCHLUESSEL.length > 0;
+/**
+ * Testmodus (Pro testweise einschaltbar) nur in Entwicklung, Testpaket und ausdrücklich freigegebenen Builds
+ * (`EXPO_PUBLIC_PRO_TESTMODUS=1`, z. B. TestFlight-Beta). Ein Store-Build ohne Schlüssel bekommt Pro nie geschenkt –
+ * dort sind Käufe dann „noch nicht verfügbar“.
+ */
+export const testmodus = !kaufAktiv && (__DEV__ || process.env.EXPO_PUBLIC_PRO_TESTMODUS === "1");
 
 export interface Angebot {
   id: string;

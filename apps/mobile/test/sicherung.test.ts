@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import { PASSWORT_MINDESTLAENGE, SicherungsFehler, ausBase64, base64, schluesselAusPasswort, sicherungErstellen, sicherungLesen, sicherungMitSchluessel, sicherungsName } from "../src/unterlagen/sicherung";
+import { PASSWORT_MINDESTLAENGE, SICHERUNG_ITERATIONEN, SicherungsFehler, ausBase64, base64, schluesselAusPasswort, sicherungErstellen, sicherungLesen, sicherungMitSchluessel, sicherungsName } from "../src/unterlagen/sicherung";
 import { LEERER_STAND, allesLoeschenErlaubt, anlegen, aufbewahrungspflichtig, ausgeben, betriebSetzen, felderSetzen, personSetzen, sicherungFaellig, standAus, zusammenfuehren } from "../src/unterlagen/speicher";
 import { istTresor, tresorOeffnen, tresorSchliessen } from "../src/unterlagen/tresor";
 
@@ -27,6 +27,16 @@ describe("Verschlüsselte Datensicherung", () => {
     const datei = sicherungErstellen(beispiel(), "richtig-langes-passwort", zufall, new Date(), IT);
     for (const geheim of ["Salon Sonne", "Sam M", "12 150380", "12345678901", "DE89", "DE12", "143/123", "unterweisung"]) expect(datei).not.toContain(geheim);
     expect(JSON.parse(datei)).toMatchObject({ format: "amtlos-sicherung", version: 1, kdf: { name: "PBKDF2-SHA256", iterationen: IT }, chiffre: { name: "AES-256-GCM" } });
+  });
+
+  it("lehnt Dateien mit überhöhter Iterationszahl ab, statt die App zu blockieren (E-143)", () => {
+    const d = JSON.parse(sicherungErstellen(beispiel(), "richtig-langes-passwort", zufall, new Date(), IT)) as { kdf: { iterationen: number } };
+    d.kdf.iterationen = 50_000_000;
+    expect(() => sicherungLesen(JSON.stringify(d), "richtig-langes-passwort")).toThrow(SicherungsFehler);
+  });
+
+  it("verschlüsselt neue Sicherungen mit mindestens 600.000 Iterationen", () => {
+    expect(SICHERUNG_ITERATIONEN).toBeGreaterThanOrEqual(600_000);
   });
 
   it("lehnt falsche Passwörter, veränderte Dateien und fremde Dateien ab", () => {

@@ -49,6 +49,19 @@ export async function cloudSchreiben(text: string, jetzt = new Date()): Promise<
   if (!(await CloudStorage.exists(ORDNER, CloudStorageScope.Documents))) await CloudStorage.mkdir(ORDNER, CloudStorageScope.Documents);
   await CloudStorage.writeFile(AKTUELL, text, CloudStorageScope.Documents);
   await CloudStorage.writeFile(`${ORDNER}/Amtlos-Sicherung-${kalenderwoche(jetzt)}.amtlos`, text, CloudStorageScope.Documents);
+  await alteWochenLoeschen().catch(() => undefined);
+}
+
+/** So viele Wochen-Sicherungen bleiben in iCloud; ältere werden gelöscht (die aktuelle enthält ohnehin alles). */
+export const WOCHEN_BEHALTEN = 12;
+
+/** Ältere Wochen-Sicherungen löschen – iCloud soll nicht jede Woche um eine volle Kopie wachsen (E-143). */
+async function alteWochenLoeschen(): Promise<void> {
+  const l = lib();
+  if (!l) return;
+  const { CloudStorage, CloudStorageScope } = l;
+  const wochen = (await CloudStorage.readdir(ORDNER, CloudStorageScope.Documents)).filter((n) => /^Amtlos-Sicherung-\d{4}-KW\d{2}\.amtlos$/.test(n)).sort();
+  for (const n of wochen.slice(0, Math.max(0, wochen.length - WOCHEN_BEHALTEN))) await CloudStorage.unlink(`${ORDNER}/${n}`, CloudStorageScope.Documents).catch(() => undefined);
 }
 
 /** Letzte Sicherung aus iCloud (oder null). */

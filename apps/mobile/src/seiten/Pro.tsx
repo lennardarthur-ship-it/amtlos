@@ -6,7 +6,7 @@ import { Betrag, Fuss, Hinweis, Kachel, Karte, Knopf, Symbol, T, TextKnopf } fro
 import { useMeldung } from "../ui/meldung";
 import { useKopf, useNav } from "../ui/navigation";
 import { HAARLINIE, RADIUS, RAND, useFarben } from "../ui/thema";
-import { angebote, kaufAktiv, kaufen, wiederherstellen, type Angebot } from "../pro/kauf";
+import { angebote, kaufAktiv, kaufen, testmodus, wiederherstellen, type Angebot } from "../pro/kauf";
 import { FREI_JE_MONAT, PRO_VORTEILE, uebrig, type ProFunktion } from "../pro/regeln";
 import { useAmtlos } from "../zustand";
 import { syncAngeboten } from "../konto/konfig";
@@ -31,18 +31,23 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
   const [wahl, setWahl] = useState<string | null>(null);
   const [laedt, setLaedt] = useState(false);
   const [fehler, setFehler] = useState<string | null>(null);
-  useEffect(() => {
+  // Angebote aus dem Store; kommt keins (z. B. Abo noch nicht freigegeben), sagen wir das und bieten „Erneut laden“
+  const angeboteLaden = () => {
     if (!kaufAktiv) return;
+    setListe(null);
+    setFehler(null);
     angebote()
       .then((l) => {
         setListe(l);
         setWahl(l[0]?.id ?? null);
+        if (!l.length) setFehler(TEXT.pro_laden_fehler);
       })
       .catch(() => {
         setListe([]);
         setFehler(TEXT.pro_laden_fehler);
       });
-  }, []);
+  };
+  useEffect(angeboteLaden, []);
   const fertig = (aktiv: boolean, text: string) => {
     z.proAktualisieren(aktiv);
     if (aktiv) {
@@ -53,6 +58,7 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
   const los = async () => {
     setFehler(null);
     if (!kaufAktiv) {
+      if (!testmodus) return;
       z.proTestSetzen(true);
       return fertig(true, TEXT.pro_test_an);
     }
@@ -132,11 +138,12 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
           )
         ) : (
           <View style={{ marginTop: 16 }}>
-            <Hinweis text={TEXT.pro_testmodus} symbol="info.circle" />
+            <Hinweis text={testmodus ? TEXT.pro_testmodus : TEXT.pro_nicht_verfuegbar} symbol="info.circle" />
           </View>
         )}
         {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
-        {z.pro && !kaufAktiv ? <TextKnopf symbol="xmark.circle" text={TEXT.pro_test_aus} onPress={() => z.proTestSetzen(false)} stil={{ marginTop: 8 }} /> : null}
+        {kaufAktiv && liste !== null && !liste.length ? <TextKnopf symbol="arrow.clockwise" text={TEXT.erneut_laden} onPress={angeboteLaden} /> : null}
+        {z.pro && testmodus ? <TextKnopf symbol="xmark.circle" text={TEXT.pro_test_aus} onPress={() => z.proTestSetzen(false)} stil={{ marginTop: 8 }} /> : null}
 
         <T v="caption" leise stil={{ marginTop: 18 }}>{TEXT.pro_abo_text}</T>
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 16, marginTop: 4 }}>
@@ -149,7 +156,7 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
         {z.pro ? (
           <Knopf ton text={TEXT.pro_aktiv} symbol="checkmark" onPress={nav.zurueck} stil={{ flex: 1 }} />
         ) : (
-          <Knopf text={!kaufAktiv ? TEXT.pro_test_einschalten : gewaehlt?.test ? TEXT.pro_test_starten : TEXT.pro_abonnieren} laedt={laedt} deaktiviert={kaufAktiv && !wahl} onPress={() => void los()} stil={{ flex: 1 }} />
+          <Knopf text={!kaufAktiv ? TEXT.pro_test_einschalten : gewaehlt?.test ? TEXT.pro_test_starten : TEXT.pro_abonnieren} laedt={laedt} deaktiviert={kaufAktiv ? !wahl : !testmodus} onPress={() => void los()} stil={{ flex: 1 }} />
         )}
       </Fuss>
     </View>

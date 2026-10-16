@@ -10,6 +10,7 @@ import { Platform } from "react-native";
 import { RAENDER, type Gestalt } from "@amtlos/fachlogik";
 import { fussAngaben, fusszeileStempeln } from "./fusszeile";
 import { mitSchriften } from "./schriften";
+import { cacheDateiLoeschen } from "./aufraeumen";
 
 /** A4 in Punkt (72 dpi). Ränder je Gestalt (E-129): unten Platz für die Fußzeile. */
 const A4 = { width: 595, height: 842 };
@@ -45,6 +46,9 @@ export async function pdfErstellen(roh: string, dateiname: string, quer = false)
     // Ohne gestempelte Fußzeile stehen die Geschäftsangaben (Steuer, Bank, Register) im Fluss am Dokumentende
     const ersatz = await Print.printToFileAsync({ html: html.replace(/<body class="([^"]*)">/, '<body class="$1 fuss-im-fluss">'), ...seite, margins });
     return ersatz.uri;
+  } finally {
+    // das ungestempelte Zwischen-PDF nie liegen lassen (Kundendaten unverschlüsselt im Cache)
+    cacheDateiLoeschen(uri);
   }
 }
 
@@ -55,8 +59,12 @@ export async function pdfTeilen(html: string, dateiname: string, quer = false): 
     return true;
   }
   const uri = await pdfErstellen(html, dateiname, quer);
-  if (Platform.OS !== "ios" && !(await Sharing.isAvailableAsync())) return druckenUri(uri);
-  return teilen(uri, { mimeType: "application/pdf", UTI: "com.adobe.pdf", titel: dateiname });
+  try {
+    if (Platform.OS !== "ios" && !(await Sharing.isAvailableAsync())) return await druckenUri(uri);
+    return await teilen(uri, { mimeType: "application/pdf", UTI: "com.adobe.pdf", titel: dateiname });
+  } finally {
+    cacheDateiLoeschen(uri);
+  }
 }
 
 /** Druckdialog; ein Abbrechen meldet expo-print als Fehler – das ist hier kein Fehler, sondern false. */
@@ -76,5 +84,10 @@ export async function drucken(html: string, dateiname: string, quer = false): Pr
     imWebOeffnen(html);
     return true;
   }
-  return druckenUri(await pdfErstellen(html, dateiname, quer));
+  const uri = await pdfErstellen(html, dateiname, quer);
+  try {
+    return await druckenUri(uri);
+  } finally {
+    cacheDateiLoeschen(uri);
+  }
 }

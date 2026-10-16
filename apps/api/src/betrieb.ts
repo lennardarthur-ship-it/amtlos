@@ -107,7 +107,9 @@ export class Ratenbegrenzer {
       const token = /^Bearer (.+)$/.exec(req.headers.authorization ?? "")?.[1];
       const streng = !token || req.path.startsWith("/v1/einladungen/") || req.path.startsWith("/v1/kalender/");
       const schluessel = token ? `t:${createHash("sha256").update(token).digest("base64url").slice(0, 22)}` : `ip:${req.ip ?? "?"}`;
-      const r = this.pruefe(`${streng ? "s" : "n"}|${schluessel}`, streng ? this.g.anonym : this.g.angemeldet);
+      // zusätzlich je IP: wechselnde (auch ungültige) Tokens umgehen die Grenze sonst beliebig (E-143)
+      const ip = token ? this.pruefe(`i|${req.ip ?? "?"}`, this.g.angemeldet * 2) : true;
+      const r = ip === true ? this.pruefe(`${streng ? "s" : "n"}|${schluessel}`, streng ? this.g.anonym : this.g.angemeldet) : ip;
       if (r === true) return weiter();
       m.begrenzt.inc();
       res.setHeader("Retry-After", String(r));

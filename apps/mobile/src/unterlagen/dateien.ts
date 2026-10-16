@@ -37,3 +37,13 @@ export function dateiEntfernen(name: string): void {
     /* schon weg */
   }
 }
+
+/** Alle Belegdateien löschen (bei „Alle Daten löschen“) – auch solche, auf die kein Beleg mehr zeigt. */
+export function alleDateienEntfernen(): void {
+  try {
+    const d = new Directory(Paths.document, "belege");
+    if (d.exists) d.delete();
+  } catch {
+    /* schon weg */
+  }
+}

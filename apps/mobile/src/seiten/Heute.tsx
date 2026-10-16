@@ -74,6 +74,7 @@ export function Heute() {
 
   return (
     <BuehnenSeite ueber={datum} buehne={buehne}>
+      {z.speicherFehler ? <Hinweis art="fehler" text={TEXT.speicher_fehler} /> : null}
       <SicherungsKarte />
       {gemacht ? (
         <View>

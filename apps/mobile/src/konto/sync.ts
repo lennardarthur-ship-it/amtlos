@@ -13,7 +13,7 @@ import { gcm } from "@noble/ciphers/aes";
 import { pbkdf2 } from "@noble/hashes/pbkdf2";
 import { sha256 } from "@noble/hashes/sha2";
 import type { Person } from "@amtlos/fachlogik";
-import { PASSWORT_MINDESTLAENGE, SICHERUNG_ITERATIONEN, ausBase64, base64, utf8 } from "../unterlagen/sicherung";
+import { ITERATIONEN_HOECHSTENS, PASSWORT_MINDESTLAENGE, SICHERUNG_ITERATIONEN, ausBase64, base64, utf8 } from "../unterlagen/sicherung";
 import { nummerDoppelt, standAus, stornoVerweisePruefen, unterlageVereinen, type Stand, type Unterlage } from "../unterlagen/speicher";
 import { tresorOeffnen, tresorSchliessen } from "../unterlagen/tresor";
 
@@ -56,7 +56,7 @@ export function huelleOeffnen(text: string, passwort: string): Uint8Array {
   } catch {
     throw new SyncFehler("format");
   }
-  if (h.format !== SCHLUESSEL_FORMAT || h.version !== 1 || h.kdf !== "PBKDF2-SHA256" || !(Number(h.iterationen) > 0) || typeof h.salz !== "string" || typeof h.nonce !== "string" || typeof h.daten !== "string") throw new SyncFehler("format");
+  if (h.format !== SCHLUESSEL_FORMAT || h.version !== 1 || h.kdf !== "PBKDF2-SHA256" || !(Number(h.iterationen) > 0) || Number(h.iterationen) > ITERATIONEN_HOECHSTENS || typeof h.salz !== "string" || typeof h.nonce !== "string" || typeof h.daten !== "string") throw new SyncFehler("format");
   try {
     const k = pbkdf2(sha256, utf8(passwort), ausBase64(h.salz), { c: h.iterationen!, dkLen: 32 });
     return gcm(k, ausBase64(h.nonce), utf8(HUELLE_ZUSATZ)).decrypt(ausBase64(h.daten));

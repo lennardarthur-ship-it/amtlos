@@ -24,7 +24,9 @@ pruefe(/freigegeben: true/.test(recht), "Datenschutzhinweis der App fachlich fre
 const eas = JSON.parse(lies("eas.json"));
 pruefe(eas.submit?.production?.ios?.ascAppId, "App Store Connect App-ID (eas.json → submit.production.ios.ascAppId)");
 pruefe(eas.submit?.production?.ios?.appleTeamId, "Apple Team-ID (eas.json → submit.production.ios.appleTeamId)");
-pruefe(process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY, "RevenueCat-Schlüssel als EAS-Secret EXPO_PUBLIC_REVENUECAT_IOS_KEY (sonst läuft der Build im Testmodus)");
+pruefe(!eas.build?.production?.env?.EXPO_PUBLIC_PRO_TESTMODUS, "Store-Build ohne Pro-Testmodus (eas.json → build.production.env ohne EXPO_PUBLIC_PRO_TESTMODUS)");
+pruefe(!process.env.EXPO_PUBLIC_API_URL || process.env.EXPO_PUBLIC_OIDC_ISSUER, "Konto: mit Server (EXPO_PUBLIC_API_URL) auch einen Anmeldedienst setzen (EXPO_PUBLIC_OIDC_ISSUER) – sonst bietet die App kein Konto an");
+pruefe(process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY, "RevenueCat-Schlüssel als EAS-Secret EXPO_PUBLIC_REVENUECAT_IOS_KEY (ohne ihn lässt sich Pro im Store-Build nicht kaufen)");
 const app = JSON.parse(lies("app.json")).expo;
 pruefe(app.extra?.eas?.projectId, "EAS-Projekt verknüpft (eas init → app.json extra.eas.projectId)");
 pruefe(app.ios?.config?.usesNonExemptEncryption !== undefined || app.ios?.infoPlist?.ITSAppUsesNonExemptEncryption !== undefined, "Export-Compliance der Verschlüsselung entschieden (ios.config.usesNonExemptEncryption, PRUEFLISTE T-77)");

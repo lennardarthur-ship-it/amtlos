@@ -1,4 +1,4 @@
-import { Body, ConflictException, Controller, Delete, Get, HttpCode, HttpException, Inject, NotFoundException, Param, Post, Put } from "@nestjs/common";
+import { Body, ConflictException, Controller, Delete, Get, HttpCode, HttpException, Inject, NotFoundException, Param, PayloadTooLargeException, Post, Put } from "@nestjs/common";
 import { z } from "zod";
 import { Datenbank } from "@amtlos/server";
 import { Kontext, type Anfragekontext } from "./auth.js";
@@ -46,8 +46,11 @@ export class TresorController {
       const e = d.subscriber?.entitlements?.pro;
       pro = Boolean(e && (e.expires_date === null || Date.parse(e.expires_date) > Date.now()));
     } catch {
-      // RevenueCat nicht erreichbar: nicht aussperren
-      pro = true;
+      // RevenueCat nicht erreichbar: beim letzten bekannten Stand bleiben, sonst nicht aussperren – aber nur kurz merken
+      pro = c ? c.pro : true;
+      this.proCache.set(kontoId, { pro, bis: Date.now() + 60_000 });
+      if (!pro) throw new ProNoetig();
+      return;
     }
     if (this.proCache.size > 10_000) this.proCache.clear();
     this.proCache.set(kontoId, { pro, bis: Date.now() + 10 * 60_000 });
@@ -117,7 +120,13 @@ export class TresorController {
     pruefe(z.string().regex(DATEINAME), name);
     const d = pruefe(z.object({ daten: Chiffre(15_000_000) }).strict(), body);
     await this.proPruefen(k.kontoId);
-    await this.db.imKontext({ kontoId: k.kontoId }, (tx) => tx.abfrage("insert into app.tresor_datei (konto_id, name, daten) values ($1, $2, $3) on conflict (konto_id, name) do nothing", [k.kontoId, name, d.daten]));
+    await this.db.imKontext({ kontoId: k.kontoId }, async (tx) => {
+      // Speicher je Konto begrenzen (E-143): Anzahl und Größe der Dateien
+      const s = await tx.eine<{ anzahl: string; bytes: string | null }>("select count(*) as anzahl, sum(length(daten)) as bytes from app.tresor_datei where konto_id = $1", [k.kontoId]);
+      if (Number(s?.anzahl ?? 0) >= this.k.TRESOR_MAX_DATEIEN || Number(s?.bytes ?? 0) + d.daten.length > this.k.TRESOR_MAX_MB * 1024 * 1024)
+        throw new PayloadTooLargeException({ statusCode: 413, meldung: "Der Speicher für die Synchronisation ist voll." });
+      await tx.abfrage("insert into app.tresor_datei (konto_id, name, daten) values ($1, $2, $3) on conflict (konto_id, name) do nothing", [k.kontoId, name, d.daten]);
+    });
   }
 
   @Get("tresor/dateien/:name")

@@ -14,3 +14,11 @@ export async function dateiHolen(name: string, _schluessel: Uint8Array | null): 
 export function dateiEntfernen(name: string): void {
   speicher()?.removeItem(SCHLUESSEL(name));
 }
+export function alleDateienEntfernen(): void {
+  const l = speicher() as unknown as { length: number; key(i: number): string | null; removeItem(k: string): void } | undefined;
+  if (!l) return;
+  for (let i = l.length - 1; i >= 0; i--) {
+    const k = l.key(i);
+    if (k?.startsWith("amtlos.datei.")) l.removeItem(k);
+  }
+}
