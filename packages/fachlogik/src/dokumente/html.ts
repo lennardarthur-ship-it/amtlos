@@ -294,6 +294,8 @@ table.liste.fortsetzung { margin-top: 0; }
 .schlussblock > table + .unterschriften, .schlussblock.nach-tabelle > .unterschriften:first-child { margin-top: 7mm; }
 .spalten2 { display: flex; gap: 10mm; }
 .spalten2 > * { flex: 1; }
+/* zwei Angaben-Spalten nebeneinander: gleiche Zeilenhöhe, auch wenn links Text und rechts eine Ausfülllinie steht */
+.spalten2 table.angaben th, .spalten2 table.angaben td { height: 7mm; vertical-align: bottom; }
 .zelle-linie { display: block; border-bottom: 0.5pt solid #8a949c; height: 4.2mm; }
 ol.nummern { margin: 0 0 2mm; padding-left: 6mm; }
 ol.nummern li { margin: 0 0 0.9mm; padding-left: 0.6mm; }
