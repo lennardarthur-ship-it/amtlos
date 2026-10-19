@@ -83,6 +83,19 @@ function auswahl(v) {
       else if (f.art === "schalter") d[f.id] = d[f.id] !== true;
       else if ((f.art === "mehrfach" || f.art === "bausteine") && f.optionen.length) d[f.id] = f.optionen.map((o) => o.wert);
       else if (f.art === "datum" && !d[f.id]) d[f.id] = HEUTE;
+      else if (f.art === "liste" && Array.isArray(d[f.id]))
+        // auch in Listen: jeder zweite Eintrag mit umgestellten Auswahlen und Schaltern (z. B. „Beleg fehlt“, „nicht bestanden“)
+        d[f.id] = d[f.id].map((e, i) => {
+          if (i % 2 === 0) return e;
+          const n = { ...e };
+          for (const x of f.felder) {
+            if (x.art === "wahl" && x.optionen.length) n[x.id] = (x.optionen.find((o) => o.wert !== n[x.id]) ?? x.optionen[0]).wert;
+            else if (x.art === "schalter") n[x.id] = n[x.id] !== true;
+            else if ((x.art === "mehrfach" || x.art === "bausteine") && x.optionen.length) n[x.id] = x.optionen.map((o) => o.wert);
+            else if (x.art === "datum" && !n[x.id]) n[x.id] = HEUTE;
+          }
+          return n;
+        });
     }
   return d;
 }
