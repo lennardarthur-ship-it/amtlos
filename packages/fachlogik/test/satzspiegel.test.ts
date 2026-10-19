@@ -4,7 +4,7 @@
  */
 import { describe, expect, it } from "vitest";
 import { LEERER_BETRIEB, RAENDER, dokumentHtml, leereDaten, vorlageFuer, type Betrieb, type Daten } from "../src/index.js";
-import { ibanText, schlussZusammen, unterschriften } from "../src/dokumente/html.js";
+import { festeLeerzeichen, ibanText, schlussZusammen, unterschriften } from "../src/dokumente/html.js";
 
 const B: Betrieb = { ...LEERER_BETRIEB, name: "Salon Sonne", strasse: "Hauptstraße 1", plz: "80331", ort: "München", verantwortlich: "Alex Sonnberg", telefon: "089 123456", email: "hallo@salon-sonne.example", steuernummer: "143/123/45678", iban: "DE89370400440532013000", bic: "COBADEFFXXX", bank: "Beispielbank", bundesland: "Bayern" };
 const HEUTE = "2026-10-13";
@@ -19,10 +19,15 @@ describe("Satzspiegel und Seitenumbrüche", () => {
     const u = unterschriften(["Unterschrift"]);
     expect(schlussZusammen(`<section class="abschnitt"><h2>A</h2><table class="liste"><tbody><tr><td>x</td></tr></tbody></table></section><p>Ich versichere …</p>${u}`)).toMatch(/<\/section><div class="schlussblock"><p>Ich versichere …<\/p><div class="unterschriften/);
     const t = schlussZusammen(`<section class="abschnitt"><h2>A</h2><table class="liste"><colgroup><col></colgroup><thead><tr><th>N</th></tr></thead><tbody><tr><td>1</td></tr><tr><td>2</td></tr></tbody></table></section>${u}`);
-    expect(t).toContain('<tbody><tr><td>1</td></tr></tbody></table></section><div class="schlussblock"><table class="liste fortsetzung"><colgroup><col></colgroup><tbody><tr><td>2</td></tr></tbody></table><div class="unterschriften');
+    // die letzte Zeile kommt in eine eigene Zeilengruppe derselben Tabelle (Kopf wiederholt sich auf der neuen Seite)
+    expect(t).toContain('<tbody><tr><td>1</td></tr></tbody><tbody class="schluss"><tr><td>2</td></tr></tbody></table></section><div class="schlussblock nach-tabelle"><div class="unterschriften');
+    // mit Summenzeile (Kassenbuch): letzte Zeile und tfoot bleiben beim Schlussblock
+    const k = schlussZusammen(`<table class="liste"><thead><tr><th>N</th></tr></thead><tbody><tr><td>1</td></tr><tr><td>2</td></tr></tbody><tfoot><tr class="summe"><td>S</td></tr></tfoot></table>${u}`);
+    expect(k).toContain('<tbody><tr><td>1</td></tr></tbody><tbody class="schluss"><tr><td>2</td></tr></tbody><tfoot><tr class="summe"><td>S</td></tr></tfoot></table><div class="schlussblock nach-tabelle">');
     // Personalfragebogen: die Erklärung steht mit der Unterschrift, nicht allein auf der Seite davor
-    expect(html("sv_meldedaten", { name: "Lea Wagner" })).toMatch(/<div class="schlussblock"><p style="margin-top:6mm">Ich versichere/);
-    expect(html("gefaehrdungsbeurteilung")).toMatch(/<div class="schlussblock"><section class="abschnitt"><h2>Wirksamkeit und Fortschreibung/);
+    // (entweder im Schlussblock oder gemeinsam in einem Block „zusammen“)
+    expect(html("sv_meldedaten", { name: "Lea Wagner" })).toMatch(/<div class="schlussblock"><p style="margin-top:6mm">Ich versichere|<div class="zusammen">(?:(?!<\/section>).)*Ich versichere(?:(?!<\/section>).)*<div class="unterschriften/s);
+    expect(html("gefaehrdungsbeurteilung")).toMatch(/<div class="schlussblock"><section class="abschnitt zusammen"><h2>Wirksamkeit und Fortschreibung/);
     expect(html("betriebsanweisung", { notruf: "Notruf 112" })).toMatch(/<div class="schlussblock"><div class="notruf">/);
   });
 
@@ -105,10 +110,45 @@ describe("weitere Vorlagen", () => {
     const h = html("allergene", { gerichte: [{ name: "Käsekuchen", kategorie: "Kuchen", allergene: ["gluten", "eier", "milch"] }, { name: "Wasser", kategorie: "Getränke", allergene: [] }] });
     expect(h.match(/<th class="dreh">/g)).toHaveLength(14);
     expect(h.match(/<td class="x">×<\/td>/g)).toHaveLength(3);
-    expect(h).toContain("keine der 14 Hauptallergene");
+    expect(h).toContain("keines der 14 Hauptallergene");
+    // je Kategorie eine Zeilengruppe; SO₂ in der Erläuterung tiefgestellt
+    expect(h.match(/<tbody class="gruppe-block"><tr class="gruppe">/g)).toHaveLength(2);
+    expect(h).toContain("SO₂");
     const i = html("ifsg_belehrung");
     expect(i).toContain('<ol class="nummern"><li>Fleisch, Geflügelfleisch und Erzeugnisse daraus</li>');
     expect(i).not.toMatch(/<li>\d+\. /);
+  });
+
+  it("feste Leerzeichen bei Paragraf, Artikel, Gesetz, Einheit – nicht in Tags, auch in Unterzeile und Kennungsleiste", () => {
+    expect(festeLeerzeichen("(§ 43 Abs. 2) bei 121 °C, Art. 32 DSGVO, § 4 Abs. 1 DGUV Vorschrift 1, §§ 5 ArbSchG, Art. 6 Abs. 1 lit. b DSGVO, § 28a SGB IV, 19 %")).toBe(
+      "(§&nbsp;43 Abs.&nbsp;2) bei 121&nbsp;°C, Art.&nbsp;32&nbsp;DSGVO, §&nbsp;4 Abs.&nbsp;1 DGUV&nbsp;Vorschrift&nbsp;1, §§&nbsp;5&nbsp;ArbSchG, Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b&nbsp;DSGVO, §&nbsp;28a&nbsp;SGB&nbsp;IV, 19&nbsp;%",
+    );
+    expect(festeLeerzeichen('<span title="§ 43 AO">Nr. und § und</span>')).toBe('<span title="§ 43 AO">Nr. und § und</span>');
+    const h = html("ifsg_belehrung");
+    expect(h).toContain('<p class="unter">Belehrung durch den Arbeitgeber (§&nbsp;43 Abs.&nbsp;4&nbsp;IfSG)</p>');
+    expect(h).toContain("<h1>Belehrung nach §&nbsp;43 Infektionsschutzgesetz</h1>");
+    expect(h).toContain(".g-vertrag p, .g-vertrag li { text-align: left; }");
+  });
+
+  it("leere Pläne und Listen drucken Tabellen zum Ausfüllen; Kopfangaben ohne „0“ und ohne Doppelung", () => {
+    const hy = html("hygieneplan", { bereich: "Bereich 1", eintraege: [] });
+    expect(hy).not.toContain("Noch keine Einträge.");
+    expect(hy).not.toContain("<dt>Bereich</dt>");
+    expect(hy.match(/<td>&nbsp;<\/td>/g)!.length).toBe(6 * 5);
+    expect(html("hautschutzplan", { eintraege: [] })).toContain('<table class="liste hoch">');
+    const ha = html("haccp", { punkte: [] });
+    expect(ha).not.toContain("<dt>Kontrollpunkte</dt>");
+    expect(html("gefahrstoffverzeichnis", { stoffe: [] })).not.toContain("Anzahl Gefahrstoffe");
+    const g = html("gefaehrdungsbeurteilung", { gefaehrdungen: [], mitwirkung: "Fachkraft für Arbeitssicherheit.\nBetriebsarzt;" });
+    expect(g).toContain("<th>Gefährdung</th><th>Risiko</th><th>Schutzmaßnahmen</th><th>Umsetzung</th>");
+    expect(g).toContain("Fachkraft für Arbeitssicherheit, Betriebsarzt</td>");
+    expect(html("pruefprotokoll_elektro", { geraete: [] }).match(/<td>&nbsp;<\/td>/g)!.length).toBe(7 * 6);
+  });
+
+  it("Betriebsanweisung: Notruf-Zeile auch ohne Angabe, kompakter Satz bei viel Text", () => {
+    expect(html("betriebsanweisung", { notruf: "" })).toContain('<div class="notruf">Notruf 112 · Ersthelfer/in: <span class="fuellen"></span></div>');
+    const lang = "Sehr lange Angabe mit vielen Wörtern, die im Aushang mehr als eine Zeile braucht und so weiter.\nZweite Zeile mit weiteren Angaben.";
+    expect(html("betriebsanweisung", { gefahren: lang, schutz: lang, gefahrfall: lang, erste_hilfe: lang, entsorgung: lang })).toContain('<body class="g-aushang ba kompakt">');
   });
 
   it("Nachweis der Arbeitsbedingungen ohne Stunden: kein „an 5 Tagen“ als Bruchstück", () => {

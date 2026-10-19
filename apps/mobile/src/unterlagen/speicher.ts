@@ -209,7 +209,14 @@ export function anlegen(s: Stand, vorlageId: string, jetzt: Date, id = neueId())
   // Startwerte aus „Mein Betrieb“ (z. B. Soll-/Ist-Versteuerung)
   for (const [feld, betriebsFeld] of Object.entries(v.ausBetrieb ?? {})) {
     const w = s.betrieb[betriebsFeld];
-    if (typeof w === "string" && w.trim()) daten[feld] = w;
+    if (typeof w !== "string" || !w.trim()) continue;
+    // Auswahlfelder (z. B. Rechtsform) nur mit einer passenden Option füllen – „GmbH“, „UG“, „e.K.“ gleich ohne Punkte/Leerzeichen
+    const def = v.abschnitte.flatMap((a) => a.felder).find((f) => f.id === feld);
+    if (def?.art === "wahl") {
+      const norm = (x: string) => x.toLowerCase().replace(/[\s.]/g, "");
+      const opt = def.optionen.find((o) => norm(o.wert) === norm(w)) ?? def.optionen.find((o) => norm(o.wert).startsWith(norm(w)));
+      if (opt) daten[feld] = opt.wert;
+    } else daten[feld] = w;
   }
   const u: Unterlage = { id, vorlage: v.id, daten, erstellt: jetzt.toISOString(), geaendert: jetzt.toISOString() };
   return [{ ...s, unterlagen: [u, ...s.unterlagen] }, u];

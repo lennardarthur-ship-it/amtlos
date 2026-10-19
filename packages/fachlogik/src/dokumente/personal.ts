@@ -137,7 +137,7 @@ export const nachweisArbeitsbedingungen: Vorlage = {
       ["5. Tätigkeit", text(d, "taetigkeit")],
       ["6. Probezeit", PROBEZEIT[text(d, "probezeit")] ?? ""],
       ["7. Arbeitsentgelt", [entgelt, text(d, "zuschlaege"), text(d, "faelligkeit") ? `Fällig ${text(d, "faelligkeit")}.` : "", text(d, "auszahlung") ? `Auszahlung: ${text(d, "auszahlung")}.` : ""].filter(Boolean).join("\n")],
-      ["8. Arbeitszeit, Pausen, Ruhezeiten", [zeit, text(d, "pausen") ? `Ruhepausen ${text(d, "pausen")}` : "", text(d, "ruhezeit") ? `Ruhezeit ${text(d, "ruhezeit")}` : "", ja(d, "schicht") ? `Schichtarbeit: ${text(d, "schicht_text")}` : ""].filter(Boolean).join("\n")],
+      ["8. Arbeitszeit, Pausen, Ruhezeiten", [zeit, text(d, "pausen") ? `Ruhepausen: ${text(d, "pausen").replace(/^\s*Ruhepausen:?\s*/i, "")}` : "", text(d, "ruhezeit") ? `Ruhezeit: ${text(d, "ruhezeit").replace(/^\s*Ruhezeit:?\s*/i, "")}` : "", ja(d, "schicht") ? `Schichtarbeit: ${text(d, "schicht_text")}` : ""].filter(Boolean).join("\n")],
       ["9. Arbeit auf Abruf", ja(d, "abruf") ? text(d, "abruf_text") : "nicht vereinbart"],
       ["10. Überstunden", text(d, "ueberstunden") === "ja" ? `${UEBERSTUNDEN.ja} ${text(d, "ueberstunden_text")}` : UEBERSTUNDEN.nein!],
       ["11. Erholungsurlaub", text(d, "urlaub") ? `${text(d, "urlaub")} Arbeitstage pro Kalenderjahr` : ""],
@@ -209,7 +209,7 @@ export const kiKompetenz: Vorlage = {
       unter: text(d, "thema") || undefined,
       meta: `Datum: ${datumDe(text(d, "datum"))}\nDurchgeführt von: ${text(d, "durchgefuehrt_von")}\nDauer: ${text(d, "dauer")}`,
       inhalt:
-        abschnitt("Angaben", angaben([["Bezeichnung", text(d, "thema")], ["KI-Werkzeuge", text(d, "ki_systeme").split("\n").filter(Boolean).join(", ")], ["Datum", datumDe(text(d, "datum"))], ["Dauer", text(d, "dauer") || null], ["Durchgeführt von", text(d, "durchgefuehrt_von")]])) +
+        abschnitt("Angaben", angaben([["Bezeichnung", text(d, "thema")], ["KI-Werkzeuge", text(d, "ki_systeme").split("\n").map((z) => z.trim().replace(/[.;,]+$/, "")).filter(Boolean).join(", ")], ["Datum", datumDe(text(d, "datum"))], ["Dauer", text(d, "dauer") || null], ["Durchgeführt von", text(d, "durchgefuehrt_von")]])) +
         abschnitt("Inhalte", (auswahl(d, "themen").length ? punkte(auswahl(d, "themen")) : absatz("")) + (text(d, "inhalt") ? zeilen(text(d, "inhalt")) : "")) +
         abschnitt("Teilnahme", `<p>Mit meiner Unterschrift bestätige ich die Teilnahme an der Schulung.</p>${teilnahmeTabelle(liste(d, "teilnehmer"))}`) +
         unterschriften(["Ort, Datum", "Unterschrift der schulenden Person"]),

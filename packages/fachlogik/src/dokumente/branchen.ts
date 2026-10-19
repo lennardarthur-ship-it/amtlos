@@ -101,18 +101,19 @@ export const allergenAushang: Vorlage = {
     const g = liste(d, "gerichte").filter((x) => text(x, "name"));
     const kategorien = [...new Set(g.map((x) => text(x, "kategorie")))];
     const nummern = Object.keys(ALLERGENE);
-    // Matrix: eine Zeile je Speise, eine Spalte je Allergen (× = enthalten); Kategorien als Zwischenzeilen
+    // Matrix: eine Zeile je Speise, eine Spalte je Allergen (× = enthalten); je Kategorie eine Zeilengruppe mit
+    // Zwischenzeile, damit die Kategorie nicht allein am Seitenende steht
     const kopf = `<thead><tr><th>Speise / Getränk</th>${nummern.map((id) => `<th class="dreh">${esc(ALLERGENE[id]!)}</th>`).join("")}</tr></thead>`;
     const zeilenHtml = kategorien
       .map((k) => {
         const zeilen = g.filter((x) => text(x, "kategorie") === k).map((x) => {
           const a = auswahl(x, "allergene");
-          return `<tr><td><strong>${zelle(text(x, "name"))}</strong>${a.length ? "" : '<br><span class="klein">keine der 14 Hauptallergene</span>'}</td>${nummern.map((id) => `<td class="x">${a.includes(id) ? "×" : ""}</td>`).join("")}</tr>`;
+          return `<tr><td><strong>${zelle(text(x, "name"))}</strong>${a.length ? "" : '<br><span class="klein">keines der 14 Hauptallergene</span>'}</td>${nummern.map((id) => `<td class="x">${a.includes(id) ? "×" : ""}</td>`).join("")}</tr>`;
         });
-        return (k ? `<tr class="gruppe"><td colspan="${nummern.length + 1}"><strong>${zelle(k)}</strong></td></tr>` : "") + zeilen.join("");
+        return `<tbody${k ? ' class="gruppe-block"' : ""}>${k ? `<tr class="gruppe"><td colspan="${nummern.length + 1}"><strong>${zelle(k)}</strong></td></tr>` : ""}${zeilen.join("")}</tbody>`;
       })
       .join("");
-    const inhalt = g.length ? `<table class="liste matrix"><colgroup><col style="width:37%">${nummern.map(() => `<col style="width:${(63 / nummern.length).toFixed(2)}%">`).join("")}</colgroup>${kopf}<tbody>${zeilenHtml}</tbody></table>` : "";
+    const inhalt = g.length ? `<table class="liste matrix"><colgroup><col style="width:37%">${nummern.map(() => `<col style="width:${(63 / nummern.length).toFixed(2)}%">`).join("")}</colgroup>${kopf}${zeilenHtml}</table>` : "";
     const legende = ja(d, "legende")
       ? abschnitt("Die 14 Hauptallergene nach Anhang II der LMIV", tabelle(["Allergen", "umfasst"], nummern.map((id, i) => [esc(ALLERGENE[id]!), esc(ALLERGENE_UMFANG[i]?.umfasst ?? "")]), { breiten: ["30%", "70%"], klasse: "legende" }))
       : "";
@@ -195,20 +196,35 @@ export const haccp: Vorlage = {
       betrieb: b,
       unter: text(d, "zeitraum") || undefined,
       quer: true,
-      meta: `Zeitraum: ${text(d, "zeitraum")}\nKontrollpunkte: ${p.length}`,
+      meta: `Zeitraum: ${text(d, "zeitraum")}${p.length ? `\nKontrollpunkte: ${p.length}` : ""}`,
       inhalt:
-        abschnitt("Kontrollpunkte, Grenzwerte und Korrekturmaßnahmen", p.length ? tabelle(["Kontrollpunkt", "Grenzwert", "Häufigkeit", "Korrekturmaßnahme"], p.map((x) => [`<strong>${zelle(text(x, "punkt"))}</strong>`, zelle(text(x, "grenzwert")), zelle(text(x, "haeufigkeit")), zelle(text(x, "korrektur"))]), { breiten: ["22%", "22%", "14%", "42%"] }) : absatz("")) +
+        abschnitt("Kontrollpunkte, Grenzwerte und Korrekturmaßnahmen", p.length ? tabelle(["Kontrollpunkt", "Grenzwert", "Häufigkeit", "Korrekturmaßnahme"], p.map((x) => [`<strong>${zelle(text(x, "punkt"))}</strong>`, zelle(text(x, "grenzwert")), zelle(text(x, "haeufigkeit")), zelle(text(x, "korrektur"))]), { breiten: ["20%", "24%", "20%", "36%"] }) : absatz("")) +
         abschnitt(
           "Messprotokoll",
           tabelle(
             ["Datum / Uhrzeit", "Kontrollpunkt", "Messwert", "In Ordnung", "Korrekturmaßnahme", "Kürzel"],
             m.map((x) => [`${datumDe(text(x, "datum"))}${text(x, "uhrzeit") ? ` ${esc(text(x, "uhrzeit"))}` : ""}`, zelle(text(x, "kontrollpunkt")), zelle(text(x, "wert")), text(x, "in_ordnung") === "nein" ? "<strong>nein</strong>" : "ja", zelle(text(x, "massnahme")), zelle(text(x, "kuerzel"))]),
-            { breiten: ["15%", "22%", "12%", "10%", "31%", "10%"], leerzeilen: ja(d, "leerzeilen") ? 14 : 0, hoch: ja(d, "leerzeilen") },
+            { breiten: ["15%", "22%", "12%", "10%", "31%", "10%"], leerzeilen: ja(d, "leerzeilen") ? haccpLeerzeilen(p.length > 0, m.length) : 0, hoch: ja(d, "leerzeilen") },
           ),
+          // mit Kontrollpunkten: Protokoll als eigenes Blatt zum Aushängen
+          p.length ? "neue-seite" : "",
         ),
     });
   },
 };
+
+/**
+ * Leere Zeilen im Messprotokoll, damit die Seite ungefähr voll wird, aber keine neue Seite nur mit Kopf und zwei
+ * Zeilen entsteht (Querformat, Satzspiegel ca. 176 mm hoch). Ohne Kontrollpunkte steht das Protokoll auf der ersten
+ * Seite unter dem Titel; mit Kontrollpunkten beginnt es auf einer eigenen Seite. Passen höchstens drei, entfallen sie.
+ */
+function haccpLeerzeilen(mitPunkten: boolean, messungen: number): number {
+  const ZEILE = 8.2; // Zeile mit Mindesthöhe 8 mm samt Linie
+  // erste Seite: Kopf, Titel, Kennungsleiste, Abschnitt 1 mit Linien; sonst nur Überschrift und Tabellenkopf
+  const platz = Math.floor((176 - (mitPunkten ? 26 : 112)) / ZEILE);
+  const frei = messungen < platz ? platz - messungen : (platz + 3 - ((messungen - platz) % (platz + 3))) % (platz + 3);
+  return frei > 3 ? frei : 0;
+}
 
 /** Nummerierte Liste; Texte, die schon mit „1. “ beginnen, bekommen die Nummer nur einmal. */
 function nummernListe(l: string[]): string {
@@ -225,9 +241,11 @@ function plan(o: { titel: string; unter?: string; d: Parameters<Vorlage["html"]>
     unter: o.unter,
     quer: true,
     klasse: zeichen > 900 ? "kompakt" : undefined,
-    meta: `Bereich: ${text(o.d, "bereich")}\nStand: ${datumDe(text(o.d, "datum"))}\nVerantwortlich: ${text(o.d, "erstellt_von")}`,
+    // der Bereich steht schon als Unterzeile unter dem Titel
+    meta: `${o.unter ? "" : `Bereich: ${text(o.d, "bereich")}\n`}Stand: ${datumDe(text(o.d, "datum"))}\nVerantwortlich: ${text(o.d, "erstellt_von")}`,
     inhalt:
-      (eintraege.length ? tabelle(o.spalten.map(([, k]) => k), eintraege.map((x) => o.spalten.map(([id], i) => (i === 0 ? `<strong>${zelle(text(x, id))}</strong>` : zelle(text(x, id))))), { breiten: o.spalten.map(([, , w]) => w) }) : absatz("", "Noch keine Einträge.")) +
+      // ohne Einträge: leere Tabelle zum Ausfüllen von Hand
+      tabelle(o.spalten.map(([, k]) => k), eintraege.map((x) => o.spalten.map(([id], i) => (i === 0 ? `<strong>${zelle(text(x, id))}</strong>` : zelle(text(x, id))))), { breiten: o.spalten.map(([, , w]) => w), ...(eintraege.length ? {} : { mindestens: 6, hoch: true }) }) +
       unterschriften(["Ort, Datum", "Unterschrift Verantwortliche/r"]),
   });
 }

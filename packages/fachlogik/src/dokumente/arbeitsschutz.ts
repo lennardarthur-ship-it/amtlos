@@ -16,6 +16,8 @@ export function teilnahmeTabelle(eintraege: Eintrag[], extra?: { kopf: string; f
 }
 
 const BEREICHE_VORSCHLAG = ["Salon", "Kosmetikkabine", "Küche", "Gastraum und Service", "Verkaufsraum", "Lager", "Werkstatt", "Baustelle beim Kunden", "Büro"];
+const GEFAEHRDUNG_KOPF = ["Gefährdung", "Risiko", "Schutzmaßnahmen", "Umsetzung"];
+const GEFAEHRDUNG_BREITEN = ["28%", "10%", "42%", "20%"];
 const WIRKSAM: Record<string, string> = { wirksam: "Die Maßnahmen sind umgesetzt und wirksam.", teilweise: "Die Maßnahmen sind teilweise wirksam; Nachbesserung siehe Bemerkung.", offen: "Die Wirksamkeit ist noch zu überprüfen." };
 
 export const gefaehrdungsbeurteilung: Vorlage = {
@@ -91,7 +93,7 @@ export const gefaehrdungsbeurteilung: Vorlage = {
         if (!l.length) return "";
         return abschnitt(
           titel,
-          tabelle(["Gefährdung", "Risiko", "Schutzmaßnahmen", "Umsetzung"], l.map((x) => [zelle(text(x, "beschreibung")), esc(RISIKO_STUFEN[text(x, "risiko")] ?? text(x, "risiko")), zellePunkte(text(x, "massnahme")), umsetzung(x)]), { breiten: ["28%", "10%", "42%", "20%"] }),
+          tabelle(GEFAEHRDUNG_KOPF, l.map((x) => [zelle(text(x, "beschreibung")), esc(RISIKO_STUFEN[text(x, "risiko")] ?? text(x, "risiko")), zellePunkte(text(x, "massnahme")), umsetzung(x)]), { breiten: GEFAEHRDUNG_BREITEN }),
         );
       })
       .join("");
@@ -109,11 +111,13 @@ export const gefaehrdungsbeurteilung: Vorlage = {
             ["Tätigkeiten", text(d, "taetigkeiten")],
             ["Beschäftigte", text(d, "beschaeftigte") || null],
             ["Beurteilt von", text(d, "beurteilt_von")],
-            ["Mitgewirkt haben", text(d, "mitwirkung").split("\n").filter(Boolean).join(", ") || null],
+            // eine Zeile je Person oder Stelle; Satzzeichen am Zeilenende entfallen, sonst stünde „Protokoll., Zweite“ da
+            ["Mitgewirkt haben", text(d, "mitwirkung").split("\n").map((z) => z.trim().replace(/[.;,]+$/, "")).filter(Boolean).join(", ") || null],
             ["Datum", datumDe(text(d, "datum"))],
           ]),
         ) +
-        (teile || abschnitt("Gefährdungen und Maßnahmen", absatz(""))) +
+        // ohne Einträge: leere Tabelle zum Ausfüllen von Hand
+        (teile || abschnitt("Gefährdungen und Maßnahmen", tabelle(GEFAEHRDUNG_KOPF, [], { breiten: GEFAEHRDUNG_BREITEN, mindestens: 6, hoch: true }))) +
         (d.mutterschutz !== false
           ? abschnitt(
               "Mutterschutz (§ 10 MuSchG)",
@@ -234,7 +238,7 @@ export const gefahrstoffverzeichnis: Vorlage = {
       titel: "Gefahrstoffverzeichnis",
       betrieb: b,
       quer: true,
-      meta: `Stand: ${datumDe(text(d, "stand"))}\nVerantwortlich: ${text(d, "verantwortlich")}\nAnzahl Gefahrstoffe: ${s.length}`,
+      meta: `Stand: ${datumDe(text(d, "stand"))}\nVerantwortlich: ${text(d, "verantwortlich")}${s.length ? `\nAnzahl Gefahrstoffe: ${s.length}` : ""}`,
       inhalt:
         tabelle(["Bezeichnung / Hersteller", "Einstufung / gefährliche Eigenschaften", "Mengenbereich", "Arbeitsbereiche", "Verwendung", "Sicherheitsdatenblatt"], zeilenHtml, { breiten: ["20%", "22%", "12%", "18%", "14%", "14%"], mindestens: s.length ? 0 : 6 }) +
         nachsatz(`Verzeichnis nach § 6 Abs. 12 GefStoffV mit ${GEFAHRSTOFF_ANGABEN.length} Pflichtangaben: ${GEFAHRSTOFF_ANGABEN.join("; ")}.`),
@@ -284,22 +288,28 @@ export const betriebsanweisung: Vorlage = {
   html(d: Daten, b) {
     // Aufbau wie das Muster der DGUV Information 211-010: Titelband mit Nummer, Bereich und Stoff, dann die Abschnitte nach TRGS 555
     const kaesten = BA_TEILE.map((t) => `<section class="kasten"><h2>${esc(t.label)}</h2><div class="inhalt">${zeilen(text(d, t.id))}</div></section>`).join("");
+    // viel Text → kompakter Satz, damit der Aushang auf ein Blatt passt (Zeilen grob: ca. 80 Zeichen je Zeile)
+    const zeilenzahl = BA_TEILE.reduce((n, t) => n + text(d, t.id).split("\n").filter((z) => z.trim()).reduce((m, z) => m + Math.ceil(z.trim().length / 80), 0), 0);
     return dokument({
       titel: "Betriebsanweisung",
       betrieb: b,
       gestalt: "aushang",
-      klasse: "ba",
+      klasse: zeilenzahl > BA_KOMPAKT_AB ? "ba kompakt" : "ba",
       band: "#e0640c",
       meta: `Stand: ${datumDe(text(d, "datum"))}`,
       inhalt:
         `<div class="titelband"><div class="t">Betriebsanweisung<small>gemäß § 14 GefStoffV (TRGS 555)</small></div><div class="n">${text(d, "nummer") ? `<span>Nummer<b>${esc(text(d, "nummer"))}</b></span>` : ""}<span>Stand<b>${datumDe(text(d, "datum")) || "&nbsp;"}</b></span></div></div>` +
         `<section class="kasten stoff"><h2>Arbeitsbereich, Arbeitsplatz, Tätigkeit · Gefahrstoffbezeichnung</h2><div class="inhalt"><div><dt>Arbeitsbereich, Arbeitsplatz, Tätigkeit</dt><dd>${text(d, "arbeitsbereich") ? esc(text(d, "arbeitsbereich")) : LINIE}</dd></div><div><dt>Gefahrstoff</dt><dd>${text(d, "stoff") ? esc(text(d, "stoff")) : LINIE}</dd></div></div></section>` +
         kaesten +
-        (text(d, "notruf") ? `<div class="notruf">${esc(text(d, "notruf"))}</div>` : "") +
+        // ohne Angabe: Notruf und Linie für die Ersthelferin bzw. den Ersthelfer zum Eintragen von Hand
+        `<div class="notruf">${text(d, "notruf") ? esc(text(d, "notruf")) : `Notruf 112 · Ersthelfer/in: ${LINIE}`}</div>` +
         unterschriften([`Freigegeben: ${text(d, "erstellt_von")}`, "Datum, Unterschrift"]),
     });
   },
 };
+
+/** Ab so vielen Textzeilen in den Kästen wird die Betriebsanweisung kompakt gesetzt. */
+const BA_KOMPAKT_AB = 12;
 
 const ERGEBNIS: Record<string, string> = { bestanden: "bestanden", maengel: "Mängel – nicht verwenden" };
 
@@ -361,7 +371,8 @@ export const elektroPruefung: Vorlage = {
         `<section class="abschnitt ohne-nummer">${tabelle(
           ["Gerät", "Hersteller / Typ", "Inventar-Nr.", "Standort", "Ergebnis", "Nächste Prüfung"],
           g.map((x) => [`<strong>${zelle(text(x, "bezeichnung"))}</strong>`, zelle(text(x, "typ")), zelle(text(x, "inventar")), zelle(text(x, "standort")), text(x, "ergebnis") === "maengel" ? `<strong>Mängel:</strong> ${zelle(text(x, "maengel"))}` : "bestanden", datumDe(text(x, "naechste"))]),
-          { breiten: ["20%", "18%", "12%", "15%", "20%", "15%"], leerzeilen: ja(d, "leerzeilen") ? 12 : 0, hoch: ja(d, "leerzeilen") },
+          // ohne Geräte (Protokoll zum Ausfüllen von Hand) immer mit leeren Zeilen – so viele, wie mit den Unterschriften auf das Blatt passen
+          { breiten: ["20%", "18%", "12%", "15%", "20%", "15%"], leerzeilen: ja(d, "leerzeilen") ? 12 : g.length ? 0 : 7, hoch: ja(d, "leerzeilen") || !g.length },
         )}</section>` +
         (einsatz ? nachsatz(`Richtwert für die Prüffrist nach DGUV Vorschrift 3 (${einsatz.quelle ?? ""}): ${einsatz.text}`) : "") +
         unterschriften(["Ort, Datum", "Unterschrift der prüfenden Person"]),

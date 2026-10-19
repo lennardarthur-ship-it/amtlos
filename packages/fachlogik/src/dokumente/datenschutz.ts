@@ -26,6 +26,8 @@ const LOESCHFRISTEN = [
   "Bücher, Inventare, Jahresabschlüsse: 10 Jahre (§ 147 AO, § 257 HGB)",
   "Löschung nach Wegfall des Zwecks (Art. 17 Abs. 1 lit. a DSGVO)",
 ];
+/** Verweis auf den Abschnitt mit den TOM – im Verzeichnis Abschnitt 3 (nach „Verantwortlicher“ und „Verarbeitungstätigkeiten“). */
+const TOM_VERWEIS = "siehe Abschnitt 3 „Technische und organisatorische Maßnahmen“";
 const DIENSTLEISTUNGEN = ["Website-Hosting", "E-Mail-Anbieter", "Online-Terminbuchung", "Kassensystem", "Cloud-Speicher", "Lohnabrechnung (Lohnbüro)", "IT-Betreuung"];
 
 export const datenschutzDokumentation: Vorlage = {
@@ -67,7 +69,7 @@ export const datenschutzDokumentation: Vorlage = {
             { id: "drittland", selten: true, art: "text", label: "Übermittlung in Drittländer", vorschlaege: ["keine Übermittlung in Drittländer"] },
             { id: "gemeinsam", selten: true, art: "text", label: "Gemeinsam Verantwortliche (Art. 26 DSGVO)", hilfe: "nur falls zutreffend, z. B. Betreiber einer Social-Media-Plattform" },
             { id: "loeschfrist", art: "mehrzeilig", label: "Fristen für die Löschung", pflicht: true, vorschlaege: LOESCHFRISTEN },
-            { id: "tom_hinweis", art: "text", label: "Technische und organisatorische Maßnahmen", vorschlaege: ["siehe Abschnitt Technische und organisatorische Maßnahmen"] },
+            { id: "tom_hinweis", art: "text", label: "Technische und organisatorische Maßnahmen", vorschlaege: [TOM_VERWEIS] },
           ],
         },
       ],
@@ -135,7 +137,7 @@ export const datenschutzDokumentation: Vorlage = {
                 ["Drittlandübermittlung (lit. e)", text(x, "drittland") || "keine"],
                 ["Gemeinsam Verantwortliche", text(x, "gemeinsam") || null],
                 ["Löschfristen (lit. f)", text(x, "loeschfrist")],
-                ["TOM (lit. g)", text(x, "tom_hinweis") || "siehe Abschnitt Technische und organisatorische Maßnahmen"],
+                ["TOM (lit. g)", text(x, "tom_hinweis") || TOM_VERWEIS],
               ]), { nummer: `2.${i + 1}`, rand: "Art. 30 Abs. 1 lit. b–g" }),
           )
           .join("")
@@ -246,7 +248,7 @@ export const datenpanne: Vorlage = {
         { id: "gemeldet_am", art: "datum", label: "Gemeldet am", wenn: { feld: "gemeldet" } },
         { id: "aktenzeichen", art: "text", label: "Aktenzeichen der Behörde", wenn: { feld: "gemeldet" } },
         { id: "verspaetung", art: "mehrzeilig", label: "Begründung, falls die Meldung später als 72 Stunden erfolgt", wenn: { feld: "gemeldet" } },
-        { id: "benachrichtigung", art: "wahl", label: "Benachrichtigung der betroffenen Personen (Art. 34 DSGVO)", optionen: optionen(BENACHRICHTIGUNG), vorbelegung: "nicht_erforderlich" },
+        { id: "benachrichtigung", art: "wahl", label: "Benachrichtigung der betroffenen Personen (Art. 34 DSGVO)", optionen: optionen(BENACHRICHTIGUNG) },
         { id: "benachrichtigt_am", art: "datum", label: "Benachrichtigt am", wenn: { feld: "benachrichtigung", ist: "erfolgt" } },
         { id: "benachrichtigung_text", art: "mehrzeilig", label: "Wie und mit welchem Inhalt benachrichtigt wurde", wenn: { feld: "benachrichtigung", ist: "erfolgt" } },
       ],
@@ -319,6 +321,8 @@ export const datenschutzinformation: Vorlage = {
     ...(b.bundesland ? [] : ["Bundesland (Mein Betrieb) – für die zuständige Aufsichtsbehörde"]),
     ...(b.email.trim() ? [] : ["E-Mail (Mein Betrieb)"]),
     ...(mitLitF(d) && !text(d, "interessen") ? ["Berechtigte Interessen (bei Art. 6 Abs. 1 lit. f DSGVO)"] : []),
+    // gewählte Verarbeitungen, die es (z. B. nach einer Umbenennung) nicht mehr gibt, fielen sonst stillschweigend weg
+    ...auswahl(d, "verarbeitungen").filter((t) => !VVT.some((v) => v.titel === t)).map((t) => `Verarbeitung „${t}“ gibt es nicht mehr – bitte neu auswählen`),
   ],
   html(d, b) {
     const gewaehlt = auswahl(d, "verarbeitungen").map((t) => VVT.find((v) => v.titel === t)).filter((v): v is (typeof VVT)[number] => Boolean(v));

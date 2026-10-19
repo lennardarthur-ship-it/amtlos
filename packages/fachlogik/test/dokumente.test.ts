@@ -72,7 +72,7 @@ describe("Dokumentvorlagen", () => {
       expect(leer).not.toContain("noch nicht angegeben");
       expect(leer).toContain('name="amtlos-fuss-links" content="Salon Sonne');
       if (v.kundendokument) expect(leer, v.id).not.toMatch(/Rechtsgrundlage|Steuern und Buchhaltung/);
-      else if (v.grundlage) expect(leer, v.id).toContain(`<dt>Rechtsgrundlage</dt><dd>${v.grundlage.replace(/&/g, "&amp;")}</dd>`);
+      else if (v.grundlage) expect(leer.replace(/&nbsp;/g, " "), v.id).toContain(`<dt>Rechtsgrundlage</dt><dd>${v.grundlage.replace(/&/g, "&amp;")}</dd>`);
       expect(leer).toContain("Salon Sonne");
       expect(leer.includes("A4 landscape"), v.id).toBe(Boolean(v.querformat));
       const voll = v.html(alles(v.abschnitte.flatMap((a) => a.felder)), BETRIEB);
@@ -137,7 +137,8 @@ describe("Dokumentvorlagen", () => {
     const uh = u.html({ thema: "Test", teilnehmer: [{ name: "Kim" }] }, BETRIEB);
     expect((uh.match(/<tr><td>/g) ?? []).length).toBe(3); // Kim + 2 freie Zeilen (ohne Namen: 6 Zeilen zum Ausdrucken)
     const h = vorlageFuer("haccp")!;
-    expect((h.html({ zeitraum: "Okt", leerzeilen: true, messungen: [] }, BETRIEB).match(/<tr><td>/g) ?? []).length).toBe(14);
+    // leere Zeilen füllen die erste Seite unter dem Titel (ohne Kontrollpunkte), mehr als drei
+    expect((h.html({ zeitraum: "Okt", leerzeilen: true, messungen: [] }, BETRIEB).match(/<tr><td>/g) ?? []).length).toBeGreaterThan(3);
   });
 
   it("liest Beträge deutsch und englisch geschrieben", () => {
@@ -158,7 +159,7 @@ describe("Dokumentvorlagen", () => {
     expect(fehlendeAngaben(r, d, BETRIEB)).toEqual([]);
     expect(fehlendeAngaben(r, d, { ...BETRIEB, steuernummer: "" })).toEqual(["Steuernummer oder USt-IdNr. (Mein Betrieb)"]);
     const ku = r.html({ ...d, kleinunternehmer: true }, BETRIEB);
-    expect(ku).toContain("Der Umsatz ist nach § 19 Abs. 1 UStG steuerfrei.");
+    expect(ku.replace(/&nbsp;/g, " ")).toContain("Der Umsatz ist nach § 19 Abs. 1 UStG steuerfrei.");
     expect(n(ku)).toContain("60,00 €");
     expect(ku).not.toContain("Umsatzsteuer 19 %");
   });
@@ -366,5 +367,40 @@ describe("Dokumentvorlagen", () => {
     expect(nl.fehlt).toEqual([]);
     expect(nl.daten.kunde).toMatchObject({ plz: "1012 LG", ort: "Amsterdam", land: "NL" });
     expect(xrechnungUbl(nl.daten, KU_HINWEIS)).toContain("<cbc:ID>K</cbc:ID>");
+  });
+
+  it("Korrekturen aus der Durchsicht: Befreiungshinweis, Vorzeichen, leere Vorlagen, Angaben aus „Mein Betrieb“", () => {
+    const html = (id: string, d: Daten, b: Betrieb = BETRIEB) => n(dokumentHtml(vorlageFuer(id)!, d, b));
+    const pos = (satz: string) => [{ bezeichnung: "Haarschnitt", menge: "1", preis: "25", satz }];
+    // Steuerbefreiung nur bei einer 0-%-Position
+    expect(html("rechnung", { nummer: "1", positionen: pos("19"), befreiung: "Steuerfrei nach § 4 Nr. 14 UStG" })).not.toContain("Steuerfrei nach");
+    expect(html("rechnung", { nummer: "1", positionen: pos("0"), befreiung: "Steuerfrei nach § 4 Nr. 14 UStG" })).toContain("Steuerfrei nach");
+    expect(eRechnungAus({ nummer: "1", datum: "2026-10-12", positionen: pos("19"), befreiung: "x" }, BETRIEB).daten.befreiungsgrund).toBeNull();
+    // fehlende Rechnungsnummer steht unter „Fehlt noch“ (Pflichtfeld)
+    expect(fehlendeAngaben(vorlageFuer("rechnung")!, { positionen: pos("19") }, BETRIEB)).toContain("Rechnungsnummer");
+    // Kz 83 mit Vorzeichen; Verlust/Fehlbetrag ohne doppeltes Minus
+    expect(html("ust_voranmeldung", { umsatz_19: "100", vorsteuer: "50" })).toContain("-31,00 €");
+    expect(erg(vorlageFuer("euer")!, { einnahmen: [{ betrag: "10" }], ausgaben: [{ betrag: "30" }] })).toContainEqual(["Verlust", "20,00 €"]);
+    expect(erg(vorlageFuer("bilanz_guv")!, { ertraege: [{ betrag: "10" }], aufwendungen: [{ betrag: "30" }] })[0]).toEqual(["Jahresfehlbetrag", "20,00 €"]);
+    // leere Vorlagen: Zeilen zum Ausfüllen, keine Summe 0
+    const az = html("arbeitszeitnachweis", {});
+    expect(az).not.toContain("0:00 h");
+    expect(az.match(/<tr><td>/g)).toHaveLength(31);
+    expect(html("bilanz_guv", {})).not.toContain("0,00 €");
+    expect(html("kassenbuch", {})).toContain("Vorlage zum Ausdrucken");
+    expect(html("kassenbuch", { eintraege: [{ text: "Einnahmen", einnahme: "10" }] })).not.toContain("Vorlage zum Ausdrucken");
+    // Rechtsform, Vertretung und Register aus „Mein Betrieb“
+    const gmbh: Betrieb = { ...BETRIEB, name: "Salon Sonne GmbH", rechtsform: "GmbH", vertretung: "Alex Muster, Kim Muster", registergericht: "Amtsgericht München", registernummer: "HRB 1" };
+    const imp = vorlageFuer("impressum")!.alsText!(leereDaten(vorlageFuer("impressum")!, gmbh, "2026-10-12"), gmbh);
+    expect(imp).toContain("Vertreten durch\nAlex Muster, Kim Muster");
+    expect(imp).toContain("Registergericht: Amtsgericht München\nRegisternummer: HRB 1");
+    expect(vorlageFuer("impressum")!.alsText!({ wirtschafts_id: "DE1" }, { ...gmbh, ust_idnr: "DE2" })).toContain("Umsatzsteuer-ID und Wirtschafts-ID");
+    expect(html("gewerbeanmeldung", leereDaten(vorlageFuer("gewerbeanmeldung")!, gmbh, "2026-10-12"), gmbh)).toContain(">GmbH<");
+    expect(html("handelsregister", {}, gmbh)).toContain(">Salon Sonne GmbH<");
+    expect(html("transparenzregister", {}, gmbh)).toContain("Amtsgericht München, HRB 1");
+    expect(bausteinText("nach {30} Tagen", { logfile_tage: "1" }, BETRIEB)).toBe("nach 1 Tag");
+    // Datenpanne: Benachrichtigung bleibt offen, bis sie bewertet ist
+    expect(html("datenpanne", leereDaten(vorlageFuer("datenpanne")!, BETRIEB, "2026-10-12"))).toMatch(/Benachrichtigung der Betroffenen<\/th><td>noch offen/);
+    expect(vorlageFuer("datenschutzinformation")!.pruefen!({ verarbeitungen: ["Gibt es nicht"] }, BETRIEB)).toContain("Verarbeitung „Gibt es nicht“ gibt es nicht mehr – bitte neu auswählen");
   });
 });

@@ -5,7 +5,20 @@
  */
 import { abschnitt, absatz, anschrift, cent, datumDe, dokument, euro, felder, liste, tabelle, text, uebertragung, unterschriften, zelle } from "./html.js";
 import { INTERESSE, RECHTSFORMEN } from "./bausteine.js";
-import type { Vorlage } from "./typen.js";
+import type { Betrieb, Vorlage } from "./typen.js";
+
+const formNorm = (t: string) => t.toLocaleLowerCase("de").replace(/[\s.]/g, "");
+/**
+ * Rechtsform aus „Mein Betrieb“ (Freitext, z. B. „GmbH“, „UG“, „e.K.“) als Wert einer Auswahl: gleiche Schreibweise
+ * ohne Leerzeichen und Punkte, sonst die erste Option, die damit beginnt; passt keine, der Text wie eingegeben.
+ */
+export function rechtsformAus(wert: string | undefined, formen: string[]): string {
+  const w = formNorm(wert ?? "");
+  if (!w) return "";
+  return formen.find((f) => formNorm(f) === w) ?? formen.find((f) => formNorm(f).startsWith(w)) ?? (wert ?? "").trim();
+}
+/** Registergericht und -nummer aus „Mein Betrieb“ in einer Zeile. */
+export const registerAus = (b: Betrieb) => [b.registergericht ?? "", b.registernummer ?? ""].map((x) => x.trim()).filter(Boolean).join(", ");
 
 const PERSON = [
   { id: "name", art: "text" as const, label: "Vor- und Nachname", pflicht: true },
@@ -21,6 +34,7 @@ export const gewerbeanmeldung: Vorlage = {
   bereich: "betrieb",
   pflichten: ["gruendung.gewerbeanzeige"],
   grundlage: "§ 14 GewO; Gewerbeanzeigeverordnung (Vordruck GewA 1)",
+  ausBetrieb: { rechtsform: "rechtsform" },
   abschnitte: [
     {
       titel: "Angaben zur Person",
@@ -38,7 +52,7 @@ export const gewerbeanmeldung: Vorlage = {
       titel: "Angaben zum Betrieb",
       hilfe: "Name, Anschrift und Kontakt übernimmt Amtlos aus „Mein Betrieb“.",
       felder: [
-        { id: "rechtsform", art: "wahl", label: "Rechtsform", optionen: RECHTSFORMEN.map((r) => ({ wert: r, text: r })), vorbelegung: "Einzelunternehmen", pflicht: true },
+        { id: "rechtsform", art: "wahl", label: "Rechtsform", optionen: RECHTSFORMEN.map((r) => ({ wert: r, text: r })), hilfe: "ohne Auswahl die Rechtsform aus „Mein Betrieb“, sonst Einzelunternehmen" },
         { id: "taetigkeit", art: "mehrzeilig", label: "Angemeldete Tätigkeit", hilfe: "so genau wie möglich, z. B. „Friseurhandwerk und Verkauf von Haarpflegeprodukten“", pflicht: true },
         { id: "beginn", art: "datum", label: "Beginn der Tätigkeit", pflicht: true },
         { id: "erwerb", art: "wahl", label: "Haupt- oder Nebenerwerb", optionen: [{ wert: "haupt", text: "Haupterwerb" }, { wert: "neben", text: "Nebenerwerb" }], vorbelegung: "haupt" },
@@ -69,7 +83,7 @@ export const gewerbeanmeldung: Vorlage = {
           felder(
             [
               ["Name des Betriebs", b.name],
-              ["Rechtsform", text(d, "rechtsform")],
+              ["Rechtsform", rechtsformAus(text(d, "rechtsform") || b.rechtsform, RECHTSFORMEN) || "Einzelunternehmen"],
               ["Betriebsstätte", anschrift(b)],
               ["Telefon, E-Mail", [b.telefon, b.email].filter((x) => x.trim()).join(", ")],
               ["Angemeldete Tätigkeit", text(d, "taetigkeit")],
@@ -96,12 +110,13 @@ export const handelsregister: Vorlage = {
   bereich: "betrieb",
   pflichten: ["gesellschaft.handelsregister_anmeldung"],
   namensFeld: "firma",
+  ausBetrieb: { firma: "name", rechtsform: "rechtsform" },
   abschnitte: [
     { titel: "Gesellschaft",
       hilfe: "Die Anmeldung zum Handelsregister macht der Notar. Mit diesem Blatt hast du alle Angaben beisammen.",
       felder: [
         { id: "firma", art: "text", label: "Firma (Name im Register)", pflicht: true },
-        { id: "rechtsform", art: "wahl", label: "Rechtsform", optionen: HR_FORMEN },
+        { id: "rechtsform", art: "wahl", label: "Rechtsform", optionen: HR_FORMEN, hilfe: "ohne Auswahl die Rechtsform aus „Mein Betrieb“" },
         { id: "sitz", art: "text", label: "Sitz (Ort)", pflicht: true },
         { id: "anschrift", art: "mehrzeilig", label: "Inländische Geschäftsanschrift", pflicht: true },
         { id: "gegenstand", art: "mehrzeilig", label: "Gegenstand des Unternehmens", pflicht: true },
@@ -114,18 +129,19 @@ export const handelsregister: Vorlage = {
   html(d, b) {
     const ges = liste(d, "gesellschafter").filter((x) => text(x, "name"));
     const gf = liste(d, "fuehrung").filter((x) => text(x, "name"));
+    const firma = text(d, "firma") || b.name.trim();
     const person = (l: typeof ges, extra = false) => tabelle(["Name", "Geburtsdatum", "Wohnort", ...(extra ? ["Anteil"] : [])], l.map((x) => [zelle(text(x, "name")), datumDe(text(x, "geburtsdatum")), zelle(text(x, "wohnort")), ...(extra ? [zelle(text(x, "anteil"))] : [])]), { breiten: extra ? ["32%", "18%", "28%", "22%"] : ["40%", "20%", "40%"] });
     return dokument({
       titel: "Anmeldung zum Handelsregister – Vorbereitung",
       betrieb: b,
-      unter: text(d, "firma") || undefined,
+      unter: firma || undefined,
       inhalt:
         `<p class="klein">Für den Termin beim Notar: Die Anmeldung zum Handelsregister reicht der Notar elektronisch ein; dieses Blatt hält die nötigen Angaben bereit.</p>` +
         abschnitt(
           "Gesellschaft",
           felder([
-            ["Firma", text(d, "firma")],
-            ["Rechtsform", text(d, "rechtsform")],
+            ["Firma", firma],
+            ["Rechtsform", rechtsformAus(text(d, "rechtsform") || b.rechtsform, HR_FORMEN.map((o) => o.wert))],
             ["Sitz", text(d, "sitz")],
             ["Inländische Geschäftsanschrift", text(d, "anschrift")],
             ["Gegenstand des Unternehmens", text(d, "gegenstand")],
@@ -148,12 +164,13 @@ export const transparenzregister: Vorlage = {
   bereich: "betrieb",
   pflichten: ["gesellschaft.transparenzregister"],
   grundlage: "§§ 19, 20 GwG",
+  ausBetrieb: { rechtsform: "rechtsform" },
   abschnitte: [
     { titel: "Gesellschaft",
       hilfe: "Gemeldet wird online beim Transparenzregister. Dieses Blatt hält fest, was du gemeldet hast.",
       felder: [
         { id: "rechtsform", art: "text", label: "Rechtsform", hilfe: "z. B. GmbH" },
-        { id: "register", art: "text", label: "Registergericht und Nummer" },
+        { id: "register", art: "text", label: "Registergericht und Nummer", hilfe: "ohne Angabe aus „Mein Betrieb“" },
         { id: "stand", art: "datum", label: "Stand", vorbelegung: "heute" },
       ],
     },
@@ -181,8 +198,8 @@ export const transparenzregister: Vorlage = {
       unter: "Angaben zum Transparenzregister",
       meta: `Stand: ${datumDe(text(d, "stand")) || "–"}`,
       inhalt:
-        abschnitt("Gesellschaft", felder([["Gesellschaft", b.name], ["Rechtsform", text(d, "rechtsform")], ["Registergericht und Nummer", text(d, "register") || null], ["Gemeldet am", datumDe(text(d, "gemeldet")) || "noch nicht gemeldet"]])) +
-        abschnitt("Wirtschaftlich Berechtigte (§ 3 GwG)", l.length ? tabelle(["Name", "Geburtsdatum", "Wohnort", "Staatsangehörigkeiten", "Interesse"], l.map((x) => [zelle(text(x, "name")), datumDe(text(x, "geburtsdatum")), zelle(text(x, "wohnort")), zelle(text(x, "staatsangehoerigkeit")), zelle([INTERESSE.find((o) => o.wert === text(x, "interesse_art"))?.text.split(",")[0] ?? "", text(x, "interesse")].filter(Boolean).join(": "))]), { breiten: ["24%", "14%", "20%", "14%", "28%"] }) : absatz("")) +
+        abschnitt("Gesellschaft", felder([["Gesellschaft", b.name], ["Rechtsform", text(d, "rechtsform") || (b.rechtsform ?? "").trim()], ["Registergericht und Nummer", text(d, "register") || registerAus(b) || null], ["Gemeldet am", datumDe(text(d, "gemeldet")) || "noch nicht gemeldet"]])) +
+        abschnitt("Wirtschaftlich Berechtigte (§ 3 GwG)", l.length ? tabelle(["Name", "Geburtsdatum", "Wohnort", "Staatsangehörigkeiten", "Interesse"], l.map((x) => [zelle(text(x, "name")), datumDe(text(x, "geburtsdatum")), zelle(text(x, "wohnort")), zelle(text(x, "staatsangehoerigkeit")), zelle([INTERESSE.find((o) => o.wert === text(x, "interesse_art"))?.text.split(",")[0] ?? "", text(x, "interesse")].filter(Boolean).join(": "))]), { breiten: ["24%", "14%", "20%", "14%", "28%"] }) : tabelle(["Name", "Geburtsdatum", "Wohnort", "Staatsangehörigkeiten", "Interesse"], [], { breiten: ["24%", "14%", "20%", "14%", "28%"], mindestens: 4, hoch: true })) +
         uebertragung(["Gemeldet am (transparenzregister.de)", "Bestätigung, Vorgangsnummer"]) +
         unterschriften(["Geschäftsführung"], { ortDatum: true }),
     });

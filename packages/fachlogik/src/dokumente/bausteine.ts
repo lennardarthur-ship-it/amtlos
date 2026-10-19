@@ -182,7 +182,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "einwirkungen",
    "beschreibung": "Hautbelastung durch Feuchtarbeit, häufiges Händewaschen, langes Handschuhtragen sowie Desinfektions- und Reinigungsmittel.",
-   "massnahme": "Feucht- und Trockenarbeit wechseln und zeitlich begrenzen.\npH-neutrale, farb- und duftstofffreie Waschmittel und rückfettende Händedesinfektion bereitstellen; Handschutz- und Händehygieneplan aufstellen.\nLatexfreie Schutzhandschuhe verwenden."
+   "massnahme": "Feucht- und Trockenarbeit wechseln und zeitlich begrenzen.\npH-neutrale, farb- und duftstofffreie Waschmittel und rückfettende Händedesinfektion bereitstellen; Hautschutz- und Händehygieneplan aufstellen.\nLatexfreie Schutzhandschuhe verwenden."
   },
   "quelle": "BGW 04-05-080, S. 21–22"
  },
@@ -1074,7 +1074,7 @@ export const HAUTSCHUTZ_FRISEUR: Vorschlag[] = [
   "werte": {
    "anlass": "Shampoonieren, Kopfmassage mit Haarbehandlungsmitteln, Pflegemittel auftragen/auswaschen",
    "schutz": "Hände mit Hautschutzpräparat eincremen",
-   "handschuhe": "Einmalhandschuhe, langstulpig (alternativ Waschhandschuhe); laut BGW 2026: Einmalhandschuhe aus Nitril oder Vinyl mit langen Stulpen über das Handgelenk",
+   "handschuhe": "Einmalhandschuhe aus Nitril oder Vinyl mit langen Stulpen über das Handgelenk (alternativ Waschhandschuhe)",
    "reinigung": "Hände nur bei Verschmutzung waschen, ggf. mit pH-hautneutralem Reinigungsmittel; gut abtrocknen; eincremen",
    "pflege": "Hände mit Hautpflegepräparat eincremen"
   },
@@ -1086,7 +1086,7 @@ export const HAUTSCHUTZ_FRISEUR: Vorschlag[] = [
   "werte": {
    "anlass": "Färben, Dauerwelle, Blondierung: Mischen, Auftragen, Überprüfen, Probewickeln, Fixieren",
    "schutz": "Hände mit Hautschutzpräparat eincremen",
-   "handschuhe": "Einmalhandschuhe (keine gepuderten Latexhandschuhe); laut BGW 2026: Friseur-Einmalhandschuhe nach DIN EN ISO 374-6 (Friseur-Symbol)",
+   "handschuhe": "Friseur-Einmalhandschuhe nach DIN EN ISO 374-6 (Friseur-Symbol), keine gepuderten Latexhandschuhe",
    "reinigung": "Hände nur bei Verschmutzung waschen, ggf. mit pH-hautneutralem Reinigungsmittel; gut abtrocknen; eincremen",
    "pflege": "Hände mit Hautpflegepräparat eincremen"
   },
@@ -1122,7 +1122,7 @@ export const HAUTSCHUTZ_FRISEUR: Vorschlag[] = [
   "werte": {
    "anlass": "Reinigung und Desinfektion von Arbeitsgeräten und Räumen",
    "schutz": "Hände mit Hautschutzpräparat eincremen",
-   "handschuhe": "Haushaltshandschuhe; laut BGW 2026: chemikalienbeständige Schutzhandschuhe nach DIN EN ISO 374, ggf. mit längerem Schaft",
+   "handschuhe": "Haushaltshandschuhe bzw. chemikalienbeständige Schutzhandschuhe nach DIN EN ISO 374, ggf. mit längerem Schaft",
    "reinigung": "Hände nur bei Verschmutzung waschen, ggf. mit pH-hautneutralem Reinigungsmittel; gut abtrocknen; eincremen",
    "pflege": "Hände mit Hautpflegepräparat eincremen"
   },
@@ -2522,7 +2522,7 @@ export const HACCP: Vorschlag[] = [
   "titel": "Kühlung Fleischzubereitungen",
   "werte": {
    "punkt": "Kühlung Fleischzubereitungen",
-   "grenzwert": "SB-verpackt max. +4; lose oder selbst verpackt (Einzelhandel) max. +7 °C",
+   "grenzwert": "SB-verpackt max. +4 °C; lose oder selbst verpackt (Einzelhandel) max. +7 °C",
    "haeufigkeit": "täglich",
    "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren."
   },
@@ -2532,7 +2532,7 @@ export const HACCP: Vorschlag[] = [
   "titel": "Kühlung Geflügelfleisch (auch Federwild, Kleinwild/Hasen)",
   "werte": {
    "punkt": "Kühlung Geflügelfleisch (auch Federwild, Kleinwild/Hasen)",
-   "grenzwert": "max. +4 (LAVES: −2 bis max. +4) °C",
+   "grenzwert": "max. +4 °C (LAVES: −2 bis max. +4 °C)",
    "haeufigkeit": "täglich",
    "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren."
   },
@@ -2542,7 +2542,7 @@ export const HACCP: Vorschlag[] = [
   "titel": "Kühlung Fisch frisch, gekochte Krebs- und Weichtiere",
   "werte": {
    "punkt": "Kühlung Fisch frisch, gekochte Krebs- und Weichtiere",
-   "grenzwert": "max. +2 bzw. in schmelzendem Eis (annähernd Schmelzeistemperatur) °C",
+   "grenzwert": "max. +2 °C bzw. in schmelzendem Eis (annähernd Schmelzeistemperatur)",
    "haeufigkeit": "täglich",
    "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren."
   },
@@ -2572,7 +2572,7 @@ export const HACCP: Vorschlag[] = [
   "titel": "Kühlung Milcherzeugnisse, Käse (außer Hartkäse), Butter, Frischkäse",
   "werte": {
    "punkt": "Kühlung Milcherzeugnisse, Käse (außer Hartkäse), Butter, Frischkäse",
-   "grenzwert": "max. +10 (sofern Hersteller nichts anderes angibt) °C",
+   "grenzwert": "max. +10 °C (sofern Hersteller nichts anderes angibt)",
    "haeufigkeit": "täglich",
    "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren."
   },
@@ -2582,7 +2582,7 @@ export const HACCP: Vorschlag[] = [
   "titel": "Kühlung Eiprodukte / roheihaltige Lebensmittel",
   "werte": {
    "punkt": "Kühlung Eiprodukte / roheihaltige Lebensmittel",
-   "grenzwert": "Eiprodukte max. +4; roheihaltige Lebensmittel: Mainz +7, LAVES +4 °C",
+   "grenzwert": "Eiprodukte max. +4 °C; roheihaltige Lebensmittel: Mainz +7 °C, LAVES +4 °C",
    "haeufigkeit": "täglich",
    "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren."
   },
@@ -2602,7 +2602,7 @@ export const HACCP: Vorschlag[] = [
   "titel": "Tiefkühlung (Tiefkühltruhe/-raum, tiefgefrorene Lebensmittel)",
   "werte": {
    "punkt": "Tiefkühlung (Tiefkühltruhe/-raum, tiefgefrorene Lebensmittel)",
-   "grenzwert": "−18 oder kälter; kurzfristig bis −15 zulässig °C",
+   "grenzwert": "−18 °C oder kälter; kurzfristig bis −15 °C zulässig",
    "haeufigkeit": "täglich",
    "korrektur": "Ware prüfen, ggf. verwerfen (nicht wieder einfrieren, wenn angetaut), Gerät korrigieren/Reparatur, dokumentieren."
   },
@@ -2612,7 +2612,7 @@ export const HACCP: Vorschlag[] = [
   "titel": "Speiseeis",
   "werte": {
    "punkt": "Speiseeis",
-   "grenzwert": "Lagerung als Tiefkühlware −18; Speiseeis zum Ausportionieren / Eistresen zur Ausgabe max. −10 °C",
+   "grenzwert": "Lagerung als Tiefkühlware −18 °C; Speiseeis zum Ausportionieren / Eistresen zur Ausgabe max. −10 °C",
    "haeufigkeit": "täglich",
    "korrektur": "Ware prüfen, angetautes Eis verwerfen, Gerät korrigieren/Reparatur, dokumentieren."
   },
@@ -2622,7 +2622,7 @@ export const HACCP: Vorschlag[] = [
   "titel": "Heißhalten / Ausgabetemperatur warmer Speisen",
   "werte": {
    "punkt": "Heißhalten / Ausgabetemperatur warmer Speisen",
-   "grenzwert": "mindestens +60 an allen Stellen bzw. im Kern (BfR 2020, LAVES, Mainz). Älterer Wert +65 (BfR 2008, BgVV, DIN-Normen, LAVES-Merkblatt B. cereus: mind. +65 °C für max. 3 Stunden)",
+   "grenzwert": "mindestens +60 °C an allen Stellen bzw. im Kern (BfR 2020, LAVES, Mainz). Älterer Wert +65 °C (BfR 2008, BgVV, DIN-Normen, LAVES-Merkblatt B. cereus: mind. +65 °C für max. 3 Stunden)",
    "haeufigkeit": "stichprobenartig bei Ausgabe (Mainz)",
    "korrektur": "Zu kalte warme Speisen bis zum Aufkochen nacherhitzen; sonst verwerfen; dokumentieren."
   },
@@ -2642,8 +2642,8 @@ export const HACCP: Vorschlag[] = [
   "titel": "Abkühlen heißer Speisen",
   "werte": {
    "punkt": "Abkühlen heißer Speisen",
-   "grenzwert": "Bereich von +65 auf +10 innerhalb von 3 Stunden durchschreiten °C / h",
-   "haeufigkeit": "",
+   "grenzwert": "Bereich von +65 °C auf +10 °C innerhalb von 3 Stunden durchschreiten",
+   "haeufigkeit": "bei jedem Abkühlvorgang",
    "korrektur": "Bei Überschreitung: Speise nicht weiter lagern, verwerfen; Abkühlverfahren (flache Behälter, Schnellkühler) anpassen."
   },
   "quelle": "oberallgaeu.org"
@@ -2652,7 +2652,7 @@ export const HACCP: Vorschlag[] = [
   "titel": "Wareneingangskontrolle",
   "werte": {
    "punkt": "Wareneingangskontrolle",
-   "grenzwert": "Temperatur bei Anlieferung: Tiefkühlware −18 (kurzfristig −15); Fleisch/Fleischerzeugnisse +4 (Mainz-Formular); Fisch +2; Hackfleisch +2; Geflügel/Wild +4. Außerdem: keine Verunreinigungen, einwandfreie Verpackung, einwandfreier Geruch, gültiges MHD, Beschaffenheit des Lieferfahrzeugs, Kennzeichnung °C / Sichtprüfung",
+   "grenzwert": "Temperatur bei Anlieferung: Tiefkühlware −18 °C (kurzfristig −15 °C); Fleisch/Fleischerzeugnisse +4 °C (Mainz-Formular); Fisch +2 °C; Hackfleisch +2 °C; Geflügel/Wild +4 °C. Außerdem: keine Verunreinigungen, einwandfreie Verpackung, einwandfreier Geruch, gültiges MHD, Beschaffenheit des Lieferfahrzeugs, Kennzeichnung (Temperaturmessung und Sichtprüfung)",
    "haeufigkeit": "stichprobenartig bei jeder Lieferung; Dokumentation z. B. durch Vermerk auf Lieferschein oder Rechnung",
    "korrektur": "Zurückweisung der Ware; Mängel und Maßnahme dokumentieren (Datum, Lieferung, Mangel, Korrekturmaßnahme, Handzeichen)."
   },
@@ -2663,7 +2663,7 @@ export const HACCP: Vorschlag[] = [
   "werte": {
    "punkt": "Frittierfett – polare Anteile",
    "grenzwert": "24 % polare Anteile = Grenze der Genusstauglichkeit (DGF-Empfehlung) → Fett wechseln; Frittiertemperatur mind. +160 °C, max. +175 °C",
-   "haeufigkeit": "keine feste Frequenz belegt; Wechselzeitpunkt nach Durchsatz über Eigenkontrollen ermitteln; Temperaturkontrollen und Fettwechsel dokumentieren",
+   "haeufigkeit": "nach Durchsatz; Wechselzeitpunkt über Eigenkontrollen ermitteln; Temperaturkontrollen und Fettwechsel dokumentieren",
    "korrektur": "Fett wechseln bei Erreichen des Grenzwerts oder Verderbsmerkmalen (stechender, kratziger Geruch/Geschmack, bläulicher Rauch, verstärkte Schaumbildung); nach Gebrauch filtrieren, in Ruhephasen abdecken; Fritteuse entleeren und reinigen; Altfett in verschließbaren Behältern bis zur Abholung durch Fachfirma lagern."
   },
   "quelle": "zvl.jena.de"
@@ -2672,7 +2672,7 @@ export const HACCP: Vorschlag[] = [
   "titel": "Reinigung und Desinfektion (Reinigungsplan Küche)",
   "werte": {
    "punkt": "Reinigung und Desinfektion (Reinigungsplan Küche)",
-   "grenzwert": "Reinigungsplan vorhanden und ausgehängt; Intervalle eingehalten Sichtkontrolle",
+   "grenzwert": "Reinigungsplan vorhanden und ausgehängt; Intervalle eingehalten (Sichtkontrolle)",
    "haeufigkeit": "Fußböden, Arbeitstische, Theken, Behälter, Waschbecken: täglich (Waschbecken-Desinfektion wöchentlich); Schneidebretter, Geräte, Abfallbehälter: nach Benutzung; Tische nach Fleisch/Geflügel/Fisch/Ei: sofort nach Gebrauch; Türen: wöchentlich; Abzugshaube/Filter: mind. monatlich; Kühlräume/-einrichtungen: mind. wöchentlich; Tiefkühleinrichtungen: mind. vierteljährlich; Trockenlager: wöchentlich; Grundreinigung: vierteljährlich; Personal-WC: täglich (Desinfektion wöchentlich)",
    "korrektur": "Nachreinigen; Plan/Intervalle anpassen; Personal unterweisen."
   },
@@ -2682,7 +2682,7 @@ export const HACCP: Vorschlag[] = [
   "titel": "Schädlingsmonitoring",
   "werte": {
    "punkt": "Schädlingsmonitoring",
-   "grenzwert": "kein Befall Sichtkontrolle",
+   "grenzwert": "kein Befall (Sichtkontrolle)",
    "haeufigkeit": "regelmäßige vorbeugende optische Kontrollen, mindestens einmal pro Quartal, dokumentiert",
    "korrektur": "Bekämpfung (ggf. Fachfirma); Datum, Bereich, Feststellung, Art der Bekämpfung, Ausführender dokumentieren."
   },
@@ -2737,7 +2737,7 @@ export const ALLERGENE_UMFANG: { bezeichnung: string; umfasst: string }[] = [
  },
  {
   "bezeichnung": "Schwefeldioxid und Sulphite",
-  "umfasst": "in Konzentrationen von mehr als 10 mg/kg oder 10 mg/l als insgesamt vorhandenes SO2, die für verzehrfertige oder gemäß den Anweisungen des Herstellers in den ursprünglichen Zustand zurückgeführte Erzeugnisse zu berechnen sind"
+  "umfasst": "in Konzentrationen von mehr als 10 mg/kg oder 10 mg/l als insgesamt vorhandenes SO₂, die für verzehrfertige oder gemäß den Anweisungen des Herstellers in den ursprünglichen Zustand zurückgeführte Erzeugnisse zu berechnen sind"
  },
  {
   "bezeichnung": "Lupinen",
@@ -2896,7 +2896,7 @@ export const HYGIENE: Vorschlag[] = [
   "titel": "Behandlungsliege / Behandlungsstuhl / Kopfstützen",
   "werte": {
    "was": "Behandlungsliege / Behandlungsstuhl / Kopfstützen",
-   "wann": "nach jedem Kunden",
+   "wann": "nach jeder Kundin / jedem Kunden",
    "womit": "Reinigungsmittel, frische Einmal- oder Stoffunterlage; bei Kunden mit Hautinfektion bzw. Kontamination VAH-gelistetes Flächendesinfektionsmittel",
    "wie": "Unterlage wechseln, Flächen abwischen; bei Kontamination wischdesinfizieren",
    "wer": "Beschäftigte"

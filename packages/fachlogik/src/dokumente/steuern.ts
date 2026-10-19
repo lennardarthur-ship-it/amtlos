@@ -96,6 +96,8 @@ export const verfahrensdokumentation: Vorlage = {
     const systeme = liste(d, "systeme").filter((x) => text(x, "name"));
     const aenderungen = liste(d, "aenderungen").filter((x) => text(x, "aenderung"));
     const l = (k: string) => (auswahl(d, k).length ? punkte(auswahl(d, k)) : absatz(""));
+    // Zwischenüberschrift bleibt mit ihrem Inhalt auf einer Seite (nicht allein am Seitenende)
+    const teil = (titel: string, inhalt: string) => `<div class="zusammen"><h3>${esc(titel)}</h3>${inhalt}</div>`;
     return dokument({
       titel: "Verfahrensdokumentation",
       betrieb: b,
@@ -109,16 +111,16 @@ export const verfahrensdokumentation: Vorlage = {
             titel: "Anwenderdokumentation: Belegeingang, Erfassung und Ablage",
             rand: "GoBD Tz. 10.1",
             inhalt:
-              `<h3>Eingang der Belege</h3>${l("belegeingang")}<h3>Art der Belegablage</h3>${l("belegart")}<h3>Ablage</h3>${l("ablage")}<h3>Erfassung, Prüfung und Verbuchung</h3>${zeilen(text(d, "erfassung"))}` +
-              (ja(d, "scannen") ? `<h3>Ersetzendes Scannen</h3>${text(d, "papier") ? `<p>${esc(text(d, "papier"))}.</p>` : ""}${zeilen(text(d, "scan_ablauf"))}` : ""),
+              teil("Eingang der Belege", l("belegeingang")) + teil("Art der Belegablage", l("belegart")) + teil("Ablage", l("ablage")) + teil("Erfassung, Prüfung und Verbuchung", zeilen(text(d, "erfassung"))) +
+              (ja(d, "scannen") ? teil("Ersetzendes Scannen", `${text(d, "papier") ? `<p>${esc(text(d, "papier"))}.</p>` : ""}${zeilen(text(d, "scan_ablauf"))}`) : ""),
           },
           {
             titel: "Technische Systemdokumentation und Betriebsdokumentation",
             rand: "GoBD Tz. 10.1",
             inhalt:
-              `<h3>Datensicherung</h3><p>Die Daten werden ${esc(text(d, "sicherung_intervall") || "____")} gesichert:</p>${l("sicherung_ort")}` +
-              (ja(d, "e_rechnung") ? `<h3>E-Rechnungen</h3><p>${esc(GOBD.eRechnung)}</p>` : "") +
-              `<h3>Zugriffsrechte</h3>${zeilen(text(d, "zugriff"))}<h3>Internes Kontrollsystem</h3>${zeilen(text(d, "kontrollen"))}`,
+              teil("Datensicherung", `<p>Die Daten werden ${esc(text(d, "sicherung_intervall") || "____")} gesichert:</p>${l("sicherung_ort")}`) +
+              (ja(d, "e_rechnung") ? teil("E-Rechnungen", `<p>${esc(GOBD.eRechnung)}</p>`) : "") +
+              teil("Zugriffsrechte", zeilen(text(d, "zugriff"))) + teil("Internes Kontrollsystem", zeilen(text(d, "kontrollen"))),
           },
           {
             titel: "Aufbewahrung und Änderungen",

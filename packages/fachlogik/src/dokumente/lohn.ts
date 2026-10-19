@@ -2,7 +2,7 @@
  * Personal (E-121): Arbeitszeitnachweis, Lohnkonto, Daten für die Sozialversicherungsmeldung. Amtlos rechnet keine
  * Lohnsteuer und keine Beiträge – die Beträge kommen aus der Lohnabrechnung. Gliederungen fachlich zu prüfen (T-61).
  */
-import { abschnitt, absatz, angaben, cent, datumDe, dokument, esc, euro, felder, ja, liste, summe, tabelle, text, unterschriften, zelle } from "./html.js";
+import { abschnitt, absatz, angaben, cent, datumDe, dokument, esc, euro, felder, ja, liste, nachsatz, summe, tabelle, text, unterschriften, zelle } from "./html.js";
 import { MINIJOB, SV } from "./bausteine.js";
 import type { Daten, Eintrag, Vorlage } from "./typen.js";
 
@@ -67,6 +67,9 @@ export const arbeitszeitnachweis: Vorlage = {
   ergebnis: (d) => [["Arbeitszeit im Monat", stunden(zeiten(d).gesamt)]],
   html(d, b) {
     const { z, gesamt } = zeiten(d);
+    // ohne Einträge: Blatt zum Eintragen von Hand – eine hohe Zeile je Tag, keine Summe „0:00 h“
+    const leer = !z.length;
+    const leerzeilen = leer ? 31 : ja(d, "leerzeilen") ? 31 - z.length : 0;
     return dokument({
       titel: "Arbeitszeitnachweis",
       betrieb: b,
@@ -76,7 +79,7 @@ export const arbeitszeitnachweis: Vorlage = {
         tabelle(
           ["Datum", "Beginn", "Ende", "Pause (Min.)", "Dauer", "Bemerkung"],
           z.map(({ x, min }) => [datumDe(text(x, "datum")), esc(text(x, "beginn")), esc(text(x, "ende")), esc(text(x, "pause")), min === null ? "" : stunden(min), zelle(text(x, "bemerkung"))]),
-          { breiten: ["15%", "12%", "12%", "13%", "13%", "35%"], leerzeilen: ja(d, "leerzeilen") ? 31 - z.length : 0, hoch: ja(d, "leerzeilen"), zahlen: [3, 4], summe: ["<strong>Summe</strong>", "", "", "", `<strong>${stunden(gesamt)}</strong>`, ""] },
+          { breiten: ["15%", "12%", "12%", "13%", "13%", "35%"], leerzeilen, hoch: leer || ja(d, "leerzeilen"), zahlen: [3, 4], ...(leer ? {} : { summe: ["<strong>Summe</strong>", "", "", "", `<strong>${stunden(gesamt)}</strong>`, ""] }) },
         ) +
         `<p class="nachsatz">Für Minijobs und die Branchen nach § 2a SchwarzArbG (u. a. Gastronomie, Friseur- und Kosmetikgewerbe, Bau): Beginn, Ende und Dauer der täglichen Arbeitszeit spätestens bis zum Ablauf des siebten auf den Arbeitstag folgenden Kalendertages aufzeichnen und mindestens zwei Jahre aufbewahren (§ 17 Abs. 1 MiLoG).</p>` +
         unterschriften(["Unterschrift beschäftigte Person", "Unterschrift Arbeitgeber/in"]),
@@ -159,24 +162,25 @@ export const lohnkonto: Vorlage = {
         // Querformat: Stammdaten in zwei Spalten, damit die Monate möglichst auf Seite 1 beginnen
         abschnitt(
           "Stammdaten",
+          // einzeilige Angaben zuerst, damit die Zeilen beider Spalten auf einer Höhe stehen; mehrzeilige bzw. entfallende am Ende
           `<div class="spalten2">${angaben([
             ["Name", text(d, "name")],
             ["Geburtsdatum", datumDe(text(d, "geburtsdatum"))],
-            ["Anschrift", text(d, "anschrift")],
             ["Beschäftigt seit", datumDe(text(d, "eintritt"))],
             ["Krankenkasse", text(d, "krankenkasse")],
+            ["Anschrift", text(d, "anschrift")],
           ])}${angaben([
             ["Steuer-ID", text(d, "steuer_id")],
             ["Steuerklasse", text(d, "steuerklasse")],
-            ["Kinderfreibeträge", text(d, "kinder") || null],
-            ["Religionsgemeinschaft", text(d, "religion") || null],
             ["SV-Nummer", text(d, "sv_nummer")],
+            ["Kinderfreibeträge", text(d, "kinder") || null],
+            ["Kirchensteuermerkmal", text(d, "religion") || null],
           ])}</div>`,
         ) +
         abschnitt(
           "Monate",
           m.length
-            ? tabelle(["Zeitraum", "Zahltag", ...BETRAEGE.map(([, l]) => l), "U"], m.map((e) => [zelle(text(e, "monat")), datumDe(text(e, "zahltag")), ...BETRAEGE.map(([k]) => betrag(e, k)), ja(e, "unterbrechung") ? "U" : ""]), { summe: ["<strong>Summe</strong>", "", ...BETRAEGE.map(([k]) => `<strong>${euro(summe(m, k))}</strong>`), ""], breiten: ["10%", "8%", ...BETRAEGE.map(() => `${79 / BETRAEGE.length}%`), "3%"], zahlen: BETRAEGE.map((_, i) => i + 2), klasse: "eng" })
+            ? tabelle(["Zeitraum", "Zahltag", ...BETRAEGE.map(([, l]) => l), "U*"], m.map((e) => [zelle(text(e, "monat")), datumDe(text(e, "zahltag")), ...BETRAEGE.map(([k]) => betrag(e, k)), ja(e, "unterbrechung") ? "U" : ""]), { summe: ["<strong>Summe</strong>", "", ...BETRAEGE.map(([k]) => `<strong>${euro(summe(m, k))}</strong>`), ""], breiten: ["10%", "8%", ...BETRAEGE.map(() => `${79 / BETRAEGE.length}%`), "3%"], zahlen: BETRAEGE.map((_, i) => i + 2), klasse: "eng" }) + nachsatz("* U = Unterbrechung ohne Lohnanspruch (§ 41 Abs. 1 EStG)")
             : absatz("", "Noch keine Monate erfasst."),
         ),
     });
@@ -241,6 +245,21 @@ export const svMeldedaten: Vorlage = {
     return (text(d, "art") === "minijob" || text(d, "personengruppe") === "109") && grenze && e !== null && e > grenze.cent ? [`Entgelt über der Minijob-Grenze von ${euro(grenze.cent)} im Monat`] : [];
   },
   html(d, b) {
+    const beschaeftigung: [string, string | null][] = [
+      ["Beginn", datumDe(text(d, "beginn"))],
+      ["Art", ARTEN.find((a) => a.wert === text(d, "art"))?.text ?? ""],
+      ["Wochenstunden", text(d, "stunden")],
+      ["Monatliches Entgelt", text(d, "entgelt") ? euro(cent(text(d, "entgelt")) ?? 0) : ""],
+      ["Tätigkeit", text(d, "taetigkeit")],
+      ["Personengruppe", SV.personengruppen.find((o) => o.wert === text(d, "personengruppe"))?.text ?? ""],
+      ["Vertragsform", SV.vertragsform.find((o) => o.wert === text(d, "vertragsform"))?.text ?? ""],
+      ["Schulabschluss", SV.schulabschluss.find((o) => o.wert === text(d, "schulabschluss"))?.text ?? ""],
+      ["Berufsabschluss", SV.ausbildung.find((o) => o.wert === text(d, "ausbildung"))?.text ?? ""],
+      ["Weitere Beschäftigungen", ja(d, "weitere") ? text(d, "weitere_welche") || "ja" : "keine"],
+    ];
+    const start = 11 - (text(d, "geburtsname") ? 0 : 1);
+    // die letzten drei Felder bleiben mit Erklärung und Unterschrift zusammen (nicht allein auf einer neuen Seite)
+    const teil = beschaeftigung.length - 3;
     return dokument({
       titel: "Personalfragebogen",
       betrieb: b,
@@ -265,21 +284,11 @@ export const svMeldedaten: Vorlage = {
         ) +
         abschnitt(
           "Beschäftigung",
-          felder([
-            ["Beginn", datumDe(text(d, "beginn"))],
-            ["Art", ARTEN.find((a) => a.wert === text(d, "art"))?.text ?? ""],
-            ["Wochenstunden", text(d, "stunden")],
-            ["Monatliches Entgelt", text(d, "entgelt") ? euro(cent(text(d, "entgelt")) ?? 0) : ""],
-            ["Tätigkeit", text(d, "taetigkeit")],
-            ["Personengruppe", SV.personengruppen.find((o) => o.wert === text(d, "personengruppe"))?.text ?? ""],
-            ["Vertragsform", SV.vertragsform.find((o) => o.wert === text(d, "vertragsform"))?.text ?? ""],
-            ["Schulabschluss", SV.schulabschluss.find((o) => o.wert === text(d, "schulabschluss"))?.text ?? ""],
-            ["Berufsabschluss", SV.ausbildung.find((o) => o.wert === text(d, "ausbildung"))?.text ?? ""],
-            ["Weitere Beschäftigungen", ja(d, "weitere") ? text(d, "weitere_welche") || "ja" : "keine"],
-          ], { start: 11 - (text(d, "geburtsname") ? 0 : 1) }),
-        ) +
-        `<p style="margin-top:6mm">Ich versichere, dass die Angaben vollständig und richtig sind, und teile Änderungen unverzüglich mit.</p>` +
-        unterschriften(["Beschäftigte Person"], { ortDatum: true }),
+          felder(beschaeftigung.slice(0, teil), { start }) +
+            `<div class="zusammen">${felder(beschaeftigung.slice(teil), { start: start + teil })}` +
+            `<p style="margin-top:6mm">Ich versichere, dass die Angaben vollständig und richtig sind, und teile Änderungen unverzüglich mit.</p>` +
+            `${unterschriften(["Beschäftigte Person"], { ortDatum: true })}</div>`,
+        ),
     });
   },
 };

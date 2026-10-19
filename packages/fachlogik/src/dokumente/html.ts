@@ -84,12 +84,28 @@ export interface AbschnittOptionen {
 /** Randangabe maskiert; Bereiche wie „lit. b–g“ oder „§§ 145–147“ werden nicht am Strich umbrochen. */
 const randText = (t: string) => esc(t).replace(/(\S+–\S+)/g, '<span class="nb">$1</span>');
 
+/**
+ * Kurzer Abschnitt (keine Listentabelle, geschätzt höchstens ein gutes Drittel einer Seite): bleibt samt Überschrift
+ * auf einer Seite. Längere Abschnitte dürfen umbrechen, sonst blieben große Lücken am Seitenende.
+ */
+function kurzerAbschnitt(inhalt: string): boolean {
+  if (inhalt.includes('class="liste')) return false;
+  const anzahl = (s: string) => inhalt.split(s).length - 1;
+  const zeichen = inhalt.replace(/<[^>]*>/g, "").length;
+  // grobe Höhe in mm: Textzeilen zu ca. 90 Zeichen, Tabellenzeilen, Linienblöcke, Unterüberschriften, Absätze
+  const hoehe = (zeichen / 90) * 4.6 + anzahl("<tr") * 7 + anzahl("fuellen-block") * 16 + anzahl("<h3") * 8 + anzahl("<p") * 2 + anzahl("<li") * 1.5;
+  return hoehe < 75;
+}
+
 export function abschnitt(titel: string, inhalt: string, o: string | AbschnittOptionen = ""): string {
   const opt: AbschnittOptionen = typeof o === "string" ? { klasse: o, ohneNummer: o.includes("ohne-nummer") } : o;
-  const klassen = ["abschnitt", opt.klasse ?? "", opt.ohneNummer ? "ohne-nummer" : ""].filter(Boolean).join(" ");
+  const klassen = ["abschnitt", opt.klasse ?? "", opt.ohneNummer ? "ohne-nummer" : "", kurzerAbschnitt(inhalt) ? "zusammen" : ""].filter(Boolean).join(" ");
   const rand = opt.rand ? `<span class="rand">${randText(opt.rand)}</span>` : "";
   return `<section class="${klassen}"><h2>${rand}${esc(titel)}</h2>${inhalt}</section>`;
 }
+
+/** Überschrift samt kurzem Inhalt als Einheit, die nicht über einen Seitenumbruch getrennt wird (CSS-Klasse „zusammen“). */
+export const zusammen = (inhalt: string) => `<div class="zusammen">${inhalt}</div>`;
 
 /** Einzelner Eintrag innerhalb eines Abschnitts (z. B. eine Verarbeitungstätigkeit): Nummer in der Randspalte. */
 export function eintrag(titel: string, inhalt: string, o: { nummer?: string; rand?: string } = {}): string {
@@ -269,7 +285,7 @@ h2, h3 { page-break-after: avoid; break-after: avoid; page-break-inside: avoid; 
 .unterschriften { page-break-before: avoid; break-before: avoid; }
 .nb { white-space: nowrap; }
 table.liste.fortsetzung { margin-top: 0; }
-.schlussblock > table + .unterschriften { margin-top: 7mm; }
+.schlussblock > table + .unterschriften, .schlussblock.nach-tabelle > .unterschriften:first-child { margin-top: 7mm; }
 .spalten2 { display: flex; gap: 10mm; }
 .spalten2 > * { flex: 1; }
 .zelle-linie { display: block; border-bottom: 0.5pt solid #8a949c; height: 4.2mm; }
@@ -278,6 +294,18 @@ ol.nummern li { margin: 0 0 0.9mm; padding-left: 0.6mm; }
 ol.nummern li::marker { color: var(--akzent); }
 thead { display: table-header-group; }
 tfoot { display: table-row-group; }
+/* Tabellen: keine einzelne Zeile unter der Überschrift oder allein auf der neuen Seite, Summenzeile nicht ohne die
+   letzte Zeile (Chromium beachtet „avoid“ an Zeilen- und Zeilengruppengrenzen; der Tabellenkopf wiederholt sich) */
+table > tbody > tr:nth-child(2), table > tbody > tr:last-child, tfoot, tfoot tr { page-break-before: avoid; break-before: avoid; }
+table.liste tbody.schluss { page-break-inside: avoid; break-inside: avoid; }
+.schlussblock.nach-tabelle { page-break-before: avoid; break-before: avoid; }
+.fuellen-block, .uebertragung { page-break-inside: avoid; break-inside: avoid; }
+/* „zusammen“: Überschrift samt kurzem Inhalt (Feldblock, Linien, kurze Tabelle) nicht über einen Seitenumbruch
+   trennen – in Vorlagen als <div class="zusammen">…</div> (oder zusammen()); abschnitt() setzt die Klasse bei kurzen
+   Abschnitten selbst. Nur für Blöcke deutlich kürzer als eine Seite, sonst bricht Chromium trotzdem um. */
+.zusammen { page-break-inside: avoid; break-inside: avoid; }
+/* eigenes Blatt (z. B. Messprotokoll zum Aushängen) */
+.neue-seite { page-break-before: always; break-before: page; }
 
 /* Kopfzeile: Betrieb links, Bereich und Logo rechts, Linie in der Hausfarbe */
 .kopfzeile { display: flex; justify-content: space-between; align-items: flex-end; gap: 8mm; padding-bottom: 2.4mm; border-bottom: 1.1pt solid var(--akzent); }
@@ -441,7 +469,8 @@ body.g-brief { padding-left: 5mm; padding-right: 10mm; }
 
 /* ---------------- Vertrag */
 .g-vertrag { font-family: ${SERIF}; font-size: 10pt; line-height: 1.55; }
-.g-vertrag p, .g-vertrag li { text-align: justify; }
+/* Flattersatz: Chromium trennt ohne Wörterbuch nicht deutsch, Blocksatz risse große Lücken */
+.g-vertrag p, .g-vertrag li { text-align: left; }
 .g-vertrag h1, .g-vertrag h2, .g-vertrag h3, .g-vertrag .kopfzeile, .g-vertrag .kennung, .g-vertrag table.liste, .g-vertrag .unterschrift, .g-vertrag table.angaben th, .g-vertrag .unter, .g-vertrag .nachsatz, .g-vertrag .klein { font-family: ${SANS}; }
 .g-vertrag h1 { text-align: center; margin-top: 9mm; font-size: 18pt; }
 .g-vertrag .unter { text-align: center; }
@@ -491,6 +520,21 @@ body.g-brief { padding-left: 5mm; padding-right: 10mm; }
 .g-aushang .unterschriften { margin-top: 10mm; }
 .g-aushang.ba .unterschriften { margin-top: 4mm; }
 .g-aushang.ba .unterschrift .linie { height: 9mm; }
+.g-aushang.ba .notruf .fuellen { min-width: 70mm; }
+/* Betriebsanweisung mit viel Text: kleinerer Satz, damit sie auf ein Blatt passt */
+.g-aushang.ba.kompakt { line-height: 1.3; }
+.g-aushang.ba.kompakt .titelband { margin-top: 3.5mm; }
+.g-aushang.ba.kompakt .titelband .t { font-size: 16pt; padding: 1.8mm 4mm; }
+.g-aushang.ba.kompakt .kasten { margin-top: 1.8mm; }
+.g-aushang.ba.kompakt .kasten h2 { font-size: 9.8pt; padding: 1.2mm 3.5mm; }
+.g-aushang.ba.kompakt .kasten .inhalt { font-size: 9.2pt; padding: 1.8mm 3.5mm 0.6mm; }
+.g-aushang.ba.kompakt .kasten .inhalt p { margin-bottom: 1.2mm; }
+.g-aushang.ba.kompakt .kasten .inhalt ul.punkte { margin-bottom: 1.2mm; }
+.g-aushang.ba.kompakt .kasten .inhalt ul.punkte li { margin-bottom: 0.5mm; }
+.g-aushang.ba.kompakt .kasten.stoff .inhalt dd { font-size: 10pt; }
+.g-aushang.ba.kompakt .notruf { font-size: 10pt; padding: 1.6mm 3.5mm; }
+.g-aushang.ba.kompakt .unterschriften { margin-top: 3mm; }
+.g-aushang.ba.kompakt .unterschrift .linie { height: 8mm; }
 /* Aushang mit viel Text: kompakter Satz, damit er auf möglichst wenige Blätter passt */
 .g-aushang.kompakt table.liste { font-size: 8.8pt; line-height: 1.32; }
 .g-aushang.kompakt table.liste th { font-size: 7.8pt; padding: 1.6mm 2mm 1.4mm; }
@@ -506,6 +550,9 @@ table.liste.eng th, table.liste.eng td { padding-left: 1.2mm; padding-right: 1.2
 .g-aushang table.liste.matrix td.x { text-align: center; font-weight: 700; padding-left: 0; padding-right: 0; }
 .g-aushang table.liste.matrix td.x, .g-aushang table.liste.matrix th.dreh { border-left: 0.5pt solid #dde1e5; }
 .g-aushang table.liste.matrix tr.gruppe td { background: var(--akzent-hauch); padding-top: 1.6mm; padding-bottom: 1.4mm; }
+/* Kategorie nicht allein am Seitenende: je Kategorie eine Zeilengruppe, die möglichst nicht umbricht */
+.matrix tr.gruppe { page-break-after: avoid; break-after: avoid; }
+.matrix tbody.gruppe-block { page-break-inside: avoid; break-inside: avoid; }
 .g-aushang .nachsatz { font-size: 9pt; }
 .g-aushang table.liste.legende { font-size: 8.6pt; }
 .g-aushang table.liste.legende th { font-size: 7.6pt; }
@@ -649,26 +696,52 @@ export function schlussZusammen(inhalt: string): string {
   const rest = inhalt.slice(i);
   const ende = obersteElemente(rest)[0]?.[1] ?? rest.length;
   let vorne = inhalt.slice(0, ab);
-  let mit = inhalt.slice(ab, i);
-  // Endet der Text davor mit einer Listentabelle (Teilnahme, Plan), wandert deren letzte Zeile mit in den Schlussblock
+  const mit = inhalt.slice(ab, i);
+  let klasse = "schlussblock";
+  // Endet der Text davor mit einer Listentabelle (Teilnahme, Plan, Kassenbuch mit Summenzeile), bleibt deren letzte
+  // Zeile samt Summenzeile (tfoot) beim Schlussblock: Sie kommt in eine eigene Zeilengruppe derselben Tabelle, die nicht
+  // umbricht, und der Schlussblock schließt ohne Umbruch an. So wiederholt sich auf der neuen Seite der Tabellenkopf
+  // (Spalten bleiben beschriftet), ohne dass er auf derselben Seite doppelt erscheint.
   if (!mit.trim()) {
     const start = vorne.lastIndexOf('<table class="liste');
-    const t = start >= 0 && /<\/tbody><\/table>(<\/section>)?\s*$/.test(vorne) ? /^<table class="(liste[^"]*)">(<colgroup>.*?<\/colgroup>)?/s.exec(vorne.slice(start)) : null;
-    const tbodyEnde = t ? vorne.lastIndexOf("</tbody>") : -1;
-    // letzte Zeile mit Inhalt samt den leeren Zeilen danach (höchstens drei Zeilen)
-    const tbodyAnfang = vorne.lastIndexOf("<tbody>") + 7;
-    let letzte = t ? vorne.lastIndexOf("<tr>", tbodyEnde) : -1;
-    for (let n = 1; t && letzte > tbodyAnfang && n < 3 && !vorne.slice(letzte, tbodyEnde).replace(/<[^>]*>|&nbsp;|\s/g, ""); n++) letzte = vorne.lastIndexOf("<tr>", letzte - 1);
-    if (t && letzte >= tbodyAnfang && letzte > tbodyAnfang) {
-      mit = `<table class="${t[1]} fortsetzung">${t[2] ?? ""}<tbody>${vorne.slice(letzte, tbodyEnde)}</tbody></table>`;
-      vorne = vorne.slice(0, letzte) + vorne.slice(tbodyEnde);
-    }
+    const fuss = start >= 0 ? /<\/tbody>(<tfoot>(?:(?!<\/?table)[\s\S])*?<\/tfoot>)?<\/table>(<\/section>)?\s*$/.exec(vorne) : null;
+    const tbodyEnde = fuss && fuss.index > start ? fuss.index : -1;
+    const tbodyAnfang = tbodyEnde >= 0 ? vorne.lastIndexOf("<tbody>", tbodyEnde) + 7 : -1;
+    // letzte Zeile mit Inhalt samt den leeren Zeilen danach (höchstens drei Zeilen); davor bleibt mindestens eine Zeile
+    let letzte = tbodyAnfang > start ? vorne.lastIndexOf("<tr>", tbodyEnde) : -1;
+    for (let n = 1; letzte > tbodyAnfang && n < 3 && !vorne.slice(letzte, tbodyEnde).replace(/<[^>]*>|&nbsp;|\s/g, ""); n++) letzte = vorne.lastIndexOf("<tr>", letzte - 1);
+    if (letzte > tbodyAnfang) {
+      vorne = `${vorne.slice(0, letzte)}</tbody><tbody class="schluss">${vorne.slice(letzte)}`;
+      klasse += " nach-tabelle";
+    } else if (tbodyEnde >= 0) klasse += " nach-tabelle";
   }
-  return `${vorne}<div class="schlussblock">${mit}${rest.slice(0, ende)}</div>${rest.slice(ende)}`;
+  return `${vorne}<div class="${klasse}">${mit}${rest.slice(0, ende)}</div>${rest.slice(ende)}`;
 }
 
-/** Zahl und Einheit (%, €) nicht trennen – nur im Text, nicht in Tags. */
-const festeLeerzeichen = (html: string) => html.replace(/(\d) (%|€)(?![^<]*>)/g, "$1&nbsp;$2");
+/** Gesetzeskürzel, die nicht von der Nummer davor getrennt werden („Art. 32 DSGVO“, „§ 147 AO“). */
+const GESETZE = "DSGVO|BDSG|AO|HGB|BGB|EStG|UStG|GewO|ArbSchG|ArbZG|MuSchG|GefStoffV|BetrSichV|TDDDG|LMIV|LMIDV|IfSG|SGB|NachwG|MiLoG|GmbHG|KassenSichV";
+const FEST: [RegExp, string][] = [
+  // Zahl und Einheit: „19 %“, „12,50 €“, „121 °C“
+  [/(\d) (%|€|°C)/g, "$1&nbsp;$2"],
+  // Verweiszeichen vor Nummer, römischer Zahl oder Buchstabe: „§ 43“, „§§ 5“, „Art. 32“, „Abs. 2“, „Nr. 1“, „lit. g“, „UAbs. 1“
+  [/(§§?|\bArt\.|\bAbs\.|\bUAbs\.|\bNr\.|\blit\.|\bSatz) (?=\d|[IVXLC]+(?![\wäöüÄÖÜß])|[a-z](?![\wäöüß]))/g, "$1&nbsp;"],
+  // Nummer bzw. Buchstabe und Gesetz: „32 DSGVO“, „lit. b DSGVO“; „SGB IV“
+  [new RegExp(`(\\d[a-z]?|\\b[a-z]) (${GESETZE})(?![\\wäöüß])`, "g"), "$1&nbsp;$2"],
+  [/\bSGB (?=[IVX]+(?![\wäöüß]))/g, "SGB&nbsp;"],
+  // Regelwerke mit Nummer: „DGUV Vorschrift 1“, „DGUV Information 211-010“, „TRGS 555“
+  [/\bDGUV (Vorschrift|Information|Regel) (?=\d)/g, "DGUV&nbsp;$1&nbsp;"],
+  [/\b(Vorschrift|TRGS|TRBS|DIN|VDE) (?=\d)/g, "$1&nbsp;"],
+];
+/**
+ * Feste Leerzeichen, wo ein Zeilenumbruch den Bezug zerreißt (Zahl und Einheit, Paragraf und Nummer, Nummer und
+ * Gesetz) – nur im Text, nie in Tags.
+ */
+export function festeLeerzeichen(html: string): string {
+  return html
+    .split(/(<[^>]*>)/)
+    .map((teil, i) => (i % 2 ? teil : FEST.reduce((t, [re, ers]) => t.replace(re, ers), teil)))
+    .join("");
+}
 
 /** Ganzes Dokument: Kopfzeile des Betriebs, Titel, Kennungsleiste, Inhalt. Die Gestalt setzt dokumentHtml(). */
 export function dokument(o: DokumentOptionen): string {
@@ -682,8 +755,8 @@ export function dokument(o: DokumentOptionen): string {
   const klassen = [`g-${g}`, o.quer ? "quer" : "", o.nummerierung === "zahl" ? "nummern-zahl" : "", o.klasse ?? ""].filter(Boolean).join(" ");
   return `${kopf({ titel: o.titel, betrieb: b, fussLinks, fussRechts: stand ? `Stand ${stand}` : "", quer: o.quer, gestalt: o.gestalt, band: o.band })}<body class="${klassen}">
 <header class="kopfzeile"><div><div class="name">${b.name.trim() ? esc(b.name.trim()) : LINIE}</div>${adresse ? `<div class="adresse">${esc(adresse)}</div>` : ""}</div><div class="rechts"><div class="art">${esc(o.art ?? "")}</div>${logoHtml(b)}</div></header>
-${o.vorTitel ?? ""}<h1>${esc(o.titel)}</h1>${o.unter ? `<p class="unter">${esc(o.unter)}</p>` : ""}
-<dl class="kennung">${GRUNDLAGE_MARKE}${kopfDaten.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
+${o.vorTitel ?? ""}${festeLeerzeichen(`<h1>${esc(o.titel)}</h1>${o.unter ? `<p class="unter">${esc(o.unter)}</p>` : ""}`)}
+<dl class="kennung">${GRUNDLAGE_MARKE}${festeLeerzeichen(kopfDaten.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join(""))}</dl>
 <main>${festeLeerzeichen(schlussZusammen(o.inhalt))}</main>
 ${fussHtml(b)}
 </body></html>`;

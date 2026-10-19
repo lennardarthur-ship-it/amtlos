@@ -908,6 +908,22 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Anleitung für den Gründer:** Docs-Seite „Amtlos veröffentlichen – Schritt für Schritt“ (Firma und Website, Apple, Abo/RevenueCat, Store-Angaben, fachliche Prüfung, Bauen/TestFlight mit iPhone-Prüfliste, Store-Eintrag, nach dem Start). `docs/11-store-start.md` ist auf demselben Stand.
 - **Weiterhin offen (nicht in meiner Hand):** Firmendaten und Impressum, Apple-Entwicklerkonto, RevenueCat-Produkte und Preise im Store, juristische und steuerliche Prüfung (PRUEFLISTE), Test auf echtem iPhone, native Schlüsselableitung im ersten EAS-Build (T-85).
 
+### E-146 · Qualitätsdurchsicht von Texten, Vorlagen und Exporten (2026-10-19)
+
+- **Anlass:** Frage des Gründers, ob alles für die Qualität der App und ihrer Ergebnisse getan ist. Die automatischen Prüfungen messen Layout und Format, niemand hatte bis dahin jeden Satz und jede Seite gelesen. Vier unabhängige Durchsichten: alle App-Texte und der Store-Text, alle 33 Vorlagen leer und voll Seite für Seite (zwei Hälften), alle Exporte mit Grenzfällen.
+- **Exporte (schwerster Befund):** „-1.500“ wurde als −1,50 € gelesen – das Storno einer Rechnung über „1.500“ € hob sie nicht auf (PDF, XRechnung, DATEV, Voranmeldung). Behoben, dazu: Menge × Preis kaufmännisch in ganzen Zehntausendsteln statt Gleitkomma (0,57 × 1,50 € = 0,86 €), Bruchteile eines Cents spiegelbildlich gerundet, Emoji an der Kürzungsgrenze brach das Steuerberatungs-Paket ab, Steuerzeichen machten die XRechnung ungültig, Belegliste und Dateien im Paket tragen dieselben (durchnummerierten) Namen, gleich aussehende Rechnungsnummern überschreiben sich nicht mehr, kein Zahlungshinweis in der Storno-XRechnung, Formelschutz in den lesbaren CSV-Listen (Hochkomma vor =, +, @, - ohne Zahl). Regressionstests in `storno-nachlass.test.ts`.
+- **Steuerberatung:** Im Januar fehlten Dezember und Q4 des Vorjahrs; die Zeiträume reichen jetzt über den Jahreswechsel, vorausgewählt ist das zuletzt abgeschlossene Quartal.
+- **Vorlagen:**
+  - Feste Leerzeichen nach §, Art., Abs., Nr., vor Gesetzeskürzeln und °C – auch in Titel, Unterzeile und Kopfleiste.
+  - Seitenumbrüche: Überschriften und Summenzeilen bleiben bei ihrem Inhalt (Klasse `zusammen`, tfoot im Schlussblock), Allergen-Kategorien bleiben bei ihren Gerichten, kompakte Betriebsanweisung passt auf ein Blatt.
+  - Vertragstexte im Flattersatz (Chromium trennt ohne Wörterbuch nicht, der Blocksatz riss Lücken).
+  - Leere Ausdruckvorlagen haben Zeilen zum Ausfüllen (Kassenbuch, Arbeitszeitnachweis, Bilanz/GuV, Gefährdungsbeurteilung, Hygiene- und Hautschutzplan, Prüfprotokoll, Transparenzregister).
+  - Angaben aus „Mein Betrieb“: Rechtsform, Vertretung, Register und Website kommen in Impressum, Gewerbeanmeldung, Handelsregister, Transparenzregister und Datenschutzerklärung (vorher z. B. „Einzelunternehmen“ bei einer GmbH). Auswahlfelder werden nur mit einer passenden Option gefüllt.
+  - Rechnung: Befreiungshinweis nur bei einer Position mit 0 %. Datenpanne: keine Vorbelegung „Benachrichtigung nicht erforderlich“ mehr, solange die Bewertung offen ist.
+  - Texte: HACCP-Grenzwerte mit °C an der richtigen Stelle, „Hautschutz- und Händehygieneplan“, Rechercheformulierungen aus Aushängen entfernt (gleiche Fakten), Verweise auf Abschnittsnummern, „nach 1 Tag“, Kz 83 mit Vorzeichen, kein doppeltes Minus bei Verlust/Jahresfehlbetrag.
+- **App-Texte:** 30 Sprachkorrekturen (u. a. „1 Angaben“, „1 Buchungen“, Fragmente ohne Subjekt, Großschreibung nach Doppelpunkt, einheitlich „Hausfarbe“, „Betrieb“, „Amtlos“ statt „uns“); Store-Text ohne „Vorschläge aus offiziellen Quellen“ und „GiroCode auf jeder Rechnung“ nur mit IBAN; kürzerer Sicherungshinweis auf „Heute“ (wurde abgeschnitten).
+- **Bewusst nicht geändert, fachlich offen:** T-87 bis T-91 (Storno-Leistungsdatum und Zahlungsangaben, Cent- vs. Euro-Basis der Voranmeldung, Vorsteuer bei Kleinbetragsrechnungen, einzelne Normverweise in Vorlagen, Werbeaussagen).
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)
