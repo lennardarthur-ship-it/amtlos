@@ -109,7 +109,7 @@ function PflichtDetail({ id }: { id: string }) {
       <Karte stil={{ marginTop: 8, paddingTop: 0 }}>
         {p.grund ? zeile(TEXT.warum, p.grund) : null}
         {/* der Termin steht oben auf der Bühne – hier nur, wenn die Pflicht abgehakt ist */}
-        {p.naechsterTermin && abgehakt ? zeile(TEXT.naechster_termin("").trim(), datumDe(p.naechsterTermin)) : null}
+        {p.naechsterTermin && abgehakt ? zeile(TEXT.naechster_termin("").replace(/:\s*$/, ""), datumDe(p.naechsterTermin)) : null}
         {p.stelle ? zeile(TEXT.zustaendig, p.stelle) : null}
         {zeile(TEXT.einstufung, TEXT.schwere[p.schwere])}
       </Karte>
