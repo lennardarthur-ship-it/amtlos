@@ -43,7 +43,9 @@ describe("Gestaltung der Dokumente (E-130)", () => {
     expect(dokumentHtml(vd, leereDaten(vd, B, "2026-10-13"), B)).toContain('class="inhalt-uebersicht"');
     const ba = vorlageFuer("betriebsanweisung")!;
     const bah = dokumentHtml(ba, leereDaten(ba, B, "2026-10-13"), B);
-    expect(bah).toContain('class="g-aushang ba"');
+    // leeres Blatt: kompakter Satz, damit die Linien zum Ausfüllen auf ein Blatt passen
+    expect(bah).toContain('class="g-aushang ba kompakt"');
+    expect(dokumentHtml(ba, { ...leereDaten(ba, B, "2026-10-13"), gefahren: "Reizt die Augen." }, B)).toContain('class="g-aushang ba"');
     expect(bah).toContain("--band:#e0640c");
   });
 });

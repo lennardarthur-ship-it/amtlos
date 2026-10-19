@@ -146,8 +146,15 @@ export const nachweisArbeitsbedingungen: Vorlage = {
       ["14. Kündigung", kuendigungText(d)],
       ["15. Tarifverträge, Vereinbarungen", text(d, "kollektiv") === "ja" ? `${KOLLEKTIV.ja} ${text(d, "kollektiv_text")}` : KOLLEKTIV.keine!],
     ];
+    // Blatt zum Ausfüllen: Punkte mit mehreren Angaben als beschriftete Linien – dieselben Teilangaben, die das
+    // ausgefüllte Dokument nennt (statt zweier unbeschrifteter Linien)
+    const leerAngaben: Record<string, string> = {
+      "7": angaben([[`${ENTGELT.monat!.replace(" (brutto)", "")} bzw. ${ENTGELT.stunde!}`, ""], ["Weitere Bestandteile", "", 2], ["Fälligkeit", ""], ["Auszahlung", ""]]),
+      "8": angaben([["Stunden pro Woche", ""], ["Arbeitstage pro Woche", ""], ["Verteilung", ""], ["Ruhepausen", ""], ["Ruhezeit", ""], ["Schichtarbeit (falls vereinbart)", ""]]),
+      "11": angaben([["Arbeitstage pro Kalenderjahr", ""]]),
+    };
     // Vertrag: Parteien in zwei Spalten, dann die 15 Punkte des § 2 Abs. 1 NachwG mit Randnummern
-    const punkteNw = zeilenNw.slice(1).map(([t, w]) => abschnitt(t.replace(/^\d+\.\s*/, ""), absatz(w ?? "")));
+    const punkteNw = zeilenNw.slice(1).map(([t, w]) => abschnitt(t.replace(/^\d+\.\s*/, ""), !w && leerAngaben[t.split(".")[0]!] ? leerAngaben[t.split(".")[0]!]! : absatz(w ?? "")));
     return dokument({
       titel: "Nachweis der wesentlichen Arbeitsbedingungen",
       betrieb: b,

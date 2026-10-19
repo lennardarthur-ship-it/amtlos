@@ -934,7 +934,12 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
   - Leere Blätter: leere Angaben der Kopfleiste als Linie (Zeitraum, Jahr, Stichtag, Geprüft von, Bereich), weitere Ausfülltabellen und Summenzeilen, USt-Zeile auf der leeren Rechnung.
   - Logik: Datenpanne „kein Risiko“ als Dokumentation ohne 72-Stunden-Frist; Urlaubs-/Krankheitstage bleiben im Arbeitszeitnachweis; Widerspruchshinweise im Personalfragebogen und bei der Rechtsform in der Gewerbeanmeldung; Impressum ohne Inhaltsübersicht, Stammkapital als eigener Teil.
   - Satz: realistischere Schätzung kurzer Abschnitte im Handbuch-Satz (keine halb leeren ersten Seiten mehr), Lohnkonto-Spalten auf einer Höhe, letzte Teilnehmerzeile bleibt bei den Leerzeilen.
-- **Bewusst nicht geändert, fachlich offen:** T-87 bis T-95 (Storno-Leistungsdatum und Zahlungsangaben, Cent- vs. Euro-Basis der Voranmeldung, Vorsteuer bei Kleinbetragsrechnungen, einzelne Normverweise in Vorlagen, Werbeaussagen).
+- **Vierte Durchsicht** (aus Sicht der Empfänger: Gast, Behörde, Beschäftigte, Prüfer):
+  - Sicherheitsrelevant: Die Allergenliste druckte bei jedem Gericht ohne Häkchen „keines der 14 Hauptallergene“. Der Vermerk erscheint jetzt nur nach ausdrücklicher Bestätigung (Schalter „Enthält keines der 14 Hauptallergene“); Gerichte ohne Angabe und Widersprüche meldet die Prüfung. Der Gästeaushang zeigt keine internen Kopfangaben mehr (`ohneKopfangaben`; bewusst nicht `kundendokument`, das in der App das Teilen sperren würde).
+  - Gefahrstoffverzeichnis: Sicherheitsdatenblatt als Auswahl ohne Startwert statt Schalter, der unbeachtet „fehlt“ druckte.
+  - Leere Blätter durchgehend zum Ausfüllen von Hand: Linien über die ganze Breite, Kästchen statt leerer Linien bei Auswahlen (Gefährdungsbeurteilung, Datenpanne, Personalfragebogen, Verfahrensdokumentation, Steuererklärung), Summenzeilen mit Linie, mehr Zeilen, drei Linien für Anschriften.
+  - HACCP-Messprotokoll mit Grenzwert je Kontrollpunkt und Unterschrift; EÜR fasst auch Einnahmen nach Zeilen der Anlage EÜR zusammen; Datenpanne mit Unterschrift „Dokumentiert von“, Begründung bei „kein Risiko“ oben; Hinweis, wenn Einwilligungen ohne Widerrufshinweis gewählt sind; kein vorgedruckter Haupterwerb; Registereintrag nur bei Registerformen.
+- **Bewusst nicht geändert, fachlich offen:** T-87 bis T-96 (Storno-Leistungsdatum und Zahlungsangaben, Cent- vs. Euro-Basis der Voranmeldung, Vorsteuer bei Kleinbetragsrechnungen, einzelne Normverweise in Vorlagen, Werbeaussagen).
 
 ---
 

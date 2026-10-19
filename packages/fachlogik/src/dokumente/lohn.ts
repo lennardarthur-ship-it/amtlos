@@ -2,7 +2,7 @@
  * Personal (E-121): Arbeitszeitnachweis, Lohnkonto, Daten für die Sozialversicherungsmeldung. Amtlos rechnet keine
  * Lohnsteuer und keine Beiträge – die Beträge kommen aus der Lohnabrechnung. Gliederungen fachlich zu prüfen (T-61).
  */
-import { abschnitt, angaben, cent, datumDe, dokument, esc, euro, felder, ja, liste, nachsatz, summe, tabelle, text, unterschriften, zelle } from "./html.js";
+import { KOPF_LINIE, ZELLE_LINIE, abschnitt, angaben, ankreuzen, cent, datumDe, dokument, esc, euro, felder, ja, liste, nachsatz, roh, summe, tabelle, text, unterschriften, zelle, type Roh } from "./html.js";
 import { MINIJOB, SV } from "./bausteine.js";
 import type { Daten, Eintrag, Vorlage } from "./typen.js";
 
@@ -86,7 +86,7 @@ export const arbeitszeitnachweis: Vorlage = {
         tabelle(
           ["Datum", "Beginn", "Ende", "Pause (Min.)", "Dauer", "Bemerkung"],
           z.map(({ x, min }) => [datumDe(text(x, "datum")), esc(text(x, "beginn")), esc(text(x, "ende")), esc(text(x, "pause")), min === null ? "" : stunden(min), zelle(text(x, "bemerkung"))]),
-          { breiten: ["15%", "12%", "12%", "13%", "13%", "35%"], leerzeilen, hoch: leer || ja(d, "leerzeilen"), zahlen: [3, 4], ...(leer ? {} : ja(d, "leerzeilen") ? { summe: ["<strong>Summe der erfassten Tage</strong>", `<strong>${stunden(gesamt)}</strong>`, ""], summeSpanne: 4 } : { summe: ["<strong>Summe</strong>", "", "", "", `<strong>${stunden(gesamt)}</strong>`, ""] }) },
+          { breiten: ["15%", "12%", "12%", "13%", "13%", "35%"], leerzeilen, hoch: leer || ja(d, "leerzeilen"), zahlen: [3, 4], ...(leer ? { summe: ["<strong>Summe</strong>", "", "", "", ZELLE_LINIE, ""] } : ja(d, "leerzeilen") ? { summe: ["<strong>Summe der erfassten Tage</strong>", `<strong>${stunden(gesamt)}</strong>`, ""], summeSpanne: 4 } : { summe: ["<strong>Summe</strong>", "", "", "", `<strong>${stunden(gesamt)}</strong>`, ""] }) },
         ) +
         `<p class="nachsatz">Für Minijobs und die Branchen nach § 2a SchwarzArbG (u. a. Gastronomie, Friseur- und Kosmetikgewerbe, Bau): Beginn, Ende und Dauer der täglichen Arbeitszeit spätestens bis zum Ablauf des siebten auf den Arbeitstag folgenden Kalendertages aufzeichnen und mindestens zwei Jahre aufbewahren (§ 17 Abs. 1 MiLoG).</p>` +
         unterschriften(["Unterschrift beschäftigte Person", "Unterschrift Arbeitgeber/in"]),
@@ -169,6 +169,8 @@ export const lohnkonto: Vorlage = {
       titel: "Lohnkonto",
       betrieb: b,
       unter: [text(d, "name"), text(d, "jahr")].filter(Boolean).join(" · ") || undefined,
+      // ohne Jahr: Linie zum Eintragen in der Kennungsleiste
+      meta: text(d, "jahr") ? undefined : `Jahr: ${KOPF_LINIE}`,
       quer: true,
       inhalt:
         // Querformat: Stammdaten in zwei Spalten, damit die Monate möglichst auf Seite 1 beginnen
@@ -192,7 +194,7 @@ export const lohnkonto: Vorlage = {
         abschnitt(
           "Monate",
           (leer
-            ? tabelle(kopf, [], { ...tabellenOptionen, mindestens: 12, hoch: true })
+            ? tabelle(kopf, [], { ...tabellenOptionen, mindestens: 12, hoch: true, summe: ["<strong>Summe</strong>", "", ...BETRAEGE.map(() => ZELLE_LINIE), ""] })
             : tabelle(kopf, m.map((e) => [zelle(text(e, "monat")), datumDe(text(e, "zahltag")), ...BETRAEGE.map(([k]) => betrag(e, k)), ja(e, "unterbrechung") ? "U" : ""]), { ...tabellenOptionen, summe: ["<strong>Summe</strong>", "", ...BETRAEGE.map(([k]) => `<strong>${euro(summe(m, k))}</strong>`), ""] })) + nachsatz("* U = Unterbrechung ohne Lohnanspruch (§ 41 Abs. 1 EStG)"),
         ),
     });
@@ -274,16 +276,23 @@ export const svMeldedaten: Vorlage = {
     const wahl = (k: string, start: string) => (leer && text(d, k) === start ? "" : text(d, k));
     // Schlüssel der Tätigkeitsschlüssel-Stellen 6, 7 und 9 (Werte der Auswahl) vor dem Text, wie im Meldeverfahren
     const mitSchluessel = (o: { wert: string; text: string } | undefined) => (o ? `${o.wert} – ${o.text}` : "");
-    const beschaeftigung: [string, string | null][] = [
+    // leeres Blatt ohne Auswahl: die Optionen zum Ankreuzen (Abschlüsse mit Schlüssel); ausgewählt: der Text
+    const kreuze = (opts: { wert: string; text: string }[], gewaehlt: string, schluessel: boolean) => {
+      const o = opts.find((x) => x.wert === gewaehlt);
+      if (o) return schluessel ? mitSchluessel(o) : o.text;
+      return leer ? roh(ankreuzen(opts.map((x) => (schluessel ? mitSchluessel(x) : x.text)), { nebeneinander: !schluessel })) : "";
+    };
+    const beschaeftigung: [string, string | Roh | null][] = [
       ["Beginn", datumDe(text(d, "beginn"))],
-      ["Art", ARTEN.find((a) => a.wert === wahl("art", "vollzeit"))?.text ?? ""],
+      ["Art", kreuze(ARTEN, wahl("art", "vollzeit"), false)],
       ["Wochenstunden", text(d, "stunden")],
       ["Monatliches Entgelt", text(d, "entgelt") ? euro(cent(text(d, "entgelt")) ?? 0) : ""],
       ["Tätigkeit", text(d, "taetigkeit")],
-      ["Personengruppe", SV.personengruppen.find((o) => o.wert === wahl("personengruppe", "101"))?.text ?? ""],
-      ["Vertragsform", mitSchluessel(SV.vertragsform.find((o) => o.wert === wahl("vertragsform", "1")))],
-      ["Schulabschluss", mitSchluessel(SV.schulabschluss.find((o) => o.wert === text(d, "schulabschluss")))],
-      ["Berufsabschluss", mitSchluessel(SV.ausbildung.find((o) => o.wert === text(d, "ausbildung")))],
+      // Schlüssel des Meldeverfahrens: auf dem leeren Blatt trägt sie der Arbeitgeber ein
+      [leer ? "Personengruppe (trägt der Arbeitgeber ein)" : "Personengruppe", SV.personengruppen.find((o) => o.wert === wahl("personengruppe", "101"))?.text ?? ""],
+      [leer ? "Vertragsform (trägt der Arbeitgeber ein)" : "Vertragsform", mitSchluessel(SV.vertragsform.find((o) => o.wert === wahl("vertragsform", "1")))],
+      ["Schulabschluss", kreuze(SV.schulabschluss, text(d, "schulabschluss"), true)],
+      ["Berufsabschluss", kreuze(SV.ausbildung, text(d, "ausbildung"), true)],
       ["Weitere Beschäftigungen", ja(d, "weitere") ? text(d, "weitere_welche") || "ja" : leer ? "" : "keine"],
     ];
     // Geburtsname: ausgefüllt oder auf dem leeren Blatt als Zeile; Feldnummern laufen durch

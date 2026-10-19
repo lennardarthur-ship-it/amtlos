@@ -60,6 +60,8 @@ const DSE_REIHE: { id: string; immer?: boolean }[] = [
   { id: "widerspruchsrecht", immer: true },
   { id: "beschwerderecht", immer: true },
 ];
+/** Bausteine, die auf einer Einwilligung beruhen – zu ihnen gehört der Hinweis auf den Widerruf (Art. 7 Abs. 3 DSGVO). */
+const MIT_EINWILLIGUNG = ["cookies_einwilligung", "newsletter", "google_maps", "youtube", "google_fonts_extern"];
 const DSE_WAHL = DSE_REIHE.filter((x) => !x.immer && DSE[x.id]).map((x) => ({ wert: x.id, text: DSE[x.id]!.titel, quelle: DSE[x.id]!.quelle }));
 
 /** Rat an den Betreiber im Baustein „Google Fonts (extern)“ – gehört nicht in die veröffentlichte Erklärung (steht als Hilfe am Feld). */
@@ -121,6 +123,8 @@ export const datenschutzerklaerungWebsite: Vorlage = {
     ...(b.bundesland ? [] : ["Bundesland (Mein Betrieb) – für die zuständige Aufsichtsbehörde"]),
     ...(b.email.trim() ? [] : ["E-Mail (Mein Betrieb)"]),
     ...(auswahl(d, "module").includes("google_fonts_lokal") && auswahl(d, "module").includes("google_fonts_extern") ? ["Schriftarten: entweder lokal oder extern wählen"] : []),
+    // nur ein Hinweis – der Baustein wird nicht von selbst ergänzt
+    ...(auswahl(d, "module").some((m) => MIT_EINWILLIGUNG.includes(m)) && !auswahl(d, "module").includes("widerruf_einwilligung") ? ["Einwilligungen gewählt – Hinweis auf den Widerruf fehlt"] : []),
   ],
   alsText: (d, b) => ["Datenschutzerklärung", ...dseTeile(d, b).map((t) => `${t.titel}\n${alsKlartext(t.text)}`), text(d, "stand") ? `Stand: ${datumDe(text(d, "stand"))}` : ""].filter(Boolean).join("\n\n"),
   html(d, b) {
@@ -282,8 +286,9 @@ export const auftragsverarbeitung: Vorlage = {
       [
         "Gegenstand, Dauer, Art und Zweck der Verarbeitung",
         angaben([
-          ["Gegenstand und Art", text(d, "gegenstand")],
-          ["Zweck", text(d, "zweck")],
+          // leer: Gegenstand und Zweck mit zwei Linien zum Ausfüllen von Hand (Daten und Personen stehen in einer Zeile)
+          ["Gegenstand und Art", text(d, "gegenstand"), 2],
+          ["Zweck", text(d, "zweck"), 2],
           ["Dauer", text(d, "dauer")],
           ["Art der personenbezogenen Daten", reihe("datenarten")],
           ["Kategorien betroffener Personen", reihe("betroffene")],
@@ -309,6 +314,8 @@ export const auftragsverarbeitung: Vorlage = {
         // ohne Angabe: Linie zum Eintragen des Hauptvertrags statt den Satz wegzulassen
         `<p>Dieser Vertrag ergänzt den Vertrag ${text(d, "hauptvertrag") ? `„${esc(text(d, "hauptvertrag"))}“` : LINIE} (Hauptvertrag) und regelt die Verarbeitung personenbezogener Daten im Auftrag nach Art. 28 DSGVO.</p>` +
         teile.map(([t, inhalt]) => abschnitt(t, inhalt)).join("") +
+        // verweisen die TOM auf eine Anlage, wird sie vor den Unterschriften genannt
+        (/Anlage/i.test(text(d, "tom")) ? "<p>Anlage: Technische und organisatorische Maßnahmen des Auftragnehmers</p>" : "") +
         // der Ort gilt für die eigene Unterschrift (Betrieb = Auftraggeber bzw. Dienstleister je nach „Wer ist wer“)
         unterschriften([mitName("Auftraggeber", ag ? b.name : text(d, "partner")), mitName("Auftragnehmer", ag ? text(d, "partner") : b.name)], { ortDatum: true, orte: text(d, "rolle") === "dienstleister" ? ["", text(d, "ort_datum")] : [text(d, "ort_datum"), ""] }),
     });

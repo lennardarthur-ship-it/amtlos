@@ -71,7 +71,7 @@ describe("Dokumentvorlagen", () => {
       expect(leer).not.toContain(PRUEFHINWEIS);
       expect(leer).not.toContain("noch nicht angegeben");
       expect(leer).toContain('name="amtlos-fuss-links" content="Salon Sonne');
-      if (v.kundendokument) expect(leer, v.id).not.toMatch(/Rechtsgrundlage|Steuern und Buchhaltung/);
+      if (v.kundendokument || v.ohneKopfangaben) expect(leer, v.id).not.toMatch(/<dt>Rechtsgrundlage|<div class="art">[^<]/);
       else if (v.grundlage) expect(leer.replace(/&nbsp;/g, " "), v.id).toContain(`<dt>Rechtsgrundlage</dt><dd>${v.grundlage.replace(/&/g, "&amp;")}</dd>`);
       expect(leer).toContain("Salon Sonne");
       expect(leer.includes("A4 landscape"), v.id).toBe(Boolean(v.querformat));
@@ -399,8 +399,9 @@ describe("Dokumentvorlagen", () => {
     expect(html("handelsregister", {}, gmbh)).toContain(">Salon Sonne GmbH<");
     expect(html("transparenzregister", {}, gmbh)).toContain("Amtsgericht München, HRB 1");
     expect(bausteinText("nach {30} Tagen", { logfile_tage: "1" }, BETRIEB)).toBe("nach 1 Tag");
-    // Datenpanne: Benachrichtigung bleibt offen, bis sie bewertet ist
-    expect(html("datenpanne", leereDaten(vorlageFuer("datenpanne")!, BETRIEB, "2026-10-12"))).toMatch(/Benachrichtigung der Betroffenen<\/th><td>noch offen/);
+    // Datenpanne: Benachrichtigung bleibt offen, bis sie bewertet ist (leeres Blatt: Optionen zum Ankreuzen)
+    expect(html("datenpanne", { ...leereDaten(vorlageFuer("datenpanne")!, BETRIEB, "2026-10-12"), beschreibung: "E-Mail falsch versandt" })).toMatch(/Benachrichtigung der Betroffenen<\/th><td>noch offen/);
+    expect(html("datenpanne", leereDaten(vorlageFuer("datenpanne")!, BETRIEB, "2026-10-12"))).toMatch(/Benachrichtigung der Betroffenen<\/th><td><ul class="ankreuzen">/);
     expect(vorlageFuer("datenschutzinformation")!.pruefen!({ verarbeitungen: ["Gibt es nicht"] }, BETRIEB)).toContain("Verarbeitung „Gibt es nicht“ gibt es nicht mehr – bitte neu auswählen");
   });
 
@@ -538,8 +539,8 @@ describe("Dokumentvorlagen", () => {
     // Prüfprotokoll, Kassenbuch, Steuererklärung, Bilanz, EÜR, Hautschutzplan: Angaben zum Eintragen
     const pp = leer("pruefprotokoll_elektro");
     expect(pp).toContain(kopfLinie("Geprüft von"));
-    expect(pp).toMatch(/<th>Prüfgrundlage<\/th><td><span class="fuellen">/);
-    expect(pp).toMatch(/<th>Prüfgerät<\/th><td><span class="fuellen">/);
+    expect(pp).toMatch(/<th>Prüfgrundlage<\/th><td><span class="fuellen zeile">/);
+    expect(pp).toMatch(/<th>Prüfgerät<\/th><td><span class="fuellen zeile">/);
     expect(leer("kassenbuch")).toContain(kopfLinie("Zeitraum"));
     const se = leer("steuererklaerung");
     expect(se).toContain(kopfLinie("Jahr"));
@@ -563,7 +564,11 @@ describe("Dokumentvorlagen", () => {
     expect(pruefe("sv_meldedaten", { art: "ausbildung", personengruppe: "101" }).some((h) => h.includes("102"))).toBe(true);
     expect(pruefe("sv_meldedaten", { art: "ausbildung", personengruppe: "121" })).toHaveLength(0);
     const sv = leer("sv_meldedaten");
-    expect(sv).not.toContain("Vollzeit");
+    // leeres Blatt: keine Startauswahl vorgedruckt, Art und Abschlüsse zum Ankreuzen, Schlüssel trägt der Arbeitgeber ein
+    expect(sv).not.toContain('<td class="wert">Vollzeit');
+    expect(sv).toContain("<li>Vollzeit</li><li>Teilzeit</li>");
+    expect(sv).toContain("<li>4 – Abitur/Fachabitur</li>");
+    expect(sv).toContain("<th>Personengruppe (trägt der Arbeitgeber ein)</th>");
     expect(sv).not.toContain("101 –");
     expect(sv).toContain("Geburtsname (falls abweichend)");
     expect(sv).toMatch(/<td class="nr">11<\/td><th>Beginn<\/th>/);
@@ -585,11 +590,11 @@ describe("Dokumentvorlagen", () => {
     const uw = html("unterweisung", { thema: "Jährlich", datum: "2026-10-12", durchgefuehrt_von: "Alex", teilnehmer: [{ name: "Kim" }, { name: "Lou" }] });
     expect(uw).toMatch(/<tbody class="schluss"><tr><td>Lou<\/td>/);
     // Unterweisung und KI-Schulung: Dauer als Linie, Datum und Durchführende nicht doppelt
-    expect(uw).toMatch(/<th>Dauer<\/th><td><span class="fuellen">/);
+    expect(uw).toMatch(/<th>Dauer<\/th><td><span class="fuellen zeile">/);
     expect(uw).not.toContain("<th>Durchgeführt von</th>");
     expect(html("unterweisung", { thema: "Jährlich" })).toContain("<th>Durchgeführt von</th>");
     const ki = html("ki_kompetenz", { thema: "KI", datum: "2026-10-12", durchgefuehrt_von: "Alex" });
-    expect(ki).toMatch(/<th>Dauer<\/th><td><span class="fuellen">/);
+    expect(ki).toMatch(/<th>Dauer<\/th><td><span class="fuellen zeile">/);
     expect(ki).not.toContain("<th>Datum</th>");
     expect(html("ki_kompetenz", { thema: "KI", datum: "2026-10-12", durchgefuehrt_von: "Alex", dauer: "1 h" })).not.toContain("<th>Dauer</th>");
     // Impressum: keine Inhaltsübersicht, Stammkapital eigener Teil nach dem Registereintrag
@@ -628,5 +633,196 @@ describe("Dokumentvorlagen", () => {
     expect(pruefe("gewerbeanmeldung", { rechtsform: "GmbH" }, gmbh)).toHaveLength(0);
     // Handbuch: lange Textabschnitte dürfen umbrechen
     expect(dse).toContain("lang-im-handbuch");
+  });
+});
+
+describe("Vorlagen, vierte Durchsicht", () => {
+  const html = (id: string, d: Daten, b: Betrieb = BETRIEB) => n(dokumentHtml(vorlageFuer(id)!, d, b));
+  const leer = (id: string, b: Betrieb = BETRIEB) => html(id, leereDaten(vorlageFuer(id)!, b, "2026-10-12"), b);
+  const pruefe = (id: string, d: Daten, b: Betrieb = BETRIEB) => vorlageFuer(id)!.pruefen!(d, b);
+
+  it("Allergenliste: „keines der 14 Hauptallergene“ nur ausdrücklich bestätigt; Aushang ohne interne Kopfangaben", () => {
+    const a = vorlageFuer("allergene")!;
+    expect(a.abschnitte[1]!.felder[0]!.art === "liste" && a.abschnitte[1]!.felder[0]!.felder.map((f) => f.id)).toContain("keine");
+    const gerichte = [
+      { name: "Wasser", kategorie: "", allergene: [], keine: true },
+      { name: "Suppe", kategorie: "", allergene: [], keine: false },
+      { name: "Kuchen", kategorie: "", allergene: ["gluten"], keine: true },
+    ];
+    const h = html("allergene", { stand: "2026-10-12", legende: true, gerichte });
+    // nur das bestätigte Gericht trägt den Vermerk – nicht das vergessene, nicht das widersprüchliche
+    expect(h.match(/keines der 14 Hauptallergene<\/span>/g)).toHaveLength(1);
+    expect(h).toContain("<strong>Wasser</strong><br><span class=\"klein\">keines der 14 Hauptallergene</span>");
+    expect(h).toContain("<strong>Suppe</strong></td>");
+    expect(h).toContain("<strong>Kuchen</strong></td>");
+    const p = pruefe("allergene", { gerichte });
+    expect(p).toContain("Gericht „Suppe“: Allergene ankreuzen oder „enthält keines“ bestätigen");
+    expect(p.some((x) => x.startsWith("Gericht „Kuchen“:") && x.includes("bitte prüfen"))).toBe(true);
+    expect(p.some((x) => x.includes("Wasser"))).toBe(false);
+    expect(fehlendeAngaben(a, { gerichte }, BETRIEB)).toContain("Gericht „Suppe“: Allergene ankreuzen oder „enthält keines“ bestätigen");
+    // für Gäste: weder Bereich noch Rechtsgrundlage im Kopf, die Grundlage steht als Fußnote; Erläuterung bricht nicht um
+    expect(a.ohneKopfangaben).toBe(true);
+    expect(a.kundendokument).toBeFalsy(); // sonst sperrte die App das leere Blatt zum Ausfüllen
+    expect(h).not.toContain("<dt>Rechtsgrundlage</dt>");
+    expect(h).toContain('<div class="art"></div>');
+    expect(h).toContain('<p class="nachsatz">Art.&nbsp;44&nbsp;LMIV');
+    expect(h).toContain('<section class="abschnitt zusammen"><h2>Die 14 Hauptallergene');
+    expect(html("allergene", { legende: true, gerichte: [] })).toContain('<section class="abschnitt neue-seite zusammen">');
+  });
+
+  it("Gefahrstoffverzeichnis: Sicherheitsdatenblatt als Auswahl ohne Startwert; frühere Schalter bleiben lesbar", () => {
+    const v = vorlageFuer("gefahrstoffverzeichnis")!;
+    const liste = v.abschnitte[1]!.felder[0]!;
+    const sdb = liste.art === "liste" ? liste.felder.find((f) => f.id === "sdb") : undefined;
+    expect(sdb?.art).toBe("wahl");
+    expect(sdb && "vorbelegung" in sdb ? sdb.vorbelegung : undefined).toBeUndefined();
+    expect(sdb?.pflicht).toBe(true);
+    const stoff = { bezeichnung: "Blondierpulver", gefahren: "H272", menge: "bis 1 kg", arbeitsbereich: "Salon" };
+    const zelleSdb = (e: Record<string, unknown>) => html("gefahrstoffverzeichnis", { stoffe: [{ ...stoff, ...e } as Record<string, string>] }).match(/<td>([^<]*(?:<[^/][^>]*>[^<]*<\/[a-z]+>|<br>[^<]*|<span class="zelle-linie"><\/span>)*)<\/td><\/tr><\/tbody>/)?.[1];
+    // übersehen: Linie zum Eintragen statt fett „fehlt“
+    expect(zelleSdb({})).toBe('<span class="zelle-linie"></span>');
+    expect(zelleSdb({ sdb: "fehlt" })).toBe("<strong>fehlt – anfordern</strong>");
+    expect(zelleSdb({ sdb: "liegt_vor", sdb_stand: "2026-01-05" })).toBe("liegt vor<br>Stand 05.01.2026");
+    // gespeicherte Einträge von früher: true = liegt vor (samt Stand), false = offen (nicht von „übersehen“ zu unterscheiden)
+    expect(zelleSdb({ sdb_vorhanden: true, sdb_stand: "2026-01-05" })).toBe("liegt vor<br>Stand 05.01.2026");
+    expect(zelleSdb({ sdb_vorhanden: false })).toBe('<span class="zelle-linie"></span>');
+    // bei „fehlt“ ist der Stand verdeckt
+    expect(zelleSdb({ sdb: "fehlt", sdb_stand: "2026-01-05" })).toBe("<strong>fehlt – anfordern</strong>");
+    expect(fehlendeAngaben(v, { stand: "2026-10-12", stoffe: [stoff] })).toContain("Gefahrstoff: Sicherheitsdatenblatt");
+    // leeres Blatt: zehn hohe Zeilen
+    const l = leer("gefahrstoffverzeichnis");
+    expect(l).toContain('<table class="liste hoch">');
+    expect(l.match(/<tr><td>&nbsp;<\/td>/g)).toHaveLength(10);
+  });
+
+  it("Datenschutzerklärung: Einwilligungs-Bausteine ohne Hinweis auf den Widerruf – nur ein Hinweis, kein Text dazu", () => {
+    const hinweis = "Einwilligungen gewählt – Hinweis auf den Widerruf fehlt";
+    const b = { ...BETRIEB };
+    for (const m of ["cookies_einwilligung", "newsletter", "google_maps", "youtube", "google_fonts_extern"]) expect(pruefe("datenschutzerklaerung_website", { module: ["hosting", m] }, b), m).toContain(hinweis);
+    expect(pruefe("datenschutzerklaerung_website", { module: ["newsletter", "widerruf_einwilligung"] }, b)).not.toContain(hinweis);
+    expect(pruefe("datenschutzerklaerung_website", { module: ["hosting", "kontakt", "google_fonts_lokal"] }, b)).not.toContain(hinweis);
+    // die Startauswahl enthält den Widerruf; das Dokument fügt ihn nicht von selbst hinzu
+    expect(pruefe("datenschutzerklaerung_website", leereDaten(vorlageFuer("datenschutzerklaerung_website")!, b, "2026-10-12"), b)).not.toContain(hinweis);
+    expect(html("datenschutzerklaerung_website", { module: ["newsletter"] })).not.toContain("Widerruf Ihrer Einwilligung");
+  });
+
+  it("EÜR: Einnahmen und Ausgaben nach Zeilen der Anlage EÜR; leeres Blatt mit Linien in den Summen", () => {
+    const d = {
+      jahr: "2026",
+      einnahmen: [
+        { text: "Umsätze", kategorie: "Umsatzsteuerpflichtige Betriebseinnahmen", betrag: "1.000,00" },
+        { text: "USt", kategorie: "Vereinnahmte Umsatzsteuer sowie Umsatzsteuer auf unentgeltliche Wertabgaben", betrag: "190,00" },
+        { text: "Umsätze Nov", kategorie: "Umsatzsteuerpflichtige Betriebseinnahmen", betrag: "500,00" },
+      ],
+      ausgaben: [{ text: "Miete", kategorie: "Miete", betrag: "300,00" }],
+    };
+    const h = html("euer", d);
+    expect(h).toContain("Betriebseinnahmen nach Zeilen der Anlage EÜR");
+    expect(h).toMatch(/Umsatzsteuerpflichtige Betriebseinnahmen<\/th><td class="zahl">1\.500,00 €/);
+    // nur eine Zeile: keine Aufstellung (stünde sonst doppelt)
+    expect(h).not.toContain("Betriebsausgaben nach Zeilen der Anlage EÜR");
+    expect(html("euer", { ...d, einnahmen: d.einnahmen.slice(0, 1) })).not.toContain("Betriebseinnahmen nach Zeilen");
+    const l = leer("euer");
+    expect(l.match(/<tr class="summe">(?:(?!<\/tr>).)*zelle-linie/g)).toHaveLength(3);
+    expect(l).not.toContain("0,00 €");
+  });
+
+  it("Messprotokoll mit Grenzwert und Zeitraum, Unterschriften; Transparenzregister mit kurzen Bezeichnungen", () => {
+    const h = html("haccp", { zeitraum: "Oktober 2026", punkte: [{ punkt: "Kühlschrank", grenzwert: "+4 bis +7 °C", korrektur: "Ware prüfen" }], messungen: [{ datum: "2026-10-12", kontrollpunkt: " kühlschrank ", wert: "5 °C", in_ordnung: "ja" }, { datum: "2026-10-12", kontrollpunkt: "Fritteuse", wert: "170 °C", in_ordnung: "ja" }] });
+    expect(h).toContain("<h2>Messprotokoll · Oktober 2026</h2>");
+    expect(h).toContain("<th>Grenzwert</th><th>Messwert</th>");
+    // Zuordnung über den Namen, ohne Groß-/Kleinschreibung und Leerzeichen am Rand
+    expect(h).toContain("<td>kühlschrank</td><td>+4 bis +7&nbsp;°C</td><td>5&nbsp;°C</td>");
+    expect(h).toContain("<td>Fritteuse</td><td></td>");
+    expect(h).toContain("<span>Geprüft (Datum)</span>");
+    expect(h).toContain("<span>Verantwortliche/r</span>");
+    expect(html("haccp", {})).toContain("<h2>Messprotokoll</h2>");
+    const t = html("transparenzregister", { berechtigte: [{ name: "Kim", interesse_art: "beteiligung", interesse: "60" }, { name: "Sam", interesse_art: "stimmrechte", interesse: "40%" }, { name: "Alex", interesse_art: "fiktiv", interesse: "Geschäftsführung" }, { name: "Lou", interesse_art: "kontrolle_sonstige", interesse: "Treuhand" }] });
+    expect(t).toContain("Kapitalanteile: 60&nbsp;%");
+    expect(t).toContain("Stimmrechte: 40&nbsp;%");
+    expect(t).toContain("Fiktiv wirtschaftlich Berechtigte/r (gesetzliche Vertretung): Geschäftsführung");
+    expect(t).toContain("Kontrolle auf sonstige Weise: Treuhand");
+  });
+
+  it("weitere Blätter: Gewerbeanmeldung, Datenpanne, Betriebsanweisung, Steuererklärung, AVV, Datenschutzinformation, Aufbewahrung", () => {
+    // Gewerbeanmeldung: kein vorgedruckter Haupterwerb auf dem leeren Blatt; Register nur bei eingetragenen Rechtsformen
+    const mitRegister = { ...BETRIEB, registergericht: "Amtsgericht München", registernummer: "HRA 1" };
+    expect(leer("gewerbeanmeldung")).not.toContain("Haupterwerb</td>");
+    expect(html("gewerbeanmeldung", { taetigkeit: "Friseur", erwerb: "haupt" })).toContain('<td class="wert">Haupterwerb</td>');
+    expect(html("gewerbeanmeldung", { taetigkeit: "Friseur" }, mitRegister)).not.toContain("Registereintrag");
+    expect(html("gewerbeanmeldung", { taetigkeit: "Friseur", rechtsform: "e. K." }, mitRegister)).toContain("Amtsgericht München, HRA 1");
+    expect(html("gewerbeanmeldung", { taetigkeit: "Friseur", rechtsform: "GmbH" })).toMatch(/Registereintrag<\/th><td class="wert">&nbsp;/);
+    // Datenpanne: leeres Blatt zum Ankreuzen mit Unterschrift; „kein Risiko“: Begründung oben bei der Bewertung
+    const dl = leer("datenpanne");
+    expect(dl).toMatch(/Bewertung<\/th><td><ul class="ankreuzen"><li>voraussichtlich kein Risiko/);
+    expect(dl).toContain("gemeldet am <span class=\"fuellen mittel\"></span> · Aktenzeichen <span class=\"fuellen mittel\"></span>");
+    expect(dl).toMatch(/Bekannt geworden<\/th><td>12\.10\.2026, <span class="fuellen mittel"><\/span> Uhr/);
+    expect(dl).toContain("<span>Dokumentiert von</span>");
+    const kr = html("datenpanne", { entdeckt_am: "2026-10-12", beschreibung: "Brief falsch versandt", risiko: "kein_risiko", begruendung: "Nur Name, sofort zurückerhalten" });
+    expect(kr).toMatch(/Bewertung<\/th><td>[^<]*<\/td><\/tr><tr><th>Begründung, warum keine Meldung nötig ist<\/th><td>Nur Name, sofort zurückerhalten/);
+    expect(kr).not.toContain("<h2>Begründung");
+    // Betriebsanweisung ohne freigebende Person; leere Kästen mit drei bzw. fünf Linien
+    const ba = html("betriebsanweisung", {});
+    expect(ba).toContain("<span>Freigegeben von (Name)</span>");
+    expect(ba.match(/<p class="fuellen-block">((?:<span class="fuellen"><\/span>)+)<\/p>/g)!.map((x) => x.split('class="fuellen"').length - 1)).toEqual([3, 5, 3, 3, 3]);
+    // Steuererklärung: verschiedene Steuern summiert; leeres Blatt mit Ankreuzen und Tabellen
+    const se = html("steuererklaerung", { jahr: "2025", vorauszahlungen: [{ art: "Einkommensteuer Q1", betrag: "100" }, { art: "Gewerbesteuer Q1", betrag: "50" }] });
+    expect(se).toContain("Summe aller Vorauszahlungen (verschiedene Steuern)");
+    expect(html("steuererklaerung", { jahr: "2025", vorauszahlungen: [{ art: "Einkommensteuer Q1", betrag: "100" }, { art: "Einkommensteuer Q2", betrag: "50" }] })).not.toContain("verschiedene Steuern");
+    const sl = leer("steuererklaerung");
+    expect(sl).toContain("<li>Einkommensteuer</li><li>Gewerbesteuer</li>");
+    expect(sl).toContain("<th>Vorsteuer im Jahr</th>");
+    expect(sl).toContain("<h2>Geleistete Vorauszahlungen</h2>");
+    expect(sl).toContain("<th>Was</th><th class=\"zahl\">Betrag</th><th>Beleg</th>");
+    // AVV: Anlage vor den Unterschriften, wenn die TOM darauf verweisen
+    expect(html("avv", { tom: "siehe Anlage (TOM-Beschreibung des Auftragsverarbeiters)" })).toContain("<p>Anlage: Technische und organisatorische Maßnahmen des Auftragnehmers</p><div class=\"unterschriften");
+    expect(html("avv", { tom: "Verschlüsselung" })).not.toContain("Anlage:");
+    // Datenschutzinformation: Ergänzungen gleich nach den Zwecken
+    const di = html("datenschutzinformation", { fuer_wen: "Kunden", verarbeitungen: [], ergaenzung: "Videoüberwachung" });
+    expect(di).toContain("<li>Zwecke, Rechtsgrundlagen, Empfänger und Speicherdauer</li><li>Ergänzungen</li>");
+    // Aufbewahrung: Spaltenkopf und drei freie Zeilen auf dem leeren Blatt
+    const au = leer("aufbewahrung");
+    expect(au).toContain("<th>Jahr der letzten Eintragung bzw. des Belegs</th>");
+    expect(au.match(/<tr><td>&nbsp;<\/td>/g)).toHaveLength(3);
+  });
+
+  it("leere Angaben als Linie über die ganze Breite, mehrzeilige mit zwei Linien; Ankreuzen statt Startwerten", () => {
+    const g = leer("gefaehrdungsbeurteilung");
+    expect(g).toMatch(/<th>Tätigkeiten<\/th><td><span class="fuellen zeile"><\/span><span class="fuellen zeile"><\/span><\/td>/);
+    expect(g).toContain("<th>Beschäftigte</th>");
+    expect(g).toContain("<th>Mitgewirkt haben</th>");
+    expect(g).toMatch(/Wirksamkeit<\/th><td><ul class="ankreuzen"><li>Die Maßnahmen sind umgesetzt und wirksam\.<\/li>/);
+    expect(g.match(/<li>(Für schwangere|Eine Fortführung)/g)).toHaveLength(3);
+    // ausgefüllt: Zwischenüberschrift vor den Einzelheiten zum Mutterschutz
+    const gv = html("gefaehrdungsbeurteilung", { gefaehrdungen: [{ beschreibung: "Rutschgefahr", massnahme: "Matten" }], mutterschutz_ergebnis: "umgestaltung", mutterschutz_details: "keine Nachtarbeit" });
+    expect(gv).toContain("<h3>Gefährdungen und Schutzmaßnahmen</h3><p>keine Nachtarbeit</p>");
+    expect(html("gefaehrdungsbeurteilung", { gefaehrdungen: [{ beschreibung: "Rutschgefahr" }], mutterschutz_ergebnis: "keine_massnahmen", mutterschutz_details: "Stehen" })).toContain("<h3>Beurteilte Gefährdungen</h3>");
+    // Verzeichnis: drei leere Verarbeitungstätigkeiten
+    const vvt = leer("datenschutz_dokumentation");
+    expect(vvt.match(/<span class="nr">2\.\d<\/span>/g)).toEqual(['<span class="nr">2.1</span>', '<span class="nr">2.2</span>', '<span class="nr">2.3</span>']);
+    // Nachweis: Entgelt, Arbeitszeit und Urlaub als beschriftete Linien
+    const nw = leer("nachweis_arbeitsbedingungen");
+    for (const k of ["Weitere Bestandteile", "Fälligkeit", "Auszahlung", "Ruhepausen", "Ruhezeit", "Arbeitstage pro Kalenderjahr"]) expect(nw, k).toContain(`<th>${k}</th>`);
+    // Verfahrensdokumentation: Auswahlen zum Ankreuzen
+    expect(leer("verfahrensdokumentation")).toMatch(/<h3>Eingang der Belege<\/h3><ul class="ankreuzen">/);
+    // Rechnung: Zahlungsaufforderung mit Linie, Anschrift mit drei Linien
+    const re = leer("rechnung");
+    expect(re).toContain('Bitte überweisen Sie den Rechnungsbetrag bis zum <span class="fuellen mittel"></span> auf das Konto');
+    expect(re).toMatch(/<div class="empf">(<span class="fuellen"><\/span>){3}<\/div>/);
+    const ohneIban = leer("rechnung", { ...BETRIEB, iban: "" });
+    expect(ohneIban).toContain('Bitte überweisen Sie den Rechnungsbetrag bis zum <span class="fuellen mittel"></span>.</p>');
+    expect(ohneIban).not.toContain("Zahlbar innerhalb");
+    // Summenzeilen mit Linie: Arbeitszeitnachweis, Lohnkonto (dazu Jahr im Kopf), Bilanz; Kassenmeldung mit TSE in zwei Zeilen
+    expect(leer("arbeitszeitnachweis")).toMatch(/<tr class="summe">(?:(?!<\/tr>).)*zelle-linie/);
+    const lk = leer("lohnkonto");
+    expect(lk).toContain('<dt>Jahr</dt><dd><span class="fuellen"></span></dd>');
+    expect(lk.match(/<tr class="summe">(?:(?!<\/tr>).)*<\/tr>/)![0].split("zelle-linie").length - 1).toBe(9);
+    const bi = leer("bilanz_guv");
+    expect(bi).toContain("Gewinn- und Verlustrechnung und Bilanz");
+    expect(bi.match(/<table class="liste hoch doppelt">.*?<\/table>/gs)!.map((t) => t.match(/<tr><td>&nbsp;/g)!.length)).toEqual([12, 12]);
+    expect(bi.match(/<table class="liste hoch">.*?<\/table>/gs)!.map((t) => t.match(/<tr><td>&nbsp;/g)!.length)).toEqual([8, 8]);
+    const km = leer("kassenmeldung");
+    expect(km).toContain("<th>TSE – Art</th>");
+    expect(km).toContain("<th>TSE – Seriennummer</th>");
   });
 });

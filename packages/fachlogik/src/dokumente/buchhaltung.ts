@@ -8,7 +8,7 @@ import { KU_HINWEIS, fehlendFuerERechnung, rundeCent, summen, type Position, typ
 import { einheitCode } from "../erechnung.js";
 import { giroCodeSvg } from "../girocode.js";
 import { AUFBEWAHRUNG, EINHEITEN, EUER_AUSGABEN, EUER_EINNAHMEN, KASSEN_ARTEN, RECHNUNGS_HINWEISE, TSE_ARTEN } from "./bausteine.js";
-import { KOPF_LINIE, ZELLE_LINIE, abschnitt, absatz, anschrift, auswahl, brief, cent, datumDe, dokument, esc, euro, felder, ibanText, kennzahlen, nachsatz, uebertragung, ja, liste, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
+import { KOPF_LINIE, LINIE_MITTEL, ZELLE_LINIE, abschnitt, absatz, ankreuzen, anschrift, auswahl, brief, cent, datumDe, dokument, esc, euro, felder, ibanText, kennzahlen, nachsatz, uebertragung, ja, liste, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
 import type { Betrieb, Daten, Eintrag, Option, Vorlage } from "./typen.js";
 
 /** ISO-Datum plus Tage als TT.MM.JJJJ. */
@@ -282,7 +282,8 @@ export const rechnung: Vorlage = {
       // „Gutschrift“ steht schon als Titel im Betreff
       ...auswahl(d, "hinweise").filter((w) => !(w === "gutschrift" && !storno)).map((w) => (w === "grundstueck" ? GRUNDSTUECK_HINWEIS : (RECHNUNGS_HINWEISE.find((h) => h.wert === w)?.text ?? ""))),
       befreiungText(d),
-      text(d, "zahlungsziel") && !storno && !gutschrift && !b.iban.trim() ? `Zahlbar ${ZIEL[text(d, "zahlungsziel")]}${text(d, "zahlungsziel") !== "sofort" && text(d, "datum") ? ` (bis ${plusTage(text(d, "datum"), Number(text(d, "zahlungsziel")))})` : ""}.` : "",
+      // leere Vorlage: statt „Zahlbar …“ die Zahlungsaufforderung mit Linie für das Datum (unten)
+      text(d, "zahlungsziel") && !storno && !gutschrift && !b.iban.trim() && !leer ? `Zahlbar ${ZIEL[text(d, "zahlungsziel")]}${text(d, "zahlungsziel") !== "sofort" && text(d, "datum") ? ` (bis ${plusTage(text(d, "datum"), Number(text(d, "zahlungsziel")))})` : ""}.` : "",
       // Stornorechnung: der Hinweis zur Zahlung aus der ursprünglichen Rechnung passt nicht mehr
       ...text(d, "hinweis").split("\n").filter((h) => !(text(d, "storno_zu") && h.trim() === ZAHLUNGS_HINWEIS)),
     ].filter((x) => x.trim());
@@ -295,7 +296,10 @@ export const rechnung: Vorlage = {
     const zahlung =
       !storno && !gutschrift && iban && s.brutto_cent > 0
         ? `<div class="zahlung">${qr ? `<div class="qr">${qr}<small>GiroCode – mit der Banking-App scannen</small></div>` : ""}<div class="text"><p>Bitte überweisen Sie <strong>${euro(s.brutto_cent)}</strong>${faellig ? ` bis zum <strong>${esc(faellig)}</strong>` : ziel === "sofort" ? " sofort ohne Abzug" : ""} auf das Konto</p><p><strong>IBAN ${esc(ibanText(iban))}</strong>${b.bic?.trim() ? `<br>BIC ${esc(b.bic.trim())}` : ""}${b.bank?.trim() ? `<br>${esc(b.bank.trim())}` : ""}<br>Verwendungszweck: Rechnung ${esc(text(d, "nummer"))}</p></div></div>`
-        : "";
+        : // leere Vorlage: Zahlungsaufforderung mit Linie für das Datum, mit Bankverbindung nur, wenn eine IBAN hinterlegt ist
+          leer && !storno && !gutschrift
+          ? `<div class="zahlung"><div class="text"><p>Bitte überweisen Sie den Rechnungsbetrag bis zum ${LINIE_MITTEL}${iban ? " auf das Konto" : "."}</p>${iban ? `<p><strong>IBAN ${esc(ibanText(iban))}</strong>${b.bic?.trim() ? `<br>BIC ${esc(b.bic.trim())}` : ""}${b.bank?.trim() ? `<br>${esc(b.bank.trim())}` : ""}<br>Verwendungszweck: Rechnung ${text(d, "nummer") ? esc(text(d, "nummer")) : LINIE_MITTEL}</p>` : ""}</div></div>`
+          : "";
     const anrede = text(d, "kunde_name") ? (storno ? `wir stornieren hiermit die unten genannte Rechnung und stellen den Betrag wie folgt gut.` : gutschrift ? `wir rechnen über die folgenden Leistungen ab und schreiben Ihnen den Betrag gut:` : `wir bedanken uns für Ihren Auftrag und stellen Ihnen folgende Leistungen in Rechnung:`) : "";
     const titel = `${storno ? "Stornorechnung" : gutschrift ? "Gutschrift" : "Rechnung"} ${text(d, "nummer")}`.trim();
     return brief({
@@ -390,7 +394,11 @@ export const euer: Vorlage = {
     const e = summe(ein, "betrag");
     const a = summe(aus, "betrag");
     const f = summe(afa, "betrag");
-    const kategorien = [...new Set(aus.map((x) => text(x, "kategorie") || "ohne Kategorie"))];
+    const kategorie = (x: Eintrag) => text(x, "kategorie") || "ohne Kategorie";
+    const kategorien = [...new Set(aus.map(kategorie))];
+    const kategorienEin = [...new Set(ein.map(kategorie))];
+    // Summen je Zeile der Anlage EÜR (nur bei mehr als einer Zeile – sonst stünde dieselbe Summe zweimal da)
+    const nachZeilen = (titel: string, l: Eintrag[], k: string[]) => (k.length > 1 ? abschnitt(titel, kennzahlen(k.map((z) => ({ text: z, betrag: euro(summe(l.filter((x) => kategorie(x) === z), "betrag")) })))) : "");
     const z = (l: Eintrag[]) => l.map((x) => [datumDe(text(x, "datum")), zelle(text(x, "text")), zelle(text(x, "kategorie")), euro(cent(text(x, "betrag")) ?? 0)]);
     const ergebnis = e - a - f;
     // Vorlage zum Ausfüllen (nichts erfasst): Beträge leer statt „0,00 €“, Tabellen mit Zeilen zum Eintragen
@@ -398,8 +406,8 @@ export const euer: Vorlage = {
     const betrag = (c: number) => (leer ? "&nbsp;" : euro(c));
     const kopfZeile = ["Datum", "Bezeichnung", "Zeile der Anlage EÜR", "Betrag"];
     const breiten = ["14%", "42%", "26%", "18%"];
-    // leere Tabelle: Summenzeile zum Eintragen
-    const summeLeer = ["<strong>Summe</strong>", "", "", "&nbsp;"];
+    // leere Tabelle: Summenzeile mit Linie zum Eintragen
+    const summeLeer = ["<strong>Summe</strong>", "", "", ZELLE_LINIE];
     return dokument({
       titel: "Einnahmen-Überschuss-Rechnung",
       betrieb: b,
@@ -415,15 +423,20 @@ export const euer: Vorlage = {
             { text: leer ? "Gewinn bzw. Verlust" : ergebnis >= 0 ? "Gewinn" : "Verlust", hinweis: "Betriebseinnahmen abzüglich Betriebsausgaben und AfA", betrag: betrag(Math.abs(ergebnis)), fett: true },
           ]),
         ) +
-        (kategorien.length > 1 ? abschnitt("Betriebsausgaben nach Zeilen der Anlage EÜR", kennzahlen(kategorien.map((k) => ({ text: k, betrag: euro(summe(aus.filter((x) => (text(x, "kategorie") || "ohne Kategorie") === k), "betrag")) })))) : "") +
-        abschnitt("Betriebseinnahmen", ein.length ? tabelle(kopfZeile, z(ein), { breiten, zahlen: [3], summe: ["<strong>Summe</strong>", "", "", `<strong>${euro(e)}</strong>`] }) : leer ? tabelle(kopfZeile, [], { breiten, zahlen: [3], mindestens: 8, hoch: true, summe: summeLeer }) : absatz("", "Keine Einnahmen erfasst.")) +
-        abschnitt("Betriebsausgaben", aus.length ? tabelle(kopfZeile, z(aus), { breiten, zahlen: [3], summe: ["<strong>Summe</strong>", "", "", `<strong>${euro(a)}</strong>`] }) : leer ? tabelle(kopfZeile, [], { breiten, zahlen: [3], mindestens: 8, hoch: true, summe: summeLeer }) : absatz("", "Keine Ausgaben erfasst.")) +
-        (leer ? abschnitt("Absetzungen für Abnutzung", tabelle(["Wirtschaftsgut", "Betrag dieses Jahr"], [], { breiten: ["75%", "25%"], zahlen: [1], mindestens: 3, hoch: true, summe: ["<strong>Summe</strong>", "&nbsp;"] })) : "") +
+        nachZeilen("Betriebseinnahmen nach Zeilen der Anlage EÜR", ein, kategorienEin) +
+        nachZeilen("Betriebsausgaben nach Zeilen der Anlage EÜR", aus, kategorien) +
+        abschnitt("Betriebseinnahmen", ein.length ? tabelle(kopfZeile, z(ein), { breiten, zahlen: [3], summe: ["<strong>Summe</strong>", "", "", `<strong>${euro(e)}</strong>`] }) : leer ? tabelle(kopfZeile, [], { breiten, zahlen: [3], mindestens: EUER_LEER_EINNAHMEN, hoch: true, summe: summeLeer }) : absatz("", "Keine Einnahmen erfasst.")) +
+        abschnitt("Betriebsausgaben", aus.length ? tabelle(kopfZeile, z(aus), { breiten, zahlen: [3], summe: ["<strong>Summe</strong>", "", "", `<strong>${euro(a)}</strong>`] }) : leer ? tabelle(kopfZeile, [], { breiten, zahlen: [3], mindestens: EUER_LEER_AUSGABEN, hoch: true, summe: summeLeer }) : absatz("", "Keine Ausgaben erfasst.")) +
+        (leer ? abschnitt("Absetzungen für Abnutzung", tabelle(["Wirtschaftsgut", "Betrag dieses Jahr"], [], { breiten: ["75%", "25%"], zahlen: [1], mindestens: 3, hoch: true, summe: ["<strong>Summe</strong>", ZELLE_LINIE] })) : "") +
         (afa.length ? abschnitt("Absetzungen für Abnutzung", tabelle(["Wirtschaftsgut", "Betrag dieses Jahr"], afa.map((x) => [zelle(text(x, "text")), euro(cent(text(x, "betrag")) ?? 0)]), { breiten: ["75%", "25%"], zahlen: [1], summe: ["<strong>Summe</strong>", `<strong>${euro(f)}</strong>`] })) : "") +
         uebertragung(["Anlage EÜR übermittelt am", "Transferticket (ELSTER)"]),
     });
   },
 };
+
+/** Leere EÜR: Zeilen zum Eintragen – so viele, dass auch Seite 2 (Ausgaben, AfA) gefüllt ist. */
+const EUER_LEER_EINNAHMEN = 8;
+const EUER_LEER_AUSGABEN = 24;
 
 // ---------------------------------------------------------------- Bilanz und GuV
 
@@ -466,8 +479,9 @@ export const bilanzGuv: Vorlage = {
     const t = (k: string) => {
       const x = l(k);
       const bilanz = k === "aktiva" || k === "passiva";
-      // leer (Vorlage zum Ausfüllen): mindestens 5 hohe Leerzeilen, Summenzeile zum Eintragen statt „0,00 €“
-      if (!x.length) return tabelle(["Posten", "Betrag"], [], { breiten: ["72%", "28%"], zahlen: [1], mindestens: Math.max(5, bilanz ? bilanzZeilen : 0), hoch: true, summe: ["<strong>Summe</strong>", "&nbsp;"], ...(bilanz ? { klasse: "doppelt" } : {}) });
+      // leer (Vorlage zum Ausfüllen): hohe Leerzeilen (GuV je 8, Aktiva und Passiva je 12 – bzw. so viele wie die andere
+      // Seite der Bilanz), Summenzeile mit Linie zum Eintragen statt „0,00 €“
+      if (!x.length) return tabelle(["Posten", "Betrag"], [], { breiten: ["72%", "28%"], zahlen: [1], mindestens: bilanz ? bilanzZeilen || 12 : 8, hoch: true, summe: ["<strong>Summe</strong>", ZELLE_LINIE], ...(bilanz ? { klasse: "doppelt" } : {}) });
       return tabelle(["Posten", "Betrag"], x.map((e) => [zelle(text(e, "posten")), euro(cent(text(e, "betrag")) ?? 0)]), { breiten: ["72%", "28%"], zahlen: [1], summe: ["<strong>Summe</strong>", `<strong>${euro(summe(x, "betrag"))}</strong>`], ...(bilanz ? { mindestens: bilanzZeilen, klasse: "doppelt" } : {}) });
     };
     const j = summe(l("ertraege"), "betrag") - summe(l("aufwendungen"), "betrag");
@@ -478,7 +492,8 @@ export const bilanzGuv: Vorlage = {
     return dokument({
       titel: "Jahresabschluss",
       betrieb: b,
-      unter: text(d, "stichtag") ? `Bilanz und Gewinn- und Verlustrechnung zum ${datumDe(text(d, "stichtag"))}` : "Bilanz und Gewinn- und Verlustrechnung",
+      // in der Reihenfolge der Abschnitte: erst die GuV, dann die Bilanz
+      unter: text(d, "stichtag") ? `Gewinn- und Verlustrechnung und Bilanz zum ${datumDe(text(d, "stichtag"))}` : "Gewinn- und Verlustrechnung und Bilanz",
       meta: [b.steuernummer.trim() ? `Steuernummer: ${b.steuernummer.trim()}` : "", `Bilanzstichtag: ${datumDe(text(d, "stichtag")) || KOPF_LINIE}`].filter(Boolean).join("\n"),
       inhalt:
         abschnitt("Gewinn- und Verlustrechnung", `<h3>Erträge</h3>${t("ertraege")}<h3>Aufwendungen</h3>${t("aufwendungen")}${kennzahlen([{ text: guvLeer ? "Jahresüberschuss bzw. Jahresfehlbetrag" : j >= 0 ? "Jahresüberschuss" : "Jahresfehlbetrag", betrag: guvLeer ? "&nbsp;" : euro(Math.abs(j)), fett: true }])}`) +
@@ -642,8 +657,11 @@ export const steuererklaerung: Vorlage = {
     const arten = auswahl(d, "arten").map((a) => ERKLAERUNGEN.find((x) => x.wert === a)?.text ?? a);
     const vz = liste(d, "vorauszahlungen").filter((x) => text(x, "art"));
     const we = liste(d, "weiteres").filter((x) => text(x, "was"));
-    // Blatt zum Ausfüllen (keine Zahlen eingegeben): auch die Umsatzzeile zum Eintragen
+    // Blatt zum Ausfüllen (keine Zahlen eingegeben): Erklärungen zum Ankreuzen, alle Zeilen und Tabellen zum Eintragen
     const leer = !["gewinn", "umsatz", "ust_jahr", "vorsteuer_jahr"].some((k) => text(d, k)) && !vz.length && !we.length;
+    // Steuerart einer Vorauszahlung: das erste Wort („Einkommensteuer Q1“ → „einkommensteuer“)
+    const steuerart = (t: string) => t.trim().split(/\s+/)[0]!.toLocaleLowerCase("de");
+    const verschiedene = new Set(vz.map((x) => steuerart(text(x, "art")))).size > 1;
     return dokument({
       titel: "Unterlagen zur Steuererklärung",
       betrieb: b,
@@ -652,15 +670,25 @@ export const steuererklaerung: Vorlage = {
       inhalt:
         abschnitt(
           "Kennzahlen",
+          // leeres Blatt: die Erklärungen zum Ankreuzen (ohne eigenen Abschnitt, damit alles auf eine Seite passt)
+          (leer && !arten.length ? `<p class="klein">Erklärungen:</p>${ankreuzen(ERKLAERUNGEN.map((x) => x.text), { nebeneinander: true })}` : "") +
           kennzahlen([
             { text: "Gewinn oder Verlust", hinweis: "aus EÜR bzw. Bilanz", betrag: text(d, "gewinn") ? euro(cent(text(d, "gewinn")) ?? 0) : "&nbsp;" },
             ...(text(d, "umsatz") || leer ? [{ text: "Umsätze im Jahr (netto)", betrag: text(d, "umsatz") ? euro(cent(text(d, "umsatz")) ?? 0) : "&nbsp;" }] : []),
-            ...(text(d, "ust_jahr") ? [{ text: "Umsatzsteuer im Jahr", betrag: euro(cent(text(d, "ust_jahr")) ?? 0) }] : []),
-            ...(text(d, "vorsteuer_jahr") ? [{ text: "Vorsteuer im Jahr", betrag: euro(cent(text(d, "vorsteuer_jahr")) ?? 0) }] : []),
+            ...(text(d, "ust_jahr") || leer ? [{ text: "Umsatzsteuer im Jahr", betrag: text(d, "ust_jahr") ? euro(cent(text(d, "ust_jahr")) ?? 0) : "&nbsp;" }] : []),
+            ...(text(d, "vorsteuer_jahr") || leer ? [{ text: "Vorsteuer im Jahr", betrag: text(d, "vorsteuer_jahr") ? euro(cent(text(d, "vorsteuer_jahr")) ?? 0) : "&nbsp;" }] : []),
           ]),
         ) +
-        (vz.length ? abschnitt("Geleistete Vorauszahlungen", tabelle(["Steuer", "Betrag"], vz.map((x) => [zelle(text(x, "art")), euro(cent(text(x, "betrag")) ?? 0)]), { breiten: ["70%", "30%"], zahlen: [1], summe: ["<strong>Summe</strong>", `<strong>${euro(summe(vz, "betrag"))}</strong>`] })) : "") +
-        (we.length ? abschnitt("Weitere Angaben und Belege", tabelle(["Was", "Betrag", "Beleg"], we.map((x) => [zelle(text(x, "was")), text(x, "betrag") ? euro(cent(text(x, "betrag")) ?? 0) : "", ja(x, "beleg") ? "liegt vor" : "<strong>fehlt</strong>"]), { breiten: ["55%", "25%", "20%"], zahlen: [1] })) : "") +
+        (vz.length
+          ? abschnitt("Geleistete Vorauszahlungen", tabelle(["Steuer", "Betrag"], vz.map((x) => [zelle(text(x, "art")), euro(cent(text(x, "betrag")) ?? 0)]), { breiten: ["70%", "30%"], zahlen: [1], summe: [verschiedene ? "<strong>Summe aller Vorauszahlungen (verschiedene Steuern)</strong>" : "<strong>Summe</strong>", `<strong>${euro(summe(vz, "betrag"))}</strong>`] }))
+          : leer
+            ? abschnitt("Geleistete Vorauszahlungen", tabelle(["Steuer", "Betrag"], [], { breiten: ["70%", "30%"], zahlen: [1], mindestens: 4, hoch: true }))
+            : "") +
+        (we.length
+          ? abschnitt("Weitere Angaben und Belege", tabelle(["Was", "Betrag", "Beleg"], we.map((x) => [zelle(text(x, "was")), text(x, "betrag") ? euro(cent(text(x, "betrag")) ?? 0) : "", ja(x, "beleg") ? "liegt vor" : "<strong>fehlt</strong>"]), { breiten: ["55%", "25%", "20%"], zahlen: [1] }))
+          : leer
+            ? abschnitt("Weitere Angaben und Belege", tabelle(["Was", "Betrag", "Beleg"], [], { breiten: ["55%", "25%", "20%"], zahlen: [1], mindestens: 5, hoch: true }))
+            : "") +
         (text(d, "notiz") ? abschnitt("Notizen", absatz(text(d, "notiz"))) : "") +
         uebertragung(["Übermittelt am", "Transferticket (ELSTER)", "Bescheid vom"]),
     });
@@ -742,13 +770,16 @@ export const kassenbuch: Vorlage = {
         tabelle(
           ["Datum", "Beleg", "Vorgang", "Einnahme", "Ausgabe", "Bestand"],
           [["", "", "<strong>Anfangsbestand</strong>", "", "", text(d, "anfang") ? `<strong>${euro(anfang)}</strong>` : ""], ...k.zeilen.map((z) => [datumDe(text(z.x, "datum")), zelle(text(z.x, "beleg")), zelle(text(z.x, "text")), z.ein ? euro(z.ein) : "", z.aus ? euro(z.aus) : "", z.bestand < 0 ? `<strong>${euro(z.bestand)}</strong>` : euro(z.bestand)])],
-          { breiten: ["11%", "10%", "39%", "13%", "13%", "14%"], zahlen: [3, 4, 5], ...(leer ? { mindestens: 20, hoch: true } : {}), summe: ["", "", `Summen und Endbestand ${esc(text(d, "zeitraum"))}`, ...(leer ? ["", "", ""] : [euro(k.zeilen.reduce((a, z) => a + z.ein, 0)), euro(k.zeilen.reduce((a, z) => a + z.aus, 0)), euro(k.ende)])] },
+          { breiten: ["11%", "10%", "39%", "13%", "13%", "14%"], zahlen: [3, 4, 5], ...(leer ? { mindestens: KASSENBUCH_LEER, hoch: true } : {}), summe: ["", "", `Summen und Endbestand ${esc(text(d, "zeitraum"))}`, ...(leer ? [ZELLE_LINIE, ZELLE_LINIE, ZELLE_LINIE] : [euro(k.zeilen.reduce((a, z) => a + z.ein, 0)), euro(k.zeilen.reduce((a, z) => a + z.aus, 0)), euro(k.ende)])] },
         ) +
         (k.negativ ? `<p><strong>Der Bestand war zwischendurch negativ – bitte prüfen.</strong></p>` : "") +
         unterschriften(["Geprüft am", "Unterschrift"]),
     });
   },
 };
+
+/** Leeres Kassenbuch: Zeilen (samt Anfangsbestand) für zwei volle Querformatseiten – Seite 2 endet mit Summe und Unterschriften. */
+const KASSENBUCH_LEER = 29;
 
 // ---------------------------------------------------------------- Kassenmeldung
 
@@ -810,7 +841,9 @@ export const kassenmeldung: Vorlage = {
             ["Außer Betrieb genommen", text(x, "ausser_betrieb") ? `${datumDe(text(x, "ausser_betrieb"))}${text(x, "grund") ? `, ${text(x, "grund")}` : ""}` : null],
           ],
         }))
-      : [{ titel: "Aufzeichnungssystem 1", zeilen: ["Art", "Hersteller / Modell", "Seriennummer", "Software", "Angeschafft am", "TSE", "Zertifizierungs-ID", "Außer Betrieb genommen"].map((t): [string, string] => [t, ""]) }];
+      : // leeres Blatt: ein Aufzeichnungssystem zum Ausfüllen von Hand (ein zweiter Block passt nicht mehr auf die Seite),
+        // die TSE mit Art und Seriennummer in eigenen Zeilen
+        [1].map((i) => ({ titel: `Aufzeichnungssystem ${i}`, zeilen: ["Art", "Hersteller / Modell", "Seriennummer", "Software", "Angeschafft am", "TSE – Art", "TSE – Seriennummer", "Zertifizierungs-ID", "Außer Betrieb genommen"].map((t): [string, string] => [t, ""]) }));
     // Feldnummern laufen durch – gezählt werden nur die tatsächlich gedruckten Zeilen (Betriebsstätte: 01–03)
     let nr = 4;
     return dokument({
@@ -885,11 +918,13 @@ export const aufbewahrung: Vorlage = {
   },
   html(d, b) {
     const l = liste(d, "eintraege").filter((x) => text(x, "art"));
+    // Blatt zum Ausfüllen (noch kein Jahr und kein Ort eingetragen): drei leere Zeilen für weitere Unterlagen
+    const leer = !l.some((x) => text(x, "letzte") || text(x, "ort"));
     return dokument({
       titel: "Aufbewahrungsplan",
       betrieb: b,
       inhalt:
-        tabelle(["Unterlagen", "Frist", "Fristbeginn (Jahr)", "Aufbewahren mindestens bis", "Wo"], l.map((x) => [zelle(text(x, "art")), text(x, "jahre") ? `${esc(text(x, "jahre"))} ${zahl(text(x, "jahre")) === 1 ? "Jahr" : "Jahre"}` : ZELLE_LINIE, text(x, "letzte") ? zelle(text(x, "letzte")) : ZELLE_LINIE, aufbewahrenBis(text(x, "letzte"), text(x, "jahre")) ?? ZELLE_LINIE, text(x, "ort") ? zelle(text(x, "ort")) : ZELLE_LINIE]), { breiten: ["46%", "10%", "13%", "14%", "17%"] }) +
+        tabelle(["Unterlagen", "Frist", "Jahr der letzten Eintragung bzw. des Belegs", "Aufbewahren mindestens bis", "Wo"], l.map((x) => [zelle(text(x, "art")), text(x, "jahre") ? `${esc(text(x, "jahre"))} ${zahl(text(x, "jahre")) === 1 ? "Jahr" : "Jahre"}` : ZELLE_LINIE, text(x, "letzte") ? zelle(text(x, "letzte")) : ZELLE_LINIE, aufbewahrenBis(text(x, "letzte"), text(x, "jahre")) ?? ZELLE_LINIE, text(x, "ort") ? zelle(text(x, "ort")) : ZELLE_LINIE]), { breiten: ["42%", "10%", "17%", "14%", "17%"], leerzeilen: leer ? 3 : 0 }) +
         nachsatz("Die Frist beginnt mit dem Schluss des Kalenderjahres, in dem die letzte Eintragung gemacht, das Inventar aufgestellt, der Jahresabschluss festgestellt, der Brief empfangen oder abgesandt oder der Buchungsbeleg entstanden ist (§ 147 Abs. 4 AO). Sie läuft nicht ab, solange die Unterlagen für Steuern von Bedeutung sind, deren Festsetzungsfrist noch nicht abgelaufen ist (§ 147 Abs. 3 AO)."),
     });
   },

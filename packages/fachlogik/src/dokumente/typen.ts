@@ -158,6 +158,12 @@ export interface Vorlage {
   fortlaufend?: string;
   /** geht an Kunden (Rechnung): ohne Rechtsgrundlage und Bereich im Kopf – das ist für die eigenen Unterlagen */
   kundendokument?: boolean;
+  /**
+   * Aushang für Gäste bzw. Kundschaft (Allergenliste): ohne Rechtsgrundlage und Bereich im Kopf wie ein Kundendokument,
+   * aber ohne dessen Folgen in der App (Teilen erst bei vollständigen Pflichtangaben, Hinweis auf fehlenden Absender) –
+   * das leere Blatt zum Ausfüllen von Hand bleibt so druckbar.
+   */
+  ohneKopfangaben?: boolean;
   /** wird beim ersten Teilen oder Drucken festgeschrieben (GoBD): danach nicht mehr änderbar oder löschbar (E-127) */
   festschreiben?: boolean;
   /** Umsätze lassen sich aus festgeschriebenen Rechnungen übernehmen (Umsatzsteuer-Voranmeldung, E-128) */

@@ -76,6 +76,8 @@ export const allergenAushang: Vorlage = {
   bereich: "gastro",
   pflichten: ["branche.gastro_allergene"],
   grundlage: "Art. 9, 44 LMIV; § 4 LMIDV",
+  // Aushang für Gäste: ohne interne Bereichsangabe und Rechtsgrundlage im Kopf (die steht als Fußnote am Ende)
+  ohneKopfangaben: true,
   abschnitte: [
     { titel: "Stand", felder: [{ id: "stand", art: "datum", label: "Stand", vorbelegung: "heute" }, { id: "legende", art: "schalter", label: "Erläuterung der 14 Allergene anfügen", vorbelegung: true }] },
     {
@@ -92,11 +94,24 @@ export const allergenAushang: Vorlage = {
             { id: "name", art: "text", label: "Name", pflicht: true },
             { id: "kategorie", art: "text", label: "Kategorie", vorschlaege: ["Frühstück", "Vorspeisen", "Hauptgerichte", "Desserts", "Kuchen und Torten", "Snacks", "Heißgetränke", "Kaltgetränke"] },
             { id: "allergene", art: "mehrfach", label: "Enthält", optionen: optionen(ALLERGENE) },
+            // ausdrückliche Bestätigung: ohne sie steht kein „keines der 14 Hauptallergene“ auf dem Aushang
+            { id: "keine", art: "schalter", label: "Enthält keines der 14 Hauptallergene" },
           ],
         },
       ],
     },
   ],
+  pruefen(d) {
+    // Ohne Kreuz ist nicht gesagt, dass ein Gericht allergenfrei ist – vergessen und „enthält keines“ sehen sonst gleich aus
+    return liste(d, "gerichte")
+      .filter((x) => text(x, "name"))
+      .flatMap((x) => {
+        const a = auswahl(x, "allergene").length > 0;
+        if (!a && !ja(x, "keine")) return [`Gericht „${text(x, "name")}“: Allergene ankreuzen oder „enthält keines“ bestätigen`];
+        if (a && ja(x, "keine")) return [`Gericht „${text(x, "name")}“: „enthält keines der 14 Hauptallergene“ bestätigt, aber Allergene angekreuzt – bitte prüfen.`];
+        return [];
+      });
+  },
   html(d, b) {
     const g = liste(d, "gerichte").filter((x) => text(x, "name"));
     const kategorien = [...new Set(g.map((x) => text(x, "kategorie")))];
@@ -108,7 +123,9 @@ export const allergenAushang: Vorlage = {
       .map((k) => {
         const zeilen = g.filter((x) => text(x, "kategorie") === k).map((x) => {
           const a = auswahl(x, "allergene");
-          return `<tr><td><strong>${zelle(text(x, "name"))}</strong>${a.length ? "" : '<br><span class="klein">keines der 14 Hauptallergene</span>'}</td>${nummern.map((id) => `<td class="x">${a.includes(id) ? "×" : ""}</td>`).join("")}</tr>`;
+          // „keines“ nur ausdrücklich bestätigt und ohne angekreuztes Allergen; sonst (nicht ausgefüllt, Widerspruch) kein Vermerk
+          const keine = ja(x, "keine") && !a.length;
+          return `<tr><td><strong>${zelle(text(x, "name"))}</strong>${keine ? '<br><span class="klein">keines der 14 Hauptallergene</span>' : ""}</td>${nummern.map((id) => `<td class="x">${a.includes(id) ? "×" : ""}</td>`).join("")}</tr>`;
         });
         return `<tbody${k ? ' class="gruppe-block"' : ""}>${k ? `<tr class="gruppe"><td colspan="${nummern.length + 1}"><strong>${zelle(k)}</strong></td></tr>` : ""}${zeilen.join("")}</tbody>`;
       })
@@ -116,15 +133,17 @@ export const allergenAushang: Vorlage = {
     // ohne Gerichte: Matrix mit leeren Zeilen zum Ausfüllen von Hand
     const leereZeilen = `<tbody>${Array.from({ length: 12 }, () => `<tr><td>&nbsp;</td>${nummern.map(() => '<td class="x"></td>').join("")}</tr>`).join("")}</tbody>`;
     const inhalt = `<table class="liste matrix${g.length ? "" : " hoch"}"><colgroup><col style="width:37%">${nummern.map(() => `<col style="width:${(63 / nummern.length).toFixed(2)}%">`).join("")}</colgroup>${kopf}${g.length ? zeilenHtml : leereZeilen}</table>`;
-    // leeres Blatt: die Matrix füllt die erste Seite, die Erläuterung folgt als eigenes Blatt
+    // leeres Blatt: die Matrix füllt die erste Seite, die Erläuterung folgt als eigenes Blatt; die Erläuterung bricht
+    // nicht über zwei Seiten (Klasse „zusammen“)
     const legende = ja(d, "legende")
-      ? abschnitt("Die 14 Hauptallergene nach Anhang II der LMIV", tabelle(["Allergen", "umfasst"], nummern.map((id, i) => [esc(ALLERGENE[id]!), esc(ALLERGENE_UMFANG[i]?.umfasst ?? "")]), { breiten: ["30%", "70%"], klasse: "legende" }), g.length ? "" : "neue-seite")
+      ? abschnitt("Die 14 Hauptallergene nach Anhang II der LMIV", tabelle(["Allergen", "umfasst"], nummern.map((id, i) => [esc(ALLERGENE[id]!), esc(ALLERGENE_UMFANG[i]?.umfasst ?? "")]), { breiten: ["30%", "70%"], klasse: "legende" }), g.length ? "zusammen" : "neue-seite zusammen")
       : "";
     return dokument({
       titel: "Allergene in unseren Speisen und Getränken",
       betrieb: b,
       meta: `Stand: ${datumDe(text(d, "stand"))}`,
-      inhalt: inhalt + `<p style="margin-top:6mm">${esc(LOSE_HINWEIS)}</p>` + legende + nachsatz(LOSE_WARE.rechtsgrundlage),
+      // die Rechtsgrundlage als Fußnote unter dem Hinweis – nach der Erläuterung rutschte sie allein auf eine neue Seite
+      inhalt: inhalt + `<p style="margin-top:6mm">${esc(LOSE_HINWEIS)}</p>` + nachsatz(LOSE_WARE.rechtsgrundlage) + legende,
     });
   },
 };
@@ -194,6 +213,10 @@ export const haccp: Vorlage = {
   html(d, b) {
     const p = liste(d, "punkte").filter((x) => text(x, "punkt"));
     const m = liste(d, "messungen").filter((x) => text(x, "kontrollpunkt") || text(x, "wert"));
+    // Grenzwert zur Messung aus den Kontrollpunkten (gleicher Name, ohne Groß-/Kleinschreibung und Leerzeichen am Rand)
+    const norm = (t: string) => t.trim().toLocaleLowerCase("de");
+    const grenzwert = (kp: string) => p.find((x) => norm(text(x, "punkt")) === norm(kp)) ?? null;
+    const zeitraum = text(d, "zeitraum");
     return dokument({
       titel: "Eigenkontrollen",
       betrieb: b,
@@ -208,15 +231,19 @@ export const haccp: Vorlage = {
           tabelle(["Kontrollpunkt", "Grenzwert", "Häufigkeit", "Korrekturmaßnahme"], p.map((x) => [`<strong>${zelle(text(x, "punkt"))}</strong>`, zelle(text(x, "grenzwert")), zelle(text(x, "haeufigkeit")), zelle(text(x, "korrektur"))]), { breiten: ["20%", "24%", "20%", "36%"], ...(p.length ? {} : { mindestens: 6, hoch: true }) }),
         ) +
         abschnitt(
-          "Messprotokoll",
+          zeitraum ? `Messprotokoll · ${zeitraum}` : "Messprotokoll",
           tabelle(
-            ["Datum / Uhrzeit", "Kontrollpunkt", "Messwert", "In Ordnung", "Korrekturmaßnahme", "Kürzel"],
-            m.map((x) => [`${datumDe(text(x, "datum"))}${text(x, "uhrzeit") ? ` ${esc(text(x, "uhrzeit"))}` : ""}`, zelle(text(x, "kontrollpunkt")), zelle(text(x, "wert")), text(x, "in_ordnung") === "nein" ? "<strong>nein</strong>" : "ja", zelle(text(x, "massnahme")), zelle(text(x, "kuerzel"))]),
-            { breiten: ["15%", "22%", "12%", "10%", "31%", "10%"], leerzeilen: ja(d, "leerzeilen") ? haccpLeerzeilen(m.length) : 0, hoch: ja(d, "leerzeilen") },
+            ["Datum / Uhrzeit", "Kontrollpunkt", "Grenzwert", "Messwert", "In Ordnung", "Korrekturmaßnahme", "Kürzel"],
+            m.map((x) => {
+              const kp = grenzwert(text(x, "kontrollpunkt"));
+              return [`${datumDe(text(x, "datum"))}${text(x, "uhrzeit") ? ` ${esc(text(x, "uhrzeit"))}` : ""}`, zelle(text(x, "kontrollpunkt")), kp ? zelle(text(kp, "grenzwert")) : "", zelle(text(x, "wert")), text(x, "in_ordnung") === "nein" ? "<strong>nein</strong>" : "ja", zelle(text(x, "massnahme")), zelle(text(x, "kuerzel"))];
+            }),
+            { breiten: ["13%", "19%", "15%", "10%", "9%", "24%", "10%"], leerzeilen: ja(d, "leerzeilen") ? haccpLeerzeilen(m.length) : 0, hoch: ja(d, "leerzeilen") },
           ),
           // Protokoll als eigenes Blatt zum Aushängen (auch leer: davor steht die Tabelle der Kontrollpunkte)
           "neue-seite",
-        ),
+        ) +
+        unterschriften(["Geprüft (Datum)", "Verantwortliche/r"]),
     });
   },
 };
@@ -228,8 +255,8 @@ export const haccp: Vorlage = {
  */
 function haccpLeerzeilen(messungen: number): number {
   const ZEILE = 8.2; // Zeile mit Mindesthöhe 8 mm samt Linie
-  // eigene Seite: nur Überschrift und Tabellenkopf
-  const platz = Math.floor((176 - 26) / ZEILE);
+  // eigene Seite: Überschrift und Tabellenkopf (26 mm), am Ende die Unterschriften (ca. 24 mm)
+  const platz = Math.floor((176 - 26 - 24) / ZEILE);
   const frei = messungen < platz ? platz - messungen : (platz + 3 - ((messungen - platz) % (platz + 3))) % (platz + 3);
   return frei > 3 ? frei : 0;
 }

@@ -3,7 +3,7 @@
  * (E-121, E-123). Vorschläge aus Muster-Verzeichnissen der Aufsichtsbehörden, DSK und BSI (bausteine.ts).
  */
 import { AUFSICHT, DSE, PANNEN_ARTEN, PANNEN_SOFORT, TOM, VVT } from "./bausteine.js";
-import { abschnitt, abschnitte, absatz, angaben, anschrift, auswahl, datumDe, dokument, eintrag, esc, ja, liste, nachsatz, tabelle, text, zelle, zeilen } from "./html.js";
+import { LINIE_MITTEL, abschnitt, abschnitte, absatz, angaben, ankreuzen, anschrift, auswahl, datumDe, dokument, eintrag, esc, ja, liste, nachsatz, roh, tabelle, text, unterschriften, zelle, zeilen } from "./html.js";
 import { DATENPANNE_RISIKO, SCHUTZZIELE, optionen } from "./konstanten.js";
 import type { Betrieb, Vorlage } from "./typen.js";
 
@@ -131,20 +131,21 @@ export const datenschutzDokumentation: Vorlage = {
           .map(
             (x, i) =>
               eintrag(text(x, "bezeichnung"), angaben([
-                ["Zwecke (lit. b)", text(x, "zweck")],
+                ["Zwecke (lit. b)", text(x, "zweck"), 2],
                 ["Rechtsgrundlage", text(x, "rechtsgrundlage")],
                 ["Betroffene Personen (lit. c)", text(x, "betroffene")],
-                ["Datenkategorien (lit. c)", text(x, "datenarten")],
+                ["Datenkategorien (lit. c)", text(x, "datenarten"), 2],
                 ["Empfänger (lit. d)", text(x, "empfaenger") || "keine"],
                 ["Drittlandübermittlung (lit. e)", text(x, "drittland") || "keine"],
                 ["Gemeinsam Verantwortliche", text(x, "gemeinsam") || null],
-                ["Löschfristen (lit. f)", text(x, "loeschfrist")],
+                ["Löschfristen (lit. f)", text(x, "loeschfrist"), 2],
                 ["TOM (lit. g)", text(x, "tom_hinweis") || TOM_VERWEIS],
               ]), { nummer: `2.${i + 1}`, rand: "Art. 30 Abs. 1 lit. b–g" }),
           )
           .join("")
       : leer
-        ? eintrag("Bezeichnung der Verarbeitung", angaben([["Bezeichnung", ""], ["Zwecke (lit. b)", ""], ["Rechtsgrundlage", ""], ["Betroffene Personen (lit. c)", ""], ["Datenkategorien (lit. c)", ""], ["Empfänger (lit. d)", ""], ["Drittlandübermittlung (lit. e)", ""], ["Löschfristen (lit. f)", ""], ["TOM (lit. g)", TOM_VERWEIS]]), { nummer: "2.1", rand: "Art. 30 Abs. 1 lit. b–g" })
+        ? // Blatt zum Ausfüllen: drei leere Verarbeitungstätigkeiten (2.1–2.3), mehrzeilige Angaben mit zwei Linien
+          [1, 2, 3].map((i) => eintrag("Bezeichnung der Verarbeitung", angaben([["Bezeichnung", ""], ["Zwecke (lit. b)", "", 2], ["Rechtsgrundlage", ""], ["Betroffene Personen (lit. c)", ""], ["Datenkategorien (lit. c)", "", 2], ["Empfänger (lit. d)", ""], ["Drittlandübermittlung (lit. e)", ""], ["Löschfristen (lit. f)", "", 2], ["TOM (lit. g)", TOM_VERWEIS]]), { nummer: `2.${i}`, rand: "Art. 30 Abs. 1 lit. b–g" })).join("")
         : absatz("", "Keine Verarbeitungstätigkeiten erfasst.");
     // Spalte „Verantwortlich“ nur, wenn mindestens eine Maßnahme eine verantwortliche Person nennt
     const mitVerantwortlich = tom.some((x) => text(x, "verantwortlich"));
@@ -273,6 +274,9 @@ export const datenpanne: Vorlage = {
     const benachrichtigt = text(d, "benachrichtigung") === "erfolgt";
     // kein Risiko: keine Meldepflicht – reine Dokumentation, ohne 72-Stunden-Frist
     const keinRisiko = risiko === "kein_risiko";
+    // Blatt zum Ausfüllen von Hand (noch nichts beschrieben): Bewertung, Meldung und Benachrichtigung zum Ankreuzen
+    const leer = !text(d, "beschreibung");
+    const uhrzeit = text(d, "entdeckt_um");
     // Gliederung wie der Mindestinhalt der Meldung nach Art. 33 Abs. 3 DSGVO (lit. a–d), Randspalte nennt den Buchstaben
     const teile: [string, string, string][] = [
       ["Art der Verletzung", text(d, "beschreibung"), "Art. 33 Abs. 3 lit. a"],
@@ -281,23 +285,43 @@ export const datenpanne: Vorlage = {
       ["Kontakt für Rückfragen", text(d, "kontakt"), "Art. 33 Abs. 3 lit. b"],
       ["Wahrscheinliche Folgen", text(d, "folgen"), "Art. 33 Abs. 3 lit. c"],
       ["Ergriffene und vorgeschlagene Maßnahmen", text(d, "massnahmen"), "Art. 33 Abs. 3 lit. d"],
-      ...(risiko === "kein_risiko" ? ([["Begründung, warum keine Meldung nötig ist", text(d, "begruendung"), "Art. 33 Abs. 1 Satz 1"]] as [string, string, string][]) : []),
     ];
+    const offen = !DATENPANNE_RISIKO[risiko];
+    const benachrichtigung = text(d, "benachrichtigung");
     return dokument({
       titel: keinRisiko ? "Datenpanne – Dokumentation" : gemeldet ? "Meldung einer Datenpanne (Dokumentation)" : "Datenpanne – Meldeentwurf und Dokumentation",
       betrieb: b,
       meta: `Bekannt seit: ${datumDe(text(d, "entdeckt_am")) || "–"}`,
       inhalt:
         angaben([
-          // ohne Uhrzeit keine erfundene „00:00 Uhr“: nur das Datum, die Frist endet drei Tage später zur selben Uhrzeit
-          ["Bekannt geworden", beginn && text(d, "entdeckt_um") ? berlinText(beginn) : datumDe(text(d, "entdeckt_am"))],
-          ["Frist (72 Stunden)", keinRisiko ? null : beginn ? (text(d, "entdeckt_um") ? berlinText(new Date(beginn.getTime() + 72 * 3600_000)) : `${datumDe(plusTageIso(text(d, "entdeckt_am"), 3))}, zur Uhrzeit des Bekanntwerdens (Uhrzeit ergänzen)`) : ""],
-          ["Bewertung", DATENPANNE_RISIKO[risiko] ?? "noch offen"],
-          ["Gemeldet", keinRisiko ? "nicht erforderlich (keine Meldepflicht)" : gemeldet ? `${datumDe(text(d, "gemeldet_am")) || "ja"}${text(d, "aktenzeichen") ? ` · Aktenzeichen ${text(d, "aktenzeichen")}` : ""}` : "noch nicht gemeldet"],
+          // ohne Uhrzeit keine erfundene „00:00 Uhr“: das Datum und eine kurze Linie für die Uhrzeit; die Frist endet drei
+          // Tage später zur selben Uhrzeit
+          ["Bekannt geworden", beginn && uhrzeit ? berlinText(beginn) : roh(`${datumDe(text(d, "entdeckt_am")) ? `${esc(datumDe(text(d, "entdeckt_am")))}, ` : `${LINIE_MITTEL}, `}${LINIE_MITTEL} Uhr`)],
+          ["Frist (72 Stunden)", keinRisiko ? null : beginn ? (uhrzeit ? berlinText(new Date(beginn.getTime() + 72 * 3600_000)) : `${datumDe(plusTageIso(text(d, "entdeckt_am"), 3))}, zur Uhrzeit des Bekanntwerdens (Uhrzeit ergänzen)`) : ""],
+          ["Bewertung", leer && offen ? roh(ankreuzen(Object.values(DATENPANNE_RISIKO))) : (DATENPANNE_RISIKO[risiko] ?? "noch offen")],
+          // kein Risiko: die Begründung gehört zur Bewertung (Art. 33 Abs. 1 Satz 1 DSGVO)
+          ["Begründung, warum keine Meldung nötig ist", keinRisiko ? text(d, "begruendung") : null, 2],
+          [
+            "Gemeldet",
+            keinRisiko
+              ? "nicht erforderlich (keine Meldepflicht)"
+              : gemeldet
+                ? `${datumDe(text(d, "gemeldet_am")) || "ja"}${text(d, "aktenzeichen") ? ` · Aktenzeichen ${text(d, "aktenzeichen")}` : ""}`
+                : leer
+                  ? roh(ankreuzen(["noch nicht gemeldet", `gemeldet am ${LINIE_MITTEL} · Aktenzeichen ${LINIE_MITTEL}`, "nicht erforderlich (keine Meldepflicht)"], { html: true }))
+                  : "noch nicht gemeldet",
+          ],
           ["Begründung der späteren Meldung", (gemeldet && text(d, "verspaetung")) || null],
           // Datum und Inhalt nur bei erfolgter Benachrichtigung (nicht an „nicht erforderlich“ oder „geplant“ angehängt)
-          ["Benachrichtigung der Betroffenen", `${BENACHRICHTIGUNG[text(d, "benachrichtigung")] ?? "noch offen"}${benachrichtigt && text(d, "benachrichtigt_am") ? ` am ${datumDe(text(d, "benachrichtigt_am"))}` : ""}${benachrichtigt && text(d, "benachrichtigung_text") ? ` – ${text(d, "benachrichtigung_text")}` : ""}`],
-        ]) + teile.map(([t, w, rand]) => abschnitt(t, absatz(w), { rand })).join(""),
+          [
+            "Benachrichtigung der Betroffenen",
+            leer && !BENACHRICHTIGUNG[benachrichtigung]
+              ? roh(ankreuzen(Object.entries(BENACHRICHTIGUNG).map(([w, t]) => (w === "erfolgt" ? `${esc(t)} am ${LINIE_MITTEL}` : esc(t))), { html: true }))
+              : `${BENACHRICHTIGUNG[benachrichtigung] ?? "noch offen"}${benachrichtigt && text(d, "benachrichtigt_am") ? ` am ${datumDe(text(d, "benachrichtigt_am"))}` : ""}${benachrichtigt && text(d, "benachrichtigung_text") ? ` – ${text(d, "benachrichtigung_text")}` : ""}`,
+          ],
+        ]) +
+        teile.map(([t, w, rand]) => abschnitt(t, absatz(w), { rand })).join("") +
+        unterschriften(["Ort, Datum", "Dokumentiert von"]),
     });
   },
 };
@@ -360,6 +384,8 @@ export const datenschutzinformation: Vorlage = {
                 .join("")
             : absatz(""),
         },
+        // Ergänzungen (weitere Verarbeitungen) gleich nach den Zwecken, nicht hinter den Rechten
+        ...(text(d, "ergaenzung") ? [{ titel: "Ergänzungen", inhalt: zeilen(text(d, "ergaenzung")) }] : []),
         ...(mitLitF(d) ? [{ titel: "Berechtigte Interessen", rand: "Art. 13 Abs. 1 lit. d", inhalt: text(d, "interessen") ? zeilen(text(d, "interessen")) : absatz("") }] : []),
         { titel: DSE.betroffenenrechte!.titel, rand: "Art. 13 Abs. 2 lit. b", inhalt: `<p>${esc(ersetze(DSE.betroffenenrechte!.text))}</p>` },
         { titel: DSE.widerspruchsrecht!.titel, rand: "Art. 21", inhalt: `<p>${esc(ersetze(DSE.widerspruchsrecht!.text))}</p>` },
@@ -367,7 +393,6 @@ export const datenschutzinformation: Vorlage = {
         { titel: DSE.beschwerderecht!.titel, rand: "Art. 13 Abs. 2 lit. d", inhalt: `<p>${esc(DSE.beschwerderecht!.text.replace("{aufsichtsbehoerde_name}", a?.name ?? "____").replace("{aufsichtsbehoerde_ort}", a?.ort ?? "____").replace("{aufsichtsbehoerde_url}", a?.url ?? "____"))}</p>` },
         { titel: "Pflicht zur Bereitstellung", rand: "Art. 13 Abs. 2 lit. e", inhalt: `<p>${esc(BEREITSTELLUNG[text(d, "bereitstellung")] ?? "")}</p>` },
         { titel: "Automatisierte Entscheidungen", rand: "Art. 13 Abs. 2 lit. f", inhalt: "<p>Eine automatisierte Entscheidungsfindung einschließlich Profiling findet nicht statt.</p>" },
-        ...(text(d, "ergaenzung") ? [{ titel: "Ergänzungen", inhalt: zeilen(text(d, "ergaenzung")) }] : []),
       ]),
     });
   },

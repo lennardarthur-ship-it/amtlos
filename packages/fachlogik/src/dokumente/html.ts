@@ -44,9 +44,12 @@ export function auswahl(d: Daten | Eintrag, k: string): string[] {
 
 // ---------------------------------------------------------------- Textbausteine
 
+/** Linien zum Ausfüllen von Hand über die ganze Breite (z. B. leere Kästen der Betriebsanweisung). */
+export const linien = (n: number) => `<p class="fuellen-block">${LINIE.repeat(Math.max(1, n))}</p>`;
+
 /** Mehrzeiliger Text als Absätze; leer → Platzhalter (oder nichts, wenn `leer` null ist). */
 export function absatz(t: string, leer: string | null = ""): string {
-  if (!t.trim()) return leer === null ? "" : leer ? `<p class="hinweis">${esc(leer)}</p>` : `<p class="fuellen-block">${LINIE}${LINIE}</p>`;
+  if (!t.trim()) return leer === null ? "" : leer ? `<p class="hinweis">${esc(leer)}</p>` : linien(2);
   return t
     .trim()
     .split(/\n\s*\n/)
@@ -69,12 +72,37 @@ export function zellePunkte(t: string): string {
   return l.length > 1 ? `<ul class="punkte">${l.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : esc(l[0] ?? "");
 }
 
-/** Zweispaltige Angaben (Bezeichnung – Wert). Zeilen mit `null` entfallen, leere Strings zeigen die Linie. */
-export function angaben(zeilen: [string, string | null][]): string {
-  const z = zeilen.filter((x): x is [string, string] => x[1] !== null);
-  if (!z.length) return "";
-  return `<table class="angaben">${z.map(([k, v]) => `<tr><th>${esc(k)}</th><td>${v.trim() ? esc(v).replace(/\n/g, "<br>") : LINIE}</td></tr>`).join("")}</table>`;
+/** Wert, der schon maskiertes HTML ist (z. B. Kästchen zum Ankreuzen, kurze Linien im Satz) – für `angaben` und `felder`. */
+export interface Roh {
+  html: string;
 }
+export const roh = (html: string): Roh => ({ html });
+/** Zeile für `angaben`: Bezeichnung, Wert (`null` entfällt) und – für leere Werte – die Zahl der Linien (Standard 1). */
+export type Angabe = [string, string | Roh | null, number?];
+
+/** Leere Angabe: Linie(n) über die ganze Wertspalte, damit Platz für Handschrift bleibt (nicht die kurze Linie im Satz). */
+const zeilenLinien = (n = 1) => '<span class="fuellen zeile"></span>'.repeat(Math.max(1, n));
+
+/**
+ * Zweispaltige Angaben (Bezeichnung – Wert). Zeilen mit `null` entfallen, leere Strings zeigen eine Linie über die
+ * ganze Breite – bei mehrzeiligen Angaben mit drittem Eintrag (z. B. 2) entsprechend mehrere Linien.
+ */
+export function angaben(zeilen: Angabe[]): string {
+  const z = zeilen.filter((x): x is [string, string | Roh, number?] => x[1] !== null);
+  if (!z.length) return "";
+  const wert = (v: string | Roh, n?: number) => (typeof v !== "string" ? v.html : v.trim() ? esc(v).replace(/\n/g, "<br>") : zeilenLinien(n));
+  return `<table class="angaben">${z.map(([k, v, n]) => `<tr><th>${esc(k)}</th><td>${wert(v, n)}</td></tr>`).join("")}</table>`;
+}
+
+/**
+ * Auswahl zum Ankreuzen von Hand (leeres Blatt): je Option ein Kästchen, statt eine Startauswahl vorzudrucken.
+ * Mit `html` sind die Optionen schon maskiertes HTML (z. B. mit kurzer Linie für ein Datum).
+ */
+export function ankreuzen(optionen: string[], o: { nebeneinander?: boolean; html?: boolean } = {}): string {
+  return `<ul class="ankreuzen${o.nebeneinander ? " neben" : ""}">${optionen.map((t) => `<li>${o.html ? t : esc(t)}</li>`).join("")}</ul>`;
+}
+/** Kurze Linie im Satz (Datum, Uhrzeit, Aktenzeichen), z. B. „gemeldet am ____“. */
+export const LINIE_MITTEL = '<span class="fuellen mittel"></span>';
 
 export interface AbschnittOptionen {
   /** zusätzliche Klasse */
@@ -178,10 +206,10 @@ export function anschrift(b: Betrieb): string {
   return [b.strasse, [b.plz, b.ort].filter(Boolean).join(" ")].filter((x) => x.trim()).join(", ");
 }
 
-/** Vertragsparteien in zwei Spalten („zwischen … und …“). Ohne Name und Anschrift: Linien für beides. */
+/** Vertragsparteien in zwei Spalten („zwischen … und …“). Ohne Name und Anschrift: Linien für beides (Anschrift zwei Zeilen). */
 export function parteien(a: { rolle: string; name: string; anschrift?: string; zusatz?: string }, b: { rolle: string; name: string; anschrift?: string; zusatz?: string }): string {
   const block = (p: typeof a, wort: string) =>
-    `<div class="partei"><div class="wort">${esc(wort)}</div><div class="name">${p.name.trim() ? esc(p.name.trim()) : LINIE}</div>${p.anschrift?.trim() ? `<div class="adresse">${esc(p.anschrift.trim()).replace(/\n/g, "<br>")}</div>` : !p.name.trim() ? `<div class="adresse">${LINIE}</div>` : ""}${p.zusatz ? `<div class="zusatz">${esc(p.zusatz)}</div>` : ""}<div class="rolle">– ${esc(p.rolle)} –</div></div>`;
+    `<div class="partei"><div class="wort">${esc(wort)}</div><div class="name">${p.name.trim() ? esc(p.name.trim()) : LINIE}</div>${p.anschrift?.trim() ? `<div class="adresse">${esc(p.anschrift.trim()).replace(/\n/g, "<br>")}</div>` : !p.name.trim() ? `<div class="adresse">${LINIE}${LINIE}</div>` : ""}${p.zusatz ? `<div class="zusatz">${esc(p.zusatz)}</div>` : ""}<div class="rolle">– ${esc(p.rolle)} –</div></div>`;
   return `<div class="parteien">${block(a, "zwischen")}${block(b, "und")}</div>`;
 }
 
@@ -189,12 +217,13 @@ export function parteien(a: { rolle: string; name: string; anschrift?: string; z
  * Formular-Feldraster (Gestalt Formular): Feldnummer, Bezeichnung, Wert im Kasten – zum Übertragen in ein amtliches
  * Formular. Zeilen mit `null` entfallen. Nummern laufen je Dokument durch (`start`).
  */
-export function felder(zeilen: [string, string | null][], o: { start?: number; nummern?: boolean } = {}): string {
-  const z = zeilen.filter((x): x is [string, string] => x[1] !== null);
+export function felder(zeilen: [string, string | Roh | null][], o: { start?: number; nummern?: boolean } = {}): string {
+  const z = zeilen.filter((x): x is [string, string | Roh] => x[1] !== null);
   if (!z.length) return "";
   let n = o.start ?? 1;
+  const wert = (v: string | Roh) => (typeof v !== "string" ? v.html : v.trim() ? esc(v).replace(/\n/g, "<br>") : "&nbsp;");
   return `<table class="felder">${z
-    .map(([k, v]) => `<tr>${o.nummern === false ? "" : `<td class="nr">${String(n++).padStart(2, "0")}</td>`}<th>${esc(k)}</th><td class="wert">${v.trim() ? esc(v).replace(/\n/g, "<br>") : "&nbsp;"}</td></tr>`)
+    .map(([k, v]) => `<tr>${o.nummern === false ? "" : `<td class="nr">${String(n++).padStart(2, "0")}</td>`}<th>${esc(k)}</th><td class="wert">${wert(v)}</td></tr>`)
     .join("")}</table>`;
 }
 
@@ -298,6 +327,19 @@ ul.punkte li::marker { color: var(--akzent); }
 .fuellen { display: inline-block; min-width: 55mm; border-bottom: 0.5pt solid #8a949c; height: 4.2mm; vertical-align: bottom; }
 .fuellen-block { margin: 0 0 2mm; }
 .fuellen-block .fuellen { display: block; width: 100%; height: 7mm; }
+/* leere Angabe (angaben): Linie über die ganze Wertspalte, weitere Linien für mehrzeilige Angaben */
+table.angaben td .fuellen.zeile { display: block; min-width: 0; width: 100%; height: 5.6mm; }
+table.angaben td .fuellen.zeile + .fuellen.zeile { height: 7mm; }
+/* Auswahl zum Ankreuzen von Hand (leeres Blatt) */
+ul.ankreuzen { list-style: none; margin: 0 0 1.6mm; padding: 0; font-weight: 400; }
+ul.ankreuzen li { position: relative; padding-left: 5.6mm; margin: 0 0 1mm; }
+ul.ankreuzen li::before { content: ""; position: absolute; left: 0; top: 0.28em; width: 3.1mm; height: 3.1mm; border: 0.7pt solid #4a535c; border-radius: 0.3mm; }
+ul.ankreuzen.neben { display: flex; flex-wrap: wrap; gap: 0.8mm 7mm; }
+ul.ankreuzen.neben li { margin: 0; }
+table.angaben td ul.ankreuzen, table.felder td.wert ul.ankreuzen { margin: 0.3mm 0 0; }
+table.angaben td ul.ankreuzen li:last-child, table.felder td.wert ul.ankreuzen li:last-child { margin-bottom: 0; }
+table.felder td.wert:has(> ul.ankreuzen) { padding-bottom: 2mm; }
+.fuellen.mittel { min-width: 26mm; width: 26mm; }
 table { border-collapse: collapse; width: 100%; }
 td, th { font-variant-numeric: lining-nums tabular-nums; }
 td.zahl, th.zahl { text-align: right; white-space: nowrap; }
@@ -411,6 +453,8 @@ table.liste ul.punkte { margin: 0; padding-left: 3.6mm; }
 .partei .name { font-weight: 600; font-size: 10.5pt; }
 .partei .adresse, .partei .zusatz { font-size: 9.4pt; }
 .partei .rolle { font-family: ${SANS}; font-size: 8.3pt; color: #4a535c; margin-top: 1.2mm; }
+/* ohne Name und Anschrift: Linien über die Spaltenbreite (Name, zwei Zeilen Anschrift) */
+.partei .name .fuellen, .partei .adresse .fuellen { display: block; min-width: 0; width: 100%; height: 6.5mm; }
 
 /* Formular-Feldraster */
 table.felder { font-size: 9.4pt; table-layout: fixed; }
@@ -476,11 +520,13 @@ body.g-brief { padding-left: 5mm; padding-right: 10mm; }
 .g-brief .anschrift .empf { font-size: 10pt; line-height: 1.25; }
 .g-brief .anschrift .empf.eng { font-size: 9pt; line-height: 1.2; }
 .g-brief .anschrift .empf.enger { font-size: 8pt; line-height: 1.18; }
+/* leere Anschrift: drei Linien (Name, Straße, PLZ und Ort) */
+.g-brief .anschrift .empf .fuellen { display: block; min-width: 0; width: 78mm; height: 6.6mm; }
 /* Informationsblock 125–200 mm vom linken Blattrand; im Fluss, damit ein langer Block den Betreff nach unten schiebt */
 .g-brief .info { flex: none; margin: 5mm 0 0 15mm; width: 75mm; font-size: 8.2pt; }
 .g-brief .info table td { padding: 0.3mm 0; line-height: 1.3; vertical-align: top; overflow-wrap: anywhere; }
 .g-brief .info .fuellen { min-width: 0; width: 38mm; }
-.g-brief .info table td:first-child { color: #4a535c; width: 31mm; padding-right: 2mm; }
+.g-brief .info table td:first-child { color: #4a535c; width: 31mm; padding-right: 2mm; white-space: nowrap; }
 .g-brief .betreff { margin: 6mm 0 4.5mm; font-size: 12.5pt; font-weight: 700; color: #12161b; }
 .g-brief .betreff span { display: block; font-size: 9pt; font-weight: 400; color: #4a535c; margin-top: 0.8mm; }
 .g-brief .anrede { margin: 0 0 3.5mm; }
@@ -564,6 +610,9 @@ body.g-brief { padding-left: 5mm; padding-right: 10mm; }
 .g-aushang.ba.kompakt .notruf { font-size: 10pt; padding: 1.6mm 3.5mm; }
 .g-aushang.ba.kompakt .unterschriften { margin-top: 3mm; }
 .g-aushang.ba.kompakt .unterschrift .linie { height: 8mm; }
+/* leere Kästen: Linien etwas enger, damit das Blatt zum Ausfüllen auf eine Seite passt */
+.g-aushang.ba .kasten .inhalt .fuellen-block { margin-bottom: 1mm; }
+.g-aushang.ba .kasten .inhalt .fuellen-block .fuellen { height: 6.4mm; }
 /* Aushang mit viel Text: kompakter Satz, damit er auf möglichst wenige Blätter passt */
 .g-aushang.kompakt table.liste { font-size: 8.8pt; line-height: 1.32; }
 .g-aushang.kompakt table.liste th { font-size: 7.8pt; padding: 1.6mm 2mm 1.4mm; }
@@ -817,7 +866,8 @@ export function brief(o: { titel: string; betreff: string; unterBetreff?: string
   const zeilenEmpf = [o.empfaenger.name.trim(), ...o.empfaenger.anschrift.trim().split("\n"), o.empfaenger.zusatz ?? ""].map((z) => z.trim()).filter(Boolean);
   // DIN 5008: Anschriftzone 27,3 mm – bis 6 Zeilen in 10 pt, sonst kleiner; die Anschrift wird nie gekürzt
   const eng = anschriftZeilen(zeilenEmpf, 44) <= 6 ? "" : anschriftZeilen(zeilenEmpf, 49) <= 7 ? " eng" : " enger";
-  const empf = `${o.empfaenger.name.trim() ? `${esc(o.empfaenger.name.trim())}<br>` : LINIE}${o.empfaenger.anschrift.trim() ? esc(o.empfaenger.anschrift.trim()).replace(/\n/g, "<br>") : LINIE}${o.empfaenger.zusatz ? `<br><span style="font-size:8pt;color:#4a535c">${esc(o.empfaenger.zusatz)}</span>` : ""}`;
+  // ohne Anschrift: zwei Linien (Straße, PLZ und Ort) unter dem Namen bzw. seiner Linie
+  const empf = `${o.empfaenger.name.trim() ? `${esc(o.empfaenger.name.trim())}<br>` : LINIE}${o.empfaenger.anschrift.trim() ? esc(o.empfaenger.anschrift.trim()).replace(/\n/g, "<br>") : `${LINIE}${LINIE}`}${o.empfaenger.zusatz ? `<br><span style="font-size:8pt;color:#4a535c">${esc(o.empfaenger.zusatz)}</span>` : ""}`;
   // leere Angaben entfallen; mit drittem Eintrag `true` bleibt eine Linie zum Ausfüllen (z. B. Rechnungsnummer)
   const info = o.info.filter(([, w, linie]) => w.trim() || linie);
   return `${kopf({ titel: o.titel, betrieb: b, fussLinks: [b.name.trim(), o.titel].filter(Boolean).join(" · "), fussRechts: o.stand ? `Stand ${o.stand}` : "", gestalt: "brief" })}<body class="g-brief">

@@ -4,11 +4,14 @@
  * zur Belegablage (AWV) und zum ersetzenden Scannen (BStBK/DStV). Fachlich zu prüfen (T-54).
  */
 import { GOBD } from "./bausteine.js";
-import { abschnitte, absatz, angaben, auswahl, datumDe, dokument, esc, ja, liste, punkte, tabelle, text, unterschriften, zelle, zeilen } from "./html.js";
+import { abschnitte, angaben, ankreuzen, auswahl, datumDe, dokument, esc, ja, liste, punkte, tabelle, text, unterschriften, zelle, zeilen } from "./html.js";
 import type { Option, Vorlage } from "./typen.js";
 
 const opt = (l: string[]): Option[] => l.map((t) => ({ wert: t, text: t }));
 const PROGRAMME = ["Buchhaltungsprogramm", "Kassensystem", "Rechnungsprogramm", "Online-Banking", "Belegscanner-App", "Upload-Portal der Steuerberatung", "Lohnprogramm", "Tabellenkalkulation"];
+
+/** Optionen der Auswahlfelder (wie im Formular) – auf dem leeren Blatt zum Ankreuzen. */
+const AUSWAHL_OPTIONEN: Record<string, string[]> = { belegeingang: GOBD.belegeingang, belegart: GOBD.belegart, ablage: GOBD.ablage, sicherung_ort: GOBD.sicherungOrt, sicherung_intervall: GOBD.sicherungIntervall };
 
 export const verfahrensdokumentation: Vorlage = {
   id: "verfahrensdokumentation",
@@ -95,7 +98,11 @@ export const verfahrensdokumentation: Vorlage = {
   html(d, b) {
     const systeme = liste(d, "systeme").filter((x) => text(x, "name"));
     const aenderungen = liste(d, "aenderungen").filter((x) => text(x, "aenderung"));
-    const l = (k: string) => (auswahl(d, k).length ? punkte(auswahl(d, k)) : absatz(""));
+    // Blatt zum Ausfüllen: noch keine Belegablage und keine Datensicherung gewählt
+    const leer = !["belegeingang", "belegart", "ablage", "sicherung_ort"].some((k) => auswahl(d, k).length);
+    // nichts ausgewählt: die Optionen zum Ankreuzen von Hand statt leerer Linien
+    const optionenVon = (k: string) => AUSWAHL_OPTIONEN[k] ?? [];
+    const l = (k: string) => (auswahl(d, k).length ? punkte(auswahl(d, k)) : ankreuzen(optionenVon(k)));
     // Zwischenüberschrift bleibt mit ihrem Inhalt auf einer Seite (nicht allein am Seitenende)
     const teil = (titel: string, inhalt: string) => `<div class="zusammen"><h3>${esc(titel)}</h3>${inhalt}</div>`;
     return dokument({
@@ -118,7 +125,8 @@ export const verfahrensdokumentation: Vorlage = {
             titel: "Technische Systemdokumentation und Betriebsdokumentation",
             rand: "GoBD Tz. 10.1",
             inhalt:
-              teil("Datensicherung", `<p>Die Daten werden ${esc(text(d, "sicherung_intervall") || "____")} gesichert:</p>${l("sicherung_ort")}`) +
+              // Blatt zum Ausfüllen (noch keine Ablage gewählt): auch das Intervall zum Ankreuzen statt des Startwerts
+              teil("Datensicherung", leer || !text(d, "sicherung_intervall") ? `<p>Die Daten werden gesichert:</p>${ankreuzen(optionenVon("sicherung_intervall"), { nebeneinander: true })}<p>Wohin:</p>${l("sicherung_ort")}` : `<p>Die Daten werden ${esc(text(d, "sicherung_intervall"))} gesichert:</p>${l("sicherung_ort")}`) +
               (ja(d, "e_rechnung") ? teil("E-Rechnungen", `<p>${esc(GOBD.eRechnung)}</p>`) : "") +
               teil("Zugriffsrechte", zeilen(text(d, "zugriff"))) + teil("Internes Kontrollsystem", zeilen(text(d, "kontrollen"))),
           },

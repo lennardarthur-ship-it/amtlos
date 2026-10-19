@@ -94,10 +94,12 @@ export const gewerbeanmeldung: Vorlage = {
   },
   html(d, b) {
     const rechtsform = rechtsformAus(text(d, "rechtsform") || b.rechtsform, RECHTSFORMEN) || "Einzelunternehmen";
-    // Registereintrag: aus „Mein Betrieb“; leer nur bei eingetragenen Rechtsformen als Linie, sonst entfällt die Zeile
-    const register = registerAus(b) || (REGISTER_FORMEN.includes(rechtsform) ? "" : null);
-    // leeres Blatt (zum Ausfüllen von Hand): auch die selten nötigen Felder als Linie
+    // Registereintrag nur bei eingetragenen Rechtsformen (aus „Mein Betrieb“, sonst Linie); ein Einzelunternehmen hat
+    // keinen – auch wenn in „Mein Betrieb“ noch ein Register steht, entfällt die Zeile
+    const register = REGISTER_FORMEN.includes(rechtsform) ? registerAus(b) : null;
+    // leeres Blatt (zum Ausfüllen von Hand): auch die selten nötigen Felder als Linie, Startauswahl nicht vordrucken
     const leer = !text(d, "taetigkeit") && !text(d, "beginn");
+    const erwerb = text(d, "erwerb") === "neben" ? "Nebenerwerb" : leer ? "" : "Haupterwerb";
     const geburtsname = text(d, "geburtsname") || (leer ? "" : null);
     return dokument({
       titel: "Gewerbeanmeldung – Datenblatt",
@@ -126,7 +128,7 @@ export const gewerbeanmeldung: Vorlage = {
               ["Telefon, E-Mail", [b.telefon, b.email].filter((x) => x.trim()).join(", ")],
               ["Angemeldete Tätigkeit", text(d, "taetigkeit")],
               ["Beginn der Tätigkeit", datumDe(text(d, "beginn"))],
-              ["Haupt- oder Nebenerwerb", text(d, "erwerb") === "neben" ? "Nebenerwerb" : "Haupterwerb"],
+              ["Haupt- oder Nebenerwerb", erwerb],
               ["Zahl der Beschäftigten", text(d, "beschaeftigte")],
               ["Erlaubnis, Handwerkskarte", text(d, "erlaubnis") || (leer ? "" : null)],
             ],
@@ -201,6 +203,20 @@ export const handelsregister: Vorlage = {
   },
 };
 
+/** Kurzbezeichnung der Art des wirtschaftlichen Interesses für die Tabelle (die Auswahltexte sind dafür zu lang). */
+const INTERESSE_KURZ: Record<string, string> = {
+  beteiligung: "Kapitalanteile",
+  stimmrechte: "Stimmrechte",
+  kontrolle_sonstige: "Kontrolle auf sonstige Weise",
+  fiktiv: "Fiktiv wirtschaftlich Berechtigte/r (gesetzliche Vertretung)",
+};
+/** „Kapitalanteile: 60 %“ – reine Zahlen bei Kapitalanteilen und Stimmrechten mit „%“, wie in der Auswahl angegeben. */
+function interesseText(art: string, umfang: string): string {
+  const u = umfang.trim();
+  const mitEinheit = (art === "beteiligung" || art === "stimmrechte") && /^\d+(?:[.,]\d+)?$/.test(u) ? `${u} %` : u.replace(/(\d)\s*%/g, "$1 %");
+  return [INTERESSE_KURZ[art] ?? INTERESSE.find((o) => o.wert === art)?.text ?? "", mitEinheit].filter(Boolean).join(": ");
+}
+
 /** Spaltenbreiten der Tabelle „Wirtschaftlich Berechtigte“ (Geburtsdatum schmal, Staatsangehörigkeiten breiter). */
 const TR_BREITEN = ["24%", "11%", "20%", "17%", "28%"];
 
@@ -247,7 +263,7 @@ export const transparenzregister: Vorlage = {
       meta: `Stand: ${datumDe(text(d, "stand")) || "–"}`,
       inhalt:
         abschnitt("Gesellschaft", felder([["Gesellschaft", b.name], ["Rechtsform", text(d, "rechtsform") || (b.rechtsform ?? "").trim()], ["Registergericht und Nummer", text(d, "register") || registerAus(b) || null], ["Gemeldet am", datumDe(text(d, "gemeldet"))]])) +
-        abschnitt("Wirtschaftlich Berechtigte (§ 3 GwG)", l.length ? tabelle(["Name", "Geburtsdatum", "Wohnort", "Staatsangehörigkeiten", "Interesse"], l.map((x) => [zelle(text(x, "name")), datumDe(text(x, "geburtsdatum")), zelle(text(x, "wohnort")), zelle(text(x, "staatsangehoerigkeit")), zelle([INTERESSE.find((o) => o.wert === text(x, "interesse_art"))?.text.split(",")[0] ?? "", text(x, "interesse")].filter(Boolean).join(": "))]), { breiten: TR_BREITEN }) : tabelle(["Name", "Geburtsdatum", "Wohnort", "Staatsangehörigkeiten", "Interesse"], [], { breiten: TR_BREITEN, mindestens: 4, hoch: true })) +
+        abschnitt("Wirtschaftlich Berechtigte (§ 3 GwG)", l.length ? tabelle(["Name", "Geburtsdatum", "Wohnort", "Staatsangehörigkeiten", "Interesse"], l.map((x) => [zelle(text(x, "name")), datumDe(text(x, "geburtsdatum")), zelle(text(x, "wohnort")), zelle(text(x, "staatsangehoerigkeit")), zelle(interesseText(text(x, "interesse_art"), text(x, "interesse")))]), { breiten: TR_BREITEN }) : tabelle(["Name", "Geburtsdatum", "Wohnort", "Staatsangehörigkeiten", "Interesse"], [], { breiten: TR_BREITEN, mindestens: 4, hoch: true })) +
         // das Meldedatum steht in Feld 04 (leer als Linie), nicht noch einmal unten
         uebertragung(["Bestätigung, Vorgangsnummer"]) +
         unterschriften(["Geschäftsführung"], { ortDatum: true }),

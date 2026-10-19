@@ -27,7 +27,7 @@ describe("Satzspiegel und Seitenumbrüche", () => {
     // Personalfragebogen: die Erklärung steht mit der Unterschrift, nicht allein auf der Seite davor
     // (entweder im Schlussblock oder gemeinsam in einem Block „zusammen“)
     expect(html("sv_meldedaten", { name: "Lea Wagner" })).toMatch(/<div class="schlussblock"><p style="margin-top:6mm">Ich versichere|<div class="zusammen">(?:(?!<\/section>).)*Ich versichere(?:(?!<\/section>).)*<div class="unterschriften/s);
-    expect(html("gefaehrdungsbeurteilung")).toMatch(/<div class="schlussblock"><section class="abschnitt zusammen"><h2>Wirksamkeit und Fortschreibung/);
+    expect(html("gefaehrdungsbeurteilung")).toMatch(/<div class="schlussblock"><section class="abschnitt zusammen[^"]*"><h2>Wirksamkeit und Fortschreibung/);
     expect(html("betriebsanweisung", { notruf: "Notruf 112" })).toMatch(/<div class="schlussblock"><div class="notruf">/);
   });
 
@@ -107,7 +107,7 @@ describe("weitere Vorlagen", () => {
   });
 
   it("Allergenliste als Matrix mit allen 14 Allergenen; IfSG-Lebensmittel einmal nummeriert", () => {
-    const h = html("allergene", { gerichte: [{ name: "Käsekuchen", kategorie: "Kuchen", allergene: ["gluten", "eier", "milch"] }, { name: "Wasser", kategorie: "Getränke", allergene: [] }] });
+    const h = html("allergene", { gerichte: [{ name: "Käsekuchen", kategorie: "Kuchen", allergene: ["gluten", "eier", "milch"] }, { name: "Wasser", kategorie: "Getränke", allergene: [], keine: true }] });
     expect(h.match(/<th class="dreh">/g)).toHaveLength(14);
     expect(h.match(/<td class="x">×<\/td>/g)).toHaveLength(3);
     expect(h).toContain("keines der 14 Hauptallergene");

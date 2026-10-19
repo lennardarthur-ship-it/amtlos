@@ -3,7 +3,7 @@
  * elektrische Geräte (E-121, E-123). Vorschläge und Bausteine aus der Recherche (bausteine.ts, Quellen dort).
  */
 import { BA_BAUSTEINE, ELEKTRO_FRISTEN, GEFAEHRDUNGEN, GEFAHRSTOFF_ANGABEN, MUTTERSCHUTZ, UNTERWEISUNGSTHEMEN } from "./bausteine.js";
-import { KOPF_LINIE, LINIE, nachsatz, abschnitt, absatz, angaben, auswahl, datumDe, dokument, esc, ja, liste, plusMonate, punkte, tabelle, text, unterschriften, zelle, zellePunkte, zeilen } from "./html.js";
+import { KOPF_LINIE, LINIE, ZELLE_LINIE, nachsatz, abschnitt, absatz, angaben, ankreuzen, auswahl, datumDe, dokument, esc, ja, linien, liste, plusMonate, punkte, roh, tabelle, text, unterschriften, zelle, zellePunkte, zeilen } from "./html.js";
 import { GEFAEHRDUNGSFAKTOREN, RISIKO_STUFEN, optionen } from "./konstanten.js";
 import type { Daten, Eintrag, Vorlage } from "./typen.js";
 
@@ -104,6 +104,9 @@ export const gefaehrdungsbeurteilung: Vorlage = {
       })
       .join("");
     const musch = MUTTERSCHUTZ.find((m) => m.wert === text(d, "mutterschutz_ergebnis"));
+    // Blatt zum Ausfüllen (keine Gefährdung erfasst): Auswahlen zum Ankreuzen statt vorgedruckter Startwerte
+    const leer = !g.length;
+    const details = text(d, "mutterschutz_details");
     return dokument({
       titel: "Gefährdungsbeurteilung",
       betrieb: b,
@@ -114,11 +117,12 @@ export const gefaehrdungsbeurteilung: Vorlage = {
           "Allgemeine Angaben",
           angaben([
             ["Arbeitsbereich / Gewerk", text(d, "arbeitsbereich")],
-            ["Tätigkeiten", text(d, "taetigkeiten")],
-            ["Beschäftigte", text(d, "beschaeftigte") || null],
+            ["Tätigkeiten", text(d, "taetigkeiten"), 2],
+            // auf dem leeren Blatt als Linie zum Eintragen, sonst nur, wenn angegeben
+            ["Beschäftigte", text(d, "beschaeftigte") || (leer ? "" : null)],
             ["Beurteilt von", text(d, "beurteilt_von")],
             // eine Zeile je Person oder Stelle; Satzzeichen am Zeilenende entfallen, sonst stünde „Protokoll., Zweite“ da
-            ["Mitgewirkt haben", text(d, "mitwirkung").split("\n").map((z) => z.trim().replace(/[.;,]+$/, "")).filter(Boolean).join(", ") || null],
+            ["Mitgewirkt haben", text(d, "mitwirkung").split("\n").map((z) => z.trim().replace(/[.;,]+$/, "")).filter(Boolean).join(", ") || (leer ? "" : null)],
             ["Datum", datumDe(text(d, "datum"))],
           ]),
         ) +
@@ -127,15 +131,18 @@ export const gefaehrdungsbeurteilung: Vorlage = {
         (d.mutterschutz !== false
           ? abschnitt(
               "Mutterschutz (§ 10 MuSchG)",
-              `<p>Ergebnis der anlassunabhängigen Beurteilung für schwangere oder stillende Frauen:</p>${musch ? `<p><strong>${esc(musch.text)}</strong></p>` : absatz("")}${text(d, "mutterschutz_details") ? zeilen(text(d, "mutterschutz_details")) : ""}`,
+              // ohne Ergebnis: die drei möglichen Ergebnisse zum Ankreuzen; Einzelheiten unter eigener Zwischenüberschrift
+              `<p>Ergebnis der anlassunabhängigen Beurteilung für schwangere oder stillende Frauen:</p>${musch ? `<p><strong>${esc(musch.text)}</strong></p>` : ankreuzen(MUTTERSCHUTZ.map((m) => m.text))}${details ? `<h3>${musch?.wert === "keine_massnahmen" ? "Beurteilte Gefährdungen" : "Gefährdungen und Schutzmaßnahmen"}</h3>${zeilen(details)}` : ""}`,
             )
           : "") +
         abschnitt(
           "Wirksamkeit und Fortschreibung",
           angaben([
-            ["Wirksamkeit", WIRKSAM[text(d, "wirksamkeit")] ?? ""],
+            // leeres Blatt: nicht den Startwert „noch zu überprüfen“ vordrucken, sondern alle Stufen zum Ankreuzen
+            ["Wirksamkeit", leer || !WIRKSAM[text(d, "wirksamkeit")] ? roh(ankreuzen(Object.values(WIRKSAM))) : WIRKSAM[text(d, "wirksamkeit")]!],
             ["Überprüft am", datumDe(text(d, "wirksamkeit_am"))],
-            ["Bemerkung", text(d, "bemerkung") || null],
+            // leeres Blatt: Platz für die Bemerkung, auf die „teilweise wirksam“ verweist
+            ["Bemerkung", text(d, "bemerkung") || (leer ? "" : null), 2],
             ["Überprüfung der Beurteilung", text(d, "fortschreibung")],
           ]),
         ) +
@@ -196,6 +203,22 @@ export const unterweisung: Vorlage = {
   },
 };
 
+const SDB = [
+  { wert: "liegt_vor", text: "liegt vor" },
+  { wert: "fehlt", text: "fehlt – anfordern" },
+];
+
+/**
+ * Sicherheitsdatenblatt eines Eintrags: Auswahl `sdb`; gespeicherte Einträge von früher haben stattdessen den Schalter
+ * `sdb_vorhanden`. Dessen `true` gilt als „liegt vor“. Ein gespeichertes `false` lässt sich nicht von einem übersehenen
+ * Schalter unterscheiden (Startwert war `false`) – es gilt deshalb als offen: Linie zum Eintragen statt „fehlt“.
+ */
+function sdbStatus(x: Eintrag): "liegt_vor" | "fehlt" | null {
+  const w = text(x, "sdb");
+  if (w === "liegt_vor" || w === "fehlt") return w;
+  return x.sdb_vorhanden === true ? "liegt_vor" : null;
+}
+
 export const gefahrstoffverzeichnis: Vorlage = {
   id: "gefahrstoffverzeichnis",
   titel: "Gefahrstoffverzeichnis",
@@ -224,8 +247,10 @@ export const gefahrstoffverzeichnis: Vorlage = {
             { id: "menge", art: "text", label: "Mengenbereich im Betrieb", pflicht: true, vorschlaege: ["bis 1 kg bzw. 1 l", "1 bis 10 kg bzw. l", "10 bis 100 kg bzw. l", "über 100 kg bzw. l"] },
             { id: "arbeitsbereich", art: "text", label: "Arbeitsbereiche mit möglicher Exposition", pflicht: true },
             { id: "verwendung", art: "text", label: "Verwendung" },
-            { id: "sdb_vorhanden", art: "schalter", label: "Sicherheitsdatenblatt liegt vor" },
-            { id: "sdb_stand", selten: true, art: "datum", label: "Stand des Sicherheitsdatenblatts", wenn: { feld: "sdb_vorhanden" } },
+            // Auswahl ohne Startwert statt Schalter: ein übersehener Schalter druckte „fehlt“ (früher `sdb_vorhanden`, siehe sdbStatus)
+            { id: "sdb", art: "wahl", label: "Sicherheitsdatenblatt", optionen: SDB, pflicht: true },
+            // nicht bei „fehlt“; bei offener Auswahl sichtbar, damit der Stand früherer Einträge (sdb_vorhanden) erhalten bleibt
+            { id: "sdb_stand", selten: true, art: "datum", label: "Stand des Sicherheitsdatenblatts", wenn: { feld: "sdb", ist: "fehlt", nicht: true } },
           ],
         },
       ],
@@ -239,7 +264,7 @@ export const gefahrstoffverzeichnis: Vorlage = {
       zelle(text(x, "menge")),
       zelle(text(x, "arbeitsbereich")),
       zelle(text(x, "verwendung")),
-      ja(x, "sdb_vorhanden") ? `liegt vor${text(x, "sdb_stand") ? `<br>Stand ${datumDe(text(x, "sdb_stand"))}` : ""}` : "<strong>fehlt</strong>",
+      ((st) => (st === "liegt_vor" ? `liegt vor${text(x, "sdb_stand") ? `<br>Stand ${datumDe(text(x, "sdb_stand"))}` : ""}` : st === "fehlt" ? "<strong>fehlt – anfordern</strong>" : ZELLE_LINIE))(sdbStatus(x)),
     ]);
     return dokument({
       titel: "Gefahrstoffverzeichnis",
@@ -247,16 +272,16 @@ export const gefahrstoffverzeichnis: Vorlage = {
       quer: true,
       meta: `Stand: ${datumDe(text(d, "stand"))}\nVerantwortlich: ${text(d, "verantwortlich")}${s.length ? `\nAnzahl Gefahrstoffe: ${s.length}` : ""}`,
       inhalt:
-        tabelle(["Bezeichnung / Hersteller", "Einstufung / gefährliche Eigenschaften", "Mengenbereich", "Arbeitsbereiche", "Verwendung", "Sicherheitsdatenblatt"], zeilenHtml, { breiten: ["20%", "22%", "12%", "18%", "14%", "14%"], mindestens: s.length ? 0 : 6 }) +
+        tabelle(["Bezeichnung / Hersteller", "Einstufung / gefährliche Eigenschaften", "Mengenbereich", "Arbeitsbereiche", "Verwendung", "Sicherheitsdatenblatt"], zeilenHtml, { breiten: ["20%", "22%", "12%", "18%", "14%", "14%"], ...(s.length ? {} : { mindestens: 10, hoch: true }) }) +
         nachsatz(`Verzeichnis nach § 6 Abs. 12 GefStoffV mit ${GEFAHRSTOFF_ANGABEN.length} Pflichtangaben: ${GEFAHRSTOFF_ANGABEN.join("; ")}.`),
     });
   },
 };
 
-/** Abschnitte nach TRGS 555 Nr. 3.2.4–3.2.8 (3.2.2/3.2.3 stehen im Kopf). */
-const BA_TEILE: { id: string; label: string; hilfe: string; bausteine?: string }[] = [
+/** Abschnitte nach TRGS 555 Nr. 3.2.4–3.2.8 (3.2.2/3.2.3 stehen im Kopf); `linien`: Linien je leerem Kasten (Blatt zum Ausfüllen). */
+const BA_TEILE: { id: string; label: string; hilfe: string; bausteine?: string; linien?: number }[] = [
   { id: "gefahren", label: "Gefahren für Mensch und Umwelt", hilfe: "H-Sätze aus dem Sicherheitsdatenblatt (Abschnitt 2), z. B. „Verursacht schwere Augenreizung“" },
-  { id: "schutz", label: "Schutzmaßnahmen und Verhaltensregeln", hilfe: "Technisch, organisatorisch, Hygiene, persönliche Schutzausrüstung", bausteine: "schutzmassnahmen" },
+  { id: "schutz", label: "Schutzmaßnahmen und Verhaltensregeln", hilfe: "Technisch, organisatorisch, Hygiene, persönliche Schutzausrüstung", bausteine: "schutzmassnahmen", linien: 5 },
   { id: "gefahrfall", label: "Verhalten im Gefahrfall", hilfe: "Bei Verschütten, Brand, Unfall – laut Sicherheitsdatenblatt (Abschnitte 5 und 6)", bausteine: "gefahrfall" },
   { id: "erste_hilfe", label: "Erste Hilfe", hilfe: "Nach Augen-, Hautkontakt, Einatmen, Verschlucken – laut Sicherheitsdatenblatt (Abschnitt 4)", bausteine: "erste_hilfe" },
   { id: "entsorgung", label: "Sachgerechte Entsorgung", hilfe: "Laut Sicherheitsdatenblatt (Abschnitt 13)", bausteine: "entsorgung" },
@@ -294,14 +319,16 @@ export const betriebsanweisung: Vorlage = {
   ],
   html(d: Daten, b) {
     // Aufbau wie das Muster der DGUV Information 211-010: Titelband mit Nummer, Bereich und Stoff, dann die Abschnitte nach TRGS 555
-    const kaesten = BA_TEILE.map((t) => `<section class="kasten"><h2>${esc(t.label)}</h2><div class="inhalt">${zeilen(text(d, t.id))}</div></section>`).join("");
+    // leerer Kasten: drei Linien zum Ausfüllen von Hand, Schutzmaßnahmen fünf
+    const kaesten = BA_TEILE.map((t) => `<section class="kasten"><h2>${esc(t.label)}</h2><div class="inhalt">${text(d, t.id) ? zeilen(text(d, t.id)) : linien(t.linien ?? 3)}</div></section>`).join("");
     // viel Text → kompakter Satz, damit der Aushang auf ein Blatt passt (Zeilen grob: ca. 80 Zeichen je Zeile)
     const zeilenzahl = BA_TEILE.reduce((n, t) => n + text(d, t.id).split("\n").filter((z) => z.trim()).reduce((m, z) => m + Math.ceil(z.trim().length / 80), 0), 0);
     return dokument({
       titel: "Betriebsanweisung",
       betrieb: b,
       gestalt: "aushang",
-      klasse: zeilenzahl > BA_KOMPAKT_AB ? "ba kompakt" : "ba",
+      // auch das leere Blatt kompakt: die Linien zum Ausfüllen brauchen sonst mehr als ein Blatt
+      klasse: zeilenzahl > BA_KOMPAKT_AB || BA_TEILE.every((t) => !text(d, t.id)) ? "ba kompakt" : "ba",
       band: "#e0640c",
       meta: `Stand: ${datumDe(text(d, "datum"))}`,
       inhalt:
@@ -310,7 +337,7 @@ export const betriebsanweisung: Vorlage = {
         kaesten +
         // ohne Angabe: Notruf und Linie für die Ersthelferin bzw. den Ersthelfer zum Eintragen von Hand
         `<div class="notruf">${text(d, "notruf") ? esc(text(d, "notruf")) : `Notruf 112 · Ersthelfer/in: ${LINIE}`}</div>` +
-        unterschriften([`Freigegeben: ${text(d, "erstellt_von")}`, "Datum, Unterschrift"]),
+        unterschriften([text(d, "erstellt_von") ? `Freigegeben: ${text(d, "erstellt_von")}` : "Freigegeben von (Name)", "Datum, Unterschrift"]),
     });
   },
 };
