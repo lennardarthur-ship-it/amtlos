@@ -70,6 +70,23 @@ function voll(v) {
   return d;
 }
 
+/**
+ * „auswahl“: wie „voll“, dazu jede Auswahl auf eine andere als die Startoption, alle Schalter umgelegt, alle
+ * Mehrfach- und Bausteinfelder voll und alle Datumsfelder gesetzt – so erscheinen auch die Abschnitte, die erst durch
+ * eine Wahl sichtbar werden.
+ */
+function auswahl(v) {
+  const d = voll(v);
+  for (const a of v.abschnitte)
+    for (const f of a.felder) {
+      if (f.art === "wahl" && f.optionen.length) d[f.id] = (f.optionen.find((o) => o.wert !== d[f.id]) ?? f.optionen[0]).wert;
+      else if (f.art === "schalter") d[f.id] = d[f.id] !== true;
+      else if ((f.art === "mehrfach" || f.art === "bausteine") && f.optionen.length) d[f.id] = f.optionen.map((o) => o.wert);
+      else if (f.art === "datum" && !d[f.id]) d[f.id] = HEUTE;
+    }
+  return d;
+}
+
 const MM = 72 / 25.4;
 const px = (mm) => `${(Math.round(mm * MM) * 4) / 3}px`;
 const pdftotext = (() => {
@@ -85,7 +102,7 @@ const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PFA
 const page = await (await browser.newContext({ locale: "de-DE" })).newPage();
 const befunde = [];
 for (const v of F.VORLAGEN) {
-  for (const [variante, daten] of [["leer", F.leereDaten(v, B, HEUTE)], ["voll", voll(v)]]) {
+  for (const [variante, daten] of [["leer", F.leereDaten(v, B, HEUTE)], ["voll", voll(v)], ["auswahl", auswahl(v)]]) {
     const name = `${v.id}-${variante}`;
     const html = F.mitSchriften(F.dokumentHtml(v, daten, B));
     const ang = F.fussAngaben(html);
@@ -123,5 +140,5 @@ for (const v of F.VORLAGEN) {
   }
 }
 await browser.close();
-console.log(befunde.length ? befunde.join("\n") : `Keine Befunde (${F.VORLAGEN.length} Vorlagen × 2). PDFs: ${OUT}`);
+console.log(befunde.length ? befunde.join("\n") : `Keine Befunde (${F.VORLAGEN.length} Vorlagen × 3). PDFs: ${OUT}`);
 process.exit(befunde.length ? 1 : 0);
