@@ -124,7 +124,7 @@ export const T = {
   bezahlt_titel: "Zahlung",
   bezahlt_kurz: "bezahlt",
   marke: { bezahlt: "Bezahlt", offen: "Offen", ueberfaellig: "Überfällig", storniert: "Storniert", entwurf: "Entwurf" },
-  ueberfaellig_seit: (n: number) => (n === 1 ? "seit 1 Tag überfällig" : `seit ${n} Tagen überfällig`),
+  ueberfaellig_seit: (n: number) => (n === 1 ? "seit\u00a0gestern\u00a0fällig" : `seit\u00a0${n}\u00a0Tagen\u00a0fällig`), // bricht als Ganzes um
   faellig_bis: (d: string) => `Fällig bis ${d}`,
   faellig_war: (d: string) => `Überfällig – fällig war der ${d}`,
   davon_ueberfaellig: (n: number) => `davon ${n} überfällig`,

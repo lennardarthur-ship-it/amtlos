@@ -926,6 +926,7 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
   - Verdeckte Felder gehören nicht ins Dokument (`ohneVerdeckte`, mit Kaskade); Formular, Papieransicht, Prüfung und PDF nutzen dieselbe Sichtbarkeit (`ohneVerdeckteFelder`).
   - Gutschrift: Titel und Summe „Gutschrift“, keine Zahlungsaufforderung und kein GiroCode; Hinweis bei Kleinunternehmer zusammen mit Reverse-Charge oder igL.
   - Kassenmeldung zählt Feldnummern lückenlos; weitere leere Ausfüllblätter (Allergene, HACCP, Lohnkonto, EÜR, Rechnung, Verfahrensdokumentation, Handelsregister); Datenpanne ohne widersprüchliche Kombinationen; Google Fonts lokal oder extern; EÜR-Kennzahlen in App und PDF gleich; „Erstattung erhalten am“; kleinere Text- und Satzfehler.
+- **Store-Bilder:** Bild 4 („Mit Grund und Quelle – Jede Pflicht erklärt“) zeigte eine Rechnung, weil das Werkzeug die erste Zeile mit „fällig“ antippte – die überfällige Rechnung. Es wählt jetzt nur Pflichten. Die überfällige Rechnung heißt „seit 3 Tagen fällig“ statt Datum plus „seit 3 Tagen überfällig“ (wurde auf „Heute“ und im Store-Bild abgeschnitten). Website-Bilder neu erzeugt.
 - **Bewusst nicht geändert, fachlich offen:** T-87 bis T-93 (Storno-Leistungsdatum und Zahlungsangaben, Cent- vs. Euro-Basis der Voranmeldung, Vorsteuer bei Kleinbetragsrechnungen, einzelne Normverweise in Vorlagen, Werbeaussagen).
 
 ---

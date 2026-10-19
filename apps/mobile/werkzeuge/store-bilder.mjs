@@ -70,7 +70,8 @@ try {
   await warte(2500);
   await foto("pflichten");
   // erste Pflicht unter „Als Nächstes“ auf „Heute“ (welche das ist, hängt vom Tag ab)
-  await p.getByRole("button", { name: /fällig|Nächster Termin/ }).locator("visible=true").first().click();
+  // nur Pflichten („In 7 Tagen fällig“, „Heute fällig“ …), nicht die überfällige Rechnung („seit 3 Tagen fällig“)
+  await p.getByRole("button", { name: /In \d+ Tagen fällig|Heute fällig|Morgen fällig|Seit .* überfällig|Nächster Termin/ }).locator("visible=true").first().click();
   await warte(900);
   await foto("pflicht");
   await knopf("Schließen").click();

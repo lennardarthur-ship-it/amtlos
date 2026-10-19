@@ -68,13 +68,14 @@ export const UnterlageZeile = memo(function UnterlageZeile({ u, letzte, fehlt, b
         : !u.festgeschrieben
           ? { text: TEXT.marke.entwurf, ton: "leise" as const }
           : undefined;
+    // überfällig: „seit … fällig“ statt des Datums – passt in eine Zeile neben die Marke
     const zusatz = !u.festgeschrieben && fehlt ? TEXT.fehlen(fehlt) : ueber > 0 && !u.bezahlt ? TEXT.ueberfaellig_seit(ueber) : "";
     return (
       <Zeile
         symbol="eurosign"
         ton={ueber > 0 && !u.bezahlt ? "frist" : ton}
         titel={storno ? TEXT.storno_titel(nummer, storno) : kunde || TEXT.rechnung_ohne_kunde}
-        text={[storno ? kunde : nummer, datum, zusatz].filter(Boolean).join(" · ")}
+        text={[storno ? kunde : nummer, ueber > 0 && !u.bezahlt && !fehlt ? "" : datum, zusatz].filter(Boolean).join(" · ")}
         wert={brutto ? euroText(brutto) : undefined}
         marke={marke}
         onPress={() => onPress(u.id)}
