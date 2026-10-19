@@ -893,6 +893,21 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Aufgeräumt:** Schrift Inter, das alte `Seite`-Bauteil und das „+“-Menü-Hilfsmittel sind entfernt.
 - **Nicht gemacht – native Schlüsselableitung:** Dafür bräuchte es ein natives Modul (z. B. react-native-quick-crypto). Das lässt sich hier weder bauen noch auf einem iPhone prüfen, und im Testpaket (Expo Go) läuft es nicht. Ein ungeprüftes natives Paket könnte den Store-Build brechen. Es kommt mit dem ersten eigenen Build (EAS/TestFlight), → T-85.
 
+### E-145 · Letzte Runde vor der Veröffentlichung (2026-10-19)
+
+- **Anlass:** Letzter Auftrag des Gründers vor der Veröffentlichung: alles tun, was in meiner Hand liegt.
+- **Einleitungssätze im grünen Band:** `Unterseite` hat ein optionales `unter`. Mitarbeiter, Kunden, Absender, Vorschläge, Anlässe, Steuerberatung und Sicherung erklären sich dort in einem Satz statt in einer Karte auf dem Blatt. Der Mitarbeiter-/Kundensatz war ohne Subjekt („Füllen … vor“) und ist neu formuliert. „Aus offiziellen Quellen vorbereitet“ bei den Vorschlägen war nicht belegt und heißt jetzt „Vorbereitete Vorschläge für deinen Betrieb“.
+- **Nach unabhängiger Code-Prüfung behoben:**
+  - Erneutes Tippen auf den aktiven Tab führt wieder zur ersten Seite des Stapels.
+  - Statusleiste: Die Option `statusBarStyle` der Navigationsleiste greift in dieser App nicht (UIViewControllerBasedStatusBarAppearance ist aus). Grüne Seiten (`Unterseite`, `BuehnenBlatt`, Ablauf, Check auf der Bühne) setzen die helle Statusleiste jetzt über `HellerStatus` (expo-status-bar), solange sie sichtbar sind.
+  - Speicherkontingent im Tresor zählt Bytes (`octet_length`) statt Zeichen; bei Überschreitung antwortet der Server mit 413 und die App sagt „Speicher voll“ statt „Formatfehler“.
+  - CORS steht vor dem Anmelde-Tor, damit Vorab-Anfragen (OPTIONS) des Browsers nicht abgewiesen werden.
+  - IP-Grenze der Ratenbegrenzung auf das Vierfache der Kontogrenze, damit mehrere Geräte hinter einem Router (Betrieb, Mobilfunk-NAT) sich nicht gegenseitig sperren.
+  - „Alles löschen“ sperrt das Speichern und verwirft den Schlüssel, bevor die Daten entfernt werden – kein Zeitfenster, in dem noch mit dem alten Schlüssel geschrieben wird.
+- **Test robuster:** Der API-Test zur Gefährdungsbeurteilung erwartete Status „offen“; zum Monatsende ist die Pflicht „fällig bald“. Der Test akzeptiert jetzt alle offenen Status.
+- **Anleitung für den Gründer:** Docs-Seite „Amtlos veröffentlichen – Schritt für Schritt“ (Firma und Website, Apple, Abo/RevenueCat, Store-Angaben, fachliche Prüfung, Bauen/TestFlight mit iPhone-Prüfliste, Store-Eintrag, nach dem Start). `docs/11-store-start.md` ist auf demselben Stand.
+- **Weiterhin offen (nicht in meiner Hand):** Firmendaten und Impressum, Apple-Entwicklerkonto, RevenueCat-Produkte und Preise im Store, juristische und steuerliche Prüfung (PRUEFLISTE), Test auf echtem iPhone, native Schlüsselableitung im ersten EAS-Build (T-85).
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

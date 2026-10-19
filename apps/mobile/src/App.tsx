@@ -56,10 +56,8 @@ function Kapsel({ state, navigation }: BottomTabBarProps) {
                 accessibilityState={{ selected: an }}
                 onPress={() => {
                   const e = navigation.emit({ type: "tabPress", target: r.key, canPreventDefault: true });
-                  if (!e.defaultPrevented) {
-                    if (an) navigation.navigate(r.name, { screen: "Wurzel" });
-                    else navigation.navigate(r.name);
-                  }
+                  // erneutes Tippen auf den aktiven Tab: der Stapel kehrt selbst zur ersten Seite zurück
+                  if (!an && !e.defaultPrevented) navigation.navigate(r.name);
                 }}
                 hitSlop={4}
                 style={({ pressed }) => ({ height: 52, minWidth: 52, paddingHorizontal: an ? 15 : 0, borderRadius: 26, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7, backgroundColor: an ? "rgba(127,227,184,0.16)" : "transparent", opacity: pressed ? 0.7 : 1 })}

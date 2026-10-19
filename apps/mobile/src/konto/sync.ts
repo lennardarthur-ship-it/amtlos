@@ -21,7 +21,7 @@ export const SCHLUESSEL_FORMAT = "amtlos-schluessel";
 const HUELLE_ZUSATZ = `${SCHLUESSEL_FORMAT}:1`;
 
 export class SyncFehler extends Error {
-  constructor(public art: "passwort" | "format" | "konflikt" | "netz" | "pro" | "anmeldung" | "konto") {
+  constructor(public art: "passwort" | "format" | "konflikt" | "netz" | "pro" | "anmeldung" | "konto" | "voll") {
     super(art);
   }
 }

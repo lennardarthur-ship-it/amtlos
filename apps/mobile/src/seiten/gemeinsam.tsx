@@ -6,8 +6,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Bereich } from "@amtlos/fachlogik";
 import { euroText } from "../unterlagen/ablage";
 import { Kachel, Motiv, T } from "../ui/bausteine";
-import { TastaturRahmen, useImBlatt, useKopf, type KopfKnopfDef } from "../ui/navigation";
-import { RADIUS, RAND, SCHRIFT, istIos, schattenStil, useFarben } from "../ui/thema";
+import { HellerStatus, TastaturRahmen, useImBlatt, useKopf, type KopfKnopfDef } from "../ui/navigation";
+import { RADIUS, RAND, SCHRIFT, schattenStil, useFarben } from "../ui/thema";
 
 /** Platz unter dem Blatt für die schwebende Tab-Leiste. */
 export const UNTEN_FREI = 120;
@@ -71,6 +71,7 @@ export function BuehnenBlatt({ kopf = "", ueber, titel, unter, buehne, rechts, f
   useKopf({ titel: kopf, buehne: true, rechts });
   return (
     <TastaturRahmen grund={f.buehne}>
+      <HellerStatus />
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" automaticallyAdjustKeyboardInsets>
         <View style={{ paddingHorizontal: RAND, paddingTop: 6, paddingBottom: 28, gap: 14, overflow: "hidden" }}>
           <Motiv zeichen="§" groesse={300} farbe="rgba(127,227,184,0.06)" stil={{ right: -70, top: -60 }} />
@@ -141,8 +142,10 @@ export function Leer({ text, unter, children, symbol = "tray" }: { text: string;
 
 /** Inhalt einer Unterseite: scrollbar, Platz für die Tab-Leiste, Tastatur schiebt mit. */
 export function Inhalt({ children, ...rest }: ScrollViewProps) {
+  // in einem Tab liegt die schwebende Tab-Leiste über dem Ende – Platz lassen; in Blättern genügt wenig
+  const imBlatt = useImBlatt();
   return (
-    <ScrollView contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 16, paddingBottom: istIos ? 32 : 140 }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" automaticallyAdjustKeyboardInsets {...rest}>
+    <ScrollView contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 22, paddingBottom: imBlatt ? 40 : UNTEN_FREI }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" automaticallyAdjustKeyboardInsets {...rest}>
       {children}
     </ScrollView>
   );

@@ -577,7 +577,7 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       const g = (await alsLea(http().post(`/v1/gefaehrdungsbeurteilungen/${b.id}/gefaehrdungen`)).send({ faktor: "einwirkungen", beschreibung: "Heiße Bleche", risiko: "mittel", massnahme: "Hitzeschutzhandschuhe", verantwortlich: "Lea", umsetzen_bis: heuteIso }).expect(201)).body;
       await alsLea(http().put(`/v1/gefaehrdungen/${g.id}`)).send({ faktor: "einwirkungen", beschreibung: "Heiße Bleche und Öfen", risiko: "hoch", massnahme: "Hitzeschutzhandschuhe", verantwortlich: "Lea" }).expect(200);
       const vorher = (await alsLea(http().get("/v1/pflichten")).expect(200)).body.filter((x: { pflicht_id: string; status: string; ergebnis: string }) =>
-        ["arbeitsschutz.gefaehrdungsbeurteilung", "personal.mutterschutz_gefaehrdungsbeurteilung"].includes(x.pflicht_id) && x.status === "offen" && x.ergebnis === "gilt");
+        ["arbeitsschutz.gefaehrdungsbeurteilung", "personal.mutterschutz_gefaehrdungsbeurteilung"].includes(x.pflicht_id) && ["offen", "faellig_bald", "ueberfaellig"].includes(x.status) && x.ergebnis === "gilt"); // Status hängt vom heutigen Datum ab (Monatsende)
       expect(vorher.length).toBeGreaterThanOrEqual(2);
       const r = (await alsLea(http().post(`/v1/gefaehrdungsbeurteilungen/${b.id}/abschliessen`)).expect(201)).body;
       expect(r.erledigte_pflichten).toBe(vorher.length);

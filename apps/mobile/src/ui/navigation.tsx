@@ -1,4 +1,5 @@
-import { StackActions, useNavigation, useRoute, type NavigationProp, type ParamListBase } from "@react-navigation/native";
+import { StackActions, useIsFocused, useNavigation, useRoute, type NavigationProp, type ParamListBase } from "@react-navigation/native";
+import { StatusBar } from "expo-status-bar";
 import { createNativeStackNavigator, type NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { KeyboardAvoidingView, Platform, Pressable, View, useWindowDimensions } from "react-native";
@@ -30,6 +31,14 @@ export type SeitenParams = { id: string; schluessel: string };
 /** Navigator der obersten Ebene (für Blätter), in einem Blatt: ob wir darin sind. */
 export const WurzelNavKontext = createContext<NavigationProp<ParamListBase> | null>(null);
 const BlattKontext = createContext(false);
+/**
+ * Helle Statusleiste, solange diese Seite sichtbar ist (E-144: alle Leisten liegen auf der grünen Bühne). Über
+ * expo-status-bar statt der Option der Navigationsleiste – die greift in dieser App nicht.
+ */
+export function HellerStatus() {
+  return useIsFocused() ? <StatusBar style="light" /> : null;
+}
+
 /** Liegt die Seite in einem Blatt (ohne Tab-Leiste darunter)? */
 export const useImBlatt = () => useContext(BlattKontext);
 
@@ -143,8 +152,8 @@ export function useKopf({ titel, rechts, schliessen, gross, buehne }: { titel: s
     if (buehne === undefined) return;
     navigation.setOptions(
       buehne
-        ? { headerStyle: { backgroundColor: f.buehne }, headerTintColor: f.minze, headerTitleStyle: { color: f.buehneText, ...SCHRIFT.bold }, contentStyle: { backgroundColor: f.buehne }, statusBarStyle: "light", ...(istIos ? null : { headerTitle: webTitel(f.buehneText) }) }
-        : { headerStyle: istIos ? undefined : { backgroundColor: f.papier }, headerTintColor: f.amt, headerTitleStyle: { color: f.tinte, ...SCHRIFT.bold }, contentStyle: { backgroundColor: f.papier }, statusBarStyle: undefined, ...(istIos ? null : { headerTitle: webTitel(f.tinte) }) },
+        ? { headerStyle: { backgroundColor: f.buehne }, headerTintColor: f.minze, headerTitleStyle: { color: f.buehneText, ...SCHRIFT.bold }, contentStyle: { backgroundColor: f.buehne }, ...(istIos ? null : { headerTitle: webTitel(f.buehneText) }) }
+        : { headerStyle: istIos ? undefined : { backgroundColor: f.papier }, headerTintColor: f.amt, headerTitleStyle: { color: f.tinte, ...SCHRIFT.bold }, contentStyle: { backgroundColor: f.papier }, ...(istIos ? null : { headerTitle: webTitel(f.tinte) }) },
     );
   }, [navigation, buehne, f]);
   // „Schließen“ setzt der Blatt-Stapel selbst auf seine erste Seite (siehe `Blatt`) – hier nichts überschreiben
@@ -191,14 +200,16 @@ export function TastaturRahmen({ children, grund }: { children: ReactNode; grund
  * Unterseite (E-144): grüne Leiste mit dem Titel groß darunter auf der Bühne, der Inhalt auf dem hellen Blatt –
  * Fußleisten bleiben über der Tastatur. Ohne Titel (z. B. gelöschter Eintrag) nur das Blatt.
  */
-export function Unterseite({ titel, children, rechts, schliessen }: { titel: string; children: ReactNode; rechts?: KopfKnopfDef | null; schliessen?: boolean }) {
+export function Unterseite({ titel, unter, children, rechts, schliessen }: { titel: string; unter?: string; children: ReactNode; rechts?: KopfKnopfDef | null; schliessen?: boolean }) {
   const f = useFarben();
   useKopf({ titel: "", rechts, schliessen: schliessen ?? true, buehne: true });
   return (
     <TastaturRahmen grund={f.buehne}>
+      <HellerStatus />
       {titel ? (
         <View style={{ paddingHorizontal: RAND, paddingTop: 2, paddingBottom: 20 }}>
           <T v="titel" accessibilityRole="header" farbe={f.buehneText} numberOfLines={3}>{titel}</T>
+          {unter ? <T farbe={f.buehneLeise} stil={{ marginTop: 6 }}>{unter}</T> : null}
         </View>
       ) : null}
       <View style={{ flex: 1, backgroundColor: f.papier, borderTopLeftRadius: RADIUS.buehne, borderTopRightRadius: RADIUS.buehne, overflow: "hidden" }}>{children}</View>

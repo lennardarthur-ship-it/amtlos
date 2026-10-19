@@ -14,6 +14,8 @@ export async function erzeugeApp(k: Konfiguration): Promise<NestExpressApplicati
   });
   const metriken = app.get<Metriken>(METRIKEN);
   app.set("trust proxy", 1);
+  // CORS zuerst: auch 401 und 429 der Vorstufen sollen im Browser lesbar ankommen
+  app.enableCors({ origin: [k.WEB_URL], credentials: false, allowedHeaders: ["Authorization", "Content-Type", "X-Unternehmen-Id", "X-Request-Id", "X-Sprache"], exposedHeaders: ["X-Request-Id"] });
   app.use(zugriffsprotokoll(metriken, k.UMGEBUNG !== "test"));
   // Ratenbegrenzung vor dem Einlesen der Anfrage (E-143) – sonst würden große Bodies erst gelesen und dann abgewiesen
   app.use(new Ratenbegrenzer({ angemeldet: k.RATE_ANGEMELDET, anonym: k.RATE_ANONYM, fensterMs: 60_000 }).middleware(metriken));
@@ -27,7 +29,6 @@ export async function erzeugeApp(k: Konfiguration): Promise<NestExpressApplicati
   // rawBody für Webhook-Signaturen (Stripe prüft über den unveränderten Body)
   app.useBodyParser("json", { limit: "256kb", verify: (req: { rawBody?: Buffer }, _res: unknown, buf: Buffer) => { req.rawBody = buf; } });
   app.use(helmet());
-  app.enableCors({ origin: [k.WEB_URL], credentials: false, allowedHeaders: ["Authorization", "Content-Type", "X-Unternehmen-Id", "X-Request-Id", "X-Sprache"], exposedHeaders: ["X-Request-Id"] });
   app.enableShutdownHooks();
   return app;
 }

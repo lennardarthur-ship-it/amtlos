@@ -353,7 +353,7 @@ export function Zeile({ links, symbol, ton, titel, text, wert, marke, rechts, on
       {vorn ? <View style={{ marginRight: 14, minWidth: 24, alignItems: "center" }}>{vorn}</View> : null}
       <View style={{ flex: 1, minWidth: 0, flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 13, minHeight: 58, borderBottomWidth: letzte ? 0 : HAARLINIE, borderColor: f.linie }}>
         <View style={{ flex: 1, minWidth: 0 }}>
-          <T fett={!gefahr} farbe={gefahr ? f.frist : undefined} numberOfLines={2}>{titel}</T>
+          <T fett={!gefahr} farbe={gefahr ? f.frist : undefined} numberOfLines={3}>{titel}</T>
           {text ? <T v="klein" leise numberOfLines={2} stil={{ marginTop: 1 }}>{text}</T> : null}
         </View>
         {/* Betrag rechts (Rechnungen, Belege) – das, wonach man in Listen sucht */}

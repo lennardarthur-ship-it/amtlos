@@ -81,9 +81,8 @@ function PersonenSeite({ art }: { art: PersonenArt }) {
     oeffnen(id, true);
   };
   return (
-    <Unterseite titel={art === "mitarbeiter" ? TEXT.mitarbeiter_titel : TEXT.kunden_titel} rechts={{ text: TEXT.neu, symbol: "plus", label: TEXT.person_hinzufuegen[art], onPress: anlegen }}>
+    <Unterseite titel={art === "mitarbeiter" ? TEXT.mitarbeiter_titel : TEXT.kunden_titel} unter={TEXT.personen_text[art]}>
       <Inhalt>
-        <T leise>{TEXT.personen_text[art]}</T>
         {alle.length > 6 ? (
           <View style={{ marginTop: 14 }}>
             <Suchfeld wert={suche} setzen={setSuche} label={TEXT.liste_suchen} />
@@ -115,9 +114,8 @@ const TEILE: Teil[] = ["angaben", "steuer", "auftritt", "gesellschaft"];
 export function AbsenderSeite() {
   const nav = useNav();
   return (
-    <Unterseite titel={TEXT.absender_titel}>
+    <Unterseite titel={TEXT.absender_titel} unter={TEXT.absender_text}>
       <Inhalt>
-        <T leise stil={{ marginBottom: 12 }}>{TEXT.absender_text}</T>
         <BetriebFormular teile={["angaben", "steuer"]} />
       </Inhalt>
       <Fuss>

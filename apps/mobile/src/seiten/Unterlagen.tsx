@@ -116,9 +116,8 @@ function VorlagenListe({ liste }: { liste: Vorlage[] }) {
 
 function AnlassSeite({ a }: { a: Anlass }) {
   return (
-    <Unterseite titel={a.titel}>
+    <Unterseite titel={a.titel} unter={a.text}>
       <Inhalt>
-        <T leise stil={{ marginBottom: 14 }}>{a.text}</T>
         <VorlagenListe liste={a.vorlagen.map((id) => vorlageFuer(id)!)} />
       </Inhalt>
     </Unterseite>

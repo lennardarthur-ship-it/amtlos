@@ -1,6 +1,6 @@
 # 11 · Vom Code in den App Store (E-132)
 
-Stand: 2026-10-13. Alles, was im Code geht, ist erledigt. Was hier steht, braucht dein Apple-Konto, deine Firma oder eine fachliche Freigabe. `node apps/mobile/werkzeuge/store-check.mjs` zeigt jederzeit, was noch offen ist.
+Stand: 2026-10-19 (E-142 bis E-144). Alles, was im Code geht, ist erledigt. Was hier steht, braucht dein Apple-Konto, deine Firma oder eine fachliche Freigabe. `node apps/mobile/werkzeuge/store-check.mjs` zeigt jederzeit, was noch offen ist.
 
 ## 1. Firma und Konten (du)
 
@@ -35,7 +35,7 @@ npx eas-cli init                       # schreibt extra.eas.projectId in app.jso
 npx eas-cli secret:create --name EXPO_PUBLIC_REVENUECAT_IOS_KEY --value appl_xxx --scope project
 ```
 
-Ohne den Schlüssel läuft jede Version im **Testmodus**. Dort lässt sich Pro testweise einschalten, und es gibt keine Käufe. So bleibt das Testpaket für Expo Go nutzbar.
+Ohne den Schlüssel lässt sich Pro in einer Store-Version **nicht kaufen** („noch nicht verfügbar“) – Apple würde die App dann ablehnen, weil sich das Abo nicht prüfen lässt. Pro testweise einschalten geht nur in Entwicklung, im Testpaket (Expo Go) und in Builds mit `EXPO_PUBLIC_PRO_TESTMODUS=1` (EAS-Profil `preview`, für TestFlight-Tester). Das Profil `production` setzt das nie (E-143).
 
 ## 4. Bauen und einreichen
 
@@ -61,7 +61,7 @@ Für Tests auf echten Geräten: `--profile preview` (interne Verteilung) oder Te
 - **„Neu in dieser Version“:** Für 1.0.0 der Text in `neu`; ab dem ersten Update die Änderungen.
 - **Synchronisation:** Wird ein Build mit `EXPO_PUBLIC_API_URL` eingereicht, stimmen „ohne Konto, ohne Server“ in Store-Texten, Bild 6 und Website nicht mehr – vorher anpassen.
 - **Kategorie:** Business (zweite: Finanzen). **Altersfreigabe:** 4+ (keine Inhalte, die eine höhere Einstufung brauchen; im Fragebogen bestätigen).
-- **App Privacy („Datenschutz-Etiketten“):** Der Code erhebt keine Daten auf eigenen Servern und nutzt kein Tracking. Über RevenueCat wird die **Kaufhistorie** verarbeitet: nicht mit der Identität verknüpft, kein Tracking, Zweck „App-Funktionalität“. So steht es auch im Privacy Manifest (`app.json` → `ios.privacyManifests`). Vor dem Absenden mit dem Datenschutzhinweis abgleichen (T-77).
+- **App Privacy („Datenschutz-Etiketten“):** Kein Tracking. Im Privacy Manifest (`app.json` → `ios.privacyManifests`) stehen seit E-143 Kaufhistorie, E-Mail-Adresse, Name und Benutzer-ID – mit der Identität verknüpft, Zweck „App-Funktionalität“. E-Mail, Name und Benutzer-ID fallen nur mit Synchronisation an; ohne sie genügt in App Store Connect die Kaufhistorie (verknüpft, weil RevenueCat Käufe einer Kennung zuordnet). Vor dem Absenden mit dem Datenschutzhinweis abgleichen (T-77, T-85).
 - **Export-Compliance:** Die App verschlüsselt lokale Daten (AES-256-GCM). Ob die Ausnahme greift, ist **nicht** entschieden (T-77). Erst danach `ios.config.usesNonExemptEncryption` setzen.
 
 ## 6. Nach dem Start messen
@@ -89,9 +89,13 @@ node apps/website/bauen.mjs            # → apps/website/dist (index, impressum
 - **Kopf:** Alles in `seite.html` vor `<!-- /kopf -->` kommt in den `<head>`: Title, Description, Open Graph (Vorschaubild `bilder/og.jpg` aus `store-bilder.mjs`), Favicon (`favicon.svg` = App-Symbol, `apple-touch-icon.png` 180 px), strukturierte Daten (`SoftwareApplication`, ohne Preis und Bewertung).
 - **`seite.json`:** `url` (z. B. `https://amtlos.de`) schaltet `canonical`, `og:url` und ein absolutes `og:image` ein; `appStoreId` (Ziffern aus App Store Connect) das Smart-App-Banner. Leer bleiben sie auskommentiert.
 - **Impressum und Datenschutz** entstehen beim Bauen aus `apps/mobile/src/rechtliches.ts`. Fehlende Anbieterangaben stehen als „folgt vor dem Start“ da, der Datenschutzhinweis als „Entwurf“, solange `freigegeben: false`. Für den Abschnitt „Diese Website“ fehlen noch die Angaben zum Hosting (Server-Protokolle) – nach Wahl des Hosters ergänzen. Nicht veröffentlichen, bevor `ANBIETER` vollständig ist.
-- **Schriften** liegen selbst gehostet in `schriften/` (Source Sans 3, Source Serif 4, variabel, Latin; SIL Open Font License, Lizenztexte daneben) – kein Abruf bei Google Fonts.
+- **Schriften** liegen selbst gehostet in `schriften/` (Onest, wie App und App-Symbol; SIL Open Font License) – kein Abruf bei Google Fonts.
 - **Bis zum Start** kein nachgebautes App-Store-Badge; danach das offizielle Badge von Apple mit Link zur App-Seite.
 
-## 9. Empfehlung App-Symbol (nicht umgesetzt)
+## 9. Vor dem Einreichen prüfen
 
-`assets/icon.png` erfüllt Apples Vorgaben (1024 × 1024, RGB, ohne Alpha). Gestalterisch ist „Blatt mit Haken“ ein verbreitetes Motiv, und die grauen Textzeilen (`#c9d0d6` auf Weiß, etwa 1,5 : 1) verschwinden ab 60 px. Vorschlag für eine Überarbeitung: Stempel größer und deutlicher als Amtsstempel, Textzeilen weglassen oder dunkler; Grün und die Idee „Stempel = erledigt, ohne Amt“ behalten. Klein prüfen (40, 60, 120 px, hell und dunkel).
+```bash
+cd apps/mobile && node werkzeuge/store-check.mjs      # listet, was noch fehlt (Exit 1, solange etwas offen ist)
+```
+
+Zusätzlich auf einem echten iPhone (TestFlight): PRUEFLISTE T-82 bis T-85 – Schrift, Statusleiste, Tab-Leiste, Wischgesten, Kauf in der Sandbox, „Käufe wiederherstellen“, Face ID, iCloud, PDF teilen und drucken.

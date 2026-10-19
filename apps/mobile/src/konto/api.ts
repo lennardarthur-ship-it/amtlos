@@ -15,7 +15,9 @@ export function fehlerAusStatus(status: number): SyncFehler {
   if (status === 401 || status === 403) return new SyncFehler("anmeldung");
   if (status === 402) return new SyncFehler("pro");
   if (status === 409) return new SyncFehler("konflikt");
-  if (status === 400 || status === 413) return new SyncFehler("format");
+  // 413: Speicher des Kontos voll (E-143) – nicht als Formatfehler melden
+  if (status === 413) return new SyncFehler("voll");
+  if (status === 400) return new SyncFehler("format");
   return new SyncFehler("netz");
 }
 

@@ -122,7 +122,7 @@ export class TresorController {
     await this.proPruefen(k.kontoId);
     await this.db.imKontext({ kontoId: k.kontoId }, async (tx) => {
       // Speicher je Konto begrenzen (E-143): Anzahl und Größe der Dateien
-      const s = await tx.eine<{ anzahl: string; bytes: string | null }>("select count(*) as anzahl, sum(length(daten)) as bytes from app.tresor_datei where konto_id = $1", [k.kontoId]);
+      const s = await tx.eine<{ anzahl: string; bytes: string | null }>("select count(*) as anzahl, sum(octet_length(daten)) as bytes from app.tresor_datei where konto_id = $1", [k.kontoId]);
       if (Number(s?.anzahl ?? 0) >= this.k.TRESOR_MAX_DATEIEN || Number(s?.bytes ?? 0) + d.daten.length > this.k.TRESOR_MAX_MB * 1024 * 1024)
         throw new PayloadTooLargeException({ statusCode: 413, meldung: "Der Speicher für die Synchronisation ist voll." });
       await tx.abfrage("insert into app.tresor_datei (konto_id, name, daten) values ($1, $2, $3) on conflict (konto_id, name) do nothing", [k.kontoId, name, d.daten]);

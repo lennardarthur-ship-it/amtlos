@@ -3,7 +3,7 @@ import { ScrollView, View } from "react-native";
 import { fehlendeAngaben, personAus, personIn, vorlageFuer, type Daten, type Vorlage, type VorlagenAbschnitt } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { Betrag, Fuss, Knopf,  T, TextKnopf, Wahl, ZurueckKnopf } from "../ui/bausteine";
-import { TastaturRahmen, useKopf, useNav } from "../ui/navigation";
+import { HellerStatus, TastaturRahmen, useKopf, useNav } from "../ui/navigation";
 import { RADIUS, RAND,  useFarben } from "../ui/thema";
 import { PERSONEN_LISTE, betriebFehlt, personenSortiert } from "../unterlagen/speicher";
 import { fehltFuer } from "../unterlagen/pruefung";
@@ -243,6 +243,7 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
 
   return (
     <View style={{ flex: 1, backgroundColor: f.buehne }}>
+      <HellerStatus />
       {amAbschluss ? null : <Fortschritt n={n} aktuell={schritt} />}
       <TastaturRahmen grund={f.buehne}>
         <ScrollView key={schritt} contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 8, paddingBottom: 0, flexGrow: 1 }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive">

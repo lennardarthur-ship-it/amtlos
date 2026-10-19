@@ -55,10 +55,9 @@ export function SteuerberatungSeite() {
     }
   };
   return (
-    <Unterseite titel={TEXT.steuerpaket_titel}>
+    <Unterseite titel={TEXT.steuerpaket_titel} unter={TEXT.steuerpaket_text}>
       <Inhalt>
-        <T leise>{TEXT.steuerpaket_text}</T>
-        <T v="klein" fett stil={{ marginTop: 20 }}>{TEXT.steuerpaket_zeitraum}</T>
+        <T v="klein" fett>{TEXT.steuerpaket_zeitraum}</T>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 8, marginHorizontal: -RAND }} contentContainerStyle={{ paddingHorizontal: RAND }}>
           <Wahl wert={wahl} aendern={setWahl} optionen={liste.map((x) => ({ wert: x.name, text: nameVon(x.name) }))} />
         </ScrollView>

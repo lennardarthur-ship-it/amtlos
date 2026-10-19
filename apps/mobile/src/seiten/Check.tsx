@@ -3,7 +3,7 @@ import { AccessibilityInfo, Platform, ScrollView, View } from "react-native";
 import type { Frage } from "@amtlos/i18n";
 import { T as TEXT } from "../texte";
 import { Auswahl, DatumFeld, Fakt, Feld, Fuss, Hinweis, Symbol, Karte, Knopf, MehrfachWahl, T, TextKnopf, ZurueckKnopf } from "../ui/bausteine";
-import { TastaturRahmen, useKopf, useNav } from "../ui/navigation";
+import { HellerStatus, TastaturRahmen, useKopf, useNav } from "../ui/navigation";
 import { RADIUS, RAND, useFarben } from "../ui/thema";
 import { CHECK_FELDER, auswertung, beantwortet, checkFragen, zusatzFragen, type Profil } from "../pflichten/check";
 import { heute } from "../unterlagen/speicher";
@@ -138,6 +138,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
 
   return (
     <View style={{ flex: 1, backgroundColor: buehne ? f.buehne : f.papier }}>
+      {buehne ? <HellerStatus /> : null}
       {buehne ? null : i < basisN ? <Fortschritt n={basisN} aktuell={Math.max(0, i)} /> : extraN && !zwischenschirm && !amEnde ? <Fortschritt n={extraN} aktuell={i - basisN} /> : <Fortschritt n={1} aktuell={1} />}
       <TastaturRahmen grund={buehne ? f.buehne : undefined}>
         <ScrollView key={i} contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 12, paddingBottom: a ? 0 : 32, flexGrow: 1 }} keyboardShouldPersistTaps="handled">

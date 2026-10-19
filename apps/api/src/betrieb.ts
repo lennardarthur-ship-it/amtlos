@@ -108,7 +108,8 @@ export class Ratenbegrenzer {
       const streng = !token || req.path.startsWith("/v1/einladungen/") || req.path.startsWith("/v1/kalender/");
       const schluessel = token ? `t:${createHash("sha256").update(token).digest("base64url").slice(0, 22)}` : `ip:${req.ip ?? "?"}`;
       // zusätzlich je IP: wechselnde (auch ungültige) Tokens umgehen die Grenze sonst beliebig (E-143)
-      const ip = token ? this.pruefe(`i|${req.ip ?? "?"}`, this.g.angemeldet * 2) : true;
+      // großzügig (×4), damit Büros und Mobilfunk-NAT mit vielen Nutzern hinter einer IP nicht ausgebremst werden
+      const ip = token ? this.pruefe(`i|${req.ip ?? "?"}`, this.g.angemeldet * 4) : true;
       const r = ip === true ? this.pruefe(`${streng ? "s" : "n"}|${schluessel}`, streng ? this.g.anonym : this.g.angemeldet) : ip;
       if (r === true) return weiter();
       m.begrenzt.inc();

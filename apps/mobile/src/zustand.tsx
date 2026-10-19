@@ -347,7 +347,9 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         const reste = (await AsyncStorage.getAllKeys().catch(() => [] as readonly string[])).filter((k) => k.startsWith(`${SCHLUESSEL}.unlesbar.`));
         if (reste.length) await AsyncStorage.multiRemove(reste).catch(() => undefined);
         await autoSchluesselLoeschen().catch(() => undefined);
-        sperre.current = false;
+        // bis der neue Schlüssel da ist, nichts schreiben – sonst landete Neues unter dem gelöschten Schlüssel (E-144)
+        sperre.current = true;
+        schluessel.current = null;
         setLadefehler(false);
         aktuell.current = LEERER_STAND;
         setStand(LEERER_STAND);
@@ -356,6 +358,7 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         // Synchronisation auf diesem Gerät beenden – sonst kämen die Daten vom Server zurück (E-134)
         await kontoVergessen();
         schluessel.current = await schluesselHolen(true).catch(() => null);
+        sperre.current = false;
         return true;
       },
     }),
