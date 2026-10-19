@@ -83,6 +83,11 @@ export const gefaehrdungsbeurteilung: Vorlage = {
       ],
     },
   ],
+  pruefen(d) {
+    // „umgesetzt und wirksam“ passt nicht zu Maßnahmen ohne Umsetzungsdatum (Hinweis, kein Hindernis)
+    const g = liste(d, "gefaehrdungen").filter((x) => text(x, "beschreibung") || text(x, "massnahme"));
+    return text(d, "wirksamkeit") === "wirksam" && g.some((x) => !text(x, "umgesetzt_am")) ? ["Wirksamkeit: „Maßnahmen umgesetzt und wirksam“ gewählt, aber nicht alle Maßnahmen haben ein Datum „Umgesetzt am“ – bitte prüfen."] : [];
+  },
   html(d, b) {
     const g = liste(d, "gefaehrdungen").filter((x) => text(x, "beschreibung") || text(x, "massnahme"));
     const umsetzung = (x: Eintrag) =>
@@ -374,7 +379,7 @@ export const elektroPruefung: Vorlage = {
           // ohne Geräte (Protokoll zum Ausfüllen von Hand) immer mit leeren Zeilen – so viele, wie mit den Unterschriften auf das Blatt passen
           { breiten: ["20%", "18%", "12%", "15%", "20%", "15%"], leerzeilen: ja(d, "leerzeilen") ? 12 : g.length ? 0 : 7, hoch: ja(d, "leerzeilen") || !g.length },
         )}</section>` +
-        (einsatz ? nachsatz(`Richtwert für die Prüffrist nach DGUV Vorschrift 3 (${einsatz.quelle ?? ""}): ${einsatz.text}`) : "") +
+        (einsatz ? nachsatz(`Richtwert für die Prüffrist nach ${einsatz.quelle ?? "DGUV Vorschrift 3"}: ${einsatz.text.replace(/\.$/, "")}.`) : "") +
         unterschriften(["Ort, Datum", "Unterschrift der prüfenden Person"]),
     });
   },

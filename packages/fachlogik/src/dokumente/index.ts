@@ -82,9 +82,20 @@ export function vorlageFuer(id: string): Vorlage | undefined {
 export function sichtbar(f: Feld, d: Daten | Eintrag): boolean {
   if (!f.wenn) return true;
   const w = d[f.wenn.feld];
+  const werte = f.wenn.ist === undefined ? undefined : Array.isArray(f.wenn.ist) ? f.wenn.ist : [f.wenn.ist];
   const erfuellt =
-    f.wenn.ist !== undefined ? (Array.isArray(w) ? (w as unknown[]).includes(f.wenn.ist) : w === f.wenn.ist) : w === true || (typeof w === "string" && w !== "") || (Array.isArray(w) && w.length > 0);
+    werte !== undefined ? werte.some((ist) => (Array.isArray(w) ? (w as unknown[]).includes(ist) : w === ist)) : w === true || (typeof w === "string" && w !== "") || (Array.isArray(w) && w.length > 0);
   return f.wenn.nicht ? !erfuellt : erfuellt;
+}
+
+/**
+ * Eingaben einer Feldliste (Schritt oder Listeneintrag) ohne verdeckte Felder – mit Kaskade: Hängt ein Feld an einem
+ * verdeckten Feld, ist es selbst verdeckt. Formular, Papieransicht, Prüfung und Dokument sehen so dasselbe.
+ */
+export function ohneVerdeckteFelder<T extends Daten | Eintrag>(felder: Feld[], d: T): T {
+  const r = { ...d } as Record<string, unknown>;
+  for (const f of felder) if (!sichtbar(f, r as T)) delete r[f.id];
+  return r as T;
 }
 
 function startwert(f: EinfachesFeld, b: Betrieb, heute: string): string | boolean | string[] | null {
@@ -133,15 +144,16 @@ function benutzt(f: Extract<Feld, { art: "liste" }>, e: Eintrag): boolean {
 /** Fehlende Pflichtangaben als lesbare Bezeichnungen („Gefährdung 2: Maßnahme“). Hindert das Erstellen nicht. */
 export function fehlendeAngaben(v: Vorlage, d: Daten, b?: Betrieb): string[] {
   const fehlt: string[] = [];
+  const sichtbar_ = ohneVerdeckte(v, d);
   for (const a of v.abschnitte)
     for (const f of a.felder) {
-      if (!sichtbar(f, d)) continue;
+      if (!sichtbar(f, sichtbar_)) continue;
       if (f.art === "liste") {
         const eintraege = (Array.isArray(d[f.id]) ? d[f.id] : []) as Eintrag[];
         const genutzt = eintraege.filter((e) => benutzt(f, e));
         if (f.pflicht && !genutzt.length) fehlt.push(`mindestens ein Eintrag: ${f.eintrag}`);
         genutzt.forEach((e, i) => {
-          for (const x of f.felder) if (x.pflicht && sichtbar(x, e) && !gefuellt(e[x.id])) fehlt.push(`${f.eintrag}${genutzt.length > 1 ? ` ${i + 1}` : ""}: ${x.label}`);
+          for (const x of f.felder) if (x.pflicht && sichtbar(x, ohneVerdeckteFelder(f.felder, e)) && !gefuellt(e[x.id])) fehlt.push(`${f.eintrag}${genutzt.length > 1 ? ` ${i + 1}` : ""}: ${x.label}`);
         });
       } else if (f.pflicht && !gefuellt(d[f.id])) fehlt.push(f.label);
     }
@@ -167,9 +179,34 @@ export function eintragAusVorschlag(f: Extract<Feld, { art: "liste" }>, vorschla
   return { ...neuerEintrag(f, b, heute), ...vorschlag.werte };
 }
 
+/**
+ * Eingaben ohne verdeckte Felder: Was die App gerade nicht zeigt (Bedingung `wenn` nicht erfüllt), gehört nicht ins
+ * Dokument – auch wenn noch ein früher eingegebener Wert gespeichert ist. In Listen gilt das je Eintrag; Felder, die an
+ * einem verdeckten Feld hängen, entfallen mit. Nur für die Ausgabe; gespeicherte Daten und die Prüfung bleiben unverändert.
+ */
+export function ohneVerdeckte(v: Vorlage, d: Daten): Daten {
+  const r: Daten = { ...d };
+  for (const a of v.abschnitte)
+    for (const f of a.felder) {
+      // gegen die bereits bereinigten Angaben prüfen: hängt ein Feld an einem verdeckten Feld, ist es selbst verdeckt
+      if (!sichtbar(f, r)) {
+        delete r[f.id];
+        continue;
+      }
+      if (f.art === "liste" && Array.isArray(d[f.id]) && f.felder.some((x) => x.wenn))
+        r[f.id] = (d[f.id] as Eintrag[]).map((e) => {
+          if (!e || typeof e !== "object") return e;
+          const n: Eintrag = { ...e };
+          for (const x of f.felder) if (!sichtbar(x, n)) delete n[x.id];
+          return n;
+        });
+    }
+  return r;
+}
+
 /** Das fertige Dokument: Vorlage + Rechtsgrundlage und Bereich im Kopf. Die App erstellt das PDF hieraus. */
 export function dokumentHtml(v: Vorlage, d: Daten, b: Betrieb): string {
   const grundlage = v.grundlage && !v.kundendokument ? `<div><dt>Rechtsgrundlage</dt><dd>${festeLeerzeichen(esc(v.grundlage))}</dd></div>` : "";
   const art = v.kundendokument ? "" : (BEREICHE.find((x) => x.id === v.bereich)?.titel ?? "");
-  return v.html(d, b).replace(GRUNDLAGE_MARKE, grundlage).replace('<div class="art"></div>', `<div class="art">${esc(art)}</div>`).split(GESTALT_MARKE).join(v.gestalt ?? "nachweis").replace(SEITE_MARKE, seiteCss(v.gestalt ?? "nachweis", v.querformat));
+  return v.html(ohneVerdeckte(v, d), b).replace(GRUNDLAGE_MARKE, grundlage).replace('<div class="art"></div>', `<div class="art">${esc(art)}</div>`).split(GESTALT_MARKE).join(v.gestalt ?? "nachweis").replace(SEITE_MARKE, seiteCss(v.gestalt ?? "nachweis", v.querformat));
 }

@@ -66,7 +66,8 @@ export interface Vorschlag {
 /** Bedingung: Feld nur zeigen, wenn ein anderes Feld gesetzt ist (Schalter an) bzw. einen bestimmten Wert hat. */
 export interface Bedingung {
   feld: string;
-  ist?: string;
+  /** Wert (bei Mehrfachauswahl: ist ausgewählt); mehrere Werte: einer davon genügt */
+  ist?: string | string[];
   /** Bedingung umkehren: Feld zeigen, wenn die Bedingung NICHT erfüllt ist */
   nicht?: boolean;
 }

@@ -61,9 +61,14 @@ const DSE_REIHE: { id: string; immer?: boolean }[] = [
 ];
 const DSE_WAHL = DSE_REIHE.filter((x) => !x.immer && DSE[x.id]).map((x) => ({ wert: x.id, text: DSE[x.id]!.titel, quelle: DSE[x.id]!.quelle }));
 
+/** Rat an den Betreiber im Baustein „Google Fonts (extern)“ – gehört nicht in die veröffentlichte Erklärung (steht als Hilfe am Feld). */
+const FONTS_EMPFEHLUNG = /\s*Empfehlung: Schriftarten lokal einbinden, dann entfällt die Übermittlung\./;
+
 function dseTeile(d: Daten, b: Betrieb): { titel: string; text: string }[] {
   const an = new Set(auswahl(d, "module"));
-  const teile = DSE_REIHE.filter((x) => (x.immer || an.has(x.id)) && DSE[x.id]).map((x) => ({ titel: DSE[x.id]!.titel, text: bausteinText(DSE[x.id]!.text, d, b) }));
+  // beide Schriftarten-Bausteine widersprechen sich: extern eingebunden geht vor (die Prüfung weist darauf hin)
+  if (an.has("google_fonts_extern")) an.delete("google_fonts_lokal");
+  const teile = DSE_REIHE.filter((x) => (x.immer || an.has(x.id)) && DSE[x.id]).map((x) => ({ titel: DSE[x.id]!.titel, text: bausteinText(DSE[x.id]!.text.replace(FONTS_EMPFEHLUNG, ""), d, b) }));
   const rechte = teile.findIndex((t) => t.titel === DSE.betroffenenrechte?.titel);
   const vorRechten = [
     ...(text(d, "ergaenzung") ? [{ titel: "Weitere Verarbeitungen", text: text(d, "ergaenzung") }] : []),
@@ -88,7 +93,7 @@ export const datenschutzerklaerungWebsite: Vorlage = {
       hilfe: "Verantwortliche Stelle, Kontakt und Aufsichtsbehörde übernimmt Amtlos aus „Mein Betrieb“.",
       felder: [
         { id: "website", art: "text", label: "Adresse der Website", hilfe: "z. B. www.salon-sonne.de – ohne Angabe die Website aus „Mein Betrieb“" },
-        { id: "module", art: "bausteine", label: "Was nutzt deine Website?", optionen: DSE_WAHL, vorbelegung: ["hosting", "server_logfiles", "kontakt", "widerruf_einwilligung"], pflicht: true },
+        { id: "module", art: "bausteine", label: "Was nutzt deine Website?", hilfe: "Schriftarten: entweder lokal oder extern – am besten lokal einbinden, dann entfällt die Übermittlung an Google.", optionen: DSE_WAHL, vorbelegung: ["hosting", "server_logfiles", "kontakt", "widerruf_einwilligung"], pflicht: true },
       ],
     },
     {
@@ -111,7 +116,11 @@ export const datenschutzerklaerungWebsite: Vorlage = {
       ],
     },
   ],
-  pruefen: (_d, b) => [...(b.bundesland ? [] : ["Bundesland (Mein Betrieb) – für die zuständige Aufsichtsbehörde"]), ...(b.email.trim() ? [] : ["E-Mail (Mein Betrieb)"])],
+  pruefen: (d, b) => [
+    ...(b.bundesland ? [] : ["Bundesland (Mein Betrieb) – für die zuständige Aufsichtsbehörde"]),
+    ...(b.email.trim() ? [] : ["E-Mail (Mein Betrieb)"]),
+    ...(auswahl(d, "module").includes("google_fonts_lokal") && auswahl(d, "module").includes("google_fonts_extern") ? ["Schriftarten: entweder lokal oder extern wählen"] : []),
+  ],
   alsText: (d, b) => ["Datenschutzerklärung", ...dseTeile(d, b).map((t) => `${t.titel}\n${alsKlartext(t.text)}`), text(d, "stand") ? `Stand: ${datumDe(text(d, "stand"))}` : ""].filter(Boolean).join("\n\n"),
   html(d, b) {
     const website = text(d, "website") || (b.website ?? "").trim();
@@ -132,6 +141,27 @@ const VSBG: Record<string, string> = {
   nicht_bereit: "Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.",
   bereit: "Wir sind bereit, an Streitbeilegungsverfahren vor der folgenden Verbraucherschlichtungsstelle teilzunehmen:",
   keine_angabe: "",
+};
+
+/** Rechtsform-Zusätze im Namen des Betriebs (längere zuerst: „GmbH & Co. KG“ vor „GmbH“ und „KG“). */
+const FORM_IM_NAMEN: [RegExp, string][] = [
+  [/GmbH\s*&\s*Co\.?\s*KG\b/, "GmbH & Co. KG"],
+  [/\bUG\b/, "UG (haftungsbeschränkt)"],
+  [/\bGmbH\b/, "GmbH"],
+  [/\bAG\b/, "AG"],
+  [/\be\.\s?(?:K|Kfm|Kfr)\./, "e. K."],
+  [/\bOHG\b/, "OHG"],
+  [/\bKG\b/, "KG"],
+  [/\be?GbR\b/, "GbR"],
+  [/\bPartG\b/, "PartG"],
+];
+/** Rechtsform, die der Name des Betriebs nennt (oder null). */
+export function formImNamen(name: string): string | null {
+  return FORM_IM_NAMEN.find(([re]) => re.test(name))?.[1] ?? null;
+}
+const formGleich = (a: string, b: string) => {
+  const n = (t: string) => t.toLocaleLowerCase("de").replace(/[\s.]/g, "").replace(/^e(?=gbr)/, "");
+  return n(a) === n(b);
 };
 
 /** Rechtsform: gewählt, sonst aus „Mein Betrieb“, sonst Einzelunternehmen. */
@@ -201,6 +231,10 @@ export const impressum: Vorlage = {
     if (!text(d, "vertreten") && !(b.vertretung ?? "").trim() && !b.verantwortlich.trim()) f.push("Inhaber/in bzw. vertretungsberechtigte Person");
     if (!b.email.trim()) f.push("E-Mail (Mein Betrieb)");
     if (!b.telefon.trim()) f.push("Telefon (Mein Betrieb) – neben der E-Mail ist ein zweiter direkter Kontaktweg nötig");
+    // Hinweis: Name mit Rechtsform-Zusatz, der nicht zur gewählten Rechtsform passt („Salon Sonne GmbH“ als Einzelunternehmen)
+    const imNamen = formImNamen(b.name);
+    const rf = rechtsformImp(d, b);
+    if (imNamen && !formGleich(imNamen, rf)) f.push(`Der Name des Betriebs enthält die Rechtsform „${imNamen}“, gewählt ist „${rf}“ – bitte prüfen.`);
     return f;
   },
   alsText: (d, b) => ["Impressum", ...impressumTeile(d, b).map((t) => `${t.titel}\n${alsKlartext(t.text)}`)].join("\n\n"),

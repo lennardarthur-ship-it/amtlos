@@ -162,7 +162,7 @@ export const datenschutzDokumentation: Vorlage = {
       titel: "Verzeichnis der Verarbeitungstätigkeiten",
       betrieb: b,
       unter: "nach Art. 30 Abs. 1 DSGVO, mit technischen und organisatorischen Maßnahmen nach Art. 32 DSGVO",
-      meta: `Stand: ${datumDe(text(d, "stand"))}\nAnsprechperson: ${text(d, "verantwortlich")}\nVerarbeitungen: ${v.length}`,
+      meta: `Stand: ${datumDe(text(d, "stand"))}\nAnsprechperson: ${text(d, "verantwortlich")}${v.length ? `\nVerarbeitungen: ${v.length}` : ""}`,
       inhalt:
         abschnitt(
           "Verantwortlicher",
@@ -244,7 +244,7 @@ export const datenpanne: Vorlage = {
       felder: [
         { id: "risiko", art: "wahl", label: "Bewertung", optionen: optionen(DATENPANNE_RISIKO) },
         { id: "begruendung", art: "mehrzeilig", label: "Begründung, warum keine Meldung nötig ist", wenn: { feld: "risiko", ist: "kein_risiko" }, pflicht: true },
-        { id: "gemeldet", art: "schalter", label: "Bereits gemeldet", wenn: { feld: "risiko" } },
+        { id: "gemeldet", art: "schalter", label: "Bereits gemeldet", wenn: { feld: "risiko", ist: ["risiko", "hohes_risiko"] } },
         { id: "gemeldet_am", art: "datum", label: "Gemeldet am", wenn: { feld: "gemeldet" } },
         { id: "aktenzeichen", art: "text", label: "Aktenzeichen der Behörde", wenn: { feld: "gemeldet" } },
         { id: "verspaetung", art: "mehrzeilig", label: "Begründung, falls die Meldung später als 72 Stunden erfolgt", wenn: { feld: "gemeldet" } },
@@ -257,7 +257,9 @@ export const datenpanne: Vorlage = {
   html(d, b) {
     const beginn = berlinZuUtc(text(d, "entdeckt_am"), text(d, "entdeckt_um"));
     const risiko = text(d, "risiko");
-    const gemeldet = ja(d, "gemeldet") && risiko !== "";
+    // „Bereits gemeldet“ gibt es nur bei Risiko bzw. hohem Risiko
+    const gemeldet = ja(d, "gemeldet") && (risiko === "risiko" || risiko === "hohes_risiko");
+    const benachrichtigt = text(d, "benachrichtigung") === "erfolgt";
     // Gliederung wie der Mindestinhalt der Meldung nach Art. 33 Abs. 3 DSGVO (lit. a–d), Randspalte nennt den Buchstaben
     const teile: [string, string, string][] = [
       ["Art der Verletzung", text(d, "beschreibung"), "Art. 33 Abs. 3 lit. a"],
@@ -279,8 +281,9 @@ export const datenpanne: Vorlage = {
           ["Frist (72 Stunden)", beginn ? (text(d, "entdeckt_um") ? berlinText(new Date(beginn.getTime() + 72 * 3600_000)) : `${datumDe(plusTageIso(text(d, "entdeckt_am"), 3))}, zur Uhrzeit des Bekanntwerdens (Uhrzeit ergänzen)`) : ""],
           ["Bewertung", DATENPANNE_RISIKO[risiko] ?? "noch offen"],
           ["Gemeldet", gemeldet ? `${datumDe(text(d, "gemeldet_am")) || "ja"}${text(d, "aktenzeichen") ? ` · Aktenzeichen ${text(d, "aktenzeichen")}` : ""}` : "noch nicht gemeldet"],
-          ["Begründung der späteren Meldung", text(d, "verspaetung") || null],
-          ["Benachrichtigung der Betroffenen", `${BENACHRICHTIGUNG[text(d, "benachrichtigung")] ?? "noch offen"}${text(d, "benachrichtigt_am") ? ` am ${datumDe(text(d, "benachrichtigt_am"))}` : ""}${text(d, "benachrichtigung_text") ? ` – ${text(d, "benachrichtigung_text")}` : ""}`],
+          ["Begründung der späteren Meldung", (gemeldet && text(d, "verspaetung")) || null],
+          // Datum und Inhalt nur bei erfolgter Benachrichtigung (nicht an „nicht erforderlich“ oder „geplant“ angehängt)
+          ["Benachrichtigung der Betroffenen", `${BENACHRICHTIGUNG[text(d, "benachrichtigung")] ?? "noch offen"}${benachrichtigt && text(d, "benachrichtigt_am") ? ` am ${datumDe(text(d, "benachrichtigt_am"))}` : ""}${benachrichtigt && text(d, "benachrichtigung_text") ? ` – ${text(d, "benachrichtigung_text")}` : ""}`],
         ]) + teile.map(([t, w, rand]) => abschnitt(t, absatz(w), { rand })).join(""),
     });
   },

@@ -142,7 +142,7 @@ export const nachweisArbeitsbedingungen: Vorlage = {
       ["10. Überstunden", text(d, "ueberstunden") === "ja" ? `${UEBERSTUNDEN.ja} ${text(d, "ueberstunden_text")}` : UEBERSTUNDEN.nein!],
       ["11. Erholungsurlaub", text(d, "urlaub") ? `${text(d, "urlaub")} Arbeitstage pro Kalenderjahr` : ""],
       ["12. Fortbildung", text(d, "fortbildung") || "Ein Anspruch auf vom Arbeitgeber bereitgestellte Fortbildung besteht nicht."],
-      ["13. Betriebliche Altersversorgung", ja(d, "bav") ? text(d, "bav_text") : "nicht zugesagt"],
+      ["13. Betriebliche Altersversorgung", ja(d, "bav") ? (text(d, "bav_text") ? `Über den Versorgungsträger: ${text(d, "bav_text")}` : "") : "nicht zugesagt"],
       ["14. Kündigung", kuendigungText(d)],
       ["15. Tarifverträge, Vereinbarungen", text(d, "kollektiv") === "ja" ? `${KOLLEKTIV.ja} ${text(d, "kollektiv_text")}` : KOLLEKTIV.keine!],
     ];

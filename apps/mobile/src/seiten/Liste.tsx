@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
-import { cent, zahl, eintragAusVorschlag, kurztitel, neuerEintrag, sichtbar, vorlageFuer, type Daten, type Eintrag, type EintragWert, type ListenFeld, type Vorschlag } from "@amtlos/fachlogik";
+import { cent, zahl, eintragAusVorschlag, kurztitel, neuerEintrag, ohneVerdeckteFelder, sichtbar, vorlageFuer, type Daten, type Eintrag, type EintragWert, type ListenFeld, type Vorschlag } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { Fuss, Karte, Knopf, Symbol, T, TextKnopf, Wahl } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
@@ -23,7 +23,7 @@ function benutzt(feld: ListenFeld, e: Eintrag): boolean {
   return feld.felder.some((x) => (x.art === "text" || x.art === "mehrzeilig" || x.art === "betrag" || x.art === "zahl" || x.art === "uhrzeit" || x.art === "mehrfach" || x.art === "bausteine") && !("vorbelegung" in x && x.vorbelegung) && gefuellt(e[x.id]));
 }
 /** Fehlende Pflichtangaben eines Eintrags (Bezeichnungen der Felder). */
-const fehltIn = (feld: ListenFeld, e: Eintrag) => (benutzt(feld, e) ? feld.felder.filter((x) => x.pflicht && sichtbar(x, e) && !gefuellt(e[x.id])).map((x) => x.label) : []);
+const fehltIn = (feld: ListenFeld, e: Eintrag) => (benutzt(feld, e) ? feld.felder.filter((x) => x.pflicht && sichtbar(x, ohneVerdeckteFelder(feld.felder, e)) && !gefuellt(e[x.id])).map((x) => x.label) : []);
 const anzeigeTitel = (feld: ListenFeld, e: Eintrag, i: number) => {
   const t = titelText(feld, e);
   const lesbar = /^\d{4}-\d{2}-\d{2}$/.test(t) ? t.split("-").reverse().join(".") : t;

@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
 import { View } from "react-native";
-import { sichtbar, type Daten, type EinfachesFeld, type Eintrag, type EintragWert, type Feld, type ListenFeld } from "@amtlos/fachlogik";
+import { ohneVerdeckteFelder, sichtbar, type Daten, type EinfachesFeld, type Eintrag, type EintragWert, type Feld, type ListenFeld } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { TextKnopf } from "../ui/bausteine";
 import { weich } from "../ui/thema";
@@ -15,7 +15,8 @@ export const gefuellt = (w: unknown) => (typeof w === "string" ? w.trim() !== ""
  */
 export function Felder({ felder, werte, setze, fehlt, liste }: { felder: Feld[]; werte: Daten | Eintrag; setze: (k: string, w: EintragWert) => void; fehlt: string[]; liste?: (f: ListenFeld) => ReactNode }) {
   const [alle, setAlle] = useState(false);
-  const da = felder.filter((x) => sichtbar(x, werte));
+  const sichtbareWerte = ohneVerdeckteFelder(felder, werte);
+  const da = felder.filter((x) => sichtbar(x, sichtbareWerte));
   const versteckt = (x: Feld) => Boolean(x.selten) && !alle && !gefuellt(werte[x.id]) && !fehlt.some((l) => l === x.label || l.endsWith(`: ${x.label}`));
   const selten = da.filter((x) => x.selten);
   const zeigen = da.filter((x) => !versteckt(x));

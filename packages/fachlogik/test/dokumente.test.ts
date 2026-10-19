@@ -169,7 +169,7 @@ describe("Dokumentvorlagen", () => {
     expect(erg(u, { umsatz_19: "1.000", umsatz_7: "100", vorsteuer: "50" })).toEqual([["Umsatzsteuer", "197,00 €"], ["Vorsteuer", "50,00 €"], ["Zahllast", "147,00 €"]]);
     expect(erg(u, { umsatz_19: "", vorsteuer: "30" })[2]).toEqual(["Erstattung", "30,00 €"]);
     const e = vorlageFuer("euer")!;
-    expect(erg(e, { einnahmen: [{ text: "a", betrag: "5000" }], ausgaben: [{ text: "b", betrag: "1200,50" }], afa: [{ text: "c", betrag: "300" }] })).toEqual([["Einnahmen", "5.000,00 €"], ["Ausgaben", "1.500,50 €"], ["Überschuss", "3.499,50 €"]]);
+    expect(erg(e, { einnahmen: [{ text: "a", betrag: "5000" }], ausgaben: [{ text: "b", betrag: "1200,50" }], afa: [{ text: "c", betrag: "300" }] })).toEqual([["Einnahmen", "5.000,00 €"], ["Ausgaben", "1.200,50 €"], ["AfA", "300,00 €"], ["Gewinn", "3.499,50 €"]]);
     const k = vorlageFuer("kassenbuch")!;
     expect(erg(k, { anfang: "100", eintraege: [{ text: "Einnahmen", einnahme: "50" }, { text: "Einkauf", ausgabe: "30" }] })).toEqual([["Endbestand", "120,00 €"]]);
     expect(erg(k, { anfang: "10", eintraege: [{ text: "Einkauf", ausgabe: "30" }, { text: "Einnahme", einnahme: "50" }] })[1]![0]).toBe("Achtung");
@@ -402,5 +402,105 @@ describe("Dokumentvorlagen", () => {
     // Datenpanne: Benachrichtigung bleibt offen, bis sie bewertet ist
     expect(html("datenpanne", leereDaten(vorlageFuer("datenpanne")!, BETRIEB, "2026-10-12"))).toMatch(/Benachrichtigung der Betroffenen<\/th><td>noch offen/);
     expect(vorlageFuer("datenschutzinformation")!.pruefen!({ verarbeitungen: ["Gibt es nicht"] }, BETRIEB)).toContain("Verarbeitung „Gibt es nicht“ gibt es nicht mehr – bitte neu auswählen");
+  });
+
+  it("Korrekturen aus der zweiten Durchsicht: verdeckte Felder, leere Blätter, Gutschrift, Hinweise", () => {
+    const html = (id: string, d: Daten, b: Betrieb = BETRIEB) => n(dokumentHtml(vorlageFuer(id)!, d, b));
+    const leer = (id: string, b: Betrieb = BETRIEB) => html(id, leereDaten(vorlageFuer(id)!, b, "2026-10-12"), b);
+    const pruefe = (id: string, d: Daten, b: Betrieb = BETRIEB) => vorlageFuer(id)!.pruefen!(d, b);
+    // verdeckte Felder gelangen nicht ins Dokument – gespeicherte Daten und Prüfung bleiben unberührt
+    const haccp = { zeitraum: "Oktober", messungen: [{ datum: "2026-10-12", kontrollpunkt: "Kühlschrank", wert: "5 °C", in_ordnung: "ja", massnahme: "Alte Maßnahme" }] };
+    expect(html("haccp", haccp)).not.toContain("Alte Maßnahme");
+    expect(html("haccp", { ...haccp, messungen: [{ ...haccp.messungen[0]!, in_ordnung: "nein" }] })).toContain("Alte Maßnahme");
+    expect(haccp.messungen[0]!.massnahme).toBe("Alte Maßnahme");
+    // Datenpanne: kein Datum an „nicht erforderlich“, keine Meldung bei „kein Risiko“, auch nicht ihre Folgefelder
+    const panne = { entdeckt_am: "2026-10-12", risiko: "kein_risiko", gemeldet: true, gemeldet_am: "2026-10-13", verspaetung: "Urlaub", benachrichtigung: "nicht_erforderlich", benachrichtigt_am: "2026-10-14", benachrichtigung_text: "per Brief" };
+    const dp = html("datenpanne", panne);
+    expect(dp).toContain("noch nicht gemeldet");
+    expect(dp).not.toContain("13.10.2026");
+    expect(dp).not.toContain("Begründung der späteren Meldung");
+    expect(dp).not.toContain("per Brief");
+    expect(dp).not.toContain("14.10.2026");
+    expect(vorlageFuer("datenpanne")!.abschnitte.flatMap((a) => a.felder).filter((f) => f.id === "gemeldet" && sichtbar(f, panne))).toHaveLength(0);
+    expect(html("datenpanne", { ...panne, risiko: "risiko", benachrichtigung: "erfolgt" })).toContain("Begründung der späteren Meldung");
+    expect(html("datenpanne", { ...panne, risiko: "risiko", benachrichtigung: "erfolgt" })).toContain("am 14.10.2026 – per Brief");
+    // Randspalte: „lit.“ bleibt beim Buchstaben, auch „lit. a, b“
+    const vvt = html("datenschutz_dokumentation", { verarbeitungen: [{ bezeichnung: "Kundenkartei" }] });
+    expect(vvt).toContain('<span class="nb">lit.&nbsp;b–g</span>');
+    expect(vvt).not.toMatch(/Verarbeitungen<\/dt><dd>0/);
+    expect(html("datenschutzinformation", leereDaten(vorlageFuer("datenschutzinformation")!, BETRIEB, "2026-10-12"))).not.toMatch(/lit\.(&nbsp;| )a, b/);
+    // leere Blätter: Zeilen und Linien zum Ausfüllen statt „Keine … erfasst“ und „0,00 €“
+    expect(html("allergene", {})).not.toContain("Keine Gerichte erfasst");
+    expect(html("allergene", {}).match(/<tr><td>&nbsp;<\/td>/g)).toHaveLength(12);
+    expect(html("haccp", {})).toContain("Korrekturmaßnahme</th>");
+    expect(html("haccp", {})).toContain("<th>Zeitraum</th>");
+    const euer = html("euer", {});
+    expect(euer).not.toContain("0,00 €");
+    expect(euer).not.toContain("erfasst");
+    expect(euer).toContain("Gewinn bzw. Verlust");
+    const re = leer("rechnung");
+    expect(re).not.toContain("0,00 €");
+    expect(re).toMatch(/Rechnungsnummer<\/td><td><span class="fuellen">/);
+    const az = html("arbeitszeitnachweis", {});
+    expect(az).toContain("<th>Beschäftigte Person</th>");
+    expect(az).toContain("<th>Monat</th>");
+    expect(html("arbeitszeitnachweis", { name: "Kim", monat: "Oktober", leerzeilen: true, tage: [{ datum: "2026-10-01", beginn: "08:00", ende: "12:00" }] })).toContain("Summe der erfassten Tage");
+    const lk = html("lohnkonto", {});
+    expect(lk).not.toContain("Noch keine Monate erfasst");
+    expect(lk).toContain("Unterbrechung ohne Lohnanspruch");
+    expect(lk).toContain("Kinderfreibeträge");
+    expect(lk).toContain("Soli­daritäts­zuschlag");
+    expect(html("lohnkonto", { monate: [{ monat: "Oktober", brutto: "100" }] })).not.toContain("Kinderfreibeträge");
+    const km = html("kassenmeldung", {});
+    expect(km).not.toContain("Keine Kassen erfasst");
+    expect(km).toContain("Aufzeichnungssystem 1");
+    expect(km).not.toMatch(/Anzahl der Aufzeichnungssysteme<\/th><td class="wert">0/);
+    // Feldnummern laufen nach den tatsächlich gedruckten Zeilen weiter
+    const kasse = { modell: "A", seriennummer: "1" };
+    expect(html("kassenmeldung", { kassen: [kasse, kasse] })).toMatch(/Aufzeichnungssystem 2<\/h2><table class="felder"><tr><td class="nr">09</);
+    expect(html("verfahrensdokumentation", {})).toContain("Änderung</th>");
+    // Gewerbeanmeldung und Handelsregister
+    const gmbh: Betrieb = { ...BETRIEB, name: "Salon Sonne GmbH", rechtsform: "GmbH" };
+    expect(html("gewerbeanmeldung", {}, gmbh)).toContain("<th>Registereintrag</th>");
+    expect(html("gewerbeanmeldung", {})).not.toContain("Registereintrag");
+    expect(html("gewerbeanmeldung", {})).toContain("Zahl der Beschäftigten");
+    expect(html("gewerbeanmeldung", {})).toContain("Erlaubnis, Handwerkskarte");
+    const hr = html("handelsregister", {}, gmbh);
+    expect(hr).toContain("Gesellschafter</h2>");
+    expect(hr).toContain("Stamm- bzw. Grundkapital");
+    expect(hr).toContain("Geburtsdatum</th>");
+    expect(html("handelsregister", {}, { ...BETRIEB, rechtsform: "e. K." })).not.toContain("Gesellschafter</h2>");
+    // Transparenzregister: Meldedatum nur einmal
+    expect(html("transparenzregister", { gemeldet: "2026-10-01" }).match(/Gemeldet am/g)).toHaveLength(1);
+    // Nachweis: Versorgungsträger benannt, leere beschäftigte Person mit Linie für die Anschrift
+    expect(html("nachweis_arbeitsbedingungen", { bav: true, bav_text: "Versorgungskasse X" })).toContain("Über den Versorgungsträger: Versorgungskasse X");
+    expect(html("nachweis_arbeitsbedingungen", {})).toMatch(/<div class="name"><span class="fuellen"><\/span><\/div><div class="adresse"><span class="fuellen">/);
+    // Gutschrift: Titel, Anrede, keine Zahlungsaufforderung, „Gutschrift“ nicht doppelt
+    const gs = html("rechnung", { nummer: "G-1", datum: "2026-10-12", zahlungsziel: "14", kunde_name: "Kim", hinweise: ["gutschrift"], positionen: [{ bezeichnung: "Provision", menge: "1", preis: "100", satz: "19" }] });
+    expect(gs).toContain(">Gutschrift G-1<");
+    expect(gs).toContain("schreiben Ihnen den Betrag gut");
+    expect(gs).not.toContain("Bitte überweisen");
+    expect(gs).not.toContain("Zahlbar");
+    expect(gs).not.toContain("GiroCode");
+    expect(gs).not.toContain("<p>Gutschrift</p>");
+    // Hinweise (keine Hindernisse)
+    expect(pruefe("rechnung", { kleinunternehmer: true, hinweise: ["reverse_charge"] })).toContain("Kleinunternehmerregelung zusammen mit Steuerschuldnerschaft des Leistungsempfängers bzw. innergemeinschaftlicher Lieferung gewählt – bitte prüfen.");
+    expect(pruefe("gefaehrdungsbeurteilung", { wirksamkeit: "wirksam", gefaehrdungen: [{ beschreibung: "Nässe" }] })).toHaveLength(1);
+    expect(pruefe("gefaehrdungsbeurteilung", { wirksamkeit: "wirksam", gefaehrdungen: [{ beschreibung: "Nässe", umgesetzt_am: "2026-10-01" }] })).toHaveLength(0);
+    expect(pruefe("datenschutzerklaerung_website", { module: ["google_fonts_lokal", "google_fonts_extern"] })).toContain("Schriftarten: entweder lokal oder extern wählen");
+    expect(pruefe("impressum", { rechtsform: "Einzelunternehmen" }, gmbh).some((h) => h.includes("„GmbH“"))).toBe(true);
+    expect(pruefe("impressum", { rechtsform: "GmbH" }, gmbh).some((h) => h.includes("Rechtsform"))).toBe(false);
+    expect(pruefe("impressum", { rechtsform: "KG" }, { ...gmbh, name: "Sonne GmbH & Co. KG" }).some((h) => h.includes("„GmbH & Co. KG“"))).toBe(true);
+    // Datenschutzerklärung: extern geht vor, kein Rat an den Betreiber im Text
+    const dse = vorlageFuer("datenschutzerklaerung_website")!.alsText!({ module: ["google_fonts_lokal", "google_fonts_extern"] }, BETRIEB);
+    expect(dse).not.toContain("lokal eingebunden");
+    expect(dse).not.toContain("Empfehlung");
+    // Steuererklärung: USt-Felder nur mit Umsatzsteuererklärung; Aufbewahrung „1 Jahr“; Erstattung
+    const ust = vorlageFuer("steuererklaerung")!.abschnitte.flatMap((a) => a.felder).find((f) => f.id === "ust_jahr")!;
+    expect(sichtbar(ust, { arten: ["est"] })).toBe(false);
+    expect(sichtbar(ust, { arten: ["est", "ust"] })).toBe(true);
+    expect(html("aufbewahrung", { eintraege: [{ art: "Briefe", jahre: "1" }] })).toContain("1 Jahr<");
+    expect(html("ust_voranmeldung", { vorsteuer: "50" })).toContain("Erstattung erhalten am");
+    expect(html("pruefprotokoll_elektro", { einsatz: "baustellen" })).not.toMatch(/DGUV Vorschrift 3 \(DGUV/);
   });
 });

@@ -922,7 +922,11 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
   - Rechnung: Befreiungshinweis nur bei einer Position mit 0 %. Datenpanne: keine Vorbelegung „Benachrichtigung nicht erforderlich“ mehr, solange die Bewertung offen ist.
   - Texte: HACCP-Grenzwerte mit °C an der richtigen Stelle, „Hautschutz- und Händehygieneplan“, Rechercheformulierungen aus Aushängen entfernt (gleiche Fakten), Verweise auf Abschnittsnummern, „nach 1 Tag“, Kz 83 mit Vorzeichen, kein doppeltes Minus bei Verlust/Jahresfehlbetrag.
 - **App-Texte:** 30 Sprachkorrekturen (u. a. „1 Angaben“, „1 Buchungen“, Fragmente ohne Subjekt, Großschreibung nach Doppelpunkt, einheitlich „Hausfarbe“, „Betrieb“, „Amtlos“ statt „uns“); Store-Text ohne „Vorschläge aus offiziellen Quellen“ und „GiroCode auf jeder Rechnung“ nur mit IBAN; kürzerer Sicherungshinweis auf „Heute“ (wurde abgeschnitten).
-- **Bewusst nicht geändert, fachlich offen:** T-87 bis T-91 (Storno-Leistungsdatum und Zahlungsangaben, Cent- vs. Euro-Basis der Voranmeldung, Vorsteuer bei Kleinbetragsrechnungen, einzelne Normverweise in Vorlagen, Werbeaussagen).
+- **Zweite Durchsicht** mit einer dritten Prüfvariante („auswahl“: jede Auswahl umgestellt, alle Schalter umgelegt, alle Daten gesetzt – zeigt Abschnitte, die erst durch eine Wahl erscheinen):
+  - Verdeckte Felder gehören nicht ins Dokument (`ohneVerdeckte`, mit Kaskade); Formular, Papieransicht, Prüfung und PDF nutzen dieselbe Sichtbarkeit (`ohneVerdeckteFelder`).
+  - Gutschrift: Titel und Summe „Gutschrift“, keine Zahlungsaufforderung und kein GiroCode; Hinweis bei Kleinunternehmer zusammen mit Reverse-Charge oder igL.
+  - Kassenmeldung zählt Feldnummern lückenlos; weitere leere Ausfüllblätter (Allergene, HACCP, Lohnkonto, EÜR, Rechnung, Verfahrensdokumentation, Handelsregister); Datenpanne ohne widersprüchliche Kombinationen; Google Fonts lokal oder extern; EÜR-Kennzahlen in App und PDF gleich; „Erstattung erhalten am“; kleinere Text- und Satzfehler.
+- **Bewusst nicht geändert, fachlich offen:** T-87 bis T-93 (Storno-Leistungsdatum und Zahlungsangaben, Cent- vs. Euro-Basis der Voranmeldung, Vorsteuer bei Kleinbetragsrechnungen, einzelne Normverweise in Vorlagen, Werbeaussagen).
 
 ---
 

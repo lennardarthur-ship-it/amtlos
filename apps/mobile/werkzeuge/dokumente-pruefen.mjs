@@ -129,7 +129,9 @@ for (const v of F.VORLAGEN) {
     fs.writeFileSync(datei, await F.fusszeileStempeln(new Uint8Array(pdf), ang));
     if (!pdftotext) continue;
     const seiten = execFileSync("pdftotext", ["-layout", datei, "-"], { encoding: "utf8" }).split("\f").filter((s) => s.trim());
-    if (ang.gestalt === "aushang" && variante === "leer" && seiten.length > 1) befunde.push(`${name}: Aushang braucht ${seiten.length} Blätter`);
+    // gewollte Seitenumbrüche (Klasse „neue-seite“, z. B. Erläuterung als eigenes Blatt) zählen nicht als Überlauf
+    const blaetter = 1 + (html.match(/class="[^"]*\bneue-seite\b/g) ?? []).length;
+    if (ang.gestalt === "aushang" && variante === "leer" && seiten.length > blaetter) befunde.push(`${name}: Aushang braucht ${seiten.length} Blätter`);
     seiten.forEach((s, i) => {
       if (i === 0 || !dom.unterschriften.length) return;
       // Zeilen ohne Kopf- und Fußzeile, ohne Unterschriftsbeschriftungen

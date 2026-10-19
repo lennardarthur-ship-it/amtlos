@@ -20,6 +20,9 @@ export function rechtsformAus(wert: string | undefined, formen: string[]): strin
 /** Registergericht und -nummer aus „Mein Betrieb“ in einer Zeile. */
 export const registerAus = (b: Betrieb) => [b.registergericht ?? "", b.registernummer ?? ""].map((x) => x.trim()).filter(Boolean).join(", ");
 
+/** Rechtsformen mit Eintrag im Handels- bzw. Gesellschaftsregister */
+const REGISTER_FORMEN = ["e. K.", "eGbR", "OHG", "KG", "GmbH & Co. KG", "UG (haftungsbeschränkt)", "GmbH"];
+
 const PERSON = [
   { id: "name", art: "text" as const, label: "Vor- und Nachname", pflicht: true },
   { id: "geburtsdatum", art: "datum" as const, label: "Geburtsdatum", pflicht: true },
@@ -62,6 +65,11 @@ export const gewerbeanmeldung: Vorlage = {
     },
   ],
   html(d, b) {
+    const rechtsform = rechtsformAus(text(d, "rechtsform") || b.rechtsform, RECHTSFORMEN) || "Einzelunternehmen";
+    // Registereintrag: aus „Mein Betrieb“; leer nur bei eingetragenen Rechtsformen als Linie, sonst entfällt die Zeile
+    const register = registerAus(b) || (REGISTER_FORMEN.includes(rechtsform) ? "" : null);
+    // leeres Blatt (zum Ausfüllen von Hand): auch die selten nötigen Felder als Linie
+    const leer = !text(d, "taetigkeit") && !text(d, "beginn");
     return dokument({
       titel: "Gewerbeanmeldung – Datenblatt",
       betrieb: b,
@@ -83,14 +91,15 @@ export const gewerbeanmeldung: Vorlage = {
           felder(
             [
               ["Name des Betriebs", b.name],
-              ["Rechtsform", rechtsformAus(text(d, "rechtsform") || b.rechtsform, RECHTSFORMEN) || "Einzelunternehmen"],
+              ["Rechtsform", rechtsform],
+              ["Registereintrag", register],
               ["Betriebsstätte", anschrift(b)],
               ["Telefon, E-Mail", [b.telefon, b.email].filter((x) => x.trim()).join(", ")],
               ["Angemeldete Tätigkeit", text(d, "taetigkeit")],
               ["Beginn der Tätigkeit", datumDe(text(d, "beginn"))],
               ["Haupt- oder Nebenerwerb", text(d, "erwerb") === "neben" ? "Nebenerwerb" : "Haupterwerb"],
-              ["Zahl der Beschäftigten", text(d, "beschaeftigte") || null],
-              ["Erlaubnis, Handwerkskarte", text(d, "erlaubnis") || null],
+              ["Zahl der Beschäftigten", text(d, "beschaeftigte")],
+              ["Erlaubnis, Handwerkskarte", text(d, "erlaubnis") || (leer ? "" : null)],
             ],
             { start: 7 - (text(d, "geburtsname") ? 0 : 1) },
           ),
@@ -130,7 +139,11 @@ export const handelsregister: Vorlage = {
     const ges = liste(d, "gesellschafter").filter((x) => text(x, "name"));
     const gf = liste(d, "fuehrung").filter((x) => text(x, "name"));
     const firma = text(d, "firma") || b.name.trim();
-    const person = (l: typeof ges, extra = false) => tabelle(["Name", "Geburtsdatum", "Wohnort", ...(extra ? ["Anteil"] : [])], l.map((x) => [zelle(text(x, "name")), datumDe(text(x, "geburtsdatum")), zelle(text(x, "wohnort")), ...(extra ? [zelle(text(x, "anteil"))] : [])]), { breiten: extra ? ["32%", "18%", "28%", "22%"] : ["40%", "20%", "40%"] });
+    const rechtsform = rechtsformAus(text(d, "rechtsform") || b.rechtsform, HR_FORMEN.map((o) => o.wert));
+    // Kapitalgesellschaft: Gesellschafter und Stammkapital gehören immer dazu (leer als Zeilen zum Ausfüllen)
+    const kapitalgesellschaft = rechtsform === "GmbH" || rechtsform === "UG (haftungsbeschränkt)";
+    const person = (l: typeof ges, extra = false, mindestens = 0) =>
+      tabelle(["Name", "Geburtsdatum", "Wohnort", ...(extra ? ["Anteil"] : [])], l.map((x) => [zelle(text(x, "name")), datumDe(text(x, "geburtsdatum")), zelle(text(x, "wohnort")), ...(extra ? [zelle(text(x, "anteil"))] : [])]), { breiten: extra ? ["32%", "18%", "28%", "22%"] : ["40%", "20%", "40%"], ...(l.length ? {} : { mindestens, hoch: true }) });
     return dokument({
       titel: "Anmeldung zum Handelsregister – Vorbereitung",
       betrieb: b,
@@ -141,15 +154,15 @@ export const handelsregister: Vorlage = {
           "Gesellschaft",
           felder([
             ["Firma", firma],
-            ["Rechtsform", rechtsformAus(text(d, "rechtsform") || b.rechtsform, HR_FORMEN.map((o) => o.wert))],
+            ["Rechtsform", rechtsform],
             ["Sitz", text(d, "sitz")],
             ["Inländische Geschäftsanschrift", text(d, "anschrift")],
             ["Gegenstand des Unternehmens", text(d, "gegenstand")],
-            ["Stamm- bzw. Grundkapital", text(d, "kapital") ? euro(cent(text(d, "kapital")) ?? 0) : null],
+            ["Stamm- bzw. Grundkapital", text(d, "kapital") ? euro(cent(text(d, "kapital")) ?? 0) : kapitalgesellschaft ? "" : null],
           ]),
         ) +
-        (ges.length ? abschnitt("Gesellschafter", person(ges, true)) : "") +
-        abschnitt("Geschäftsführung bzw. Inhaber/in", gf.length ? person(gf) : absatz("")) +
+        (ges.length || kapitalgesellschaft ? abschnitt("Gesellschafter", person(ges, true, 3)) : "") +
+        abschnitt("Geschäftsführung bzw. Inhaber/in", person(gf, false, 2)) +
         (text(d, "vertretung") ? abschnitt("Vertretungsregelung", absatz(text(d, "vertretung"))) : "") +
         uebertragung(["Notartermin am", "Notar/in", "Eingetragen am, Registernummer"]),
     });
@@ -200,7 +213,8 @@ export const transparenzregister: Vorlage = {
       inhalt:
         abschnitt("Gesellschaft", felder([["Gesellschaft", b.name], ["Rechtsform", text(d, "rechtsform") || (b.rechtsform ?? "").trim()], ["Registergericht und Nummer", text(d, "register") || registerAus(b) || null], ["Gemeldet am", datumDe(text(d, "gemeldet")) || "noch nicht gemeldet"]])) +
         abschnitt("Wirtschaftlich Berechtigte (§ 3 GwG)", l.length ? tabelle(["Name", "Geburtsdatum", "Wohnort", "Staatsangehörigkeiten", "Interesse"], l.map((x) => [zelle(text(x, "name")), datumDe(text(x, "geburtsdatum")), zelle(text(x, "wohnort")), zelle(text(x, "staatsangehoerigkeit")), zelle([INTERESSE.find((o) => o.wert === text(x, "interesse_art"))?.text.split(",")[0] ?? "", text(x, "interesse")].filter(Boolean).join(": "))]), { breiten: ["24%", "14%", "20%", "14%", "28%"] }) : tabelle(["Name", "Geburtsdatum", "Wohnort", "Staatsangehörigkeiten", "Interesse"], [], { breiten: ["24%", "14%", "20%", "14%", "28%"], mindestens: 4, hoch: true })) +
-        uebertragung(["Gemeldet am (transparenzregister.de)", "Bestätigung, Vorgangsnummer"]) +
+        // steht das Meldedatum schon oben, nicht noch einmal als Linie
+        uebertragung([...(text(d, "gemeldet") ? [] : ["Gemeldet am (transparenzregister.de)"]), "Bestätigung, Vorgangsnummer"]) +
         unterschriften(["Geschäftsführung"], { ortDatum: true }),
     });
   },

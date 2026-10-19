@@ -82,7 +82,11 @@ export interface AbschnittOptionen {
 
 /** Abschnitt mit Überschrift; in Nachweis, Vertrag und Handbuch stehen Nummer und `rand` in der Randspalte. */
 /** Randangabe maskiert; Bereiche wie „lit. b–g“ oder „§§ 145–147“ werden nicht am Strich umbrochen. */
-const randText = (t: string) => esc(t).replace(/(\S+–\S+)/g, '<span class="nb">$1</span>');
+const randText = (t: string) =>
+  esc(t)
+    .replace(/((?:lit\.\s)?\S+–\S+)/g, '<span class="nb">$1</span>')
+    // „lit. a, b“: Einzelbuchstabe nach Komma nicht allein an den Zeilenanfang
+    .replace(/, (?=[a-z](?![\wäöüß]))/g, ",&nbsp;");
 
 /**
  * Kurzer Abschnitt (keine Listentabelle, geschätzt höchstens ein gutes Drittel einer Seite): bleibt samt Überschrift
@@ -117,14 +121,16 @@ export function eintrag(titel: string, inhalt: string, o: { nummer?: string; ran
 /**
  * Tabelle. Zellen sind bereits maskiertes HTML (mit `zelle` erzeugen). `leerzeilen` hängt leere Zeilen zum
  * Ausfüllen von Hand an; `mindestens` füllt bis zu dieser Zeilenzahl auf; `zahlen` nennt rechtsbündige Spalten;
- * `summe` ist eine abgesetzte Schlusszeile.
+ * `summe` ist eine abgesetzte Schlusszeile; mit `summeSpanne` reicht ihre erste Zelle über so viele Spalten (für eine
+ * längere Bezeichnung), die übrigen Zellen schließen rechts an.
  */
-export function tabelle(kopf: string[], zeilen: string[][], o: { breiten?: string[]; leerzeilen?: number; mindestens?: number; hoch?: boolean; zahlen?: number[]; summe?: string[]; klasse?: string } = {}): string {
+export function tabelle(kopf: string[], zeilen: string[][], o: { breiten?: string[]; leerzeilen?: number; mindestens?: number; hoch?: boolean; zahlen?: number[]; summe?: string[]; summeSpanne?: number; klasse?: string } = {}): string {
   const leer = Math.max(o.leerzeilen ?? 0, (o.mindestens ?? 0) - zeilen.length);
   const alle = [...zeilen, ...Array.from({ length: leer }, () => kopf.map(() => "&nbsp;"))];
   const cols = o.breiten ? `<colgroup>${o.breiten.map((b) => `<col style="width:${b}">`).join("")}</colgroup>` : "";
   const z = (i: number) => (o.zahlen?.includes(i) ? ' class="zahl"' : "");
-  const fuss = o.summe ? `<tfoot><tr class="summe">${o.summe.map((c, i) => `<td${z(i)}>${c}</td>`).join("")}</tr></tfoot>` : "";
+  const spanne = Math.max(1, o.summeSpanne ?? 1);
+  const fuss = o.summe ? `<tfoot><tr class="summe">${o.summe.map((c, i) => (i === 0 && spanne > 1 ? `<td colspan="${spanne}">${c}</td>` : `<td${z(i + spanne - 1)}>${c}</td>`)).join("")}</tr></tfoot>` : "";
   return `<table class="liste${o.hoch ? " hoch" : ""}${o.klasse ? ` ${o.klasse}` : ""}">${cols}<thead><tr>${kopf.map((k, i) => `<th${z(i)}>${esc(k)}</th>`).join("")}</tr></thead><tbody>${alle.map((r) => `<tr>${r.map((c, i) => `<td${z(i)}>${c}</td>`).join("")}</tr>`).join("")}</tbody>${fuss}</table>`;
 }
 export const zelle = (t: string) => esc(t).replace(/\n/g, "<br>");
@@ -156,10 +162,10 @@ export function anschrift(b: Betrieb): string {
   return [b.strasse, [b.plz, b.ort].filter(Boolean).join(" ")].filter((x) => x.trim()).join(", ");
 }
 
-/** Vertragsparteien in zwei Spalten („zwischen … und …“). */
+/** Vertragsparteien in zwei Spalten („zwischen … und …“). Ohne Name und Anschrift: Linien für beides. */
 export function parteien(a: { rolle: string; name: string; anschrift?: string; zusatz?: string }, b: { rolle: string; name: string; anschrift?: string; zusatz?: string }): string {
   const block = (p: typeof a, wort: string) =>
-    `<div class="partei"><div class="wort">${esc(wort)}</div><div class="name">${p.name.trim() ? esc(p.name.trim()) : LINIE}</div>${p.anschrift?.trim() ? `<div class="adresse">${esc(p.anschrift.trim()).replace(/\n/g, "<br>")}</div>` : ""}${p.zusatz ? `<div class="zusatz">${esc(p.zusatz)}</div>` : ""}<div class="rolle">– ${esc(p.rolle)} –</div></div>`;
+    `<div class="partei"><div class="wort">${esc(wort)}</div><div class="name">${p.name.trim() ? esc(p.name.trim()) : LINIE}</div>${p.anschrift?.trim() ? `<div class="adresse">${esc(p.anschrift.trim()).replace(/\n/g, "<br>")}</div>` : !p.name.trim() ? `<div class="adresse">${LINIE}</div>` : ""}${p.zusatz ? `<div class="zusatz">${esc(p.zusatz)}</div>` : ""}<div class="rolle">– ${esc(p.rolle)} –</div></div>`;
   return `<div class="parteien">${block(a, "zwischen")}${block(b, "und")}</div>`;
 }
 
@@ -451,6 +457,7 @@ body.g-brief { padding-left: 5mm; padding-right: 10mm; }
 /* Informationsblock 125–200 mm vom linken Blattrand; im Fluss, damit ein langer Block den Betreff nach unten schiebt */
 .g-brief .info { flex: none; margin: 5mm 0 0 15mm; width: 75mm; font-size: 8.2pt; }
 .g-brief .info table td { padding: 0.3mm 0; line-height: 1.3; vertical-align: top; overflow-wrap: anywhere; }
+.g-brief .info .fuellen { min-width: 0; width: 38mm; }
 .g-brief .info table td:first-child { color: #4a535c; width: 31mm; padding-right: 2mm; }
 .g-brief .betreff { margin: 6mm 0 4.5mm; font-size: 12.5pt; font-weight: 700; color: #12161b; }
 .g-brief .betreff span { display: block; font-size: 9pt; font-weight: 400; color: #4a535c; margin-top: 0.8mm; }
@@ -772,7 +779,7 @@ function anschriftZeilen(t: string[], proZeile: number): number {
  * Anschrift im Fenster (45 mm von oben, 20 mm von links, 85 × 45 mm), Informationsblock rechts daneben, Betreff,
  * Inhalt. Die Fußzeile mit Anschrift, Kontakt, Bank, Steuer und Register setzt die App auf jede Seite.
  */
-export function brief(o: { titel: string; betreff: string; unterBetreff?: string; betrieb: Betrieb; empfaenger: { name: string; anschrift: string; zusatz?: string }; info: [string, string][]; anrede?: string; inhalt: string; vermerk?: string; stand?: string }): string {
+export function brief(o: { titel: string; betreff: string; unterBetreff?: string; betrieb: Betrieb; empfaenger: { name: string; anschrift: string; zusatz?: string }; info: [string, string, boolean?][]; anrede?: string; inhalt: string; vermerk?: string; stand?: string }): string {
   const b = o.betrieb;
   const logo = logoHtml(b);
   const zusatz = [anschrift(b)].filter(Boolean).join("");
@@ -784,11 +791,12 @@ export function brief(o: { titel: string; betreff: string; unterBetreff?: string
   // DIN 5008: Anschriftzone 27,3 mm – bis 6 Zeilen in 10 pt, sonst kleiner; die Anschrift wird nie gekürzt
   const eng = anschriftZeilen(zeilenEmpf, 44) <= 6 ? "" : anschriftZeilen(zeilenEmpf, 49) <= 7 ? " eng" : " enger";
   const empf = `${o.empfaenger.name.trim() ? `${esc(o.empfaenger.name.trim())}<br>` : LINIE}${o.empfaenger.anschrift.trim() ? esc(o.empfaenger.anschrift.trim()).replace(/\n/g, "<br>") : LINIE}${o.empfaenger.zusatz ? `<br><span style="font-size:8pt;color:#4a535c">${esc(o.empfaenger.zusatz)}</span>` : ""}`;
-  const info = o.info.filter(([, w]) => w.trim());
+  // leere Angaben entfallen; mit drittem Eintrag `true` bleibt eine Linie zum Ausfüllen (z. B. Rechnungsnummer)
+  const info = o.info.filter(([, w, linie]) => w.trim() || linie);
   return `${kopf({ titel: o.titel, betrieb: b, fussLinks: [b.name.trim(), o.titel].filter(Boolean).join(" · "), fussRechts: o.stand ? `Stand ${o.stand}` : "", gestalt: "brief" })}<body class="g-brief">
 <header class="kopf">${logo}<div class="marke"${logo ? ' style="right:65mm"' : ""}><div class="name">${b.name.trim() ? esc(b.name.trim()) : LINIE}</div>${zusatz ? `<div class="zusatz">${esc(zusatz)}</div>` : ""}</div></header>
 <div class="fenster"><div class="anschrift"><div class="ruecksendung">${esc(ruecksendung)}</div><div class="vermerk">${o.vermerk ? esc(o.vermerk) : ""}</div><div class="empf${eng}">${empf}</div></div>
-<div class="info"><table>${info.map(([k, w]) => `<tr><td>${esc(k)}</td><td>${esc(w)}</td></tr>`).join("")}</table></div></div>
+<div class="info"><table>${info.map(([k, w]) => `<tr><td>${esc(k)}</td><td>${w.trim() ? esc(w) : LINIE}</td></tr>`).join("")}</table></div></div>
 <h1 class="betreff">${esc(o.betreff)}${o.unterBetreff ? `<span>${esc(o.unterBetreff)}</span>` : ""}</h1>
 ${o.anrede ? `<p class="anrede">${esc(o.anrede)}</p>` : ""}<main>${festeLeerzeichen(o.inhalt)}</main>
 ${fussHtml(b)}

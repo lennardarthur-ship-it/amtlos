@@ -5,7 +5,7 @@
  */
 import { teilnahmeTabelle } from "./arbeitsschutz.js";
 import { ALLERGENE_UMFANG, HACCP, HAUTSCHUTZ_FRISEUR, HYGIENE, IFSG, LOSE_WARE } from "./bausteine.js";
-import { abschnitt, absatz, auswahl, datumDe, dokument, esc, ja, liste, nachsatz, plusMonate, punkte, tabelle, text, unterschriften, zelle } from "./html.js";
+import { abschnitt, absatz, angaben, auswahl, datumDe, dokument, esc, ja, liste, nachsatz, plusMonate, punkte, tabelle, text, unterschriften, zelle } from "./html.js";
 import { ALLERGENE, optionen } from "./konstanten.js";
 import type { Vorlage } from "./typen.js";
 
@@ -113,15 +113,18 @@ export const allergenAushang: Vorlage = {
         return `<tbody${k ? ' class="gruppe-block"' : ""}>${k ? `<tr class="gruppe"><td colspan="${nummern.length + 1}"><strong>${zelle(k)}</strong></td></tr>` : ""}${zeilen.join("")}</tbody>`;
       })
       .join("");
-    const inhalt = g.length ? `<table class="liste matrix"><colgroup><col style="width:37%">${nummern.map(() => `<col style="width:${(63 / nummern.length).toFixed(2)}%">`).join("")}</colgroup>${kopf}${zeilenHtml}</table>` : "";
+    // ohne Gerichte: Matrix mit leeren Zeilen zum Ausfüllen von Hand
+    const leereZeilen = `<tbody>${Array.from({ length: 12 }, () => `<tr><td>&nbsp;</td>${nummern.map(() => '<td class="x"></td>').join("")}</tr>`).join("")}</tbody>`;
+    const inhalt = `<table class="liste matrix${g.length ? "" : " hoch"}"><colgroup><col style="width:37%">${nummern.map(() => `<col style="width:${(63 / nummern.length).toFixed(2)}%">`).join("")}</colgroup>${kopf}${g.length ? zeilenHtml : leereZeilen}</table>`;
+    // leeres Blatt: die Matrix füllt die erste Seite, die Erläuterung folgt als eigenes Blatt
     const legende = ja(d, "legende")
-      ? abschnitt("Die 14 Hauptallergene nach Anhang II der LMIV", tabelle(["Allergen", "umfasst"], nummern.map((id, i) => [esc(ALLERGENE[id]!), esc(ALLERGENE_UMFANG[i]?.umfasst ?? "")]), { breiten: ["30%", "70%"], klasse: "legende" }))
+      ? abschnitt("Die 14 Hauptallergene nach Anhang II der LMIV", tabelle(["Allergen", "umfasst"], nummern.map((id, i) => [esc(ALLERGENE[id]!), esc(ALLERGENE_UMFANG[i]?.umfasst ?? "")]), { breiten: ["30%", "70%"], klasse: "legende" }), g.length ? "" : "neue-seite")
       : "";
     return dokument({
       titel: "Allergene in unseren Speisen und Getränken",
       betrieb: b,
       meta: `Stand: ${datumDe(text(d, "stand"))}`,
-      inhalt: (inhalt || absatz("", "Keine Gerichte erfasst.")) + `<p style="margin-top:6mm">${esc(LOSE_HINWEIS)}</p>` + legende + nachsatz(LOSE_WARE.rechtsgrundlage),
+      inhalt: inhalt + `<p style="margin-top:6mm">${esc(LOSE_HINWEIS)}</p>` + legende + nachsatz(LOSE_WARE.rechtsgrundlage),
     });
   },
 };
@@ -198,16 +201,21 @@ export const haccp: Vorlage = {
       quer: true,
       meta: `Zeitraum: ${text(d, "zeitraum")}${p.length ? `\nKontrollpunkte: ${p.length}` : ""}`,
       inhalt:
-        abschnitt("Kontrollpunkte, Grenzwerte und Korrekturmaßnahmen", p.length ? tabelle(["Kontrollpunkt", "Grenzwert", "Häufigkeit", "Korrekturmaßnahme"], p.map((x) => [`<strong>${zelle(text(x, "punkt"))}</strong>`, zelle(text(x, "grenzwert")), zelle(text(x, "haeufigkeit")), zelle(text(x, "korrektur"))]), { breiten: ["20%", "24%", "20%", "36%"] }) : absatz("")) +
+        // die Kennungsleiste lässt einen leeren Zeitraum weg: dann ein Feld zum Eintragen
+        (text(d, "zeitraum") ? "" : angaben([["Zeitraum", ""]])) +
+        abschnitt(
+          "Kontrollpunkte, Grenzwerte und Korrekturmaßnahmen",
+          tabelle(["Kontrollpunkt", "Grenzwert", "Häufigkeit", "Korrekturmaßnahme"], p.map((x) => [`<strong>${zelle(text(x, "punkt"))}</strong>`, zelle(text(x, "grenzwert")), zelle(text(x, "haeufigkeit")), zelle(text(x, "korrektur"))]), { breiten: ["20%", "24%", "20%", "36%"], ...(p.length ? {} : { mindestens: 6, hoch: true }) }),
+        ) +
         abschnitt(
           "Messprotokoll",
           tabelle(
             ["Datum / Uhrzeit", "Kontrollpunkt", "Messwert", "In Ordnung", "Korrekturmaßnahme", "Kürzel"],
             m.map((x) => [`${datumDe(text(x, "datum"))}${text(x, "uhrzeit") ? ` ${esc(text(x, "uhrzeit"))}` : ""}`, zelle(text(x, "kontrollpunkt")), zelle(text(x, "wert")), text(x, "in_ordnung") === "nein" ? "<strong>nein</strong>" : "ja", zelle(text(x, "massnahme")), zelle(text(x, "kuerzel"))]),
-            { breiten: ["15%", "22%", "12%", "10%", "31%", "10%"], leerzeilen: ja(d, "leerzeilen") ? haccpLeerzeilen(p.length > 0, m.length) : 0, hoch: ja(d, "leerzeilen") },
+            { breiten: ["15%", "22%", "12%", "10%", "31%", "10%"], leerzeilen: ja(d, "leerzeilen") ? haccpLeerzeilen(m.length) : 0, hoch: ja(d, "leerzeilen") },
           ),
-          // mit Kontrollpunkten: Protokoll als eigenes Blatt zum Aushängen
-          p.length ? "neue-seite" : "",
+          // Protokoll als eigenes Blatt zum Aushängen (auch leer: davor steht die Tabelle der Kontrollpunkte)
+          "neue-seite",
         ),
     });
   },
@@ -215,13 +223,13 @@ export const haccp: Vorlage = {
 
 /**
  * Leere Zeilen im Messprotokoll, damit die Seite ungefähr voll wird, aber keine neue Seite nur mit Kopf und zwei
- * Zeilen entsteht (Querformat, Satzspiegel ca. 176 mm hoch). Ohne Kontrollpunkte steht das Protokoll auf der ersten
- * Seite unter dem Titel; mit Kontrollpunkten beginnt es auf einer eigenen Seite. Passen höchstens drei, entfallen sie.
+ * Zeilen entsteht (Querformat, Satzspiegel ca. 176 mm hoch). Das Protokoll beginnt auf einer eigenen Seite. Passen
+ * höchstens drei, entfallen sie.
  */
-function haccpLeerzeilen(mitPunkten: boolean, messungen: number): number {
+function haccpLeerzeilen(messungen: number): number {
   const ZEILE = 8.2; // Zeile mit Mindesthöhe 8 mm samt Linie
-  // erste Seite: Kopf, Titel, Kennungsleiste, Abschnitt 1 mit Linien; sonst nur Überschrift und Tabellenkopf
-  const platz = Math.floor((176 - (mitPunkten ? 26 : 112)) / ZEILE);
+  // eigene Seite: nur Überschrift und Tabellenkopf
+  const platz = Math.floor((176 - 26) / ZEILE);
   const frei = messungen < platz ? platz - messungen : (platz + 3 - ((messungen - platz) % (platz + 3))) % (platz + 3);
   return frei > 3 ? frei : 0;
 }

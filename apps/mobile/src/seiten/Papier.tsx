@@ -1,5 +1,5 @@
 import { Pressable, View } from "react-native";
-import { cent, sichtbar, zahl, type Daten, type Eintrag, type Feld, type Vorlage } from "@amtlos/fachlogik";
+import { cent, ohneVerdeckte, sichtbar, zahl, type Daten, type Eintrag, type Feld, type Vorlage } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { Symbol, T, textAus } from "../ui/bausteine";
 import { RADIUS, SCHRIFT } from "../ui/thema";
@@ -84,6 +84,7 @@ function zeilen(felder: Feld[], d: Daten, nameFeld?: string): Zeile[] {
  */
 export function PapierBlatt({ v, d, jeSchritt, ergebnis, springen }: { v: Vorlage; d: Daten; jeSchritt: string[][]; ergebnis: [string, string][]; springen: (schritt: number) => void }) {
   const summe = ergebnis.at(-1);
+  d = ohneVerdeckte(v, d); // wie im PDF: nichts zeigen, was das Formular gerade verdeckt
   return (
     <View style={{ borderRadius: RADIUS.blatt, backgroundColor: "#ffffff", paddingHorizontal: 20, paddingVertical: 22, gap: 6, shadowColor: "#000", shadowOpacity: 0.35, shadowRadius: 24, shadowOffset: { width: 0, height: 14 }, elevation: 10 }}>
       <View style={{ flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", gap: 10, marginBottom: 6 }}>

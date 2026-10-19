@@ -2,7 +2,7 @@
  * Personal (E-121): Arbeitszeitnachweis, Lohnkonto, Daten für die Sozialversicherungsmeldung. Amtlos rechnet keine
  * Lohnsteuer und keine Beiträge – die Beträge kommen aus der Lohnabrechnung. Gliederungen fachlich zu prüfen (T-61).
  */
-import { abschnitt, absatz, angaben, cent, datumDe, dokument, esc, euro, felder, ja, liste, nachsatz, summe, tabelle, text, unterschriften, zelle } from "./html.js";
+import { abschnitt, angaben, cent, datumDe, dokument, esc, euro, felder, ja, liste, nachsatz, summe, tabelle, text, unterschriften, zelle } from "./html.js";
 import { MINIJOB, SV } from "./bausteine.js";
 import type { Daten, Eintrag, Vorlage } from "./typen.js";
 
@@ -76,10 +76,12 @@ export const arbeitszeitnachweis: Vorlage = {
       unter: [text(d, "name"), text(d, "monat")].filter(Boolean).join(", ") || undefined,
       meta: `Beschäftigte Person: ${text(d, "name")}\nMonat: ${text(d, "monat")}`,
       inhalt:
+        // die Kennungsleiste lässt leere Angaben weg: dann Felder zum Eintragen von Hand
+        (!text(d, "name") || !text(d, "monat") ? `<div style="margin-bottom:5mm">${felder([["Beschäftigte Person", text(d, "name")], ["Monat", text(d, "monat")]], { nummern: false })}</div>` : "") +
         tabelle(
           ["Datum", "Beginn", "Ende", "Pause (Min.)", "Dauer", "Bemerkung"],
           z.map(({ x, min }) => [datumDe(text(x, "datum")), esc(text(x, "beginn")), esc(text(x, "ende")), esc(text(x, "pause")), min === null ? "" : stunden(min), zelle(text(x, "bemerkung"))]),
-          { breiten: ["15%", "12%", "12%", "13%", "13%", "35%"], leerzeilen, hoch: leer || ja(d, "leerzeilen"), zahlen: [3, 4], ...(leer ? {} : { summe: ["<strong>Summe</strong>", "", "", "", `<strong>${stunden(gesamt)}</strong>`, ""] }) },
+          { breiten: ["15%", "12%", "12%", "13%", "13%", "35%"], leerzeilen, hoch: leer || ja(d, "leerzeilen"), zahlen: [3, 4], ...(leer ? {} : ja(d, "leerzeilen") ? { summe: ["<strong>Summe der erfassten Tage</strong>", `<strong>${stunden(gesamt)}</strong>`, ""], summeSpanne: 4 } : { summe: ["<strong>Summe</strong>", "", "", "", `<strong>${stunden(gesamt)}</strong>`, ""] }) },
         ) +
         `<p class="nachsatz">Für Minijobs und die Branchen nach § 2a SchwarzArbG (u. a. Gastronomie, Friseur- und Kosmetikgewerbe, Bau): Beginn, Ende und Dauer der täglichen Arbeitszeit spätestens bis zum Ablauf des siebten auf den Arbeitstag folgenden Kalendertages aufzeichnen und mindestens zwei Jahre aufbewahren (§ 17 Abs. 1 MiLoG).</p>` +
         unterschriften(["Unterschrift beschäftigte Person", "Unterschrift Arbeitgeber/in"]),
@@ -152,6 +154,11 @@ export const lohnkonto: Vorlage = {
   ergebnis: (d) => [["Brutto im Jahr", euro(summe(liste(d, "monate"), "brutto"))], ["Lohnsteuer im Jahr", euro(summe(liste(d, "monate"), "lohnsteuer"))]],
   html(d, b) {
     const m = liste(d, "monate").filter((x) => text(x, "monat"));
+    // ohne Monate: Blatt zum Eintragen von Hand
+    const leer = !m.length;
+    // Spaltenköpfe mit weichen Trennstellen (nur im Kopf), damit „Solidaritätszuschlag“ in die schmale Spalte passt
+    const kopf = ["Zeitraum", "Zahltag", ...BETRAEGE.map(([k, l]) => (k === "soli" ? "Soli\u00addaritäts\u00adzuschlag" : l)), "U*"];
+    const tabellenOptionen = { breiten: ["10%", "8%", ...BETRAEGE.map(() => `${79 / BETRAEGE.length}%`), "3%"], zahlen: BETRAEGE.map((_, i) => i + 2), klasse: "eng" };
     const betrag = (e: Eintrag, k: string) => (text(e, k) ? euro(cent(text(e, k)) ?? 0) : "");
     return dokument({
       titel: "Lohnkonto",
@@ -173,15 +180,15 @@ export const lohnkonto: Vorlage = {
             ["Steuer-ID", text(d, "steuer_id")],
             ["Steuerklasse", text(d, "steuerklasse")],
             ["SV-Nummer", text(d, "sv_nummer")],
-            ["Kinderfreibeträge", text(d, "kinder") || null],
-            ["Kirchensteuermerkmal", text(d, "religion") || null],
+            ["Kinderfreibeträge", text(d, "kinder") || (leer ? "" : null)],
+            ["Kirchensteuermerkmal", text(d, "religion") || (leer ? "" : null)],
           ])}</div>`,
         ) +
         abschnitt(
           "Monate",
-          m.length
-            ? tabelle(["Zeitraum", "Zahltag", ...BETRAEGE.map(([, l]) => l), "U*"], m.map((e) => [zelle(text(e, "monat")), datumDe(text(e, "zahltag")), ...BETRAEGE.map(([k]) => betrag(e, k)), ja(e, "unterbrechung") ? "U" : ""]), { summe: ["<strong>Summe</strong>", "", ...BETRAEGE.map(([k]) => `<strong>${euro(summe(m, k))}</strong>`), ""], breiten: ["10%", "8%", ...BETRAEGE.map(() => `${79 / BETRAEGE.length}%`), "3%"], zahlen: BETRAEGE.map((_, i) => i + 2), klasse: "eng" }) + nachsatz("* U = Unterbrechung ohne Lohnanspruch (§ 41 Abs. 1 EStG)")
-            : absatz("", "Noch keine Monate erfasst."),
+          (leer
+            ? tabelle(kopf, [], { ...tabellenOptionen, mindestens: 12, hoch: true })
+            : tabelle(kopf, m.map((e) => [zelle(text(e, "monat")), datumDe(text(e, "zahltag")), ...BETRAEGE.map(([k]) => betrag(e, k)), ja(e, "unterbrechung") ? "U" : ""]), { ...tabellenOptionen, summe: ["<strong>Summe</strong>", "", ...BETRAEGE.map(([k]) => `<strong>${euro(summe(m, k))}</strong>`), ""] })) + nachsatz("* U = Unterbrechung ohne Lohnanspruch (§ 41 Abs. 1 EStG)"),
         ),
     });
   },

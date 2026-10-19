@@ -125,7 +125,7 @@ export const verfahrensdokumentation: Vorlage = {
           {
             titel: "Aufbewahrung und Änderungen",
             rand: "GoBD Tz. 10.1, 10.2",
-            inhalt: `<p>Diese Verfahrensdokumentation wird als Organisationsunterlage aufbewahrt; Änderungen werden mit Datum festgehalten.</p>${aenderungen.length ? tabelle(["Datum", "Änderung"], aenderungen.map((x) => [datumDe(text(x, "datum")), zelle(text(x, "aenderung"))]), { breiten: ["18%", "82%"] }) : ""}`,
+            inhalt: `<p>Diese Verfahrensdokumentation wird als Organisationsunterlage aufbewahrt; Änderungen werden mit Datum festgehalten.</p>${aenderungen.length ? tabelle(["Datum", "Änderung"], aenderungen.map((x) => [datumDe(text(x, "datum")), zelle(text(x, "aenderung"))]), { breiten: ["18%", "82%"] }) : tabelle(["Datum", "Änderung"], [], { breiten: ["18%", "82%"], mindestens: 4, hoch: true })}`,
           },
         ]) +
         unterschriften(["Unterschrift"], { ortDatum: true }),
