@@ -5,7 +5,7 @@ import { RAND } from "../ui/thema";
 import { Feld, Fuss, Hinweis, Karte, Knopf, T, Wahl } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { Unterseite } from "../ui/navigation";
-import { gestellteRechnungen, steuerpaket, zeitraeume } from "../unterlagen/steuerpaket";
+import { gestellteRechnungen, standardZeitraum, steuerpaket, zeitraeume } from "../unterlagen/steuerpaket";
 import { dateiTeilenBytes } from "../unterlagen/sicherungDatei";
 import { heute } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
@@ -20,10 +20,10 @@ export function SteuerberatungSeite() {
   const z = useAmtlos();
   const melden = useMeldung();
   const sperre = useProSperre();
-  // Quartale zuerst – die übliche Wahl ist vorausgewählt und sofort sichtbar; dann Monate, dann Jahre
+  // Quartale zuerst – das zuletzt abgeschlossene ist vorausgewählt; dann Monate, dann Jahre
   const rang = (n: string) => (/-Q\d$/.test(n) ? 0 : /^\d{4}-\d{2}$/.test(n) ? 1 : 2);
   const liste = zeitraeume(heute()).sort((a, b) => rang(a.name) - rang(b.name));
-  const [wahl, setWahl] = useState(liste.find((x) => /^\d{4}-Q\d$/.test(x.name))?.name ?? liste[0]!.name);
+  const [wahl, setWahl] = useState(() => standardZeitraum(heute()));
   const [laedt, setLaedt] = useState(false);
   const [fehler, setFehler] = useState<string | null>(null);
   const [hinweis, setHinweis] = useState<string | null>(null);

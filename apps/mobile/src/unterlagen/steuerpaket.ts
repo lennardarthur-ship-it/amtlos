@@ -202,9 +202,28 @@ export function zeitraeume(heute: string): Zeitraum[] {
   const j = Number(heute.slice(0, 4));
   const m = Number(heute.slice(5, 7));
   const ende = (jahr: number, monat: number) => new Date(Date.UTC(jahr, monat, 0)).toISOString().slice(0, 10);
+  const zwei = (n: number) => String(n).padStart(2, "0");
   const z: Zeitraum[] = [];
-  for (let mm = m; mm >= Math.max(1, m - 2); mm--) z.push({ von: `${j}-${String(mm).padStart(2, "0")}-01`, bis: ende(j, mm), name: `${j}-${String(mm).padStart(2, "0")}` });
-  for (let q = Math.ceil(m / 3); q >= 1; q--) z.push({ von: `${j}-${String(q * 3 - 2).padStart(2, "0")}-01`, bis: ende(j, q * 3), name: `${j}-Q${q}` });
+  // laufender und zwei vorherige Monate, über den Jahreswechsel hinweg (im Januar gehört der Dezember dazu)
+  for (let i = 0; i < 3; i++) {
+    const jahr = m - i >= 1 ? j : j - 1;
+    const monat = ((m - i - 1 + 12) % 12) + 1;
+    z.push({ von: `${jahr}-${zwei(monat)}-01`, bis: ende(jahr, monat), name: `${jahr}-${zwei(monat)}` });
+  }
+  // laufendes und drei vorherige Quartale, ebenfalls über den Jahreswechsel (im Januar: Q4 des Vorjahrs)
+  const q0 = Math.ceil(m / 3);
+  for (let i = 0; i < 4; i++) {
+    const jahr = q0 - i >= 1 ? j : j - 1;
+    const q = ((q0 - i - 1 + 4) % 4) + 1;
+    z.push({ von: `${jahr}-${zwei(q * 3 - 2)}-01`, bis: ende(jahr, q * 3), name: `${jahr}-Q${q}` });
+  }
   z.push({ von: `${j}-01-01`, bis: `${j}-12-31`, name: String(j) }, { von: `${j - 1}-01-01`, bis: `${j - 1}-12-31`, name: String(j - 1) });
   return z;
+}
+
+/** Vorauswahl: das zuletzt abgeschlossene Quartal – das braucht die Steuerberatung für die Voranmeldung. */
+export function standardZeitraum(heute: string): string {
+  const j = Number(heute.slice(0, 4));
+  const q = Math.ceil(Number(heute.slice(5, 7)) / 3) - 1;
+  return q >= 1 ? `${j}-Q${q}` : `${j - 1}-Q4`;
 }

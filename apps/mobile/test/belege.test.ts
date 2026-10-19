@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { KU_HINWEIS, eRechnungAus, xrechnungUbl, type Beleg } from "@amtlos/fachlogik";
 import { sicherungErstellen, sicherungLesen, sicherungLesenMitDateien } from "../src/unterlagen/sicherung";
 import { LEERER_STAND, anlegen, aufbewahrungspflichtig, ausgeben, belegLoeschen, belegSetzen, bezahltSetzen, felderSetzen, standAus, ungesichert, zusammenfuehren, type Stand } from "../src/unterlagen/speicher";
-import { belegDateiname, euerUebernahme, jahreMitDaten, steuerpaket, zeitraeume } from "../src/unterlagen/steuerpaket";
+import { belegDateiname, euerUebernahme, jahreMitDaten, standardZeitraum, steuerpaket, zeitraeume } from "../src/unterlagen/steuerpaket";
 import { perioden, umsaetzeFuer } from "../src/unterlagen/ustAusRechnungen";
 
 const t = (d: string) => new Date(`${d}T09:00:00Z`);
@@ -84,6 +84,14 @@ describe("Voranmeldung und EÜR aus Belegen (E-133)", () => {
 });
 
 describe("Paket für die Steuerberatung (E-133)", () => {
+  it("bietet über den Jahreswechsel Vormonate und Vorquartale an und wählt das letzte abgeschlossene Quartal vor", () => {
+    const namen = zeitraeume("2027-01-15").map((x) => x.name);
+    expect(namen).toEqual(["2027-01", "2026-12", "2026-11", "2027-Q1", "2026-Q4", "2026-Q3", "2026-Q2", "2027", "2026"]);
+    expect(zeitraeume("2027-01-15").find((x) => x.name === "2026-12")).toEqual({ von: "2026-12-01", bis: "2026-12-31", name: "2026-12" });
+    expect(standardZeitraum("2027-01-15")).toBe("2026-Q4");
+    expect(standardZeitraum("2026-10-19")).toBe("2026-Q3");
+    expect(standardZeitraum("2026-05-02")).toBe("2026-Q1");
+  });
   it("enthält DATEV-Stapel, Listen, E-Rechnungen und Belegdateien des Zeitraums", () => {
     let s: Stand = { ...LEERER_STAND, betrieb: BETRIEB, steuerberatung: { kontenrahmen: "SKR03", beraternummer: "1001", mandantennummer: "42" } };
     s = rechnung(s, "r1", "2026-10-05", "100,00", "2026-10-10");

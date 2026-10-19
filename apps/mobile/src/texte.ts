@@ -352,7 +352,7 @@ export const T = {
   entsperren_grund: "Amtlos entsperren",
   letzte_sicherung: (d: string | null) => (d ? `Letzte Sicherung: ${d}` : "Noch keine Sicherung erstellt"),
   sicherung_faellig_titel: "Zeit für eine Sicherung",
-  sicherung_faellig: (tage: number | null) => (tage === null ? "Du hast noch keine Sicherung. Rechnungen und Belege musst du Jahre aufbewahren – eine Sicherung schützt sie, falls dem iPhone etwas passiert." : `Deine letzte Sicherung ist ${tage} Tage alt, seitdem hat sich etwas geändert.`),
+  sicherung_faellig: (tage: number | null) => (tage === null ? "Noch keine Sicherung. Sie schützt Rechnungen und Belege, falls dem iPhone etwas passiert." : `Deine letzte Sicherung ist ${tage} Tage alt, seitdem hat sich etwas geändert.`),
   jetzt_sichern: "Jetzt sichern",
   icloud_auto: "Automatisch in iCloud sichern",
   icloud_auto_hilfe: "Nach jeder Änderung, verschlüsselt mit deinem Passwort, im iCloud-Drive-Ordner „Amtlos“. Ist das iPhone weg, stellst du auf dem neuen alles wieder her.",
