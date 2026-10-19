@@ -90,7 +90,7 @@ export function belegfeld1Aus(s: string): string {
 }
 
 /** Leerraum zusammenziehen und auf `n` Zeichen kürzen (Buchungstext, Bezeichnung). */
-const kuerze = (s: string, n: number) => s.replace(/\s+/g, " ").trim().slice(0, n);
+const kuerze = (s: string, n: number) => Array.from(s.replace(/\s+/g, " ").trim()).slice(0, n).join(""); // nach Zeichen, nicht mitten durch ein Emoji
 
 function erloeskonto(k: (typeof BUCHUNGSKONTEN)[Kontenrahmen], satz: number | null): string {
   if (satz === null) return k.erloese.ku;

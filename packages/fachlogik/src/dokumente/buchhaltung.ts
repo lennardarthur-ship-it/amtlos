@@ -147,7 +147,7 @@ export function eRechnungAus(d: Daten, b: Betrieb): { daten: RechnungsDaten; feh
       return { bezeichnung: text(e, "bezeichnung"), menge: zahl(text(e, "menge")) ?? 1, einheit: "stueck" as const, einheit_code: einheitCode(text(e, "einheit")), preis_cent: storno ? -preis : preis, ust_satz: ku ? null : Number(text(e, "satz") || "19") };
     }),
     kleinunternehmer: ku,
-    hinweis: [text(d, "befreiung"), text(d, "hinweis")].filter(Boolean).join("\n") || null,
+    hinweis: [text(d, "befreiung"), ...text(d, "hinweis").split("\n").filter((h) => !(storno && h.trim() === ZAHLUNGS_HINWEIS))].filter(Boolean).join("\n") || null,
     ...(storno ? { art: "storno" as const, storniert_nummer: storno } : {}),
     steuerart,
     befreiungsgrund: text(d, "befreiung") || null,

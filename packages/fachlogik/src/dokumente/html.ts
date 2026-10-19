@@ -6,6 +6,7 @@
  * Abschnittsnummer und Rechtsgrundlage stehen links neben dem Text wie Randnummern in einem Gesetzeskommentar.
  */
 import type { Betrieb, Daten, Eintrag } from "./typen.js";
+import { rundeCent } from "../rechnung.js";
 
 /**
  * Hinweis zur fachlichen Abnahme (PRUEFLISTE T-52 ff.). Steht in der App vor dem Erstellen, nicht im Dokument: Die
@@ -729,14 +730,15 @@ function lesen(t: string | null | undefined): number | null {
   let s = t.replace(/\s|€/g, "");
   if (s === "") return null;
   if (/,\d{1,2}$/.test(s) || s.includes(",")) s = s.replace(/\./g, "").replace(",", ".");
-  else if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, "");
+  else if (/^-?\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, ""); // auch „-1.500“ (Storno, Nachlass)
   const n = Number(s);
   return Number.isFinite(n) ? n : null;
 }
 /** „1.234,56“ / „1234.56“ / „12“ → Cent; leer oder unlesbar → null. */
 export function cent(t: string | null | undefined): number | null {
   const n = lesen(t);
-  return n === null ? null : Math.round(n * 100);
+  // erst auf Zehntel-Cent glätten (Gleitkomma: 1,005 × 100 = 100,4999…), dann kaufmännisch und für negative Beträge spiegelbildlich runden
+  return n === null ? null : rundeCent(Math.round(n * 10_000) / 100);
 }
 /** Zahl wie „1,5“ oder „2,345“ (Menge in kg) → 1.5 bzw. 2.345 – bis vier Nachkommastellen; leer oder unlesbar → null. */
 export function zahl(t: string | null | undefined): number | null {

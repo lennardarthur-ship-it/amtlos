@@ -33,7 +33,8 @@ export interface Summen {
 }
 
 export function summen(positionen: Position[], kleinunternehmer: boolean): Summen {
-  const zeilen = positionen.map((p) => rundeCent(p.menge * p.preis_cent));
+  // Mengen haben höchstens vier Nachkommastellen: als ganze Zehntausendstel rechnen, sonst rundet Gleitkomma falsch (0,57 × 1,50 € = 0,8549…)
+  const zeilen = positionen.map((p) => rundeCent((Math.round(p.menge * 10_000) * p.preis_cent) / 10_000));
   const nachSatz = new Map<number | null, number>();
   positionen.forEach((p, i) => {
     const satz = kleinunternehmer ? null : p.ust_satz;

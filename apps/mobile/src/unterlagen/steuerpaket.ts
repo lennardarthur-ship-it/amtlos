@@ -104,7 +104,12 @@ export interface Steuerberatung {
 export const LEERE_STEUERBERATUNG: Steuerberatung = { kontenrahmen: "SKR03", beraternummer: "", mandantennummer: "" };
 
 const imZeitraum = (iso: string, z: Zeitraum) => iso >= z.von && iso <= z.bis;
-const csvFeld = (s: string) => (/[;"\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s);
+// Text, den Excel als Formel lesen würde (=, +, @, - ohne Zahl), bekommt ein Hochkomma davor; Beträge wie „-12,50“ bleiben
+const entschaerft = (s: string) => (/^[=+@\t\r]/.test(s) || (/^-/.test(s) && !/^-[\d.,]+$/.test(s)) ? `'${s}` : s);
+const csvFeld = (roh: string) => {
+  const s = entschaerft(roh);
+  return /[;"\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+};
 const csv = (kopf: string[], zeilen: string[][]) => "﻿" + [kopf, ...zeilen].map((z) => z.map(csvFeld).join(";")).join("\r\n") + "\r\n";
 const sicher = (s: string) => s.normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/ß/g, "ss").replace(/[^A-Za-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60) || "ohne-name";
 
@@ -125,13 +130,13 @@ export function rechnungenCsv(s: Stand, z: Zeitraum): string {
   return csv(["Nummer", "Datum", "Leistungsdatum", "Kunde", "Netto", "USt", "Brutto", "Steuersätze", "Bezahlt am", "Storno zu"], zeilen);
 }
 
-export function belegeCsv(s: Stand, z: Zeitraum): string {
+export function belegeCsv(s: Stand, z: Zeitraum, dateinamen: Map<string, string> = new Map()): string {
   const zeilen = s.belege
     .filter((b) => imZeitraum(b.datum, z))
     .sort((a, b) => a.datum.localeCompare(b.datum))
     .map((b) => {
       const sm = belegSummen(b);
-      return [datumDe(b.datum), b.lieferant, b.nummer ?? "", kategorieFuer(b.kategorie).titel, kategorieFuer(b.kategorie).euer, betrag(sm.netto_cent), betrag(sm.ust_cent), betrag(sm.vorsteuer_cent), betrag(sm.brutto_cent), b.steuer.map((x) => `${x.satz} %`).join(", "), b.bezahlt ? datumDe(b.bezahlt) : "", b.zahlung, b.datei ? belegDateiname(b) : "", (b.notiz ?? "").replace(/\s+/g, " ")];
+      return [datumDe(b.datum), b.lieferant, b.nummer ?? "", kategorieFuer(b.kategorie).titel, kategorieFuer(b.kategorie).euer, betrag(sm.netto_cent), betrag(sm.ust_cent), betrag(sm.vorsteuer_cent), betrag(sm.brutto_cent), b.steuer.map((x) => `${x.satz} %`).join(", "), b.bezahlt ? datumDe(b.bezahlt) : "", b.zahlung, dateinamen.get(b.id) ?? "", (b.notiz ?? "").replace(/\s+/g, " ")];
     });
   return csv(["Datum", "Lieferant", "Nummer", "Kategorie", "Zeile Anlage EÜR", "Netto", "USt", "Vorsteuer", "Brutto", "Steuersätze", "Bezahlt am", "Zahlung", "Datei", "Notiz"], zeilen);
 }
@@ -158,7 +163,18 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
   inhalt[`EXTF_Buchungsstapel_${z.name}.csv`] = datevExtfBytes(datevExtf(buchungen, { beraternummer: sb.beraternummer, mandantennummer: sb.mandantennummer, wjBeginn: `${z.von.slice(0, 4)}-01-01`, von: z.von, bis: z.bis, kontenrahmen: sb.kontenrahmen, bezeichnung: `Amtlos ${z.name}`, erzeugtAm: jetzt }));
   inhalt[`Buchungsliste_${z.name}.csv`] = utf8(buchungslisteCsv(buchungen));
   inhalt[`Rechnungen_${z.name}.csv`] = utf8(rechnungenCsv(s, z));
-  inhalt[`Belege_${z.name}.csv`] = utf8(belegeCsv(s, z));
+  // Dateinamen einmal vergeben (doppelte durchnummeriert) – dieselben stehen in der Belegliste
+  const dateinamen = new Map<string, string>();
+  const vergeben = new Set<string>();
+  for (const b of belege) {
+    if (!b.datei || !dateien[b.datei]) continue;
+    let name = belegDateiname(b);
+    for (let i = 2; vergeben.has(name); i++) name = belegDateiname(b).replace(/(\.\w+)$/, `_${i}$1`);
+    vergeben.add(name);
+    dateinamen.set(b.id, name);
+    inhalt[`Belege/${name}`] = dateien[b.datei]!;
+  }
+  inhalt[`Belege_${z.name}.csv`] = utf8(belegeCsv(s, z, dateinamen));
   let ohneXml = 0;
   for (const u of rechnungen) {
     const { daten, fehlt } = eRechnungAus(u.daten, s.betrieb);
@@ -166,15 +182,9 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
       ohneXml++;
       continue;
     }
-    inhalt[`E-Rechnungen/${sicher(daten.nummer)}.xml`] = utf8(xrechnungUbl(daten, KU_HINWEIS));
-  }
-  const vergeben = new Set<string>();
-  for (const b of belege) {
-    if (!b.datei || !dateien[b.datei]) continue;
-    let name = belegDateiname(b);
-    for (let i = 2; vergeben.has(name); i++) name = belegDateiname(b).replace(/(\.\w+)$/, `_${i}$1`);
-    vergeben.add(name);
-    inhalt[`Belege/${name}`] = dateien[b.datei]!;
+    let pfad = `E-Rechnungen/${sicher(daten.nummer)}.xml`;
+    for (let i = 2; inhalt[pfad]; i++) pfad = `E-Rechnungen/${sicher(daten.nummer)}_${i}.xml`; // „2026/001“ und „2026-001“
+    inhalt[pfad] = utf8(xrechnungUbl(daten, KU_HINWEIS));
   }
   inhalt["LIESMICH.txt"] = utf8(
     [

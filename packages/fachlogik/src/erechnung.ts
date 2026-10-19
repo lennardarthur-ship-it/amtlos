@@ -102,7 +102,9 @@ const NS = {
   "xmlns:cac": "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2",
   "xmlns:cbc": "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
 };
-const escXml = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+// Steuerzeichen (z. B. aus Word kopierte Zeilenumbrüche) sind in XML 1.0 verboten und machen die E-Rechnung ungültig
+// eslint-disable-next-line no-control-regex
+const escXml = (s: string) => s.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]/g, " ").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 /** Element aus der JSON-Struktur: Schlüssel „x@attr“ sind Attribute von „x“, Listen wiederholen das Element. */
 function element(name: string, wert: unknown, attribute: Record<string, string>, tiefe: number): string {
