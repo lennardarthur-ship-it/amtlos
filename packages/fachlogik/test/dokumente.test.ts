@@ -416,7 +416,10 @@ describe("Dokumentvorlagen", () => {
     // Datenpanne: kein Datum an „nicht erforderlich“, keine Meldung bei „kein Risiko“, auch nicht ihre Folgefelder
     const panne = { entdeckt_am: "2026-10-12", risiko: "kein_risiko", gemeldet: true, gemeldet_am: "2026-10-13", verspaetung: "Urlaub", benachrichtigung: "nicht_erforderlich", benachrichtigt_am: "2026-10-14", benachrichtigung_text: "per Brief" };
     const dp = html("datenpanne", panne);
-    expect(dp).toContain("noch nicht gemeldet");
+    // kein Risiko: reine Dokumentation, keine 72-Stunden-Frist, Meldung nicht erforderlich
+    expect(dp).toContain("nicht erforderlich (keine Meldepflicht)");
+    expect(dp).toContain("<h1>Datenpanne – Dokumentation</h1>");
+    expect(dp).not.toContain("Frist (72 Stunden)");
     expect(dp).not.toContain("13.10.2026");
     expect(dp).not.toContain("Begründung der späteren Meldung");
     expect(dp).not.toContain("per Brief");
@@ -467,7 +470,7 @@ describe("Dokumentvorlagen", () => {
     expect(html("gewerbeanmeldung", {})).toContain("Erlaubnis, Handwerkskarte");
     const hr = html("handelsregister", {}, gmbh);
     expect(hr).toContain("Gesellschafter</h2>");
-    expect(hr).toContain("Stamm- bzw. Grundkapital");
+    expect(hr).toContain("<th>Stammkapital</th>");
     expect(hr).toContain("Geburtsdatum</th>");
     expect(html("handelsregister", {}, { ...BETRIEB, rechtsform: "e. K." })).not.toContain("Gesellschafter</h2>");
     // Transparenzregister: Meldedatum nur einmal
@@ -502,5 +505,128 @@ describe("Dokumentvorlagen", () => {
     expect(html("aufbewahrung", { eintraege: [{ art: "Briefe", jahre: "1" }] })).toContain("1 Jahr<");
     expect(html("ust_voranmeldung", { vorsteuer: "50" })).toContain("Erstattung erhalten am");
     expect(html("pruefprotokoll_elektro", { einsatz: "baustellen" })).not.toMatch(/DGUV Vorschrift 3 \(DGUV/);
+  });
+  it("Korrekturen aus der dritten Durchsicht: Bausteine ohne Quellenvermerke, leere Blätter, Hinweise", () => {
+    const html = (id: string, d: Daten, b: Betrieb = BETRIEB) => n(dokumentHtml(vorlageFuer(id)!, d, b));
+    const leer = (id: string, b: Betrieb = BETRIEB) => html(id, leereDaten(vorlageFuer(id)!, b, "2026-10-12"), b);
+    const pruefe = (id: string, d: Daten, b: Betrieb = BETRIEB) => vorlageFuer(id)!.pruefen!(d, b);
+    const kopfLinie = (titel: string) => `<dt>${titel}</dt><dd><span class="fuellen"></span></dd>`;
+    // HACCP: Quellen stehen im Feld „quelle“, nicht im Drucktext; beide Grenzwerte bleiben stehen
+    const haccp = vorlageFuer("haccp")!.abschnitte.flatMap((a) => a.felder).find((f) => f.art === "liste")!;
+    const vorschlaege = haccp.art === "liste" ? haccp.vorschlaege! : [];
+    for (const v of vorschlaege) for (const k of ["grenzwert", "haeufigkeit", "korrektur"]) expect(String(v.werte[k])).not.toMatch(/Mainz|LAVES|BfR|BgVV|DGF|Älterer Wert/);
+    const heiss = vorschlaege.find((v) => v.titel.startsWith("Heißhalten"))!;
+    expect(String(heiss.werte.grenzwert)).toContain("+60 °C");
+    expect(String(heiss.werte.grenzwert)).toContain("+65 °C");
+    expect(heiss.quelle).toContain("BfR 2008");
+    // Datenschutzinformation: keine Quellenvermerke im Text, Löschung als Aussage
+    const dsi = html("datenschutzinformation", { fuer_wen: "Kunden", verarbeitungen: ["Kundenverwaltung / Kundenkartei", "Videoüberwachung (z. B. Verkaufsraum, Eingang, Lager)", "Bewerbungsverfahren", "E-Mail-Newsletter / E-Mail-Werbung"], interessen: "Schutz" });
+    expect(dsi).not.toMatch(/BayLDA-Muster|laut DSK/);
+    expect(dsi).toContain("Kundenstammdaten werden gelöscht, sobald");
+    expect(dsi).toContain("Aufnahmen werden in der Regel nach 72 Stunden gelöscht");
+    // USt-Voranmeldung: leeres Blatt ohne „0,00 €“, Zeitraum als Linie, Hinweis zu ELSTER
+    const uv = leer("ust_voranmeldung");
+    expect(uv).not.toContain("0,00 €");
+    expect(uv).toContain(kopfLinie("Zeitraum"));
+    expect(uv).not.toContain("wie hier angegeben");
+    expect(html("ust_voranmeldung", { vorsteuer: "50" })).toContain("ELSTER rechnet aus vollen Euro; maßgeblich ist der Betrag, den ELSTER errechnet.");
+    expect(html("ust_voranmeldung", { umsatz_19: "100" })).toContain("19,00 €");
+    // Rechnung: leere Vorlage mit Umsatzsteuerzeile, Kleinunternehmer ohne; Leistungszeitraum
+    expect(leer("rechnung")).toContain('Umsatzsteuer <span class="fuellen kurz"></span> %');
+    expect(html("rechnung", { kleinunternehmer: true })).not.toContain("fuellen kurz");
+    expect(html("rechnung", { leistung_gleich: false, leistung: "Oktober 2026" })).toContain("Leistungsdatum/-zeitraum");
+    // Prüfprotokoll, Kassenbuch, Steuererklärung, Bilanz, EÜR, Hautschutzplan: Angaben zum Eintragen
+    const pp = leer("pruefprotokoll_elektro");
+    expect(pp).toContain(kopfLinie("Geprüft von"));
+    expect(pp).toMatch(/<th>Prüfgrundlage<\/th><td><span class="fuellen">/);
+    expect(pp).toMatch(/<th>Prüfgerät<\/th><td><span class="fuellen">/);
+    expect(leer("kassenbuch")).toContain(kopfLinie("Zeitraum"));
+    const se = leer("steuererklaerung");
+    expect(se).toContain(kopfLinie("Jahr"));
+    expect(se).toContain("Umsätze im Jahr (netto)");
+    expect(html("steuererklaerung", { jahr: "2026", gewinn: "100" })).not.toContain("Umsätze im Jahr");
+    const bg = leer("bilanz_guv");
+    expect(bg).toContain(kopfLinie("Bilanzstichtag"));
+    expect(bg.split('<tr class="summe">').length - 1).toBe(4);
+    const eu = leer("euer");
+    expect(eu).toContain(kopfLinie("Jahr"));
+    expect(eu.split('<tr class="summe">').length - 1).toBe(3);
+    expect(leer("hautschutzplan")).toContain(kopfLinie("Bereich"));
+    // Aufbewahrung: Fristbeginn kein Jahr
+    expect(pruefe("aufbewahrung", { eintraege: [{ art: "Belege", jahre: "8", letzte: "26" }] })).toHaveLength(1);
+    expect(pruefe("aufbewahrung", { eintraege: [{ art: "Belege", jahre: "8", letzte: "2026" }, { art: "Briefe", jahre: "6" }] })).toHaveLength(0);
+    // Personalfragebogen: Widersprüche, leeres Blatt ohne Startauswahl, Schlüssel vor dem Text
+    expect(pruefe("sv_meldedaten", { art: "teilzeit", vertragsform: "1", personengruppe: "101" }).some((h) => h.includes("Vertragsform"))).toBe(true);
+    expect(pruefe("sv_meldedaten", { art: "vollzeit", vertragsform: "1", personengruppe: "101" })).toHaveLength(0);
+    expect(pruefe("sv_meldedaten", { art: "minijob", personengruppe: "101" }).some((h) => h.includes("109"))).toBe(true);
+    expect(pruefe("sv_meldedaten", { art: "minijob", personengruppe: "109" })).toHaveLength(0);
+    expect(pruefe("sv_meldedaten", { art: "ausbildung", personengruppe: "101" }).some((h) => h.includes("102"))).toBe(true);
+    expect(pruefe("sv_meldedaten", { art: "ausbildung", personengruppe: "121" })).toHaveLength(0);
+    const sv = leer("sv_meldedaten");
+    expect(sv).not.toContain("Vollzeit");
+    expect(sv).not.toContain("101 –");
+    expect(sv).toContain("Geburtsname (falls abweichend)");
+    expect(sv).toMatch(/<td class="nr">11<\/td><th>Beginn<\/th>/);
+    const svVoll = html("sv_meldedaten", { name: "Kim", art: "vollzeit", personengruppe: "101", vertragsform: "1", schulabschluss: "4" });
+    expect(svVoll).toContain("1 – Vollzeit, unbefristet");
+    expect(svVoll).toContain("4 – Abitur/Fachabitur");
+    expect(svVoll).not.toContain("Geburtsname");
+    expect(svVoll).toMatch(/<td class="nr">10<\/td><th>Beginn<\/th>/);
+    // Arbeitszeit: Tage nur mit Bemerkung, Pause gerundet, je fehlender Angabe eine Zeile
+    const az = html("arbeitszeitnachweis", { name: "Kim", monat: "Oktober", tage: [{ datum: "2026-10-01", beginn: "08:00", ende: "16:30", pause: "7,5" }, { datum: "2026-10-02", bemerkung: "Urlaub" }] });
+    expect(az).toContain("Urlaub");
+    expect(az).toContain("8:22 h");
+    expect(az).not.toContain(".5 h");
+    expect(arbeitsminuten("08:00", "16:30", "7,5")).toBe(502);
+    const azMonat = html("arbeitszeitnachweis", { name: "Kim" });
+    expect(azMonat).toContain("<th>Monat</th>");
+    expect(azMonat).not.toContain("<th>Beschäftigte Person</th>");
+    // Teilnahme: letzter Name bleibt mit den Leerzeilen zusammen
+    const uw = html("unterweisung", { thema: "Jährlich", datum: "2026-10-12", durchgefuehrt_von: "Alex", teilnehmer: [{ name: "Kim" }, { name: "Lou" }] });
+    expect(uw).toMatch(/<tbody class="schluss"><tr><td>Lou<\/td>/);
+    // Unterweisung und KI-Schulung: Dauer als Linie, Datum und Durchführende nicht doppelt
+    expect(uw).toMatch(/<th>Dauer<\/th><td><span class="fuellen">/);
+    expect(uw).not.toContain("<th>Durchgeführt von</th>");
+    expect(html("unterweisung", { thema: "Jährlich" })).toContain("<th>Durchgeführt von</th>");
+    const ki = html("ki_kompetenz", { thema: "KI", datum: "2026-10-12", durchgefuehrt_von: "Alex" });
+    expect(ki).toMatch(/<th>Dauer<\/th><td><span class="fuellen">/);
+    expect(ki).not.toContain("<th>Datum</th>");
+    expect(html("ki_kompetenz", { thema: "KI", datum: "2026-10-12", durchgefuehrt_von: "Alex", dauer: "1 h" })).not.toContain("<th>Dauer</th>");
+    // Impressum: keine Inhaltsübersicht, Stammkapital eigener Teil nach dem Registereintrag
+    const gmbh: Betrieb = { ...BETRIEB, name: "Sonne GmbH", rechtsform: "GmbH", registergericht: "AG München", registernummer: "HRB 1", vertretung: "Alex Muster" };
+    const imp = html("impressum", { rechtsform: "GmbH", kapital: "25.000 €", ausstehend: "12.500 €", vsbg: "nicht_bereit", reglementiert: true }, gmbh);
+    expect(imp).not.toContain("<nav class=\"inhalt-uebersicht");
+    expect(imp.indexOf("Registereintrag")).toBeLessThan(imp.indexOf(">Stammkapital<"));
+    expect(imp).not.toMatch(/Alex Muster<br>Stammkapital/);
+    // Transparenzregister: Meldedatum nur in Feld 04
+    const tr = leer("transparenzregister");
+    expect(tr).not.toContain("noch nicht gemeldet");
+    expect(tr).not.toContain("Gemeldet am (transparenzregister.de)");
+    expect(tr).toContain('<col style="width:11%">');
+    // Verfahrensdokumentation: leere Tabelle der Programme
+    expect(leer("verfahrensdokumentation")).toContain("<th>Programm, Gerät</th>");
+    // Verzeichnis: Spalte „Verantwortlich“ nur bei Angabe, leeres Blatt ohne „Keine … erfasst.“
+    const vvt = html("datenschutz_dokumentation", { tom: [{ schutzziel: "vertraulichkeit", massnahme: "Passwörter" }] });
+    expect(vvt).not.toContain("<th>Verantwortlich</th>");
+    expect(html("datenschutz_dokumentation", { tom: [{ schutzziel: "vertraulichkeit", massnahme: "Passwörter", verantwortlich: "Alex" }] })).toContain("<th>Verantwortlich</th>");
+    expect(leer("datenschutz_dokumentation")).not.toContain("erfasst.");
+    // AVV: Unterschriften mit den Namen der Parteien
+    expect(html("avv", { rolle: "auftraggeber", partner: "Host AG" })).toContain("Auftragnehmer (Host AG)");
+    // Handelsregister: GmbH mit Geschäftsführung und Vertretungsregelung
+    const hr = html("handelsregister", { rechtsform: "GmbH" });
+    expect(hr).toContain("Vertretungsregelung");
+    expect(hr).toContain(">Geschäftsführung<");
+    expect(hr).toContain("<th>Stammkapital</th>");
+    expect(html("handelsregister", { rechtsform: "e. K." })).toContain("Geschäftsführung bzw. Inhaber/in");
+    // Datenschutzerklärung: Zeilenumbrüche bleiben, Website nicht doppelt
+    const dse = html("datenschutzerklaerung_website", { website: "www.sonne.example", ergaenzung: "Erste Zeile\nZweite Zeile" });
+    expect(dse).toContain("Erste Zeile<br>Zweite Zeile");
+    expect(dse).not.toContain("<dt>Website</dt>");
+    // Gewerbeanmeldung: Geburtsname auf dem leeren Blatt, Rechtsform im Namen
+    expect(leer("gewerbeanmeldung")).toContain("Geburtsname (falls abweichend)");
+    expect(pruefe("gewerbeanmeldung", { rechtsform: "Einzelunternehmen" }, gmbh).some((h) => h.includes("„GmbH“"))).toBe(true);
+    expect(pruefe("gewerbeanmeldung", { rechtsform: "GmbH" }, gmbh)).toHaveLength(0);
+    // Handbuch: lange Textabschnitte dürfen umbrechen
+    expect(dse).toContain("lang-im-handbuch");
   });
 });

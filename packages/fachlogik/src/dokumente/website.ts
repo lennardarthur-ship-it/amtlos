@@ -3,7 +3,7 @@
  * Vertrag zur Auftragsverarbeitung mit den Pflichtinhalten nach Art. 28 Abs. 3 DSGVO. Texte aus bausteine.ts.
  */
 import { AVV_KLAUSELN, DSE } from "./bausteine.js";
-import { rechtsformAus } from "./betrieb.js";
+import { formGleich, formImNamen, rechtsformAus } from "./betrieb.js";
 import { aufsichtFuer } from "./datenschutz.js";
 import { LINIE, abschnitt, abschnitte, angaben, anschrift, auswahl, datumDe, dokument, esc, ja, parteien, text, unterschriften, zeilen } from "./html.js";
 import { optionen } from "./konstanten.js";
@@ -36,7 +36,8 @@ export function bausteinText(t: string, d: Daten, b: Betrieb): string {
     .replace(/ {2,}/g, " ")
     .trim();
 }
-const alsHtml = (t: string) => `<p>${esc(t).replace(/\uE000/g, LINIE)}</p>`;
+// Zeilenumbrüche bleiben erhalten (z. B. in „Weitere Verarbeitungen“), wie im Impressum
+const alsHtml = (t: string) => `<p>${esc(t).replace(/\n/g, "<br>").replace(/\uE000/g, LINIE)}</p>`;
 const alsKlartext = (t: string) => t.replace(/\uE000/g, "[bitte ergänzen]");
 
 /** Bausteine der Datenschutzerklärung in fester Reihenfolge; „immer“ steht in jeder Erklärung. */
@@ -127,8 +128,9 @@ export const datenschutzerklaerungWebsite: Vorlage = {
     return dokument({
       titel: "Datenschutzerklärung",
       betrieb: b,
+      // die Website steht als Unterzeile, nicht noch einmal in der Kennungsleiste
       unter: website || undefined,
-      meta: `Website: ${website}\nStand: ${datumDe(text(d, "stand"))}`,
+      meta: `Stand: ${datumDe(text(d, "stand"))}`,
       inhalt: abschnitte(dseTeile(d, b).map((t) => ({ titel: t.titel, inhalt: alsHtml(t.text) }))),
     });
   },
@@ -143,41 +145,22 @@ const VSBG: Record<string, string> = {
   keine_angabe: "",
 };
 
-/** Rechtsform-Zusätze im Namen des Betriebs (längere zuerst: „GmbH & Co. KG“ vor „GmbH“ und „KG“). */
-const FORM_IM_NAMEN: [RegExp, string][] = [
-  [/GmbH\s*&\s*Co\.?\s*KG\b/, "GmbH & Co. KG"],
-  [/\bUG\b/, "UG (haftungsbeschränkt)"],
-  [/\bGmbH\b/, "GmbH"],
-  [/\bAG\b/, "AG"],
-  [/\be\.\s?(?:K|Kfm|Kfr)\./, "e. K."],
-  [/\bOHG\b/, "OHG"],
-  [/\bKG\b/, "KG"],
-  [/\be?GbR\b/, "GbR"],
-  [/\bPartG\b/, "PartG"],
-];
-/** Rechtsform, die der Name des Betriebs nennt (oder null). */
-export function formImNamen(name: string): string | null {
-  return FORM_IM_NAMEN.find(([re]) => re.test(name))?.[1] ?? null;
-}
-const formGleich = (a: string, b: string) => {
-  const n = (t: string) => t.toLocaleLowerCase("de").replace(/[\s.]/g, "").replace(/^e(?=gbr)/, "");
-  return n(a) === n(b);
-};
-
 /** Rechtsform: gewählt, sonst aus „Mein Betrieb“, sonst Einzelunternehmen. */
 const rechtsformImp = (d: Daten, b: Betrieb) => rechtsformAus(text(d, "rechtsform") || b.rechtsform, RECHTSFORMEN_IMP) || "Einzelunternehmen";
 
 function impressumTeile(d: Daten, b: Betrieb): { titel: string; text: string }[] {
   const rf = rechtsformImp(d, b);
-  const kapital = text(d, "kapital") && /GmbH|UG/.test(rf) ? `\nStammkapital: ${text(d, "kapital")}${text(d, "ausstehend") ? `\nAusstehende Einlagen: ${text(d, "ausstehend")}` : ""}` : "";
+  // Stammkapital als eigener Teil nach dem Registereintrag (nicht unter „Vertreten durch“)
+  const kapital = text(d, "kapital") && /GmbH|UG/.test(rf) ? { titel: "Stammkapital", text: `${text(d, "kapital")}${text(d, "ausstehend") ? `\nAusstehende Einlagen: ${text(d, "ausstehend")}` : ""}` } : null;
   const t: { titel: string; text: string }[] = [
     { titel: "Angaben gemäß § 5 DDG", text: [b.name.trim() + (!b.name.includes(rf) && rf !== "Einzelunternehmen" ? ` ${rf}` : ""), b.strasse, [b.plz, b.ort].filter(Boolean).join(" ")].filter((x) => x.trim()).join("\n") || FEHLT },
-    { titel: rf === "Einzelunternehmen" ? "Inhaber/in" : "Vertreten durch", text: (text(d, "vertreten") || (b.vertretung ?? "").trim() || b.verantwortlich.trim() || FEHLT) + kapital },
+    { titel: rf === "Einzelunternehmen" ? "Inhaber/in" : "Vertreten durch", text: text(d, "vertreten") || (b.vertretung ?? "").trim() || b.verantwortlich.trim() || FEHLT },
     { titel: "Kontakt", text: [b.telefon ? `Telefon: ${b.telefon}` : "", `E-Mail: ${b.email.trim() || FEHLT}`].filter(Boolean).join("\n") },
   ];
   const gericht = text(d, "register_gericht") || (b.registergericht ?? "").trim();
   const nummer = text(d, "register_nr") || (b.registernummer ?? "").trim();
   if (gericht || nummer) t.push({ titel: "Registereintrag", text: `Registergericht: ${gericht || FEHLT}\nRegisternummer: ${nummer || FEHLT}` });
+  if (kapital) t.push(kapital);
   const ids = [b.ust_idnr.trim() ? `Umsatzsteuer-Identifikationsnummer nach § 27a UStG: ${b.ust_idnr.trim()}` : "", text(d, "wirtschafts_id") ? `Wirtschafts-Identifikationsnummer nach § 139c AO: ${text(d, "wirtschafts_id")}` : ""].filter(Boolean);
   if (ids.length) t.push({ titel: b.ust_idnr.trim() && text(d, "wirtschafts_id") ? "Umsatzsteuer-ID und Wirtschafts-ID" : b.ust_idnr.trim() ? "Umsatzsteuer-ID" : "Wirtschafts-ID", text: ids.join("\n") });
   if (text(d, "aufsicht")) t.push({ titel: "Zuständige Aufsichtsbehörde", text: text(d, "aufsicht") });
@@ -242,7 +225,10 @@ export const impressum: Vorlage = {
     return dokument({
       titel: "Impressum",
       betrieb: b,
-      inhalt: abschnitte(impressumTeile(d, b).map((t) => ({ titel: t.titel, inhalt: `<p>${esc(t.text).replace(/\n/g, "<br>").replace(/\uE000/g, LINIE)}</p>` }))),
+      // ohne Inhaltsübersicht: das Impressum ist kurz, die Übersicht schöbe nur Zeilen auf eine zweite Seite
+      inhalt: impressumTeile(d, b)
+        .map((t) => abschnitt(t.titel, `<p>${esc(t.text).replace(/\n/g, "<br>").replace(/\uE000/g, LINIE)}</p>`))
+        .join(""),
     });
   },
 };
@@ -287,6 +273,8 @@ export const auftragsverarbeitung: Vorlage = {
   ],
   html(d, b) {
     const ag = text(d, "rolle") !== "dienstleister";
+    // Unterschrift mit dem Namen der Partei, z. B. „Auftraggeber (Salon Sonne GmbH)“
+    const mitName = (rolle: string, name: string) => (name.trim() ? `${rolle} (${name.trim()})` : rolle);
     // mehrzeilige Angaben in einer Zeile: Satzzeichen am Zeilenende entfallen („Name., Kontaktdaten“)
     const reihe = (k: string) => text(d, k).split("\n").map((z) => z.trim().replace(/[.;,]+$/, "")).filter(Boolean).join(", ");
     // Abschnitte in Reihenfolge; die Klausel (c) verweist auf den Paragraphen mit den technischen und organisatorischen Maßnahmen
@@ -322,7 +310,7 @@ export const auftragsverarbeitung: Vorlage = {
         `<p>Dieser Vertrag ergänzt den Vertrag ${text(d, "hauptvertrag") ? `„${esc(text(d, "hauptvertrag"))}“` : LINIE} (Hauptvertrag) und regelt die Verarbeitung personenbezogener Daten im Auftrag nach Art. 28 DSGVO.</p>` +
         teile.map(([t, inhalt]) => abschnitt(t, inhalt)).join("") +
         // der Ort gilt für die eigene Unterschrift (Betrieb = Auftraggeber bzw. Dienstleister je nach „Wer ist wer“)
-        unterschriften(["Auftraggeber", "Auftragnehmer"], { ortDatum: true, orte: text(d, "rolle") === "dienstleister" ? ["", text(d, "ort_datum")] : [text(d, "ort_datum"), ""] }),
+        unterschriften([mitName("Auftraggeber", ag ? b.name : text(d, "partner")), mitName("Auftragnehmer", ag ? text(d, "partner") : b.name)], { ortDatum: true, orte: text(d, "rolle") === "dienstleister" ? ["", text(d, "ort_datum")] : [text(d, "ort_datum"), ""] }),
     });
   },
 };

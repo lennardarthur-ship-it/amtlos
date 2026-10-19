@@ -8,7 +8,7 @@ import { KU_HINWEIS, fehlendFuerERechnung, rundeCent, summen, type Position, typ
 import { einheitCode } from "../erechnung.js";
 import { giroCodeSvg } from "../girocode.js";
 import { AUFBEWAHRUNG, EINHEITEN, EUER_AUSGABEN, EUER_EINNAHMEN, KASSEN_ARTEN, RECHNUNGS_HINWEISE, TSE_ARTEN } from "./bausteine.js";
-import { ZELLE_LINIE, abschnitt, absatz, anschrift, auswahl, brief, cent, datumDe, dokument, esc, euro, felder, ibanText, kennzahlen, nachsatz, uebertragung, ja, liste, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
+import { KOPF_LINIE, ZELLE_LINIE, abschnitt, absatz, anschrift, auswahl, brief, cent, datumDe, dokument, esc, euro, felder, ibanText, kennzahlen, nachsatz, uebertragung, ja, liste, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
 import type { Betrieb, Daten, Eintrag, Option, Vorlage } from "./typen.js";
 
 /** ISO-Datum plus Tage als TT.MM.JJJJ. */
@@ -272,6 +272,8 @@ export const rechnung: Vorlage = {
     const summenZeilen = [
       `<tr><td>Summe netto</td><td>${betrag(s.netto_cent)}</td></tr>`,
       ...(ku ? [] : s.gruppen.map((g) => `<tr><td>${g.satz === 0 ? nullProzentText(auswahl(d, "hinweise"), befreiungText(d)) : `Umsatzsteuer ${g.satz} %`} auf ${euro(g.netto_cent)}</td><td>${euro(g.ust_cent)}</td></tr>`)),
+      // leere Vorlage: Zeile für die Umsatzsteuer mit Steuersatz zum Eintragen
+      ...(leer && !ku ? [`<tr><td>Umsatzsteuer <span class="fuellen kurz"></span> %</td><td>&nbsp;</td></tr>`] : []),
       `<tr class="gesamt"><td>${gutschrift ? "Gutschriftsbetrag" : "Rechnungsbetrag"}</td><td>${betrag(s.brutto_cent)}</td></tr>`,
     ].join("");
     const leistung = text(d, "leistung");
@@ -299,7 +301,7 @@ export const rechnung: Vorlage = {
     return brief({
       titel,
       betreff: titel,
-      // der Leistungszeitraum steht im Informationsblock („Leistung“), nicht noch einmal unter dem Betreff
+      // der Leistungszeitraum steht im Informationsblock („Leistungsdatum/-zeitraum“), nicht noch einmal unter dem Betreff
       unterBetreff: storno ? `Diese Rechnung storniert die Rechnung Nr. ${storno}${text(d, "storno_zu_datum") ? ` vom ${datumDe(text(d, "storno_zu_datum"))}` : ""}.` : undefined,
       betrieb: b,
       stand: datumDe(datum),
@@ -307,7 +309,7 @@ export const rechnung: Vorlage = {
       info: [
         ["Rechnungsnummer", text(d, "nummer"), true],
         ["Rechnungsdatum", datumDe(datum)],
-        [ja(d, "leistung_gleich") ? "Leistungsdatum" : "Leistung", ja(d, "leistung_gleich") ? datumDe(datum) : leistung],
+        [ja(d, "leistung_gleich") ? "Leistungsdatum" : "Leistungsdatum/-zeitraum", ja(d, "leistung_gleich") ? datumDe(datum) : leistung],
         ["Steuernummer", b.steuernummer.trim()],
         ["USt-IdNr.", b.ust_idnr.trim()],
         ["Ansprechpartner", b.verantwortlich.trim()],
@@ -396,11 +398,13 @@ export const euer: Vorlage = {
     const betrag = (c: number) => (leer ? "&nbsp;" : euro(c));
     const kopfZeile = ["Datum", "Bezeichnung", "Zeile der Anlage EÜR", "Betrag"];
     const breiten = ["14%", "42%", "26%", "18%"];
+    // leere Tabelle: Summenzeile zum Eintragen
+    const summeLeer = ["<strong>Summe</strong>", "", "", "&nbsp;"];
     return dokument({
       titel: "Einnahmen-Überschuss-Rechnung",
       betrieb: b,
       unter: text(d, "jahr") ? `Gewinnermittlung nach § 4 Abs. 3 EStG für ${text(d, "jahr")}` : undefined,
-      meta: [b.steuernummer.trim() ? `Steuernummer: ${b.steuernummer.trim()}` : "", `Jahr: ${text(d, "jahr")}`].filter(Boolean).join("\n"),
+      meta: [b.steuernummer.trim() ? `Steuernummer: ${b.steuernummer.trim()}` : "", `Jahr: ${text(d, "jahr") || KOPF_LINIE}`].filter(Boolean).join("\n"),
       inhalt:
         abschnitt(
           "Ergebnis",
@@ -412,9 +416,9 @@ export const euer: Vorlage = {
           ]),
         ) +
         (kategorien.length > 1 ? abschnitt("Betriebsausgaben nach Zeilen der Anlage EÜR", kennzahlen(kategorien.map((k) => ({ text: k, betrag: euro(summe(aus.filter((x) => (text(x, "kategorie") || "ohne Kategorie") === k), "betrag")) })))) : "") +
-        abschnitt("Betriebseinnahmen", ein.length ? tabelle(kopfZeile, z(ein), { breiten, zahlen: [3], summe: ["<strong>Summe</strong>", "", "", `<strong>${euro(e)}</strong>`] }) : leer ? tabelle(kopfZeile, [], { breiten, zahlen: [3], mindestens: 8, hoch: true }) : absatz("", "Keine Einnahmen erfasst.")) +
-        abschnitt("Betriebsausgaben", aus.length ? tabelle(kopfZeile, z(aus), { breiten, zahlen: [3], summe: ["<strong>Summe</strong>", "", "", `<strong>${euro(a)}</strong>`] }) : leer ? tabelle(kopfZeile, [], { breiten, zahlen: [3], mindestens: 8, hoch: true }) : absatz("", "Keine Ausgaben erfasst.")) +
-        (leer ? abschnitt("Absetzungen für Abnutzung", tabelle(["Wirtschaftsgut", "Betrag dieses Jahr"], [], { breiten: ["75%", "25%"], zahlen: [1], mindestens: 3, hoch: true })) : "") +
+        abschnitt("Betriebseinnahmen", ein.length ? tabelle(kopfZeile, z(ein), { breiten, zahlen: [3], summe: ["<strong>Summe</strong>", "", "", `<strong>${euro(e)}</strong>`] }) : leer ? tabelle(kopfZeile, [], { breiten, zahlen: [3], mindestens: 8, hoch: true, summe: summeLeer }) : absatz("", "Keine Einnahmen erfasst.")) +
+        abschnitt("Betriebsausgaben", aus.length ? tabelle(kopfZeile, z(aus), { breiten, zahlen: [3], summe: ["<strong>Summe</strong>", "", "", `<strong>${euro(a)}</strong>`] }) : leer ? tabelle(kopfZeile, [], { breiten, zahlen: [3], mindestens: 8, hoch: true, summe: summeLeer }) : absatz("", "Keine Ausgaben erfasst.")) +
+        (leer ? abschnitt("Absetzungen für Abnutzung", tabelle(["Wirtschaftsgut", "Betrag dieses Jahr"], [], { breiten: ["75%", "25%"], zahlen: [1], mindestens: 3, hoch: true, summe: ["<strong>Summe</strong>", "&nbsp;"] })) : "") +
         (afa.length ? abschnitt("Absetzungen für Abnutzung", tabelle(["Wirtschaftsgut", "Betrag dieses Jahr"], afa.map((x) => [zelle(text(x, "text")), euro(cent(text(x, "betrag")) ?? 0)]), { breiten: ["75%", "25%"], zahlen: [1], summe: ["<strong>Summe</strong>", `<strong>${euro(f)}</strong>`] })) : "") +
         uebertragung(["Anlage EÜR übermittelt am", "Transferticket (ELSTER)"]),
     });
@@ -462,8 +466,8 @@ export const bilanzGuv: Vorlage = {
     const t = (k: string) => {
       const x = l(k);
       const bilanz = k === "aktiva" || k === "passiva";
-      // leer (Vorlage zum Ausfüllen): mindestens 5 hohe Leerzeilen, keine Summe „0,00 €“
-      if (!x.length) return tabelle(["Posten", "Betrag"], [], { breiten: ["72%", "28%"], zahlen: [1], mindestens: Math.max(5, bilanz ? bilanzZeilen : 0), hoch: true });
+      // leer (Vorlage zum Ausfüllen): mindestens 5 hohe Leerzeilen, Summenzeile zum Eintragen statt „0,00 €“
+      if (!x.length) return tabelle(["Posten", "Betrag"], [], { breiten: ["72%", "28%"], zahlen: [1], mindestens: Math.max(5, bilanz ? bilanzZeilen : 0), hoch: true, summe: ["<strong>Summe</strong>", "&nbsp;"], ...(bilanz ? { klasse: "doppelt" } : {}) });
       return tabelle(["Posten", "Betrag"], x.map((e) => [zelle(text(e, "posten")), euro(cent(text(e, "betrag")) ?? 0)]), { breiten: ["72%", "28%"], zahlen: [1], summe: ["<strong>Summe</strong>", `<strong>${euro(summe(x, "betrag"))}</strong>`], ...(bilanz ? { mindestens: bilanzZeilen, klasse: "doppelt" } : {}) });
     };
     const j = summe(l("ertraege"), "betrag") - summe(l("aufwendungen"), "betrag");
@@ -475,7 +479,7 @@ export const bilanzGuv: Vorlage = {
       titel: "Jahresabschluss",
       betrieb: b,
       unter: text(d, "stichtag") ? `Bilanz und Gewinn- und Verlustrechnung zum ${datumDe(text(d, "stichtag"))}` : "Bilanz und Gewinn- und Verlustrechnung",
-      meta: [b.steuernummer.trim() ? `Steuernummer: ${b.steuernummer.trim()}` : "", text(d, "stichtag") ? `Stichtag: ${datumDe(text(d, "stichtag"))}` : ""].filter(Boolean).join("\n"),
+      meta: [b.steuernummer.trim() ? `Steuernummer: ${b.steuernummer.trim()}` : "", `Bilanzstichtag: ${datumDe(text(d, "stichtag")) || KOPF_LINIE}`].filter(Boolean).join("\n"),
       inhalt:
         abschnitt("Gewinn- und Verlustrechnung", `<h3>Erträge</h3>${t("ertraege")}<h3>Aufwendungen</h3>${t("aufwendungen")}${kennzahlen([{ text: guvLeer ? "Jahresüberschuss bzw. Jahresfehlbetrag" : j >= 0 ? "Jahresüberschuss" : "Jahresfehlbetrag", betrag: guvLeer ? "&nbsp;" : euro(Math.abs(j)), fett: true }])}`) +
         abschnitt("Bilanz", `<div class="bilanz"><div><h3>Aktiva</h3>${t("aktiva")}</div><div><h3>Passiva</h3>${t("passiva")}</div></div>${akt !== pas ? `<p class="nachsatz"><strong>Aktiva und Passiva weichen um ${euro(akt - pas)} ab – bitte prüfen.</strong></p>` : ""}`) +
@@ -543,19 +547,23 @@ export const ustVoranmeldung: Vorlage = {
     const x = ust(d);
     const frei = cent(text(d, "umsatz_frei")) ?? 0;
     const ist = text(d, "versteuerung") === "ist";
+    // Vorlage zum Ausfüllen (keine Beträge eingegeben): Beträge leer statt „0,00 €“
+    const leer = !["umsatz_19", "umsatz_7", "umsatz_frei", "vorsteuer"].some((k) => text(d, k));
+    const betrag = (c: number) => (leer ? "&nbsp;" : euro(c));
+    const ueberschuss = !leer && x.zahllast < 0;
     return dokument({
       titel: "Umsatzsteuer-Voranmeldung",
       betrieb: b,
       unter: [text(d, "zeitraum"), "Übertragungshilfe für ELSTER"].filter(Boolean).join(", "),
-      meta: [b.steuernummer.trim() ? `Steuernummer: ${b.steuernummer.trim()}` : "", `Zeitraum: ${text(d, "zeitraum")}`, `Besteuerung: ${ist ? "nach vereinnahmten Entgelten (§ 20 UStG)" : "nach vereinbarten Entgelten"}`].filter(Boolean).join("\n"),
+      meta: [b.steuernummer.trim() ? `Steuernummer: ${b.steuernummer.trim()}` : "", `Zeitraum: ${text(d, "zeitraum") || KOPF_LINIE}`, `Besteuerung: ${ist ? "nach vereinnahmten Entgelten (§ 20 UStG)" : "nach vereinbarten Entgelten"}`].filter(Boolean).join("\n"),
       inhalt:
         abschnitt(
           "Steuerpflichtige Umsätze",
           kennzahlen([
-            { kz: "81", text: "Umsätze zum Steuersatz 19 %", hinweis: "Bemessungsgrundlage ohne Umsatzsteuer, im Vordruck in vollen Euro", betrag: euro(x.u19) },
-            { text: "darauf Umsatzsteuer 19 % (rechnet ELSTER)", betrag: euro(x.s19) },
-            { kz: "86", text: "Umsätze zum Steuersatz 7 %", hinweis: "Bemessungsgrundlage ohne Umsatzsteuer, im Vordruck in vollen Euro", betrag: euro(x.u7) },
-            { text: "darauf Umsatzsteuer 7 % (rechnet ELSTER)", betrag: euro(x.s7) },
+            { kz: "81", text: "Umsätze zum Steuersatz 19 %", hinweis: "Bemessungsgrundlage ohne Umsatzsteuer, im Vordruck in vollen Euro", betrag: betrag(x.u19) },
+            { text: "darauf Umsatzsteuer 19 % (rechnet ELSTER)", betrag: betrag(x.s19) },
+            { kz: "86", text: "Umsätze zum Steuersatz 7 %", hinweis: "Bemessungsgrundlage ohne Umsatzsteuer, im Vordruck in vollen Euro", betrag: betrag(x.u7) },
+            { text: "darauf Umsatzsteuer 7 % (rechnet ELSTER)", betrag: betrag(x.s7) },
           ]),
         ) +
         (frei
@@ -564,14 +572,20 @@ export const ustVoranmeldung: Vorlage = {
         abschnitt(
           "Vorsteuer und Zahllast",
           kennzahlen([
-            { text: "Umsatzsteuer gesamt", betrag: euro(x.s19 + x.s7) },
-            { kz: "66", text: "Vorsteuerbeträge aus Rechnungen anderer Unternehmer", hinweis: "§ 15 Abs. 1 Satz 1 Nr. 1 UStG", betrag: euro(x.vst) },
-            { kz: "83", text: x.zahllast >= 0 ? "Verbleibende Umsatzsteuer-Vorauszahlung" : "Verbleibender Überschuss (Erstattung)", hinweis: x.zahllast >= 0 ? "bis zum 10. Tag nach Ablauf des Zeitraums zu übermitteln und zu zahlen (§ 18 Abs. 1 UStG)" : "Überschuss: Betrag mit Minuszeichen übertragen, wie hier angegeben", betrag: euro(x.zahllast), fett: true },
+            { text: "Umsatzsteuer gesamt", betrag: betrag(x.s19 + x.s7) },
+            { kz: "66", text: "Vorsteuerbeträge aus Rechnungen anderer Unternehmer", hinweis: "§ 15 Abs. 1 Satz 1 Nr. 1 UStG", betrag: betrag(x.vst) },
+            {
+              kz: "83",
+              text: leer ? "Verbleibende Umsatzsteuer-Vorauszahlung bzw. Überschuss" : ueberschuss ? "Verbleibender Überschuss (Erstattung)" : "Verbleibende Umsatzsteuer-Vorauszahlung",
+              hinweis: ueberschuss ? "Überschuss: Betrag mit Minuszeichen übertragen" : leer ? "Vorauszahlung bis zum 10. Tag nach Ablauf des Zeitraums (§ 18 Abs. 1 UStG); Überschuss mit Minuszeichen übertragen" : "bis zum 10. Tag nach Ablauf des Zeitraums zu übermitteln und zu zahlen (§ 18 Abs. 1 UStG)",
+              betrag: betrag(x.zahllast),
+              fett: true,
+            },
           ]),
         ) +
         (text(d, "notiz") ? abschnitt("Notiz", absatz(text(d, "notiz"))) : "") +
-        nachsatz("Kennzahlen nach dem Vordruckmuster USt 1 A für 2026. Vor dem Übertragen gegen das aktuelle ELSTER-Formular prüfen; das Formular rechnet die Steuerbeträge selbst.") +
-        uebertragung(["Übermittelt am", "Transferticket (ELSTER)", x.zahllast < 0 ? "Erstattung erhalten am" : "Gezahlt am"]),
+        nachsatz("Kennzahlen nach dem Vordruckmuster USt 1 A für 2026. Vor dem Übertragen gegen das aktuelle ELSTER-Formular prüfen; das Formular rechnet die Steuerbeträge selbst. ELSTER rechnet aus vollen Euro; maßgeblich ist der Betrag, den ELSTER errechnet.") +
+        uebertragung(["Übermittelt am", "Transferticket (ELSTER)", ueberschuss ? "Erstattung erhalten am" : "Gezahlt am"]),
     });
   },
 };
@@ -628,17 +642,19 @@ export const steuererklaerung: Vorlage = {
     const arten = auswahl(d, "arten").map((a) => ERKLAERUNGEN.find((x) => x.wert === a)?.text ?? a);
     const vz = liste(d, "vorauszahlungen").filter((x) => text(x, "art"));
     const we = liste(d, "weiteres").filter((x) => text(x, "was"));
+    // Blatt zum Ausfüllen (keine Zahlen eingegeben): auch die Umsatzzeile zum Eintragen
+    const leer = !["gewinn", "umsatz", "ust_jahr", "vorsteuer_jahr"].some((k) => text(d, k)) && !vz.length && !we.length;
     return dokument({
       titel: "Unterlagen zur Steuererklärung",
       betrieb: b,
       unter: [text(d, "jahr") ? `Jahr ${text(d, "jahr")}` : "", arten.join(", ")].filter(Boolean).join(": "),
-      meta: [b.steuernummer.trim() ? `Steuernummer: ${b.steuernummer.trim()}` : "", `Jahr: ${text(d, "jahr")}`].filter(Boolean).join("\n"),
+      meta: [b.steuernummer.trim() ? `Steuernummer: ${b.steuernummer.trim()}` : "", `Jahr: ${text(d, "jahr") || KOPF_LINIE}`].filter(Boolean).join("\n"),
       inhalt:
         abschnitt(
           "Kennzahlen",
           kennzahlen([
             { text: "Gewinn oder Verlust", hinweis: "aus EÜR bzw. Bilanz", betrag: text(d, "gewinn") ? euro(cent(text(d, "gewinn")) ?? 0) : "&nbsp;" },
-            ...(text(d, "umsatz") ? [{ text: "Umsätze im Jahr (netto)", betrag: euro(cent(text(d, "umsatz")) ?? 0) }] : []),
+            ...(text(d, "umsatz") || leer ? [{ text: "Umsätze im Jahr (netto)", betrag: text(d, "umsatz") ? euro(cent(text(d, "umsatz")) ?? 0) : "&nbsp;" }] : []),
             ...(text(d, "ust_jahr") ? [{ text: "Umsatzsteuer im Jahr", betrag: euro(cent(text(d, "ust_jahr")) ?? 0) }] : []),
             ...(text(d, "vorsteuer_jahr") ? [{ text: "Vorsteuer im Jahr", betrag: euro(cent(text(d, "vorsteuer_jahr")) ?? 0) }] : []),
           ]),
@@ -719,6 +735,8 @@ export const kassenbuch: Vorlage = {
       titel: "Kassenbuch",
       betrieb: b,
       unter: [text(d, "zeitraum"), leer ? "Vorlage zum Ausdrucken" : ""].filter(Boolean).join(" · ") || undefined,
+      // ohne Zeitraum: Linie zum Eintragen in der Kennungsleiste
+      meta: text(d, "zeitraum") ? undefined : `Zeitraum: ${KOPF_LINIE}`,
       quer: true,
       inhalt:
         tabelle(
@@ -859,6 +877,12 @@ export const aufbewahrung: Vorlage = {
       ],
     },
   ],
+  pruefen(d) {
+    // Fristbeginn eingetragen, aber kein Jahr: dann bleibt „Aufbewahren mindestens bis“ leer
+    return liste(d, "eintraege")
+      .filter((x) => text(x, "letzte") && !(/^\d{4}$/.test(text(x, "letzte")) && Number(text(x, "letzte")) >= 1900))
+      .map((x) => `Fristbeginn „${text(x, "letzte")}“${text(x, "art") ? ` bei „${text(x, "art").slice(0, 60)}${text(x, "art").length > 60 ? "…" : ""}“` : ""} ist kein Jahr – bitte vierstellig eintragen (z. B. 2026)`);
+  },
   html(d, b) {
     const l = liste(d, "eintraege").filter((x) => text(x, "art"));
     return dokument({

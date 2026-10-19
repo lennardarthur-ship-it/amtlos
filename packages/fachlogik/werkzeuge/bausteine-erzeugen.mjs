@@ -111,14 +111,16 @@ const rechtsformen = st.rechtsformen.app_empfehlung_auswahl;
 const aufbewahrung = st.aufbewahrung.fristen.map((f) => ({ jahre: String(f.jahre), art: f.unterlagen.replace(/, Lohnberechnungsunterlagen/, "") }));
 
 // ---------------------------------------------------------------- Lebensmittel und Beauty
-const haccp = lb.haccp.kontrollpunkte.map((k) => ({ titel: k.punkt, werte: { punkt: k.punkt, grenzwert: `${k.grenzwert}${k.einheit && !String(k.grenzwert).includes(k.einheit) && k.einheit !== "%" ? ` ${k.einheit}` : ""}`, haeufigkeit: k.haeufigkeit ?? "", korrektur: k.korrektur ?? "" }, quelle: beleg({ quelle: String(k.quelle).split(";")[0] }) }));
+/** Alle Belege einer „;“-getrennten Quellenangabe, ohne Doppelte. */
+const alleBelege = (q) => [...new Set(String(q).split(";").map((x) => beleg({ quelle: x.trim() })).filter(Boolean))].join("; ");
+const haccp = lb.haccp.kontrollpunkte.map((k) => ({ titel: k.punkt, werte: { punkt: k.punkt, grenzwert: `${k.grenzwert}${k.einheit && !String(k.grenzwert).includes(k.einheit) && k.einheit !== "%" ? ` ${k.einheit}` : ""}`, haeufigkeit: k.haeufigkeit ?? "", korrektur: k.korrektur ?? "" }, quelle: alleBelege(k.quelle) }));
 const allergeneUmfang = lb.allergene.liste.map((a) => ({ bezeichnung: a.bezeichnung, umfasst: a.umfasst }));
 const loseWare = { formen: lb.allergene.lose_ware.schriftlich_formen, anforderung: lb.allergene.lose_ware.schriftlich_anforderung, rechtsgrundlage: lb.allergene.lose_ware.rechtsgrundlage };
 const ifsg = { inhalte: lb.ifsg.inhalte.punkte.map((p) => p.replace(/\s*–\s*siehe \w+\)/, ")")), personen: lb.ifsg.taetigkeitsverbote.personen.map((p) => p.text), lebensmittel: lb.ifsg.taetigkeitsverbote.lebensmittel_abs2, symptome: lb.ifsg.taetigkeitsverbote.symptome_merkblatt ?? [] };
 const BR = { friseur: "Friseur", kosmetik: "Kosmetik", nagelstudio: "Nagelstudio", fusspflege: "Fußpflege" };
 const hygiene = lb.hygieneplan.zeilen.map((z) => ({ gruppe: (z.branchen ?? []).length >= 3 ? "Alle Beauty-Betriebe" : (z.branchen ?? []).map((b) => BR[b] ?? b).join(", "), titel: z.was, werte: { was: z.was, wann: z.wann, womit: z.womit, wie: z.wie, wer: z.wer }, quelle: beleg({ quelle: String(z.quelle).split(";")[0] }) }));
 
-const daten = ohneNull({
+const daten0 = ohneNull({
   GEFAEHRDUNGEN: gefaehrdungen, MUTTERSCHUTZ: mutterschutz, UNTERWEISUNGSTHEMEN: unterweisungsthemen, BA_GLIEDERUNG: baGliederung, BA_BAUSTEINE: baBausteine,
   HAUTSCHUTZ_FRISEUR: hautFriseur, ELEKTRO_FRISTEN: elektroFristen, GEFAHRSTOFF_ANGABEN: gefahrstoffAngaben,
   VVT: vvt, TOM: tom, DSE: dse, AUFSICHT: aufsicht, AVV_KLAUSELN: avvKlauseln, PANNEN_ARTEN: pannenArten, PANNEN_SOFORT: sofort,
@@ -126,6 +128,82 @@ const daten = ohneNull({
   KASSEN_ARTEN: kassenArten, TSE_ARTEN: tseArten, NACHWG: nachwg, MINDESTLOHN: mindestlohn, MINIJOB: minijob, SV: sv, INTERESSE: interesse, RECHTSFORMEN: rechtsformen, AUFBEWAHRUNG: aufbewahrung,
   HACCP: haccp, ALLERGENE_UMFANG: allergeneUmfang, LOSE_WARE: loseWare, IFSG: ifsg, HYGIENE: hygiene,
 });
+
+// ---------------------------------------------------------------- Nachträgliche Korrekturen der Druckfassung
+/**
+ * Korrekturen aus den Vorlagen-Durchsichten (E-146 und dritte Durchsicht): Die Recherche in docs/recherche bleibt
+ * unverändert; hier wird nur die Fassung angepasst, die in Vorlagen und PDFs steht. Quellennamen, Formularhinweise und
+ * ältere Werte gehören ins Feld „quelle“, nicht in den Drucktext. Hinweise für Betriebe sind als neutrale Aussage
+ * formuliert, ohne den Inhalt zu ändern. Jede Korrektur muss greifen, sonst bricht das Skript ab (veraltete Korrektur).
+ * Wo zwei Behörden verschiedene Grenzwerte nennen, bleiben beide stehen (Fachprüfung PRUEFLISTE T-62).
+ */
+const SETZE = [
+  // HACCP – Einheit an jedem Wert, Quellenangaben aus dem Drucktext ins Feld „quelle“
+  ["HACCP", "Kühlung Hackfleisch", "werte.grenzwert", "vorverpackt (SB) bzw. nicht am Ort der Abgabe hergestellt: max. +2 °C; am Ort der Abgabe hergestellt / lose: max. +7 °C (abweichende Behördenangabe: +7 bzw. +4 °C je nach Abgabezeitpunkt)"],
+  ["HACCP", "Kühlung Hackfleisch", "quelle", "Lebensmittelüberwachung Mainz; LAVES Niedersachsen (lose: +7 bzw. +4 °C je nach Abgabezeitpunkt)"],
+  ["HACCP", "Kühlung Fleischzubereitungen", "werte.grenzwert", "SB-verpackt max. +4 °C; lose oder selbst verpackt (Einzelhandel) max. +7 °C"],
+  ["HACCP", "Kühlung Geflügelfleisch (auch Federwild, Kleinwild/Hasen)", "werte.grenzwert", "max. +4 °C (abweichende Behördenangabe: −2 bis max. +4 °C)"],
+  ["HACCP", "Kühlung Geflügelfleisch (auch Federwild, Kleinwild/Hasen)", "quelle", "Lebensmittelüberwachung Mainz (max. +4 °C); LAVES Niedersachsen (−2 bis max. +4 °C)"],
+  ["HACCP", "Kühlung Fisch frisch, gekochte Krebs- und Weichtiere", "werte.grenzwert", "max. +2 °C bzw. in schmelzendem Eis (annähernd Schmelzeistemperatur)"],
+  ["HACCP", "Kühlung Milcherzeugnisse, Käse (außer Hartkäse), Butter, Frischkäse", "werte.grenzwert", "max. +10 °C (sofern Hersteller nichts anderes angibt)"],
+  ["HACCP", "Kühlung Eiprodukte / roheihaltige Lebensmittel", "werte.grenzwert", "Eiprodukte max. +4 °C; roheihaltige Lebensmittel: max. +7 °C bzw. max. +4 °C (Behördenangaben unterschiedlich)"],
+  ["HACCP", "Kühlung Eiprodukte / roheihaltige Lebensmittel", "quelle", "Lebensmittelüberwachung Mainz (roheihaltig +7 °C); LAVES Niedersachsen (roheihaltig +4 °C)"],
+  ["HACCP", "Tiefkühlung (Tiefkühltruhe/-raum, tiefgefrorene Lebensmittel)", "werte.grenzwert", "−18 °C oder kälter; kurzfristig bis −15 °C zulässig"],
+  ["HACCP", "Speiseeis", "werte.grenzwert", "Lagerung als Tiefkühlware −18 °C; Speiseeis zum Ausportionieren / Eistresen zur Ausgabe max. −10 °C"],
+  ["HACCP", "Heißhalten / Ausgabetemperatur warmer Speisen", "werte.grenzwert", "mindestens +60 °C an allen Stellen bzw. im Kern; teils werden mind. +65 °C für max. 3 Stunden angegeben"],
+  ["HACCP", "Heißhalten / Ausgabetemperatur warmer Speisen", "werte.haeufigkeit", "stichprobenartig bei Ausgabe"],
+  ["HACCP", "Heißhalten / Ausgabetemperatur warmer Speisen", "quelle", "+60 °C: BfR 2020, LAVES Niedersachsen, Lebensmittelüberwachung Mainz; +65 °C (älterer Wert): BfR 2008, BgVV, DIN-Normen, LAVES-Merkblatt B. cereus"],
+  ["HACCP", "Ausgabetemperatur Kaltspeisen und Salate", "werte.korrektur", "Bei Unterbrechung der Kühlkette > 30 Minuten Lebensmittel entsorgen; dokumentieren."],
+  ["HACCP", "Abkühlen heißer Speisen", "werte.grenzwert", "Bereich von +65 °C auf +10 °C innerhalb von 3 Stunden durchschreiten"],
+  ["HACCP", "Abkühlen heißer Speisen", "werte.haeufigkeit", "bei jedem Abkühlvorgang"],
+  ["HACCP", "Abkühlen heißer Speisen", "quelle", "oberallgaeu.org (BgVV-Temperaturempfehlungen)"],
+  ["HACCP", "Wareneingangskontrolle", "werte.grenzwert", "Temperatur bei Anlieferung: Tiefkühlware −18 °C (kurzfristig −15 °C); Fleisch/Fleischerzeugnisse +4 °C; Fisch +2 °C; Hackfleisch +2 °C; Geflügel/Wild +4 °C. Außerdem: keine Verunreinigungen, einwandfreie Verpackung, einwandfreier Geruch, gültiges MHD, Beschaffenheit des Lieferfahrzeugs, Kennzeichnung (Temperaturmessung und Sichtprüfung)"],
+  ["HACCP", "Wareneingangskontrolle", "quelle", "Lebensmittelüberwachung Mainz (Formular Wareneingangskontrolle, Merkblatt)"],
+  ["HACCP", "Frittierfett – polare Anteile", "werte.grenzwert", "24 % polare Anteile = Grenze der Genusstauglichkeit → Fett wechseln; Frittiertemperatur mind. +160 °C, max. +175 °C"],
+  ["HACCP", "Frittierfett – polare Anteile", "werte.haeufigkeit", "nach Durchsatz; Wechselzeitpunkt über Eigenkontrollen ermitteln; Temperaturkontrollen und Fettwechsel dokumentieren"],
+  ["HACCP", "Frittierfett – polare Anteile", "quelle", "zvl.jena.de; 24 % polare Anteile: DGF-Empfehlung"],
+  ["HACCP", "Reinigung und Desinfektion (Reinigungsplan Küche)", "werte.grenzwert", "Reinigungsplan vorhanden und ausgehängt; Intervalle eingehalten (Sichtkontrolle)"],
+  ["HACCP", "Schädlingsmonitoring", "werte.grenzwert", "kein Befall (Sichtkontrolle)"],
+  // Verzeichnis der Verarbeitungstätigkeiten – Quellenvermerke ins Feld „quelle“, Anweisungen als Aussage
+  ["VVT", "Kundenverwaltung / Kundenkartei", "werte.loeschfrist", (t) => t.replace(/^Kundenstammdaten löschen, sobald/, "Kundenstammdaten werden gelöscht, sobald")],
+  ["VVT", "Personalverwaltung (Personalakte, Arbeitszeit)", "werte.loeschfrist", (t) => t.replace(" (BayLDA-Muster; Orientierung an regelmäßiger Verjährung § 195 BGB)", " (Orientierung an regelmäßiger Verjährung § 195 BGB)")],
+  ["VVT", "Personalverwaltung (Personalakte, Arbeitszeit)", "quelle", "BayLDA-Muster"],
+  ["VVT", "Bewerbungsverfahren", "werte.loeschfrist", (t) => t.replace(" (BayLDA-Muster).", ".")],
+  ["VVT", "Bewerbungsverfahren", "quelle", "BayLDA-Muster; § 15 AGG; § 61b ArbGG"],
+  ["VVT", "Betrieb der Website (Hosting, Server-Logfiles)", "werte.loeschfrist", (t) => t.replace(" (BayLDA-Muster).", ".")],
+  ["VVT", "Betrieb der Website (Hosting, Server-Logfiles)", "quelle", "BayLDA-Muster"],
+  ["VVT", "E-Mail-Newsletter / E-Mail-Werbung", "werte.loeschfrist", (t) => t.replace(" laut DSK.", ".")],
+  ["VVT", "E-Mail-Newsletter / E-Mail-Werbung", "quelle", "DSK (Orientierungshilfe Werbung)"],
+  ["VVT", "Videoüberwachung (z. B. Verkaufsraum, Eingang, Lager)", "werte.loeschfrist", "Aufnahmen werden in der Regel nach 72 Stunden gelöscht; länger nur zur Sicherung eines konkreten Vorfalls."],
+  ["VVT", "Videoüberwachung (z. B. Verkaufsraum, Eingang, Lager)", "quelle", "DSK (Orientierungshilfe Videoüberwachung)"],
+  // Hautschutzplan Friseur – Handschuhangaben nach BGW 2026 (E-146)
+  ["HAUTSCHUTZ_FRISEUR", "Shampoonieren, Kopfmassage mit Haarbehandlungsmitteln, Pflegemittel auftragen/auswaschen", "werte.handschuhe", "Einmalhandschuhe aus Nitril oder Vinyl mit langen Stulpen über das Handgelenk (alternativ Waschhandschuhe)"],
+  ["HAUTSCHUTZ_FRISEUR", "Färben, Dauerwelle, Blondierung: Mischen, Auftragen, Überprüfen, Probewickeln, Fixieren", "werte.handschuhe", "Friseur-Einmalhandschuhe nach DIN EN ISO 374-6 (Friseur-Symbol), keine gepuderten Latexhandschuhe"],
+  ["HAUTSCHUTZ_FRISEUR", "Reinigung und Desinfektion von Arbeitsgeräten und Räumen", "werte.handschuhe", "Haushaltshandschuhe bzw. chemikalienbeständige Schutzhandschuhe nach DIN EN ISO 374, ggf. mit längerem Schaft"],
+];
+/** Textersetzungen in allen Texten einer Liste (E-146). */
+const ERSETZE = [
+  ["GEFAEHRDUNGEN", "Handschutz- und Händehygieneplan", "Hautschutz- und Händehygieneplan"],
+  ["ALLERGENE_UMFANG", "vorhandenes SO2,", "vorhandenes SO₂,"],
+  ["HYGIENE", "\"nach jedem Kunden\"", "\"nach jeder Kundin / jedem Kunden\""],
+];
+const daten = daten0;
+for (const [liste, schluessel, pfad, neu] of SETZE) {
+  const eintrag = daten[liste].find((x) => x.titel === schluessel || x.bezeichnung === schluessel);
+  if (!eintrag) throw new Error(`Korrektur: ${liste} „${schluessel}“ nicht gefunden`);
+  const teile = pfad.split(".");
+  const ziel = teile.slice(0, -1).reduce((o, k) => o[k], eintrag);
+  const feld = teile.at(-1);
+  const alt = ziel[feld];
+  ziel[feld] = typeof neu === "function" ? neu(alt) : neu;
+  if (ziel[feld] === alt) throw new Error(`Korrektur greift nicht mehr: ${liste} „${schluessel}“ ${pfad}`);
+}
+for (const [liste, alt, neu] of ERSETZE) {
+  const vorher = JSON.stringify(daten[liste]);
+  if (!vorher.includes(alt)) throw new Error(`Ersetzung greift nicht mehr: ${liste} „${alt}“`);
+  daten[liste] = JSON.parse(vorher.split(alt).join(neu));
+}
+
 const typen = {
   GEFAEHRDUNGEN: "Vorschlag[]", MUTTERSCHUTZ: "Option[]", UNTERWEISUNGSTHEMEN: "(Option & { branchen: string[] })[]", BA_GLIEDERUNG: "{ nr: string; abschnitt: string; inhalt: string }[]", BA_BAUSTEINE: "Record<string, Option[]>",
   HAUTSCHUTZ_FRISEUR: "Vorschlag[]", ELEKTRO_FRISTEN: "(Option & { unsicher?: boolean })[]", GEFAHRSTOFF_ANGABEN: "string[]",

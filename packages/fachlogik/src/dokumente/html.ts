@@ -17,6 +17,11 @@ export const PRUEFHINWEIS = "Die Vorlagen sind noch nicht von Fachleuten geprüf
 export const LEER = "(noch nicht angegeben)";
 /** Leere Angabe im Dokument: eine Linie zum Ausfüllen von Hand. */
 export const LINIE = '<span class="fuellen"></span>';
+/**
+ * Wert in der Kennungsleiste (`meta`), der als Linie zum Ausfüllen erscheint – für Angaben, die auf dem leeren Blatt
+ * von Hand einzutragen sind (Zeitraum, Jahr, Stichtag). Leere Werte entfallen sonst in der Leiste.
+ */
+export const KOPF_LINIE = "\u0001";
 
 export const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -92,18 +97,24 @@ const randText = (t: string) =>
  * Kurzer Abschnitt (keine Listentabelle, geschätzt höchstens ein gutes Drittel einer Seite): bleibt samt Überschrift
  * auf einer Seite. Längere Abschnitte dürfen umbrechen, sonst blieben große Lücken am Seitenende.
  */
-function kurzerAbschnitt(inhalt: string): boolean {
-  if (inhalt.includes('class="liste')) return false;
+function kurzerAbschnitt(inhalt: string): "" | "kurz" | "kurz-ausser-handbuch" {
+  if (inhalt.includes('class="liste')) return "";
   const anzahl = (s: string) => inhalt.split(s).length - 1;
   const zeichen = inhalt.replace(/<[^>]*>/g, "").length;
-  // grobe Höhe in mm: Textzeilen zu ca. 90 Zeichen, Tabellenzeilen, Linienblöcke, Unterüberschriften, Absätze
-  const hoehe = (zeichen / 90) * 4.6 + anzahl("<tr") * 7 + anzahl("fuellen-block") * 16 + anzahl("<h3") * 8 + anzahl("<p") * 2 + anzahl("<li") * 1.5;
-  return hoehe < 75;
+  // grobe Höhe in mm: Textzeilen, Tabellenzeilen, Linienblöcke, Unterüberschriften, Absätze
+  const rest = anzahl("<tr") * 7 + anzahl("fuellen-block") * 16 + anzahl("<h3") * 8 + anzahl("<p") * 2 + anzahl("<li") * 1.5;
+  // Standardsatz: ca. 90 Zeichen zu 4,6 mm je Zeile
+  if ((zeichen / 90) * 4.6 + rest >= 75) return "";
+  // Handbuch (Serif 10 pt, Zeilenabstand 1,6, Text höchstens 150 mm breit): gemessen ca. 67 Zeichen zu 5,6 mm je Zeile.
+  // Dort nur Abschnitte unter ca. 45 mm zusammenhalten – sonst rückt ein langer Absatzblock ganz auf die nächste Seite
+  // und lässt eine halb leere Seite zurück (Datenschutzerklärung, Datenschutzinformation).
+  return (zeichen / 67) * 5.6 + rest < 45 ? "kurz" : "kurz-ausser-handbuch";
 }
 
 export function abschnitt(titel: string, inhalt: string, o: string | AbschnittOptionen = ""): string {
   const opt: AbschnittOptionen = typeof o === "string" ? { klasse: o, ohneNummer: o.includes("ohne-nummer") } : o;
-  const klassen = ["abschnitt", opt.klasse ?? "", opt.ohneNummer ? "ohne-nummer" : "", kurzerAbschnitt(inhalt) ? "zusammen" : ""].filter(Boolean).join(" ");
+  const kurz = kurzerAbschnitt(inhalt);
+  const klassen = ["abschnitt", opt.klasse ?? "", opt.ohneNummer ? "ohne-nummer" : "", kurz ? "zusammen" : "", kurz === "kurz-ausser-handbuch" ? "lang-im-handbuch" : ""].filter(Boolean).join(" ");
   const rand = opt.rand ? `<span class="rand">${randText(opt.rand)}</span>` : "";
   return `<section class="${klassen}"><h2>${rand}${esc(titel)}</h2>${inhalt}</section>`;
 }
@@ -122,16 +133,21 @@ export function eintrag(titel: string, inhalt: string, o: { nummer?: string; ran
  * Tabelle. Zellen sind bereits maskiertes HTML (mit `zelle` erzeugen). `leerzeilen` hängt leere Zeilen zum
  * Ausfüllen von Hand an; `mindestens` füllt bis zu dieser Zeilenzahl auf; `zahlen` nennt rechtsbündige Spalten;
  * `summe` ist eine abgesetzte Schlusszeile; mit `summeSpanne` reicht ihre erste Zelle über so viele Spalten (für eine
- * längere Bezeichnung), die übrigen Zellen schließen rechts an.
+ * längere Bezeichnung), die übrigen Zellen schließen rechts an. `schluss` hält die letzten so vielen Zeilen als eigene
+ * Zeilengruppe zusammen (z. B. letzter Name samt Leerzeilen), damit auf einer neuen Seite nicht nur Leerzeilen stehen.
  */
-export function tabelle(kopf: string[], zeilen: string[][], o: { breiten?: string[]; leerzeilen?: number; mindestens?: number; hoch?: boolean; zahlen?: number[]; summe?: string[]; summeSpanne?: number; klasse?: string } = {}): string {
+export function tabelle(kopf: string[], zeilen: string[][], o: { breiten?: string[]; leerzeilen?: number; mindestens?: number; hoch?: boolean; zahlen?: number[]; summe?: string[]; summeSpanne?: number; klasse?: string; schluss?: number } = {}): string {
   const leer = Math.max(o.leerzeilen ?? 0, (o.mindestens ?? 0) - zeilen.length);
   const alle = [...zeilen, ...Array.from({ length: leer }, () => kopf.map(() => "&nbsp;"))];
   const cols = o.breiten ? `<colgroup>${o.breiten.map((b) => `<col style="width:${b}">`).join("")}</colgroup>` : "";
   const z = (i: number) => (o.zahlen?.includes(i) ? ' class="zahl"' : "");
   const spanne = Math.max(1, o.summeSpanne ?? 1);
   const fuss = o.summe ? `<tfoot><tr class="summe">${o.summe.map((c, i) => (i === 0 && spanne > 1 ? `<td colspan="${spanne}">${c}</td>` : `<td${z(i + spanne - 1)}>${c}</td>`)).join("")}</tr></tfoot>` : "";
-  return `<table class="liste${o.hoch ? " hoch" : ""}${o.klasse ? ` ${o.klasse}` : ""}">${cols}<thead><tr>${kopf.map((k, i) => `<th${z(i)}>${esc(k)}</th>`).join("")}</tr></thead><tbody>${alle.map((r) => `<tr>${r.map((c, i) => `<td${z(i)}>${c}</td>`).join("")}</tr>`).join("")}</tbody>${fuss}</table>`;
+  const zeile = (r: string[]) => `<tr>${r.map((c, i) => `<td${z(i)}>${c}</td>`).join("")}</tr>`;
+  // mindestens eine Zeile bleibt vor der Schlussgruppe, sonst wäre die ganze Tabelle eine Gruppe
+  const ab = o.schluss && alle.length > o.schluss ? alle.length - o.schluss : alle.length;
+  const rumpf = `<tbody>${alle.slice(0, ab).map(zeile).join("")}</tbody>${ab < alle.length ? `<tbody class="schluss">${alle.slice(ab).map(zeile).join("")}</tbody>` : ""}`;
+  return `<table class="liste${o.hoch ? " hoch" : ""}${o.klasse ? ` ${o.klasse}` : ""}">${cols}<thead><tr>${kopf.map((k, i) => `<th${z(i)}>${esc(k)}</th>`).join("")}</tr></thead>${rumpf}${fuss}</table>`;
 }
 export const zelle = (t: string) => esc(t).replace(/\n/g, "<br>");
 
@@ -292,7 +308,8 @@ h2, h3 { page-break-after: avoid; break-after: avoid; page-break-inside: avoid; 
 .nb { white-space: nowrap; }
 table.liste.fortsetzung { margin-top: 0; }
 .schlussblock > table + .unterschriften, .schlussblock.nach-tabelle > .unterschriften:first-child { margin-top: 7mm; }
-.spalten2 { display: flex; gap: 10mm; }
+/* oben bündig: die kürzere Spalte wird nicht auf die Höhe der längeren gestreckt */
+.spalten2 { display: flex; gap: 10mm; align-items: flex-start; }
 .spalten2 > * { flex: 1; }
 /* zwei Angaben-Spalten nebeneinander: gleiche Zeilenhöhe, auch wenn links Text und rechts eine Ausfülllinie steht */
 .spalten2 table.angaben th, .spalten2 table.angaben td { height: 7mm; vertical-align: bottom; }
@@ -331,6 +348,9 @@ h1 { font-size: 20pt; line-height: 1.12; margin: 7mm 0 1mm; font-weight: 600; le
 .kennung dt { font-size: 6.9pt; color: #4a535c; margin: 0 0 0.3mm; letter-spacing: 0.15pt; }
 .kennung dd { font-size: 8.8pt; margin: 0; font-weight: 600; color: #1a1f24; }
 .kennung:empty { display: none; }
+.kennung dd .fuellen { min-width: 0; width: 100%; max-width: 45mm; height: 4.6mm; }
+/* kurze Linie im Text, z. B. für einen Steuersatz „Umsatzsteuer ___ %“ */
+.fuellen.kurz { min-width: 10mm; width: 10mm; }
 
 /* Abschnitte */
 h2 { font-size: 12.5pt; margin: 0 0 2.4mm; font-weight: 600; color: #12161b; padding-bottom: 1.1mm; border-bottom: 0.5pt solid #c9d0d6; position: relative; }
@@ -585,6 +605,8 @@ table.liste.eng th, table.liste.eng td { padding-left: 1.2mm; padding-right: 1.2
 .g-handbuch h2 { font-size: 12.5pt; }
 .g-handbuch table.angaben td { font-family: ${SERIF}; }
 .g-handbuch p { max-width: 150mm; }
+/* im Handbuchsatz zu lang zum Zusammenhalten (siehe kurzerAbschnitt): darf umbrechen, die Überschrift bleibt beim Text */
+.g-handbuch section.abschnitt.zusammen.lang-im-handbuch { page-break-inside: auto; break-inside: auto; }
 `;
 
 /** Felder der Kennungsleiste aus „Bezeichnung: Wert“-Zeilen. */
@@ -715,7 +737,10 @@ export function schlussZusammen(inhalt: string): string {
     const start = vorne.lastIndexOf('<table class="liste');
     const fuss = start >= 0 ? /<\/tbody>(<tfoot>(?:(?!<\/?table)[\s\S])*?<\/tfoot>)?<\/table>(<\/section>)?\s*$/.exec(vorne) : null;
     const tbodyEnde = fuss && fuss.index > start ? fuss.index : -1;
-    const tbodyAnfang = tbodyEnde >= 0 ? vorne.lastIndexOf("<tbody>", tbodyEnde) + 7 : -1;
+    const tbodyTag = tbodyEnde >= 0 ? vorne.lastIndexOf("<tbody", tbodyEnde) : -1;
+    const tbodyAnfang = tbodyTag >= 0 ? vorne.indexOf(">", tbodyTag) + 1 : -1;
+    // die Tabelle hat schon eine Schlussgruppe (tabelle(…, { schluss })): die bleibt so beim Schlussblock
+    if (tbodyTag > start && vorne.startsWith('<tbody class="schluss">', tbodyTag)) return `${vorne}<div class="${klasse} nach-tabelle">${rest.slice(0, ende)}</div>${rest.slice(ende)}`;
     // letzte Zeile mit Inhalt samt den leeren Zeilen danach (höchstens drei Zeilen); davor bleibt mindestens eine Zeile
     let letzte = tbodyAnfang > start ? vorne.lastIndexOf("<tr>", tbodyEnde) : -1;
     for (let n = 1; letzte > tbodyAnfang && n < 3 && !vorne.slice(letzte, tbodyEnde).replace(/<[^>]*>|&nbsp;|\s/g, ""); n++) letzte = vorne.lastIndexOf("<tr>", letzte - 1);
@@ -758,14 +783,14 @@ export function dokument(o: DokumentOptionen): string {
   const kontakt = [b.telefon, b.email].filter((x) => x.trim()).join(" · ");
   const adresse = [anschrift(b), kontakt].filter(Boolean).join(" · ");
   const kopfDaten = kopfZeilen(o.meta);
-  const stand = kopfDaten.find(([k]) => /^(stand|datum|rechnungsdatum|prüfdatum|ausgestellt|bekannt seit)/i.test(k))?.[1] ?? "";
+  const stand = kopfDaten.find(([k, v]) => v !== KOPF_LINIE && /^(stand|datum|rechnungsdatum|prüfdatum|ausgestellt|bekannt seit)/i.test(k))?.[1] ?? "";
   const fussLinks = [b.name.trim(), o.titel].filter(Boolean).join(" · ");
   const g = o.gestalt ?? GESTALT_MARKE;
   const klassen = [`g-${g}`, o.quer ? "quer" : "", o.nummerierung === "zahl" ? "nummern-zahl" : "", o.klasse ?? ""].filter(Boolean).join(" ");
   return `${kopf({ titel: o.titel, betrieb: b, fussLinks, fussRechts: stand ? `Stand ${stand}` : "", quer: o.quer, gestalt: o.gestalt, band: o.band })}<body class="${klassen}">
 <header class="kopfzeile"><div><div class="name">${b.name.trim() ? esc(b.name.trim()) : LINIE}</div>${adresse ? `<div class="adresse">${esc(adresse)}</div>` : ""}</div><div class="rechts"><div class="art">${esc(o.art ?? "")}</div>${logoHtml(b)}</div></header>
 ${o.vorTitel ?? ""}${festeLeerzeichen(`<h1>${esc(o.titel)}</h1>${o.unter ? `<p class="unter">${esc(o.unter)}</p>` : ""}`)}
-<dl class="kennung">${GRUNDLAGE_MARKE}${festeLeerzeichen(kopfDaten.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join(""))}</dl>
+<dl class="kennung">${GRUNDLAGE_MARKE}${festeLeerzeichen(kopfDaten.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${v === KOPF_LINIE ? LINIE : esc(v)}</dd></div>`).join(""))}</dl>
 <main>${festeLeerzeichen(schlussZusammen(o.inhalt))}</main>
 ${fussHtml(b)}
 </body></html>`;

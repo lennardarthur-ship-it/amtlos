@@ -1204,7 +1204,7 @@ export const VVT: Vorschlag[] = [
    "betroffene": "Kunden, Interessenten",
    "datenarten": "Name, Anschrift, Kontaktdaten (Telefon, E-Mail), Angaben zum Auftrag / Leistungshistorie, ggf. Bankverbindung, ggf. Gesundheitsdaten (nur mit ausdrücklicher Einwilligung)",
    "empfaenger": "Steuerberater (eigenständiger Verantwortlicher), IT-/Software-Dienstleister (Auftragsverarbeiter)",
-   "loeschfrist": "Kundenstammdaten löschen, sobald kein Zweck und keine Aufbewahrungspflicht mehr besteht (z. B. Kunde erteilt über mehrere Jahre keine Aufträge mehr). Rechnungsrelevante Unterlagen: Buchungsbelege 8 Jahre (§ 147 Abs. 1 Nr. 4, Abs. 3 AO; § 257 Abs. 1 Nr. 4, Abs. 4 HGB), Geschäftsbriefe 6 Jahre (§ 147 Abs. 1 Nr. 2, 3 AO; § 257 Abs. 1 Nr. 2, 3 HGB), jeweils ab Ende des Kalenderjahres.",
+   "loeschfrist": "Kundenstammdaten werden gelöscht, sobald kein Zweck und keine Aufbewahrungspflicht mehr besteht (z. B. Kunde erteilt über mehrere Jahre keine Aufträge mehr). Rechnungsrelevante Unterlagen: Buchungsbelege 8 Jahre (§ 147 Abs. 1 Nr. 4, Abs. 3 AO; § 257 Abs. 1 Nr. 4, Abs. 4 HGB), Geschäftsbriefe 6 Jahre (§ 147 Abs. 1 Nr. 2, 3 AO; § 257 Abs. 1 Nr. 2, 3 HGB), jeweils ab Ende des Kalenderjahres.",
    "drittland": "keine Übermittlung in Drittländer"
   },
   "quelle": "BayLDA"
@@ -1260,10 +1260,10 @@ export const VVT: Vorschlag[] = [
    "betroffene": "Beschäftigte, Auszubildende",
    "datenarten": "Name, Anschrift, Vertragsdaten, Zeitwirtschaftsdaten, Daten zur Arbeitsleistung, Leistungsbeurteilungen, Urlaubs- und Krankheitszeiten (ohne Diagnosen)",
    "empfaenger": "Steuerberater / Lohnbüro, ggf. Anbieter der Zeiterfassungssoftware (Auftragsverarbeiter)",
-   "loeschfrist": "Personalakte in der Regel ca. 3 Jahre nach Ausscheiden (BayLDA-Muster; Orientierung an regelmäßiger Verjährung § 195 BGB); steuer-/sozialversicherungsrelevante Unterlagen nach den gesetzlichen Fristen.",
+   "loeschfrist": "Personalakte in der Regel ca. 3 Jahre nach Ausscheiden (Orientierung an regelmäßiger Verjährung § 195 BGB); steuer-/sozialversicherungsrelevante Unterlagen nach den gesetzlichen Fristen.",
    "drittland": "keine Übermittlung in Drittländer"
   },
-  "quelle": "BayLDA"
+  "quelle": "BayLDA-Muster"
  },
  {
   "titel": "Bewerbungsverfahren",
@@ -1274,10 +1274,10 @@ export const VVT: Vorschlag[] = [
    "betroffene": "Bewerberinnen und Bewerber",
    "datenarten": "Name, Kontaktdaten, Lebenslauf, Zeugnisse, Qualifikationen, Anschreiben, ggf. Gesprächsnotizen",
    "empfaenger": "intern: an der Auswahl beteiligte Personen, ggf. Anbieter einer Bewerbungsplattform (Auftragsverarbeiter)",
-   "loeschfrist": "Abgelehnte Bewerber: 6 Monate nach Abschluss des Bewerbungsverfahrens (BayLDA-Muster). Hintergrund: Geltendmachung von Ansprüchen nach § 15 Abs. 4 AGG binnen 2 Monaten ab Zugang der Ablehnung, Klagefrist § 61b Abs. 1 ArbGG 3 Monate nach schriftlicher Geltendmachung.",
+   "loeschfrist": "Abgelehnte Bewerber: 6 Monate nach Abschluss des Bewerbungsverfahrens. Hintergrund: Geltendmachung von Ansprüchen nach § 15 Abs. 4 AGG binnen 2 Monaten ab Zugang der Ablehnung, Klagefrist § 61b Abs. 1 ArbGG 3 Monate nach schriftlicher Geltendmachung.",
    "drittland": "keine Übermittlung in Drittländer"
   },
-  "quelle": "BayLDA"
+  "quelle": "BayLDA-Muster; § 15 AGG; § 61b ArbGG"
  },
  {
   "titel": "Betrieb der Website (Hosting, Server-Logfiles)",
@@ -1288,10 +1288,10 @@ export const VVT: Vorschlag[] = [
    "betroffene": "Website-Besucher",
    "datenarten": "IP-Adresse, Datum und Uhrzeit des Abrufs, abgerufene Seite/Datei, Browser- und Betriebssysteminformationen, Referrer-URL",
    "empfaenger": "Hosting-Dienstleister (Auftragsverarbeiter, AV-Vertrag erforderlich)",
-   "loeschfrist": "IP-Adressen in Logfiles nach 30 Tagen (BayLDA-Muster).",
+   "loeschfrist": "IP-Adressen in Logfiles nach 30 Tagen.",
    "drittland": "keine Übermittlung in Drittländer"
   },
-  "quelle": "BayLDA"
+  "quelle": "BayLDA-Muster"
  },
  {
   "titel": "Kontaktanfragen (Kontaktformular, E-Mail, Telefon)",
@@ -1330,10 +1330,10 @@ export const VVT: Vorschlag[] = [
    "betroffene": "Newsletter-Abonnenten, Bestandskunden",
    "datenarten": "E-Mail-Adresse, ggf. Name, Einwilligungsnachweis (Zeitpunkt, Wortlaut, Bestätigung), ggf. Öffnungs-/Klickdaten (nur mit Einwilligung)",
    "empfaenger": "Newsletter-Versanddienstleister (Auftragsverarbeiter)",
-   "loeschfrist": "Löschung der Adresse aus dem Verteiler unverzüglich nach Abmeldung/Widerspruch; der Einwilligungsnachweis darf zur Rechtsverteidigung aufbewahrt werden – Richtwert 3 Jahre (Verjährung § 31 OWiG, § 195 BGB) laut DSK.",
+   "loeschfrist": "Löschung der Adresse aus dem Verteiler unverzüglich nach Abmeldung/Widerspruch; der Einwilligungsnachweis darf zur Rechtsverteidigung aufbewahrt werden – Richtwert 3 Jahre (Verjährung § 31 OWiG, § 195 BGB).",
    "drittland": "keine Übermittlung in Drittländer"
   },
-  "quelle": "DSK"
+  "quelle": "DSK (Orientierungshilfe Werbung)"
  },
  {
   "titel": "Videoüberwachung (z. B. Verkaufsraum, Eingang, Lager)",
@@ -1344,10 +1344,10 @@ export const VVT: Vorschlag[] = [
    "betroffene": "Kunden, Besucher, ggf. Beschäftigte, Lieferanten",
    "datenarten": "Bildaufnahmen (ggf. Zeitstempel)",
    "empfaenger": "im Anlassfall Polizei / Strafverfolgungsbehörden, ggf. Wartungs- oder Sicherheitsdienstleister (Auftragsverarbeiter)",
-   "loeschfrist": "Speicherdauer von 72 Stunden ist in der Regel zulässig; längere Speicherung nur mit besonderer Begründung (z. B. Sicherung eines konkreten Vorfalls).",
+   "loeschfrist": "Aufnahmen werden in der Regel nach 72 Stunden gelöscht; länger nur zur Sicherung eines konkreten Vorfalls.",
    "drittland": "keine Übermittlung in Drittländer"
   },
-  "quelle": "DSK"
+  "quelle": "DSK (Orientierungshilfe Videoüberwachung)"
  },
  {
   "titel": "Lieferanten- und Dienstleisterverwaltung",
@@ -2496,7 +2496,7 @@ export const HACCP: Vorschlag[] = [
    "haeufigkeit": "täglich (Temperaturkontrolle)",
    "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren."
   },
-  "quelle": "Lebensmittelüberwachung Mainz"
+  "quelle": "Lebensmittelüberwachung Mainz; LAVES Niedersachsen"
  },
  {
   "titel": "Kühlung Innereien / Nebenprodukte der Schlachtung (frisch)",
@@ -2506,17 +2506,17 @@ export const HACCP: Vorschlag[] = [
    "haeufigkeit": "täglich",
    "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren."
   },
-  "quelle": "LAVES Niedersachsen"
+  "quelle": "LAVES Niedersachsen; Lebensmittelüberwachung Mainz"
  },
  {
   "titel": "Kühlung Hackfleisch",
   "werte": {
    "punkt": "Kühlung Hackfleisch",
-   "grenzwert": "vorverpackt (SB) bzw. nicht am Ort der Abgabe hergestellt: max. +2 °C; am Ort der Abgabe hergestellt / lose: max. +7 °C (LAVES: +7 bzw. +4 °C je nach Abgabezeitpunkt)",
+   "grenzwert": "vorverpackt (SB) bzw. nicht am Ort der Abgabe hergestellt: max. +2 °C; am Ort der Abgabe hergestellt / lose: max. +7 °C (abweichende Behördenangabe: +7 bzw. +4 °C je nach Abgabezeitpunkt)",
    "haeufigkeit": "täglich",
    "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren."
   },
-  "quelle": "Lebensmittelüberwachung Mainz"
+  "quelle": "Lebensmittelüberwachung Mainz; LAVES Niedersachsen (lose: +7 bzw. +4 °C je nach Abgabezeitpunkt)"
  },
  {
   "titel": "Kühlung Fleischzubereitungen",
@@ -2532,11 +2532,11 @@ export const HACCP: Vorschlag[] = [
   "titel": "Kühlung Geflügelfleisch (auch Federwild, Kleinwild/Hasen)",
   "werte": {
    "punkt": "Kühlung Geflügelfleisch (auch Federwild, Kleinwild/Hasen)",
-   "grenzwert": "max. +4 °C (LAVES: −2 bis max. +4 °C)",
+   "grenzwert": "max. +4 °C (abweichende Behördenangabe: −2 bis max. +4 °C)",
    "haeufigkeit": "täglich",
    "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren."
   },
-  "quelle": "Lebensmittelüberwachung Mainz"
+  "quelle": "Lebensmittelüberwachung Mainz (max. +4 °C); LAVES Niedersachsen (−2 bis max. +4 °C)"
  },
  {
   "titel": "Kühlung Fisch frisch, gekochte Krebs- und Weichtiere",
@@ -2546,7 +2546,7 @@ export const HACCP: Vorschlag[] = [
    "haeufigkeit": "täglich",
    "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren."
   },
-  "quelle": "Lebensmittelüberwachung Mainz"
+  "quelle": "Lebensmittelüberwachung Mainz; LAVES Niedersachsen"
  },
  {
   "titel": "Kühlung Räucherfisch, Marinaden, Fischerzeugnisse",
@@ -2566,7 +2566,7 @@ export const HACCP: Vorschlag[] = [
    "haeufigkeit": "täglich",
    "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren."
   },
-  "quelle": "Lebensmittelüberwachung Mainz"
+  "quelle": "Lebensmittelüberwachung Mainz; LAVES Niedersachsen"
  },
  {
   "titel": "Kühlung Milcherzeugnisse, Käse (außer Hartkäse), Butter, Frischkäse",
@@ -2576,17 +2576,17 @@ export const HACCP: Vorschlag[] = [
    "haeufigkeit": "täglich",
    "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren."
   },
-  "quelle": "Lebensmittelüberwachung Mainz"
+  "quelle": "Lebensmittelüberwachung Mainz; LAVES Niedersachsen"
  },
  {
   "titel": "Kühlung Eiprodukte / roheihaltige Lebensmittel",
   "werte": {
    "punkt": "Kühlung Eiprodukte / roheihaltige Lebensmittel",
-   "grenzwert": "Eiprodukte max. +4 °C; roheihaltige Lebensmittel: Mainz +7 °C, LAVES +4 °C",
+   "grenzwert": "Eiprodukte max. +4 °C; roheihaltige Lebensmittel: max. +7 °C bzw. max. +4 °C (Behördenangaben unterschiedlich)",
    "haeufigkeit": "täglich",
    "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren."
   },
-  "quelle": "Lebensmittelüberwachung Mainz"
+  "quelle": "Lebensmittelüberwachung Mainz (roheihaltig +7 °C); LAVES Niedersachsen (roheihaltig +4 °C)"
  },
  {
   "titel": "Kühlung feine Backwaren / Konditorwaren mit nicht durcherhitzter Füllung oder Auflage; Feinkost-, Obst-/Gemüsesalate, belegte Brötchen, Desserts",
@@ -2596,7 +2596,7 @@ export const HACCP: Vorschlag[] = [
    "haeufigkeit": "täglich",
    "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren."
   },
-  "quelle": "Lebensmittelüberwachung Mainz"
+  "quelle": "Lebensmittelüberwachung Mainz; LAVES Niedersachsen"
  },
  {
   "titel": "Tiefkühlung (Tiefkühltruhe/-raum, tiefgefrorene Lebensmittel)",
@@ -2606,7 +2606,7 @@ export const HACCP: Vorschlag[] = [
    "haeufigkeit": "täglich",
    "korrektur": "Ware prüfen, ggf. verwerfen (nicht wieder einfrieren, wenn angetaut), Gerät korrigieren/Reparatur, dokumentieren."
   },
-  "quelle": "Lebensmittelüberwachung Mainz"
+  "quelle": "Lebensmittelüberwachung Mainz; LAVES Niedersachsen"
  },
  {
   "titel": "Speiseeis",
@@ -2616,17 +2616,17 @@ export const HACCP: Vorschlag[] = [
    "haeufigkeit": "täglich",
    "korrektur": "Ware prüfen, angetautes Eis verwerfen, Gerät korrigieren/Reparatur, dokumentieren."
   },
-  "quelle": "LAVES Niedersachsen"
+  "quelle": "LAVES Niedersachsen; Lebensmittelüberwachung Mainz"
  },
  {
   "titel": "Heißhalten / Ausgabetemperatur warmer Speisen",
   "werte": {
    "punkt": "Heißhalten / Ausgabetemperatur warmer Speisen",
-   "grenzwert": "mindestens +60 °C an allen Stellen bzw. im Kern (BfR 2020, LAVES, Mainz). Älterer Wert +65 °C (BfR 2008, BgVV, DIN-Normen, LAVES-Merkblatt B. cereus: mind. +65 °C für max. 3 Stunden)",
-   "haeufigkeit": "stichprobenartig bei Ausgabe (Mainz)",
+   "grenzwert": "mindestens +60 °C an allen Stellen bzw. im Kern; teils werden mind. +65 °C für max. 3 Stunden angegeben",
+   "haeufigkeit": "stichprobenartig bei Ausgabe",
    "korrektur": "Zu kalte warme Speisen bis zum Aufkochen nacherhitzen; sonst verwerfen; dokumentieren."
   },
-  "quelle": "BfR"
+  "quelle": "+60 °C: BfR 2020, LAVES Niedersachsen, Lebensmittelüberwachung Mainz; +65 °C (älterer Wert): BfR 2008, BgVV, DIN-Normen, LAVES-Merkblatt B. cereus"
  },
  {
   "titel": "Ausgabetemperatur Kaltspeisen und Salate",
@@ -2634,7 +2634,7 @@ export const HACCP: Vorschlag[] = [
    "punkt": "Ausgabetemperatur Kaltspeisen und Salate",
    "grenzwert": "max. +7 °C",
    "haeufigkeit": "stichprobenartig",
-   "korrektur": "Bei Unterbrechung der Kühlkette > 30 Minuten Lebensmittel entsorgen (Mainz); dokumentieren."
+   "korrektur": "Bei Unterbrechung der Kühlkette > 30 Minuten Lebensmittel entsorgen; dokumentieren."
   },
   "quelle": "Lebensmittelüberwachung Mainz"
  },
@@ -2646,27 +2646,27 @@ export const HACCP: Vorschlag[] = [
    "haeufigkeit": "bei jedem Abkühlvorgang",
    "korrektur": "Bei Überschreitung: Speise nicht weiter lagern, verwerfen; Abkühlverfahren (flache Behälter, Schnellkühler) anpassen."
   },
-  "quelle": "oberallgaeu.org"
+  "quelle": "oberallgaeu.org (BgVV-Temperaturempfehlungen)"
  },
  {
   "titel": "Wareneingangskontrolle",
   "werte": {
    "punkt": "Wareneingangskontrolle",
-   "grenzwert": "Temperatur bei Anlieferung: Tiefkühlware −18 °C (kurzfristig −15 °C); Fleisch/Fleischerzeugnisse +4 °C (Mainz-Formular); Fisch +2 °C; Hackfleisch +2 °C; Geflügel/Wild +4 °C. Außerdem: keine Verunreinigungen, einwandfreie Verpackung, einwandfreier Geruch, gültiges MHD, Beschaffenheit des Lieferfahrzeugs, Kennzeichnung (Temperaturmessung und Sichtprüfung)",
+   "grenzwert": "Temperatur bei Anlieferung: Tiefkühlware −18 °C (kurzfristig −15 °C); Fleisch/Fleischerzeugnisse +4 °C; Fisch +2 °C; Hackfleisch +2 °C; Geflügel/Wild +4 °C. Außerdem: keine Verunreinigungen, einwandfreie Verpackung, einwandfreier Geruch, gültiges MHD, Beschaffenheit des Lieferfahrzeugs, Kennzeichnung (Temperaturmessung und Sichtprüfung)",
    "haeufigkeit": "stichprobenartig bei jeder Lieferung; Dokumentation z. B. durch Vermerk auf Lieferschein oder Rechnung",
    "korrektur": "Zurückweisung der Ware; Mängel und Maßnahme dokumentieren (Datum, Lieferung, Mangel, Korrekturmaßnahme, Handzeichen)."
   },
-  "quelle": "Lebensmittelüberwachung Mainz"
+  "quelle": "Lebensmittelüberwachung Mainz (Formular Wareneingangskontrolle, Merkblatt)"
  },
  {
   "titel": "Frittierfett – polare Anteile",
   "werte": {
    "punkt": "Frittierfett – polare Anteile",
-   "grenzwert": "24 % polare Anteile = Grenze der Genusstauglichkeit (DGF-Empfehlung) → Fett wechseln; Frittiertemperatur mind. +160 °C, max. +175 °C",
+   "grenzwert": "24 % polare Anteile = Grenze der Genusstauglichkeit → Fett wechseln; Frittiertemperatur mind. +160 °C, max. +175 °C",
    "haeufigkeit": "nach Durchsatz; Wechselzeitpunkt über Eigenkontrollen ermitteln; Temperaturkontrollen und Fettwechsel dokumentieren",
    "korrektur": "Fett wechseln bei Erreichen des Grenzwerts oder Verderbsmerkmalen (stechender, kratziger Geruch/Geschmack, bläulicher Rauch, verstärkte Schaumbildung); nach Gebrauch filtrieren, in Ruhephasen abdecken; Fritteuse entleeren und reinigen; Altfett in verschließbaren Behältern bis zur Abholung durch Fachfirma lagern."
   },
-  "quelle": "zvl.jena.de"
+  "quelle": "zvl.jena.de; 24 % polare Anteile: DGF-Empfehlung"
  },
  {
   "titel": "Reinigung und Desinfektion (Reinigungsplan Küche)",

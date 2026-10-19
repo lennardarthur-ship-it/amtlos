@@ -15,14 +15,19 @@ export function arbeitsminuten(beginn: string, ende: string, pause: string): num
   const b = minuten(beginn);
   const e = minuten(ende);
   if (b === null || e === null) return null;
-  const p = Number((pause || "0").replace(",", "."));
+  // Pause auf ganze Minuten gerundet („7,5“ → 8), sonst stünde „8:22.5 h“ im Nachweis
+  const p = Math.round(Number((pause || "0").replace(",", ".")));
   return Math.max(0, (e >= b ? e - b : e + 1440 - b) - (Number.isFinite(p) ? p : 0));
 }
-export const stunden = (min: number) => `${Math.floor(min / 60)}:${String(min % 60).padStart(2, "0")} h`;
+export const stunden = (min: number) => {
+  const m = Math.round(min);
+  return `${Math.floor(m / 60)}:${String(m % 60).padStart(2, "0")} h`;
+};
 
 function zeiten(d: Daten) {
+  // auch Tage nur mit Bemerkung (Urlaub, krank) bleiben stehen – ohne Dauer
   const z = liste(d, "tage")
-    .filter((x) => text(x, "beginn") || text(x, "ende"))
+    .filter((x) => text(x, "beginn") || text(x, "ende") || text(x, "bemerkung"))
     .map((x) => ({ x, min: arbeitsminuten(text(x, "beginn"), text(x, "ende"), text(x, "pause")) }));
   return { z, gesamt: z.reduce((a, t) => a + (t.min ?? 0), 0) };
 }
@@ -76,8 +81,8 @@ export const arbeitszeitnachweis: Vorlage = {
       unter: [text(d, "name"), text(d, "monat")].filter(Boolean).join(", ") || undefined,
       meta: `Beschäftigte Person: ${text(d, "name")}\nMonat: ${text(d, "monat")}`,
       inhalt:
-        // die Kennungsleiste lässt leere Angaben weg: dann Felder zum Eintragen von Hand
-        (!text(d, "name") || !text(d, "monat") ? `<div style="margin-bottom:5mm">${felder([["Beschäftigte Person", text(d, "name")], ["Monat", text(d, "monat")]], { nummern: false })}</div>` : "") +
+        // die Kennungsleiste lässt leere Angaben weg: dann je fehlender Angabe eine Zeile zum Eintragen von Hand
+        (!text(d, "name") || !text(d, "monat") ? `<div style="margin-bottom:5mm">${felder([["Beschäftigte Person", text(d, "name") ? null : ""], ["Monat", text(d, "monat") ? null : ""]], { nummern: false })}</div>` : "") +
         tabelle(
           ["Datum", "Beginn", "Ende", "Pause (Min.)", "Dauer", "Bemerkung"],
           z.map(({ x, min }) => [datumDe(text(x, "datum")), esc(text(x, "beginn")), esc(text(x, "ende")), esc(text(x, "pause")), min === null ? "" : stunden(min), zelle(text(x, "bemerkung"))]),
@@ -249,22 +254,41 @@ export const svMeldedaten: Vorlage = {
   pruefen(d) {
     const grenze = MINIJOB.filter((m) => m.ab <= (text(d, "beginn") || "9999")).sort((a, b) => b.ab.localeCompare(a.ab))[0];
     const e = cent(text(d, "entgelt"));
-    return (text(d, "art") === "minijob" || text(d, "personengruppe") === "109") && grenze && e !== null && e > grenze.cent ? [`Entgelt über der Minijob-Grenze von ${euro(grenze.cent)} im Monat`] : [];
+    const art = text(d, "art");
+    const pg = text(d, "personengruppe");
+    const vf = SV.vertragsform.find((o) => o.wert === text(d, "vertragsform"));
+    const artText = ARTEN.find((a) => a.wert === art)?.text ?? art;
+    const pgText = SV.personengruppen.find((o) => o.wert === pg)?.text ?? pg;
+    const f: string[] = [];
+    if ((art === "minijob" || pg === "109") && grenze && e !== null && e > grenze.cent) f.push(`Entgelt über der Minijob-Grenze von ${euro(grenze.cent)} im Monat`);
+    // Widersprüche zwischen den Auswahlen – Hinweise, kein Hindernis
+    if (vf && ((art === "teilzeit" && /^Vollzeit/.test(vf.text)) || (art === "vollzeit" && /^Teilzeit/.test(vf.text)))) f.push(`Art „${artText}“ passt nicht zur Vertragsform „${vf.text}“ – bitte prüfen.`);
+    if (art === "minijob" && pg && !["109", "110"].includes(pg)) f.push(`Art „Minijob“ mit Personengruppe „${pgText}“ – üblich ist 109 (bzw. 110 bei kurzfristiger Beschäftigung), bitte prüfen.`);
+    // 121 sind ebenfalls Auszubildende (mit Entgelt bis zur Geringverdienergrenze)
+    if (art === "ausbildung" && pg && !["102", "121"].includes(pg)) f.push(`Art „Ausbildung“ mit Personengruppe „${pgText}“ – für Auszubildende gilt 102 (bzw. 121), bitte prüfen.`);
+    return f;
   },
   html(d, b) {
+    // Blatt zum Ausfüllen (noch kein Name): Startauswahlen nicht drucken, sondern Linien zum Eintragen
+    const leer = !text(d, "name");
+    const wahl = (k: string, start: string) => (leer && text(d, k) === start ? "" : text(d, k));
+    // Schlüssel der Tätigkeitsschlüssel-Stellen 6, 7 und 9 (Werte der Auswahl) vor dem Text, wie im Meldeverfahren
+    const mitSchluessel = (o: { wert: string; text: string } | undefined) => (o ? `${o.wert} – ${o.text}` : "");
     const beschaeftigung: [string, string | null][] = [
       ["Beginn", datumDe(text(d, "beginn"))],
-      ["Art", ARTEN.find((a) => a.wert === text(d, "art"))?.text ?? ""],
+      ["Art", ARTEN.find((a) => a.wert === wahl("art", "vollzeit"))?.text ?? ""],
       ["Wochenstunden", text(d, "stunden")],
       ["Monatliches Entgelt", text(d, "entgelt") ? euro(cent(text(d, "entgelt")) ?? 0) : ""],
       ["Tätigkeit", text(d, "taetigkeit")],
-      ["Personengruppe", SV.personengruppen.find((o) => o.wert === text(d, "personengruppe"))?.text ?? ""],
-      ["Vertragsform", SV.vertragsform.find((o) => o.wert === text(d, "vertragsform"))?.text ?? ""],
-      ["Schulabschluss", SV.schulabschluss.find((o) => o.wert === text(d, "schulabschluss"))?.text ?? ""],
-      ["Berufsabschluss", SV.ausbildung.find((o) => o.wert === text(d, "ausbildung"))?.text ?? ""],
-      ["Weitere Beschäftigungen", ja(d, "weitere") ? text(d, "weitere_welche") || "ja" : "keine"],
+      ["Personengruppe", SV.personengruppen.find((o) => o.wert === wahl("personengruppe", "101"))?.text ?? ""],
+      ["Vertragsform", mitSchluessel(SV.vertragsform.find((o) => o.wert === wahl("vertragsform", "1")))],
+      ["Schulabschluss", mitSchluessel(SV.schulabschluss.find((o) => o.wert === text(d, "schulabschluss")))],
+      ["Berufsabschluss", mitSchluessel(SV.ausbildung.find((o) => o.wert === text(d, "ausbildung")))],
+      ["Weitere Beschäftigungen", ja(d, "weitere") ? text(d, "weitere_welche") || "ja" : leer ? "" : "keine"],
     ];
-    const start = 11 - (text(d, "geburtsname") ? 0 : 1);
+    // Geburtsname: ausgefüllt oder auf dem leeren Blatt als Zeile; Feldnummern laufen durch
+    const geburtsname = text(d, "geburtsname") || (leer ? "" : null);
+    const start = 11 - (geburtsname === null ? 1 : 0);
     // die letzten drei Felder bleiben mit Erklärung und Unterschrift zusammen (nicht allein auf einer neuen Seite)
     const teil = beschaeftigung.length - 3;
     return dokument({
@@ -278,7 +302,7 @@ export const svMeldedaten: Vorlage = {
           "Person",
           felder([
             ["Name", text(d, "name")],
-            ["Geburtsname", text(d, "geburtsname") || null],
+            ["Geburtsname (falls abweichend)", geburtsname],
             ["Geburtsdatum", datumDe(text(d, "geburtsdatum"))],
             ["Geburtsort", text(d, "geburtsort")],
             ["Staatsangehörigkeit", text(d, "staatsangehoerigkeit")],

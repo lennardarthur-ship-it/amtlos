@@ -3,7 +3,7 @@
  * elektrische Geräte (E-121, E-123). Vorschläge und Bausteine aus der Recherche (bausteine.ts, Quellen dort).
  */
 import { BA_BAUSTEINE, ELEKTRO_FRISTEN, GEFAEHRDUNGEN, GEFAHRSTOFF_ANGABEN, MUTTERSCHUTZ, UNTERWEISUNGSTHEMEN } from "./bausteine.js";
-import { LINIE, nachsatz, abschnitt, absatz, angaben, auswahl, datumDe, dokument, esc, ja, liste, plusMonate, punkte, tabelle, text, unterschriften, zelle, zellePunkte, zeilen } from "./html.js";
+import { KOPF_LINIE, LINIE, nachsatz, abschnitt, absatz, angaben, auswahl, datumDe, dokument, esc, ja, liste, plusMonate, punkte, tabelle, text, unterschriften, zelle, zellePunkte, zeilen } from "./html.js";
 import { GEFAEHRDUNGSFAKTOREN, RISIKO_STUFEN, optionen } from "./konstanten.js";
 import type { Daten, Eintrag, Vorlage } from "./typen.js";
 
@@ -11,8 +11,9 @@ import type { Daten, Eintrag, Vorlage } from "./typen.js";
 export function teilnahmeTabelle(eintraege: Eintrag[], extra?: { kopf: string; feld: string; datum?: boolean }): string {
   const kopf = ["Name", ...(extra ? [extra.kopf] : []), "Unterschrift"];
   const zeilen = eintraege.filter((e) => text(e, "name")).map((e) => [zelle(text(e, "name")), ...(extra ? [zelle(extra.datum ? datumDe(text(e, extra.feld)) : text(e, extra.feld))] : []), ""]);
-  // mit Namen: zwei Leerzeilen zum Nachtragen; ohne Namen (Liste zum Ausdrucken): sechs Zeilen
-  return tabelle(kopf, zeilen, { breiten: extra ? ["38%", "22%", "40%"] : ["45%", "55%"], ...(zeilen.length ? { leerzeilen: 2 } : { mindestens: 6 }), hoch: true });
+  // mit Namen: zwei Leerzeilen zum Nachtragen, die mit dem letzten Namen zusammenbleiben (keine Seite nur mit Kopf und
+  // Leerzeilen); ohne Namen (Liste zum Ausdrucken): sechs Zeilen
+  return tabelle(kopf, zeilen, { breiten: extra ? ["38%", "22%", "40%"] : ["45%", "55%"], ...(zeilen.length ? { leerzeilen: 2, schluss: 3 } : { mindestens: 6 }), hoch: true });
 }
 
 const BEREICHE_VORSCHLAG = ["Salon", "Kosmetikkabine", "Küche", "Gastraum und Service", "Verkaufsraum", "Lager", "Werkstatt", "Baustelle beim Kunden", "Büro"];
@@ -185,7 +186,8 @@ export const unterweisung: Vorlage = {
       unter: text(d, "thema") || undefined,
       meta: `Datum: ${datumDe(text(d, "datum"))}\nDurchgeführt von: ${text(d, "durchgefuehrt_von")}\nNächste Unterweisung: ${naechste ? `bis ${naechste}` : ""}`,
       inhalt:
-        abschnitt("Angaben", angaben([["Bezeichnung", text(d, "thema")], ["Anlass", ANLASS[text(d, "anlass")] ?? ""], ["Datum", datumDe(text(d, "datum"))], ["Dauer", text(d, "dauer") || null], ["Durchgeführt von", text(d, "durchgefuehrt_von")]])) +
+        // Datum und Durchgeführt von stehen in der Kennungsleiste; dort entfallen leere Angaben – dann hier als Linie
+        abschnitt("Angaben", angaben([["Bezeichnung", text(d, "thema")], ["Anlass", ANLASS[text(d, "anlass")] ?? ""], ["Datum", text(d, "datum") ? null : ""], ["Dauer", text(d, "dauer")], ["Durchgeführt von", text(d, "durchgefuehrt_von") ? null : ""]])) +
         abschnitt("Inhalte der Unterweisung", (themen.length ? punkte(themen) : absatz("")) + (text(d, "inhalt") ? `<h3>Betriebsspezifische Ergänzungen</h3>${zeilen(text(d, "inhalt"))}` : "")) +
         abschnitt("Teilnahme", `<p>Mit meiner Unterschrift bestätige ich, dass ich an der Unterweisung teilgenommen und die Inhalte verstanden habe.</p>${teilnahmeTabelle(liste(d, "teilnehmer"))}`) +
         nachsatz(`Die Unterweisung ist mindestens einmal jährlich zu wiederholen (§ 4 Abs. 1 DGUV Vorschrift 1)${naechste ? `, nächster Termin spätestens am ${naechste}` : ""}.`) +
@@ -370,9 +372,10 @@ export const elektroPruefung: Vorlage = {
       titel: "Prüfprotokoll elektrische Geräte",
       betrieb: b,
       quer: true,
-      meta: `Prüfdatum: ${datumDe(text(d, "datum"))}\nGeprüft von: ${text(d, "pruefer")}\nArt der Prüfung: ${text(d, "pruefart")}`,
+      // ohne prüfende Person: Linie in der Kennungsleiste; ohne Geräte (Blatt zum Ausfüllen) auch Prüfgrundlage und Prüfgerät als Linie
+      meta: `Prüfdatum: ${datumDe(text(d, "datum"))}\nGeprüft von: ${text(d, "pruefer") || KOPF_LINIE}\nArt der Prüfung: ${text(d, "pruefart")}`,
       inhalt:
-        angaben([["Umfang der Prüfung", auswahl(d, "umfang").join(", ")], ["Prüfgrundlage", text(d, "norm") || null], ["Prüfgerät", text(d, "messgeraet") || null]]) +
+        angaben([["Umfang der Prüfung", auswahl(d, "umfang").join(", ")], ["Prüfgrundlage", text(d, "norm") || (g.length ? null : "")], ["Prüfgerät", text(d, "messgeraet") || (g.length ? null : "")]]) +
         `<section class="abschnitt ohne-nummer">${tabelle(
           ["Gerät", "Hersteller / Typ", "Inventar-Nr.", "Standort", "Ergebnis", "Nächste Prüfung"],
           g.map((x) => [`<strong>${zelle(text(x, "bezeichnung"))}</strong>`, zelle(text(x, "typ")), zelle(text(x, "inventar")), zelle(text(x, "standort")), text(x, "ergebnis") === "maengel" ? `<strong>Mängel:</strong> ${zelle(text(x, "maengel"))}` : "bestanden", datumDe(text(x, "naechste"))]),

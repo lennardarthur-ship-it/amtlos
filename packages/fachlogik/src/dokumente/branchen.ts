@@ -5,7 +5,7 @@
  */
 import { teilnahmeTabelle } from "./arbeitsschutz.js";
 import { ALLERGENE_UMFANG, HACCP, HAUTSCHUTZ_FRISEUR, HYGIENE, IFSG, LOSE_WARE } from "./bausteine.js";
-import { abschnitt, absatz, angaben, auswahl, datumDe, dokument, esc, ja, liste, nachsatz, plusMonate, punkte, tabelle, text, unterschriften, zelle } from "./html.js";
+import { KOPF_LINIE, abschnitt, absatz, angaben, auswahl, datumDe, dokument, esc, ja, liste, nachsatz, plusMonate, punkte, tabelle, text, unterschriften, zelle } from "./html.js";
 import { ALLERGENE, optionen } from "./konstanten.js";
 import type { Vorlage } from "./typen.js";
 
@@ -250,7 +250,8 @@ function plan(o: { titel: string; unter?: string; d: Parameters<Vorlage["html"]>
     quer: true,
     klasse: zeichen > 900 ? "kompakt" : undefined,
     // der Bereich steht schon als Unterzeile unter dem Titel
-    meta: `${o.unter ? "" : `Bereich: ${text(o.d, "bereich")}\n`}Stand: ${datumDe(text(o.d, "datum"))}\nVerantwortlich: ${text(o.d, "erstellt_von")}`,
+    // ohne Bereich: Linie zum Eintragen in der Kennungsleiste
+    meta: `${o.unter ? "" : `Bereich: ${text(o.d, "bereich") || KOPF_LINIE}\n`}Stand: ${datumDe(text(o.d, "datum"))}\nVerantwortlich: ${text(o.d, "erstellt_von")}`,
     inhalt:
       // ohne Einträge: leere Tabelle zum Ausfüllen von Hand
       tabelle(o.spalten.map(([, k]) => k), eintraege.map((x) => o.spalten.map(([id], i) => (i === 0 ? `<strong>${zelle(text(x, id))}</strong>` : zelle(text(x, id))))), { breiten: o.spalten.map(([, , w]) => w), ...(eintraege.length ? {} : { mindestens: 6, hoch: true }) }) +

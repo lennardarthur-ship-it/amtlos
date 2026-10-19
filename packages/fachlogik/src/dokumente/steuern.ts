@@ -106,7 +106,7 @@ export const verfahrensdokumentation: Vorlage = {
       inhalt:
         abschnitte([
           { titel: "Allgemeine Beschreibung", rand: "GoBD Tz. 10.1", inhalt: angaben([["Betrieb", b.name], ["Tätigkeit und Organisation", text(d, "organisation")], ["Steuerberatung", text(d, "steuerberatung") || null], ["Verantwortlich", text(d, "verantwortlich")]]) },
-          { titel: "Eingesetzte Programme und Geräte", rand: "GoBD Tz. 10.1", inhalt: systeme.length ? tabelle(["Programm, Gerät", "Wofür", "Version, seit"], systeme.map((x) => [zelle(text(x, "name")), zelle(text(x, "zweck")), zelle(text(x, "version"))]), { breiten: ["38%", "38%", "24%"] }) : absatz("") },
+          { titel: "Eingesetzte Programme und Geräte", rand: "GoBD Tz. 10.1", inhalt: tabelle(["Programm, Gerät", "Wofür", "Version, seit"], systeme.map((x) => [zelle(text(x, "name")), zelle(text(x, "zweck")), zelle(text(x, "version"))]), { breiten: ["38%", "38%", "24%"], ...(systeme.length ? {} : { mindestens: 4, hoch: true }) }) },
           {
             titel: "Anwenderdokumentation: Belegeingang, Erfassung und Ablage",
             rand: "GoBD Tz. 10.1",

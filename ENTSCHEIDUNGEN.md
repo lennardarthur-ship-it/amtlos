@@ -927,7 +927,14 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
   - Gutschrift: Titel und Summe „Gutschrift“, keine Zahlungsaufforderung und kein GiroCode; Hinweis bei Kleinunternehmer zusammen mit Reverse-Charge oder igL.
   - Kassenmeldung zählt Feldnummern lückenlos; weitere leere Ausfüllblätter (Allergene, HACCP, Lohnkonto, EÜR, Rechnung, Verfahrensdokumentation, Handelsregister); Datenpanne ohne widersprüchliche Kombinationen; Google Fonts lokal oder extern; EÜR-Kennzahlen in App und PDF gleich; „Erstattung erhalten am“; kleinere Text- und Satzfehler.
 - **Store-Bilder:** Bild 4 („Mit Grund und Quelle – Jede Pflicht erklärt“) zeigte eine Rechnung, weil das Werkzeug die erste Zeile mit „fällig“ antippte – die überfällige Rechnung. Es wählt jetzt nur Pflichten. Die überfällige Rechnung heißt „seit 3 Tagen fällig“ statt Datum plus „seit 3 Tagen überfällig“ (wurde auf „Heute“ und im Store-Bild abgeschnitten). Website-Bilder neu erzeugt.
-- **Bewusst nicht geändert, fachlich offen:** T-87 bis T-93 (Storno-Leistungsdatum und Zahlungsangaben, Cent- vs. Euro-Basis der Voranmeldung, Vorsteuer bei Kleinbetragsrechnungen, einzelne Normverweise in Vorlagen, Werbeaussagen).
+- **Dritte Durchsicht** (unabhängige Prüfer, alle 33 Vorlagen in drei Varianten): keine schweren Layout- oder Rechenfehler mehr. Behoben:
+  - HACCP und Verzeichnis der Verarbeitungstätigkeiten ohne Recherchevermerke im gedruckten Text (Quellen stehen vollständig im Feld `quelle`); doppelte HACCP-Grenzwerte bleiben bis zur Fachentscheidung neutral formuliert stehen (T-94).
+  - `bausteine.ts` entsteht wieder ausschließlich aus `werkzeuge/bausteine-erzeugen.mjs`: frühere Handkorrekturen stehen als Korrekturtabellen im Skript, das bei einer nicht mehr greifenden Korrektur abbricht; ein zweiter Lauf ergibt dieselbe Datei. Vorher hätte ein neuer Lauf 21 Korrekturen überschrieben.
+  - USt-Voranmeldung ohne „wie hier angegeben“, mit Hinweis, dass ELSTER aus vollen Euro rechnet und dessen Betrag maßgeblich ist (Berechnung unverändert, T-88).
+  - Leere Blätter: leere Angaben der Kopfleiste als Linie (Zeitraum, Jahr, Stichtag, Geprüft von, Bereich), weitere Ausfülltabellen und Summenzeilen, USt-Zeile auf der leeren Rechnung.
+  - Logik: Datenpanne „kein Risiko“ als Dokumentation ohne 72-Stunden-Frist; Urlaubs-/Krankheitstage bleiben im Arbeitszeitnachweis; Widerspruchshinweise im Personalfragebogen und bei der Rechtsform in der Gewerbeanmeldung; Impressum ohne Inhaltsübersicht, Stammkapital als eigener Teil.
+  - Satz: realistischere Schätzung kurzer Abschnitte im Handbuch-Satz (keine halb leeren ersten Seiten mehr), Lohnkonto-Spalten auf einer Höhe, letzte Teilnehmerzeile bleibt bei den Leerzeilen.
+- **Bewusst nicht geändert, fachlich offen:** T-87 bis T-95 (Storno-Leistungsdatum und Zahlungsangaben, Cent- vs. Euro-Basis der Voranmeldung, Vorsteuer bei Kleinbetragsrechnungen, einzelne Normverweise in Vorlagen, Werbeaussagen).
 
 ---
 

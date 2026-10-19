@@ -209,7 +209,8 @@ export const kiKompetenz: Vorlage = {
       unter: text(d, "thema") || undefined,
       meta: `Datum: ${datumDe(text(d, "datum"))}\nDurchgeführt von: ${text(d, "durchgefuehrt_von")}\nDauer: ${text(d, "dauer")}`,
       inhalt:
-        abschnitt("Angaben", angaben([["Bezeichnung", text(d, "thema")], ["KI-Werkzeuge", text(d, "ki_systeme").split("\n").map((z) => z.trim().replace(/[.;,]+$/, "")).filter(Boolean).join(", ")], ["Datum", datumDe(text(d, "datum"))], ["Dauer", text(d, "dauer") || null], ["Durchgeführt von", text(d, "durchgefuehrt_von")]])) +
+        // Datum, Durchgeführt von und Dauer stehen in der Kennungsleiste; dort entfallen leere Angaben – dann hier als Linie
+        abschnitt("Angaben", angaben([["Bezeichnung", text(d, "thema")], ["KI-Werkzeuge", text(d, "ki_systeme").split("\n").map((z) => z.trim().replace(/[.;,]+$/, "")).filter(Boolean).join(", ")], ["Datum", text(d, "datum") ? null : ""], ["Dauer", text(d, "dauer") ? null : ""], ["Durchgeführt von", text(d, "durchgefuehrt_von") ? null : ""]])) +
         abschnitt("Inhalte", (auswahl(d, "themen").length ? punkte(auswahl(d, "themen")) : absatz("")) + (text(d, "inhalt") ? zeilen(text(d, "inhalt")) : "")) +
         abschnitt("Teilnahme", `<p>Mit meiner Unterschrift bestätige ich die Teilnahme an der Schulung.</p>${teilnahmeTabelle(liste(d, "teilnehmer"))}`) +
         unterschriften(["Ort, Datum", "Unterschrift der schulenden Person"]),

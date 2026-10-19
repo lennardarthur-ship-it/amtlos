@@ -124,6 +124,8 @@ export const datenschutzDokumentation: Vorlage = {
     const v = liste(d, "verarbeitungen").filter((x) => text(x, "bezeichnung"));
     const tom = liste(d, "tom").filter((x) => text(x, "massnahme"));
     const dl = liste(d, "dienstleister").filter((x) => text(x, "name"));
+    // leeres Verzeichnis (nichts erfasst): Blatt zum Ausfüllen mit Zeilen und Tabellen statt „Keine … erfasst.“
+    const leer = !v.length && !tom.length && !dl.length;
     const verarbeitungen = v.length
       ? v
           .map(
@@ -141,23 +143,32 @@ export const datenschutzDokumentation: Vorlage = {
               ]), { nummer: `2.${i + 1}`, rand: "Art. 30 Abs. 1 lit. b–g" }),
           )
           .join("")
-      : absatz("", "Keine Verarbeitungstätigkeiten erfasst.");
+      : leer
+        ? eintrag("Bezeichnung der Verarbeitung", angaben([["Bezeichnung", ""], ["Zwecke (lit. b)", ""], ["Rechtsgrundlage", ""], ["Betroffene Personen (lit. c)", ""], ["Datenkategorien (lit. c)", ""], ["Empfänger (lit. d)", ""], ["Drittlandübermittlung (lit. e)", ""], ["Löschfristen (lit. f)", ""], ["TOM (lit. g)", TOM_VERWEIS]]), { nummer: "2.1", rand: "Art. 30 Abs. 1 lit. b–g" })
+        : absatz("", "Keine Verarbeitungstätigkeiten erfasst.");
+    // Spalte „Verantwortlich“ nur, wenn mindestens eine Maßnahme eine verantwortliche Person nennt
+    const mitVerantwortlich = tom.some((x) => text(x, "verantwortlich"));
     const massnahmen = tom.length
       ? Object.entries(SCHUTZZIELE)
           .map(([ziel, titel]) => {
             const l = tom.filter((x) => (text(x, "schutzziel") || "sonstiges") === ziel);
             if (!l.length) return "";
-            return `<h3>${esc(titel)}</h3>${tabelle(["Maßnahme", "Stand", "Verantwortlich"], l.map((m) => [zelle(text(m, "massnahme")), text(m, "umgesetzt_am") ? `umgesetzt ${datumDe(text(m, "umgesetzt_am"))}` : "geplant", zelle(text(m, "verantwortlich"))]), { breiten: ["62%", "18%", "20%"] })}`;
+            const zeilenTom = l.map((m) => [zelle(text(m, "massnahme")), text(m, "umgesetzt_am") ? `umgesetzt ${datumDe(text(m, "umgesetzt_am"))}` : "geplant", ...(mitVerantwortlich ? [zelle(text(m, "verantwortlich"))] : [])]);
+            return `<h3>${esc(titel)}</h3>${tabelle(["Maßnahme", "Stand", ...(mitVerantwortlich ? ["Verantwortlich"] : [])], zeilenTom, { breiten: mitVerantwortlich ? ["62%", "18%", "20%"] : ["80%", "20%"] })}`;
           })
           .join("")
-      : absatz("", "Keine Maßnahmen erfasst.");
+      : leer
+        ? tabelle(["Schutzziel", "Maßnahme", "Stand", "Verantwortlich"], [], { breiten: ["20%", "46%", "16%", "18%"], mindestens: 6, hoch: true })
+        : absatz("", "Keine Maßnahmen erfasst.");
     const dienstleister = dl.length
       ? tabelle(
           ["Dienstleister", "Leistung", "Auftragsverarbeitung (Art. 28 DSGVO)", "Drittland"],
           dl.map((x) => [`<strong>${zelle(text(x, "name"))}</strong>`, zelle(text(x, "leistung")), ja(x, "auftragsverarbeitung") ? (ja(x, "avv_vorhanden") ? `Vertrag liegt vor${text(x, "avv_datum") ? ` (vom ${datumDe(text(x, "avv_datum"))})` : ""}` : "<strong>Vertrag fehlt</strong>") : "nein (eigenständig verantwortlich)", zelle(text(x, "drittland")) || "keine"]),
           { breiten: ["24%", "26%", "32%", "18%"] },
         )
-      : absatz("", "Keine Dienstleister erfasst.");
+      : leer
+        ? tabelle(["Dienstleister", "Leistung", "Auftragsverarbeitung (Art. 28 DSGVO)", "Drittland"], [], { breiten: ["24%", "26%", "32%", "18%"], mindestens: 4, hoch: true })
+        : absatz("", "Keine Dienstleister erfasst.");
     return dokument({
       titel: "Verzeichnis der Verarbeitungstätigkeiten",
       betrieb: b,
@@ -260,6 +271,8 @@ export const datenpanne: Vorlage = {
     // „Bereits gemeldet“ gibt es nur bei Risiko bzw. hohem Risiko
     const gemeldet = ja(d, "gemeldet") && (risiko === "risiko" || risiko === "hohes_risiko");
     const benachrichtigt = text(d, "benachrichtigung") === "erfolgt";
+    // kein Risiko: keine Meldepflicht – reine Dokumentation, ohne 72-Stunden-Frist
+    const keinRisiko = risiko === "kein_risiko";
     // Gliederung wie der Mindestinhalt der Meldung nach Art. 33 Abs. 3 DSGVO (lit. a–d), Randspalte nennt den Buchstaben
     const teile: [string, string, string][] = [
       ["Art der Verletzung", text(d, "beschreibung"), "Art. 33 Abs. 3 lit. a"],
@@ -271,16 +284,16 @@ export const datenpanne: Vorlage = {
       ...(risiko === "kein_risiko" ? ([["Begründung, warum keine Meldung nötig ist", text(d, "begruendung"), "Art. 33 Abs. 1 Satz 1"]] as [string, string, string][]) : []),
     ];
     return dokument({
-      titel: gemeldet ? "Meldung einer Datenpanne (Dokumentation)" : "Datenpanne – Meldeentwurf und Dokumentation",
+      titel: keinRisiko ? "Datenpanne – Dokumentation" : gemeldet ? "Meldung einer Datenpanne (Dokumentation)" : "Datenpanne – Meldeentwurf und Dokumentation",
       betrieb: b,
       meta: `Bekannt seit: ${datumDe(text(d, "entdeckt_am")) || "–"}`,
       inhalt:
         angaben([
           // ohne Uhrzeit keine erfundene „00:00 Uhr“: nur das Datum, die Frist endet drei Tage später zur selben Uhrzeit
           ["Bekannt geworden", beginn && text(d, "entdeckt_um") ? berlinText(beginn) : datumDe(text(d, "entdeckt_am"))],
-          ["Frist (72 Stunden)", beginn ? (text(d, "entdeckt_um") ? berlinText(new Date(beginn.getTime() + 72 * 3600_000)) : `${datumDe(plusTageIso(text(d, "entdeckt_am"), 3))}, zur Uhrzeit des Bekanntwerdens (Uhrzeit ergänzen)`) : ""],
+          ["Frist (72 Stunden)", keinRisiko ? null : beginn ? (text(d, "entdeckt_um") ? berlinText(new Date(beginn.getTime() + 72 * 3600_000)) : `${datumDe(plusTageIso(text(d, "entdeckt_am"), 3))}, zur Uhrzeit des Bekanntwerdens (Uhrzeit ergänzen)`) : ""],
           ["Bewertung", DATENPANNE_RISIKO[risiko] ?? "noch offen"],
-          ["Gemeldet", gemeldet ? `${datumDe(text(d, "gemeldet_am")) || "ja"}${text(d, "aktenzeichen") ? ` · Aktenzeichen ${text(d, "aktenzeichen")}` : ""}` : "noch nicht gemeldet"],
+          ["Gemeldet", keinRisiko ? "nicht erforderlich (keine Meldepflicht)" : gemeldet ? `${datumDe(text(d, "gemeldet_am")) || "ja"}${text(d, "aktenzeichen") ? ` · Aktenzeichen ${text(d, "aktenzeichen")}` : ""}` : "noch nicht gemeldet"],
           ["Begründung der späteren Meldung", (gemeldet && text(d, "verspaetung")) || null],
           // Datum und Inhalt nur bei erfolgter Benachrichtigung (nicht an „nicht erforderlich“ oder „geplant“ angehängt)
           ["Benachrichtigung der Betroffenen", `${BENACHRICHTIGUNG[text(d, "benachrichtigung")] ?? "noch offen"}${benachrichtigt && text(d, "benachrichtigt_am") ? ` am ${datumDe(text(d, "benachrichtigt_am"))}` : ""}${benachrichtigt && text(d, "benachrichtigung_text") ? ` – ${text(d, "benachrichtigung_text")}` : ""}`],
