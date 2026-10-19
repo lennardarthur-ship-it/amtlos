@@ -52,7 +52,7 @@ describe("Beträge und Exporte (Prüfbefund 2026-10-19)", () => {
   });
   it("E-Rechnung ohne verbotene Steuerzeichen und ohne Zahlungshinweis im Storno", () => {
     const re = eRechnungAus(mit([{ bezeichnung: "Erste\u000bZeile", menge: "1", preis: "10", satz: "19" }], { hinweis: "Bitte geben Sie bei der Zahlung die Rechnungsnummer an." }), B).daten;
-    expect(xrechnungUbl(re, KU_HINWEIS)).not.toMatch(/\u000b/);
+    expect(xrechnungUbl(re, KU_HINWEIS)).not.toContain("\u000b");
     const st = eRechnungAus(mit([{ bezeichnung: "x", menge: "1", preis: "-10", satz: "19" }], { nummer: "2026-002", storno_zu: "2026-001", hinweis: "Bitte geben Sie bei der Zahlung die Rechnungsnummer an." }), B).daten;
     expect(xrechnungUbl(st, KU_HINWEIS)).not.toContain("Rechnungsnummer an");
   });
