@@ -4,7 +4,7 @@ import type { Response } from "express";
 import type PgBoss from "pg-boss";
 import { z } from "zod";
 import { entscheidendeSaetze, type Knoten } from "@amtlos/rules-engine";
-import { Datenbank, heute, ladeAktivenKatalog, neuberechnungEinreihen, type Tx } from "@amtlos/server";
+import { Datenbank, heute, ladeAktivenKatalog, neuberechnenInTx, neuberechnungEinreihen, type Tx } from "@amtlos/server";
 import { Kontext, MitUnternehmen, Oeffentlich, type Anfragekontext } from "./auth.js";
 import { BEREICH_JE_KATEGORIE, heuteUebersicht } from "./heute.js";
 import { pruefe, t, uebersetzeDbFehler, type Text } from "./hilfen.js";
@@ -188,12 +188,18 @@ export class PflichtenController {
     return { ...u, als_naechstes: u.als_naechstes.map((a) => karten.get(`${a.pflicht_id}|${a.periode}`)), vor_start: vorStart };
   }
 
-  /** Sammelbestätigung: alle offenen Pflichten, die vor dem ersten Profil fällig waren, als erledigt markieren. */
+  /**
+   * Sammelbestätigung: alle offenen Pflichten, die vor dem ersten Profil fällig waren, als erledigt markieren.
+   * Zuerst den Plan auf das aktuelle Profil bringen – unter der Berechnungssperre des Unternehmens, in derselben
+   * Transaktion. Sonst legt eine noch wartende oder gerade laufende Neuberechnung (z. B. nach der eben beantworteten
+   * Nachfrage zur Umsatzsteuer) danach neue offene Fristen vor dem Start an, und die Bestätigung erfasst sie nicht.
+   */
   @MitUnternehmen("inhaber", "admin", "steuerberater")
   @Post("pflichten/vor-start-erledigt")
   async vorStartErledigt(@Kontext() k: Anfragekontext) {
     return this.db
       .imKontext({ kontoId: k.kontoId, unternehmenId: k.unternehmenId }, async (tx) => {
+        await neuberechnenInTx(tx, k.unternehmenId!, "vor-start-erledigt");
         const ids = await tx.abfrage<{ id: string }>(
           `update app.pflicht_instanz set status = 'erledigt', erledigt_am = now(), erledigt_von = $2, erledigt_mit_version_id = pflicht_version_id, aktualisiert_am = now()
             where unternehmen_id = $1 and status = 'offen'

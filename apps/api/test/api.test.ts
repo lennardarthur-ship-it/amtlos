@@ -142,6 +142,33 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
     expect(juli.body.nachweise[0].notiz).toMatch(/Sammelbestätigung/);
   });
 
+  it("Sammelbestätigung gilt auch, wenn die Neuberechnung der letzten Profiländerung noch wartet", async () => {
+    // Eigenes Unternehmen: erstes Profil (Kleinunternehmerin, keine Voranmeldung) berechnet und in die Vergangenheit gelegt
+    const vera = await token("vera");
+    const neu = await http().post("/v1/unternehmen").set("Authorization", `Bearer ${vera}`).send({ name: "Veras Laden" }).expect(201);
+    const alsVera = (r: request.Test) => r.set("Authorization", `Bearer ${vera}`).set("X-Unternehmen-Id", neu.body.id);
+    const basis = { rechtsform: "einzelunternehmen", gruendungsdatum: "2019-04-01", "taetigkeit.einordnung": "gewerbe", "beschaeftigte.gesamt": 0, gemeinde_ags: "08111000" };
+    await alsVera(http().put("/v1/profil")).send({ daten: { ...basis, "ust.kleinunternehmer": true } }).expect(200);
+    await neuberechnen(worker, neu.body.id, "profil:1");
+    const owner = new Datenbank(urls.owner);
+    await owner.imKontext({}, async (tx) => {
+      await tx.abfrage("alter table app.profil_version no force row level security");
+      await tx.abfrage("update app.profil_version set erstellt_am = '2026-10-01' where unternehmen_id = $1", [neu.body.id]);
+      await tx.abfrage("alter table app.profil_version force row level security");
+    });
+    await owner.schliessen();
+    // Nachfrage beantwortet: keine Kleinunternehmerin, monatliche Voranmeldung – die Neuberechnung im Worker ist nur eingereiht
+    await alsVera(http().put("/v1/profil")).send({ daten: { ...basis, "ust.kleinunternehmer": false, "ust.zahllast_vorjahr": 12400 } }).expect(200);
+    await alsVera(http().post("/v1/pflichten/vor-start-erledigt")).expect(201);
+    expect((await alsVera(http().get("/v1/heute")).expect(200)).body.vor_start.anzahl).toBe(0);
+    // Der Worker holt die Berechnung nach: keine neuen offenen Fristen vor dem Start
+    await neuberechnen(worker, neu.body.id, "profil:2");
+    expect((await alsVera(http().get("/v1/heute")).expect(200)).body.vor_start.anzahl).toBe(0);
+    const juli = await alsVera(http().get("/v1/pflichten/steuern.ust_voranmeldung/2026-07")).expect(200);
+    expect(juli.body.status).toBe("erledigt");
+    expect(juli.body.nachweise[0].notiz).toMatch(/Sammelbestätigung/);
+  });
+
   it("Erledigen mit Nachweis, wieder öffnen, Rollenprüfung", async () => {
     await alsAnna(http().post("/v1/pflichten/steuern.ust_voranmeldung/2026-09/erledigen")).send({ notiz: "über ELSTER übermittelt" }).expect(201);
     await alsAnna(http().post("/v1/pflichten/steuern.ust_voranmeldung/2026-09/erledigen")).send({}).expect(404);
