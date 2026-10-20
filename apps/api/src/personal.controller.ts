@@ -343,6 +343,8 @@ export class PersonalController {
           );
         } else if (u.art === "ifsg") {
           // Belehrung nach § 43 IfSG: erledigt die Pflicht je Einstellung der Teilnehmenden (Branchenpaket Gastronomie)
+          // Ereignis für die Wiederholung alle zwei Jahre (§ 43 Abs. 4 IfSG, R10) – wie in der App
+          await this.ereignis(tx, k, "ifsg_belehrung_durchgefuehrt", u.datum, { datum: u.datum });
           const perioden = teilnahmen.map((x) => `aenderung-${x.eintritt.replaceAll("-", "")}`);
           erledigt = await tx.abfrage<{ id: string }>(
             `update app.pflicht_instanz set status = 'erledigt', erledigt_am = now(), erledigt_von = $2, erledigt_mit_version_id = pflicht_version_id, aktualisiert_am = now()
