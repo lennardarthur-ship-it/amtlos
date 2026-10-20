@@ -94,7 +94,8 @@ async function rundgang(farbschema, breite) {
   // Sammelbestätigung vor dem Start
   if (await p.locator("#vorstart").count()) {
     await p.click("#vorstart ~ div button, section[aria-labelledby=vorstart] button");
-    const weg = await p.locator("#vorstart").waitFor({ state: "detached", timeout: 15000 }).then(() => true, () => false);
+    // Neuberechnung im Worker: auf langsamen CI-Maschinen (Prüfbefund 2026-10-20) bis zu 30 s
+    const weg = await p.locator("#vorstart").waitFor({ state: "detached", timeout: 30000 }).then(() => true, () => false);
     pruefe(weg, `${name("heute")}: Sammelbestätigung bleibt sichtbar`);
   }
 
