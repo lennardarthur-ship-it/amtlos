@@ -67,32 +67,33 @@ Entscheidungen liegen im Git-Repository (GitHub: lennardarthur-ship-it/amtlos). 
 4. Es erscheint ein QR-Code. Mit der normalen Kamera-App des iPhones scannen → „In Expo Go öffnen“.
    iPhone und Mac müssen im selben WLAN sein. Fragt der Mac, ob „node“ Verbindungen annehmen darf: Erlauben.
 5. In der App:
-   - Vier Tabs: Pflichten · Vorlagen · Unterlagen · Mein Betrieb.
+   - Vier Tabs: Heute · Pflichten · Unterlagen · Mein Betrieb – dazu rechts der Knopf „+“ für alles Neue
+     (Rechnung, Beleg, jede Vorlage).
    - „Pflichten-Check starten“ – ein paar Fragen, dann zeigt die App, welche Pflichten für deinen Betrieb gelten.
    - „Mein Betrieb“: oben den Betrieb eintragen (Name, Adresse, verantwortliche Person), darunter Steuer und Bank,
      Briefkopf, Mitarbeiter und Kunden – jede Gruppe auf einer eigenen Seite.
-   - „Vorlagen“: „Rechnung schreiben“ oder unter „Wofür brauchst du eine Unterlage?“ den Anlass wählen (z. B. „Ich stelle jemanden ein“).
+   - „+“: „Rechnung“ oder unter „Wofür brauchst du eine Unterlage?“ den Anlass wählen (z. B. „Ich stelle jemanden ein“).
    - Schritt für Schritt ausfüllen, unten „Weiter“. Am Ende siehst du das Dokument und tippst „PDF teilen“.
      Bei Datumsfeldern öffnet der Kalender-Knopf den iPhone-Kalender; über Zahlentastaturen gibt es „Fertig“.
    - „Unterlagen“: alles, was du angelegt hast – mit Summe der offenen Rechnungen, Filtern und Suche.
      Alles bleibt nur auf dem iPhone. „Daten sichern“ (Mein Betrieb) erstellt eine mit deinem Passwort verschlüsselte
      Datei, „Sicherung wiederherstellen“ spielt sie zurück.
-   - Der erste Tab „Pflichten“ zeigt nach dem Check, was jetzt dran ist. Dort „Erinnerungen“ einschalten
+   - „Heute“ zeigt, was als Nächstes dran ist und was Kunden noch offen haben. Im Tab „Pflichten“ „Erinnerungen“ einschalten
      (Mitteilungen erlauben): Die App erinnert 3 Tage vor jedem Termin – ganz ohne Server.
    - „Mein Betrieb → Briefkopf“: Logo und Hausfarbe wählen – sie erscheinen auf Rechnung und Unterlagen.
    - Rechnung mit Bankverbindung: im Zahlungsblock steht ein GiroCode – mit der Banking-App scannen, Überweisung ist vorausgefüllt.
    - Jede Unterlage hat ihren eigenen Aufbau (Brief, Vertrag, Aushang, Nachweis, Vordruck, Handbuch): Abschnittsnummern und Gesetze am Rand, Vordrucke mit Feldnummern zum Übertragen.
-   - Rechnung an eine Firma: im Abschluss „Als E-Rechnung teilen (XRechnung)“, auch ins Ausland.
-     Nach dem Teilen „Zahlung eingegangen“ vermerken.
+   - Rechnung an eine Firma: im Abschluss „Als E-Rechnung teilen (XRechnung)“, auch mit Leistungszeitraum.
+     Nach dem Teilen „Zahlung eingegangen“ vermerken. „Mein Betrieb → Kontrollmappe“ bündelt Nachweise für Kontrollen.
    - „Umsatzsteuer-Voranmeldung“: übernimmt die Umsätze aus deinen Rechnungen – nach Leistungsdatum (Soll)
      oder nach Zahlungseingang (Ist).
    - „Mein Betrieb → Deine Daten“: alles liegt verschlüsselt auf dem iPhone, optional mit Face ID gesperrt.
-   - „Beleg erfassen“ (Vorlagen) bzw. unten in „Unterlagen“: Foto, Datei oder E-Rechnung (XRechnung/ZUGFeRD-PDF
+   - „+ → Beleg“ bzw. „Beleg“ auf „Heute“: Foto, Datei oder E-Rechnung (XRechnung/ZUGFeRD-PDF
      aus der Dateien-App) – E-Rechnungen füllen sich selbst aus. Die Vorsteuer landet in der Voranmeldung, Einnahmen
      und Ausgaben in der EÜR („Aus Rechnungen und Belegen übernehmen“).
    - „Mein Betrieb → Paket für die Steuerberatung“: ZIP mit DATEV-Buchungsstapel, Listen und Belegen.
    - „Amtlos Pro“ (oben unter „Mein Betrieb“): In dieser Testversion gibt es keinen Kauf – „Pro testweise einschalten“
-     zeigt alle Funktionen. Ohne Pro: 5 Unterlagen im Monat als PDF, kein Logo/keine Hausfarbe, keine E-Rechnung.
+     zeigt alle Funktionen (im späteren Store-Build gibt es diesen Knopf nicht). Ohne Pro: 5 Unterlagen im Monat als PDF, kein Logo/keine Hausfarbe, keine E-Rechnung.
    - „Über Amtlos“: Impressum und Datenschutz (Angaben folgen vor dem Start), „Amtlos weiterempfehlen“.
    - Synchronisation zwischen Geräten (Konto, Ende-zu-Ende-verschlüsselt) ist eingebaut, in diesem Testpaket aber
      aus: Sie braucht einen laufenden Amtlos-Server und einen Anmeldedienst. Ohne Server bleibt alles auf dem iPhone.
