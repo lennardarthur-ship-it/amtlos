@@ -13,7 +13,7 @@ export function teilnahmeTabelle(eintraege: Eintrag[], extra?: { kopf: string; f
   const zeilen = eintraege.filter((e) => text(e, "name")).map((e) => [zelle(text(e, "name")), ...(extra ? [zelle(extra.datum ? datumDe(text(e, extra.feld)) : text(e, extra.feld))] : []), ""]);
   // mit Namen: zwei Leerzeilen zum Nachtragen, die mit dem letzten Namen zusammenbleiben (keine Seite nur mit Kopf und
   // Leerzeilen); ohne Namen (Liste zum Ausdrucken): sechs Zeilen
-  return tabelle(kopf, zeilen, { breiten: extra ? ["38%", "22%", "40%"] : ["45%", "55%"], ...(zeilen.length ? { leerzeilen: 2, schluss: 3 } : { mindestens: 6 }), hoch: true });
+  return tabelle(kopf, zeilen, { breiten: extra ? ["38%", "22%", "40%"] : ["45%", "55%"], ...(zeilen.length ? { leerzeilen: 2, schluss: 3 } : { mindestens: 6 }), hoch: true, klasse: "teilnahme" });
 }
 
 const BEREICHE_VORSCHLAG = ["Salon", "Kosmetikkabine", "Küche", "Gastraum und Service", "Verkaufsraum", "Lager", "Werkstatt", "Baustelle beim Kunden", "Büro"];
@@ -91,8 +91,16 @@ export const gefaehrdungsbeurteilung: Vorlage = {
   },
   html(d, b) {
     const g = liste(d, "gefaehrdungen").filter((x) => text(x, "beschreibung") || text(x, "massnahme"));
+    // beschriftet, damit Name und Daten ohne Spaltenkopf verständlich sind: „Wer: … · Frist: … · erledigt …“ (je eine Zeile)
+    const lbl = (t: string) => `<span class="lbl">${t}</span> `;
     const umsetzung = (x: Eintrag) =>
-      [text(x, "verantwortlich"), text(x, "umsetzen_bis") ? `bis ${datumDe(text(x, "umsetzen_bis"))}` : "", text(x, "umgesetzt_am") ? `umgesetzt ${datumDe(text(x, "umgesetzt_am"))}` : "offen"].filter(Boolean).map(esc).join("<br>");
+      [
+        text(x, "verantwortlich") ? `${lbl("Wer:")}${esc(text(x, "verantwortlich"))}` : "",
+        text(x, "umsetzen_bis") ? `${lbl("Frist:")}${datumDe(text(x, "umsetzen_bis"))}` : "",
+        text(x, "umgesetzt_am") ? `${lbl("erledigt")}${datumDe(text(x, "umgesetzt_am"))}` : lbl("offen").trim(),
+      ]
+        .filter(Boolean)
+        .join("<br>");
     const teile = Object.entries(GEFAEHRDUNGSFAKTOREN)
       .map(([faktor, titel]) => {
         const l = g.filter((x) => (text(x, "faktor") || "sonstiges") === faktor);
@@ -152,6 +160,8 @@ export const gefaehrdungsbeurteilung: Vorlage = {
 };
 
 const ANLASS: Record<string, string> = { erst: "Erstunterweisung vor Aufnahme der Tätigkeit", wiederholung: "Wiederholungsunterweisung (mindestens jährlich)", anlass: "Unterweisung aus besonderem Anlass (z. B. neue Arbeitsmittel, Unfall)" };
+/** Anlass kurz für die Kennungsleiste, mit weicher Trennstelle (die schmale Spalte trennt sonst nicht) */
+const ANLASS_KURZ: Record<string, string> = { erst: "Erst\u00adunterweisung", wiederholung: "Wiederholungs\u00adunterweisung", anlass: "aus besonderem Anlass" };
 
 export const unterweisung: Vorlage = {
   id: "unterweisung",
@@ -191,14 +201,19 @@ export const unterweisung: Vorlage = {
       titel: "Unterweisungsnachweis",
       betrieb: b,
       unter: text(d, "thema") || undefined,
-      meta: `Datum: ${datumDe(text(d, "datum"))}\nDurchgeführt von: ${text(d, "durchgefuehrt_von")}\nNächste Unterweisung: ${naechste ? `bis ${naechste}` : ""}`,
+      // Anlass und Dauer in der Kennungsleiste (die Bezeichnung steht schon als Unterzeile unter dem Titel)
+      meta: `Datum: ${datumDe(text(d, "datum"))}\nDurchgeführt von: ${text(d, "durchgefuehrt_von")}\nAnlass: ${ANLASS_KURZ[text(d, "anlass")] ?? ""}\nDauer: ${text(d, "dauer")}\nNächste Unterweisung: ${naechste ? `bis ${naechste}` : ""}`,
       inhalt:
-        // Datum und Durchgeführt von stehen in der Kennungsleiste; dort entfallen leere Angaben – dann hier als Linie
-        abschnitt("Angaben", angaben([["Bezeichnung", text(d, "thema")], ["Anlass", ANLASS[text(d, "anlass")] ?? ""], ["Datum", text(d, "datum") ? null : ""], ["Dauer", text(d, "dauer")], ["Durchgeführt von", text(d, "durchgefuehrt_von") ? null : ""]])) +
+        // in der Kennungsleiste entfallen leere Angaben – dann hier als Linie zum Eintragen
+        ((a) => (a ? abschnitt("Angaben", a) : ""))(
+          angaben([["Bezeichnung", text(d, "thema") ? null : ""], ["Anlass", ANLASS[text(d, "anlass")] ? null : ""], ["Datum", text(d, "datum") ? null : ""], ["Dauer", text(d, "dauer") ? null : ""], ["Durchgeführt von", text(d, "durchgefuehrt_von") ? null : ""]]),
+        ) +
         abschnitt("Inhalte der Unterweisung", (themen.length ? punkte(themen) : absatz("")) + (text(d, "inhalt") ? `<h3>Betriebsspezifische Ergänzungen</h3>${zeilen(text(d, "inhalt"))}` : "")) +
         abschnitt("Teilnahme", `<p class="vor-tabelle">Mit meiner Unterschrift bestätige ich, dass ich an der Unterweisung teilgenommen und die Inhalte verstanden habe.</p>${teilnahmeTabelle(liste(d, "teilnehmer"))}`) +
-        nachsatz(`Die Unterweisung ist mindestens einmal jährlich zu wiederholen (§ 4 Abs. 1 DGUV Vorschrift 1)${naechste ? `, nächster Termin spätestens am ${naechste}` : ""}.`) +
-        unterschriften(["Ort, Datum", "Unterschrift der unterweisenden Person"]),
+        // der Hinweis zur Wiederholung steht als Fußnote nach den Unterschriften: so bleibt die letzte Teilnahmezeile mit
+        // den Unterschriften zusammen (Schlussblock), statt dass eine Folgeseite nur Hinweis und Unterschriften trägt
+        unterschriften(["Ort, Datum", "Unterschrift der unterweisenden Person"]) +
+        nachsatz(`Die Unterweisung ist mindestens einmal jährlich zu wiederholen (§ 4 Abs. 1 DGUV Vorschrift 1)${naechste ? `, nächster Termin spätestens am ${naechste}` : ""}.`),
     });
   },
 };
@@ -321,15 +336,15 @@ export const betriebsanweisung: Vorlage = {
     // Aufbau wie das Muster der DGUV Information 211-010: Titelband mit Nummer, Bereich und Stoff, dann die Abschnitte nach TRGS 555
     // leerer Kasten: drei Linien zum Ausfüllen von Hand, Schutzmaßnahmen fünf
     const kaesten = BA_TEILE.map((t) => `<section class="kasten"><h2>${esc(t.label)}</h2><div class="inhalt">${text(d, t.id) ? zeilen(text(d, t.id)) : linien(t.linien ?? 3)}</div></section>`).join("");
-    // viel Text → kompakter Satz, damit der Aushang auf ein Blatt passt (Zeilen grob: ca. 80 Zeichen je Zeile)
-    const zeilenzahl = BA_TEILE.reduce((n, t) => n + text(d, t.id).split("\n").filter((z) => z.trim()).reduce((m, z) => m + Math.ceil(z.trim().length / 80), 0), 0);
+    // viel Text → kompakter Satz, damit der Aushang auf ein Blatt passt (geschätzte Höhe der Kästen, siehe baHoehe)
     return dokument({
       titel: "Betriebsanweisung",
       betrieb: b,
       gestalt: "aushang",
       // auch das leere Blatt kompakt: die Linien zum Ausfüllen brauchen sonst mehr als ein Blatt
-      klasse: zeilenzahl > BA_KOMPAKT_AB || BA_TEILE.every((t) => !text(d, t.id)) ? "ba kompakt" : "ba",
-      band: "#e0640c",
+      klasse: baHoehe(d) > BA_PLATZ || BA_TEILE.every((t) => !text(d, t.id)) ? "ba kompakt" : "ba",
+      // Orange der DGUV-Muster, so weit abgedunkelt, dass die weiße Schrift im Band 4,5 : 1 erreicht (#e0640c: 3,5 : 1)
+      band: "#c2540a",
       meta: `Stand: ${datumDe(text(d, "datum"))}`,
       inhalt:
         `<div class="titelband"><div class="t">Betriebsanweisung<small>gemäß § 14 GefStoffV (TRGS 555)</small></div><div class="n">${text(d, "nummer") ? `<span>Nummer<b>${esc(text(d, "nummer"))}</b></span>` : ""}<span>Stand<b>${datumDe(text(d, "datum")) || "&nbsp;"}</b></span></div></div>` +
@@ -342,8 +357,25 @@ export const betriebsanweisung: Vorlage = {
   },
 };
 
-/** Ab so vielen Textzeilen in den Kästen wird die Betriebsanweisung kompakt gesetzt. */
-const BA_KOMPAKT_AB = 12;
+/**
+ * Platz für die fünf Kästen nach TRGS 555 im normalen Satz (10,4 pt) in mm: Satzspiegel 269 mm abzüglich Kopf,
+ * Titelband und Stoffkasten (ca. 81 mm) sowie Notruf und Unterschriften (ca. 30 mm), etwas Reserve für einen
+ * zweizeiligen Stoffnamen. Gemessen an den PDFs der Prüfwerkzeuge (dokumente-pruefen, Jahres-Szenarien).
+ */
+const BA_PLATZ = 155;
+
+/**
+ * Geschätzte Höhe der fünf Kästen im normalen Satz (mm): je Kasten Überschrift, Innenabstand und Abstand (16,8 mm),
+ * je Textzeile 5,1 mm (ca. 96 Zeichen je Zeile), je Aufzählungspunkt 0,9 mm; ein leerer Kasten je Linie zum Ausfüllen 6,4 mm.
+ * Früher zählten nur die Zeilen (ab 12 kompakt) – kurze Anweisungen wurden zu früh klein gesetzt, lange liefen über.
+ */
+function baHoehe(d: Daten): number {
+  return BA_TEILE.reduce((h, t) => {
+    const z = text(d, t.id).split("\n").map((x) => x.trim()).filter(Boolean);
+    if (!z.length) return h + 16.8 + (t.linien ?? 3) * 6.4 + 1;
+    return h + 16.8 + z.reduce((m, x) => m + 5.1 * Math.ceil(x.length / 96), 0) + (z.length > 1 ? 0.9 * z.length : 1.9);
+  }, 0);
+}
 
 const ERGEBNIS: Record<string, string> = { bestanden: "bestanden", maengel: "Mängel – nicht verwenden" };
 

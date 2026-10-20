@@ -5,19 +5,24 @@ import { Pressable, ScrollView, View, type ScrollViewProps } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Bereich } from "@amtlos/fachlogik";
 import { euroText } from "../unterlagen/ablage";
-import { Kachel, Motiv, T, useGrosseSchrift } from "../ui/bausteine";
+import { BuehnenText, Motiv, Stempel, T, useGrosseSchrift } from "../ui/bausteine";
 import { HellerStatus, TastaturRahmen, useImBlatt, useKopf, type KopfKnopfDef } from "../ui/navigation";
-import { RADIUS, RAND, SCHRIFT, schattenStil, useFarben } from "../ui/thema";
+import { BLATT_OBEN, RADIUS, RAND, SCHRIFT, schattenStil, useFarben } from "../ui/thema";
 
 /** Platz unter dem Blatt für die schwebende Tab-Leiste. */
 export const UNTEN_FREI = 120;
+
+/** Das §-Motiv der Bühne – überall an derselben Stelle und gleich leise (A2), damit es nichts überlagert. */
+function BuehnenMotiv() {
+  return <Motiv zeichen="§" groesse={340} farbe="rgba(127,227,184,0.045)" stil={{ right: -84, top: -56 }} />;
+}
 
 /**
  * Tab-Seite (E-142 „Bühne und Papier“): oben die dunkelgrüne Bühne mit Zeile darüber, großem Titel und dem, was auf
  * dieser Seite zählt (Betrag, Jahr, Knöpfe); darunter schiebt sich das helle Blatt mit dem Rest. Statusleiste hell,
  * solange die Seite sichtbar ist. Unter dem Blatt geht der helle Grund weiter (kein Grün beim Ziehen nach oben).
  */
-export function BuehnenSeite({ ueber, titel, rechts, buehne, children, ...rest }: ScrollViewProps & { ueber?: string; titel?: string; rechts?: ReactNode; buehne?: ReactNode }) {
+export function BuehnenSeite({ ueber, titel, satz, rechts, buehne, children, ...rest }: ScrollViewProps & { ueber?: string; titel?: string; satz?: boolean; rechts?: ReactNode; buehne?: ReactNode }) {
   const f = useFarben();
   const inset = useSafeAreaInsets();
   const sichtbar = useIsFocused();
@@ -27,17 +32,18 @@ export function BuehnenSeite({ ueber, titel, rechts, buehne, children, ...rest }
       {sichtbar ? <StatusBar style="light" /> : null}
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets {...rest}>
         <View style={{ paddingTop: inset.top + (ueber || rechts ? 14 : 28), paddingHorizontal: RAND, paddingBottom: 30, gap: 22, overflow: "hidden" }}>
-          <Motiv zeichen="§" groesse={380} farbe="rgba(127,227,184,0.06)" stil={{ right: -92, top: -40 }} />
+          <BuehnenMotiv />
           {ueber || rechts ? (
             <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12, minHeight: 40 }}>
               <T v="klein" fett farbe={f.buehneLeise} stil={{ flex: 1 }} numberOfLines={gross ? undefined : 1}>{ueber ?? ""}</T>
               {rechts}
             </View>
           ) : null}
-          {titel ? <T v="grossTitel" accessibilityRole="header" farbe={f.buehneText}>{titel}</T> : null}
+          {/* ein Satz als Titel (z. B. „8 Dinge in den nächsten 2 Wochen“) in 28 statt 34 pt – bricht sonst unschön (A9) */}
+          {titel ? <T v={satz ? "titel" : "grossTitel"} accessibilityRole="header" farbe={f.buehneText}>{titel}</T> : null}
           {buehne}
         </View>
-        <View style={{ flexGrow: 1, backgroundColor: f.papier, borderTopLeftRadius: RADIUS.buehne, borderTopRightRadius: RADIUS.buehne, paddingHorizontal: RAND, paddingTop: 24, paddingBottom: UNTEN_FREI }}>
+        <View style={{ flexGrow: 1, backgroundColor: f.papier, borderTopLeftRadius: RADIUS.buehne, borderTopRightRadius: RADIUS.buehne, paddingHorizontal: RAND, paddingTop: BLATT_OBEN, paddingBottom: UNTEN_FREI }}>
           {children}
           {/* heller Grund unter dem Blatt – beim Ziehen über das Ende hinaus kein Grün */}
           <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: -1000, height: 1000, backgroundColor: f.papier }} />
@@ -48,14 +54,14 @@ export function BuehnenSeite({ ueber, titel, rechts, buehne, children, ...rest }
 }
 
 /** Betrag groß wie in Finanz-Apps: Euro weiß, Cent und Zeichen gedämpft. */
-export function GrosserBetrag({ cent, groesse = 60 }: { cent: number; groesse?: number }) {
+export function GrosserBetrag({ cent, groesse = 60, label }: { cent: number; groesse?: number; label?: string }) {
   const f = useFarben();
   const text = euroText(cent);
   const komma = text.lastIndexOf(",");
   const vorn = komma > 0 ? text.slice(0, komma) : text;
   const hinten = komma > 0 ? text.slice(komma) : "";
   return (
-    <T accessibilityLabel={text} maxFontSizeMultiplier={1.4} farbe={f.buehneText} stil={{ ...SCHRIFT.display, fontSize: groesse, lineHeight: groesse * 1.07, letterSpacing: -groesse * 0.04, fontVariant: ["tabular-nums"] }}>
+    <T accessibilityLabel={label ?? text} maxFontSizeMultiplier={1.4} farbe={f.buehneText} stil={{ ...SCHRIFT.display, fontSize: groesse, lineHeight: groesse * 1.07, letterSpacing: -groesse * 0.04, fontVariant: ["tabular-nums"] }}>
       {vorn}
       <T maxFontSizeMultiplier={1.4} farbe="rgba(255,255,255,0.72)" stil={{ ...SCHRIFT.display, fontSize: groesse, lineHeight: groesse * 1.07, letterSpacing: -groesse * 0.04 }}>{hinten}</T>
     </T>
@@ -66,22 +72,34 @@ export function GrosserBetrag({ cent, groesse = 60 }: { cent: number; groesse?: 
  * Unterseite oder Blatt im Bühnen-Aufbau (E-144): Die Navigationsleiste wird grün, darunter setzt sich die Bühne fort
  * mit Titel, einem Satz und dem, was zählt; das helle Blatt trägt den Rest. Ein Fuß (Hauptknopf) bleibt unten stehen.
  */
-export function BuehnenBlatt({ kopf = "", ueber, titel, unter, buehne, rechts, fuss, children }: { kopf?: string; ueber?: string; titel?: string; unter?: string; buehne?: ReactNode; rechts?: KopfKnopfDef | null; fuss?: ReactNode; children?: ReactNode }) {
+/**
+ * `fest`: bleibt beim Scrollen oben stehen (z. B. das Suchfeld in „Neu erstellen“ – A17), direkt unter Titel und Satz.
+ */
+export function BuehnenBlatt({ kopf = "", ueber, titel, unter, buehne, fest, rechts, fuss, children }: { kopf?: string; ueber?: string; titel?: string; unter?: string; buehne?: ReactNode; fest?: ReactNode; rechts?: KopfKnopfDef | null; fuss?: ReactNode; children?: ReactNode }) {
   const f = useFarben();
   const imBlatt = useImBlatt();
   useKopf({ titel: kopf, buehne: true, rechts });
+  const kopfTeil = (
+    <View key="kopf" style={{ paddingHorizontal: RAND, paddingTop: 6, paddingBottom: fest ? 14 : buehne ? 14 : 28, gap: 14, overflow: "hidden" }}>
+      <BuehnenMotiv />
+      {ueber ? <T v="klein" fett farbe={f.buehneLeise}>{ueber}</T> : null}
+      {titel ? <T v="titel" accessibilityRole="header" farbe={f.buehneText}>{titel}</T> : null}
+      {unter ? <BuehnenText text={unter} /> : null}
+      {fest ? null : buehne}
+    </View>
+  );
   return (
     <TastaturRahmen grund={f.buehne}>
       <HellerStatus />
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" automaticallyAdjustKeyboardInsets>
-        <View style={{ paddingHorizontal: RAND, paddingTop: 6, paddingBottom: 28, gap: 14, overflow: "hidden" }}>
-          <Motiv zeichen="§" groesse={300} farbe="rgba(127,227,184,0.06)" stil={{ right: -70, top: -60 }} />
-          {ueber ? <T v="klein" fett farbe={f.buehneLeise}>{ueber}</T> : null}
-          {titel ? <T v="titel" accessibilityRole="header" farbe={f.buehneText}>{titel}</T> : null}
-          {unter ? <T farbe={f.buehneLeise}>{unter}</T> : null}
-          {buehne}
-        </View>
-        <View style={{ flexGrow: 1, backgroundColor: f.papier, borderTopLeftRadius: RADIUS.buehne, borderTopRightRadius: RADIUS.buehne, paddingHorizontal: RAND, paddingTop: 24, paddingBottom: fuss ? 24 : imBlatt ? 40 : UNTEN_FREI }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" automaticallyAdjustKeyboardInsets stickyHeaderIndices={fest ? [1] : undefined}>
+        {kopfTeil}
+        {fest ? (
+          <View key="fest" style={{ paddingHorizontal: RAND, paddingVertical: 8, backgroundColor: f.buehne }}>
+            {fest}
+          </View>
+        ) : null}
+        {fest && buehne ? <View key="buehne" style={{ paddingHorizontal: RAND, paddingTop: 6, paddingBottom: 28 }}>{buehne}</View> : fest ? <View key="buehne" style={{ height: 20 }} /> : null}
+        <View key="blatt" style={{ flexGrow: 1, backgroundColor: f.papier, borderTopLeftRadius: RADIUS.buehne, borderTopRightRadius: RADIUS.buehne, paddingHorizontal: RAND, paddingTop: BLATT_OBEN, paddingBottom: fuss ? 24 : imBlatt ? 40 : UNTEN_FREI }}>
           {children}
           <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: -1000, height: 1000, backgroundColor: f.papier }} />
         </View>
@@ -95,7 +113,7 @@ export function BuehnenBlatt({ kopf = "", ueber, titel, unter, buehne, rechts, f
 export function BuehnenKnopf({ text, onPress, label }: { text: string; onPress: () => void; label?: string }) {
   const f = useFarben();
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={label ?? text} onPress={onPress} hitSlop={6} style={({ pressed }) => ({ minHeight: 40, paddingHorizontal: 16, borderRadius: 20, justifyContent: "center", backgroundColor: f.buehneFlaeche, opacity: pressed ? 0.7 : 1 })}>
+    <Pressable accessibilityRole="button" accessibilityLabel={label ?? text} onPress={onPress} hitSlop={6} style={({ pressed }) => ({ minHeight: 40, paddingHorizontal: 16, borderRadius: RADIUS.pille, justifyContent: "center", backgroundColor: f.buehneFlaeche, opacity: pressed ? 0.7 : 1 })}>
       <T v="klein" farbe={f.buehneText} stil={{ ...SCHRIFT.halb }}>{text}</T>
     </Pressable>
   );
@@ -105,7 +123,7 @@ export function BuehnenKnopf({ text, onPress, label }: { text: string; onPress: 
 export function BuehnenMarke({ text, warnung }: { text: string; warnung?: boolean }) {
   const f = useFarben();
   return (
-    <View style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, backgroundColor: warnung ? "rgba(255,105,97,0.22)" : f.buehneFlaeche }}>
+    <View style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: RADIUS.pille, backgroundColor: warnung ? "rgba(255,105,97,0.22)" : f.buehneFlaeche }}>
       <T v="caption" farbe={warnung ? "#ffc9c4" : f.buehneText} stil={{ ...SCHRIFT.halb }}>{text}</T>
     </View>
   );
@@ -115,7 +133,7 @@ export function BuehnenMarke({ text, warnung }: { text: string; warnung?: boolea
 export function BlattKopf({ titel, rechts, onPress, erste }: { titel: string; rechts?: string; onPress?: () => void; erste?: boolean }) {
   const f = useFarben();
   return (
-    <View style={{ flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", marginTop: erste ? 0 : 30, marginBottom: 12, paddingHorizontal: 4 }}>
+    <View style={{ flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", marginTop: erste ? 0 : 30, marginBottom: 12 }}>
       <T v="gross" accessibilityRole="header">{titel}</T>
       {rechts && onPress ? (
         <Pressable accessibilityRole="button" onPress={onPress} hitSlop={6} style={{ minHeight: 44, marginVertical: -9, justifyContent: "center" }}>
@@ -126,14 +144,17 @@ export function BlattKopf({ titel, rechts, onPress, erste }: { titel: string; re
   );
 }
 
-/** Leerer Zustand als Einladung: großes Symbol, ein Satz, was jetzt sinnvoll ist, und die Handlung dazu. */
-export function Leer({ text, unter, children, symbol = "tray" }: { text: string; unter?: string; children?: ReactNode; symbol?: string }) {
+/**
+ * Leerer Zustand als Einladung (B7): der Amtlos-Stempel groß und leise (wie ein Abdruck), ein warmer Satz, was jetzt
+ * sinnvoll ist, und die Handlung dazu. `symbol` bleibt für ältere Aufrufe, der Stempel ersetzt es.
+ */
+export function Leer({ text, unter, children }: { text: string; unter?: string; children?: ReactNode; symbol?: string }) {
   const f = useFarben();
   return (
     <View style={[{ paddingTop: 28, paddingBottom: 20, paddingHorizontal: 20, borderRadius: RADIUS.karte, backgroundColor: f.blatt, gap: 18, alignItems: "stretch", borderWidth: 0 }, schattenStil(f)]}>
       <View style={{ alignItems: "center", gap: 8 }}>
-        <Kachel symbol={symbol} groesse={84} />
-        <T v="gross" stil={{ textAlign: "center", marginTop: 10 }}>{text}</T>
+        <Stempel groesse={96} farbe={f.amt} grund={f.amtHauch} />
+        <T v="gross" stil={{ textAlign: "center", marginTop: 14 }}>{text}</T>
         {unter ? <T leise stil={{ textAlign: "center", maxWidth: 300 }}>{unter}</T> : null}
       </View>
       {children}
@@ -146,7 +167,7 @@ export function Inhalt({ children, ...rest }: ScrollViewProps) {
   // in einem Tab liegt die schwebende Tab-Leiste über dem Ende – Platz lassen; in Blättern genügt wenig
   const imBlatt = useImBlatt();
   return (
-    <ScrollView contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 22, paddingBottom: imBlatt ? 40 : UNTEN_FREI }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" automaticallyAdjustKeyboardInsets {...rest}>
+    <ScrollView contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: BLATT_OBEN, paddingBottom: imBlatt ? 40 : UNTEN_FREI }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" automaticallyAdjustKeyboardInsets {...rest}>
       {children}
     </ScrollView>
   );
@@ -156,10 +177,11 @@ export function Inhalt({ children, ...rest }: ScrollViewProps) {
 export function Gruppe({ titel, children, fuss, hilfe, erste }: { titel?: string; children: ReactNode; fuss?: string; hilfe?: string; erste?: boolean }) {
   return (
     <View style={{ marginTop: erste ? 0 : 30 }}>
-      {titel ? <T v="gross" accessibilityRole="header" stil={{ marginBottom: hilfe ? 3 : 12, marginLeft: 4 }}>{titel}</T> : null}
-      {hilfe ? <T v="caption" leise stil={{ marginBottom: 11, marginLeft: 2 }}>{hilfe}</T> : null}
+      {/* alles auf derselben Fluchtlinie wie Karten und Text (A10) – keine eingerückten Überschriften */}
+      {titel ? <T v="gross" accessibilityRole="header" stil={{ marginBottom: hilfe ? 3 : 12 }}>{titel}</T> : null}
+      {hilfe ? <T v="caption" leise stil={{ marginBottom: 11 }}>{hilfe}</T> : null}
       {children}
-      {fuss ? <T v="caption" leise stil={{ marginTop: 8, marginLeft: 2 }}>{fuss}</T> : null}
+      {fuss ? <T v="caption" leise stil={{ marginTop: 8 }}>{fuss}</T> : null}
     </View>
   );
 }

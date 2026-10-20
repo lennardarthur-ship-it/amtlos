@@ -26,7 +26,7 @@ describe("Satzspiegel und Seitenumbrüche", () => {
     expect(k).toContain('<tbody><tr><td>1</td></tr></tbody><tbody class="schluss"><tr><td>2</td></tr></tbody><tfoot><tr class="summe"><td>S</td></tr></tfoot></table><div class="schlussblock nach-tabelle">');
     // Personalfragebogen: die Erklärung steht mit der Unterschrift, nicht allein auf der Seite davor
     // (entweder im Schlussblock oder gemeinsam in einem Block „zusammen“)
-    expect(html("sv_meldedaten", { name: "Lea Wagner" })).toMatch(/<div class="schlussblock"><p style="margin-top:6mm">Ich versichere|<div class="zusammen">(?:(?!<\/section>).)*Ich versichere(?:(?!<\/section>).)*<div class="unterschriften/s);
+    expect(html("sv_meldedaten", { name: "Lea Wagner" })).toMatch(/<div class="schlussblock"><p style="margin-top:4mm">Ich versichere|<div class="zusammen">(?:(?!<\/section>).)*Ich versichere(?:(?!<\/section>).)*<div class="unterschriften/s);
     expect(html("gefaehrdungsbeurteilung")).toMatch(/<div class="schlussblock"><section class="abschnitt zusammen[^"]*"><h2>Wirksamkeit und Fortschreibung/);
     expect(html("betriebsanweisung", { notruf: "Notruf 112" })).toMatch(/<div class="schlussblock"><div class="notruf">/);
   });
@@ -35,27 +35,62 @@ describe("Satzspiegel und Seitenumbrüche", () => {
     const h = html("bilanz_guv");
     expect(h).toContain("h2, h3 { page-break-after: avoid; break-after: avoid; page-break-inside: avoid; break-inside: avoid; }");
     expect(h).toContain("table.liste th.zahl, table.liste td.zahl { text-align: right; }");
-    expect(h).toContain(".g-formular .bilanz { display: flex; gap: 8mm; page-break-inside: avoid; break-inside: avoid; }");
+    expect(h).toContain("table.liste.bilanz { page-break-inside: avoid; break-inside: avoid; }");
     expect(h).toContain(".g-nachweis:not(.quer) main:has(section.abschnitt) .unterschriften");
-    expect(h).toContain("table.felder { font-size: 9.4pt; table-layout: fixed; }");
+    expect(h).toContain("table.felder { font-size: 9.4pt; table-layout: fixed; line-height: 1.32; }");
   });
 
-  it("Bilanz: Aktiva und Passiva gleich lang, Summen mit Doppellinie; Verlust ohne doppeltes Minus", () => {
-    const h = html("bilanz_guv", { aktiva: [{ posten: "Bank", betrag: "100,00" }], passiva: [{ posten: "Kapital", betrag: "60,00" }, { posten: "Gewinn", betrag: "40,00" }] });
-    const tabellen = h.match(/<table class="liste doppelt">.*?<\/table>/gs)!;
-    expect(tabellen).toHaveLength(2);
-    expect(tabellen.map((t) => (t.match(/<tbody>.*<\/tbody>/s)![0].match(/<tr>/g) ?? []).length)).toEqual([2, 2]);
+  it("Bilanz: eine Tabelle Aktiva | Passiva (gleiche Zeilenhöhen, Summen auf einer Linie, Doppellinie 3 pt); GuV ohne leere Kennzahlspalte; Verlust ohne doppeltes Minus", () => {
+    const h = html("bilanz_guv", { ertraege: [{ posten: "Umsatz", betrag: "100,00" }], aktiva: [{ posten: "Bank", betrag: "100,00" }], passiva: [{ posten: "Kapital", betrag: "60,00" }, { posten: "Gewinn", betrag: "40,00" }] });
+    const tabellen = h.match(/<table class="liste doppelt bilanz">.*?<\/table>/gs)!;
+    expect(tabellen).toHaveLength(1);
+    expect(tabellen[0]).toContain("<thead><tr><th>Aktiva</th><th class=\"zahl\">Betrag</th><th>Passiva</th><th class=\"zahl\">Betrag</th></tr></thead>");
+    // zwei Zeilen: Bank | Kapital, (leer) | Gewinn – die kürzere Seite wird aufgefüllt
+    expect(tabellen[0]).toContain('<tr><td>&nbsp;</td><td class="zahl"></td><td>Gewinn</td><td class="zahl">40,00\u00a0€</td></tr>');
+    expect(tabellen[0]).toMatch(/<tr class="summe"><td><strong>Summe<\/strong><\/td><td class="zahl"><strong>100,00\u00a0€<\/strong><\/td><td><strong>Summe<\/strong><\/td><td class="zahl"><strong>100,00\u00a0€<\/strong><\/td><\/tr>/);
+    expect(h).toContain("table.liste.doppelt tr.summe td.zahl { border-bottom: 3pt double #1a1f24; }");
+    // Jahresüberschuss ohne leere Kennzahlspalte davor
+    expect(h).toContain('<table class="kennzahlen"><tr class="gesamt"><th>Jahresüberschuss</th>');
+    // die Bilanz bleibt mit der Unterschrift zusammen (Schlussblock)
+    expect(h).toMatch(/<div class="schlussblock"><section class="abschnitt[^"]*"><h2>Bilanz/);
     const e = html("euer", { jahr: "2026", einnahmen: [{ text: "Umsatz", betrag: "100,00" }], ausgaben: [{ text: "Miete", betrag: "300,00" }] });
     expect(e).toMatch(/Verlust<small>[^<]*<\/small><\/th><td class="zahl">200,00\u00a0€/);
   });
 });
 
 describe("Brief nach DIN 5008", () => {
-  it("Informationsblock im Fluss bis 200 mm: rechter Druckrand 10 mm, Text über das Padding bis 190 mm", () => {
+  it("Informationsblock im Fluss von 125 bis 190 mm (bündig mit dem Text): rechter Druckrand 10 mm, Text über das Padding bis 190 mm", () => {
     expect(RAENDER.brief).toEqual([12, 10, 30, 20]);
     const h = html("rechnung", RECHNUNG);
-    expect(h).toContain("body.g-brief { padding-left: 5mm; padding-right: 10mm; }");
-    expect(h).toContain(".g-brief .info { flex: none; margin: 5mm 0 0 15mm; width: 75mm;");
+    expect(h).toContain("body.g-brief { padding-left: 5mm; padding-right: 10mm; font-size: 10pt; }");
+    expect(h).toContain(".g-brief .info { flex: none; margin: 5mm 0 0 15mm; width: 65mm; font-size: 8.5pt; }");
+  });
+
+  it("Rechnung, Feinsatz: Infoblock mit Rechnungsdatum zuletzt (halbfett, abgesetzt), Betreff 13 pt, Spaltenbreiten, Summen ab der Mengenspalte, Gesamtlinie in Tinte", () => {
+    const h = html("rechnung", RECHNUNG);
+    const info = /<div class="info"><table>(.*?)<\/table>/.exec(h)![1]!;
+    const k = [...info.matchAll(/<tr(?: class="(\w+)")?><td>([^<]*)<\/td>/g)].map((m) => (m[1] === "leer" ? "–" : m[2]! + (m[1] === "fett" ? "*" : "")));
+    expect(k).toEqual(["Rechnungsnummer", "Leistungsdatum", "Steuernummer", "Ansprechperson", "Telefon", "E-Mail", "–", "Rechnungsdatum*"]);
+    expect(h).toContain(".g-brief .betreff { margin: 8mm 0 4.5mm; font-size: 13pt;");
+    expect(h).toContain('<col style="width:5%"><col style="width:47%"><col style="width:13%"><col style="width:13%"><col style="width:7%"><col style="width:15%">');
+    expect(h).toContain('<table class="summen">');
+    expect(h).toContain(".g-brief .summen { width: 48%; margin-left: 52%;");
+    expect(h).toContain(".summen tr.gesamt td { border-top: 1pt solid #1a1f24;");
+    const ku = html("rechnung", { ...RECHNUNG, kleinunternehmer: true });
+    expect(ku).toContain('<col style="width:5%"><col style="width:54%"><col style="width:13%"><col style="width:13%"><col style="width:15%">');
+    expect(ku).toContain('<table class="summen ku">');
+    // Zahlungsblock: Empfänger vor der IBAN; Einleitung ohne doppelten Dank
+    expect(h).toContain("Empfänger: Salon Sonne (Alex Sonnberg)<br><strong>IBAN DE89 3704 0044 0532 0130 00</strong>");
+    expect(h).toContain("<p>wie vereinbart berechnen wir Ihnen folgende Leistungen:</p>");
+    expect(h).not.toContain("bedanken");
+  });
+
+  it("Rechnung: Anrede wählbar (Privatkundschaft), sonst „Sehr geehrte Damen und Herren“", () => {
+    expect(html("rechnung", RECHNUNG)).toContain('<p class="anrede">Sehr geehrte Damen und Herren,</p>');
+    expect(html("rechnung", { ...RECHNUNG, anrede: "Hallo Frau Krause," })).toContain('<p class="anrede">Hallo Frau Krause,</p>');
+    expect(html("rechnung", { ...RECHNUNG, anrede: "Guten Tag Herr Brenner" })).toContain('<p class="anrede">Guten Tag Herr Brenner,</p>');
+    const f = vorlageFuer("rechnung")!.abschnitte.flatMap((a) => a.felder).find((x) => x.id === "anrede")!;
+    expect(f).toMatchObject({ art: "text", selten: true });
   });
 
   it("lange Anschrift wird kleiner gesetzt statt den Betreff zu überdecken, nie gekürzt", () => {
@@ -108,8 +143,11 @@ describe("weitere Vorlagen", () => {
 
   it("Allergenliste als Matrix mit allen 14 Allergenen; IfSG-Lebensmittel einmal nummeriert", () => {
     const h = html("allergene", { gerichte: [{ name: "Käsekuchen", kategorie: "Kuchen", allergene: ["gluten", "eier", "milch"] }, { name: "Wasser", kategorie: "Getränke", allergene: [], keine: true }] });
-    expect(h.match(/<th class="dreh">/g)).toHaveLength(14);
-    expect(h.match(/<td class="x">×<\/td>/g)).toHaveLength(3);
+    expect(h.match(/<th class="kz" title="[^"]+">[A-N]<\/th>/g)).toHaveLength(14);
+    expect(h.match(/<td class="x">●<\/td>/g)).toHaveLength(3);
+    // Zuordnung der Kennbuchstaben unter der Matrix und als erste Spalte der Erläuterung
+    expect(h.match(/<span class="nb"><b>[A-N]<\/b> /g)).toHaveLength(14);
+    expect(h).toContain("<tr><td>N</td><td>Weichtiere</td>");
     expect(h).toContain("keines der 14 Hauptallergene");
     // je Kategorie eine Zeilengruppe; SO₂ in der Erläuterung tiefgestellt
     expect(h.match(/<tbody class="gruppe-block"><tr class="gruppe">/g)).toHaveLength(2);
@@ -121,11 +159,15 @@ describe("weitere Vorlagen", () => {
 
   it("feste Leerzeichen bei Paragraf, Artikel, Gesetz, Einheit – nicht in Tags, auch in Unterzeile und Kennungsleiste", () => {
     expect(festeLeerzeichen("(§ 43 Abs. 2) bei 121 °C, Art. 32 DSGVO, § 4 Abs. 1 DGUV Vorschrift 1, §§ 5 ArbSchG, Art. 6 Abs. 1 lit. b DSGVO, § 28a SGB IV, 19 %")).toBe(
-      "(§&nbsp;43 Abs.&nbsp;2) bei 121&nbsp;°C, Art.&nbsp;32&nbsp;DSGVO, §&nbsp;4 Abs.&nbsp;1 DGUV&nbsp;Vorschrift&nbsp;1, §§&nbsp;5&nbsp;ArbSchG, Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;b&nbsp;DSGVO, §&nbsp;28a&nbsp;SGB&nbsp;IV, 19&nbsp;%",
+      "(§&nbsp;43&nbsp;Abs.&nbsp;2) bei 121&nbsp;°C, Art.&nbsp;32&nbsp;DSGVO, §&nbsp;4&nbsp;Abs.&nbsp;1 DGUV&nbsp;Vorschrift&nbsp;1, §§&nbsp;5&nbsp;ArbSchG, Art.&nbsp;6&nbsp;Abs.&nbsp;1&nbsp;lit.&nbsp;b&nbsp;DSGVO, §&nbsp;28a&nbsp;SGB&nbsp;IV, 19&nbsp;%",
     );
+    // Nummer und Gliederungsangabe („622 Abs.“, „3 Satz“, „2 Nr.“), „je/pro/à“ nicht allein am Zeilenende
+    expect(festeLeerzeichen("§ 622 Abs. 2, § 3 Satz 1, § 4 Nr. 2, Satzung, je Stunde, (pro Monat), à 0,5 l")).toBe("§&nbsp;622&nbsp;Abs.&nbsp;2, §&nbsp;3&nbsp;Satz&nbsp;1, §&nbsp;4&nbsp;Nr.&nbsp;2, Satzung, je&nbsp;Stunde, (pro&nbsp;Monat), à&nbsp;0,5 l");
+    // in der schmalen Randspalte nicht (dort entstünden zu lange untrennbare Ketten)
+    expect(festeLeerzeichen('<span class="rand">Art. 6 Abs. 1 <span class="nb">lit. b–f</span> DSGVO</span> Art. 6 Abs. 1')).toBe('<span class="rand">Art.&nbsp;6 Abs.&nbsp;1 <span class="nb">lit.&nbsp;b–f</span> DSGVO</span> Art.&nbsp;6&nbsp;Abs.&nbsp;1');
     expect(festeLeerzeichen('<span title="§ 43 AO">Nr. und § und</span>')).toBe('<span title="§ 43 AO">Nr. und § und</span>');
     const h = html("ifsg_belehrung");
-    expect(h).toContain('<p class="unter">Belehrung durch den Arbeitgeber (§&nbsp;43 Abs.&nbsp;4&nbsp;IfSG)</p>');
+    expect(h).toContain('<p class="unter">Belehrung durch den Arbeitgeber (§&nbsp;43&nbsp;Abs.&nbsp;4&nbsp;IfSG)</p>');
     expect(h).toContain("<h1>Belehrung nach §&nbsp;43 Infektionsschutzgesetz</h1>");
     expect(h).toContain(".g-vertrag p, .g-vertrag li { text-align: left; }");
   });
@@ -148,7 +190,10 @@ describe("weitere Vorlagen", () => {
   it("Betriebsanweisung: Notruf-Zeile auch ohne Angabe, kompakter Satz bei viel Text", () => {
     expect(html("betriebsanweisung", { notruf: "" })).toContain('<div class="notruf">Notruf 112 · Ersthelfer/in: <span class="fuellen"></span></div>');
     const lang = "Sehr lange Angabe mit vielen Wörtern, die im Aushang mehr als eine Zeile braucht und so weiter.\nZweite Zeile mit weiteren Angaben.";
-    expect(html("betriebsanweisung", { gefahren: lang, schutz: lang, gefahrfall: lang, erste_hilfe: lang, entsorgung: lang })).toContain('<body class="g-aushang ba kompakt">');
+    // kompakt nach geschätzter Höhe der Kästen: zwei lange und drei kurze Kästen passen im normalen Satz, fünf lange nicht
+    expect(html("betriebsanweisung", { gefahren: lang, schutz: lang, gefahrfall: "Fenster öffnen.", erste_hilfe: "Augen spülen.", entsorgung: "Restmüll." })).toContain('<body class="g-aushang ba">');
+    const sehrLang = `${lang}\n${lang}`;
+    expect(html("betriebsanweisung", { gefahren: sehrLang, schutz: sehrLang, gefahrfall: lang, erste_hilfe: lang, entsorgung: lang })).toContain('<body class="g-aushang ba kompakt">');
   });
 
   it("Nachweis der Arbeitsbedingungen ohne Stunden: kein „an 5 Tagen“ als Bruchstück", () => {

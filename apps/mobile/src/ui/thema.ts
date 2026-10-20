@@ -1,4 +1,5 @@
-import { LayoutAnimation, Platform, StyleSheet, useColorScheme } from "react-native";
+import { useEffect, useState } from "react";
+import { AccessibilityInfo, LayoutAnimation, Platform, StyleSheet, useColorScheme } from "react-native";
 
 /**
  * Designsystem der App (docs/06-design.md, E-142 „Bühne und Papier“): Jede Tab-Seite beginnt auf der dunkelgrünen
@@ -32,6 +33,10 @@ const HELL = {
   fristHauch: "#ffe9ea",
   bald: "#a05a00",
   baldHauch: "#fff2dc",
+  /** Symbolscheibe in Bernstein (Kacheln, Plaketten) */
+  baldScheibe: "#fff2dc",
+  /** Kreis hinter einem Symbol auf einer bernsteinfarbenen Karte */
+  baldKreis: "#ffffff",
   lila: "#5e5ce6",
   lilaHauch: "#ecebfd",
   gold: "#a05a00",
@@ -42,11 +47,14 @@ const HELL = {
   buehne: "#063b29",
   buehneText: "#ffffff",
   buehneLeise: "rgba(255,255,255,0.74)",
-  buehneFlaeche: "rgba(255,255,255,0.12)",
+  /** Zweitknöpfe, Suchfeld und Plaketten auf der Bühne: deckend – das §-Motiv scheint nicht durch */
+  buehneFlaeche: "#1e5240",
   buehneKnopf: "#7fe3b8",
   buehneKnopfText: "#063b29",
   /** Tab-Leiste: dunkle Kapsel */
   kapsel: "#0c1f18",
+  /** Rand der Kapsel (nur dunkel sichtbar) */
+  kapselRand: "transparent",
   leiste: "rgba(255,255,255,0.8)",
   schatten: 0.08,
 };
@@ -70,7 +78,9 @@ const DUNKEL: typeof HELL = {
   frist: "#ff7a70",
   fristHauch: "#3a1715",
   bald: "#ffb340",
-  baldHauch: "#3a2a10",
+  baldHauch: "#2e2414",
+  baldScheibe: "rgba(255,179,64,0.14)",
+  baldKreis: "rgba(255,179,64,0.14)",
   lila: "#a5a3ff",
   lilaHauch: "#25243f",
   gold: "#ffb340",
@@ -80,10 +90,11 @@ const DUNKEL: typeof HELL = {
   buehne: "#0a2a1e",
   buehneText: "#ffffff",
   buehneLeise: "rgba(255,255,255,0.72)",
-  buehneFlaeche: "rgba(255,255,255,0.1)",
+  buehneFlaeche: "#1d3a2f",
   buehneKnopf: "#7fe3b8",
   buehneKnopfText: "#063b29",
-  kapsel: "#1f2a25",
+  kapsel: "#2a3a33",
+  kapselRand: "rgba(255,255,255,0.08)",
   leiste: "rgba(24,32,28,0.9)",
   schatten: 0,
 };
@@ -105,8 +116,13 @@ export const GROESSE = { mini: 11, caption: 13, klein: 15, basis: 17, gross: 20,
 export const ZIEL = 48;
 /** Seitenrand */
 export const RAND = 20;
-/** Ecken: Felder 14, Karten 24, Bühne und Blatt 32, Knöpfe 18 (abgerundete Rechtecke), Chips sind Pillen. */
-export const RADIUS = { klein: 14, karte: 24, buehne: 32, blatt: 8, knopf: 18 } as const;
+/**
+ * Ecken – eine Skala: 10 (kleine Flächen auf dem Papier), 14 (Felder, Kacheln, Fristblatt), 18 (Knöpfe, Antwortkarten),
+ * 24 (Karten), 32 (Bühne und Blatt), Pille (Chips, Plaketten). Das Papier selbst hat 6 – wie ein Blatt, nicht wie eine Karte.
+ */
+export const RADIUS = { fein: 10, klein: 14, knopf: 18, karte: 24, buehne: 32, pille: 999, blatt: 6 } as const;
+/** Abstand vom oberen Rand des hellen Blatts bis zum ersten Inhalt – auf allen Blättern gleich. */
+export const BLATT_OBEN = 24;
 export const HAARLINIE = StyleSheet.hairlineWidth;
 
 export function useFarben(): Farben {
@@ -120,6 +136,21 @@ export function schattenStil(f: Farben, staerke = 1) {
 }
 
 export const istIos = Platform.OS === "ios";
+
+/** „Bewegung reduzieren“ (Bedienungshilfen): dann keine Feder- und Stempel-Animationen. */
+export function useWenigBewegung(): boolean {
+  const [an, setAn] = useState(false);
+  useEffect(() => {
+    let aktiv = true;
+    void AccessibilityInfo.isReduceMotionEnabled().then((w) => aktiv && setAn(w)).catch(() => undefined);
+    const abo = AccessibilityInfo.addEventListener("reduceMotionChanged", (w: boolean) => setAn(w));
+    return () => {
+      aktiv = false;
+      abo.remove();
+    };
+  }, []);
+  return an;
+}
 
 /** Nächste Layout-Änderung weich einblenden (Auf- und Zuklappen) – im Web ohne Wirkung. */
 export function weich(): void {

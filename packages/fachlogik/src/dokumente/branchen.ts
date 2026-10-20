@@ -116,27 +116,30 @@ export const allergenAushang: Vorlage = {
     const g = liste(d, "gerichte").filter((x) => text(x, "name"));
     const kategorien = [...new Set(g.map((x) => text(x, "kategorie")))];
     const nummern = Object.keys(ALLERGENE);
-    // Matrix: eine Zeile je Speise, eine Spalte je Allergen (× = enthalten); je Kategorie eine Zeilengruppe mit
+    // Kennbuchstaben A–N in der Reihenfolge von Anhang II LMIV; die Zuordnung steht unter der Matrix (und in der Erläuterung)
+    const kz = (i: number) => String.fromCharCode(65 + i);
+    // Matrix: eine Zeile je Speise, eine Spalte je Allergen (● = enthalten); je Kategorie eine Zeilengruppe mit
     // Zwischenzeile, damit die Kategorie nicht allein am Seitenende steht
-    const kopf = `<thead><tr><th>Speise / Getränk</th>${nummern.map((id) => `<th class="dreh">${esc(ALLERGENE[id]!)}</th>`).join("")}</tr></thead>`;
+    const kopf = `<thead><tr><th>Speise / Getränk</th>${nummern.map((id, i) => `<th class="kz" title="${esc(ALLERGENE[id]!)}">${kz(i)}</th>`).join("")}</tr></thead>`;
     const zeilenHtml = kategorien
       .map((k) => {
         const zeilen = g.filter((x) => text(x, "kategorie") === k).map((x) => {
           const a = auswahl(x, "allergene");
           // „keines“ nur ausdrücklich bestätigt und ohne angekreuztes Allergen; sonst (nicht ausgefüllt, Widerspruch) kein Vermerk
           const keine = ja(x, "keine") && !a.length;
-          return `<tr><td><strong>${zelle(text(x, "name"))}</strong>${keine ? '<br><span class="klein">keines der 14 Hauptallergene</span>' : ""}</td>${nummern.map((id) => `<td class="x">${a.includes(id) ? "×" : ""}</td>`).join("")}</tr>`;
+          return `<tr><td><strong>${zelle(text(x, "name"))}</strong>${keine ? '<br><span class="klein">keines der 14 Hauptallergene</span>' : ""}</td>${nummern.map((id) => `<td class="x">${a.includes(id) ? "●" : ""}</td>`).join("")}</tr>`;
         });
         return `<tbody${k ? ' class="gruppe-block"' : ""}>${k ? `<tr class="gruppe"><td colspan="${nummern.length + 1}"><strong>${zelle(k)}</strong></td></tr>` : ""}${zeilen.join("")}</tbody>`;
       })
       .join("");
     // ohne Gerichte: Matrix mit leeren Zeilen zum Ausfüllen von Hand
     const leereZeilen = `<tbody>${Array.from({ length: 12 }, () => `<tr><td>&nbsp;</td>${nummern.map(() => '<td class="x"></td>').join("")}</tr>`).join("")}</tbody>`;
-    const inhalt = `<table class="liste matrix${g.length ? "" : " hoch"}"><colgroup><col style="width:37%">${nummern.map(() => `<col style="width:${(63 / nummern.length).toFixed(2)}%">`).join("")}</colgroup>${kopf}${g.length ? zeilenHtml : leereZeilen}</table>`;
+    const schluessel = `<p class="schluessel">${nummern.map((id, i) => `<span class="nb"><b>${kz(i)}</b> ${esc(ALLERGENE[id]!)}</span>`).join(" · ")}</p>`;
+    const inhalt = `<table class="liste matrix${g.length ? "" : " hoch"}"><colgroup><col style="width:37%">${nummern.map(() => `<col style="width:${(63 / nummern.length).toFixed(2)}%">`).join("")}</colgroup>${kopf}${g.length ? zeilenHtml : leereZeilen}</table>${schluessel}`;
     // leeres Blatt: die Matrix füllt die erste Seite, die Erläuterung folgt als eigenes Blatt; die Erläuterung bricht
     // nicht über zwei Seiten (Klasse „zusammen“)
     const legende = ja(d, "legende")
-      ? abschnitt("Die 14 Hauptallergene nach Anhang II der LMIV", tabelle(["Allergen", "umfasst"], nummern.map((id, i) => [esc(ALLERGENE[id]!), esc(ALLERGENE_UMFANG[i]?.umfasst ?? "")]), { breiten: ["30%", "70%"], klasse: "legende" }), g.length ? "zusammen" : "neue-seite zusammen")
+      ? abschnitt("Die 14 Hauptallergene nach Anhang II der LMIV", tabelle(["", "Allergen", "umfasst"], nummern.map((id, i) => [kz(i), esc(ALLERGENE[id]!), esc(ALLERGENE_UMFANG[i]?.umfasst ?? "")]), { breiten: ["6%", "28%", "66%"], klasse: "legende" }), g.length ? "zusammen" : "neue-seite zusammen")
       : "";
     return dokument({
       titel: "Allergene in unseren Speisen und Getränken",
@@ -278,7 +281,8 @@ function plan(o: { titel: string; unter?: string; d: Parameters<Vorlage["html"]>
     betrieb: o.b,
     unter: o.unter,
     quer: true,
-    klasse: zeichen > 900 ? "kompakt" : undefined,
+    // kompakter Satz erst bei viel Text (ab ca. 1.800 Zeichen); auch dann nicht unter 9,6 pt (CSS .g-aushang.kompakt)
+    klasse: zeichen > 1800 ? "kompakt" : undefined,
     // der Bereich steht schon als Unterzeile unter dem Titel
     // ohne Bereich: Linie zum Eintragen in der Kennungsleiste
     meta: `${o.unter ? "" : `Bereich: ${text(o.d, "bereich") || KOPF_LINIE}\n`}Stand: ${datumDe(text(o.d, "datum"))}\nVerantwortlich: ${text(o.d, "erstellt_von")}`,

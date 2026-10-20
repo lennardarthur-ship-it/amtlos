@@ -2,9 +2,9 @@ import { memo, useMemo, useState } from "react";
 import { View } from "react-native";
 import { ANLAESSE, BEREICHE, KURZ, VORLAGEN, unterlagenName, vorlageFuer, type Anlass, type Betrieb, type Vorlage } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { Karte, Knopf, Suchfeld, Symbol, T, TextKnopf, Zeile, type Ton } from "../ui/bausteine";
+import { Karte, Knopf, Suchfeld, Symbol, T, TextKnopf, Wahl, Zeile, type Ton } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
-import { RAND, useFarben } from "../ui/thema";
+import { useFarben } from "../ui/thema";
 import { fehltFuer } from "../unterlagen/pruefung";
 import { betriebFehlt, heute, sortiert, type Unterlage } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
@@ -15,8 +15,8 @@ import { useOeffnen, useStarten, useZiel } from "./starten";
 import { BelegErfassenSeite } from "./Belege";
 
 /** Symbol je Anlass. */
-/** Zweitfarbe je Anlass – Kategorien unterscheiden sich auf einen Blick (Wort und Symbol tragen die Bedeutung). */
-const ANLASS_TON: Record<string, Ton> = { einstellen: "lila", gruenden: "gold", laufend: "amt", steuern: "blau", website: "lila", datenschutz: "blau", sicherheit: "gold", gastro: "amt", beauty: "lila", panne: "bald" };
+/** Ton je Anlass (B11): ruhig grün, nur „Wenn etwas schiefgeht“ in Bernstein – Wort und Symbol tragen die Bedeutung. */
+const ANLASS_TON: Record<string, Ton> = { panne: "bald" };
 
 const ANLASS_SYMBOL: Record<string, string> = {
   einstellen: "person.badge.plus",
@@ -75,7 +75,8 @@ export const UnterlageZeile = memo(function UnterlageZeile({ u, letzte, fehlt, b
         symbol="eurosign"
         ton={ueber > 0 && !u.bezahlt ? "frist" : ton}
         titel={storno ? TEXT.storno_titel(nummer, storno) : kunde || TEXT.rechnung_ohne_kunde}
-        text={[storno ? kunde : nummer, ueber > 0 && !u.bezahlt && !fehlt ? "" : datum, zusatz].filter(Boolean).join(" · ")}
+        // geschütztes Leerzeichen vor dem Trenner: eine umbrechende Zeile beginnt nie mit „·“ (A15)
+        text={[storno ? kunde : nummer, ueber > 0 && !u.bezahlt && !fehlt ? "" : datum, zusatz].filter(Boolean).join("\u00a0· ")}
         wert={brutto ? euroText(brutto) : undefined}
         marke={marke}
         onPress={() => onPress(u.id)}
@@ -84,7 +85,7 @@ export const UnterlageZeile = memo(function UnterlageZeile({ u, letzte, fehlt, b
     );
   }
   const status = u.festgeschrieben ? TEXT.festgeschrieben_kurz : fehlt ? TEXT.fehlen(fehlt) : TEXT.vollstaendig;
-  return <Zeile symbol="doc.text" ton={ton} titel={unterlagenName(v, u.daten)} text={`${wann(zuletzt)} · ${status}`} onPress={() => onPress(u.id)} letzte={letzte} />;
+  return <Zeile symbol="doc.text" ton={ton} titel={unterlagenName(v, u.daten)} text={`${wann(zuletzt)}\u00a0· ${status}`} onPress={() => onPress(u.id)} letzte={letzte} />;
 });
 
 /** Tage über dem Zahlungsziel je offener Rechnung – einmal je Stand berechnet. */
@@ -129,9 +130,21 @@ export { Suchfeld };
 
 const passt = (s: string) => (v: Vorlage) => !s || `${v.titel} ${KURZ[v.id] ?? ""} ${v.beschreibung}`.toLowerCase().includes(s);
 
-function Treffer({ s }: { s: string }) {
+function Treffer({ s, setzen }: { s: string; setzen?: (w: string) => void }) {
   const liste = VORLAGEN.filter(passt(s));
-  return <View style={{ marginTop: 16 }}>{liste.length ? <VorlagenListe liste={liste} /> : <T leise>{TEXT.nichts_gefunden}</T>}</View>;
+  if (liste.length) return <View>{<VorlagenListe liste={liste} />}</View>;
+  // nichts gefunden (B7): nicht nur „nichts da“, sondern Vorschläge, mit denen es weitergeht
+  return (
+    <View style={{ gap: 12 }}>
+      <T leise>{TEXT.nichts_gefunden}</T>
+      {setzen ? (
+        <View style={{ gap: 4 }}>
+          <T v="klein" fett>{TEXT.suche_vielleicht}</T>
+          <Wahl wert={null} aendern={setzen} optionen={TEXT.suche_beispiele.map((b) => ({ wert: b, text: b }))} />
+        </View>
+      ) : null}
+    </View>
+  );
 }
 
 /** Alle Vorlagen nach Bereich – für alle, die wissen, was sie suchen. */
@@ -144,11 +157,13 @@ function AlleSeite() {
       <Inhalt>
         <Suchfeld wert={suche} setzen={setSuche} />
         {s ? (
-          <Treffer s={s} />
+          <View style={{ marginTop: 16 }}>
+            <Treffer s={s} setzen={setSuche} />
+          </View>
         ) : (
           BEREICHE.map((b) => (
             <View key={b.id} style={{ marginTop: 22 }}>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 8, marginLeft: 2 }}>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 8 }}>
                 <Symbol name={BEREICH_SYMBOL[b.id]} groesse={18} farbe={f.tinteLeise} />
                 <T v="klein" fett leise accessibilityRole="header">{b.titel}</T>
               </View>
@@ -181,20 +196,19 @@ export function Unterlagen(_: { schliessen?: boolean }) {
     <BuehnenBlatt
       titel={TEXT.neu_titel}
       unter={TEXT.unterlagen_unter}
+      // das Suchfeld bleibt beim Tippen oben stehen, die Treffer scrollen darunter (A17)
+      fest={<Suchfeld buehne wert={suche} setzen={setSuche} />}
       buehne={
-        <View style={{ gap: 12, marginTop: 4 }}>
-          <Suchfeld buehne wert={suche} setzen={setSuche} />
-          {s ? null : (
-            <View style={{ flexDirection: "row", gap: 10 }}>
-              <Knopf buehne symbol="plus" text={TEXT.kurz_rechnung} onPress={() => starten("rechnung")} stil={{ flex: 1, paddingHorizontal: 12 }} />
-              <Knopf glas symbol="doc.viewfinder" text={TEXT.kurz_beleg} onPress={() => ziel((n) => n.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />))} stil={{ flex: 1, paddingHorizontal: 12 }} />
-            </View>
-          )}
-        </View>
+        s ? undefined : (
+          <View style={{ flexDirection: "row", gap: 10 }}>
+            <Knopf buehne symbol="plus" text={TEXT.kurz_rechnung} onPress={() => starten("rechnung")} stil={{ flex: 1, paddingHorizontal: 12 }} />
+            <Knopf glas symbol="doc.viewfinder" text={TEXT.kurz_beleg} onPress={() => ziel((n) => n.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />))} stil={{ flex: 1, paddingHorizontal: 12 }} />
+          </View>
+        )
       }
     >
       {s ? (
-        <Treffer s={s} />
+        <Treffer s={s} setzen={setSuche} />
       ) : (
         <View>
           {betriebFehlt(stand.betrieb) ? (
@@ -223,7 +237,7 @@ export function Unterlagen(_: { schliessen?: boolean }) {
                   <UnterlageZeile key={u.id} u={u} ueber={ueberJe.get(u.id) ?? 0} letzte={i === zuletzt.length - 1} fehlt={fehltJe.get(u.id) ?? 0} betrieb={stand.betrieb} onPress={oeffnen} />
                 ))}
               </Karte>
-              {stand.unterlagen.length > zuletzt.length ? <TextKnopf text={TEXT.alle_anzeigen} onPress={() => ziel(() => tabWechseln("meine"))} stil={{ marginLeft: 4 }} /> : null}
+              {stand.unterlagen.length > zuletzt.length ? <TextKnopf text={TEXT.alle_anzeigen} onPress={() => ziel(() => tabWechseln("meine"))} /> : null}
             </Gruppe>
           ) : null}
 
@@ -239,7 +253,7 @@ export function Unterlagen(_: { schliessen?: boolean }) {
           </Karte>
         </View>
       )}
-      <T v="caption" leise stil={{ marginTop: 24, paddingHorizontal: RAND / 5 }}>{TEXT.ueber}</T>
+      <T v="caption" leise stil={{ marginTop: 24 }}>{TEXT.ueber}</T>
     </BuehnenBlatt>
   );
 }

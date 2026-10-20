@@ -21,6 +21,7 @@ import { CloudZeile, SicherungSeite, WiederherstellenSeite } from "./Sicherung";
 import { ProZeile, useProSperre } from "./Pro";
 import { UeberGruppe } from "./Recht";
 import { SteuerberatungSeite } from "./Steuerberatung";
+import { KontrollmappeSeite } from "./Kontrollmappe";
 import { KontoZeile } from "./Konto";
 import { syncAngeboten } from "../konto/konfig";
 
@@ -349,6 +350,11 @@ export function Betrieb() {
       <Gruppe titel={TEXT.steuerpaket_titel}>
         <Karte>
           <Zeile symbol="briefcase" ton="gold" titel={TEXT.steuerpaket_zeile} text={TEXT.steuerpaket_zeile_text} onPress={() => nav.oeffnen("steuerberatung", () => <SteuerberatungSeite />, true)} letzte />
+        </Karte>
+      </Gruppe>
+      <Gruppe titel={TEXT.kontrollmappe_gruppe_titel}>
+        <Karte>
+          <Zeile symbol="folder" ton="blau" titel={TEXT.kontrollmappe_zeile} text={TEXT.kontrollmappe_zeile_text} onPress={() => nav.oeffnen("kontrollmappe", () => <KontrollmappeSeite />, true)} letzte />
         </Karte>
       </Gruppe>
       <Gruppe titel={TEXT.personen_gruppe}>

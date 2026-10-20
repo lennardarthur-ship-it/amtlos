@@ -2,10 +2,9 @@ import { useEffect, useState } from "react";
 import { dokumentHtml, pdfDateiname, vorlageFuer } from "@amtlos/fachlogik";
 import { betriebFuerDokument } from "../pro/regeln";
 import { pdfBytes } from "../unterlagen/pdf";
-import { ScrollView, View } from "react-native";
+import { View } from "react-native";
 import { T as TEXT } from "../texte";
-import { RAND } from "../ui/thema";
-import { Feld, Fuss, Hinweis, Karte, Knopf, T, Wahl } from "../ui/bausteine";
+import { ChipLeiste, Feld, Fuss, Hinweis, Karte, Knopf, T, Wahl } from "../ui/bausteine";
 import { useMeldung, useMeldungLeeren } from "../ui/meldung";
 import { Unterseite } from "../ui/navigation";
 import { gestellteRechnungen, standardZeitraum, steuerpaket, zeitraeume } from "../unterlagen/steuerpaket";
@@ -87,9 +86,8 @@ export function SteuerberatungSeite() {
     <Unterseite titel={TEXT.steuerpaket_titel} unter={TEXT.steuerpaket_text}>
       <Inhalt>
         <T v="klein" fett>{TEXT.steuerpaket_zeitraum}</T>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 8, marginHorizontal: -RAND }} contentContainerStyle={{ paddingHorizontal: RAND }}>
-          <Wahl wert={wahl} aendern={setWahl} optionen={liste.map((x) => ({ wert: x.name, text: nameVon(x.name) }))} />
-        </ScrollView>
+        {/* scrollt zum vorausgewählten Zeitraum, mit Seitenrand davor (A16) */}
+        <ChipLeiste wert={wahl} aendern={setWahl} optionen={liste.map((x) => ({ wert: x.name, text: nameVon(x.name) }))} stil={{ marginTop: 8 }} />
         <Karte stil={{ marginTop: 12, paddingVertical: 12 }}>
           <T fett>{nameVon(wahl)}</T>
           <T v="klein" leise>{TEXT.steuerpaket_inhalt(anzahlR, anzahlB)}</T>

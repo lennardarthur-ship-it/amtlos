@@ -217,6 +217,9 @@ function paketNeuerungen(name, zr, inhalt, erg, kleinunternehmer, belegeRoh) {
   vergleich(bereich, `Fragen_${zr.name}.txt vorhanden`, fragen ? "ja" : "nein", "ja");
   const liesmich = Buffer.from(inhalt["LIESMICH.txt"]).toString("utf8");
   vergleich(bereich, "LIESMICH: Mandant-Block und „Nicht enthalten – bitte zusätzlich liefern“", /Mandant \(Angaben aus der App\)/.test(liesmich) && /Nicht enthalten – bitte zusätzlich liefern/.test(liesmich) && /Kassenumsätze/.test(liesmich) && /Lohnjournal/.test(liesmich) ? "ja" : "nein", "ja");
+  // Kasse laut Pflichten-Check (ja): Hinweis auf fehlende Kassenumsätze ganz oben im LIESMICH und in den Fragen
+  vergleich(bereich, "LIESMICH: „Betrieb mit Kasse: Kassenumsätze fehlen in diesem Paket.“ in der ersten Zeile", /^Betrieb mit Kasse: Kassenumsätze fehlen in diesem Paket\./.test(liesmich) ? "ja" : "nein", "ja");
+  vergleich(bereich, "Fragen: Kassenhinweis", /Betrieb mit Kasse: Kassenumsätze fehlen in diesem Paket\./.test(fragen) ? "ja" : "nein", "ja");
   vergleich(bereich, "LIESMICH: Kleinunternehmer ja/nein", (/Kleinunternehmer \(§ 19 UStG\): (ja|nein)/.exec(liesmich) ?? [])[1] ?? "fehlt", kleinunternehmer ? "ja" : "nein");
   const jahr = /^\d{4}$/.test(zr.name);
   vergleich(bereich, "LIESMICH: Satz „Nicht zusätzlich zu den Monats-/Quartalsstapeln importieren“ genau im Jahrespaket", /Nicht zusätzlich zu den Monats-\/Quartalsstapeln importieren/.test(liesmich) ? "ja" : "nein", jahr ? "ja" : "nein");
@@ -283,7 +286,8 @@ const pJahr = paketPruefen("Jahr 2026", { von: "2026-01-01", bis: "2026-12-31", 
   const ohneDatum = bau.docs.filter((d) => !/-\d{4}-\d{2}-\d{2}\.pdf$/.test(d.datei));
   vergleich("Dateinamen", "PDF-Namen enden mit vollständigem Datum", ohneDatum.length ? ohneDatum.map((d) => d.datei).join(", ") : "alle", "alle");
 }
-const pdftext = (p) => execFileSync("pdftotext", ["-layout", p, "-"], { encoding: "utf8" });
+// typografisches Minus (U+2212) der PDFs wie den Bindestrich der Erwartungswerte behandeln
+const pdftext = (p) => execFileSync("pdftotext", ["-layout", p, "-"], { encoding: "utf8" }).replace(/\u2212/g, "-");
 for (const x of D.vorgaenge()) {
   const d = bau.docs.find((y) => y.ordner === "rechnungen" && y.datei.includes(x.nummer));
   if (!d) continue;

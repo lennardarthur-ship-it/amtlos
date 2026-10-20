@@ -4,7 +4,8 @@
  * - bei Briefen (DIN 5008): die Geschäftsangaben in Spalten (Anschrift, Kontakt, Bank, Steuer/Register), Falz- und
  *   Lochmarken auf der ersten Seite und ab zwei Seiten „Seite x von y“. Die Spalten werden nie gekürzt (Pflichtangaben
  *   nach § 35a GmbHG, § 37a HGB): sie brechen um, die Spaltenbreiten richten sich nach dem Inhalt;
- * - sonst: „Betrieb · Dokument“ links und „Stand … · Seite x von y“ rechts;
+ * - sonst: „Betrieb · Dokument“ links und „Stand … · Seite x von y“ rechts, bündig mit dem Satzspiegel der Gestalt
+ *   (linker und rechter Seitenrand aus der Meta-Angabe „amtlos-raender“, z. B. Aushang 14 mm, Nachweis 18 mm);
  * - ab Seite 2 immer eine kleine Kopfzeile mit dem Dokumentnamen, damit lose Blätter zuzuordnen sind.
  * Schrift: Amtlos Sans (wie im Dokument), notfalls Helvetica.
  */
@@ -21,6 +22,8 @@ export interface FussAngaben {
   rechts: string;
   spalten: string[][];
   farbe: string;
+  /** Seitenränder der Gestalt in mm (oben, rechts, unten, links) – fehlen sie, gelten 20 mm links und rechts */
+  raender?: [number, number, number, number];
 }
 
 const entity = (t: string) => t.replace(/&quot;/g, '"').replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
@@ -35,7 +38,9 @@ export function fussAngaben(html: string): FussAngaben {
   } catch {
     spalten = [];
   }
-  return { gestalt: meta("amtlos-gestalt") || "nachweis", links: meta("amtlos-fuss-links"), rechts: meta("amtlos-fuss-rechts"), spalten, farbe: meta("amtlos-farbe") || "#2f3a45" };
+  const r = meta("amtlos-raender").split(",").map(Number);
+  const raender = r.length === 4 && r.every((x) => Number.isFinite(x) && x >= 0 && x < 60) ? (r as [number, number, number, number]) : undefined;
+  return { gestalt: meta("amtlos-gestalt") || "nachweis", links: meta("amtlos-fuss-links"), rechts: meta("amtlos-fuss-rechts"), spalten, farbe: meta("amtlos-farbe") || "#2f3a45", ...(raender ? { raender } : {}) };
 }
 
 /** Zeichen, die die Schrift darstellen kann (Latin-1, Latin Extended-A und Satzzeichen; Helvetica nur WinAnsi). */
@@ -102,16 +107,16 @@ function kuerzen(t: string, schrift: PDFFont, groesse: number, max: number): str
   return s;
 }
 
-/** Geschäftsangaben gesetzt: Spaltenbreiten, Zeilen (umbrochen, nie gekürzt), Schriftgröße (6,8 pt, bei mehr als fünf Zeilen kleiner). */
+/** Geschäftsangaben gesetzt: Spaltenbreiten, Zeilen (umbrochen, nie gekürzt), Schriftgröße (7,2 pt, bei mehr als fünf Zeilen kleiner). */
 function briefSpalten(spalten: string[][], verfuegbar: number, normal: PDFFont, fett: PDFFont, eigen: boolean) {
   const abstandSpalten = 8;
-  for (const groesse of [6.8, 6.4, 6]) {
+  for (const groesse of [7.2, 6.8, 6.4]) {
     const zeilenRoh = spalten.map((s) => s.map((z) => ({ fett: z.startsWith("**") && z.endsWith("**"), text: darstellbar(z.startsWith("**") && z.endsWith("**") ? z.slice(2, -2) : z, eigen) })));
     const natuerlich = zeilenRoh.map((s) => Math.max(...s.map((z) => (z.fett ? fett : normal).widthOfTextAtSize(z.text, groesse))) + abstandSpalten);
     const breiten = spaltenBreiten(natuerlich, verfuegbar);
     const gesetzt = zeilenRoh.map((s, i) => s.flatMap((z) => umbrechen(z.text, z.fett ? fett : normal, groesse, breiten[i]! - abstandSpalten).map((t) => ({ fett: z.fett, text: t }))));
     const abstand = groesse * 1.27;
-    if (Math.max(...gesetzt.map((s) => s.length)) <= 5 || groesse === 6) return { spalten: gesetzt, breiten, groesse, abstand };
+    if (Math.max(...gesetzt.map((s) => s.length)) <= 5 || groesse === 6.4) return { spalten: gesetzt, breiten, groesse, abstand };
   }
   throw new Error("unerreichbar");
 }
@@ -173,20 +178,23 @@ export async function fusszeileStempeln(pdf: string | Uint8Array, f: FussAngaben
       }
       return;
     }
-    const rand = 20 * MM;
-    const y = 9 * MM;
+    // bündig mit dem Satzspiegel: linker bzw. rechter Seitenrand der Gestalt
+    const randL = (f.raender?.[3] ?? 20) * MM;
+    const randR = (f.raender?.[1] ?? 20) * MM;
+    // Aushang: unterer Rand nur 16 mm – die Fußzeile steht tiefer
+    const y = (f.gestalt === "aushang" ? 7 : 9) * MM;
     const groesse = 7.2;
     const r = darstellbar([f.rechts, `Seite ${i + 1} von ${seiten.length}`].filter(Boolean).join(" · "), eigen);
     const rBreite = normal.widthOfTextAtSize(r, groesse);
-    const l = kuerzen(darstellbar(f.links, eigen), normal, groesse, width - 2 * rand - rBreite - 16);
-    seite.drawLine({ start: { x: rand, y: y + 10 }, end: { x: rand + 14, y: y + 10 }, thickness: 1.2, color: akzent });
-    seite.drawLine({ start: { x: rand + 14, y: y + 10 }, end: { x: width - rand, y: y + 10 }, thickness: 0.4, color: linie });
-    seite.drawText(l, { x: rand, y, size: groesse, font: normal, color: grau });
-    seite.drawText(r, { x: width - rand - rBreite, y, size: groesse, font: normal, color: grau });
+    const l = kuerzen(darstellbar(f.links, eigen), normal, groesse, width - randL - randR - rBreite - 16);
+    seite.drawLine({ start: { x: randL, y: y + 10 }, end: { x: randL + 14, y: y + 10 }, thickness: 1.2, color: akzent });
+    seite.drawLine({ start: { x: randL + 14, y: y + 10 }, end: { x: width - randR, y: y + 10 }, thickness: 0.4, color: linie });
+    seite.drawText(l, { x: randL, y, size: groesse, font: normal, color: grau });
+    seite.drawText(r, { x: width - randR - rBreite, y, size: groesse, font: normal, color: grau });
     // Folgeseiten: Dokumentname oben rechts
     if (i > 0) {
-      const kopf = kuerzen(darstellbar(f.links.split(" · ").slice(1).join(" · ") || f.links, eigen), normal, groesse, (width - 2 * rand) * 0.6);
-      seite.drawText(kopf, { x: width - rand - normal.widthOfTextAtSize(kopf, groesse), y: height - 7.5 * MM, size: groesse, font: normal, color: grau });
+      const kopf = kuerzen(darstellbar(f.links.split(" · ").slice(1).join(" · ") || f.links, eigen), normal, groesse, (width - randL - randR) * 0.6);
+      seite.drawText(kopf, { x: width - randR - normal.widthOfTextAtSize(kopf, groesse), y: height - 7.5 * MM, size: groesse, font: normal, color: grau });
     }
   });
   return doc.save();

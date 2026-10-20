@@ -12,6 +12,7 @@ import { belegFoto } from "../unterlagen/belegfoto";
 import { ausUtf8, base64 } from "../unterlagen/sicherung";
 import { dateiTeilenBytes, dateiWaehlenBytes } from "../unterlagen/sicherungDatei";
 import { leererBeleg, neueId } from "../unterlagen/speicher";
+import { istKleinunternehmer } from "../unterlagen/steuerpaket";
 import { useAmtlos } from "../zustand";
 import { bestaetigen } from "../ui/bestaetigen";
 import { BuehnenBlatt, GrosserBetrag, datumKurz } from "./gemeinsam";
@@ -166,6 +167,9 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
   zRef.current = z;
   // Betragsfelder als Text, damit Eingaben wie „12,“ nicht verloren gehen
   const [betraege, setBetraege] = useState<string[]>(() => (b?.steuer ?? []).map((s) => betragText(s.brutto_cent)));
+  // Kleinunternehmer ziehen keine Vorsteuer ab: der Schalter steht dann unter „Weitere Angaben“ (außer er ist an)
+  const ku = istKleinunternehmer(z.stand);
+  const [vorsteuerOffen, setVorsteuerOffen] = useState(false);
   useEffect(
     () => () => {
       const jetzt = zRef.current.stand.belege.find((x) => x.id === id);
@@ -232,12 +236,22 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
             </View>
           ))}
         </Karte>
-        <Schalter label={TEXT.beleg_vorsteuer} hilfe={TEXT.beleg_vorsteuer_hilfe} wert={b.vorsteuer} aendern={(w) => setze({ vorsteuer: w })} />
+        {ku ? null : <Schalter label={TEXT.beleg_vorsteuer} hilfe={TEXT.beleg_vorsteuer_hilfe} wert={b.vorsteuer} aendern={(w) => setze({ vorsteuer: w })} />}
         <AuswahlZeile label={TEXT.beleg_kategorie} wert={b.kategorie} aendern={(w) => setze({ kategorie: w })} optionen={KATEGORIEN.map((x) => ({ wert: x.id, text: x.titel }))} />
         {k.hinweis ? <T v="caption" leise stil={{ marginTop: 4 }}>{k.hinweis}</T> : null}
         <Wahl label={TEXT.beleg_zahlung} wert={b.zahlung} aendern={(w) => setze({ zahlung: w })} optionen={ZAHLUNGSWEGE} />
         <DatumFeld label={TEXT.beleg_bezahlt} hilfe={TEXT.beleg_bezahlt_hilfe} wert={b.bezahlt ?? null} aendern={(d) => setze({ bezahlt: d })} />
         <Feld label={TEXT.beleg_notiz} wert={b.notiz ?? ""} aendern={(w) => setze({ notiz: w || null })} mehrzeilig />
+        {ku ? (
+          <View style={{ marginTop: 14 }}>
+            <T v="caption" leise>{TEXT.beleg_ku_keine_vorsteuer}</T>
+            {vorsteuerOffen || b.vorsteuer ? (
+              <Schalter label={TEXT.beleg_vorsteuer} hilfe={TEXT.beleg_vorsteuer_hilfe} wert={b.vorsteuer} aendern={(w) => setze({ vorsteuer: w })} />
+            ) : (
+              <TextKnopf symbol="chevron.down" text={TEXT.weitere_angaben(1)} erweitert={false} onPress={() => { weich(); setVorsteuerOffen(true); }} />
+            )}
+          </View>
+        ) : null}
         <TextKnopf
           symbol="trash"
           gefahr

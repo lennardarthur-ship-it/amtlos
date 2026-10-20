@@ -165,7 +165,7 @@ export function WiederherstellenSeite({ fertig }: { fertig?: () => void }) {
               else setHinweis(TEXT.icloud_leer);
             })
           }
-          stil={{ marginLeft: 4, marginTop: 4 }}
+          stil={{ marginTop: 4 }}
         />
       ) : null}
       {datei && !gelesen ? <PasswortFeld label={TEXT.passwort} wert={pw} aendern={(w) => { setPw(w); setFehler(null); }} onSubmitEditing={() => void oeffnen()} /> : null}
@@ -199,7 +199,7 @@ export function SicherungsKarte() {
   return (
     // kompakt: eine Zeile mit Symbol, Satz und Pfeil – der Hinweis soll auffallen, nicht die Seite beherrschen
     <Pressable accessibilityRole="button" accessibilityLabel={`${TEXT.sicherung_faellig_titel}. ${TEXT.sicherung_faellig(faellig.tage)}`} onPress={() => nav.oeffnen("sicherung", () => <SicherungSeite />, true)} style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 14, padding: 14, borderRadius: RADIUS.karte, backgroundColor: f.baldHauch, marginBottom: 18, opacity: pressed ? 0.75 : 1 })}>
-      <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: f.papier, alignItems: "center", justifyContent: "center" }}>
+      <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: f.baldKreis, alignItems: "center", justifyContent: "center" }}>
         <Symbol name="exclamationmark.shield" groesse={20} farbe={f.bald} gewicht="semibold" />
       </View>
       <View style={{ flex: 1 }}>

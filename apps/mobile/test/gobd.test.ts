@@ -50,7 +50,7 @@ describe("Rechnungen nach GoBD (E-127)", () => {
     const html = dokumentHtml(vorlageFuer("rechnung")!, st!.daten, B).replace(/\u00a0|\u202f/g, " ");
     expect(html).toContain("Stornorechnung 2026-002");
     expect(html).toContain("storniert die Rechnung Nr. 2026-001");
-    expect(html).toContain("-23,80 €");
+    expect(html).toContain("\u221223,80 €");
     // ein verworfener Storno-Entwurf gibt die Rechnung wieder frei
     expect(loeschen(s, "st").unterlagen.find((x) => x.id === "r1")!.storniertDurch).toBeUndefined();
   });

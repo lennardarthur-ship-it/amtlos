@@ -1,12 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { SymbolView, type SymbolViewProps } from "expo-symbols";
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { AccessibilityInfo, ActivityIndicator, Pressable, Text as RNText, Switch, TextInput, View, useColorScheme, useWindowDimensions, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
+import { NavigationContext } from "@react-navigation/native";
+import { createContext, useContext, useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { AccessibilityInfo, ActivityIndicator, Animated, Pressable, Text as RNText, ScrollView, Switch, TextInput, View, useColorScheme, useWindowDimensions, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { T as TEXT } from "../texte";
 import { DatumWahl } from "./datumwahl";
-import { GROESSE, HAARLINIE, RADIUS, SCHRIFT, TASTATUR_FERTIG, ZIEL, istIos, useFarben, weich, type Farben } from "./thema";
+import { FussKontext } from "./fussHoehe";
+import { GROESSE, HAARLINIE, RADIUS, RAND, SCHRIFT, TASTATUR_FERTIG, ZIEL, istIos, useFarben, useWenigBewegung, weich, type Farben } from "./thema";
 
 type Variante = "grossTitel" | "titel" | "gross" | "basis" | "klein" | "caption" | "mini";
 /** Textstile in Onest (E-142): Titel extrafett und eng gesetzt, Fließtext ruhig. */
@@ -77,10 +79,11 @@ export function Symbol({ name, groesse = 22, farbe, gewicht = "medium" }: { name
   );
 }
 
+/** Töne für Kacheln und Plaketten. Auf den Seiten nur Grün, Grau und Bernstein (Rot für Überfälliges) – Lila, Gold und Blau sind veraltet. */
 export type Ton = "amt" | "bald" | "frist" | "leise" | "lila" | "gold" | "blau";
 export const tonFarben = (f: Farben, ton: Ton) =>
   ton === "bald"
-    ? { grund: f.baldHauch, zeichen: f.bald }
+    ? { grund: f.baldScheibe, zeichen: f.bald }
     : ton === "frist"
       ? { grund: f.fristHauch, zeichen: f.frist }
       : ton === "leise"
@@ -98,7 +101,7 @@ export function Kachel({ symbol, ton = "amt", groesse = 40 }: { symbol: string; 
   const f = useFarben();
   const t = tonFarben(f, ton);
   return (
-    <View style={{ width: groesse, height: groesse, borderRadius: Math.round(groesse * 0.32), backgroundColor: t.grund, alignItems: "center", justifyContent: "center" }}>
+    <View style={{ width: groesse, height: groesse, borderRadius: groesse <= 56 ? RADIUS.klein : RADIUS.karte, backgroundColor: t.grund, alignItems: "center", justifyContent: "center" }}>
       <Symbol name={symbol} groesse={Math.round(groesse * 0.5)} farbe={t.zeichen} gewicht="semibold" />
     </View>
   );
@@ -134,7 +137,7 @@ export function Fristblatt({ termin, heute, erledigt, groesse = 46 }: { termin: 
   const t = erledigt ? tonFarben(f, "amt") : tage < 0 ? tonFarben(f, "frist") : tage <= 14 ? tonFarben(f, "bald") : { grund: f.flaeche, zeichen: f.tinte };
   const fmt = (o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", ...o }).format(d).replace(".", "");
   return (
-    <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={{ width: groesse, height: groesse, borderRadius: Math.round(groesse * 0.32), backgroundColor: t.grund, alignItems: "center", justifyContent: "center" }}>
+    <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={{ width: groesse, height: groesse, borderRadius: RADIUS.klein, backgroundColor: t.grund, alignItems: "center", justifyContent: "center" }}>
       <RNText allowFontScaling={false} style={{ ...SCHRIFT.display, fontSize: groesse * 0.38, lineHeight: groesse * 0.42, color: t.zeichen, letterSpacing: -0.5 }}>{fmt({ day: "numeric" })}</RNText>
       <RNText allowFontScaling={false} style={{ ...SCHRIFT.bold, fontSize: groesse * 0.21, lineHeight: groesse * 0.26, color: t.zeichen, textTransform: "uppercase", letterSpacing: 0.4 }}>{fmt({ month: "short" })}</RNText>
     </View>
@@ -167,7 +170,7 @@ export function Motiv({ zeichen, groesse = 220, farbe, stil }: { zeichen: string
  * Der Amtlos-Stempel (wie im App-Symbol): doppelter Ring mit Haken, leicht gedreht – „amtlich erledigt, ohne Amt“.
  * Das eine wiederkehrende Bildzeichen: Einladung, leere Listen, geschaffte Schritte. Rein dekorativ.
  */
-export function Stempel({ groesse = 64, farbe, grund }: { groesse?: number; farbe?: string; grund?: string }) {
+export function Stempel({ groesse = 64, farbe, grund, text, unter }: { groesse?: number; farbe?: string; grund?: string; text?: string; unter?: string }) {
   const f = useFarben();
   const c = farbe ?? f.amt;
   const ring = Math.max(2, Math.round(groesse * 0.075));
@@ -175,9 +178,42 @@ export function Stempel({ groesse = 64, farbe, grund }: { groesse?: number; farb
     <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={{ width: groesse, height: groesse, transform: [{ rotate: "-12deg" }] }}>
       <View style={{ position: "absolute", inset: 0, borderRadius: groesse / 2, borderWidth: ring, borderColor: c, backgroundColor: grund }} />
       <View style={{ position: "absolute", top: groesse * 0.13, left: groesse * 0.13, right: groesse * 0.13, bottom: groesse * 0.13, borderRadius: groesse, borderWidth: Math.max(1, ring / 3.5), borderColor: c, alignItems: "center", justifyContent: "center" }}>
-        <Symbol name="checkmark" groesse={Math.round(groesse * 0.4)} farbe={c} gewicht="heavy" />
+        {text ? (
+          // Wort-Stempel („GETEILT“, „BEZAHLT“) mit Datum darunter – wie ein Eingangsstempel auf Papier
+          <>
+            <RNText allowFontScaling={false} style={{ ...SCHRIFT.display, color: c, fontSize: groesse * 0.135, lineHeight: groesse * 0.17, letterSpacing: groesse * 0.006 }}>{text.toUpperCase()}</RNText>
+            {unter ? <RNText allowFontScaling={false} style={{ ...SCHRIFT.bold, color: c, fontSize: groesse * 0.1, lineHeight: groesse * 0.13, marginTop: groesse * 0.02 }}>{unter}</RNText> : null}
+          </>
+        ) : (
+          <Symbol name="checkmark" groesse={Math.round(groesse * 0.4)} farbe={c} gewicht="heavy" />
+        )}
       </View>
     </View>
+  );
+}
+
+/**
+ * Auftritt eines Stempels (B1): fällt mit einer Feder auf das Papier (~280 ms) und gibt eine Erfolgs-Haptik –
+ * nur wenn `jetzt` (gerade eben geteilt bzw. bezahlt); mit „Bewegung reduzieren“ steht er einfach da.
+ */
+export function StempelAuftritt({ jetzt, children, stil }: { jetzt: boolean; children: ReactNode; stil?: StyleProp<ViewStyle> }) {
+  const wenig = useWenigBewegung();
+  const los = useRef(new Animated.Value(jetzt ? 0 : 1)).current;
+  useEffect(() => {
+    if (!jetzt) return;
+    if (istIos) void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => undefined);
+    if (wenig) {
+      los.setValue(1);
+      return;
+    }
+    los.setValue(0);
+    Animated.spring(los, { toValue: 1, useNativeDriver: true, damping: 14, stiffness: 260, mass: 0.7 }).start();
+  }, [jetzt, wenig, los]);
+  const scale = los.interpolate({ inputRange: [0, 1], outputRange: [1.7, 1] });
+  return (
+    <Animated.View pointerEvents="none" style={[{ opacity: los.interpolate({ inputRange: [0, 0.35, 1], outputRange: [0, 1, 1] }), transform: [{ scale }] }, stil]}>
+      {children}
+    </Animated.View>
   );
 }
 
@@ -263,10 +299,45 @@ export function TextKnopf({ text, onPress, symbol, gefahr, leise, buehne, stil, 
 export function Fuss({ children, ueber, buehne }: { children: ReactNode; ueber?: ReactNode; buehne?: boolean }) {
   const f = useFarben();
   const inset = useSafeAreaInsets();
+  const grund = buehne ? f.buehne : f.papier;
+  // Höhe melden, solange die Seite im Fokus ist – Meldungen erscheinen dann über der Leiste (A4)
+  const melden = useContext(FussKontext);
+  const nav = useContext(NavigationContext);
+  const id = useId();
+  const [hoehe, setHoehe] = useState(0);
+  const [fokus, setFokus] = useState(() => nav?.isFocused() ?? true);
+  useEffect(() => {
+    if (!nav) return;
+    setFokus(nav.isFocused());
+    const an = nav.addListener("focus", () => setFokus(true));
+    const aus = nav.addListener("blur", () => setFokus(false));
+    return () => {
+      an();
+      aus();
+    };
+  }, [nav]);
+  useEffect(() => {
+    melden?.(id, fokus && hoehe ? hoehe : null);
+    return () => melden?.(id, null);
+  }, [melden, id, fokus, hoehe]);
   return (
-    <View style={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: Math.max(inset.bottom, 14) + 4, backgroundColor: buehne ? f.buehne : f.papier, gap: 8 }}>
+    <View onLayout={(e) => setHoehe(Math.round(e.nativeEvent.layout.height))} style={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: Math.max(inset.bottom, 14) + 4, backgroundColor: grund, gap: 8 }}>
+      {/* weicher Übergang statt harter Kante: der Inhalt läuft unter der Leiste aus (A5) */}
+      <Verlauf farbe={grund} />
       {ueber}
       <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>{children}</View>
+    </View>
+  );
+}
+
+/** 24 pt Verlauf von durchsichtig zur Grundfarbe, über dem oberen Rand des Elternelements; fängt keine Berührungen. */
+function Verlauf({ farbe, hoehe = 24 }: { farbe: string; hoehe?: number }) {
+  const n = 12;
+  return (
+    <View pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={{ position: "absolute", left: 0, right: 0, top: -hoehe, height: hoehe }}>
+      {Array.from({ length: n }, (_, i) => (
+        <View key={i} style={{ height: hoehe / n, backgroundColor: farbe, opacity: Math.pow((i + 1) / n, 1.6) }} />
+      ))}
     </View>
   );
 }
@@ -302,6 +373,20 @@ export function Fakt({ symbol: _symbol, ton, text, letzte }: { symbol: string; t
       <View style={{ flex: 1, paddingVertical: 12, borderBottomWidth: letzte ? 0 : HAARLINIE, borderColor: f.linie }}>
         <T v="klein">{text}</T>
       </View>
+    </View>
+  );
+}
+
+/**
+ * Das eine Kästchen (A6): 22 pt, Ecken 6, gewählt gefüllt in Amtsgrün mit Haken (13 pt). `invers`: auf gefüllter
+ * dunkler Fläche (gewählter Chip) – dann weiß mit grünem Haken. Rein dekorativ; Zustand trägt das Element darum.
+ */
+export function Kaestchen({ an, invers, groesse = 22 }: { an: boolean; invers?: boolean; groesse?: number }) {
+  const f = useFarben();
+  const voll = invers ? f.hauptText : f.amt;
+  return (
+    <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={{ width: groesse, height: groesse, borderRadius: 6, borderWidth: an ? 0 : 2, borderColor: invers ? f.hauptText : f.rahmen, backgroundColor: an ? voll : "transparent", alignItems: "center", justifyContent: "center" }}>
+      {an ? <Symbol name="checkmark" groesse={13} farbe={invers ? f.haupt : f.amtText} gewicht="heavy" /> : null}
     </View>
   );
 }
@@ -365,12 +450,13 @@ export function Zeile({ links, symbol, ton, titel, text, wert, marke, rechts, on
         <View style={{ flex: 1, minWidth: 0 }}>
           <T fett={!gefahr} farbe={gefahr ? f.frist : undefined} numberOfLines={gross ? undefined : 3}>{titel}</T>
           {text ? <T v="klein" leise numberOfLines={gross ? undefined : 2} stil={{ marginTop: 1 }}>{text}</T> : null}
+          {/* Status als Plakette unter dem Titel (A15) – rechts bleibt Platz für den Betrag */}
+          {marke ? <View style={{ flexDirection: "row", marginTop: 5 }}><Marke text={marke.text} ton={marke.ton} /></View> : null}
         </View>
         {/* Betrag rechts (Rechnungen, Belege) – das, wonach man in Listen sucht */}
-        {wert || marke ? (
-          <View style={{ alignItems: "flex-end", gap: 4, marginLeft: 4 }}>
-            {wert ? <Betrag>{wert}</Betrag> : null}
-            {marke ? <Marke text={marke.text} ton={marke.ton} /> : null}
+        {wert ? (
+          <View style={{ alignItems: "flex-end", marginLeft: 4 }}>
+            <Betrag>{wert}</Betrag>
           </View>
         ) : null}
         {rechts ?? (onPress && !gefahr ? <Symbol name="chevron.right" groesse={14} farbe={f.zeiger} gewicht="semibold" /> : null)}
@@ -390,7 +476,7 @@ export function Marke({ text, ton }: { text: string; ton: Ton }) {
   const f = useFarben();
   const t = tonFarben(f, ton);
   return (
-    <View style={{ paddingHorizontal: 9, paddingVertical: 3, borderRadius: 999, backgroundColor: t.grund }}>
+    <View style={{ paddingHorizontal: 9, paddingVertical: 3, borderRadius: RADIUS.pille, backgroundColor: t.grund }}>
       {/* Grün auf Grünhauch: das tiefe Grün, sonst reicht der Kontrast für 12 pt nicht */}
       <T v="mini" farbe={ton === "amt" ? f.amtTief : t.zeichen} stil={{ fontSize: 12, lineHeight: 15 }}>{text}</T>
     </View>
@@ -464,7 +550,8 @@ export function feldRahmen(f: Farben, zustand: { fokus?: boolean; fehler?: boole
     borderWidth: 2,
     borderColor: zustand.fehler ? f.frist : zustand.fokus ? f.amt : "transparent",
     paddingHorizontal: 14,
-    backgroundColor: zustand.inKarte ? f.flaeche : f.blatt,
+    // überall dieselbe gefüllte graue Fläche mit Fokusrahmen (A7) – auf dem Blatt wie in Karten klar abgegrenzt
+    backgroundColor: f.flaeche,
   };
 }
 // Web-Vorschau: kein Browser-Fokusrahmen (der eigene Rahmen in Amtsgrün zeigt den Fokus)
@@ -617,9 +704,9 @@ function Chip({ text, an, rolle, onPress, kaestchen }: { text: string; an: boole
         if (istIos) void Haptics.selectionAsync();
         onPress();
       }}
-      style={({ pressed }) => ({ minHeight: 40, paddingLeft: kaestchen ? 11 : 16, paddingRight: 16, borderRadius: 20, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: an ? f.haupt : pressed ? f.linie : inKarte ? f.flaeche : f.blatt, flexShrink: 1 })}
+      style={({ pressed }) => ({ minHeight: 40, paddingLeft: kaestchen ? 9 : 16, paddingRight: 16, borderRadius: RADIUS.pille, flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: an ? f.haupt : pressed ? f.linie : inKarte ? f.flaeche : f.blatt, flexShrink: 1 })}
     >
-      {kaestchen ? <Symbol name={an ? "checkmark.square.fill" : "square"} groesse={16} farbe={an ? f.hauptText : f.tinteLeise} /> : null}
+      {kaestchen ? <Kaestchen an={an} invers={an} /> : null}
       <T v="klein" fett farbe={an ? f.hauptText : f.tinte} stil={{ flexShrink: 1 }}>{text}</T>
     </Pressable>
   );
@@ -661,7 +748,8 @@ export function Schalter({ label, wert, aendern, hilfe }: { label: string; wert:
       </View>
       {/* nur Anzeige – Zustand und Bedienung trägt die Zeile */}
       <View pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden>
-        <Switch value={wert} trackColor={{ true: f.haupt, false: f.linie }} thumbColor="#ffffff" ios_backgroundColor={f.linie} />
+        {/* Web: ohne activeThumbColor färbt react-native-web den Knopf im An-Zustand grün (A11) */}
+        <Switch value={wert} trackColor={{ true: f.haupt, false: f.linie }} thumbColor="#ffffff" ios_backgroundColor={f.linie} {...({ activeThumbColor: "#ffffff" } as object)} />
       </View>
     </Pressable>
   );
@@ -694,14 +782,12 @@ function AntwortKarte({ text, an, rolle, onPress }: { text: string; an: boolean;
         if (istIos) void Haptics.selectionAsync();
         onPress();
       }}
-      style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 14, minHeight: 60, paddingHorizontal: 18, paddingVertical: 14, borderRadius: 18, borderWidth: 2, borderColor: an ? f.amt : "transparent", backgroundColor: an ? f.amtHauch : pressed ? f.flaeche : f.blatt })}
+      style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 14, minHeight: 60, paddingHorizontal: 18, paddingVertical: 14, borderRadius: RADIUS.knopf, borderWidth: 2, borderColor: an ? f.amt : "transparent", backgroundColor: an ? f.amtHauch : pressed ? f.flaeche : f.blatt })}
     >
       {rolle === "radio" ? (
         <View style={{ width: 24, height: 24, borderRadius: 12, borderWidth: an ? 7 : 2, borderColor: an ? f.amt : f.rahmen, backgroundColor: f.papier }} />
       ) : (
-        <View style={{ width: 24, height: 24, borderRadius: 7, borderWidth: an ? 0 : 2, borderColor: f.rahmen, backgroundColor: an ? f.amt : f.papier, alignItems: "center", justifyContent: "center" }}>
-          {an ? <Symbol name="checkmark" groesse={14} farbe={f.amtText} gewicht="bold" /> : null}
-        </View>
+        <Kaestchen an={an} />
       )}
       <T fett={an} stil={{ flex: 1 }}>{text}</T>
     </Pressable>
@@ -801,8 +887,8 @@ export function BausteinListe({ label, hilfe, werte, aendern, optionen }: { labe
               }}
               style={({ pressed }) => ({ flexDirection: "row", gap: 12, paddingHorizontal: 14, paddingVertical: 12, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie, backgroundColor: an ? f.amtHauch : pressed ? f.linieLeise : "transparent" })}
             >
-              <View style={{ paddingTop: 1 }}>
-                <Symbol name={an ? "checkmark.square.fill" : "square"} groesse={19} farbe={an ? f.amt : f.rahmen} />
+              <View style={{ paddingTop: 0 }}>
+                <Kaestchen an={an} />
               </View>
               <View style={{ flex: 1 }}>
                 <T v="klein">{o.text}</T>
@@ -839,6 +925,86 @@ export function Suchfeld({ wert, setzen, label = TEXT.suchen, buehne }: { wert: 
         returnKeyType="search"
         style={[feldText(f), { flex: 1, minHeight: 40 }, buehne ? { color: f.buehneText } : null]}
       />
+    </View>
+  );
+}
+
+/**
+ * Chips zum Wählen in einer waagrechten Leiste (Zeiträume, Filter, Gruppen): beginnt und endet am Seitenrand und
+ * scrollt beim Öffnen zum gewählten Chip, mit Seitenrand davor (A16). Radio-Semantik wie `Wahl`.
+ */
+export function ChipLeiste<W extends string>({ label, wert, aendern, optionen, hilfe, stil }: { label?: string; wert: W | null; aendern: (w: W) => void; optionen: { wert: W; text: string }[]; hilfe?: string; stil?: StyleProp<ViewStyle> }) {
+  const ref = useRef<ScrollView>(null);
+  const lagen = useRef(new Map<string, number>());
+  const gescrollt = useRef(false);
+  const hin = (x: number | undefined) => {
+    if (x === undefined || gescrollt.current) return;
+    gescrollt.current = true;
+    ref.current?.scrollTo({ x: Math.max(0, x - RAND), animated: false });
+  };
+  return (
+    <View style={[{ marginTop: label ? 20 : 0 }, stil]}>
+      {label ? <FeldKopf label={label} hilfe={hilfe} /> : null}
+      <ScrollView ref={ref} horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -RAND, marginTop: label ? 9 : 0 }} contentContainerStyle={{ paddingLeft: RAND }}>
+        <View accessibilityRole="radiogroup" accessibilityLabel={label} style={{ flexDirection: "row", gap: 8 }}>
+          {optionen.map((o) => (
+            <View
+              key={o.wert}
+              onLayout={(e) => {
+                lagen.current.set(o.wert, e.nativeEvent.layout.x);
+                if (o.wert === wert) hin(e.nativeEvent.layout.x);
+              }}
+            >
+              <Chip text={o.text} an={o.wert === wert} rolle="radio" onPress={() => aendern(o.wert)} />
+            </View>
+          ))}
+          {/* Abstand am Ende: der letzte Chip klebt nicht am Rand */}
+          <View style={{ width: RAND - 8 }} />
+        </View>
+      </ScrollView>
+    </View>
+  );
+}
+
+/** „Hinzufügen“ – überall gleich (A23): gestrichelte Karte mit grünem Plus-Kreis. */
+export function HinzufuegenKnopf({ text, label, onPress, stil }: { text: string; label?: string; onPress: () => void; stil?: StyleProp<ViewStyle> }) {
+  const f = useFarben();
+  return (
+    <Pressable accessibilityRole="button" accessibilityLabel={label ?? text} onPress={onPress} style={({ pressed }) => [{ flexDirection: "row", alignItems: "center", gap: 12, minHeight: 56, paddingHorizontal: 16, borderRadius: RADIUS.karte, borderWidth: 1.5, borderStyle: "dashed", borderColor: f.rahmen, backgroundColor: pressed ? f.blatt : "transparent" }, stil]}>
+      <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: f.amt, alignItems: "center", justifyContent: "center" }}>
+        <Symbol name="plus" groesse={15} farbe={f.amtText} gewicht="bold" />
+      </View>
+      <T fett farbe={f.amt} stil={{ flexShrink: 1 }}>{text}</T>
+    </Pressable>
+  );
+}
+
+/** Kurze Zeilen auf der Bühne: Text in höchstens zwei Zeilen; ein längerer Rest steckt hinter einem (i) (B2). */
+export function kurzUndRest(text: string, max = 88): [string, string] {
+  // ~88 Zeichen sind zwei Zeilen bei 17 pt auf dem iPhone
+  if (text.length <= max) return [text, ""];
+  // am Satzende schneiden, sonst am letzten Wort vor der Grenze (dann mit „…“)
+  const satz = text.slice(0, max + 1).search(/[.!?]\s(?=[^.!?]*$)/);
+  if (satz > 30) return [text.slice(0, satz + 1).trim(), text.slice(satz + 1).trim()];
+  const wort = text.lastIndexOf(" ", max);
+  return [`${text.slice(0, wort).replace(/[,:;–-]+$/, "").trim()}\u00a0…`, text.slice(wort).trim()];
+}
+
+/** Satz unter dem Titel auf der Bühne: höchstens zwei Zeilen, der Rest hinter (i) zum Aufklappen. */
+export function BuehnenText({ text, stil }: { text: string; stil?: StyleProp<TextStyle> }) {
+  const f = useFarben();
+  const [offen, setOffen] = useState(false);
+  const [kurz, rest] = kurzUndRest(text);
+  if (!rest) return <T farbe={f.buehneLeise} stil={stil}>{text}</T>;
+  return (
+    <View>
+      <T farbe={f.buehneLeise} stil={stil}>
+        {offen ? text : kurz}
+      </T>
+      <Pressable accessibilityRole="button" accessibilityLabel={offen ? TEXT.weniger : TEXT.mehr_dazu} accessibilityState={{ expanded: offen }} aria-expanded={offen} onPress={() => { weich(); setOffen(!offen); }} hitSlop={8} style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-start", minHeight: 36, opacity: pressed ? 0.6 : 1 })}>
+        <Symbol name={offen ? "info.circle.fill" : "info.circle"} groesse={16} farbe={f.minze} />
+        <T v="klein" fett farbe={f.minze}>{offen ? TEXT.weniger : TEXT.mehr_dazu}</T>
+      </Pressable>
     </View>
   );
 }

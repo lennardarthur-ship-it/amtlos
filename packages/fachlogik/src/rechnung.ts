@@ -32,6 +32,16 @@ const EINHEIT_MEHRZAHL: Record<string, string> = {
   person: "personen",
   paket: "pakete",
   kilowattstunde: "kilowattstunden",
+  seite: "seiten",
+  karte: "karten",
+  nacht: "nächte",
+  portion: "portionen",
+  flasche: "flaschen",
+  kiste: "kisten",
+  fahrt: "fahrten",
+  lieferung: "lieferungen",
+  einheit: "einheiten",
+  lizenz: "lizenzen",
 };
 
 /** Einheit passend zur Menge gebeugt: „1 Stunde“, aber „1,5 Stunden“, „2 Pauschalen“ – unbekannte Einheiten wie eingegeben. */

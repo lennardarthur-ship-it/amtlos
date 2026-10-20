@@ -6,7 +6,7 @@ import { T as TEXT } from "../texte";
 import { useMeldung } from "../ui/meldung";
 import { BausteinListe, Fristblatt, Fuss, Hinweis, Kachel, Karte, Knopf, Schalter, SchnellKachel, Symbol, T, TextKnopf, Zeile, tageBis } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
-import { HAARLINIE, SCHRIFT, useFarben, weich } from "../ui/thema";
+import { HAARLINIE, RADIUS, SCHRIFT, useFarben, weich } from "../ui/thema";
 import { KATEGORIE_TITEL, auswertung, beantwortet, dringlichkeit, erinnerungsPlan, fortschritt, frageZu, gruendungsSchritte, haken, istErledigt, offeneFragenNachWirkung, selten, type PflichtInfo } from "../pflichten/check";
 import { allesAbsagen, erinnerungenMoeglich, erlaubnisAnfragen, planen } from "../pflichten/erinnerungen";
 import { heute } from "../unterlagen/speicher";
@@ -126,7 +126,7 @@ function PflichtDetail({ id }: { id: string }) {
         {p.stelle ? zeile(TEXT.zustaendig, p.stelle) : null}
         {zeile(TEXT.einstufung, TEXT.schwere[p.schwere])}
       </Karte>
-      {p.erklaerung ? <T v="klein" stil={{ marginTop: 16, marginHorizontal: 4 }}>{p.erklaerung}</T> : null}
+      {p.erklaerung ? <T v="klein" stil={{ marginTop: 16 }}>{p.erklaerung}</T> : null}
       {gilt && p.vorlagen.length > 1 ? (
         // mehrere Vorlagen zu einer Pflicht (z. B. Gefahrstoffverzeichnis und Betriebsanweisung): alle zum Ausfüllen
         <Gruppe titel={TEXT.vorlagen_zur_pflicht}>
@@ -139,7 +139,7 @@ function PflichtDetail({ id }: { id: string }) {
       ) : null}
       {p.rechtsgrundlage.length ? (
         <Gruppe titel={TEXT.grundlage}>
-          <T v="klein" stil={{ marginHorizontal: 4 }}>{p.rechtsgrundlage.join(" · ")}</T>
+          <T v="klein">{p.rechtsgrundlage.join(" · ")}</T>
         </Gruppe>
       ) : null}
       {p.quellen.length ? (
@@ -151,7 +151,7 @@ function PflichtDetail({ id }: { id: string }) {
           </Karte>
         </Gruppe>
       ) : null}
-      <T v="caption" leise stil={{ marginTop: 16, marginHorizontal: 4 }}>{TEXT.pflichten_quelle}</T>
+      <T v="caption" leise stil={{ marginTop: 16 }}>{TEXT.pflichten_quelle}</T>
     </BuehnenBlatt>
   );
 }
@@ -174,14 +174,17 @@ export function PflichtZeile({ p, letzte, erledigt, ohneWichtig }: { p: PflichtI
   const termin = !erledigt && p.naechsterTermin ? p.naechsterTermin : null;
   // das Datum steht im Fristblatt – im Text nur kurz (ohne Jahr, wenn es dieses Jahr ist)
   const fern = termin ? tageBis(termin, heute()) > 30 : false;
-  const unter = erledigt ? TEXT.erledigt : termin ? (fern ? fristText(termin) : `${fristText(termin)} · ${datumDe(termin).slice(0, 6)}`) : p.vorlage ? TEXT.unterlage_in_amtlos : p.schwere === "hoch" ? TEXT.wichtig : p.kurz;
+  const unter = erledigt ? TEXT.erledigt : termin ? (fern ? fristText(termin) : `${fristText(termin)}\u00a0· ${datumDe(termin).slice(0, 6)}`) : p.vorlage ? TEXT.unterlage_in_amtlos : p.kurz;
+  const wichtig = !erledigt && !ohneWichtig && p.schwere === "hoch";
   return (
     <Zeile
-      // mit Termin: das Fristblatt (Datum auf einen Blick); sonst der Status als Form
-      links={termin ? <Fristblatt termin={termin} heute={heute()} /> : <Kachel symbol={erledigt ? "checkmark" : p.schwere === "hoch" ? "exclamationmark" : BEREICH_SYMBOL_KAT[p.kategorie] ?? "doc.text"} ton={erledigt ? "amt" : p.schwere === "hoch" ? "bald" : "leise"} groesse={46} />}
-      // „Wichtig“ steckt sonst nur im Symbol – für VoiceOver mit ansagen
+      // mit Termin: das Fristblatt (Datum auf einen Blick); ohne Termin eine ruhige graue Kachel mit dem Bereich (A24) –
+      // kein bernsteinfarbenes „!“, das wie eine Frist aussieht
+      links={termin ? <Fristblatt termin={termin} heute={heute()} /> : <Kachel symbol={erledigt ? "checkmark" : BEREICH_SYMBOL_KAT[p.kategorie] ?? "doc.text"} ton={erledigt ? "amt" : "leise"} groesse={46} />}
       titel={p.titel}
-      text={!erledigt && !ohneWichtig && p.schwere === "hoch" && unter !== TEXT.wichtig ? `${TEXT.wichtig} · ${unter}` : unter}
+      text={unter}
+      // „Wichtig“ als Plakette unter dem Titel – VoiceOver liest sie mit
+      marke={wichtig ? { text: TEXT.wichtig, ton: "bald" } : undefined}
       onPress={() => nav.oeffnen(`pflicht-${p.id}`, () => <PflichtDetail id={p.id} />, true)}
       letzte={letzte}
     />
@@ -238,9 +241,9 @@ function PflichtenInhalt() {
       ) : null}
       <ErinnerungsSchalter />
       <KurzKlaeren offen={offen} unklar={a.unbekannt.length} />
-      <T v="gross" accessibilityRole="header" stil={{ marginTop: 30, marginLeft: 2 }}>{TEXT.alle_nach_bereich}</T>
+      <T v="gross" accessibilityRole="header" stil={{ marginTop: 30 }}>{TEXT.alle_nach_bereich}</T>
       {/* die vollständige Liste erst auf Wunsch – oben steht, was jetzt zu tun ist */}
-      <TextKnopf erweitert={alleZeigen} symbol={alleZeigen ? "chevron.up" : "chevron.down"} text={alleZeigen ? TEXT.liste_verbergen : TEXT.alle_pflichten_zeigen(a.gilt.length)} onPress={() => { weich(); setAlleZeigen(!alleZeigen); }} stil={{ marginLeft: 4 }} />
+      <TextKnopf erweitert={alleZeigen} symbol={alleZeigen ? "chevron.up" : "chevron.down"} text={alleZeigen ? TEXT.liste_verbergen : TEXT.alle_pflichten_zeigen(a.gilt.length)} onPress={() => { weich(); setAlleZeigen(!alleZeigen); }} />
       {alleZeigen && kategorien.map((k) => {
         const l = a.gilt.filter((p) => p.kategorie === k);
         return (
@@ -265,7 +268,7 @@ function PflichtenInhalt() {
       {a.gruendung.length ? (
         <Gruppe titel={TEXT.gruendung_titel(a.gruendung.length)} fuss={TEXT.gruendung_text}>
           {a.gruendung.some((p) => !fertig(p)) ? <Knopf ton symbol="checkmark" text={TEXT.gruendung_alle} onPress={() => a.gruendung.filter((p) => !fertig(p)).forEach((p) => z.erledigtSetzen(p.id, heute()))} /> : null}
-          <TextKnopf erweitert={gruendungZeigen} symbol={gruendungZeigen ? "chevron.up" : "chevron.down"} text={gruendungZeigen ? TEXT.liste_verbergen : TEXT.liste_zeigen} onPress={() => { weich(); setGruendungZeigen(!gruendungZeigen); }} stil={{ marginLeft: 4 }} />
+          <TextKnopf erweitert={gruendungZeigen} symbol={gruendungZeigen ? "chevron.up" : "chevron.down"} text={gruendungZeigen ? TEXT.liste_verbergen : TEXT.liste_zeigen} onPress={() => { weich(); setGruendungZeigen(!gruendungZeigen); }} />
           {gruendungZeigen ? (
             <Karte>
               {a.gruendung.map((p, i) => (
@@ -277,7 +280,7 @@ function PflichtenInhalt() {
       ) : null}
       {a.unbekannt.length ? (
         <Gruppe titel={TEXT.offen_angaben_titel(a.unbekannt.length)} fuss={TEXT.offen_angaben_text}>
-          <TextKnopf erweitert={zeigen} symbol={zeigen ? "chevron.up" : "chevron.down"} text={zeigen ? TEXT.liste_verbergen : TEXT.liste_zeigen} onPress={() => { weich(); setZeigen(!zeigen); }} stil={{ marginLeft: 4 }} />
+          <TextKnopf erweitert={zeigen} symbol={zeigen ? "chevron.up" : "chevron.down"} text={zeigen ? TEXT.liste_verbergen : TEXT.liste_zeigen} onPress={() => { weich(); setZeigen(!zeigen); }} />
           {zeigen ? (
             <Karte>
               {a.unbekannt.map((p, i) => (
@@ -287,8 +290,8 @@ function PflichtenInhalt() {
           ) : null}
         </Gruppe>
       ) : null}
-      <TextKnopf symbol="pencil" text={TEXT.angaben_aendern} onPress={() => nav.oeffnen("check", () => <CheckAblauf einleitung={false} />, true)} stil={{ marginTop: 20, marginLeft: 4 }} />
-      <T v="caption" leise stil={{ marginTop: 8, marginLeft: 4 }}>{TEXT.pflichten_quelle}</T>
+      <TextKnopf symbol="pencil" text={TEXT.angaben_aendern} onPress={() => nav.oeffnen("check", () => <CheckAblauf einleitung={false} />, true)} stil={{ marginTop: 20 }} />
+      <T v="caption" leise stil={{ marginTop: 8 }}>{TEXT.pflichten_quelle}</T>
     </View>
   );
 }
@@ -327,7 +330,7 @@ function KurzKlaeren({ offen, unklar }: { offen: { feld: string; anzahl: number 
           );
         })}
       </View>
-      {weitere.length ? <TextKnopf symbol="questionmark.circle" text={TEXT.weitere_fragen(weitere.length)} onPress={() => nav.oeffnen("nachfragen", () => <CheckAblauf felder={weitere.map((o) => o.feld)} />, true)} stil={{ marginLeft: 4 }} /> : null}
+      {weitere.length ? <TextKnopf symbol="questionmark.circle" text={TEXT.weitere_fragen(weitere.length)} onPress={() => nav.oeffnen("nachfragen", () => <CheckAblauf felder={weitere.map((o) => o.feld)} />, true)} /> : null}
     </Gruppe>
   );
 }
@@ -407,7 +410,7 @@ function Start() {
       {/* wer gleich etwas erledigen will, findet es ohne Scrollen */}
       <View style={{ flexDirection: "row", gap: 12 }}>
         <SchnellKachel symbol="eurosign" text={TEXT.start_rechnung} onPress={() => starten("rechnung")} />
-        <SchnellKachel ton="lila" symbol="doc.text" text={TEXT.start_vorlagen} onPress={erstellen.oeffnen} />
+        <SchnellKachel ton="leise" symbol="doc.text" text={TEXT.start_vorlagen} onPress={erstellen.oeffnen} />
       </View>
       <Gruppe titel={TEXT.start_so_hilft}>
         <Karte>
@@ -454,7 +457,7 @@ function Jahresblick({ gilt, tag }: { gilt: PflichtInfo[]; tag: string }) {
           accessible
           accessibilityRole="text"
           accessibilityLabel={TEXT.monat_termine(mo.lang, mo.termine)}
-          style={{ width: "15.2%", flexGrow: 1, minHeight: 54, borderRadius: 14, padding: 7, justifyContent: "space-between", backgroundColor: mo.jetzt ? f.minze : mo.termine ? "rgba(127,227,184,0.16)" : "transparent", borderWidth: mo.jetzt || mo.termine ? 0 : 1.5, borderStyle: "dashed", borderColor: "rgba(255,255,255,0.3)" }}
+          style={{ width: "15.2%", flexGrow: 1, minHeight: 54, borderRadius: RADIUS.klein, padding: 7, justifyContent: "space-between", backgroundColor: mo.jetzt ? f.minze : mo.termine ? "rgba(127,227,184,0.16)" : "transparent", borderWidth: mo.jetzt || mo.termine ? 0 : 1.5, borderStyle: "dashed", borderColor: "rgba(255,255,255,0.3)" }}
         >
           <T v="caption" maxFontSizeMultiplier={1.5} farbe={mo.jetzt ? f.buehneKnopfText : f.buehneLeise} stil={{ ...SCHRIFT.halb, fontSize: 12, lineHeight: 14 }}>{mo.kurz}</T>
           {mo.termine ? <T maxFontSizeMultiplier={1.5} farbe={mo.jetzt ? f.buehneKnopfText : f.buehneText} stil={{ ...SCHRIFT.display, fontSize: 17, lineHeight: 19 }}>{String(mo.termine)}</T> : null}
@@ -484,6 +487,7 @@ export function PflichtenTab() {
       rechts={gemacht ? <BuehnenKnopf text={TEXT.jahr_neu_pruefen} onPress={check} /> : undefined}
       // groß, was in den nächsten zwei Wochen ansteht – die Gesamtzahl klein darunter (sie erschlägt sonst)
       titel={gemacht ? TEXT.ergebnis_bald(bald) : TEXT.pflichten_karte_titel}
+      satz
       buehne={
         gemacht ? (
           <View style={{ gap: 14 }}>
@@ -526,7 +530,7 @@ function ErinnerungsSchalter() {
       {fehler ? (
         <View>
           <Hinweis art="fehler" text={TEXT.erinnern_verweigert} />
-          <TextKnopf symbol="gearshape" text={TEXT.einstellungen_oeffnen} onPress={() => void Linking.openSettings()} stil={{ marginLeft: 4 }} />
+          <TextKnopf symbol="gearshape" text={TEXT.einstellungen_oeffnen} onPress={() => void Linking.openSettings()} />
         </View>
       ) : null}
     </Karte>

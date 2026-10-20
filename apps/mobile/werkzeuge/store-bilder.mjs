@@ -3,6 +3,9 @@
  * gesetzt auf 1290 × 2796 (iPhone 6,9″) mit Überschrift aus store/de.json, in der Reihenfolge von `bilder`.
  * Ergebnis: <ausgabe>/store-1…6-<bildschirm>.png.
  *
+ * Über jedem Bildschirm steht eine Statusleiste wie auf dem iPhone (9:41, volles Netz, WLAN, voller Akku) in der Farbe
+ * der obersten Bildzeile – der Web-Export hat keine; ohne sie wirkt der Bildschirm abgeschnitten.
+ *
  * Optional je Bild `lupe: { x, y, b, h }` (Anteile des Bildschirms): vergrößert diesen Ausschnitt desselben echten
  * Bildschirms als Lupe über dem Gerät – z. B. Summe und GiroCode der Rechnung, die in A4-Verkleinerung unlesbar wären.
  *
@@ -87,7 +90,7 @@ try {
   await warte(600);
   await knopf("Schließen").click();
   await warte(700);
-  await knopf("Erstellen").click();
+  await knopf("Neu erstellen").click(); // „+“ in der Tab-Leiste
   await warte(1000);
   await foto("vorlagen");
   await knopf("Schließen").click();
@@ -112,6 +115,24 @@ const lupeHtml = (name, l, oben) => {
   return `<div class="lupe" style="top:${oben}px;width:${breite}px;height:${hoehe}px;background-image:url(${png(name)});background-size:${Math.round(faktor)}px auto;background-position:${Math.round(-l.x * faktor)}px ${Math.round(-l.y * faktor * (852 / 393))}px"></div>`;
 };
 
+/**
+ * iOS-Statusleiste (B16): 9:41 links, rechts Netz, WLAN und voller Akku – weiß auf der grünen Bühne, dunkel auf hellem
+ * Grund. Höhe 54 pt wie beim iPhone mit Dynamic Island, in Bildschirm-Pixeln der Aufnahme (3×); skaliert mit dem Bild.
+ */
+const statusleiste = (breite) => {
+  const f = breite / (393 * 3); // Pixel der Aufnahme → Pixel im Satz
+  const px = (n) => Math.round(n * 3 * f);
+  return `<div class="status" style="height:${px(54)}px;padding:0 ${px(34)}px 0 ${px(52)}px;font-size:${px(17)}px">
+    <span style="font-family:S;font-weight:800;letter-spacing:-.2px">9:41</span>
+    <span style="display:flex;gap:${px(6)}px;align-items:center">
+      <svg width="${px(19)}" height="${px(12)}" viewBox="0 0 19 12"><rect x="0" y="8" width="3.2" height="4" rx="1" fill="currentColor"/><rect x="5.2" y="5.5" width="3.2" height="6.5" rx="1" fill="currentColor"/><rect x="10.4" y="3" width="3.2" height="9" rx="1" fill="currentColor"/><rect x="15.6" y="0" width="3.2" height="12" rx="1" fill="currentColor"/></svg>
+      <svg width="${px(17)}" height="${px(12)}" viewBox="0 0 17 12"><path d="M8.5 2.3c2.4 0 4.6.9 6.3 2.5l1.2-1.2C14 1.7 11.4.6 8.5.6S3 1.7 1 3.6l1.2 1.2C3.9 3.2 6.1 2.3 8.5 2.3zm0 3.4c1.5 0 2.9.6 4 1.6l1.2-1.2C12.3 4.8 10.5 4 8.5 4S4.7 4.8 3.3 6.1l1.2 1.2c1.1-1 2.5-1.6 4-1.6zm0 3.4c.6 0 1.2.2 1.7.6L8.5 11.4 6.8 9.7c.5-.4 1.1-.6 1.7-.6z" fill="currentColor"/></svg>
+      <svg width="${px(27)}" height="${px(13)}" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.8" fill="none" stroke="currentColor" stroke-opacity=".4"/><rect x="2" y="2" width="20" height="9" rx="2.5" fill="currentColor"/><path d="M25 4.5v4c.8-.3 1.4-1.1 1.4-2s-.6-1.7-1.4-2z" fill="currentColor" fill-opacity=".45"/></svg>
+    </span></div>`;
+};
+// Farbe der obersten Bildzeile → Grund der Statusleiste; Schrift hell oder dunkel je nach Helligkeit
+const statusFarbe = `<script>document.querySelectorAll(".schirm").forEach((s)=>{const i=s.querySelector("img");const los=()=>{const c=document.createElement("canvas");c.width=i.naturalWidth;c.height=4;const x=c.getContext("2d");x.drawImage(i,0,0);const [r,g,b]=x.getImageData(Math.round(i.naturalWidth/2),1,1,1).data;const st=s.querySelector(".status");st.style.background="rgb("+r+","+g+","+b+")";st.style.color=(0.299*r+0.587*g+0.114*b)>150?"#0c1f18":"#fff"};i.complete?los():i.onload=los})</script>`;
+
 const satz = await browser.newPage({ viewport: { width: 1290, height: 2796 }, deviceScaleFactor: 1 });
 for (const [i, b] of texte.bilder.entries()) {
   if (!roh[b.bildschirm]) throw new Error(`Bildschirm fehlt: ${b.bildschirm}`);
@@ -122,11 +143,14 @@ for (const [i, b] of texte.bilder.entries()) {
   h1{font-family:S;font-weight:800;font-size:104px;line-height:1.04;margin:0;letter-spacing:-3px}
   p{font-size:52px;line-height:1.3;margin:36px 0 0;color:#7fe3b8}
   .geraet{position:absolute;left:140px;right:140px;top:${b.oben ?? 760}px;border-radius:88px;padding:16px;background:linear-gradient(#f4f7f5,#cfd9d4);box-shadow:0 0 0 3px rgba(255,255,255,.18),0 50px 140px rgba(0,0,0,.45)}
-  .geraet img{display:block;width:100%;border-radius:72px}
+  .schirm{border-radius:72px;overflow:hidden}
+  .status{display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;font-family:A;font-weight:600}
+  .geraet img{display:block;width:100%}
   .lupe{position:absolute;left:80px;border-radius:40px;border:10px solid #fff;background-color:#fff;background-repeat:no-repeat;box-shadow:0 40px 100px rgba(0,0,0,.45)}
   </style></head><body><div class="text"><h1>${b.titel}</h1><p>${b.text}</p></div>
-  <div class="geraet"><img src="${png(b.bildschirm)}"></div>${b.lupe ? lupeHtml(b.bildschirm, b.lupe, 1500) : ""}</body></html>`;
+  <div class="geraet"><div class="schirm">${statusleiste(1290 - 280 - 32)}<img src="${png(b.bildschirm)}"></div></div>${b.lupe ? lupeHtml(b.bildschirm, b.lupe, 1500) : ""}${statusFarbe}</body></html>`;
   await satz.setContent(html, { waitUntil: "load" });
+  await satz.waitForTimeout(150);
   await satz.screenshot({ path: path.join(OUT, `store-${i + 1}-${b.bildschirm}${schema === "dark" ? "-dunkel" : ""}.png`) });
 }
 

@@ -185,6 +185,9 @@ export const RECHNUNG_PLZ_FEHLT = "PLZ und Ort des Empfängers fehlen (letzte Ze
 export const RECHNUNG_NULL = "Rechnungsbetrag ist 0,00 € – bitte die Preise prüfen";
 export const RECHNUNG_NEGATIV = "Rechnungsbetrag ist negativ – bitte die Preise prüfen (eine geteilte Rechnung korrigierst du mit „Stornieren“)";
 
+/** Anrede der Rechnung, wenn keine eigene angegeben ist. */
+const ANREDE_STANDARD = "Sehr geehrte Damen und Herren";
+
 export const rechnung: Vorlage = {
   id: "rechnung",
   gestalt: "brief",
@@ -219,6 +222,7 @@ export const rechnung: Vorlage = {
         { id: "kunde_name", art: "text", label: "Name oder Firma", pflicht: true },
         { id: "kunde_anschrift", art: "mehrzeilig", label: "Anschrift", hilfe: "Straße und Hausnummer, PLZ und Ort – im Ausland das Land in die letzte Zeile", pflicht: true },
         { id: "kunde_email", art: "text", label: "E-Mail des Empfängers", hilfe: "nötig für die E-Rechnung an Unternehmen" },
+        { id: "anrede", selten: true, art: "text", label: "Anrede", hilfe: `Steht über dem Text der Rechnung; leer: „${ANREDE_STANDARD}“`, vorschlaege: [ANREDE_STANDARD, "Sehr geehrte Frau …", "Sehr geehrter Herr …", "Guten Tag …", "Hallo …"] },
         { id: "kunde_ust_idnr", selten: true, art: "text", label: "USt-IdNr. des Empfängers", hilfe: "nur bei innergemeinschaftlichen Leistungen oder Steuerschuldnerschaft des Empfängers" },
       ],
     },
@@ -341,15 +345,19 @@ export const rechnung: Vorlage = {
     const faellig = ziel && ziel !== "sofort" && datum ? plusTage(datum, Number(ziel)) : "";
     const iban = b.iban.trim();
     // Zahlungsaufforderung mit Bankverbindung und GiroCode – nur aus den Angaben in „Mein Betrieb“ und der Rechnung
-    const qr = !storno && !gutschrift && iban && s.brutto_cent > 0 ? giroCodeSvg({ name: b.name.trim(), iban, bic: b.bic ?? null, betragCent: s.brutto_cent, verwendungszweck: `Rechnung ${text(d, "nummer")}` }, 28) : null;
+    const qr = !storno && !gutschrift && iban && s.brutto_cent > 0 ? giroCodeSvg({ name: b.name.trim(), iban, bic: b.bic ?? null, betragCent: s.brutto_cent, verwendungszweck: `Rechnung ${text(d, "nummer")}` }, 25) : null;
+    // Kontoinhaber vor der IBAN; Einzelunternehmen mit der Inhaberin bzw. dem Inhaber (Gesellschaften: nur die Firma)
+    const empfaenger = b.name.trim() ? `Empfänger: ${esc(b.name.trim())}${b.verantwortlich.trim() && !(b.vertretung ?? "").trim() && b.verantwortlich.trim() !== b.name.trim() ? ` (${esc(b.verantwortlich.trim())})` : ""}<br>` : "";
+    // BIC und Bank in einer Zeile („BIC … · Sparkasse …“) – spart eine Zeile im Zahlungsblock
+    const bicBank = [b.bic?.trim() ? `BIC ${esc(b.bic.trim())}` : "", b.bank?.trim() ? esc(b.bank.trim()) : ""].filter(Boolean).join(" · ");
     const zahlung =
       !storno && !gutschrift && iban && s.brutto_cent > 0
-        ? `<div class="zahlung">${qr ? `<div class="qr">${qr}<small>GiroCode – mit der Banking-App scannen</small></div>` : ""}<div class="text"><p>Bitte überweisen Sie <strong>${euro(s.brutto_cent)}</strong>${faellig ? ` bis zum <strong>${esc(faellig)}</strong>` : ziel === "sofort" ? " sofort ohne Abzug" : ""} auf das Konto</p><p><strong>IBAN ${esc(ibanText(iban))}</strong>${b.bic?.trim() ? `<br>BIC ${esc(b.bic.trim())}` : ""}${b.bank?.trim() ? `<br>${esc(b.bank.trim())}` : ""}<br>Verwendungszweck: Rechnung ${esc(text(d, "nummer"))}</p></div></div>`
+        ? `<div class="zahlung">${qr ? `<div class="qr">${qr}<small>GiroCode – mit der Banking-App scannen</small></div>` : ""}<div class="text"><p>Bitte überweisen Sie <strong>${euro(s.brutto_cent)}</strong>${faellig ? ` bis zum <strong>${esc(faellig)}</strong>` : ziel === "sofort" ? " sofort ohne Abzug" : ""} auf das Konto</p><p>${empfaenger}<strong>IBAN ${esc(ibanText(iban))}</strong>${bicBank ? `<br>${bicBank}` : ""}<br>Verwendungszweck: Rechnung ${esc(text(d, "nummer"))}</p></div></div>`
         : // leere Vorlage: Zahlungsaufforderung mit Linie für das Datum, mit Bankverbindung nur, wenn eine IBAN hinterlegt ist
           leer && !storno && !gutschrift
-          ? `<div class="zahlung"><div class="text"><p>Bitte überweisen Sie den Rechnungsbetrag bis zum ${LINIE_MITTEL}${iban ? " auf das Konto" : "."}</p>${iban ? `<p><strong>IBAN ${esc(ibanText(iban))}</strong>${b.bic?.trim() ? `<br>BIC ${esc(b.bic.trim())}` : ""}${b.bank?.trim() ? `<br>${esc(b.bank.trim())}` : ""}<br>Verwendungszweck: Rechnung ${text(d, "nummer") ? esc(text(d, "nummer")) : LINIE_MITTEL}</p>` : ""}</div></div>`
+          ? `<div class="zahlung"><div class="text"><p>Bitte überweisen Sie den Rechnungsbetrag bis zum ${LINIE_MITTEL}${iban ? " auf das Konto" : "."}</p>${iban ? `<p>${empfaenger}<strong>IBAN ${esc(ibanText(iban))}</strong>${bicBank ? `<br>${bicBank}` : ""}<br>Verwendungszweck: Rechnung ${text(d, "nummer") ? esc(text(d, "nummer")) : LINIE_MITTEL}</p>` : ""}</div></div>`
           : "";
-    const anrede = text(d, "kunde_name") ? (storno ? `wir stornieren hiermit die unten genannte Rechnung und stellen den Betrag wie folgt gut.` : gutschrift ? `wir rechnen über die folgenden Leistungen ab und schreiben Ihnen den Betrag gut:` : `wir bedanken uns für Ihren Auftrag und stellen Ihnen folgende Leistungen in Rechnung:`) : "";
+    const anrede = text(d, "kunde_name") ? (storno ? `wir stornieren hiermit die unten genannte Rechnung und stellen den Betrag wie folgt gut.` : gutschrift ? `wir rechnen über die folgenden Leistungen ab und schreiben Ihnen den Betrag gut:` : `wie vereinbart berechnen wir Ihnen folgende Leistungen:`) : "";
     const titel = `${rechnungsTitel(d)} ${text(d, "nummer")}`.trim();
     return brief({
       titel,
@@ -359,24 +367,27 @@ export const rechnung: Vorlage = {
       betrieb: b,
       stand: datumDe(datum),
       empfaenger: { name: text(d, "kunde_name"), anschrift: text(d, "kunde_anschrift"), zusatz: text(d, "kunde_ust_idnr") ? `USt-IdNr. ${text(d, "kunde_ust_idnr")}` : undefined },
+      // Reihenfolge nach DIN 5008: Bezugszeichen oben, das Datum abgesetzt als letzte Zeile (halbfett)
       info: [
         ["Rechnungsnummer", text(d, "nummer"), true],
-        ["Rechnungsdatum", datumDe(datum)],
         // ein einzelnes Datum heißt „Leistungsdatum“, alles andere (z. B. „Oktober 2026“, „02.03. – 27.03.2026“) „Leistungszeitraum“
         [ja(d, "leistung_gleich") || isoAus(leistung) || !leistung.trim() ? "Leistungsdatum" : "Leistungszeitraum", ja(d, "leistung_gleich") ? datumDe(datum) : leistung],
         ["Steuernummer", b.steuernummer.trim()],
         ["USt-IdNr.", b.ust_idnr.trim()],
-        ["Ansprechpartner", b.verantwortlich.trim()],
+        ["Ansprechperson", b.verantwortlich.trim()],
         ["Telefon", b.telefon.trim()],
         ["E-Mail", b.email.trim()],
+        null,
+        ["Rechnungsdatum", datumDe(datum), false, true],
       ],
-      anrede: anrede ? `Sehr geehrte Damen und Herren,` : undefined,
+      anrede: anrede ? `${(text(d, "anrede") || ANREDE_STANDARD).replace(/[,\s]+$/, "")},` : undefined,
       inhalt:
         (anrede ? `<p>${esc(anrede)}</p>` : "") +
-        `<section>${tabelle(["Pos.", "Leistung", "Menge", "Einzelpreis", ...(ku ? [] : ["USt"]), "Betrag"], zeilenHtml, { breiten: ku ? ["7%", "48%", "15%", "15%", "15%"] : ["7%", "41%", "14%", "14%", "9%", "15%"], zahlen: ku ? [2, 3, 4] : [2, 3, 4, 5], ...(leer ? { mindestens: 5, hoch: true } : {}) })}</section>` +
-        `<table class="summen">${summenZeilen}</table>` +
-        // Zahlungsaufforderung, Hinweise und Gruß bleiben beisammen: Passt der Schluss nicht mehr auf die Seite, geht die
-        // Zahlungsaufforderung mit, statt Hinweise und Gruß allein auf eine Folgeseite zu stellen
+        `<section>${tabelle(["Pos.", "Leistung", "Menge", "Einzelpreis", ...(ku ? [] : ["USt"]), "Betrag"], zeilenHtml, { breiten: ku ? ["5%", "54%", "13%", "13%", "15%"] : ["5%", "47%", "13%", "13%", "7%", "15%"], zahlen: ku ? [2, 3, 4] : [2, 3, 4, 5], ...(leer ? { mindestens: 5, hoch: true } : {}) })}</section>` +
+        // Summenblock beginnt an der Mengenspalte (CSS .g-brief .summen bzw. .summen.ku)
+        `<table class="summen${ku ? " ku" : ""}">${summenZeilen}</table>` +
+        // Die Zahlungsaufforderung bleibt bei den Summen (CSS: kein Umbruch davor und darin); passt der Schluss nicht mehr
+        // auf die Seite, rücken nur Hinweise und Gruß als Block auf die Folgeseite
         `<div class="abschluss">` +
         zahlung +
         `<div class="schluss">` +
@@ -559,15 +570,27 @@ export const bilanzGuv: Vorlage = {
   },
   html(d, b) {
     const l = (k: string) => liste(d, k).filter((x) => text(x, "posten") || text(x, "betrag"));
-    // Aktiva und Passiva gleich lang, damit die Summen auf einer Linie stehen (mit Doppellinie)
-    const bilanzZeilen = Math.max(l("aktiva").length, l("passiva").length);
     const t = (k: string) => {
       const x = l(k);
-      const bilanz = k === "aktiva" || k === "passiva";
-      // leer (Vorlage zum Ausfüllen): hohe Leerzeilen (GuV je 8, Aktiva und Passiva je 12 – bzw. so viele wie die andere
-      // Seite der Bilanz), Summenzeile mit Linie zum Eintragen statt „0,00 €“
-      if (!x.length) return tabelle(["Posten", "Betrag"], [], { breiten: ["72%", "28%"], zahlen: [1], mindestens: bilanz ? bilanzZeilen || 12 : 8, hoch: true, summe: ["<strong>Summe</strong>", ZELLE_LINIE], ...(bilanz ? { klasse: "doppelt" } : {}) });
-      return tabelle(["Posten", "Betrag"], x.map((e) => [zelle(text(e, "posten")), euro(cent(text(e, "betrag")) ?? 0)]), { breiten: ["72%", "28%"], zahlen: [1], summe: ["<strong>Summe</strong>", `<strong>${euro(summe(x, "betrag"))}</strong>`], ...(bilanz ? { mindestens: bilanzZeilen, klasse: "doppelt" } : {}) });
+      // leer (Vorlage zum Ausfüllen): 8 hohe Leerzeilen, Summenzeile mit Linie zum Eintragen statt „0,00 €“
+      if (!x.length) return tabelle(["Posten", "Betrag"], [], { breiten: ["72%", "28%"], zahlen: [1], mindestens: 8, hoch: true, summe: ["<strong>Summe</strong>", ZELLE_LINIE] });
+      return tabelle(["Posten", "Betrag"], x.map((e) => [zelle(text(e, "posten")), euro(cent(text(e, "betrag")) ?? 0)]), { breiten: ["72%", "28%"], zahlen: [1], summe: ["<strong>Summe</strong>", `<strong>${euro(summe(x, "betrag"))}</strong>`] });
+    };
+    // Bilanz als eine Tabelle (Aktiva links, Passiva rechts): jede Zeile gleich hoch, die Summen stehen auf einer Linie
+    // (mit Doppellinie). Leer: 12 hohe Zeilen zum Ausfüllen, Summen als Linie
+    const bilanz = () => {
+      const a = l("aktiva");
+      const p = l("passiva");
+      const n = Math.max(a.length, p.length);
+      const seite = (x: Eintrag[], i: number) => (x[i] ? [zelle(text(x[i]!, "posten")), euro(cent(text(x[i]!, "betrag")) ?? 0)] : ["&nbsp;", ""]);
+      const s_ = (x: Eintrag[]) => (x.length ? `<strong>${euro(summe(x, "betrag"))}</strong>` : ZELLE_LINIE);
+      return tabelle(["Aktiva", "Betrag", "Passiva", "Betrag"], Array.from({ length: n }, (_, i) => [...seite(a, i), ...seite(p, i)]), {
+        breiten: ["33%", "17%", "33%", "17%"],
+        zahlen: [1, 3],
+        summe: ["<strong>Summe</strong>", s_(a), "<strong>Summe</strong>", s_(p)],
+        klasse: "doppelt bilanz",
+        ...(n ? {} : { mindestens: 12, hoch: true }),
+      });
     };
     const j = summe(l("ertraege"), "betrag") - summe(l("aufwendungen"), "betrag");
     // Vorlage zum Ausfüllen: kein errechnetes Ergebnis „0,00 €“
@@ -582,7 +605,7 @@ export const bilanzGuv: Vorlage = {
       meta: [b.steuernummer.trim() ? `Steuernummer: ${b.steuernummer.trim()}` : "", `Bilanzstichtag: ${datumDe(text(d, "stichtag")) || KOPF_LINIE}`].filter(Boolean).join("\n"),
       inhalt:
         abschnitt("Gewinn- und Verlustrechnung", `<h3>Erträge</h3>${t("ertraege")}<h3>Aufwendungen</h3>${t("aufwendungen")}${kennzahlen([{ text: guvLeer ? "Jahresüberschuss bzw. Jahresfehlbetrag" : j >= 0 ? "Jahresüberschuss" : "Jahresfehlbetrag", betrag: guvLeer ? "&nbsp;" : euro(Math.abs(j)), fett: true }])}`) +
-        abschnitt("Bilanz", `<div class="bilanz"><div><h3>Aktiva</h3>${t("aktiva")}</div><div><h3>Passiva</h3>${t("passiva")}</div></div>${akt !== pas ? `<p class="nachsatz"><strong>Aktiva und Passiva weichen um ${euro(akt - pas)} ab – bitte prüfen.</strong></p>` : ""}`) +
+        abschnitt("Bilanz", `${bilanz()}${akt !== pas ? `<p class="nachsatz"><strong>Aktiva und Passiva weichen um ${euro(akt - pas)} ab – bitte prüfen.</strong></p>` : ""}`) +
         unterschriften(["Unterschrift"], { ortDatum: true }),
     });
   },

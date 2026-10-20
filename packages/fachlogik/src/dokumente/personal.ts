@@ -5,7 +5,7 @@
 import { teilnahmeTabelle } from "./arbeitsschutz.js";
 import { mitVertretung } from "./betrieb.js";
 import { MINDESTLOHN, NACHWG } from "./bausteine.js";
-import { abschnitt, absatz, angaben, anschrift, auswahl, cent, datumDe, dokument, euro, ja, liste, parteien, punkte, text, unterschriften, zahl, zahlText, zeilen } from "./html.js";
+import { abschnitt, absatz, angaben, anschrift, anschriftMehrzeilig, auswahl, cent, datumDe, dokument, euro, ja, liste, parteien, punkte, text, unterschriften, zahl, zahlText, zeilen } from "./html.js";
 import { optionen } from "./konstanten.js";
 import type { Daten, Vorlage } from "./typen.js";
 
@@ -157,7 +157,25 @@ export const nachweisArbeitsbedingungen: Vorlage = {
     // Vertrag: Parteien in zwei Spalten, dann die 15 Punkte des § 2 Abs. 1 NachwG mit Randnummern
     // Kapitalgesellschaft mit Geschäftsführung in „Mein Betrieb“: „vertreten durch …“ bei Partei und Unterschrift
     const vertreten = mitVertretung(b) !== b.name.trim() ? `vertreten durch ${(b.vertretung ?? "").trim()}` : "";
-    const punkteNw = zeilenNw.slice(1).map(([t, w]) => abschnitt(t.replace(/^\d+\.\s*/, ""), !w && leerAngaben[t.split(".")[0]!] ? leerAngaben[t.split(".")[0]!]! : absatz(w ?? "")));
+    // kompakt: aufeinanderfolgende Punkte mit kurzer, einzeiliger Angabe (Beginn, Befristung, Arbeitsort …) stehen als
+    // Angabenzeilen unter einer gemeinsamen Randnummer („2.–6.“); längere Texte bleiben eigene Abschnitte. Wortlaut und
+    // Reihenfolge aller Punkte bleiben gleich, die Nummerierung der Abschnitte läuft weiter (counter-increment).
+    const kurz = ([t, w]: [string, string | null]) => !leerAngaben[t.split(".")[0]!] && !(w ?? "").includes("\n") && (w ?? "").length <= 60;
+    const punkteNw: string[] = [];
+    const rest = zeilenNw.slice(1);
+    for (let i = 0; i < rest.length; ) {
+      let j = i;
+      while (j < rest.length && kurz(rest[j]!)) j++;
+      if (j - i >= 2) {
+        const nr = (k: number) => rest[k]![0].split(".")[0]!;
+        punkteNw.push(`<section class="abschnitt gruppe zusammen" style="counter-increment: abschnitt ${j - i}"><div class="gruppe-nr">${nr(i)}.–${nr(j - 1)}.</div>${angaben(rest.slice(i, j).map(([t, w]) => [t.replace(/^\d+\.\s*/, ""), w ?? ""]))}</section>`);
+        i = j;
+        continue;
+      }
+      const [t, w] = rest[i]!;
+      punkteNw.push(abschnitt(t.replace(/^\d+\.\s*/, ""), !w && leerAngaben[t.split(".")[0]!] ? leerAngaben[t.split(".")[0]!]! : absatz(w ?? "")));
+      i++;
+    }
     return dokument({
       titel: "Nachweis der wesentlichen Arbeitsbedingungen",
       betrieb: b,
@@ -166,7 +184,7 @@ export const nachweisArbeitsbedingungen: Vorlage = {
       meta: `Beginn: ${datumDe(text(d, "beginn"))}\nAusgestellt: ${datumDe(text(d, "ausgestellt_am"))}`,
       inhalt:
         `<p class="klein">Diese Niederschrift hält die wesentlichen Vertragsbedingungen nach § 2 Abs. 1 Nachweisgesetz fest. Sie ersetzt keinen Arbeitsvertrag; bestehende vertragliche Vereinbarungen gelten weiter.</p>` +
-        abschnitt("Vertragsparteien", parteien({ rolle: "Arbeitgeber", name: b.name, anschrift: anschrift(b), zusatz: vertreten || undefined }, { rolle: "beschäftigte Person", name: text(d, "name"), anschrift: text(d, "anschrift") })) +
+        abschnitt("Vertragsparteien", parteien({ rolle: "Arbeitgeber", name: b.name, anschrift: anschriftMehrzeilig(b), zusatz: vertreten || undefined }, { rolle: "beschäftigte Person", name: text(d, "name"), anschrift: text(d, "anschrift") })) +
         punkteNw.join("") +
         unterschriften([vertreten ? `Arbeitgeber/in, ${vertreten}` : "Arbeitgeber/in", "Beschäftigte Person (Erhalt bestätigt)"], { ortDatum: true }),
     });

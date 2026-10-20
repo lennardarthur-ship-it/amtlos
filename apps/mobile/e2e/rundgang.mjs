@@ -154,7 +154,8 @@ try {
   // Zwischenschirm: Ergebnis steht, Zusatzfragen sind freiwillig (E-136); eine Zusatzfrage ansehen, dann überspringen
   pruefe(await sichtbar("Geschafft – dein Ergebnis steht"), "Zwischenschirm vor den Zusatzfragen fehlt");
   await foto("check-zwischen");
-  await knopf("Genauer machen").click();
+  // Hauptknopf ist „Ergebnis ansehen“, „Genauer machen (n Fragen)“ der Weg zu den Zusatzfragen (B6)
+  await p.getByRole("button", { name: /^Genauer machen/ }).locator("visible=true").last().click();
   await warte(600);
   pruefe(await sichtbar("Genauer machen · Frage 1 von"), "Zusatzfragen ohne eigenen Fortschritt");
   pruefe((await knopf("Überspringen").count()) > 0, "ohne Antwort kein „Überspringen“");
@@ -215,7 +216,7 @@ try {
   await warte();
   await feld("Name oder Firma").fill("Kim Beispiel");
   await feld("Anschrift").fill("Gartenweg 3\n80333 München");
-  pruefe(await sichtbar("Weitere Angaben (1)"), "seltene Felder nicht hinter „Weitere Angaben“");
+  pruefe(await sichtbar(/Weitere Angaben \(\d+\)/), "seltene Felder nicht hinter „Weitere Angaben“");
   await knopf("Weiter").click();
   await warte();
   await tippe(p.getByRole("button", { name: /^Position 1/ }).locator("visible=true").last());
@@ -253,7 +254,7 @@ try {
   pruefe((await sichtbar("Geteilt am")) && (await knopf("Stornieren").count()) > 0 && (await p.getByRole("button", { name: "Löschen", exact: true }).locator("visible=true").count()) === 0, "Rechnung nach dem Teilen nicht festgeschrieben");
   await foto("festgeschrieben");
   // Zahlungseingang vermerken (E-129): ändert die festgeschriebene Rechnung nicht
-  await tippe(knopf("Zahlung eingegangen – heute"));
+  await tippe(knopf("Als bezahlt markieren"));
   await warte(500);
   pruefe(await sichtbar("Bezahlt am"), "Zahlungseingang nicht vermerkt");
   // E-Rechnung (E-128): fehlen Angaben für XRechnung (hier E-Mail, Telefon, IBAN), nennt Amtlos sie statt einer ungültigen Datei
@@ -272,7 +273,8 @@ try {
   await p.getByRole("tab", { name: "Heute" }).click();
   await warte(800);
   pruefe(await sichtbar("2026-001 · "), "Rechnung fehlt unter „Zuletzt bearbeitet“");
-  pruefe(await sichtbar("Offen bei Kunden"), "Offener Betrag auf „Heute“ fehlt");
+  // die einzige Rechnung ist bezahlt: statt „0,00 € offen“ steht der Umsatz des Monats groß da (B2)
+  pruefe((await sichtbar("Alles bezahlt")) && (await sichtbar("Umsatz im ")), "„Alles bezahlt“ mit Monatsumsatz fehlt auf „Heute“");
   await foto("heute");
 
   // zweite Rechnung (Knopf auf der Bühne): Nummer zählt hoch, gespeicherter Kunde füllt die Anschrift

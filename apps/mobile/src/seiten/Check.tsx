@@ -2,9 +2,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AccessibilityInfo, Platform, ScrollView, View } from "react-native";
 import type { Frage } from "@amtlos/i18n";
 import { T as TEXT } from "../texte";
-import { Auswahl, DatumFeld, Fakt, Feld, Fuss, Hinweis, Symbol, Karte, Knopf, MehrfachWahl, T, TextKnopf, ZurueckKnopf } from "../ui/bausteine";
+import { Auswahl, DatumFeld, Fakt, Feld, Fuss, Hinweis, Stempel, Symbol, Karte, Knopf, MehrfachWahl, T, TextKnopf, ZurueckKnopf } from "../ui/bausteine";
 import { HellerStatus, TastaturRahmen, useKopf, useNav } from "../ui/navigation";
-import { RADIUS, RAND, useFarben } from "../ui/thema";
+import { BLATT_OBEN, RADIUS, RAND, SCHRIFT, useFarben } from "../ui/thema";
 import { CHECK_FELDER, auswertung, beantwortet, checkFragen, dringlichkeit, selten, zusatzFragen, type Profil } from "../pflichten/check";
 import { heute } from "../unterlagen/speicher";
 import { PflichtZeile } from "./Pflichten";
@@ -72,13 +72,26 @@ function TextFeld({ label, wert, setzen }: { label: string; wert: string; setzen
   return <Feld ohneLabel label={label} wert={text} aendern={setText} onBlur={() => setzen(text)} onSubmitEditing={() => setzen(text)} />;
 }
 
+/** Fortschritt als ein durchgehender 4-pt-Balken (B9) – gezählt in Fragen, nicht in Kästchen. */
 function Fortschritt({ n, aktuell, label }: { n: number; aktuell: number; label?: string }) {
   const f = useFarben();
+  const anteil = n ? Math.min(1, Math.max(0, aktuell / n)) : 0;
   return (
-    <View accessibilityRole="progressbar" accessibilityLabel={label} accessibilityValue={{ min: 0, max: n, now: aktuell, text: label }} style={{ flexDirection: "row", gap: 4, paddingHorizontal: RAND, paddingVertical: 10 }}>
-      {Array.from({ length: n }, (_, i) => (
-        <View key={i} style={{ flex: 1, height: 4, borderRadius: 2, backgroundColor: i < aktuell ? f.amt : f.linie }} />
-      ))}
+    <View accessibilityRole="progressbar" accessibilityLabel={label} accessibilityValue={{ min: 0, max: n, now: aktuell, text: label }} style={{ paddingHorizontal: RAND, paddingVertical: 10 }}>
+      <View style={{ height: 4, borderRadius: 2, backgroundColor: f.linie, overflow: "hidden" }}>
+        <View style={{ width: `${anteil * 100}%`, minWidth: anteil ? 4 : 0, height: 4, borderRadius: 2, backgroundColor: f.amt }} />
+      </View>
+    </View>
+  );
+}
+
+/** Zählkachel auf der Bühne (B6): große Zahl, kurzes Wort darunter. */
+function Zahl({ zahl, text }: { zahl: number; text: string }) {
+  const f = useFarben();
+  return (
+    <View accessible accessibilityRole="text" accessibilityLabel={`${zahl} ${text}`} style={{ flex: 1, minHeight: 76, padding: 12, borderRadius: RADIUS.klein, backgroundColor: f.buehneFlaeche, justifyContent: "space-between" }}>
+      <T maxFontSizeMultiplier={1.4} farbe={f.buehneText} stil={{ ...SCHRIFT.display, fontSize: 28, lineHeight: 32, letterSpacing: -0.8, fontVariant: ["tabular-nums"] }}>{String(zahl)}</T>
+      <T v="caption" maxFontSizeMultiplier={1.6} farbe={f.buehneLeise} stil={{ ...SCHRIFT.halb }}>{text}</T>
     </View>
   );
 }
@@ -167,14 +180,14 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
                 <T v="titel" accessibilityRole="header" farbe={f.buehneText} stil={{ marginTop: 22, textAlign: "center" }}>{TEXT.check_einleitung_titel}</T>
                 <T farbe={f.buehneLeise} stil={{ marginTop: 10, textAlign: "center" }}>{TEXT.check_einleitung_text}</T>
               </View>
-              <View style={{ marginTop: 26, flexDirection: "row", gap: 10, padding: 14, borderRadius: 18, backgroundColor: f.buehneFlaeche }}>
+              <View style={{ marginTop: 26, flexDirection: "row", gap: 10, padding: 14, borderRadius: RADIUS.knopf, backgroundColor: f.buehneFlaeche }}>
                 <Symbol name="info.circle" groesse={17} farbe={f.minze} gewicht="semibold" />
                 <T v="klein" farbe={f.buehneLeise} stil={{ flex: 1 }}>{TEXT.check_hinweis}</T>
               </View>
             </View>
           ) : zwischenschirm ? (
             <View style={{ paddingTop: 16 }}>
-              <Symbol name="checkmark.circle.fill" groesse={60} farbe={f.minze} gewicht="regular" />
+              <Stempel groesse={72} farbe={f.minze} />
               <T v="titel" accessibilityRole="header" farbe={f.buehneText} stil={{ marginTop: 18 }}>{TEXT.zwischen_titel}</T>
               <T farbe={f.buehneLeise} stil={{ marginTop: 10 }}>{TEXT.zwischen_text(extraN)}</T>
             </View>
@@ -190,12 +203,18 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
           ) : a ? (
             <View style={{ flexGrow: 1 }}>
               <View style={{ paddingTop: 12, paddingBottom: 28 }}>
-                <Symbol name="checkmark.circle.fill" groesse={60} farbe={f.minze} gewicht="regular" />
+                <Stempel groesse={72} farbe={f.minze} />
                 {/* groß, was bald ansteht; die Gesamtzahl klein – „47 Pflichten“ allein erschlägt */}
                 <T v="titel" accessibilityRole="header" farbe={f.buehneText} stil={{ marginTop: 18 }}>{TEXT.ergebnis_bald(bald)}</T>
                 <T v="klein" farbe={f.buehneLeise} stil={{ marginTop: 8 }}>{TEXT.ergebnis_gesamt(a.gilt.length, selten(a.gilt))}</T>
+                {/* drei Zahlen auf einen Blick (B6): alle Pflichten, bald fällig, mit Vorlage in Amtlos */}
+                <View style={{ flexDirection: "row", gap: 8, marginTop: 18 }}>
+                  <Zahl zahl={a.gilt.length} text={TEXT.ergebnis_zahlen.pflichten} />
+                  <Zahl zahl={bald} text={TEXT.ergebnis_zahlen.bald} />
+                  <Zahl zahl={a.gilt.filter((p) => p.vorlage).length} text={TEXT.ergebnis_zahlen.vorlage} />
+                </View>
               </View>
-              <View style={{ flexGrow: 1, marginHorizontal: -RAND, paddingHorizontal: RAND, paddingTop: 24, paddingBottom: 32, backgroundColor: f.papier, borderTopLeftRadius: RADIUS.buehne, borderTopRightRadius: RADIUS.buehne }}>
+              <View style={{ flexGrow: 1, marginHorizontal: -RAND, paddingHorizontal: RAND, paddingTop: BLATT_OBEN, paddingBottom: 32, backgroundColor: f.papier, borderTopLeftRadius: RADIUS.buehne, borderTopRightRadius: RADIUS.buehne }}>
               {a.gilt.length ? (
                 <View>
                   <T v="gross">{TEXT.ergebnis_anfangen(Math.min(3, a.gilt.length))}</T>
@@ -224,14 +243,15 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
             </View>
           ) : null}
         </ScrollView>
-        <Fuss buehne={buehne && !a} ueber={zwischenschirm ? <TextKnopf buehne text={TEXT.zwischen_ergebnis} onPress={() => { setZwischen(false); setI(fragen.length); }} stil={{ alignSelf: "center" }} /> : undefined}>
+        {/* Zwischenschirm (B6): das Ergebnis ist der Hauptweg, „Genauer machen“ das freiwillige Extra */}
+        <Fuss buehne={buehne && !a} ueber={zwischenschirm ? <TextKnopf buehne text={TEXT.zwischen_genauer_n(extraN)} onPress={() => setZwischen(false)} stil={{ alignSelf: "center" }} /> : undefined}>
           {i > 0 ? (
             <ZurueckKnopf buehne={buehne && !a} label={TEXT.vorheriger_schritt} onPress={() => { if (zeit.current) clearTimeout(zeit.current); setI(i - 1); }} />
           ) : null}
           {i < 0 ? (
             <Knopf buehne text={TEXT.check_starten} onPress={() => setI(0)} stil={{ flex: 1 }} />
           ) : zwischenschirm ? (
-            <Knopf buehne text={TEXT.zwischen_genauer} onPress={() => setZwischen(false)} stil={{ flex: 1 }} />
+            <Knopf buehne text={TEXT.zwischen_ergebnis} onPress={() => { setZwischen(false); setI(fragen.length); }} stil={{ flex: 1 }} />
           ) : frage ? (
             // ohne Antwort heißt der Knopf „Überspringen“ – nie ein grauer, scheinbar gesperrter „Weiter“-Knopf
             <Knopf ton={!beantwortet(z.stand.profil, frage.feld)} text={beantwortet(z.stand.profil, frage.feld) ? TEXT.weiter : TEXT.check_ueberspringen} onPress={weiter} stil={{ flex: 1 }} />

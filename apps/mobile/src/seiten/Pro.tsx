@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Image, Linking, Pressable, View } from "react-native";
+import { ActivityIndicator, Linking, Pressable, View } from "react-native";
 import { LINKS } from "../rechtliches";
 import { T as TEXT } from "../texte";
-import { Betrag, Fuss, Hinweis, Kachel, Karte, Knopf, Symbol, T, TextKnopf } from "../ui/bausteine";
+import { Betrag, Fuss, Hinweis, Kachel, Karte, Knopf, Symbol, T, TextKnopf, useGrosseSchrift } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { useNav } from "../ui/navigation";
 import { BuehnenBlatt } from "./gemeinsam";
@@ -15,6 +15,22 @@ import { DatenschutzSeite } from "./Recht";
 
 /** „Synchronisation“ nur zeigen, wenn dieser Build einen Server hat (E-134). */
 const VORTEILE = PRO_VORTEILE.filter((v) => v !== "sync" || syncAngeboten);
+/** Reihenfolge nach Nutzen (B13): gesparte Zeit und das Paket für die Steuerberatung zuerst, der Briefkopf zuletzt. */
+const NACH_NUTZEN: ProFunktion[] = ["steuerberater", "ust_uebernahme", "pdf", "e_rechnung", "icloud", "sync", "briefkopf"];
+const VORTEIL_SYMBOL: Record<ProFunktion, string> = { pdf: "square.and.arrow.up", e_rechnung: "doc.text", ust_uebernahme: "percent", steuerberater: "briefcase", sync: "arrow.triangle.2.circlepath", icloud: "icloud", briefkopf: "paintpalette" };
+
+/** Vorteil als Kachel im 2×2-Raster: Symbol, kurzer Titel, ein Satz. */
+function VorteilKachel({ v }: { v: ProFunktion }) {
+  const f = useFarben();
+  const gross = useGrosseSchrift();
+  return (
+    <View accessible accessibilityRole="text" accessibilityLabel={`${TEXT.pro_vorteil[v].titel}. ${TEXT.pro_vorteil[v].text(FREI_JE_MONAT)}`} style={{ flexBasis: gross ? "100%" : "46%", flexGrow: 1, padding: 14, borderRadius: RADIUS.karte, backgroundColor: f.blatt, gap: 8 }}>
+      <Kachel symbol={VORTEIL_SYMBOL[v]} groesse={36} />
+      <T fett stil={{ marginTop: 2 }}>{TEXT.pro_kachel[v]}</T>
+      <T v="caption" leise>{TEXT.pro_vorteil[v].text(FREI_JE_MONAT)}</T>
+    </View>
+  );
+}
 
 
 /**
@@ -86,6 +102,10 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
     }
   };
   const gewaehlt = liste?.find((a) => a.id === wahl);
+  const reihe = NACH_NUTZEN.filter((x) => VORTEILE.includes(x));
+  const sortiert = grund ? [grund, ...reihe.filter((x) => x !== grund)] : reihe;
+  const haupt = sortiert.slice(0, 4);
+  const weitere = sortiert.slice(4);
   const rest = uebrig(z.stand.unterlagen, new Date());
   return (
     <BuehnenBlatt
@@ -98,34 +118,32 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
           )}
         </Fuss>
       }
-      buehne={
-        // wie Apples eigene Abo-Seiten: App-Symbol, Titel und ein Satz mittig – hier auf der Bühne
-        <View style={{ alignItems: "center", paddingTop: 4, gap: 6 }}>
-          {/* eslint-disable-next-line @typescript-eslint/no-require-imports -- Bild aus den Assets */}
-          <Image source={require("../../assets/icon.png")} style={{ width: 84, height: 84, borderRadius: 19, borderWidth: 1, borderColor: "rgba(255,255,255,0.18)" }} accessibilityIgnoresInvertColors />
-          <T v="grossTitel" accessibilityRole="header" farbe={f.buehneText} stil={{ marginTop: 10, textAlign: "center" }}>{TEXT.pro_titel}</T>
-          <T farbe={f.buehneLeise} stil={{ textAlign: "center", maxWidth: 320 }}>{grund ? TEXT.pro_grund[grund](FREI_JE_MONAT) : TEXT.pro_unter}</T>
-        </View>
-      }
+      // zuerst der Nutzen (B13): mehr Zeit, Steuerpaket, vorzeigbare Unterlagen – nicht Logo und Hausfarbe
+      ueber={TEXT.pro_marke}
+      titel={TEXT.pro_wert_titel}
+      unter={grund ? TEXT.pro_grund[grund](FREI_JE_MONAT) : TEXT.pro_wert_text}
     >
-      <Karte>
-        {/* der Grund, aus dem der Bezahlschirm aufging, steht oben */}
-        {(grund ? [grund, ...VORTEILE.filter((x) => x !== grund)] : VORTEILE).map((v, i, l) => (
-          <View key={v} style={{ flexDirection: "row", gap: 12, alignItems: "flex-start" }}>
-            <View style={{ paddingTop: 17 }}>
-              <Symbol name="checkmark" groesse={15} farbe={f.amt} gewicht="bold" />
-            </View>
-            <View style={{ flex: 1, paddingVertical: 14, borderBottomWidth: i === l.length - 1 ? 0 : HAARLINIE, borderColor: f.linie }}>
-              <T fett>{TEXT.pro_vorteil[v].titel}</T>
-              <T v="klein" leise stil={{ marginTop: 2 }}>{TEXT.pro_vorteil[v].text(FREI_JE_MONAT)}</T>
-            </View>
-          </View>
+      {/* die vier stärksten Vorteile als Raster – der Grund, aus dem der Bezahlschirm aufging, steht vorn */}
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
+        {haupt.map((v) => (
+          <VorteilKachel key={v} v={v} />
         ))}
-      </Karte>
+      </View>
+      {weitere.length ? (
+        <Karte stil={{ marginTop: 10 }}>
+          <T v="caption" fett leise stil={{ paddingTop: 12 }}>{TEXT.pro_ausserdem}</T>
+          {weitere.map((v, i, l) => (
+            <View key={v} style={{ flexDirection: "row", gap: 12, alignItems: "center", paddingVertical: 11, borderBottomWidth: i === l.length - 1 ? 0 : HAARLINIE, borderColor: f.linie }}>
+              <Symbol name={VORTEIL_SYMBOL[v]} groesse={18} farbe={f.amt} />
+              <T v="klein" stil={{ flex: 1 }}>{TEXT.pro_vorteil[v].titel}</T>
+            </View>
+          ))}
+        </Karte>
+      ) : null}
       <View style={{ marginTop: 10 }}>
         <Hinweis art="erfolg" text={TEXT.pro_frei_bleibt} />
       </View>
-      {!z.pro ? <T v="caption" leise stil={{ marginTop: 4, marginLeft: 4 }}>{TEXT.pro_rest(rest, FREI_JE_MONAT)}</T> : null}
+      {!z.pro ? <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.pro_rest(rest, FREI_JE_MONAT)}</T> : null}
 
       {kaufAktiv ? (
         liste === null ? (
@@ -187,7 +205,7 @@ export function ProZeile() {
     <Pressable accessibilityRole="button" onPress={() => nav.oeffnen("pro", () => <ProSeite />, true)} style={({ pressed }) => ({ opacity: pressed ? 0.75 : 1 })}>
       {/* ruhige Karte wie die übrigen – die lauteste Fläche des Bildschirms soll nicht die Werbung sein */}
       <View style={{ flexDirection: "row", alignItems: "center", gap: 14, padding: 14, borderRadius: RADIUS.karte, backgroundColor: f.blatt }}>
-        <Kachel symbol={z.pro ? "checkmark.seal.fill" : "sparkles"} ton="gold" />
+        <Kachel symbol={z.pro ? "checkmark.seal.fill" : "sparkles"} ton="amt" />
         <View style={{ flex: 1 }}>
           <T fett>{z.pro ? TEXT.pro_aktiv : TEXT.pro_titel}</T>
           <T v="klein" leise>{z.pro ? TEXT.pro_aktiv_text : TEXT.pro_rest(rest, FREI_JE_MONAT)}</T>

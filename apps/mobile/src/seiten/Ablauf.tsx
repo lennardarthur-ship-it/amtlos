@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { fehlendeAngaben, personAus, personIn, vorlageFuer, type Daten, type Vorlage, type VorlagenAbschnitt } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { Betrag, Fuss, Knopf,  T, TextKnopf, Wahl, ZurueckKnopf } from "../ui/bausteine";
+import { Betrag, Fuss, Hinweis, Knopf,  T, TextKnopf, Wahl, ZurueckKnopf } from "../ui/bausteine";
 import { HellerStatus, TastaturRahmen, useKopf, useNav } from "../ui/navigation";
 import { RADIUS, RAND,  useFarben } from "../ui/thema";
 import { PERSONEN_LISTE, betriebFehlt, personenSortiert } from "../unterlagen/speicher";
@@ -13,7 +13,7 @@ import { Abschluss, festschreibenHinweis, useTeilen } from "./Abschluss";
 import { AuswahlSeite } from "../ui/auswahlseite";
 import { AbsenderSeite } from "./Betrieb";
 import { useProSperre } from "./Pro";
-import { euerUebernahme, jahreMitDaten, type EuerUebernahme } from "../unterlagen/steuerpaket";
+import { euerUebernahme, jahreMitDaten, kassenHinweis, kassenLage, type EuerUebernahme } from "../unterlagen/steuerpaket";
 import { Ansage, Felder, useAnsage } from "./felder";
 import { InfoSeite } from "./InfoSeite";
 import { ListenSchritt } from "./Liste";
@@ -74,11 +74,14 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
   const liste = perioden(z.stand.unterlagen, z.stand.betrieb, v, z.stand.belege);
   const offen = v === "ist" ? offeneRechnungen(z.stand.unterlagen).length : 0;
   const r = uebernommen && uebernommen.v === v ? uebernommen.r : null;
+  // Kleinunternehmer geben keine Voranmeldung ab – dann kein Kassenhinweis
+  const kasse = r && !r.kleinunternehmer ? kassenHinweis(kassenLage(z.stand.profil), "ust") : null;
   // Ergebnis und Warnungen der Übernahme ansagen (VoiceOver bemerkt die neuen Zeilen sonst nicht)
   useAnsage(
     r
       ? [
           r.kleinunternehmer ? TEXT.aus_rechnungen_ku : TEXT.aus_rechnungen_ok(r.anzahl),
+          kasse?.text ?? "",
           r.gutschriften ? TEXT.aus_rechnungen_gutschriften(r.gutschriften) : "",
           r.ersatz ? TEXT.aus_rechnungen_ersatz(r.ersatz) : "",
           r.offen ? TEXT.aus_rechnungen_offen(r.offen) : "",
@@ -109,6 +112,7 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
       {r ? (
         <View style={{ marginTop: 8, gap: 4 }}>
           {r.kleinunternehmer ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_ku}</T> : <T v="caption" farbe={f.amtTief}>{TEXT.aus_rechnungen_ok(r.anzahl)}</T>}
+          {kasse ? <Hinweis art={kasse.warnung ? "warnung" : "info"} symbol="banknote" text={kasse.text} /> : null}
           {r.gutschriften ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_gutschriften(r.gutschriften)}</T> : null}
           {r.ersatz ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_ersatz(r.ersatz)}</T> : null}
           {r.offen ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_offen(r.offen)}</T> : null}
@@ -126,7 +130,8 @@ function EuerAusDaten({ id }: { id: string }) {
   const sperre = useProSperre();
   const [ergebnis, setErgebnis] = useState<{ jahr: string; r: EuerUebernahme } | null>(null);
   const jahre = jahreMitDaten(z.stand);
-  useAnsage(ergebnis ? [TEXT.euer_aus_daten_ok(ergebnis.r.rechnungen, ergebnis.r.belege), ergebnis.r.unbezahlt ? TEXT.euer_unbezahlt(ergebnis.r.unbezahlt) : "", ergebnis.r.anlagen ? TEXT.euer_anlagen(ergebnis.r.anlagen) : "", ergebnis.r.hinweis].filter(Boolean).join(" ") : null);
+  const kasse = ergebnis ? kassenHinweis(kassenLage(z.stand.profil), "euer") : null;
+  useAnsage(ergebnis ? [TEXT.euer_aus_daten_ok(ergebnis.r.rechnungen, ergebnis.r.belege), kasse?.text ?? "", ergebnis.r.unbezahlt ? TEXT.euer_unbezahlt(ergebnis.r.unbezahlt) : "", ergebnis.r.anlagen ? TEXT.euer_anlagen(ergebnis.r.anlagen) : "", ergebnis.r.hinweis].filter(Boolean).join(" ") : null);
   if (!jahre.length) return <T v="caption" leise stil={{ marginTop: 10 }}>{TEXT.euer_leer}</T>;
   return (
     <View style={{ marginTop: 16, padding: 16, borderRadius: RADIUS.karte, backgroundColor: f.amtHauch }}>
@@ -147,6 +152,7 @@ function EuerAusDaten({ id }: { id: string }) {
       {ergebnis ? (
         <View style={{ marginTop: 8, gap: 4 }}>
           <T v="caption" farbe={f.amtTief}>{TEXT.euer_aus_daten_ok(ergebnis.r.rechnungen, ergebnis.r.belege)}</T>
+          {kasse ? <Hinweis art={kasse.warnung ? "warnung" : "info"} symbol="banknote" text={kasse.text} /> : null}
           {ergebnis.r.unbezahlt ? <T v="caption" farbe={f.bald}>{TEXT.euer_unbezahlt(ergebnis.r.unbezahlt)}</T> : null}
           {ergebnis.r.anlagen ? <T v="caption" farbe={f.bald}>{TEXT.euer_anlagen(ergebnis.r.anlagen)}</T> : null}
           <T v="caption" farbe={f.bald}>{ergebnis.r.hinweis}</T>

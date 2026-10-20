@@ -4,7 +4,7 @@ import { createNativeStackNavigator, type NativeStackNavigationOptions } from "@
 import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { KeyboardAvoidingView, Platform, Pressable, View, useWindowDimensions } from "react-native";
 import { T as TEXT } from "../texte";
-import { Symbol, T, useGrosseSchrift } from "./bausteine";
+import { BuehnenText, Symbol, T, useGrosseSchrift } from "./bausteine";
 import { MINZE, RADIUS, RAND, SCHRIFT, ZIEL, istIos, useFarben, type Farben } from "./thema";
 
 /**
@@ -100,7 +100,8 @@ export function kopfOptionen(f: Farben): NativeStackNavigationOptions {
 /** Web: Titel der Leiste gekürzt, in der passenden Farbe (auf der Bühne weiß). */
 const webTitel = (farbe: string) =>
   function WebTitel({ children }: { children: string }) {
-    return <T fett numberOfLines={1} farbe={farbe} stil={{ maxWidth: 220 }}>{children}</T>;
+    // 180 pt: lässt links „Schließen“ und rechts „Übersicht“ Platz (A12) – lange Titel enden mit „…“
+    return <T fett numberOfLines={1} farbe={farbe} stil={{ maxWidth: 180 }}>{children}</T>;
   };
 
 function WebZurueck({ buehne }: { buehne: boolean }) {
@@ -214,7 +215,7 @@ export function Unterseite({ titel, unter, children, rechts, schliessen }: { tit
       {titel ? (
         <View style={{ paddingHorizontal: RAND, paddingTop: 2, paddingBottom: 20 }}>
           <T v="titel" accessibilityRole="header" farbe={f.buehneText} numberOfLines={gross ? undefined : 3}>{titel}</T>
-          {unter ? <T farbe={f.buehneLeise} stil={{ marginTop: 6 }}>{unter}</T> : null}
+          {unter ? <BuehnenText text={unter} stil={{ marginTop: 6 }} /> : null}
         </View>
       ) : null}
       <View style={{ flex: 1, backgroundColor: f.papier, borderTopLeftRadius: RADIUS.buehne, borderTopRightRadius: RADIUS.buehne, overflow: "hidden" }}>{children}</View>

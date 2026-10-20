@@ -67,8 +67,8 @@ describe("Rechnung: Beschriftungen", () => {
 
   it("Infoblock: E-Mail-Wert darf umbrechen (Wertspalte), die Beschriftung nicht", () => {
     const h = html("rechnung", RECHNUNG);
-    expect(h).toContain(".g-brief .info table td { padding: 0.3mm 0; line-height: 1.3; vertical-align: top; overflow-wrap: anywhere; }");
-    expect(h).toContain(".g-brief .info table td:first-child { color: #4a535c; width: 31mm; padding-right: 2mm; white-space: nowrap; }");
+    expect(h).toContain(".g-brief .info table td { padding: 0.15mm 0; line-height: 1.25; vertical-align: top; overflow-wrap: anywhere; }");
+    expect(h).toContain(".g-brief .info table td:first-child { color: #4a535c; width: 21mm; padding-right: 2mm; white-space: nowrap; }");
   });
 });
 
@@ -147,7 +147,7 @@ describe("Kapitalgesellschaft: EÜR-Warnung und „vertreten durch“", () => {
   it("AVV: „vertreten durch“ bei der Partei und der Unterschrift des Betriebs, halbe Anführungszeichen im Hauptvertrag", () => {
     const d = { partner: "TerminFix GmbH", partner_anschrift: "Am Markt 1\n10115 Berlin", hauptvertrag: "Nutzungsvertrag „Salon M“ vom 20.03.2025", tom: "Verschlüsselung" };
     const h = html("avv", d, GMBH);
-    expect(h).toContain('<div class="name">Salon Sonne GmbH</div><div class="adresse">Hauptstraße 1, 20259 Hamburg</div><div class="zusatz">vertreten durch Alex Sonnberg, Chris Sonnberg</div><div class="rolle">– Verantwortlicher, Auftraggeber –</div>');
+    expect(h).toContain('<div class="name">Salon Sonne GmbH</div><div class="adresse">Hauptstraße 1<br>20259 Hamburg</div><div class="zusatz">vertreten durch Alex Sonnberg, Chris Sonnberg</div><div class="rolle">– Verantwortlicher, Auftraggeber –</div>');
     expect(h).toContain("<span>Auftraggeber (Salon Sonne GmbH, vertreten durch Alex Sonnberg, Chris Sonnberg)</span>");
     expect(h).toContain("<span>Auftragnehmer (TerminFix GmbH)</span>");
     expect(h).toContain("ergänzt den Vertrag „Nutzungsvertrag ‚Salon M‘ vom 20.03.2025“ (Hauptvertrag)");

@@ -9,7 +9,7 @@ import { datenpanne, datenschutzDokumentation, datenschutzinformation } from "./
 import { kiKompetenz, nachweisArbeitsbedingungen } from "./personal.js";
 import { verfahrensdokumentation } from "./steuern.js";
 import { pdfDateiname } from "../dateinamen.js";
-import { GESTALT_MARKE, GRUNDLAGE_MARKE, SEITE_MARKE, cent, esc, festeLeerzeichen, seiteCss, zahl } from "./html.js";
+import { GESTALT_MARKE, GRUNDLAGE_MARKE, RAENDER, RAENDER_MARKE, SEITE_MARKE, cent, esc, festeLeerzeichen, kennungFassen, seiteCss, zahl } from "./html.js";
 import type { Bereich, Betrieb, Daten, EinfachesFeld, Eintrag, Feld, Vorlage, Vorschlag } from "./typen.js";
 
 export * from "./typen.js";
@@ -227,6 +227,9 @@ export function dokumentHtml(v: Vorlage, d: Daten, b: Betrieb): string {
   // Kundendokumente und Aushänge für Gäste: ohne Rechtsgrundlage und Bereich – das ist für die eigenen Unterlagen
   const fuerAndere = v.kundendokument || v.ohneKopfangaben;
   const grundlage = v.grundlage && !fuerAndere ? `<div><dt>Rechtsgrundlage</dt><dd>${festeLeerzeichen(esc(v.grundlage))}</dd></div>` : "";
-  const art = fuerAndere ? "" : (BEREICHE.find((x) => x.id === v.bereich)?.titel ?? "");
-  return v.html(ohneVerdeckte(v, d), b).replace(GRUNDLAGE_MARKE, grundlage).replace('<div class="art"></div>', `<div class="art">${esc(art)}</div>`).split(GESTALT_MARKE).join(v.gestalt ?? "nachweis").replace(SEITE_MARKE, seiteCss(v.gestalt ?? "nachweis", v.querformat));
+  // Aushänge: ohne Bereich der App (z. B. „Beauty und Kosmetik“ auf dem Hygieneplan eines Cafés) – er sagt dem Leser
+  // an der Wand nichts und passt nicht immer zur Branche
+  const art = fuerAndere || v.gestalt === "aushang" ? "" : (BEREICHE.find((x) => x.id === v.bereich)?.titel ?? "");
+  return kennungFassen(v.html(ohneVerdeckte(v, d), b).replace(GRUNDLAGE_MARKE, grundlage)).replace('<div class="art"></div>', `<div class="art">${esc(art)}</div>`).split(GESTALT_MARKE).join(v.gestalt ?? "nachweis").replace(SEITE_MARKE, seiteCss(v.gestalt ?? "nachweis", v.querformat))
+    .replace(RAENDER_MARKE, RAENDER[v.gestalt ?? "nachweis"].join(","));
 }

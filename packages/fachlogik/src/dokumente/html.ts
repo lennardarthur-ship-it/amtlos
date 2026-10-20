@@ -202,8 +202,22 @@ export function ibanText(iban: string): string {
   return /^[A-Z]{2}\d{2}[A-Z0-9]{8,30}$/.test(roh) ? roh.replace(/(.{4})(?=.)/g, "$1 ") : iban.trim();
 }
 
+/**
+ * Sozialversicherungsnummer gegliedert wie auf dem SV-Ausweis: Bereichsnummer, Geburtsdatum, Anfangsbuchstabe,
+ * Seriennummer mit Prüfziffer – „53 140788 K 123“; anderes bleibt unverändert.
+ */
+export function svNummerText(nr: string): string {
+  const roh = nr.replace(/\s+/g, "").toUpperCase();
+  const m = /^(\d{2})(\d{6})([A-Z])(\d{3})$/.exec(roh);
+  return m ? `${m[1]} ${m[2]} ${m[3]} ${m[4]}` : nr.trim();
+}
+
 export function anschrift(b: Betrieb): string {
   return [b.strasse, [b.plz, b.ort].filter(Boolean).join(" ")].filter((x) => x.trim()).join(", ");
+}
+/** Anschrift des Betriebs zweizeilig (Straße / PLZ Ort) – z. B. für die Vertragsparteien, gleich gesetzt wie die Gegenseite. */
+export function anschriftMehrzeilig(b: Betrieb): string {
+  return [b.strasse, [b.plz, b.ort].filter(Boolean).join(" ")].filter((x) => x.trim()).join("\n");
 }
 
 /** Vertragsparteien in zwei Spalten („zwischen … und …“). Ohne Name und Anschrift: Linien für beides (Anschrift zwei Zeilen). */
@@ -229,8 +243,10 @@ export function felder(zeilen: [string, string | Roh | null][], o: { start?: num
 
 /** Kennzahlen-Tabelle wie im amtlichen Vordruck (USt-Voranmeldung): Kennzahl im Kasten, Bezeichnung, Betrag. */
 export function kennzahlen(zeilen: { kz?: string; text: string; betrag: string; fett?: boolean; hinweis?: string }[]): string {
+  // ohne jede Kennzahl keine leere Kennzahlspalte (sie rückte die Bezeichnung grundlos ein)
+  const mitKz = zeilen.some((z) => z.kz);
   return `<table class="kennzahlen">${zeilen
-    .map((z) => `<tr${z.fett ? ' class="gesamt"' : ""}><td class="kz">${z.kz ? `<span>${esc(z.kz)}</span>` : ""}</td><th>${esc(z.text)}${z.hinweis ? `<small>${esc(z.hinweis)}</small>` : ""}</th><td class="zahl">${z.betrag}</td></tr>`)
+    .map((z) => `<tr${z.fett ? ' class="gesamt"' : ""}>${mitKz ? `<td class="kz">${z.kz ? `<span>${esc(z.kz)}</span>` : ""}</td>` : ""}<th>${esc(z.text)}${z.hinweis ? `<small>${esc(z.hinweis)}</small>` : ""}</th><td class="zahl">${z.betrag}</td></tr>`)
     .join("")}</table>`;
 }
 
@@ -269,10 +285,53 @@ export const HAUSFARBEN: { wert: string; text: string }[] = [
   { wert: "#5e4a12", text: "Oliv" },
 ];
 
-/** Hausfarbe aus „Mein Betrieb“ (nur #rrggbb), sonst Graphit. */
+/** Kontrast einer Farbe (#rrggbb) zu Weiß nach WCAG 2 (1 … 21). */
+export function kontrastZuWeiss(hex: string): number {
+  const kanal = (i: number) => {
+    const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  };
+  const l = 0.2126 * kanal(1) + 0.7152 * kanal(3) + 0.0722 * kanal(5);
+  return 1.05 / (l + 0.05);
+}
+
+/** #rrggbb → [Farbton 0..360, Sättigung 0..1, Helligkeit 0..1] und zurück. */
+function hsl(hex: string): [number, number, number] {
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255) as [number, number, number];
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  if (max === min) return [0, 0, l];
+  const d = max - min;
+  const s = d / (1 - Math.abs(2 * l - 1));
+  const h = max === r ? ((g - b) / d + (g < b ? 6 : 0)) * 60 : max === g ? ((b - r) / d + 2) * 60 : ((r - g) / d + 4) * 60;
+  return [h, s, l];
+}
+function hexAus(h: number, s: number, l: number): string {
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = l - c / 2;
+  const [r, g, b] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
+  return `#${[r, g, b].map((v) => Math.round((v + m) * 255).toString(16).padStart(2, "0")).join("")}`;
+}
+
+/** Mindestkontrast der Hausfarbe zu Weiß: Sie steht als Text (Name, Nummern) und unter weißer Schrift (Aushangkopf). */
+export const MINDESTKONTRAST = 4.5;
+
+/**
+ * Hausfarbe aus „Mein Betrieb“ (nur #rrggbb), sonst Graphit. Zu helle Farben (Kontrast zu Weiß unter 4,5 : 1) werden
+ * bei gleichem Farbton und gleicher Sättigung so weit abgedunkelt, bis der Kontrast reicht – z. B. #c27c0e → #9a6210.
+ */
 export function akzent(b: Betrieb): string {
-  const f = (b.farbe ?? "").trim();
-  return /^#[0-9a-fA-F]{6}$/.test(f) ? f.toLowerCase() : HAUSFARBEN[0]!.wert;
+  const f = (b.farbe ?? "").trim().toLowerCase();
+  if (!/^#[0-9a-f]{6}$/.test(f)) return HAUSFARBEN[0]!.wert;
+  if (kontrastZuWeiss(f) >= MINDESTKONTRAST) return f;
+  const [h, s, l] = hsl(f);
+  for (let x = l; x > 0; x -= 0.005) {
+    const neu = hexAus(h, s, Math.max(0, x));
+    if (kontrastZuWeiss(neu) >= MINDESTKONTRAST) return neu;
+  }
+  return HAUSFARBEN[0]!.wert;
 }
 
 /** Farbe mit Weiß gemischt (Anteil der Farbe 0..1) – für Flächen in der Hausfarbe. */
@@ -304,6 +363,8 @@ export const SEITE_MARKE = "/*amtlos-seite*/";
 export const GRUNDLAGE_MARKE = "<!--amtlos-grundlage-->";
 /** Platzhalter für die Gestalt der Vorlage – dokumentHtml() setzt sie ein (ohne Vorlage: „nachweis“). */
 export const GESTALT_MARKE = "amtlos-gestalt-offen";
+/** Platzhalter für die Seitenränder in der Meta-Angabe für die Fußzeile – dokumentHtml() setzt RAENDER der Gestalt ein. */
+export const RAENDER_MARKE = "amtlos-raender-offen";
 
 const SANS = `"Amtlos Sans", "Source Sans 3", "Helvetica Neue", Helvetica, Arial, "Liberation Sans", sans-serif`;
 const SERIF = `"Amtlos Serif", "Source Serif 4", Charter, "Iowan Old Style", Georgia, "DejaVu Serif", serif`;
@@ -351,10 +412,16 @@ h2, h3 { page-break-after: avoid; break-after: avoid; page-break-inside: avoid; 
 table.liste.fortsetzung { margin-top: 0; }
 .schlussblock > table + .unterschriften, .schlussblock.nach-tabelle > .unterschriften:first-child { margin-top: 7mm; }
 /* oben bündig: die kürzere Spalte wird nicht auf die Höhe der längeren gestreckt */
-.spalten2 { display: flex; gap: 10mm; align-items: flex-start; }
-.spalten2 > * { flex: 1; }
+.spalten2, .spalten3 { display: flex; gap: 10mm; align-items: flex-start; }
+.spalten2 > *, .spalten3 > * { flex: 1; }
+.spalten3 { gap: 7mm; }
+.spalten3 table.angaben { font-size: 8.6pt; }
+.spalten3 table.angaben th { width: 42%; font-size: 7.8pt; padding-right: 2mm; }
 /* zwei Angaben-Spalten nebeneinander: gleiche Zeilenhöhe, auch wenn links Text und rechts eine Ausfülllinie steht */
-.spalten2 table.angaben th, .spalten2 table.angaben td { height: 7mm; vertical-align: bottom; }
+.spalten2 table.angaben th, .spalten2 table.angaben td, .spalten3 table.angaben th, .spalten3 table.angaben td { height: 7mm; vertical-align: top; }
+.spalten3 table.angaben th, .spalten3 table.angaben td { height: 6mm; padding-top: 1.1mm; padding-bottom: 1mm; }
+/* nur leere Ausfülllinien sitzen unten auf der Zeile */
+.spalten2 table.angaben td:has(> .fuellen.zeile), .spalten3 table.angaben td:has(> .fuellen.zeile) { vertical-align: bottom; }
 .zelle-linie { display: block; border-bottom: 0.5pt solid #8a949c; height: 4.2mm; }
 ol.nummern { margin: 0 0 2mm; padding-left: 6mm; }
 ol.nummern li { margin: 0 0 0.9mm; padding-left: 0.6mm; }
@@ -395,8 +462,14 @@ h1 { font-size: 20pt; line-height: 1.12; margin: 7mm 0 1mm; font-weight: 600; le
 .kennung { display: grid; grid-template-columns: repeat(auto-fit, minmax(34mm, 1fr)); margin: 0 0 6mm; padding: 2mm 0 2mm 3mm; border-left: 2pt solid var(--akzent); background: var(--akzent-hauch); }
 .kennung div { padding: 0.5mm 3mm 0.5mm 0; }
 .kennung dt { font-size: 6.9pt; color: #4a535c; margin: 0 0 0.3mm; letter-spacing: 0.15pt; }
-.kennung dd { font-size: 8.8pt; margin: 0; font-weight: 600; color: #1a1f24; }
+.kennung dd { font-size: 8.8pt; margin: 0; font-weight: 600; color: #1a1f24; overflow-wrap: break-word; }
 .kennung:empty { display: none; }
+/* nur eine Angabe: kleine Zeile statt Band (kennungFassen) */
+.kennung-zeile { margin: 1.5mm 0 5mm; font-size: 8.3pt; color: #4a535c; }
+.unter + .kennung-zeile { margin-top: -2.5mm; }
+.kennung-zeile b { font-weight: 600; color: #1a1f24; }
+.kennung-zeile .fuellen { min-width: 40mm; }
+.g-aushang.ba .kennung-zeile { display: none; }
 .kennung dd .fuellen { min-width: 0; width: 100%; max-width: 45mm; height: 4.6mm; }
 /* kurze Linie im Text, z. B. für einen Steuersatz „Umsatzsteuer ___ %“ */
 .fuellen.kurz { min-width: 10mm; width: 10mm; }
@@ -407,7 +480,7 @@ h2 .rand { display: none; }
 section.abschnitt > h2::before { counter-increment: abschnitt; content: counter(abschnitt); display: inline-block; min-width: 6mm; color: var(--akzent); font-weight: 700; }
 section.abschnitt.ohne-nummer > h2::before, h2.ohne::before { content: none; }
 h3 { font-size: 10.4pt; margin: 3.4mm 0 1.2mm; font-weight: 600; position: relative; }
-h3 .nr, h3 .rand { display: none; }
+h3 .nr, h3 .rand, .gruppe-nr { display: none; }
 .abschnitt { margin-top: 6.5mm; }
 .eintrag { margin: 0 0 3mm; padding: 0 0 2.4mm; border-bottom: 0.5pt solid #e4e8eb; }
 .eintrag:last-child { border-bottom: 0; }
@@ -429,7 +502,16 @@ table.liste td:first-child, table.liste th:first-child { padding-left: 0; }
 table.liste td:last-child, table.liste th:last-child { padding-right: 0; }
 table.liste.hoch td { height: 8mm; }
 table.liste tr.summe td { border-bottom: 0; border-top: 1pt solid var(--akzent); font-weight: 600; padding-top: 1.8mm; }
-table.liste.doppelt tr.summe td.zahl { border-bottom: 2.2pt double var(--akzent); }
+/* Doppellinie unter der Bilanzsumme: 3 pt, damit beide Linien auch gedruckt getrennt stehen */
+table.liste.doppelt tr.summe td.zahl { border-bottom: 3pt double #1a1f24; }
+/* Bilanz als eine Tabelle (Aktiva | Passiva): gleiche Zeilenhöhen, Summen auf einer Linie */
+table.liste.bilanz { page-break-inside: avoid; break-inside: avoid; }
+table.liste.bilanz td:nth-child(3), table.liste.bilanz th:nth-child(3) { padding-left: 5mm; border-left: 0.5pt solid #c9d0d6; }
+table.liste.bilanz td:nth-child(2), table.liste.bilanz th:nth-child(2) { padding-right: 4mm; }
+/* Teilnahmeliste: Zeilen hoch genug für eine Unterschrift */
+table.liste.teilnahme td { height: 10mm; }
+/* Beschriftung in einer Zelle (z. B. „Wer:“, „Frist:“ in der Gefährdungsbeurteilung) */
+table.liste .lbl { font-size: 7.4pt; color: #4a535c; }
 table.liste ul.punkte { margin: 0; padding-left: 3.6mm; }
 
 /* Kasten (Betriebsanweisung) */
@@ -441,7 +523,8 @@ table.liste ul.punkte { margin: 0; padding-left: 3.6mm; }
 .summen { width: 58%; margin-left: 42%; margin-top: 3mm; font-size: 9.6pt; }
 .summen td { padding: 1.2mm 0; }
 .summen td:last-child { text-align: right; white-space: nowrap; }
-.summen tr.gesamt td { border-top: 1pt solid var(--akzent); font-weight: 700; font-size: 11pt; padding-top: 2mm; }
+/* Gesamtbetrag: Linie in Tintenfarbe – die Hausfarbe bleibt Kopf und Gliederung vorbehalten */
+.summen tr.gesamt td { border-top: 1pt solid #1a1f24; font-weight: 700; font-size: 11pt; padding-top: 2mm; }
 
 /* Unterschriften */
 .unterschriften { display: flex; gap: 12mm; margin-top: 10mm; }
@@ -452,6 +535,12 @@ table.liste ul.punkte { margin: 0; padding-left: 3.6mm; }
 .unterschrift span { display: block; margin-bottom: 3mm; }
 .unterschrift span:last-child { margin-bottom: 0; }
 .unterschrift:only-child { max-width: 50%; }
+/* eine Unterschrift mit Ort und Datum: beide Linien nebeneinander statt untereinander (spart eine Zeile Höhe) */
+.unterschriften.mit-ort .unterschrift:only-child { max-width: none; display: grid; grid-template-columns: 1fr 1fr; column-gap: 12mm; align-items: end; }
+.unterschriften.mit-ort .unterschrift:only-child > :nth-child(1) { grid-column: 1; grid-row: 1; }
+.unterschriften.mit-ort .unterschrift:only-child > :nth-child(2) { grid-column: 1; grid-row: 2; margin-bottom: 0; }
+.unterschriften.mit-ort .unterschrift:only-child > :nth-child(3) { grid-column: 2; grid-row: 1; }
+.unterschriften.mit-ort .unterschrift:only-child > :nth-child(4) { grid-column: 2; grid-row: 2; }
 
 /* Parteien (Vertrag) */
 .parteien { display: flex; gap: 10mm; margin: 2mm 0 5mm; }
@@ -464,17 +553,18 @@ table.liste ul.punkte { margin: 0; padding-left: 3.6mm; }
 .partei .name .fuellen, .partei .adresse .fuellen { display: block; min-width: 0; width: 100%; height: 6.5mm; }
 
 /* Formular-Feldraster */
-table.felder { font-size: 9.4pt; table-layout: fixed; }
+table.felder { font-size: 9.4pt; table-layout: fixed; line-height: 1.32; }
 table.felder td.wert { overflow-wrap: anywhere; }
-table.felder td.nr { width: 7mm; font-size: 6.8pt; color: #7a838c; vertical-align: top; padding: 1.8mm 0 1.2mm; }
-table.felder th { text-align: left; font-weight: 400; font-size: 8.3pt; color: #4a535c; width: 38%; padding: 1.8mm 4mm 1.2mm 0; vertical-align: top; }
-table.felder td.wert { padding: 1.2mm 2mm 1.2mm 2mm; vertical-align: top; font-weight: 600; border-bottom: 0.6pt solid #8a949c; }
+table.felder td.nr { width: 7mm; font-size: 7.4pt; font-weight: 600; color: #4a535c; vertical-align: top; padding: 1.4mm 0 1mm; }
+table.felder th { text-align: left; font-weight: 400; font-size: 8.3pt; color: #4a535c; width: 38%; padding: 1.4mm 4mm 1mm 0; vertical-align: top; }
+/* Werte: Regular in 9,8 pt (ein Medium-Schnitt ist nicht eingebettet; Halbfett wirkte wie lauter Überschriften) */
+table.felder td.wert { padding: 1mm 2mm; vertical-align: top; font-weight: 400; font-size: 9.8pt; border-bottom: 0.6pt solid #8a949c; }
 table.felder tr + tr td.nr, table.felder tr + tr th { border-top: 0.5pt dotted #c9d0d6; }
 table.kennzahlen { font-size: 9.6pt; }
 table.kennzahlen td.kz { width: 14mm; padding: 1.4mm 2mm 1.4mm 0; vertical-align: middle; }
 table.kennzahlen td.kz span { display: inline-block; min-width: 9mm; padding: 0.6mm 1.2mm; border: 0.6pt solid #1a1f24; font-size: 8.3pt; text-align: center; }
 table.kennzahlen th { text-align: left; font-weight: 400; padding: 1.4mm 3mm 1.4mm 0; vertical-align: middle; }
-table.kennzahlen th small { display: block; font-size: 7.4pt; color: #4a535c; }
+table.kennzahlen th small { display: block; font-size: 7.4pt; color: #4a535c; font-weight: 400; }
 table.kennzahlen td.zahl { width: 34mm; padding: 1.4mm 2mm; border: 0.6pt solid #8a949c; background: #ffffff; vertical-align: middle; }
 table.kennzahlen tr + tr td, table.kennzahlen tr + tr th { border-top: 0.5pt solid #e4e8eb; }
 table.kennzahlen tr + tr td.zahl { border-top: 0.6pt solid #8a949c; }
@@ -483,7 +573,8 @@ table.kennzahlen tr.gesamt td.zahl { border-width: 1pt; }
 
 /* Inhaltsübersicht */
 .inhalt-uebersicht { margin: 0 0 7mm; padding: 2.6mm 0 2mm; border-top: 0.5pt solid #c9d0d6; border-bottom: 0.5pt solid #c9d0d6; font-family: ${SANS}; }
-.inhalt-uebersicht h2 { border: 0; font-size: 8.3pt; color: #4a535c; margin: 0 0 1.2mm; padding: 0; font-weight: 600; }
+/* nav … > h2: setzt sich gegen die h2-Größe der Gestalt (z. B. .g-handbuch h2) durch */
+nav.inhalt-uebersicht > h2 { border: 0; font-size: 8.3pt; color: #4a535c; margin: 0 0 1.2mm; padding: 0; font-weight: 600; background: none; }
 .inhalt-uebersicht ol { margin: 0; padding: 0; columns: 2; column-gap: 8mm; font-size: 8.8pt; list-style: none; counter-reset: ue; }
 .inhalt-uebersicht li { counter-increment: ue; padding-left: 7mm; position: relative; margin: 0 0 0.6mm; break-inside: avoid; }
 .inhalt-uebersicht li::before { content: counter(ue); position: absolute; left: 0; color: var(--akzent); font-weight: 700; }
@@ -499,9 +590,14 @@ body.g-brief.fuss-im-fluss .fussleiste { display: flex; }
 /* ---------------- Randspalte (Nachweis, Vertrag, Handbuch): Nummern und Gesetzesangaben links neben dem Text */
 ${r("main")} { padding-left: ${RANDSPALTE}mm; }
 ${r("section.abschnitt > h2::before")} { position: absolute; left: -${RANDSPALTE}mm; top: 0; width: ${RANDSPALTE - 4}mm; min-width: 0; text-align: left; }
-${r("h2 .rand")} { display: block; position: absolute; left: -${RANDSPALTE}mm; top: 6.2mm; width: ${RANDSPALTE - 4}mm; font-size: 6.8pt; line-height: 1.3; font-weight: 400; color: #7a838c; font-family: ${SANS}; hyphens: manual; }
+${r("h2 .rand")} { display: block; position: absolute; left: -${RANDSPALTE}mm; top: 6.2mm; width: ${RANDSPALTE - 4}mm; font-size: 7.2pt; line-height: 1.3; font-weight: 400; color: #5c666f; font-family: ${SANS}; hyphens: manual; }
 ${r("h3 .nr")} { display: block; position: absolute; left: -${RANDSPALTE}mm; top: 0; width: ${RANDSPALTE - 4}mm; color: var(--akzent); font-weight: 700; font-family: ${SANS}; }
-${r("h3 .rand")} { display: block; position: absolute; left: -${RANDSPALTE}mm; top: 0; width: ${RANDSPALTE - 4}mm; font-size: 6.8pt; line-height: 1.3; font-weight: 400; color: #7a838c; font-family: ${SANS}; }
+${r("h3 .rand")} { display: block; position: absolute; left: -${RANDSPALTE}mm; top: 0; width: ${RANDSPALTE - 4}mm; font-size: 7.2pt; line-height: 1.3; font-weight: 400; color: #5c666f; font-family: ${SANS}; }
+/* mehrere kurze Punkte unter einer Randnummer (z. B. „2.–6.“ im Nachweis der Arbeitsbedingungen) */
+${r("section.abschnitt.gruppe")} { position: relative; }
+${r(".gruppe-nr")} { display: block; position: absolute; left: -${RANDSPALTE}mm; top: 1.3mm; width: ${RANDSPALTE - 4}mm; color: var(--akzent); font-weight: 700; font-family: ${SANS}; font-size: 10.8pt; }
+/* Nachweis: Tabellen über die ganze Breite (auch über die Randspalte), damit die Spalten Platz haben */
+.g-nachweis:not(.quer) main:has(section.abschnitt) section.abschnitt table.liste { margin-left: -${RANDSPALTE}mm; width: calc(100% + ${RANDSPALTE}mm); }
 ${r("h3 .nr ~ .rand")} { top: 5.2mm; }
 ${r("section.abschnitt > h2 + .eintrag")} { margin-top: 7mm; }
 ${MIT_RAND.split(", ").map((g) => `${g}:not(.quer) main:has(section.abschnitt) .unterschriften`).join(", ")} { margin-left: -${RANDSPALTE}mm; }
@@ -513,7 +609,7 @@ ${r("main:not(:has(section.abschnitt))")}, .quer main { padding-left: 0; }
 .quer .unterschriften, .quer .inhalt-uebersicht { margin-left: 0; }
 
 /* ---------------- Brief (DIN 5008 Form B) */
-body.g-brief { padding-left: 5mm; padding-right: 10mm; }
+body.g-brief { padding-left: 5mm; padding-right: 10mm; font-size: 10pt; }
 .g-brief .kopf { position: relative; height: 33mm; }
 .g-brief .kopf .marke { position: absolute; left: 0; top: 4mm; }
 .g-brief .kopf .marke .name { font-size: 17pt; line-height: 1.05; font-weight: 600; color: var(--akzent); letter-spacing: -0.15pt; }
@@ -529,24 +625,40 @@ body.g-brief { padding-left: 5mm; padding-right: 10mm; }
 .g-brief .anschrift .empf.enger { font-size: 8pt; line-height: 1.18; }
 /* leere Anschrift: drei Linien (Name, Straße, PLZ und Ort) */
 .g-brief .anschrift .empf .fuellen { display: block; min-width: 0; width: 78mm; height: 6.6mm; }
-/* Informationsblock 125–200 mm vom linken Blattrand; im Fluss, damit ein langer Block den Betreff nach unten schiebt */
-.g-brief .info { flex: none; margin: 5mm 0 0 15mm; width: 75mm; font-size: 8.2pt; }
-.g-brief .info table td { padding: 0.3mm 0; line-height: 1.3; vertical-align: top; overflow-wrap: anywhere; }
+/* Informationsblock 125–190 mm vom linken Blattrand (rechtsbündig mit dem Text); im Fluss, damit ein langer Block den
+   Betreff nach unten schiebt */
+.g-brief .info { flex: none; margin: 5mm 0 0 15mm; width: 65mm; font-size: 8.5pt; }
+.g-brief .info table td { padding: 0.15mm 0; line-height: 1.25; vertical-align: top; overflow-wrap: anywhere; }
 .g-brief .info .fuellen { min-width: 0; width: 38mm; }
-.g-brief .info table td:first-child { color: #4a535c; width: 31mm; padding-right: 2mm; white-space: nowrap; }
-.g-brief .betreff { margin: 6mm 0 4.5mm; font-size: 12.5pt; font-weight: 700; color: #12161b; }
+.g-brief .info table td:first-child { color: #4a535c; width: 21mm; padding-right: 2mm; white-space: nowrap; }
+.g-brief .info table tr.leer td { height: 2mm; padding: 0; }
+.g-brief .info table tr.fett td:last-child { font-weight: 600; }
+.g-brief .betreff { margin: 8mm 0 4.5mm; font-size: 13pt; font-weight: 700; color: #12161b; }
 .g-brief .betreff span { display: block; font-size: 9pt; font-weight: 400; color: #4a535c; margin-top: 0.8mm; }
 .g-brief .anrede { margin: 0 0 3.5mm; }
-.g-brief table.liste th { border-bottom-width: 1.2pt; }
-.g-brief table.liste td { padding-top: 1.6mm; padding-bottom: 1.6mm; }
-.g-brief .zahlung { margin-top: 4mm; display: flex; gap: 5mm; align-items: stretch; background: var(--akzent-hauch); border-left: 2pt solid var(--akzent); padding: 3mm 3.5mm; }
-.g-brief .zahlung .qr { flex: 0 0 auto; background: #fff; padding: 1.5mm; align-self: flex-start; }
+.g-brief table.liste { font-size: 9.2pt; }
+.g-brief table.liste th { border-bottom-width: 1.2pt; font-size: 7.8pt; }
+.g-brief table.liste td { padding-top: 1.3mm; padding-bottom: 1.3mm; }
+/* Summenblock beginnt an der Mengenspalte der Positionstabelle (Spaltenbreiten in der Rechnung) */
+.g-brief .summen { width: 48%; margin-left: 52%; font-size: 10pt; margin-top: 2.4mm; }
+.g-brief .summen td { padding: 0.9mm 0; }
+.g-brief .summen tr.gesamt td { padding-top: 1.6mm; }
+.g-brief .summen.ku { width: 41%; margin-left: 59%; }
+.g-brief .summen tr.gesamt td { font-size: 12pt; }
+.g-brief .zahlung { margin-top: 4mm; display: flex; gap: 5mm; align-items: stretch; background: var(--akzent-hauch); border-left: 2pt solid var(--akzent); padding: 2.6mm 3.5mm; line-height: 1.38; }
+.g-brief .zahlung p { margin-bottom: 1.4mm; }
+/* die Ruhezone (4 Module, weiß) steckt im SVG selbst */
+.g-brief .zahlung .qr { flex: 0 0 auto; background: #fff; padding: 0 0 1mm; align-self: flex-start; }
 .g-brief .zahlung .qr svg { display: block; }
 .g-brief .zahlung .qr small { display: block; text-align: center; font-size: 6.4pt; color: #4a535c; margin-top: 1mm; }
 .g-brief .zahlung .text { flex: 1; }
 .g-brief .zahlung p:last-child { margin: 0; }
-.g-brief .schluss, .g-brief .abschluss { page-break-inside: avoid; break-inside: avoid; }
-.g-brief .gruss { margin-top: 3.5mm; }
+/* Zahlungsblock bleibt bei den Summen und bricht nicht; nur Hinweise und Gruß dürfen auf eine Folgeseite rücken
+   (früher hielt .abschluss alles zusammen – eine kurze Rechnung lief dann mit 80 mm Leerraum auf zwei Seiten) */
+.g-brief .abschluss { page-break-inside: auto; break-inside: auto; }
+.g-brief .zahlung { page-break-inside: avoid; break-inside: avoid; page-break-before: avoid; break-before: avoid; }
+.g-brief .schluss { page-break-inside: avoid; break-inside: avoid; }
+.g-brief .gruss { margin-top: 3mm; }
 .g-brief .gruss p { margin-bottom: 1.4mm; }
 
 /* ---------------- Vertrag */
@@ -570,12 +682,14 @@ body.g-brief { padding-left: 5mm; padding-right: 10mm; }
 .g-aushang .kopfzeile { background: var(--akzent); color: #ffffff; padding: 3.5mm 5mm; border: 0; align-items: center; }
 .g-aushang .kopfzeile .name, .g-aushang .kopfzeile .adresse, .g-aushang .kopfzeile .art { color: #ffffff; }
 .g-aushang .kopfzeile .logo { background: #ffffff; padding: 1.2mm 2mm; border-radius: 1mm; max-height: 13mm; }
-.g-aushang h1 { font-size: 26pt; margin-top: 6mm; }
+.g-aushang h1 { font-size: 26pt; margin-top: 5mm; }
 .g-aushang .unter { font-size: 13pt; }
 .g-aushang .kennung { margin-bottom: 5mm; }
-.g-aushang table.liste { font-size: 10pt; }
+/* aus 1–2 m lesbar: Tabellen mindestens 10,5 pt, erste Spalte (was/wofür) 12 pt halbfett */
+.g-aushang table.liste { font-size: 10.5pt; }
+.g-aushang table.liste:not(.matrix):not(.legende) td:first-child { font-size: 12pt; font-weight: 600; line-height: 1.25; }
 .g-aushang table.liste th { font-size: 8.6pt; padding: 2.2mm 2.4mm 1.8mm; background: var(--akzent-hauch); color: #1a1f24; border-bottom-width: 1.2pt; }
-.g-aushang table.liste td { padding: 2.6mm 2.4mm; }
+.g-aushang table.liste td { padding: 2mm 2.4mm; }
 .g-aushang table.liste td:first-child, .g-aushang table.liste th:first-child { padding-left: 2.4mm; }
 .g-aushang table.liste td:last-child, .g-aushang table.liste th:last-child { padding-right: 2.4mm; }
 .g-aushang h2 { font-size: 13.5pt; }
@@ -594,12 +708,14 @@ body.g-brief { padding-left: 5mm; padding-right: 10mm; }
 .g-aushang.ba .kasten { margin-top: 2.4mm; }
 .g-aushang.ba .kasten h2 { font-size: 11pt; padding: 1.8mm 4mm; }
 .g-aushang.ba .kasten .inhalt { padding: 2.6mm 4mm 1.2mm; font-size: 10.4pt; }
+/* Aufzählungspunkte in der Kennfarbe der Kästen, nicht in der Hausfarbe */
+.g-aushang.ba .kasten ul.punkte li::marker { color: var(--band, var(--akzent)); }
 .g-aushang.ba .kasten.stoff .inhalt { display: flex; gap: 6mm; }
 .g-aushang.ba .kasten.stoff .inhalt > div { flex: 1; }
 .g-aushang.ba .kasten.stoff .inhalt dt { font-size: 7.6pt; color: #4a535c; margin-bottom: 0.6mm; }
 .g-aushang.ba .kasten.stoff .inhalt dd { margin: 0; font-weight: 600; font-size: 11pt; }
 .g-aushang.ba .notruf { margin-top: 2mm; padding: 2mm 4mm; border: 1.2pt solid #1a1f24; font-weight: 700; font-size: 11pt; }
-.g-aushang .unterschriften { margin-top: 10mm; }
+.g-aushang .unterschriften { margin-top: 8mm; }
 .g-aushang.ba .unterschriften { margin-top: 4mm; }
 .g-aushang.ba .unterschrift .linie { height: 9mm; }
 .g-aushang.ba .notruf .fuellen { min-width: 70mm; }
@@ -621,34 +737,52 @@ body.g-brief { padding-left: 5mm; padding-right: 10mm; }
 .g-aushang.ba .kasten .inhalt .fuellen-block { margin-bottom: 1mm; }
 .g-aushang.ba .kasten .inhalt .fuellen-block .fuellen { height: 6.4mm; }
 /* Aushang mit viel Text: kompakter Satz, damit er auf möglichst wenige Blätter passt */
-.g-aushang.kompakt table.liste { font-size: 8.8pt; line-height: 1.32; }
-.g-aushang.kompakt table.liste th { font-size: 7.8pt; padding: 1.6mm 2mm 1.4mm; }
-.g-aushang.kompakt table.liste td { padding: 1.7mm 2mm; }
+/* nie unter 9,6 pt (Fließtextgröße der übrigen Dokumente) */
+.g-aushang.kompakt table.liste { font-size: 9.6pt; line-height: 1.26; }
+.g-aushang.kompakt table.liste th { font-size: 8.2pt; padding: 1.4mm 2mm 1.2mm; }
+.g-aushang.kompakt table.liste td { padding: 1.2mm 2mm; }
+.g-aushang.kompakt table.liste:not(.matrix):not(.legende) td:first-child { font-size: 10.5pt; line-height: 1.2; }
 .g-aushang.kompakt h1 { font-size: 22pt; margin-top: 4mm; }
 .g-aushang.kompakt .unter { font-size: 11pt; margin-bottom: 3mm; }
 .g-aushang.kompakt .kennung { margin-bottom: 3.5mm; }
 /* Lohnkonto: viele Betragsspalten im Querformat */
 table.liste.eng { font-size: 7.8pt; }
 table.liste.eng th, table.liste.eng td { padding-left: 1.2mm; padding-right: 1.2mm; }
+table.liste.lohn { line-height: 1.3; }
+table.liste.lohn td { padding-top: 1.3mm; padding-bottom: 1.2mm; }
+table.liste.lohn th { padding-top: 1.2mm; padding-bottom: 1mm; }
+/* Lohnkonto auf einem Querformatblatt: Titel, Abschnittsabstände und Stammdaten enger */
+.lohnkonto h1 { font-size: 16pt; margin-top: 3.5mm; }
+.lohnkonto .unter { font-size: 10pt; margin-bottom: 2mm; }
+.lohnkonto .unter + .kennung-zeile { margin: -1mm 0 3mm; }
+.lohnkonto .kennung { margin-bottom: 3.5mm; }
+.lohnkonto .abschnitt { margin-top: 3mm; }
+.lohnkonto h2 { font-size: 11pt; margin-bottom: 1.2mm; padding-bottom: 0.6mm; }
+.lohnkonto .spalten3 table.angaben th, .lohnkonto .spalten3 table.angaben td { height: 5.4mm; padding-top: 0.9mm; padding-bottom: 0.8mm; line-height: 1.3; }
+.lohnkonto .nachsatz { margin-top: 1.2mm; font-size: 7.6pt; line-height: 1.25; }
+table.liste.lohn tr.summe td { background: var(--akzent-hauch); padding-top: 1.4mm; padding-bottom: 1.4mm; }
 /* Allergen-Matrix: eine Zeile je Speise, eine Spalte je Allergen (Bezeichnung senkrecht) */
-.g-aushang table.liste.matrix th.dreh { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; text-align: left; vertical-align: middle; padding: 2mm 0.6mm; font-size: 7.6pt; line-height: 1.1; }
-.g-aushang table.liste.matrix td.x { text-align: center; font-weight: 700; padding-left: 0; padding-right: 0; }
-.g-aushang table.liste.matrix td.x, .g-aushang table.liste.matrix th.dreh { border-left: 0.5pt solid #dde1e5; }
+/* Spaltenköpfe: Kennbuchstaben A–N (Zuordnung in der Legende), enthalten = Punkt */
+.g-aushang table.liste.matrix th.kz { text-align: center; vertical-align: bottom; padding: 2mm 0 1.6mm; font-size: 9pt; font-weight: 700; }
+.g-aushang table.liste.matrix td.x { text-align: center; font-size: 11pt; line-height: 1; vertical-align: middle; padding-left: 0; padding-right: 0; color: #1a1f24; }
+.g-aushang table.liste.matrix td:first-child { font-size: 10.5pt; }
+.g-aushang .schluessel { margin: 2mm 0 0; font-size: 9pt; color: #4a535c; line-height: 1.5; }
+.g-aushang .schluessel b { color: #1a1f24; }
+.g-aushang table.liste.matrix td.x, .g-aushang table.liste.matrix th.kz { border-left: 0.5pt solid #dde1e5; }
 .g-aushang table.liste.matrix tr.gruppe td { background: var(--akzent-hauch); padding-top: 1.6mm; padding-bottom: 1.4mm; }
 /* Kategorie nicht allein am Seitenende: je Kategorie eine Zeilengruppe, die möglichst nicht umbricht */
 .matrix tr.gruppe { page-break-after: avoid; break-after: avoid; }
 .matrix tbody.gruppe-block { page-break-inside: avoid; break-inside: avoid; }
 .g-aushang .nachsatz { font-size: 9pt; }
-.g-aushang table.liste.legende { font-size: 8.6pt; }
+.g-aushang table.liste.legende { font-size: 9.6pt; }
+.g-aushang table.liste.legende td:first-child { font-weight: 700; text-align: center; }
 .g-aushang table.liste.legende th { font-size: 7.6pt; }
 .g-aushang table.liste.legende td { padding: 1.6mm 2.4mm; }
 
 /* ---------------- Formular (Zusammenstellung für ein amtliches Formular) */
 .g-formular h2 { background: var(--akzent-hauch); padding: 1.6mm 2.6mm; border: 0; font-size: 10.8pt; margin-top: 1mm; }
 .g-formular section.abschnitt > h2::before { min-width: 7mm; }
-.g-formular .abschnitt { margin-top: 5.5mm; }
-.g-formular .bilanz { display: flex; gap: 8mm; page-break-inside: avoid; break-inside: avoid; }
-.g-formular .bilanz > div { flex: 1; }
+.g-formular .abschnitt { margin-top: 5mm; }
 .g-formular .uebertragung { margin-top: 8mm; padding-top: 2.5mm; border-top: 0.5pt solid #c9d0d6; font-size: 8.3pt; color: #4a535c; display: flex; gap: 10mm; }
 .g-formular .uebertragung div { flex: 1; }
 .g-formular .uebertragung .linie { border-bottom: 0.5pt solid #8a949c; height: 6mm; margin-bottom: 1mm; }
@@ -708,7 +842,7 @@ function kopf(o: { titel: string; betrieb: Betrieb; fussLinks: string; fussRecht
   const seite = `<style>${o.gestalt ? seiteCss(o.gestalt, o.quer) : o.quer ? `${SEITE_MARKE}@page { size: A4 landscape; }` : SEITE_MARKE}</style>`;
   const g = o.gestalt ?? GESTALT_MARKE;
   const band = o.band ? `--band:${o.band};` : "";
-  return `<!doctype html><html lang="de"><head><meta charset="utf-8"><title>${esc(o.titel)}</title><meta name="amtlos-gestalt" content="${g}"><meta name="amtlos-fuss-links" content="${esc(o.fussLinks)}"><meta name="amtlos-fuss-rechts" content="${esc(o.fussRechts)}"><meta name="amtlos-fuss-spalten" content="${esc(JSON.stringify(fussSpalten(b)))}"><meta name="amtlos-farbe" content="${farbe}"><style>:root{--akzent:${farbe};--akzent-hauch:${hauch(farbe, 0.08)};${band}}${STIL}</style>${seite}</head>`;
+  return `<!doctype html><html lang="de"><head><meta charset="utf-8"><title>${esc(o.titel)}</title><meta name="amtlos-gestalt" content="${g}"><meta name="amtlos-raender" content="${o.gestalt ? RAENDER[o.gestalt].join(",") : RAENDER_MARKE}"><meta name="amtlos-fuss-links" content="${esc(o.fussLinks)}"><meta name="amtlos-fuss-rechts" content="${esc(o.fussRechts)}"><meta name="amtlos-fuss-spalten" content="${esc(JSON.stringify(fussSpalten(b)))}"><meta name="amtlos-farbe" content="${farbe}"><style>:root{--akzent:${farbe};--akzent-hauch:${hauch(farbe, 0.08)};${band}}${STIL}</style>${seite}</head>`;
 }
 
 export interface DokumentOptionen {
@@ -773,7 +907,7 @@ export function schlussZusammen(inhalt: string): string {
     if (inhalt.slice(e, ab).trim()) break;
     const el = davor.slice(a, e);
     const kurz = /^<(p|div class="notruf)/.test(el) && el.length < 1500;
-    const abschnittOhneListe = /^<section class="abschnitt/.test(el) && (!el.includes('class="liste') || el.includes('class="bilanz"')) && el.length < 6000;
+    const abschnittOhneListe = /^<section class="abschnitt/.test(el) && (!el.includes('class="liste') || /class="liste[^"]*\bbilanz\b/.test(el)) && el.length < 6000;
     // ein kurzer Absatz reicht als Zusammenhang; ein ganzer Abschnitt nur, wenn direkt davor nichts Kurzes steht
     if (!kurz && !(abschnittOhneListe && genommen === 0)) break;
     ab = a;
@@ -822,15 +956,46 @@ const FEST: [RegExp, string][] = [
   [/\bDGUV (Vorschrift|Information|Regel) (?=\d)/g, "DGUV&nbsp;$1&nbsp;"],
   [/\b(Vorschrift|TRGS|TRBS|DIN|VDE) (?=\d)/g, "$1&nbsp;"],
 ];
+/** Nur im Fließtext, nicht in der schmalen Randspalte (dort entstünden zu lange untrennbare Ketten). */
+const FEST_TEXT: [RegExp, string][] = [
+  // Nummer und folgende Gliederungsangabe: „§ 622 Abs. 2“, „Art. 6 Abs. 1“, „§ 3 Satz 1“, „S. 5 Nr. 2“
+  [/(\d[a-z]?) (Abs\.|UAbs\.|Satz|Nr\.|S\.|lit\.)(?![\wäöüß])/g, "$1&nbsp;$2"],
+  // „je Stunde“, „pro Monat“, „à 0,5 l“: das Wort nicht allein am Zeilenende
+  [/(^|[\s(])(je|pro|à) (?=\S)/g, "$1$2&nbsp;"],
+];
 /**
  * Feste Leerzeichen, wo ein Zeilenumbruch den Bezug zerreißt (Zahl und Einheit, Paragraf und Nummer, Nummer und
  * Gesetz) – nur im Text, nie in Tags.
  */
 export function festeLeerzeichen(html: string): string {
+  // Tiefe innerhalb einer Randangabe (<span class="rand">, darin ggf. weitere <span>)
+  let rand = 0;
   return html
     .split(/(<[^>]*>)/)
-    .map((teil, i) => (i % 2 ? teil : FEST.reduce((t, [re, ers]) => t.replace(re, ers), teil)))
+    .map((teil, i) => {
+      if (i % 2) {
+        if (rand && /^<span[\s>]/.test(teil)) rand++;
+        else if (rand && teil === "</span>") rand--;
+        else if (/^<span class="rand"/.test(teil)) rand = 1;
+        return teil;
+      }
+      const t = FEST.reduce((x, [re, ers]) => x.replace(re, ers), teil);
+      return rand ? t : FEST_TEXT.reduce((x, [re, ers]) => x.replace(re, ers), t);
+    })
     .join("");
+}
+
+/**
+ * Kennungsleiste erst ab zwei Angaben als Band; mit nur einer Angabe (z. B. nur der Rechtsgrundlage) eine kleine Zeile
+ * unter dem Titel – ein Farbband für einen einzigen Wert wirkte schwerer als der Inhalt. Aufruf nach dem Einsetzen der
+ * Rechtsgrundlage (dokumentHtml).
+ */
+export function kennungFassen(html: string): string {
+  return html.replace(/<dl class="kennung">([\s\S]*?)<\/dl>/, (ganz, innen: string) => {
+    const felder = [...innen.matchAll(/<div><dt>([\s\S]*?)<\/dt><dd>([\s\S]*?)<\/dd><\/div>/g)];
+    if (felder.length !== 1) return ganz;
+    return `<p class="kennung-zeile">${felder[0]![1]}: <b>${felder[0]![2]}</b></p>`;
+  });
 }
 
 /** Ganzes Dokument: Kopfzeile des Betriebs, Titel, Kennungsleiste, Inhalt. Die Gestalt setzt dokumentHtml(). */
@@ -839,13 +1004,15 @@ export function dokument(o: DokumentOptionen): string {
   const kontakt = [b.telefon, b.email].filter((x) => x.trim()).join(" · ");
   const adresse = [anschrift(b), kontakt].filter(Boolean).join(" · ");
   const kopfDaten = kopfZeilen(o.meta);
+  // Unterzeile nur, wenn sie nicht schon als Wert in der Kennungsleiste steht (z. B. der Arbeitsbereich)
+  const unter = o.unter && !kopfDaten.some(([, v]) => v === o.unter!.trim()) ? o.unter : "";
   const stand = kopfDaten.find(([k, v]) => v !== KOPF_LINIE && /^(stand|datum|rechnungsdatum|prüfdatum|ausgestellt|bekannt seit)/i.test(k))?.[1] ?? "";
   const fussLinks = [b.name.trim(), o.titel].filter(Boolean).join(" · ");
   const g = o.gestalt ?? GESTALT_MARKE;
   const klassen = [`g-${g}`, o.quer ? "quer" : "", o.nummerierung === "zahl" ? "nummern-zahl" : "", o.klasse ?? ""].filter(Boolean).join(" ");
   return `${kopf({ titel: o.titel, betrieb: b, fussLinks, fussRechts: stand ? `Stand ${stand}` : "", quer: o.quer, gestalt: o.gestalt, band: o.band })}<body class="${klassen}">
 <header class="kopfzeile"><div><div class="name">${b.name.trim() ? esc(b.name.trim()) : LINIE}</div>${adresse ? `<div class="adresse">${esc(adresse)}</div>` : ""}</div><div class="rechts"><div class="art">${esc(o.art ?? "")}</div>${logoHtml(b)}</div></header>
-${o.vorTitel ?? ""}${festeLeerzeichen(`<h1>${esc(o.titel)}</h1>${o.unter ? `<p class="unter">${esc(o.unter)}</p>` : ""}`)}
+${o.vorTitel ?? ""}${festeLeerzeichen(`<h1>${esc(o.titel)}</h1>${unter ? `<p class="unter">${esc(unter)}</p>` : ""}`)}
 <dl class="kennung">${GRUNDLAGE_MARKE}${festeLeerzeichen(kopfDaten.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${v === KOPF_LINIE ? LINIE : esc(v)}</dd></div>`).join(""))}</dl>
 <main>${festeLeerzeichen(schlussZusammen(o.inhalt))}</main>
 ${fussHtml(b)}
@@ -858,11 +1025,20 @@ function anschriftZeilen(t: string[], proZeile: number): number {
 }
 
 /**
+ * Wert im Informationsblock. Eine E-Mail-Adresse, die nicht in die Spalte passt, bricht nach dem „@“ um statt am
+ * Bindestrich im Domainnamen („hallo@cafe-“ / „morgenrot.example“).
+ */
+function infoWert(w: string): string {
+  const m = /^([^@\s]+@)([^@\s]{1,32})$/.exec(w.trim());
+  return m ? `<span class="nb">${esc(m[1]!)}</span><wbr><span class="nb">${esc(m[2]!)}</span>` : esc(w);
+}
+
+/**
  * Geschäftsbrief nach DIN 5008 Form B (E-129/E-130): Briefkopf (Logo bzw. Name in der Hausfarbe), Rücksendeangabe und
  * Anschrift im Fenster (45 mm von oben, 20 mm von links, 85 × 45 mm), Informationsblock rechts daneben, Betreff,
  * Inhalt. Die Fußzeile mit Anschrift, Kontakt, Bank, Steuer und Register setzt die App auf jede Seite.
  */
-export function brief(o: { titel: string; betreff: string; unterBetreff?: string; betrieb: Betrieb; empfaenger: { name: string; anschrift: string; zusatz?: string }; info: [string, string, boolean?][]; anrede?: string; inhalt: string; vermerk?: string; stand?: string }): string {
+export function brief(o: { titel: string; betreff: string; unterBetreff?: string; betrieb: Betrieb; empfaenger: { name: string; anschrift: string; zusatz?: string }; info: ([string, string, boolean?, boolean?] | null)[]; anrede?: string; inhalt: string; vermerk?: string; stand?: string }): string {
   const b = o.betrieb;
   const logo = logoHtml(b);
   const zusatz = [anschrift(b)].filter(Boolean).join("");
@@ -875,12 +1051,14 @@ export function brief(o: { titel: string; betreff: string; unterBetreff?: string
   const eng = anschriftZeilen(zeilenEmpf, 44) <= 6 ? "" : anschriftZeilen(zeilenEmpf, 49) <= 7 ? " eng" : " enger";
   // ohne Anschrift: zwei Linien (Straße, PLZ und Ort) unter dem Namen bzw. seiner Linie
   const empf = `${o.empfaenger.name.trim() ? `${esc(o.empfaenger.name.trim())}<br>` : LINIE}${o.empfaenger.anschrift.trim() ? esc(o.empfaenger.anschrift.trim()).replace(/\n/g, "<br>") : `${LINIE}${LINIE}`}${o.empfaenger.zusatz ? `<br><span style="font-size:8pt;color:#4a535c">${esc(o.empfaenger.zusatz)}</span>` : ""}`;
-  // leere Angaben entfallen; mit drittem Eintrag `true` bleibt eine Linie zum Ausfüllen (z. B. Rechnungsnummer)
-  const info = o.info.filter(([, w, linie]) => w.trim() || linie);
+  // leere Angaben entfallen; mit drittem Eintrag `true` bleibt eine Linie zum Ausfüllen (z. B. Rechnungsnummer), mit
+  // viertem `true` steht der Wert halbfett (Datum). `null` ist eine Leerzeile – nur zwischen zwei Angaben.
+  const gefuellt = o.info.filter((z) => z === null || z[1].trim() || z[2]);
+  const info = gefuellt.filter((z, i) => z !== null || (i > 0 && gefuellt[i - 1] !== null && gefuellt.slice(i + 1).some((x) => x !== null)));
   return `${kopf({ titel: o.titel, betrieb: b, fussLinks: [b.name.trim(), o.titel].filter(Boolean).join(" · "), fussRechts: o.stand ? `Stand ${o.stand}` : "", gestalt: "brief" })}<body class="g-brief">
 <header class="kopf">${logo}<div class="marke"${logo ? ' style="right:65mm"' : ""}><div class="name">${b.name.trim() ? esc(b.name.trim()) : LINIE}</div>${zusatz ? `<div class="zusatz">${esc(zusatz)}</div>` : ""}</div></header>
 <div class="fenster"><div class="anschrift"><div class="ruecksendung">${esc(ruecksendung)}</div><div class="vermerk">${o.vermerk ? esc(o.vermerk) : ""}</div><div class="empf${eng}">${empf}</div></div>
-<div class="info"><table>${info.map(([k, w]) => `<tr><td>${esc(k)}</td><td>${w.trim() ? esc(w) : LINIE}</td></tr>`).join("")}</table></div></div>
+<div class="info"><table>${info.map((z) => (z === null ? '<tr class="leer"><td></td><td></td></tr>' : `<tr${z[3] ? ' class="fett"' : ""}><td>${esc(z[0])}</td><td>${z[1].trim() ? infoWert(z[1]) : LINIE}</td></tr>`)).join("")}</table></div></div>
 <h1 class="betreff">${esc(o.betreff)}${o.unterBetreff ? `<span>${esc(o.unterBetreff)}</span>` : ""}</h1>
 ${o.anrede ? `<p class="anrede">${esc(o.anrede)}</p>` : ""}<main>${festeLeerzeichen(o.inhalt)}</main>
 ${fussHtml(b)}
@@ -895,7 +1073,8 @@ ${fussHtml(b)}
  */
 function lesen(t: string | null | undefined): number | null {
   if (typeof t !== "string") return null;
-  let s = t.replace(/\s|€/g, "");
+  // typografisches Minus (U+2212, so steht es in den Dokumenten) wie Bindestrich
+  let s = t.replace(/\s|€/g, "").replace(/\u2212/g, "-");
   if (s === "") return null;
   // „45,-“ / „45,–“ / „45.-“: glatte Euro
   s = s.replace(/[,.][-–—]{1,2}$/, "");
@@ -917,7 +1096,11 @@ export function zahl(t: string | null | undefined): number | null {
   const n = lesen(t);
   return n === null ? null : Math.round(n * 10_000) / 10_000;
 }
-export const euro = (c: number) => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(c / 100);
+/**
+ * Betrag in Euro für Dokumente: „1.234,56 €“; negative Beträge mit typografischem Minus (U+2212) statt Bindestrich
+ * („−23,80 €“). Maschinenlesbare Ausgaben (CSV, DATEV, Steuerberater-Paket) formatieren selbst.
+ */
+export const euro = (c: number) => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(c / 100).replace(/^-/, "\u2212");
 export const zahlText = (n: number, stellen = 2) => new Intl.NumberFormat("de-DE", { maximumFractionDigits: stellen }).format(n);
 /** Summe eines Betragsfelds über Listeneinträge (Cent). */
 export const summe = (l: Eintrag[], k: string) => l.reduce((a, e) => a + (cent(text(e, k)) ?? 0), 0);

@@ -72,7 +72,12 @@ describe("Dokumentvorlagen", () => {
       expect(leer).not.toContain("noch nicht angegeben");
       expect(leer).toContain('name="amtlos-fuss-links" content="Salon Sonne');
       if (v.kundendokument || v.ohneKopfangaben) expect(leer, v.id).not.toMatch(/<dt>Rechtsgrundlage|<div class="art">[^<]/);
-      else if (v.grundlage) expect(leer.replace(/&nbsp;/g, " "), v.id).toContain(`<dt>Rechtsgrundlage</dt><dd>${v.grundlage.replace(/&/g, "&amp;")}</dd>`);
+      // Rechtsgrundlage im Band oder – als einzige Angabe – in der kleinen Zeile unter dem Titel (kennungFassen)
+      else if (v.grundlage) {
+        const g = v.grundlage.replace(/&/g, "&amp;");
+        const l = leer.replace(/&nbsp;/g, " ");
+        expect(l.includes(`<dt>Rechtsgrundlage</dt><dd>${g}</dd>`) || l.includes(`<p class="kennung-zeile">Rechtsgrundlage: <b>${g}</b></p>`), v.id).toBe(true);
+      }
       expect(leer).toContain("Salon Sonne");
       expect(leer.includes("A4 landscape"), v.id).toBe(Boolean(v.querformat));
       const voll = v.html(alles(v.abschnitte.flatMap((a) => a.felder)), BETRIEB);
@@ -130,9 +135,10 @@ describe("Dokumentvorlagen", () => {
   it("zeigt Allergene, Unterschriftszeilen und leere HACCP-Zeilen", () => {
     const a = vorlageFuer("allergene")!;
     const html = a.html({ stand: "2026-10-12", gerichte: [{ name: "Apfelkuchen", kategorie: "Kuchen", allergene: ["gluten", "eier", "milch"] }] }, BETRIEB);
-    // Matrix (E-130): eine Spalte je Allergen, × = enthalten
-    expect(html).toContain('<th class="dreh">Milch (einschließlich Laktose)</th>');
-    expect((html.match(/<td class="x">×<\/td>/g) ?? []).length).toBe(3);
+    // Matrix (E-130): eine Spalte je Allergen mit Kennbuchstaben (Milch = G), ● = enthalten, Zuordnung darunter
+    expect(html).toContain('<th class="kz" title="Milch (einschließlich Laktose)">G</th>');
+    expect((html.match(/<td class="x">●<\/td>/g) ?? []).length).toBe(3);
+    expect(html).toContain('<span class="nb"><b>G</b> Milch (einschließlich Laktose)</span>');
     const u = vorlageFuer("unterweisung")!;
     const uh = u.html({ thema: "Test", teilnehmer: [{ name: "Kim" }] }, BETRIEB);
     expect((uh.match(/<tr><td>/g) ?? []).length).toBe(3); // Kim + 2 freie Zeilen (ohne Namen: 6 Zeilen zum Ausdrucken)
@@ -379,7 +385,7 @@ describe("Dokumentvorlagen", () => {
     // fehlende Rechnungsnummer steht unter „Fehlt noch“ (Pflichtfeld)
     expect(fehlendeAngaben(vorlageFuer("rechnung")!, { positionen: pos("19") }, BETRIEB)).toContain("Rechnungsnummer");
     // Kz 83 mit Vorzeichen; Verlust/Fehlbetrag ohne doppeltes Minus
-    expect(html("ust_voranmeldung", { umsatz_19: "100", vorsteuer: "50" })).toContain("-31,00 €");
+    expect(html("ust_voranmeldung", { umsatz_19: "100", vorsteuer: "50" })).toContain("\u221231,00 €");
     expect(erg(vorlageFuer("euer")!, { einnahmen: [{ betrag: "10" }], ausgaben: [{ betrag: "30" }] })).toContainEqual(["Verlust", "20,00 €"]);
     expect(erg(vorlageFuer("bilanz_guv")!, { ertraege: [{ betrag: "10" }], aufwendungen: [{ betrag: "30" }] })[0]).toEqual(["Jahresfehlbetrag", "20,00 €"]);
     // leere Vorlagen: Zeilen zum Ausfüllen, keine Summe 0
@@ -550,7 +556,8 @@ describe("Dokumentvorlagen", () => {
     expect(html("steuererklaerung", { jahr: "2026", gewinn: "100" })).not.toContain("Umsätze im Jahr");
     const bg = leer("bilanz_guv");
     expect(bg).toContain(kopfLinie("Bilanzstichtag"));
-    expect(bg.split('<tr class="summe">').length - 1).toBe(4);
+    // GuV: Erträge, Aufwendungen; Bilanz: eine Tabelle Aktiva | Passiva mit einer Summenzeile
+    expect(bg.split('<tr class="summe">').length - 1).toBe(3);
     const eu = leer("euer");
     expect(eu).toContain(kopfLinie("Jahr"));
     expect(eu.split('<tr class="summe">').length - 1).toBe(3);
@@ -806,7 +813,7 @@ describe("Vorlagen, vierte Durchsicht", () => {
     expect(vvt.match(/<span class="nr">2\.\d<\/span>/g)).toEqual(['<span class="nr">2.1</span>', '<span class="nr">2.2</span>', '<span class="nr">2.3</span>']);
     // Nachweis: Entgelt, Arbeitszeit und Urlaub als beschriftete Linien
     const nw = leer("nachweis_arbeitsbedingungen");
-    for (const k of ["Weitere Bestandteile", "Fälligkeit", "Auszahlung", "Ruhepausen", "Ruhezeit", "Arbeitstage pro Kalenderjahr"]) expect(nw, k).toContain(`<th>${k}</th>`);
+    for (const k of ["Weitere Bestandteile", "Fälligkeit", "Auszahlung", "Ruhepausen", "Ruhezeit", "Arbeitstage pro Kalenderjahr"]) expect(nw.replace(/&nbsp;/g, " "), k).toContain(`<th>${k}</th>`);
     // Verfahrensdokumentation: Auswahlen zum Ankreuzen
     expect(leer("verfahrensdokumentation")).toMatch(/<h3>Eingang der Belege<\/h3><ul class="ankreuzen">/);
     // Rechnung: Zahlungsaufforderung mit Linie, Anschrift mit drei Linien
@@ -823,7 +830,10 @@ describe("Vorlagen, vierte Durchsicht", () => {
     expect(lk.match(/<tr class="summe">(?:(?!<\/tr>).)*<\/tr>/)![0].split("zelle-linie").length - 1).toBe(9);
     const bi = leer("bilanz_guv");
     expect(bi).toContain("Gewinn- und Verlustrechnung und Bilanz");
-    expect(bi.match(/<table class="liste hoch doppelt">.*?<\/table>/gs)!.map((t) => t.match(/<tr><td>&nbsp;/g)!.length)).toEqual([12, 12]);
+    // Bilanz: eine Tabelle Aktiva | Passiva mit 12 Leerzeilen, beide Summen als Linie
+    const bil = bi.match(/<table class="liste hoch doppelt bilanz">.*?<\/table>/gs)!;
+    expect(bil.map((t) => t.match(/<tr><td>&nbsp;/g)!.length)).toEqual([12]);
+    expect(bil[0]!.match(/<tr class="summe">(?:(?!<\/tr>).)*<\/tr>/)![0].split("zelle-linie").length - 1).toBe(2);
     expect(bi.match(/<table class="liste hoch">.*?<\/table>/gs)!.map((t) => t.match(/<tr><td>&nbsp;/g)!.length)).toEqual([8, 8]);
     const km = leer("kassenmeldung");
     expect(km).toContain("<th>TSE – Art</th>");
@@ -835,12 +845,14 @@ describe("Vorlagen, fünfte Durchsicht (Jahres-Szenario Café)", () => {
   const html = (id: string, d: Daten, b: Betrieb = BETRIEB) => n(dokumentHtml(vorlageFuer(id)!, d, b));
   const RE = { nummer: "2026-001", datum: "2026-01-22", zahlungsziel: "14", kunde_name: "Kim", positionen: [{ bezeichnung: "Frühstück", menge: "18", preis: "14,50", satz: "7" }] };
 
-  it("Rechnung: Zahlungsaufforderung, Hinweise und Gruß als ein Schlussteil; kein doppelter Hinweis auf die Rechnungsnummer", () => {
+  it("Rechnung: Zahlungsaufforderung bei den Summen, Hinweise und Gruß als ein Schlussteil; kein doppelter Hinweis auf die Rechnungsnummer", () => {
     const hinweis = "Vielen Dank für Ihren Auftrag.\nBitte geben Sie bei der Zahlung die Rechnungsnummer an.";
     const h = html("rechnung", { ...RE, hinweis });
-    // der Schlussteil bricht nur als Ganzes um – keine Folgeseite nur mit Hinweisen und Gruß
-    expect(h).toMatch(/<div class="abschluss"><div class="zahlung">.*?Verwendungszweck: Rechnung 2026-001.*?<div class="schluss">.*?Mit freundlichen Grüßen/);
-    expect(h).toContain(".g-brief .schluss, .g-brief .abschluss { page-break-inside: avoid; break-inside: avoid; }");
+    // die Zahlungsaufforderung bleibt bei den Summen und bricht nicht; nur Hinweise und Gruß rücken als Block weiter
+    expect(h).toMatch(/<table class="summen">.*?<\/table><div class="abschluss"><div class="zahlung">.*?Verwendungszweck: Rechnung 2026-001.*?<div class="schluss">.*?Mit freundlichen Grüßen/);
+    expect(h).toContain(".g-brief .abschluss { page-break-inside: auto; break-inside: auto; }");
+    expect(h).toContain(".g-brief .zahlung { page-break-inside: avoid; break-inside: avoid; page-break-before: avoid; break-before: avoid; }");
+    expect(h).toContain(".g-brief .schluss { page-break-inside: avoid; break-inside: avoid; }");
     // die Rechnungsnummer steht als Verwendungszweck in der Zahlungsaufforderung
     expect(h).not.toContain("Bitte geben Sie bei der Zahlung die Rechnungsnummer an.");
     expect(h).toContain("<p>Vielen Dank für Ihren Auftrag.</p>");

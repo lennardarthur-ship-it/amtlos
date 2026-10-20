@@ -1,4 +1,5 @@
-import { Pressable, View } from "react-native";
+import { Pressable, View, type ViewStyle } from "react-native";
+import type { ReactNode } from "react";
 import { cent, ohneVerdeckte, sichtbar, zahl, type Daten, type Eintrag, type Feld, type Vorlage } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { Symbol, T, textAus } from "../ui/bausteine";
@@ -9,7 +10,8 @@ import { euroText } from "../unterlagen/ablage";
 const TINTE = "#0c1f18";
 const LEISE = "#5b6b65";
 const LINIE = "#e3e9e6";
-const GEDRUECKT = "#eef4f1";
+/** gedrückter Bereich: Amtsgrün-Hauch (B12) */
+const GEDRUECKT = "#e1f3ea";
 const FEHLT = "#a05a00";
 const FEHLT_GRUND = "#fff2dc";
 
@@ -77,6 +79,19 @@ function zeilen(felder: Feld[], d: Daten, nameFeld?: string): Zeile[] {
   return z.slice(0, 8);
 }
 
+/** Zwei Schatten wie bei echtem Papier (B12): ein enger Kontaktschatten und ein weicher, tiefer. */
+const SCHATTEN_NAH: ViewStyle = { shadowColor: "#000", shadowOpacity: 0.16, shadowRadius: 2, shadowOffset: { width: 0, height: 1 }, elevation: 2 };
+const SCHATTEN_FERN: ViewStyle = { shadowColor: "#000", shadowOpacity: 0.3, shadowRadius: 22, shadowOffset: { width: 0, height: 14 }, elevation: 10 };
+
+/** Blatt Papier: weiß, Ecken 6, zwei Schatten. Der Inhalt bestimmt die Höhe. */
+export function Papier({ children, stil }: { children: ReactNode; stil?: ViewStyle }) {
+  return (
+    <View style={[{ borderRadius: RADIUS.blatt, backgroundColor: "#ffffff" }, SCHATTEN_FERN]}>
+      <View style={[{ borderRadius: RADIUS.blatt, backgroundColor: "#ffffff" }, SCHATTEN_NAH, stil]}>{children}</View>
+    </View>
+  );
+}
+
 /**
  * Das Dokument als Blatt Papier zum Bearbeiten (E-144): jeder Abschnitt ist ein antippbarer Bereich auf dem Papier –
  * Antippen springt zu den Feldern dieses Abschnitts. Fehlendes steht bernsteinfarben im Bereich. Das echte PDF zeigt
@@ -86,7 +101,7 @@ export function PapierBlatt({ v, d, jeSchritt, ergebnis, springen }: { v: Vorlag
   const summe = ergebnis.at(-1);
   d = ohneVerdeckte(v, d); // wie im PDF: nichts zeigen, was das Formular gerade verdeckt
   return (
-    <View style={{ borderRadius: RADIUS.blatt, backgroundColor: "#ffffff", paddingHorizontal: 20, paddingVertical: 22, gap: 6, shadowColor: "#000", shadowOpacity: 0.35, shadowRadius: 24, shadowOffset: { width: 0, height: 14 }, elevation: 10 }}>
+    <Papier stil={{ paddingHorizontal: 20, paddingVertical: 22, gap: 6 }}>
       <View style={{ flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", gap: 10, marginBottom: 6 }}>
         <T farbe={TINTE} stil={{ ...SCHRIFT.display, fontSize: 24, lineHeight: 28, letterSpacing: -0.7, flex: 1 }}>{v.titel}</T>
         <T v="caption" farbe={LEISE} stil={{ marginTop: 6 }}>{TEXT.papier_tippen}</T>
@@ -104,11 +119,11 @@ export function PapierBlatt({ v, d, jeSchritt, ergebnis, springen }: { v: Vorlag
             accessibilityLabel={[`${a.titel ?? TEXT.schritt(i + 1, v.abschnitte.length)}: ${z.map((x) => (x.rechts ? `${x.links} ${x.rechts}` : x.links)).join(", ")}`.replace(/: $/, ""), fehlt.length ? TEXT.papier_fehlt(fehlt.join(", ")) : ""].filter(Boolean).join(". ")}
             accessibilityHint={TEXT.papier_tippen}
             onPress={() => springen(i)}
-            style={({ pressed }) => ({ marginHorizontal: -10, paddingHorizontal: 10, paddingVertical: 10, borderRadius: 12, backgroundColor: pressed ? GEDRUECKT : fehlt.length ? FEHLT_GRUND : "transparent" })}
+            style={({ pressed }) => ({ marginHorizontal: -10, paddingHorizontal: 10, paddingVertical: 10, borderRadius: RADIUS.fein, backgroundColor: pressed ? GEDRUECKT : fehlt.length ? FEHLT_GRUND : "transparent" })}
           >
             <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: z.length || fehlt.length ? 4 : 0 }}>
               <T v="caption" farbe={LEISE} stil={{ ...SCHRIFT.bold }}>{a.titel ?? ""}</T>
-              <Symbol name="pencil" groesse={14} farbe={fehlt.length ? FEHLT : LEISE} />
+              <Symbol name="pencil" groesse={16} farbe={fehlt.length ? FEHLT : LEISE} />
             </View>
             {z.map((x, k) =>
               x.voll ? (
@@ -132,6 +147,6 @@ export function PapierBlatt({ v, d, jeSchritt, ergebnis, springen }: { v: Vorlag
           <T farbe={TINTE} stil={{ ...SCHRIFT.display, fontSize: 24, lineHeight: 28, letterSpacing: -0.8, fontVariant: ["tabular-nums"] }}>{summe[1]}</T>
         </View>
       ) : null}
-    </View>
+    </Papier>
   );
 }

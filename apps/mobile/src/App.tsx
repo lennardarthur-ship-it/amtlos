@@ -46,7 +46,7 @@ function Kapsel({ state, navigation }: BottomTabBarProps) {
   const mitWort = useWindowDimensions().fontScale <= 1.35;
   return (
     <View pointerEvents="box-none" style={{ position: "absolute", left: 0, right: 0, bottom: Math.max(inset.bottom - 6, 14), paddingHorizontal: 20 }}>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 4, height: 66, paddingLeft: 7, paddingRight: 7, borderRadius: 33, backgroundColor: f.kapsel, shadowColor: "#000", shadowOpacity: 0.25, shadowRadius: 18, shadowOffset: { width: 0, height: 10 }, elevation: 8 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 4, height: 66, paddingLeft: 7, paddingRight: 7, borderRadius: 33, backgroundColor: f.kapsel, borderWidth: 1, borderColor: f.kapselRand, shadowColor: "#000", shadowOpacity: 0.25, shadowRadius: 18, shadowOffset: { width: 0, height: 10 }, elevation: 8 }}>
         <View accessibilityRole="tablist" style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
           {state.routes.map((r, i) => {
             const k = TABS.find((t) => t.id === r.name)!;
@@ -115,6 +115,12 @@ function aktiverTab(): Tab | null {
   const tabs = navRef.getRootState()?.routes.find((r) => r.name === "Tabs")?.state;
   const r = tabs && typeof tabs.index === "number" ? tabs.routes[tabs.index] : undefined;
   return r ? (r.name as Tab) : null;
+}
+
+/** Liegt die Tab-Leiste gerade frei (kein Blatt darüber)? – für die Lage der Meldungen. */
+function tabsOben(): boolean {
+  const st = navRef.isReady() ? navRef.getRootState() : undefined;
+  return !st || st.routes[st.index ?? 0]?.name === "Tabs";
 }
 
 function BlattSeite() {
@@ -280,7 +286,7 @@ export default function App() {
           <ErinnerungsPlaner />
           <AutoSicherung />
           <Sperre>
-            <MeldungAnbieter unten={100}>
+            <MeldungAnbieter imTab={tabsOben}>
               <Rahmen />
             </MeldungAnbieter>
           </Sperre>

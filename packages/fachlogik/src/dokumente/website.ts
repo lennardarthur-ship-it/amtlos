@@ -5,7 +5,7 @@
 import { AVV_KLAUSELN, DSE } from "./bausteine.js";
 import { formGleich, formImNamen, mitVertretung, rechtsformAus } from "./betrieb.js";
 import { aufsichtFuer } from "./datenschutz.js";
-import { LINIE, abschnitt, abschnitte, angaben, anschrift, auswahl, datumDe, dokument, esc, ja, parteien, text, unterschriften, zeilen } from "./html.js";
+import { LINIE, abschnitt, abschnitte, angaben, anschrift, anschriftMehrzeilig, auswahl, datumDe, dokument, esc, ja, parteien, text, unterschriften, zeilen } from "./html.js";
 import { optionen } from "./konstanten.js";
 import type { Betrieb, Daten, Vorlage } from "./typen.js";
 
@@ -325,8 +325,8 @@ export const auftragsverarbeitung: Vorlage = {
       meta: `Auftraggeber: ${ag ? b.name : text(d, "partner")}\nAuftragnehmer: ${ag ? text(d, "partner") : b.name}`,
       inhalt:
         parteien(
-          { rolle: "Verantwortlicher, Auftraggeber", name: ag ? b.name : text(d, "partner"), anschrift: ag ? anschrift(b) : text(d, "partner_anschrift"), zusatz: ag ? vertreten : undefined },
-          { rolle: "Auftragsverarbeiter, Auftragnehmer", name: ag ? text(d, "partner") : b.name, anschrift: ag ? text(d, "partner_anschrift") : anschrift(b), zusatz: ag ? undefined : vertreten },
+          { rolle: "Verantwortlicher, Auftraggeber", name: ag ? b.name : text(d, "partner"), anschrift: ag ? anschriftMehrzeilig(b) : text(d, "partner_anschrift"), zusatz: ag ? vertreten : undefined },
+          { rolle: "Auftragsverarbeiter, Auftragnehmer", name: ag ? text(d, "partner") : b.name, anschrift: ag ? text(d, "partner_anschrift") : anschriftMehrzeilig(b), zusatz: ag ? undefined : vertreten },
         ) +
         // ohne Angabe: Linie zum Eintragen des Hauptvertrags statt den Satz wegzulassen
         `<p>Dieser Vertrag ergänzt den Vertrag ${hauptvertrag ? `„${esc(hauptvertrag)}“` : LINIE} (Hauptvertrag) und regelt die Verarbeitung personenbezogener Daten im Auftrag nach Art. 28 DSGVO.</p>` +

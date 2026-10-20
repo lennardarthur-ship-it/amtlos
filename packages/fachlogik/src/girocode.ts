@@ -29,7 +29,13 @@ export function giroCodeDaten(a: GiroCodeAngaben): string | null {
   return ["BCD", "002", "1", "SCT", (a.bic ?? "").replace(/\s/g, "").toUpperCase(), name, iban, betrag, "", "", zweck].join("\n");
 }
 
-/** GiroCode als SVG mit `mm` Kantenlänge, Fehlerkorrektur M wie von der EPC vorgegeben. Null, wenn Angaben fehlen. */
+/** Ruhezone um den Code in Modulen (ISO/IEC 18004: mindestens 4), weiß im SVG selbst – unabhängig vom Hintergrund. */
+export const RUHEZONE = 4;
+
+/**
+ * GiroCode als SVG mit `mm` Kantenlänge (samt Ruhezone), Fehlerkorrektur M wie von der EPC vorgegeben. Null, wenn
+ * Angaben fehlen.
+ */
 export function giroCodeSvg(a: GiroCodeAngaben, mm = 30): string | null {
   const daten = giroCodeDaten(a);
   if (!daten) return null;
@@ -39,5 +45,6 @@ export function giroCodeSvg(a: GiroCodeAngaben, mm = 30): string | null {
   const n = qr.getModuleCount();
   const pfad: string[] = [];
   for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (qr.isDark(r, c)) pfad.push(`M${c} ${r}h1v1h-1z`);
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${n} ${n}" width="${mm}mm" height="${mm}mm" shape-rendering="crispEdges" role="img" aria-label="GiroCode"><rect width="${n}" height="${n}" fill="#fff"/><path d="${pfad.join("")}" fill="#000"/></svg>`;
+  const r = RUHEZONE;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${-r} ${-r} ${n + 2 * r} ${n + 2 * r}" width="${mm}mm" height="${mm}mm" shape-rendering="crispEdges" role="img" aria-label="GiroCode"><rect x="${-r}" y="${-r}" width="${n + 2 * r}" height="${n + 2 * r}" fill="#fff"/><path d="${pfad.join("")}" fill="#000"/></svg>`;
 }

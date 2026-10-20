@@ -54,7 +54,20 @@ export function Heute() {
 
   const buehne = (
     <View style={{ gap: 26 }}>
-      {hatRechnungen ? (
+      {hatRechnungen && !offen.anzahl ? (
+        // nichts offen (B2): kein großes „0,00 €“, sondern das Erfreuliche – alles bezahlt, dazu der Umsatz des Monats
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={TEXT.heute_bezahlt_label(monatsName, euroText(monat.cent))}
+          accessibilityHint={TEXT.oeffnet_unterlagen}
+          onPress={() => tabWechseln("meine")} style={({ pressed }) => ({ gap: 4, opacity: pressed ? 0.75 : 1 })}>
+          <T v="klein" farbe={f.buehneLeise} stil={{ ...SCHRIFT.mittel }}>{TEXT.umsatz_monat(monatsName)}</T>
+          <GrosserBetrag cent={monat.cent} />
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
+            <BuehnenMarke text={TEXT.kachel_offen_text(0)} />
+          </View>
+        </Pressable>
+      ) : hatRechnungen ? (
         <Pressable
           accessibilityRole="button"
           // alles, was auf der Fläche steht, auch für VoiceOver – nicht nur den Betrag
@@ -99,7 +112,7 @@ export function Heute() {
             <Hinweis art="erfolg" text={nichtsDranText(stand.erinnerungen)} />
           )}
           {fs.gesamt ? (
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginTop: 14, paddingHorizontal: 4 }}>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginTop: 14 }}>
               <View style={{ flex: 1 }}>
                 <Balken prozent={fs.prozent} label={TEXT.fortschritt_text(fs.fertig, fs.gesamt)} />
               </View>

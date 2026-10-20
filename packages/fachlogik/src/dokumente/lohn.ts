@@ -2,7 +2,7 @@
  * Personal (E-121): Arbeitszeitnachweis, Lohnkonto, Daten für die Sozialversicherungsmeldung. Amtlos rechnet keine
  * Lohnsteuer und keine Beiträge – die Beträge kommen aus der Lohnabrechnung. Gliederungen fachlich zu prüfen (T-61).
  */
-import { KOPF_LINIE, ZELLE_LINIE, abschnitt, angaben, ankreuzen, cent, datumDe, dokument, esc, euro, felder, ja, liste, nachsatz, roh, summe, tabelle, text, unterschriften, zelle, type Roh } from "./html.js";
+import { KOPF_LINIE, ZELLE_LINIE, abschnitt, angaben, ankreuzen, cent, datumDe, dokument, esc, euro, felder, ibanText, ja, liste, nachsatz, roh, summe, svNummerText, tabelle, text, unterschriften, zelle, type Roh } from "./html.js";
 import { MINIJOB, SV } from "./bausteine.js";
 import type { Daten, Eintrag, Vorlage } from "./typen.js";
 
@@ -173,8 +173,11 @@ export const lohnkonto: Vorlage = {
     const leer = !m.length;
     // Spaltenköpfe mit weichen Trennstellen (nur im Kopf), damit „Solidaritätszuschlag“ in die schmale Spalte passt
     const kopf = ["Zeitraum", "Zahltag", ...BETRAEGE.map(([k, l]) => (k === "soli" ? "Soli\u00addaritäts\u00adzuschlag" : l)), "U*"];
-    const tabellenOptionen = { breiten: ["10%", "8%", ...BETRAEGE.map(() => `${79 / BETRAEGE.length}%`), "3%"], zahlen: BETRAEGE.map((_, i) => i + 2), klasse: "eng" };
-    const betrag = (e: Eintrag, k: string) => (text(e, k) ? euro(cent(text(e, k)) ?? 0) : "");
+    const tabellenOptionen = { breiten: ["10%", "8%", ...BETRAEGE.map(() => `${79 / BETRAEGE.length}%`), "3%"], zahlen: BETRAEGE.map((_, i) => i + 2), klasse: "eng lohn" };
+    // leere Zelle: „–“ (nicht leer gelassen); Spalte ganz ohne Beträge: auch in der Summe „–“ statt „0,00 €“
+    const STRICH = "–";
+    const betrag = (e: Eintrag, k: string) => (text(e, k) ? euro(cent(text(e, k)) ?? 0) : STRICH);
+    const spalteLeer = (k: string) => m.every((e) => !text(e, k));
     return dokument({
       titel: "Lohnkonto",
       betrieb: b,
@@ -182,21 +185,25 @@ export const lohnkonto: Vorlage = {
       // ohne Jahr: Linie zum Eintragen in der Kennungsleiste
       meta: text(d, "jahr") ? undefined : `Jahr: ${KOPF_LINIE}`,
       quer: true,
+      // engerer Satz (CSS .lohnkonto), damit Stammdaten und alle zwölf Monate samt Summe auf ein Querformatblatt passen
+      klasse: "lohnkonto",
       inhalt:
         // Querformat: Stammdaten in zwei Spalten, damit die Monate möglichst auf Seite 1 beginnen
         abschnitt(
           "Stammdaten",
-          // einzeilige Angaben zuerst, damit die Zeilen beider Spalten auf einer Höhe stehen; mehrzeilige bzw. entfallende am Ende
-          `<div class="spalten2">${angaben([
+          // drei Spalten, damit Stammdaten und alle zwölf Monate auf ein Querformatblatt passen; einzeilige Angaben zuerst,
+          // damit die Zeilen der Spalten auf einer Höhe stehen; mehrzeilige bzw. entfallende am Ende
+          `<div class="spalten3">${angaben([
             ["Name", text(d, "name")],
             ["Geburtsdatum", datumDe(text(d, "geburtsdatum"))],
+            ["Anschrift", text(d, "anschrift")],
+          ])}${angaben([
             ["Beschäftigt seit", datumDe(text(d, "eintritt"))],
             ["Krankenkasse", text(d, "krankenkasse")],
-            ["Anschrift", text(d, "anschrift")],
+            ["SV-Nummer", svNummerText(text(d, "sv_nummer"))],
           ])}${angaben([
             ["Steuer-ID", text(d, "steuer_id")],
             ["Steuerklasse", text(d, "steuerklasse")],
-            ["SV-Nummer", text(d, "sv_nummer")],
             ["Kinderfreibeträge", text(d, "kinder") || (leer ? "" : null)],
             ["Kirchensteuermerkmal", text(d, "religion") || (leer ? "" : null)],
           ])}</div>`,
@@ -205,7 +212,7 @@ export const lohnkonto: Vorlage = {
           "Monate",
           (leer
             ? tabelle(kopf, [], { ...tabellenOptionen, mindestens: 12, hoch: true, summe: ["<strong>Summe</strong>", "", ...BETRAEGE.map(() => ZELLE_LINIE), ""] })
-            : tabelle(kopf, m.map((e) => [zelle(text(e, "monat")), datumDe(text(e, "zahltag")), ...BETRAEGE.map(([k]) => betrag(e, k)), ja(e, "unterbrechung") ? "U" : ""]), { ...tabellenOptionen, summe: ["<strong>Summe</strong>", "", ...BETRAEGE.map(([k]) => `<strong>${euro(summe(m, k))}</strong>`), ""] })) + nachsatz("* U = Unterbrechung ohne Lohnanspruch (§ 41 Abs. 1 EStG)"),
+            : tabelle(kopf, m.map((e) => [zelle(text(e, "monat")), datumDe(text(e, "zahltag")), ...BETRAEGE.map(([k]) => betrag(e, k)), ja(e, "unterbrechung") ? "U" : ""]), { ...tabellenOptionen, summe: ["<strong>Summe</strong>", "", ...BETRAEGE.map(([k]) => (spalteLeer(k) ? STRICH : `<strong>${euro(summe(m, k))}</strong>`)), ""] })) + nachsatz("* U = Unterbrechung ohne Lohnanspruch (§ 41 Abs. 1 EStG)"),
         ),
     });
   },
@@ -327,17 +334,17 @@ export const svMeldedaten: Vorlage = {
             ["Geburtsort", text(d, "geburtsort")],
             ["Staatsangehörigkeit", text(d, "staatsangehoerigkeit")],
             ["Anschrift", text(d, "anschrift")],
-            ["SV-Nummer", text(d, "sv_nummer")],
+            ["SV-Nummer", svNummerText(text(d, "sv_nummer"))],
             ["Steuer-ID", text(d, "steuer_id")],
             ["Krankenkasse", text(d, "krankenkasse")],
-            ["IBAN", text(d, "iban")],
+            ["IBAN", ibanText(text(d, "iban"))],
           ]),
         ) +
         abschnitt(
           "Beschäftigung",
           felder(beschaeftigung.slice(0, teil), { start }) +
             `<div class="zusammen">${felder(beschaeftigung.slice(teil), { start: start + teil })}` +
-            `<p style="margin-top:6mm">Ich versichere, dass die Angaben vollständig und richtig sind, und teile Änderungen unverzüglich mit.</p>` +
+            `<p style="margin-top:4mm">Ich versichere, dass die Angaben vollständig und richtig sind, und teile Änderungen unverzüglich mit.</p>` +
             `${unterschriften(["Beschäftigte Person"], { ortDatum: true })}</div>`,
         ),
     });

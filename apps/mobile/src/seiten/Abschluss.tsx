@@ -1,18 +1,19 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Pressable, Share, View } from "react-native";
-import { KU_HINWEIS, PRUEFHINWEIS, dateinamenTeil, dokumentHtml, eRechnungAus, pdfDateiname, vorlageFuer, xrechnungUbl, type Vorlage } from "@amtlos/fachlogik";
+import { KU_HINWEIS, PRUEFHINWEIS, cent as centAus, dateinamenTeil, dokumentHtml, eRechnungAus, pdfDateiname, vorlageFuer, xrechnungUbl, type Vorlage } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { DatumFeld, Fuss, Hinweis, Karte, Knopf, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
+import { DatumFeld, Fuss, Hinweis, Karte, Knopf, Stempel, StempelAuftritt, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
-import { HAARLINIE, RADIUS, RAND, SCHRIFT, useFarben } from "../ui/thema";
+import { BLATT_OBEN, HAARLINIE, RADIUS, RAND, SCHRIFT, useFarben } from "../ui/thema";
 import { Vorschau } from "../ui/Vorschau";
-import { PapierBlatt } from "./Papier";
+import { Papier, PapierBlatt } from "./Papier";
+import { GrosserBetrag } from "./gemeinsam";
 import { drucken, pdfTeilen } from "../unterlagen/pdf";
 import { NUMMER_DOPPELT, fehltFuer } from "../unterlagen/pruefung";
 import { dateiTeilen } from "../unterlagen/sicherungDatei";
 import { heute } from "../unterlagen/speicher";
-import { faelligAm } from "../unterlagen/ablage";
+import { euroText, faelligAm, rechnungBrutto } from "../unterlagen/ablage";
 import { useAmtlos } from "../zustand";
 import { bestaetigen } from "../ui/bestaetigen";
 import { AbsenderSeite } from "./Betrieb";
@@ -125,6 +126,14 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
   const melden = useMeldung();
   const u = z.stand.unterlagen.find((x) => x.id === id);
   const v = u ? vorlageFuer(u.vorlage) : undefined;
+  // Stempel auf dem Papier (A1, B1): „Geteilt“ bzw. „Bezahlt“ – fällt nur auf, wenn es gerade eben passiert ist
+  const stempel = u && v && u.festgeschrieben && v.storno && !u.daten.storno_zu ? (u.bezahlt ? "bezahlt" : "geteilt") : null;
+  const stempelVorher = useRef(stempel);
+  const stempelNeu = useRef<string | null>(null);
+  if (stempel !== stempelVorher.current) {
+    stempelNeu.current = stempel;
+    stempelVorher.current = stempel;
+  }
   if (!u || !v) return null;
   const d = u.daten;
   const jeSchritt = fehltJeSchritt(v, d);
@@ -142,18 +151,29 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
   const fertig = alle.length === 0;
   const datumDe = (iso: string) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(iso));
   const geteilt = fest && v.storno && !d.storno_zu;
+  // Rechnung an jemanden: auf der Bühne Stand und Empfänger – der Betrag steht groß auf dem Papier darunter (A13)
+  const kunde = typeof d.kunde_name === "string" ? d.kunde_name.trim() : "";
+  const kurzDatum = (iso: string) => `${iso.slice(8, 10)}.${iso.slice(5, 7)}.`;
+  const faellig = v.storno && !d.storno_zu ? faelligAm(u) : null;
+  const empfaengerZeile = v.storno && kunde ? [TEXT.an_empfaenger(kunde), u.bezahlt ? TEXT.bezahlt_am_kurz(kurzDatum(u.bezahlt)) : faellig ? TEXT.faellig_kurz(kurzDatum(faellig)) : ""].filter(Boolean).join("\u00a0· ") : "";
+  const standText = fest ? (u.bezahlt && geteilt ? TEXT.stempel_bezahlt : geteilt ? TEXT.geteilt_titel : TEXT.festgeschrieben_titel) : fertig ? TEXT.alles_drin : TEXT.fast_fertig;
+  // Ergebnis in Euro (z. B. EÜR) groß wie überall auf der Bühne; andere Ergebnisse (Stunden …) als Text
+  const letzte = ergebnis.at(-1);
+  const letzteCent = letzte && /€\s*$/.test(letzte[1]) ? centAus(letzte[1].replace(/\s*€\s*$/, "")) : null;
   return (
     <View>
-      {/* Bühne (E-142): Stand, Summe und das Dokument als Blatt Papier auf dem tiefen Grün */}
+      {/* Bühne (E-142): Stand, Empfänger bzw. Ergebnis und das Dokument als Blatt Papier auf dem tiefen Grün */}
       <View style={{ paddingTop: 8, gap: 6 }}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
           {fertig || fest ? <Symbol name={fest && !geteilt ? "lock.fill" : "checkmark.circle.fill"} groesse={20} farbe={f.minze} gewicht="semibold" /> : null}
-          <T v="klein" farbe={f.buehneLeise} stil={{ ...SCHRIFT.halb }}>{fest ? (geteilt ? TEXT.geteilt_titel : TEXT.festgeschrieben_titel) : fertig ? TEXT.alles_drin : TEXT.fast_fertig}</T>
+          <T v="klein" farbe={f.buehneLeise} stil={{ ...SCHRIFT.halb }}>{standText}</T>
         </View>
-        {ergebnis.length ? (
+        {empfaengerZeile ? (
+          <T v="gross" accessibilityRole="header" farbe={f.buehneText}>{empfaengerZeile}</T>
+        ) : letzte ? (
           <View>
-            <T v="klein" farbe={f.buehneLeise}>{ergebnis.at(-1)![0]}</T>
-            <T farbe={f.buehneText} stil={{ ...SCHRIFT.display, fontSize: 44, lineHeight: 50, letterSpacing: -1.6, fontVariant: ["tabular-nums"] }}>{ergebnis.at(-1)![1]}</T>
+            <T v="klein" farbe={f.buehneLeise}>{letzte[0]}</T>
+            {letzteCent !== null ? <GrosserBetrag cent={letzteCent} groesse={44} /> : <T farbe={f.buehneText} stil={{ ...SCHRIFT.display, fontSize: 44, lineHeight: 50, letterSpacing: -1.6, fontVariant: ["tabular-nums"] }}>{letzte[1]}</T>}
           </View>
         ) : (
           <T v="titel" accessibilityRole="header" farbe={f.buehneText}>{fest ? (geteilt ? TEXT.geteilt_titel : TEXT.festgeschrieben_titel) : fertig ? TEXT.fertig : TEXT.fast_fertig}</T>
@@ -180,9 +200,15 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
       {fest ? (
         // festgeschrieben: das echte Dokument, nicht mehr bearbeitbar
         <Pressable accessibilityRole="button" accessibilityLabel={TEXT.vorschau_oeffnen} onPress={() => nav.oeffnen(`vorschau-${id}`, () => <VorschauSeite id={id} />, true)} style={({ pressed }) => ({ marginTop: 18, opacity: pressed ? 0.9 : 1, transform: [{ scale: pressed ? 0.99 : 1 }] })}>
-          <View style={{ borderRadius: RADIUS.blatt, backgroundColor: "#ffffff", shadowColor: "#000", shadowOpacity: 0.35, shadowRadius: 24, shadowOffset: { width: 0, height: 14 }, elevation: 10 }}>
+          <Papier>
             <Vorschau papier html={html} quer={v.querformat} hoehe={v.querformat ? 260 : 440} />
-          </View>
+            {stempel ? (
+              // Eingangsstempel oben rechts auf dem Blatt – Papier ist immer weiß, daher feste Farben
+              <StempelAuftritt key={stempel} jetzt={stempelNeu.current === stempel} stil={{ position: "absolute", top: 14, right: 12 }}>
+                <Stempel groesse={104} farbe={stempel === "bezahlt" ? "#0a7d55" : "#06573b"} grund="rgba(255,255,255,0.86)" text={stempel === "bezahlt" ? TEXT.stempel_bezahlt : TEXT.stempel_geteilt} unter={stempel === "bezahlt" ? datumDe(`${u.bezahlt!}T12:00:00Z`) : datumDe(u.festgeschrieben!)} />
+              </StempelAuftritt>
+            ) : null}
+          </Papier>
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, minHeight: 48 }}>
             <Symbol name="eye" groesse={17} farbe={f.minze} />
             <T v="klein" farbe={f.minze} stil={{ ...SCHRIFT.halb }}>{TEXT.vorschau_oeffnen}</T>
@@ -200,7 +226,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
       )}
 
       {/* das Blatt darunter: Zahlung, Hinweise, Angaben und weitere Möglichkeiten */}
-      <View style={{ marginHorizontal: -RAND, marginTop: 10, paddingHorizontal: RAND, paddingTop: 24, paddingBottom: 32, backgroundColor: f.papier, borderTopLeftRadius: RADIUS.buehne, borderTopRightRadius: RADIUS.buehne }}>
+      <View style={{ marginHorizontal: -RAND, marginTop: 10, paddingHorizontal: RAND, paddingTop: BLATT_OBEN, paddingBottom: 32, backgroundColor: f.papier, borderTopLeftRadius: RADIUS.buehne, borderTopRightRadius: RADIUS.buehne }}>
         {fest ? (
           <View>
             {geteilt ? <Hinweis art="erfolg" symbol="checkmark.circle" text={TEXT.geteilt_text(datumDe(u.festgeschrieben!))} /> : <Hinweis symbol="lock" text={TEXT.festgeschrieben_text(datumDe(u.festgeschrieben!), Boolean(v.storno))} />}
@@ -221,11 +247,10 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
           </Karte>
         ) : null}
         {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
-        {zaehlt ? <T v="caption" leise stil={{ marginTop: 4, marginLeft: 4 }}>{TEXT.pro_rest(rest, FREI_JE_MONAT)}</T> : null}
-        <T v="caption" leise stil={{ marginTop: 4, marginLeft: 4 }}>{PRUEFHINWEIS}</T>
+        {zaehlt ? <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.pro_rest(rest, FREI_JE_MONAT)}</T> : null}
+        <T v="caption" leise stil={{ marginTop: 4 }}>{PRUEFHINWEIS}</T>
 
-
-        <T v="gross" accessibilityRole="header" stil={{ marginTop: 30, marginBottom: 11, marginLeft: 2 }}>{TEXT.mehr}</T>
+        <T v="gross" accessibilityRole="header" stil={{ marginTop: 30, marginBottom: 11 }}>{TEXT.mehr}</T>
         {eFehlt.length ? <ERechnungFehlt v={v} fehlt={eFehlt} springen={springen} gesperrt={fest} /> : null}
         <Karte>
           {[
@@ -247,7 +272,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
             <Zeile key={x.symbol} symbol={x.symbol} titel={x.titel} onPress={x.los} letzte={i === l.length - 1} />
           ))}
         </Karte>
-        <View style={{ marginTop: 8, marginLeft: 2 }}>
+        <View style={{ marginTop: 8 }}>
           {/* Rückfragen als System-Dialog – eine Karte am Seitenende läge halb unter Fußleiste oder Meldung */}
           {fest ? (
             v.storno && !u.storniertDurch && !d.storno_zu ? (
@@ -334,6 +359,15 @@ function Zahlung({ id }: { id: string }) {
   if (!u) return null;
   const faellig = faelligAm(u);
   const datumDe = (iso: string) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(`${iso}T12:00:00Z`));
+  const ueberfaellig = !u.bezahlt && !erstattung && Boolean(faellig && faellig < heute());
+  // freundliche Zahlungserinnerung als Text ins Teilen-Menü – Mail, Nachrichten, WhatsApp; nichts wird verschickt, ohne dass man es sieht
+  const erinnern = () => {
+    const b = z.stand.betrieb;
+    const nummer = typeof u.daten.nummer === "string" ? u.daten.nummer.trim() : "";
+    const kunde = typeof u.daten.kunde_name === "string" ? u.daten.kunde_name.trim() : "";
+    const message = TEXT.erinnerung_text({ nummer, betrag: euroText(rechnungBrutto(u, b)), faellig: faellig ? datumDe(faellig) : "", kunde, iban: b.iban.trim(), absender: [b.verantwortlich.trim(), b.name.trim()].filter(Boolean).join("\n") });
+    void Share.share({ message, title: TEXT.erinnerung_senden }).catch(() => undefined);
+  };
   return (
     <Karte stil={{ marginTop: 12, paddingVertical: 14, gap: 10 }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
@@ -347,7 +381,9 @@ function Zahlung({ id }: { id: string }) {
         <TextKnopf symbol="xmark" text={TEXT.zahlung_entfernen} onPress={() => z.bezahltSetzen(id, null)} />
       ) : (
         <View style={{ gap: 4 }}>
-          <Knopf ton symbol="checkmark" text={erstattung ? TEXT.als_erstattet : TEXT.als_bezahlt} onPress={() => vermerken(heute())} />
+          {/* nach dem Teilen ist „bezahlt“ der nächste Schritt (B1) – als Hauptknopf; überfällig zuerst die Erinnerung */}
+          {ueberfaellig ? <Knopf symbol="envelope" text={TEXT.erinnerung_senden} onPress={erinnern} /> : null}
+          <Knopf ton={ueberfaellig} symbol="checkmark" text={erstattung ? TEXT.als_erstattet : TEXT.als_bezahlt_markieren} onPress={() => vermerken(heute())} stil={ueberfaellig ? { marginTop: 6 } : undefined} />
           {anders ? <DatumFeld label={TEXT.anderes_datum} wert={null} aendern={(d) => d && vermerken(d)} /> : <TextKnopf text={TEXT.anderes_datum} onPress={() => setAnders(true)} />}
         </View>
       )}

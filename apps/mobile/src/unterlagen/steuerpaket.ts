@@ -38,6 +38,7 @@ import {
   type RechnungsDaten,
 } from "@amtlos/fachlogik";
 import { APP_VERSION } from "../version";
+import { T as TEXT } from "../texte";
 import { utf8 } from "./sicherung";
 import { GUTSCHRIFT_HINWEIS, istGutschrift } from "./ustAusRechnungen";
 import type { Stand, Unterlage } from "./speicher";
@@ -53,6 +54,31 @@ export { GUTSCHRIFT_HINWEIS, istGutschrift };
 export const gestellteRechnungen = (s: Stand) => s.unterlagen.filter((u) => u.vorlage === "rechnung" && u.festgeschrieben && typeof u.daten.datum === "string");
 /** Gestellte Rechnungen ohne Gutschriften – nur sie sind Umsätze des Betriebs. */
 export const umsatzRechnungen = (s: Stand) => gestellteRechnungen(s).filter((u) => !istGutschrift(u));
+
+/**
+ * Kasse laut Pflichten-Check („kasse.elektronisch“): „kasse“ (ja), „keine“ (nein) oder „unbekannt“ (nicht beantwortet).
+ * Amtlos kennt nur Rechnungen und Belege – mit Kasse fehlen die Kassenumsätze in allem, was daraus gerechnet wird
+ * (Voranmeldung, EÜR, Steuerberater-Paket).
+ */
+export type KassenLage = "kasse" | "keine" | "unbekannt";
+export function kassenLage(profil: Stand["profil"]): KassenLage {
+  const w = profil["kasse.elektronisch"];
+  return w === true ? "kasse" : w === false ? "keine" : "unbekannt";
+}
+
+/** Hinweis in der App nach einer Übernahme: mit Kasse laut Check als Warnung, ohne Antwort ruhiger („Falls du …“). */
+export function kassenHinweis(lage: KassenLage, art: "ust" | "euer"): { text: string; warnung: boolean } | null {
+  if (lage === "keine") return null;
+  if (art === "ust") return lage === "kasse" ? { text: TEXT.kasse_ust, warnung: true } : { text: TEXT.kasse_ust_vielleicht, warnung: false };
+  return lage === "kasse" ? { text: TEXT.kasse_euer, warnung: true } : { text: TEXT.kasse_euer_vielleicht, warnung: false };
+}
+
+/** Satz für LIESMICH und Fragen im Paket – null, wenn der Betrieb laut Check keine Kasse hat. */
+export function kassenSatzPaket(lage: KassenLage): string | null {
+  if (lage === "keine") return null;
+  const satz = "Kassenumsätze fehlen in diesem Paket. Die Umsätze laut Tagesabschlüssen (Z-Bons) bzw. Kassenexport bitte zusätzlich liefern.";
+  return lage === "kasse" ? `Betrieb mit Kasse: ${satz}` : `Falls der Betrieb eine Kasse nutzt: ${satz}`;
+}
 
 /**
  * Kleinunternehmer (§ 19 UStG): laut Pflichten-Check („ust.kleinunternehmer“); ohne Antwort dort, wenn alle
@@ -407,11 +433,14 @@ export function fragenText(s: Stand, z: Zeitraum, nummern: Map<string, string> =
   dazu("Stornos mit Bezug zu einem anderen Zeitraum – gibt es eine Ersatzrechnung, und in welchem Zeitraum?", stornoZeilen);
 
   const anzahl = abschnitte.reduce((a, x) => a + x.zeilen.length, 0);
+  const kasse = kassenSatzPaket(kassenLage(s.profil));
   const text = [
     `Amtlos – Fragen zum Zeitraum ${datumDe(z.von)} bis ${datumDe(z.bis)}`,
     `Betrieb: ${s.betrieb.name || "ohne Namen"}`,
     ``,
     `Automatisch aus den erfassten Daten zusammengestellt: nur Sachverhalte, keine steuerliche Bewertung. Belege mit Amtlos-Belegnummer (wie in Belege_${z.name}.csv und im Dateinamen unter Belege/).`,
+    // Kasse: nicht als Frage gezählt, aber vor allen Fragen – die Kassenumsätze fehlen in allen Summen
+    ...(kasse ? ["", kasse] : []),
     ...(abschnitte.length ? abschnitte.flatMap((a) => ["", a.titel, ...a.zeilen]) : ["", "Keine offenen Punkte gefunden."]),
   ].join("\r\n");
   return { text: text + "\r\n", anzahl };
@@ -506,8 +535,11 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
   const ohneXml = ohneXmlListe.length;
   const versteuerung = s.betrieb.versteuerung === "ist" ? "Ist (vereinnahmte Entgelte, § 20 UStG)" : s.betrieb.versteuerung === "soll" ? "Soll (vereinbarte Entgelte)" : "nicht angegeben (Soll angenommen)";
   const uhrzeit = /T(\d{2}):(\d{2})/.exec(jetzt);
+  const kassenSatz = kassenSatzPaket(kassenLage(s.profil));
   inhalt["LIESMICH.txt"] = utf8(
     [
+      // ganz oben: ohne Kassenumsätze stimmen Umsätze und Erlöse dieses Pakets nicht
+      ...(kassenSatz ? [kassenSatz, ``] : []),
       `Amtlos – Unterlagen für die Steuerberatung`,
       `Betrieb: ${s.betrieb.name || "ohne Namen"}`,
       `Zeitraum: ${datumDe(z.von)} bis ${datumDe(z.bis)}`,

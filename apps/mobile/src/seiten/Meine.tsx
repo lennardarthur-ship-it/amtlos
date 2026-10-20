@@ -1,15 +1,14 @@
 import { useState, useMemo } from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { T as TEXT } from "../texte";
-import { RAND, SCHRIFT } from "../ui/thema";
-import { Betrag, Karte, Knopf, T, TextKnopf, Wahl } from "../ui/bausteine";
+import { Betrag, ChipLeiste, Karte, Knopf, T, TextKnopf } from "../ui/bausteine";
 import { useNav } from "../ui/navigation";
 import { useFarben } from "../ui/thema";
 import { belegeFiltern, euroText, rechnungBrutto, filterVerfuegbar, filtern, offeneSumme, rechnungenSortiert, type Filter } from "../unterlagen/ablage";
 import { heute, sortiert, type Unterlage } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { BelegErfassen, BelegSeite, BelegZeile } from "./Belege";
-import { BuehnenMarke, BuehnenSeite, GrosserBetrag, Gruppe, Leer } from "./gemeinsam";
+import { BuehnenMarke, BuehnenSeite, Gruppe, Leer } from "./gemeinsam";
 import { useOeffnen, useStarten } from "./starten";
 import { useErstellen } from "./Erstellen";
 import { Suchfeld, UnterlageZeile, useFehltJe, useUeberfaellig } from "./Unterlagen";
@@ -19,25 +18,21 @@ import { BelegErfassenSeite } from "./Belege";
 const SUCHE_AB = 6;
 
 /**
- * Offene Rechnungen auf der Bühne (E-142): der Betrag groß, darunter Anzahl bzw. „davon überfällig“. Antippen filtert
- * die Liste auf offene Rechnungen (noch einmal: alle) – die Plakette sagt, was der nächste Tipp tut.
+ * Offene Rechnungen auf der Bühne (B2): der große Betrag steht schon auf „Heute“ – hier nur als Plakette mit Anzahl und
+ * Summe. Antippen filtert die Liste auf offene Rechnungen (noch einmal: alle); die zweite Plakette sagt, was der Tipp tut.
  */
 function OffenAufBuehne({ anzahl, ueberfaellig, cent, aktiv, onPress }: { anzahl: number; ueberfaellig: number; cent: number; aktiv: boolean; onPress: () => void }) {
-  const f = useFarben();
+  if (!anzahl) return <View style={{ flexDirection: "row" }}><BuehnenMarke text={TEXT.kachel_offen_text(0)} /></View>;
   return (
     <Pressable
-      // nur ein Knopf, wenn es etwas zu filtern gibt; „überfällig“ gehört in die Ansage, der Hinweis sagt, was der Tipp tut
-      accessibilityRole={anzahl ? "button" : "text"}
-      accessibilityState={anzahl ? { selected: aktiv } : undefined}
-      accessibilityLabel={anzahl ? `${TEXT.offene_summe(anzahl, euroText(cent))}${ueberfaellig ? `, ${TEXT.davon_ueberfaellig(ueberfaellig)}` : ""}` : TEXT.alles_bezahlt}
-      accessibilityHint={anzahl ? (aktiv ? TEXT.offen_hinweis_alle : TEXT.offen_hinweis_filtern) : undefined}
-      onPress={anzahl ? onPress : undefined} style={({ pressed }) => ({ gap: 4, opacity: pressed ? 0.75 : 1 })}>
-      <T v="klein" farbe={f.buehneLeise} stil={{ ...SCHRIFT.mittel }}>{TEXT.offen_bei_kunden}</T>
-      <GrosserBetrag cent={cent} groesse={48} />
-      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8 }}>
-        <BuehnenMarke warnung={Boolean(ueberfaellig)} text={anzahl ? (ueberfaellig ? TEXT.davon_ueberfaellig(ueberfaellig) : TEXT.kachel_offen_text(anzahl)) : TEXT.alles_bezahlt} />
-        {anzahl ? <BuehnenMarke text={aktiv ? TEXT.filter.alle : TEXT.nur_offene} /> : null}
-      </View>
+      // „überfällig“ gehört in die Ansage, der Hinweis sagt, was der Tipp tut
+      accessibilityRole="button"
+      accessibilityState={{ selected: aktiv }}
+      accessibilityLabel={`${TEXT.offene_summe(anzahl, euroText(cent))}${ueberfaellig ? `, ${TEXT.davon_ueberfaellig(ueberfaellig)}` : ""}`}
+      accessibilityHint={aktiv ? TEXT.offen_hinweis_alle : TEXT.offen_hinweis_filtern}
+      onPress={onPress} style={({ pressed }) => ({ flexDirection: "row", flexWrap: "wrap", gap: 8, opacity: pressed ? 0.75 : 1 })}>
+      <BuehnenMarke warnung={Boolean(ueberfaellig)} text={ueberfaellig ? `${TEXT.offene_summe(anzahl, euroText(cent))}\u00a0· ${TEXT.davon_ueberfaellig(ueberfaellig)}` : TEXT.offene_summe(anzahl, euroText(cent))} />
+      <BuehnenMarke text={aktiv ? TEXT.filter.alle : TEXT.nur_offene} />
     </Pressable>
   );
 }
@@ -90,7 +85,8 @@ export function Meine() {
   const ueberJe = useUeberfaellig();
   return (
     <BuehnenSeite
-      ueber={alle.length ? TEXT.anzahl_unterlagen(alle.length) : undefined}
+      // immer eine Zeile über dem Titel – sonst springt der Titel, sobald die erste Unterlage da ist (A18)
+      ueber={alle.length ? TEXT.meine_stand(alle.length, alle.filter((u) => u.vorlage === "rechnung" && !u.festgeschrieben).length) : TEXT.noch_leer}
       titel={TEXT.meine_titel}
       buehne={hatRechnungen ? <OffenAufBuehne anzahl={offen.anzahl} ueberfaellig={offen.ueberfaellig} cent={offen.cent} aktiv={aktiv === "offen"} onPress={() => setFilter(aktiv === "offen" ? "alle" : "offen")} /> : undefined}
     >
@@ -101,18 +97,14 @@ export function Meine() {
               <Suchfeld wert={suche} setzen={setSuche} label={TEXT.meine_suchen} />
             </View>
           ) : null}
-          {verfuegbar.length > 1 ? (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12, marginHorizontal: -RAND }} contentContainerStyle={{ paddingHorizontal: RAND }}>
-              <Wahl wert={aktiv} aendern={setFilter} optionen={verfuegbar.map((w) => ({ wert: w, text: TEXT.filter[w] }))} />
-            </ScrollView>
-          ) : null}
+          {verfuegbar.length > 1 ? <ChipLeiste wert={aktiv} aendern={setFilter} optionen={verfuegbar.map((w) => ({ wert: w, text: TEXT.filter[w] }))} stil={{ marginBottom: 12 }} /> : null}
           {liste.length ? (
             // nach Monaten gegliedert (bei Rechnungen nach Rechnungsdatum, mit Monatssumme) – lange Listen bleiben lesbar
             <View style={{ gap: 18 }}>
               {nachMonat(liste.slice(0, zeigen), aktiv === "rechnungen" || aktiv === "offen").map((g) => (
                 <View key={g.monat}>
                   {g.titel ? (
-                    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8, marginHorizontal: 2 }}>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
                       <T v="klein" fett leise accessibilityRole="header">{g.titel}</T>
                       {g.rechnungen ? <Betrag v="klein" farbe={f.tinteLeise}>{euroText(g.liste.reduce((a, u) => a + rechnungBrutto(u, stand.betrieb), 0))}</Betrag> : null}
                     </View>
@@ -130,14 +122,14 @@ export function Meine() {
               <T leise>{TEXT.meine_nichts}</T>
               {/* leere Treffer mit dem Weg zurück: Filter bzw. Suche zurücksetzen */}
               {aktiv !== "alle" ? (
-                <TextKnopf symbol="xmark.circle" text={TEXT.filter_zuruecksetzen} onPress={() => { setFilter("alle"); setSuche(""); }} stil={{ marginLeft: 4 }} />
+                <TextKnopf symbol="xmark.circle" text={TEXT.filter_zuruecksetzen} onPress={() => { setFilter("alle"); setSuche(""); }} />
               ) : suche ? (
-                <TextKnopf symbol="xmark.circle" text={TEXT.suche_leeren} onPress={() => setSuche("")} stil={{ marginLeft: 4 }} />
+                <TextKnopf symbol="xmark.circle" text={TEXT.suche_leeren} onPress={() => setSuche("")} />
               ) : null}
             </View>
           ) : null}
           {liste.length > zeigen ? (
-            <TextKnopf symbol="chevron.down" text={TEXT.weitere_zeigen(Math.min(SCHRITT, liste.length - zeigen))} onPress={() => setZeigen((n) => n + SCHRITT)} stil={{ marginLeft: 4, marginTop: 4 }} />
+            <TextKnopf symbol="chevron.down" text={TEXT.weitere_zeigen(Math.min(SCHRITT, liste.length - zeigen))} onPress={() => setZeigen((n) => n + SCHRITT)} stil={{ marginTop: 4 }} />
           ) : null}
           {belegeGezeigt.length ? (
             <Gruppe titel={aktiv === "alle" ? TEXT.belege_titel : undefined}>
@@ -146,7 +138,7 @@ export function Meine() {
                   <BelegZeile key={b.id} b={b} letzte={i === belegeGezeigt.length - 1} onPress={() => belegOeffnen(b.id)} />
                 ))}
               </Karte>
-              {aktiv === "alle" && belege.length > belegeGezeigt.length ? <TextKnopf text={TEXT.alle_belege(belege.length)} onPress={() => setFilter("belege")} stil={{ marginLeft: 4 }} /> : null}
+              {aktiv === "alle" && belege.length > belegeGezeigt.length ? <TextKnopf text={TEXT.alle_belege(belege.length)} onPress={() => setFilter("belege")} /> : null}
             </Gruppe>
           ) : null}
           <Gruppe titel={TEXT.beleg_erfassen}>
@@ -154,7 +146,7 @@ export function Meine() {
           </Gruppe>
         </View>
       ) : (
-        <Leer symbol="folder" text={TEXT.meine_leer} unter={TEXT.meine_leer_text}>
+        <Leer text={TEXT.meine_leer} unter={TEXT.meine_leer_text}>
           <View style={{ gap: 10 }}>
             <Knopf symbol="plus" text={TEXT.rechnung_schreiben} onPress={() => starten("rechnung")} />
             <Knopf ton symbol="doc.viewfinder" text={TEXT.beleg_erfassen} onPress={() => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />)} />
