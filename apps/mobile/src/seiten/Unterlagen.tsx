@@ -6,10 +6,9 @@ import { Karte, Knopf, Suchfeld, Symbol, T, TextKnopf, Wahl, Zeile, useGrosseSch
 import { Unterseite, useNav } from "../ui/navigation";
 import { useFarben } from "../ui/thema";
 import { isoliert } from "../ui/trennen";
-import { fehltFuer } from "../unterlagen/pruefung";
-import { betriebFehlt, heute, sortiert, type Unterlage } from "../unterlagen/speicher";
-import { useAmtlos } from "../zustand";
-import { euroText, offeneIds, rechnungBrutto, tageUeberfaellig } from "../unterlagen/ablage";
+import { betriebFehlt, heute, sortiert, type Stand, type Unterlage } from "../unterlagen/speicher";
+import { useAktionen, useStandWahl } from "../zustand";
+import { euroText, fehltJeBerechnen, offeneIds, rechnungBrutto, tageUeberfaellig } from "../unterlagen/ablage";
 import { BetriebFormular } from "./Betrieb";
 import { BEREICH_SYMBOL, BuehnenBlatt, Gruppe, Inhalt, datumKurz } from "./gemeinsam";
 import { useOeffnen, useStarten, useZiel } from "./starten";
@@ -35,8 +34,12 @@ const ANLASS_SYMBOL: Record<string, string> = {
 /** Zuletzt geändert: „Heute“, „Gestern“ oder das Datum – kurz, damit die Zeile nicht umbricht. */
 function wann(iso: string): string {
   const tag = heute(new Date(iso));
-  if (tag === heute()) return TEXT.heute;
-  if (tag === heute(new Date(Date.now() - 864e5))) return TEXT.gestern;
+  const h = heute();
+  if (tag === h) return TEXT.heute;
+  // gestern = heute minus ein Tag (Kalender in deutscher Zeit, ohne einen weiteren Formatter-Aufruf je Zeile)
+  const g = new Date(`${h}T12:00:00Z`);
+  g.setUTCDate(g.getUTCDate() - 1);
+  if (tag === g.toISOString().slice(0, 10)) return TEXT.gestern;
   return datumKurz(iso);
 }
 
@@ -92,20 +95,27 @@ export const UnterlageZeile = memo(function UnterlageZeile({ u, letzte, fehlt, b
   return <Zeile symbol="doc.text" ton={ton} titel={unterlagenName(v, u.daten)} text={`${wann(zuletzt)}\u00a0· ${status}`} marke={u.konfliktKopieVon ? { text: TEXT.marke.konfliktkopie, ton: "frist" } : undefined} onPress={() => onPress(u.id)} letzte={letzte} />;
 });
 
+// Überfällige je Unterlagenliste und Tag – Heute, Unterlagen und Meine teilen sich eine Rechnung (R9 Performance)
+const ueberZwischen = new WeakMap<Unterlage[], { tag: string; je: Map<string, number> }>();
+
 /** Tage über dem Zahlungsziel je offener Rechnung – einmal je Stand berechnet. */
 export function useUeberfaellig(): Map<string, number> {
-  const { stand } = useAmtlos();
+  const unterlagen = useStandWahl((s) => s.unterlagen);
   const tag = heute();
   return useMemo(() => {
-    const ids = offeneIds(stand.unterlagen);
-    return new Map(stand.unterlagen.filter((u) => ids.has(u.id)).map((u) => [u.id, tageUeberfaellig(u, tag, ids)]));
-  }, [stand.unterlagen, tag]);
+    const da = ueberZwischen.get(unterlagen);
+    if (da?.tag === tag) return da.je;
+    const ids = offeneIds(unterlagen);
+    const je = new Map(unterlagen.filter((u) => ids.has(u.id)).map((u) => [u.id, tageUeberfaellig(u, tag, ids)]));
+    ueberZwischen.set(unterlagen, { tag, je });
+    return je;
+  }, [unterlagen, tag]);
 }
 
-/** Fehlende Angaben je Unterlage – einmal je Stand berechnet, nicht in jeder Zeile. */
 export function useFehltJe(): Map<string, number> {
-  const { stand } = useAmtlos();
-  return useMemo(() => new Map(stand.unterlagen.map((u) => [u.id, fehltFuer(stand, u).length])), [stand.unterlagen, stand.betrieb]);
+  const unterlagen = useStandWahl((s) => s.unterlagen);
+  const betrieb = useStandWahl((s) => s.betrieb);
+  return useMemo(() => fehltJeBerechnen({ unterlagen, betrieb }), [unterlagen, betrieb]);
 }
 
 /** Vorlage in einer Liste: Titel und ein Satz in Alltagssprache. Antippen startet sofort. */
@@ -185,7 +195,9 @@ function AlleSeite() {
  * bearbeitete Unterlagen und Anlässe in Alltagssprache. Alle Vorlagen gibt es über „Alle Unterlagen“ und die Suche.
  */
 export function Unterlagen(_: { schliessen?: boolean }) {
-  const { stand, tabWechseln } = useAmtlos();
+  const { tabWechseln } = useAktionen();
+  const unterlagen = useStandWahl((s) => s.unterlagen);
+  const betrieb = useStandWahl((s) => s.betrieb);
   const nav = useNav();
   const ziel = useZiel();
   const starten = useStarten();
@@ -195,7 +207,7 @@ export function Unterlagen(_: { schliessen?: boolean }) {
   const [suche, setSuche] = useState("");
   const grosseSchrift = useGrosseSchrift();
   const s = suche.trim().toLowerCase();
-  const zuletzt = sortiert(stand).slice(0, 3);
+  const zuletzt = useMemo(() => sortiert({ unterlagen } as Stand).slice(0, 3), [unterlagen]);
   const zuAnlass = (a: Anlass) => (a.vorlagen.length === 1 ? starten(a.vorlagen[0]!) : nav.oeffnen(`anlass-${a.id}`, () => <AnlassSeite a={a} />));
   return (
     <BuehnenBlatt
@@ -217,7 +229,7 @@ export function Unterlagen(_: { schliessen?: boolean }) {
         <Treffer s={s} setzen={setSuche} />
       ) : (
         <View>
-          {betriebFehlt(stand.betrieb) ? (
+          {betriebFehlt(betrieb) ? (
             <Karte stil={{ marginBottom: 6 }}>
               <Zeile
                 symbol="building.2"
@@ -237,17 +249,17 @@ export function Unterlagen(_: { schliessen?: boolean }) {
             </Karte>
           ) : null}
           {zuletzt.length ? (
-            <Gruppe erste={!betriebFehlt(stand.betrieb)} titel={TEXT.zuletzt}>
+            <Gruppe erste={!betriebFehlt(betrieb)} titel={TEXT.zuletzt}>
               <Karte>
                 {zuletzt.map((u, i) => (
-                  <UnterlageZeile key={u.id} u={u} ueber={ueberJe.get(u.id) ?? 0} letzte={i === zuletzt.length - 1} fehlt={fehltJe.get(u.id) ?? 0} betrieb={stand.betrieb} onPress={oeffnen} />
+                  <UnterlageZeile key={u.id} u={u} ueber={ueberJe.get(u.id) ?? 0} letzte={i === zuletzt.length - 1} fehlt={fehltJe.get(u.id) ?? 0} betrieb={betrieb} onPress={oeffnen} />
                 ))}
               </Karte>
-              {stand.unterlagen.length > zuletzt.length ? <TextKnopf text={TEXT.alle_anzeigen} onPress={() => ziel(() => tabWechseln("meine"))} /> : null}
+              {unterlagen.length > zuletzt.length ? <TextKnopf text={TEXT.alle_anzeigen} onPress={() => ziel(() => tabWechseln("meine"))} /> : null}
             </Gruppe>
           ) : null}
 
-          <Gruppe erste={!zuletzt.length && !betriebFehlt(stand.betrieb)} titel={TEXT.wofuer}>
+          <Gruppe erste={!zuletzt.length && !betriebFehlt(betrieb)} titel={TEXT.wofuer}>
             <Karte>
               {ANLAESSE.map((a, i) => (
                 <Zeile key={a.id} symbol={ANLASS_SYMBOL[a.id] ?? "doc.text"} ton={ANLASS_TON[a.id] ?? "amt"} titel={a.titel} text={a.text} onPress={() => zuAnlass(a)} letzte={i === ANLAESSE.length - 1} />

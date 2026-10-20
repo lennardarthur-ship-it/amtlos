@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ScrollView, View } from "react-native";
-import { fehlendeAngaben, personAus, personIn, vorlageFuer, type Daten, type Vorlage, type VorlagenAbschnitt } from "@amtlos/fachlogik";
+import { VORSTEUER_AUFTEILEN, fehlendeAngaben, personAus, personIn, vorlageFuer, type Daten, type Vorlage, type VorlagenAbschnitt } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { Betrag, Fuss, Hinweis, Knopf,  T, TextKnopf, Wahl, ZurueckKnopf } from "../ui/bausteine";
 import { HellerStatus, TastaturRahmen, useKopf, useNav } from "../ui/navigation";
@@ -87,6 +87,7 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
           r.ersatz ? TEXT.aus_rechnungen_ersatz(r.ersatz) : "",
           r.offen ? TEXT.aus_rechnungen_offen(r.offen) : "",
           r.vorsteuerBelege || r.ohneVorsteuer ? TEXT.aus_rechnungen_vorsteuer(r.vorsteuerBelege, r.ohneVorsteuer) : "",
+          r.vorsteuerPruefen ? VORSTEUER_AUFTEILEN : "",
         ].filter(Boolean).join(" ")
       : null,
   );
@@ -118,6 +119,7 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
           {r.ersatz ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_ersatz(r.ersatz)}</T> : null}
           {r.offen ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_offen(r.offen)}</T> : null}
           {r.vorsteuerBelege || r.ohneVorsteuer ? <T v="caption" farbe={f.amtTief}>{TEXT.aus_rechnungen_vorsteuer(r.vorsteuerBelege, r.ohneVorsteuer)}</T> : null}
+          {r.vorsteuerPruefen ? <T v="caption" farbe={f.bald}>{VORSTEUER_AUFTEILEN}</T> : null}
         </View>
       ) : null}
     </View>

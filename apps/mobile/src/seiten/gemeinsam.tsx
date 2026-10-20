@@ -1,7 +1,7 @@
 import { useIsFocused } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
-import { type ReactNode } from "react";
-import { Pressable, ScrollView, View, type ScrollViewProps } from "react-native";
+import { useCallback, type ReactElement, type ReactNode } from "react";
+import { FlatList, Platform, Pressable, ScrollView, View, type ScrollViewProps } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Bereich } from "@amtlos/fachlogik";
 import { euroText } from "../unterlagen/ablage";
@@ -47,9 +47,64 @@ export function BuehnenSeite({ ueber, titel, satz, rechts, buehne, children, ...
         <View style={{ flexGrow: 1, backgroundColor: f.papier, borderTopLeftRadius: RADIUS.buehne, borderTopRightRadius: RADIUS.buehne, paddingHorizontal: RAND, paddingTop: BLATT_OBEN, paddingBottom: UNTEN_FREI }}>
           {children}
           {/* heller Grund unter dem Blatt – beim Ziehen über das Ende hinaus kein Grün */}
-          <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: -1000, height: 1000, backgroundColor: f.papier }} />
+          {Platform.OS === "web" ? null : <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: -1000, height: 1000, backgroundColor: f.papier }} />}
         </View>
       </ScrollView>
+    </View>
+  );
+}
+
+/**
+ * Tab-Seite wie `BuehnenSeite`, aber mit einer virtualisierten Liste auf dem Blatt (R9 Performance): Nur die sichtbaren
+ * Zeilen werden gezeichnet – bei 5.000 Belegen statt 70.000 DOM-Knoten bzw. nativen Ansichten ein paar Dutzend. `kopf`
+ * steht auf dem Blatt über der Liste, `fuss` darunter; jede Zeile liegt auf dem Blatt mit dessen Seitenrand.
+ */
+export function BuehnenListe<T>({ ueber, titel, buehne, kopf, fuss, daten, zeile, schluessel }: { ueber?: string; titel?: string; buehne?: ReactNode; kopf?: ReactNode; fuss?: ReactNode; daten: readonly T[]; zeile: (eintrag: T) => ReactElement | null; schluessel: (eintrag: T) => string }) {
+  const f = useFarben();
+  const inset = useSafeAreaInsets();
+  const sichtbar = useIsFocused();
+  const gross = useGrosseSchrift();
+  const oben = (
+    <View>
+      <View style={{ paddingTop: inset.top + (ueber ? 14 : 28), paddingHorizontal: RAND, paddingBottom: 30, gap: 22, overflow: "hidden" }}>
+        <BuehnenMotiv />
+        {ueber ? (
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12, minHeight: 40 }}>
+            <T v="klein" fett farbe={f.buehneLeise} stil={{ flex: 1 }} numberOfLines={gross ? undefined : 1}>{ueber}</T>
+          </View>
+        ) : null}
+        {titel ? <T v="grossTitel" accessibilityRole="header" farbe={f.buehneText}>{trennen(titel)}</T> : null}
+        {buehne}
+      </View>
+      <View style={{ backgroundColor: f.papier, borderTopLeftRadius: RADIUS.buehne, borderTopRightRadius: RADIUS.buehne, paddingHorizontal: RAND, paddingTop: BLATT_OBEN }}>{kopf}</View>
+    </View>
+  );
+  const unten = (
+    <View style={{ backgroundColor: f.papier, paddingHorizontal: RAND, paddingBottom: UNTEN_FREI, flexGrow: 1 }}>
+      {fuss}
+      {/* heller Grund unter dem Blatt – beim Ziehen über das Ende hinaus kein Grün (im Web verlängerte er die Liste) */}
+      {Platform.OS === "web" ? null : <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: -1000, height: 1000, backgroundColor: f.papier }} />}
+    </View>
+  );
+  const zeichnen = useCallback(({ item }: { item: T }) => <View style={{ backgroundColor: f.papier, paddingHorizontal: RAND }}>{zeile(item)}</View>, [f.papier, zeile]);
+  return (
+    <View style={{ flex: 1, backgroundColor: f.buehne }}>
+      {sichtbar ? <StatusBar style="light" /> : null}
+      <FlatList
+        style={{ flex: 1 }}
+        contentContainerStyle={{ flexGrow: 1 }}
+        data={daten}
+        renderItem={zeichnen}
+        keyExtractor={schluessel}
+        ListHeaderComponent={oben}
+        ListFooterComponent={unten}
+        ListFooterComponentStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
+        automaticallyAdjustKeyboardInsets
+        initialNumToRender={20}
+        maxToRenderPerBatch={20}
+        windowSize={9}
+      />
     </View>
   );
 }
@@ -102,7 +157,7 @@ export function BuehnenBlatt({ kopf = "", ueber, titel, unter, buehne, fest, rec
         {fest && buehne ? <View key="buehne" style={{ paddingHorizontal: RAND, paddingTop: 6, paddingBottom: 28 }}>{buehne}</View> : fest ? <View key="buehne" style={{ height: 20 }} /> : null}
         <View key="blatt" style={{ flexGrow: 1, backgroundColor: f.papier, borderTopLeftRadius: RADIUS.buehne, borderTopRightRadius: RADIUS.buehne, paddingHorizontal: RAND, paddingTop: BLATT_OBEN, paddingBottom: fuss ? 24 : imBlatt ? 40 : UNTEN_FREI }}>
           {children}
-          <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: -1000, height: 1000, backgroundColor: f.papier }} />
+          {Platform.OS === "web" ? null : <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: -1000, height: 1000, backgroundColor: f.papier }} />}
         </View>
       </ScrollView>
       {fuss}
@@ -200,4 +255,5 @@ export const BEREICH_SYMBOL: Record<Bereich, string> = {
 };
 
 /** ISO-Zeitpunkt → TT.MM.JJJJ (deutsche Ortszeit). */
-export const datumKurz = (iso: string) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(iso));
+const DATUM_KURZ = new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" });
+export const datumKurz = (iso: string) => DATUM_KURZ.format(new Date(iso));

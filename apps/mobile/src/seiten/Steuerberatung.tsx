@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { dokumentHtml, pdfDateiname, vorlageFuer } from "@amtlos/fachlogik";
 import { betriebFuerDokument } from "../pro/regeln";
 import { pdfBytes } from "../unterlagen/pdf";
@@ -13,6 +13,11 @@ import { heute } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { Inhalt } from "./gemeinsam";
 import { useProSperre } from "./Pro";
+
+/** Ab so vielen MB warnt das Paket (R9 Performance): Es entsteht ganz im Arbeitsspeicher. */
+export const PAKET_MB_WARNUNG = 300;
+
+const MONAT_JAHR = new Intl.DateTimeFormat("de-DE", { month: "long", year: "numeric", timeZone: "UTC" });
 
 /**
  * Paket für die Steuerberatung (E-133): Zeitraum wählen, Kontenrahmen und DATEV-Nummern angeben, ZIP teilen.
@@ -45,34 +50,48 @@ export function SteuerberatungSeite() {
   const [laedt, setLaedt] = useState(false);
   const [fehler, setFehler] = useState<string | null>(null);
   const [hinweis, setHinweis] = useState<string | null>(null);
+  const [fortschritt, setFortschritt] = useState<string | null>(null);
   const sb = z.stand.steuerberatung;
   const zr = liste.find((x) => x.name === wahl)!;
   const anzahlR = gestellteRechnungen(z.stand).filter((u) => String(u.daten.datum) >= zr.von && String(u.daten.datum) <= zr.bis).length;
   const anzahlB = z.stand.belege.filter((b) => b.datum >= zr.von && b.datum <= zr.bis).length;
-  const nameVon = (n: string) => (/^\d{4}$/.test(n) ? `Jahr ${n}` : /Q(\d)$/.test(n) ? `${n.slice(-1)}. Quartal ${n.slice(0, 4)}` : new Intl.DateTimeFormat("de-DE", { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${n}-01T00:00:00Z`)));
+  // ungefähre Größe: Belegdateien im Zeitraum plus etwa 60 KB je Rechnungs-PDF
+  const mb = useMemo(() => {
+    let bytes = anzahlR * 60_000;
+    for (const b of z.stand.belege) if (b.datei && b.datum >= zr.von && b.datum <= zr.bis) bytes += z.dateiGroesse(b.datei);
+    return Math.round(bytes / 1e6);
+  }, [z.stand.belege, zr.von, zr.bis, anzahlR]);
+  const gross = mb > PAKET_MB_WARNUNG;
+  const nameVon = (n: string) => (/^\d{4}$/.test(n) ? `Jahr ${n}` : /Q(\d)$/.test(n) ? `${n.slice(-1)}. Quartal ${n.slice(0, 4)}` : MONAT_JAHR.format(new Date(`${n}-01T00:00:00Z`)));
   const los = async () => {
     setFehler(null);
     setHinweis(null);
     if (!sperre("steuerberater")) return;
     setLaedt(true);
     try {
+      // Belegdateien eine nach der anderen lesen, mit Fortschritt (R9 Performance)
       const dateien: Record<string, Uint8Array> = {};
-      for (const b of z.stand.belege) {
-        if (!b.datei || b.datum < zr.von || b.datum > zr.bis) continue;
-        const bytes = await z.dateiLesen(b.datei);
-        if (bytes) dateien[b.datei] = bytes;
+      const imZeitraum = z.stand.belege.filter((b) => b.datei && b.datum >= zr.von && b.datum <= zr.bis);
+      for (const [i, b] of imZeitraum.entries()) {
+        setFortschritt(TEXT.steuerpaket_fortschritt_belege(i + 1, imZeitraum.length));
+        const bytes = await z.dateiLesen(b.datei!);
+        if (bytes) dateien[b.datei!] = bytes;
       }
       // Rechnungen (auch Stornos und Gutschriften) als PDF beilegen – die Kanzlei braucht das Belegbild jeder Ausgangsrechnung
       const rechnungsPdfs: Record<string, Uint8Array> = {};
       const v = vorlageFuer("rechnung");
+      const rechnungenImZeitraum = gestellteRechnungen(z.stand).filter((u) => String(u.daten.datum ?? "") >= zr.von && String(u.daten.datum ?? "") <= zr.bis);
       if (v)
-        for (const u of gestellteRechnungen(z.stand)) {
-          const d = String(u.daten.datum ?? "");
-          if (d < zr.von || d > zr.bis) continue;
+        for (const [i, u] of rechnungenImZeitraum.entries()) {
+          setFortschritt(TEXT.steuerpaket_fortschritt_pdfs(i + 1, rechnungenImZeitraum.length));
           const bytes = await pdfBytes(dokumentHtml(v, u.daten, betriebFuerDokument(z.stand.betrieb, z.pro)), pdfDateiname(v, u.daten, heute()), v.querformat).catch(() => null);
           if (bytes) rechnungsPdfs[u.id] = bytes;
         }
+      setFortschritt(TEXT.steuerpaket_fortschritt_zip);
+      // gezeichnet, bevor das Packen den Thread belegt
+      await new Promise((r) => setTimeout(r, 30));
       const p = steuerpaket(z.stand, zr, sb, dateien, new Date().toISOString(), { rechnungsPdfs });
+      setFortschritt(null);
       if (!(await dateiTeilenBytes(p.dateiname, p.zip, "application/zip"))) return;
       melden(TEXT.steuerpaket_fertig(p.buchungen));
       if (p.ohneXml) setHinweis(TEXT.steuerpaket_ohne_xml(p.ohneXml));
@@ -80,6 +99,7 @@ export function SteuerberatungSeite() {
       setFehler(TEXT.paket_fehler);
     } finally {
       setLaedt(false);
+      setFortschritt(null);
     }
   };
   return (
@@ -105,12 +125,14 @@ export function SteuerberatungSeite() {
         <T v="caption" leise stil={{ marginTop: 6 }}>{TEXT.steuerpaket_nummern_hilfe}</T>
         <View style={{ marginTop: 14 }}>
           <Hinweis text={TEXT.steuerpaket_hinweis} />
+          {gross ? <Hinweis art="warnung" text={TEXT.steuerpaket_gross(mb)} /> : null}
+          {fortschritt ? <Hinweis text={fortschritt} /> : null}
           {hinweis ? <Hinweis text={hinweis} /> : null}
           {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
         </View>
       </Inhalt>
       <Fuss>
-        <Knopf text={TEXT.mitPro(TEXT.steuerpaket_teilen, z.pro)} symbol="square.and.arrow.up" laedt={laedt} deaktiviert={!anzahlR && !anzahlB} onPress={() => void los()} stil={{ flex: 1 }} />
+        <Knopf text={TEXT.mitPro(gross ? TEXT.trotzdem_erstellen : TEXT.steuerpaket_teilen, z.pro)} symbol="square.and.arrow.up" laedt={laedt} deaktiviert={!anzahlR && !anzahlB} onPress={() => void los()} stil={{ flex: 1 }} />
       </Fuss>
     </Unterseite>
   );

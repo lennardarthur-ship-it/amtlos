@@ -8,7 +8,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { AppState } from "react-native";
 import { proKontoTrennen, proKontoVerbinden } from "../pro/kauf";
 import { zufall } from "../unterlagen/sicherungDatei";
-import { useAmtlos } from "../zustand";
+import { useAktionen, useAmtlosStatus, useStandWahl } from "../zustand";
 import { tresorServer } from "./api";
 import { API_URL, syncAngeboten } from "./konfig";
 import { anmelden, beiAenderung, kontoIdMerken, kontoVergessen, sitzungLesen, sitzungVergessen, syncSchluesselLesen, syncSchluesselSpeichern, syncSchluesselVergessen, syncZaehlerLesen, syncZaehlerMerken, tokenHolen } from "./sitzung";
@@ -54,6 +54,8 @@ interface Konto {
 }
 
 const ZULETZT = "amtlos.sync.zuletzt.v1";
+/** Automatisch synchronisieren frühestens so lange nach der letzten Änderung (R9 Performance; beim Öffnen sofort) */
+export const SYNC_NACH_MS = 30_000;
 const Kontext = createContext<Konto | null>(null);
 
 export function useKonto(): Konto {
@@ -66,9 +68,12 @@ const gleich = () => new Promise((r) => setTimeout(r, 30));
 const alsFehler = (e: unknown): SyncFehler => (e instanceof SyncFehler ? e : new SyncFehler("netz"));
 
 export function KontoAnbieter({ children }: { children: ReactNode }) {
-  const z = useAmtlos();
-  const zRef = useRef(z);
-  zRef.current = z;
+  // nur Handlungen, Status und der Änderungszeitpunkt – nicht bei jeder Eingabe neu zeichnen (R9 Performance)
+  const aktionen = useAktionen();
+  const amtlosStatus = useAmtlosStatus();
+  const geaendert = useStandWahl((s) => s.geaendert);
+  const zRef = useRef(aktionen);
+  zRef.current = aktionen;
   const [status, setStatus] = useState<KontoStatus>(syncAngeboten ? "laedt" : "aus");
   const [name, setName] = useState("");
   const [laeuft, setLaeuft] = useState(false);
@@ -119,7 +124,7 @@ export function KontoAnbieter({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // AutoSync: nach Änderungen (kurz gewartet) und beim Öffnen der App
+  // AutoSync: nach Änderungen (gewartet, R9 Performance: jede Runde verschlüsselt den ganzen Stand) und beim Öffnen der App
   const zuletzt = useRef<string | undefined>(undefined);
   const laeuftRef = useRef<Promise<boolean> | null>(null);
   const nochmal = useRef(false);
@@ -153,6 +158,7 @@ export function KontoAnbieter({ children }: { children: ReactNode }) {
           if (!inzwischen) zuletzt.current = zRef.current.aktuellerStand().geaendert;
         },
         dateiLokal: (n) => zRef.current.dateiLesen(n),
+        dateiVorhanden: (n) => zRef.current.dateiVorhanden(n),
         dateiAblegen: (n, b) => zRef.current.dateiAblegenUnter(n, b),
       };
       const r = await synchronisieren(u);
@@ -195,11 +201,10 @@ export function KontoAnbieter({ children }: { children: ReactNode }) {
   const jetztRef = useRef(jetzt);
   jetztRef.current = jetzt;
 
-  const automatisch = status === "aktiv" && z.pro && z.bereit && !z.ladefehler;
-  const geaendert = z.stand.geaendert;
+  const automatisch = status === "aktiv" && amtlosStatus.pro && amtlosStatus.bereit && !amtlosStatus.ladefehler;
   useEffect(() => {
     if (!automatisch || geaendert === zuletzt.current) return;
-    const t = setTimeout(() => void jetzt(), zuletzt.current === undefined ? 800 : 4000);
+    const t = setTimeout(() => void jetzt(), zuletzt.current === undefined ? 800 : SYNC_NACH_MS);
     return () => clearTimeout(t);
   }, [automatisch, geaendert, jetzt]);
   useEffect(() => {

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { Image, Linking, View } from "react-native";
 import { KATEGORIEN, STEUERSAETZE, ZAHLUNGSWEGE, belegAusERechnung, belegSummen, cent, eRechnungAusPdf, eRechnungLesen, kategorieFuer, type Beleg } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
@@ -9,7 +9,7 @@ import { useMeldung } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
 import { istIos, useFarben, weich } from "../ui/thema";
 import { belegFoto } from "../unterlagen/belegfoto";
-import { ausUtf8, base64 } from "../unterlagen/sicherung";
+import { ausUtf8 } from "../unterlagen/sicherung";
 import { dateiTeilenBytes, dateiWaehlenBytes } from "../unterlagen/sicherungDatei";
 import { belegEndgueltigLoeschbar, leererBeleg, neueId } from "../unterlagen/speicher";
 import { istKleinunternehmer } from "../unterlagen/steuerpaket";
@@ -18,8 +18,11 @@ import { bestaetigen } from "../ui/bestaetigen";
 import { BuehnenBlatt, GrosserBetrag, datumKurz } from "./gemeinsam";
 import { useAnsage } from "./felder";
 
-const euro = (c: number) => `${new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(c / 100)} €`;
-const betragText = (c: number) => (c ? new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false }).format(c / 100) : "");
+// Formatter einmal anlegen (R9 Performance)
+const EURO = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const BETRAG = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false });
+const euro = (c: number) => `${EURO.format(c / 100)} €`;
+const betragText = (c: number) => (c ? BETRAG.format(c / 100) : "");
 const endung = (name: string) => (name.split(".").pop() ?? "").toLowerCase();
 const MIME: Record<string, string> = { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", pdf: "application/pdf", xml: "application/xml" };
 
@@ -109,8 +112,8 @@ function KameraVerweigert() {
   );
 }
 
-/** Zeile in Listen: Lieferant, Datum, Betrag, Kategorie bzw. was fehlt. */
-export function BelegZeile({ b, letzte, onPress }: { b: Beleg; letzte: boolean; onPress: () => void }) {
+/** Zeile in Listen: Lieferant, Datum, Betrag, Kategorie bzw. was fehlt. `onPress` bekommt die ID (gleichbleibende Funktion, memo). */
+export const BelegZeile = memo(function BelegZeile({ b, letzte, onPress }: { b: Beleg; letzte: boolean; onPress: (id: string) => void }) {
   const s = belegSummen(b);
   const unvollstaendig = !b.lieferant.trim() || !s.brutto_cent;
   return (
@@ -119,11 +122,11 @@ export function BelegZeile({ b, letzte, onPress }: { b: Beleg; letzte: boolean; 
       titel={b.lieferant.trim() || TEXT.beleg_ohne_lieferant}
       text={`${datumKurz(`${b.datum}T12:00:00Z`)} · ${unvollstaendig ? TEXT.beleg_unvollstaendig : kategorieFuer(b.kategorie).titel}`}
       wert={s.brutto_cent ? euro(s.brutto_cent) : undefined}
-      onPress={onPress}
+      onPress={() => onPress(b.id)}
       letzte={letzte}
     />
   );
-}
+});
 
 /** Vorschau der Belegdatei: Foto als Bild, sonst Name mit „Original teilen“. */
 function DateiVorschau({ b }: { b: Beleg }) {
@@ -134,9 +137,17 @@ function DateiVorschau({ b }: { b: Beleg }) {
   useEffect(() => {
     if (!b.datei || !["jpg", "jpeg", "png"].includes(art)) return;
     let aktiv = true;
-    void z.dateiLesen(b.datei).then((bytes) => aktiv && bytes && setBild(`data:${MIME[art]};base64,${base64(bytes)}`));
+    let entfernen: (() => void) | null = null;
+    // als vorübergehende Datei statt data-URI: kein weiteres Base64 des ganzen Fotos (R9 Performance); beim Verlassen weg
+    void z.dateiAnzeigen(b.datei, MIME[art] ?? "application/octet-stream").then((a) => {
+      if (!a) return;
+      if (!aktiv) return a.entfernen();
+      entfernen = a.entfernen;
+      setBild(a.uri);
+    });
     return () => {
       aktiv = false;
+      entfernen?.();
     };
   }, [b.datei, art]);
   if (!b.datei) return null;

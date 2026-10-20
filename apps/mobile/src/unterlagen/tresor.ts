@@ -62,3 +62,37 @@ export function tresorOeffnen(text: string, schluessel: Uint8Array, kontext?: st
   if (d.version === 2 && kontext === undefined) throw new Error("Kontext fehlt");
   return ausUtf8(gcm(schluessel, ausBase64(d.nonce), utf8(d.version === 1 ? ZUSATZ : zusatz2(kontext!))).decrypt(ausBase64(d.daten)));
 }
+
+/**
+ * Binärformat für Belegdateien (R9 Performance, „Format 3“): Kennung, Nonce, Chiffretext – ohne JSON und ohne doppeltes
+ * Base64. Ein 1-MB-Foto belegt so gut 1 MB statt 1,8 MB und wird ohne Umwege ver- und entschlüsselt. Der Zusatztext
+ * bindet wie in Format 2 an den Zweck (z. B. „datei:<Name>“). Ältere Dateien (Text mit Format 1/2) bleiben lesbar:
+ * Sie beginnen mit „{“, nie mit der Kennung.
+ */
+export const BINAER_KENNUNG = utf8("amtlos-tresor:3\n");
+const zusatz3 = (kontext: string) => `${TRESOR_FORMAT}:3:${kontext}`;
+
+/** Liegen die Bytes im Binärformat vor? */
+export function istBinaerTresor(bytes: Uint8Array): boolean {
+  if (bytes.length < BINAER_KENNUNG.length + 12 + 16) return false;
+  for (let i = 0; i < BINAER_KENNUNG.length; i++) if (bytes[i] !== BINAER_KENNUNG[i]) return false;
+  return true;
+}
+
+/** Bytes verschlüsseln (Binärformat, immer an einen Kontext gebunden). */
+export function tresorBytesSchliessen(klar: Uint8Array, schluessel: Uint8Array, nonce: Uint8Array, kontext: string): Uint8Array {
+  if (schluessel.length !== 32 || nonce.length !== 12) throw new Error("Schlüssel oder Nonce ungültig");
+  const geheim = gcm(schluessel, nonce, utf8(zusatz3(kontext))).encrypt(klar);
+  const out = new Uint8Array(BINAER_KENNUNG.length + 12 + geheim.length);
+  out.set(BINAER_KENNUNG, 0);
+  out.set(nonce, BINAER_KENNUNG.length);
+  out.set(geheim, BINAER_KENNUNG.length + 12);
+  return out;
+}
+
+/** Binärformat entschlüsseln; wirft bei falschem Schlüssel, falschem Kontext oder veränderten Daten. */
+export function tresorBytesOeffnen(bytes: Uint8Array, schluessel: Uint8Array, kontext: string): Uint8Array {
+  if (!istBinaerTresor(bytes)) throw new Error("Kein Amtlos-Tresor");
+  const n = BINAER_KENNUNG.length;
+  return gcm(schluessel, bytes.subarray(n, n + 12), utf8(zusatz3(kontext))).decrypt(bytes.subarray(n + 12));
+}

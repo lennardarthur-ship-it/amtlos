@@ -18,7 +18,7 @@ import { Fehlergrenze } from "./ui/Fehlergrenze";
 import { MeldungAnbieter } from "./ui/meldung";
 import { useSchrift } from "./ui/schrift";
 import { entsperren } from "./unterlagen/sperre";
-import { Blatt, InhaltSeite, WurzelNavKontext, kopfOptionen, useNav } from "./ui/navigation";
+import { Blatt, InhaltSeite, TAB_OPTIONEN, WurzelNavKontext, kopfOptionen, useNav } from "./ui/navigation";
 import { HAARLINIE, SCHRIFT, TASTATUR_FERTIG, istIos, useFarben } from "./ui/thema";
 import { AmtlosAnbieter, useAmtlos, type Tab } from "./zustand";
 import { KontoAnbieter } from "./konto/konto";
@@ -113,7 +113,7 @@ function TabSeiten({ route }: { route: { name: string } }) {
 
 function TabLeiste() {
   return (
-    <Tabs.Navigator screenOptions={{ headerShown: false }} tabBar={(p: BottomTabBarProps) => <Kapsel {...p} />}>
+    <Tabs.Navigator screenOptions={TAB_OPTIONEN} tabBar={(p: BottomTabBarProps) => <Kapsel {...p} />}>
       {TABS.map((t) => (
         <Tabs.Screen key={t.id} name={t.id} component={TabSeiten} options={{ title: TEXT.tabs[t.id] }} />
       ))}

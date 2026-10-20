@@ -7,6 +7,7 @@ import { T as TEXT } from "../texte";
 import { BuehnenText, Symbol, T, useGrosseSchrift } from "./bausteine";
 import { MINZE, RADIUS, RAND, SCHRIFT, ZIEL, istIos, useFarben, type Farben } from "./thema";
 import { trennen } from "./trennen";
+import { useAktionen } from "../zustand";
 
 /**
  * Navigation (E-141): echte iOS-Navigation mit react-native-screens – UINavigationController mit großen Titeln,
@@ -66,12 +67,21 @@ export function useNav(): Nav {
   );
 }
 
+/**
+ * Optionen der Tab-Seiten (R9 Performance): Nicht sichtbare Tabs werden eingefroren – eine Eingabe oder ein Tab-Wechsel
+ * zeichnet nicht mehr alle vier Seiten neu. Beim Zurückkehren holt der Tab den aktuellen Stand nach.
+ */
+export const TAB_OPTIONEN = { headerShown: false, freezeOnBlur: true } as const;
+
 /** Zeigt den registrierten Inhalt einer Route. */
 export function InhaltSeite() {
   const params = useRoute().params as SeitenParams | undefined;
   const inhalt = params ? INHALTE.get(params.id) : undefined;
+  const { sichern } = useAktionen();
   // geschlossene Seiten aus dem Verzeichnis nehmen
   useEffect(() => () => void (params && INHALTE.delete(params.id)), [params]);
+  // Formular oder Unterseite verlassen: Ausstehendes gleich speichern, nicht erst nach der Tipp-Pause (R9 Performance)
+  useEffect(() => () => sichern(), [sichern]);
   return <>{inhalt ? inhalt() : null}</>;
 }
 
@@ -87,6 +97,8 @@ export function kopfOptionen(f: Farben): NativeStackNavigationOptions {
     headerLargeTitleStyle: { color: f.tinte, ...SCHRIFT.display },
     headerBackTitleStyle: { fontFamily: SCHRIFT.mittel.fontFamily },
     contentStyle: { backgroundColor: f.papier },
+    // verdeckte Seiten (unter einer Unterseite oder einem Blatt) einfrieren – Tippen im Blatt zeichnet sie nicht neu
+    freezeOnBlur: true,
     ...(Platform.OS === "web"
       ? {
           headerLeft: (p) => (p.canGoBack ? <WebZurueck buehne={p.tintColor === f.minze} /> : null),

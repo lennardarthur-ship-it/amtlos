@@ -10,7 +10,7 @@ import { HAARLINIE, RADIUS, SCHRIFT, useFarben, weich } from "../ui/thema";
 import { KATEGORIE_TITEL, auswertung, beantwortet, dringlichkeit, erinnerungsPlan, fortschritt, frageZu, gruendungsSchritte, haken, istErledigt, offeneFragenNachWirkung, selten, type PflichtInfo } from "../pflichten/check";
 import { allesAbsagen, erinnerungenMoeglich, erlaubnisAnfragen, planen } from "../pflichten/erinnerungen";
 import { heute } from "../unterlagen/speicher";
-import { useAmtlos } from "../zustand";
+import { useAmtlos, useStandWahl } from "../zustand";
 import { Antwort, CheckAblauf } from "./Check";
 import { SicherungsKarte } from "./Sicherung";
 import { BuehnenBlatt, BuehnenKnopf, BuehnenSeite, Gruppe, Inhalt, datumKurz } from "./gemeinsam";
@@ -18,12 +18,19 @@ import { useOeffnen, useStarten } from "./starten";
 import { useErstellen } from "./Erstellen";
 
 const datumDe = (iso: string) => datumKurz(`${iso}T12:00:00Z`);
+const TAG_LANG = new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", weekday: "long", day: "numeric", month: "long", year: "numeric" });
 
 /** Auswertung des Katalogs für das gespeicherte Profil (und Ereignisse aus den Unterlagen) – nur neu, wenn sich Antworten, Unterlagen oder der Tag ändern. */
 export function useAuswertung() {
-  const { stand } = useAmtlos();
+  const profil = useStandWahl((s) => s.profil);
+  const unterlagen = useStandWahl((s) => s.unterlagen);
   const tag = heute();
-  return useMemo(() => auswertung(stand.profil, tag, stand.unterlagen), [stand.profil, stand.unterlagen, tag]);
+  // die Auswertung braucht aus den Unterlagen nur durchgeführte Unterweisungen (Ereignisse) – nur sie bestimmen, ob neu
+  // gerechnet wird, nicht jeder Tastendruck in einer Rechnung (R9 Performance)
+  const unterweisungen = useMemo(() => unterlagen.filter((u) => u.vorlage === "unterweisung" && u.ausgegeben && !u.storniertDurch), [unterlagen]);
+  const schluessel = unterweisungen.map((u) => `${u.id}:${String(u.daten.datum ?? "")}`).join("|");
+  // `schluessel` steht für alles, was die Auswertung aus `unterweisungen` liest (ID, Datum) – bewusst statt der Liste
+  return useMemo(() => auswertung(profil, tag, unterweisungen), [profil, schluessel, tag]);
 }
 
 /** Hat jemand den Check schon gemacht? (die erste Frage ist beantwortet) */
@@ -99,7 +106,7 @@ function PflichtDetail({ id }: { id: string }) {
             <T accessibilityElementsHidden importantForAccessibility="no" aria-hidden maxFontSizeMultiplier={1.4} farbe={tage < 0 ? "#ffc9c4" : f.minze} stil={{ ...SCHRIFT.display, fontSize: 52, lineHeight: 54, letterSpacing: -2 }}>{String(Math.abs(tage))}</T>
             <View style={{ paddingBottom: 6, flex: 1 }}>
               <T fett farbe={f.buehneText}>{fristText(termin)}</T>
-              <T v="klein" farbe={f.buehneLeise}>{new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date(`${termin}T12:00:00Z`))}</T>
+              <T v="klein" farbe={f.buehneLeise}>{TAG_LANG.format(new Date(`${termin}T12:00:00Z`))}</T>
             </View>
           </View>
         ) : abgehakt ? (
@@ -235,6 +242,16 @@ function PflichtenInhalt() {
           <Karte>
             {d.naechsteWochen.map((p, i) => (
               <PflichtZeile key={p.id} p={p} erledigt={false} letzte={i === d.naechsteWochen.length - 1} />
+            ))}
+          </Karte>
+        </Gruppe>
+      ) : null}
+      {a.kommend.length ? (
+        // ruhig: nur zur Kenntnis, ohne Knopf und ohne Warnfarbe
+        <Gruppe titel={TEXT.kommt_demnaechst_titel} hilfe={TEXT.kommt_demnaechst_hilfe}>
+          <Karte>
+            {a.kommend.map((p, i) => (
+              <Zeile key={p.id} symbol="calendar" ton="leise" titel={p.titel} text={p.naechsterTermin ? TEXT.gilt_ab(datumDe(p.naechsterTermin)) : p.kurz} letzte={i === a.kommend.length - 1} />
             ))}
           </Karte>
         </Gruppe>

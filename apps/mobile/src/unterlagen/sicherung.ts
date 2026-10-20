@@ -73,21 +73,40 @@ interface Datei {
   daten: string;
 }
 
-// ---- Kodierung ohne Abhängigkeit von TextEncoder/Buffer (nicht überall in React Native vorhanden)
+// ---- Kodierung: native Funktionen, wo die Laufzeit sie hat – sonst in JavaScript (R9 Performance)
+//
+// Hermes (React Native 0.86) bringt TextEncoder, atob und btoa mit, Expo ergänzt TextDecoder; im Web und in Node gibt
+// es alles. Jede native Funktion wird beim Laden einmal mit festen Werten geprüft – weicht sie ab (z. B. ein TextDecoder
+// ohne `fatal` oder mit verschlucktem BOM), bleibt es bei der JavaScript-Fassung. Die Ausgabe ist byte-gleich.
 
-export function utf8(s: string): Uint8Array {
+type Global = {
+  TextEncoder?: new () => { encode(s: string): Uint8Array };
+  TextDecoder?: new (label?: string, o?: { fatal?: boolean; ignoreBOM?: boolean }) => { decode(b: Uint8Array): string };
+  atob?: (s: string) => string;
+  btoa?: (s: string) => string;
+};
+type U8Base64 = { fromBase64?: (s: string) => Uint8Array };
+const G = globalThis as unknown as Global;
+const PROBE = "Aä€😀\u{feff}z";
+const PROBE_BYTES = [0x41, 0xc3, 0xa4, 0xe2, 0x82, 0xac, 0xf0, 0x9f, 0x98, 0x80, 0xef, 0xbb, 0xbf, 0x7a];
+const gleicheBytes = (a: ArrayLike<number>, b: ArrayLike<number>) => a.length === b.length && Array.prototype.every.call(a, (x: number, i: number) => x === b[i]);
+
+/** utf8 in JavaScript (Rückfall) – wirft bei einzelnen Surrogaten (URIError). */
+export function utf8Js(s: string): Uint8Array {
   const b = unescape(encodeURIComponent(s));
   const out = new Uint8Array(b.length);
   for (let i = 0; i < b.length; i++) out[i] = b.charCodeAt(i);
   return out;
 }
-export function ausUtf8(bytes: Uint8Array): string {
+/** ausUtf8 in JavaScript (Rückfall) – wirft bei ungültigem UTF-8, lässt ein BOM stehen. */
+export function ausUtf8Js(bytes: Uint8Array): string {
   let s = "";
   for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
   return decodeURIComponent(escape(s));
 }
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-export function base64(bytes: Uint8Array): string {
+/** base64 in JavaScript (Rückfall). */
+export function base64Js(bytes: Uint8Array): string {
   let s = "";
   for (let i = 0; i < bytes.length; i += 3) {
     const n = (bytes[i]! << 16) | ((bytes[i + 1] ?? 0) << 8) | (bytes[i + 2] ?? 0);
@@ -95,7 +114,8 @@ export function base64(bytes: Uint8Array): string {
   }
   return s;
 }
-export function ausBase64(s: string): Uint8Array {
+/** ausBase64 in JavaScript (Rückfall): großzügig – Zeichen außerhalb des Alphabets (auch „=“) werden übergangen. */
+export function ausBase64Js(s: string): Uint8Array {
   const rein = s.replace(/[^A-Za-z0-9+/]/g, "");
   const out = new Uint8Array(Math.floor((rein.length * 3) / 4));
   let j = 0;
@@ -107,6 +127,80 @@ export function ausBase64(s: string): Uint8Array {
   }
   return out;
 }
+
+const pruefen = <T>(f: () => T | null): T | null => {
+  try {
+    return f();
+  } catch {
+    return null;
+  }
+};
+const encoder = pruefen(() => {
+  const e = G.TextEncoder ? new G.TextEncoder() : null;
+  return e && gleicheBytes(e.encode(PROBE), PROBE_BYTES) ? e : null;
+});
+const decoder = pruefen(() => {
+  const d = G.TextDecoder ? new G.TextDecoder("utf-8", { fatal: true, ignoreBOM: true }) : null;
+  if (!d || d.decode(new Uint8Array([0xef, 0xbb, 0xbf, ...PROBE_BYTES])) !== `\u{feff}${PROBE}`) return null;
+  // ungültiges UTF-8 muss werfen wie die JavaScript-Fassung – sonst würde Kaputtes still zu „�“
+  try {
+    d.decode(new Uint8Array([0x41, 0xc3]));
+    return null;
+  } catch {
+    return d;
+  }
+});
+/** Bytes ↔ „Binärtext“ (ein Zeichen je Byte) für atob/btoa – in Stücken, damit der Aufrufstapel reicht. */
+function binaerText(bytes: Uint8Array): string {
+  let s = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000) as unknown as number[]);
+  return s;
+}
+const nativBtoa = pruefen(() => (G.btoa && G.btoa(binaerText(new Uint8Array(PROBE_BYTES))) === base64Js(new Uint8Array(PROBE_BYTES)) ? G.btoa : null));
+const nativFromBase64 = pruefen(() => {
+  const f = (Uint8Array as unknown as U8Base64).fromBase64;
+  return f && gleicheBytes(f("QcOk4oKs8J+YgO+7v3o"), PROBE_BYTES) ? f : null;
+});
+const nativAtob = pruefen(() => {
+  if (!G.atob) return null;
+  const t = G.atob("QcOk4oKs8J+YgO+7v3o");
+  return t.length === PROBE_BYTES.length && PROBE_BYTES.every((b, i) => t.charCodeAt(i) === b) ? G.atob : null;
+});
+const UNGUELTIG = /[^A-Za-z0-9+/]/;
+const UNGUELTIG_ALLE = /[^A-Za-z0-9+/]/g;
+
+/** Text → UTF-8. Nativ ersetzt ein einzelnes Surrogat durch U+FFFD, statt zu werfen – gültiger Text ist byte-gleich. */
+export function utf8(s: string): Uint8Array {
+  return encoder ? encoder.encode(s) : utf8Js(s);
+}
+export function ausUtf8(bytes: Uint8Array): string {
+  return decoder ? decoder.decode(bytes) : ausUtf8Js(bytes);
+}
+export function base64(bytes: Uint8Array): string {
+  return nativBtoa ? nativBtoa(binaerText(bytes)) : base64Js(bytes);
+}
+export function ausBase64(s: string): Uint8Array {
+  if (!nativFromBase64 && !nativAtob) return ausBase64Js(s);
+  // wie die JavaScript-Fassung: „=“ am Ende und fremde Zeichen übergehen, ohne Polsterung dekodieren
+  let ende = s.length;
+  while (ende > 0 && s.charCodeAt(ende - 1) === 61) ende--;
+  let rein = ende === s.length ? s : s.slice(0, ende);
+  if (UNGUELTIG.test(rein)) rein = rein.replace(UNGUELTIG_ALLE, "");
+  // Länge mit Rest 1 ist kein gültiges Base64 – das behandelt die JavaScript-Fassung (wie bisher großzügig)
+  if (rein.length % 4 === 1) return ausBase64Js(rein);
+  try {
+    if (nativFromBase64) return nativFromBase64(rein);
+    const t = nativAtob!(rein);
+    const out = new Uint8Array(t.length);
+    for (let i = 0; i < t.length; i++) out[i] = t.charCodeAt(i);
+    return out;
+  } catch {
+    return ausBase64Js(rein);
+  }
+}
+
+/** Welche native Kodierung greift (für Tests und Messungen). */
+export const kodierungNativ = { utf8: Boolean(encoder), ausUtf8: Boolean(decoder), base64: Boolean(nativBtoa), ausBase64: nativFromBase64 ? "fromBase64" : nativAtob ? "atob" : null };
 
 const schluessel = (passwort: string, salz: Uint8Array, iterationen: number) => pbkdf2(sha256, utf8(passwort), salz, { c: iterationen, dkLen: 32 });
 

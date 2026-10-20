@@ -6,9 +6,9 @@ import { useNav } from "../ui/navigation";
 import { SCHRIFT, useFarben } from "../ui/thema";
 import { stundeIn, zeitzoneAbweichend } from "../ui/zeit";
 import { euroText, monatsSumme, offeneSumme } from "../unterlagen/ablage";
-import { heute, sortiert } from "../unterlagen/speicher";
+import { heute, sortiert, type Stand } from "../unterlagen/speicher";
 import { dringlichkeit, fortschritt, istErledigt } from "../pflichten/check";
-import { useAmtlos } from "../zustand";
+import { useAktionen, useAmtlosStatus, useStandWahl } from "../zustand";
 import { BelegErfassenSeite } from "./Belege";
 import { BlattKopf, BuehnenMarke, BuehnenSeite, GrosserBetrag } from "./gemeinsam";
 import { Balken, Einladung, PflichtZeile, checkGemacht, nichtsDranText, useAuswertung } from "./Pflichten";
@@ -16,15 +16,25 @@ import { SicherungsKarte } from "./Sicherung";
 import { useOeffnen, useStarten } from "./starten";
 import { UnterlageZeile, useFehltJe, useUeberfaellig } from "./Unterlagen";
 
+// Formatter einmal anlegen (R9 Performance)
+const WOCHENTAG = new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", weekday: "long", day: "numeric", month: "long" });
+const MONAT = new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", month: "long" });
+
 /**
  * „Heute“ (E-142): Auf der Bühne steht, was Kunden noch schulden – dazu die zwei häufigsten Handlungen. Auf dem Blatt
  * darunter: was als Nächstes ansteht (überfällige Rechnungen zuerst, dann Pflichten), der Fortschritt und das zuletzt
  * Bearbeitete.
  */
 export function Heute() {
-  const z = useAmtlos();
+  // nur die Teile des Stands, die „Heute“ zeigt (R9 Performance)
+  const z = useAmtlosStatus();
+  const { tabWechseln } = useAktionen();
   const f = useFarben();
-  const { stand, tabWechseln } = z;
+  const erledigt = useStandWahl((s) => s.erledigt);
+  const unterlagen = useStandWahl((s) => s.unterlagen);
+  const betrieb = useStandWahl((s) => s.betrieb);
+  const profil = useStandWahl((s) => s.profil);
+  const erinnerungen = useStandWahl((s) => s.erinnerungen);
   const nav = useNav();
   const starten = useStarten();
   const oeffnen = useOeffnen();
@@ -32,8 +42,7 @@ export function Heute() {
   const ueberJe = useUeberfaellig();
   const a = useAuswertung();
   const tag = heute();
-  const gemacht = checkGemacht(stand.profil);
-  const { erledigt, unterlagen, betrieb } = stand;
+  const gemacht = checkGemacht(profil);
 
   const { naechste, fs } = useMemo(() => {
     const e = { erledigt, unterlagen, betrieb };
@@ -45,10 +54,10 @@ export function Heute() {
   // überfällige Rechnungen gehören zu „Als Nächstes“ – Geld, das fehlt, ist dringender als jede Liste
   const ueberfaellig = useMemo(() => unterlagen.filter((u) => (ueberJe.get(u.id) ?? 0) > 0).sort((x, y) => (ueberJe.get(y.id) ?? 0) - (ueberJe.get(x.id) ?? 0)).slice(0, 2), [unterlagen, ueberJe]);
   const hatRechnungen = unterlagen.some((u) => u.vorlage === "rechnung" && u.festgeschrieben);
-  const zuletzt = sortiert(stand).slice(0, 3);
+  const zuletzt = useMemo(() => sortiert({ unterlagen } as Stand).slice(0, 3), [unterlagen]);
   const jetzt = new Date();
-  const datum = new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", weekday: "long", day: "numeric", month: "long" }).format(jetzt);
-  const monatsName = new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", month: "long" }).format(jetzt);
+  const datum = WOCHENTAG.format(jetzt);
+  const monatsName = MONAT.format(jetzt);
   const stunde = stundeIn(jetzt);
   // auf Reisen (G10): Datum und Fristen bleiben in deutscher Zeit – das dazusagen, wenn das Gerät anders tickt
   const ueber = zeitzoneAbweichend(jetzt) ? TEXT.datum_deutsche_zeit(datum) : datum;
@@ -112,7 +121,7 @@ export function Heute() {
               ))}
             </Karte>
           ) : (
-            <Hinweis art="erfolg" text={nichtsDranText(stand.erinnerungen)} />
+            <Hinweis art="erfolg" text={nichtsDranText(erinnerungen)} />
           )}
           {fs.gesamt ? (
             <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginTop: 14 }}>

@@ -743,4 +743,8 @@ export const T = {
   sicherung_gross: (fotos: number, mb: number) => `Diese Sicherung enthält ${fotos} Belegdateien (etwa ${mb} MB). Eine so große Sicherungsdatei kann Amtlos auf dem iPhone abbrechen lassen, weil sie ganz in den Arbeitsspeicher muss. Empfohlen: die automatische iCloud-Sicherung – sie legt jede Belegdatei einzeln ab. Du kannst trotzdem eine Datei erstellen.`,
   sicherung_trotzdem: "Trotzdem sichern",
   sicherung_fortschritt: (n: number, von: number) => `Belegdateien ${n} von ${von} …`,
+  // (R9 Performance, Nachtrag) Pflichten, die bald in Kraft treten
+  kommt_demnaechst_titel: "Kommt demnächst",
+  kommt_demnaechst_hilfe: "Neue Pflichten, die in den nächsten zwölf Monaten in Kraft treten. Noch ist nichts zu tun.",
+  gilt_ab: (d: string) => `Gilt ab ${d}`,
 };

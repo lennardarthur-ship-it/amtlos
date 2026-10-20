@@ -212,6 +212,11 @@ export interface SyncUmgebung {
   /** zusammengeführten Stand übernehmen – die Umgebung führt mit inzwischen gemachten Änderungen erneut zusammen */
   uebernehmen(s: Stand): void;
   dateiLokal(name: string): Promise<Uint8Array | null>;
+  /**
+   * Liegt die Datei auf dem Gerät? – ohne sie zu lesen (R9 Performance). Ohne diese Funktion wird wie früher gelesen.
+   * Eine vorhandene Datei, die auch auf dem Server liegt, wird dann weder gelesen noch entschlüsselt.
+   */
+  dateiVorhanden?(name: string): boolean | Promise<boolean>;
   dateiAblegen(name: string, bytes: Uint8Array): Promise<void>;
 }
 
@@ -247,11 +252,15 @@ export async function synchronisieren(u: SyncUmgebung): Promise<SyncErgebnis> {
     const fehlend: string[] = [];
     for (const b of [...z.stand.belege, ...z.stand.belegArchiv]) {
       if (!b.datei) continue;
-      const lokal = await u.dateiLokal(b.datei);
-      if (lokal && !aufServer.has(b.datei)) {
+      // zuerst gegen den Server prüfen, lokal nur nachsehen – gelesen und entschlüsselt wird erst zum Hochladen
+      const da = u.dateiVorhanden ? await u.dateiVorhanden(b.datei) : undefined;
+      const server = aufServer.has(b.datei);
+      if (server && da) continue;
+      const lokal = da === false ? null : await u.dateiLokal(b.datei);
+      if (lokal && !server) {
         await u.api.dateiSpeichern(b.datei, dateiVerschluesseln(lokal, u.sync, u.zufall(12), u.konto === undefined ? undefined : b.datei));
         hoch++;
-      } else if (!lokal && aufServer.has(b.datei)) {
+      } else if (!lokal && server) {
         const text = await u.api.dateiHolen(b.datei);
         if (!text) {
           fehlend.push(b.datei);

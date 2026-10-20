@@ -54,7 +54,11 @@ async function geraet(name, stand) {
     knopf: (t) => p.getByRole("button", { name: t, exact: true }).locator("visible=true").last(),
     feld: (t) => p.getByLabel(t, { exact: true }).locator("visible=true").last(),
     sichtbar: async (t) => (await p.getByText(t, { exact: false }).locator("visible=true").count()) > 0,
-    stand: async () => JSON.parse(await p.evaluate((k) => localStorage.getItem(k), SCHLUESSEL)),
+    // gespeichert wird 1,5 s nach der letzten Änderung, im Leerlauf (R9 Performance)
+    stand: async () => {
+      await p.waitForTimeout(2500);
+      return JSON.parse(await p.evaluate((k) => localStorage.getItem(k), SCHLUESSEL));
+    },
     async warteAuf(t, ms = 15000) {
       const bis = Date.now() + ms;
       while (Date.now() < bis) {

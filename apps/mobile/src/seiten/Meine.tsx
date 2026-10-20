@@ -1,14 +1,15 @@
-import { useState, useMemo } from "react";
+import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { Pressable, View } from "react-native";
 import { T as TEXT } from "../texte";
+import type { Beleg } from "@amtlos/fachlogik";
 import { Betrag, ChipLeiste, Karte, Knopf, T, TextKnopf } from "../ui/bausteine";
 import { useNav } from "../ui/navigation";
-import { useFarben } from "../ui/thema";
+import { RADIUS, useFarben } from "../ui/thema";
 import { belegeFiltern, euroText, rechnungBrutto, filterVerfuegbar, filtern, offeneSumme, rechnungenSortiert, type Filter } from "../unterlagen/ablage";
-import { heute, sortiert, type Unterlage } from "../unterlagen/speicher";
-import { useAmtlos } from "../zustand";
+import { heute, sortiert, type Stand, type Unterlage } from "../unterlagen/speicher";
+import { useStandWahl } from "../zustand";
 import { BelegErfassen, BelegSeite, BelegZeile } from "./Belege";
-import { BuehnenMarke, BuehnenSeite, Gruppe, Leer } from "./gemeinsam";
+import { BuehnenListe, BuehnenMarke, Gruppe, Leer } from "./gemeinsam";
 import { useOeffnen, useStarten } from "./starten";
 import { useErstellen } from "./Erstellen";
 import { Suchfeld, UnterlageZeile, useFehltJe, useUeberfaellig } from "./Unterlagen";
@@ -38,6 +39,8 @@ function OffenAufBuehne({ anzahl, ueberfaellig, cent, aktiv, onPress }: { anzahl
 }
 
 const SCHRITT = 50;
+// einmal angelegt (R9 Performance)
+const MONAT_JAHR = new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", month: "long", year: "numeric" });
 
 /**
  * Liste in Monatsgruppen: Rechnungen nach Rechnungsdatum, sonst nach letzter Bearbeitung. Liegt alles in einem Monat
@@ -50,110 +53,153 @@ function nachMonat(liste: Unterlage[], rechnungen: boolean) {
     const m = schluessel(u);
     const g = gruppen.at(-1);
     if (g && g.monat === m) g.liste.push(u);
-    else gruppen.push({ monat: m, titel: new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", month: "long", year: "numeric" }).format(new Date(`${m}-15T12:00:00Z`)), rechnungen, liste: [u] });
+    else gruppen.push({ monat: m, titel: MONAT_JAHR.format(new Date(`${m}-15T12:00:00Z`)), rechnungen, liste: [u] });
   }
   if (gruppen.length < 2 || liste.length < 6) return [{ monat: "alle", titel: "", rechnungen: false, liste }];
   return gruppen;
 }
 
+/** Einträge der virtualisierten Liste (R9 Performance): Monatsüberschriften, Zeilen, Knöpfe – in der Reihenfolge der Seite. */
+type Eintrag =
+  | { art: "monat"; key: string; titel: string; summe: string | null; erste: boolean }
+  | { art: "unterlage"; key: string; u: Unterlage; erste: boolean; letzte: boolean }
+  | { art: "mehr"; key: string; anzahl: number }
+  | { art: "belegKopf"; key: string; titel?: string }
+  | { art: "beleg"; key: string; b: Beleg; erste: boolean; letzte: boolean }
+  | { art: "alleBelege"; key: string; anzahl: number };
+
+/** Zeile als Teil einer Karte: erste und letzte mit runden Ecken – sieht aus wie eine Karte um die ganze Gruppe. */
+function KartenStueck({ erste, letzte, children }: { erste: boolean; letzte: boolean; children: ReactNode }) {
+  return <Karte stil={{ borderRadius: 0, borderTopLeftRadius: erste ? RADIUS.karte : 0, borderTopRightRadius: erste ? RADIUS.karte : 0, borderBottomLeftRadius: letzte ? RADIUS.karte : 0, borderBottomRightRadius: letzte ? RADIUS.karte : 0 }}>{children}</Karte>;
+}
+
 /** Alle angelegten Unterlagen, zuletzt bearbeitete zuerst; Filter und Suche, sobald es sich lohnt. */
 export function Meine() {
-  const { stand } = useAmtlos();
+  // nur die Teile des Stands, die diese Seite zeigt (R9 Performance)
+  const unterlagen = useStandWahl((s) => s.unterlagen);
+  const belegeAlle = useStandWahl((s) => s.belege);
+  const betrieb = useStandWahl((s) => s.betrieb);
   const f = useFarben();
   const erstellen = useErstellen();
   const nav = useNav();
   const oeffnen = useOeffnen();
-  const belegOeffnen = (id: string) => nav.oeffnen(`beleg-${id}`, () => <BelegSeite id={id} />, true);
+  const belegOeffnen = useCallback((id: string) => nav.oeffnen(`beleg-${id}`, () => <BelegSeite id={id} />, true), [nav]);
   const starten = useStarten();
   const [filter, setFilter] = useState<Filter>("alle");
   const [suche, setSuche] = useState("");
   // viele Unterlagen: in Schritten zeigen, damit die Liste flüssig bleibt
   const [zeigen, setZeigen] = useState(SCHRITT);
   // nur neu rechnen, wenn sich Unterlagen, Belege, Filter oder Suche ändern – nicht bei jeder Eingabe anderswo
-  const alle = useMemo(() => sortiert(stand), [stand.unterlagen]);
-  const verfuegbar = useMemo(() => filterVerfuegbar(alle, stand.belege.length), [alle, stand.belege.length]);
+  const alle = useMemo(() => sortiert({ unterlagen } as Stand), [unterlagen]);
+  const verfuegbar = useMemo(() => filterVerfuegbar(alle, belegeAlle.length), [alle, belegeAlle.length]);
   const aktiv: Filter = verfuegbar.includes(filter) ? filter : "alle";
   const liste = useMemo(() => {
     const l = filtern(alle, aktiv, suche);
     return aktiv === "rechnungen" || aktiv === "offen" ? rechnungenSortiert(l) : l;
   }, [alle, aktiv, suche]);
-  const belege = useMemo(() => (aktiv === "alle" || aktiv === "belege" ? belegeFiltern(stand.belege, suche) : []), [aktiv, stand.belege, suche]);
-  const belegeGezeigt = aktiv === "belege" ? belege : belege.slice(0, 5);
-  const offen = useMemo(() => offeneSumme(alle, stand.betrieb, heute()), [alle, stand.betrieb]);
-  const hatRechnungen = alle.some((u) => u.vorlage === "rechnung" && u.festgeschrieben);
+  const belege = useMemo(() => (aktiv === "alle" || aktiv === "belege" ? belegeFiltern(belegeAlle, suche) : []), [aktiv, belegeAlle, suche]);
+  const offen = useMemo(() => offeneSumme(alle, betrieb, heute()), [alle, betrieb]);
+  const hatRechnungen = useMemo(() => alle.some((u) => u.vorlage === "rechnung" && u.festgeschrieben), [alle]);
+  const entwuerfe = useMemo(() => alle.filter((u) => u.vorlage === "rechnung" && !u.festgeschrieben).length, [alle]);
   const fehltJe = useFehltJe();
   const ueberJe = useUeberfaellig();
+  const eintraege = useMemo(() => {
+    const e: Eintrag[] = [];
+    const gruppen = liste.length ? nachMonat(liste.slice(0, zeigen), aktiv === "rechnungen" || aktiv === "offen") : [];
+    gruppen.forEach((g, gi) => {
+      if (g.titel) e.push({ art: "monat", key: `m-${g.monat}`, titel: g.titel, summe: g.rechnungen ? euroText(g.liste.reduce((a, u) => a + rechnungBrutto(u, betrieb), 0)) : null, erste: gi === 0 });
+      g.liste.forEach((u, i) => e.push({ art: "unterlage", key: `u-${u.id}`, u, erste: i === 0, letzte: i === g.liste.length - 1 }));
+    });
+    if (liste.length > zeigen) e.push({ art: "mehr", key: "mehr", anzahl: Math.min(SCHRITT, liste.length - zeigen) });
+    const gezeigt = aktiv === "belege" ? belege : belege.slice(0, 5);
+    if (gezeigt.length) {
+      e.push({ art: "belegKopf", key: "belege", titel: aktiv === "alle" ? TEXT.belege_titel : undefined });
+      gezeigt.forEach((b, i) => e.push({ art: "beleg", key: `b-${b.id}`, b, erste: i === 0, letzte: i === gezeigt.length - 1 }));
+      if (aktiv === "alle" && belege.length > gezeigt.length) e.push({ art: "alleBelege", key: "alle-belege", anzahl: belege.length });
+    }
+    return e;
+  }, [liste, zeigen, aktiv, belege, betrieb]);
+  const zeile = useCallback(
+    (e: Eintrag) => {
+      switch (e.art) {
+        case "monat":
+          return (
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8, marginTop: e.erste ? 0 : 18 }}>
+              <T v="klein" fett leise accessibilityRole="header">{e.titel}</T>
+              {e.summe ? <Betrag v="klein" farbe={f.tinteLeise}>{e.summe}</Betrag> : null}
+            </View>
+          );
+        case "unterlage":
+          return (
+            <KartenStueck erste={e.erste} letzte={e.letzte}>
+              <UnterlageZeile u={e.u} ueber={ueberJe.get(e.u.id) ?? 0} letzte={e.letzte} fehlt={fehltJe.get(e.u.id) ?? 0} betrieb={betrieb} onPress={oeffnen} />
+            </KartenStueck>
+          );
+        case "mehr":
+          return <TextKnopf symbol="chevron.down" text={TEXT.weitere_zeigen(e.anzahl)} onPress={() => setZeigen((n) => n + SCHRITT)} stil={{ marginTop: 4 }} />;
+        case "belegKopf":
+          return <View style={{ marginTop: 30 }}>{e.titel ? <T v="gross" accessibilityRole="header" stil={{ marginBottom: 12 }}>{e.titel}</T> : null}</View>;
+        case "beleg":
+          return (
+            <KartenStueck erste={e.erste} letzte={e.letzte}>
+              <BelegZeile b={e.b} letzte={e.letzte} onPress={belegOeffnen} />
+            </KartenStueck>
+          );
+        case "alleBelege":
+          return <TextKnopf text={TEXT.alle_belege(e.anzahl)} onPress={() => setFilter("belege")} />;
+      }
+    },
+    [f.tinteLeise, ueberJe, fehltJe, betrieb, oeffnen, belegOeffnen],
+  );
+  const leer = !alle.length && !belegeAlle.length;
+  const kopf = leer ? (
+    <Leer text={TEXT.meine_leer} unter={TEXT.meine_leer_text}>
+      <View style={{ gap: 10 }}>
+        <Knopf symbol="plus" text={TEXT.rechnung_schreiben} onPress={() => starten("rechnung")} />
+        <Knopf ton symbol="doc.viewfinder" text={TEXT.beleg_erfassen} onPress={() => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />)} />
+        <TextKnopf symbol="doc.text" text={TEXT.zu_den_unterlagen} onPress={erstellen.oeffnen} stil={{ alignSelf: "center" }} />
+      </View>
+    </Leer>
+  ) : (
+    <View>
+      {alle.length + belegeAlle.length >= SUCHE_AB ? (
+        <View style={{ marginBottom: 12 }}>
+          <Suchfeld wert={suche} setzen={setSuche} label={TEXT.meine_suchen} />
+        </View>
+      ) : null}
+      {verfuegbar.length > 1 ? <ChipLeiste wert={aktiv} aendern={setFilter} optionen={verfuegbar.map((w) => ({ wert: w, text: TEXT.filter[w] }))} stil={{ marginBottom: 12 }} /> : null}
+      {!liste.length && !belege.length ? (
+        <View style={{ marginTop: 8 }}>
+          <T leise>{TEXT.meine_nichts}</T>
+          {/* leere Treffer mit dem Weg zurück: Filter bzw. Suche zurücksetzen */}
+          {aktiv !== "alle" ? (
+            <TextKnopf symbol="xmark.circle" text={TEXT.filter_zuruecksetzen} onPress={() => { setFilter("alle"); setSuche(""); }} />
+          ) : suche ? (
+            <TextKnopf symbol="xmark.circle" text={TEXT.suche_leeren} onPress={() => setSuche("")} />
+          ) : null}
+        </View>
+      ) : null}
+    </View>
+  );
   return (
-    <BuehnenSeite
+    <BuehnenListe
       // immer eine Zeile über dem Titel – sonst springt der Titel, sobald die erste Unterlage da ist (A18)
-      ueber={alle.length ? TEXT.meine_stand(alle.length, alle.filter((u) => u.vorlage === "rechnung" && !u.festgeschrieben).length) : TEXT.noch_leer}
+      ueber={alle.length ? TEXT.meine_stand(alle.length, entwuerfe) : TEXT.noch_leer}
       titel={TEXT.meine_titel}
       buehne={hatRechnungen ? <OffenAufBuehne anzahl={offen.anzahl} ueberfaellig={offen.ueberfaellig} cent={offen.cent} aktiv={aktiv === "offen"} onPress={() => setFilter(aktiv === "offen" ? "alle" : "offen")} /> : undefined}
-    >
-      {alle.length || stand.belege.length ? (
-        <View>
-          {alle.length + stand.belege.length >= SUCHE_AB ? (
-            <View style={{ marginBottom: 12 }}>
-              <Suchfeld wert={suche} setzen={setSuche} label={TEXT.meine_suchen} />
-            </View>
-          ) : null}
-          {verfuegbar.length > 1 ? <ChipLeiste wert={aktiv} aendern={setFilter} optionen={verfuegbar.map((w) => ({ wert: w, text: TEXT.filter[w] }))} stil={{ marginBottom: 12 }} /> : null}
-          {liste.length ? (
-            // nach Monaten gegliedert (bei Rechnungen nach Rechnungsdatum, mit Monatssumme) – lange Listen bleiben lesbar
-            <View style={{ gap: 18 }}>
-              {nachMonat(liste.slice(0, zeigen), aktiv === "rechnungen" || aktiv === "offen").map((g) => (
-                <View key={g.monat}>
-                  {g.titel ? (
-                    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
-                      <T v="klein" fett leise accessibilityRole="header">{g.titel}</T>
-                      {g.rechnungen ? <Betrag v="klein" farbe={f.tinteLeise}>{euroText(g.liste.reduce((a, u) => a + rechnungBrutto(u, stand.betrieb), 0))}</Betrag> : null}
-                    </View>
-                  ) : null}
-                  <Karte>
-                    {g.liste.map((u, i, l) => (
-                      <UnterlageZeile key={u.id} u={u} ueber={ueberJe.get(u.id) ?? 0} letzte={i === l.length - 1} fehlt={fehltJe.get(u.id) ?? 0} betrieb={stand.betrieb} onPress={oeffnen} />
-                    ))}
-                  </Karte>
-                </View>
-              ))}
-            </View>
-          ) : !belege.length ? (
-            <View style={{ marginTop: 8 }}>
-              <T leise>{TEXT.meine_nichts}</T>
-              {/* leere Treffer mit dem Weg zurück: Filter bzw. Suche zurücksetzen */}
-              {aktiv !== "alle" ? (
-                <TextKnopf symbol="xmark.circle" text={TEXT.filter_zuruecksetzen} onPress={() => { setFilter("alle"); setSuche(""); }} />
-              ) : suche ? (
-                <TextKnopf symbol="xmark.circle" text={TEXT.suche_leeren} onPress={() => setSuche("")} />
-              ) : null}
-            </View>
-          ) : null}
-          {liste.length > zeigen ? (
-            <TextKnopf symbol="chevron.down" text={TEXT.weitere_zeigen(Math.min(SCHRITT, liste.length - zeigen))} onPress={() => setZeigen((n) => n + SCHRITT)} stil={{ marginTop: 4 }} />
-          ) : null}
-          {belegeGezeigt.length ? (
-            <Gruppe titel={aktiv === "alle" ? TEXT.belege_titel : undefined}>
-              <Karte>
-                {belegeGezeigt.map((b, i) => (
-                  <BelegZeile key={b.id} b={b} letzte={i === belegeGezeigt.length - 1} onPress={() => belegOeffnen(b.id)} />
-                ))}
-              </Karte>
-              {aktiv === "alle" && belege.length > belegeGezeigt.length ? <TextKnopf text={TEXT.alle_belege(belege.length)} onPress={() => setFilter("belege")} /> : null}
-            </Gruppe>
-          ) : null}
+      kopf={kopf}
+      daten={leer ? [] : eintraege}
+      zeile={zeile}
+      schluessel={eintragSchluessel}
+      fuss={
+        leer ? null : (
           <Gruppe titel={TEXT.beleg_erfassen}>
             <BelegErfassen kompakt />
           </Gruppe>
-        </View>
-      ) : (
-        <Leer text={TEXT.meine_leer} unter={TEXT.meine_leer_text}>
-          <View style={{ gap: 10 }}>
-            <Knopf symbol="plus" text={TEXT.rechnung_schreiben} onPress={() => starten("rechnung")} />
-            <Knopf ton symbol="doc.viewfinder" text={TEXT.beleg_erfassen} onPress={() => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />)} />
-            <TextKnopf symbol="doc.text" text={TEXT.zu_den_unterlagen} onPress={erstellen.oeffnen} stil={{ alignSelf: "center" }} />
-          </View>
-        </Leer>
-      )}
-    </BuehnenSeite>
+        )
+      }
+    />
   );
 }
+
+const eintragSchluessel = (e: Eintrag) => e.key;

@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext } from "react";
 import { useNav, type Nav } from "../ui/navigation";
-import { useAmtlos } from "../zustand";
+import { useAktionen } from "../zustand";
 import { Ablauf } from "./Ablauf";
 
 /**
@@ -17,7 +17,8 @@ export function useZiel() {
 
 /** Vorlage antippen = sofort loslegen (E-124): neue Unterlage anlegen und den Ablauf im Vollbild öffnen. */
 export function useStarten() {
-  const { anlegen } = useAmtlos();
+  // nur die Handlung – Seiten mit diesem Hook zeichnen sonst bei jeder Eingabe neu (R9 Performance)
+  const { anlegen } = useAktionen();
   const ziel = useZiel();
   return (vorlageId: string) => {
     const u = anlegen(vorlageId);

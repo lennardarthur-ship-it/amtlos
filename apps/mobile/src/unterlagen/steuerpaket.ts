@@ -623,7 +623,8 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
       ...(ohneXml ? [``, `Rechnungen ohne E-Rechnung (XRechnung)`, ...ohneXmlListe] : []),
       ``,
       `Nicht enthalten – bitte zusätzlich liefern`,
-      `- Kassenumsätze (Z-Bons bzw. Kassenexport) – Amtlos kennt nur Rechnungen und Belege.`,
+      // ohne Kasse laut Pflichten-Check (Antwort „nein“) entfällt die Zeile
+      ...(kassenLage(s.profil) === "keine" ? [] : [`- Kassenumsätze (Z-Bons bzw. Kassenexport) – Amtlos kennt nur Rechnungen und Belege.`]),
       `- Kontoauszüge – Zahlungen sind nicht gebucht.`,
       `- Privatentnahmen und Privateinlagen (außer privat bezahlten Belegen).`,
       `- An das Finanzamt gezahlte Umsatzsteuer-Vorauszahlungen und Erstattungen.`,

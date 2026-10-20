@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Pressable, View } from "react-native";
 import { T as TEXT } from "../texte";
 import { Fuss, Hinweis, Karte, Knopf, PasswortFeld, Schalter, Symbol, T, TextKnopf } from "../ui/bausteine";
@@ -16,6 +16,10 @@ import { useProSperre } from "./Pro";
 
 /** Kurz warten, damit der Ladezustand gezeichnet ist, bevor die Schlüsselableitung den Thread belegt. */
 const gleich = () => new Promise((r) => setTimeout(r, 30));
+
+/** Ab so vielen Belegdateien bzw. so vielen MB warnt die Sicherung als Datei (R9 Performance) */
+export const SICHERUNG_DATEIEN_WARNUNG = 50;
+export const SICHERUNG_MB_WARNUNG = 150;
 
 /** Neues Passwort brauchbar: stark genug (H-1) und zweimal gleich eingegeben. */
 export const passwortBereit = (pw: string, pw2: string) => passwortSchwaeche(pw) === null && pw === pw2;
@@ -47,6 +51,17 @@ export function SicherungSeite() {
   const [pw2, setPw2] = useState("");
   const [laedt, setLaedt] = useState(false);
   const [meldung, setMeldung] = useState<{ art: "erfolg" | "fehler"; text: string } | null>(null);
+  const [fortschritt, setFortschritt] = useState<string | null>(null);
+  // große Sicherung (R9 Performance): Die Sicherungsdatei entsteht ganz im Arbeitsspeicher – ab etwa 50 Belegdateien
+  // oder 150 MB droht auf dem iPhone der Abbruch. Dann vorher warnen und die iCloud-Sicherung empfehlen.
+  const umfang = useMemo(() => {
+    const namen = new Set([...z.stand.belege, ...z.stand.belegArchiv].map((b) => b.datei).filter((n): n is string => Boolean(n)));
+    let bytes = 0;
+    for (const n of namen) bytes += z.dateiGroesse(n);
+    // Base64 in der Sicherungsdatei: etwa ein Drittel mehr als die Datei selbst
+    return { dateien: namen.size, mb: Math.round((bytes * 1.37) / 1e6) };
+  }, [z.stand.belege, z.stand.belegArchiv]);
+  const gross = umfang.dateien > SICHERUNG_DATEIEN_WARNUNG || umfang.mb > SICHERUNG_MB_WARNUNG;
   const bereit = passwortBereit(pw, pw2);
   const los = async () => {
     setMeldung(null);
@@ -54,7 +69,8 @@ export function SicherungSeite() {
     try {
       await gleich();
       const gesichert = z.stand;
-      const { dateien } = await z.dateienFuerSicherung(gesichert);
+      const { dateien } = await z.dateienFuerSicherung(gesichert, (n, von) => setFortschritt(TEXT.sicherung_fortschritt(n, von)));
+      setFortschritt(null);
       const fehlend = fehlendeDateien(gesichert, dateien);
       const text = sicherungErstellen(gesichert, pw, zufall, new Date(), undefined, dateien);
       // abgebrochen: keine Sicherung – die Erinnerung bleibt und „Alle Daten löschen“ bleibt gesperrt
@@ -77,6 +93,7 @@ export function SicherungSeite() {
       setMeldung({ art: "fehler", text: TEXT.sicherung_fehler });
     } finally {
       setLaedt(false);
+      setFortschritt(null);
     }
   };
   return (
@@ -88,7 +105,7 @@ export function SicherungSeite() {
             {erledigt ? (
               <Knopf text={TEXT.fertig} symbol="checkmark" onPress={nav.zurueck} stil={{ flex: 1 }} />
             ) : (
-              <Knopf text={laedt ? TEXT.sicherung_laeuft : TEXT.sicherung_erstellen} symbol="lock" laedt={laedt} deaktiviert={!bereit} onPress={() => void los()} stil={{ flex: 1 }} />
+              <Knopf text={laedt ? TEXT.sicherung_laeuft : gross ? TEXT.sicherung_trotzdem : TEXT.sicherung_erstellen} symbol="lock" laedt={laedt} deaktiviert={!bereit} onPress={() => void los()} stil={{ flex: 1 }} />
             )}
           </Fuss>
       }
@@ -96,6 +113,8 @@ export function SicherungSeite() {
       {erledigt ? null : <PasswortPaar label={TEXT.passwort} pw={pw} pw2={pw2} setPw={setPw} setPw2={setPw2} />}
       <View style={{ marginTop: 18 }}>
         <Hinweis art="warnung" text={TEXT.sicherung_warnung} symbol="lock" />
+        {gross && !erledigt ? <Hinweis art="warnung" text={TEXT.sicherung_gross(umfang.dateien, umfang.mb)} symbol="icloud" /> : null}
+        {fortschritt ? <Hinweis text={fortschritt} /> : null}
         {meldung ? <Hinweis art={meldung.art} text={meldung.text} /> : null}
       </View>
     </BuehnenBlatt>

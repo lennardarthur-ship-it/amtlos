@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import * as StoreReview from "expo-store-review";
 import { AppState } from "react-native";
 import { sollFragen } from "./pro/bewertung";
@@ -9,11 +9,11 @@ import { allesAbsagen } from "./pflichten/erinnerungen";
 import { cacheLeeren } from "./unterlagen/aufraeumen";
 import { istTresor, tresorOeffnen, tresorSchliessen } from "./unterlagen/tresor";
 import type { Beleg, Betrieb, Daten, Person, PersonAngaben, PersonenArt } from "@amtlos/fachlogik";
-import { alleDateienEntfernen, dateiAblegen, dateiEntfernen, dateiHolen } from "./unterlagen/dateien";
+import { alleDateienEntfernen, ansichtenAufraeumen, dateiAblegen, dateiAnzeigen, dateiEntfernen, dateiGroesse, dateiHolen, dateiVorhanden } from "./unterlagen/dateien";
 import { base64, ausBase64, type Dateien } from "./unterlagen/sicherung";
 import { kontoVergessen } from "./konto/sitzung";
 import { syncZusammenfuehren } from "./konto/sync";
-import { LEERER_STAND, StandFehler, ausgabeMoeglich, belegLoeschen, belegSetzen, neueId, steuerberatungSetzen, aendern, allesLoeschenErlaubt, anlegen, ausgeben, bezahltSetzen, zusammenfuehren, type Zusammenfuehrung, betriebSetzen, erledigtSetzen, felderSetzen, istLesbar, profilSetzen, stornieren, kopieren, loeschen, personLoeschen, personMerken, personSetzen, standAus, type Stand, type Unterlage } from "./unterlagen/speicher";
+import { LEERER_STAND, StandFehler, ausgabeMoeglich, belegLoeschen, belegSetzen, neueId, steuerberatungSetzen, aendern, allesLoeschenErlaubt, anlegen, ausgeben, bezahltSetzen, zusammenfuehren, type Zusammenfuehrung, betriebSetzen, erledigtSetzen, felderSetzen, istLesbar, profilSetzen, stornieren, kopieren, loeschen, personLoeschen, personMerken, personSetzen, standAus, standGleich, type Stand, type Unterlage } from "./unterlagen/speicher";
 
 /** Alles liegt nur auf dem Gerät (E-121): kein Konto, kein Server. Seit E-129 verschlüsselt (Schlüssel im Schlüsselbund). */
 const SCHLUESSEL = "amtlos.unterlagen.v1";
@@ -24,6 +24,23 @@ const BEISEITE = `${SCHLUESSEL}.unlesbar.`;
 const BEISEITE_KONTEXT = "beiseite";
 /** nach einem Schreibfehler so lange warten, dann erneut versuchen (H5) */
 const NEU_VERSUCHEN_MS = 5000;
+/**
+ * Speichern nach so langer Tipp-Pause (R9 Performance): Jedes Speichern verschlüsselt den ganzen Stand – bei einem großen
+ * Betrieb auf dem iPhone mehrere Sekunden. Dazu sofort beim Wechsel in den Hintergrund und beim Verlassen eines Blatts
+ * oder einer Unterseite (`sichern`).
+ */
+export const SPEICHERN_NACH_MS = 1500;
+
+/** Arbeit erst, wenn der JS-Thread frei ist (requestIdleCallback; ersetzt den veralteten InteractionManager). */
+const wennFrei = (f: () => void): (() => void) => {
+  const g = globalThis as unknown as { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (h: number) => void };
+  if (g.requestIdleCallback) {
+    const h = g.requestIdleCallback(f, { timeout: 1000 });
+    return () => g.cancelIdleCallback?.(h);
+  }
+  const t = setTimeout(f, 0);
+  return () => clearTimeout(t);
+};
 
 export type Tab = "heute" | "pflichten" | "meine" | "betrieb";
 
@@ -103,21 +120,73 @@ interface Zustand {
   dateiSpeichern(bytes: Uint8Array, endung: string): Promise<string>;
   dateiLesen(name: string): Promise<Uint8Array | null>;
   /** alle Belegdateien als Base64 – für die Sicherung; `fehlend`: Dateien, die sich nicht lesen ließen (H3) */
-  dateienFuerSicherung(s?: Stand): Promise<{ dateien: Dateien; fehlend: string[] }>;
+  dateienFuerSicherung(s?: Stand, fortschritt?: (n: number, von: number) => void): Promise<{ dateien: Dateien; fehlend: string[] }>;
   /** Belegdateien aus einer Sicherung ablegen (vorhandene bleiben); liefert die Zahl der Dateien, die sich nicht ablegen ließen (G4) */
   dateienEinspielen(d: Dateien): Promise<number>;
   /** Synchronisation (E-134): aktueller Stand, zusammengeführten Stand übernehmen, Datei unter ihrem Namen ablegen */
   aktuellerStand(): Stand;
   syncUebernehmen(s: Stand): void;
   dateiAblegenUnter(name: string, bytes: Uint8Array): Promise<void>;
+  /** Liegt die Belegdatei auf dem Gerät? (ohne sie zu entschlüsseln) */
+  dateiVorhanden(name: string): boolean;
+  /** Größe der verschlüsselten Belegdatei in Bytes (0, wenn sie fehlt) */
+  dateiGroesse(name: string): number;
+  /** Belegdatei als vorübergehende Datei zum Anzeigen (Foto); `entfernen` löscht sie wieder */
+  dateiAnzeigen(name: string, mime: string): Promise<{ uri: string; entfernen(): void } | null>;
+  /** Ausstehende Änderungen gleich speichern, ohne die Tipp-Pause abzuwarten (beim Verlassen eines Formulars) */
+  sichern(): void;
 }
 
-const Kontext = createContext<Zustand | null>(null);
+/** Zustandswerte ohne den Stand (ändern sich selten) */
+type StatusFelder = "bereit" | "ladefehler" | "ladefehlerArt" | "verschluesselt" | "speicherFehler" | "speicherFehlerArt" | "tab" | "pro";
+export type AmtlosStatus = Pick<Zustand, StatusFelder>;
+/** Handlungen – über die ganze Laufzeit dieselben Funktionen (R9 Performance: kein Neuzeichnen wegen neuer Funktionen) */
+export type AmtlosAktionen = Omit<Zustand, StatusFelder | "stand">;
+
+/**
+ * Drei Kontexte (R9 Performance): Stand, Status und Handlungen. `useAmtlos` liefert wie bisher alles zusammen (und
+ * zeichnet bei jeder Änderung neu); wer nur Handlungen braucht, nimmt `useAktionen`, wer nur einen Teil des Stands
+ * braucht, `useStandWahl` – dann zeichnet ein Tastendruck in einer Unterlage nicht alle Seiten neu.
+ */
+interface StandQuelle {
+  lesen(): Stand;
+  abonnieren(f: () => void): () => void;
+}
+const StandKontext = createContext<Stand | null>(null);
+const StatusKontext = createContext<AmtlosStatus | null>(null);
+const AktionenKontext = createContext<AmtlosAktionen | null>(null);
+const QuelleKontext = createContext<StandQuelle | null>(null);
 
 export function useAmtlos(): Zustand {
-  const z = useContext(Kontext);
-  if (!z) throw new Error("useAmtlos außerhalb von AmtlosAnbieter");
-  return z;
+  const stand = useContext(StandKontext);
+  const status = useContext(StatusKontext);
+  const aktionen = useContext(AktionenKontext);
+  if (!stand || !status || !aktionen) throw new Error("useAmtlos außerhalb von AmtlosAnbieter");
+  return useMemo(() => ({ ...aktionen, ...status, stand }), [aktionen, status, stand]);
+}
+
+/** Nur die Handlungen – zeichnet nie wegen Änderungen am Stand neu. */
+export function useAktionen(): AmtlosAktionen {
+  const a = useContext(AktionenKontext);
+  if (!a) throw new Error("useAktionen außerhalb von AmtlosAnbieter");
+  return a;
+}
+
+/** Nur der Status (Ladefehler, Speicherfehler, Tab, Pro …). */
+export function useAmtlosStatus(): AmtlosStatus {
+  const s = useContext(StatusKontext);
+  if (!s) throw new Error("useAmtlosStatus außerhalb von AmtlosAnbieter");
+  return s;
+}
+
+/**
+ * Ein Teil des Stands; neu gezeichnet wird nur, wenn sich dieser Teil ändert (Vergleich mit Object.is). Der Wähler muss
+ * einen vorhandenen Teil liefern (z. B. `(s) => s.unterlagen`), kein neu gebautes Objekt.
+ */
+export function useStandWahl<T>(waehlen: (s: Stand) => T): T {
+  const q = useContext(QuelleKontext);
+  if (!q) throw new Error("useStandWahl außerhalb von AmtlosAnbieter");
+  return useSyncExternalStore(q.abonnieren, () => waehlen(q.lesen()), () => waehlen(q.lesen()));
 }
 
 export function AmtlosAnbieter({ children }: { children: ReactNode }) {
@@ -125,11 +194,30 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
   const [ladefehler, setLadefehler] = useState(false);
   const [ladefehlerArt, setLadefehlerArt] = useState<"unlesbar" | "version" | null>(null);
   const sperre = useRef(false);
-  const [stand, setStand] = useState<Stand>(LEERER_STAND);
+  const [stand, setStandIntern] = useState<Stand>(LEERER_STAND);
   const [tab, tabWechseln] = useState<Tab>("heute");
   // aktueller Stand für Handlungen, die sofort ein Ergebnis zurückgeben (anlegen, kopieren)
   const aktuell = useRef(stand);
   const zeit = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // geplantes Speichern, sobald der Thread frei ist; ausstehend: es gibt Ungespeichertes
+  const frei = useRef<(() => void) | null>(null);
+  const ausstehend = useRef(false);
+  // Quelle für `useStandWahl`: benachrichtigt Abonnenten, sobald ein neuer Stand gilt
+  const abonnenten = useRef(new Set<() => void>());
+  const quelle = useMemo<StandQuelle>(
+    () => ({
+      lesen: () => aktuell.current,
+      abonnieren: (f) => {
+        abonnenten.current.add(f);
+        return () => abonnenten.current.delete(f);
+      },
+    }),
+    [],
+  );
+  const setStand = useCallback((s: Stand) => {
+    setStandIntern(s);
+    for (const f of [...abonnenten.current]) f();
+  }, []);
 
   const [storePro, setStorePro] = useState(false);
   useEffect(() => {
@@ -189,6 +277,8 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
   }, []);
   useEffect(() => {
     void laden();
+    // Ansichtsdateien (entschlüsselte Fotos), die beim letzten Beenden liegen geblieben sind
+    ansichtenAufraeumen();
   }, [laden]);
 
   /**
@@ -233,6 +323,9 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
   const schreiben = useCallback(() => {
     if (zeit.current) clearTimeout(zeit.current);
     zeit.current = null;
+    frei.current?.();
+    frei.current = null;
+    ausstehend.current = false;
     if (nochmal.current) clearTimeout(nochmal.current);
     nochmal.current = null;
     if (sperre.current) return;
@@ -272,22 +365,50 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
   const schreibenRef = useRef(schreiben);
   schreibenRef.current = schreiben;
 
-  /** Neuen Stand übernehmen und kurz danach speichern (Tippen erzeugt viele Änderungen). */
+  /** Speichern nach der Tipp-Pause planen – und dann erst, wenn gerade nichts gezeichnet oder getippt wird. */
+  const planen = useCallback(() => {
+    ausstehend.current = true;
+    if (zeit.current) clearTimeout(zeit.current);
+    frei.current?.();
+    frei.current = null;
+    zeit.current = setTimeout(() => {
+      zeit.current = null;
+      frei.current = wennFrei(() => {
+        frei.current = null;
+        schreiben();
+      });
+    }, SPEICHERN_NACH_MS);
+  }, [schreiben]);
+
+  /**
+   * Formular verlassen: Ausstehendes ohne die restliche Tipp-Pause speichern – sobald der Thread frei ist, also nach der
+   * Animation zum Schließen, nicht mittendrin.
+   */
+  const sichern = useCallback(() => {
+    if (!ausstehend.current || frei.current) return;
+    if (zeit.current) clearTimeout(zeit.current);
+    zeit.current = null;
+    frei.current = wennFrei(() => {
+      frei.current = null;
+      schreiben();
+    });
+  }, [schreiben]);
+
+  /** Neuen Stand übernehmen und nach der Tipp-Pause speichern (Tippen erzeugt viele Änderungen). */
   const setzen = useCallback(
     (neu: Stand) => {
       const s = { ...neu, geaendert: new Date().toISOString() };
       aktuell.current = s;
       setStand(s);
-      if (zeit.current) clearTimeout(zeit.current);
-      zeit.current = setTimeout(schreiben, 300);
+      planen();
     },
-    [schreiben],
+    [planen, setStand],
   );
 
   // Geht die App in den Hintergrund, sofort speichern – sonst fehlt nach dem Beenden die letzte Eingabe
   useEffect(() => {
     const abo = AppState.addEventListener("change", (z) => {
-      if (z !== "active" && zeit.current) schreiben();
+      if (z !== "active" && ausstehend.current) schreiben();
     });
     return () => abo.remove();
   }, [schreiben]);
@@ -326,16 +447,15 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
     return n;
   }, [setzen]);
 
-  const wert = useMemo<Zustand>(
+  const pro = storePro || (testmodus && stand.proTest);
+  const status = useMemo<AmtlosStatus>(
+    () => ({ bereit, ladefehler, ladefehlerArt, verschluesselt, speicherFehler: speicherFehlerArt !== null, speicherFehlerArt, tab, pro }),
+    [bereit, ladefehler, ladefehlerArt, verschluesselt, speicherFehlerArt, tab, pro],
+  );
+
+  // alle Abhängigkeiten sind selbst stabil (useCallback ohne wechselnde Werte) – die Handlungen bleiben dieselben
+  const aktionen = useMemo<AmtlosAktionen>(
     () => ({
-      bereit,
-      ladefehler,
-      ladefehlerArt,
-      verschluesselt,
-      speicherFehler: speicherFehlerArt !== null,
-      speicherFehlerArt,
-      stand,
-      tab,
       tabWechseln,
       betriebSpeichern: (b) => setzen(betriebSetzen(aktuell.current, b)),
       anlegen: (vorlageId) => {
@@ -390,12 +510,19 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         const bis = gesichertStand && gesichertStand.geaendert !== aktuell.current.geaendert && gesichertStand.geaendert ? gesichertStand.geaendert : jetzt;
         aktuell.current = { ...aktuell.current, letzteSicherung: bis };
         setStand(aktuell.current);
-        schreiben();
+        // nicht sofort ein zweites Mal den ganzen Stand verschlüsseln (R9 Performance) – mit der nächsten Pause speichern
+        planen();
       },
-      bezahltSetzen: (id, datum) => setzen(bezahltSetzen(aktuell.current, id, datum)),
+      bezahltSetzen: (id, datum) => {
+        let s = bezahltSetzen(aktuell.current, id, datum);
+        // Zahlung vor dem Teilen vermerkt: „Schon bezahlt am“ der Rechnung vorbelegen, wenn es noch leer ist – dann steht
+        // auf dem PDF keine Zahlungsaufforderung (felderSetzen ändert festgeschriebene Rechnungen nicht)
+        const u = s.unterlagen.find((x) => x.id === id);
+        if (datum && u && u.vorlage === "rechnung" && !u.festgeschrieben && !String(u.daten.bezahlt_am ?? "").trim()) s = felderSetzen(s, id, { bezahlt_am: datum }, new Date());
+        setzen(s);
+      },
       appSperreSetzen: (an) => setzen({ ...aktuell.current, appSperre: an }),
       cloudSicherungSetzen: (an) => setzen({ ...aktuell.current, cloudSicherung: an }),
-      pro: storePro || (testmodus && stand.proTest),
       proAktualisieren: (aktiv) => (aktiv === undefined ? void proAktiv().then(setStorePro) : setStorePro(aktiv)),
       proTestSetzen: (an) => setzen({ ...aktuell.current, proTest: an }),
       steuerberatungSetzen: (sb) => setzen(steuerberatungSetzen(aktuell.current, sb)),
@@ -416,12 +543,20 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         return name;
       },
       dateiLesen: (name) => dateiHolen(name, schluessel.current).catch(() => null),
-      dateienFuerSicherung: async (s) => {
+      dateiVorhanden: (name) => dateiVorhanden(name),
+      dateiGroesse: (name) => dateiGroesse(name),
+      dateiAnzeigen: (name, mime) => dateiAnzeigen(name, schluessel.current, mime).catch(() => null),
+      sichern,
+      dateienFuerSicherung: async (s, fortschritt) => {
         const d: Dateien = {};
         const fehlend: string[] = [];
         const st = s ?? aktuell.current;
-        for (const b of [...st.belege, ...st.belegArchiv]) {
+        const alle = [...st.belege, ...st.belegArchiv];
+        let i = 0;
+        for (const b of alle) {
+          i++;
           if (!b.datei || d[b.datei]) continue;
+          fortschritt?.(i, alle.length);
           // eine fehlende oder unlesbare Datei nie still übergehen (H3) – die Sicherung wäre sonst unvollständig
           const bytes = await dateiHolen(b.datei, schluessel.current).catch(() => null);
           if (bytes) d[b.datei] = base64(bytes);
@@ -444,8 +579,8 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         const vorher = aktuell.current;
         const neu = syncZusammenfuehren(vorher, entfernt).stand;
         // nichts Neues: Stand nicht als geändert markieren (sonst gälte er als ungesichert und die iCloud-Sicherung liefe erneut)
-        const ohneZeit = (x: Stand) => JSON.stringify({ ...x, geaendert: undefined });
-        if (ohneZeit(neu) === ohneZeit(vorher)) return;
+        // inhaltlich vergleichen, gleiche Objekte überspringen (R9 Performance: vorher zweimal JSON.stringify des ganzen Stands)
+        if (standGleich(neu, vorher)) return;
         // auf einem anderen Gerät gelöschte Belege: Datei hier auch entfernen (ungültig markierte behalten ihre Datei)
         const bleiben = new Set([...neu.belege, ...neu.belegArchiv].map((b) => b.datei).filter(Boolean));
         for (const b of vorher.belege) if (b.datei && !bleiben.has(b.datei)) dateiEntfernen(b.datei);
@@ -470,6 +605,10 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
           if (!trotzLadefehler || !(await ladefehlerAufheben())) return false;
         } else if (!allesLoeschenErlaubt(aktuell.current)) return false;
         if (zeit.current) clearTimeout(zeit.current);
+        zeit.current = null;
+        frei.current?.();
+        frei.current = null;
+        ausstehend.current = false;
         if (!nachLadefehler) {
           for (const b of [...aktuell.current.belege, ...aktuell.current.belegArchiv]) if (b.datei) dateiEntfernen(b.datei);
           // auch Reste: verwaiste Belegdateien, beiseitegelegte unlesbare Stände, Vorversion (E-143)
@@ -502,7 +641,15 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         return true;
       },
     }),
-    [bereit, ladefehler, ladefehlerArt, verschluesselt, speicherFehlerArt, stand, tab, setzen, schreiben, storePro, laden, ladefehlerAufheben, beiseitegelegteVersuchen],
+    [setzen, schreiben, planen, sichern, setStand, laden, ladefehlerAufheben, beiseitegelegteVersuchen],
   );
-  return <Kontext.Provider value={wert}>{children}</Kontext.Provider>;
+  return (
+    <AktionenKontext.Provider value={aktionen}>
+      <QuelleKontext.Provider value={quelle}>
+        <StatusKontext.Provider value={status}>
+          <StandKontext.Provider value={stand}>{children}</StandKontext.Provider>
+        </StatusKontext.Provider>
+      </QuelleKontext.Provider>
+    </AktionenKontext.Provider>
+  );
 }

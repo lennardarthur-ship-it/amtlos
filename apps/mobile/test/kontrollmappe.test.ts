@@ -44,8 +44,9 @@ describe("Kassenhinweis: Voranmeldung, EÜR und Paket kennen keine Kassenumsätz
     const ohne = profilSetzen(basis, { "kasse.elektronisch": false });
     expect(liesmich(ohne).split("\r\n")[0]).toBe("Amtlos – Unterlagen für die Steuerberatung");
     expect(fragenText(ohne, Q).text).not.toMatch(/Kasse nutzt|Betrieb mit Kasse/);
-    // der Punkt unter „Nicht enthalten“ bleibt in jedem Fall
-    expect(liesmich(ohne)).toContain("- Kassenumsätze (Z-Bons bzw. Kassenexport)");
+    // ohne Kasse laut Check entfällt auch der Punkt unter „Nicht enthalten“; mit Kasse oder ohne Antwort bleibt er
+    expect(liesmich(ohne)).not.toContain("- Kassenumsätze (Z-Bons bzw. Kassenexport)");
+    expect(liesmich(basis)).toContain("- Kassenumsätze (Z-Bons bzw. Kassenexport)");
   });
 });
 

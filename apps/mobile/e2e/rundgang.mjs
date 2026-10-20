@@ -483,7 +483,7 @@ try {
   await tippe(knopf("Daten sichern"));
   await warte(800);
   await feld("Passwort").fill("kurz");
-  pruefe(await sichtbar("Mindestens 10 Zeichen"), "kurzes Passwort nicht angemahnt");
+  pruefe(await sichtbar("Mindestens 12 Zeichen"), "kurzes Passwort nicht angemahnt");
   await feld("Passwort").fill("sonnenschein-2026");
   await feld("Passwort wiederholen").fill("sonnenschein-2026");
   await foto("sicherung");

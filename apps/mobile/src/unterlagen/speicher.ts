@@ -248,8 +248,19 @@ export function standAus(json: string | null): Stand {
   };
 }
 
+// Formatter einmal anlegen (R9 Performance): ein neuer Intl.DateTimeFormat je Aufruf ist rund 70× langsamer
+const TAG_FORMAT = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Berlin" });
+// „heute“ ohne Argument wird in Listen je Zeile abgefragt – je Minute einmal berechnen
+let heuteZwischen: { minute: number; tag: string } | null = null;
+
 /** Heutiges Datum in Deutschland als YYYY-MM-DD. */
-export const heute = (jetzt = new Date()) => new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Berlin" }).format(jetzt);
+export const heute = (jetzt?: Date) => {
+  if (jetzt) return TAG_FORMAT.format(jetzt);
+  const ms = Date.now();
+  const minute = Math.floor(ms / 60_000);
+  if (heuteZwischen?.minute !== minute) heuteZwischen = { minute, tag: TAG_FORMAT.format(new Date(ms)) };
+  return heuteZwischen.tag;
+};
 
 /** Neuer, leerer Beleg (von Hand oder mit Foto). Kleinunternehmer (§ 19 UStG) starten ohne Vorsteuerabzug. */
 export function leererBeleg(quelle: Beleg["quelle"], datei: string | null, kleinunternehmer = false, jetzt = new Date()): Beleg {
@@ -297,8 +308,9 @@ const nummerVon = (u: Unterlage) => {
   const v = vorlageFuer(u.vorlage);
   return v?.fortlaufend && typeof u.daten[v.fortlaufend] === "string" ? (u.daten[v.fortlaufend] as string).trim() : "";
 };
-// Häufigkeit je „Vorlage|Nummer“, einmal je Liste berechnet – Listen fragen das für jede Zeile ab
-const nummernZaehler = new WeakMap<Unterlage[], Map<string, number>>();
+// Häufigkeit je „Vorlage|Nummer“ und „Vorlage|Nummer“ je ID, einmal je Liste berechnet – Listen fragen das für jede
+// Zeile ab; beides als Map, damit eine Abfrage O(1) bleibt (R9 Performance: vorher quadratisch über alle Unterlagen)
+const nummernZaehler = new WeakMap<Unterlage[], { anzahl: Map<string, number>; jeId: Map<string, string> }>();
 
 /** Gibt es dieselbe Nummer schon in einer anderen Unterlage derselben Vorlage? */
 export function nummerDoppelt(s: Stand, u: Unterlage): boolean {
@@ -306,16 +318,20 @@ export function nummerDoppelt(s: Stand, u: Unterlage): boolean {
   if (!n) return false;
   let z = nummernZaehler.get(s.unterlagen);
   if (!z) {
-    z = new Map();
+    z = { anzahl: new Map(), jeId: new Map() };
     for (const x of s.unterlagen) {
       const nx = nummerVon(x);
-      if (nx) z.set(`${x.vorlage}|${nx}`, (z.get(`${x.vorlage}|${nx}`) ?? 0) + 1);
+      if (!nx) continue;
+      const k = `${x.vorlage}|${nx}`;
+      z.anzahl.set(k, (z.anzahl.get(k) ?? 0) + 1);
+      z.jeId.set(x.id, k);
     }
     nummernZaehler.set(s.unterlagen, z);
   }
-  const anzahl = z.get(`${u.vorlage}|${n}`) ?? 0;
+  const k = `${u.vorlage}|${n}`;
+  const anzahl = z.anzahl.get(k) ?? 0;
   // u selbst zählt mit, wenn es mit derselben Nummer in der Liste steht
-  return anzahl - (s.unterlagen.some((x) => x.id === u.id && x.vorlage === u.vorlage && nummerVon(x) === n) ? 1 : 0) > 0;
+  return anzahl - (z.jeId.get(u.id) === k ? 1 : 0) > 0;
 }
 
 export const istFest = (u: Unterlage | undefined) => Boolean(u?.festgeschrieben);
@@ -481,7 +497,41 @@ export function betriebSetzen(s: Stand, b: Betrieb): Stand {
 export const steuerberatungSetzen = (s: Stand, sb: Stand["steuerberatung"]): Stand => ({ ...mitZeit(s, "steuerberatung"), steuerberatung: sb });
 
 /** Zuletzt bearbeitete zuerst. */
-export const sortiert = (s: Stand) => [...s.unterlagen].sort((a, b) => b.geaendert.localeCompare(a.geaendert));
+// je Unterlagenliste einmal sortiert (R9 Performance: Seiten fragen das bei jedem Zeichnen ab) – nicht verändern
+const sortiertZwischen = new WeakMap<Unterlage[], Unterlage[]>();
+export const sortiert = (s: Stand): Unterlage[] => {
+  let l = sortiertZwischen.get(s.unterlagen);
+  if (!l) {
+    l = [...s.unterlagen].sort((a, b) => b.geaendert.localeCompare(a.geaendert));
+    sortiertZwischen.set(s.unterlagen, l);
+  }
+  return l;
+};
+
+/**
+ * Inhaltlich gleich wie im JSON (R9 Performance, ersetzt den Vergleich zweier JSON.stringify des ganzen Stands):
+ * Gleiche Objekte werden sofort übersprungen – nach dem Zusammenführen ist fast alles noch dasselbe Objekt. Schlüssel
+ * mit `undefined` zählen wie fehlende (wie in JSON); die Reihenfolge der Schlüssel spielt keine Rolle.
+ */
+export function gleicherInhalt(a: unknown, b: unknown): boolean {
+  if (a === b) return true;
+  if (typeof a !== "object" || typeof b !== "object" || a === null || b === null) return typeof a === "number" && typeof b === "number" && Number.isNaN(a) && Number.isNaN(b) ? true : false;
+  if (Array.isArray(a) !== Array.isArray(b)) return false;
+  if (Array.isArray(a)) {
+    const y = b as unknown[];
+    if (a.length !== y.length) return false;
+    for (let i = 0; i < a.length; i++) if (!gleicherInhalt(a[i] === undefined ? null : a[i], y[i] === undefined ? null : y[i])) return false;
+    return true;
+  }
+  const x = a as Record<string, unknown>;
+  const y = b as Record<string, unknown>;
+  for (const k in x) if (x[k] !== undefined && !gleicherInhalt(x[k], y[k])) return false;
+  for (const k in y) if (y[k] !== undefined && x[k] === undefined) return false;
+  return true;
+}
+
+/** Zwei Stände inhaltlich gleich – ohne den Zeitpunkt der letzten Änderung. */
+export const standGleich = (a: Stand, b: Stand) => gleicherInhalt({ ...a, geaendert: undefined }, { ...b, geaendert: undefined });
 
 export const betriebFehlt = (b: Betrieb) => !b.name.trim();
 

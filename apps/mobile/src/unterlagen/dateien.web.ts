@@ -24,3 +24,24 @@ export function alleDateienEntfernen(): void {
     if (k?.startsWith("amtlos.datei.")) l.removeItem(k);
   }
 }
+
+/** Liegt die Datei vor? – ohne sie zu dekodieren (R9 Performance). */
+export function dateiVorhanden(name: string): boolean {
+  return istBelegDateiname(name) && speicher()?.getItem(SCHLUESSEL(name)) != null;
+}
+/** ungefähre Größe in Bytes (Base64 im localStorage) */
+export function dateiGroesse(name: string): number {
+  const t = istBelegDateiname(name) ? speicher()?.getItem(SCHLUESSEL(name)) : null;
+  return t ? Math.floor((t.length * 3) / 4) : 0;
+}
+/** Web: Anzeige über eine Blob-URL (statt einer data-URI). */
+export async function dateiAnzeigen(name: string, _schluessel: Uint8Array | null, mime = "application/octet-stream"): Promise<{ uri: string; entfernen(): void } | null> {
+  const bytes = await dateiHolen(name, null);
+  if (!bytes) return null;
+  const g = globalThis as unknown as { URL: { createObjectURL(b: unknown): string; revokeObjectURL(u: string): void }; Blob: new (t: unknown[], o: { type: string }) => unknown };
+  const uri = g.URL.createObjectURL(new g.Blob([bytes], { type: mime }));
+  return { uri, entfernen: () => g.URL.revokeObjectURL(uri) };
+}
+export function ansichtenAufraeumen(): void {
+  /* im Web nichts im Cache */
+}
