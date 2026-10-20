@@ -58,7 +58,7 @@ export async function neuberechnenInTx(
   );
   if (!profil) return { status: "kein_profil" };
 
-  const ereignisse = await ladeEreignisse(tx, unternehmenId);
+  const ereignisse = ereignisseMitBestand(await ladeEreignisse(tx, unternehmenId), profil.daten, stichtag);
 
   const bestand = await tx.abfrage<Instanz>(
     `select id, pflicht_id, periode, status, faellig_am, erledigt_am::date::text as erledigt_am, erledigt_mit_version_id, pflicht_version_id
@@ -154,6 +154,21 @@ export async function ladeEreignisse(tx: Tx, unternehmenId: string): Promise<Ere
   return zeilen
     .filter((e) => !e.storniert_ereignis_id) // Storno-Einträge selbst sind keine fachlichen Ereignisse
     .map((e) => ({ typ: e.typ, datum: e.eingetreten_am, ...(storniert.has(e.id) ? { storniert: true } : {}) }));
+}
+
+/**
+ * Beschäftigte laut Profil ohne erfasste Personen (H6): `beschaeftigte.gesamt` ≥ 1, aber noch keine Einstellung in
+ * app.ereignis (die entsteht erst beim Anlegen in „Personal“). Dann gelten die Einstellungs-Pflichten trotzdem – wie in
+ * der iPhone-App (apps/mobile/src/pflichten/check.ts, ereignisseAusStand): „erste_einstellung“ und „einstellung“ am
+ * Gründungstag, sonst am Stichtag. Sobald echte Einstellungen erfasst sind, gelten nur noch diese.
+ */
+export function ereignisseMitBestand(ereignisse: Ereignis[], profil: Record<string, unknown>, stichtag: Datum): Ereignis[] {
+  const anzahl = profil["beschaeftigte.gesamt"];
+  if (typeof anzahl !== "number" || anzahl < 1) return ereignisse;
+  if (ereignisse.some((e) => (e.typ === "einstellung" || e.typ === "erste_einstellung") && !e.storniert)) return ereignisse;
+  const g = profil["gruendungsdatum"];
+  const datum = typeof g === "string" && /^\d{4}-\d{2}-\d{2}$/.test(g) ? g : stichtag;
+  return [...ereignisse, { typ: "erste_einstellung", datum }, { typ: "einstellung", datum }].sort((a, b) => a.datum.localeCompare(b.datum));
 }
 
 /** Höchstens so viele Einzelmeldungen je Rollout; darüber eine Sammelmeldung (keine Benachrichtigungsflut). */

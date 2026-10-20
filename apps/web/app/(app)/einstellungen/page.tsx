@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { datumLang, fuelle, sichtbareSchritte } from "@amtlos/i18n";
 import { redirect } from "next/navigation";
 import { senden } from "@/lib/aktion";
+import { antwortZusammenfassung } from "@/lib/antworten";
 import { api, apiAntwort, aktivesUnternehmen } from "@/lib/api";
 import { sitzungBeenden } from "@/lib/sitzung";
 import type { Abo } from "./abo/page";
@@ -67,7 +68,7 @@ export default async function Einstellungen({ searchParams }: { searchParams: Pr
         <p className="mt-1 text-tinte-leise">{x.einstellungen.profil_text}</p>
         <ul className="mt-3 border-t border-linie">
           {sichtbareSchritte(profil.daten).map((schritt) => (
-            <VerweisZeile key={schritt.id} href={`/onboarding/${schritt.id}?zurueck=/einstellungen`} titel={schritt.titel[s]} />
+            <VerweisZeile key={schritt.id} href={`/onboarding/${schritt.id}?zurueck=/einstellungen`} titel={schritt.titel[s]} text={antwortZusammenfassung(schritt, profil.daten, s, x)} />
           ))}
         </ul>
       </section>

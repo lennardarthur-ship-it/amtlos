@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Inject, Post } from "@nestjs/common";
+import { Body, Controller, Get, Inject, Post, Query, Res } from "@nestjs/common";
+import type { Response } from "express";
 import { z } from "zod";
 import { StandardKalender, plusMonate } from "@amtlos/fristen";
 import { auswerten, entscheidendeSaetze } from "@amtlos/rules-engine";
 import { Datenbank, frageBeantworten, heute, ladeAktivenKatalog, ladeEreignisse, profilZuFakten, type KatalogPflicht, type KatalogRegelwert } from "@amtlos/server";
 import { Kontext, MitUnternehmen, type Anfragekontext } from "./auth.js";
-import { pruefe, t, type Text } from "./hilfen.js";
+import { pruefe, seite, seitenkopf, t, type Text } from "./hilfen.js";
 
 type Radarinfo = { wahrscheinlichkeit?: string; erwartet_ab?: string | null; vorbereitung?: Text[] };
 
@@ -81,13 +82,17 @@ export class AssistentController {
 
   @MitUnternehmen()
   @Get("benachrichtigungen")
-  async benachrichtigungen(@Kontext() k: Anfragekontext) {
-    return this.db.imKontext(this.kontext(k), (tx) =>
-      tx.abfrage(
-        "select id, art, titel, text, link, gelesen_am, erstellt_am from app.benachrichtigung where unternehmen_id = $1 and konto_id = $2 order by gelesen_am is not null, erstellt_am desc limit 50",
-        [k.unternehmenId, k.kontoId],
+  async benachrichtigungen(@Kontext() k: Anfragekontext, @Query() q: { limit?: string; cursor?: string }, @Res({ passthrough: true }) res: Response) {
+    // Standard wie bisher 50 (Heute zeigt nur die neuesten); mit limit/cursor seitenweise bis 200 (M9)
+    const s = seite({ limit: q.limit ?? "50", cursor: q.cursor });
+    const zeilen = await this.db.imKontext(this.kontext(k), (tx) =>
+      tx.abfrage<{ gesamt: number }>(
+        `select id, art, titel, text, link, gelesen_am, erstellt_am, count(*) over () as gesamt from app.benachrichtigung
+          where unternehmen_id = $1 and konto_id = $2 order by gelesen_am is not null, erstellt_am desc, id limit $3 offset $4`,
+        [k.unternehmenId, k.kontoId, s.limit, s.versatz],
       ),
     );
+    return seitenkopf(res, zeilen, s);
   }
 
   /** Als gelesen markieren: bestimmte IDs oder alle. */

@@ -32,6 +32,8 @@ async function austritt(id: string, f: FormData) {
 }
 
 export default async function PersonalSeite({ searchParams }: { searchParams: Promise<{ fehler?: string }> }) {
+  // Mitarbeitende: keine Personalliste, aber Stempeln und Unterweisungen (H4)
+  if ((await aktivesUnternehmen()).rolle === "mitarbeiter") redirect("/personal/zeiten");
   const [{ s, t: x }, liste, schwellen, { fehler }, u] = await Promise.all([t(), api<Beschaeftigter[]>("/v1/beschaeftigte"), api<Schwellen>("/v1/personal/schwellen"), searchParams, aktivesUnternehmen()]);
   const darfSchreiben = u.rolle !== "mitarbeiter";
   const heute = new Date().toISOString().slice(0, 10);

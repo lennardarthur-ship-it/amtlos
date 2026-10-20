@@ -1,4 +1,5 @@
 import { VerweisZeile } from "@/komponenten/verweis-zeile";
+import { aktivesUnternehmen, darfVerwalten } from "@/lib/api";
 import { t } from "@/lib/sprache";
 import { pfadSichtbar } from "@/lib/umfang";
 
@@ -6,7 +7,14 @@ export const metadata = { title: "Mehr" };
 
 /** Bereiche ohne eigenen Platz in der Leiste (E-098); mobil zusätzlich die, die nur am Desktop in der Seitenleiste stehen. */
 export default async function MehrSeite() {
-  const { t: x } = await t();
+  const [{ t: x }, u] = await Promise.all([t(), aktivesUnternehmen()]);
+  const verwalten = darfVerwalten(u.rolle);
+  // Mitarbeitende: Stempeln und Unterweisungen bestätigen statt Personalbereich, keine Meldungen und kein Datenschutz (H3, H4)
+  const nurMitarbeiter = [
+    ["/personal/zeiten", x.personal.zeiten, x.personal.zeiten_text, false],
+    ["/personal/unterweisungen", x.personal.unterweisungen, x.personal.unterweisungen_text, false],
+  ] as const;
+  const nurVerwalten = new Set(["/datenschutz", "/melden", "/kanzlei"]);
   const eintraege = [
     ["/frag", x.frag.titel, x.frag.text, false],
     ["/radar", x.radar.titel, x.radar.text, false],
@@ -21,7 +29,7 @@ export default async function MehrSeite() {
     ["/hilfe", x.hilfe.titel, "", false],
     ["/einstellungen", x.nav.einstellungen, "", true],
   ] as const;
-  const eintraegeSichtbar = eintraege.filter(([href]) => pfadSichtbar(href));
+  const eintraegeSichtbar = [...(verwalten ? [] : nurMitarbeiter), ...eintraege].filter(([href]) => pfadSichtbar(href) && (verwalten || !nurVerwalten.has(href)));
   return (
     <div className="lesetext space-y-6">
       <h1 className="text-titel font-bold">{x.mehr.titel}</h1>

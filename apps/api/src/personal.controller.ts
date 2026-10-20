@@ -5,9 +5,9 @@ import { z } from "zod";
 import { StandardKalender } from "@amtlos/fristen";
 import { auswerten } from "@amtlos/rules-engine";
 import { Datenbank, dokumentAblegen, heute, ladeAktivenKatalog, neuberechnungEinreihen, profilZuFakten, unterweisungsprotokollPdf, type Ablage, type Tx } from "@amtlos/server";
-import { Kontext, MitUnternehmen, type Anfragekontext } from "./auth.js";
+import { Kontext, LESEN_VERTRAULICH, MitUnternehmen, type Anfragekontext } from "./auth.js";
 import { ABLAGE } from "./finanzen.controller.js";
-import { pruefe, t, uebersetzeDbFehler, type Text } from "./hilfen.js";
+import { DATUM, pruefe, t, uebersetzeDbFehler, type Text } from "./hilfen.js";
 import { WARTESCHLANGE } from "./kern.controller.js";
 import { profilNachziehen } from "./profil-sync.js";
 
@@ -16,7 +16,6 @@ const SCHREIBEN = ["inhaber", "admin", "steuerberater"] as const;
 export const SCHWELLEN = [10, 20, 50, 150, 250];
 
 const Uuid = z.string().uuid();
-const DATUM = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Datum im Format JJJJ-MM-TT");
 const ART = z.enum(["vollzeit", "teilzeit", "minijob", "azubi", "werkstudent"]);
 const BeschaeftigterNeu = z
   .object({ vorname: z.string().trim().min(1).max(100), nachname: z.string().trim().min(1).max(100), art: ART, eintritt: DATUM, wochenstunden: z.number().positive().max(80).nullable().optional() })
@@ -87,8 +86,10 @@ export class PersonalController {
   @MitUnternehmen()
   @Get("beschaeftigte")
   async liste(@Kontext() k: Anfragekontext) {
+    // Mitarbeitende brauchen nur Namen und Zeitraum (Stempeln, Unterweisungen bestätigen) – keine Personalakte (H4)
+    const spalten = k.rolle === "mitarbeiter" ? "id, vorname, nachname, eintritt, austritt" : "*, wochenstunden::float8 as wochenstunden";
     return this.db.imKontext(this.kontext(k), (tx) =>
-      tx.abfrage("select *, wochenstunden::float8 as wochenstunden from app.beschaeftigter where unternehmen_id = $1 order by (austritt is not null), nachname, vorname", [k.unternehmenId]),
+      tx.abfrage<Record<string, unknown>>(`select ${spalten} from app.beschaeftigter where unternehmen_id = $1 order by (austritt is not null), nachname, vorname`, [k.unternehmenId]),
     );
   }
 
@@ -152,7 +153,7 @@ export class PersonalController {
   }
 
   /** Checkliste zur Einstellung: alle Pflichten, die für den Eintrittstag entstanden sind (je_ereignis). */
-  @MitUnternehmen()
+  @MitUnternehmen(...LESEN_VERTRAULICH)
   @Get("beschaeftigte/:id/checkliste")
   async checkliste(@Kontext() k: Anfragekontext, @Param("id") id: string) {
     pruefe(Uuid, id);

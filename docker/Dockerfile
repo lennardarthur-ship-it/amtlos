@@ -4,7 +4,8 @@
 #   Ziele: api, worker, web, studio, werkzeug (Migrationen, Katalog-Import, Betriebskommandos)
 # Laufzeit: Node 22 (wie .nvmrc), ohne Root, ohne Paketmanager im Image, nur Produktionsabhängigkeiten.
 
-ARG NODE_BILD=node:22-bookworm-slim
+# Genaue Version (Reproduzierbarkeit); Dependabot schlägt Updates vor (.github/dependabot.yml)
+ARG NODE_BILD=node:22.22.0-bookworm-slim
 
 FROM ${NODE_BILD} AS basis
 ENV PNPM_HOME=/pnpm PATH=/pnpm:$PATH NEXT_TELEMETRY_DISABLED=1

@@ -7,7 +7,7 @@ import { entscheidendeSaetze, type Knoten } from "@amtlos/rules-engine";
 import { Datenbank, heute, ladeAktivenKatalog, neuberechnenInTx, neuberechnungEinreihen, type Tx } from "@amtlos/server";
 import { Kontext, MitUnternehmen, Oeffentlich, type Anfragekontext } from "./auth.js";
 import { BEREICH_JE_KATEGORIE, heuteUebersicht } from "./heute.js";
-import { pruefe, t, uebersetzeDbFehler, type Text } from "./hilfen.js";
+import { pruefe, seite, t, uebersetzeDbFehler, type Text } from "./hilfen.js";
 import { erzeugeIcs } from "./ics.js";
 import { fortschritt, offeneVoraussetzungen, ordne } from "@amtlos/fachlogik";
 import { KONFIGURATION, type Konfiguration } from "./konfiguration.js";
@@ -94,12 +94,18 @@ export class PflichtenController {
 
   @MitUnternehmen()
   @Get("pflichten")
-  async liste(@Kontext() k: Anfragekontext, @Query("status") status?: string) {
-    const filter = pruefe(StatusFilter, status);
+  async liste(@Kontext() k: Anfragekontext, @Query() q: { status?: string; limit?: string; cursor?: string }, @Res({ passthrough: true }) res: Response) {
+    const filter = pruefe(StatusFilter, q.status);
+    // Seitenweise (M9) nur auf Wunsch: ohne limit wie bisher alles (die Oberfläche gruppiert und zählt die ganze Liste)
+    const s = q.limit || q.cursor ? seite(q) : undefined;
     const zeilen = await this.db.imKontext({ kontoId: k.kontoId, unternehmenId: k.unternehmenId }, (tx) =>
       this.laden(k, tx, filter === "alle" ? "and pi.status <> 'entfallen'" : "and pi.anzeige_status = $2", filter === "alle" ? [] : [filter]),
     );
-    return zeilen.map((z) => karte(z, k.sprache));
+    res.setHeader("X-Gesamt", String(zeilen.length));
+    if (!s) return zeilen.map((z) => karte(z, k.sprache));
+    const teil = zeilen.slice(s.versatz, s.versatz + s.limit);
+    if (s.versatz + teil.length < zeilen.length) res.setHeader("X-Naechster-Cursor", String(s.versatz + teil.length));
+    return teil.map((z) => karte(z, k.sprache));
   }
 
   @MitUnternehmen()
@@ -130,7 +136,13 @@ export class PflichtenController {
 
   @MitUnternehmen("inhaber", "admin", "steuerberater", "mitarbeiter")
   @Post("pflichten/:pflichtId/:periode/erledigen")
-  async erledigen(@Kontext() k: Anfragekontext, @Param("pflichtId") pflichtId: string, @Param("periode") periode: string, @Body() body: unknown) {
+  async erledigen(
+    @Kontext() k: Anfragekontext,
+    @Param("pflichtId") pflichtId: string,
+    @Param("periode") periode: string,
+    @Body() body: unknown,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const { notiz } = pruefe(Erledigen, body ?? {});
     return this.db
       .imKontext({ kontoId: k.kontoId, unternehmenId: k.unternehmenId }, async (tx) => {
@@ -139,7 +151,15 @@ export class PflichtenController {
             where pflicht_id = $1 and periode = $2 and status = 'offen' returning id`,
           [pflichtId, periode, k.kontoId],
         );
-        if (!i) throw new NotFoundException("Keine offene Pflicht mit dieser Periode");
+        if (!i) {
+          // Idempotent (M4): eine Wiederholung (App offline, Doppelklick, Netzfehler) bekommt dasselbe Ergebnis
+          const schon = await tx.eine("select 1 from app.pflicht_instanz where pflicht_id = $1 and periode = $2 and status = 'erledigt'", [pflichtId, periode]);
+          if (schon) {
+            res.status(200);
+            return { pflicht_id: pflichtId, periode, status: "erledigt", wiederholt: true };
+          }
+          throw new NotFoundException("Keine offene Pflicht mit dieser Periode");
+        }
         await tx.abfrage("insert into app.nachweis (unternehmen_id, pflicht_instanz_id, art, notiz, erstellt_von) values ($1, $2, 'bestaetigung', $3, $4)", [
           k.unternehmenId, i.id, notiz ?? null, k.kontoId,
         ]);
@@ -185,7 +205,8 @@ export class PflichtenController {
         [k.unternehmenId],
       ),
     );
-    return { ...u, als_naechstes: u.als_naechstes.map((a) => karten.get(`${a.pflicht_id}|${a.periode}`)), vor_start: vorStart };
+    const berechnung = await this.db.imKontext({ kontoId: k.kontoId, unternehmenId: k.unternehmenId }, (tx) => berechnungsStand(tx, k.unternehmenId!));
+    return { ...u, als_naechstes: u.als_naechstes.map((a) => karten.get(`${a.pflicht_id}|${a.periode}`)), vor_start: vorStart, berechnung };
   }
 
   /**
@@ -325,6 +346,30 @@ export class PflichtenController {
     );
     res.type("text/calendar; charset=utf-8").send(ics);
   }
+}
+
+/**
+ * Ist der Plan auf dem Stand des letzten Profils (M5)? profil_version: neueste Profilversion; berechnet_version: die
+ * Profilversion des letzten Berechnungslaufs. status: aktuell | laeuft | fehlgeschlagen (H2: der Worker meldet Fehler).
+ */
+export async function berechnungsStand(tx: Tx, unternehmenId: string) {
+  const r = await tx.eine<{ profil_version: number | null; profil_seit: Date | null; berechnet_version: number | null; berechnet_am: Date | null; fehler_am: Date | null }>(
+    `select p.version as profil_version, p.erstellt_am as profil_seit, lp.version as berechnet_version, l.gestartet_am as berechnet_am,
+            (select max(f.erstellt_am) from app.berechnung_fehler f where f.unternehmen_id = $1 and f.profil_version = p.version) as fehler_am
+       from (select version, erstellt_am from app.profil_version where unternehmen_id = $1 order by version desc limit 1) p
+       left join lateral (select bl.profil_version_id, bl.gestartet_am from app.berechnungslauf bl where bl.unternehmen_id = $1 order by bl.gestartet_am desc limit 1) l on true
+       left join app.profil_version lp on lp.id = l.profil_version_id`,
+    [unternehmenId],
+  );
+  if (!r) return { status: "kein_profil" as const, profil_version: 0, berechnet_version: null, seit: null };
+  const aktuell = r.berechnet_version !== null && r.berechnet_version >= r.profil_version!;
+  const fehlgeschlagen = !aktuell && r.fehler_am !== null && (!r.berechnet_am || r.fehler_am.getTime() > r.berechnet_am.getTime());
+  return {
+    status: aktuell ? ("aktuell" as const) : fehlgeschlagen ? ("fehlgeschlagen" as const) : ("laeuft" as const),
+    profil_version: r.profil_version!,
+    berechnet_version: r.berechnet_version,
+    seit: r.profil_seit,
+  };
 }
 
 /** Termine außerhalb des Katalogs: Fristen aus Behördenbriefen und nächste Geräteprüfungen (Spezifikation 4.I, 6.11). */

@@ -12,9 +12,11 @@ const LINK_COOKIE = "amtlos_einladung_neu";
 const EINLADBAR = ["mitarbeiter", "steuerberater", "admin"] as const;
 
 interface Team {
-  mitglieder: { konto_id: string; anzeigename: string; email: string; rolle: "inhaber" | "mitarbeiter" | "steuerberater" | "admin"; ich: boolean }[];
+  mitglieder: { konto_id: string; anzeigename: string; email: string | null; rolle: "inhaber" | "mitarbeiter" | "steuerberater" | "admin"; ich: boolean }[];
   einladungen: { id: string; email: string; rolle: (typeof EINLADBAR)[number]; laeuft_ab: string }[];
   darf_verwalten: boolean;
+  /** false für die letzte Inhaberin bzw. den letzten Inhaber (G7) */
+  darf_verlassen?: boolean;
 }
 
 const berlinerDatum = (zeitpunkt: string) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin" }).format(new Date(zeitpunkt));
@@ -98,7 +100,7 @@ export default async function TeamSeite({ searchParams }: { searchParams: Promis
                 {m.ich ? <span className="font-normal text-tinte-leise"> ({x.team.du})</span> : null}
               </p>
               <p className="truncate text-klein text-tinte-leise">
-                {x.team.rollen[m.rolle]} · {m.email}
+                {m.email ? `${x.team.rollen[m.rolle]} · ${m.email}` : x.team.rollen[m.rolle]}
               </p>
             </div>
             {team.darf_verwalten && !m.ich && (binInhaber || m.rolle !== "inhaber") ? (
@@ -196,10 +198,16 @@ export default async function TeamSeite({ searchParams }: { searchParams: Promis
         <h2 id="verlassen" className="text-gross font-bold">
           {x.team.verlassen_titel}
         </h2>
-        <p className="mt-1">{x.team.verlassen_text}</p>
-        <form action={verlassen} className="mt-3">
-          <button className="knopf knopf-leise">{x.team.verlassen}</button>
-        </form>
+        {team.darf_verlassen === false ? (
+          <p className="mt-1">{x.team.verlassen_letzter}</p>
+        ) : (
+          <>
+            <p className="mt-1">{x.team.verlassen_text}</p>
+            <form action={verlassen} className="mt-3">
+              <button className="knopf knopf-leise">{x.team.verlassen}</button>
+            </form>
+          </>
+        )}
       </section>
     </div>
   );

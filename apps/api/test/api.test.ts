@@ -48,6 +48,7 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       WEB_URL: "https://app.amtlos.test", API_URL: "https://api.amtlos.test", OIDC_ISSUER: undefined, OIDC_AUDIENCE: undefined, METRIKEN_TOKEN: METRIK_TOKEN, RATE_ANGEMELDET: 10_000, RATE_ANONYM: 1_000, ABLAGE_VERZEICHNIS: fs.mkdtempSync(path.join(os.tmpdir(), "ablage-")),
       ONLINECHECK_PRIVATE_NETZE: "erlaubt", ONLINECHECK_JE_TAG: 3,
       STRIPE_WEBHOOK_SECRET: WEBHOOK_GEHEIM, ABO_TESTTAGE: 14, TRESOR_MAX_MB: 1024, TRESOR_MAX_DATEIEN: 3,
+      TRUST_PROXY: "loopback", MANDANTEN_JE_TAG: 5, EINLADUNGEN_JE_TAG: 50,
     });
     await app.init();
     [anna, ben, mia] = await Promise.all([token("anna"), token("ben"), token("mia")]);
@@ -81,7 +82,7 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
 
   it("validiert das Profil und speichert Versionen; die Neuberechnung wird eingereiht", async () => {
     const falsch = await alsAnna(http().put("/v1/profil")).send({ daten: { rechtsfrom: "gmbh" } }).expect(422);
-    expect(falsch.body.fehler[0].meldung).toMatch(/Unrecognized key/);
+    expect(falsch.body.fehler[0].meldung).toMatch(/Unbekanntes Feld: rechtsfrom/);
     const r = await alsAnna(http().put("/v1/profil"))
       .send({ daten: { rechtsform: "einzelunternehmen", gruendungsdatum: "2019-04-01", "taetigkeit.einordnung": "gewerbe", "ust.kleinunternehmer": false, "ust.zahllast_vorjahr": 12400, "ust.dauerfristverlaengerung": true, "beschaeftigte.gesamt": 1, gemeinde_ags: "08111000" } })
       .expect(200);
@@ -171,7 +172,10 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
 
   it("Erledigen mit Nachweis, wieder öffnen, Rollenprüfung", async () => {
     await alsAnna(http().post("/v1/pflichten/steuern.ust_voranmeldung/2026-09/erledigen")).send({ notiz: "über ELSTER übermittelt" }).expect(201);
-    await alsAnna(http().post("/v1/pflichten/steuern.ust_voranmeldung/2026-09/erledigen")).send({}).expect(404);
+    // M4: Wiederholen ist idempotent (200 mit demselben Status statt 404)
+    const nochmal = await alsAnna(http().post("/v1/pflichten/steuern.ust_voranmeldung/2026-09/erledigen")).send({}).expect(200);
+    expect(nochmal.body).toMatchObject({ status: "erledigt", wiederholt: true });
+    await alsAnna(http().post("/v1/pflichten/steuern.gibt_es_nicht/2026-09/erledigen")).send({}).expect(404);
     const d = await alsAnna(http().get("/v1/pflichten/steuern.ust_voranmeldung/2026-09")).expect(200);
     expect(d.body.status).toBe("erledigt");
     expect(d.body.nachweise[0]).toMatchObject({ art: "bestaetigung", notiz: "über ELSTER übermittelt" });
@@ -1204,6 +1208,169 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       // Endgültiges Löschen durch den Worker nach Frist
       const n = await worker.imKontext({}, (tx) => tx.eine<{ n: number }>("select app.endgueltig_loeschen(interval '0 days') as n"));
       expect(n!.n).toBeGreaterThanOrEqual(1);
+    });
+  });
+  describe("Runde 9: Regressionen (Web/API-Durchsicht)", () => {
+    const neueFirma = async (name: string) => {
+      const t = await token(name.toLowerCase().replace(/\W+/g, "-"));
+      const id = (await http().post("/v1/unternehmen").set("Authorization", `Bearer ${t}`).send({ name }).expect(201)).body.id as string;
+      return { t, id, als: (r: request.Test) => r.set("Authorization", `Bearer ${t}`).set("X-Unternehmen-Id", id) };
+    };
+
+    it("H1: unmögliche Kalendertage werden mit 422 abgewiesen, nie 500 und nie im Profil gespeichert", async () => {
+      const f = await neueFirma("Datum GmbH");
+      const r = await f.als(http().post("/v1/ereignisse")).send({ typ: "gruendung", datum: "2026-02-31" }).expect(422);
+      expect(r.body.fehler[0]).toMatchObject({ feld: "datum", meldung: "Diesen Kalendertag gibt es nicht" });
+      await f.als(http().post("/v1/beschaeftigte")).send({ vorname: "A", nachname: "B", art: "vollzeit", eintritt: "2026-02-30" }).expect(422);
+      await f.als(http().put("/v1/profil")).send({ daten: { gruendungsdatum: "0000-00-00" } }).expect(422);
+      expect((await f.als(http().get("/v1/profil")).expect(200)).body.version).toBe(0);
+      await f.als(http().post("/v1/ereignisse")).send({ typ: "gruendung", datum: "2026-02-28" }).expect(201);
+    });
+
+    it("G1: Nutzlast von Ereignissen nur mit den Feldern des Typs, flach und klein", async () => {
+      const f = await neueFirma("Nutzlast GmbH");
+      const tief = `{"typ":"arbeitsunfall","datum":"2026-10-01","payload":{"datum":${'{"x":'.repeat(5000)}{}${"}".repeat(5000)}}}`;
+      await f.als(http().post("/v1/ereignisse")).set("Content-Type", "application/json").send(tief).expect(422);
+      // Kaputtes JSON: fester deutscher Text statt Parser-Details (G3)
+      const kaputt = await f.als(http().post("/v1/ereignisse")).set("Content-Type", "application/json").send('{"typ":').expect(400);
+      expect(kaputt.body.message).toBe("Anfrage ungültig (kein gültiges JSON)");
+      await f.als(http().post("/v1/ereignisse")).send({ typ: "arbeitsunfall", datum: "2026-10-01", payload: { fremd: "x" } }).expect(422);
+      await f.als(http().post("/v1/ereignisse")).send({ typ: "arbeitsunfall", datum: "2026-10-01", payload: { datum: "2026-10-01", au_tage: 3 } }).expect(201);
+    });
+
+    it("M1: parallele Profiländerungen gehen nicht verloren; veraltete erwartete_version gibt 409", async () => {
+      const f = await neueFirma("Profil GmbH");
+      await f.als(http().put("/v1/profil")).send({ daten: { rechtsform: "gmbh" } }).expect(200);
+      const felder = [{ erwerb: "haupt" }, { bundesland: "HH" }, { "beschaeftigte.gesamt": 2 }, { "ust.kleinunternehmer": false }, { "kasse.elektronisch": true }, { "taetigkeit.einordnung": "gewerbe" }];
+      const antworten = await Promise.all(felder.map((a) => f.als(http().put("/v1/profil")).send({ aenderungen: a })));
+      expect(antworten.map((a) => a.status)).toEqual(felder.map(() => 200));
+      const p = (await f.als(http().get("/v1/profil")).expect(200)).body;
+      expect(p.version).toBe(7);
+      expect(p.daten).toMatchObject(Object.assign({ rechtsform: "gmbh" }, ...felder));
+      const konflikt = await f.als(http().put("/v1/profil")).send({ aenderungen: { erwerb: "neben" }, erwartete_version: 3 }).expect(409);
+      expect(konflikt.body.version).toBe(7);
+      await f.als(http().put("/v1/profil")).send({ aenderungen: { erwerb: null }, erwartete_version: 7 }).expect(200);
+      expect((await f.als(http().get("/v1/profil")).expect(200)).body.daten.erwerb).toBeUndefined();
+      await f.als(http().put("/v1/profil")).send({ daten: {}, aenderungen: {} }).expect(422);
+    });
+
+    it("M2: gleichzeitige Meldungen mit derselben client_id ergeben ein Ereignis und sonst „wiederholt“", async () => {
+      const f = await neueFirma("Idempotenz GmbH");
+      const clientId = "0b8f6c2e-4d3a-4f1e-8a7b-9c6d5e4f3a2b";
+      const r = await Promise.all([1, 2, 3, 4, 5].map(() => f.als(http().post("/v1/ereignisse")).send({ typ: "neuer_arbeitsplatz", datum: "2026-10-01", client_id: clientId })));
+      expect(r.map((x) => x.status)).toEqual([201, 201, 201, 201, 201]);
+      expect(r.filter((x) => x.body.wiederholt === false)).toHaveLength(1);
+      expect(new Set(r.map((x) => x.body.id)).size).toBe(1);
+      expect((await f.als(http().get("/v1/ereignisse")).expect(200)).body).toHaveLength(1);
+    });
+
+    it("M3: parallele Stornos legen genau einen Storno-Eintrag an", async () => {
+      const f = await neueFirma("Storno GmbH");
+      const e = (await f.als(http().post("/v1/ereignisse")).send({ typ: "neuer_arbeitsplatz", datum: "2026-10-01" }).expect(201)).body;
+      const r = await Promise.all([1, 2, 3, 4].map(() => f.als(http().post(`/v1/ereignisse/${e.id}/storno`))));
+      expect(r.map((x) => x.status)).toEqual([201, 201, 201, 201]);
+      const liste = (await f.als(http().get("/v1/ereignisse")).expect(200));
+      expect(liste.body.filter((x: { storniert_ereignis_id: string | null }) => x.storniert_ereignis_id === e.id)).toHaveLength(1);
+      expect(liste.headers["x-gesamt"]).toBe("2");
+    });
+
+    it("M9: Listen seitenweise mit limit/cursor und X-Gesamt", async () => {
+      const f = await neueFirma("Seiten GmbH");
+      for (const d of ["2026-01-01", "2026-02-01", "2026-03-01"]) await f.als(http().post("/v1/ereignisse")).send({ typ: "neuer_arbeitsplatz", datum: d }).expect(201);
+      const s1 = await f.als(http().get("/v1/ereignisse?limit=2")).expect(200);
+      expect(s1.body.map((x: { datum: string }) => x.datum)).toEqual(["2026-03-01", "2026-02-01"]);
+      expect(s1.headers["x-gesamt"]).toBe("3");
+      const s2 = await f.als(http().get(`/v1/ereignisse?limit=2&cursor=${s1.headers["x-naechster-cursor"]}`)).expect(200);
+      expect(s2.body.map((x: { datum: string }) => x.datum)).toEqual(["2026-01-01"]);
+      expect(s2.headers["x-naechster-cursor"]).toBeUndefined();
+      await f.als(http().get("/v1/ereignisse?limit=500")).expect(422);
+    });
+
+    it("H4: Mitarbeitende lesen keine Finanzen, Personalakten, Datenpannen, Anfragen und fremden E-Mail-Adressen", async () => {
+      const alsMia = (r: request.Test) => r.set("Authorization", `Bearer ${mia}`).set("X-Unternehmen-Id", firma);
+      for (const pfad of ["/v1/rechnungen", "/v1/belege", "/v1/kunden", "/v1/rechnungssteller", "/v1/finanzen/uebersicht", "/v1/kassen", "/v1/datenpannen", "/v1/betroffenenanfragen"])
+        await alsMia(http().get(pfad)).expect(403);
+      const rechnung = (await alsAnna(http().get("/v1/rechnungen")).expect(200)).body.find((x: { pdf_dokument_id: string | null }) => x.pdf_dokument_id);
+      await alsMia(http().get(`/v1/rechnungen/${rechnung.id}`)).expect(403);
+      // Rechnungs-PDF: für Anna lesbar, für Mia „nicht gefunden“
+      await alsAnna(http().get(`/v1/dokumente/${rechnung.pdf_dokument_id}/datei`)).expect(200);
+      await alsMia(http().get(`/v1/dokumente/${rechnung.pdf_dokument_id}/datei`)).expect(404);
+      // Beschäftigte: nur Namen
+      const b = (await alsMia(http().get("/v1/beschaeftigte")).expect(200)).body as Record<string, unknown>[];
+      for (const x of b) expect(Object.keys(x).sort()).toEqual(["austritt", "eintritt", "id", "nachname", "vorname"]);
+      const team = (await alsMia(http().get("/v1/team")).expect(200)).body as { mitglieder: { email: string | null; ich: boolean }[] };
+      expect(team.mitglieder.filter((m) => !m.ich).every((m) => m.email === null)).toBe(true);
+      expect(team.mitglieder.find((m) => m.ich)!.email).toBe("mia@example.org");
+      // Pflichten sehen und erledigen bleibt erlaubt
+      await alsMia(http().get("/v1/pflichten")).expect(200);
+    });
+
+    it("G7: der letzten Inhaberin wird „Verlassen“ nicht angeboten", async () => {
+      const f = await neueFirma("Allein GmbH");
+      expect((await f.als(http().get("/v1/team")).expect(200)).body.darf_verlassen).toBe(false);
+      await f.als(http().post("/v1/team/verlassen")).expect(409);
+    });
+
+    it("H5: nach dem Löschen liefert der Kalender nichts mehr und Einladungen lassen sich nicht annehmen", async () => {
+      const f = await neueFirma("Kalender GmbH");
+      const abo = (await f.als(http().post("/v1/kalender/abo")).expect(201)).body;
+      const pfad = new URL(abo.url).pathname;
+      await http().get(pfad).expect(200);
+      const einladung = (await f.als(http().post("/v1/einladungen")).send({ email: "nachzuegler@example.org", rolle: "mitarbeiter" }).expect(201)).body;
+      await f.als(http().delete("/v1/unternehmen")).send({ name: "Kalender GmbH" }).expect(204);
+      await http().get(pfad).expect(404);
+      const t = await token("nachzuegler");
+      const linkToken = new URL(einladung.link).pathname.split("/").pop();
+      await http().post("/v1/einladungen/annehmen").set("Authorization", `Bearer ${t}`).send({ token: linkToken }).expect(404);
+      expect((await http().get("/v1/ich").set("Authorization", `Bearer ${t}`).expect(200)).body.unternehmen).toEqual([]);
+    });
+
+    it("M5/H2: Heute meldet, ob der Plan zum letzten Profil passt, und zeigt Fehlversuche des Workers", async () => {
+      const f = await neueFirma("Stand GmbH");
+      expect((await f.als(http().get("/v1/heute")).expect(200)).body.berechnung.status).toBe("kein_profil");
+      await f.als(http().put("/v1/profil")).send({ daten: { rechtsform: "gmbh", gruendungsdatum: "2020-01-01", bundesland: "HH" } }).expect(200);
+      expect((await f.als(http().get("/v1/heute")).expect(200)).body.berechnung).toMatchObject({ status: "laeuft", profil_version: 1, berechnet_version: null });
+      await worker.imKontext({ unternehmenId: f.id }, (tx) =>
+        tx.abfrage("insert into app.berechnung_fehler (unternehmen_id, profil_version, grund) values ($1, 1, 'Test')", [f.id]),
+      );
+      expect((await f.als(http().get("/v1/heute")).expect(200)).body.berechnung.status).toBe("fehlgeschlagen");
+      await neuberechnen(worker, f.id, "test", { kalender: new StandardKalender() });
+      expect((await f.als(http().get("/v1/heute")).expect(200)).body.berechnung).toMatchObject({ status: "aktuell", profil_version: 1, berechnet_version: 1 });
+      await f.als(http().put("/v1/profil")).send({ aenderungen: { erwerb: "haupt" } }).expect(200);
+      expect((await f.als(http().get("/v1/heute")).expect(200)).body.berechnung).toMatchObject({ status: "laeuft", profil_version: 2, berechnet_version: 1 });
+    });
+
+    it("G2: ein Rechnungsentwurf nimmt keine Kunden-ID eines anderen Unternehmens an", async () => {
+      const fremd = await neueFirma("Fremdkunde GmbH");
+      const ku = (await fremd.als(http().post("/v1/kunden")).send({ name: "Geheim AG", strasse: "Weg 1", plz: "10115", ort: "Berlin" }).expect(201)).body;
+      const r = await alsAnna(http().post("/v1/rechnungen")).send({ kunde_id: ku.id, positionen: [] });
+      expect([404, 422]).toContain(r.status);
+    });
+
+    it("M6/M12: Kanzlei sieht den Einladungsstand, erneuert die Einladung solange es keinen Inhaber gibt, mit Tagesgrenze", async () => {
+      const kanzlei = await token("kanzlei-r9");
+      const als = (r: request.Test) => r.set("Authorization", `Bearer ${kanzlei}`);
+      const m = (await als(http().post("/v1/mandanten")).send({ name: "Mandant R9", email: "inhaberin-r9@example.org" }).expect(201)).body;
+      const liste = await als(http().get("/v1/mandanten?suche=r9")).expect(200);
+      expect(liste.headers["x-gesamt"]).toBe("1");
+      expect(liste.body[0].einladung).toMatchObject({ email: "inhaberin-r9@example.org", status: "offen" });
+      // abgelaufen: Kanzlei erneuert, der alte Link gilt nicht mehr
+      const owner = new Datenbank(urls.owner);
+      await owner.imKontext({}, (tx) => tx.abfrage("update app.einladung set laeuft_ab = now() - interval '1 day' where unternehmen_id = $1", [m.id]));
+      await owner.schliessen();
+      expect((await als(http().get("/v1/mandanten?filter=einladung")).expect(200)).body[0].einladung.status).toBe("abgelaufen");
+      const neu = (await als(http().post(`/v1/mandanten/${m.id}/einladung-erneuern`)).send({}).expect(201)).body;
+      expect(neu.email).toBe("inhaberin-r9@example.org");
+      const inhaberin = await token("inhaberin-r9");
+      const alt = new URL(m.einladung.link).pathname.split("/").pop();
+      await http().post("/v1/einladungen/annehmen").set("Authorization", `Bearer ${inhaberin}`).send({ token: alt }).expect(404);
+      await http().post("/v1/einladungen/annehmen").set("Authorization", `Bearer ${inhaberin}`).send({ token: new URL(neu.link).pathname.split("/").pop() }).expect(200);
+      // Mit Inhaber: keine Erneuerung mehr; Fremde dürfen gar nicht
+      await als(http().post(`/v1/mandanten/${m.id}/einladung-erneuern`)).send({}).expect(409);
+      await alsAnna(http().post(`/v1/mandanten/${m.id}/einladung-erneuern`)).send({}).expect(404);
+      // Tagesgrenze (Test: 5 je Konto und Tag; 2 sind verbraucht)
+      for (let i = 0; i < 3; i++) await als(http().post("/v1/mandanten")).send({ name: `Grenze ${i}`, email: `grenze${i}@example.org` }).expect(201);
+      await als(http().post("/v1/mandanten")).send({ name: "Zu viel", email: "zuviel@example.org" }).expect(429);
     });
   });
 });

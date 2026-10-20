@@ -40,9 +40,10 @@ import {
   type Tx,
 } from "@amtlos/server";
 import { KU_HINWEIS, umsaetzeNachSatz, ustZeitraum } from "@amtlos/fachlogik";
-import { Kontext, MitUnternehmen, type Anfragekontext } from "./auth.js";
+import { Kontext, LESEN_VERTRAULICH, MitUnternehmen, type Anfragekontext } from "./auth.js";
 import { ELSTER } from "./elster.controller.js";
-import { pruefe, uebersetzeDbFehler } from "./hilfen.js";
+import { DATUM, pruefe, seite, seitenkopf, uebersetzeDbFehler } from "./hilfen.js";
+import { profilSperren } from "./profil-sync.js";
 import { WARTESCHLANGE } from "./kern.controller.js";
 
 export const ABLAGE = Symbol("ABLAGE");
@@ -52,7 +53,6 @@ export { KU_HINWEIS };
 
 const SCHREIBEN = ["inhaber", "admin", "steuerberater"] as const;
 const Uuid = z.string().uuid();
-const DATUM = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Datum im Format JJJJ-MM-TT");
 const TEXT = (max = 200) => z.string().trim().min(1).max(max);
 const OPT = (max = 200) => z.string().trim().max(max).optional().nullable().transform((x) => x || null);
 
@@ -165,7 +165,7 @@ export class FinanzenController {
 
   // ------------------------------------------------------------ Rechnungssteller
 
-  @MitUnternehmen()
+  @MitUnternehmen(...LESEN_VERTRAULICH)
   @Get("rechnungssteller")
   async steller(@Kontext() k: Anfragekontext) {
     // Leeres Objekt statt null: null wäre ein leerer Antwortkörper (kein gültiges JSON)
@@ -191,7 +191,7 @@ export class FinanzenController {
 
   // ------------------------------------------------------------ Kunden
 
-  @MitUnternehmen()
+  @MitUnternehmen(...LESEN_VERTRAULICH)
   @Get("kunden")
   async kunden(@Kontext() k: Anfragekontext) {
     return this.db.imKontext(this.kontext(k), (tx) => tx.abfrage("select * from app.kunde where unternehmen_id = $1 order by name", [k.unternehmenId]));
@@ -212,20 +212,21 @@ export class FinanzenController {
 
   // ------------------------------------------------------------ Rechnungen
 
-  @MitUnternehmen()
+  @MitUnternehmen(...LESEN_VERTRAULICH)
   @Get("rechnungen")
-  async rechnungen(@Kontext() k: Anfragekontext) {
+  async rechnungen(@Kontext() k: Anfragekontext, @Query() q: { limit?: string; cursor?: string }, @Res({ passthrough: true }) res: Response) {
+    const s = seite(q);
     const zeilen = await this.db.imKontext(this.kontext(k), (tx) =>
-      tx.abfrage<RechnungZeile>(
-        `select r.*, coalesce(r.kunde->>'name', ku.name) as kunde_name from app.rechnung r left join app.kunde ku on ku.id = r.kunde_id
-          where r.unternehmen_id = $1 order by (r.status = 'entwurf') desc, r.rechnungsdatum desc nulls first, r.nummer desc`,
-        [k.unternehmenId],
+      tx.abfrage<RechnungZeile & { gesamt: number }>(
+        `select r.*, coalesce(r.kunde->>'name', ku.name) as kunde_name, count(*) over () as gesamt from app.rechnung r left join app.kunde ku on ku.id = r.kunde_id
+          where r.unternehmen_id = $1 order by (r.status = 'entwurf') desc, r.rechnungsdatum desc nulls first, r.nummer desc, r.id limit $2 offset $3`,
+        [k.unternehmenId, s.limit, s.versatz],
       ),
     );
-    return zeilen.map(zahl);
+    return seitenkopf(res, zeilen, s).map((z) => zahl(z as RechnungZeile));
   }
 
-  @MitUnternehmen()
+  @MitUnternehmen(...LESEN_VERTRAULICH)
   @Get("rechnungen/:id")
   async rechnung(@Kontext() k: Anfragekontext, @Param("id") id: string) {
     pruefe(Uuid, id);
@@ -393,7 +394,18 @@ export class FinanzenController {
   @Get("dokumente/:id/datei")
   async datei(@Kontext() k: Anfragekontext, @Param("id") id: string, @Res() res: Response) {
     pruefe(Uuid, id);
-    const d = await this.db.imKontext(this.kontext(k), (tx) => tx.eine<{ titel: string; mime: string; objekt_key: string; sha256: Buffer }>("select titel, mime, objekt_key, sha256 from app.dokument where id = $1", [id]));
+    // Mitarbeitende (H4): nur Unterlagen für ihre Arbeit – Unterweisungs- und Gefährdungsprotokolle, Sicherheitsdatenblätter
+    // und selbst hochgeladene Nachweise; keine Rechnungen, Belege, Verträge, Behördenbriefe oder Datenpannen
+    const nurArbeit = k.rolle === "mitarbeiter";
+    const d = await this.db.imKontext(this.kontext(k), (tx) =>
+      tx.eine<{ titel: string; mime: string; objekt_key: string; sha256: Buffer }>(
+        `select d.titel, d.mime, d.objekt_key, d.sha256 from app.dokument d where d.id = $1
+           and (not $2 or d.art = 'sicherheitsdatenblatt' or d.erstellt_von = $3
+                or exists (select 1 from app.unterweisung u where u.dokument_id = d.id)
+                or exists (select 1 from app.gefaehrdungsbeurteilung g where g.dokument_id = d.id))`,
+        [id, nurArbeit, k.kontoId],
+      ),
+    );
     if (!d) throw new NotFoundException("Dokument nicht gefunden");
     const inhalt = await this.ablage.lesen(d.objekt_key);
     const endung = d.objekt_key.split(".").pop();
@@ -406,17 +418,19 @@ export class FinanzenController {
 
   // ------------------------------------------------------------ Belege
 
-  @MitUnternehmen()
+  @MitUnternehmen(...LESEN_VERTRAULICH)
   @Get("belege")
-  async belege(@Kontext() k: Anfragekontext) {
-    return this.db.imKontext(this.kontext(k), (tx) =>
-      tx.abfrage(
-        `select b.*, b.brutto_cent::float8 as brutto_cent, b.ust_cent::float8 as ust_cent, d.titel as datei_titel, d.mime
+  async belege(@Kontext() k: Anfragekontext, @Query() q: { limit?: string; cursor?: string }, @Res({ passthrough: true }) res: Response) {
+    const s = seite(q);
+    const zeilen = await this.db.imKontext(this.kontext(k), (tx) =>
+      tx.abfrage<{ gesamt: number }>(
+        `select b.*, b.brutto_cent::float8 as brutto_cent, b.ust_cent::float8 as ust_cent, d.titel as datei_titel, d.mime, count(*) over () as gesamt
            from app.beleg b join app.dokument d on d.id = b.dokument_id
-          where b.unternehmen_id = $1 order by b.belegdatum desc nulls first, b.erfasst_am desc`,
-        [k.unternehmenId],
+          where b.unternehmen_id = $1 order by b.belegdatum desc nulls first, b.erfasst_am desc, b.id limit $2 offset $3`,
+        [k.unternehmenId, s.limit, s.versatz],
       ),
     );
+    return seitenkopf(res, zeilen, s);
   }
 
   /** Beleg hochladen (PDF, Foto oder E-Rechnung als XML). E-Rechnungen werden gelesen und vorbefüllt. */
@@ -441,7 +455,11 @@ export class FinanzenController {
       try {
         gelesen = eRechnungLesen(datei.buffer.toString("utf8"));
       } catch (e) {
-        throw new UnprocessableEntityException({ meldung: "Keine lesbare E-Rechnung", fehler: [{ feld: "datei", meldung: (e as Error).message }] });
+        // Feste Texte statt Parser-Details (G3): nur der DOCTYPE-Fall bekommt einen eigenen Hinweis
+        const meldung = /DOCTYPE|ENTITY/.test((e as Error).message)
+          ? "Die Datei enthält DOCTYPE- oder ENTITY-Angaben und wird aus Sicherheitsgründen abgelehnt."
+          : "Die Datei ist keine lesbare E-Rechnung (XRechnung oder ZUGFeRD im Format CII oder UBL).";
+        throw new UnprocessableEntityException({ meldung: "Keine lesbare E-Rechnung", fehler: [{ feld: "datei", meldung }] });
       }
     }
     return this.db
@@ -494,7 +512,7 @@ export class FinanzenController {
   // ------------------------------------------------------------ Auswertungen
 
   /** Übersicht: Umsatz des Jahres aus Rechnungen, Kleinunternehmergrenze, offene Entwürfe. */
-  @MitUnternehmen()
+  @MitUnternehmen(...LESEN_VERTRAULICH)
   @Get("finanzen/uebersicht")
   async uebersicht(@Kontext() k: Anfragekontext) {
     return this.db.imKontext(this.kontext(k), async (tx) => {
@@ -532,7 +550,7 @@ export class FinanzenController {
    * aus den gestellten Rechnungen (nach Rechnungsdatum), Vorsteuer aus den Belegen (nach Belegdatum).
    * Keine Kennzahlen des amtlichen Formulars (stehen nicht in der Spezifikation, T-08).
    */
-  @MitUnternehmen()
+  @MitUnternehmen(...LESEN_VERTRAULICH)
   @Get("finanzen/ust-voranmeldung")
   async ustVoranmeldung(@Kontext() k: Anfragekontext, @Query("periode") periode = "") {
     const zeitraum = ustZeitraum(periode);
@@ -562,7 +580,7 @@ export class FinanzenController {
 
   // ------------------------------------------------------------ Kassen
 
-  @MitUnternehmen()
+  @MitUnternehmen(...LESEN_VERTRAULICH)
   @Get("kassen")
   async kassen(@Kontext() k: Anfragekontext) {
     return this.db.imKontext(this.kontext(k), (tx) => tx.abfrage("select * from app.kasse where unternehmen_id = $1 order by angeschafft_am desc", [k.unternehmenId]));
@@ -573,6 +591,7 @@ export class FinanzenController {
    * erfasst, nutzt eine; die Anzahl entspricht den aktiven Kassen. So greifen TSE- und Meldepflichten ohne Rückfrage.
    */
   private async kassenProfil(tx: Tx, k: Anfragekontext) {
+    await profilSperren(tx, k.unternehmenId!);
     const p = await tx.eine<{ version: number; daten: Record<string, unknown> }>("select version, daten from app.profil_version where unternehmen_id = $1 order by version desc limit 1", [k.unternehmenId]);
     const anzahl = (await tx.eine<{ n: number }>("select count(*)::int as n from app.kasse where unternehmen_id = $1 and ausser_betrieb_am is null", [k.unternehmenId]))!.n;
     const daten = { ...(p?.daten ?? {}), "kasse.elektronisch": anzahl > 0 ? true : (p?.daten["kasse.elektronisch"] ?? null), "kasse.anzahl": anzahl };

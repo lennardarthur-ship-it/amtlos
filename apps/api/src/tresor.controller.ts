@@ -1,6 +1,6 @@
 import { Body, ConflictException, Controller, Delete, Get, HttpCode, HttpException, Inject, NotFoundException, Param, PayloadTooLargeException, Post, Put } from "@nestjs/common";
 import { z } from "zod";
-import { Datenbank } from "@amtlos/server";
+import { Datenbank, type Tx } from "@amtlos/server";
 import { Kontext, type Anfragekontext } from "./auth.js";
 import { pruefe } from "./hilfen.js";
 import { KONFIGURATION, type Konfiguration } from "./konfiguration.js";
@@ -9,6 +9,8 @@ import { KONFIGURATION, type Konfiguration } from "./konfiguration.js";
 const Chiffre = (max: number) => z.string().min(20).max(max).regex(/^\{"format":"amtlos-tresor"/, "Kein verschlüsselter Inhalt");
 const Schluessel = z.string().min(20).max(4000).regex(/^\{"format":"amtlos-schluessel"/, "Kein verschlüsselter Schlüssel");
 const DATEINAME = /^[A-Za-z0-9_-]{4,64}\.[a-z0-9]{1,8}$/;
+
+const voll = () => new PayloadTooLargeException({ statusCode: 413, meldung: "Der Speicher für die Synchronisation ist voll." });
 
 /** HTTP 402: Synchronisation gehört zu Amtlos Pro (nur geprüft, wenn REVENUECAT_SECRET_KEY gesetzt ist). */
 class ProNoetig extends HttpException {
@@ -57,6 +59,14 @@ export class TresorController {
     if (!pro) throw new ProNoetig();
   }
 
+  /** Belegung des Speichers; sperrt die Tresor-Zeile bis zum Ende der Transaktion (undefined: kein Tresor). */
+  private async belegung(tx: Tx, kontoId: string) {
+    const t = await tx.eine<{ stand_bytes: string }>("select coalesce(octet_length(daten), 0) as stand_bytes from app.tresor where konto_id = $1 for update", [kontoId]);
+    if (!t) return undefined;
+    const d = await tx.eine<{ anzahl: string; bytes: string | null }>("select count(*) as anzahl, sum(octet_length(daten)) as bytes from app.tresor_datei where konto_id = $1", [kontoId]);
+    return { stand_bytes: Number(t.stand_bytes), anzahl: Number(d?.anzahl ?? 0), dateien_bytes: Number(d?.bytes ?? 0) };
+  }
+
   @Get("tresor")
   async holen(@Kontext() k: Anfragekontext) {
     const t = await this.db.imKontext({ kontoId: k.kontoId }, (tx) => tx.eine<{ version: string; schluessel: string; daten: string | null; geaendert_am: string }>("select version, schluessel, daten, geaendert_am from app.tresor where konto_id = $1", [k.kontoId]));
@@ -80,6 +90,9 @@ export class TresorController {
     const d = pruefe(z.object({ version: z.number().int().min(0), daten: Chiffre(30_000_000) }).strict(), body);
     await this.proPruefen(k.kontoId);
     return this.db.imKontext({ kontoId: k.kontoId }, async (tx) => {
+      // Der Stand zählt zum Speicher (M-4): Dateien plus neuer Stand höchstens TRESOR_MAX_MB
+      const s = await this.belegung(tx, k.kontoId);
+      if (s && s.dateien_bytes + Buffer.byteLength(d.daten) > this.k.TRESOR_MAX_MB * 1024 * 1024) throw voll();
       const r = await tx.eine<{ version: string }>("update app.tresor set daten = $3, version = version + 1, geaendert_am = now() where konto_id = $1 and version = $2 returning version", [k.kontoId, d.version, d.daten]);
       if (r) return { version: Number(r.version) };
       const aktuell = await tx.eine<{ version: string }>("select version from app.tresor where konto_id = $1", [k.kontoId]);
@@ -121,10 +134,11 @@ export class TresorController {
     const d = pruefe(z.object({ daten: Chiffre(15_000_000) }).strict(), body);
     await this.proPruefen(k.kontoId);
     await this.db.imKontext({ kontoId: k.kontoId }, async (tx) => {
-      // Speicher je Konto begrenzen (E-143): Anzahl und Größe der Dateien
-      const s = await tx.eine<{ anzahl: string; bytes: string | null }>("select count(*) as anzahl, sum(octet_length(daten)) as bytes from app.tresor_datei where konto_id = $1", [k.kontoId]);
-      if (Number(s?.anzahl ?? 0) >= this.k.TRESOR_MAX_DATEIEN || Number(s?.bytes ?? 0) + d.daten.length > this.k.TRESOR_MAX_MB * 1024 * 1024)
-        throw new PayloadTooLargeException({ statusCode: 413, meldung: "Der Speicher für die Synchronisation ist voll." });
+      // Speicher je Konto begrenzen (E-143, M-4): Anzahl und Größe der Dateien plus Stand, unter der Sperre der
+      // Tresor-Zeile – parallele Uploads warten aufeinander und überschreiten die Grenze nicht
+      const s = await this.belegung(tx, k.kontoId);
+      if (!s) throw new NotFoundException("Noch keine Synchronisation eingerichtet");
+      if (s.anzahl >= this.k.TRESOR_MAX_DATEIEN || s.dateien_bytes + s.stand_bytes + Buffer.byteLength(d.daten) > this.k.TRESOR_MAX_MB * 1024 * 1024) throw voll();
       await tx.abfrage("insert into app.tresor_datei (konto_id, name, daten) values ($1, $2, $3) on conflict (konto_id, name) do nothing", [k.kontoId, name, d.daten]);
     });
   }

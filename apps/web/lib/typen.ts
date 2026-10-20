@@ -42,6 +42,8 @@ export interface Heute {
   als_naechstes: Karte[];
   zaehler: { offen: number; ueberfaellig: number; angabe_fehlt: number; erledigt: number; klar: number; naechste_90: number };
   vor_start: { anzahl: number; seit: string | null };
+  /** Passt der Plan zum letzten Profil? (M5, H2) */
+  berechnung?: { status: "kein_profil" | "laeuft" | "aktuell" | "fehlgeschlagen"; profil_version: number; berechnet_version: number | null; seit: string | null };
 }
 
 export interface GruendungsSchritt extends Karte {

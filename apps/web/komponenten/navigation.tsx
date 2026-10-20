@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 export interface NavEintrag {
   href: string;
@@ -46,8 +46,12 @@ function Symbol({ art }: { art: NavEintrag["symbol"] }) {
 }
 
 /** Desktop: Seitenleiste links. Mobil: Leiste unten mit großen Zielen. */
-export function Navigation({ eintraege, beschriftung }: { eintraege: NavEintrag[]; beschriftung: string }) {
+export function Navigation({ eintraege: alle, beschriftung }: { eintraege: NavEintrag[]; beschriftung: string }) {
   const pfad = usePathname();
+  const suche = useSearchParams();
+  // Schnellstart (UX 7): nur der Weg zurück zu „Heute“ – die übrigen Bereiche sind vor dem ersten Plan noch leer
+  const schnellstart = pfad.startsWith("/onboarding") && suche.get("phase") === "schnell";
+  const eintraege = schnellstart ? alle.filter((e) => e.href === "/heute").map((e) => ({ ...e, nurDesktop: false })) : alle;
   const mobilVersteckt = eintraege.filter((e) => e.nurDesktop).map((e) => e.href);
   const unter = (h: string) => pfad === h || pfad.startsWith(`${h}/`);
   // „Mehr“ ist aktiv auf seinen Unterseiten und – nur mobil sichtbar markiert – auf den mobil versteckten Bereichen.

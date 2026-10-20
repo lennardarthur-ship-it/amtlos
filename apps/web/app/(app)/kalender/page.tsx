@@ -69,7 +69,7 @@ export default async function KalenderSeite() {
                             <span className={`w-16 flex-none whitespace-nowrap text-right tabular-nums ${k.status === "erledigt" ? "text-tinte-leise" : "font-bold"}`}>
                               {ueberfaelligAlt ? `${d.tag}.${k.faellig_am!.slice(5, 7)}.` : `${d.wochentag} ${d.tag}.`}
                             </span>
-                            <span className={`flex min-w-0 items-start gap-2 ${k.status === "erledigt" ? "text-tinte-leise line-through" : ""}`}>
+                            <span className={`flex min-w-0 items-start gap-2 hyphens-auto [overflow-wrap:anywhere] ${k.status === "erledigt" ? "text-tinte-leise line-through" : ""}`}>
                               <StatusForm status={k.status} className={`mt-1.5 ${k.status === "ueberfaellig" ? "text-frist" : k.status === "faellig_bald" ? "text-bald" : k.status === "erledigt" ? "text-amt" : ""}`} />
                               <span>
                                 {k.titel}
@@ -88,7 +88,7 @@ export default async function KalenderSeite() {
                             <span className={`w-16 flex-none whitespace-nowrap text-right font-bold tabular-nums ${w.datum.slice(0, 7) < dieserMonat ? "text-frist" : ""}`}>
                               {w.datum.slice(0, 7) !== m ? `${d.tag}.${w.datum.slice(5, 7)}.` : `${d.wochentag} ${d.tag}.`}
                             </span>
-                            <span className="min-w-0">{w.titel}</span>
+                            <span className="min-w-0 hyphens-auto [overflow-wrap:anywhere]">{w.titel}</span>
                           </Link>
                         </li>
                       );

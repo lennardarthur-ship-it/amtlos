@@ -28,6 +28,8 @@ jobs:
       - run: pnpm test
       - name: Katalogauszug der App aktuell (E-121)
         run: node apps/mobile/werkzeuge/katalog-buendel.mjs && git diff --exit-code apps/mobile/src/unterlagen/katalog.json apps/mobile/src/pflichten/katalog.json
+      - name: Erzeugte Bausteine aktuell (E-123, aus docs/recherche)
+        run: node packages/fachlogik/werkzeuge/bausteine-erzeugen.mjs && git diff --exit-code packages/fachlogik/src/dokumente/bausteine.ts
       - name: Mobile App bündeln (Metro, Android und iOS)
         run: |
           cd apps/mobile
@@ -275,13 +277,16 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @amtlos/server... --filter @amtlos/fachlogik build
       - run: node scripts/e-rechnung-beispiele.mjs e-rechnungen
-      - name: KoSIT-Validator und XRechnung-Konfiguration laden (offizielle Releases)
+      - name: KoSIT-Validator und XRechnung-Konfiguration laden (offizielle Releases, feste Versionen)
         env:
           GH_TOKEN: ${{ github.token }}
+          # Feste Versionen statt „neueste“ (Reproduzierbarkeit): bewusst anheben, wenn KoSIT neue Regeln veröffentlicht
+          KOSIT_VALIDATOR: v1.6.2
+          KOSIT_XRECHNUNG: v2026-01-31
         run: |
           mkdir -p kosit && cd kosit
-          gh release download --repo itplr-kosit/validator --pattern '*.zip' --clobber
-          gh release download --repo itplr-kosit/validator-configuration-xrechnung --pattern '*.zip' --clobber
+          gh release download "$KOSIT_VALIDATOR" --repo itplr-kosit/validator --pattern '*.zip' --clobber
+          gh release download "$KOSIT_XRECHNUNG" --repo itplr-kosit/validator-configuration-xrechnung --pattern '*.zip' --clobber
           for z in *.zip; do unzip -oq "$z"; done
           ls
       - name: Beispielrechnungen prüfen

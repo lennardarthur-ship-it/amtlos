@@ -1,4 +1,5 @@
 import type PgBoss from "pg-boss";
+import { z } from "zod";
 import {
   JOBS,
   heute,
@@ -13,6 +14,17 @@ import {
   type NeuberechnungsJob,
   type Versand,
 } from "@amtlos/server";
+
+/**
+ * Empfänger prüfen, bevor nodemailer ihn sieht (M-5): Die Adresse stammt aus dem Token des Identitätsanbieters bzw. aus
+ * einer Einladung. Genau eine Adresse (höchstens 254 Zeichen), ohne Zeilenumbrüche, Listen oder Gruppen.
+ */
+const Empfaenger = z.string().max(254).email().refine((x) => !/[\r\n,;<>"]/.test(x), "Genau eine Adresse");
+export function empfaengerPruefen(an: string): string {
+  const r = Empfaenger.safeParse(an);
+  if (!r.success) throw new Error("Empfängeradresse ungültig");
+  return r.data;
+}
 
 export interface Protokoll {
   info(msg: string, daten?: Record<string, unknown>): void;
@@ -35,13 +47,50 @@ export async function verteileNeuberechnungen(db: Datenbank, boss: PgBoss, grund
   return ids.length;
 }
 
-export async function arbeiterStarten(boss: PgBoss, db: Datenbank, versand: Versand, appUrl: string, log: Protokoll) {
-  await boss.work<NeuberechnungsJob>(JOBS.neuberechnung, { batchSize: 5 }, async (jobs) => {
-    for (const job of jobs) {
-      const r = await verarbeiteNeuberechnung(db, job.data);
+/** Kurzer, fester Grund für Logs und app.berechnung_fehler – ohne Profilwerte (z. B. das kaputte Datum selbst). */
+export function fehlerGrund(e: unknown): string {
+  const m = e instanceof Error ? e.message : String(e);
+  return m.replace(/'[^']*'/g, "'…'").replace(/"[^"]*"/g, '"…"').slice(0, 300);
+}
+
+/** Fehlversuch vermerken (H2): „Heute“ zeigt dann einen Fehlerzustand statt endlos „Einen Moment …“. */
+export async function berechnungFehlerVermerken(db: Datenbank, unternehmenId: string, versuch: number, endgueltig: boolean, grund: string) {
+  await db.imKontext({ unternehmenId }, (tx) =>
+    tx.abfrage(
+      `insert into app.berechnung_fehler (unternehmen_id, profil_version, versuch, endgueltig, grund)
+       values ($1, (select max(version) from app.profil_version where unternehmen_id = $1), $2, $3, $4)`,
+      [unternehmenId, versuch, endgueltig, grund],
+    ),
+  );
+}
+
+type JobMitMeta = { id: string; data: NeuberechnungsJob; retryCount?: number; retryLimit?: number };
+
+/**
+ * Neuberechnungen in Paketen (H2): jeder Job einzeln abgesichert. pg-boss markiert bei einer Ausnahme im Handler das
+ * ganze Paket als fehlgeschlagen – ein kaputtes Unternehmen hielt so bis zu vier andere auf. Fehlgeschlagene Jobs
+ * meldet der Handler einzeln mit boss.fail (Wiederholung nach der Queue-Einstellung), die übrigen schließt pg-boss ab.
+ */
+export async function neuberechnungsPaket(boss: Pick<PgBoss, "fail">, db: Datenbank, jobs: JobMitMeta[], log: Protokoll, rechnen = verarbeiteNeuberechnung) {
+  for (const job of jobs) {
+    try {
+      const r = await rechnen(db, job.data);
       log.info("neuberechnung", { unternehmen: job.data.unternehmenId, grund: job.data.ausgeloestDurch, status: r.status, ...r.instanzen, erinnerungen: r.erinnerungen });
+    } catch (e) {
+      const versuch = job.retryCount ?? 0;
+      const endgueltig = job.retryLimit !== undefined && versuch >= job.retryLimit;
+      const grund = fehlerGrund(e);
+      log.fehler("neuberechnung_fehler", { unternehmen: job.data.unternehmenId, grund: job.data.ausgeloestDurch, meldung: grund, versuch, endgueltig });
+      await berechnungFehlerVermerken(db, job.data.unternehmenId, versuch, endgueltig, grund).catch((v: unknown) =>
+        log.fehler("neuberechnung_fehler_vermerk", { unternehmen: job.data.unternehmenId, meldung: fehlerGrund(v) }),
+      );
+      await boss.fail(JOBS.neuberechnung, job.id, { meldung: grund });
     }
-  });
+  }
+}
+
+export async function arbeiterStarten(boss: PgBoss, db: Datenbank, versand: Versand, appUrl: string, log: Protokoll) {
+  await boss.work<NeuberechnungsJob>(JOBS.neuberechnung, { batchSize: 5, includeMetadata: true }, (jobs) => neuberechnungsPaket(boss, db, jobs, log));
   await boss.work<{ grund?: string }>(JOBS.tageswechsel, async ([job]) => {
     const n = await verteileNeuberechnungen(db, boss, job?.data.grund ?? `tageswechsel:${heute()}`);
     log.info("tageswechsel", { unternehmen: n });

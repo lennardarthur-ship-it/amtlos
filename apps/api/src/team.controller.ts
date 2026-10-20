@@ -1,10 +1,10 @@
 import { createHash, randomBytes } from "node:crypto";
-import { Body, ConflictException, Controller, Delete, ForbiddenException, Get, HttpCode, Inject, NotFoundException, Param, Post, Put } from "@nestjs/common";
+import { Body, ConflictException, Controller, Delete, ForbiddenException, Get, HttpCode, HttpException, Inject, NotFoundException, Param, Post, Put } from "@nestjs/common";
 import type PgBoss from "pg-boss";
 import { z } from "zod";
 import { Datenbank, einladungEinreihen, pgFehlercode } from "@amtlos/server";
 import { Kontext, MitUnternehmen, OhneAbo, type Anfragekontext } from "./auth.js";
-import { pruefe, uebersetzeDbFehler } from "./hilfen.js";
+import { emailBestaetigt, pruefe, uebersetzeDbFehler } from "./hilfen.js";
 import { KONFIGURATION, type Konfiguration } from "./konfiguration.js";
 import { WARTESCHLANGE } from "./kern.controller.js";
 
@@ -50,7 +50,15 @@ export class TeamController {
             [k.unternehmenId],
           )
         : [];
-      return { mitglieder: mitglieder.map((m) => ({ ...m, ich: m.konto_id === k.kontoId })), einladungen, darf_verwalten: verwaltet };
+      // E-Mail-Adressen der anderen sehen nur Inhaber, Admins und die Steuerberatung (H4)
+      const adressen = k.rolle !== "mitarbeiter";
+      return {
+        mitglieder: mitglieder.map((m) => ({ ...m, email: adressen || m.konto_id === k.kontoId ? m.email : null, ich: m.konto_id === k.kontoId })),
+        einladungen,
+        darf_verwalten: verwaltet,
+        // Der letzte Inhaber kann nicht austreten (G7) – die Oberfläche bietet den Knopf dann nicht an
+        darf_verlassen: !(k.rolle === "inhaber" && mitglieder.filter((m) => m.rolle === "inhaber").length <= 1),
+      };
     });
   }
 
@@ -59,6 +67,7 @@ export class TeamController {
   @Post("einladungen")
   async einladen(@Kontext() k: Anfragekontext, @Body() body: unknown) {
     const { email, rolle } = pruefe(EinladungNeu, body);
+    await emailBestaetigt(this.db, k.kontoId);
     const token = randomBytes(32).toString("base64url");
     return this.db
       .imKontext({ kontoId: k.kontoId, unternehmenId: k.unternehmenId }, async (tx) => {
@@ -67,6 +76,10 @@ export class TeamController {
           [k.unternehmenId, email],
         );
         if (schonDa) throw new ConflictException("Diese Person ist schon im Team");
+        // Grenze je Unternehmen und Tag (M12): Einladungen sind E-Mails an beliebige Adressen
+        const heute = await tx.eine<{ n: number }>("select count(*)::int as n from app.einladung where unternehmen_id = $1 and erstellt_am > now() - interval '1 day'", [k.unternehmenId]);
+        if ((heute?.n ?? 0) >= this.k.EINLADUNGEN_JE_TAG)
+          throw new HttpException({ statusCode: 429, meldung: "Heute wurden schon sehr viele Einladungen verschickt. Bitte versuche es morgen wieder." }, 429);
         // Eine neue Einladung ersetzt eine offene an dieselbe Adresse (der alte Link wird ungültig).
         await tx.abfrage(
           "update app.einladung set widerrufen_am = now() where unternehmen_id = $1 and email = $2 and angenommen_am is null and widerrufen_am is null",

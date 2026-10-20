@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 import { z } from "zod";
 import { Datenbank, ExpoPush, ProtokollVersand, erzeugeWarteschlange, type Nachricht, type PushNachricht, type Versand } from "@amtlos/server";
-import { arbeiterStarten, type Protokoll } from "./arbeit.js";
+import { arbeiterStarten, empfaengerPruefen, type Protokoll } from "./arbeit.js";
 
 const Konfig = z
   .object({
@@ -31,7 +31,9 @@ class SmtpVersand implements Versand {
     this.transport = nodemailer.createTransport(url);
   }
   async email(n: Nachricht): Promise<void> {
-    await this.transport.sendMail({ from: this.absender, to: n.an, subject: n.betreff, text: n.text });
+    const an = empfaengerPruefen(n.an);
+    // Betreff einzeilig (Katalogtitel), damit keine Kopfzeilen entstehen können
+    await this.transport.sendMail({ from: this.absender, to: { name: "", address: an }, subject: n.betreff.replace(/[\r\n]+/g, " "), text: n.text });
   }
 }
 

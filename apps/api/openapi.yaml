@@ -114,22 +114,26 @@ paths:
     put:
       tags: [Profil und Ereignisse]
       summary: Neue Profilversion speichern und Neuberechnung einreihen
-      description: Profile werden nie überschrieben (E-018). Aufbau der Daten siehe `apps/api/src/profil-schema.ts`.
+      description: >-
+        Profile werden nie überschrieben (E-018). Aufbau der Daten siehe `apps/api/src/profil-schema.ts`. Entweder `daten`
+        (ganzes Profil) oder `aenderungen` (nur geänderte Angaben, `null` löscht; der Server führt sie mit der aktuellen
+        Version zusammen). Mit `erwartete_version` antwortet die API mit 409, wenn inzwischen jemand anderes gespeichert hat.
       x-rollen: [inhaber, admin, steuerberater]
       parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
       requestBody:
         required: true
-        content: { application/json: { schema: { type: object, required: [daten], additionalProperties: false, properties: { daten: { $ref: "#/components/schemas/ProfilDaten" } } } } }
+        content: { application/json: { schema: { type: object, additionalProperties: false, properties: { daten: { $ref: "#/components/schemas/ProfilDaten" }, aenderungen: { type: object }, erwartete_version: { type: integer, minimum: 0 } } } } }
       responses:
         "200": { description: Gespeichert, content: { application/json: { schema: { type: object, properties: { version: { type: integer }, daten: { $ref: "#/components/schemas/ProfilDaten" } } } } } }
         "403": { $ref: "#/components/responses/KeineBerechtigung" }
+        "409": { description: Profil wurde inzwischen geändert (enthält die aktuelle Version) }
         "422": { $ref: "#/components/responses/Eingabefehler" }
 
   /v1/ereignisse:
     get:
       tags: [Profil und Ereignisse]
-      summary: Gemeldete Ereignisse (neueste zuerst)
-      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      summary: Gemeldete Ereignisse (neueste zuerst), seitenweise
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { $ref: "#/components/parameters/Limit" }, { $ref: "#/components/parameters/Cursor" }]
       responses:
         "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Ereignis" } } } } }
     post:
@@ -180,6 +184,8 @@ paths:
       parameters:
         - { $ref: "#/components/parameters/Unternehmen" }
         - { name: status, in: query, schema: { enum: [offen, faellig_bald, ueberfaellig, angabe_fehlt, erledigt, nicht_zutreffend, alle], default: alle } }
+        - { $ref: "#/components/parameters/Limit" }
+        - { $ref: "#/components/parameters/Cursor" }
       responses:
         "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/PflichtKarte" } } } } }
 
@@ -240,6 +246,14 @@ paths:
                   zaehler: { type: object, properties: { offen: { type: integer }, ueberfaellig: { type: integer }, angabe_fehlt: { type: integer }, erledigt: { type: integer }, klar: { type: integer, description: sicher geltende offene Pflichten }, naechste_90: { type: integer, description: davon mit Frist in 90 Tagen oder überfällig } } }
                   als_naechstes: { type: array, maxItems: 3, items: { $ref: "#/components/schemas/PflichtKarte" } }
                   vor_start: { type: object, properties: { anzahl: { type: integer }, seit: { type: [string, "null"], format: date } } }
+                  berechnung:
+                    type: object
+                    description: Passt der Plan zum letzten Profil? (Die Oberfläche wartet, bis status „aktuell“ ist.)
+                    properties:
+                      status: { type: string, enum: [kein_profil, laeuft, aktuell, fehlgeschlagen] }
+                      profil_version: { type: integer }
+                      berechnet_version: { type: [integer, "null"] }
+                      seit: { type: [string, "null"], format: date-time, description: Zeitpunkt der letzten Profilversion }
 
   /v1/gruendung:
     get:
@@ -318,6 +332,7 @@ paths:
     get:
       tags: [Finanzen]
       summary: Eigene Angaben für Rechnungen (Anschrift, Steuernummer/USt-IdNr., Bank)
+      x-rollen: [inhaber, admin, steuerberater]
       parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
       responses:
         "200": { description: OK (leer, wenn noch nicht erfasst) }
@@ -335,6 +350,7 @@ paths:
     get:
       tags: [Finanzen]
       summary: Kunden
+      x-rollen: [inhaber, admin, steuerberater]
       parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
       responses:
         "200": { description: OK }
@@ -352,7 +368,8 @@ paths:
     get:
       tags: [Finanzen]
       summary: Rechnungen (Entwürfe zuerst, dann nach Datum)
-      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { $ref: "#/components/parameters/Limit" }, { $ref: "#/components/parameters/Cursor" }]
       responses:
         "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Rechnung" } } } } }
     post:
@@ -368,6 +385,7 @@ paths:
     get:
       tags: [Finanzen]
       summary: Eine Rechnung
+      x-rollen: [inhaber, admin, steuerberater]
       parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
       responses:
         "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Rechnung" } } } }
@@ -424,7 +442,8 @@ paths:
     get:
       tags: [Finanzen]
       summary: Belege
-      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      x-rollen: [inhaber, admin, steuerberater]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { $ref: "#/components/parameters/Limit" }, { $ref: "#/components/parameters/Cursor" }]
       responses:
         "200": { description: OK }
     post:
@@ -465,6 +484,7 @@ paths:
     get:
       tags: [Finanzen]
       summary: Umsatz des Jahres aus den Rechnungen, Stand zur Kleinunternehmergrenze, Entwürfe und Belege
+      x-rollen: [inhaber, admin, steuerberater]
       parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
       responses:
         "200": { description: OK }
@@ -473,6 +493,7 @@ paths:
     get:
       tags: [Finanzen]
       summary: Vorbereitung der USt-Voranmeldung (Umsätze je Satz, Umsatzsteuer, Vorsteuer, Zahllast) – ohne Formular-Kennzahlen
+      x-rollen: [inhaber, admin, steuerberater]
       parameters:
         - { $ref: "#/components/parameters/Unternehmen" }
         - { name: periode, in: query, required: true, schema: { type: string, pattern: "^\\d{4}-(0[1-9]|1[0-2]|Q[1-4])$" } }
@@ -484,6 +505,7 @@ paths:
     get:
       tags: [Finanzen]
       summary: Elektronische Kassen
+      x-rollen: [inhaber, admin, steuerberater]
       parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
       responses:
         "200": { description: OK }
@@ -551,6 +573,7 @@ paths:
     get:
       tags: [Personal]
       summary: Checkliste zu Einstellung und Austritt – die Pflichten, die dafür entstanden sind
+      x-rollen: [inhaber, admin, steuerberater]
       parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
       responses:
         "200": { description: OK }
@@ -1108,6 +1131,7 @@ paths:
     get:
       tags: [Datenschutz]
       summary: Anfragen Betroffener mit Fristuhr (Tage bis zur Frist)
+      x-rollen: [inhaber, admin, steuerberater]
       parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
       responses:
         "200": { description: OK }
@@ -1147,6 +1171,7 @@ paths:
     get:
       tags: [Datenschutz]
       summary: Datenpannen mit 72-Stunden-Frist
+      x-rollen: [inhaber, admin, steuerberater]
       parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
       responses:
         "200": { description: OK }
@@ -1163,6 +1188,7 @@ paths:
     get:
       tags: [Datenschutz]
       summary: Datenpanne
+      x-rollen: [inhaber, admin, steuerberater]
       parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
       responses:
         "200": { description: OK }
@@ -1207,6 +1233,7 @@ paths:
     get:
       tags: [Datenschutz]
       summary: Meldeentwurf als PDF (Gliederung nach Art. 33 Abs. 3 DSGVO)
+      x-rollen: [inhaber, admin, steuerberater]
       parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { name: id, in: path, required: true, schema: { type: string, format: uuid } }]
       responses:
         "200": { description: PDF, content: { application/pdf: { schema: { type: string, format: binary } } } }
@@ -1384,7 +1411,7 @@ paths:
     get:
       tags: [Assistent]
       summary: Eigene Benachrichtigungen (ungelesene zuerst) – z. B. „Was ändert sich für dich?“
-      parameters: [{ $ref: "#/components/parameters/Unternehmen" }]
+      parameters: [{ $ref: "#/components/parameters/Unternehmen" }, { $ref: "#/components/parameters/Limit" }, { $ref: "#/components/parameters/Cursor" }]
       responses:
         "200": { description: OK }
 
@@ -1682,7 +1709,12 @@ paths:
   /v1/mandanten:
     get:
       tags: [Kanzlei]
-      summary: Alle eigenen Unternehmen mit Ampel, Zählern und dringendster Pflicht (Kanzlei-Übersicht)
+      summary: Alle eigenen Unternehmen mit Ampel, Zählern und dringendster Pflicht (Kanzlei-Übersicht), seitenweise
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 200 } }
+        - { name: cursor, in: query, schema: { type: string }, description: Wert aus dem Header X-Naechster-Cursor }
+        - { name: suche, in: query, schema: { type: string, maxLength: 100 }, description: Teil des Namens }
+        - { name: filter, in: query, schema: { type: string, enum: [alle, ueberfaellig, angabe_fehlt, einladung] } }
       responses:
         "200":
           description: OK
@@ -1701,6 +1733,14 @@ paths:
                     zaehler: { type: object }
                     ampel: { type: object }
                     naechste: { type: object, nullable: true }
+                    einladung:
+                      type: object
+                      nullable: true
+                      description: Stand der Inhaber-Einladung (nur für die Steuerberatung, solange es keinen Inhaber gibt)
+                      properties:
+                        email: { type: string }
+                        laeuft_ab: { type: string, format: date-time }
+                        status: { type: string, enum: [offen, abgelaufen, angenommen, widerrufen] }
     post:
       tags: [Kanzlei]
       summary: Mandant anlegen – die Kanzlei wird Steuerberatung, der Mandant erhält eine Einladung als Inhaber (Link nur in dieser Antwort)
@@ -1708,6 +1748,18 @@ paths:
       responses:
         "201": { description: Angelegt }
         "422": { $ref: "#/components/responses/Eingabefehler" }
+
+  /v1/mandanten/{id}/einladung-erneuern:
+    post:
+      tags: [Kanzlei]
+      summary: Inhaber-Einladung erneut senden (nur Steuerberatung, solange das Unternehmen keinen Inhaber hat; alte Links werden ungültig)
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: false, content: { application/json: { schema: { type: object, additionalProperties: false, properties: { email: { type: string, format: email } } } } } }
+      responses:
+        "201": { description: Neue Einladung (Link nur in dieser Antwort) }
+        "404": { description: Kein eigener Mandant }
+        "409": { description: Der Mandant hat schon einen Inhaber }
+        "429": { description: Tagesgrenze für Mandanten und Einladungen erreicht }
 
   /v1/marke:
     get:
@@ -1896,6 +1948,9 @@ components:
 
   parameters:
     Unternehmen: { name: X-Unternehmen-Id, in: header, required: true, schema: { type: string, format: uuid } }
+    # Seitenweise Listen (M9): Gesamtzahl im Header X-Gesamt, nächster Cursor in X-Naechster-Cursor
+    Limit: { name: limit, in: query, required: false, schema: { type: integer, minimum: 1, maximum: 200, default: 200 } }
+    Cursor: { name: cursor, in: query, required: false, schema: { type: string } }
     PflichtId: { name: pflichtId, in: path, required: true, schema: { type: string, example: steuern.ust_voranmeldung } }
     Periode: { name: periode, in: path, required: true, schema: { type: string, pattern: "^(einmalig|\\d{4}(-(0[1-9]|1[0-2]|Q[1-4]|H[12]))?|aenderung-\\d+)$", example: 2026-09 } }
 

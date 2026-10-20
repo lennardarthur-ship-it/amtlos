@@ -13,7 +13,7 @@ async function anlegen(formular: FormData) {
   const marke = (await aktuelleMarke())?.schluessel ?? null; // aus dem Hostnamen, nicht aus dem Formular
   const u = await apiOhneUnternehmen<{ id: string }>("/v1/unternehmen", { method: "POST", body: JSON.stringify({ name, marke }) });
   await unternehmenWaehlen(u.id);
-  redirect("/onboarding/rechtsform");
+  redirect("/onboarding/rechtsform?phase=schnell");
 }
 
 export default async function UnternehmenNeu() {

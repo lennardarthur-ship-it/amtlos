@@ -2,7 +2,7 @@ import { BadRequestException, Body, ConflictException, Controller, Delete, Get, 
 import type { Request } from "express";
 import { z } from "zod";
 import { Datenbank, aboStand, checkoutStarten, portalOeffnen, pruefeStripeSignatur, stripeEreignis, type StripeKlient } from "@amtlos/server";
-import { Kontext, MitUnternehmen, Oeffentlich, OhneAbo, type Anfragekontext } from "./auth.js";
+import { Kontext, KontoCache, MitUnternehmen, Oeffentlich, OhneAbo, type Anfragekontext } from "./auth.js";
 import { pruefe, uebersetzeDbFehler } from "./hilfen.js";
 import { KONFIGURATION, type Konfiguration } from "./konfiguration.js";
 
@@ -26,6 +26,7 @@ export class KontoController {
     @Inject(Datenbank) private readonly db: Datenbank,
     @Inject(KONFIGURATION) private readonly k: Konfiguration,
     @Inject(STRIPE) private readonly stripe: StripeKlient | null,
+    @Inject(KontoCache) private readonly kontoCache: KontoCache,
   ) {}
 
   private kontext(k: Anfragekontext) {
@@ -123,5 +124,7 @@ export class KontoController {
         if ((e as { code?: string }).code === "P0005") throw new ConflictException("Zuerst alle Unternehmen löschen oder verlassen");
         throw e;
       });
+    // Das Token zeigt sonst bis zu 5 Minuten weiter auf das gelöschte Konto (G-7)
+    this.kontoCache.delete(k.sub);
   }
 }

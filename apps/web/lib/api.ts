@@ -44,11 +44,17 @@ export const aktivesUnternehmen = cache(async () => {
   return i.unternehmen.find((u) => u.id === gewaehlt) ?? i.unternehmen[0]!;
 });
 
-/** API-Aufruf im Kontext des aktiven Unternehmens. 404 → notFound(), 422 → EingabeFehler. */
+export type Rolle = Ich["unternehmen"][number]["rolle"];
+/** Darf diese Rolle Angaben ändern und vertrauliche Bereiche sehen? (API: LESEN_VERTRAULICH, H3/H4) */
+export const darfVerwalten = (rolle: Rolle) => rolle !== "mitarbeiter";
+
+/** API-Aufruf im Kontext des aktiven Unternehmens. 404 → notFound(), 403 → Hinweis „keine Berechtigung“, 422 → EingabeFehler. */
 export async function api<T>(pfad: string, init: RequestInit = {}): Promise<T> {
   const u = await aktivesUnternehmen();
   const r = await roh(pfad, { ...init, unternehmen: u.id });
   if (r.status === 404) notFound();
+  // Rolle reicht nicht (z. B. Mitarbeiter:in): verständliche Seite statt allgemeiner Fehlerseite (H3)
+  if (r.status === 403) redirect("/keine-berechtigung");
   if (r.status === 402) redirect("/einstellungen/abo?abgelaufen=1"); // Testphase vorbei: zum Abo (E-113)
   if (r.status === 422) throw new EingabeFehler(((await r.json()) as { fehler?: { feld: string; meldung: string }[] }).fehler ?? []);
   if (!r.ok) throw new Error(`API ${init.method ?? "GET"} ${pfad}: ${r.status}`);

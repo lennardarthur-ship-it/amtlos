@@ -44,6 +44,14 @@ export function anzeigeStatus(i: { status: Instanz["status"]; ergebnis: PflichtE
   return i.faellig_am <= bald ? "faellig_bald" : "offen";
 }
 
+/**
+ * Begründung für „gilt nicht“ (H6): Die entscheidenden Sätze beschreiben die Bedingung, unter der die Pflicht gilt
+ * („Du stellst jemanden ein.“) – nicht ihre Verneinung. Deshalb als Bedingung formuliert: „Gilt erst, wenn: …“.
+ */
+export function nichtZutreffendGrund(saetze: string[]): string | null {
+  return saetze.length ? `Gilt erst, wenn: ${saetze.join(" ")}` : null;
+}
+
 export function sollInstanzen(
   ergebnisse: PflichtErgebnis[],
   pflichten: Map<string, Pflicht>,
@@ -66,7 +74,7 @@ export function sollInstanzen(
 
     if (e.ergebnis === "gilt_nicht") {
       soll.push({ ...basis, periode: "einmalig", status: "nicht_zutreffend", faellig_am: null, faellig_roh: null,
-        nicht_zutreffend_grund: entscheidendeSaetze(e.begruendung).join(" ") || null });
+        nicht_zutreffend_grund: nichtZutreffendGrund(entscheidendeSaetze(e.begruendung)) });
       continue;
     }
     if (e.ergebnis === "unbekannt" && p.frist.typ === "wiederkehrend") {

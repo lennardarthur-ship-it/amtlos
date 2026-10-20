@@ -59,10 +59,10 @@ export async function planeErinnerungen(tx: Tx, unternehmenId: string, stichtag:
   const gesendet = new Set<string>();
   const geplant = new Map<string, string>();
   for (const g of await tx.abfrage<{ s: string; status: string; geplant_fuer: Date }>(
-    "select pflicht_instanz_id || '|' || konto_id || '|' || kanal as s, status, geplant_fuer from app.erinnerung where unternehmen_id = $1 and status in ('gesendet', 'geplant')",
+    "select pflicht_instanz_id || '|' || konto_id || '|' || kanal as s, status, geplant_fuer from app.erinnerung where unternehmen_id = $1 and status in ('gesendet', 'in_versand', 'geplant')",
     [unternehmenId],
   )) {
-    if (g.status === "gesendet") gesendet.add(g.s);
+    if (g.status !== "geplant") gesendet.add(g.s); // im Versand zählt wie gesendet (keine zweite Sofort-Erinnerung)
     else if (!geplant.has(g.s) || g.geplant_fuer.toISOString() < geplant.get(g.s)!) geplant.set(g.s, g.geplant_fuer.toISOString());
   }
 
@@ -88,7 +88,7 @@ export async function planeErinnerungen(tx: Tx, unternehmenId: string, stichtag:
   // Nur Unterschiede schreiben (Lasttest E-109): Überholtes löschen, Neues einfügen, Gleiches stehen lassen
   const json = JSON.stringify(soll);
   await tx.abfrage(
-    `delete from app.erinnerung e where e.unternehmen_id = $1 and e.status = 'geplant'
+    `delete from app.erinnerung e where e.unternehmen_id = $1 and e.status = 'geplant' and e.versuche = 0
        and not exists (select 1 from jsonb_to_recordset($2::jsonb) as s(pflicht_instanz_id uuid, konto_id uuid, kanal text, geplant_fuer timestamptz)
                         where s.pflicht_instanz_id = e.pflicht_instanz_id and s.konto_id = e.konto_id and s.kanal = e.kanal and s.geplant_fuer = e.geplant_fuer)`,
     [unternehmenId, json],
@@ -137,58 +137,113 @@ export class ProtokollVersand implements Versand {
   }
 }
 
-/** Versendet fällige Erinnerungen. Läuft als Worker; jedes Unternehmen in eigenem Kontext. */
-export async function versendeFaelligeErinnerungen(db: Datenbank, versand: Versand, appUrl: string): Promise<{ gesendet: number; fehler: number }> {
-  const faellig = await db.imKontext({}, (tx) =>
-    tx.abfrage<{ erinnerung_id: string; unternehmen_id: string }>("select * from app.faellige_erinnerungen(500)"),
-  );
+/** Höchstens so viele Versuche je Erinnerung; Abstand 5, 10, 20, 40 Minuten … (M10) */
+export const MAX_VERSUCHE = 5;
+const abstandMinuten = (versuch: number) => 5 * 2 ** Math.max(0, versuch - 1);
+
+interface Vorgemerkt {
+  id: string; kanal: string; konto_id: string; email: string; sprache: string; faellig_am: Datum;
+  titel: { de: string; en?: string }; pflicht_id: string; periode: string; versuche: number;
+}
+
+/**
+ * Versendet fällige Erinnerungen (M10). Je Unternehmen in drei Schritten, damit nichts doppelt oder gar nicht ankommt:
+ * 1. vormerken: Status „in_versand“ setzen und committen (eine zweite Instanz überspringt diese Zeilen),
+ * 2. senden – außerhalb jeder Transaktion; ein Rollback kann keine schon verschickte Mail mehr „zurücknehmen“,
+ * 3. Ergebnis je Erinnerung festhalten: gesendet, oder nach einem Fehler erneut „geplant“ mit wachsendem Abstand
+ *    (nach MAX_VERSUCHE endgültig „fehler“). Bleibt eine Zeile in Schritt 2 hängen (Absturz), holt
+ *    app.faellige_erinnerungen sie nach einer Stunde wieder.
+ * Arbeitet in Paketen, bis nichts mehr ansteht (höchstens maxRunden × grenze je Lauf).
+ */
+export async function versendeFaelligeErinnerungen(
+  db: Datenbank,
+  versand: Versand,
+  appUrl: string,
+  optionen: { grenze?: number; maxRunden?: number } = {},
+): Promise<{ gesendet: number; fehler: number }> {
+  const grenze = optionen.grenze ?? 500;
   const z = { gesendet: 0, fehler: 0 };
-  for (const unternehmenId of new Set(faellig.map((f) => f.unternehmen_id))) {
-    const ids = faellig.filter((f) => f.unternehmen_id === unternehmenId).map((f) => f.erinnerung_id);
-    await db.imKontext({ unternehmenId }, async (tx) => {
-      const zeilen = await tx.abfrage<{ id: string; kanal: string; konto_id: string; email: string; sprache: string; faellig_am: Datum; titel: { de: string; en?: string }; pflicht_id: string; periode: string }>(
-        `select e.id, e.kanal, e.konto_id, k.email, k.sprache, pi.faellig_am, pv.daten->'titel' as titel, pi.pflicht_id, pi.periode
-           from app.erinnerung e
-           join app.konto k on k.id = e.konto_id
-           join app.pflicht_instanz pi on pi.id = e.pflicht_instanz_id
-           join katalog.pflicht_version_anzeige pv on pv.id = pi.pflicht_version_id
-          where e.id = any($1) and e.status = 'geplant' and pi.status = 'offen'
-          for update of e skip locked`,
-        [ids],
-      );
-      for (const z2 of zeilen) {
-        try {
-          const titel = (z2.sprache === "en" && z2.titel.en) || z2.titel.de;
-          const datum = new Date(`${z2.faellig_am}T12:00:00Z`).toLocaleDateString(z2.sprache === "en" ? "en-GB" : "de-DE", { timeZone: "UTC", day: "2-digit", month: "2-digit", year: "numeric" });
-          const betreff = z2.sprache === "en" ? `Due on ${datum}: ${titel}` : `Fällig am ${datum}: ${titel}`;
-          const pfad = `/pflichten/${encodeURIComponent(z2.pflicht_id)}/${encodeURIComponent(z2.periode)}`;
-          let status = "verworfen"; // sms: erst nach Anbieterwahl
-          if (z2.kanal === "email") {
-            await versand.email({ an: z2.email, betreff, text: `${titel}\n\n${appUrl}${pfad}` });
-            status = "gesendet";
-          } else if (z2.kanal === "push" && versand.push) {
-            const tokens = (await tx.abfrage<{ push_token: string }>("select push_token from app.geraet where konto_id = $1 and aktiv", [z2.konto_id])).map((g) => g.push_token);
-            if (tokens.length) {
-              // Push zeigt nur Titel und Datum (Sperrbildschirm), keine weiteren Unternehmensdaten
-              const r = await versand.push({ tokens, titel: betreff, text: z2.sprache === "en" ? "Open Amtlos to see what to do." : "Öffne Amtlos, um zu sehen, was zu tun ist.", link: pfad });
-              if (r.ungueltig.length) await tx.abfrage("update app.geraet set aktiv = false where push_token = any($1)", [r.ungueltig]);
-              status = "gesendet";
-            }
-          }
-          await tx.abfrage("update app.erinnerung set status = $2, gesendet_am = now() where id = $1", [z2.id, status]);
-          z.gesendet++;
-        } catch {
-          await tx.abfrage("update app.erinnerung set status = 'fehler' where id = $1", [z2.id]);
-          z.fehler++;
+  for (let runde = 0; runde < (optionen.maxRunden ?? 20); runde++) {
+    const faellig = await db.imKontext({}, (tx) =>
+      tx.abfrage<{ erinnerung_id: string; unternehmen_id: string }>("select * from app.faellige_erinnerungen($1)", [grenze]),
+    );
+    for (const unternehmenId of new Set(faellig.map((f) => f.unternehmen_id))) {
+      const ids = faellig.filter((f) => f.unternehmen_id === unternehmenId).map((f) => f.erinnerung_id);
+      const r = await versendeFuerUnternehmen(db, versand, appUrl, unternehmenId, ids);
+      z.gesendet += r.gesendet;
+      z.fehler += r.fehler;
+    }
+    if (faellig.length < grenze) break;
+  }
+  return z;
+}
+
+async function versendeFuerUnternehmen(db: Datenbank, versand: Versand, appUrl: string, unternehmenId: string, ids: string[]) {
+  const z = { gesendet: 0, fehler: 0 };
+  // 1. vormerken (eigene Transaktion, sofort committet)
+  const zeilen = await db.imKontext({ unternehmenId }, async (tx) => {
+    // Erinnerungen zu inzwischen erledigten Pflichten verwerfen
+    await tx.abfrage(
+      `update app.erinnerung e set status = 'verworfen' from app.pflicht_instanz pi
+        where e.id = any($1) and e.status in ('geplant', 'in_versand') and pi.id = e.pflicht_instanz_id and pi.status <> 'offen'`,
+      [ids],
+    );
+    const vorgemerkt = await tx.abfrage<Vorgemerkt>(
+      `select e.id, e.kanal, e.konto_id, k.email, k.sprache, pi.faellig_am, pv.daten->'titel' as titel, pi.pflicht_id, pi.periode, e.versuche
+         from app.erinnerung e
+         join app.konto k on k.id = e.konto_id
+         join app.pflicht_instanz pi on pi.id = e.pflicht_instanz_id
+         join katalog.pflicht_version_anzeige pv on pv.id = pi.pflicht_version_id
+        where e.id = any($1) and pi.status = 'offen'
+          and (e.status = 'geplant' or (e.status = 'in_versand' and e.versand_begonnen_am < now() - interval '1 hour'))
+        for update of e skip locked`,
+      [ids],
+    );
+    if (vorgemerkt.length)
+      await tx.abfrage("update app.erinnerung set status = 'in_versand', versand_begonnen_am = now() where id = any($1)", [vorgemerkt.map((v) => v.id)]);
+    return vorgemerkt;
+  });
+
+  // 2. senden, 3. Ergebnis je Erinnerung festhalten
+  for (const e of zeilen) {
+    let status: "gesendet" | "verworfen" = "verworfen"; // sms: erst nach Anbieterwahl
+    let ungueltig: string[] = [];
+    try {
+      const titel = (e.sprache === "en" && e.titel.en) || e.titel.de;
+      const datum = new Date(`${e.faellig_am}T12:00:00Z`).toLocaleDateString(e.sprache === "en" ? "en-GB" : "de-DE", { timeZone: "UTC", day: "2-digit", month: "2-digit", year: "numeric" });
+      const betreff = e.sprache === "en" ? `Due on ${datum}: ${titel}` : `Fällig am ${datum}: ${titel}`;
+      const pfad = `/pflichten/${encodeURIComponent(e.pflicht_id)}/${encodeURIComponent(e.periode)}`;
+      if (e.kanal === "email") {
+        await versand.email({ an: e.email, betreff, text: `${titel}\n\n${appUrl}${pfad}` });
+        status = "gesendet";
+      } else if (e.kanal === "push" && versand.push) {
+        const tokens = await db.imKontext({ unternehmenId }, async (tx) =>
+          (await tx.abfrage<{ push_token: string }>("select push_token from app.geraet where konto_id = $1 and aktiv", [e.konto_id])).map((g) => g.push_token),
+        );
+        if (tokens.length) {
+          // Push zeigt nur Titel und Datum (Sperrbildschirm), keine weiteren Unternehmensdaten
+          const r = await versand.push({ tokens, titel: betreff, text: e.sprache === "en" ? "Open Amtlos to see what to do." : "Öffne Amtlos, um zu sehen, was zu tun ist.", link: pfad });
+          ungueltig = r.ungueltig;
+          status = "gesendet";
         }
       }
-      // Erinnerungen zu inzwischen erledigten Pflichten verwerfen
-      await tx.abfrage(
-        `update app.erinnerung e set status = 'verworfen' from app.pflicht_instanz pi
-          where e.id = any($1) and e.status = 'geplant' and pi.id = e.pflicht_instanz_id and pi.status <> 'offen'`,
-        [ids],
+    } catch {
+      const versuche = e.versuche + 1;
+      await db.imKontext({ unternehmenId }, (tx) =>
+        tx.abfrage(
+          `update app.erinnerung set versuche = $2, status = $3, versand_begonnen_am = null,
+                  naechster_versuch = now() + make_interval(mins => $4) where id = $1`,
+          [e.id, versuche, versuche >= MAX_VERSUCHE ? "fehler" : "geplant", abstandMinuten(versuche)],
+        ),
       );
+      z.fehler++;
+      continue;
+    }
+    await db.imKontext({ unternehmenId }, async (tx) => {
+      if (ungueltig.length) await tx.abfrage("update app.geraet set aktiv = false where push_token = any($1)", [ungueltig]);
+      await tx.abfrage("update app.erinnerung set status = $2, gesendet_am = now(), versand_begonnen_am = null where id = $1", [e.id, status]);
     });
+    z.gesendet++;
   }
   return z;
 }

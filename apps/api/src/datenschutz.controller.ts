@@ -4,16 +4,15 @@ import type { Response } from "express";
 import type PgBoss from "pg-boss";
 import { z } from "zod";
 import { Datenbank, SCHUTZZIELE, datenpanneMeldungPdf, datenschutzDokumentationPdf, dokumentAblegen, heute, neuberechnungEinreihen, type Ablage, type Tx } from "@amtlos/server";
-import { Kontext, MitUnternehmen, type Anfragekontext } from "./auth.js";
+import { Kontext, LESEN_VERTRAULICH, MitUnternehmen, type Anfragekontext } from "./auth.js";
 import { ortsdatum, plusMonate } from "./datum.js";
 import { ABLAGE } from "./finanzen.controller.js";
-import { pruefe, uebersetzeDbFehler } from "./hilfen.js";
+import { DATUM, pruefe, uebersetzeDbFehler } from "./hilfen.js";
 import { WARTESCHLANGE } from "./kern.controller.js";
 import { profilNachziehen } from "./profil-sync.js";
 
 const SCHREIBEN = ["inhaber", "admin", "steuerberater"] as const;
 const Uuid = z.string().uuid();
-const DATUM = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Datum im Format JJJJ-MM-TT");
 const Zeitpunkt = z.string().datetime({ offset: true });
 const TEXT = (max: number) => z.string().trim().min(1).max(max);
 const FREI = (max: number) => z.string().trim().max(max).default("");
@@ -331,7 +330,7 @@ export class DatenschutzController {
 
   // ------------------------------------------------------------ Betroffenenanfragen
 
-  @MitUnternehmen()
+  @MitUnternehmen(...LESEN_VERTRAULICH)
   @Get("betroffenenanfragen")
   async anfragen(@Kontext() k: Anfragekontext) {
     return this.db.imKontext(this.kontext(k), (tx) =>
@@ -383,7 +382,7 @@ export class DatenschutzController {
 
   // ------------------------------------------------------------ Datenpannen
 
-  @MitUnternehmen()
+  @MitUnternehmen(...LESEN_VERTRAULICH)
   @Get("datenpannen")
   async pannen(@Kontext() k: Anfragekontext) {
     return this.db.imKontext(this.kontext(k), (tx) =>
@@ -414,7 +413,7 @@ export class DatenschutzController {
       .catch(uebersetzeDbFehler);
   }
 
-  @MitUnternehmen()
+  @MitUnternehmen(...LESEN_VERTRAULICH)
   @Get("datenpannen/:id")
   async panne(@Kontext() k: Anfragekontext, @Param("id") id: string) {
     pruefe(Uuid, id);
@@ -473,7 +472,7 @@ export class DatenschutzController {
   }
 
   /** Meldeentwurf als PDF (gegliedert nach Art. 33 Abs. 3 DSGVO) – Grundlage für das Portal der Aufsichtsbehörde. */
-  @MitUnternehmen()
+  @MitUnternehmen(...LESEN_VERTRAULICH)
   @Get("datenpannen/:id/meldeentwurf")
   async meldeentwurf(@Kontext() k: Anfragekontext, @Param("id") id: string, @Res() res: Response) {
     pruefe(Uuid, id);

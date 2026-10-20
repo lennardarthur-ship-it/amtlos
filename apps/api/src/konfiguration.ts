@@ -33,6 +33,16 @@ const Schema = z
     /** Speicher je Konto für die Synchronisation (E-143): höchstens so viele MB und Dateien */
     TRESOR_MAX_MB: z.coerce.number().int().positive().default(1024),
     TRESOR_MAX_DATEIEN: z.coerce.number().int().positive().default(5000),
+    /**
+     * Welchen vorgeschalteten Proxys X-Forwarded-For geglaubt wird (Express „trust proxy“, G-9): Anzahl der Hops (z. B. 1),
+     * Netze/Namen (z. B. „10.0.0.0/8“ oder „loopback, uniquelocal“) oder false. Standard: nur private Netze – wer die API
+     * direkt aus dem Internet erreicht, kann die IP-Grenze dann nicht mit einem gefälschten Header umgehen.
+     */
+    TRUST_PROXY: z.string().trim().min(1).default("loopback, linklocal, uniquelocal"),
+    /** Mandanten (bzw. erneuerte Inhaber-Einladungen) je Konto und Tag (M12) */
+    MANDANTEN_JE_TAG: z.coerce.number().int().positive().default(20),
+    /** Team-Einladungen je Unternehmen und Tag (M12) */
+    EINLADUNGEN_JE_TAG: z.coerce.number().int().positive().default(50),
   })
   .superRefine((k, ctx) => {
     if (k.AUTH_MODUS === "oidc" && (!k.OIDC_ISSUER || !k.OIDC_AUDIENCE))
@@ -43,6 +53,8 @@ const Schema = z
       ctx.addIssue({ code: "custom", message: "ONLINECHECK_PRIVATE_NETZE=erlaubt ist in staging und prod verboten (SSRF)" });
     if ((k.UMGEBUNG === "prod" || k.UMGEBUNG === "staging") && (!k.STRIPE_SECRET_KEY || !k.STRIPE_WEBHOOK_SECRET || !k.STRIPE_PREIS_ID))
       ctx.addIssue({ code: "custom", message: "STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET und STRIPE_PREIS_ID sind in staging/prod Pflicht (Abo, E-113)" });
+    if ((k.UMGEBUNG === "prod" || k.UMGEBUNG === "staging") && !k.REVENUECAT_SECRET_KEY)
+      ctx.addIssue({ code: "custom", message: "REVENUECAT_SECRET_KEY ist in staging/prod Pflicht (sonst ist die Synchronisation freier Speicher für jedes Konto)" });
     if (k.AUTH_MODUS === "dev") {
       if (!k.DEV_JWT_SECRET) ctx.addIssue({ code: "custom", message: "AUTH_MODUS=dev braucht DEV_JWT_SECRET (≥ 32 Zeichen)" });
       if (k.UMGEBUNG === "prod" || k.UMGEBUNG === "staging")
@@ -51,6 +63,14 @@ const Schema = z
   });
 
 export type Konfiguration = z.infer<typeof Schema>;
+
+/** TRUST_PROXY in den Wert für Express übersetzen: Zahl = Anzahl Hops, true/false, sonst Liste von Netzen. */
+export function vertrauenswuerdigeProxys(wert: string | undefined): number | boolean | string {
+  const w = (wert ?? "loopback, linklocal, uniquelocal").trim();
+  if (/^\d+$/.test(w)) return Number(w);
+  if (w === "true" || w === "false") return w === "true";
+  return w;
+}
 export const KONFIGURATION = Symbol("KONFIGURATION");
 
 export function ladeKonfiguration(env: NodeJS.ProcessEnv = process.env): Konfiguration {

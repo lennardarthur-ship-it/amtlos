@@ -63,6 +63,13 @@ export const PG_FEHLER = {
   pruefung: "23514",
   fremdschluessel: "23503",
   rls: "42501",
+  /** ungültiges bzw. unmögliches Datum (2026-02-31), Zahl außerhalb des Bereichs, falsches Textformat (H1) */
+  datumFormat: "22007",
+  datumBereich: "22008",
+  wertBereich: "22003",
+  textFormat: "22P02",
+  /** zu tiefe Verschachtelung (z. B. JSON mit Tausenden Ebenen, G1) */
+  zuTief: "54001",
 } as const;
 
 export function pgFehlercode(e: unknown): string | undefined {

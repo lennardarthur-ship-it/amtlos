@@ -4,7 +4,7 @@ import type { NextFunction, Request, Response } from "express";
 import type PgBoss from "pg-boss";
 import { Counter, Histogram, Registry, collectDefaultMetrics, Gauge } from "prom-client";
 import { JOBS } from "@amtlos/server";
-import { Oeffentlich } from "./auth.js";
+import { Oeffentlich, type Claims } from "./auth.js";
 import { WARTESCHLANGE } from "./kern.controller.js";
 import { KONFIGURATION, type Konfiguration } from "./konfiguration.js";
 
@@ -74,7 +74,7 @@ export class BetriebController {
 
 /**
  * Ratenbegrenzung (E-082): gleitendes Fenster je Schlüssel, im Speicher der Instanz.
- * Schlüssel: Hash des Bearer-Tokens, sonst die IP (nur flüchtig im Speicher, nie geloggt).
+ * Schlüssel: Hash des geprüften Bearer-Tokens, sonst die IP (nur flüchtig im Speicher, nie geloggt).
  * Strenger für Routen ohne Login und für Einladungs-Tokens (Ausprobieren erschweren).
  */
 export interface Grenzen {
@@ -104,17 +104,79 @@ export class Ratenbegrenzer {
   middleware(m: Metriken) {
     return (req: Request, res: Response, weiter: NextFunction) => {
       if (req.path === "/v1/gesundheit" || req.path === "/metriken") return weiter();
-      const token = /^Bearer (.+)$/.exec(req.headers.authorization ?? "")?.[1];
-      const streng = !token || req.path.startsWith("/v1/einladungen/") || req.path.startsWith("/v1/kalender/");
-      const schluessel = token ? `t:${createHash("sha256").update(token).digest("base64url").slice(0, 22)}` : `ip:${req.ip ?? "?"}`;
-      // zusätzlich je IP: wechselnde (auch ungültige) Tokens umgehen die Grenze sonst beliebig (E-143)
-      // großzügig (×4), damit Büros und Mobilfunk-NAT mit vielen Nutzern hinter einer IP nicht ausgebremst werden
-      const ip = token ? this.pruefe(`i|${req.ip ?? "?"}`, this.g.angemeldet * 4) : true;
-      const r = ip === true ? this.pruefe(`${streng ? "s" : "n"}|${schluessel}`, streng ? this.g.anonym : this.g.angemeldet) : ip;
+      const ip = req.ip ?? "?";
+      const hash = (x: string) => createHash("sha256").update(x).digest("base64url").slice(0, 22);
+      let r: true | number;
+      if (req.path.startsWith("/v1/kalender/")) {
+        // Kalender-Abos (M8): Google und Outlook holen viele Feeds von wenigen IPs – Schlüssel ist das Token im Pfad.
+        // Die IP-Grenze bleibt als großzügige Obergrenze gegen das Durchprobieren erfundener Tokens.
+        const ipGrenze = this.pruefe(`k|${ip}`, this.g.anonym * 50);
+        r = ipGrenze === true ? this.pruefe(`f|${hash(req.path)}`, this.g.anonym) : ipGrenze;
+      } else if (req.amtlosClaims) {
+        // Nur geprüfte Tokens zählen als angemeldet (M7): ungültige oder erfundene Tokens fallen unter die IP-Grenze
+        const token = /^Bearer (.+)$/.exec(req.headers.authorization ?? "")![1]!;
+        const streng = req.path.startsWith("/v1/einladungen/");
+        // zusätzlich je IP: großzügig (×4), damit Büros und Mobilfunk-NAT hinter einer IP nicht ausgebremst werden (E-143)
+        const ipGrenze = this.pruefe(`i|${ip}`, this.g.angemeldet * 4);
+        r = ipGrenze === true ? this.pruefe(`${streng ? "s" : "n"}|t:${hash(token)}`, streng ? this.g.anonym : this.g.angemeldet) : ipGrenze;
+      } else {
+        r = this.pruefe(`s|ip:${ip}`, this.g.anonym);
+      }
       if (r === true) return weiter();
       m.begrenzt.inc();
       res.setHeader("Retry-After", String(r));
       res.status(429).json({ statusCode: 429, message: "Zu viele Anfragen. Bitte warte einen Moment." });
     };
   }
+}
+
+/**
+ * Vorfilter (M-2, M7): prüft ein Bearer-Token vollständig, bevor ein Body gelesen wird. Gültige Tokens landen in
+ * req.amtlosClaims (der AuthGuard nutzt sie weiter); ungültige werden hier noch nicht abgewiesen – öffentliche Routen
+ * gehen weiter, geschützte beantwortet der AuthGuard mit 401.
+ */
+export function tokenVorpruefung(pruefer: { pruefe(token: string): Promise<Claims> }) {
+  return (req: Request, _res: Response, weiter: NextFunction) => {
+    const token = /^Bearer (.+)$/.exec(req.headers.authorization ?? "")?.[1];
+    if (!token) return weiter();
+    pruefer.pruefe(token).then(
+      (c) => {
+        req.amtlosClaims = c;
+        weiter();
+      },
+      () => weiter(),
+    );
+  };
+}
+
+/**
+ * Große Uploads (Synchronisation, M-2): nur mit geprüftem Token, Content-Length über der Grenze sofort 413, und je IP
+ * höchstens wenige gleichzeitig – alles, bevor der Body gelesen wird.
+ */
+export function grosserUpload(maxBytes: number, gleichzeitigJeIp = 4) {
+  const laufend = new Map<string, number>();
+  return (req: Request, res: Response, weiter: NextFunction) => {
+    if (req.method !== "PUT" && req.method !== "POST") return weiter();
+    if (!req.amtlosClaims) return void res.status(401).json({ statusCode: 401, message: "Anmeldung nötig" });
+    const laenge = Number(req.headers["content-length"] ?? NaN);
+    if (Number.isFinite(laenge) && laenge > maxBytes) return void res.status(413).json({ statusCode: 413, meldung: "Die Datei ist zu groß." });
+    const ip = req.ip ?? "?";
+    const n = laufend.get(ip) ?? 0;
+    if (n >= gleichzeitigJeIp) {
+      res.setHeader("Retry-After", "5");
+      return void res.status(429).json({ statusCode: 429, message: "Zu viele gleichzeitige Uploads. Bitte warte einen Moment." });
+    }
+    laufend.set(ip, n + 1);
+    let frei = false;
+    const freigeben = () => {
+      if (frei) return;
+      frei = true;
+      const rest = (laufend.get(ip) ?? 1) - 1;
+      if (rest > 0) laufend.set(ip, rest);
+      else laufend.delete(ip);
+    };
+    res.on("finish", freigeben);
+    res.on("close", freigeben);
+    weiter();
+  };
 }

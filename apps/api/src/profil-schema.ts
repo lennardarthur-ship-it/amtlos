@@ -1,13 +1,14 @@
 import { createRequire } from "node:module";
 import { z } from "zod";
+import { DATUM } from "./hilfen.js";
 
 const require = createRequire(import.meta.url);
 const fakten = require("@amtlos/rules-schema/fakten.json") as { fakten: { pfad: string; typ: string; werte?: string[] }[] };
-const ereignisseKatalog = require("@amtlos/rules-schema/ereignisse.json") as { ereignisse: { typ: string }[] };
+const ereignisseKatalog = require("@amtlos/rules-schema/ereignisse.json") as { ereignisse: { typ: string; payload?: string[] }[] };
 
 export const EREIGNISTYPEN = new Set(ereignisseKatalog.ereignisse.map((e) => e.typ));
-
-const DATUM = /^\d{4}-\d{2}-\d{2}$/;
+/** Erlaubte Felder der Nutzlast je Ereignistyp (G1). */
+export const EREIGNIS_PAYLOAD = new Map(ereignisseKatalog.ereignisse.map((e) => [e.typ, e.payload ?? []]));
 
 /** Amtlicher Gemeindeschlüssel: die ersten beiden Stellen sind das Land. */
 export const LAND_AUS_AGS: Record<string, string> = {
@@ -29,7 +30,7 @@ function feldSchema(typ: string, werte?: string[]): z.ZodTypeAny {
     case "zahl":
       return z.number().finite().min(0).max(1e12);
     case "datum":
-      return z.string().regex(DATUM, "Datum im Format JJJJ-MM-TT");
+      return DATUM;
     default:
       return z.string().trim().min(1).max(200);
   }

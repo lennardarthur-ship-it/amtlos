@@ -2,6 +2,7 @@ import Link from "next/link";
 import { datumLang, fuelle } from "@amtlos/i18n";
 import { api } from "@/lib/api";
 import { t } from "@/lib/sprache";
+import { pfadSichtbar } from "@/lib/umfang";
 
 export const metadata = { title: "Expertinnen und Experten" };
 
@@ -47,7 +48,12 @@ export default async function ExpertenSeite({ searchParams }: { searchParams: Pr
           ))}
         </ul>
       ) : (
-        <p>{e.leer}</p>
+        <div className="space-y-2 rounded-md border border-dashed border-linie p-4">
+          <p className="font-bold">{e.leer}</p>
+          {/* Leerzustand mit Ausweg (UX 9) */}
+          <p>{e.leer_text}</p>
+          {pfadSichtbar("/frag") ? <Link href="/frag" className="verweis">{x.frag.titel}</Link> : null}
+        </div>
       )}
       {anfragen.length ? (
         <section>

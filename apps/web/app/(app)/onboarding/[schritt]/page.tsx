@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { SCHRITTE, fragenJePhase, fuelle, schritteJePhase, type Frage, type Phase } from "@amtlos/i18n";
-import { EingabeFehler, api } from "@/lib/api";
+import { EingabeFehler, api, apiAntwort } from "@/lib/api";
 import { t } from "@/lib/sprache";
 
 export const metadata = { title: "Dein Unternehmen" };
@@ -40,16 +40,27 @@ async function speichern(schrittId: string, phase: Phase, zurueck: string | unde
   const schritt = SCHRITTE.find((s) => s.id === schrittId)!;
   const alt = await api<Profil>("/v1/profil");
   const daten: Record<string, unknown> = { ...alt.daten };
-  const { s: sprache } = await t();
+  const { s: sprache, t: x } = await t();
   // In der Nachfrage-Phase stehen nur die damals offenen Fragen im Formular: genau die kommen als Felder mit
   const fragen = phase === "nachfragen" ? schritt.fragen.filter((f) => formular.has(f.feld) || formular.has(`${f.feld}__gezeigt`)) : fragenJePhase(schritt, phase, alt.daten);
-  for (const f of fragen) daten[f.feld] = wertAus(f, formular, sprache);
-  try {
-    await api("/v1/profil", { method: "PUT", body: JSON.stringify({ daten }) });
-  } catch (e) {
-    if (e instanceof EingabeFehler) redirect(`/onboarding/${schrittId}?phase=${phase}&fehler=${encodeURIComponent(e.message)}`);
-    throw e;
+  // Nur die Antworten dieses Schritts schicken (M1): der Server führt sie mit dem aktuellen Stand zusammen. Die Version,
+  // die beim Anzeigen galt, verhindert, dass wir Änderungen überschreiben, die jemand anderes inzwischen gespeichert hat.
+  const aenderungen: Record<string, unknown> = {};
+  for (const f of fragen) aenderungen[f.feld] = daten[f.feld] = wertAus(f, formular, sprache);
+  const gelesen = Number(formular.get("__version"));
+  const r = await apiAntwort("/v1/profil", {
+    method: "PUT",
+    body: JSON.stringify({ aenderungen, ...(Number.isInteger(gelesen) && gelesen >= 0 ? { erwartete_version: gelesen } : {}) }),
+  });
+  const hier = `/onboarding/${schrittId}?phase=${phase}${zurueck ? `&zurueck=${encodeURIComponent(zurueck)}` : ""}`;
+  if (r.status === 409) redirect(`${hier}&fehler=${encodeURIComponent(x.onboarding.konflikt)}`);
+  if (r.status === 422) {
+    const fehler = new EingabeFehler(((await r.json()) as { fehler?: { feld: string; meldung: string }[] }).fehler ?? []);
+    redirect(`${hier}&fehler=${encodeURIComponent(fehler.message)}`);
   }
+  if (r.status === 403) redirect("/keine-berechtigung");
+  if (r.status === 402) redirect("/einstellungen/abo?abgelaufen=1");
+  if (!r.ok) throw new Error(`API PUT /v1/profil: ${r.status}`);
   if (zurueck) redirect(zurueck);
   // Nächster relevanter Schritt der Phase nach den gerade gespeicherten Angaben (z. B. „Gesellschaft“ nur für UG/GmbH)
   const pos = SCHRITTE.findIndex((s) => s.id === schrittId);
@@ -99,6 +110,7 @@ export default async function OnboardingSchritt({
       ) : null}
 
       <form action={speichern.bind(null, schritt.id, phase, sichererRuecksprung)} className="space-y-8">
+        <input type="hidden" name="__version" value={profil.version} />
         {fragen.map((f) => (
           <FrageFeld key={f.feld} frage={f} wert={profil.daten[f.feld]} sprache={s} unbekanntText={x.onboarding.spaeter} jaNein={[x.gemeinsam.ja, x.gemeinsam.nein]} />
         ))}
@@ -144,7 +156,13 @@ function FrageFeld({ frage: f, wert, sprache: s, unbekanntText, jaNein }: { frag
         {f.hilfe ? <p id={hilfeId} className="mt-1 text-tinte-leise">{f.hilfe[s]}</p> : null}
         <div className="mt-3 space-y-1">
           {Object.entries(optionen).map(([k, text]) => option(k, text, typ, gewaehlt(k)))}
-          {f.art !== "mehrfach" ? option(UNBEKANNT, unbekanntText, "radio", unbekannt) : null}
+          {/* „Weiß ich nicht“ ohne Vorauswahl und optisch zurückgenommen (UX 7): ohne Antwort bleibt die Angabe ohnehin offen */}
+          {f.art !== "mehrfach" ? (
+            <label className="mt-2 flex min-h-11 cursor-pointer items-center gap-3 rounded-md border-t border-linie px-2 pt-2 text-klein text-tinte-leise hover:bg-blatt">
+              <input type="radio" name={f.feld} value={UNBEKANNT} defaultChecked={false} className="size-4 flex-none accent-amt" />
+              {unbekanntText}
+            </label>
+          ) : null}
         </div>
       </fieldset>
     );

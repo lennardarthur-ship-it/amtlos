@@ -3,7 +3,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { Datenbank, JOBS, ProtokollVersand, erzeugeWarteschlange, heute, importiereKatalog } from "@amtlos/server";
 import { DB_VERFUEGBAR, WURZEL, frischeDatenbank } from "@amtlos/server/testhilfen";
 import type PgBoss from "pg-boss";
-import { arbeiterStarten, verarbeiteNeuberechnung } from "../src/arbeit.js";
+import { arbeiterStarten, empfaengerPruefen, fehlerGrund, neuberechnungsPaket, verarbeiteNeuberechnung } from "../src/arbeit.js";
 
 const still = { info: () => undefined, fehler: () => undefined };
 
@@ -34,6 +34,40 @@ describe.skipIf(!DB_VERFUEGBAR)("Worker", () => {
   afterAll(async () => {
     await boss?.stop({ graceful: false, wait: true });
     await Promise.all([api?.schliessen(), worker?.schliessen()]);
+  });
+
+  it("H2: ein kaputtes Unternehmen hält die anderen im Paket nicht auf; Fehler wird geloggt, vermerkt und einzeln gemeldet", async () => {
+    const fehlerLog: Record<string, unknown>[] = [];
+    const log = { info: () => undefined, fehler: (msg: string, d?: Record<string, unknown>) => void fehlerLog.push({ msg, ...d }) };
+    const gemeldet: string[] = [];
+    const bossAttrappe = { fail: async (_name: string, id: string) => void gemeldet.push(id) } as unknown as Pick<PgBoss, "fail">;
+    const fertig: string[] = [];
+    const rechnen = async (_db: Datenbank, job: { unternehmenId: string }) => {
+      if (job.unternehmenId === unternehmenId) throw new Error("Ungültiges Datum: '0000-00-00'");
+      fertig.push(job.unternehmenId);
+      return { status: "berechnet" as const, erinnerungen: 0 };
+    };
+    const andere = ["11111111-1111-4111-8111-111111111111", "22222222-2222-4222-8222-222222222222"];
+    const jobs = [
+      { id: "a", data: { unternehmenId: andere[0]!, ausgeloestDurch: "t" } },
+      { id: "kaputt", data: { unternehmenId, ausgeloestDurch: "t" }, retryCount: 3, retryLimit: 3 },
+      { id: "b", data: { unternehmenId: andere[1]!, ausgeloestDurch: "t" } },
+    ];
+    await neuberechnungsPaket(bossAttrappe, worker, jobs, log, rechnen);
+    expect(fertig).toEqual(andere);
+    expect(gemeldet).toEqual(["kaputt"]);
+    expect(fehlerLog[0]).toMatchObject({ msg: "neuberechnung_fehler", unternehmen: unternehmenId, meldung: "Ungültiges Datum: '…'", endgueltig: true });
+    const vermerk = await api.imKontext({ kontoId: (await api.imKontext({}, async (tx) => (await tx.eine<{ id: string }>("select app.konto_anmelden('w', 'w@example.org', 'W') as id"))!.id)), unternehmenId }, (tx) =>
+      tx.abfrage<{ profil_version: number; endgueltig: boolean; grund: string }>("select profil_version, endgueltig, grund from app.berechnung_fehler where unternehmen_id = $1", [unternehmenId]),
+    );
+    expect(vermerk).toEqual([{ profil_version: 1, endgueltig: true, grund: "Ungültiges Datum: '…'" }]);
+    expect(fehlerGrund(new Error('Wert "geheim" ungültig'))).toBe('Wert "…" ungültig');
+  });
+
+  it("M-5: E-Mails nur an genau eine gültige Adresse", () => {
+    expect(empfaengerPruefen("anna@example.org")).toBe("anna@example.org");
+    for (const boese of ["a@example.org\r\nBcc: x@example.org", "a@example.org, b@example.org", "Gruppe: a@example.org;", `${"a".repeat(250)}@example.org`, "keine-adresse"])
+      expect(() => empfaengerPruefen(boese), boese).toThrow("Empfängeradresse ungültig");
   });
 
   it("berechnet und plant Erinnerungen in einer Transaktion", async () => {

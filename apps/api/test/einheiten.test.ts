@@ -76,18 +76,24 @@ describe("ICS", () => {
 });
 
 describe("Ratenbegrenzung", () => {
-  it("lässt bis zur Grenze durch, dann 429 mit Retry-After, neues Fenster gibt frei", async () => {
+  const aufbau = async (angemeldet = 3, anonym = 1) => {
     const { Ratenbegrenzer, erzeugeMetriken } = await import("../src/betrieb.js");
-    let t = 0;
-    const r = new Ratenbegrenzer({ angemeldet: 3, anonym: 1, fensterMs: 60_000 }, () => t);
+    const uhr = { t: 0 };
+    const r = new Ratenbegrenzer({ angemeldet, anonym, fensterMs: 60_000 }, () => uhr.t);
     const mw = r.middleware(erzeugeMetriken());
-    const aufruf = (pfad: string, auth?: string) => {
+    /** gueltig: das Token hat der Vorfilter geprüft (req.amtlosClaims) */
+    const aufruf = (pfad: string, auth?: string, gueltig = true, ip = "10.0.0.1") => {
       const kopf: Record<string, string> = {};
       const res = { setHeader: (k: string, v: string) => { kopf[k] = v; }, status: () => res, json: () => res };
       let durch = false;
-      mw({ path: pfad, headers: auth ? { authorization: `Bearer ${auth}` } : {}, ip: "10.0.0.1" } as never, res as never, () => { durch = true; });
+      mw({ path: pfad, headers: auth ? { authorization: `Bearer ${auth}` } : {}, ip, amtlosClaims: auth && gueltig ? { sub: auth } : undefined } as never, res as never, () => { durch = true; });
       return { durch, kopf };
     };
+    return { uhr, aufruf };
+  };
+
+  it("lässt bis zur Grenze durch, dann 429 mit Retry-After, neues Fenster gibt frei", async () => {
+    const { uhr, aufruf } = await aufbau();
     expect([1, 2, 3].map(() => aufruf("/v1/heute", "tok").durch)).toEqual([true, true, true]);
     const viert = aufruf("/v1/heute", "tok");
     expect(viert.durch).toBe(false);
@@ -97,8 +103,86 @@ describe("Ratenbegrenzung", () => {
     expect(aufruf("/v1/einladungen/annehmen", "tok2").durch).toBe(false); // streng: 1
     expect(aufruf("/v1/gesundheit").durch).toBe(true);
     expect(aufruf("/v1/gesundheit").durch).toBe(true); // nie begrenzt
-    t = 60_000;
+    uhr.t = 60_000;
     expect(aufruf("/v1/heute", "tok").durch).toBe(true);
+  });
+
+  it("M7: wechselnde ungültige Tokens zählen wie anonyme Anfragen derselben IP", async () => {
+    const { aufruf } = await aufbau(600, 2);
+    const ergebnis = Array.from({ length: 5 }, (_, i) => aufruf("/v1/marke", `erfunden-${i}`, false).durch);
+    expect(ergebnis).toEqual([true, true, false, false, false]);
+    expect(aufruf("/v1/marke", "erfunden-x", false, "10.0.0.2").durch).toBe(true); // andere IP
+  });
+
+  it("M8: Kalender-Feeds werden je Token begrenzt, nicht je IP (Google ruft viele Feeds von einer IP ab)", async () => {
+    const { aufruf } = await aufbau(600, 2);
+    const feeds = Array.from({ length: 10 }, (_, i) => `/v1/kalender/${String(i).padStart(43, "a")}.ics`);
+    expect(feeds.map((f) => aufruf(f).durch)).toEqual(feeds.map(() => true));
+    expect([1, 2, 3].map(() => aufruf(feeds[0]!).durch)).toEqual([true, false, false]); // derselbe Feed: Grenze anonym (2)
+  });
+});
+
+describe("Große Uploads (M-2)", () => {
+  const aufruf = async (mw: ReturnType<Awaited<typeof import("../src/betrieb.js")>["grosserUpload"]>, req: Record<string, unknown>) => {
+    let status = 0;
+    let durch = false;
+    const res = { setHeader: () => undefined, status: (s: number) => { status = s; return res; }, json: () => res, on: () => res };
+    mw({ method: "PUT", headers: {}, ip: "10.0.0.1", ...req } as never, res as never, () => { durch = true; });
+    return { status, durch };
+  };
+  it("ohne geprüftes Token 401, zu großer Content-Length sofort 413, sonst weiter; Lesen unberührt", async () => {
+    const { grosserUpload } = await import("../src/betrieb.js");
+    const mw = grosserUpload(1000, 2);
+    expect(await aufruf(mw, { headers: { authorization: "Bearer erfunden-aber-lang-genug-12345" } })).toEqual({ status: 401, durch: false });
+    expect(await aufruf(mw, { amtlosClaims: { sub: "a" }, headers: { "content-length": "1001" } })).toEqual({ status: 413, durch: false });
+    expect(await aufruf(mw, { amtlosClaims: { sub: "a" }, headers: { "content-length": "1000" } })).toEqual({ status: 0, durch: true });
+    expect(await aufruf(mw, { method: "GET" })).toEqual({ status: 0, durch: true });
+    // gleichzeitige Uploads je IP (höchstens 2): einer läuft schon, der zweite darf, der dritte wartet
+    expect((await aufruf(mw, { amtlosClaims: { sub: "a" } })).durch).toBe(true);
+    expect((await aufruf(mw, { amtlosClaims: { sub: "a" } })).status).toBe(429);
+    expect((await aufruf(mw, { amtlosClaims: { sub: "a" }, ip: "10.0.0.2" })).durch).toBe(true);
+  });
+});
+
+describe("Datumsprüfung (H1)", () => {
+  it("nimmt nur echte Kalendertage an", async () => {
+    const { DATUM, istKalendertag } = await import("../src/hilfen.js");
+    for (const gut of ["2026-02-28", "2028-02-29", "1900-01-01", "2026-12-31"]) expect(istKalendertag(gut)).toBe(true);
+    for (const schlecht of ["2026-02-31", "2026-02-29", "2026-02-30", "0000-00-00", "2026-13-01", "2026-00-10", "1899-12-31", "2026-1-01"]) expect(istKalendertag(schlecht)).toBe(false);
+    expect(DATUM.safeParse("2026-02-31").success).toBe(false);
+    expect(ProfilSchema.safeParse({ gruendungsdatum: "0000-00-00" }).success).toBe(false);
+    expect(ProfilSchema.safeParse({ gruendungsdatum: "2026-02-28" }).success).toBe(true);
+  });
+  it("Fehlertexte sind deutsch (G3)", async () => {
+    const { pruefe } = await import("../src/hilfen.js");
+    const { z } = await import("zod");
+    try {
+      pruefe(z.object({ a: z.number() }).strict(), { a: "x", b: 1 });
+      expect.unreachable();
+    } catch (e) {
+      const fehler = (e as { getResponse(): { fehler: { meldung: string }[] } }).getResponse().fehler.map((f) => f.meldung);
+      expect(fehler).toEqual(["Erwartet: Zahl, erhalten: Text", "Unbekanntes Feld: b"]);
+    }
+  });
+});
+
+describe("Sicherheit: Konfiguration und OIDC", () => {
+  const basis = { DATABASE_URL: "postgres://x", OIDC_ISSUER: "https://login.example.org/realms/amtlos", OIDC_AUDIENCE: "amtlos", ABLAGE_VERZEICHNIS: "/daten", STRIPE_SECRET_KEY: "sk_" + "x".repeat(20), STRIPE_WEBHOOK_SECRET: "whsec_" + "x".repeat(20), STRIPE_PREIS_ID: "price_1" };
+  it("M-4: REVENUECAT_SECRET_KEY ist in staging/prod Pflicht", () => {
+    expect(() => ladeKonfiguration({ ...basis, UMGEBUNG: "prod" })).toThrow(/REVENUECAT_SECRET_KEY/);
+    expect(ladeKonfiguration({ ...basis, UMGEBUNG: "prod", REVENUECAT_SECRET_KEY: "sk_rc_1234567890" }).UMGEBUNG).toBe("prod");
+  });
+  it("G-9: TRUST_PROXY als Hops, Schalter oder Netze", async () => {
+    const { vertrauenswuerdigeProxys } = await import("../src/konfiguration.js");
+    expect(vertrauenswuerdigeProxys("1")).toBe(1);
+    expect(vertrauenswuerdigeProxys("false")).toBe(false);
+    expect(vertrauenswuerdigeProxys("10.0.0.0/8")).toBe("10.0.0.0/8");
+    expect(ladeKonfiguration({ ...basis, AUTH_MODUS: "oidc" }).TRUST_PROXY).toBe("loopback, linklocal, uniquelocal");
+  });
+  it("G-8: Discovery behält den Pfad des Issuers", async () => {
+    const { discoveryUrl } = await import("../src/auth.js");
+    expect(discoveryUrl("https://login.example.org/realms/amtlos").href).toBe("https://login.example.org/realms/amtlos/.well-known/openid-configuration");
+    expect(discoveryUrl("https://login.example.org/").href).toBe("https://login.example.org/.well-known/openid-configuration");
   });
 });
 

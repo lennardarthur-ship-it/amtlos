@@ -6,7 +6,7 @@ import path from "node:path";
 import { DateiAblage, Datenbank, NichtVerfuegbaresElster, StripeRest, erzeugeWarteschlange } from "@amtlos/server";
 import { ArbeitsschutzController } from "./arbeitsschutz.controller.js";
 import { AssistentController } from "./assistent.controller.js";
-import { AuthGuard } from "./auth.js";
+import { AuthGuard, KontoCache, TokenPruefer } from "./auth.js";
 import { BranchenController } from "./branchen.controller.js";
 import { DatenschutzController } from "./datenschutz.controller.js";
 import { BetriebController, METRIKEN, erzeugeMetriken } from "./betrieb.js";
@@ -30,6 +30,8 @@ export function appModul(k: Konfiguration) {
     controllers: [KernController, PflichtenController, TeamController, ElsterController, FinanzenController, PersonalController, ArbeitsschutzController, DatenschutzController, OnlineCheckController, BranchenController, AssistentController, PostfachController, MarktplatzController, KanzleiController, MobilController, TresorController, KontoController, BetriebController],
     providers: [
       { provide: KONFIGURATION, useValue: k },
+      { provide: TokenPruefer, useFactory: () => new TokenPruefer(k) },
+      { provide: KontoCache, useFactory: () => new KontoCache() },
       { provide: METRIKEN, useFactory: erzeugeMetriken },
       { provide: ELSTER, useClass: NichtVerfuegbaresElster },
       { provide: STRIPE, useFactory: () => (k.STRIPE_SECRET_KEY ? new StripeRest(k.STRIPE_SECRET_KEY) : null) },

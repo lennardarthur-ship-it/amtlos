@@ -33,7 +33,7 @@
     "@e-invoice-eu/core": "3.3.0",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
-    "fast-xml-parser": "4.5.7",
+    "fast-xml-parser": "5.11.2",
     "node-html-parser": "6.1.13",
     "pg": "^8.13.0",
     "pg-boss": "^10.1.0",

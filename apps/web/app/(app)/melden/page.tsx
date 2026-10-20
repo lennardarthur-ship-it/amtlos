@@ -3,7 +3,8 @@ import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { datumLang } from "@amtlos/i18n";
-import { api } from "@/lib/api";
+import { senden } from "@/lib/aktion";
+import { aktivesUnternehmen, api, darfVerwalten } from "@/lib/api";
 import { t } from "@/lib/sprache";
 import { pfadSichtbar } from "@/lib/umfang";
 
@@ -23,22 +24,22 @@ interface Ereignis { id: string; typ: string; datum: string; storniert: boolean;
 
 async function melden(formular: FormData) {
   "use server";
-  await api("/v1/ereignisse", {
-    method: "POST",
-    body: JSON.stringify({ typ: formular.get("typ"), datum: formular.get("datum"), client_id: formular.get("client_id") }),
-  });
+  // senden(): unmögliche Daten oder fehlende Rechte als verständlicher Hinweis auf der Seite (H1, H3)
+  await senden("/v1/ereignisse", "POST", { typ: formular.get("typ"), datum: formular.get("datum"), client_id: formular.get("client_id") }, "/melden");
   revalidatePath("/melden");
   redirect("/melden?gemeldet=1");
 }
 
 async function zuruecknehmen(id: string) {
   "use server";
-  await api(`/v1/ereignisse/${id}/storno`, { method: "POST" });
+  await senden(`/v1/ereignisse/${id}/storno`, "POST", undefined, "/melden");
   revalidatePath("/melden");
 }
 
-export default async function MeldenSeite({ searchParams }: { searchParams: Promise<{ gemeldet?: string }> }) {
-  const [{ s, t: x }, liste, { gemeldet }] = await Promise.all([t(), api<Ereignis[]>("/v1/ereignisse"), searchParams]);
+export default async function MeldenSeite({ searchParams }: { searchParams: Promise<{ gemeldet?: string; fehler?: string }> }) {
+  // Ereignisse melden Inhaber:in, Admin und Steuerberatung (H3)
+  if (!darfVerwalten((await aktivesUnternehmen()).rolle)) redirect("/keine-berechtigung");
+  const [{ s, t: x }, liste, { gemeldet, fehler }] = await Promise.all([t(), api<Ereignis[]>("/v1/ereignisse"), searchParams]);
   const eigene = liste.filter((e) => !e.storniert_ereignis_id);
   const heute = new Date().toISOString().slice(0, 10);
 
@@ -56,6 +57,11 @@ export default async function MeldenSeite({ searchParams }: { searchParams: Prom
           </p>
         ) : null}
       </header>
+      {fehler ? (
+        <p role="alert" className="lesetext rounded-md border-2 border-frist bg-frist-hauch p-4">
+          {fehler}
+        </p>
+      ) : null}
       {gemeldet ? (
         <p role="status" className="lesetext rounded-md bg-amt-hauch p-4 font-bold text-amt">
           {x.melden.gemeldet}

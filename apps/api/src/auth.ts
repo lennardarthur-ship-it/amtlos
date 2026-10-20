@@ -27,9 +27,13 @@ export interface Anfragekontext {
   rolle?: Rolle;
 }
 
+export type Claims = JWTPayload & { email?: string; email_verified?: boolean; name?: string; preferred_username?: string };
+
 declare module "express" {
   interface Request {
     amtlos?: Anfragekontext;
+    /** Vom Vorfilter geprüftes Token (M-2/M7): gesetzt, wenn das Bearer-Token gültig ist */
+    amtlosClaims?: Claims;
   }
 }
 
@@ -45,6 +49,12 @@ export const MitUnternehmen = (...rollen: Rolle[]) => (ziel: object, schluessel?
   SetMetadata(UNTERNEHMEN_NOETIG, true)(ziel, schluessel!, desc!);
   if (rollen.length) SetMetadata(ROLLEN, rollen)(ziel, schluessel!, desc!);
 };
+
+/**
+ * Lesen vertraulicher Daten (H4): Finanzen, Personalakten, Datenpannen und Betroffenenanfragen enthalten Daten Dritter.
+ * Mitarbeitende sehen Pflichten und erledigen sie – mehr nicht („nur, was man braucht“, Art. 5 DSGVO).
+ */
+export const LESEN_VERTRAULICH: Rolle[] = ["inhaber", "admin", "steuerberater"];
 
 /** Schreibende Route, die auch ohne laufendes Abo erlaubt ist (Abo abschließen, Unternehmen löschen, Team verlassen). */
 export const OhneAbo = () => SetMetadata(OHNE_ABO, true);
@@ -62,6 +72,40 @@ export const Kontext = createParamDecorator((_: unknown, ctx: ExecutionContext):
   return k;
 });
 
+/**
+ * Prüft Bearer-Tokens (OIDC über JWKS, E-014; im Entwicklungsmodus HS256). Eigene Klasse, damit schon der Vorfilter vor
+ * dem Einlesen des Bodys prüfen kann (M-2) und die Ratenbegrenzung nur geprüfte Tokens als „angemeldet“ zählt (M7).
+ */
+export class TokenPruefer {
+  private jwks?: JWTVerifyGetKey;
+  constructor(private readonly k: Konfiguration) {}
+
+  async pruefe(token: string): Promise<Claims> {
+    try {
+      if (this.k.AUTH_MODUS === "dev") {
+        const { payload } = await jwtVerify(token, new TextEncoder().encode(this.k.DEV_JWT_SECRET!), { algorithms: ["HS256"], issuer: "amtlos-dev" });
+        return payload as Claims;
+      }
+      this.jwks ??= await this.ladeJwks();
+      const { payload } = await jwtVerify(token, this.jwks, { issuer: this.k.OIDC_ISSUER, audience: this.k.OIDC_AUDIENCE, algorithms: ["RS256", "ES256"] });
+      return payload as Claims;
+    } catch {
+      throw new UnauthorizedException("Token ungültig oder abgelaufen");
+    }
+  }
+
+  private async ladeJwks(): Promise<JWTVerifyGetKey> {
+    // Pfad des Issuers behalten (Keycloak: https://…/realms/amtlos), G-8
+    const discovery = await fetch(discoveryUrl(this.k.OIDC_ISSUER!)).then((r) => r.json() as Promise<{ jwks_uri: string }>);
+    return createRemoteJWKSet(new URL(discovery.jwks_uri));
+  }
+}
+
+export const discoveryUrl = (issuer: string) => new URL(`${issuer.replace(/\/?$/, "/")}.well-known/openid-configuration`);
+
+/** Konto-Zuordnung je Subjekt (5 Minuten); beim Löschen eines Kontos geleert (G-7). */
+export class KontoCache extends Map<string, { id: string; sprache: "de" | "en"; bis: number }> {}
+
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
@@ -71,13 +115,12 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
  */
 @Injectable()
 export class AuthGuard implements CanActivate {
-  private jwks?: JWTVerifyGetKey;
-  private readonly kontoCache = new Map<string, { id: string; sprache: "de" | "en"; bis: number }>();
-
   constructor(
     @Inject(Reflector) private readonly reflector: Reflector,
     @Inject(Datenbank) private readonly db: Datenbank,
     @Inject(KONFIGURATION) private readonly k: Konfiguration,
+    @Inject(TokenPruefer) private readonly pruefer: TokenPruefer,
+    @Inject(KontoCache) private readonly kontoCache: KontoCache,
   ) {}
 
   async canActivate(ctx: ExecutionContext): Promise<boolean> {
@@ -87,7 +130,8 @@ export class AuthGuard implements CanActivate {
 
     const token = /^Bearer (.+)$/.exec(req.headers.authorization ?? "")?.[1];
     if (!token) throw new UnauthorizedException("Anmeldung erforderlich");
-    const claims = await this.pruefeToken(token);
+    // Der Vorfilter hat das Token meist schon geprüft (main.ts); sonst hier
+    const claims = req.amtlosClaims ?? (await this.pruefer.pruefe(token));
     if (!claims.sub) throw new UnauthorizedException("Token ohne Subjekt");
 
     const konto = await this.konto(claims);
@@ -120,30 +164,14 @@ export class AuthGuard implements CanActivate {
     return true;
   }
 
-  private async pruefeToken(token: string): Promise<JWTPayload & { email?: string; name?: string; preferred_username?: string }> {
-    try {
-      if (this.k.AUTH_MODUS === "dev") {
-        const { payload } = await jwtVerify(token, new TextEncoder().encode(this.k.DEV_JWT_SECRET!), { algorithms: ["HS256"], issuer: "amtlos-dev" });
-        return payload;
-      }
-      this.jwks ??= await this.ladeJwks();
-      const { payload } = await jwtVerify(token, this.jwks, { issuer: this.k.OIDC_ISSUER, audience: this.k.OIDC_AUDIENCE });
-      return payload;
-    } catch {
-      throw new UnauthorizedException("Token ungültig oder abgelaufen");
-    }
-  }
-
-  private async ladeJwks(): Promise<JWTVerifyGetKey> {
-    const discovery = await fetch(new URL("/.well-known/openid-configuration", this.k.OIDC_ISSUER)).then((r) => r.json() as Promise<{ jwks_uri: string }>);
-    return createRemoteJWKSet(new URL(discovery.jwks_uri));
-  }
-
-  private async konto(claims: JWTPayload & { email?: string; name?: string; preferred_username?: string }) {
+  private async konto(claims: Claims) {
     const sub = claims.sub!;
     const cache = this.kontoCache.get(sub);
     if (cache && cache.bis > Date.now()) return cache;
-    const email = claims.email ?? `${sub}@unbekannt.invalid`;
+    // Die E-Mail-Adresse zählt nur, wenn der Anbieter sie bestätigt hat (G-8): sie entscheidet über Einladungen.
+    // Entwicklungs-Tokens stellt die API selbst aus – dort gilt die Adresse als bestätigt.
+    const bestaetigt = this.k.AUTH_MODUS === "dev" || claims.email_verified === true;
+    const email = (bestaetigt && claims.email) || `${sub}@unbekannt.invalid`;
     const name = claims.name ?? claims.preferred_username ?? email;
     const zeile = await this.db.imKontext({}, (tx) =>
       tx.eine<{ id: string }>("select app.konto_anmelden($1, $2, $3) as id", [sub, email, name]),

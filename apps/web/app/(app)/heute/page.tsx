@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { datumLang, fuelle, offeneFragen, schritteJePhase, fragenJePhase } from "@amtlos/i18n";
 import { AutoAktualisieren } from "@/komponenten/auto-aktualisieren";
 import { Fristblatt } from "@/komponenten/fristblatt";
 import { PflichtZeile } from "@/komponenten/pflicht-zeile";
 import { StatusForm, StatusText } from "@/komponenten/status";
-import { api } from "@/lib/api";
+import { senden } from "@/lib/aktion";
+import { aktivesUnternehmen, api, apiAntwort, darfVerwalten } from "@/lib/api";
 import { branchenAusProfil } from "@/lib/branchen";
 import { t } from "@/lib/sprache";
 import { pfadSichtbar } from "@/lib/umfang";
@@ -29,9 +31,30 @@ async function gelesen(f: FormData) {
 
 async function vorStartErledigt() {
   "use server";
-  await api("/v1/pflichten/vor-start-erledigt", { method: "POST" });
+  // senden(): bei 4xx verständlicher Text auf der Seite statt Fehlerseite (H3)
+  await senden("/v1/pflichten/vor-start-erledigt", "POST", undefined, "/heute");
   revalidatePath("/heute");
 }
+
+/** „Rückgängig“ nach dem Erledigen (UX 5): öffnet die Pflicht wieder. */
+async function rueckgaengig(schluessel: string) {
+  "use server";
+  const [pflichtId = "", periode = ""] = schluessel.split("|");
+  await senden(`/v1/pflichten/${encodeURIComponent(pflichtId)}/${encodeURIComponent(periode)}/wieder-oeffnen`, "POST", undefined, "/heute");
+  revalidatePath("/heute");
+  redirect(`/heute?wieder=${encodeURIComponent(schluessel)}`);
+}
+
+/** Titel einer Pflicht für Bestätigungen; ohne Treffer (z. B. inzwischen entfallen) leer. */
+async function titelVon(schluessel: string | undefined): Promise<string | null> {
+  const [pflichtId, periode] = (schluessel ?? "").split("|");
+  if (!pflichtId || !periode) return null;
+  const r = await apiAntwort(`/v1/pflichten/${encodeURIComponent(pflichtId)}/${encodeURIComponent(periode)}`);
+  return r.ok ? ((await r.json()) as { titel: string }).titel : null;
+}
+
+/** Nach so vielen Sekunden ohne fertigen Plan zeigt „Heute“ statt „Einen Moment“ einen Hinweis mit Ausweg (UX 3). */
+const GEDULD_S = 30;
 
 const pfadZu = (k: Karte) => `/pflichten/${encodeURIComponent(k.pflicht_id)}/${encodeURIComponent(k.periode)}`;
 
@@ -39,21 +62,29 @@ const pfadZu = (k: Karte) => `/pflichten/${encodeURIComponent(k.pflicht_id)}/${e
  * „Heute“ (Spezifikation 6.1, E-112): eine klare nächste Handlung statt einer Liste. Reihenfolge: Willkommen (einmal),
  * das eine Ding jetzt, danach, Gründung, Nachfragen, Rest. Fehlende Angaben erscheinen gebündelt als Fragen.
  */
-export default async function HeuteSeite({ searchParams }: { searchParams: Promise<{ willkommen?: string; erledigt?: string }> }) {
-  const [{ s, t: x }, h, profil, g, { willkommen, erledigt }] = await Promise.all([
+export default async function HeuteSeite({ searchParams }: { searchParams: Promise<{ willkommen?: string; erledigt?: string; wieder?: string; fehler?: string }> }) {
+  const [{ s, t: x }, h, profil, g, { willkommen, erledigt, wieder, fehler }, u] = await Promise.all([
     t(),
     api<Heute>("/v1/heute"),
     api<{ version: number; daten?: Record<string, unknown> }>("/v1/profil"),
     api<Gruendung>("/v1/gruendung"),
     searchParams,
+    aktivesUnternehmen(),
   ]);
+  const verwalten = darfVerwalten(u.rolle);
+  const [erledigtTitel, wiederTitel] = await Promise.all([titelVon(erledigt), titelVon(wieder)]);
   const [meldungen, termine] = await Promise.all([api<Meldung[]>("/v1/benachrichtigungen"), api<Termin[]>("/v1/termine")]);
   const daten = profil.daten ?? {};
   const ohneProfil = profil.version === 0;
-  const nochNichtBerechnet = !ohneProfil && h.zaehler.offen + h.zaehler.erledigt === 0 && h.als_naechstes.length === 0;
+  // Der Plan gilt erst als fertig, wenn er zur letzten Profilversion passt (M5) – nicht schon bei Zwischenständen
+  const stand = h.berechnung?.status ?? (h.zaehler.offen + h.zaehler.erledigt === 0 && h.als_naechstes.length === 0 ? "laeuft" : "aktuell");
+  const nochNichtBerechnet = !ohneProfil && stand !== "aktuell";
+  const wartetSeit = h.berechnung?.seit ? (Date.now() - Date.parse(h.berechnung.seit)) / 1000 : 0;
+  // Fehler des Workers (H2) oder ungewöhnlich lange Wartezeit: Ausweg anbieten statt endlos „Einen Moment“ (UX 3)
+  const berechnungHaengt = nochNichtBerechnet && (stand === "fehlgeschlagen" || wartetSeit > GEDULD_S);
   const gruendungOffen = g.fortschritt.gesamt > 0 && !g.fortschritt.fertig;
   const branchen = branchenAusProfil(daten);
-  const nachfragen = ohneProfil ? 0 : offeneFragen(daten);
+  const nachfragen = ohneProfil || !verwalten ? 0 : offeneFragen(daten);
   const naechsteRunde = nachfragen ? schritteJePhase("nachfragen", daten)[0] : undefined;
   const ungelesen = meldungen.filter((m) => !m.gelesen_am).slice(0, 5);
   const ortsdatum = (d: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: ZONE }).format(d);
@@ -70,18 +101,36 @@ export default async function HeuteSeite({ searchParams }: { searchParams: Promi
 
       {ohneProfil ? (
         <section className="lesetext rounded-md border-2 border-dashed border-amt bg-blatt p-6">
-          <p className="text-gross">{x.heute.profil_fehlt}</p>
-          <Link href="/onboarding/rechtsform" className="knopf mt-5">
-            {x.heute.profil_starten}
-          </Link>
+          <p className="text-gross">{verwalten ? x.heute.profil_fehlt : x.rolle.mitarbeiter_hinweis}</p>
+          {verwalten ? (
+            <Link href="/onboarding/rechtsform?phase=schnell" className="knopf mt-5">
+              {x.heute.profil_starten}
+            </Link>
+          ) : null}
         </section>
       ) : null}
 
-      {nochNichtBerechnet ? (
+      {fehler ? (
+        <p role="alert" className="lesetext rounded-md border-2 border-frist bg-frist-hauch p-4">{fehler}</p>
+      ) : null}
+
+      {nochNichtBerechnet && !berechnungHaengt ? (
         <section className="lesetext rounded-md border-2 border-amt bg-blatt p-6" aria-live="polite">
           <AutoAktualisieren />
           <p className="text-gross font-bold">{x.heute.berechnung_titel}</p>
           <p className="mt-2 text-tinte-leise">{x.heute.berechnung_laeuft}</p>
+        </section>
+      ) : null}
+
+      {berechnungHaengt ? (
+        <section role="alert" className="lesetext rounded-md border-2 border-bald bg-bald-hauch p-6">
+          {stand === "fehlgeschlagen" ? null : <AutoAktualisieren alleMs={10_000} hoechstens={30} />}
+          <p className="text-gross font-bold">{stand === "fehlgeschlagen" ? x.heute.berechnung_fehler_titel : x.heute.berechnung_titel}</p>
+          <p className="mt-2">{stand === "fehlgeschlagen" ? x.heute.berechnung_fehler_text : x.heute.berechnung_langsam_text}</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            {verwalten ? <Link href="/einstellungen#profil" className="knopf">{x.heute.angaben_pruefen}</Link> : null}
+            <Link href="/heute" className="knopf knopf-leise">{x.heute.neu_laden}</Link>
+          </div>
         </section>
       ) : null}
 
@@ -94,10 +143,20 @@ export default async function HeuteSeite({ searchParams }: { searchParams: Promi
       ) : null}
 
       {erledigt && !ohneProfil ? (
-        <p role="status" className="lesetext flex flex-wrap items-center gap-x-3 rounded-md bg-amt-hauch p-4 font-bold text-amt">
+        <div role="status" className="lesetext flex flex-wrap items-center gap-x-3 gap-y-2 rounded-md bg-amt-hauch p-4 font-bold text-amt">
           <span className="stempel">{x.status.erledigt}</span>
-          <span>{h.zaehler.klar ? fuelle(x.heute.erledigt_weiter, { n: h.zaehler.erledigt, offen: h.zaehler.naechste_90 }) : x.heute.erledigt_alles}</span>
-        </p>
+          {/* Was wurde erledigt – mit „Rückgängig“ (UX 5) */}
+          {erledigtTitel ? <span>{fuelle(x.heute.erledigt_was, { titel: erledigtTitel })}</span> : null}
+          <span className="font-normal">{h.zaehler.klar ? fuelle(x.heute.erledigt_weiter, { n: h.zaehler.erledigt, offen: h.zaehler.naechste_90 }) : x.heute.erledigt_alles}</span>
+          {erledigtTitel && verwalten ? (
+            <form action={rueckgaengig.bind(null, erledigt)}>
+              <button className="verweis text-klein">{x.heute.rueckgaengig}</button>
+            </form>
+          ) : null}
+        </div>
+      ) : null}
+      {wiederTitel ? (
+        <p role="status" className="lesetext rounded-md bg-blatt p-4">{fuelle(x.heute.rueckgaengig_fertig, { titel: wiederTitel })}</p>
       ) : null}
 
       {ungelesen.length ? (
@@ -120,6 +179,24 @@ export default async function HeuteSeite({ searchParams }: { searchParams: Promi
               </li>
             ))}
           </ul>
+        </section>
+      ) : null}
+
+      {/* Bei neuen Konten zuerst (UX 1): sonst stehen oben lauter rote „Überfällig seit …“ aus der Zeit vor Amtlos */}
+      {h.vor_start.anzahl > 0 && h.vor_start.seit && verwalten && !nochNichtBerechnet ? (
+        <section aria-labelledby="vorstart" className="rounded-md border-2 border-amt bg-blatt p-5">
+          <h2 id="vorstart" className="font-bold">
+            {x.heute.vor_start_titel}
+          </h2>
+          <p className="lesetext mt-1 text-klein">{fuelle(x.heute.vor_start_text, { n: h.vor_start.anzahl, datum: datumLang(h.vor_start.seit, s) })}</p>
+          <div className="mt-3 flex flex-wrap gap-3">
+            <form action={vorStartErledigt}>
+              <button className="knopf">{x.heute.vor_start_ja}</button>
+            </form>
+            <Link href="/pflichten?status=ueberfaellig" className="verweis self-center text-klein">
+              {x.heute.vor_start_einzeln}
+            </Link>
+          </div>
         </section>
       ) : null}
 
@@ -191,23 +268,6 @@ export default async function HeuteSeite({ searchParams }: { searchParams: Promi
         </section>
       ) : null}
 
-      {h.vor_start.anzahl > 0 && h.vor_start.seit ? (
-        <section aria-labelledby="vorstart" className="rounded-md border border-linie bg-blatt p-5">
-          <h2 id="vorstart" className="font-bold">
-            {x.heute.vor_start_titel}
-          </h2>
-          <p className="lesetext mt-1 text-klein">{fuelle(x.heute.vor_start_text, { n: h.vor_start.anzahl, datum: datumLang(h.vor_start.seit, s) })}</p>
-          <div className="mt-3 flex flex-wrap gap-3">
-            <form action={vorStartErledigt}>
-              <button className="knopf knopf-leise">{x.heute.vor_start_ja}</button>
-            </form>
-            <Link href="/pflichten?status=ueberfaellig" className="verweis self-center text-klein">
-              {x.heute.vor_start_einzeln}
-            </Link>
-          </div>
-        </section>
-      ) : null}
-
       {naheTermine.length ? (
         <section aria-labelledby="weitere">
           <h2 id="weitere" className="text-gross font-bold">{x.heute.weitere_fristen}</h2>
@@ -239,7 +299,7 @@ export default async function HeuteSeite({ searchParams }: { searchParams: Promi
         </form>
       ) : null}
 
-      {!ohneProfil ? (
+      {!ohneProfil && verwalten ? (
         <p className="lesetext flex flex-wrap items-center gap-x-4 gap-y-2">
           <span>{x.heute.melden_frage}</span>
           <Link href="/melden" className="knopf knopf-leise">{x.heute.melden_link}</Link>

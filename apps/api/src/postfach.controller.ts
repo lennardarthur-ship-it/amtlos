@@ -4,12 +4,11 @@ import { z } from "zod";
 import { Datenbank, dokumentAblegen, heute, type Ablage } from "@amtlos/server";
 import { Kontext, MitUnternehmen, type Anfragekontext } from "./auth.js";
 import { ABLAGE } from "./finanzen.controller.js";
-import { pruefe, uebersetzeDbFehler } from "./hilfen.js";
+import { DATUM, pruefe, uebersetzeDbFehler } from "./hilfen.js";
 import { terminTitel, weitereTermine } from "./pflichten.controller.js";
 
 const SCHREIBEN = ["inhaber", "admin", "steuerberater"] as const;
 const Uuid = z.string().uuid();
-const DATUM = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Datum im Format JJJJ-MM-TT");
 const ARTEN = ["bescheid", "mahnung", "anhoerung", "auskunftsersuchen", "sonstiges"] as const;
 const FRISTARTEN = ["einspruch", "zahlung", "antwort", "sonstige"] as const;
 const TYPEN: Record<string, string> = { "application/pdf": "pdf", "image/jpeg": "jpg", "image/png": "png" };

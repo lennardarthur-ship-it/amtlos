@@ -6,7 +6,7 @@ import { z } from "zod";
 import { Datenbank, GEFAEHRDUNGSFAKTOREN, dokumentAblegen, gefaehrdungsbeurteilungPdf, gefahrstoffverzeichnisPdf, heute, neuberechnungEinreihen, type Ablage, type Tx } from "@amtlos/server";
 import { Kontext, MitUnternehmen, type Anfragekontext } from "./auth.js";
 import { ABLAGE } from "./finanzen.controller.js";
-import { pruefe, uebersetzeDbFehler } from "./hilfen.js";
+import { DATUM, pruefe, uebersetzeDbFehler } from "./hilfen.js";
 import { WARTESCHLANGE } from "./kern.controller.js";
 import { profilNachziehen } from "./profil-sync.js";
 import { plusMonate } from "./datum.js";
@@ -15,7 +15,6 @@ export { plusMonate };
 
 const SCHREIBEN = ["inhaber", "admin", "steuerberater"] as const;
 const Uuid = z.string().uuid();
-const DATUM = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Datum im Format JJJJ-MM-TT");
 const TEXT = (max: number) => z.string().trim().min(1).max(max);
 const OPTIONAL = (max: number) => z.string().trim().max(max).nullable().optional().transform((v) => (v ? v : null));
 

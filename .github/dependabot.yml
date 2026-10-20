@@ -1,0 +1,38 @@
+# Automatische Abhängigkeits-Updates (Due-Diligence H2): wöchentlich, gruppiert, damit wenige PRs entstehen.
+# Kleine Updates gesammelt; Major-Versionen einzeln (gestaffelt prüfen, z. B. pg-boss, zod, NestJS, vitest).
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Berlin
+    open-pull-requests-limit: 10
+    groups:
+      laufzeit-klein:
+        dependency-type: production
+        update-types: [minor, patch]
+      entwicklung-klein:
+        dependency-type: development
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Berlin
+    groups:
+      actions:
+        patterns: ["*"]
+
+  - package-ecosystem: docker
+    directory: /docker
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Berlin

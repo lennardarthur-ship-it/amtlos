@@ -1,9 +1,9 @@
 import { Fusszeile } from "@/komponenten/fusszeile";
 import { Markenname } from "@/komponenten/markenname";
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { Navigation, type NavEintrag } from "@/komponenten/navigation";
-import { aktivesUnternehmen, api, ich } from "@/lib/api";
+import { aktivesUnternehmen, api, darfVerwalten, ich } from "@/lib/api";
 import { fuelle } from "@amtlos/i18n";
 import type { Abo } from "./einstellungen/abo/page";
 import { t } from "@/lib/sprache";
@@ -11,6 +11,8 @@ import { pfadSichtbar } from "@/lib/umfang";
 
 /** Seiten, die über „Mehr“ erreicht werden (dort ist „Mehr“ aktiv). */
 const MEHR = ["/radar", "/frag", "/experten", "/team", "/hilfe", "/melden", "/kanzlei"];
+/** Bereiche mit Daten Dritter (Finanzen, Personalakten, Datenpannen): für Mitarbeitende ausgeblendet (H4). */
+const VERTRAULICH = ["/finanzen", "/personal", "/datenschutz"];
 
 export default async function AppRahmen({ children }: { children: ReactNode }) {
   const [{ s, t: x }, u, i, abo] = await Promise.all([t(), aktivesUnternehmen(), ich(), api<Abo>("/v1/abo").catch(() => null)]);
@@ -26,8 +28,10 @@ export default async function AppRahmen({ children }: { children: ReactNode }) {
           <Link href="/heute" className="tracking-tight">
             <Markenname />
           </Link>
-          <p className="truncate text-klein text-tinte-leise md:mt-1" title={u.name}>
+          <p className="truncate text-klein text-tinte-leise md:mt-1" title={fuelle(x.rolle.angemeldet_als, { rolle: x.team.rollen[u.rolle], unternehmen: u.name })}>
             {u.name}
+            {/* In welchem Unternehmen und mit welcher Rolle man gerade handelt (UX 2 und 4) */}
+            <span className="block truncate text-tinte-leise md:mt-0.5">{x.team.rollen[u.rolle]}</span>
             {i.unternehmen.length > 1 ? (
               <>
                 {" "}
@@ -38,6 +42,7 @@ export default async function AppRahmen({ children }: { children: ReactNode }) {
             ) : null}
           </p>
         </div>
+        <Suspense>
         <Navigation
           beschriftung={x.nav.hauptnavigation}
           eintraege={([
@@ -52,14 +57,20 @@ export default async function AppRahmen({ children }: { children: ReactNode }) {
             { href: "/postfach", text: x.nav.postfach, symbol: "postfach", nurDesktop: true },
             { href: "/einstellungen", text: x.nav.einstellungen, symbol: "einstellungen", nurDesktop: true },
             { href: "/mehr", text: x.nav.mehr, symbol: "mehr", auch: MEHR },
-          ] satisfies NavEintrag[]).filter((e) => pfadSichtbar(e.href))}
+          ] satisfies NavEintrag[]).filter((e) => pfadSichtbar(e.href) && (darfVerwalten(u.rolle) || !VERTRAULICH.includes(e.href)))}
         />
+        </Suspense>
       </aside>
       <main id="inhalt" className="min-w-0 flex-1 px-4 pb-28 pt-2 md:px-0 md:py-8">
         {aboHinweis ? (
           <p className={`mb-6 rounded-md border-2 p-3 text-klein ${abo.schreibbar ? "border-bald bg-bald-hauch" : "border-frist bg-frist-hauch"}`}>
             {abo.schreibbar ? fuelle(x.abo.hinweis_tage, { n: Math.max(0, resttage ?? 0) }) : `${x.abo.schreiben_gesperrt} `}
             <Link href="/einstellungen/abo" className="verweis font-bold">{x.abo.hinweis_link}</Link>
+          </p>
+        ) : null}
+        {u.rolle === "mitarbeiter" ? (
+          <p className="mb-6 text-klein text-tinte-leise">
+            {fuelle(x.rolle.angemeldet_als, { rolle: x.team.rollen[u.rolle], unternehmen: u.name })} {x.rolle.mitarbeiter_hinweis}
           </p>
         ) : null}
         {children}

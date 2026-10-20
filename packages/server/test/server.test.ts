@@ -81,7 +81,7 @@ describe.skipIf(!DB_VERFUEGBAR)("Server-Kern gegen PostgreSQL", () => {
 
     const i = await instanzen();
     expect(i.find((x) => x.pflicht_id === "gruendung.berufsgenossenschaft")).toMatchObject({ periode: "einmalig", status: "offen", faellig_am: "2026-10-08" });
-    expect(i.find((x) => x.pflicht_id === "steuern.ust_voranmeldung")).toMatchObject({ status: "nicht_zutreffend", nicht_zutreffend_grund: "Du nutzt die Kleinunternehmerregelung nicht." });
+    expect(i.find((x) => x.pflicht_id === "steuern.ust_voranmeldung")).toMatchObject({ status: "nicht_zutreffend", nicht_zutreffend_grund: "Gilt erst, wenn: Du nutzt die Kleinunternehmerregelung nicht." });
     expect(i.find((x) => x.pflicht_id === "arbeitsschutz.gefaehrdungsbeurteilung")).toMatchObject({ status: "nicht_zutreffend" });
   });
 
@@ -133,7 +133,37 @@ describe.skipIf(!DB_VERFUEGBAR)("Server-Kern gegen PostgreSQL", () => {
       tx.abfrage("insert into app.ereignis (unternehmen_id, typ, eingetreten_am, quelle, storniert_ereignis_id) values ($1, 'erste_einstellung', '2026-11-02', 'nutzer', $2)", [unternehmenId, ev]),
     );
     await neuberechnen(worker, unternehmenId, "storno", { stichtag: STICHTAG, kalender });
-    expect((await instanzen()).find((x) => x.pflicht_id === "arbeitsschutz.gefaehrdungsbeurteilung")).toMatchObject({ status: "offen", faellig_am: null });
+    // Ohne (nicht stornierte) Einstellung zählt wieder das Profil (H6): 1 Beschäftigte ⇒ Einstellung zum Gründungstag
+    expect((await instanzen()).find((x) => x.pflicht_id === "arbeitsschutz.gefaehrdungsbeurteilung")).toMatchObject({ status: "offen", faellig_am: "2026-09-30" });
+    // Ohne Beschäftigte gilt sie nicht – mit der Begründung als Bedingung
+    await profilSetzen({ rechtsform: "freiberuf", gruendungsdatum: "2026-10-01", "ust.kleinunternehmer": true, "beschaeftigte.gesamt": 0, bundesland: "BE" });
+    await neuberechnen(worker, unternehmenId, "storno", { stichtag: STICHTAG, kalender });
+    expect((await instanzen()).find((x) => x.pflicht_id === "arbeitsschutz.gefaehrdungsbeurteilung")).toMatchObject({
+      status: "nicht_zutreffend", nicht_zutreffend_grund: "Gilt erst, wenn: Du beschäftigst mindestens eine Person.",
+    });
+  });
+
+  it("H6: Beschäftigte im Profil ohne erfasste Personen – Einstellungs-Pflichten gelten (wie in der App)", async () => {
+    const { ereignisseMitBestand } = await import("../src/berechnung.js");
+    expect(ereignisseMitBestand([], { "beschaeftigte.gesamt": 3, gruendungsdatum: "2019-04-01" }, STICHTAG)).toEqual([
+      { typ: "erste_einstellung", datum: "2019-04-01" },
+      { typ: "einstellung", datum: "2019-04-01" },
+    ]);
+    expect(ereignisseMitBestand([], { "beschaeftigte.gesamt": 1 }, STICHTAG)).toEqual([{ typ: "erste_einstellung", datum: STICHTAG }, { typ: "einstellung", datum: STICHTAG }]);
+    expect(ereignisseMitBestand([], { "beschaeftigte.gesamt": 0 }, STICHTAG)).toEqual([]);
+    const echt = [{ typ: "einstellung", datum: "2026-11-02" }];
+    expect(ereignisseMitBestand(echt, { "beschaeftigte.gesamt": 3 }, STICHTAG)).toBe(echt);
+
+    await profilSetzen({ rechtsform: "freiberuf", gruendungsdatum: "2026-10-01", "ust.kleinunternehmer": true, "beschaeftigte.gesamt": 3, bundesland: "BE" });
+    await neuberechnen(worker, unternehmenId, "profil", { stichtag: STICHTAG, kalender });
+    const i = await instanzen();
+    for (const id of ["arbeitsschutz.erstunterweisung", "personal.nachweisgesetz", "personal.sv_anmeldung"]) {
+      const offen = i.filter((x) => x.pflicht_id === id && x.status !== "entfallen");
+      expect(offen.length, id).toBeGreaterThan(0);
+      expect(offen.every((x) => x.status === "offen"), id).toBe(true);
+    }
+    // Begründungen für „gilt nicht“ sind als Bedingung formuliert, nicht als Behauptung
+    for (const x of i.filter((y) => y.status === "nicht_zutreffend" && y.nicht_zutreffend_grund)) expect(x.nicht_zutreffend_grund).toMatch(/^Gilt erst, wenn: /);
   });
 
   it("plant Erinnerungen um 8 Uhr Ortszeit und versendet fällige", async () => {
@@ -160,6 +190,41 @@ describe.skipIf(!DB_VERFUEGBAR)("Server-Kern gegen PostgreSQL", () => {
     expect(versand.gesendet[0]).toMatchObject({ an: "test@example.org" });
     expect(versand.gesendet[0]!.betreff).toMatch(/^Fällig am \d{2}\.\d{2}\.\d{4}: /);
     expect((await versendeFaelligeErinnerungen(worker, versand, "x")).gesendet).toBe(0); // nicht doppelt
+  });
+
+  it("M10: SMTP-Fehler – Erinnerung bleibt geplant und wird mit Abstand erneut versucht; nichts doppelt", async () => {
+    const admin = new Datenbank(urls.owner);
+    const alsEigentuemer = async <T>(sql: string, werte: unknown[] = []) => {
+      await admin.imKontext({}, (tx) => tx.abfrage("alter table app.erinnerung no force row level security"));
+      try {
+        return await admin.imKontext({}, (tx) => tx.abfrage<T & Record<string, unknown>>(sql, werte));
+      } finally {
+        await admin.imKontext({}, (tx) => tx.abfrage("alter table app.erinnerung force row level security"));
+      }
+    };
+    const [ziel] = await alsEigentuemer<{ id: string }>(
+      "update app.erinnerung set geplant_fuer = now() - interval '1 minute' where id = (select id from app.erinnerung where status = 'geplant' order by geplant_fuer limit 1) returning id",
+    );
+    let versuche = 0;
+    const kaputt = { email: async () => { versuche++; throw new Error("SMTP 421"); } };
+    expect(await versendeFaelligeErinnerungen(worker, kaputt, "x")).toEqual({ gesendet: 0, fehler: 1 });
+    const [nachFehler] = await alsEigentuemer<{ status: string; versuche: number; naechster_versuch: Date }>("select status, versuche, naechster_versuch from app.erinnerung where id = $1", [ziel!.id]);
+    expect(nachFehler).toMatchObject({ status: "geplant", versuche: 1 });
+    expect(nachFehler!.naechster_versuch.getTime()).toBeGreaterThan(Date.now());
+    // vor dem nächsten Versuch passiert nichts; eine Neuplanung löscht die Wiederholung nicht
+    expect(await versendeFaelligeErinnerungen(worker, kaputt, "x")).toEqual({ gesendet: 0, fehler: 0 });
+    await worker.imKontext({ unternehmenId }, (tx) => planeErinnerungen(tx, unternehmenId, STICHTAG));
+    expect(await alsEigentuemer("select 1 from app.erinnerung where id = $1", [ziel!.id])).toHaveLength(1);
+    // Abstand abgelaufen: diesmal klappt es – genau eine Mail
+    await alsEigentuemer("update app.erinnerung set naechster_versuch = now() - interval '1 second' where id = $1", [ziel!.id]);
+    const versand = new ProtokollVersand();
+    expect(await versendeFaelligeErinnerungen(worker, versand, "x")).toEqual({ gesendet: 1, fehler: 0 });
+    expect(versand.gesendet).toHaveLength(1);
+    expect(versuche).toBe(1);
+    // Hängengebliebener Versand (Worker abgestürzt) wird nach einer Stunde erneut versucht
+    await alsEigentuemer("update app.erinnerung set status = 'in_versand', versand_begonnen_am = now() - interval '2 hours' where id = $1", [ziel!.id]);
+    expect((await versendeFaelligeErinnerungen(worker, versand, "x")).gesendet).toBe(1);
+    await admin.schliessen();
   });
 
   it("reiht Neuberechnungen transaktional ein", async () => {

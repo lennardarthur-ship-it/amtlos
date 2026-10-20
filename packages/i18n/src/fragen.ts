@@ -108,11 +108,6 @@ export const SCHRITTE: Schritt[] = [
         },
       },
       { feld: "gesellschafter.anzahl", art: "zahl", frage: { de: "Wie viele Gesellschafter gibt es?", en: "How many shareholders are there?" } },
-      {
-        feld: "gesellschafter.auslaendische_investoren",
-        art: "janein",
-        frage: { de: "Sind Investoren aus dem Ausland beteiligt oder geplant?", en: "Are investors from abroad involved or planned?" },
-      },
     ],
   },
   {
@@ -246,6 +241,13 @@ export const SCHRITTE: Schritt[] = [
         },
       },
       { feld: "alg1_bezug", art: "janein", frage: { de: "Bekommst du gerade Arbeitslosengeld I?", en: "Are you currently receiving unemployment benefit I?" } },
+      // für jede Rechtsform (nicht nur UG/GmbH): sonst blieben AWV-Meldung und Investitionsprüfung bei Einzelunternehmen offen
+      {
+        feld: "gesellschafter.auslaendische_investoren",
+        art: "janein",
+        frage: { de: "Sind Investoren aus dem Ausland an deinem Unternehmen beteiligt oder geplant?", en: "Are investors from abroad involved in your business or planned?" },
+        hilfe: { de: "Zum Beispiel Gesellschafter, stille Beteiligte oder Geldgeber mit Sitz im Ausland. Wenn nicht: Nein.", en: "For example shareholders, silent partners or backers based abroad. If not: No." },
+      },
     ],
   },
   {
@@ -342,7 +344,8 @@ export const SCHRITTE: Schritt[] = [
         optionen: {
           ladengeschaeft: { de: "Im Laden", en: "In a shop" },
           onlineshop: { de: "Eigener Onlineshop", en: "Own online shop" },
-          marktplatz: { de: "Über Marktplätze", en: "Through marketplaces" },
+          marktplatz: { de: "Über Online-Marktplätze (z. B. Amazon, Etsy, eBay)", en: "Through online marketplaces (e.g. Amazon, Etsy, eBay)" },
+          marktstand: { de: "Am Marktstand (Wochen-, Weihnachts- oder Kunsthandwerkermarkt)", en: "At a market stall (weekly, Christmas or craft market)" },
           abo: { de: "Im Abo", en: "Subscriptions" },
           app: { de: "Über eine App", en: "Through an app" },
           vor_ort_beim_kunden: { de: "Beim Kunden vor Ort", en: "At the customer's site" },
@@ -362,6 +365,15 @@ export const SCHRITTE: Schritt[] = [
           lebensmittel: { de: "Lebensmittel", en: "Food" },
           kosmetik: { de: "Kosmetik", en: "Cosmetics" },
           digital: { de: "Digitale Produkte", en: "Digital products" },
+        },
+      },
+      {
+        feld: "bauleistungen.fuer_unternehmen",
+        art: "janein",
+        frage: { de: "Erbringst du Bauleistungen für andere Unternehmen?", en: "Do you provide construction work for other businesses?" },
+        hilfe: {
+          de: "Bauleistungen sind alle Leistungen, die der Herstellung, Instandsetzung, Instandhaltung, Änderung oder Beseitigung von Bauwerken dienen (§ 48 Abs. 1 EStG) – auch Elektro-, Sanitär- oder Malerarbeiten, zum Beispiel als Subunternehmer.",
+          en: "Construction work means any work serving the construction, repair, maintenance, alteration or demolition of buildings (§ 48(1) EStG) – including electrical, plumbing or painting work, e.g. as a subcontractor.",
         },
       },
       { feld: "online.website", art: "janein", frage: { de: "Hast du eine eigene Website?", en: "Do you have your own website?" } },
@@ -413,6 +425,7 @@ export const SCHRITTE: Schritt[] = [
           monatlich: { de: "Monatlich", en: "Monthly" },
           quartalsweise: { de: "Vierteljährlich", en: "Quarterly" },
           jaehrlich: { de: "Jährlich", en: "Yearly" },
+          keine: { de: "Keine – nur Minijobs mit 2 % Pauschsteuer über die Minijob-Zentrale", en: "None – only mini-jobs with the 2 % flat-rate tax via the Minijob-Zentrale" },
         },
       },
       { feld: "arbeitsschutz.elektrische_geraete", art: "janein", frage: { de: "Nutzt ihr im Betrieb elektrische Geräte (z. B. Computer, Maschinen, Küchengeräte)?", en: "Do you use electrical equipment at work (e.g. computers, machines, kitchen appliances)?" } },

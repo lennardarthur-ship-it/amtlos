@@ -5,7 +5,7 @@ import { datumLang, frageFuerFakt, fuelle, schrittFuerFakt } from "@amtlos/i18n"
 import { Fristblatt } from "@/komponenten/fristblatt";
 import { periodeText } from "@/lib/periode";
 import { StatusText } from "@/komponenten/status";
-import { api } from "@/lib/api";
+import { aktivesUnternehmen, api, darfVerwalten } from "@/lib/api";
 import { t } from "@/lib/sprache";
 import { zielPfad } from "@/lib/ziele";
 import type { KartenDetail } from "@/lib/typen";
@@ -40,7 +40,9 @@ async function wiederOeffnen(pflichtId: string, periode: string) {
 /** Seitenvertrag „Pflicht-Karte“ (docs/04): Was · Bis wann · Erledigen · Warum · Was sonst · Mehr · Quellen. */
 export default async function PflichtSeite({ params }: { params: Params }) {
   const { pflichtId, periode } = await params;
-  const [{ s, t: x }, d] = await Promise.all([t(), api<KartenDetail>(`/v1/pflichten/${encodeURIComponent(pflichtId)}/${encodeURIComponent(periode)}`)]);
+  const [{ s, t: x }, d, u] = await Promise.all([t(), api<KartenDetail>(`/v1/pflichten/${encodeURIComponent(pflichtId)}/${encodeURIComponent(periode)}`), aktivesUnternehmen()]);
+  // Mitarbeitende erledigen, öffnen aber nichts wieder und ändern keine Angaben (H3)
+  const verwalten = darfVerwalten(u.rolle);
   const offen = ["offen", "faellig_bald", "ueberfaellig", "angabe_fehlt"].includes(d.status);
   const ergaenzenSchritt = d.fehlende_fakten.map(schrittFuerFakt).find(Boolean);
   const steuerOderRecht = ["steuern", "gesellschaft"].includes(d.kategorie) || d.status === "angabe_fehlt";
@@ -86,9 +88,11 @@ export default async function PflichtSeite({ params }: { params: Params }) {
       {d.status === "erledigt" ? (
         <section className="flex flex-wrap items-center gap-4">
           <span className="stempel">{d.erledigt_am ? fuelle(x.karte.erledigt_am, { datum: datumLang(d.erledigt_am.slice(0, 10), s) }) : x.status.erledigt}</span>
-          <form action={wiederOeffnen.bind(null, pflichtId, periode)}>
-            <button className="knopf knopf-leise">{x.karte.wieder_oeffnen}</button>
-          </form>
+          {verwalten ? (
+            <form action={wiederOeffnen.bind(null, pflichtId, periode)}>
+              <button className="knopf knopf-leise">{x.karte.wieder_oeffnen}</button>
+            </form>
+          ) : null}
         </section>
       ) : offen && d.ergebnis === "gilt" ? (
         <>
@@ -138,7 +142,7 @@ export default async function PflichtSeite({ params }: { params: Params }) {
               <li key={f}>{frageFuerFakt(f)?.frage[s] ?? d.zu_klaeren.join(" ")}</li>
             ))}
           </ul>
-          {ergaenzenSchritt ? (
+          {ergaenzenSchritt && verwalten ? (
             <Link href={`/onboarding/${ergaenzenSchritt}?zurueck=${encodeURIComponent(`/pflichten/${pflichtId}/${periode}`)}`} className="knopf mt-4">
               {x.karte.angabe_ergaenzen}
             </Link>
