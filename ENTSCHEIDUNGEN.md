@@ -981,6 +981,20 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 - **Oberfläche:** Der Stempel aus E-142 wird endlich benutzt (leere Zustände, Check-Ergebnis, „GETEILT“/„BEZAHLT“ auf dem Papier mit Feder-Animation und Erfolgs-Haptik, abschaltbar über „Bewegung reduzieren“); deckende Bühnenknöpfe, sichtbare Kapsel im Dunkelmodus, Meldungen über Fuß oder Kapsel statt über Feldern, Verlauf über dem Fuß, ein Kästchen, ein Feldstil, eine Radius-Skala (10/14/18/24/32/Pille), eine Fluchtlinie, `BLATT_OBEN`; Bühne mit Aussage (Monatsumsatz statt „0,00 €“, Zahl der Unterlagen), Bühnentext höchstens zwei Zeilen; Check-Abschluss mit Ergebnis als Hauptknopf und Zählkacheln; Live-Rechnung im Positionseditor; Bezahlschirm beginnt mit dem Nutzen; Store-Bilder mit iOS-Statusleiste.
 - **Dokumente:** kurze Rechnungen bleiben einseitig (Zahlungsblock beim Betrag; alle 51 Szenario-Rechnungen einseitig), Brief 10 pt und Feinsatz nach DIN 5008 (Infoblock bis 190 mm, Rechnungsdatum zuletzt, Summen ab Mengenspalte, Empfänger im Zahlungsblock, GiroCode 25 mm mit Ruhezone), optionale Anrede, Fußzeile auf dem Satzspiegel je Gestalt, Hausfarben mit mindestens 4,5:1, typografisches Minus, Aushänge lesbarer (10,5/12 pt, Allergenmatrix mit Kennbuchstaben), Lohnkonto auf einer Querseite, Bilanz als eine Tabelle mit echter Doppellinie, kräftigere Feldnummern und Randangaben, Mehrzahl weiterer Einheiten, IBAN/SV-Nummer gegliedert. Keine PDF hat mehr Seiten als vorher.
 
+
+### E-151 · Runde 9: zwölf unabhängige Prüfungen und Korrekturen (2026-10-20)
+
+**Prüfungen:** Datenintegrität, Sicherheit/Datenschutz, Performance mit großem Betrieb (2.300 Unterlagen, 5.000 Belege), Apple App Review, kleine Bildschirme/große Schrift/Grenzfälle, Lektorat aller Bausteine und Vorlagen, Web-App/API/Worker, technische Due Diligence, Website/Store-Eintrag sowie drei neue Jahres-Szenarien (Online-Shop mit EU-Kundschaft, Physio-Praxis, Elektrobetrieb).
+
+**Entschieden und umgesetzt:**
+- **Integrität:** festgeschriebene Fassungen werden nie überschrieben (Konfliktkopie), nur das Storno aus `storniertDurch` zählt, Festschreiben nur bei unverändertem PDF-Inhalt, Belege in der Aufbewahrung werden archiviert statt gelöscht (Protokoll der Änderungen), Sicherung nur vollständig mit allen Belegdateien, alter Schlüssel wird archiviert, unbekannte Vorlagen/Belege bleiben erhalten, Versionsprüfung mit Migrationsgerüst, Schreibfehler sichtbar.
+- **Sicherheit:** Tresor-Format 2 mit Zweckbindung (AAD) und Zähler gegen Rückspielen, Format 3 binär für Fotos (alte Formate bleiben lesbar), Passwortstärke statt nur Länge, Abdeckung im App-Umschalter, Entpackgrenze 20 MB, Prüfung der Belegdateinamen; Server: Token vor dem Body, Rollen „Mitarbeiter“ ohne vertrauliche Daten, CSP/HSTS, nodemailer 10.
+- **App Review:** kein Testknopf im Store-Build, Testzeitraum nur bei Berechtigung, Preis am Knopf, `usesNonExemptEncryption: true`, Privacy Manifest nach Build-Art (`app.config.ts`), Fehlergrenze ohne Crash-SDK.
+- **Performance ohne native Module** (Expo Go muss weiter laufen): gebündeltes Speichern im Leerlauf, Sync ohne Entschlüsseln vorhandener Dateien, getrennte Kontexte, virtualisierte Listen; Steuerberater-Paket ohne Neukomprimieren.
+- **Fachlich (nur gesicherte Punkte):** § 141 AO nicht für Freiberufler, Kz 41/48/60, Leistungszeitraum in Quartal und XRechnung, Soll-Versteuerung bei Vorauszahlung, halbjährliche Unterweisung Jugendlicher (§ 29 JArbSchG), Fälligkeit am Werktag. Alles Weitere in PRUEFLISTE T-106 bis T-111.
+
+**Bewusst nicht umgesetzt (Gründerentscheidung):** Speicher-Umbau (Teilspeichern/SQLite) und native Verschlüsselung, Streaming-Sicherungsformat, geheimer Zusatzschlüssel für den Sync, Crash-Reporting, Einfrieren der Server-Plattform, neue Funktionen aus den Szenarien (Leitweg-ID, Abschlags-/Schlussrechnung, Skonto, § 13b am Beleg, anteilige Vorsteuer, Einnahmen ohne Rechnung, OSS, Vorlagen für Heilberufe und Shops), Nummernvergabe erst beim Teilen.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)
