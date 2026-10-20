@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useRef, useState } from "react";
 import { Image, Pressable, View } from "react-native";
 import { BUNDESLAENDER, HAUSFARBEN, PERSONEN_FELDER, VERSTEUERUNG, VORLAGEN, emailGueltig, ibanGueltig, plzGueltig, type Betrieb as BetriebDaten, type PersonenArt } from "@amtlos/fachlogik";
@@ -151,6 +152,7 @@ export function AbsenderSeite() {
 export function BetriebFormular({ teil, teile }: { teil?: Teil; teile?: Teil[] }) {
   const { stand, betriebSpeichern, pro } = useAmtlos();
   const sperre = useProSperre();
+  const f = useFarben();
   const [b, setB] = useState<BetriebDaten>(stand.betrieb);
   // geprüft wird ein Feld erst nach dem Verlassen (beim Tippen wäre jede halbe IBAN „ungültig“) – gespeicherte Werte sofort
   const [verlassen, setVerlassen] = useState<Set<keyof BetriebDaten>>(() => new Set((["iban", "plz", "email"] as const).filter((k) => (stand.betrieb[k] ?? "").trim())));
@@ -183,14 +185,16 @@ export function BetriebFormular({ teil, teile }: { teil?: Teil; teile?: Teil[] }
           <Karte stil={{ paddingBottom: 14 }}>
             <Feld label={TEXT.b_name} {...feld("name")} textContentType="organizationName" />
             <Feld label={TEXT.b_strasse} {...feld("strasse")} textContentType="streetAddressLine1" />
-            <View style={{ flexDirection: "row", gap: 10, alignItems: "flex-end" }}>
+            {/* PLZ und Ort nebeneinander; die Meldung zur PLZ steht darunter über die ganze Breite – neben „Ort“ verschöbe sie das Raster (G7) */}
+            <View style={{ flexDirection: "row", gap: 10, alignItems: "flex-start" }}>
               <View style={{ flex: 1 }}>
-                <Feld label={TEXT.b_plz} {...feld("plz")} keyboardType="number-pad" textContentType="postalCode" />
+                <Feld label={TEXT.b_plz} {...feld("plz")} ohneFehlerText keyboardType="number-pad" textContentType="postalCode" />
               </View>
               <View style={{ flex: 2 }}>
                 <Feld label={TEXT.b_ort} {...feld("ort")} textContentType="addressCity" />
               </View>
             </View>
+            {feld("plz").fehler ? <T v="caption" farbe={f.frist} stil={{ marginTop: 5 }}>{feld("plz").fehler}</T> : null}
             <AuswahlZeile label={TEXT.b_bundesland} wert={b.bundesland || null} aendern={(w) => feld("bundesland").aendern(w)} optionen={BUNDESLAENDER.map((l) => ({ wert: l, text: l }))} />
             <Feld label={TEXT.b_verantwortlich} {...feld("verantwortlich")} textContentType="name" />
             <Feld label={TEXT.b_telefon} {...feld("telefon")} keyboardType="phone-pad" textContentType="telephoneNumber" />
@@ -316,10 +320,31 @@ function BetriebKopf({ b, onPress }: { b: BetriebDaten; onPress: () => void }) {
 }
 
 /** Tab „Mein Betrieb“: Übersicht wie in den iOS-Einstellungen – jede Gruppe auf einer eigenen Seite. */
+/** Präfix der beiseitegelegten (unlesbaren) Stände – wie in zustand.tsx (`${SCHLUESSEL}.unlesbar.`) */
+const BEISEITE_PRAEFIX = "amtlos.unterlagen.v1.unlesbar.";
+
+/** Gibt es beiseitegelegte Stände (H4)? Nur dann steht „Beiseitegelegte Daten erneut öffnen“ da. */
+function useBeiseitegelegt(stand: unknown): boolean {
+  const [da, setDa] = useState(false);
+  useEffect(() => {
+    let aktiv = true;
+    void AsyncStorage.getAllKeys()
+      .then((k) => aktiv && setDa(k.some((x) => x.startsWith(BEISEITE_PRAEFIX))))
+      .catch(() => undefined);
+    return () => {
+      aktiv = false;
+    };
+  }, [stand]);
+  return da;
+}
+
 export function Betrieb() {
   const z = useAmtlos();
   const { allesLoeschen } = z;
   const nav = useNav();
+  const melden = useMeldung();
+  const beiseite = useBeiseitegelegt(z.ladefehler);
+  const [versucht, setVersucht] = useState(false);
   const [frage, setFrage] = useState(false);
   const [zaehler, setZaehler] = useState(0);
   const fest = aufbewahrungspflichtig(z.stand).length;
@@ -384,7 +409,22 @@ export function Betrieb() {
           <Zeile symbol="arrow.clockwise" ton="blau" titel={TEXT.wiederherstellen} label={TEXT.wiederherstellen} onPress={() => nav.oeffnen("wiederherstellen", () => <WiederherstellenSeite fertig={() => setZaehler((x) => x + 1)} />, true)} letzte />
         </Karte>
       </Gruppe>
-      <Gruppe fuss={TEXT.alles_loeschen_text}>
+      {beiseite && !z.ladefehler ? (
+        <Karte stil={{ marginTop: 16 }}>
+          <Zeile
+            symbol="arrow.clockwise"
+            ton="blau"
+            titel={TEXT.beiseitegelegte_versuchen}
+            onPress={() => {
+              if (versucht) return;
+              setVersucht(true);
+              void z.beiseitegelegteVersuchen().then((n) => melden(TEXT.beiseitegelegte_ergebnis(n))).finally(() => setVersucht(false));
+            }}
+            letzte
+          />
+        </Karte>
+      ) : null}
+      <Gruppe fuss={`${TEXT.alles_loeschen_text} ${TEXT.alles_loeschen_kopien_hinweis}`}>
         {frage && !darfLoeschen ? (
           <Karte stil={{ paddingVertical: 14, gap: 10 }}>
             <T>{TEXT.loeschen_gesperrt(fest, regelwert("steuern.aufbewahrung.belege_jahre") ?? 8)}</T>
@@ -401,10 +441,13 @@ export function Betrieb() {
                 gefahr
                 text={TEXT.loeschen_ja}
                 onPress={() =>
-                  void allesLoeschen().then(() => {
+                  void (async () => {
+                    // Ladefehler (H4): nur nach einer zweiten, ausdrücklichen Bestätigung – die unlesbaren Daten bleiben beiseitegelegt
+                    if (z.ladefehler && !(await bestaetigen({ titel: TEXT.ladefehler_alles_loeschen_wirklich, text: TEXT.ladefehler_alles_loeschen_text, ja: TEXT.alles_loeschen }))) return;
+                    await allesLoeschen(z.ladefehler);
                     setFrage(false);
                     setZaehler((x) => x + 1);
-                  })
+                  })()
                 }
                 stil={{ flex: 1 }}
               />

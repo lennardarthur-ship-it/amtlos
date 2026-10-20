@@ -26,6 +26,8 @@ export const T = {
   erstellen: "Erstellen",
   alle_vorlagen_menue: "Alle Vorlagen …",
   neu_titel: "Neu erstellen",
+  /** Kopf von „Heute“, wenn das Gerät eine andere Zeitzone hat (G10) */
+  datum_deutsche_zeit: (datum: string) => `${datum} · deutsche Zeit`,
   gruss: (stunde: number) => (stunde < 11 ? "Guten Morgen" : stunde < 18 ? "Guten Tag" : "Guten Abend"),
   als_naechstes: "Als Nächstes",
   alle_pflichten: "Alle Pflichten",
@@ -150,7 +152,7 @@ export const T = {
   aus_rechnungen_ok: (n: number) => (n === 1 ? "Umsätze aus 1 Rechnung übernommen – Stornos zählen negativ." : `Umsätze aus ${n} Rechnungen übernommen – Stornos zählen negativ.`),
   bezahlt_titel: "Zahlung",
   bezahlt_kurz: "bezahlt",
-  marke: { bezahlt: "Bezahlt", offen: "Offen", ueberfaellig: "Überfällig", storniert: "Storniert", entwurf: "Entwurf" },
+  marke: { bezahlt: "Bezahlt", offen: "Offen", ueberfaellig: "Überfällig", storniert: "Storniert", entwurf: "Entwurf", konfliktkopie: "Konfliktkopie – nicht gültig" },
   ueberfaellig_seit: (n: number) => (n === 1 ? "seit\u00a0gestern\u00a0fällig" : `seit\u00a0${n}\u00a0Tagen\u00a0fällig`), // bricht als Ganzes um
   faellig_bis: (d: string) => `Fällig bis ${d}`,
   faellig_war: (d: string) => `Überfällig – fällig war der ${d}`,
@@ -634,6 +636,10 @@ export const T = {
   tastatur_fertig: "Fertig",
   datum_waehlen: "Datum wählen",
   datum_falsch: "Bitte das Datum als TT.MM.JJJJ eingeben, z. B. 05.03.2026.",
+  menge_null: "Die Menge ist 0 oder negativ – so kann die Rechnung nicht raus. Rabatte trägst du als negativen Preis ein.",
+  betrag_unplausibel: "Ungewöhnlich hoher Betrag (über 10 Mio. €) – bitte Menge und Preis prüfen.",
+  datum_gibt_es_nicht: "Diesen Tag gibt es nicht – bitte Tag und Monat prüfen.",
+  datum_unplausibel: (jahr: string) => `Jahr ${jahr} – stimmt das?`,
   weitere_pflichten: "Weitere",
   datum_uebernehmen: "Übernehmen",
   // Konto und Synchronisation (E-134)

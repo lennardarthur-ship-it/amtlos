@@ -2,9 +2,10 @@ import { memo, useMemo, useState } from "react";
 import { View } from "react-native";
 import { ANLAESSE, BEREICHE, KURZ, VORLAGEN, unterlagenName, vorlageFuer, type Anlass, type Betrieb, type Vorlage } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { Karte, Knopf, Suchfeld, Symbol, T, TextKnopf, Wahl, Zeile, type Ton } from "../ui/bausteine";
+import { Karte, Knopf, Suchfeld, Symbol, T, TextKnopf, Wahl, Zeile, useGrosseSchrift, type Ton } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { useFarben } from "../ui/thema";
+import { isoliert } from "../ui/trennen";
 import { fehltFuer } from "../unterlagen/pruefung";
 import { betriebFehlt, heute, sortiert, type Unterlage } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
@@ -57,7 +58,10 @@ export const UnterlageZeile = memo(function UnterlageZeile({ u, letzte, fehlt, b
     const kunde = typeof u.daten.kunde_name === "string" ? u.daten.kunde_name.trim() : "";
     const brutto = rechnungBrutto(u, betrieb);
     // Status als Plakette rechts – wie in den Rechnungslisten guter Buchhaltungs-Apps; „überfällig“ nach dem eigenen Zahlungsziel
-    const marke = u.storniertDurch
+    // Konfliktkopie (K1): aufbewahrt, zählt aber nirgends – das muss in der Liste sofort zu sehen sein
+    const marke = u.konfliktKopieVon
+      ? { text: TEXT.marke.konfliktkopie, ton: "frist" as const }
+      : u.storniertDurch
       ? { text: TEXT.marke.storniert, ton: "leise" as const }
       : u.festgeschrieben && !storno
         ? u.bezahlt
@@ -74,9 +78,9 @@ export const UnterlageZeile = memo(function UnterlageZeile({ u, letzte, fehlt, b
       <Zeile
         symbol="eurosign"
         ton={ueber > 0 && !u.bezahlt ? "frist" : ton}
-        titel={storno ? TEXT.storno_titel(nummer, storno) : kunde || TEXT.rechnung_ohne_kunde}
+        titel={storno ? TEXT.storno_titel(nummer, storno) : isoliert(kunde) || TEXT.rechnung_ohne_kunde}
         // geschütztes Leerzeichen vor dem Trenner: eine umbrechende Zeile beginnt nie mit „·“ (A15)
-        text={[storno ? kunde : nummer, ueber > 0 && !u.bezahlt && !fehlt ? "" : datum, zusatz].filter(Boolean).join("\u00a0· ")}
+        text={[storno ? isoliert(kunde) : nummer, ueber > 0 && !u.bezahlt && !fehlt ? "" : datum, zusatz].filter(Boolean).join("\u00a0· ")}
         wert={brutto ? euroText(brutto) : undefined}
         marke={marke}
         onPress={() => onPress(u.id)}
@@ -85,7 +89,7 @@ export const UnterlageZeile = memo(function UnterlageZeile({ u, letzte, fehlt, b
     );
   }
   const status = u.festgeschrieben ? TEXT.festgeschrieben_kurz : fehlt ? TEXT.fehlen(fehlt) : TEXT.vollstaendig;
-  return <Zeile symbol="doc.text" ton={ton} titel={unterlagenName(v, u.daten)} text={`${wann(zuletzt)}\u00a0· ${status}`} onPress={() => onPress(u.id)} letzte={letzte} />;
+  return <Zeile symbol="doc.text" ton={ton} titel={unterlagenName(v, u.daten)} text={`${wann(zuletzt)}\u00a0· ${status}`} marke={u.konfliktKopieVon ? { text: TEXT.marke.konfliktkopie, ton: "frist" } : undefined} onPress={() => onPress(u.id)} letzte={letzte} />;
 });
 
 /** Tage über dem Zahlungsziel je offener Rechnung – einmal je Stand berechnet. */
@@ -189,6 +193,7 @@ export function Unterlagen(_: { schliessen?: boolean }) {
   const fehltJe = useFehltJe();
   const ueberJe = useUeberfaellig();
   const [suche, setSuche] = useState("");
+  const grosseSchrift = useGrosseSchrift();
   const s = suche.trim().toLowerCase();
   const zuletzt = sortiert(stand).slice(0, 3);
   const zuAnlass = (a: Anlass) => (a.vorlagen.length === 1 ? starten(a.vorlagen[0]!) : nav.oeffnen(`anlass-${a.id}`, () => <AnlassSeite a={a} />));
@@ -200,9 +205,10 @@ export function Unterlagen(_: { schliessen?: boolean }) {
       fest={<Suchfeld buehne wert={suche} setzen={setSuche} />}
       buehne={
         s ? undefined : (
-          <View style={{ flexDirection: "row", gap: 10 }}>
-            <Knopf buehne symbol="plus" text={TEXT.kurz_rechnung} onPress={() => starten("rechnung")} stil={{ flex: 1, paddingHorizontal: 12 }} />
-            <Knopf glas symbol="doc.viewfinder" text={TEXT.kurz_beleg} onPress={() => ziel((n) => n.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />))} stil={{ flex: 1, paddingHorizontal: 12 }} />
+          // große Schrift: untereinander, sonst wird „Rechnung“ abgeschnitten (M5, wie auf „Heute“)
+          <View style={{ flexDirection: grosseSchrift ? "column" : "row", gap: 10 }}>
+            <Knopf buehne symbol="plus" text={TEXT.kurz_rechnung} onPress={() => starten("rechnung")} stil={{ flex: grosseSchrift ? undefined : 1, paddingHorizontal: 12 }} />
+            <Knopf glas symbol="doc.viewfinder" text={TEXT.kurz_beleg} onPress={() => ziel((n) => n.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />))} stil={{ flex: grosseSchrift ? undefined : 1, paddingHorizontal: 12 }} />
           </View>
         )
       }

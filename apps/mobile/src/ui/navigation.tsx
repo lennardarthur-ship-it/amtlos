@@ -6,6 +6,7 @@ import { KeyboardAvoidingView, Platform, Pressable, View, useWindowDimensions } 
 import { T as TEXT } from "../texte";
 import { BuehnenText, Symbol, T, useGrosseSchrift } from "./bausteine";
 import { MINZE, RADIUS, RAND, SCHRIFT, ZIEL, istIos, useFarben, type Farben } from "./thema";
+import { trennen } from "./trennen";
 
 /**
  * Navigation (E-141): echte iOS-Navigation mit react-native-screens – UINavigationController mit großen Titeln,
@@ -100,8 +101,10 @@ export function kopfOptionen(f: Farben): NativeStackNavigationOptions {
 /** Web: Titel der Leiste gekürzt, in der passenden Farbe (auf der Bühne weiß). */
 const webTitel = (farbe: string) =>
   function WebTitel({ children }: { children: string }) {
-    // 180 pt: lässt links „Schließen“ und rechts „Übersicht“ Platz (A12) – lange Titel enden mit „…“
-    return <T fett numberOfLines={1} farbe={farbe} stil={{ maxWidth: 180 }}>{children}</T>;
+    // lässt links „Schließen“ und rechts „Übersicht“ Platz (A12) – lange Titel enden mit „…“; schmale Geräte weniger.
+    // Schrift höchstens 130 % wie die Leiste des iPhones – bei 200 % lägen Titel und „Übersicht“ übereinander (G11)
+    const { width } = useWindowDimensions();
+    return <T fett numberOfLines={1} maxFontSizeMultiplier={1.3} farbe={farbe} stil={{ maxWidth: Math.max(96, Math.min(180, width - 210)) }}>{children}</T>;
   };
 
 function WebZurueck({ buehne }: { buehne: boolean }) {
@@ -131,7 +134,7 @@ export function KopfText({ text, onPress, label, buehne = true }: { text: string
   const f = useFarben();
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={label ?? text} onPress={onPress} hitSlop={8} style={({ pressed }) => ({ minHeight: ZIEL, justifyContent: "center", paddingHorizontal: RAND - 6, opacity: pressed ? 0.55 : 1 })}>
-      <T fett farbe={buehne ? f.minze : f.amt}>{text}</T>
+      <T fett numberOfLines={1} maxFontSizeMultiplier={1.3} farbe={buehne ? f.minze : f.amt}>{text}</T>
     </Pressable>
   );
 }
@@ -214,7 +217,7 @@ export function Unterseite({ titel, unter, children, rechts, schliessen }: { tit
       <HellerStatus />
       {titel ? (
         <View style={{ paddingHorizontal: RAND, paddingTop: 2, paddingBottom: 20 }}>
-          <T v="titel" accessibilityRole="header" farbe={f.buehneText} numberOfLines={gross ? undefined : 3}>{titel}</T>
+          <T v="titel" accessibilityRole="header" farbe={f.buehneText} numberOfLines={gross ? undefined : 3}>{trennen(titel)}</T>
           {unter ? <BuehnenText text={unter} stil={{ marginTop: 6 }} /> : null}
         </View>
       ) : null}

@@ -55,6 +55,16 @@ export function einheitFuerMenge(einheit: string, menge: number): string {
 
 export const KU_HINWEIS = "Der Umsatz ist nach § 19 Abs. 1 UStG steuerfrei.";
 
+/**
+ * Obergrenze für eine Plausibilitätswarnung (G6): Beträge über 10 Mio. € sind bei Kleinbetrieben fast immer ein
+ * Tippfehler (Menge und Preis vertauscht, Komma vergessen). Nur ein Hinweis – gerechnet wird trotzdem exakt.
+ */
+export const PLAUSIBEL_BIS_CENT = 1_000_000_000;
+export const betragUnplausibel = (c: number) => Math.abs(c) > PLAUSIBEL_BIS_CENT;
+
+/** Menge einer Position, die keine gültige Rechnungszeile ergibt (0 oder negativ, M6) – wie die E-Rechnung prüft. */
+export const mengeUngueltig = (menge: number) => !(menge > 0);
+
 export const rundeCent = (x: number) => Math.sign(x) * Math.round(Math.abs(x)); // kaufmännisch, symmetrisch
 
 export interface Summen {

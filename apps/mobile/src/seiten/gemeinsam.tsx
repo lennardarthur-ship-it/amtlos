@@ -8,6 +8,7 @@ import { euroText } from "../unterlagen/ablage";
 import { BuehnenText, Motiv, Stempel, T, useGrosseSchrift } from "../ui/bausteine";
 import { HellerStatus, TastaturRahmen, useImBlatt, useKopf, type KopfKnopfDef } from "../ui/navigation";
 import { BLATT_OBEN, RADIUS, RAND, SCHRIFT, schattenStil, useFarben } from "../ui/thema";
+import { trennen } from "../ui/trennen";
 
 /** Platz unter dem Blatt für die schwebende Tab-Leiste. */
 export const UNTEN_FREI = 120;
@@ -40,7 +41,7 @@ export function BuehnenSeite({ ueber, titel, satz, rechts, buehne, children, ...
             </View>
           ) : null}
           {/* ein Satz als Titel (z. B. „8 Dinge in den nächsten 2 Wochen“) in 28 statt 34 pt – bricht sonst unschön (A9) */}
-          {titel ? <T v={satz ? "titel" : "grossTitel"} accessibilityRole="header" farbe={f.buehneText}>{titel}</T> : null}
+          {titel ? <T v={satz ? "titel" : "grossTitel"} accessibilityRole="header" farbe={f.buehneText}>{trennen(titel)}</T> : null}
           {buehne}
         </View>
         <View style={{ flexGrow: 1, backgroundColor: f.papier, borderTopLeftRadius: RADIUS.buehne, borderTopRightRadius: RADIUS.buehne, paddingHorizontal: RAND, paddingTop: BLATT_OBEN, paddingBottom: UNTEN_FREI }}>
@@ -83,7 +84,7 @@ export function BuehnenBlatt({ kopf = "", ueber, titel, unter, buehne, fest, rec
     <View key="kopf" style={{ paddingHorizontal: RAND, paddingTop: 6, paddingBottom: fest ? 14 : buehne ? 14 : 28, gap: 14, overflow: "hidden" }}>
       <BuehnenMotiv />
       {ueber ? <T v="klein" fett farbe={f.buehneLeise}>{ueber}</T> : null}
-      {titel ? <T v="titel" accessibilityRole="header" farbe={f.buehneText}>{titel}</T> : null}
+      {titel ? <T v="titel" accessibilityRole="header" farbe={f.buehneText}>{trennen(titel)}</T> : null}
       {unter ? <BuehnenText text={unter} /> : null}
       {fest ? null : buehne}
     </View>
@@ -123,7 +124,8 @@ export function BuehnenKnopf({ text, onPress, label }: { text: string; onPress: 
 export function BuehnenMarke({ text, warnung }: { text: string; warnung?: boolean }) {
   const f = useFarben();
   return (
-    <View style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: RADIUS.pille, backgroundColor: warnung ? "rgba(255,105,97,0.22)" : f.buehneFlaeche }}>
+    // darf schrumpfen und umbrechen – sonst würde ein langer Text („… davon 1 überfällig“) rechts abgeschnitten (G2)
+    <View style={{ flexShrink: 1, maxWidth: "100%", paddingHorizontal: 12, paddingVertical: 6, borderRadius: RADIUS.pille, backgroundColor: warnung ? "rgba(255,105,97,0.22)" : f.buehneFlaeche }}>
       <T v="caption" farbe={warnung ? "#ffc9c4" : f.buehneText} stil={{ ...SCHRIFT.halb }}>{text}</T>
     </View>
   );

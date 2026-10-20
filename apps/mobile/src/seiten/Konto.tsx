@@ -8,12 +8,11 @@ import { Feld, Fuss, Hinweis, Karte, Knopf, PasswortFeld, Symbol, T, TextKnopf, 
 import { useMeldung } from "../ui/meldung";
 import { useNav } from "../ui/navigation";
 import { useFarben, weich } from "../ui/thema";
-import { PASSWORT_MINDESTLAENGE } from "../unterlagen/sicherung";
 import { useAmtlos } from "../zustand";
 import { bestaetigen } from "../ui/bestaetigen";
 import { BuehnenBlatt, Gruppe } from "./gemeinsam";
 import { ProSeite, useProSperre } from "./Pro";
-import { PasswortPaar } from "./Sicherung";
+import { PasswortPaar, passwortBereit } from "./Sicherung";
 
 const zeitpunkt = (iso: string) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
 
@@ -39,7 +38,8 @@ export function KontoZeile() {
 function NeuesPasswort({ label, setzen }: { label: string; setzen: (pw: string | null) => void }) {
   const [pw, setPw] = useState("");
   const [pw2, setPw2] = useState("");
-  const pruefen = (a: string, b: string) => setzen(a.length >= PASSWORT_MINDESTLAENGE && a === b ? a : null);
+  // dieselbe Prüfung wie bei der Sicherung (H-1): stark genug und zweimal gleich
+  const pruefen = (a: string, b: string) => setzen(passwortBereit(a, b) ? a : null);
   return <PasswortPaar label={label} pw={pw} pw2={pw2} setPw={(w) => { setPw(w); pruefen(w, pw2); }} setPw2={(w) => { setPw2(w); pruefen(pw, w); }} />;
 }
 
@@ -54,6 +54,8 @@ export function KontoSeite() {
   const [kennung, setKennung] = useState("");
   const [pw, setPw] = useState("");
   const [neuPw, setNeuPw] = useState<string | null>(null);
+  const [altPw, setAltPw] = useState("");
+  const [altFalsch, setAltFalsch] = useState(false);
   const [falsch, setFalsch] = useState(false);
   const [aendern, setAendern] = useState(false);
   const [beschaeftigt, setBeschaeftigt] = useState(false);
@@ -173,22 +175,35 @@ export function KontoSeite() {
         ) : null}
         {fehler}
         {k.nummernKonflikte.length ? <Hinweis text={TEXT.konto_nummern(k.nummernKonflikte)} symbol="number" /> : null}
+        {/* nach dem Zusammenführen (K1, K2, Belegdateien): was geklärt werden muss */}
+        {k.festKonflikte.length ? <Hinweis art="warnung" text={TEXT.fest_konflikt(k.festKonflikte)} /> : null}
+        {k.mehrfachStorniert.length ? <Hinweis art="warnung" text={TEXT.mehrfach_storniert(k.mehrfachStorniert)} /> : null}
+        {k.defekteDateien.length ? <Hinweis art="warnung" text={TEXT.konto_dateien_defekt(k.defekteDateien.length)} /> : null}
+        {k.fehlendeDateien.length ? <Hinweis art="warnung" text={TEXT.konto_dateien_fehlen(k.fehlendeDateien.length)} /> : null}
 
         <Gruppe>
           {aendern ? (
             <Karte stil={{ paddingBottom: 14 }}>
               <T v="klein" leise stil={{ marginTop: 12 }}>{TEXT.konto_passwort_aendern_text}</T>
+              {/* das bisherige Passwort zuerst (M-6): wer nur das entsperrte Gerät hat, kann es nicht ändern */}
+              <PasswortFeld label={TEXT.konto_passwort_alt} wert={altPw} aendern={(w) => { setAltPw(w); setAltFalsch(false); }} fehler={altFalsch ? TEXT.konto_passwort_alt_falsch : null} />
               <NeuesPasswort label={TEXT.konto_passwort_neu} setzen={setNeuPw} />
               <View style={{ flexDirection: "row", gap: 10, marginTop: 14 }}>
                 <Knopf
                   text={TEXT.konto_passwort_aendern}
                   laedt={beschaeftigt}
-                  deaktiviert={!neuPw}
+                  deaktiviert={!neuPw || !altPw}
                   onPress={() =>
                     void machen(async () => {
-                      if (!neuPw) return;
-                      await k.passwortAendern(neuPw);
+                      if (!neuPw || !altPw) return;
+                      try {
+                        await k.passwortAendern(neuPw, altPw);
+                      } catch (e) {
+                        if (e instanceof SyncFehler && e.art === "passwort") setAltFalsch(true);
+                        throw e;
+                      }
                       setAendern(false);
+                      setAltPw("");
                       melden(TEXT.konto_passwort_geaendert);
                     })
                   }
@@ -198,7 +213,7 @@ export function KontoSeite() {
               </View>
             </Karte>
           ) : (
-            <TextKnopf symbol="key" text={TEXT.konto_passwort_aendern} onPress={() => { weich(); setNeuPw(null); setAendern(true); }} />
+            <TextKnopf symbol="key" text={TEXT.konto_passwort_aendern} onPress={() => { weich(); setNeuPw(null); setAltPw(""); setAltFalsch(false); setAendern(true); }} />
           )}
         </Gruppe>
 

@@ -22,6 +22,7 @@ import { Blatt, InhaltSeite, WurzelNavKontext, kopfOptionen, useNav } from "./ui
 import { HAARLINIE, SCHRIFT, TASTATUR_FERTIG, istIos, useFarben } from "./ui/thema";
 import { AmtlosAnbieter, useAmtlos, type Tab } from "./zustand";
 import { KontoAnbieter } from "./konto/konto";
+import { Abdeckung } from "./sicherheit/abdeckung";
 
 void SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
@@ -42,16 +43,27 @@ function Kapsel({ state, navigation }: BottomTabBarProps) {
   const f = useFarben();
   const inset = useSafeAreaInsets();
   const erstellen = useErstellen();
-  // große Schrift: das Wort in der Pille passt dann nicht mehr neben vier Symbole und „+“ – nur noch Symbole; lange
-  // drücken zeigt den Namen groß (Large Content Viewer, iOS)
-  const mitWort = useWindowDimensions().fontScale <= 1.35;
+  const { width, fontScale } = useWindowDimensions();
+  // schmale Geräte (SE, mini, „Größerer Text“ im Anzeigezoom): weniger Rand, damit vier Symbole und „+“ sicher passen
+  const rand = width < 360 ? 12 : 20;
+  const pillenRand = width < 400 ? 12 : 15;
+  // Platz der Tab-Reihe: Breite ohne Ränder, Innenabstand der Kapsel, „+“ (52 + 6) und Lücke (4)
+  const platz = width - 2 * rand - 14 - 52 - 6 - 4;
+  // Wort in der Pille nur, wenn es neben den drei anderen Symbolen Platz hat – geschätzt aus der Wortlänge (halbfett,
+  // 15 pt, eher breit gerechnet) und der Schriftgröße; sonst nur Symbole (lange drücken zeigt den Namen groß, iOS)
+  const mitWort = (id: Tab) => {
+    if (fontScale > 1.35) return false;
+    const wort = TEXT.tabs_kurz[id].length * 15 * 0.62 * Math.max(1, fontScale);
+    return 3 * 52 + 2 * pillenRand + 21 + 7 + wort <= platz;
+  };
   return (
-    <View pointerEvents="box-none" style={{ position: "absolute", left: 0, right: 0, bottom: Math.max(inset.bottom - 6, 14), paddingHorizontal: 20 }}>
+    <View pointerEvents="box-none" style={{ position: "absolute", left: 0, right: 0, bottom: Math.max(inset.bottom - 6, 14), paddingHorizontal: rand }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 4, height: 66, paddingLeft: 7, paddingRight: 7, borderRadius: 33, backgroundColor: f.kapsel, borderWidth: 1, borderColor: f.kapselRand, shadowColor: "#000", shadowOpacity: 0.25, shadowRadius: 18, shadowOffset: { width: 0, height: 10 }, elevation: 8 }}>
-        <View accessibilityRole="tablist" style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+        <View accessibilityRole="tablist" style={{ flex: 1, minWidth: 0, overflow: "hidden", flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
           {state.routes.map((r, i) => {
             const k = TABS.find((t) => t.id === r.name)!;
             const an = i === state.index;
+            const wort = an && mitWort(k.id);
             return (
               <Pressable
                 key={r.key}
@@ -67,10 +79,10 @@ function Kapsel({ state, navigation }: BottomTabBarProps) {
                   if (!an && !e.defaultPrevented) navigation.navigate(r.name);
                 }}
                 hitSlop={4}
-                style={({ pressed }) => ({ height: 52, minWidth: 52, paddingHorizontal: an && mitWort ? 15 : 0, borderRadius: 26, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7, backgroundColor: an ? "rgba(127,227,184,0.16)" : "transparent", opacity: pressed ? 0.7 : 1 })}
+                style={({ pressed }) => ({ height: 52, minWidth: 52, paddingHorizontal: wort ? pillenRand : 0, borderRadius: 26, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7, backgroundColor: an ? "rgba(127,227,184,0.16)" : "transparent", opacity: pressed ? 0.7 : 1 })}
               >
                 <Symbol name={an ? k.symbolAn : k.symbol} groesse={21} farbe={an ? f.minze : "rgba(255,255,255,0.72)"} gewicht={an ? "semibold" : "regular"} />
-                {an && mitWort ? <T v="klein" farbe={f.minze} stil={{ ...SCHRIFT.bold }} numberOfLines={1} maxFontSizeMultiplier={1.35}>{TEXT.tabs_kurz[k.id]}</T> : null}
+                {wort ? <T v="klein" farbe={f.minze} stil={{ ...SCHRIFT.bold }} numberOfLines={1} maxFontSizeMultiplier={1.35}>{TEXT.tabs_kurz[k.id]}</T> : null}
               </Pressable>
             );
           })}
@@ -240,7 +252,7 @@ function LadefehlerSeite() {
     <View style={{ flex: 1, padding: 24, gap: 14, justifyContent: "center" }}>
       <Kachel symbol="exclamationmark.triangle" ton="frist" groesse={60} />
       <T v="titel" accessibilityRole="header">{TEXT.ladefehler_titel}</T>
-      <T>{TEXT.ladefehler}</T>
+      <T>{z.ladefehlerArt === "version" ? TEXT.ladefehler_version : TEXT.ladefehler}</T>
       <Knopf text={TEXT.ladefehler_nochmal} symbol="arrow.clockwise" laedt={laedt} onPress={() => { setLaedt(true); void z.neuLaden().finally(() => setLaedt(false)); }} />
       <Knopf ton text={TEXT.wiederherstellen} symbol="arrow.clockwise" onPress={() => nav.oeffnen("wiederherstellen", () => <WiederherstellenSeite />, true)} />
       {frage ? (
@@ -307,6 +319,8 @@ export default function App() {
               <TastaturLeiste />
             </KontoAnbieter>
           </Fehlergrenze>
+          {/* über allem (auch Sperrseite): verdeckt Inhalte im App-Umschalter bei eingeschalteter App-Sperre (M-3) */}
+          <Abdeckung />
         </AmtlosAnbieter>
       </Fehlergrenze>
     </SafeAreaProvider>

@@ -25,10 +25,13 @@ const BERLIN = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Berlin" });
 const monat = (iso: string | Date) => BERLIN.format(typeof iso === "string" ? new Date(iso) : iso).slice(0, 7);
 const istStorno = (u: Unterlage) => typeof u.daten.storno_zu === "string" && u.daten.storno_zu.trim() !== "";
 
-/** Im Monat von `jetzt` erstmals ausgegebene Unterlagen (ohne Stornorechnungen – Korrekturen zählen nie). */
+/**
+ * Im Monat von `jetzt` erstmals ausgegebene Unterlagen – ohne Stornorechnungen (Korrekturen zählen nie) und ohne
+ * Konfliktkopien (K1: dieselbe Unterlage, auf einem zweiten Gerät geteilt; zählt wie in `nichtZaehlend` nicht mit).
+ */
 export function verbraucht(unterlagen: Unterlage[], jetzt: Date): number {
   const m = monat(jetzt);
-  return unterlagen.filter((u) => u.ausgegeben && monat(u.ausgegeben) === m && !istStorno(u)).length;
+  return unterlagen.filter((u) => u.ausgegeben && monat(u.ausgegeben) === m && !istStorno(u) && !u.konfliktKopieVon).length;
 }
 
 /** Wie viele kostenlose erste Ausgaben in diesem Monat noch übrig sind. */

@@ -6,6 +6,8 @@ import { createContext, useContext, useEffect, useId, useRef, useState, type Rea
 import { AccessibilityInfo, ActivityIndicator, Animated, Pressable, Text as RNText, ScrollView, Switch, TextInput, View, useColorScheme, useWindowDimensions, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { T as TEXT } from "../texte";
+import { datumLesen, isoAus } from "./datum";
+import { trennen } from "./trennen";
 import { DatumWahl } from "./datumwahl";
 import { FussKontext } from "./fussHoehe";
 import { GROESSE, HAARLINIE, RADIUS, RAND, SCHRIFT, TASTATUR_FERTIG, ZIEL, istIos, useFarben, useWenigBewegung, weich, type Farben } from "./thema";
@@ -442,19 +444,25 @@ export function Zeile({ links, symbol, ton, titel, text, wert, marke, rechts, on
   const f = useFarben();
   // große Schrift: nichts abschneiden – die Zeile wird dann eben höher
   const gross = useGrosseSchrift();
+  const schmal = useWindowDimensions().width < 360;
+  // große Schrift oder sehr schmal (320 pt): der Betrag rückt unter Titel und Text – nebeneinander blieben für den
+  // Titel nur ein paar Zeichen, Wörter und Daten brächen mitten im Wort („Kim / Beis / piel“, M4, G2)
+  const betragUnten = Boolean(wert) && (gross || schmal);
   const vorn = symbol ? <Kachel symbol={symbol} ton={ton} /> : links;
   const inhalt = (pressed: boolean) => (
     <View style={{ flexDirection: "row", alignItems: "center", opacity: pressed ? 0.55 : 1 }}>
       {vorn ? <View style={{ marginRight: 14, minWidth: 24, alignItems: "center" }}>{vorn}</View> : null}
       <View style={{ flex: 1, minWidth: 0, flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 13, minHeight: 58, borderBottomWidth: letzte ? 0 : HAARLINIE, borderColor: f.linie }}>
         <View style={{ flex: 1, minWidth: 0 }}>
-          <T fett={!gefahr} farbe={gefahr ? f.frist : undefined} numberOfLines={gross ? undefined : 3}>{titel}</T>
-          {text ? <T v="klein" leise numberOfLines={gross ? undefined : 2} stil={{ marginTop: 1 }}>{text}</T> : null}
+          {/* Absatz immer links nach rechts (G3) – ein Kundenname in arabischer Schrift ordnet sonst die ganze Zeile um */}
+          <T fett={!gefahr} farbe={gefahr ? f.frist : undefined} numberOfLines={gross ? undefined : 3} stil={{ writingDirection: "ltr" }}>{trennen(titel)}</T>
+          {text ? <T v="klein" leise numberOfLines={gross ? undefined : 2} stil={{ marginTop: 1, writingDirection: "ltr" }}>{text}</T> : null}
           {/* Status als Plakette unter dem Titel (A15) – rechts bleibt Platz für den Betrag */}
           {marke ? <View style={{ flexDirection: "row", marginTop: 5 }}><Marke text={marke.text} ton={marke.ton} /></View> : null}
+          {betragUnten ? <View style={{ flexDirection: "row", marginTop: 6 }}><Betrag>{wert}</Betrag></View> : null}
         </View>
         {/* Betrag rechts (Rechnungen, Belege) – das, wonach man in Listen sucht */}
-        {wert ? (
+        {wert && !betragUnten ? (
           <View style={{ alignItems: "flex-end", marginLeft: 4 }}>
             <Betrag>{wert}</Betrag>
           </View>
@@ -558,7 +566,7 @@ export function feldRahmen(f: Farben, zustand: { fokus?: boolean; fehler?: boole
 const feldText = (f: Farben): TextStyle => ({ color: f.tinte, ...SCHRIFT.regular, fontSize: GROESSE.basis, ...(istIos ? null : ({ outlineStyle: "none" } as unknown as TextStyle)) });
 
 /** Beschriftetes Textfeld; die Beschriftung steht darüber und ist mit dem Feld verbunden. */
-export function Feld({ label, wert, aendern, hilfe, fehler, mehrzeilig, ohneLabel, optional, onFocus, onBlur, ...rest }: { label: string; wert: string; aendern: (w: string) => void; hilfe?: string; fehler?: string | null; mehrzeilig?: boolean; ohneLabel?: boolean; optional?: boolean } & Omit<React.ComponentProps<typeof TextInput>, "value" | "onChangeText" | "style">) {
+export function Feld({ label, wert, aendern, hilfe, fehler, mehrzeilig, ohneLabel, optional, ohneFehlerText, onFocus, onBlur, ...rest }: { label: string; wert: string; aendern: (w: string) => void; hilfe?: string; fehler?: string | null; mehrzeilig?: boolean; ohneLabel?: boolean; optional?: boolean; /** Fehler nur am Rahmen (und für VoiceOver) – der Text steht dann außerhalb, z. B. unter einer Feldreihe */ ohneFehlerText?: boolean } & Omit<React.ComponentProps<typeof TextInput>, "value" | "onChangeText" | "style">) {
   const f = useFarben();
   const inKarte = useInKarte();
   const [fokus, setFokus] = useState(false);
@@ -588,7 +596,7 @@ export function Feld({ label, wert, aendern, hilfe, fehler, mehrzeilig, ohneLabe
         style={[feldRahmen(f, { fokus, fehler: Boolean(fehler), inKarte }), feldText(f), { minHeight: mehrzeilig ? 104 : 50, paddingTop: mehrzeilig ? 13 : 0, paddingBottom: mehrzeilig ? 13 : 0, textAlignVertical: mehrzeilig ? "top" : "center", marginTop: 7 }]}
         {...rest}
       />
-      {fehler ? <T v="caption" farbe={f.frist} stil={{ marginTop: 5 }}>{fehler}</T> : null}
+      {fehler && !ohneFehlerText ? <T v="caption" farbe={f.frist} stil={{ marginTop: 5 }}>{fehler}</T> : null}
     </View>
   );
 }
@@ -633,29 +641,35 @@ export function PasswortFeld({ label, wert, aendern, hinweis, fehler, neu, onBlu
   );
 }
 
-/** ISO-Datum ↔ deutsche Schreibweise TT.MM.JJJJ (bzw. englisch DD/MM/YYYY). */
-export function isoAus(text: string): string | null {
-  const de = /^\s*(\d{1,2})[./-](\d{1,2})[./-](\d{4})\s*$/.exec(text);
-  const iso = /^\s*(\d{4})-(\d{2})-(\d{2})\s*$/.exec(text);
-  const [t, mo, j] = de ? [Number(de[1]), Number(de[2]), Number(de[3])] : iso ? [Number(iso[3]), Number(iso[2]), Number(iso[1])] : [0, 0, 0];
-  if (!j) return null;
-  // nur Tage, die es gibt (kein 31.02.) – zurückgerechnet geprüft
-  const d = new Date(Date.UTC(j, mo - 1, t));
-  if (d.getUTCFullYear() !== j || d.getUTCMonth() !== mo - 1 || d.getUTCDate() !== t) return null;
-  return `${j}-${String(mo).padStart(2, "0")}-${String(t).padStart(2, "0")}`;
-}
+/** ISO-Datum ↔ deutsche Schreibweise TT.MM.JJJJ (bzw. englisch DD/MM/YYYY, kurz „5.3.26“) – siehe ./datum. */
+export { isoAus };
 export const textAus = (iso: string | null | undefined) => (iso ? `${iso.slice(8, 10)}.${iso.slice(5, 7)}.${iso.slice(0, 4)}` : "");
 
-/** Datumsfeld ohne zusätzliches Paket: Eingabe als TT.MM.JJJJ, „Heute“ als Abkürzung. Liefert ISO oder null. */
+/**
+ * Datumsfeld ohne zusätzliches Paket: Eingabe als TT.MM.JJJJ, „Heute“ als Abkürzung. Liefert ISO oder null.
+ * Der Text bleibt beim Tippen stehen, auch wenn er (noch) kein Datum ist (H2) – nur ein Wert von außen („Heute“,
+ * Kalender, anderer Stand) ersetzt ihn. Beim Verlassen wird ein gültiges Datum einheitlich geschrieben („5.3.26“ →
+ * „05.03.2026“).
+ */
 export function DatumFeld({ label, wert, aendern, hilfe, ohneHeute, ohneLabel }: { label: string; wert: string | null; aendern: (iso: string | null) => void; hilfe?: string; ohneHeute?: boolean; ohneLabel?: boolean }) {
   const f = useFarben();
   const heuteText = TEXT.heute;
   const [text, setText] = useState(textAus(wert));
   const [fokus, setFokus] = useState(false);
   const inKarte = useInKarte();
-  useEffect(() => setText(textAus(wert)), [wert]);
+  // zuletzt aus diesem Feld gemeldeter Wert: kommt er als `wert` zurück, bleibt der getippte Text stehen
+  const gemeldet = useRef<string | null>(wert);
+  useEffect(() => {
+    if (wert === gemeldet.current) return;
+    gemeldet.current = wert;
+    setText(textAus(wert));
+  }, [wert]);
   const heute = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Berlin" }).format(new Date());
-  const falsch = text.trim() !== "" && !isoAus(text);
+  const gelesen = datumLesen(text);
+  const leer = text.trim() === "";
+  // ein unmöglicher Tag sofort, ein unvollständiges Format erst nach dem Verlassen – beim Tippen ist „20.10.20“ normal
+  const fehlerText = leer ? null : gelesen.fehler === "tag" ? TEXT.datum_gibt_es_nicht : gelesen.fehler === "format" && !fokus ? TEXT.datum_falsch : null;
+  const hinweisText = !leer && gelesen.iso && gelesen.unplausibel ? TEXT.datum_unplausibel(gelesen.iso.slice(0, 4)) : null;
   return (
     <View style={{ marginTop: ohneLabel ? 8 : 20 }}>
       {ohneLabel ? null : <FeldKopf label={label} hilfe={hilfe} />}
@@ -665,17 +679,22 @@ export function DatumFeld({ label, wert, aendern, hilfe, ohneHeute, ohneLabel }:
           value={text}
           onChangeText={(w) => {
             setText(w);
-            aendern(w.trim() === "" ? null : isoAus(w));
+            const iso = w.trim() === "" ? null : datumLesen(w).iso;
+            gemeldet.current = iso;
+            aendern(iso);
           }}
           onFocus={() => setFokus(true)}
-          onBlur={() => setFokus(false)}
+          onBlur={() => {
+            setFokus(false);
+            if (gelesen.iso) setText(textAus(gelesen.iso));
+          }}
           placeholder="TT.MM.JJJJ"
-          accessibilityHint={falsch ? TEXT.datum_falsch : undefined}
+          accessibilityHint={fehlerText ?? hinweisText ?? undefined}
           placeholderTextColor={f.tinteLeise}
           selectionColor={f.amt}
           keyboardType="numbers-and-punctuation"
           inputAccessoryViewID={TASTATUR_FERTIG}
-          style={[feldRahmen(f, { fokus, fehler: falsch, inKarte }), feldText(f), { flex: 1, minWidth: 0 }]}
+          style={[feldRahmen(f, { fokus, fehler: Boolean(fehlerText), inKarte }), feldText(f), { flex: 1, minWidth: 0 }]}
         />
         {ohneHeute ? null : (
           <Pressable accessibilityRole="button" accessibilityLabel={`${label}: ${heuteText}`} onPress={() => aendern(heute)} style={({ pressed }) => ({ minHeight: 50, paddingHorizontal: 15, borderRadius: RADIUS.klein, justifyContent: "center", backgroundColor: f.amtHauch, opacity: pressed ? 0.7 : 1 })}>
@@ -684,7 +703,7 @@ export function DatumFeld({ label, wert, aendern, hilfe, ohneHeute, ohneLabel }:
         )}
         <DatumWahl label={label} wert={wert} aendern={aendern} />
       </View>
-      {falsch ? <T v="caption" farbe={f.frist} stil={{ marginTop: 5 }}>{TEXT.datum_falsch}</T> : null}
+      {fehlerText ? <T v="caption" farbe={f.frist} stil={{ marginTop: 5 }}>{fehlerText}</T> : hinweisText ? <T v="caption" farbe={f.bald} stil={{ marginTop: 5 }}>{hinweisText}</T> : null}
     </View>
   );
 }

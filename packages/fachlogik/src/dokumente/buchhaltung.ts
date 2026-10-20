@@ -4,7 +4,7 @@
  * E-Bilanz, Kassenmeldung), erstellt die App als ausgefüllte Unterlage zum Übertragen – sie übermittelt nichts.
  * Gliederungen fachlich zu prüfen (T-58).
  */
-import { KU_HINWEIS, einheitFuerMenge, fehlendFuerERechnung, rundeCent, summen, type Position, type RechnungsDaten } from "../rechnung.js";
+import { KU_HINWEIS, einheitFuerMenge, fehlendFuerERechnung, mengeUngueltig, rundeCent, summen, type Position, type RechnungsDaten } from "../rechnung.js";
 import { einheitCode } from "../erechnung.js";
 import { giroCodeSvg } from "../girocode.js";
 import { EUER_ZEILE_STEUERFREI, EUER_ZEILE_STEUERPFLICHTIG, KATEGORIEN } from "../belege.js";
@@ -183,6 +183,8 @@ function plusTageIso(iso: string, tage: number): string {
 /** Meldungen der Rechnungsprüfung (auch für die Zuordnung zu einem Feld im Abschluss). */
 export const RECHNUNG_PLZ_FEHLT = "PLZ und Ort des Empfängers fehlen (letzte Zeile der Anschrift, z. B. 10115 Berlin)";
 export const RECHNUNG_NULL = "Rechnungsbetrag ist 0,00 € – bitte die Preise prüfen";
+/** Position mit Menge 0 oder negativ (M6) – die E-Rechnung lehnt sie ab; Rabatte als negativer Preis eintragen. */
+export const RECHNUNG_MENGE = "Menge einer Position ist 0 oder negativ – bitte die Menge prüfen (Rabatte als negativen Preis eintragen)";
 export const RECHNUNG_NEGATIV = "Rechnungsbetrag ist negativ – bitte die Preise prüfen (eine geteilte Rechnung korrigierst du mit „Stornieren“)";
 
 /** Anrede der Rechnung, wenn keine eigene angegeben ist. */
@@ -261,6 +263,7 @@ export const rechnung: Vorlage = {
     [RECHNUNG_PLZ_FEHLT]: "kunde_anschrift",
     [RECHNUNG_NULL]: "positionen",
     [RECHNUNG_NEGATIV]: "positionen",
+    [RECHNUNG_MENGE]: "positionen",
     // was der E-Rechnung fehlt (eRechnungAus) – für „Ergänzen“ unter „Für die E-Rechnung fehlt noch“
     [E_FEHLT["kunde.anschrift"]!]: "kunde_anschrift",
     [E_LAND_FEHLT]: "kunde_anschrift",
@@ -290,6 +293,7 @@ export const rechnung: Vorlage = {
       if (brutto === 0) f.push(RECHNUNG_NULL);
       else if (brutto < 0) f.push(RECHNUNG_NEGATIV);
     }
+    if (pos.some((x) => mengeUngueltig(x.p.menge))) f.push(RECHNUNG_MENGE);
     const nullProzent = positionen(d).some((x) => x.p.ust_satz === 0);
     if (nullProzent && !ja(d, "kleinunternehmer") && !text(d, "befreiung") && !auswahl(d, "hinweise").some((h) => h === "reverse_charge" || h === "igl")) f.push("Hinweis auf die Steuerbefreiung (bei 0 %)");
     // Hinweis, kein Hindernis: beides zusammen ist selten richtig

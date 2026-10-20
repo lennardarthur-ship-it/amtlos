@@ -4,6 +4,7 @@ import { T as TEXT } from "../texte";
 import { Hinweis, Karte, Knopf, T, useGrosseSchrift } from "../ui/bausteine";
 import { useNav } from "../ui/navigation";
 import { SCHRIFT, useFarben } from "../ui/thema";
+import { stundeIn, zeitzoneAbweichend } from "../ui/zeit";
 import { euroText, monatsSumme, offeneSumme } from "../unterlagen/ablage";
 import { heute, sortiert } from "../unterlagen/speicher";
 import { dringlichkeit, fortschritt, istErledigt } from "../pflichten/check";
@@ -48,7 +49,9 @@ export function Heute() {
   const jetzt = new Date();
   const datum = new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", weekday: "long", day: "numeric", month: "long" }).format(jetzt);
   const monatsName = new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", month: "long" }).format(jetzt);
-  const stunde = Number(new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", hour: "numeric", hourCycle: "h23" }).format(jetzt));
+  const stunde = stundeIn(jetzt);
+  // auf Reisen (G10): Datum und Fristen bleiben in deutscher Zeit – das dazusagen, wenn das Gerät anders tickt
+  const ueber = zeitzoneAbweichend(jetzt) ? TEXT.datum_deutsche_zeit(datum) : datum;
   const zeilen = ueberfaellig.length + naechste.length;
   const grosseSchrift = useGrosseSchrift();
 
@@ -93,8 +96,8 @@ export function Heute() {
   );
 
   return (
-    <BuehnenSeite ueber={datum} buehne={buehne}>
-      {z.speicherFehler ? <Hinweis art="fehler" text={TEXT.speicher_fehler} /> : null}
+    <BuehnenSeite ueber={ueber} buehne={buehne}>
+      {z.speicherFehler ? <Hinweis art="fehler" text={z.speicherFehlerArt === "schreiben" ? TEXT.speicher_fehler_schreiben : TEXT.speicher_fehler} /> : null}
       <SicherungsKarte />
       {gemacht ? (
         <View>

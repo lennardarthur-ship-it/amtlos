@@ -190,7 +190,8 @@ export function tabelle(kopf: string[], zeilen: string[][], o: { breiten?: strin
   const rumpf = `<tbody>${alle.slice(0, ab).map(zeile).join("")}</tbody>${ab < alle.length ? `<tbody class="schluss">${alle.slice(ab).map(zeile).join("")}</tbody>` : ""}`;
   return `<table class="liste${o.hoch ? " hoch" : ""}${o.klasse ? ` ${o.klasse}` : ""}">${cols}<thead><tr>${kopf.map((k, i) => `<th${z(i)}>${esc(k)}</th>`).join("")}</tr></thead>${rumpf}${fuss}</table>`;
 }
-export const zelle = (t: string) => esc(t).replace(/\n/g, "<br>");
+/** Zelleninhalt mit Zeilenumbrüchen; Tabs (aus eingefügtem Text) werden zu Leerzeichen (G4). */
+export const zelle = (t: string) => esc(t.replace(/[ \t]*\t[ \t]*/g, " ")).replace(/\n/g, "<br>");
 
 /**
  * Unterschriften nebeneinander. Mit `ortDatum` bekommt jeder Block zusätzlich eine Zeile für Ort und Datum (Verträge,
@@ -1061,11 +1062,13 @@ export function brief(o: { titel: string; betreff: string; unterBetreff?: string
   const ortZeile = [b.plz.trim(), b.ort.trim()].filter(Boolean).join(" ");
   const voll = [b.name.trim(), b.strasse.trim(), ortZeile].filter(Boolean).join(" · ");
   const ruecksendung = voll.length <= 72 ? voll : [b.name.trim(), b.ort.trim()].filter(Boolean).join(" · ");
-  const zeilenEmpf = [o.empfaenger.name.trim(), ...o.empfaenger.anschrift.trim().split("\n"), o.empfaenger.zusatz ?? ""].map((z) => z.trim()).filter(Boolean);
+  // eingefügte Anschrift (G4): Leerzeilen entfallen, Tabs und doppelte Leerzeichen werden zu einem Leerzeichen
+  const anschriftZ = o.empfaenger.anschrift.split("\n").map((z) => z.replace(/[ \t]+/g, " ").trim()).filter(Boolean);
+  const zeilenEmpf = [o.empfaenger.name.trim(), ...anschriftZ, o.empfaenger.zusatz ?? ""].map((z) => z.trim()).filter(Boolean);
   // DIN 5008: Anschriftzone 27,3 mm – bis 6 Zeilen in 10 pt, sonst kleiner; die Anschrift wird nie gekürzt
   const eng = anschriftZeilen(zeilenEmpf, 44) <= 6 ? "" : anschriftZeilen(zeilenEmpf, 49) <= 7 ? " eng" : " enger";
   // ohne Anschrift: zwei Linien (Straße, PLZ und Ort) unter dem Namen bzw. seiner Linie
-  const empf = `${o.empfaenger.name.trim() ? `${esc(o.empfaenger.name.trim())}<br>` : LINIE}${o.empfaenger.anschrift.trim() ? esc(o.empfaenger.anschrift.trim()).replace(/\n/g, "<br>") : `${LINIE}${LINIE}`}${o.empfaenger.zusatz ? `<br><span style="font-size:8pt;color:#4a535c">${esc(o.empfaenger.zusatz)}</span>` : ""}`;
+  const empf = `${o.empfaenger.name.trim() ? `${esc(o.empfaenger.name.trim().replace(/[ \t]+/g, " "))}<br>` : LINIE}${anschriftZ.length ? anschriftZ.map(esc).join("<br>") : `${LINIE}${LINIE}`}${o.empfaenger.zusatz ? `<br><span style="font-size:8pt;color:#4a535c">${esc(o.empfaenger.zusatz)}</span>` : ""}`;
   // leere Angaben entfallen; mit drittem Eintrag `true` bleibt eine Linie zum Ausfüllen (z. B. Rechnungsnummer), mit
   // viertem `true` steht der Wert halbfett (Datum). `null` ist eine Leerzeile – nur zwischen zwei Angaben.
   const gefuellt = o.info.filter((z) => z === null || z[1].trim() || z[2]);

@@ -17,6 +17,7 @@ import { euerUebernahme, jahreMitDaten, kassenHinweis, kassenLage, type EuerUebe
 import { Ansage, Felder, useAnsage } from "./felder";
 import { InfoSeite } from "./InfoSeite";
 import { ListenSchritt } from "./Liste";
+import { trennen } from "../ui/trennen";
 
 /** Fehlende Angaben je Schritt – für „Fast fertig“ und die Übersicht. Prüfungen gegen „Mein Betrieb“ stehen extra. */
 export function fehltJeSchritt(v: Vorlage, d: Daten): string[][] {
@@ -169,7 +170,7 @@ function SchrittKopf({ v, a, index }: { v: Vorlage; a: VorlagenAbschnitt; index:
   return (
     <View style={{ paddingTop: 4, paddingBottom: 26 }}>
       <T v="caption" fett farbe={f.minze} stil={{ marginBottom: 4 }}>{TEXT.schritt(index + 1, v.abschnitte.length)}</T>
-      <T v="titel" accessibilityRole="header" farbe={f.buehneText}>{a.titel}</T>
+      <T v="titel" accessibilityRole="header" farbe={f.buehneText}>{trennen(a.titel ?? "")}</T>
       {a.hilfe ? <T farbe={f.buehneLeise} stil={{ marginTop: 6 }}>{a.hilfe}</T> : null}
       {index === 0 ? <TextKnopf buehne symbol="questionmark.circle" text={TEXT.wozu_link} onPress={() => nav.oeffnen(`info-${v.id}`, () => <InfoSeite id={v.id} />, true)} stil={{ marginTop: 4 }} /> : null}
     </View>

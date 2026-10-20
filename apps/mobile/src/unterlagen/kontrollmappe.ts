@@ -8,7 +8,7 @@
 import { PDFDocument } from "pdf-lib/cjs/index";
 import { BEREICHE, dateinamenTeil, unterlagenName, vorlageFuer, type Bereich, type Vorlage } from "@amtlos/fachlogik";
 import { fehltFuer } from "./pruefung";
-import type { Stand, Unterlage } from "./speicher";
+import { nichtZaehlend, type Stand, type Unterlage } from "./speicher";
 
 /** Bereiche, deren Unterlagen bei Kontrollen (Gewerbeaufsicht, BG, Lebensmittelüberwachung, Datenschutz) vorzulegen sind */
 const MAPPE_BEREICHE: Bereich[] = ["arbeitsschutz", "beauty", "gastro", "personal", "datenschutz"];
@@ -66,7 +66,10 @@ function gruppe(v: Vorlage, u: Unterlage): string {
 export function mappenAuswahl(s: Stand): MappenAuswahl {
   const beste = new Map<string, { u: Unterlage; v: Vorlage; geteilt: boolean; zeit: string }>();
   const ohne = new Set<string>();
+  // Konfliktkopien (K1) gelten nicht – in die Mappe kommt nur die gültige Fassung
+  const aus = nichtZaehlend(s.unterlagen);
   for (const u of s.unterlagen) {
+    if (aus.has(u.id)) continue;
     const v = vorlageFuer(u.vorlage);
     if (!v || !gehoertInMappe(v)) continue;
     const geteilt = Boolean(u.ausgegeben || u.festgeschrieben);

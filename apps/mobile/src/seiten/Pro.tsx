@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Linking, Pressable, View } from "react-native";
 import { LINKS } from "../rechtliches";
 import { T as TEXT } from "../texte";
+import { trennen } from "../ui/trennen";
 import { Betrag, Fuss, Hinweis, Kachel, Karte, Knopf, Symbol, T, TextKnopf, useGrosseSchrift } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { useNav } from "../ui/navigation";
@@ -27,7 +28,7 @@ function VorteilKachel({ v }: { v: ProFunktion }) {
   return (
     <View accessible accessibilityRole="text" accessibilityLabel={`${TEXT.pro_vorteil[v].titel}. ${TEXT.pro_vorteil[v].text(FREI_JE_MONAT)}`} style={{ flexBasis: gross ? "100%" : "46%", flexGrow: 1, padding: 14, borderRadius: RADIUS.karte, backgroundColor: f.blatt, gap: 8 }}>
       <Kachel symbol={VORTEIL_SYMBOL[v]} groesse={36} />
-      <T fett stil={{ marginTop: 2 }}>{TEXT.pro_kachel[v]}</T>
+      <T fett stil={{ marginTop: 2 }}>{trennen(TEXT.pro_kachel[v])}</T>
       <T v="caption" leise>{TEXT.pro_vorteil[v].text(FREI_JE_MONAT)}</T>
     </View>
   );
@@ -77,8 +78,10 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
     setFehler(null);
     if (!kaufAktiv) {
       if (!testmodus) return;
+      // nur der Testschalter – nicht den Store-Status setzen, sonst bliebe Pro nach „testweise ausschalten“ an (M3)
       z.proTestSetzen(true);
-      return fertig(true, TEXT.pro_test_an);
+      melden(TEXT.pro_test_an);
+      return nav.zurueck();
     }
     if (!wahl) return;
     setLaedt(true);
@@ -186,7 +189,11 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
       )}
       {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
       {kaufAktiv && liste !== null && !liste.length ? <TextKnopf symbol="arrow.clockwise" text={TEXT.erneut_laden} onPress={angeboteLaden} /> : null}
-      {z.pro && testmodus ? <TextKnopf symbol="xmark.circle" text={TEXT.pro_test_aus} onPress={() => z.proTestSetzen(false)} stil={{ marginTop: 8 }} /> : null}
+      {z.pro && testmodus ? <TextKnopf symbol="xmark.circle" text={TEXT.pro_test_aus} onPress={() => {
+            z.proTestSetzen(false);
+            // ohne echten Kauf gibt es kein Abo: Store-Status mit zurücksetzen; mit Kauf beim Store neu fragen (M3)
+            z.proAktualisieren(kaufAktiv ? undefined : false);
+          }} stil={{ marginTop: 8 }} /> : null}
 
       <T v="caption" leise stil={{ marginTop: 18 }}>{TEXT.pro_abo_text}</T>
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 16, marginTop: 4 }}>

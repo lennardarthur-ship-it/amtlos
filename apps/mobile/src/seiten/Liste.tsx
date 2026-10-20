@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Pressable, View } from "react-native";
-import { cent, summen, zahl, eintragAusVorschlag, kurztitelListe, neuerEintrag, ohneVerdeckteFelder, sichtbar, unlesbar, unlesbarText, vorlageFuer, type Daten, type Eintrag, type EintragWert, type ListenFeld, type Vorschlag } from "@amtlos/fachlogik";
+import { betragUnplausibel, cent, mengeUngueltig, summen, zahl, eintragAusVorschlag, kurztitelListe, neuerEintrag, ohneVerdeckteFelder, sichtbar, unlesbar, unlesbarText, vorlageFuer, type Daten, type Eintrag, type EintragWert, type ListenFeld, type Vorschlag } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { ChipLeiste, Fuss, HinzufuegenKnopf, Kaestchen, Karte, Knopf, Symbol, T, TextKnopf } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
@@ -74,6 +74,8 @@ function EintragSeite({ id, feldId, index, neu }: { id: string; feldId: string; 
   if (!feld || !e) return <Unterseite titel="">{null}</Unterseite>;
   // ein unlesbarer Preis würde als 0,00 € auf der Rechnung stehen – erst korrigieren (rote Zeile am Feld)
   const unlesbarDa = feld.felder.some((x) => sichtbar(x, ohneVerdeckteFelder(feld.felder, e)) && unlesbar(x, e[x.id]));
+  // Menge 0 oder negativ (M6): ergäbe eine Zeile über 0,00 € – die E-Rechnung lehnt sie ab; Rabatte als negativer Preis
+  const mengeFalsch = feld.felder.some((x) => x.id === "menge" && x.art === "zahl") && benutzt(feld, e) && typeof e.menge === "string" && e.menge.trim() !== "" && zahl(e.menge) !== null && mengeUngueltig(zahl(e.menge)!);
   const setze = (k: string, w: EintragWert) => {
     const liste = eintraegeVon(z.daten(id), feld);
     z.setzen(id, { [feld.id]: liste.map((y, j) => (j === index ? { ...y, [k]: w } : y)) });
@@ -98,7 +100,7 @@ function EintragSeite({ id, feldId, index, neu }: { id: string; feldId: string; 
           stil={{ marginTop: 24 }}
         />
       </Inhalt>
-      <Fuss ueber={unlesbarDa ? <Ansage v="caption" text={TEXT.preis_unlesbar_fertig} farbe={f.frist} /> : null}>
+      <Fuss ueber={unlesbarDa ? <Ansage v="caption" text={TEXT.preis_unlesbar_fertig} farbe={f.frist} /> : mengeFalsch ? <Ansage v="caption" text={TEXT.menge_null} farbe={f.frist} /> : null}>
         <Knopf text={TEXT.fertig} deaktiviert={unlesbarDa} onPress={nav.zurueck} stil={{ flex: 1 }} />
       </Fuss>
     </Unterseite>
@@ -121,6 +123,8 @@ function Rechnung({ e, kleinunternehmer }: { e: Eintrag; kleinunternehmer: boole
   return (
     <View accessibilityRole="summary" style={{ marginTop: 16, paddingVertical: 12, paddingHorizontal: 14, borderRadius: RADIUS.klein, backgroundColor: f.amtHauch }}>
       <T v="klein" fett farbe={f.amtTief} stil={{ fontVariant: ["tabular-nums"] }}>{text}</T>
+      {/* ungewöhnlich hoher Betrag (G6): nur ein Hinweis – Menge und Preis vertauscht oder Komma vergessen? */}
+      {betragUnplausibel(s.brutto_cent) ? <T v="caption" farbe={f.bald} stil={{ marginTop: 6 }}>{TEXT.betrag_unplausibel}</T> : null}
     </View>
   );
 }

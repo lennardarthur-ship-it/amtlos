@@ -126,20 +126,68 @@ export function personMerken(liste: Person[], neu: PersonAngaben, id: string): P
   return liste.map((p) => (p === alt ? ({ ...p, ...werte, id: p.id, name: p.name } as Person) : p));
 }
 
+const JAHR = /(?:19|20)\d\d/;
+
+interface NummerTeile {
+  /** Text vor der laufenden Zahl */
+  vor: string;
+  zahl: number;
+  breite: number;
+  /** Text nach der laufenden Zahl, z. B. „/2026“ bei „12/2026“ */
+  nach: string;
+  /** Jahreszahl im Schema (vor oder nach der Zahl), sonst null */
+  jahr: string | null;
+}
+
 /**
- * Nächste fortlaufende Nummer, z. B. „2026-014“ → „2026-015“. Zählt im Schema der höchsten Nummer des Jahres weiter;
- * gibt es im Jahr noch keine, beginnt sie mit „JJJJ-001“. Nummern ohne Jahreszahl zählen weiter, wenn es nur solche gibt.
+ * Zerlegt eine Nummer in Präfix, laufende Zahl und Rest. Steht vor der letzten Zahl schon eine Jahreszahl („2026-014“,
+ * „RE-2026-0099“), ist die letzte Zahl die laufende. Sonst kann die letzte Zahl selbst das Jahr sein („12/2026“,
+ * „001-2026“) – dann zählt die Zahl davor.
+ */
+function nummerTeile(n: string): NummerTeile | null {
+  const m = /^(.*?)(\d+)$/.exec(n);
+  if (!m) return null;
+  const vor = m[1]!;
+  const jahrVorn = JAHR.exec(vor);
+  if (jahrVorn) return { vor, zahl: Number(m[2]), breite: m[2]!.length, nach: "", jahr: jahrVorn[0] };
+  const h = /^(.*?)(\d+)(\D+)((?:19|20)\d\d)$/.exec(n);
+  if (h) return { vor: h[1]!, zahl: Number(h[2]), breite: h[2]!.length, nach: h[3]! + h[4]!, jahr: h[4]! };
+  return { vor, zahl: Number(m[2]), breite: m[2]!.length, nach: "", jahr: null };
+}
+
+const zusammen = (t: NummerTeile, zahl: number) => `${t.vor}${String(zahl).padStart(t.breite, "0")}${t.nach}`;
+
+/**
+ * Nächste fortlaufende Nummer, z. B. „2026-014“ → „2026-015“, „12/2026“ → „13/2026“. Zählt im Schema der höchsten Nummer
+ * des Jahres weiter. Gibt es im Jahr noch keine, wird das Schema der jüngsten Vorjahresnummer übernommen – Jahr ersetzt,
+ * Zahl auf 1 in gleicher Breite („RE-2026-0099“ → „RE-2027-0001“; ein Monat direkt nach dem Jahr wird „01“). Ohne
+ * Vorjahr beginnt sie mit „JJJJ-001“. Nummern ohne Jahreszahl zählen weiter, wenn es nur solche gibt.
  */
 export function naechsteNummer(vorhandene: string[], jahr: string): string {
-  const teile = vorhandene
-    .map((n) => /^(.*?)(\d+)$/.exec(n.trim()))
-    .filter((m): m is RegExpExecArray => Boolean(m))
-    .map((m) => ({ vor: m[1]!, zahl: Number(m[2]), breite: m[2]!.length }));
-  const imJahr = teile.filter((t) => t.vor.includes(jahr));
-  const pool = imJahr.length ? imJahr : teile.some((t) => /(19|20)\d\d/.test(t.vor)) ? [] : teile;
-  if (!pool.length) return `${jahr}-001`;
-  const max = pool.reduce((a, b) => (b.zahl > a.zahl ? b : a));
-  return `${max.vor}${String(max.zahl + 1).padStart(max.breite, "0")}`;
+  const teile = vorhandene.map((n) => nummerTeile(n.trim())).filter((t): t is NummerTeile => Boolean(t));
+  const imJahr = teile.filter((t) => t.jahr === jahr);
+  if (imJahr.length) {
+    const max = imJahr.reduce((a, b) => (b.zahl > a.zahl ? b : a));
+    return zusammen(max, max.zahl + 1);
+  }
+  const mitJahr = teile.filter((t) => t.jahr !== null);
+  if (mitJahr.length) {
+    // jüngstes Vorjahr, darin die höchste Zahl – dessen Schema mit dem neuen Jahr
+    const vorlage = mitJahr.reduce((a, b) => (b.jahr! > a.jahr! || (b.jahr === a.jahr && b.zahl > a.zahl) ? b : a));
+    const alt = vorlage.jahr!;
+    const tausch = (s: string) => {
+      const i = s.lastIndexOf(alt);
+      if (i < 0) return s;
+      // „2026-12-“: Monat nach dem Jahr gehört zum alten Jahr – im neuen beginnt er mit Januar
+      const rest = s.slice(i + 4).replace(/^([-/.]?)(0[1-9]|1[0-2])(?=[-/.])/, (_, trenner: string) => `${trenner}01`);
+      return s.slice(0, i) + jahr + rest;
+    };
+    const neu = { ...vorlage, vor: vorlage.nach ? vorlage.vor : tausch(vorlage.vor), nach: vorlage.nach ? tausch(vorlage.nach) : "" };
+    return zusammen(neu, 1);
+  }
+  if (!teile.length) return `${jahr}-001`;
+  const max = teile.reduce((a, b) => (b.zahl > a.zahl ? b : a));
+  return zusammen(max, max.zahl + 1);
 }
 
 const TRENNER = [". ", "; ", " durch ", " (", ": ", " – ", ", "];

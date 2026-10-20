@@ -2,7 +2,8 @@ import { Pressable, View, type ViewStyle } from "react-native";
 import type { ReactNode } from "react";
 import { cent, ohneVerdeckte, sichtbar, zahl, type Daten, type Eintrag, type Feld, type Vorlage } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { Symbol, T, textAus } from "../ui/bausteine";
+import { Symbol, T, textAus, useGrosseSchrift } from "../ui/bausteine";
+import { isoliert } from "../ui/trennen";
 import { RADIUS, SCHRIFT } from "../ui/thema";
 import { euroText } from "../unterlagen/ablage";
 
@@ -99,12 +100,14 @@ export function Papier({ children, stil }: { children: ReactNode; stil?: ViewSty
  */
 export function PapierBlatt({ v, d, jeSchritt, ergebnis, springen }: { v: Vorlage; d: Daten; jeSchritt: string[][]; ergebnis: [string, string][]; springen: (schritt: number) => void }) {
   const summe = ergebnis.at(-1);
+  // große Schrift: Bezeichnung und Wert untereinander – nebeneinander blieben vom Wert nur „2…“ (wie M4)
+  const gross = useGrosseSchrift();
   d = ohneVerdeckte(v, d); // wie im PDF: nichts zeigen, was das Formular gerade verdeckt
   return (
     <Papier stil={{ paddingHorizontal: 20, paddingVertical: 22, gap: 6 }}>
-      <View style={{ flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", gap: 10, marginBottom: 6 }}>
+      <View style={{ flexDirection: gross ? "column" : "row", alignItems: "flex-start", justifyContent: "space-between", gap: gross ? 0 : 10, marginBottom: 6 }}>
         <T farbe={TINTE} stil={{ ...SCHRIFT.display, fontSize: 24, lineHeight: 28, letterSpacing: -0.7, flex: 1 }}>{v.titel}</T>
-        <T v="caption" farbe={LEISE} stil={{ marginTop: 6 }}>{TEXT.papier_tippen}</T>
+        <T v="caption" farbe={LEISE} stil={{ marginTop: gross ? 2 : 6 }}>{TEXT.papier_tippen}</T>
       </View>
       {v.abschnitte.map((a, i) => {
         const fehlt = jeSchritt[i] ?? [];
@@ -127,12 +130,12 @@ export function PapierBlatt({ v, d, jeSchritt, ergebnis, springen }: { v: Vorlag
             </View>
             {z.map((x, k) =>
               x.voll ? (
-                <T key={k} v="klein" fett={x.fett} farbe={TINTE} numberOfLines={2}>{x.links}</T>
+                <T key={k} v="klein" fett={x.fett} farbe={TINTE} numberOfLines={2} stil={{ writingDirection: "ltr" }}>{isoliert(x.links)}</T>
               ) : (
-                <View key={k} style={{ flexDirection: "row", justifyContent: "space-between", gap: 12, paddingVertical: 1 }}>
+                <View key={k} style={{ flexDirection: gross ? "column" : "row", justifyContent: "space-between", gap: gross ? 0 : 12, paddingVertical: gross ? 3 : 1 }}>
                   {/* Beträge einer Liste (Positionen) werden nie gekürzt – die Bezeichnung bricht um */}
-                  <T v="klein" farbe={x.rechts && a.felder.some((f) => f.art === "liste") ? TINTE : LEISE} numberOfLines={2} stil={{ flex: 1, flexShrink: 1 }}>{x.links}</T>
-                  {x.rechts ? <T v="klein" farbe={TINTE} numberOfLines={1} stil={{ fontVariant: ["tabular-nums"], flexShrink: a.felder.some((f) => f.art === "liste") ? 0 : 1, textAlign: "right" }}>{x.rechts}</T> : null}
+                  <T v="klein" farbe={x.rechts && a.felder.some((f) => f.art === "liste") ? TINTE : LEISE} numberOfLines={2} stil={{ flex: 1, flexShrink: 1, writingDirection: "ltr" }}>{isoliert(x.links)}</T>
+                  {x.rechts ? <T v="klein" farbe={TINTE} numberOfLines={gross ? undefined : 1} stil={{ fontVariant: ["tabular-nums"], flexShrink: a.felder.some((f) => f.art === "liste") ? 0 : 1, textAlign: gross ? "left" : "right" }}>{x.rechts}</T> : null}
                 </View>
               ),
             )}

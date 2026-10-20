@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { Pressable, Share, View } from "react-native";
-import { KU_HINWEIS, PRUEFHINWEIS, cent as centAus, dateinamenTeil, dokumentHtml, eRechnungAus, pdfDateiname, vorlageFuer, xrechnungUbl, type Vorlage } from "@amtlos/fachlogik";
+import { KU_HINWEIS, PRUEFHINWEIS, betragUnplausibel, cent as centAus, dateinamenTeil, dokumentHtml, eRechnungAus, pdfDateiname, vorlageFuer, xrechnungUbl, type Vorlage } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { DatumFeld, Fuss, Hinweis, Karte, Knopf, Stempel, StempelAuftritt, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
@@ -46,6 +46,7 @@ export function schrittFuer(v: Vorlage, text: string): number {
  */
 export function useTeilen(id: string) {
   const z = useAmtlos();
+  const melden = useMeldung();
   const sperre = useProSperre();
   const [laedt, setLaedt] = useState(false);
   const [fehler, setFehler] = useState<string | null>(null);
@@ -58,13 +59,16 @@ export function useTeilen(id: string) {
     // Freikontingent (E-132): erneutes Teilen und Stornos gehen immer
     if (!ausgabeErlaubt(z.stand.unterlagen, u, z.pro, new Date()) && !sperre("pdf")) return;
     setLaedt(art === "teilen");
+    // der Inhalt, aus dem das PDF entsteht (H1): Ändert er sich, während das Teilen-Menü offen ist (z. B. durch die
+    // Synchronisation), wird nicht festgeschrieben
+    const pdfDaten = u.daten;
     try {
-      const html = dokumentHtml(v, u.daten, betriebFuerDokument(z.stand.betrieb, z.pro));
+      const html = dokumentHtml(v, pdfDaten, betriebFuerDokument(z.stand.betrieb, z.pro));
       const ok = art === "teilen" ? await pdfTeilen(html, pdfDateiname(v, u.daten, heute()), v.querformat) : await drucken(html, pdfDateiname(v, u.daten, heute()), v.querformat);
       // abgebrochen: nichts festschreiben, nichts vom Freikontingent verbrauchen
       if (!ok) return;
       const erstesMal = !u.ausgegeben;
-      z.ausgeben(id);
+      if (!z.ausgeben(id, pdfDaten)) return melden(TEXT.pdf_geaendert, "info");
       if (erstesMal && v.festschreiben) z.erfolg();
     } catch {
       setFehler(TEXT.pdf_fehler);
@@ -84,8 +88,9 @@ export function useTeilen(id: string) {
     const alle = [...new Set([...fehltFuer(z.stand, u), ...fehlt])];
     setEFehlt(alle);
     if (alle.length) return;
+    const xmlDaten = u.daten;
     try {
-      if (await dateiTeilen(`E-Rechnung-${dateinamenTeil(daten.nummer, 60) || "ohne-Nummer"}.xml`, xrechnungUbl(daten, KU_HINWEIS), "application/xml")) z.ausgeben(id);
+      if (await dateiTeilen(`E-Rechnung-${dateinamenTeil(daten.nummer, 60) || "ohne-Nummer"}.xml`, xrechnungUbl(daten, KU_HINWEIS), "application/xml") && !z.ausgeben(id, xmlDaten)) melden(TEXT.pdf_geaendert, "info");
     } catch {
       setFehler(TEXT.e_rechnung_fehler);
     }
@@ -247,6 +252,8 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
           </Karte>
         ) : null}
         {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
+        {/* Plausibilität (G6): nur ein Hinweis, kein Hindernis */}
+        {v.storno && betragUnplausibel(rechnungBrutto(u, z.stand.betrieb)) ? <Hinweis art="warnung" text={TEXT.betrag_unplausibel} /> : null}
         {zaehlt ? <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.pro_rest(rest, FREI_JE_MONAT)}</T> : null}
         <T v="caption" leise stil={{ marginTop: 4 }}>{PRUEFHINWEIS}</T>
 
