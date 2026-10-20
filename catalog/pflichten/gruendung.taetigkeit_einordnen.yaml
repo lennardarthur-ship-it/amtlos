@@ -1,7 +1,7 @@
 # Katalog A.1 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gruendung.taetigkeit_einordnen
-version: 1
+version: 2
 katalog_nr: A.1
 titel:
   de: 'Tätigkeit einordnen: freier Beruf oder Gewerbe'
@@ -43,6 +43,7 @@ sanktion:
     de: Ohne diese Einordnung bleibt offen, welche Anmeldungen du brauchst.
   schwere: hoch
 automatisierung: hinweis
+einordnung: hinweis
 aktion:
   art: formular
   ziel: onboarding.taetigkeit

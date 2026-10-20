@@ -1,7 +1,7 @@
 # Katalog D.41 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.nachweisgesetz
-version: 1
+version: 2
 katalog_nr: D.41
 titel:
   de: Arbeitsbedingungen schriftlich festhalten
@@ -37,7 +37,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Bußgeld bis 2.000 € (§ 4 NachwG).
   schwere: mittel
 automatisierung: dokument_generator
 aktion:
@@ -53,7 +53,7 @@ quellen:
 fachlich_zu_pruefen:
 - Frist (je Angabe unterschiedlich) steht nicht in der Spezifikation – als spätestens bei Beginn eingetragen, fachlich ersetzen
 - Zulässige Form (Schriftform/elektronisch) aktuell?
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion aus der Rechtsprüfung R10 (G-16) übernommen – Fundstelle bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

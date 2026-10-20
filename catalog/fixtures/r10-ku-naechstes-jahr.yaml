@@ -1,0 +1,15 @@
+persona: freiberuf
+beschreibung: "R10 (Nutzertest Lea): Kleinunternehmerin, Vorjahr 21.500 €, erwartet 34.000 € – dieses Jahr noch Kleinunternehmerin, ab 1.1. Regelbesteuerung"
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: freiberuf
+  profil.gruendungsdatum: "2024-02-01"
+  profil.taetigkeit.einordnung: freiberuf
+  profil.ust.kleinunternehmer: true
+  profil.umsatz.vorjahr: 21500
+  profil.umsatz.prognose_laufendes_jahr: 34000
+  profil.bundesland: BW
+erwartet:
+  steuern.kleinunternehmer_naechstes_jahr: gilt
+  steuern.kleinunternehmer_grenze_ueberschritten: gilt_nicht
+  steuern.kleinunternehmerregelung: gilt

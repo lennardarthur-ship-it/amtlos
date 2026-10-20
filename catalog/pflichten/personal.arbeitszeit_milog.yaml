@@ -1,16 +1,20 @@
 # Katalog D.42 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.arbeitszeit_milog
-version: 1
+version: 2
 katalog_nr: D.42
 titel:
   de: Arbeitszeit nach § 17 MiLoG aufzeichnen
 kurz:
-  de: Für Minijobber und in Sofortmeldebranchen musst du Beginn, Ende und Dauer der Arbeitszeit aufzeichnen.
+  de: Für Minijobber und in den Branchen nach § 2a Schwarzarbeitsbekämpfungsgesetz zeichnest du laufend Beginn, Ende und Dauer der Arbeitszeit auf.
 erklaerung:
-  de: § 17 MiLoG verlangt Aufzeichnungen für geringfügig Beschäftigte und für Beschäftigte in den Branchen mit Sofortmeldepflicht.
+  de: § 17 MiLoG verlangt Aufzeichnungen für geringfügig Beschäftigte und für Beschäftigte in den Branchen nach § 2a Schwarzarbeitsbekämpfungsgesetz
+    (zum Beispiel Bau, Gaststätten und Hotels, Transport und Logistik, Gebäudereinigung). Aufzuzeichnen ist spätestens bis zum Ablauf
+    des siebten Tages nach der Arbeitsleistung; die Aufzeichnungen bewahrst du zwei Jahre auf. Das ist eine laufende Pflicht – ein
+    Arbeitszeitnachweis gilt für seinen Monat.
 rechtsgrundlage:
 - § 17 MiLoG
+- § 2a SchwarzArbG
 kategorie: personal
 ausloeser:
   all:
@@ -31,12 +35,17 @@ ausloeser:
       - bau
       - gastronomie
       - personenbefoerderung
+      - spedition_logistik
+      - schausteller
+      - forstwirtschaft
       - gebaeudereinigung
       - messebau
       - fleischwirtschaft
+      - prostitution
       - sicherheitsgewerbe
+      # Branchen nach § 2a SchwarzArbG (eigene Liste, auf die § 17 MiLoG verweist) – derzeit deckungsgleich mit § 28a Abs. 4 SGB IV
       label:
-        de: Dein Betrieb gehört zu einer Branche mit Sofortmeldepflicht.
+        de: Dein Betrieb gehört zu einer Branche nach § 2a Schwarzarbeitsbekämpfungsgesetz.
 frist:
   typ: dauerhaft
 wiederholung:
@@ -47,9 +56,14 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Bußgeld bis 30.000 € (§ 21 MiLoG).
   schwere: hoch
 automatisierung: hinweis
+erledigung:
+  art: laufend
+  zeitraum: monat
+aenderungsnotiz:
+  de: Die Aufzeichnung ist eine laufende Pflicht – ein Arbeitszeitnachweis erledigt sie nur für seinen Monat. Die Branchenliste ist vollständig.
 aktion:
   art: link
   ziel: app.zeiterfassung
@@ -61,8 +75,9 @@ quellen:
   url: https://www.gesetze-im-internet.de/milog/__17.html
   abgerufen: null
 fachlich_zu_pruefen:
-- Fristen für Aufzeichnung und Aufbewahrung ergänzen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Fristen (7. Tag, zwei Jahre Aufbewahrung) im Text ergänzt (R10, Rechtsprüfung bestätigt) – als Termin nicht abgebildet; laufend je Kalendermonat'
+- '§ 2a SchwarzArbG: Aufnahme von Friseur- und Kosmetikgewerbe (Gesetz zur Modernisierung der Schwarzarbeitsbekämpfung) – ob und ab wann in Kraft (T-99)'
+- 'Sanktion aus der Rechtsprüfung R10 (G-16) übernommen – Fundstelle bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

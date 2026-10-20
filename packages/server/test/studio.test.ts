@@ -41,18 +41,21 @@ describe.skipIf(!DB_VERFUEGBAR)("Studio: Versionen, Vier-Augen-Freigabe, Release
   });
 
   let neueId: string;
+  let neueVersion: number;
   it("legt neue Versionen nur gültig und mit fortlaufender Nummer an", async () => {
     const [v1] = await pflichtVersionen(studio, "steuern.ust_voranmeldung");
     await expect(neuePflichtversionImport({ ...v1!.daten, kurz: { de: "" } })).rejects.toThrow(StudioFehler);
     await expect(neuePflichtversionImport({ ...v1!.daten, ausloeser: { feld: "profil.gibt_es_nicht", op: "==", wert: true } })).rejects.toThrow(/unbekannter Fakt/);
     await expect(neuePflichtversionAls(k.stb!, { ...v1!.daten })).rejects.toThrow(/Redaktion/);
     const r = await neuePflichtversionImport({ ...v1!.daten, version: 99, kurz: { de: "Neu formuliert." } });
-    expect(r.version).toBe(2);
+    // fortlaufend nach der importierten Katalogversion (R10: Katalog steht bei Version 2)
+    neueVersion = v1!.version + 1;
+    expect(r.version).toBe(neueVersion);
     neueId = r.id;
-    // Version 1 (importierter Entwurf) ist damit überholt
+    // die importierte Version (Entwurf) ist damit überholt
     expect((await pflichtVersionen(studio, "steuern.ust_voranmeldung")).map((v) => [v.version, v.pruef_status])).toEqual([
-      [2, "in_pruefung"],
-      [1, "zurueckgezogen"],
+      [neueVersion, "in_pruefung"],
+      [v1!.version, "zurueckgezogen"],
     ]);
   });
 
@@ -64,7 +67,7 @@ describe.skipIf(!DB_VERFUEGBAR)("Studio: Versionen, Vier-Augen-Freigabe, Release
     expect(await pruefentscheidung(studio, k.stb!, neueId, { entscheidung: "freigegeben", qualifikation: "steuerberater" })).toEqual({ status: "freigegeben" });
     await expect(pruefentscheidung(studio, k.ra!, neueId, { entscheidung: "freigegeben", qualifikation: null })).rejects.toThrow(/nicht in Prüfung/);
     const ueb = (await pflichtUebersicht(studio)).find((p) => p.pflicht_id === "steuern.ust_voranmeldung");
-    expect(ueb).toMatchObject({ version: 2, pruef_status: "freigegeben", freigaben: 2, im_release: false });
+    expect(ueb).toMatchObject({ version: neueVersion, pruef_status: "freigegeben", freigaben: 2, im_release: false });
   });
 
   it("Testlauf zeigt die Wirkung einer Änderung auf die Fixtures", async () => {
@@ -86,20 +89,22 @@ describe.skipIf(!DB_VERFUEGBAR)("Studio: Versionen, Vier-Augen-Freigabe, Release
     // Die freigegebene USt-Version verweist auf noch ungeprüfte Regelwerte → kein Release
     await expect(releaseVeroeffentlichen(studio, k.redakteurin!, "prod-Release")).rejects.toThrow(/Regelwerte fehlen.*grenze_befreiung/);
     const rw = await studio.imKontext({}, (tx) =>
-      tx.abfrage<{ id: string }>("select id from katalog.regelwert_version where regelwert_id in ('steuern.ust_va.grenze_befreiung', 'steuern.ust_va.grenze_monatlich')"),
+      // R10: die Voranmeldung nutzt auch die Kleinunternehmergrenzen (Pflicht über der Grenze ohne bekannte Zahllast)
+      tx.abfrage<{ id: string }>("select id from katalog.regelwert_version where regelwert_id in ('steuern.ust_va.grenze_befreiung', 'steuern.ust_va.grenze_monatlich', 'steuern.ustg19.grenze_vorjahr', 'steuern.ustg19.grenze_laufendes_jahr')"),
     );
     for (const { id } of rw) {
       await pruefentscheidung(studio, k.pruefer!, id, { entscheidung: "freigegeben", qualifikation: null }, "regelwert_version");
       expect(await pruefentscheidung(studio, k.stb!, id, { entscheidung: "freigegeben", qualifikation: "steuerberater" }, "regelwert_version")).toEqual({ status: "freigegeben" });
     }
     const p = await releaseVeroeffentlichen(studio, k.redakteurin!, "prod-Release");
-    expect(p.inhalte).toBe(3); // USt-Version + zwei freigegebene Regelwerte, nichts Ungeprüftes
+    expect(p.inhalte).toBe(1 + rw.length); // USt-Version + die freigegebenen Regelwerte, nichts Ungeprüftes
     await owner.imKontext({}, (tx) => tx.abfrage("update katalog.plattform set umgebung = 'dev'"));
   });
 
   it("legt Regelwertversionen nur gültig an; Einheit fest, Überholtes zurückgezogen", async () => {
     const { neueRegelwertversion, regelwertVersionen } = await import("../src/studio.js");
-    const [v1] = await regelwertVersionen(studio, "steuern.ustg19.grenze_vorjahr");
+    // ein Regelwert, den der Release-Test oben nicht freigibt (R10: die Voranmeldung nutzt die Vorjahresgrenze)
+    const [v1] = await regelwertVersionen(studio, "steuern.ustg19.grenze_gruendungsjahr");
     const basis = { ...(v1!.daten as Record<string, unknown>) };
     await expect(neueRegelwertversion(studio, k.redakteurin!, { ...basis, quellen: [] })).rejects.toThrow(/Quellen: braucht mindestens 1 Eintrag/);
     await expect(neueRegelwertversion(studio, k.redakteurin!, { ...basis, einheit: "anzahl" })).rejects.toThrow(/Einheit/);
@@ -107,7 +112,7 @@ describe.skipIf(!DB_VERFUEGBAR)("Studio: Versionen, Vier-Augen-Freigabe, Release
     await expect(neueRegelwertversion(studio, k.stb!, basis)).rejects.toThrow(/Redaktion/);
     const r = await neueRegelwertversion(studio, k.redakteurin!, { ...basis, version: 42, fachlich_zu_pruefen: ["Test"] });
     expect(r.version).toBe(2);
-    expect((await regelwertVersionen(studio, "steuern.ustg19.grenze_vorjahr")).map((v) => [v.version, v.pruef_status])).toEqual([
+    expect((await regelwertVersionen(studio, "steuern.ustg19.grenze_gruendungsjahr")).map((v) => [v.version, v.pruef_status])).toEqual([
       [2, "in_pruefung"],
       [1, "zurueckgezogen"],
     ]);

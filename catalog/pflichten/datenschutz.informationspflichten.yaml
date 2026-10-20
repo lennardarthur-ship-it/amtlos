@@ -1,7 +1,7 @@
 # Katalog F.58 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: datenschutz.informationspflichten
-version: 1
+version: 2
 katalog_nr: F.58
 titel:
   de: Über die Datenverarbeitung informieren
@@ -41,7 +41,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Bußgeld nach Art. 83 Abs. 5 DSGVO.
   schwere: mittel
 automatisierung: dokument_generator
 status_recht: in_kraft
@@ -55,7 +55,7 @@ fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Pflichtinhalte als Checkliste fachlich ergänzen
 - Vorlage Datenschutzerklärung (6.4) erst nach Prüfung
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion aus der Rechtsprüfung R10 (G-16) übernommen – Fundstelle bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

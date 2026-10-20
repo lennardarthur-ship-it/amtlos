@@ -1,0 +1,92 @@
+# R10: neu (Nutzertest Freiberuf: Vorjahr unter 25.000 €, laufendes Jahr darüber, aber höchstens 100.000 € – ab 1.1. des Folgejahres Regelbesteuerung, § 19 Abs. 1 UStG)
+schema_version: 1
+id: steuern.kleinunternehmer_naechstes_jahr
+version: 1
+katalog_nr: C.23
+titel:
+  de: Ab 1. Januar Regelbesteuerung
+kurz:
+  de: Nach deinen Angaben liegt dein Umsatz in diesem Jahr über 25.000 €. Dieses Jahr bleibst du Kleinunternehmer, ab 1. Januar
+    des nächsten Jahres gilt die Regelbesteuerung.
+erklaerung:
+  de: 'Die Kleinunternehmerregelung setzt voraus, dass dein Umsatz im Vorjahr höchstens 25.000 € betrug. Überschreitest du diese
+    Grenze in diesem Jahr, ohne über 100.000 € zu kommen, gilt die Regelung bis zum Jahresende weiter. Ab 1. Januar weist du auf
+    deinen Rechnungen Umsatzsteuer aus, gibst Umsatzsteuer-Voranmeldungen ab und kannst die Vorsteuer aus deinen Eingangsrechnungen
+    abziehen. Stelle Rechnungsvorlage, Preise und Buchhaltung rechtzeitig um.'
+rechtsgrundlage:
+- § 19 Abs. 1 UStG
+kategorie: steuern
+ausloeser:
+  all:
+  - feld: profil.ust.kleinunternehmer
+    op: ==
+    wert: true
+    label:
+      de: Du nutzt die Kleinunternehmerregelung.
+  - feld: abgeleitet.ist_gruendungsjahr
+    op: ==
+    wert: false
+  - feld: abgeleitet.noch_nicht_gestartet
+    op: ==
+    wert: false
+  - feld: profil.umsatz.vorjahr
+    op: <=
+    wert:
+      regelwert: steuern.ustg19.grenze_vorjahr
+    label:
+      de: Dein Umsatz im Vorjahr lag höchstens bei 25.000 €.
+  - any:
+    - all:
+      - feld: profil.umsatz.prognose_laufendes_jahr
+        op: '>'
+        wert:
+          regelwert: steuern.ustg19.grenze_vorjahr
+        label:
+          de: Dein erwarteter Umsatz in diesem Jahr liegt über 25.000 €.
+      - feld: profil.umsatz.prognose_laufendes_jahr
+        op: <=
+        wert:
+          regelwert: steuern.ustg19.grenze_laufendes_jahr
+    - all:
+      - feld: finanzen.umsatz.laufendes_jahr
+        op: vorhanden
+      - feld: finanzen.umsatz.laufendes_jahr
+        op: '>'
+        wert:
+          regelwert: steuern.ustg19.grenze_vorjahr
+        label:
+          de: Nach deinen Rechnungen in Amtlos liegt dein Umsatz in diesem Jahr über 25.000 €.
+      - feld: finanzen.umsatz.laufendes_jahr
+        op: <=
+        wert:
+          regelwert: steuern.ustg19.grenze_laufendes_jahr
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Finanzamt
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Ab 1. Januar fällt Umsatzsteuer an, auch wenn du sie nicht berechnest.
+  schwere: hoch
+automatisierung: hinweis
+einordnung: hinweis
+aktion:
+  art: abhaken
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Umsatzsteuergesetz § 19
+  url: https://www.gesetze-im-internet.de/ustg_1980/__19.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Neu (R10): Folgen der Regelbesteuerung ab 1.1. (Rechnungen mit USt, Voranmeldung, Vorsteuerabzug) – Formulierung und Vollständigkeit bestätigen, z. B. Rhythmus der Voranmeldung im Folgejahr'
+- 'Prognose statt tatsächlicher Umsatz – Formulierung „nach deinen Angaben“ bestätigen'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

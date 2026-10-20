@@ -283,6 +283,64 @@
         }
       }
     },
+    "einordnung": {
+      "enum": [
+        "pflicht",
+        "hinweis",
+        "option"
+      ],
+      "default": "pflicht",
+      "description": "R10: Was der Eintrag für den Betrieb ist – gesetzliche Pflicht, Hinweis (kennen, im Blick behalten, prüfen) oder freiwillige Option (z. B. Förderung). Ergebnis und Listen zählen sie getrennt."
+    },
+    "erledigung": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "art"
+      ],
+      "description": "R10: Wann die Pflicht in der App als erledigt gilt. einmalig (Standard): ein Haken oder eine vollständige, geteilte Unterlage erledigt sie. laufend: Haken oder Unterlage gelten nur für den Zeitraum (Kalendermonat bzw. -jahr) oder bis zum nächsten Termin aus der Unterlage – danach ist sie wieder offen. bestaetigen: eine Unterlage bereitet nur vor; erledigt ist sie erst mit der ausdrücklichen Bestätigung (z. B. „In ELSTER gemeldet“).",
+      "properties": {
+        "art": {
+          "enum": [
+            "einmalig",
+            "laufend",
+            "bestaetigen"
+          ]
+        },
+        "zeitraum": {
+          "enum": [
+            "monat",
+            "jahr"
+          ],
+          "description": "laufend bzw. bestaetigen: Haken und Unterlagen gelten für den Kalendermonat bzw. das Kalenderjahr, in dem sie gesetzt bzw. geteilt wurden"
+        },
+        "naechster_termin_aus": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)?$",
+          "description": "laufend: Feld der Unterlage mit dem nächsten Termin (z. B. geraete.naechste – Liste.Feld); die Unterlage gilt bis zum frühesten Termin"
+        },
+        "bestaetigung": {
+          "$ref": "#/$defs/text",
+          "description": "bestaetigen: Beschriftung des Knopfs, z. B. „In ELSTER gemeldet“"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "art": {
+                "const": "bestaetigen"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "bestaetigung"
+            ]
+          }
+        }
+      ]
+    },
     "erneut_erledigen": {
       "type": "boolean",
       "default": false,

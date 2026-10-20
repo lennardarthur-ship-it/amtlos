@@ -112,6 +112,38 @@
   pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
 
 - schema_version: 1
+  id: steuern.hgb241a.grenze_umsatz
+  version: 1
+  katalog_nr: C.28
+  bezeichnung: { de: "Befreiung von der Buchführung nach § 241a HGB – Umsatzgrenze" }
+  einheit: EUR
+  wert: 800000
+  gueltig_ab: "2026-01-01"
+  gueltig_bis: null
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 241a HGB"]
+  quellen:
+    - { titel: Handelsgesetzbuch § 241a, url: "https://www.gesetze-im-internet.de/hgb/__241a.html", abgerufen: null }
+  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter (R10, Steuerprüfung: 800.000 € Umsatzerlöse)"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+
+- schema_version: 1
+  id: steuern.hgb241a.grenze_gewinn
+  version: 1
+  katalog_nr: C.28
+  bezeichnung: { de: "Befreiung von der Buchführung nach § 241a HGB – Grenze Jahresüberschuss" }
+  einheit: EUR
+  wert: 80000
+  gueltig_ab: "2026-01-01"
+  gueltig_bis: null
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 241a HGB"]
+  quellen:
+    - { titel: Handelsgesetzbuch § 241a, url: "https://www.gesetze-im-internet.de/hgb/__241a.html", abgerufen: null }
+  fachlich_zu_pruefen: ["gueltig_ab ist Platzhalter (R10, Steuerprüfung: 80.000 € Jahresüberschuss)", "Jahresüberschuss mit dem angegebenen Gewinn gleichgesetzt"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+
+- schema_version: 1
   id: steuern.e_rechnung.grenze_vorjahresumsatz_2027
   version: 1
   katalog_nr: C.30

@@ -1,7 +1,7 @@
 # Katalog C.24. Zeigt: Rhythmus abhängig von Fakten, Regelwerte, Dauerfristverlängerung.
 schema_version: 1
 id: steuern.ust_voranmeldung
-version: 1
+version: 2
 katalog_nr: C.24
 titel:
   de: Umsatzsteuer-Voranmeldung abgeben
@@ -10,8 +10,9 @@ kurz:
 erklaerung:
   de: >-
     Wer Umsatzsteuer auf Rechnungen ausweist, gibt je nach Höhe der Steuer im Vorjahr
-    monatlich oder vierteljährlich eine Voranmeldung über ELSTER ab. Amtlos bereitet die
-    Zahlen vor; du übermittelst selbst.
+    monatlich oder vierteljährlich eine Voranmeldung über ELSTER ab. Liegt dein Umsatz über
+    der Kleinunternehmergrenze, gilt die Pflicht sicher – offen ist dann nur, ob monatlich
+    oder vierteljährlich. Amtlos bereitet die Zahlen vor; du übermittelst selbst.
 rechtsgrundlage: ["§ 18 UStG"]
 kategorie: steuern
 ausloeser:
@@ -20,7 +21,30 @@ ausloeser:
       op: "=="
       wert: false
       label: { de: Du nutzt die Kleinunternehmerregelung nicht. }
+    # R10: „keine“ = das Finanzamt hat von der Voranmeldung befreit; ohne Angabe gilt die Bedingung
+    - not:
+        all:
+          - { feld: profil.ust.voranmeldung_rhythmus, op: vorhanden }
+          - { feld: profil.ust.voranmeldung_rhythmus, op: "==", wert: keine }
     - any:
+        - all:
+            - { feld: profil.ust.voranmeldung_rhythmus, op: vorhanden }
+            - feld: profil.ust.voranmeldung_rhythmus
+              op: in
+              wert: [monatlich, quartalsweise]
+              label: { de: Du gibst die Voranmeldung regelmäßig ab. }
+        # R10: ohne bekannte Steuer des Vorjahres gilt die Pflicht über der Kleinunternehmergrenze sicher, nur der Rhythmus ist offen
+        - all:
+            - { feld: profil.ust.zahllast_vorjahr, op: nicht_vorhanden }
+            - any:
+                - feld: profil.umsatz.vorjahr
+                  op: ">"
+                  wert: { regelwert: steuern.ustg19.grenze_vorjahr }
+                  label: { de: Dein Umsatz im Vorjahr lag über der Kleinunternehmergrenze. }
+                - feld: profil.umsatz.prognose_laufendes_jahr
+                  op: ">"
+                  wert: { regelwert: steuern.ustg19.grenze_laufendes_jahr }
+                  label: { de: Dein erwarteter Umsatz in diesem Jahr liegt über der Kleinunternehmergrenze. }
         - feld: profil.ust.zahllast_vorjahr
           op: ">"
           wert: { regelwert: steuern.ust_va.grenze_befreiung }
@@ -35,13 +59,35 @@ ausloeser:
           label: { de: Du hast dein Unternehmen im Vorjahr gegründet. }
 frist:
   typ: wiederkehrend
+  # R10: zuerst der angegebene Rhythmus; ohne Angabe (oder „weiß nicht“) nach der Zahllast des Vorjahres
   rhythmus:
     waehle:
       - wenn:
-          feld: profil.ust.zahllast_vorjahr
-          op: ">"
-          wert: { regelwert: steuern.ust_va.grenze_monatlich }
+          any:
+            - all:
+                - { feld: profil.ust.voranmeldung_rhythmus, op: vorhanden }
+                - { feld: profil.ust.voranmeldung_rhythmus, op: "==", wert: monatlich }
+            - all:
+                - any:
+                    - { feld: profil.ust.voranmeldung_rhythmus, op: nicht_vorhanden }
+                    - { feld: profil.ust.voranmeldung_rhythmus, op: "==", wert: unklar }
+                - feld: profil.ust.zahllast_vorjahr
+                  op: ">"
+                  wert: { regelwert: steuern.ust_va.grenze_monatlich }
         dann: monatlich
+      - wenn:
+          any:
+            - all:
+                - { feld: profil.ust.voranmeldung_rhythmus, op: vorhanden }
+                - { feld: profil.ust.voranmeldung_rhythmus, op: "==", wert: quartalsweise }
+            - all:
+                - any:
+                    - { feld: profil.ust.voranmeldung_rhythmus, op: nicht_vorhanden }
+                    - { feld: profil.ust.voranmeldung_rhythmus, op: "==", wert: unklar }
+                - feld: profil.ust.zahllast_vorjahr
+                  op: "<="
+                  wert: { regelwert: steuern.ust_va.grenze_monatlich }
+        dann: quartalsweise
     sonst: quartalsweise
   faellig: { art: tag_nach_periodenende, monate_nach: 1, tag: 10 }
   verlaengerung:
@@ -58,6 +104,9 @@ sanktion:
   text: { de: Die Folgen sind noch nicht fachlich erfasst. }
   schwere: mittel
 automatisierung: formular_vorausfuellen
+aenderungsnotiz:
+  de: Über der Kleinunternehmergrenze gilt die Voranmeldung jetzt sicher, auch wenn die Steuer des Vorjahres nicht bekannt ist – du
+    kannst den Rhythmus direkt angeben.
 aktion: { art: uebermittlung, ziel: elster.ust_va, nachweis_erforderlich: true }
 status_recht: in_kraft
 gueltig_ab: null
@@ -67,6 +116,7 @@ quellen:
     url: https://www.gesetze-im-internet.de/ustg_1980/__18.html
     abgerufen: null
 fachlich_zu_pruefen:
+  - "R10: Pflicht gilt bei Umsatz über der Kleinunternehmergrenze ohne Regelung nach § 19 auch ohne bekannte Vorjahres-Zahllast (Hinweis Nutzertest) – Sonderfälle (Befreiung bis 2.000 €) bestätigen"
   - "Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen (früherer Text war nicht belegt)"
   - "Befreiung bis Grenze ist laut Spezifikation 'möglich' (Ermessen Finanzamt?) – Auslöser bildet das als 'gilt nicht' ab; Formulierung prüfen"
   - "Neugründer: Aussetzung der monatlichen Pflicht 2021–2026 (Radar) – Rhythmus im Gründungs- und Folgejahr festlegen"

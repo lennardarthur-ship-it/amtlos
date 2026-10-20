@@ -1,7 +1,7 @@
 # Katalog G.74 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.dac7
-version: 2
+version: 3
 katalog_nr: G.74
 titel:
   de: Meldungen der Plattformen an das Finanzamt (DAC7) verstehen
@@ -35,6 +35,7 @@ sanktion:
     de: Keine eigene Pflicht – Erklärung der Plattformmeldungen.
   schwere: niedrig
 automatisierung: hinweis
+einordnung: hinweis
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null

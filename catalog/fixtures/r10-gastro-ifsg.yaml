@@ -1,0 +1,30 @@
+persona: kleiner_betrieb
+beschreibung: "R10 (Rechtsprüfung § 43 IfSG): Café mit Einstellung am 1.9. – Bescheinigung des Gesundheitsamts vor Beginn, Belehrung durch den Arbeitgeber nach Aufnahme der Tätigkeit, Folgebelehrung zwei Jahre nach der Belehrung"
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2021-05-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [gastronomie_lebensmittel]
+  profil.beschaeftigte.gesamt: 3
+  profil.kunden.segmente: [b2c]
+  profil.produkte.arten: [lebensmittel]
+  profil.online.website: false
+  profil.online.social_media: true
+  profil.bundesland: NW
+ereignisse:
+  - { typ: erste_einstellung, datum: "2021-05-01" }
+  - { typ: einstellung, datum: "2026-09-01" }
+  - { typ: ifsg_belehrung_durchgefuehrt, datum: "2026-09-02" }
+erwartet:
+  branche.gastro_ifsg_bescheinigung: gilt
+  branche.gastro_ifsg_belehrung: gilt
+  branche.gastro_ifsg_folgebelehrung: gilt
+  # Lebensmittel sind von der Produktsicherheitsverordnung ausgenommen (Art. 2 Abs. 3)
+  produkte.gpsr: gilt_nicht
+  # geschäftliches Social-Media-Profil ohne Website: Impressum trotzdem
+  online.impressum: gilt
+termine_enthaelt:
+  branche.gastro_ifsg_bescheinigung: [["aenderung-20260901", "2026-08-31"]]
+  branche.gastro_ifsg_belehrung: [["aenderung-20260901", "2026-09-01"]]
+  branche.gastro_ifsg_folgebelehrung: [["aenderung-20260902", "2028-09-02"]]

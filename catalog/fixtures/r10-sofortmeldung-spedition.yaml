@@ -1,0 +1,26 @@
+persona: kleiner_betrieb
+beschreibung: "R10 (Rechtsprüfung, § 28a Abs. 4 SGB IV, § 2a SchwarzArbG): Spedition mit Einstellung – Sofortmeldung und Arbeitszeitaufzeichnung nach § 17 MiLoG; Kosmetikhändler ohne eigene Produkte"
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: "2019-01-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [transport_logistik, beauty_kosmetik]
+  profil.beschaeftigte.gesamt: 6
+  profil.beschaeftigte.minijob: 0
+  profil.personal.sofortmeldebranchen: [spedition_logistik]
+  profil.kunden.segmente: [b2c]
+  profil.produkte.arten: [kosmetik]
+  profil.produkte.hersteller: false
+  profil.bundesland: HB
+ereignisse:
+  - { typ: erste_einstellung, datum: "2019-01-01" }
+  - { typ: einstellung, datum: "2026-10-01" }
+erwartet:
+  personal.sofortmeldung: gilt
+  personal.arbeitszeit_milog: gilt
+  branche.beauty_kosmetikverordnung: gilt_nicht
+  produkte.gpsr: gilt
+termine_enthaelt:
+  personal.sofortmeldung: [["aenderung-20261001", "2026-10-01"]]
+  personal.sv_anmeldung: [["aenderung-20261001", "2026-11-12"]]

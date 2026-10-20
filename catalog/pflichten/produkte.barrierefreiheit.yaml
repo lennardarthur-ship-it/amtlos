@@ -1,7 +1,7 @@
 # Katalog G.70 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: produkte.barrierefreiheit
-version: 1
+version: 2
 katalog_nr: G.70
 titel:
   de: Prüfen, ob deine Produkte unter das BFSG fallen
@@ -32,6 +32,7 @@ sanktion:
     de: Die Folgen sind noch nicht fachlich erfasst.
   schwere: mittel
 automatisierung: hinweis
+einordnung: hinweis
 status_recht: in_kraft
 gueltig_ab: '2025-06-28'
 gueltig_bis: null

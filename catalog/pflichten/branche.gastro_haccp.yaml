@@ -1,7 +1,7 @@
 # Katalog H.1 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.gastro_haccp
-version: 1
+version: 2
 katalog_nr: H.1
 titel:
   de: Eigenkontrollen nach HACCP
@@ -9,7 +9,8 @@ kurz:
   de: Du kontrollierst und dokumentierst regelmäßig die kritischen Punkte deiner Lebensmittelhygiene, zum Beispiel Kühltemperaturen.
 erklaerung:
   de: Lebensmittelunternehmen müssen ein Verfahren nach den HACCP-Grundsätzen einrichten und die Kontrollen dokumentieren.
-    Amtlos bietet Kontrolllisten mit Grenzwerten, die du festlegst.
+    Das ist ein ständiges Verfahren mit laufender Dokumentation, keine einmalige Aufgabe. Amtlos bietet Kontrolllisten mit Grenzwerten,
+    die du festlegst – ein Protokoll gilt für seinen Monat.
 rechtsgrundlage:
 - Art. 5 Verordnung (EG) Nr. 852/2004
 kategorie: branche
@@ -34,6 +35,11 @@ sanktion:
     de: Die Folgen sind noch nicht fachlich erfasst.
   schwere: hoch
 automatisierung: dokument_generator
+erledigung:
+  art: laufend
+  zeitraum: monat
+aenderungsnotiz:
+  de: Die Eigenkontrollen sind eine laufende Pflicht – ein Kontrollprotokoll erledigt sie nur für seinen Monat.
 aktion:
   art: link
   ziel: app.eigenkontrollen

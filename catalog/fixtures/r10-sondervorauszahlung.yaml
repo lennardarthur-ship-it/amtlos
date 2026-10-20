@@ -1,0 +1,13 @@
+persona: gewerbe
+beschreibung: "R10 (Steuerprüfung): monatliche Voranmeldung mit Dauerfristverlängerung – Sondervorauszahlung bis 10. Februar"
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2014-04-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.ust.kleinunternehmer: false
+  profil.ust.zahllast_vorjahr: 30000
+  profil.ust.dauerfristverlaengerung: true
+  profil.bundesland: BY
+erwartet:
+  steuern.ust_sondervorauszahlung: gilt

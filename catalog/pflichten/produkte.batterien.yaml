@@ -1,25 +1,34 @@
 # Katalog G.72 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: produkte.batterien
-version: 2
+version: 3
 katalog_nr: G.72
 titel:
   de: Batterien registrieren (BattDG)
 kurz:
-  de: Bevor du Batterien oder Geräte mit Batterien verkaufst, registrierst du dich nach dem Batteriegesetz.
+  de: Bringst du Batterien oder Geräte mit Batterien selbst erstmals in Deutschland in Verkehr, registrierst du dich vorher nach dem
+    Batteriegesetz.
 erklaerung:
-  de: Hersteller von Batterien müssen sich vor dem Inverkehrbringen registrieren.
+  de: Hersteller von Batterien müssen sich vor dem Inverkehrbringen registrieren. Hersteller ist auch, wer unter eigener Marke verkauft
+    oder Batterien bzw. Geräte mit Batterien nach Deutschland einführt. Wer bei einem Händler in Deutschland kauft und weiterverkauft
+    oder einbaut, ist in der Regel nicht Hersteller.
 rechtsgrundlage:
 - BattDG
 kategorie: produkte
 branchen:
 - onlinehandel
 ausloeser:
-  feld: profil.produkte.arten
-  op: enthaelt
-  wert: batterien
-  label:
-    de: Du verkaufst Batterien oder Geräte mit Batterien.
+  all:
+  - feld: profil.produkte.arten
+    op: enthaelt
+    wert: batterien
+    label:
+      de: Du verkaufst Batterien oder Geräte mit Batterien.
+  - feld: profil.produkte.erstinverkehrbringer
+    op: ==
+    wert: true
+    label:
+      de: Du bringst Elektrogeräte oder Batterien selbst erstmals in Deutschland in Verkehr (Herstellung, Eigenmarke oder Import).
 frist:
   typ: dauerhaft
 wiederholung:
@@ -33,6 +42,9 @@ sanktion:
     de: Die Folgen sind noch nicht fachlich erfasst.
   schwere: hoch
 automatisierung: hinweis
+aenderungsnotiz:
+  de: Gilt erst, wenn du die Geräte oder Batterien selbst erstmals in Deutschland in Verkehr bringst – nicht beim Einkauf im deutschen
+    Großhandel.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -41,6 +53,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/battdg/
   abgerufen: null
 fachlich_zu_pruefen:
+- 'Rückfrage „selbst erstmals in Deutschland in Verkehr (Herstellung, Eigenmarke, Import)“ vor dem Auslösen (R10, K-430) – Installateur mit Einkauf im inländischen Großhandel als Nicht-Hersteller bestätigen; Pflichten als Vertreiber (Rücknahme) nicht abgebildet'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Zuständige Stelle und Registrierungsweg ergänzen
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen

@@ -1,7 +1,7 @@
 # Katalog B.17 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.gf_pflichten_haftung
-version: 1
+version: 2
 katalog_nr: B.17
 titel:
   de: Pflichten und Haftung der Geschäftsführung kennen
@@ -32,6 +32,7 @@ sanktion:
     de: Die Folgen sind noch nicht fachlich erfasst.
   schwere: mittel
 automatisierung: hinweis
+einordnung: hinweis
 aktion:
   art: abhaken
 status_recht: in_kraft

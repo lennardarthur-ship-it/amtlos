@@ -1,0 +1,15 @@
+persona: gewerbe
+beschreibung: "R10 (Steuerprüfung): Einzelunternehmen über den Grenzen des § 141 AO, aber ohne Mitteilung des Finanzamts – noch keine Buchführungspflicht (§ 141 Abs. 2 AO), EÜR"
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2015-04-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.umsatz.vorjahr: 900000
+  profil.gewinn.vorjahr: 120000
+  profil.steuern.buchfuehrung_mitteilung: false
+  profil.bundesland: NW
+erwartet:
+  steuern.buchfuehrungspflicht: gilt_nicht
+  steuern.e_bilanz: gilt_nicht
+  steuern.euer: gilt

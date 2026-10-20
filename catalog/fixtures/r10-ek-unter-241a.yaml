@@ -1,0 +1,28 @@
+persona: handwerk
+beschreibung: "R10 (Nutzertest Jonas, Steuerprüfung): e. K. Elektrobetrieb unter den Grenzen des § 241a HGB – keine Buchführungspflicht, EÜR; Elektrogeräte und Batterien nur aus dem deutschen Großhandel"
+stichtag: "2026-10-20"
+fakten:
+  profil.rechtsform: ek
+  profil.gruendungsdatum: "2012-04-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [handwerk]
+  profil.handwerk.anlage: a
+  profil.umsatz.vorjahr: 420000
+  profil.gewinn.vorjahr: 60000
+  profil.kunden.segmente: [b2b, b2c]
+  profil.produkte.arten: [dienstleistung, elektrogeraete, batterien]
+  profil.produkte.erstinverkehrbringer: false
+  profil.bundesland: BW
+erwartet:
+  steuern.buchfuehrungspflicht: gilt_nicht
+  steuern.e_bilanz: gilt_nicht
+  steuern.euer: gilt
+  steuern.est_erklaerung: gilt
+  steuern.feststellungserklaerung: gilt_nicht
+  gruendung.handwerksrolle: gilt
+  gruendung.handwerk_verzeichnis: gilt_nicht
+  produkte.elektrogeraete: gilt_nicht
+  produkte.batterien: gilt_nicht
+termine_enthaelt:
+  # Anlage A: Eintragung vor dem Beginn (§ 1 HwO) – spätestens am Tag davor
+  gruendung.handwerksrolle: [["einmalig", "2012-03-31"]]

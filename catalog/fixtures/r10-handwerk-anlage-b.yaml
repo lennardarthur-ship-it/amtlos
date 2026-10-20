@@ -1,0 +1,15 @@
+persona: gruenderin
+beschreibung: "R10 (Rechtsprüfung, § 18/19 HwO): zulassungsfreies Handwerk (Anlage B1) – Verzeichnis der Handwerkskammer, Anzeige bei Beginn; keine Handwerksrolle"
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2026-11-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [handwerk]
+  profil.handwerk.anlage: b1
+  profil.bundesland: HH
+erwartet:
+  gruendung.handwerk_verzeichnis: gilt
+  gruendung.handwerksrolle: gilt_nicht
+termine_enthaelt:
+  gruendung.handwerk_verzeichnis: [["einmalig", "2026-11-01"]]

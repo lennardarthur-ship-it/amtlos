@@ -1,0 +1,73 @@
+# R10: neu (Steuerprüfung: bei Personengesellschaften gibt die Gesellschaft die Feststellungserklärung ab, § 180 AO; die Gesellschafter die ESt)
+schema_version: 1
+id: steuern.feststellungserklaerung
+version: 1
+katalog_nr: C.27
+titel:
+  de: Erklärung zur gesonderten und einheitlichen Feststellung abgeben
+kurz:
+  de: Einmal im Jahr gibt eure Gesellschaft elektronisch die Feststellungserklärung ab; die Gesellschafter versteuern ihren Anteil
+    in ihrer eigenen Einkommensteuererklärung.
+erklaerung:
+  de: Bei einer Personengesellschaft stellt das Finanzamt den Gewinn der Gesellschaft gesondert und einheitlich fest und verteilt
+    ihn auf die Gesellschafter. Dafür gibt die Gesellschaft jedes Jahr eine Feststellungserklärung ab – ohne Steuerberatung bis
+    31. Juli des Folgejahres, mit Steuerberatung bis Ende Februar des übernächsten Jahres. Jede Gesellschafterin und jeder Gesellschafter
+    gibt zusätzlich die eigene Einkommensteuererklärung ab.
+rechtsgrundlage:
+- § 180 Abs. 1 Nr. 2 Buchst. a AO
+- § 181 AO
+- § 149 AO
+kategorie: steuern
+ausloeser:
+  feld: profil.rechtsform
+  op: in
+  wert:
+  - gbr
+  - partg
+  - partg_mbb
+  - gmbh_co_kg
+  label:
+    de: Dein Unternehmen ist eine Personengesellschaft.
+frist:
+  typ: wiederkehrend
+  rhythmus: jaehrlich
+  # § 149 Abs. 2 AO: sieben Monate nach Ablauf des Kalenderjahres (31. Juli); beratene Fälle § 149 Abs. 3 AO: letzter
+  # Tag im Februar des zweitfolgenden Jahres (31. Juli + 7 Monate, Monatsende-Regel); § 108 Abs. 3 AO: nächster Werktag
+  faellig:
+    art: tag_nach_periodenende
+    monate_nach: 7
+    tag: 31
+  verlaengerung:
+    wenn: { feld: profil.steuerberater, op: "==", wert: true }
+    versatz: P7M
+  verschiebung: { regel: naechster_werktag, kalender: bundesland }
+  erinnerung: [P30D, P7D]
+wiederholung:
+  art: periodisch
+stelle:
+  de: Finanzamt
+kanal: elster
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: formular_vorausfuellen
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Abgabenordnung § 180 (Gesonderte Feststellung von Besteuerungsgrundlagen)
+  url: https://www.gesetze-im-internet.de/ao_1977/__180.html
+  abgerufen: null
+- titel: Abgabenordnung § 149 (Abgabe der Steuererklärungen)
+  url: https://dejure.org/gesetze/AO/149.html
+  abgerufen: 2026-10-13
+fachlich_zu_pruefen:
+- 'Neu nach Steuerprüfung R10 (§ 180 AO, eindeutig); Fristen wie bei der Einkommensteuer (§ 149 AO über § 181 Abs. 1 AO) übernommen – bestätigen'
+- 'Ausnahme für Gesellschaften mit nur einem Beteiligten bzw. Fälle ohne Feststellung (§ 180 Abs. 3 AO) nicht abgebildet'
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

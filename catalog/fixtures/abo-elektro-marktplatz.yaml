@@ -10,6 +10,7 @@ fakten:
   profil.kunden.segmente: [b2c, b2b]
   profil.vertrieb.kanaele: [onlineshop, marktplatz, abo]
   profil.produkte.arten: [elektrogeraete, batterien, verpackung]
+  profil.produkte.erstinverkehrbringer: true
   profil.online.website: true
   profil.handel.hohe_bargeschaefte: false
   profil.bundesland: NW

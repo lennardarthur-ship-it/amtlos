@@ -1,0 +1,12 @@
+persona: gruenderin
+beschreibung: "R10 (Steuerprüfung, K-468): GbR – die Gesellschaft gibt die Feststellungserklärung ab (§ 180 AO), keine eigene Einkommensteuererklärung der Gesellschaft"
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: gbr
+  profil.gruendungsdatum: "2022-01-01"
+  profil.taetigkeit.einordnung: freiberuf
+  profil.steuerberater: false
+  profil.bundesland: BE
+erwartet:
+  steuern.feststellungserklaerung: gilt
+  steuern.est_erklaerung: gilt_nicht

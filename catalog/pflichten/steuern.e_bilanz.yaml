@@ -1,23 +1,108 @@
 # Katalog B.18 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.e_bilanz
-version: 1
+version: 2
 katalog_nr: B.18
 titel:
   de: E-Bilanz ans Finanzamt übermitteln
 kurz:
-  de: Die Bilanz deiner Gesellschaft übermittelst du elektronisch ans Finanzamt.
+  de: Wenn du bilanzierst, übermittelst du Bilanz und Gewinn- und Verlustrechnung elektronisch ans Finanzamt.
 erklaerung:
-  de: Die E-Bilanz ist die elektronische Übermittlung von Bilanz und Gewinn- und Verlustrechnung an das Finanzamt.
+  de: Die E-Bilanz ist die elektronische Übermittlung von Bilanz und Gewinn- und Verlustrechnung an das Finanzamt. Sie gilt für
+    alle, die Bücher führen und bilanzieren – nicht nur für Gesellschaften. Eine Bilanz als PDF erledigt sie nicht.
 rechtsgrundlage:
 - § 5b EStG
 kategorie: steuern
 ausloeser:
-  feld: abgeleitet.ist_kapitalgesellschaft
-  op: ==
-  wert: true
-  label:
-    de: Dein Unternehmen ist eine UG oder GmbH.
+  # R10: an die Buchführungspflicht gekoppelt (§ 5b EStG gilt für alle, die bilanzieren) – gleiche Bedingung wie steuern.buchfuehrungspflicht
+  any:
+  - feld: abgeleitet.ist_kapitalgesellschaft
+    op: ==
+    wert: true
+    label:
+      de: Dein Unternehmen ist eine Kapitalgesellschaft.
+  - feld: profil.rechtsform
+    op: ==
+    wert: gmbh_co_kg
+    label:
+      de: Dein Unternehmen ist eine GmbH & Co. KG und damit nach dem Handelsgesetzbuch buchführungspflichtig.
+  # e.K.: nach HGB buchführungspflichtig, außer die Grenzen des § 241a HGB werden eingehalten (zwei aufeinanderfolgende Jahre;
+  # vereinfacht über das Vorjahr, im Gründungsjahr über die Schätzung für das erste Jahr)
+  - all:
+    - feld: profil.rechtsform
+      op: ==
+      wert: ek
+      label:
+        de: Du bist als Kauffrau oder Kaufmann im Handelsregister eingetragen.
+    - any:
+      - all:
+        - feld: abgeleitet.ist_gruendungsjahr
+          op: ==
+          wert: false
+        - feld: abgeleitet.noch_nicht_gestartet
+          op: ==
+          wert: false
+        - any:
+          - feld: profil.umsatz.vorjahr
+            op: '>'
+            wert:
+              regelwert: steuern.hgb241a.grenze_umsatz
+            label:
+              de: Dein Umsatz im Vorjahr lag über 800.000 € – die Befreiung nach § 241a HGB greift nicht.
+          - feld: profil.gewinn.vorjahr
+            op: '>'
+            wert:
+              regelwert: steuern.hgb241a.grenze_gewinn
+            label:
+              de: Dein Gewinn im Vorjahr lag über 80.000 € – die Befreiung nach § 241a HGB greift nicht.
+      - all:
+        - feld: abgeleitet.ist_gruendungsjahr
+          op: ==
+          wert: true
+        - any:
+          - feld: profil.umsatz.prognose_laufendes_jahr
+            op: '>'
+            wert:
+              regelwert: steuern.hgb241a.grenze_umsatz
+            label:
+              de: Dein erwarteter Umsatz im ersten Jahr liegt über 800.000 € – die Befreiung nach § 241a HGB greift nicht.
+          - feld: profil.gewinn.prognose_laufendes_jahr
+            op: '>'
+            wert:
+              regelwert: steuern.hgb241a.grenze_gewinn
+            label:
+              de: Dein erwarteter Gewinn im ersten Jahr liegt über 80.000 € – die Befreiung nach § 241a HGB greift nicht.
+  # § 141 AO: Pflicht erst nach Mitteilung des Finanzamts (§ 141 Abs. 2 AO)
+  - all:
+    - all:
+      - feld: abgeleitet.ist_gruendungsjahr
+        op: ==
+        wert: false
+      - feld: abgeleitet.noch_nicht_gestartet
+        op: ==
+        wert: false
+      # § 141 AO gilt nur für gewerbliche Unternehmer und Land- und Forstwirte, nicht für freie Berufe
+      - feld: profil.taetigkeit.einordnung
+        op: '!='
+        wert: freiberuf
+    - any:
+      - feld: profil.umsatz.vorjahr
+        op: '>'
+        wert:
+          regelwert: steuern.ao141.grenze_umsatz
+        label:
+          de: Dein Umsatz im Vorjahr lag über der Grenze für die Buchführungspflicht nach § 141 AO.
+      - feld: profil.gewinn.vorjahr
+        op: '>'
+        wert:
+          regelwert: steuern.ao141.grenze_gewinn
+        label:
+          de: Dein Gewinn im Vorjahr lag über der Grenze für die Buchführungspflicht nach § 141 AO.
+    - feld: profil.steuern.buchfuehrung_mitteilung
+      op: ==
+      wert: true
+      label:
+        de: Das Finanzamt hat dir mitgeteilt, dass du Bücher führen musst.
 frist:
   typ: dauerhaft
 wiederholung:
@@ -31,6 +116,13 @@ sanktion:
     de: Die Folgen sind noch nicht fachlich erfasst.
   schwere: mittel
 automatisierung: hinweis
+erledigung:
+  art: bestaetigen
+  zeitraum: jahr
+  bestaetigung:
+    de: An das Finanzamt übermittelt
+aenderungsnotiz:
+  de: Gilt jetzt für alle, die zur Buchführung verpflichtet sind, nicht nur für Kapitalgesellschaften.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null

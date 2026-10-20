@@ -1,7 +1,7 @@
 # Katalog C.33 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.kassenmeldung
-version: 1
+version: 2
 katalog_nr: C.33
 titel:
   de: Elektronische Kasse beim Finanzamt melden
@@ -9,7 +9,8 @@ kurz:
   de: Melde jede elektronische Kasse innerhalb eines Monats nach der Anschaffung über ELSTER – je Betriebsstätte.
 erklaerung:
   de: Elektronische Kassen müssen dem Finanzamt gemeldet werden, innerhalb eines Monats nach Anschaffung oder Außerbetriebnahme.
-    Bestandskassen waren bis 31.7.2025 zu melden.
+    Bestandskassen waren bis 31.7.2025 zu melden. Die Meldung geht nur über ELSTER (amtlich vorgeschriebener Datensatz); ein ausgedrucktes
+    oder geteiltes Datenblatt erfüllt sie nicht.
 rechtsgrundlage:
 - § 146a AO
 kategorie: steuern
@@ -41,6 +42,12 @@ sanktion:
     de: Die Folgen sind noch nicht fachlich erfasst.
   schwere: hoch
 automatisierung: formular_vorausfuellen
+erledigung:
+  art: bestaetigen
+  bestaetigung:
+    de: In ELSTER gemeldet
+aenderungsnotiz:
+  de: Das Datenblatt aus Amtlos bereitet die Meldung nur vor. Erledigt ist sie, wenn du bestätigst, dass du sie in ELSTER übermittelt hast.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null

@@ -1,0 +1,70 @@
+# R10: aus branche.gastro_ifsg_belehrung herausgelöst (Rechtsprüfung: Belehrung durch den Arbeitgeber „im Weiteren alle zwei Jahre“, § 43 Abs. 4 IfSG)
+schema_version: 1
+id: branche.gastro_ifsg_folgebelehrung
+version: 1
+katalog_nr: H.1
+titel:
+  de: Belehrung nach § 43 IfSG alle zwei Jahre wiederholen
+kurz:
+  de: Die Belehrung nach § 43 IfSG wiederholst du für alle, die bei dir mit Lebensmitteln arbeiten, alle zwei Jahre.
+erklaerung:
+  de: Nach der ersten Belehrung belehrst du deine Beschäftigten im Weiteren alle zwei Jahre über die Tätigkeitsverbote und
+    Verpflichtungen nach §§ 42 und 43 IfSG und dokumentierst das. Zwei Jahre nach jeder Belehrung, die du in Amtlos erfasst,
+    erinnert Amtlos an die nächste. Hast du deine letzte Belehrung noch nicht in Amtlos erfasst, erfasse sie – dann kennt Amtlos
+    den Termin.
+rechtsgrundlage:
+- § 43 Abs. 4 IfSG
+kategorie: branche
+branchen:
+- gastronomie_lebensmittel
+ausloeser:
+  all:
+  - feld: profil.taetigkeit.branchen
+    op: enthaelt
+    wert: gastronomie_lebensmittel
+    label:
+      de: Dein Betrieb gehört zur Gastronomie oder Lebensmittelbranche.
+  - feld: abgeleitet.hat_beschaeftigte
+    op: ==
+    wert: true
+    label:
+      de: Du beschäftigst mindestens eine Person.
+frist:
+  typ: relativ
+  bezug:
+    ereignis: ifsg_belehrung_durchgefuehrt
+  versatz: P2Y
+  zeitpunkt: spaetestens
+  je_ereignis: true
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+aktion:
+  art: link
+  ziel: app.ifsg
+  nachweis_erforderlich: true
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Infektionsschutzgesetz § 43
+  url: https://www.gesetze-im-internet.de/ifsg/__43.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Abstand „alle zwei Jahre“ ab der letzten erfassten Belehrung (Ereignis ifsg_belehrung_durchgefuehrt) umgesetzt (R10, Rechtsprüfung § 43 Abs. 4 IfSG)'
+- Höhe und Nummer der Bußgeldvorschrift in § 73 IfSG unsicher – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

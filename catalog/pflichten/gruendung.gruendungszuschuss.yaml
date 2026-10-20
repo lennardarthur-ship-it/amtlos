@@ -1,7 +1,7 @@
 # Katalog A.13 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gruendung.gruendungszuschuss
-version: 1
+version: 2
 katalog_nr: A.13
 titel:
   de: Gründungszuschuss beantragen
@@ -46,6 +46,7 @@ sanktion:
     de: Keine Pflicht. Nach dem Start ist ein Antrag nicht mehr möglich.
   schwere: mittel
 automatisierung: hinweis
+einordnung: option
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null

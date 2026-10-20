@@ -1,14 +1,16 @@
 # Katalog C.25 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.zusammenfassende_meldung
-version: 1
+version: 2
 katalog_nr: C.25
 titel:
   de: Zusammenfassende Meldung abgeben
 kurz:
   de: Wenn du Leistungen an Unternehmen in anderen EU-Ländern erbringst, meldest du sie in der Zusammenfassenden Meldung.
 erklaerung:
-  de: Die Zusammenfassende Meldung ist bei innergemeinschaftlichen Leistungen an Unternehmen (B2B) abzugeben.
+  de: Die Zusammenfassende Meldung ist bei innergemeinschaftlichen Leistungen an Unternehmen (B2B) abzugeben. Du übermittelst sie
+    bis zum 25. Tag nach Ablauf jedes Kalendermonats an das Bundeszentralamt für Steuern. Vierteljährlich reicht, wenn deine
+    innergemeinschaftlichen Lieferungen je Quartal höchstens 50.000 € betragen.
 rechtsgrundlage:
 - § 18a UStG
 kategorie: steuern
@@ -37,6 +39,8 @@ sanktion:
     de: Die Folgen sind noch nicht fachlich erfasst.
   schwere: mittel
 automatisierung: formular_vorausfuellen
+aenderungsnotiz:
+  de: 'Frist ergänzt: bis zum 25. Tag nach Ablauf des Monats, vierteljährlich bei innergemeinschaftlichen Lieferungen bis 50.000 € je Quartal.'
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -46,8 +50,8 @@ quellen:
   abgerufen: null
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Meldezeitraum und Abgabefrist ergänzen
-- Kleinunternehmer ausgenommen?
+- 'Frist (25. Tag nach Monatsende, vierteljährlich bei igL bis 50.000 € je Quartal, § 18a UStG) nur im Text ergänzt (R10, Steuerprüfung) – als Termine abbilden, sobald der Meldezeitraum abgefragt wird'
+- 'Kleinunternehmer ausgenommen (§ 18a Abs. 4 UStG)? Laut Steuerprüfung R10 „meines Wissens befreit“ – vor dem Ändern des Auslösers bestätigen'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:

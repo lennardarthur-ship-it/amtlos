@@ -1,7 +1,7 @@
 # Katalog A.12 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gruendung.statusfeststellung
-version: 1
+version: 2
 katalog_nr: A.12
 titel:
   de: Statusfeststellung erwägen (Scheinselbstständigkeit)
@@ -39,6 +39,7 @@ sanktion:
     de: Keine Pflicht. Ohne Klärung bleibt das Risiko einer späteren Einstufung als Beschäftigung.
   schwere: niedrig
 automatisierung: hinweis
+einordnung: option
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null

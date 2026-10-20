@@ -1,7 +1,7 @@
 # Katalog B.22 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.foerderprogramme
-version: 1
+version: 2
 katalog_nr: B.22
 titel:
   de: Förderprogramme prüfen (Option)
@@ -38,6 +38,7 @@ sanktion:
     de: Keine Pflicht.
   schwere: niedrig
 automatisierung: hinweis
+einordnung: option
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null

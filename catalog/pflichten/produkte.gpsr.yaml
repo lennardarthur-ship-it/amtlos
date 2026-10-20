@@ -1,17 +1,22 @@
 # Katalog G.73 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: produkte.gpsr
-version: 3
+version: 4
 katalog_nr: G.73
 titel:
   de: 'Produktsicherheit (GPSR): Angaben und verantwortliche Person'
 kurz:
-  de: Für Verbraucherprodukte brauchst du eine verantwortliche Person in der EU, Herstellerangaben und Sicherheitsinformationen.
+  de: Verbraucherprodukte brauchen Herstellerangaben, Sicherheitsinformationen und eine verantwortliche Person in der EU. Verkaufst
+    du fremde Markenware, prüfst du vor dem Verkauf, ob diese Angaben vorhanden sind.
 erklaerung:
-  de: Die Produktsicherheitsverordnung gilt seit 13.12.2024. Wer Produkte im Fernabsatz anbietet (zum Beispiel im Onlineshop
-    oder auf einem Marktplatz), nennt Herstellerangaben und Sicherheitsinformationen schon beim Angebot.
+  de: Die Produktsicherheitsverordnung gilt seit 13.12.2024. Für die verantwortliche Person in der EU, die Herstellerangaben und
+    die Sicherheitsinformationen sorgen Hersteller und Importeure. Als Händlerin oder Händler fremder Ware prüfst du vor dem Verkauf,
+    ob Hersteller, gegebenenfalls Importeur und die nötigen Angaben auf dem Produkt oder der Verpackung stehen. Wer Produkte im Fernabsatz
+    anbietet (zum Beispiel im Onlineshop oder auf einem Marktplatz), nennt diese Angaben schon beim Angebot. Lebensmittel fallen
+    nicht unter die Verordnung.
 rechtsgrundlage:
 - Verordnung (EU) 2023/988 (GPSR)
+- Art. 2 Abs. 3 VO (EU) 2023/988 (Lebensmittel ausgenommen)
 kategorie: produkte
 branchen:
 - onlinehandel
@@ -29,7 +34,6 @@ ausloeser:
     - elektrogeraete
     - batterien
     - kosmetik
-    - lebensmittel
     label:
       de: Du verkaufst Waren.
 frist:
@@ -45,6 +49,9 @@ sanktion:
     de: Die Folgen sind noch nicht fachlich erfasst.
   schwere: hoch
 automatisierung: hinweis
+aenderungsnotiz:
+  de: Lebensmittel lösen die Pflicht nicht mehr aus (Art. 2 Abs. 3). Für Händlerinnen und Händler fremder Markenware ist beschrieben,
+    was sie prüfen.
 aktion:
   art: link
   ziel: app.onlinecheck
@@ -58,7 +65,8 @@ quellen:
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Pflichten für Händler vs. Hersteller trennen
-- Lebensmittel und Kosmetik haben eigene Regeln – Abgrenzung
+- 'Lebensmittel als Auslöser entfernt (Art. 2 Abs. 3 GPSR, R10); Abgrenzung zur Kosmetikverordnung offen'
+- 'Händlerin fremder Markenware im Laden ohne Fernabsatz: nur Sorgfaltspflichten nach Art. 12 – Auslöser auf Hersteller/Importeur/Fernabsatz einschränken? Schwere „hoch“ für Händler angemessen?'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 pruefung:
   status: entwurf

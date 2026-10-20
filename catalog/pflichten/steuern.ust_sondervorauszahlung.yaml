@@ -1,7 +1,7 @@
 # Katalog C.24 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.ust_sondervorauszahlung
-version: 1
+version: 2
 katalog_nr: C.24
 titel:
   de: Sondervorauszahlung zur Umsatzsteuer leisten
@@ -9,7 +9,8 @@ kurz:
   de: Wenn du die Voranmeldung monatlich abgibst und eine Dauerfristverlängerung hast, zahlst du einmal im Jahr eine Sondervorauszahlung
     von einem Elftel.
 erklaerung:
-  de: Bei monatlicher Abgabe mit Dauerfristverlängerung wird eine Sondervorauszahlung von 1/11 fällig.
+  de: Bei monatlicher Abgabe mit Dauerfristverlängerung zahlst du bis zum 10. Februar eine Sondervorauszahlung von einem Elftel
+    der Vorauszahlungen des Vorjahres. Sie wird in der Voranmeldung für Dezember angerechnet (Kennzahl 39).
 rechtsgrundlage:
 - § 18 UStG
 kategorie: steuern
@@ -32,7 +33,18 @@ ausloeser:
     label:
       de: Du gibst die Voranmeldung monatlich ab.
 frist:
-  typ: dauerhaft
+  typ: wiederkehrend
+  rhythmus: keiner
+  faellig:
+    art: feste_termine
+    termine:
+    - 02-10
+  verschiebung:
+    regel: naechster_werktag
+    kalender: bundesland
+  erinnerung:
+  - P14D
+  - P3D
 wiederholung:
   art: periodisch
 stelle:
@@ -44,6 +56,8 @@ sanktion:
     de: Die Folgen sind noch nicht fachlich erfasst.
   schwere: mittel
 automatisierung: formular_vorausfuellen
+aenderungsnotiz:
+  de: 'Termin ergänzt: jedes Jahr bis 10. Februar, ein Elftel der Vorauszahlungen des Vorjahres, angerechnet im Dezember.'
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -52,8 +66,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/ustg_1980/__18.html
   abgerufen: null
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Fälligkeitstermin und Bemessungsgrundlage der Sondervorauszahlung ergänzen (K-08)
+- 'Termin 10.02. und 1/11 der Vorjahres-Vorauszahlungen ergänzt (R10, Steuerprüfung) – Verschiebung auf den nächsten Werktag bestätigen'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 pruefung:
   status: entwurf

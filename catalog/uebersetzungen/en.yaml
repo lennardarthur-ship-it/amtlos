@@ -73,8 +73,6 @@ eintraege:
   en: On online marketplaces, you provide your full seller information.
 - de: Auf deiner Website informierst du in einer Datenschutzerklärung über die Verarbeitung von Daten.
   en: On your website, you provide a privacy policy (Datenschutzerklärung) explaining how data is processed.
-- de: Auf deiner Website stellst du ein Impressum mit den Pflichtangaben bereit – leicht erkennbar und immer erreichbar.
-  en: On your website, you provide a legal notice (Impressum) with the mandatory information, easy to find and always accessible.
 - de: Aufbewahrungsfrist für Buchungsbelege einschließlich Rechnungen
   en: Retention period for accounting vouchers including invoices
 - de: Aufbewahrungsfrist für Handels- und Geschäftsbriefe
@@ -131,8 +129,6 @@ eintraege:
   en: If there is a data breach, you report it to the data protection supervisory authority within 72 hours.
 - de: Bei grenzüberschreitenden Zahlungen über der Meldegrenze – zum Beispiel Investorengeld aus dem Ausland – besteht eine Meldepflicht.
   en: For cross-border payments above the reporting threshold – for example investor money from abroad – there is a reporting obligation.
-- de: Bei monatlicher Abgabe mit Dauerfristverlängerung wird eine Sondervorauszahlung von 1/11 fällig.
-  en: For monthly filing with a permanent deadline extension, a special advance payment of 1/11 is due.
 - de: Bei voraussichtlich hohem Risiko für die Betroffenen ist vorab eine Folgenabschätzung durchzuführen und zu dokumentieren.
   en: If there is likely to be a high risk to the people affected, an impact assessment must be carried out and documented in advance.
 - de: Beim BSI registrieren (NIS2)
@@ -141,8 +137,6 @@ eintraege:
   en: Submit the contribution statement
 - de: Belege und Rechnungen monatlich vollständig halten
   en: Keep receipts and invoices complete every month
-- de: Belehrung nach § 43 Infektionsschutzgesetz
-  en: Instruction under § 43 Infektionsschutzgesetz
 - de: Bericht zur Entgelttransparenz (geplant)
   en: Pay transparency report (planned)
 - de: Berufserlaubnis und Zulassung
@@ -185,10 +179,6 @@ eintraege:
   en: This affects, for example, real estate agents, residential property managers and insurance intermediaries. The scope and proof are set by the relevant regulation.
 - de: Betroffene haben unter anderem Rechte auf Auskunft, Berichtigung, Löschung und Widerspruch. Amtlos zeigt die Frist ab Eingang und führt die Anfrage bis zur Antwort.
   en: Data subjects have rights including access, rectification, erasure and objection. Amtlos shows the deadline from receipt and tracks the request until it is answered.
-- de: Bevor du Batterien oder Geräte mit Batterien verkaufst, registrierst du dich nach dem Batteriegesetz.
-  en: Before you sell batteries or devices with batteries, you register under the Battery Act (BattDG).
-- de: Bevor du Elektrogeräte verkaufst, registrierst du dich bei der stiftung ear.
-  en: Before you sell electrical devices, you register with stiftung ear.
 - de: Bevor du Lebensmittel herstellst, behandelst oder verkaufst, registrierst du deinen Betrieb bei der Lebensmittelüberwachung.
   en: Before you produce, handle or sell food, you register your business with the food control authority (Lebensmittelüberwachung).
 - de: Bevor du die erste Person einstellst, brauchst du eine Betriebsnummer von der Bundesagentur für Arbeit.
@@ -209,14 +199,6 @@ eintraege:
   en: Mandatory bookkeeping under § 141 AO – profit limit
 - de: Buchführungspflicht nach § 141 AO – Umsatzgrenze
   en: Mandatory bookkeeping under § 141 AO – revenue limit
-- de: Buchführungspflichtig ist, wer nach dem Handelsgesetzbuch dazu verpflichtet ist oder die Grenzen nach § 141 AO überschreitet (800.000 € Umsatz oder 80.000 € Gewinn). Amtlos erstellt keine Bilanz selbst,
-    sondern übergibt an deine Steuerberatung (E-051).
-  en: You are required to keep books if the German Commercial Code (HGB) requires it or if you exceed the limits under § 141 AO (€800,000 revenue or €80,000 profit). Amtlos does not prepare a balance sheet
-    itself but hands over to your tax adviser (E-051).
-- de: 'Buchungsbelege einschließlich Rechnungen: 8 Jahre. Jahresabschlüsse, Bücher und Organisationsunterlagen: 10 Jahre. Handels- und Geschäftsbriefe: 6 Jahre. Amtlos zeigt dir, wann du Unterlagen löschen
-    darfst.'
-  en: 'Accounting vouchers including invoices: 8 years. Annual financial statements, books and organisational documents: 10 years. Commercial and business letters: 6 years. Amtlos shows you when you may
-    delete records.'
 - de: Bundesagentur für Arbeit, Betriebsnummern-Service
   en: Federal Employment Agency (Bundesagentur für Arbeit), establishment number service
 - de: Bundesamt für Sicherheit in der Informationstechnik (BSI)
@@ -227,8 +209,6 @@ eintraege:
   en: Federal Central Tax Office (Bundeszentralamt für Steuern)
 - de: Bundeszentralamt für Steuern (BZSt)
   en: Federal Central Tax Office (BZSt)
-- de: Bußgeld möglich; Haftungsrisiko bei Arbeitsunfällen.
-  en: Fine possible; liability risk in case of workplace accidents.
 - de: Bußgelder bis 10 Mio. € bzw. 2 % des Umsatzes sind möglich.
   en: Fines of up to €10 million or 2% of revenue are possible.
 - de: Damit Amtlos die Termine der Lohnsteuer-Anmeldung berechnen kann, brauchst du den Anmeldezeitraum.
@@ -243,8 +223,6 @@ eintraege:
   en: The tax office has set prepayments.
 - de: Das Hinweisgeberschutzgesetz verlangt ab 50 Beschäftigten eine interne Meldestelle.
   en: The Whistleblower Protection Act (HinSchG) requires an internal reporting channel from 50 employees.
-- de: Das Impressum nennt unter anderem Name, Anschrift und Kontakt, bei Gesellschaften auch Vertretung und Register. Der Online-Check prüft, ob es verlinkt ist.
-  en: The legal notice includes, among other things, name, address and contact details, and for companies also the legal representatives and register details. The online check verifies that it is linked.
 - de: Das Kapital, das die Gesellschafter bei der Gründung einer GmbH oder UG mindestens aufbringen.
   en: The minimum capital that the shareholders contribute when founding a GmbH or UG.
 - de: Das Nachweisgesetz verlangt, dass die wesentlichen Arbeitsbedingungen dokumentiert und der beschäftigten Person ausgehändigt werden.
@@ -254,8 +232,6 @@ eintraege:
     the market.
 - de: Das Verzeichnis beschreibt je Verarbeitung Zweck, betroffene Personen, Datenarten, Empfänger und Löschfristen. Amtlos hilft beim Anlegen und erzeugt das Verzeichnis als PDF.
   en: For each processing activity, the record describes the purpose, people affected, types of data, recipients and deletion periods. Amtlos helps you set it up and generates the record as a PDF.
-- de: Das Verzeichnis der Handwerkskammer, in dem Handwerksbetriebe eingetragen sind.
-  en: The Chamber of Crafts' register in which craft businesses are entered.
 - de: Daten deiner Beschäftigten verarbeitest du nur, soweit es für das Arbeitsverhältnis nötig ist.
   en: You process your employees' data only as far as necessary for the employment relationship.
 - de: Daten dürfen nur so lange gespeichert werden, wie es für den Zweck nötig ist. Gesetzliche Aufbewahrungspflichten (z. B. für Rechnungen) gehen vor.
@@ -288,24 +264,18 @@ eintraege:
   en: Your business is in the hospitality or food industry.
 - de: Dein Betrieb gehört zur Immobilien- oder Finanzbranche.
   en: Your business is in the real estate or finance industry.
-- de: Dein Betrieb ist ein Handwerk nach Anlage A oder B der Handwerksordnung.
-  en: Your business is a craft under Annex A or B of the Handwerksordnung.
 - de: Dein Betrieb ist ein Handwerksbetrieb.
   en: Your business is a skilled trade business (Handwerksbetrieb).
 - de: Dein Geschäftsjahr ist das Kalenderjahr.
   en: Your financial year is the calendar year.
 - de: Dein Geschäftsjahr weicht vom Kalenderjahr ab.
   en: Your financial year differs from the calendar year.
-- de: Dein Gewinn im Vorjahr lag über der Grenze für die Buchführungspflicht.
-  en: Your profit in the previous year was above the limit for mandatory bookkeeping.
 - de: Dein Umsatz im Gründungsjahr hat 80 % der Grenze erreicht.
   en: Your revenue in your founding year has reached 80% of the limit.
 - de: Dein Umsatz im Gründungsjahr hat 95 % der Grenze erreicht.
   en: Your revenue in your founding year has reached 95% of the limit.
 - de: Dein Umsatz im Vorjahr lag über 800.000 €.
   en: Your revenue in the previous year was above €800,000.
-- de: Dein Umsatz im Vorjahr lag über der Grenze für die Buchführungspflicht.
-  en: Your revenue in the previous year was above the limit for mandatory bookkeeping.
 - de: Dein Umsatz im Vorjahr lag über der Grenze.
   en: Your revenue in the previous year was above the limit.
 - de: Dein Umsatz in diesem Jahr hat 80 % der Grenze erreicht.
@@ -322,8 +292,6 @@ eintraege:
   en: Your company is a UG (haftungsbeschränkt).
 - de: Dein Unternehmen ist eine UG oder GmbH.
   en: Your company is a UG or GmbH.
-- de: Dein Unternehmen ist im Handelsregister eingetragen.
-  en: Your company is registered in the commercial register (Handelsregister).
 - de: Dein erwarteter Umsatz im Gründungsjahr liegt über der Grenze für das Gründungsjahr.
   en: Your expected revenue in your founding year is above the limit for the founding year.
 - de: Dein erwarteter Umsatz in diesem Jahr liegt über 800.000 €.
@@ -390,9 +358,6 @@ eintraege:
   en: The deregistration (DEÜV) goes to the health insurance fund (Krankenkasse) or the mini-job centre (Minijob-Zentrale), via the payroll software.
 - de: Die Anforderungen ergeben sich aus dem Infektionsschutz und den Hygieneverordnungen der Länder.
   en: The requirements come from infection protection law and the hygiene ordinances of the federal states.
-- de: Die Anmeldung zur Sozialversicherung (DEÜV) geht an die Krankenkasse der beschäftigten Person, bei Minijobs an die Minijob-Zentrale. Die Meldung läuft über ein systemgeprüftes Lohnprogramm.
-  en: The social security registration (DEÜV) goes to the employee's health insurance fund (Krankenkasse), or to the mini-job centre (Minijob-Zentrale) for mini-jobs. The notification is sent via system-certified
-    payroll software.
 - de: Die Aussetzung der monatlichen Voranmeldung für Neugründer endet am 31.12.2026 – ob sie verlängert wird, ist offen.
   en: The suspension of the monthly advance return for new founders ends on 31.12.2026 – whether it will be extended is open.
 - de: Die Außenwirtschaftsverordnung verlangt Meldungen bei grenzüberschreitenden Zahlungen über einer Meldegrenze. Die Grenze steht als Regelwert in Amtlos, sobald sie fachlich freigegeben ist.
@@ -408,23 +373,16 @@ eintraege:
     anfängt.
   en: The establishment number identifies your business in all social security reports. You apply for it at the establishment number service of the Federal Employment Agency (Bundesagentur für Arbeit) before
     your first person starts working for you.
-- de: Die Bilanz deiner Gesellschaft übermittelst du elektronisch ans Finanzamt.
-  en: You submit your company's balance sheet electronically to the tax office (Finanzamt).
 - de: Die Bilanz in elektronischer Form, die ans Finanzamt übermittelt wird.
   en: The balance sheet in electronic form, submitted to the tax office (Finanzamt).
 - de: Die Bundesregierung plant, die Benennungspflicht ab 20 Personen nach § 38 BDSG zu streichen.
   en: The federal government plans to remove the obligation to appoint a data protection officer from 20 people under § 38 BDSG.
 - de: Die Datenschutzerklärung muss von jeder Seite erreichbar sein. Inhaltlich folgt sie den Informationspflichten der DSGVO (Katalog F).
   en: The privacy policy must be reachable from every page. Its content follows the GDPR information obligations (catalogue F).
-- de: Die E-Bilanz ist die elektronische Übermittlung von Bilanz und Gewinn- und Verlustrechnung an das Finanzamt.
-  en: The E-Bilanz is the electronic submission of the balance sheet and profit and loss statement to the tax office (Finanzamt).
 - de: Die EU-Entgelttransparenzrichtlinie war bis 7.6.2026 umzusetzen; das deutsche Gesetz steht aus. Bis dahin gilt das bisherige Entgelttransparenzgesetz weiter.
   en: The EU Pay Transparency Directive had to be transposed by 7.6.2026; the German law is still pending. Until then, the existing Pay Transparency Act (Entgelttransparenzgesetz) continues to apply.
 - de: Die Einkommensteuererklärung übermittelst du elektronisch – ohne Steuerberatung bis 31. Juli des Folgejahres, mit Steuerberatung bis Ende Februar des übernächsten Jahres (§ 149 AO).
   en: You submit your income tax return electronically – without a tax adviser by 31 July of the following year, with a tax adviser by the end of February of the year after that (§ 149 AO).
-- de: Die Erstbelehrung macht das Gesundheitsamt oder ein beauftragter Arzt; die Bescheinigung bewahrst du auf. Danach belehrst du selbst in Abständen. Amtlos dokumentiert die Belehrung im Unterweisungsmodul.
-  en: The initial instruction is given by the public health office (Gesundheitsamt) or an appointed doctor; you keep the certificate. After that, you give the instruction yourself at intervals. Amtlos documents
-    the instruction in the safety briefing module.
 - de: Die Folgen sind noch nicht fachlich erfasst.
   en: The consequences have not yet been reviewed by experts.
 - de: Die Frist beginnt, sobald du von der Panne erfährst. Keine Meldung ist nötig, wenn voraussichtlich kein Risiko für die Betroffenen besteht – das entscheidest und dokumentierst du. Amtlos zeigt einen
@@ -464,10 +422,6 @@ eintraege:
   en: The small business scheme (Kleinunternehmerregelung) ends from the sale that exceeds the limit. For this, Amtlos counts the invoices you issued in Amtlos. Invoices outside Amtlos are not included.
 - de: Die Kleinunternehmerregelung endet ab dem Umsatz, der die Grenze überschreitet. Prüfe mit dem Finanzamt oder deiner Steuerberatung, ab wann du Umsatzsteuer ausweisen und anmelden musst.
   en: The small business scheme (Kleinunternehmerregelung) ends from the sale that exceeds the limit. Check with the tax office (Finanzamt) or your tax adviser from when you must show and declare VAT.
-- de: 'Die Kleinunternehmerregelung gilt, wenn dein Umsatz im Vorjahr höchstens 25.000 € betrug und im laufenden Jahr 100.000 € nicht übersteigt. Im Gründungsjahr gilt 25.000 € für das laufende Jahr. Die
-    Grenze ist hart: Ab dem Umsatz, der sie überschreitet, endet der Status. Wer auf die Regelung verzichtet, ist fünf Jahre daran gebunden.'
-  en: 'The small business scheme (Kleinunternehmerregelung) applies if your revenue in the previous year was no more than €25,000 and does not exceed €100,000 in the current year. In the founding year,
-    €25,000 applies for the current year. The limit is strict: your status ends from the sale that exceeds it. If you opt out of the scheme, you are bound by that choice for five years.'
 - de: Die Lebensmittelinformationsverordnung verlangt Angaben zu Allergenen. Amtlos führt eine Allergenliste je Gericht und erstellt daraus eine Übersicht zum Aushängen.
   en: The Food Information Regulation (LMIV) requires information on allergens. Amtlos keeps an allergen list per dish and creates an overview from it for you to post.
 - de: Die Lohnabrechnung selbst macht ein systemgeprüfter Partner; Amtlos liefert Stammdaten und Fristen.
@@ -492,16 +446,12 @@ eintraege:
     scheme (Kleinunternehmerregelung) are exempt. A PDF invoice is not an e-invoice.
 - de: Die Preisangabenverordnung regelt, wie Preise gegenüber Verbrauchern anzugeben sind.
   en: The Price Indication Ordinance (Preisangabenverordnung) governs how prices must be stated to consumers.
-- de: Die Produktsicherheitsverordnung gilt seit 13.12.2024. Wer Produkte im Fernabsatz anbietet (zum Beispiel im Onlineshop oder auf einem Marktplatz), nennt Herstellerangaben und Sicherheitsinformationen schon beim Angebot.
-  en: The General Product Safety Regulation has applied since 13.12.2024. Anyone offering products at a distance (for example in an online shop or on a marketplace) states manufacturer information and safety information with the offer.
 - de: Die Regeln gelten für bestimmte Fahrzeugklassen. Daten aus Fahrtenschreibern müssen ausgelesen und aufbewahrt werden.
   en: The rules apply to certain vehicle classes. Tachograph data must be downloaded and retained.
 - de: Die Registrierung ist Voraussetzung für die Meldewege bei Sicherheitsvorfällen.
   en: Registration is a prerequisite for the reporting channels for security incidents.
 - de: Die Sozialkassen regeln unter anderem Urlaub und Berufsbildung in der Bauwirtschaft. Ob dein Betrieb erfasst ist, hängt von den überwiegenden Tätigkeiten ab.
   en: Among other things, the social funds cover holidays and vocational training in the construction industry. Whether your business is covered depends on its predominant activities.
-- de: Die Spezifikation verlangt, den Status des früheren OS-Plattform-Links zu prüfen und aktuell zu halten. Der Online-Check meldet, ob der Link auf deiner Website steht.
-  en: The specification requires checking the status of the former ODR platform link and keeping it up to date. The online check reports whether the link is on your website.
 - de: Die Statusfeststellung ist eine Möglichkeit, keine Pflicht. Sie schafft Sicherheit, wenn das Risiko der Scheinselbstständigkeit besteht.
   en: The status determination is an option, not an obligation. It gives you certainty if there is a risk of bogus self-employment.
 - de: Die UG (haftungsbeschränkt) muss 25 % ihres Jahresüberschusses in eine gesetzliche Rücklage einstellen.
@@ -519,8 +469,6 @@ eintraege:
   en: The safety briefing explains the workplace hazards and the protective measures from the risk assessment. Amtlos records it digitally with a signature.
 - de: Die Verordnung zur arbeitsmedizinischen Vorsorge regelt Pflicht-, Angebots- und Wunschvorsorge. Bei Bildschirmarbeit ist Vorsorge anzubieten.
   en: The Ordinance on Occupational Health Care (Verordnung zur arbeitsmedizinischen Vorsorge) covers mandatory, offered and requested check-ups. For screen work, a check-up must be offered.
-- de: Die Zusammenfassende Meldung ist bei innergemeinschaftlichen Leistungen an Unternehmen (B2B) abzugeben.
-  en: The EC sales list must be submitted for intra-Community services to businesses (B2B).
 - de: Die allgemeine Gefährdungsbeurteilung (E.50) wird im Handwerk je Gewerk und Tätigkeit konkretisiert. Branchenvorlagen folgen nach fachlicher Prüfung.
   en: In skilled trades, the general risk assessment (E.50) is made specific per trade and activity. Industry templates will follow after expert review.
 - de: Die anlassunabhängige Gefährdungsbeurteilung nach dem Mutterschutzgesetz ist Teil der allgemeinen Gefährdungsbeurteilung.
@@ -553,8 +501,6 @@ eintraege:
   en: You offer subscriptions.
 - de: Du bietest arbeitsmedizinische Vorsorge an, zum Beispiel die Angebotsvorsorge bei Bildschirmarbeit.
   en: You offer occupational health check-ups, for example the offered check-up for screen work.
-- de: Du bist als Person oder über eine Personengesellschaft unternehmerisch tätig.
-  en: You are self-employed as an individual or through a partnership.
 - de: Du bist im Gründungsjahr.
   en: You are in your founding year.
 - de: Du bist nicht zur doppelten Buchführung verpflichtet.
@@ -791,8 +737,6 @@ eintraege:
   en: Submit the cash-basis profit statement (Anlage EÜR)
 - de: Einwilligung für Cookies und Tracking einholen
   en: Get consent for cookies and tracking
-- de: Elektrische Betriebsmittel müssen in bestimmten Abständen geprüft werden. Amtlos erinnert an die Prüffristen, sobald sie als Regeldaten hinterlegt sind.
-  en: Electrical equipment must be inspected at certain intervals. Amtlos reminds you of the inspection deadlines as soon as they are stored as rule data.
 - de: Elektrische Geräte prüfen lassen
   en: Have electrical equipment inspected
 - de: Elektrische Geräte und Anlagen lässt du regelmäßig prüfen (DGUV Vorschrift 3).
@@ -809,8 +753,6 @@ eintraege:
   en: Electronic recording systems must be protected by a certified technical security device. A receipt must be issued for every business transaction.
 - de: Elektronische Kasse beim Finanzamt melden
   en: Register your electronic cash register with the tax office
-- de: Elektronische Kassen müssen dem Finanzamt gemeldet werden, innerhalb eines Monats nach Anschaffung oder Außerbetriebnahme. Bestandskassen waren bis 31.7.2025 zu melden.
-  en: Electronic cash registers must be reported to the tax office (Finanzamt) within one month of purchase or decommissioning. Existing cash registers had to be reported by 31.7.2025.
 - de: Endet eine Beschäftigung, meldest du die Person bei der Krankenkasse ab.
   en: When an employment ends, you deregister the person with the health insurance fund (Krankenkasse).
 - de: Entgeltstruktur nach Geschlecht auswerten (mit Lohnbüro)
@@ -855,8 +797,6 @@ eintraege:
   en: Check funding programmes (optional)
 - de: Für Beschäftigte zahlst du Umlagen (U1, U2, U3) und rufst Arbeitsunfähigkeitsbescheinigungen elektronisch ab.
   en: For employees, you pay levies (U1, U2, U3) and retrieve sick notes electronically.
-- de: Für Beschäftigtendaten gelten besondere Regeln. Amtlos selbst speichert nur das Nötigste (Name, Beschäftigungsart, Eintritt und Austritt).
-  en: Special rules apply to employee data. Amtlos itself stores only what is necessary (name, type of employment, start and end date).
 - de: Für Betriebsstätten fällt der Rundfunkbeitrag an. Die Anmeldung machst du beim Beitragsservice.
   en: The broadcasting fee (Rundfunkbeitrag) applies to business premises. You register with the Beitragsservice.
 - de: Für Fahrerinnen und Fahrer gelten Lenk- und Ruhezeiten, die mit dem Fahrtenschreiber aufgezeichnet werden.
@@ -865,16 +805,12 @@ eintraege:
   en: Extensive obligations apply to high-risk AI systems, postponed to 2.12.2027 or 2.8.2028.
 - de: Für Jugendliche gelten Erstuntersuchung, Arbeitszeitgrenzen und eine Aushangpflicht.
   en: For young people, an initial medical examination, working time limits and a notice posting obligation apply.
-- de: Für Minijobber und in Sofortmeldebranchen musst du Beginn, Ende und Dauer der Arbeitszeit aufzeichnen.
-  en: For mini-jobbers and in industries with immediate reporting obligations, you must record the start, end and duration of working time.
 - de: Für Mitarbeiterbeteiligungen gibt es steuerliche Sonderregeln (§ 19a EStG) und virtuelle Modelle (VSOP). Amtlos erklärt die Modelle; Vorlagen folgen mit dem Dokumentengenerator.
   en: For employee participation, there are special tax rules (§ 19a EStG) and virtual models (VSOP). Amtlos explains the models; templates will follow with the document generator.
 - de: Für Startups gibt es Förderprogramme wie EXIST, INVEST, KfW-Programme und Programme der Länder.
   en: There are funding programmes for startups such as EXIST, INVEST, KfW programmes and programmes of the federal states.
 - de: Für Tätigkeiten mit Feuchtarbeit oder hautbelastenden Stoffen legst du in einem Hautschutzplan Schutz, Reinigung und Pflege fest.
   en: For work involving wet work or substances that stress the skin, you set out protection, cleaning and care in a skin protection plan.
-- de: Für Verbraucherprodukte brauchst du eine verantwortliche Person in der EU, Herstellerangaben und Sicherheitsinformationen.
-  en: For consumer products, you need a responsible person in the EU, manufacturer information and safety information.
 - de: Für bestimmte Produkte (z. B. Computer, Smartphones, E-Book-Reader) gelten Barrierefreiheitsanforderungen – die Kleinstunternehmen-Ausnahme gilt dafür nicht verlässlich.
   en: Accessibility requirements apply to certain products (e.g. computers, smartphones, e-book readers) – the micro-enterprise exemption does not reliably apply to them.
 - de: Für bestimmte erlaubnispflichtige Tätigkeiten gilt eine regelmäßige Weiterbildungspflicht – nur wo sie noch gilt.
@@ -927,8 +863,6 @@ eintraege:
   en: Depending on the activity, health and care professions need a licence to practise (Approbation), a permit or an approval.
 - de: Gesundheitsamt bzw. zuständige Kammer oder Behörde
   en: Public health office (Gesundheitsamt) or the competent chamber or authority
-- de: Gesundheitsamt; danach du selbst
-  en: Public health office (Gesundheitsamt); after that, you
 - de: Gewerbe anmelden
   en: Register your trade
 - de: Gewerbeamt der Gemeinde
@@ -957,10 +891,6 @@ eintraege:
   en: Post a skin protection plan
 - de: Hebesatz
   en: Multiplier (Hebesatz)
-- de: Hersteller und Händler, die als Hersteller gelten, müssen sich nach dem ElektroG vor dem Verkauf registrieren.
-  en: Manufacturers, and retailers who count as manufacturers, must register under the ElektroG before selling.
-- de: Hersteller von Batterien müssen sich vor dem Inverkehrbringen registrieren.
-  en: Battery manufacturers must register before placing products on the market.
 - de: Hinweis zur Verbraucherstreitbeilegung
   en: Notice on consumer dispute resolution
 - de: Hygieneplan führen
@@ -987,20 +917,12 @@ eintraege:
   en: In skilled trades, you assess the hazards per trade and place of work – including at customers' construction sites.
 - de: Immobilienmakler und viele Finanzdienstleister sind Verpflichtete nach dem Geldwäschegesetz.
   en: Real estate agents and many financial service providers are obliged entities under the Anti-Money Laundering Act (Geldwäschegesetz).
-- de: Impressum auf der Website
-  en: Legal notice (Impressum) on your website
 - de: In Beauty- und Kosmetikbetrieben legst du in einem Hygieneplan fest, wie Geräte, Flächen und Hände gereinigt und desinfiziert werden.
   en: In beauty and cosmetics businesses, you set out in a hygiene plan how equipment, surfaces and hands are cleaned and disinfected.
 - de: In IT- und Agenturprojekten können Fehler teuer werden. Haftungsregeln in Verträgen und eine passende Versicherung begrenzen das Risiko.
   en: In IT and agency projects, mistakes can be expensive. Liability clauses in contracts and suitable insurance limit the risk.
 - de: In deiner Branche meldest du neue Beschäftigte spätestens bei Arbeitsbeginn sofort an.
   en: In your industry, you register new employees immediately, at the latest when they start work.
-- de: In den Branchen nach § 28a Abs. 4 SGB IV – unter anderem Bau, Gastronomie, Personenbeförderung, Gebäudereinigung, Messebau, Fleischwirtschaft und Sicherheitsgewerbe – ist eine Sofortmeldung bei Arbeitsbeginn
-    Pflicht.
-  en: In the industries under § 28a Abs. 4 SGB IV – including construction, hospitality, passenger transport, building cleaning, trade fair construction, the meat industry and the security industry – an
-    immediate notification (Sofortmeldung) when work starts is an obligation.
-- de: In die Handwerksrolle eintragen
-  en: Register in the register of craftspeople
 - de: Innerhalb einer Woche nach Gründung meldest du dein Unternehmen bei der zuständigen Berufsgenossenschaft an – auch ohne Mitarbeiter.
   en: Within one week of founding, you register your business with the responsible employers' liability insurance association (Berufsgenossenschaft), even without employees.
 - de: Innerhalb eines Monats nach dem Start meldest du dich über ELSTER beim Finanzamt an.
@@ -1029,8 +951,6 @@ eintraege:
   en: Depending on your workforce, you display certain laws at your workplace, for example ArbZG, AGG, MuSchG and JArbSchG.
 - de: Jede neue Person unterweist du vor dem ersten Arbeitstag zu den Gefahren und Schutzmaßnahmen.
   en: You give every new person a safety briefing on hazards and protective measures before their first working day.
-- de: Jede neue beschäftigte Person meldest du bei der Krankenkasse an.
-  en: You register every new employee with the health insurance fund (Krankenkasse).
 - de: Jugendarbeitsschutz beachten
   en: Follow youth employment protection rules
 - de: KI-Inhalte und KI-Interaktion kennzeichnen
@@ -1109,16 +1029,12 @@ eintraege:
 - de: Laut Entwurf (Juni 2026) soll ab 1.1.2027 elektronisch erfasst werden, mit Übergangsfristen nach Betriebsgröße; Betriebe bis 10 Beschäftigte sollen keine elektronische Pflicht haben. Noch kein Gesetz.
   en: According to the draft (June 2026), time is to be recorded electronically from 1.1.2027, with transition periods depending on company size; businesses with up to 10 employees are not to have an electronic
     obligation. Not yet law.
-- de: Lebensmittelunternehmen müssen ein Verfahren nach den HACCP-Grundsätzen einrichten und die Kontrollen dokumentieren. Amtlos bietet Kontrolllisten mit Grenzwerten, die du festlegst.
-  en: Food businesses must set up a procedure based on HACCP principles and document the checks. Amtlos provides checklists with limit values that you set.
 - de: Lebensmittelunternehmen müssen jeden Betrieb bei der zuständigen Behörde registrieren lassen – meist beim Veterinär- und Lebensmittelüberwachungsamt des Kreises.
   en: Food businesses must register every establishment with the competent authority – usually the district's veterinary and food control office (Veterinär- und Lebensmittelüberwachungsamt).
 - de: Lebensmittelüberwachung des Kreises bzw. der Stadt
   en: Food control authority (Lebensmittelüberwachung) of the district or city
 - de: Lenk- und Ruhezeiten einhalten und aufzeichnen
   en: Comply with and record driving and rest times
-- de: Link zur OS-Plattform prüfen
-  en: Check the link to the ODR platform
 - de: Lohnabrechnung über geprüfte Software
   en: Payroll via certified software
 - de: Lohnpartner oder Steuerberatung
@@ -1261,8 +1177,6 @@ eintraege:
   en: 'Product safety (GPSR): information and responsible person'
 - de: Prüfe in deinen Verträgen die Haftung und ob eine Berufs- oder Betriebshaftpflicht passt.
   en: Check the liability in your contracts and whether professional or business liability insurance is right for you.
-- de: Prüfe, ob der frühere Link zur Online-Streitbeilegungsplattform der EU auf deiner Website noch aktuell ist.
-  en: Check whether the former link to the EU online dispute resolution platform on your website is still up to date.
 - de: Prüfen, ob NIS2 für dich gilt
   en: Check whether NIS2 applies to you
 - de: Prüfen, ob deine Produkte unter das BFSG fallen
@@ -1435,8 +1349,6 @@ eintraege:
   en: If you use video surveillance, you make it recognisable and document the purpose.
 - de: Wenn du die Voranmeldung monatlich abgibst und eine Dauerfristverlängerung hast, zahlst du einmal im Jahr eine Sondervorauszahlung von einem Elftel.
   en: If you file the advance return monthly and have a permanent deadline extension (Dauerfristverlängerung), you make a special advance payment (Sondervorauszahlung) of one eleventh once a year.
-- de: Wenn du ein Handwerk betreibst, musst du dich bei der Handwerkskammer eintragen lassen.
-  en: If you run a craft business, you must register with the Chamber of Crafts (Handwerkskammer).
 - de: Wenn du eine elektronische Kasse nicht mehr nutzt, meldest du das innerhalb eines Monats über ELSTER.
   en: If you stop using an electronic cash register, you report this via ELSTER within one month.
 - de: Wenn du nur einen Auftraggeber hast, kannst du bei der Clearingstelle der Rentenversicherung klären lassen, ob du wirklich selbstständig bist.
@@ -1449,14 +1361,8 @@ eintraege:
   en: If anything changes among the shareholders, a new list of shareholders (Gesellschafterliste) must be submitted to the commercial register (Handelsregister) – via the notary.
 - de: Wer Jugendliche beschäftigt, braucht vorab eine ärztliche Erstuntersuchung, muss besondere Arbeitszeitgrenzen einhalten und das Jugendarbeitsschutzgesetz aushängen.
   en: If you employ young people, they need an initial medical examination beforehand, you must comply with special working time limits and you must post the Youth Employment Protection Act (Jugendarbeitsschutzgesetz).
-- de: Wer Umsatzsteuer auf Rechnungen ausweist, gibt je nach Höhe der Steuer im Vorjahr monatlich oder vierteljährlich eine Voranmeldung über ELSTER ab. Amtlos bereitet die Zahlen vor; du übermittelst selbst.
-  en: If you show VAT on invoices, you file an advance return via ELSTER monthly or quarterly, depending on the amount of tax in the previous year. Amtlos prepares the figures; you submit them yourself.
-- de: Wer bei dir mit Lebensmitteln arbeitet, braucht vor dem ersten Arbeitstag die Belehrung nach § 43 IfSG.
-  en: Anyone who works with food in your business needs the instruction under § 43 IfSG before their first working day.
 - de: Wer im Unternehmen mit KI arbeitet, braucht ausreichende KI-Kompetenz – sorge für Schulung und halte sie fest.
   en: 'Anyone in your company who works with AI needs sufficient AI literacy: provide training and keep a record of it.'
-- de: Wer nicht zur doppelten Buchführung verpflichtet ist, ermittelt den Gewinn mit der Einnahmen-Überschuss-Rechnung.
-  en: If you are not required to use double-entry bookkeeping, you calculate your profit with the cash-basis profit statement (Einnahmen-Überschuss-Rechnung).
 - de: Wer unter NIS2 fällt, muss erhebliche Sicherheitsvorfälle melden und Risikomanagement-Maßnahmen umsetzen. Die Geschäftsleitung haftet für die Umsetzung.
   en: If NIS2 applies to you, you must report significant security incidents and implement risk management measures. Management is liable for implementation.
 - de: Wer wenig Umsatz macht, kann ohne Umsatzsteuer abrechnen.
@@ -1477,8 +1383,6 @@ eintraege:
   en: Pay the share capital into the business account before the company is registered with the commercial register (Handelsregister).
 - de: Zentrale Stelle Verpackungsregister (LUCID)
   en: Central Agency Packaging Register (Zentrale Stelle Verpackungsregister, LUCID)
-- de: Zulassungspflichtige Handwerke (Anlage A der Handwerksordnung) brauchen einen Meisterbrief oder eine Ausnahme. Zulassungsfreie Handwerke (Anlage B) müssen ebenfalls eingetragen werden.
-  en: Crafts that require a licence (Annex A of the Handwerksordnung) need a master craftsman's certificate (Meisterbrief) or an exemption. Licence-free crafts (Annex B) must also be registered.
 - de: Zum Jahresabschluss gehören Bilanz und Gewinn- und Verlustrechnung. Die Gesellschafter stellen ihn fest. Die Bilanz geht außerdem elektronisch als E-Bilanz ans Finanzamt.
   en: The annual financial statements include the balance sheet and profit and loss statement. The shareholders approve them. The balance sheet is also sent electronically to the tax office (Finanzamt)
     as an E-Bilanz.
@@ -1500,8 +1404,6 @@ eintraege:
   en: eAU
 - de: stiftung elektro-altgeräte register (ear)
   en: stiftung elektro-altgeräte register (ear)
-- de: § 17 MiLoG verlangt Aufzeichnungen für geringfügig Beschäftigte und für Beschäftigte in den Branchen mit Sofortmeldepflicht.
-  en: § 17 MiLoG requires records for marginally employed persons and for employees in industries with an immediate reporting obligation (Sofortmeldepflicht).
 - de: § 312k BGB verlangt eine einfache Kündigungsmöglichkeit über die Website für Dauerschuldverhältnisse, die online geschlossen werden können.
   en: § 312k BGB requires an easy way to cancel via the website for continuing obligations that can be concluded online.
 - de: Änderungen im Gesellschafterkreis werden notariell abgewickelt; die aktualisierte Gesellschafterliste wird beim Handelsregister eingereicht.
@@ -1516,3 +1418,233 @@ eintraege:
   en: Inform people about data processing
 - de: –
   en: –
+- de: Elektrische Betriebsmittel müssen in bestimmten Abständen geprüft werden. Ein Prüfprotokoll gilt bis zur nächsten Prüfung, die darin steht (sonst bis zum Richtwert für die gewählten Einsatzbedingungen) – dann erinnert Amtlos wieder.
+  en: Electrical equipment must be inspected at certain intervals. An inspection record is valid until the next inspection stated in it (otherwise until the guideline interval for the selected operating conditions) – then Amtlos reminds you again.
+- de: Ein Prüfprotokoll erledigt die Pflicht bis zur nächsten Prüfung, die im Protokoll steht – danach ist sie wieder offen.
+  en: An inspection record fulfils the obligation until the next inspection stated in the record – after that it is open again.
+- de: Ein Bußgeld droht erst, wenn du einer vollziehbaren Anordnung der Aufsichtsbehörde nicht folgst (§ 25 Abs. 1 Nr. 2 ArbSchG); bei Arbeitsunfällen besteht ein Haftungsrisiko.
+  en: A fine only applies if you do not comply with an enforceable order of the supervisory authority (§ 25(1) no. 2 ArbSchG); in case of workplace accidents there is a liability risk.
+- de: Du stellst eigene Produkte her, verkaufst sie unter deinem Namen oder importierst sie von außerhalb der EU.
+  en: You make your own products, sell them under your own name or import them from outside the EU.
+- de: Gilt erst, wenn du eigene Kosmetik herstellst, unter deinem Namen verkaufst oder von außerhalb der EU importierst – nicht beim Weiterverkauf fremder Markenware.
+  en: Applies only if you make your own cosmetics, sell them under your own name or import them from outside the EU – not when you resell other brands' goods.
+- de: Lebensmittelunternehmen müssen ein Verfahren nach den HACCP-Grundsätzen einrichten und die Kontrollen dokumentieren. Das ist ein ständiges Verfahren mit laufender Dokumentation, keine einmalige Aufgabe. Amtlos bietet Kontrolllisten mit Grenzwerten, die du festlegst – ein Protokoll gilt für seinen Monat.
+  en: Food businesses must set up a procedure based on HACCP principles and document the checks. This is an ongoing procedure with continuous records, not a one-off task. Amtlos offers checklists with limits you define – a record covers its month.
+- de: Die Eigenkontrollen sind eine laufende Pflicht – ein Kontrollprotokoll erledigt sie nur für seinen Monat.
+  en: The own checks are an ongoing obligation – a check record only fulfils it for its month.
+- de: Belehrung nach § 43 IfSG durch den Arbeitgeber
+  en: Briefing under § 43 IfSG by the employer
+- de: Wer neu bei dir mit Lebensmitteln arbeitet, belehrst du nach Aufnahme der Tätigkeit selbst und dokumentierst das.
+  en: Anyone who newly works with food in your business is briefed by you after starting work, and you document it.
+- de: Neben der Bescheinigung des Gesundheitsamts vor dem ersten Arbeitstag belehrst du als Arbeitgeber neue Beschäftigte nach Aufnahme der Tätigkeit über die Tätigkeitsverbote und Verpflichtungen nach §§ 42 und 43 IfSG und dokumentierst die Belehrung. Danach wiederholst du sie alle zwei Jahre – siehe „Belehrung nach § 43 IfSG alle zwei Jahre wiederholen“.
+  en: In addition to the health office certificate before the first working day, as employer you brief new staff after they start work on the activity bans and obligations under §§ 42 and 43 IfSG and document the briefing. After that you repeat it every two years – see “Repeat the briefing under § 43 IfSG every two years”.
+- de: Aufgeteilt in die Bescheinigung des Gesundheitsamts vor dem ersten Arbeitstag, deine Belehrung nach Aufnahme der Tätigkeit und die Wiederholung alle zwei Jahre mit Erinnerung.
+  en: Split into the health office certificate before the first working day, your briefing after starting work and the repetition every two years with a reminder.
+- de: Bescheinigung des Gesundheitsamts vor dem ersten Arbeitstag (§ 43 IfSG)
+  en: Health office certificate before the first working day (§ 43 IfSG)
+- de: Wer bei dir erstmals mit Lebensmitteln arbeitet, braucht vor dem ersten Arbeitstag die Bescheinigung über die Belehrung durch das Gesundheitsamt.
+  en: Anyone who works with food in your business for the first time needs the certificate of the briefing by the health office before the first working day.
+- de: Die Erstbelehrung macht das Gesundheitsamt oder ein beauftragter Arzt. Die Bescheinigung darf bei Aufnahme der Tätigkeit höchstens drei Monate alt sein; du bewahrst sie im Betrieb auf. Das gilt auch für dich selbst, wenn du mit Lebensmitteln arbeitest. Danach belehrst du deine Beschäftigten selbst – siehe „Belehrung nach § 43 IfSG durch den Arbeitgeber“.
+  en: The initial briefing is given by the health office or a commissioned doctor. When work starts, the certificate may be no more than three months old; you keep it on the premises. This also applies to you if you work with food yourself. After that you brief your staff yourself – see “Briefing under § 43 IfSG by the employer”.
+- de: Gesundheitsamt bzw. beauftragter Arzt
+  en: Health office or commissioned doctor
+- de: Belehrung nach § 43 IfSG alle zwei Jahre wiederholen
+  en: Repeat the briefing under § 43 IfSG every two years
+- de: Die Belehrung nach § 43 IfSG wiederholst du für alle, die bei dir mit Lebensmitteln arbeiten, alle zwei Jahre.
+  en: You repeat the briefing under § 43 IfSG every two years for everyone who works with food in your business.
+- de: Nach der ersten Belehrung belehrst du deine Beschäftigten im Weiteren alle zwei Jahre über die Tätigkeitsverbote und Verpflichtungen nach §§ 42 und 43 IfSG und dokumentierst das. Zwei Jahre nach jeder Belehrung, die du in Amtlos erfasst, erinnert Amtlos an die nächste. Hast du deine letzte Belehrung noch nicht in Amtlos erfasst, erfasse sie – dann kennt Amtlos den Termin.
+  en: After the first briefing you brief your staff every two years on the activity bans and obligations under §§ 42 and 43 IfSG and document it. Two years after each briefing you record in Amtlos, Amtlos reminds you of the next one. If you have not yet recorded your last briefing in Amtlos, record it – then Amtlos knows the date.
+- de: Daten deiner Beschäftigten verarbeitest du, soweit es für die Durchführung des Arbeitsvertrags erforderlich ist oder ein Gesetz es verlangt, zum Beispiel für Lohn, Sozialversicherung und Steuer. Amtlos selbst speichert nur das Nötigste (Name, Beschäftigungsart, Eintritt und Austritt).
+  en: You process your staff's data as far as necessary to perform the employment contract or required by law, for example for payroll, social security and tax. Amtlos itself stores only the minimum (name, type of employment, start and end date).
+- de: 'Rechtsgrundlage umgestellt: Art. 6 Abs. 1 lit. b und c DSGVO statt § 26 BDSG (EuGH, Urteil vom 30.03.2023, C-34/21).'
+  en: 'Legal basis changed: Art. 6(1)(b) and (c) GDPR instead of § 26 BDSG (CJEU, judgment of 30.03.2023, C-34/21).'
+- de: Bußgeld nach Art. 83 Abs. 4 DSGVO.
+  en: Fine under Art. 83(4) GDPR.
+- de: Bußgeld nach Art. 83 Abs. 5 DSGVO.
+  en: Fine under Art. 83(5) GDPR.
+- de: Im Verzeichnis der Handwerkskammer eintragen (Anlage B)
+  en: Register in the directory of the chamber of crafts (Annex B)
+- de: Ein zulassungsfreies oder handwerksähnliches Gewerbe zeigst du bei Beginn der Handwerkskammer an.
+  en: You notify the chamber of crafts of a licence-free or craft-like trade when you start.
+- de: Zulassungsfreie Handwerke (Anlage B1) und handwerksähnliche Gewerbe (Anlage B2) kommen nicht in die Handwerksrolle, sondern in das Verzeichnis der Handwerkskammer. Den Beginn des Betriebs zeigst du der Handwerkskammer an, zusammen mit der Gewerbeanmeldung.
+  en: Licence-free crafts (Annex B1) and craft-like trades (Annex B2) are not entered in the crafts register but in the directory of the chamber of crafts. You notify the chamber of crafts when you start the business, together with the trade registration.
+- de: Verzeichnis nach § 19 HwO
+  en: Directory under § 19 HwO
+- de: Das Verzeichnis der Handwerkskammer für zulassungsfreie Handwerke und handwerksähnliche Gewerbe (Anlage B).
+  en: The directory of the chamber of crafts for licence-free crafts and craft-like trades (Annex B).
+- de: Dein Betrieb ist ein zulassungsfreies Handwerk oder handwerksähnliches Gewerbe (Anlage B der Handwerksordnung).
+  en: Your business is a licence-free craft or craft-like trade (Annex B of the Crafts Code).
+- de: In die Handwerksrolle eintragen (Anlage A)
+  en: Register in the crafts register (Annex A)
+- de: Ein zulassungspflichtiges Handwerk darfst du erst betreiben, wenn du in die Handwerksrolle eingetragen bist.
+  en: You may only run a licensed craft once you are entered in the crafts register.
+- de: Zulassungspflichtige Handwerke (Anlage A der Handwerksordnung) brauchen einen Meisterbrief oder eine Ausnahme. Den selbstständigen Betrieb darfst du erst nach der Eintragung in die Handwerksrolle aufnehmen – die Eintragung muss also vor dem Beginn stehen.
+  en: Licensed crafts (Annex A of the Crafts Code) need a master craftsman's certificate or an exemption. You may only start the independent business after entry in the crafts register – so the entry must be in place before you start.
+- de: Das Verzeichnis der Handwerkskammer für zulassungspflichtige Handwerke (Anlage A).
+  en: The register of the chamber of crafts for licensed crafts (Annex A).
+- de: Dein Betrieb ist ein zulassungspflichtiges Handwerk nach Anlage A der Handwerksordnung.
+  en: Your business is a licensed craft under Annex A of the Crafts Code.
+- de: Gilt jetzt nur für zulassungspflichtige Handwerke (Anlage A) und muss vor dem Beginn erledigt sein. Für Anlage B gibt es den eigenen Schritt „Im Verzeichnis der Handwerkskammer eintragen“.
+  en: Now applies only to licensed crafts (Annex A) and must be done before you start. Annex B has its own step “Register in the directory of the chamber of crafts”.
+- de: Impressum auf Website und Social-Media-Profilen
+  en: Legal notice (Impressum) on your website and social media profiles
+- de: Auf deiner Website und deinen geschäftlichen Profilen in sozialen Netzwerken stellst du ein Impressum mit den Pflichtangaben bereit – leicht erkennbar und immer erreichbar.
+  en: On your website and your business profiles on social networks you provide a legal notice with the mandatory details – easy to find and always accessible.
+- de: Das Impressum nennt unter anderem Name, Anschrift und Kontakt, bei Gesellschaften auch Vertretung und Register. Auch ein geschäftliches Profil zum Beispiel bei Instagram oder Facebook ist ein digitaler Dienst mit Impressumspflicht – verlinke dort dein Impressum. Der Online-Check prüft, ob es auf deiner Website verlinkt ist.
+  en: The legal notice states, among other things, name, address and contact details, for companies also the representatives and register. A business profile, for example on Instagram or Facebook, is also a digital service requiring a legal notice – link your legal notice there. The online check verifies whether it is linked on your website.
+- de: Du hast ein geschäftliches Profil in sozialen Netzwerken.
+  en: You have a business profile on social networks.
+- de: Bußgeld bis 50.000 € (§ 33 DDG), dazu Abmahnungen nach dem Wettbewerbsrecht.
+  en: Fine of up to €50,000 (§ 33 DDG), plus warning letters under competition law.
+- de: Gilt jetzt auch für geschäftliche Profile in sozialen Netzwerken.
+  en: Now also applies to business profiles on social networks.
+- de: Link zur OS-Plattform entfernen
+  en: Remove the link to the ODR platform
+- de: Die Pflicht zum Link auf die Online-Streitbeilegungsplattform der EU ist seit 20.07.2025 entfallen. Steht der Link noch auf deiner Website, entferne ihn.
+  en: The obligation to link to the EU online dispute resolution platform no longer applies since 20.07.2025. If the link is still on your website, remove it.
+- de: Die Verordnung (EU) Nr. 524/2013 über die Online-Streitbeilegung ist durch die Verordnung (EU) 2024/3228 mit Wirkung zum 20.07.2025 aufgehoben, die Plattform eingestellt. Damit ist auch die Pflicht entfallen, auf sie zu verlinken. Ein Link auf die eingestellte Plattform hilft niemandem – entferne ihn aus Impressum, Shop und AGB. Der Online-Check meldet, ob er noch auf deiner Website steht.
+  en: Regulation (EU) No 524/2013 on online dispute resolution was repealed by Regulation (EU) 2024/3228 with effect from 20.07.2025, and the platform was shut down. This also ended the obligation to link to it. A link to the closed platform helps nobody – remove it from your legal notice, shop and terms. The online check reports whether it is still on your website.
+- de: Die Linkpflicht ist seit 20.07.2025 entfallen (Verordnung (EU) 2024/3228). Entferne den Link.
+  en: The link obligation no longer applies since 20.07.2025 (Regulation (EU) 2024/3228). Remove the link.
+- de: Für Minijobber und in den Branchen nach § 2a Schwarzarbeitsbekämpfungsgesetz zeichnest du laufend Beginn, Ende und Dauer der Arbeitszeit auf.
+  en: For mini-jobbers and in the sectors under § 2a of the Act to Combat Undeclared Work you continuously record the start, end and duration of working hours.
+- de: § 17 MiLoG verlangt Aufzeichnungen für geringfügig Beschäftigte und für Beschäftigte in den Branchen nach § 2a Schwarzarbeitsbekämpfungsgesetz (zum Beispiel Bau, Gaststätten und Hotels, Transport und Logistik, Gebäudereinigung). Aufzuzeichnen ist spätestens bis zum Ablauf des siebten Tages nach der Arbeitsleistung; die Aufzeichnungen bewahrst du zwei Jahre auf. Das ist eine laufende Pflicht – ein Arbeitszeitnachweis gilt für seinen Monat.
+  en: § 17 MiLoG requires records for marginal employees and for employees in the sectors under § 2a of the Act to Combat Undeclared Work (for example construction, restaurants and hotels, transport and logistics, building cleaning). Records must be made no later than the end of the seventh day after the work; you keep them for two years. This is an ongoing obligation – a working time record covers its month.
+- de: Dein Betrieb gehört zu einer Branche nach § 2a Schwarzarbeitsbekämpfungsgesetz.
+  en: Your business belongs to a sector under § 2a of the Act to Combat Undeclared Work.
+- de: Bußgeld bis 30.000 € (§ 21 MiLoG).
+  en: Fine of up to €30,000 (§ 21 MiLoG).
+- de: Die Aufzeichnung ist eine laufende Pflicht – ein Arbeitszeitnachweis erledigt sie nur für seinen Monat. Die Branchenliste ist vollständig.
+  en: Recording is an ongoing obligation – a working time record only fulfils it for its month. The list of sectors is complete.
+- de: Bußgeld bis 2.000 € (§ 4 NachwG).
+  en: Fine of up to €2,000 (§ 4 NachwG).
+- de: 'In den Branchen nach § 28a Abs. 4 SGB IV ist eine Sofortmeldung spätestens bei Arbeitsbeginn Pflicht: Baugewerbe, Gaststätten- und Beherbergungsgewerbe, Personenbeförderung, Speditions-, Transport- und damit verbundenes Logistikgewerbe, Schaustellergewerbe, Forstwirtschaft, Gebäudereinigung, Auf- und Abbau von Messen und Ausstellungen, Fleischwirtschaft, Prostitutionsgewerbe sowie Wach- und Sicherheitsgewerbe. Die Anmeldung zur Sozialversicherung mit der ersten Lohnabrechnung kommt dazu.'
+  en: 'In the sectors under § 28a(4) SGB IV an immediate report at the latest when work starts is mandatory: construction, restaurants and accommodation, passenger transport, haulage, transport and related logistics, fairground and showmen''s trade, forestry, building cleaning, setting up and dismantling trade fairs and exhibitions, meat industry, prostitution trade and guarding and security services. The social security registration with the first payroll comes in addition.'
+- de: Bußgeld bis 25.000 € (§ 111 SGB IV).
+  en: Fine of up to €25,000 (§ 111 SGB IV).
+- de: Über das Lohnprogramm gemeldet
+  en: Reported via the payroll software
+- de: Die Branchenliste ist jetzt vollständig nach § 28a Abs. 4 SGB IV, unter anderem mit Hotels, Spedition, Transport und Logistik.
+  en: The list of sectors is now complete under § 28a(4) SGB IV, including hotels, haulage, transport and logistics.
+- de: Jede neue beschäftigte Person meldest du mit der ersten Lohnabrechnung bei der Krankenkasse an, spätestens sechs Wochen nach Beginn.
+  en: You register each new employee with the health insurer with the first payroll, at the latest six weeks after the start.
+- de: Die Anmeldung zur Sozialversicherung (DEÜV) geht an die Krankenkasse der beschäftigten Person, bei Minijobs an die Minijob-Zentrale. Sie ist mit der ersten folgenden Entgeltabrechnung fällig, spätestens sechs Wochen nach Beginn der Beschäftigung. Die Meldung läuft über ein systemgeprüftes Lohnprogramm. In Branchen mit Sofortmeldepflicht kommt am ersten Arbeitstag die Sofortmeldung dazu.
+  en: The social security registration (DEÜV) goes to the employee's health insurer, for mini-jobs to the Minijob-Zentrale. It is due with the first following payroll, at the latest six weeks after the employment starts. The report is made via certified payroll software. In sectors with an immediate reporting obligation, the immediate report on the first working day comes in addition.
+- de: 'Frist korrigiert: mit der ersten Lohnabrechnung, spätestens sechs Wochen nach Beginn (§ 6 DEÜV). Die Unterlage mit den Meldedaten erledigt die Meldung nicht – erledigt ist sie, wenn du die Meldung bestätigst.'
+  en: 'Deadline corrected: with the first payroll, at the latest six weeks after the start (§ 6 DEÜV). The document with the reporting data does not complete the report – it is done once you confirm the report.'
+- de: Bringst du Batterien oder Geräte mit Batterien selbst erstmals in Deutschland in Verkehr, registrierst du dich vorher nach dem Batteriegesetz.
+  en: If you place batteries or devices with batteries on the German market for the first time yourself, you register under the Battery Act beforehand.
+- de: Hersteller von Batterien müssen sich vor dem Inverkehrbringen registrieren. Hersteller ist auch, wer unter eigener Marke verkauft oder Batterien bzw. Geräte mit Batterien nach Deutschland einführt. Wer bei einem Händler in Deutschland kauft und weiterverkauft oder einbaut, ist in der Regel nicht Hersteller.
+  en: Battery producers must register before placing batteries on the market. A producer is also anyone who sells under their own brand or imports batteries or devices with batteries into Germany. Anyone who buys from a dealer in Germany and resells or installs is usually not a producer.
+- de: Du bringst Elektrogeräte oder Batterien selbst erstmals in Deutschland in Verkehr (Herstellung, Eigenmarke oder Import).
+  en: You place electrical devices or batteries on the German market for the first time yourself (manufacturing, own brand or import).
+- de: Gilt erst, wenn du die Geräte oder Batterien selbst erstmals in Deutschland in Verkehr bringst – nicht beim Einkauf im deutschen Großhandel.
+  en: Applies only if you place the devices or batteries on the German market for the first time yourself – not when you buy from German wholesalers.
+- de: Bringst du Elektrogeräte selbst erstmals in Deutschland in Verkehr, registrierst du dich vorher bei der stiftung ear.
+  en: If you place electrical devices on the German market for the first time yourself, you register with stiftung ear beforehand.
+- de: Hersteller und Händler, die als Hersteller gelten, müssen sich nach dem ElektroG vor dem Verkauf registrieren. Als Hersteller gilt auch, wer unter eigener Marke verkauft oder Geräte nach Deutschland einführt. Wer bei einem Händler in Deutschland kauft und weiterverkauft oder einbaut, ist in der Regel nicht Hersteller.
+  en: Producers and dealers who count as producers must register under the ElektroG before selling. Anyone who sells under their own brand or imports devices into Germany also counts as a producer. Anyone who buys from a dealer in Germany and resells or installs is usually not a producer.
+- de: Verbraucherprodukte brauchen Herstellerangaben, Sicherheitsinformationen und eine verantwortliche Person in der EU. Verkaufst du fremde Markenware, prüfst du vor dem Verkauf, ob diese Angaben vorhanden sind.
+  en: Consumer products need manufacturer details, safety information and a responsible person in the EU. If you sell other brands' goods, you check before selling that these details are present.
+- de: Die Produktsicherheitsverordnung gilt seit 13.12.2024. Für die verantwortliche Person in der EU, die Herstellerangaben und die Sicherheitsinformationen sorgen Hersteller und Importeure. Als Händlerin oder Händler fremder Ware prüfst du vor dem Verkauf, ob Hersteller, gegebenenfalls Importeur und die nötigen Angaben auf dem Produkt oder der Verpackung stehen. Wer Produkte im Fernabsatz anbietet (zum Beispiel im Onlineshop oder auf einem Marktplatz), nennt diese Angaben schon beim Angebot. Lebensmittel fallen nicht unter die Verordnung.
+  en: The General Product Safety Regulation has applied since 13.12.2024. Manufacturers and importers take care of the responsible person in the EU, the manufacturer details and the safety information. As a dealer of other brands' goods you check before selling whether the manufacturer, where applicable the importer, and the required details are on the product or packaging. Anyone offering products at a distance (for example in an online shop or on a marketplace) states these details in the offer. Food is not covered by the regulation.
+- de: Lebensmittel lösen die Pflicht nicht mehr aus (Art. 2 Abs. 3). Für Händlerinnen und Händler fremder Markenware ist beschrieben, was sie prüfen.
+  en: Food no longer triggers the obligation (Art. 2(3)). For dealers of other brands' goods it is described what they check.
+- de: 'Buchungsbelege einschließlich Rechnungen: 8 Jahre. Jahresabschlüsse, Bücher und Organisationsunterlagen: 10 Jahre. Handels- und Geschäftsbriefe: 6 Jahre. Die Frist läuft aber nicht ab, solange die Unterlagen für Steuern von Bedeutung sind, deren Festsetzungsfrist noch nicht abgelaufen ist – zum Beispiel bei einer laufenden Betriebsprüfung oder einem offenen Einspruch. Amtlos zeigt dir, ab wann du Unterlagen frühestens löschen darfst; ob noch etwas offen ist, klärst du vorher mit deiner Steuerberatung.'
+  en: 'Accounting vouchers including invoices: 8 years. Annual financial statements, books and organisational documents: 10 years. Commercial and business letters: 6 years. However, the period does not expire as long as the documents matter for taxes whose assessment period has not yet expired – for example during an ongoing tax audit or an open objection. Amtlos shows you the earliest date you may delete documents; check with your tax adviser beforehand whether anything is still open.'
+- de: 'Ergänzt: Die Aufbewahrungsfrist läuft nicht ab, solange für die Unterlagen eine Festsetzungsfrist noch offen ist (§ 147 Abs. 3 S. 5 AO).'
+  en: 'Added: the retention period does not expire as long as an assessment period for the documents is still open (§ 147(3) sentence 5 AO).'
+- de: Bücher nach den Regeln der doppelten Buchführung führen Kapitalgesellschaften und die GmbH & Co. KG immer. Eingetragene Kaufleute (e. K.) sind befreit, wenn sie an zwei aufeinanderfolgenden Abschlussstichtagen höchstens 800.000 € Umsatz und 80.000 € Jahresüberschuss haben (§ 241a HGB). Steuerlich wirst du nach § 141 AO erst buchführungspflichtig, wenn das Finanzamt es dir mitteilt – das kann es, wenn dein Umsatz über 800.000 € oder dein Gewinn über 80.000 € liegt. Bis dahin ermittelst du den Gewinn mit der Einnahmen-Überschuss-Rechnung. Die Buchführung ist eine laufende Pflicht; den Jahresabschluss macht in der Regel deine Steuerberatung.
+  en: Corporations and the GmbH & Co. KG always keep double-entry books. Registered merchants (e. K.) are exempt if on two consecutive balance sheet dates they have no more than €800,000 turnover and €80,000 annual net profit (§ 241a HGB). For tax purposes you only become obliged to keep books under § 141 AO when the tax office notifies you – it can do so if your turnover exceeds €800,000 or your profit €80,000. Until then you determine profit with the cash-basis accounts (EÜR). Bookkeeping is an ongoing obligation; the annual financial statements are usually prepared by your tax adviser.
+- de: Dein Unternehmen ist eine GmbH & Co. KG und damit nach dem Handelsgesetzbuch buchführungspflichtig.
+  en: Your business is a GmbH & Co. KG and therefore obliged to keep books under the Commercial Code.
+- de: Du bist als Kauffrau oder Kaufmann im Handelsregister eingetragen.
+  en: You are registered as a merchant in the commercial register.
+- de: Dein Umsatz im Vorjahr lag über 800.000 € – die Befreiung nach § 241a HGB greift nicht.
+  en: Your turnover last year exceeded €800,000 – the exemption under § 241a HGB does not apply.
+- de: Dein Gewinn im Vorjahr lag über 80.000 € – die Befreiung nach § 241a HGB greift nicht.
+  en: Your profit last year exceeded €80,000 – the exemption under § 241a HGB does not apply.
+- de: Dein erwarteter Umsatz im ersten Jahr liegt über 800.000 € – die Befreiung nach § 241a HGB greift nicht.
+  en: Your expected turnover in the first year exceeds €800,000 – the exemption under § 241a HGB does not apply.
+- de: Dein erwarteter Gewinn im ersten Jahr liegt über 80.000 € – die Befreiung nach § 241a HGB greift nicht.
+  en: Your expected profit in the first year exceeds €80,000 – the exemption under § 241a HGB does not apply.
+- de: Dein Umsatz im Vorjahr lag über der Grenze für die Buchführungspflicht nach § 141 AO.
+  en: Your turnover last year exceeded the limit for the bookkeeping obligation under § 141 AO.
+- de: Dein Gewinn im Vorjahr lag über der Grenze für die Buchführungspflicht nach § 141 AO.
+  en: Your profit last year exceeded the limit for the bookkeeping obligation under § 141 AO.
+- de: Das Finanzamt hat dir mitgeteilt, dass du Bücher führen musst.
+  en: The tax office has notified you that you must keep books.
+- de: Bücher für dieses Jahr laufend geführt
+  en: Books kept on an ongoing basis this year
+- de: Eingetragene Kaufleute unter den Grenzen des § 241a HGB sind nicht mehr buchführungspflichtig; die Pflicht nach § 141 AO gilt erst nach Mitteilung des Finanzamts. Eine Unterlage erledigt die Buchführung nicht mehr.
+  en: Registered merchants below the limits of § 241a HGB are no longer obliged to keep books; the obligation under § 141 AO only applies after notification by the tax office. A document no longer completes bookkeeping.
+- de: Wenn du bilanzierst, übermittelst du Bilanz und Gewinn- und Verlustrechnung elektronisch ans Finanzamt.
+  en: If you prepare balance sheets, you transmit the balance sheet and profit and loss account electronically to the tax office.
+- de: Die E-Bilanz ist die elektronische Übermittlung von Bilanz und Gewinn- und Verlustrechnung an das Finanzamt. Sie gilt für alle, die Bücher führen und bilanzieren – nicht nur für Gesellschaften. Eine Bilanz als PDF erledigt sie nicht.
+  en: The e-balance sheet is the electronic transmission of the balance sheet and profit and loss account to the tax office. It applies to everyone who keeps books and prepares balance sheets – not only to companies. A balance sheet as a PDF does not complete it.
+- de: An das Finanzamt übermittelt
+  en: Transmitted to the tax office
+- de: Gilt jetzt für alle, die zur Buchführung verpflichtet sind, nicht nur für Kapitalgesellschaften.
+  en: Now applies to everyone obliged to keep books, not only to corporations.
+- de: Du bist als Einzelperson unternehmerisch tätig.
+  en: You run your business as an individual.
+- de: Bei GbR, Partnerschaftsgesellschaft und GmbH & Co. KG gibt die Gesellschaft jetzt die Feststellungserklärung ab (eigene Pflicht); die Einkommensteuererklärung machen die Gesellschafter persönlich.
+  en: For a GbR, partnership company and GmbH & Co. KG, the company now files the declaration of separate determination (separate obligation); the partners file income tax returns personally.
+- de: Wer nicht zur doppelten Buchführung verpflichtet ist, ermittelt den Gewinn mit der Einnahmen-Überschuss-Rechnung. Das gilt auch für eingetragene Kaufleute unter den Grenzen des § 241a HGB und für Gewerbetreibende, denen das Finanzamt keine Buchführungspflicht mitgeteilt hat.
+  en: Anyone not obliged to keep double-entry books determines profit with the cash-basis accounts (EÜR). This also applies to registered merchants below the limits of § 241a HGB and to traders whom the tax office has not notified of a bookkeeping obligation.
+- de: Gilt jetzt auch für eingetragene Kaufleute unter den Grenzen des § 241a HGB und bis zur Mitteilung des Finanzamts nach § 141 AO.
+  en: Now also applies to registered merchants below the limits of § 241a HGB and until notification by the tax office under § 141 AO.
+- de: Erklärung zur gesonderten und einheitlichen Feststellung abgeben
+  en: File the declaration of separate and uniform determination
+- de: Einmal im Jahr gibt eure Gesellschaft elektronisch die Feststellungserklärung ab; die Gesellschafter versteuern ihren Anteil in ihrer eigenen Einkommensteuererklärung.
+  en: Once a year your company electronically files the declaration of separate determination; the partners pay tax on their share in their own income tax returns.
+- de: Bei einer Personengesellschaft stellt das Finanzamt den Gewinn der Gesellschaft gesondert und einheitlich fest und verteilt ihn auf die Gesellschafter. Dafür gibt die Gesellschaft jedes Jahr eine Feststellungserklärung ab – ohne Steuerberatung bis 31. Juli des Folgejahres, mit Steuerberatung bis Ende Februar des übernächsten Jahres. Jede Gesellschafterin und jeder Gesellschafter gibt zusätzlich die eigene Einkommensteuererklärung ab.
+  en: For a partnership, the tax office determines the company's profit separately and uniformly and allocates it to the partners. For this the company files a declaration of separate determination every year – without a tax adviser by 31 July of the following year, with a tax adviser by the end of February of the year after. Each partner also files their own income tax return.
+- de: Dein Unternehmen ist eine Personengesellschaft.
+  en: Your business is a partnership.
+- de: Elektronische Kassen müssen dem Finanzamt gemeldet werden, innerhalb eines Monats nach Anschaffung oder Außerbetriebnahme. Bestandskassen waren bis 31.7.2025 zu melden. Die Meldung geht nur über ELSTER (amtlich vorgeschriebener Datensatz); ein ausgedrucktes oder geteiltes Datenblatt erfüllt sie nicht.
+  en: Electronic tills must be reported to the tax office within one month of purchase or decommissioning. Existing tills had to be reported by 31.7.2025. The report can only be made via ELSTER (officially prescribed data set); a printed or shared data sheet does not fulfil it.
+- de: In ELSTER gemeldet
+  en: Reported in ELSTER
+- de: Das Datenblatt aus Amtlos bereitet die Meldung nur vor. Erledigt ist sie, wenn du bestätigst, dass du sie in ELSTER übermittelt hast.
+  en: The data sheet from Amtlos only prepares the report. It is done once you confirm that you transmitted it in ELSTER.
+- de: Ab 1. Januar Regelbesteuerung
+  en: Standard VAT from 1 January
+- de: Nach deinen Angaben liegt dein Umsatz in diesem Jahr über 25.000 €. Dieses Jahr bleibst du Kleinunternehmer, ab 1. Januar des nächsten Jahres gilt die Regelbesteuerung.
+  en: According to your details, your turnover this year exceeds €25,000. You remain a small business this year; from 1 January of next year standard VAT taxation applies.
+- de: Die Kleinunternehmerregelung setzt voraus, dass dein Umsatz im Vorjahr höchstens 25.000 € betrug. Überschreitest du diese Grenze in diesem Jahr, ohne über 100.000 € zu kommen, gilt die Regelung bis zum Jahresende weiter. Ab 1. Januar weist du auf deinen Rechnungen Umsatzsteuer aus, gibst Umsatzsteuer-Voranmeldungen ab und kannst die Vorsteuer aus deinen Eingangsrechnungen abziehen. Stelle Rechnungsvorlage, Preise und Buchhaltung rechtzeitig um.
+  en: The small business scheme requires that your turnover last year was no more than €25,000. If you exceed this limit this year without going over €100,000, the scheme continues until the end of the year. From 1 January you show VAT on your invoices, file advance VAT returns and can deduct input VAT from your purchase invoices. Adjust your invoice template, prices and bookkeeping in good time.
+- de: Dein Umsatz im Vorjahr lag höchstens bei 25.000 €.
+  en: Your turnover last year was no more than €25,000.
+- de: Dein erwarteter Umsatz in diesem Jahr liegt über 25.000 €.
+  en: Your expected turnover this year exceeds €25,000.
+- de: Nach deinen Rechnungen in Amtlos liegt dein Umsatz in diesem Jahr über 25.000 €.
+  en: According to your invoices in Amtlos, your turnover this year exceeds €25,000.
+- de: Ab 1. Januar fällt Umsatzsteuer an, auch wenn du sie nicht berechnest.
+  en: From 1 January VAT is due, even if you do not charge it.
+- de: 'Die Kleinunternehmerregelung gilt, wenn dein Umsatz im Vorjahr höchstens 25.000 € betrug und im laufenden Jahr 100.000 € nicht übersteigt. Die 25.000 € beziehen sich also auf das Vorjahr: Liegt dein Umsatz in diesem Jahr über 25.000 €, aber höchstens bei 100.000 €, bleibst du dieses Jahr Kleinunternehmer – ab 1. Januar des nächsten Jahres gilt dann die Regelbesteuerung. Die 100.000 € sind die harte Grenze im laufenden Jahr: Ab dem Umsatz, mit dem du sie überschreitest, endet die Regelung sofort. Im Gründungsjahr gilt 25.000 € als harte Grenze für das laufende Jahr. Wer auf die Regelung verzichtet, ist fünf Jahre daran gebunden.'
+  en: 'The small business scheme applies if your turnover last year was no more than €25,000 and does not exceed €100,000 in the current year. So the €25,000 refers to the previous year: if your turnover this year exceeds €25,000 but stays at or below €100,000, you remain a small business this year – from 1 January of next year standard VAT taxation applies. The €100,000 is the hard limit in the current year: the scheme ends immediately with the sale that exceeds it. In the founding year, €25,000 is the hard limit for the current year. If you waive the scheme, you are bound for five years.'
+- de: 'Klarer erklärt: 25.000 € ist die Grenze für das Vorjahr, 100.000 € die harte Grenze im laufenden Jahr.'
+  en: 'Explained more clearly: €25,000 is the limit for the previous year, €100,000 the hard limit in the current year.'
+- de: Bei monatlicher Abgabe mit Dauerfristverlängerung zahlst du bis zum 10. Februar eine Sondervorauszahlung von einem Elftel der Vorauszahlungen des Vorjahres. Sie wird in der Voranmeldung für Dezember angerechnet (Kennzahl 39).
+  en: With monthly filing and a permanent filing extension you pay a special advance payment of one eleventh of the previous year's advance payments by 10 February. It is credited in the advance return for December (box 39).
+- de: 'Termin ergänzt: jedes Jahr bis 10. Februar, ein Elftel der Vorauszahlungen des Vorjahres, angerechnet im Dezember.'
+  en: 'Deadline added: every year by 10 February, one eleventh of the previous year''s advance payments, credited in December.'
+- de: Wer Umsatzsteuer auf Rechnungen ausweist, gibt je nach Höhe der Steuer im Vorjahr monatlich oder vierteljährlich eine Voranmeldung über ELSTER ab. Liegt dein Umsatz über der Kleinunternehmergrenze, gilt die Pflicht sicher – offen ist dann nur, ob monatlich oder vierteljährlich. Amtlos bereitet die Zahlen vor; du übermittelst selbst.
+  en: Anyone who shows VAT on invoices files an advance return via ELSTER monthly or quarterly, depending on last year's tax. If your turnover exceeds the small business limit, the obligation applies for certain – only whether monthly or quarterly is open. Amtlos prepares the figures; you submit them yourself.
+- de: Du gibst die Voranmeldung regelmäßig ab.
+  en: You file the advance return regularly.
+- de: Dein Umsatz im Vorjahr lag über der Kleinunternehmergrenze.
+  en: Your turnover last year exceeded the small business limit.
+- de: Dein erwarteter Umsatz in diesem Jahr liegt über der Kleinunternehmergrenze.
+  en: Your expected turnover this year exceeds the small business limit.
+- de: Über der Kleinunternehmergrenze gilt die Voranmeldung jetzt sicher, auch wenn die Steuer des Vorjahres nicht bekannt ist – du kannst den Rhythmus direkt angeben.
+  en: Above the small business limit the advance return now applies for certain, even if last year's tax is unknown – you can state the filing frequency directly.
+- de: Die Zusammenfassende Meldung ist bei innergemeinschaftlichen Leistungen an Unternehmen (B2B) abzugeben. Du übermittelst sie bis zum 25. Tag nach Ablauf jedes Kalendermonats an das Bundeszentralamt für Steuern. Vierteljährlich reicht, wenn deine innergemeinschaftlichen Lieferungen je Quartal höchstens 50.000 € betragen.
+  en: The recapitulative statement must be filed for intra-community supplies to businesses (B2B). You transmit it to the Federal Central Tax Office by the 25th day after the end of each calendar month. Quarterly is enough if your intra-community supplies are no more than €50,000 per quarter.
+- de: 'Frist ergänzt: bis zum 25. Tag nach Ablauf des Monats, vierteljährlich bei innergemeinschaftlichen Lieferungen bis 50.000 € je Quartal.'
+  en: 'Deadline added: by the 25th day after the end of the month, quarterly for intra-community supplies of up to €50,000 per quarter.'
+- de: Befreiung von der Buchführung nach § 241a HGB – Umsatzgrenze
+  en: Exemption from bookkeeping under § 241a HGB – turnover limit
+- de: Befreiung von der Buchführung nach § 241a HGB – Grenze Jahresüberschuss
+  en: Exemption from bookkeeping under § 241a HGB – annual net profit limit

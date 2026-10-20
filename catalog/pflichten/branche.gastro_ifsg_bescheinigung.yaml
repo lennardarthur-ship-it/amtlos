@@ -1,0 +1,65 @@
+# R10: aus branche.gastro_ifsg_belehrung herausgelöst (Rechtsprüfung: Bescheinigung nach § 43 Abs. 1 IfSG vor Beginn, nicht älter als drei Monate)
+schema_version: 1
+id: branche.gastro_ifsg_bescheinigung
+version: 1
+katalog_nr: H.1
+titel:
+  de: Bescheinigung des Gesundheitsamts vor dem ersten Arbeitstag (§ 43 IfSG)
+kurz:
+  de: Wer bei dir erstmals mit Lebensmitteln arbeitet, braucht vor dem ersten Arbeitstag die Bescheinigung über die Belehrung durch
+    das Gesundheitsamt.
+erklaerung:
+  de: Die Erstbelehrung macht das Gesundheitsamt oder ein beauftragter Arzt. Die Bescheinigung darf bei Aufnahme der Tätigkeit
+    höchstens drei Monate alt sein; du bewahrst sie im Betrieb auf. Das gilt auch für dich selbst, wenn du mit Lebensmitteln
+    arbeitest. Danach belehrst du deine Beschäftigten selbst – siehe „Belehrung nach § 43 IfSG durch den Arbeitgeber“.
+rechtsgrundlage:
+- § 43 Abs. 1 IfSG
+kategorie: branche
+branchen:
+- gastronomie_lebensmittel
+ausloeser:
+  all:
+  - feld: profil.taetigkeit.branchen
+    op: enthaelt
+    wert: gastronomie_lebensmittel
+    label:
+      de: Dein Betrieb gehört zur Gastronomie oder Lebensmittelbranche.
+  - ereignis: einstellung
+    op: eingetreten
+    label:
+      de: Du stellst jemanden ein.
+frist:
+  typ: relativ
+  bezug:
+    ereignis: einstellung
+  versatz: P0D
+  zeitpunkt: vor_beginn
+  je_ereignis: true
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Gesundheitsamt bzw. beauftragter Arzt
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Infektionsschutzgesetz § 43
+  url: https://www.gesetze-im-internet.de/ifsg/__43.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Höchstalter drei Monate nur bei erstmaliger Tätigkeit? Umgang mit Kräften, die vorher schon anderswo mit Lebensmitteln gearbeitet haben'
+- Höhe und Nummer der Bußgeldvorschrift in § 73 IfSG unsicher – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

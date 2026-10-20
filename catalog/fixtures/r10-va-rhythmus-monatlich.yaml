@@ -1,0 +1,16 @@
+persona: gewerbe
+beschreibung: "R10: Rhythmus der Voranmeldung direkt angegeben (monatlich, mit Dauerfristverlängerung) – Termine ohne Zahllast des Vorjahres; Sondervorauszahlung bis 10.02."
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2014-04-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.ust.kleinunternehmer: false
+  profil.ust.voranmeldung_rhythmus: monatlich
+  profil.ust.dauerfristverlaengerung: false
+  profil.bundesland: BY
+erwartet:
+  steuern.ust_voranmeldung: gilt
+termine_enthaelt:
+  # 10.10.2026 ist ein Samstag → Montag 12.10.
+  steuern.ust_voranmeldung: [["2026-09", "2026-10-12"]]

@@ -1,15 +1,17 @@
 # Katalog G.66 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.impressum
-version: 2
+version: 3
 katalog_nr: G.66
 titel:
-  de: Impressum auf der Website
+  de: Impressum auf Website und Social-Media-Profilen
 kurz:
-  de: Auf deiner Website stellst du ein Impressum mit den Pflichtangaben bereit – leicht erkennbar und immer erreichbar.
+  de: Auf deiner Website und deinen geschäftlichen Profilen in sozialen Netzwerken stellst du ein Impressum mit den Pflichtangaben
+    bereit – leicht erkennbar und immer erreichbar.
 erklaerung:
-  de: Das Impressum nennt unter anderem Name, Anschrift und Kontakt, bei Gesellschaften auch Vertretung und Register. Der
-    Online-Check prüft, ob es verlinkt ist.
+  de: Das Impressum nennt unter anderem Name, Anschrift und Kontakt, bei Gesellschaften auch Vertretung und Register. Auch ein
+    geschäftliches Profil zum Beispiel bei Instagram oder Facebook ist ein digitaler Dienst mit Impressumspflicht – verlinke dort
+    dein Impressum. Der Online-Check prüft, ob es auf deiner Website verlinkt ist.
 rechtsgrundlage:
 - § 5 DDG
 kategorie: online
@@ -29,6 +31,11 @@ ausloeser:
     - app
     label:
       de: Du verkaufst über einen Onlineshop oder eine App.
+  - feld: profil.online.social_media
+    op: ==
+    wert: true
+    label:
+      de: Du hast ein geschäftliches Profil in sozialen Netzwerken.
 frist:
   typ: dauerhaft
 wiederholung:
@@ -39,9 +46,11 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Bußgeld bis 50.000 € (§ 33 DDG), dazu Abmahnungen nach dem Wettbewerbsrecht.
   schwere: hoch
 automatisierung: hinweis
+aenderungsnotiz:
+  de: Gilt jetzt auch für geschäftliche Profile in sozialen Netzwerken.
 aktion:
   art: link
   ziel: app.onlinecheck
@@ -55,7 +64,6 @@ quellen:
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Pflichtangaben je Rechtsform als Checkliste fachlich ergänzen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 pruefung:
   status: entwurf
   geprueft_von: null

@@ -7,7 +7,7 @@ import { useMeldung } from "../ui/meldung";
 import { BausteinListe, Fristblatt, Fuss, Hinweis, Kachel, Karte, Knopf, Schalter, SchnellKachel, Symbol, T, TextKnopf, Zeile, tageBis } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { HAARLINIE, RADIUS, SCHRIFT, useFarben, weich } from "../ui/thema";
-import { KATEGORIE_TITEL, auswertung, beantwortet, dringlichkeit, erinnerungsPlan, fortschritt, frageZu, gruendungsSchritte, haken, istErledigt, offeneFragenNachWirkung, selten, type PflichtInfo } from "../pflichten/check";
+import { KATEGORIE_TITEL, auswertung, beantwortet, dringlichkeit, erinnerungsPlan, erledigtDurch, fortschritt, frageZu, gruendungsSchritte, gueltigBis, haken, istErledigt, offeneFragenNachWirkung, offeneKernFragen, selten, zaehlung, type PflichtInfo } from "../pflichten/check";
 import { allesAbsagen, erinnerungenMoeglich, erlaubnisAnfragen, planen } from "../pflichten/erinnerungen";
 import { heute } from "../unterlagen/speicher";
 import { useAmtlos, useStandWahl } from "../zustand";
@@ -24,13 +24,16 @@ const TAG_LANG = new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", w
 export function useAuswertung() {
   const profil = useStandWahl((s) => s.profil);
   const unterlagen = useStandWahl((s) => s.unterlagen);
+  const mitarbeiter = useStandWahl((s) => s.mitarbeiter);
   const tag = heute();
-  // die Auswertung braucht aus den Unterlagen nur durchgeführte Unterweisungen (Ereignisse) – nur sie bestimmen, ob neu
-  // gerechnet wird, nicht jeder Tastendruck in einer Rechnung (R9 Performance)
-  const unterweisungen = useMemo(() => unterlagen.filter((u) => u.vorlage === "unterweisung" && u.ausgegeben && !u.storniertDurch), [unterlagen]);
+  // die Auswertung braucht aus den Unterlagen nur durchgeführte Unterweisungen und IfSG-Belehrungen (Ereignisse) – nur sie
+  // bestimmen, ob neu gerechnet wird, nicht jeder Tastendruck in einer Rechnung (R9 Performance)
+  const unterweisungen = useMemo(() => unterlagen.filter((u) => (u.vorlage === "unterweisung" || u.vorlage === "ifsg_belehrung") && u.ausgegeben && !u.storniertDurch), [unterlagen]);
   const schluessel = unterweisungen.map((u) => `${u.id}:${String(u.daten.datum ?? "")}`).join("|");
-  // `schluessel` steht für alles, was die Auswertung aus `unterweisungen` liest (ID, Datum) – bewusst statt der Liste
-  return useMemo(() => auswertung(profil, tag, unterweisungen), [profil, schluessel, tag]);
+  // R10: aus „Mitarbeiter“ zählen Geburtsdatum (unter 18) und „Beschäftigt seit“ (Neueinstellung)
+  const personen = mitarbeiter.map((m) => `${m.geburtsdatum ?? ""}:${m.beginn ?? ""}`).join("|");
+  // `schluessel` und `personen` stehen für alles, was die Auswertung daraus liest – bewusst statt der Listen
+  return useMemo(() => auswertung(profil, tag, unterweisungen, mitarbeiter), [profil, schluessel, personen, tag]);
 }
 
 /** Hat jemand den Check schon gemacht? (die erste Frage ist beantwortet) */
@@ -52,18 +55,24 @@ function PflichtDetail({ id }: { id: string }) {
   const oeffnen = useOeffnen();
   const melden = useMeldung();
   const a = useAuswertung();
-  const p = [...a.gilt, ...a.gruendung, ...a.unbekannt].find((x) => x.id === id);
+  const p = [...a.gilt, ...a.gruendung, ...a.beiEinstellung, ...a.unbekannt].find((x) => x.id === id);
   if (!p) return <Unterseite titel="">{null}</Unterseite>;
   // schon angefangen? Dann die vorhandene Unterlage öffnen statt mit „Ausfüllen“ eine zweite anzulegen
   const vorhanden = p.vorlage ? z.stand.unterlagen.filter((u) => u.vorlage === p.vorlage && !u.storniertDurch).sort((x, y) => (y.ausgegeben ?? y.geaendert).localeCompare(x.ausgegeben ?? x.geaendert))[0] : undefined;
-  const gilt = a.gilt.includes(p) || a.gruendung.includes(p);
+  const gilt = a.gilt.includes(p) || a.gruendung.includes(p) || a.beiEinstellung.includes(p);
   const abgehakt = istErledigt(p, { ...z.stand, unterlagen: [] });
   // wiederkehrend: der Haken gilt für den nächsten Termin, danach ist die Pflicht wieder offen
   const abhaken = () => {
     z.erledigtSetzen(p.id, abgehakt ? null : heute(), abgehakt ? null : p.wiederkehrend ? p.naechsterTermin : null);
     melden(abgehakt ? TEXT.haken_entfernt : TEXT.als_erledigt_vermerkt);
   };
-  const durchUnterlage = !abgehakt && istErledigt(p, { ...z.stand, erledigt: {} });
+  // R10: laufende Pflicht – welche Unterlage erledigt sie gerade und bis wann; „bestaetigen“: nur der Haken erledigt
+  const unterlageFertig = abgehakt ? null : erledigtDurch(p, z.stand);
+  const durchUnterlage = Boolean(unterlageFertig);
+  const bestaetigen = p.erledigung.art === "bestaetigen" ? p.erledigung.bestaetigung ?? TEXT.als_erledigt_kurz : null;
+  const laufendBis = unterlageFertig && p.erledigung.art === "laufend" && p.erledigung.naechsterTerminAus ? gueltigBis(unterlageFertig, p.erledigung.naechsterTerminAus) : null;
+  const zeitraumText = (iso: string) => (p.erledigung.zeitraum === "jahr" ? iso.slice(0, 4) : new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", month: "long", year: "numeric" }).format(new Date(`${iso.slice(0, 10)}T12:00:00Z`)));
+  const lohnWer = p.lohnbuero ? TEXT.r10_lohn_wer[String(z.stand.profil["personal.lohn_durch"])] : undefined;
   // erste Zeile ohne Linie oben – sonst doppelte Linie am Kartenrand
   let erste = true;
   const zeile = (titel: string, wert: string) => {
@@ -83,11 +92,11 @@ function PflichtDetail({ id }: { id: string }) {
       {p.vorlage ? (
         // Haken als zweiter Knopf im Fuß – nicht als Textlink halb unter der Leiste
         <>
-          <Knopf ton text={abgehakt ? TEXT.haken_entfernen_kurz : TEXT.als_erledigt_kurz} symbol={abgehakt ? "xmark" : "checkmark"} onPress={abhaken} stil={{ flex: 1 }} />
+          <Knopf ton text={abgehakt ? (bestaetigen ? TEXT.r10_bestaetigen_entfernen : TEXT.haken_entfernen_kurz) : bestaetigen ?? TEXT.als_erledigt_kurz} symbol={abgehakt ? "xmark" : "checkmark"} onPress={abhaken} stil={{ flex: 1 }} />
           {vorhanden ? <Knopf text={TEXT.unterlage_oeffnen_kurz} onPress={() => oeffnen(vorhanden.id)} stil={{ flex: 1.3 }} /> : <Knopf text={TEXT.unterlage_erstellen_kurz} symbol="plus" onPress={() => starten(p.vorlage!)} stil={{ flex: 1.3 }} />}
         </>
       ) : (
-        <Knopf ton={abgehakt} text={abgehakt ? TEXT.haken_entfernen : TEXT.als_erledigt} symbol={abgehakt ? undefined : "checkmark"} onPress={abhaken} stil={{ flex: 1 }} />
+        <Knopf ton={abgehakt} text={abgehakt ? (bestaetigen ? TEXT.r10_bestaetigen_entfernen : TEXT.haken_entfernen) : bestaetigen ?? TEXT.als_erledigt} symbol={abgehakt ? undefined : "checkmark"} onPress={abhaken} stil={{ flex: 1 }} />
       )}
     </Fuss>
   ) : null;
@@ -112,19 +121,24 @@ function PflichtDetail({ id }: { id: string }) {
         ) : abgehakt ? (
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginTop: 4 }}>
             <Symbol name="checkmark.circle.fill" groesse={20} farbe={f.minze} />
-            <T fett farbe={f.buehneText}>{TEXT.erledigt_am(datumDe(haken(z.stand.erledigt[p.id])?.datum ?? heute()))}</T>
+            <T fett farbe={f.buehneText}>{bestaetigen ? TEXT.r10_bestaetigt_am(bestaetigen, datumDe(haken(z.stand.erledigt[p.id])?.datum ?? heute())) : TEXT.erledigt_am(datumDe(haken(z.stand.erledigt[p.id])?.datum ?? heute()))}</T>
           </View>
         ) : undefined
       }
     >
-      {durchUnterlage ? <Hinweis art="erfolg" text={TEXT.erledigt_durch_unterlage} /> : null}
+      {durchUnterlage ? <Hinweis art="erfolg" text={laufendBis ? `${TEXT.erledigt_durch_unterlage} ${TEXT.r10_laufend_bis(datumDe(laufendBis))}` : TEXT.erledigt_durch_unterlage} /> : null}
+      {p.einordnung !== "pflicht" ? <Hinweis text={TEXT.r10_einordnung[p.einordnung] ?? ""} /> : null}
+      {lohnWer ? <Hinweis text={TEXT.r10_lohn_hinweis(lohnWer)} /> : null}
       {gilt && vorhanden ? (
         <Karte stil={{ marginTop: 8 }}>
           <Zeile symbol="doc.text" ton="amt" titel={TEXT.deine_unterlage(vorlageFuer(vorhanden.vorlage)?.titel ?? vorhanden.vorlage)} text={vorhanden.ausgegeben ? TEXT.unterlage_geteilt_am(datumKurz(vorhanden.ausgegeben)) : TEXT.unterlage_entwurf_vom(datumKurz(vorhanden.geaendert))} onPress={() => oeffnen(vorhanden.id)} letzte />
         </Karte>
       ) : null}
       {/* einmalige Pflicht mit Vorlage: erledigt ist sie erst, wenn die Unterlage gedruckt oder geteilt ist */}
-      {gilt && p.vorlage && !p.wiederkehrend && !abgehakt && !durchUnterlage ? <Hinweis text={TEXT.pflicht_drucken_erledigt} /> : null}
+      {gilt && p.vorlage && !p.wiederkehrend && !abgehakt && !durchUnterlage && p.erledigung.art === "einmalig" ? <Hinweis text={TEXT.pflicht_drucken_erledigt} /> : null}
+      {/* R10: laufende Pflichten und Pflichten, die erst mit einer Bestätigung erledigt sind */}
+      {gilt && p.erledigung.art === "laufend" ? <Hinweis text={p.erledigung.zeitraum ? TEXT.r10_laufend(p.erledigung.zeitraum, zeitraumText(heute())) : TEXT.r10_laufend_termin} /> : null}
+      {gilt && bestaetigen && !abgehakt ? <Hinweis text={TEXT.r10_bestaetigen_hinweis(bestaetigen)} /> : null}
       {p.wiederkehrend && p.naechsterTermin ? <Hinweis text={TEXT.wiederkehrend_hinweis(datumDe(p.naechsterTermin))} /> : null}
       <Karte stil={{ marginTop: 8, paddingTop: 0 }}>
         {p.grund ? zeile(TEXT.warum, p.grund) : null}
@@ -178,11 +192,17 @@ const BEREICH_SYMBOL_KAT: Record<string, string> = { gruendung: "flag", gesellsc
 
 export function PflichtZeile({ p, letzte, erledigt, ohneWichtig }: { p: PflichtInfo; letzte: boolean; erledigt: boolean; ohneWichtig?: boolean }) {
   const nav = useNav();
+  const z = useAmtlos();
   const termin = !erledigt && p.naechsterTermin ? p.naechsterTermin : null;
   // das Datum steht im Fristblatt – im Text nur kurz (ohne Jahr, wenn es dieses Jahr ist)
   const fern = termin ? tageBis(termin, heute()) > 30 : false;
-  const unter = erledigt ? TEXT.erledigt : termin ? (fern ? fristText(termin) : `${fristText(termin)}\u00a0· ${datumDe(termin).slice(0, 6)}`) : p.vorlage ? TEXT.unterlage_in_amtlos : p.kurz;
-  const wichtig = !erledigt && !ohneWichtig && p.schwere === "hoch";
+  const lohn = p.lohnbuero ? TEXT.r10_lohn_durch[String(z.stand.profil["personal.lohn_durch"])] : undefined;
+  const basis = erledigt ? TEXT.erledigt : termin ? (fern ? fristText(termin) : `${fristText(termin)}\u00a0· ${datumDe(termin).slice(0, 6)}`) : p.vorlage ? TEXT.unterlage_in_amtlos : p.kurz;
+  // R10: was das Lohnbüro bzw. die Steuerberatung macht, steht dabei
+  const unter = lohn && !erledigt ? `${lohn}\u00a0· ${basis}` : basis;
+  const wichtig = !erledigt && !ohneWichtig && p.schwere === "hoch" && p.einordnung === "pflicht";
+  // R10: Hinweise und Optionen sichtbar als solche (Rechtsprüfung: getrennt zählen und anzeigen)
+  const marke = p.einordnung !== "pflicht" ? { text: TEXT.r10_marke[p.einordnung] ?? "", ton: "leise" as const } : wichtig ? { text: TEXT.wichtig, ton: "bald" as const } : undefined;
   return (
     <Zeile
       // mit Termin: das Fristblatt (Datum auf einen Blick); ohne Termin eine ruhige graue Kachel mit dem Bereich (A24) –
@@ -191,7 +211,7 @@ export function PflichtZeile({ p, letzte, erledigt, ohneWichtig }: { p: PflichtI
       titel={p.titel}
       text={unter}
       // „Wichtig“ als Plakette unter dem Titel – VoiceOver liest sie mit
-      marke={wichtig ? { text: TEXT.wichtig, ton: "bald" } : undefined}
+      marke={marke}
       onPress={() => nav.oeffnen(`pflicht-${p.id}`, () => <PflichtDetail id={p.id} />, true)}
       letzte={letzte}
     />
@@ -220,10 +240,19 @@ function PflichtenInhalt() {
     };
   }, [a, erledigt, unterlagen, profil, betrieb, tag]);
   const fertig = (p: PflichtInfo) => istErledigt(p, { erledigt, unterlagen, betrieb });
+  const [einstellungZeigen, setEinstellungZeigen] = useState(false);
+  const zahl = zaehlung(a.gilt);
+  // R10: abgebrochener Check – die offenen Kern-Fragen weiter beantworten statt von vorn (Nutzertest Lea)
+  const kernOffen = offeneKernFragen(profil);
   return (
     <View>
+      {kernOffen.length ? (
+        <Gruppe erste titel={TEXT.r10_check_fortsetzen_titel} fuss={TEXT.r10_check_fortsetzen_text(kernOffen.length)}>
+          <Knopf ton symbol="checklist" text={TEXT.r10_check_fortsetzen} onPress={() => nav.oeffnen("nachfragen", () => <CheckAblauf felder={kernOffen} />, true)} />
+        </Gruppe>
+      ) : null}
       {d.jetzt.length ? (
-        <Gruppe erste titel={TEXT.jetzt_dran(d.jetzt.length)}>
+        <Gruppe erste={!kernOffen.length} titel={TEXT.jetzt_dran(d.jetzt.length)}>
           <Karte>
             {d.jetzt.map((p, i) => (
               // sind alle „wichtig“, sagt das Wort nichts – dann zählt der Termin
@@ -232,7 +261,7 @@ function PflichtenInhalt() {
           </Karte>
         </Gruppe>
       ) : (
-        <Gruppe erste titel={TEXT.jetzt_dran(0)}>
+        <Gruppe erste={!kernOffen.length} titel={TEXT.jetzt_dran(0)}>
           <Hinweis art="erfolg" text={nichtsDranText(z.stand.erinnerungen)} />
         </Gruppe>
       )}
@@ -260,7 +289,7 @@ function PflichtenInhalt() {
       <KurzKlaeren offen={offen} unklar={a.unbekannt.length} />
       <T v="gross" accessibilityRole="header" stil={{ marginTop: 30 }}>{TEXT.alle_nach_bereich}</T>
       {/* die vollständige Liste erst auf Wunsch – oben steht, was jetzt zu tun ist */}
-      <TextKnopf erweitert={alleZeigen} symbol={alleZeigen ? "chevron.up" : "chevron.down"} text={alleZeigen ? TEXT.liste_verbergen : TEXT.alle_pflichten_zeigen(a.gilt.length)} onPress={() => { weich(); setAlleZeigen(!alleZeigen); }} />
+      <TextKnopf erweitert={alleZeigen} symbol={alleZeigen ? "chevron.up" : "chevron.down"} text={alleZeigen ? TEXT.liste_verbergen : TEXT.r10_alle_zeigen(zahl.pflichten, zahl.hinweise, zahl.optionen)} onPress={() => { weich(); setAlleZeigen(!alleZeigen); }} />
       {alleZeigen && kategorien.map((k) => {
         const l = a.gilt.filter((p) => p.kategorie === k);
         return (
@@ -290,6 +319,19 @@ function PflichtenInhalt() {
             <Karte>
               {a.gruendung.map((p, i) => (
                 <PflichtZeile key={p.id} p={p} erledigt={fertig(p)} letzte={i === a.gruendung.length - 1} />
+              ))}
+            </Karte>
+          ) : null}
+        </Gruppe>
+      ) : null}
+      {a.beiEinstellung.length ? (
+        // R10: Einstellungs-Pflichten eines bestehenden Betriebs ohne neue Einstellung – zur Kenntnis, nicht „jetzt dran“
+        <Gruppe titel={TEXT.r10_bei_einstellung_titel(a.beiEinstellung.length)} fuss={TEXT.r10_bei_einstellung_text}>
+          <TextKnopf erweitert={einstellungZeigen} symbol={einstellungZeigen ? "chevron.up" : "chevron.down"} text={einstellungZeigen ? TEXT.liste_verbergen : TEXT.liste_zeigen} onPress={() => { weich(); setEinstellungZeigen(!einstellungZeigen); }} />
+          {einstellungZeigen ? (
+            <Karte>
+              {a.beiEinstellung.map((p, i) => (
+                <PflichtZeile key={p.id} p={p} erledigt={fertig(p)} ohneWichtig letzte={i === a.beiEinstellung.length - 1} />
               ))}
             </Karte>
           ) : null}
@@ -493,22 +535,23 @@ export function PflichtenTab() {
   const gemacht = checkGemacht(z.stand.profil);
   const { erledigt, unterlagen, betrieb } = z.stand;
   const tag = heute();
-  const { fs, bald } = useMemo(() => {
+  const { fs, d } = useMemo(() => {
     const e = { erledigt, unterlagen, betrieb };
-    return { fs: fortschritt(a, e), bald: dringlichkeit(a, e, tag).jetzt.length };
+    return { fs: fortschritt(a, e), d: dringlichkeit(a, e, tag) };
   }, [a, erledigt, unterlagen, betrieb, tag]);
+  const zahl = zaehlung(a.gilt);
   const check = () => nav.oeffnen("check", () => <CheckAblauf einleitung={!gemacht} />, true);
   return (
     <BuehnenSeite
       ueber={gemacht ? TEXT.fortschritt_text(fs.fertig, fs.gesamt) : TEXT.tabs.pflichten}
       rechts={gemacht ? <BuehnenKnopf text={TEXT.jahr_neu_pruefen} onPress={check} /> : undefined}
       // groß, was in den nächsten zwei Wochen ansteht – die Gesamtzahl klein darunter (sie erschlägt sonst)
-      titel={gemacht ? TEXT.ergebnis_bald(bald) : TEXT.pflichten_karte_titel}
+      titel={gemacht ? TEXT.r10_ergebnis_bald(d.termine, d.ohneTermin) : TEXT.pflichten_karte_titel}
       satz
       buehne={
         gemacht ? (
           <View style={{ gap: 14 }}>
-            <T v="klein" farbe={f.buehneLeise} stil={{ marginTop: -10 }}>{TEXT.ergebnis_gesamt(a.gilt.length, selten(a.gilt))}</T>
+            <T v="klein" farbe={f.buehneLeise} stil={{ marginTop: -10 }}>{TEXT.r10_ergebnis_gesamt(zahl.pflichten, zahl.hinweise, zahl.optionen, selten(a.gilt))}</T>
             <T v="klein" fett accessibilityRole="header" farbe={f.buehneText} stil={{ marginTop: 8 }}>{TEXT.jahr_titel}</T>
             <Jahresblick gilt={a.gilt} tag={tag} />
           </View>

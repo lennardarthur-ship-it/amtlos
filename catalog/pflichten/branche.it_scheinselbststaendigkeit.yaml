@@ -1,7 +1,7 @@
 # Katalog H.6 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.it_scheinselbststaendigkeit
-version: 1
+version: 2
 katalog_nr: H.6
 titel:
   de: Scheinselbstständigkeit vermeiden
@@ -47,6 +47,7 @@ sanktion:
     de: Die Folgen sind noch nicht fachlich erfasst.
   schwere: hoch
 automatisierung: hinweis
+einordnung: hinweis
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null

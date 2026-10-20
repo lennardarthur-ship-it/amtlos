@@ -1,15 +1,15 @@
 # Katalog E.54 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: arbeitsschutz.dguv_v3
-version: 2
+version: 3
 katalog_nr: E.54
 titel:
   de: Elektrische Geräte prüfen lassen
 kurz:
   de: Elektrische Geräte und Anlagen lässt du regelmäßig prüfen (DGUV Vorschrift 3).
 erklaerung:
-  de: Elektrische Betriebsmittel müssen in bestimmten Abständen geprüft werden. Amtlos erinnert an die Prüffristen, sobald
-    sie als Regeldaten hinterlegt sind.
+  de: Elektrische Betriebsmittel müssen in bestimmten Abständen geprüft werden. Ein Prüfprotokoll gilt bis zur nächsten Prüfung,
+    die darin steht (sonst bis zum Richtwert für die gewählten Einsatzbedingungen) – dann erinnert Amtlos wieder.
 rechtsgrundlage:
 - DGUV Vorschrift 3
 kategorie: arbeitsschutz
@@ -41,6 +41,11 @@ sanktion:
     de: Die Folgen sind noch nicht fachlich erfasst.
   schwere: mittel
 automatisierung: hinweis
+erledigung:
+  art: laufend
+  naechster_termin_aus: geraete.naechste
+aenderungsnotiz:
+  de: Ein Prüfprotokoll erledigt die Pflicht bis zur nächsten Prüfung, die im Protokoll steht – danach ist sie wieder offen.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null

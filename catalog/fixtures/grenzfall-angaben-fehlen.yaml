@@ -8,6 +8,7 @@ erwartet:
   arbeitsschutz.gefaehrdungsbeurteilung: unbekannt
   gruendung.berufsgenossenschaft: gilt
 fehlende_fakten:
-  steuern.ust_voranmeldung: [profil.ust.kleinunternehmer, profil.ust.zahllast_vorjahr, profil.gruendungsdatum]
+  # R10: ohne Steuer des Vorjahres entscheidet der Umsatz über der Kleinunternehmergrenze
+  steuern.ust_voranmeldung: [profil.ust.kleinunternehmer, profil.ust.zahllast_vorjahr, profil.gruendungsdatum, profil.umsatz.vorjahr, profil.umsatz.prognose_laufendes_jahr]
   arbeitsschutz.gefaehrdungsbeurteilung: [profil.beschaeftigte.gesamt]
   gruendung.berufsgenossenschaft: [profil.gruendungsdatum]

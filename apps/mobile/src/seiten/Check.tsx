@@ -5,7 +5,7 @@ import { T as TEXT } from "../texte";
 import { Auswahl, DatumFeld, Fakt, Feld, Fuss, Hinweis, Stempel, Symbol, Karte, Knopf, MehrfachWahl, T, TextKnopf, ZurueckKnopf } from "../ui/bausteine";
 import { HellerStatus, TastaturRahmen, useKopf, useNav } from "../ui/navigation";
 import { BLATT_OBEN, RADIUS, RAND, SCHRIFT, useFarben } from "../ui/thema";
-import { CHECK_FELDER, auswertung, beantwortet, checkFragen, dringlichkeit, selten, zusatzFragen, type Profil } from "../pflichten/check";
+import { CHECK_FELDER, auswertung, beantwortet, checkFragen, dringlichkeit, folgeAntworten, selten, zaehlung, zusatzFragen, type Profil } from "../pflichten/check";
 import { heute } from "../unterlagen/speicher";
 import { PflichtZeile } from "./Pflichten";
 import { useAmtlos } from "../zustand";
@@ -109,7 +109,8 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
   const [liste, setListe] = useState<string[]>(() => felder ?? [...CHECK_FELDER]);
   const [zusatz, setZusatz] = useState(false);
   const [extra, setExtra] = useState<string[]>([]);
-  const fragen = checkFragen(z.stand.profil, liste);
+  // Kern-Bedingungen (z. B. Minijob nur mit Beschäftigten) nur im ganzen Check; Zusatz- und Nachfragen werden immer gestellt
+  const fragen = checkFragen(z.stand.profil, liste, voll ? extra : liste);
   const [i, setI] = useState(voll && einleitung ? -1 : 0);
   const zeit = useRef<ReturnType<typeof setTimeout> | null>(null);
   const vorleser = useRef(false);
@@ -142,7 +143,8 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
   };
   const setzen = (feld: string, w: Wert, springen?: boolean) => {
     const bl = feld === "bundesland" && typeof w === "string" ? frage?.optionen?.[w]?.de : undefined;
-    z.profilSetzen({ [feld]: w }, bl);
+    // R10: was aus der Antwort folgt, gleich mit (z. B. „Freiberuflich“ ⇒ freier Beruf, keine zweite Frage danach)
+    z.profilSetzen({ ...folgeAntworten(feld, w, z.stand.profil), [feld]: w }, bl);
     // mit VoiceOver nicht von selbst weiterspringen – sonst verliert man unangekündigt die Frage
     if (springen && !vorleser.current) {
       if (zeit.current) clearTimeout(zeit.current);
@@ -153,15 +155,21 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
   useEffect(() => {
     if (!voll || !amEnde || zusatz) return;
     setZusatz(true);
-    const neu = zusatzFragen(z.stand.profil, heute()).filter((f) => !liste.includes(f));
+    // R10: auch Kern-Felder, die der Check für diesen Betrieb übersprungen hat (z. B. Geräte bei einer Agentur), als Zusatzfrage
+    const gestellt = new Set(fragen.map((q) => q.feld));
+    const neu = zusatzFragen(z.stand.profil, heute(), 8, z.stand.unterlagen, z.stand.mitarbeiter).filter((f) => !gestellt.has(f));
     if (neu.length) {
       setExtra(neu);
-      setListe((l) => [...l, ...neu]);
+      setListe((l) => [...l.filter((x) => !neu.includes(x)), ...neu]);
       setZwischen(true);
     }
   }, [voll, amEnde, zusatz, z.stand.profil, liste]);
-  const a = useMemo(() => (amEnde && voll && zusatz ? auswertung(z.stand.profil, heute(), z.stand.unterlagen) : null), [amEnde, voll, zusatz, z.stand.profil, z.stand.unterlagen]);
-  const bald = useMemo(() => (a ? dringlichkeit(a, { erledigt: z.stand.erledigt, unterlagen: z.stand.unterlagen, betrieb: z.stand.betrieb }, heute()).jetzt.length : 0), [a, z.stand.erledigt, z.stand.unterlagen, z.stand.betrieb]);
+  const a = useMemo(() => (amEnde && voll && zusatz ? auswertung(z.stand.profil, heute(), z.stand.unterlagen, z.stand.mitarbeiter) : null), [amEnde, voll, zusatz, z.stand.profil, z.stand.unterlagen, z.stand.mitarbeiter]);
+  const d = useMemo(() => (a ? dringlichkeit(a, { erledigt: z.stand.erledigt, unterlagen: z.stand.unterlagen, betrieb: z.stand.betrieb }, heute()) : null), [a, z.stand.erledigt, z.stand.unterlagen, z.stand.betrieb]);
+  const bald = d?.jetzt.length ?? 0;
+  // R10: Pflichten, Hinweise und Optionen getrennt (Rechtsprüfung) – „Mit diesen fängst du an“ nur echte Pflichten
+  const zahl = a ? zaehlung(a.gilt) : { pflichten: 0, hinweise: 0, optionen: 0 };
+  const pflichtenListe = a ? a.gilt.filter((p) => p.einordnung === "pflicht") : [];
   // Auftakt, Zwischenstand und Ergebnis auf der Bühne (E-144); die Fragen selbst auf hellem Grund
   const buehne = i < 0 || zwischenschirm || Boolean(a);
   useKopf({ titel: TEXT.check_titel, schliessen: true, buehne });
@@ -205,21 +213,21 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
               <View style={{ paddingTop: 12, paddingBottom: 28 }}>
                 <Stempel groesse={72} farbe={f.minze} />
                 {/* groß, was bald ansteht; die Gesamtzahl klein – „47 Pflichten“ allein erschlägt */}
-                <T v="titel" accessibilityRole="header" farbe={f.buehneText} stil={{ marginTop: 18 }}>{TEXT.ergebnis_bald(bald)}</T>
-                <T v="klein" farbe={f.buehneLeise} stil={{ marginTop: 8 }}>{TEXT.ergebnis_gesamt(a.gilt.length, selten(a.gilt))}</T>
-                {/* drei Zahlen auf einen Blick (B6): alle Pflichten, bald fällig, mit Vorlage in Amtlos */}
+                <T v="titel" accessibilityRole="header" farbe={f.buehneText} stil={{ marginTop: 18 }}>{TEXT.r10_ergebnis_bald(d?.termine ?? 0, d?.ohneTermin ?? 0)}</T>
+                <T v="klein" farbe={f.buehneLeise} stil={{ marginTop: 8 }}>{TEXT.r10_ergebnis_gesamt(zahl.pflichten, zahl.hinweise, zahl.optionen, selten(a.gilt))}</T>
+                {/* drei Zahlen auf einen Blick (B6): Pflichten (ohne Hinweise und Optionen), bald fällig, mit Vorlage in Amtlos */}
                 <View style={{ flexDirection: "row", gap: 8, marginTop: 18 }}>
-                  <Zahl zahl={a.gilt.length} text={TEXT.ergebnis_zahlen.pflichten} />
+                  <Zahl zahl={zahl.pflichten} text={TEXT.ergebnis_zahlen.pflichten} />
                   <Zahl zahl={bald} text={TEXT.ergebnis_zahlen.bald} />
                   <Zahl zahl={a.gilt.filter((p) => p.vorlage).length} text={TEXT.ergebnis_zahlen.vorlage} />
                 </View>
               </View>
               <View style={{ flexGrow: 1, marginHorizontal: -RAND, paddingHorizontal: RAND, paddingTop: BLATT_OBEN, paddingBottom: 32, backgroundColor: f.papier, borderTopLeftRadius: RADIUS.buehne, borderTopRightRadius: RADIUS.buehne }}>
-              {a.gilt.length ? (
+              {pflichtenListe.length ? (
                 <View>
-                  <T v="gross">{TEXT.ergebnis_anfangen(Math.min(3, a.gilt.length))}</T>
+                  <T v="gross">{TEXT.ergebnis_anfangen(Math.min(3, pflichtenListe.length))}</T>
                   <Karte stil={{ marginTop: 10 }}>
-                    {a.gilt.slice(0, 3).map((p, k, l) => (
+                    {pflichtenListe.slice(0, 3).map((p, k, l) => (
                       <PflichtZeile key={p.id} p={p} erledigt={false} ohneWichtig letzte={k === l.length - 1} />
                     ))}
                   </Karte>
@@ -228,8 +236,9 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
               <Karte stil={{ marginTop: 16 }}>
                 {[
                   { symbol: "doc.text", ton: "amt" as const, text: TEXT.ergebnis_vorlagen(a.gilt.filter((p) => p.vorlage).length) },
-                  ...(a.gilt.some((p) => p.schwere === "hoch") ? [{ symbol: "exclamationmark.circle", ton: "bald" as const, text: TEXT.ergebnis_wichtig(a.gilt.filter((p) => p.schwere === "hoch").length) }] : []),
+                  ...(pflichtenListe.some((p) => p.schwere === "hoch") ? [{ symbol: "exclamationmark.circle", ton: "bald" as const, text: TEXT.ergebnis_wichtig(pflichtenListe.filter((p) => p.schwere === "hoch").length) }] : []),
                   ...(a.gruendung.length ? [{ symbol: "flag", ton: "leise" as const, text: TEXT.ergebnis_gruendung(a.gruendung.length) }] : []),
+                  ...(a.beiEinstellung.length ? [{ symbol: "person.2", ton: "leise" as const, text: TEXT.r10_bei_einstellung_titel(a.beiEinstellung.length) }] : []),
                   ...(a.unbekannt.length ? [{ symbol: "questionmark.circle", ton: "leise" as const, text: TEXT.ergebnis_unbekannt(a.unbekannt.length) }] : []),
                 ].map((x, k, l) => (
                   <Fakt key={x.symbol} symbol={x.symbol} ton={x.ton} text={x.text} letzte={k === l.length - 1} />

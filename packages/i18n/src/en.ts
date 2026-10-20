@@ -1192,6 +1192,7 @@ export const en: Texte = {
     datenpanne: "Data breach discovered",
     betriebsaufgabe: "Stopped trading",
     unterweisung_durchgefuehrt: "Safety briefing held",
+    ifsg_belehrung_durchgefuehrt: "Food hygiene briefing under § 43 IfSG held",
     betroffenenanfrage: "Request from a data subject (access, erasure …)",
   },
   einstellungen: { titel: "Settings", profil: "Information about your business", profil_text: "Change your answers. Every change is saved; earlier versions stay traceable.", sprache: "Language", sprache_speichern: "Save language", erinnerungen: "Reminders", erinnerungen_text: "How and when Amtlos reminds you of deadlines – applies to you in this business.", kanal: { email: "Email", push: "Push in the app" }, aktiv: "Remind me", push_ohne_geraet: "Push is available as soon as you sign in to the Amtlos app on your phone.", vorlauf: "Days before the deadline", vorlauf_hilfe: "Separated by commas, e.g. 14, 3 (up to 5 values, up to 90 days).", erinnerungen_speichern: "Save reminders", gespeichert: "Saved.", offen: "{n} still open", keine_angaben: "nothing answered yet" },

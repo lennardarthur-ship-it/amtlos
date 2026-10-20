@@ -1,7 +1,7 @@
 # Katalog C.33 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.kassenmeldung_ausserbetriebnahme
-version: 1
+version: 2
 katalog_nr: C.33
 titel:
   de: Außerbetriebnahme einer Kasse melden
@@ -39,6 +39,12 @@ sanktion:
     de: Die Folgen sind noch nicht fachlich erfasst.
   schwere: mittel
 automatisierung: formular_vorausfuellen
+erledigung:
+  art: bestaetigen
+  bestaetigung:
+    de: In ELSTER gemeldet
+aenderungsnotiz:
+  de: Das Datenblatt aus Amtlos bereitet die Meldung nur vor. Erledigt ist sie, wenn du bestätigst, dass du sie in ELSTER übermittelt hast.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null

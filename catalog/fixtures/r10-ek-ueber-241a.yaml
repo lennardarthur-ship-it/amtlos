@@ -1,0 +1,14 @@
+persona: handwerk
+beschreibung: "R10 (Steuerprüfung): e. K. mit Umsatz im Vorjahr über 800.000 € – die Befreiung nach § 241a HGB greift nicht; doppelte Buchführung und E-Bilanz, keine EÜR"
+stichtag: "2026-10-20"
+fakten:
+  profil.rechtsform: ek
+  profil.gruendungsdatum: "2010-01-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.umsatz.vorjahr: 900000
+  profil.gewinn.vorjahr: 50000
+  profil.bundesland: NW
+erwartet:
+  steuern.buchfuehrungspflicht: gilt
+  steuern.e_bilanz: gilt
+  steuern.euer: gilt_nicht

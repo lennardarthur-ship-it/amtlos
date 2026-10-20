@@ -1,7 +1,7 @@
 # Katalog D.42 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.arbeitszeit_aufzeichnung
-version: 1
+version: 2
 katalog_nr: D.42
 titel:
   de: Arbeitszeit aufzeichnen
@@ -32,6 +32,9 @@ sanktion:
     de: Die Folgen sind noch nicht fachlich erfasst.
   schwere: mittel
 automatisierung: hinweis
+erledigung:
+  art: laufend
+  zeitraum: monat
 aktion:
   art: link
   ziel: app.zeiterfassung

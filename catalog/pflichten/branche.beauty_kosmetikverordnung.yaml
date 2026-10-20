@@ -1,7 +1,7 @@
 # Katalog H.3 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.beauty_kosmetikverordnung
-version: 1
+version: 2
 katalog_nr: H.3
 titel:
   de: Kosmetikverordnung bei eigenen Produkten
@@ -26,6 +26,11 @@ ausloeser:
     wert: kosmetik
     label:
       de: Du verkaufst Kosmetik.
+  - feld: profil.produkte.hersteller
+    op: ==
+    wert: true
+    label:
+      de: Du stellst eigene Produkte her, verkaufst sie unter deinem Namen oder importierst sie von außerhalb der EU.
 frist:
   typ: dauerhaft
 wiederholung:
@@ -39,6 +44,9 @@ sanktion:
     de: Die Folgen sind noch nicht fachlich erfasst.
   schwere: hoch
 automatisierung: hinweis
+aenderungsnotiz:
+  de: Gilt erst, wenn du eigene Kosmetik herstellst, unter deinem Namen verkaufst oder von außerhalb der EU importierst – nicht beim
+    Weiterverkauf fremder Markenware.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -49,7 +57,7 @@ quellen:
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Notifizierung (CPNP) und Kennzeichnung ergänzen
-- Abgrenzung Herstellung ↔ Weiterverkauf
+- 'Auslöser an die Frage „eigene Produkte, Eigenmarke oder Import von außerhalb der EU“ gekoppelt (R10) – Abgrenzung Herstellung ↔ Weiterverkauf bestätigen'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 pruefung:
   status: entwurf

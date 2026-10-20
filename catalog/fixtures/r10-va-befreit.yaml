@@ -1,0 +1,13 @@
+persona: gewerbe
+beschreibung: "R10: vom Finanzamt von der Voranmeldung befreit (Antwort „keine“) – keine Voranmeldung, auch über der Kleinunternehmergrenze"
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2014-04-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.ust.kleinunternehmer: false
+  profil.ust.voranmeldung_rhythmus: keine
+  profil.umsatz.vorjahr: 40000
+  profil.bundesland: BY
+erwartet:
+  steuern.ust_voranmeldung: gilt_nicht

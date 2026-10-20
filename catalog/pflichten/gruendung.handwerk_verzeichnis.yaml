@@ -1,0 +1,66 @@
+# R10: aus gruendung.handwerksrolle herausgelöst (Rechtsprüfung: Anlage B1/B2 kommen in das Verzeichnis nach § 19 HwO, Anzeige bei Beginn nach § 18 HwO)
+schema_version: 1
+id: gruendung.handwerk_verzeichnis
+version: 1
+katalog_nr: A.4
+titel:
+  de: Im Verzeichnis der Handwerkskammer eintragen (Anlage B)
+kurz:
+  de: Ein zulassungsfreies oder handwerksähnliches Gewerbe zeigst du bei Beginn der Handwerkskammer an.
+erklaerung:
+  de: Zulassungsfreie Handwerke (Anlage B1) und handwerksähnliche Gewerbe (Anlage B2) kommen nicht in die Handwerksrolle, sondern
+    in das Verzeichnis der Handwerkskammer. Den Beginn des Betriebs zeigst du der Handwerkskammer an, zusammen mit der Gewerbeanmeldung.
+begriffe:
+- begriff:
+    de: Verzeichnis nach § 19 HwO
+  erklaerung:
+    de: Das Verzeichnis der Handwerkskammer für zulassungsfreie Handwerke und handwerksähnliche Gewerbe (Anlage B).
+rechtsgrundlage:
+- § 18 HwO
+- § 19 HwO
+kategorie: gruendung
+branchen:
+- handwerk
+ausloeser:
+  feld: profil.handwerk.anlage
+  op: in
+  wert:
+  - b1
+  - b2
+  label:
+    de: Dein Betrieb ist ein zulassungsfreies Handwerk oder handwerksähnliches Gewerbe (Anlage B der Handwerksordnung).
+phase: gruendung
+frist:
+  typ: relativ
+  bezug:
+    fakt: profil.gruendungsdatum
+  versatz: P0D
+  zeitpunkt: spaetestens
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Handwerkskammer
+kanal: portal
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Handwerksordnung
+  url: https://www.gesetze-im-internet.de/hwo/
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Anzeige „bei Beginn“ (§ 18 HwO, gleichzeitig mit der Gewerbeanzeige) als „spätestens am Tag des Beginns“ umgesetzt (R10, Rechtsprüfung) – bestätigen'
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

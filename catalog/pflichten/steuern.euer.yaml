@@ -1,18 +1,21 @@
 # Katalog C.27 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.euer
-version: 2
+version: 3
 katalog_nr: C.27
 titel:
   de: Einnahmen-Überschuss-Rechnung (Anlage EÜR) abgeben
 kurz:
   de: Einmal im Jahr ermittelst du deinen Gewinn mit der Anlage EÜR und übermittelst sie elektronisch.
 erklaerung:
-  de: Wer nicht zur doppelten Buchführung verpflichtet ist, ermittelt den Gewinn mit der Einnahmen-Überschuss-Rechnung.
+  de: Wer nicht zur doppelten Buchführung verpflichtet ist, ermittelt den Gewinn mit der Einnahmen-Überschuss-Rechnung. Das gilt
+    auch für eingetragene Kaufleute unter den Grenzen des § 241a HGB und für Gewerbetreibende, denen das Finanzamt keine Buchführungspflicht
+    mitgeteilt hat.
 rechtsgrundlage:
 - § 4 Abs. 3 EStG
 kategorie: steuern
 ausloeser:
+  # Gegenstück zu steuern.buchfuehrungspflicht (R10: § 241a HGB, § 141 AO erst nach Mitteilung)
   not:
     any:
     - feld: abgeleitet.ist_kapitalgesellschaft
@@ -21,15 +24,59 @@ ausloeser:
       label:
         de: Dein Unternehmen ist eine Kapitalgesellschaft.
     - feld: profil.rechtsform
-      op: in
-      wert:
-      - ek
-      - gmbh_co_kg
+      op: ==
+      wert: gmbh_co_kg
       label:
-        de: Dein Unternehmen ist im Handelsregister eingetragen.
+        de: Dein Unternehmen ist eine GmbH & Co. KG und damit nach dem Handelsgesetzbuch buchführungspflichtig.
+    # e.K.: nach HGB buchführungspflichtig, außer die Grenzen des § 241a HGB werden eingehalten (zwei aufeinanderfolgende Jahre;
+    # vereinfacht über das Vorjahr, im Gründungsjahr über die Schätzung für das erste Jahr)
     - all:
-      - &id001
-        all:
+      - feld: profil.rechtsform
+        op: ==
+        wert: ek
+        label:
+          de: Du bist als Kauffrau oder Kaufmann im Handelsregister eingetragen.
+      - any:
+        - all:
+          - feld: abgeleitet.ist_gruendungsjahr
+            op: ==
+            wert: false
+          - feld: abgeleitet.noch_nicht_gestartet
+            op: ==
+            wert: false
+          - any:
+            - feld: profil.umsatz.vorjahr
+              op: '>'
+              wert:
+                regelwert: steuern.hgb241a.grenze_umsatz
+              label:
+                de: Dein Umsatz im Vorjahr lag über 800.000 € – die Befreiung nach § 241a HGB greift nicht.
+            - feld: profil.gewinn.vorjahr
+              op: '>'
+              wert:
+                regelwert: steuern.hgb241a.grenze_gewinn
+              label:
+                de: Dein Gewinn im Vorjahr lag über 80.000 € – die Befreiung nach § 241a HGB greift nicht.
+        - all:
+          - feld: abgeleitet.ist_gruendungsjahr
+            op: ==
+            wert: true
+          - any:
+            - feld: profil.umsatz.prognose_laufendes_jahr
+              op: '>'
+              wert:
+                regelwert: steuern.hgb241a.grenze_umsatz
+              label:
+                de: Dein erwarteter Umsatz im ersten Jahr liegt über 800.000 € – die Befreiung nach § 241a HGB greift nicht.
+            - feld: profil.gewinn.prognose_laufendes_jahr
+              op: '>'
+              wert:
+                regelwert: steuern.hgb241a.grenze_gewinn
+              label:
+                de: Dein erwarteter Gewinn im ersten Jahr liegt über 80.000 € – die Befreiung nach § 241a HGB greift nicht.
+    # § 141 AO: Pflicht erst nach Mitteilung des Finanzamts (§ 141 Abs. 2 AO)
+    - all:
+      - all:
         - feld: abgeleitet.ist_gruendungsjahr
           op: ==
           wert: false
@@ -40,20 +87,24 @@ ausloeser:
         - feld: profil.taetigkeit.einordnung
           op: '!='
           wert: freiberuf
-      - feld: profil.umsatz.vorjahr
-        op: '>'
-        wert:
-          regelwert: steuern.ao141.grenze_umsatz
+      - any:
+        - feld: profil.umsatz.vorjahr
+          op: '>'
+          wert:
+            regelwert: steuern.ao141.grenze_umsatz
+          label:
+            de: Dein Umsatz im Vorjahr lag über der Grenze für die Buchführungspflicht nach § 141 AO.
+        - feld: profil.gewinn.vorjahr
+          op: '>'
+          wert:
+            regelwert: steuern.ao141.grenze_gewinn
+          label:
+            de: Dein Gewinn im Vorjahr lag über der Grenze für die Buchführungspflicht nach § 141 AO.
+      - feld: profil.steuern.buchfuehrung_mitteilung
+        op: ==
+        wert: true
         label:
-          de: Dein Umsatz im Vorjahr lag über der Grenze für die Buchführungspflicht.
-    - all:
-      - *id001
-      - feld: profil.gewinn.vorjahr
-        op: '>'
-        wert:
-          regelwert: steuern.ao141.grenze_gewinn
-        label:
-          de: Dein Gewinn im Vorjahr lag über der Grenze für die Buchführungspflicht.
+          de: Das Finanzamt hat dir mitgeteilt, dass du Bücher führen musst.
   label:
     de: Du bist nicht zur doppelten Buchführung verpflichtet.
 frist:
@@ -69,6 +120,8 @@ sanktion:
     de: Die Folgen sind noch nicht fachlich erfasst.
   schwere: mittel
 automatisierung: formular_vorausfuellen
+aenderungsnotiz:
+  de: Gilt jetzt auch für eingetragene Kaufleute unter den Grenzen des § 241a HGB und bis zur Mitteilung des Finanzamts nach § 141 AO.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null

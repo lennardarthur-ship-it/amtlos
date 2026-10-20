@@ -1,18 +1,21 @@
 # Katalog C.28 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.buchfuehrungspflicht
-version: 2
+version: 3
 katalog_nr: C.28
 titel:
   de: Doppelte Buchführung
 kurz:
   de: Du musst Bücher nach den Regeln der doppelten Buchführung führen und einen Jahresabschluss machen.
 erklaerung:
-  de: Buchführungspflichtig ist, wer nach dem Handelsgesetzbuch dazu verpflichtet ist oder die Grenzen nach § 141 AO überschreitet
-    (800.000 € Umsatz oder 80.000 € Gewinn). Amtlos erstellt keine Bilanz selbst, sondern übergibt an deine Steuerberatung
-    (E-051).
+  de: 'Bücher nach den Regeln der doppelten Buchführung führen Kapitalgesellschaften und die GmbH & Co. KG immer. Eingetragene
+    Kaufleute (e. K.) sind befreit, wenn sie an zwei aufeinanderfolgenden Abschlussstichtagen höchstens 800.000 € Umsatz und
+    80.000 € Jahresüberschuss haben (§ 241a HGB). Steuerlich wirst du nach § 141 AO erst buchführungspflichtig, wenn das Finanzamt
+    es dir mitteilt – das kann es, wenn dein Umsatz über 800.000 € oder dein Gewinn über 80.000 € liegt. Bis dahin ermittelst du
+    den Gewinn mit der Einnahmen-Überschuss-Rechnung. Die Buchführung ist eine laufende Pflicht; den Jahresabschluss macht in der
+    Regel deine Steuerberatung.'
 rechtsgrundlage:
-- HGB
+- §§ 238, 241a HGB
 - § 141 AO
 kategorie: steuern
 ausloeser:
@@ -23,15 +26,59 @@ ausloeser:
     label:
       de: Dein Unternehmen ist eine Kapitalgesellschaft.
   - feld: profil.rechtsform
-    op: in
-    wert:
-    - ek
-    - gmbh_co_kg
+    op: ==
+    wert: gmbh_co_kg
     label:
-      de: Dein Unternehmen ist im Handelsregister eingetragen.
+      de: Dein Unternehmen ist eine GmbH & Co. KG und damit nach dem Handelsgesetzbuch buchführungspflichtig.
+  # e.K.: nach HGB buchführungspflichtig, außer die Grenzen des § 241a HGB werden eingehalten (zwei aufeinanderfolgende Jahre;
+  # vereinfacht über das Vorjahr, im Gründungsjahr über die Schätzung für das erste Jahr)
   - all:
-    - &id001
-      all:
+    - feld: profil.rechtsform
+      op: ==
+      wert: ek
+      label:
+        de: Du bist als Kauffrau oder Kaufmann im Handelsregister eingetragen.
+    - any:
+      - all:
+        - feld: abgeleitet.ist_gruendungsjahr
+          op: ==
+          wert: false
+        - feld: abgeleitet.noch_nicht_gestartet
+          op: ==
+          wert: false
+        - any:
+          - feld: profil.umsatz.vorjahr
+            op: '>'
+            wert:
+              regelwert: steuern.hgb241a.grenze_umsatz
+            label:
+              de: Dein Umsatz im Vorjahr lag über 800.000 € – die Befreiung nach § 241a HGB greift nicht.
+          - feld: profil.gewinn.vorjahr
+            op: '>'
+            wert:
+              regelwert: steuern.hgb241a.grenze_gewinn
+            label:
+              de: Dein Gewinn im Vorjahr lag über 80.000 € – die Befreiung nach § 241a HGB greift nicht.
+      - all:
+        - feld: abgeleitet.ist_gruendungsjahr
+          op: ==
+          wert: true
+        - any:
+          - feld: profil.umsatz.prognose_laufendes_jahr
+            op: '>'
+            wert:
+              regelwert: steuern.hgb241a.grenze_umsatz
+            label:
+              de: Dein erwarteter Umsatz im ersten Jahr liegt über 800.000 € – die Befreiung nach § 241a HGB greift nicht.
+          - feld: profil.gewinn.prognose_laufendes_jahr
+            op: '>'
+            wert:
+              regelwert: steuern.hgb241a.grenze_gewinn
+            label:
+              de: Dein erwarteter Gewinn im ersten Jahr liegt über 80.000 € – die Befreiung nach § 241a HGB greift nicht.
+  # § 141 AO: Pflicht erst nach Mitteilung des Finanzamts (§ 141 Abs. 2 AO)
+  - all:
+    - all:
       - feld: abgeleitet.ist_gruendungsjahr
         op: ==
         wert: false
@@ -42,20 +89,24 @@ ausloeser:
       - feld: profil.taetigkeit.einordnung
         op: '!='
         wert: freiberuf
-    - feld: profil.umsatz.vorjahr
-      op: '>'
-      wert:
-        regelwert: steuern.ao141.grenze_umsatz
+    - any:
+      - feld: profil.umsatz.vorjahr
+        op: '>'
+        wert:
+          regelwert: steuern.ao141.grenze_umsatz
+        label:
+          de: Dein Umsatz im Vorjahr lag über der Grenze für die Buchführungspflicht nach § 141 AO.
+      - feld: profil.gewinn.vorjahr
+        op: '>'
+        wert:
+          regelwert: steuern.ao141.grenze_gewinn
+        label:
+          de: Dein Gewinn im Vorjahr lag über der Grenze für die Buchführungspflicht nach § 141 AO.
+    - feld: profil.steuern.buchfuehrung_mitteilung
+      op: ==
+      wert: true
       label:
-        de: Dein Umsatz im Vorjahr lag über der Grenze für die Buchführungspflicht.
-  - all:
-    - *id001
-    - feld: profil.gewinn.vorjahr
-      op: '>'
-      wert:
-        regelwert: steuern.ao141.grenze_gewinn
-      label:
-        de: Dein Gewinn im Vorjahr lag über der Grenze für die Buchführungspflicht.
+        de: Das Finanzamt hat dir mitgeteilt, dass du Bücher führen musst.
 frist:
   typ: dauerhaft
 wiederholung:
@@ -69,10 +120,21 @@ sanktion:
     de: Die Folgen sind noch nicht fachlich erfasst.
   schwere: hoch
 automatisierung: partner
+erledigung:
+  art: bestaetigen
+  zeitraum: jahr
+  bestaetigung:
+    de: Bücher für dieses Jahr laufend geführt
+aenderungsnotiz:
+  de: 'Eingetragene Kaufleute unter den Grenzen des § 241a HGB sind nicht mehr buchführungspflichtig; die Pflicht nach § 141 AO
+    gilt erst nach Mitteilung des Finanzamts. Eine Unterlage erledigt die Buchführung nicht mehr.'
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
 quellen:
+- titel: Handelsgesetzbuch § 241a
+  url: https://www.gesetze-im-internet.de/hgb/__241a.html
+  abgerufen: null
 - titel: Abgabenordnung § 141
   url: https://www.gesetze-im-internet.de/ao_1977/__141.html
   abgerufen: null
@@ -81,9 +143,9 @@ quellen:
   abgerufen: null
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- e.K. und GmbH & Co. KG als HGB-buchführungspflichtig angenommen – bestätigen
+- 'e. K. nach § 241a HGB (R10, Steuerprüfung): Zwei-Jahres-Betrachtung vereinfacht über das Vorjahr bzw. im Gründungsjahr über die Schätzung; Jahresüberschuss = angegebener Gewinn'
 - Im Gründungsjahr und vor dem Start gibt es keine Vorjahreswerte – § 141-Grenzen dann als nicht überschritten behandelt
-- '§ 141 AO: Pflicht beginnt erst nach Mitteilung des Finanzamts – berücksichtigen'
+- '§ 141 AO erst nach Mitteilung des Finanzamts (§ 141 Abs. 2 AO) über die Frage „Mitteilung erhalten?“ umgesetzt (R10, Steuerprüfung)'
 - Grenze inklusive/exklusive
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 pruefung:

@@ -10,6 +10,7 @@ fakten:
   profil.beschaeftigte.gesamt: 4
   profil.kunden.segmente: [b2c]
   profil.produkte.arten: [dienstleistung, kosmetik]
+  profil.produkte.hersteller: true
   profil.arbeitsschutz.gefahrstoffe: true
   profil.bundesland: RP
   profil.gemeinde_ags: "07315000"

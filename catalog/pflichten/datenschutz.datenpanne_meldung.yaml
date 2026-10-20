@@ -1,7 +1,7 @@
 # Katalog F.60 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: datenschutz.datenpanne_meldung
-version: 1
+version: 2
 katalog_nr: F.60
 titel:
   de: Datenpanne der Aufsichtsbehörde melden
@@ -36,7 +36,7 @@ kanal: portal
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Bußgeld nach Art. 83 Abs. 4 DSGVO.
   schwere: hoch
 automatisierung: dokument_generator
 aktion:

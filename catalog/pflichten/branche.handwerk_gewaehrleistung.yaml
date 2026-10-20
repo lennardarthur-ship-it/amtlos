@@ -1,7 +1,7 @@
 # Katalog H.2 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.handwerk_gewaehrleistung
-version: 1
+version: 2
 katalog_nr: H.2
 titel:
   de: Gewährleistung im Blick behalten
@@ -35,6 +35,7 @@ sanktion:
     de: Keine eigene Pflicht – Hinweis zum Risiko.
   schwere: niedrig
 automatisierung: hinweis
+einordnung: hinweis
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null

@@ -1,7 +1,7 @@
 # Katalog C.27 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.est_erklaerung
-version: 1
+version: 2
 katalog_nr: C.27
 titel:
   de: Einkommensteuererklärung abgeben
@@ -20,12 +20,8 @@ ausloeser:
   - einzelunternehmen
   - freiberuf
   - ek
-  - gbr
-  - partg
-  - partg_mbb
-  - gmbh_co_kg
   label:
-    de: Du bist als Person oder über eine Personengesellschaft unternehmerisch tätig.
+    de: Du bist als Einzelperson unternehmerisch tätig.
 frist:
   typ: wiederkehrend
   rhythmus: jaehrlich
@@ -51,6 +47,9 @@ sanktion:
     de: Die Folgen sind noch nicht fachlich erfasst.
   schwere: mittel
 automatisierung: formular_vorausfuellen
+aenderungsnotiz:
+  de: Bei GbR, Partnerschaftsgesellschaft und GmbH & Co. KG gibt die Gesellschaft jetzt die Feststellungserklärung ab (eigene Pflicht);
+    die Einkommensteuererklärung machen die Gesellschafter persönlich.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -72,7 +71,6 @@ fachlich_zu_pruefen:
 - Übergangsfristen Art. 97 § 36 EGAO (Veranlagungszeiträume bis 2024) sind nicht abgebildet – ab Veranlagungszeitraum 2025 gilt § 149 AO regulär
 - Vorabanforderung nach § 149 Abs. 4 AO (frühere Frist im Einzelfall) und Fristverlängerung auf Antrag nicht abgebildet
 - 'Verschiebung auf den nächsten Werktag nach § 108 Abs. 3 AO – Feiertagskalender des Bundeslands prüfen'
-- 'Personengesellschaften: Feststellungserklärung der Gesellschaft zusätzlich?'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:

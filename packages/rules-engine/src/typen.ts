@@ -81,6 +81,10 @@ export interface Pflicht {
   gueltig_ab: Datum | null;
   gueltig_bis?: Datum | null;
   erneut_erledigen?: boolean;
+  /** R10: Pflicht, Hinweis oder freiwillige Option (Standard: Pflicht) */
+  einordnung?: "pflicht" | "hinweis" | "option";
+  /** R10: wann die Pflicht in der App als erledigt gilt (Standard: einmalig) */
+  erledigung?: { art: "einmalig" | "laufend" | "bestaetigen"; zeitraum?: "monat" | "jahr"; naechster_termin_aus?: string; bestaetigung?: Text };
   [weitere: string]: unknown;
 }
 

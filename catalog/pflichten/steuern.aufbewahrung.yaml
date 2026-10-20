@@ -1,7 +1,7 @@
 # Katalog C.32 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.aufbewahrung
-version: 1
+version: 2
 katalog_nr: C.32
 titel:
   de: Unterlagen aufbewahren
@@ -9,9 +9,12 @@ kurz:
   de: Bewahre Belege und Rechnungen 8 Jahre, Jahresabschlüsse und Bücher 10 Jahre und Geschäftsbriefe 6 Jahre auf.
 erklaerung:
   de: 'Buchungsbelege einschließlich Rechnungen: 8 Jahre. Jahresabschlüsse, Bücher und Organisationsunterlagen: 10 Jahre.
-    Handels- und Geschäftsbriefe: 6 Jahre. Amtlos zeigt dir, wann du Unterlagen löschen darfst.'
+    Handels- und Geschäftsbriefe: 6 Jahre. Die Frist läuft aber nicht ab, solange die Unterlagen für Steuern von Bedeutung sind,
+    deren Festsetzungsfrist noch nicht abgelaufen ist – zum Beispiel bei einer laufenden Betriebsprüfung oder einem offenen Einspruch.
+    Amtlos zeigt dir, ab wann du Unterlagen frühestens löschen darfst; ob noch etwas offen ist, klärst du vorher mit deiner Steuerberatung.'
 rechtsgrundlage:
 - § 147 AO
+- § 147 Abs. 3 S. 5 AO (Ablaufhemmung)
 - § 257 HGB
 kategorie: steuern
 ausloeser:
@@ -29,6 +32,8 @@ sanktion:
     de: Die Folgen sind noch nicht fachlich erfasst.
   schwere: mittel
 automatisierung: hinweis
+aenderungsnotiz:
+  de: 'Ergänzt: Die Aufbewahrungsfrist läuft nicht ab, solange für die Unterlagen eine Festsetzungsfrist noch offen ist (§ 147 Abs. 3 S. 5 AO).'
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null

@@ -1,18 +1,20 @@
 # Katalog D.38 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.sv_anmeldung
-version: 1
+version: 2
 katalog_nr: D.38
 titel:
   de: Beschäftigte bei der Sozialversicherung anmelden
 kurz:
-  de: Jede neue beschäftigte Person meldest du bei der Krankenkasse an.
+  de: Jede neue beschäftigte Person meldest du mit der ersten Lohnabrechnung bei der Krankenkasse an, spätestens sechs Wochen nach Beginn.
 erklaerung:
   de: Die Anmeldung zur Sozialversicherung (DEÜV) geht an die Krankenkasse der beschäftigten Person, bei Minijobs an die Minijob-Zentrale.
-    Die Meldung läuft über ein systemgeprüftes Lohnprogramm.
+    Sie ist mit der ersten folgenden Entgeltabrechnung fällig, spätestens sechs Wochen nach Beginn der Beschäftigung. Die Meldung
+    läuft über ein systemgeprüftes Lohnprogramm. In Branchen mit Sofortmeldepflicht kommt am ersten Arbeitstag die Sofortmeldung
+    dazu.
 rechtsgrundlage:
 - § 28a SGB IV
-- DEÜV
+- § 6 DEÜV
 kategorie: personal
 ausloeser:
   ereignis: einstellung
@@ -25,7 +27,7 @@ frist:
   typ: relativ
   bezug:
     ereignis: einstellung
-  versatz: P0D
+  versatz: P6W
   zeitpunkt: spaetestens
   je_ereignis: true
   verschiebung:
@@ -39,9 +41,16 @@ kanal: partner
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Bußgeld bis 25.000 € (§ 111 SGB IV).
   schwere: hoch
 automatisierung: partner
+erledigung:
+  art: bestaetigen
+  bestaetigung:
+    de: Über das Lohnprogramm gemeldet
+aenderungsnotiz:
+  de: 'Frist korrigiert: mit der ersten Lohnabrechnung, spätestens sechs Wochen nach Beginn (§ 6 DEÜV). Die Unterlage mit den Meldedaten
+    erledigt die Meldung nicht – erledigt ist sie, wenn du die Meldung bestätigst.'
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -50,8 +59,8 @@ quellen:
   url: https://www.gesetze-im-internet.de/sgb_4/__28a.html
   abgerufen: null
 fachlich_zu_pruefen:
-- Frist der Anmeldung steht nicht in der Spezifikation – als spätestens bei Beschäftigungsbeginn eingetragen, fachlich ersetzen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Frist nach § 6 DEÜV (erste Entgeltabrechnung, spätestens sechs Wochen) als „spätestens sechs Wochen nach Beginn“ umgesetzt (R10, Rechtsprüfung) – die frühere Abrechnung als Termin ist nicht abgebildet'
+- 'Sanktion aus der Rechtsprüfung R10 (G-16) übernommen – Fundstelle bestätigen'
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf

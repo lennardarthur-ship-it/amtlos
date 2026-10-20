@@ -1,0 +1,14 @@
+persona: handwerk
+beschreibung: "R10 (Nutzertests Sabine, Mehmet): kein Kleinunternehmer, Umsatz über der Kleinunternehmergrenze, Steuer des Vorjahres unbekannt – Voranmeldung gilt, nur der Rhythmus ist offen"
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2014-04-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.ust.kleinunternehmer: false
+  profil.umsatz.vorjahr: 210000
+  profil.bundesland: BY
+erwartet:
+  steuern.ust_voranmeldung: gilt
+fehlende_fakten:
+  steuern.ust_voranmeldung: [profil.ust.zahllast_vorjahr]

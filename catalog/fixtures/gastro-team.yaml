@@ -59,7 +59,8 @@ erwartet:
 termine_enthaelt:
   # je Einstellung eine Instanz (je_ereignis)
   personal.sofortmeldung: [["aenderung-20260901", "2026-09-01"], ["aenderung-20261102", "2026-11-02"]]
-  personal.sv_anmeldung: [["aenderung-20260901", "2026-09-01"], ["aenderung-20261102", "2026-11-02"]]
+  # § 6 DEÜV: mit der ersten Entgeltabrechnung, spätestens sechs Wochen nach Beginn (R10)
+  personal.sv_anmeldung: [["aenderung-20260901", "2026-10-13"], ["aenderung-20261102", "2026-12-14"]]
   # vor Arbeitsaufnahme: spätestens am Tag davor
   arbeitsschutz.erstunterweisung: [["aenderung-20261102", "2026-11-01"]]
   arbeitsschutz.unterweisung_wiederholen: [["aenderung-20251115", "2026-11-15"]]

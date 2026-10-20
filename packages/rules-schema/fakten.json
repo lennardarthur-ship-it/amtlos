@@ -152,10 +152,28 @@
       "ab": 2
     },
     {
+      "pfad": "profil.steuern.buchfuehrung_mitteilung",
+      "typ": "bool",
+      "herleitung": "Onboarding (R10): Mitteilung des Finanzamts über die Buchführungspflicht nach § 141 Abs. 2 AO erhalten",
+      "ab": 10
+    },
+    {
       "pfad": "profil.ust.kleinunternehmer",
       "typ": "bool",
       "herleitung": "Onboarding: Kleinunternehmerregelung gewählt",
       "ab": 2
+    },
+    {
+      "pfad": "profil.ust.voranmeldung_rhythmus",
+      "typ": "enum",
+      "werte": [
+        "monatlich",
+        "quartalsweise",
+        "keine",
+        "unklar"
+      ],
+      "herleitung": "Onboarding (R10): wie oft die Voranmeldung abgegeben wird – „keine“ = vom Finanzamt befreit",
+      "ab": 10
     },
     {
       "pfad": "profil.ust.dauerfristverlaengerung",
@@ -223,10 +241,28 @@
       "ab": 2
     },
     {
+      "pfad": "profil.produkte.hersteller",
+      "typ": "bool",
+      "herleitung": "Onboarding (R10): stellt eigene Produkte her, verkauft unter eigenem Namen bzw. eigener Marke oder importiert von außerhalb der EU",
+      "ab": 10
+    },
+    {
+      "pfad": "profil.produkte.erstinverkehrbringer",
+      "typ": "bool",
+      "herleitung": "Onboarding (R10): bringt Elektrogeräte oder Batterien selbst erstmals in Deutschland in Verkehr (Herstellung, Eigenmarke, Import)",
+      "ab": 10
+    },
+    {
       "pfad": "profil.online.website",
       "typ": "bool",
       "herleitung": "Onboarding: eigene Website (auch ohne Shop)",
       "ab": 7
+    },
+    {
+      "pfad": "profil.online.social_media",
+      "typ": "bool",
+      "herleitung": "Onboarding (R10): geschäftliches Profil in sozialen Netzwerken",
+      "ab": 10
     },
     {
       "pfad": "profil.handel.hohe_bargeschaefte",
@@ -313,13 +349,17 @@
         "bau",
         "gastronomie",
         "personenbefoerderung",
+        "spedition_logistik",
+        "schausteller",
+        "forstwirtschaft",
         "gebaeudereinigung",
         "messebau",
         "fleischwirtschaft",
+        "prostitution",
         "sicherheitsgewerbe",
         "keine"
       ],
-      "herleitung": "Onboarding; Liste aus Spezifikation D.38 (§ 28a Abs. 4 SGB IV)",
+      "herleitung": "Onboarding; Branchen nach § 28a Abs. 4 SGB IV (R10 vervollständigt; „gastronomie“ = Gaststätten und Beherbergung)",
       "ab": 5
     },
     {
@@ -333,6 +373,17 @@
       ],
       "herleitung": "Angabe des Nutzers (vom Finanzamt festgelegt; Grenzen nicht in der Spezifikation)",
       "ab": 5
+    },
+    {
+      "pfad": "profil.personal.lohn_durch",
+      "typ": "enum",
+      "werte": [
+        "selbst",
+        "steuerberatung",
+        "lohnbuero"
+      ],
+      "herleitung": "Onboarding (R10): wer die Lohnabrechnung und die Meldungen macht",
+      "ab": 10
     },
     {
       "pfad": "profil.arbeitsschutz.elektrische_geraete",

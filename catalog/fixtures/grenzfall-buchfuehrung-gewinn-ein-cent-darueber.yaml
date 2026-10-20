@@ -1,5 +1,5 @@
 persona: grenzfall
-beschreibung: Gewinn im Vorjahr 80.000,01 € – buchführungspflichtig, keine EÜR
+beschreibung: Gewinn im Vorjahr 80.000,01 € – buchführungspflichtig, keine EÜR (R10, mit Mitteilung des Finanzamts nach § 141 Abs. 2 AO)
 stichtag: '2026-10-11'
 fakten:
   profil.rechtsform: einzelunternehmen
@@ -7,6 +7,7 @@ fakten:
   profil.taetigkeit.einordnung: gewerbe
   profil.umsatz.vorjahr: 300000
   profil.bundesland: BE
+  profil.steuern.buchfuehrung_mitteilung: true
   profil.gewinn.vorjahr: 80000.01
 erwartet:
   steuern.buchfuehrungspflicht: gilt

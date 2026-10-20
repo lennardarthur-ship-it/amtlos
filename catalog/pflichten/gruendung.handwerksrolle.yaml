@@ -1,37 +1,42 @@
-# Katalog A.4 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog A.4 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft · R10: nur noch Anlage A; Anlage B1/B2 in gruendung.handwerk_verzeichnis (§ 19 HwO)
 schema_version: 1
 id: gruendung.handwerksrolle
-version: 1
+version: 2
 katalog_nr: A.4
 titel:
-  de: In die Handwerksrolle eintragen
+  de: In die Handwerksrolle eintragen (Anlage A)
 kurz:
-  de: Wenn du ein Handwerk betreibst, musst du dich bei der Handwerkskammer eintragen lassen.
+  de: Ein zulassungspflichtiges Handwerk darfst du erst betreiben, wenn du in die Handwerksrolle eingetragen bist.
 erklaerung:
-  de: Zulassungspflichtige Handwerke (Anlage A der Handwerksordnung) brauchen einen Meisterbrief oder eine Ausnahme. Zulassungsfreie
-    Handwerke (Anlage B) müssen ebenfalls eingetragen werden.
+  de: Zulassungspflichtige Handwerke (Anlage A der Handwerksordnung) brauchen einen Meisterbrief oder eine Ausnahme. Den selbstständigen
+    Betrieb darfst du erst nach der Eintragung in die Handwerksrolle aufnehmen – die Eintragung muss also vor dem Beginn stehen.
 begriffe:
 - begriff:
     de: Handwerksrolle
   erklaerung:
-    de: Das Verzeichnis der Handwerkskammer, in dem Handwerksbetriebe eingetragen sind.
+    de: Das Verzeichnis der Handwerkskammer für zulassungspflichtige Handwerke (Anlage A).
 rechtsgrundlage:
-- HwO
+- § 1 HwO
+- § 6 HwO
 kategorie: gruendung
 branchen:
 - handwerk
 ausloeser:
   feld: profil.handwerk.anlage
-  op: in
-  wert:
-  - a
-  - b1
-  - b2
+  op: ==
+  wert: a
   label:
-    de: Dein Betrieb ist ein Handwerk nach Anlage A oder B der Handwerksordnung.
+    de: Dein Betrieb ist ein zulassungspflichtiges Handwerk nach Anlage A der Handwerksordnung.
 phase: gruendung
 frist:
-  typ: dauerhaft
+  typ: relativ
+  bezug:
+    fakt: profil.gruendungsdatum
+  versatz: P0D
+  zeitpunkt: vor_beginn
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
 wiederholung:
   art: einmalig
 stelle:
@@ -43,6 +48,9 @@ sanktion:
     de: Die Folgen sind noch nicht fachlich erfasst.
   schwere: mittel
 automatisierung: hinweis
+aenderungsnotiz:
+  de: Gilt jetzt nur für zulassungspflichtige Handwerke (Anlage A) und muss vor dem Beginn erledigt sein. Für Anlage B gibt es den
+    eigenen Schritt „Im Verzeichnis der Handwerkskammer eintragen“.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -51,8 +59,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/hwo/
   abgerufen: null
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- 'Anlage B2 (handwerksähnliche Gewerbe): ebenfalls eintragungspflichtig im Sinne der Spezifikation? Verzeichnis statt Rolle?'
+- 'Frist „vor Beginn“ nach § 1 HwO (Betrieb erst nach Eintragung) umgesetzt (R10, Rechtsprüfung) – Paragrafen der Eintragung bestätigen'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 pruefung:
   status: entwurf

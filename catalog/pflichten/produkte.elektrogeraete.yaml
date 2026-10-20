@@ -1,25 +1,33 @@
 # Katalog G.72 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: produkte.elektrogeraete
-version: 2
+version: 3
 katalog_nr: G.72
 titel:
   de: Elektrogeräte bei der stiftung ear registrieren
 kurz:
-  de: Bevor du Elektrogeräte verkaufst, registrierst du dich bei der stiftung ear.
+  de: Bringst du Elektrogeräte selbst erstmals in Deutschland in Verkehr, registrierst du dich vorher bei der stiftung ear.
 erklaerung:
-  de: Hersteller und Händler, die als Hersteller gelten, müssen sich nach dem ElektroG vor dem Verkauf registrieren.
+  de: Hersteller und Händler, die als Hersteller gelten, müssen sich nach dem ElektroG vor dem Verkauf registrieren. Als Hersteller
+    gilt auch, wer unter eigener Marke verkauft oder Geräte nach Deutschland einführt. Wer bei einem Händler in Deutschland kauft
+    und weiterverkauft oder einbaut, ist in der Regel nicht Hersteller.
 rechtsgrundlage:
 - ElektroG
 kategorie: produkte
 branchen:
 - onlinehandel
 ausloeser:
-  feld: profil.produkte.arten
-  op: enthaelt
-  wert: elektrogeraete
-  label:
-    de: Du verkaufst Elektrogeräte.
+  all:
+  - feld: profil.produkte.arten
+    op: enthaelt
+    wert: elektrogeraete
+    label:
+      de: Du verkaufst Elektrogeräte.
+  - feld: profil.produkte.erstinverkehrbringer
+    op: ==
+    wert: true
+    label:
+      de: Du bringst Elektrogeräte oder Batterien selbst erstmals in Deutschland in Verkehr (Herstellung, Eigenmarke oder Import).
 frist:
   typ: dauerhaft
 wiederholung:
@@ -33,6 +41,9 @@ sanktion:
     de: Die Folgen sind noch nicht fachlich erfasst.
   schwere: hoch
 automatisierung: hinweis
+aenderungsnotiz:
+  de: Gilt erst, wenn du die Geräte oder Batterien selbst erstmals in Deutschland in Verkehr bringst – nicht beim Einkauf im deutschen
+    Großhandel.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -41,6 +52,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/elektrog_2015/
   abgerufen: null
 fachlich_zu_pruefen:
+- 'Rückfrage „selbst erstmals in Deutschland in Verkehr (Herstellung, Eigenmarke, Import)“ vor dem Auslösen (R10, K-430) – Installateur mit Einkauf im inländischen Großhandel als Nicht-Hersteller bestätigen; Pflichten als Vertreiber (Rücknahme) nicht abgebildet'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Wer gilt als Hersteller (Import, Eigenmarke)?
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen

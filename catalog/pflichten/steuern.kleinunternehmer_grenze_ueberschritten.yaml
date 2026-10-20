@@ -1,7 +1,7 @@
 # Katalog C.23 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.kleinunternehmer_grenze_ueberschritten
-version: 1
+version: 2
 katalog_nr: C.23
 titel:
   de: 'Kleinunternehmergrenze überschritten: Umsatzsteuer prüfen'
@@ -93,6 +93,7 @@ sanktion:
     de: Ab dem Umsatz über der Grenze fällt Umsatzsteuer an, auch wenn du sie nicht berechnet hast.
   schwere: hoch
 automatisierung: hinweis
+einordnung: hinweis
 aktion:
   art: abhaken
 status_recht: in_kraft

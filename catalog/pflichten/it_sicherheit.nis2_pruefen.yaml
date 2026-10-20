@@ -1,7 +1,7 @@
 # Katalog F.64 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: it_sicherheit.nis2_pruefen
-version: 1
+version: 2
 katalog_nr: F.64
 titel:
   de: Prüfen, ob NIS2 für dich gilt
@@ -38,6 +38,7 @@ sanktion:
     de: Ohne diese Klärung bleibt offen, ob Registrierung und Meldepflichten gelten.
   schwere: mittel
 automatisierung: hinweis
+einordnung: hinweis
 aktion:
   art: formular
   ziel: onboarding.daten

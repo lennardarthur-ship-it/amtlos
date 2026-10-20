@@ -1,17 +1,18 @@
-# Katalog H.1 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog H.1 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft · R10: aufgeteilt in Bescheinigung vor Beginn (§ 43 Abs. 1, branche.gastro_ifsg_bescheinigung), Belehrung nach Aufnahme der Tätigkeit (§ 43 Abs. 4, diese Pflicht) und Folgebelehrung alle zwei Jahre (branche.gastro_ifsg_folgebelehrung)
 schema_version: 1
 id: branche.gastro_ifsg_belehrung
-version: 1
+version: 2
 katalog_nr: H.1
 titel:
-  de: Belehrung nach § 43 Infektionsschutzgesetz
+  de: Belehrung nach § 43 IfSG durch den Arbeitgeber
 kurz:
-  de: Wer bei dir mit Lebensmitteln arbeitet, braucht vor dem ersten Arbeitstag die Belehrung nach § 43 IfSG.
+  de: Wer neu bei dir mit Lebensmitteln arbeitet, belehrst du nach Aufnahme der Tätigkeit selbst und dokumentierst das.
 erklaerung:
-  de: Die Erstbelehrung macht das Gesundheitsamt oder ein beauftragter Arzt; die Bescheinigung bewahrst du auf. Danach belehrst
-    du selbst in Abständen. Amtlos dokumentiert die Belehrung im Unterweisungsmodul.
+  de: Neben der Bescheinigung des Gesundheitsamts vor dem ersten Arbeitstag belehrst du als Arbeitgeber neue Beschäftigte nach
+    Aufnahme der Tätigkeit über die Tätigkeitsverbote und Verpflichtungen nach §§ 42 und 43 IfSG und dokumentierst die Belehrung.
+    Danach wiederholst du sie alle zwei Jahre – siehe „Belehrung nach § 43 IfSG alle zwei Jahre wiederholen“.
 rechtsgrundlage:
-- § 43 IfSG
+- § 43 Abs. 4 IfSG
 kategorie: branche
 branchen:
 - gastronomie_lebensmittel
@@ -31,7 +32,7 @@ frist:
   bezug:
     ereignis: einstellung
   versatz: P0D
-  zeitpunkt: vor_beginn
+  zeitpunkt: spaetestens
   je_ereignis: true
   verschiebung:
     regel: keine
@@ -39,7 +40,7 @@ frist:
 wiederholung:
   art: einmalig
 stelle:
-  de: Gesundheitsamt; danach du selbst
+  de: Du selbst
 kanal: intern_dokumentieren
 kosten: null
 sanktion:
@@ -51,6 +52,9 @@ aktion:
   art: link
   ziel: app.ifsg
   nachweis_erforderlich: true
+aenderungsnotiz:
+  de: Aufgeteilt in die Bescheinigung des Gesundheitsamts vor dem ersten Arbeitstag, deine Belehrung nach Aufnahme der Tätigkeit und
+    die Wiederholung alle zwei Jahre mit Erinnerung.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -59,9 +63,8 @@ quellen:
   url: https://www.gesetze-im-internet.de/ifsg/__43.html
   abgerufen: null
 fachlich_zu_pruefen:
-- Abstand der Folgebelehrungen und Höchstalter der Bescheinigung stehen nicht in der Spezifikation – ergänzen
-- Gilt das auch für die Inhaberin selbst?
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- '„Nach Aufnahme der Tätigkeit“ als spätestens am ersten Arbeitstag umgesetzt (R10) – Frist fachlich bestätigen'
+- Höhe und Nummer der Bußgeldvorschrift in § 73 IfSG unsicher – Sanktion fachlich ergänzen
 pruefung:
   status: entwurf
   geprueft_von: null

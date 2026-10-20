@@ -1,15 +1,17 @@
 # Katalog D.38 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.sofortmeldung
-version: 1
+version: 2
 katalog_nr: D.38
 titel:
   de: Sofortmeldung bei Arbeitsbeginn
 kurz:
   de: In deiner Branche meldest du neue Beschäftigte spätestens bei Arbeitsbeginn sofort an.
 erklaerung:
-  de: In den Branchen nach § 28a Abs. 4 SGB IV – unter anderem Bau, Gastronomie, Personenbeförderung, Gebäudereinigung, Messebau,
-    Fleischwirtschaft und Sicherheitsgewerbe – ist eine Sofortmeldung bei Arbeitsbeginn Pflicht.
+  de: 'In den Branchen nach § 28a Abs. 4 SGB IV ist eine Sofortmeldung spätestens bei Arbeitsbeginn Pflicht: Baugewerbe, Gaststätten-
+    und Beherbergungsgewerbe, Personenbeförderung, Speditions-, Transport- und damit verbundenes Logistikgewerbe, Schaustellergewerbe,
+    Forstwirtschaft, Gebäudereinigung, Auf- und Abbau von Messen und Ausstellungen, Fleischwirtschaft, Prostitutionsgewerbe sowie
+    Wach- und Sicherheitsgewerbe. Die Anmeldung zur Sozialversicherung mit der ersten Lohnabrechnung kommt dazu.'
 rechtsgrundlage:
 - § 28a Abs. 4 SGB IV
 kategorie: personal
@@ -25,9 +27,13 @@ ausloeser:
     - bau
     - gastronomie
     - personenbefoerderung
+    - spedition_logistik
+    - schausteller
+    - forstwirtschaft
     - gebaeudereinigung
     - messebau
     - fleischwirtschaft
+    - prostitution
     - sicherheitsgewerbe
     label:
       de: Dein Betrieb gehört zu einer Branche mit Sofortmeldepflicht.
@@ -55,9 +61,15 @@ kanal: partner
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Bußgeld bis 25.000 € (§ 111 SGB IV).
   schwere: hoch
 automatisierung: partner
+erledigung:
+  art: bestaetigen
+  bestaetigung:
+    de: Über das Lohnprogramm gemeldet
+aenderungsnotiz:
+  de: Die Branchenliste ist jetzt vollständig nach § 28a Abs. 4 SGB IV, unter anderem mit Hotels, Spedition, Transport und Logistik.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -67,8 +79,8 @@ quellen:
   abgerufen: null
 fachlich_zu_pruefen:
 - „Bei Arbeitsbeginn“ als spätestens am Tag des Beginns umgesetzt – bestätigen
-- Branchenliste vollständig (§ 28a Abs. 4 SGB IV)?
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Branchenliste nach § 28a Abs. 4 SGB IV vervollständigt (R10, Rechtsprüfung): Beherbergung unter „Gastronomie“, Spedition/Transport/Logistik, Schausteller, Forstwirtschaft, Prostitutionsgewerbe – Zuordnung von Elektro- und Ausbaugewerken zum Baugewerbe offen'
+- 'Sanktion aus der Rechtsprüfung R10 (G-16) übernommen – Fundstelle bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

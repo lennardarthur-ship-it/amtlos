@@ -5,22 +5,25 @@ import { parse } from "yaml";
 import { describe, expect, it } from "vitest";
 import { VORLAGEN } from "@amtlos/fachlogik";
 import { LEERER_STAND, anlegen, erledigtSetzen, profilSetzen, standAus } from "../src/unterlagen/speicher";
-import { CHECK_FELDER, KATALOG, auswertung, checkFragen, ereignisseAusStand, dringlichkeit, erinnerungsPlan, fortschritt, frageZu, gruendungsSchritte, istErledigt, offeneFragenNachWirkung, selten, zusatzFragen, type PflichtInfo, type Profil } from "../src/pflichten/check";
+import { CHECK_FELDER, KATALOG, auswertung, checkFragen, ereignisseAusStand, dringlichkeit, erinnerungsPlan, folgeAntworten, fortschritt, frageZu, gruendungsSchritte, istErledigt, offeneFragenNachWirkung, offeneKernFragen, selten, zusatzFragen, type PflichtInfo, type Profil } from "../src/pflichten/check";
 
 const FIXTURES = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../catalog/fixtures");
 const salon: Profil = { "taetigkeit.branchen": ["beauty_kosmetik"], rechtsform: "einzelunternehmen", "taetigkeit.einordnung": "gewerbe", bundesland: "BY", "beschaeftigte.gesamt": 3, "kasse.elektronisch": true, "online.website": false, "ust.kleinunternehmer": false, gruendungsdatum: "2024-03-01" };
 const ids = (l: { id: string }[]) => l.map((p) => p.id);
 
 describe("Pflichten-Check", () => {
-  it("„Kurz klären“ fragt nur, was für den Betrieb gestellt wird – die Investoren-Frage für jede Rechtsform (AWV, Szenario Shop)", () => {
+  it("„Kurz klären“ fragt nur, was für den Betrieb gestellt wird – die Investoren-Frage nur bei Gesellschaften (R10)", () => {
     const felder = offeneFragenNachWirkung(auswertung(salon, "2026-10-13"), salon).map((o) => o.feld);
     expect(felder).not.toContain("gesellschaft.handelsregister");
-    // Einzelunternehmen: Frage wird gestellt, „Nein“ klärt AWV-Meldung und Investitionsprüfung
-    expect(felder).toContain("gesellschafter.auslaendische_investoren");
+    // Einzelunternehmen: keine Investoren-Frage (Nutzertests Mehmet, Jonas, Sabine)
+    expect(felder).not.toContain("gesellschafter.auslaendische_investoren");
     const nein = { ...salon, "gesellschafter.auslaendische_investoren": false };
     expect(ids(auswertung(nein, "2026-10-13").unbekannt)).not.toEqual(expect.arrayContaining(["gesellschaft.awv_meldung"]));
     const gmbh = { ...salon, rechtsform: "gmbh" };
     expect(offeneFragenNachWirkung(auswertung(gmbh, "2026-10-13"), gmbh).map((o) => o.feld)).toContain("gesellschafter.auslaendische_investoren");
+    // ohne Beschäftigte keine Fragen zum Personal
+    const allein = { ...salon, "beschaeftigte.gesamt": 0 };
+    expect(offeneFragenNachWirkung(auswertung(allein, "2026-10-13"), allein).map((o) => o.feld)).not.toEqual(expect.arrayContaining(["beschaeftigte.minijob"]));
   });
   it("bestehender Betrieb mit Beschäftigten: Pflichten mit Auslöser „einstellung“ gelten (Ereignisse wie auf dem Server)", () => {
     const cafe: Profil = { "taetigkeit.branchen": ["gastronomie_lebensmittel"], rechtsform: "einzelunternehmen", "taetigkeit.einordnung": "gewerbe", bundesland: "SN", "beschaeftigte.gesamt": 2, "kasse.elektronisch": true, "online.website": true, "ust.kleinunternehmer": false, steuerberater: true, gruendungsdatum: "2022-03-01" };
@@ -29,13 +32,20 @@ describe("Pflichten-Check", () => {
       { typ: "erste_einstellung", datum: "2022-03-01" },
     ]);
     const a = auswertung(cafe, "2026-01-15");
-    expect(ids(a.gilt)).toEqual(expect.arrayContaining(["branche.gastro_ifsg_belehrung", "personal.nachweisgesetz", "personal.sv_anmeldung", "arbeitsschutz.erstunterweisung"]));
+    // R10: läuft der Betrieb länger und gab es keine neue Einstellung, stehen die Einstellungs-Pflichten unter „Bei Neueinstellung“
+    const einstellung = ["branche.gastro_ifsg_bescheinigung", "branche.gastro_ifsg_belehrung", "personal.nachweisgesetz", "personal.sv_anmeldung", "arbeitsschutz.erstunterweisung"];
+    expect(ids(a.beiEinstellung)).toEqual(expect.arrayContaining(einstellung));
+    for (const id of einstellung) expect(ids(a.gilt), id).not.toContain(id);
     // Termine der Einstellung liegen in der Vergangenheit – kein erfundener „überfälliger“ Termin
-    for (const id of ["branche.gastro_ifsg_belehrung", "personal.nachweisgesetz"]) expect(a.gilt.find((p) => p.id === id)!.naechsterTermin, id).toBeNull();
+    for (const id of ["branche.gastro_ifsg_belehrung", "personal.nachweisgesetz"]) expect(a.beiEinstellung.find((p) => p.id === id)!.naechsterTermin, id).toBeNull();
+    // neue Mitarbeiterin mit „Beschäftigt seit“ ⇒ die Einstellungs-Pflichten sind wieder dran
+    const neu = auswertung(cafe, "2026-01-15", [], [{ name: "Ina", beginn: "2026-01-20" }]);
+    expect(ids(neu.gilt)).toEqual(expect.arrayContaining(einstellung));
+    expect(neu.gilt.find((p) => p.id === "arbeitsschutz.erstunterweisung")!.naechsterTermin).toBe("2026-01-19");
     // ohne Beschäftigte keine Einstellung, also auch keine dieser Pflichten
     const allein = auswertung({ ...cafe, "beschaeftigte.gesamt": 0 }, "2026-01-15");
     expect(ereignisseAusStand({ ...cafe, "beschaeftigte.gesamt": 0 }, "2026-01-15")).toEqual([]);
-    for (const id of ["branche.gastro_ifsg_belehrung", "personal.nachweisgesetz", "personal.sv_anmeldung"]) expect(ids(allein.gilt), id).not.toContain(id);
+    for (const id of ["branche.gastro_ifsg_belehrung", "personal.nachweisgesetz", "personal.sv_anmeldung"]) expect(ids([...allein.gilt, ...allein.beiEinstellung]), id).not.toContain(id);
     // Gründung in der Zukunft: Einstellung geplant, noch nicht eingetreten
     const spaeter = auswertung({ ...cafe, gruendungsdatum: "2026-06-01" }, "2026-01-15");
     expect(ids(spaeter.gilt)).not.toContain("personal.nachweisgesetz");
@@ -59,6 +69,23 @@ describe("Pflichten-Check", () => {
     expect(checkFragen({}).map((f) => f.feld)).not.toContain("gesellschaft.handelsregister");
     expect(checkFragen({ rechtsform: "gmbh" }).map((f) => f.feld)).toContain("gesellschaft.handelsregister");
     expect(checkFragen({}).length).toBeLessThanOrEqual(10);
+    // R10: branchentypische Fragen im Kern-Check, Minijob direkt nach der Zahl der Beschäftigten
+    const felder = (p: Profil) => checkFragen(p).map((f) => f.feld);
+    const gastro = felder({ "taetigkeit.branchen": ["gastronomie_lebensmittel"], "beschaeftigte.gesamt": 4 });
+    expect(gastro.indexOf("beschaeftigte.minijob")).toBe(gastro.indexOf("beschaeftigte.gesamt") + 1);
+    expect(felder({ "taetigkeit.branchen": ["beauty_kosmetik"], "beschaeftigte.gesamt": 2 })).toEqual(expect.arrayContaining(["arbeitsschutz.gefahrstoffe", "arbeitsschutz.elektrische_geraete", "beschaeftigte.jugendlich"]));
+    expect(felder({ "taetigkeit.branchen": ["handwerk"], "beschaeftigte.gesamt": 2 })).toEqual(expect.arrayContaining(["bauleistungen.fuer_unternehmen", "arbeitsschutz.elektrische_geraete", "beschaeftigte.jugendlich"]));
+    expect(felder({ "taetigkeit.branchen": ["handwerk"], "beschaeftigte.gesamt": 0 })).not.toContain("beschaeftigte.minijob");
+    // „Freiberuflich (ohne Gewerbe)“: keine Frage nach Gewerbe oder freiem Beruf, keine Kasse ohne Laden-Branche
+    const frei = felder({ rechtsform: "freiberuf", "taetigkeit.branchen": ["it_agentur_freelancer"] });
+    expect(frei).not.toContain("taetigkeit.einordnung");
+    expect(frei).not.toContain("kasse.elektronisch");
+    expect(folgeAntworten("rechtsform", "freiberuf", {})).toEqual({ "taetigkeit.einordnung": "freiberuf" });
+    // Social Media nur ohne eigene Website
+    expect(felder({ "online.website": false })).toContain("online.social_media");
+    expect(felder({ "online.website": true })).not.toContain("online.social_media");
+    // abgebrochener Check: die offenen Kern-Fragen
+    expect(offeneKernFragen({ "taetigkeit.branchen": ["handwerk"] })[0]).toBe("rechtsform");
   });
 
   it("rechnet mit dem ganzen Katalog: Branche, Beschäftigte und Website entscheiden mit", () => {
@@ -87,7 +114,7 @@ describe("Pflichten-Check", () => {
       const a = auswertung(profil, fx.stichtag);
       for (const [id, erwartet] of Object.entries(fx.erwartet)) {
         if (KATALOG.pflichten.find((p) => p.id === id && ["entwurf", "beschlossen", "geplant"].includes(p.status_recht))) continue;
-        const ist = ids(a.gilt).includes(id) || ids(a.gruendung).includes(id) ? "gilt" : ids(a.unbekannt).includes(id) ? "unbekannt" : "gilt_nicht";
+        const ist = ids(a.gilt).includes(id) || ids(a.gruendung).includes(id) || ids(a.beiEinstellung).includes(id) ? "gilt" : ids(a.unbekannt).includes(id) ? "unbekannt" : "gilt_nicht";
         expect(ist, `${datei}: ${id}`).toBe(erwartet);
         geprueft++;
       }
@@ -103,12 +130,14 @@ describe("Pflichten-Check", () => {
     expect(fortschritt(a, s).fertig).toBe(0);
     // vollständige Unterlage zählt erst, wenn sie als PDF geteilt bzw. gedruckt wurde
     const [s2, u] = anlegen(s, "hautschutzplan", new Date("2026-10-12T08:00:00Z"), "h");
-    const voll = { ...s2, unterlagen: [{ ...u, daten: { ...u.daten, eintraege: [{ anlass: "Haare waschen", schutz: "", handschuhe: "", reinigung: "", pflege: "" }] } }] };
+    // vollständig heißt auch: Name des Betriebs eingetragen (R10, Kopf der Aushänge)
+    const voll = { ...s2, betrieb: { ...s2.betrieb, name: "Salon Kraus" }, unterlagen: [{ ...u, daten: { ...u.daten, eintraege: [{ anlass: "Haare waschen", schutz: "", handschuhe: "", reinigung: "", pflege: "" }] } }] };
     expect(fortschritt(a, voll).fertig).toBe(0);
     const ausgegeben = { ...voll, unterlagen: voll.unterlagen.map((x) => ({ ...x, ausgegeben: "2026-10-12T09:00:00Z" })) };
     const f = fortschritt(a, ausgegeben);
     expect(f.fertig).toBe(1);
-    expect(f.prozent).toBe(Math.round((1 / a.gilt.length) * 100));
+    // R10: nur echte Pflichten zählen (Hinweise und Optionen getrennt)
+    expect(f.prozent).toBe(Math.round((1 / a.gilt.filter((p) => p.einordnung === "pflicht").length) * 100));
   });
 
   it("hakt wiederkehrende Pflichten nur bis zum nächsten Termin ab", () => {

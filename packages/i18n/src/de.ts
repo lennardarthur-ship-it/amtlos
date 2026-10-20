@@ -1191,6 +1191,7 @@ export const de = {
     datenpanne: "Datenpanne entdeckt",
     betriebsaufgabe: "Tätigkeit aufgegeben",
     unterweisung_durchgefuehrt: "Unterweisung durchgeführt",
+    ifsg_belehrung_durchgefuehrt: "Belehrung nach § 43 IfSG durchgeführt",
     betroffenenanfrage: "Anfrage einer betroffenen Person (Auskunft, Löschung …)",
   },
   einstellungen: { titel: "Einstellungen", profil: "Angaben zu deinem Unternehmen", profil_text: "Ändere deine Angaben. Jede Änderung wird gespeichert, ältere Stände bleiben nachvollziehbar.", sprache: "Sprache", sprache_speichern: "Sprache speichern", erinnerungen: "Erinnerungen", erinnerungen_text: "Wie und wann Amtlos dich an Fristen erinnert – gilt für dich in diesem Unternehmen.", kanal: { email: "E-Mail", push: "Push in der App" }, aktiv: "Erinnern", push_ohne_geraet: "Push gibt es, sobald du dich in der Amtlos-App auf deinem Handy anmeldest.", vorlauf: "Tage vor der Frist", vorlauf_hilfe: "Durch Komma getrennt, z. B. 14, 3 (höchstens 5 Werte, bis 90 Tage).", erinnerungen_speichern: "Erinnerungen speichern", gespeichert: "Gespeichert.", offen: "noch {n} offen", keine_angaben: "noch nichts angegeben" },

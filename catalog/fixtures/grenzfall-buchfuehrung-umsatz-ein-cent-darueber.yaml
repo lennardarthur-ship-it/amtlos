@@ -1,5 +1,5 @@
 persona: grenzfall
-beschreibung: Umsatz im Vorjahr 800.000,01 € bei geringem Gewinn – buchführungspflichtig
+beschreibung: Umsatz im Vorjahr 800.000,01 € bei geringem Gewinn – buchführungspflichtig (R10, mit Mitteilung des Finanzamts nach § 141 Abs. 2 AO)
 stichtag: '2026-10-11'
 fakten:
   profil.rechtsform: einzelunternehmen
@@ -7,6 +7,7 @@ fakten:
   profil.taetigkeit.einordnung: gewerbe
   profil.umsatz.vorjahr: 800000.01
   profil.bundesland: BE
+  profil.steuern.buchfuehrung_mitteilung: true
   profil.gewinn.vorjahr: 20000
 erwartet:
   steuern.buchfuehrungspflicht: gilt

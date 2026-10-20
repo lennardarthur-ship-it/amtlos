@@ -1,18 +1,19 @@
 # Katalog F.62 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: datenschutz.beschaeftigtendaten
-version: 1
+version: 2
 katalog_nr: F.62
 titel:
   de: Beschäftigtendaten schützen
 kurz:
   de: Daten deiner Beschäftigten verarbeitest du nur, soweit es für das Arbeitsverhältnis nötig ist.
 erklaerung:
-  de: Für Beschäftigtendaten gelten besondere Regeln. Amtlos selbst speichert nur das Nötigste (Name, Beschäftigungsart, Eintritt
-    und Austritt).
+  de: Daten deiner Beschäftigten verarbeitest du, soweit es für die Durchführung des Arbeitsvertrags erforderlich ist oder ein Gesetz
+    es verlangt, zum Beispiel für Lohn, Sozialversicherung und Steuer. Amtlos selbst speichert nur das Nötigste (Name, Beschäftigungsart,
+    Eintritt und Austritt).
 rechtsgrundlage:
-- § 26 BDSG
-- Art. 88 DSGVO
+- Art. 6 Abs. 1 lit. b DSGVO
+- Art. 6 Abs. 1 lit. c DSGVO
 kategorie: datenschutz
 ausloeser:
   any:
@@ -39,16 +40,22 @@ sanktion:
     de: Die Folgen sind noch nicht fachlich erfasst.
   schwere: niedrig
 automatisierung: hinweis
+aenderungsnotiz:
+  de: 'Rechtsgrundlage umgestellt: Art. 6 Abs. 1 lit. b und c DSGVO statt § 26 BDSG (EuGH, Urteil vom 30.03.2023, C-34/21).'
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
 quellen:
-- titel: Bundesdatenschutzgesetz § 26
-  url: https://www.gesetze-im-internet.de/bdsg_2018/__26.html
+- titel: Datenschutz-Grundverordnung Art. 6
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679
+  abgerufen: null
+  fundstelle: Art. 6 Abs. 1 lit. b und c
+- titel: EuGH, Urteil vom 30.03.2023, C-34/21
+  url: https://curia.europa.eu/juris/liste.jsf?num=C-34/21
   abgerufen: null
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Anwendbarkeit von § 26 BDSG nach der Rechtsprechung des EuGH (2023) prüfen
+- '§ 26 BDSG nach EuGH C-34/21 nicht mehr als eigene Grundlage genannt (R10, Rechtsprüfung); Art. 9 DSGVO für Gesundheitsdaten von Beschäftigten (z. B. eAU) gesondert prüfen'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:

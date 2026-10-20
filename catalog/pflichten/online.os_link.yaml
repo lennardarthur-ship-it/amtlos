@@ -1,17 +1,21 @@
 # Katalog G.69 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.os_link
-version: 2
+version: 3
 katalog_nr: G.69
 titel:
-  de: Link zur OS-Plattform prüfen
+  de: Link zur OS-Plattform entfernen
 kurz:
-  de: Prüfe, ob der frühere Link zur Online-Streitbeilegungsplattform der EU auf deiner Website noch aktuell ist.
+  de: Die Pflicht zum Link auf die Online-Streitbeilegungsplattform der EU ist seit 20.07.2025 entfallen. Steht der Link noch auf
+    deiner Website, entferne ihn.
 erklaerung:
-  de: Die Spezifikation verlangt, den Status des früheren OS-Plattform-Links zu prüfen und aktuell zu halten. Der Online-Check
-    meldet, ob der Link auf deiner Website steht.
+  de: Die Verordnung (EU) Nr. 524/2013 über die Online-Streitbeilegung ist durch die Verordnung (EU) 2024/3228 mit Wirkung zum
+    20.07.2025 aufgehoben, die Plattform eingestellt. Damit ist auch die Pflicht entfallen, auf sie zu verlinken. Ein Link auf
+    die eingestellte Plattform hilft niemandem – entferne ihn aus Impressum, Shop und AGB. Der Online-Check meldet, ob er noch
+    auf deiner Website steht.
 rechtsgrundlage:
-- Verordnung (EU) Nr. 524/2013
+- Verordnung (EU) 2024/3228
+- Verordnung (EU) Nr. 524/2013 (aufgehoben)
 kategorie: online
 branchen:
 - onlinehandel
@@ -42,6 +46,9 @@ sanktion:
     de: Die Folgen sind noch nicht fachlich erfasst.
   schwere: niedrig
 automatisierung: hinweis
+einordnung: hinweis
+aenderungsnotiz:
+  de: Die Linkpflicht ist seit 20.07.2025 entfallen (Verordnung (EU) 2024/3228). Entferne den Link.
 aktion:
   art: link
   ziel: app.onlinecheck
@@ -49,14 +56,14 @@ status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
 quellen:
+- titel: Verordnung (EU) 2024/3228
+  url: https://eur-lex.europa.eu/eli/reg/2024/3228/oj
+  abgerufen: null
 - titel: Verordnung (EU) Nr. 524/2013
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32013R0524
   abgerufen: null
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Aktueller Status der OS-Plattform und der Linkpflicht – fachlich prüfen und Text anpassen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- 'Aufhebung zum 20.07.2025 durch VO (EU) 2024/3228 (R10, Rechtsprüfung) – Fundstelle der Quelle eintragen; ob ein noch vorhandener Link selbst ein Wettbewerbsrisiko ist, offen'
 pruefung:
   status: entwurf
   geprueft_von: null

@@ -1,7 +1,7 @@
 # Katalog C.23 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.kleinunternehmer_warnung_80
-version: 1
+version: 2
 katalog_nr: C.23
 titel:
   de: Kleinunternehmergrenze zu 80 % erreicht
@@ -76,6 +76,7 @@ sanktion:
     de: Noch keine Folge – eine Warnung, damit du rechtzeitig planen kannst.
   schwere: mittel
 automatisierung: hinweis
+einordnung: hinweis
 aktion:
   art: abhaken
 status_recht: in_kraft
