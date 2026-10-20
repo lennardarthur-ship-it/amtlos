@@ -50,6 +50,11 @@ export interface AusgangsRechnungFuerBuchung {
   /** Tag des Zahlungseingangs (ISO) – für die Buchung derzeit ohne Bedeutung, siehe Prüfpunkt Ist-Versteuerung */
   bezahlt?: string | null;
   art: "rechnung" | "storno";
+  /**
+   * Gutschrift (§ 14 Abs. 2 Satz 2 UStG): der Betrieb rechnet als Leistungsempfänger ab – für ihn eine Ausgabe, kein
+   * Erlös. Wird nicht als Erlös gebucht; die Ausgabe kommt aus dem Beleg bzw. von der Steuerberatung.
+   */
+  gutschrift?: boolean;
   kleinunternehmer: boolean;
   kunde: string;
   positionen: Position[];
@@ -103,12 +108,14 @@ function erloeskonto(k: (typeof BUCHUNGSKONTEN)[Kontenrahmen], satz: number | nu
 /**
  * Je Rechnung und Steuersatz eine Buchung Forderungen an Erlöse mit dem Bruttobetrag (das Automatikkonto rechnet die
  * Umsatzsteuer selbst). Stornos als einfache Umkehrbuchung (Soll und Haben getauscht). Die Versteuerungsart ändert die
- * Buchungen nicht – sie steht in den Mandantenstammdaten der Steuerberatung (Prüfpunkt).
+ * Buchungen nicht – sie steht in den Mandantenstammdaten der Steuerberatung (Prüfpunkt). Gutschriften (auch ihre
+ * Stornos) sind keine Erlöse und werden übersprungen.
  */
 export function buchungenAusRechnungen(rechnungen: AusgangsRechnungFuerBuchung[], kontenrahmen: Kontenrahmen, _o?: { versteuerung?: "soll" | "ist" }): Buchung[] {
   const k = BUCHUNGSKONTEN[kontenrahmen];
   const aus: Buchung[] = [];
   for (const r of rechnungen) {
+    if (r.gutschrift) continue;
     const storno = r.art === "storno";
     const buchungstext = kuerze(`${storno ? "Storno" : "RE"} ${r.nummer} ${r.kunde}`, 60);
     for (const g of summen(r.positionen, r.kleinunternehmer).gruppen) {

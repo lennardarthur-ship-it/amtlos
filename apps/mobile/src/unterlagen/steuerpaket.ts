@@ -7,6 +7,7 @@
  */
 import { zipSync } from "fflate";
 import {
+  EUER_KAPITALGESELLSCHAFT,
   EUER_ZEILE_STEUERFREI,
   EUER_ZEILE_STEUERPFLICHTIG,
   KU_HINWEIS,
@@ -19,6 +20,7 @@ import {
   datevExtfBytes,
   eRechnungAus,
   euerFuer,
+  istKapitalgesellschaft,
   kategorieFuer,
   summen,
   xrechnungUbl,
@@ -30,19 +32,35 @@ import {
   type Kontenrahmen,
 } from "@amtlos/fachlogik";
 import { utf8 } from "./sicherung";
+import { GUTSCHRIFT_HINWEIS, istGutschrift } from "./ustAusRechnungen";
 import type { Stand, Unterlage } from "./speicher";
 
 const betrag = (cent: number) => new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(cent / 100);
 const datumDe = (iso: string) => `${iso.slice(8, 10)}.${iso.slice(5, 7)}.${iso.slice(0, 4)}`;
 const istStorno = (u: Unterlage) => typeof u.daten.storno_zu === "string" && u.daten.storno_zu.trim() !== "";
+export { GUTSCHRIFT_HINWEIS, istGutschrift };
 
-/** Festgeschriebene (geteilte) Rechnungen – nur sie gelten als gestellt. */
+
+/** Festgeschriebene (geteilte) Rechnungen – nur sie gelten als gestellt (inkl. Stornorechnungen und Gutschriften). */
 export const gestellteRechnungen = (s: Stand) => s.unterlagen.filter((u) => u.vorlage === "rechnung" && u.festgeschrieben && typeof u.daten.datum === "string");
+/** Gestellte Rechnungen ohne Gutschriften – nur sie sind Umsätze des Betriebs. */
+export const umsatzRechnungen = (s: Stand) => gestellteRechnungen(s).filter((u) => !istGutschrift(u));
+
+/**
+ * Kleinunternehmer (§ 19 UStG): laut Pflichten-Check („ust.kleinunternehmer“); ohne Antwort dort, wenn alle
+ * gestellten Rechnungen als Kleinunternehmer-Rechnung geschrieben sind.
+ */
+export function istKleinunternehmer(s: Stand): boolean {
+  const p = s.profil["ust.kleinunternehmer"];
+  if (typeof p === "boolean") return p;
+  const r = gestellteRechnungen(s);
+  return r.length > 0 && r.every((u) => u.daten.kleinunternehmer === true);
+}
 
 /** Ausgangsrechnung in der Form, die die Buchungen brauchen. */
 export function rechnungFuerBuchung(u: Unterlage, betrieb: Betrieb): AusgangsRechnungFuerBuchung {
   const { daten } = eRechnungAus(u.daten, betrieb);
-  return { id: u.id, nummer: daten.nummer, datum: daten.rechnungsdatum, bezahlt: u.bezahlt ?? null, art: istStorno(u) ? "storno" : "rechnung", kleinunternehmer: daten.kleinunternehmer, kunde: daten.kunde.name, positionen: daten.positionen };
+  return { id: u.id, nummer: daten.nummer, datum: daten.rechnungsdatum, bezahlt: u.bezahlt ?? null, art: istStorno(u) ? "storno" : "rechnung", gutschrift: istGutschrift(u), kleinunternehmer: daten.kleinunternehmer, kunde: daten.kunde.name, positionen: daten.positionen };
 }
 
 /**
@@ -50,7 +68,7 @@ export function rechnungFuerBuchung(u: Unterlage, betrieb: Betrieb): AusgangsRec
  * 0 % einer Rechnung mit Steuerart „igl“, „reverse_charge“ oder „befreit“ zählen als steuerfrei (eigene EÜR-Zeile).
  */
 export function einnahmenAusRechnungen(s: Stand): Einnahme[] {
-  return gestellteRechnungen(s)
+  return umsatzRechnungen(s)
     .filter((u) => u.bezahlt)
     .map((u) => {
       const { daten } = eRechnungAus(u.daten, s.betrieb);
@@ -64,7 +82,7 @@ export function einnahmenAusRechnungen(s: Stand): Einnahme[] {
 /** Jahre mit Daten (Zahlungen von Rechnungen, Zahltage von Belegen), neueste zuerst. */
 export function jahreMitDaten(s: Stand): string[] {
   const j = new Set<string>();
-  for (const u of gestellteRechnungen(s)) if (u.bezahlt) j.add(u.bezahlt.slice(0, 4));
+  for (const u of umsatzRechnungen(s)) if (u.bezahlt) j.add(u.bezahlt.slice(0, 4));
   for (const b of s.belege) j.add(zahltag(b).slice(0, 4));
   return [...j].sort((a, b) => b.localeCompare(a));
 }
@@ -78,7 +96,9 @@ export interface EuerUebernahme {
   belege: number;
   /** geteilte Rechnungen des Jahres ohne vermerkten Zahlungseingang */
   unbezahlt: number;
-  /** was die Übernahme nicht enthält und von Hand ergänzt werden muss */
+  /** Gutschriften des Jahres – nicht als Einnahme übernommen */
+  gutschriften: number;
+  /** was die Übernahme nicht enthält und von Hand ergänzt werden muss (bei Kapitalgesellschaften mit Warnung vorab) */
   hinweis: string;
 }
 
@@ -94,7 +114,8 @@ export function euerUebernahme(s: Stand, jahr: string): EuerUebernahme {
   const ein: Record<string, string>[] = [];
   const pflichtig = e.einnahmen_netto_cent - e.einnahmen_steuerfrei_cent;
   if (ku) {
-    if (e.einnahmen_netto_cent) ein.push({ datum: "", text: "Umsätze aus Rechnungen (netto)", kategorie: "Umsatzsteuerlicher Kleinunternehmer", betrag: betrag(e.einnahmen_netto_cent) });
+    // ohne „(netto)“: bei Kleinunternehmern gibt es keine Umsatzsteuer, der Betrag ist der Rechnungsbetrag
+    if (e.einnahmen_netto_cent) ein.push({ datum: "", text: "Umsätze aus Rechnungen", kategorie: "Umsatzsteuerlicher Kleinunternehmer", betrag: betrag(e.einnahmen_netto_cent) });
   } else {
     if (pflichtig) ein.push({ datum: "", text: "Umsätze aus Rechnungen (netto)", kategorie: EUER_ZEILE_STEUERPFLICHTIG, betrag: betrag(pflichtig) });
     if (e.einnahmen_steuerfrei_cent) ein.push({ datum: "", text: "Steuerfreie Umsätze aus Rechnungen (z. B. innergemeinschaftliche Lieferung)", kategorie: EUER_ZEILE_STEUERFREI, betrag: betrag(e.einnahmen_steuerfrei_cent) });
@@ -103,7 +124,18 @@ export function euerUebernahme(s: Stand, jahr: string): EuerUebernahme {
   const aus: Record<string, string>[] = e.ausgaben.zeilen.map((z) => ({ datum: "", text: `${z.kategorie.titel} (${z.anzahl} ${z.anzahl === 1 ? "Beleg" : "Belege"})`, kategorie: z.kategorie.euer, betrag: betrag(z.netto_cent) }));
   if (e.ausgaben.vorsteuer_cent) aus.push({ datum: "", text: "Gezahlte Vorsteuer aus Belegen", kategorie: "Gezahlte Vorsteuerbeträge", betrag: betrag(e.ausgaben.vorsteuer_cent) });
   const imJahr = gestellteRechnungen(s).filter((u) => String(u.daten.datum).startsWith(`${jahr}-`));
-  return { einnahmen: ein, ausgaben: aus, anlagen: e.ausgaben.anlagen.length, rechnungen: e.anzahl_einnahmen, belege: s.belege.filter((b) => zahltag(b).startsWith(`${jahr}-`)).length, unbezahlt: imJahr.filter((u) => !u.bezahlt && !u.storniertDurch && !istStorno(u)).length, hinweis: EUER_NICHT_ENTHALTEN };
+  const gutschriften = imJahr.filter(istGutschrift).length;
+  const hinweis = [istKapitalgesellschaft(s.betrieb.rechtsform, s.betrieb.name) ? EUER_KAPITALGESELLSCHAFT : "", gutschriften ? GUTSCHRIFT_HINWEIS : "", EUER_NICHT_ENTHALTEN].filter(Boolean).join(" ");
+  return {
+    einnahmen: ein,
+    ausgaben: aus,
+    anlagen: e.ausgaben.anlagen.length,
+    rechnungen: e.anzahl_einnahmen,
+    belege: s.belege.filter((b) => zahltag(b).startsWith(`${jahr}-`)).length,
+    unbezahlt: imJahr.filter((u) => !u.bezahlt && !u.storniertDurch && !istStorno(u) && !istGutschrift(u)).length,
+    gutschriften,
+    hinweis,
+  };
 }
 
 // ---------------------------------------------------------------- Steuerberater-Paket
@@ -136,9 +168,10 @@ const sicher = (s: string) => dateinamenTeil(s, 60, "._-") || "ohne-name";
 /** Dateiname der Belegdatei im Paket: Datum_Lieferant_Nummer.endung */
 export const belegDateiname = (b: Beleg) => `${b.datum}_${sicher(b.lieferant)}${b.nummer ? `_${sicher(b.nummer)}` : ""}.${(b.datei ?? "").split(".").pop() || "bin"}`;
 
-export function rechnungenCsv(s: Stand, z: Zeitraum): string {
+/** Rechnungsliste (ohne Gutschriften) bzw. mit `gutschriften` die Liste der Gutschriften – gleiche Spalten. */
+export function rechnungenCsv(s: Stand, z: Zeitraum, gutschriften = false): string {
   const zeilen = gestellteRechnungen(s)
-    .filter((u) => imZeitraum(String(u.daten.datum), z))
+    .filter((u) => istGutschrift(u) === gutschriften && imZeitraum(String(u.daten.datum), z))
     .sort((a, b) => String(a.daten.datum).localeCompare(String(b.daten.datum)))
     .map((u) => {
       const { daten } = eRechnungAus(u.daten, s.betrieb);
@@ -147,7 +180,7 @@ export function rechnungenCsv(s: Stand, z: Zeitraum): string {
       const saetze = sm.gruppen.map((g) => (g.satz === null ? "§ 19" : `${g.satz} %`)).join(", ");
       return [daten.nummer, datumDe(daten.rechnungsdatum), daten.leistungsdatum ? datumDe(daten.leistungsdatum) : "", daten.kunde.name, betrag(vz * sm.netto_cent), betrag(vz * sm.ust_cent), betrag(vz * sm.brutto_cent), saetze, u.bezahlt ? datumDe(u.bezahlt) : "", istStorno(u) ? String(u.daten.storno_zu) : ""];
     });
-  return csv(["Nummer", "Datum", "Leistungsdatum", "Kunde", "Netto", "USt", "Brutto", "Steuersätze", "Bezahlt am", "Storno zu"], zeilen);
+  return csv(["Nummer", "Datum", "Leistungsdatum", gutschriften ? "Leistender (Empfänger der Gutschrift)" : "Kunde", "Netto", "USt", "Brutto", "Steuersätze", "Bezahlt am", "Storno zu"], zeilen);
 }
 
 export function belegeCsv(s: Stand, z: Zeitraum, dateinamen: Map<string, string> = new Map()): string {
@@ -165,6 +198,8 @@ export interface PaketErgebnis {
   zip: Uint8Array;
   dateiname: string;
   rechnungen: number;
+  /** Gutschriften im Zeitraum – eigene Liste, nicht als Erlös gebucht */
+  gutschriften: number;
   belege: number;
   /** Rechnungen, für die keine E-Rechnung erzeugt werden konnte (Angaben fehlen) */
   ohneXml: number;
@@ -176,13 +211,19 @@ export interface PaketErgebnis {
  * entschlüsselt). `jetzt` als ISO-Zeitpunkt für den DATEV-Kopf.
  */
 export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: Record<string, Uint8Array>, jetzt: string): PaketErgebnis {
-  const rechnungen = gestellteRechnungen(s).filter((u) => imZeitraum(String(u.daten.datum), z));
+  const alle = gestellteRechnungen(s).filter((u) => imZeitraum(String(u.daten.datum), z));
+  // Gutschriften sind Ausgaben des Betriebs: nicht in Rechnungsliste und Erlösbuchungen, sondern in einer eigenen Liste
+  const rechnungen = alle.filter((u) => !istGutschrift(u));
+  const gutschriften = alle.filter(istGutschrift);
+  const ku = istKleinunternehmer(s);
+  const ist = s.betrieb.versteuerung === "ist";
   const belege = s.belege.filter((b) => imZeitraum(b.datum, z));
   const buchungen = [...buchungenAusRechnungen(rechnungen.map((u) => rechnungFuerBuchung(u, s.betrieb)), sb.kontenrahmen), ...buchungenAusBelegen(belege, sb.kontenrahmen)].sort((a, b) => a.datum.localeCompare(b.datum));
   const inhalt: Record<string, Uint8Array> = {};
   inhalt[`EXTF_Buchungsstapel_${z.name}.csv`] = datevExtfBytes(datevExtf(buchungen, { beraternummer: sb.beraternummer, mandantennummer: sb.mandantennummer, wjBeginn: `${z.von.slice(0, 4)}-01-01`, von: z.von, bis: z.bis, kontenrahmen: sb.kontenrahmen, bezeichnung: `Amtlos ${z.name}`, erzeugtAm: jetzt }));
   inhalt[`Buchungsliste_${z.name}.csv`] = utf8(buchungslisteCsv(buchungen));
   inhalt[`Rechnungen_${z.name}.csv`] = utf8(rechnungenCsv(s, z));
+  if (gutschriften.length) inhalt[`Gutschriften_${z.name}.csv`] = utf8(rechnungenCsv(s, z, true));
   // Dateinamen einmal vergeben (doppelte durchnummeriert) – dieselben stehen in der Belegliste
   const dateinamen = new Map<string, string>();
   const vergeben = new Set<string>();
@@ -196,7 +237,7 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
   }
   inhalt[`Belege_${z.name}.csv`] = utf8(belegeCsv(s, z, dateinamen));
   let ohneXml = 0;
-  for (const u of rechnungen) {
+  for (const u of alle) {
     const { daten, fehlt } = eRechnungAus(u.daten, s.betrieb);
     if (fehlt.length) {
       ohneXml++;
@@ -217,15 +258,23 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
       `- EXTF_Buchungsstapel_${z.name}.csv: DATEV-Format „Buchungsstapel“ (${sb.kontenrahmen}), ${buchungen.length} Buchungen. Das Format ist noch nicht gegen den DATEV-Leitfaden geprüft – bitte vor dem Import kontrollieren.${sb.beraternummer && sb.mandantennummer ? "" : " Berater- und Mandantennummer fehlen und sind für den Import nötig."}`,
       `- Buchungsliste_${z.name}.csv: dieselben Buchungen zum Lesen (Semikolon, UTF-8).`,
       `- Rechnungen_${z.name}.csv: ${rechnungen.length} gestellte Rechnungen mit Netto, USt, Brutto und Zahlungseingang.`,
+      ...(gutschriften.length ? [`- Gutschriften_${z.name}.csv: ${gutschriften.length} ${gutschriften.length === 1 ? "Gutschrift" : "Gutschriften"}, die der Betrieb als Leistungsempfänger ausgestellt hat – nicht in Rechnungsliste und Buchungsstapel. ${GUTSCHRIFT_HINWEIS}`] : []),
       `- Belege_${z.name}.csv: ${belege.length} Belege mit Kategorie, Vorsteuer und Zahlung.`,
-      `- E-Rechnungen/: XRechnung der Ausgangsrechnungen${ohneXml ? ` (${ohneXml} ohne, weil Angaben fehlen)` : ""}.`,
+      `- E-Rechnungen/: XRechnung der Ausgangsrechnungen${gutschriften.length ? " und Gutschriften" : ""}${ohneXml ? ` (${ohneXml} ohne, weil Angaben fehlen)` : ""}.`,
       `- Belege/: Originaldateien (Fotos, PDFs, E-Rechnungen) – unverändert.`,
       ``,
       `Zuordnung: Rechnungen nach Rechnungsdatum, Belege nach Belegdatum. Die PDFs der Ausgangsrechnungen liegen beim Betrieb.`,
-      `Die Umsatzsteuer-Voranmeldung ordnet Rechnungen dagegen nach dem Leistungsdatum zu (Soll-Versteuerung) – an den Grenzen eines Zeitraums können die Summen dieses Pakets deshalb von der Voranmeldung abweichen.`,
+      // Kleinunternehmer geben in der Regel keine Voranmeldung ab – dann kein Satz dazu; sonst nach „Mein Betrieb“ (Soll/Ist)
+      ...(ku
+        ? []
+        : [
+            ist
+              ? `Die Umsatzsteuer-Voranmeldung ordnet Rechnungen dagegen nach dem Zahlungseingang zu (Ist-Versteuerung, § 20 UStG); eine Stornorechnung zählt mit der vermerkten Erstattung – an den Grenzen eines Zeitraums können die Summen dieses Pakets deshalb von der Voranmeldung abweichen.`
+              : `Die Umsatzsteuer-Voranmeldung ordnet Rechnungen dagegen nach dem Leistungsdatum zu (Soll-Versteuerung) – an den Grenzen eines Zeitraums können die Summen dieses Pakets deshalb von der Voranmeldung abweichen.`,
+          ]),
     ].join("\r\n"),
   );
-  return { zip: zipSync(inhalt, { level: 6 }), dateiname: `Amtlos-Steuerberatung-${sicher(s.betrieb.name || "Betrieb")}-${z.name}.zip`, rechnungen: rechnungen.length, belege: belege.length, ohneXml, buchungen: buchungen.length };
+  return { zip: zipSync(inhalt, { level: 6 }), dateiname: `Amtlos-Steuerberatung-${sicher(s.betrieb.name || "Betrieb")}-${z.name}.zip`, rechnungen: rechnungen.length, gutschriften: gutschriften.length, belege: belege.length, ohneXml, buchungen: buchungen.length };
 }
 
 /** Zeiträume zur Auswahl: aktuelles und letztes Jahr, Quartale und Monate des laufenden Jahres bis heute. */

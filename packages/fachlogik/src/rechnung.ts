@@ -20,6 +20,28 @@ export const EINHEIT_CODE: Record<Einheit, string> = { stueck: "C62", stunde: "H
  * Hinweis für Kleinunternehmer auf Rechnungen (Server, API, App). Seit 2025 sind die Umsätze steuerfrei; Wortlaut
  * nach den Hinweisen des LfSt Bayern (Stand Januar 2026), E-123.
  */
+/** Mehrzahl gängiger Zähleinheiten (klein geschrieben); Maßeinheiten (kg, m, l …) und „Stück“ bleiben unverändert. */
+const EINHEIT_MEHRZAHL: Record<string, string> = {
+  stunde: "stunden",
+  minute: "minuten",
+  tag: "tage",
+  woche: "wochen",
+  monat: "monate",
+  pauschale: "pauschalen",
+  person: "personen",
+  paket: "pakete",
+  kilowattstunde: "kilowattstunden",
+};
+
+/** Einheit passend zur Menge gebeugt: „1 Stunde“, aber „1,5 Stunden“, „2 Pauschalen“ – unbekannte Einheiten wie eingegeben. */
+export function einheitFuerMenge(einheit: string, menge: number): string {
+  const e = einheit.trim();
+  const mehr = EINHEIT_MEHRZAHL[e.toLocaleLowerCase("de")];
+  if (!mehr || Math.abs(menge) === 1) return e;
+  // Schreibweise des ersten Buchstabens übernehmen („Stunde“ → „Stunden“, „stunde“ → „stunden“)
+  return e[0] === e[0]!.toLocaleUpperCase("de") ? mehr[0]!.toLocaleUpperCase("de") + mehr.slice(1) : mehr;
+}
+
 export const KU_HINWEIS = "Der Umsatz ist nach § 19 Abs. 1 UStG steuerfrei.";
 
 export const rundeCent = (x: number) => Math.sign(x) * Math.round(Math.abs(x)); // kaufmännisch, symmetrisch

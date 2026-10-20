@@ -2,7 +2,7 @@
  * „Meine Unterlagen“ – reine Funktionen für Filter, Suche und die Summe offener Rechnungen (ohne Gerät testbar).
  */
 import { eRechnungAus, kategorieFuer, summen, unterlagenName, vorlageFuer, type Beleg, type Betrieb } from "@amtlos/fachlogik";
-import { offeneRechnungen } from "./ustAusRechnungen";
+import { istGutschrift, offeneRechnungen } from "./ustAusRechnungen";
 import type { Unterlage } from "./speicher";
 
 export type Filter = "alle" | "rechnungen" | "offen" | "entwuerfe" | "belege";
@@ -89,10 +89,10 @@ export const offeneIds = (unterlagen: Unterlage[]) => new Set(offeneRechnungen(u
 
 /**
  * Im Monat berechnet (`monat` = JJJJ-MM, nach Rechnungsdatum): geteilte Rechnungen brutto, Stornorechnungen ziehen ab.
- * `anzahl` zählt die Rechnungen ohne Stornos.
+ * `anzahl` zählt die Rechnungen ohne Stornos. Gutschriften sind Ausgaben und zählen nicht.
  */
 export function monatsSumme(unterlagen: Unterlage[], betrieb: Betrieb, monat: string): { anzahl: number; cent: number } {
-  const im = unterlagen.filter((u) => u.vorlage === "rechnung" && u.festgeschrieben && typeof u.daten.datum === "string" && u.daten.datum.startsWith(monat));
+  const im = unterlagen.filter((u) => u.vorlage === "rechnung" && u.festgeschrieben && typeof u.daten.datum === "string" && u.daten.datum.startsWith(monat) && !istGutschrift(u));
   return { anzahl: im.filter((u) => !istStorno(u)).length, cent: im.reduce((a, u) => a + rechnungBrutto(u, betrieb), 0) };
 }
 

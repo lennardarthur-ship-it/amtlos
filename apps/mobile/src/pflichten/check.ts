@@ -57,8 +57,10 @@ export interface PflichtInfo {
   quellen: { titel: string; url: string }[];
   /** Grund laut Katalog, z. B. „Du beschäftigst mindestens eine Person.“ */
   grund: string;
-  /** Vorlage in der App, die diese Pflicht belegt */
+  /** Vorlage in der App, die diese Pflicht belegt (die erste; sie zählt für „erledigt durch Unterlage“) */
   vorlage: string | null;
+  /** alle Vorlagen zu dieser Pflicht, z. B. Gefahrstoffverzeichnis und Betriebsanweisung */
+  vorlagen: string[];
   /** nächster Termin aus dem Katalog (wiederkehrende Pflichten) */
   naechsterTermin: string | null;
   /** alle Termine ab heute in den nächsten zwölf Monaten (ISO, aufsteigend) – für den Jahresblick */
@@ -84,8 +86,9 @@ const IMMER = "Gilt für jedes Unternehmen, unabhängig von deinen Angaben.";
 export const BESTAND_AB_MONATEN = 6;
 
 const text = (t: unknown) => (t && typeof t === "object" && typeof (t as { de?: unknown }).de === "string" ? (t as { de: string }).de : "");
-const VORLAGE_JE_PFLICHT = new Map<string, string>();
-for (const v of VORLAGEN) for (const p of v.pflichten) if (!VORLAGE_JE_PFLICHT.has(p)) VORLAGE_JE_PFLICHT.set(p, v.id);
+/** Vorlagen je Pflicht in der Reihenfolge von VORLAGEN – die erste ist die Hauptvorlage */
+const VORLAGEN_JE_PFLICHT = new Map<string, string[]>();
+for (const v of VORLAGEN) for (const p of v.pflichten) VORLAGEN_JE_PFLICHT.set(p, [...(VORLAGEN_JE_PFLICHT.get(p) ?? []), v.id]);
 const SCHWERE = { hoch: 0, mittel: 1, niedrig: 2 } as const;
 
 function plusMonate(iso: string, n: number): string {
@@ -155,7 +158,8 @@ export function auswertung(profil: Profil, stichtag: string, unterlagen: readonl
       quellen: (p.quellen ?? []).filter((q): q is { titel: string; url: string } => Boolean(q.url)),
       // die Sätze, die das Ergebnis tragen – auch bei zusammengesetzten Auslösern („weil du … und …“)
       grund: entscheidendeSaetze(e.begruendung).join(" ") || ("immer" in (p.ausloeser as object) ? IMMER : ""),
-      vorlage: VORLAGE_JE_PFLICHT.get(p.id) ?? null,
+      vorlage: VORLAGEN_JE_PFLICHT.get(p.id)?.[0] ?? null,
+      vorlagen: VORLAGEN_JE_PFLICHT.get(p.id) ?? [],
       naechsterTermin: termin,
       termine,
       offeneFragen: zuErfragendeFakten(e.fehlende_fakten)

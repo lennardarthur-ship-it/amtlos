@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Linking, View } from "react-native";
+import { vorlageFuer } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { useMeldung } from "../ui/meldung";
 import { Fristblatt, Fuss, Hinweis, Kachel, Karte, Knopf, Schalter, SchnellKachel, Symbol, T, TextKnopf, Zeile, tageBis } from "../ui/bausteine";
@@ -114,6 +115,16 @@ function PflichtDetail({ id }: { id: string }) {
         {zeile(TEXT.einstufung, TEXT.schwere[p.schwere])}
       </Karte>
       {p.erklaerung ? <T v="klein" stil={{ marginTop: 16, marginHorizontal: 4 }}>{p.erklaerung}</T> : null}
+      {gilt && p.vorlagen.length > 1 ? (
+        // mehrere Vorlagen zu einer Pflicht (z. B. Gefahrstoffverzeichnis und Betriebsanweisung): alle zum Ausfüllen
+        <Gruppe titel={TEXT.vorlagen_zur_pflicht}>
+          <Karte>
+            {p.vorlagen.map((vid, i) => (
+              <Zeile key={vid} symbol="doc.text" ton="amt" titel={vorlageFuer(vid)?.titel ?? vid} rechts={<Symbol name="plus" groesse={16} />} onPress={() => starten(vid)} letzte={i === p.vorlagen.length - 1} />
+            ))}
+          </Karte>
+        </Gruppe>
+      ) : null}
       {p.rechtsgrundlage.length ? (
         <Gruppe titel={TEXT.grundlage}>
           <T v="klein" stil={{ marginHorizontal: 4 }}>{p.rechtsgrundlage.join(" · ")}</T>

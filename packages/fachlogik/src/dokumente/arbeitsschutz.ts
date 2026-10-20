@@ -196,7 +196,7 @@ export const unterweisung: Vorlage = {
         // Datum und Durchgeführt von stehen in der Kennungsleiste; dort entfallen leere Angaben – dann hier als Linie
         abschnitt("Angaben", angaben([["Bezeichnung", text(d, "thema")], ["Anlass", ANLASS[text(d, "anlass")] ?? ""], ["Datum", text(d, "datum") ? null : ""], ["Dauer", text(d, "dauer")], ["Durchgeführt von", text(d, "durchgefuehrt_von") ? null : ""]])) +
         abschnitt("Inhalte der Unterweisung", (themen.length ? punkte(themen) : absatz("")) + (text(d, "inhalt") ? `<h3>Betriebsspezifische Ergänzungen</h3>${zeilen(text(d, "inhalt"))}` : "")) +
-        abschnitt("Teilnahme", `<p>Mit meiner Unterschrift bestätige ich, dass ich an der Unterweisung teilgenommen und die Inhalte verstanden habe.</p>${teilnahmeTabelle(liste(d, "teilnehmer"))}`) +
+        abschnitt("Teilnahme", `<p class="vor-tabelle">Mit meiner Unterschrift bestätige ich, dass ich an der Unterweisung teilgenommen und die Inhalte verstanden habe.</p>${teilnahmeTabelle(liste(d, "teilnehmer"))}`) +
         nachsatz(`Die Unterweisung ist mindestens einmal jährlich zu wiederholen (§ 4 Abs. 1 DGUV Vorschrift 1)${naechste ? `, nächster Termin spätestens am ${naechste}` : ""}.`) +
         unterschriften(["Ort, Datum", "Unterschrift der unterweisenden Person"]),
     });

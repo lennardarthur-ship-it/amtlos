@@ -149,6 +149,12 @@ export function standAus(json: string | null): Stand {
 /** Heutiges Datum in Deutschland als YYYY-MM-DD. */
 export const heute = (jetzt = new Date()) => new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Berlin" }).format(jetzt);
 
+/** Neuer, leerer Beleg (von Hand oder mit Foto). Kleinunternehmer (§ 19 UStG) starten ohne Vorsteuerabzug. */
+export function leererBeleg(quelle: Beleg["quelle"], datei: string | null, kleinunternehmer = false, jetzt = new Date()): Beleg {
+  const iso = jetzt.toISOString();
+  return { id: neueId(), datum: heute(jetzt), lieferant: "", nummer: null, kategorie: "sonstiges", steuer: [{ satz: 19, brutto_cent: 0 }], vorsteuer: !kleinunternehmer, zahlung: "bank", bezahlt: null, notiz: null, datei, quelle, erstellt: iso, geaendert: iso };
+}
+
 export const neueId = () => `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
 
 /** Ist der gespeicherte Text lesbar? Unlesbares darf nicht durch einen leeren Stand überschrieben werden. */

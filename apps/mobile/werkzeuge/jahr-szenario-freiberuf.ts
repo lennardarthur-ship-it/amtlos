@@ -295,7 +295,7 @@ export function standBauen(): Bau {
         auffaellig.push(`E-Rechnung ${b.nummer} ließ sich nicht lesen (eRechnungLesen → null).`);
         continue;
       }
-      const roh = belegAusERechnung(gelesen, b.id, jetzt);
+      const roh = belegAusERechnung(gelesen, b.id, jetzt, { kleinunternehmer: true }); // wie die App: Kleinunternehmer ohne Vorsteuer
       vergleichText("E-Rechnung einlesen", `${b.nummer}: Vorsteuer-Schalter nach dem Einlesen (Kleinunternehmerin darf keine Vorsteuer abziehen)`, roh.vorsteuer ? "an" : "aus", "aus");
       infos.push(`E-Rechnung ${b.nummer} eingelesen: Lieferant „${roh.lieferant}“, Kategorie zunächst „${kategorieFuer(roh.kategorie).titel}“, Vorsteuer ${roh.vorsteuer ? "AN" : "aus"} (von Hand auf „Werbung“ und Vorsteuer aus gestellt). Notiz: ${(roh.notiz ?? "").replace(/\n/g, " | ")}`);
       s = belegSetzen(s, { ...roh, kategorie: b.kategorie, vorsteuer: false, bezahlt: b.bezahlt, datei: `${b.id}.xml` }, t(b.datum, 18));
@@ -337,7 +337,7 @@ export function standBauen(): Bau {
   }
 
   dok({ id: "dse", vorlage: "datenschutzerklaerung_website", datum: "2026-01-09", worum: "Datenschutzerklärung der Portfolio-Website: Hosting bei Schwarzwaldhost, Server-Logfiles 7 Tage, Kontaktformular, Newsletter (Double-Opt-in, Briefkasten Mailservice), Schriften lokal eingebunden, Link zu Instagram und Behance, keine Cookies.",
-    daten: () => ({ website: "https://www.mira-lindqvist.example", module: ["hosting", "server_logfiles", "kontakt", "newsletter", "google_fonts_lokal", "social_media_links", "widerruf_einwilligung"], hoster_name: "Schwarzwaldhost GmbH", hoster_anschrift: "Lörracher Straße 16, 79115 Freiburg im Breisgau", logfile_tage: "7",
+    daten: () => ({ website: "https://www.mira-lindqvist.example", module: ["hosting", "server_logfiles", "kontakt", "newsletter", "google_fonts_lokal", "social_media_links", "widerruf_einwilligung"], hoster_name: "Schwarzwaldhost GmbH", hoster_anschrift: "Lörracher Straße 16, 79115 Freiburg im Breisgau", logfile_tage: "7", kontaktformular: true,
       newsletter_themen: "Neue Arbeiten aus dem Portfolio, freie Termine und Workshops (etwa viermal im Jahr)", newsletter_dienst: "Briefkasten Mailservice GmbH, Große Elbstraße 145, 22767 Hamburg", netzwerke: "Instagram und Behance", stand: "2026-01-09" }) });
   {
     const h = dokHtml(s, "dse");

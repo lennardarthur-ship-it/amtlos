@@ -18,7 +18,8 @@ export { HAUSFARBEN, PRUEFHINWEIS, RAENDER, akzent, fussSpalten, type Gestalt } 
 export { BUNDESLAENDER, aufsichtFuer, berlinZuUtc } from "./datenschutz.js";
 export { mindestlohnAm, mindesturlaub, stundenlohn } from "./personal.js";
 export { bausteinText } from "./website.js";
-export { VERSTEUERUNG, aufbewahrenBis, eRechnungAus } from "./buchhaltung.js";
+export { EUER_KAPITALGESELLSCHAFT, VERSTEUERUNG, aufbewahrenBis, eRechnungAus, rechnungsTitel } from "./buchhaltung.js";
+export { istKapitalgesellschaft, mitVertretung } from "./betrieb.js";
 export { STEUERKLASSEN, arbeitsminuten } from "./lohn.js";
 export { ANLAESSE, KURZ, PERSONEN_FELDER, kurztitel, naechsteNummer, personAus, personIn, personMerken, type Anlass } from "./ablauf.js";
 export { cent, zahl } from "./html.js";
@@ -165,7 +166,8 @@ export function fehlendeAngaben(v: Vorlage, d: Daten, b?: Betrieb): string[] {
 /** Name einer Unterlage in der Übersicht, z. B. „Gefährdungsbeurteilung · Küche“. */
 export function unterlagenName(v: Vorlage, d: Daten): string {
   const zusatz = v.namensFeld && typeof d[v.namensFeld] === "string" ? (d[v.namensFeld] as string).trim().split("\n")[0]!.slice(0, 40) : "";
-  return zusatz ? `${v.titel} · ${zusatz}` : v.titel;
+  const titel = v.titelFuer?.(d) ?? v.titel;
+  return zusatz ? `${titel} · ${zusatz}` : titel;
 }
 
 /** Dateiname für das PDF – siehe `pdfDateiname` (Umlaute umgeschrieben, Datum genau einmal und nie gekürzt). */

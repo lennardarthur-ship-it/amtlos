@@ -40,7 +40,8 @@ export function pdfDateiname(v: Vorlage, d: Daten, datum: string): string {
   // Datum aus dem Namen nehmen (Namensfeld ist das Datum) – es steht genau einmal am Ende
   // wie unterlagenName (Titel und Namensfeld), aber ohne dessen Kürzung mitten im Wort – gekürzt wird unten am Trennzeichen
   const zusatz = v.namensFeld && typeof d[v.namensFeld] === "string" ? (d[v.namensFeld] as string).trim().split("\n")[0]! : "";
-  const name = dateinamenTeil(`${v.titel} ${zusatz}`, 400)
+  // Titel der einzelnen Unterlage, z. B. „Stornorechnung“ oder „Gutschrift“ statt „Rechnung“
+  const name = dateinamenTeil(`${v.titelFuer?.(d) ?? v.titel} ${zusatz}`, 400)
     .split(tag ? `-${tag}` : "\0")
     .join("");
   const teil = dateinamenTeil(name, tag ? PDF_MAX - tag.length - 1 : PDF_MAX) || "Unterlage";

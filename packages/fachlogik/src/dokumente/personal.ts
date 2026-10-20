@@ -3,6 +3,7 @@
  * der Recherche (bausteine.ts); Prüfung gegen Mindestlohn und Mindesturlaub. Fachlich zu prüfen (T-53).
  */
 import { teilnahmeTabelle } from "./arbeitsschutz.js";
+import { mitVertretung } from "./betrieb.js";
 import { MINDESTLOHN, NACHWG } from "./bausteine.js";
 import { abschnitt, absatz, angaben, anschrift, auswahl, cent, datumDe, dokument, euro, ja, liste, parteien, punkte, text, unterschriften, zahl, zahlText, zeilen } from "./html.js";
 import { optionen } from "./konstanten.js";
@@ -154,6 +155,8 @@ export const nachweisArbeitsbedingungen: Vorlage = {
       "11": angaben([["Arbeitstage pro Kalenderjahr", ""]]),
     };
     // Vertrag: Parteien in zwei Spalten, dann die 15 Punkte des § 2 Abs. 1 NachwG mit Randnummern
+    // Kapitalgesellschaft mit Geschäftsführung in „Mein Betrieb“: „vertreten durch …“ bei Partei und Unterschrift
+    const vertreten = mitVertretung(b) !== b.name.trim() ? `vertreten durch ${(b.vertretung ?? "").trim()}` : "";
     const punkteNw = zeilenNw.slice(1).map(([t, w]) => abschnitt(t.replace(/^\d+\.\s*/, ""), !w && leerAngaben[t.split(".")[0]!] ? leerAngaben[t.split(".")[0]!]! : absatz(w ?? "")));
     return dokument({
       titel: "Nachweis der wesentlichen Arbeitsbedingungen",
@@ -163,9 +166,9 @@ export const nachweisArbeitsbedingungen: Vorlage = {
       meta: `Beginn: ${datumDe(text(d, "beginn"))}\nAusgestellt: ${datumDe(text(d, "ausgestellt_am"))}`,
       inhalt:
         `<p class="klein">Diese Niederschrift hält die wesentlichen Vertragsbedingungen nach § 2 Abs. 1 Nachweisgesetz fest. Sie ersetzt keinen Arbeitsvertrag; bestehende vertragliche Vereinbarungen gelten weiter.</p>` +
-        abschnitt("Vertragsparteien", parteien({ rolle: "Arbeitgeber", name: b.name, anschrift: anschrift(b) }, { rolle: "beschäftigte Person", name: text(d, "name"), anschrift: text(d, "anschrift") })) +
+        abschnitt("Vertragsparteien", parteien({ rolle: "Arbeitgeber", name: b.name, anschrift: anschrift(b), zusatz: vertreten || undefined }, { rolle: "beschäftigte Person", name: text(d, "name"), anschrift: text(d, "anschrift") })) +
         punkteNw.join("") +
-        unterschriften(["Arbeitgeber/in", "Beschäftigte Person (Erhalt bestätigt)"], { ortDatum: true }),
+        unterschriften([vertreten ? `Arbeitgeber/in, ${vertreten}` : "Arbeitgeber/in", "Beschäftigte Person (Erhalt bestätigt)"], { ortDatum: true }),
     });
   },
 };
@@ -219,7 +222,7 @@ export const kiKompetenz: Vorlage = {
         // Datum, Durchgeführt von und Dauer stehen in der Kennungsleiste; dort entfallen leere Angaben – dann hier als Linie
         abschnitt("Angaben", angaben([["Bezeichnung", text(d, "thema")], ["KI-Werkzeuge", text(d, "ki_systeme").split("\n").map((z) => z.trim().replace(/[.;,]+$/, "")).filter(Boolean).join(", ")], ["Datum", text(d, "datum") ? null : ""], ["Dauer", text(d, "dauer") ? null : ""], ["Durchgeführt von", text(d, "durchgefuehrt_von") ? null : ""]])) +
         abschnitt("Inhalte", (auswahl(d, "themen").length ? punkte(auswahl(d, "themen")) : absatz("")) + (text(d, "inhalt") ? zeilen(text(d, "inhalt")) : "")) +
-        abschnitt("Teilnahme", `<p>Mit meiner Unterschrift bestätige ich die Teilnahme an der Schulung.</p>${teilnahmeTabelle(liste(d, "teilnehmer"))}`) +
+        abschnitt("Teilnahme", `<p class="vor-tabelle">Mit meiner Unterschrift bestätige ich die Teilnahme an der Schulung.</p>${teilnahmeTabelle(liste(d, "teilnehmer"))}`) +
         unterschriften(["Ort, Datum", "Unterschrift der schulenden Person"]),
     });
   },

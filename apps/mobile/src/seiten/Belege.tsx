@@ -11,7 +11,7 @@ import { istIos, useFarben, weich } from "../ui/thema";
 import { belegFoto } from "../unterlagen/belegfoto";
 import { ausUtf8, base64 } from "../unterlagen/sicherung";
 import { dateiTeilenBytes, dateiWaehlenBytes } from "../unterlagen/sicherungDatei";
-import { heute, neueId } from "../unterlagen/speicher";
+import { leererBeleg, neueId } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { bestaetigen } from "../ui/bestaetigen";
 import { BuehnenBlatt, GrosserBetrag, datumKurz } from "./gemeinsam";
@@ -21,12 +21,6 @@ const betragText = (c: number) => (c ? new Intl.NumberFormat("de-DE", { minimumF
 const endung = (name: string) => (name.split(".").pop() ?? "").toLowerCase();
 const MIME: Record<string, string> = { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", pdf: "application/pdf", xml: "application/xml" };
 
-/** Neuer, leerer Beleg (von Hand oder mit Foto). */
-function leererBeleg(quelle: Beleg["quelle"], datei: string | null): Beleg {
-  const jetzt = new Date().toISOString();
-  return { id: neueId(), datum: heute(), lieferant: "", nummer: null, kategorie: "sonstiges", steuer: [{ satz: 19, brutto_cent: 0 }], vorsteuer: true, zahlung: "bank", bezahlt: null, notiz: null, datei, quelle, erstellt: jetzt, geaendert: jetzt };
-}
-
 /**
  * Beleg erfassen (E-133): Foto, Datei (PDF, Bild, E-Rechnung) oder von Hand. Eine E-Rechnung (XRechnung, ZUGFeRD)
  * füllt den Beleg selbst aus; die Originaldatei wird unverändert und verschlüsselt aufbewahrt.
@@ -35,18 +29,20 @@ export function useBelegErfassen() {
   const z = useAmtlos();
   const nav = useNav();
   const melden = useMeldung();
+  // Startwert für „Vorsteuer abziehbar“: aus der Antwort im Pflichten-Check
+  const ku = z.stand.profil["ust.kleinunternehmer"] === true;
   const oeffnen = (b: Beleg, neu: boolean) => nav.oeffnen(`beleg-${b.id}`, () => <BelegSeite id={b.id} neu={neu} />, true);
   const anlegen = (b: Beleg, neu = true) => {
     z.belegSetzen(b);
     oeffnen(b, neu);
   };
   return {
-    hand: () => anlegen(leererBeleg("hand", null)),
+    hand: () => anlegen(leererBeleg("hand", null, ku)),
     foto: async (kamera: boolean) => {
       try {
         const bytes = await belegFoto(kamera);
         if (!bytes) return;
-        anlegen(leererBeleg("foto", await z.dateiSpeichern(bytes, "jpg")));
+        anlegen(leererBeleg("foto", await z.dateiSpeichern(bytes, "jpg"), ku));
       } catch (e) {
         melden((e as Error).message === "kamera" ? TEXT.beleg_kamera_verweigert : TEXT.beleg_fehler, "info");
       }
@@ -60,13 +56,13 @@ export function useBelegErfassen() {
         const gelesen = text ? eRechnungLesen(text) : null;
         const name = await z.dateiSpeichern(d.bytes, art);
         if (gelesen) {
-          const b = { ...belegAusERechnung(gelesen, neueId(), new Date().toISOString()), datei: name };
+          const b = { ...belegAusERechnung(gelesen, neueId(), new Date().toISOString(), { kleinunternehmer: ku }), datei: name };
           anlegen(b, false);
           melden(TEXT.erechnung_gelesen(gelesen.lieferant.name, euro(gelesen.summen.brutto_cent)));
           return;
         }
         if (art === "xml") melden(TEXT.erechnung_unlesbar, "info");
-        anlegen(leererBeleg("foto", name));
+        anlegen(leererBeleg("foto", name, ku));
       } catch {
         melden(TEXT.beleg_fehler, "info");
       }

@@ -352,8 +352,9 @@ const euro = (cent: number) => `${(cent / 100).toFixed(2).replace(".", ",")} €
  * Beleg (Eingangsrechnung) aus einer gelesenen E-Rechnung: Brutto je Steuersatz, Vorsteuer wenn Umsatzsteuer
  * ausgewiesen ist, Zahlung per Bank, noch nicht bezahlt. Sätze außer 19/7/0 und Besonderheiten (Reverse Charge,
  * innergemeinschaftlicher Erwerb) landen als Hinweis in der Notiz. Kategorie: Sonstiges – die Zuordnung macht der Betrieb.
+ * Kleinunternehmer (§ 19 UStG, `o.kleinunternehmer`): Vorsteuer-Schalter aus – wie beim Beleg von Hand.
  */
-export function belegAusERechnung(r: GeleseneRechnung, id: string, jetztIso: string): Beleg {
+export function belegAusERechnung(r: GeleseneRechnung, id: string, jetztIso: string, o: { kleinunternehmer?: boolean } = {}): Beleg {
   const hinweise: string[] = [];
   const nachSatz = new Map<number, number>();
   for (const s of r.saetze) {
@@ -388,7 +389,7 @@ export function belegAusERechnung(r: GeleseneRechnung, id: string, jetztIso: str
     nummer: r.nummer || null,
     kategorie: "sonstiges",
     steuer,
-    vorsteuer: r.summen.ust_cent > 0,
+    vorsteuer: !o.kleinunternehmer && r.summen.ust_cent > 0,
     zahlung: "bank",
     bezahlt: null,
     notiz: notiz || null,

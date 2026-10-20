@@ -149,6 +149,8 @@ export interface Vorlage {
   pflichten: string[];
   /** Feld, das eine einzelne Unterlage in „Meine Unterlagen“ benennt (z. B. Arbeitsbereich) */
   namensFeld?: string;
+  /** Titel der einzelnen Unterlage, wenn er von den Daten abhängt (z. B. „Stornorechnung“, „Gutschrift“) – für Name und Dateiname */
+  titelFuer?(daten: Daten): string;
   abschnitte: VorlagenAbschnitt[];
   /** Rechtsgrundlage für den Dokumentkopf, z. B. „§§ 5, 6 ArbSchG“ */
   grundlage?: string;

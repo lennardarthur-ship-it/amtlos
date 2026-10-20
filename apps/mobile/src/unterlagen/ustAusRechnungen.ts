@@ -5,7 +5,9 @@
  * - Ist (vereinnahmte Entgelte, § 13 Abs. 1 Nr. 1 b, § 20 UStG): Zeitraum, in dem das Geld eingegangen ist – nach dem
  *   Zahlungseingang, den du an der Rechnung vermerkst. Unbezahlte Rechnungen zählen nicht; eine Stornorechnung zählt
  *   erst, wenn du die Erstattung vermerkst.
- * Nur festgeschriebene (geteilte) Rechnungen zählen – Entwürfe sind nicht raus. Fachlich zu prüfen: T-70.
+ * Nur festgeschriebene (geteilte) Rechnungen zählen – Entwürfe sind nicht raus. Gutschriften zählen nicht: Der Betrieb
+ * rechnet darin als Leistungsempfänger ab, sie sind keine eigenen Umsätze. Kleinunternehmer (§ 19 UStG) übernehmen
+ * nichts – ihre Umsätze gehören in keine Kennzahl der Voranmeldung. Fachlich zu prüfen: T-70.
  */
 import { eRechnungAus, umsaetzeNachSatz, ustZeitraum, vorsteuerFuer, type Beleg, type Betrieb } from "@amtlos/fachlogik";
 import type { Unterlage } from "./speicher";
@@ -23,7 +25,19 @@ export function periodeText(p: string): string {
 
 const betragText = (cent: number) => new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(cent / 100);
 
-const festeRechnungen = (unterlagen: Unterlage[]) => unterlagen.filter((u) => u.vorlage === "rechnung" && u.festgeschrieben && typeof u.daten.datum === "string");
+/**
+ * Gutschrift (Hinweis „gutschrift“, § 14 Abs. 2 Satz 2 UStG): Der Betrieb rechnet als Leistungsempfänger selbst ab –
+ * für ihn ist das eine Ausgabe, keine Einnahme. Gutschriften (und ihre Stornos) zählen deshalb nicht als Umsatz.
+ */
+export const istGutschrift = (u: Unterlage) => Array.isArray(u.daten.hinweise) && u.daten.hinweise.some((h) => h === "gutschrift");
+
+/** Steht bei der EÜR-Übernahme und im Steuerberater-Paket, sobald Gutschriften dabei sind. */
+export const GUTSCHRIFT_HINWEIS = "Gutschriften sind Ausgaben – bitte als Beleg erfassen bzw. von der Steuerberatung buchen lassen.";
+
+const gestellt = (unterlagen: Unterlage[]) => unterlagen.filter((u) => u.vorlage === "rechnung" && u.festgeschrieben && typeof u.daten.datum === "string");
+/** Geteilte Rechnungen, die Umsätze sind (ohne Gutschriften). */
+const festeRechnungen = (unterlagen: Unterlage[]) => gestellt(unterlagen).filter((u) => !istGutschrift(u));
+const kuRechnung = (u: Unterlage) => u.daten.kleinunternehmer === true;
 
 interface Zuordnung {
   u: Unterlage;
@@ -55,7 +69,7 @@ export function perioden(unterlagen: Unterlage[], betrieb: Betrieb, v: Versteuer
   return [...set].sort((a, b) => b.localeCompare(a) || (a.includes("Q") ? 1 : -1));
 }
 
-/** Festgeschriebene Rechnungen ohne vermerkten Zahlungseingang (nicht storniert, keine Stornorechnung). */
+/** Festgeschriebene Rechnungen ohne vermerkten Zahlungseingang (nicht storniert, keine Stornorechnung, keine Gutschrift). */
 export const offeneRechnungen = (unterlagen: Unterlage[]) => festeRechnungen(unterlagen).filter((u) => !u.bezahlt && !u.storniertDurch && !(typeof u.daten.storno_zu === "string" && u.daten.storno_zu));
 
 export interface UstUebernahme {
@@ -68,15 +82,32 @@ export interface UstUebernahme {
   /** Belege mit Vorsteuer im Zeitraum und solche mit Umsatzsteuer, aber ohne Vorsteuerabzug (E-133) */
   vorsteuerBelege: number;
   ohneVorsteuer: number;
+  /** Kleinunternehmer: nichts übernommen (`werte` enthält nur den Zeitraum) */
+  kleinunternehmer: boolean;
+  /** Gutschriften im Zeitraum – keine Umsätze, nicht übernommen */
+  gutschriften: number;
 }
 
-/** Felder der Voranmeldung für einen Zeitraum („JJJJ-MM“ oder „JJJJ-Qn“). */
-export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: Betrieb, v: Versteuerung = "soll", belege: Beleg[] = []): UstUebernahme | null {
+/**
+ * Felder der Voranmeldung für einen Zeitraum („JJJJ-MM“ oder „JJJJ-Qn“). `kleinunternehmer`: Antwort im Pflichten-Check
+ * („ust.kleinunternehmer“); ohne Antwort gilt als Kleinunternehmer, wessen Rechnungen im Zeitraum alle Kleinunternehmer-
+ * Rechnungen sind. Dann wird nichts übernommen – auch keine Vorsteuer.
+ */
+export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: Betrieb, v: Versteuerung = "soll", belege: Beleg[] = [], kleinunternehmer?: boolean): UstUebernahme | null {
   const z = ustZeitraum(periode);
   if (!z) return null;
-  const im = festeRechnungen(unterlagen)
+  const imZeitraum = (u: Unterlage) => {
+    const x = zuordnen(u, v, betrieb);
+    return x.tag !== null && x.tag >= z.von && x.tag <= z.bis;
+  };
+  const gutschriften = gestellt(unterlagen).filter((u) => istGutschrift(u) && imZeitraum(u)).length;
+  const alle = festeRechnungen(unterlagen)
     .map((u) => zuordnen(u, v, betrieb))
     .filter((x) => x.tag && x.tag >= z.von && x.tag <= z.bis);
+  const ku = kleinunternehmer ?? (alle.length > 0 && alle.every((x) => kuRechnung(x.u)));
+  if (ku) return { werte: { zeitraum: periodeText(periode) }, anzahl: 0, ersatz: 0, offen: 0, vorsteuerBelege: 0, ohneVorsteuer: 0, kleinunternehmer: true, gutschriften };
+  // einzelne Kleinunternehmer-Rechnungen (z. B. aus der Zeit vor dem Wechsel zur Regelbesteuerung) zählen nicht mit
+  const im = alle.filter((x) => !kuRechnung(x.u));
   const gruppen = umsaetzeNachSatz(
     im.map(({ u }) => {
       const { daten } = eRechnungAus(u.daten, betrieb);
@@ -91,6 +122,8 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
     anzahl: im.length,
     ersatz: im.filter((x) => x.ersatz).length,
     offen: v === "ist" ? offeneRechnungen(unterlagen).length : 0,
+    kleinunternehmer: false,
+    gutschriften,
     werte: { zeitraum: periodeText(periode), umsatz_19: betragText(summe((s) => s === 19)), umsatz_7: betragText(summe((s) => s === 7)), umsatz_frei: betragText(summe((s) => s === null || s === 0)), ...(belege.length ? { vorsteuer: betragText(vst.cent) } : {}) },
   };
 }

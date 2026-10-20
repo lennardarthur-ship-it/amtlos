@@ -39,6 +39,25 @@ export const formGleich = (a: string, b: string) => {
   return n(a) === n(b);
 };
 
+/**
+ * Kapitalgesellschaft (GmbH, UG, AG) nach der Rechtsform aus „Mein Betrieb“ – ohne Angabe dort nach dem Zusatz im
+ * Namen des Betriebs. Eine GmbH & Co. KG ist eine Kommanditgesellschaft und zählt nicht dazu.
+ */
+export function istKapitalgesellschaft(rechtsform: string | undefined, name = ""): boolean {
+  const rf = (rechtsform ?? "").trim();
+  const form = rf ? formImNamen(rf) : formImNamen(name);
+  return form === "GmbH" || form === "UG (haftungsbeschränkt)" || form === "AG";
+}
+
+/**
+ * Vertragspartei bzw. Arbeitgeber als Text: bei einer Kapitalgesellschaft mit Geschäftsführung in „Mein Betrieb“
+ * „Firma, vertreten durch …“, sonst nur der Name.
+ */
+export function mitVertretung(b: Betrieb, name = b.name.trim()): string {
+  const v = (b.vertretung ?? "").trim();
+  return name && v && istKapitalgesellschaft(b.rechtsform, b.name) ? `${name}, vertreten durch ${v}` : name;
+}
+
 /** Registergericht und -nummer aus „Mein Betrieb“ in einer Zeile. */
 export const registerAus = (b: Betrieb) => [b.registergericht ?? "", b.registernummer ?? ""].map((x) => x.trim()).filter(Boolean).join(", ");
 

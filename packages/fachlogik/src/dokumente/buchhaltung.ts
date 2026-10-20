@@ -4,10 +4,11 @@
  * E-Bilanz, Kassenmeldung), erstellt die App als ausgefüllte Unterlage zum Übertragen – sie übermittelt nichts.
  * Gliederungen fachlich zu prüfen (T-58).
  */
-import { KU_HINWEIS, fehlendFuerERechnung, rundeCent, summen, type Position, type RechnungsDaten } from "../rechnung.js";
+import { KU_HINWEIS, einheitFuerMenge, fehlendFuerERechnung, rundeCent, summen, type Position, type RechnungsDaten } from "../rechnung.js";
 import { einheitCode } from "../erechnung.js";
 import { giroCodeSvg } from "../girocode.js";
 import { EUER_ZEILE_STEUERFREI, EUER_ZEILE_STEUERPFLICHTIG, KATEGORIEN } from "../belege.js";
+import { istKapitalgesellschaft } from "./betrieb.js";
 import { AUFBEWAHRUNG, EINHEITEN, EUER_AUSGABEN, EUER_EINNAHMEN, KASSEN_ARTEN, RECHNUNGS_HINWEISE, TSE_ARTEN } from "./bausteine.js";
 import { KOPF_LINIE, LINIE_MITTEL, ZELLE_LINIE, abschnitt, absatz, ankreuzen, anschrift, auswahl, brief, cent, datumDe, dokument, esc, euro, felder, ibanText, kennzahlen, nachsatz, uebertragung, ja, liste, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
 import type { Betrieb, Daten, Eintrag, Option, Vorlage } from "./typen.js";
@@ -167,6 +168,11 @@ export function eRechnungAus(d: Daten, b: Betrieb): { daten: RechnungsDaten; feh
   return { daten, fehlt };
 }
 
+/** Art der Rechnung aus den Daten: Stornorechnung (storniert eine andere), Gutschrift (Hinweis „gutschrift“) oder Rechnung. */
+export function rechnungsTitel(d: Daten): "Rechnung" | "Stornorechnung" | "Gutschrift" {
+  return text(d, "storno_zu") ? "Stornorechnung" : auswahl(d, "hinweise").includes("gutschrift") ? "Gutschrift" : "Rechnung";
+}
+
 function plusTageIso(iso: string, tage: number): string {
   const [j, m, t] = iso.split("-").map(Number) as [number, number, number];
   return new Date(Date.UTC(j, m - 1, t + tage)).toISOString().slice(0, 10);
@@ -188,6 +194,7 @@ export const rechnung: Vorlage = {
   ausProfil: { kleinunternehmer: "ust.kleinunternehmer" },
   grundlage: "§ 14 Abs. 4 UStG",
   namensFeld: "nummer",
+  titelFuer: rechnungsTitel,
   abschnitte: [
     { titel: "Eckdaten",
       hilfe: "Am Ende teilst du die Rechnung als PDF – an Unternehmen zusätzlich als E-Rechnung (XRechnung).",
@@ -265,13 +272,14 @@ export const rechnung: Vorlage = {
     const zeilenHtml = pos.map(({ e, p }, i) => [
       String(i + 1),
       zelle(p.bezeichnung),
-      `${zahlText(p.menge, 4)}${text(e, "einheit") ? ` ${esc(text(e, "einheit"))}` : ""}`,
+      `${zahlText(p.menge, 4)}${text(e, "einheit") ? ` ${esc(einheitFuerMenge(text(e, "einheit"), p.menge))}` : ""}`,
       euro(p.preis_cent),
       ...(ku ? [] : [p.ust_satz === 0 ? "0 %" : `${p.ust_satz} %`]),
       euro(s.zeilen[i]!),
     ]);
     const summenZeilen = [
-      `<tr><td>Summe netto</td><td>${betrag(s.netto_cent)}</td></tr>`,
+      // Kleinunternehmer: ohne Umsatzsteuer gibt es kein „netto“
+      `<tr><td>${ku ? "Summe" : "Summe netto"}</td><td>${betrag(s.netto_cent)}</td></tr>`,
       ...(ku ? [] : s.gruppen.map((g) => `<tr><td>${g.satz === 0 ? nullProzentText(auswahl(d, "hinweise"), befreiungText(d)) : `Umsatzsteuer ${g.satz} %`} auf ${euro(g.netto_cent)}</td><td>${euro(g.ust_cent)}</td></tr>`)),
       // leere Vorlage: Zeile für die Umsatzsteuer mit Steuersatz zum Eintragen
       ...(leer && !ku ? [`<tr><td>Umsatzsteuer <span class="fuellen kurz"></span> %</td><td>&nbsp;</td></tr>`] : []),
@@ -305,11 +313,11 @@ export const rechnung: Vorlage = {
           ? `<div class="zahlung"><div class="text"><p>Bitte überweisen Sie den Rechnungsbetrag bis zum ${LINIE_MITTEL}${iban ? " auf das Konto" : "."}</p>${iban ? `<p><strong>IBAN ${esc(ibanText(iban))}</strong>${b.bic?.trim() ? `<br>BIC ${esc(b.bic.trim())}` : ""}${b.bank?.trim() ? `<br>${esc(b.bank.trim())}` : ""}<br>Verwendungszweck: Rechnung ${text(d, "nummer") ? esc(text(d, "nummer")) : LINIE_MITTEL}</p>` : ""}</div></div>`
           : "";
     const anrede = text(d, "kunde_name") ? (storno ? `wir stornieren hiermit die unten genannte Rechnung und stellen den Betrag wie folgt gut.` : gutschrift ? `wir rechnen über die folgenden Leistungen ab und schreiben Ihnen den Betrag gut:` : `wir bedanken uns für Ihren Auftrag und stellen Ihnen folgende Leistungen in Rechnung:`) : "";
-    const titel = `${storno ? "Stornorechnung" : gutschrift ? "Gutschrift" : "Rechnung"} ${text(d, "nummer")}`.trim();
+    const titel = `${rechnungsTitel(d)} ${text(d, "nummer")}`.trim();
     return brief({
       titel,
       betreff: titel,
-      // der Leistungszeitraum steht im Informationsblock („Leistungsdatum/-zeitraum“), nicht noch einmal unter dem Betreff
+      // der Leistungszeitraum steht im Informationsblock („Leistungsdatum“ bzw. „Leistungszeitraum“), nicht noch einmal unter dem Betreff
       unterBetreff: storno ? `Diese Rechnung storniert die Rechnung Nr. ${storno}${text(d, "storno_zu_datum") ? ` vom ${datumDe(text(d, "storno_zu_datum"))}` : ""}.` : undefined,
       betrieb: b,
       stand: datumDe(datum),
@@ -317,7 +325,8 @@ export const rechnung: Vorlage = {
       info: [
         ["Rechnungsnummer", text(d, "nummer"), true],
         ["Rechnungsdatum", datumDe(datum)],
-        [ja(d, "leistung_gleich") ? "Leistungsdatum" : "Leistungsdatum/-zeitraum", ja(d, "leistung_gleich") ? datumDe(datum) : leistung],
+        // ein einzelnes Datum heißt „Leistungsdatum“, alles andere (z. B. „Oktober 2026“, „02.03. – 27.03.2026“) „Leistungszeitraum“
+        [ja(d, "leistung_gleich") || isoAus(leistung) || !leistung.trim() ? "Leistungsdatum" : "Leistungszeitraum", ja(d, "leistung_gleich") ? datumDe(datum) : leistung],
         ["Steuernummer", b.steuernummer.trim()],
         ["USt-IdNr.", b.ust_idnr.trim()],
         ["Ansprechpartner", b.verantwortlich.trim()],
@@ -367,6 +376,9 @@ const EUER_AUSGABEN_ZEILEN = zeilenMit(
 );
 const EUER_EINNAHMEN_ZEILEN = zeilenMit(EUER_EINNAHMEN, [EUER_ZEILE_STEUERPFLICHTIG, EUER_ZEILE_STEUERFREI]);
 
+/** Warnung bei der EÜR, wenn „Mein Betrieb“ eine Kapitalgesellschaft ist (Rechtsform bzw. Zusatz im Namen). */
+export const EUER_KAPITALGESELLSCHAFT = "Kapitalgesellschaften erstellen eine Bilanz statt einer EÜR – bitte prüfen.";
+
 export const euer: Vorlage = {
   id: "euer",
   gestalt: "formular",
@@ -411,6 +423,10 @@ export const euer: Vorlage = {
       felder: [{ id: "afa", art: "liste", label: "Abschreibungen", eintrag: "Abschreibung", titelFeld: "text", felder: [{ id: "text", art: "text", label: "Wirtschaftsgut", pflicht: true }, { id: "betrag", art: "betrag", label: "Betrag dieses Jahr (€)", pflicht: true }] }],
     },
   ],
+  pruefen(_d, b) {
+    // Hinweis, kein Hindernis: die Vorlage bleibt nutzbar (z. B. für eine Gesellschaft, die die Rechtsform noch wechselt)
+    return istKapitalgesellschaft(b.rechtsform, b.name) ? [EUER_KAPITALGESELLSCHAFT] : [];
+  },
   ergebnis(d) {
     // wie im Dokument: Betriebsausgaben ohne AfA, AfA eigens, Ergebnis nach Abzug beider
     const e = summe(liste(d, "einnahmen"), "betrag");
@@ -864,7 +880,7 @@ export const kassenmeldung: Vorlage = {
           titel: `Aufzeichnungssystem ${i + 1}${text(x, "ausser_betrieb") ? " (außer Betrieb)" : ""}`,
           zeilen: [
             ["Art", text(x, "art")],
-            ["Hersteller / Modell", [text(x, "hersteller"), text(x, "modell")].filter(Boolean).join(" ")],
+            ["Hersteller / Modell", [text(x, "hersteller"), text(x, "modell")].filter(Boolean).join(", ")],
             ["Seriennummer", text(x, "seriennummer")],
             ["Software", text(x, "software") || null],
             ["Angeschafft am", datumDe(text(x, "anschaffung"))],

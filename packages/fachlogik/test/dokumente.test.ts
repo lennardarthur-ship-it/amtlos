@@ -535,7 +535,9 @@ describe("Dokumentvorlagen", () => {
     // Rechnung: leere Vorlage mit Umsatzsteuerzeile, Kleinunternehmer ohne; Leistungszeitraum
     expect(leer("rechnung")).toContain('Umsatzsteuer <span class="fuellen kurz"></span> %');
     expect(html("rechnung", { kleinunternehmer: true })).not.toContain("fuellen kurz");
-    expect(html("rechnung", { leistung_gleich: false, leistung: "Oktober 2026" })).toContain("Leistungsdatum/-zeitraum");
+    expect(html("rechnung", { leistung_gleich: false, leistung: "Oktober 2026" })).toContain("<td>Leistungszeitraum</td><td>Oktober 2026</td>");
+    expect(html("rechnung", { leistung_gleich: false, leistung: "12.10.2026" })).toContain("<td>Leistungsdatum</td><td>12.10.2026</td>");
+    expect(html("rechnung", { leistung_gleich: false, leistung: "12.10.2026" })).not.toContain("Leistungsdatum/-zeitraum");
     // Prüfprotokoll, Kassenbuch, Steuererklärung, Bilanz, EÜR, Hautschutzplan: Angaben zum Eintragen
     const pp = leer("pruefprotokoll_elektro");
     expect(pp).toContain(kopfLinie("Geprüft von"));
@@ -774,8 +776,10 @@ describe("Vorlagen, vierte Durchsicht", () => {
     expect(sl).toContain("<th>Vorsteuer im Jahr</th>");
     expect(sl).toContain("<h2>Geleistete Vorauszahlungen</h2>");
     expect(sl).toContain("<th>Was</th><th class=\"zahl\">Betrag</th><th>Beleg</th>");
-    // AVV: Anlage vor den Unterschriften, wenn die TOM darauf verweisen
-    expect(html("avv", { tom: "siehe Anlage (TOM-Beschreibung des Auftragsverarbeiters)" })).toContain("<p>Anlage: Technische und organisatorische Maßnahmen des Auftragnehmers</p><div class=\"unterschriften");
+    // AVV: Anlage am Ende des Paragraphen über die TOM (nicht allein über den Unterschriften), wenn die TOM darauf verweisen
+    const avvAnlage = html("avv", { tom: "siehe Anlage (TOM-Beschreibung des Auftragsverarbeiters)" });
+    expect(avvAnlage).toContain("<h2>Technische und organisatorische Maßnahmen</h2><p>siehe Anlage (TOM-Beschreibung des Auftragsverarbeiters)</p><p>Anlage: Technische und organisatorische Maßnahmen des Auftragnehmers</p></section>");
+    expect(avvAnlage).not.toContain("Auftragnehmers</p><div class=\"unterschriften");
     expect(html("avv", { tom: "Verschlüsselung" })).not.toContain("Anlage:");
     // Datenschutzinformation: Ergänzungen gleich nach den Zwecken
     const di = html("datenschutzinformation", { fuer_wen: "Kunden", verarbeitungen: [], ergaenzung: "Videoüberwachung" });

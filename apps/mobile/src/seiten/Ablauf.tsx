@@ -85,7 +85,8 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
           wert={uebernommen?.v === v ? uebernommen.periode : null}
           aendern={(p) => {
             if (!sperre("ust_uebernahme")) return;
-            const erg = umsaetzeFuer(z.stand.unterlagen, p, z.stand.betrieb, v, z.stand.belege);
+            const ku = z.stand.profil["ust.kleinunternehmer"];
+            const erg = umsaetzeFuer(z.stand.unterlagen, p, z.stand.betrieb, v, z.stand.belege, typeof ku === "boolean" ? ku : undefined);
             if (!erg) return;
             z.setzen(id, erg.werte);
             setUebernommen({ periode: p, v, r: erg });
@@ -95,7 +96,8 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
       </ScrollView>
       {r ? (
         <View style={{ marginTop: 8, gap: 4 }}>
-          <T v="caption" farbe={f.amtTief}>{TEXT.aus_rechnungen_ok(r.anzahl)}</T>
+          {r.kleinunternehmer ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_ku}</T> : <T v="caption" farbe={f.amtTief}>{TEXT.aus_rechnungen_ok(r.anzahl)}</T>}
+          {r.gutschriften ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_gutschriften(r.gutschriften)}</T> : null}
           {r.ersatz ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_ersatz(r.ersatz)}</T> : null}
           {r.offen ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_offen(r.offen)}</T> : null}
           {r.vorsteuerBelege || r.ohneVorsteuer ? <T v="caption" farbe={f.amtTief}>{TEXT.aus_rechnungen_vorsteuer(r.vorsteuerBelege, r.ohneVorsteuer)}</T> : null}

@@ -364,6 +364,10 @@ tfoot { display: table-row-group; }
 /* Tabellen: keine einzelne Zeile unter der Überschrift oder allein auf der neuen Seite, Summenzeile nicht ohne die
    letzte Zeile (Chromium beachtet „avoid“ an Zeilen- und Zeilengruppengrenzen; der Tabellenkopf wiederholt sich) */
 table > tbody > tr:nth-child(2), table > tbody > tr:last-child, tfoot, tfoot tr { page-break-before: avoid; break-before: avoid; }
+/* Feldtabelle aus einer einzigen Zeile (z. B. letztes Feld mit Erklärung und Unterschrift im Personalfragebogen): Die
+   Regel für die letzte Zeile hieße hier „nicht vor der Tabelle umbrechen“ und schöbe die Zeilen davor mit auf die
+   Folgeseite – ob davor umbrochen wird, entscheidet der umgebende Block */
+table.felder > tbody > tr:only-child { page-break-before: auto; break-before: auto; }
 table.liste tbody.schluss { page-break-inside: avoid; break-inside: avoid; }
 .schlussblock.nach-tabelle { page-break-before: avoid; break-before: avoid; }
 .fuellen-block, .uebertragung { page-break-inside: avoid; break-inside: avoid; }
@@ -371,6 +375,9 @@ table.liste tbody.schluss { page-break-inside: avoid; break-inside: avoid; }
    trennen – in Vorlagen als <div class="zusammen">…</div> (oder zusammen()); abschnitt() setzt die Klasse bei kurzen
    Abschnitten selbst. Nur für Blöcke deutlich kürzer als eine Seite, sonst bricht Chromium trotzdem um. */
 .zusammen { page-break-inside: avoid; break-inside: avoid; }
+/* Einleitungssatz einer Liste (z. B. „Mit meiner Unterschrift bestätige ich …“) nicht ohne die Liste am Seitenende –
+   passt der Anfang der Liste nicht mehr, geht er samt Überschrift mit auf die neue Seite */
+.vor-tabelle { page-break-after: avoid; break-after: avoid; page-break-inside: avoid; break-inside: avoid; }
 /* eigenes Blatt (z. B. Messprotokoll zum Aushängen) */
 .neue-seite { page-break-before: always; break-before: page; }
 

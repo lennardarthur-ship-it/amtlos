@@ -308,8 +308,9 @@ export const svMeldedaten: Vorlage = {
     // Geburtsname: ausgefüllt oder auf dem leeren Blatt als Zeile; Feldnummern laufen durch
     const geburtsname = text(d, "geburtsname") || (leer ? "" : null);
     const start = 11 - (geburtsname === null ? 1 : 0);
-    // die letzten drei Felder bleiben mit Erklärung und Unterschrift zusammen (nicht allein auf einer neuen Seite)
-    const teil = beschaeftigung.length - 3;
+    // das letzte Feld bleibt mit Erklärung und Unterschrift zusammen (nicht allein auf einer neuen Seite) – mehr
+    // Felder schöben den Block samt Feldern auf die Folgeseite und ließen auf Seite 1 eine Lücke
+    const teil = beschaeftigung.length - 1;
     return dokument({
       titel: "Personalfragebogen",
       betrieb: b,

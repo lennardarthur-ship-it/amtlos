@@ -953,6 +953,19 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
   - Café bekommt keine Beauty-Vorlagen (Hygieneplan, Hautschutzplan) mehr angeboten; Datenschutz-Baustein ohne „Friseur-Kundenkartei“; HACCP-Messprotokoll ohne leere Grenzwert-Spalte; Urlaubs- und Krankheitstage ohne „Fehlt noch: Beginn, Ende“; LIESMICH erklärt Rechnungs- gegen Leistungsdatum.
 - **Offen:** T-97 (steuerliche Fragen: Storno über den Quartalswechsel, DATEV 8125, Energie-Kategorie, USt-Zahlungen/AfA in der EÜR, ZM) und T-98 (Kassenumsätze fehlen in der App – Produktlücke für Gastronomie und Einzelhandel).
 
+### E-148 · Szenarien Salon GmbH und Kleinunternehmerin (2026-10-20)
+
+- **Anlass:** Sechste Durchsicht – zwei weitere, gegensätzliche Betriebe ein Jahr lang mit den echten App-Funktionen: `jahr-szenario-salon.mjs` (GmbH, zwei Geschäftsführer, Ist-Versteuerung, monatliche Voranmeldung, 4 Beschäftigte, Beauty) und `jahr-szenario-freiberuf.mjs` (Kleinunternehmerin, Grafikdesign, Kunden in NL und CH, Website). Ergebnis nach den Korrekturen: Salon 327/328, Kleinunternehmerin 228/238, Café 228/235 Kennzahlen gleich der unabhängigen Rechnung; die Rest-Abweichungen sind die fachlich offenen Punkte (T-97, T-100, T-101).
+- **Behoben:**
+  - Gutschriften zählten als Umsatz (EÜR, DATEV, Rechnungsliste, USt-Übernahme, Monatssumme, offene Rechnungen). Für den Aussteller sind sie Ausgaben: eigene Liste `Gutschriften_<Zeitraum>.csv` im Paket, Hinweis „als Beleg erfassen“. Typcode der E-Rechnung unverändert (T-101).
+  - Kleinunternehmer: Voranmeldung übernimmt nichts (mit Hinweis), neue und eingelesene Belege starten ohne Vorsteuer, „Summe“ statt „Summe netto“, LIESMICH ohne Voranmeldungs-Satz und mit Soll/Ist aus „Mein Betrieb“.
+  - EÜR bei Kapitalgesellschaften mit Warnung (Bilanz statt EÜR).
+  - Rechnungen: Einheiten gebeugt („9 Stunden“), „Leistungsdatum“ bzw. „Leistungszeitraum“ je nach Eingabe; Dateinamen „Stornorechnung-…“, „Gutschrift-…“.
+  - Pflichten zeigen alle zugehörigen Vorlagen (z. B. Gefahrstoffverzeichnis und Betriebsanweisung).
+  - „vertreten durch …“ bei Kapitalgesellschaften in AVV, Nachweis der Arbeitsbedingungen und Verfahrensdokumentation; AVV-Anlage am Ende von § 4.
+  - Seitenumbrüche im Personalfragebogen und bei Teilnehmerlisten; Kassenmeldung „Hersteller, Modell“; Datenschutzerklärung nennt ein Kontaktformular nur, wenn eines angegeben ist.
+- **Bewusst offen:** T-99 (Widerspruch § 2a SchwarzArbG bei Friseuren – vorrangig), T-100, T-101. Der Infoblock der Rechnung reicht nach DIN 5008 bis 200 mm; lange E-Mail-Adressen enden dort, nicht an der 190-mm-Textkante (Gestaltungsentscheidung aus E-130 beibehalten).
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

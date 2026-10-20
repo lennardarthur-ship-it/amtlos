@@ -4,6 +4,7 @@
  * zur Belegablage (AWV) und zum ersetzenden Scannen (BStBK/DStV). Fachlich zu prüfen (T-54).
  */
 import { GOBD } from "./bausteine.js";
+import { mitVertretung } from "./betrieb.js";
 import { abschnitte, angaben, ankreuzen, auswahl, datumDe, dokument, esc, ja, liste, punkte, tabelle, text, unterschriften, zelle, zeilen } from "./html.js";
 import type { Option, Vorlage } from "./typen.js";
 
@@ -112,7 +113,7 @@ export const verfahrensdokumentation: Vorlage = {
       meta: `Stand: ${datumDe(text(d, "stand"))}\nVersion: ${text(d, "version")}\nVerantwortlich: ${text(d, "verantwortlich")}`,
       inhalt:
         abschnitte([
-          { titel: "Allgemeine Beschreibung", rand: "GoBD Tz. 10.1", inhalt: angaben([["Betrieb", b.name], ["Tätigkeit und Organisation", text(d, "organisation")], ["Steuerberatung", text(d, "steuerberatung") || null], ["Verantwortlich", text(d, "verantwortlich")]]) },
+          { titel: "Allgemeine Beschreibung", rand: "GoBD Tz. 10.1", inhalt: angaben([["Betrieb", mitVertretung(b)], ["Tätigkeit und Organisation", text(d, "organisation")], ["Steuerberatung", text(d, "steuerberatung") || null], ["Verantwortlich", text(d, "verantwortlich")]]) },
           { titel: "Eingesetzte Programme und Geräte", rand: "GoBD Tz. 10.1", inhalt: tabelle(["Programm, Gerät", "Wofür", "Version, seit"], systeme.map((x) => [zelle(text(x, "name")), zelle(text(x, "zweck")), zelle(text(x, "version"))]), { breiten: ["38%", "38%", "24%"], ...(systeme.length ? {} : { mindestens: 4, hoch: true }) }) },
           {
             titel: "Anwenderdokumentation: Belegeingang, Erfassung und Ablage",
@@ -136,7 +137,8 @@ export const verfahrensdokumentation: Vorlage = {
             inhalt: `<div${aenderungen.length <= 8 ? ' class="zusammen"' : ""}><p>Diese Verfahrensdokumentation wird als Organisationsunterlage aufbewahrt; Änderungen werden mit Datum festgehalten.</p>${aenderungen.length ? tabelle(["Datum", "Änderung"], aenderungen.map((x) => [datumDe(text(x, "datum")), zelle(text(x, "aenderung"))]), { breiten: ["18%", "82%"] }) : tabelle(["Datum", "Änderung"], [], { breiten: ["18%", "82%"], mindestens: 4, hoch: true })}</div>`,
           },
         ]) +
-        unterschriften(["Unterschrift"], { ortDatum: true }),
+        // Kapitalgesellschaft: wer für den Betrieb unterschreibt (Geschäftsführung aus „Mein Betrieb“)
+        unterschriften([mitVertretung(b) !== b.name.trim() ? `Unterschrift (${mitVertretung(b)})` : "Unterschrift"], { ortDatum: true }),
     });
   },
 };

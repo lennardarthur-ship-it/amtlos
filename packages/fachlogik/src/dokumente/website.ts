@@ -3,7 +3,7 @@
  * Vertrag zur Auftragsverarbeitung mit den Pflichtinhalten nach Art. 28 Abs. 3 DSGVO. Texte aus bausteine.ts.
  */
 import { AVV_KLAUSELN, DSE } from "./bausteine.js";
-import { formGleich, formImNamen, rechtsformAus } from "./betrieb.js";
+import { formGleich, formImNamen, mitVertretung, rechtsformAus } from "./betrieb.js";
 import { aufsichtFuer } from "./datenschutz.js";
 import { LINIE, abschnitt, abschnitte, angaben, anschrift, auswahl, datumDe, dokument, esc, ja, parteien, text, unterschriften, zeilen } from "./html.js";
 import { optionen } from "./konstanten.js";
@@ -67,11 +67,22 @@ const DSE_WAHL = DSE_REIHE.filter((x) => !x.immer && DSE[x.id]).map((x) => ({ we
 /** Rat an den Betreiber im Baustein „Google Fonts (extern)“ – gehört nicht in die veröffentlichte Erklärung (steht als Hilfe am Feld). */
 const FONTS_EMPFEHLUNG = /\s*Empfehlung: Schriftarten lokal einbinden, dann entfällt die Übermittlung\./;
 
+/**
+ * Baustein „Kontakt“ ohne Kontaktformular (Schalter aus): nur E-Mail und Telefon. Ältere Erklärungen ohne den Schalter
+ * behalten den Text mit Formular.
+ */
+function ohneKontaktformular(t: { titel: string; text: string }): { titel: string; text: string } {
+  return { titel: t.titel.replace(/, Telefon oder Kontaktformular$/, " oder Telefon"), text: t.text.replace(/per E-Mail, telefonisch oder über das Kontaktformular/, "per E-Mail oder telefonisch") };
+}
+
 function dseTeile(d: Daten, b: Betrieb): { titel: string; text: string }[] {
   const an = new Set(auswahl(d, "module"));
   // beide Schriftarten-Bausteine widersprechen sich: extern eingebunden geht vor (die Prüfung weist darauf hin)
   if (an.has("google_fonts_extern")) an.delete("google_fonts_lokal");
-  const teile = DSE_REIHE.filter((x) => (x.immer || an.has(x.id)) && DSE[x.id]).map((x) => ({ titel: DSE[x.id]!.titel, text: bausteinText(DSE[x.id]!.text.replace(FONTS_EMPFEHLUNG, ""), d, b) }));
+  const teile = DSE_REIHE.filter((x) => (x.immer || an.has(x.id)) && DSE[x.id]).map((x) => {
+    const t = { titel: DSE[x.id]!.titel, text: bausteinText(DSE[x.id]!.text.replace(FONTS_EMPFEHLUNG, ""), d, b) };
+    return x.id === "kontakt" && d.kontaktformular === false ? ohneKontaktformular(t) : t;
+  });
   const rechte = teile.findIndex((t) => t.titel === DSE.betroffenenrechte?.titel);
   const vorRechten = [
     ...(text(d, "ergaenzung") ? [{ titel: "Weitere Verarbeitungen", text: text(d, "ergaenzung") }] : []),
@@ -104,6 +115,7 @@ export const datenschutzerklaerungWebsite: Vorlage = {
       felder: [
         { id: "hoster_name", art: "text", label: "Hosting-Anbieter", wenn: { feld: "module", ist: "hosting" }, hilfe: "steht im Vertrag mit deinem Website-Anbieter" },
         { id: "hoster_anschrift", art: "text", label: "Anschrift des Hosting-Anbieters", wenn: { feld: "module", ist: "hosting" } },
+        { id: "kontaktformular", art: "schalter", label: "Die Website hat ein Kontaktformular", hilfe: "sonst nennt der Abschnitt „Kontakt“ nur E-Mail und Telefon", wenn: { feld: "module", ist: "kontakt" } },
         { id: "logfile_tage", art: "zahl", label: "Server-Logfiles werden gelöscht nach (Tagen)", hilfe: "laut Hosting-Anbieter, z. B. 7, 14 oder 30", wenn: { feld: "module", ist: "server_logfiles" } },
         { id: "link_einstellungen", art: "text", label: "Wo Besucher Cookie-Einstellungen ändern können", vorschlaege: ["den Link „Cookie-Einstellungen“ am Ende jeder Seite"], wenn: { feld: "module", ist: "cookies_einwilligung" } },
         { id: "cookie_zwecke", art: "text", label: "Wofür technisch notwendige Cookies genutzt werden", vorschlaege: ["Speicherung Ihrer Cookie-Auswahl", "Speicherung Ihrer Cookie-Auswahl und des Warenkorbs"], wenn: { feld: "module", ist: "technisch_notwendige_cookies" } },
@@ -277,6 +289,10 @@ export const auftragsverarbeitung: Vorlage = {
   ],
   html(d, b) {
     const ag = text(d, "rolle") !== "dienstleister";
+    // der Betrieb als Partei: bei einer Kapitalgesellschaft mit Geschäftsführung in „Mein Betrieb“ „vertreten durch …“
+    const vertreten = mitVertretung(b) !== b.name.trim() ? `vertreten durch ${(b.vertretung ?? "").trim()}` : undefined;
+    // Hauptvertrag in Anführungszeichen; Anführungszeichen in der Eingabe werden zu halben („Vertrag ‚Salon M‘ vom …“)
+    const hauptvertrag = text(d, "hauptvertrag").replace(/[„"“]([^„"“”]*)[“"”]/g, "‚$1‘");
     // Unterschrift mit dem Namen der Partei, z. B. „Auftraggeber (Salon Sonne GmbH)“
     const mitName = (rolle: string, name: string) => (name.trim() ? `${rolle} (${name.trim()})` : rolle);
     // mehrzeilige Angaben in einer Zeile: Satzzeichen am Zeilenende entfallen („Name., Kontaktdaten“)
@@ -296,7 +312,8 @@ export const auftragsverarbeitung: Vorlage = {
       ],
       ["Pflichten des Auftragnehmers (Art. 28 Abs. 3 Satz 2 lit. a–h DSGVO)", ""],
       ["Unterauftragsverarbeiter", zeilen(text(d, "unterauftrag"))],
-      ["Technische und organisatorische Maßnahmen", zeilen(text(d, "tom"))],
+      // verweisen die TOM auf eine Anlage, wird sie am Ende dieses Paragraphen genannt (nicht allein über den Unterschriften)
+      ["Technische und organisatorische Maßnahmen", zeilen(text(d, "tom")) + (/Anlage/i.test(text(d, "tom")) ? "<p>Anlage: Technische und organisatorische Maßnahmen des Auftragnehmers</p>" : "")],
       ["Rechte und Pflichten des Auftraggebers", "<p>Der Auftraggeber ist für die Rechtmäßigkeit der Verarbeitung verantwortlich und erteilt Weisungen in dokumentierter Form. Er ist berechtigt, die Einhaltung dieses Vertrags zu überprüfen.</p>"],
     ];
     const tomNr = teile.findIndex(([t]) => t === "Technische und organisatorische Maßnahmen") + 1;
@@ -308,16 +325,14 @@ export const auftragsverarbeitung: Vorlage = {
       meta: `Auftraggeber: ${ag ? b.name : text(d, "partner")}\nAuftragnehmer: ${ag ? text(d, "partner") : b.name}`,
       inhalt:
         parteien(
-          { rolle: "Verantwortlicher, Auftraggeber", name: ag ? b.name : text(d, "partner"), anschrift: ag ? anschrift(b) : text(d, "partner_anschrift") },
-          { rolle: "Auftragsverarbeiter, Auftragnehmer", name: ag ? text(d, "partner") : b.name, anschrift: ag ? text(d, "partner_anschrift") : anschrift(b) },
+          { rolle: "Verantwortlicher, Auftraggeber", name: ag ? b.name : text(d, "partner"), anschrift: ag ? anschrift(b) : text(d, "partner_anschrift"), zusatz: ag ? vertreten : undefined },
+          { rolle: "Auftragsverarbeiter, Auftragnehmer", name: ag ? text(d, "partner") : b.name, anschrift: ag ? text(d, "partner_anschrift") : anschrift(b), zusatz: ag ? undefined : vertreten },
         ) +
         // ohne Angabe: Linie zum Eintragen des Hauptvertrags statt den Satz wegzulassen
-        `<p>Dieser Vertrag ergänzt den Vertrag ${text(d, "hauptvertrag") ? `„${esc(text(d, "hauptvertrag"))}“` : LINIE} (Hauptvertrag) und regelt die Verarbeitung personenbezogener Daten im Auftrag nach Art. 28 DSGVO.</p>` +
+        `<p>Dieser Vertrag ergänzt den Vertrag ${hauptvertrag ? `„${esc(hauptvertrag)}“` : LINIE} (Hauptvertrag) und regelt die Verarbeitung personenbezogener Daten im Auftrag nach Art. 28 DSGVO.</p>` +
         teile.map(([t, inhalt]) => abschnitt(t, inhalt)).join("") +
-        // verweisen die TOM auf eine Anlage, wird sie vor den Unterschriften genannt
-        (/Anlage/i.test(text(d, "tom")) ? "<p>Anlage: Technische und organisatorische Maßnahmen des Auftragnehmers</p>" : "") +
         // der Ort gilt für die eigene Unterschrift (Betrieb = Auftraggeber bzw. Dienstleister je nach „Wer ist wer“)
-        unterschriften([mitName("Auftraggeber", ag ? b.name : text(d, "partner")), mitName("Auftragnehmer", ag ? text(d, "partner") : b.name)], { ortDatum: true, orte: text(d, "rolle") === "dienstleister" ? ["", text(d, "ort_datum")] : [text(d, "ort_datum"), ""] }),
+        unterschriften([mitName("Auftraggeber", ag ? mitVertretung(b) : text(d, "partner")), mitName("Auftragnehmer", ag ? text(d, "partner") : mitVertretung(b))], { ortDatum: true, orte: text(d, "rolle") === "dienstleister" ? ["", text(d, "ort_datum")] : [text(d, "ort_datum"), ""] }),
     });
   },
 };
