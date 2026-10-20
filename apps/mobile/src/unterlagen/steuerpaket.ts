@@ -41,7 +41,7 @@ import { APP_VERSION } from "../version";
 import { T as TEXT } from "../texte";
 import { utf8 } from "./sicherung";
 import { GUTSCHRIFT_HINWEIS, istGutschrift } from "./ustAusRechnungen";
-import type { Stand, Unterlage } from "./speicher";
+import { nichtZaehlend, type Stand, type Unterlage } from "./speicher";
 
 // 0 statt -0: ein Storno über 0,00 € steht als „0,00“ da, nicht als „-0,00“
 const betrag = (cent: number) => new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(cent === 0 ? 0 : cent / 100);
@@ -50,8 +50,14 @@ const istStorno = (u: Unterlage) => typeof u.daten.storno_zu === "string" && u.d
 export { GUTSCHRIFT_HINWEIS, istGutschrift };
 
 
-/** Festgeschriebene (geteilte) Rechnungen – nur sie gelten als gestellt (inkl. Stornorechnungen und Gutschriften). */
-export const gestellteRechnungen = (s: Stand) => s.unterlagen.filter((u) => u.vorlage === "rechnung" && u.festgeschrieben && typeof u.daten.datum === "string");
+/**
+ * Festgeschriebene (geteilte) Rechnungen – nur sie gelten als gestellt (inkl. Stornorechnungen und Gutschriften).
+ * Konfliktkopien und doppelte Stornos zählen nicht (K1, K2) – so auch nicht in EÜR und DATEV-Export.
+ */
+export const gestellteRechnungen = (s: Stand) => {
+  const aus = nichtZaehlend(s.unterlagen);
+  return s.unterlagen.filter((u) => u.vorlage === "rechnung" && u.festgeschrieben && typeof u.daten.datum === "string" && !aus.has(u.id));
+};
 /** Gestellte Rechnungen ohne Gutschriften – nur sie sind Umsätze des Betriebs. */
 export const umsatzRechnungen = (s: Stand) => gestellteRechnungen(s).filter((u) => !istGutschrift(u));
 
@@ -330,9 +336,9 @@ export const ZAHLTAG_FEHLT = "fehlt – Belegdatum verwendet";
 
 /**
  * Belegliste mit Amtlos-Belegnummer, Belegfeld 1 wie im DATEV-Stapel, Aufwandskonto, Zahltag (für die EÜR) und einer
- * Summenzeile am Ende. `nummern` aus `belegNummern(s.belege)` – ohne Angabe selbst abgeleitet.
+ * Summenzeile am Ende. `nummern` aus `belegNummern([...s.belege, ...s.belegArchiv])` – ohne Angabe selbst abgeleitet.
  */
-export function belegeCsv(s: Stand, z: Zeitraum, dateinamen: Map<string, string> = new Map(), kontenrahmen: Kontenrahmen = s.steuerberatung.kontenrahmen, nummern: Map<string, string> = belegNummern(s.belege)): string {
+export function belegeCsv(s: Stand, z: Zeitraum, dateinamen: Map<string, string> = new Map(), kontenrahmen: Kontenrahmen = s.steuerberatung.kontenrahmen, nummern: Map<string, string> = belegNummern([...s.belege, ...s.belegArchiv])): string {
   const summe = { netto: 0, ust: 0, vorsteuer: 0, brutto: 0 };
   const zeilen = belegeImZeitraum(s, z).map((b) => {
     const sm = belegSummen(b);
@@ -381,7 +387,7 @@ export function grundOhneXml(fehlt: string[], kundeUstId: string | null | undefi
  * Fragen an den Betrieb, die sich aus den Daten ergeben – nur Sachverhalte, keine steuerliche Bewertung. Abschnitte ohne
  * Einträge entfallen; ohne Fragen ein Satz „Keine offenen Punkte“.
  */
-export function fragenText(s: Stand, z: Zeitraum, nummern: Map<string, string> = belegNummern(s.belege)): { text: string; anzahl: number } {
+export function fragenText(s: Stand, z: Zeitraum, nummern: Map<string, string> = belegNummern([...s.belege, ...s.belegArchiv])): { text: string; anzahl: number } {
   const belege = belegeImZeitraum(s, z);
   const bz = (b: Beleg, zusatz = "") => `- ${nummern.get(b.id) ?? ""} · ${datumDe(b.datum)} · ${b.lieferant.trim() || "ohne Lieferant"} · ${betrag(belegSummen(b).brutto_cent)} € brutto${b.notiz ? ` · Notiz: ${b.notiz.replace(/\s+/g, " ").trim()}` : ""}${zusatz}`;
   const rz = (u: Unterlage, zusatz = "") => {
@@ -485,7 +491,7 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
   const gutschriften = alle.filter(istGutschrift);
   const ku = istKleinunternehmer(s);
   const ist = s.betrieb.versteuerung === "ist";
-  const nummern = belegNummern(s.belege);
+  const nummern = belegNummern([...s.belege, ...s.belegArchiv]);
   const belege = belegeImZeitraum(s, z);
   const buchungen = [...buchungenAusRechnungen(rechnungen.map((u) => rechnungFuerBuchung(u, s.betrieb)), sb.kontenrahmen), ...buchungenAusBelegen(belege, sb.kontenrahmen, { nummern })].sort((a, b) => a.datum.localeCompare(b.datum));
   const inhalt: Record<string, Uint8Array> = {};

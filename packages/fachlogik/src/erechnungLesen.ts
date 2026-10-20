@@ -469,15 +469,25 @@ class Bitleser {
   }
 }
 
+/**
+ * Obergrenze für entpackte Daten (G-2): Eine E-Rechnung im PDF ist wenige hundert KB groß. Eine präparierte Datei
+ * („Entpackbombe“) könnte sonst aus 15 MB mehrere GB machen und die App zum Absturz bringen.
+ */
+export const INFLATE_HOECHSTENS = 20 * 1024 * 1024;
+
 class Ausgabe {
   private puffer: Uint8Array;
   laenge = 0;
-  constructor(erwartet: number) {
-    this.puffer = new Uint8Array(Math.max(1024, erwartet));
+  constructor(
+    erwartet: number,
+    private max = INFLATE_HOECHSTENS,
+  ) {
+    this.puffer = new Uint8Array(Math.min(this.max, Math.max(1024, erwartet)));
   }
   schreibe(b: number) {
     if (this.laenge === this.puffer.length) {
-      const neu = new Uint8Array(this.puffer.length * 2);
+      if (this.laenge >= this.max) throw new Error("Deflate: entpackte Daten zu groß");
+      const neu = new Uint8Array(Math.min(this.max, this.puffer.length * 2));
       neu.set(this.puffer);
       this.puffer = neu;
     }
@@ -492,9 +502,9 @@ class Ausgabe {
   }
 }
 
-function inflateRoh(daten: Uint8Array): Uint8Array {
+function inflateRoh(daten: Uint8Array, max: number): Uint8Array {
   const b = new Bitleser(daten);
-  const aus = new Ausgabe(daten.length * 4);
+  const aus = new Ausgabe(daten.length * 4, max);
   let letzter = 0;
   while (!letzter) {
     letzter = b.bits(1);
@@ -556,17 +566,19 @@ function inflateRoh(daten: Uint8Array): Uint8Array {
 }
 
 /** zlib-Strom (RFC 1950, wie /FlateDecode im PDF) oder roher Deflate-Strom (RFC 1951) entpacken. Wirft bei kaputten Daten. */
-export function inflate(daten: Uint8Array): Uint8Array {
+export function inflate(daten: Uint8Array, max = INFLATE_HOECHSTENS): Uint8Array {
   const b0 = daten[0] ?? 0;
   const b1 = daten[1] ?? 0;
   if (daten.length >= 2 && (b0 & 0x0f) === 8 && ((b0 << 8) | b1) % 31 === 0) {
     try {
-      return inflateRoh(daten.subarray(b1 & 0x20 ? 6 : 2));
-    } catch {
+      return inflateRoh(daten.subarray(b1 & 0x20 ? 6 : 2), max);
+    } catch (e) {
+      // zu groß: nicht noch einmal als Rohstrom entpacken
+      if (e instanceof Error && e.message.includes("zu groß")) throw e;
       // kein zlib-Kopf, sondern zufällig passende Rohdaten – unten als roher Strom versuchen
     }
   }
-  return inflateRoh(daten);
+  return inflateRoh(daten, max);
 }
 
 // ---------------------------------------------------------------- XML aus ZUGFeRD/Factur-X-PDF

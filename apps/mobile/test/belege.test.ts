@@ -35,13 +35,13 @@ describe("Belege (E-133): Stand, Aufbewahrung, Zusammenführen", () => {
     expect(z.stand.belege.find((b) => b.id === "b1")!.lieferant).toBe("Neu GmbH");
   });
   it("Sicherung Version 2 trägt die Belegdateien, Version 1 bleibt lesbar", () => {
-    const s = belegSetzen(LEERER_STAND, beleg("b1", "2026-10-02", 1000, { datei: "abc.jpg" }), t("2026-10-02"));
+    const s = belegSetzen(LEERER_STAND, beleg("b1", "2026-10-02", 1000, { datei: "abcd1234.jpg" }), t("2026-10-02"));
     const zufall = (n: number) => new Uint8Array(n).fill(7);
-    const v2 = sicherungErstellen(s, "sonnenschein-2026", zufall, t("2026-10-02"), 1000, { "abc.jpg": "AAEC" });
+    const v2 = sicherungErstellen(s, "sonnenschein-2026", zufall, t("2026-10-02"), 1000, { "abcd1234.jpg": "AAEC" });
     expect(JSON.parse(v2).version).toBe(2);
     const r = sicherungLesenMitDateien(v2, "sonnenschein-2026");
-    expect(r.dateien).toEqual({ "abc.jpg": "AAEC" });
-    expect(r.stand.belege[0]!.datei).toBe("abc.jpg");
+    expect(r.dateien).toEqual({ "abcd1234.jpg": "AAEC" });
+    expect(r.stand.belege[0]!.datei).toBe("abcd1234.jpg");
     const v1 = sicherungErstellen(s, "sonnenschein-2026", zufall, t("2026-10-02"), 1000);
     expect(JSON.parse(v1).version).toBe(1);
     expect(sicherungLesen(v1, "sonnenschein-2026").belege).toHaveLength(1);

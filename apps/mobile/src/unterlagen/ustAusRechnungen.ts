@@ -10,7 +10,7 @@
  * nichts – ihre Umsätze gehören in keine Kennzahl der Voranmeldung. Fachlich zu prüfen: T-70.
  */
 import { eRechnungAus, umsaetzeNachSatz, ustZeitraum, vorsteuerFuer, type Beleg, type Betrieb } from "@amtlos/fachlogik";
-import type { Unterlage } from "./speicher";
+import { nichtZaehlend, type Unterlage } from "./speicher";
 
 export type Versteuerung = "soll" | "ist";
 
@@ -34,7 +34,11 @@ export const istGutschrift = (u: Unterlage) => Array.isArray(u.daten.hinweise) &
 /** Steht bei der EÜR-Übernahme und im Steuerberater-Paket, sobald Gutschriften dabei sind. */
 export const GUTSCHRIFT_HINWEIS = "Gutschriften sind Ausgaben – bitte als Beleg erfassen bzw. von der Steuerberatung buchen lassen.";
 
-const gestellt = (unterlagen: Unterlage[]) => unterlagen.filter((u) => u.vorlage === "rechnung" && u.festgeschrieben && typeof u.daten.datum === "string");
+/** Gestellte Rechnungen – ohne Konfliktkopien und doppelte Stornos (K1, K2: je Rechnung zählt nur das Storno aus `storniertDurch`). */
+const gestellt = (unterlagen: Unterlage[]) => {
+  const aus = nichtZaehlend(unterlagen);
+  return unterlagen.filter((u) => u.vorlage === "rechnung" && u.festgeschrieben && typeof u.daten.datum === "string" && !aus.has(u.id));
+};
 /** Geteilte Rechnungen, die Umsätze sind (ohne Gutschriften). */
 const festeRechnungen = (unterlagen: Unterlage[]) => gestellt(unterlagen).filter((u) => !istGutschrift(u));
 const kuRechnung = (u: Unterlage) => u.daten.kleinunternehmer === true;

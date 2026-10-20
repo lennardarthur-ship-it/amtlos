@@ -7,6 +7,11 @@ export async function schluesselHolen(_anlegen: boolean): Promise<Uint8Array | n
 }
 export const nonce = () => Crypto.getRandomBytes(12);
 export async function schluesselLoeschen(): Promise<void> {}
+export async function schluesselArchivieren(_jetzt?: Date): Promise<void> {}
+export async function archivierteSchluessel(): Promise<Uint8Array[]> {
+  return [];
+}
+export async function archivLoeschen(): Promise<void> {}
 export async function autoSchluesselSpeichern(_k: unknown): Promise<void> {}
 export async function autoSchluesselHolen(): Promise<null> {
   return null;

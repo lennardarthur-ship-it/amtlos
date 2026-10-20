@@ -7,7 +7,8 @@
 import { gcm } from "@noble/ciphers/aes";
 import { pbkdf2 } from "@noble/hashes/pbkdf2";
 import { sha256 } from "@noble/hashes/sha2";
-import { standAus, type Stand } from "./speicher";
+import { istBelegDateiname } from "@amtlos/fachlogik";
+import { StandFehler, standAus, type Stand } from "./speicher";
 
 export const SICHERUNG_FORMAT = "amtlos-sicherung";
 /**
@@ -19,6 +20,33 @@ export const SICHERUNG_FORMAT = "amtlos-sicherung";
 export const SICHERUNG_ITERATIONEN = 150_000;
 export const ITERATIONEN_HOECHSTENS = 5_000_000;
 export const PASSWORT_MINDESTLAENGE = 10;
+/** Für neue Passwörter (H-1, Teil 3): mindestens so viele Zeichen – oder ein Satz aus mindestens drei Wörtern. */
+export const PASSWORT_EMPFOHLEN = 12;
+
+const HAEUFIG = ["passwort", "password", "kennwort", "geheim", "amtlos", "qwertz", "qwerty", "asdf", "yxcv", "hallo", "willkommen", "welcome", "sommer", "winter", "fruehling", "frühling", "herbst", "januar", "dezember", "iloveyou", "ichliebedich", "schatz", "admin", "letmein", "monkey", "dragon", "football", "fussball", "fußball", "bayern", "dortmund", "schalke", "berlin", "hamburg", "muenchen", "münchen", "deutschland", "test", "login", "master", "hello", "secret", "sonne", "blume", "hase", "mausi", "baby", "abc", "xyz"];
+const FOLGEN = ["0123456789", "abcdefghijklmnopqrstuvwxyz", "qwertzuiopü", "asdfghjklöä", "yxcvbnm", "qwertyuiop", "zxcvbnm"];
+
+/**
+ * Stärke eines neuen Passworts – eine einfache Abschätzung ohne Wörterbuch-Bibliothek: Gesperrt sind kurze
+ * Passwörter, solche aus wenigen verschiedenen Zeichen und solche, die nach Abzug häufiger Wörter, Tastatur- und
+ * Zahlenfolgen, Jahreszahlen und Wiederholungen kaum noch etwas Eigenes enthalten („Sommer2025!“, „Passwort1234“).
+ * Liefert null, wenn das Passwort genügt, sonst den Grund.
+ */
+export function passwortSchwaeche(pw: string): "kurz" | "einfach" | null {
+  const woerter = pw.split(/[\s\-_.,;:+/]+/).filter((w) => /\p{L}{3,}/u.test(w));
+  const satz = woerter.length >= 3 && new Set(woerter.map((w) => w.toLowerCase())).size >= 3;
+  if (pw.length < PASSWORT_MINDESTLAENGE || (!satz && pw.length < PASSWORT_EMPFOHLEN)) return "kurz";
+  if (new Set(pw.toLowerCase()).size < 6) return "einfach";
+  let kern = pw.toLowerCase();
+  for (const w of HAEUFIG) kern = kern.split(w).join(" ");
+  for (const f of FOLGEN) for (let n = f.length; n >= 4; n--) for (let i = 0; i + n <= f.length; i++) kern = kern.split(f.slice(i, i + n)).join(" ");
+  kern = kern
+    .replace(/(19|20)\d{2}/g, " ")
+    .replace(/(.)\1{2,}/gu, " ")
+    .replace(/[^\p{L}\p{N}]+/gu, "");
+  // was übrig bleibt, muss für sich genug Vielfalt haben
+  return new Set(kern).size < 6 || kern.length < 7 ? "einfach" : null;
+}
 /** bindet Format und Version an den Inhalt – geänderte Kopfdaten fallen beim Entschlüsseln auf */
 const ZUSATZ = `${SICHERUNG_FORMAT}:1`;
 
@@ -140,11 +168,34 @@ export function sicherungLesenMitDateien(text: string, passwort: string): { stan
     throw new SicherungsFehler("passwort");
   }
   const klartext = ausUtf8(klar);
-  if (d.version === 1) return { stand: standAus(klartext), dateien: {}, schluessel: k };
-  const roh = JSON.parse(klartext) as { stand?: unknown; dateien?: unknown };
+  // unlesbarer Inhalt oder Stand aus einer neueren App-Version: keine Sicherung, die sich einspielen ließe
+  const lesen = (json: string) => {
+    try {
+      return standAus(json);
+    } catch (e) {
+      if (e instanceof StandFehler) throw new SicherungsFehler("format");
+      throw e;
+    }
+  };
+  if (d.version === 1) return { stand: lesen(klartext), dateien: {}, schluessel: k };
+  let roh: { stand?: unknown; dateien?: unknown };
+  try {
+    roh = JSON.parse(klartext) as { stand?: unknown; dateien?: unknown };
+  } catch {
+    throw new SicherungsFehler("format");
+  }
   const dateien: Dateien = {};
-  if (roh.dateien && typeof roh.dateien === "object") for (const [k, v] of Object.entries(roh.dateien as Record<string, unknown>)) if (typeof v === "string" && /^[\w.-]+$/.test(k)) dateien[k] = v;
-  return { stand: standAus(JSON.stringify(roh.stand ?? null)), dateien, schluessel: k };
+  // nur Dateinamen, wie die App sie vergibt (G-1)
+  if (roh.dateien && typeof roh.dateien === "object") for (const [k, v] of Object.entries(roh.dateien as Record<string, unknown>)) if (typeof v === "string" && istBelegDateiname(k)) dateien[k] = v;
+  return { stand: lesen(JSON.stringify(roh.stand ?? null)), dateien, schluessel: k };
+}
+
+/**
+ * Belegdateien, auf die der Stand verweist, die aber nicht in `dateien` stecken (H3). Eine Sicherung mit fehlenden
+ * Dateien ist nicht vollständig: Sie darf nicht als Sicherung zählen und „Alle Daten löschen“ nicht freigeben.
+ */
+export function fehlendeDateien(stand: Stand, dateien: Dateien): string[] {
+  return [...new Set([...stand.belege, ...stand.belegArchiv].map((b) => b.datei).filter((n): n is string => Boolean(n) && !dateien[n!]))];
 }
 
 /** Kennung eines Sicherungsschlüssels (aus dem Salz) – Ordnername der Belegdateien in iCloud. */

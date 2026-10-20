@@ -37,7 +37,41 @@ export interface Beleg {
   quelle?: BelegQuelle;
   erstellt: string;
   geaendert: string;
+  /**
+   * Als ungültig markiert (ISO): Innerhalb der Aufbewahrungsfrist wird ein Beleg nicht gelöscht, sondern mit Grund
+   * ungültig gesetzt – Datensatz und Datei bleiben erhalten, er zählt aber nirgends mehr mit (GoBD).
+   */
+  ungueltig?: string | null;
+  ungueltig_grund?: string | null;
+  /** frühere Fassungen (älteste zuerst) – Änderungen an einem Beleg werden protokolliert, nicht überschrieben */
+  historie?: BelegFassung[];
 }
+
+/** Eine frühere Fassung eines Belegs: Inhalt, wie er bis `bis` galt. */
+export interface BelegFassung {
+  /** galt bis zu diesem Zeitpunkt (ISO) */
+  bis: string;
+  datum: string;
+  lieferant: string;
+  nummer?: string | null;
+  kategorie: string;
+  steuer: BelegSteuer[];
+  vorsteuer: boolean;
+  zahlung: Zahlungsweg;
+  bezahlt?: string | null;
+  notiz?: string | null;
+  datei?: string | null;
+}
+
+/**
+ * Erlaubter Dateiname einer Belegdatei (Name aus der App: Zufallskennung und Endung). Alles andere – Pfade wie
+ * „../x“, Schrägstriche, sehr lange Namen – kommt nie in den Stand, damit ein präparierter Stand aus Sync oder
+ * Sicherung keine Dateien außerhalb des Belegordners schreibt oder löscht.
+ */
+export const istBelegDateiname = (name: unknown): name is string => typeof name === "string" && /^[A-Za-z0-9_-]{4,64}\.[a-z0-9]{1,8}$/.test(name);
+
+/** Steuersätze, die in Belegen vorkommen dürfen – 16 % und 5 % galten im 2. Halbjahr 2020 und liegen noch in der Frist. */
+export const BELEG_SAETZE_ERLAUBT = [19, 16, 7, 5, 0] as const;
 
 export interface Kategorie {
   id: string;
@@ -159,7 +193,7 @@ export function vorsteuerFuer(belege: Beleg[], von: string, bis: string): { cent
   let anzahl = 0;
   let ohne = 0;
   for (const b of belege) {
-    if (b.datum < von || b.datum > bis) continue;
+    if (b.ungueltig || b.datum < von || b.datum > bis) continue;
     const s = belegSummen(b);
     if (b.vorsteuer && s.ust_cent) {
       cent += s.ust_cent;
@@ -181,7 +215,7 @@ export function ausgabenFuer(belege: Beleg[], jahr: string): { zeilen: EuerAusga
   let vorsteuer = 0;
   const anlagen: Beleg[] = [];
   for (const b of belege) {
-    if (!zahltag(b).startsWith(`${jahr}-`)) continue;
+    if (b.ungueltig || !zahltag(b).startsWith(`${jahr}-`)) continue;
     const k = kategorieFuer(b.kategorie);
     const s = belegSummen(b);
     vorsteuer += s.vorsteuer_cent;
@@ -240,34 +274,73 @@ export function euerFuer(einnahmen: Einnahme[], belege: Beleg[], jahr: string) {
   };
 }
 
-/** Gespeicherten Beleg prüfen und bereinigen (unbekannte Felder fallen weg); null, wenn Kernangaben fehlen. */
+const steuerAus = (roh: unknown): BelegSteuer[] =>
+  Array.isArray(roh)
+    ? (roh as unknown[])
+        .filter((x): x is Record<string, unknown> => Boolean(x && typeof x === "object"))
+        .map((x) => ({ satz: Number(x.satz), brutto_cent: Number(x.brutto_cent) }))
+        .filter((x) => Number.isInteger(x.brutto_cent) && (BELEG_SAETZE_ERLAUBT as readonly number[]).includes(x.satz))
+    : [];
+const ZAHLUNGEN = ["bank", "bar", "privat"] as const;
+const ISO_TAG = /^\d{4}-\d{2}-\d{2}$/;
+
+function fassungAus(roh: unknown): BelegFassung | null {
+  if (!roh || typeof roh !== "object") return null;
+  const r = roh as Record<string, unknown>;
+  const s = (k: string) => (typeof r[k] === "string" ? (r[k] as string) : "");
+  if (!s("bis")) return null;
+  return {
+    bis: s("bis"),
+    datum: s("datum"),
+    lieferant: s("lieferant"),
+    nummer: s("nummer") || null,
+    kategorie: s("kategorie"),
+    steuer: steuerAus(r.steuer),
+    vorsteuer: r.vorsteuer === true,
+    zahlung: ZAHLUNGEN.find((z) => z === r.zahlung) ?? "bank",
+    bezahlt: s("bezahlt") || null,
+    notiz: s("notiz") || null,
+    datei: istBelegDateiname(r.datei) ? r.datei : null,
+  };
+}
+
+/**
+ * Gespeicherten Beleg prüfen und bereinigen (unbekannte Felder fallen weg); null, wenn Kernangaben fehlen. Wer den
+ * Rohsatz trotzdem aufbewahren muss (Aufbewahrungspflicht), reicht ihn bei null unverändert weiter.
+ */
 export function belegAus(roh: unknown): Beleg | null {
   if (!roh || typeof roh !== "object") return null;
   const r = roh as Record<string, unknown>;
   const s = (k: string) => (typeof r[k] === "string" ? (r[k] as string) : "");
-  if (!s("id") || !/^\d{4}-\d{2}-\d{2}$/.test(s("datum"))) return null;
-  const steuer = Array.isArray(r.steuer)
-    ? (r.steuer as unknown[])
-        .filter((x): x is Record<string, unknown> => Boolean(x && typeof x === "object"))
-        .map((x) => ({ satz: Number(x.satz), brutto_cent: Number(x.brutto_cent) }))
-        .filter((x) => Number.isInteger(x.brutto_cent) && [19, 7, 0].includes(x.satz))
-    : [];
-  const zahlung = (["bank", "bar", "privat"] as const).find((z) => z === r.zahlung) ?? "bank";
+  if (!s("id") || !ISO_TAG.test(s("datum"))) return null;
+  const zahlung = ZAHLUNGEN.find((z) => z === r.zahlung) ?? "bank";
   const quelle = (["hand", "foto", "erechnung"] as const).find((q) => q === r.quelle);
+  const historie = Array.isArray(r.historie) ? (r.historie as unknown[]).map(fassungAus).filter((f): f is BelegFassung => f !== null) : [];
   return {
     id: s("id"),
     datum: s("datum"),
     lieferant: s("lieferant"),
     nummer: s("nummer") || null,
     kategorie: kategorieFuer(s("kategorie")).id,
-    steuer,
+    steuer: steuerAus(r.steuer),
     vorsteuer: r.vorsteuer === true,
     zahlung,
-    bezahlt: /^\d{4}-\d{2}-\d{2}$/.test(s("bezahlt")) ? s("bezahlt") : null,
+    bezahlt: ISO_TAG.test(s("bezahlt")) ? s("bezahlt") : null,
     notiz: s("notiz") || null,
-    datei: s("datei") || null,
+    // nur Namen, wie die App sie vergibt (G-1) – nie Pfade
+    datei: istBelegDateiname(r.datei) ? r.datei : null,
     ...(quelle ? { quelle } : {}),
     erstellt: s("erstellt") || s("datum"),
     geaendert: s("geaendert") || s("erstellt") || s("datum"),
+    ...(s("ungueltig") ? { ungueltig: s("ungueltig"), ungueltig_grund: s("ungueltig_grund") || null } : {}),
+    ...(historie.length ? { historie } : {}),
   };
 }
+
+/** Inhalt eines Belegs als frühere Fassung (für das Änderungsprotokoll). */
+export function belegFassung(b: Beleg, bis: string): BelegFassung {
+  return { bis, datum: b.datum, lieferant: b.lieferant, nummer: b.nummer ?? null, kategorie: b.kategorie, steuer: b.steuer.map((x) => ({ ...x })), vorsteuer: b.vorsteuer, zahlung: b.zahlung, bezahlt: b.bezahlt ?? null, notiz: b.notiz ?? null, datei: b.datei ?? null };
+}
+
+/** Hat sich der Inhalt (nicht nur der Zeitstempel) eines Belegs geändert? */
+export const belegInhaltGeaendert = (a: Beleg, b: Beleg) => JSON.stringify(belegFassung(a, "")) !== JSON.stringify(belegFassung(b, ""));

@@ -11,7 +11,7 @@ import { zufall } from "../unterlagen/sicherungDatei";
 import { useAmtlos } from "../zustand";
 import { tresorServer } from "./api";
 import { API_URL, syncAngeboten } from "./konfig";
-import { anmelden, beiAenderung, kontoIdMerken, kontoVergessen, sitzungLesen, sitzungVergessen, syncSchluesselLesen, syncSchluesselSpeichern, syncSchluesselVergessen, tokenHolen } from "./sitzung";
+import { anmelden, beiAenderung, kontoIdMerken, kontoVergessen, sitzungLesen, sitzungVergessen, syncSchluesselLesen, syncSchluesselSpeichern, syncSchluesselVergessen, syncZaehlerLesen, syncZaehlerMerken, tokenHolen } from "./sitzung";
 import { SyncFehler, huelleErstellen, huelleOeffnen, synchronisieren, zufallsSchluessel, type SyncUmgebung } from "./sync";
 
 export type KontoStatus = "aus" | "laedt" | "abgemeldet" | "ohneSchluessel" | "aktiv";
@@ -28,6 +28,12 @@ interface Konto {
   /** Fehler kam von einer Handlung (Einrichten, Beenden …), nicht vom automatischen Abgleich */
   fehlerBeiHandlung: boolean;
   nummernKonflikte: string[];
+  /** letzte Synchronisation: verschieden festgeschriebene Unterlagen (K1), mehrfach stornierte Rechnungen (K2) */
+  festKonflikte: string[];
+  mehrfachStorniert: string[];
+  /** letzte Synchronisation: Belegdateien, die auf dem Server beschädigt sind bzw. nirgends mehr liegen (M5) */
+  defekteDateien: string[];
+  fehlendeDateien: string[];
   /** angemeldet ohne Schlüssel: gibt es auf dem Server schon eine Synchronisation? (null = unbekannt) */
   serverEingerichtet: boolean | null;
   anmelden(kennung?: string): Promise<boolean>;
@@ -36,7 +42,11 @@ interface Konto {
   verbinden(passwort: string): Promise<void>;
   /** synchronisieren; true bei Erfolg (Fehler stehen in `fehler`) */
   jetzt(): Promise<boolean>;
-  passwortAendern(neu: string): Promise<void>;
+  /**
+   * Sync-Passwort ändern (M-6): nur mit dem bisherigen Passwort – es muss die Hülle auf dem Server öffnen und den
+   * Schlüssel dieses Geräts ergeben. Ohne `alt` wird abgelehnt (SyncFehler „passwort“).
+   */
+  passwortAendern(neu: string, alt?: string): Promise<void>;
   /** Synchronisation beenden und alles auf dem Server löschen (die Daten auf den Geräten bleiben) */
   beenden(): Promise<void>;
   /** Konto löschen: Konto und alle Sync-Daten auf dem Server; die Daten auf dem Gerät bleiben */
@@ -66,6 +76,10 @@ export function KontoAnbieter({ children }: { children: ReactNode }) {
   const [fehler, setFehler] = useState<FehlerArt | null>(null);
   const [fehlerBeiHandlung, setFehlerBeiHandlung] = useState(false);
   const [nummernKonflikte, setNummernKonflikte] = useState<string[]>([]);
+  const [festKonflikte, setFestKonflikte] = useState<string[]>([]);
+  const [mehrfachStorniert, setMehrfachStorniert] = useState<string[]>([]);
+  const [defekteDateien, setDefekteDateien] = useState<string[]>([]);
+  const [fehlendeDateien, setFehlendeDateien] = useState<string[]>([]);
   const [serverEingerichtet, setServerEingerichtet] = useState<boolean | null>(null);
   const server = useMemo(() => tresorServer(API_URL, tokenHolen), []);
 
@@ -128,6 +142,8 @@ export function KontoAnbieter({ children }: { children: ReactNode }) {
           },
         },
         sync: k.k,
+        // Stand an das Konto binden, alte Stände ablehnen (M-1)
+        ...(k.konto ? { konto: k.konto, zaehlerLesen: syncZaehlerLesen, zaehlerMerken: syncZaehlerMerken } : {}),
         zufall,
         lokal: () => (gelesen = zRef.current.aktuellerStand()),
         uebernehmen: (s) => {
@@ -144,6 +160,10 @@ export function KontoAnbieter({ children }: { children: ReactNode }) {
       setLetzte(wann);
       void AsyncStorage.setItem(ZULETZT, wann).catch(() => undefined);
       setNummernKonflikte(r.nummernKonflikte);
+      setFestKonflikte(r.festKonflikte);
+      setMehrfachStorniert(r.mehrfachStorniert);
+      setDefekteDateien(r.defekteDateien);
+      setFehlendeDateien(r.fehlendeDateien);
       setFehler(null);
       return true;
     } catch (e) {
@@ -213,6 +233,10 @@ export function KontoAnbieter({ children }: { children: ReactNode }) {
       fehler,
       fehlerBeiHandlung,
       nummernKonflikte,
+      festKonflikte,
+      mehrfachStorniert,
+      defekteDateien,
+      fehlendeDateien,
       serverEingerichtet,
       anmelden: async (kennung) => {
         setFehler(null);
@@ -273,13 +297,23 @@ export function KontoAnbieter({ children }: { children: ReactNode }) {
         await jetzt();
       },
       jetzt,
-      passwortAendern: async (neu) => {
+      passwortAendern: async (neu, alt) => {
         const k = await syncSchluesselLesen();
         if (!k) throw new SyncFehler("format");
+        // wer das Gerät entsperrt in der Hand hat, soll das Passwort nicht ohne das bisherige ändern können (M-6)
+        if (!alt) throw new SyncFehler("passwort");
         await gleich();
         try {
+          const t = await server.holen();
+          if (!t) throw new SyncFehler("format");
+          const bisher = huelleOeffnen(t.schluessel, alt);
+          if (bisher.length !== k.k.length || bisher.some((b, i) => b !== k.k[i])) throw new SyncFehler("passwort");
+          // Hinweis: Der Sync-Schlüssel selbst bleibt (keine Schlüsselrotation) – Belegdateien auf dem Server lassen
+          // sich nicht überschreiben; dafür bräuchte es einen eigenen Server-Endpunkt.
           await server.schluesselSetzen(huelleErstellen(k.k, neu, zufall));
         } catch (e) {
+          // falsches bisheriges Passwort ist nur eine Rückmeldung auf der Seite, kein Zustand
+          if (e instanceof SyncFehler && e.art === "passwort") throw e;
           throw await fehlerMerken(e, true);
         }
       },
@@ -311,7 +345,7 @@ export function KontoAnbieter({ children }: { children: ReactNode }) {
         zuletzt.current = undefined;
       },
     }),
-    [status, name, laeuft, letzte, fehler, fehlerBeiHandlung, nummernKonflikte, serverEingerichtet, server, neuLesen, kontoPruefen, fehlerMerken, jetzt],
+    [status, name, laeuft, letzte, fehler, fehlerBeiHandlung, nummernKonflikte, festKonflikte, mehrfachStorniert, defekteDateien, fehlendeDateien, serverEingerichtet, server, neuLesen, kontoPruefen, fehlerMerken, jetzt],
   );
   return <Kontext.Provider value={wert}>{children}</Kontext.Provider>;
 }

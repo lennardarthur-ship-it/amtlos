@@ -13,6 +13,16 @@ WebBrowser.maybeCompleteAuthSession();
 
 const SITZUNG = "amtlos.sitzung.v1";
 const SYNC = "amtlos.sync.v1";
+/** höchster gesehener Zähler des Sync-Stands (M-1) – gehört zum Sync-Schlüssel und geht mit ihm */
+const ZAEHLER = "amtlos.sync.zaehler.v1";
+
+export async function syncZaehlerLesen(): Promise<number> {
+  const n = Number(await geheimLesen(ZAEHLER).catch(() => null));
+  return Number.isSafeInteger(n) && n > 0 ? n : 0;
+}
+export async function syncZaehlerMerken(n: number): Promise<void> {
+  if (n > (await syncZaehlerLesen())) await geheimSchreiben(ZAEHLER, String(n));
+}
 
 export interface Sitzung {
   token: string;
@@ -69,6 +79,8 @@ export async function syncSchluesselLesen(): Promise<{ k: Uint8Array; konto: str
 
 export async function syncSchluesselSpeichern(k: Uint8Array, konto: string): Promise<void> {
   const wert = JSON.stringify({ k: base64(k), konto });
+  // neuer Schlüssel: neue Zählung
+  await geheimLoeschen(ZAEHLER).catch(() => undefined);
   await geheimSchreiben(SYNC, wert);
   // erst verwenden, wenn er sich wieder lesen lässt
   if ((await geheimLesen(SYNC)) !== wert) throw new SyncFehler("format");
@@ -78,6 +90,7 @@ export async function syncSchluesselSpeichern(k: Uint8Array, konto: string): Pro
 /** Sync auf diesem Gerät beenden (Server bleibt, wie er ist). */
 export async function syncSchluesselVergessen(): Promise<void> {
   await geheimLoeschen(SYNC).catch(() => undefined);
+  await geheimLoeschen(ZAEHLER).catch(() => undefined);
   melden();
 }
 
@@ -91,6 +104,7 @@ export async function sitzungVergessen(): Promise<void> {
 export async function kontoVergessen(): Promise<void> {
   await geheimLoeschen(SITZUNG).catch(() => undefined);
   await geheimLoeschen(SYNC).catch(() => undefined);
+  await geheimLoeschen(ZAEHLER).catch(() => undefined);
   melden();
 }
 

@@ -2,7 +2,7 @@
  * Unterlagen und Betrieb – nur auf dem Gerät (E-121). Reine Funktionen über einem unveränderlichen Stand, damit sie
  * ohne Gerät testbar sind; zustand.tsx speichert den Stand in AsyncStorage.
  */
-import { LEERER_BETRIEB, belegAus, leereDaten, type Beleg, naechsteNummer, personMerken as merken, vorlageFuer, type Betrieb, type Daten, type Person, type PersonAngaben, type PersonenArt } from "@amtlos/fachlogik";
+import { LEERER_BETRIEB, belegAus, belegFassung, belegInhaltGeaendert, belegSummen, leereDaten, type Beleg, naechsteNummer, personMerken as merken, vorlageFuer, type Betrieb, type Daten, type Person, type PersonAngaben, type PersonenArt } from "@amtlos/fachlogik";
 
 export interface Unterlage {
   id: string;
@@ -20,6 +20,15 @@ export interface Unterlage {
   bezahlt?: string;
   /** wann die Zahlung zuletzt vermerkt oder entfernt wurde (ISO) – entscheidet beim Zusammenführen zweier Fassungen */
   bezahltGeaendert?: string;
+  /** Stornorechnung: ID der stornierten Rechnung (M1) – die Nummer allein ist bei doppelt vergebenen Nummern mehrdeutig */
+  stornoZuId?: string;
+  /**
+   * Konfliktkopie (K1): Zwei Geräte haben dieselbe Unterlage mit verschiedenem Inhalt festgeschrieben. Gültig bleibt die
+   * zuerst festgeschriebene; die andere Fassung bleibt als Kopie erhalten, zählt aber nirgends mit (nicht gültig).
+   */
+  konfliktKopieVon?: string;
+  /** SHA-256 (hex) des geteilten PDFs, wenn beim Festschreiben bekannt (H1) */
+  pdfSha256?: string;
 }
 
 export interface Stand {
@@ -58,9 +67,50 @@ export interface Stand {
   zeiten: Record<string, string>;
   /** Bitte um eine Bewertung (E-132): Erfolgsmomente gezählt, zuletzt gefragt am (ISO) */
   bewertung: { erfolge: number; gefragt?: string };
+  /**
+   * Als ungültig markierte Belege (H2): innerhalb der Aufbewahrungsfrist nicht gelöscht, sondern hier mit Grund
+   * aufbewahrt – samt Datei. Sie erscheinen in keiner Liste und zählen nirgends mit.
+   */
+  belegArchiv: Beleg[];
+  /**
+   * Was diese App-Version nicht kennt (M4): Unterlagen einer unbekannten Vorlage (neuere App, umbenannte Vorlage) und
+   * Belege mit unlesbaren Kernangaben. Sie werden unverändert aufbewahrt und weitergereicht, nur nicht angezeigt –
+   * nie verworfen (GoBD).
+   */
+  fremd: { unterlagen: Record<string, unknown>[]; belege: Record<string, unknown>[] };
 }
 
-export const LEERER_STAND: Stand = { version: 1, betrieb: LEERER_BETRIEB, unterlagen: [], belege: [], mitarbeiter: [], kunden: [], profil: {}, erledigt: {}, erinnerungen: false, appSperre: false, cloudSicherung: false, proTest: false, bewertung: { erfolge: 0 }, steuerberatung: { kontenrahmen: "SKR03", beraternummer: "", mandantennummer: "" }, geloescht: {}, zeiten: {} };
+/** Aktuelle Version des gespeicherten Stands. Höhere Versionen stammen aus einer neueren App und werden nie überschrieben. */
+export const STAND_VERSION = 1;
+
+/**
+ * Migrationen: Eintrag n hebt einen Stand von Version n auf n + 1. Noch keine nötig – das Gerüst steht, damit eine
+ * künftige Änderung am Format nicht in `standAus` versteckt werden muss.
+ */
+export const MIGRATIONEN: Record<number, (roh: Record<string, unknown>) => Record<string, unknown>> = {};
+
+export class StandFehler extends Error {
+  /** „unlesbar“: kein gültiges JSON bzw. kein Objekt; „version“: aus einer neueren App-Version */
+  constructor(public art: "unlesbar" | "version") {
+    super(art === "version" ? "Stand aus einer neueren App-Version" : "Stand unlesbar");
+  }
+}
+
+/** Gespeicherten Stand auf die aktuelle Version heben; wirft StandFehler „version“ bei einer unbekannten, höheren Version. */
+export function migrieren(roh: Record<string, unknown>): Record<string, unknown> {
+  let v = typeof roh.version === "number" && Number.isInteger(roh.version) && roh.version >= 1 ? roh.version : 1;
+  if (v > STAND_VERSION) throw new StandFehler("version");
+  let r = roh;
+  while (v < STAND_VERSION) {
+    const m = MIGRATIONEN[v];
+    if (!m) throw new StandFehler("version");
+    r = m(r);
+    v++;
+  }
+  return { ...r, version: STAND_VERSION };
+}
+
+export const LEERER_STAND: Stand = { version: 1, betrieb: LEERER_BETRIEB, unterlagen: [], belege: [], mitarbeiter: [], kunden: [], profil: {}, erledigt: {}, erinnerungen: false, appSperre: false, cloudSicherung: false, proTest: false, bewertung: { erfolge: 0 }, steuerberatung: { kontenrahmen: "SKR03", beraternummer: "", mandantennummer: "" }, geloescht: {}, zeiten: {}, belegArchiv: [], fremd: { unterlagen: [], belege: [] } };
 
 function profilAus(roh: unknown): Stand["profil"] {
   if (!roh || typeof roh !== "object" || Array.isArray(roh)) return {};
@@ -106,44 +156,96 @@ function personenAus(roh: unknown): Person[] {
     .map((p) => Object.fromEntries(Object.entries(p).filter(([, w]) => typeof w === "string" || w === null)) as Person);
 }
 
-/** Gespeicherten Stand lesen; Unlesbares oder Unbekanntes führt zu einem leeren bzw. bereinigten Stand. */
+const ISO_ZEIT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/;
+const istIso = (w: unknown): w is string => typeof w === "string" && ISO_ZEIT.test(w);
+const ANFANG = "1970-01-01T00:00:00.000Z";
+const istObjekt = (w: unknown): w is Record<string, unknown> => Boolean(w && typeof w === "object" && !Array.isArray(w));
+
+/**
+ * Eine gespeicherte Unterlage bereinigen: Zeitstempel müssen ISO-Zeitpunkte sein (K1 – sonst entschiede ein
+ * präpariertes `geaendert` das Zusammenführen). Eine Festschreibung geht dabei nie verloren: Ist ihr Zeitpunkt
+ * unlesbar, gilt der der Ausgabe bzw. der letzten Änderung.
+ */
+function unterlageAus(u: Record<string, unknown>): Unterlage {
+  const erstellt = istIso(u.erstellt) ? u.erstellt : istIso(u.geaendert) ? u.geaendert : ANFANG;
+  const geaendert = istIso(u.geaendert) ? u.geaendert : erstellt;
+  const r: Unterlage = { ...(u as unknown as Unterlage), erstellt, geaendert };
+  if (u.ausgegeben) r.ausgegeben = istIso(u.ausgegeben) ? u.ausgegeben : geaendert;
+  else delete r.ausgegeben;
+  if (u.festgeschrieben) r.festgeschrieben = istIso(u.festgeschrieben) ? u.festgeschrieben : (r.ausgegeben ?? geaendert);
+  else delete r.festgeschrieben;
+  for (const k of ["storniertDurch", "stornoZuId", "konfliktKopieVon", "pdfSha256", "bezahlt"] as const) if (typeof u[k] !== "string" || !u[k]) delete r[k];
+  if (!istIso(u.bezahltGeaendert)) delete r.bezahltGeaendert;
+  return r;
+}
+
+/**
+ * Gespeicherten Stand lesen und bereinigen. `null` ergibt den leeren Stand. Unlesbares (kein JSON, kein Objekt) und
+ * Stände einer neueren App-Version werfen StandFehler – der Aufrufer darf dann nichts überschreiben (Ladefehler).
+ * Unbekannte Vorlagen und unlesbare Belege fallen nicht weg, sondern kommen nach `fremd` (M4).
+ */
 export function standAus(json: string | null): Stand {
   if (!json) return LEERER_STAND;
+  let geparst: unknown;
   try {
-    const roh = JSON.parse(json) as Partial<Stand>;
-    const betrieb = { ...LEERER_BETRIEB };
-    for (const k of Object.keys(LEERER_BETRIEB) as (keyof Betrieb)[]) {
-      const w = (roh.betrieb as Record<string, unknown> | undefined)?.[k];
-      if (typeof w === "string") betrieb[k] = w;
-    }
-    const unterlagen = (Array.isArray(roh.unterlagen) ? roh.unterlagen : []).filter(
-      (u): u is Unterlage => Boolean(u && typeof u.id === "string" && typeof u.vorlage === "string" && vorlageFuer(u.vorlage) && u.daten && typeof u.daten === "object"),
-    );
-    const r = roh as Record<string, unknown>;
-    const iso = (w: unknown) => (typeof w === "string" && w ? w : undefined);
-    return {
-      version: 1,
-      betrieb,
-      unterlagen,
-      belege: (Array.isArray(r.belege) ? r.belege : []).map(belegAus).filter((b): b is Beleg => b !== null),
-      mitarbeiter: personenAus(r.mitarbeiter),
-      kunden: personenAus(r.kunden),
-      profil: profilAus(r.profil),
-      erledigt: erledigtAus(r.erledigt),
-      erinnerungen: r.erinnerungen === true,
-      appSperre: r.appSperre === true,
-      cloudSicherung: r.cloudSicherung === true,
-      proTest: r.proTest === true,
-      bewertung: bewertungAus(r.bewertung),
-      steuerberatung: steuerberatungAus(r.steuerberatung),
-      geloescht: isoKarte(r.geloescht),
-      zeiten: isoKarte(r.zeiten),
-      ...(iso(r.geaendert) ? { geaendert: iso(r.geaendert) } : {}),
-      ...(iso(r.letzteSicherung) ? { letzteSicherung: iso(r.letzteSicherung) } : {}),
-    };
+    geparst = JSON.parse(json);
   } catch {
-    return LEERER_STAND;
+    throw new StandFehler("unlesbar");
   }
+  if (!istObjekt(geparst)) throw new StandFehler("unlesbar");
+  const roh = migrieren(geparst) as Partial<Stand>;
+  const betrieb = { ...LEERER_BETRIEB };
+  for (const k of Object.keys(LEERER_BETRIEB) as (keyof Betrieb)[]) {
+    const w = (roh.betrieb as Record<string, unknown> | undefined)?.[k];
+    if (typeof w === "string") betrieb[k] = w;
+  }
+  const r = roh as Record<string, unknown>;
+  const fremdRoh = istObjekt(r.fremd) ? r.fremd : {};
+  const liste = (w: unknown) => (Array.isArray(w) ? (w as unknown[]).filter(istObjekt) : []);
+  // bekannte Vorlagen in `unterlagen`, unbekannte unverändert in `fremd` – auch aus `fremd` eines älteren Geräts zurück
+  const unterlagen: Unterlage[] = [];
+  const fremdeUnterlagen: Record<string, unknown>[] = [];
+  const gesehen = new Set<string>();
+  for (const u of [...liste(r.unterlagen), ...liste(fremdRoh.unterlagen)]) {
+    if (typeof u.id !== "string" || gesehen.has(u.id)) continue;
+    gesehen.add(u.id);
+    if (typeof u.vorlage === "string" && vorlageFuer(u.vorlage) && istObjekt(u.daten)) unterlagen.push(unterlageAus(u));
+    else fremdeUnterlagen.push(u);
+  }
+  const belege: Beleg[] = [];
+  const belegArchiv: Beleg[] = [];
+  const fremdeBelege: Record<string, unknown>[] = [];
+  const belegGesehen = new Set<string>();
+  for (const b of [...liste(r.belege), ...liste(r.belegArchiv), ...liste(fremdRoh.belege)]) {
+    if (typeof b.id !== "string" || belegGesehen.has(b.id)) continue;
+    belegGesehen.add(b.id);
+    const g = belegAus(b);
+    if (!g) fremdeBelege.push(b);
+    else (g.ungueltig ? belegArchiv : belege).push(g);
+  }
+  const iso = (w: unknown) => (typeof w === "string" && w ? w : undefined);
+  return {
+    version: 1,
+    betrieb,
+    unterlagen,
+    belege,
+    belegArchiv,
+    fremd: { unterlagen: fremdeUnterlagen, belege: fremdeBelege },
+    mitarbeiter: personenAus(r.mitarbeiter),
+    kunden: personenAus(r.kunden),
+    profil: profilAus(r.profil),
+    erledigt: erledigtAus(r.erledigt),
+    erinnerungen: r.erinnerungen === true,
+    appSperre: r.appSperre === true,
+    cloudSicherung: r.cloudSicherung === true,
+    proTest: r.proTest === true,
+    bewertung: bewertungAus(r.bewertung),
+    steuerberatung: steuerberatungAus(r.steuerberatung),
+    geloescht: isoKarte(r.geloescht),
+    zeiten: isoKarte(r.zeiten),
+    ...(iso(r.geaendert) ? { geaendert: iso(r.geaendert) } : {}),
+    ...(iso(r.letzteSicherung) ? { letzteSicherung: iso(r.letzteSicherung) } : {}),
+  };
 }
 
 /** Heutiges Datum in Deutschland als YYYY-MM-DD. */
@@ -155,7 +257,22 @@ export function leererBeleg(quelle: Beleg["quelle"], datei: string | null, klein
   return { id: neueId(), datum: heute(jetzt), lieferant: "", nummer: null, kategorie: "sonstiges", steuer: [{ satz: 19, brutto_cent: 0 }], vorsteuer: !kleinunternehmer, zahlung: "bank", bezahlt: null, notiz: null, datei, quelle, erstellt: iso, geaendert: iso };
 }
 
-export const neueId = () => `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
+/**
+ * Zufallsquelle für IDs. Auf dem Gerät setzt schluesselbund.ts `expo-crypto` ein; sonst Web Crypto (Node, Browser).
+ * Math.random nur als letzter Ausweg – IDs müssen über Geräte hinweg kollisionsfest sein (Synchronisation).
+ */
+let idZufall: ((n: number) => Uint8Array) | null = null;
+export const idZufallSetzen = (f: (n: number) => Uint8Array) => {
+  idZufall = f;
+};
+function zufallsBytes(n: number): Uint8Array {
+  if (idZufall) return idZufall(n);
+  const c = (globalThis as { crypto?: { getRandomValues?: (a: Uint8Array) => Uint8Array } }).crypto;
+  if (c?.getRandomValues) return c.getRandomValues(new Uint8Array(n));
+  return Uint8Array.from({ length: n }, () => Math.floor(Math.random() * 256));
+}
+/** Neue ID: Zeitstempel (Base36, sortierbar) und 64 Bit Zufall (Base36), nur Kleinbuchstaben und Ziffern. */
+export const neueId = () => `${Date.now().toString(36)}${Array.from(zufallsBytes(8), (b) => b.toString(36).padStart(2, "0")).join("")}`;
 
 /** Ist der gespeicherte Text lesbar? Unlesbares darf nicht durch einen leeren Stand überschrieben werden. */
 export function istLesbar(json: string | null): boolean {
@@ -175,6 +292,8 @@ function naechste(s: Stand, vorlageId: string, feld: string, jetzt: Date): strin
 }
 
 const nummerVon = (u: Unterlage) => {
+  // eine Konfliktkopie (K1) trägt die Nummer der gültigen Fassung – sie zählt nicht als zweite Unterlage
+  if (u.konfliktKopieVon) return "";
   const v = vorlageFuer(u.vorlage);
   return v?.fortlaufend && typeof u.daten[v.fortlaufend] === "string" ? (u.daten[v.fortlaufend] as string).trim() : "";
 };
@@ -238,15 +357,31 @@ export function felderSetzen(s: Stand, id: string, werte: Daten, jetzt: Date): S
   return { ...s, unterlagen: s.unterlagen.map((u) => (u.id === id && !u.festgeschrieben ? { ...u, daten: { ...u.daten, ...werte }, geaendert: jetzt.toISOString() } : u)) };
 }
 
-/** Als PDF geteilt oder gedruckt: merken, und Vorlagen mit `festschreiben` festschreiben. */
-export function ausgeben(s: Stand, id: string, jetzt: Date): Stand {
+/**
+ * Lässt sich die Unterlage mit genau diesem Inhalt ausgeben (H1)? `daten` ist der Inhalt, aus dem das PDF erzeugt
+ * wurde. Hat sich die Unterlage inzwischen geändert (z. B. hat die Synchronisation während des Teilen-Menüs einen
+ * neueren Entwurf gebracht), darf nicht festgeschrieben werden – sonst stünde etwas anderes fest, als verschickt wurde.
+ */
+export function ausgabeMoeglich(s: Stand, id: string, daten?: Daten): boolean {
+  const u = s.unterlagen.find((x) => x.id === id);
+  if (!u) return false;
+  return !daten || Boolean(u.festgeschrieben) || JSON.stringify(u.daten) === JSON.stringify(daten);
+}
+
+/**
+ * Als PDF geteilt oder gedruckt: merken, und Vorlagen mit `festschreiben` festschreiben. Mit `daten` (Inhalt des PDFs)
+ * nur, wenn die Unterlage noch genau diesen Inhalt hat – sonst bleibt der Stand unverändert (siehe `ausgabeMoeglich`).
+ */
+export function ausgeben(s: Stand, id: string, jetzt: Date, daten?: Daten, pdfSha256?: string): Stand {
+  if (!ausgabeMoeglich(s, id, daten)) return s;
   return {
     ...s,
     unterlagen: s.unterlagen.map((u) => {
       if (u.id !== id) return u;
       const fest = vorlageFuer(u.vorlage)?.festschreiben;
       if (u.ausgegeben && (!fest || u.festgeschrieben)) return u;
-      return { ...u, ausgegeben: u.ausgegeben ?? jetzt.toISOString(), ...(fest && !u.festgeschrieben ? { festgeschrieben: jetzt.toISOString() } : {}) };
+      const festschreiben = fest && !u.festgeschrieben;
+      return { ...u, ausgegeben: u.ausgegeben ?? jetzt.toISOString(), ...(festschreiben ? { festgeschrieben: jetzt.toISOString(), ...(pdfSha256 ? { pdfSha256 } : {}) } : {}) };
     }),
   };
 }
@@ -258,7 +393,7 @@ export function ausgeben(s: Stand, id: string, jetzt: Date): Stand {
 export function stornieren(s: Stand, id: string, jetzt: Date, neu = neueId()): [Stand, Unterlage | null] {
   const alt = s.unterlagen.find((u) => u.id === id);
   const v = alt ? vorlageFuer(alt.vorlage) : undefined;
-  if (!alt || !v?.storno || !alt.festgeschrieben || alt.storniertDurch || alt.daten.storno_zu) return [s, null];
+  if (!alt || !v?.storno || !alt.festgeschrieben || alt.storniertDurch || alt.daten.storno_zu || alt.konfliktKopieVon) return [s, null];
   const daten = JSON.parse(JSON.stringify(alt.daten)) as Daten;
   const negativ = (p: unknown) => (typeof p === "string" && p.trim() ? (p.trim().startsWith("-") ? p.trim().slice(1) : `-${p.trim()}`) : p);
   if (Array.isArray(daten.positionen)) daten.positionen = (daten.positionen as Record<string, unknown>[]).map((e) => ({ ...e, preis: negativ(e.preis) })) as Daten[string];
@@ -266,7 +401,7 @@ export function stornieren(s: Stand, id: string, jetzt: Date, neu = neueId()): [
   daten.storno_zu_datum = typeof alt.daten.datum === "string" ? alt.daten.datum : null;
   daten.datum = heute(jetzt);
   if (v.fortlaufend) daten[v.fortlaufend] = naechste(s, v.id, v.fortlaufend, jetzt);
-  const u: Unterlage = { id: neu, vorlage: v.id, daten, erstellt: jetzt.toISOString(), geaendert: jetzt.toISOString() };
+  const u: Unterlage = { id: neu, vorlage: v.id, daten, erstellt: jetzt.toISOString(), geaendert: jetzt.toISOString(), stornoZuId: id };
   return [{ ...s, unterlagen: [u, ...s.unterlagen.map((x) => (x.id === id ? { ...x, storniertDurch: neu } : x))] }, u];
 }
 
@@ -322,7 +457,10 @@ export const personenSortiert = (l: Person[]) => [...l].filter((p) => p.name.tri
 /** Antworten im Pflichten-Check setzen. Das Bundesland übernimmt „Mein Betrieb“, solange dort keins steht. */
 export function profilSetzen(s: Stand, werte: Stand["profil"], bundeslandName?: string): Stand {
   const betrieb = bundeslandName && !s.betrieb.bundesland ? { ...s.betrieb, bundesland: bundeslandName } : s.betrieb;
-  const mit = mitZeit(betrieb === s.betrieb ? s : mitZeit(s, "betrieb"), "profil");
+  const jetzt = new Date();
+  let mit = mitZeit(betrieb === s.betrieb ? s : mitZeit(s, "betrieb", jetzt), "profil", jetzt);
+  // je Antwort ein eigener Zeitpunkt (G1): so gehen Antworten auf zwei Geräten beim Synchronisieren nicht verloren
+  for (const k of Object.keys(werte)) mit = mitZeit(mit, `profil:${k}`, jetzt);
   return { ...mit, betrieb, profil: { ...s.profil, ...werte } };
 }
 
@@ -331,7 +469,9 @@ export function erledigtSetzen(s: Stand, pflichtId: string, datum: string | null
   const erledigt = { ...s.erledigt };
   if (datum) erledigt[pflichtId] = termin ? `${datum}|${termin}` : datum;
   else delete erledigt[pflichtId];
-  return { ...mitZeit(s, "erledigt"), erledigt };
+  // je Pflicht ein eigener Zeitpunkt (G1): Haken auf zwei Geräten an verschiedenen Pflichten bleiben beide
+  const jetzt = new Date();
+  return { ...mitZeit(mitZeit(s, "erledigt", jetzt), `erledigt:${pflichtId}`, jetzt), erledigt };
 }
 
 export function betriebSetzen(s: Stand, b: Betrieb): Stand {
@@ -352,23 +492,55 @@ export function bezahltSetzen(s: Stand, id: string, datum: string | null, jetzt 
   return { ...s, unterlagen: s.unterlagen.map((u) => (u.id === id ? (datum ? { ...u, bezahlt: datum, bezahltGeaendert: g } : (({ bezahlt: _weg, ...rest }) => ({ ...rest, bezahltGeaendert: g }))(u)) : u)) };
 }
 
-/** Unterlagen, die aufbewahrt werden müssen: festgeschriebene (Rechnungen, Kassenbuch) und Belege. */
-export const aufbewahrungspflichtig = (s: Stand): { id: string }[] => [...s.unterlagen.filter((u) => u.festgeschrieben), ...s.belege];
+/** Unterlagen, die aufbewahrt werden müssen: festgeschriebene (Rechnungen, Kassenbuch), Belege (auch ungültig markierte) und Unbekanntes. */
+export const aufbewahrungspflichtig = (s: Stand): { id: string }[] => [...s.unterlagen.filter((u) => u.festgeschrieben), ...s.belege, ...s.belegArchiv, ...(s.fremd.unterlagen as { id: string }[]), ...(s.fremd.belege as { id: string }[])];
 
-/** Beleg anlegen oder ändern (E-133). */
+/**
+ * Ruhezeit für das Änderungsprotokoll der Belege (H2): War ein Beleg so lange unverändert, wird vor der nächsten
+ * Änderung seine bisherige Fassung festgehalten. Tippen in einem Feld erzeugt so nur einen Eintrag, nicht einen je Taste.
+ */
+export const BELEG_RUHE_MS = 10 * 60 * 1000;
+/** So lange nach dem Erfassen darf ein Beleg noch endgültig gelöscht werden (falsch erfasst, doppelt fotografiert). */
+export const BELEG_LOESCHBAR_MS = 24 * 60 * 60 * 1000;
+
+/** Beleg anlegen oder ändern (E-133). Änderungen an einem älteren Beleg werden protokolliert (H2). */
 export function belegSetzen(s: Stand, b: Beleg, jetzt: Date): Stand {
-  const neu = { ...b, geaendert: jetzt.toISOString() };
-  return { ...s, belege: s.belege.some((x) => x.id === b.id) ? s.belege.map((x) => (x.id === b.id ? neu : x)) : [neu, ...s.belege] };
+  const alt = s.belege.find((x) => x.id === b.id);
+  // ungültig markierte Belege bleiben, wie sie sind
+  if (!alt && s.belegArchiv.some((x) => x.id === b.id)) return s;
+  const iso = jetzt.toISOString();
+  const historie = [...(alt?.historie ?? [])];
+  if (alt && belegInhaltGeaendert(alt, b) && jetzt.getTime() - Date.parse(alt.geaendert) > BELEG_RUHE_MS) historie.push(belegFassung(alt, iso));
+  const { historie: _h, ...rest } = b;
+  const neu: Beleg = { ...rest, geaendert: iso, ...(historie.length ? { historie } : {}) };
+  return { ...s, belege: alt ? s.belege.map((x) => (x.id === b.id ? neu : x)) : [neu, ...s.belege] };
 }
 
-export const belegLoeschen = (s: Stand, id: string): Stand => ({ ...vermerken(s, `b:${id}`), belege: s.belege.filter((b) => b.id !== id) });
+/** Darf der Beleg endgültig gelöscht werden? Nur leer (nichts erfasst) oder frisch erfasst – sonst wird er ungültig markiert. */
+export function belegEndgueltigLoeschbar(b: Beleg, jetzt = new Date()): boolean {
+  const leer = !b.lieferant.trim() && !b.datei && !belegSummen(b).brutto_cent;
+  return leer || jetzt.getTime() - Date.parse(b.erstellt) < BELEG_LOESCHBAR_MS;
+}
+
+/**
+ * Beleg löschen (H2): Leere oder frisch erfasste Belege werden gelöscht (mit Löschvermerk für die Synchronisation).
+ * Alle anderen liegen in der Aufbewahrungsfrist – sie werden mit Grund als ungültig markiert und ins Archiv gelegt;
+ * Datensatz und Datei bleiben erhalten.
+ */
+export function belegLoeschen(s: Stand, id: string, jetzt = new Date(), grund = "In der App als ungültig markiert"): Stand {
+  const b = s.belege.find((x) => x.id === id);
+  if (!b) return s;
+  if (belegEndgueltigLoeschbar(b, jetzt)) return { ...vermerken(s, `b:${id}`, jetzt), belege: s.belege.filter((x) => x.id !== id) };
+  const iso = jetzt.toISOString();
+  return { ...s, belege: s.belege.filter((x) => x.id !== id), belegArchiv: [{ ...b, ungueltig: iso, ungueltig_grund: grund, geaendert: iso }, ...s.belegArchiv.filter((x) => x.id !== id)] };
+}
 
 /** Belege nach Belegdatum, neueste zuerst. */
 export const belegeSortiert = (s: Stand) => [...s.belege].sort((a, b) => b.datum.localeCompare(a.datum) || b.geaendert.localeCompare(a.geaendert));
 
 /** Seit der letzten Datensicherung geändert (oder nie gesichert)? */
 export function ungesichert(s: Stand): boolean {
-  if (!s.letzteSicherung) return s.unterlagen.length > 0 || s.belege.length > 0 || s.mitarbeiter.length > 0 || s.kunden.length > 0;
+  if (!s.letzteSicherung) return s.unterlagen.length > 0 || s.belege.length > 0 || s.belegArchiv.length > 0 || s.mitarbeiter.length > 0 || s.kunden.length > 0;
   return Boolean(s.geaendert && s.geaendert > s.letzteSicherung);
 }
 
@@ -386,36 +558,114 @@ export function sicherungFaellig(s: Stand, jetzt: Date, nach = 7): { tage: numbe
   return tage >= nach ? { tage } : null;
 }
 
+const istStornoRechnung = (u: Unterlage) => typeof u.daten.storno_zu === "string" && u.daten.storno_zu.trim() !== "";
+
+/**
+ * Ziel jeder Stornorechnung: über `stornoZuId` (M1), bei älteren Daten über die Nummer – aber nur, wenn sie
+ * eindeutig ist (zwei offline vergebene gleiche Nummern dürfen nicht beide als storniert gelten).
+ */
+function stornoZiele(l: Unterlage[]): Map<string, Unterlage[]> {
+  const nachId = new Map(l.map((u) => [u.id, u]));
+  const nachNummer = new Map<string, Unterlage[]>();
+  for (const x of l) {
+    const n = nummerVon(x);
+    if (n && !istStornoRechnung(x)) nachNummer.set(`${x.vorlage}|${n}`, [...(nachNummer.get(`${x.vorlage}|${n}`) ?? []), x]);
+  }
+  const ziele = new Map<string, Unterlage[]>();
+  for (const st of l) {
+    if (!istStornoRechnung(st) || st.konfliktKopieVon) continue;
+    const kandidaten = st.stornoZuId ? [nachId.get(st.stornoZuId)].filter((x): x is Unterlage => Boolean(x)) : (nachNummer.get(`${st.vorlage}|${String(st.daten.storno_zu).trim()}`) ?? []);
+    const ziel = kandidaten.length === 1 ? kandidaten[0]! : undefined;
+    if (ziel && ziel.id !== st.id) ziele.set(ziel.id, [...(ziele.get(ziel.id) ?? []), st]);
+  }
+  return ziele;
+}
+
+/** Festgeschriebene Stornos einer Rechnung, die zuerst festgeschriebene vorn (eindeutig auf allen Geräten). */
+const festeStornos = (stornos: Unterlage[]) => stornos.filter((x) => x.festgeschrieben).sort((a, b) => a.festgeschrieben!.localeCompare(b.festgeschrieben!) || a.id.localeCompare(b.id));
+
 /**
  * Storno-Verweise abgleichen: Verweise auf eine Stornorechnung, die es nicht (mehr) gibt, entfernen – sonst ließe
- * sich die Rechnung nie mehr korrigieren; fehlende Verweise aus `storno_zu` der vorhandenen Stornorechnungen ergänzen.
+ * sich die Rechnung nie mehr korrigieren; fehlende Verweise aus den vorhandenen Stornorechnungen ergänzen. Gibt es
+ * mehrere Stornos zu einer Rechnung (zwei Geräte offline, K2), zeigt der Verweis auf allen Geräten auf dieselbe:
+ * die zuerst festgeschriebene, sonst den Entwurf mit der kleinsten ID.
  */
 export function stornoVerweisePruefen(l: Unterlage[]): Unterlage[] {
   const ids = new Set(l.map((u) => u.id));
-  const stornoFuer = new Map<string, string>();
-  for (const x of l) {
-    const zu = typeof x.daten.storno_zu === "string" ? x.daten.storno_zu.trim() : "";
-    if (zu) stornoFuer.set(`${x.vorlage}|${zu}`, x.id);
-  }
+  const ziele = stornoZiele(l);
   return l.map((u) => {
-    if (u.storniertDurch && !ids.has(u.storniertDurch)) return (({ storniertDurch: _weg, ...rest }) => rest)(u);
-    const st = !u.storniertDurch && !u.daten.storno_zu ? stornoFuer.get(`${u.vorlage}|${nummerVon(u)}`) : undefined;
-    return st && st !== u.id && nummerVon(u) ? { ...u, storniertDurch: st } : u;
+    const stornos = ziele.get(u.id) ?? [];
+    const gewaehlt = festeStornos(stornos)[0] ?? [...stornos].sort((a, b) => a.id.localeCompare(b.id))[0];
+    // ohne zuordenbares Storno: einen vorhandenen Verweis nur behalten, wenn die Stornorechnung noch da ist
+    // und nicht eindeutig zu einer anderen Rechnung gehört
+    const behalten = u.storniertDurch && ids.has(u.storniertDurch) && ![...ziele.entries()].some(([ziel, l2]) => ziel !== u.id && l2.some((x) => x.id === u.storniertDurch)) ? u.storniertDurch : undefined;
+    const sd = istStornoRechnung(u) ? behalten : (gewaehlt?.id ?? behalten);
+    if (sd === u.storniertDurch) return u;
+    if (!sd) return (({ storniertDurch: _weg, ...rest }) => rest)(u);
+    return { ...u, storniertDurch: sd };
   });
+}
+
+/**
+ * Was in Umsatzsteuer-Voranmeldung, EÜR, DATEV-Export und Listen nicht mitzählt (K1, K2): Konfliktkopien und
+ * festgeschriebene Stornorechnungen, auf die die stornierte Rechnung nicht verweist (doppelt storniert) – je
+ * Ursprungsrechnung zählt nur die Stornorechnung aus `storniertDurch`.
+ */
+export function nichtZaehlend(l: Unterlage[]): Set<string> {
+  const aus = new Set(l.filter((u) => u.konfliktKopieVon).map((u) => u.id));
+  const nachId = new Map(l.map((u) => [u.id, u]));
+  for (const [ziel, stornos] of stornoZiele(l)) {
+    const sd = nachId.get(ziel)?.storniertDurch;
+    for (const st of stornos) if (st.id !== sd) aus.add(st.id);
+  }
+  return aus;
+}
+
+/** Nummern von Rechnungen mit mehr als einer festgeschriebenen Stornorechnung (K2). */
+export function mehrfachStorniert(l: Unterlage[]): string[] {
+  const nachId = new Map(l.map((u) => [u.id, u]));
+  return [...stornoZiele(l)].filter(([, st]) => festeStornos(st).length > 1).map(([ziel]) => nummerVon(nachId.get(ziel)!) || ziel).sort();
 }
 
 const frueher = (x?: string, y?: string) => (x && y ? (x < y ? x : y) : (x ?? y));
 
+/** Kurzer, auf allen Geräten gleicher Hash (FNV-1a) – für die ID einer Konfliktkopie. */
+function kurzHash(text: string): string {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 0x01000193) >>> 0;
+  return h.toString(36);
+}
+
+export interface Vereinigung {
+  u: Unterlage;
+  /** zweite, abweichend festgeschriebene Fassung (K1) – als Konfliktkopie unter neuer ID aufzubewahren */
+  kopie?: Unterlage;
+}
+
 /**
  * Zwei Fassungen derselben Unterlage vereinen (Synchronisation und Wiederherstellen). Festgeschrieben schlägt
- * Entwurf, sonst gewinnt die zuletzt geänderte Fassung. Vermerke werden feldweise vereint: erste Ausgabe und
- * Festschreibung nach dem früheren Datum, ein Storno-Verweis aus jeder Fassung, die Zahlung nach dem Zeitpunkt
- * ihrer letzten Änderung (ohne Zeitpunkt – ältere Daten – bleibt eine vorhandene Zahlung erhalten).
+ * Entwurf, zwischen Entwürfen gewinnt die zuletzt geänderte Fassung. Sind beide festgeschrieben, wird der Inhalt nie
+ * übernommen (K1): Gültig bleibt die zuerst festgeschriebene Fassung; weicht die andere ab, kommt sie als
+ * Konfliktkopie zurück. Vermerke werden feldweise vereint: erste Ausgabe und Festschreibung nach dem früheren Datum,
+ * ein Storno-Verweis aus jeder Fassung, die Zahlung nach dem Zeitpunkt ihrer letzten Änderung (ohne Zeitpunkt –
+ * ältere Daten – bleibt eine vorhandene Zahlung erhalten).
  */
-export function unterlageVereinen(lokal: Unterlage, andere: Unterlage): Unterlage {
+export function unterlagenVereinen(lokal: Unterlage, andere: Unterlage): Vereinigung {
   const fl = Boolean(lokal.festgeschrieben);
   const fa = Boolean(andere.festgeschrieben);
-  const basis = fl !== fa ? (fl ? lokal : andere) : lokal.geaendert >= andere.geaendert ? lokal : andere;
+  let basis: Unterlage;
+  let kopie: Unterlage | undefined;
+  if (fl && fa) {
+    const dl = JSON.stringify(lokal.daten);
+    const da = JSON.stringify(andere.daten);
+    // zuerst festgeschrieben gewinnt; bei gleichem Zeitpunkt entscheidet der Inhalt – auf allen Geräten gleich
+    basis = lokal.festgeschrieben! < andere.festgeschrieben! ? lokal : andere.festgeschrieben! < lokal.festgeschrieben! ? andere : dl <= da ? lokal : andere;
+    const zweite = basis === lokal ? andere : lokal;
+    if (dl !== da) {
+      const { storniertDurch: _s, bezahlt: _b, bezahltGeaendert: _bg, ...rest } = zweite;
+      kopie = { ...rest, id: `${lokal.id}-konflikt-${kurzHash(JSON.stringify(zweite.daten))}`, konfliktKopieVon: lokal.id };
+    }
+  } else basis = fl !== fa ? (fl ? lokal : andere) : lokal.geaendert >= andere.geaendert ? lokal : andere;
   const zweite = basis === lokal ? andere : lokal;
   const r: Unterlage = { ...basis };
   const ausgegeben = frueher(lokal.ausgegeben, andere.ausgegeben);
@@ -430,7 +680,65 @@ export function unterlageVereinen(lokal: Unterlage, andere: Unterlage): Unterlag
   delete r.bezahltGeaendert;
   if (quelle.bezahlt) r.bezahlt = quelle.bezahlt;
   if (quelle.bezahltGeaendert) r.bezahltGeaendert = quelle.bezahltGeaendert;
-  return r;
+  return kopie ? { u: r, kopie } : { u: r };
+}
+
+/** Wie `unterlagenVereinen`, nur die gültige Fassung. */
+export const unterlageVereinen = (lokal: Unterlage, andere: Unterlage): Unterlage => unterlagenVereinen(lokal, andere).u;
+
+/**
+ * Unterlagen zweier Stände nach ID vereinen; Konfliktkopien (K1) kommen dazu und werden ihrerseits vereint.
+ * Liefert die vereinten Unterlagen und die Nummern (bzw. IDs) der Unterlagen mit Konflikt.
+ */
+export function unterlagenZusammenfuehren(lokal: Unterlage[], andere: Unterlage[], ueberspringen: (x: Unterlage) => boolean = () => false): { liste: Map<string, Unterlage>; konflikte: string[]; neu: number; aktualisiert: number; behalten: number } {
+  const m = new Map(lokal.map((u) => [u.id, u]));
+  const konflikte = new Set<string>();
+  let neu = 0;
+  let aktualisiert = 0;
+  let behalten = 0;
+  const dazu = (e: Unterlage, zaehlen: boolean) => {
+    const l = m.get(e.id);
+    if (!l) {
+      m.set(e.id, e);
+      if (zaehlen) neu++;
+      return;
+    }
+    const v = unterlagenVereinen(l, e);
+    m.set(e.id, v.u);
+    if (zaehlen) {
+      if (JSON.stringify(v.u) === JSON.stringify(l)) behalten++;
+      else aktualisiert++;
+    }
+    if (v.kopie) {
+      konflikte.add(nummerVon(v.u) || v.u.id);
+      dazu(v.kopie, false);
+    }
+  };
+  for (const e of andere) if (!ueberspringen(e)) dazu(e, true);
+  return { liste: m, konflikte: [...konflikte].sort(), neu, aktualisiert, behalten };
+}
+
+/** Belege beider Seiten (gültige und ungültig markierte) nach ID: die zuletzt geänderte Fassung gewinnt. */
+export function belegeVereinen(a: Beleg[], b: Beleg[]): Map<string, Beleg> {
+  const m = new Map(a.map((x) => [x.id, x]));
+  for (const x of b) {
+    const l = m.get(x.id);
+    if (!l || l.geaendert < x.geaendert) m.set(x.id, x);
+  }
+  return m;
+}
+
+/** Fremdes (unbekannte Vorlagen, unlesbare Belege) beider Seiten nach ID vereinen – nie etwas verlieren. */
+export function fremdVereinen(a: Stand["fremd"], b: Stand["fremd"]): Stand["fremd"] {
+  const vereinen = (x: Record<string, unknown>[], y: Record<string, unknown>[]) => {
+    const m = new Map(x.map((e) => [String(e.id), e]));
+    for (const e of y) {
+      const l = m.get(String(e.id));
+      if (!l || String(l.geaendert ?? "") < String(e.geaendert ?? "")) m.set(String(e.id), e);
+    }
+    return [...m.values()];
+  };
+  return { unterlagen: vereinen(a.unterlagen, b.unterlagen), belege: vereinen(a.belege, b.belege) };
 }
 
 export interface Zusammenfuehrung {
@@ -440,54 +748,71 @@ export interface Zusammenfuehrung {
   aktualisiert: number;
   /** gleiche Nummer in zwei verschiedenen Unterlagen derselben Vorlage */
   nummernKonflikte: string[];
+  /** auf zwei Geräten verschieden festgeschrieben (K1): gültig bleibt die zuerst festgeschriebene, die andere ist Konfliktkopie */
+  festKonflikte: string[];
+  /** Rechnungen mit mehr als einer festgeschriebenen Stornorechnung (K2) */
+  mehrfachStorniert: string[];
 }
 
 /**
- * Sicherung zurückspielen, ohne Neueres zu verlieren (E-129): Unterlagen werden nach ID zusammengeführt. Eine
- * festgeschriebene Unterlage wird nie ersetzt; sonst gewinnt die zuletzt geänderte Fassung. Was nur auf dem Gerät
- * existiert, bleibt. Personen, Antworten und Haken werden ergänzt; „Mein Betrieb“ nur übernommen, wenn er leer ist.
+ * Sicherung zurückspielen, ohne Neueres zu verlieren (E-129): Unterlagen werden nach ID zusammengeführt (siehe
+ * `unterlagenVereinen`). Was nur auf dem Gerät existiert, bleibt. Auf dem Gerät gelöschte Entwürfe kommen nicht
+ * zurück (M7); ausdrücklich wiederhergestellte Belege schon – sie bekommen einen neuen Zeitstempel, damit sie einen
+ * Löschvermerk schlagen (H2). Personen, Antworten und Haken werden ergänzt; „Mein Betrieb“ nur übernommen, wenn er leer ist.
  */
-export function zusammenfuehren(aktuell: Stand, gesichert: Stand): Zusammenfuehrung {
-  const nachId = new Map(aktuell.unterlagen.map((u) => [u.id, u]));
-  let neu = 0;
-  let behalten = 0;
-  let aktualisiert = 0;
-  for (const g of gesichert.unterlagen) {
-    const a = nachId.get(g.id);
-    if (!a) {
-      nachId.set(g.id, g);
-      neu++;
-    } else {
-      const v = unterlageVereinen(a, g);
-      nachId.set(a.id, v);
-      if (JSON.stringify(v) === JSON.stringify(a)) behalten++;
-      else aktualisiert++;
-    }
-  }
+export function zusammenfuehren(aktuell: Stand, gesichert: Stand, jetzt = new Date()): Zusammenfuehrung {
+  // Löschvermerke für Entwürfe beider Seiten (M7) – festgeschriebene Unterlagen werden nie gelöscht
+  const geloescht: Record<string, string> = { ...aktuell.geloescht };
+  for (const [k, v] of Object.entries(gesichert.geloescht)) if (k.startsWith("u:") && (!geloescht[k] || v > geloescht[k]!)) geloescht[k] = v;
+  const vermerk = (u: Unterlage) => geloescht[`u:${u.id}`];
+  const zuletzt = (x: Unterlage) => (x.ausgegeben && x.ausgegeben > x.geaendert ? x.ausgegeben : x.geaendert);
+  const weg = (u: Unterlage) => !u.festgeschrieben && Boolean(vermerk(u)) && zuletzt(u) <= vermerk(u)!;
+  const u = unterlagenZusammenfuehren(aktuell.unterlagen, gesichert.unterlagen, weg);
+  const unterlagen = stornoVerweisePruefen([...u.liste.values()].filter((x) => !weg(x)));
+
   const personen = (a: Person[], g: Person[]) => [...a, ...g.filter((p) => !a.some((x) => x.id === p.id))];
   // Belege: nach ID, die zuletzt geänderte Fassung gewinnt; nur auf dem Gerät Vorhandenes bleibt
-  const belegNachId = new Map(aktuell.belege.map((b) => [b.id, b]));
-  for (const g of gesichert.belege) {
-    const a = belegNachId.get(g.id);
+  const lokaleBelege = [...aktuell.belege, ...aktuell.belegArchiv];
+  const lokalIds = new Map(lokaleBelege.map((b) => [b.id, b]));
+  let neu = u.neu;
+  let aktualisiert = u.aktualisiert;
+  let behalten = u.behalten;
+  const iso = jetzt.toISOString();
+  const wieder: Beleg[] = [];
+  for (const g of [...gesichert.belege, ...gesichert.belegArchiv]) {
+    const a = lokalIds.get(g.id);
     if (!a) {
-      belegNachId.set(g.id, g);
       neu++;
+      // auf dem Gerät (oder einem anderen) gelöscht, jetzt bewusst zurückgeholt: schlägt den Löschvermerk
+      if (geloescht[`b:${g.id}`]) {
+        delete geloescht[`b:${g.id}`];
+        wieder.push({ ...g, geaendert: iso });
+      } else wieder.push(g);
     } else if (a.geaendert < g.geaendert) {
-      belegNachId.set(g.id, g);
       aktualisiert++;
+      wieder.push(g);
     } else behalten++;
   }
+  const belegNachId = belegeVereinen(lokaleBelege, wieder);
+  const alleBelege = [...belegNachId.values()];
   const erledigt = { ...gesichert.erledigt, ...aktuell.erledigt };
   const stand: Stand = {
     ...aktuell,
     betrieb: betriebFehlt(aktuell.betrieb) ? gesichert.betrieb : aktuell.betrieb,
-    unterlagen: stornoVerweisePruefen([...nachId.values()]),
-    belege: [...belegNachId.values()],
+    unterlagen,
+    belege: alleBelege.filter((b) => !b.ungueltig),
+    belegArchiv: alleBelege.filter((b) => b.ungueltig),
     mitarbeiter: personen(aktuell.mitarbeiter, gesichert.mitarbeiter),
     kunden: personen(aktuell.kunden, gesichert.kunden),
     profil: { ...gesichert.profil, ...aktuell.profil },
     erledigt,
+    geloescht,
+    fremd: fremdVereinen(aktuell.fremd, gesichert.fremd),
   };
-  const nummernKonflikte = [...new Set(stand.unterlagen.filter((u) => nummerDoppelt(stand, u)).map((u) => String(u.daten[vorlageFuer(u.vorlage)!.fortlaufend!]).trim()))].sort();
-  return { stand, neu, behalten, aktualisiert, nummernKonflikte };
+  return { stand, neu, behalten, aktualisiert, nummernKonflikte: nummernKonflikteVon(stand), festKonflikte: u.konflikte, mehrfachStorniert: mehrfachStorniert(stand.unterlagen) };
+}
+
+/** Nummern, die in zwei verschiedenen Unterlagen derselben Vorlage vorkommen. */
+export function nummernKonflikteVon(s: Stand): string[] {
+  return [...new Set(s.unterlagen.filter((u) => nummerDoppelt(s, u)).map(nummerVon))].filter(Boolean).sort();
 }

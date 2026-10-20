@@ -5,7 +5,7 @@ import { Fuss, Hinweis, Karte, Knopf, PasswortFeld, Schalter, Symbol, T, TextKno
 import { useNav } from "../ui/navigation";
 import { useMeldung } from "../ui/meldung";
 import { RADIUS, useFarben } from "../ui/thema";
-import { PASSWORT_MINDESTLAENGE, SicherungsFehler, base64, schluesselAusPasswort, schluesselKennung, sicherungErstellen, sicherungLesenMitDateien, sicherungMitSchluessel, sicherungsDatei, sicherungsDateiLesen, sicherungsKdf, sicherungsName, type Dateien, type SicherungsSchluessel } from "../unterlagen/sicherung";
+import { PASSWORT_EMPFOHLEN, SicherungsFehler, fehlendeDateien, passwortSchwaeche, base64, schluesselAusPasswort, schluesselKennung, sicherungErstellen, sicherungLesenMitDateien, sicherungMitSchluessel, sicherungsDatei, sicherungsDateiLesen, sicherungsKdf, sicherungsName, type Dateien, type SicherungsSchluessel } from "../unterlagen/sicherung";
 import { cloudBeiseitelegen, cloudDateiLesen, cloudDateiSchreiben, cloudDateien, cloudLesen, cloudSchreiben, cloudVerfuegbar } from "../unterlagen/cloud";
 import { autoSchluesselHolen, autoSchluesselLoeschen, autoSchluesselSpeichern } from "../unterlagen/schluesselbund";
 import { dateiTeilen, dateiWaehlen, zufall } from "../unterlagen/sicherungDatei";
@@ -17,17 +17,22 @@ import { useProSperre } from "./Pro";
 /** Kurz warten, damit der Ladezustand gezeichnet ist, bevor die Schlüsselableitung den Thread belegt. */
 const gleich = () => new Promise((r) => setTimeout(r, 30));
 
+/** Neues Passwort brauchbar: stark genug (H-1) und zweimal gleich eingegeben. */
+export const passwortBereit = (pw: string, pw2: string) => passwortSchwaeche(pw) === null && pw === pw2;
+
 /**
- * Neues Passwort zweimal: „Mindestens n Zeichen“ steht beim Tippen ruhig als Hilfe darunter und wird erst nach dem
- * Verlassen des Felds zum Fehler; „stimmen nicht überein“ ebenso erst nach dem zweiten Feld.
+ * Neues Passwort zweimal: Die Anforderung (mindestens 12 Zeichen oder drei Wörter, nichts Naheliegendes) steht beim
+ * Tippen ruhig als Hilfe darunter und wird erst nach dem Verlassen des Felds zum Fehler; „stimmen nicht überein“
+ * ebenso erst nach dem zweiten Feld.
  */
 export function PasswortPaar({ label, pw, pw2, setPw, setPw2 }: { label: string; pw: string; pw2: string; setPw: (w: string) => void; setPw2: (w: string) => void }) {
   const [verlassen1, setVerlassen1] = useState(false);
   const [verlassen2, setVerlassen2] = useState(false);
-  const kurz = pw.length < PASSWORT_MINDESTLAENGE;
+  const schwaeche = passwortSchwaeche(pw);
+  const text = schwaeche === "einfach" ? TEXT.passwort_einfach : TEXT.passwort_anforderung(PASSWORT_EMPFOHLEN);
   return (
     <View>
-      <PasswortFeld neu label={label} wert={pw} aendern={setPw} onBlur={() => setVerlassen1(true)} hinweis={kurz ? TEXT.passwort_kurz(PASSWORT_MINDESTLAENGE) : null} fehler={verlassen1 && pw.length > 0 && kurz ? TEXT.passwort_kurz(PASSWORT_MINDESTLAENGE) : null} />
+      <PasswortFeld neu label={label} wert={pw} aendern={setPw} onBlur={() => setVerlassen1(true)} hinweis={schwaeche ? text : null} fehler={(verlassen1 || schwaeche === "einfach") && pw.length > 0 && schwaeche ? text : null} />
       <PasswortFeld neu label={TEXT.passwort_wiederholen} wert={pw2} aendern={setPw2} onBlur={() => setVerlassen2(true)} fehler={(verlassen2 || pw2.length >= pw.length) && pw2.length > 0 && pw !== pw2 ? TEXT.passwort_ungleich : null} />
     </View>
   );
@@ -42,16 +47,26 @@ export function SicherungSeite() {
   const [pw2, setPw2] = useState("");
   const [laedt, setLaedt] = useState(false);
   const [meldung, setMeldung] = useState<{ art: "erfolg" | "fehler"; text: string } | null>(null);
-  const bereit = pw.length >= PASSWORT_MINDESTLAENGE && pw === pw2;
+  const bereit = passwortBereit(pw, pw2);
   const los = async () => {
     setMeldung(null);
     setLaedt(true);
     try {
       await gleich();
       const gesichert = z.stand;
-      const text = sicherungErstellen(gesichert, pw, zufall, new Date(), undefined, await z.dateienFuerSicherung(gesichert));
+      const { dateien } = await z.dateienFuerSicherung(gesichert);
+      const fehlend = fehlendeDateien(gesichert, dateien);
+      const text = sicherungErstellen(gesichert, pw, zufall, new Date(), undefined, dateien);
       // abgebrochen: keine Sicherung – die Erinnerung bleibt und „Alle Daten löschen“ bleibt gesperrt
       if (!(await dateiTeilen(sicherungsName(heute()), text))) return;
+      // fehlen Belegdateien, ist die Sicherung nicht vollständig (H3): teilen ja, aber nicht als gesichert zählen
+      if (fehlend.length) {
+        setMeldung({ art: "fehler", text: TEXT.sicherung_dateien_fehlen(fehlend.length) });
+        setPw("");
+        setPw2("");
+        setErledigt(true);
+        return;
+      }
       z.gesichert(gesichert);
       setMeldung({ art: "erfolg", text: TEXT.sicherung_fertig });
       // fertig: Passwort aus dem Feld, Knopf wird zu „Fertig“ – keine doppelte Sicherung aus Versehen
@@ -133,12 +148,16 @@ export function WiederherstellenSeite({ fertig }: { fertig?: () => void }) {
               <Knopf
                 text={TEXT.jetzt_wiederherstellen}
                 onPress={() =>
-                  void z.zusammenfuehren(gelesen).then(async (r) => {
-                    await z.dateienEinspielen(dateien);
-                    melden(TEXT.wiederhergestellt_text(r.neu, r.aktualisiert));
-                    fertig?.();
-                    nav.zurueck();
-                  })
+                  void z
+                    .zusammenfuehren(gelesen)
+                    .then(async (r) => {
+                      const fehler = await z.dateienEinspielen(dateien);
+                      // Belegdateien, die sich nicht ablegen ließen, nicht als Erfolg verbuchen (G4)
+                      melden(fehler ? `${TEXT.wiederhergestellt_text(r.neu, r.aktualisiert)} ${TEXT.wiederherstellen_dateien_fehler(fehler)}` : TEXT.wiederhergestellt_text(r.neu, r.aktualisiert), fehler ? "info" : undefined);
+                      fertig?.();
+                      nav.zurueck();
+                    })
+                    .catch(() => setFehler(TEXT.wiederherstellen_fehler))
                 }
                 stil={{ flex: 1 }}
               />
@@ -183,6 +202,8 @@ function Vorschau({ aktuell, gelesen }: { aktuell: Stand; gelesen: Stand }) {
       <Hinweis art="erfolg" text={TEXT.inhalt_sicherung(gelesen.betrieb.name, gelesen.unterlagen.length, gelesen.mitarbeiter.length, gelesen.kunden.length, gelesen.belege.length)} />
       <Hinweis text={TEXT.zusammenfuehren_text(z.neu, z.aktualisiert, z.behalten)} />
       {z.nummernKonflikte.length ? <Hinweis art="fehler" text={TEXT.nummern_konflikt(z.nummernKonflikte)} /> : null}
+      {z.festKonflikte.length ? <Hinweis art="fehler" text={TEXT.fest_konflikt(z.festKonflikte)} /> : null}
+      {z.mehrfachStorniert.length ? <Hinweis art="fehler" text={TEXT.mehrfach_storniert(z.mehrfachStorniert)} /> : null}
     </View>
   );
 }
@@ -211,15 +232,21 @@ export function SicherungsKarte() {
   );
 }
 
-/** Belegdateien, die in iCloud noch fehlen, einzeln hochladen (je Datei einmal). */
-async function belegeHochladen(z: ReturnType<typeof useAmtlos>, k: SicherungsSchluessel, stand: Stand): Promise<void> {
+/**
+ * Belegdateien, die in iCloud noch fehlen, einzeln hochladen (je Datei einmal). Liefert die Zahl der Dateien, die
+ * sich auf dem Gerät nicht lesen ließen (H3) – dann ist die Sicherung nicht vollständig.
+ */
+async function belegeHochladen(z: ReturnType<typeof useAmtlos>, k: SicherungsSchluessel, stand: Stand): Promise<number> {
   const kennung = schluesselKennung(k.salz);
   const da = await cloudDateien(kennung);
-  for (const b of stand.belege) {
+  let fehlend = 0;
+  for (const b of [...stand.belege, ...stand.belegArchiv]) {
     if (!b.datei || da.has(b.datei)) continue;
     const bytes = await z.dateiLesen(b.datei);
     if (bytes) await cloudDateiSchreiben(kennung, b.datei, sicherungsDatei(bytes, k.schluessel, zufall));
+    else fehlend++;
   }
+  return fehlend;
 }
 
 /** Belegdateien einer iCloud-Sicherung holen, die nicht in der Sicherungsdatei selbst stecken. */
@@ -228,7 +255,7 @@ async function belegeAusCloud(text: string, stand: Stand, schluessel: Uint8Array
   if (!kdf) return vorhanden;
   const kennung = schluesselKennung(kdf.salz);
   const d: Dateien = { ...vorhanden };
-  for (const b of stand.belege) {
+  for (const b of [...stand.belege, ...stand.belegArchiv]) {
     if (!b.datei || d[b.datei]) continue;
     const roh = await cloudDateiLesen(kennung, b.datei);
     const bytes = roh ? sicherungsDateiLesen(roh, schluessel) : null;
@@ -283,7 +310,8 @@ function CloudSicherungSeite() {
   const [pw2, setPw2] = useState("");
   const [laedt, setLaedt] = useState(false);
   const [fehler, setFehler] = useState(false);
-  const bereit = pw.length >= PASSWORT_MINDESTLAENGE && pw === pw2;
+  const [fehlend, setFehlend] = useState(0);
+  const bereit = passwortBereit(pw, pw2);
   const los = async () => {
     setFehler(false);
     setLaedt(true);
@@ -308,9 +336,14 @@ function CloudSicherungSeite() {
       k ??= schluesselAusPasswort(pw, zufall);
       await autoSchluesselSpeichern(k);
       const stand = z.aktuellerStand();
-      await belegeHochladen(z, k, stand);
+      const ohne = await belegeHochladen(z, k, stand);
       await cloudSchreiben(sicherungMitSchluessel(stand, k, zufall, new Date()));
       z.cloudSicherungSetzen(true);
+      // nur vollständig gilt als gesichert (H3)
+      if (ohne) {
+        setFehlend(ohne);
+        return;
+      }
       z.gesichert(stand);
       nav.zurueck();
     } catch {
@@ -333,6 +366,7 @@ function CloudSicherungSeite() {
       <View style={{ marginTop: 18 }}>
         <Hinweis art="warnung" text={TEXT.sicherung_warnung} symbol="lock" />
         {fehler ? <Hinweis art="fehler" text={TEXT.icloud_fehler} /> : null}
+        {fehlend ? <Hinweis art="fehler" text={TEXT.sicherung_dateien_fehlen(fehlend)} /> : null}
       </View>
     </BuehnenBlatt>
   );
@@ -350,9 +384,10 @@ export function AutoSicherung() {
         if (!k || !(await cloudVerfuegbar())) return;
         const gesichert = z.aktuellerStand();
         // erst die Belegdateien (einzeln, nur fehlende), dann der Stand ohne Fotos – so verweist er nie auf Fehlendes
-        await belegeHochladen(z, k, gesichert);
+        const ohne = await belegeHochladen(z, k, gesichert);
         await cloudSchreiben(sicherungMitSchluessel(gesichert, k, zufall, new Date()));
-        z.gesichert(gesichert);
+        // fehlt eine Belegdatei, gilt die Sicherung nicht als vollständig (H3) – die Erinnerung bleibt
+        if (!ohne) z.gesichert(gesichert);
       })().catch(() => undefined);
     }, 20_000);
     return () => clearTimeout(zeit);

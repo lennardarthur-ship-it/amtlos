@@ -14,8 +14,8 @@ import { pbkdf2 } from "@noble/hashes/pbkdf2";
 import { sha256 } from "@noble/hashes/sha2";
 import type { Person } from "@amtlos/fachlogik";
 import { ITERATIONEN_HOECHSTENS, PASSWORT_MINDESTLAENGE, SICHERUNG_ITERATIONEN, ausBase64, base64, utf8 } from "../unterlagen/sicherung";
-import { nummerDoppelt, standAus, stornoVerweisePruefen, unterlageVereinen, type Stand, type Unterlage } from "../unterlagen/speicher";
-import { tresorOeffnen, tresorSchliessen } from "../unterlagen/tresor";
+import { belegeVereinen, fremdVereinen, mehrfachStorniert, nummernKonflikteVon, standAus, stornoVerweisePruefen, unterlagenZusammenfuehren, type Stand, type Unterlage } from "../unterlagen/speicher";
+import { tresorOeffnen, tresorSchliessen, tresorVersion } from "../unterlagen/tresor";
 
 export const SCHLUESSEL_FORMAT = "amtlos-schluessel";
 const HUELLE_ZUSATZ = `${SCHLUESSEL_FORMAT}:1`;
@@ -71,16 +71,46 @@ export function syncInhalt(s: Stand): Stand {
   return { ...rest, appSperre: false, cloudSicherung: false, erinnerungen: false, proTest: false, bewertung: { erfolge: 0 } } as Stand;
 }
 
-export const standVerschluesseln = (s: Stand, sync: Uint8Array, nonce: Uint8Array) => tresorSchliessen(JSON.stringify(syncInhalt(s)), sync, nonce);
-export function standEntschluesseln(text: string, sync: Uint8Array): Stand {
+/**
+ * Stand für den Server (M-1): Format 2, gebunden an das Konto, mit einem fortlaufenden Zähler im verschlüsselten
+ * Inhalt. Jedes Gerät merkt sich den höchsten gesehenen Zähler; einen älteren Stand (vom Server zurückgespielt)
+ * lehnt es ab. Ohne Konto (Tests, ältere Aufrufer) wie bisher Format 1.
+ */
+export function standVerschluesseln(s: Stand, sync: Uint8Array, nonce: Uint8Array, konto?: string, zaehler = 0): string {
+  if (konto === undefined) return tresorSchliessen(JSON.stringify(syncInhalt(s)), sync, nonce);
+  return tresorSchliessen(JSON.stringify({ zaehler, stand: syncInhalt(s) }), sync, nonce, `sync-stand:${konto}`);
+}
+
+/**
+ * Stand vom Server öffnen. `gesehen`: höchster schon gesehener Zähler – ein kleinerer (zurückgespielter alter Stand)
+ * oder ein Stand ohne Zähler, nachdem schon einer mit Zähler da war, ergibt SyncFehler „format“.
+ */
+export function standEntschluesselnMitZaehler(text: string, sync: Uint8Array, konto?: string, gesehen = 0): { stand: Stand; zaehler: number } {
+  let klar: string;
   try {
-    return standAus(tresorOeffnen(text, sync));
+    klar = tresorOeffnen(text, sync, konto === undefined ? undefined : `sync-stand:${konto}`);
   } catch {
     throw new SyncFehler("passwort");
   }
+  try {
+    if (tresorVersion(text) === 1) {
+      if (gesehen > 0) throw new SyncFehler("format");
+      return { stand: standAus(klar), zaehler: 0 };
+    }
+    const roh = JSON.parse(klar) as { zaehler?: unknown; stand?: unknown };
+    const zaehler = typeof roh.zaehler === "number" && Number.isSafeInteger(roh.zaehler) && roh.zaehler >= 0 ? roh.zaehler : -1;
+    if (zaehler < 0 || zaehler < gesehen) throw new SyncFehler("format");
+    return { stand: standAus(JSON.stringify(roh.stand ?? null)), zaehler };
+  } catch (e) {
+    // unlesbar oder aus einer neueren App-Version: nichts zusammenführen, nichts überschreiben
+    throw e instanceof SyncFehler ? e : new SyncFehler("format");
+  }
 }
-export const dateiVerschluesseln = (bytes: Uint8Array, sync: Uint8Array, nonce: Uint8Array) => tresorSchliessen(base64(bytes), sync, nonce);
-export const dateiEntschluesseln = (text: string, sync: Uint8Array) => ausBase64(tresorOeffnen(text, sync));
+export const standEntschluesseln = (text: string, sync: Uint8Array, konto?: string, gesehen = 0): Stand => standEntschluesselnMitZaehler(text, sync, konto, gesehen).stand;
+
+/** Belegdatei für den Server – Format 2, gebunden an den Dateinamen (M-1). */
+export const dateiVerschluesseln = (bytes: Uint8Array, sync: Uint8Array, nonce: Uint8Array, name?: string) => tresorSchliessen(base64(bytes), sync, nonce, name === undefined ? undefined : `sync-datei:${name}`);
+export const dateiEntschluesseln = (text: string, sync: Uint8Array, name?: string) => ausBase64(tresorOeffnen(text, sync, name === undefined ? undefined : `sync-datei:${name}`));
 
 const neuer = (a: string | undefined, b: string | undefined) => (a ?? "") >= (b ?? "");
 
@@ -100,6 +130,27 @@ export interface SyncZusammenfuehrung {
   stand: Stand;
   /** gleiche fortlaufende Nummer in zwei Unterlagen (z. B. auf zwei Geräten offline vergeben) */
   nummernKonflikte: string[];
+  /** auf zwei Geräten verschieden festgeschrieben (K1) – die zuerst festgeschriebene gilt, die andere ist Konfliktkopie */
+  festKonflikte: string[];
+  /** Rechnungen mit mehr als einer festgeschriebenen Stornorechnung (K2) */
+  mehrfachStorniert: string[];
+}
+
+/**
+ * Karte schlüsselweise zusammenführen (G1): je Schlüssel gewinnt die Seite mit dem neueren Zeitpunkt
+ * `zeiten["<bereich>:<schlüssel>"]`. Ohne Zeitpunkt auf beiden Seiten (ältere Daten) bleibt erhalten, was eine Seite hat.
+ */
+function schluesselweise<T>(lokal: Record<string, T>, entfernt: Record<string, T>, lz: Record<string, string>, ez: Record<string, string>, bereich: string): Record<string, T> {
+  const p = `${bereich}:`;
+  const schluessel = new Set([...Object.keys(lokal), ...Object.keys(entfernt), ...[...Object.keys(lz), ...Object.keys(ez)].filter((k) => k.startsWith(p)).map((k) => k.slice(p.length))]);
+  const aus: Record<string, T> = {};
+  for (const k of schluessel) {
+    const tl = lz[p + k] ?? "";
+    const te = ez[p + k] ?? "";
+    const quelle = tl === te ? (k in lokal ? lokal : entfernt) : tl > te ? lokal : entfernt;
+    if (k in quelle) aus[k] = quelle[k]!;
+  }
+  return aus;
 }
 
 /** Lokalen Stand mit dem Stand vom Server zusammenführen (siehe Kopf). Gerätegebundenes bleibt lokal. */
@@ -110,31 +161,32 @@ export function syncZusammenfuehren(lokal: Stand, entfernt: Stand): SyncZusammen
   for (const [k, v] of Object.entries(lokal.zeiten)) if (!zeiten[k] || v > zeiten[k]!) zeiten[k] = v;
   const lokalNeuer = (bereich: string) => neuer(lokal.zeiten[bereich], entfernt.zeiten[bereich]);
   const fest = (u: Unterlage) => Boolean(u.festgeschrieben);
-  // Unterlagen feldweise vereinen (festgeschrieben schlägt Entwurf, Zahlung und Storno gehen nicht verloren);
-  // Löschvermerke wie bei allen anderen; Verweise auf gelöschte Stornos fallen weg
-  const um = new Map(lokal.unterlagen.map((u) => [u.id, u]));
-  for (const e of entfernt.unterlagen) {
-    const l = um.get(e.id);
-    um.set(e.id, l ? unterlageVereinen(l, e) : e);
-  }
+  // Unterlagen feldweise vereinen (festgeschrieben schlägt Entwurf, Zahlung und Storno gehen nicht verloren; zwei
+  // verschieden festgeschriebene Fassungen werden nie vermischt – K1); Löschvermerke wie bei allen anderen;
+  // Verweise auf gelöschte Stornos fallen weg
+  const u = unterlagenZusammenfuehren(lokal.unterlagen, entfernt.unterlagen);
   // nach dem Löschvermerk geändert oder geteilt: bleibt
   const zuletzt = (x: Unterlage) => (x.ausgegeben && x.ausgegeben > x.geaendert ? x.ausgegeben : x.geaendert);
-  const unterlagen = stornoVerweisePruefen([...um.values()].filter((x) => fest(x) || !geloescht[`u:${x.id}`] || zuletzt(x) > geloescht[`u:${x.id}`]!));
+  const unterlagen = stornoVerweisePruefen([...u.liste.values()].filter((x) => fest(x) || !geloescht[`u:${x.id}`] || zuletzt(x) > geloescht[`u:${x.id}`]!));
+  // Belege: gültige und ungültig markierte gemeinsam (die neuere Fassung gewinnt, auch beim Ungültig-Vermerk);
+  // ungültig markierte bleiben immer (Aufbewahrungspflicht), gültige weichen einem neueren Löschvermerk
+  const belege = [...belegeVereinen([...lokal.belege, ...lokal.belegArchiv], [...entfernt.belege, ...entfernt.belegArchiv]).values()].filter((b) => b.ungueltig || !geloescht[`b:${b.id}`] || b.geaendert > geloescht[`b:${b.id}`]!);
   const stand: Stand = {
     ...lokal,
     betrieb: lokalNeuer("betrieb") ? lokal.betrieb : entfernt.betrieb,
-    profil: lokalNeuer("profil") ? lokal.profil : entfernt.profil,
-    erledigt: lokalNeuer("erledigt") ? lokal.erledigt : entfernt.erledigt,
+    profil: schluesselweise(lokal.profil, entfernt.profil, lokal.zeiten, entfernt.zeiten, "profil"),
+    erledigt: schluesselweise(lokal.erledigt, entfernt.erledigt, lokal.zeiten, entfernt.zeiten, "erledigt"),
     steuerberatung: lokalNeuer("steuerberatung") ? lokal.steuerberatung : entfernt.steuerberatung,
     unterlagen,
-    belege: nachId(lokal.belege, entfernt.belege, geloescht, "b:"),
+    belege: belege.filter((b) => !b.ungueltig),
+    belegArchiv: belege.filter((b) => b.ungueltig),
     mitarbeiter: nachId<Person>(lokal.mitarbeiter, entfernt.mitarbeiter, geloescht, "m:"),
     kunden: nachId<Person>(lokal.kunden, entfernt.kunden, geloescht, "k:"),
+    fremd: fremdVereinen(lokal.fremd, entfernt.fremd),
     geloescht,
     zeiten,
   };
-  const nummernKonflikte = [...new Set(stand.unterlagen.filter((u) => nummerDoppelt(stand, u)).map((u) => String(u.daten.nummer ?? "").trim()))].filter(Boolean).sort();
-  return { stand, nummernKonflikte };
+  return { stand, nummernKonflikte: nummernKonflikteVon(stand), festKonflikte: u.konflikte, mehrfachStorniert: mehrfachStorniert(stand.unterlagen) };
 }
 
 /** Schnittstelle zum Server – im Test ein Speicher im Arbeitsspeicher. */
@@ -149,6 +201,11 @@ export interface TresorApi {
 export interface SyncUmgebung {
   api: TresorApi;
   sync: Uint8Array;
+  /** Konto, an das der Stand gebunden ist (M-1); ohne Angabe Format 1 wie bisher */
+  konto?: string;
+  /** höchster bisher gesehener Zähler des Stands und ihn merken (M-1, Schutz vor zurückgespielten Ständen) */
+  zaehlerLesen?(): Promise<number>;
+  zaehlerMerken?(n: number): Promise<void>;
   zufall: (n: number) => Uint8Array;
   /** aktueller lokaler Stand (wird während der Synchronisation erneut gelesen) */
   lokal(): Stand;
@@ -163,6 +220,12 @@ export interface SyncErgebnis {
   hochgeladen: number;
   heruntergeladen: number;
   nummernKonflikte: string[];
+  festKonflikte: string[];
+  mehrfachStorniert: string[];
+  /** Belegdateien auf dem Server, die sich nicht entschlüsseln ließen (M5) – übersprungen, nicht abgelegt */
+  defekteDateien: string[];
+  /** Belegdateien, die weder auf dem Gerät noch auf dem Server liegen (M5) */
+  fehlendeDateien: string[];
 }
 
 /**
@@ -173,30 +236,45 @@ export async function synchronisieren(u: SyncUmgebung): Promise<SyncErgebnis> {
   for (let versuch = 0; versuch < 3; versuch++) {
     const t = await u.api.holen();
     if (!t) throw new SyncFehler("format");
-    const entfernt = t.daten ? standEntschluesseln(t.daten, u.sync) : null;
-    const z = entfernt ? syncZusammenfuehren(u.lokal(), entfernt) : { stand: u.lokal(), nummernKonflikte: [] };
-    // Dateien: was dem Server fehlt, hoch; was dem Gerät fehlt, herunter
+    const gesehen = (await u.zaehlerLesen?.()) ?? 0;
+    const entfernt = t.daten ? standEntschluesselnMitZaehler(t.daten, u.sync, u.konto, gesehen) : null;
+    const z: SyncZusammenfuehrung = entfernt ? syncZusammenfuehren(u.lokal(), entfernt.stand) : { stand: u.lokal(), nummernKonflikte: [], festKonflikte: [], mehrfachStorniert: [] };
+    // Dateien: was dem Server fehlt, hoch; was dem Gerät fehlt, herunter – auch die ungültig markierter Belege
     const aufServer = new Set(await u.api.dateien());
     let hoch = 0;
     let runter = 0;
-    for (const b of z.stand.belege) {
+    const defekt: string[] = [];
+    const fehlend: string[] = [];
+    for (const b of [...z.stand.belege, ...z.stand.belegArchiv]) {
       if (!b.datei) continue;
       const lokal = await u.dateiLokal(b.datei);
       if (lokal && !aufServer.has(b.datei)) {
-        await u.api.dateiSpeichern(b.datei, dateiVerschluesseln(lokal, u.sync, u.zufall(12)));
+        await u.api.dateiSpeichern(b.datei, dateiVerschluesseln(lokal, u.sync, u.zufall(12), u.konto === undefined ? undefined : b.datei));
         hoch++;
       } else if (!lokal && aufServer.has(b.datei)) {
         const text = await u.api.dateiHolen(b.datei);
-        if (text) {
-          await u.dateiAblegen(b.datei, dateiEntschluesseln(text, u.sync));
-          runter++;
+        if (!text) {
+          fehlend.push(b.datei);
+          continue;
         }
-      }
+        // eine beschädigte oder vertauschte Datei blockiert nicht die ganze Synchronisation (M5)
+        let bytes: Uint8Array;
+        try {
+          bytes = dateiEntschluesseln(text, u.sync, b.datei);
+        } catch {
+          defekt.push(b.datei);
+          continue;
+        }
+        await u.dateiAblegen(b.datei, bytes);
+        runter++;
+      } else if (!lokal) fehlend.push(b.datei);
     }
     try {
-      const version = await u.api.speichern(t.version, standVerschluesseln(z.stand, u.sync, u.zufall(12)));
+      const zaehler = Math.max(gesehen, entfernt?.zaehler ?? 0) + 1;
+      const version = await u.api.speichern(t.version, standVerschluesseln(z.stand, u.sync, u.zufall(12), u.konto, zaehler));
+      await u.zaehlerMerken?.(zaehler);
       u.uebernehmen(z.stand);
-      return { version, hochgeladen: hoch, heruntergeladen: runter, nummernKonflikte: z.nummernKonflikte };
+      return { version, hochgeladen: hoch, heruntergeladen: runter, nummernKonflikte: z.nummernKonflikte, festKonflikte: z.festKonflikte, mehrfachStorniert: z.mehrfachStorniert, defekteDateien: defekt, fehlendeDateien: fehlend };
     } catch (e) {
       if (e instanceof SyncFehler && e.art === "konflikt") continue;
       throw e;

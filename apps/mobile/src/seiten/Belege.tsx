@@ -11,7 +11,7 @@ import { istIos, useFarben, weich } from "../ui/thema";
 import { belegFoto } from "../unterlagen/belegfoto";
 import { ausUtf8, base64 } from "../unterlagen/sicherung";
 import { dateiTeilenBytes, dateiWaehlenBytes } from "../unterlagen/sicherungDatei";
-import { leererBeleg, neueId } from "../unterlagen/speicher";
+import { belegEndgueltigLoeschbar, leererBeleg, neueId } from "../unterlagen/speicher";
 import { istKleinunternehmer } from "../unterlagen/steuerpaket";
 import { useAmtlos } from "../zustand";
 import { bestaetigen } from "../ui/bestaetigen";
@@ -255,15 +255,18 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
         <TextKnopf
           symbol="trash"
           gefahr
-          text={TEXT.loeschen}
-          onPress={() =>
-            void bestaetigen({ titel: TEXT.loeschen_wirklich, text: TEXT.beleg_loeschen_hinweis(regelwert("steuern.aufbewahrung.belege_jahre") ?? 8), ja: TEXT.loeschen_ja }).then((ok) => {
+          text={belegEndgueltigLoeschbar(b) ? TEXT.loeschen : TEXT.beleg_ungueltig_knopf}
+          onPress={() => {
+            const jahre = regelwert("steuern.aufbewahrung.belege_jahre") ?? 8;
+            // in der Aufbewahrungsfrist wird nicht gelöscht, sondern mit Grund ungültig markiert (H2)
+            const endgueltig = belegEndgueltigLoeschbar(b);
+            void bestaetigen(endgueltig ? { titel: TEXT.loeschen_wirklich, text: TEXT.beleg_loeschen_hinweis(jahre), ja: TEXT.loeschen_ja } : { titel: TEXT.beleg_ungueltig_wirklich, text: TEXT.beleg_ungueltig_text(jahre), ja: TEXT.beleg_ungueltig_ja }).then((ok) => {
               if (!ok) return;
-              z.belegLoeschen(id);
-              melden(TEXT.geloescht, "info");
+              const r = z.belegLoeschen(id, TEXT.beleg_ungueltig_grund);
+              melden(r === "ungueltig" ? TEXT.beleg_ungueltig_gesetzt : TEXT.geloescht, "info");
               nav.zurueck();
-            })
-          }
+            });
+          }}
           stil={{ marginTop: 24 }}
         />
     </BuehnenBlatt>

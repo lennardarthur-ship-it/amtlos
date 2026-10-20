@@ -3,7 +3,7 @@ import { PDFDocument } from "pdf-lib";
 import { VORLAGEN, dokumentHtml, fehlendeAngaben, leereDaten, vorlageFuer } from "@amtlos/fachlogik";
 import { fussAngaben, fusszeileStempeln } from "../src/unterlagen/fusszeile";
 import { pflichtenFuer, rechtsgrundlagen } from "../src/unterlagen/katalog";
-import { LEERER_STAND, aendern, anlegen, betriebFehlt, betriebSetzen, felderSetzen, heute, kopieren, loeschen, personLoeschen, personMerken, personSetzen, personenSortiert, sortiert, standAus } from "../src/unterlagen/speicher";
+import { LEERER_STAND, aendern, anlegen, betriebFehlt, betriebSetzen, felderSetzen, heute, kopieren, loeschen, personLoeschen, personMerken, personSetzen, personenSortiert, sortiert, standAus, StandFehler } from "../src/unterlagen/speicher";
 
 const B = { name: "Café Mond", strasse: "Markt 2", plz: "54321", ort: "Beispielstadt", verantwortlich: "Robin Beispiel", telefon: "", email: "", steuernummer: "", ust_idnr: "", iban: "", bundesland: "Hessen" };
 const t = (s: string) => new Date(`2026-10-12T${s}:00Z`);
@@ -27,14 +27,15 @@ describe("Unterlagen auf dem Gerät", () => {
     expect(() => anlegen(s, "gibt_es_nicht", t("08:00"))).toThrow();
   });
 
-  it("liest gespeicherte Stände tolerant: Unlesbares, unbekannte Vorlagen und fremde Felder fallen weg", () => {
+  it("liest gespeicherte Stände tolerant: Unlesbares wirft, unbekannte Vorlagen bleiben unter „fremd“, fremde Felder fallen weg", () => {
     expect(standAus(null)).toEqual(LEERER_STAND);
-    expect(standAus("{kaputt")).toEqual(LEERER_STAND);
+    expect(() => standAus("{kaputt")).toThrow(StandFehler);
     const s = standAus(JSON.stringify({ version: 1, betrieb: { name: "X", boese: 1, plz: 5 }, unterlagen: [{ id: "1", vorlage: "haccp", daten: {}, erstellt: "", geaendert: "" }, { id: "2", vorlage: "weg", daten: {} }, null] }));
     expect(s.betrieb).toEqual({ ...LEERER_STAND.betrieb, name: "X" });
     expect(s.mitarbeiter).toEqual([]);
     expect(standAus(JSON.stringify({ mitarbeiter: [{ id: "m", name: "Sam", taetigkeit: "Friseur/in", boese: 1 }, { name: "ohne id" }] })).mitarbeiter).toEqual([{ id: "m", name: "Sam", taetigkeit: "Friseur/in" }]);
     expect(s.unterlagen.map((u) => u.id)).toEqual(["1"]);
+    expect(s.fremd.unterlagen.map((u) => u.id)).toEqual(["2"]);
     expect(betriebFehlt(s.betrieb)).toBe(false);
     expect(betriebFehlt(LEERER_STAND.betrieb)).toBe(true);
   });

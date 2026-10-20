@@ -67,7 +67,7 @@ describe("Zusammenführen zweier Geräte (E-134)", () => {
     basis = belegSetzen(basis, beleg("b2"), t("2026-10-01"));
     basis = personSetzen(basis, "kunde", { id: "k1", name: "Kim" }, t("2026-10-01"));
     basis = anlegen(basis, "unterweisung", t("2026-10-01"), "u1")[0];
-    const a = loeschen(personLoeschen(belegLoeschen(basis, "b1"), "kunde", "k1"), "u1");
+    const a = loeschen(personLoeschen(belegLoeschen(basis, "b1", t("2026-10-02")), "kunde", "k1"), "u1");
     const spaeter = new Date(Date.now() + 60_000);
     const b = belegSetzen(basis, beleg("b2", { lieferant: "Später geändert" }), spaeter);
     const z = syncZusammenfuehren(b, a).stand;
@@ -155,7 +155,7 @@ describe("Zusammenführen zweier Geräte (E-134)", () => {
   });
 
   it("übersteht den Weg durch JSON (standAus behält Löschvermerke und Zeiten)", () => {
-    const s = belegLoeschen(betriebSetzen(LEERER_STAND, B), "weg");
+    const s: Stand = { ...betriebSetzen(LEERER_STAND, B), geloescht: { "b:weg": "2026-10-02T09:00:00.000Z" } };
     const r = standAus(JSON.stringify(s));
     expect(r.geloescht["b:weg"]).toBeTruthy();
     expect(r.zeiten.betrieb).toBeTruthy();
@@ -224,7 +224,7 @@ describe("Synchronisieren gegen einen Server (E-134)", () => {
     expect([...b.g.dateien.get("b1abc.jpg")!]).toEqual([1, 2, 3, 4]);
 
     // Löschen auf B kommt auf A an
-    b.g.stand = belegLoeschen(b.g.stand, "b1");
+    b.g.stand = belegLoeschen(b.g.stand, "b1", t("2026-10-02"));
     await synchronisieren(b.u);
     await synchronisieren(a.u);
     expect(a.g.stand.belege).toEqual([]);

@@ -30,13 +30,16 @@ export async function dateiWaehlen(): Promise<{ name: string; text: string } | n
   if (r.canceled || !r.assets[0]) return null;
   const a = r.assets[0];
   const f = new File(a.uri);
-  const text = await f.text();
   try {
-    f.delete();
-  } catch {
-    /* nicht unsere Kopie */
+    return { name: a.name, text: await f.text() };
+  } finally {
+    // auch wenn das Lesen scheitert, die Kopie nicht im Cache liegen lassen (G-12)
+    try {
+      f.delete();
+    } catch {
+      /* nicht unsere Kopie */
+    }
   }
-  return { name: a.name, text };
 }
 
 /** Binärdatei teilen (Steuerberater-Paket, Originale von Belegen). */
@@ -62,11 +65,14 @@ export async function dateiWaehlenBytes(typen: string[]): Promise<{ name: string
   if (r.canceled || !r.assets[0]) return null;
   const a = r.assets[0];
   const f = new File(a.uri);
-  const bytes = f.bytesSync();
   try {
-    f.delete();
-  } catch {
-    /* nicht unsere Kopie */
+    return { name: a.name, bytes: f.bytesSync(), mime: a.mimeType ?? "" };
+  } finally {
+    // auch wenn das Lesen scheitert, die Kopie nicht im Cache liegen lassen (G-12)
+    try {
+      f.delete();
+    } catch {
+      /* nicht unsere Kopie */
+    }
   }
-  return { name: a.name, bytes, mime: a.mimeType ?? "" };
 }
