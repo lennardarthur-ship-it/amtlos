@@ -15,9 +15,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm
@@ -55,9 +55,9 @@ jobs:
       PGUSER: postgres
       PGPASSWORD: postgres
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm
@@ -103,7 +103,7 @@ jobs:
       PGUSER: postgres
       PGPASSWORD: postgres
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: psql-Client
         run: sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
       - name: Schema einspielen und testen
@@ -111,8 +111,8 @@ jobs:
           set -o pipefail
           db/tests/run.sh | tee ergebnis.txt
           grep -q "ALLE SCHEMA-TESTS BESTANDEN" ergebnis.txt
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm
@@ -145,9 +145,9 @@ jobs:
       PGPASSWORD: postgres
       DEV_JWT_SECRET: ci-entwicklungs-geheimnis-mindestens-32-zeichen
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm
@@ -190,7 +190,7 @@ jobs:
         # Rundgänge: die letzten Zeilen ohne Zugriffsprotokoll (der Befund steht vor dem Node-Stacktrace)
         run: for f in e2e-web.txt e2e-kern.txt e2e-studio.txt api.log web.log web-kern.log; do [ -f "$f" ] && grep -v '"stufe":"info"' "$f" | grep -v "^\s*at " | tail -n 10 | sed "s/^/::error title=$f::/" || true; done
       - if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: e2e-ergebnisse
           path: |
@@ -216,8 +216,8 @@ jobs:
       PGUSER: postgres
       PGPASSWORD: postgres
     steps:
-      - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
+      - uses: actions/checkout@v7
+      - uses: docker/setup-buildx-action@v4
       - name: Images bauen
         run: |
           for ziel in werkzeug api worker web studio; do
@@ -264,13 +264,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "17"
@@ -311,7 +311,7 @@ jobs:
           done
           exit $fehler
       - if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: e-rechnungen
           path: |
