@@ -1,7 +1,7 @@
 # Katalog C.35 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.bauabzugsteuer_freistellung
-version: 1
+version: 2
 katalog_nr: C.35
 titel:
   de: Freistellungsbescheinigung für Bauleistungen beantragen
@@ -16,12 +16,23 @@ kategorie: steuern
 branchen:
 - bau
 - handwerk
+# Branche „Bau“ oder – im Handwerk – die Angabe, Bauleistungen für andere Unternehmen zu erbringen (z. B. Elektro, Sanitär)
 ausloeser:
-  feld: profil.taetigkeit.branchen
-  op: enthaelt
-  wert: bau
-  label:
-    de: Du erbringst Bauleistungen.
+  any:
+  - feld: profil.taetigkeit.branchen
+    op: enthaelt
+    wert: bau
+    label:
+      de: Du erbringst Bauleistungen.
+  - all:
+    - feld: profil.taetigkeit.branchen
+      op: enthaelt
+      wert: handwerk
+    - feld: profil.bauleistungen.fuer_unternehmen
+      op: ==
+      wert: true
+      label:
+        de: Du erbringst Bauleistungen für andere Unternehmen.
 frist:
   typ: dauerhaft
 wiederholung:

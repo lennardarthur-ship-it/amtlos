@@ -199,6 +199,7 @@
         "marktplatz",
         "abo",
         "app",
+        "marktstand",
         "vor_ort_beim_kunden",
         "keine_direktvertrieb"
       ],
@@ -327,7 +328,8 @@
       "werte": [
         "monatlich",
         "quartalsweise",
-        "jaehrlich"
+        "jaehrlich",
+        "keine"
       ],
       "herleitung": "Angabe des Nutzers (vom Finanzamt festgelegt; Grenzen nicht in der Spezifikation)",
       "ab": 5
@@ -423,6 +425,12 @@
       "typ": "ganzzahl",
       "herleitung": "Onboarding / Cap Table",
       "ab": 3
+    },
+    {
+      "pfad": "profil.bauleistungen.fuer_unternehmen",
+      "typ": "bool",
+      "herleitung": "Onboarding (Bauleistungen nach § 48 Abs. 1 EStG an Unternehmen)",
+      "ab": 2
     },
     {
       "pfad": "profil.gesellschafter.auslaendische_investoren",

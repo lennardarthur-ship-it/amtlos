@@ -374,7 +374,7 @@ export function standBauen(): Bau {
       ],
       tom: [
         "Geräteverschlüsselung und Bildschirmsperre", "Website ausschließlich über HTTPS", "WLAN mit aktueller Verschlüsselung", "Persönliche Benutzerkonten", "Starke, individuelle Passwörter", "Zwei-Faktor-Authentisierung",
-        "Clean-Desk", "Abschließbare Räume/Schränke", "Verpflichtung aller Beschäftigten", "Auftragsverarbeitungsverträge", "Automatische Sicherheitsupdates", "Protokollierung von Änderungen in Kassen",
+        "Aufgeräumter Arbeitsplatz (Clean Desk)", "Abschließbare Räume/Schränke", "Verpflichtung aller Beschäftigten", "Auftragsverarbeitungsverträge", "Automatische Sicherheitsupdates", "Protokollierung von Änderungen in Kassen",
         "Regelmäßige Datensicherung", "Sorgfältige Auswahl von Hosting", "Jährliche Überprüfung des Verzeichnisses", "Regelmäßige Sensibilisierung",
       ].map((x) => vorschlag("datenschutz_dokumentation", "tom", x, h, { umgesetzt_am: "2025-04-01", verantwortlich: "Alex Sonnberg" })),
       dienstleister: eintraege("datenschutz_dokumentation", "dienstleister", [
@@ -475,7 +475,7 @@ export function standBauen(): Bau {
       themen: ["gefaehrdungen_am_eigenen_arbeitsplatz_un", "erste_hilfe_ersthelfer_standort_verbandk", "brandschutz_verhalten_im_brandfall_umgan", "stolper_rutsch_und_sturzgefahren_ordnung", "elektrische_geraete_sichtpruefung_vor_be", "gefahrstoffe_inhalt_der_betriebsanweisun", "hautschutz_hautschutzplan_richtige_schut", "persoenliche_schutzausruestung_auswahl_b", "friseurchemikalien_faerbe_blondier_dauer", "feuchtarbeit_und_hautschutz_im_salon_hau", "infektionsschutz_und_hygiene_stich_und_s"],
       inhalt: "Ersthelferin: Leonie Brandt (Kurs 03/2025). Verbandkasten im Farbraum, Feuerlöscher am Empfang. Blondierpulver nur staubarm (Paste) verwenden; Mischen nur im Farbraum mit eingeschalteter Absaugung.", teilnehmer: eintraege("unterweisung", "teilnehmer", ALLE, h) }) });
   dok({ id: "unterweisung-jarbschg", vorlage: "unterweisung", datum: "2026-08-10", worum: "Halbjährliche Unterweisung des jugendlichen Auszubildenden (§ 29 Abs. 2 JArbSchG) zu Gefahrstoffen, Hautschutz und Infektionsschutz.",
-    daten: (h) => ({ thema: "Unterweisung Gefahrstoffe", anlass: "anlass", dauer: "30 Minuten", durchgefuehrt_von: "Chris Sonnberg",
+    daten: (h) => ({ thema: "Unterweisung Gefahrstoffe", anlass: "anlass", jugendliche: true, dauer: "30 Minuten", durchgefuehrt_von: "Chris Sonnberg",
       themen: ["gefahrstoffe_inhalt_der_betriebsanweisun", "friseurchemikalien_faerbe_blondier_dauer", "feuchtarbeit_und_hautschutz_im_salon_hau", "infektionsschutz_und_hygiene_stich_und_s"],
       inhalt: "Halbjährliche Unterweisung nach § 29 Abs. 2 JArbSchG (Auszubildender unter 18 Jahren). Betriebsanweisungen BA-01 (Blondiermittel) und BA-02 (Oxidationshaarfarben) besprochen; Färben nur unter Aufsicht.", teilnehmer: eintraege("unterweisung", "teilnehmer", [{ name: m("m4").name }], h) }) });
 
@@ -558,7 +558,7 @@ export function standBauen(): Bau {
     vergleichText(`USt ${em.m} (Übernahme, Ist)`, "Anzahl zugeordneter Rechnungen/Stornos", String(anzahl), String(em.nummern.length));
     const erg = v("ust_voranmeldung").ergebnis!(unterlage(id).daten);
     vergleich(`USt ${em.m} (fertige Voranmeldung)`, "Zahllast (mit Cent)", ausEuro(erg[2]![1]) * (erg[2]![0] === "Erstattung" ? -1 : 1), em.zahllast);
-    ust.push({ m: em.m, app, appAnzahl: anzahl, offen, versteuerung, final: Object.fromEntries(["umsatz_19", "umsatz_7", "umsatz_frei", "vorsteuer"].map((k) => [k, String(unterlage(id).daten[k] ?? "")])) });
+    ust.push({ m: em.m, app, appAnzahl: anzahl, offen, versteuerung, final: Object.fromEntries(["umsatz_19", "umsatz_7", "umsatz_igl", "umsatz_48", "umsatz_13b", "umsatz_frei", "vorsteuer"].map((k) => [k, String(unterlage(id).daten[k] ?? "")])) });
   }
   // Januar 2027: die im Januar 2027 bezahlte Rechnung 2026-017 gehört dorthin (nur Übernahme, keine Unterlage)
   {
@@ -603,13 +603,13 @@ export function standBauen(): Bau {
   const vaSumme = (k: string) => erwartet.reduce((a, em) => a + ausEuro(String(unterlage(`ust-${em.m}`).daten[k] ?? "0")), 0);
   const ustJahr = erwartet.reduce((a, em) => a + ausEuro(v("ust_voranmeldung").ergebnis!(unterlage(`ust-${em.m}`).daten)[0]![1]), 0);
   dok({ id: "steuer", vorlage: "steuererklaerung", datum: "2027-05-31", worum: "Zusammenstellung für KSt, GewSt und USt 2026: Jahresüberschuss aus der Bilanz/GuV (vor Ertragsteuern), Umsätze/USt/Vorsteuer als Summe der zwölf Voranmeldungen (Ist), KSt-Vorauszahlungen 4 × 600 €, GewSt-Vorauszahlungen 4 × 550 €.",
-    daten: (h) => ({ jahr: "2026", arten: ["kst", "gewst", "ust"], gewinn: euro(g.jahresueberschuss), umsatz: euro(vaSumme("umsatz_19") + vaSumme("umsatz_7") + vaSumme("umsatz_frei")), ust_jahr: euro(ustJahr), vorsteuer_jahr: euro(vaSumme("vorsteuer")),
+    daten: (h) => ({ jahr: "2026", arten: ["kst", "gewst", "ust"], gewinn: euro(g.jahresueberschuss), umsatz: euro(vaSumme("umsatz_19") + vaSumme("umsatz_7") + (vaSumme("umsatz_frei") + vaSumme("umsatz_igl") + vaSumme("umsatz_48") + vaSumme("umsatz_13b"))), ust_jahr: euro(ustJahr), vorsteuer_jahr: euro(vaSumme("vorsteuer")),
       vorauszahlungen: eintraege("steuererklaerung", "vorauszahlungen", [...[1, 2, 3, 4].map((q) => ({ art: `Körperschaftsteuer Q${q} (inkl. SolZ)`, betrag: "600,00" })), ...[1, 2, 3, 4].map((q) => ({ art: `Gewerbesteuer Q${q}`, betrag: "550,00" }))], h),
       weiteres: eintraege("steuererklaerung", "weiteres", [{ was: "Verlustvortrag aus dem Rumpfwirtschaftsjahr 2025 (KSt und GewSt)", betrag: "6.900,00", beleg: true }, { was: "Geschäftsführergehälter (angemessen, Anstellungsverträge vom 10.03.2025)", betrag: euro(12 * 2 * D.GF_GEHALT), beleg: true }], h),
       notiz: "Gewinnermittlung durch Bestandsvergleich (§ 5 EStG, § 8 KStG) – Bilanz, GuV und E-Bilanz erstellt die Steuerkanzlei. Umsatzsteuer nach vereinnahmten Entgelten (§ 20 UStG); Kassenumsätze in den Voranmeldungen von Hand ergänzt." }) });
   {
     const j = D.jahresSummen();
-    vergleich("Steuererklärung", "Umsätze im Jahr netto (Summe der Voranmeldungen, Ist)", vaSumme("umsatz_19") + vaSumme("umsatz_7") + vaSumme("umsatz_frei"), j.r19 + j.r7 + j.r0 + j.k19);
+    vergleich("Steuererklärung", "Umsätze im Jahr netto (Summe der Voranmeldungen, Ist)", vaSumme("umsatz_19") + vaSumme("umsatz_7") + (vaSumme("umsatz_frei") + vaSumme("umsatz_igl") + vaSumme("umsatz_48") + vaSumme("umsatz_13b")), j.r19 + j.r7 + j.r0 + j.k19);
     vergleich("Steuererklärung", "Umsatzsteuer im Jahr (Summe der Voranmeldungen, mit Cent)", ustJahr, j.ust);
     vergleich("Steuererklärung", "Vorsteuer im Jahr", vaSumme("vorsteuer"), j.vorsteuer);
   }

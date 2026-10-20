@@ -2,6 +2,9 @@
  * Texte der App. Die App erstellt deutsche Unterlagen nach deutschem Recht und ist deshalb nur auf Deutsch (E-121);
  * die Formulartexte stehen bei den Vorlagen in @amtlos/fachlogik.
  */
+/** Empfänger der Zahlungserinnerung ist eine Firma, Behörde oder Einrichtung (Rechtsform oder typisches Wort im Namen). */
+const ERINNERUNG_FIRMA = /\b(GmbH|mbH|AG|UG|KG|OHG|GbR|SE|PartG|Ltd\.?|Inc\.?|e\.\s?K\.|e\.\s?V\.|eG)(?=$|[\s&,.)])|\b(Hausverwaltung|Verwaltung|Praxis|Kanzlei|Büro|Gesellschaft|Verein|Genossenschaft|Stadt|Gemeinde|Landkreis|Amt|Behörde|Schule|Kita|Klinik|Stiftung|Werkstatt|Agentur|Studio|Hotel|Restaurant|Café)\b/;
+
 export const T = {
   app: "Amtlos",
   ladefehler_titel: "Deine Daten ließen sich nicht öffnen",
@@ -336,11 +339,13 @@ export const T = {
     [
       `Zahlungserinnerung zur Rechnung ${o.nummer}`,
       "",
-      o.kunde ? `Guten Tag ${o.kunde},` : "Guten Tag,",
+      // Firma, Behörde oder Praxis: „Sehr geehrte Damen und Herren“; Person: „Guten Tag Vorname Name“
+      !o.kunde ? "Guten Tag," : ERINNERUNG_FIRMA.test(o.kunde) ? "Sehr geehrte Damen und Herren," : `Guten Tag ${o.kunde},`,
       "",
       `sicher ist es im Alltag untergegangen: Unsere Rechnung ${o.nummer} über ${o.betrag} war am ${o.faellig} fällig. Bei uns ist bisher keine Zahlung eingegangen.`,
       "",
-      `Wir bitten Sie, den Betrag in den nächsten Tagen zu überweisen${o.iban ? ` (IBAN ${o.iban}, Verwendungszweck: ${o.nummer})` : ""}. Sollte sich Ihre Zahlung mit dieser Nachricht überschnitten haben, betrachten Sie sie bitte als gegenstandslos.`,
+      // IBAN in Vierergruppen und Verwendungszweck wie auf der Rechnung („Rechnung 2026-023“)
+      `Wir bitten Sie, den Betrag in den nächsten Tagen zu überweisen${o.iban ? ` (IBAN ${o.iban.replace(/\s+/g, "").toUpperCase().replace(/(.{4})(?=.)/g, "$1 ")}, Verwendungszweck: Rechnung ${o.nummer})` : ""}. Sollte sich Ihre Zahlung mit dieser Nachricht überschnitten haben, betrachten Sie sie bitte als gegenstandslos.`,
       "",
       "Vielen Dank und freundliche Grüße",
       o.absender,
@@ -632,6 +637,10 @@ export const T = {
   kasse_ust: "Deine Kassenumsätze sind nicht enthalten – trag die Umsätze aus deinen Tagesabschlüssen (Z-Bons) zusätzlich ein, sonst stimmt die Voranmeldung nicht.",
   kasse_ust_vielleicht: "Falls du eine Kasse nutzt: Deine Kassenumsätze sind nicht enthalten – trag die Umsätze aus deinen Tagesabschlüssen (Z-Bons) zusätzlich ein, sonst stimmt die Voranmeldung nicht.",
   kasse_euer: "Deine Kassenumsätze sind nicht enthalten – trag die Einnahmen aus deinen Tagesabschlüssen (Z-Bons) zusätzlich ein, sonst stimmt die EÜR nicht.",
+  shop_ust: "Umsätze aus deinem Onlineshop, von Online-Marktplätzen, aus der App oder vom Marktstand sind nicht enthalten – trag sie laut Shop-, Plattform- und Zahlungsberichten bzw. Kassenbuch zusätzlich ein, sonst stimmt die Voranmeldung nicht.",
+  shop_euer: "Einnahmen aus deinem Onlineshop, von Online-Marktplätzen, aus der App oder vom Marktstand sind nicht enthalten – trag sie laut Shop-, Plattform- und Zahlungsberichten bzw. Kassenbuch zusätzlich ein, sonst stimmt die EÜR nicht.",
+  kasse_shop_ust: "Deine Kassenumsätze und die Umsätze aus Onlineshop, Online-Marktplätzen, App oder Marktstand sind nicht enthalten – trag sie laut Tagesabschlüssen (Z-Bons) und Shop-, Plattform- und Zahlungsberichten zusätzlich ein, sonst stimmt die Voranmeldung nicht.",
+  kasse_shop_euer: "Deine Kasseneinnahmen und die Einnahmen aus Onlineshop, Online-Marktplätzen, App oder Marktstand sind nicht enthalten – trag sie laut Tagesabschlüssen (Z-Bons) und Shop-, Plattform- und Zahlungsberichten zusätzlich ein, sonst stimmt die EÜR nicht.",
   kasse_euer_vielleicht: "Falls du eine Kasse nutzt: Deine Kassenumsätze sind nicht enthalten – trag die Einnahmen aus deinen Tagesabschlüssen (Z-Bons) zusätzlich ein, sonst stimmt die EÜR nicht.",
   tastatur_fertig: "Fertig",
   datum_waehlen: "Datum wählen",
@@ -725,4 +734,13 @@ export const T = {
   konto_dateien_defekt: (n: number) => `${n === 1 ? "1 Belegdatei" : `${n} Belegdateien`} auf dem Server ${n === 1 ? "ist" : "sind"} beschädigt und wurde${n === 1 ? "" : "n"} übersprungen. Liegt das Original noch auf einem anderen Gerät, synchronisiere dort.`,
   konto_dateien_fehlen: (n: number) => `${n === 1 ? "1 Belegdatei fehlt" : `${n} Belegdateien fehlen`} auf diesem Gerät und auf dem Server.`,
   pdf_geaendert: "Die Unterlage hat sich geändert, während das Teilen-Menü offen war (z. B. durch die Synchronisation). Sie wurde nicht festgeschrieben – bitte das PDF neu erstellen und noch einmal teilen.",
+  // R9 Performance
+  steuerpaket_fortschritt_belege: (n: number, von: number) => `Belege werden gelesen … ${n} von ${von}`,
+  steuerpaket_fortschritt_pdfs: (n: number, von: number) => `Rechnungen werden als PDF erstellt … ${n} von ${von}`,
+  steuerpaket_fortschritt_zip: "Das Paket wird gepackt …",
+  steuerpaket_gross: (mb: number) => `Dieses Paket wird etwa ${mb} MB groß. Auf dem iPhone kann das am Arbeitsspeicher scheitern. Wähle besser einen kürzeren Zeitraum (Quartal oder Monat) – oder erstelle es trotzdem.`,
+  trotzdem_erstellen: "Trotzdem erstellen",
+  sicherung_gross: (fotos: number, mb: number) => `Diese Sicherung enthält ${fotos} Belegdateien (etwa ${mb} MB). Eine so große Sicherungsdatei kann Amtlos auf dem iPhone abbrechen lassen, weil sie ganz in den Arbeitsspeicher muss. Empfohlen: die automatische iCloud-Sicherung – sie legt jede Belegdatei einzeln ab. Du kannst trotzdem eine Datei erstellen.`,
+  sicherung_trotzdem: "Trotzdem sichern",
+  sicherung_fortschritt: (n: number, von: number) => `Belegdateien ${n} von ${von} …`,
 };

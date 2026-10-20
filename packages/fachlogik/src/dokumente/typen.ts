@@ -155,6 +155,8 @@ export interface Vorlage {
   abschnitte: VorlagenAbschnitt[];
   /** Rechtsgrundlage für den Dokumentkopf, z. B. „§§ 5, 6 ArbSchG“ */
   grundlage?: string;
+  /** Rechtsgrundlage nach den Angaben (z. B. nur die gewählten Erklärungen) – statt `grundlage` im Dokumentkopf */
+  grundlageFuer?: (d: Daten, b: Betrieb) => string;
   /** Unterlage betrifft eine gespeicherte Person (Mitarbeiter, Kunde): Auswahl füllt diese Felder */
   person?: PersonenBezug;
   /** Feld mit fortlaufender Nummer (z. B. Rechnungsnummer): neue Unterlagen zählen hoch */

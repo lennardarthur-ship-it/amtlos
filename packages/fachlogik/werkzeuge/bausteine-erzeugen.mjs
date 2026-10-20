@@ -173,7 +173,8 @@ const SETZE = [
   ["VVT", "Personalverwaltung (Personalakte, Arbeitszeit)", "quelle", "BayLDA-Muster"],
   ["VVT", "Bewerbungsverfahren", "werte.loeschfrist", "Unterlagen abgelehnter Bewerberinnen und Bewerber werden 6 Monate nach Abschluss des Bewerbungsverfahrens gelöscht. Grund: Ansprüche nach § 15 Abs. 4 AGG können binnen 2 Monaten ab Zugang der Ablehnung geltend gemacht werden; die Klagefrist beträgt 3 Monate nach schriftlicher Geltendmachung (§ 61b Abs. 1 ArbGG)."],
   ["VVT", "Bewerbungsverfahren", "quelle", "BayLDA-Muster; § 15 AGG; § 61b ArbGG"],
-  ["VVT", "Betrieb der Website (Hosting, Server-Logfiles)", "werte.loeschfrist", "IP-Adressen in den Logfiles werden nach 30 Tagen gelöscht."],
+  // keine feste Zahl: die Frist steht in der Datenschutzerklärung (Feld „Server-Logfiles werden gelöscht nach“) und hängt vom Hoster ab
+  ["VVT", "Betrieb der Website (Hosting, Server-Logfiles)", "werte.loeschfrist", "IP-Adressen in den Logfiles werden nach der Frist des Hosting-Anbieters gelöscht, die in der Datenschutzerklärung genannt ist (z. B. 7, 14 oder 30 Tage)."],
   ["VVT", "Betrieb der Website (Hosting, Server-Logfiles)", "werte.empfaenger", "Hosting-Dienstleister (Auftragsverarbeiter)"],
   ["VVT", "Betrieb der Website (Hosting, Server-Logfiles)", "quelle", "BayLDA-Muster"],
   ["VVT", "E-Mail-Newsletter / E-Mail-Werbung", "werte.loeschfrist", "Die Adresse wird nach Abmeldung oder Widerspruch unverzüglich aus dem Verteiler gelöscht; der Nachweis der Einwilligung wird zur Rechtsverteidigung aufbewahrt (Richtwert: 3 Jahre; Verjährung § 31 OWiG, § 195 BGB)."],
@@ -273,6 +274,30 @@ for (const [liste, schluessel, pfad, neu] of SETZE) {
   const alt = ziel[feld];
   ziel[feld] = typeof neu === "function" ? neu(alt) : neu;
   if (ziel[feld] === alt) throw new Error(`Korrektur greift nicht mehr: ${liste} „${schluessel}“ ${pfad}`);
+}
+/**
+ * Vorschläge für bestimmte Branchen abtrennen (Szenario Elektro, r9): Der allgemeine Vorschlag bleibt unter seinem Titel
+ * (gespeicherte Auswahlen bleiben gültig), ohne den branchenbezogenen Teil; dieser steht wörtlich unverändert in einem
+ * eigenen Vorschlag mit dem neuen Titel direkt dahinter. [Liste, Titel, neuer Titel, { Feld: Text im allgemeinen Vorschlag }]
+ */
+const TEILEN = [
+  ["VVT", "Kundenverwaltung / Kundenkartei", "Kundenkartei mit Gesundheitsangaben (z. B. Allergien, Unverträglichkeiten)", {
+    rechtsgrundlage: (t) => t.replace(/ Bei Gesundheitsangaben \(z\. B\. Allergien\/Unverträglichkeiten\) ausdrückliche Einwilligung nach Art\. 9 Abs\. 2 lit\. a DSGVO\./, ""),
+    datenarten: (t) => t.replace(/, ggf\. Gesundheitsdaten \(nur mit ausdrücklicher Einwilligung\)/, ""),
+  }],
+];
+for (const [liste, titel, neuerTitel, allgemein] of TEILEN) {
+  const i = daten[liste].findIndex((x) => x.titel === titel);
+  if (i < 0) throw new Error(`Teilen: ${liste} „${titel}“ nicht gefunden`);
+  const kopie = JSON.parse(JSON.stringify(daten[liste][i]));
+  kopie.titel = neuerTitel;
+  kopie.werte.bezeichnung = neuerTitel;
+  for (const [feld, f] of Object.entries(allgemein)) {
+    const alt = daten[liste][i].werte[feld];
+    daten[liste][i].werte[feld] = f(alt);
+    if (daten[liste][i].werte[feld] === alt) throw new Error(`Teilen greift nicht mehr: ${liste} „${titel}“ ${feld}`);
+  }
+  daten[liste].splice(i + 1, 0, kopie);
 }
 for (const [liste, alt, neu] of ERSETZE) {
   const vorher = JSON.stringify(daten[liste]);

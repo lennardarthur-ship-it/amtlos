@@ -6,7 +6,7 @@
  *   der Aufrufer sie mitgibt – den PDFs der Rechnungen.
  * Fachlich zu prüfen: PRUEFLISTE T-79 (Zuordnung) und die Prüfpunkte in packages/fachlogik/src/buchungen.ts.
  */
-import { zipSync } from "fflate";
+import { zipSync, type Zippable } from "fflate";
 import {
   EUER_KAPITALGESELLSCHAFT,
   EUER_ZEILE_STEUERFREI,
@@ -24,6 +24,8 @@ import {
   datevExtfBytes,
   eRechnungAus,
   euerFuer,
+  kennzahlBefreiung,
+  VORSTEUER_AUFTEILEN,
   istKapitalgesellschaft,
   kategorieFuer,
   summen,
@@ -64,25 +66,36 @@ export const umsatzRechnungen = (s: Stand) => gestellteRechnungen(s).filter((u) 
 /**
  * Kasse laut Pflichten-Check („kasse.elektronisch“): „kasse“ (ja), „keine“ (nein) oder „unbekannt“ (nicht beantwortet).
  * Amtlos kennt nur Rechnungen und Belege – mit Kasse fehlen die Kassenumsätze in allem, was daraus gerechnet wird
- * (Voranmeldung, EÜR, Steuerberater-Paket).
+ * (Voranmeldung, EÜR, Steuerberater-Paket). Dasselbe gilt für Umsätze über Onlineshop, Online-Marktplätze, App oder
+ * Marktstand („vertrieb.kanaele“): dann „shop“ bzw. mit Kasse „kasse_shop“.
  */
-export type KassenLage = "kasse" | "keine" | "unbekannt";
+export type KassenLage = "kasse" | "keine" | "unbekannt" | "shop" | "kasse_shop";
+/** Verkaufswege, deren Umsätze ohne Rechnung aus Amtlos entstehen (Shop- und Plattformberichte, Marktkasse). */
+export const SHOP_KANAELE = ["onlineshop", "marktplatz", "app", "marktstand"];
 export function kassenLage(profil: Stand["profil"]): KassenLage {
   const w = profil["kasse.elektronisch"];
+  const k = profil["vertrieb.kanaele"];
+  const shop = Array.isArray(k) && k.some((x) => SHOP_KANAELE.includes(String(x)));
+  if (shop) return w === true ? "kasse_shop" : "shop";
   return w === true ? "kasse" : w === false ? "keine" : "unbekannt";
 }
 
-/** Hinweis in der App nach einer Übernahme: mit Kasse laut Check als Warnung, ohne Antwort ruhiger („Falls du …“). */
+/** Hinweis in der App nach einer Übernahme: mit Kasse bzw. Shop laut Check als Warnung, ohne Antwort ruhiger („Falls du …“). */
 export function kassenHinweis(lage: KassenLage, art: "ust" | "euer"): { text: string; warnung: boolean } | null {
   if (lage === "keine") return null;
+  if (lage === "shop") return { text: art === "ust" ? TEXT.shop_ust : TEXT.shop_euer, warnung: true };
+  if (lage === "kasse_shop") return { text: art === "ust" ? TEXT.kasse_shop_ust : TEXT.kasse_shop_euer, warnung: true };
   if (art === "ust") return lage === "kasse" ? { text: TEXT.kasse_ust, warnung: true } : { text: TEXT.kasse_ust_vielleicht, warnung: false };
   return lage === "kasse" ? { text: TEXT.kasse_euer, warnung: true } : { text: TEXT.kasse_euer_vielleicht, warnung: false };
 }
 
-/** Satz für LIESMICH und Fragen im Paket – null, wenn der Betrieb laut Check keine Kasse hat. */
+/** Satz für LIESMICH und Fragen im Paket – null, wenn der Betrieb laut Check weder Kasse noch Shop/Marktstand hat. */
 export function kassenSatzPaket(lage: KassenLage): string | null {
   if (lage === "keine") return null;
   const satz = "Kassenumsätze fehlen in diesem Paket. Die Umsätze laut Tagesabschlüssen (Z-Bons) bzw. Kassenexport bitte zusätzlich liefern.";
+  const shop = "Betrieb mit Onlineshop, Online-Marktplatz, App oder Marktstand (laut Pflichten-Check): Diese Umsätze fehlen in diesem Paket. Bitte die Shop-, Plattform- und Zahlungsberichte (z. B. Monatsabrechnungen, Auszahlungsübersichten) bzw. das Kassenbuch des Marktstands zusätzlich liefern.";
+  if (lage === "shop") return shop;
+  if (lage === "kasse_shop") return `Betrieb mit Kasse: ${satz}\r\n${shop}`;
   return lage === "kasse" ? `Betrieb mit Kasse: ${satz}` : `Falls der Betrieb eine Kasse nutzt: ${satz}`;
 }
 
@@ -145,6 +158,9 @@ export interface EuerUebernahme {
 /** Steht nach jeder Übernahme sichtbar da: Amtlos rechnet diese Posten nicht aus. */
 export const EUER_NICHT_ENTHALTEN =
   "Nicht enthalten: die an das Finanzamt gezahlten Umsatzsteuer-Vorauszahlungen (Zeile „An das Finanzamt gezahlte und gegebenenfalls verrechnete Umsatzsteuer“), eine Erstattung vom Finanzamt und die Abschreibungen (AfA) – bitte selbst ergänzen.";
+/** Zusatz mit Onlineshop, Marktplatz, App oder Marktstand laut Pflichten-Check: diese Einnahmen kennt Amtlos nicht. */
+export const EUER_SHOP_NICHT_ENTHALTEN =
+  "Ebenfalls nicht enthalten: Einnahmen aus Onlineshop, Online-Marktplätzen, App und Marktstand (laut Shop-, Plattform- und Zahlungsberichten bzw. Kassenbuch), auch Fernverkäufe in andere EU-Länder (OSS) und die dafür gezahlte Umsatzsteuer – bitte selbst ergänzen.";
 
 /** Einträge für die Vorlage „EÜR“ (Listen `einnahmen` und `ausgaben`) aus den Daten eines Jahres. */
 export function euerUebernahme(s: Stand, jahr: string): EuerUebernahme {
@@ -158,14 +174,16 @@ export function euerUebernahme(s: Stand, jahr: string): EuerUebernahme {
     if (e.einnahmen_netto_cent) ein.push({ datum: "", text: "Umsätze aus Rechnungen", kategorie: "Umsatzsteuerlicher Kleinunternehmer", betrag: betrag(e.einnahmen_netto_cent) });
   } else {
     if (pflichtig) ein.push({ datum: "", text: "Umsätze aus Rechnungen (netto)", kategorie: EUER_ZEILE_STEUERPFLICHTIG, betrag: betrag(pflichtig) });
-    if (e.einnahmen_steuerfrei_cent) ein.push({ datum: "", text: "Steuerfreie Umsätze aus Rechnungen (z. B. innergemeinschaftliche Lieferung)", kategorie: EUER_ZEILE_STEUERFREI, betrag: betrag(e.einnahmen_steuerfrei_cent) });
+    // ohne Beispiel: die Zeile sammelt igL, § 13b-Umsätze und Steuerbefreiungen (z. B. Heilbehandlungen)
+    if (e.einnahmen_steuerfrei_cent) ein.push({ datum: "", text: "Steuerfreie und nicht steuerbare Umsätze aus Rechnungen", kategorie: EUER_ZEILE_STEUERFREI, betrag: betrag(e.einnahmen_steuerfrei_cent) });
   }
   if (e.ust_vereinnahmt_cent) ein.push({ datum: "", text: "Vereinnahmte Umsatzsteuer", kategorie: "Vereinnahmte Umsatzsteuer sowie Umsatzsteuer auf unentgeltliche Wertabgaben", betrag: betrag(e.ust_vereinnahmt_cent) });
   const aus: Record<string, string>[] = e.ausgaben.zeilen.map((z) => ({ datum: "", text: `${z.kategorie.titel} (${z.anzahl} ${z.anzahl === 1 ? "Beleg" : "Belege"})`, kategorie: z.kategorie.euer, betrag: betrag(z.netto_cent) }));
   if (e.ausgaben.vorsteuer_cent) aus.push({ datum: "", text: "Gezahlte Vorsteuer aus Belegen", kategorie: "Gezahlte Vorsteuerbeträge", betrag: betrag(e.ausgaben.vorsteuer_cent) });
   const imJahr = gestellteRechnungen(s).filter((u) => String(u.daten.datum).startsWith(`${jahr}-`));
   const gutschriften = imJahr.filter(istGutschrift).length;
-  const hinweis = [istKapitalgesellschaft(s.betrieb.rechtsform, s.betrieb.name) ? EUER_KAPITALGESELLSCHAFT : "", gutschriften ? GUTSCHRIFT_HINWEIS : "", EUER_NICHT_ENTHALTEN].filter(Boolean).join(" ");
+  const lage = kassenLage(s.profil);
+  const hinweis = [istKapitalgesellschaft(s.betrieb.rechtsform, s.betrieb.name) ? EUER_KAPITALGESELLSCHAFT : "", gutschriften ? GUTSCHRIFT_HINWEIS : "", EUER_NICHT_ENTHALTEN, lage === "shop" || lage === "kasse_shop" ? EUER_SHOP_NICHT_ENTHALTEN : ""].filter(Boolean).join(" ");
   return {
     einnahmen: ein,
     ausgaben: aus,
@@ -331,6 +349,9 @@ export function rechnungenCsv(s: Stand, z: Zeitraum, gutschriften = false, pdfs?
 /** Belege des Zeitraums nach Belegdatum, bei gleichem Datum in der Reihenfolge der Erfassung. */
 const belegeImZeitraum = (s: Stand, z: Zeitraum) => s.belege.filter((b) => imZeitraum(b.datum, z)).sort((a, b) => a.datum.localeCompare(b.datum) || a.erstellt.localeCompare(b.erstellt) || a.id.localeCompare(b.id));
 
+/** Belegkategorien, bei denen ein Beleg ohne Umsatzsteuer auf § 13b UStG hindeuten kann (Frage im Paket). */
+const STEUERSCHULD_KATEGORIEN = ["waren", "fremdleistungen", "buero", "werbung", "sonstiges"];
+
 /** Hinweis in der Belegliste, wenn der Zahltag fehlt und die EÜR das Belegdatum nimmt */
 export const ZAHLTAG_FEHLT = "fehlt – Belegdatum verwendet";
 
@@ -437,6 +458,18 @@ export function fragenText(s: Stand, z: Zeitraum, nummern: Map<string, string> =
     }
   }
   dazu("Stornos mit Bezug zu einem anderen Zeitraum – gibt es eine Ersatzrechnung, und in welchem Zeitraum?", stornoZeilen);
+  // steuerfreie Umsätze ohne Vorsteuerabzug (§ 4 Nr. 8–29 UStG) und Belege mit Vorsteuer: abziehbar nur, soweit sie nicht diesen Umsätzen dienen
+  const kz48 = umsatzRechnungen(s).some((u) => {
+    if (!imZeitraum(String(u.daten.datum), z)) return false;
+    const { daten } = eRechnungAus(u.daten, s.betrieb);
+    return daten.steuerart === "befreit" && kennzahlBefreiung(daten.befreiungsgrund) === "48";
+  });
+  if (kz48) dazu(`${VORSTEUER_AUFTEILEN} Belege mit Vorsteuer im Zeitraum – wofür werden sie verwendet?`, belege.filter((b) => belegSummen(b).vorsteuer_cent > 0).map((b) => bz(b, ` · Vorsteuer ${betrag(belegSummen(b).vorsteuer_cent)} €`)));
+  // Belege ohne Umsatzsteuer für Leistungen, bei denen der Empfänger die Steuer schulden kann (Subunternehmer, ausländische Anbieter)
+  dazu(
+    "Belege ohne Umsatzsteuer (Waren, Fremdleistungen, Büro/Software, Werbung, Sonstiges): Schuldet der Betrieb die Umsatzsteuer als Leistungsempfänger (§ 13b UStG, z. B. Bauleistung eines Subunternehmers oder Leistung eines Unternehmens aus dem Ausland)?",
+    belege.filter((b) => STEUERSCHULD_KATEGORIEN.includes(b.kategorie) && b.steuer.some((x) => x.brutto_cent) && b.steuer.every((x) => !x.brutto_cent || x.satz === 0)).map((b) => bz(b)),
+  );
 
   const anzahl = abschnitte.reduce((a, x) => a + x.zeilen.length, 0);
   const kasse = kassenSatzPaket(kassenLage(s.profil));
@@ -477,6 +510,18 @@ export interface PaketOptionen {
 }
 
 const ja = (b: boolean) => (b ? "ja" : "nein");
+
+/**
+ * ZIP des Pakets (R9 Performance): Fotos, PDFs und andere schon komprimierte Dateien unkomprimiert ablegen (Level 0) –
+ * sie werden mit Level 6 kaum kleiner, das Komprimieren kostete aber rund 90 % der Zeit. Texte (CSV, XML, TXT) wie
+ * bisher mit Level 6. Der Inhalt des ZIP bleibt derselbe.
+ */
+const SCHON_KOMPRIMIERT = /\.(jpe?g|png|heic|heif|webp|gif|pdf|zip)$/i;
+export function paketZippen(inhalt: Record<string, Uint8Array>): Uint8Array {
+  const z: Zippable = {};
+  for (const [name, bytes] of Object.entries(inhalt)) z[name] = SCHON_KOMPRIMIERT.test(name) ? [bytes, { level: 0 }] : [bytes, { level: 6 }];
+  return zipSync(z);
+}
 
 /**
  * Das Paket für die Steuerberatung. `dateien` liefert die Bytes einer Belegdatei (verschlüsselt abgelegt, vom Aufrufer
@@ -596,7 +641,7 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
           ]),
     ].join("\r\n"),
   );
-  return { zip: zipSync(inhalt, { level: 6 }), dateiname: `Amtlos-Steuerberatung-${sicher(s.betrieb.name || "Betrieb")}-${z.name}.zip`, rechnungen: rechnungen.length, gutschriften: gutschriften.length, belege: belege.length, ohneXml, buchungen: buchungen.length, fragen: fragen.anzahl, pdfs: pdfs?.size ?? 0 };
+  return { zip: paketZippen(inhalt), dateiname: `Amtlos-Steuerberatung-${sicher(s.betrieb.name || "Betrieb")}-${z.name}.zip`, rechnungen: rechnungen.length, gutschriften: gutschriften.length, belege: belege.length, ohneXml, buchungen: buchungen.length, fragen: fragen.anzahl, pdfs: pdfs?.size ?? 0 };
 }
 
 /** Zeiträume zur Auswahl: aktuelles und letztes Jahr, Quartale und Monate des laufenden Jahres bis heute. */

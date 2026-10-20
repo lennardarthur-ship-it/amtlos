@@ -139,7 +139,9 @@ export const lohnkonto: Vorlage = {
         { id: "geburtsdatum", art: "datum", label: "Geburtsdatum", pflicht: true },
         { id: "anschrift", art: "mehrzeilig", label: "Anschrift", pflicht: true },
         { id: "steuer_id", art: "text", label: "Steuer-Identifikationsnummer", pflicht: true },
-        { id: "steuerklasse", art: "wahl", label: "Steuerklasse", optionen: STEUERKLASSEN, pflicht: true },
+        // pauschal versteuerter Minijob (§ 40a EStG): ohne Lohnsteuerabzugsmerkmale, also ohne Steuerklasse
+        { id: "pauschal", selten: true, art: "schalter", label: "Lohnsteuer pauschal (Minijob, § 40a EStG)", hilfe: "Dann gilt keine Steuerklasse – die Pauschsteuer steht in der Abrechnung der Minijob-Zentrale" },
+        { id: "steuerklasse", art: "wahl", label: "Steuerklasse", optionen: STEUERKLASSEN, pflicht: true, wenn: { feld: "pauschal", nicht: true } },
         { id: "kinder", art: "text", label: "Kinderfreibeträge" },
         { id: "religion", art: "text", label: "Kirchensteuermerkmal", vorschlaege: ["keine Kirchensteuerpflicht", "ev (evangelisch)", "rk (römisch-katholisch)"] },
         { id: "sv_nummer", art: "text", label: "Sozialversicherungsnummer", pflicht: true },
@@ -203,7 +205,7 @@ export const lohnkonto: Vorlage = {
             ["SV-Nummer", svNummerText(text(d, "sv_nummer"))],
           ])}${angaben([
             ["Steuer-ID", text(d, "steuer_id")],
-            ["Steuerklasse", text(d, "steuerklasse")],
+            ["Steuerklasse", ja(d, "pauschal") ? "keine – Lohnsteuer pauschal (§ 40a EStG)" : text(d, "steuerklasse")],
             ["Kinderfreibeträge", text(d, "kinder") || (leer ? "" : null)],
             ["Kirchensteuermerkmal", text(d, "religion") || (leer ? "" : null)],
           ])}</div>`,

@@ -1200,6 +1200,20 @@ export const VVT: Vorschlag[] = [
   "werte": {
    "bezeichnung": "Kundenverwaltung / Kundenkartei",
    "zweck": "Bearbeitung von Aufträgen und Kundenbeziehungen einschließlich Rechnungsstellung; ggf. postalische Werbung an Bestandskunden",
+   "rechtsgrundlage": "Art. 6 Abs. 1 lit. b DSGVO (Vertrag/vorvertragliche Maßnahmen); Art. 6 Abs. 1 lit. c DSGVO i. V. m. § 147 AO, § 257 HGB (Aufbewahrung); Art. 6 Abs. 1 lit. f DSGVO (postalische Bestandskundenwerbung).",
+   "betroffene": "Kundinnen und Kunden, Interessenten",
+   "datenarten": "Name, Anschrift, Kontaktdaten (Telefon, E-Mail), Angaben zum Auftrag / Leistungshistorie, ggf. Bankverbindung",
+   "empfaenger": "Steuerberater (eigenständiger Verantwortlicher), IT-/Software-Dienstleister (Auftragsverarbeiter)",
+   "loeschfrist": "Kundenstammdaten werden gelöscht, sobald sie für den Zweck nicht mehr erforderlich sind und keine Aufbewahrungspflicht mehr besteht (z. B. wenn über mehrere Jahre keine Aufträge mehr erteilt werden). Rechnungsrelevante Unterlagen: Buchungsbelege 8 Jahre (§ 147 Abs. 1 Nr. 4, Abs. 3 AO; § 257 Abs. 1 Nr. 4, Abs. 4 HGB), Geschäftsbriefe 6 Jahre (§ 147 Abs. 1 Nr. 2, 3 AO; § 257 Abs. 1 Nr. 2, 3 HGB), jeweils ab Ende des Kalenderjahres.",
+   "drittland": "keine Übermittlung in Drittländer"
+  },
+  "quelle": "BayLDA"
+ },
+ {
+  "titel": "Kundenkartei mit Gesundheitsangaben (z. B. Allergien, Unverträglichkeiten)",
+  "werte": {
+   "bezeichnung": "Kundenkartei mit Gesundheitsangaben (z. B. Allergien, Unverträglichkeiten)",
+   "zweck": "Bearbeitung von Aufträgen und Kundenbeziehungen einschließlich Rechnungsstellung; ggf. postalische Werbung an Bestandskunden",
    "rechtsgrundlage": "Art. 6 Abs. 1 lit. b DSGVO (Vertrag/vorvertragliche Maßnahmen); Art. 6 Abs. 1 lit. c DSGVO i. V. m. § 147 AO, § 257 HGB (Aufbewahrung); Art. 6 Abs. 1 lit. f DSGVO (postalische Bestandskundenwerbung). Bei Gesundheitsangaben (z. B. Allergien/Unverträglichkeiten) ausdrückliche Einwilligung nach Art. 9 Abs. 2 lit. a DSGVO.",
    "betroffene": "Kundinnen und Kunden, Interessenten",
    "datenarten": "Name, Anschrift, Kontaktdaten (Telefon, E-Mail), Angaben zum Auftrag / Leistungshistorie, ggf. Bankverbindung, ggf. Gesundheitsdaten (nur mit ausdrücklicher Einwilligung)",
@@ -1288,7 +1302,7 @@ export const VVT: Vorschlag[] = [
    "betroffene": "Besucherinnen und Besucher der Website",
    "datenarten": "IP-Adresse, Datum und Uhrzeit des Abrufs, abgerufene Seite/Datei, Browser- und Betriebssysteminformationen, Referrer-URL",
    "empfaenger": "Hosting-Dienstleister (Auftragsverarbeiter)",
-   "loeschfrist": "IP-Adressen in den Logfiles werden nach 30 Tagen gelöscht.",
+   "loeschfrist": "IP-Adressen in den Logfiles werden nach der Frist des Hosting-Anbieters gelöscht, die in der Datenschutzerklärung genannt ist (z. B. 7, 14 oder 30 Tage).",
    "drittland": "keine Übermittlung in Drittländer"
   },
   "quelle": "BayLDA-Muster"

@@ -78,6 +78,11 @@ export interface Auswertung {
   /** Gründungsschritte eines Betriebs, der seit mehr als sechs Monaten läuft – vermutlich längst erledigt */
   gruendung: PflichtInfo[];
   unbekannt: PflichtInfo[];
+  /**
+   * Pflichten, die erst in den nächsten zwölf Monaten in Kraft treten (gueltig_ab nach dem Stichtag) und für dieses
+   * Profil dann gelten – ausgewertet zum Tag des Inkrafttretens; `naechsterTermin` ist dieser Tag (für den Jahresblick).
+   */
+  kommend: PflichtInfo[];
 }
 
 /** Grund für Pflichten, deren Auslöser im Katalog „immer“ ist */
@@ -173,10 +178,19 @@ export function auswertung(profil: Profil, stichtag: string, unterlagen: readonl
   const bestehend = Boolean(beginn && beginn <= plusMonate(stichtag, -BESTAND_AB_MONATEN));
   const ausGruendung = (e: (typeof ergebnisse)[number]) => bestehend && nachId.get(e.pflicht_id)?.phase === "gruendung";
   const gilt = aktiv.filter((e) => e.ergebnis === "gilt");
+  // erst später in Kraft (Engine wertet sie zum Stichtag nicht aus): je Tag des Inkrafttretens einmal auswerten
+  const bis = plusMonate(stichtag, 12);
+  const ab = [...new Set(KATALOG.pflichten.map((p) => p.gueltig_ab).filter((d): d is string => typeof d === "string" && d > stichtag && d <= bis))].sort();
+  const kommend: PflichtInfo[] = [];
+  for (const tag of ab) {
+    const spaeter = auswerten({ katalog: { ...KATALOG, pflichten: KATALOG.pflichten.filter((p) => p.gueltig_ab === tag) }, fakten, ereignisse, stichtag: tag, kalender: new StandardKalender(), fenster: { von: tag, bis: plusMonate(tag, 12) } });
+    for (const e of spaeter.filter((x) => !x.radar && x.ergebnis === "gilt")) kommend.push({ ...info(e), naechsterTermin: tag, termine: [tag] });
+  }
   return {
     gilt: sortiert(gilt.filter((e) => !ausGruendung(e)).map(info)),
     gruendung: sortiert(gilt.filter(ausGruendung).map(info)),
     unbekannt: sortiert(aktiv.filter((e) => e.ergebnis === "unbekannt" && !ausGruendung(e)).map(info)),
+    kommend,
   };
 }
 

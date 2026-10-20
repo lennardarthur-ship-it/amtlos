@@ -95,6 +95,8 @@ export interface Bau {
 export const PROFIL: Profil = {
   "taetigkeit.branchen": ["gesundheit_pflege"],
   rechtsform: "freiberuf",
+  // seit r9 für alle Rechtsformen gefragt (AWV-Meldung, Investitionsprüfung)
+  "gesellschafter.auslaendische_investoren": false,
   "taetigkeit.einordnung": "freiberuf",
   bundesland: "SN",
   "beschaeftigte.gesamt": 2,
@@ -576,14 +578,15 @@ export function standBauen(): Bau {
         zeile = { q: eq.q, app: erg.werte, anzahl: erg.anzahl, offen: erg.offen, vorsteuerBelege: erg.vorsteuerBelege, ohneVorsteuer: erg.ohneVorsteuer, vstStandard: std.werte.vorsteuer ?? "–" };
         vergleich(`USt-Übernahme ${eq.q}`, "Umsätze 19 % aus Rechnungen (nach Zahlungseingang)", ausEuro(erg.werte.umsatz_19 ?? "0"), eq.app.umsatz_19);
         vergleich(`USt-Übernahme ${eq.q}`, "Umsätze 7 %", ausEuro(erg.werte.umsatz_7 ?? "0"), 0);
-        vergleich(`USt-Übernahme ${eq.q}`, "Umsätze ohne USt aus Rechnungen (steuerfreie Heilbehandlung)", ausEuro(erg.werte.umsatz_frei ?? "0"), eq.app.umsatz_frei);
+        vergleich(`USt-Übernahme ${eq.q}`, "Umsätze ohne USt aus Rechnungen (steuerfreie Heilbehandlung)", ausEuro(erg.werte.umsatz_48 ?? "0"), eq.app.umsatz_frei);
         vergleich(`USt-Übernahme ${eq.q}`, "Vorsteuer aus Belegen mit Schalter „an“ (nur rein steuerpflichtig genutzte)", ausEuro(erg.werte.vorsteuer ?? "0"), eq.app.vorsteuer);
         vergleich(`USt-Übernahme ${eq.q}`, "Vorsteuer mit den Startwerten der App (alle Belege „an“)", ausEuro(std.werte.vorsteuer ?? "0"), eq.vstStandard);
         const plus = (k: string, c: number) => euro(ausEuro(erg.werte[k] ?? "0") + c);
         s = felderSetzen(s, id, {
           ...erg.werte,
           umsatz_19: plus("umsatz_19", eq.empfang.netto),
-          umsatz_frei: plus("umsatz_frei", eq.gkv + eq.zuzahlungen),
+          // seit r9 eigenes Feld Kz 48 (steuerfreie Umsätze ohne Vorsteuerabzug)
+          umsatz_48: plus("umsatz_48", eq.gkv + eq.zuzahlungen),
           vorsteuer: plus("vorsteuer", eq.vstAnteil + eq.vst13b),
           notiz: [
             `Umsätze ohne USt sind steuerfreie Heilbehandlungen nach § 4 Nr. 14 UStG → Kz 48 (steuerfreie Umsätze ohne Vorsteuerabzug), nicht Kz 41/43. Darin: Rechnungen ${euro(eq.reFrei)} €, Abrechnungszentrum ${euro(eq.gkv)} €, Zuzahlungen ${euro(eq.zuzahlungen)} €.`,
@@ -599,7 +602,7 @@ export function standBauen(): Bau {
     vergleich(`USt-Voranmeldung ${eq.q} (fertig)`, "Umsatzsteuer 19 % (Formular)", ausEuro(formular.find((x) => x[0] === "Umsatzsteuer")![1]), eq.ust19);
     vergleich(`USt-Voranmeldung ${eq.q} (fertig)`, "Vorsteuer (Formular)", ausEuro(formular.find((x) => x[0] === "Vorsteuer")![1]), eq.vorsteuer);
     vergleich(`USt-Voranmeldung ${eq.q} (fertig)`, "Zahllast inkl. § 13b-Steuer", ausEuro(z[1]) * (z[0] === "Erstattung" ? -1 : 1), eq.zahllast);
-    vergleich(`USt-Voranmeldung ${eq.q} (fertig)`, "„Umsätze ohne USt“ (= Kz 48)", ausEuro(unterlage(id).daten.umsatz_frei as string), eq.kz48);
+    vergleich(`USt-Voranmeldung ${eq.q} (fertig)`, "Kz 48 (steuerfreie Umsätze ohne Vorsteuerabzug)", ausEuro(unterlage(id).daten.umsatz_48 as string), eq.kz48);
   }
   {
     // ohne die eigene Notiz (dort stehen Kz 48 und § 13b von Hand)
@@ -630,7 +633,7 @@ export function standBauen(): Bau {
       }
       vergleichText("EÜR-Übernahme", "Anlagen (Kombigerät) gemeldet", String(uebernahme.anlagen), "1");
       vergleichText("EÜR-Übernahme", "unbezahlte Rechnungen des Jahres", String(uebernahme.unbezahlt), "2");
-      vergleichText("EÜR-Übernahme", "Steuerfreie Zeile heißt „… (z. B. innergemeinschaftliche Lieferung)“ – für Heilbehandlungen unpassend", uebernahme.einnahmen.find((x) => x.kategorie === EUER_ZEILE_STEUERFREI)?.text ?? "–", "Steuerfreie Umsätze aus Rechnungen");
+      vergleichText("EÜR-Übernahme", "Steuerfreie Zeile heißt „… (z. B. innergemeinschaftliche Lieferung)“ – für Heilbehandlungen unpassend", ((t) => (/innergemeinschaftlich/.test(t) ? t : "ohne igL-Beispiel"))(uebernahme.einnahmen.find((x) => x.kategorie === EUER_ZEILE_STEUERFREI)?.text ?? "–"), "ohne igL-Beispiel");
       const d = unterlage("euer").daten;
       const anlage = D.BELEGE.find((b) => b.id === D.AFA.beleg)!;
       const ein = [

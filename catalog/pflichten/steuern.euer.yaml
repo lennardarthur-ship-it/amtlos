@@ -1,7 +1,7 @@
 # Katalog C.27 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.euer
-version: 1
+version: 2
 katalog_nr: C.27
 titel:
   de: Einnahmen-Überschuss-Rechnung (Anlage EÜR) abgeben
@@ -36,6 +36,10 @@ ausloeser:
         - feld: abgeleitet.noch_nicht_gestartet
           op: ==
           wert: false
+        # § 141 AO gilt nur für gewerbliche Unternehmer und Land- und Forstwirte, nicht für freie Berufe
+        - feld: profil.taetigkeit.einordnung
+          op: '!='
+          wert: freiberuf
       - feld: profil.umsatz.vorjahr
         op: '>'
         wert:

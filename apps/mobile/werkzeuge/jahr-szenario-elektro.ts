@@ -107,6 +107,9 @@ export const PROFIL: Profil = {
   "beschaeftigte.jugendlich": 1,
   "personal.sofortmeldebranchen": ["keine"],
   "personal.lohnsteuer_anmeldezeitraum": "monatlich",
+  // seit r9 gefragt: Bauleistungen für andere Unternehmen (Bauabzugsteuer) und Investoren für alle Rechtsformen
+  "bauleistungen.fuer_unternehmen": true,
+  "gesellschafter.auslaendische_investoren": false,
   "kasse.elektronisch": false,
   "online.website": true,
   "ust.kleinunternehmer": false,
@@ -323,7 +326,7 @@ export function standBauen(): Bau {
     const datumDe = (iso: string) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(`${iso}T12:00:00Z`));
     const text = TEXT.erinnerung_text({ nummer: String(u.daten.nummer ?? "").trim(), betrag: euroText(rechnungBrutto(u, b)), faellig: faellig ? datumDe(faellig) : "", kunde: String(u.daten.kunde_name ?? "").trim(), iban: b.iban.trim(), absender: [b.verantwortlich.trim(), b.name.trim()].filter(Boolean).join("\n") });
     const brutto = D.rechnungsSumme(r.pos).brutto;
-    vergleichText(`Zahlungserinnerung ${r.nummer}`, "Text nennt Nummer, Betrag, Fälligkeit, IBAN", [r.nummer, `${D.eur(brutto)} €`, D.de(D.faellig(r)), D.BETRIEB.iban].filter((x) => !text.replace(/\u00a0/g, " ").includes(x)).join(", ") || "alle", "alle");
+    vergleichText(`Zahlungserinnerung ${r.nummer}`, "Text nennt Nummer, Betrag, Fälligkeit, IBAN", [r.nummer, `${D.eur(brutto)} €`, D.de(D.faellig(r)), D.BETRIEB.iban.replace(/\s+/g, "")].filter((x) => !text.replace(/\u00a0/g, " ").replace(/(?<=IBAN [A-Z0-9 ]*) (?=[A-Z0-9])/g, "").includes(x)).join(", ") || "alle", "alle");
     vergleichText(`Zahlungserinnerung ${r.nummer}`, "Rechnung steht in „offene Rechnungen“ (offeneRechnungen)", offeneRechnungen(s.unterlagen).some((x) => x.id === r.id) ? "ja" : "nein", "ja");
     erinnerung = { nummer: r.nummer, heute, text, faellig, tage };
     // Zahlungseingänge 2027 erst jetzt vermerken (der Stand bildet das Jahresende ab)
@@ -529,7 +532,7 @@ export function standBauen(): Bau {
       themen: ["gefaehrdungen_am_eigenen_arbeitsplatz_un", "erste_hilfe_ersthelfer_standort_verbandk", "brandschutz_verhalten_im_brandfall_umgan", "sichere_benutzung_von_leitern_und_tritte", "elektrische_geraete_sichtpruefung_vor_be", "gefahrstoffe_inhalt_der_betriebsanweisun", "persoenliche_schutzausruestung_auswahl_b", "laerm_gehoerschutz_ab_80_85_db_a", "staubarmes_arbeiten_absaugung_nassbearbe", "heben_und_tragen_hilfsmittel_rueckengere"],
       inhalt: "Fünf Sicherheitsregeln nach DIN VDE 0105-100 mit praktischer Übung am Verteiler; Störlichtbogen-Schutzausrüstung; Verhalten auf fremden Baustellen (SiGe-Plan, Absprache mit Bauleitung); Ersthelfer: Tobias Reinartz (Kurs 10/2025), Verbandkasten im Werkstattwagen und in der Werkstatt.", teilnehmer: eintraege("unterweisung", "teilnehmer", ALLE, h) }) });
   dok({ id: "unterweisung-azubi", vorlage: "unterweisung", datum: "2026-07-20", worum: "Halbjährliche Unterweisung des Auszubildenden (17) nach § 29 Abs. 2 JArbSchG: elektrische Gefährdungen, Leitern, Gefahrstoffe (Gießharz, Montageschaum).",
-    daten: (h) => ({ thema: "Halbjährliche Unterweisung Auszubildender (§ 29 JArbSchG)", anlass: "anlass", dauer: "45 Minuten", durchgefuehrt_von: "Jens Brandt",
+    daten: (h) => ({ thema: "Halbjährliche Unterweisung Auszubildender (§ 29 JArbSchG)", anlass: "anlass", jugendliche: true, dauer: "45 Minuten", durchgefuehrt_von: "Jens Brandt",
       themen: ["gefaehrdungen_am_eigenen_arbeitsplatz_un", "sichere_benutzung_von_leitern_und_tritte", "elektrische_geraete_sichtpruefung_vor_be", "gefahrstoffe_inhalt_der_betriebsanweisun", "persoenliche_schutzausruestung_auswahl_b"],
       inhalt: "Zweite Unterweisung im Jahr für den Jugendlichen (erste am 20.01.2026 mit allen). Arbeiten an elektrischen Anlagen nur unter Aufsicht einer Elektrofachkraft; Betriebsanweisungen BA-01 (Gießharz) und BA-02 (PU-Montageschaum) besprochen.", teilnehmer: eintraege("unterweisung", "teilnehmer", [{ name: m("m3").name }], h) }) });
 
@@ -601,14 +604,14 @@ export function standBauen(): Bau {
     const verschoben = D.vorgaenge().filter((x) => x.art === "rechnung" && (x.r.abschlag || (x.r.leistungText && !/^\d{2}\.\d{2}\.\d{4}$/.test(x.r.leistungText))) && D.steuerQuartal(x).q !== D.quartal(x.datum) && (D.steuerQuartal(x).q === eq.q || D.quartal(x.datum) === eq.q));
     const grundAbschlag = verschoben.map((x) => `${x.nummer} (${x.r.abschlag ? "Abschlag vor Ausführung, Steuer mit Zahlung am " + D.de(x.bezahlt!) + " – Mindest-Ist, § 13 Abs. 1 Nr. 1 a Satz 4 UStG" : "Leistungszeitraum „" + x.r.leistungText + "“ endet im " + D.steuerQuartal(x).q}) zählt die App nach dem Rechnungsdatum ${D.de(x.datum)} in ${D.quartal(x.datum)}, gesetzlich in ${D.steuerQuartal(x).q}`).join("; ");
     vergleich(`USt ${eq.q} (Übernahme, Soll)`, "Umsätze 19 % (Kz 81)", ausEuro(app.umsatz_19 ?? "0"), eq.r19, [grundAbschlag, grund19].filter(Boolean).join(" "));
-    vergleich(`USt ${eq.q} (Übernahme, Soll)`, "Umsätze ohne USt = § 13b-Bauleistungen (Kz 60) + Nullsteuersatz PV (Kz 87)", ausEuro(app.umsatz_frei ?? "0"), eq.r13b + eq.rNull);
+    vergleich(`USt ${eq.q} (Übernahme, Soll)`, "Umsätze ohne USt = § 13b-Bauleistungen (Kz 60) + Nullsteuersatz PV (Kz 87)", ausEuro(app.umsatz_13b ?? "0") + ausEuro(app.umsatz_frei ?? "0"), eq.r13b + eq.rNull);
     vergleich(`USt ${eq.q} (Übernahme aus Belegen)`, "Vorsteuer aus Rechnungen (Kz 66)", ausEuro(app.vorsteuer ?? "0"), eq.vorsteuer66);
-    if (eq.r13b) vergleichText(`USt ${eq.q} (Formular)`, `§ 13b-Bauleistungen als eigene Kennzahl 60 (${euro(eq.r13b)} €)`, "nein – nur „Umsätze ohne Umsatzsteuer“ mit Hinweis auf Kz 41/43/21", "Kz 60", "Die Voranmeldung hat keine Zeile für Kz 60; der Hinweistext nennt 41, 43 und 21, nicht 60 (packages/fachlogik/src/dokumente/buchhaltung.ts:693).");
+    if (eq.r13b) vergleichText(`USt ${eq.q} (Formular)`, `§ 13b-Bauleistungen als eigene Kennzahl 60 (${euro(eq.r13b)} €)`, ausEuro(app.umsatz_13b ?? "0") === eq.r13b ? "Kz 60" : `nein – Kz 60: ${app.umsatz_13b ?? "fehlt"} €`, "Kz 60", "Die Voranmeldung hat keine Zeile für Kz 60; der Hinweistext nennt 41, 43 und 21, nicht 60 (packages/fachlogik/src/dokumente/buchhaltung.ts:693).");
     if (eq.rNull) vergleichText(`USt ${eq.q} (Formular)`, `Nullsteuersatz-Umsätze PV als eigene Kennzahl (${euro(eq.rNull)} €)`, "nein – in „Umsätze ohne Umsatzsteuer“", "Kz 87");
     if (eq.kz84) vergleichText(`USt ${eq.q} (Formular)`, `empfangene § 13b-Bauleistung Kz 84 ${euro(eq.kz84)} € / Kz 85 ${euro(eq.kz85)} € / Kz 67 ${euro(eq.kz67)} €`, "keine Felder, Beleg nur mit 0 %", "Kz 84/85/67", "Die Zahllast ändert sich nicht (Steuer = Vorsteuer), die Kennzahlen sind aber anzumelden; die Belegerfassung kennt keine Steuerschuldnerschaft (packages/fachlogik/src/belege.ts:20–41).");
     const erg = v("ust_voranmeldung").ergebnis!(u.daten);
     vergleich(`USt ${eq.q} (fertige Voranmeldung)`, "Zahllast (mit Cent)", ausEuro(erg[2]![1]) * (erg[2]![0] === "Erstattung" ? -1 : 1), eq.zahllast, [grundAbschlag, grund19].filter(Boolean).join(" "));
-    ust.push({ q: eq.q, app, appAnzahl: anzahl, ersatz, final: Object.fromEntries(["umsatz_19", "umsatz_7", "umsatz_frei", "vorsteuer"].map((k) => [k, String(u.daten[k] ?? "")])) });
+    ust.push({ q: eq.q, app, appAnzahl: anzahl, ersatz, final: Object.fromEntries(["umsatz_19", "umsatz_7", "umsatz_igl", "umsatz_48", "umsatz_13b", "umsatz_frei", "vorsteuer"].map((k) => [k, String(u.daten[k] ?? "")])) });
   }
 
   // ---------------------------------------------------------------- EÜR 2026 (Übernahme + USt-Zahlungen und AfA von Hand)
@@ -659,13 +662,13 @@ export function standBauen(): Bau {
   const ustJahr = [1, 2, 3, 4].reduce((a, q) => a + ausEuro(v("ust_voranmeldung").ergebnis!(unterlage(`ust-q${q}`).daten)[0]![1]), 0);
   const gewinn = euerErgebnis.find((z) => z[0] === "Gewinn" || z[0] === "Verlust")!;
   dok({ id: "steuer", vorlage: "steuererklaerung", datum: "2027-03-01", worum: "Zusammenstellung für ESt, GewSt und USt 2026: Gewinn aus der EÜR, Umsätze/USt/Vorsteuer als Summe der vier Voranmeldungen, ESt-Vorauszahlungen 4 × 2.400 €, GewSt 4 × 650 €, Kranken-/Pflegeversicherung, Rentenversicherung (Handwerkerpflichtversicherung).",
-    daten: (h) => ({ jahr: "2026", arten: ["est", "gewst", "ust"], gewinn: `${gewinn[0] === "Verlust" ? "-" : ""}${gewinn[1].replace(/[€\s\u00a0]/g, "")}`, umsatz: euro(vaSumme("umsatz_19") + vaSumme("umsatz_7") + vaSumme("umsatz_frei")), ust_jahr: euro(ustJahr), vorsteuer_jahr: euro(vaSumme("vorsteuer")),
+    daten: (h) => ({ jahr: "2026", arten: ["est", "gewst", "ust"], gewinn: `${gewinn[0] === "Verlust" ? "-" : ""}${gewinn[1].replace(/[€\s\u00a0]/g, "")}`, umsatz: euro(vaSumme("umsatz_19") + vaSumme("umsatz_7") + (vaSumme("umsatz_frei") + vaSumme("umsatz_igl") + vaSumme("umsatz_48") + vaSumme("umsatz_13b"))), ust_jahr: euro(ustJahr), vorsteuer_jahr: euro(vaSumme("vorsteuer")),
       vorauszahlungen: eintraege("steuererklaerung", "vorauszahlungen", [...[1, 2, 3, 4].map((q) => ({ art: `Einkommensteuer Q${q}`, betrag: "2.400,00" })), ...[1, 2, 3, 4].map((q) => ({ art: `Gewerbesteuer Q${q}`, betrag: "650,00" }))], h),
       weiteres: eintraege("steuererklaerung", "weiteres", [{ was: "Kranken- und Pflegeversicherung (freiwillig gesetzlich)", betrag: "8.412,00", beleg: true }, { was: "Pflichtbeiträge Rentenversicherung als Handwerker (Handwerksrolle, § 2 Satz 1 Nr. 8 SGB VI)", betrag: "8.234,40", beleg: true }], h),
       notiz: "Umsatzsteuer: § 13b-Bauleistungen an Hochbau Kemper (Kz 60) und PV-Anlage zum Nullsteuersatz (Kz 87) stehen in den Voranmeldungen gemeinsam unter „Umsätze ohne Umsatzsteuer“; empfangene § 13b-Leistung Kernbohrtechnik Yilmaz (Kz 84/85/67) ist in den Voranmeldungen nicht enthalten. Abschlag 2026-014 und Skonto 2026-021 mit der Steuerberatung abstimmen." }) });
   {
     const j = D.jahresSummen();
-    vergleich("Steuererklärung", "Umsätze im Jahr netto (Summe der Voranmeldungen)", vaSumme("umsatz_19") + vaSumme("umsatz_7") + vaSumme("umsatz_frei"), j.r19 + j.r13b + j.rNull, "Skonto fehlt (Abschlag gleicht sich über das Jahr aus).");
+    vergleich("Steuererklärung", "Umsätze im Jahr netto (Summe der Voranmeldungen)", vaSumme("umsatz_19") + vaSumme("umsatz_7") + (vaSumme("umsatz_frei") + vaSumme("umsatz_igl") + vaSumme("umsatz_48") + vaSumme("umsatz_13b")), j.r19 + j.r13b + j.rNull, "Skonto fehlt (Abschlag gleicht sich über das Jahr aus).");
     vergleich("Steuererklärung", "Umsatzsteuer im Jahr (Summe der Voranmeldungen, mit Cent)", ustJahr, j.ust, "Skonto-Minderung und § 13b-Steuer als Leistungsempfänger (Kz 85) fehlen.");
     vergleich("Steuererklärung", "Vorsteuer im Jahr", vaSumme("vorsteuer"), j.vorsteuer, "§ 13b-Vorsteuer (Kz 67) fehlt.");
   }

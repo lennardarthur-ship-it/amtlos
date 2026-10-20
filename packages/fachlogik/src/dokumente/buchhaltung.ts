@@ -7,17 +7,25 @@
 import { KU_HINWEIS, einheitFuerMenge, fehlendFuerERechnung, mengeUngueltig, rundeCent, summen, type Position, type RechnungsDaten } from "../rechnung.js";
 import { einheitCode } from "../erechnung.js";
 import { giroCodeSvg } from "../girocode.js";
+import { BUNDESLAENDER, StandardKalender, verschiebe, type Bundesland } from "@amtlos/fristen";
 import { EUER_ZEILE_STEUERFREI, EUER_ZEILE_STEUERPFLICHTIG, KATEGORIEN } from "../belege.js";
 import { istKapitalgesellschaft } from "./betrieb.js";
 import { AUFBEWAHRUNG, EINHEITEN, EUER_AUSGABEN, EUER_EINNAHMEN, KASSEN_ARTEN, RECHNUNGS_HINWEISE, TSE_ARTEN } from "./bausteine.js";
 import { KOPF_LINIE, LINIE_MITTEL, ZELLE_LINIE, abschnitt, absatz, ankreuzen, anschrift, auswahl, brief, cent, datumDe, dokument, esc, euro, felder, ibanText, kennzahlen, nachsatz, uebertragung, ja, liste, neufassung, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
 import type { Betrieb, Daten, Eintrag, Option, Vorlage } from "./typen.js";
 
-/** ISO-Datum plus Tage als TT.MM.JJJJ. */
-function plusTage(iso: string, tage: number): string {
+
+const KALENDER = new StandardKalender();
+/**
+ * Fälligkeit nach Zahlungsziel (ISO): fällt der letzte Tag auf einen Samstag, Sonntag oder Feiertag (am Sitz laut „Mein
+ * Betrieb“, sonst bundeseinheitlich), ist es der nächste Werktag (§ 193 BGB). Leer bei falschem Datum.
+ */
+export function faelligAm(iso: string, tage: number, bundesland = ""): string {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
   if (!m || !Number.isFinite(tage)) return "";
-  return datumDe(new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3]) + tage)).toISOString().slice(0, 10));
+  const roh = new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3]) + tage)).toISOString().slice(0, 10);
+  const land = (BUNDESLAENDER as readonly string[]).includes(bundesland.trim()) ? (bundesland.trim() as Bundesland) : undefined;
+  return verschiebe(roh, { regel: "naechster_werktag", kalender: land ? "bundesland" : "bundeseinheitlich" }, { bundesland: land }, KALENDER).datum;
 }
 
 const SAETZE = [
@@ -28,11 +36,24 @@ const SAETZE = [
 /** Hinweis bei steuerpflichtigen Leistungen im Zusammenhang mit einem Grundstück an Privatpersonen (§ 14 Abs. 4 Nr. 9 UStG). */
 const GRUNDSTUECK_HINWEIS = "Sie sind gesetzlich verpflichtet, diese Rechnung, einen Zahlungsbeleg oder eine andere beweiskräftige Unterlage zwei Jahre aufzubewahren (§ 14b Abs. 1 Satz 5 UStG).";
 const ZAHLUNGS_HINWEIS = "Bitte geben Sie bei der Zahlung die Rechnungsnummer an.";
+/**
+ * Auswahltext für den Hinweis „Gutschrift“: gemeint ist die Abrechnung durch den Leistungsempfänger (§ 14 Abs. 2 Satz 2
+ * UStG), nicht die im Handel „Gutschrift“ genannte Rechnungskorrektur. Gedruckt wird weiter nur das Wort „Gutschrift“.
+ */
+export const GUTSCHRIFT_AUSWAHL = "Gutschrift – Abrechnung durch den Leistungsempfänger (§ 14 Abs. 2 Satz 2 UStG), keine Rechnungskorrektur; eine eigene Rechnung korrigierst du mit „Stornieren“";
+/**
+ * Befreiungshinweis bis zu dieser Länge steht direkt in der Summenzeile („Umsatzsteuer 0 % (Steuerfreie Heilbehandlung
+ * nach § 4 Nr. 14 Buchst. a UStG)“) statt unter „Hinweise“ – so kann er nicht ohne die Beträge auf eine Folgeseite rücken.
+ */
+const BEFREIUNG_IN_SUMME = 90;
+const befreiungInSumme = (befreiung: string) => !!befreiung && !befreiung.includes("\n") && befreiung.length <= BEFREIUNG_IN_SUMME;
 /** Bezeichnung der 0-%-Zeile in der Summe: mit dem gewählten Grund statt pauschal „steuerfrei“ (Texte wie in den Pflichthinweisen). */
 function nullProzentText(hinweise: string[], befreiung: string): string {
   if (hinweise.includes("reverse_charge")) return `Umsatzsteuer 0 % (${RECHNUNGS_HINWEISE.find((h) => h.wert === "reverse_charge")!.text})`;
   if (hinweise.includes("igl")) return "Umsatzsteuer 0 % (steuerfreie innergemeinschaftliche Lieferung)";
-  if (befreiung) return "Umsatzsteuer 0 % (steuerfrei, siehe Hinweis)";
+  // der eigene Text (z. B. Steuerbefreiung nach § 4 UStG oder Nullsteuersatz) – kein pauschales „steuerfrei“
+  if (befreiungInSumme(befreiung)) return `Umsatzsteuer 0 % (${befreiung.replace(/\.$/, "")})`;
+  if (befreiung) return "Umsatzsteuer 0 % (siehe Hinweis)";
   return "Steuerfrei bzw. 0 %";
 }
 const ZIEL: Record<string, string> = { sofort: "sofort ohne Abzug", "7": "innerhalb von 7 Tagen", "14": "innerhalb von 14 Tagen", "30": "innerhalb von 30 Tagen" };
@@ -61,7 +82,7 @@ const E_FEHLT: Record<string, string> = {
   positionen: "mindestens eine Position",
   "positionen.ungueltig": "Positionen mit Bezeichnung, Menge und Preis",
   "positionen.steuersatz": "Umsatzsteuersatz je Position",
-  leistungsdatum: "Leistungsdatum als Datum (TT.MM.JJJJ)",
+  leistungsdatum: "Leistungsdatum als Datum (TT.MM.JJJJ) oder Zeitraum (TT.MM.–TT.MM.JJJJ bzw. Monat und Jahr)",
   "steuer.grund_null": "Grund für 0 % Umsatzsteuer (Hinweis: Steuerschuldnerschaft des Empfängers, innergemeinschaftliche Lieferung oder Steuerbefreiung)",
   "steuer.befreiungsgrund": "Hinweis auf die Steuerbefreiung",
   "steller.ust_idnr": "USt-IdNr. des Betriebs (Mein Betrieb)",
@@ -74,6 +95,45 @@ const isoAus = (t: string) => {
   const m = /^\s*(\d{1,2})\.(\d{1,2})\.(\d{4})\s*$/.exec(t);
   return m ? `${m[3]}-${m[2]!.padStart(2, "0")}-${m[1]!.padStart(2, "0")}` : /^\d{4}-\d{2}-\d{2}$/.test(t.trim()) ? t.trim() : null;
 };
+
+const MONATSNAMEN = ["januar", "februar", "märz", "april", "mai", "juni", "juli", "august", "september", "oktober", "november", "dezember"];
+const gueltigIso = (j: number, m: number, t: number) => {
+  const d = new Date(Date.UTC(j, m - 1, t));
+  return d.getUTCFullYear() === j && d.getUTCMonth() === m - 1 && d.getUTCDate() === t ? d.toISOString().slice(0, 10) : null;
+};
+/**
+ * Leistungszeitraum aus dem Freitext der Rechnung: „12.01.–11.02.2026“, „02.03.2026 – 27.03.2026“, „01.06. bis
+ * 30.06.2026“ oder ein Kalendermonat („Oktober 2026“). null, wenn der Text kein eindeutiger Zeitraum ist.
+ */
+export function leistungszeitraumAus(t: string): { von: string; bis: string } | null {
+  const z = t.replace(/\s+/g, " ").trim();
+  const m = /^(\d{1,2})\.(\d{1,2})\.(\d{4})? ?(?:–|—|-|bis) ?(\d{1,2})\.(\d{1,2})\.(\d{4})$/.exec(z);
+  if (m) {
+    const [t1, m1, t2, m2, j2] = [m[1], m[2], m[4], m[5], m[6]].map(Number) as [number, number, number, number, number];
+    // ohne Jahr am Anfang: dasselbe Jahr wie am Ende, über den Jahreswechsel („15.12.–15.01.2027“) das Vorjahr
+    const j1 = m[3] ? Number(m[3]) : m1 > m2 ? j2 - 1 : j2;
+    const von = gueltigIso(j1, m1, t1);
+    const bis = gueltigIso(j2, m2, t2);
+    return von && bis && von <= bis ? { von, bis } : null;
+  }
+  const mo = /^([a-zäöü]+) (\d{4})$/i.exec(z);
+  const i = mo ? MONATSNAMEN.indexOf(mo[1]!.toLocaleLowerCase("de")) : -1;
+  if (mo && i >= 0) {
+    const j = Number(mo[2]);
+    return { von: gueltigIso(j, i + 1, 1)!, bis: new Date(Date.UTC(j, i + 1, 0)).toISOString().slice(0, 10) };
+  }
+  return null;
+}
+
+/**
+ * Kennzahl der Voranmeldung für eine Steuerbefreiung nach dem Hinweistext: § 4 Nr. 8 bis 29 UStG → Kz 48 (steuerfrei
+ * ohne Vorsteuerabzug); sonst (z. B. § 4 Nr. 1 bis 7, Nullsteuersatz, ohne Vorschrift) null – dann „weitere Umsätze“.
+ */
+export function kennzahlBefreiung(befreiungsgrund: string | null | undefined): "48" | null {
+  const m = /§\s*4\s+Nr\.\s*(\d+)/.exec(befreiungsgrund ?? "");
+  const nr = m ? Number(m[1]) : NaN;
+  return nr >= 8 && nr <= 29 ? "48" : null;
+}
 
 /** Länder für die Anschrift: Name (deutsch/englisch/landessprachlich) oder Kürzel → ISO 3166-1 alpha-2. */
 const LAENDER: Record<string, string> = {
@@ -145,11 +205,13 @@ export function eRechnungAus(d: Daten, b: Betrieb): { daten: RechnungsDaten; feh
   const pos = liste(d, "positionen").filter((e) => text(e, "bezeichnung") || text(e, "preis"));
   const datum = text(d, "datum");
   const ziel = text(d, "zahlungsziel");
+  const leistungsdatum = ja(d, "leistung_gleich") ? datum || null : isoAus(text(d, "leistung"));
   const daten: RechnungsDaten = {
     nummer: text(d, "nummer"),
     rechnungsdatum: datum,
-    leistungsdatum: ja(d, "leistung_gleich") ? datum || null : isoAus(text(d, "leistung")),
-    faellig_am: datum && ziel && ziel !== "sofort" ? plusTageIso(datum, Number(ziel)) : null,
+    leistungsdatum,
+    ...(leistungsdatum ? {} : { leistungszeitraum: leistungszeitraumAus(text(d, "leistung")) }),
+    faellig_am: datum && ziel && ziel !== "sofort" ? faelligAm(datum, Number(ziel), b.bundesland) || null : null,
     steller: { name: b.name.trim(), strasse: b.strasse.trim(), plz: b.plz.trim(), ort: b.ort.trim(), land: "DE", email: b.email.trim(), telefon: b.telefon.trim() || null, steuernummer: b.steuernummer.trim() || null, ust_idnr: b.ust_idnr.trim() || null, iban: b.iban.trim() || null },
     kunde: { name: text(d, "kunde_name"), strasse: a.strasse, plz: a.plz, ort: a.ort, land: a.land ?? "DE", email: text(d, "kunde_email") || null, ust_idnr: text(d, "kunde_ust_idnr") || null, geschaeftskunde: true },
     positionen: pos.map((e) => {
@@ -175,10 +237,6 @@ export function rechnungsTitel(d: Daten): "Rechnung" | "Stornorechnung" | "Gutsc
   return text(d, "storno_zu") ? "Stornorechnung" : auswahl(d, "hinweise").includes("gutschrift") ? "Gutschrift" : "Rechnung";
 }
 
-function plusTageIso(iso: string, tage: number): string {
-  const [j, m, t] = iso.split("-").map(Number) as [number, number, number];
-  return new Date(Date.UTC(j, m - 1, t + tage)).toISOString().slice(0, 10);
-}
 
 /** Meldungen der Rechnungsprüfung (auch für die Zuordnung zu einem Feld im Abschluss). */
 export const RECHNUNG_PLZ_FEHLT = "PLZ und Ort des Empfängers fehlen (letzte Zeile der Anschrift, z. B. 10115 Berlin)";
@@ -216,6 +274,7 @@ export const rechnung: Vorlage = {
         { id: "leistung_gleich", art: "schalter", label: "Leistungsdatum entspricht dem Rechnungsdatum", vorbelegung: true },
         { id: "leistung", art: "text", label: "Datum oder Zeitraum der Leistung", hilfe: "z. B. 12.10.2026 oder Oktober 2026", pflicht: true, wenn: { feld: "leistung_gleich", nicht: true } },
         { id: "zahlungsziel", art: "wahl", label: "Zahlungsziel", optionen: [{ wert: "7", text: "7 Tage" }, { wert: "14", text: "14 Tage" }, { wert: "30", text: "30 Tage" }, { wert: "sofort", text: "Sofort" }], vorbelegung: "14", hilfe: "Steht auf der Rechnung als „Zahlbar innerhalb von … Tagen“ mit dem Datum." },
+        { id: "bezahlt_am", selten: true, art: "datum", label: "Schon bezahlt am", hilfe: "z. B. bei Barzahlung, Vorkasse oder Zahlung im Onlineshop – bezahlt am oder vor dem Rechnungsdatum, entfällt die Zahlungsaufforderung" },
       ],
     },
     {
@@ -253,7 +312,7 @@ export const rechnung: Vorlage = {
       felder: [
         // aus dem Pflichten-Check vorbelegt (ausProfil) – daher unter „Weitere Angaben“; eingeschaltet steht er ohnehin da
         { id: "kleinunternehmer", selten: true, art: "schalter", label: "Kleinunternehmer (§ 19 UStG)", hilfe: "Dann wird keine Umsatzsteuer ausgewiesen; der Hinweis auf die Steuerbefreiung steht auf der Rechnung." },
-        { id: "hinweise", selten: true, art: "bausteine", label: "Pflichthinweise, falls zutreffend", optionen: [...RECHNUNGS_HINWEISE.filter((h) => h.wert !== "steuerfrei").map((h) => ({ wert: h.wert, text: h.text, quelle: h.quelle })), { wert: "grundstueck", text: GRUNDSTUECK_HINWEIS, quelle: "§ 14 Abs. 4 Nr. 9, § 14b Abs. 1 Satz 5 UStG" }] },
+        { id: "hinweise", selten: true, art: "bausteine", label: "Pflichthinweise, falls zutreffend", optionen: [...RECHNUNGS_HINWEISE.filter((h) => h.wert !== "steuerfrei").map((h) => ({ wert: h.wert, text: h.wert === "gutschrift" ? GUTSCHRIFT_AUSWAHL : h.text, quelle: h.quelle })), { wert: "grundstueck", text: GRUNDSTUECK_HINWEIS, quelle: "§ 14 Abs. 4 Nr. 9, § 14b Abs. 1 Satz 5 UStG" }] },
         { id: "befreiung", selten: true, art: "text", label: "Hinweis auf die Steuerbefreiung (bei 0 %)", hilfe: "Pflicht, wenn eine Position steuerfrei ist – mit der Vorschrift", vorschlaege: ["Steuerfreie Leistung nach § 4 Nr. … UStG"] },
         { id: "hinweis", art: "mehrzeilig", label: "Weitere Hinweise", vorschlaege: ["Vielen Dank für Ihren Auftrag.", ZAHLUNGS_HINWEIS] },
       ],
@@ -331,31 +390,41 @@ export const rechnung: Vorlage = {
       `<tr class="gesamt"><td>${gutschrift ? "Gutschriftsbetrag" : "Rechnungsbetrag"}</td><td>${betrag(s.brutto_cent)}</td></tr>`,
     ].join("");
     const leistung = text(d, "leistung");
+    const datum = text(d, "datum");
+    // schon bezahlt (am oder vor dem Rechnungsdatum, z. B. bar oder im Onlineshop): keine Zahlungsaufforderung
+    const bezahltAm = isoAus(text(d, "bezahlt_am"));
+    const schonBezahlt = !storno && !gutschrift && !leer && !!bezahltAm && !!datum && bezahltAm <= datum;
+    const zahlbar = !storno && !gutschrift && !schonBezahlt;
     // Zahlungsaufforderung mit Verwendungszweck „Rechnung <Nummer>“ (unten, bei hinterlegter IBAN)
-    const mitVerwendungszweck = !storno && !gutschrift && !!b.iban.trim() && (s.brutto_cent > 0 || leer);
-    const hinweise = [
+    const mitVerwendungszweck = zahlbar && !!b.iban.trim() && (s.brutto_cent > 0 || leer);
+    const befreiung = befreiungText(d);
+    // Pflichthinweise stehen direkt unter den Summen und rücken nicht ohne sie auf eine Folgeseite
+    const pflichtHinweise = [
       ...(ku ? [KU_HINWEIS] : []),
       // „Gutschrift“ steht schon als Titel im Betreff
       ...auswahl(d, "hinweise").filter((w) => !(w === "gutschrift" && !storno)).map((w) => (w === "grundstueck" ? GRUNDSTUECK_HINWEIS : (RECHNUNGS_HINWEISE.find((h) => h.wert === w)?.text ?? ""))),
-      befreiungText(d),
+      // ein kurzer Befreiungshinweis steht schon in der Summenzeile
+      befreiungInSumme(befreiung) && !ku ? "" : befreiung,
+      schonBezahlt ? `Der Rechnungsbetrag wurde am ${datumDe(bezahltAm)} bezahlt.` : "",
+    ].filter((x) => x.trim());
+    const hinweise = [
       // leere Vorlage: statt „Zahlbar …“ die Zahlungsaufforderung mit Linie für das Datum (unten)
-      text(d, "zahlungsziel") && !storno && !gutschrift && !b.iban.trim() && !leer ? `Zahlbar ${ZIEL[text(d, "zahlungsziel")]}${text(d, "zahlungsziel") !== "sofort" && text(d, "datum") ? ` (bis ${plusTage(text(d, "datum"), Number(text(d, "zahlungsziel")))})` : ""}.` : "",
+      text(d, "zahlungsziel") && zahlbar && !b.iban.trim() && !leer ? `Zahlbar ${ZIEL[text(d, "zahlungsziel")]}${text(d, "zahlungsziel") !== "sofort" && text(d, "datum") ? ` (bis ${datumDe(faelligAm(text(d, "datum"), Number(text(d, "zahlungsziel")), b.bundesland))})` : ""}.` : "",
       // Stornorechnung: der Hinweis zur Zahlung aus der ursprünglichen Rechnung passt nicht mehr; mit Zahlungsaufforderung
       // steht die Rechnungsnummer schon als Verwendungszweck darin – der Satz wäre doppelt und kostete eine Zeile
-      ...text(d, "hinweis").split("\n").filter((h) => !((text(d, "storno_zu") || mitVerwendungszweck) && h.trim() === ZAHLUNGS_HINWEIS)),
+      ...text(d, "hinweis").split("\n").filter((h) => !((text(d, "storno_zu") || mitVerwendungszweck || schonBezahlt) && h.trim() === ZAHLUNGS_HINWEIS)),
     ].filter((x) => x.trim());
-    const datum = text(d, "datum");
     const ziel = text(d, "zahlungsziel");
-    const faellig = ziel && ziel !== "sofort" && datum ? plusTage(datum, Number(ziel)) : "";
+    const faellig = ziel && ziel !== "sofort" && datum ? datumDe(faelligAm(datum, Number(ziel), b.bundesland)) : "";
     const iban = b.iban.trim();
     // Zahlungsaufforderung mit Bankverbindung und GiroCode – nur aus den Angaben in „Mein Betrieb“ und der Rechnung
-    const qr = !storno && !gutschrift && iban && s.brutto_cent > 0 ? giroCodeSvg({ name: b.name.trim(), iban, bic: b.bic ?? null, betragCent: s.brutto_cent, verwendungszweck: `Rechnung ${text(d, "nummer")}` }, 25) : null;
+    const qr = zahlbar && iban && s.brutto_cent > 0 ? giroCodeSvg({ name: b.name.trim(), iban, bic: b.bic ?? null, betragCent: s.brutto_cent, verwendungszweck: `Rechnung ${text(d, "nummer")}` }, 25) : null;
     // Kontoinhaber vor der IBAN; Einzelunternehmen mit der Inhaberin bzw. dem Inhaber (Gesellschaften: nur die Firma)
     const empfaenger = b.name.trim() ? `Empfänger: ${esc(b.name.trim())}${b.verantwortlich.trim() && !(b.vertretung ?? "").trim() && b.verantwortlich.trim() !== b.name.trim() ? ` (${esc(b.verantwortlich.trim())})` : ""}<br>` : "";
     // BIC und Bank in einer Zeile („BIC … · Sparkasse …“) – spart eine Zeile im Zahlungsblock
     const bicBank = [b.bic?.trim() ? `BIC ${esc(b.bic.trim())}` : "", b.bank?.trim() ? esc(b.bank.trim()) : ""].filter(Boolean).join(" · ");
     const zahlung =
-      !storno && !gutschrift && iban && s.brutto_cent > 0
+      zahlbar && iban && s.brutto_cent > 0
         ? `<div class="zahlung">${qr ? `<div class="qr">${qr}<small>GiroCode – mit der Banking-App scannen</small></div>` : ""}<div class="text"><p>Bitte überweisen Sie <strong>${euro(s.brutto_cent)}</strong>${faellig ? ` bis zum <strong>${esc(faellig)}</strong>` : ziel === "sofort" ? " sofort ohne Abzug" : ""} auf das Konto</p><p>${empfaenger}<strong>IBAN ${esc(ibanText(iban))}</strong>${bicBank ? `<br>${bicBank}` : ""}<br>Verwendungszweck: Rechnung ${esc(text(d, "nummer"))}</p></div></div>`
         : // leere Vorlage: Zahlungsaufforderung mit Linie für das Datum, mit Bankverbindung nur, wenn eine IBAN hinterlegt ist
           leer && !storno && !gutschrift
@@ -390,8 +459,10 @@ export const rechnung: Vorlage = {
         `<section>${tabelle(["Pos.", "Leistung", "Menge", "Einzelpreis", ...(ku ? [] : ["USt"]), "Betrag"], zeilenHtml, { breiten: ku ? ["5%", "54%", "13%", "13%", "15%"] : ["5%", "47%", "13%", "13%", "7%", "15%"], zahlen: ku ? [2, 3, 4] : [2, 3, 4, 5], ...(leer ? { mindestens: 5, hoch: true } : {}) })}</section>` +
         // Summenblock beginnt an der Mengenspalte (CSS .g-brief .summen bzw. .summen.ku)
         `<table class="summen${ku ? " ku" : ""}">${summenZeilen}</table>` +
+        // Pflichthinweise (Steuerbefreiung, Steuerschuldnerschaft, § 19 …) gehören zu den Beträgen: direkt darunter, ohne Umbruch davor
+        (pflichtHinweise.length ? `<div class="pflichthinweise">${pflichtHinweise.map((h) => `<p>${esc(h)}</p>`).join("")}</div>` : "") +
         // Die Zahlungsaufforderung bleibt bei den Summen (CSS: kein Umbruch davor und darin); passt der Schluss nicht mehr
-        // auf die Seite, rücken nur Hinweise und Gruß als Block auf die Folgeseite
+        // auf die Seite, rücken nur weitere Hinweise und Gruß auf die Folgeseite
         `<div class="abschluss">` +
         zahlung +
         `<div class="schluss">` +
@@ -626,6 +697,19 @@ function ust(d: Daten) {
   return { u19, u7, s19, s7, vst, zahllast: s19 + s7 - vst };
 }
 
+/** Welche Kennzahl für übrige Umsätze ohne Umsatzsteuer gilt (Vordruckmuster USt 1 A). */
+const KZ_FREI_HINWEIS = "welche Kennzahl gilt (z. B. 43 steuerfreie Umsätze mit Vorsteuerabzug, 21 nicht steuerbare sonstige Leistungen nach § 18b UStG, 45 übrige nicht steuerbare Umsätze, 87 Umsätze zum Nullsteuersatz nach § 12 Abs. 3 UStG), hängt von der Art des Umsatzes ab";
+/** Felder der Voranmeldung mit Umsätzen ohne Umsatzsteuer und ihre Kennzahl. */
+const UST_OHNE_STEUER: { id: string; kz?: string; text: string; hinweis?: string }[] = [
+  { id: "umsatz_igl", kz: "41", text: "Innergemeinschaftliche Lieferungen an Abnehmer mit USt-IdNr.", hinweis: "§ 4 Nr. 1 Buchst. b, § 6a UStG – auch in der Zusammenfassenden Meldung" },
+  { id: "umsatz_48", kz: "48", text: "Steuerfreie Umsätze ohne Vorsteuerabzug", hinweis: "§ 4 Nr. 8 bis 29 UStG; Vorsteuer aus Eingangsleistungen für diese Umsätze ist nicht abziehbar (§ 15 Abs. 2 UStG)" },
+  { id: "umsatz_13b", kz: "60", text: "Steuerpflichtige Umsätze, für die der Leistungsempfänger die Steuer schuldet", hinweis: "§ 13b UStG" },
+  { id: "umsatz_frei", text: "Weitere steuerfreie oder nicht steuerbare Umsätze", hinweis: `${KZ_FREI_HINWEIS[0]!.toUpperCase()}${KZ_FREI_HINWEIS.slice(1)}` },
+];
+
+/** Hinweis bei steuerfreien Umsätzen ohne Vorsteuerabzug (Voranmeldung, Steuerberater-Paket). */
+export const VORSTEUER_AUFTEILEN = "Steuerfreie Umsätze ohne Vorsteuerabzug und Vorsteuer im selben Zeitraum: Vorsteuer aus Eingangsleistungen, die diesen Umsätzen dienen, ist nicht abziehbar (§ 15 Abs. 2 UStG); dienen sie beiden Arten von Umsätzen, ist sie aufzuteilen (§ 15 Abs. 4 UStG). Bitte die Vorsteuer prüfen.";
+
 export const VERSTEUERUNG: Option[] = [
   { wert: "soll", text: "Soll – der Normalfall" },
   { wert: "ist", text: "Ist – nur mit Genehmigung" },
@@ -655,7 +739,10 @@ export const ustVoranmeldung: Vorlage = {
       felder: [
         { id: "umsatz_19", art: "betrag", label: "Umsätze zu 19 % (€)" },
         { id: "umsatz_7", art: "betrag", label: "Umsätze zu 7 % (€)", hilfe: "seit 2026 auch Speisen in Restaurant und Café (ohne Getränke)" },
-        { id: "umsatz_frei", selten: true, art: "betrag", label: "Umsätze ohne Umsatzsteuer (€)", hilfe: "z. B. steuerfreie Umsätze – welche Zeile in ELSTER gilt, hängt von der Art ab" },
+        { id: "umsatz_igl", selten: true, art: "betrag", label: "Innergemeinschaftliche Lieferungen an Abnehmer mit USt-IdNr. (Kz 41) (€)", hilfe: "aus Rechnungen mit dem Hinweis „innergemeinschaftliche Lieferung“" },
+        { id: "umsatz_48", selten: true, art: "betrag", label: "Steuerfreie Umsätze ohne Vorsteuerabzug (Kz 48) (€)", hilfe: "Steuerbefreiungen nach § 4 Nr. 8 bis 29 UStG, z. B. Heilbehandlungen (§ 4 Nr. 14 UStG)" },
+        { id: "umsatz_13b", selten: true, art: "betrag", label: "Umsätze, für die der Leistungsempfänger die Steuer schuldet (Kz 60) (€)", hilfe: "aus Rechnungen mit dem Hinweis „Steuerschuldnerschaft des Leistungsempfängers“ (§ 13b UStG)" },
+        { id: "umsatz_frei", selten: true, art: "betrag", label: "Weitere Umsätze ohne Umsatzsteuer (€)", hilfe: `z. B. steuerfreie Umsätze – ${KZ_FREI_HINWEIS}` },
       ],
     },
     {
@@ -672,10 +759,10 @@ export const ustVoranmeldung: Vorlage = {
   },
   html(d, b) {
     const x = ust(d);
-    const frei = cent(text(d, "umsatz_frei")) ?? 0;
+    const ohneSteuer = UST_OHNE_STEUER.map((f) => ({ ...f, cent: cent(text(d, f.id)) ?? 0 })).filter((f) => f.cent);
     const ist = text(d, "versteuerung") === "ist";
     // Vorlage zum Ausfüllen (keine Beträge eingegeben): Beträge leer statt „0,00 €“
-    const leer = !["umsatz_19", "umsatz_7", "umsatz_frei", "vorsteuer"].some((k) => text(d, k));
+    const leer = !["umsatz_19", "umsatz_7", "vorsteuer", ...UST_OHNE_STEUER.map((f) => f.id)].some((k) => text(d, k));
     const betrag = (c: number) => (leer ? "&nbsp;" : euro(c));
     const ueberschuss = !leer && x.zahllast < 0;
     return dokument({
@@ -693,8 +780,8 @@ export const ustVoranmeldung: Vorlage = {
             { text: "darauf Umsatzsteuer 7 % (rechnet ELSTER)", betrag: betrag(x.s7) },
           ]),
         ) +
-        (frei
-          ? abschnitt("Umsätze ohne Umsatzsteuer", kennzahlen([{ text: "Steuerfreie oder nicht steuerbare Umsätze", hinweis: "Welche Kennzahl gilt (z. B. 41 innergemeinschaftliche Lieferungen, 43 weitere steuerfreie Umsätze, 21 Leistungen nach § 18b UStG), hängt von der Art des Umsatzes ab", betrag: euro(frei) }]))
+        (ohneSteuer.length
+          ? abschnitt("Umsätze ohne Umsatzsteuer", kennzahlen(ohneSteuer.map((f) => ({ ...(f.kz ? { kz: f.kz } : {}), text: f.text, hinweis: f.hinweis, betrag: euro(f.cent) }))))
           : "") +
         abschnitt(
           "Vorsteuer und Zahllast",
@@ -710,6 +797,8 @@ export const ustVoranmeldung: Vorlage = {
             },
           ]),
         ) +
+        // steuerfreie Umsätze ohne Vorsteuerabzug und Vorsteuer im selben Zeitraum: an die Aufteilung erinnern
+        ((cent(text(d, "umsatz_48")) ?? 0) && x.vst > 0 ? nachsatz(VORSTEUER_AUFTEILEN) : "") +
         (text(d, "notiz") ? abschnitt("Notiz", absatz(text(d, "notiz"))) : "") +
         nachsatz("Kennzahlen nach dem Vordruckmuster USt 1 A für 2026. Vor dem Übertragen gegen das aktuelle ELSTER-Formular prüfen; das Formular rechnet die Steuerbeträge selbst. ELSTER rechnet aus vollen Euro; maßgeblich ist der Betrag, den ELSTER errechnet.") +
         uebertragung(["Übermittelt am", "Transferticket (ELSTER)", ueberschuss ? "Erstattung erhalten am" : "Gezahlt am"]),
@@ -734,6 +823,14 @@ export const steuererklaerung: Vorlage = {
   bereich: "steuern",
   pflichten: ["steuern.est_erklaerung", "steuern.gewst_erklaerung", "steuern.ust_jahreserklaerung", "steuern.kst_erklaerung"],
   grundlage: "§ 25 EStG; § 31 KStG; § 14a GewStG; § 18 Abs. 3 UStG",
+  // nur die Gesetze der gewählten Erklärungen; ohne Auswahl: KStG nur für Kapitalgesellschaften, EStG nur für die anderen
+  grundlageFuer(d, b) {
+    const je: Record<string, string> = { est: "§ 25 EStG", kst: "§ 31 KStG", gewst: "§ 14a GewStG", ust: "§ 18 Abs. 3 UStG" };
+    const arten = auswahl(d, "arten").filter((a) => je[a]);
+    const reihe = ["est", "kst", "gewst", "ust"];
+    const gewaehlt = arten.length ? reihe.filter((a) => arten.includes(a)) : reihe.filter((a) => a !== (istKapitalgesellschaft(b.rechtsform, b.name) ? "est" : "kst"));
+    return gewaehlt.map((a) => je[a]).join("; ");
+  },
   namensFeld: "jahr",
   abschnitte: [
     { titel: "Jahr und Erklärungen",
@@ -792,7 +889,17 @@ export const steuererklaerung: Vorlage = {
           ]),
         ) +
         (vz.length
-          ? abschnitt("Geleistete Vorauszahlungen", tabelle(["Steuer", "Betrag"], vz.map((x) => [zelle(text(x, "art")), euro(cent(text(x, "betrag")) ?? 0)]), { breiten: ["70%", "30%"], zahlen: [1], summe: [verschiedene ? "<strong>Summe aller Vorauszahlungen (verschiedene Steuern)</strong>" : "<strong>Summe</strong>", `<strong>${euro(summe(vz, "betrag"))}</strong>`] }))
+          ? abschnitt(
+              "Geleistete Vorauszahlungen",
+              // verschiedene Steuern: keine Gesamtsumme (Einkommen- und Umsatzsteuer zusammenzuzählen, sagt nichts), sondern je Steuer
+              verschiedene
+                ? tabelle(["Steuer", "Betrag"], vz.map((x) => [zelle(text(x, "art")), euro(cent(text(x, "betrag")) ?? 0)]), { breiten: ["70%", "30%"], zahlen: [1] }) +
+                    kennzahlen([...new Set(vz.map((x) => steuerart(text(x, "art"))))].map((art) => {
+                      const je = vz.filter((x) => steuerart(text(x, "art")) === art);
+                      return { text: `Summe ${text(je[0]!, "art").trim().split(/\s+/)[0]}`, betrag: euro(summe(je, "betrag")), fett: true };
+                    }))
+                : tabelle(["Steuer", "Betrag"], vz.map((x) => [zelle(text(x, "art")), euro(cent(text(x, "betrag")) ?? 0)]), { breiten: ["70%", "30%"], zahlen: [1], summe: ["<strong>Summe</strong>", `<strong>${euro(summe(vz, "betrag"))}</strong>`] }),
+            )
           : leer
             ? abschnitt("Geleistete Vorauszahlungen", tabelle(["Steuer", "Betrag"], [], { breiten: ["70%", "30%"], zahlen: [1], mindestens: 4, hoch: true }))
             : "") +

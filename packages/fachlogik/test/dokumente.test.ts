@@ -74,7 +74,7 @@ describe("Dokumentvorlagen", () => {
       if (v.kundendokument || v.ohneKopfangaben) expect(leer, v.id).not.toMatch(/<dt>Rechtsgrundlage|<div class="art">[^<]/);
       // Rechtsgrundlage im Band oder – als einzige Angabe – in der kleinen Zeile unter dem Titel (kennungFassen)
       else if (v.grundlage) {
-        const g = v.grundlage.replace(/&/g, "&amp;");
+        const g = (v.grundlageFuer?.(leereDaten(v, BETRIEB, "2026-10-12"), BETRIEB) || v.grundlage).replace(/&/g, "&amp;");
         const l = leer.replace(/&nbsp;/g, " ");
         expect(l.includes(`<dt>Rechtsgrundlage</dt><dd>${g}</dd>`) || l.includes(`<p class="kennung-zeile">Rechtsgrundlage: <b>${g}</b></p>`), v.id).toBe(true);
       }
@@ -774,10 +774,17 @@ describe("Vorlagen, vierte Durchsicht", () => {
     const ba = html("betriebsanweisung", {});
     expect(ba).toContain("<span>Freigegeben von (Name)</span>");
     expect(ba.match(/<p class="fuellen-block">((?:<span class="fuellen"><\/span>)+)<\/p>/g)!.map((x) => x.split('class="fuellen"').length - 1)).toEqual([3, 5, 3, 3, 3]);
-    // Steuererklärung: verschiedene Steuern summiert; leeres Blatt mit Ankreuzen und Tabellen
-    const se = html("steuererklaerung", { jahr: "2025", vorauszahlungen: [{ art: "Einkommensteuer Q1", betrag: "100" }, { art: "Gewerbesteuer Q1", betrag: "50" }] });
-    expect(se).toContain("Summe aller Vorauszahlungen (verschiedene Steuern)");
-    expect(html("steuererklaerung", { jahr: "2025", vorauszahlungen: [{ art: "Einkommensteuer Q1", betrag: "100" }, { art: "Einkommensteuer Q2", betrag: "50" }] })).not.toContain("verschiedene Steuern");
+    // Steuererklärung: verschiedene Steuern je Steuer summiert (keine Gesamtsumme, Szenario Praxis); leeres Blatt mit Ankreuzen und Tabellen
+    const se = html("steuererklaerung", { jahr: "2025", vorauszahlungen: [{ art: "Einkommensteuer Q1", betrag: "100" }, { art: "Gewerbesteuer Q1", betrag: "50" }, { art: "Einkommensteuer Q2", betrag: "100" }] });
+    expect(se).toMatch(/Summe Einkommensteuer<\/th><td class="zahl">200,00 €/);
+    expect(se).toMatch(/Summe Gewerbesteuer<\/th><td class="zahl">50,00 €/);
+    expect(se).not.toContain("250,00 €");
+    expect(html("steuererklaerung", { jahr: "2025", vorauszahlungen: [{ art: "Einkommensteuer Q1", betrag: "100" }, { art: "Einkommensteuer Q2", betrag: "50" }] })).toContain("<strong>150,00 €</strong>");
+    // Rechtsgrundlage nach den gewählten Erklärungen bzw. Rechtsform (Szenario Praxis: kein KStG beim Einzelunternehmen)
+    const rg = (d: Daten, b: Betrieb = BETRIEB) => vorlageFuer("steuererklaerung")!.grundlageFuer!(d, b);
+    expect(rg({ arten: ["est", "ust"] })).toBe("§ 25 EStG; § 18 Abs. 3 UStG");
+    expect(rg({}, { ...BETRIEB, rechtsform: "Einzelunternehmen" })).toBe("§ 25 EStG; § 14a GewStG; § 18 Abs. 3 UStG");
+    expect(rg({}, { ...BETRIEB, rechtsform: "GmbH" })).toBe("§ 31 KStG; § 14a GewStG; § 18 Abs. 3 UStG");
     const sl = leer("steuererklaerung");
     expect(sl).toContain("<li>Einkommensteuer</li><li>Gewerbesteuer</li>");
     expect(sl).toContain("<th>Vorsteuer im Jahr</th>");
@@ -852,7 +859,8 @@ describe("Vorlagen, fünfte Durchsicht (Jahres-Szenario Café)", () => {
     expect(h).toMatch(/<table class="summen">.*?<\/table><div class="abschluss"><div class="zahlung">.*?Verwendungszweck: Rechnung 2026-001.*?<div class="schluss">.*?Mit freundlichen Grüßen/);
     expect(h).toContain(".g-brief .abschluss { page-break-inside: auto; break-inside: auto; }");
     expect(h).toContain(".g-brief .zahlung { page-break-inside: avoid; break-inside: avoid; page-break-before: avoid; break-before: avoid; }");
-    expect(h).toContain(".g-brief .schluss { page-break-inside: avoid; break-inside: avoid; }");
+    // weitere Hinweise dürfen umbrechen, der Gruß bleibt beim letzten (Szenario Elektro)
+    expect(h).toContain(".g-brief .schluss > p.gruss { page-break-before: avoid; break-before: avoid;");
     // die Rechnungsnummer steht als Verwendungszweck in der Zahlungsaufforderung
     expect(h).not.toContain("Bitte geben Sie bei der Zahlung die Rechnungsnummer an.");
     expect(h).toContain("<p>Vielen Dank für Ihren Auftrag.</p>");
@@ -873,8 +881,12 @@ describe("Vorlagen, fünfte Durchsicht (Jahres-Szenario Café)", () => {
   it("Datenschutz: Baustein Kundenverwaltung ohne Friseur-Beispiel", () => {
     const v = vorlageFuer("datenschutz_dokumentation")!;
     const vorschlaege = v.abschnitte.flatMap((a) => a.felder).flatMap((f) => (f.art === "liste" ? (f.vorschlaege ?? []) : []));
+    // allgemein ohne Gesundheitsangaben (Szenario Elektro); diese stehen in einem eigenen Vorschlag
     const kunden = vorschlaege.find((x) => x.titel === "Kundenverwaltung / Kundenkartei")!;
-    expect(kunden.werte.rechtsgrundlage).toContain("Bei Gesundheitsangaben (z. B. Allergien/Unverträglichkeiten) ausdrückliche Einwilligung nach Art. 9 Abs. 2 lit. a DSGVO.");
+    expect(kunden.werte.rechtsgrundlage).not.toContain("Gesundheit");
+    expect(kunden.werte.datenarten).not.toContain("Gesundheit");
+    const gesund = vorschlaege.find((x) => x.titel === "Kundenkartei mit Gesundheitsangaben (z. B. Allergien, Unverträglichkeiten)")!;
+    expect(gesund.werte.rechtsgrundlage).toContain("Bei Gesundheitsangaben (z. B. Allergien/Unverträglichkeiten) ausdrückliche Einwilligung nach Art. 9 Abs. 2 lit. a DSGVO.");
     expect(JSON.stringify(vorschlaege)).not.toContain("Friseur-Kundenkartei");
   });
 

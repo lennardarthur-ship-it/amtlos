@@ -1,0 +1,15 @@
+persona: gewerbe
+beschreibung: Gewerbliches Einzelunternehmen mit Umsatz und Gewinn im Vorjahr über den Grenzen des § 141 AO – Buchführungspflicht statt EÜR (Gegenstück zu freiberuf-ueber-grenze)
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2015-04-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [handwerk]
+  profil.umsatz.vorjahr: 900000
+  profil.gewinn.vorjahr: 120000
+  profil.bundesland: NW
+  profil.gemeinde_ags: "05913000"
+erwartet:
+  steuern.buchfuehrungspflicht: gilt
+  steuern.euer: gilt_nicht

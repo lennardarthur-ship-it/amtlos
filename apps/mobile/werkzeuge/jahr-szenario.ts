@@ -353,7 +353,7 @@ export function standBauen(): Bau {
       tom: [
         "Website ausschließlich über HTTPS", "WLAN mit aktueller Verschlüsselung", "Geräteverschlüsselung und Bildschirmsperre", "Persönliche Benutzerkonten", "Starke, individuelle Passwörter", "Zwei-Faktor-Authentisierung",
         "Abschließbare Räume/Schränke", "Verpflichtung aller Beschäftigten", "Akten- und Datenträgervernichtung", "Auftragsverarbeitungsverträge", "Automatische Sicherheitsupdates", "Firewall des Routers",
-        "Protokollierung von Änderungen in Kassen", "Regelmäßige Datensicherung", "Mindestens eine Sicherungskopie", "Wiederherstellung aus der Datensicherung", "Jährliche Überprüfung des Verzeichnisses", "Regelmäßige Sensibilisierung",
+        "Protokollierung von Änderungen in Kassen", "Regelmäßige Datensicherung", "Mindestens eine Sicherungskopie", "Regelmäßiger Test der Wiederherstellung", "Jährliche Überprüfung des Verzeichnisses", "Regelmäßige Sensibilisierung",
       ].map((x) => vorschlag("datenschutz_dokumentation", "tom", x, h, { umgesetzt_am: "2025-03-01", verantwortlich: "Jana Weber" })),
       dienstleister: eintraege("datenschutz_dokumentation", "dienstleister", [
         { name: "Hostwerk Leipzig GmbH", leistung: "Website-Hosting", auftragsverarbeitung: true, avv_vorhanden: true, avv_datum: "2024-05-10", drittland: "keine Übermittlung in Drittländer" },
@@ -589,17 +589,17 @@ export function standBauen(): Bau {
         const u7 = ausEuro(erg.werte.umsatz_7 ?? "0") + eq.k7;
         s = felderSetzen(s, id, {
           umsatz_19: euro(u19), umsatz_7: euro(u7),
-          notiz: `Aus Rechnungen übernommen (Amtlos, ${erg.anzahl} Rechnungen): 19 % ${erg.werte.umsatz_19} €, 7 % ${erg.werte.umsatz_7} €, ohne USt ${erg.werte.umsatz_frei} €${eq.r0 ? " (innergemeinschaftliche Lieferung, Kz 41; Zusammenfassende Meldung abgeben)" : ""}. Vorsteuer aus ${erg.vorsteuerBelege} Belegen.\nZuzüglich Kassenumsätze laut Z-Bons (netto): 19 % ${euro(eq.k19)} €, 7 % ${euro(eq.k7)} €.`,
+          notiz: `Aus Rechnungen übernommen (Amtlos, ${erg.anzahl} Rechnungen): 19 % ${erg.werte.umsatz_19} €, 7 % ${erg.werte.umsatz_7} €, Kz 41 ${erg.werte.umsatz_igl} €, weitere ohne USt ${erg.werte.umsatz_frei} €${eq.r0 ? " (innergemeinschaftliche Lieferung, Kz 41; Zusammenfassende Meldung abgeben)" : ""}. Vorsteuer aus ${erg.vorsteuerBelege} Belegen.\nZuzüglich Kassenumsätze laut Z-Bons (netto): 19 % ${euro(eq.k19)} €, 7 % ${euro(eq.k7)} €.`,
         }, t(vaDatum[i]!, 9));
       } });
     const u = unterlage(id);
     vergleich(`USt ${periode} (Übernahme aus Rechnungen)`, "Umsätze 19 %", ausEuro(app.umsatz_19 ?? "0"), eq.r19);
     vergleich(`USt ${periode} (Übernahme aus Rechnungen)`, "Umsätze 7 %", ausEuro(app.umsatz_7 ?? "0"), eq.r7);
-    vergleich(`USt ${periode} (Übernahme aus Rechnungen)`, "Umsätze ohne USt (igl)", ausEuro(app.umsatz_frei ?? "0"), eq.r0);
+    vergleich(`USt ${periode} (Übernahme aus Rechnungen)`, "Umsätze ohne USt (igl, Kz 41)", ausEuro(app.umsatz_igl ?? "0"), eq.r0);
     vergleich(`USt ${periode} (Übernahme aus Belegen)`, "Vorsteuer", ausEuro(app.vorsteuer ?? "0"), eq.vorsteuer);
     const erg = v("ust_voranmeldung").ergebnis!(u.daten);
     vergleich(`USt ${periode} (fertige Voranmeldung)`, "Zahllast (mit Cent)", ausEuro(erg[2]![1]) * (erg[2]![0] === "Erstattung" ? -1 : 1), eq.zahllast);
-    ust.push({ q: periode, app, appAnzahl: anzahl, kasse: { k19: eq.k19, k7: eq.k7 }, final: Object.fromEntries(["umsatz_19", "umsatz_7", "umsatz_frei", "vorsteuer"].map((k) => [k, String(u.daten[k] ?? "")])) });
+    ust.push({ q: periode, app, appAnzahl: anzahl, kasse: { k19: eq.k19, k7: eq.k7 }, final: Object.fromEntries(["umsatz_19", "umsatz_7", "umsatz_igl", "umsatz_48", "umsatz_13b", "umsatz_frei", "vorsteuer"].map((k) => [k, String(u.daten[k] ?? "")])) });
   }
 
   // ---------------------------------------------------------------- EÜR 2026 (Übernahme + Kasse, USt-Zahlungen, AfA von Hand)
@@ -657,13 +657,13 @@ export function standBauen(): Bau {
   const ustJahr = [1, 2, 3, 4].reduce((a, q) => a + ausEuro(v("ust_voranmeldung").ergebnis!(unterlage(`ust-q${q}`).daten)[0]![1]), 0);
   const gewinn = euerErgebnis.find((z) => z[0] === "Gewinn" || z[0] === "Verlust")!;
   dok({ id: "steuer", vorlage: "steuererklaerung", datum: "2027-03-01", worum: "Zusammenstellung für ESt, GewSt und USt 2026: Gewinn aus der EÜR, Umsätze/USt/Vorsteuer als Summe der vier Voranmeldungen, ESt-Vorauszahlungen 4 × 1.850 €, GewSt-Vorauszahlungen 4 × 220 €, Kranken-/Pflegeversicherung und Rürup-Beiträge.",
-    daten: (h) => ({ jahr: "2026", arten: ["est", "gewst", "ust"], gewinn: `${gewinn[0] === "Verlust" ? "-" : ""}${gewinn[1].replace(/[€\s\u00a0]/g, "")}`, umsatz: euro(vaSumme("umsatz_19") + vaSumme("umsatz_7") + vaSumme("umsatz_frei")), ust_jahr: euro(ustJahr), vorsteuer_jahr: euro(vaSumme("vorsteuer")),
+    daten: (h) => ({ jahr: "2026", arten: ["est", "gewst", "ust"], gewinn: `${gewinn[0] === "Verlust" ? "-" : ""}${gewinn[1].replace(/[€\s\u00a0]/g, "")}`, umsatz: euro(vaSumme("umsatz_19") + vaSumme("umsatz_7") + (vaSumme("umsatz_frei") + vaSumme("umsatz_igl") + vaSumme("umsatz_48") + vaSumme("umsatz_13b"))), ust_jahr: euro(ustJahr), vorsteuer_jahr: euro(vaSumme("vorsteuer")),
       vorauszahlungen: eintraege("steuererklaerung", "vorauszahlungen", [...[1, 2, 3, 4].map((q) => ({ art: `Einkommensteuer Q${q}`, betrag: "1.850,00" })), ...[1, 2, 3, 4].map((q) => ({ art: `Gewerbesteuer Q${q}`, betrag: "220,00" }))], h),
       weiteres: eintraege("steuererklaerung", "weiteres", [{ was: "Kranken- und Pflegeversicherung (freiwillig gesetzlich, AOK PLUS)", betrag: "5.874,00", beleg: true }, { was: "Basisrente (Rürup), Beiträge 2026", betrag: "2.400,00", beleg: true }, { was: "Spende an den Kunstverein Plagwitz e. V.", betrag: "150,00", beleg: false }], h),
       notiz: "Kassenumsätze sind in den Voranmeldungen von Hand ergänzt (Z-Bons). Innergemeinschaftliche Lieferung nach Österreich: Zusammenfassende Meldung für das 3. Quartal abgegeben." }) });
   {
     const j = D.jahresSummen();
-    vergleich("Steuererklärung", "Umsätze im Jahr netto (Summe der Voranmeldungen)", vaSumme("umsatz_19") + vaSumme("umsatz_7") + vaSumme("umsatz_frei"), j.r19 + j.r7 + j.r0 + j.k19 + j.k7);
+    vergleich("Steuererklärung", "Umsätze im Jahr netto (Summe der Voranmeldungen)", vaSumme("umsatz_19") + vaSumme("umsatz_7") + (vaSumme("umsatz_frei") + vaSumme("umsatz_igl") + vaSumme("umsatz_48") + vaSumme("umsatz_13b")), j.r19 + j.r7 + j.r0 + j.k19 + j.k7);
     vergleich("Steuererklärung", "Umsatzsteuer im Jahr (Summe der Voranmeldungen, mit Cent)", ustJahr, j.ust);
     vergleich("Steuererklärung", "Vorsteuer im Jahr", vaSumme("vorsteuer"), j.vorsteuer);
   }

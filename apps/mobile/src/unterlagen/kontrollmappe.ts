@@ -52,11 +52,18 @@ function datumVon(u: Unterlage): string {
   return (u.ausgegeben ?? u.geaendert).slice(0, 10);
 }
 
+/**
+ * Weiteres Feld, das bei Vorlagen mit Zeitangabe als Namensfeld eigene Fassungen trennt: Prüfprotokolle je
+ * Einsatzbereich (z. B. Werkstatt und Baustelle) – sonst stünde nur das neueste Protokoll in der Mappe.
+ */
+const GRUPPE_ZUSATZ: Record<string, string> = { pruefprotokoll_elektro: "einsatz" };
+
 /** Gruppe einer Unterlage: Vorlage plus Namensfeld (Arbeitsbereich, Thema, Person …) – Zeitangaben fassen zusammen. */
 function gruppe(v: Vorlage, u: Unterlage): string {
   const feld = v.namensFeld && !ZEIT_FELDER.has(v.namensFeld) ? u.daten[v.namensFeld] : null;
   const name = typeof feld === "string" ? feld.trim().split("\n")[0]!.toLocaleLowerCase("de") : "";
-  return `${v.id}\u0000${name}`;
+  const z = GRUPPE_ZUSATZ[v.id] ? u.daten[GRUPPE_ZUSATZ[v.id]!] : null;
+  return `${v.id}\u0000${name}${typeof z === "string" && z.trim() ? `\u0000${z.trim().toLocaleLowerCase("de")}` : ""}`;
 }
 
 /**
@@ -107,6 +114,8 @@ const bereichTitel = (b: Bereich) => BEREICHE.find((x) => x.id === b)?.titel ?? 
  */
 export function deckblattHtml(betrieb: string, heute: string, eintraege: (MappenEintrag & { seite?: number })[]): string {
   const name = betrieb.trim() || "Betrieb";
+  // viele Einträge: engere Zeilen, damit das Inhaltsverzeichnis nicht mit wenigen Zeilen auf eine zweite Seite läuft
+  const eng = eintraege.length > 9;
   const zeilen = eintraege
     .map((e, i) => `<tr><td class="nr">${i + 1}</td><td><div class="t">${esc(e.titel)}</div><div class="b">${esc(bereichTitel(e.bereich))}</div></td><td class="d">${datumDe(e.datum)}</td><td class="s">${e.seite ?? ""}</td></tr>`)
     .join("");
@@ -126,7 +135,8 @@ th{font-size:8.5pt;font-weight:600;text-align:left;color:#5b6670;padding:0 2mm 1
 th.s{text-align:right}
 .t{font-weight:600}.b{font-size:8.5pt;color:#5b6670;margin-top:.5mm}
 .hinweis{margin-top:8mm;font-size:8.5pt;color:#5b6670}
-</style></head><body class="g-nachweis">
+body.eng h1{margin:3mm 0 1mm;font-size:22pt}body.eng .stand{margin-bottom:6mm}body.eng td{padding:1.5mm 2mm}body.eng .hinweis{margin-top:5mm}
+</style></head><body class="g-nachweis${eng ? " eng" : ""}">
 <div class="art">Kontrollmappe</div>
 <h1>Nachweise des Betriebs</h1>
 <p class="betrieb">${esc(name)}</p>

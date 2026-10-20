@@ -116,7 +116,10 @@ export const PROFIL: Profil = {
   "vorauszahlung.gewst": true,
   "kunden.segmente": ["b2c", "b2b"],
   "kunden.regionen": ["inland", "eu"],
-  "vertrieb.kanaele": ["onlineshop"],
+  // Marktstand seit r9 als eigene Antwort; Lohnsteuer „keine“ (nur Minijob mit Pauschsteuer); Investoren-Frage für alle Rechtsformen
+  "vertrieb.kanaele": ["onlineshop", "marktstand"],
+  "personal.lohnsteuer_anmeldezeitraum": "keine",
+  "gesellschafter.auslaendische_investoren": false,
   "produkte.arten": ["physisch", "verpackung", "kosmetik"],
   "handel.hohe_bargeschaefte": false,
   "arbeitsschutz.elektrische_geraete": true,
@@ -200,6 +203,8 @@ export function standBauen(): Bau {
             positionen: r.pos.map((x) => ({ bezeichnung: x.bez, menge: menge(x.menge), einheit: x.einheit, preis: euro(x.preis), satz: String(x.satz) })),
             hinweise: r.igl ? ["igl"] : [],
             hinweis: r.hinweis,
+            // schon bezahlt am oder vor dem Rechnungsdatum (Shop-Bestellung): Feld „Schon bezahlt am“ (r9)
+            ...(r.bezahlt && r.bezahlt <= r.datum ? { bezahlt_am: r.bezahlt } : {}),
           }),
         });
         if (u.daten.nummer !== r.nummer) auffaellig.push(`Rechnungsnummer: erwartet ${r.nummer}, App vergab ${String(u.daten.nummer)}.`);
@@ -499,7 +504,7 @@ export function standBauen(): Bau {
         s = felderSetzen(s, id, erg.werte, t(tag, 9));
         const u19 = ausEuro(erg.werte.umsatz_19 ?? "0") + sh.netto19 + sh.marktNetto;
         const notiz = [
-          `Aus Rechnungen übernommen (Amtlos, Soll): 19 % ${erg.werte.umsatz_19} €, ohne USt ${erg.werte.umsatz_frei} € (= innergemeinschaftliche Lieferungen, Kz 41). Vorsteuer aus ${erg.vorsteuerBelege} Belegen.`,
+          `Aus Rechnungen übernommen (Amtlos, Soll): 19 % ${erg.werte.umsatz_19} €, Kz 41 (igL) ${erg.werte.umsatz_igl} €, weitere ohne USt ${erg.werte.umsatz_frei} €. Vorsteuer aus ${erg.vorsteuerBelege} Belegen.`,
           `Zuzüglich Shop-Umsätze laut Umsatzbericht (Inland und EU-Fernverkäufe vor der Schwelle, netto 19 %): ${euro(sh.netto19)} €; Marktkasse laut Kassenbuch: ${euro(sh.marktNetto)} €.`,
           em.kz46 ? `§ 13b UStG (Leistungen von Unternehmern aus Irland, ${em.b13.join(", ")}): Kz 46 ${euro(em.kz46)} €, Kz 47 ${euro(em.kz47)} €, Kz 67 ${euro(em.kz67)} € – in ELSTER zusätzlich eintragen.` : "",
           sh.ossBrutto ? `Fernverkäufe nach der Schwelle (${euro(sh.ossNetto)} € netto) gehören in die OSS-Erklärung, nicht hierher.` : "",
@@ -508,14 +513,14 @@ export function standBauen(): Bau {
       } });
     vergleichText(`USt ${em.m}`, "Versteuerungsart in der Voranmeldung (aus „Mein Betrieb“)", versteuerung, "soll");
     vergleich(`USt ${em.m} (Übernahme, Soll)`, "Umsätze 19 % aus Rechnungen", ausEuro(app.umsatz_19 ?? "0"), em.r19);
-    vergleich(`USt ${em.m} (Übernahme, Soll)`, "Umsätze ohne USt aus Rechnungen = Kz 41 (igL)", ausEuro(app.umsatz_frei ?? "0"), em.kz41);
+    vergleich(`USt ${em.m} (Übernahme, Soll)`, "Umsätze ohne USt aus Rechnungen = Kz 41 (igL)", ausEuro(app.umsatz_igl ?? "0"), em.kz41);
     vergleich(`USt ${em.m} (Übernahme aus Belegen)`, "Vorsteuer Kz 66 (nach Belegdatum)", ausEuro(app.vorsteuer ?? "0"), em.kz66);
     vergleichText(`USt ${em.m} (Übernahme, Soll)`, "zugeordnete Rechnungen/Stornos", String(anzahl), String(em.nummern.length));
     const erg = v("ust_voranmeldung").ergebnis!(unterlage(id).daten);
     vergleich(`USt ${em.m} (fertige Voranmeldung)`, "Kz 81 Bemessungsgrundlage 19 % (Rechnungen + Shop + Markt)", ausEuro(String(unterlage(id).daten.umsatz_19 ?? "0")), em.kz81);
     vergleich(`USt ${em.m} (fertige Voranmeldung)`, "Zahllast (mit Cent; § 13b gleicht sich aus)", ausEuro(erg[2]![1]) * (erg[2]![0] === "Erstattung" ? -1 : 1), em.zahllast);
     if (em.kz46) vergleichText(`USt ${em.m} (fertige Voranmeldung)`, `Kz 46/47 § 13b (${euro(em.kz46)} € / ${euro(em.kz47)} €) als Feld der Voranmeldung`, "kein Feld (nur Notiz)", "Feld");
-    ust.push({ m: em.m, app, appAnzahl: anzahl, final: Object.fromEntries(["umsatz_19", "umsatz_7", "umsatz_frei", "vorsteuer"].map((k) => [k, String(unterlage(id).daten[k] ?? "")])), zahllast: `${erg[2]![0]} ${erg[2]![1]}` });
+    ust.push({ m: em.m, app, appAnzahl: anzahl, final: Object.fromEntries(["umsatz_19", "umsatz_7", "umsatz_igl", "umsatz_48", "umsatz_13b", "umsatz_frei", "vorsteuer"].map((k) => [k, String(unterlage(id).daten[k] ?? "")])), zahllast: `${erg[2]![0]} ${erg[2]![1]}` });
   }
   infos.push(`Pflichten-Check: Kasse laut Profil „${kassenLage(s.profil)}“ – ohne elektronische Kasse sagt die App bei der USt-Übernahme nichts zu fehlenden Shop- und Marktumsätzen (kassenHinweis gibt null zurück bzw. nur „Falls du …“).`);
 
@@ -582,14 +587,14 @@ export function standBauen(): Bau {
   const ustJahr = erwartet.reduce((a, em) => a + ausEuro(v("ust_voranmeldung").ergebnis!(unterlage(`ust-${em.m}`).daten)[0]![1]), 0);
   const gewinnZeile = euerErgebnis.find((z) => z[0] === "Gewinn" || z[0] === "Verlust")!;
   dok({ id: "steuer", vorlage: "steuererklaerung", datum: "2027-03-15", worum: "Zusammenstellung für ESt (Anlage G, EÜR), GewSt und USt 2026: Gewinn aus der EÜR, Umsatz/USt/Vorsteuer als Summe der zwölf Voranmeldungen der App (ohne § 13b, ohne OSS), ESt-Vorauszahlungen 4 × 2.400 €, GewSt 4 × 650 €.",
-    daten: (h) => ({ jahr: "2026", arten: ["est", "gewst", "ust"], gewinn: gewinnZeile[1].replace(/\s*€$/, ""), umsatz: euro(vaSumme("umsatz_19") + vaSumme("umsatz_7") + vaSumme("umsatz_frei")), ust_jahr: euro(ustJahr), vorsteuer_jahr: euro(vaSumme("vorsteuer")),
+    daten: (h) => ({ jahr: "2026", arten: ["est", "gewst", "ust"], gewinn: gewinnZeile[1].replace(/\s*€$/, ""), umsatz: euro(vaSumme("umsatz_19") + vaSumme("umsatz_7") + (vaSumme("umsatz_frei") + vaSumme("umsatz_igl") + vaSumme("umsatz_48") + vaSumme("umsatz_13b"))), ust_jahr: euro(ustJahr), vorsteuer_jahr: euro(vaSumme("vorsteuer")),
       vorauszahlungen: eintraege("steuererklaerung", "vorauszahlungen", [...[1, 2, 3, 4].map((q) => ({ art: `Einkommensteuer Q${q}`, betrag: "2.400,00" })), ...[1, 2, 3, 4].map((q) => ({ art: `Gewerbesteuer Q${q}`, betrag: "650,00" }))], h),
       weiteres: eintraege("steuererklaerung", "weiteres", [{ was: "Kranken- und Pflegeversicherung (freiwillig gesetzlich)", betrag: "5.880,00", beleg: true }, { was: "OSS-Erklärungen Q3/Q4 2026 (BZSt): ausländische USt, nicht Teil der deutschen USt-Erklärung", betrag: euro(summe(oss.map((q) => q.steuer))), beleg: true }, { was: "Zusammenfassende Meldungen Q1 und Q3 (igL Österreich)", betrag: euro(D.jahresSummen().kz41), beleg: true }], h),
       notiz: `Umsatzsteuer nach vereinbarten Entgelten. In der Jahreserklärung zusätzlich § 13b: Bemessungsgrundlage ${euro(D.jahresSummen().kz46)} €, Steuer ${euro(D.jahresSummen().kz47)} € und gleich hohe Vorsteuer (in den Feldern oben nicht enthalten).` }) });
   {
     const j = D.jahresSummen();
     vergleich("Steuererklärung", "Gewinn = EÜR (unabhängig)", ausEuro(String(unterlage("steuer").daten.gewinn ?? "0")), eu.gewinn);
-    vergleich("Steuererklärung", "Umsätze im Jahr (Inland 19 % + igL, Summe der Voranmeldungen)", vaSumme("umsatz_19") + vaSumme("umsatz_frei"), j.kz81 + j.kz41);
+    vergleich("Steuererklärung", "Umsätze im Jahr (Inland 19 % + igL, Summe der Voranmeldungen)", vaSumme("umsatz_19") + (vaSumme("umsatz_frei") + vaSumme("umsatz_igl") + vaSumme("umsatz_48") + vaSumme("umsatz_13b")), j.kz81 + j.kz41);
     vergleich("Steuererklärung", "Umsatzsteuer im Jahr inkl. § 13b (Summe der Voranmeldungen)", ustJahr, j.ust);
     vergleich("Steuererklärung", "Vorsteuer im Jahr inkl. § 13b (Kz 66 + Kz 67)", vaSumme("vorsteuer"), j.kz66 + j.kz67);
   }
@@ -679,7 +684,7 @@ export function standBauen(): Bau {
   {
     const sommer = auswertung(s.profil, "2026-07-01", s.unterlagen.filter((u) => (u.ausgegeben ?? "") < "2026-07-02"));
     vergleichText("Pflichten-Check (01.07.2026)", "online.widerrufsbutton (gilt ab 19.06.2026)", sommer.gilt.some((p) => p.id === "online.widerrufsbutton") ? "gilt" : "fehlt", "gilt");
-    vergleichText(`Pflichten-Check (${D.de(stichtag)})`, "Widerrufsbutton als kommende Pflicht im 12-Monats-Blick (ab 19.06.2026)", [...a.gilt, ...a.gruendung].some((p) => p.id === "online.widerrufsbutton") ? "angekündigt" : "nicht sichtbar", "angekündigt");
+    vergleichText(`Pflichten-Check (${D.de(stichtag)})`, "Widerrufsbutton als kommende Pflicht im 12-Monats-Blick (ab 19.06.2026)", [...a.gilt, ...a.gruendung, ...a.kommend].some((p) => p.id === "online.widerrufsbutton") ? "angekündigt" : "nicht sichtbar", "angekündigt");
   }
   const lst = [...a.gilt, ...a.gruendung, ...a.unbekannt].find((p) => p.id === "personal.lohnsteuer_anmeldung");
   infos.push(`Pflichten-Check: „Lohnsteuer-Anmeldung“ ${lst ? `erscheint (${a.unbekannt.some((p) => p.id === lst.id) ? "unklar" : "gilt"}, Grund: ${(lst as PflichtInfo).grund ?? ""})` : "erscheint nicht"} – bei einem einzigen Minijob mit einheitlicher Pauschsteuer (2 %) geht die Steuer an die Minijob-Zentrale, eine Lohnsteuer-Anmeldung beim Finanzamt fällt dafür nicht an.`);

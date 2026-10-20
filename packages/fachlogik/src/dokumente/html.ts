@@ -671,7 +671,13 @@ body.g-brief { padding-left: 5mm; padding-right: 10mm; font-size: 10pt; }
    (früher hielt .abschluss alles zusammen – eine kurze Rechnung lief dann mit 80 mm Leerraum auf zwei Seiten) */
 .g-brief .abschluss { page-break-inside: auto; break-inside: auto; }
 .g-brief .zahlung { page-break-inside: avoid; break-inside: avoid; page-break-before: avoid; break-before: avoid; }
-.g-brief .schluss { page-break-inside: avoid; break-inside: avoid; }
+/* weitere Hinweise dürfen zwischen den Absätzen umbrechen; der Gruß bleibt beim letzten Hinweis */
+.g-brief .schluss { page-break-inside: auto; break-inside: auto; }
+.g-brief .schluss p { page-break-inside: avoid; break-inside: avoid; }
+.g-brief .schluss > p.gruss { page-break-before: avoid; break-before: avoid; page-break-inside: avoid; break-inside: avoid; }
+/* Pflichthinweise unter den Summen: zusammen mit den Beträgen, nie allein auf der Folgeseite */
+.g-brief .pflichthinweise { margin-top: 3mm; page-break-before: avoid; break-before: avoid; page-break-inside: avoid; break-inside: avoid; }
+.g-brief .pflichthinweise p { margin-bottom: 1.4mm; }
 .g-brief .gruss { margin-top: 3mm; }
 .g-brief .gruss p { margin-bottom: 1.4mm; }
 

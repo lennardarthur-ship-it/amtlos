@@ -1,7 +1,7 @@
 # Katalog D.40 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.lohnsteuer_anmeldung
-version: 1
+version: 2
 katalog_nr: D.40
 titel:
   de: Lohnsteuer anmelden
@@ -24,6 +24,12 @@ ausloeser:
     op: vorhanden
     label:
       de: Du hast deinen Anmeldezeitraum angegeben.
+  # „keine“: nur Minijobs mit einheitlicher Pauschsteuer, die an die Minijob-Zentrale geht (§ 40a Abs. 2, 6 EStG)
+  - feld: profil.personal.lohnsteuer_anmeldezeitraum
+    op: '!='
+    wert: keine
+    label:
+      de: Du meldest Lohnsteuer beim Finanzamt an.
 frist:
   typ: wiederkehrend
   rhythmus:

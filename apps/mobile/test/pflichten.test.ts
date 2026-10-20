@@ -12,9 +12,13 @@ const salon: Profil = { "taetigkeit.branchen": ["beauty_kosmetik"], rechtsform: 
 const ids = (l: { id: string }[]) => l.map((p) => p.id);
 
 describe("Pflichten-Check", () => {
-  it("„Kurz klären“ fragt nur, was für den Betrieb gestellt wird – keine Investoren-Frage beim Einzelunternehmen", () => {
+  it("„Kurz klären“ fragt nur, was für den Betrieb gestellt wird – die Investoren-Frage für jede Rechtsform (AWV, Szenario Shop)", () => {
     const felder = offeneFragenNachWirkung(auswertung(salon, "2026-10-13"), salon).map((o) => o.feld);
-    expect(felder).not.toContain("gesellschafter.auslaendische_investoren");
+    expect(felder).not.toContain("gesellschaft.handelsregister");
+    // Einzelunternehmen: Frage wird gestellt, „Nein“ klärt AWV-Meldung und Investitionsprüfung
+    expect(felder).toContain("gesellschafter.auslaendische_investoren");
+    const nein = { ...salon, "gesellschafter.auslaendische_investoren": false };
+    expect(ids(auswertung(nein, "2026-10-13").unbekannt)).not.toEqual(expect.arrayContaining(["gesellschaft.awv_meldung"]));
     const gmbh = { ...salon, rechtsform: "gmbh" };
     expect(offeneFragenNachWirkung(auswertung(gmbh, "2026-10-13"), gmbh).map((o) => o.feld)).toContain("gesellschafter.auslaendische_investoren");
   });
@@ -45,7 +49,10 @@ describe("Pflichten-Check", () => {
     expect(w?.wiederkehrend).toBe(true);
     const stand = { ...LEERER_STAND, unterlagen: [{ id: "u1", vorlage: "unterweisung", daten: u.daten, erstellt: "2026-02-10", geaendert: "2026-02-10", ausgegeben: u.ausgegeben }] };
     expect(istErledigt(w!, { erledigt: {}, unterlagen: stand.unterlagen, betrieb: stand.betrieb })).toBe(false);
-    expect(ids(auswertung(salon, "2026-10-20").gilt)).not.toContain("arbeitsschutz.unterweisung_wiederholen");
+    // ohne erfasste Unterweisung gilt die Wiederholung trotzdem (Beschäftigte), nur ohne Termin (Szenario Elektro)
+    const ohne = auswertung(salon, "2026-10-20").gilt.find((p) => p.id === "arbeitsschutz.unterweisung_wiederholen");
+    expect(ohne?.naechsterTermin).toBeNull();
+    expect(ids(auswertung({ ...salon, "beschaeftigte.gesamt": 0 }, "2026-10-20").gilt)).not.toContain("arbeitsschutz.unterweisung_wiederholen");
   });
   it("stellt die Fragen aus dem Fragebogen – die Gesellschafts-Frage nur bei UG und GmbH", () => {
     for (const f of CHECK_FELDER) expect(frageZu(f), f).toBeTruthy();

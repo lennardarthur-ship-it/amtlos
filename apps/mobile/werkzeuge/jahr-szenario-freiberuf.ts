@@ -86,6 +86,8 @@ export interface Bau {
 export const PROFIL: Profil = {
   "taetigkeit.branchen": ["it_agentur_freelancer"],
   rechtsform: "einzelunternehmen",
+  // seit r9 für alle Rechtsformen gefragt (AWV-Meldung, Investitionsprüfung)
+  "gesellschafter.auslaendische_investoren": false,
   "taetigkeit.einordnung": "freiberuf",
   bundesland: "BW",
   "beschaeftigte.gesamt": 0,

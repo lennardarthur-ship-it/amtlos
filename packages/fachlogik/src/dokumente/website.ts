@@ -86,7 +86,8 @@ function dseTeile(d: Daten, b: Betrieb): { titel: string; text: string }[] {
   const rechte = teile.findIndex((t) => t.titel === DSE.betroffenenrechte?.titel);
   const vorRechten = [
     ...(text(d, "ergaenzung") ? [{ titel: "Weitere Verarbeitungen", text: text(d, "ergaenzung") }] : []),
-    { titel: "Pflicht zur Bereitstellung", text: "Sie sind weder gesetzlich noch vertraglich verpflichtet, uns personenbezogene Daten bereitzustellen. Ohne die technisch erforderlichen Daten kann die Website jedoch nicht angezeigt werden; ohne Angaben in einer Anfrage können wir diese nicht bearbeiten." },
+    // Art. 13 Abs. 2 lit. e DSGVO: bei Bestellungen und Aufträgen sind die Angaben für den Vertragsschluss erforderlich
+    { titel: "Pflicht zur Bereitstellung", text: "Soweit Sie uns personenbezogene Daten für einen Vertrag bereitstellen (z. B. bei einer Bestellung, Buchung oder einem Auftrag: Name, Anschrift, Kontaktdaten), sind diese für den Abschluss und die Erfüllung des Vertrags erforderlich; ohne sie können wir den Vertrag nicht schließen oder erfüllen. Im Übrigen sind Sie weder gesetzlich noch vertraglich verpflichtet, uns personenbezogene Daten bereitzustellen. Ohne die technisch erforderlichen Daten kann die Website jedoch nicht angezeigt werden; ohne Angaben in einer Anfrage können wir diese nicht bearbeiten." },
     { titel: "Automatisierte Entscheidungen", text: "Eine automatisierte Entscheidungsfindung einschließlich Profiling findet nicht statt." },
   ];
   teile.splice(rechte < 0 ? teile.length : rechte, 0, ...vorRechten);
@@ -180,7 +181,9 @@ function impressumTeile(d: Daten, b: Betrieb): { titel: string; text: string }[]
   const ids = [b.ust_idnr.trim() ? `Umsatzsteuer-Identifikationsnummer nach § 27a UStG: ${b.ust_idnr.trim()}` : "", text(d, "wirtschafts_id") ? `Wirtschafts-Identifikationsnummer nach § 139c AO: ${text(d, "wirtschafts_id")}` : ""].filter(Boolean);
   if (ids.length) t.push({ titel: b.ust_idnr.trim() && text(d, "wirtschafts_id") ? "Umsatzsteuer-ID und Wirtschafts-ID" : b.ust_idnr.trim() ? "Umsatzsteuer-ID" : "Wirtschafts-ID", text: ids.join("\n") });
   if (text(d, "aufsicht")) t.push({ titel: "Zuständige Aufsichtsbehörde", text: text(d, "aufsicht") });
-  if (ja(d, "reglementiert")) t.push({ titel: "Berufsrechtliche Angaben", text: [`Kammer: ${text(d, "kammer") || FEHLT}`, `Gesetzliche Berufsbezeichnung: ${text(d, "berufsbezeichnung") || FEHLT}, verliehen in ${text(d, "verleihung") || "Deutschland"}`, `Berufsrechtliche Regelungen: ${text(d, "regelungen") || FEHLT}`].join("\n") });
+  if (ja(d, "reglementiert")) t.push({ titel: "Berufsrechtliche Angaben", text: [
+    // Kammer nur, wenn der Betrieb einer angehört (§ 5 Abs. 1 Nr. 5 Buchst. a DDG) – viele reglementierte Berufe haben keine
+    ...(text(d, "kammer") ? [`Kammer: ${text(d, "kammer")}`] : []), `Gesetzliche Berufsbezeichnung: ${text(d, "berufsbezeichnung") || FEHLT}, verliehen in ${text(d, "verleihung") || "Deutschland"}`, `Berufsrechtliche Regelungen: ${text(d, "regelungen") || FEHLT}`].join("\n") });
   if (text(d, "redaktion")) t.push({ titel: "Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV", text: text(d, "redaktion") });
   const v = text(d, "vsbg");
   if (v && VSBG[v]) t.push({ titel: "Verbraucherstreitbeilegung", text: v === "bereit" ? `${VSBG.bereit}\n${text(d, "schlichtungsstelle") || FEHLT}` : VSBG[v]! });
@@ -214,7 +217,7 @@ export const impressum: Vorlage = {
       felder: [
         { id: "aufsicht", selten: true, art: "text", label: "Zuständige Aufsichtsbehörde", hilfe: "wenn deine Tätigkeit eine behördliche Zulassung braucht" },
         { id: "reglementiert", art: "schalter", label: "Reglementierter Beruf", hilfe: "z. B. zulassungspflichtiges Handwerk mit Meisterpflicht" },
-        { id: "kammer", art: "text", label: "Kammer", wenn: { feld: "reglementiert" }, vorschlaege: ["Handwerkskammer"] },
+        { id: "kammer", art: "text", label: "Kammer", hilfe: "nur, wenn du einer Kammer angehörst – sonst leer lassen", wenn: { feld: "reglementiert" }, vorschlaege: ["Handwerkskammer"] },
         { id: "berufsbezeichnung", art: "text", label: "Gesetzliche Berufsbezeichnung", wenn: { feld: "reglementiert" }, vorschlaege: ["Friseurmeister/in", "Elektrotechnikermeister/in"] },
         { id: "verleihung", art: "text", label: "Staat der Verleihung", wenn: { feld: "reglementiert" }, vorschlaege: ["Deutschland"] },
         { id: "regelungen", art: "text", label: "Berufsrechtliche Regelungen und wo sie zu finden sind", wenn: { feld: "reglementiert" }, vorschlaege: ["Handwerksordnung (HwO), abrufbar unter www.gesetze-im-internet.de"] },

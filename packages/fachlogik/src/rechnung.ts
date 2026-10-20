@@ -42,6 +42,14 @@ const EINHEIT_MEHRZAHL: Record<string, string> = {
   lieferung: "lieferungen",
   einheit: "einheiten",
   lizenz: "lizenzen",
+  behandlung: "behandlungen",
+  besuch: "besuche",
+  hausbesuch: "hausbesuche",
+  sitzung: "sitzungen",
+  termin: "termine",
+  anfahrt: "anfahrten",
+  kurs: "kurse",
+  einsatz: "einsätze",
 };
 
 /** Einheit passend zur Menge gebeugt: „1 Stunde“, aber „1,5 Stunden“, „2 Pauschalen“ – unbekannte Einheiten wie eingegeben. */
@@ -100,6 +108,8 @@ export interface KundeDaten {
 }
 export interface RechnungsDaten {
   nummer: string; rechnungsdatum: string; leistungsdatum?: string | null; faellig_am?: string | null;
+  /** Leistungszeitraum (BG-14, BT-73/74), wenn statt eines Leistungsdatums ein Zeitraum angegeben ist (§ 31 Abs. 4 UStDV) */
+  leistungszeitraum?: { von: string; bis: string } | null;
   steller: Steller; kunde: KundeDaten; positionen: Position[]; kleinunternehmer: boolean; hinweis?: string | null;
   art?: "rechnung" | "storno"; storniert_nummer?: string | null;
   /** Grund für 0 %: Steuerschuldnerschaft des Empfängers, innergemeinschaftliche Lieferung oder Steuerbefreiung (E-129) */
@@ -122,7 +132,7 @@ export function fehlendFuerERechnung(r: RechnungsDaten): string[] {
   if (!r.positionen.length) f.push("positionen");
   if (r.positionen.some((p) => !p.bezeichnung || !(p.menge > 0) || !Number.isInteger(p.preis_cent))) f.push("positionen.ungueltig");
   if (!r.kleinunternehmer && r.positionen.some((p) => p.ust_satz === null)) f.push("positionen.steuersatz");
-  if (!r.leistungsdatum) f.push("leistungsdatum");
+  if (!r.leistungsdatum && !r.leistungszeitraum) f.push("leistungsdatum");
   // 0 % ohne Kleinunternehmer: Grund nötig; Reverse Charge und innergemeinschaftliche Lieferung brauchen beide USt-IdNr. (BR-AE-02/03, BR-IC-02/03)
   if (!r.kleinunternehmer && r.positionen.some((p) => p.ust_satz === 0)) {
     const art = r.steuerart ?? "standard";

@@ -492,8 +492,8 @@ eintraege:
     scheme (Kleinunternehmerregelung) are exempt. A PDF invoice is not an e-invoice.
 - de: Die Preisangabenverordnung regelt, wie Preise gegenüber Verbrauchern anzugeben sind.
   en: The Price Indication Ordinance (Preisangabenverordnung) governs how prices must be stated to consumers.
-- de: Die Produktsicherheitsverordnung gilt seit 13.12.2024. Im Onlineshop müssen Herstellerangaben und Sicherheitsinformationen beim Angebot stehen.
-  en: The General Product Safety Regulation has applied since 13.12.2024. In an online shop, manufacturer information and safety information must be shown with the offer.
+- de: Die Produktsicherheitsverordnung gilt seit 13.12.2024. Wer Produkte im Fernabsatz anbietet (zum Beispiel im Onlineshop oder auf einem Marktplatz), nennt Herstellerangaben und Sicherheitsinformationen schon beim Angebot.
+  en: The General Product Safety Regulation has applied since 13.12.2024. Anyone offering products at a distance (for example in an online shop or on a marketplace) states manufacturer information and safety information with the offer.
 - de: Die Regeln gelten für bestimmte Fahrzeugklassen. Daten aus Fahrtenschreibern müssen ausgelesen und aufbewahrt werden.
   en: The rules apply to certain vehicle classes. Tachograph data must be downloaded and retained.
 - de: Die Registrierung ist Voraussetzung für die Meldewege bei Sicherheitsvorfällen.
@@ -599,8 +599,8 @@ eintraege:
   en: You have a permit under § 34c, § 34d or § 34f GewO.
 - de: Du hast eine Kasse außer Betrieb genommen.
   en: You have decommissioned a cash register.
-- de: Du hast eine Unterweisung durchgeführt.
-  en: You have given a safety briefing.
+- de: Du erbringst Bauleistungen für andere Unternehmen.
+  en: You provide construction work for other businesses.
 - de: Du hast eine Website.
   en: You have a website.
 - de: Du hast im Vorjahr gegründet.
@@ -629,6 +629,8 @@ eintraege:
   en: You define and document how you protect the data, for example with encryption, access rights and backups.
 - de: Du legst fest, wann welche Daten gelöscht werden – unter Beachtung der Aufbewahrungsfristen.
   en: You define when which data is deleted – taking the retention periods into account.
+- de: Du meldest Lohnsteuer beim Finanzamt an.
+  en: You file wage tax returns with the tax office.
 - de: Du meldest dem Finanzamt regelmäßig, wie viel Umsatzsteuer du eingenommen und gezahlt hast, und überweist die Differenz.
   en: You regularly report to the tax office (Finanzamt) how much VAT you have collected and paid, and transfer the difference.
 - de: Du musst Bücher nach den Regeln der doppelten Buchführung führen und einen Jahresabschluss machen.
@@ -751,8 +753,8 @@ eintraege:
   en: A service provider processes data on your behalf and according to your instructions.
 - de: Ein Gesetzentwurf liegt noch nicht vor. Amtlos beobachtet das Vorhaben und passt den Gründungsassistenten an, sobald es konkret wird.
   en: There is no draft bill yet. Amtlos is following the plan and will update the founding assistant as soon as it becomes concrete.
-- de: Ein Jahr nach jeder Unterweisung erinnert Amtlos an die Wiederholung. Mit der neuen Unterweisung ist die alte erledigt.
-  en: One year after each safety briefing, Amtlos reminds you to repeat it. The new safety briefing completes the old one.
+- de: Ein Jahr nach jeder Unterweisung erinnert Amtlos an die Wiederholung. Mit der neuen Unterweisung ist die alte erledigt. Hast du deine letzte Unterweisung noch nicht in Amtlos erfasst, erfasse sie – dann kennt Amtlos den nächsten Termin.
+  en: One year after each safety briefing, Amtlos reminds you to repeat it. The new safety briefing completes the old one. If you have not yet recorded your last safety briefing in Amtlos, record it – then Amtlos knows the next date.
 - de: Ein Prozentsatz, den jede Gemeinde selbst festlegt und der die Höhe der Gewerbesteuer bestimmt.
   en: A percentage that each municipality sets itself and that determines the amount of trade tax.
 - de: Ein Vorgang, bei dem du Daten über Menschen nutzt, z. B. Kundenverwaltung oder Lohnabrechnung.
@@ -871,8 +873,8 @@ eintraege:
   en: There are funding programmes for startups such as EXIST, INVEST, KfW programmes and programmes of the federal states.
 - de: Für Tätigkeiten mit Feuchtarbeit oder hautbelastenden Stoffen legst du in einem Hautschutzplan Schutz, Reinigung und Pflege fest.
   en: For work involving wet work or substances that stress the skin, you set out protection, cleaning and care in a skin protection plan.
-- de: Für Verbraucherprodukte brauchst du eine verantwortliche Person in der EU, Herstellerangaben und Sicherheitsinformationen – auch im Onlineshop.
-  en: For consumer products, you need a responsible person in the EU, manufacturer information and safety information – in your online shop too.
+- de: Für Verbraucherprodukte brauchst du eine verantwortliche Person in der EU, Herstellerangaben und Sicherheitsinformationen.
+  en: For consumer products, you need a responsible person in the EU, manufacturer information and safety information.
 - de: Für bestimmte Produkte (z. B. Computer, Smartphones, E-Book-Reader) gelten Barrierefreiheitsanforderungen – die Kleinstunternehmen-Ausnahme gilt dafür nicht verlässlich.
   en: Accessibility requirements apply to certain products (e.g. computers, smartphones, e-book readers) – the micro-enterprise exemption does not reliably apply to them.
 - de: Für bestimmte erlaubnispflichtige Tätigkeiten gilt eine regelmäßige Weiterbildungspflicht – nur wo sie noch gilt.

@@ -1,16 +1,15 @@
 # Katalog G.73 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: produkte.gpsr
-version: 2
+version: 3
 katalog_nr: G.73
 titel:
   de: 'Produktsicherheit (GPSR): Angaben und verantwortliche Person'
 kurz:
-  de: Für Verbraucherprodukte brauchst du eine verantwortliche Person in der EU, Herstellerangaben und Sicherheitsinformationen
-    – auch im Onlineshop.
+  de: Für Verbraucherprodukte brauchst du eine verantwortliche Person in der EU, Herstellerangaben und Sicherheitsinformationen.
 erklaerung:
-  de: Die Produktsicherheitsverordnung gilt seit 13.12.2024. Im Onlineshop müssen Herstellerangaben und Sicherheitsinformationen
-    beim Angebot stehen.
+  de: Die Produktsicherheitsverordnung gilt seit 13.12.2024. Wer Produkte im Fernabsatz anbietet (zum Beispiel im Onlineshop
+    oder auf einem Marktplatz), nennt Herstellerangaben und Sicherheitsinformationen schon beim Angebot.
 rechtsgrundlage:
 - Verordnung (EU) 2023/988 (GPSR)
 kategorie: produkte

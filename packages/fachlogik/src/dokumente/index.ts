@@ -18,7 +18,7 @@ export { HAUSFARBEN, PRUEFHINWEIS, RAENDER, akzent, fussSpalten, type Gestalt } 
 export { BUNDESLAENDER, aufsichtFuer, berlinZuUtc } from "./datenschutz.js";
 export { mindestlohnAm, mindesturlaub, stundenlohn } from "./personal.js";
 export { bausteinText } from "./website.js";
-export { EUER_KAPITALGESELLSCHAFT, RECHNUNG_NEGATIV, RECHNUNG_NULL, RECHNUNG_PLZ_FEHLT, VERSTEUERUNG, aufbewahrenBis, eRechnungAus, rechnungsTitel } from "./buchhaltung.js";
+export { EUER_KAPITALGESELLSCHAFT, GUTSCHRIFT_AUSWAHL, RECHNUNG_NEGATIV, RECHNUNG_NULL, RECHNUNG_PLZ_FEHLT, VERSTEUERUNG, VORSTEUER_AUFTEILEN, aufbewahrenBis, eRechnungAus, faelligAm, kennzahlBefreiung, leistungszeitraumAus, rechnungsTitel } from "./buchhaltung.js";
 export { istKapitalgesellschaft, mitVertretung } from "./betrieb.js";
 export { STEUERKLASSEN, arbeitsminuten } from "./lohn.js";
 export { ANLAESSE, KURZ, PERSONEN_FELDER, kurztitel, kurztitelListe, naechsteNummer, personAus, personIn, personMerken, type Anlass } from "./ablauf.js";
@@ -182,9 +182,20 @@ export function fehlendeAngaben(v: Vorlage, d: Daten, b?: Betrieb): string[] {
   return fehlt;
 }
 
+/** Text auf höchstens `max` Zeichen, am Wortende gekürzt mit „…“ (ein einzelnes zu langes Wort hart). */
+function kuerzen(t: string, max: number): string {
+  if (t.length <= max) return t;
+  const schnitt = t.slice(0, max);
+  const leer = schnitt.lastIndexOf(" ");
+  return `${(leer >= max / 2 ? schnitt.slice(0, leer) : schnitt).replace(/[\s,;:–-]+$/, "")}…`;
+}
+
 /** Name einer Unterlage in der Übersicht, z. B. „Gefährdungsbeurteilung · Küche“. */
 export function unterlagenName(v: Vorlage, d: Daten): string {
-  const zusatz = v.namensFeld && typeof d[v.namensFeld] === "string" ? (d[v.namensFeld] as string).trim().split("\n")[0]!.slice(0, 40) : "";
+  const roh = v.namensFeld && typeof d[v.namensFeld] === "string" ? (d[v.namensFeld] as string).trim().split("\n")[0]! : "";
+  // Datum deutsch (TT.MM.JJJJ); lange Namen am Wortende kürzen („…“) statt mitten im Wort
+  const iso = /^(\d{4})-(\d{2})-(\d{2})$/.exec(roh);
+  const zusatz = iso ? `${iso[3]}.${iso[2]}.${iso[1]}` : kuerzen(roh, 40);
   const titel = v.titelFuer?.(d) ?? v.titel;
   return zusatz ? `${titel} · ${zusatz}` : titel;
 }
@@ -226,7 +237,8 @@ export function ohneVerdeckte(v: Vorlage, d: Daten): Daten {
 export function dokumentHtml(v: Vorlage, d: Daten, b: Betrieb): string {
   // Kundendokumente und Aushänge für Gäste: ohne Rechtsgrundlage und Bereich – das ist für die eigenen Unterlagen
   const fuerAndere = v.kundendokument || v.ohneKopfangaben;
-  const grundlage = v.grundlage && !fuerAndere ? `<div><dt>Rechtsgrundlage</dt><dd>${festeLeerzeichen(esc(v.grundlage))}</dd></div>` : "";
+  const rg = v.grundlageFuer?.(d, b) || v.grundlage;
+  const grundlage = rg && !fuerAndere ? `<div><dt>Rechtsgrundlage</dt><dd>${festeLeerzeichen(esc(rg))}</dd></div>` : "";
   // Aushänge: ohne Bereich der App (z. B. „Beauty und Kosmetik“ auf dem Hygieneplan eines Cafés) – er sagt dem Leser
   // an der Wand nichts und passt nicht immer zur Branche
   const art = fuerAndere || v.gestalt === "aushang" ? "" : (BEREICHE.find((x) => x.id === v.bereich)?.titel ?? "");

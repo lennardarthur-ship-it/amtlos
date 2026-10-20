@@ -179,6 +179,7 @@ export const unterweisung: Vorlage = {
         { id: "datum", art: "datum", label: "Datum", vorbelegung: "heute", pflicht: true },
         { id: "dauer", art: "text", label: "Dauer", vorschlaege: ["30 Minuten", "45 Minuten", "60 Minuten", "90 Minuten"] },
         { id: "durchgefuehrt_von", art: "text", label: "Durchgeführt von", vorbelegung: "verantwortlich", pflicht: true },
+        { id: "jugendliche", selten: true, art: "schalter", label: "Mit Jugendlichen unter 18 Jahren", hilfe: "Dann ist die Unterweisung mindestens halbjährlich zu wiederholen (§ 29 Abs. 2 JArbSchG)" },
       ],
     },
     {
@@ -196,7 +197,9 @@ export const unterweisung: Vorlage = {
   ],
   html(d, b) {
     const themen = auswahl(d, "themen").map((w) => UNTERWEISUNGSTHEMEN.find((t) => t.wert === w)?.text ?? w);
-    const naechste = plusMonate(text(d, "datum"), 12);
+    // Jugendliche: mindestens halbjährlich (§ 29 Abs. 2 JArbSchG), sonst mindestens jährlich (§ 4 Abs. 1 DGUV Vorschrift 1)
+    const jugendliche = ja(d, "jugendliche");
+    const naechste = plusMonate(text(d, "datum"), jugendliche ? 6 : 12);
     return dokument({
       titel: "Unterweisungsnachweis",
       betrieb: b,
@@ -213,7 +216,7 @@ export const unterweisung: Vorlage = {
         // der Hinweis zur Wiederholung steht als Fußnote nach den Unterschriften: so bleibt die letzte Teilnahmezeile mit
         // den Unterschriften zusammen (Schlussblock), statt dass eine Folgeseite nur Hinweis und Unterschriften trägt
         unterschriften(["Ort, Datum", "Unterschrift der unterweisenden Person"]) +
-        nachsatz(`Die Unterweisung ist mindestens einmal jährlich zu wiederholen (§ 4 Abs. 1 DGUV Vorschrift 1)${naechste ? `, nächster Termin spätestens am ${naechste}` : ""}.`),
+        nachsatz(`${jugendliche ? "Die Unterweisung Jugendlicher ist mindestens halbjährlich zu wiederholen (§ 29 Abs. 2 JArbSchG)" : "Die Unterweisung ist mindestens einmal jährlich zu wiederholen (§ 4 Abs. 1 DGUV Vorschrift 1)"}${naechste ? `, nächster Termin spätestens am ${naechste}` : ""}.`),
     });
   },
 };

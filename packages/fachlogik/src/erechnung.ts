@@ -41,6 +41,8 @@ export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record
     "cbc:DocumentCurrencyCode": "EUR",
     // BT-10 ist in der XRechnung Pflicht; ohne Käuferreferenz verwenden wir die Rechnungsnummer (Prüfpunkt T-07)
     "cbc:BuyerReference": r.kunde.kaeufer_referenz || r.nummer,
+    // Leistungszeitraum statt Leistungsdatum (BG-14: BT-73 Beginn, BT-74 Ende)
+    ...(!r.leistungsdatum && r.leistungszeitraum ? { "cac:InvoicePeriod": { "cbc:StartDate": r.leistungszeitraum.von, "cbc:EndDate": r.leistungszeitraum.bis } } : {}),
     ...(r.art === "storno" && r.storniert_nummer ? { "cac:BillingReference": [{ "cac:InvoiceDocumentReference": { "cbc:ID": r.storniert_nummer } }] } : {}),
     "cac:AccountingSupplierParty": {
       "cac:Party": {
@@ -135,5 +137,9 @@ export function xrechnungUbl(r: RechnungsDaten, kuHinweis: string): string {
 const CODE_JE_TEXT: Record<string, string> = {
   stück: "C62", stueck: "C62", stunde: "HUR", minute: "MIN", tag: "DAY", woche: "WEE", monat: "MON", pauschale: "LS", pauschal: "LS",
   kilogramm: "KGM", gramm: "GRM", liter: "LTR", meter: "MTR", quadratmeter: "MTK", kubikmeter: "MTQ", kilometer: "KMT", kilowattstunde: "KWH",
+  // Mehrzahl (die Rechnung beugt die Einheit nach der Menge) und gängige Kurzformen
+  stunden: "HUR", minuten: "MIN", tage: "DAY", wochen: "WEE", monate: "MON", pauschalen: "LS", kilowattstunden: "KWH",
+  stk: "C62", "stk.": "C62", std: "HUR", "std.": "HUR", h: "HUR", min: "MIN", "min.": "MIN", kg: "KGM", g: "GRM", l: "LTR", m: "MTR",
+  "m²": "MTK", m2: "MTK", qm: "MTK", "m³": "MTQ", m3: "MTQ", km: "KMT", kwh: "KWH", "lfm": "MTR", "lfd. m": "MTR",
 };
 export const einheitCode = (text: string) => CODE_JE_TEXT[text.trim().toLowerCase()] ?? "C62";

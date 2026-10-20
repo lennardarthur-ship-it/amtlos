@@ -92,7 +92,7 @@ describe("Voranmeldung und EÜR aus Belegen (E-133)", () => {
     const e = euerUebernahme(s, "2026");
     expect(e.einnahmen).toEqual([
       { datum: "", text: "Umsätze aus Rechnungen (netto)", kategorie: "Umsatzsteuerpflichtige Betriebseinnahmen", betrag: "100,00" },
-      { datum: "", text: "Steuerfreie Umsätze aus Rechnungen (z. B. innergemeinschaftliche Lieferung)", kategorie: EUER_ZEILE_STEUERFREI, betrag: "840,00" },
+      { datum: "", text: "Steuerfreie und nicht steuerbare Umsätze aus Rechnungen", kategorie: EUER_ZEILE_STEUERFREI, betrag: "840,00" },
       { datum: "", text: "Vereinnahmte Umsatzsteuer", kategorie: "Vereinnahmte Umsatzsteuer sowie Umsatzsteuer auf unentgeltliche Wertabgaben", betrag: "19,00" },
     ]);
     // dieselben Zeilentexte wie in den Vorschlägen der Vorlage „EÜR“
