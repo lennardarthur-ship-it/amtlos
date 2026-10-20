@@ -90,6 +90,9 @@ export const PERSONEN_FELDER: Record<PersonenArt, EinfachesFeld[]> = {
     { id: "anschrift", art: "mehrzeilig", label: "Anschrift" },
     { id: "email", art: "text", label: "E-Mail", hilfe: "für die E-Rechnung" },
     { id: "ust_idnr", art: "text", label: "USt-IdNr.", hilfe: "nur bei Unternehmen im EU-Ausland oder Steuerschuldnerschaft", selten: true },
+    // R10: Behörden brauchen die Leitweg-ID in der E-Rechnung (BT-10); Steuernummer für Gutschriften an Leistende
+    { id: "leitweg_id", art: "text", label: "Leitweg-ID bzw. Käuferreferenz", hilfe: "bei Behörden und Kommunen Pflicht für die E-Rechnung", selten: true },
+    { id: "steuernummer", art: "text", label: "Steuernummer", hilfe: "nur, wenn du für diesen Partner Gutschriften ausstellst", selten: true },
   ],
 };
 

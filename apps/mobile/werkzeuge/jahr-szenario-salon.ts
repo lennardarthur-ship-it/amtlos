@@ -628,7 +628,7 @@ export function standBauen(): Bau {
 
   // ---------------------------------------------------------------- Pflichten-Check der App für diesen Betrieb
   const stichtag = "2026-01-15";
-  const a = auswertung(s.profil, stichtag, s.unterlagen.filter((u) => (u.ausgegeben ?? "") < "2026-01-16"));
+  const a = auswertung(s.profil, stichtag, s.unterlagen.filter((u) => (u.ausgegeben ?? "") < "2026-01-16"), s.mitarbeiter);
   const zeile = (p: PflichtInfo): PflichtZeile => ({ id: p.id, titel: p.titel, vorlage: p.vorlage, erzeugt: !!p.vorlage && genutzt.has(p.vorlage), termin: p.naechsterTermin, termine: p.termine.length, grund: p.grund });
   const pflichten = { stichtag, gilt: a.gilt.map(zeile), gruendung: a.gruendung.map(zeile), unbekannt: a.unbekannt.map((p) => ({ titel: p.titel, fragen: p.offeneFragen })) };
   const istDa = (id: string) => (a.gilt.some((p) => p.id === id) ? "gilt" : a.gruendung.some((p) => p.id === id) ? "gilt (Gründung)" : a.unbekannt.some((p) => p.id === id) ? "unklar" : "fehlt");

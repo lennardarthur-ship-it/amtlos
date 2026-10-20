@@ -204,7 +204,8 @@ function paketNeuerungen(name, zr, inhalt, erg, kleinunternehmer, belegeRoh) {
   const extf = csvLesen(inhalt[`EXTF_Buchungsstapel_${zr.name}.csv`], "latin1");
   const ez = extf.slice(2);
   const belegfelder = new Set(ez.map((z) => z[10]));
-  const fehlend = be.zeilen.map((z) => be.w(z, "Belegfeld 1 (DATEV)")).filter((b) => !belegfelder.has(b));
+  // R10: Belege, die nicht in den Stapel gehören (Personal, Auslagen einer GmbH), sind in der Belegliste markiert
+  const fehlend = be.zeilen.filter((z) => !/^nein/.test(be.w(z, "Im Buchungsstapel") ?? "")).map((z) => be.w(z, "Belegfeld 1 (DATEV)")).filter((b) => !belegfelder.has(b));
   vergleich(bereich, "DATEV: Belegfeld 1 der Belegbuchungen = Spalte „Belegfeld 1 (DATEV)“ der Belegliste", fehlend.length ? fehlend.join(", ") : "alle gefunden", "alle gefunden");
   const gi = extf[1].indexOf("Buchungs GUID");
   const guids = ez.map((z) => z[gi]);
@@ -218,8 +219,9 @@ function paketNeuerungen(name, zr, inhalt, erg, kleinunternehmer, belegeRoh) {
   const liesmich = Buffer.from(inhalt["LIESMICH.txt"]).toString("utf8");
   vergleich(bereich, "LIESMICH: Mandant-Block und „Nicht enthalten – bitte zusätzlich liefern“", /Mandant \(Angaben aus der App\)/.test(liesmich) && /Nicht enthalten – bitte zusätzlich liefern/.test(liesmich) && /Kassenumsätze/.test(liesmich) && /Lohnjournal/.test(liesmich) ? "ja" : "nein", "ja");
   // Kasse laut Pflichten-Check (ja): Hinweis auf fehlende Kassenumsätze ganz oben im LIESMICH und in den Fragen
-  vergleich(bereich, "LIESMICH: „Betrieb mit Kasse: Kassenumsätze fehlen in diesem Paket.“ in der ersten Zeile", /^Betrieb mit Kasse: Kassenumsätze fehlen in diesem Paket\./.test(liesmich) ? "ja" : "nein", "ja");
-  vergleich(bereich, "Fragen: Kassenhinweis", /Betrieb mit Kasse: Kassenumsätze fehlen in diesem Paket\./.test(fragen) ? "ja" : "nein", "ja");
+  // R10: der Kassenhinweis steht einmal an fester Stelle (LIESMICH, Abschnitt „Wichtig“), nicht mehr vor dem Kopf und in den Fragen
+  vergleich(bereich, "LIESMICH: „Betrieb mit Kasse: Kassenumsätze fehlen in diesem Paket.“ einmal unter „Wichtig“", /\r\nWichtig\r\n- Betrieb mit Kasse: Kassenumsätze fehlen in diesem Paket\./.test(liesmich) && liesmich.split("Kassenumsätze").length === 2 ? "ja" : "nein", "ja");
+  vergleich(bereich, "Fragen: Kassenhinweis nicht doppelt", /Betrieb mit Kasse: Kassenumsätze fehlen in diesem Paket\./.test(fragen) ? "ja" : "nein", "nein");
   vergleich(bereich, "LIESMICH: Kleinunternehmer ja/nein", (/Kleinunternehmer \(§ 19 UStG\): (ja|nein)/.exec(liesmich) ?? [])[1] ?? "fehlt", kleinunternehmer ? "ja" : "nein");
   const jahr = /^\d{4}$/.test(zr.name);
   vergleich(bereich, "LIESMICH: Satz „Nicht zusätzlich zu den Monats-/Quartalsstapeln importieren“ genau im Jahrespaket", /Nicht zusätzlich zu den Monats-\/Quartalsstapeln importieren/.test(liesmich) ? "ja" : "nein", jahr ? "ja" : "nein");
@@ -259,7 +261,7 @@ function paketPruefen(name, zr, erg, ordner) {
   vergleich(`Paket ${name}`, "E-Rechnungen im Paket", Object.keys(inhalt).filter((p) => p.startsWith("E-Rechnungen/")).length, vg.length - ohneXml);
   const extf = csvLesen(inhalt[`EXTF_Buchungsstapel_${zr.name}.csv`], "latin1");
   const zeilen = extf.slice(2);
-  const erwBuchungen = summe(vg.map((x) => Object.values(x.s.gruppen).filter((g) => g.netto + g.ust !== 0).length)) + summe(bl.map((b) => b.saetze.filter((x) => x.betrag).length));
+  const erwBuchungen = summe(vg.map((x) => Object.values(x.s.gruppen).filter((g) => g.netto + g.ust !== 0).length)) + summe(bl.filter((b) => b.kategorie !== "personal" && b.zahlung !== "privat").map((b) => b.saetze.filter((x) => x.betrag).length)); // R10: Personal und GmbH-Auslagen nicht im Stapel
   vergleich(`Paket ${name}`, "DATEV: Anzahl Buchungen", zeilen.length, erwBuchungen);
   vergleich(`Paket ${name}`, "DATEV: Spalten je Zeile = Spalten im Kopf", zeilen.every((z) => z.length === extf[1].length) ? "ja" : "nein", "ja");
   const kontoSumme = (konto) => summe(zeilen.filter((z) => z[7] === konto).map((z) => (z[1] === "H" ? -1 : 1) * centAus(z[0])));
@@ -273,7 +275,7 @@ function paketPruefen(name, zr, erg, ordner) {
   vergleich(`Paket ${name}`, "LIESMICH: erklärt die Zuordnung bei Ist-Versteuerung (Zahlungseingang statt Leistungsdatum)", /Ist-Versteuerung|vereinnahmte|nach (dem )?Zahlungseingang/.test(liesmich) ? "ja" : "nein", "ja");
   const neu = paketNeuerungen(name, zr, inhalt, erg, false, bl);
   vergleich(`Paket ${name}`, "LIESMICH: Mandant mit Rechtsform GmbH und Versteuerung Ist", /- Rechtsform: GmbH\r\n/.test(liesmich) && /- Versteuerung: Ist /.test(liesmich) ? "ja" : "nein", "ja");
-  if (bl.some((b) => b.zahlung === "privat")) vergleich(`Paket ${name}`, "Fragen: privat bezahlter Beleg der GmbH aufgeführt", /Privat bezahlte Belege/.test(neu.fragen) ? "ja" : "nein", "ja");
+  if (bl.some((b) => b.zahlung === "privat")) vergleich(`Paket ${name}`, "Fragen: privat bezahlter Beleg der GmbH aufgeführt", /Privat (bezahlte|ausgelegte) Belege/.test(neu.fragen) ? "ja" : "nein", "ja");
   return { anzahl: Object.keys(inhalt).length, buchungen: zeilen.length, fragen: erg.fragen };
 }
 const pMonat = paketPruefen("Juni 2026", { von: "2026-06-01", bis: "2026-06-30", name: "2026-06" }, pk.monat, "steuerpaket-2026-06");

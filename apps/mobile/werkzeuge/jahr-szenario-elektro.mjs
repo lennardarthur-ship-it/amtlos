@@ -253,7 +253,7 @@ function paketPruefen(name, zr, erg, ordner) {
   anzahl(bereich, "E-Rechnungen im Paket (alle Rechnungen an Unternehmen mit E-Mail)", Object.keys(inhalt).filter((p) => p.startsWith("E-Rechnungen/")).length, vg.length - ohneXml, mitZeitraum.length ? `Ohne XRechnung, weil die Leistung als Zeitraum bzw. Text eingetragen ist („Leistungsdatum als Datum (TT.MM.JJJJ)“): ${mitZeitraum.join(", ")} – darunter alle § 13b-Rechnungen an den Generalunternehmer.` : "");
   const extf = csvLesen(inhalt[`EXTF_Buchungsstapel_${zr.name}.csv`], "latin1");
   const zeilen = extf.slice(2);
-  const erwBuchungen = summe(vg.map((x) => Object.values(x.s.gruppen).filter((g) => g.netto + g.ust !== 0).length)) + summe(bl.map((b) => b.saetze.filter((x) => x.betrag).length));
+  const erwBuchungen = summe(vg.map((x) => Object.values(x.s.gruppen).filter((g) => g.netto + g.ust !== 0).length)) + summe(bl.filter((b) => b.kategorie !== "personal").map((b) => b.saetze.filter((x) => x.betrag).length)); // R10: Personal nicht im Stapel
   anzahl(bereich, "DATEV: Anzahl Buchungen", zeilen.length, erwBuchungen);
   vergleich(bereich, "DATEV: Spalten je Zeile = Spalten im Kopf", zeilen.every((z) => z.length === extf[1].length) ? "ja" : "nein", "ja");
   vergleich(bereich, "DATEV: Kopf Beraternummer/Mandant", `${extf[0][10]}/${extf[0][11]}`, "41522/30318");

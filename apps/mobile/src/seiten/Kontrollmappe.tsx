@@ -3,11 +3,14 @@ import { Platform, Pressable, View } from "react-native";
 import { BEREICHE, dokumentHtml, pdfDateiname, vorlageFuer } from "@amtlos/fachlogik";
 import { betriebFuerDokument } from "../pro/regeln";
 import { T as TEXT } from "../texte";
-import { Fuss, Hinweis, Karte, Knopf, Symbol, T } from "../ui/bausteine";
+import { ChipLeiste, Fuss, Hinweis, Karte, Knopf, Symbol, T, Zeile } from "../ui/bausteine";
 import { useMeldung, useMeldungLeeren } from "../ui/meldung";
 import { Unterseite } from "../ui/navigation";
 import { HAARLINIE, useFarben, weich } from "../ui/thema";
-import { datumDe, deckblattHtml, mappeDateiname, mappeZusammenfuegen, mappenAuswahl, seitenzahl, startSeiten, type MappenEintrag } from "../unterlagen/kontrollmappe";
+import { KONTROLLARTEN, datumDe, deckblattHtml, fehltInMappe, fuerKontrolle, mappeDateiname, mappeZusammenfuegen, mappenAuswahl, seitenzahl, startSeiten, type Kontrollart, type MappenEintrag } from "../unterlagen/kontrollmappe";
+import { istErledigt } from "../pflichten/check";
+import { useAuswertung } from "./Pflichten";
+import { useStarten } from "./starten";
 import { pdfBytes } from "../unterlagen/pdf";
 import { dateiTeilenBytes } from "../unterlagen/sicherungDatei";
 import { heute } from "../unterlagen/speicher";
@@ -52,7 +55,17 @@ export function KontrollmappeSeite() {
   const melden = useMeldung();
   const leeren = useMeldungLeeren();
   useEffect(() => leeren(), [leeren]);
-  const { eintraege, unvollstaendig } = useMemo(() => mappenAuswahl(z.stand), [z.stand]);
+  const { eintraege: alleEintraege, unvollstaendig } = useMemo(() => mappenAuswahl(z.stand), [z.stand]);
+  // Kontrollart (R10): nur, was die jeweilige Stelle prüft
+  const [art, setArt] = useState<Kontrollart>("alle");
+  const eintraege = useMemo(() => alleEintraege.filter((e) => fuerKontrolle(e.vorlage, art)), [alleEintraege, art]);
+  // „Fehlt noch“: offene Pflichten aus dem Check mit einer Vorlage, die in diese Mappe gehört
+  const a = useAuswertung();
+  const starten = useStarten();
+  const fehlt = useMemo(() => {
+    const e = { erledigt: z.stand.erledigt, unterlagen: z.stand.unterlagen, betrieb: z.stand.betrieb };
+    return fehltInMappe(a.gilt.filter((p) => !istErledigt(p, e)), eintraege, art).slice(0, 8);
+  }, [a, z.stand.erledigt, z.stand.unterlagen, z.stand.betrieb, eintraege, art]);
   const [ab, setAb] = useState<Set<string>>(() => new Set());
   const [laedt, setLaedt] = useState(false);
   const [fehler, setFehler] = useState<string | null>(null);
@@ -92,7 +105,7 @@ export function KontrollmappeSeite() {
       let deck: Uint8Array | null = null;
       for (let i = 0; i < 2; i++) {
         const start = startSeiten(deckSeiten, seiten);
-        deck = await pdfBytes(deckblattHtml(z.stand.betrieb.name, tag, drin.map((e, j) => ({ ...e, seite: start[j] }))), "Kontrollmappe-Deckblatt.pdf");
+        deck = await pdfBytes(deckblattHtml(z.stand.betrieb.name, tag, drin.map((e, j) => ({ ...e, seite: start[j] })), art === "alle" ? undefined : TEXT.kontrollmappe_arten[art]), "Kontrollmappe-Deckblatt.pdf");
         if (!deck) throw new Error("pdf");
         const n = await seitenzahl(deck);
         if (n === deckSeiten) break;
@@ -111,9 +124,20 @@ export function KontrollmappeSeite() {
   return (
     <Unterseite titel={TEXT.kontrollmappe_titel} unter={TEXT.kontrollmappe_text}>
       <Inhalt>
+        <ChipLeiste label={TEXT.kontrollmappe_art_label} wert={art} aendern={setArt} optionen={KONTROLLARTEN.map((k) => ({ wert: k, text: TEXT.kontrollmappe_arten[k]! }))} stil={{ marginTop: 0 }} />
+        <T v="caption" leise stil={{ marginTop: 8 }}>{TEXT.kontrollmappe_art_hilfe[art]}</T>
+        {fehlt.length ? (
+          <Gruppe titel={TEXT.kontrollmappe_fehlt_titel} hilfe={TEXT.kontrollmappe_fehlt_hilfe}>
+            <Karte>
+              {fehlt.map((x, i) => (
+                <Zeile key={x.id} symbol="plus.circle" ton="bald" titel={x.titel} text={vorlageFuer(x.vorlage)?.titel} onPress={() => starten(x.vorlage)} letzte={i === fehlt.length - 1} />
+              ))}
+            </Karte>
+          </Gruppe>
+        ) : null}
         {eintraege.length ? (
           gruppen.map((g, gi) => (
-            <Gruppe key={g.id} erste={gi === 0} titel={g.titel} hilfe={gi === 0 ? TEXT.kontrollmappe_gruppe_hilfe : undefined}>
+            <Gruppe key={g.id} titel={g.titel} hilfe={gi === 0 ? TEXT.kontrollmappe_gruppe_hilfe : undefined}>
               <Karte>
                 {g.liste.map((e, i) => (
                   <MappenZeile key={e.id} e={e} an={!ab.has(e.id)} umschalten={() => umschalten(e.id)} letzte={i === g.liste.length - 1} />
@@ -122,7 +146,9 @@ export function KontrollmappeSeite() {
             </Gruppe>
           ))
         ) : (
-          <Hinweis text={TEXT.kontrollmappe_leer} />
+          <View style={{ marginTop: 16 }}>
+            <Hinweis text={alleEintraege.length ? TEXT.kontrollmappe_art_leer : TEXT.kontrollmappe_leer} />
+          </View>
         )}
         <View style={{ marginTop: 14 }}>
           {unvollstaendig ? <Hinweis text={TEXT.kontrollmappe_unvollstaendig(unvollstaendig)} /> : null}

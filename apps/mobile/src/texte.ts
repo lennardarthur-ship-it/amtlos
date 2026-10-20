@@ -771,7 +771,6 @@ export const T = {
   kontrollmappe_fehlt_titel: "Fehlt noch für eine Kontrolle",
   kontrollmappe_fehlt_hilfe: "Offene Pflichten aus deinem Pflichten-Check, für die es eine Vorlage gibt. Tippe, um die Unterlage zu erstellen.",
   kontrollmappe_art_leer: "Für diese Kontrolle ist noch keine fertige Unterlage da.",
-  pruefstand_fuss: "Inhalte noch nicht von Fachleuten geprüft",
   verantwortlich_titel: "Verantwortlich",
   datenschutz_entwurf: "Entwurf – dieser Hinweis ist fachlich noch nicht freigegeben.",
   // R10 Steuer
@@ -781,6 +780,7 @@ export const T = {
   beleg_steuerschuld_betrag: (steuer: string) => `Selbst anzumeldende Umsatzsteuer: ${steuer}`,
   beleg_kaeufer_fremd: "Diese E-Rechnung ist an einen anderen Käufer gerichtet – Vorsteuer ausgeschaltet. Siehe Notiz.",
   ust_13b_belege: (n: number) => `${n} ${n === 1 ? "Beleg" : "Belege"} mit Steuerschuldnerschaft (§ 13b) übernommen – Kz 46/47 bzw. 84/85, Vorsteuer Kz 67.`,
+  ust_ku_13b: "Als Kleinunternehmer gibst du eine Voranmeldung nur für die Steuer nach § 13b ab – übernommen sind nur die Belege mit Steuerschuldnerschaft (ohne Vorsteuerabzug).",
   ust_dfv: "Mit Dauerfristverlängerung (laut Pflichten-Check) gibst du die Voranmeldung einen Monat später ab.",
   ust_sondervorauszahlung: "Letzte Voranmeldung des Jahres: Die Sondervorauszahlung (Kz 39) bitte selbst eintragen.",
   // R10 Pflichten

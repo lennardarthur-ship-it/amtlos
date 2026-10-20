@@ -12,8 +12,16 @@ export interface DatumGelesen {
   unplausibel: boolean;
 }
 
-export function datumLesen(text: string): DatumGelesen {
-  const de = /^\s*(\d{1,2})[./-](\d{1,2})[./-](\d{4}|\d{2})\s*$/.exec(text);
+export function datumLesen(text: string, o: { jahrReicht?: boolean } = {}): DatumGelesen {
+  // nur das Jahr („2014“), wo der Tag nicht zählt (z. B. „läuft seit“): 1. Januar des Jahres (R10)
+  const jahr = o.jahrReicht ? /^\s*(\d{4})\s*$/.exec(text) : null;
+  if (jahr) {
+    const j = Number(jahr[1]);
+    return { iso: `${jahr[1]}-01-01`, fehler: null, unplausibel: j < 2000 || j > 2099 };
+  }
+  // Ziffern ohne Punkte (R10): „01042014“ bzw. „010414“ – wie auf dem Ziffernblock getippt
+  const ziffern = /^\s*(\d{2})(\d{2})(\d{4}|\d{2})\s*$/.exec(text);
+  const de = /^\s*(\d{1,2})[./-](\d{1,2})[./-](\d{4}|\d{2})\s*$/.exec(text) ?? ziffern;
   const iso = /^\s*(\d{4})-(\d{2})-(\d{2})\s*$/.exec(text);
   if (!de && !iso) return { iso: null, fehler: "format", unplausibel: false };
   const t = Number(de ? de[1] : iso![3]);
@@ -29,3 +37,27 @@ export function datumLesen(text: string): DatumGelesen {
 
 /** ISO-Datum aus der Eingabe oder null. */
 export const isoAus = (text: string): string | null => datumLesen(text).iso;
+
+/** Nur ein Jahr eingetippt („2014“) – dann fragt das Feld nach dem ganzen Datum. */
+export const nurJahr = (text: string) => /^\s*\d{4}\s*$/.test(text);
+
+/**
+ * Uhrzeit lesen (R10): „14:00“, „9:30“, auch „14.00“, „14,00“ und Ziffern ohne Trennzeichen („1400“, „930“) – liefert
+ * „HH:MM“ oder null.
+ */
+export function uhrzeitLesen(text: string): string | null {
+  const t = text.trim();
+  const m = /^(\d{1,2})[:.,h](\d{2})$/.exec(t) ?? /^(\d{1,2})(\d{2})$/.exec(t) ?? (/^\d{1,2}$/.test(t) ? [t, t, "00"] : null);
+  if (!m) return null;
+  const h = Number(m[1]);
+  const min = Number(m[2]);
+  if (h > 23 || min > 59) return null;
+  return `${String(h).padStart(2, "0")}:${String(min).padStart(2, "0")}`;
+}
+
+/** Ist eine Person am Stichtag noch keine 18 (Geburtsdatum ISO, z. B. aus „Mitarbeiter“)? */
+export function minderjaehrig(geburtsdatum: unknown, stichtag: string): boolean {
+  if (typeof geburtsdatum !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(geburtsdatum)) return false;
+  const volljaehrig = `${Number(geburtsdatum.slice(0, 4)) + 18}${geburtsdatum.slice(4)}`;
+  return stichtag < volljaehrig;
+}

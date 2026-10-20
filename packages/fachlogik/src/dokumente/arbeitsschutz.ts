@@ -5,7 +5,7 @@
 import { BA_BAUSTEINE, ELEKTRO_FRISTEN, GEFAEHRDUNGEN, GEFAHRSTOFF_ANGABEN, MUTTERSCHUTZ, UNTERWEISUNGSTHEMEN } from "./bausteine.js";
 import { KOPF_LINIE, LINIE, ZELLE_LINIE, nachsatz, abschnitt, absatz, angaben, ankreuzen, auswahl, datumDe, dokument, esc, ja, linien, liste, plusMonate, punkte, roh, tabelle, text, unterschriften, zelle, zellePunkte, zeilen } from "./html.js";
 import { GEFAEHRDUNGSFAKTOREN, RISIKO_STUFEN, optionen } from "./konstanten.js";
-import type { Daten, Eintrag, Vorlage } from "./typen.js";
+import type { Daten, Eintrag, Option, Vorlage, Vorschlag } from "./typen.js";
 
 /** Teilnahmeliste mit Unterschriftsspalte; leere Zeilen zum Nachtragen von Hand. */
 export function teilnahmeTabelle(eintraege: Eintrag[], extra?: { kopf: string; feld: string; datum?: boolean }): string {
@@ -19,6 +19,33 @@ export function teilnahmeTabelle(eintraege: Eintrag[], extra?: { kopf: string; f
 const BEREICHE_VORSCHLAG = ["Salon", "Kosmetikkabine", "Küche", "Gastraum und Service", "Verkaufsraum", "Lager", "Werkstatt", "Baustelle beim Kunden", "Büro"];
 const GEFAEHRDUNG_KOPF = ["Gefährdung", "Risiko", "Schutzmaßnahmen", "Umsetzung"];
 const GEFAEHRDUNG_BREITEN = ["28%", "10%", "42%", "20%"];
+/**
+ * Ergänzende Vorschläge (R10) zu den Bausteinen der Recherche: Arbeiten an elektrischen Anlagen (Elektrohandwerk) und
+ * Jugendliche (§ 28a JArbSchG). Fachlich zu prüfen wie die übrigen Bausteine (PRUEFLISTE T-62).
+ */
+const GEFAEHRDUNGEN_EXTRA: Vorschlag[] = [
+  {
+    gruppe: "Handwerk",
+    titel: "Elektrischer Schlag und Störlichtbogen bei Arbeiten an oder in der Nähe elektrischer Anlagen.",
+    werte: {
+      faktor: "arbeitsmittel",
+      risiko: "hoch",
+      beschreibung: "Elektrischer Schlag und Störlichtbogen bei Arbeiten an oder in der Nähe elektrischer Anlagen.",
+      massnahme: "Arbeiten nur im spannungsfreien Zustand nach den fünf Sicherheitsregeln (freischalten, gegen Wiedereinschalten sichern, Spannungsfreiheit feststellen, erden und kurzschließen, benachbarte unter Spannung stehende Teile abdecken oder abschranken).\nArbeiten nur durch Elektrofachkräfte bzw. elektrotechnisch unterwiesene Personen unter deren Leitung und Aufsicht.\nGeeignete isolierte Werkzeuge, Spannungsprüfer und persönliche Schutzausrüstung (z. B. Gesichtsschutz gegen Störlichtbogen) bereitstellen und prüfen.",
+    },
+    quelle: "DIN VDE 0105-100; DGUV Vorschrift 3",
+  },
+  {
+    titel: "Jugendliche Beschäftigte: Gefährdungen durch fehlende Erfahrung, Arbeitszeit und verbotene Arbeiten.",
+    werte: {
+      faktor: "qualifikation",
+      beschreibung: "Jugendliche Beschäftigte (unter 18 Jahren): Gefährdungen durch fehlende Erfahrung, Arbeitszeit und Tätigkeiten, die für Jugendliche verboten oder beschränkt sind.",
+      massnahme: "Vor Beginn der Beschäftigung und bei wesentlicher Änderung der Arbeitsbedingungen die Gefährdungen für Jugendliche beurteilen (§ 28a JArbSchG).\nGefährliche Arbeiten nach § 22 JArbSchG nur, soweit zur Ausbildung erforderlich und unter Aufsicht einer fachkundigen Person.\nVor Beginn und danach mindestens halbjährlich unterweisen (§ 29 JArbSchG); Arbeitszeit- und Pausenregeln (§§ 8–14 JArbSchG) einhalten.",
+    },
+    quelle: "§§ 22, 28a, 29 JArbSchG",
+  },
+];
+
 const WIRKSAM: Record<string, string> = { wirksam: "Die Maßnahmen sind umgesetzt und wirksam.", teilweise: "Die Maßnahmen sind teilweise wirksam; Nachbesserung siehe Bemerkung.", offen: "Die Wirksamkeit ist noch zu überprüfen." };
 
 export const gefaehrdungsbeurteilung: Vorlage = {
@@ -52,7 +79,7 @@ export const gefaehrdungsbeurteilung: Vorlage = {
           titelFeld: "beschreibung",
           pflicht: true,
           leerStarten: true,
-          vorschlaege: GEFAEHRDUNGEN,
+          vorschlaege: [...GEFAEHRDUNGEN, ...GEFAEHRDUNGEN_EXTRA],
           gruppenLabel: "Branche",
           felder: [
             { id: "beschreibung", art: "mehrzeilig", label: "Gefährdung", pflicht: true },
@@ -163,6 +190,20 @@ const ANLASS: Record<string, string> = { erst: "Erstunterweisung vor Aufnahme de
 /** Anlass kurz für die Kennungsleiste, mit weicher Trennstelle (die schmale Spalte trennt sonst nicht) */
 const ANLASS_KURZ: Record<string, string> = { erst: "Erst\u00adunterweisung", wiederholung: "Wiederholungs\u00adunterweisung", anlass: "aus besonderem Anlass" };
 
+/**
+ * Themen der Unterweisung mit Branchengruppen (R10): Die App zeigt die passenden zuerst \u2013 beim Friseur keine Fritteuse,
+ * beim Elektriker keine Friseurchemikalien. Erg\u00e4nzt um die f\u00fcnf Sicherheitsregeln f\u00fcr Elektroarbeiten (Handwerk).
+ */
+const UNTERWEISUNG_OPTIONEN: Option[] = [
+  ...UNTERWEISUNGSTHEMEN.map((t) => ({ wert: t.wert, text: t.text, quelle: t.quelle, gruppen: t.branchen })),
+  {
+    wert: "elektro_fuenf_sicherheitsregeln",
+    text: "Arbeiten an elektrischen Anlagen: die f\u00fcnf Sicherheitsregeln (freischalten, gegen Wiedereinschalten sichern, Spannungsfreiheit feststellen, erden und kurzschlie\u00dfen, benachbarte unter Spannung stehende Teile abdecken oder abschranken)",
+    quelle: "DIN VDE 0105-100; DGUV Vorschrift 3",
+    gruppen: ["handwerk_allgemein"],
+  },
+];
+
 export const unterweisung: Vorlage = {
   id: "unterweisung",
   titel: "Unterweisungsnachweis",
@@ -170,6 +211,10 @@ export const unterweisung: Vorlage = {
   bereich: "arbeitsschutz",
   pflichten: ["arbeitsschutz.erstunterweisung", "arbeitsschutz.unterweisung_wiederholen"],
   grundlage: "§ 12 ArbSchG; § 4 Abs. 1 DGUV Vorschrift 1",
+  // mit Jugendlichen gehört § 29 JArbSchG in den Kopf – er bestimmt den halbjährlichen Termin (R10)
+  grundlageFuer: (d) => (ja(d, "jugendliche") ? "§ 12 ArbSchG; § 29 JArbSchG; § 4 Abs. 1 DGUV Vorschrift 1" : ""),
+  // „Davon unter 18 Jahren“ im Pflichten-Check: Schalter vorbelegt (die App setzt ihn außerdem, sobald ein Teilnehmer unter 18 ist)
+  ausProfil: { jugendliche: "beschaeftigte.jugendlich" },
   namensFeld: "thema",
   abschnitte: [
     { titel: "Unterweisung",
@@ -179,13 +224,13 @@ export const unterweisung: Vorlage = {
         { id: "datum", art: "datum", label: "Datum", vorbelegung: "heute", pflicht: true },
         { id: "dauer", art: "text", label: "Dauer", vorschlaege: ["30 Minuten", "45 Minuten", "60 Minuten", "90 Minuten"] },
         { id: "durchgefuehrt_von", art: "text", label: "Durchgeführt von", vorbelegung: "verantwortlich", pflicht: true },
-        { id: "jugendliche", selten: true, art: "schalter", label: "Mit Jugendlichen unter 18 Jahren", hilfe: "Dann ist die Unterweisung mindestens halbjährlich zu wiederholen (§ 29 Abs. 2 JArbSchG)" },
+        { id: "jugendliche", art: "schalter", label: "Mit Jugendlichen unter 18 Jahren", hilfe: "Dann ist die Unterweisung mindestens halbjährlich zu wiederholen (§ 29 Abs. 2 JArbSchG)" },
       ],
     },
     {
       titel: "Inhalte",
       felder: [
-        { id: "themen", art: "bausteine", label: "Themen der Unterweisung", optionen: UNTERWEISUNGSTHEMEN.map((t) => ({ wert: t.wert, text: t.text, quelle: t.quelle })), vorbelegung: [UNTERWEISUNGSTHEMEN[0]!.wert, UNTERWEISUNGSTHEMEN[1]!.wert, UNTERWEISUNGSTHEMEN[2]!.wert], pflicht: true },
+        { id: "themen", art: "bausteine", label: "Themen der Unterweisung", optionen: UNTERWEISUNG_OPTIONEN, vorbelegung: [UNTERWEISUNGSTHEMEN[0]!.wert, UNTERWEISUNGSTHEMEN[1]!.wert, UNTERWEISUNGSTHEMEN[2]!.wert], pflicht: true },
         { id: "inhalt", art: "mehrzeilig", label: "Betriebsspezifische Ergänzungen", hilfe: "z. B. konkrete Geräte, Mittel, Abläufe in deinem Betrieb" },
       ],
     },
@@ -196,7 +241,7 @@ export const unterweisung: Vorlage = {
     },
   ],
   html(d, b) {
-    const themen = auswahl(d, "themen").map((w) => UNTERWEISUNGSTHEMEN.find((t) => t.wert === w)?.text ?? w);
+    const themen = auswahl(d, "themen").map((w) => UNTERWEISUNG_OPTIONEN.find((t) => t.wert === w)?.text ?? w);
     // Jugendliche: mindestens halbjährlich (§ 29 Abs. 2 JArbSchG), sonst mindestens jährlich (§ 4 Abs. 1 DGUV Vorschrift 1)
     const jugendliche = ja(d, "jugendliche");
     const naechste = plusMonate(text(d, "datum"), jugendliche ? 6 : 12);
@@ -381,11 +426,32 @@ function baHoehe(d: Daten): number {
 }
 
 const ERGEBNIS: Record<string, string> = { bestanden: "bestanden", maengel: "Mängel – nicht verwenden" };
+const NORM = "DIN EN 50678 (VDE 0701) / DIN EN 50699 (VDE 0702)";
+const SCHUTZKLASSE: Record<string, string> = { I: "I", II: "II", III: "III" };
+
+/** Geräte zum Antippen, je Branchengruppe (R10): beim Elektriker keine Föhne, im Salon keine Winkelschleifer. */
+const GERAETE: Record<string, string[]> = {
+  friseur: ["Föhn", "Glätteisen", "Lockenstab", "Haarschneidemaschine", "Trockenhaube", "Wärmegerät (Climazon)"],
+  kosmetik: ["Wachserwärmer", "Bedampfer", "Lupenleuchte", "Behandlungsliege (elektrisch)", "Nageltrockner (UV/LED)"],
+  gastro_cafe: ["Kaffeemaschine", "Wasserkocher", "Mikrowelle", "Toaster", "Mixer", "Kühlschrank (Stecker)", "Spülmaschine (Stecker)"],
+  handwerk_allgemein: ["Bohrmaschine", "Bohrhammer", "Akkuschrauber-Ladegerät", "Winkelschleifer", "Stichsäge", "Kreissäge", "Baustrahler", "Kabeltrommel", "Baustromverteiler", "Industriestaubsauger"],
+  buero_laden: ["Computer mit Netzteil", "Monitor", "Drucker", "Kassensystem", "Kaffeemaschine"],
+  alle: ["Verlängerungskabel", "Mehrfachsteckdose", "Wasserkocher"],
+};
+const GERAETE_VORSCHLAEGE = [...new Set(Object.values(GERAETE).flat())];
+const GERAETE_GRUPPEN: Record<string, string[]> = Object.fromEntries(GERAETE_VORSCHLAEGE.map((g) => [g, Object.keys(GERAETE).filter((k) => GERAETE[k]!.includes(g))]));
+
+/** Richtwert der Prüffrist in Monaten aus dem Text der DGUV-Tabelle („Richtwert 6 Monate“, „Richtwert 4 Jahre“). */
+export function richtwertMonate(text: string): number | null {
+  const m = /Richtwert[^0-9]{0,30}(\d+)\s*(Monat|Monate|Jahr|Jahre)\b/.exec(text);
+  if (!m) return null;
+  return Number(m[1]) * (m[2]!.startsWith("Jahr") ? 12 : 1);
+}
 
 export const elektroPruefung: Vorlage = {
   id: "pruefprotokoll_elektro",
   titel: "Prüfprotokoll elektrische Geräte (DGUV V3)",
-  beschreibung: "Verzeichnis der geprüften Geräte mit Ergebnis und nächstem Termin – mit den Richtwerten für Prüffristen aus der DGUV Vorschrift 3.",
+  beschreibung: "Verzeichnis der geprüften Geräte mit Schutzklasse, Messwerten, Ergebnis und nächstem Termin – mit den Richtwerten für Prüffristen aus der DGUV Vorschrift 3.",
   bereich: "arbeitsschutz",
   pflichten: ["arbeitsschutz.dguv_v3"],
   grundlage: "§ 5 DGUV Vorschrift 3; § 14 BetrSichV",
@@ -395,13 +461,15 @@ export const elektroPruefung: Vorlage = {
     { titel: "Prüfung",
       hilfe: "Prüfen darf eine Elektrofachkraft; eine elektrotechnisch unterwiesene Person nur unter Leitung und Aufsicht einer Elektrofachkraft. Die Prüffrist legst du in der Gefährdungsbeurteilung fest.",
       felder: [
-        { id: "pruefer", art: "text", label: "Prüfende Elektrofachkraft / Firma", pflicht: true },
+        // im Handwerk prüft meist der Betrieb selbst – dann ist die verantwortliche Person aus „Mein Betrieb“ vorbelegt (R10)
+        { id: "pruefer", art: "text", label: "Prüfende Elektrofachkraft / Firma", pflicht: true, vorbelegung: "verantwortlich", vorbelegungGruppen: ["handwerk_allgemein"] },
         { id: "datum", art: "datum", label: "Prüfdatum", vorbelegung: "heute", pflicht: true },
+        { id: "auftraggeber", art: "mehrzeilig", label: "Auftraggeber / Prüfort", hilfe: "Wenn du beim Kunden prüfst: Name und Anschrift des Kunden bzw. Ort der Prüfung" },
         { id: "messgeraet", selten: true, art: "text", label: "Verwendetes Prüfgerät" },
         { id: "pruefart", art: "wahl", label: "Art der Prüfung", optionen: [{ wert: "Wiederholungsprüfung", text: "Wiederholungsprüfung" }, { wert: "Erstprüfung", text: "Erstprüfung" }, { wert: "Prüfung nach Instandsetzung", text: "nach Instandsetzung" }], vorbelegung: "Wiederholungsprüfung", pflicht: true },
         { id: "umfang", art: "bausteine", label: "Umfang der Prüfung", optionen: ["Sichtprüfung", "Messung des Schutzleiterwiderstands", "Messung des Isolationswiderstands", "Messung des Schutzleiter- bzw. Berührungsstroms", "Funktionsprüfung"].map((t) => ({ wert: t, text: t })), vorbelegung: ["Sichtprüfung", "Messung des Schutzleiterwiderstands", "Messung des Isolationswiderstands", "Funktionsprüfung"], pflicht: true },
-        { id: "norm", art: "text", label: "Prüfgrundlage", vorschlaege: ["DIN EN 50678 (VDE 0701) / DIN EN 50699 (VDE 0702)"] },
-        { id: "einsatz", art: "wahl", label: "Einsatzbedingungen (Richtwert für die Prüffrist)", optionen: ELEKTRO_FRISTEN.slice(0, 4).map((o) => ({ wert: o.wert, text: o.text, quelle: o.quelle })) },
+        { id: "norm", art: "text", label: "Prüfgrundlage", vorbelegung: { text: NORM }, vorschlaege: [NORM] },
+        { id: "einsatz", art: "wahl", label: "Einsatzbedingungen (Richtwert für die Prüffrist)", hilfe: "Ohne eigenes Datum je Gerät rechnet Amtlos die nächste Prüfung aus Prüfdatum und Richtwert.", optionen: ELEKTRO_FRISTEN.slice(0, 4).map((o) => ({ wert: o.wert, text: o.text, quelle: o.quelle })) },
         { id: "leerzeilen", selten: true, art: "schalter", label: "Leere Zeilen zum Ausfüllen von Hand anhängen" },
       ],
     },
@@ -415,13 +483,18 @@ export const elektroPruefung: Vorlage = {
           eintrag: "Gerät",
           titelFeld: "bezeichnung",
           felder: [
-            { id: "bezeichnung", art: "text", label: "Gerät", pflicht: true, vorschlaege: ["Föhn", "Glätteisen", "Haarschneidemaschine", "Kaffeemaschine", "Wasserkocher", "Mikrowelle", "Verlängerungskabel", "Mehrfachsteckdose", "Bohrmaschine", "Akku-Ladegerät", "Computer mit Netzteil"] },
+            { id: "bezeichnung", art: "text", label: "Gerät", pflicht: true, vorschlaege: GERAETE_VORSCHLAEGE, vorschlagGruppen: GERAETE_GRUPPEN },
             { id: "typ", art: "text", label: "Hersteller / Typ" },
             { id: "inventar", art: "text", label: "Inventar-Nr." },
             { id: "standort", art: "text", label: "Standort" },
+            { id: "schutzklasse", art: "wahl", label: "Schutzklasse", optionen: optionen(SCHUTZKLASSE) },
+            // Messwerte nach DIN EN 50678 / 50699 – wie vom Prüfgerät angezeigt, mit Einheit
+            { id: "rpe", art: "text", label: "Schutzleiterwiderstand RPE (Ω)", hilfe: "z. B. 0,12", wenn: { feld: "schutzklasse", ist: ["II", "III"], nicht: true } },
+            { id: "riso", art: "text", label: "Isolationswiderstand RISO (MΩ)", hilfe: "z. B. > 20" },
+            { id: "ipe", art: "text", label: "Schutzleiter- bzw. Berührungsstrom IPE / IB (mA)", hilfe: "z. B. 0,05" },
             { id: "ergebnis", art: "wahl", label: "Ergebnis", optionen: optionen(ERGEBNIS), vorbelegung: "bestanden" },
             { id: "maengel", art: "text", label: "Mängel", wenn: { feld: "ergebnis", ist: "maengel" }, pflicht: true },
-            { id: "naechste", art: "datum", label: "Nächste Prüfung" },
+            { id: "naechste", art: "datum", label: "Nächste Prüfung", hilfe: "leer: Prüfdatum plus Richtwert der Einsatzbedingungen" },
           ],
         },
       ],
@@ -430,6 +503,11 @@ export const elektroPruefung: Vorlage = {
   html(d, b) {
     const g = liste(d, "geraete").filter((x) => text(x, "bezeichnung"));
     const einsatz = ELEKTRO_FRISTEN.find((o) => o.wert === text(d, "einsatz"));
+    // nächste Prüfung: eigenes Datum je Gerät, sonst Prüfdatum plus Richtwert (R10)
+    const richtwert = einsatz ? richtwertMonate(einsatz.text) : null;
+    const naechste = (x: Eintrag) => (text(x, "naechste") ? datumDe(text(x, "naechste")) : richtwert ? plusMonate(text(d, "datum"), richtwert) : "");
+    const messwert = (x: Eintrag, id: string, einheit: string) => (text(x, id) ? `${esc(text(x, id))}&nbsp;${einheit}` : "");
+    const auftrag = text(d, "auftraggeber");
     return dokument({
       titel: "Prüfprotokoll elektrische Geräte",
       betrieb: b,
@@ -437,14 +515,24 @@ export const elektroPruefung: Vorlage = {
       // ohne prüfende Person: Linie in der Kennungsleiste; ohne Geräte (Blatt zum Ausfüllen) auch Prüfgrundlage und Prüfgerät als Linie
       meta: `Prüfdatum: ${datumDe(text(d, "datum"))}\nGeprüft von: ${text(d, "pruefer") || KOPF_LINIE}\nArt der Prüfung: ${text(d, "pruefart")}`,
       inhalt:
-        angaben([["Umfang der Prüfung", auswahl(d, "umfang").join(", ")], ["Prüfgrundlage", text(d, "norm") || (g.length ? null : "")], ["Prüfgerät", text(d, "messgeraet") || (g.length ? null : "")]]) +
+        angaben([["Auftraggeber / Prüfort", auftrag || null], ["Umfang der Prüfung", auswahl(d, "umfang").join(", ")], ["Prüfgrundlage", text(d, "norm") || (g.length ? null : "")], ["Prüfgerät", text(d, "messgeraet") || (g.length ? null : "")]]) +
         `<section class="abschnitt ohne-nummer">${tabelle(
-          ["Gerät", "Hersteller / Typ", "Inventar-Nr.", "Standort", "Ergebnis", "Nächste Prüfung"],
-          g.map((x) => [`<strong>${zelle(text(x, "bezeichnung"))}</strong>`, zelle(text(x, "typ")), zelle(text(x, "inventar")), zelle(text(x, "standort")), text(x, "ergebnis") === "maengel" ? `<strong>Mängel:</strong> ${zelle(text(x, "maengel"))}` : "bestanden", datumDe(text(x, "naechste"))]),
+          ["Gerät", "Hersteller / Typ, Inventar-Nr.", "Standort", "SK", "RPE", "RISO", "IPE / IB", "Ergebnis", "Nächste Prüfung"],
+          g.map((x) => [
+            `<strong>${zelle(text(x, "bezeichnung"))}</strong>`,
+            zelle([text(x, "typ"), text(x, "inventar") ? `Inv.-Nr. ${text(x, "inventar")}` : ""].filter(Boolean).join("\n")),
+            zelle(text(x, "standort")),
+            esc(text(x, "schutzklasse")),
+            text(x, "schutzklasse") === "II" || text(x, "schutzklasse") === "III" ? "–" : messwert(x, "rpe", "Ω"),
+            messwert(x, "riso", "MΩ"),
+            messwert(x, "ipe", "mA"),
+            text(x, "ergebnis") === "maengel" ? `<strong>Mängel:</strong> ${zelle(text(x, "maengel"))}` : "bestanden",
+            naechste(x),
+          ]),
           // ohne Geräte (Protokoll zum Ausfüllen von Hand) immer mit leeren Zeilen – so viele, wie mit den Unterschriften auf das Blatt passen
-          { breiten: ["20%", "18%", "12%", "15%", "20%", "15%"], leerzeilen: ja(d, "leerzeilen") ? 12 : g.length ? 0 : 7, hoch: ja(d, "leerzeilen") || !g.length },
+          { breiten: ["16%", "17%", "11%", "5%", "8%", "8%", "8%", "15%", "12%"], leerzeilen: ja(d, "leerzeilen") ? 12 : g.length ? 0 : 7, hoch: ja(d, "leerzeilen") || !g.length },
         )}</section>` +
-        (einsatz ? nachsatz(`Prüffrist (${einsatz.quelle ?? "DGUV Vorschrift 3"}) – ${einsatz.text.replace(/\.$/, "")}.`) : "") +
+        nachsatz(`SK = Schutzklasse; Messwerte: RPE Schutzleiterwiderstand, RISO Isolationswiderstand, IPE / IB Schutzleiter- bzw. Berührungsstrom.${einsatz ? ` Prüffrist (${einsatz.quelle ?? "DGUV Vorschrift 3"}) – ${einsatz.text.replace(/\.$/, "")}.` : ""}`) +
         unterschriften(["Ort, Datum", "Unterschrift der prüfenden Person"]),
     });
   },

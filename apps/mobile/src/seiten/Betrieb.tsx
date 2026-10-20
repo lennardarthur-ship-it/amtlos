@@ -119,6 +119,9 @@ function mitGesellschaft(profil: Record<string, unknown>, b: BetriebDaten): bool
   return [b.rechtsform, b.registergericht, b.registernummer, b.vertretung].some((x) => (x ?? "").trim());
 }
 
+/** Rechtsform aus dem Pflichten-Check als Text für „Mein Betrieb“ (R10) – Einzelunternehmen und Freiberuf ohne Register. */
+const RECHTSFORM_AUS_CHECK: Record<string, string> = { gbr: "GbR", ek: "e. K.", ug: "UG (haftungsbeschränkt)", gmbh: "GmbH", gmbh_co_kg: "GmbH & Co. KG", partg: "PartG", partg_mbb: "PartG mbB" };
+
 /** Plausibilität (IBAN-Prüfsumme, PLZ, E-Mail) – nur als Hinweis am Feld, gespeichert wird trotzdem. */
 function pruefung(k: keyof BetriebDaten, w: string): string | null {
   if (k === "iban") return ibanGueltig(w) ? null : TEXT.iban_ungueltig;
@@ -167,6 +170,12 @@ export function BetriebFormular({ teil, teile }: { teil?: Teil; teile?: Teil[] }
     onBlur: () => setVerlassen((v) => (v.has(k) ? v : new Set(v).add(k))),
   });
   const zeigt = (t: Teil) => (teile ? teile.includes(t) : !teil || teil === t) && (t !== "gesellschaft" || Boolean(teil) || mitGesellschaft(stand.profil, b));
+  // Rechtsform aus dem Pflichten-Check vorbelegen, solange sie leer ist (R10) – einmal beim Öffnen des Abschnitts
+  const ausCheck = RECHTSFORM_AUS_CHECK[String(stand.profil.rechtsform ?? "")];
+  useEffect(() => {
+    if (zeigt("gesellschaft") && ausCheck && !(b.rechtsform ?? "").trim()) feld("rechtsform").aendern(ausCheck);
+    // nur beim Öffnen des Formulars
+  }, []);
   const kopf = (t: Teil, titel: string, text?: string) =>
     teil ? (
       <T leise stil={{ marginBottom: 12 }}>{text ?? TEXT.teil_text[t]}</T>

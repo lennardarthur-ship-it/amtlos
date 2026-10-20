@@ -325,6 +325,8 @@ export function standBauen(): Bau {
         id: b.id, datum: b.datum, lieferant: b.lieferant, nummer: b.nummer, kategorie: b.kategorie,
         steuer: sm.jeSatz.map((x) => ({ satz: x.satz, brutto_cent: x.brutto })),
         vorsteuer: vst, zahlung: b.zahlung, bezahlt: b.bezahlt, notiz: b.notiz ?? null, datei: `${b.id}.pdf`, quelle: "foto", erstellt: jetzt, geaendert: jetzt,
+        // R10: CloudOffice (Irland) als § 13b-Beleg – Kz 46/47 kommen aus dem Beleg; die anteilige Vorsteuer (Kz 67) trägt die Praxis von Hand ein
+        ...(b.p13b ? { steuerschuld: "eu" as const } : {}),
       };
       s = belegSetzen(s, beleg, t(b.datum, 18));
       belegDateien.push({ datei: `${b.id}.pdf`, html: belegHtml(b) });
@@ -587,19 +589,22 @@ export function standBauen(): Bau {
           umsatz_19: plus("umsatz_19", eq.empfang.netto),
           // seit r9 eigenes Feld Kz 48 (steuerfreie Umsätze ohne Vorsteuerabzug)
           umsatz_48: plus("umsatz_48", eq.gkv + eq.zuzahlungen),
-          vorsteuer: plus("vorsteuer", eq.vstAnteil + eq.vst13b),
+          vorsteuer: plus("vorsteuer", eq.vstAnteil),
+          // Vorsteuer aus § 13b nur anteilig (gemischt genutzt, § 15 Abs. 4 UStG) – von Hand in Kz 67
+          ...(eq.vst13b ? { vorsteuer_13b: euro(eq.vst13b) } : {}),
           notiz: [
             `Umsätze ohne USt sind steuerfreie Heilbehandlungen nach § 4 Nr. 14 UStG → Kz 48 (steuerfreie Umsätze ohne Vorsteuerabzug), nicht Kz 41/43. Darin: Rechnungen ${euro(eq.reFrei)} €, Abrechnungszentrum ${euro(eq.gkv)} €, Zuzahlungen ${euro(eq.zuzahlungen)} €.`,
             `19 %: Rechnungen ${euro(eq.rePflichtig)} € + Empfang (EC-Terminal) ${euro(eq.empfang.netto)} €.`,
             `Vorsteuer: voll abziehbar ${euro(eq.vstVoll)} €; gemischt genutzte Belege ${euro(eq.gemischtGesamt)} € × ${D.QUOTE_VORLAEUFIG} % = ${euro(eq.vstAnteil)} € (vorläufiger Umsatzschlüssel, § 15 Abs. 4 UStG)${eq.st13b ? `; Vorsteuer aus § 13b ${euro(eq.vst13b)} € (Kz 67)` : ""}.`,
-            ...(eq.st13b ? [`§ 13b UStG (CloudOffice Ireland Ltd.): Bemessungsgrundlage ${euro(eq.bmg13b)} € (Kz 46), Steuer ${euro(eq.st13b)} € (Kz 47) – die App hat dafür kein Feld; die Zahllast ist um ${euro(eq.st13b)} € zu erhöhen.`] : []),
+            ...(eq.st13b ? [`§ 13b UStG (CloudOffice Ireland Ltd.): Bemessungsgrundlage ${euro(eq.bmg13b)} € (Kz 46), Steuer ${euro(eq.st13b)} € (Kz 47) aus dem Beleg übernommen; Vorsteuer daraus anteilig ${euro(eq.vst13b)} € (Kz 67).`] : []),
           ].join("\n"),
         }, t(VA_ERSTELLT[eq.q]!, 10));
       } });
     const formular = v("ust_voranmeldung").ergebnis!(unterlage(id).daten);
     if (zeile) ust.push({ ...(zeile as Omit<UstZeile, "formular">), formular });
     const z = formular.find((x) => /Zahllast|Erstattung/.test(x[0]))!;
-    vergleich(`USt-Voranmeldung ${eq.q} (fertig)`, "Umsatzsteuer 19 % (Formular)", ausEuro(formular.find((x) => x[0] === "Umsatzsteuer")![1]), eq.ust19);
+    // R10: „Umsatzsteuer“ im Formular enthält die § 13b-Steuer (Kz 47)
+    vergleich(`USt-Voranmeldung ${eq.q} (fertig)`, "Umsatzsteuer 19 % + § 13b Kz 47 (Formular)", ausEuro(formular.find((x) => x[0] === "Umsatzsteuer")![1]), eq.ust19 + eq.st13b);
     vergleich(`USt-Voranmeldung ${eq.q} (fertig)`, "Vorsteuer (Formular)", ausEuro(formular.find((x) => x[0] === "Vorsteuer")![1]), eq.vorsteuer);
     vergleich(`USt-Voranmeldung ${eq.q} (fertig)`, "Zahllast inkl. § 13b-Steuer", ausEuro(z[1]) * (z[0] === "Erstattung" ? -1 : 1), eq.zahllast);
     vergleich(`USt-Voranmeldung ${eq.q} (fertig)`, "Kz 48 (steuerfreie Umsätze ohne Vorsteuerabzug)", ausEuro(unterlage(id).daten.umsatz_48 as string), eq.kz48);

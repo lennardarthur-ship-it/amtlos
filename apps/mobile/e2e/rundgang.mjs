@@ -139,17 +139,23 @@ try {
   await warte(800);
   await feld("Wie viele Menschen arbeiten für dich, dich selbst nicht mitgezählt?").fill("3");
   await knopf("Weiter").click();
-  await warte(400);
-  await radio("Ja").click(); // elektronische Kasse
-  await warte(800);
-  await radio("Nein").click(); // keine Website
-  await warte(800);
-  await radio("Nein").click(); // keine Kleinunternehmerregelung
-  await warte(800);
-  await radio("Nein").click(); // keine Steuerberatung (E-129: Frist der Steuererklärungen)
-  await warte(800);
-  await feld("Wann hast du angefangen oder wann willst du anfangen?").fill("01.03.2024");
-  await knopf("Weiter").click();
+  // Fragen nach der Zahl der Beschäftigten (R10: Minijob, Löhne, Social Media …) der Reihe nach beantworten (Kasse ja, sonst nein, Zahlen 0)
+  for (let i = 0; i < 30; i++) {
+    await warte(500);
+    if (await sichtbar("Geschafft – dein Ergebnis steht")) break;
+    const datum = p.getByLabel("Wann hast du angefangen oder wann willst du anfangen?", { exact: true }).locator("visible=true");
+    if (await datum.count()) { await datum.last().fill("01.03.2024"); await knopf("Weiter").click(); await warte(1200); continue; }
+    if (await sichtbar("Wer macht die Löhne")) { await radio("Ein Lohnbüro").click(); continue; }
+    const ja = p.getByRole("radio", { name: "Ja", exact: true }).locator("visible=true");
+    if ((await sichtbar(/Kasse/)) && (await ja.count())) { await ja.last().click(); continue; }
+    const nein = p.getByRole("radio", { name: /^Nein/ }).locator("visible=true");
+    if (await nein.count()) { await nein.first().click(); continue; }
+    const tb = p.getByRole("textbox").locator("visible=true");
+    if (await tb.count()) { await tb.last().fill("0"); await knopf("Weiter").click(); continue; }
+    const r = p.getByRole("radio").locator("visible=true");
+    if (await r.count()) { await r.first().click(); continue; }
+    await knopf(/Weiter|Überspringen/).click();
+  }
   await warte(1200);
   // Zwischenschirm: Ergebnis steht, Zusatzfragen sind freiwillig (E-136); eine Zusatzfrage ansehen, dann überspringen
   pruefe(await sichtbar("Geschafft – dein Ergebnis steht"), "Zwischenschirm vor den Zusatzfragen fehlt");
@@ -177,7 +183,7 @@ try {
   pruefe(await sichtbar("Jetzt dran"), "„Jetzt dran“ fehlt im Pflichten-Tab");
   pruefe(await sichtbar("Kurz klären"), "„Kurz klären“ mit den wirksamsten Fragen fehlt");
   // die vollständige Liste ist eingeklappt (E-136): aufklappen
-  await tippe(p.getByRole("button", { name: /^Alle \d+ Pflichten ansehen$/ }).locator("visible=true").last());
+  await tippe(p.getByRole("button", { name: /^Alle ansehen: \d+ Pflichten/ }).locator("visible=true").last());
   await warte(500);
   pruefe((await sichtbar("Hautschutzplan aushängen")) && (await sichtbar("Elektronische Kasse beim Finanzamt melden")) && !(await sichtbar("Impressum auf der Website")), "Pflichten passen nicht zum Profil (Beauty, Kasse, keine Website)");
   pruefe(await sichtbar("Aus der Gründung"), "Gründungsschritte des bestehenden Betriebs nicht abgetrennt");

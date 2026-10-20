@@ -2,7 +2,7 @@
  * Unterlagen und Betrieb – nur auf dem Gerät (E-121). Reine Funktionen über einem unveränderlichen Stand, damit sie
  * ohne Gerät testbar sind; zustand.tsx speichert den Stand in AsyncStorage.
  */
-import { LEERER_BETRIEB, belegAus, belegFassung, belegInhaltGeaendert, belegSummen, leereDaten, type Beleg, naechsteNummer, personMerken as merken, vorlageFuer, type Betrieb, type Daten, type Person, type PersonAngaben, type PersonenArt } from "@amtlos/fachlogik";
+import { LEERER_BETRIEB, belegAus, belegFassung, belegInhaltGeaendert, belegSummen, gruppenAusBranchen, leereDaten, type Beleg, naechsteNummer, personMerken as merken, vorlageFuer, type Betrieb, type Daten, type Person, type PersonAngaben, type PersonenArt } from "@amtlos/fachlogik";
 
 export interface Unterlage {
   id: string;
@@ -339,13 +339,17 @@ export const istFest = (u: Unterlage | undefined) => Boolean(u?.festgeschrieben)
 export function anlegen(s: Stand, vorlageId: string, jetzt: Date, id = neueId()): [Stand, Unterlage] {
   const v = vorlageFuer(vorlageId);
   if (!v) throw new Error(`Unbekannte Vorlage: ${vorlageId}`);
-  const daten = leereDaten(v, s.betrieb, heute(jetzt));
+  // Branche aus dem Pflichten-Check: manche Vorbelegungen passen nur in bestimmten Branchen (R10)
+  const daten = leereDaten(v, s.betrieb, heute(jetzt), gruppenAusBranchen(s.profil["taetigkeit.branchen"]));
   // fortlaufende Nummer (Rechnung): aus den vorhandenen Unterlagen derselben Vorlage weiterzählen
   if (v.fortlaufend) daten[v.fortlaufend] = naechste(s, v.id, v.fortlaufend, jetzt);
   // Startwerte aus dem Pflichten-Check (z. B. Kleinunternehmer), pro Unterlage überschreibbar
   for (const [feld, profilFeld] of Object.entries(v.ausProfil ?? {})) {
     const w = s.profil[profilFeld];
-    if (w !== undefined && w !== null && !Array.isArray(w)) daten[feld] = typeof w === "number" ? String(w) : w;
+    if (w === undefined || w === null || Array.isArray(w)) continue;
+    // Zahl für einen Schalter (z. B. „Davon unter 18 Jahren: 1“ → „Mit Jugendlichen“): an, sobald größer als 0
+    const schalter = v.abschnitte.some((a) => a.felder.some((f) => f.id === feld && f.art === "schalter"));
+    daten[feld] = schalter ? (typeof w === "number" ? w > 0 : w === true) : typeof w === "number" ? String(w) : w;
   }
   // Startwerte aus „Mein Betrieb“ (z. B. Soll-/Ist-Versteuerung)
   for (const [feld, betriebsFeld] of Object.entries(v.ausBetrieb ?? {})) {

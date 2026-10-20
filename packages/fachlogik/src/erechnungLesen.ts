@@ -191,7 +191,7 @@ export interface GeleseneRechnung {
   /** Fälligkeit, ISO */
   faellig: string | null;
   lieferant: { name: string; ust_idnr: string | null; steuernummer: string | null; iban: string | null; strasse?: string | null; plz?: string | null; ort?: string | null };
-  empfaenger: { name: string };
+  empfaenger: { name: string; strasse?: string | null; plz?: string | null; ort?: string | null };
   waehrung: string;
   summen: { netto_cent: number; ust_cent: number; brutto_cent: number; zu_zahlen_cent: number };
   /** je Steuersatz; `kategorie` nach UNTDID 5305 (S, E, AE, K, Z, …) */
@@ -255,7 +255,7 @@ function ublLesen(w: XmlElement, vz: 1 | -1): GeleseneRechnung {
       plz: textVon(adresse, "PostalZone"),
       ort: textVon(adresse, "CityName"),
     },
-    empfaenger: { name: name(kunde) },
+    empfaenger: { name: name(kunde), strasse: textVon(kind(kunde, "PostalAddress"), "StreetName"), plz: textVon(kind(kunde, "PostalAddress"), "PostalZone"), ort: textVon(kind(kunde, "PostalAddress"), "CityName") },
     waehrung: textVon(w, "DocumentCurrencyCode") ?? "EUR",
     summen: { netto_cent: netto, ust_cent: ust, brutto_cent: brutto, zu_zahlen_cent: geld(kind(gesamt, "PayableAmount")) ?? brutto },
     saetze: alle(steuer, "TaxSubtotal").map((s) => ({
@@ -318,7 +318,7 @@ function ciiLesen(w: XmlElement): GeleseneRechnung {
       plz: textVon(adresse, "PostcodeCode"),
       ort: textVon(adresse, "CityName"),
     },
-    empfaenger: { name: textVon(vereinbarung, "BuyerTradeParty", "Name") ?? "" },
+    empfaenger: { name: textVon(vereinbarung, "BuyerTradeParty", "Name") ?? "", strasse: textVon(vereinbarung, "BuyerTradeParty", "PostalTradeAddress", "LineOne"), plz: textVon(vereinbarung, "BuyerTradeParty", "PostalTradeAddress", "PostcodeCode"), ort: textVon(vereinbarung, "BuyerTradeParty", "PostalTradeAddress", "CityName") },
     waehrung,
     summen: { netto_cent: netto, ust_cent: ust, brutto_cent: brutto, zu_zahlen_cent: geld(kind(summe, "DuePayableAmount")) ?? brutto },
     saetze: alle(abrechnung, "ApplicableTradeTax").map((t) => ({
@@ -348,14 +348,48 @@ function ciiLesen(w: XmlElement): GeleseneRechnung {
 
 const euro = (cent: number) => `${(cent / 100).toFixed(2).replace(".", ",")} €`;
 
+/** Rechtsformzusätze und Füllwörter, die beim Namensvergleich nicht zählen */
+const NAME_FUELL = new Set(["gmbh", "ug", "haftungsbeschränkt", "ag", "kg", "ohg", "gbr", "ek", "e", "k", "co", "und", "inh", "inhaber", "inhaberin", "mbh", "the", "der", "die", "das"]);
+const namensTeile = (s: string) =>
+  s
+    .toLocaleLowerCase("de")
+    .replace(/[^a-z0-9äöüß]+/g, " ")
+    .split(" ")
+    .filter((w) => w.length > 1 && !NAME_FUELL.has(w));
+
+/**
+ * Ist der Käufer der E-Rechnung (BG-7) erkennbar ein anderer als der eigene Betrieb? Gleich gilt: alle Namenswörter
+ * (ohne Rechtsform) des einen stecken im anderen – „Elektro Brandt“ und „Elektro Brandt GmbH“, aber nicht „Elektro
+ * Becker“ –, der Name der Inhaberin bzw. des Inhabers steht im Käufer, oder die PLZ ist gleich. Ohne Namen auf einer
+ * Seite: nicht entscheidbar (false).
+ */
+export function kaeuferFremd(r: Pick<GeleseneRechnung, "empfaenger">, betrieb: { name: string; plz?: string | null; verantwortlich?: string | null }): boolean {
+  const k = namensTeile(r.empfaenger.name);
+  const b = namensTeile(betrieb.name);
+  if (!k.length || !b.length) return false;
+  const alleIn = (a: string[], c: string[]) => a.every((w) => c.includes(w));
+  if (alleIn(b, k) || alleIn(k, b)) return false;
+  const inhaber = namensTeile(betrieb.verantwortlich ?? "");
+  if (inhaber.length && alleIn(inhaber, k)) return false;
+  const plz = (x: string | null | undefined) => (x ?? "").replace(/\s/g, "");
+  if (plz(r.empfaenger.plz) && plz(r.empfaenger.plz) === plz(betrieb.plz)) return false;
+  return true;
+}
+
+/** Hinweis im Beleg, wenn die E-Rechnung an einen anderen Käufer gerichtet ist (§ 15 Abs. 1 Nr. 1 UStG). */
+export const KAEUFER_FREMD = (name: string) => `Die E-Rechnung ist an „${name}“ gerichtet, nicht an deinen Betrieb – ohne Rechnung an dich ist kein Vorsteuerabzug möglich (§ 15 Abs. 1 Nr. 1 UStG). Vorsteuer ausgeschaltet, bitte prüfen.`;
+
 /**
  * Beleg (Eingangsrechnung) aus einer gelesenen E-Rechnung: Brutto je Steuersatz, Vorsteuer wenn Umsatzsteuer
  * ausgewiesen ist, Zahlung per Bank, noch nicht bezahlt. Sätze außer 19/7/0 und Besonderheiten (Reverse Charge,
  * innergemeinschaftlicher Erwerb) landen als Hinweis in der Notiz. Kategorie: Sonstiges – die Zuordnung macht der Betrieb.
  * Kleinunternehmer (§ 19 UStG, `o.kleinunternehmer`): Vorsteuer-Schalter aus – wie beim Beleg von Hand.
  */
-export function belegAusERechnung(r: GeleseneRechnung, id: string, jetztIso: string, o: { kleinunternehmer?: boolean } = {}): Beleg {
+export function belegAusERechnung(r: GeleseneRechnung, id: string, jetztIso: string, o: { kleinunternehmer?: boolean; betrieb?: { name: string; plz?: string | null; verantwortlich?: string | null } } = {}): Beleg {
   const hinweise: string[] = [];
+  // R10: fremd adressierte E-Rechnung – Warnung in der Notiz und kein Vorsteuerabzug
+  const fremd = !!o.betrieb && kaeuferFremd(r, o.betrieb);
+  if (fremd) hinweise.push(KAEUFER_FREMD(r.empfaenger.name));
   const nachSatz = new Map<number, number>();
   for (const s of r.saetze) {
     let satz = s.satz;
@@ -372,7 +406,11 @@ export function belegAusERechnung(r: GeleseneRechnung, id: string, jetztIso: str
   const steuer: BelegSteuer[] = [...nachSatz].sort((a, b) => b[0] - a[0]).map(([satz, brutto_cent]) => ({ satz, brutto_cent }));
   const summeSaetze = steuer.reduce((a, s) => a + s.brutto_cent, 0);
   if (summeSaetze !== r.summen.brutto_cent) hinweise.push(`Summe je Steuersatz (${euro(summeSaetze)}) weicht vom Rechnungsbetrag (${euro(r.summen.brutto_cent)}) ab.`);
-  if (r.saetze.some((s) => s.kategorie === "AE")) hinweise.push("Steuerschuldnerschaft des Leistungsempfängers (Reverse Charge): Umsatzsteuer selbst anmelden und als Vorsteuer abziehen.");
+  // Reverse Charge: als § 13b-Beleg übernehmen – Anbieter aus dem EU-Ausland (USt-IdNr.) als sonstige Leistung, sonst wie eine Bauleistung im Inland (Kz 84/85)
+  const ae = r.saetze.length > 0 && r.saetze.every((s) => s.kategorie === "AE");
+  const auslandId = /^[A-Z]{2}/.exec((r.lieferant.ust_idnr ?? "").replace(/\s/g, "").toUpperCase())?.[0];
+  const steuerschuld: Beleg["steuerschuld"] = ae ? (auslandId && auslandId !== "DE" ? "eu" : "bau") : null;
+  if (r.saetze.some((s) => s.kategorie === "AE")) hinweise.push(ae ? "Steuerschuldnerschaft des Leistungsempfängers (Reverse Charge): als § 13b-Beleg übernommen – die Umsatzsteuer meldest du selbst an (bitte die Art der Leistung prüfen)." : "Steuerschuldnerschaft des Leistungsempfängers (Reverse Charge): Umsatzsteuer selbst anmelden und als Vorsteuer abziehen.");
   if (r.saetze.some((s) => s.kategorie === "K")) hinweise.push("Innergemeinschaftlicher Erwerb: Erwerbsteuer selbst anmelden und als Vorsteuer abziehen.");
   const notiz = [
     r.verwendungszweck ? `Verwendungszweck: ${r.verwendungszweck}` : null,
@@ -389,13 +427,14 @@ export function belegAusERechnung(r: GeleseneRechnung, id: string, jetztIso: str
     nummer: r.nummer || null,
     kategorie: "sonstiges",
     steuer,
-    vorsteuer: !o.kleinunternehmer && r.summen.ust_cent > 0,
+    vorsteuer: !fremd && !o.kleinunternehmer && (r.summen.ust_cent > 0 || !!steuerschuld),
     zahlung: "bank",
     bezahlt: null,
     notiz: notiz || null,
     quelle: "erechnung",
     erstellt: jetztIso,
     geaendert: jetztIso,
+    ...(steuerschuld ? { steuerschuld } : {}),
   };
 }
 

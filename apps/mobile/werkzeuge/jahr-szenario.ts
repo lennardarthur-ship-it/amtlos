@@ -680,10 +680,14 @@ export function standBauen(): Bau {
 
   // ---------------------------------------------------------------- Pflichten-Check der App: passt das zu den erzeugten Unterlagen?
   // Stichtag 15.01.2026 mit den Unterlagen, die die App dann hat; Ereignisse leitet die App aus Profil und Unterlagen ab
-  const a = auswertung(s.profil, "2026-01-15", s.unterlagen.filter((u) => (u.ausgegeben ?? "") < "2026-01-16"));
+  // R10: wie die App mit den gespeicherten Mitarbeitern (Beschäftigt seit ⇒ Einstellung; Leon seit 01.09.2025 ⇒ Einstellungs-Pflichten dran)
+  const a = auswertung(s.profil, "2026-01-15", s.unterlagen.filter((u) => (u.ausgegeben ?? "") < "2026-01-16"), s.mitarbeiter);
   for (const id of ["branche.gastro_ifsg_belehrung", "arbeitsschutz.erstunterweisung", "personal.nachweisgesetz"]) vergleichText("Pflichten-Check (15.01.2026)", `gilt: ${id} (Auslöser „einstellung“, 2 Beschäftigte)`, a.gilt.some((p) => p.id === id) ? "ja" : "nein", "ja");
+  // R10: ohne neue Einstellung in den letzten sechs Monaten stehen sie unter „Bei Neueinstellung“ (Nutzertests Sabine, Jonas)
+  const ohneNeue = auswertung(s.profil, "2026-01-15", s.unterlagen.filter((u) => (u.ausgegeben ?? "") < "2026-01-16"), s.mitarbeiter.map((m) => ({ ...m, beginn: "2022-03-01" })));
+  vergleichText("Pflichten-Check (15.01.2026)", "ohne neue Einstellung: Sofortmeldung unter „Bei Neueinstellung“", ohneNeue.beiEinstellung.some((p) => p.id === "personal.sofortmeldung") && !ohneNeue.gilt.some((p) => p.id === "personal.sofortmeldung") ? "ja" : "nein", "ja");
   // Jahresende: die Unterweisung vom 10.02.2026 ist ausgegeben ⇒ Wiederholung spätestens 10.02.2027
-  const ende = auswertung(s.profil, "2026-12-31", s.unterlagen).gilt.find((p) => p.id === "arbeitsschutz.unterweisung_wiederholen");
+  const ende = auswertung(s.profil, "2026-12-31", s.unterlagen, s.mitarbeiter).gilt.find((p) => p.id === "arbeitsschutz.unterweisung_wiederholen");
   vergleichText("Pflichten-Check (31.12.2026)", "Unterweisung wiederholen – nächster Termin", ende?.naechsterTermin ?? "fehlt", "2027-02-10");
   const pflichten = {
     gilt: a.gilt.map((p) => ({ id: p.id, titel: p.titel, vorlage: p.vorlage, erzeugt: !!p.vorlage && genutzt.has(p.vorlage) })),

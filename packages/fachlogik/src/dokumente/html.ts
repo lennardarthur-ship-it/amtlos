@@ -714,6 +714,31 @@ body.g-brief { padding-left: 5mm; padding-right: 10mm; font-size: 10pt; }
 .g-aushang table.liste td:last-child, .g-aushang table.liste th:last-child { padding-right: 2.4mm; }
 .g-aushang h2 { font-size: 13.5pt; }
 .g-aushang section.abschnitt > h2::before { content: none; }
+/* HACCP-Monatsraster (R10): je Gerät Wert- und Kürzelzeile, je Tag eine schmale Spalte */
+table.liste.raster { table-layout: fixed; font-size: 8pt; }
+table.liste.raster th, table.liste.raster td { border: 0.4pt solid #b8c0c6; padding: 0.6mm 0.8mm; }
+table.liste.raster th.tag { font-size: 7pt; text-align: center; padding: 1mm 0; }
+table.liste.raster tr.wert td { height: 11mm; }
+table.liste.raster tr.kuerzel td { height: 6mm; }
+table.liste.raster td.art { font-size: 6.8pt; color: #5b6670; }
+table.liste.raster tbody.geraet { page-break-inside: avoid; break-inside: avoid; }
+/* Hautschutzplan (R10): ein Blatt am Waschplatz – große Schrift, Zeile „Produkt“ mit den Produkten des Betriebs */
+.g-aushang.haut h1 { font-size: 20pt; margin-top: 2mm; }
+.g-aushang.haut .kennung { margin-bottom: 3mm; }
+.g-aushang.haut table.liste { font-size: 11pt; line-height: 1.28; }
+.g-aushang.haut table.liste th { font-size: 10pt; }
+.g-aushang.haut table.liste:not(.matrix):not(.legende) td:first-child { font-size: 11.8pt; }
+.g-aushang.haut table.liste td { padding: 1.6mm 2.4mm; }
+.g-aushang.haut tr.produkte td { background: var(--akzent-hauch); padding-top: 1.8mm; padding-bottom: 1.8mm; font-size: 12pt; }
+.g-aushang.haut tr.produkte .zelle-linie { height: 4.4mm; }
+.g-aushang.haut tr.produkte .alle { margin-top: 1mm; font-size: 9pt; font-weight: 400; line-height: 1.25; }
+.g-aushang.haut.dicht table.liste { font-size: 9.6pt; line-height: 1.25; }
+.g-aushang.haut.dicht table.liste:not(.matrix):not(.legende) td:first-child { font-size: 10pt; line-height: 1.22; }
+.g-aushang.haut.dicht table.liste td { padding: 1.3mm 2.2mm; }
+.g-aushang.haut.dicht .kopfzeile { padding: 2.2mm 4mm; }
+.g-aushang.haut.dicht h1 { font-size: 17pt; margin-top: 1.5mm; }
+.g-aushang.haut.dicht .unter { font-size: 11pt; }
+.g-aushang.haut.dicht .kennung { margin-bottom: 2.4mm; }
 /* Betriebsanweisung nach dem Muster der DGUV Information 211-010: Kopf schlicht, Kästen in der Kennfarbe (Gefahrstoffe orange) */
 .g-aushang.ba .kopfzeile { background: none; color: #1a1f24; padding: 0 0 2.4mm; border-bottom: 1.1pt solid var(--akzent); align-items: flex-end; }
 .g-aushang.ba .kopfzeile .name { color: var(--akzent); }

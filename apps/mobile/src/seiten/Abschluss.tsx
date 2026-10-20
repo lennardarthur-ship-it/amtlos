@@ -254,6 +254,10 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
         {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
         {/* Plausibilität (G6): nur ein Hinweis, kein Hindernis */}
         {v.storno && betragUnplausibel(rechnungBrutto(u, z.stand.betrieb)) ? <Hinweis art="warnung" text={TEXT.betrag_unplausibel} /> : null}
+        {/* R10: fachliche Hinweise der Vorlage (Leitweg-ID, EU-Kunde, Abweichung vom Pflichten-Check) – kein Hindernis */}
+        {!fest
+          ? (v.hinweise?.(d, z.stand.betrieb, { kleinunternehmer: typeof z.stand.profil["ust.kleinunternehmer"] === "boolean" ? (z.stand.profil["ust.kleinunternehmer"] as boolean) : null }) ?? []).map((h) => <Hinweis key={h} art="warnung" text={h} />)
+          : null}
         {zaehlt ? <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.pro_rest(rest, FREI_JE_MONAT)}</T> : null}
         <T v="caption" leise stil={{ marginTop: 4 }}>{PRUEFHINWEIS}</T>
 

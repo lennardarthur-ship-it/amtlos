@@ -89,7 +89,9 @@ describe("Voranmeldung: Kennzahlen ohne Umsatzsteuer (Szenarien Shop, Praxis, El
   });
   it("Kz 48 nur bei Befreiungen nach § 4 Nr. 8 bis 29 UStG", () => {
     expect(kennzahlBefreiung("Steuerfreie Heilbehandlung nach § 4 Nr. 14 Buchst. a UStG")).toBe("48");
-    expect(kennzahlBefreiung("steuerfrei nach § 4 Nr. 1 Buchst. a UStG (Ausfuhr)")).toBeNull();
+    // R10: Ausfuhrlieferung → Kz 43 (steuerfrei mit Vorsteuerabzug)
+    expect(kennzahlBefreiung("steuerfrei nach § 4 Nr. 1 Buchst. a UStG (Ausfuhr)")).toBe("43");
+    expect(kennzahlBefreiung("Steuerfreie innergemeinschaftliche Lieferung nach § 4 Nr. 1b UStG")).toBeNull();
     expect(kennzahlBefreiung("Nullsteuersatz nach § 12 Abs. 3 UStG")).toBeNull();
   });
 });

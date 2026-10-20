@@ -177,14 +177,14 @@ describe("weitere Vorlagen", () => {
     expect(hy).not.toContain("Noch keine Einträge.");
     expect(hy).not.toContain("<dt>Bereich</dt>");
     expect(hy.match(/<td>&nbsp;<\/td>/g)!.length).toBe(6 * 5);
-    expect(html("hautschutzplan", { eintraege: [] })).toContain('<table class="liste hoch">');
+    expect(html("hautschutzplan", { eintraege: [] })).toContain('<table class="liste haut hoch">');
     const ha = html("haccp", { punkte: [] });
     expect(ha).not.toContain("<dt>Kontrollpunkte</dt>");
     expect(html("gefahrstoffverzeichnis", { stoffe: [] })).not.toContain("Anzahl Gefahrstoffe");
     const g = html("gefaehrdungsbeurteilung", { gefaehrdungen: [], mitwirkung: "Fachkraft für Arbeitssicherheit.\nBetriebsarzt;" });
     expect(g).toContain("<th>Gefährdung</th><th>Risiko</th><th>Schutzmaßnahmen</th><th>Umsetzung</th>");
     expect(g).toContain("Fachkraft für Arbeitssicherheit, Betriebsarzt</td>");
-    expect(html("pruefprotokoll_elektro", { geraete: [] }).match(/<td>&nbsp;<\/td>/g)!.length).toBe(7 * 6);
+    expect(html("pruefprotokoll_elektro", { geraete: [] }).match(/<td>&nbsp;<\/td>/g)!.length).toBe(7 * 9);
   });
 
   it("Betriebsanweisung: Notruf-Zeile auch ohne Angabe, kompakter Satz bei viel Text", () => {

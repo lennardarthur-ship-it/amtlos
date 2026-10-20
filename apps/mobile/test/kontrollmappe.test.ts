@@ -31,22 +31,22 @@ describe("Kassenhinweis: Voranmeldung, EÜR und Paket kennen keine Kassenumsätz
     expect(kassenSatzPaket("unbekannt")).toMatch(/^Falls der Betrieb eine Kasse nutzt: Kassenumsätze fehlen/);
     expect(kassenSatzPaket("keine")).toBeNull();
   });
-  it("Paket: Satz ganz oben im LIESMICH und in den Fragen (nicht als Frage gezählt)", () => {
+  it("Paket: Satz einmal im LIESMICH unter „Wichtig“, nicht in den Fragen (R10)", () => {
     const Q = { von: "2026-01-01", bis: "2026-03-31", name: "2026-Q1" };
     const basis: Stand = { ...LEERER_STAND, betrieb: B };
     const liesmich = (s: Stand) => strFromU8(unzipSync(steuerpaket(s, Q, s.steuerberatung, {}, "2026-04-10T08:00:00").zip)["LIESMICH.txt"]!);
     const mit = profilSetzen(basis, { "kasse.elektronisch": true });
-    expect(liesmich(mit).split("\r\n")[0]).toMatch(/^Betrieb mit Kasse: Kassenumsätze fehlen in diesem Paket\./);
-    expect(liesmich(mit).split("\r\n")[2]).toBe("Amtlos – Unterlagen für die Steuerberatung");
-    expect(fragenText(mit, Q).text).toContain("Betrieb mit Kasse: Kassenumsätze fehlen in diesem Paket.");
+    expect(liesmich(mit).split("\r\n")[0]).toBe("Amtlos – Unterlagen für die Steuerberatung");
+    expect(liesmich(mit)).toMatch(/\r\nWichtig\r\n- Betrieb mit Kasse: Kassenumsätze fehlen in diesem Paket\./);
+    expect(liesmich(mit).split("Kassenumsätze").length).toBe(2);
+    expect(fragenText(mit, Q).text).not.toContain("Kassenumsätze fehlen");
     expect(fragenText(mit, Q).anzahl).toBe(0);
-    expect(liesmich(basis).split("\r\n")[0]).toMatch(/^Falls der Betrieb eine Kasse nutzt:/);
+    expect(liesmich(basis)).toMatch(/\r\nWichtig\r\n- Falls der Betrieb eine Kasse nutzt:/);
     const ohne = profilSetzen(basis, { "kasse.elektronisch": false });
-    expect(liesmich(ohne).split("\r\n")[0]).toBe("Amtlos – Unterlagen für die Steuerberatung");
+    expect(liesmich(ohne)).not.toContain("Kassenumsätze");
     expect(fragenText(ohne, Q).text).not.toMatch(/Kasse nutzt|Betrieb mit Kasse/);
     // ohne Kasse laut Check entfällt auch der Punkt unter „Nicht enthalten“; mit Kasse oder ohne Antwort bleibt er
-    expect(liesmich(ohne)).not.toContain("- Kassenumsätze (Z-Bons bzw. Kassenexport)");
-    expect(liesmich(basis)).toContain("- Kassenumsätze (Z-Bons bzw. Kassenexport)");
+    expect(liesmich(basis).split("Kassenumsätze").length).toBe(2);
   });
 });
 

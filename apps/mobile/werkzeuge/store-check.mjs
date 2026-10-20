@@ -51,6 +51,12 @@ pruefe(app.ios?.privacyManifests?.NSPrivacyTracking === false, "Privacy Manifest
 const datenarten = app.ios?.privacyManifests?.NSPrivacyCollectedDataTypes ?? [];
 const kauf = datenarten.find((d) => d.NSPrivacyCollectedDataType === "NSPrivacyCollectedDataTypePurchaseHistory");
 pruefe(kauf?.NSPrivacyCollectedDataTypePurposes?.includes("NSPrivacyCollectedDataTypePurposeAnalytics") && kauf?.NSPrivacyCollectedDataTypePurposes?.includes("NSPrivacyCollectedDataTypePurposeAppFunctionality"), "Privacy Manifest: Kaufhistorie mit Zweck App-Funktionalität und Analysen (RevenueCat)");
+// R10: „Analysen“ im Manifest (RevenueCat-Dashboard) und die Texte sagen dasselbe – keine eigenen Analysen, RevenueCat
+// wertet Käufe für die Abo-Verwaltung aus (Store-Prüfhinweise, Datenschutzhinweis der App, Website)
+const storeTexte = JSON.parse(lies("store/de.json"));
+const website = fs.readFileSync(path.join(APP, "../website/seite.html"), "utf8");
+pruefe(/evaluates purchases for subscription management/.test(storeTexte.pruefhinweise) && /RevenueCat[^"]*Abo-Verwaltung/.test(recht) && /RevenueCat[^<]*Abo-Verwaltung/.test(website) && !/sends no analytics/i.test(storeTexte.pruefhinweise), "Texte zu Analysen passen zum Privacy Manifest (Store-Prüfhinweise, Datenschutzhinweis, Website)");
+pruefe(!recht.includes("[vor Veröffentlichung eintragen]"), "Datenschutzhinweis ohne Platzhalter (Garantie für die Übermittlung in die USA, Speicherdauer bei RevenueCat – src/rechtliches.ts)");
 const nurSync = ["EmailAddress", "Name", "UserID"].map((x) => `NSPrivacyCollectedDataType${x}`);
 pruefe(!datenarten.some((d) => nurSync.includes(d.NSPrivacyCollectedDataType)) && fs.existsSync(path.join(APP, "app.config.ts")), "Privacy Manifest: E-Mail, Name, Benutzer-ID nur in Builds mit Sync (app.config.ts, nicht fest in app.json)");
 

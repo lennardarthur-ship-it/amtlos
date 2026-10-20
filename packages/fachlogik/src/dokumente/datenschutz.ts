@@ -16,9 +16,17 @@ const RECHTSGRUNDLAGEN = [
   "Art. 6 Abs. 1 lit. b DSGVO (Vertrag oder vorvertragliche Maßnahmen)",
   "Art. 6 Abs. 1 lit. c DSGVO (rechtliche Verpflichtung)",
   "Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse)",
-  "Art. 88 DSGVO i. V. m. § 26 BDSG (Beschäftigungsverhältnis)",
+  // § 26 Abs. 1 BDSG ist nach EuGH C-34/21 keine tragfähige eigene Grundlage (R10) – Beschäftigtendaten über lit. b und c
+  "Art. 6 Abs. 1 lit. b und c DSGVO (Beschäftigungsverhältnis)",
   "Art. 9 Abs. 2 lit. a DSGVO (ausdrückliche Einwilligung bei Gesundheitsdaten)",
 ];
+/** Früher gespeicherte Rechtsgrundlage (bis R10) → heutige Fassung; ältere Verzeichnisse drucken so die neue. */
+const RECHTSGRUNDLAGE_FRUEHER: Record<string, string> = { "Art. 88 DSGVO i. V. m. § 26 BDSG (Beschäftigungsverhältnis)": "Art. 6 Abs. 1 lit. b und c DSGVO (Beschäftigungsverhältnis)" };
+export const rechtsgrundlageNeu = (t: string) =>
+  t
+    .split("\n")
+    .map((z) => RECHTSGRUNDLAGE_FRUEHER[z.trim()] ?? z)
+    .join("\n");
 const BETROFFENE = ["Kundinnen und Kunden", "Interessenten", "Beschäftigte", "Bewerberinnen und Bewerber", "Lieferanten und Dienstleister", "Besucherinnen und Besucher der Website"];
 const LOESCHFRISTEN = [
   "Buchungsbelege und Rechnungen: 8 Jahre (§ 147 AO, § 257 HGB), ab Ende des Kalenderjahres",
@@ -132,7 +140,7 @@ export const datenschutzDokumentation: Vorlage = {
             (x, i) =>
               eintrag(text(x, "bezeichnung"), angaben([
                 ["Zwecke (lit. b)", text(x, "zweck"), 2],
-                ["Rechtsgrundlage", text(x, "rechtsgrundlage")],
+                ["Rechtsgrundlage", rechtsgrundlageNeu(text(x, "rechtsgrundlage"))],
                 ["Betroffene Personen (lit. c)", text(x, "betroffene")],
                 ["Datenkategorien (lit. c)", text(x, "datenarten"), 2],
                 ["Empfänger (lit. d)", text(x, "empfaenger") || "keine"],

@@ -1,7 +1,7 @@
 import { Linking, View } from "react-native";
 import { BEREICHE, KURZ, PRUEFHINWEIS, vorlageFuer } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { Hinweis, Karte, Symbol, T, Zeile } from "../ui/bausteine";
+import { Karte, Symbol, T, Zeile } from "../ui/bausteine";
 import { Unterseite } from "../ui/navigation";
 import { useFarben } from "../ui/thema";
 import { pflichtenFuer, rechtsgrundlagen } from "../unterlagen/katalog";
@@ -48,9 +48,8 @@ export function InfoSeite({ id }: { id: string }) {
             </Karte>
           </Gruppe>
         ) : null}
-        <View style={{ marginTop: 20 }}>
-          <Hinweis text={PRUEFHINWEIS} />
-        </View>
+        {/* Prüfstand als ruhige Fußnote (R10) – deutlich gesagt wird er einmal zu Beginn des Pflichten-Checks */}
+        <T v="caption" leise stil={{ marginTop: 20 }}>{PRUEFHINWEIS}</T>
       </Inhalt>
     </Unterseite>
   );

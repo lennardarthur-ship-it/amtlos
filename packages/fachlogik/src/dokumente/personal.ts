@@ -4,15 +4,37 @@
  */
 import { teilnahmeTabelle } from "./arbeitsschutz.js";
 import { mitVertretung } from "./betrieb.js";
-import { MINDESTLOHN, NACHWG } from "./bausteine.js";
+import { MINDESTLOHN, MINIJOB, NACHWG } from "./bausteine.js";
 import { abschnitt, absatz, angaben, anschrift, anschriftMehrzeilig, auswahl, cent, datumDe, dokument, euro, ja, liste, neufassung, parteien, punkte, stabileOption, text, unterschriften, zahl, zahlText, zeilen } from "./html.js";
 import { optionen } from "./konstanten.js";
 import type { Daten, Vorlage } from "./typen.js";
 
+/**
+ * Werte vor 2026 (R10) für Unterlagen mit früherem Beginn oder Ausstellungsdatum – die Recherche-Tabellen beginnen 2026:
+ * Mindestlohn 12,41 € (2024) und 12,82 € (2025, Vierte Mindestlohnanpassungsverordnung), Minijob-Grenze 538 € bzw.
+ * 556 € (§ 8 Abs. 1a SGB IV: Mindestlohn × 130 / 3, aufgerundet).
+ */
+const MINDESTLOHN_FRUEHER = [{ ab: "2024-01-01", cent: 1241 }, { ab: "2025-01-01", cent: 1282 }];
+const MINIJOB_FRUEHER = [{ ab: "2024-01-01", cent: 53800 }, { ab: "2025-01-01", cent: 55600 }];
+const amStichtag = (l: { ab: string; cent: number }[], iso: string) => l.filter((m) => m.ab <= (iso || "9999")).sort((a, b) => b.ab.localeCompare(a.ab))[0]?.cent ?? null;
+
 /** Mindestlohn je Stunde (Cent), der am Stichtag gilt. */
 export function mindestlohnAm(iso: string): number | null {
-  const g = MINDESTLOHN.filter((m) => m.ab <= (iso || "9999")).sort((a, b) => b.ab.localeCompare(a.ab))[0];
-  return g?.cent ?? null;
+  return amStichtag([...MINDESTLOHN_FRUEHER, ...MINDESTLOHN], iso);
+}
+/** Minijob-Grenze im Monat (Cent), die am Stichtag gilt. */
+export function minijobGrenzeAm(iso: string): number | null {
+  return amStichtag([...MINIJOB_FRUEHER, ...MINIJOB], iso);
+}
+/** Stichtag für Grenzen im Nachweis: ausgestellt am, sonst Beginn (R10 – nicht das heutige Jahr). */
+const stichtag = (d: Daten) => text(d, "ausgestellt_am") || text(d, "beginn") || new Date().toISOString().slice(0, 10);
+/** Monatsentgelt in Cent (Stundenlohn × Wochenstunden × 13/3), sonst der Monatsbetrag. */
+function monatsentgelt(d: Daten): number | null {
+  const betrag = cent(text(d, "entgelt_betrag"));
+  if (betrag === null) return null;
+  if (text(d, "entgelt_art") !== "stunde") return betrag;
+  const w = zahl(text(d, "wochenstunden"));
+  return w ? Math.round((betrag * w * 13) / 3) : null;
 }
 /** Stundenlohn in Cent aus Stundenlohn oder Monatsgehalt und Wochenstunden (Monat = 13/3 Wochen). */
 export function stundenlohn(d: Daten): number | null {
@@ -75,6 +97,8 @@ export const nachweisArbeitsbedingungen: Vorlage = {
       felder: [
         { id: "entgelt_art", art: "wahl", label: "Art", optionen: optionen(ENTGELT), vorbelegung: "monat" },
         { id: "entgelt_betrag", art: "betrag", label: "Betrag brutto (€)", pflicht: true },
+        // Minijob (R10): die Grenze steht mit dem Wert zum Ausstellungsdatum im Nachweis – nicht als Freitext mit Jahreszahl
+        { id: "minijob", art: "schalter", label: "Minijob (geringfügig entlohnt)", hilfe: "Der Nachweis nennt die Minijob-Grenze, die am Ausstellungstag gilt" },
         { id: "zuschlaege", art: "mehrzeilig", label: "Weitere Bestandteile", hilfe: "Vergütung von Überstunden, Zuschläge, Zulagen, Prämien, Sonderzahlungen – jeweils getrennt", vorschlaege: ["Keine weiteren Bestandteile.", "Überstunden werden mit dem vereinbarten Stundenlohn vergütet.", "Überstunden werden durch Freizeit ausgeglichen."] },
         { id: "faelligkeit", art: "text", label: "Fälligkeit", pflicht: true, vorschlaege: FAELLIG },
         { id: "auszahlung", art: "text", label: "Art der Auszahlung", pflicht: true, vorschlaege: ["Überweisung auf das von der beschäftigten Person benannte Konto"] },
@@ -124,8 +148,15 @@ export const nachweisArbeitsbedingungen: Vorlage = {
     const urlaub = zahl(text(d, "urlaub"));
     const tage = zahl(text(d, "tage_pro_woche"));
     if (urlaub !== null && tage && urlaub < mindesturlaub(tage)) f.push(`Urlaub liegt unter dem gesetzlichen Mindesturlaub von ${mindesturlaub(tage)} Arbeitstagen`);
+    const grenze = minijobGrenzeAm(stichtag(d));
+    const monat = monatsentgelt(d);
+    if (ja(d, "minijob") && grenze !== null && monat !== null && monat > grenze) f.push(`Monatsentgelt (rechnerisch ${euro(monat)}) liegt über der Minijob-Grenze von ${euro(grenze)}`);
     return f;
   },
+  // beim Teilen (R10): Form und Empfangsnachweis – gerade per Messenger geteilte PDFs erfüllen sonst die Form nicht
+  hinweise: () => [
+    "Form: In den Branchen nach § 2a SchwarzArbG (z. B. Bau, Gaststätten und Beherbergung, Transport und Logistik, Gebäudereinigung) gilt die Schriftform – ausdrucken, beide unterschreiben, aushändigen. Sonst reicht die Textform (z. B. PDF per E-Mail) nur, wenn das Dokument speicher- und ausdruckbar ist und du einen Empfangsnachweis anforderst (§ 2 Abs. 1 NachwG).",
+  ],
   html(d, b) {
     const ort = text(d, "arbeitsort") === "anders" ? `${ORT.anders} ${text(d, "arbeitsort_text")}` : (ORT[text(d, "arbeitsort")] ?? "");
     const entgelt = text(d, "entgelt_betrag") ? `${ENTGELT[text(d, "entgelt_art")] ?? ""}: ${euro(cent(text(d, "entgelt_betrag")) ?? 0)}` : "";
@@ -137,7 +168,7 @@ export const nachweisArbeitsbedingungen: Vorlage = {
       ["4. Arbeitsort", ort],
       ["5. Tätigkeit", text(d, "taetigkeit")],
       ["6. Probezeit", PROBEZEIT[text(d, "probezeit")] ?? ""],
-      ["7. Arbeitsentgelt", [entgelt, text(d, "zuschlaege"), text(d, "faelligkeit") ? `Fällig ${text(d, "faelligkeit")}.` : "", text(d, "auszahlung") ? `Auszahlung: ${text(d, "auszahlung")}.` : ""].filter(Boolean).join("\n")],
+      ["7. Arbeitsentgelt", [entgelt, ja(d, "minijob") && minijobGrenzeAm(stichtag(d)) !== null ? `Geringfügig entlohnte Beschäftigung (Minijob): Das monatliche Arbeitsentgelt übersteigt die Minijob-Grenze von ${euro(minijobGrenzeAm(stichtag(d))!)} (Stand ${datumDe(stichtag(d))}) nicht.` : "", text(d, "zuschlaege"), text(d, "faelligkeit") ? `Fällig ${text(d, "faelligkeit")}.` : "", text(d, "auszahlung") ? `Auszahlung: ${text(d, "auszahlung")}.` : ""].filter(Boolean).join("\n")],
       ["8. Arbeitszeit, Pausen, Ruhezeiten", [zeit, text(d, "pausen") ? `Ruhepausen: ${text(d, "pausen").replace(/^\s*Ruhepausen:?\s*/i, "")}` : "", text(d, "ruhezeit") ? `Ruhezeit: ${text(d, "ruhezeit").replace(/^\s*Ruhezeit:?\s*/i, "")}` : "", ja(d, "schicht") ? `Schichtarbeit: ${text(d, "schicht_text")}` : ""].filter(Boolean).join("\n")],
       ["9. Arbeit auf Abruf", ja(d, "abruf") ? text(d, "abruf_text") : "nicht vereinbart"],
       ["10. Überstunden", text(d, "ueberstunden") === "ja" ? `${UEBERSTUNDEN.ja} ${text(d, "ueberstunden_text")}` : UEBERSTUNDEN.nein!],

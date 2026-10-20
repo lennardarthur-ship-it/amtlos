@@ -115,8 +115,14 @@ const webTitel = (farbe: string) =>
   function WebTitel({ children }: { children: string }) {
     // lässt links „Schließen“ und rechts „Übersicht“ Platz (A12) – lange Titel enden mit „…“; schmale Geräte weniger.
     // Schrift höchstens 130 % wie die Leiste des iPhones – bei 200 % lägen Titel und „Übersicht“ übereinander (G11)
-    const { width } = useWindowDimensions();
-    return <T fett numberOfLines={1} maxFontSizeMultiplier={1.3} farbe={farbe} stil={{ maxWidth: Math.max(96, Math.min(180, width - 210)) }}>{children}</T>;
+    const { width, fontScale } = useWindowDimensions();
+    // große Schrift oder schmal (R10): zwei kleinere Zeilen mit Trennstrich statt „Allergenlis…“
+    const eng = fontScale > 1.3 || width < 340;
+    return (
+      <T fett v={eng ? "klein" : "basis"} numberOfLines={eng ? 2 : 1} maxFontSizeMultiplier={1.3} farbe={farbe} stil={{ maxWidth: eng ? Math.max(120, Math.min(220, width - 120)) : Math.max(96, Math.min(180, width - 210)), textAlign: "center" }}>
+        {children}
+      </T>
+    );
   };
 
 function WebZurueck({ buehne }: { buehne: boolean }) {
@@ -167,6 +173,9 @@ export interface KopfKnopfDef {
 export function useKopf({ titel, rechts, schliessen, gross, buehne }: { titel: string; rechts?: KopfKnopfDef | null; schliessen?: boolean; gross?: boolean; buehne?: boolean }) {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const f = useFarben();
+  // große Schrift oder schmal (R10): Textknopf rechts als runder Symbolknopf – sonst läge „Übersicht“ über dem Titel
+  const { fontScale, width } = useWindowDimensions();
+  const eng = fontScale > 1.3 || width < 340;
   // Bühne (E-142): Leiste und Grund im tiefen Grün, Schrift weiß, Knöpfe Minze – z. B. der Abschluss einer Rechnung
   useLayoutEffect(() => {
     if (buehne === undefined) return;
@@ -191,11 +200,11 @@ export function useKopf({ titel, rechts, schliessen, gross, buehne }: { titel: s
         ? () => [{ type: "button", label: rechts.text, accessibilityLabel: rechts.label ?? rechts.text, onPress: aufRechts, ...(rechts.symbol ? { icon: { type: "sfSymbol" as const, name: rechts.symbol as never } } : null), ...(rechts.hervor ? { variant: "prominent" as const } : null) }]
         : undefined;
     } else {
-      o.headerRight = rechts ? (p: { tintColor?: string }) => (rechts.symbol ? <RundKnopf symbol={rechts.symbol} label={rechts.label ?? rechts.text} onPress={aufRechts} buehne={p.tintColor === f.minze} /> : <KopfText text={rechts.text} label={rechts.label} onPress={aufRechts} buehne={p.tintColor === f.minze} />) : undefined;
+      o.headerRight = rechts ? (p: { tintColor?: string }) => (rechts.symbol || eng ? <RundKnopf symbol={rechts.symbol ?? "list.bullet"} label={rechts.label ?? rechts.text} onPress={aufRechts} buehne={p.tintColor === f.minze} /> : <KopfText text={rechts.text} label={rechts.label} onPress={aufRechts} buehne={p.tintColor === f.minze} />) : undefined;
     }
     navigation.setOptions(o);
     // Handler stehen in Referenzen
-  }, [navigation, titel, Boolean(rechts), rechts?.text, rechts?.symbol, rechts?.label, rechts?.hervor, gross, f]);
+  }, [navigation, titel, Boolean(rechts), rechts?.text, rechts?.symbol, rechts?.label, rechts?.hervor, gross, f, eng]);
 }
 
 /**

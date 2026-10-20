@@ -1,5 +1,5 @@
 import { Linking, Share, View } from "react-native";
-import { ANBIETER, LINKS, datenschutzAbschnitte, hilfeZiel } from "../rechtliches";
+import { ANBIETER, DATENSCHUTZ, LINKS, datenschutzAbschnitte, hilfeZiel } from "../rechtliches";
 import { syncAngeboten } from "../konto/konfig";
 import { T as TEXT } from "../texte";
 import { Hinweis, Karte, T, Zeile } from "../ui/bausteine";
@@ -42,13 +42,18 @@ export function DatenschutzSeite() {
   return (
     <Unterseite titel={TEXT.datenschutz}>
       <Inhalt>
+        {/* Verantwortlicher mit Kontakt zuerst (Art. 13 Abs. 1 lit. a DSGVO) – aus ANBIETER, nie erfunden */}
+        <View style={{ marginBottom: 18 }}>
+          <T fett accessibilityRole="header">{TEXT.verantwortlich_titel}</T>
+          {ANBIETER.name ? <T v="klein" stil={{ marginTop: 4 }}>{TEXT.verantwortlich_ist(ANBIETER.name, ANBIETER.anschrift, ANBIETER.email)}</T> : <Hinweis text={TEXT.anbieter_folgt} />}
+        </View>
         {datenschutzAbschnitte(syncAngeboten).map((a) => (
           <View key={a.titel} style={{ marginBottom: 18 }}>
             <T fett accessibilityRole="header">{a.titel}</T>
             <T v="klein" stil={{ marginTop: 4 }}>{a.text}</T>
           </View>
         ))}
-        {ANBIETER.name ? <T v="klein" leise>{TEXT.verantwortlich_ist(ANBIETER.name, ANBIETER.anschrift, ANBIETER.email)}</T> : <Hinweis text={TEXT.anbieter_folgt} />}
+        {!DATENSCHUTZ.freigegeben ? <T v="caption" leise>{TEXT.datenschutz_entwurf}</T> : null}
       </Inhalt>
     </Unterseite>
   );

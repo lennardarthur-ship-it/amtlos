@@ -6,7 +6,7 @@ import { createContext, useContext, useEffect, useId, useRef, useState, type Rea
 import { AccessibilityInfo, ActivityIndicator, Animated, Pressable, Text as RNText, ScrollView, Switch, TextInput, View, useColorScheme, useWindowDimensions, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { T as TEXT } from "../texte";
-import { datumLesen, isoAus } from "./datum";
+import { datumLesen, isoAus, nurJahr, uhrzeitLesen } from "./datum";
 import { trennen } from "./trennen";
 import { DatumWahl } from "./datumwahl";
 import { FussKontext } from "./fussHoehe";
@@ -31,12 +31,18 @@ export function useGrosseSchrift(): boolean {
   return useWindowDimensions().fontScale > GROSSE_SCHRIFT_AB;
 }
 
-/** Text mit Markenschrift. `fett` wählt den Halbfett-Schnitt (keine künstliche Fettung). */
+/**
+ * Text mit Markenschrift. `fett` wählt den Halbfett-Schnitt (keine künstliche Fettung). Bei großer Schrift oder auf sehr
+ * schmalen Geräten bekommen lange Wörter weiche Trennstellen (R10) – sonst brächen „Sozialversicherungsbeiträge“ oder
+ * „Temperaturkontrolle“ in Kacheln, Listen und Vorschlägen mitten im Wort ohne Strich.
+ */
 export function T({ v = "basis", fett, leise, farbe, stil, children, ...rest }: { v?: Variante; fett?: boolean; leise?: boolean; farbe?: string; stil?: StyleProp<TextStyle>; children: ReactNode } & Omit<React.ComponentProps<typeof RNText>, "style">) {
   const f = useFarben();
+  const { fontScale, width } = useWindowDimensions();
+  const eng = fontScale > GROSSE_SCHRIFT_AB || width < 360;
   return (
     <RNText {...rest} style={[STIL[v], fett && !UEBERSCHRIFT.has(v) ? { ...SCHRIFT.halb } : null, { color: farbe ?? (leise ? f.tinteLeise : f.tinte) }, stil]}>
-      {children}
+      {eng && typeof children === "string" ? trennen(children) : children}
     </RNText>
   );
 }
@@ -651,8 +657,10 @@ export const textAus = (iso: string | null | undefined) => (iso ? `${iso.slice(8
  * Kalender, anderer Stand) ersetzt ihn. Beim Verlassen wird ein gültiges Datum einheitlich geschrieben („5.3.26“ →
  * „05.03.2026“).
  */
-export function DatumFeld({ label, wert, aendern, hilfe, ohneHeute, ohneLabel }: { label: string; wert: string | null; aendern: (iso: string | null) => void; hilfe?: string; ohneHeute?: boolean; ohneLabel?: boolean }) {
+export function DatumFeld({ label, wert, aendern, hilfe, ohneHeute, ohneLabel, jahrReicht: jahrGesetzt }: { label: string; wert: string | null; aendern: (iso: string | null) => void; hilfe?: string; ohneHeute?: boolean; ohneLabel?: boolean; /** nur das Jahr genügt („2014“ → 01.01.2014), z. B. „seit wann“ */ jahrReicht?: boolean }) {
   const f = useFarben();
+  // Frage im Pflichten-Check (ohne Beschriftung: „Wann hast du angefangen?“): das Jahr allein genügt (R10, Sabine #12)
+  const jahrReicht = jahrGesetzt ?? Boolean(ohneLabel);
   const heuteText = TEXT.heute;
   const [text, setText] = useState(textAus(wert));
   const [fokus, setFokus] = useState(false);
@@ -665,10 +673,11 @@ export function DatumFeld({ label, wert, aendern, hilfe, ohneHeute, ohneLabel }:
     setText(textAus(wert));
   }, [wert]);
   const heute = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Berlin" }).format(new Date());
-  const gelesen = datumLesen(text);
+  const gelesen = datumLesen(text, { jahrReicht });
   const leer = text.trim() === "";
-  // ein unmöglicher Tag sofort, ein unvollständiges Format erst nach dem Verlassen – beim Tippen ist „20.10.20“ normal
-  const fehlerText = leer ? null : gelesen.fehler === "tag" ? TEXT.datum_gibt_es_nicht : gelesen.fehler === "format" && !fokus ? TEXT.datum_falsch : null;
+  // ein unmöglicher Tag sofort, ein unvollständiges Format erst nach dem Verlassen – beim Tippen ist „20.10.20“ normal;
+  // nur ein Jahr („2014“) ohne `jahrReicht`: nach dem ganzen Datum fragen statt stumm nichts zu übernehmen (R10)
+  const fehlerText = leer ? null : gelesen.fehler === "tag" ? TEXT.datum_gibt_es_nicht : gelesen.fehler === "format" && !fokus ? (nurJahr(text) ? TEXT.datum_nur_jahr(text.trim()) : TEXT.datum_falsch) : null;
   const hinweisText = !leer && gelesen.iso && gelesen.unplausibel ? TEXT.datum_unplausibel(gelesen.iso.slice(0, 4)) : null;
   return (
     <View style={{ marginTop: ohneLabel ? 8 : 20 }}>
@@ -679,7 +688,7 @@ export function DatumFeld({ label, wert, aendern, hilfe, ohneHeute, ohneLabel }:
           value={text}
           onChangeText={(w) => {
             setText(w);
-            const iso = w.trim() === "" ? null : datumLesen(w).iso;
+            const iso = w.trim() === "" ? null : datumLesen(w, { jahrReicht }).iso;
             gemeldet.current = iso;
             aendern(iso);
           }}
@@ -878,10 +887,55 @@ export function MehrfachWahl({ label, werte, aendern, optionen, hilfe, ohneLabel
   );
 }
 
-/** Uhrzeit als HH:MM. */
-export function UhrzeitFeld({ label, wert, aendern, hilfe }: { label: string; wert: string; aendern: (w: string) => void; hilfe?: string }) {
-  const falsch = wert.trim() !== "" && !/^([01]?\d|2[0-3]):[0-5]\d$/.test(wert.trim());
-  return <Feld label={label} hilfe={hilfe === "HH:MM" ? undefined : hilfe} wert={wert} aendern={aendern} placeholder="HH:MM" keyboardType="numbers-and-punctuation" fehler={falsch ? TEXT.uhrzeit_falsch : null} />;
+/**
+ * Uhrzeit als HH:MM (R10): Ziffernblock statt Symboltastatur – „1400“ wird zu 14:00, „930“ beim Verlassen zu 09:30;
+ * „14.00“ und „14,00“ gehen auch. `jetzt`: Knopf „Jetzt“ setzt die aktuelle Uhrzeit (deutsche Zeit).
+ */
+export function UhrzeitFeld({ label, wert, aendern, hilfe, jetzt }: { label: string; wert: string; aendern: (w: string) => void; hilfe?: string; jetzt?: boolean }) {
+  const f = useFarben();
+  const [fokus, setFokus] = useState(false);
+  const roh = wert.trim();
+  const gueltig = /^([01]?\d|2[0-3]):[0-5]\d$/.test(roh);
+  // beim Tippen nur melden, was sicher falsch ist (z. B. „25:00“) – „14“ ist noch unterwegs zu „1400“
+  const falsch = roh !== "" && !gueltig && (!fokus || roh.length >= 4) && !uhrzeitLesen(roh);
+  const setzen = (w: string) => {
+    // vier Ziffern sind vollständig: gleich als Uhrzeit schreiben („1400“ → „14:00“)
+    const z = /^\d{4}$/.test(w.trim()) ? uhrzeitLesen(w) : null;
+    aendern(z ?? w);
+  };
+  const jetztZeit = () => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date());
+  const feld = (
+    <Feld
+      label={label}
+      ohneLabel={Boolean(jetzt)}
+      hilfe={hilfe === "HH:MM" ? undefined : hilfe}
+      wert={wert}
+      aendern={setzen}
+      placeholder="HH:MM"
+      keyboardType="number-pad"
+      autoCorrect={false}
+      spellCheck={false}
+      fehler={falsch ? TEXT.uhrzeit_falsch : null}
+      onFocus={() => setFokus(true)}
+      onBlur={() => {
+        setFokus(false);
+        const z = uhrzeitLesen(roh);
+        if (roh && z && z !== roh) aendern(z);
+      }}
+    />
+  );
+  if (!jetzt) return feld;
+  return (
+    <View style={{ marginTop: 20 }}>
+      <FeldKopf label={label} hilfe={hilfe === "HH:MM" ? undefined : hilfe} />
+      <View style={{ flexDirection: "row", gap: 8, alignItems: "flex-start" }}>
+        <View style={{ flex: 1 }}>{feld}</View>
+        <Pressable accessibilityRole="button" accessibilityLabel={`${label}: ${TEXT.jetzt}`} onPress={() => aendern(jetztZeit())} style={({ pressed }) => ({ minHeight: 50, marginTop: 15, paddingHorizontal: 15, borderRadius: RADIUS.klein, justifyContent: "center", backgroundColor: f.amtHauch, opacity: pressed ? 0.7 : 1 })}>
+          <T v="klein" fett farbe={f.amtTief}>{TEXT.jetzt}</T>
+        </Pressable>
+      </View>
+    </View>
+  );
 }
 
 /** Textbausteine zum Ankreuzen – untereinander, mit Quelle (Checkbox-Semantik). */

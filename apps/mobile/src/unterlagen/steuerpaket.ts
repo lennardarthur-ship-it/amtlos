@@ -15,6 +15,7 @@ import {
   buchungenAusBelegen,
   buchungenAusRechnungen,
   buchungslisteCsv,
+  belegImStapel,
   belegKennung,
   belegNummern,
   belegSummen,
@@ -23,8 +24,11 @@ import {
   datevExtf,
   datevExtfBytes,
   eRechnungAus,
+  drittlandLand,
+  euUnternehmenLand,
   euerFuer,
   kennzahlBefreiung,
+  steuerschuldBetrag,
   VORSTEUER_AUFTEILEN,
   istKapitalgesellschaft,
   kategorieFuer,
@@ -42,7 +46,7 @@ import {
 import { APP_VERSION } from "../version";
 import { T as TEXT } from "../texte";
 import { utf8 } from "./sicherung";
-import { GUTSCHRIFT_HINWEIS, istGutschrift } from "./ustAusRechnungen";
+import { GUTSCHRIFT_HINWEIS, istGutschrift, kuImZeitraum, zuordnungsTage } from "./ustAusRechnungen";
 import { nichtZaehlend, type Stand, type Unterlage } from "./speicher";
 
 // 0 statt -0: ein Storno über 0,00 € steht als „0,00“ da, nicht als „-0,00“
@@ -110,10 +114,40 @@ export function istKleinunternehmer(s: Stand): boolean {
   return r.length > 0 && r.every((u) => u.daten.kleinunternehmer === true);
 }
 
-/** Ausgangsrechnung in der Form, die die Buchungen brauchen. */
-export function rechnungFuerBuchung(u: Unterlage, betrieb: Betrieb): AusgangsRechnungFuerBuchung {
+/** Rechtsform laut Pflichten-Check (Wert der Antwort) als Text – für LIESMICH, wenn „Mein Betrieb“ keine hat (R10). */
+const RECHTSFORM_TEXT: Record<string, string> = { einzelunternehmen: "Einzelunternehmen", freiberuf: "Freiberuflich (Einzelunternehmen)", gbr: "GbR", ek: "e. K.", ug: "UG (haftungsbeschränkt)", gmbh: "GmbH", gmbh_co_kg: "GmbH & Co. KG", partg: "PartG", partg_mbb: "PartG mbB" };
+/** Rechtsform aus „Mein Betrieb“, sonst aus dem Pflichten-Check (mit Herkunft). */
+export function rechtsformFuer(s: Stand): { text: string; ausCheck: boolean } | null {
+  const b = s.betrieb.rechtsform?.trim();
+  if (b) return { text: b, ausCheck: false };
+  const p = s.profil.rechtsform;
+  return typeof p === "string" && RECHTSFORM_TEXT[p] ? { text: RECHTSFORM_TEXT[p]!, ausCheck: true } : null;
+}
+/** Kapitalgesellschaft laut „Mein Betrieb“ oder Pflichten-Check */
+export const kapitalgesellschaft = (s: Stand) => istKapitalgesellschaft(rechtsformFuer(s)?.text, s.betrieb.name);
+
+/** Ausgangsrechnung in der Form, die die Buchungen brauchen. `tage`: Zuordnung zur Steuerperiode (zuordnungsTage). */
+export function rechnungFuerBuchung(u: Unterlage, betrieb: Betrieb, o: { tage?: Map<string, string | null>; betriebKu?: boolean } = {}): AusgangsRechnungFuerBuchung {
   const { daten } = eRechnungAus(u.daten, betrieb);
-  return { id: u.id, nummer: daten.nummer, datum: daten.rechnungsdatum, bezahlt: u.bezahlt ?? null, art: istStorno(u) ? "storno" : "rechnung", storniert_nummer: daten.storniert_nummer ?? null, gutschrift: istGutschrift(u), kleinunternehmer: daten.kleinunternehmer, kunde: daten.kunde.name, positionen: daten.positionen };
+  const leistung = daten.leistungsdatum ?? daten.leistungszeitraum?.bis ?? null;
+  return {
+    id: u.id,
+    nummer: daten.nummer,
+    datum: daten.rechnungsdatum,
+    bezahlt: u.bezahlt ?? null,
+    art: istStorno(u) ? "storno" : "rechnung",
+    storniert_nummer: daten.storniert_nummer ?? null,
+    gutschrift: istGutschrift(u),
+    kleinunternehmer: daten.kleinunternehmer,
+    kunde: daten.kunde.name,
+    positionen: daten.positionen,
+    steuerart: daten.steuerart,
+    kunde_land: daten.kunde.land,
+    kunde_ust_idnr: daten.kunde.ust_idnr ?? null,
+    leistungsdatum: istStorno(u) ? null : leistung,
+    steuerperiode: o.tage?.get(u.id) ?? null,
+    empfaenger_ku: o.betriebKu ?? false,
+  };
 }
 
 /**
@@ -127,9 +161,29 @@ export function einnahmenAusRechnungen(s: Stand): Einnahme[] {
       const { daten } = eRechnungAus(u.daten, s.betrieb);
       const sm = summen(daten.positionen, daten.kleinunternehmer);
       const vz = istStorno(u) ? -1 : 1;
-      const frei = daten.steuerart && daten.steuerart !== "standard" ? sm.gruppen.filter((g) => g.satz === 0).reduce((a, g) => a + g.netto_cent, 0) : 0;
-      return { tag: u.bezahlt!, netto_cent: vz * sm.netto_cent, ust_cent: vz * sm.ust_cent, steuerfrei_cent: vz * frei, kleinunternehmer: daten.kleinunternehmer };
+      // Nullsteuersatz (§ 12 Abs. 3 UStG) ist steuerpflichtig zu 0 % – Zeile „umsatzsteuerpflichtig“, nicht „steuerfrei“ (R10)
+      const frei = daten.steuerart && daten.steuerart !== "standard" && daten.steuerart !== "nullsatz" ? sm.gruppen.filter((g) => g.satz === 0).reduce((a, g) => a + g.netto_cent, 0) : 0;
+      // Kleinunternehmer: Leistungen an Unternehmen im Ausland sind nicht steuerbar – eigene „davon“-Zeile der Anlage EÜR
+      const nichtSteuerbar = daten.kleinunternehmer && (daten.steuerart === "reverse_charge" || euUnternehmenLand(u.daten) || drittlandLand(u.daten)) ? sm.netto_cent : 0;
+      return { tag: u.bezahlt!, netto_cent: vz * sm.netto_cent, ust_cent: vz * sm.ust_cent, steuerfrei_cent: vz * frei, nicht_steuerbar_cent: vz * nichtSteuerbar, kleinunternehmer: daten.kleinunternehmer };
     });
+}
+
+/** Gutschriften mit Zahlungsvermerk im Jahr – Ausgaben des Betriebs (bezogene Leistungen), R10. */
+function gutschriftAusgaben(s: Stand, jahr: string): { netto: number; ust: number; anzahl: number } {
+  let netto = 0;
+  let ust = 0;
+  let anzahl = 0;
+  for (const u of gestellteRechnungen(s)) {
+    if (!istGutschrift(u) || !u.bezahlt?.startsWith(`${jahr}-`)) continue;
+    const { daten } = eRechnungAus(u.daten, s.betrieb);
+    const sm = summen(daten.positionen, daten.kleinunternehmer);
+    const vz = istStorno(u) ? -1 : 1;
+    netto += vz * sm.netto_cent;
+    ust += vz * sm.ust_cent;
+    anzahl++;
+  }
+  return { netto, ust, anzahl };
 }
 
 /** Jahre mit Daten (Zahlungen von Rechnungen, Zahltage von Belegen), neueste zuerst. */
@@ -170,8 +224,11 @@ export function euerUebernahme(s: Stand, jahr: string): EuerUebernahme {
   const ein: Record<string, string>[] = [];
   const pflichtig = e.einnahmen_netto_cent - e.einnahmen_steuerfrei_cent;
   if (ku) {
-    // ohne „(netto)“: bei Kleinunternehmern gibt es keine Umsatzsteuer, der Betrag ist der Rechnungsbetrag
-    if (e.einnahmen_netto_cent) ein.push({ datum: "", text: "Umsätze aus Rechnungen", kategorie: "Umsatzsteuerlicher Kleinunternehmer", betrag: betrag(e.einnahmen_netto_cent) });
+    // ohne „(netto)“: bei Kleinunternehmern gibt es keine Umsatzsteuer, der Betrag ist der Rechnungsbetrag. Nicht steuerbare
+    // Umsätze (Ausland) als eigene Zeile – in der Anlage EÜR die „davon“-Zeile zur Kleinunternehmer-Zeile
+    const ns = e.einnahmen_nicht_steuerbar_cent;
+    if (e.einnahmen_netto_cent - ns) ein.push({ datum: "", text: "Umsätze aus Rechnungen", kategorie: "Umsatzsteuerlicher Kleinunternehmer", betrag: betrag(e.einnahmen_netto_cent - ns) });
+    if (ns) ein.push({ datum: "", text: "Nicht steuerbare Umsätze aus Rechnungen (Leistungen an Unternehmen im Ausland; in der Anlage EÜR „davon“ zur Kleinunternehmer-Zeile)", kategorie: "Nicht steuerbare Umsätze sowie Umsätze nach § 19 Absatz 3 Satz 1 Nummer 1 und 2 UStG", betrag: betrag(ns) });
   } else {
     if (pflichtig) ein.push({ datum: "", text: "Umsätze aus Rechnungen (netto)", kategorie: EUER_ZEILE_STEUERPFLICHTIG, betrag: betrag(pflichtig) });
     // ohne Beispiel: die Zeile sammelt igL, § 13b-Umsätze und Steuerbefreiungen (z. B. Heilbehandlungen)
@@ -179,11 +236,16 @@ export function euerUebernahme(s: Stand, jahr: string): EuerUebernahme {
   }
   if (e.ust_vereinnahmt_cent) ein.push({ datum: "", text: "Vereinnahmte Umsatzsteuer", kategorie: "Vereinnahmte Umsatzsteuer sowie Umsatzsteuer auf unentgeltliche Wertabgaben", betrag: betrag(e.ust_vereinnahmt_cent) });
   const aus: Record<string, string>[] = e.ausgaben.zeilen.map((z) => ({ datum: "", text: `${z.kategorie.titel} (${z.anzahl} ${z.anzahl === 1 ? "Beleg" : "Belege"})`, kategorie: z.kategorie.euer, betrag: betrag(z.netto_cent) }));
-  if (e.ausgaben.vorsteuer_cent) aus.push({ datum: "", text: "Gezahlte Vorsteuer aus Belegen", kategorie: "Gezahlte Vorsteuerbeträge", betrag: betrag(e.ausgaben.vorsteuer_cent) });
+  // Gutschriften (bezahlt im Jahr) sind Ausgaben: bezogene Leistungen; ausgewiesene Steuer des Leistenden als Vorsteuer, außer als Kleinunternehmer
+  const gs = gutschriftAusgaben(s, jahr);
+  const betriebKu = istKleinunternehmer(s);
+  if (gs.netto || gs.ust) aus.push({ datum: "", text: `Gutschriften an Leistende (${gs.anzahl} ${gs.anzahl === 1 ? "Gutschrift" : "Gutschriften"})`, kategorie: "Bezogene Leistungen", betrag: betrag(betriebKu ? gs.netto + gs.ust : gs.netto) });
+  const vorsteuer = e.ausgaben.vorsteuer_cent + (betriebKu ? 0 : gs.ust);
+  if (vorsteuer) aus.push({ datum: "", text: gs.ust && !betriebKu ? "Gezahlte Vorsteuer aus Belegen und Gutschriften" : "Gezahlte Vorsteuer aus Belegen", kategorie: "Gezahlte Vorsteuerbeträge", betrag: betrag(vorsteuer) });
   const imJahr = gestellteRechnungen(s).filter((u) => String(u.daten.datum).startsWith(`${jahr}-`));
   const gutschriften = imJahr.filter(istGutschrift).length;
   const lage = kassenLage(s.profil);
-  const hinweis = [istKapitalgesellschaft(s.betrieb.rechtsform, s.betrieb.name) ? EUER_KAPITALGESELLSCHAFT : "", gutschriften ? GUTSCHRIFT_HINWEIS : "", EUER_NICHT_ENTHALTEN, lage === "shop" || lage === "kasse_shop" ? EUER_SHOP_NICHT_ENTHALTEN : ""].filter(Boolean).join(" ");
+  const hinweis = [kapitalgesellschaft(s) ? EUER_KAPITALGESELLSCHAFT : "", gutschriften ? GUTSCHRIFT_HINWEIS : "", EUER_NICHT_ENTHALTEN, lage === "shop" || lage === "kasse_shop" ? EUER_SHOP_NICHT_ENTHALTEN : ""].filter(Boolean).join(" ");
   return {
     einnahmen: ein,
     ausgaben: aus,
@@ -227,7 +289,7 @@ const sicher = (s: string) => dateinamenTeil(s, 60, "._-") || "ohne-name";
 /** Nummern wie „2026-002“ und „2026-010“ in natürlicher Reihenfolge */
 const nachNummer = (a: string, b: string) => a.localeCompare(b, "de", { numeric: true });
 
-const STEUERART_TEXT: Record<NonNullable<RechnungsDaten["steuerart"]>, string> = { standard: "Standard", igl: "igL", reverse_charge: "Reverse Charge", befreit: "befreit" };
+const STEUERART_TEXT: Record<NonNullable<RechnungsDaten["steuerart"]>, string> = { standard: "Standard", igl: "igL", reverse_charge: "Reverse Charge", befreit: "befreit", nullsatz: "Nullsteuersatz (§ 12 Abs. 3 UStG)" };
 /** Steuerart einer Rechnung für die Listen: Standard, igL, Reverse Charge, § 19 oder befreit */
 const steuerartText = (d: RechnungsDaten) => (d.kleinunternehmer ? "§ 19" : STEUERART_TEXT[d.steuerart ?? "standard"]);
 
@@ -369,7 +431,10 @@ export function belegeCsv(s: Stand, z: Zeitraum, dateinamen: Map<string, string>
     summe.brutto += sm.brutto_cent;
     const kat = kategorieFuer(b.kategorie);
     const konten = kontenrahmen === "SKR03" ? kat.skr03 : kat.skr04;
-    const konto = [...new Set(b.steuer.filter((x) => x.brutto_cent).map((x) => konten[x.satz] ?? konten[19] ?? ""))].join(", ");
+    // dasselbe Konto wie im Stapel (auch § 13b-Konten); Belege, die nicht in den Stapel gehen, mit Vermerk
+    const imStapel = belegImStapel(b, { kapitalgesellschaft: kapitalgesellschaft(s) });
+    const gebucht = buchungenAusBelegen([b], kontenrahmen).map((x) => x.konto);
+    const konto = [...new Set(gebucht.length ? gebucht : b.steuer.filter((x) => x.brutto_cent).map((x) => konten[x.satz] ?? konten[19] ?? ""))].join(", ");
     const nr = nummern.get(b.id) ?? "";
     return [
       nr,
@@ -389,11 +454,13 @@ export function belegeCsv(s: Stand, z: Zeitraum, dateinamen: Map<string, string>
       b.bezahlt ? datumDe(b.bezahlt) : `${datumDe(b.datum)} (${ZAHLTAG_FEHLT})`,
       dateinamen.get(b.id) ?? "",
       (b.notiz ?? "").replace(/\s+/g, " "),
+      b.steuerschuld ? `§ 13b (${b.steuerschuld === "eu" ? "sonstige Leistung EU" : "Bauleistung Inland"}), Steuer ${betrag(steuerschuldBetrag(b))}` : "",
+      imStapel ? "ja" : b.kategorie === "personal" ? "nein – Lohnbuchhaltung" : "nein – Gesellschafter-Verrechnung",
     ];
   });
-  const summenZeile = ["Summe", "", "", "", "", "", "", "", betrag(summe.netto), betrag(summe.ust), betrag(summe.vorsteuer), betrag(summe.brutto), "", "", "", "", ""];
+  const summenZeile = ["Summe", "", "", "", "", "", "", "", betrag(summe.netto), betrag(summe.ust), betrag(summe.vorsteuer), betrag(summe.brutto), "", "", "", "", "", "", ""];
   return csv(
-    ["Amtlos-Belegnr.", "Datum", "Lieferant", "Belegnummer (Lieferant)", "Belegfeld 1 (DATEV)", "Kategorie", "Zeile Anlage EÜR", "Konto (DATEV)", "Netto", "USt", "Vorsteuer", "Brutto", "Steuersätze", "Zahlung", "Zahltag (für EÜR verwendet)", "Datei", "Notiz"],
+    ["Amtlos-Belegnr.", "Datum", "Lieferant", "Belegnummer (Lieferant)", "Belegfeld 1 (DATEV)", "Kategorie", "Zeile Anlage EÜR", "Konto (DATEV)", "Netto", "USt", "Vorsteuer", "Brutto", "Steuersätze", "Zahlung", "Zahltag (für EÜR verwendet)", "Datei", "Notiz", "Steuerschuldnerschaft", "Im Buchungsstapel"],
     zeilen.length ? [...zeilen, summenZeile] : [],
   );
 }
@@ -433,16 +500,19 @@ export function fragenText(s: Stand, z: Zeitraum, nummern: Map<string, string> =
     `Rechnungen ohne vermerkten Zahlungseingang zum ${datumDe(z.bis)}:`,
     offen.map((x) => rz(x.u, `${x.daten.faellig_am ? ` · fällig ${datumDe(x.daten.faellig_am)}` : ""}${x.u.bezahlt ? ` · bezahlt erst am ${datumDe(x.u.bezahlt)}` : ""}${x.daten.rechnungsdatum < z.von ? " · aus früherem Zeitraum" : ""}`)),
   );
-  dazu("Privat bezahlte Belege (Zahlungsweg „privat bezahlt“):", belege.filter((b) => b.zahlung === "privat").map((b) => bz(b)));
+  dazu(
+    kapitalgesellschaft(s) ? "Privat ausgelegte Belege (Kapitalgesellschaft – nicht im Buchungsstapel, da es keine Privatkonten gibt): Wer hat ausgelegt, auf welches Verrechnungskonto?" : "Privat bezahlte Belege (Zahlungsweg „privat bezahlt“):",
+    belege.filter((b) => b.zahlung === "privat").map((b) => bz(b)),
+  );
   dazu("Kfz-Kosten: Fahrzeug und privater Anteil?", belege.filter((b) => b.kategorie === "fahrzeug").map((b) => bz(b)));
   dazu("Bewirtung: Anlass und Teilnehmer?", belege.filter((b) => b.kategorie === "bewirtung").map((b) => bz(b)));
   dazu(
-    "Anschaffungen über 800 € netto: Was wurde angeschafft, Nutzungsdauer?",
+    "Anschaffungen über 800 € netto: Was wurde angeschafft, Nutzungsdauer? (Computerhardware und Software: auch 1 Jahr möglich, BMF 22.02.2022)",
     // Kategorie „Anschaffung über 800 €“ oder als GWG erfasst, aber über 800 € netto
     belege.filter((b) => kategorieFuer(b.kategorie).anlage || (b.kategorie === "gwg" && belegSummen(b).netto_cent > 80000)).map((b) => bz(b, ` · ${betrag(belegSummen(b).netto_cent)} € netto · Kategorie „${kategorieFuer(b.kategorie).titel}“`)),
   );
   dazu(
-    "Gutschriften (der Betrieb rechnet als Leistungsempfänger ab; nicht im Buchungsstapel). Leistender und Art der Leistung?",
+    "Gutschriften (der Betrieb rechnet als Leistungsempfänger ab; im Stapel als Aufwand „bezogene Leistungen“). Art der Leistung – passt das Konto?",
     gestellteRechnungen(s).filter((u) => istGutschrift(u) && imZeitraum(String(u.daten.datum), z)).map((u) => rz(u, u.bezahlt ? ` · bezahlt am ${datumDe(u.bezahlt)}` : " · ohne Zahlungsvermerk")),
   );
   const stornoZeilen: string[] = [];
@@ -468,18 +538,21 @@ export function fragenText(s: Stand, z: Zeitraum, nummern: Map<string, string> =
   // Belege ohne Umsatzsteuer für Leistungen, bei denen der Empfänger die Steuer schulden kann (Subunternehmer, ausländische Anbieter)
   dazu(
     "Belege ohne Umsatzsteuer (Waren, Fremdleistungen, Büro/Software, Werbung, Sonstiges): Schuldet der Betrieb die Umsatzsteuer als Leistungsempfänger (§ 13b UStG, z. B. Bauleistung eines Subunternehmers oder Leistung eines Unternehmens aus dem Ausland)?",
-    belege.filter((b) => STEUERSCHULD_KATEGORIEN.includes(b.kategorie) && b.steuer.some((x) => x.brutto_cent) && b.steuer.every((x) => !x.brutto_cent || x.satz === 0)).map((b) => bz(b)),
+    belege.filter((b) => !b.steuerschuld && STEUERSCHULD_KATEGORIEN.includes(b.kategorie) && b.steuer.some((x) => x.brutto_cent) && b.steuer.every((x) => !x.brutto_cent || x.satz === 0)).map((b) => bz(b)),
+  );
+  // als § 13b erfasst: Konto steht im Stapel nur für SKR03 fest (3120/3123), Kleinunternehmer ohne Vorsteuer
+  dazu(
+    `Belege mit Steuerschuldnerschaft des Leistungsempfängers (§ 13b UStG) – Kz 46/47 bzw. 84/85${istKleinunternehmer(s) ? " (Kleinunternehmer: ohne Vorsteuerabzug)" : ", Vorsteuer Kz 67"}. Bitte Art der Leistung und Konto prüfen:`,
+    belege.filter((b) => b.steuerschuld).map((b) => bz(b, ` · ${b.steuerschuld === "eu" ? "sonstige Leistung EU" : "Bauleistung Inland"} · Steuer ${betrag(steuerschuldBetrag(b))} €`)),
   );
 
   const anzahl = abschnitte.reduce((a, x) => a + x.zeilen.length, 0);
-  const kasse = kassenSatzPaket(kassenLage(s.profil));
   const text = [
     `Amtlos – Fragen zum Zeitraum ${datumDe(z.von)} bis ${datumDe(z.bis)}`,
     `Betrieb: ${s.betrieb.name || "ohne Namen"}`,
     ``,
     `Automatisch aus den erfassten Daten zusammengestellt: nur Sachverhalte, keine steuerliche Bewertung. Belege mit Amtlos-Belegnummer (wie in Belege_${z.name}.csv und im Dateinamen unter Belege/).`,
-    // Kasse: nicht als Frage gezählt, aber vor allen Fragen – die Kassenumsätze fehlen in allen Summen
-    ...(kasse ? ["", kasse] : []),
+    // Kasse/Shop: steht einmal im LIESMICH unter „Wichtig“ (R10 – nicht doppelt)
     ...(abschnitte.length ? abschnitte.flatMap((a) => ["", a.titel, ...a.zeilen]) : ["", "Keine offenen Punkte gefunden."]),
   ].join("\r\n");
   return { text: text + "\r\n", anzahl };
@@ -534,11 +607,20 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
   // Gutschriften sind Ausgaben des Betriebs: nicht in Rechnungsliste und Erlösbuchungen, sondern in einer eigenen Liste
   const rechnungen = alle.filter((u) => !istGutschrift(u));
   const gutschriften = alle.filter(istGutschrift);
-  const ku = istKleinunternehmer(s);
+  // Kleinunternehmer je Zeitraum: die Rechnungen des Zeitraums entscheiden, sonst der Pflichten-Check (Lea, Befund 4)
+  const profilKu = s.profil["ust.kleinunternehmer"];
+  const ku = kuImZeitraum(rechnungen, typeof profilKu === "boolean" ? profilKu : undefined) ?? istKleinunternehmer(s);
   const ist = s.betrieb.versteuerung === "ist";
   const nummern = belegNummern([...s.belege, ...s.belegArchiv]);
   const belege = belegeImZeitraum(s, z);
-  const buchungen = [...buchungenAusRechnungen(rechnungen.map((u) => rechnungFuerBuchung(u, s.betrieb)), sb.kontenrahmen), ...buchungenAusBelegen(belege, sb.kontenrahmen, { nummern })].sort((a, b) => a.datum.localeCompare(b.datum));
+  const kapital = kapitalgesellschaft(s);
+  const tage = zuordnungsTage(s.unterlagen, s.betrieb, ist ? "ist" : "soll");
+  // Gutschriften gehen als Aufwand in den Stapel (R10), Rechnungen als Erlös
+  const buchungen = [...buchungenAusRechnungen(alle.map((u) => rechnungFuerBuchung(u, s.betrieb, { tage, betriebKu: ku })), sb.kontenrahmen), ...buchungenAusBelegen(belege, sb.kontenrahmen, { nummern, kapitalgesellschaft: kapital })].sort((a, b) => a.datum.localeCompare(b.datum));
+  const nichtImStapel = belege.filter((b) => !belegImStapel(b, { kapitalgesellschaft: kapital }));
+  const mit13b = belege.filter((b) => b.steuerschuld).length;
+  const rechtsform = rechtsformFuer(s);
+  const dfv = s.profil["ust.dauerfristverlaengerung"] === true;
   const inhalt: Record<string, Uint8Array> = {};
   inhalt[`EXTF_Buchungsstapel_${z.name}.csv`] = datevExtfBytes(datevExtf(buchungen, { beraternummer: sb.beraternummer, mandantennummer: sb.mandantennummer, wjBeginn: `${z.von.slice(0, 4)}-01-01`, von: z.von, bis: z.bis, kontenrahmen: sb.kontenrahmen, bezeichnung: `Amtlos ${z.name}`, erzeugtAm: jetzt }));
   inhalt[`Buchungsliste_${z.name}.csv`] = utf8(buchungslisteCsv(buchungen));
@@ -587,10 +669,15 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
   const versteuerung = s.betrieb.versteuerung === "ist" ? "Ist (vereinnahmte Entgelte, § 20 UStG)" : s.betrieb.versteuerung === "soll" ? "Soll (vereinbarte Entgelte)" : "nicht angegeben (Soll angenommen)";
   const uhrzeit = /T(\d{2}):(\d{2})/.exec(jetzt);
   const kassenSatz = kassenSatzPaket(kassenLage(s.profil));
+  // „Wichtig“: an fester Stelle direkt nach den Mandantendaten, jeder Punkt nur einmal (R10)
+  const wichtig = [
+    ...(kassenSatz ? kassenSatz.split("\r\n") : []),
+    ...(nichtImStapel.length ? [`${nichtImStapel.length} ${nichtImStapel.length === 1 ? "Beleg steht" : "Belege stehen"} nur in der Belegliste, nicht im Buchungsstapel: Personal (Lohn bucht die Lohnbuchhaltung)${kapital ? " und privat ausgelegte Belege der Gesellschaft (Verrechnungskonto Gesellschafter bitte festlegen)" : ""}.`] : []),
+    ...(mit13b ? [`${mit13b} ${mit13b === 1 ? "Beleg" : "Belege"} mit Steuerschuldnerschaft des Leistungsempfängers (§ 13b UStG)${sb.kontenrahmen === "SKR03" ? " – im Stapel auf 3120 (Bauleistung Inland) bzw. 3123 (sonstige Leistung EU)" : " – im Stapel auf dem Kategorie-Konto ohne Steuer, bitte auf das § 13b-Konto umbuchen"}${ku ? "; Kleinunternehmer: ohne Vorsteuerabzug, bitte Konto prüfen" : ""}.`] : []),
+    ...(ku ? [] : [`Nullsteuersatz-Umsätze (§ 12 Abs. 3 UStG, Kz 87) stehen vorerst auf dem Konto für steuerfreie Umsätze (${sb.kontenrahmen === "SKR03" ? "8100" : "4100"}) – bitte bei Bedarf umbuchen.`].filter(() => alle.some((u) => eRechnungAus(u.daten, s.betrieb).daten.steuerart === "nullsatz"))),
+  ];
   inhalt["LIESMICH.txt"] = utf8(
     [
-      // ganz oben: ohne Kassenumsätze stimmen Umsätze und Erlöse dieses Pakets nicht
-      ...(kassenSatz ? [kassenSatz, ``] : []),
       `Amtlos – Unterlagen für die Steuerberatung`,
       `Betrieb: ${s.betrieb.name || "ohne Namen"}`,
       `Zeitraum: ${datumDe(z.von)} bis ${datumDe(z.bis)}`,
@@ -598,22 +685,24 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
       ``,
       `Mandant (Angaben aus der App)`,
       `- Name: ${s.betrieb.name.trim() || "nicht angegeben"}`,
-      `- Rechtsform: ${s.betrieb.rechtsform?.trim() || "nicht angegeben"}`,
+      `- Rechtsform: ${rechtsform ? `${rechtsform.text}${rechtsform.ausCheck ? " (laut Pflichten-Check)" : ""}` : "nicht angegeben"}`,
       `- Steuernummer: ${s.betrieb.steuernummer.trim() || "nicht angegeben"}`,
       `- USt-IdNr.: ${s.betrieb.ust_idnr.trim() || "nicht angegeben"}`,
       `- Kleinunternehmer (§ 19 UStG): ${ja(ku)}`,
       `- Versteuerung: ${versteuerung}`,
+      ...(ku ? [] : [`- Dauerfristverlängerung (laut Pflichten-Check): ${s.profil["ust.dauerfristverlaengerung"] === undefined ? "nicht angegeben" : ja(dfv)}`]),
       `- Kontenrahmen: ${sb.kontenrahmen}`,
       `- Berater-/Mandantennummer: ${sb.beraternummer || "fehlt"} / ${sb.mandantennummer || "fehlt"}`,
       `- Zeitraum: ${datumDe(z.von)} bis ${datumDe(z.bis)} (${z.name})`,
       `- App: Amtlos ${APP_VERSION}`,
       `- Erstellt am: ${datumDe(jetzt.slice(0, 10))}${uhrzeit ? ` ${uhrzeit[1]}:${uhrzeit[2]} Uhr${/Z$|[+-]00:?00$/.test(jetzt) ? " (UTC)" : ""}` : ""}`,
       ``,
+      ...(wichtig.length ? [`Wichtig`, ...wichtig.map((w) => `- ${w}`), ``] : []),
       `Inhalt`,
       `- EXTF_Buchungsstapel_${z.name}.csv: DATEV-Format „Buchungsstapel“ (${sb.kontenrahmen}), ${buchungen.length} Buchungen. Das Format ist noch nicht gegen den DATEV-Leitfaden geprüft – bitte vor dem Import kontrollieren.${sb.beraternummer && sb.mandantennummer ? "" : " Berater- und Mandantennummer fehlen und sind für den Import nötig."}`,
       `- Buchungsliste_${z.name}.csv: dieselben Buchungen zum Lesen (Semikolon, UTF-8), mit stabiler Buchungs-GUID je Buchung.`,
       `- Rechnungen_${z.name}.csv: ${rechnungen.length} gestellte Rechnungen mit Steuerart, Netto, USt, Brutto, Fälligkeit, Zahlungseingang und offenem Betrag; Summen je Steuersatz am Ende.`,
-      ...(gutschriften.length ? [`- Gutschriften_${z.name}.csv: ${gutschriften.length} ${gutschriften.length === 1 ? "Gutschrift" : "Gutschriften"}, die der Betrieb als Leistungsempfänger ausgestellt hat – nicht in Rechnungsliste und Buchungsstapel. ${GUTSCHRIFT_HINWEIS}`] : []),
+      ...(gutschriften.length ? [`- Gutschriften_${z.name}.csv: ${gutschriften.length} ${gutschriften.length === 1 ? "Gutschrift" : "Gutschriften"}, die der Betrieb als Leistungsempfänger ausgestellt hat – nicht in der Rechnungsliste; im Buchungsstapel als Aufwand (bezogene Leistungen).`] : []),
       `- Belege_${z.name}.csv: ${belege.length} Belege mit Amtlos-Belegnummer, Kategorie, Konto, Vorsteuer und Zahltag; Summe am Ende.`,
       `- Fragen_${z.name}.txt: ${fragen.anzahl ? `${fragen.anzahl} ${fragen.anzahl === 1 ? "Punkt" : "Punkte"} zum Klären (nur Sachverhalte aus den Daten)` : "keine offenen Punkte gefunden"}.`,
       `- E-Rechnungen/: XRechnung der Ausgangsrechnungen${gutschriften.length ? " und Gutschriften" : ""}${ohneXml ? ` (${ohneXml} ohne, siehe unten)` : ""}.`,
@@ -623,15 +712,14 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
       ...(ohneXml ? [``, `Rechnungen ohne E-Rechnung (XRechnung)`, ...ohneXmlListe] : []),
       ``,
       `Nicht enthalten – bitte zusätzlich liefern`,
-      // ohne Kasse laut Pflichten-Check (Antwort „nein“) entfällt die Zeile
-      ...(kassenLage(s.profil) === "keine" ? [] : [`- Kassenumsätze (Z-Bons bzw. Kassenexport) – Amtlos kennt nur Rechnungen und Belege.`]),
+      // Kassenumsätze: einmal unter „Wichtig“ (R10)
       `- Kontoauszüge – Zahlungen sind nicht gebucht.`,
       `- Privatentnahmen und Privateinlagen (außer privat bezahlten Belegen).`,
       `- An das Finanzamt gezahlte Umsatzsteuer-Vorauszahlungen und Erstattungen.`,
       `- Abschreibungen (AfA) und Anlagenverzeichnis.`,
       `- Lohnjournal bzw. Lohnabrechnungen.`,
       ``,
-      `Zuordnung: Rechnungen nach Rechnungsdatum, Belege nach Belegdatum.${pdfs ? "" : " Die PDFs der Ausgangsrechnungen liegen beim Betrieb."}`,
+      `Zuordnung: Rechnungen nach Rechnungsdatum, Belege nach Belegdatum. Im Buchungsstapel stehen bei Rechnungen das Leistungsdatum (Feld „Leistungsdatum“) und der Tag, nach dem die App die Umsatzsteuer zuordnet (Feld „Datum Zuord. Steuerperiode“). Forderungen und Verbindlichkeiten gehen auf die Konten ohne Kontokorrent (${sb.kontenrahmen === "SKR03" ? "1410/1610" : "1210/3310"}).${pdfs ? "" : " Die PDFs der Ausgangsrechnungen liegen beim Betrieb."}`,
       // Kleinunternehmer geben in der Regel keine Voranmeldung ab – dann kein Satz dazu; sonst nach „Mein Betrieb“ (Soll/Ist)
       ...(ku
         ? []

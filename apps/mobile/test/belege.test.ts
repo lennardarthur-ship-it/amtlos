@@ -131,9 +131,9 @@ describe("Paket für die Steuerberatung (E-133)", () => {
     expect(re[2]).toBe("Summe 19 %;;;;;;;100,00;19,00;119,00;19 %;;;;");
     expect(re[3]).toBe("Summe gesamt;;;;;;;100,00;19,00;119,00;;;;0,00;");
     const be = strFromU8(inhalt["Belege_2026-Q4.csv"]!).replace(/^\uFEFF/, "").split("\r\n");
-    expect(be[0]).toBe("Amtlos-Belegnr.;Datum;Lieferant;Belegnummer (Lieferant);Belegfeld 1 (DATEV);Kategorie;Zeile Anlage EÜR;Konto (DATEV);Netto;USt;Vorsteuer;Brutto;Steuersätze;Zahlung;Zahltag (für EÜR verwendet);Datei;Notiz");
-    expect(be[1]).toBe("B2026-002;02.10.2026;Müller & Söhne;L-b1;L-b1;Waren und Material;Waren, Rohstoffe und Hilfsstoffe einschließlich der Nebenkosten;3400;100,00;19,00;19,00;119,00;19 %;Überweisung oder Karte;02.10.2026 (fehlt – Belegdatum verwendet);B2026-002_2026-10-02_Mueller-Soehne_L-b1.jpg;");
-    expect(be[2]).toBe("Summe;;;;;;;;100,00;19,00;19,00;119,00;;;;;");
+    expect(be[0]).toBe("Amtlos-Belegnr.;Datum;Lieferant;Belegnummer (Lieferant);Belegfeld 1 (DATEV);Kategorie;Zeile Anlage EÜR;Konto (DATEV);Netto;USt;Vorsteuer;Brutto;Steuersätze;Zahlung;Zahltag (für EÜR verwendet);Datei;Notiz;Steuerschuldnerschaft;Im Buchungsstapel");
+    expect(be[1]).toBe("B2026-002;02.10.2026;Müller & Söhne;L-b1;L-b1;Waren und Material;Waren, Rohstoffe und Hilfsstoffe einschließlich der Nebenkosten;3400;100,00;19,00;19,00;119,00;19 %;Überweisung oder Karte;02.10.2026 (fehlt – Belegdatum verwendet);B2026-002_2026-10-02_Mueller-Soehne_L-b1.jpg;;;ja");
+    expect(be[2]).toBe("Summe;;;;;;;;100,00;19,00;19,00;119,00;;;;;;;");
     expect(Array.from(inhalt["Belege/B2026-002_2026-10-02_Mueller-Soehne_L-b1.jpg"]!)).toEqual([1, 2, 3]);
     // DATEV: Belegfeld 1 wie in der Belegliste, Buchungs-GUID gesetzt
     const extf = strFromU8(inhalt["EXTF_Buchungsstapel_2026-Q4.csv"]!, true).split("\r\n");
@@ -177,7 +177,9 @@ describe("Paket für die Steuerberatung: LIESMICH, Fragen, Listen (Durchsicht St
     expect(l).toContain("Nicht zusätzlich zu den Monats-/Quartalsstapeln importieren – gleiche Buchungen.");
     expect(l).toContain("- 2026-003 (Pat Privat): Privatkunde (ohne E-Mail erfasst) – keine E-Rechnung nötig");
     expect(p.ohneXml).toBe(1);
-    expect(l).toMatch(/Nicht enthalten – bitte zusätzlich liefern\r\n- Kassenumsätze \(Z-Bons bzw\. Kassenexport\)/);
+    // R10: der Kassensatz steht einmal unter „Wichtig“, nicht noch einmal unter „Nicht enthalten“
+    expect(l).toMatch(/\r\nWichtig\r\n- Falls der Betrieb eine Kasse nutzt: Kassenumsätze fehlen/);
+    expect(l).toMatch(/Nicht enthalten – bitte zusätzlich liefern\r\n- Kontoauszüge/);
     for (const w of ["Kontoauszüge", "Privatentnahmen und Privateinlagen", "Umsatzsteuer-Vorauszahlungen und Erstattungen", "Abschreibungen (AfA)", "Lohnjournal"]) expect(l, w).toContain(w);
     // Quartalspaket: kein Jahressatz; fehlende Angaben werden genannt
     const q = strFromU8(unzipSync(steuerpaket({ ...s, betrieb: { ...s.betrieb, versteuerung: "" } }, Q1, s.steuerberatung, {}, "2026-04-10T08:00:00").zip)["LIESMICH.txt"]!);
@@ -199,7 +201,7 @@ describe("Paket für die Steuerberatung: LIESMICH, Fragen, Listen (Durchsicht St
     expect(f).toMatch(/Privat bezahlte Belege[^\n]*\r\n- B2026-004 /);
     expect(f).toMatch(/Kfz-Kosten: Fahrzeug und privater Anteil\?\r\n- B2026-002 /);
     expect(f).toMatch(/Bewirtung: Anlass und Teilnehmer\?\r\n- B2026-003 · 02\.06\.2026 · Friseurbedarf Müller · 59,50 € brutto · Notiz: Kundengespräch\r\n/);
-    expect(f).toMatch(/Nutzungsdauer\?\r\n- B2026-004 · 02\.07\.2026 · Friseurbedarf Müller · 2\.380,00 € brutto · 2\.000,00 € netto/);
+    expect(f).toMatch(/Nutzungsdauer\? \(Computerhardware und Software: auch 1 Jahr möglich, BMF 22\.02\.2022\)\r\n- B2026-004 · 02\.07\.2026 · Friseurbedarf Müller · 2\.380,00 € brutto · 2\.000,00 € netto/);
     // Storno im selben Jahr: kein Bezug zu einem anderen Zeitraum; keine Gutschriften
     expect(f).not.toContain("Stornos mit Bezug");
     expect(f).not.toContain("Gutschriften");

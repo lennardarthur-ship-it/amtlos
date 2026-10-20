@@ -52,6 +52,11 @@ export interface Option {
   text: string;
   /** Kurzbeleg, z. B. „BGW“ oder „§ 622 BGB“ – in der App unter dem Baustein angezeigt */
   quelle?: string;
+  /**
+   * Branchengruppen, für die der Baustein passt (R10), z. B. ["friseur", "kosmetik"]; „alle“ oder ohne Angabe: für jeden
+   * Betrieb. Die App zeigt passende zuerst und den Rest unter „Weitere“ (siehe BRANCHEN_GRUPPEN).
+   */
+  gruppen?: string[];
 }
 
 /** Vorbereiteter Listeneintrag zum Übernehmen, z. B. eine typische Gefährdung mit Maßnahmen. */
@@ -81,14 +86,22 @@ interface FeldBasis {
   wenn?: Bedingung;
   /** selten nötig: die App zeigt das Feld erst unter „Weitere Angaben“ (oder wenn es schon ausgefüllt ist) */
   selten?: boolean;
+  /** hervorgehoben (R10): Angabe, die nur der Betrieb kennt, z. B. der Produktname im Hautschutzplan */
+  hervor?: boolean;
 }
 
 export type EinfachesFeld =
   /** `vorschlaege`: antippbare Formulierungen – bei „text“ ersetzen sie den Inhalt, bei „mehrzeilig“ kommen sie als neue Zeile dazu */
   /** `vorbelegung`: Angaben aus „Mein Betrieb“ oder ein fester Startwert (`{ text: "Stück" }`) */
-  | (FeldBasis & { art: "text" | "mehrzeilig"; vorbelegung?: "verantwortlich" | "betrieb_kontakt" | { text: string }; vorschlaege?: string[] })
+  /**
+   * `vorschlagGruppen` (R10): Branchengruppen je Vorschlag (fehlt einer: für alle) – die App zeigt nur die passenden.
+   * `vorbelegungGruppen`: die Vorbelegung gilt nur für diese Branchengruppen (z. B. „prüfende Elektrofachkraft“ = Inhaber
+   * nur im Handwerk). `vorschlaegeAus`: Vorschläge aus einer anderen Liste derselben Unterlage (z. B. Kontrollpunkte).
+   */
+  | (FeldBasis & { art: "text" | "mehrzeilig"; vorbelegung?: "verantwortlich" | "betrieb_kontakt" | { text: string }; vorschlaege?: string[]; vorschlagGruppen?: Record<string, string[]>; vorbelegungGruppen?: string[]; vorschlaegeAus?: { liste: string; feld: string } })
   | (FeldBasis & { art: "datum"; vorbelegung?: "heute" })
-  | (FeldBasis & { art: "uhrzeit" })
+  /** `jetzt`: Knopf „Jetzt“ setzt die aktuelle Uhrzeit */
+  | (FeldBasis & { art: "uhrzeit"; jetzt?: boolean })
   /** Euro-Betrag, gespeichert wie eingegeben („1.234,50“) */
   | (FeldBasis & { art: "betrag"; vorbelegung?: string })
   /** Zahl, gespeichert wie eingegeben („1,5“) */
@@ -190,6 +203,11 @@ export interface Vorlage {
   ergebnis?(daten: Daten): [string, string][];
   /** Fehlende Angaben außerhalb des Formulars, z. B. in „Mein Betrieb“ */
   pruefen?(daten: Daten, betrieb: Betrieb): string[];
+  /**
+   * Hinweise, die nicht am Teilen hindern (R10): z. B. Leitweg-ID bei Behörden, EU-Kunde mit 19 %, Abweichung vom
+   * Pflichten-Check. `extra.kleinunternehmer`: Antwort im Pflichten-Check, falls vorhanden.
+   */
+  hinweise?(daten: Daten, betrieb: Betrieb, extra?: { kleinunternehmer?: boolean | null }): string[];
   /** Meldung aus `pruefen` → Feld, bei dem man sie behebt (für „Ergänzen“ im Abschluss) */
   pruefenZu?: Record<string, string>;
   /** Reiner Text zum Kopieren, z. B. für die Website */

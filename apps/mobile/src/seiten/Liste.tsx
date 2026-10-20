@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { Pressable, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { betragUnplausibel, cent, mengeUngueltig, summen, zahl, eintragAusVorschlag, kurztitelListe, neuerEintrag, ohneVerdeckteFelder, sichtbar, unlesbar, unlesbarText, vorlageFuer, type Daten, type Eintrag, type EintragWert, type ListenFeld, type Vorschlag } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { ChipLeiste, Fuss, HinzufuegenKnopf, Kaestchen, Karte, Knopf, Symbol, T, TextKnopf } from "../ui/bausteine";
+import { ChipLeiste, Fuss, HinzufuegenKnopf, Kaestchen, Karte, Knopf, Symbol, T, TextKnopf, Wahl } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
 import { BLATT_OBEN, HAARLINIE, RADIUS, RAND, ZIEL, useFarben } from "../ui/thema";
 import { heute, personenSortiert } from "../unterlagen/speicher";
+import { minderjaehrig } from "../ui/datum";
 import { VORSCHLAG_GRUPPE } from "../pflichten/check";
 import { useAmtlos } from "../zustand";
 import { Ansage, Felder, gefuellt } from "./felder";
@@ -41,6 +42,15 @@ const anzeigeTitel = (feld: ListenFeld, eintraege: Eintrag[]) => {
 function feldIn(vorlageId: string, feldId: string): ListenFeld | undefined {
   const f = vorlageFuer(vorlageId)?.abschnitte.flatMap((a) => a.felder).find((x) => x.id === feldId);
   return f?.art === "liste" ? f : undefined;
+}
+
+/**
+ * Rechnungspositionen bei Kleinunternehmern (R10, Befund Freiberuf): ohne Steuersatz und ohne „netto“ – es wird keine
+ * Umsatzsteuer ausgewiesen.
+ */
+function kuFelder(feld: ListenFeld, ku: boolean): ListenFeld["felder"] {
+  if (!ku || feld.id !== "positionen") return feld.felder;
+  return feld.felder.filter((x) => x.id !== "satz").map((x) => (x.id === "preis" ? { ...x, label: x.label.replace(/\s*netto/, "") } : x));
 }
 
 /** Ein Eintrag einer Liste auf eigener Seite (E-124): ruhiger als aufgeklappte Karten, Tastatur hat Platz. */
@@ -83,7 +93,7 @@ function EintragSeite({ id, feldId, index, neu }: { id: string; feldId: string; 
   return (
     <Unterseite titel={`${feld.eintrag} ${index + 1}`}>
       <Inhalt contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: BLATT_OBEN - 20, paddingBottom: 32 }}>
-        <Felder felder={feld.felder} werte={e} fehlt={fehltIn(feld, e)} setze={setze} />
+        <Felder felder={kuFelder(feld, u?.daten.kleinunternehmer === true)} werte={e} fehlt={fehltIn(feld, e)} setze={setze} kontext={u?.daten} />
         <Rechnung e={e} kleinunternehmer={u?.daten.kleinunternehmer === true} />
         <TextKnopf
           symbol="trash"
@@ -146,7 +156,8 @@ function VorschlagSeite({ id, feldId }: { id: string; feldId: string }) {
   const [offen, setOffen] = useState<string | null>(null);
   if (!feld || !u) return <Unterseite titel="">{null}</Unterseite>;
   const vorhanden = eintraegeVon(u.daten, feld).map((e) => titelText(feld, e));
-  const liste = alle.filter((v) => !gruppe || (gruppe === PASSEND ? passend.includes(v.gruppe ?? "") : v.gruppe === gruppe));
+  // Vorschläge ohne Gruppe (z. B. Jugendliche) passen zu jeder Branche
+  const liste = alle.filter((v) => !gruppe || !v.gruppe || (gruppe === PASSEND ? passend.includes(v.gruppe) : v.gruppe === gruppe));
   const istDa = (v: Vorschlag) => vorhanden.includes(titelText(feld, v.werte) || v.titel);
   // Kurztitel über alle Vorschläge der Liste (nicht nur die gefilterten) – so bleibt ein Titel beim Filtern gleich
   const kurzAlle = kurztitelListe(alle.map((v) => v.titel));
@@ -249,11 +260,26 @@ export function ListenSchritt({ feld, id }: { feld: ListenFeld; id: string }) {
   const z = useAmtlos();
   const nav = useNav();
   const f = useFarben();
-  const eintraege = eintraegeVon(z.stand.unterlagen.find((u) => u.id === id)?.daten, feld);
+  const daten = z.stand.unterlagen.find((u) => u.id === id)?.daten;
+  const eintraege = eintraegeVon(daten, feld);
   const titel = anzeigeTitel(feld, eintraege);
   const oeffnen = (i: number, neu = false) => nav.oeffnen(`eintrag-${id}-${feld.id}-${i}`, () => <EintragSeite id={id} feldId={feld.id} index={i} neu={neu} />, true);
   const mitarbeiter = feld.ausMitarbeitern ? personenSortiert(z.stand.mitarbeiter) : [];
-  const fehlend = mitarbeiter.filter((p) => !eintraege.some((e) => titelText(feld, e).toLocaleLowerCase("de") === p.name.trim().toLocaleLowerCase("de")));
+  const gleich = (a: string, b: string) => a.trim().toLocaleLowerCase("de") === b.trim().toLocaleLowerCase("de");
+  const fehlend = mitarbeiter.filter((p) => !eintraege.some((e) => gleich(titelText(feld, e), p.name)));
+  // Jugendliche unter den Teilnehmenden (R10): Schalter „Mit Jugendlichen“ setzen, sobald einer dazukommt – nur bei
+  // einer Zunahme, damit ein bewusst ausgeschalteter Schalter aus bleibt
+  const stichtag = typeof daten?.datum === "string" && daten.datum ? daten.datum : heute();
+  const jugendlich = feld.ausMitarbeitern && daten && "jugendliche" in daten ? eintraege.filter((e) => mitarbeiter.some((p) => gleich(p.name, titelText(feld, e)) && minderjaehrig(p.geburtsdatum, stichtag))).length : 0;
+  const vorher = useRef(jugendlich);
+  useEffect(() => {
+    if (jugendlich > vorher.current && daten?.jugendliche !== true) z.setzen(id, { jugendliche: true });
+    vorher.current = jugendlich;
+  }, [jugendlich, daten?.jugendliche, id, z]);
+  const eintragen = (personen: typeof mitarbeiter) => {
+    const behalten = eintraegeVon(z.daten(id), feld).filter((e) => benutzt(feld, e));
+    z.setzen(id, { [feld.id]: [...behalten, ...personen.map((p) => ({ ...neuerEintrag(feld, z.stand.betrieb, heute()), [feld.titelFeld]: p.name }))] });
+  };
   return (
     <View style={{ marginTop: 16, gap: 10 }}>
       {eintraege.length ? (
@@ -278,16 +304,12 @@ export function ListenSchritt({ feld, id }: { feld: ListenFeld; id: string }) {
         <T v="klein" leise>{TEXT.liste_leer}</T>
       )}
       {feld.vorschlaege?.length ? <Knopf ton symbol="checklist" text={TEXT.aus_vorschlaegen(feld.vorschlaege.length)} onPress={() => nav.oeffnen(`vorschlaege-${id}-${feld.id}`, () => <VorschlagSeite id={id} feldId={feld.id} />, true)} /> : null}
-      {fehlend.length ? (
-        <Knopf
-          ton
-          symbol="person.2"
-          text={TEXT.alle_mitarbeiter(fehlend.length)}
-          onPress={() => {
-            const behalten = eintraegeVon(z.daten(id), feld).filter((e) => benutzt(feld, e));
-            z.setzen(id, { [feld.id]: [...behalten, ...fehlend.map((p) => ({ ...neuerEintrag(feld, z.stand.betrieb, heute()), [feld.titelFeld]: p.name }))] });
-          }}
-        />
+      {fehlend.length ? <Knopf ton symbol="person.2" text={TEXT.alle_mitarbeiter(fehlend.length)} onPress={() => eintragen(fehlend)} /> : null}
+      {/* einzelne Mitarbeiter antippen statt Namen tippen (R10) */}
+      {fehlend.length > 1 ? (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -RAND }} contentContainerStyle={{ paddingHorizontal: RAND, paddingVertical: 2 }}>
+          <Wahl label={TEXT.mitarbeiter_einzeln} wert={null} aendern={(pid) => eintragen(fehlend.filter((p) => p.id === pid))} optionen={fehlend.map((p) => ({ wert: p.id, text: minderjaehrig(p.geburtsdatum, stichtag) ? TEXT.unter_18(p.name) : p.name }))} />
+        </ScrollView>
       ) : null}
       {/* Hinzufügen als gestrichelte Zeile – zeigt, wo der nächste Eintrag hinkommt */}
       <HinzufuegenKnopf

@@ -1,36 +1,92 @@
-import { useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { View } from "react-native";
-import { cent, type EinfachesFeld, type EintragWert } from "@amtlos/fachlogik";
+import { PLATZHALTER, cent, passtZuGruppen, type Daten, type EinfachesFeld, type Eintrag, type EintragWert, type Option } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { Auswahl, BausteinListe, DatumFeld, Feld, MehrfachWahl, Schalter, TextKnopf, UhrzeitFeld, Wahl } from "./bausteine";
+import { Auswahl, BausteinListe, DatumFeld, Feld, MehrfachWahl, Schalter, T, TextKnopf, UhrzeitFeld, Wahl } from "./bausteine";
+import { RADIUS, useFarben } from "./thema";
+
+/**
+ * Umfeld der Eingaben (R10): Branchengruppen des Betriebs (Vorschläge nach Branche) und die ganze Unterlage (Vorschläge
+ * aus einer anderen Liste, z. B. die eigenen Kontrollpunkte bei einer Messung).
+ */
+export const EingabeKontext = createContext<{ gruppen: readonly string[]; daten?: Daten }>({ gruppen: [] });
+
+/** Vorschläge eines Textfelds: eigene Einträge aus einer anderen Liste zuerst, dann die zur Branche passenden. */
+export function vorschlaegeFuer(feld: EinfachesFeld, gruppen: readonly string[], daten?: Daten): string[] {
+  if (feld.art !== "text" && feld.art !== "mehrzeilig") return [];
+  const aus = feld.vorschlaegeAus && daten && Array.isArray(daten[feld.vorschlaegeAus.liste]) ? (daten[feld.vorschlaegeAus.liste] as Eintrag[]).map((e) => (typeof e?.[feld.vorschlaegeAus!.feld] === "string" ? (e[feld.vorschlaegeAus!.feld] as string).trim().split("\n")[0]! : "")).filter(Boolean) : [];
+  const fest = (feld.vorschlaege ?? []).filter((v) => passtZuGruppen(feld.vorschlagGruppen?.[v], gruppen));
+  return [...new Set([...aus, ...fest])];
+}
+
+/** Bausteine nach Branche: passende zuerst, gewählte immer sichtbar, der Rest auf Wunsch. */
+function aufteilen(optionen: Option[], gruppen: readonly string[], gewaehlt: string[]): [Option[], Option[]] {
+  const da = optionen.filter((o) => passtZuGruppen(o.gruppen, gruppen) || gewaehlt.includes(o.wert));
+  return [da, optionen.filter((o) => !da.includes(o))];
+}
 
 /** Viele oder lange Möglichkeiten untereinander, wenige kurze als Chips. */
 const alsListe = (texte: string[]) => texte.length > 12 || texte.some((t) => t.length > 28);
 const ANDERS = "\u0001anders";
 
+/** Vorschlag mit Platzhalter „…“ (z. B. „Guten Tag …“): wird zum Text, in dem nur noch der Name fehlt. */
+const mitLuecke = (t: string) => t.includes(PLATZHALTER);
+
 /**
  * Einzeiliges Feld mit festen Möglichkeiten (E-124): auswählen statt tippen. „Andere …“ öffnet ein Textfeld für den
- * seltenen Fall, dass nichts passt. Erneutes Tippen auf die gewählte Möglichkeit hebt die Auswahl auf.
+ * seltenen Fall, dass nichts passt. Erneutes Tippen auf die gewählte Möglichkeit hebt die Auswahl auf. Vorschläge mit
+ * „…“ (R10) öffnen das Textfeld vorbefüllt, der Platzhalter ist markiert – Tippen ersetzt ihn durch den Namen.
  */
 export function AuswahlMitAnders({ label, hilfe, optionen, wert, setzen }: { label: string; hilfe?: string; optionen: string[]; wert: string; setzen: (w: string) => void }) {
-  const eigen = wert.trim() !== "" && !optionen.includes(wert.trim());
+  const f = useFarben();
+  const roh = wert.trim();
+  const eigen = roh !== "" && (!optionen.includes(roh) || mitLuecke(roh));
   const [anders, setAnders] = useState(eigen);
+  // Markierung des Platzhalters nach der Wahl – gilt nur, bis jemand tippt oder den Cursor setzt
+  const [stelle, setStelle] = useState<{ start: number; end: number } | undefined>(undefined);
   const offen = anders || eigen;
   const auswahl = [...optionen.map((o) => ({ wert: o, text: o })), { wert: ANDERS, text: TEXT.andere }];
-  const gewaehlt = offen ? ANDERS : wert.trim() || null;
+  const gewaehlt = roh && optionen.includes(roh) ? roh : offen ? ANDERS : null;
   const waehlen = (w: string) => {
     if (w === ANDERS) {
       setAnders(true);
+      setStelle(undefined);
       if (!eigen) setzen("");
       return;
     }
+    if (mitLuecke(w) && w !== roh) {
+      const i = w.indexOf(PLATZHALTER);
+      setAnders(true);
+      setStelle({ start: i, end: i + PLATZHALTER.length });
+      setzen(w);
+      return;
+    }
     setAnders(false);
-    setzen(w === wert.trim() ? "" : w);
+    setStelle(undefined);
+    setzen(w === roh ? "" : w);
   };
   return (
     <View>
       {alsListe(optionen) ? <Auswahl label={label} hilfe={hilfe} wert={gewaehlt} aendern={waehlen} optionen={auswahl} /> : <Wahl label={label} hilfe={hilfe} wert={gewaehlt} aendern={waehlen} optionen={auswahl} />}
-      {offen ? <Feld ohneLabel label={label} wert={eigen ? wert : ""} aendern={setzen} placeholder={TEXT.eigene_angabe} autoFocus={!eigen} /> : null}
+      {offen ? (
+        <Feld
+          ohneLabel
+          label={label}
+          wert={eigen ? wert : ""}
+          aendern={(w) => {
+            setStelle(undefined);
+            setzen(w);
+          }}
+          placeholder={TEXT.eigene_angabe}
+          autoFocus={!eigen || Boolean(stelle)}
+          selection={stelle}
+          onSelectionChange={(e) => {
+            const s = e.nativeEvent.selection;
+            if (stelle && (s.start !== stelle.start || s.end !== stelle.end)) setStelle(undefined);
+          }}
+        />
+      ) : null}
+      {mitLuecke(roh) ? <T v="caption" farbe={f.bald} stil={{ marginTop: 5 }}>{TEXT.platzhalter_ersetzen}</T> : null}
     </View>
   );
 }
@@ -76,21 +132,47 @@ function tastaturFuer(id: string): Partial<React.ComponentProps<typeof Feld>> {
   return {};
 }
 
-/** Ein Eingabefeld je Feldart. */
+/**
+ * Bausteine nach Branche (R10): die passenden Themen, gewählte immer; die übrigen hinter „Weitere“ – beim Friseur keine
+ * Fritteuse, beim Elektriker keine Friseurchemikalien.
+ */
+function BausteineNachBranche({ feld, werte, setzen }: { feld: Extract<EinfachesFeld, { art: "bausteine" }>; werte: string[]; setzen: (w: string[]) => void }) {
+  const { gruppen } = useContext(EingabeKontext);
+  const [alle, setAlle] = useState(false);
+  const [da, rest] = aufteilen(feld.optionen, gruppen, werte);
+  return (
+    <View>
+      <BausteinListe label={feld.label} hilfe={feld.hilfe} werte={werte} aendern={setzen} optionen={alle ? feld.optionen : da} />
+      {rest.length ? <TextKnopf symbol={alle ? "chevron.up" : "chevron.down"} erweitert={alle} text={alle ? TEXT.weniger_themen : TEXT.weitere_themen(rest.length)} onPress={() => setAlle(!alle)} stil={{ marginTop: 6 }} /> : null}
+    </View>
+  );
+}
+
+/** Ein Eingabefeld je Feldart; hervorgehobene Felder (z. B. Produktname) auf getönter Fläche. */
 export function Eingabe({ feld, wert, setzen }: { feld: EinfachesFeld; wert: EintragWert | undefined; setzen: (w: EintragWert) => void }) {
+  const f = useFarben();
+  const inhalt = <EingabeFeld feld={feld} wert={wert} setzen={setzen} />;
+  if (!feld.hervor) return inhalt;
+  return <View style={{ marginTop: 14, paddingHorizontal: 12, paddingBottom: 12, paddingTop: 0, borderRadius: RADIUS.klein, backgroundColor: f.amtHauch }}>{inhalt}</View>;
+}
+
+function EingabeFeld({ feld, wert, setzen }: { feld: EinfachesFeld; wert: EintragWert | undefined; setzen: (w: EintragWert) => void }) {
+  const { gruppen, daten } = useContext(EingabeKontext);
   const text = typeof wert === "string" ? wert : "";
   switch (feld.art) {
     case "text":
-    case "mehrzeilig":
-      if (feld.vorschlaege?.length)
-        return feld.art === "text" ? <AuswahlMitAnders label={feld.label} hilfe={feld.hilfe} optionen={feld.vorschlaege} wert={text} setzen={setzen} /> : <ZeilenAuswahl label={feld.label} hilfe={feld.hilfe} optionen={feld.vorschlaege} wert={text} setzen={setzen} />;
+    case "mehrzeilig": {
+      const vorschlaege = vorschlaegeFuer(feld, gruppen, daten);
+      if (vorschlaege.length)
+        return feld.art === "text" ? <AuswahlMitAnders label={feld.label} hilfe={feld.hilfe} optionen={vorschlaege} wert={text} setzen={setzen} /> : <ZeilenAuswahl label={feld.label} hilfe={feld.hilfe} optionen={vorschlaege} wert={text} setzen={setzen} />;
       return <Feld label={feld.label} hilfe={feld.hilfe} wert={text} aendern={setzen} mehrzeilig={feld.art === "mehrzeilig"} optional={!feld.pflicht} {...(feld.art === "text" ? tastaturFuer(feld.id) : {})} />;
+    }
     case "bausteine":
-      return <BausteinListe label={feld.label} hilfe={feld.hilfe} werte={Array.isArray(wert) ? wert : []} aendern={setzen} optionen={feld.optionen} />;
+      return <BausteineNachBranche feld={feld} werte={Array.isArray(wert) ? wert : []} setzen={setzen} />;
     case "datum":
       return <DatumFeld label={feld.label} hilfe={feld.hilfe} wert={text || null} aendern={setzen} />;
     case "uhrzeit":
-      return <UhrzeitFeld label={feld.label} hilfe={feld.hilfe} wert={text} aendern={setzen} />;
+      return <UhrzeitFeld label={feld.label} hilfe={feld.hilfe} wert={text} aendern={setzen} jetzt={feld.jetzt} />;
     case "betrag":
       // Preis einer Position darf negativ sein (Nachlass) – die Zifferntastatur hat kein Minus
       return <Feld label={feld.label} hilfe={feld.hilfe} wert={text} aendern={setzen} keyboardType={feld.id === "preis" ? "numbers-and-punctuation" : "decimal-pad"} placeholder="0,00" optional={!feld.pflicht} fehler={text.trim() && cent(text) === null ? TEXT.betrag_falsch : null} />;

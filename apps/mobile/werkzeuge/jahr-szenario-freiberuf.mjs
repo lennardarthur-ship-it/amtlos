@@ -208,7 +208,8 @@ function paketNeuerungen(name, zr, inhalt, erg, kleinunternehmer, belegeRoh) {
   const extf = csvLesen(inhalt[`EXTF_Buchungsstapel_${zr.name}.csv`], "latin1");
   const ez = extf.slice(2);
   const belegfelder = new Set(ez.map((z) => z[10]));
-  const fehlend = be.zeilen.map((z) => be.w(z, "Belegfeld 1 (DATEV)")).filter((b) => !belegfelder.has(b));
+  // R10: Belege, die nicht in den Stapel gehören (Personal, Auslagen einer GmbH), sind in der Belegliste markiert
+  const fehlend = be.zeilen.filter((z) => !/^nein/.test(be.w(z, "Im Buchungsstapel") ?? "")).map((z) => be.w(z, "Belegfeld 1 (DATEV)")).filter((b) => !belegfelder.has(b));
   vergleich(bereich, "DATEV: Belegfeld 1 der Belegbuchungen = Spalte „Belegfeld 1 (DATEV)“ der Belegliste", fehlend.length ? fehlend.join(", ") : "alle gefunden", "alle gefunden");
   const gi = extf[1].indexOf("Buchungs GUID");
   const guids = ez.map((z) => z[gi]);
@@ -266,10 +267,13 @@ let paketInfo = {};
   const zeilen = extf.slice(2);
   vergleich(`Paket ${name}`, "DATEV: Spalten je Zeile = Spalten im Kopf", zeilen.every((z) => z.length === extf[1].length) ? "ja" : "nein", "ja");
   const kontoSumme = (konto) => summe(zeilen.filter((z) => z[7] === konto).map((z) => (z[1] === "H" ? -1 : 1) * centAus(z[0])));
-  vergleich(`Paket ${name}`, "DATEV: Brutto auf Erlöskonto 8195 (Kleinunternehmer, SKR03) – nur echte Ausgangsrechnungen", kontoSumme("8195"), summe(umsatz.map((x) => x.vz * x.s.brutto)));
+  // R10: die Leistung an das EU-Unternehmen (Steuerschuldnerschaft des Empfängers) geht auf 8336, nicht auf 8195
+  vergleich(`Paket ${name}`, "DATEV: Brutto auf Erlöskonto 8195 (Kleinunternehmer, SKR03) – nur echte Ausgangsrechnungen im Inland/Drittland", kontoSumme("8195"), summe(umsatz.filter((x) => D.KUNDE_ORT[x.kunde] !== "eu_b2b").map((x) => x.vz * x.s.brutto)));
+  vergleich(`Paket ${name}`, "DATEV: Leistung an das EU-Unternehmen auf 8336 (Empfänger schuldet die Steuer)", kontoSumme("8336"), summe(umsatz.filter((x) => D.KUNDE_ORT[x.kunde] === "eu_b2b").map((x) => x.vz * x.s.brutto)));
   vergleich(`Paket ${name}`, "DATEV: keine Buchung auf 8400/8300 (Regelsteuer-Erlöse)", zeilen.filter((z) => z[7] === "8400" || z[7] === "8300").length, 0);
-  const belegeMitSteuer = summe(D.BELEGE.map((b) => b.saetze.filter((x) => x.satz > 0 && x.betrag).length));
-  vergleich(`Paket ${name}`, "DATEV: Belegbuchungen mit Steuersatz > 0 tragen BU-Schlüssel 40 (ohne Vorsteuer)", zeilen.filter((z) => z[8] === "40").length, belegeMitSteuer);
+  // R10: BU 40 nur auf Automatikkonten (Wareneingang); auf Konten ohne Automatik ohne Vorsteuer kein BU
+  const belegeMitSteuer = summe(D.BELEGE.filter((b) => b.kategorie === "waren").map((b) => b.saetze.filter((x) => x.satz > 0 && x.betrag).length));
+  vergleich(`Paket ${name}`, "DATEV: BU 40 nur auf Automatikkonten (ohne Vorsteuer), sonst kein BU-Schlüssel", zeilen.filter((z) => ["40", "9", "8"].includes(z[8])).length, belegeMitSteuer);
   vergleich(`Paket ${name}`, "DATEV: Kopf Beraternummer/Mandant", `${extf[0][10]}/${extf[0][11]}`, "41077/20318");
   const liesmich = Buffer.from(inhalt["LIESMICH.txt"]).toString("utf8");
   if (/Umsatzsteuer-Voranmeldung/.test(liesmich)) auffaellig.push("Paket LIESMICH.txt erklärt die Zuordnung zur Umsatzsteuer-Voranmeldung (Leistungsdatum) – bei einer Kleinunternehmerin gibt es keine (außer § 13b); der Text ist für sie irreführend (apps/mobile/src/unterlagen/steuerpaket.ts).");
@@ -302,7 +306,9 @@ for (const d of bau.docs.filter((y) => y.ordner === "rechnungen")) {
   const ohneIdNr = flach.replace(/USt-IdNr\.?/g, "").replace(/Umsatzsteuer-Identifikationsnummer/g, "");
   if (/Umsatzsteuer|\bUSt\b|MwSt/.test(ohneIdNr)) auffaellig.push(`PDF ${d.datei}: Wort „Umsatzsteuer/USt/MwSt“ auf einer Kleinunternehmer-Rechnung: „…${/.{0,40}(Umsatzsteuer|\bUSt\b|MwSt).{0,40}/.exec(ohneIdNr)?.[0]}…“`);
   if (/\b(19|7) ?%/.test(flach)) auffaellig.push(`PDF ${d.datei}: Steuersatz „19 %“/„7 %“ auf einer Kleinunternehmer-Rechnung: „…${/.{0,40}\b(19|7) ?%.{0,20}/.exec(flach)?.[0]}…“`);
-  if (!flach.includes("§ 19 Abs. 1 UStG")) auffaellig.push(`PDF ${d.datei}: Kleinunternehmer-Hinweis (§ 19 Abs. 1 UStG) fehlt.`);
+  if (x && D.KUNDE_ORT[x.kunde] === "eu_b2b") {
+    if (!flach.includes("Steuerschuldnerschaft des Leistungsempfängers")) auffaellig.push(`PDF ${d.datei}: Hinweis auf die Steuerschuldnerschaft des Leistungsempfängers fehlt.`);
+  } else if (!flach.includes("§ 19 Abs. 1 UStG")) auffaellig.push(`PDF ${d.datei}: Kleinunternehmer-Hinweis (§ 19 Abs. 1 UStG) fehlt.`);
   const seitenZahl = Number(/Pages:\s+(\d+)/.exec(execFileSync("pdfinfo", [path.join(OUT, "rechnungen", d.datei)], { encoding: "utf8" }))?.[1] ?? 1);
   if (seitenZahl > 1) auffaellig.push(`PDF ${d.datei}: ${seitenZahl} Seiten.`);
 }

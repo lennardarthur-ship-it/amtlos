@@ -146,10 +146,10 @@
  },
  {
   "id": "branche.gastro_ifsg_belehrung",
-  "titel": "Belehrung nach § 43 Infektionsschutzgesetz",
-  "kurz": "Wer bei dir mit Lebensmitteln arbeitet, braucht vor dem ersten Arbeitstag die Belehrung nach § 43 IfSG.",
+  "titel": "Belehrung nach § 43 IfSG durch den Arbeitgeber",
+  "kurz": "Wer neu bei dir mit Lebensmitteln arbeitet, belehrst du nach Aufnahme der Tätigkeit selbst und dokumentierst das.",
   "rechtsgrundlage": [
-   "§ 43 IfSG"
+   "§ 43 Abs. 4 IfSG"
   ],
   "quellen": [
    {
@@ -336,8 +336,8 @@
  },
  {
   "id": "online.impressum",
-  "titel": "Impressum auf der Website",
-  "kurz": "Auf deiner Website stellst du ein Impressum mit den Pflichtangaben bereit – leicht erkennbar und immer erreichbar.",
+  "titel": "Impressum auf Website und Social-Media-Profilen",
+  "kurz": "Auf deiner Website und deinen geschäftlichen Profilen in sozialen Netzwerken stellst du ein Impressum mit den Pflichtangaben bereit – leicht erkennbar und immer erreichbar.",
   "rechtsgrundlage": [
    "§ 5 DDG"
   ],
@@ -367,9 +367,10 @@
  {
   "id": "personal.arbeitszeit_milog",
   "titel": "Arbeitszeit nach § 17 MiLoG aufzeichnen",
-  "kurz": "Für Minijobber und in Sofortmeldebranchen musst du Beginn, Ende und Dauer der Arbeitszeit aufzeichnen.",
+  "kurz": "Für Minijobber und in den Branchen nach § 2a Schwarzarbeitsbekämpfungsgesetz zeichnest du laufend Beginn, Ende und Dauer der Arbeitszeit auf.",
   "rechtsgrundlage": [
-   "§ 17 MiLoG"
+   "§ 17 MiLoG",
+   "§ 2a SchwarzArbG"
   ],
   "quellen": [
    {
@@ -442,10 +443,10 @@
  {
   "id": "personal.sv_anmeldung",
   "titel": "Beschäftigte bei der Sozialversicherung anmelden",
-  "kurz": "Jede neue beschäftigte Person meldest du bei der Krankenkasse an.",
+  "kurz": "Jede neue beschäftigte Person meldest du mit der ersten Lohnabrechnung bei der Krankenkasse an, spätestens sechs Wochen nach Beginn.",
   "rechtsgrundlage": [
    "§ 28a SGB IV",
-   "DEÜV"
+   "§ 6 DEÜV"
   ],
   "quellen": [
    {
@@ -461,6 +462,7 @@
   "kurz": "Bewahre Belege und Rechnungen 8 Jahre, Jahresabschlüsse und Bücher 10 Jahre und Geschäftsbriefe 6 Jahre auf.",
   "rechtsgrundlage": [
    "§ 147 AO",
+   "§ 147 Abs. 3 S. 5 AO (Ablaufhemmung)",
    "§ 257 HGB"
   ],
   "quellen": [
@@ -480,10 +482,14 @@
   "titel": "Doppelte Buchführung",
   "kurz": "Du musst Bücher nach den Regeln der doppelten Buchführung führen und einen Jahresabschluss machen.",
   "rechtsgrundlage": [
-   "HGB",
+   "§§ 238, 241a HGB",
    "§ 141 AO"
   ],
   "quellen": [
+   {
+    "titel": "Handelsgesetzbuch § 241a",
+    "url": "https://www.gesetze-im-internet.de/hgb/__241a.html"
+   },
    {
     "titel": "Abgabenordnung § 141",
     "url": "https://www.gesetze-im-internet.de/ao_1977/__141.html"
@@ -498,7 +504,7 @@
  {
   "id": "steuern.e_bilanz",
   "titel": "E-Bilanz ans Finanzamt übermitteln",
-  "kurz": "Die Bilanz deiner Gesellschaft übermittelst du elektronisch ans Finanzamt.",
+  "kurz": "Wenn du bilanzierst, übermittelst du Bilanz und Gewinn- und Verlustrechnung elektronisch ans Finanzamt.",
   "rechtsgrundlage": [
    "§ 5b EStG"
   ],
@@ -549,6 +555,27 @@
    {
     "titel": "Einkommensteuergesetz § 4",
     "url": "https://www.gesetze-im-internet.de/estg/__4.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "steuern.feststellungserklaerung",
+  "titel": "Erklärung zur gesonderten und einheitlichen Feststellung abgeben",
+  "kurz": "Einmal im Jahr gibt eure Gesellschaft elektronisch die Feststellungserklärung ab; die Gesellschafter versteuern ihren Anteil in ihrer eigenen Einkommensteuererklärung.",
+  "rechtsgrundlage": [
+   "§ 180 Abs. 1 Nr. 2 Buchst. a AO",
+   "§ 181 AO",
+   "§ 149 AO"
+  ],
+  "quellen": [
+   {
+    "titel": "Abgabenordnung § 180 (Gesonderte Feststellung von Besteuerungsgrundlagen)",
+    "url": "https://www.gesetze-im-internet.de/ao_1977/__180.html"
+   },
+   {
+    "titel": "Abgabenordnung § 149 (Abgabe der Steuererklärungen)",
+    "url": "https://dejure.org/gesetze/AO/149.html"
    }
   ],
   "geprueft": false

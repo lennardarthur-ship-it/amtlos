@@ -1,6 +1,6 @@
 import { memo, useEffect, useRef, useState } from "react";
 import { Image, Linking, View } from "react-native";
-import { KATEGORIEN, STEUERSAETZE, ZAHLUNGSWEGE, belegAusERechnung, belegSummen, cent, eRechnungAusPdf, eRechnungLesen, kategorieFuer, type Beleg } from "@amtlos/fachlogik";
+import { KATEGORIEN, STEUERSAETZE, STEUERSCHULD_ARTEN, ZAHLUNGSWEGE, belegAusERechnung, belegSummen, cent, eRechnungAusPdf, eRechnungLesen, kaeuferFremd, kategorieFuer, steuerschuldBetrag, type Beleg } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { regelwert } from "../pflichten/check";
 import { AuswahlZeile } from "../ui/auswahlseite";
@@ -66,9 +66,12 @@ export function useBelegErfassen() {
         const gelesen = text ? eRechnungLesen(text) : null;
         const name = await z.dateiSpeichern(d.bytes, art);
         if (gelesen) {
-          const b = { ...belegAusERechnung(gelesen, neueId(), new Date().toISOString(), { kleinunternehmer: ku }), datei: name };
+          // R10: Käufer der E-Rechnung gegen „Mein Betrieb“ prüfen – fremd adressiert: Vorsteuer aus, Warnung
+          const betrieb = { name: z.stand.betrieb.name, plz: z.stand.betrieb.plz, verantwortlich: z.stand.betrieb.verantwortlich };
+          const b = { ...belegAusERechnung(gelesen, neueId(), new Date().toISOString(), { kleinunternehmer: ku, betrieb }), datei: name };
           anlegen(b, false);
-          melden(TEXT.erechnung_gelesen(gelesen.lieferant.name, euro(gelesen.summen.brutto_cent)));
+          if (kaeuferFremd(gelesen, betrieb)) melden(TEXT.beleg_kaeufer_fremd, "info");
+          else melden(TEXT.erechnung_gelesen(gelesen.lieferant.name, euro(gelesen.summen.brutto_cent)));
           return;
         }
         if (art === "xml") melden(TEXT.erechnung_unlesbar, "info");
@@ -248,9 +251,17 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
           ))}
         </Karte>
         {ku ? null : <Schalter label={TEXT.beleg_vorsteuer} hilfe={TEXT.beleg_vorsteuer_hilfe} wert={b.vorsteuer} aendern={(w) => setze({ vorsteuer: w })} />}
+        {/* R10: § 13b als Leistungsempfänger – auch für Kleinunternehmer */}
+        <Schalter label={TEXT.beleg_steuerschuld} hilfe={TEXT.beleg_steuerschuld_hilfe} wert={!!b.steuerschuld} aendern={(w) => setze({ steuerschuld: w ? (b.steuerschuld ?? "eu") : null })} />
+        {b.steuerschuld ? (
+          <View>
+            <Wahl label={TEXT.beleg_steuerschuld_art} wert={b.steuerschuld} aendern={(w) => setze({ steuerschuld: w })} optionen={STEUERSCHULD_ARTEN} />
+            <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.beleg_steuerschuld_betrag(euro(steuerschuldBetrag(b)))}</T>
+          </View>
+        ) : null}
         <AuswahlZeile label={TEXT.beleg_kategorie} wert={b.kategorie} aendern={(w) => setze({ kategorie: w })} optionen={KATEGORIEN.map((x) => ({ wert: x.id, text: x.titel }))} />
         {k.hinweis ? <T v="caption" leise stil={{ marginTop: 4 }}>{k.hinweis}</T> : null}
-        <Wahl label={TEXT.beleg_zahlung} wert={b.zahlung} aendern={(w) => setze({ zahlung: w })} optionen={ZAHLUNGSWEGE} />
+        <Wahl label={TEXT.beleg_zahlung} wert={b.zahlung} aendern={(w) => setze(w === "bar" && !b.bezahlt && b.datum ? { zahlung: w, bezahlt: b.datum } : { zahlung: w })} optionen={ZAHLUNGSWEGE} />
         <DatumFeld label={TEXT.beleg_bezahlt} hilfe={TEXT.beleg_bezahlt_hilfe} wert={b.bezahlt ?? null} aendern={(d) => setze({ bezahlt: d })} />
         <Feld label={TEXT.beleg_notiz} wert={b.notiz ?? ""} aendern={(w) => setze({ notiz: w || null })} mehrzeilig />
         {ku ? (

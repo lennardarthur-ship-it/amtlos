@@ -94,11 +94,15 @@ describe("Dateinamen und Namen: Stornorechnung und Gutschrift", () => {
 });
 
 describe("Gutschrift ist kein Erlös", () => {
-  it("buchungenAusRechnungen überspringt Gutschriften (auch deren Storno)", () => {
+  it("buchungenAusRechnungen bucht Gutschriften als Aufwand (R10), ihr Storno umgekehrt", () => {
     const re: AusgangsRechnungFuerBuchung = { id: "r1", nummer: "2026-010", datum: "2026-09-01", art: "rechnung", kleinunternehmer: true, kunde: "Kunde", positionen: [{ bezeichnung: "Design", menge: 1, einheit: "stueck", preis_cent: 10000, ust_satz: null }] };
     const gs: AusgangsRechnungFuerBuchung = { ...re, id: "g1", nummer: "2026-011", kunde: "Fotograf", gutschrift: true };
     const b = buchungenAusRechnungen([re, gs, { ...gs, id: "g2", art: "storno" }], "SKR03");
-    expect(b.map((x) => x.quelle_id)).toEqual(["r1"]);
+    expect(b.map((x) => [x.quelle_id, x.konto, x.gegenkonto, x.soll_haben, x.art])).toEqual([
+      ["r1", "1410", "8195", "S", "einnahme"],
+      ["g1", "3100", "1610", "S", "ausgabe"],
+      ["g2", "3100", "1610", "H", "ausgabe"],
+    ]);
   });
 });
 

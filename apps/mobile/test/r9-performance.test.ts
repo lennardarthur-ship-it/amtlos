@@ -225,8 +225,9 @@ describe("Steuerberater-Paket: LIESMICH ohne Kassenzeile, wenn der Betrieb keine
     return new TextDecoder().decode(unzipSync(p.zip)["LIESMICH.txt"]);
   };
   it("Zeile „Kassenumsätze“ nur mit Kasse oder ohne Antwort", () => {
-    expect(liesmich({ "kasse.elektronisch": false })).not.toContain("- Kassenumsätze (Z-Bons");
-    expect(liesmich({ "kasse.elektronisch": true })).toContain("- Kassenumsätze (Z-Bons");
-    expect(liesmich({})).toContain("- Kassenumsätze (Z-Bons");
+    // R10: einmal unter „Wichtig“
+    expect(liesmich({ "kasse.elektronisch": false })).not.toContain("Kassenumsätze");
+    expect(liesmich({ "kasse.elektronisch": true })).toContain("- Betrieb mit Kasse: Kassenumsätze fehlen");
+    expect(liesmich({})).toContain("- Falls der Betrieb eine Kasse nutzt: Kassenumsätze fehlen");
   });
 });

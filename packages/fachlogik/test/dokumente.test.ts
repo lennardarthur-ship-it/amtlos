@@ -494,7 +494,9 @@ describe("Dokumentvorlagen", () => {
     expect(gs).not.toContain("GiroCode");
     expect(gs).not.toContain("<p>Gutschrift</p>");
     // Hinweise (keine Hindernisse)
-    expect(pruefe("rechnung", { kleinunternehmer: true, hinweise: ["reverse_charge"] })).toContain("Kleinunternehmerregelung zusammen mit Steuerschuldnerschaft des Leistungsempfängers bzw. innergemeinschaftlicher Lieferung gewählt – bitte prüfen.");
+    // R10: Kleinunternehmer mit Steuerschuldnerschaft hindert nicht mehr am Teilen – Hinweis über `hinweise`
+    expect(pruefe("rechnung", { kleinunternehmer: true, hinweise: ["reverse_charge"] }).some((x) => x.includes("Kleinunternehmer"))).toBe(false);
+    expect(vorlageFuer("rechnung")!.hinweise!({ kleinunternehmer: true, hinweise: ["reverse_charge"] }, BETRIEB)).toHaveLength(1);
     expect(pruefe("gefaehrdungsbeurteilung", { wirksamkeit: "wirksam", gefaehrdungen: [{ beschreibung: "Nässe" }] })).toHaveLength(1);
     expect(pruefe("gefaehrdungsbeurteilung", { wirksamkeit: "wirksam", gefaehrdungen: [{ beschreibung: "Nässe", umgesetzt_am: "2026-10-01" }] })).toHaveLength(0);
     expect(pruefe("datenschutzerklaerung_website", { module: ["google_fonts_lokal", "google_fonts_extern"] })).toContain("Schriftarten: entweder lokal oder extern wählen");
@@ -547,7 +549,8 @@ describe("Dokumentvorlagen", () => {
     // Prüfprotokoll, Kassenbuch, Steuererklärung, Bilanz, EÜR, Hautschutzplan: Angaben zum Eintragen
     const pp = leer("pruefprotokoll_elektro");
     expect(pp).toContain(kopfLinie("Geprüft von"));
-    expect(pp).toMatch(/<th>Prüfgrundlage<\/th><td><span class="fuellen zeile">/);
+    // Prüfgrundlage ist vorbelegt (R10) und steht auch auf dem leeren Blatt
+    expect(pp).toContain("<th>Prüfgrundlage</th><td>DIN EN 50678 (VDE&nbsp;0701) / DIN EN 50699 (VDE&nbsp;0702)</td>");
     expect(pp).toMatch(/<th>Prüfgerät<\/th><td><span class="fuellen zeile">/);
     expect(leer("kassenbuch")).toContain(kopfLinie("Zeitraum"));
     const se = leer("steuererklaerung");
@@ -863,7 +866,8 @@ describe("Vorlagen, fünfte Durchsicht (Jahres-Szenario Café)", () => {
     expect(h).toContain(".g-brief .schluss > p.gruss { page-break-before: avoid; break-before: avoid;");
     // die Rechnungsnummer steht als Verwendungszweck in der Zahlungsaufforderung
     expect(h).not.toContain("Bitte geben Sie bei der Zahlung die Rechnungsnummer an.");
-    expect(h).toContain("<p>Vielen Dank für Ihren Auftrag.</p>");
+    // R10: ein kurzer Hinweis steht im selben Absatz wie der Gruß (spart eine Folgeseite nur für den Gruß)
+    expect(h).toMatch(/<p class="gruss"[^>]*>Vielen Dank für Ihren Auftrag\.<br>Mit freundlichen Grüßen<br>Alex Muster<\/p>/);
     // ohne IBAN keine Zahlungsaufforderung: dann bleibt der Hinweis
     expect(html("rechnung", { ...RE, hinweis }, { ...BETRIEB, iban: "" })).toContain("Bitte geben Sie bei der Zahlung die Rechnungsnummer an.");
     // Gutschrift: keine Zahlungsaufforderung, der Hinweis bleibt, wie eingetragen

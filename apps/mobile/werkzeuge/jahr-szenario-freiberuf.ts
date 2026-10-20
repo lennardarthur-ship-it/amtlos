@@ -194,14 +194,17 @@ export function standBauen(): Bau {
             leistung: r.leistungText ?? (r.leistung ? D.de(r.leistung) : ""),
             zahlungsziel: r.ziel,
             positionen: r.pos.map((p) => ({ bezeichnung: p.bez, menge: menge(p.menge), einheit: p.einheit, preis: euro(p.preis), satz: "19" })),
-            hinweise: r.gutschrift ? ["gutschrift"] : [],
+            // R10: beim EU-Unternehmen (NL) folgt die Nutzerin dem Hinweis der App und wählt die Steuerschuldnerschaft des Empfängers
+            hinweise: r.gutschrift ? ["gutschrift"] : D.KUNDE_ORT[r.kunde] === "eu_b2b" ? ["reverse_charge"] : [],
+            // Gutschrift: der Fotograf ist selbst Kleinunternehmer (seine Steuernummer kommt aus dem Kunden)
+            ...(r.gutschrift ? { leistender_steuer: "ku" } : {}),
             hinweis: r.hinweis,
           }),
           danach: (x) => {
             vergleichText(`Rechnung ${r.nummer}`, "Schalter „Kleinunternehmer“ aus dem Profil vorbelegt", x.daten.kleinunternehmer === true ? "ja" : "nein", "ja");
-            const p = v("rechnung").pruefen?.(x.daten, s.betrieb) ?? [];
+            const p = [...(v("rechnung").pruefen?.(x.daten, s.betrieb) ?? []), ...(v("rechnung").hinweise?.(x.daten, s.betrieb, { kleinunternehmer: true }) ?? [])];
             if (p.length) infos.push(`Rechnung ${r.nummer}: Prüfhinweise der App: ${p.join(" | ")}`);
-            else if (D.KUNDE_ORT[r.kunde] !== "inland") infos.push(`Rechnung ${r.nummer} (${D.KUNDE_ORT[r.kunde] === "eu_b2b" ? "EU-Unternehmen" : "Drittland"}): die App gibt keinen Prüfhinweis (Kleinunternehmer-Hinweis „§ 19 steuerfrei“ wird gedruckt).`);
+            else if (D.KUNDE_ORT[r.kunde] !== "inland") infos.push(`Rechnung ${r.nummer} (${D.KUNDE_ORT[r.kunde] === "eu_b2b" ? "EU-Unternehmen" : "Drittland"}): die App gibt keinen Prüfhinweis.`);
           },
         });
         if (u.daten.nummer !== r.nummer) auffaellig.push(`Rechnungsnummer: erwartet ${r.nummer}, App vergab ${String(u.daten.nummer)}.`);
@@ -262,7 +265,9 @@ export function standBauen(): Bau {
     const kategorien = [...xml.matchAll(/<cac:(?:Classified)?TaxCategory>\s*<cbc:ID>([A-Z]+)<\/cbc:ID>\s*<cbc:Percent>([\d.]+)</g)].map((m) => `${m[1]} ${m[2]}`);
     vergleichText("E-Rechnung " + x.nummer, "Steuerkategorien (nur E 0 – befreit/Kleinunternehmer)", [...new Set(kategorien)].join(", "), "E 0");
     vergleich("E-Rechnung " + x.nummer, "TaxAmount (BT-110) = 0", Math.round(Number(/<cac:TaxTotal>\s*<cbc:TaxAmount[^>]*>([-\d.]+)</.exec(xml)?.[1] ?? "NaN") * 100), 0);
-    if (!xml.includes(KU_HINWEIS)) auffaellig.push(`E-Rechnung ${x.nummer}: Kleinunternehmer-Hinweis fehlt im XML.`);
+    // R10: an das EU-Unternehmen (Steuerschuldnerschaft gewählt) steht dieser Hinweis statt des § 19-Hinweises
+    if (D.KUNDE_ORT[x.kunde] === "eu_b2b") vergleichText("E-Rechnung " + x.nummer, "EU-Unternehmen: Hinweis „Steuerschuldnerschaft des Leistungsempfängers“ statt § 19", xml.includes("Steuerschuldnerschaft des Leistungsempfängers") && !xml.includes(KU_HINWEIS) ? "ja" : "nein", "ja");
+    else if (!xml.includes(KU_HINWEIS)) auffaellig.push(`E-Rechnung ${x.nummer}: Kleinunternehmer-Hinweis fehlt im XML.`);
     if (x.art === "gutschrift") {
       const typ = /<cbc:InvoiceTypeCode>(\d+)</.exec(xml)?.[1];
       const verkaeufer = /<cac:AccountingSupplierParty>[\s\S]*?<cbc:RegistrationName>([^<]*)</.exec(xml)?.[1];
@@ -308,6 +313,8 @@ export function standBauen(): Bau {
         id: b.id, datum: b.datum, lieferant: b.lieferant, nummer: b.nummer, kategorie: b.kategorie,
         steuer: sm.jeSatz.map((x) => ({ satz: x.satz, brutto_cent: x.brutto })),
         vorsteuer: false, zahlung: b.zahlung, bezahlt: b.bezahlt, notiz: b.notiz ?? null, datei: `${b.id}.pdf`, quelle: "foto", erstellt: jetzt, geaendert: jetzt,
+        // R10: Adobe (Irland) als § 13b-Beleg – auch die Kleinunternehmerin schuldet die Steuer (Kz 46/47, ohne Kz 67)
+        ...(b.p13b ? { steuerschuld: "eu" as const } : {}),
       };
       s = belegSetzen(s, beleg, t(b.datum, 18));
       belegDateien.push({ datei: `${b.id}.pdf`, html: belegHtml(b) });
@@ -444,11 +451,12 @@ export function standBauen(): Bau {
       uebernahme = euerUebernahme(s, "2026");
       s = felderSetzen(s, "euer", { jahr: "2026", einnahmen: uebernahme.einnahmen, ausgaben: uebernahme.ausgaben }, t("2027-02-20", 9));
       const zahl = (l: Record<string, string>[], k: string) => l.filter((x) => x.kategorie === k).reduce((a, x) => a + ausEuro(x.betrag ?? "0"), 0);
-      vergleich("EÜR-Übernahme", "Einnahmen in Zeile „Umsatzsteuerlicher Kleinunternehmer“ (ohne Gutschrift)", zahl(uebernahme.einnahmen, "Umsatzsteuerlicher Kleinunternehmer"), eu.einnahmen);
+      // R10: die nicht steuerbaren Umsätze (NL, CH) stehen in der eigenen „davon“-Zeile, die Kleinunternehmer-Zeile enthält den Rest
+      vergleich("EÜR-Übernahme", "Einnahmen in Zeile „Umsatzsteuerlicher Kleinunternehmer“ (ohne Gutschrift, ohne nicht steuerbare)", zahl(uebernahme.einnahmen, "Umsatzsteuerlicher Kleinunternehmer"), eu.einnahmen - eu.einnahmenAusland);
       vergleich("EÜR-Übernahme", "davon nicht steuerbare Umsätze (NL, CH) in eigener Zeile", zahl(uebernahme.einnahmen, "Nicht steuerbare Umsätze sowie Umsätze nach § 19 Absatz 3 Satz 1 Nummer 1 und 2 UStG"), eu.einnahmenAusland);
       vergleich("EÜR-Übernahme", "keine Zeile „Vereinnahmte Umsatzsteuer“", zahl(uebernahme.einnahmen, "Vereinnahmte Umsatzsteuer sowie Umsatzsteuer auf unentgeltliche Wertabgaben"), 0);
       vergleich("EÜR-Übernahme", "keine Zeile „Gezahlte Vorsteuerbeträge“", zahl(uebernahme.ausgaben, "Gezahlte Vorsteuerbeträge"), 0);
-      vergleich("EÜR-Übernahme", "Betriebsausgaben aus Belegen (brutto, ohne Anlage)", uebernahme.ausgaben.reduce((a, x) => a + ausEuro(x.betrag ?? "0"), 0), eu.ausgabenBelege);
+      vergleich("EÜR-Übernahme", "Betriebsausgaben aus Belegen (brutto, ohne Anlage)", uebernahme.ausgaben.filter((x) => !(x.text ?? "").startsWith("Gutschriften an Leistende")).reduce((a, x) => a + ausEuro(x.betrag ?? "0"), 0), eu.ausgabenBelege);
       for (const [kat, w] of Object.entries(eu.nachKategorie)) {
         const titel = kategorieFuer(kat).titel;
         const zeile = uebernahme.ausgaben.find((x) => (x.text ?? "").startsWith(titel));
@@ -458,7 +466,7 @@ export function standBauen(): Bau {
       vergleichText("EÜR-Übernahme", "Anlagen (Laptop) gemeldet", String(uebernahme.anlagen), "1");
       vergleichText("EÜR-Übernahme", "unbezahlte Rechnungen des Jahres", String(uebernahme.unbezahlt), "1");
       vergleichText("EÜR-Übernahme", "Hinweis: AfA selbst ergänzen", /AfA/.test(uebernahme.hinweis) ? "ja" : "nein", "ja");
-      const ho = uebernahme.ausgaben.find((x) => (x.text ?? "").startsWith(kategorieFuer("sonstiges").titel));
+      const ho = uebernahme.ausgaben.find((x) => (x.text ?? "").startsWith(kategorieFuer("homeoffice").titel));
       vergleichText("EÜR-Übernahme", "Homeoffice-Tagespauschale (Eigenbeleg b20) in der Zeile der Tagespauschale/des Arbeitszimmers", ho?.kategorie ?? "–", "Aufwendungen für ein häusliches Arbeitszimmer");
       // Standardwerte (Vorsteuer an): was eine Kleinunternehmerin bekäme, die den Schalter nicht ausschaltet
       const vstStd = zahl(standard.ausgaben, "Gezahlte Vorsteuerbeträge");

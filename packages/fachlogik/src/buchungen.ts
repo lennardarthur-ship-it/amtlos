@@ -11,7 +11,13 @@
  *   leer und müssen nur in Anzahl und Reihenfolge stimmen.
  * - Im Dateikopf stehen „Datum vom“ und „Datum bis“ als JJJJMMTT (wie der Wirtschaftsjahresbeginn), nicht als TTMMJJJJ;
  *   Feld 27 trägt den Kontenrahmen („03“/„04“).
- * - Konten, BU-Schlüssel 40 und die Umkehrbuchung für Stornos sind Annahmen.
+ * - Konten, BU-Schlüssel 40/9/8 und die Umkehrbuchung für Stornos sind Annahmen.
+ *
+ * R10 (Steuerberatung): Belege mit Vorsteuer auf Konten ohne Steuerautomatik bekommen BU 9 (19 %) bzw. 8 (7 %); das
+ * Erlöskonto richtet sich nach der Steuerart der Rechnung (igL, § 13b Inland, EU-Leistung, Drittland); § 13b-Eingangs-
+ * leistungen gehen auf eigene Konten; Gutschriften werden als Aufwand gebucht; Personal-Belege und privat ausgelegte
+ * Belege einer Kapitalgesellschaft bleiben aus dem Stapel (nur Belegliste); Leistungsdatum und Datum der Steuerperiode
+ * stehen in den Feldern 115/116; Forderungen und Verbindlichkeiten auf Konten ohne Kontokorrent.
  */
 import { belegKennung, kategorieFuer, type Beleg } from "./belege.js";
 import { summen, type Position } from "./rechnung.js";
@@ -42,6 +48,12 @@ export interface Buchung {
   quelle_id: string;
   /** stabile Kennung der Buchung (36 Zeichen), abgeleitet aus Quelle und Steuersatz – DATEV-Feld „Buchungs GUID“ */
   guid?: string;
+  /** Leistungsdatum (ISO) – DATEV-Feld „Leistungsdatum“ (115) */
+  leistungsdatum?: string | null;
+  /** Tag, nach dem die App die Umsatzsteuer dem Zeitraum zuordnet (ISO) – DATEV-Feld „Datum Zuord. Steuerperiode“ (116) */
+  steuerperiode?: string | null;
+  /** USt-IdNr. des Abnehmers bei innergemeinschaftlichen Lieferungen und EU-Leistungen – „EU-Land u. UStID (Bestimmung)“ */
+  eu_ustid?: string | null;
 }
 
 /** Was eine Ausgangsrechnung für die Buchung braucht – Teilmenge der gespeicherten Rechnung. */
@@ -63,13 +75,46 @@ export interface AusgangsRechnungFuerBuchung {
   kleinunternehmer: boolean;
   kunde: string;
   positionen: Position[];
+  /** Grund für 0 % (aus der Rechnung); bestimmt das Erlöskonto */
+  steuerart?: "standard" | "reverse_charge" | "igl" | "befreit" | "nullsatz";
+  /** Land des Empfängers (ISO 3166-1 alpha-2) – Inland, übriges Gemeinschaftsgebiet oder Drittland */
+  kunde_land?: string | null;
+  kunde_ust_idnr?: string | null;
+  /** Leistungsdatum bzw. Ende des Leistungszeitraums (ISO) */
+  leistungsdatum?: string | null;
+  /** Tag der Zuordnung zur Steuerperiode, wie die Voranmeldung der App ihn verwendet (ISO) */
+  steuerperiode?: string | null;
+  /** Gutschrift: der Betrieb (Aussteller, Leistungsempfänger) ist Kleinunternehmer – keine Vorsteuer */
+  empfaenger_ku?: boolean;
 }
+
+/** Mitgliedstaaten der EU außer Deutschland (ISO 3166-1; Griechenland als GR) – für Erlöskonten und Hinweise. */
+export const EU_LAENDER = ["AT", "BE", "BG", "CY", "CZ", "DK", "EE", "ES", "FI", "FR", "GR", "HR", "HU", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PL", "PT", "RO", "SE", "SI", "SK"] as const;
+export const istEuAusland = (land: string | null | undefined) => !!land && (EU_LAENDER as readonly string[]).includes(land.toUpperCase());
 
 /**
  * BU-Schlüssel, der die Steuerautomatik eines Automatikkontos aufhebt („keine Steuer“) – gesetzt, wenn ein Beleg keinen
  * Vorsteuerabzug erlaubt, das Kategorie-Konto aber Vorsteuer automatisch ziehen würde. Fachlich zu prüfen.
  */
 export const BU_OHNE_STEUER = "40";
+/** BU-Schlüssel für Vorsteuer auf Konten ohne Steuerautomatik: 9 = 19 %, 8 = 7 % (16 % und 5 % aus 2020: offen, PRUEFLISTE). */
+export const BU_VORSTEUER: Record<number, string> = { 19: "9", 7: "8" };
+
+/**
+ * Automatikkonten der verwendeten Kategorien: Die Steuer rechnet DATEV aus dem Konto selbst (kein BU-Schlüssel, ohne
+ * Vorsteuerabzug BU 40). Alle anderen Aufwandskonten sind ohne Automatik und brauchen BU 9/8 (fachlich zu prüfen).
+ */
+export const AUTOMATIKKONTEN: Record<Kontenrahmen, readonly string[]> = {
+  SKR03: ["3400", "3300", "3120", "3123"],
+  SKR04: ["5400", "5300"],
+};
+
+/**
+ * Konten für § 13b-Eingangsleistungen (Automatik: Vorsteuer und Umsatzsteuer). Nur SKR03 ist hier hinterlegt (3120
+ * Bauleistung Inland, 3123 sonstige Leistung EU); in SKR04 bleibt das Kategorie-Konto – die Steuerberatung bucht um
+ * (PRUEFLISTE).
+ */
+export const KONTEN_13B: Record<Kontenrahmen, { bau: string; eu: string } | null> = { SKR03: { bau: "3120", eu: "3123" }, SKR04: null };
 
 /** Sachkonten je Kontenrahmen – fachlich zu prüfen. Aufwandskonten stehen in der Kategorie (belege.ts). */
 export const BUCHUNGSKONTEN: Record<
@@ -81,13 +126,28 @@ export const BUCHUNGSKONTEN: Record<
     verbindlichkeiten: string;
     kasse: string;
     privateinlagen: string;
-    /** Erlöskonten je Steuersatz; `ku` für Kleinunternehmer (§ 19 UStG), `0` für steuerfreie Umsätze */
-    erloese: { 19: string; 7: string; 0: string; ku: string };
+    /**
+     * Erlöskonten je Steuersatz; `ku` für Kleinunternehmer (§ 19 UStG), `0` für steuerfreie Umsätze (§ 4 Nr. 8 ff. UStG
+     * und vorerst der Nullsteuersatz), `igl` innergemeinschaftliche Lieferung, `rc13b` § 13b-Umsatz im Inland, `eu`
+     * sonstige Leistung an Unternehmen im übrigen Gemeinschaftsgebiet (Empfänger schuldet die Steuer), `drittland`
+     * im Drittland steuerbare Leistung (im Inland nicht steuerbar)
+     */
+    erloese: { 19: string; 7: string; 0: string; ku: string; igl: string; rc13b: string; eu: string; drittland: string };
+    /** Aufwandskonto für Gutschriften (bezogene Leistungen) */
+    gutschrift: string;
   }
 > = {
-  SKR03: { forderungen: "1400", verbindlichkeiten: "1600", kasse: "1000", privateinlagen: "1890", erloese: { 19: "8400", 7: "8300", 0: "8100", ku: "8195" } },
-  SKR04: { forderungen: "1200", verbindlichkeiten: "3300", kasse: "1600", privateinlagen: "2180", erloese: { 19: "4400", 7: "4300", 0: "4100", ku: "4185" } },
+  // Forderungen/Verbindlichkeiten ohne Kontokorrent (1410/1610 bzw. 1210/3310), damit beim Bankabruf kein OPOS nötig ist
+  SKR03: { forderungen: "1410", verbindlichkeiten: "1610", kasse: "1000", privateinlagen: "1890", erloese: { 19: "8400", 7: "8300", 0: "8100", ku: "8195", igl: "8125", rc13b: "8337", eu: "8336", drittland: "8338" }, gutschrift: "3100" },
+  SKR04: { forderungen: "1210", verbindlichkeiten: "3310", kasse: "1600", privateinlagen: "2180", erloese: { 19: "4400", 7: "4300", 0: "4100", ku: "4185", igl: "4125", rc13b: "4337", eu: "4336", drittland: "4338" }, gutschrift: "5900" },
 };
+
+/** BU-Schlüssel eines Aufwands: Automatikkonto ohne Vorsteuerabzug 40, Konto ohne Automatik mit Vorsteuer 9/8, sonst leer. */
+export function buAufwand(kontenrahmen: Kontenrahmen, konto: string, satz: number, vorsteuer: boolean): string {
+  if (satz <= 0) return "";
+  if (AUTOMATIKKONTEN[kontenrahmen].includes(konto)) return vorsteuer ? "" : BU_OHNE_STEUER;
+  return vorsteuer ? (BU_VORSTEUER[satz] ?? "") : "";
+}
 
 const UMLAUTE: Record<string, string> = { ä: "ae", ö: "oe", ü: "ue", Ä: "AE", Ö: "OE", Ü: "UE", ß: "ss" };
 
@@ -127,10 +187,14 @@ export function buchungsGuid(quelle_id: string, satz: number | null): string {
   return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20, 32)}`;
 }
 
-function erloeskonto(k: (typeof BUCHUNGSKONTEN)[Kontenrahmen], satz: number | null): string {
+function erloeskonto(k: (typeof BUCHUNGSKONTEN)[Kontenrahmen], satz: number | null, r?: Pick<AusgangsRechnungFuerBuchung, "steuerart" | "kunde_land">): string {
+  const land = (r?.kunde_land ?? "DE").toUpperCase();
+  // Leistung an ein Unternehmen im übrigen Gemeinschaftsgebiet mit Steuerschuldnerschaft des Empfängers – auch bei
+  // Kleinunternehmern (Ort der Leistung im Ausland, § 3a Abs. 2 UStG)
+  if ((satz === 0 || satz === null) && r?.steuerart === "reverse_charge") return istEuAusland(land) ? k.erloese.eu : land === "DE" ? k.erloese.rc13b : k.erloese.drittland;
   if (satz === null) return k.erloese.ku;
   if (satz === 7) return k.erloese[7];
-  if (satz === 0) return k.erloese[0];
+  if (satz === 0) return r?.steuerart === "igl" ? k.erloese.igl : k.erloese[0];
   // Regelsatz; ein unbekannter Satz landet ebenfalls hier (die App kennt nur 19, 7 und 0)
   return k.erloese[19];
 }
@@ -145,7 +209,10 @@ export function buchungenAusRechnungen(rechnungen: AusgangsRechnungFuerBuchung[]
   const k = BUCHUNGSKONTEN[kontenrahmen];
   const aus: Buchung[] = [];
   for (const r of rechnungen) {
-    if (r.gutschrift) continue;
+    if (r.gutschrift) {
+      aus.push(...gutschriftBuchungen(r, kontenrahmen));
+      continue;
+    }
     const storno = r.art === "storno";
     const kunde = kuerze(r.kunde, NAME_IM_TEXT);
     const buchungstext = kuerze(storno ? `Storno ${r.nummer}${r.storniert_nummer ? ` zu RE ${r.storniert_nummer}` : ""} ${kunde}` : `RE ${r.nummer} ${kunde}`, 60);
@@ -159,7 +226,7 @@ export function buchungenAusRechnungen(rechnungen: AusgangsRechnungFuerBuchung[]
         betrag_cent: Math.abs(brutto),
         soll_haben: haben ? "H" : "S",
         konto: k.forderungen,
-        gegenkonto: erloeskonto(k, g.satz),
+        gegenkonto: erloeskonto(k, g.satz, r),
         bu_schluessel: "",
         belegfeld1: belegfeld1Aus(r.nummer),
         buchungstext,
@@ -167,8 +234,45 @@ export function buchungenAusRechnungen(rechnungen: AusgangsRechnungFuerBuchung[]
         art: storno ? "storno" : "einnahme",
         quelle_id: r.id,
         guid: buchungsGuid(r.id, g.satz),
+        leistungsdatum: r.leistungsdatum ?? null,
+        steuerperiode: r.steuerperiode ?? null,
+        // USt-IdNr. des Abnehmers für Kz 41/21 und die Zusammenfassende Meldung
+        eu_ustid: (g.satz === 0 || g.satz === null) && (r.steuerart === "igl" || (r.steuerart === "reverse_charge" && istEuAusland(r.kunde_land))) && r.kunde_ust_idnr ? r.kunde_ust_idnr.replace(/\s/g, "").toUpperCase() : null,
       });
     }
+  }
+  return aus;
+}
+
+/**
+ * Gutschrift (§ 14 Abs. 2 Satz 2 UStG): der Betrieb ist Leistungsempfänger – Aufwand (bezogene Leistungen) an
+ * Verbindlichkeiten, mit Vorsteuer (BU 9/8), wenn der Leistende Umsatzsteuer ausweist und der Betrieb kein
+ * Kleinunternehmer ist. Ein Storno der Gutschrift kehrt die Seiten um.
+ */
+function gutschriftBuchungen(r: AusgangsRechnungFuerBuchung, kontenrahmen: Kontenrahmen): Buchung[] {
+  const k = BUCHUNGSKONTEN[kontenrahmen];
+  const storno = r.art === "storno";
+  const text = kuerze(`${storno ? "Storno " : ""}Gutschrift ${r.nummer} ${kuerze(r.kunde, NAME_IM_TEXT)}`, 60);
+  const aus: Buchung[] = [];
+  for (const g of summen(r.positionen, r.kleinunternehmer).gruppen) {
+    const brutto = g.netto_cent + g.ust_cent;
+    if (!brutto) continue;
+    const haben = storno ? brutto > 0 : brutto < 0;
+    aus.push({
+      datum: r.datum,
+      betrag_cent: Math.abs(brutto),
+      soll_haben: haben ? "H" : "S",
+      konto: k.gutschrift,
+      gegenkonto: k.verbindlichkeiten,
+      bu_schluessel: g.satz ? buAufwand(kontenrahmen, k.gutschrift, g.satz, !r.empfaenger_ku) : "",
+      belegfeld1: belegfeld1Aus(r.nummer),
+      buchungstext: text,
+      ust_satz: g.satz,
+      art: "ausgabe",
+      quelle_id: r.id,
+      guid: buchungsGuid(r.id, g.satz),
+      leistungsdatum: r.leistungsdatum ?? null,
+    });
   }
   return aus;
 }
@@ -180,24 +284,28 @@ export function buchungenAusRechnungen(rechnungen: AusgangsRechnungFuerBuchung[]
  * `o.nummern` (`belegNummern`), ohne diese die Beleg-ID in Kurzform. Buchungstext: Lieferant (höchstens 40 Zeichen)
  * und Kurzbezeichnung der Kategorie.
  */
-export function buchungenAusBelegen(belege: Beleg[], kontenrahmen: Kontenrahmen, o?: { nummern?: Map<string, string> }): Buchung[] {
+export function buchungenAusBelegen(belege: Beleg[], kontenrahmen: Kontenrahmen, o?: { nummern?: Map<string, string>; kapitalgesellschaft?: boolean }): Buchung[] {
   const k = BUCHUNGSKONTEN[kontenrahmen];
   const aus: Buchung[] = [];
   for (const b of belege) {
+    if (!belegImStapel(b, o)) continue;
     const kat = kategorieFuer(b.kategorie);
     const konten = kontenrahmen === "SKR03" ? kat.skr03 : kat.skr04;
+    const k13b = b.steuerschuld && b.vorsteuer ? KONTEN_13B[kontenrahmen] : null;
     const gegenkonto = b.zahlung === "bar" ? k.kasse : b.zahlung === "privat" ? k.privateinlagen : k.verbindlichkeiten;
     const buchungstext = kuerze(`${kuerze(b.lieferant, NAME_IM_TEXT)} ${kat.kurz}`, 60);
     const belegfeld1 = belegfeld1Aus(belegKennung(b, o?.nummern?.get(b.id) ?? belegfeld1Aus(b.id).slice(0, 12).toUpperCase()));
     for (const s of b.steuer) {
       if (!s.brutto_cent) continue;
+      // § 13b mit Vorsteuerabzug: Automatikkonto für Steuer und Vorsteuer (SKR03); sonst das Kategorie-Konto ohne Steuer
+      const konto = k13b ? k13b[b.steuerschuld!] : b.steuerschuld ? (konten[19] ?? "") : (konten[s.satz] ?? konten[19] ?? "");
       aus.push({
         datum: b.datum,
         betrag_cent: Math.abs(s.brutto_cent),
         soll_haben: s.brutto_cent < 0 ? "H" : "S",
-        konto: konten[s.satz] ?? konten[19] ?? "",
+        konto,
         gegenkonto,
-        bu_schluessel: !b.vorsteuer && s.satz > 0 ? BU_OHNE_STEUER : "",
+        bu_schluessel: b.steuerschuld ? "" : buAufwand(kontenrahmen, konto, s.satz, b.vorsteuer),
         belegfeld1,
         buchungstext,
         ust_satz: s.satz,
@@ -208,6 +316,17 @@ export function buchungenAusBelegen(belege: Beleg[], kontenrahmen: Kontenrahmen,
     }
   }
   return aus;
+}
+
+/**
+ * Gehört ein Beleg in den Buchungsstapel? Nicht: Personal (Lohn bucht die Steuerberatung aus der Lohnbuchhaltung,
+ * sonst doppelt) und – bei Kapitalgesellschaften – privat ausgelegte Belege (keine Privatkonten; das Gesellschafter-
+ * Verrechnungskonto legt die Steuerberatung fest). Beide stehen nur in der Belegliste.
+ */
+export function belegImStapel(b: Pick<Beleg, "kategorie" | "zahlung">, o?: { kapitalgesellschaft?: boolean }): boolean {
+  if (b.kategorie === "personal") return false;
+  if (o?.kapitalgesellschaft && b.zahlung === "privat") return false;
+  return true;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -294,6 +413,10 @@ export const DATEV_SPALTEN: readonly string[] = [
 
 /** Index des Felds „Buchungs GUID“ in der Buchungszeile (Feld 103 der Version 700 – fachlich zu prüfen) */
 export const DATEV_GUID = DATEV_SPALTEN.indexOf("Buchungs GUID");
+/** Felder 115 „Leistungsdatum“, 116 „Datum Zuord. Steuerperiode“ und 40 „EU-Land u. UStID (Bestimmung)“ */
+export const DATEV_LEISTUNGSDATUM = DATEV_SPALTEN.indexOf("Leistungsdatum");
+export const DATEV_STEUERPERIODE = DATEV_SPALTEN.indexOf("Datum Zuord. Steuerperiode");
+export const DATEV_EU_USTID = DATEV_SPALTEN.indexOf("EU-Land u. UStID (Bestimmung)");
 
 export interface DatevExtfOptionen {
   beraternummer?: string;
@@ -324,6 +447,7 @@ const nurZiffern = (s: string | undefined) => (s ?? "").replace(/\D/g, "");
 const jjjjmmtt = (iso: string) => iso.slice(0, 10).replace(/-/g, "");
 /** Belegdatum im DATEV-Format TTMM – das Jahr ergibt sich aus dem Stapelzeitraum */
 const ttmm = (iso: string) => iso.slice(8, 10) + iso.slice(5, 7);
+const ttmmjjjjOhnePunkt = (iso: string) => `${iso.slice(8, 10)}${iso.slice(5, 7)}${iso.slice(0, 4)}`;
 const ttmmjjjj = (iso: string) => `${iso.slice(8, 10)}.${iso.slice(5, 7)}.${iso.slice(0, 4)}`;
 
 /** „Erzeugt am“ als JJJJMMTThhmmssfff aus einem ISO-Zeitpunkt; fehlende Teile werden mit Nullen gefüllt. */
@@ -385,6 +509,10 @@ export function datevExtf(buchungen: Buchung[], o: DatevExtfOptionen): string {
     f[11] = inAnfzOderLeer(b.belegfeld2 ? belegfeld1Aus(b.belegfeld2).slice(0, 12) : "");
     f[13] = inAnfz(kuerze(b.buchungstext, 60));
     if (b.guid) f[DATEV_GUID] = inAnfz(b.guid.slice(0, 36));
+    if (b.eu_ustid) f[DATEV_EU_USTID] = inAnfz(b.eu_ustid.slice(0, 15));
+    // Datumsfelder TTMMJJJJ – damit ordnet DATEV die Umsatzsteuer wie die Voranmeldung der App zu
+    if (b.leistungsdatum) f[DATEV_LEISTUNGSDATUM] = ttmmjjjjOhnePunkt(b.leistungsdatum);
+    if (b.steuerperiode) f[DATEV_STEUERPERIODE] = ttmmjjjjOhnePunkt(b.steuerperiode);
     return f.join(";");
   });
   return [kopf.join(";"), DATEV_SPALTEN.join(";"), ...zeilen].join("\r\n") + "\r\n";
@@ -427,16 +555,20 @@ export function buchungslisteCsv(buchungen: Buchung[]): string {
 /** Fachlich unsichere Punkte dieser Datei als Sätze – für die PRUEFLISTE. */
 export function pruefpunkteBuchungen(): string[] {
   return [
-    "Sachkonten: Forderungen aus L+L (SKR03 1400, SKR04 1200), Verbindlichkeiten aus L+L (1600/3300), Kasse (1000/1600), Privateinlagen (1890/2180) und Erlöskonten 19 % (8400/4400), 7 % (8300/4300), Kleinunternehmer § 19 UStG (8195/4185) gegen den aktuellen DATEV-Kontenrahmen prüfen.",
-    "Umsätze mit 0 % ohne Kleinunternehmerregelung landen pauschal auf „Steuerfreie Umsätze“ (SKR03 8100, SKR04 4100); innergemeinschaftliche Lieferungen (§ 4 Nr. 1b UStG) und Leistungen nach § 13b UStG bräuchten eigene Konten (z. B. 8125/4125, 8337/4337) – die Buchung kennt die Steuerart der Rechnung nicht.",
-    "Die Kategorie-Konten werden als Automatikkonten behandelt (Bruttobetrag, kein BU-Schlüssel). Für Konten ohne Steuerautomatik (SKR03 z. B. 4930 Bürobedarf, 4600 Werbekosten) wäre stattdessen BU 9 (19 % Vorsteuer) bzw. 8 (7 %) nötig; dort ist BU 40 unzulässig.",
-    "BU-Schlüssel 40 („keine Steuer“ bei Automatikkonten) wird gesetzt, wenn ein Beleg keinen Vorsteuerabzug erlaubt und der Satz größer 0 ist – richtig und bei allen verwendeten Konten zulässig?",
+    "Sachkonten: Forderungen aus L+L ohne Kontokorrent (SKR03 1410, SKR04 1210), Verbindlichkeiten aus L+L ohne Kontokorrent (1610/3310), Kasse (1000/1600), Privateinlagen (1890/2180) und Erlöskonten 19 % (8400/4400), 7 % (8300/4300), Kleinunternehmer § 19 UStG (8195/4185) gegen den aktuellen DATEV-Kontenrahmen prüfen.",
+    "Erlöskonten nach Steuerart: igL 8125/4125 (mit „EU-Land u. UStID“), § 13b im Inland 8337/4337, sonstige Leistung an Unternehmen im übrigen Gemeinschaftsgebiet (Empfänger schuldet die Steuer, Kz 21) 8336/4336, im Drittland steuerbare Leistung 8338/4338 – die Steuerberatung nannte 8338 für die EU-Leistung; nach unserem Stand ist 8338 das Drittlandkonto und 8336 das EU-Konto. Bitte prüfen. Nullsteuersatz (§ 12 Abs. 3 UStG, Kz 87) bleibt vorerst auf 8100/4100 – Konto für Kz 87 offen.",
+    "Automatikkonten: nur SKR03 3400/3300 (Wareneingang 19/7 %), 3120/3123 (§ 13b) und SKR04 5400/5300 gelten als Automatikkonten (kein BU, ohne Vorsteuerabzug BU 40). Alle anderen Kategorie-Konten (z. B. 4930, 4600, 4210, 3100, 0420) gelten als Konten ohne Automatik und bekommen bei Vorsteuer BU 9 (19 %) bzw. 8 (7 %). Für die Sätze 16 % und 5 % (2. Halbjahr 2020) setzt der Export keinen BU-Schlüssel.",
+    "BU-Schlüssel 40 („keine Steuer“ bei Automatikkonten) wird nur noch auf Automatikkonten gesetzt, wenn ein Beleg keinen Vorsteuerabzug erlaubt – weist DATEV BU 40 auf Konten ohne Automatik ab oder warnt es nur?",
+    "§ 13b-Eingangsleistungen: SKR03 3120 (Bauleistung eines im Inland ansässigen Unternehmers) bzw. 3123 (sonstige Leistung eines im übrigen Gemeinschaftsgebiet ansässigen Unternehmers) als Automatikkonten für Umsatzsteuer und Vorsteuer. SKR04-Gegenstücke und das Konto für Kleinunternehmer (Steuer ohne Vorsteuerabzug) sind nicht hinterlegt – dort bleibt das Kategorie-Konto ohne Steuer.",
+    "Gutschriften (§ 14 Abs. 2 Satz 2 UStG) werden als Aufwand auf „bezogene Leistungen“ (SKR03 3100, SKR04 5900) an Verbindlichkeiten gebucht, mit BU 9/8 bei ausgewiesener Steuer – passendes Aufwandskonto je nach Leistung mit der Steuerberatung klären.",
+    "Personal-Belege und privat ausgelegte Belege einer Kapitalgesellschaft stehen nur in der Belegliste, nicht im Stapel. Verrechnungskonto Gesellschafter (z. B. SKR03 0755) mit der Steuerberatung festlegen.",
+    "Felder 115 „Leistungsdatum“ und 116 „Datum Zuord. Steuerperiode“ (TTMMJJJJ) sind bei Ausgangsrechnungen gefüllt; Feld 40 „EU-Land u. UStID (Bestimmung)“ bei igL und EU-Leistungen – Format und Feldnummern prüfen.",
     "Stornos werden als einfache Umkehrbuchung (Soll und Haben getauscht) ausgegeben, nicht als Generalumkehr (Feld „Generalumkehr (GU)“ bzw. negativer Umsatz). Folgen für Verkehrszahlen und Umsatzstatistik mit der Steuerberatung klären.",
     "Die Spaltenliste der Buchungszeile (125 Felder, Version 700, Formatversion 13) ist aus dem Gedächtnis nachgebaut; gefüllt werden die ersten 14 Felder und „Buchungs GUID“ (Feld 103, stabile GUID aus Quelle und Steuersatz – darf der Export sie setzen, und steht sie an der richtigen Stelle?). Reihenfolge, Anzahl und Bezeichnungen gegen den DATEV-Schnittstellen-Entwicklungsleitfaden prüfen.",
     "Dateikopf: „Datum vom“ und „Datum bis“ stehen als JJJJMMTT (nicht TTMMJJJJ), Feld 27 trägt den Kontenrahmen („03“/„04“), Festschreibung 0, Rechnungslegungszweck 0, Herkunft „RE“ – gegen die Formatbeschreibung prüfen. Berater- und Mandantennummer sind beim Import Pflicht.",
     "Ist-Versteuerung (§ 20 UStG) ändert die Buchungen nicht: gebucht wird Forderung an Erlös zum Rechnungsdatum, die Versteuerungsart steht in den Mandantenstammdaten. Reicht das, oder soll bei Ist-Versteuerung erst mit der Zahlung gebucht werden (Zufluss, § 11 EStG)?",
     "Belegdatum im Format TTMM: das Jahr ergibt sich aus dem Stapelzeitraum. Alle Buchungen eines Stapels müssen in „Datum vom/bis“ und im Wirtschaftsjahr liegen – der Aufrufer muss je Zeitraum (Monat oder Jahr) einen eigenen Stapel erzeugen.",
-    "Belege mit Zahlungsweg Bank werden gegen Verbindlichkeiten aus L+L gebucht, die Zahlung selbst nicht (sie kommt aus dem Kontoauszug der Steuerberatung). Bei Einnahmen-Überschuss-Rechnung ist der Zahlungstag maßgeblich – ob stattdessen direkt gegen Bank (SKR03 1200, SKR04 1800) gebucht werden soll, mit der Steuerberatung klären.",
+    "Belege mit Zahlungsweg Bank werden gegen Verbindlichkeiten aus L+L ohne Kontokorrent gebucht, die Zahlung selbst nicht (sie kommt aus dem Kontoauszug der Steuerberatung). Bei Einnahmen-Überschuss-Rechnung ist der Zahlungstag maßgeblich – ob stattdessen direkt gegen Bank (SKR03 1200, SKR04 1800) gebucht werden soll, mit der Steuerberatung klären.",
     "Belegfeld 1 wird auf die DATEV-zulässigen Zeichen (Ziffern, Buchstaben, $ & % * + - /) gekürzt, Umlaute werden umschrieben – stimmt die Zeichenliste? Textfelder werden nach Windows-1252 kodiert; andere Zeichen werden „?“.",
   ];
 }

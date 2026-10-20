@@ -81,7 +81,7 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
   useAnsage(
     r
       ? [
-          r.kleinunternehmer ? TEXT.aus_rechnungen_ku : TEXT.aus_rechnungen_ok(r.anzahl),
+          r.kleinunternehmer ? (r.steuerschuldBelege ? TEXT.ust_ku_13b : TEXT.aus_rechnungen_ku) : TEXT.aus_rechnungen_ok(r.anzahl),
           kasse?.text ?? "",
           r.gutschriften ? TEXT.aus_rechnungen_gutschriften(r.gutschriften) : "",
           r.ersatz ? TEXT.aus_rechnungen_ersatz(r.ersatz) : "",
@@ -113,13 +113,17 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
       </ScrollView>
       {r ? (
         <View style={{ marginTop: 8, gap: 4 }}>
-          {r.kleinunternehmer ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_ku}</T> : <T v="caption" farbe={f.amtTief}>{TEXT.aus_rechnungen_ok(r.anzahl)}</T>}
+          {r.kleinunternehmer ? <T v="caption" farbe={f.bald}>{r.steuerschuldBelege ? TEXT.ust_ku_13b : TEXT.aus_rechnungen_ku}</T> : <T v="caption" farbe={f.amtTief}>{TEXT.aus_rechnungen_ok(r.anzahl)}</T>}
           {kasse ? <Hinweis art={kasse.warnung ? "warnung" : "info"} symbol="banknote" text={kasse.text} /> : null}
           {r.gutschriften ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_gutschriften(r.gutschriften)}</T> : null}
           {r.ersatz ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_ersatz(r.ersatz)}</T> : null}
           {r.offen ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_offen(r.offen)}</T> : null}
           {r.vorsteuerBelege || r.ohneVorsteuer ? <T v="caption" farbe={f.amtTief}>{TEXT.aus_rechnungen_vorsteuer(r.vorsteuerBelege, r.ohneVorsteuer)}</T> : null}
           {r.vorsteuerPruefen ? <T v="caption" farbe={f.bald}>{VORSTEUER_AUFTEILEN}</T> : null}
+          {/* R10: § 13b-Belege, Dauerfristverlängerung und Sondervorauszahlung */}
+          {r.steuerschuldBelege ? <T v="caption" farbe={f.amtTief}>{TEXT.ust_13b_belege(r.steuerschuldBelege)}</T> : null}
+          {!r.kleinunternehmer && z.stand.profil["ust.dauerfristverlaengerung"] === true ? <T v="caption" farbe={f.amtTief}>{TEXT.ust_dfv}</T> : null}
+          {!r.kleinunternehmer && z.stand.profil["ust.dauerfristverlaengerung"] === true && uebernommen && /-12$/.test(uebernommen.periode) ? <T v="caption" farbe={f.bald}>{TEXT.ust_sondervorauszahlung}</T> : null}
         </View>
       ) : null}
     </View>
@@ -186,6 +190,8 @@ function Schritt({ v, a, index, id, daten, fehlt }: { v: Vorlage; a: VorlagenAbs
     <View>
       {mitPerson ? <PersonenWahl v={v} id={id} daten={daten} /> : null}
       {v.ausRechnungen && index === 0 ? <AusRechnungen id={id} daten={daten} /> : null}
+      {/* R10 UI: Kasse bzw. Shop laut Check – bei den Umsätzen immer sagen, dass sie dazugehören (nicht erst nach der Übernahme) */}
+      {v.ausRechnungen && index === 1 && kassenHinweis(kassenLage(z.stand.profil), "ust")?.warnung ? <Hinweis art="warnung" symbol="banknote" text={kassenLage(z.stand.profil) === "shop" ? TEXT.shop_ust_schritt : TEXT.kasse_ust_schritt} /> : null}
       {v.id === "euer" && index === 0 ? <EuerAusDaten id={id} /> : null}
       <Felder felder={a.felder} werte={daten} fehlt={fehlt} setze={(k, w) => z.setzen(id, { [k]: w })} liste={(f) => <ListenSchritt feld={f} id={id} />} />
     </View>

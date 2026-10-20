@@ -14,9 +14,11 @@ export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record
   // Steuerkategorie (UNTDID 5305): S Normal, E befreit (auch Kleinunternehmer), AE Steuerschuldnerschaft des Empfängers, K innergemeinschaftliche Lieferung
   const null0 = r.steuerart === "reverse_charge" ? "AE" : r.steuerart === "igl" ? "K" : "E";
   const kategorie = (satz: number | null) => (satz === null ? { "cbc:ID": "E", "cbc:Percent": "0" } : satz === 0 ? { "cbc:ID": null0, "cbc:Percent": "0" } : { "cbc:ID": "S", "cbc:Percent": String(satz) });
+  // Kleinunternehmer mit Leistung an ein Unternehmen im EU-Ausland: Hinweis auf die Steuerschuldnerschaft statt § 19 (Kategorie bleibt E)
+  const kuText = r.kleinunternehmer && r.steuerart === "reverse_charge" ? "Steuerschuldnerschaft des Leistungsempfängers" : kuHinweis;
   const befreiung = (satz: number | null): Record<string, string> =>
     satz === null
-      ? { "cbc:TaxExemptionReason": kuHinweis }
+      ? { "cbc:TaxExemptionReason": kuText }
       : satz !== 0
         ? {}
         : r.steuerart === "reverse_charge"
@@ -37,12 +39,14 @@ export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record
     "cbc:IssueDate": r.rechnungsdatum,
     ...(r.faellig_am ? { "cbc:DueDate": r.faellig_am } : {}),
     "cbc:InvoiceTypeCode": r.art === "storno" ? "384" : "380",
-    ...(r.hinweis || r.kleinunternehmer ? { "cbc:Note": [r.kleinunternehmer ? kuHinweis : null, r.hinweis].filter(Boolean) } : {}),
+    ...(r.hinweis || r.kleinunternehmer ? { "cbc:Note": [r.kleinunternehmer ? kuText : null, r.hinweis].filter(Boolean) } : {}),
     "cbc:DocumentCurrencyCode": "EUR",
-    // BT-10 ist in der XRechnung Pflicht; ohne Käuferreferenz verwenden wir die Rechnungsnummer (Prüfpunkt T-07)
+    // BT-10 ist in der XRechnung Pflicht: Leitweg-ID bzw. Käuferreferenz, ohne sie die Rechnungsnummer (Prüfpunkt T-07)
     "cbc:BuyerReference": r.kunde.kaeufer_referenz || r.nummer,
     // Leistungszeitraum statt Leistungsdatum (BG-14: BT-73 Beginn, BT-74 Ende)
     ...(!r.leistungsdatum && r.leistungszeitraum ? { "cac:InvoicePeriod": { "cbc:StartDate": r.leistungszeitraum.von, "cbc:EndDate": r.leistungszeitraum.bis } } : {}),
+    // Bestellnummer des Käufers (BT-13) – in UBL nach InvoicePeriod, vor BillingReference
+    ...(r.bestellnummer ? { "cac:OrderReference": { "cbc:ID": r.bestellnummer } } : {}),
     ...(r.art === "storno" && r.storniert_nummer ? { "cac:BillingReference": [{ "cac:InvoiceDocumentReference": { "cbc:ID": r.storniert_nummer } }] } : {}),
     "cac:AccountingSupplierParty": {
       "cac:Party": {

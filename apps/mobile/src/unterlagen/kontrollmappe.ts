@@ -104,6 +104,52 @@ export function mappenAuswahl(s: Stand): MappenAuswahl {
   return { eintraege, unvollstaendig };
 }
 
+/**
+ * Kontrollarten (R10): Jede Stelle bekommt nur, was sie prüft – die Lebensmittelkontrolle keine Gehälter (Datenminimierung,
+ * Art. 5 Abs. 1 lit. c DSGVO). „alle“ bündelt wie bisher alles.
+ */
+export type Kontrollart = "alle" | "hygiene" | "zoll" | "bg" | "datenschutz";
+export const KONTROLLARTEN: Kontrollart[] = ["alle", "hygiene", "zoll", "bg", "datenschutz"];
+const JE_KONTROLLE: Record<Exclude<Kontrollart, "alle">, ReadonlySet<string>> = {
+  hygiene: new Set(["ifsg_belehrung", "allergene", "haccp", "hygieneplan"]),
+  zoll: new Set(["arbeitszeitnachweis", "nachweis_arbeitsbedingungen"]),
+  bg: new Set(["gefaehrdungsbeurteilung", "unterweisung", "gefahrstoffverzeichnis", "betriebsanweisung", "pruefprotokoll_elektro", "hautschutzplan"]),
+  datenschutz: new Set(["datenschutz_dokumentation", "avv", "datenschutzinformation", "datenpanne"]),
+};
+
+/** Gehört eine Vorlage in die Mappe für diese Kontrollart? */
+export function fuerKontrolle(vorlageId: string, art: Kontrollart): boolean {
+  const v = vorlageFuer(vorlageId);
+  if (!v || !gehoertInMappe(v)) return false;
+  return art === "alle" || JE_KONTROLLE[art].has(vorlageId);
+}
+
+/** Was eine offene Pflicht braucht, um in der Mappe zu fehlen: Titel und die Vorlagen dazu. */
+export interface PflichtMitVorlagen {
+  id: string;
+  titel: string;
+  vorlagen: string[];
+}
+
+/**
+ * „Fehlt noch für eine Kontrolle“ (R10): offene Pflichten mit einer Vorlage, die in die Mappe gehört – solange keine
+ * Unterlage zu einer dieser Vorlagen in der Mappe steht. Die erste passende Vorlage ist die zum Erstellen.
+ */
+export function fehltInMappe(offen: readonly PflichtMitVorlagen[], eintraege: readonly MappenEintrag[], art: Kontrollart): { id: string; titel: string; vorlage: string }[] {
+  const da = new Set(eintraege.map((e) => e.vorlage));
+  const gesehen = new Set<string>();
+  const r: { id: string; titel: string; vorlage: string }[] = [];
+  for (const p of offen) {
+    const passend = p.vorlagen.filter((v) => fuerKontrolle(v, art));
+    if (!passend.length || passend.some((v) => da.has(v))) continue;
+    // eine Vorlage nur einmal anbieten (z. B. Unterweisung für Erst- und Wiederholungsunterweisung)
+    if (gesehen.has(passend[0]!)) continue;
+    gesehen.add(passend[0]!);
+    r.push({ id: p.id, titel: p.titel, vorlage: passend[0]! });
+  }
+  return r;
+}
+
 const esc = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 export const datumDe = (iso: string) => `${iso.slice(8, 10)}.${iso.slice(5, 7)}.${iso.slice(0, 4)}`;
 const bereichTitel = (b: Bereich) => BEREICHE.find((x) => x.id === b)?.titel ?? "";
@@ -112,7 +158,7 @@ const bereichTitel = (b: Bereich) => BEREICHE.find((x) => x.id === b)?.titel ?? 
  * Deckblatt: Betrieb, Datum, Inhaltsverzeichnis mit Titel, Datum und – wenn bekannt – Seite in der Mappe. Die Meta-Tags
  * geben der Fußzeile (fusszeile.ts) Betrieb und Stand.
  */
-export function deckblattHtml(betrieb: string, heute: string, eintraege: (MappenEintrag & { seite?: number })[]): string {
+export function deckblattHtml(betrieb: string, heute: string, eintraege: (MappenEintrag & { seite?: number })[], art?: string): string {
   const name = betrieb.trim() || "Betrieb";
   // viele Einträge: engere Zeilen, damit das Inhaltsverzeichnis nicht mit wenigen Zeilen auf eine zweite Seite läuft
   const eng = eintraege.length > 9;
@@ -137,7 +183,7 @@ th.s{text-align:right}
 .hinweis{margin-top:8mm;font-size:8.5pt;color:#5b6670}
 body.eng h1{margin:3mm 0 1mm;font-size:22pt}body.eng .stand{margin-bottom:6mm}body.eng td{padding:1.5mm 2mm}body.eng .hinweis{margin-top:5mm}
 </style></head><body class="g-nachweis${eng ? " eng" : ""}">
-<div class="art">Kontrollmappe</div>
+<div class="art">Kontrollmappe${art ? ` · ${esc(art)}` : ""}</div>
 <h1>Nachweise des Betriebs</h1>
 <p class="betrieb">${esc(name)}</p>
 <p class="stand">Zusammengestellt am ${datumDe(heute)} · ${eintraege.length} ${eintraege.length === 1 ? "Unterlage" : "Unterlagen"}</p>

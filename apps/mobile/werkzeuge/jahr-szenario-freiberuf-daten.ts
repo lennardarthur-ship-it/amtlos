@@ -75,7 +75,7 @@ export const KUNDEN = {
   k8: { name: "Studio Grachtwerk B.V.", anschrift: "Keizersgracht 221\n1016 DV Amsterdam\nNiederlande", email: "facturen@grachtwerk.example", ust_idnr: "NL859310276B01" },
   k9: { name: "Kulturverein Zwischenraum e. V.", anschrift: "Haslacher Straße 43\n79115 Freiburg im Breisgau", email: "kasse@zwischenraum-freiburg.example" },
   /** Fotograf, Kleinunternehmer – Mira rechnet seine Leistung per Gutschrift ab (sie ist Leistungsempfängerin) */
-  kf: { name: "Jonas Kiefer Fotografie", anschrift: "Habsburgerstraße 88\n79104 Freiburg im Breisgau", email: "post@kiefer-fotografie.example" },
+  kf: { name: "Jonas Kiefer Fotografie", anschrift: "Habsburgerstraße 88\n79104 Freiburg im Breisgau", email: "post@kiefer-fotografie.example", steuernummer: "06/482/19375" },
 } as const;
 export type KundeId = keyof typeof KUNDEN;
 /** Ort der Leistung: Inland, EU-Unternehmer (§ 3a Abs. 2 UStG, Empfänger schuldet die Steuer dort), Drittland */
@@ -233,7 +233,7 @@ export const BELEGE: BelegRoh[] = [
     pos: [{ text: "Briefmarken 0,95 € (10 Stück), umsatzsteuerfrei", satz: 0, betrag: 950 }] }),
   einfach({ id: "b19", datum: "2026-12-31", ...FUNKNETZ, nummer: "FN-7712-2026-2", kategorie: "buero", art: "netto", zahlung: "bank", bezahlt: "2027-01-05", datei: "pdf", worum: "Mobilfunk Juli–Dezember – Rechnung vom 31.12.2026, Lastschrift erst 05.01.2027 (Ausgabe EÜR 2027)",
     pos: [{ text: "Mobilfunktarif „Business S“ Juli–Dezember 2026", menge: "6 × 21,01 €", satz: 19, betrag: 12606 }] }),
-  einfach({ id: "b20", datum: "2026-12-31", lieferant: "Eigenbeleg Mira Lindqvist", anschrift: "Günterstalstraße 37\n79102 Freiburg im Breisgau", nummer: "EB-2026-01", kategorie: "sonstiges", art: "brutto", zahlung: "privat", bezahlt: null, datei: "pdf", worum: "Homeoffice-Tagespauschale (§ 4 Abs. 5 Satz 1 Nr. 6c EStG): 210 Tage × 6 € = 1.260 € (Höchstbetrag) – kein Arbeitszimmer; in der App nur als „Sonstiges“ erfassbar",
+  einfach({ id: "b20", datum: "2026-12-31", lieferant: "Eigenbeleg Mira Lindqvist", anschrift: "Günterstalstraße 37\n79102 Freiburg im Breisgau", nummer: "EB-2026-01", kategorie: "homeoffice", art: "brutto", zahlung: "privat", bezahlt: null, datei: "pdf", worum: "Homeoffice-Tagespauschale (§ 4 Abs. 5 Satz 1 Nr. 6c EStG): 210 Tage × 6 € = 1.260 € (Höchstbetrag) – kein Arbeitszimmer; seit R10 eigene Kategorie „Homeoffice-Pauschale bzw. Arbeitszimmer“",
     pos: [{ text: "Tätigkeit in der häuslichen Wohnung an 210 Tagen ohne Aufsuchen einer anderen Betriebsstätte, 210 × 6,00 €", satz: 0, betrag: 126000 }] }),
   einfach({ id: "b21", datum: "2026-07-15", lieferant: "Künstlerbedarf Augustinerplatz", anschrift: "Augustinerplatz 2\n79098 Freiburg im Breisgau", nummer: "Bon 0715-0912", kategorie: "waren", art: "brutto", zahlung: "bank", bezahlt: null, datei: "pdf", worum: "Layoutmarker und Fineliner (Material, 19 %, Kleinbetragsrechnung)",
     pos: [{ text: "Layoutmarker-Set 24 Farben", satz: 19, betrag: 4990 }, { text: "Fineliner-Set 0,1–0,8 mm", satz: 19, betrag: 1500 }] }),

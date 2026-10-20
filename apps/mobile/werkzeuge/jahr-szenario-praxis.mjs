@@ -260,8 +260,9 @@ function paketPruefen(name, zr, ordner) {
   const kontoSumme = (konto) => summe(zeilen.filter((z) => z[7] === konto).map((z) => (z[1] === "H" ? -1 : 1) * centAus(z[0])));
   vergleich(bereich, "DATEV: Brutto auf 8400 (19 %) = 19-%-Anteil der Rechnungen inkl. USt", kontoSumme("8400"), summe(vg.map((x) => x.vz * (x.s.pflichtig + x.s.ust))));
   vergleich(bereich, "DATEV: Brutto auf 8100 (steuerfreie Umsätze § 4 Nr. 8 ff.) = steuerfreie Positionen", kontoSumme("8100"), summe(vg.map((x) => x.vz * x.s.frei)));
-  const ohneVst = summe(belege.filter((b) => b.zuordnung !== "pflichtig").map((b) => b.saetze.filter((x) => x.satz > 0 && x.betrag).length));
-  vergleich(bereich, "DATEV: Belegbuchungen mit Satz > 0 ohne Vorsteuer tragen BU 40", zeilen.filter((z) => z[8] === "40").length, ohneVst);
+  // R10: BU 40 nur auf Automatikkonten (Wareneingang 3400/3300); auf Konten ohne Automatik ohne Vorsteuer kein BU, mit Vorsteuer BU 9/8
+  const AUTOMATIK = ["3400", "3300", "3120", "3123"];
+  vergleich(bereich, "DATEV: kein BU 40 auf Konten ohne Automatik", zeilen.filter((z) => z[8] === "40" && !AUTOMATIK.includes(z[6])).length, 0);
   const gi = extf[1].indexOf("Buchungs GUID");
   const guids = zeilen.map((z) => z[gi]);
   vergleich(bereich, "DATEV: Buchungs-GUID in jeder Zeile und eindeutig", gi >= 0 && guids.every((g, i) => /^[0-9a-f-]{36}$/.test(g) && guids.indexOf(g) === i) ? "ja" : "nein", "ja");

@@ -121,6 +121,8 @@ export const PROFIL: Profil = {
   "personal.lohnsteuer_anmeldezeitraum": "keine",
   "gesellschafter.auslaendische_investoren": false,
   "produkte.arten": ["physisch", "verpackung", "kosmetik"],
+  // R10: eigene Seife – die Kosmetikverordnung gilt erst mit dieser Antwort (Frage „eigene Produkte?“)
+  "produkte.hersteller": true,
   "handel.hohe_bargeschaefte": false,
   "arbeitsschutz.elektrische_geraete": true,
   "arbeitsschutz.gefahrstoffe": true,
@@ -281,7 +283,9 @@ export function standBauen(): Bau {
     const beleg: Beleg = {
       id: b.id, datum: b.datum, lieferant: b.lieferant, nummer: b.nummer, kategorie: b.kategorie,
       steuer: sm.jeSatz.map((x) => ({ satz: x.satz, brutto_cent: x.brutto })),
-      vorsteuer: b.vorsteuer, zahlung: b.zahlung, bezahlt: b.bezahlt, notiz: b.notiz ?? null, datei: `${b.id}.pdf`, quelle: "foto", erstellt: jetzt, geaendert: jetzt,
+      vorsteuer: b.vorsteuer || !!b.p13b, zahlung: b.zahlung, bezahlt: b.bezahlt, notiz: b.notiz ?? null, datei: `${b.id}.pdf`, quelle: "foto", erstellt: jetzt, geaendert: jetzt,
+      // R10: Leistungen aus Irland als § 13b-Beleg (Kz 46/47, Vorsteuer Kz 67)
+      ...(b.p13b ? { steuerschuld: "eu" as const } : {}),
     };
     s = belegSetzen(s, beleg, t(b.datum, 18));
     belegDateien.push({ datei: `${b.id}.pdf`, html: belegHtml(b) });
@@ -289,7 +293,7 @@ export function standBauen(): Bau {
     vergleich(`Beleg ${b.id} ${b.lieferant}`, "Brutto", app.brutto_cent, sm.brutto);
     vergleich(`Beleg ${b.id} ${b.lieferant}`, "Vorsteuer (App rechnet aus Brutto, Beleg weist aus)", app.vorsteuer_cent, sm.vorsteuer);
   }
-  infos.push(`§ 13b-Belege (${D.BELEGE.filter((b) => b.p13b).map((b) => b.id).join(", ")}): in der App mit 0 % und „Vorsteuer abziehbar“ aus erfasst – einen Schalter „Steuerschuldnerschaft des Leistungsempfängers“ gibt es beim Beleg nicht; die Notiz ist der einzige Ort für den Hinweis.`);
+  infos.push(`§ 13b-Belege (${D.BELEGE.filter((b) => b.p13b).map((b) => b.id).join(", ")}): in der App mit dem Schalter „Ich schulde die Umsatzsteuer (§ 13b UStG)“ und „Dienstleistung aus dem EU-Ausland“ erfasst (seit R10).`);
 
   // ---------------------------------------------------------------- Website und Datenschutz
   const SHOP_ERG = [
@@ -519,7 +523,7 @@ export function standBauen(): Bau {
     const erg = v("ust_voranmeldung").ergebnis!(unterlage(id).daten);
     vergleich(`USt ${em.m} (fertige Voranmeldung)`, "Kz 81 Bemessungsgrundlage 19 % (Rechnungen + Shop + Markt)", ausEuro(String(unterlage(id).daten.umsatz_19 ?? "0")), em.kz81);
     vergleich(`USt ${em.m} (fertige Voranmeldung)`, "Zahllast (mit Cent; § 13b gleicht sich aus)", ausEuro(erg[2]![1]) * (erg[2]![0] === "Erstattung" ? -1 : 1), em.zahllast);
-    if (em.kz46) vergleichText(`USt ${em.m} (fertige Voranmeldung)`, `Kz 46/47 § 13b (${euro(em.kz46)} € / ${euro(em.kz47)} €) als Feld der Voranmeldung`, "kein Feld (nur Notiz)", "Feld");
+    if (em.kz46) vergleichText(`USt ${em.m} (fertige Voranmeldung)`, `Kz 46/47/67 § 13b als Felder der Voranmeldung`, `${euro(ausEuro(app.rc_eu_netto ?? "0"))} / ${euro(ausEuro(app.rc_eu_steuer ?? "0"))} / ${euro(ausEuro(app.vorsteuer_13b ?? "0"))}`, `${euro(em.kz46)} / ${euro(em.kz47)} / ${euro(em.kz67)}`);
     ust.push({ m: em.m, app, appAnzahl: anzahl, final: Object.fromEntries(["umsatz_19", "umsatz_7", "umsatz_igl", "umsatz_48", "umsatz_13b", "umsatz_frei", "vorsteuer"].map((k) => [k, String(unterlage(id).daten[k] ?? "")])), zahllast: `${erg[2]![0]} ${erg[2]![1]}` });
   }
   infos.push(`Pflichten-Check: Kasse laut Profil „${kassenLage(s.profil)}“ – ohne elektronische Kasse sagt die App bei der USt-Übernahme nichts zu fehlenden Shop- und Marktumsätzen (kassenHinweis gibt null zurück bzw. nur „Falls du …“).`);
@@ -587,7 +591,7 @@ export function standBauen(): Bau {
   const ustJahr = erwartet.reduce((a, em) => a + ausEuro(v("ust_voranmeldung").ergebnis!(unterlage(`ust-${em.m}`).daten)[0]![1]), 0);
   const gewinnZeile = euerErgebnis.find((z) => z[0] === "Gewinn" || z[0] === "Verlust")!;
   dok({ id: "steuer", vorlage: "steuererklaerung", datum: "2027-03-15", worum: "Zusammenstellung für ESt (Anlage G, EÜR), GewSt und USt 2026: Gewinn aus der EÜR, Umsatz/USt/Vorsteuer als Summe der zwölf Voranmeldungen der App (ohne § 13b, ohne OSS), ESt-Vorauszahlungen 4 × 2.400 €, GewSt 4 × 650 €.",
-    daten: (h) => ({ jahr: "2026", arten: ["est", "gewst", "ust"], gewinn: gewinnZeile[1].replace(/\s*€$/, ""), umsatz: euro(vaSumme("umsatz_19") + vaSumme("umsatz_7") + (vaSumme("umsatz_frei") + vaSumme("umsatz_igl") + vaSumme("umsatz_48") + vaSumme("umsatz_13b"))), ust_jahr: euro(ustJahr), vorsteuer_jahr: euro(vaSumme("vorsteuer")),
+    daten: (h) => ({ jahr: "2026", arten: ["est", "gewst", "ust"], gewinn: gewinnZeile[1].replace(/\s*€$/, ""), umsatz: euro(vaSumme("umsatz_19") + vaSumme("umsatz_7") + (vaSumme("umsatz_frei") + vaSumme("umsatz_igl") + vaSumme("umsatz_48") + vaSumme("umsatz_13b"))), ust_jahr: euro(ustJahr), vorsteuer_jahr: euro(vaSumme("vorsteuer") + vaSumme("vorsteuer_13b")),
       vorauszahlungen: eintraege("steuererklaerung", "vorauszahlungen", [...[1, 2, 3, 4].map((q) => ({ art: `Einkommensteuer Q${q}`, betrag: "2.400,00" })), ...[1, 2, 3, 4].map((q) => ({ art: `Gewerbesteuer Q${q}`, betrag: "650,00" }))], h),
       weiteres: eintraege("steuererklaerung", "weiteres", [{ was: "Kranken- und Pflegeversicherung (freiwillig gesetzlich)", betrag: "5.880,00", beleg: true }, { was: "OSS-Erklärungen Q3/Q4 2026 (BZSt): ausländische USt, nicht Teil der deutschen USt-Erklärung", betrag: euro(summe(oss.map((q) => q.steuer))), beleg: true }, { was: "Zusammenfassende Meldungen Q1 und Q3 (igL Österreich)", betrag: euro(D.jahresSummen().kz41), beleg: true }], h),
       notiz: `Umsatzsteuer nach vereinbarten Entgelten. In der Jahreserklärung zusätzlich § 13b: Bemessungsgrundlage ${euro(D.jahresSummen().kz46)} €, Steuer ${euro(D.jahresSummen().kz47)} € und gleich hohe Vorsteuer (in den Feldern oben nicht enthalten).` }) });
@@ -596,7 +600,7 @@ export function standBauen(): Bau {
     vergleich("Steuererklärung", "Gewinn = EÜR (unabhängig)", ausEuro(String(unterlage("steuer").daten.gewinn ?? "0")), eu.gewinn);
     vergleich("Steuererklärung", "Umsätze im Jahr (Inland 19 % + igL, Summe der Voranmeldungen)", vaSumme("umsatz_19") + (vaSumme("umsatz_frei") + vaSumme("umsatz_igl") + vaSumme("umsatz_48") + vaSumme("umsatz_13b")), j.kz81 + j.kz41);
     vergleich("Steuererklärung", "Umsatzsteuer im Jahr inkl. § 13b (Summe der Voranmeldungen)", ustJahr, j.ust);
-    vergleich("Steuererklärung", "Vorsteuer im Jahr inkl. § 13b (Kz 66 + Kz 67)", vaSumme("vorsteuer"), j.kz66 + j.kz67);
+    vergleich("Steuererklärung", "Vorsteuer im Jahr inkl. § 13b (Kz 66 + Kz 67)", vaSumme("vorsteuer") + vaSumme("vorsteuer_13b"), j.kz66 + j.kz67);
   }
 
   // ---------------------------------------------------------------- Varianten (eigener Stand, ändern den Hauptstand nicht)

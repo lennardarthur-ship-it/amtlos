@@ -113,7 +113,11 @@ export interface RechnungsDaten {
   steller: Steller; kunde: KundeDaten; positionen: Position[]; kleinunternehmer: boolean; hinweis?: string | null;
   art?: "rechnung" | "storno"; storniert_nummer?: string | null;
   /** Grund für 0 %: Steuerschuldnerschaft des Empfängers, innergemeinschaftliche Lieferung oder Steuerbefreiung (E-129) */
-  steuerart?: "standard" | "reverse_charge" | "igl" | "befreit";
+  steuerart?: "standard" | "reverse_charge" | "igl" | "befreit" | "nullsatz";
+  /** Bestellnummer des Käufers (BT-13) */
+  bestellnummer?: string | null;
+  /** Abschlagsrechnung vor Ausführung der Leistung: Leistungsdatum ist noch offen (§ 14 Abs. 4 Nr. 6 UStG) */
+  abschlag?: boolean;
   /** Hinweis auf die Steuerbefreiung (bei „befreit“) */
   befreiungsgrund?: string | null;
 }
@@ -132,14 +136,14 @@ export function fehlendFuerERechnung(r: RechnungsDaten): string[] {
   if (!r.positionen.length) f.push("positionen");
   if (r.positionen.some((p) => !p.bezeichnung || !(p.menge > 0) || !Number.isInteger(p.preis_cent))) f.push("positionen.ungueltig");
   if (!r.kleinunternehmer && r.positionen.some((p) => p.ust_satz === null)) f.push("positionen.steuersatz");
-  if (!r.leistungsdatum && !r.leistungszeitraum) f.push("leistungsdatum");
+  if (!r.leistungsdatum && !r.leistungszeitraum && !r.abschlag) f.push("leistungsdatum");
   // 0 % ohne Kleinunternehmer: Grund nötig; Reverse Charge und innergemeinschaftliche Lieferung brauchen beide USt-IdNr. (BR-AE-02/03, BR-IC-02/03)
   if (!r.kleinunternehmer && r.positionen.some((p) => p.ust_satz === 0)) {
     const art = r.steuerart ?? "standard";
     if (art === "standard") f.push("steuer.grund_null");
     if ((art === "reverse_charge" || art === "igl") && !s.ust_idnr) f.push("steller.ust_idnr");
     if ((art === "reverse_charge" || art === "igl") && !r.kunde.ust_idnr) f.push("kunde.ust_idnr");
-    if (art === "befreit" && !r.befreiungsgrund) f.push("steuer.befreiungsgrund");
+    if ((art === "befreit" || art === "nullsatz") && !r.befreiungsgrund) f.push("steuer.befreiungsgrund");
   }
   return f;
 }

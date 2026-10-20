@@ -45,7 +45,20 @@ export interface Beleg {
   ungueltig_grund?: string | null;
   /** frühere Fassungen (älteste zuerst) – Änderungen an einem Beleg werden protokolliert, nicht überschrieben */
   historie?: BelegFassung[];
+  /**
+   * Steuerschuldnerschaft des Leistungsempfängers (§ 13b UStG, R10): Der Betrieb schuldet die Umsatzsteuer auf diese
+   * Eingangsleistung selbst. „bau“: Bauleistung eines im Inland ansässigen Unternehmers (§ 13b Abs. 2 Nr. 4, Abs. 5
+   * Satz 2 UStG); „eu“: sonstige Leistung eines im übrigen Gemeinschaftsgebiet ansässigen Unternehmers (§ 13b Abs. 1
+   * UStG). Die Beträge in `steuer` sind dann die Rechnungsbeträge ohne Umsatzsteuer (Bemessungsgrundlage).
+   */
+  steuerschuld?: Steuerschuld | null;
 }
+
+export type Steuerschuld = "bau" | "eu";
+export const STEUERSCHULD_ARTEN: { wert: Steuerschuld; text: string }[] = [
+  { wert: "eu", text: "Dienstleistung aus dem EU-Ausland" },
+  { wert: "bau", text: "Bauleistung aus Deutschland" },
+];
 
 /** Eine frühere Fassung eines Belegs: Inhalt, wie er bis `bis` galt. */
 export interface BelegFassung {
@@ -61,6 +74,7 @@ export interface BelegFassung {
   bezahlt?: string | null;
   notiz?: string | null;
   datei?: string | null;
+  steuerschuld?: Steuerschuld | null;
 }
 
 /**
@@ -98,18 +112,25 @@ export const KATEGORIEN: Kategorie[] = [
   { id: "waren", titel: "Waren und Material", kurz: "Wareneinkauf", euer: "Waren, Rohstoffe und Hilfsstoffe einschließlich der Nebenkosten", skr03: { 19: "3400", 7: "3300", 0: "3200" }, skr04: { 19: "5400", 7: "5300", 0: "5200" } },
   { id: "fremdleistungen", titel: "Fremdleistungen", kurz: "Fremdleistung", euer: "Bezogene Leistungen", skr03: konto("3100"), skr04: konto("5900") },
   { id: "personal", titel: "Personal (Löhne, Gehälter, Sozialabgaben)", kurz: "Personal", euer: "Ausgaben für eigenes Personal", skr03: konto("4120"), skr04: konto("6020"), hinweis: "ohne Vorsteuer" },
-  { id: "miete", titel: "Miete und Nebenkosten", kurz: "Miete", euer: "Miete/Pacht für Geschäftsräume und betrieblich genutzte Grundstücke", skr03: konto("4210"), skr04: konto("6310") },
+  { id: "miete", titel: "Miete und Nebenkosten", kurz: "Miete", euer: "Miete/Pacht für Geschäftsräume und betrieblich genutzte Grundstücke", skr03: konto("4210"), skr04: konto("6310"), hinweis: "Strom, Gas und Wasser vom Versorger: Kategorie „Energie“" },
+  // R10: Strom, Gas und Wasser nicht auf Miete (Steuerberatung) – eigene Kategorie, in der EÜR nicht in der Mietzeile
+  { id: "energie", titel: "Energie (Strom, Gas, Wasser)", kurz: "Energie", euer: "Sonstige Aufwendungen für betrieblich genutzte Grundstücke", skr03: konto("4240"), skr04: konto("6325") },
   { id: "buero", titel: "Büro, Porto, Telefon, Software", kurz: "Büro/Telefon", euer: "Übrige unbeschränkt abziehbare Betriebsausgaben", skr03: konto("4930"), skr04: konto("6815") },
   { id: "werbung", titel: "Werbung", kurz: "Werbung", euer: "Übrige unbeschränkt abziehbare Betriebsausgaben", skr03: konto("4600"), skr04: konto("6600") },
   { id: "reise", titel: "Reisekosten", kurz: "Reisekosten", euer: "Übernachtungs- und Reisenebenkosten bei Geschäftsreisen", skr03: konto("4670"), skr04: konto("6670") },
   { id: "bewirtung", titel: "Bewirtung", kurz: "Bewirtung", euer: "Bewirtungsaufwendungen", skr03: konto("4650"), skr04: konto("6640"), abziehbar: 70, hinweis: "70 % abziehbar (§ 4 Abs. 5 Nr. 2 EStG), Bewirtungsbeleg mit Anlass und Teilnehmern" },
   { id: "geschenke", titel: "Geschenke", kurz: "Geschenke", euer: "Geschenke", skr03: konto("4630"), skr04: konto("6610"), hinweis: "bis 50 € je Person und Jahr abziehbar (§ 4 Abs. 5 Nr. 1 EStG)" },
-  { id: "fahrzeug", titel: "Fahrzeug (Kraftstoff, Reparatur, Versicherung)", kurz: "Kfz", euer: "Kraftfahrzeugkosten und andere Fahrtkosten", skr03: konto("4530"), skr04: konto("6530") },
+  { id: "fahrzeug", titel: "Fahrzeug (Kraftstoff, Reparatur, Wartung)", kurz: "Kfz", euer: "Kraftfahrzeugkosten und andere Fahrtkosten", skr03: konto("4530"), skr04: konto("6530"), hinweis: "Kfz-Steuer und Kfz-Versicherung: eigene Kategorien" },
+  { id: "kfz_steuer", titel: "Kfz-Steuer", kurz: "Kfz-Steuer", euer: "Kraftfahrzeugkosten und andere Fahrtkosten", skr03: konto("4510"), skr04: konto("7685"), hinweis: "ohne Vorsteuer" },
+  { id: "kfz_versicherung", titel: "Kfz-Versicherung", kurz: "Kfz-Versich.", euer: "Kraftfahrzeugkosten und andere Fahrtkosten", skr03: konto("4520"), skr04: konto("6520"), hinweis: "ohne Vorsteuer" },
   { id: "versicherungen", titel: "Versicherungen und Beiträge", kurz: "Versicherung", euer: "Übrige unbeschränkt abziehbare Betriebsausgaben", skr03: konto("4360"), skr04: konto("6400"), hinweis: "meist ohne Vorsteuer" },
   { id: "beratung", titel: "Steuerberatung, Rechtsberatung, Buchführung", kurz: "Beratung", euer: "Übrige unbeschränkt abziehbare Betriebsausgaben", skr03: konto("4950"), skr04: konto("6825") },
   { id: "fortbildung", titel: "Fortbildung", kurz: "Fortbildung", euer: "Übrige unbeschränkt abziehbare Betriebsausgaben", skr03: konto("4945"), skr04: konto("6821") },
   { id: "gwg", titel: "Geräte und Ausstattung bis 800 € netto", kurz: "GWG", euer: "Aufwendungen für geringwertige Wirtschaftsgüter nach § 6 Absatz 2 EStG", skr03: konto("4855"), skr04: konto("6260"), hinweis: "sofort abziehbar (§ 6 Abs. 2 EStG)" },
   { id: "anlage", titel: "Anschaffung über 800 € netto (wird abgeschrieben)", kurz: "Anlagegut", euer: "AfA auf unbewegliche Wirtschaftsgüter / bewegliche Wirtschaftsgüter / immaterielle Wirtschaftsgüter", skr03: konto("0420"), skr04: konto("0650"), anlage: true, hinweis: "keine sofortige Betriebsausgabe – Abschreibung über die Nutzungsdauer" },
+  // R10: Tagespauschale (§ 4 Abs. 5 Satz 1 Nr. 6c EStG) bzw. Arbeitszimmer – eigene Zeile der Anlage EÜR; Eigenbeleg ohne Vorsteuer.
+  // Eigene Konten sind nicht sicher bekannt – vorerst die Konten von „Sonstiges“ (PRUEFLISTE).
+  { id: "homeoffice", titel: "Homeoffice-Pauschale bzw. Arbeitszimmer", kurz: "Homeoffice", euer: "Aufwendungen für ein häusliches Arbeitszimmer", skr03: konto("4900"), skr04: konto("6300"), hinweis: "Tagespauschale 6 € je Tag, höchstens 1.260 € im Jahr (§ 4 Abs. 5 Satz 1 Nr. 6c EStG) – als Eigenbeleg, ohne Vorsteuer" },
   { id: "sonstiges", titel: "Sonstiges", kurz: "Sonstiges", euer: "Übrige unbeschränkt abziehbare Betriebsausgaben", skr03: konto("4900"), skr04: konto("6300") },
 ];
 
@@ -137,7 +158,12 @@ export interface BelegSummen {
   vorsteuer_cent: number;
 }
 
-export function belegSummen(b: Pick<Beleg, "steuer" | "vorsteuer">): BelegSummen {
+export function belegSummen(b: Pick<Beleg, "steuer" | "vorsteuer"> & { steuerschuld?: Steuerschuld | null }): BelegSummen {
+  // § 13b: die Rechnung weist keine Umsatzsteuer aus – der Betrag ist netto, die Steuer schuldet der Betrieb (steuerschuldFuer)
+  if (b.steuerschuld) {
+    const n = b.steuer.reduce((a, s) => a + s.brutto_cent, 0);
+    return { brutto_cent: n, netto_cent: n, ust_cent: 0, vorsteuer_cent: 0 };
+  }
   let brutto = 0;
   let netto = 0;
   let ust = 0;
@@ -203,6 +229,51 @@ export function vorsteuerFuer(belege: Beleg[], von: string, bis: string): { cent
   return { cent, anzahl, ohne };
 }
 
+/** Steuersatz einer § 13b-Eingangsleistung: der erfasste Satz, bei 0 % der Regelsatz 19 %. */
+const satz13b = (satz: number) => (satz > 0 ? satz : 19);
+
+/** Umsatzsteuer, die der Betrieb für eine § 13b-Eingangsleistung schuldet (0 ohne Steuerschuldnerschaft). */
+export function steuerschuldBetrag(b: Pick<Beleg, "steuer"> & { steuerschuld?: Steuerschuld | null }): number {
+  if (!b.steuerschuld) return 0;
+  return b.steuer.reduce((a, s) => a + rundeCent((s.brutto_cent * satz13b(s.satz)) / 100), 0);
+}
+
+export interface SteuerschuldSummen {
+  /** Kz 46/47: sonstige Leistungen nach § 13b Abs. 1 UStG (EU) – Bemessungsgrundlage und Steuer */
+  eu_netto_cent: number;
+  eu_steuer_cent: number;
+  /** Kz 84/85: andere Leistungen nach § 13b Abs. 2 UStG (hier: Bauleistungen) */
+  bau_netto_cent: number;
+  bau_steuer_cent: number;
+  /** Kz 67: Vorsteuer aus Leistungen nach § 13b UStG (nur bei Vorsteuerabzug) */
+  vorsteuer_cent: number;
+  anzahl: number;
+}
+
+/**
+ * § 13b-Eingangsleistungen eines Zeitraums nach Belegdatum (vereinfachend wie die Vorsteuer – die Steuer entsteht bei
+ * § 13b Abs. 1 mit Ablauf des Monats der Leistung, bei Abs. 2 mit der Rechnung, spätestens einen Monat danach; PRUEFLISTE).
+ * Die Steuer schulden auch Kleinunternehmer (§ 13b Abs. 8 UStG); Vorsteuer (Kz 67) nur mit Vorsteuerabzug.
+ */
+export function steuerschuldFuer(belege: Beleg[], von: string, bis: string): SteuerschuldSummen {
+  const r: SteuerschuldSummen = { eu_netto_cent: 0, eu_steuer_cent: 0, bau_netto_cent: 0, bau_steuer_cent: 0, vorsteuer_cent: 0, anzahl: 0 };
+  for (const b of belege) {
+    if (b.ungueltig || !b.steuerschuld || b.datum < von || b.datum > bis) continue;
+    const netto = b.steuer.reduce((a, s) => a + s.brutto_cent, 0);
+    const steuer = steuerschuldBetrag(b);
+    if (b.steuerschuld === "eu") {
+      r.eu_netto_cent += netto;
+      r.eu_steuer_cent += steuer;
+    } else {
+      r.bau_netto_cent += netto;
+      r.bau_steuer_cent += steuer;
+    }
+    if (b.vorsteuer) r.vorsteuer_cent += steuer;
+    r.anzahl++;
+  }
+  return r;
+}
+
 export interface EuerAusgabenZeile {
   kategorie: Kategorie;
   netto_cent: number;
@@ -249,6 +320,8 @@ export interface Einnahme {
    * (innergemeinschaftliche Lieferung, Steuerbefreiung, § 13b) – eigene Zeile der Anlage EÜR
    */
   steuerfrei_cent?: number;
+  /** Kleinunternehmer: Anteil nicht steuerbarer Umsätze (Leistungsort im Ausland) – „davon“-Zeile der Anlage EÜR */
+  nicht_steuerbar_cent?: number;
   kleinunternehmer: boolean;
 }
 
@@ -257,6 +330,7 @@ export function euerFuer(einnahmen: Einnahme[], belege: Beleg[], jahr: string) {
   const im = einnahmen.filter((e) => e.tag.startsWith(`${jahr}-`));
   const einnahmen_netto = im.reduce((a, e) => a + e.netto_cent, 0);
   const steuerfrei = im.reduce((a, e) => a + (e.steuerfrei_cent ?? 0), 0);
+  const nichtSteuerbar = im.reduce((a, e) => a + (e.nicht_steuerbar_cent ?? 0), 0);
   const ust_vereinnahmt = im.reduce((a, e) => a + e.ust_cent, 0);
   const ausgaben = ausgabenFuer(belege, jahr);
   const summe_einnahmen = einnahmen_netto + ust_vereinnahmt;
@@ -265,6 +339,8 @@ export function euerFuer(einnahmen: Einnahme[], belege: Beleg[], jahr: string) {
     einnahmen_netto_cent: einnahmen_netto,
     /** davon steuerfrei / nicht steuerbar / § 13b (in `einnahmen_netto_cent` enthalten) */
     einnahmen_steuerfrei_cent: steuerfrei,
+    /** Kleinunternehmer: davon nicht steuerbar (in `einnahmen_netto_cent` enthalten) */
+    einnahmen_nicht_steuerbar_cent: nichtSteuerbar,
     ust_vereinnahmt_cent: ust_vereinnahmt,
     summe_einnahmen_cent: summe_einnahmen,
     ausgaben,
@@ -301,8 +377,11 @@ function fassungAus(roh: unknown): BelegFassung | null {
     bezahlt: s("bezahlt") || null,
     notiz: s("notiz") || null,
     datei: istBelegDateiname(r.datei) ? r.datei : null,
+    ...(steuerschuldAus(r.steuerschuld) ? { steuerschuld: steuerschuldAus(r.steuerschuld) } : {}),
   };
 }
+
+const steuerschuldAus = (w: unknown): Steuerschuld | null => (w === "bau" || w === "eu" ? w : null);
 
 /**
  * Gespeicherten Beleg prüfen und bereinigen (unbekannte Felder fallen weg); null, wenn Kernangaben fehlen. Wer den
@@ -334,12 +413,13 @@ export function belegAus(roh: unknown): Beleg | null {
     geaendert: s("geaendert") || s("erstellt") || s("datum"),
     ...(s("ungueltig") ? { ungueltig: s("ungueltig"), ungueltig_grund: s("ungueltig_grund") || null } : {}),
     ...(historie.length ? { historie } : {}),
+    ...(steuerschuldAus(r.steuerschuld) ? { steuerschuld: steuerschuldAus(r.steuerschuld) } : {}),
   };
 }
 
 /** Inhalt eines Belegs als frühere Fassung (für das Änderungsprotokoll). */
 export function belegFassung(b: Beleg, bis: string): BelegFassung {
-  return { bis, datum: b.datum, lieferant: b.lieferant, nummer: b.nummer ?? null, kategorie: b.kategorie, steuer: b.steuer.map((x) => ({ ...x })), vorsteuer: b.vorsteuer, zahlung: b.zahlung, bezahlt: b.bezahlt ?? null, notiz: b.notiz ?? null, datei: b.datei ?? null };
+  return { bis, datum: b.datum, lieferant: b.lieferant, nummer: b.nummer ?? null, kategorie: b.kategorie, steuer: b.steuer.map((x) => ({ ...x })), vorsteuer: b.vorsteuer, zahlung: b.zahlung, bezahlt: b.bezahlt ?? null, notiz: b.notiz ?? null, datei: b.datei ?? null, ...(b.steuerschuld ? { steuerschuld: b.steuerschuld } : {}) };
 }
 
 /** Hat sich der Inhalt (nicht nur der Zeitstempel) eines Belegs geändert? */

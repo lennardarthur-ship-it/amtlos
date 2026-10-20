@@ -44,7 +44,8 @@ describe("Umsatzsteuer aus Rechnungen (Szenarien Shop, Elektro, Praxis)", () => 
     s = rechnung(s, "c", "2026-03-04", { befreiung: "Steuerfreie Heilbehandlung nach § 4 Nr. 14 Buchst. a UStG", positionen: [{ ...null0[0], preis: "300,00" }] });
     s = rechnung(s, "d", "2026-03-05", { befreiung: "Nullsteuersatz nach § 12 Abs. 3 UStG", positionen: [{ ...null0[0], preis: "400,00" }] });
     const u = umsaetzeFuer(s.unterlagen, "2026-03", B, "soll", [beleg("b1", "2026-03-10", {})])!;
-    expect(u.werte).toMatchObject({ umsatz_igl: "100,00", umsatz_13b: "200,00", umsatz_48: "300,00", umsatz_frei: "400,00" });
+    // R10: Nullsteuersatz in Kz 87 statt „weitere Umsätze“
+    expect(u.werte).toMatchObject({ umsatz_igl: "100,00", umsatz_13b: "200,00", umsatz_48: "300,00", umsatz_87: "400,00", umsatz_frei: "0,00" });
     expect(u.vorsteuerPruefen).toBe(true);
     // Fragen im Paket: Vorsteuer bei steuerfreien Umsätzen
     const f = fragenText({ ...s, belege: [beleg("b1", "2026-03-10", {})] }, { von: "2026-03-01", bis: "2026-03-31", name: "2026-03" });

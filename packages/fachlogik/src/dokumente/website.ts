@@ -197,7 +197,9 @@ export const impressum: Vorlage = {
   beschreibung: "Die Anbieterangaben nach § 5 DDG für deine Website – Rechtsform wählen, Register und Kammer nur wenn nötig. Als Text zum Einfügen.",
   bereich: "betrieb",
   pflichten: ["online.impressum"],
-  grundlage: "§ 5 DDG; § 36 VSBG",
+  grundlage: "§ 5 DDG",
+  // § 36 VSBG nur, wenn das Impressum eine Angabe zur Streitbeilegung enthält (R10, T-90)
+  grundlageFuer: (d) => (text(d, "vsbg") && text(d, "vsbg") !== "keine_angabe" ? "§ 5 DDG; § 36 VSBG" : "§ 5 DDG"),
   ausBetrieb: { rechtsform: "rechtsform", vertreten: "vertretung", register_gericht: "registergericht", register_nr: "registernummer" },
   abschnitte: [
     { titel: "Angaben zum Unternehmen",
@@ -206,7 +208,7 @@ export const impressum: Vorlage = {
         { id: "rechtsform", art: "wahl", label: "Rechtsform", optionen: RECHTSFORMEN_IMP.map((r) => ({ wert: r, text: r })), hilfe: "ohne Auswahl die Rechtsform aus „Mein Betrieb“, sonst Einzelunternehmen" },
         { id: "vertreten", art: "text", label: "Inhaber/in bzw. vertretungsberechtigte Person", hilfe: "ohne Angabe die Geschäftsführung bzw. verantwortliche Person aus „Mein Betrieb“; bei mehreren alle nennen" },
         { id: "kapital", selten: true, art: "text", label: "Stammkapital", hilfe: "nur bei GmbH/UG und nur, wenn du es angeben möchtest" },
-        { id: "ausstehend", selten: true, art: "text", label: "Ausstehende Einlagen", hilfe: "Pflicht, wenn Kapital angegeben und nicht voll eingezahlt", wenn: { feld: "kapital" } },
+        { id: "ausstehend", art: "text", label: "Ausstehende Einlagen", hilfe: "Gibst du das Kapital an, gehören die ausstehenden Einlagen dazu – bei voller Einzahlung „keine“", wenn: { feld: "kapital" }, vorschlaege: ["keine"] },
         { id: "register_gericht", art: "text", label: "Registergericht", hilfe: "nur bei Eintragung, z. B. Amtsgericht München" },
         { id: "register_nr", art: "text", label: "Registernummer", hilfe: "z. B. HRB 123456" },
         { id: "wirtschafts_id", selten: true, art: "text", label: "Wirtschafts-Identifikationsnummer", hilfe: "nur falls vorhanden" },
@@ -221,7 +223,9 @@ export const impressum: Vorlage = {
         { id: "berufsbezeichnung", art: "text", label: "Gesetzliche Berufsbezeichnung", wenn: { feld: "reglementiert" }, vorschlaege: ["Friseurmeister/in", "Elektrotechnikermeister/in"] },
         { id: "verleihung", art: "text", label: "Staat der Verleihung", wenn: { feld: "reglementiert" }, vorschlaege: ["Deutschland"] },
         { id: "regelungen", art: "text", label: "Berufsrechtliche Regelungen und wo sie zu finden sind", wenn: { feld: "reglementiert" }, vorschlaege: ["Handwerksordnung (HwO), abrufbar unter www.gesetze-im-internet.de"] },
-        { id: "redaktion", selten: true, art: "text", label: "Verantwortlich für redaktionelle Inhalte (Name, Anschrift)", hilfe: "nur bei journalistisch-redaktionellen Inhalten, z. B. Blog" },
+        // nur auf ausdrückliche Wahl (R10): § 18 Abs. 2 MStV gilt nur für journalistisch-redaktionelle Angebote
+        { id: "redaktionell", selten: true, art: "schalter", label: "Journalistisch-redaktionelle Inhalte (z. B. Blog mit Berichten)", hilfe: "Dann nennt das Impressum eine verantwortliche Person nach § 18 Abs. 2 MStV – für eine normale Firmenwebsite nicht nötig" },
+        { id: "redaktion", art: "text", label: "Verantwortlich für redaktionelle Inhalte (Name, Anschrift)", wenn: { feld: "redaktionell" }, pflicht: true },
         { id: "vsbg", art: "wahl", label: "Verbraucherstreitbeilegung (§ 36 VSBG)", hilfe: "Pflicht ab mehr als 10 Beschäftigten oder wenn du teilnimmst", optionen: [{ wert: "keine_angabe", text: "keine Angabe" }, { wert: "nicht_bereit", text: "nicht bereit" }, { wert: "bereit", text: "bereit" }], vorbelegung: "keine_angabe" },
         { id: "schlichtungsstelle", art: "mehrzeilig", label: "Verbraucherschlichtungsstelle (Name, Anschrift, Website)", wenn: { feld: "vsbg", ist: "bereit" } },
       ],
@@ -233,6 +237,8 @@ export const impressum: Vorlage = {
     if (!text(d, "vertreten") && !(b.vertretung ?? "").trim() && !b.verantwortlich.trim()) f.push("Inhaber/in bzw. vertretungsberechtigte Person");
     if (!b.email.trim()) f.push("E-Mail (Mein Betrieb)");
     if (!b.telefon.trim()) f.push("Telefon (Mein Betrieb) – neben der E-Mail ist ein zweiter direkter Kontaktweg nötig");
+    // Kapital nur mit ausstehenden Einlagen (§ 35a Abs. 1 S. 2 GmbHG analog) – sonst lieber weglassen (R10)
+    if (text(d, "kapital") && /GmbH|UG/.test(rechtsformImp(d, b)) && !text(d, "ausstehend")) f.push("Ausstehende Einlagen (bei voller Einzahlung „keine“) – oder das Stammkapital weglassen");
     // Hinweis: Name mit Rechtsform-Zusatz, der nicht zur gewählten Rechtsform passt („Salon Sonne GmbH“ als Einzelunternehmen)
     const imNamen = formImNamen(b.name);
     const rf = rechtsformImp(d, b);

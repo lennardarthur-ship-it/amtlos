@@ -10,7 +10,7 @@ import { EUER_KAPITALGESELLSCHAFT } from "@amtlos/fachlogik";
 import { auswertung } from "../src/pflichten/check";
 import { monatsSumme, offeneSumme } from "../src/unterlagen/ablage";
 import { LEERER_STAND, anlegen, ausgeben, bezahltSetzen, felderSetzen, leererBeleg, stornieren, type Stand } from "../src/unterlagen/speicher";
-import { EUER_NICHT_ENTHALTEN, GUTSCHRIFT_HINWEIS, euerUebernahme, istKleinunternehmer, steuerpaket } from "../src/unterlagen/steuerpaket";
+import { EUER_NICHT_ENTHALTEN, euerUebernahme, istKleinunternehmer, steuerpaket } from "../src/unterlagen/steuerpaket";
 import { umsaetzeFuer } from "../src/unterlagen/ustAusRechnungen";
 
 const t = (d: string) => new Date(`${d}T09:00:00Z`);
@@ -43,8 +43,10 @@ describe("Gutschrift ist für den Aussteller eine Ausgabe", () => {
     expect(e.rechnungen).toBe(2);
     expect(e.gutschriften).toBe(2);
     expect(e.unbezahlt).toBe(0);
-    expect(e.hinweis).toContain("Gutschriften sind Ausgaben – bitte als Beleg erfassen bzw. von der Steuerberatung buchen lassen");
+    expect(e.hinweis).toContain("Gutschriften sind Ausgaben: Mit Zahlungsvermerk übernimmt Amtlos sie");
     expect(e.hinweis).toContain(EUER_NICHT_ENTHALTEN);
+    // R10: die bezahlte Gutschrift (700 €) ist eine Ausgabe „Bezogene Leistungen“, die unbezahlte fehlt noch
+    expect(e.ausgaben).toContainEqual({ datum: "", text: "Gutschriften an Leistende (1 Gutschrift)", kategorie: "Bezogene Leistungen", betrag: "700,00" });
     // ohne Gutschrift: Hinweis wie bisher
     const ohne = euerUebernahme({ ...s, unterlagen: s.unterlagen.filter((u) => !u.id.startsWith("g")) }, "2026");
     expect(ohne.hinweis).toBe(EUER_NICHT_ENTHALTEN);
@@ -62,11 +64,12 @@ describe("Gutschrift ist für den Aussteller eine Ausgabe", () => {
     expect(gs).toContain("Leistender (Empfänger der Gutschrift)");
     expect(gs).toContain("2026-003;03.09.2026;03.09.2026;;Jonas Kiefer Fotografie;;§ 19;700,00;0,00;700,00;§ 19;17.09.2026;10.09.2026;0,00;");
     const datev = strFromU8(inhalt["Buchungsliste_2026.csv"]!);
-    expect(datev).not.toContain("Jonas Kiefer");
+    // R10: Gutschrift als Aufwand (bezogene Leistungen), nicht als Erlös
+    expect(datev).toMatch(/;700,00;S;3100;1610;;2026-003;Gutschrift 2026-003 Jonas Kiefer Fotografie;/);
     expect(datev).toContain("Verlag Nord");
     const liesmich = strFromU8(inhalt["LIESMICH.txt"]!);
     expect(liesmich).toContain("Gutschriften_2026.csv: 1 Gutschrift");
-    expect(liesmich).toContain(GUTSCHRIFT_HINWEIS);
+    expect(liesmich).toContain("im Buchungsstapel als Aufwand (bezogene Leistungen)");
     // die XRechnung der Gutschrift bleibt im Paket (Rechnungsart unverändert, fachlich offen)
     expect(Object.keys(inhalt).filter((k) => k.startsWith("E-Rechnungen/"))).toHaveLength(3);
     // ohne Gutschrift keine leere Liste
@@ -93,10 +96,10 @@ describe("Kleinunternehmer", () => {
     expect(q1.kleinunternehmer).toBe(true);
     expect(q1.werte).toEqual({ zeitraum: "1. Quartal 2026" });
     expect(umsaetzeFuer(s.unterlagen, "2026-Q1", s.betrieb)!.kleinunternehmer).toBe(true);
-    // ausdrücklich regelbesteuert: Kleinunternehmer-Rechnungen zählen trotzdem nicht als steuerfrei
+    // R10 (Lea, Befund 4): Check heute „regelbesteuert“, alle Rechnungen des Zeitraums aber § 19 – der Zeitraum zählt
     const regel = umsaetzeFuer(s.unterlagen, "2026-Q1", s.betrieb, "soll", [], false)!;
-    expect(regel.kleinunternehmer).toBe(false);
-    expect(regel.werte.umsatz_frei).toBe("0,00");
+    expect(regel.kleinunternehmer).toBe(true);
+    expect(regel.werte).toEqual({ zeitraum: "1. Quartal 2026" });
   });
 
   it("istKleinunternehmer: Antwort im Check, sonst aus den Rechnungen", () => {

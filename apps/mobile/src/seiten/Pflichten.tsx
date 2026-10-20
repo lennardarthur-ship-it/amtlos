@@ -92,7 +92,8 @@ function PflichtDetail({ id }: { id: string }) {
       {p.vorlage ? (
         // Haken als zweiter Knopf im Fuß – nicht als Textlink halb unter der Leiste
         <>
-          <Knopf ton text={abgehakt ? (bestaetigen ? TEXT.r10_bestaetigen_entfernen : TEXT.haken_entfernen_kurz) : bestaetigen ?? TEXT.als_erledigt_kurz} symbol={abgehakt ? "xmark" : "checkmark"} onPress={abhaken} stil={{ flex: 1 }} />
+          {/* R10 UI (Mehmet #24): schon durch eine Unterlage erledigt – kein zweites „Erledigt“ daneben */}
+          {durchUnterlage && !bestaetigen ? null : <Knopf ton text={abgehakt ? (bestaetigen ? TEXT.r10_bestaetigen_entfernen : TEXT.haken_entfernen_kurz) : bestaetigen ?? TEXT.als_erledigt_kurz} symbol={abgehakt ? "xmark" : "checkmark"} onPress={abhaken} stil={{ flex: 1 }} />}
           {vorhanden ? <Knopf text={TEXT.unterlage_oeffnen_kurz} onPress={() => oeffnen(vorhanden.id)} stil={{ flex: 1.3 }} /> : <Knopf text={TEXT.unterlage_erstellen_kurz} symbol="plus" onPress={() => starten(p.vorlage!)} stil={{ flex: 1.3 }} />}
         </>
       ) : (

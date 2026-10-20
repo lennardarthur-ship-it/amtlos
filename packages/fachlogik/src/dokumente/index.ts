@@ -16,9 +16,11 @@ export * from "./typen.js";
 export { ALLERGENE, DATENPANNE_RISIKO, GEFAEHRDUNGSFAKTOREN, RISIKO_STUFEN, SCHUTZZIELE } from "./konstanten.js";
 export { HAUSFARBEN, PRUEFHINWEIS, RAENDER, akzent, fussSpalten, type Gestalt } from "./html.js";
 export { BUNDESLAENDER, aufsichtFuer, berlinZuUtc } from "./datenschutz.js";
-export { mindestlohnAm, mindesturlaub, stundenlohn } from "./personal.js";
+export { mindestlohnAm, mindesturlaub, minijobGrenzeAm, stundenlohn } from "./personal.js";
 export { bausteinText } from "./website.js";
 export { EUER_KAPITALGESELLSCHAFT, GUTSCHRIFT_AUSWAHL, RECHNUNG_NEGATIV, RECHNUNG_NULL, RECHNUNG_PLZ_FEHLT, VERSTEUERUNG, VORSTEUER_AUFTEILEN, aufbewahrenBis, eRechnungAus, faelligAm, kennzahlBefreiung, leistungszeitraumAus, rechnungsTitel } from "./buchhaltung.js";
+// R10 Steuer
+export { NULLSATZ_HINWEIS, RECHNUNG_13B_TEXT, RECHNUNG_EU_19, RECHNUNG_GUTSCHRIFT_STEUER, RECHNUNG_KU_DRITTLAND, RECHNUNG_KU_EU, RECHNUNG_KU_IGL, RECHNUNG_KU_PROFIL, RECHNUNG_KU_RC, RECHNUNG_LEITWEG, UST_FRIST, UST_FRIST_DFV, drittlandLand, euUnternehmenLand, istNullsatzText, istOeffentlicherEmpfaenger, kuFuer } from "./buchhaltung.js";
 export { istKapitalgesellschaft, mitVertretung } from "./betrieb.js";
 export { STEUERKLASSEN, arbeitsminuten } from "./lohn.js";
 export { ANLAESSE, KURZ, PERSONEN_FELDER, kurztitel, kurztitelListe, naechsteNummer, personAus, personIn, personMerken, type Anlass } from "./ablauf.js";
@@ -80,6 +82,41 @@ export function vorlageFuer(id: string): Vorlage | undefined {
   return VORLAGEN.find((v) => v.id === id);
 }
 
+/**
+ * Branchengruppen der Bausteine (R10) je Branche aus dem Pflichten-Check („taetigkeit.branchen“). Ohne passende
+ * Branche (z. B. Transport, Gesundheit, Andere) filtert die App nicht.
+ */
+export const BRANCHEN_GRUPPEN: Record<string, string[]> = {
+  gastronomie_lebensmittel: ["gastro_cafe"],
+  beauty_kosmetik: ["friseur", "kosmetik"],
+  handwerk: ["handwerk_allgemein"],
+  bau: ["handwerk_allgemein"],
+  onlinehandel: ["buero_laden"],
+  it_agentur_freelancer: ["buero_laden"],
+  immobilien_finanzen: ["buero_laden"],
+};
+
+/** Branchengruppen eines Betriebs aus den Branchen im Pflichten-Check. */
+export function gruppenAusBranchen(branchen: unknown): string[] {
+  return Array.isArray(branchen) ? [...new Set(branchen.flatMap((b) => BRANCHEN_GRUPPEN[String(b)] ?? []))] : [];
+}
+
+/** Passt ein Baustein mit diesen Gruppen zum Betrieb? Ohne Gruppen am Baustein oder ohne bekannte Branche: ja. */
+export function passtZuGruppen(baustein: string[] | undefined, meine: readonly string[]): boolean {
+  return !baustein?.length || !meine.length || baustein.includes("alle") || baustein.some((g) => meine.includes(g));
+}
+
+/** Platzhalter „…“ in einem Vorschlag (z. B. „Guten Tag …“): wer ihn wählt, ergänzt den Namen. */
+export const PLATZHALTER = "…";
+/** Steht in einem Textfeld noch ein Platzhalter aus einem Vorschlag (z. B. „Sehr geehrte Frau …“)? */
+export function platzhalterOffen(f: Feld, w: unknown): boolean {
+  return (f.art === "text" || f.art === "mehrzeilig") && Boolean(f.vorschlaege?.some((x) => x.includes(PLATZHALTER))) && typeof w === "string" && w.includes(PLATZHALTER);
+}
+/** Bezeichnung für „Fehlt noch“, z. B. „Anrede: Name statt „…“ eintragen“. */
+export const platzhalterText = (f: Feld) => `${f.label}: Name statt „${PLATZHALTER}“ eintragen`;
+/** „Fehlt noch“, wenn der Betrieb keinen Namen hat (R10): Ohne ihn bleibt der Kopf jedes PDFs leer. */
+export const BETRIEBSNAME_FEHLT = "Name des Betriebs (Mein Betrieb)";
+
 /** Ist ein Feld angesichts der übrigen Eingaben sichtbar? */
 export function sichtbar(f: Feld, d: Daten | Eintrag): boolean {
   if (!f.wenn) return true;
@@ -100,10 +137,12 @@ export function ohneVerdeckteFelder<T extends Daten | Eintrag>(felder: Feld[], d
   return r as T;
 }
 
-function startwert(f: EinfachesFeld, b: Betrieb, heute: string): string | boolean | string[] | null {
+function startwert(f: EinfachesFeld, b: Betrieb, heute: string, gruppen?: readonly string[]): string | boolean | string[] | null {
   switch (f.art) {
     case "text":
     case "mehrzeilig":
+      // Vorbelegung nur für bestimmte Branchen (z. B. Inhaber als prüfende Elektrofachkraft im Handwerk)
+      if (f.vorbelegungGruppen && !f.vorbelegungGruppen.some((g) => gruppen?.includes(g))) return "";
       if (typeof f.vorbelegung === "object") return f.vorbelegung.text;
       return f.vorbelegung === "verantwortlich" ? b.verantwortlich : f.vorbelegung === "betrieb_kontakt" ? [b.verantwortlich, b.telefon, b.email].filter((x) => x.trim()).join(", ") : "";
     case "datum":
@@ -129,11 +168,14 @@ export function neuerEintrag(f: Extract<Feld, { art: "liste" }>, b: Betrieb, heu
   return Object.fromEntries(f.felder.map((x) => [x.id, startwert(x, b, heute)]));
 }
 
-/** Startwerte einer neuen Unterlage, mit Angaben aus „Mein Betrieb“ und dem heutigen Datum. Listen beginnen mit einem Eintrag. */
-export function leereDaten(v: Vorlage, b: Betrieb, heute: string): Daten {
+/**
+ * Startwerte einer neuen Unterlage, mit Angaben aus „Mein Betrieb“ und dem heutigen Datum. Listen beginnen mit einem
+ * Eintrag. `gruppen`: Branchengruppen des Betriebs (für Vorbelegungen, die nur in bestimmten Branchen passen).
+ */
+export function leereDaten(v: Vorlage, b: Betrieb, heute: string, gruppen?: readonly string[]): Daten {
   const d: Daten = {};
   for (const a of v.abschnitte)
-    for (const f of a.felder) d[f.id] = f.art === "liste" ? (f.start ? f.start.map((e) => ({ ...neuerEintrag(f, b, heute), ...e })) : f.leerStarten ? [] : [neuerEintrag(f, b, heute)]) : startwert(f, b, heute);
+    for (const f of a.felder) d[f.id] = f.art === "liste" ? (f.start ? f.start.map((e) => ({ ...neuerEintrag(f, b, heute), ...e })) : f.leerStarten ? [] : [neuerEintrag(f, b, heute)]) : startwert(f, b, heute, gruppen);
   return d;
 }
 
@@ -173,12 +215,18 @@ export function fehlendeAngaben(v: Vorlage, d: Daten, b?: Betrieb): string[] {
             if (!sichtbar(x, ohneVerdeckteFelder(f.felder, e))) continue;
             if (x.pflicht && !gefuellt(e[x.id])) fehlt.push(`${vor}${x.label}`);
             else if (unlesbar(x, e[x.id])) fehlt.push(`${vor}${unlesbarText(x)}`);
+            else if (platzhalterOffen(x, e[x.id])) fehlt.push(`${vor}${platzhalterText(x)}`);
           }
         });
       } else if (f.pflicht && !gefuellt(d[f.id])) fehlt.push(f.label);
       else if (unlesbar(f, d[f.id])) fehlt.push(unlesbarText(f));
+      // „Guten Tag …“ (R10): ein nicht ersetzter Platzhalter stünde wörtlich auf dem PDF
+      else if (platzhalterOffen(f, d[f.id])) fehlt.push(platzhalterText(f));
     }
   if (b && v.pruefen) fehlt.push(...v.pruefen(d, b));
+  // ohne Namen des Betriebs bleibt der Kopf leer (R10) – eine Kontrolle kann das Blatt keinem Betrieb zuordnen. Prüfungen
+  // der Vorlage, die den Namen schon nennen („Name und Anschrift …“), reichen.
+  if (b && !b.name.trim() && !fehlt.some((x) => /^Name\b.*\(Mein Betrieb\)/.test(x))) fehlt.push(BETRIEBSNAME_FEHLT);
   return fehlt;
 }
 

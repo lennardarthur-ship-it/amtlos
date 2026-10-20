@@ -233,7 +233,8 @@ function paketPruefen(name, zr, erg, ordner) {
   if (b13.length) {
     const kennungen = new Set(b13.map((b) => (b.nummer ?? "").replace(/[^A-Za-z0-9$&%*+\-/]/g, "").slice(0, 36)));
     const zeilen13 = zeilen.filter((z) => [...kennungen].some((k) => k && z[10].startsWith(k.slice(0, 12))));
-    vergleich(bereich, `DATEV: § 13b-Belege (${b13.map((b) => b.id).join(", ")}) mit Steuerschlüssel für Reverse Charge (BU ≠ leer/40)`, zeilen13.length ? zeilen13.map((z) => `${z[10]}: Konto ${z[6]}/${z[7]}, BU „${z[8]}“`).join(" | ") : "nicht gefunden", "BU für § 13b");
+    // R10: § 13b-Belege auf dem Automatikkonto 3123 (sonstige Leistung aus dem EU-Ausland, Vorsteuer und Umsatzsteuer)
+    vergleich(bereich, `DATEV: § 13b-Belege (${b13.map((b) => b.id).join(", ")}) auf dem § 13b-Konto 3123`, zeilen13.length ? ([...new Set(zeilen13.map((z) => `${z[6]}/${z[8] || "ohne BU"}`))].join(", ")) : "nicht gefunden", "3123/ohne BU");
   }
   const liesmich = Buffer.from(inhalt["LIESMICH.txt"]).toString("utf8");
   const fragen = inhalt[`Fragen_${zr.name}.txt`] ? Buffer.from(inhalt[`Fragen_${zr.name}.txt`]).toString("utf8") : "";

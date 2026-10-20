@@ -2,6 +2,10 @@ import { describe, expect, it } from "vitest";
 import { belegNummern, belegnummerNormal, type Beleg } from "../src/belege.js";
 import {
   BU_OHNE_STEUER,
+  DATEV_EU_USTID,
+  DATEV_LEISTUNGSDATUM,
+  DATEV_STEUERPERIODE,
+  buAufwand,
   DATEV_SPALTEN,
   belegfeld1Aus,
   buchungenAusBelegen,
@@ -51,10 +55,10 @@ describe("Buchungen und DATEV-Export (E-132)", () => {
     };
     const b = buchungenAusRechnungen([r], "SKR03");
     expect(b).toHaveLength(2);
-    expect(b[0]).toMatchObject({ datum: "2026-10-05", betrag_cent: 642, soll_haben: "S", konto: "1400", gegenkonto: "8300", bu_schluessel: "", belegfeld1: "2026-005", buchungstext: "RE 2026-005 Kim Beispiel", ust_satz: 7, art: "einnahme", quelle_id: "re-1" });
-    expect(b[1]).toMatchObject({ betrag_cent: 11900, soll_haben: "S", konto: "1400", gegenkonto: "8400", ust_satz: 19 });
+    expect(b[0]).toMatchObject({ datum: "2026-10-05", betrag_cent: 642, soll_haben: "S", konto: "1410", gegenkonto: "8300", bu_schluessel: "", belegfeld1: "2026-005", buchungstext: "RE 2026-005 Kim Beispiel", ust_satz: 7, art: "einnahme", quelle_id: "re-1" });
+    expect(b[1]).toMatchObject({ betrag_cent: 11900, soll_haben: "S", konto: "1410", gegenkonto: "8400", ust_satz: 19 });
     const s4 = buchungenAusRechnungen([r], "SKR04");
-    expect(s4.map((x) => [x.konto, x.gegenkonto])).toEqual([["1200", "4300"], ["1200", "4400"]]);
+    expect(s4.map((x) => [x.konto, x.gegenkonto])).toEqual([["1210", "4300"], ["1210", "4400"]]);
   });
 
   it("Kleinunternehmer buchen auf 8195/4185, 0 % ohne Kleinunternehmer auf 8100/4100", () => {
@@ -70,7 +74,7 @@ describe("Buchungen und DATEV-Export (E-132)", () => {
   it("Storno dreht Soll und Haben um; die Versteuerungsart ändert nichts; Nullbeträge fallen weg", () => {
     const st = buchungenAusRechnungen([{ ...RE, id: "re-2", nummer: "2026-006", art: "storno" }], "SKR03", { versteuerung: "ist" });
     expect(st).toHaveLength(1);
-    expect(st[0]).toMatchObject({ betrag_cent: 11900, soll_haben: "H", konto: "1400", gegenkonto: "8400", art: "storno", buchungstext: "Storno 2026-006 Kim Beispiel", quelle_id: "re-2" });
+    expect(st[0]).toMatchObject({ betrag_cent: 11900, soll_haben: "H", konto: "1410", gegenkonto: "8400", art: "storno", buchungstext: "Storno 2026-006 Kim Beispiel", quelle_id: "re-2" });
     expect(buchungenAusRechnungen([RE], "SKR03", { versteuerung: "ist" })).toEqual(buchungenAusRechnungen([RE], "SKR03"));
     expect(buchungenAusRechnungen([{ ...RE, positionen: [] }], "SKR03")).toEqual([]);
   });
@@ -78,10 +82,10 @@ describe("Buchungen und DATEV-Export (E-132)", () => {
   it("Beleg bar mit Bewirtung: 4650 an 1000 (SKR03), 6640 an 1600 (SKR04); Bank an Verbindlichkeiten, privat an Privateinlagen", () => {
     const b = buchungenAusBelegen([BELEG], "SKR03");
     expect(b).toHaveLength(1);
-    expect(b[0]).toMatchObject({ datum: "2026-10-07", betrag_cent: 5950, soll_haben: "S", konto: "4650", gegenkonto: "1000", bu_schluessel: "", belegfeld1: "Bon-4711", buchungstext: "Gasthaus Krone Bewirtung", ust_satz: 19, art: "ausgabe", quelle_id: "k9x1abcd2efg" });
+    expect(b[0]).toMatchObject({ datum: "2026-10-07", betrag_cent: 5950, soll_haben: "S", konto: "4650", gegenkonto: "1000", bu_schluessel: "9", belegfeld1: "Bon-4711", buchungstext: "Gasthaus Krone Bewirtung", ust_satz: 19, art: "ausgabe", quelle_id: "k9x1abcd2efg" });
     expect(buchungenAusBelegen([BELEG], "SKR04")[0]).toMatchObject({ konto: "6640", gegenkonto: "1600" });
-    expect(buchungenAusBelegen([{ ...BELEG, zahlung: "bank" }], "SKR03")[0]?.gegenkonto).toBe("1600");
-    expect(buchungenAusBelegen([{ ...BELEG, zahlung: "bank" }], "SKR04")[0]?.gegenkonto).toBe("3300");
+    expect(buchungenAusBelegen([{ ...BELEG, zahlung: "bank" }], "SKR03")[0]?.gegenkonto).toBe("1610");
+    expect(buchungenAusBelegen([{ ...BELEG, zahlung: "bank" }], "SKR04")[0]?.gegenkonto).toBe("3310");
     expect(buchungenAusBelegen([{ ...BELEG, zahlung: "privat" }], "SKR03")[0]?.gegenkonto).toBe("1890");
     expect(buchungenAusBelegen([{ ...BELEG, zahlung: "privat" }], "SKR04")[0]?.gegenkonto).toBe("2180");
   });
@@ -158,9 +162,10 @@ describe("Buchungen und DATEV-Export (E-132)", () => {
     expect(DATEV_SPALTEN).toHaveLength(125);
     expect(zeilen[1]!.split(";")).toHaveLength(125);
     expect(zeilen[1]!.startsWith("Umsatz (ohne Soll/Haben-Kz);Soll/Haben-Kennzeichen;WKZ Umsatz;Kurs;Basis-Umsatz;WKZ Basis-Umsatz;Konto;Gegenkonto (ohne BU-Schlüssel);BU-Schlüssel;Belegdatum;Belegfeld 1;Belegfeld 2;Skonto;Buchungstext;")).toBe(true);
-    expect(zeilen[2]).toBe('119,00;"S";"EUR";;;;1400;8400;;0510;"2026-005";;;"RE 2026-005 Kim Beispiel"' + ";".repeat(89) + `"${buchungsGuid("re-1", 19)}"` + ";".repeat(22));
+    expect(zeilen[2]).toBe('119,00;"S";"EUR";;;;1410;8400;;0510;"2026-005";;;"RE 2026-005 Kim Beispiel"' + ";".repeat(89) + `"${buchungsGuid("re-1", 19)}"` + ";".repeat(22));
     expect(zeilen[2]!.split(";")).toHaveLength(125);
-    expect(zeilen[3]!.startsWith('59,50;"S";"EUR";;;;4650;1000;;0710;"Bon-4711";;;"Gasthaus Krone Bewirtung";')).toBe(true);
+    // R10: 4650 ist kein Automatikkonto – Vorsteuer über BU 9
+    expect(zeilen[3]!.startsWith('59,50;"S";"EUR";;;;4650;1000;"9";0710;"Bon-4711";;;"Gasthaus Krone Bewirtung";')).toBe(true);
     // BU-Schlüssel als Text, innere Anführungszeichen verdoppelt, Fälligkeit in Belegfeld 2, Erzeugt-am ohne Millisekunden
     const bu = datevExtf([{ ...buchungen[1]!, bu_schluessel: "40", belegfeld2: "151126", buchungstext: 'Café "Mond"' }], { ...EXPORT, kontenrahmen: "SKR04", erzeugtAm: "2026-10-13T12:00:00" });
     expect(bu.split("\r\n")[2]!.startsWith('59,50;"S";"EUR";;;;4650;1000;"40";0710;"Bon-4711";"151126";;"Café ""Mond""";')).toBe(true);
@@ -180,8 +185,9 @@ describe("Buchungen und DATEV-Export (E-132)", () => {
     const csv = buchungslisteCsv([...b, ...buchungenAusBelegen([{ ...BELEG, vorsteuer: false }], "SKR03")]);
     expect(csv.startsWith("﻿Datum;Betrag;S/H;Konto;Gegenkonto;BU;Beleg;Text;USt;Buchungs-GUID\r\n")).toBe(true);
     const zeilen = csv.slice(1, -2).split("\r\n");
-    expect(zeilen[1]).toBe(`05.10.2026;119,00;S;1400;8400;;2026-005;"RE 2026-005 Kim; Beispiel";19;${buchungsGuid("re-1", 19)}`);
-    expect(zeilen[2]).toBe(`07.10.2026;59,50;S;4650;1000;40;Bon-4711;Gasthaus Krone Bewirtung;19;${buchungsGuid(BELEG.id, 19)}`);
+    expect(zeilen[1]).toBe(`05.10.2026;119,00;S;1410;8400;;2026-005;"RE 2026-005 Kim; Beispiel";19;${buchungsGuid("re-1", 19)}`);
+    // ohne Vorsteuerabzug auf einem Konto ohne Automatik: kein BU (BU 40 nur auf Automatikkonten)
+    expect(zeilen[2]).toBe(`07.10.2026;59,50;S;4650;1000;;Bon-4711;Gasthaus Krone Bewirtung;19;${buchungsGuid(BELEG.id, 19)}`);
     expect(buchungslisteCsv(buchungenAusRechnungen([{ ...RE, kleinunternehmer: true }], "SKR03"))).toContain(`;RE 2026-005 Kim Beispiel;;${buchungsGuid("re-1", null)}\r\n`);
   });
 
@@ -189,5 +195,61 @@ describe("Buchungen und DATEV-Export (E-132)", () => {
     const p = pruefpunkteBuchungen();
     expect(p.length).toBeGreaterThanOrEqual(6);
     for (const w of ["BU-Schlüssel 40", "Generalumkehr", "125 Felder", "Ist-Versteuerung", "TTMM", "8100"]) expect(p.some((s) => s.includes(w)), w).toBe(true);
+  });
+});
+
+describe("R10 Steuerberatung: BU-Schlüssel, Erlöskonten, § 13b, Felder 115/116", () => {
+  const POS = (satz: number | null, preis = 10000) => [{ bezeichnung: "Leistung", menge: 1, einheit: "stueck" as const, preis_cent: preis, ust_satz: satz }];
+  it("Belege mit Vorsteuer: BU 9/8 auf Konten ohne Automatik, Automatikkonten ohne BU (ohne Abzug BU 40)", () => {
+    const buero = buchungenAusBelegen([{ ...BELEG, kategorie: "buero", steuer: [{ satz: 19, brutto_cent: 1190 }, { satz: 7, brutto_cent: 107 }] }], "SKR03");
+    expect(buero.map((x) => [x.konto, x.bu_schluessel])).toEqual([["4930", "9"], ["4930", "8"]]);
+    expect(buchungenAusBelegen([{ ...BELEG, kategorie: "buero", vorsteuer: false }], "SKR03")[0]?.bu_schluessel).toBe("");
+    expect(buchungenAusBelegen([{ ...BELEG, kategorie: "waren" }], "SKR03")[0]).toMatchObject({ konto: "3400", bu_schluessel: "" });
+    expect(buchungenAusBelegen([{ ...BELEG, kategorie: "waren" }], "SKR04")[0]).toMatchObject({ konto: "5400", bu_schluessel: "" });
+    expect(buchungenAusBelegen([{ ...BELEG, kategorie: "werbung" }], "SKR04")[0]).toMatchObject({ konto: "6600", bu_schluessel: "9" });
+    expect(buAufwand("SKR03", "4930", 0, true)).toBe("");
+  });
+  it("Personal-Belege und privat ausgelegte Belege einer Kapitalgesellschaft bleiben aus dem Stapel", () => {
+    expect(buchungenAusBelegen([{ ...BELEG, kategorie: "personal" }], "SKR03")).toEqual([]);
+    expect(buchungenAusBelegen([{ ...BELEG, zahlung: "privat" }], "SKR03", { kapitalgesellschaft: true })).toEqual([]);
+    expect(buchungenAusBelegen([{ ...BELEG, zahlung: "privat" }], "SKR03")).toHaveLength(1);
+  });
+  it("Energie, Kfz-Steuer und Kfz-Versicherung haben eigene Konten", () => {
+    expect(buchungenAusBelegen([{ ...BELEG, kategorie: "energie" }], "SKR03")[0]?.konto).toBe("4240");
+    expect(buchungenAusBelegen([{ ...BELEG, kategorie: "energie" }], "SKR04")[0]?.konto).toBe("6325");
+    expect(buchungenAusBelegen([{ ...BELEG, kategorie: "kfz_steuer", vorsteuer: false, steuer: [{ satz: 0, brutto_cent: 18000 }] }], "SKR03")[0]?.konto).toBe("4510");
+    expect(buchungenAusBelegen([{ ...BELEG, kategorie: "kfz_versicherung", vorsteuer: false, steuer: [{ satz: 0, brutto_cent: 50000 }] }], "SKR03")[0]?.konto).toBe("4520");
+  });
+  it("§ 13b-Belege: SKR03 3120/3123 ohne BU, SKR04 Kategorie-Konto; ohne Vorsteuerabzug (Kleinunternehmer) Kategorie-Konto", () => {
+    const eu = { ...BELEG, kategorie: "buero", steuerschuld: "eu" as const, steuer: [{ satz: 0, brutto_cent: 5000 }] };
+    expect(buchungenAusBelegen([eu], "SKR03")[0]).toMatchObject({ konto: "3123", bu_schluessel: "", betrag_cent: 5000 });
+    expect(buchungenAusBelegen([{ ...eu, steuerschuld: "bau" }], "SKR03")[0]?.konto).toBe("3120");
+    expect(buchungenAusBelegen([eu], "SKR04")[0]).toMatchObject({ konto: "6815", bu_schluessel: "" });
+    expect(buchungenAusBelegen([{ ...eu, vorsteuer: false }], "SKR03")[0]).toMatchObject({ konto: "4930", bu_schluessel: "" });
+  });
+  it("Erlöskonto nach Steuerart: igL 8125 mit USt-IdNr., § 13b Inland 8337, EU-Leistung 8336, Drittland 8338", () => {
+    const igl = buchungenAusRechnungen([{ ...RE, positionen: POS(0), steuerart: "igl", kunde_land: "AT", kunde_ust_idnr: "ATU 12345678" }], "SKR03")[0]!;
+    expect(igl).toMatchObject({ gegenkonto: "8125", eu_ustid: "ATU12345678" });
+    expect(buchungenAusRechnungen([{ ...RE, positionen: POS(0), steuerart: "igl", kunde_land: "AT" }], "SKR04")[0]?.gegenkonto).toBe("4125");
+    expect(buchungenAusRechnungen([{ ...RE, positionen: POS(0), steuerart: "reverse_charge", kunde_land: "DE" }], "SKR03")[0]?.gegenkonto).toBe("8337");
+    expect(buchungenAusRechnungen([{ ...RE, positionen: POS(0), steuerart: "reverse_charge", kunde_land: "NL", kunde_ust_idnr: "NL859310276B01" }], "SKR03")[0]).toMatchObject({ gegenkonto: "8336", eu_ustid: "NL859310276B01" });
+    // Kleinunternehmer mit Leistung an ein Unternehmen im EU-Ausland: ebenfalls das EU-Konto statt 8195
+    expect(buchungenAusRechnungen([{ ...RE, kleinunternehmer: true, steuerart: "reverse_charge", kunde_land: "NL" }], "SKR03")[0]?.gegenkonto).toBe("8336");
+    expect(buchungenAusRechnungen([{ ...RE, positionen: POS(0), steuerart: "reverse_charge", kunde_land: "CH" }], "SKR03")[0]?.gegenkonto).toBe("8338");
+    // Nullsteuersatz bleibt vorerst auf 8100 (Konto für Kz 87 offen)
+    expect(buchungenAusRechnungen([{ ...RE, positionen: POS(0), steuerart: "nullsatz" }], "SKR03")[0]?.gegenkonto).toBe("8100");
+  });
+  it("DATEV-Felder Leistungsdatum (115), Datum Zuord. Steuerperiode (116) und EU-Land u. UStID", () => {
+    expect(DATEV_LEISTUNGSDATUM).toBe(114);
+    expect(DATEV_STEUERPERIODE).toBe(115);
+    const z = datevExtf(buchungenAusRechnungen([{ ...RE, positionen: POS(0), steuerart: "igl", kunde_land: "AT", kunde_ust_idnr: "ATU12345678", leistungsdatum: "2026-09-30", steuerperiode: "2026-09-30" }], "SKR03"), EXPORT).split("\r\n")[2]!.split(";");
+    expect(z[DATEV_LEISTUNGSDATUM]).toBe("30092026");
+    expect(z[DATEV_STEUERPERIODE]).toBe("30092026");
+    expect(z[DATEV_EU_USTID]).toBe('"ATU12345678"');
+  });
+  it("Gutschrift mit ausgewiesener Steuer: Aufwand mit BU 9 – nicht, wenn der Betrieb Kleinunternehmer ist", () => {
+    const gs: AusgangsRechnungFuerBuchung = { ...RE, gutschrift: true, positionen: POS(19) };
+    expect(buchungenAusRechnungen([gs], "SKR03")[0]).toMatchObject({ konto: "3100", gegenkonto: "1610", bu_schluessel: "9", betrag_cent: 11900 });
+    expect(buchungenAusRechnungen([{ ...gs, empfaenger_ku: true }], "SKR03")[0]?.bu_schluessel).toBe("");
   });
 });
