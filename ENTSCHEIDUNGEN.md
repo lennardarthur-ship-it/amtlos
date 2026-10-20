@@ -995,6 +995,17 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 
 **Bewusst nicht umgesetzt (Gründerentscheidung):** Speicher-Umbau (Teilspeichern/SQLite) und native Verschlüsselung, Streaming-Sicherungsformat, geheimer Zusatzschlüssel für den Sync, Crash-Reporting, Einfrieren der Server-Plattform, neue Funktionen aus den Szenarien (Leitweg-ID, Abschlags-/Schlussrechnung, Skonto, § 13b am Beleg, anteilige Vorsteuer, Einnahmen ohne Rechnung, OSS, Vorlagen für Heilberufe und Shops), Nummernvergabe erst beim Teilen.
 
+
+### E-152 · Runde 10: simulierte echte Prüfer (2026-10-20)
+
+**Prüfer:** vier Nutzerinnen und Nutzer in ihrer Rolle (Friseurmeisterin am iPhone SE, Café-Inhaber mit großer Schrift, Elektromeister, Freiberuflerin im Dunkelmodus im Vergleich mit lexoffice/sevDesk), eine Fachanwältin für IT-Recht/Datenschutz, ein Steuerberater mit DATEV-Kanzlei.
+
+**Urteile:** Anwältin „go mit Auflagen“ (Smartlaw: keine Rechtsdienstleistung; StBerG: Selbsthilfe-Werkzeug), Steuerberater „dulden“ (DATEV-Stapel verlor Vorsteuer), Nutzer würden die kostenlosen Pflicht-Vorlagen nutzen, Pro noch nicht kaufen.
+
+**Entschieden und umgesetzt:** eindeutige Rechts- und Steuerfehler mit Norm (Katalog, DATEV, Voranmeldung, Rechnungen an EU-Unternehmen, Leitweg-ID, Gutschrift, Abschlag); Pflichten mit `erledigung` (bestätigen / laufend) statt „erledigt durch ein PDF“; `einordnung` Pflicht/Hinweis/Option; Kernfragen je Branche; Kontrollmappe nach Kontrollart; Datenschutzhinweis nach Art. 13; entschärfte Werbeaussagen. Vorgeschlagene Antworten der simulierten Fachleute stehen in der Prüfliste (T-112 bis T-115) und gelten erst nach Bestätigung durch echte Fachleute.
+
+**Gründerentscheidungen offen:** Anbietergesellschaft/Impressum, eigene Nutzungsbedingungen, Vermögensschadenhaftpflicht, Markenanmeldung; DATEV-Stapel als Pro-Leistung erst nach echtem Testimport; Freikontingent ohne Pflicht-Aushänge; Angebot/Aufmaß, Schlussrechnung mit Abschlagsverrechnung, Skonto, Mahnstufen, englische Rechnung, Belegerkennung, Hygieneschulung, Kassennachschau-Checkliste.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)
