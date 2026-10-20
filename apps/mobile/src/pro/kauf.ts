@@ -17,6 +17,12 @@ export const kaufAktiv = Platform.OS === "ios" && SCHLUESSEL.length > 0;
  * dort sind Käufe dann „noch nicht verfügbar“.
  */
 export const testmodus = !kaufAktiv && (__DEV__ || process.env.EXPO_PUBLIC_PRO_TESTMODUS === "1");
+/**
+ * Bezahlschirm mit Knopf überhaupt anbieten? Nur mit echtem Kauf oder im Testmodus. Ein Store-Build ohne Schlüssel
+ * zeigt weder „Pro testweise einschalten“ noch einen toten Kaufknopf (App-Review B2) – `store-check.mjs` meldet den
+ * fehlenden Schlüssel vorher.
+ */
+export const paywallVerfuegbar = kaufAktiv || testmodus;
 
 export interface Angebot {
   id: string;
@@ -25,7 +31,12 @@ export interface Angebot {
   preis: string;
   /** „monatlich“, „jährlich“ … */
   zeitraum: string;
-  /** kostenloser Testzeitraum, z. B. „14 Tage“ – null, wenn keiner */
+  /** „pro Monat“, „pro Jahr“ … – für „danach 49,99 € pro Jahr“ */
+  je: string;
+  /**
+   * kostenloser Testzeitraum, z. B. „14 Tage“ – null, wenn keiner oder wenn das Apple-Konto ihn nicht (mehr) bekommt
+   * bzw. die Berechtigung unbekannt ist (App-Review R2)
+   */
   test: string | null;
 }
 
@@ -51,6 +62,7 @@ function laden(): Promise<RC | null> {
 }
 
 const ZEITRAUM: Record<string, string> = { P1W: "wöchentlich", P1M: "monatlich", P3M: "vierteljährlich", P6M: "halbjährlich", P1Y: "jährlich" };
+const JE: Record<string, string> = { P1W: "pro Woche", P1M: "pro Monat", P3M: "pro Quartal", P6M: "pro Halbjahr", P1Y: "pro Jahr" };
 function testText(periode: string | undefined | null): string | null {
   const m = periode ? /^P(\d+)([DWMY])$/.exec(periode) : null;
   if (!m) return null;
@@ -71,19 +83,41 @@ export async function proAktiv(): Promise<boolean> {
   }
 }
 
+/**
+ * Darf das Apple-Konto den kostenlosen Testzeitraum nutzen (App-Review R2)? Nur „berechtigt“ zählt; unbekannt, nicht
+ * berechtigt oder ein Fehler der Abfrage heißt: kein Testzeitraum anzeigen – lieber ehrlich den Preis als ein Trial,
+ * das Apple dann nicht gewährt.
+ */
+async function testBerechtigt(p: RC, ids: string[]): Promise<Set<string>> {
+  const frei = new Set<string>();
+  const berechtigt = p.INTRO_ELIGIBILITY_STATUS?.INTRO_ELIGIBILITY_STATUS_ELIGIBLE;
+  if (!ids.length || berechtigt === undefined) return frei;
+  // nach getOfferings() aufrufen: erst dann kennt das SDK auf iOS die Abo-Gruppe
+  try {
+    const r = await p.checkTrialOrIntroductoryPriceEligibility(ids);
+    for (const id of ids) if (r[id]?.status === berechtigt) frei.add(id);
+  } catch {
+    // unbekannt → ohne Testzeitraum
+  }
+  return frei;
+}
+
 /** Angebote aus dem Store (aktuelles „Offering“), Jahresabo zuerst. */
 export async function angebote(): Promise<Angebot[]> {
   const p = await laden();
   if (!p) return [];
   const o = await p.getOfferings();
   const pakete = o.current?.availablePackages ?? [];
+  const mitTest = pakete.filter((pk) => pk.product.introPrice?.price === 0).map((pk) => pk.product.identifier);
+  const frei = await testBerechtigt(p, mitTest);
   return pakete
     .map((pk) => ({
       id: pk.identifier,
       titel: pk.product.title,
       preis: pk.product.priceString,
       zeitraum: ZEITRAUM[pk.product.subscriptionPeriod ?? ""] ?? "",
-      test: pk.product.introPrice && pk.product.introPrice.price === 0 ? testText(pk.product.introPrice.period) : null,
+      je: JE[pk.product.subscriptionPeriod ?? ""] ?? "",
+      test: pk.product.introPrice && pk.product.introPrice.price === 0 && frei.has(pk.product.identifier) ? testText(pk.product.introPrice.period) : null,
     }))
     .sort((a, b) => (a.zeitraum === "jährlich" ? -1 : b.zeitraum === "jährlich" ? 1 : 0));
 }

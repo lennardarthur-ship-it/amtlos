@@ -5,7 +5,9 @@
  * Brief (DIN 5008), Vertrag, Aushang, Nachweis, Formular, Handbuch. Das eine prägende Element ist die Randspalte:
  * Abschnittsnummer und Rechtsgrundlage stehen links neben dem Text wie Randnummern in einem Gesetzeskommentar.
  */
-import type { Betrieb, Daten, Eintrag } from "./typen.js";
+import { istGueltig, plusMonate as plusMonateDatum } from "@amtlos/fristen";
+import type { Betrieb, Daten, Eintrag, Option } from "./typen.js";
+import { FRUEHERE_TEXTE } from "./bausteine.js";
 import { rundeCent } from "../rechnung.js";
 
 /**
@@ -40,6 +42,17 @@ export function liste(d: Daten, k: string): Eintrag[] {
 export function auswahl(d: Daten | Eintrag, k: string): string[] {
   const w = d[k];
   return Array.isArray(w) ? w.filter((x): x is string => typeof x === "string") : [];
+}
+
+/**
+ * Neu gefasste Auswahltexte (Lektorat r9): Gespeichert wird weiter der frühere Text als Wert, damit bestehende
+ * Auswahlen gültig bleiben; angezeigt und gedruckt wird die Neufassung. `frueher` bildet Neufassung → früheren Text ab.
+ */
+export const stabileOption = (t: string, frueher: Record<string, string> = FRUEHERE_TEXTE): Option => ({ wert: frueher[t] ?? t, text: t });
+/** Gespeicherter Wert (früherer Text) → Neufassung; unbekannte Werte (eigene Eingaben) bleiben, wie sie sind. */
+export function neufassung(w: string, frueher: Record<string, string> = FRUEHERE_TEXTE): string {
+  for (const [neu, alt] of Object.entries(frueher)) if (alt === w) return neu;
+  return w;
 }
 
 // ---------------------------------------------------------------- Textbausteine
@@ -943,10 +956,12 @@ export function schlussZusammen(inhalt: string): string {
 }
 
 /** Gesetzeskürzel, die nicht von der Nummer davor getrennt werden („Art. 32 DSGVO“, „§ 147 AO“). */
-const GESETZE = "DSGVO|BDSG|AO|HGB|BGB|EStG|UStG|GewO|ArbSchG|ArbZG|MuSchG|GefStoffV|BetrSichV|TDDDG|LMIV|LMIDV|IfSG|SGB|NachwG|MiLoG|GmbHG|KassenSichV";
+const GESETZE = "DSGVO|BDSG|AO|HGB|BGB|EStG|UStG|GewO|ArbSchG|ArbZG|MuSchG|GefStoffV|BetrSichV|TDDDG|LMIV|LMIDV|IfSG|SGB|NachwG|MiLoG|GmbHG|KassenSichV|GwG|KSchG|BUrlG|TzBfG|AGG|ArbGG|OWiG|UWG|MStV|DDG|VSBG|KStG|GewStG|EStDV|LStDV|SchwarzArbG";
 const FEST: [RegExp, string][] = [
   // Zahl und Einheit: „19 %“, „12,50 €“, „121 °C“
   [/(\d) (%|€|°C)/g, "$1&nbsp;$2"],
+  // Zahl und Maßeinheit: „100 m³“, „750 Lux“, „80 dB(A)“, „30 mA“, „3–5 ml“ – nur als eigenes Wort („3 mal“ bleibt)
+  [/(\d) (m³|m²|cm|mm|m|ml|l|kg|mg\/kg|mg\/l|mA|A|Lux|dB\(A\)|LE|h)(?![\wäöüßÄÖÜ])/g, "$1&nbsp;$2"],
   // Verweiszeichen vor Nummer, römischer Zahl oder Buchstabe: „§ 43“, „§§ 5“, „Art. 32“, „Abs. 2“, „Nr. 1“, „lit. g“, „UAbs. 1“
   [/(§§?|\bArt\.|\bAbs\.|\bUAbs\.|\bNr\.|\blit\.|\bSatz) (?=\d|[IVXLC]+(?![\wäöüÄÖÜß])|[a-z](?![\wäöüß]))/g, "$1&nbsp;"],
   // Nummer bzw. Buchstabe und Gesetz: „32 DSGVO“, „lit. b DSGVO“; „SGB IV“
@@ -1106,9 +1121,7 @@ export const zahlText = (n: number, stellen = 2) => new Intl.NumberFormat("de-DE
 export const summe = (l: Eintrag[], k: string) => l.reduce((a, e) => a + (cent(text(e, k)) ?? 0), 0);
 
 /** ISO-Datum plus Monate (für Folgetermine), als TT.MM.JJJJ. */
+/** Monatsende-Regel wie bei den Fristen (@amtlos/fristen): 31.01. + 1 Monat = 28./29.02., 29.02. + 12 Monate = 28.02. */
 export function plusMonate(iso: string, monate: number): string {
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
-  if (!m) return "";
-  const d = new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1 + monate, Number(m[3])));
-  return datumDe(d.toISOString().slice(0, 10));
+  return istGueltig(iso) ? datumDe(plusMonateDatum(iso, monate)) : "";
 }

@@ -1,6 +1,6 @@
 # 11 · Vom Code in den App Store (E-132)
 
-Stand: 2026-10-19 (E-142 bis E-144). Alles, was im Code geht, ist erledigt. Was hier steht, braucht dein Apple-Konto, deine Firma oder eine fachliche Freigabe. `node apps/mobile/werkzeuge/store-check.mjs` zeigt jederzeit, was noch offen ist.
+Stand: 2026-10-20 (E-142 bis E-144, App-Review-Vorprüfung R9). Alles, was im Code geht, ist erledigt. Was hier steht, braucht dein Apple-Konto, deine Firma oder eine fachliche Freigabe. `node apps/mobile/werkzeuge/store-check.mjs` zeigt jederzeit, was noch offen ist.
 
 ## 1. Firma und Konten (du)
 
@@ -32,10 +32,19 @@ Die Preise wählst du in App Store Connect. Die App zeigt den Preis aus dem Stor
 cd apps/mobile
 npx eas-cli login
 npx eas-cli init                       # schreibt extra.eas.projectId in app.json
-npx eas-cli secret:create --name EXPO_PUBLIC_REVENUECAT_IOS_KEY --value appl_xxx --scope project
+npx eas-cli env:create --environment production --name EXPO_PUBLIC_REVENUECAT_IOS_KEY --value appl_xxx --visibility sensitive
+npx eas-cli env:exec production "node werkzeuge/store-check.mjs"   # Store-Check mit den Variablen der Umgebung „production“
 ```
 
-Ohne den Schlüssel lässt sich Pro in einer Store-Version **nicht kaufen** („noch nicht verfügbar“) – Apple würde die App dann ablehnen, weil sich das Abo nicht prüfen lässt. Pro testweise einschalten geht nur in Entwicklung, im Testpaket (Expo Go) und in Builds mit `EXPO_PUBLIC_PRO_TESTMODUS=1` (EAS-Profil `preview`, für TestFlight-Tester). Das Profil `production` setzt das nie (E-143).
+Hinweis für ältere EAS-CLI-Versionen (vor den Umgebungsvariablen): `npx eas-cli secret:create --name EXPO_PUBLIC_REVENUECAT_IOS_KEY --value appl_xxx --scope project`.
+
+`store-check.mjs` prüft standardmäßig das Profil `production` und meldet einen fehlenden Schlüssel als offen (`--profile preview` prüft ein anderes Profil). Ohne Schlüssel zeigt ein Store-Build **keinen** Kaufknopf und keinen Einstieg in den Bezahlschirm unter „Mein Betrieb“ – nie „Pro testweise einschalten“ (App-Review B2).
+
+Ohne den Schlüssel lässt sich Pro in einer Store-Version **nicht kaufen** – Apple würde die App dann ablehnen, weil sich das Abo nicht prüfen lässt. Pro testweise einschalten geht nur in Entwicklung, im Testpaket (Expo Go) und in Builds mit `EXPO_PUBLIC_PRO_TESTMODUS=1` (EAS-Profil `preview`, für TestFlight-Tester). Das Profil `production` setzt das nie (E-143).
+
+**Mit dieser Version einreichen:** Beide Abos (`amtlos_pro_jahr`, `amtlos_pro_monat`) mit Review-Screenshot und Beschreibung an die App-Version hängen (das erste Abo muss zusammen mit einer Version geprüft werden). Paid Applications Agreement, Bank- und Steuerdaten müssen aktiv sein – sonst lädt die App keine Angebote („Die Angebote ließen sich nicht laden“) und Apple lehnt nach 2.1(b) ab.
+
+**Testzeitraum und Preis (App-Review R2/R3):** Die App zeigt den kostenlosen Testzeitraum nur, wenn RevenueCat das Apple-Konto als berechtigt meldet (`checkTrialOrIntroductoryPriceEligibility`); unbekannt oder nicht berechtigt → nur der Preis. Direkt über dem Kaufknopf steht gleich groß „14 Tage kostenlos, danach 49,99 € pro Jahr“ – Zeitraum und Betrag kommen aus dem Store (`priceString`), nie aus dem Code.
 
 ## 4. Bauen und einreichen
 
@@ -61,8 +70,8 @@ Für Tests auf echten Geräten: `--profile preview` (interne Verteilung) oder Te
 - **„Neu in dieser Version“:** Für 1.0.0 der Text in `neu`; ab dem ersten Update die Änderungen.
 - **Synchronisation:** Wird ein Build mit `EXPO_PUBLIC_API_URL` eingereicht, stimmen „ohne Konto, ohne Server“ in Store-Texten, Bild 6 und Website nicht mehr – vorher anpassen.
 - **Kategorie:** Business (zweite: Finanzen). **Altersfreigabe:** 4+ (keine Inhalte, die eine höhere Einstufung brauchen; im Fragebogen bestätigen).
-- **App Privacy („Datenschutz-Etiketten“):** Kein Tracking. Im Privacy Manifest (`app.json` → `ios.privacyManifests`) stehen seit E-143 Kaufhistorie, E-Mail-Adresse, Name und Benutzer-ID – mit der Identität verknüpft, Zweck „App-Funktionalität“. E-Mail, Name und Benutzer-ID fallen nur mit Synchronisation an; ohne sie genügt in App Store Connect die Kaufhistorie (verknüpft, weil RevenueCat Käufe einer Kennung zuordnet). Vor dem Absenden mit dem Datenschutzhinweis abgleichen (T-77, T-85).
-- **Export-Compliance:** Die App verschlüsselt lokale Daten (AES-256-GCM). Ob die Ausnahme greift, ist **nicht** entschieden (T-77). Erst danach `ios.config.usesNonExemptEncryption` setzen.
+- **App Privacy („Datenschutz-Etiketten“):** Kein Tracking. Im Privacy Manifest (`app.json` → `ios.privacyManifests`) steht die Kaufhistorie (RevenueCat) – mit der Identität verknüpft, Zwecke **App-Funktionalität und Analysen** (RevenueCat-Dashboard, wie von RevenueCat verlangt). E-Mail-Adresse, Name und Benutzer-ID fallen nur mit Synchronisation an: `app.config.ts` ergänzt sie im Manifest nur, wenn `EXPO_PUBLIC_API_URL` gesetzt ist. In App Store Connect für einen Build ohne Sync also nur „Käufe → Kaufhistorie“ (App-Funktionalität + Analysen, verknüpft, kein Tracking) angeben. Vor dem Absenden mit dem Datenschutzhinweis abgleichen (T-77, T-85).
+- **Export-Compliance:** Die App verschlüsselt selbst mit Standardverfahren, die nicht aus iOS stammen (AES-256-GCM, PBKDF2-SHA256 über `@noble/ciphers`/`@noble/hashes`). Deshalb steht in `app.json` `ios.config.usesNonExemptEncryption: true` (Apples Ausnahme gilt nur für Verschlüsselung des Betriebssystems). In App Store Connect angeben: „Standard encryption algorithms instead of, or in addition to, using or accessing the encryption within Apple's operating system“. **Frankreich:** Dafür verlangt Apple die französische Verschlüsselungserklärung (ANSSI). Entweder sie hochladen oder Frankreich bis dahin aus der Verfügbarkeit nehmen – **Entscheidung des Gründers bzw. rechtlich zu klären (T-77), nicht im Code entschieden.** Nach Apples Freigabe den erhaltenen Code als `ITSEncryptionExportComplianceCode` in `ios.infoPlist` eintragen. Die Gegenposition „keine meldepflichtige Verschlüsselung“ (EAR Kat. 5 Teil 2, Note 4) ginge nur mit anwaltlicher Einstufung. Ohne Frankreich in den Hinweisen für die Prüfung den Satz zur hochgeladenen Export-Dokumentation streichen.
 
 ## 6. Nach dem Start messen
 
@@ -77,7 +86,7 @@ Die App kann ohne Synchronisation veröffentlicht werden – dann zeigt sie nich
 1. **Server betreiben:** API (`apps/api`) mit Postgres, Migrationen bis 0019, `AUTH_MODUS=oidc`, `OIDC_ISSUER`, `OIDC_AUDIENCE`, `REVENUECAT_SECRET_KEY` (damit nur Pro synchronisiert). Hosting in der EU, AV-Vertrag (T-80).
 2. **Anmeldedienst (Identity-Provider)** mit einer „Native App“ anlegen: PKCE, Weiterleitung `amtlos://anmeldung`, Scopes `openid profile email offline_access`; das Zugriffstoken muss die Zielgruppe `OIDC_AUDIENCE` tragen.
 3. **Build-Variablen** (EAS-Secrets bzw. `eas.json` → `env`): `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_OIDC_ISSUER`, `EXPO_PUBLIC_OIDC_CLIENT_ID`, bei Bedarf `EXPO_PUBLIC_OIDC_AUDIENCE`.
-4. **App Privacy und Privacy Manifest ergänzen:** E-Mail-Adresse und Benutzer-ID (mit Identität verknüpft, App-Funktionalität), Kaufhistorie dann ebenfalls verknüpft. Datenschutzhinweis: Abschnitt „Konto und Synchronisation“ erscheint automatisch – fachlich freigeben (T-80).
+4. **App Privacy ergänzen:** E-Mail-Adresse, Name (falls Server oder Anmeldedienst ihn speichert) und Benutzer-ID (mit Identität verknüpft, App-Funktionalität), Kaufhistorie dann an die Konto-ID gebunden. Das Privacy Manifest ergänzt `app.config.ts` automatisch, sobald `EXPO_PUBLIC_API_URL` gesetzt ist. Datenschutzhinweis: Abschnitt „Konto und Synchronisation“ erscheint automatisch – fachlich freigeben (T-80).
 5. **App-Prüfung:** Apple verlangt bei Konten das Löschen in der App – vorhanden unter „Mein Betrieb → Auf mehreren Geräten → Konto löschen“. In den Hinweisen für die Prüfung ein Testkonto angeben.
 
 ## 8. Website (`apps/website`)

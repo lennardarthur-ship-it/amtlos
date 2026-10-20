@@ -5,7 +5,8 @@
  * Reine Funktionen, ohne Gerät testbar.
  */
 import { VORLAGEN, fehlendeAngaben, vorlageFuer, type Betrieb } from "@amtlos/fachlogik";
-import { StandardKalender } from "@amtlos/fristen";
+// Monatsende-Regel der Fristen: 31.01. + 1 Monat = 28./29.02., 29.02. + 12 Monate = 28.02.
+import { StandardKalender, plusMonate } from "@amtlos/fristen";
 import { SCHRITTE, type Frage } from "@amtlos/i18n";
 import { auswerten, entscheidendeSaetze, zuErfragendeFakten, type Ereignis, type Katalog, type Pflicht } from "@amtlos/rules-engine";
 import roh from "./katalog.json";
@@ -90,12 +91,6 @@ const text = (t: unknown) => (t && typeof t === "object" && typeof (t as { de?: 
 const VORLAGEN_JE_PFLICHT = new Map<string, string[]>();
 for (const v of VORLAGEN) for (const p of v.pflichten) VORLAGEN_JE_PFLICHT.set(p, [...(VORLAGEN_JE_PFLICHT.get(p) ?? []), v.id]);
 const SCHWERE = { hoch: 0, mittel: 1, niedrig: 2 } as const;
-
-function plusMonate(iso: string, n: number): string {
-  const [j, m, t] = iso.split("-").map(Number) as [number, number, number];
-  const d = new Date(Date.UTC(j, m - 1 + n, Math.min(t, 28)));
-  return d.toISOString().slice(0, 10);
-}
 
 /** Unterlage, soweit sie für abgeleitete Ereignisse zählt (Teil von `Unterlage` aus unterlagen/speicher.ts). */
 export interface UnterlageFuerEreignis {

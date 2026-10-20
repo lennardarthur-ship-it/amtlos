@@ -5,7 +5,7 @@
 import { teilnahmeTabelle } from "./arbeitsschutz.js";
 import { mitVertretung } from "./betrieb.js";
 import { MINDESTLOHN, NACHWG } from "./bausteine.js";
-import { abschnitt, absatz, angaben, anschrift, anschriftMehrzeilig, auswahl, cent, datumDe, dokument, euro, ja, liste, parteien, punkte, text, unterschriften, zahl, zahlText, zeilen } from "./html.js";
+import { abschnitt, absatz, angaben, anschrift, anschriftMehrzeilig, auswahl, cent, datumDe, dokument, euro, ja, liste, neufassung, parteien, punkte, stabileOption, text, unterschriften, zahl, zahlText, zeilen } from "./html.js";
 import { optionen } from "./konstanten.js";
 import type { Daten, Vorlage } from "./typen.js";
 
@@ -194,11 +194,17 @@ export const nachweisArbeitsbedingungen: Vorlage = {
 const KI_THEMEN = [
   "Funktionsweise und Grenzen der eingesetzten KI-Werkzeuge",
   "Chancen und Risiken beim Einsatz von KI im Betrieb",
-  "Keine personenbezogenen oder vertraulichen Daten in KI-Werkzeuge eingeben, soweit nicht ausdrücklich freigegeben",
-  "Ergebnisse von KI-Werkzeugen vor der Verwendung prüfen",
+  "Umgang mit personenbezogenen und vertraulichen Daten: nur ausdrücklich freigegebene Daten in KI-Werkzeuge eingeben",
+  "Prüfung von KI-Ergebnissen vor der Verwendung",
   "Verantwortlichkeiten und Ansprechperson im Betrieb",
   "Umgang mit KI-erzeugten Texten und Bildern gegenüber Kundinnen und Kunden",
 ];
+/** Neufassung → früherer Text: gespeichert wird weiter der frühere Text, damit bestehende Auswahlen gültig bleiben. */
+const KI_THEMEN_FRUEHER: Record<string, string> = {
+  "Umgang mit personenbezogenen und vertraulichen Daten: nur ausdrücklich freigegebene Daten in KI-Werkzeuge eingeben": "Keine personenbezogenen oder vertraulichen Daten in KI-Werkzeuge eingeben, soweit nicht ausdrücklich freigegeben",
+  "Prüfung von KI-Ergebnissen vor der Verwendung": "Ergebnisse von KI-Werkzeugen vor der Verwendung prüfen",
+};
+const kiOption = (t: string) => stabileOption(t, KI_THEMEN_FRUEHER);
 
 export const kiKompetenz: Vorlage = {
   id: "ki_kompetenz",
@@ -221,7 +227,7 @@ export const kiKompetenz: Vorlage = {
     {
       titel: "Inhalte",
       felder: [
-        { id: "themen", art: "bausteine", label: "Inhalte der Schulung", optionen: KI_THEMEN.map((t) => ({ wert: t, text: t })), vorbelegung: KI_THEMEN.slice(0, 4), pflicht: true },
+        { id: "themen", art: "bausteine", label: "Inhalte der Schulung", optionen: KI_THEMEN.map(kiOption), vorbelegung: KI_THEMEN.slice(0, 4).map((t) => kiOption(t).wert), pflicht: true },
         { id: "inhalt", art: "mehrzeilig", label: "Ergänzungen" },
       ],
     },
@@ -239,7 +245,7 @@ export const kiKompetenz: Vorlage = {
       inhalt:
         // Datum, Durchgeführt von und Dauer stehen in der Kennungsleiste; dort entfallen leere Angaben – dann hier als Linie
         abschnitt("Angaben", angaben([["Bezeichnung", text(d, "thema")], ["KI-Werkzeuge", text(d, "ki_systeme").split("\n").map((z) => z.trim().replace(/[.;,]+$/, "")).filter(Boolean).join(", ")], ["Datum", text(d, "datum") ? null : ""], ["Dauer", text(d, "dauer") ? null : ""], ["Durchgeführt von", text(d, "durchgefuehrt_von") ? null : ""]])) +
-        abschnitt("Inhalte", (auswahl(d, "themen").length ? punkte(auswahl(d, "themen")) : absatz("")) + (text(d, "inhalt") ? zeilen(text(d, "inhalt")) : "")) +
+        abschnitt("Inhalte", (auswahl(d, "themen").length ? punkte(auswahl(d, "themen").map((w) => neufassung(w, KI_THEMEN_FRUEHER))) : absatz("")) + (text(d, "inhalt") ? zeilen(text(d, "inhalt")) : "")) +
         abschnitt("Teilnahme", `<p class="vor-tabelle">Mit meiner Unterschrift bestätige ich die Teilnahme an der Schulung.</p>${teilnahmeTabelle(liste(d, "teilnehmer"))}`) +
         unterschriften(["Ort, Datum", "Unterschrift der schulenden Person"]),
     });

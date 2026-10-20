@@ -154,6 +154,16 @@ describe("Pflichten-Check", () => {
     for (const p of alt.gilt) expect(p.grund, p.id).not.toBe("");
   });
 
+  it("rechnet die sechs Monate bis „bestehend“ mit der Monatsende-Regel der Fristen", () => {
+    // 31.10. − 6 Monate = 30.04. (nicht 28.04.); 31.08.2028 − 6 Monate = 29.02.2028 (Schaltjahr)
+    const gilt = (beginn: string, stichtag: string) => ids(auswertung({ ...salon, gruendungsdatum: beginn }, stichtag).gilt).includes("gruendung.gewerbeanzeige");
+    expect(gilt("2026-04-30", "2026-10-31")).toBe(false);
+    expect(gilt("2026-04-29", "2026-10-31")).toBe(false);
+    expect(gilt("2026-05-01", "2026-10-31")).toBe(true);
+    expect(gilt("2028-02-29", "2028-08-31")).toBe(false);
+    expect(gilt("2028-03-01", "2028-08-31")).toBe(true);
+  });
+
   it("zeigt „Schon erledigt?“ nur jungen Betrieben mit mehreren offenen Gründungsschritten", () => {
     const heute = "2026-10-12";
     const leer = { erledigt: {}, unterlagen: [], betrieb: LEERER_STAND.betrieb };

@@ -282,7 +282,7 @@ export const auftragsverarbeitung: Vorlage = {
         { id: "datenarten", art: "mehrzeilig", label: "Art der personenbezogenen Daten", pflicht: true, vorschlaege: ["Name", "Kontaktdaten (Telefon, E-Mail)", "Termine und gebuchte Leistungen", "Zahlungsdaten", "Beschäftigtendaten (Lohn, Steuer, Sozialversicherung)"] },
         { id: "betroffene", art: "mehrzeilig", label: "Kategorien betroffener Personen", pflicht: true, vorschlaege: ["Kundinnen und Kunden", "Interessenten", "Beschäftigte"] },
         { id: "unterauftrag", art: "mehrzeilig", label: "Genehmigte Unterauftragsverarbeiter", hilfe: "Name, Anschrift, Leistung – oder „keine“", pflicht: true, vorschlaege: ["keine"] },
-        { id: "tom", art: "mehrzeilig", label: "Technische und organisatorische Maßnahmen des Auftragsverarbeiters", pflicht: true, vorschlaege: ["siehe Anlage (TOM-Beschreibung des Auftragsverarbeiters)"] },
+        { id: "tom", art: "mehrzeilig", label: "Technische und organisatorische Maßnahmen des Auftragsverarbeiters", pflicht: true, vorschlaege: ["Die technischen und organisatorischen Maßnahmen des Auftragnehmers sind in der Anlage beschrieben."] },
         { id: "ort_datum", art: "text", label: "Ort", hilfe: "für die Unterschrift" },
       ],
     },

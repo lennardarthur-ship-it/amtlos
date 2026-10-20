@@ -299,7 +299,7 @@ const BA_TEILE: { id: string; label: string; hilfe: string; bausteine?: string; 
   { id: "schutz", label: "Schutzmaßnahmen und Verhaltensregeln", hilfe: "Technisch, organisatorisch, Hygiene, persönliche Schutzausrüstung", bausteine: "schutzmassnahmen", linien: 5 },
   { id: "gefahrfall", label: "Verhalten im Gefahrfall", hilfe: "Bei Verschütten, Brand, Unfall – laut Sicherheitsdatenblatt (Abschnitte 5 und 6)", bausteine: "gefahrfall" },
   { id: "erste_hilfe", label: "Erste Hilfe", hilfe: "Nach Augen-, Hautkontakt, Einatmen, Verschlucken – laut Sicherheitsdatenblatt (Abschnitt 4)", bausteine: "erste_hilfe" },
-  { id: "entsorgung", label: "Sachgerechte Entsorgung", hilfe: "Laut Sicherheitsdatenblatt (Abschnitt 13)", bausteine: "entsorgung" },
+  { id: "entsorgung", label: "Sachgerechte Entsorgung", hilfe: "Laut Sicherheitsdatenblatt (Abschnitt 13); Entsorgungswege im Zweifel mit der örtlichen Gewerbeabfallberatung klären", bausteine: "entsorgung" },
 ];
 
 export const betriebsanweisung: Vorlage = {
@@ -441,7 +441,7 @@ export const elektroPruefung: Vorlage = {
           // ohne Geräte (Protokoll zum Ausfüllen von Hand) immer mit leeren Zeilen – so viele, wie mit den Unterschriften auf das Blatt passen
           { breiten: ["20%", "18%", "12%", "15%", "20%", "15%"], leerzeilen: ja(d, "leerzeilen") ? 12 : g.length ? 0 : 7, hoch: ja(d, "leerzeilen") || !g.length },
         )}</section>` +
-        (einsatz ? nachsatz(`Richtwert für die Prüffrist nach ${einsatz.quelle ?? "DGUV Vorschrift 3"}: ${einsatz.text.replace(/\.$/, "")}.`) : "") +
+        (einsatz ? nachsatz(`Prüffrist (${einsatz.quelle ?? "DGUV Vorschrift 3"}) – ${einsatz.text.replace(/\.$/, "")}.`) : "") +
         unterschriften(["Ort, Datum", "Unterschrift der prüfenden Person"]),
     });
   },

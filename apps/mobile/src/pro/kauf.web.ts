@@ -2,11 +2,13 @@
 export const PRO_BERECHTIGUNG = "pro";
 export const kaufAktiv = false;
 export const testmodus = true;
+export const paywallVerfuegbar = true;
 export interface Angebot {
   id: string;
   titel: string;
   preis: string;
   zeitraum: string;
+  je: string;
   test: string | null;
 }
 export const proAktiv = async () => false;

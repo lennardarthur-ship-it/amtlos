@@ -589,7 +589,7 @@ describe("Dokumentvorlagen", () => {
     // Arbeitszeit: Tage nur mit Bemerkung, Pause gerundet, je fehlender Angabe eine Zeile
     const az = html("arbeitszeitnachweis", { name: "Kim", monat: "Oktober", tage: [{ datum: "2026-10-01", beginn: "08:00", ende: "16:30", pause: "7,5" }, { datum: "2026-10-02", bemerkung: "Urlaub" }] });
     expect(az).toContain("Urlaub");
-    expect(az).toContain("8:22 h");
+    expect(az).toContain("8:22&nbsp;h");
     expect(az).not.toContain(".5 h");
     expect(arbeitsminuten("08:00", "16:30", "7,5")).toBe(502);
     const azMonat = html("arbeitszeitnachweis", { name: "Kim" });

@@ -98,7 +98,7 @@ export const arbeitszeitnachweis: Vorlage = {
           z.map(({ x, min }) => [datumDe(text(x, "datum")), esc(text(x, "beginn")), esc(text(x, "ende")), esc(text(x, "pause")), min === null ? "" : stunden(min), zelle(text(x, "bemerkung"))]),
           { breiten: ["15%", "12%", "12%", "13%", "13%", "35%"], leerzeilen, hoch: leer || ja(d, "leerzeilen"), zahlen: [3, 4], ...(leer ? { summe: ["<strong>Summe</strong>", "", "", "", ZELLE_LINIE, ""] } : ja(d, "leerzeilen") ? { summe: ["<strong>Summe der erfassten Tage</strong>", `<strong>${stunden(gesamt)}</strong>`, ""], summeSpanne: 4 } : { summe: ["<strong>Summe</strong>", "", "", "", `<strong>${stunden(gesamt)}</strong>`, ""] }) },
         ) +
-        `<p class="nachsatz">Für Minijobs und die Branchen nach § 2a SchwarzArbG (u. a. Gastronomie, Friseur- und Kosmetikgewerbe, Bau): Beginn, Ende und Dauer der täglichen Arbeitszeit spätestens bis zum Ablauf des siebten auf den Arbeitstag folgenden Kalendertages aufzeichnen und mindestens zwei Jahre aufbewahren (§ 17 Abs. 1 MiLoG).</p>` +
+        `<p class="nachsatz">Aufzeichnungspflicht nach § 17 Abs. 1 MiLoG für Minijobs und die Branchen nach § 2a SchwarzArbG (u. a. Gastronomie, Friseur- und Kosmetikgewerbe, Bau): Beginn, Ende und Dauer der täglichen Arbeitszeit spätestens bis zum Ablauf des siebten Kalendertages nach dem Arbeitstag aufzeichnen. Die Aufzeichnungen mindestens zwei Jahre aufbewahren.</p>` +
         unterschriften(["Unterschrift beschäftigte Person", "Unterschrift Arbeitgeber/in"]),
     });
   },

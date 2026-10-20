@@ -77,7 +77,7 @@ describe("Gestaltung der Dokumente (E-130)", () => {
     expect(plan("unterweisung")).toContain('<div class="art">Arbeitsschutz</div>');
     // nur eine Angabe: kleine Zeile statt Band; die Unterzeile entfällt, wenn sie schon in der Leiste steht
     const lk = plan("lohnkonto", { name: "Kim", jahr: "2026" });
-    expect(lk).toContain('<p class="kennung-zeile">Rechtsgrundlage: <b>§&nbsp;41&nbsp;EStG; §&nbsp;4 LStDV</b></p>');
+    expect(lk).toContain('<p class="kennung-zeile">Rechtsgrundlage: <b>§&nbsp;41&nbsp;EStG; §&nbsp;4&nbsp;LStDV</b></p>');
     expect(lk).not.toContain('<dl class="kennung">');
     const gb = plan("gefaehrdungsbeurteilung", { arbeitsbereich: "Küche" });
     expect(gb).toContain("<dt>Arbeitsbereich</dt><dd>Küche</dd>");

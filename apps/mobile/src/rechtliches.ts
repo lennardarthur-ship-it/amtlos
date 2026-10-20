@@ -68,3 +68,12 @@ export function datenschutzAbschnitte(sync: boolean) {
 }
 
 export const anbieterVollstaendig = () => Boolean(ANBIETER.name && ANBIETER.anschrift && ANBIETER.email && ANBIETER.vertretung);
+
+/**
+ * Wohin „Hilfe & Kontakt“ führt: die Support-Seite, sonst die E-Mail-Adresse des Anbieters (sobald eingetragen) –
+ * nie eine erfundene Adresse. Ohne beides entfällt die Zeile; der Store-Check meldet die fehlende Support-URL.
+ */
+export function hilfeZiel(support: string, email: string): string {
+  if (support) return support;
+  return email ? `mailto:${email}` : "";
+}

@@ -162,7 +162,7 @@ describe("weitere Vorlagen", () => {
       "(§&nbsp;43&nbsp;Abs.&nbsp;2) bei 121&nbsp;°C, Art.&nbsp;32&nbsp;DSGVO, §&nbsp;4&nbsp;Abs.&nbsp;1 DGUV&nbsp;Vorschrift&nbsp;1, §§&nbsp;5&nbsp;ArbSchG, Art.&nbsp;6&nbsp;Abs.&nbsp;1&nbsp;lit.&nbsp;b&nbsp;DSGVO, §&nbsp;28a&nbsp;SGB&nbsp;IV, 19&nbsp;%",
     );
     // Nummer und Gliederungsangabe („622 Abs.“, „3 Satz“, „2 Nr.“), „je/pro/à“ nicht allein am Zeilenende
-    expect(festeLeerzeichen("§ 622 Abs. 2, § 3 Satz 1, § 4 Nr. 2, Satzung, je Stunde, (pro Monat), à 0,5 l")).toBe("§&nbsp;622&nbsp;Abs.&nbsp;2, §&nbsp;3&nbsp;Satz&nbsp;1, §&nbsp;4&nbsp;Nr.&nbsp;2, Satzung, je&nbsp;Stunde, (pro&nbsp;Monat), à&nbsp;0,5 l");
+    expect(festeLeerzeichen("§ 622 Abs. 2, § 3 Satz 1, § 4 Nr. 2, Satzung, je Stunde, (pro Monat), à 0,5 l")).toBe("§&nbsp;622&nbsp;Abs.&nbsp;2, §&nbsp;3&nbsp;Satz&nbsp;1, §&nbsp;4&nbsp;Nr.&nbsp;2, Satzung, je&nbsp;Stunde, (pro&nbsp;Monat), à&nbsp;0,5&nbsp;l");
     // in der schmalen Randspalte nicht (dort entstünden zu lange untrennbare Ketten)
     expect(festeLeerzeichen('<span class="rand">Art. 6 Abs. 1 <span class="nb">lit. b–f</span> DSGVO</span> Art. 6 Abs. 1')).toBe('<span class="rand">Art.&nbsp;6 Abs.&nbsp;1 <span class="nb">lit.&nbsp;b–f</span> DSGVO</span> Art.&nbsp;6&nbsp;Abs.&nbsp;1');
     expect(festeLeerzeichen('<span title="§ 43 AO">Nr. und § und</span>')).toBe('<span title="§ 43 AO">Nr. und § und</span>');

@@ -82,7 +82,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "sonstiges",
    "beschreibung": "Brand- und Explosionsgefahr durch alkoholische Desinfektionsmittel, Spraydosen und entzündbare Flüssigkeiten.",
-   "massnahme": "Brennbare Flüssigkeiten nicht an Arbeitsplätzen, unter Treppen oder in Fluchtwegen lagern; am Arbeitsplatz höchstens den Tagesbedarf.\nSpraydosen nicht über 50 °C erwärmen, nicht in offene Flammen oder beim Rauchen sprühen.\nFeuerlöscher bereitstellen (bis 50 m² Grundfläche Schaumlöscher A/B mit 6 LE), alle zwei Jahre prüfen lassen."
+   "massnahme": "Brennbare Flüssigkeiten nicht an Arbeitsplätzen, unter Treppen oder in Fluchtwegen lagern; am Arbeitsplatz höchstens den Tagesbedarf.\nSpraydosen nicht über 50 °C erwärmen, nicht in offene Flammen oder beim Rauchen sprühen.\nFeuerlöscher bereitstellen (bis 50 m² Grundfläche Schaumlöscher A/B mit 6 Löschmitteleinheiten), alle zwei Jahre prüfen lassen."
   },
   "quelle": "BGW"
  },
@@ -142,7 +142,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "qualifikation",
    "beschreibung": "Fehlende Kenntnisse über Gefahrstoffe, Hautschutz und Hygieneregeln.",
-   "massnahme": "Regelmäßig unterweisen und die Unterweisung mit Betriebsanweisung, Reinigungs- und Desinfektionsplan sowie Hautschutzplan verknüpfen.\nUnterweisung dokumentieren (z. B. BGW-Dokumentationshilfe „Nachweis über Schulung/Unterweisung/Einweisung“)."
+   "massnahme": "Regelmäßig unterweisen und die Unterweisung mit Betriebsanweisung, Reinigungs- und Desinfektionsplan sowie Hautschutzplan verknüpfen.\nUnterweisung dokumentieren (z. B. mit dem Unterweisungsnachweis)."
   },
   "quelle": "BGW"
  },
@@ -182,7 +182,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "einwirkungen",
    "beschreibung": "Hautbelastung durch Feuchtarbeit, häufiges Händewaschen, langes Handschuhtragen sowie Desinfektions- und Reinigungsmittel.",
-   "massnahme": "Feucht- und Trockenarbeit wechseln und zeitlich begrenzen.\npH-neutrale, farb- und duftstofffreie Waschmittel und rückfettende Händedesinfektion bereitstellen; Hautschutz- und Händehygieneplan aufstellen.\nLatexfreie Schutzhandschuhe verwenden."
+   "massnahme": "Feucht- und Trockenarbeit wechseln und zeitlich begrenzen.\npH-neutrale, farb- und duftstofffreie Hautreinigungsmittel und rückfettende Händedesinfektion bereitstellen; Hautschutz- und Händehygieneplan aufstellen.\nLatexfreie Schutzhandschuhe verwenden."
   },
   "quelle": "BGW 04-05-080, S. 21–22"
  },
@@ -222,7 +222,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "einwirkungen",
    "beschreibung": "Sensibilisierung durch Konservierungs- und Duftstoffe in Kosmetikprodukten (z. B. Massageöle, Cremes, Nagellack).",
-   "massnahme": "Nur zugelassene, EU-kosmetikkonforme Produkte verwenden; Mengen gering halten.\nBetriebsanweisung erstellen; arbeitsmedizinische Vorsorge berücksichtigen."
+   "massnahme": "Nur zugelassene, der EU-Kosmetikverordnung entsprechende Produkte verwenden; Mengen gering halten.\nBetriebsanweisung erstellen; arbeitsmedizinische Vorsorge berücksichtigen."
   },
   "quelle": "BGW 04-05-080, S. 33, 37"
  },
@@ -452,7 +452,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "einwirkungen",
    "beschreibung": "Gehörschäden durch Lärm von Maschinen und Werkzeugen.",
-   "massnahme": "Lärmarme Verfahren und lärmgeminderte Geräte einsetzen; Maschinen warten (scharfe Werkzeuge, intakte Gehäuse).\nAb oberem Auslösewert (85 dB(A)) Lärmbereiche kennzeichnen und Lärmminderungsprogramm aufstellen; ab unterem Auslösewert (80 dB(A)) unterweisen und Vorsorge anbieten.\nGehörschutz ab 80 dB(A) bereitstellen, ab 85 dB(A) tragen."
+   "massnahme": "Lärmarme Verfahren und lärmgeminderte Geräte einsetzen; Maschinen warten (scharfe Werkzeuge, intakte Gehäuse).\nAb dem oberen Auslösewert (85 dB(A)) Lärmbereiche kennzeichnen und Lärmminderungsprogramm aufstellen; ab dem unteren Auslösewert (80 dB(A)) unterweisen und Vorsorge anbieten.\nGehörschutz ab 80 dB(A) bereitstellen, ab 85 dB(A) tragen."
   },
   "quelle": "DGUV-Handlungshilfe „Lärm in der Bauwirtschaft“, Stand 02/2011 (Auslösewerte nach LärmVibrationsArbSchV)"
  },
@@ -1051,7 +1051,7 @@ export const BA_BAUSTEINE: Record<string, Option[]> = {
  "entsorgung": [
   {
    "wert": "entsorgung_mit_der_oertlichen_gewerbeabf",
-   "text": "Entsorgung mit der örtlichen Gewerbeabfallberatung klären.",
+   "text": "Abfälle nur über die im Betrieb festgelegten Entsorgungswege entsorgen.",
    "quelle": "BGW"
   },
   {
@@ -1075,8 +1075,8 @@ export const HAUTSCHUTZ_FRISEUR: Vorschlag[] = [
    "anlass": "Shampoonieren, Kopfmassage mit Haarbehandlungsmitteln, Pflegemittel auftragen/auswaschen",
    "schutz": "Hände mit Hautschutzpräparat eincremen",
    "handschuhe": "Einmalhandschuhe aus Nitril oder Vinyl mit langen Stulpen über das Handgelenk (alternativ Waschhandschuhe)",
-   "reinigung": "Hände nur bei Verschmutzung waschen, ggf. mit pH-hautneutralem Reinigungsmittel; gut abtrocknen; eincremen",
-   "pflege": "Hände mit Hautpflegepräparat eincremen"
+   "reinigung": "Hände nur bei Verschmutzung waschen, ggf. mit pH-hautneutralem Reinigungsmittel; gut abtrocknen",
+   "pflege": "Nach dem Waschen, vor Pausen und nach Arbeitsende Hände mit Hautpflegepräparat eincremen"
   },
   "quelle": "TRGS 530 / BGW"
  },
@@ -1087,8 +1087,8 @@ export const HAUTSCHUTZ_FRISEUR: Vorschlag[] = [
    "anlass": "Färben, Dauerwelle, Blondierung: Mischen, Auftragen, Überprüfen, Probewickeln, Fixieren",
    "schutz": "Hände mit Hautschutzpräparat eincremen",
    "handschuhe": "Friseur-Einmalhandschuhe nach DIN EN ISO 374-6 (Friseur-Symbol), keine gepuderten Latexhandschuhe",
-   "reinigung": "Hände nur bei Verschmutzung waschen, ggf. mit pH-hautneutralem Reinigungsmittel; gut abtrocknen; eincremen",
-   "pflege": "Hände mit Hautpflegepräparat eincremen"
+   "reinigung": "Hände nur bei Verschmutzung waschen, ggf. mit pH-hautneutralem Reinigungsmittel; gut abtrocknen",
+   "pflege": "Nach dem Waschen, vor Pausen und nach Arbeitsende Hände mit Hautpflegepräparat eincremen"
   },
   "quelle": "TRGS 530 / BGW"
  },
@@ -1098,9 +1098,9 @@ export const HAUTSCHUTZ_FRISEUR: Vorschlag[] = [
   "werte": {
    "anlass": "Färben, Dauerwelle, Blondierung: Aufemulgieren, Auswaschen",
    "schutz": "Hände mit Hautschutzpräparat eincremen",
-   "handschuhe": "Einmalhandschuhe, langstulpig",
-   "reinigung": "Hände nur bei Verschmutzung waschen, ggf. mit pH-hautneutralem Reinigungsmittel; gut abtrocknen; eincremen",
-   "pflege": "Hände mit Hautpflegepräparat eincremen"
+   "handschuhe": "Einmalhandschuhe mit langen Stulpen",
+   "reinigung": "Hände nur bei Verschmutzung waschen, ggf. mit pH-hautneutralem Reinigungsmittel; gut abtrocknen",
+   "pflege": "Nach dem Waschen, vor Pausen und nach Arbeitsende Hände mit Hautpflegepräparat eincremen"
   },
   "quelle": "TRGS 530 / BGW"
  },
@@ -1111,8 +1111,8 @@ export const HAUTSCHUTZ_FRISEUR: Vorschlag[] = [
    "anlass": "Styling, Kopfmassage ohne Haarbehandlungsmittel",
    "schutz": "Hände mit Hautschutzpräparat eincremen",
    "handschuhe": "Einmalhandschuhe bei empfindlicher Haut",
-   "reinigung": "Hände nur bei Verschmutzung waschen, ggf. mit pH-hautneutralem Reinigungsmittel; gut abtrocknen; eincremen",
-   "pflege": "Hände mit Hautpflegepräparat eincremen"
+   "reinigung": "Hände nur bei Verschmutzung waschen, ggf. mit pH-hautneutralem Reinigungsmittel; gut abtrocknen",
+   "pflege": "Nach dem Waschen, vor Pausen und nach Arbeitsende Hände mit Hautpflegepräparat eincremen"
   },
   "quelle": "TRGS 530 / BGW"
  },
@@ -1123,8 +1123,8 @@ export const HAUTSCHUTZ_FRISEUR: Vorschlag[] = [
    "anlass": "Reinigung und Desinfektion von Arbeitsgeräten und Räumen",
    "schutz": "Hände mit Hautschutzpräparat eincremen",
    "handschuhe": "Haushaltshandschuhe bzw. chemikalienbeständige Schutzhandschuhe nach DIN EN ISO 374, ggf. mit längerem Schaft",
-   "reinigung": "Hände nur bei Verschmutzung waschen, ggf. mit pH-hautneutralem Reinigungsmittel; gut abtrocknen; eincremen",
-   "pflege": "Hände mit Hautpflegepräparat eincremen"
+   "reinigung": "Hände nur bei Verschmutzung waschen, ggf. mit pH-hautneutralem Reinigungsmittel; gut abtrocknen",
+   "pflege": "Nach dem Waschen, vor Pausen und nach Arbeitsende Hände mit Hautpflegepräparat eincremen"
   },
   "quelle": "TRGS 530 / BGW"
  },
@@ -1151,37 +1151,37 @@ export const ELEKTRO_FRISTEN: (Option & { unsicher?: boolean })[] = [
  {
   "wert": "baustellen",
   "text": "Baustellen: Richtwert 3 Monate, höchstens 1 Jahr bei Fehlerquote unter 2 %",
-  "quelle": "DGUV Vorschrift 3, DA zu § 5, Tabelle 1B"
+  "quelle": "DGUV Vorschrift 3, Durchführungsanweisung zu § 5, Tabelle 1B"
  },
  {
   "wert": "fertigungsstaetten_werkstaetten_oder_unt",
   "text": "Fertigungsstätten, Werkstätten oder unter ähnlichen Bedingungen: Richtwert 6 Monate, höchstens 1 Jahr bei Fehlerquote unter 2 %",
-  "quelle": "DGUV Vorschrift 3, DA zu § 5, Tabelle 1B"
+  "quelle": "DGUV Vorschrift 3, Durchführungsanweisung zu § 5, Tabelle 1B"
  },
  {
   "wert": "bueros_oder_unter_aehnlichen_bedingungen",
   "text": "Büros oder unter ähnlichen Bedingungen: Richtwert 6 Monate, höchstens 2 Jahre bei Fehlerquote unter 2 %",
-  "quelle": "DGUV Vorschrift 3, DA zu § 5, Tabelle 1B"
+  "quelle": "DGUV Vorschrift 3, Durchführungsanweisung zu § 5, Tabelle 1B"
  },
  {
   "wert": "elektrische_anlagen_und_ortsfeste_betrie",
   "text": "Elektrische Anlagen und ortsfeste Betriebsmittel: Richtwert 4 Jahre",
-  "quelle": "DGUV Vorschrift 3, DA zu § 5, Tabelle 1A"
+  "quelle": "DGUV Vorschrift 3, Durchführungsanweisung zu § 5, Tabelle 1A"
  },
  {
   "wert": "elektrische_anlagen_und_ortsfeste_betrie",
   "text": "Elektrische Anlagen und ortsfeste Betriebsmittel in Betriebsstätten, Räumen und Anlagen besonderer Art (DIN VDE 0100 Gruppe 700): Richtwert 1 Jahr",
-  "quelle": "DGUV Vorschrift 3, DA zu § 5, Tabelle 1A"
+  "quelle": "DGUV Vorschrift 3, Durchführungsanweisung zu § 5, Tabelle 1A"
  },
  {
   "wert": "schutzmassnahmen_mit_fehlerstrom_schutze",
   "text": "Schutzmaßnahmen mit Fehlerstrom-Schutzeinrichtungen in nichtstationären Anlagen (Prüfung auf Wirksamkeit): Richtwert 1 Monat",
-  "quelle": "DGUV Vorschrift 3, DA zu § 5, Tabelle 1A"
+  "quelle": "DGUV Vorschrift 3, Durchführungsanweisung zu § 5, Tabelle 1A"
  },
  {
   "wert": "fehlerstrom_differenzstrom_und_fehlerspa",
   "text": "Fehlerstrom-, Differenzstrom- und Fehlerspannungs-Schutzschalter: Betätigen der Prüfeinrichtung durch den Benutzer: Richtwert stationäre Anlagen: 6 Monate; nichtstationäre Anlagen: arbeitstäglich",
-  "quelle": "DGUV Vorschrift 3, DA zu § 5, Tabelle 1A",
+  "quelle": "DGUV Vorschrift 3, Durchführungsanweisung zu § 5, Tabelle 1A",
   "unsicher": true
  }
 ];
@@ -1201,10 +1201,10 @@ export const VVT: Vorschlag[] = [
    "bezeichnung": "Kundenverwaltung / Kundenkartei",
    "zweck": "Bearbeitung von Aufträgen und Kundenbeziehungen einschließlich Rechnungsstellung; ggf. postalische Werbung an Bestandskunden",
    "rechtsgrundlage": "Art. 6 Abs. 1 lit. b DSGVO (Vertrag/vorvertragliche Maßnahmen); Art. 6 Abs. 1 lit. c DSGVO i. V. m. § 147 AO, § 257 HGB (Aufbewahrung); Art. 6 Abs. 1 lit. f DSGVO (postalische Bestandskundenwerbung). Bei Gesundheitsangaben (z. B. Allergien/Unverträglichkeiten) ausdrückliche Einwilligung nach Art. 9 Abs. 2 lit. a DSGVO.",
-   "betroffene": "Kunden, Interessenten",
+   "betroffene": "Kundinnen und Kunden, Interessenten",
    "datenarten": "Name, Anschrift, Kontaktdaten (Telefon, E-Mail), Angaben zum Auftrag / Leistungshistorie, ggf. Bankverbindung, ggf. Gesundheitsdaten (nur mit ausdrücklicher Einwilligung)",
    "empfaenger": "Steuerberater (eigenständiger Verantwortlicher), IT-/Software-Dienstleister (Auftragsverarbeiter)",
-   "loeschfrist": "Kundenstammdaten werden gelöscht, sobald kein Zweck und keine Aufbewahrungspflicht mehr besteht (z. B. Kunde erteilt über mehrere Jahre keine Aufträge mehr). Rechnungsrelevante Unterlagen: Buchungsbelege 8 Jahre (§ 147 Abs. 1 Nr. 4, Abs. 3 AO; § 257 Abs. 1 Nr. 4, Abs. 4 HGB), Geschäftsbriefe 6 Jahre (§ 147 Abs. 1 Nr. 2, 3 AO; § 257 Abs. 1 Nr. 2, 3 HGB), jeweils ab Ende des Kalenderjahres.",
+   "loeschfrist": "Kundenstammdaten werden gelöscht, sobald sie für den Zweck nicht mehr erforderlich sind und keine Aufbewahrungspflicht mehr besteht (z. B. wenn über mehrere Jahre keine Aufträge mehr erteilt werden). Rechnungsrelevante Unterlagen: Buchungsbelege 8 Jahre (§ 147 Abs. 1 Nr. 4, Abs. 3 AO; § 257 Abs. 1 Nr. 4, Abs. 4 HGB), Geschäftsbriefe 6 Jahre (§ 147 Abs. 1 Nr. 2, 3 AO; § 257 Abs. 1 Nr. 2, 3 HGB), jeweils ab Ende des Kalenderjahres.",
    "drittland": "keine Übermittlung in Drittländer"
   },
   "quelle": "BayLDA"
@@ -1215,10 +1215,10 @@ export const VVT: Vorschlag[] = [
    "bezeichnung": "Terminvereinbarung (telefonisch, vor Ort oder Online-Buchung)",
    "zweck": "Planung, Bestätigung und Erinnerung von Kundenterminen",
    "rechtsgrundlage": "Art. 6 Abs. 1 lit. b DSGVO; Terminerinnerung per SMS/E-Mail: Art. 6 Abs. 1 lit. b DSGVO, soweit vertragsbezogen, sonst Art. 6 Abs. 1 lit. a DSGVO",
-   "betroffene": "Kunden, Interessenten",
+   "betroffene": "Kundinnen und Kunden, Interessenten",
    "datenarten": "Name, Telefonnummer / E-Mail, Termin (Datum, Uhrzeit, gewünschte Leistung), ggf. Notizen",
    "empfaenger": "Anbieter des Online-Terminbuchungssystems (Auftragsverarbeiter)",
-   "loeschfrist": "Keine spezielle gesetzliche Frist. Löschung nach Wegfall des Zwecks (nach Terminwahrnehmung), soweit die Daten nicht in die Kundenkartei oder Rechnung übernommen werden (Art. 5 Abs. 1 lit. e, Art. 17 Abs. 1 lit. a DSGVO).",
+   "loeschfrist": "Die Daten werden gelöscht, sobald der Zweck entfallen ist (nach dem Termin), soweit sie nicht in die Kundenkartei oder eine Rechnung übernommen werden; eine besondere gesetzliche Frist gibt es nicht (Art. 5 Abs. 1 lit. e, Art. 17 Abs. 1 lit. a DSGVO).",
    "drittland": "keine Übermittlung in Drittländer"
   },
   "quelle": "DSGVO"
@@ -1232,7 +1232,7 @@ export const VVT: Vorschlag[] = [
    "betroffene": "Kunden, Lieferanten, Geschäftspartner (Ansprechpersonen)",
    "datenarten": "Name, Anschrift, Rechnungs- und Zahlungsdaten, Bankverbindung, ggf. USt-IdNr.",
    "empfaenger": "Steuerberater (eigenständiger Verantwortlicher), Finanzamt, Kreditinstitute, Buchhaltungssoftware-Anbieter (Auftragsverarbeiter)",
-   "loeschfrist": "Bücher, Aufzeichnungen, Jahresabschlüsse, Inventare: 10 Jahre; Buchungsbelege: 8 Jahre (seit 01.01.2025); Handels-/Geschäftsbriefe: 6 Jahre – jeweils ab Ende des Kalenderjahres (§ 147 Abs. 1, 3, 4 AO; § 257 Abs. 1, 4, 5 HGB).",
+   "loeschfrist": "Bücher, Aufzeichnungen, Jahresabschlüsse, Inventare: 10 Jahre; Buchungsbelege: 8 Jahre; Handels-/Geschäftsbriefe: 6 Jahre – jeweils ab Ende des Kalenderjahres (§ 147 Abs. 1, 3, 4 AO; § 257 Abs. 1, 4, 5 HGB).",
    "drittland": "keine Übermittlung in Drittländer"
   },
   "quelle": "§ 147 AO"
@@ -1260,7 +1260,7 @@ export const VVT: Vorschlag[] = [
    "betroffene": "Beschäftigte, Auszubildende",
    "datenarten": "Name, Anschrift, Vertragsdaten, Zeitwirtschaftsdaten, Daten zur Arbeitsleistung, Leistungsbeurteilungen, Urlaubs- und Krankheitszeiten (ohne Diagnosen)",
    "empfaenger": "Steuerberater / Lohnbüro, ggf. Anbieter der Zeiterfassungssoftware (Auftragsverarbeiter)",
-   "loeschfrist": "Personalakte in der Regel ca. 3 Jahre nach Ausscheiden (Orientierung an regelmäßiger Verjährung § 195 BGB); steuer-/sozialversicherungsrelevante Unterlagen nach den gesetzlichen Fristen.",
+   "loeschfrist": "Personalakte in der Regel 3 Jahre nach dem Ausscheiden (Orientierung an der regelmäßigen Verjährung, § 195 BGB); steuer- und sozialversicherungsrelevante Unterlagen nach den gesetzlichen Fristen.",
    "drittland": "keine Übermittlung in Drittländer"
   },
   "quelle": "BayLDA-Muster"
@@ -1274,7 +1274,7 @@ export const VVT: Vorschlag[] = [
    "betroffene": "Bewerberinnen und Bewerber",
    "datenarten": "Name, Kontaktdaten, Lebenslauf, Zeugnisse, Qualifikationen, Anschreiben, ggf. Gesprächsnotizen",
    "empfaenger": "intern: an der Auswahl beteiligte Personen, ggf. Anbieter einer Bewerbungsplattform (Auftragsverarbeiter)",
-   "loeschfrist": "Abgelehnte Bewerber: 6 Monate nach Abschluss des Bewerbungsverfahrens. Hintergrund: Geltendmachung von Ansprüchen nach § 15 Abs. 4 AGG binnen 2 Monaten ab Zugang der Ablehnung, Klagefrist § 61b Abs. 1 ArbGG 3 Monate nach schriftlicher Geltendmachung.",
+   "loeschfrist": "Unterlagen abgelehnter Bewerberinnen und Bewerber werden 6 Monate nach Abschluss des Bewerbungsverfahrens gelöscht. Grund: Ansprüche nach § 15 Abs. 4 AGG können binnen 2 Monaten ab Zugang der Ablehnung geltend gemacht werden; die Klagefrist beträgt 3 Monate nach schriftlicher Geltendmachung (§ 61b Abs. 1 ArbGG).",
    "drittland": "keine Übermittlung in Drittländer"
   },
   "quelle": "BayLDA-Muster; § 15 AGG; § 61b ArbGG"
@@ -1285,10 +1285,10 @@ export const VVT: Vorschlag[] = [
    "bezeichnung": "Betrieb der Website (Hosting, Server-Logfiles)",
    "zweck": "Darstellung des Unternehmens im Internet; technische Bereitstellung und Sicherheit der Website",
    "rechtsgrundlage": "Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an sicherer, funktionsfähiger Bereitstellung); Zugriff auf Endgeräte (Cookies u. Ä.) nur mit Einwilligung nach § 25 Abs. 1 TDDDG, es sei denn unbedingt erforderlich (§ 25 Abs. 2 Nr. 2 TDDDG)",
-   "betroffene": "Website-Besucher",
+   "betroffene": "Besucherinnen und Besucher der Website",
    "datenarten": "IP-Adresse, Datum und Uhrzeit des Abrufs, abgerufene Seite/Datei, Browser- und Betriebssysteminformationen, Referrer-URL",
-   "empfaenger": "Hosting-Dienstleister (Auftragsverarbeiter, AV-Vertrag erforderlich)",
-   "loeschfrist": "IP-Adressen in Logfiles nach 30 Tagen.",
+   "empfaenger": "Hosting-Dienstleister (Auftragsverarbeiter)",
+   "loeschfrist": "IP-Adressen in den Logfiles werden nach 30 Tagen gelöscht.",
    "drittland": "keine Übermittlung in Drittländer"
   },
   "quelle": "BayLDA-Muster"
@@ -1302,7 +1302,7 @@ export const VVT: Vorschlag[] = [
    "betroffene": "Interessenten, Kunden, sonstige anfragende Personen",
    "datenarten": "Name, E-Mail-Adresse / Telefonnummer, Inhalt der Anfrage, Zeitpunkt",
    "empfaenger": "Hosting-/E-Mail-Dienstleister (Auftragsverarbeiter)",
-   "loeschfrist": "Nach abschließender Bearbeitung, sofern keine Aufbewahrungspflicht besteht; führt die Anfrage zu einem Geschäft, sind Geschäftsbriefe 6 Jahre aufzubewahren (§ 257 Abs. 1 Nr. 2, 3, Abs. 4 HGB; § 147 Abs. 1 Nr. 2, 3, Abs. 3 AO).",
+   "loeschfrist": "Die Daten werden nach abschließender Bearbeitung gelöscht, sofern keine Aufbewahrungspflicht besteht; führt die Anfrage zu einem Geschäft, sind Geschäftsbriefe 6 Jahre aufzubewahren (§ 257 Abs. 1 Nr. 2, 3, Abs. 4 HGB; § 147 Abs. 1 Nr. 2, 3, Abs. 3 AO).",
    "drittland": "keine Übermittlung in Drittländer"
   },
   "quelle": "DSGVO"
@@ -1316,7 +1316,7 @@ export const VVT: Vorschlag[] = [
    "betroffene": "Kunden, Lieferanten, Geschäftspartner, Beschäftigte",
    "datenarten": "Name, E-Mail-Adresse, Inhalte der Korrespondenz, Metadaten (Zeit, Absender, Empfänger)",
    "empfaenger": "E-Mail-Provider (Auftragsverarbeiter), ggf. IT-Dienstleister",
-   "loeschfrist": "Handels- und Geschäftsbriefe (auch per E-Mail): 6 Jahre; E-Mails mit Belegfunktion (z. B. Rechnung): 8 Jahre (§ 257 Abs. 1, 4 HGB; § 147 Abs. 1, 3 AO). Übrige E-Mails nach Zweckerfüllung.",
+   "loeschfrist": "Handels- und Geschäftsbriefe (auch per E-Mail): 6 Jahre; E-Mails mit Belegfunktion (z. B. Rechnung): 8 Jahre (§ 257 Abs. 1, 4 HGB; § 147 Abs. 1, 3 AO). Übrige E-Mails werden gelöscht, sobald sie nicht mehr benötigt werden.",
    "drittland": "keine Übermittlung in Drittländer"
   },
   "quelle": "§ 257 HGB"
@@ -1330,7 +1330,7 @@ export const VVT: Vorschlag[] = [
    "betroffene": "Newsletter-Abonnenten, Bestandskunden",
    "datenarten": "E-Mail-Adresse, ggf. Name, Einwilligungsnachweis (Zeitpunkt, Wortlaut, Bestätigung), ggf. Öffnungs-/Klickdaten (nur mit Einwilligung)",
    "empfaenger": "Newsletter-Versanddienstleister (Auftragsverarbeiter)",
-   "loeschfrist": "Löschung der Adresse aus dem Verteiler unverzüglich nach Abmeldung/Widerspruch; der Einwilligungsnachweis darf zur Rechtsverteidigung aufbewahrt werden – Richtwert 3 Jahre (Verjährung § 31 OWiG, § 195 BGB).",
+   "loeschfrist": "Die Adresse wird nach Abmeldung oder Widerspruch unverzüglich aus dem Verteiler gelöscht; der Nachweis der Einwilligung wird zur Rechtsverteidigung aufbewahrt (Richtwert: 3 Jahre; Verjährung § 31 OWiG, § 195 BGB).",
    "drittland": "keine Übermittlung in Drittländer"
   },
   "quelle": "DSK (Orientierungshilfe Werbung)"
@@ -1358,7 +1358,7 @@ export const VVT: Vorschlag[] = [
    "betroffene": "Ansprechpersonen bei Lieferanten und Dienstleistern, Einzelunternehmer",
    "datenarten": "Name, geschäftliche Kontaktdaten, Bestell- und Rechnungsdaten, Bankverbindung",
    "empfaenger": "Steuerberater (eigenständiger Verantwortlicher), Kreditinstitut",
-   "loeschfrist": "Buchungsbelege 8 Jahre, Geschäftsbriefe 6 Jahre (§ 147 Abs. 1, 3 AO; § 257 Abs. 1, 4 HGB); Kontaktdaten nach Ende der Geschäftsbeziehung.",
+   "loeschfrist": "Buchungsbelege 8 Jahre, Geschäftsbriefe 6 Jahre (§ 147 Abs. 1, 3 AO; § 257 Abs. 1, 4 HGB); Kontaktdaten werden nach Ende der Geschäftsbeziehung gelöscht.",
    "drittland": "keine Übermittlung in Drittländer"
   },
   "quelle": "§ 147 AO"
@@ -1382,14 +1382,14 @@ export const VVT: Vorschlag[] = [
   "werte": {
    "bezeichnung": "Unternehmensauftritt in sozialen Netzwerken (z. B. Facebook-/Instagram-Seite)",
    "zweck": "Öffentlichkeitsarbeit und Kommunikation mit Interessenten",
-   "rechtsgrundlage": "Art. 6 Abs. 1 lit. f DSGVO bzw. Art. 6 Abs. 1 lit. a DSGVO; gemeinsame Verantwortlichkeit mit dem Plattformbetreiber nach Art. 26 DSGVO (EuGH C-210/16)",
+   "rechtsgrundlage": "Art. 6 Abs. 1 lit. f DSGVO bzw. Art. 6 Abs. 1 lit. a DSGVO; gemeinsame Verantwortlichkeit mit dem Plattformbetreiber nach Art. 26 DSGVO",
    "betroffene": "Besucher und Follower der Seite, Kommentierende",
    "datenarten": "öffentliche Profilangaben, Kommentare, Nachrichten, Reaktionen, von der Plattform bereitgestellte Statistiken (Insights)",
    "empfaenger": "Plattformbetreiber (gemeinsam Verantwortlicher), ggf. mit Übermittlung in die USA",
    "loeschfrist": "Nachrichten nach Erledigung; im Übrigen nach den Einstellungen der Plattform.",
-   "drittland": "möglich: USA (Plattformbetreiber); Grundlage laut Datenschutzhinweisen des Anbieters"
+   "drittland": "möglich: USA (Plattformbetreiber); Grundlage der Übermittlung: siehe Datenschutzhinweise des Anbieters"
   },
-  "quelle": "DSK"
+  "quelle": "DSK; EuGH C-210/16"
  }
 ];
 
@@ -1432,10 +1432,10 @@ export const TOM: Vorschlag[] = [
  },
  {
   "gruppe": "Verschlüsselung",
-  "titel": "Transportverschlüsselung (TLS) beim E-Mail-Versand; vertrauliche Unterlagen nur verschlüsselt versenden",
+  "titel": "Transportverschlüsselung (TLS) beim E-Mail-Versand; vertrauliche Unterlagen werden nur verschlüsselt versendet",
   "werte": {
    "schutzziel": "pseudonymisierung_verschluesselung",
-   "massnahme": "Transportverschlüsselung (TLS) beim E-Mail-Versand; vertrauliche Unterlagen nur verschlüsselt versenden"
+   "massnahme": "Transportverschlüsselung (TLS) beim E-Mail-Versand; vertrauliche Unterlagen werden nur verschlüsselt versendet"
   },
   "quelle": "BSI IT-Grundschutz APP.5.3 Allgemeiner E-Mail-Client und -Server"
  },
@@ -1513,10 +1513,10 @@ export const TOM: Vorschlag[] = [
  },
  {
   "gruppe": "Vertraulichkeit",
-  "titel": "Clean-Desk: keine Kundenunterlagen offen im Kundenbereich; Bildschirme nicht von Kunden einsehbar",
+  "titel": "Aufgeräumter Arbeitsplatz (Clean Desk): keine Kundenunterlagen offen im Kundenbereich; Bildschirme nicht von Kunden einsehbar",
   "werte": {
    "schutzziel": "vertraulichkeit",
-   "massnahme": "Clean-Desk: keine Kundenunterlagen offen im Kundenbereich; Bildschirme nicht von Kunden einsehbar"
+   "massnahme": "Aufgeräumter Arbeitsplatz (Clean Desk): keine Kundenunterlagen offen im Kundenbereich; Bildschirme nicht von Kunden einsehbar"
   },
   "quelle": "BSI IT-Grundschutz INF.7 Büroarbeitsplatz"
  },
@@ -1567,10 +1567,10 @@ export const TOM: Vorschlag[] = [
  },
  {
   "gruppe": "Integrität",
-  "titel": "Automatische Sicherheitsupdates für Betriebssystem, Browser und Programme aktivieren",
+  "titel": "Automatische Sicherheitsupdates für Betriebssystem, Browser und Programme aktiviert",
   "werte": {
    "schutzziel": "integritaet",
-   "massnahme": "Automatische Sicherheitsupdates für Betriebssystem, Browser und Programme aktivieren"
+   "massnahme": "Automatische Sicherheitsupdates für Betriebssystem, Browser und Programme aktiviert"
   },
   "quelle": "BayLDA Muster-VVT"
  },
@@ -1603,10 +1603,10 @@ export const TOM: Vorschlag[] = [
  },
  {
   "gruppe": "Integrität",
-  "titel": "Software nur aus vertrauenswürdigen Quellen; nicht mehr unterstützte Systeme ersetzen",
+  "titel": "Software nur aus vertrauenswürdigen Quellen; nicht mehr unterstützte Systeme werden ersetzt",
   "werte": {
    "schutzziel": "integritaet",
-   "massnahme": "Software nur aus vertrauenswürdigen Quellen; nicht mehr unterstützte Systeme ersetzen"
+   "massnahme": "Software nur aus vertrauenswürdigen Quellen; nicht mehr unterstützte Systeme werden ersetzt"
   },
   "quelle": "BSI IT-Grundschutz SYS.2.1 / OPS.1.1.3"
  },
@@ -1630,10 +1630,10 @@ export const TOM: Vorschlag[] = [
  },
  {
   "gruppe": "Verfügbarkeit",
-  "titel": "Mindestens eine Sicherungskopie getrennt vom Netzwerk bzw. außer Haus aufbewahren (Schutz vor Ransomware, Brand, Diebstahl)",
+  "titel": "Mindestens eine Sicherungskopie getrennt vom Netzwerk bzw. außer Haus aufbewahrt (Schutz vor Ransomware, Brand, Diebstahl)",
   "werte": {
    "schutzziel": "verfuegbarkeit_belastbarkeit",
-   "massnahme": "Mindestens eine Sicherungskopie getrennt vom Netzwerk bzw. außer Haus aufbewahren (Schutz vor Ransomware, Brand, Diebstahl)"
+   "massnahme": "Mindestens eine Sicherungskopie getrennt vom Netzwerk bzw. außer Haus aufbewahrt (Schutz vor Ransomware, Brand, Diebstahl)"
   },
   "quelle": "BSI IT-Grundschutz CON.3 Datensicherungskonzept"
  },
@@ -1657,28 +1657,28 @@ export const TOM: Vorschlag[] = [
  },
  {
   "gruppe": "Wiederherstellung",
-  "titel": "Wiederherstellung aus der Datensicherung regelmäßig testen",
+  "titel": "Regelmäßiger Test der Wiederherstellung aus der Datensicherung",
   "werte": {
    "schutzziel": "wiederherstellung",
-   "massnahme": "Wiederherstellung aus der Datensicherung regelmäßig testen"
+   "massnahme": "Regelmäßiger Test der Wiederherstellung aus der Datensicherung"
   },
   "quelle": "BSI IT-Grundschutz CON.3 Datensicherungskonzept"
  },
  {
   "gruppe": "Wiederherstellung",
-  "titel": "Notfall-Kontaktliste (IT-Dienstleister, Bank, Aufsichtsbehörde, Polizei) und Ablauf für Sicherheitsvorfälle bereithalten",
+  "titel": "Notfall-Kontaktliste (IT-Dienstleister, Bank, Aufsichtsbehörde, Polizei) und Ablauf für Sicherheitsvorfälle liegen bereit",
   "werte": {
    "schutzziel": "wiederherstellung",
-   "massnahme": "Notfall-Kontaktliste (IT-Dienstleister, Bank, Aufsichtsbehörde, Polizei) und Ablauf für Sicherheitsvorfälle bereithalten"
+   "massnahme": "Notfall-Kontaktliste (IT-Dienstleister, Bank, Aufsichtsbehörde, Polizei) und Ablauf für Sicherheitsvorfälle liegen bereit"
   },
   "quelle": "BSI IT-Grundschutz DER.2.1 Behandlung von Sicherheitsvorfällen"
  },
  {
   "gruppe": "Wiederherstellung",
-  "titel": "Dokumentierte Zugangsdaten für Notfälle sicher hinterlegen (z. B. versiegelter Umschlag im Tresor)",
+  "titel": "Zugangsdaten für Notfälle sicher hinterlegt (z. B. versiegelter Umschlag im Tresor)",
   "werte": {
    "schutzziel": "wiederherstellung",
-   "massnahme": "Dokumentierte Zugangsdaten für Notfälle sicher hinterlegen (z. B. versiegelter Umschlag im Tresor)"
+   "massnahme": "Zugangsdaten für Notfälle sicher hinterlegt (z. B. versiegelter Umschlag im Tresor)"
   },
   "quelle": "BSI IT-Grundschutz ORP.4"
  },
@@ -1702,10 +1702,10 @@ export const TOM: Vorschlag[] = [
  },
  {
   "gruppe": "Überprüfung",
-  "titel": "Regelmäßige Kontrolle der vergebenen Benutzerkonten und Berechtigungen; Konten ausgeschiedener Beschäftigter sofort sperren",
+  "titel": "Regelmäßige Kontrolle der vergebenen Benutzerkonten und Berechtigungen; Konten ausgeschiedener Beschäftigter werden sofort gesperrt",
   "werte": {
    "schutzziel": "ueberpruefung",
-   "massnahme": "Regelmäßige Kontrolle der vergebenen Benutzerkonten und Berechtigungen; Konten ausgeschiedener Beschäftigter sofort sperren"
+   "massnahme": "Regelmäßige Kontrolle der vergebenen Benutzerkonten und Berechtigungen; Konten ausgeschiedener Beschäftigter werden sofort gesperrt"
   },
   "quelle": "BSI IT-Grundschutz ORP.4 / ORP.2 Personal"
  },
@@ -1753,7 +1753,7 @@ export const DSE: Record<string, { titel: string; text: string; quelle?: string;
  },
  "server_logfiles": {
   "titel": "Server-Logfiles",
-  "text": "Beim Aufruf unserer Website werden durch den von Ihrem Browser übermittelten Datenaustausch automatisch folgende Daten in Server-Logfiles gespeichert: IP-Adresse, Datum und Uhrzeit des Abrufs, aufgerufene Seite bzw. Datei, übertragene Datenmenge, Browsertyp und -version, Betriebssystem sowie die zuvor besuchte Seite (Referrer). Die Verarbeitung dient der Auslieferung der Website sowie der Gewährleistung von Stabilität und Sicherheit. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO; unser berechtigtes Interesse liegt in diesen Zwecken. Die Logfiles werden nach {30} Tagen gelöscht.",
+  "text": "Beim Aufruf unserer Website übermittelt Ihr Browser technisch bedingt Daten an unseren Server. Dabei werden automatisch folgende Daten in Server-Logfiles gespeichert: IP-Adresse, Datum und Uhrzeit des Abrufs, aufgerufene Seite bzw. Datei, übertragene Datenmenge, Browsertyp und -version, Betriebssystem sowie die zuvor besuchte Seite (Referrer). Die Verarbeitung dient der Auslieferung der Website sowie der Gewährleistung von Stabilität und Sicherheit. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO; unser berechtigtes Interesse liegt in diesen Zwecken. Die Logfiles werden nach {30} Tagen gelöscht.",
   "quelle": "BayLDA",
   "unsicher": true
  },
@@ -1770,18 +1770,18 @@ export const DSE: Record<string, { titel: string; text: string; quelle?: string;
  },
  "technisch_notwendige_cookies": {
   "titel": "Technisch notwendige Cookies",
-  "text": "Einige Cookies sind unbedingt erforderlich, damit die Website bzw. von Ihnen ausdrücklich gewünschte Funktionen (z. B. {Speicherung Ihrer Cookie-Auswahl, Warenkorb, Login}) funktionieren. Für diese Cookies ist nach § 25 Abs. 2 Nr. 2 TDDDG keine Einwilligung erforderlich. Soweit dabei personenbezogene Daten verarbeitet werden, beruht dies auf unserem berechtigten Interesse an einer funktionsfähigen Website (Art. 6 Abs. 1 lit. f DSGVO). Diese Cookies werden {nach Ende der Sitzung / nach {dauer}} gelöscht.",
+  "text": "Einige Cookies sind unbedingt erforderlich, damit die Website und von Ihnen ausdrücklich gewünschte Funktionen (z. B. {Speicherung Ihrer Cookie-Auswahl, Warenkorb, Login}) bereitstehen. Für diese Cookies ist nach § 25 Abs. 2 Nr. 2 TDDDG keine Einwilligung erforderlich. Soweit dabei personenbezogene Daten verarbeitet werden, beruht dies auf unserem berechtigten Interesse an einer funktionsfähigen Website (Art. 6 Abs. 1 lit. f DSGVO). Diese Cookies werden {nach Ende der Sitzung / nach {dauer}} gelöscht.",
   "quelle": "DSK"
  },
  "google_maps": {
   "titel": "Google Maps",
-  "text": "Auf unserer Website können Sie eine Karte von Google Maps (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland) anzeigen lassen. Die Karte wird erst geladen, wenn Sie dem zuvor zugestimmt haben; dabei werden u. a. Ihre IP-Adresse und Informationen zu Ihrem Browser an Google übermittelt, auch an Server in den USA. Rechtsgrundlage ist Ihre Einwilligung (§ 25 Abs. 1 TDDDG, Art. 6 Abs. 1 lit. a DSGVO), die Sie jederzeit widerrufen können. Für Übermittlungen in die USA stützt sich Google auf den Angemessenheitsbeschluss zum EU-US Data Privacy Framework (Durchführungsbeschluss (EU) 2023/1795). Weitere Informationen: https://policies.google.com/privacy.",
+  "text": "Auf unserer Website können Sie eine Karte von Google Maps (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland) anzeigen lassen. Die Karte wird erst geladen, wenn Sie zuvor eingewilligt haben; dabei werden u. a. Ihre IP-Adresse und Informationen zu Ihrem Browser an Google übermittelt, auch an Server in den USA. Rechtsgrundlage ist Ihre Einwilligung (§ 25 Abs. 1 TDDDG, Art. 6 Abs. 1 lit. a DSGVO), die Sie jederzeit widerrufen können. Für Übermittlungen in die USA stützt sich Google auf den Angemessenheitsbeschluss zum EU-US Data Privacy Framework, Durchführungsbeschluss (EU) 2023/1795. Weitere Informationen: https://policies.google.com/privacy.",
   "quelle": "DSK",
   "unsicher": true
  },
  "youtube": {
   "titel": "Eingebettete YouTube-Videos",
-  "text": "Wir binden Videos der Plattform YouTube (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland) im erweiterten Datenschutzmodus ein. Die Videos werden erst geladen, wenn Sie dem zustimmen bzw. das Video aktiv starten; erst dann werden Daten wie Ihre IP-Adresse an YouTube/Google übermittelt und ggf. Cookies auf Ihrem Endgerät gespeichert, auch mit Übermittlung in die USA. Rechtsgrundlage ist Ihre Einwilligung (§ 25 Abs. 1 TDDDG, Art. 6 Abs. 1 lit. a DSGVO), die Sie jederzeit widerrufen können. Weitere Informationen: https://policies.google.com/privacy.",
+  "text": "Wir binden Videos der Plattform YouTube (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland) im erweiterten Datenschutzmodus ein. Die Videos werden erst geladen, wenn Sie eingewilligt haben bzw. das Video aktiv starten; erst dann werden Daten wie Ihre IP-Adresse an YouTube/Google übermittelt und ggf. Cookies auf Ihrem Endgerät gespeichert, auch mit Übermittlung in die USA. Rechtsgrundlage ist Ihre Einwilligung (§ 25 Abs. 1 TDDDG, Art. 6 Abs. 1 lit. a DSGVO), die Sie jederzeit widerrufen können. Weitere Informationen: https://policies.google.com/privacy.",
   "quelle": "DSK",
   "unsicher": true
  },
@@ -1799,7 +1799,7 @@ export const DSE: Record<string, { titel: string; text: string; quelle?: string;
  },
  "newsletter": {
   "titel": "Newsletter (Double-Opt-in)",
-  "text": "Wenn Sie sich für unseren Newsletter anmelden, verwenden wir Ihre E-Mail-Adresse {und Ihren Namen}, um Ihnen regelmäßig Informationen über {themen} zu senden. Nach der Anmeldung erhalten Sie eine E-Mail mit einem Bestätigungslink; erst nach Bestätigung werden Sie in den Verteiler aufgenommen (Double-Opt-in). Wir protokollieren Anmeldung und Bestätigung (Zeitpunkt, Wortlaut der Einwilligung), um die Einwilligung nachweisen zu können. Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Sie können den Newsletter jederzeit über den Abmeldelink in jeder E-Mail oder per Nachricht an {email} abbestellen; den Nachweis Ihrer Einwilligung bewahren wir danach bis zu drei Jahre auf. Der Versand erfolgt über {versanddienstleister}, mit dem wir einen Auftragsverarbeitungsvertrag geschlossen haben.",
+  "text": "Wenn Sie sich für unseren Newsletter anmelden, verwenden wir Ihre E-Mail-Adresse {und Ihren Namen}, um Ihnen regelmäßig Informationen über {themen} zu senden. Nach der Anmeldung erhalten Sie eine E-Mail mit einem Bestätigungslink; erst nach Bestätigung werden Sie in den Verteiler aufgenommen (Double-Opt-in). Wir protokollieren Anmeldung und Bestätigung (Zeitpunkt, Wortlaut der Einwilligung), um die Einwilligung nachweisen zu können. Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Sie können den Newsletter jederzeit über den Abmeldelink in jeder E-Mail oder per Nachricht an {email} abbestellen; den Nachweis Ihrer Einwilligung bewahren wir danach bis zu drei Jahre auf. Der Versand erfolgt über {versanddienstleister}, mit dem wir einen Vertrag zur Auftragsverarbeitung nach Art. 28 DSGVO geschlossen haben.",
   "quelle": "DSK"
  },
  "social_media_links": {
@@ -1810,13 +1810,13 @@ export const DSE: Record<string, { titel: string; text: string; quelle?: string;
  },
  "online_terminbuchung": {
   "titel": "Online-Terminbuchung über einen Drittanbieter",
-  "text": "Für die Online-Terminbuchung nutzen wir den Dienst {anbieter_name}, {anbieter_anschrift}. Dabei verarbeiten wir die von Ihnen eingegebenen Daten (z. B. Name, Kontaktdaten, gewünschter Termin und Leistung), um Ihren Termin zu planen, zu bestätigen und Sie ggf. daran zu erinnern. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO. Der Anbieter verarbeitet die Daten in unserem Auftrag auf Grundlage eines Vertrags nach Art. 28 DSGVO. Die Daten werden gelöscht, wenn sie für die Terminabwicklung nicht mehr erforderlich sind und keine gesetzlichen Aufbewahrungspflichten bestehen.",
+  "text": "Für die Online-Terminbuchung nutzen wir den Dienst {anbieter_name}, {anbieter_anschrift}. Dabei verarbeiten wir die von Ihnen eingegebenen Daten (z. B. Name, Kontaktdaten, gewünschter Termin und Leistung), um Ihren Termin zu planen, zu bestätigen und Sie ggf. daran zu erinnern. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO. Der Anbieter verarbeitet die Daten in unserem Auftrag auf Grundlage eines Vertrags zur Auftragsverarbeitung nach Art. 28 DSGVO. Die Daten werden gelöscht, wenn sie für die Terminabwicklung nicht mehr erforderlich sind und keine gesetzlichen Aufbewahrungspflichten bestehen.",
   "quelle": "DSK",
   "unsicher": true
  },
  "betroffenenrechte": {
   "titel": "Ihre Rechte",
-  "text": "Sie haben das Recht, Auskunft über die von uns verarbeiteten personenbezogenen Daten zu verlangen (Art. 15 DSGVO). Sie können die Berichtigung unrichtiger oder die Vervollständigung unvollständiger Daten verlangen (Art. 16 DSGVO). Sie können die Löschung Ihrer Daten verlangen, soweit keine gesetzliche Aufbewahrungspflicht oder ein anderer Grund nach Art. 17 Abs. 3 DSGVO entgegensteht (Art. 17 DSGVO). Sie können die Einschränkung der Verarbeitung verlangen, etwa solange die Richtigkeit Ihrer Daten geprüft wird (Art. 18 DSGVO). Sie haben das Recht, Daten, die Sie uns auf Grundlage einer Einwilligung oder eines Vertrags bereitgestellt haben, in einem strukturierten, gängigen und maschinenlesbaren Format zu erhalten oder übermitteln zu lassen (Art. 20 DSGVO). Sie haben das Recht, aus Gründen, die sich aus Ihrer besonderen Situation ergeben, einer auf Art. 6 Abs. 1 lit. e oder f DSGVO gestützten Verarbeitung zu widersprechen (Art. 21 DSGVO). Zur Ausübung Ihrer Rechte genügt eine Nachricht an {email}.",
+  "text": "Sie haben das Recht, Auskunft über die von uns verarbeiteten personenbezogenen Daten zu verlangen (Art. 15 DSGVO). Sie können die Berichtigung unrichtiger oder die Vervollständigung unvollständiger Daten verlangen (Art. 16 DSGVO). Sie können die Löschung Ihrer Daten verlangen, soweit keine gesetzliche Aufbewahrungspflicht oder ein anderer Grund nach Art. 17 Abs. 3 DSGVO entgegensteht (Art. 17 DSGVO). Sie können die Einschränkung der Verarbeitung verlangen, etwa solange die Richtigkeit Ihrer Daten geprüft wird (Art. 18 DSGVO). Sie haben das Recht, Daten, die Sie uns auf Grundlage einer Einwilligung oder eines Vertrags bereitgestellt haben, in einem strukturierten, gängigen und maschinenlesbaren Format zu erhalten oder übermitteln zu lassen (Art. 20 DSGVO). Außerdem können Sie der Verarbeitung widersprechen (Art. 21 DSGVO, siehe „Widerspruchsrecht“). Zur Ausübung Ihrer Rechte genügt eine Nachricht an {email}.",
   "quelle": "DSGVO"
  },
  "widerruf_einwilligung": {
@@ -2026,7 +2026,7 @@ export const PANNEN_SOFORT: (Option & { unsicher?: boolean })[] = [
  },
  {
   "wert": "betroffene_geraete_vom_netz_trennen_nich",
-  "text": "Betroffene Geräte vom Netz trennen (nicht ausschalten, wenn Spurensicherung nötig), bei Ransomware keine Lösegeldzahlung ohne Beratung",
+  "text": "Betroffene Geräte vom Netz trennen (nicht ausschalten, wenn Spurensicherung nötig); bei Ransomware keine Lösegeldzahlung ohne Beratung",
   "quelle": "EDSA Leitlinien 01/2021 (Ransomware-Fälle)",
   "unsicher": true
  },
@@ -2172,15 +2172,15 @@ export const GOBD: { belegeingang: string[]; belegart: string[]; ablage: string[
   "Eigenbeleg"
  ],
  "belegart": [
-  "originär Papier, Ablage in Papier (Muster 4.1)",
-  "originär Papier, wird gescannt (ersetzendes Scannen, Muster 4.2)",
-  "originär digital (Muster 4.3)"
+  "Papierbeleg, wird in Papier abgelegt",
+  "Papierbeleg, wird gescannt (ersetzendes Scannen)",
+  "elektronischer Beleg (originär digital)"
  ],
  "ablage": [
   "Papierordner (chronologisch/nach Belegart)",
   "Dokumentenmanagementsystem (DMS)",
   "Buchhaltungssoftware mit Belegarchiv",
-  "Upload an Steuerberater (z. B. Kanzlei-Portal)",
+  "Upload an die Steuerberatung (z. B. Kanzlei-Portal)",
   "Cloud-Speicher"
  ],
  "papier": [
@@ -2196,16 +2196,16 @@ export const GOBD: { belegeingang: string[]; belegart: string[]; ablage: string[
  "sicherungOrt": [
   "externer Datenträger (Festplatte/NAS) außerhalb der Betriebsräume",
   "Cloud-Backup",
-  "durch Softwareanbieter/Rechenzentrum",
-  "durch Steuerberater"
+  "beim Softwareanbieter bzw. im Rechenzentrum",
+  "bei der Steuerberatung"
  ],
  "eRechnung": "Bei E-Rechnungen muss der strukturierte Teil unveränderbar in seiner ursprünglichen Form aufbewahrt werden."
 };
 
 export const KASSEN_ARTEN: string[] = [
- "Computergestützte Kassensysteme / PC-Kassensysteme",
- "Tablet-/App-Kassensysteme",
- "Elektronische Registrierkassen",
+ "Computergestütztes Kassensystem (PC-Kasse)",
+ "Tablet-/App-Kassensystem",
+ "Elektronische Registrierkasse",
  "Taxameter",
  "Wegstreckenzähler"
 ];
@@ -2348,7 +2348,7 @@ export const SV: { personengruppen: Option[]; schulabschluss: Option[]; ausbildu
   },
   {
    "wert": "121",
-   "text": "121 – Auszubildende mit Entgelt bis zur Geringverdienergrenze (325 Euro)"
+   "text": "121 – Auszubildende mit Entgelt bis zur Geringverdienergrenze (325 €)"
   },
   {
    "wert": "123",
@@ -2634,7 +2634,7 @@ export const HACCP: Vorschlag[] = [
    "punkt": "Ausgabetemperatur Kaltspeisen und Salate",
    "grenzwert": "max. +7 °C",
    "haeufigkeit": "stichprobenartig",
-   "korrektur": "Bei Unterbrechung der Kühlkette > 30 Minuten Lebensmittel entsorgen; dokumentieren."
+   "korrektur": "Bei Unterbrechung der Kühlkette von mehr als 30 Minuten Lebensmittel entsorgen; dokumentieren."
   },
   "quelle": "Lebensmittelüberwachung Mainz"
  },
@@ -2652,7 +2652,7 @@ export const HACCP: Vorschlag[] = [
   "titel": "Wareneingangskontrolle",
   "werte": {
    "punkt": "Wareneingangskontrolle",
-   "grenzwert": "Temperatur bei Anlieferung: Tiefkühlware −18 °C (kurzfristig −15 °C); Fleisch/Fleischerzeugnisse +4 °C; Fisch +2 °C; Hackfleisch +2 °C; Geflügel/Wild +4 °C. Außerdem: keine Verunreinigungen, einwandfreie Verpackung, einwandfreier Geruch, gültiges MHD, Beschaffenheit des Lieferfahrzeugs, Kennzeichnung (Temperaturmessung und Sichtprüfung)",
+   "grenzwert": "Temperatur bei Anlieferung (Messung): Tiefkühlware −18 °C (kurzfristig −15 °C); Fleisch/Fleischerzeugnisse +4 °C; Fisch +2 °C; Hackfleisch +2 °C; Geflügel/Wild +4 °C. Sichtkontrolle: keine Verunreinigungen, einwandfreie Verpackung, einwandfreier Geruch, gültiges MHD, Beschaffenheit des Lieferfahrzeugs, Kennzeichnung",
    "haeufigkeit": "stichprobenartig bei jeder Lieferung; Dokumentation z. B. durch Vermerk auf Lieferschein oder Rechnung",
    "korrektur": "Zurückweisung der Ware; Mängel und Maßnahme dokumentieren (Datum, Lieferung, Mangel, Korrekturmaßnahme, Handzeichen)."
   },
@@ -2662,7 +2662,7 @@ export const HACCP: Vorschlag[] = [
   "titel": "Frittierfett – polare Anteile",
   "werte": {
    "punkt": "Frittierfett – polare Anteile",
-   "grenzwert": "24 % polare Anteile = Grenze der Genusstauglichkeit → Fett wechseln; Frittiertemperatur mind. +160 °C, max. +175 °C",
+   "grenzwert": "24 % polare Anteile (Grenze der Genusstauglichkeit): Fett wechseln; Frittiertemperatur mind. +160 °C, max. +175 °C",
    "haeufigkeit": "nach Durchsatz; Wechselzeitpunkt über Eigenkontrollen ermitteln; Temperaturkontrollen und Fettwechsel dokumentieren",
    "korrektur": "Fett wechseln bei Erreichen des Grenzwerts oder Verderbsmerkmalen (stechender, kratziger Geruch/Geschmack, bläulicher Rauch, verstärkte Schaumbildung); nach Gebrauch filtrieren, in Ruhephasen abdecken; Fritteuse entleeren und reinigen; Altfett in verschließbaren Behältern bis zur Abholung durch Fachfirma lagern."
   },
@@ -2683,7 +2683,7 @@ export const HACCP: Vorschlag[] = [
   "werte": {
    "punkt": "Schädlingsmonitoring",
    "grenzwert": "kein Befall (Sichtkontrolle)",
-   "haeufigkeit": "regelmäßige vorbeugende optische Kontrollen, mindestens einmal pro Quartal, dokumentiert",
+   "haeufigkeit": "regelmäßige vorbeugende Sichtkontrollen, mindestens einmal pro Quartal, dokumentiert",
    "korrektur": "Bekämpfung (ggf. Fachfirma); Datum, Bereich, Feststellung, Art der Bekämpfung, Ausführender dokumentieren."
   },
   "quelle": "Lebensmittelüberwachung Mainz"
@@ -2763,11 +2763,11 @@ export const LOSE_WARE: { formen: string[]; anforderung: string; rechtsgrundlage
 export const IFSG: { inhalte: string[]; personen: string[]; lebensmittel: string[]; symptome: string[] } = {
  "inhalte": [
   "Tätigkeitsverbote und Beschäftigungsverbote nach § 42 Abs. 1 (Krankheiten, Symptome, Ausscheider)",
-  "betroffene Lebensmittel nach § 42 Abs. 2 und Tätigkeit in Küchen von Gaststätten und Gemeinschaftsverpflegung",
+  "Betroffene Lebensmittel nach § 42 Abs. 2 und Tätigkeit in Küchen von Gaststätten und Gemeinschaftsverpflegung",
   "Pflicht, Hinderungsgründe nach Aufnahme der Tätigkeit dem Arbeitgeber unverzüglich mitzuteilen (§ 43 Abs. 2)",
   "Pflicht des Arbeitgebers zur Belehrung nach Aufnahme der Tätigkeit und danach alle zwei Jahre, mit Dokumentation (§ 43 Abs. 4)",
   "Aufbewahrungs- und Vorlagepflicht für Bescheinigung und letzte Dokumentation (§ 43 Abs. 5)",
-  "bei Krankheitszeichen ärztlichen Rat einholen und mitteilen, dass man mit Lebensmitteln arbeitet (Merkblatt Gesundheitsamt)"
+  "Bei Krankheitszeichen ärztlichen Rat einholen und mitteilen, dass man mit Lebensmitteln arbeitet"
  ],
  "personen": [
   "Personen, die an Typhus abdominalis, Paratyphus, Cholera, Shigellenruhr, Salmonellose, einer anderen infektiösen Gastroenteritis oder Virushepatitis A oder E erkrankt oder dessen verdächtig sind",
@@ -2800,7 +2800,7 @@ export const HYGIENE: Vorschlag[] = [
   "titel": "Händewaschen",
   "werte": {
    "was": "Händewaschen",
-   "wann": "Arbeitsbeginn, nach Pausen/Essen, nach Toilettenbesuch, bei sichtbarer Verschmutzung",
+   "wann": "vor Arbeitsbeginn, nach Pausen und dem Essen, nach dem Toilettenbesuch, bei sichtbarer Verschmutzung",
    "womit": "Flüssigseife aus Spender (keine Stückseife), Einmalhandtücher",
    "wie": "Hände gründlich waschen, abspülen und sorgfältig abtrocknen",
    "wer": "alle Beschäftigten"
@@ -2826,19 +2826,19 @@ export const HYGIENE: Vorschlag[] = [
    "was": "Einmalhandschuhe (Infektionsschutz)",
    "wann": "bei möglichem Kontakt mit Blut, Wundsekret oder verletzter Haut; bei verletzenden Tätigkeiten",
    "womit": "allergenarme Einmalhandschuhe",
-   "wie": "für jeden Kunden neue Handschuhe; bei Beschädigung sofort wechseln; danach Händedesinfektion",
+   "wie": "für jede Kundin und jeden Kunden neue Handschuhe; bei Beschädigung sofort wechseln; danach Händedesinfektion",
    "wer": "behandelnde Person"
   },
   "quelle": "Rahmenhygieneplan"
  },
  {
   "gruppe": "Alle Beauty-Betriebe",
-  "titel": "Hautdesinfektion beim Kunden",
+  "titel": "Hautdesinfektion bei Kundin/Kunde",
   "werte": {
-   "was": "Hautdesinfektion beim Kunden",
+   "was": "Hautdesinfektion bei Kundin/Kunde",
    "wann": "vor hautverletzenden Eingriffen",
    "womit": "VAH-gelistetes, viruswirksames Hautdesinfektionsmittel (Originalgebinde, nicht umfüllen)",
-   "wie": "auf trockene Haut sprühen oder mit sterilem Tupfer auftragen; Einwirkzeit nach Herstellerangabe einhalten (Rahmenhygieneplan: > 1 Minute); nicht ins Gesicht sprühen",
+   "wie": "auf trockene Haut sprühen oder mit sterilem Tupfer auftragen; Einwirkzeit nach Herstellerangabe einhalten, mindestens 1 Minute; nicht ins Gesicht sprühen",
    "wer": "behandelnde Person"
   },
   "quelle": "Rahmenhygieneplan"
@@ -2848,7 +2848,7 @@ export const HYGIENE: Vorschlag[] = [
   "titel": "Instrumente ohne Verletzungsrisiko (Kämme, Bürsten, Wickler, Scheren, Rasierpinsel)",
   "werte": {
    "was": "Instrumente ohne Verletzungsrisiko (Kämme, Bürsten, Wickler, Scheren, Rasierpinsel)",
-   "wann": "nach Behandlung bei Bedarf und am Arbeitstagsende; bei Kontakt mit Blut, Sekreten oder unklaren Hautveränderungen sofort",
+   "wann": "nach der Behandlung bei Bedarf und bei Arbeitsende; bei Kontakt mit Blut, Sekreten oder unklaren Hautveränderungen sofort",
    "womit": "Wasser und fettlösender Reiniger; bei Kontamination VAH-gelistetes Instrumentendesinfektionsmittel nach Herstellerangabe",
    "wie": "Haare/Hautschuppen entfernen, nass reinigen, trocknen; bei Blut/Sekret zuerst Tauchdesinfektion (Einwirkzeit abwarten), dann reinigen",
    "wer": "Beschäftigte"
@@ -2862,7 +2862,7 @@ export const HYGIENE: Vorschlag[] = [
    "was": "Instrumente mit Verletzungsrisiko (Rasiermesser, Klingen, Scherköpfe, Nagelhautschere/-zange, Pinzetten, Hautraspeln, Maniküre-/Pediküreinstrumente)",
    "wann": "nach jeder Kundin / jedem Kunden",
    "womit": "vorzugsweise Einwegklingen; sonst VAH-gelistetes, viruswirksames Instrumentendesinfektionsmittel nach Herstellerangabe (Bayern: mind. begrenzt viruzid)",
-   "wie": "Einwegartikel nach einmaliger Verwendung entsorgen; Mehrweginstrumente zerlegt vollständig einlegen (Einwirkzeit ab letztem eingelegten Teil), abspülen, reinigen, trocknen, trocken und geschützt lagern; Lösung bei sichtbarer Verschmutzung sofort, sonst täglich wechseln",
+   "wie": "Einwegartikel nach einmaliger Verwendung entsorgen; Mehrweginstrumente zerlegt und vollständig in die Lösung einlegen (Einwirkzeit ab dem zuletzt eingelegten Teil), abspülen, reinigen, trocknen und geschützt lagern; Lösung bei sichtbarer Verschmutzung sofort, sonst täglich wechseln",
    "wer": "Beschäftigte"
   },
   "quelle": "BGW"
@@ -2897,7 +2897,7 @@ export const HYGIENE: Vorschlag[] = [
   "werte": {
    "was": "Behandlungsliege / Behandlungsstuhl / Kopfstützen",
    "wann": "nach jeder Kundin / jedem Kunden",
-   "womit": "Reinigungsmittel, frische Einmal- oder Stoffunterlage; bei Kunden mit Hautinfektion bzw. Kontamination VAH-gelistetes Flächendesinfektionsmittel",
+   "womit": "Reinigungsmittel, frische Einmal- oder Stoffunterlage; bei Kundin/Kunde mit Hautinfektion bzw. Kontamination VAH-gelistetes Flächendesinfektionsmittel",
    "wie": "Unterlage wechseln, Flächen abwischen; bei Kontamination wischdesinfizieren",
    "wer": "Beschäftigte"
   },
@@ -2934,7 +2934,7 @@ export const HYGIENE: Vorschlag[] = [
    "was": "Wäsche: Handtücher, Kundenumhänge, Abdecktücher, Arbeitskleidung",
    "wann": "nach jeder Kundin / jedem Kunden",
    "womit": "Vollwaschmittel bzw. desinfizierendes Waschverfahren",
-   "wie": "in Wäschebeutel/-behälter sammeln, getrennt von Reinigungstüchern; bei mindestens 60 °C waschen (bewährt: 60 °C plus Maschinentrocknung); Umhänge nur mit Papierhalskrause; bei Blut-/Sekretverschmutzung bei 60 °C waschen oder entsorgen",
+   "wie": "in Wäschebeutel/-behälter sammeln, getrennt von Reinigungstüchern; bei mindestens 60 °C waschen, danach möglichst im Trockner trocknen; Umhänge nur mit Papierhalskrause verwenden; mit Blut oder Sekret verschmutzte Wäsche bei mindestens 60 °C waschen oder entsorgen",
    "wer": "Beschäftigte"
   },
   "quelle": "BGW"
@@ -2969,20 +2969,20 @@ export const HYGIENE: Vorschlag[] = [
   "werte": {
    "was": "Spitze, scharfe, zerbrechliche Gegenstände (Klingen, Lanzetten, Kanülen)",
    "wann": "unmittelbar nach Gebrauch",
-   "womit": "stich-, bruch- und durchstichfester, verschließbarer Behälter",
-   "wie": "direkt einwerfen, nicht zurückstecken; Behälter fest verschließen und über den Hausmüll entsorgen",
+   "womit": "stich- und bruchfester, verschließbarer Behälter",
+   "wie": "direkt einwerfen, Schutzkappe nicht wieder aufsetzen; Behälter fest verschließen und über den Hausmüll entsorgen",
    "wer": "behandelnde Person"
   },
   "quelle": "gesetze-bayern.de"
  },
  {
   "gruppe": "Alle Beauty-Betriebe",
-  "titel": "Umgang mit Blut – Verletzung des Kunden",
+  "titel": "Umgang mit Blut – Verletzung von Kundin/Kunde",
   "werte": {
-   "was": "Umgang mit Blut – Verletzung des Kunden",
+   "was": "Umgang mit Blut – Verletzung von Kundin/Kunde",
    "wann": "bei unbeabsichtigter Verletzung",
    "womit": "Einmalhandschuhe, steriler Tupfer, zugelassenes Wund-/Hautantiseptikum, Pflaster",
-   "wie": "Blutung nicht mit ungeschützten Händen berühren; mit sterilem Tupfer und leichtem Druck stillen, Wunde desinfizieren, Pflaster; bei größeren Wunden Arzt; kontaminierte Flächen und Instrumente sofort desinfizieren",
+   "wie": "Blutung nicht mit ungeschützten Händen berühren; mit sterilem Tupfer und leichtem Druck stillen, Wunde desinfizieren und mit Pflaster versorgen; größere Wunden ärztlich versorgen lassen; kontaminierte Flächen und Instrumente sofort desinfizieren",
    "wer": "behandelnde Person"
   },
   "quelle": "Rahmenhygieneplan"
@@ -2994,7 +2994,7 @@ export const HYGIENE: Vorschlag[] = [
    "was": "Umgang mit Blut – Stich-/Schnittverletzung der beschäftigten Person",
    "wann": "sofort nach Verletzung",
    "womit": "Hautantiseptikum (VAH-gelistet), Verbandmaterial, Verbandbuch",
-   "wie": "Blutfluss fördern, Wunde mind. 1 Minute desinfizieren, abdecken; Infektionsstatus des Kunden erfragen (Hepatitis, HIV); unverzüglich Hausarzt bzw. Durchgangsarzt (ggf. Postexpositionsprophylaxe); Unfall im Verbandbuch dokumentieren",
+   "wie": "Blutfluss fördern, Wunde mind. 1 Minute desinfizieren, abdecken; Infektionsstatus von Kundin/Kunde erfragen (Hepatitis, HIV); unverzüglich Hausarzt bzw. Durchgangsarzt (ggf. Postexpositionsprophylaxe); Unfall im Verbandbuch dokumentieren",
    "wer": "betroffene Person / Arbeitgeber"
   },
   "quelle": "Rahmenhygieneplan"
@@ -3006,9 +3006,23 @@ export const HYGIENE: Vorschlag[] = [
    "was": "Hygieneplan pflegen und Personal unterweisen",
    "wann": "jährlich überprüfen und aktualisieren; Unterweisung mind. jährlich",
    "womit": "schriftlicher bzw. elektronischer Hygieneplan, Unterweisungsnachweis",
-   "wie": "Plan jederzeit einsehbar halten; Belehrung der Mitarbeitenden schriftlich dokumentieren",
+   "wie": "Plan jederzeit einsehbar halten; Unterweisung der Beschäftigten schriftlich dokumentieren",
    "wer": "Inhaber/in"
   },
   "quelle": "Rahmenhygieneplan"
  }
 ];
+
+export const FRUEHERE_TEXTE: Record<string, string> = {
+ "Papierbeleg, wird in Papier abgelegt": "originär Papier, Ablage in Papier (Muster 4.1)",
+ "Papierbeleg, wird gescannt (ersetzendes Scannen)": "originär Papier, wird gescannt (ersetzendes Scannen, Muster 4.2)",
+ "elektronischer Beleg (originär digital)": "originär digital (Muster 4.3)",
+ "beim Softwareanbieter bzw. im Rechenzentrum": "durch Softwareanbieter/Rechenzentrum",
+ "bei der Steuerberatung": "durch Steuerberater",
+ "Upload an die Steuerberatung (z. B. Kanzlei-Portal)": "Upload an Steuerberater (z. B. Kanzlei-Portal)",
+ "Betroffene Lebensmittel nach § 42 Abs. 2 und Tätigkeit in Küchen von Gaststätten und Gemeinschaftsverpflegung": "betroffene Lebensmittel nach § 42 Abs. 2 und Tätigkeit in Küchen von Gaststätten und Gemeinschaftsverpflegung",
+ "Bei Krankheitszeichen ärztlichen Rat einholen und mitteilen, dass man mit Lebensmitteln arbeitet": "bei Krankheitszeichen ärztlichen Rat einholen und mitteilen, dass man mit Lebensmitteln arbeitet (Merkblatt Gesundheitsamt)",
+ "Computergestütztes Kassensystem (PC-Kasse)": "Computergestützte Kassensysteme / PC-Kassensysteme",
+ "Tablet-/App-Kassensystem": "Tablet-/App-Kassensysteme",
+ "Elektronische Registrierkasse": "Elektronische Registrierkassen"
+};

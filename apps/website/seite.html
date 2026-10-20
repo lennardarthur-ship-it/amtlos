@@ -1,6 +1,7 @@
 <title>Amtlos – Pflichten, Rechnungen & E-Rechnung für kleine Betriebe</title>
-<meta name="description" content="Für Selbstständige und kleine Betriebe: Amtlos zeigt, welche Pflichten gelten, und erstellt Rechnungen, E-Rechnungen und Unterlagen wie Hygieneplan oder Gefährdungsbeurteilung. Auf dem iPhone, ohne Konto.">
-<meta name="theme-color" content="#136f5b">
+<meta name="description" content="Welche Pflichten gelten für deinen Betrieb? Amtlos zeigt es mit Termin und Rechtsgrundlage und erstellt Rechnungen, E-Rechnungen und Vorlagen. iPhone, ohne Konto.">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0a110e" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preload" href="schriften/onest-400Regular.woff2" as="font" type="font/woff2" crossorigin>
@@ -13,10 +14,10 @@
 <meta property="og:image" content="__OG_BILD__">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Amtlos: Pflichten-Tab der App mit Terminen und „Jetzt dran“">
+<meta property="og:image:alt" content="Amtlos: Pflichten-Tab der App mit den Pflichten der nächsten zwei Wochen, Monatsübersicht und „Jetzt dran“">
 <meta name="twitter:card" content="summary_large_image">
 __KOPF_EXTRA__
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Amtlos","operatingSystem":"iOS","applicationCategory":"BusinessApplication","inLanguage":"de","description":"Pflichten-Check, Rechnungen mit E-Rechnung und über 30 Vorlagen für Selbstständige und kleine Betriebe in Deutschland. Daten verschlüsselt auf dem iPhone, ohne Konto."}</script>
+<script type="application/ld+json">__JSON_LD__</script>
 <style>
 /* Onest (OFL 1.1) – dieselbe Schrift wie die App (E-139) */
 @font-face { font-family: "Onest"; font-style: normal; font-weight: 400; font-display: swap; src: url(schriften/onest-400Regular.woff2) format("woff2"); }
@@ -28,7 +29,8 @@ __KOPF_EXTRA__
   --blatt: #f3f6f4;
   --tinte: #0d1f18;
   --tinte-2: #56675f;
-  --tinte-3: #67776f;
+  --tinte-3: #5d6d65;
+  --chip-rand: #78887f;
   --linie: #dfe5e1;
   --linie-leise: #ebefec;
   --amt: #0a7d55;
@@ -41,13 +43,13 @@ __KOPF_EXTRA__
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --papier: #0a110e; --blatt: #141d19; --tinte: #eef3f0; --tinte-2: #a4b3ac; --tinte-3: #8a9a92;
+    --papier: #0a110e; --blatt: #141d19; --tinte: #eef3f0; --tinte-2: #a4b3ac; --tinte-3: #8a9a92; --chip-rand: #5b6b63;
     --linie: #25322c; --linie-leise: #1b2621; --amt: #3fd49a; --amt-tief: #a2f1cf; --amt-hauch: #123629; --amt-text: #03140d;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --papier: #0a110e; --blatt: #141d19; --tinte: #eef3f0; --tinte-2: #a4b3ac; --tinte-3: #8a9a92;
+  --papier: #0a110e; --blatt: #141d19; --tinte: #eef3f0; --tinte-2: #a4b3ac; --tinte-3: #8a9a92; --chip-rand: #5b6b63;
   --linie: #25322c; --linie-leise: #1b2621; --amt: #3fd49a; --amt-tief: #a2f1cf; --amt-hauch: #123629; --amt-text: #03140d;
   color-scheme: dark;
 }
@@ -55,7 +57,9 @@ __KOPF_EXTRA__
 body { background: var(--papier); color: var(--tinte); font: 400 1.0625rem/1.55 var(--sans); padding-inline: 1.25rem; }
 .breite { max-width: 72rem; margin-inline: auto; }
 a { color: var(--amt); }
-a:focus-visible, button:focus-visible { outline: 3px solid var(--amt); outline-offset: 3px; border-radius: 4px; }
+.springen { position: absolute; left: 1rem; top: -4rem; z-index: 10; background: var(--papier); color: var(--amt); padding: .7rem 1rem; border-radius: .5rem; font-weight: 600; }
+.springen:focus { top: 1rem; }
+a:focus-visible, button:focus-visible, .leiste:focus-visible { outline: 3px solid var(--amt); outline-offset: 3px; border-radius: 4px; }
 h1, h2, h3 { font-family: var(--serif); font-weight: 800; text-wrap: balance; margin: 0; letter-spacing: -0.03em; }
 p { margin: 0; }
 .leise { color: var(--tinte-2); }
@@ -91,14 +95,14 @@ p { margin: 0; }
 .status small { font-weight: 400; font-size: .875rem; color: var(--tinte-2); }
 
 /* Check-Blatt */
-.check { background: var(--blatt); border: 1px solid var(--linie); border-radius: .75rem; box-shadow: 0 1.5rem 3rem -1.8rem rgba(23, 35, 46, .35); overflow: hidden; }
+.check { background: var(--blatt); border: 1px solid var(--linie); border-radius: .75rem; box-shadow: 0 1.5rem 3rem -1.8rem rgba(13, 31, 24, .35); overflow: hidden; }
 .check-kopf { display: flex; justify-content: space-between; gap: 1rem; padding: .7rem 1.1rem; background: var(--amt-hauch); font-size: .8125rem; color: var(--amt-tief); font-weight: 600; flex-wrap: wrap; }
 .check-inhalt { padding: 1.25rem 1.25rem 1.4rem; display: grid; gap: 1.1rem; }
 .frage { display: grid; gap: .5rem; }
 .frage-titel { font-weight: 600; font-size: .9375rem; }
 .chips { display: flex; flex-wrap: wrap; gap: .45rem; }
-.chip { font: 600 .9375rem/1 var(--sans); padding: .6rem .85rem; border-radius: 999px; border: 1px solid var(--linie); background: var(--blatt); color: var(--tinte); cursor: pointer; min-height: 2.75rem; }
-.chip[aria-checked="true"] { background: var(--tinte); border-color: var(--tinte); color: var(--papier); }
+.chip { font: 600 .9375rem/1 var(--sans); padding: .6rem .85rem; border-radius: 999px; border: 1px solid var(--chip-rand); background: var(--papier); color: var(--tinte); cursor: pointer; min-height: 2.75rem; }
+.chip[aria-pressed="true"] { background: var(--tinte); border-color: var(--tinte); color: var(--papier); }
 .ergebnis { border-top: 1px solid var(--linie-leise); padding-top: 1.1rem; display: grid; gap: .9rem; }
 .ergebnis-zahl { display: flex; align-items: baseline; gap: .7rem; flex-wrap: wrap; }
 .ergebnis-zahl strong { font: 700 3.4rem/1 var(--serif); color: var(--amt); font-variant-numeric: tabular-nums; }
@@ -108,7 +112,7 @@ p { margin: 0; }
 .balken span.spur i { display: block; height: 100%; background: var(--amt); border-radius: 999px; transition: width .35s ease; }
 .beispiele { display: grid; gap: 0; border-top: 1px solid var(--linie-leise); }
 .beispiele div { display: grid; grid-template-columns: 6.2rem minmax(0, 1fr); gap: .8rem; padding: .55rem 0; border-bottom: 1px solid var(--linie-leise); font-size: .9375rem; }
-.beispiele span { hyphens: auto; overflow-wrap: anywhere; }
+.beispiele span { -webkit-hyphens: auto; hyphens: auto; overflow-wrap: break-word; }
 .beispiele em { font-style: normal; font-size: .8125rem; color: var(--tinte-3); font-variant-numeric: tabular-nums; }
 .fussnote { font-size: .78rem; color: var(--tinte-3); }
 
@@ -162,17 +166,18 @@ details[open] summary::before { transform: rotate(90deg); }
 details summary::-webkit-details-marker { display: none; }
 details p { margin-top: .6rem; color: var(--tinte-2); }
 
-.fuss { border-top: 1px solid var(--linie); padding-block: 2rem 3rem; display: flex; flex-wrap: wrap; gap: 1rem 2rem; justify-content: space-between; font-size: .875rem; color: var(--tinte-2); }
-.fuss nav { display: flex; gap: 1.25rem; flex-wrap: wrap; }
+.fuss { border-top: 1px solid var(--linie); padding-block: 2rem 3rem; display: flex; align-items: center; flex-wrap: wrap; gap: 1rem 2rem; justify-content: space-between; font-size: .875rem; color: var(--tinte-2); }
+.fuss nav { display: flex; gap: 0 1.25rem; flex-wrap: wrap; }
 .fuss nav a { display: inline-flex; align-items: center; min-height: 2.75rem; }
 .pro-marke { font-size: .75em; font-weight: 700; color: var(--amt-tief); background: var(--amt-hauch); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; vertical-align: .08em; }
 @media (prefers-reduced-motion: reduce) { .balken span.spur i { transition: none; } .leiste { scroll-snap-type: none; } details summary::before { transition: none; } }
 </style>
 <!-- /kopf -->
 
+<a class="springen" href="#inhalt">Zum Inhalt springen</a>
 <div class="breite">
   <header class="kopf">
-    <a class="marke" href="#start" aria-label="Amtlos – Startseite">
+    <a class="marke" href="./" aria-label="Amtlos – Startseite">
       <svg viewBox="0 0 1024 1024" aria-hidden="true"><rect width="1024" height="1024" rx="224" fill="#063b29"/>
   <path transform="translate(274.6 805.4) scale(0.8287 -0.8287)" d="M294 -8Q249 -8 206.0 1.0Q163 10 127.5 30.0Q92 50 69.5 84.0Q47 118 43 170H208Q213 152 226.5 139.0Q240 126 258.0 119.5Q276 113 295 113Q314 113 328.5 117.0Q343 121 352.0 129.5Q361 138 361 152Q361 164 356.0 171.0Q351 178 342.0 182.0Q333 186 321 188Q290 194 252.5 201.0Q215 208 179.5 219.0Q144 230 119 246Q87 267 71.5 295.0Q56 323 56 356Q56 390 71.5 418.0Q87 446 116 460Q89 477 76.0 505.5Q63 534 63 563Q63 609 84.5 638.5Q106 668 139.5 685.0Q173 702 213.0 709.0Q253 716 289 716Q348 716 398.0 700.0Q448 684 481.0 647.5Q514 611 519 551H356Q353 568 343.0 578.0Q333 588 319.0 592.5Q305 597 289 597Q273 597 259.0 593.5Q245 590 236.0 582.0Q227 574 227 560Q227 545 240.5 535.5Q254 526 271.0 522.0Q288 518 300 516Q326 511 352.0 506.0Q378 501 403.0 495.5Q428 490 451 480Q494 464 512.0 435.0Q530 406 530 368Q530 335 517.0 305.5Q504 276 482 260Q508 240 518.0 212.5Q528 185 528 158Q528 113 507.5 81.5Q487 50 453.5 30.0Q420 10 378.5 1.0Q337 -8 294 -8ZM358 304Q364 308 368.0 315.5Q372 323 374.5 331.0Q377 339 377 345Q377 366 359.0 375.0Q341 384 322 389Q299 395 275.0 401.0Q251 407 228 410Q219 404 214.5 393.0Q210 382 210 372Q210 361 214.5 352.5Q219 344 230.0 338.0Q241 332 257 327Q275 322 306.0 315.0Q337 308 358 304Z" fill="#7fe3b8"/></svg>
       Amtlos
@@ -180,11 +185,11 @@ details p { margin-top: .6rem; color: var(--tinte-2); }
     <span class="bald">Bald im App Store · für iPhone</span>
   </header>
 
-  <main id="start">
+  <main id="inhalt">
     <div class="einstieg">
       <div>
         <h1>Welche Pflichten gelten für deinen Betrieb?</h1>
-        <p class="unter">Für Selbstständige und kleine Betriebe in Deutschland: Amtlos zeigt dir, welche Pflichten gelten, und erstellt Rechnungen, E-Rechnungen und Unterlagen wie Hygieneplan oder Gefährdungsbeurteilung. Auf dem iPhone, ohne Konto.</p>
+        <p class="unter">Amtlos zeigt dir, welche Pflichten für deinen Betrieb gelten, und erstellt Rechnungen und Unterlagen dazu. Auf dem iPhone, ohne Konto.</p>
         <ul class="punkte">
           <li>Pflichten-Check mit Begründung, Rechtsgrundlage und Terminen</li>
           <li><span>Rechnungen fortlaufend nummeriert, mit GiroCode – als E-Rechnung (XRechnung) mit <span class="pro-marke">Pro</span></span></li>
@@ -201,14 +206,14 @@ details p { margin-top: .6rem; color: var(--tinte-2); }
         <div class="check-inhalt">
           <div class="frage">
             <span class="frage-titel" id="f-branche">Was machst du?</span>
-            <div class="chips" role="radiogroup" aria-labelledby="f-branche" id="branchen"></div>
+            <div class="chips" role="group" aria-labelledby="f-branche" id="branchen"></div>
           </div>
           <div class="frage">
             <span class="frage-titel" id="f-team">Arbeitet jemand für dich?</span>
-            <div class="chips" role="radiogroup" aria-labelledby="f-team" id="team"></div>
+            <div class="chips" role="group" aria-labelledby="f-team" id="team"></div>
           </div>
-          <div class="ergebnis" aria-live="polite">
-            <div class="ergebnis-zahl"><strong id="anzahl">41</strong><span id="satz">Pflichten gelten für dich.</span></div>
+          <div class="ergebnis">
+            <div class="ergebnis-zahl" aria-live="polite"><strong id="anzahl">41</strong><span id="satz">Pflichten gelten für dich.</span></div>
             <div class="balken" id="balken"></div>
             <div class="beispiele" id="beispiele"></div>
             <p class="fussnote" id="fussnote"></p>
@@ -222,16 +227,16 @@ details p { margin-top: .6rem; color: var(--tinte-2); }
         <div class="rand"><b>1</b>Die App</div>
         <div>
           <h2 id="s-app">So sieht Amtlos aus</h2>
-          <p class="einleitung">Echte Bildschirme aus der App, mit einem erfundenen Salon als Beispiel.</p>
+          <p class="einleitung">Echte Bildschirme aus der App, mit einem erfundenen Salon als Beispiel. Er hat mehr Angaben gemacht als der Kurz-Check oben, deshalb zeigt die App andere Zahlen.</p>
         </div>
       </div>
       <div class="leiste" tabindex="0" role="region" aria-label="Bildschirme der App">
-        <figure><img src="bilder/pflichten.jpg" width="464" height="1006" alt="Pflichten-Tab: 12 von 31 Pflichten erledigt, „Jetzt dran“ mit nächstem Termin und offene Fragen zum Klären" loading="lazy"><figcaption><b>Jetzt dran</b>Was als Nächstes fällig ist, mit Termin.</figcaption></figure>
-        <figure><img src="bilder/rechnung.jpg" width="464" height="1006" alt="Vorschau einer Rechnung im Briefformat mit Positionen, Umsatzsteuer und GiroCode" loading="lazy"><figcaption><b>Rechnung als Brief</b>DIN 5008, GiroCode, deine Hausfarbe.</figcaption></figure>
-        <figure><img src="bilder/vorlagen.jpg" width="464" height="1006" alt="Vorlagen: Suche, „Rechnung schreiben“, „Beleg erfassen“, zuletzt bearbeitet und Vorlagen nach Anlass" loading="lazy"><figcaption><b>Vorlagen nach Anlass</b>„Ich stelle jemanden ein“ statt Paragrafen.</figcaption></figure>
-        <figure><img src="bilder/pflicht.jpg" width="464" height="1006" alt="Pflicht „Gefährdungsbeurteilung erstellen“ mit Grund, Zuständigkeit, Rechtsgrundlage und Quellen" loading="lazy"><figcaption><b>Mit Grund und Quelle</b>Jede Pflicht erklärt, mit Gesetz und Link.</figcaption></figure>
-        <figure><img src="bilder/ablage.jpg" width="464" height="1006" alt="Meine Unterlagen: Summe offener Rechnungen, Suche, Filter und Liste der Unterlagen" loading="lazy"><figcaption><b>Offene Rechnungen</b>Summe auf einen Blick, Zahlung vermerken.</figcaption></figure>
-        <figure><img src="bilder/betrieb.jpg" width="464" height="1006" alt="Mein Betrieb mit Betriebsangaben, Steuer und Bank, Briefkopf und Pro-Status" loading="lazy"><figcaption><b>Dein Betrieb</b>Einmal eintragen, überall vorausgefüllt.</figcaption></figure>
+        <figure><img src="bilder/pflichten.jpg" width="464" height="1006" alt="Pflichten-Tab: „Für deinen Betrieb: 2 Dinge in den nächsten 2 Wochen“, 12 von 34 erledigt, Pflichten je Monat und „Jetzt dran“ mit zwei Terminen" loading="lazy"><figcaption><b>Jetzt dran</b>Was als Nächstes fällig ist, mit Termin.</figcaption></figure>
+        <figure><img src="bilder/rechnung.jpg" width="464" height="1006" alt="Vorschau einer Rechnung im Briefformat mit Positionen, Umsatzsteuer und GiroCode" loading="lazy"><figcaption><b>Rechnung als Brief</b>DIN 5008 und GiroCode – mit <span class="pro-marke">Pro</span> in deiner Hausfarbe.</figcaption></figure>
+        <figure><img src="bilder/vorlagen.jpg" width="464" height="1006" alt="Neu erstellen: Vorlage suchen und „Wofür brauchst du eine Unterlage?“ mit Anlässen wie „Ich stelle jemanden ein“, „Ich gründe oder eröffne“ und „Sicherheit am Arbeitsplatz“" loading="lazy"><figcaption><b>Vorlagen nach Anlass</b>„Ich stelle jemanden ein“ statt Paragrafen.</figcaption></figure>
+        <figure><img src="bilder/pflicht.jpg" width="464" height="1006" alt="Pflicht „Beitragsnachweis übermitteln“: warum sie für dich gilt, zuständige Stelle, Wichtigkeit, Rechtsgrundlage § 28f SGB IV und Quelle auf gesetze-im-internet.de" loading="lazy"><figcaption><b>Mit Grund und Quelle</b>Jede Pflicht erklärt, mit Gesetz und Link.</figcaption></figure>
+        <figure><img src="bilder/ablage.jpg" width="464" height="1006" alt="Unterlagen: 2 offene Rechnungen über 701,61 €, davon 1 überfällig, Suche, Filter und Liste der Unterlagen" loading="lazy"><figcaption><b>Offene Rechnungen</b>Summe auf einen Blick, Zahlung vermerken.</figcaption></figure>
+        <figure><img src="bilder/betrieb.jpg" width="464" height="1006" alt="Mein Betrieb: Salon Sonne, Amtlos Pro mit noch 3 von 5 kostenlosen Unterlagen diesen Monat, Angaben zum Betrieb, Steuer und Bank, Briefkopf" loading="lazy"><figcaption><b>Dein Betrieb</b>Einmal eintragen, überall vorausgefüllt.</figcaption></figure>
       </div>
       <p class="wischen" aria-hidden="true">Seitlich wischen für weitere Bildschirme →</p>
     </section>
@@ -257,26 +262,27 @@ details p { margin-top: .6rem; color: var(--tinte-2); }
               <li>Fortlaufende Nummer, Pflichtangaben werden vor dem Teilen geprüft</li>
               <li>Nach dem Teilen festgeschrieben, Korrektur per Stornorechnung</li>
               <li>GiroCode: Die Banking-App deiner Kunden füllt die Überweisung aus</li>
-              <li>E-Rechnung (XRechnung) für Firmenkunden, auch ins EU-Ausland <span class="pro-marke">Pro</span></li>
-              <li>Umsätze für die Umsatzsteuer-Voranmeldung nach Soll oder Ist</li>
+              <li>E-Rechnung (XRechnung) für Firmenkunden <span class="pro-marke">Pro</span></li>
+              <li>Bei überfälligen Rechnungen eine Zahlungserinnerung senden</li>
               <li>E-Rechnungen empfangen und Belege per Foto erfassen</li>
-              <li>Vorsteuer und Ausgaben für Voranmeldung und EÜR – mit <span class="pro-marke">Pro</span> per Tipp übernommen</li>
+              <li>Umsätze, Vorsteuer und Ausgaben für Voranmeldung und EÜR, nach Soll oder Ist – mit <span class="pro-marke">Pro</span> per Tipp übernommen</li>
               <li>Paket für die Steuerberatung mit Buchungsstapel im DATEV-Format <span class="pro-marke">Pro</span></li>
             </ul>
           </div>
         </div>
         <div class="blatt-zeile leistung">
-          <div class="rand">§ 5 ArbSchG<br>Art. 30 DSGVO<br>LMHV</div>
+          <div class="rand">§ 5 ArbSchG<br>Art. 30 DSGVO<br>LMHV, IfSG</div>
           <div>
             <h3>Unterlagen, die Prüfer erwarten</h3>
-            <p>Hygieneplan, Hautschutzplan, Allergenliste, Gefährdungsbeurteilung, Betriebsanweisung, Unterweisung, Nachweis der Arbeitsbedingungen, Verzeichnis der Verarbeitungstätigkeiten, Datenschutzerklärung, Verfahrensdokumentation. Mit Vorschlägen aus offiziellen Quellen, gesetzt wie ein ordentliches Amtsdokument.</p>
+            <p>Hygieneplan, Hautschutzplan, Allergenliste, Gefährdungsbeurteilung, Betriebsanweisung, Unterweisung, Nachweis der Arbeitsbedingungen, Verzeichnis der Verarbeitungstätigkeiten, Datenschutzerklärung, Verfahrensdokumentation. Mit Vorschlägen für deinen Betrieb, gesetzt wie ein ordentliches Amtsdokument.</p>
+            <p>Kommt eine Kontrolle, fasst die Kontrollmappe deine aktuellen Nachweise zu Arbeitsschutz, Hygiene, Datenschutz und Personal in einem PDF zusammen – mit Deckblatt und Inhaltsverzeichnis.</p>
           </div>
         </div>
         <div class="blatt-zeile leistung">
           <div class="rand">AES-256<br>ohne Konto</div>
           <div>
             <h3>Deine Daten bleiben bei dir</h3>
-            <p>Alles liegt verschlüsselt auf deinem iPhone. Es gibt kein Konto und keinen Amtlos-Server mit deinen Kunden- oder Mitarbeiterdaten. Sicherung als verschlüsselte Datei oder automatisch in deinem iCloud Drive <span class="pro-marke">Pro</span>, auf Wunsch mit Face ID gesperrt.</p>
+            <p>Alles liegt verschlüsselt auf deinem iPhone. Es gibt kein Konto und keinen Amtlos-Server mit deinen Kunden- oder Mitarbeiterdaten. Sicherung als verschlüsselte Datei oder automatisch in deinem iCloud Drive <span class="pro-marke">Pro</span>, auf Wunsch mit Face ID gesperrt. Kein Tracking.</p>
           </div>
         </div>
       </div>
@@ -339,10 +345,16 @@ details p { margin-top: .6rem; color: var(--tinte-2); }
         <div>
           <h2 id="s-fragen">Häufige Fragen</h2>
           <div style="margin-top:1.25rem">
+<!-- fragen -->
             <details><summary>Ersetzt Amtlos meine Steuerberatung?</summary><p>Nein. Amtlos zeigt, was gilt, und bereitet Unterlagen vor. Für Beratung im Einzelfall bleibt deine Steuerberaterin oder dein Steuerberater zuständig. Die Inhalte werden derzeit fachlich geprüft.</p></details>
-            <details><summary>Wo liegen meine Daten?</summary><p>Nur auf deinem iPhone, verschlüsselt. Amtlos hat kein Konto und keinen Server mit deinen Unterlagen. Eine Sicherung erstellst du selbst als verschlüsselte Datei oder automatisch in deinem iCloud Drive.</p></details>
+            <details><summary>Wo liegen meine Daten?</summary><p>Nur auf deinem iPhone, verschlüsselt. Amtlos hat kein Konto und keinen Server mit deinen Unterlagen. Eine Sicherung erstellst du selbst als verschlüsselte Datei oder automatisch in deinem iCloud Drive (<span class="pro-marke">Pro</span>).</p></details>
             <details><summary>Für wen ist Amtlos gedacht?</summary><p>Für Einzelunternehmen, Salons, Cafés, Handwerksbetriebe, Freelancer und kleine GmbHs in Deutschland – alle, die keine eigene Buchhaltungsabteilung haben.</p></details>
+            <details><summary>Was passiert, wenn ich mein iPhone verliere?</summary><p>Deine Daten liegen nur auf dem iPhone. Hast du eine Sicherung – als verschlüsselte Datei oder automatisch in deinem iCloud Drive (<span class="pro-marke">Pro</span>) –, holst du sie auf dem neuen iPhone mit deinem Passwort zurück. Ohne Sicherung sind die Daten weg, denn Amtlos hat keine Kopie.</p></details>
+            <details><summary>Muss ich schon E-Rechnungen schreiben?</summary><p>Empfangen können musst du sie seit 2025 – das geht in Amtlos kostenlos. Ausstellen müssen Unternehmen ab 2027 bei mehr als 800.000 € Vorjahresumsatz, ab 2028 alle übrigen. Ausnahmen gelten unter anderem für Kleinunternehmer und Kleinbetragsrechnungen bis 250 €. XRechnungen erstellt Amtlos mit <span class="pro-marke">Pro</span>.</p></details>
+            <details><summary>Ist Amtlos etwas für Kleinunternehmer?</summary><p>Ja. Der Pflichten-Check fragt nach der Kleinunternehmerregelung. Rechnungen stellt Amtlos dann ohne Umsatzsteuer und mit dem passenden Hinweis aus, Belege erfasst es ohne Vorsteuerabzug.</p></details>
+            <details><summary>Wie kündige ich Pro?</summary><p>In den Einstellungen deines Apple-Accounts unter Abonnements, spätestens 24 Stunden vor Ende des Zeitraums. Danach nutzt du Amtlos kostenlos weiter.</p></details>
             <details><summary>Gibt es Amtlos für Android oder im Browser?</summary><p>Zum Start gibt es Amtlos für das iPhone. Weitere Plattformen folgen.</p></details>
+<!-- /fragen -->
           </div>
         </div>
       </div>
@@ -351,7 +363,7 @@ details p { margin-top: .6rem; color: var(--tinte-2); }
 
   <footer class="fuss">
     <span>© 2026 Amtlos</span>
-    <nav aria-label="Rechtliches"><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a></nav>
+    <nav aria-label="Rechtliches"><a href="hilfe.html">Hilfe und Kontakt</a><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a></nav>
   </footer>
 </div>
 
@@ -360,24 +372,26 @@ const DATEN = __PROFILE__;
 const TEAM = [["0", "Nur ich"], ["3", "Ja, ein kleines Team"]];
 let wahl = { branche: "beauty_kosmetik", team: "3" };
 
+// Knöpfe nur einmal anlegen und danach nur markieren – sonst geht beim Tippen der Tastaturfokus verloren (WCAG 2.4.3)
 function chips(id, optionen, schluessel) {
   const el = document.getElementById(id);
-  el.innerHTML = "";
   for (const [wert, text] of optionen) {
     const b = document.createElement("button");
     b.type = "button";
     b.className = "chip";
-    b.setAttribute("role", "radio");
-    b.setAttribute("aria-checked", String(wahl[schluessel] === wert));
+    b.dataset.wert = wert;
     b.textContent = text;
     b.addEventListener("click", () => { wahl[schluessel] = wert; zeichnen(); });
     el.appendChild(b);
   }
 }
+function markieren(id, schluessel) {
+  for (const b of document.getElementById(id).children) b.setAttribute("aria-pressed", String(b.dataset.wert === wahl[schluessel]));
+}
 
 function zeichnen() {
-  chips("branchen", DATEN.branchen, "branche");
-  chips("team", TEAM, "team");
+  markieren("branchen", "branche");
+  markieren("team", "team");
   const p = DATEN.profile[`${wahl.branche}|${wahl.team}`];
   document.getElementById("anzahl").textContent = p.gilt;
   document.getElementById("satz").textContent = `Pflichten gelten für dich – ${p.unklar} weitere hängen von Details ab, die der Check in der App klärt.`;
@@ -387,5 +401,7 @@ function zeichnen() {
   const name = DATEN.branchen.find((b) => b[0] === wahl.branche)[1];
   document.getElementById("fussnote").textContent = `Beispiel: ${name}, Einzelunternehmen in Bayern, Start im November 2026${wahl.team === "3" ? ", drei Beschäftigte" : ""}. Aus dem Amtlos-Katalog, fachlich noch nicht abschließend geprüft.`;
 }
+chips("branchen", DATEN.branchen, "branche");
+chips("team", TEAM, "team");
 zeichnen();
 </script>

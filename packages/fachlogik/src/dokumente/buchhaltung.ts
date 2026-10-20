@@ -10,7 +10,7 @@ import { giroCodeSvg } from "../girocode.js";
 import { EUER_ZEILE_STEUERFREI, EUER_ZEILE_STEUERPFLICHTIG, KATEGORIEN } from "../belege.js";
 import { istKapitalgesellschaft } from "./betrieb.js";
 import { AUFBEWAHRUNG, EINHEITEN, EUER_AUSGABEN, EUER_EINNAHMEN, KASSEN_ARTEN, RECHNUNGS_HINWEISE, TSE_ARTEN } from "./bausteine.js";
-import { KOPF_LINIE, LINIE_MITTEL, ZELLE_LINIE, abschnitt, absatz, ankreuzen, anschrift, auswahl, brief, cent, datumDe, dokument, esc, euro, felder, ibanText, kennzahlen, nachsatz, uebertragung, ja, liste, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
+import { KOPF_LINIE, LINIE_MITTEL, ZELLE_LINIE, abschnitt, absatz, ankreuzen, anschrift, auswahl, brief, cent, datumDe, dokument, esc, euro, felder, ibanText, kennzahlen, nachsatz, uebertragung, ja, liste, neufassung, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
 import type { Betrieb, Daten, Eintrag, Option, Vorlage } from "./typen.js";
 
 /** ISO-Datum plus Tage als TT.MM.JJJJ. */
@@ -357,7 +357,7 @@ export const rechnung: Vorlage = {
           leer && !storno && !gutschrift
           ? `<div class="zahlung"><div class="text"><p>Bitte überweisen Sie den Rechnungsbetrag bis zum ${LINIE_MITTEL}${iban ? " auf das Konto" : "."}</p>${iban ? `<p>${empfaenger}<strong>IBAN ${esc(ibanText(iban))}</strong>${bicBank ? `<br>${bicBank}` : ""}<br>Verwendungszweck: Rechnung ${text(d, "nummer") ? esc(text(d, "nummer")) : LINIE_MITTEL}</p>` : ""}</div></div>`
           : "";
-    const anrede = text(d, "kunde_name") ? (storno ? `wir stornieren hiermit die unten genannte Rechnung und stellen den Betrag wie folgt gut.` : gutschrift ? `wir rechnen über die folgenden Leistungen ab und schreiben Ihnen den Betrag gut:` : `wie vereinbart berechnen wir Ihnen folgende Leistungen:`) : "";
+    const anrede = text(d, "kunde_name") ? (storno ? `wir stornieren hiermit die oben genannte Rechnung und schreiben Ihnen den Betrag wie folgt gut:` : gutschrift ? `wir rechnen über die folgenden Leistungen ab und schreiben Ihnen den Betrag gut:` : `wie vereinbart berechnen wir Ihnen folgende Leistungen:`) : "";
     const titel = `${rechnungsTitel(d)} ${text(d, "nummer")}`.trim();
     return brief({
       titel,
@@ -939,7 +939,7 @@ export const kassenmeldung: Vorlage = {
       ? k.map((x, i) => ({
           titel: `Aufzeichnungssystem ${i + 1}${text(x, "ausser_betrieb") ? " (außer Betrieb)" : ""}`,
           zeilen: [
-            ["Art", text(x, "art")],
+            ["Art", neufassung(text(x, "art"))],
             ["Hersteller / Modell", [text(x, "hersteller"), text(x, "modell")].filter(Boolean).join(", ")],
             ["Seriennummer", text(x, "seriennummer")],
             ["Software", text(x, "software") || null],

@@ -1,5 +1,5 @@
 import { Linking, Share, View } from "react-native";
-import { ANBIETER, LINKS, datenschutzAbschnitte } from "../rechtliches";
+import { ANBIETER, LINKS, datenschutzAbschnitte, hilfeZiel } from "../rechtliches";
 import { syncAngeboten } from "../konto/konfig";
 import { T as TEXT } from "../texte";
 import { Hinweis, Karte, T, Zeile } from "../ui/bausteine";
@@ -7,7 +7,11 @@ import { Unterseite, useNav } from "../ui/navigation";
 import { useFarben } from "../ui/thema";
 import { Inhalt } from "./gemeinsam";
 
-/** Impressum der App (§ 5 DDG) aus `rechtliches.ts` – fehlende Angaben stehen als „folgt“ da. */
+/**
+ * Impressum der App (§ 5 DDG) aus `rechtliches.ts` – fehlende Angaben stehen als „folgt“ da. Das ist nur im
+ * Entwicklungsstand erreichbar: `werkzeuge/store-check.mjs` meldet jede leere Pflichtangabe, bevor ein Build eingereicht
+ * wird (App-Review B1).
+ */
 export function ImpressumSeite() {
   const f = useFarben();
   const zeile = (titel: string, wert: string) => (
@@ -53,10 +57,11 @@ export function DatenschutzSeite() {
 /** Gruppe unter „Mein Betrieb“: Weiterempfehlen, Hilfe, Rechtliches. */
 export function UeberGruppe() {
   const nav = useNav();
+  const hilfe = hilfeZiel(LINKS.support, ANBIETER.email);
   const teilen = () => void Share.share({ message: TEXT.empfehlen_text(LINKS.appStore || LINKS.website) }).catch(() => undefined);
   const zeilen = [
     { titel: TEXT.empfehlen, symbol: "square.and.arrow.up", onPress: teilen },
-    ...(LINKS.support ? [{ titel: TEXT.hilfe_kontakt, symbol: "questionmark.circle", onPress: () => void Linking.openURL(LINKS.support) }] : []),
+    ...(hilfe ? [{ titel: TEXT.hilfe_kontakt, symbol: "questionmark.circle", onPress: () => void Linking.openURL(hilfe) }] : []),
     { titel: TEXT.datenschutz, symbol: "hand.raised", onPress: () => nav.oeffnen("datenschutz", () => <DatenschutzSeite />) },
     { titel: TEXT.impressum, symbol: "info.circle", onPress: () => nav.oeffnen("impressum", () => <ImpressumSeite />) },
     { titel: TEXT.nutzungsbedingungen, symbol: "doc.plaintext", onPress: () => void Linking.openURL(LINKS.nutzung) },

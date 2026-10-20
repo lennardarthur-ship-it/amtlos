@@ -7,7 +7,8 @@ import { useMeldung } from "../ui/meldung";
 import { useNav } from "../ui/navigation";
 import { BuehnenBlatt } from "./gemeinsam";
 import { HAARLINIE, RADIUS, useFarben } from "../ui/thema";
-import { angebote, kaufAktiv, kaufen, testmodus, wiederherstellen, type Angebot } from "../pro/kauf";
+import { angebote, kaufAktiv, kaufen, paywallVerfuegbar, testmodus, wiederherstellen, type Angebot } from "../pro/kauf";
+import { knopfText, preisZeile } from "../pro/bezahltext";
 import { FREI_JE_MONAT, PRO_VORTEILE, uebrig, type ProFunktion } from "../pro/regeln";
 import { useAmtlos } from "../zustand";
 import { syncAngeboten } from "../konto/konfig";
@@ -34,9 +35,10 @@ function VorteilKachel({ v }: { v: ProFunktion }) {
 
 
 /**
- * Bezahlschirm (E-132): warum Pro, was Pro bringt, Angebote aus dem Store. Ohne Store-Anbindung (Testpaket) lässt
- * sich Pro testweise einschalten. Pflichtangaben für Abos (Verlängerung, Kündigung, Nutzungsbedingungen, Datenschutz)
- * stehen unter dem Knopf.
+ * Bezahlschirm (E-132): warum Pro, was Pro bringt, Angebote aus dem Store. Ohne Store-Anbindung lässt sich Pro nur im
+ * Testmodus (Entwicklung, Testpaket, `EXPO_PUBLIC_PRO_TESTMODUS=1`) testweise einschalten; ein Store-Build ohne Kauf
+ * zeigt keinen Kaufknopf (App-Review B2). Der Preis nach dem Testzeitraum steht gleich groß direkt über dem Knopf (R3).
+ * Pflichtangaben für Abos (Verlängerung, Kündigung, Nutzungsbedingungen, Datenschutz) stehen unter dem Knopf.
  */
 export function ProSeite({ grund }: { grund?: ProFunktion }) {
   const z = useAmtlos();
@@ -102,6 +104,7 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
     }
   };
   const gewaehlt = liste?.find((a) => a.id === wahl);
+  const knopf = knopfText({ kaufAktiv, testmodus, gewaehlt });
   const reihe = NACH_NUTZEN.filter((x) => VORTEILE.includes(x));
   const sortiert = grund ? [grund, ...reihe.filter((x) => x !== grund)] : reihe;
   const haupt = sortiert.slice(0, 4);
@@ -110,11 +113,22 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
   return (
     <BuehnenBlatt
       fuss={
-        <Fuss ueber={gewaehlt?.test ? <T v="caption" leise stil={{ textAlign: "center" }}>{TEXT.pro_danach(gewaehlt.preis, gewaehlt.zeitraum)}</T> : null}>
+        <Fuss
+          ueber={
+            !z.pro && kaufAktiv && gewaehlt ? (
+              <View accessible accessibilityRole="text" style={{ alignItems: "center" }}>
+                <T fett stil={{ textAlign: "center" }}>{preisZeile(gewaehlt)}</T>
+                <T v="caption" leise stil={{ textAlign: "center" }}>{TEXT.pro_kuendbar}</T>
+              </View>
+            ) : null
+          }
+        >
           {z.pro ? (
             <Knopf ton text={TEXT.pro_aktiv} symbol="checkmark" onPress={nav.zurueck} stil={{ flex: 1 }} />
+          ) : knopf ? (
+            <Knopf text={knopf} laedt={laedt} deaktiviert={kaufAktiv ? !wahl : !testmodus} onPress={() => void los()} stil={{ flex: 1 }} />
           ) : (
-            <Knopf text={!kaufAktiv ? TEXT.pro_test_einschalten : gewaehlt?.test ? TEXT.pro_test_starten : TEXT.pro_abonnieren} laedt={laedt} deaktiviert={kaufAktiv ? !wahl : !testmodus} onPress={() => void los()} stil={{ flex: 1 }} />
+            <Knopf ton text={TEXT.schliessen} onPress={nav.zurueck} stil={{ flex: 1 }} />
           )}
         </Fuss>
       }
@@ -195,12 +209,16 @@ export function useProSperre() {
   };
 }
 
-/** Zeile unter „Mein Betrieb“: Pro-Status, öffnet den Bezahlschirm. */
+/**
+ * Zeile unter „Mein Betrieb“: Pro-Status, öffnet den Bezahlschirm. Ohne Kauf und ohne Testmodus (Store-Build ohne
+ * RevenueCat-Schlüssel) entfällt der Einstieg ganz (App-Review B2).
+ */
 export function ProZeile() {
   const z = useAmtlos();
   const nav = useNav();
   const f = useFarben();
   const rest = uebrig(z.stand.unterlagen, new Date());
+  if (!paywallVerfuegbar && !z.pro) return null;
   return (
     <Pressable accessibilityRole="button" onPress={() => nav.oeffnen("pro", () => <ProSeite />, true)} style={({ pressed }) => ({ opacity: pressed ? 0.75 : 1 })}>
       {/* ruhige Karte wie die übrigen – die lauteste Fläche des Bildschirms soll nicht die Werbung sein */}

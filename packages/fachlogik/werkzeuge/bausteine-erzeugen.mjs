@@ -71,7 +71,7 @@ const liste = (x) => (Array.isArray(x) ? x.join(", ") : (x ?? ""));
  * entfernt (Art. 6 Abs. 1 lit. b/c steht bereits da); Drittland aus dem Empfängertext übernommen.
  */
 const ohne26 = (t) => t.replace(/[;,]\s*(ergänzend )?Art\. 88 DSGVO i\. V\. m\. § 26( Abs\. 1)? BDSG/g, "");
-const drittland = (v) => (/USA/.test(liste(v.empfaenger)) ? "möglich: USA (Plattformbetreiber); Grundlage laut Datenschutzhinweisen des Anbieters" : "keine Übermittlung in Drittländer");
+const drittland = (v) => (/USA/.test(liste(v.empfaenger)) ? "möglich: USA (Plattformbetreiber); Grundlage der Übermittlung: siehe Datenschutzhinweise des Anbieters" : "keine Übermittlung in Drittländer");
 const vvt = ds.vvt_verarbeitungen.map((v) => ({ titel: v.bezeichnung, werte: { bezeichnung: v.bezeichnung, zweck: v.zweck, rechtsgrundlage: ohne26(v.rechtsgrundlage), betroffene: liste(v.betroffene), datenarten: liste(v.datenarten), empfaenger: liste(v.empfaenger), loeschfrist: v.loeschfrist, drittland: drittland(v) }, quelle: beleg({ quelle: v.quelle }) }));
 const SCHUTZ = { pseudonymisierung_verschluesselung: "Verschlüsselung", vertraulichkeit: "Vertraulichkeit", integritaet: "Integrität", verfuegbarkeit_belastbarkeit: "Verfügbarkeit", wiederherstellung: "Wiederherstellung", ueberpruefung: "Überprüfung" };
 const tom = Object.entries(SCHUTZ).flatMap(([k, g]) => (ds.tom[k] ?? []).map((m) => ({ gruppe: g, titel: m.massnahme, werte: { schutzziel: k, massnahme: m.massnahme }, quelle: beleg({ quelle: m.quelle }) })));
@@ -153,31 +153,41 @@ const SETZE = [
   ["HACCP", "Heißhalten / Ausgabetemperatur warmer Speisen", "werte.grenzwert", "mindestens +60 °C an allen Stellen bzw. im Kern; teils werden mind. +65 °C für max. 3 Stunden angegeben"],
   ["HACCP", "Heißhalten / Ausgabetemperatur warmer Speisen", "werte.haeufigkeit", "stichprobenartig bei Ausgabe"],
   ["HACCP", "Heißhalten / Ausgabetemperatur warmer Speisen", "quelle", "+60 °C: BfR 2020, LAVES Niedersachsen, Lebensmittelüberwachung Mainz; +65 °C (älterer Wert): BfR 2008, BgVV, DIN-Normen, LAVES-Merkblatt B. cereus"],
-  ["HACCP", "Ausgabetemperatur Kaltspeisen und Salate", "werte.korrektur", "Bei Unterbrechung der Kühlkette > 30 Minuten Lebensmittel entsorgen; dokumentieren."],
+  ["HACCP", "Ausgabetemperatur Kaltspeisen und Salate", "werte.korrektur", "Bei Unterbrechung der Kühlkette von mehr als 30 Minuten Lebensmittel entsorgen; dokumentieren."],
   ["HACCP", "Abkühlen heißer Speisen", "werte.grenzwert", "Bereich von +65 °C auf +10 °C innerhalb von 3 Stunden durchschreiten"],
   ["HACCP", "Abkühlen heißer Speisen", "werte.haeufigkeit", "bei jedem Abkühlvorgang"],
   ["HACCP", "Abkühlen heißer Speisen", "quelle", "oberallgaeu.org (BgVV-Temperaturempfehlungen)"],
-  ["HACCP", "Wareneingangskontrolle", "werte.grenzwert", "Temperatur bei Anlieferung: Tiefkühlware −18 °C (kurzfristig −15 °C); Fleisch/Fleischerzeugnisse +4 °C; Fisch +2 °C; Hackfleisch +2 °C; Geflügel/Wild +4 °C. Außerdem: keine Verunreinigungen, einwandfreie Verpackung, einwandfreier Geruch, gültiges MHD, Beschaffenheit des Lieferfahrzeugs, Kennzeichnung (Temperaturmessung und Sichtprüfung)"],
+  ["HACCP", "Wareneingangskontrolle", "werte.grenzwert", "Temperatur bei Anlieferung (Messung): Tiefkühlware −18 °C (kurzfristig −15 °C); Fleisch/Fleischerzeugnisse +4 °C; Fisch +2 °C; Hackfleisch +2 °C; Geflügel/Wild +4 °C. Sichtkontrolle: keine Verunreinigungen, einwandfreie Verpackung, einwandfreier Geruch, gültiges MHD, Beschaffenheit des Lieferfahrzeugs, Kennzeichnung"],
   ["HACCP", "Wareneingangskontrolle", "quelle", "Lebensmittelüberwachung Mainz (Formular Wareneingangskontrolle, Merkblatt)"],
-  ["HACCP", "Frittierfett – polare Anteile", "werte.grenzwert", "24 % polare Anteile = Grenze der Genusstauglichkeit → Fett wechseln; Frittiertemperatur mind. +160 °C, max. +175 °C"],
+  ["HACCP", "Frittierfett – polare Anteile", "werte.grenzwert", "24 % polare Anteile (Grenze der Genusstauglichkeit): Fett wechseln; Frittiertemperatur mind. +160 °C, max. +175 °C"],
   ["HACCP", "Frittierfett – polare Anteile", "werte.haeufigkeit", "nach Durchsatz; Wechselzeitpunkt über Eigenkontrollen ermitteln; Temperaturkontrollen und Fettwechsel dokumentieren"],
   ["HACCP", "Frittierfett – polare Anteile", "quelle", "zvl.jena.de; 24 % polare Anteile: DGF-Empfehlung"],
   ["HACCP", "Reinigung und Desinfektion (Reinigungsplan Küche)", "werte.grenzwert", "Reinigungsplan vorhanden und ausgehängt; Intervalle eingehalten (Sichtkontrolle)"],
   ["HACCP", "Schädlingsmonitoring", "werte.grenzwert", "kein Befall (Sichtkontrolle)"],
+  ["HACCP", "Schädlingsmonitoring", "werte.haeufigkeit", (t) => t.replace("vorbeugende optische Kontrollen", "vorbeugende Sichtkontrollen")],
   // Verzeichnis der Verarbeitungstätigkeiten – Quellenvermerke ins Feld „quelle“, Anweisungen als Aussage
-  ["VVT", "Kundenverwaltung / Kundenkartei", "werte.loeschfrist", (t) => t.replace(/^Kundenstammdaten löschen, sobald/, "Kundenstammdaten werden gelöscht, sobald")],
+  ["VVT", "Kundenverwaltung / Kundenkartei", "werte.loeschfrist", (t) => t.replace("Kundenstammdaten löschen, sobald kein Zweck und keine Aufbewahrungspflicht mehr besteht (z. B. Kunde erteilt über mehrere Jahre keine Aufträge mehr).", "Kundenstammdaten werden gelöscht, sobald sie für den Zweck nicht mehr erforderlich sind und keine Aufbewahrungspflicht mehr besteht (z. B. wenn über mehrere Jahre keine Aufträge mehr erteilt werden).")],
   // der Baustein gilt für alle Branchen (Datenschutzinformation, Verzeichnis): Beispiel ohne Friseur-Bezug
   ["VVT", "Kundenverwaltung / Kundenkartei", "werte.rechtsgrundlage", (t) => t.replace("(z. B. Allergien/Unverträglichkeiten in der Friseur-Kundenkartei)", "(z. B. Allergien/Unverträglichkeiten)")],
-  ["VVT", "Personalverwaltung (Personalakte, Arbeitszeit)", "werte.loeschfrist", (t) => t.replace(" (BayLDA-Muster; Orientierung an regelmäßiger Verjährung § 195 BGB)", " (Orientierung an regelmäßiger Verjährung § 195 BGB)")],
+  ["VVT", "Personalverwaltung (Personalakte, Arbeitszeit)", "werte.loeschfrist", "Personalakte in der Regel 3 Jahre nach dem Ausscheiden (Orientierung an der regelmäßigen Verjährung, § 195 BGB); steuer- und sozialversicherungsrelevante Unterlagen nach den gesetzlichen Fristen."],
   ["VVT", "Personalverwaltung (Personalakte, Arbeitszeit)", "quelle", "BayLDA-Muster"],
-  ["VVT", "Bewerbungsverfahren", "werte.loeschfrist", (t) => t.replace(" (BayLDA-Muster).", ".")],
+  ["VVT", "Bewerbungsverfahren", "werte.loeschfrist", "Unterlagen abgelehnter Bewerberinnen und Bewerber werden 6 Monate nach Abschluss des Bewerbungsverfahrens gelöscht. Grund: Ansprüche nach § 15 Abs. 4 AGG können binnen 2 Monaten ab Zugang der Ablehnung geltend gemacht werden; die Klagefrist beträgt 3 Monate nach schriftlicher Geltendmachung (§ 61b Abs. 1 ArbGG)."],
   ["VVT", "Bewerbungsverfahren", "quelle", "BayLDA-Muster; § 15 AGG; § 61b ArbGG"],
-  ["VVT", "Betrieb der Website (Hosting, Server-Logfiles)", "werte.loeschfrist", (t) => t.replace(" (BayLDA-Muster).", ".")],
+  ["VVT", "Betrieb der Website (Hosting, Server-Logfiles)", "werte.loeschfrist", "IP-Adressen in den Logfiles werden nach 30 Tagen gelöscht."],
+  ["VVT", "Betrieb der Website (Hosting, Server-Logfiles)", "werte.empfaenger", "Hosting-Dienstleister (Auftragsverarbeiter)"],
   ["VVT", "Betrieb der Website (Hosting, Server-Logfiles)", "quelle", "BayLDA-Muster"],
-  ["VVT", "E-Mail-Newsletter / E-Mail-Werbung", "werte.loeschfrist", (t) => t.replace(" laut DSK.", ".")],
+  ["VVT", "E-Mail-Newsletter / E-Mail-Werbung", "werte.loeschfrist", "Die Adresse wird nach Abmeldung oder Widerspruch unverzüglich aus dem Verteiler gelöscht; der Nachweis der Einwilligung wird zur Rechtsverteidigung aufbewahrt (Richtwert: 3 Jahre; Verjährung § 31 OWiG, § 195 BGB)."],
   ["VVT", "E-Mail-Newsletter / E-Mail-Werbung", "quelle", "DSK (Orientierungshilfe Werbung)"],
   ["VVT", "Videoüberwachung (z. B. Verkaufsraum, Eingang, Lager)", "werte.loeschfrist", "Aufnahmen werden in der Regel nach 72 Stunden gelöscht; länger nur zur Sicherung eines konkreten Vorfalls."],
   ["VVT", "Videoüberwachung (z. B. Verkaufsraum, Eingang, Lager)", "quelle", "DSK (Orientierungshilfe Videoüberwachung)"],
+  // Datenschutzinformation für Betroffene (r9): ganze Sätze, Recherche-Reste (Stichtag, Aktenzeichen) ins Feld „quelle“
+  ["VVT", "Terminvereinbarung (telefonisch, vor Ort oder Online-Buchung)", "werte.loeschfrist", "Die Daten werden gelöscht, sobald der Zweck entfallen ist (nach dem Termin), soweit sie nicht in die Kundenkartei oder eine Rechnung übernommen werden; eine besondere gesetzliche Frist gibt es nicht (Art. 5 Abs. 1 lit. e, Art. 17 Abs. 1 lit. a DSGVO)."],
+  ["VVT", "Rechnungsstellung und Buchhaltung", "werte.loeschfrist", (t) => t.replace(" (seit 01.01.2025)", "")],
+  ["VVT", "Kontaktanfragen (Kontaktformular, E-Mail, Telefon)", "werte.loeschfrist", (t) => t.replace(/^Nach abschließender Bearbeitung, sofern/, "Die Daten werden nach abschließender Bearbeitung gelöscht, sofern")],
+  ["VVT", "Geschäftliche E-Mail-Kommunikation", "werte.loeschfrist", (t) => t.replace("Übrige E-Mails nach Zweckerfüllung.", "Übrige E-Mails werden gelöscht, sobald sie nicht mehr benötigt werden.")],
+  ["VVT", "Lieferanten- und Dienstleisterverwaltung", "werte.loeschfrist", (t) => t.replace("Kontaktdaten nach Ende der Geschäftsbeziehung.", "Kontaktdaten werden nach Ende der Geschäftsbeziehung gelöscht.")],
+  ["VVT", "Unternehmensauftritt in sozialen Netzwerken (z. B. Facebook-/Instagram-Seite)", "werte.rechtsgrundlage", (t) => t.replace(" (EuGH C-210/16)", "")],
+  ["VVT", "Unternehmensauftritt in sozialen Netzwerken (z. B. Facebook-/Instagram-Seite)", "quelle", (t) => `${t}; EuGH C-210/16`],
   // Hautschutzplan Friseur – Handschuhangaben nach BGW 2026 (E-146)
   ["HAUTSCHUTZ_FRISEUR", "Shampoonieren, Kopfmassage mit Haarbehandlungsmitteln, Pflegemittel auftragen/auswaschen", "werte.handschuhe", "Einmalhandschuhe aus Nitril oder Vinyl mit langen Stulpen über das Handgelenk (alternativ Waschhandschuhe)"],
   ["HAUTSCHUTZ_FRISEUR", "Färben, Dauerwelle, Blondierung: Mischen, Auftragen, Überprüfen, Probewickeln, Fixieren", "werte.handschuhe", "Friseur-Einmalhandschuhe nach DIN EN ISO 374-6 (Friseur-Symbol), keine gepuderten Latexhandschuhe"],
@@ -188,6 +198,70 @@ const ERSETZE = [
   ["GEFAEHRDUNGEN", "Handschutz- und Händehygieneplan", "Hautschutz- und Händehygieneplan"],
   ["ALLERGENE_UMFANG", "vorhandenes SO2,", "vorhandenes SO₂,"],
   ["HYGIENE", "\"nach jedem Kunden\"", "\"nach jeder Kundin / jedem Kunden\""],
+  // Lektorat r9: Hinweise an den Betrieb und Recherche-Reste aus Texten für Dritte, einheitliche Begriffe
+  ["VVT", "\"Kunden, Interessenten\"", "\"Kundinnen und Kunden, Interessenten\""],
+  ["VVT", "\"Website-Besucher\"", "\"Besucherinnen und Besucher der Website\""],
+  ["DSE", " Sie haben das Recht, aus Gründen, die sich aus Ihrer besonderen Situation ergeben, einer auf Art. 6 Abs. 1 lit. e oder f DSGVO gestützten Verarbeitung zu widersprechen (Art. 21 DSGVO).", " Außerdem können Sie der Verarbeitung widersprechen (Art. 21 DSGVO, siehe „Widerspruchsrecht“)."],
+  ["DSE", "werden durch den von Ihrem Browser übermittelten Datenaustausch automatisch folgende Daten in Server-Logfiles gespeichert:", "übermittelt Ihr Browser technisch bedingt Daten an unseren Server. Dabei werden automatisch folgende Daten in Server-Logfiles gespeichert:"],
+  ["DSE", "damit die Website bzw. von Ihnen ausdrücklich gewünschte Funktionen (z. B. {Speicherung Ihrer Cookie-Auswahl, Warenkorb, Login}) funktionieren", "damit die Website und von Ihnen ausdrücklich gewünschte Funktionen (z. B. {Speicherung Ihrer Cookie-Auswahl, Warenkorb, Login}) bereitstehen"],
+  ["DSE", "wenn Sie dem zuvor zugestimmt haben", "wenn Sie zuvor eingewilligt haben"],
+  ["DSE", "wenn Sie dem zustimmen bzw. das Video aktiv starten", "wenn Sie eingewilligt haben bzw. das Video aktiv starten"],
+  ["DSE", "zum EU-US Data Privacy Framework (Durchführungsbeschluss (EU) 2023/1795).", "zum EU-US Data Privacy Framework, Durchführungsbeschluss (EU) 2023/1795."],
+  ["DSE", "einen Auftragsverarbeitungsvertrag geschlossen haben", "einen Vertrag zur Auftragsverarbeitung nach Art. 28 DSGVO geschlossen haben"],
+  ["DSE", "auf Grundlage eines Vertrags nach Art. 28 DSGVO", "auf Grundlage eines Vertrags zur Auftragsverarbeitung nach Art. 28 DSGVO"],
+  ["HYGIENE", " (Rahmenhygieneplan: > 1 Minute)", ", mindestens 1 Minute"],
+  ["HYGIENE", "stich-, bruch- und durchstichfester", "stich- und bruchfester"],
+  ["HYGIENE", "Belehrung der Mitarbeitenden schriftlich dokumentieren", "Unterweisung der Beschäftigten schriftlich dokumentieren"],
+  ["HYGIENE", "bei mindestens 60 °C waschen (bewährt: 60 °C plus Maschinentrocknung); Umhänge nur mit Papierhalskrause; bei Blut-/Sekretverschmutzung bei 60 °C waschen oder entsorgen", "bei mindestens 60 °C waschen, danach möglichst im Trockner trocknen; Umhänge nur mit Papierhalskrause verwenden; mit Blut oder Sekret verschmutzte Wäsche bei mindestens 60 °C waschen oder entsorgen"],
+  ["HYGIENE", "Mehrweginstrumente zerlegt vollständig einlegen (Einwirkzeit ab letztem eingelegten Teil), abspülen, reinigen, trocknen, trocken und geschützt lagern", "Mehrweginstrumente zerlegt und vollständig in die Lösung einlegen (Einwirkzeit ab dem zuletzt eingelegten Teil), abspülen, reinigen, trocknen und geschützt lagern"],
+  ["HYGIENE", "Wunde desinfizieren, Pflaster; bei größeren Wunden Arzt;", "Wunde desinfizieren und mit Pflaster versorgen; größere Wunden ärztlich versorgen lassen;"],
+  ["HYGIENE", "für jeden Kunden neue Handschuhe", "für jede Kundin und jeden Kunden neue Handschuhe"],
+  ["HYGIENE", "Hautdesinfektion beim Kunden", "Hautdesinfektion bei Kundin/Kunde"],
+  ["HYGIENE", "bei Kunden mit Hautinfektion", "bei Kundin/Kunde mit Hautinfektion"],
+  ["HYGIENE", "Verletzung des Kunden", "Verletzung von Kundin/Kunde"],
+  ["HYGIENE", "Infektionsstatus des Kunden erfragen", "Infektionsstatus von Kundin/Kunde erfragen"],
+  ["HYGIENE", "nach Behandlung bei Bedarf und am Arbeitstagsende", "nach der Behandlung bei Bedarf und bei Arbeitsende"],
+  ["HYGIENE", "\"Arbeitsbeginn, nach Pausen/Essen, nach Toilettenbesuch", "\"vor Arbeitsbeginn, nach Pausen und dem Essen, nach dem Toilettenbesuch"],
+  ["HYGIENE", "nicht zurückstecken", "Schutzkappe nicht wieder aufsetzen"],
+  ["HAUTSCHUTZ_FRISEUR", "; gut abtrocknen; eincremen", "; gut abtrocknen"],
+  ["HAUTSCHUTZ_FRISEUR", "Hände mit Hautpflegepräparat eincremen", "Nach dem Waschen, vor Pausen und nach Arbeitsende Hände mit Hautpflegepräparat eincremen"],
+  ["HAUTSCHUTZ_FRISEUR", "\"Einmalhandschuhe, langstulpig\"", "\"Einmalhandschuhe mit langen Stulpen\""],
+  ["BA_BAUSTEINE", "Entsorgung mit der örtlichen Gewerbeabfallberatung klären.", "Abfälle nur über die im Betrieb festgelegten Entsorgungswege entsorgen."],
+  ["GEFAEHRDUNGEN", "Unterweisung dokumentieren (z. B. BGW-Dokumentationshilfe „Nachweis über Schulung/Unterweisung/Einweisung“).", "Unterweisung dokumentieren (z. B. mit dem Unterweisungsnachweis)."],
+  ["GEFAEHRDUNGEN", "farb- und duftstofffreie Waschmittel", "farb- und duftstofffreie Hautreinigungsmittel"],
+  ["GEFAEHRDUNGEN", "EU-kosmetikkonforme Produkte", "der EU-Kosmetikverordnung entsprechende Produkte"],
+  ["GEFAEHRDUNGEN", "Ab oberem Auslösewert", "Ab dem oberen Auslösewert"],
+  ["GEFAEHRDUNGEN", "ab unterem Auslösewert", "ab dem unteren Auslösewert"],
+  ["GEFAEHRDUNGEN", "mit 6 LE)", "mit 6 Löschmitteleinheiten)"],
+  ["ELEKTRO_FRISTEN", "DA zu § 5", "Durchführungsanweisung zu § 5"],
+  ["TOM", "Programme aktivieren\"", "Programme aktiviert\""],
+  ["TOM", "bzw. außer Haus aufbewahren", "bzw. außer Haus aufbewahrt"],
+  ["TOM", "\"Wiederherstellung aus der Datensicherung regelmäßig testen\"", "\"Regelmäßiger Test der Wiederherstellung aus der Datensicherung\""],
+  ["TOM", "für Sicherheitsvorfälle bereithalten", "für Sicherheitsvorfälle liegen bereit"],
+  ["TOM", "\"Dokumentierte Zugangsdaten für Notfälle sicher hinterlegen", "\"Zugangsdaten für Notfälle sicher hinterlegt"],
+  ["TOM", "Beschäftigter sofort sperren", "Beschäftigter werden sofort gesperrt"],
+  ["TOM", "nicht mehr unterstützte Systeme ersetzen", "nicht mehr unterstützte Systeme werden ersetzt"],
+  ["TOM", "vertrauliche Unterlagen nur verschlüsselt versenden", "vertrauliche Unterlagen werden nur verschlüsselt versendet"],
+  ["TOM", "Clean-Desk: keine", "Aufgeräumter Arbeitsplatz (Clean Desk): keine"],
+  ["SV", "(325 Euro)", "(325 €)"],
+  ["PANNEN_SOFORT", "nötig), bei Ransomware", "nötig); bei Ransomware"],
+];
+/**
+ * Neufassungen von Auswahltexten, die gespeichert werden (Lektorat r9): Die Vorlagen speichern weiter den früheren
+ * Text als Wert (FRUEHERE_TEXTE: neu → früher), damit bestehende Auswahlen gültig bleiben; gedruckt wird die Neufassung.
+ */
+const NEUFASSEN = [
+  ["GOBD", "originär Papier, Ablage in Papier (Muster 4.1)", "Papierbeleg, wird in Papier abgelegt"],
+  ["GOBD", "originär Papier, wird gescannt (ersetzendes Scannen, Muster 4.2)", "Papierbeleg, wird gescannt (ersetzendes Scannen)"],
+  ["GOBD", "originär digital (Muster 4.3)", "elektronischer Beleg (originär digital)"],
+  ["GOBD", "durch Softwareanbieter/Rechenzentrum", "beim Softwareanbieter bzw. im Rechenzentrum"],
+  ["GOBD", "durch Steuerberater", "bei der Steuerberatung"],
+  ["GOBD", "Upload an Steuerberater (z. B. Kanzlei-Portal)", "Upload an die Steuerberatung (z. B. Kanzlei-Portal)"],
+  ["IFSG", "betroffene Lebensmittel nach § 42 Abs. 2 und Tätigkeit in Küchen von Gaststätten und Gemeinschaftsverpflegung", "Betroffene Lebensmittel nach § 42 Abs. 2 und Tätigkeit in Küchen von Gaststätten und Gemeinschaftsverpflegung"],
+  ["IFSG", "bei Krankheitszeichen ärztlichen Rat einholen und mitteilen, dass man mit Lebensmitteln arbeitet (Merkblatt Gesundheitsamt)", "Bei Krankheitszeichen ärztlichen Rat einholen und mitteilen, dass man mit Lebensmitteln arbeitet"],
+  ["KASSEN_ARTEN", "Computergestützte Kassensysteme / PC-Kassensysteme", "Computergestütztes Kassensystem (PC-Kasse)"],
+  ["KASSEN_ARTEN", "Tablet-/App-Kassensysteme", "Tablet-/App-Kassensystem"],
+  ["KASSEN_ARTEN", "Elektronische Registrierkassen", "Elektronische Registrierkasse"],
 ];
 const daten = daten0;
 for (const [liste, schluessel, pfad, neu] of SETZE) {
@@ -205,6 +279,15 @@ for (const [liste, alt, neu] of ERSETZE) {
   if (!vorher.includes(alt)) throw new Error(`Ersetzung greift nicht mehr: ${liste} „${alt}“`);
   daten[liste] = JSON.parse(vorher.split(alt).join(neu));
 }
+const fruehereTexte = {};
+for (const [liste, alt, neu] of NEUFASSEN) {
+  const vorher = JSON.stringify(daten[liste]);
+  const suche = JSON.stringify(alt);
+  if (vorher.split(suche).length !== 2) throw new Error(`Neufassung greift nicht genau einmal: ${liste} „${alt}“`);
+  daten[liste] = JSON.parse(vorher.replace(suche, () => JSON.stringify(neu)));
+  fruehereTexte[neu] = alt;
+}
+daten.FRUEHERE_TEXTE = fruehereTexte;
 
 const typen = {
   GEFAEHRDUNGEN: "Vorschlag[]", MUTTERSCHUTZ: "Option[]", UNTERWEISUNGSTHEMEN: "(Option & { branchen: string[] })[]", BA_GLIEDERUNG: "{ nr: string; abschnitt: string; inhalt: string }[]", BA_BAUSTEINE: "Record<string, Option[]>",
@@ -214,6 +297,7 @@ const typen = {
   KASSEN_ARTEN: "string[]", TSE_ARTEN: "string[]", NACHWG: "{ angaben: { nr: number; text: string }[]; einleitung: string; kuendigungGrund: string; klagefrist: string; urlaub: string }", MINDESTLOHN: "{ ab: string; cent: number }[]", MINIJOB: "{ ab: string; cent: number }[]",
   SV: "{ personengruppen: Option[]; schulabschluss: Option[]; ausbildung: Option[]; vertragsform: Option[] }", INTERESSE: "Option[]", RECHTSFORMEN: "string[]", AUFBEWAHRUNG: "{ jahre: string; art: string }[]",
   HACCP: "Vorschlag[]", ALLERGENE_UMFANG: "{ bezeichnung: string; umfasst: string }[]", LOSE_WARE: "{ formen: string[]; anforderung: string; rechtsgrundlage: string }", IFSG: "{ inhalte: string[]; personen: string[]; lebensmittel: string[]; symptome: string[] }", HYGIENE: "Vorschlag[]",
+  FRUEHERE_TEXTE: "Record<string, string>",
 };
 const kopf = `/**
  * Bausteine aus der Recherche vom 12.10.2026 (docs/recherche/2026-10-12) – ERZEUGT von werkzeuge/bausteine-erzeugen.mjs,

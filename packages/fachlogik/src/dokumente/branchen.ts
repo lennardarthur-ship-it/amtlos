@@ -5,7 +5,7 @@
  */
 import { teilnahmeTabelle } from "./arbeitsschutz.js";
 import { ALLERGENE_UMFANG, HACCP, HAUTSCHUTZ_FRISEUR, HYGIENE, IFSG, LOSE_WARE } from "./bausteine.js";
-import { KOPF_LINIE, abschnitt, absatz, angaben, auswahl, datumDe, dokument, esc, ja, liste, nachsatz, plusMonate, punkte, tabelle, text, unterschriften, zelle } from "./html.js";
+import { KOPF_LINIE, abschnitt, absatz, angaben, auswahl, datumDe, dokument, esc, ja, liste, nachsatz, neufassung, plusMonate, punkte, stabileOption, tabelle, text, unterschriften, zelle } from "./html.js";
 import { ALLERGENE, optionen } from "./konstanten.js";
 import type { Vorlage } from "./typen.js";
 
@@ -22,7 +22,7 @@ export const ifsgBelehrung: Vorlage = {
       felder: [
         { id: "datum", art: "datum", label: "Datum der Belehrung", vorbelegung: "heute", pflicht: true },
         { id: "belehrt_von", art: "text", label: "Belehrt von", vorbelegung: "verantwortlich", pflicht: true },
-        { id: "inhalte", art: "bausteine", label: "Inhalte der Belehrung", optionen: IFSG.inhalte.map((t) => ({ wert: t, text: t, quelle: "§§ 42, 43 IfSG" })), vorbelegung: IFSG.inhalte.slice(0, 5), pflicht: true },
+        { id: "inhalte", art: "bausteine", label: "Inhalte der Belehrung", optionen: IFSG.inhalte.map((t) => ({ ...stabileOption(t), quelle: "§§ 42, 43 IfSG" })), vorbelegung: IFSG.inhalte.slice(0, 5).map((t) => stabileOption(t).wert), pflicht: true },
         { id: "liste_anhaengen", art: "schalter", label: "Tätigkeitsverbote und Lebensmittel nach § 42 IfSG im Dokument aufführen", vorbelegung: true },
       ],
     },
@@ -45,7 +45,7 @@ export const ifsgBelehrung: Vorlage = {
   ],
   html(d, b) {
     const naechste = plusMonate(text(d, "datum"), 24);
-    const inhalte = auswahl(d, "inhalte");
+    const inhalte = auswahl(d, "inhalte").map((w) => neufassung(w));
     return dokument({
       titel: "Belehrung nach § 43 Infektionsschutzgesetz",
       betrieb: b,
@@ -139,7 +139,7 @@ export const allergenAushang: Vorlage = {
     // leeres Blatt: die Matrix füllt die erste Seite, die Erläuterung folgt als eigenes Blatt; die Erläuterung bricht
     // nicht über zwei Seiten (Klasse „zusammen“)
     const legende = ja(d, "legende")
-      ? abschnitt("Die 14 Hauptallergene nach Anhang II der LMIV", tabelle(["", "Allergen", "umfasst"], nummern.map((id, i) => [kz(i), esc(ALLERGENE[id]!), esc(ALLERGENE_UMFANG[i]?.umfasst ?? "")]), { breiten: ["6%", "28%", "66%"], klasse: "legende" }), g.length ? "zusammen" : "neue-seite zusammen")
+      ? abschnitt("Die 14 Hauptallergene nach Anhang II der LMIV", tabelle(["", "Allergen", "Umfasst"], nummern.map((id, i) => [kz(i), esc(ALLERGENE[id]!), esc(ALLERGENE_UMFANG[i]?.umfasst ?? "")]), { breiten: ["6%", "28%", "66%"], klasse: "legende" }), g.length ? "zusammen" : "neue-seite zusammen")
       : "";
     return dokument({
       titel: "Allergene in unseren Speisen und Getränken",

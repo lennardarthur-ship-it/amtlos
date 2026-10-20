@@ -5,10 +5,11 @@
  */
 import { GOBD } from "./bausteine.js";
 import { mitVertretung } from "./betrieb.js";
-import { abschnitte, angaben, ankreuzen, auswahl, datumDe, dokument, esc, ja, liste, punkte, tabelle, text, unterschriften, zelle, zeilen } from "./html.js";
+import { abschnitte, angaben, ankreuzen, auswahl, datumDe, dokument, esc, ja, liste, neufassung, punkte, stabileOption, tabelle, text, unterschriften, zelle, zeilen } from "./html.js";
 import type { Option, Vorlage } from "./typen.js";
 
-const opt = (l: string[]): Option[] => l.map((t) => ({ wert: t, text: t }));
+// Wert bleibt der frühere Text (gespeicherte Auswahlen), Anzeige und Druck in der Neufassung
+const opt = (l: string[]): Option[] => l.map((t) => stabileOption(t));
 const PROGRAMME = ["Buchhaltungsprogramm", "Kassensystem", "Rechnungsprogramm", "Online-Banking", "Belegscanner-App", "Upload-Portal der Steuerberatung", "Lohnprogramm", "Tabellenkalkulation"];
 
 /** Optionen der Auswahlfelder (wie im Formular) – auf dem leeren Blatt zum Ankreuzen. */
@@ -103,7 +104,7 @@ export const verfahrensdokumentation: Vorlage = {
     const leer = !["belegeingang", "belegart", "ablage", "sicherung_ort"].some((k) => auswahl(d, k).length);
     // nichts ausgewählt: die Optionen zum Ankreuzen von Hand statt leerer Linien
     const optionenVon = (k: string) => AUSWAHL_OPTIONEN[k] ?? [];
-    const l = (k: string) => (auswahl(d, k).length ? punkte(auswahl(d, k)) : ankreuzen(optionenVon(k)));
+    const l = (k: string) => (auswahl(d, k).length ? punkte(auswahl(d, k).map((w) => neufassung(w))) : ankreuzen(optionenVon(k)));
     // Zwischenüberschrift bleibt mit ihrem Inhalt auf einer Seite (nicht allein am Seitenende)
     const teil = (titel: string, inhalt: string) => `<div class="zusammen"><h3>${esc(titel)}</h3>${inhalt}</div>`;
     return dokument({

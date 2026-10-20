@@ -8,6 +8,11 @@
  *
  * Optional je Bild `lupe: { x, y, b, h }` (Anteile des Bildschirms): vergrößert diesen Ausschnitt desselben echten
  * Bildschirms als Lupe über dem Gerät – z. B. Summe und GiroCode der Rechnung, die in A4-Verkleinerung unlesbar wären.
+ * `lupe.bildschirm` nimmt stattdessen eine weitere Aufnahme (z. B. „pflicht-quellen“: dieselbe Pflicht, bis
+ * Rechtsgrundlage und Quellen gescrollt), `lupe.oben` setzt die Höhe der Lupe (Standard 1500 px).
+ *
+ * Jede Aufnahme prüft, dass zu sehen ist, was die Bildzeile in store/de.json verspricht (R9: Bild 1 zeigte „Heute“
+ * statt „Pflichten“, Bild 3 keine Vorlagen, Bild 4 keine Quelle). Mein Betrieb wird ohne Pro aufgenommen.
  *
  * Zusätzlich (nur hell) die Bilder der Website: <website>/<bildschirm>.jpg (464 × 1006, passend zu width/height in
  * apps/website/seite.html) und <website>/og.jpg (1200 × 630, Vorschaubild für geteilte Links). Standard für <website>
@@ -16,6 +21,8 @@
  *   cd apps/mobile && CI=1 npx expo export --platform web --output-dir /tmp/expo-web
  *   node werkzeuge/store-bilder.mjs /tmp/expo-web /tmp/store-bilder [website]   # DUNKEL=1 für dunkle Bildschirme
  */
+/* global process, console, URL, localStorage */
+/* eslint-disable no-console -- Kommandozeilenwerkzeug */
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import http from "node:http";
@@ -71,12 +78,18 @@ const foto = async (name) => {
 try {
   await p.goto("http://localhost:4997/");
   await warte(2500);
+  // Bild 1 „Welche Pflichten gelten für dich?“: der Tab „Pflichten“ (nicht „Heute“)
+  await tab("Pflichten");
   await foto("pflichten");
-  // erste Pflicht unter „Als Nächstes“ auf „Heute“ (welche das ist, hängt vom Tag ab)
-  // nur Pflichten („In 7 Tagen fällig“, „Heute fällig“ …), nicht die überfällige Rechnung („seit 3 Tagen fällig“)
+  // Bild 4 „Mit Grund und Quelle“: erste Pflicht unter „Jetzt dran“ (welche das ist, hängt vom Tag ab) – oben mit
+  // Titel und Termin, dazu derselbe Bildschirm bis Rechtsgrundlage und Quellen gescrollt (Lupe und Website-Bild)
   await p.getByRole("button", { name: /In \d+ Tagen fällig|Heute fällig|Morgen fällig|Seit .* überfällig|Nächster Termin/ }).locator("visible=true").first().click();
   await warte(900);
   await foto("pflicht");
+  await p.getByText("Rechtsgrundlage", { exact: true }).locator("visible=true").first().evaluate((el) => el.scrollIntoView({ block: "center" }));
+  await warte(600);
+  if (!(await p.getByText(/www\./).locator("visible=true").first().isVisible())) throw new Error("Quelle nicht im Bild");
+  await foto("pflicht-quellen");
   await knopf("Schließen").click();
   await warte(700);
   await tab("Unterlagen");
@@ -90,12 +103,27 @@ try {
   await warte(600);
   await knopf("Schließen").click();
   await warte(700);
-  await knopf("Neu erstellen").click(); // „+“ in der Tab-Leiste
+  // Bild 3 „Über 30 Vorlagen“: „+“ in der Tab-Leiste, gescrollt bis „Wofür brauchst du eine Unterlage?“ (Vorlagen nach Anlass)
+  await knopf("Neu erstellen").click();
   await warte(1000);
+  const anlass = p.getByText("Wofür brauchst du eine Unterlage?").locator("visible=true").first();
+  await anlass.evaluate((el) => el.scrollIntoView({ block: "start" }));
+  await p.mouse.move(196, 500);
+  await p.mouse.wheel(0, -90); // Überschrift unter der festen Suchleiste sichtbar
+  await warte(800);
+  if (!(await anlass.isVisible())) throw new Error("Vorlagen nach Anlass nicht im Bild");
   await foto("vorlagen");
   await knopf("Schließen").click();
   await warte(700);
+  // Bild 6 „Mein Betrieb“ ohne Pro (M7): sonst stünde dort „Pro ist aktiv – Alle Funktionen sind frei“
+  await p.evaluate(() => {
+    const s = JSON.parse(localStorage.getItem("amtlos.unterlagen.v1"));
+    localStorage.setItem("amtlos.unterlagen.v1", JSON.stringify({ ...s, proTest: false }));
+  });
+  await p.reload();
+  await warte(2500);
   await tab("Mein Betrieb");
+  if (await p.getByText("Pro ist aktiv").locator("visible=true").count()) throw new Error("Mein Betrieb zeigt noch „Pro ist aktiv“");
   await foto("betrieb");
 } finally {
   srv.close();
@@ -109,6 +137,7 @@ const png = (name) => `data:image/png;base64,${roh[name].toString("base64")}`;
 
 // Lupe: derselbe echte Bildschirm, Ausschnitt vergrößert (Breite der Lupe 1130 px, mittig über dem Gerät)
 const lupeHtml = (name, l, oben) => {
+  name = l.bildschirm ?? name;
   const breite = 1130;
   const faktor = breite / l.b; // Bildschirmbreite in px der Lupe
   const hoehe = Math.round(faktor * l.h * (852 / 393));
@@ -136,6 +165,7 @@ const statusFarbe = `<script>document.querySelectorAll(".schirm").forEach((s)=>{
 const satz = await browser.newPage({ viewport: { width: 1290, height: 2796 }, deviceScaleFactor: 1 });
 for (const [i, b] of texte.bilder.entries()) {
   if (!roh[b.bildschirm]) throw new Error(`Bildschirm fehlt: ${b.bildschirm}`);
+  if (b.lupe?.bildschirm && !roh[b.lupe.bildschirm]) throw new Error(`Bildschirm der Lupe fehlt: ${b.lupe.bildschirm}`);
   const html = `<!doctype html><html><head><meta charset="utf-8"><style>${css}
   html,body{margin:0;width:1290px;height:2796px;overflow:hidden}
   body{background:#063b29;font-family:A;color:#fff;position:relative}
@@ -148,7 +178,7 @@ for (const [i, b] of texte.bilder.entries()) {
   .geraet img{display:block;width:100%}
   .lupe{position:absolute;left:80px;border-radius:40px;border:10px solid #fff;background-color:#fff;background-repeat:no-repeat;box-shadow:0 40px 100px rgba(0,0,0,.45)}
   </style></head><body><div class="text"><h1>${b.titel}</h1><p>${b.text}</p></div>
-  <div class="geraet"><div class="schirm">${statusleiste(1290 - 280 - 32)}<img src="${png(b.bildschirm)}"></div></div>${b.lupe ? lupeHtml(b.bildschirm, b.lupe, 1500) : ""}${statusFarbe}</body></html>`;
+  <div class="geraet"><div class="schirm">${statusleiste(1290 - 280 - 32)}<img src="${png(b.bildschirm)}"></div></div>${b.lupe ? lupeHtml(b.bildschirm, b.lupe, b.lupe.oben ?? 1500) : ""}${statusFarbe}</body></html>`;
   await satz.setContent(html, { waitUntil: "load" });
   await satz.waitForTimeout(150);
   await satz.screenshot({ path: path.join(OUT, `store-${i + 1}-${b.bildschirm}${schema === "dark" ? "-dunkel" : ""}.png`) });
@@ -158,9 +188,11 @@ for (const [i, b] of texte.bilder.entries()) {
 if (WEB) {
   fs.mkdirSync(WEB, { recursive: true });
   const web = await browser.newPage({ viewport: { width: 464, height: 1006 }, deviceScaleFactor: 1 });
-  for (const name of Object.keys(roh)) {
+  // Datei der Website → Aufnahme; „pflicht“ zeigt auf der Website Rechtsgrundlage und Quellen (Bildunterschrift „Mit Grund und Quelle“)
+  const WEB_BILDER = { pflichten: "pflichten", rechnung: "rechnung", vorlagen: "vorlagen", pflicht: "pflicht-quellen", ablage: "ablage", betrieb: "betrieb" };
+  for (const [datei, name] of Object.entries(WEB_BILDER)) {
     await web.setContent(`<!doctype html><html><body style="margin:0"><img src="${png(name)}" style="display:block;width:464px;height:1006px"></body></html>`, { waitUntil: "load" });
-    await web.screenshot({ path: path.join(WEB, `${name}.jpg`), type: "jpeg", quality: 82 });
+    await web.screenshot({ path: path.join(WEB, `${datei}.jpg`), type: "jpeg", quality: 82 });
   }
   const og = await browser.newPage({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 });
   const titel = texte.bilder[0].titel;

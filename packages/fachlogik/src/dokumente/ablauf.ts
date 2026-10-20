@@ -172,7 +172,11 @@ function gekuerzt(s: string, stufe: number): { text: string; weiter: boolean } {
   const l = schnitte(s);
   if (stufe < l.length) return { text: s.slice(0, l[stufe]), weiter: true };
   if (s.length <= 70 || stufe > l.length) return { text: s, weiter: false };
-  return { text: `${s.slice(0, 60).replace(/\s+\S*$/, "")} …`, weiter: true };
+  // nicht in einer Klammer abschneiden („… hinterlegt (z. B. …“): dann vor der Klammer kürzen
+  let t = s.slice(0, 60).replace(/\s+\S*$/, "");
+  const klammer = t.lastIndexOf("(");
+  if (klammer > 0 && !t.includes(")", klammer)) t = t.slice(0, klammer).trimEnd();
+  return { text: `${t} …`, weiter: true };
 }
 
 /** Kurzer Titel für lange Vorschläge, z. B. „Ausrutschen, Stolpern und Stürzen durch glatte Böden …“ → „Ausrutschen, Stolpern und Stürzen“. */

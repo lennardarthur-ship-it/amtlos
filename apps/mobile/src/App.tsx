@@ -14,6 +14,7 @@ import { Heute } from "./seiten/Heute";
 import { NeuBlatt, useErstellen } from "./seiten/Erstellen";
 import { T as TEXT } from "./texte";
 import { Kachel, Karte, Knopf, Symbol, T, TextKnopf } from "./ui/bausteine";
+import { Fehlergrenze } from "./ui/Fehlergrenze";
 import { MeldungAnbieter } from "./ui/meldung";
 import { useSchrift } from "./ui/schrift";
 import { entsperren } from "./unterlagen/sperre";
@@ -273,6 +274,16 @@ function TastaturLeiste() {
   );
 }
 
+/**
+ * Für die innere Fehlergrenze: Der Stand gilt als gespeichert, wenn er geladen ist und das Speichern klappt – der
+ * Anbieter bleibt bei einem Absturz darunter bestehen und schreibt die letzte Änderung (300 ms bzw. beim Wechsel in den
+ * Hintergrund).
+ */
+function useDatenGespeichert() {
+  const z = useAmtlos();
+  return z.bereit && !z.ladefehler && !z.speicherFehler;
+}
+
 export default function App() {
   const dunkel = useColorScheme() === "dark";
   // Onest (E-142) – bis sie geladen ist, bleibt der Startbildschirm stehen
@@ -280,19 +291,24 @@ export default function App() {
   if (!schrift) return null;
   return (
     <SafeAreaProvider>
-      <AmtlosAnbieter>
-        <KontoAnbieter>
-          <StatusBar style={dunkel ? "light" : "dark"} />
-          <ErinnerungsPlaner />
-          <AutoSicherung />
-          <Sperre>
-            <MeldungAnbieter imTab={tabsOben}>
-              <Rahmen />
-            </MeldungAnbieter>
-          </Sperre>
-          <TastaturLeiste />
-        </KontoAnbieter>
-      </AmtlosAnbieter>
+      {/* außen: fängt auch Abstürze im Anbieter selbst – dann ohne Zusage, dass alles gespeichert ist */}
+      <Fehlergrenze>
+        <AmtlosAnbieter>
+          <Fehlergrenze useGespeichert={useDatenGespeichert}>
+            <KontoAnbieter>
+              <StatusBar style={dunkel ? "light" : "dark"} />
+              <ErinnerungsPlaner />
+              <AutoSicherung />
+              <Sperre>
+                <MeldungAnbieter imTab={tabsOben}>
+                  <Rahmen />
+                </MeldungAnbieter>
+              </Sperre>
+              <TastaturLeiste />
+            </KontoAnbieter>
+          </Fehlergrenze>
+        </AmtlosAnbieter>
+      </Fehlergrenze>
     </SafeAreaProvider>
   );
 }
