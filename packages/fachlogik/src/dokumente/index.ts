@@ -8,6 +8,7 @@ import { allergenAushang, haccp, hautschutzplan, hygieneplan, ifsgBelehrung } fr
 import { datenpanne, datenschutzDokumentation, datenschutzinformation } from "./datenschutz.js";
 import { kiKompetenz, nachweisArbeitsbedingungen } from "./personal.js";
 import { verfahrensdokumentation } from "./steuern.js";
+import { pdfDateiname } from "../dateinamen.js";
 import { GESTALT_MARKE, GRUNDLAGE_MARKE, SEITE_MARKE, esc, festeLeerzeichen, seiteCss } from "./html.js";
 import type { Bereich, Betrieb, Daten, EinfachesFeld, Eintrag, Feld, Vorlage, Vorschlag } from "./typen.js";
 
@@ -167,12 +168,8 @@ export function unterlagenName(v: Vorlage, d: Daten): string {
   return zusatz ? `${v.titel} · ${zusatz}` : v.titel;
 }
 
-/** Dateiname für das PDF, nur mit unbedenklichen Zeichen. */
-export function dateiname(v: Vorlage, d: Daten, datum: string): string {
-  const roh = `${unterlagenName(v, d).replace(" · ", " ")} ${datum}`;
-  const s = roh.replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/Ä/g, "Ae").replace(/Ö/g, "Oe").replace(/Ü/g, "Ue").replace(/ß/g, "ss");
-  return `${s.replace(/[^A-Za-z0-9-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80)}.pdf`;
-}
+/** Dateiname für das PDF – siehe `pdfDateiname` (Umlaute umgeschrieben, Datum genau einmal und nie gekürzt). */
+export const dateiname = (v: Vorlage, d: Daten, datum: string): string => pdfDateiname(v, d, datum);
 
 /** Vorschlag als Listeneintrag mit Startwerten für alle Felder. */
 export function eintragAusVorschlag(f: Extract<Feld, { art: "liste" }>, vorschlag: Vorschlag, b: Betrieb, heute: string): Eintrag {

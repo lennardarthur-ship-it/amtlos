@@ -274,7 +274,8 @@ function ublLesen(w: XmlElement, vz: 1 | -1): GeleseneRechnung {
         satz: zahl(textVon(z, "Item", "ClassifiedTaxCategory", "Percent")),
       };
     }),
-    verwendungszweck: zahlung.map((z) => textVon(z, "PaymentID")).find(Boolean) ?? textVon(w, "BuyerReference"),
+    // nur der Verwendungszweck (BT-83, cbc:PaymentID) – nie die Käuferreferenz (BT-10, z. B. „Kundennr. 10233“)
+    verwendungszweck: zahlung.map((z) => textVon(z, "PaymentID")).find(Boolean) ?? null,
     hinweise: alle(w, "Note").map(text).filter((t): t is string => t !== null),
   };
 }
@@ -337,7 +338,8 @@ function ciiLesen(w: XmlElement): GeleseneRechnung {
         satz: zahl(textVon(zeile, "ApplicableTradeTax", "RateApplicablePercent")),
       };
     }),
-    verwendungszweck: textVon(abrechnung, "PaymentReference") ?? textVon(vereinbarung, "BuyerReference"),
+    // nur der Verwendungszweck (BT-83, ram:PaymentReference) – nie die Käuferreferenz (BT-10)
+    verwendungszweck: textVon(abrechnung, "PaymentReference") ?? null,
     hinweise: alle(dokument, "IncludedNote").map((n) => textVon(n, "Content")).filter((t): t is string => t !== null),
   };
 }

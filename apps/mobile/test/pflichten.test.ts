@@ -5,7 +5,7 @@ import { parse } from "yaml";
 import { describe, expect, it } from "vitest";
 import { VORLAGEN } from "@amtlos/fachlogik";
 import { LEERER_STAND, anlegen, erledigtSetzen, profilSetzen, standAus } from "../src/unterlagen/speicher";
-import { CHECK_FELDER, KATALOG, auswertung, checkFragen, dringlichkeit, erinnerungsPlan, fortschritt, frageZu, istErledigt, offeneFragenNachWirkung, zusatzFragen, type Profil } from "../src/pflichten/check";
+import { CHECK_FELDER, KATALOG, auswertung, checkFragen, ereignisseAusStand, dringlichkeit, erinnerungsPlan, fortschritt, frageZu, istErledigt, offeneFragenNachWirkung, zusatzFragen, type Profil } from "../src/pflichten/check";
 
 const FIXTURES = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../catalog/fixtures");
 const salon: Profil = { "taetigkeit.branchen": ["beauty_kosmetik"], rechtsform: "einzelunternehmen", "taetigkeit.einordnung": "gewerbe", bundesland: "BY", "beschaeftigte.gesamt": 3, "kasse.elektronisch": true, "online.website": false, "ust.kleinunternehmer": false, gruendungsdatum: "2024-03-01" };
@@ -17,6 +17,35 @@ describe("Pflichten-Check", () => {
     expect(felder).not.toContain("gesellschafter.auslaendische_investoren");
     const gmbh = { ...salon, rechtsform: "gmbh" };
     expect(offeneFragenNachWirkung(auswertung(gmbh, "2026-10-13"), gmbh).map((o) => o.feld)).toContain("gesellschafter.auslaendische_investoren");
+  });
+  it("bestehender Betrieb mit Beschäftigten: Pflichten mit Auslöser „einstellung“ gelten (Ereignisse wie auf dem Server)", () => {
+    const cafe: Profil = { "taetigkeit.branchen": ["gastronomie_lebensmittel"], rechtsform: "einzelunternehmen", "taetigkeit.einordnung": "gewerbe", bundesland: "SN", "beschaeftigte.gesamt": 2, "kasse.elektronisch": true, "online.website": true, "ust.kleinunternehmer": false, steuerberater: true, gruendungsdatum: "2022-03-01" };
+    expect(ereignisseAusStand(cafe, "2026-01-15")).toEqual([
+      { typ: "einstellung", datum: "2022-03-01" },
+      { typ: "erste_einstellung", datum: "2022-03-01" },
+    ]);
+    const a = auswertung(cafe, "2026-01-15");
+    expect(ids(a.gilt)).toEqual(expect.arrayContaining(["branche.gastro_ifsg_belehrung", "personal.nachweisgesetz", "personal.sv_anmeldung", "arbeitsschutz.erstunterweisung"]));
+    // Termine der Einstellung liegen in der Vergangenheit – kein erfundener „überfälliger“ Termin
+    for (const id of ["branche.gastro_ifsg_belehrung", "personal.nachweisgesetz"]) expect(a.gilt.find((p) => p.id === id)!.naechsterTermin, id).toBeNull();
+    // ohne Beschäftigte keine Einstellung, also auch keine dieser Pflichten
+    const allein = auswertung({ ...cafe, "beschaeftigte.gesamt": 0 }, "2026-01-15");
+    expect(ereignisseAusStand({ ...cafe, "beschaeftigte.gesamt": 0 }, "2026-01-15")).toEqual([]);
+    for (const id of ["branche.gastro_ifsg_belehrung", "personal.nachweisgesetz", "personal.sv_anmeldung"]) expect(ids(allein.gilt), id).not.toContain(id);
+    // Gründung in der Zukunft: Einstellung geplant, noch nicht eingetreten
+    const spaeter = auswertung({ ...cafe, gruendungsdatum: "2026-06-01" }, "2026-01-15");
+    expect(ids(spaeter.gilt)).not.toContain("personal.nachweisgesetz");
+  });
+  it("ausgegebene Unterweisung ⇒ Wiederholung ein Jahr später; die Unterweisung selbst hakt die Wiederholung nicht ab", () => {
+    const u = { vorlage: "unterweisung", daten: { datum: "2026-02-10", thema: "Jährliche Unterweisung" }, ausgegeben: "2026-02-10T10:00:00Z" };
+    expect(ereignisseAusStand({}, "2026-10-20", [u, { ...u, ausgegeben: undefined }, { ...u, storniertDurch: "x" }])).toEqual([{ typ: "unterweisung_durchgefuehrt", datum: "2026-02-10" }]);
+    const a = auswertung(salon, "2026-10-20", [u]);
+    const w = a.gilt.find((p) => p.id === "arbeitsschutz.unterweisung_wiederholen");
+    expect(w?.naechsterTermin).toBe("2027-02-10");
+    expect(w?.wiederkehrend).toBe(true);
+    const stand = { ...LEERER_STAND, unterlagen: [{ id: "u1", vorlage: "unterweisung", daten: u.daten, erstellt: "2026-02-10", geaendert: "2026-02-10", ausgegeben: u.ausgegeben }] };
+    expect(istErledigt(w!, { erledigt: {}, unterlagen: stand.unterlagen, betrieb: stand.betrieb })).toBe(false);
+    expect(ids(auswertung(salon, "2026-10-20").gilt)).not.toContain("arbeitsschutz.unterweisung_wiederholen");
   });
   it("stellt die Fragen aus dem Fragebogen – die Gesellschafts-Frage nur bei UG und GmbH", () => {
     for (const f of CHECK_FELDER) expect(frageZu(f), f).toBeTruthy();

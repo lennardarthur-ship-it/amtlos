@@ -166,6 +166,8 @@ const SETZE = [
   ["HACCP", "Schädlingsmonitoring", "werte.grenzwert", "kein Befall (Sichtkontrolle)"],
   // Verzeichnis der Verarbeitungstätigkeiten – Quellenvermerke ins Feld „quelle“, Anweisungen als Aussage
   ["VVT", "Kundenverwaltung / Kundenkartei", "werte.loeschfrist", (t) => t.replace(/^Kundenstammdaten löschen, sobald/, "Kundenstammdaten werden gelöscht, sobald")],
+  // der Baustein gilt für alle Branchen (Datenschutzinformation, Verzeichnis): Beispiel ohne Friseur-Bezug
+  ["VVT", "Kundenverwaltung / Kundenkartei", "werte.rechtsgrundlage", (t) => t.replace("(z. B. Allergien/Unverträglichkeiten in der Friseur-Kundenkartei)", "(z. B. Allergien/Unverträglichkeiten)")],
   ["VVT", "Personalverwaltung (Personalakte, Arbeitszeit)", "werte.loeschfrist", (t) => t.replace(" (BayLDA-Muster; Orientierung an regelmäßiger Verjährung § 195 BGB)", " (Orientierung an regelmäßiger Verjährung § 195 BGB)")],
   ["VVT", "Personalverwaltung (Personalakte, Arbeitszeit)", "quelle", "BayLDA-Muster"],
   ["VVT", "Bewerbungsverfahren", "werte.loeschfrist", (t) => t.replace(" (BayLDA-Muster).", ".")],

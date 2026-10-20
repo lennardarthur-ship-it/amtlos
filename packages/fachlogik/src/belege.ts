@@ -163,12 +163,21 @@ export function ausgabenFuer(belege: Beleg[], jahr: string): { zeilen: EuerAusga
   return { zeilen, vorsteuer_cent: vorsteuer, anlagen, summe_cent: zeilen.reduce((a, z) => a + z.netto_cent, 0) };
 }
 
+/** Zeilen der Anlage EÜR für Einnahmen – dieselben Texte wie in den Vorschlägen der Vorlage „EÜR“ */
+export const EUER_ZEILE_STEUERPFLICHTIG = "Umsatzsteuerpflichtige Betriebseinnahmen";
+export const EUER_ZEILE_STEUERFREI = "Umsatzsteuerfreie, nicht umsatzsteuerbare Betriebseinnahmen sowie Betriebseinnahmen, für die der Leistungsempfänger die Umsatzsteuer nach § 13b UStG schuldet";
+
 export interface Einnahme {
   /** Tag des Zahlungseingangs (Zufluss) */
   tag: string;
+  /** Stornos negativ */
   netto_cent: number;
   ust_cent: number;
-  /** Stornos negativ */
+  /**
+   * Anteil von `netto_cent` ohne Umsatzsteuer, weil steuerfrei, nicht steuerbar oder vom Empfänger geschuldet
+   * (innergemeinschaftliche Lieferung, Steuerbefreiung, § 13b) – eigene Zeile der Anlage EÜR
+   */
+  steuerfrei_cent?: number;
   kleinunternehmer: boolean;
 }
 
@@ -176,12 +185,15 @@ export interface Einnahme {
 export function euerFuer(einnahmen: Einnahme[], belege: Beleg[], jahr: string) {
   const im = einnahmen.filter((e) => e.tag.startsWith(`${jahr}-`));
   const einnahmen_netto = im.reduce((a, e) => a + e.netto_cent, 0);
+  const steuerfrei = im.reduce((a, e) => a + (e.steuerfrei_cent ?? 0), 0);
   const ust_vereinnahmt = im.reduce((a, e) => a + e.ust_cent, 0);
   const ausgaben = ausgabenFuer(belege, jahr);
   const summe_einnahmen = einnahmen_netto + ust_vereinnahmt;
   const summe_ausgaben = ausgaben.summe_cent + ausgaben.vorsteuer_cent;
   return {
     einnahmen_netto_cent: einnahmen_netto,
+    /** davon steuerfrei / nicht steuerbar / § 13b (in `einnahmen_netto_cent` enthalten) */
+    einnahmen_steuerfrei_cent: steuerfrei,
     ust_vereinnahmt_cent: ust_vereinnahmt,
     summe_einnahmen_cent: summe_einnahmen,
     ausgaben,

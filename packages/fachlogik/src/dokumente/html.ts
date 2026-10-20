@@ -532,14 +532,14 @@ body.g-brief { padding-left: 5mm; padding-right: 10mm; }
 .g-brief .anrede { margin: 0 0 3.5mm; }
 .g-brief table.liste th { border-bottom-width: 1.2pt; }
 .g-brief table.liste td { padding-top: 1.6mm; padding-bottom: 1.6mm; }
-.g-brief .zahlung { margin-top: 5mm; display: flex; gap: 5mm; align-items: stretch; background: var(--akzent-hauch); border-left: 2pt solid var(--akzent); padding: 3mm 3.5mm; }
+.g-brief .zahlung { margin-top: 4mm; display: flex; gap: 5mm; align-items: stretch; background: var(--akzent-hauch); border-left: 2pt solid var(--akzent); padding: 3mm 3.5mm; }
 .g-brief .zahlung .qr { flex: 0 0 auto; background: #fff; padding: 1.5mm; align-self: flex-start; }
 .g-brief .zahlung .qr svg { display: block; }
 .g-brief .zahlung .qr small { display: block; text-align: center; font-size: 6.4pt; color: #4a535c; margin-top: 1mm; }
 .g-brief .zahlung .text { flex: 1; }
 .g-brief .zahlung p:last-child { margin: 0; }
-.g-brief .schluss { page-break-inside: avoid; break-inside: avoid; }
-.g-brief .gruss { margin-top: 4.5mm; }
+.g-brief .schluss, .g-brief .abschluss { page-break-inside: avoid; break-inside: avoid; }
+.g-brief .gruss { margin-top: 3.5mm; }
 .g-brief .gruss p { margin-bottom: 1.4mm; }
 
 /* ---------------- Vertrag */

@@ -426,7 +426,7 @@ try {
   const zipPfad = `${OUT}/${paket.suggestedFilename()}`;
   await paket.saveAs(zipPfad);
   const zipText = fs.readFileSync(zipPfad).toString("latin1");
-  pruefe(zipText.includes("EXTF_Buchungsstapel_2026.csv") && zipText.includes("Belege/2026-10-08_Friseurbedarf-Muller-GmbH_L-2026-77.xml") && zipText.includes("Rechnungen_2026.csv"), "Paket für die Steuerberatung unvollständig");
+  pruefe(zipText.includes("EXTF_Buchungsstapel_2026.csv") && zipText.includes("Belege/2026-10-08_Friseurbedarf-Mueller-GmbH_L-2026-77.xml") && zipText.includes("Rechnungen_2026.csv"), "Paket für die Steuerberatung unvollständig");
   // dem Betrieb fehlen E-Mail, Telefon und IBAN – keine E-Rechnung im Paket, und die App sagt es
   await warte(600);
   pruefe(await sichtbar("keine E-Rechnung im Paket"), "fehlende E-Rechnung im Paket nicht gemeldet");

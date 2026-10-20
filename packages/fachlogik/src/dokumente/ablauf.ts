@@ -50,7 +50,11 @@ export interface Anlass {
   vorlagen: string[];
 }
 
-/** Anlässe auf der Startseite: so denken Gründer – nicht in Rechtsgebieten. Eine Vorlage darf in mehreren stehen. */
+/**
+ * Anlässe auf der Startseite: so denken Gründer – nicht in Rechtsgebieten. Eine Vorlage darf in mehreren stehen.
+ * Hautschutz- und Hygieneplan sind Beauty-Vorlagen (Kopf, Rechtsgrundlage, Vorschläge): Sie stehen nur unter „Salon und
+ * Kosmetik“, nicht in allgemeinen Anlässen und nicht bei Gastronomie (dort die HACCP-Eigenkontrollen).
+ */
 export const ANLAESSE: Anlass[] = [
   { id: "einstellen", titel: "Ich stelle jemanden ein", text: "Arbeitsbedingungen, Anmeldung, Lohn, Unterweisung", vorlagen: ["nachweis_arbeitsbedingungen", "sv_meldedaten", "lohnkonto", "arbeitszeitnachweis", "unterweisung", "gefaehrdungsbeurteilung", "datenschutzinformation", "ki_kompetenz", "ifsg_belehrung"] },
   { id: "gruenden", titel: "Ich gründe oder eröffne", text: "Gewerbe, Register, Kasse, Belege", vorlagen: ["gewerbeanmeldung", "handelsregister", "transparenzregister", "kassenmeldung", "verfahrensdokumentation", "aufbewahrung", "datenschutz_dokumentation", "gefaehrdungsbeurteilung"] },
@@ -58,8 +62,8 @@ export const ANLAESSE: Anlass[] = [
   { id: "steuern", titel: "Jahresabschluss und Steuern", text: "EÜR, Bilanz, Steuererklärung, Aufbewahrung", vorlagen: ["euer", "bilanz_guv", "steuererklaerung", "ust_voranmeldung", "aufbewahrung"] },
   { id: "website", titel: "Ich mache eine Website", text: "Impressum, Datenschutzerklärung, Verträge", vorlagen: ["impressum", "datenschutzerklaerung_website", "avv"] },
   { id: "datenschutz", titel: "Kundendaten und Datenschutz", text: "Verzeichnis, Info-Blatt, Verträge", vorlagen: ["datenschutz_dokumentation", "datenschutzinformation", "avv", "datenschutzerklaerung_website", "datenpanne"] },
-  { id: "sicherheit", titel: "Sicherheit am Arbeitsplatz", text: "Gefahren, Unterweisung, Gefahrstoffe, Geräte", vorlagen: ["gefaehrdungsbeurteilung", "unterweisung", "betriebsanweisung", "gefahrstoffverzeichnis", "pruefprotokoll_elektro", "hautschutzplan"] },
-  { id: "gastro", titel: "Café, Restaurant, Lebensmittel", text: "Allergene, Eigenkontrollen, Hygiene", vorlagen: ["allergene", "haccp", "ifsg_belehrung", "hygieneplan"] },
+  { id: "sicherheit", titel: "Sicherheit am Arbeitsplatz", text: "Gefahren, Unterweisung, Gefahrstoffe, Geräte", vorlagen: ["gefaehrdungsbeurteilung", "unterweisung", "betriebsanweisung", "gefahrstoffverzeichnis", "pruefprotokoll_elektro"] },
+  { id: "gastro", titel: "Café, Restaurant, Lebensmittel", text: "Allergene, Eigenkontrollen, Hygiene", vorlagen: ["allergene", "haccp", "ifsg_belehrung"] },
   { id: "beauty", titel: "Salon und Kosmetik", text: "Hautschutz, Hygiene, Gefahrstoffe", vorlagen: ["hautschutzplan", "hygieneplan", "gefaehrdungsbeurteilung", "gefahrstoffverzeichnis", "betriebsanweisung"] },
   { id: "panne", titel: "Daten verloren oder gestohlen", text: "Datenpanne festhalten und melden", vorlagen: ["datenpanne"] },
 ];

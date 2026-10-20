@@ -134,6 +134,7 @@ function EuerAusDaten({ id }: { id: string }) {
           <T v="caption" farbe={f.amtTief}>{TEXT.euer_aus_daten_ok(ergebnis.r.rechnungen, ergebnis.r.belege)}</T>
           {ergebnis.r.unbezahlt ? <T v="caption" farbe={f.bald}>{TEXT.euer_unbezahlt(ergebnis.r.unbezahlt)}</T> : null}
           {ergebnis.r.anlagen ? <T v="caption" farbe={f.bald}>{TEXT.euer_anlagen(ergebnis.r.anlagen)}</T> : null}
+          <T v="caption" farbe={f.bald}>{ergebnis.r.hinweis}</T>
         </View>
       ) : null}
     </View>

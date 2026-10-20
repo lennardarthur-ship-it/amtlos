@@ -941,6 +941,18 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
   - HACCP-Messprotokoll mit Grenzwert je Kontrollpunkt und Unterschrift; EÜR fasst auch Einnahmen nach Zeilen der Anlage EÜR zusammen; Datenpanne mit Unterschrift „Dokumentiert von“, Begründung bei „kein Risiko“ oben; Hinweis, wenn Einwilligungen ohne Widerrufshinweis gewählt sind; kein vorgedruckter Haupterwerb; Registereintrag nur bei Registerformen.
 - **Bewusst nicht geändert, fachlich offen:** T-87 bis T-96 (Storno-Leistungsdatum und Zahlungsangaben, Cent- vs. Euro-Basis der Voranmeldung, Vorsteuer bei Kleinbetragsrechnungen, einzelne Normverweise in Vorlagen, Werbeaussagen).
 
+### E-147 · Jahresszenario „Café Morgenrot“ (2026-10-20)
+
+- **Anlass:** Fünfte Durchsicht mit neuem Blickwinkel: ein realistischer Betrieb ein ganzes Jahr lang, mit den echten Funktionen der App statt Platzhaltern. Werkzeug `apps/mobile/werkzeuge/jahr-szenario.mjs` (Rohdaten und unabhängige Rechnung in `jahr-szenario-daten.ts`, App-Ablauf in `jahr-szenario.ts`) – Einzelunternehmen, 2 Beschäftigte, 17 Rechnungen (7/19 %, Mengen, Rabatt, zwei Stornos, igL nach Österreich), 32 Belege, empfangene XRechnung, vier Voranmeldungen, EÜR, Steuerberatungs-Pakete, 28 Vorlagen; `SZENARIO.md` vergleicht 235 Kennzahlen der App mit einer unabhängigen Rechnung. Vorher `npx tsc -p tsconfig.build.json` in packages/fachlogik (das Werkzeug lädt `dist`).
+- **Behoben:**
+  - Pflichten-Check: Pflichten mit Ereignis als Auslöser erschienen bei bestehenden Betrieben nie (die App übergab keine Ereignisse). `ereignisseAusStand` leitet dieselben Ereignisse ab wie der Server (Einstellung bei Beschäftigten im Profil, durchgeführte Unterweisung aus ausgegebenen Unterlagen). Beim Café erscheinen jetzt IfSG-Belehrung, Erstunterweisung, Nachweis nach NachwG, SV-Anmeldung und Sofortmeldung; die Wiederholung der Unterweisung folgt aus deren Datum.
+  - EÜR-Übernahme: steuerfreie Einnahmen (igL, Reverse Charge, befreit) in eigener Zeile; sichtbarer Hinweis, dass gezahlte USt-Vorauszahlungen, Erstattungen und AfA von Hand zu ergänzen sind. Vorschlagsliste der EÜR-Vorlage enthält alle Zeilen der Belegkategorien wortgleich.
+  - Rechnungen: Zahlungskasten, Hinweise und Gruß bleiben als ein Block zusammen; der doppelte Satz „Bitte geben Sie bei der Zahlung die Rechnungsnummer an“ entfällt neben dem Verwendungszweck. 15 von 17 Rechnungen einseitig (vorher 9).
+  - E-Rechnung einlesen: Verwendungszweck nur aus PaymentID bzw. PaymentReference, nie aus der Käuferreferenz.
+  - Dateinamen (`dateinamen.ts`): Umlaute umgeschrieben (auch im Steuerpaket), Akzente auf den Grundbuchstaben, Datum genau einmal und nie gekürzt.
+  - Café bekommt keine Beauty-Vorlagen (Hygieneplan, Hautschutzplan) mehr angeboten; Datenschutz-Baustein ohne „Friseur-Kundenkartei“; HACCP-Messprotokoll ohne leere Grenzwert-Spalte; Urlaubs- und Krankheitstage ohne „Fehlt noch: Beginn, Ende“; LIESMICH erklärt Rechnungs- gegen Leistungsdatum.
+- **Offen:** T-97 (steuerliche Fragen: Storno über den Quartalswechsel, DATEV 8125, Energie-Kategorie, USt-Zahlungen/AfA in der EÜR, ZM) und T-98 (Kassenumsätze fehlen in der App – Produktlücke für Gastronomie und Einzelhandel).
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

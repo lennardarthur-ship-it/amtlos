@@ -7,6 +7,7 @@
 import { KU_HINWEIS, fehlendFuerERechnung, rundeCent, summen, type Position, type RechnungsDaten } from "../rechnung.js";
 import { einheitCode } from "../erechnung.js";
 import { giroCodeSvg } from "../girocode.js";
+import { EUER_ZEILE_STEUERFREI, EUER_ZEILE_STEUERPFLICHTIG, KATEGORIEN } from "../belege.js";
 import { AUFBEWAHRUNG, EINHEITEN, EUER_AUSGABEN, EUER_EINNAHMEN, KASSEN_ARTEN, RECHNUNGS_HINWEISE, TSE_ARTEN } from "./bausteine.js";
 import { KOPF_LINIE, LINIE_MITTEL, ZELLE_LINIE, abschnitt, absatz, ankreuzen, anschrift, auswahl, brief, cent, datumDe, dokument, esc, euro, felder, ibanText, kennzahlen, nachsatz, uebertragung, ja, liste, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
 import type { Betrieb, Daten, Eintrag, Option, Vorlage } from "./typen.js";
@@ -277,6 +278,8 @@ export const rechnung: Vorlage = {
       `<tr class="gesamt"><td>${gutschrift ? "Gutschriftsbetrag" : "Rechnungsbetrag"}</td><td>${betrag(s.brutto_cent)}</td></tr>`,
     ].join("");
     const leistung = text(d, "leistung");
+    // Zahlungsaufforderung mit Verwendungszweck „Rechnung <Nummer>“ (unten, bei hinterlegter IBAN)
+    const mitVerwendungszweck = !storno && !gutschrift && !!b.iban.trim() && (s.brutto_cent > 0 || leer);
     const hinweise = [
       ...(ku ? [KU_HINWEIS] : []),
       // „Gutschrift“ steht schon als Titel im Betreff
@@ -284,8 +287,9 @@ export const rechnung: Vorlage = {
       befreiungText(d),
       // leere Vorlage: statt „Zahlbar …“ die Zahlungsaufforderung mit Linie für das Datum (unten)
       text(d, "zahlungsziel") && !storno && !gutschrift && !b.iban.trim() && !leer ? `Zahlbar ${ZIEL[text(d, "zahlungsziel")]}${text(d, "zahlungsziel") !== "sofort" && text(d, "datum") ? ` (bis ${plusTage(text(d, "datum"), Number(text(d, "zahlungsziel")))})` : ""}.` : "",
-      // Stornorechnung: der Hinweis zur Zahlung aus der ursprünglichen Rechnung passt nicht mehr
-      ...text(d, "hinweis").split("\n").filter((h) => !(text(d, "storno_zu") && h.trim() === ZAHLUNGS_HINWEIS)),
+      // Stornorechnung: der Hinweis zur Zahlung aus der ursprünglichen Rechnung passt nicht mehr; mit Zahlungsaufforderung
+      // steht die Rechnungsnummer schon als Verwendungszweck darin – der Satz wäre doppelt und kostete eine Zeile
+      ...text(d, "hinweis").split("\n").filter((h) => !((text(d, "storno_zu") || mitVerwendungszweck) && h.trim() === ZAHLUNGS_HINWEIS)),
     ].filter((x) => x.trim());
     const datum = text(d, "datum");
     const ziel = text(d, "zahlungsziel");
@@ -325,15 +329,43 @@ export const rechnung: Vorlage = {
         (anrede ? `<p>${esc(anrede)}</p>` : "") +
         `<section>${tabelle(["Pos.", "Leistung", "Menge", "Einzelpreis", ...(ku ? [] : ["USt"]), "Betrag"], zeilenHtml, { breiten: ku ? ["7%", "48%", "15%", "15%", "15%"] : ["7%", "41%", "14%", "14%", "9%", "15%"], zahlen: ku ? [2, 3, 4] : [2, 3, 4, 5], ...(leer ? { mindestens: 5, hoch: true } : {}) })}</section>` +
         `<table class="summen">${summenZeilen}</table>` +
+        // Zahlungsaufforderung, Hinweise und Gruß bleiben beisammen: Passt der Schluss nicht mehr auf die Seite, geht die
+        // Zahlungsaufforderung mit, statt Hinweise und Gruß allein auf eine Folgeseite zu stellen
+        `<div class="abschluss">` +
         zahlung +
         `<div class="schluss">` +
         (hinweise.length ? `<div class="gruss">${hinweise.map((h) => `<p>${esc(h)}</p>`).join("")}</div>` : "") +
-        `<p class="gruss">Mit freundlichen Grüßen<br>${esc(b.verantwortlich.trim() || b.name.trim())}${b.verantwortlich.trim() && b.name.trim() ? `<br><span class="klein">${esc(b.name.trim())}</span>` : ""}</p></div>`,
+        `<p class="gruss">Mit freundlichen Grüßen<br>${esc(b.verantwortlich.trim() || b.name.trim())}${b.verantwortlich.trim() && b.name.trim() ? `<br><span class="klein">${esc(b.name.trim())}</span>` : ""}</p></div></div>`,
     });
   },
 };
 
 // ---------------------------------------------------------------- EÜR
+
+/**
+ * Zeilen der Anlage EÜR zum Auswählen: die Liste aus der Recherche, ergänzt um jede Zeile, die „EÜR übernehmen“ aus den
+ * Belegkategorien (belege.ts) einträgt – wortgleich, damit übernommene Zeilen in der Vorschlagsliste stehen. Fehlende
+ * Zeilen stehen vor der Zeile, bei der sie im Vordruck einsortiert sind (sonst am Ende).
+ */
+function zeilenMit(liste: string[], dazu: string[], vor: Record<string, string> = {}): string[] {
+  const r = [...liste];
+  for (const z of new Set(dazu)) {
+    if (r.includes(z)) continue;
+    const i = vor[z] ? r.indexOf(vor[z]) : -1;
+    if (i >= 0) r.splice(i, 0, z);
+    else r.push(z);
+  }
+  return r;
+}
+const EUER_AUSGABEN_ZEILEN = zeilenMit(
+  EUER_AUSGABEN,
+  KATEGORIEN.map((k) => k.euer),
+  {
+    "Miete/Pacht für Geschäftsräume und betrieblich genutzte Grundstücke": "Miete/Aufwendungen für doppelte Haushaltsführung",
+    "Kraftfahrzeugkosten und andere Fahrtkosten": "Fahrtkosten für nicht zum Betriebsvermögen gehörende Fahrzeuge",
+  },
+);
+const EUER_EINNAHMEN_ZEILEN = zeilenMit(EUER_EINNAHMEN, [EUER_ZEILE_STEUERPFLICHTIG, EUER_ZEILE_STEUERFREI]);
 
 export const euer: Vorlage = {
   id: "euer",
@@ -352,7 +384,7 @@ export const euer: Vorlage = {
     {
       titel: "Einnahmen",
       hilfe: "Was im Jahr eingegangen ist.",
-      felder: [{ id: "einnahmen", art: "liste", label: "Einnahmen", eintrag: "Einnahme", titelFeld: "text", pflicht: true, felder: [{ id: "datum", art: "datum", label: "Datum" }, { id: "text", art: "text", label: "Bezeichnung", hilfe: "z. B. Umsätze Oktober", pflicht: true }, { id: "kategorie", art: "text", label: "Zeile der Anlage EÜR", vorschlaege: EUER_EINNAHMEN }, { id: "betrag", art: "betrag", label: "Betrag (€)", pflicht: true }] }],
+      felder: [{ id: "einnahmen", art: "liste", label: "Einnahmen", eintrag: "Einnahme", titelFeld: "text", pflicht: true, felder: [{ id: "datum", art: "datum", label: "Datum" }, { id: "text", art: "text", label: "Bezeichnung", hilfe: "z. B. Umsätze Oktober", pflicht: true }, { id: "kategorie", art: "text", label: "Zeile der Anlage EÜR", vorschlaege: EUER_EINNAHMEN_ZEILEN }, { id: "betrag", art: "betrag", label: "Betrag (€)", pflicht: true }] }],
     },
     {
       titel: "Ausgaben",
@@ -367,7 +399,7 @@ export const euer: Vorlage = {
           felder: [
             { id: "datum", art: "datum", label: "Datum" },
             { id: "text", art: "text", label: "Bezeichnung", hilfe: "z. B. Miete Oktober", pflicht: true },
-            { id: "kategorie", art: "text", label: "Zeile der Anlage EÜR", vorschlaege: EUER_AUSGABEN },
+            { id: "kategorie", art: "text", label: "Zeile der Anlage EÜR", vorschlaege: EUER_AUSGABEN_ZEILEN },
             { id: "betrag", art: "betrag", label: "Betrag (€)", pflicht: true },
           ],
         },

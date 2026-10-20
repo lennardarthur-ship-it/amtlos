@@ -7,7 +7,7 @@
 import { VORLAGEN, fehlendeAngaben, vorlageFuer, type Betrieb } from "@amtlos/fachlogik";
 import { StandardKalender } from "@amtlos/fristen";
 import { SCHRITTE, type Frage } from "@amtlos/i18n";
-import { auswerten, entscheidendeSaetze, zuErfragendeFakten, type Katalog, type Pflicht } from "@amtlos/rules-engine";
+import { auswerten, entscheidendeSaetze, zuErfragendeFakten, type Ereignis, type Katalog, type Pflicht } from "@amtlos/rules-engine";
 import roh from "./katalog.json";
 
 export const KATALOG = roh as unknown as Katalog;
@@ -94,10 +94,50 @@ function plusMonate(iso: string, n: number): string {
   return d.toISOString().slice(0, 10);
 }
 
-/** Katalog für dieses Profil auswerten. Pflichten im Rechtsänderungs-Radar (Entwurf, geplant) zählen nicht mit. */
-export function auswertung(profil: Profil, stichtag: string): Auswertung {
+/** Unterlage, soweit sie für abgeleitete Ereignisse zählt (Teil von `Unterlage` aus unterlagen/speicher.ts). */
+export interface UnterlageFuerEreignis {
+  vorlage: string;
+  daten: Record<string, unknown>;
+  ausgegeben?: string;
+  storniertDurch?: string;
+}
+
+const ISO = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * Ereignisse für die Engine, wie sie der Server aus seinen Datensätzen hat (packages/server `ladeEreignisse`) – die App
+ * kennt keine Ereignis-Tabelle, also leitet sie dieselben Ereignistypen (packages/rules-schema/ereignisse.json) aus dem
+ * ab, was auf dem Gerät steht. Keine neuen Auslöser, nur die Gegenstücke zu dem, was der Server meldet:
+ * - Beschäftigte im Profil (`beschaeftigte.gesamt` ≥ 1) ⇒ „erste_einstellung“ und „einstellung“ sind eingetreten (Server:
+ *   beim Anlegen einer beschäftigten Person, personal.controller). Den Tag kennt die App nicht: Gründungsdatum, sonst
+ *   der Stichtag. Liegt die Gründung in der Zukunft, ist die Einstellung geplant (wie im Katalog „op: geplant“).
+ * - ausgegebene, nicht stornierte Unterweisung mit Datum ⇒ „unterweisung_durchgefuehrt“ an diesem Tag (Server: beim
+ *   Abschließen einer Unterweisung) – daraus die Wiederholung nach einem Jahr.
+ */
+export function ereignisseAusStand(profil: Profil, stichtag: string, unterlagen: readonly UnterlageFuerEreignis[] = []): Ereignis[] {
+  const ereignisse: Ereignis[] = [];
+  const anzahl = profil["beschaeftigte.gesamt"];
+  if (typeof anzahl === "number" && anzahl >= 1) {
+    const g = profil.gruendungsdatum;
+    const datum = typeof g === "string" && ISO.test(g) ? g : stichtag;
+    ereignisse.push({ typ: "erste_einstellung", datum }, { typ: "einstellung", datum });
+  }
+  for (const u of unterlagen) {
+    if (u.vorlage !== "unterweisung" || !u.ausgegeben || u.storniertDurch) continue;
+    const d = u.daten.datum;
+    if (typeof d === "string" && ISO.test(d)) ereignisse.push({ typ: "unterweisung_durchgefuehrt", datum: d });
+  }
+  return ereignisse.sort((a, b) => a.datum.localeCompare(b.datum) || a.typ.localeCompare(b.typ));
+}
+
+/**
+ * Katalog für dieses Profil auswerten. Pflichten im Rechtsänderungs-Radar (Entwurf, geplant) zählen nicht mit.
+ * Ereignisse leitet `ereignisseAusStand` aus Profil und Unterlagen ab (z. B. Beschäftigte ⇒ Einstellung).
+ */
+export function auswertung(profil: Profil, stichtag: string, unterlagen: readonly UnterlageFuerEreignis[] = []): Auswertung {
   const fakten = Object.fromEntries(Object.entries(profil).filter(([, w]) => w !== null && w !== undefined).map(([k, w]) => [`profil.${k}`, w]));
-  const ergebnisse = auswerten({ katalog: KATALOG, fakten, ereignisse: [], stichtag, kalender: new StandardKalender(), fenster: { von: stichtag, bis: plusMonate(stichtag, 12) } });
+  const ereignisse = ereignisseAusStand(profil, stichtag, unterlagen);
+  const ergebnisse = auswerten({ katalog: KATALOG, fakten, ereignisse, stichtag, kalender: new StandardKalender(), fenster: { von: stichtag, bis: plusMonate(stichtag, 12) } });
   const nachId = new Map(KATALOG.pflichten.map((p) => [p.id, p]));
   const info = (e: (typeof ergebnisse)[number]): PflichtInfo => {
     const p = nachId.get(e.pflicht_id) as Pflicht & { stelle?: unknown; quellen?: { titel: string; url?: string }[]; pruefung?: { status?: string } };
@@ -123,7 +163,9 @@ export function auswertung(profil: Profil, stichtag: string): Auswertung {
         .map((f) => f.slice("profil.".length))
         .filter((f) => FRAGE.has(f)),
       geprueft: p.pruefung?.status === "freigegeben",
-      wiederkehrend: p.wiederholung?.art === "periodisch" || e.termine.length > 1,
+      // je Ereignis mit kommendem Termin (z. B. Unterweisung ein Jahr nach der letzten): „erledigt“ gilt nur für diesen
+      // Termin – sonst hakte die Unterweisung, aus der der Termin entsteht, ihre eigene Wiederholung schon ab
+      wiederkehrend: p.wiederholung?.art === "periodisch" || e.termine.length > 1 || Boolean(termin && p.frist.typ === "relativ" && "ereignis" in p.frist.bezug && p.frist.je_ereignis),
     };
   };
   const sortiert = (l: PflichtInfo[]) => l.sort((a, b) => SCHWERE[a.schwere] - SCHWERE[b.schwere] || (a.naechsterTermin ?? "9999").localeCompare(b.naechsterTermin ?? "9999") || a.titel.localeCompare(b.titel, "de"));
@@ -142,8 +184,8 @@ export function auswertung(profil: Profil, stichtag: string): Auswertung {
 /**
  * Zusatzfragen für ein genaueres Ergebnis: die Profilfelder, die die meisten unklaren Pflichten klären – höchstens `n`.
  */
-export function zusatzFragen(profil: Profil, stichtag: string, n = 8): string[] {
-  return offeneFragenNachWirkung(auswertung(profil, stichtag), profil).slice(0, n).map((o) => o.feld);
+export function zusatzFragen(profil: Profil, stichtag: string, n = 8, unterlagen: readonly UnterlageFuerEreignis[] = []): string[] {
+  return offeneFragenNachWirkung(auswertung(profil, stichtag, unterlagen), profil).slice(0, n).map((o) => o.feld);
 }
 
 /** Offene Fragen, nach der Zahl unklarer Pflichten, die sie klären (E-129) – die wirksamste zuerst. */

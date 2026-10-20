@@ -11,3 +11,4 @@ export * from "./dokumente/index.js";
 export * from "./belege.js";
 export * from "./erechnungLesen.js";
 export * from "./buchungen.js";
+export * from "./dateinamen.js";

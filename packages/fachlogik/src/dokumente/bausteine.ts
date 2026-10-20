@@ -1200,7 +1200,7 @@ export const VVT: Vorschlag[] = [
   "werte": {
    "bezeichnung": "Kundenverwaltung / Kundenkartei",
    "zweck": "Bearbeitung von Aufträgen und Kundenbeziehungen einschließlich Rechnungsstellung; ggf. postalische Werbung an Bestandskunden",
-   "rechtsgrundlage": "Art. 6 Abs. 1 lit. b DSGVO (Vertrag/vorvertragliche Maßnahmen); Art. 6 Abs. 1 lit. c DSGVO i. V. m. § 147 AO, § 257 HGB (Aufbewahrung); Art. 6 Abs. 1 lit. f DSGVO (postalische Bestandskundenwerbung). Bei Gesundheitsangaben (z. B. Allergien/Unverträglichkeiten in der Friseur-Kundenkartei) ausdrückliche Einwilligung nach Art. 9 Abs. 2 lit. a DSGVO.",
+   "rechtsgrundlage": "Art. 6 Abs. 1 lit. b DSGVO (Vertrag/vorvertragliche Maßnahmen); Art. 6 Abs. 1 lit. c DSGVO i. V. m. § 147 AO, § 257 HGB (Aufbewahrung); Art. 6 Abs. 1 lit. f DSGVO (postalische Bestandskundenwerbung). Bei Gesundheitsangaben (z. B. Allergien/Unverträglichkeiten) ausdrückliche Einwilligung nach Art. 9 Abs. 2 lit. a DSGVO.",
    "betroffene": "Kunden, Interessenten",
    "datenarten": "Name, Anschrift, Kontaktdaten (Telefon, E-Mail), Angaben zum Auftrag / Leistungshistorie, ggf. Bankverbindung, ggf. Gesundheitsdaten (nur mit ausdrücklicher Einwilligung)",
    "empfaenger": "Steuerberater (eigenständiger Verantwortlicher), IT-/Software-Dienstleister (Auftragsverarbeiter)",

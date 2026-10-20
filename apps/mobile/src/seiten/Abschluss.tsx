@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Pressable, Share, View } from "react-native";
-import { KU_HINWEIS, PRUEFHINWEIS, dateiname, dokumentHtml, eRechnungAus, vorlageFuer, xrechnungUbl } from "@amtlos/fachlogik";
+import { KU_HINWEIS, PRUEFHINWEIS, dateinamenTeil, dokumentHtml, eRechnungAus, pdfDateiname, vorlageFuer, xrechnungUbl } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { DatumFeld, Fuss, Hinweis, Karte, Knopf, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
@@ -40,7 +40,7 @@ export function useTeilen(id: string) {
     setLaedt(art === "teilen");
     try {
       const html = dokumentHtml(v, u.daten, betriebFuerDokument(z.stand.betrieb, z.pro));
-      const ok = art === "teilen" ? await pdfTeilen(html, dateiname(v, u.daten, heute()), v.querformat) : await drucken(html, dateiname(v, u.daten, heute()), v.querformat);
+      const ok = art === "teilen" ? await pdfTeilen(html, pdfDateiname(v, u.daten, heute()), v.querformat) : await drucken(html, pdfDateiname(v, u.daten, heute()), v.querformat);
       // abgebrochen: nichts festschreiben, nichts vom Freikontingent verbrauchen
       if (!ok) return;
       const erstesMal = !u.ausgegeben;
@@ -65,7 +65,7 @@ export function useTeilen(id: string) {
     setEFehlt(alle);
     if (alle.length) return;
     try {
-      if (await dateiTeilen(`E-Rechnung-${daten.nummer.replace(/[^A-Za-z0-9-]+/g, "-")}.xml`, xrechnungUbl(daten, KU_HINWEIS), "application/xml")) z.ausgeben(id);
+      if (await dateiTeilen(`E-Rechnung-${dateinamenTeil(daten.nummer, 60) || "ohne-Nummer"}.xml`, xrechnungUbl(daten, KU_HINWEIS), "application/xml")) z.ausgeben(id);
     } catch {
       setFehler(TEXT.e_rechnung_fehler);
     }

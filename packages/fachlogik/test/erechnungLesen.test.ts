@@ -152,8 +152,9 @@ describe("E-Rechnungen lesen (Eingang)", () => {
       { bezeichnung: "Fachbuch", menge: 1, einheit: "C62", netto_cent: 2999, satz: 7 },
     ]);
     expect(r.positionen.map((p) => einheitText(p.einheit))).toEqual(["Stunde", "Stück"]);
-    // ohne PaymentID dient die Käuferreferenz als Verwendungszweck
-    expect(r.verwendungszweck).toBe("PO-77");
+    // ohne PaymentID kein Verwendungszweck – die Käuferreferenz (BT-10, hier „PO-77“) ist keiner
+    expect(xml).toContain("<cbc:BuyerReference>PO-77</cbc:BuyerReference>");
+    expect(r.verwendungszweck).toBeNull();
     expect(r.hinweise).toEqual(["Vielen Dank für Ihren Auftrag."]);
   });
 
@@ -210,6 +211,17 @@ describe("E-Rechnungen lesen (Eingang)", () => {
     ]);
     expect(r.verwendungszweck).toBe("L-2026-4711");
     expect(r.hinweise).toEqual(["Lieferung frei Haus.", "Zahlbar innerhalb von 14 Tagen."]);
+  });
+
+  it("Verwendungszweck nur aus BT-83 (UBL PaymentID, CII PaymentReference), nie aus der Käuferreferenz BT-10", () => {
+    const ubl = xrechnungUbl({ ...BASIS, kunde: { ...BASIS.kunde, kaeufer_referenz: "Kundennr. 10233" } }, KU_HINWEIS);
+    expect(eRechnungLesen(ubl)!.verwendungszweck).toBeNull();
+    const mitZweck = ubl.replace("</cbc:PaymentMeansCode>", "</cbc:PaymentMeansCode><cbc:PaymentID>RE 2026-0001</cbc:PaymentID>");
+    expect(mitZweck).toContain("<cbc:PaymentID>");
+    expect(eRechnungLesen(mitZweck)!.verwendungszweck).toBe("RE 2026-0001");
+    const ohne = CII.replace("<ram:PaymentReference>L-2026-4711</ram:PaymentReference>", "");
+    expect(ohne).toContain("<ram:BuyerReference>Filiale Süd</ram:BuyerReference>");
+    expect(eRechnungLesen(ohne)!.verwendungszweck).toBeNull();
   });
 
   it("löst Entitäten und CDATA auf, überspringt Kommentare, Deklaration und DOCTYPE", () => {

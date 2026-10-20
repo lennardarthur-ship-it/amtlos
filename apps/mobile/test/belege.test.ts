@@ -1,9 +1,9 @@
 import { unzipSync, strFromU8 } from "fflate";
 import { describe, expect, it } from "vitest";
-import { KU_HINWEIS, eRechnungAus, xrechnungUbl, type Beleg } from "@amtlos/fachlogik";
+import { EUER_ZEILE_STEUERFREI, KU_HINWEIS, eRechnungAus, vorlageFuer, xrechnungUbl, type Beleg } from "@amtlos/fachlogik";
 import { sicherungErstellen, sicherungLesen, sicherungLesenMitDateien } from "../src/unterlagen/sicherung";
 import { LEERER_STAND, anlegen, aufbewahrungspflichtig, ausgeben, belegLoeschen, belegSetzen, bezahltSetzen, felderSetzen, standAus, ungesichert, zusammenfuehren, type Stand } from "../src/unterlagen/speicher";
-import { belegDateiname, euerUebernahme, jahreMitDaten, standardZeitraum, steuerpaket, zeitraeume } from "../src/unterlagen/steuerpaket";
+import { EUER_NICHT_ENTHALTEN, belegDateiname, euerUebernahme, jahreMitDaten, standardZeitraum, steuerpaket, zeitraeume } from "../src/unterlagen/steuerpaket";
 import { perioden, umsaetzeFuer } from "../src/unterlagen/ustAusRechnungen";
 
 const t = (d: string) => new Date(`${d}T09:00:00Z`);
@@ -79,7 +79,27 @@ describe("Voranmeldung und EÜR aus Belegen (E-133)", () => {
     expect(e.ausgaben.at(-1)).toMatchObject({ kategorie: "Gezahlte Vorsteuerbeträge", betrag: "399,00" });
     expect(e.anlagen).toBe(1);
     expect(e.unbezahlt).toBe(1);
+    expect(e.hinweis).toBe(EUER_NICHT_ENTHALTEN);
     expect(jahreMitDaten(s)).toEqual(["2027", "2026"]);
+  });
+  it("EÜR: steuerfreie innergemeinschaftliche Lieferung in der Zeile für steuerfreie Einnahmen; Hinweis auf USt-Zahlungen und AfA", () => {
+    let s: Stand = { ...LEERER_STAND, betrieb: { ...BETRIEB, ust_idnr: "DE123456789" } };
+    s = rechnung(s, "r1", "2026-03-05", "100,00", "2026-03-20");
+    const [s1] = anlegen(s, "rechnung", t("2026-08-27"), "r2");
+    s = felderSetzen(s1, "r2", { datum: "2026-08-27", leistungsdatum: "2026-08-25", kunde_name: "Feinkost Huber GmbH", kunde_anschrift: "Ringstraße 1\n1010 Wien", kunde_land: "AT", kunde_ust_idnr: "ATU12345678", hinweise: ["igl"], positionen: [{ bezeichnung: "Präsentbox", menge: "40", einheit: "Stück", preis: "21,00", satz: "0" }] }, t("2026-08-27"));
+    s = bezahltSetzen(ausgeben(s, "r2", t("2026-08-27")), "r2", "2026-09-10");
+    expect(eRechnungAus(s.unterlagen.find((u) => u.id === "r2")!.daten, s.betrieb).daten.steuerart).toBe("igl");
+    const e = euerUebernahme(s, "2026");
+    expect(e.einnahmen).toEqual([
+      { datum: "", text: "Umsätze aus Rechnungen (netto)", kategorie: "Umsatzsteuerpflichtige Betriebseinnahmen", betrag: "100,00" },
+      { datum: "", text: "Steuerfreie Umsätze aus Rechnungen (z. B. innergemeinschaftliche Lieferung)", kategorie: EUER_ZEILE_STEUERFREI, betrag: "840,00" },
+      { datum: "", text: "Vereinnahmte Umsatzsteuer", kategorie: "Vereinnahmte Umsatzsteuer sowie Umsatzsteuer auf unentgeltliche Wertabgaben", betrag: "19,00" },
+    ]);
+    // dieselben Zeilentexte wie in den Vorschlägen der Vorlage „EÜR“
+    const vorschlaege = vorlageFuer("euer")!.abschnitte.flatMap((a) => a.felder).flatMap((f) => ("felder" in f && f.felder ? f.felder : [])).flatMap((f) => ("vorschlaege" in f && f.vorschlaege ? f.vorschlaege : []));
+    for (const z of e.einnahmen) expect(vorschlaege, z.kategorie).toContain(z.kategorie);
+    expect(e.hinweis).toMatch(/Umsatzsteuer-Vorauszahlungen/);
+    expect(e.hinweis).toMatch(/Abschreibungen \(AfA\)/);
   });
 });
 
@@ -102,13 +122,18 @@ describe("Paket für die Steuerberatung (E-133)", () => {
     const p = steuerpaket(s, z, s.steuerberatung, { "f1.jpg": new Uint8Array([1, 2, 3]) }, "2026-10-13T12:00:00.000Z");
     expect(p).toMatchObject({ rechnungen: 1, belege: 1, ohneXml: 0, dateiname: "Amtlos-Steuerberatung-Salon-Sonne-2026-Q4.zip" });
     const inhalt = unzipSync(p.zip);
-    expect(Object.keys(inhalt).sort()).toEqual(["Belege/2026-10-02_Muller-Sohne_L-b1.jpg", "Belege_2026-Q4.csv", "Buchungsliste_2026-Q4.csv", "E-Rechnungen/2026-001.xml", "EXTF_Buchungsstapel_2026-Q4.csv", "LIESMICH.txt", "Rechnungen_2026-Q4.csv"].sort());
+    expect(Object.keys(inhalt).sort()).toEqual(["Belege/2026-10-02_Mueller-Soehne_L-b1.jpg", "Belege_2026-Q4.csv", "Buchungsliste_2026-Q4.csv", "E-Rechnungen/2026-001.xml", "EXTF_Buchungsstapel_2026-Q4.csv", "LIESMICH.txt", "Rechnungen_2026-Q4.csv"].sort());
     expect(strFromU8(inhalt["EXTF_Buchungsstapel_2026-Q4.csv"]!, true).startsWith('"EXTF";700;21')).toBe(true);
     expect(strFromU8(inhalt["Rechnungen_2026-Q4.csv"]!)).toContain("2026-001;05.10.2026;05.10.2026;Kim Beispiel;100,00;19,00;119,00;19 %;10.10.2026;");
     expect(strFromU8(inhalt["Belege_2026-Q4.csv"]!)).toContain("Müller & Söhne");
-    expect(Array.from(inhalt["Belege/2026-10-02_Muller-Sohne_L-b1.jpg"]!)).toEqual([1, 2, 3]);
+    expect(Array.from(inhalt["Belege/2026-10-02_Mueller-Soehne_L-b1.jpg"]!)).toEqual([1, 2, 3]);
     const xml = strFromU8(inhalt["E-Rechnungen/2026-001.xml"]!);
     expect(xml).toBe(xrechnungUbl(eRechnungAus(s.unterlagen[0]!.daten, s.betrieb).daten, KU_HINWEIS));
     expect(belegDateiname(beleg("x", "2026-01-01", 1, { lieferant: "", nummer: null, datei: "a.pdf" }))).toBe("2026-01-01_ohne-name.pdf");
+    expect(belegDateiname(beleg("y", "2026-01-31", 1, { lieferant: "Lohnbüro Weiß", nummer: "LA 01/2026", datei: "b.pdf" }))).toBe("2026-01-31_Lohnbuero-Weiss_LA-01-2026.pdf");
+    expect(belegDateiname(beleg("z", "2026-02-01", 1, { lieferant: "Café Crème", nummer: null, datei: "c.jpg" }))).toBe("2026-02-01_Cafe-Creme.jpg");
+    expect(steuerpaket({ ...s, betrieb: { ...s.betrieb, name: "Café Morgenrot" } }, z, s.steuerberatung, {}, "2026-10-13T12:00:00.000Z").dateiname).toBe("Amtlos-Steuerberatung-Cafe-Morgenrot-2026-Q4.zip");
+    // Hinweis: Paket nach Rechnungsdatum, Voranmeldung nach Leistungsdatum
+    expect(strFromU8(inhalt["LIESMICH.txt"]!)).toMatch(/nach dem Leistungsdatum zu \(Soll-Versteuerung\).*abweichen/);
   });
 });

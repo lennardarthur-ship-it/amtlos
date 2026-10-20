@@ -60,8 +60,9 @@ export const arbeitszeitnachweis: Vorlage = {
           titelFeld: "datum",
           felder: [
             { id: "datum", art: "datum", label: "Datum", vorbelegung: "heute", pflicht: true },
-            { id: "beginn", art: "uhrzeit", label: "Beginn", pflicht: true },
-            { id: "ende", art: "uhrzeit", label: "Ende", pflicht: true },
+            // Pflicht nur ohne Bemerkung (Urlaub, krank) – das prüft pruefen(), die Liste kennt keine solche Bedingung
+            { id: "beginn", art: "uhrzeit", label: "Beginn" },
+            { id: "ende", art: "uhrzeit", label: "Ende" },
             { id: "pause", art: "zahl", label: "Pause (Minuten)" },
             { id: "bemerkung", selten: true, art: "text", label: "Bemerkung", hilfe: "z. B. Urlaub, krank" },
           ],
@@ -70,6 +71,15 @@ export const arbeitszeitnachweis: Vorlage = {
     },
   ],
   ergebnis: (d) => [["Arbeitszeit im Monat", stunden(zeiten(d).gesamt)]],
+  pruefen(d) {
+    // Beginn und Ende fehlen nur an Tagen ohne Bemerkung; ein Tag mit „Urlaub“ oder „krank“ braucht keine Uhrzeiten
+    const tage = liste(d, "tage").filter((x) => ["beginn", "ende", "pause", "bemerkung"].some((k) => text(x, k)));
+    return tage.flatMap((x, i) =>
+      text(x, "bemerkung")
+        ? []
+        : [["beginn", "Beginn"], ["ende", "Ende"]].filter(([k]) => !text(x, k!)).map(([, label]) => `Arbeitstag${tage.length > 1 ? ` ${i + 1}` : ""}: ${label}`),
+    );
+  },
   html(d, b) {
     const { z, gesamt } = zeiten(d);
     // ohne Einträge: Blatt zum Eintragen von Hand – eine hohe Zeile je Tag, keine Summe „0:00 h“

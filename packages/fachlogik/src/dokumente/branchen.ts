@@ -213,9 +213,12 @@ export const haccp: Vorlage = {
   html(d, b) {
     const p = liste(d, "punkte").filter((x) => text(x, "punkt"));
     const m = liste(d, "messungen").filter((x) => text(x, "kontrollpunkt") || text(x, "wert"));
-    // Grenzwert zur Messung aus den Kontrollpunkten (gleicher Name, ohne Groß-/Kleinschreibung und Leerzeichen am Rand)
-    const norm = (t: string) => t.trim().toLocaleLowerCase("de");
+    // Grenzwert zur Messung aus den Kontrollpunkten (gleicher Name, ohne Groß-/Kleinschreibung und Leerzeichen)
+    const norm = (t: string) => t.trim().replace(/\s+/g, " ").toLocaleLowerCase("de");
     const grenzwert = (kp: string) => p.find((x) => norm(text(x, "punkt")) === norm(kp)) ?? null;
+    // Messungen heißen meist nach dem Gerät („Kühlschrank Küche“): Passt keine zu einem Kontrollpunkt, entfällt die
+    // Spalte „Grenzwert“ statt leer zu bleiben. Das leere Protokoll zum Eintragen von Hand behält sie.
+    const mitGrenzwert = !m.length || m.some((x) => grenzwert(text(x, "kontrollpunkt")));
     const zeitraum = text(d, "zeitraum");
     return dokument({
       titel: "Eigenkontrollen",
@@ -233,12 +236,12 @@ export const haccp: Vorlage = {
         abschnitt(
           zeitraum ? `Messprotokoll · ${zeitraum}` : "Messprotokoll",
           tabelle(
-            ["Datum / Uhrzeit", "Kontrollpunkt", "Grenzwert", "Messwert", "In Ordnung", "Korrekturmaßnahme", "Kürzel"],
+            ["Datum / Uhrzeit", "Kontrollpunkt", ...(mitGrenzwert ? ["Grenzwert"] : []), "Messwert", "In Ordnung", "Korrekturmaßnahme", "Kürzel"],
             m.map((x) => {
               const kp = grenzwert(text(x, "kontrollpunkt"));
-              return [`${datumDe(text(x, "datum"))}${text(x, "uhrzeit") ? ` ${esc(text(x, "uhrzeit"))}` : ""}`, zelle(text(x, "kontrollpunkt")), kp ? zelle(text(kp, "grenzwert")) : "", zelle(text(x, "wert")), text(x, "in_ordnung") === "nein" ? "<strong>nein</strong>" : "ja", zelle(text(x, "massnahme")), zelle(text(x, "kuerzel"))];
+              return [`${datumDe(text(x, "datum"))}${text(x, "uhrzeit") ? ` ${esc(text(x, "uhrzeit"))}` : ""}`, zelle(text(x, "kontrollpunkt")), ...(mitGrenzwert ? [kp ? zelle(text(kp, "grenzwert")) : ""] : []), zelle(text(x, "wert")), text(x, "in_ordnung") === "nein" ? "<strong>nein</strong>" : "ja", zelle(text(x, "massnahme")), zelle(text(x, "kuerzel"))];
             }),
-            { breiten: ["13%", "19%", "15%", "10%", "9%", "24%", "10%"], leerzeilen: ja(d, "leerzeilen") ? haccpLeerzeilen(m.length) : 0, hoch: ja(d, "leerzeilen") },
+            { breiten: mitGrenzwert ? ["13%", "19%", "15%", "10%", "9%", "24%", "10%"] : ["14%", "24%", "12%", "10%", "29%", "11%"], leerzeilen: ja(d, "leerzeilen") ? haccpLeerzeilen(m.length) : 0, hoch: ja(d, "leerzeilen") },
           ),
           // Protokoll als eigenes Blatt zum Aushängen (auch leer: davor steht die Tabelle der Kontrollpunkte)
           "neue-seite",

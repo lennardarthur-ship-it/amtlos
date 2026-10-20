@@ -826,3 +826,90 @@ describe("Vorlagen, vierte Durchsicht", () => {
     expect(km).toContain("<th>TSE – Seriennummer</th>");
   });
 });
+
+describe("Vorlagen, fünfte Durchsicht (Jahres-Szenario Café)", () => {
+  const html = (id: string, d: Daten, b: Betrieb = BETRIEB) => n(dokumentHtml(vorlageFuer(id)!, d, b));
+  const RE = { nummer: "2026-001", datum: "2026-01-22", zahlungsziel: "14", kunde_name: "Kim", positionen: [{ bezeichnung: "Frühstück", menge: "18", preis: "14,50", satz: "7" }] };
+
+  it("Rechnung: Zahlungsaufforderung, Hinweise und Gruß als ein Schlussteil; kein doppelter Hinweis auf die Rechnungsnummer", () => {
+    const hinweis = "Vielen Dank für Ihren Auftrag.\nBitte geben Sie bei der Zahlung die Rechnungsnummer an.";
+    const h = html("rechnung", { ...RE, hinweis });
+    // der Schlussteil bricht nur als Ganzes um – keine Folgeseite nur mit Hinweisen und Gruß
+    expect(h).toMatch(/<div class="abschluss"><div class="zahlung">.*?Verwendungszweck: Rechnung 2026-001.*?<div class="schluss">.*?Mit freundlichen Grüßen/);
+    expect(h).toContain(".g-brief .schluss, .g-brief .abschluss { page-break-inside: avoid; break-inside: avoid; }");
+    // die Rechnungsnummer steht als Verwendungszweck in der Zahlungsaufforderung
+    expect(h).not.toContain("Bitte geben Sie bei der Zahlung die Rechnungsnummer an.");
+    expect(h).toContain("<p>Vielen Dank für Ihren Auftrag.</p>");
+    // ohne IBAN keine Zahlungsaufforderung: dann bleibt der Hinweis
+    expect(html("rechnung", { ...RE, hinweis }, { ...BETRIEB, iban: "" })).toContain("Bitte geben Sie bei der Zahlung die Rechnungsnummer an.");
+    // Gutschrift: keine Zahlungsaufforderung, der Hinweis bleibt, wie eingetragen
+    expect(html("rechnung", { ...RE, hinweis, hinweise: ["gutschrift"] })).toContain("Bitte geben Sie bei der Zahlung die Rechnungsnummer an.");
+  });
+
+  it("Anlässe: Beauty-Vorlagen (Hygiene-, Hautschutzplan) nur unter „Salon und Kosmetik“", () => {
+    const beauty = VORLAGEN.filter((v) => v.bereich === "beauty").map((v) => v.id);
+    expect(beauty.sort()).toEqual(["hautschutzplan", "hygieneplan"]);
+    for (const a of ANLAESSE) if (a.id !== "beauty") for (const id of beauty) expect(a.vorlagen, `${a.id}: ${id}`).not.toContain(id);
+    expect(ANLAESSE.find((a) => a.id === "beauty")!.vorlagen).toEqual(expect.arrayContaining(beauty));
+    expect(ANLAESSE.find((a) => a.id === "gastro")!.vorlagen).toEqual(["allergene", "haccp", "ifsg_belehrung"]);
+  });
+
+  it("Datenschutz: Baustein Kundenverwaltung ohne Friseur-Beispiel", () => {
+    const v = vorlageFuer("datenschutz_dokumentation")!;
+    const vorschlaege = v.abschnitte.flatMap((a) => a.felder).flatMap((f) => (f.art === "liste" ? (f.vorschlaege ?? []) : []));
+    const kunden = vorschlaege.find((x) => x.titel === "Kundenverwaltung / Kundenkartei")!;
+    expect(kunden.werte.rechtsgrundlage).toContain("Bei Gesundheitsangaben (z. B. Allergien/Unverträglichkeiten) ausdrückliche Einwilligung nach Art. 9 Abs. 2 lit. a DSGVO.");
+    expect(JSON.stringify(vorschlaege)).not.toContain("Friseur-Kundenkartei");
+  });
+
+  it("HACCP-Messprotokoll: Spalte „Grenzwert“ nur, wenn eine Messung zu einem Kontrollpunkt passt", () => {
+    const punkte = [{ punkt: "Kühllagerung  allgemein", grenzwert: "max. +7 °C", korrektur: "Ware prüfen" }];
+    const geraete = html("haccp", { zeitraum: "Oktober 2026", punkte, messungen: [{ datum: "2026-10-12", kontrollpunkt: "Kühlschrank Küche", wert: "5 °C", in_ordnung: "ja" }, { datum: "2026-10-12", kontrollpunkt: "Kuchenvitrine", wert: "6 °C", in_ordnung: "ja" }] });
+    expect(geraete).toContain("<th>Kontrollpunkt</th><th>Messwert</th>");
+    expect(geraete.split("<h2>Messprotokoll")[1]).not.toContain("<th>Grenzwert</th>");
+    expect(geraete).toContain("<td>Kühlschrank Küche</td><td>5&nbsp;°C</td>");
+    // tolerant: Groß-/Kleinschreibung und Leerzeichen
+    const passend = html("haccp", { zeitraum: "Oktober 2026", punkte, messungen: [{ datum: "2026-10-12", kontrollpunkt: " KÜHLLAGERUNG allgemein ", wert: "5 °C", in_ordnung: "ja" }, { datum: "2026-10-12", kontrollpunkt: "Kuchenvitrine", wert: "6 °C", in_ordnung: "ja" }] });
+    expect(passend).toContain("<th>Grenzwert</th><th>Messwert</th>");
+    expect(passend).toContain("<td>KÜHLLAGERUNG allgemein</td><td>max. +7&nbsp;°C</td>");
+    expect(passend).toContain("<td>Kuchenvitrine</td><td></td>");
+    // leeres Protokoll zum Eintragen von Hand behält die Spalte
+    expect(html("haccp", { zeitraum: "Oktober 2026", punkte, leerzeilen: true })).toContain("<th>Grenzwert</th><th>Messwert</th>");
+  });
+
+  it("Arbeitszeitnachweis: Tag nur mit Bemerkung (Urlaub, krank) braucht weder Beginn noch Ende", () => {
+    const v = vorlageFuer("arbeitszeitnachweis")!;
+    const tage: Record<string, string>[] = [
+      { datum: "2026-10-01", beginn: "08:00", ende: "16:30", pause: "30" },
+      { datum: "2026-10-02", bemerkung: "Urlaub" },
+      { datum: "2026-10-05", beginn: "08:00" },
+    ];
+    const fehlt = fehlendeAngaben(v, { name: "Kim", monat: "Oktober 2026", tage }, BETRIEB);
+    expect(fehlt).toEqual(["Arbeitstag 3: Ende"]);
+    expect(fehlendeAngaben(v, { name: "Kim", monat: "Oktober 2026", tage: [{ datum: "2026-10-02", pause: "30" }] }, BETRIEB)).toEqual(["Arbeitstag: Beginn", "Arbeitstag: Ende"]);
+    expect(fehlendeAngaben(v, { name: "Kim", monat: "Oktober 2026", tage: tage.slice(0, 2) }, BETRIEB)).toEqual([]);
+    // die Liste in der App prüft Pflichtfelder je Eintrag: Beginn und Ende sind dort keine Pflicht mehr
+    const liste = v.abschnitte.flatMap((a) => a.felder).find((f) => f.id === "tage")!;
+    expect(liste.art === "liste" && liste.felder.filter((f) => f.pflicht).map((f) => f.id)).toEqual(["datum"]);
+  });
+
+  it("EÜR: jede Zeile aus „EÜR übernehmen“ (Belegkategorien) steht wortgleich in der Vorschlagsliste", async () => {
+    const { KATEGORIEN, EUER_ZEILE_STEUERFREI, EUER_ZEILE_STEUERPFLICHTIG } = await import("../src/belege.js");
+    const v = vorlageFuer("euer")!;
+    const vorschlaege = (liste: string) => {
+      const f = v.abschnitte.flatMap((a) => a.felder).find((x) => x.id === liste)!;
+      const k = f.art === "liste" ? f.felder.find((x) => x.id === "kategorie") : undefined;
+      return k?.art === "text" ? (k.vorschlaege ?? []) : [];
+    };
+    const aus = vorschlaege("ausgaben");
+    for (const k of KATEGORIEN) expect(aus, k.id).toContain(k.euer);
+    expect(aus).toContain("Miete/Pacht für Geschäftsräume und betrieblich genutzte Grundstücke");
+    expect(aus).toContain("Kraftfahrzeugkosten und andere Fahrtkosten");
+    expect(aus).toContain("Gezahlte Vorsteuerbeträge");
+    expect(new Set(aus).size).toBe(aus.length);
+    // an der Stelle im Vordruck einsortiert
+    expect(aus.indexOf("Miete/Pacht für Geschäftsräume und betrieblich genutzte Grundstücke")).toBe(aus.indexOf("Miete/Aufwendungen für doppelte Haushaltsführung") - 1);
+    const ein = vorschlaege("einnahmen");
+    expect(ein).toEqual(expect.arrayContaining([EUER_ZEILE_STEUERPFLICHTIG, EUER_ZEILE_STEUERFREI, "Vereinnahmte Umsatzsteuer sowie Umsatzsteuer auf unentgeltliche Wertabgaben"]));
+  });
+});

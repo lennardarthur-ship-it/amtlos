@@ -7,11 +7,14 @@
  */
 import { zipSync } from "fflate";
 import {
+  EUER_ZEILE_STEUERFREI,
+  EUER_ZEILE_STEUERPFLICHTIG,
   KU_HINWEIS,
   buchungenAusBelegen,
   buchungenAusRechnungen,
   buchungslisteCsv,
   belegSummen,
+  dateinamenTeil,
   datevExtf,
   datevExtfBytes,
   eRechnungAus,
@@ -42,7 +45,10 @@ export function rechnungFuerBuchung(u: Unterlage, betrieb: Betrieb): AusgangsRec
   return { id: u.id, nummer: daten.nummer, datum: daten.rechnungsdatum, bezahlt: u.bezahlt ?? null, art: istStorno(u) ? "storno" : "rechnung", kleinunternehmer: daten.kleinunternehmer, kunde: daten.kunde.name, positionen: daten.positionen };
 }
 
-/** Einnahmen aus Rechnungen mit vermerktem Zahlungseingang (Zufluss, § 11 Abs. 1 EStG); Stornos negativ. */
+/**
+ * Einnahmen aus Rechnungen mit vermerktem Zahlungseingang (Zufluss, § 11 Abs. 1 EStG); Stornos negativ. Positionen zu
+ * 0 % einer Rechnung mit Steuerart „igl“, „reverse_charge“ oder „befreit“ zählen als steuerfrei (eigene EÜR-Zeile).
+ */
 export function einnahmenAusRechnungen(s: Stand): Einnahme[] {
   return gestellteRechnungen(s)
     .filter((u) => u.bezahlt)
@@ -50,7 +56,8 @@ export function einnahmenAusRechnungen(s: Stand): Einnahme[] {
       const { daten } = eRechnungAus(u.daten, s.betrieb);
       const sm = summen(daten.positionen, daten.kleinunternehmer);
       const vz = istStorno(u) ? -1 : 1;
-      return { tag: u.bezahlt!, netto_cent: vz * sm.netto_cent, ust_cent: vz * sm.ust_cent, kleinunternehmer: daten.kleinunternehmer };
+      const frei = daten.steuerart && daten.steuerart !== "standard" ? sm.gruppen.filter((g) => g.satz === 0).reduce((a, g) => a + g.netto_cent, 0) : 0;
+      return { tag: u.bezahlt!, netto_cent: vz * sm.netto_cent, ust_cent: vz * sm.ust_cent, steuerfrei_cent: vz * frei, kleinunternehmer: daten.kleinunternehmer };
     });
 }
 
@@ -71,7 +78,13 @@ export interface EuerUebernahme {
   belege: number;
   /** geteilte Rechnungen des Jahres ohne vermerkten Zahlungseingang */
   unbezahlt: number;
+  /** was die Übernahme nicht enthält und von Hand ergänzt werden muss */
+  hinweis: string;
 }
+
+/** Steht nach jeder Übernahme sichtbar da: Amtlos rechnet diese Posten nicht aus. */
+export const EUER_NICHT_ENTHALTEN =
+  "Nicht enthalten: die an das Finanzamt gezahlten Umsatzsteuer-Vorauszahlungen (Zeile „An das Finanzamt gezahlte und gegebenenfalls verrechnete Umsatzsteuer“), eine Erstattung vom Finanzamt und die Abschreibungen (AfA) – bitte selbst ergänzen.";
 
 /** Einträge für die Vorlage „EÜR“ (Listen `einnahmen` und `ausgaben`) aus den Daten eines Jahres. */
 export function euerUebernahme(s: Stand, jahr: string): EuerUebernahme {
@@ -79,12 +92,18 @@ export function euerUebernahme(s: Stand, jahr: string): EuerUebernahme {
   const e = euerFuer(einnahmen, s.belege, jahr);
   const ku = einnahmen.some((x) => x.kleinunternehmer && x.tag.startsWith(`${jahr}-`));
   const ein: Record<string, string>[] = [];
-  if (e.einnahmen_netto_cent) ein.push({ datum: "", text: "Umsätze aus Rechnungen (netto)", kategorie: ku ? "Umsatzsteuerlicher Kleinunternehmer" : "Umsatzsteuerpflichtige Betriebseinnahmen", betrag: betrag(e.einnahmen_netto_cent) });
+  const pflichtig = e.einnahmen_netto_cent - e.einnahmen_steuerfrei_cent;
+  if (ku) {
+    if (e.einnahmen_netto_cent) ein.push({ datum: "", text: "Umsätze aus Rechnungen (netto)", kategorie: "Umsatzsteuerlicher Kleinunternehmer", betrag: betrag(e.einnahmen_netto_cent) });
+  } else {
+    if (pflichtig) ein.push({ datum: "", text: "Umsätze aus Rechnungen (netto)", kategorie: EUER_ZEILE_STEUERPFLICHTIG, betrag: betrag(pflichtig) });
+    if (e.einnahmen_steuerfrei_cent) ein.push({ datum: "", text: "Steuerfreie Umsätze aus Rechnungen (z. B. innergemeinschaftliche Lieferung)", kategorie: EUER_ZEILE_STEUERFREI, betrag: betrag(e.einnahmen_steuerfrei_cent) });
+  }
   if (e.ust_vereinnahmt_cent) ein.push({ datum: "", text: "Vereinnahmte Umsatzsteuer", kategorie: "Vereinnahmte Umsatzsteuer sowie Umsatzsteuer auf unentgeltliche Wertabgaben", betrag: betrag(e.ust_vereinnahmt_cent) });
   const aus: Record<string, string>[] = e.ausgaben.zeilen.map((z) => ({ datum: "", text: `${z.kategorie.titel} (${z.anzahl} ${z.anzahl === 1 ? "Beleg" : "Belege"})`, kategorie: z.kategorie.euer, betrag: betrag(z.netto_cent) }));
   if (e.ausgaben.vorsteuer_cent) aus.push({ datum: "", text: "Gezahlte Vorsteuer aus Belegen", kategorie: "Gezahlte Vorsteuerbeträge", betrag: betrag(e.ausgaben.vorsteuer_cent) });
   const imJahr = gestellteRechnungen(s).filter((u) => String(u.daten.datum).startsWith(`${jahr}-`));
-  return { einnahmen: ein, ausgaben: aus, anlagen: e.ausgaben.anlagen.length, rechnungen: e.anzahl_einnahmen, belege: s.belege.filter((b) => zahltag(b).startsWith(`${jahr}-`)).length, unbezahlt: imJahr.filter((u) => !u.bezahlt && !u.storniertDurch && !istStorno(u)).length };
+  return { einnahmen: ein, ausgaben: aus, anlagen: e.ausgaben.anlagen.length, rechnungen: e.anzahl_einnahmen, belege: s.belege.filter((b) => zahltag(b).startsWith(`${jahr}-`)).length, unbezahlt: imJahr.filter((u) => !u.bezahlt && !u.storniertDurch && !istStorno(u)).length, hinweis: EUER_NICHT_ENTHALTEN };
 }
 
 // ---------------------------------------------------------------- Steuerberater-Paket
@@ -111,7 +130,8 @@ const csvFeld = (roh: string) => {
   return /[;"\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 };
 const csv = (kopf: string[], zeilen: string[][]) => "﻿" + [kopf, ...zeilen].map((z) => z.map(csvFeld).join(";")).join("\r\n") + "\r\n";
-const sicher = (s: string) => s.normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/ß/g, "ss").replace(/[^A-Za-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60) || "ohne-name";
+/** Teil eines Dateinamens im Paket: Umlaute umgeschrieben („Söhne“ → „Soehne“), höchstens 60 Zeichen */
+const sicher = (s: string) => dateinamenTeil(s, 60, "._-") || "ohne-name";
 
 /** Dateiname der Belegdatei im Paket: Datum_Lieferant_Nummer.endung */
 export const belegDateiname = (b: Beleg) => `${b.datum}_${sicher(b.lieferant)}${b.nummer ? `_${sicher(b.nummer)}` : ""}.${(b.datei ?? "").split(".").pop() || "bin"}`;
@@ -202,6 +222,7 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
       `- Belege/: Originaldateien (Fotos, PDFs, E-Rechnungen) – unverändert.`,
       ``,
       `Zuordnung: Rechnungen nach Rechnungsdatum, Belege nach Belegdatum. Die PDFs der Ausgangsrechnungen liegen beim Betrieb.`,
+      `Die Umsatzsteuer-Voranmeldung ordnet Rechnungen dagegen nach dem Leistungsdatum zu (Soll-Versteuerung) – an den Grenzen eines Zeitraums können die Summen dieses Pakets deshalb von der Voranmeldung abweichen.`,
     ].join("\r\n"),
   );
   return { zip: zipSync(inhalt, { level: 6 }), dateiname: `Amtlos-Steuerberatung-${sicher(s.betrieb.name || "Betrieb")}-${z.name}.zip`, rechnungen: rechnungen.length, belege: belege.length, ohneXml, buchungen: buchungen.length };

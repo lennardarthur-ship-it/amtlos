@@ -17,11 +17,11 @@ import { useErstellen } from "./Erstellen";
 
 const datumDe = (iso: string) => datumKurz(`${iso}T12:00:00Z`);
 
-/** Auswertung des Katalogs für das gespeicherte Profil – nur neu, wenn sich Antworten oder der Tag ändern. */
+/** Auswertung des Katalogs für das gespeicherte Profil (und Ereignisse aus den Unterlagen) – nur neu, wenn sich Antworten, Unterlagen oder der Tag ändern. */
 export function useAuswertung() {
   const { stand } = useAmtlos();
   const tag = heute();
-  return useMemo(() => auswertung(stand.profil, tag), [stand.profil, tag]);
+  return useMemo(() => auswertung(stand.profil, tag, stand.unterlagen), [stand.profil, stand.unterlagen, tag]);
 }
 
 /** Hat jemand den Check schon gemacht? (die erste Frage ist beantwortet) */

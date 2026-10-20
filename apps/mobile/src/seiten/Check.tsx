@@ -131,7 +131,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
       setZwischen(true);
     }
   }, [voll, amEnde, zusatz, z.stand.profil, liste]);
-  const a = useMemo(() => (amEnde && voll && zusatz ? auswertung(z.stand.profil, heute()) : null), [amEnde, voll, zusatz, z.stand.profil]);
+  const a = useMemo(() => (amEnde && voll && zusatz ? auswertung(z.stand.profil, heute(), z.stand.unterlagen) : null), [amEnde, voll, zusatz, z.stand.profil, z.stand.unterlagen]);
   // Auftakt, Zwischenstand und Ergebnis auf der Bühne (E-144); die Fragen selbst auf hellem Grund
   const buehne = i < 0 || zwischenschirm || Boolean(a);
   useKopf({ titel: TEXT.check_titel, schliessen: true, buehne });
