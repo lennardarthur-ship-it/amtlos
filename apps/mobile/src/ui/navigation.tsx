@@ -4,8 +4,8 @@ import { createNativeStackNavigator, type NativeStackNavigationOptions } from "@
 import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { KeyboardAvoidingView, Platform, Pressable, View, useWindowDimensions } from "react-native";
 import { T as TEXT } from "../texte";
-import { Symbol, T } from "./bausteine";
-import { RADIUS, RAND, SCHRIFT, ZIEL, istIos, useFarben, type Farben } from "./thema";
+import { Symbol, T, useGrosseSchrift } from "./bausteine";
+import { MINZE, RADIUS, RAND, SCHRIFT, ZIEL, istIos, useFarben, type Farben } from "./thema";
 
 /**
  * Navigation (E-141): echte iOS-Navigation mit react-native-screens – UINavigationController mit großen Titeln,
@@ -88,7 +88,7 @@ export function kopfOptionen(f: Farben): NativeStackNavigationOptions {
     contentStyle: { backgroundColor: f.papier },
     ...(Platform.OS === "web"
       ? {
-          headerLeft: (p) => (p.canGoBack ? <WebZurueck /> : null),
+          headerLeft: (p) => (p.canGoBack ? <WebZurueck buehne={p.tintColor === f.minze} /> : null),
           headerTitleAlign: "center",
           // lange Titel kürzen statt mit den Knöpfen zu kollidieren (das iPhone macht das selbst)
           headerTitle: webTitel(f.tinte),
@@ -103,30 +103,34 @@ const webTitel = (farbe: string) =>
     return <T fett numberOfLines={1} farbe={farbe} stil={{ maxWidth: 220 }}>{children}</T>;
   };
 
-function WebZurueck() {
+function WebZurueck({ buehne }: { buehne: boolean }) {
   const nav = useNav();
-  return <RundKnopf symbol="chevron.left" label={TEXT.zurueck} onPress={nav.zurueck} />;
+  return <RundKnopf symbol="chevron.left" label={TEXT.zurueck} onPress={nav.zurueck} buehne={buehne} />;
 }
 
-/** Runder Knopf für die Kopfzeile im Web (auf dem iPhone übernimmt das die Systemleiste mit Glas). */
-export function RundKnopf({ symbol, label, onPress }: { symbol: string; label: string; onPress: () => void }) {
+/**
+ * Runder Knopf für die Kopfzeile im Web (auf dem iPhone übernimmt das die Systemleiste mit Glas). Auf der Bühne
+ * Glasfläche mit weißem Zeichen; auf hellem Grund (`buehne={false}`) ruhige Fläche mit dunklem Zeichen – Weiß auf
+ * Hell wäre kaum zu sehen. Ob die Leiste auf der Bühne liegt, verrät ihre Zeichenfarbe (Minze, siehe `useKopf`).
+ */
+export function RundKnopf({ symbol, label, onPress, buehne = true }: { symbol: string; label: string; onPress: () => void; buehne?: boolean }) {
   const f = useFarben();
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} hitSlop={8} style={({ pressed }) => ({ width: ZIEL, height: ZIEL, alignItems: "center", justifyContent: "center", marginHorizontal: RAND - 18, opacity: pressed ? 0.55 : 1 })}>
       {/* alle Leisten liegen auf der Bühne (E-144): Glasfläche mit weißem Zeichen */}
-      <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: f.buehneFlaeche, alignItems: "center", justifyContent: "center" }}>
-        <Symbol name={symbol} groesse={15} farbe={f.buehneText} gewicht="bold" />
+      <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: buehne ? f.buehneFlaeche : f.flaeche, alignItems: "center", justifyContent: "center" }}>
+        <Symbol name={symbol} groesse={15} farbe={buehne ? f.buehneText : f.tinte} gewicht="bold" />
       </View>
     </Pressable>
   );
 }
 
 /** Textknopf rechts in der Kopfzeile (Web; iOS nutzt Systemknöpfe). */
-export function KopfText({ text, onPress, label }: { text: string; onPress: () => void; label?: string }) {
+export function KopfText({ text, onPress, label, buehne = true }: { text: string; onPress: () => void; label?: string; buehne?: boolean }) {
   const f = useFarben();
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={label ?? text} onPress={onPress} hitSlop={8} style={({ pressed }) => ({ minHeight: ZIEL, justifyContent: "center", paddingHorizontal: RAND - 6, opacity: pressed ? 0.55 : 1 })}>
-      <T fett farbe={f.minze}>{text}</T>
+      <T fett farbe={buehne ? f.minze : f.amt}>{text}</T>
     </Pressable>
   );
 }
@@ -171,11 +175,11 @@ export function useKopf({ titel, rechts, schliessen, gross, buehne }: { titel: s
         ? () => [{ type: "button", label: rechts.text, accessibilityLabel: rechts.label ?? rechts.text, onPress: aufRechts, ...(rechts.symbol ? { icon: { type: "sfSymbol" as const, name: rechts.symbol as never } } : null), ...(rechts.hervor ? { variant: "prominent" as const } : null) }]
         : undefined;
     } else {
-      o.headerRight = rechts ? () => (rechts.symbol ? <RundKnopf symbol={rechts.symbol} label={rechts.label ?? rechts.text} onPress={aufRechts} /> : <KopfText text={rechts.text} label={rechts.label} onPress={aufRechts} />) : undefined;
+      o.headerRight = rechts ? (p: { tintColor?: string }) => (rechts.symbol ? <RundKnopf symbol={rechts.symbol} label={rechts.label ?? rechts.text} onPress={aufRechts} buehne={p.tintColor === f.minze} /> : <KopfText text={rechts.text} label={rechts.label} onPress={aufRechts} buehne={p.tintColor === f.minze} />) : undefined;
     }
     navigation.setOptions(o);
     // Handler stehen in Referenzen
-  }, [navigation, titel, Boolean(rechts), rechts?.text, rechts?.symbol, rechts?.label, rechts?.hervor, gross]);
+  }, [navigation, titel, Boolean(rechts), rechts?.text, rechts?.symbol, rechts?.label, rechts?.hervor, gross, f]);
 }
 
 /**
@@ -202,13 +206,14 @@ export function TastaturRahmen({ children, grund }: { children: ReactNode; grund
  */
 export function Unterseite({ titel, unter, children, rechts, schliessen }: { titel: string; unter?: string; children: ReactNode; rechts?: KopfKnopfDef | null; schliessen?: boolean }) {
   const f = useFarben();
+  const gross = useGrosseSchrift();
   useKopf({ titel: "", rechts, schliessen: schliessen ?? true, buehne: true });
   return (
     <TastaturRahmen grund={f.buehne}>
       <HellerStatus />
       {titel ? (
         <View style={{ paddingHorizontal: RAND, paddingTop: 2, paddingBottom: 20 }}>
-          <T v="titel" accessibilityRole="header" farbe={f.buehneText} numberOfLines={3}>{titel}</T>
+          <T v="titel" accessibilityRole="header" farbe={f.buehneText} numberOfLines={gross ? undefined : 3}>{titel}</T>
           {unter ? <T farbe={f.buehneLeise} stil={{ marginTop: 6 }}>{unter}</T> : null}
         </View>
       ) : null}
@@ -219,16 +224,16 @@ export function Unterseite({ titel, unter, children, rechts, schliessen }: { tit
 
 const BlattStapel = createNativeStackNavigator();
 
-function BlattSchliessen() {
+function BlattSchliessen({ buehne }: { buehne: boolean }) {
   const navigation = useNavigation();
-  return <RundKnopf symbol="xmark" label={TEXT.schliessen} onPress={() => navigation.getParent()?.goBack()} />;
+  return <RundKnopf symbol="xmark" label={TEXT.schliessen} onPress={() => navigation.getParent()?.goBack()} buehne={buehne} />;
 }
 
 /** Erste Seite eines Blatts: links „Schließen“ (iPhone: Glasknopf der Leiste). */
 const erstesBlattOptionen = ({ navigation }: { navigation: NavigationProp<ParamListBase> }): NativeStackNavigationOptions =>
   istIos
     ? { unstable_headerLeftItems: () => [{ type: "button", label: TEXT.schliessen, icon: { type: "sfSymbol", name: "xmark" }, onPress: () => navigation.getParent()?.goBack() }] }
-    : { headerLeft: () => <BlattSchliessen /> };
+    : { headerLeft: (p) => <BlattSchliessen buehne={p.tintColor === MINZE} /> };
 
 /** Ein Blatt (Ablauf, Formular): eigener Stapel – Unterseiten schieben sich im Blatt herein, „Schließen“ schließt es. */
 export function Blatt({ params }: { params?: SeitenParams }) {

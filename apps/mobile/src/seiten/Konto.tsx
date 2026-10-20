@@ -4,7 +4,7 @@ import { devAnmeldung, syncAngeboten } from "../konto/konfig";
 import { useKonto } from "../konto/konto";
 import { SyncFehler } from "../konto/sync";
 import { T as TEXT } from "../texte";
-import { Feld, Fuss, Hinweis, Karte, Knopf, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
+import { Feld, Fuss, Hinweis, Karte, Knopf, PasswortFeld, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { useNav } from "../ui/navigation";
 import { useFarben, weich } from "../ui/thema";
@@ -13,6 +13,7 @@ import { useAmtlos } from "../zustand";
 import { bestaetigen } from "../ui/bestaetigen";
 import { BuehnenBlatt, Gruppe } from "./gemeinsam";
 import { ProSeite, useProSperre } from "./Pro";
+import { PasswortPaar } from "./Sicherung";
 
 const zeitpunkt = (iso: string) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
 
@@ -39,12 +40,7 @@ function NeuesPasswort({ label, setzen }: { label: string; setzen: (pw: string |
   const [pw, setPw] = useState("");
   const [pw2, setPw2] = useState("");
   const pruefen = (a: string, b: string) => setzen(a.length >= PASSWORT_MINDESTLAENGE && a === b ? a : null);
-  return (
-    <View>
-      <Feld label={label} wert={pw} aendern={(w) => { setPw(w); pruefen(w, pw2); }} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="newPassword" fehler={pw.length > 0 && pw.length < PASSWORT_MINDESTLAENGE ? TEXT.passwort_kurz(PASSWORT_MINDESTLAENGE) : null} />
-      <Feld label={TEXT.passwort_wiederholen} wert={pw2} aendern={(w) => { setPw2(w); pruefen(pw, w); }} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="newPassword" fehler={pw2.length > 0 && pw !== pw2 ? TEXT.passwort_ungleich : null} />
-    </View>
-  );
+  return <PasswortPaar label={label} pw={pw} pw2={pw2} setPw={(w) => { setPw(w); pruefen(w, pw2); }} setPw2={(w) => { setPw2(w); pruefen(pw, w); }} />;
 }
 
 /** Konto und Synchronisation (E-134): anmelden, einrichten bzw. verbinden, Stand, Passwort, beenden. */
@@ -106,7 +102,7 @@ export function KontoSeite() {
         <View>
           <T fett accessibilityRole="header" stil={{ marginTop: 8 }}>{TEXT.konto_verbinden_titel}</T>
           <T leise stil={{ marginTop: 4 }}>{TEXT.konto_verbinden_text}</T>
-          <Feld label={TEXT.konto_passwort} wert={pw} aendern={(w) => { setPw(w); setFalsch(false); }} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="password" fehler={falsch ? TEXT.konto_fehler.passwort : null} />
+          <PasswortFeld label={TEXT.konto_passwort} wert={pw} aendern={(w) => { setPw(w); setFalsch(false); }} fehler={falsch ? TEXT.konto_fehler.passwort : null} />
           {fehler}
         </View>
       );

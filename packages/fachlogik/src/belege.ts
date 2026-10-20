@@ -4,6 +4,7 @@
  * Zahlung (Abfluss, § 11 Abs. 2 EStG). Daraus entstehen die Vorsteuer der Umsatzsteuer-Voranmeldung (Kz 66) und die
  * Betriebsausgaben der EÜR. Fachlich zu prüfen: PRUEFLISTE T-79.
  */
+import { umschreiben } from "./dateinamen.js";
 import { rundeCent } from "./rechnung.js";
 
 export type Zahlungsweg = "bank" | "bar" | "privat";
@@ -42,6 +43,8 @@ export interface Kategorie {
   id: string;
   /** in Alltagssprache */
   titel: string;
+  /** Kurzbezeichnung für Buchungstexte, höchstens 15 Zeichen */
+  kurz: string;
   /** Zeile der Anlage EÜR (Wortlaut) – fachlich zu prüfen */
   euer: string;
   /** Standardkonten je Steuersatz (Automatikkonten mit Vorsteuer) – fachlich zu prüfen */
@@ -58,22 +61,22 @@ const konto = (k: string) => ({ 19: k, 7: k, 0: k });
 
 /** Kategorien in Alltagssprache mit Zuordnung zur Anlage EÜR und Standardkonten (T-79). */
 export const KATEGORIEN: Kategorie[] = [
-  { id: "waren", titel: "Waren und Material", euer: "Waren, Rohstoffe und Hilfsstoffe einschließlich der Nebenkosten", skr03: { 19: "3400", 7: "3300", 0: "3200" }, skr04: { 19: "5400", 7: "5300", 0: "5200" } },
-  { id: "fremdleistungen", titel: "Fremdleistungen", euer: "Bezogene Leistungen", skr03: konto("3100"), skr04: konto("5900") },
-  { id: "personal", titel: "Personal (Löhne, Gehälter, Sozialabgaben)", euer: "Ausgaben für eigenes Personal", skr03: konto("4120"), skr04: konto("6020"), hinweis: "ohne Vorsteuer" },
-  { id: "miete", titel: "Miete und Nebenkosten", euer: "Miete/Pacht für Geschäftsräume und betrieblich genutzte Grundstücke", skr03: konto("4210"), skr04: konto("6310") },
-  { id: "buero", titel: "Büro, Porto, Telefon, Software", euer: "Übrige unbeschränkt abziehbare Betriebsausgaben", skr03: konto("4930"), skr04: konto("6815") },
-  { id: "werbung", titel: "Werbung", euer: "Übrige unbeschränkt abziehbare Betriebsausgaben", skr03: konto("4600"), skr04: konto("6600") },
-  { id: "reise", titel: "Reisekosten", euer: "Übernachtungs- und Reisenebenkosten bei Geschäftsreisen", skr03: konto("4670"), skr04: konto("6670") },
-  { id: "bewirtung", titel: "Bewirtung", euer: "Bewirtungsaufwendungen", skr03: konto("4650"), skr04: konto("6640"), abziehbar: 70, hinweis: "70 % abziehbar (§ 4 Abs. 5 Nr. 2 EStG), Bewirtungsbeleg mit Anlass und Teilnehmern" },
-  { id: "geschenke", titel: "Geschenke", euer: "Geschenke", skr03: konto("4630"), skr04: konto("6610"), hinweis: "bis 50 € je Person und Jahr abziehbar (§ 4 Abs. 5 Nr. 1 EStG)" },
-  { id: "fahrzeug", titel: "Fahrzeug (Kraftstoff, Reparatur, Versicherung)", euer: "Kraftfahrzeugkosten und andere Fahrtkosten", skr03: konto("4530"), skr04: konto("6530") },
-  { id: "versicherungen", titel: "Versicherungen und Beiträge", euer: "Übrige unbeschränkt abziehbare Betriebsausgaben", skr03: konto("4360"), skr04: konto("6400"), hinweis: "meist ohne Vorsteuer" },
-  { id: "beratung", titel: "Steuerberatung, Rechtsberatung, Buchführung", euer: "Übrige unbeschränkt abziehbare Betriebsausgaben", skr03: konto("4950"), skr04: konto("6825") },
-  { id: "fortbildung", titel: "Fortbildung", euer: "Übrige unbeschränkt abziehbare Betriebsausgaben", skr03: konto("4945"), skr04: konto("6821") },
-  { id: "gwg", titel: "Geräte und Ausstattung bis 800 € netto", euer: "Aufwendungen für geringwertige Wirtschaftsgüter nach § 6 Absatz 2 EStG", skr03: konto("4855"), skr04: konto("6260"), hinweis: "sofort abziehbar (§ 6 Abs. 2 EStG)" },
-  { id: "anlage", titel: "Anschaffung über 800 € netto (wird abgeschrieben)", euer: "AfA auf unbewegliche Wirtschaftsgüter / bewegliche Wirtschaftsgüter / immaterielle Wirtschaftsgüter", skr03: konto("0420"), skr04: konto("0650"), anlage: true, hinweis: "keine sofortige Betriebsausgabe – Abschreibung über die Nutzungsdauer" },
-  { id: "sonstiges", titel: "Sonstiges", euer: "Übrige unbeschränkt abziehbare Betriebsausgaben", skr03: konto("4900"), skr04: konto("6300") },
+  { id: "waren", titel: "Waren und Material", kurz: "Wareneinkauf", euer: "Waren, Rohstoffe und Hilfsstoffe einschließlich der Nebenkosten", skr03: { 19: "3400", 7: "3300", 0: "3200" }, skr04: { 19: "5400", 7: "5300", 0: "5200" } },
+  { id: "fremdleistungen", titel: "Fremdleistungen", kurz: "Fremdleistung", euer: "Bezogene Leistungen", skr03: konto("3100"), skr04: konto("5900") },
+  { id: "personal", titel: "Personal (Löhne, Gehälter, Sozialabgaben)", kurz: "Personal", euer: "Ausgaben für eigenes Personal", skr03: konto("4120"), skr04: konto("6020"), hinweis: "ohne Vorsteuer" },
+  { id: "miete", titel: "Miete und Nebenkosten", kurz: "Miete", euer: "Miete/Pacht für Geschäftsräume und betrieblich genutzte Grundstücke", skr03: konto("4210"), skr04: konto("6310") },
+  { id: "buero", titel: "Büro, Porto, Telefon, Software", kurz: "Büro/Telefon", euer: "Übrige unbeschränkt abziehbare Betriebsausgaben", skr03: konto("4930"), skr04: konto("6815") },
+  { id: "werbung", titel: "Werbung", kurz: "Werbung", euer: "Übrige unbeschränkt abziehbare Betriebsausgaben", skr03: konto("4600"), skr04: konto("6600") },
+  { id: "reise", titel: "Reisekosten", kurz: "Reisekosten", euer: "Übernachtungs- und Reisenebenkosten bei Geschäftsreisen", skr03: konto("4670"), skr04: konto("6670") },
+  { id: "bewirtung", titel: "Bewirtung", kurz: "Bewirtung", euer: "Bewirtungsaufwendungen", skr03: konto("4650"), skr04: konto("6640"), abziehbar: 70, hinweis: "70 % abziehbar (§ 4 Abs. 5 Nr. 2 EStG), Bewirtungsbeleg mit Anlass und Teilnehmern" },
+  { id: "geschenke", titel: "Geschenke", kurz: "Geschenke", euer: "Geschenke", skr03: konto("4630"), skr04: konto("6610"), hinweis: "bis 50 € je Person und Jahr abziehbar (§ 4 Abs. 5 Nr. 1 EStG)" },
+  { id: "fahrzeug", titel: "Fahrzeug (Kraftstoff, Reparatur, Versicherung)", kurz: "Kfz", euer: "Kraftfahrzeugkosten und andere Fahrtkosten", skr03: konto("4530"), skr04: konto("6530") },
+  { id: "versicherungen", titel: "Versicherungen und Beiträge", kurz: "Versicherung", euer: "Übrige unbeschränkt abziehbare Betriebsausgaben", skr03: konto("4360"), skr04: konto("6400"), hinweis: "meist ohne Vorsteuer" },
+  { id: "beratung", titel: "Steuerberatung, Rechtsberatung, Buchführung", kurz: "Beratung", euer: "Übrige unbeschränkt abziehbare Betriebsausgaben", skr03: konto("4950"), skr04: konto("6825") },
+  { id: "fortbildung", titel: "Fortbildung", kurz: "Fortbildung", euer: "Übrige unbeschränkt abziehbare Betriebsausgaben", skr03: konto("4945"), skr04: konto("6821") },
+  { id: "gwg", titel: "Geräte und Ausstattung bis 800 € netto", kurz: "GWG", euer: "Aufwendungen für geringwertige Wirtschaftsgüter nach § 6 Absatz 2 EStG", skr03: konto("4855"), skr04: konto("6260"), hinweis: "sofort abziehbar (§ 6 Abs. 2 EStG)" },
+  { id: "anlage", titel: "Anschaffung über 800 € netto (wird abgeschrieben)", kurz: "Anlagegut", euer: "AfA auf unbewegliche Wirtschaftsgüter / bewegliche Wirtschaftsgüter / immaterielle Wirtschaftsgüter", skr03: konto("0420"), skr04: konto("0650"), anlage: true, hinweis: "keine sofortige Betriebsausgabe – Abschreibung über die Nutzungsdauer" },
+  { id: "sonstiges", titel: "Sonstiges", kurz: "Sonstiges", euer: "Übrige unbeschränkt abziehbare Betriebsausgaben", skr03: konto("4900"), skr04: konto("6300") },
 ];
 
 export const kategorieFuer = (id: string): Kategorie => KATEGORIEN.find((k) => k.id === id) ?? KATEGORIEN[KATEGORIEN.length - 1]!;
@@ -112,6 +115,40 @@ export function belegSummen(b: Pick<Beleg, "steuer" | "vorsteuer">): BelegSummen
   }
   return { brutto_cent: brutto, netto_cent: netto, ust_cent: ust, vorsteuer_cent: b.vorsteuer ? ust : 0 };
 }
+
+/**
+ * Belegnummer des Lieferanten in einer Form, die DATEV (Belegfeld 1), Dateinamen und Listen gleich zeigen: Umlaute
+ * umgeschrieben, alles außer Buchstaben und Ziffern zu „-“ zusammengezogen, höchstens 36 Zeichen („LA 01/2026“ →
+ * „LA-01-2026“).
+ */
+export function belegnummerNormal(s: string | null | undefined): string {
+  return umschreiben(s ?? "")
+    .replace(/[^A-Za-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 36)
+    .replace(/-+$/, "");
+}
+
+/**
+ * Laufende Amtlos-Belegnummer je Jahr des Belegdatums, z. B. „B2026-017“ – abgeleitet, nicht gespeichert. Gezählt wird
+ * in der Reihenfolge der Erfassung (erstellt, dann Belegdatum, dann ID): so verschiebt ein nachträglich erfasster Beleg
+ * mit früherem Datum die Nummern der schon weitergegebenen Belege nicht (nur Löschen verschiebt sie).
+ */
+export function belegNummern(belege: Pick<Beleg, "id" | "datum" | "erstellt">[]): Map<string, string> {
+  const sortiert = [...belege].sort((a, b) => a.erstellt.localeCompare(b.erstellt) || a.datum.localeCompare(b.datum) || a.id.localeCompare(b.id));
+  const zaehler = new Map<string, number>();
+  const aus = new Map<string, string>();
+  for (const b of sortiert) {
+    const jahr = b.datum.slice(0, 4);
+    const n = (zaehler.get(jahr) ?? 0) + 1;
+    zaehler.set(jahr, n);
+    aus.set(b.id, `B${jahr}-${String(n).padStart(3, "0")}`);
+  }
+  return aus;
+}
+
+/** Kennung eines Belegs in DATEV (Belegfeld 1), Belegliste und Dateiname: Nummer des Lieferanten (normalisiert), sonst die Amtlos-Belegnummer. */
+export const belegKennung = (b: Pick<Beleg, "nummer">, amtlosNr: string) => belegnummerNormal(b.nummer) || amtlosNr;
 
 /** Tag, nach dem ein Beleg der EÜR zugeordnet wird: Zahlung (Abfluss), sonst Belegdatum. */
 export const zahltag = (b: Pick<Beleg, "datum" | "bezahlt">) => b.bezahlt || b.datum;

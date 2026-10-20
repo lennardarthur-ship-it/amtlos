@@ -5,7 +5,7 @@ import { Pressable, ScrollView, View, type ScrollViewProps } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Bereich } from "@amtlos/fachlogik";
 import { euroText } from "../unterlagen/ablage";
-import { Kachel, Motiv, T } from "../ui/bausteine";
+import { Kachel, Motiv, T, useGrosseSchrift } from "../ui/bausteine";
 import { HellerStatus, TastaturRahmen, useImBlatt, useKopf, type KopfKnopfDef } from "../ui/navigation";
 import { RADIUS, RAND, SCHRIFT, schattenStil, useFarben } from "../ui/thema";
 
@@ -21,6 +21,7 @@ export function BuehnenSeite({ ueber, titel, rechts, buehne, children, ...rest }
   const f = useFarben();
   const inset = useSafeAreaInsets();
   const sichtbar = useIsFocused();
+  const gross = useGrosseSchrift();
   return (
     <View style={{ flex: 1, backgroundColor: f.buehne }}>
       {sichtbar ? <StatusBar style="light" /> : null}
@@ -29,7 +30,7 @@ export function BuehnenSeite({ ueber, titel, rechts, buehne, children, ...rest }
           <Motiv zeichen="§" groesse={380} farbe="rgba(127,227,184,0.06)" stil={{ right: -92, top: -40 }} />
           {ueber || rechts ? (
             <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12, minHeight: 40 }}>
-              <T v="klein" fett farbe={f.buehneLeise} stil={{ flex: 1 }} numberOfLines={1}>{ueber ?? ""}</T>
+              <T v="klein" fett farbe={f.buehneLeise} stil={{ flex: 1 }} numberOfLines={gross ? undefined : 1}>{ueber ?? ""}</T>
               {rechts}
             </View>
           ) : null}
@@ -54,9 +55,9 @@ export function GrosserBetrag({ cent, groesse = 60 }: { cent: number; groesse?: 
   const vorn = komma > 0 ? text.slice(0, komma) : text;
   const hinten = komma > 0 ? text.slice(komma) : "";
   return (
-    <T accessibilityLabel={text} farbe={f.buehneText} stil={{ ...SCHRIFT.display, fontSize: groesse, lineHeight: groesse * 1.07, letterSpacing: -groesse * 0.04, fontVariant: ["tabular-nums"] }}>
+    <T accessibilityLabel={text} maxFontSizeMultiplier={1.4} farbe={f.buehneText} stil={{ ...SCHRIFT.display, fontSize: groesse, lineHeight: groesse * 1.07, letterSpacing: -groesse * 0.04, fontVariant: ["tabular-nums"] }}>
       {vorn}
-      <T farbe="rgba(255,255,255,0.72)" stil={{ ...SCHRIFT.display, fontSize: groesse, lineHeight: groesse * 1.07, letterSpacing: -groesse * 0.04 }}>{hinten}</T>
+      <T maxFontSizeMultiplier={1.4} farbe="rgba(255,255,255,0.72)" stil={{ ...SCHRIFT.display, fontSize: groesse, lineHeight: groesse * 1.07, letterSpacing: -groesse * 0.04 }}>{hinten}</T>
     </T>
   );
 }
@@ -117,7 +118,7 @@ export function BlattKopf({ titel, rechts, onPress, erste }: { titel: string; re
     <View style={{ flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", marginTop: erste ? 0 : 30, marginBottom: 12, paddingHorizontal: 4 }}>
       <T v="gross" accessibilityRole="header">{titel}</T>
       {rechts && onPress ? (
-        <Pressable accessibilityRole="button" onPress={onPress} hitSlop={10}>
+        <Pressable accessibilityRole="button" onPress={onPress} hitSlop={6} style={{ minHeight: 44, marginVertical: -9, justifyContent: "center" }}>
           {({ pressed }) => <T v="klein" farbe={f.amt} stil={{ ...SCHRIFT.halb, opacity: pressed ? 0.55 : 1 }}>{rechts}</T>}
         </Pressable>
       ) : null}

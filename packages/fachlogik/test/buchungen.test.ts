@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Beleg } from "../src/belege.js";
+import { belegNummern, belegnummerNormal, type Beleg } from "../src/belege.js";
 import {
   BU_OHNE_STEUER,
   DATEV_SPALTEN,
@@ -7,6 +7,8 @@ import {
   buchungenAusBelegen,
   buchungenAusRechnungen,
   buchungslisteCsv,
+  buchungsGuid,
+  DATEV_GUID,
   datevExtf,
   datevExtfBytes,
   pruefpunkteBuchungen,
@@ -76,7 +78,7 @@ describe("Buchungen und DATEV-Export (E-132)", () => {
   it("Beleg bar mit Bewirtung: 4650 an 1000 (SKR03), 6640 an 1600 (SKR04); Bank an Verbindlichkeiten, privat an Privateinlagen", () => {
     const b = buchungenAusBelegen([BELEG], "SKR03");
     expect(b).toHaveLength(1);
-    expect(b[0]).toMatchObject({ datum: "2026-10-07", betrag_cent: 5950, soll_haben: "S", konto: "4650", gegenkonto: "1000", bu_schluessel: "", belegfeld1: "Bon4711", buchungstext: "Gasthaus Krone Bewirtung", ust_satz: 19, art: "ausgabe", quelle_id: "k9x1abcd2efg" });
+    expect(b[0]).toMatchObject({ datum: "2026-10-07", betrag_cent: 5950, soll_haben: "S", konto: "4650", gegenkonto: "1000", bu_schluessel: "", belegfeld1: "Bon-4711", buchungstext: "Gasthaus Krone Bewirtung", ust_satz: 19, art: "ausgabe", quelle_id: "k9x1abcd2efg" });
     expect(buchungenAusBelegen([BELEG], "SKR04")[0]).toMatchObject({ konto: "6640", gegenkonto: "1600" });
     expect(buchungenAusBelegen([{ ...BELEG, zahlung: "bank" }], "SKR03")[0]?.gegenkonto).toBe("1600");
     expect(buchungenAusBelegen([{ ...BELEG, zahlung: "bank" }], "SKR04")[0]?.gegenkonto).toBe("3300");
@@ -89,7 +91,53 @@ describe("Buchungen und DATEV-Export (E-132)", () => {
     expect(ohne.map((x) => [x.konto, x.bu_schluessel, x.betrag_cent])).toEqual([["3400", BU_OHNE_STEUER, 1190], ["3300", "40", 214], ["3200", "", 500]]);
     // ohne Belegnummer: Kurzform der Beleg-ID
     expect(ohne[0]?.belegfeld1).toBe("K9X1ABCD2EFG");
-    expect(ohne.every((x) => x.buchungstext === "Gasthaus Krone Waren und Material")).toBe(true);
+    expect(ohne.every((x) => x.buchungstext === "Gasthaus Krone Wareneinkauf")).toBe(true);
+    // mit Amtlos-Belegnummern: die Amtlos-Nummer statt der ID; eine eigene Nummer des Lieferanten bleibt (normalisiert)
+    const nummern = new Map([["k9x1abcd2efg", "B2026-017"]]);
+    expect(buchungenAusBelegen([{ ...BELEG, nummer: null }], "SKR03", { nummern })[0]?.belegfeld1).toBe("B2026-017");
+    expect(buchungenAusBelegen([{ ...BELEG, nummer: "RE 2026/77 ä" }], "SKR03", { nummern })[0]?.belegfeld1).toBe("RE-2026-77-ae");
+  });
+
+  it("Buchungstext: Kurzbezeichnung der Kategorie, Lieferant/Kunde höchstens 40 Zeichen ohne Leerzeichen am Ende; Storno mit Bezug", () => {
+    const lang = "Großhandel für Gastronomiebedarf und Kaffee GmbH & Co. KG Niederlassung Süd";
+    const b = buchungenAusBelegen([{ ...BELEG, lieferant: lang, kategorie: "fahrzeug" }], "SKR03")[0]!;
+    expect(b.buchungstext).toBe(`${Array.from(lang).slice(0, 40).join("").trimEnd()} Kfz`);
+    expect(buchungenAusBelegen([{ ...BELEG, lieferant: "Stadtwerke", kategorie: "gwg" }], "SKR03")[0]?.buchungstext).toBe("Stadtwerke GWG");
+    const st = buchungenAusRechnungen([{ ...RE, nummer: "2026-007", art: "storno", storniert_nummer: "2026-005" }], "SKR03")[0]!;
+    expect(st.buchungstext).toBe("Storno 2026-007 zu RE 2026-005 Kim Beispiel");
+    expect(buchungenAusRechnungen([{ ...RE, kunde: "Kunde mit sehr langem Namen  und  Leerzeichen am Ende 1234567" }], "SKR03")[0]?.buchungstext).toBe("RE 2026-005 Kunde mit sehr langem Namen und Leerzeic");
+  });
+
+  it("Buchungs-GUID: stabil aus Quelle und Steuersatz, 36 Zeichen, je Satz verschieden; steht in DATEV-Feld „Buchungs GUID“", () => {
+    const g = buchungsGuid("re-1", 19);
+    expect(g).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-8[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+    expect(buchungsGuid("re-1", 19)).toBe(g);
+    expect(buchungsGuid("re-1", 7)).not.toBe(g);
+    expect(buchungsGuid("re-1", null)).not.toBe(g);
+    expect(buchungsGuid("re-2", 19)).not.toBe(g);
+    expect(buchungenAusRechnungen([RE], "SKR03")[0]?.guid).toBe(g);
+    expect(buchungenAusBelegen([BELEG], "SKR03")[0]?.guid).toBe(buchungsGuid(BELEG.id, 19));
+    expect(DATEV_SPALTEN[DATEV_GUID]).toBe("Buchungs GUID");
+    expect(DATEV_GUID).toBe(102);
+    const zeile = datevExtf(buchungenAusRechnungen([RE], "SKR03"), EXPORT).split("\r\n")[2]!.split(";");
+    expect(zeile[DATEV_GUID]).toBe(`"${g}"`);
+  });
+
+  it("Amtlos-Belegnummer je Jahr in der Reihenfolge der Erfassung; Belegnummer des Lieferanten normalisiert", () => {
+    const n = belegNummern([
+      { id: "c", datum: "2026-03-01", erstellt: "2026-03-05T10:00:00Z" },
+      { id: "a", datum: "2026-01-10", erstellt: "2026-01-12T10:00:00Z" },
+      { id: "d", datum: "2027-01-02", erstellt: "2027-01-03T10:00:00Z" },
+      // nachträglich erfasst, früheres Datum: bekommt die nächste Nummer, die anderen bleiben
+      { id: "b", datum: "2026-01-05", erstellt: "2026-04-01T10:00:00Z" },
+    ]);
+    expect(Object.fromEntries(n)).toEqual({ a: "B2026-001", c: "B2026-002", b: "B2026-003", d: "B2027-001" });
+    expect(belegnummerNormal("LA 01/2026")).toBe("LA-01-2026");
+    expect(belegnummerNormal(" Nr. 4711 ")).toBe("Nr-4711");
+    expect(belegnummerNormal("Müller/Ö")).toBe("Mueller-Oe");
+    expect(belegnummerNormal("  ")).toBe("");
+    expect(belegnummerNormal(null)).toBe("");
+    expect(belegnummerNormal("x".repeat(50))).toHaveLength(36);
   });
 
   it("Belegfeld 1: nur zulässige Zeichen, Umlaute umschrieben, höchstens 36 Zeichen", () => {
@@ -110,12 +158,12 @@ describe("Buchungen und DATEV-Export (E-132)", () => {
     expect(DATEV_SPALTEN).toHaveLength(125);
     expect(zeilen[1]!.split(";")).toHaveLength(125);
     expect(zeilen[1]!.startsWith("Umsatz (ohne Soll/Haben-Kz);Soll/Haben-Kennzeichen;WKZ Umsatz;Kurs;Basis-Umsatz;WKZ Basis-Umsatz;Konto;Gegenkonto (ohne BU-Schlüssel);BU-Schlüssel;Belegdatum;Belegfeld 1;Belegfeld 2;Skonto;Buchungstext;")).toBe(true);
-    expect(zeilen[2]).toBe('119,00;"S";"EUR";;;;1400;8400;;0510;"2026-005";;;"RE 2026-005 Kim Beispiel"' + ";".repeat(111));
+    expect(zeilen[2]).toBe('119,00;"S";"EUR";;;;1400;8400;;0510;"2026-005";;;"RE 2026-005 Kim Beispiel"' + ";".repeat(89) + `"${buchungsGuid("re-1", 19)}"` + ";".repeat(22));
     expect(zeilen[2]!.split(";")).toHaveLength(125);
-    expect(zeilen[3]!.startsWith('59,50;"S";"EUR";;;;4650;1000;;0710;"Bon4711";;;"Gasthaus Krone Bewirtung";')).toBe(true);
+    expect(zeilen[3]!.startsWith('59,50;"S";"EUR";;;;4650;1000;;0710;"Bon-4711";;;"Gasthaus Krone Bewirtung";')).toBe(true);
     // BU-Schlüssel als Text, innere Anführungszeichen verdoppelt, Fälligkeit in Belegfeld 2, Erzeugt-am ohne Millisekunden
     const bu = datevExtf([{ ...buchungen[1]!, bu_schluessel: "40", belegfeld2: "151126", buchungstext: 'Café "Mond"' }], { ...EXPORT, kontenrahmen: "SKR04", erzeugtAm: "2026-10-13T12:00:00" });
-    expect(bu.split("\r\n")[2]!.startsWith('59,50;"S";"EUR";;;;4650;1000;"40";0710;"Bon4711";"151126";;"Café ""Mond""";')).toBe(true);
+    expect(bu.split("\r\n")[2]!.startsWith('59,50;"S";"EUR";;;;4650;1000;"40";0710;"Bon-4711";"151126";;"Café ""Mond""";')).toBe(true);
     expect(bu.split("\r\n")[0]!).toContain(";20261013120000000;;");
     expect(bu.split("\r\n")[0]!.endsWith(';"04";;;;')).toBe(true);
   });
@@ -130,11 +178,11 @@ describe("Buchungen und DATEV-Export (E-132)", () => {
   it("buchungslisteCsv: UTF-8 mit BOM, Semikolon, Datum TT.MM.JJJJ, Texte mit Semikolon in Anführungszeichen", () => {
     const b = buchungenAusRechnungen([{ ...RE, kunde: "Kim; Beispiel" }], "SKR03");
     const csv = buchungslisteCsv([...b, ...buchungenAusBelegen([{ ...BELEG, vorsteuer: false }], "SKR03")]);
-    expect(csv.startsWith("﻿Datum;Betrag;S/H;Konto;Gegenkonto;BU;Beleg;Text;USt\r\n")).toBe(true);
+    expect(csv.startsWith("﻿Datum;Betrag;S/H;Konto;Gegenkonto;BU;Beleg;Text;USt;Buchungs-GUID\r\n")).toBe(true);
     const zeilen = csv.slice(1, -2).split("\r\n");
-    expect(zeilen[1]).toBe('05.10.2026;119,00;S;1400;8400;;2026-005;"RE 2026-005 Kim; Beispiel";19');
-    expect(zeilen[2]).toBe("07.10.2026;59,50;S;4650;1000;40;Bon4711;Gasthaus Krone Bewirtung;19");
-    expect(buchungslisteCsv(buchungenAusRechnungen([{ ...RE, kleinunternehmer: true }], "SKR03"))).toContain(";RE 2026-005 Kim Beispiel;\r\n");
+    expect(zeilen[1]).toBe(`05.10.2026;119,00;S;1400;8400;;2026-005;"RE 2026-005 Kim; Beispiel";19;${buchungsGuid("re-1", 19)}`);
+    expect(zeilen[2]).toBe(`07.10.2026;59,50;S;4650;1000;40;Bon-4711;Gasthaus Krone Bewirtung;19;${buchungsGuid(BELEG.id, 19)}`);
+    expect(buchungslisteCsv(buchungenAusRechnungen([{ ...RE, kleinunternehmer: true }], "SKR03"))).toContain(`;RE 2026-005 Kim Beispiel;;${buchungsGuid("re-1", null)}\r\n`);
   });
 
   it("Prüfpunkte sind nicht leer und nennen BU 40, Generalumkehr, Feldliste und Ist-Versteuerung", () => {

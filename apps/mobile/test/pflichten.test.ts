@@ -5,7 +5,7 @@ import { parse } from "yaml";
 import { describe, expect, it } from "vitest";
 import { VORLAGEN } from "@amtlos/fachlogik";
 import { LEERER_STAND, anlegen, erledigtSetzen, profilSetzen, standAus } from "../src/unterlagen/speicher";
-import { CHECK_FELDER, KATALOG, auswertung, checkFragen, ereignisseAusStand, dringlichkeit, erinnerungsPlan, fortschritt, frageZu, istErledigt, offeneFragenNachWirkung, zusatzFragen, type Profil } from "../src/pflichten/check";
+import { CHECK_FELDER, KATALOG, auswertung, checkFragen, ereignisseAusStand, dringlichkeit, erinnerungsPlan, fortschritt, frageZu, gruendungsSchritte, istErledigt, offeneFragenNachWirkung, selten, zusatzFragen, type PflichtInfo, type Profil } from "../src/pflichten/check";
 
 const FIXTURES = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../catalog/fixtures");
 const salon: Profil = { "taetigkeit.branchen": ["beauty_kosmetik"], rechtsform: "einzelunternehmen", "taetigkeit.einordnung": "gewerbe", bundesland: "BY", "beschaeftigte.gesamt": 3, "kasse.elektronisch": true, "online.website": false, "ust.kleinunternehmer": false, gruendungsdatum: "2024-03-01" };
@@ -121,10 +121,10 @@ describe("Pflichten-Check", () => {
     const leer = { erledigt: {}, unterlagen: [], betrieb: LEERER_STAND.betrieb };
     const d = dringlichkeit(a, leer, heute);
     // jede offene Pflicht steht in genau einem Abschnitt
-    expect(d.jetzt.length + d.diesenMonat.length + d.imBlick.length).toBe(a.gilt.length);
-    expect(new Set([...d.jetzt, ...d.diesenMonat, ...d.imBlick].map((p) => p.id)).size).toBe(a.gilt.length);
+    expect(d.jetzt.length + d.naechsteWochen.length + d.imBlick.length).toBe(a.gilt.length);
+    expect(new Set([...d.jetzt, ...d.naechsteWochen, ...d.imBlick].map((p) => p.id)).size).toBe(a.gilt.length);
     for (const p of d.jetzt) expect(p.naechsterTermin ? p.naechsterTermin <= "2026-10-26" : p.schwere === "hoch", p.id).toBe(true);
-    for (const p of d.diesenMonat) expect(p.naechsterTermin! > "2026-10-26" && p.naechsterTermin! <= "2026-11-26", p.id).toBe(true);
+    for (const p of d.naechsteWochen) expect(p.naechsterTermin! > "2026-10-26" && p.naechsterTermin! <= "2026-11-26", p.id).toBe(true);
     // Erinnerungen: nur mit Termin, nie vor heute, höchstens 3 Tage vorher, sortiert und begrenzt
     const plan = erinnerungsPlan(a, leer, heute);
     expect(plan.length).toBeGreaterThan(0);
@@ -152,6 +152,33 @@ describe("Pflichten-Check", () => {
     expect(alt.gruendung.every((p) => KATALOG.pflichten.find((k) => k.id === p.id)?.phase === "gruendung")).toBe(true);
     // jede geltende Pflicht hat einen Grund („Warum für dich“)
     for (const p of alt.gilt) expect(p.grund, p.id).not.toBe("");
+  });
+
+  it("zeigt „Schon erledigt?“ nur jungen Betrieben mit mehreren offenen Gründungsschritten", () => {
+    const heute = "2026-10-12";
+    const leer = { erledigt: {}, unterlagen: [], betrieb: LEERER_STAND.betrieb };
+    const jung = { ...salon, gruendungsdatum: "2026-09-01" };
+    const a = auswertung(jung, heute);
+    const l = gruendungsSchritte(a, jung, leer, heute);
+    expect(l.length).toBeGreaterThanOrEqual(3);
+    expect(ids(l)).toContain("gruendung.gewerbeanzeige");
+    expect(l.every((p) => KATALOG.pflichten.find((k) => k.id === p.id)?.phase === "gruendung")).toBe(true);
+    // abgehakte Schritte fallen heraus; bleiben weniger als drei, entfällt die Karte
+    const fast = { ...leer, erledigt: Object.fromEntries(l.slice(0, l.length - 2).map((p) => [p.id, heute])) };
+    expect(gruendungsSchritte(a, jung, fast, heute)).toEqual([]);
+    expect(gruendungsSchritte(a, jung, { ...leer, erledigt: { [l[0]!.id]: heute } }, heute)).toHaveLength(l.length - 1);
+    // bestehender Betrieb, Beginn in der Zukunft oder ohne Datum: keine Karte
+    expect(gruendungsSchritte(auswertung(salon, heute), salon, leer, heute)).toEqual([]);
+    const geplant = { ...salon, gruendungsdatum: "2027-01-01" };
+    expect(gruendungsSchritte(auswertung(geplant, heute), geplant, leer, heute)).toEqual([]);
+    const ohne = { ...salon, gruendungsdatum: null };
+    expect(gruendungsSchritte(auswertung(ohne, heute), ohne, leer, heute)).toEqual([]);
+  });
+
+  it("zählt Pflichten, die höchstens einmal im Jahr anstehen", () => {
+    const p = (termine: string[]) => ({ termine }) as unknown as PflichtInfo;
+    expect(selten([p([]), p(["2026-11-01"]), p(["2026-11-01", "2026-12-01"])])).toBe(true);
+    expect(selten([p([]), p(["2026-11-01", "2026-12-01"])])).toBe(false);
   });
 
   it("schlägt Zusatzfragen vor, die unklare Pflichten klären", () => {

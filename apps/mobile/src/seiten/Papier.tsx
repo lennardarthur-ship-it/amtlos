@@ -100,7 +100,9 @@ export function PapierBlatt({ v, d, jeSchritt, ergebnis, springen }: { v: Vorlag
           {i > 0 && !fehlt.length && !(jeSchritt[i - 1] ?? []).length ? <View style={{ height: 1, backgroundColor: LINIE }} /> : null}
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={`${a.titel ?? TEXT.schritt(i + 1, v.abschnitte.length)} ${TEXT.papier_bearbeiten}${fehlt.length ? `, ${TEXT.eintrag_fehlt(fehlt.length)}` : ""}`}
+            // VoiceOver liest, was auf dem Papier steht, und was fehlt – nicht nur „Rechnungsempfänger bearbeiten“
+            accessibilityLabel={[`${a.titel ?? TEXT.schritt(i + 1, v.abschnitte.length)}: ${z.map((x) => (x.rechts ? `${x.links} ${x.rechts}` : x.links)).join(", ")}`.replace(/: $/, ""), fehlt.length ? TEXT.papier_fehlt(fehlt.join(", ")) : ""].filter(Boolean).join(". ")}
+            accessibilityHint={TEXT.papier_tippen}
             onPress={() => springen(i)}
             style={({ pressed }) => ({ marginHorizontal: -10, paddingHorizontal: 10, paddingVertical: 10, borderRadius: 12, backgroundColor: pressed ? GEDRUECKT : fehlt.length ? FEHLT_GRUND : "transparent" })}
           >
@@ -113,8 +115,9 @@ export function PapierBlatt({ v, d, jeSchritt, ergebnis, springen }: { v: Vorlag
                 <T key={k} v="klein" fett={x.fett} farbe={TINTE} numberOfLines={2}>{x.links}</T>
               ) : (
                 <View key={k} style={{ flexDirection: "row", justifyContent: "space-between", gap: 12, paddingVertical: 1 }}>
-                  <T v="klein" farbe={x.rechts && a.felder.some((f) => f.art === "liste") ? TINTE : LEISE} numberOfLines={1} stil={{ flexShrink: 1 }}>{x.links}</T>
-                  {x.rechts ? <T v="klein" farbe={TINTE} numberOfLines={1} stil={{ fontVariant: ["tabular-nums"], flexShrink: 1, textAlign: "right" }}>{x.rechts}</T> : null}
+                  {/* Beträge einer Liste (Positionen) werden nie gekürzt – die Bezeichnung bricht um */}
+                  <T v="klein" farbe={x.rechts && a.felder.some((f) => f.art === "liste") ? TINTE : LEISE} numberOfLines={2} stil={{ flex: 1, flexShrink: 1 }}>{x.links}</T>
+                  {x.rechts ? <T v="klein" farbe={TINTE} numberOfLines={1} stil={{ fontVariant: ["tabular-nums"], flexShrink: a.felder.some((f) => f.art === "liste") ? 0 : 1, textAlign: "right" }}>{x.rechts}</T> : null}
                 </View>
               ),
             )}

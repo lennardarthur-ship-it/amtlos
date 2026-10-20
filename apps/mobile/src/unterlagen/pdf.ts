@@ -52,6 +52,17 @@ export async function pdfErstellen(roh: string, dateiname: string, quer = false)
   }
 }
 
+/** PDF als Bytes (für das Paket an die Steuerberatung); im Web gibt es kein expo-print – dann null. */
+export async function pdfBytes(html: string, dateiname: string, quer = false): Promise<Uint8Array | null> {
+  if (Platform.OS === "web") return null;
+  const uri = await pdfErstellen(html, dateiname, quer);
+  try {
+    return new File(uri).bytesSync();
+  } finally {
+    cacheDateiLoeschen(uri);
+  }
+}
+
 /** Erstellt das PDF und öffnet das Teilen-Menü; true, wenn es weitergegeben wurde (false: abgebrochen). */
 export async function pdfTeilen(html: string, dateiname: string, quer = false): Promise<boolean> {
   if (Platform.OS === "web") {

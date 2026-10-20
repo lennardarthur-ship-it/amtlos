@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Image, Pressable, View } from "react-native";
-import { BUNDESLAENDER, HAUSFARBEN, PERSONEN_FELDER, VERSTEUERUNG, VORLAGEN, type Betrieb as BetriebDaten, type PersonenArt } from "@amtlos/fachlogik";
+import { BUNDESLAENDER, HAUSFARBEN, PERSONEN_FELDER, VERSTEUERUNG, VORLAGEN, emailGueltig, ibanGueltig, plzGueltig, type Betrieb as BetriebDaten, type PersonenArt } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { logoWaehlen } from "../unterlagen/logo";
 import { AuswahlZeile } from "../ui/auswahlseite";
@@ -14,7 +14,7 @@ import { KATALOG, regelwert } from "../pflichten/check";
 import { APP_VERSION } from "../version";
 import { useAmtlos } from "../zustand";
 import { bestaetigen } from "../ui/bestaetigen";
-import { Felder } from "./felder";
+import { Ansage, Felder } from "./felder";
 import { BuehnenSeite, Gruppe, Inhalt, datumKurz } from "./gemeinsam";
 import { CheckProfilZeile } from "./Pflichten";
 import { CloudZeile, SicherungSeite, WiederherstellenSeite } from "./Sicherung";
@@ -108,6 +108,24 @@ type Teil = "angaben" | "steuer" | "auftritt" | "gesellschaft";
 const TEILE: Teil[] = ["angaben", "steuer", "auftritt", "gesellschaft"];
 
 /**
+ * „Gesellschaft“ (Rechtsform, Register) nur zeigen, wenn sie passen kann: nicht für Einzelunternehmen und Freiberufler
+ * laut Pflichten-Check – außer es steht schon etwas darin.
+ */
+function mitGesellschaft(profil: Record<string, unknown>, b: BetriebDaten): boolean {
+  const rf = profil.rechtsform;
+  if (rf !== "einzelunternehmen" && rf !== "freiberuf") return true;
+  return [b.rechtsform, b.registergericht, b.registernummer, b.vertretung].some((x) => (x ?? "").trim());
+}
+
+/** Plausibilität (IBAN-Prüfsumme, PLZ, E-Mail) – nur als Hinweis am Feld, gespeichert wird trotzdem. */
+function pruefung(k: keyof BetriebDaten, w: string): string | null {
+  if (k === "iban") return ibanGueltig(w) ? null : TEXT.iban_ungueltig;
+  if (k === "plz") return plzGueltig(w) ? null : TEXT.plz_ungueltig;
+  if (k === "email") return emailGueltig(w) ? null : TEXT.email_ungueltig;
+  return null;
+}
+
+/**
  * Absender einer Rechnung eintragen – nur Angaben und Steuer/Bank, mit „Fertig“ zurück in den Ablauf (statt des
  * ganzen Betriebsformulars). Die Angaben landen wie immer unter „Mein Betrieb“.
  */
@@ -133,6 +151,8 @@ export function BetriebFormular({ teil, teile }: { teil?: Teil; teile?: Teil[] }
   const { stand, betriebSpeichern, pro } = useAmtlos();
   const sperre = useProSperre();
   const [b, setB] = useState<BetriebDaten>(stand.betrieb);
+  // geprüft wird ein Feld erst nach dem Verlassen (beim Tippen wäre jede halbe IBAN „ungültig“) – gespeicherte Werte sofort
+  const [verlassen, setVerlassen] = useState<Set<keyof BetriebDaten>>(() => new Set((["iban", "plz", "email"] as const).filter((k) => (stand.betrieb[k] ?? "").trim())));
   const feld = (k: keyof BetriebDaten) => ({
     wert: b[k] ?? "",
     aendern: (w: string) => {
@@ -140,8 +160,10 @@ export function BetriebFormular({ teil, teile }: { teil?: Teil; teile?: Teil[] }
       setB(neu);
       betriebSpeichern(neu);
     },
+    fehler: verlassen.has(k) ? pruefung(k, b[k] ?? "") : null,
+    onBlur: () => setVerlassen((v) => (v.has(k) ? v : new Set(v).add(k))),
   });
-  const zeigt = (t: Teil) => (teile ? teile.includes(t) : !teil || teil === t);
+  const zeigt = (t: Teil) => (teile ? teile.includes(t) : !teil || teil === t) && (t !== "gesellschaft" || Boolean(teil) || mitGesellschaft(stand.profil, b));
   const kopf = (t: Teil, titel: string, text?: string) =>
     teil ? (
       <T leise stil={{ marginBottom: 12 }}>{text ?? TEXT.teil_text[t]}</T>
@@ -312,13 +334,14 @@ export function Betrieb() {
       </Unterseite>
     ));
   const personen = (art: PersonenArt) => personenSortiert(z.stand[PERSONEN_LISTE[art]]);
+  const teileSichtbar = TEILE.filter((t) => t !== "gesellschaft" || mitGesellschaft(z.stand.profil, b));
   return (
     <BuehnenSeite key={zaehler} ueber={betriebFehlt(b) ? undefined : TEXT.betrieb_titel} buehne={<BetriebKopf b={b} onPress={betriebFehlt(b) ? oeffneAlles : () => oeffneTeil("angaben")} />}>
       <ProZeile />
       <Gruppe titel={TEXT.betrieb_gruppe}>
         <Karte>
-          {TEILE.map((t, i) => (
-            <Zeile key={t} symbol={TEIL_SYMBOL[t]} ton={TEIL_TON[t]} titel={TEXT.teil_titel[t]} text={zusammenfassung(b, t)} onPress={() => oeffneTeil(t)} letzte={i === TEILE.length - 1} />
+          {teileSichtbar.map((t, i) => (
+            <Zeile key={t} symbol={TEIL_SYMBOL[t]} ton={TEIL_TON[t]} titel={TEXT.teil_titel[t]} text={zusammenfassung(b, t)} onPress={() => oeffneTeil(t)} letzte={i === teileSichtbar.length - 1} />
           ))}
         </Karte>
       </Gruppe>
@@ -454,7 +477,7 @@ function LogoWahl({ logo, setzen }: { logo: string; setzen: (l: string) => void 
           {logo ? <TextKnopf symbol="trash" text={TEXT.logo_entfernen} onPress={() => setzen("")} /> : null}
         </View>
       </View>
-      {fehler ? <T v="caption" farbe={f.frist}>{TEXT.logo_fehler}</T> : null}
+      {fehler ? <Ansage v="caption" fett={false} farbe={f.frist} text={TEXT.logo_fehler} /> : null}
     </View>
   );
 }

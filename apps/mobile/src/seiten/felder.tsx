@@ -1,10 +1,23 @@
-import { useState, type ReactNode } from "react";
-import { View } from "react-native";
+import { useEffect, useState, type ReactNode } from "react";
+import { AccessibilityInfo, View } from "react-native";
 import { ohneVerdeckteFelder, sichtbar, type Daten, type EinfachesFeld, type Eintrag, type EintragWert, type Feld, type ListenFeld } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { TextKnopf } from "../ui/bausteine";
+import { T, TextKnopf } from "../ui/bausteine";
 import { weich } from "../ui/thema";
 import { Eingabe } from "../ui/eingaben";
+
+/** Meldung ansagen, sobald sie erscheint oder sich ändert – VoiceOver kennt keine Live-Regionen und keine Rolle „alert“. */
+export function useAnsage(text: string | null | undefined) {
+  useEffect(() => {
+    if (text) AccessibilityInfo.announceForAccessibility(text);
+  }, [text]);
+}
+
+/** Kurze Fehlermeldung als Text (z. B. direkt über dem Hauptknopf), die beim Erscheinen angesagt wird. */
+export function Ansage({ text, farbe, v = "klein", fett = true }: { text: string; farbe?: string; v?: "klein" | "caption"; fett?: boolean }) {
+  useAnsage(text);
+  return <T v={v} fett={fett} farbe={farbe} accessibilityRole="alert" accessibilityLiveRegion="polite">{text}</T>;
+}
 
 /** Hat ein Feld einen Wert, den jemand eingetragen hat? (Schalter aus, leere Texte und Listen zählen nicht) */
 export const gefuellt = (w: unknown) => (typeof w === "string" ? w.trim() !== "" : Array.isArray(w) ? w.length > 0 : w === true);

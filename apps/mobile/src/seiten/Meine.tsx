@@ -25,7 +25,13 @@ const SUCHE_AB = 6;
 function OffenAufBuehne({ anzahl, ueberfaellig, cent, aktiv, onPress }: { anzahl: number; ueberfaellig: number; cent: number; aktiv: boolean; onPress: () => void }) {
   const f = useFarben();
   return (
-    <Pressable accessibilityRole="button" accessibilityState={{ selected: aktiv }} accessibilityLabel={anzahl ? TEXT.offene_summe(anzahl, euroText(cent)) : TEXT.alles_bezahlt} onPress={anzahl ? onPress : undefined} style={({ pressed }) => ({ gap: 4, opacity: pressed ? 0.75 : 1 })}>
+    <Pressable
+      // nur ein Knopf, wenn es etwas zu filtern gibt; „überfällig“ gehört in die Ansage, der Hinweis sagt, was der Tipp tut
+      accessibilityRole={anzahl ? "button" : "text"}
+      accessibilityState={anzahl ? { selected: aktiv } : undefined}
+      accessibilityLabel={anzahl ? `${TEXT.offene_summe(anzahl, euroText(cent))}${ueberfaellig ? `, ${TEXT.davon_ueberfaellig(ueberfaellig)}` : ""}` : TEXT.alles_bezahlt}
+      accessibilityHint={anzahl ? (aktiv ? TEXT.offen_hinweis_alle : TEXT.offen_hinweis_filtern) : undefined}
+      onPress={anzahl ? onPress : undefined} style={({ pressed }) => ({ gap: 4, opacity: pressed ? 0.75 : 1 })}>
       <T v="klein" farbe={f.buehneLeise} stil={{ ...SCHRIFT.mittel }}>{TEXT.offen_bei_kunden}</T>
       <GrosserBetrag cent={cent} groesse={48} />
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8 }}>
@@ -120,7 +126,15 @@ export function Meine() {
               ))}
             </View>
           ) : !belege.length ? (
-            <T leise stil={{ marginTop: 8 }}>{TEXT.meine_nichts}</T>
+            <View style={{ marginTop: 8 }}>
+              <T leise>{TEXT.meine_nichts}</T>
+              {/* leere Treffer mit dem Weg zurück: Filter bzw. Suche zurücksetzen */}
+              {aktiv !== "alle" ? (
+                <TextKnopf symbol="xmark.circle" text={TEXT.filter_zuruecksetzen} onPress={() => { setFilter("alle"); setSuche(""); }} stil={{ marginLeft: 4 }} />
+              ) : suche ? (
+                <TextKnopf symbol="xmark.circle" text={TEXT.suche_leeren} onPress={() => setSuche("")} stil={{ marginLeft: 4 }} />
+              ) : null}
+            </View>
           ) : null}
           {liste.length > zeigen ? (
             <TextKnopf symbol="chevron.down" text={TEXT.weitere_zeigen(Math.min(SCHRITT, liste.length - zeigen))} onPress={() => setZeigen((n) => n + SCHRITT)} stil={{ marginLeft: 4, marginTop: 4 }} />

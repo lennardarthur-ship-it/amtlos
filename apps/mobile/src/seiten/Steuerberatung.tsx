@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { dokumentHtml, pdfDateiname, vorlageFuer } from "@amtlos/fachlogik";
+import { betriebFuerDokument } from "../pro/regeln";
+import { pdfBytes } from "../unterlagen/pdf";
 import { ScrollView, View } from "react-native";
 import { T as TEXT } from "../texte";
 import { RAND } from "../ui/thema";
 import { Feld, Fuss, Hinweis, Karte, Knopf, T, Wahl } from "../ui/bausteine";
-import { useMeldung } from "../ui/meldung";
+import { useMeldung, useMeldungLeeren } from "../ui/meldung";
 import { Unterseite } from "../ui/navigation";
 import { gestellteRechnungen, standardZeitraum, steuerpaket, zeitraeume } from "../unterlagen/steuerpaket";
 import { dateiTeilenBytes } from "../unterlagen/sicherungDatei";
@@ -19,11 +22,27 @@ import { useProSperre } from "./Pro";
 export function SteuerberatungSeite() {
   const z = useAmtlos();
   const melden = useMeldung();
+  const leeren = useMeldungLeeren();
+  // eine Meldung vom vorigen Bildschirm („Beleg gespeichert.“) läge sonst über dem Formular
+  useEffect(() => leeren(), [leeren]);
   const sperre = useProSperre();
   // Quartale zuerst – das zuletzt abgeschlossene ist vorausgewählt; dann Monate, dann Jahre
   const rang = (n: string) => (/-Q\d$/.test(n) ? 0 : /^\d{4}-\d{2}$/.test(n) ? 1 : 2);
   const liste = zeitraeume(heute()).sort((a, b) => rang(a.name) - rang(b.name));
-  const [wahl, setWahl] = useState(() => standardZeitraum(heute()));
+  // Rechnungen und Belege im Zeitraum
+  const anzahl = (zr: { von: string; bis: string }) => gestellteRechnungen(z.stand).filter((u) => String(u.daten.datum) >= zr.von && String(u.daten.datum) <= zr.bis).length + z.stand.belege.filter((b) => b.datum >= zr.von && b.datum <= zr.bis).length;
+  // vorausgewählt: der jüngste Zeitraum mit Daten – zuerst das zuletzt abgeschlossene Quartal, sonst das laufende,
+  // sonst (beide leer) doch das abgeschlossene; nie ein leeres Paket als Vorschlag, wenn es ein volles gibt
+  const [wahl, setWahl] = useState(() => {
+    const abgeschlossen = standardZeitraum(heute());
+    const j = heute().slice(0, 4);
+    const laufend = `${j}-Q${Math.ceil(Number(heute().slice(5, 7)) / 3)}`;
+    const mitDaten = (n: string) => {
+      const zr = liste.find((x) => x.name === n);
+      return Boolean(zr && anzahl(zr));
+    };
+    return mitDaten(abgeschlossen) ? abgeschlossen : mitDaten(laufend) ? laufend : abgeschlossen;
+  });
   const [laedt, setLaedt] = useState(false);
   const [fehler, setFehler] = useState<string | null>(null);
   const [hinweis, setHinweis] = useState<string | null>(null);
@@ -44,7 +63,17 @@ export function SteuerberatungSeite() {
         const bytes = await z.dateiLesen(b.datei);
         if (bytes) dateien[b.datei] = bytes;
       }
-      const p = steuerpaket(z.stand, zr, sb, dateien, new Date().toISOString());
+      // Rechnungen (auch Stornos und Gutschriften) als PDF beilegen – die Kanzlei braucht das Belegbild jeder Ausgangsrechnung
+      const rechnungsPdfs: Record<string, Uint8Array> = {};
+      const v = vorlageFuer("rechnung");
+      if (v)
+        for (const u of gestellteRechnungen(z.stand)) {
+          const d = String(u.daten.datum ?? "");
+          if (d < zr.von || d > zr.bis) continue;
+          const bytes = await pdfBytes(dokumentHtml(v, u.daten, betriebFuerDokument(z.stand.betrieb, z.pro)), pdfDateiname(v, u.daten, heute()), v.querformat).catch(() => null);
+          if (bytes) rechnungsPdfs[u.id] = bytes;
+        }
+      const p = steuerpaket(z.stand, zr, sb, dateien, new Date().toISOString(), { rechnungsPdfs });
       if (!(await dateiTeilenBytes(p.dateiname, p.zip, "application/zip"))) return;
       melden(TEXT.steuerpaket_fertig(p.buchungen));
       if (p.ohneXml) setHinweis(TEXT.steuerpaket_ohne_xml(p.ohneXml));

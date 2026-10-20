@@ -889,11 +889,18 @@ ${fussHtml(b)}
 
 // ---------------------------------------------------------------- Geld und Zahlen
 
-/** „1.234,56“ / „1234.56“ / „12“ → Zahl; leer oder unlesbar → null. */
+/**
+ * „1.234,56“ / „1234.56“ / „12“ / „45,-“ → Zahl; leer oder unlesbar → null. Englische Schreibweise mit Tausender-Komma
+ * („1,234.56“) gilt als unlesbar – sonst würde daraus still 1,23.
+ */
 function lesen(t: string | null | undefined): number | null {
   if (typeof t !== "string") return null;
   let s = t.replace(/\s|€/g, "");
   if (s === "") return null;
+  // „45,-“ / „45,–“ / „45.-“: glatte Euro
+  s = s.replace(/[,.][-–—]{1,2}$/, "");
+  // Punkt nach einem Komma gibt es in deutscher Schreibweise nicht („1,234.56“)
+  if (/,.*\./.test(s)) return null;
   if (/,\d{1,2}$/.test(s) || s.includes(",")) s = s.replace(/\./g, "").replace(",", ".");
   else if (/^-?\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, ""); // auch „-1.500“ (Storno, Nachlass)
   const n = Number(s);

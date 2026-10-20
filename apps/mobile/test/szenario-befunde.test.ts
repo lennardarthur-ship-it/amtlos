@@ -60,7 +60,7 @@ describe("Gutschrift ist für den Aussteller eine Ausgabe", () => {
     expect(re).not.toContain("2026-003;");
     const gs = strFromU8(inhalt["Gutschriften_2026.csv"]!);
     expect(gs).toContain("Leistender (Empfänger der Gutschrift)");
-    expect(gs).toContain("2026-003;03.09.2026;03.09.2026;Jonas Kiefer Fotografie;700,00;0,00;700,00;§ 19;10.09.2026;");
+    expect(gs).toContain("2026-003;03.09.2026;03.09.2026;;Jonas Kiefer Fotografie;;§ 19;700,00;0,00;700,00;§ 19;17.09.2026;10.09.2026;0,00;");
     const datev = strFromU8(inhalt["Buchungsliste_2026.csv"]!);
     expect(datev).not.toContain("Jonas Kiefer");
     expect(datev).toContain("Verlag Nord");

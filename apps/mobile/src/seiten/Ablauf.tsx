@@ -9,12 +9,12 @@ import { PERSONEN_LISTE, betriebFehlt, personenSortiert } from "../unterlagen/sp
 import { fehltFuer } from "../unterlagen/pruefung";
 import { offeneRechnungen, periodeText, perioden, umsaetzeFuer, type UstUebernahme, type Versteuerung } from "../unterlagen/ustAusRechnungen";
 import { useAmtlos } from "../zustand";
-import { Abschluss, useTeilen } from "./Abschluss";
+import { Abschluss, festschreibenHinweis, useTeilen } from "./Abschluss";
 import { AuswahlSeite } from "../ui/auswahlseite";
 import { AbsenderSeite } from "./Betrieb";
 import { useProSperre } from "./Pro";
 import { euerUebernahme, jahreMitDaten, type EuerUebernahme } from "../unterlagen/steuerpaket";
-import { Felder } from "./felder";
+import { Ansage, Felder, useAnsage } from "./felder";
 import { InfoSeite } from "./InfoSeite";
 import { ListenSchritt } from "./Liste";
 
@@ -73,9 +73,21 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
   const [uebernommen, setUebernommen] = useState<{ periode: string; v: Versteuerung; r: UstUebernahme } | null>(null);
   const liste = perioden(z.stand.unterlagen, z.stand.betrieb, v, z.stand.belege);
   const offen = v === "ist" ? offeneRechnungen(z.stand.unterlagen).length : 0;
+  const r = uebernommen && uebernommen.v === v ? uebernommen.r : null;
+  // Ergebnis und Warnungen der Übernahme ansagen (VoiceOver bemerkt die neuen Zeilen sonst nicht)
+  useAnsage(
+    r
+      ? [
+          r.kleinunternehmer ? TEXT.aus_rechnungen_ku : TEXT.aus_rechnungen_ok(r.anzahl),
+          r.gutschriften ? TEXT.aus_rechnungen_gutschriften(r.gutschriften) : "",
+          r.ersatz ? TEXT.aus_rechnungen_ersatz(r.ersatz) : "",
+          r.offen ? TEXT.aus_rechnungen_offen(r.offen) : "",
+          r.vorsteuerBelege || r.ohneVorsteuer ? TEXT.aus_rechnungen_vorsteuer(r.vorsteuerBelege, r.ohneVorsteuer) : "",
+        ].filter(Boolean).join(" ")
+      : null,
+  );
   if (!liste.length)
     return <T v="caption" leise stil={{ marginTop: 10 }}>{v === "ist" && offen ? TEXT.aus_rechnungen_ist_leer(offen) : TEXT.aus_rechnungen_leer}</T>;
-  const r = uebernommen && uebernommen.v === v ? uebernommen.r : null;
   return (
     <View style={{ marginTop: 16, padding: 16, borderRadius: RADIUS.karte, backgroundColor: f.amtHauch }}>
       <T v="klein" fett farbe={f.amtTief}>{TEXT.mitPro(TEXT.aus_rechnungen_titel, z.pro)}</T>
@@ -114,6 +126,7 @@ function EuerAusDaten({ id }: { id: string }) {
   const sperre = useProSperre();
   const [ergebnis, setErgebnis] = useState<{ jahr: string; r: EuerUebernahme } | null>(null);
   const jahre = jahreMitDaten(z.stand);
+  useAnsage(ergebnis ? [TEXT.euer_aus_daten_ok(ergebnis.r.rechnungen, ergebnis.r.belege), ergebnis.r.unbezahlt ? TEXT.euer_unbezahlt(ergebnis.r.unbezahlt) : "", ergebnis.r.anlagen ? TEXT.euer_anlagen(ergebnis.r.anlagen) : "", ergebnis.r.hinweis].filter(Boolean).join(" ") : null);
   if (!jahre.length) return <T v="caption" leise stil={{ marginTop: 10 }}>{TEXT.euer_leer}</T>;
   return (
     <View style={{ marginTop: 16, padding: 16, borderRadius: RADIUS.karte, backgroundColor: f.amtHauch }}>
@@ -201,6 +214,8 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
   const zRef = useRef(z);
   zRef.current = z;
   const weg = useRef(false);
+  // VoiceOver: neuer Schritt wird angesagt (der Fokus bleibt sonst auf „Weiter“)
+  useAnsage(vorlage && schritt < n ? `${TEXT.schritt(schritt + 1, n)}: ${vorlage.abschnitte[schritt]?.titel ?? ""}` : null);
 
   useEffect(
     () => () => {
@@ -272,7 +287,10 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
           ueber={
             amAbschluss && teilen.fehler ? (
               // direkt über dem Knopf – oben im Inhalt sähe man den Hinweis nach dem Scrollen nicht
-              <T v="klein" fett farbe={f.frist} accessibilityRole="alert">{teilen.fehler}</T>
+              <Ansage text={teilen.fehler} farbe={f.frist} />
+            ) : amAbschluss && !absenderFehlt && festschreibenHinweis(vorlage, fest) ? (
+              // vor dem ersten Teilen: was das Teilen bewirkt – direkt über dem Knopf, ohne Rückfrage
+              <T v="caption" leise>{festschreibenHinweis(vorlage, fest)}</T>
             ) : !amAbschluss && letzteZahl && !/^0,00\s/.test(letzteZahl[1]) ? (
               <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                 <T v="klein" leise>{letzteZahl[0]}</T>

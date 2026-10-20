@@ -2,7 +2,7 @@ import { unzipSync, strFromU8 } from "fflate";
 import { describe, expect, it } from "vitest";
 import { EUER_ZEILE_STEUERFREI, KU_HINWEIS, eRechnungAus, vorlageFuer, xrechnungUbl, type Beleg } from "@amtlos/fachlogik";
 import { sicherungErstellen, sicherungLesen, sicherungLesenMitDateien } from "../src/unterlagen/sicherung";
-import { LEERER_STAND, anlegen, aufbewahrungspflichtig, ausgeben, belegLoeschen, belegSetzen, bezahltSetzen, felderSetzen, standAus, ungesichert, zusammenfuehren, type Stand } from "../src/unterlagen/speicher";
+import { LEERER_STAND, anlegen, aufbewahrungspflichtig, ausgeben, belegLoeschen, belegSetzen, bezahltSetzen, felderSetzen, standAus, stornieren, ungesichert, zusammenfuehren, type Stand } from "../src/unterlagen/speicher";
 import { EUER_NICHT_ENTHALTEN, belegDateiname, euerUebernahme, jahreMitDaten, standardZeitraum, steuerpaket, zeitraeume } from "../src/unterlagen/steuerpaket";
 import { perioden, umsaetzeFuer } from "../src/unterlagen/ustAusRechnungen";
 
@@ -122,18 +122,132 @@ describe("Paket für die Steuerberatung (E-133)", () => {
     const p = steuerpaket(s, z, s.steuerberatung, { "f1.jpg": new Uint8Array([1, 2, 3]) }, "2026-10-13T12:00:00.000Z");
     expect(p).toMatchObject({ rechnungen: 1, belege: 1, ohneXml: 0, dateiname: "Amtlos-Steuerberatung-Salon-Sonne-2026-Q4.zip" });
     const inhalt = unzipSync(p.zip);
-    expect(Object.keys(inhalt).sort()).toEqual(["Belege/2026-10-02_Mueller-Soehne_L-b1.jpg", "Belege_2026-Q4.csv", "Buchungsliste_2026-Q4.csv", "E-Rechnungen/2026-001.xml", "EXTF_Buchungsstapel_2026-Q4.csv", "LIESMICH.txt", "Rechnungen_2026-Q4.csv"].sort());
+    // Amtlos-Belegnummer nach Erfassung je Jahr: b2 (Juli) wurde zuerst erfasst → B2026-001, b1 → B2026-002
+    expect(Object.keys(inhalt).sort()).toEqual(["Belege/B2026-002_2026-10-02_Mueller-Soehne_L-b1.jpg", "Belege_2026-Q4.csv", "Buchungsliste_2026-Q4.csv", "E-Rechnungen/2026-001.xml", "EXTF_Buchungsstapel_2026-Q4.csv", "Fragen_2026-Q4.txt", "LIESMICH.txt", "Rechnungen_2026-Q4.csv"].sort());
     expect(strFromU8(inhalt["EXTF_Buchungsstapel_2026-Q4.csv"]!, true).startsWith('"EXTF";700;21')).toBe(true);
-    expect(strFromU8(inhalt["Rechnungen_2026-Q4.csv"]!)).toContain("2026-001;05.10.2026;05.10.2026;Kim Beispiel;100,00;19,00;119,00;19 %;10.10.2026;");
-    expect(strFromU8(inhalt["Belege_2026-Q4.csv"]!)).toContain("Müller & Söhne");
-    expect(Array.from(inhalt["Belege/2026-10-02_Mueller-Soehne_L-b1.jpg"]!)).toEqual([1, 2, 3]);
+    const re = strFromU8(inhalt["Rechnungen_2026-Q4.csv"]!).replace(/^\uFEFF/, "").split("\r\n");
+    expect(re[0]).toBe("Nummer;Datum;Leistungsdatum;Leistungszeitraum;Kunde;USt-IdNr. Kunde;Steuerart;Netto;USt;Brutto;Steuersätze;Fällig am;Bezahlt am;Offener Betrag zum 31.12.2026;Storno zu");
+    expect(re[1]).toBe("2026-001;05.10.2026;05.10.2026;;Kim Beispiel;;Standard;100,00;19,00;119,00;19 %;19.10.2026;10.10.2026;0,00;");
+    expect(re[2]).toBe("Summe 19 %;;;;;;;100,00;19,00;119,00;19 %;;;;");
+    expect(re[3]).toBe("Summe gesamt;;;;;;;100,00;19,00;119,00;;;;0,00;");
+    const be = strFromU8(inhalt["Belege_2026-Q4.csv"]!).replace(/^\uFEFF/, "").split("\r\n");
+    expect(be[0]).toBe("Amtlos-Belegnr.;Datum;Lieferant;Belegnummer (Lieferant);Belegfeld 1 (DATEV);Kategorie;Zeile Anlage EÜR;Konto (DATEV);Netto;USt;Vorsteuer;Brutto;Steuersätze;Zahlung;Zahltag (für EÜR verwendet);Datei;Notiz");
+    expect(be[1]).toBe("B2026-002;02.10.2026;Müller & Söhne;L-b1;L-b1;Waren und Material;Waren, Rohstoffe und Hilfsstoffe einschließlich der Nebenkosten;3400;100,00;19,00;19,00;119,00;19 %;Überweisung oder Karte;02.10.2026 (fehlt – Belegdatum verwendet);B2026-002_2026-10-02_Mueller-Soehne_L-b1.jpg;");
+    expect(be[2]).toBe("Summe;;;;;;;;100,00;19,00;19,00;119,00;;;;;");
+    expect(Array.from(inhalt["Belege/B2026-002_2026-10-02_Mueller-Soehne_L-b1.jpg"]!)).toEqual([1, 2, 3]);
+    // DATEV: Belegfeld 1 wie in der Belegliste, Buchungs-GUID gesetzt
+    const extf = strFromU8(inhalt["EXTF_Buchungsstapel_2026-Q4.csv"]!, true).split("\r\n");
+    expect(extf.some((z) => z.includes(';"L-b1";'))).toBe(true);
     const xml = strFromU8(inhalt["E-Rechnungen/2026-001.xml"]!);
     expect(xml).toBe(xrechnungUbl(eRechnungAus(s.unterlagen[0]!.daten, s.betrieb).daten, KU_HINWEIS));
     expect(belegDateiname(beleg("x", "2026-01-01", 1, { lieferant: "", nummer: null, datei: "a.pdf" }))).toBe("2026-01-01_ohne-name.pdf");
     expect(belegDateiname(beleg("y", "2026-01-31", 1, { lieferant: "Lohnbüro Weiß", nummer: "LA 01/2026", datei: "b.pdf" }))).toBe("2026-01-31_Lohnbuero-Weiss_LA-01-2026.pdf");
     expect(belegDateiname(beleg("z", "2026-02-01", 1, { lieferant: "Café Crème", nummer: null, datei: "c.jpg" }))).toBe("2026-02-01_Cafe-Creme.jpg");
+    expect(belegDateiname(beleg("z", "2026-02-01", 1, { lieferant: "Café Crème", nummer: "Nr. 7", datei: "c.jpg" }), "B2026-004")).toBe("B2026-004_2026-02-01_Cafe-Creme_Nr-7.jpg");
     expect(steuerpaket({ ...s, betrieb: { ...s.betrieb, name: "Café Morgenrot" } }, z, s.steuerberatung, {}, "2026-10-13T12:00:00.000Z").dateiname).toBe("Amtlos-Steuerberatung-Cafe-Morgenrot-2026-Q4.zip");
     // Hinweis: Paket nach Rechnungsdatum, Voranmeldung nach Leistungsdatum
     expect(strFromU8(inhalt["LIESMICH.txt"]!)).toMatch(/nach dem Leistungsdatum zu \(Soll-Versteuerung\).*abweichen/);
+  });
+});
+
+describe("Paket für die Steuerberatung: LIESMICH, Fragen, Listen (Durchsicht Steuerberaterin)", () => {
+  /** Jahr 2026: Rechnungen (eine an einen Privatkunden ohne E-Mail, eine storniert im Folgequartal, eine offen), Belege aller Fragearten */
+  function jahr(): Stand {
+    let s: Stand = { ...LEERER_STAND, betrieb: { ...BETRIEB, rechtsform: "Einzelunternehmen", versteuerung: "soll", ust_idnr: "DE123456789" }, steuerberatung: { kontenrahmen: "SKR03", beraternummer: "1001", mandantennummer: "42" } };
+    s = rechnung(s, "r1", "2026-03-05", "100,00", "2026-03-20");
+    s = rechnung(s, "r2", "2026-03-28", "200,00"); // storniert im April
+    const [s1] = anlegen(s, "rechnung", t("2026-11-02"), "r3");
+    s = ausgeben(felderSetzen(s1, "r3", { datum: "2026-11-02", kunde_name: "Pat Privat", kunde_anschrift: "Am Bach 2\n80333 München", positionen: [{ bezeichnung: "Haarschnitt", menge: "1", einheit: "", preis: "40,00", satz: "19" }] }, t("2026-11-02")), "r3", t("2026-11-02"));
+    const [s2, st] = stornieren(s, "r2", t("2026-04-03"), "st1");
+    s = ausgeben(s2, st!.id, t("2026-04-03"));
+    s = belegSetzen(s, beleg("b1", "2026-02-02", 11900, { nummer: null }), t("2026-02-02"));
+    s = belegSetzen(s, beleg("b2", "2026-05-02", 9520, { kategorie: "fahrzeug", bezahlt: "2026-05-03" }), t("2026-05-02"));
+    s = belegSetzen(s, beleg("b3", "2026-06-02", 5950, { kategorie: "bewirtung", zahlung: "bar", notiz: "Kundengespräch" }), t("2026-06-02"));
+    s = belegSetzen(s, beleg("b4", "2026-07-02", 238000, { kategorie: "anlage", zahlung: "privat" }), t("2026-07-02"));
+    return s;
+  }
+  const JAHR = { von: "2026-01-01", bis: "2026-12-31", name: "2026" };
+  const Q1 = { von: "2026-01-01", bis: "2026-03-31", name: "2026-Q1" };
+
+  it("LIESMICH: Mandant, Jahrespaket-Hinweis, Rechnungen ohne E-Rechnung mit Grund, „Nicht enthalten“", () => {
+    const s = jahr();
+    const p = steuerpaket(s, JAHR, s.steuerberatung, {}, "2027-02-15T10:00:00.000Z");
+    const l = strFromU8(unzipSync(p.zip)["LIESMICH.txt"]!);
+    for (const z of ["Mandant (Angaben aus der App)", "- Name: Salon Sonne", "- Rechtsform: Einzelunternehmen", "- Steuernummer: 143/123/45678", "- USt-IdNr.: DE123456789", "- Kleinunternehmer (§ 19 UStG): nein", "- Versteuerung: Soll (vereinbarte Entgelte)", "- Kontenrahmen: SKR03", "- Berater-/Mandantennummer: 1001 / 42", "- Zeitraum: 01.01.2026 bis 31.12.2026 (2026)", "- App: Amtlos 1.0.0", "- Erstellt am: 15.02.2027 10:00 Uhr (UTC)"]) expect(l, z).toContain(z);
+    expect(l).toContain("Nicht zusätzlich zu den Monats-/Quartalsstapeln importieren – gleiche Buchungen.");
+    expect(l).toContain("- 2026-003 (Pat Privat): Privatkunde (ohne E-Mail erfasst) – keine E-Rechnung nötig");
+    expect(p.ohneXml).toBe(1);
+    expect(l).toMatch(/Nicht enthalten – bitte zusätzlich liefern\r\n- Kassenumsätze \(Z-Bons bzw\. Kassenexport\)/);
+    for (const w of ["Kontoauszüge", "Privatentnahmen und Privateinlagen", "Umsatzsteuer-Vorauszahlungen und Erstattungen", "Abschreibungen (AfA)", "Lohnjournal"]) expect(l, w).toContain(w);
+    // Quartalspaket: kein Jahressatz; fehlende Angaben werden genannt
+    const q = strFromU8(unzipSync(steuerpaket({ ...s, betrieb: { ...s.betrieb, versteuerung: "" } }, Q1, s.steuerberatung, {}, "2026-04-10T08:00:00").zip)["LIESMICH.txt"]!);
+    expect(q).not.toContain("Monats-/Quartalsstapeln");
+    expect(q).toContain("- Versteuerung: nicht angegeben (Soll angenommen)");
+    expect(q).toContain("- Erstellt am: 10.04.2026 08:00 Uhr\r\n");
+    const ohneMail = { ...s, betrieb: { ...s.betrieb, email: "" } };
+    expect(strFromU8(unzipSync(steuerpaket(ohneMail, Q1, s.steuerberatung, {}, "2026-04-10T08:00:00").zip)["LIESMICH.txt"]!)).toMatch(/- 2026-001 \(Kim Beispiel\): Angaben fehlen: E-Mail des Betriebs/);
+  });
+
+  it("Fragen_<Zeitraum>.txt: nur Abschnitte mit Einträgen, Sachverhalte ohne Bewertung", () => {
+    const s = jahr();
+    const p = steuerpaket(s, JAHR, s.steuerberatung, {}, "2027-02-15T10:00:00.000Z");
+    const f = strFromU8(unzipSync(p.zip)["Fragen_2026.txt"]!);
+    expect(f).toContain("Belege mit Zahlungsweg Überweisung/Karte ohne Zahltag");
+    expect(f).toMatch(/Wann wurde bezahlt\?\r\n- B2026-001 · 02\.02\.2026 · Friseurbedarf Müller · 119,00 € brutto\r\n/);
+    expect(f).toMatch(/Belege ohne Belegnummer des Lieferanten[^\n]*\r\n- B2026-001 /);
+    expect(f).toMatch(/Rechnungen ohne vermerkten Zahlungseingang zum 31\.12\.2026:\r\n- 2026-003 · 02\.11\.2026 · Pat Privat · 47,60 € brutto · fällig 16\.11\.2026\r\n/);
+    expect(f).toMatch(/Privat bezahlte Belege[^\n]*\r\n- B2026-004 /);
+    expect(f).toMatch(/Kfz-Kosten: Fahrzeug und privater Anteil\?\r\n- B2026-002 /);
+    expect(f).toMatch(/Bewirtung: Anlass und Teilnehmer\?\r\n- B2026-003 · 02\.06\.2026 · Friseurbedarf Müller · 59,50 € brutto · Notiz: Kundengespräch\r\n/);
+    expect(f).toMatch(/Nutzungsdauer\?\r\n- B2026-004 · 02\.07\.2026 · Friseurbedarf Müller · 2\.380,00 € brutto · 2\.000,00 € netto/);
+    // Storno im selben Jahr: kein Bezug zu einem anderen Zeitraum; keine Gutschriften
+    expect(f).not.toContain("Stornos mit Bezug");
+    expect(f).not.toContain("Gutschriften");
+    expect(p.fragen).toBe(7);
+    // Q1: die stornierte Rechnung (Storno im April) gehört dazu; Bewirtung/Kfz fehlen
+    const q = strFromU8(unzipSync(steuerpaket(s, Q1, s.steuerberatung, {}, "2026-04-10T08:00:00").zip)["Fragen_2026-Q1.txt"]!);
+    expect(q).toMatch(/Stornos mit Bezug zu einem anderen Zeitraum[^\n]*\r\n- 2026-002 · 28\.03\.2026 · Kim Beispiel · 238,00 € brutto · storniert durch 2026-004 vom 03\.04\.2026 \(anderer Zeitraum\)/);
+    expect(q).toMatch(/zum 31\.03\.2026:\r\n- 2026-002 /); // zum Quartalsende noch offen (Storno erst im April)
+    expect(q).not.toContain("Kfz-Kosten");
+    expect(q).not.toContain("Bewirtung");
+    const q2 = strFromU8(unzipSync(steuerpaket(s, { von: "2026-04-01", bis: "2026-06-30", name: "2026-Q2" }, s.steuerberatung, {}, "2026-07-10T08:00:00").zip)["Fragen_2026-Q2.txt"]!);
+    expect(q2).toMatch(/- 2026-004 · 03\.04\.2026 · Kim Beispiel · -238,00 € brutto · storniert RE 2026-002 vom 28\.03\.2026 \(anderer Zeitraum\)/);
+    // leerer Zeitraum
+    const leer = strFromU8(unzipSync(steuerpaket(s, { von: "2026-09-01", bis: "2026-09-30", name: "2026-09" }, s.steuerberatung, {}, "2026-10-10T08:00:00").zip)["Fragen_2026-09.txt"]!);
+    expect(leer).toContain("Keine offenen Punkte gefunden.");
+  });
+
+  it("Rechnungsliste: sortiert nach Datum und Nummer, Storno ohne „-0,00“, Summen je Satz; Buchungstext des Stornos mit Bezug; Zahltag fehlt markiert", () => {
+    const s = jahr();
+    const inhalt = unzipSync(steuerpaket(s, JAHR, s.steuerberatung, {}, "2027-02-15T10:00:00.000Z").zip);
+    const re = strFromU8(inhalt["Rechnungen_2026.csv"]!).replace(/^\uFEFF/, "").split("\r\n").filter(Boolean);
+    expect(re.slice(1).map((z) => z.split(";")[0])).toEqual(["2026-001", "2026-002", "2026-004", "2026-003", "Summe 19 %", "Summe gesamt"]); // nach Datum (Storno 2026-004 vom April vor 2026-003 vom November)
+    expect(re[3]).toBe("2026-004;03.04.2026;03.04.2026;;Kim Beispiel;;Standard;-200,00;-38,00;-238,00;19 %;;;0,00;2026-002");
+    expect(re.join("\n")).not.toContain("-0,00");
+    expect(re.at(-1)).toBe("Summe gesamt;;;;;;;140,00;26,60;166,60;;;;47,60;");
+    const liste = strFromU8(inhalt["Buchungsliste_2026.csv"]!);
+    expect(liste).toContain(";Storno 2026-004 zu RE 2026-002 Kim Beispiel;19;");
+    expect(liste).toContain(";B2026-001;Friseurbedarf Müller Wareneinkauf;19;");
+    expect(liste).toContain(";L-b2;Friseurbedarf Müller Kfz;19;");
+    const be = strFromU8(inhalt["Belege_2026.csv"]!);
+    expect(be).toContain("02.02.2026 (fehlt – Belegdatum verwendet)");
+    expect(be).toContain(";03.05.2026;"); // Zahltag vorhanden
+  });
+
+  it("Rechnungs-PDFs: mit `rechnungsPdfs` unter Rechnungen/<Nummer>_<Kunde>.pdf und in der Spalte „Datei“", () => {
+    const s = jahr();
+    const ohne = unzipSync(steuerpaket(s, JAHR, s.steuerberatung, {}, "2027-02-15T10:00:00.000Z").zip);
+    expect(Object.keys(ohne).some((k) => k.startsWith("Rechnungen/"))).toBe(false);
+    const p = steuerpaket(s, JAHR, s.steuerberatung, {}, "2027-02-15T10:00:00.000Z", { rechnungsPdfs: { r1: new Uint8Array([37, 80]), r3: new Uint8Array([1]) } });
+    expect(p.pdfs).toBe(2);
+    const inhalt = unzipSync(p.zip);
+    expect(Object.keys(inhalt).filter((k) => k.startsWith("Rechnungen/")).sort()).toEqual(["Rechnungen/2026-001_Kim-Beispiel.pdf", "Rechnungen/2026-003_Pat-Privat.pdf"]);
+    const re = strFromU8(inhalt["Rechnungen_2026.csv"]!).replace(/^\uFEFF/, "").split("\r\n");
+    expect(re[0]!.endsWith(";Storno zu;Datei")).toBe(true);
+    expect(re[1]!.endsWith(";2026-001_Kim-Beispiel.pdf")).toBe(true);
+    expect(re[2]!.endsWith(";")).toBe(true);
+    const l = strFromU8(inhalt["LIESMICH.txt"]!);
+    expect(l).toContain("- Rechnungen/: PDFs der Rechnungen (2)");
+    expect(l).not.toContain("Die PDFs der Ausgangsrechnungen liegen beim Betrieb.");
   });
 });

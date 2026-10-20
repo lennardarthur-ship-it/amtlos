@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Pressable, Share, View } from "react-native";
-import { KU_HINWEIS, PRUEFHINWEIS, dateinamenTeil, dokumentHtml, eRechnungAus, pdfDateiname, vorlageFuer, xrechnungUbl } from "@amtlos/fachlogik";
+import { KU_HINWEIS, PRUEFHINWEIS, dateinamenTeil, dokumentHtml, eRechnungAus, pdfDateiname, vorlageFuer, xrechnungUbl, type Vorlage } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { DatumFeld, Fuss, Hinweis, Karte, Knopf, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
@@ -19,6 +19,25 @@ import { AbsenderSeite } from "./Betrieb";
 import { Ablauf, fehltJeSchritt } from "./Ablauf";
 import { useProSperre } from "./Pro";
 import { FREI_JE_MONAT, ausgabeErlaubt, betriebFuerDokument, uebrig } from "../pro/regeln";
+import { Ansage, useAnsage } from "./felder";
+
+/**
+ * Satz direkt über „PDF teilen“, solange die Unterlage noch nicht festgeschrieben ist (E-127): was das erste Teilen
+ * bewirkt – bei Rechnungen mit dem Hinweis aufs Stornieren.
+ */
+export function festschreibenHinweis(v: Vorlage, fest: boolean): string | null {
+  if (!v.festschreiben || fest) return null;
+  return v.storno ? TEXT.rechnung_wird_festgeschrieben : TEXT.wird_festgeschrieben;
+}
+
+/**
+ * Zu welchem Schritt eine Meldung aus „Fehlt noch“ gehört: Feld mit genau dieser Bezeichnung oder Zuordnung der
+ * Vorlage (`pruefenZu`, z. B. „PLZ und Ort des Empfängers fehlen“ → Anschrift). −1: keinem Schritt zuzuordnen.
+ */
+export function schrittFuer(v: Vorlage, text: string): number {
+  const feld = v.pruefenZu?.[text];
+  return v.abschnitte.findIndex((a) => a.felder.some((x) => x.label === text || (feld !== undefined && x.id === feld)));
+}
 
 /**
  * PDF teilen oder drucken – mit Ladezustand und Fehlermeldung. Dokumente an Kunden (Rechnung) gehen nur vollständig
@@ -88,7 +107,7 @@ function VorschauSeite({ id }: { id: string }) {
           <Vorschau html={dokumentHtml(v, u.daten, betriebFuerDokument(z.stand.betrieb, z.pro))} quer={v.querformat} />
         </View>
       </View>
-      <Fuss ueber={teilen.fehler ? <T v="klein" fett farbe={f.frist} accessibilityRole="alert">{teilen.fehler}</T> : null}>
+      <Fuss ueber={teilen.fehler ? <Ansage text={teilen.fehler} farbe={f.frist} /> : festschreibenHinweis(v, Boolean(u.festgeschrieben)) ? <T v="caption" leise>{festschreibenHinweis(v, Boolean(u.festgeschrieben))}</T> : null}>
         <Knopf text={TEXT.pdf_teilen} symbol="square.and.arrow.up" laedt={teilen.laedt} onPress={() => void teilen.los()} stil={{ flex: 1 }} />
       </Fuss>
     </Unterseite>
@@ -115,7 +134,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
   const storno = u.storniertDurch ? z.stand.unterlagen.find((x) => x.id === u.storniertDurch) : undefined;
   const imFormular = new Set(jeSchritt.flat());
   // Prüfungen außerhalb der Schritte: einem Schritt zuordnen, wenn ein Feld dort so heißt; sonst „Mein Betrieb“ bzw. ohne Sprung
-  const extra = alle.filter((x) => !imFormular.has(x)).map((x) => ({ text: x, schritt: x === NUMMER_DOPPELT ? nummerSchritt : v.abschnitte.findIndex((a) => a.felder.some((feld) => feld.label === x)), betrieb: x.includes("(Mein Betrieb)") }));
+  const extra = alle.filter((x) => !imFormular.has(x)).map((x) => ({ text: x, schritt: x === NUMMER_DOPPELT ? nummerSchritt : schrittFuer(v, x), betrieb: x.includes("(Mein Betrieb)") }));
   const html = dokumentHtml(v, d, betriebFuerDokument(z.stand.betrieb, z.pro));
   const rest = uebrig(z.stand.unterlagen, new Date());
   const zaehlt = !z.pro && !u.ausgegeben && !(typeof d.storno_zu === "string" && d.storno_zu);
@@ -195,26 +214,19 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
             {ergebnis.map(([k, w], i) => (
               <View key={k} style={{ flexDirection: "row", justifyContent: "space-between", gap: 12, paddingVertical: 9, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie }}>
                 <T v="klein" leise={i < ergebnis.length - 1} fett={i === ergebnis.length - 1} stil={{ flex: 1 }}>{k}</T>
-                <T v="klein" fett={i === ergebnis.length - 1} stil={{ flexShrink: 1, textAlign: "right", fontVariant: ["tabular-nums"] }}>{w}</T>
+                {/* der Betrag wird nie gekürzt – lieber bricht die Bezeichnung um */}
+                <T v="klein" fett={i === ergebnis.length - 1} stil={{ flexShrink: 0, textAlign: "right", fontVariant: ["tabular-nums"] }}>{w}</T>
               </View>
             ))}
           </Karte>
         ) : null}
         {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
-        {v.festschreiben && !fest ? <T v="caption" leise stil={{ marginTop: 10, marginLeft: 4 }}>{TEXT.wird_festgeschrieben}</T> : null}
         {zaehlt ? <T v="caption" leise stil={{ marginTop: 4, marginLeft: 4 }}>{TEXT.pro_rest(rest, FREI_JE_MONAT)}</T> : null}
         <T v="caption" leise stil={{ marginTop: 4, marginLeft: 4 }}>{PRUEFHINWEIS}</T>
 
 
         <T v="gross" accessibilityRole="header" stil={{ marginTop: 30, marginBottom: 11, marginLeft: 2 }}>{TEXT.mehr}</T>
-        {eFehlt.length ? (
-          <View style={{ backgroundColor: f.baldHauch, borderRadius: RADIUS.karte, paddingHorizontal: 16, paddingVertical: 12, marginBottom: 10 }}>
-            <T v="klein" fett>{TEXT.e_rechnung_fehlt}</T>
-            {eFehlt.map((x) => (
-              <T key={x} v="klein" stil={{ marginTop: 3 }}>• {x}</T>
-            ))}
-          </View>
-        ) : null}
+        {eFehlt.length ? <ERechnungFehlt v={v} fehlt={eFehlt} springen={springen} gesperrt={fest} /> : null}
         <Karte>
           {[
             ...(v.eRechnung && eRechnung ? [{ symbol: "doc.text", titel: TEXT.mitPro(TEXT.e_rechnung, z.pro), los: () => void eRechnung() }] : []),
@@ -272,6 +284,33 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
         </View>
         <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: -1000, height: 1000, backgroundColor: f.papier }} />
       </View>
+    </View>
+  );
+}
+
+/** „Für die E-Rechnung fehlt noch“: wie „Fehlt noch“ mit „Ergänzen“ je Angabe – angesagt, sobald die Liste erscheint. */
+function ERechnungFehlt({ v, fehlt, springen, gesperrt }: { v: Vorlage; fehlt: string[]; springen: (schritt: number) => void; gesperrt: boolean }) {
+  const f = useFarben();
+  const nav = useNav();
+  useAnsage(`${TEXT.e_rechnung_fehlt} ${fehlt.join(", ")}`);
+  return (
+    <View accessibilityRole="summary" style={{ backgroundColor: f.baldHauch, borderRadius: RADIUS.karte, paddingHorizontal: 16, paddingVertical: 12, marginBottom: 10 }}>
+      <T v="klein" fett>{TEXT.e_rechnung_fehlt}</T>
+      {fehlt.map((x, i) => {
+        const betrieb = x.includes("(Mein Betrieb)");
+        // festgeschrieben: Angaben der Rechnung lassen sich nicht mehr ändern – nur „Mein Betrieb“
+        const schritt = gesperrt ? -1 : x === NUMMER_DOPPELT ? v.abschnitte.findIndex((a) => a.felder.some((feld) => feld.id === v.fortlaufend)) : schrittFuer(v, x);
+        return (
+          <View key={x} style={{ flexDirection: "row", alignItems: "center", gap: 8, minHeight: 44, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie }}>
+            <T v="klein" stil={{ flex: 1 }}>{x}</T>
+            {betrieb ? (
+              <TextKnopf text={TEXT.ergaenzen} label={`${TEXT.im_betrieb}: ${x}`} onPress={() => nav.oeffnen("absender", () => <AbsenderSeite />, true)} />
+            ) : schritt >= 0 ? (
+              <TextKnopf text={TEXT.ergaenzen} label={`${TEXT.ergaenzen}: ${x}`} onPress={() => springen(schritt)} />
+            ) : null}
+          </View>
+        );
+      })}
     </View>
   );
 }

@@ -167,6 +167,68 @@ const centAus = (t) => {
 };
 const summe = (l) => l.reduce((a, b) => a + b, 0);
 
+/** CSV-Liste des Pakets mit Spalten nach Namen (Anfang des Spaltennamens genügt); Summenzeilen („Summe …“) getrennt */
+const liste = (bytes) => {
+  const [kopf, ...alle] = csvLesen(bytes);
+  const sp = (name) => {
+    const genau = kopf.indexOf(name);
+    const i = genau >= 0 ? genau : kopf.findIndex((k) => k.startsWith(name));
+    if (i < 0) throw new Error(`Spalte „${name}“ fehlt: ${kopf.join(";")}`);
+    return i;
+  };
+  return { kopf, zeilen: alle.filter((z) => !/^Summe\b/.test(z[0])), summen: alle.filter((z) => /^Summe\b/.test(z[0])), sp, w: (z, name) => z[sp(name)] };
+};
+const isoAusDe = (t) => (/^\d{2}\.\d{2}\.\d{4}/.test(t) ? `${t.slice(6, 10)}-${t.slice(3, 5)}-${t.slice(0, 2)}` : "");
+/**
+ * Neuerungen nach der Durchsicht der Steuerberaterin (Oktober 2026): Spalten und Summenzeilen der Listen, Amtlos-Belegnummer
+ * in Liste, Dateiname und DATEV, Buchungs-GUID, Buchungstext, Fragen-Datei, Mandanten- und „Nicht enthalten“-Block.
+ */
+function paketNeuerungen(name, zr, inhalt, erg, kleinunternehmer, belegeRoh) {
+  const bereich = `Paket ${name}`;
+  const re = liste(inhalt[`Rechnungen_${zr.name}.csv`]);
+  const be = liste(inhalt[`Belege_${zr.name}.csv`]);
+  vergleich(bereich, "Rechnungsliste: neue Spalten Steuerart, Fällig am, Offener Betrag, USt-IdNr. Kunde, Leistungszeitraum", ["Steuerart", "Fällig am", "Offener Betrag", "USt-IdNr.", "Leistungszeitraum"].filter((n) => !re.kopf.some((k) => k.startsWith(n))).join(", ") || "alle", "alle");
+  const gesamt = re.summen.find((z) => z[0] === "Summe gesamt");
+  if (re.zeilen.length) {
+    vergleich(bereich, "Rechnungsliste: „Summe gesamt“ Brutto = Summe der Zeilen", gesamt ? centAus(re.w(gesamt, "Brutto")) : NaN, summe(re.zeilen.map((z) => centAus(re.w(z, "Brutto")))));
+    vergleich(bereich, "Rechnungsliste: Summen je Steuersatz ergeben „Summe gesamt“ (Netto)", summe(re.summen.filter((z) => z !== gesamt).map((z) => centAus(re.w(z, "Netto")))), gesamt ? centAus(re.w(gesamt, "Netto")) : NaN);
+    vergleich(bereich, "Rechnungsliste: „Summe gesamt“ offener Betrag = Summe der Zeilen", gesamt ? centAus(re.w(gesamt, "Offener Betrag")) : NaN, summe(re.zeilen.map((z) => centAus(re.w(z, "Offener Betrag")))));
+  }
+  const reihenfolge = re.zeilen.map((z) => `${isoAusDe(re.w(z, "Datum"))}|${re.w(z, "Nummer")}`);
+  vergleich(bereich, "Rechnungsliste: sortiert nach Datum, dann Nummer", reihenfolge.every((x, i) => i === 0 || reihenfolge[i - 1].localeCompare(x, "de", { numeric: true }) <= 0) ? "ja" : "nein", "ja");
+  const alleCsv = Object.keys(inhalt).filter((p) => p.endsWith(".csv") && !p.startsWith("EXTF")).map((p) => new TextDecoder().decode(inhalt[p]));
+  vergleich(bereich, "Listen: kein „-0,00“", alleCsv.some((t) => /(^|;)-0,00(;|\r)/m.test(t)) ? "kommt vor" : "keins", "keins");
+  if (be.zeilen.length) vergleich(bereich, "Belegliste: Summenzeile Brutto = Summe der Zeilen", be.summen[0] ? centAus(be.w(be.summen[0], "Brutto")) : NaN, summe(be.zeilen.map((z) => centAus(be.w(z, "Brutto")))));
+  const nrn = be.zeilen.map((z) => be.w(z, "Amtlos-Belegnr."));
+  vergleich(bereich, "Belegliste: Amtlos-Belegnr. eindeutig und in der Form B<Jahr>-nnn", nrn.every((n, i) => /^B\d{4}-\d{3}$/.test(n) && nrn.indexOf(n) === i) ? "ja" : nrn.join(", "), "ja");
+  const dateiFalsch = be.zeilen.filter((z) => be.w(z, "Datei") && !(be.w(z, "Datei").startsWith(`${be.w(z, "Amtlos-Belegnr.")}_`) && inhalt[`Belege/${be.w(z, "Datei")}`]));
+  vergleich(bereich, "Belegdateien beginnen mit der Amtlos-Belegnr. der Liste und liegen unter Belege/", dateiFalsch.length ? dateiFalsch.map((z) => be.w(z, "Datei")).join(", ") : "alle", "alle");
+  const ohneZahltag = be.zeilen.filter((z) => /fehlt – Belegdatum verwendet/.test(be.w(z, "Zahltag"))).length;
+  vergleich(bereich, "Belegliste: Markierung „fehlt – Belegdatum verwendet“ genau bei Belegen ohne Zahltag", String(ohneZahltag), String(belegeRoh.filter((b) => !b.bezahlt).length));
+  const extf = csvLesen(inhalt[`EXTF_Buchungsstapel_${zr.name}.csv`], "latin1");
+  const ez = extf.slice(2);
+  const belegfelder = new Set(ez.map((z) => z[10]));
+  const fehlend = be.zeilen.map((z) => be.w(z, "Belegfeld 1 (DATEV)")).filter((b) => !belegfelder.has(b));
+  vergleich(bereich, "DATEV: Belegfeld 1 der Belegbuchungen = Spalte „Belegfeld 1 (DATEV)“ der Belegliste", fehlend.length ? fehlend.join(", ") : "alle gefunden", "alle gefunden");
+  const gi = extf[1].indexOf("Buchungs GUID");
+  const guids = ez.map((z) => z[gi]);
+  vergleich(bereich, "DATEV: Buchungs-GUID in jeder Zeile (36 Zeichen) und eindeutig", gi >= 0 && guids.every((g, i) => /^[0-9a-f-]{36}$/.test(g) && guids.indexOf(g) === i) ? "ja" : "nein", "ja");
+  const texte = ez.map((z) => z[13]);
+  vergleich(bereich, "DATEV: Buchungstext höchstens 60 Zeichen, ohne Leerzeichen am Ende", texte.filter((t) => t.length > 60 || t !== t.trimEnd()).join(" | ") || "alle", "alle");
+  const bl = liste(inhalt[`Buchungsliste_${zr.name}.csv`]);
+  vergleich(bereich, "Buchungsliste: GUIDs wie im DATEV-Stapel", bl.zeilen.map((z) => bl.w(z, "Buchungs-GUID")).sort().join(",") === [...guids].sort().join(",") ? "ja" : "nein", "ja");
+  const fragen = inhalt[`Fragen_${zr.name}.txt`] ? Buffer.from(inhalt[`Fragen_${zr.name}.txt`]).toString("utf8") : "";
+  vergleich(bereich, `Fragen_${zr.name}.txt vorhanden`, fragen ? "ja" : "nein", "ja");
+  const liesmich = Buffer.from(inhalt["LIESMICH.txt"]).toString("utf8");
+  vergleich(bereich, "LIESMICH: Mandant-Block und „Nicht enthalten – bitte zusätzlich liefern“", /Mandant \(Angaben aus der App\)/.test(liesmich) && /Nicht enthalten – bitte zusätzlich liefern/.test(liesmich) && /Kassenumsätze/.test(liesmich) && /Lohnjournal/.test(liesmich) ? "ja" : "nein", "ja");
+  vergleich(bereich, "LIESMICH: Kleinunternehmer ja/nein", (/Kleinunternehmer \(§ 19 UStG\): (ja|nein)/.exec(liesmich) ?? [])[1] ?? "fehlt", kleinunternehmer ? "ja" : "nein");
+  const jahr = /^\d{4}$/.test(zr.name);
+  vergleich(bereich, "LIESMICH: Satz „Nicht zusätzlich zu den Monats-/Quartalsstapeln importieren“ genau im Jahrespaket", /Nicht zusätzlich zu den Monats-\/Quartalsstapeln importieren/.test(liesmich) ? "ja" : "nein", jahr ? "ja" : "nein");
+  const ohneXmlZeilen = (liesmich.split("Rechnungen ohne E-Rechnung (XRechnung)")[1] ?? "").split(/\r\n\r\n/)[0].split("\r\n").filter((z) => z.startsWith("- "));
+  vergleich(bereich, "LIESMICH: Rechnungen ohne E-Rechnung einzeln mit Grund", String(ohneXmlZeilen.length), String(erg.ohneXml));
+  return { fragen, liesmich, rechnungen: re, belege: be };
+}
+
 const pk = S.paket(s, belegBytes);
 let paketInfo = {};
 {
@@ -181,15 +243,20 @@ let paketInfo = {};
   merke("steuerpaket-jahr/", `entpacktes Paket: ${Object.keys(inhalt).length} Dateien (${Object.keys(inhalt).filter((p) => !p.includes("/")).join(", ")}, E-Rechnungen/, Belege/).`);
   const vg = D.vorgaenge();
   const umsatz = D.umsatzVorgaenge();
-  const re = csvLesen(inhalt["Rechnungen_2026.csv"]).slice(1);
-  vergleich(`Paket ${name}`, "Anzahl Belegzeilen in der Rechnungsliste (inkl. Storno und Gutschrift)", re.length, vg.length);
-  vergleich(`Paket ${name}`, "Rechnungsliste: Summe USt (Kleinunternehmerin: 0)", summe(re.map((z) => centAus(z[5]))), 0);
-  vergleich(`Paket ${name}`, "Rechnungsliste: Summe Brutto der Ausgangsrechnungen (ohne die Gutschrift, die eine Ausgabe ist)", summe(re.map((z) => centAus(z[6]))), summe(umsatz.map((x) => x.vz * x.s.brutto)));
-  vergleich(`Paket ${name}`, "Rechnungsliste: Spalte Steuersätze überall „§ 19“", [...new Set(re.map((z) => z[7]))].join(", "), "§ 19");
-  const be = csvLesen(inhalt["Belege_2026.csv"]).slice(1);
+  // Spalten nach Namen, ohne die Summenzeilen am Ende; Gutschriften stehen seit Oktober 2026 in einer eigenen Liste
+  const reL = liste(inhalt["Rechnungen_2026.csv"]);
+  const re = reL.zeilen;
+  const gs = inhalt["Gutschriften_2026.csv"] ? liste(inhalt["Gutschriften_2026.csv"]).zeilen : [];
+  vergleich(`Paket ${name}`, "Anzahl Belegzeilen in Rechnungs- und Gutschriftenliste (inkl. Storno und Gutschrift)", String(re.length + gs.length), String(vg.length));
+  vergleich(`Paket ${name}`, "Rechnungsliste: Summe USt (Kleinunternehmerin: 0)", summe(re.map((z) => centAus(reL.w(z, "USt")))), 0);
+  vergleich(`Paket ${name}`, "Rechnungsliste: Summe Brutto der Ausgangsrechnungen (ohne die Gutschrift, die eine Ausgabe ist)", summe(re.map((z) => centAus(reL.w(z, "Brutto")))), summe(umsatz.map((x) => x.vz * x.s.brutto)));
+  vergleich(`Paket ${name}`, "Rechnungsliste: Spalte Steuersätze überall „§ 19“", [...new Set(re.map((z) => reL.w(z, "Steuersätze")))].join(", "), "§ 19");
+  vergleich(`Paket ${name}`, "Rechnungsliste: Spalte Steuerart überall „§ 19“", [...new Set(re.map((z) => reL.w(z, "Steuerart")))].join(", "), "§ 19");
+  const beL = liste(inhalt["Belege_2026.csv"]);
+  const be = beL.zeilen;
   vergleich(`Paket ${name}`, "Anzahl Belege (nach Belegdatum)", be.length, D.BELEGE.length);
-  vergleich(`Paket ${name}`, "Belegliste: Summe Brutto", summe(be.map((z) => centAus(z[8]))), summe(D.BELEGE.map((b) => D.belegSumme(b).brutto)));
-  vergleich(`Paket ${name}`, "Belegliste: Summe Vorsteuer (Kleinunternehmerin: 0)", summe(be.map((z) => centAus(z[7]))), 0);
+  vergleich(`Paket ${name}`, "Belegliste: Summe Brutto", summe(be.map((z) => centAus(beL.w(z, "Brutto")))), summe(D.BELEGE.map((b) => D.belegSumme(b).brutto)));
+  vergleich(`Paket ${name}`, "Belegliste: Summe Vorsteuer (Kleinunternehmerin: 0)", summe(be.map((z) => centAus(beL.w(z, "Vorsteuer")))), 0);
   vergleich(`Paket ${name}`, "Belegdateien im Paket", Object.keys(inhalt).filter((p) => p.startsWith("Belege/")).length, D.BELEGE.length);
   vergleich(`Paket ${name}`, "E-Rechnungen im Paket = erzeugte XRechnungen", Object.keys(inhalt).filter((p) => p.startsWith("E-Rechnungen/")).length, bau.xmls.length);
   const extf = csvLesen(inhalt["EXTF_Buchungsstapel_2026.csv"], "latin1");
@@ -202,8 +269,11 @@ let paketInfo = {};
   vergleich(`Paket ${name}`, "DATEV: Belegbuchungen mit Steuersatz > 0 tragen BU-Schlüssel 40 (ohne Vorsteuer)", zeilen.filter((z) => z[8] === "40").length, belegeMitSteuer);
   vergleich(`Paket ${name}`, "DATEV: Kopf Beraternummer/Mandant", `${extf[0][10]}/${extf[0][11]}`, "41077/20318");
   const liesmich = Buffer.from(inhalt["LIESMICH.txt"]).toString("utf8");
-  if (/Umsatzsteuer-Voranmeldung/.test(liesmich)) auffaellig.push("Paket LIESMICH.txt erklärt die Zuordnung zur Umsatzsteuer-Voranmeldung (Leistungsdatum) – bei einer Kleinunternehmerin gibt es keine (außer § 13b); der Text ist für sie irreführend (apps/mobile/src/unterlagen/steuerpaket.ts:225).");
-  paketInfo = { anzahl: Object.keys(inhalt).length, buchungen: zeilen.length, ohneXml: pk.ohneXml };
+  if (/Umsatzsteuer-Voranmeldung/.test(liesmich)) auffaellig.push("Paket LIESMICH.txt erklärt die Zuordnung zur Umsatzsteuer-Voranmeldung (Leistungsdatum) – bei einer Kleinunternehmerin gibt es keine (außer § 13b); der Text ist für sie irreführend (apps/mobile/src/unterlagen/steuerpaket.ts).");
+  const neu = paketNeuerungen(name, { von: "2026-01-01", bis: "2026-12-31", name: "2026" }, inhalt, pk, true, D.BELEGE);
+  if (D.BELEGE.some((b) => b.kategorie === "bewirtung")) vergleich(`Paket ${name}`, "Fragen: Bewirtung (Anlass und Teilnehmer?)", /Bewirtung: Anlass und Teilnehmer\?/.test(neu.fragen) ? "ja" : "nein", "ja");
+  vergleich(`Paket ${name}`, "Fragen: Gutschrift aufgeführt", /Gutschriften \(der Betrieb rechnet als Leistungsempfänger ab/.test(neu.fragen) ? "ja" : "nein", "ja");
+  paketInfo = { anzahl: Object.keys(inhalt).length, buchungen: zeilen.length, ohneXml: pk.ohneXml, fragen: pk.fragen };
 }
 
 // ---------------------------------------------------------------- Dateinamen
@@ -336,7 +406,7 @@ md.push("## Vergleich App ↔ unabhängige Rechnung", "", `${vergleiche.filter((
 md.push(tab(["", "Bereich", "Prüfung", "App", "erwartet"], vergleiche.map((v) => [v.ok ? "✓" : "✗", v.bereich, v.was, v.app, v.erwartet])), "");
 md.push("EÜR-Übernahme der App (Rohzeilen):", "", tab(["Liste", "Bezeichnung", "Zeile Anlage EÜR", "Betrag"], [...bau.euer.uebernahme.einnahmen.map((x) => ["Einnahme", x.text, x.kategorie, x.betrag]), ...bau.euer.uebernahme.ausgaben.map((x) => ["Ausgabe", x.text, x.kategorie, x.betrag])]), "", `Ergebnis der fertigen EÜR (Formular, nach Ergänzung von AfA und § 13b-Zahlung): ${bau.euer.ergebnis.map(([a, b]) => `${a} ${b}`).join(", ")}.`, "");
 md.push("Dieselbe Übernahme mit den Standardwerten der App (alle Belege „Vorsteuer abziehbar“ an):", "", tab(["Liste", "Bezeichnung", "Zeile Anlage EÜR", "Betrag"], [...bau.euer.standard.einnahmen.map((x) => ["Einnahme", x.text, x.kategorie, x.betrag]), ...bau.euer.standard.ausgaben.map((x) => ["Ausgabe", x.text, x.kategorie, x.betrag])]), "");
-md.push("### Steuerberater-Paket 2026", "", `${paketInfo.anzahl} Dateien, ${paketInfo.buchungen} DATEV-Buchungen, ${paketInfo.ohneXml} Rechnungen ohne E-Rechnung.`, "");
+md.push("### Steuerberater-Paket 2026", "", `${paketInfo.anzahl} Dateien, ${paketInfo.buchungen} DATEV-Buchungen, ${paketInfo.ohneXml} Rechnungen ohne E-Rechnung (mit Grund im LIESMICH), ${paketInfo.fragen} Punkte in Fragen_2026.txt.`, "");
 
 md.push("## Pflichten-Check der App", "", `Profil (Antworten wie in der App): ${Object.entries(bau.profil).map(([k, w]) => `${k} = ${Array.isArray(w) ? w.join("/") : w}`).join("; ")}. Stichtag 15.01.2026.`, "");
 md.push("### Gilt", "", tab(["Pflicht", "ID", "Schwere", "Nächster Termin", "Grund laut App", "Vorlage (erzeugt?)"], bau.pflichten.gilt.map((p) => [p.titel, p.id, p.schwere, p.termin ? D.de(p.termin) : "–", p.grund, p.vorlage ? `${p.vorlage} (${p.erzeugt ? "ja" : "**nein**"})` : "–"])), "");

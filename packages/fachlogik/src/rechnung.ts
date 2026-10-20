@@ -3,6 +3,7 @@
  * Zusammenfassung für die Umsatzsteuer-Voranmeldung. Vom Server (packages/server/src/finanzen.ts, apps/api) und vom
  * Demo-Modus der App genutzt.
  */
+export { emailGueltig, ibanGueltig, ibanNormal, plzGueltig } from "./pruefen.js";
 export interface Position {
   bezeichnung: string;
   menge: number;

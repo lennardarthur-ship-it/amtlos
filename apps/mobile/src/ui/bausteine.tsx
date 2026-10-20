@@ -1,8 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { SymbolView, type SymbolViewProps } from "expo-symbols";
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { AccessibilityInfo, ActivityIndicator, Pressable, Text as RNText, Switch, TextInput, View, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { AccessibilityInfo, ActivityIndicator, Pressable, Text as RNText, Switch, TextInput, View, useColorScheme, useWindowDimensions, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { T as TEXT } from "../texte";
 import { DatumWahl } from "./datumwahl";
@@ -20,6 +20,12 @@ const STIL: Record<Variante, TextStyle> = {
   mini: { fontSize: GROESSE.mini, lineHeight: 14, ...SCHRIFT.mittel, letterSpacing: 0.1 },
 };
 const UEBERSCHRIFT = new Set<Variante>(["grossTitel", "titel", "gross"]);
+
+/** Große Schrift (Dynamic Type über 130 %): Zeilen nicht mehr kürzen, Reihen untereinander statt nebeneinander. */
+export const GROSSE_SCHRIFT_AB = 1.3;
+export function useGrosseSchrift(): boolean {
+  return useWindowDimensions().fontScale > GROSSE_SCHRIFT_AB;
+}
 
 /** Text mit Markenschrift. `fett` wählt den Halbfett-Schnitt (keine künstliche Fettung). */
 export function T({ v = "basis", fett, leise, farbe, stil, children, ...rest }: { v?: Variante; fett?: boolean; leise?: boolean; farbe?: string; stil?: StyleProp<TextStyle>; children: ReactNode } & Omit<React.ComponentProps<typeof RNText>, "style">) {
@@ -56,7 +62,7 @@ const FALLBACK: Record<string, keyof typeof Ionicons.glyphMap> = {
   "folder": "folder-outline", "doc.on.doc": "copy-outline", "printer": "print-outline", "lock.shield": "shield-checkmark-outline", "fork.knife": "restaurant-outline",
   "scissors": "cut-outline", "cross.case": "medkit-outline", "checkmark.square.fill": "checkbox", "square": "square-outline", "chevron.down": "chevron-down", "chevron.up": "chevron-up",
   "doc.richtext": "document-text-outline", "hammer": "hammer-outline", "info.circle.fill": "information-circle", "circle": "ellipse-outline", "arrow.uturn.backward": "arrow-undo-outline", "xmark.circle": "close-circle-outline",
-  "person.crop.circle": "person-circle-outline", "eye": "eye-outline", "arrow.left": "arrow-back", "list.number": "list-outline", "checkmark.circle.fill": "checkmark-circle", "person.badge.clock": "person-outline",
+  "person.crop.circle": "person-circle-outline", "eye": "eye-outline", "eye.slash": "eye-off-outline", "arrow.left": "arrow-back", "list.number": "list-outline", "checkmark.circle.fill": "checkmark-circle", "person.badge.clock": "person-outline",
   "figure.wave": "body-outline", "storefront": "storefront-outline", "calendar.badge.checkmark": "calendar-outline", "laptopcomputer": "laptop-outline", "exclamationmark.shield": "shield-outline", "cup.and.saucer": "cafe-outline", "sparkle": "sparkles-outline", "arrow.clockwise": "refresh-outline", "pencil": "create-outline", "plus.circle": "add-circle-outline", "paintpalette": "color-palette-outline", "eurosign.circle": "logo-euro", "photo": "image-outline", "lock.fill": "lock-closed", "faceid": "scan-outline", "line.3.horizontal.decrease.circle": "funnel-outline", "icloud": "cloud-outline", "checkmark.seal.fill": "ribbon", "hand.raised": "hand-left-outline", "doc.plaintext": "document-outline", "square.grid.2x2": "grid-outline", "exclamationmark": "alert", "house": "home-outline", "house.fill": "home", "folder.fill": "folder", "building.2.fill": "business",
 };
 export function Symbol({ name, groesse = 22, farbe, gewicht = "medium" }: { name: string; groesse?: number; farbe?: string; gewicht?: SymbolViewProps["weight"] }) {
@@ -105,7 +111,7 @@ export function Initialen({ name, groesse = 34 }: { name: string; groesse?: numb
   const kurz = ((teile[0]?.[0] ?? "") + (teile.length > 1 ? teile.at(-1)![0] : "")).toUpperCase() || "?";
   return (
     <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={{ width: groesse, height: groesse, borderRadius: groesse / 2, backgroundColor: f.amtHauch, alignItems: "center", justifyContent: "center" }}>
-      <T v="caption" farbe={f.amtTief} stil={{ ...SCHRIFT.bold, fontSize: groesse * 0.38, lineHeight: groesse * 0.5, letterSpacing: 0.4 }}>{kurz}</T>
+      <T v="caption" allowFontScaling={false} farbe={f.amtTief} stil={{ ...SCHRIFT.bold, fontSize: groesse * 0.38, lineHeight: groesse * 0.5, letterSpacing: 0.4 }}>{kurz}</T>
     </View>
   );
 }
@@ -129,8 +135,8 @@ export function Fristblatt({ termin, heute, erledigt, groesse = 46 }: { termin: 
   const fmt = (o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", ...o }).format(d).replace(".", "");
   return (
     <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={{ width: groesse, height: groesse, borderRadius: Math.round(groesse * 0.32), backgroundColor: t.grund, alignItems: "center", justifyContent: "center" }}>
-      <RNText style={{ ...SCHRIFT.display, fontSize: groesse * 0.38, lineHeight: groesse * 0.42, color: t.zeichen, letterSpacing: -0.5 }}>{fmt({ day: "numeric" })}</RNText>
-      <RNText style={{ ...SCHRIFT.bold, fontSize: groesse * 0.21, lineHeight: groesse * 0.26, color: t.zeichen, textTransform: "uppercase", letterSpacing: 0.4 }}>{fmt({ month: "short" })}</RNText>
+      <RNText allowFontScaling={false} style={{ ...SCHRIFT.display, fontSize: groesse * 0.38, lineHeight: groesse * 0.42, color: t.zeichen, letterSpacing: -0.5 }}>{fmt({ day: "numeric" })}</RNText>
+      <RNText allowFontScaling={false} style={{ ...SCHRIFT.bold, fontSize: groesse * 0.21, lineHeight: groesse * 0.26, color: t.zeichen, textTransform: "uppercase", letterSpacing: 0.4 }}>{fmt({ month: "short" })}</RNText>
     </View>
   );
 }
@@ -186,9 +192,10 @@ const tippen = () => {
  */
 export function Knopf({ text, onPress, leise, ton, gefahr, buehne, glas, deaktiviert, laedt, symbol, stil }: { text: string; onPress: () => void; leise?: boolean; ton?: boolean; gefahr?: boolean; buehne?: boolean; glas?: boolean; deaktiviert?: boolean; laedt?: boolean; symbol?: string; stil?: StyleProp<ViewStyle> }) {
   const f = useFarben();
+  const dunkel = useColorScheme() === "dark";
   const haupt = gefahr ? f.frist : f.haupt;
   const grund = buehne ? f.buehneKnopf : glas ? f.buehneFlaeche : ton ? f.flaeche : leise ? "transparent" : haupt;
-  const schrift = buehne ? f.buehneKnopfText : glas ? f.buehneText : ton ? (gefahr ? f.frist : f.tinte) : leise ? haupt : gefahr ? "#ffffff" : f.hauptText;
+  const schrift = buehne ? f.buehneKnopfText : glas ? f.buehneText : ton ? (gefahr ? f.frist : f.tinte) : leise ? haupt : gefahr ? (dunkel ? f.papier : "#ffffff") : f.hauptText;
   return (
     <Pressable
       accessibilityRole="button"
@@ -240,11 +247,12 @@ export function SchnellKachel({ symbol, text, onPress, ton = "amt" }: { symbol: 
 const KNOPF_SYMBOLE = new Set(["square.and.arrow.up", "faceid", "plus", "doc.viewfinder"]);
 
 /** Handlung als Text (Links, „Entfernen“, „Weitere Angaben“) – ohne Rahmen, 44 pt Tippfläche. */
-export function TextKnopf({ text, onPress, symbol, gefahr, leise, buehne, stil, label }: { text: string; onPress: () => void; symbol?: string; gefahr?: boolean; leise?: boolean; buehne?: boolean; stil?: StyleProp<ViewStyle>; label?: string }) {
+/** `erweitert`: der Knopf klappt etwas auf oder zu (Liste zeigen) – VoiceOver sagt „erweitert“ bzw. „reduziert“. */
+export function TextKnopf({ text, onPress, symbol, gefahr, leise, buehne, stil, label, erweitert }: { text: string; onPress: () => void; symbol?: string; gefahr?: boolean; leise?: boolean; buehne?: boolean; stil?: StyleProp<ViewStyle>; label?: string; erweitert?: boolean }) {
   const f = useFarben();
   const farbe = buehne ? f.minze : gefahr ? f.frist : leise ? f.tinteLeise : f.amt;
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={label ?? text} onPress={onPress} hitSlop={4} style={({ pressed }) => [{ minHeight: 44, flexDirection: "row", alignItems: "center", gap: 7, alignSelf: "flex-start", opacity: pressed ? 0.55 : 1 }, stil]}>
+    <Pressable accessibilityRole="button" accessibilityLabel={label ?? text} accessibilityState={erweitert === undefined ? undefined : { expanded: erweitert }} aria-expanded={erweitert} onPress={onPress} hitSlop={4} style={({ pressed }) => [{ minHeight: 44, flexDirection: "row", alignItems: "center", gap: 7, alignSelf: "flex-start", opacity: pressed ? 0.55 : 1 }, stil]}>
       {symbol && symbol.startsWith("chevron") ? <Symbol name={symbol} groesse={13} farbe={farbe} gewicht="bold" /> : null}
       <T v="klein" fett farbe={farbe}>{text}</T>
     </Pressable>
@@ -347,14 +355,16 @@ export function Abschnitt({ titel, rechts, children }: { titel?: string; rechts?
  */
 export function Zeile({ links, symbol, ton, titel, text, wert, marke, rechts, onPress, letzte, gefahr, label }: { links?: ReactNode; symbol?: string; ton?: Ton; titel: string; text?: string; wert?: string; marke?: { text: string; ton: Ton }; rechts?: ReactNode; onPress?: () => void; letzte?: boolean; gefahr?: boolean; label?: string }) {
   const f = useFarben();
+  // große Schrift: nichts abschneiden – die Zeile wird dann eben höher
+  const gross = useGrosseSchrift();
   const vorn = symbol ? <Kachel symbol={symbol} ton={ton} /> : links;
   const inhalt = (pressed: boolean) => (
     <View style={{ flexDirection: "row", alignItems: "center", opacity: pressed ? 0.55 : 1 }}>
       {vorn ? <View style={{ marginRight: 14, minWidth: 24, alignItems: "center" }}>{vorn}</View> : null}
       <View style={{ flex: 1, minWidth: 0, flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 13, minHeight: 58, borderBottomWidth: letzte ? 0 : HAARLINIE, borderColor: f.linie }}>
         <View style={{ flex: 1, minWidth: 0 }}>
-          <T fett={!gefahr} farbe={gefahr ? f.frist : undefined} numberOfLines={3}>{titel}</T>
-          {text ? <T v="klein" leise numberOfLines={2} stil={{ marginTop: 1 }}>{text}</T> : null}
+          <T fett={!gefahr} farbe={gefahr ? f.frist : undefined} numberOfLines={gross ? undefined : 3}>{titel}</T>
+          {text ? <T v="klein" leise numberOfLines={gross ? undefined : 2} stil={{ marginTop: 1 }}>{text}</T> : null}
         </View>
         {/* Betrag rechts (Rechnungen, Belege) – das, wonach man in Listen sucht */}
         {wert || marke ? (
@@ -381,7 +391,8 @@ export function Marke({ text, ton }: { text: string; ton: Ton }) {
   const t = tonFarben(f, ton);
   return (
     <View style={{ paddingHorizontal: 9, paddingVertical: 3, borderRadius: 999, backgroundColor: t.grund }}>
-      <T v="mini" farbe={t.zeichen} stil={{ fontSize: 12, lineHeight: 15 }}>{text}</T>
+      {/* Grün auf Grünhauch: das tiefe Grün, sonst reicht der Kontrast für 12 pt nicht */}
+      <T v="mini" farbe={ton === "amt" ? f.amtTief : t.zeichen} stil={{ fontSize: 12, lineHeight: 15 }}>{text}</T>
     </View>
   );
 }
@@ -392,9 +403,12 @@ export function Hinweis({ text, art = "info", symbol }: { text: string; art?: "i
   // Orange nur für echte Warnungen – neutrale Hinweise ruhig, sonst wirkt alles wie eine Warnung
   const farbe = art === "fehler" ? f.frist : art === "erfolg" ? f.amt : art === "warnung" ? f.bald : f.tinteLeise;
   const hg = art === "fehler" ? f.fristHauch : art === "erfolg" ? f.amtHauch : art === "warnung" ? f.baldHauch : f.flaeche;
-  // Fehler und Erfolge ansagen (VoiceOver kennt keine Live-Regionen)
+  // Fehler immer ansagen (VoiceOver kennt keine Live-Regionen); Erfolg und Info nur, wenn sie sich nach dem ersten
+  // Zeichnen ändern – sonst sagt jede Seite beim Öffnen ihre stehenden Hinweise an
+  const gezeichnet = useRef(false);
   useEffect(() => {
-    if (art === "fehler" || art === "erfolg") AccessibilityInfo.announceForAccessibility(text);
+    if (art === "fehler" || (gezeichnet.current && art !== "warnung")) AccessibilityInfo.announceForAccessibility(text);
+    gezeichnet.current = true;
   }, [art, text]);
   // neutrale Hinweise ohne Kasten (ruhig, wie eine Fußnote); Warnung, Fehler, Erfolg mit Fläche
   const kasten = art !== "info";
@@ -492,6 +506,46 @@ export function Feld({ label, wert, aendern, hilfe, fehler, mehrzeilig, ohneLabe
   );
 }
 
+/**
+ * Passwortfeld mit Auge (zeigen/verbergen). `hinweis` steht ruhig darunter (z. B. „Mindestens 10 Zeichen“), `fehler`
+ * rot – die Seite entscheidet, wann aus dem Hinweis ein Fehler wird (erst nach Verlassen des Felds oder beim Absenden).
+ */
+export function PasswortFeld({ label, wert, aendern, hinweis, fehler, neu, onBlur, onSubmitEditing }: { label: string; wert: string; aendern: (w: string) => void; hinweis?: string | null; fehler?: string | null; neu?: boolean; onBlur?: () => void; onSubmitEditing?: () => void }) {
+  const f = useFarben();
+  const inKarte = useInKarte();
+  const [fokus, setFokus] = useState(false);
+  const [zeigen, setZeigen] = useState(false);
+  return (
+    <View style={{ marginTop: 20 }}>
+      <FeldKopf label={label} />
+      <View style={[feldRahmen(f, { fokus, fehler: Boolean(fehler), inKarte }), { flexDirection: "row", alignItems: "center", marginTop: 7, paddingRight: 0 }]}>
+        <TextInput
+          accessibilityLabel={label}
+          accessibilityHint={fehler ?? hinweis ?? undefined}
+          value={wert}
+          onChangeText={aendern}
+          secureTextEntry={!zeigen}
+          autoCapitalize="none"
+          autoCorrect={false}
+          textContentType={neu ? "newPassword" : "password"}
+          selectionColor={f.amt}
+          onFocus={() => setFokus(true)}
+          onBlur={() => {
+            setFokus(false);
+            onBlur?.();
+          }}
+          onSubmitEditing={onSubmitEditing}
+          style={[feldText(f), { flex: 1, minHeight: 46 }]}
+        />
+        <Pressable accessibilityRole="button" accessibilityLabel={zeigen ? TEXT.passwort_verbergen : TEXT.passwort_zeigen} onPress={() => setZeigen(!zeigen)} hitSlop={4} style={({ pressed }) => ({ width: ZIEL, minHeight: 46, alignItems: "center", justifyContent: "center", opacity: pressed ? 0.55 : 1 })}>
+          <Symbol name={zeigen ? "eye.slash" : "eye"} groesse={19} farbe={f.tinteLeise} />
+        </Pressable>
+      </View>
+      {fehler ? <T v="caption" farbe={f.frist} stil={{ marginTop: 5 }}>{fehler}</T> : hinweis ? <T v="caption" leise stil={{ marginTop: 5 }}>{hinweis}</T> : null}
+    </View>
+  );
+}
+
 /** ISO-Datum ↔ deutsche Schreibweise TT.MM.JJJJ (bzw. englisch DD/MM/YYYY). */
 export function isoAus(text: string): string | null {
   const de = /^\s*(\d{1,2})[./-](\d{1,2})[./-](\d{4})\s*$/.exec(text);
@@ -585,29 +639,31 @@ export function Wahl<W extends string>({ label, wert, aendern, optionen, hilfe }
   );
 }
 
-/** Schalter mit Beschriftung (iOS-Switch in Handlungsfarbe). */
+/**
+ * Schalter mit Beschriftung (iOS-Switch in Handlungsfarbe): die ganze Zeile ist ein Element mit Rolle „Schalter“ –
+ * Antippen irgendwo schaltet um, VoiceOver liest Beschriftung, Zustand und die Hilfe als Hinweis in einem.
+ */
 export function Schalter({ label, wert, aendern, hilfe }: { label: string; wert: boolean; aendern: (w: boolean) => void; hilfe?: string }) {
   const f = useFarben();
   return (
-    <View style={{ flexDirection: "row", alignItems: "center", gap: 12, minHeight: ZIEL + 4, marginTop: 14 }}>
+    <Pressable
+      accessibilityRole="switch"
+      accessibilityLabel={label}
+      accessibilityHint={hilfe}
+      accessibilityState={{ checked: wert }}
+      aria-checked={wert}
+      onPress={() => aendern(!wert)}
+      style={{ flexDirection: "row", alignItems: "center", gap: 12, minHeight: ZIEL + 4, marginTop: 14 }}
+    >
       <View style={{ flex: 1 }}>
-        <SchalterText label={label} hilfe={hilfe} />
+        <T>{label}</T>
+        {hilfe ? <T v="caption" leise stil={{ marginTop: 2 }}>{hilfe}</T> : null}
       </View>
-      <Switch accessibilityLabel={label} value={wert} onValueChange={aendern} trackColor={{ true: f.haupt, false: f.linie }} thumbColor="#ffffff" ios_backgroundColor={f.linie} />
-    </View>
-  );
-}
-
-function SchalterText({ label, hilfe }: { label: string; hilfe?: string }) {
-  const [offen, setOffen] = useState(false);
-  return (
-    <View>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-        <T stil={{ flexShrink: 1 }}>{label}</T>
-        {hilfe ? <HilfeKnopf label={label} offen={offen} umschalten={() => { weich(); setOffen(!offen); }} /> : null}
+      {/* nur Anzeige – Zustand und Bedienung trägt die Zeile */}
+      <View pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden>
+        <Switch value={wert} trackColor={{ true: f.haupt, false: f.linie }} thumbColor="#ffffff" ios_backgroundColor={f.linie} />
       </View>
-      {hilfe && offen ? <T v="caption" leise stil={{ marginTop: 4 }}>{hilfe}</T> : null}
-    </View>
+    </Pressable>
   );
 }
 

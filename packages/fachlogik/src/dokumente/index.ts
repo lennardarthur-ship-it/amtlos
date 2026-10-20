@@ -9,7 +9,7 @@ import { datenpanne, datenschutzDokumentation, datenschutzinformation } from "./
 import { kiKompetenz, nachweisArbeitsbedingungen } from "./personal.js";
 import { verfahrensdokumentation } from "./steuern.js";
 import { pdfDateiname } from "../dateinamen.js";
-import { GESTALT_MARKE, GRUNDLAGE_MARKE, SEITE_MARKE, esc, festeLeerzeichen, seiteCss } from "./html.js";
+import { GESTALT_MARKE, GRUNDLAGE_MARKE, SEITE_MARKE, cent, esc, festeLeerzeichen, seiteCss, zahl } from "./html.js";
 import type { Bereich, Betrieb, Daten, EinfachesFeld, Eintrag, Feld, Vorlage, Vorschlag } from "./typen.js";
 
 export * from "./typen.js";
@@ -18,10 +18,10 @@ export { HAUSFARBEN, PRUEFHINWEIS, RAENDER, akzent, fussSpalten, type Gestalt } 
 export { BUNDESLAENDER, aufsichtFuer, berlinZuUtc } from "./datenschutz.js";
 export { mindestlohnAm, mindesturlaub, stundenlohn } from "./personal.js";
 export { bausteinText } from "./website.js";
-export { EUER_KAPITALGESELLSCHAFT, VERSTEUERUNG, aufbewahrenBis, eRechnungAus, rechnungsTitel } from "./buchhaltung.js";
+export { EUER_KAPITALGESELLSCHAFT, RECHNUNG_NEGATIV, RECHNUNG_NULL, RECHNUNG_PLZ_FEHLT, VERSTEUERUNG, aufbewahrenBis, eRechnungAus, rechnungsTitel } from "./buchhaltung.js";
 export { istKapitalgesellschaft, mitVertretung } from "./betrieb.js";
 export { STEUERKLASSEN, arbeitsminuten } from "./lohn.js";
-export { ANLAESSE, KURZ, PERSONEN_FELDER, kurztitel, naechsteNummer, personAus, personIn, personMerken, type Anlass } from "./ablauf.js";
+export { ANLAESSE, KURZ, PERSONEN_FELDER, kurztitel, kurztitelListe, naechsteNummer, personAus, personIn, personMerken, type Anlass } from "./ablauf.js";
 export { cent, zahl } from "./html.js";
 
 export const BEREICHE: { id: Bereich; titel: string }[] = [
@@ -104,6 +104,7 @@ function startwert(f: EinfachesFeld, b: Betrieb, heute: string): string | boolea
   switch (f.art) {
     case "text":
     case "mehrzeilig":
+      if (typeof f.vorbelegung === "object") return f.vorbelegung.text;
       return f.vorbelegung === "verantwortlich" ? b.verantwortlich : f.vorbelegung === "betrieb_kontakt" ? [b.verantwortlich, b.telefon, b.email].filter((x) => x.trim()).join(", ") : "";
     case "datum":
       return f.vorbelegung === "heute" ? heute : null;
@@ -143,6 +144,18 @@ function benutzt(f: Extract<Feld, { art: "liste" }>, e: Eintrag): boolean {
   return f.felder.some((x) => (x.art === "text" || x.art === "mehrzeilig" || x.art === "betrag" || x.art === "zahl" || x.art === "uhrzeit" || x.art === "mehrfach" || x.art === "bausteine") && !("vorbelegung" in x && x.vorbelegung) && gefuellt(e[x.id]));
 }
 
+/** Betrag oder Zahl eingetragen, aber nicht lesbar („45 Euro“, „1,234.56“) – im Dokument stünde sonst 0,00 €. */
+export function unlesbar(f: Feld, w: unknown): boolean {
+  if (f.art !== "betrag" && f.art !== "zahl") return false;
+  return typeof w === "string" && w.trim() !== "" && (f.art === "betrag" ? cent(w) : zahl(w)) === null;
+}
+/** Bezeichnung für „Fehlt noch“, z. B. „Preis nicht lesbar (z. B. 45,00)“. */
+export function unlesbarText(f: Feld): string {
+  if (f.id === "preis") return "Preis nicht lesbar (z. B. 45,00)";
+  const name = f.label.replace(/\s*\(€\)\s*$/, "");
+  return f.art === "zahl" ? `${name} nicht lesbar (z. B. 1,5)` : `${name} nicht lesbar (z. B. 12,50)`;
+}
+
 /** Fehlende Pflichtangaben als lesbare Bezeichnungen („Gefährdung 2: Maßnahme“). Hindert das Erstellen nicht. */
 export function fehlendeAngaben(v: Vorlage, d: Daten, b?: Betrieb): string[] {
   const fehlt: string[] = [];
@@ -155,9 +168,15 @@ export function fehlendeAngaben(v: Vorlage, d: Daten, b?: Betrieb): string[] {
         const genutzt = eintraege.filter((e) => benutzt(f, e));
         if (f.pflicht && !genutzt.length) fehlt.push(`mindestens ein Eintrag: ${f.eintrag}`);
         genutzt.forEach((e, i) => {
-          for (const x of f.felder) if (x.pflicht && sichtbar(x, ohneVerdeckteFelder(f.felder, e)) && !gefuellt(e[x.id])) fehlt.push(`${f.eintrag}${genutzt.length > 1 ? ` ${i + 1}` : ""}: ${x.label}`);
+          const vor = `${f.eintrag}${genutzt.length > 1 ? ` ${i + 1}` : ""}: `;
+          for (const x of f.felder) {
+            if (!sichtbar(x, ohneVerdeckteFelder(f.felder, e))) continue;
+            if (x.pflicht && !gefuellt(e[x.id])) fehlt.push(`${vor}${x.label}`);
+            else if (unlesbar(x, e[x.id])) fehlt.push(`${vor}${unlesbarText(x)}`);
+          }
         });
       } else if (f.pflicht && !gefuellt(d[f.id])) fehlt.push(f.label);
+      else if (unlesbar(f, d[f.id])) fehlt.push(unlesbarText(f));
     }
   if (b && v.pruefen) fehlt.push(...v.pruefen(d, b));
   return fehlt;

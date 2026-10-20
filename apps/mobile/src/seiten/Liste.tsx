@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
-import { cent, zahl, eintragAusVorschlag, kurztitel, neuerEintrag, ohneVerdeckteFelder, sichtbar, vorlageFuer, type Daten, type Eintrag, type EintragWert, type ListenFeld, type Vorschlag } from "@amtlos/fachlogik";
+import { cent, zahl, eintragAusVorschlag, kurztitelListe, neuerEintrag, ohneVerdeckteFelder, sichtbar, unlesbar, unlesbarText, vorlageFuer, type Daten, type Eintrag, type EintragWert, type ListenFeld, type Vorschlag } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { Fuss, Karte, Knopf, Symbol, T, TextKnopf, Wahl } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
@@ -9,7 +9,7 @@ import { HAARLINIE, RADIUS, RAND, ZIEL, useFarben } from "../ui/thema";
 import { heute, personenSortiert } from "../unterlagen/speicher";
 import { VORSCHLAG_GRUPPE } from "../pflichten/check";
 import { useAmtlos } from "../zustand";
-import { Felder, gefuellt } from "./felder";
+import { Ansage, Felder, gefuellt } from "./felder";
 import { Inhalt } from "./gemeinsam";
 
 /** Filter „passend zu deinem Betrieb“ (mehrere Gruppen, z. B. Friseur und Kosmetik bei Beauty) */
@@ -22,12 +22,20 @@ const eintraegeVon = (d: Daten | undefined, feld: ListenFeld) => ((d && Array.is
 function benutzt(feld: ListenFeld, e: Eintrag): boolean {
   return feld.felder.some((x) => (x.art === "text" || x.art === "mehrzeilig" || x.art === "betrag" || x.art === "zahl" || x.art === "uhrzeit" || x.art === "mehrfach" || x.art === "bausteine") && !("vorbelegung" in x && x.vorbelegung) && gefuellt(e[x.id]));
 }
-/** Fehlende Pflichtangaben eines Eintrags (Bezeichnungen der Felder). */
-const fehltIn = (feld: ListenFeld, e: Eintrag) => (benutzt(feld, e) ? feld.felder.filter((x) => x.pflicht && sichtbar(x, ohneVerdeckteFelder(feld.felder, e)) && !gefuellt(e[x.id])).map((x) => x.label) : []);
-const anzeigeTitel = (feld: ListenFeld, e: Eintrag, i: number) => {
-  const t = titelText(feld, e);
-  const lesbar = /^\d{4}-\d{2}-\d{2}$/.test(t) ? t.split("-").reverse().join(".") : t;
-  return lesbar ? kurztitel(lesbar) : `${feld.eintrag} ${i + 1} ${TEXT.eintrag_leer}`;
+/** Fehlende Pflichtangaben eines Eintrags (Bezeichnungen der Felder) und unlesbare Beträge („45 Euro“). */
+const fehltIn = (feld: ListenFeld, e: Eintrag) => {
+  if (!benutzt(feld, e)) return [];
+  const da = feld.felder.filter((x) => sichtbar(x, ohneVerdeckteFelder(feld.felder, e)));
+  return [...da.filter((x) => x.pflicht && !gefuellt(e[x.id])).map((x) => x.label), ...da.filter((x) => unlesbar(x, e[x.id])).map(unlesbarText)];
+};
+/** Titel aller Einträge einer Liste – gekürzt, aber nie zwei gleiche („Färben, Dauerwelle“ zweimal). */
+const anzeigeTitel = (feld: ListenFeld, eintraege: Eintrag[]) => {
+  const roh = eintraege.map((e) => {
+    const t = titelText(feld, e);
+    return /^\d{4}-\d{2}-\d{2}$/.test(t) ? t.split("-").reverse().join(".") : t;
+  });
+  const kurz = kurztitelListe(roh);
+  return roh.map((t, i) => (t ? kurz[i]! : `${feld.eintrag} ${i + 1} ${TEXT.eintrag_leer}`));
 };
 
 function feldIn(vorlageId: string, feldId: string): ListenFeld | undefined {
@@ -39,6 +47,8 @@ function feldIn(vorlageId: string, feldId: string): ListenFeld | undefined {
 function EintragSeite({ id, feldId, index, neu }: { id: string; feldId: string; index: number; neu?: boolean }) {
   const z = useAmtlos();
   const nav = useNav();
+  const melden = useMeldung();
+  const f = useFarben();
   const u = z.stand.unterlagen.find((x) => x.id === id);
   const feld = u ? feldIn(u.vorlage, feldId) : undefined;
   const e = feld ? eintraegeVon(u?.daten, feld)[index] : undefined;
@@ -62,6 +72,8 @@ function EintragSeite({ id, feldId, index, neu }: { id: string; feldId: string; 
     }
   }, [e, nav]);
   if (!feld || !e) return <Unterseite titel="">{null}</Unterseite>;
+  // ein unlesbarer Preis würde als 0,00 € auf der Rechnung stehen – erst korrigieren (rote Zeile am Feld)
+  const unlesbarDa = feld.felder.some((x) => sichtbar(x, ohneVerdeckteFelder(feld.felder, e)) && unlesbar(x, e[x.id]));
   const setze = (k: string, w: EintragWert) => {
     const liste = eintraegeVon(z.daten(id), feld);
     z.setzen(id, { [feld.id]: liste.map((y, j) => (j === index ? { ...y, [k]: w } : y)) });
@@ -78,13 +90,15 @@ function EintragSeite({ id, feldId, index, neu }: { id: string; feldId: string; 
             anfang.current = "";
             weg.current = true;
             z.setzen(id, { [feld.id]: eintraegeVon(z.daten(id), feld).filter((_, j) => j !== index) });
+            // die Meldungen können (noch) keine Aktion wie „Rückgängig“ – wenigstens sagen, was passiert ist
+            melden(TEXT.eintrag_entfernt, "info");
             nav.zurueck();
           }}
           stil={{ marginTop: 24 }}
         />
       </Inhalt>
-      <Fuss>
-        <Knopf text={TEXT.fertig} onPress={nav.zurueck} stil={{ flex: 1 }} />
+      <Fuss ueber={unlesbarDa ? <Ansage v="caption" text={TEXT.preis_unlesbar_fertig} farbe={f.frist} /> : null}>
+        <Knopf text={TEXT.fertig} deaktiviert={unlesbarDa} onPress={nav.zurueck} stil={{ flex: 1 }} />
       </Fuss>
     </Unterseite>
   );
@@ -109,6 +123,9 @@ function VorschlagSeite({ id, feldId }: { id: string; feldId: string }) {
   const vorhanden = eintraegeVon(u.daten, feld).map((e) => titelText(feld, e));
   const liste = alle.filter((v) => !gruppe || (gruppe === PASSEND ? passend.includes(v.gruppe ?? "") : v.gruppe === gruppe));
   const istDa = (v: Vorschlag) => vorhanden.includes(titelText(feld, v.werte) || v.titel);
+  // Kurztitel über alle Vorschläge der Liste (nicht nur die gefilterten) – so bleibt ein Titel beim Filtern gleich
+  const kurzAlle = kurztitelListe(alle.map((v) => v.titel));
+  const kurzVon = (v: Vorschlag) => kurzAlle[alle.indexOf(v)] ?? v.titel;
   // erste lange Angabe eines Vorschlags (z. B. Schutzmaßnahmen) als Details
   const details = (v: Vorschlag) => feld.felder.filter((x) => x.id !== feld.titelFeld && (x.art === "text" || x.art === "mehrzeilig") && typeof v.werte[x.id] === "string" && (v.werte[x.id] as string).length > 0).slice(0, 2);
   const uebernehmen = () => {
@@ -131,7 +148,7 @@ function VorschlagSeite({ id, feldId }: { id: string; feldId: string }) {
             const da = istDa(v);
             const an = da || gewaehlt.has(v.titel);
             const auf = offen === v.titel;
-            const kurz = kurztitel(v.titel);
+            const kurz = kurzVon(v);
             return (
               <View key={`${v.gruppe}-${v.titel}`} style={{ borderTopWidth: i ? 1 : 0, borderColor: f.linieLeise }}>
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -194,6 +211,7 @@ export function ListenSchritt({ feld, id }: { feld: ListenFeld; id: string }) {
   const nav = useNav();
   const f = useFarben();
   const eintraege = eintraegeVon(z.stand.unterlagen.find((u) => u.id === id)?.daten, feld);
+  const titel = anzeigeTitel(feld, eintraege);
   const oeffnen = (i: number, neu = false) => nav.oeffnen(`eintrag-${id}-${feld.id}-${i}`, () => <EintragSeite id={id} feldId={feld.id} index={i} neu={neu} />, true);
   const mitarbeiter = feld.ausMitarbeitern ? personenSortiert(z.stand.mitarbeiter) : [];
   const fehlend = mitarbeiter.filter((p) => !eintraege.some((e) => titelText(feld, e).toLocaleLowerCase("de") === p.name.trim().toLocaleLowerCase("de")));
@@ -204,12 +222,12 @@ export function ListenSchritt({ feld, id }: { feld: ListenFeld; id: string }) {
           {eintraege.map((e, i) => {
             const fehlt = fehltIn(feld, e);
             return (
-              <Pressable key={i} accessibilityRole="button" accessibilityLabel={`${feld.eintrag} ${i + 1}: ${anzeigeTitel(feld, e, i)}`} onPress={() => oeffnen(i)} style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 14, minHeight: ZIEL + 12, paddingVertical: 12, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie, opacity: pressed ? 0.6 : 1 })}>
+              <Pressable key={i} accessibilityRole="button" accessibilityLabel={`${feld.eintrag} ${i + 1}: ${titel[i]}${fehlt.length ? `, ${TEXT.eintrag_fehlt(fehlt.length)}: ${fehlt.join(", ")}` : betragszeile(e) ? `, ${betragszeile(e)}` : ""}`} onPress={() => oeffnen(i)} style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 14, minHeight: ZIEL + 12, paddingVertical: 12, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie, opacity: pressed ? 0.6 : 1 })}>
                 <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: fehlt.length ? f.baldHauch : f.amtHauch, alignItems: "center", justifyContent: "center" }}>
                   <T v="caption" fett farbe={fehlt.length ? f.bald : f.amt} stil={{}}>{i + 1}</T>
                 </View>
                 <View style={{ flex: 1 }}>
-                  <T fett={benutzt(feld, e)} leise={!benutzt(feld, e)} numberOfLines={2}>{anzeigeTitel(feld, e, i)}</T>
+                  <T fett={benutzt(feld, e)} leise={!benutzt(feld, e)} numberOfLines={2}>{titel[i]}</T>
                   {fehlt.length ? <T v="caption" farbe={f.bald}>{TEXT.eintrag_fehlt(fehlt.length)}</T> : betragszeile(e) ? <T v="caption" leise>{betragszeile(e)}</T> : null}
                 </View>
                 <Symbol name="chevron.right" groesse={14} farbe={f.zeiger} gewicht="semibold" />

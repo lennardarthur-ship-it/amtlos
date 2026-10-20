@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Image, View } from "react-native";
+import { Image, Linking, View } from "react-native";
 import { KATEGORIEN, STEUERSAETZE, ZAHLUNGSWEGE, belegAusERechnung, belegSummen, cent, eRechnungAusPdf, eRechnungLesen, kategorieFuer, type Beleg } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { regelwert } from "../pflichten/check";
@@ -15,6 +15,7 @@ import { leererBeleg, neueId } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { bestaetigen } from "../ui/bestaetigen";
 import { BuehnenBlatt, GrosserBetrag, datumKurz } from "./gemeinsam";
+import { useAnsage } from "./felder";
 
 const euro = (c: number) => `${new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(c / 100)} €`;
 const betragText = (c: number) => (c ? new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false }).format(c / 100) : "");
@@ -31,20 +32,25 @@ export function useBelegErfassen() {
   const melden = useMeldung();
   // Startwert für „Vorsteuer abziehbar“: aus der Antwort im Pflichten-Check
   const ku = z.stand.profil["ust.kleinunternehmer"] === true;
+  // Kamera verweigert: bleibender Hinweis mit „Einstellungen öffnen“ statt einer Meldung, die gleich wieder verschwindet
+  const [kameraVerweigert, setKameraVerweigert] = useState(false);
   const oeffnen = (b: Beleg, neu: boolean) => nav.oeffnen(`beleg-${b.id}`, () => <BelegSeite id={b.id} neu={neu} />, true);
   const anlegen = (b: Beleg, neu = true) => {
     z.belegSetzen(b);
     oeffnen(b, neu);
   };
   return {
+    kameraVerweigert,
     hand: () => anlegen(leererBeleg("hand", null, ku)),
     foto: async (kamera: boolean) => {
       try {
         const bytes = await belegFoto(kamera);
         if (!bytes) return;
+        setKameraVerweigert(false);
         anlegen(leererBeleg("foto", await z.dateiSpeichern(bytes, "jpg"), ku));
       } catch (e) {
-        melden((e as Error).message === "kamera" ? TEXT.beleg_kamera_verweigert : TEXT.beleg_fehler, "info");
+        if ((e as Error).message === "kamera") setKameraVerweigert(true);
+        else melden(TEXT.beleg_fehler, "info");
       }
     },
     datei: async () => {
@@ -80,11 +86,25 @@ export function BelegErfassen({ kompakt }: { kompakt?: boolean }) {
     { symbol: "pencil", titel: TEXT.beleg_hand, text: kompakt ? undefined : TEXT.beleg_hand_text, los: e.hand },
   ];
   return (
-    <Karte>
-      {zeilen.map((z, i) => (
-        <Zeile key={z.titel} symbol={z.symbol} titel={z.titel} text={z.text} onPress={z.los} letzte={i === zeilen.length - 1} />
-      ))}
-    </Karte>
+    <View>
+      {e.kameraVerweigert ? <KameraVerweigert /> : null}
+      <Karte>
+        {zeilen.map((z, i) => (
+          <Zeile key={z.titel} symbol={z.symbol} titel={z.titel} text={z.text} onPress={z.los} letzte={i === zeilen.length - 1} />
+        ))}
+      </Karte>
+    </View>
+  );
+}
+
+/** Kein Zugriff auf die Kamera: bleibt stehen, bis ein Foto klappt – mit Sprung in die Einstellungen der App. */
+function KameraVerweigert() {
+  useAnsage(TEXT.beleg_kamera_verweigert);
+  return (
+    <View style={{ marginBottom: 8 }}>
+      <Hinweis art="warnung" symbol="camera" text={TEXT.beleg_kamera_verweigert} />
+      <TextKnopf symbol="gearshape" text={TEXT.einstellungen_oeffnen} onPress={() => void Linking.openSettings().catch(() => undefined)} />
+    </View>
   );
 }
 
@@ -178,6 +198,8 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
             onPress={() => {
               // sagen, dass und was gespeichert ist – man landet sonst ohne Rückmeldung wieder auf „Beleg erfassen“
               if (b.lieferant.trim() || s.brutto_cent) melden(TEXT.beleg_gespeichert([b.lieferant.trim(), s.brutto_cent ? euro(s.brutto_cent) : ""].filter(Boolean).join(", ")));
+              // ein neuer Beleg ohne Angaben und ohne Datei verschwindet beim Verlassen – das nicht still tun
+              else if (neu && !b.datei) melden(TEXT.beleg_nichts_gespeichert, "info");
               nav.zurueck();
             }}
             stil={{ flex: 1 }}
@@ -194,7 +216,7 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
           <View key={i}>
             <Feld label={b.steuer.length > 1 ? TEXT.beleg_betrag_satz(x.satz) : TEXT.beleg_betrag} wert={betraege[i] ?? ""} aendern={(w) => betragSetzen(i, w)} keyboardType="decimal-pad" placeholder="0,00" fehler={(betraege[i] ?? "").trim() && cent(betraege[i]!) === null ? TEXT.betrag_falsch : null} />
             <Wahl label={TEXT.beleg_satz} wert={String(x.satz) as "19" | "7" | "0"} aendern={(w) => setze({ steuer: b.steuer.map((y, j) => (j === i ? { ...y, satz: Number(w) } : y)) })} optionen={STEUERSAETZE.map((p) => ({ wert: String(p) as "19" | "7" | "0", text: `${p} %` }))} />
-            {b.steuer.length > 1 ? <TextKnopf symbol="xmark" leise text={TEXT.entfernen} onPress={() => { weich(); setBetraege(betraege.filter((_, j) => j !== i)); setze({ steuer: b.steuer.filter((_, j) => j !== i) }); }} /> : null}
+            {b.steuer.length > 1 ? <TextKnopf symbol="xmark" leise text={TEXT.entfernen} label={TEXT.satz_entfernen(x.satz)} onPress={() => { weich(); setBetraege(betraege.filter((_, j) => j !== i)); setze({ steuer: b.steuer.filter((_, j) => j !== i) }); }} /> : null}
           </View>
         ))}
         {b.steuer.length < 3 ? <TextKnopf symbol="plus" text={TEXT.beleg_weiterer_satz} onPress={() => { weich(); setBetraege([...betraege, ""]); setze({ steuer: [...b.steuer, { satz: b.steuer.some((x) => x.satz === 7) ? 0 : 7, brutto_cent: 0 }] }); }} stil={{ marginTop: 6 }} /> : null}

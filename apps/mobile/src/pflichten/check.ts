@@ -269,19 +269,39 @@ const plusTage = (iso: string, n: number) => {
 
 /**
  * Was jetzt dran ist (E-128, Review K7): offene Pflichten mit Termin in den nächsten 14 Tagen (auch überfällige)
- * und die wichtigsten offenen ohne Termin; „Diesen Monat“ mit Termin in 15 bis 45 Tagen; der Rest „Im Blick“.
+ * und die wichtigsten offenen ohne Termin; „In den nächsten Wochen“ mit Termin in 15 bis 45 Tagen (bewusst nicht
+ * „Diesen Monat“ – das Fenster reicht über das Monatsende hinaus); der Rest „Im Blick“.
  */
 export function dringlichkeit(a: Auswertung, e: Erledigt, heute: string) {
   const offen = a.gilt.filter((p) => !istErledigt(p, e));
   const bald = plusTage(heute, 14);
-  const monat = plusTage(heute, 45);
+  const spaeter = plusTage(heute, 45);
   const mitTermin = offen.filter((p) => p.naechsterTermin).sort((x, y) => x.naechsterTermin!.localeCompare(y.naechsterTermin!));
   const terminBald = mitTermin.filter((p) => p.naechsterTermin! <= bald);
   const wichtigOhne = offen.filter((p) => !p.naechsterTermin && p.schwere === "hoch");
   const jetzt = [...terminBald, ...wichtigOhne];
-  const diesenMonat = mitTermin.filter((p) => p.naechsterTermin! > bald && p.naechsterTermin! <= monat);
-  const imBlick = offen.filter((p) => !jetzt.includes(p) && !diesenMonat.includes(p));
-  return { jetzt, diesenMonat, imBlick };
+  const naechsteWochen = mitTermin.filter((p) => p.naechsterTermin! > bald && p.naechsterTermin! <= spaeter);
+  const imBlick = offen.filter((p) => !jetzt.includes(p) && !naechsteWochen.includes(p));
+  return { jetzt, naechsteWochen, imBlick };
+}
+
+/** Höchstens einmal im Jahr fällig (ein Termin oder keiner in den nächsten zwölf Monaten) – für „viele davon nur einmal im Jahr“. */
+export const selten = (gilt: readonly PflichtInfo[]) => gilt.filter((p) => p.termine.length <= 1).length * 2 > gilt.length;
+
+/** Ab so vielen offenen Gründungsschritten lohnt die Karte „Schon erledigt?“. */
+export const SCHON_ERLEDIGT_AB = 3;
+
+/**
+ * Karte „Schon erledigt?“ für junge Betriebe: Angefangen vor weniger als sechs Monaten (nicht in der Zukunft), dann
+ * stehen die Gründungsschritte noch bei den offenen Pflichten – oft sind sie längst erledigt. Liefert die offenen
+ * Gründungsschritte (Phase „gruendung“ im Katalog), sobald es mindestens `ab` sind; sonst nichts.
+ */
+export function gruendungsSchritte(a: Auswertung, profil: Profil, e: Erledigt, stichtag: string, ab = SCHON_ERLEDIGT_AB): PflichtInfo[] {
+  const beginn = typeof profil.gruendungsdatum === "string" && ISO.test(profil.gruendungsdatum) ? profil.gruendungsdatum : null;
+  if (!beginn || beginn > stichtag || beginn <= plusMonate(stichtag, -BESTAND_AB_MONATEN)) return [];
+  const phase = new Map(KATALOG.pflichten.map((p) => [p.id, p.phase]));
+  const l = a.gilt.filter((p) => phase.get(p.id) === "gruendung" && !istErledigt(p, e));
+  return l.length >= ab ? l : [];
 }
 
 export interface Erinnerung {

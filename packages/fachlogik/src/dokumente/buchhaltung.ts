@@ -68,6 +68,8 @@ const E_FEHLT: Record<string, string> = {
   "kunde.ust_idnr": "USt-IdNr. des Empfängers",
 };
 
+const E_LAND_FEHLT = "Land des Empfängers in der letzten Zeile der Anschrift (z. B. Österreich)";
+
 const isoAus = (t: string) => {
   const m = /^\s*(\d{1,2})\.(\d{1,2})\.(\d{4})\s*$/.exec(t);
   return m ? `${m[3]}-${m[2]!.padStart(2, "0")}-${m[1]!.padStart(2, "0")}` : /^\d{4}-\d{2}-\d{2}$/.test(t.trim()) ? t.trim() : null;
@@ -162,7 +164,7 @@ export function eRechnungAus(d: Daten, b: Betrieb): { daten: RechnungsDaten; feh
     befreiungsgrund: befreiung || null,
   };
   const fehlt = fehlendFuerERechnung(daten).map((c) => E_FEHLT[c] ?? c);
-  if (!a.land && a.plz) fehlt.push("Land des Empfängers in der letzten Zeile der Anschrift (z. B. Österreich)");
+  if (!a.land && a.plz) fehlt.push(E_LAND_FEHLT);
   if (!daten.nummer) fehlt.unshift("Rechnungsnummer");
   if (!datum) fehlt.unshift("Rechnungsdatum");
   return { daten, fehlt };
@@ -177,6 +179,11 @@ function plusTageIso(iso: string, tage: number): string {
   const [j, m, t] = iso.split("-").map(Number) as [number, number, number];
   return new Date(Date.UTC(j, m - 1, t + tage)).toISOString().slice(0, 10);
 }
+
+/** Meldungen der Rechnungsprüfung (auch für die Zuordnung zu einem Feld im Abschluss). */
+export const RECHNUNG_PLZ_FEHLT = "PLZ und Ort des Empfängers fehlen (letzte Zeile der Anschrift, z. B. 10115 Berlin)";
+export const RECHNUNG_NULL = "Rechnungsbetrag ist 0,00 € – bitte die Preise prüfen";
+export const RECHNUNG_NEGATIV = "Rechnungsbetrag ist negativ – bitte die Preise prüfen (eine geteilte Rechnung korrigierst du mit „Stornieren“)";
 
 export const rechnung: Vorlage = {
   id: "rechnung",
@@ -228,7 +235,7 @@ export const rechnung: Vorlage = {
           felder: [
             { id: "bezeichnung", art: "text", label: "Leistung oder Ware", hilfe: "handelsübliche Bezeichnung bzw. Art und Umfang der Leistung", pflicht: true },
             { id: "menge", art: "zahl", label: "Menge", vorbelegung: "1" },
-            { id: "einheit", art: "text", label: "Einheit", vorschlaege: EINHEITEN.slice(0, 8) },
+            { id: "einheit", art: "text", label: "Einheit", vorschlaege: EINHEITEN.slice(0, 8), vorbelegung: { text: "Stück" } },
             { id: "preis", art: "betrag", label: "Einzelpreis netto (€)", pflicht: true },
             { id: "satz", art: "wahl", label: "Umsatzsteuer", optionen: SAETZE, vorbelegung: "19" },
           ],
@@ -238,17 +245,47 @@ export const rechnung: Vorlage = {
     {
       titel: "Steuer und Hinweise",
       felder: [
-        { id: "kleinunternehmer", art: "schalter", label: "Kleinunternehmer (§ 19 UStG)", hilfe: "Dann wird keine Umsatzsteuer ausgewiesen; der Hinweis auf die Steuerbefreiung steht auf der Rechnung." },
+        // aus dem Pflichten-Check vorbelegt (ausProfil) – daher unter „Weitere Angaben“; eingeschaltet steht er ohnehin da
+        { id: "kleinunternehmer", selten: true, art: "schalter", label: "Kleinunternehmer (§ 19 UStG)", hilfe: "Dann wird keine Umsatzsteuer ausgewiesen; der Hinweis auf die Steuerbefreiung steht auf der Rechnung." },
         { id: "hinweise", selten: true, art: "bausteine", label: "Pflichthinweise, falls zutreffend", optionen: [...RECHNUNGS_HINWEISE.filter((h) => h.wert !== "steuerfrei").map((h) => ({ wert: h.wert, text: h.text, quelle: h.quelle })), { wert: "grundstueck", text: GRUNDSTUECK_HINWEIS, quelle: "§ 14 Abs. 4 Nr. 9, § 14b Abs. 1 Satz 5 UStG" }] },
         { id: "befreiung", selten: true, art: "text", label: "Hinweis auf die Steuerbefreiung (bei 0 %)", hilfe: "Pflicht, wenn eine Position steuerfrei ist – mit der Vorschrift", vorschlaege: ["Steuerfreie Leistung nach § 4 Nr. … UStG"] },
         { id: "hinweis", art: "mehrzeilig", label: "Weitere Hinweise", vorschlaege: ["Vielen Dank für Ihren Auftrag.", ZAHLUNGS_HINWEIS] },
       ],
     },
   ],
+  pruefenZu: {
+    [RECHNUNG_PLZ_FEHLT]: "kunde_anschrift",
+    [RECHNUNG_NULL]: "positionen",
+    [RECHNUNG_NEGATIV]: "positionen",
+    // was der E-Rechnung fehlt (eRechnungAus) – für „Ergänzen“ unter „Für die E-Rechnung fehlt noch“
+    [E_FEHLT["kunde.anschrift"]!]: "kunde_anschrift",
+    [E_LAND_FEHLT]: "kunde_anschrift",
+    [E_FEHLT["kunde.email"]!]: "kunde_email",
+    [E_FEHLT["kunde.ust_idnr"]!]: "kunde_ust_idnr",
+    [E_FEHLT.positionen!]: "positionen",
+    [E_FEHLT["positionen.ungueltig"]!]: "positionen",
+    [E_FEHLT["positionen.steuersatz"]!]: "positionen",
+    [E_FEHLT.leistungsdatum!]: "leistung_gleich",
+    [E_FEHLT["steuer.grund_null"]!]: "befreiung",
+    [E_FEHLT["steuer.befreiungsgrund"]!]: "befreiung",
+  },
   pruefen(d, b) {
     const f: string[] = [];
     if (!b.name.trim() || !anschrift(b)) f.push("Name und Anschrift des Betriebs (Mein Betrieb)");
     if (!b.steuernummer.trim() && !b.ust_idnr.trim()) f.push("Steuernummer oder USt-IdNr. (Mein Betrieb)");
+    // Anschrift des Empfängers: PLZ und Ort in der letzten Zeile (im Ausland: Land in der Zeile danach – dort keine Prüfung)
+    const anschrift_ = text(d, "kunde_anschrift");
+    if (anschrift_) {
+      const a = anschriftZerlegen(anschrift_, text(d, "kunde_ust_idnr"));
+      if ((!a.land || a.land === "DE") && (!a.plz || !a.ort)) f.push(RECHNUNG_PLZ_FEHLT);
+    }
+    // Rechnungsbetrag 0 € oder negativ (z. B. Preis nicht lesbar): so nicht teilen – Korrekturen laufen über das Storno
+    const pos = positionen(d);
+    if (pos.length && !text(d, "storno_zu")) {
+      const brutto = summen(pos.map((x) => x.p), ja(d, "kleinunternehmer")).brutto_cent;
+      if (brutto === 0) f.push(RECHNUNG_NULL);
+      else if (brutto < 0) f.push(RECHNUNG_NEGATIV);
+    }
     const nullProzent = positionen(d).some((x) => x.p.ust_satz === 0);
     if (nullProzent && !ja(d, "kleinunternehmer") && !text(d, "befreiung") && !auswahl(d, "hinweise").some((h) => h === "reverse_charge" || h === "igl")) f.push("Hinweis auf die Steuerbefreiung (bei 0 %)");
     // Hinweis, kein Hindernis: beides zusammen ist selten richtig
@@ -501,14 +538,14 @@ export const bilanzGuv: Vorlage = {
   id: "bilanz_guv",
   gestalt: "formular",
   titel: "Bilanz und Gewinn- und Verlustrechnung",
-  beschreibung: "Jahresabschluss für Kaufleute: Erträge und Aufwendungen, Vermögen und Kapital – mit Prüfung, ob Aktiva und Passiva aufgehen.",
+  beschreibung: "Vorläufige Übersicht – kein Jahresabschluss: Erträge und Aufwendungen, Vermögen und Kapital – mit Prüfung, ob Aktiva und Passiva aufgehen.",
   bereich: "steuern",
   pflichten: ["steuern.buchfuehrungspflicht", "steuern.e_bilanz"],
   grundlage: "§§ 238, 242 HGB; § 5b EStG",
   namensFeld: "stichtag",
   abschnitte: [
     { titel: "Stichtag",
-      hilfe: "Die Zahlen kommen aus deiner Buchführung. Die E-Bilanz geht elektronisch ans Finanzamt, meist über Buchhaltungsprogramm oder Steuerberatung.",
+      hilfe: "Vorläufige Übersicht – kein Jahresabschluss. Die Zahlen kommen aus deiner Buchführung; den Jahresabschluss und die E-Bilanz ans Finanzamt erstellst du meist mit Buchhaltungsprogramm oder Steuerberatung.",
       felder: [{ id: "stichtag", art: "datum", label: "Bilanzstichtag", pflicht: true }],
     },
     { titel: "Gewinn- und Verlustrechnung", felder: [posten("ertraege", "Erträge", "Ertrag", "z. B. Umsatzerlöse"), posten("aufwendungen", "Aufwendungen", "Aufwand", "z. B. Materialaufwand, Personalaufwand")] },

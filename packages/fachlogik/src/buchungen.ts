@@ -7,12 +7,13 @@
  * Fachlich zu prüfen – siehe `pruefpunkteBuchungen()` und PRUEFLISTE:
  * - Die Spaltenliste der Buchungszeile (125 Felder der Version 700) ist aus dem Gedächtnis nachgebaut und NICHT gegen den
  *   aktuellen DATEV-Schnittstellen-Entwicklungsleitfaden abgeglichen. Sicher sind die ersten 14 Kernfelder (Umsatz bis
- *   Buchungstext); alle weiteren bleiben leer und müssen nur in Anzahl und Reihenfolge stimmen.
+ *   Buchungstext); dazu kommt die „Buchungs GUID“ (Feld 103, stabil aus Quelle und Steuersatz). Alle weiteren bleiben
+ *   leer und müssen nur in Anzahl und Reihenfolge stimmen.
  * - Im Dateikopf stehen „Datum vom“ und „Datum bis“ als JJJJMMTT (wie der Wirtschaftsjahresbeginn), nicht als TTMMJJJJ;
  *   Feld 27 trägt den Kontenrahmen („03“/„04“).
  * - Konten, BU-Schlüssel 40 und die Umkehrbuchung für Stornos sind Annahmen.
  */
-import { kategorieFuer, type Beleg } from "./belege.js";
+import { belegKennung, kategorieFuer, type Beleg } from "./belege.js";
 import { summen, type Position } from "./rechnung.js";
 
 export type Kontenrahmen = "SKR03" | "SKR04";
@@ -39,6 +40,8 @@ export interface Buchung {
   art: "einnahme" | "ausgabe" | "storno";
   /** ID der Rechnung oder des Belegs, aus dem die Buchung stammt */
   quelle_id: string;
+  /** stabile Kennung der Buchung (36 Zeichen), abgeleitet aus Quelle und Steuersatz – DATEV-Feld „Buchungs GUID“ */
+  guid?: string;
 }
 
 /** Was eine Ausgangsrechnung für die Buchung braucht – Teilmenge der gespeicherten Rechnung. */
@@ -50,6 +53,8 @@ export interface AusgangsRechnungFuerBuchung {
   /** Tag des Zahlungseingangs (ISO) – für die Buchung derzeit ohne Bedeutung, siehe Prüfpunkt Ist-Versteuerung */
   bezahlt?: string | null;
   art: "rechnung" | "storno";
+  /** bei einem Storno: Nummer der stornierten Rechnung (für den Buchungstext „Storno … zu RE …“) */
+  storniert_nummer?: string | null;
   /**
    * Gutschrift (§ 14 Abs. 2 Satz 2 UStG): der Betrieb rechnet als Leistungsempfänger ab – für ihn eine Ausgabe, kein
    * Erlös. Wird nicht als Erlös gebucht; die Ausgabe kommt aus dem Beleg bzw. von der Steuerberatung.
@@ -95,7 +100,32 @@ export function belegfeld1Aus(s: string): string {
 }
 
 /** Leerraum zusammenziehen und auf `n` Zeichen kürzen (Buchungstext, Bezeichnung). */
-const kuerze = (s: string, n: number) => Array.from(s.replace(/\s+/g, " ").trim()).slice(0, n).join(""); // nach Zeichen, nicht mitten durch ein Emoji
+const kuerze = (s: string, n: number) => Array.from(s.replace(/\s+/g, " ").trim()).slice(0, n).join("").trimEnd(); // nach Zeichen, nicht mitten durch ein Emoji
+
+/** Länge des Lieferanten- bzw. Kundennamens im Buchungstext */
+const NAME_IM_TEXT = 40;
+
+/**
+ * Stabile Buchungs-GUID (36 Zeichen, Form 8-4-4-4-12, Version 8 nach RFC 9562) aus Quelle und Steuersatz: dieselbe
+ * Rechnung bzw. derselbe Beleg ergibt in jedem Paket dieselbe GUID. Kein Zufall, keine Kryptografie – vier FNV-1a-Hashes.
+ */
+export function buchungsGuid(quelle_id: string, satz: number | null): string {
+  const text = `amtlos|${quelle_id}|${satz === null ? "ku" : satz}`;
+  const teile: string[] = [];
+  for (let seed = 0; seed < 4; seed++) {
+    let h = (0x811c9dc5 ^ (seed * 0x9e3779b1)) >>> 0;
+    for (let i = 0; i < text.length; i++) {
+      h ^= text.charCodeAt(i);
+      h = Math.imul(h, 0x01000193) >>> 0;
+    }
+    teile.push(h.toString(16).padStart(8, "0"));
+  }
+  const hex = teile.join("").split("");
+  hex[12] = "8"; // Version 8 (frei definiert)
+  hex[16] = ((parseInt(hex[16]!, 16) & 0x3) | 0x8).toString(16); // Variante RFC 9562
+  const h = hex.join("");
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20, 32)}`;
+}
 
 function erloeskonto(k: (typeof BUCHUNGSKONTEN)[Kontenrahmen], satz: number | null): string {
   if (satz === null) return k.erloese.ku;
@@ -117,7 +147,8 @@ export function buchungenAusRechnungen(rechnungen: AusgangsRechnungFuerBuchung[]
   for (const r of rechnungen) {
     if (r.gutschrift) continue;
     const storno = r.art === "storno";
-    const buchungstext = kuerze(`${storno ? "Storno" : "RE"} ${r.nummer} ${r.kunde}`, 60);
+    const kunde = kuerze(r.kunde, NAME_IM_TEXT);
+    const buchungstext = kuerze(storno ? `Storno ${r.nummer}${r.storniert_nummer ? ` zu RE ${r.storniert_nummer}` : ""} ${kunde}` : `RE ${r.nummer} ${kunde}`, 60);
     for (const g of summen(r.positionen, r.kleinunternehmer).gruppen) {
       const brutto = g.netto_cent + g.ust_cent;
       if (!brutto) continue;
@@ -135,6 +166,7 @@ export function buchungenAusRechnungen(rechnungen: AusgangsRechnungFuerBuchung[]
         ust_satz: g.satz,
         art: storno ? "storno" : "einnahme",
         quelle_id: r.id,
+        guid: buchungsGuid(r.id, g.satz),
       });
     }
   }
@@ -144,17 +176,19 @@ export function buchungenAusRechnungen(rechnungen: AusgangsRechnungFuerBuchung[]
 /**
  * Je Beleg und Steuersatz eine Buchung Aufwandskonto (aus der Kategorie) an Verbindlichkeiten, bei Barzahlung an Kasse,
  * bei privater Zahlung an Privateinlagen – mit dem Bruttobetrag. Ohne Vorsteuerabzug bei Satz > 0: BU-Schlüssel 40.
+ * Belegfeld 1: Nummer des Lieferanten (normalisiert, `belegnummerNormal`), sonst die Amtlos-Belegnummer aus
+ * `o.nummern` (`belegNummern`), ohne diese die Beleg-ID in Kurzform. Buchungstext: Lieferant (höchstens 40 Zeichen)
+ * und Kurzbezeichnung der Kategorie.
  */
-export function buchungenAusBelegen(belege: Beleg[], kontenrahmen: Kontenrahmen): Buchung[] {
+export function buchungenAusBelegen(belege: Beleg[], kontenrahmen: Kontenrahmen, o?: { nummern?: Map<string, string> }): Buchung[] {
   const k = BUCHUNGSKONTEN[kontenrahmen];
   const aus: Buchung[] = [];
   for (const b of belege) {
     const kat = kategorieFuer(b.kategorie);
     const konten = kontenrahmen === "SKR03" ? kat.skr03 : kat.skr04;
     const gegenkonto = b.zahlung === "bar" ? k.kasse : b.zahlung === "privat" ? k.privateinlagen : k.verbindlichkeiten;
-    const buchungstext = kuerze(`${b.lieferant} ${kat.titel}`, 60);
-    // Belegnummer des Lieferanten, sonst die Beleg-ID in Kurzform
-    const belegfeld1 = b.nummer ? belegfeld1Aus(b.nummer) : belegfeld1Aus(b.id).slice(0, 12).toUpperCase();
+    const buchungstext = kuerze(`${kuerze(b.lieferant, NAME_IM_TEXT)} ${kat.kurz}`, 60);
+    const belegfeld1 = belegfeld1Aus(belegKennung(b, o?.nummern?.get(b.id) ?? belegfeld1Aus(b.id).slice(0, 12).toUpperCase()));
     for (const s of b.steuer) {
       if (!s.brutto_cent) continue;
       aus.push({
@@ -169,6 +203,7 @@ export function buchungenAusBelegen(belege: Beleg[], kontenrahmen: Kontenrahmen)
         ust_satz: s.satz,
         art: "ausgabe",
         quelle_id: b.id,
+        guid: buchungsGuid(b.id, s.satz),
       });
     }
   }
@@ -181,7 +216,7 @@ export function buchungenAusBelegen(belege: Beleg[], kontenrahmen: Kontenrahmen)
 
 /**
  * Spaltenüberschriften der Buchungszeile, Version 700 (125 Felder). Aus dem Gedächtnis nachgebaut – gegen den
- * DATEV-Schnittstellen-Entwicklungsleitfaden prüfen. Gefüllt werden nur die Felder 1–14; die übrigen bleiben leer.
+ * DATEV-Schnittstellen-Entwicklungsleitfaden prüfen. Gefüllt werden die Felder 1–14 und „Buchungs GUID“; die übrigen bleiben leer.
  */
 export const DATEV_SPALTEN: readonly string[] = [
   "Umsatz (ohne Soll/Haben-Kz)",
@@ -256,6 +291,9 @@ export const DATEV_SPALTEN: readonly string[] = [
   "EU-Steuersatz (Ursprung)",
   "Abw. Skontokonto",
 ];
+
+/** Index des Felds „Buchungs GUID“ in der Buchungszeile (Feld 103 der Version 700 – fachlich zu prüfen) */
+export const DATEV_GUID = DATEV_SPALTEN.indexOf("Buchungs GUID");
 
 export interface DatevExtfOptionen {
   beraternummer?: string;
@@ -346,6 +384,7 @@ export function datevExtf(buchungen: Buchung[], o: DatevExtfOptionen): string {
     f[10] = inAnfzOderLeer(belegfeld1Aus(b.belegfeld1));
     f[11] = inAnfzOderLeer(b.belegfeld2 ? belegfeld1Aus(b.belegfeld2).slice(0, 12) : "");
     f[13] = inAnfz(kuerze(b.buchungstext, 60));
+    if (b.guid) f[DATEV_GUID] = inAnfz(b.guid.slice(0, 36));
     return f.join(";");
   });
   return [kopf.join(";"), DATEV_SPALTEN.join(";"), ...zeilen].join("\r\n") + "\r\n";
@@ -378,11 +417,11 @@ export function datevExtfBytes(inhalt: string): Uint8Array {
 export function buchungslisteCsv(buchungen: Buchung[]): string {
   const feld = (s: string) => (/[;"\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s);
   const zeilen = buchungen.map((b) =>
-    [ttmmjjjj(b.datum), betragMitKomma(b.betrag_cent), b.soll_haben, b.konto, b.gegenkonto, b.bu_schluessel, b.belegfeld1, b.buchungstext, b.ust_satz === null ? "" : String(b.ust_satz)]
+    [ttmmjjjj(b.datum), betragMitKomma(b.betrag_cent), b.soll_haben, b.konto, b.gegenkonto, b.bu_schluessel, b.belegfeld1, b.buchungstext, b.ust_satz === null ? "" : String(b.ust_satz), b.guid ?? ""]
       .map(feld)
       .join(";"),
   );
-  return "﻿" + ["Datum;Betrag;S/H;Konto;Gegenkonto;BU;Beleg;Text;USt", ...zeilen].join("\r\n") + "\r\n";
+  return "﻿" + ["Datum;Betrag;S/H;Konto;Gegenkonto;BU;Beleg;Text;USt;Buchungs-GUID", ...zeilen].join("\r\n") + "\r\n";
 }
 
 /** Fachlich unsichere Punkte dieser Datei als Sätze – für die PRUEFLISTE. */
@@ -393,7 +432,7 @@ export function pruefpunkteBuchungen(): string[] {
     "Die Kategorie-Konten werden als Automatikkonten behandelt (Bruttobetrag, kein BU-Schlüssel). Für Konten ohne Steuerautomatik (SKR03 z. B. 4930 Bürobedarf, 4600 Werbekosten) wäre stattdessen BU 9 (19 % Vorsteuer) bzw. 8 (7 %) nötig; dort ist BU 40 unzulässig.",
     "BU-Schlüssel 40 („keine Steuer“ bei Automatikkonten) wird gesetzt, wenn ein Beleg keinen Vorsteuerabzug erlaubt und der Satz größer 0 ist – richtig und bei allen verwendeten Konten zulässig?",
     "Stornos werden als einfache Umkehrbuchung (Soll und Haben getauscht) ausgegeben, nicht als Generalumkehr (Feld „Generalumkehr (GU)“ bzw. negativer Umsatz). Folgen für Verkehrszahlen und Umsatzstatistik mit der Steuerberatung klären.",
-    "Die Spaltenliste der Buchungszeile (125 Felder, Version 700, Formatversion 13) ist aus dem Gedächtnis nachgebaut; nur die ersten 14 Felder werden gefüllt. Reihenfolge, Anzahl und Bezeichnungen gegen den DATEV-Schnittstellen-Entwicklungsleitfaden prüfen.",
+    "Die Spaltenliste der Buchungszeile (125 Felder, Version 700, Formatversion 13) ist aus dem Gedächtnis nachgebaut; gefüllt werden die ersten 14 Felder und „Buchungs GUID“ (Feld 103, stabile GUID aus Quelle und Steuersatz – darf der Export sie setzen, und steht sie an der richtigen Stelle?). Reihenfolge, Anzahl und Bezeichnungen gegen den DATEV-Schnittstellen-Entwicklungsleitfaden prüfen.",
     "Dateikopf: „Datum vom“ und „Datum bis“ stehen als JJJJMMTT (nicht TTMMJJJJ), Feld 27 trägt den Kontenrahmen („03“/„04“), Festschreibung 0, Rechnungslegungszweck 0, Herkunft „RE“ – gegen die Formatbeschreibung prüfen. Berater- und Mandantennummer sind beim Import Pflicht.",
     "Ist-Versteuerung (§ 20 UStG) ändert die Buchungen nicht: gebucht wird Forderung an Erlös zum Rechnungsdatum, die Versteuerungsart steht in den Mandantenstammdaten. Reicht das, oder soll bei Ist-Versteuerung erst mit der Zahlung gebucht werden (Zufluss, § 11 EStG)?",
     "Belegdatum im Format TTMM: das Jahr ergibt sich aus dem Stapelzeitraum. Alle Buchungen eines Stapels müssen in „Datum vom/bis“ und im Wirtschaftsjahr liegen – der Aufrufer muss je Zeitraum (Monat oder Jahr) einen eigenen Stapel erzeugen.",

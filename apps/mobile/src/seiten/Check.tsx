@@ -5,15 +5,18 @@ import { T as TEXT } from "../texte";
 import { Auswahl, DatumFeld, Fakt, Feld, Fuss, Hinweis, Symbol, Karte, Knopf, MehrfachWahl, T, TextKnopf, ZurueckKnopf } from "../ui/bausteine";
 import { HellerStatus, TastaturRahmen, useKopf, useNav } from "../ui/navigation";
 import { RADIUS, RAND, useFarben } from "../ui/thema";
-import { CHECK_FELDER, auswertung, beantwortet, checkFragen, zusatzFragen, type Profil } from "../pflichten/check";
+import { CHECK_FELDER, auswertung, beantwortet, checkFragen, dringlichkeit, selten, zusatzFragen, type Profil } from "../pflichten/check";
 import { heute } from "../unterlagen/speicher";
 import { PflichtZeile } from "./Pflichten";
 import { useAmtlos } from "../zustand";
 
 type Wert = Profil[string];
 
-/** Eingabe je Fragenart aus dem Fragebogen (packages/i18n/fragen.ts). */
-export function Antwort({ f, wert, setzen }: { f: Frage; wert: Wert | undefined; setzen: (w: Wert, weiter?: boolean) => void }) {
+/**
+ * Eingabe je Fragenart aus dem Fragebogen (packages/i18n/fragen.ts). `aufBlur`: Zahlen und Text erst beim Verlassen
+ * des Felds (oder mit der Eingabetaste) übernehmen – wo jede Antwort sofort neu rechnet („Kurz klären“).
+ */
+export function Antwort({ f, wert, setzen, aufBlur }: { f: Frage; wert: Wert | undefined; setzen: (w: Wert, weiter?: boolean) => void; aufBlur?: boolean }) {
   const optionen = Object.entries(f.optionen ?? {}).map(([k, t]) => ({ wert: k, text: t.de }));
   switch (f.art) {
     case "auswahl":
@@ -36,16 +39,17 @@ export function Antwort({ f, wert, setzen }: { f: Frage; wert: Wert | undefined;
       );
     case "zahl":
     case "betrag":
-      return <ZahlFeld label={f.frage.de} wert={typeof wert === "number" ? wert : null} setzen={(n) => setzen(n)} />;
+      return <ZahlFeld label={f.frage.de} wert={typeof wert === "number" ? wert : null} setzen={(n) => setzen(n)} aufBlur={aufBlur} />;
     case "datum":
       return <DatumFeld ohneLabel label={f.frage.de} wert={typeof wert === "string" ? wert : null} aendern={(d) => setzen(d)} />;
     default:
-      return <Feld ohneLabel label={f.frage.de} wert={typeof wert === "string" ? wert : ""} aendern={(t) => setzen(t || null)} />;
+      return aufBlur ? <TextFeld label={f.frage.de} wert={typeof wert === "string" ? wert : ""} setzen={(t) => setzen(t || null)} /> : <Feld ohneLabel label={f.frage.de} wert={typeof wert === "string" ? wert : ""} aendern={(t) => setzen(t || null)} />;
   }
 }
 
-function ZahlFeld({ label, wert, setzen }: { label: string; wert: number | null; setzen: (n: number | null) => void }) {
+function ZahlFeld({ label, wert, setzen, aufBlur }: { label: string; wert: number | null; setzen: (n: number | null) => void; aufBlur?: boolean }) {
   const [text, setText] = useState(wert === null ? "" : String(wert));
+  const uebernehmen = (t = text) => setzen(t === "" ? null : Number(t));
   return (
     <Feld
       ohneLabel
@@ -54,17 +58,24 @@ function ZahlFeld({ label, wert, setzen }: { label: string; wert: number | null;
       aendern={(t) => {
         const rein = t.replace(/[^0-9]/g, "");
         setText(rein);
-        setzen(rein === "" ? null : Number(rein));
+        if (!aufBlur) uebernehmen(rein);
       }}
+      onBlur={aufBlur ? () => uebernehmen() : undefined}
+      onSubmitEditing={aufBlur ? () => uebernehmen() : undefined}
       keyboardType="number-pad"
     />
   );
 }
 
-function Fortschritt({ n, aktuell }: { n: number; aktuell: number }) {
+function TextFeld({ label, wert, setzen }: { label: string; wert: string; setzen: (t: string) => void }) {
+  const [text, setText] = useState(wert);
+  return <Feld ohneLabel label={label} wert={text} aendern={setText} onBlur={() => setzen(text)} onSubmitEditing={() => setzen(text)} />;
+}
+
+function Fortschritt({ n, aktuell, label }: { n: number; aktuell: number; label?: string }) {
   const f = useFarben();
   return (
-    <View accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: n, now: aktuell }} style={{ flexDirection: "row", gap: 4, paddingHorizontal: RAND, paddingVertical: 10 }}>
+    <View accessibilityRole="progressbar" accessibilityLabel={label} accessibilityValue={{ min: 0, max: n, now: aktuell, text: label }} style={{ flexDirection: "row", gap: 4, paddingHorizontal: RAND, paddingVertical: 10 }}>
       {Array.from({ length: n }, (_, i) => (
         <View key={i} style={{ flex: 1, height: 4, borderRadius: 2, backgroundColor: i < aktuell ? f.amt : f.linie }} />
       ))}
@@ -91,8 +102,8 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
   const vorleser = useRef(false);
   useEffect(() => {
     // im Web meldet react-native-web immer „an“ – dort gibt es kein VoiceOver-Problem
-  if (Platform.OS === "web") return;
-  void AccessibilityInfo.isScreenReaderEnabled().then((an) => (vorleser.current = an));
+    if (Platform.OS === "web") return;
+    void AccessibilityInfo.isScreenReaderEnabled().then((an) => (vorleser.current = an));
     const abo = AccessibilityInfo.addEventListener("screenReaderChanged", (an: boolean) => (vorleser.current = an));
     return () => abo.remove();
   }, []);
@@ -106,6 +117,11 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
   const [zwischen, setZwischen] = useState(false);
   const zwischenschirm = zwischen && extraN > 0 && i === basisN;
   const frage = i >= 0 && !amEnde && !(zwischen && extraN > 0 && i === basisN) ? fragen[i] : undefined;
+  const schrittText = frage ? (extra.includes(frage.feld) ? TEXT.zusatz_schritt(i - basisN + 1, extraN) : TEXT.schritt(i + 1, basisN)) : "";
+  // neue Frage ansagen – sonst merkt VoiceOver den Wechsel nicht (der Fokus bleibt auf dem Weiter-Knopf)
+  useEffect(() => {
+    if (frage) AccessibilityInfo.announceForAccessibility(`${schrittText}: ${frage.frage.de}`);
+  }, [frage?.feld]);
   const weiter = () => {
     if (zeit.current) clearTimeout(zeit.current);
     if (i + 1 >= fragen.length && !voll) return nav.zurueck();
@@ -132,6 +148,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
     }
   }, [voll, amEnde, zusatz, z.stand.profil, liste]);
   const a = useMemo(() => (amEnde && voll && zusatz ? auswertung(z.stand.profil, heute(), z.stand.unterlagen) : null), [amEnde, voll, zusatz, z.stand.profil, z.stand.unterlagen]);
+  const bald = useMemo(() => (a ? dringlichkeit(a, { erledigt: z.stand.erledigt, unterlagen: z.stand.unterlagen, betrieb: z.stand.betrieb }, heute()).jetzt.length : 0), [a, z.stand.erledigt, z.stand.unterlagen, z.stand.betrieb]);
   // Auftakt, Zwischenstand und Ergebnis auf der Bühne (E-144); die Fragen selbst auf hellem Grund
   const buehne = i < 0 || zwischenschirm || Boolean(a);
   useKopf({ titel: TEXT.check_titel, schliessen: true, buehne });
@@ -139,7 +156,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
   return (
     <View style={{ flex: 1, backgroundColor: buehne ? f.buehne : f.papier }}>
       {buehne ? <HellerStatus /> : null}
-      {buehne ? null : i < basisN ? <Fortschritt n={basisN} aktuell={Math.max(0, i)} /> : extraN && !zwischenschirm && !amEnde ? <Fortschritt n={extraN} aktuell={i - basisN} /> : <Fortschritt n={1} aktuell={1} />}
+      {buehne ? null : i < basisN ? <Fortschritt n={basisN} aktuell={Math.max(0, i)} label={schrittText} /> : extraN && !zwischenschirm && !amEnde ? <Fortschritt n={extraN} aktuell={i - basisN} label={schrittText} /> : <Fortschritt n={1} aktuell={1} />}
       <TastaturRahmen grund={buehne ? f.buehne : undefined}>
         <ScrollView key={i} contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 12, paddingBottom: a ? 0 : 32, flexGrow: 1 }} keyboardShouldPersistTaps="handled">
           {i < 0 ? (
@@ -163,7 +180,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
             </View>
           ) : frage ? (
             <View>
-              <T v="caption" leise>{extra.includes(frage.feld) ? TEXT.zusatz_schritt(i - basisN + 1, extraN) : TEXT.schritt(i + 1, basisN)}</T>
+              <T v="caption" leise>{schrittText}</T>
               <T v="titel" accessibilityRole="header" stil={{ marginTop: 4 }}>{frage.frage.de}</T>
               {frage.hilfe ? <T leise stil={{ marginTop: 8 }}>{frage.hilfe.de}</T> : null}
               <View style={{ marginTop: 12 }}>
@@ -174,7 +191,9 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
             <View style={{ flexGrow: 1 }}>
               <View style={{ paddingTop: 12, paddingBottom: 28 }}>
                 <Symbol name="checkmark.circle.fill" groesse={60} farbe={f.minze} gewicht="regular" />
-                <T v="titel" accessibilityRole="header" farbe={f.buehneText} stil={{ marginTop: 18 }}>{TEXT.ergebnis_titel(a.gilt.length)}</T>
+                {/* groß, was bald ansteht; die Gesamtzahl klein – „47 Pflichten“ allein erschlägt */}
+                <T v="titel" accessibilityRole="header" farbe={f.buehneText} stil={{ marginTop: 18 }}>{TEXT.ergebnis_bald(bald)}</T>
+                <T v="klein" farbe={f.buehneLeise} stil={{ marginTop: 8 }}>{TEXT.ergebnis_gesamt(a.gilt.length, selten(a.gilt))}</T>
               </View>
               <View style={{ flexGrow: 1, marginHorizontal: -RAND, paddingHorizontal: RAND, paddingTop: 24, paddingBottom: 32, backgroundColor: f.papier, borderTopLeftRadius: RADIUS.buehne, borderTopRightRadius: RADIUS.buehne }}>
               {a.gilt.length ? (

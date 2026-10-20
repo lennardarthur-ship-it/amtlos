@@ -153,7 +153,7 @@ describe("Dokumentvorlagen", () => {
 
   it("Rechnung: Summen je Steuersatz, Kleinunternehmer-Hinweis, fehlende Steuernummer im Betrieb", () => {
     const r = vorlageFuer("rechnung")!;
-    const d = { ...leereDaten(r, BETRIEB, "2026-10-12"), nummer: "2026-001", leistung: "Oktober 2026", kunde_name: "Kim", kunde_anschrift: "Weg 1",
+    const d = { ...leereDaten(r, BETRIEB, "2026-10-12"), nummer: "2026-001", leistung: "Oktober 2026", kunde_name: "Kim", kunde_anschrift: "Weg 1\n12345 Musterstadt",
       positionen: [{ bezeichnung: "Haarschnitt", menge: "2", einheit: "", preis: "25,00", satz: "19" }, { bezeichnung: "Buch", menge: "1", einheit: "", preis: "10", satz: "7" }] };
     expect(erg(r, d)).toEqual([["Netto", "60,00 €"], ["Umsatzsteuer", "10,20 €"], ["Rechnungsbetrag", "70,20 €"]]);
     expect(fehlendeAngaben(r, d, BETRIEB)).toEqual([]);

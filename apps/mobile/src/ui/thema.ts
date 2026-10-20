@@ -18,7 +18,7 @@ const HELL = {
   linie: "#d5ddd9",
   linieLeise: "#e6ece9",
   /** Rahmen von Eingabefeldern: mindestens 3:1 (WCAG 1.4.11) */
-  rahmen: "#87958f",
+  rahmen: "#75837d",
   zeiger: "#b4c0bb",
   amt: "#0a7d55",
   amtTief: "#06573b",
@@ -88,6 +88,8 @@ const DUNKEL: typeof HELL = {
   schatten: 0,
 };
 export type Farben = typeof HELL;
+/** Minze ist hell und dunkel gleich – Zeichenfarbe der Leisten auf der Bühne (daran erkennen Kopfknöpfe die Bühne). */
+export const MINZE = HELL.minze;
 
 /** Schrift (E-142): Onest in fünf Schnitten – überall gleich (iPhone, Web-Vorschau, Store-Bilder). */
 export const SCHRIFT = {

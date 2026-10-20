@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Pressable, View } from "react-native";
 import { T as TEXT } from "../texte";
-import { Feld, Fuss, Hinweis, Karte, Knopf, Schalter, Symbol, T, TextKnopf } from "../ui/bausteine";
+import { Fuss, Hinweis, Karte, Knopf, PasswortFeld, Schalter, Symbol, T, TextKnopf } from "../ui/bausteine";
 import { useNav } from "../ui/navigation";
 import { useMeldung } from "../ui/meldung";
 import { RADIUS, useFarben } from "../ui/thema";
@@ -17,6 +17,22 @@ import { useProSperre } from "./Pro";
 /** Kurz warten, damit der Ladezustand gezeichnet ist, bevor die Schlüsselableitung den Thread belegt. */
 const gleich = () => new Promise((r) => setTimeout(r, 30));
 
+/**
+ * Neues Passwort zweimal: „Mindestens n Zeichen“ steht beim Tippen ruhig als Hilfe darunter und wird erst nach dem
+ * Verlassen des Felds zum Fehler; „stimmen nicht überein“ ebenso erst nach dem zweiten Feld.
+ */
+export function PasswortPaar({ label, pw, pw2, setPw, setPw2 }: { label: string; pw: string; pw2: string; setPw: (w: string) => void; setPw2: (w: string) => void }) {
+  const [verlassen1, setVerlassen1] = useState(false);
+  const [verlassen2, setVerlassen2] = useState(false);
+  const kurz = pw.length < PASSWORT_MINDESTLAENGE;
+  return (
+    <View>
+      <PasswortFeld neu label={label} wert={pw} aendern={setPw} onBlur={() => setVerlassen1(true)} hinweis={kurz ? TEXT.passwort_kurz(PASSWORT_MINDESTLAENGE) : null} fehler={verlassen1 && pw.length > 0 && kurz ? TEXT.passwort_kurz(PASSWORT_MINDESTLAENGE) : null} />
+      <PasswortFeld neu label={TEXT.passwort_wiederholen} wert={pw2} aendern={setPw2} onBlur={() => setVerlassen2(true)} fehler={(verlassen2 || pw2.length >= pw.length) && pw2.length > 0 && pw !== pw2 ? TEXT.passwort_ungleich : null} />
+    </View>
+  );
+}
+
 /** Daten verschlüsselt sichern (E-125): Passwort zweimal, dann Datei ins Teilen-Menü. Nichts geht im Klartext raus. */
 export function SicherungSeite() {
   const z = useAmtlos();
@@ -26,8 +42,6 @@ export function SicherungSeite() {
   const [pw2, setPw2] = useState("");
   const [laedt, setLaedt] = useState(false);
   const [meldung, setMeldung] = useState<{ art: "erfolg" | "fehler"; text: string } | null>(null);
-  const kurz = pw.length > 0 && pw.length < PASSWORT_MINDESTLAENGE;
-  const ungleich = pw2.length > 0 && pw !== pw2;
   const bereit = pw.length >= PASSWORT_MINDESTLAENGE && pw === pw2;
   const los = async () => {
     setMeldung(null);
@@ -64,8 +78,7 @@ export function SicherungSeite() {
           </Fuss>
       }
     >
-      <Feld label={TEXT.passwort} wert={pw} aendern={setPw} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="newPassword" fehler={kurz ? TEXT.passwort_kurz(PASSWORT_MINDESTLAENGE) : null} />
-      <Feld label={TEXT.passwort_wiederholen} wert={pw2} aendern={setPw2} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="newPassword" fehler={ungleich ? TEXT.passwort_ungleich : null} />
+      {erledigt ? null : <PasswortPaar label={TEXT.passwort} pw={pw} pw2={pw2} setPw={setPw} setPw2={setPw2} />}
       <View style={{ marginTop: 18 }}>
         <Hinweis art="warnung" text={TEXT.sicherung_warnung} symbol="lock" />
         {meldung ? <Hinweis art={meldung.art} text={meldung.text} /> : null}
@@ -155,7 +168,7 @@ export function WiederherstellenSeite({ fertig }: { fertig?: () => void }) {
           stil={{ marginLeft: 4, marginTop: 4 }}
         />
       ) : null}
-      {datei && !gelesen ? <Feld label={TEXT.passwort} wert={pw} aendern={setPw} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="password" onSubmitEditing={() => void oeffnen()} /> : null}
+      {datei && !gelesen ? <PasswortFeld label={TEXT.passwort} wert={pw} aendern={(w) => { setPw(w); setFehler(null); }} onSubmitEditing={() => void oeffnen()} /> : null}
       {hinweis ? <Hinweis text={hinweis} symbol="icloud" /> : null}
       {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
       {gelesen ? <Vorschau aktuell={z.stand} gelesen={gelesen} /> : null}
@@ -180,7 +193,9 @@ export function SicherungsKarte() {
   const nav = useNav();
   const f = useFarben();
   const faellig = sicherungFaellig(z.stand, new Date());
-  if (!faellig) return null;
+  // erst, wenn es etwas Unersetzliches gibt: eine geteilte Rechnung oder einen Beleg – nicht schon nach einem Entwurf
+  const wertvoll = z.stand.belege.length > 0 || z.stand.unterlagen.some((u) => u.vorlage === "rechnung" && (u.festgeschrieben || u.ausgegeben));
+  if (!faellig || !wertvoll) return null;
   return (
     // kompakt: eine Zeile mit Symbol, Satz und Pfeil – der Hinweis soll auffallen, nicht die Seite beherrschen
     <Pressable accessibilityRole="button" accessibilityLabel={`${TEXT.sicherung_faellig_titel}. ${TEXT.sicherung_faellig(faellig.tage)}`} onPress={() => nav.oeffnen("sicherung", () => <SicherungSeite />, true)} style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 14, padding: 14, borderRadius: RADIUS.karte, backgroundColor: f.baldHauch, marginBottom: 18, opacity: pressed ? 0.75 : 1 })}>
@@ -314,8 +329,7 @@ function CloudSicherungSeite() {
           </Fuss>
       }
     >
-      <Feld label={TEXT.passwort} wert={pw} aendern={setPw} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="newPassword" fehler={pw.length > 0 && pw.length < PASSWORT_MINDESTLAENGE ? TEXT.passwort_kurz(PASSWORT_MINDESTLAENGE) : null} />
-      <Feld label={TEXT.passwort_wiederholen} wert={pw2} aendern={setPw2} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="newPassword" fehler={pw2.length > 0 && pw !== pw2 ? TEXT.passwort_ungleich : null} />
+      <PasswortPaar label={TEXT.passwort} pw={pw} pw2={pw2} setPw={setPw} setPw2={setPw2} />
       <View style={{ marginTop: 18 }}>
         <Hinweis art="warnung" text={TEXT.sicherung_warnung} symbol="lock" />
         {fehler ? <Hinweis art="fehler" text={TEXT.icloud_fehler} /> : null}

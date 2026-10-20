@@ -142,19 +142,66 @@ export function naechsteNummer(vorhandene: string[], jahr: string): string {
   return `${max.vor}${String(max.zahl + 1).padStart(max.breite, "0")}`;
 }
 
+const TRENNER = [". ", "; ", " durch ", " (", ": ", " – ", ", "];
+
+/**
+ * Mögliche Schnittstellen eines Titels, aufsteigend: Trenner ab dem 12. Zeichen (davor wäre der Titel zu knapp), nie
+ * innerhalb einer Klammer, und der Rest endet auf ein Hauptwort bzw. eine Zahl – „Spitze, scharfe“ wäre ein halber Titel.
+ */
+function schnitte(s: string): number[] {
+  const tiefe: number[] = [];
+  let t = 0;
+  for (const z of s) {
+    if (z === "(") t++;
+    tiefe.push(t);
+    if (z === ")") t = Math.max(0, t - 1);
+  }
+  const r = new Set<number>();
+  for (const trenner of TRENNER)
+    for (let i = s.indexOf(trenner); i >= 0; i = s.indexOf(trenner, i + 1)) {
+      if (i < 12 || tiefe[i] !== 0) continue;
+      const letztes = /(\S+)$/.exec(s.slice(0, i))?.[1] ?? "";
+      // Satzende, keine Abkürzung („z. B.“, „Nr.“, „bzw.“)
+      if (trenner === ". " && (letztes.length < 3 || /^(bzw|ggf|usw|etc|vgl|Abs|inkl|evtl|max|min|ca|Std|Tel)$/i.test(letztes))) continue;
+      if (/^[\p{Lu}\d]/u.test(letztes) || /[)\d]$/.test(letztes)) r.add(i);
+    }
+  return [...r].sort((a, b) => a - b);
+}
+
+function gekuerzt(s: string, stufe: number): { text: string; weiter: boolean } {
+  const l = schnitte(s);
+  if (stufe < l.length) return { text: s.slice(0, l[stufe]), weiter: true };
+  if (s.length <= 70 || stufe > l.length) return { text: s, weiter: false };
+  return { text: `${s.slice(0, 60).replace(/\s+\S*$/, "")} …`, weiter: true };
+}
+
 /** Kurzer Titel für lange Vorschläge, z. B. „Ausrutschen, Stolpern und Stürzen durch glatte Böden …“ → „Ausrutschen, Stolpern und Stürzen“. */
 export function kurztitel(t: string): string {
-  const s = t.trim().replace(/\.$/, "");
-  // frühester Trenner ab dem 12. Zeichen – davor wäre der Titel zu knapp
-  let ende = -1;
-  for (const trenner of [" durch ", " (", ": ", " – ", ", "]) {
-    for (let i = s.indexOf(trenner); i >= 0; i = s.indexOf(trenner, i + 1))
-      if (i >= 12) {
-        if (ende < 0 || i < ende) ende = i;
-        break;
-      }
+  return gekuerzt(t.trim().replace(/\.$/, ""), 0).text;
+}
+
+/**
+ * Kurze Titel für eine ganze Liste: Ergeben zwei Titel denselben Kurztitel („Färben, Dauerwelle“ zweimal), werden beide
+ * bis zum nächsten Trenner verlängert – so lange, bis sie sich unterscheiden (notfalls der volle Titel).
+ */
+export function kurztitelListe(titel: string[]): string[] {
+  const s = titel.map((t) => t.trim().replace(/\.$/, ""));
+  const stufe = s.map(() => 0);
+  for (let runde = 0; runde < 20; runde++) {
+    const r = s.map((x, i) => gekuerzt(x, stufe[i]!));
+    const gruppen = new Map<string, number[]>();
+    r.forEach((x, i) => gruppen.set(x.text, [...(gruppen.get(x.text) ?? []), i]));
+    let geaendert = false;
+    for (const [, idx] of gruppen) {
+      // gleicher Volltitel: verlängern hilft nicht
+      if (idx.length < 2 || new Set(idx.map((i) => s[i])).size < 2) continue;
+      for (const i of idx)
+        if (r[i]!.weiter) {
+          stufe[i]!++;
+          geaendert = true;
+        }
+    }
+    if (!geaendert) return r.map((x) => x.text);
   }
-  if (ende > 0) return s.slice(0, ende);
-  if (s.length <= 70) return s;
-  return `${s.slice(0, 60).replace(/\s+\S*$/, "")} …`;
+  return s.map((x, i) => gekuerzt(x, stufe[i]!).text);
 }

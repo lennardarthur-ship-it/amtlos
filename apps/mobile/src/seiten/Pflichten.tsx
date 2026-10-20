@@ -1,19 +1,20 @@
+import { useIsFocused } from "@react-navigation/native";
 import { useEffect, useMemo, useState } from "react";
 import { Linking, View } from "react-native";
 import { vorlageFuer } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { useMeldung } from "../ui/meldung";
-import { Fristblatt, Fuss, Hinweis, Kachel, Karte, Knopf, Schalter, SchnellKachel, Symbol, T, TextKnopf, Zeile, tageBis } from "../ui/bausteine";
+import { BausteinListe, Fristblatt, Fuss, Hinweis, Kachel, Karte, Knopf, Schalter, SchnellKachel, Symbol, T, TextKnopf, Zeile, tageBis } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { HAARLINIE, SCHRIFT, useFarben, weich } from "../ui/thema";
-import { KATEGORIE_TITEL, auswertung, beantwortet, dringlichkeit, erinnerungsPlan, fortschritt, frageZu, haken, istErledigt, offeneFragenNachWirkung, type PflichtInfo } from "../pflichten/check";
+import { KATEGORIE_TITEL, auswertung, beantwortet, dringlichkeit, erinnerungsPlan, fortschritt, frageZu, gruendungsSchritte, haken, istErledigt, offeneFragenNachWirkung, selten, type PflichtInfo } from "../pflichten/check";
 import { allesAbsagen, erinnerungenMoeglich, erlaubnisAnfragen, planen } from "../pflichten/erinnerungen";
 import { heute } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { Antwort, CheckAblauf } from "./Check";
 import { SicherungsKarte } from "./Sicherung";
 import { BuehnenBlatt, BuehnenKnopf, BuehnenSeite, Gruppe, Inhalt, datumKurz } from "./gemeinsam";
-import { useStarten } from "./starten";
+import { useOeffnen, useStarten } from "./starten";
 import { useErstellen } from "./Erstellen";
 
 const datumDe = (iso: string) => datumKurz(`${iso}T12:00:00Z`);
@@ -28,10 +29,10 @@ export function useAuswertung() {
 /** Hat jemand den Check schon gemacht? (die erste Frage ist beantwortet) */
 export const checkGemacht = (profil: Record<string, unknown>) => beantwortet(profil as never, "taetigkeit.branchen") || beantwortet(profil as never, "rechtsform");
 
-export function Balken({ prozent, grund, farbe }: { prozent: number; grund?: string; farbe?: string }) {
+export function Balken({ prozent, grund, farbe, label }: { prozent: number; grund?: string; farbe?: string; label?: string }) {
   const f = useFarben();
   return (
-    <View accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: 100, now: prozent }} style={{ height: 8, borderRadius: 4, backgroundColor: grund ?? f.linie, overflow: "hidden" }}>
+    <View accessibilityRole="progressbar" accessibilityLabel={label} accessibilityValue={{ min: 0, max: 100, now: prozent, text: label }} style={{ height: 8, borderRadius: 4, backgroundColor: grund ?? f.linie, overflow: "hidden" }}>
       <View style={{ width: `${Math.max(prozent, 2)}%`, height: 8, borderRadius: 4, backgroundColor: farbe ?? f.amt }} />
     </View>
   );
@@ -41,10 +42,13 @@ function PflichtDetail({ id }: { id: string }) {
   const z = useAmtlos();
   const f = useFarben();
   const starten = useStarten();
+  const oeffnen = useOeffnen();
   const melden = useMeldung();
   const a = useAuswertung();
   const p = [...a.gilt, ...a.gruendung, ...a.unbekannt].find((x) => x.id === id);
   if (!p) return <Unterseite titel="">{null}</Unterseite>;
+  // schon angefangen? Dann die vorhandene Unterlage öffnen statt mit „Ausfüllen“ eine zweite anzulegen
+  const vorhanden = p.vorlage ? z.stand.unterlagen.filter((u) => u.vorlage === p.vorlage && !u.storniertDurch).sort((x, y) => (y.ausgegeben ?? y.geaendert).localeCompare(x.ausgegeben ?? x.geaendert))[0] : undefined;
   const gilt = a.gilt.includes(p) || a.gruendung.includes(p);
   const abgehakt = istErledigt(p, { ...z.stand, unterlagen: [] });
   // wiederkehrend: der Haken gilt für den nächsten Termin, danach ist die Pflicht wieder offen
@@ -73,7 +77,7 @@ function PflichtDetail({ id }: { id: string }) {
         // Haken als zweiter Knopf im Fuß – nicht als Textlink halb unter der Leiste
         <>
           <Knopf ton text={abgehakt ? TEXT.haken_entfernen_kurz : TEXT.als_erledigt_kurz} symbol={abgehakt ? "xmark" : "checkmark"} onPress={abhaken} stil={{ flex: 1 }} />
-          <Knopf text={TEXT.unterlage_erstellen_kurz} symbol="plus" onPress={() => starten(p.vorlage!)} stil={{ flex: 1.3 }} />
+          {vorhanden ? <Knopf text={TEXT.unterlage_oeffnen_kurz} onPress={() => oeffnen(vorhanden.id)} stil={{ flex: 1.3 }} /> : <Knopf text={TEXT.unterlage_erstellen_kurz} symbol="plus" onPress={() => starten(p.vorlage!)} stil={{ flex: 1.3 }} />}
         </>
       ) : (
         <Knopf ton={abgehakt} text={abgehakt ? TEXT.haken_entfernen : TEXT.als_erledigt} symbol={abgehakt ? undefined : "checkmark"} onPress={abhaken} stil={{ flex: 1 }} />
@@ -91,7 +95,8 @@ function PflichtDetail({ id }: { id: string }) {
         termin ? (
           // der nächste Termin groß: Tage bis dahin und das Datum – das Wichtigste zuerst
           <View style={{ flexDirection: "row", alignItems: "flex-end", gap: 12, marginTop: 6 }}>
-            <T farbe={tage < 0 ? "#ffc9c4" : f.minze} stil={{ ...SCHRIFT.display, fontSize: 52, lineHeight: 54, letterSpacing: -2 }}>{String(Math.abs(tage))}</T>
+            {/* die Zahl steht daneben in Worten („In 11 Tagen fällig“) – für VoiceOver verborgen */}
+            <T accessibilityElementsHidden importantForAccessibility="no" aria-hidden maxFontSizeMultiplier={1.4} farbe={tage < 0 ? "#ffc9c4" : f.minze} stil={{ ...SCHRIFT.display, fontSize: 52, lineHeight: 54, letterSpacing: -2 }}>{String(Math.abs(tage))}</T>
             <View style={{ paddingBottom: 6, flex: 1 }}>
               <T fett farbe={f.buehneText}>{fristText(termin)}</T>
               <T v="klein" farbe={f.buehneLeise}>{new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(new Date(`${termin}T12:00:00Z`))}</T>
@@ -106,6 +111,13 @@ function PflichtDetail({ id }: { id: string }) {
       }
     >
       {durchUnterlage ? <Hinweis art="erfolg" text={TEXT.erledigt_durch_unterlage} /> : null}
+      {gilt && vorhanden ? (
+        <Karte stil={{ marginTop: 8 }}>
+          <Zeile symbol="doc.text" ton="amt" titel={TEXT.deine_unterlage(vorlageFuer(vorhanden.vorlage)?.titel ?? vorhanden.vorlage)} text={vorhanden.ausgegeben ? TEXT.unterlage_geteilt_am(datumKurz(vorhanden.ausgegeben)) : TEXT.unterlage_entwurf_vom(datumKurz(vorhanden.geaendert))} onPress={() => oeffnen(vorhanden.id)} letzte />
+        </Karte>
+      ) : null}
+      {/* einmalige Pflicht mit Vorlage: erledigt ist sie erst, wenn die Unterlage gedruckt oder geteilt ist */}
+      {gilt && p.vorlage && !p.wiederkehrend && !abgehakt && !durchUnterlage ? <Hinweis text={TEXT.pflicht_drucken_erledigt} /> : null}
       {p.wiederkehrend && p.naechsterTermin ? <Hinweis text={TEXT.wiederkehrend_hinweis(datumDe(p.naechsterTermin))} /> : null}
       <Karte stil={{ marginTop: 8, paddingTop: 0 }}>
         {p.grund ? zeile(TEXT.warum, p.grund) : null}
@@ -211,23 +223,24 @@ function PflichtenInhalt() {
         </Gruppe>
       ) : (
         <Gruppe erste titel={TEXT.jetzt_dran(0)}>
-          <Hinweis art="erfolg" text={TEXT.nichts_dran} />
+          <Hinweis art="erfolg" text={nichtsDranText(z.stand.erinnerungen)} />
         </Gruppe>
       )}
-      {d.diesenMonat.length ? (
-        <Gruppe titel={TEXT.diesen_monat(d.diesenMonat.length)}>
+      <SchonErledigt />
+      {d.naechsteWochen.length ? (
+        <Gruppe titel={TEXT.naechste_wochen(d.naechsteWochen.length)}>
           <Karte>
-            {d.diesenMonat.map((p, i) => (
-              <PflichtZeile key={p.id} p={p} erledigt={false} letzte={i === d.diesenMonat.length - 1} />
+            {d.naechsteWochen.map((p, i) => (
+              <PflichtZeile key={p.id} p={p} erledigt={false} letzte={i === d.naechsteWochen.length - 1} />
             ))}
           </Karte>
         </Gruppe>
       ) : null}
       <ErinnerungsSchalter />
-      {offen.length ? <KurzKlaeren offen={offen} unklar={a.unbekannt.length} /> : null}
+      <KurzKlaeren offen={offen} unklar={a.unbekannt.length} />
       <T v="gross" accessibilityRole="header" stil={{ marginTop: 30, marginLeft: 2 }}>{TEXT.alle_nach_bereich}</T>
       {/* die vollständige Liste erst auf Wunsch – oben steht, was jetzt zu tun ist */}
-      <TextKnopf symbol={alleZeigen ? "chevron.up" : "chevron.down"} text={alleZeigen ? TEXT.liste_verbergen : TEXT.alle_pflichten_zeigen(a.gilt.length)} onPress={() => { weich(); setAlleZeigen(!alleZeigen); }} stil={{ marginLeft: 4 }} />
+      <TextKnopf erweitert={alleZeigen} symbol={alleZeigen ? "chevron.up" : "chevron.down"} text={alleZeigen ? TEXT.liste_verbergen : TEXT.alle_pflichten_zeigen(a.gilt.length)} onPress={() => { weich(); setAlleZeigen(!alleZeigen); }} stil={{ marginLeft: 4 }} />
       {alleZeigen && kategorien.map((k) => {
         const l = a.gilt.filter((p) => p.kategorie === k);
         return (
@@ -252,7 +265,7 @@ function PflichtenInhalt() {
       {a.gruendung.length ? (
         <Gruppe titel={TEXT.gruendung_titel(a.gruendung.length)} fuss={TEXT.gruendung_text}>
           {a.gruendung.some((p) => !fertig(p)) ? <Knopf ton symbol="checkmark" text={TEXT.gruendung_alle} onPress={() => a.gruendung.filter((p) => !fertig(p)).forEach((p) => z.erledigtSetzen(p.id, heute()))} /> : null}
-          <TextKnopf symbol={gruendungZeigen ? "chevron.up" : "chevron.down"} text={gruendungZeigen ? TEXT.liste_verbergen : TEXT.liste_zeigen} onPress={() => { weich(); setGruendungZeigen(!gruendungZeigen); }} stil={{ marginLeft: 4 }} />
+          <TextKnopf erweitert={gruendungZeigen} symbol={gruendungZeigen ? "chevron.up" : "chevron.down"} text={gruendungZeigen ? TEXT.liste_verbergen : TEXT.liste_zeigen} onPress={() => { weich(); setGruendungZeigen(!gruendungZeigen); }} stil={{ marginLeft: 4 }} />
           {gruendungZeigen ? (
             <Karte>
               {a.gruendung.map((p, i) => (
@@ -264,7 +277,7 @@ function PflichtenInhalt() {
       ) : null}
       {a.unbekannt.length ? (
         <Gruppe titel={TEXT.offen_angaben_titel(a.unbekannt.length)} fuss={TEXT.offen_angaben_text}>
-          <TextKnopf symbol={zeigen ? "chevron.up" : "chevron.down"} text={zeigen ? TEXT.liste_verbergen : TEXT.liste_zeigen} onPress={() => { weich(); setZeigen(!zeigen); }} stil={{ marginLeft: 4 }} />
+          <TextKnopf erweitert={zeigen} symbol={zeigen ? "chevron.up" : "chevron.down"} text={zeigen ? TEXT.liste_verbergen : TEXT.liste_zeigen} onPress={() => { weich(); setZeigen(!zeigen); }} stil={{ marginLeft: 4 }} />
           {zeigen ? (
             <Karte>
               {a.unbekannt.map((p, i) => (
@@ -282,29 +295,78 @@ function PflichtenInhalt() {
 
 /**
  * „Kurz klären“ (E-129): statt einer langen Liste unklarer Pflichten die drei Fragen, die am meisten klären – direkt
- * hier beantwortbar. Jede Antwort rechnet sofort neu.
+ * hier beantwortbar. Die gezeigten Fragen bleiben stehen, solange die Seite sichtbar ist (Stand beim Erscheinen):
+ * sonst verschwände eine Frage mitten in der Antwort (Mehrfachauswahl, Zahl nach der ersten Ziffer). Neu gewählt wird
+ * erst, wenn man zurückkommt; beantwortete Fragen zeigen dann kein „klärt …“ mehr.
  */
 function KurzKlaeren({ offen, unklar }: { offen: { feld: string; anzahl: number }[]; unklar: number }) {
   const z = useAmtlos();
   const nav = useNav();
   const f = useFarben();
-  const oben = offen.slice(0, 3);
+  const sichtbar = useIsFocused();
+  const [felder, setFelder] = useState(() => offen.slice(0, 3).map((o) => o.feld));
+  useEffect(() => {
+    if (sichtbar) setFelder(offen.slice(0, 3).map((o) => o.feld));
+    // nur beim Erscheinen neu wählen – nicht bei jeder Antwort
+  }, [sichtbar]);
+  if (!felder.length) return null;
+  const weitere = offen.filter((o) => !felder.includes(o.feld));
   return (
     <Gruppe titel={TEXT.kurz_klaeren_titel} fuss={TEXT.kurz_klaeren_text(unklar)}>
       <View style={{ gap: 22 }}>
-        {oben.map((o) => {
-          const fr = frageZu(o.feld);
+        {felder.map((feld) => {
+          const fr = frageZu(feld);
           if (!fr) return null;
+          const anzahl = offen.find((o) => o.feld === feld)?.anzahl ?? 0;
           return (
-            <View key={o.feld} style={{ gap: 6 }}>
+            <View key={feld} style={{ gap: 6 }}>
               <T fett>{fr.frage.de}</T>
-              <T v="caption" farbe={f.amt}>{TEXT.klaert(o.anzahl)}</T>
-              <Antwort f={fr} wert={z.stand.profil[o.feld]} setzen={(w) => z.profilSetzen({ [o.feld]: w })} />
+              {anzahl && !beantwortet(z.stand.profil, feld) ? <T v="caption" farbe={f.amt}>{TEXT.klaert(anzahl)}</T> : null}
+              <Antwort f={fr} wert={z.stand.profil[feld]} setzen={(w) => z.profilSetzen({ [feld]: w })} aufBlur />
             </View>
           );
         })}
       </View>
-      {offen.length > oben.length ? <TextKnopf symbol="questionmark.circle" text={TEXT.weitere_fragen(offen.length - oben.length)} onPress={() => nav.oeffnen("nachfragen", () => <CheckAblauf felder={offen.slice(oben.length).map((o) => o.feld)} />, true)} stil={{ marginLeft: 4 }} /> : null}
+      {weitere.length ? <TextKnopf symbol="questionmark.circle" text={TEXT.weitere_fragen(weitere.length)} onPress={() => nav.oeffnen("nachfragen", () => <CheckAblauf felder={weitere.map((o) => o.feld)} />, true)} stil={{ marginLeft: 4 }} /> : null}
+    </Gruppe>
+  );
+}
+
+/** „Gerade ist nichts dringend.“ – und nur dann eine Erinnerung versprechen, wenn sie eingeschaltet ist. */
+export function nichtsDranText(erinnerungen: boolean): string {
+  return erinnerungenMoeglich ? `${TEXT.nichts_dran} ${TEXT.nichts_dran_erinnerung(erinnerungen)}` : TEXT.nichts_dran;
+}
+
+/**
+ * „Schon erledigt?“ für junge Betriebe (weniger als sechs Monate): die offenen Gründungsschritte zum Ankreuzen –
+ * mehrere auf einmal abhaken statt jede Pflicht einzeln zu öffnen.
+ */
+function SchonErledigt() {
+  const z = useAmtlos();
+  const melden = useMeldung();
+  const a = useAuswertung();
+  const { erledigt, unterlagen, betrieb, profil } = z.stand;
+  const tag = heute();
+  const l = useMemo(() => gruendungsSchritte(a, profil, { erledigt, unterlagen, betrieb }, tag), [a, profil, erledigt, unterlagen, betrieb, tag]);
+  const [gewaehlt, setGewaehlt] = useState<string[]>([]);
+  if (!l.length) return null;
+  const auswahl = gewaehlt.filter((id) => l.some((p) => p.id === id));
+  return (
+    <Gruppe titel={TEXT.schon_erledigt_titel} hilfe={TEXT.schon_erledigt_text}>
+      <Karte stil={{ paddingBottom: 14 }}>
+        <BausteinListe label={TEXT.schon_erledigt_titel} werte={auswahl} aendern={setGewaehlt} optionen={l.map((p) => ({ wert: p.id, text: p.titel }))} />
+        <Knopf
+          ton
+          text={TEXT.schon_erledigt_knopf(auswahl.length)}
+          deaktiviert={!auswahl.length}
+          onPress={() => {
+            for (const id of auswahl) z.erledigtSetzen(id, heute());
+            melden(TEXT.schon_erledigt_fertig(auswahl.length));
+            setGewaehlt([]);
+          }}
+          stil={{ marginTop: 12 }}
+        />
+      </Karte>
     </Gruppe>
   );
 }
@@ -382,17 +444,20 @@ function jahresblick(gilt: PflichtInfo[], tag: string) {
 function Jahresblick({ gilt, tag }: { gilt: PflichtInfo[]; tag: string }) {
   const f = useFarben();
   const monate = useMemo(() => jahresblick(gilt, tag), [gilt, tag]);
+  // VoiceOver: eine Zusammenfassung für die ganze Reihe (nur Monate mit Terminen) statt zwölf einzelner Kacheln
+  const zusammen = TEXT.jahr_zusammen(monate.filter((m) => m.termine).map((m) => TEXT.monat_termine(m.lang, m.termine)));
   return (
-    <View accessibilityLabel={TEXT.jahr_hinweis} style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
+    <View accessible accessibilityRole="summary" accessibilityLabel={zusammen} style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
       {monate.map((mo) => (
         <View
           key={mo.schluessel}
           accessible
+          accessibilityRole="text"
           accessibilityLabel={TEXT.monat_termine(mo.lang, mo.termine)}
-          style={{ width: "15.2%", flexGrow: 1, height: 54, borderRadius: 14, padding: 7, justifyContent: "space-between", backgroundColor: mo.jetzt ? f.minze : mo.termine ? "rgba(127,227,184,0.16)" : "transparent", borderWidth: mo.jetzt || mo.termine ? 0 : 1.5, borderStyle: "dashed", borderColor: "rgba(255,255,255,0.3)" }}
+          style={{ width: "15.2%", flexGrow: 1, minHeight: 54, borderRadius: 14, padding: 7, justifyContent: "space-between", backgroundColor: mo.jetzt ? f.minze : mo.termine ? "rgba(127,227,184,0.16)" : "transparent", borderWidth: mo.jetzt || mo.termine ? 0 : 1.5, borderStyle: "dashed", borderColor: "rgba(255,255,255,0.3)" }}
         >
-          <T v="caption" farbe={mo.jetzt ? f.buehneKnopfText : f.buehneLeise} stil={{ ...SCHRIFT.halb, fontSize: 12, lineHeight: 14 }}>{mo.kurz}</T>
-          {mo.termine ? <T farbe={mo.jetzt ? f.buehneKnopfText : f.buehneText} stil={{ ...SCHRIFT.display, fontSize: 17, lineHeight: 19 }}>{String(mo.termine)}</T> : null}
+          <T v="caption" maxFontSizeMultiplier={1.5} farbe={mo.jetzt ? f.buehneKnopfText : f.buehneLeise} stil={{ ...SCHRIFT.halb, fontSize: 12, lineHeight: 14 }}>{mo.kurz}</T>
+          {mo.termine ? <T maxFontSizeMultiplier={1.5} farbe={mo.jetzt ? f.buehneKnopfText : f.buehneText} stil={{ ...SCHRIFT.display, fontSize: 17, lineHeight: 19 }}>{String(mo.termine)}</T> : null}
         </View>
       ))}
     </View>
@@ -407,16 +472,25 @@ export function PflichtenTab() {
   const a = useAuswertung();
   const gemacht = checkGemacht(z.stand.profil);
   const { erledigt, unterlagen, betrieb } = z.stand;
-  const fs = useMemo(() => fortschritt(a, { erledigt, unterlagen, betrieb }), [a, erledigt, unterlagen, betrieb]);
+  const tag = heute();
+  const { fs, bald } = useMemo(() => {
+    const e = { erledigt, unterlagen, betrieb };
+    return { fs: fortschritt(a, e), bald: dringlichkeit(a, e, tag).jetzt.length };
+  }, [a, erledigt, unterlagen, betrieb, tag]);
   const check = () => nav.oeffnen("check", () => <CheckAblauf einleitung={!gemacht} />, true);
   return (
     <BuehnenSeite
       ueber={gemacht ? TEXT.fortschritt_text(fs.fertig, fs.gesamt) : TEXT.tabs.pflichten}
-      rechts={gemacht ? <BuehnenKnopf text={TEXT.jahr_neu_pruefen} label={TEXT.angaben_aendern} onPress={check} /> : undefined}
-      titel={gemacht ? TEXT.jahr_titel : TEXT.pflichten_karte_titel}
+      rechts={gemacht ? <BuehnenKnopf text={TEXT.jahr_neu_pruefen} onPress={check} /> : undefined}
+      // groß, was in den nächsten zwei Wochen ansteht – die Gesamtzahl klein darunter (sie erschlägt sonst)
+      titel={gemacht ? TEXT.ergebnis_bald(bald) : TEXT.pflichten_karte_titel}
       buehne={
         gemacht ? (
-          <Jahresblick gilt={a.gilt} tag={heute()} />
+          <View style={{ gap: 14 }}>
+            <T v="klein" farbe={f.buehneLeise} stil={{ marginTop: -10 }}>{TEXT.ergebnis_gesamt(a.gilt.length, selten(a.gilt))}</T>
+            <T v="klein" fett accessibilityRole="header" farbe={f.buehneText} stil={{ marginTop: 8 }}>{TEXT.jahr_titel}</T>
+            <Jahresblick gilt={a.gilt} tag={tag} />
+          </View>
         ) : (
           <View style={{ gap: 18 }}>
             <T farbe={f.buehneLeise}>{TEXT.pflichten_einladung}</T>
@@ -448,7 +522,13 @@ function ErinnerungsSchalter() {
           void erlaubnisAnfragen().then((ok) => (ok ? z.erinnerungenSetzen(true) : setFehler(true)));
         }}
       />
-      {fehler ? <Hinweis art="fehler" text={TEXT.erinnern_verweigert} /> : null}
+      {/* bleibt stehen, bis man es erneut versucht – mit dem Weg in die Einstellungen */}
+      {fehler ? (
+        <View>
+          <Hinweis art="fehler" text={TEXT.erinnern_verweigert} />
+          <TextKnopf symbol="gearshape" text={TEXT.einstellungen_oeffnen} onPress={() => void Linking.openSettings()} stil={{ marginLeft: 4 }} />
+        </View>
+      ) : null}
     </Karte>
   );
 }

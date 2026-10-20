@@ -3,8 +3,8 @@ import { DarkTheme, DefaultTheme, NavigationContainer, createNavigationContainer
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, AppState, InputAccessoryView, Keyboard, Pressable, View, useColorScheme } from "react-native";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ActivityIndicator, AppState, InputAccessoryView, Keyboard, Pressable, View, useColorScheme, useWindowDimensions } from "react-native";
 import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Betrieb } from "./seiten/Betrieb";
 import { ErinnerungsPlaner, PflichtenTab } from "./seiten/Pflichten";
@@ -41,6 +41,9 @@ function Kapsel({ state, navigation }: BottomTabBarProps) {
   const f = useFarben();
   const inset = useSafeAreaInsets();
   const erstellen = useErstellen();
+  // große Schrift: das Wort in der Pille passt dann nicht mehr neben vier Symbole und „+“ – nur noch Symbole; lange
+  // drücken zeigt den Namen groß (Large Content Viewer, iOS)
+  const mitWort = useWindowDimensions().fontScale <= 1.35;
   return (
     <View pointerEvents="box-none" style={{ position: "absolute", left: 0, right: 0, bottom: Math.max(inset.bottom - 6, 14), paddingHorizontal: 20 }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 4, height: 66, paddingLeft: 7, paddingRight: 7, borderRadius: 33, backgroundColor: f.kapsel, shadowColor: "#000", shadowOpacity: 0.25, shadowRadius: 18, shadowOffset: { width: 0, height: 10 }, elevation: 8 }}>
@@ -54,21 +57,24 @@ function Kapsel({ state, navigation }: BottomTabBarProps) {
                 accessibilityRole="tab"
                 accessibilityLabel={TEXT.tabs[k.id]}
                 accessibilityState={{ selected: an }}
+                aria-selected={an}
+                accessibilityShowsLargeContentViewer
+                accessibilityLargeContentTitle={TEXT.tabs[k.id]}
                 onPress={() => {
                   const e = navigation.emit({ type: "tabPress", target: r.key, canPreventDefault: true });
                   // erneutes Tippen auf den aktiven Tab: der Stapel kehrt selbst zur ersten Seite zurück
                   if (!an && !e.defaultPrevented) navigation.navigate(r.name);
                 }}
                 hitSlop={4}
-                style={({ pressed }) => ({ height: 52, minWidth: 52, paddingHorizontal: an ? 15 : 0, borderRadius: 26, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7, backgroundColor: an ? "rgba(127,227,184,0.16)" : "transparent", opacity: pressed ? 0.7 : 1 })}
+                style={({ pressed }) => ({ height: 52, minWidth: 52, paddingHorizontal: an && mitWort ? 15 : 0, borderRadius: 26, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7, backgroundColor: an ? "rgba(127,227,184,0.16)" : "transparent", opacity: pressed ? 0.7 : 1 })}
               >
                 <Symbol name={an ? k.symbolAn : k.symbol} groesse={21} farbe={an ? f.minze : "rgba(255,255,255,0.72)"} gewicht={an ? "semibold" : "regular"} />
-                {an ? <T v="klein" farbe={f.minze} stil={{ ...SCHRIFT.bold }} numberOfLines={1}>{TEXT.tabs_kurz[k.id]}</T> : null}
+                {an && mitWort ? <T v="klein" farbe={f.minze} stil={{ ...SCHRIFT.bold }} numberOfLines={1} maxFontSizeMultiplier={1.35}>{TEXT.tabs_kurz[k.id]}</T> : null}
               </Pressable>
             );
           })}
         </View>
-        <Pressable accessibilityRole="button" accessibilityLabel={TEXT.erstellen} onPress={erstellen.oeffnen} hitSlop={4} style={({ pressed }) => ({ width: 52, height: 52, borderRadius: 26, marginLeft: 6, backgroundColor: f.minze, alignItems: "center", justifyContent: "center", transform: [{ scale: pressed ? 0.94 : 1 }] })}>
+        <Pressable accessibilityRole="button" accessibilityLabel={TEXT.neu_titel} accessibilityShowsLargeContentViewer accessibilityLargeContentTitle={TEXT.neu_titel} onPress={erstellen.oeffnen} hitSlop={4} style={({ pressed }) => ({ width: 52, height: 52, borderRadius: 26, marginLeft: 6, backgroundColor: f.minze, alignItems: "center", justifyContent: "center", transform: [{ scale: pressed ? 0.94 : 1 }] })}>
           <Symbol name="plus" groesse={22} farbe={f.buehneKnopfText} gewicht="bold" />
         </Pressable>
       </View>
@@ -124,9 +130,15 @@ function Navigation({ erste }: { erste: () => React.JSX.Element }) {
     const basis = dunkel ? DarkTheme : DefaultTheme;
     return { ...basis, colors: { ...basis.colors, primary: f.amt, background: f.papier, card: f.papier, text: f.tinte, border: f.linie } };
   }, [dunkel, f]);
+  // Tab im Zustand und Tab in der Navigation abgleichen – über den zuletzt abgeglichenen Tab, nicht über den Vergleich
+  // beider Seiten: Ändern sich beide im selben Durchgang (Blatt schließt, Tab wechselt), liefen sie sonst gegeneinander
+  // („heute“ ↔ „pflichten“ ohne Ende, React-Fehler #185). Jede Seite meldet nur, was sich bei ihr geändert hat.
+  const abgeglichen = useRef<Tab>(tab);
   // Tab aus dem Zustand (z. B. „Zu den Unterlagen“) → Navigation
   useEffect(() => {
-    if (navRef.isReady() && aktiverTab() && aktiverTab() !== tab) navRef.navigate("Tabs", { screen: tab }, { pop: true });
+    if (tab === abgeglichen.current) return;
+    abgeglichen.current = tab;
+    if (navRef.isReady() && aktiverTab() !== tab) navRef.navigate("Tabs", { screen: tab }, { pop: true });
   }, [tab]);
   const wurzelNav = navRef as unknown as NavigationProp<ParamListBase>;
   return (
@@ -135,8 +147,11 @@ function Navigation({ erste }: { erste: () => React.JSX.Element }) {
         ref={navRef}
         theme={thema}
         onStateChange={() => {
+          // Navigation (Tippen auf einen Tab, Zurück) → Zustand – nur, wenn sich der sichtbare Tab wirklich geändert hat
           const t = aktiverTab();
-          if (t && t !== tab) tabWechseln(t);
+          if (!t || t === abgeglichen.current) return;
+          abgeglichen.current = t;
+          tabWechseln(t);
         }}
       >
         <Wurzel.Navigator screenOptions={{ ...kopfOptionen(f), headerShown: false }}>

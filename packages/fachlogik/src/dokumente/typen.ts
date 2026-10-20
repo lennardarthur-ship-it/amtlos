@@ -85,7 +85,8 @@ interface FeldBasis {
 
 export type EinfachesFeld =
   /** `vorschlaege`: antippbare Formulierungen – bei „text“ ersetzen sie den Inhalt, bei „mehrzeilig“ kommen sie als neue Zeile dazu */
-  | (FeldBasis & { art: "text" | "mehrzeilig"; vorbelegung?: "verantwortlich" | "betrieb_kontakt"; vorschlaege?: string[] })
+  /** `vorbelegung`: Angaben aus „Mein Betrieb“ oder ein fester Startwert (`{ text: "Stück" }`) */
+  | (FeldBasis & { art: "text" | "mehrzeilig"; vorbelegung?: "verantwortlich" | "betrieb_kontakt" | { text: string }; vorschlaege?: string[] })
   | (FeldBasis & { art: "datum"; vorbelegung?: "heute" })
   | (FeldBasis & { art: "uhrzeit" })
   /** Euro-Betrag, gespeichert wie eingegeben („1.234,50“) */
@@ -187,6 +188,8 @@ export interface Vorlage {
   ergebnis?(daten: Daten): [string, string][];
   /** Fehlende Angaben außerhalb des Formulars, z. B. in „Mein Betrieb“ */
   pruefen?(daten: Daten, betrieb: Betrieb): string[];
+  /** Meldung aus `pruefen` → Feld, bei dem man sie behebt (für „Ergänzen“ im Abschluss) */
+  pruefenZu?: Record<string, string>;
   /** Reiner Text zum Kopieren, z. B. für die Website */
   alsText?(daten: Daten, betrieb: Betrieb): string;
 }

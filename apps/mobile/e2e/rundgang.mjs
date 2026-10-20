@@ -23,7 +23,9 @@ const srv = http.createServer((req, res) => {
   res.writeHead(200, { "Content-Type": ext === ".js" ? "text/javascript" : ext === ".css" ? "text/css" : ext === ".ttf" ? "font/ttf" : "text/html" });
   fs.createReadStream(p).pipe(res);
 });
-await new Promise((r) => srv.listen(4998, r));
+// freier Port – mehrere Rundgänge (hell, dunkel) dürfen gleichzeitig laufen
+await new Promise((r) => srv.listen(Number(process.env.PORT) || 0, r));
+const ADRESSE = `http://localhost:${srv.address().port}/`;
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PFAD || "/opt/pw-browsers/chromium", headless: true, args: ["--no-sandbox"] });
 const schema = process.env.DUNKEL ? "dark" : "light";
 const ctx = await browser.newContext({ viewport: { width: 393, height: 852 }, deviceScaleFactor: 2, colorScheme: schema, locale: "de-DE" });
@@ -57,18 +59,18 @@ async function zurueck() {
 }
 /** Blatt „Neu erstellen“ über den „+“-Knopf in der Tab-Leiste (E-138) */
 async function neu() {
-  // „+“ sitzt auf „Heute“ und „Unterlagen“ oben rechts
-  if ((await p.getByRole("button", { name: "Erstellen", exact: true }).locator("visible=true").count()) === 0) {
+  // „+“ sitzt rechts in der Tab-Leiste; heißt wie das Blatt, das er öffnet
+  if ((await p.getByRole("button", { name: "Neu erstellen", exact: true }).locator("visible=true").count()) === 0) {
     await p.getByRole("tab", { name: "Heute" }).click();
     await warte(700);
   }
-  await knopf("Erstellen").click();
+  await knopf("Neu erstellen").click();
   await warte(900);
 }
 const sichtbar = async (text) => (await p.getByText(text, { exact: false }).locator("visible=true").count()) > 0;
 
 try {
-  await p.goto("http://localhost:4998/");
+  await p.goto(ADRESSE);
   await warte(2500);
   // Start auf „Heute“ (E-142): Bühne mit Rechnung und Beleg, auf dem Blatt die Einladung zum Check
   pruefe((await sichtbar("Welche Pflichten gelten für dich?")) && (await p.getByRole("button", { name: "Rechnung", exact: true }).count()) > 0, "„Heute“ mit Einladung und schnellen Wegen fehlt beim Start");
@@ -115,6 +117,10 @@ try {
   await p.getByRole("tab", { name: "Pflichten" }).click();
   await warte(800);
   pruefe(await sichtbar("Welche Pflichten gelten für dich?"), "Einladung zum Pflichten-Check fehlt");
+  // gestartet über die Karte auf „Heute“: am Ende schließt der Check und wechselt zum Tab „Pflichten“ – derselbe
+  // Durchgang ändert Navigation und Tab-Zustand (früher weißer Bildschirm, React-Fehler #185)
+  await p.getByRole("tab", { name: "Heute" }).click();
+  await warte(800);
   await knopf("Pflichten-Check starten").click();
   await warte(800);
   pruefe(await sichtbar("noch nicht von Fachleuten geprüft"), "Prüfhinweis fehlt in der Einleitung des Checks");
@@ -158,10 +164,12 @@ try {
     await knopf("Überspringen").click();
     await warte(500);
   }
-  pruefe((await amEnde()) && (await sichtbar("Für deinen Betrieb gelten")), "Ergebnis des Checks fehlt");
+  pruefe((await amEnde()) && (await sichtbar("Für deinen Betrieb:")) && (await sichtbar(/^Insgesamt \d+ Pflichten/)), "Ergebnis des Checks fehlt (bald Anstehendes groß, Gesamtzahl klein)");
   await foto("check-ergebnis");
   await knopf("Deine Pflichten ansehen").click();
   await warte(1200);
+  pruefe(befunde.length === 0, `Fehler nach „Deine Pflichten ansehen“ (vom Check auf „Heute“): ${befunde.join(" | ")}`);
+  pruefe((await p.getByRole("tab", { name: "Pflichten", selected: true }).count()) === 1, "nach dem Check nicht im Tab „Pflichten“ gelandet");
   // Bühne (E-142): das Jahr mit den Terminen je Monat
   pruefe((await sichtbar("Dein Jahr")) && (await p.getByLabel(/: \d+ Termine?$/).count()) > 0, "Jahresblick fehlt im Pflichten-Tab");
   await foto("pflichten-jahr");
@@ -177,6 +185,7 @@ try {
   await tippe(p.getByRole("button", { name: /^Hautschutzplan aushängen/ }).locator("visible=true").last());
   await warte(900);
   pruefe(await sichtbar("TRGS 401"), "Rechtsgrundlage fehlt in der Pflicht");
+  pruefe(await sichtbar("Drucken oder teilen, dann ist die Pflicht erledigt."), "Pflicht mit Vorlage sagt nicht, wann sie erledigt ist");
   await knopf("Ausfüllen").click();
   await warte(900);
   pruefe(await sichtbar("Hautschutzplan"), "Unterlage zur Pflicht startet nicht");
@@ -213,7 +222,6 @@ try {
   await warte(800);
   await feld("Leistung oder Ware").fill("Haarschnitt");
   await feld("Menge").fill("2");
-  await tippe(p.getByRole("radio", { name: "Stück" }).locator("visible=true").last());
   await feld("Einzelpreis netto (€)").fill("25");
   await foto("position");
   await knopf("Fertig").click();
@@ -228,7 +236,7 @@ try {
   // auf dem Papier (E-144): Positionen und Summe stehen da; Antippen springt zum Schritt und zurück
   pruefe((await sichtbar("Haarschnitt")) && (await sichtbar("2 × 25,00 €")), "Positionen fehlen auf dem Papier");
   await foto("abschluss");
-  await tippe(p.getByRole("button", { name: /^Rechnungsempfänger bearbeiten/ }).locator("visible=true").last());
+  await tippe(p.getByRole("button", { name: /^Rechnungsempfänger(:| bearbeiten)/ }).locator("visible=true").last());
   await warte(800);
   pruefe((await feld("Name oder Firma").inputValue()) === "Kim Beispiel", "Antippen auf dem Papier springt nicht zum Empfänger");
   await knopf("Übersicht").click();
@@ -426,7 +434,7 @@ try {
   const zipPfad = `${OUT}/${paket.suggestedFilename()}`;
   await paket.saveAs(zipPfad);
   const zipText = fs.readFileSync(zipPfad).toString("latin1");
-  pruefe(zipText.includes("EXTF_Buchungsstapel_2026.csv") && zipText.includes("Belege/2026-10-08_Friseurbedarf-Mueller-GmbH_L-2026-77.xml") && zipText.includes("Rechnungen_2026.csv"), "Paket für die Steuerberatung unvollständig");
+  pruefe(zipText.includes("EXTF_Buchungsstapel_2026.csv") && /Belege\/(B\d{4}-\d{3}_)?2026-10-08_Friseurbedarf-Mueller-GmbH_L-2026-77\.xml/.test(zipText) && zipText.includes("Rechnungen_2026.csv"), "Paket für die Steuerberatung unvollständig");
   // dem Betrieb fehlen E-Mail, Telefon und IBAN – keine E-Rechnung im Paket, und die App sagt es
   await warte(600);
   pruefe(await sichtbar("keine E-Rechnung im Paket"), "fehlende E-Rechnung im Paket nicht gemeldet");

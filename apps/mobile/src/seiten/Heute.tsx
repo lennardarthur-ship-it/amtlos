@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Pressable, View } from "react-native";
 import { T as TEXT } from "../texte";
-import { Hinweis, Karte, Knopf, T } from "../ui/bausteine";
+import { Hinweis, Karte, Knopf, T, useGrosseSchrift } from "../ui/bausteine";
 import { useNav } from "../ui/navigation";
 import { SCHRIFT, useFarben } from "../ui/thema";
 import { euroText, monatsSumme, offeneSumme } from "../unterlagen/ablage";
@@ -10,7 +10,7 @@ import { dringlichkeit, fortschritt, istErledigt } from "../pflichten/check";
 import { useAmtlos } from "../zustand";
 import { BelegErfassenSeite } from "./Belege";
 import { BlattKopf, BuehnenMarke, BuehnenSeite, GrosserBetrag } from "./gemeinsam";
-import { Balken, Einladung, PflichtZeile, checkGemacht, useAuswertung } from "./Pflichten";
+import { Balken, Einladung, PflichtZeile, checkGemacht, nichtsDranText, useAuswertung } from "./Pflichten";
 import { SicherungsKarte } from "./Sicherung";
 import { useOeffnen, useStarten } from "./starten";
 import { UnterlageZeile, useFehltJe, useUeberfaellig } from "./Unterlagen";
@@ -37,7 +37,7 @@ export function Heute() {
   const { naechste, fs } = useMemo(() => {
     const e = { erledigt, unterlagen, betrieb };
     const d = dringlichkeit(a, e, tag);
-    return { naechste: [...d.jetzt, ...d.diesenMonat].slice(0, 3), fs: fortschritt(a, e) };
+    return { naechste: [...d.jetzt, ...d.naechsteWochen].slice(0, 3), fs: fortschritt(a, e) };
   }, [a, erledigt, unterlagen, betrieb, tag]);
   const offen = useMemo(() => offeneSumme(unterlagen, betrieb, tag), [unterlagen, betrieb, tag]);
   const monat = useMemo(() => monatsSumme(unterlagen, betrieb, tag.slice(0, 7)), [unterlagen, betrieb, tag]);
@@ -50,11 +50,17 @@ export function Heute() {
   const monatsName = new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", month: "long" }).format(jetzt);
   const stunde = Number(new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", hour: "numeric", hourCycle: "h23" }).format(jetzt));
   const zeilen = ueberfaellig.length + naechste.length;
+  const grosseSchrift = useGrosseSchrift();
 
   const buehne = (
     <View style={{ gap: 26 }}>
       {hatRechnungen ? (
-        <Pressable accessibilityRole="button" accessibilityLabel={`${TEXT.offen_bei_kunden}: ${euroText(offen.cent)}`} onPress={() => tabWechseln("meine")} style={({ pressed }) => ({ gap: 4, opacity: pressed ? 0.75 : 1 })}>
+        <Pressable
+          accessibilityRole="button"
+          // alles, was auf der Fläche steht, auch für VoiceOver – nicht nur den Betrag
+          accessibilityLabel={TEXT.offen_label(euroText(offen.cent), offen.ueberfaellig ? TEXT.davon_ueberfaellig(offen.ueberfaellig) : TEXT.kachel_offen_text(offen.anzahl), TEXT.monat_summe(monatsName, euroText(monat.cent)))}
+          accessibilityHint={TEXT.oeffnet_unterlagen}
+          onPress={() => tabWechseln("meine")} style={({ pressed }) => ({ gap: 4, opacity: pressed ? 0.75 : 1 })}>
           <T v="klein" farbe={f.buehneLeise} stil={{ ...SCHRIFT.mittel }}>{TEXT.offen_bei_kunden}</T>
           <GrosserBetrag cent={offen.cent} />
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
@@ -65,9 +71,10 @@ export function Heute() {
       ) : (
         <T v="grossTitel" accessibilityRole="header" farbe={f.buehneText} stil={{ fontSize: 40, lineHeight: 44, letterSpacing: -1.4 }}>{TEXT.gruss(stunde)}</T>
       )}
-      <View style={{ flexDirection: "row", gap: 10 }}>
-        <Knopf buehne symbol="plus" text={TEXT.kurz_rechnung} onPress={() => starten("rechnung")} stil={{ flex: 1, paddingHorizontal: 12 }} />
-        <Knopf glas symbol="doc.viewfinder" text={TEXT.kurz_beleg} onPress={() => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />)} stil={{ flex: 1, paddingHorizontal: 12 }} />
+      {/* große Schrift: untereinander, sonst brechen die Wörter mitten im Knopf */}
+      <View style={{ flexDirection: grosseSchrift ? "column" : "row", gap: 10 }}>
+        <Knopf buehne symbol="plus" text={TEXT.kurz_rechnung} onPress={() => starten("rechnung")} stil={{ flex: grosseSchrift ? undefined : 1, paddingHorizontal: 12 }} />
+        <Knopf glas symbol="doc.viewfinder" text={TEXT.kurz_beleg} onPress={() => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />)} stil={{ flex: grosseSchrift ? undefined : 1, paddingHorizontal: 12 }} />
       </View>
     </View>
   );
@@ -89,12 +96,12 @@ export function Heute() {
               ))}
             </Karte>
           ) : (
-            <Hinweis art="erfolg" text={TEXT.nichts_dran_kurz} />
+            <Hinweis art="erfolg" text={nichtsDranText(stand.erinnerungen)} />
           )}
           {fs.gesamt ? (
             <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginTop: 14, paddingHorizontal: 4 }}>
               <View style={{ flex: 1 }}>
-                <Balken prozent={fs.prozent} />
+                <Balken prozent={fs.prozent} label={TEXT.fortschritt_text(fs.fertig, fs.gesamt)} />
               </View>
               <T v="caption" leise stil={{ ...SCHRIFT.halb }}>{TEXT.fortschritt_text(fs.fertig, fs.gesamt)}</T>
             </View>

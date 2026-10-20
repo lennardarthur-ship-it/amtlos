@@ -14,6 +14,12 @@ interface Meldung {
 }
 
 const Kontext = createContext<((text: string, art?: Art) => void) | null>(null);
+const LeerenKontext = createContext<(() => void) | null>(null);
+
+/** Eine noch sichtbare Meldung sofort ausblenden (z. B. beim Öffnen einer neuen Seite, damit sie nichts verdeckt). */
+export function useMeldungLeeren(): () => void {
+  return useContext(LeerenKontext) ?? (() => undefined);
+}
 
 /** Kurze Bestätigung am unteren Rand („Sicherung erstellt.“) – mit Haptik, verschwindet von selbst. */
 export function useMeldung(): (text: string, art?: Art) => void {
@@ -32,11 +38,14 @@ export function MeldungAnbieter({ children, unten = 0 }: { children: ReactNode; 
   }, []);
   const weg = useCallback((nr: number) => setAktuell((m) => (m?.nr === nr ? null : m)), []);
   const wert = useMemo(() => melden, [melden]);
+  const leeren = useCallback(() => setAktuell(null), []);
   return (
     <Kontext.Provider value={wert}>
+      <LeerenKontext.Provider value={leeren}>
       {children}
       {/* über allem – auch über Blättern (auf dem iPhone eigenes Fenster, sonst läge die Meldung unter dem Blatt) */}
       {aktuell ? istIos ? <FullWindowOverlay unstable_accessibilityContainerViewIsModal={false}><Anzeige meldung={aktuell} weg={weg} unten={unten} /></FullWindowOverlay> : <Anzeige meldung={aktuell} weg={weg} unten={unten} /> : null}
+      </LeerenKontext.Provider>
     </Kontext.Provider>
   );
 }
