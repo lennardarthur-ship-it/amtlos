@@ -41,6 +41,7 @@ import { fussAngaben, fusszeileStempeln } from "../src/unterlagen/fusszeile";
 import { mitSchriften } from "../src/unterlagen/schriften";
 import { auswertung, type Profil } from "../src/pflichten/check";
 import * as D from "./jahr-szenario-freiberuf-daten";
+import { MARKE } from "@amtlos/marke";
 
 export { RAENDER, KU_HINWEIS, fussAngaben, fusszeileStempeln, mitSchriften, unzipSync, D };
 
@@ -389,26 +390,26 @@ export function standBauen(): Bau {
       ], h),
     }) });
 
-  dok({ id: "verfahren", vorlage: "verfahrensdokumentation", datum: "2026-01-12", worum: "Verfahrensdokumentation (GoBD) für eine Einzelperson ohne Kasse: Amtlos für Rechnungen/Belege, Online-Banking, Upload an das Steuerbüro einmal im Jahr; Belege überwiegend digital, wenige Kassenbons fotografiert.",
+  dok({ id: "verfahren", vorlage: "verfahrensdokumentation", datum: "2026-01-12", worum: `Verfahrensdokumentation (GoBD) für eine Einzelperson ohne Kasse: ${MARKE.name} für Rechnungen/Belege, Online-Banking, Upload an das Steuerbüro einmal im Jahr; Belege überwiegend digital, wenige Kassenbons fotografiert.`,
     daten: () => ({ version: "1.0", verantwortlich: "Mira Lindqvist",
       organisation: "Grafikdesign als freier Beruf, Einzelunternehmerin ohne Beschäftigte, Büro in der eigenen Wohnung. Kleinunternehmerin nach § 19 UStG; Gewinnermittlung durch Einnahmen-Überschuss-Rechnung.",
       steuerberatung: "Jahresabschluss durch die Steuerberatung; laufende Buchführung im Betrieb",
       systeme: eintraege("verfahrensdokumentation", "systeme", [
-        { name: "Amtlos (App, iPhone)", zweck: "Rechnungsprogramm", version: "seit 01/2026" },
+        { name: `${MARKE.name} (App, iPhone)`, zweck: "Rechnungsprogramm", version: "seit 01/2026" },
         { name: "Sparkasse Freiburg Online-Banking", zweck: "Online-Banking", version: "seit 04/2023" },
         { name: "Steuerbüro Kaltenbach – Upload-Portal", zweck: "Upload-Portal der Steuerberatung", version: "seit 03/2024" },
       ], "2026-01-12"),
       belegeingang: ["E-Mail mit PDF-Anhang", "Download aus Kunden-/Lieferantenportal", "E-Rechnung (XRechnung/ZUGFeRD) per E-Mail oder Portal", "Papier (Post/persönlich)", "Eigenbeleg"],
       belegart: ["originär digital (Muster 4.3)", "originär Papier, Ablage in Papier (Muster 4.1)"],
       ablage: ["Buchhaltungssoftware mit Belegarchiv", "Upload an Steuerberater (z. B. Kanzlei-Portal)", "Papierordner (chronologisch/nach Belegart)"],
-      erfassung: "Belege werden monatlich in Amtlos erfasst (Datei bzw. Foto) und einmal im Jahr als Paket an das Steuerbüro übermittelt.\nAusgangsrechnungen werden fortlaufend nummeriert in Amtlos erstellt und beim Teilen festgeschrieben; Korrekturen nur per Stornorechnung.",
+      erfassung: `Belege werden monatlich in ${MARKE.name} erfasst (Datei bzw. Foto) und einmal im Jahr als Paket an das Steuerbüro übermittelt.\nAusgangsrechnungen werden fortlaufend nummeriert in ${MARKE.name} erstellt und beim Teilen festgeschrieben; Korrekturen nur per Stornorechnung.`,
       scannen: false, sicherung_intervall: "wöchentlich", sicherung_ort: ["Cloud-Backup", "externer Datenträger (Festplatte/NAS) außerhalb der Betriebsräume"], e_rechnung: true,
       zugriff: "Zugriff auf Buchhaltung und Belege nur für Inhaber/in und Steuerberatung",
       kontrollen: "Monatlicher Abgleich von Kontoauszügen und Buchungen\nVor der Zahlung: Eingangsrechnungen sachlich und rechnerisch prüfen",
-      aenderungen: eintraege("verfahrensdokumentation", "aenderungen", [{ datum: "2026-01-12", aenderung: "Umstellung der Rechnungsstellung und Belegerfassung von Tabellenkalkulation auf Amtlos." }], "2026-01-12") }) });
+      aenderungen: eintraege("verfahrensdokumentation", "aenderungen", [{ datum: "2026-01-12", aenderung: `Umstellung der Rechnungsstellung und Belegerfassung von Tabellenkalkulation auf ${MARKE.name}.` }], "2026-01-12") }) });
 
   dok({ id: "aufbewahrung", vorlage: "aufbewahrung", datum: "2026-01-12", worum: "Aufbewahrungsplan mit den Startzeilen der App (Fristbeginn 2026, Ablageort).",
-    daten: (h) => ({ eintraege: (leereDatenVon("aufbewahrung", h).eintraege as Eintrag[]).map((e) => ({ ...e, letzte: "2026", ort: "Amtlos (verschlüsselt), Cloud-Backup; Papier im Büroschrank" })) }) });
+    daten: (h) => ({ eintraege: (leereDatenVon("aufbewahrung", h).eintraege as Eintrag[]).map((e) => ({ ...e, letzte: "2026", ort: `${MARKE.name} (verschlüsselt), Cloud-Backup; Papier im Büroschrank` })) }) });
   {
     const zeilen = (unterlage("aufbewahrung").daten.eintraege as Eintrag[]).map((e) => String(e.art));
     const fremd = zeilen.filter((z) => /Lohn|Kasse|Personal|Beschäftigt|Arbeitszeit/i.test(z));

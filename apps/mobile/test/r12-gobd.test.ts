@@ -39,6 +39,7 @@ import {
 } from "../src/unterlagen/speicher";
 import { euerUebernahme, steuerpaket } from "../src/unterlagen/steuerpaket";
 import { umsaetzeFuer } from "../src/unterlagen/ustAusRechnungen";
+import { MARKE } from "@amtlos/marke";
 
 const t = (d: string, h = 9) => new Date(`${d}T${String(h).padStart(2, "0")}:00:00Z`);
 const BETRIEB = { ...LEERER_STAND.betrieb, name: "Café Morgenrot", strasse: "Karl-Heine-Str. 1", plz: "04229", ort: "Leipzig", email: "info@cafe.example", telefon: "0341 1", steuernummer: "231/100/40001", iban: "DE89370400440532013000", verantwortlich: "Jana Weber" };
@@ -98,7 +99,7 @@ describe("Belege: feste Nummern, Festschreibung, Löschen, Protokoll", () => {
     const prot = datei(q.zip, "Aenderungsprotokoll_2026-05.csv");
     expect(prot).toContain("Steuersatz falsch erfasst");
     expect(prot).toContain("endgültig gelöscht");
-    expect(datei(q.zip, "LIESMICH.txt")).toContain("Lücken in den Amtlos-Belegnummern");
+    expect(datei(q.zip, "LIESMICH.txt")).toContain(`Lücken in den ${MARKE.name}-Belegnummern`);
   });
   it("abgegebene (geteilte) Voranmeldung schreibt die Belege ihres Zeitraums fest", () => {
     expect(zeitraumAusText("2. Quartal 2026")).toMatchObject({ von: "2026-04-01", bis: "2026-06-30" });

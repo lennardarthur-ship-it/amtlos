@@ -8,6 +8,7 @@ import { aufsichtFuer } from "./datenschutz.js";
 import { LINIE, abschnitt, abschnitte, angaben, anschrift, anschriftMehrzeilig, auswahl, datumDe, dokument, esc, ja, parteien, text, unterschriften, zeilen } from "./html.js";
 import { optionen } from "./konstanten.js";
 import type { Betrieb, Daten, Vorlage } from "./typen.js";
+import { MARKE } from "@amtlos/marke";
 
 /** Markierung für eine fehlende Angabe; im Dokument eine Linie, im Text „[bitte ergänzen]“. */
 const FEHLT = "\uE000";
@@ -150,7 +151,7 @@ export const datenschutzerklaerungWebsite: Vorlage = {
   ausBetrieb: { website: "website" },
   abschnitte: [
     { titel: "Deine Website",
-      hilfe: "Verantwortliche Stelle, Kontakt und Aufsichtsbehörde übernimmt Amtlos aus „Mein Betrieb“.",
+      hilfe: `Verantwortliche Stelle, Kontakt und Aufsichtsbehörde übernimmt ${MARKE.name} aus „Mein Betrieb“.`,
       felder: [
         { id: "website", art: "text", label: "Adresse der Website", hilfe: "z. B. www.salon-sonne.de – ohne Angabe die Website aus „Mein Betrieb“" },
         { id: "module", art: "bausteine", label: "Was nutzt deine Website?", hilfe: "Schriftarten: entweder lokal oder extern – am besten lokal einbinden, dann entfällt die Übermittlung an Google.", optionen: DSE_WAHL, vorbelegung: ["hosting", "server_logfiles", "kontakt", "widerruf_einwilligung"], pflicht: true },
@@ -271,7 +272,7 @@ export const impressum: Vorlage = {
   },
   abschnitte: [
     { titel: "Angaben zum Unternehmen",
-      hilfe: "Name, Anschrift, Telefon, E-Mail und USt-IdNr. übernimmt Amtlos aus „Mein Betrieb“. Die Steuernummer gehört nicht ins Impressum.",
+      hilfe: `Name, Anschrift, Telefon, E-Mail und USt-IdNr. übernimmt ${MARKE.name} aus „Mein Betrieb“. Die Steuernummer gehört nicht ins Impressum.`,
       felder: [
         { id: "rechtsform", art: "wahl", label: "Rechtsform", optionen: RECHTSFORMEN_IMP.map((r) => ({ wert: r, text: r })), hilfe: "ohne Auswahl die Rechtsform aus „Mein Betrieb“, sonst Einzelunternehmen" },
         // R12 (Coach #15): aus „Mein Betrieb“ vorbelegt (Inhaber/in bzw. Geschäftsführung)

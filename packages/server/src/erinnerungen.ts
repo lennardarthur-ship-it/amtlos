@@ -2,6 +2,7 @@ import { minusDauer, type Datum } from "@amtlos/fristen";
 import type { Datenbank, Tx } from "./datenbank.js";
 import { heute } from "./berechnung.js";
 import { ladeAktivenKatalog } from "./katalog.js";
+import { MARKE } from "@amtlos/marke";
 
 const STANDARD_VORLAUF = ["P14D", "P3D"];
 const UHRZEIT = 8; // 08:00 Ortszeit
@@ -222,7 +223,7 @@ async function versendeFuerUnternehmen(db: Datenbank, versand: Versand, appUrl: 
         );
         if (tokens.length) {
           // Push zeigt nur Titel und Datum (Sperrbildschirm), keine weiteren Unternehmensdaten
-          const r = await versand.push({ tokens, titel: betreff, text: e.sprache === "en" ? "Open Amtlos to see what to do." : "Öffne Amtlos, um zu sehen, was zu tun ist.", link: pfad });
+          const r = await versand.push({ tokens, titel: betreff, text: e.sprache === "en" ? `Open ${MARKE.name} to see what to do.` : `Öffne ${MARKE.name}, um zu sehen, was zu tun ist.`, link: pfad });
           ungueltig = r.ungueltig;
           status = "gesendet";
         }

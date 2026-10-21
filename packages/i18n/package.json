@@ -5,10 +5,15 @@
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
-  "exports": { ".": "./src/index.ts" },
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "lint": "eslint src"
+  },
+  "dependencies": {
+    "@amtlos/marke": "workspace:*"
   }
 }

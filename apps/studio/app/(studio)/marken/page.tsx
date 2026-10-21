@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { MARKEN_FLAECHEN, StudioFehler, kontrast, markeSpeichern, markenListe, type MarkeDaten } from "@amtlos/server";
 import { datenbank, ich } from "@/lib/studio";
+import { MARKE } from "@amtlos/marke";
 
 export const metadata = { title: "White-Label-Marken" };
 
@@ -37,7 +38,7 @@ function Formular({ m, aktion }: { m?: Marke; aktion: (f: FormData) => Promise<v
   return (
     <form action={aktion} className="grid gap-3 md:grid-cols-2">
       <label className="block"><span className="font-bold">Schlüssel</span><input name="schluessel" required pattern="[a-z0-9][a-z0-9-]{1,39}" defaultValue={m?.schluessel} className="feld mt-1" /></label>
-      <label className="block"><span className="font-bold">Name (wird statt „Amtlos“ angezeigt)</span><input name="name" required defaultValue={m?.name} className="feld mt-1" /></label>
+      <label className="block"><span className="font-bold">Name (wird statt „{MARKE.name}“ angezeigt)</span><input name="name" required defaultValue={m?.name} className="feld mt-1" /></label>
       <label className="block md:col-span-2"><span className="font-bold">Hostnamen (durch Komma getrennt)</span><input name="hosts" defaultValue={m?.hosts.join(", ")} className="feld mt-1" /></label>
       <label className="block"><span className="font-bold">Farbe hell (#rrggbb, mind. 4,5 : 1 auf Weiß)</span><input name="farbe_hell" required defaultValue={m?.farbe_hell ?? "#136f5b"} className="feld mt-1" /></label>
       <label className="block"><span className="font-bold">Farbe dunkel (#rrggbb, mind. 4,5 : 1 auf Dunkel)</span><input name="farbe_dunkel" required defaultValue={m?.farbe_dunkel ?? "#5cc2a6"} className="feld mt-1" /></label>
@@ -57,7 +58,7 @@ export default async function MarkenSeite({ searchParams }: { searchParams: Prom
     <div className="space-y-8">
       <h1 className="text-titel font-bold">White-Label-Marken</h1>
       <p className="lesetext">
-        Partner (z. B. Steuerberatungen, Kammern) bieten Amtlos unter eigenem Namen und eigener Adresse an. Die Marke ändert nur Name, Handlungsfarbe und Logo;
+        Partner (z. B. Steuerberatungen, Kammern) bieten {MARKE.name} unter eigenem Namen und eigener Adresse an. Die Marke ändert nur Name, Handlungsfarbe und Logo;
         Inhalte, Prüfstatus und Datenschutz bleiben gleich. Die Anzahl zeigt Unternehmen, die unter der Marke angelegt wurden (Lizenzbericht). Pflege nur durch Plattform-Admins.
       </p>
       {fehler ? <p role="alert" className="lesetext rounded-md border-2 border-frist bg-frist-hauch p-4">{fehler}</p> : null}

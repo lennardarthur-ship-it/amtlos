@@ -12,6 +12,7 @@ import { monatsSumme, offeneSumme } from "../src/unterlagen/ablage";
 import { LEERER_STAND, anlegen, ausgeben, bezahltSetzen, felderSetzen, leererBeleg, stornieren, type Stand } from "../src/unterlagen/speicher";
 import { EUER_NICHT_ENTHALTEN, euerUebernahme, istKleinunternehmer, steuerpaket } from "../src/unterlagen/steuerpaket";
 import { umsaetzeFuer } from "../src/unterlagen/ustAusRechnungen";
+import { MARKE } from "@amtlos/marke";
 
 const t = (d: string) => new Date(`${d}T09:00:00Z`);
 const BETRIEB = { ...LEERER_STAND.betrieb, name: "Mira Lindqvist – Grafikdesign", strasse: "Wiesenweg 4", plz: "79098", ort: "Freiburg", email: "hallo@mira.example", telefon: "0761 1", steuernummer: "06/123/45678", iban: "DE89370400440532013000" };
@@ -43,7 +44,7 @@ describe("Gutschrift ist für den Aussteller eine Ausgabe", () => {
     expect(e.rechnungen).toBe(2);
     expect(e.gutschriften).toBe(2);
     expect(e.unbezahlt).toBe(0);
-    expect(e.hinweis).toContain("Gutschriften sind Ausgaben: Mit Zahlungsvermerk übernimmt Amtlos sie");
+    expect(e.hinweis).toContain(`Gutschriften sind Ausgaben: Mit Zahlungsvermerk übernimmt ${MARKE.name} sie`);
     expect(e.hinweis).toContain(EUER_NICHT_ENTHALTEN);
     // R10: die bezahlte Gutschrift (700 €) ist eine Ausgabe „Bezogene Leistungen“, die unbezahlte fehlt noch
     expect(e.ausgaben).toContainEqual({ datum: "", text: "Gutschriften an Leistende (1 Gutschrift)", kategorie: "Bezogene Leistungen", betrag: "700,00" });

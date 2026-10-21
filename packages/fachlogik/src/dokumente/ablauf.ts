@@ -7,6 +7,7 @@ import { BESCHAEFTIGUNGSARTEN, ENTGELT_ARTEN, STEUERKLASSEN } from "./lohn.js";
 /** R12: übliche Aufenthaltstitel (Vorschläge, frei änderbar). */
 const AUFENTHALTSTITEL = ["Aufenthaltserlaubnis", "Niederlassungserlaubnis", "Blaue Karte EU", "Erlaubnis zum Daueraufenthalt – EU", "Fiktionsbescheinigung", "Duldung mit Beschäftigungserlaubnis", "Aufenthaltsgestattung mit Beschäftigungserlaubnis"];
 import type { Daten, EinfachesFeld, Person, PersonAngaben, PersonenArt, Vorlage } from "./typen.js";
+import { MARKE } from "@amtlos/marke";
 
 /** Ein Satz je Vorlage, ohne Paragrafen – für Listen in der App. */
 export const KURZ: Record<string, string> = {
@@ -87,7 +88,7 @@ export const PERSONEN_FELDER: Record<PersonenArt, EinfachesFeld[]> = {
     { id: "staatsangehoerigkeit", art: "text", label: "Staatsangehörigkeit", vorschlaege: ["deutsch"] },
     // R12 (Zoll #5): Aufenthaltstitel bei Staatsangehörigen außerhalb von EU, EWR und Schweiz – Kopie als Datei in der App
     { id: "aufenthalt_art", art: "text", label: "Aufenthaltstitel", hilfe: "nur bei Staatsangehörigkeit außerhalb von EU, EWR und Schweiz", selten: true, wenn: { feld: "staatsangehoerigkeit", ist: ["deutsch", "Deutsch"], nicht: true }, vorschlaege: AUFENTHALTSTITEL },
-    { id: "aufenthalt_bis", art: "datum", label: "Aufenthaltstitel gültig bis", hilfe: "Amtlos erinnert auf „Heute“ rechtzeitig vor dem Ablauf", selten: true, wenn: { feld: "staatsangehoerigkeit", ist: ["deutsch", "Deutsch"], nicht: true } },
+    { id: "aufenthalt_bis", art: "datum", label: "Aufenthaltstitel gültig bis", hilfe: `${MARKE.name} erinnert auf „Heute“ rechtzeitig vor dem Ablauf`, selten: true, wenn: { feld: "staatsangehoerigkeit", ist: ["deutsch", "Deutsch"], nicht: true } },
     { id: "taetigkeit", art: "text", label: "Tätigkeit" },
     { id: "beginn", art: "datum", label: "Beschäftigt seit" },
     // R12 (Zoll #4, #8): Art, Umfang und Entgelt – für Minijob- und Mindestlohnprüfung und die Personalübersicht

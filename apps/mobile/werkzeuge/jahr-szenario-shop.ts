@@ -41,6 +41,7 @@ import { mitSchriften } from "../src/unterlagen/schriften";
 import { deckblattHtml, mappeDateiname, mappeZusammenfuegen, mappenAuswahl, seitenzahl, startSeiten } from "../src/unterlagen/kontrollmappe";
 import { auswertung, type PflichtInfo, type Profil } from "../src/pflichten/check";
 import * as D from "./jahr-szenario-shop-daten";
+import { MARKE } from "@amtlos/marke";
 
 export { RAENDER, fussAngaben, fusszeileStempeln, mitSchriften, unzipSync, D, deckblattHtml, mappeDateiname, mappeZusammenfuegen, seitenzahl, startSeiten };
 
@@ -363,12 +364,12 @@ export function standBauen(): Bau {
       ], h),
     }) });
 
-  dok({ id: "verfahren", vorlage: "verfahrensdokumentation", datum: "2026-01-15", worum: "Verfahrensdokumentation (GoBD) für Onlineshop, Märkte und Großhandel: Amtlos für Rechnungen und Belege, Shop-System mit Umsatzberichten, PayPal/Stripe, Kassenbuch für die Marktkasse, Online-Banking, Upload an das Steuerbüro.",
+  dok({ id: "verfahren", vorlage: "verfahrensdokumentation", datum: "2026-01-15", worum: `Verfahrensdokumentation (GoBD) für Onlineshop, Märkte und Großhandel: ${MARKE.name} für Rechnungen und Belege, Shop-System mit Umsatzberichten, PayPal/Stripe, Kassenbuch für die Marktkasse, Online-Banking, Upload an das Steuerbüro.`,
     daten: () => ({ version: "1.0", verantwortlich: "Lina Hoff (Inhaberin)",
       organisation: "Kerzenwerk Lina Hoff, Herstellung von Duftkerzen und Naturseifen in der eigenen Werkstatt. Verkauf über den eigenen Onlineshop (Deutschland und EU), an Marktständen (Kunsthandwerkermarkt, Weihnachtsmarkt) und an Händler/Hotels. Inhaberin Lina Hoff (Herstellung, Buchhaltung, Einkauf), eine Minijobberin (Packen und Versand).",
       steuerberatung: "Jahresabschluss durch die Steuerberatung; laufende Buchführung im Betrieb",
       systeme: eintraege("verfahrensdokumentation", "systeme", [
-        { name: "Amtlos (App, iPhone)", zweck: "Rechnungsprogramm und Belegerfassung", version: "seit 01/2026" },
+        { name: `${MARKE.name} (App, iPhone)`, zweck: "Rechnungsprogramm und Belegerfassung", version: "seit 01/2026" },
         { name: "Shopwerk (Shop-System)", zweck: "Onlineshop, Bestellungen, monatliche Umsatz- und Steuerberichte (CSV), OSS-Bericht je Land", version: "Tarif „Grow“, seit 04/2023" },
         { name: "PayPal-Geschäftskonto und Stripe-Dashboard", zweck: "Zahlungsabwicklung, Auszahlungs- und Gebührenberichte", version: "seit 04/2023" },
         { name: "Kassenbuch (Papier) für die Marktkasse", zweck: "offene Ladenkasse an Marktständen, tägliches Zählprotokoll", version: "seit 04/2023" },
@@ -378,15 +379,15 @@ export function standBauen(): Bau {
       belegeingang: ["Papier (Post/persönlich)", "E-Mail mit PDF-Anhang", "Download aus Kunden-/Lieferantenportal", "Kontoauszug/Bank-Schnittstelle", "Eigenbeleg"],
       belegart: ["originär Papier, Ablage in Papier (Muster 4.1)", "originär digital (Muster 4.3)"],
       ablage: ["Buchhaltungssoftware mit Belegarchiv", "Upload an Steuerberater (z. B. Kanzlei-Portal)", "Papierordner (chronologisch/nach Belegart)"],
-      erfassung: "Belege werden wöchentlich in Amtlos erfasst (Foto bzw. PDF); Gebührenübersichten von PayPal, Stripe, Shopwerk und Meta werden monatlich bzw. quartalsweise aus den Portalen geladen.\nShop-Umsätze: Am Monatsende wird der Umsatz- und Steuerbericht des Shop-Systems (je Land und Steuersatz, mit Erstattungen) als CSV und PDF exportiert, unverändert archiviert und für die Voranmeldung bzw. OSS-Erklärung verwendet; die einzelnen Bestellungen bleiben im Shop-System gespeichert.\nMarktkasse: Zählprotokoll und Kassenbuch täglich nach Marktschluss.\nAusgangsrechnungen (Großhandel, Rechnungen auf Wunsch) werden fortlaufend nummeriert in Amtlos erstellt und beim Teilen festgeschrieben; Korrekturen nur per Stornorechnung.",
+      erfassung: `Belege werden wöchentlich in ${MARKE.name} erfasst (Foto bzw. PDF); Gebührenübersichten von PayPal, Stripe, Shopwerk und Meta werden monatlich bzw. quartalsweise aus den Portalen geladen.\nShop-Umsätze: Am Monatsende wird der Umsatz- und Steuerbericht des Shop-Systems (je Land und Steuersatz, mit Erstattungen) als CSV und PDF exportiert, unverändert archiviert und für die Voranmeldung bzw. OSS-Erklärung verwendet; die einzelnen Bestellungen bleiben im Shop-System gespeichert.\nMarktkasse: Zählprotokoll und Kassenbuch täglich nach Marktschluss.\nAusgangsrechnungen (Großhandel, Rechnungen auf Wunsch) werden fortlaufend nummeriert in ${MARKE.name} erstellt und beim Teilen festgeschrieben; Korrekturen nur per Stornorechnung.`,
       scannen: false, sicherung_intervall: "wöchentlich", sicherung_ort: ["Cloud-Backup", "durch Softwareanbieter/Rechenzentrum"], e_rechnung: true,
       zugriff: "Zugriff auf Buchhaltung, Shop-Verwaltung und Zahlungskonten nur für die Inhaberin; die Minijobberin hat im Shop-System nur die Rolle „Versand“ (Bestellungen ansehen, Versandlabels drucken)",
       kontrollen: "Monatlicher Abgleich Shop-Bericht ↔ Auszahlungen PayPal/Stripe ↔ Kontoauszug\nTägliches Zählen der Marktkasse\nVor jeder Voranmeldung: Rechnungen zu Shop-Bestellungen aus dem Shop-Umsatz herausrechnen",
-      aenderungen: eintraege("verfahrensdokumentation", "aenderungen", [{ datum: "2026-01-15", aenderung: "Rechnungsstellung und Belegerfassung auf Amtlos umgestellt." }, { datum: "2026-07-17", aenderung: "EU-Lieferschwelle überschritten: Shop berechnet ab Bestellung #2219 die Steuer des Bestimmungslands; OSS-Registrierung beim BZSt." }], "2026-01-15") }) });
+      aenderungen: eintraege("verfahrensdokumentation", "aenderungen", [{ datum: "2026-01-15", aenderung: `Rechnungsstellung und Belegerfassung auf ${MARKE.name} umgestellt.` }, { datum: "2026-07-17", aenderung: "EU-Lieferschwelle überschritten: Shop berechnet ab Bestellung #2219 die Steuer des Bestimmungslands; OSS-Registrierung beim BZSt." }], "2026-01-15") }) });
 
   dok({ id: "aufbewahrung", vorlage: "aufbewahrung", datum: "2026-01-15", worum: "Aufbewahrungsplan mit den Startzeilen der App und fünf ergänzten Zeilen (Shop-Berichte und Bestelldaten, OSS-Aufzeichnungen, Kassenbuch Markt, Lohnkonto/Arbeitszeit Minijob, Produktinformationsdatei Kosmetik).",
     daten: (h) => {
-      const start = (leereDatenVon("aufbewahrung", h).eintraege as Eintrag[]).map((e) => ({ ...e, letzte: "2026", ort: "Amtlos (verschlüsselt) und Upload-Portal Steuerbüro; Papier im Büroschrank" }));
+      const start = (leereDatenVon("aufbewahrung", h).eintraege as Eintrag[]).map((e) => ({ ...e, letzte: "2026", ort: `${MARKE.name} (verschlüsselt) und Upload-Portal Steuerbüro; Papier im Büroschrank` }));
       return { eintraege: [...start, ...eintraege("aufbewahrung", "eintraege", [
         { art: "Shop-Umsatzberichte, Bestell- und Erstattungsdaten (Export aus dem Shop-System), Auszahlungsberichte PayPal/Stripe", jahre: "10", letzte: "2026", ort: "Export auf externer Festplatte und im Cloud-Backup" },
         { art: "Aufzeichnungen zum OSS-Verfahren (§ 22 Abs. 1 UStG i. V. m. Art. 63c MwStVO)", jahre: "10", letzte: "2026", ort: "Ordner „OSS“ (digital)" },
@@ -510,7 +511,7 @@ export function standBauen(): Bau {
         s = felderSetzen(s, id, erg.werte, t(tag, 9));
         const u19 = ausEuro(erg.werte.umsatz_19 ?? "0") + sh.netto19 + sh.marktNetto;
         const notiz = [
-          `Aus Rechnungen übernommen (Amtlos, Soll): 19 % ${erg.werte.umsatz_19} €, Kz 41 (igL) ${erg.werte.umsatz_igl} €, weitere ohne USt ${erg.werte.umsatz_frei} €. Vorsteuer aus ${erg.vorsteuerBelege} Belegen.`,
+          `Aus Rechnungen übernommen (${MARKE.name}, Soll): 19 % ${erg.werte.umsatz_19} €, Kz 41 (igL) ${erg.werte.umsatz_igl} €, weitere ohne USt ${erg.werte.umsatz_frei} €. Vorsteuer aus ${erg.vorsteuerBelege} Belegen.`,
           `Zuzüglich Shop-Umsätze laut Umsatzbericht (Inland und EU-Fernverkäufe vor der Schwelle, netto 19 %): ${euro(sh.netto19)} €; Marktkasse laut Kassenbuch: ${euro(sh.marktNetto)} €.`,
           em.kz46 ? `§ 13b UStG (Leistungen von Unternehmern aus Irland, ${em.b13.join(", ")}): Kz 46 ${euro(em.kz46)} €, Kz 47 ${euro(em.kz47)} €, Kz 67 ${euro(em.kz67)} € – in ELSTER zusätzlich eintragen.` : "",
           sh.ossBrutto ? `Fernverkäufe nach der Schwelle (${euro(sh.ossNetto)} € netto) gehören in die OSS-Erklärung, nicht hierher.` : "",

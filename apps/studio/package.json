@@ -13,7 +13,9 @@
     "e2e": "node e2e/editor.e2e.mjs"
   },
   "dependencies": {
+    "@amtlos/marke": "workspace:*",
     "@amtlos/rules-engine": "workspace:*",
+    "@amtlos/rules-schema": "workspace:*",
     "@amtlos/server": "workspace:*",
     "@amtlos/web-kern": "workspace:*",
     "next": "^16.0.0",
@@ -21,8 +23,7 @@
     "pg-boss": "^10.1.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "server-only": "^0.0.1",
-    "@amtlos/rules-schema": "workspace:*"
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.0",

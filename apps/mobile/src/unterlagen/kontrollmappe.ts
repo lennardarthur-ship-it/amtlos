@@ -11,6 +11,7 @@ import { BEREICHE, BESCHAEFTIGUNGSARTEN, belegNummern, cent, dateinamenTeil, kas
 import { euroText as euro } from "./ablage";
 import { fehltFuer } from "./pruefung";
 import { HAUPT_STAETTE, NACHWEIS_MONATE, geteiltAm, heute as heuteBerlin, nichtZaehlend, staetteVon, type Stand, type Unterlage } from "./speicher";
+import { MARKE } from "@amtlos/marke";
 
 /** Bereiche, deren Unterlagen bei Kontrollen (Gewerbeaufsicht, BG, Lebensmittelüberwachung, Datenschutz) vorzulegen sind */
 const MAPPE_BEREICHE: Bereich[] = ["arbeitsschutz", "beauty", "gastro", "personal", "datenschutz"];
@@ -387,7 +388,7 @@ export function tagesabschluesseHtml(l: readonly Kassenabschluss[], betrieb: str
     })
     .join("");
   return `<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Tagesabschlüsse</title><meta name="amtlos-gestalt" content="nachweis"><meta name="amtlos-fuss-links" content="${esc(`${betrieb.trim() || "Betrieb"} · Tagesabschlüsse`)}"><meta name="amtlos-fuss-rechts" content="${esc(`Stand ${datumDe(heute)}`)}">${MAPPE_STIL}</head><body>
-<h1>Tagesabschlüsse</h1><p>${esc(betrieb.trim() || "Betrieb")} · aus Amtlos, festgeschrieben beim Speichern · ${l.length} ${l.length === 1 ? "Abschluss" : "Abschlüsse"}. Die Einzelaufzeichnungen, der DSFinV-K-Export und die Programmierprotokolle liegen im Kassensystem.</p>
+<h1>Tagesabschlüsse</h1><p>${esc(betrieb.trim() || "Betrieb")} · aus ${MARKE.name}, festgeschrieben beim Speichern · ${l.length} ${l.length === 1 ? "Abschluss" : "Abschlüsse"}. Die Einzelaufzeichnungen, der DSFinV-K-Export und die Programmierprotokolle liegen im Kassensystem.</p>
 <table><thead><tr><th>Tag</th><th>Z-Bon</th><th>TSE</th><th class="r">Umsatz</th><th class="r">Karte</th><th class="r">Bar</th><th>Erfasst, festgeschrieben, Korrekturen</th></tr></thead><tbody>${zeilen}</tbody></table></body></html>`;
 }
 
@@ -703,7 +704,7 @@ export async function mappeZusammenfuegen(teile: Uint8Array[], titel = "Kontroll
     for (const s of seiten) ziel.addPage(s);
   }
   ziel.setTitle(titel);
-  ziel.setCreator("Amtlos");
+  ziel.setCreator(MARKE.name);
   return ziel.save();
 }
 

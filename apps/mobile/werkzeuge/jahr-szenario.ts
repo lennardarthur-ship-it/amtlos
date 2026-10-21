@@ -47,6 +47,7 @@ import { fussAngaben, fusszeileStempeln } from "../src/unterlagen/fusszeile";
 import { mitSchriften } from "../src/unterlagen/schriften";
 import { auswertung } from "../src/pflichten/check";
 import * as D from "./jahr-szenario-daten";
+import { MARKE } from "@amtlos/marke";
 
 export { RAENDER, fussAngaben, fusszeileStempeln, mitSchriften, unzipSync, D };
 
@@ -436,12 +437,12 @@ export function standBauen(): Bau {
       ], h),
     }) });
 
-  dok({ id: "verfahren", vorlage: "verfahrensdokumentation", datum: "2026-01-15", worum: "Verfahrensdokumentation (GoBD): Amtlos für Rechnungen/Belege, KassaVista mit Cloud-TSE, Online-Banking, Kanzleiportal; Belege teils Papier (fotografiert), teils digital und E-Rechnung; tägliche Kassenzählung.",
+  dok({ id: "verfahren", vorlage: "verfahrensdokumentation", datum: "2026-01-15", worum: `Verfahrensdokumentation (GoBD): ${MARKE.name} für Rechnungen/Belege, KassaVista mit Cloud-TSE, Online-Banking, Kanzleiportal; Belege teils Papier (fotografiert), teils digital und E-Rechnung; tägliche Kassenzählung.`,
     daten: () => ({ version: "1.2", verantwortlich: "Jana Weber",
       organisation: "Café mit 34 Sitzplätzen und Catering für Firmen- und Privatkunden. Inhaberin Jana Weber (Buchhaltung, Einkauf, Service), eine Köchin in Vollzeit, eine Servicekraft im Minijob. Öffnungszeiten Di–So 8–18 Uhr.",
       steuerberatung: "Jahresabschluss durch die Steuerberatung; laufende Buchführung im Betrieb",
       systeme: eintraege("verfahrensdokumentation", "systeme", [
-        { name: "Amtlos (App, iPhone)", zweck: "Rechnungsprogramm", version: "seit 01/2026" },
+        { name: `${MARKE.name} (App, iPhone)`, zweck: "Rechnungsprogramm", version: "seit 01/2026" },
         { name: "KassaVista POS mit Cloud-TSE (Tablet-Kasse)", zweck: "Kassensystem", version: "6.4, seit 03/2022" },
         { name: "Sparkasse Leipzig Online-Banking", zweck: "Online-Banking", version: "seit 03/2022" },
         { name: "Kanzleiportal Albrecht & Partner", zweck: "Upload-Portal der Steuerberatung", version: "seit 01/2023" },
@@ -450,15 +451,15 @@ export function standBauen(): Bau {
       belegeingang: ["Papier (Post/persönlich)", "E-Mail mit PDF-Anhang", "E-Rechnung (XRechnung/ZUGFeRD) per E-Mail oder Portal", "Kassensystem/Kassenbericht", "Kontoauszug/Bank-Schnittstelle", "Eigenbeleg"],
       belegart: ["originär Papier, Ablage in Papier (Muster 4.1)", "originär digital (Muster 4.3)"],
       ablage: ["Papierordner (chronologisch/nach Belegart)", "Upload an Steuerberater (z. B. Kanzlei-Portal)"],
-      erfassung: "Belege werden wöchentlich in Amtlos erfasst (Foto bzw. Datei) und quartalsweise als Paket an die Steuerberatung übermittelt.\nEingangsrechnungen werden vor der Zahlung sachlich und rechnerisch geprüft.\nAusgangsrechnungen werden fortlaufend nummeriert in Amtlos erstellt und beim Teilen festgeschrieben; Korrekturen nur per Stornorechnung.",
+      erfassung: `Belege werden wöchentlich in ${MARKE.name} erfasst (Foto bzw. Datei) und quartalsweise als Paket an die Steuerberatung übermittelt.\nEingangsrechnungen werden vor der Zahlung sachlich und rechnerisch geprüft.\nAusgangsrechnungen werden fortlaufend nummeriert in ${MARKE.name} erstellt und beim Teilen festgeschrieben; Korrekturen nur per Stornorechnung.`,
       scannen: false, sicherung_intervall: "wöchentlich", sicherung_ort: ["Cloud-Backup", "durch Softwareanbieter/Rechenzentrum"], e_rechnung: true,
       zugriff: "Zugriff auf Buchhaltung und Belege nur für Inhaber/in und Steuerberatung\nKasse: eigene Bedienerkennung je Person",
       kontrollen: "Tägliches Zählen der Kasse und Abgleich mit dem Kassenbericht\nMonatlicher Abgleich von Kontoauszügen und Buchungen",
-      aenderungen: eintraege("verfahrensdokumentation", "aenderungen", [{ datum: "2026-01-15", aenderung: "Umstellung der Rechnungsstellung und Belegerfassung auf Amtlos; E-Rechnungsempfang eingerichtet." }], "2026-01-15") }) });
+      aenderungen: eintraege("verfahrensdokumentation", "aenderungen", [{ datum: "2026-01-15", aenderung: `Umstellung der Rechnungsstellung und Belegerfassung auf ${MARKE.name}; E-Rechnungsempfang eingerichtet.` }], "2026-01-15") }) });
 
   dok({ id: "aufbewahrung", vorlage: "aufbewahrung", datum: "2026-01-15", worum: "Aufbewahrungsplan mit den Startzeilen der App (Fristbeginn 2026, Ablageort) und zwei ergänzten Zeilen (Kassendaten, Lohnkonten).",
     daten: (h) => {
-      const start = (leereDatenVon("aufbewahrung", h).eintraege as Eintrag[]).map((e) => ({ ...e, letzte: "2026", ort: "Amtlos (verschlüsselt) und Kanzleiportal; Papier im Büroschrank" }));
+      const start = (leereDatenVon("aufbewahrung", h).eintraege as Eintrag[]).map((e) => ({ ...e, letzte: "2026", ort: `${MARKE.name} (verschlüsselt) und Kanzleiportal; Papier im Büroschrank` }));
       return { eintraege: [...start, ...eintraege("aufbewahrung", "eintraege", [
         { art: "Kassendaten: TSE-Export und DSFinV-K-Export, Z-Bons, Kassenberichte", jahre: "8", letzte: "2026", ort: "KassaVista-Cloud und externe Festplatte" },
         { art: "Lohnkonten (§ 41 Abs. 1 EStG)", jahre: "6", letzte: "2026", ort: "Lohnbüro Lorenz und Personalordner" },
@@ -659,7 +660,7 @@ export function standBauen(): Bau {
         anzahl = erg.anzahl;
         kasseTage = erg.kasseTage;
         vergleichText(`USt ${periode} (Kasse)`, "Tage ohne Kassenabschluss (Kassenhinweis entfällt)", erg.kasseFehlend?.join(", ") || "keine", "keine");
-        s = felderSetzen(s, id, { ...erg.werte, notiz: `Aus Rechnungen und Tagesabschlüssen übernommen (Amtlos, ${erg.anzahl} Rechnungen, ${erg.kasseTage} Kassenabschlüsse${eq.r0 ? "; innergemeinschaftliche Lieferung, Kz 41 – Zusammenfassende Meldung abgeben" : ""}). Vorsteuer aus ${erg.vorsteuerBelege} Belegen.` }, t(vaDatum[i]!, 9));
+        s = felderSetzen(s, id, { ...erg.werte, notiz: `Aus Rechnungen und Tagesabschlüssen übernommen (${MARKE.name}, ${erg.anzahl} Rechnungen, ${erg.kasseTage} Kassenabschlüsse${eq.r0 ? "; innergemeinschaftliche Lieferung, Kz 41 – Zusammenfassende Meldung abgeben" : ""}). Vorsteuer aus ${erg.vorsteuerBelege} Belegen.` }, t(vaDatum[i]!, 9));
         if (erg.ersatz) infos.push(`${periode}: ${erg.ersatz} Rechnung(en) ohne eindeutiges Leistungsdatum nach Rechnungsdatum zugeordnet.`);
       } });
     const u = unterlage(id);
@@ -733,7 +734,7 @@ export function standBauen(): Bau {
     daten: (h) => ({ jahr: "2026", arten: ["est", "gewst", "ust"], gewinn: `${gewinn[0] === "Verlust" ? "-" : ""}${gewinn[1].replace(/[€\s\u00a0]/g, "")}`, umsatz: euro(vaSumme("umsatz_19") + vaSumme("umsatz_7") + (vaSumme("umsatz_frei") + vaSumme("umsatz_igl") + vaSumme("umsatz_48") + vaSumme("umsatz_13b"))), ust_jahr: euro(ustJahr), vorsteuer_jahr: euro(vaSumme("vorsteuer")),
       vorauszahlungen: eintraege("steuererklaerung", "vorauszahlungen", [...[1, 2, 3, 4].map((q) => ({ art: `Einkommensteuer Q${q}`, betrag: "1.850,00" })), ...[1, 2, 3, 4].map((q) => ({ art: `Gewerbesteuer Q${q}`, betrag: "220,00" }))], h),
       weiteres: eintraege("steuererklaerung", "weiteres", [{ was: "Kranken- und Pflegeversicherung (freiwillig gesetzlich, AOK PLUS)", betrag: "5.874,00", beleg: true }, { was: "Basisrente (Rürup), Beiträge 2026", betrag: "2.400,00", beleg: true }, { was: "Spende an den Kunstverein Plagwitz e. V.", betrag: "150,00", beleg: false }], h),
-      notiz: "Kassenumsätze kommen aus den Tagesabschlüssen in Amtlos (Z-Bons). Innergemeinschaftliche Lieferung nach Österreich: Zusammenfassende Meldung für das 3. Quartal abgegeben." }) });
+      notiz: `Kassenumsätze kommen aus den Tagesabschlüssen in ${MARKE.name} (Z-Bons). Innergemeinschaftliche Lieferung nach Österreich: Zusammenfassende Meldung für das 3. Quartal abgegeben.` }) });
   {
     const j = D.jahresSummen();
     vergleich("Steuererklärung", "Umsätze im Jahr netto (Summe der Voranmeldungen)", vaSumme("umsatz_19") + vaSumme("umsatz_7") + (vaSumme("umsatz_frei") + vaSumme("umsatz_igl") + vaSumme("umsatz_48") + vaSumme("umsatz_13b")), j.r19 + j.r7 + j.r0 + j.k19 + j.k7);

@@ -4,7 +4,7 @@ const config: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   output: "standalone",
-  transpilePackages: ["@amtlos/i18n", "@amtlos/web-kern"],
+  transpilePackages: ["@amtlos/i18n", "@amtlos/web-kern", "@amtlos/marke"],
   // Belege bis 15 MB (die API begrenzt ebenfalls auf 15 MB)
   experimental: { serverActions: { bodySizeLimit: "16mb" } },
   async headers() {

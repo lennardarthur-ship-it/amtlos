@@ -14,6 +14,7 @@
   "dependencies": {
     "@amtlos/fachlogik": "workspace:*",
     "@amtlos/fristen": "workspace:*",
+    "@amtlos/marke": "workspace:*",
     "@amtlos/rules-engine": "workspace:*",
     "@amtlos/rules-schema": "workspace:*",
     "@amtlos/server": "workspace:*",

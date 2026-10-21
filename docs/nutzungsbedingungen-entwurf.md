@@ -1,10 +1,10 @@
-# Nutzungsbedingungen für Amtlos – ENTWURF
+# Nutzungsbedingungen für Betriebsklar – ENTWURF
 
 > **Entwurf zur anwaltlichen Prüfung (E-156). Nicht veröffentlichen.** Erstellt als Arbeitsgrundlage, um die Prüfung zu verkürzen – kein geprüfter Rechtstext. Bis zur Freigabe gilt in der App Apples Standard-Lizenzvertrag (`LINKS.nutzung`). Eckige Klammern füllt der Gründer bzw. die Anwältin aus. Fragen an die Prüfung stehen in den Kästen „Prüfen:“.
 
 ## 1. Anbieter und Geltungsbereich
 
-1.1 Diese Bedingungen gelten für die Nutzung der App „Amtlos“ (im Folgenden „App“) von [Firma, Rechtsform, Anschrift, Vertretung, Register, E-Mail] (im Folgenden „wir“).
+1.1 Diese Bedingungen gelten für die Nutzung der App „Betriebsklar“ (im Folgenden „App“) von [Firma, Rechtsform, Anschrift, Vertretung, Register, E-Mail] (im Folgenden „wir“).
 
 1.2 Die Bedingungen gelten für Unternehmer (§ 14 BGB) und Verbraucher (§ 13 BGB). Wo Regeln nur für eine Gruppe gelten, ist das gesagt.
 
@@ -12,11 +12,11 @@
 
 > Prüfen: Apple verlangt für eigene Nutzungsbedingungen bestimmte Mindestinhalte (Developer Program License Agreement, Schedule 1 / „Minimum Terms of Developer’s End-User License Agreement“). Die Ziffern 1.3, 3.4, 8, 10.3 und 11 sollen sie abdecken – vollständig?
 
-## 2. Was Amtlos ist – und was nicht
+## 2. Was Betriebsklar ist – und was nicht
 
-2.1 Amtlos ist eine Software, die allgemeine Informationen zu typischen Pflichten von Betrieben in Deutschland bereitstellt, Vorlagen zum Selbstausfüllen anbietet, an Fristen erinnert und bei Rechnungen und Belegen hilft.
+2.1 Betriebsklar ist eine Software, die allgemeine Informationen zu typischen Pflichten von Betrieben in Deutschland bereitstellt, Vorlagen zum Selbstausfüllen anbietet, an Fristen erinnert und bei Rechnungen und Belegen hilft.
 
-2.2 **Amtlos ist keine Rechts- oder Steuerberatung.** Der Pflichten-Check ordnet deine Angaben einem festen, allgemeinen Katalog zu und zeigt, welche Pflichten nach diesen Angaben in Frage kommen. Er prüft nicht deinen Einzelfall. Vorlagen sind Muster für typische Fälle und müssen von dir an deinen Betrieb angepasst werden. Für die rechtliche oder steuerliche Beurteilung deines Einzelfalls wende dich an eine Rechtsanwältin, einen Rechtsanwalt, eine Steuerberaterin oder einen Steuerberater.
+2.2 **Betriebsklar ist keine Rechts- oder Steuerberatung.** Der Pflichten-Check ordnet deine Angaben einem festen, allgemeinen Katalog zu und zeigt, welche Pflichten nach diesen Angaben in Frage kommen. Er prüft nicht deinen Einzelfall. Vorlagen sind Muster für typische Fälle und müssen von dir an deinen Betrieb angepasst werden. Für die rechtliche oder steuerliche Beurteilung deines Einzelfalls wende dich an eine Rechtsanwältin, einen Rechtsanwalt, eine Steuerberaterin oder einen Steuerberater.
 
 2.3 Der Katalog gibt den Rechtsstand wieder, der in der App angezeigt wird („Rechtsstand: …“). Gesetze ändern sich; wir aktualisieren den Katalog mit App-Updates, können aber nicht garantieren, dass jede Änderung sofort enthalten ist.
 
@@ -34,11 +34,11 @@
 
 3.4 Wartung und Support leisten wir, nicht Apple. Kontakt: [E-Mail / Support-Seite].
 
-## 4. Kostenlose Nutzung und Amtlos Pro
+## 4. Kostenlose Nutzung und Betriebsklar Pro
 
-4.1 Die App kann kostenlos genutzt werden. Welche Funktionen kostenlos sind und welche Amtlos Pro freischaltet, steht in der App vor dem Kauf.
+4.1 Die App kann kostenlos genutzt werden. Welche Funktionen kostenlos sind und welche Betriebsklar Pro freischaltet, steht in der App vor dem Kauf.
 
-4.2 Amtlos Pro ist ein Abonnement, das du über deinen Apple-Account abschließt. Preis, Laufzeit, Probezeitraum und Verlängerung zeigt die App vor dem Kauf. Bezahlung, Verlängerung, Kündigung und Erstattung richten sich nach den Bedingungen von Apple; kündigen kannst du in den Einstellungen deines Apple-Accounts.
+4.2 Betriebsklar Pro ist ein Abonnement, das du über deinen Apple-Account abschließt. Preis, Laufzeit, Probezeitraum und Verlängerung zeigt die App vor dem Kauf. Bezahlung, Verlängerung, Kündigung und Erstattung richten sich nach den Bedingungen von Apple; kündigen kannst du in den Einstellungen deines Apple-Accounts.
 
 4.3 Für Verbraucher: Ein Widerrufsrecht besteht nach den Bedingungen des App Store, über den der Kauf läuft.
 
@@ -58,7 +58,7 @@
 
 6.1 Die App funktioniert ohne Verbindung zu unseren Servern. Für Käufe und Updates brauchst du den App Store.
 
-6.2 Wir dürfen die App weiterentwickeln und Funktionen ändern, wenn das für dich zumutbar ist – insbesondere, um sie an geänderte Gesetze anzupassen. Bezahlte Kernfunktionen von Amtlos Pro entfernen wir während eines laufenden Abozeitraums nicht ersatzlos.
+6.2 Wir dürfen die App weiterentwickeln und Funktionen ändern, wenn das für dich zumutbar ist – insbesondere, um sie an geänderte Gesetze anzupassen. Bezahlte Kernfunktionen von Betriebsklar Pro entfernen wir während eines laufenden Abozeitraums nicht ersatzlos.
 
 > Prüfen: Änderungsvorbehalt bei digitalen Produkten gegenüber Verbrauchern (§ 327r BGB).
 

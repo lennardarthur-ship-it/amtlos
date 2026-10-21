@@ -33,6 +33,7 @@
 import { sachentnahmenFuer, type Sachentnahme } from "@amtlos/fachlogik";
 import { eRechnungAus, fehlendeTage, istEuAusland, kassenUmsatz, kennzahlBefreiung, steuerschuldFuer, summen, ustZeitraum, vorsteuerFuer, zahlungsAnteile, type Beleg, type Betrieb, type Kassenabschluss, type RechnungsDaten } from "@amtlos/fachlogik";
 import { nichtZaehlend, type Unterlage } from "./speicher";
+import { MARKE } from "@amtlos/marke";
 
 export type Versteuerung = "soll" | "ist";
 
@@ -54,7 +55,7 @@ const betragText = (cent: number) => new Intl.NumberFormat("de-DE", { minimumFra
 export const istGutschrift = (u: Unterlage) => Array.isArray(u.daten.hinweise) && u.daten.hinweise.some((h) => h === "gutschrift");
 
 /** Steht bei der EÜR-Übernahme und im Steuerberater-Paket, sobald Gutschriften dabei sind. */
-export const GUTSCHRIFT_HINWEIS = "Gutschriften sind Ausgaben: Mit Zahlungsvermerk übernimmt Amtlos sie als „Bezogene Leistungen“ (EÜR) bzw. als Aufwand (Buchungsstapel) – bitte nicht zusätzlich als Beleg erfassen. Gutschriften ohne Zahlungsvermerk fehlen in der EÜR noch.";
+export const GUTSCHRIFT_HINWEIS = `Gutschriften sind Ausgaben: Mit Zahlungsvermerk übernimmt ${MARKE.name} sie als „Bezogene Leistungen“ (EÜR) bzw. als Aufwand (Buchungsstapel) – bitte nicht zusätzlich als Beleg erfassen. Gutschriften ohne Zahlungsvermerk fehlen in der EÜR noch.`;
 
 /** Gestellte Rechnungen – ohne Konfliktkopien und doppelte Stornos (K1, K2: je Rechnung zählt nur das Storno aus `storniertDurch`). */
 const gestellt = (unterlagen: Unterlage[]) => {

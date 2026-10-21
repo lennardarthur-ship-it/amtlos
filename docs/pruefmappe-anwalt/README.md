@@ -2,7 +2,7 @@
 
 Stand: Oktober 2026. Diese Mappe ist für eine Anwältin oder einen Anwalt mit Schwerpunkt **Arbeitsrecht und Datenschutzrecht**, für die Fragen zum Rechtsdienstleistungsgesetz gegebenenfalls zusätzlich **Berufsrecht / Legal Tech**. Sie soll den Prüfauftrag eingrenzen und damit die Kosten planbar machen.
 
-## Was Amtlos ist
+## Was Betriebsklar ist
 
 Eine iPhone-App für kleine Betriebe in Deutschland (Café, Salon, Handwerk, Praxis, Laden). Sie
 
@@ -10,7 +10,7 @@ Eine iPhone-App für kleine Betriebe in Deutschland (Café, Salon, Handwerk, Pra
 2. bietet **Vorlagen** zum Ausfüllen (Gefährdungsbeurteilung, Nachweis nach NachwG, AVV, Datenschutzinformation …), die der Nutzer selbst ausfüllt und als PDF ausgibt,
 3. erinnert an Fristen und führt Rechnungen und Belege.
 
-Die Daten bleiben auf dem Gerät. Amtlos sieht keine Nutzerdaten.
+Die Daten bleiben auf dem Gerät. Betriebsklar sieht keine Nutzerdaten.
 
 ## Inhalt der Mappe
 
@@ -63,10 +63,10 @@ Alle übrigen Vorlagen (Unterweisung, Betriebsanweisung, Hygieneplan, HACCP, All
 6. Genügt der Hinweis in der App (Check, Pflichtdetails, jede Vorlage) oder muss er zusätzlich auf die PDFs? (Heute bewusst nicht auf den PDFs, weil das die Unterlagen des Nutzers sind, die er Kontrolleuren und Kunden zeigt.)
 7. Welche Angaben braucht die Vermögensschadenhaftpflicht-Versicherung, um das Risiko „fehlerhafte Vorlage / fehlende Pflicht im Katalog“ zu decken?
 
-### Datenschutz (Amtlos selbst)
+### Datenschutz (Betriebsklar selbst)
 
 8. Ist der Datenschutzhinweis der App vollständig (Art. 13 DSGVO)? Übermittlung an RevenueCat (USA) auf Grundlage der Standardvertragsklauseln Modul 2 laut Auftragsverarbeitungsvertrag von RevenueCat (Stand August 2026).
-9. Ist Amtlos für die Daten, die Nutzer in der App über Kunden und Mitarbeiter erfassen, weder Verantwortlicher noch Auftragsverarbeiter (alles bleibt auf dem Gerät, Ende-zu-Ende-verschlüsselte Sicherung)?
+9. Ist Betriebsklar für die Daten, die Nutzer in der App über Kunden und Mitarbeiter erfassen, weder Verantwortlicher noch Auftragsverarbeiter (alles bleibt auf dem Gerät, Ende-zu-Ende-verschlüsselte Sicherung)?
 
 ### Vorlagen allgemein
 

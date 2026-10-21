@@ -45,6 +45,7 @@ import { mitSchriften } from "../src/unterlagen/schriften";
 import { auswertung, type PflichtInfo, type Profil } from "../src/pflichten/check";
 import { T as TEXT } from "../src/texte";
 import * as D from "./jahr-szenario-elektro-daten";
+import { MARKE } from "@amtlos/marke";
 
 export { RAENDER, fussAngaben, fusszeileStempeln, mitSchriften, unzipSync, D, deckblattHtml, mappeDateiname, mappeZusammenfuegen, seitenzahl, startSeiten };
 
@@ -442,12 +443,12 @@ export function standBauen(): Bau {
       ], h),
     }) });
 
-  dok({ id: "verfahren", vorlage: "verfahrensdokumentation", datum: "2026-01-15", worum: "Verfahrensdokumentation (GoBD): Amtlos für Rechnungen/Belege, Aufmaß auf Papier, Online-Banking, Steuerbüro mit DATEV; keine Kasse, Bareinkäufe über die Portokasse.",
+  dok({ id: "verfahren", vorlage: "verfahrensdokumentation", datum: "2026-01-15", worum: `Verfahrensdokumentation (GoBD): ${MARKE.name} für Rechnungen/Belege, Aufmaß auf Papier, Online-Banking, Steuerbüro mit DATEV; keine Kasse, Bareinkäufe über die Portokasse.`,
     daten: () => ({ version: "2.0", verantwortlich: "Jens Brandt",
       organisation: "Elektro-Meisterbetrieb (Einzelunternehmen) mit Werkstatt und Lager in Dortmund-Aplerbeck; Inhaber Jens Brandt (Elektrotechnikermeister, Angebote, Aufmaß, Rechnungen, Buchhaltung), zwei Gesellen, ein Auszubildender. Arbeiten überwiegend auf Baustellen und bei Kunden vor Ort; ein Werkstattwagen.",
       steuerberatung: "Jahresabschluss durch die Steuerberatung; laufende Buchführung im Betrieb",
       systeme: eintraege("verfahrensdokumentation", "systeme", [
-        { name: "Amtlos (App, iPhone)", zweck: "Rechnungsprogramm und Belegerfassung", version: "seit 01/2026" },
+        { name: `${MARKE.name} (App, iPhone)`, zweck: "Rechnungsprogramm und Belegerfassung", version: "seit 01/2026" },
         { name: "Aufmaß- und Stundenzettel (Papier, je Baustelle)", zweck: "Grundlage der Rechnungen", version: "laufend" },
         { name: "Sparkasse Dortmund Online-Banking", zweck: "Online-Banking", version: "seit 04/2014" },
         { name: "DATEV Unternehmen online (Steuerbüro)", zweck: "Belegaustausch und Lohnabrechnung", version: "seit 01/2020" },
@@ -455,15 +456,15 @@ export function standBauen(): Bau {
       belegeingang: ["Papier (Post/persönlich)", "E-Mail mit PDF-Anhang", "E-Rechnung (XRechnung/ZUGFeRD) per E-Mail oder Portal", "Kontoauszug/Bank-Schnittstelle", "Eigenbeleg"],
       belegart: ["originär Papier, Ablage in Papier (Muster 4.1)", "originär digital (Muster 4.3)"],
       ablage: ["Papierordner (chronologisch/nach Belegart)", "Upload an Steuerberater (z. B. Kanzlei-Portal)"],
-      erfassung: "Belege werden wöchentlich in Amtlos erfasst (Foto bzw. Datei) und quartalsweise als Paket an das Steuerbüro übermittelt.\nAufmaß und Stundenzettel der Baustellen werden zur Rechnung abgelegt (Rechnungsnummer auf dem Aufmaß).\nAusgangsrechnungen werden fortlaufend nummeriert in Amtlos erstellt und beim Teilen festgeschrieben; Korrekturen nur per Stornorechnung.",
+      erfassung: `Belege werden wöchentlich in ${MARKE.name} erfasst (Foto bzw. Datei) und quartalsweise als Paket an das Steuerbüro übermittelt.\nAufmaß und Stundenzettel der Baustellen werden zur Rechnung abgelegt (Rechnungsnummer auf dem Aufmaß).\nAusgangsrechnungen werden fortlaufend nummeriert in ${MARKE.name} erstellt und beim Teilen festgeschrieben; Korrekturen nur per Stornorechnung.`,
       scannen: false, sicherung_intervall: "wöchentlich", sicherung_ort: ["Cloud-Backup", "durch Steuerberater"], e_rechnung: true,
       zugriff: "Zugriff auf Buchhaltung und Belege nur für den Inhaber und das Steuerbüro",
       kontrollen: "Monatlicher Abgleich von Kontoauszügen, offenen Rechnungen und Zahlungseingängen\nZahlungserinnerung bei überfälligen Rechnungen nach 14 Tagen",
-      aenderungen: eintraege("verfahrensdokumentation", "aenderungen", [{ datum: "2026-01-15", aenderung: "Rechnungen und Belegerfassung auf Amtlos umgestellt; E-Rechnungsempfang vom Großhandel eingerichtet." }], "2026-01-15") }) });
+      aenderungen: eintraege("verfahrensdokumentation", "aenderungen", [{ datum: "2026-01-15", aenderung: `Rechnungen und Belegerfassung auf ${MARKE.name} umgestellt; E-Rechnungsempfang vom Großhandel eingerichtet.` }], "2026-01-15") }) });
 
   dok({ id: "aufbewahrung", vorlage: "aufbewahrung", datum: "2026-01-15", worum: "Aufbewahrungsplan mit den Startzeilen der App und drei ergänzten Zeilen (Aufmaß/Stundenzettel, Prüfprotokolle, Lohnkonten).",
     daten: (h) => {
-      const start = (leereDatenVon("aufbewahrung", h).eintraege as Eintrag[]).map((e) => ({ ...e, letzte: "2026", ort: "Amtlos (verschlüsselt) und DATEV Unternehmen online; Papier im Büro der Werkstatt" }));
+      const start = (leereDatenVon("aufbewahrung", h).eintraege as Eintrag[]).map((e) => ({ ...e, letzte: "2026", ort: `${MARKE.name} (verschlüsselt) und DATEV Unternehmen online; Papier im Büro der Werkstatt` }));
       return { eintraege: [...start, ...eintraege("aufbewahrung", "eintraege", [
         { art: "Aufmaß und Stundenzettel (Grundlage der Rechnungen)", jahre: "8", letzte: "2026", ort: "Ordner je Kunde/Baustelle" },
         { art: "Prüfprotokolle elektrischer Anlagen (DIN VDE 0100-600) und Geräte (DGUV V3)", jahre: "10", letzte: "2026", ort: "Ordner Prüfprotokolle" },
@@ -612,7 +613,7 @@ export function standBauen(): Bau {
         app = erg.werte;
         anzahl = erg.anzahl;
         ersatz = erg.ersatz;
-        s = felderSetzen(s, id, { ...erg.werte, notiz: `Aus Rechnungen übernommen (Amtlos, ${erg.anzahl} Rechnungen, davon ${erg.ersatz} nach Rechnungsdatum zugeordnet). Vorsteuer aus ${erg.vorsteuerBelege} Belegen${erg.ohneVorsteuer ? `, ${erg.ohneVorsteuer} mit USt ohne Vorsteuerabzug` : ""}.` }, t(vaDatum[i]!, 9));
+        s = felderSetzen(s, id, { ...erg.werte, notiz: `Aus Rechnungen übernommen (${MARKE.name}, ${erg.anzahl} Rechnungen, davon ${erg.ersatz} nach Rechnungsdatum zugeordnet). Vorsteuer aus ${erg.vorsteuerBelege} Belegen${erg.ohneVorsteuer ? `, ${erg.ohneVorsteuer} mit USt ohne Vorsteuerabzug` : ""}.` }, t(vaDatum[i]!, 9));
       } });
     const u = unterlage(id);
     const grund19 = eq.skonto19 ? `Skonto-Minderung ${euro(eq.skonto19)} € (Zahlung 2026-021 am 09.10. mit 2 %) – seit R12 als Minderung im Zeitraum der Zahlung vermerkt.` : "";
@@ -745,7 +746,7 @@ export function standBauen(): Bau {
   ];
   for (const [id, soll, warum] of ERWARTET) {
     const ist = istDa(id);
-    vergleichText(`Pflichten-Check (${D.de(stichtag)})`, `${id} (${warum})`, ist === "gilt (Gründung)" && soll === "gilt" ? "gilt" : ist, soll, id === "steuern.bauabzugsteuer_freistellung" ? "Der Katalog löst die Pflicht nur mit der Branche „Bau“ aus (Auslöser profil.taetigkeit.branchen enthält „bau“)." : id === "arbeitsschutz.unterweisung_wiederholen" ? "Auslöser ist das Ereignis „unterweisung_durchgefuehrt“ aus einer in der App ausgegebenen Unterweisung – ein Betrieb mit Beschäftigten seit 2017 sieht die jährliche Wiederholung erst, nachdem er eine Unterweisung in Amtlos erfasst hat (bis dahin nur die Erstunterweisung)." : "");
+    vergleichText(`Pflichten-Check (${D.de(stichtag)})`, `${id} (${warum})`, ist === "gilt (Gründung)" && soll === "gilt" ? "gilt" : ist, soll, id === "steuern.bauabzugsteuer_freistellung" ? "Der Katalog löst die Pflicht nur mit der Branche „Bau“ aus (Auslöser profil.taetigkeit.branchen enthält „bau“)." : id === "arbeitsschutz.unterweisung_wiederholen" ? `Auslöser ist das Ereignis „unterweisung_durchgefuehrt“ aus einer in der App ausgegebenen Unterweisung – ein Betrieb mit Beschäftigten seit 2017 sieht die jährliche Wiederholung erst, nachdem er eine Unterweisung in ${MARKE.name} erfasst hat (bis dahin nur die Erstunterweisung).` : "");
   }
   vergleichText(`Pflichten-Check (${D.de(stichtag)})`, "gruendung.handwerksrolle vorhanden (Anlage A)", istDa("gruendung.handwerksrolle") === "fehlt" ? "fehlt" : "vorhanden", "vorhanden");
   vergleichText(`Pflichten-Check (${D.de(stichtag)})`, "gruendung.rentenversicherungspflicht (Handwerker in der Handwerksrolle)", istDa("gruendung.rentenversicherungspflicht") === "fehlt" ? "fehlt" : "vorhanden", "vorhanden");

@@ -27,6 +27,7 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
+import { MARKE } from "../../../packages/marke/index.js";
 
 /**
  * Beobachtungen, die beim Erstellen des Szenarios (Oktober 2026) beim Durchsehen der PDFs und Pakete aufgefallen sind
@@ -182,10 +183,10 @@ function paketNeuerungen(name, zr, inhalt, erg, kleinunternehmer, belegeRoh) {
   const alleCsv = Object.keys(inhalt).filter((p) => p.endsWith(".csv") && !p.startsWith("EXTF")).map((p) => new TextDecoder().decode(inhalt[p]));
   vergleich(bereich, "Listen: kein „-0,00“", alleCsv.some((t) => /(^|;)-0,00(;|\r)/m.test(t)) ? "kommt vor" : "keins", "keins");
   if (be.zeilen.length) vergleich(bereich, "Belegliste: Summenzeile Brutto = Summe der Zeilen", be.summen[0] ? centAus(be.w(be.summen[0], "Brutto")) : NaN, summe(be.zeilen.map((z) => centAus(be.w(z, "Brutto")))));
-  const nrn = be.zeilen.map((z) => be.w(z, "Amtlos-Belegnr."));
-  vergleich(bereich, "Belegliste: Amtlos-Belegnr. eindeutig und in der Form B<Jahr>-nnn", nrn.every((n, i) => /^B\d{4}-\d{3}$/.test(n) && nrn.indexOf(n) === i) ? "ja" : nrn.join(", "), "ja");
-  const dateiFalsch = be.zeilen.filter((z) => be.w(z, "Datei") && !(be.w(z, "Datei").startsWith(`${be.w(z, "Amtlos-Belegnr.")}_`) && inhalt[`Belege/${be.w(z, "Datei")}`]));
-  vergleich(bereich, "Belegdateien beginnen mit der Amtlos-Belegnr. der Liste und liegen unter Belege/", dateiFalsch.length ? dateiFalsch.map((z) => be.w(z, "Datei")).join(", ") : "alle", "alle");
+  const nrn = be.zeilen.map((z) => be.w(z, `${MARKE.name}-Belegnr.`));
+  vergleich(bereich, "Belegliste: Belegnr. der App eindeutig und in der Form B<Jahr>-nnn", nrn.every((n, i) => /^B\d{4}-\d{3}$/.test(n) && nrn.indexOf(n) === i) ? "ja" : nrn.join(", "), "ja");
+  const dateiFalsch = be.zeilen.filter((z) => be.w(z, "Datei") && !(be.w(z, "Datei").startsWith(`${be.w(z, `${MARKE.name}-Belegnr.`)}_`) && inhalt[`Belege/${be.w(z, "Datei")}`]));
+  vergleich(bereich, "Belegdateien beginnen mit der Belegnr. der App der Liste und liegen unter Belege/", dateiFalsch.length ? dateiFalsch.map((z) => be.w(z, "Datei")).join(", ") : "alle", "alle");
   const ohneZahltag = be.zeilen.filter((z) => /fehlt – Belegdatum verwendet/.test(be.w(z, "Zahltag"))).length;
   vergleich(bereich, "Belegliste: Markierung „fehlt – Belegdatum verwendet“ genau bei Belegen ohne Zahltag", String(ohneZahltag), String(belegeRoh.filter((b) => !b.bezahlt).length));
   const extf = csvLesen(inhalt[`EXTF_Buchungsstapel_${zr.name}.csv`], "latin1");

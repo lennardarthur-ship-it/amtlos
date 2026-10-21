@@ -7,6 +7,7 @@ import { GOBD } from "./bausteine.js";
 import { mitVertretung } from "./betrieb.js";
 import { abschnitte, angaben, ankreuzen, auswahl, datumDe, dokument, esc, ja, liste, neufassung, punkte, stabileOption, tabelle, text, unterschriften, zelle, zeilen } from "./html.js";
 import type { Option, Vorlage } from "./typen.js";
+import { MARKE } from "@amtlos/marke";
 
 // Wert bleibt der frühere Text (gespeicherte Auswahlen), Anzeige und Druck in der Neufassung
 const opt = (l: string[]): Option[] => l.map((t) => stabileOption(t));
@@ -16,7 +17,7 @@ const PROGRAMME = ["Buchhaltungsprogramm", "Kassensystem", "Rechnungsprogramm", 
 const KASSEN_ARTEN = ["Elektronisches Kassensystem mit TSE (Einzelaufzeichnung je Verkauf)", "Offene Ladenkasse ohne elektronisches Kassensystem (Kassenbericht mit Zählung)", "Keine Bareinnahmen"];
 /** R12 GoBD: Bausteine zum Ablauf an der Kasse. */
 const KASSEN_ABLAUF = [
-  "Jeden Abend Tagesabschluss (Z-Bon) und Übernahme der Summen je Steuersatz, Karte, Trinkgeld, Gutscheine und Entnahmen in Amtlos am selben Tag",
+  `Jeden Abend Tagesabschluss (Z-Bon) und Übernahme der Summen je Steuersatz, Karte, Trinkgeld, Gutscheine und Entnahmen in ${MARKE.name} am selben Tag`,
   "Der Bargeldbestand wird am Ende jedes Tages gezählt; Kassendifferenzen werden mit Grund vermerkt und gebucht",
   "Offene Ladenkasse: Kassenbericht täglich mit Zählprotokoll; Bareinnahmen werden aus dem gezählten Bestand zurückgerechnet",
   "Z-Bons, Einzelaufzeichnungen, DSFinV-K- und TSE-Export werden 10 Jahre aufbewahrt (§ 147 Abs. 1 Nr. 1, Abs. 3 AO)",
@@ -30,9 +31,9 @@ const AMTLOS_ABLAEUFE = [
   "Rechnungen bekommen fortlaufende Nummern und werden beim ersten Teilen festgeschrieben – mit den Absenderdaten, dem Hash des geteilten PDFs und der XRechnung. Korrigiert wird nur per Stornorechnung.",
   "Tagesabschlüsse der Kasse sind ab dem Speichern festgeschrieben; „erfasst am“ und „festgeschrieben am“ werden gespeichert. Korrekturen sind nur mit Grund möglich, die vorige Fassung bleibt erhalten; Nacherfassungen werden gekennzeichnet. Tage nach dem aktuellen Datum lassen sich nicht erfassen.",
   "Das Kassenbuch wird nur lesbar aus den Tagesabschlüssen erzeugt und beim ersten Teilen festgeschrieben (Inhalt mit SHA-256); nach einer Korrektur entsteht eine neue Fassung.",
-  "Belege bekommen beim Erfassen eine feste Amtlos-Belegnummer. Endgültig löschen lässt sich ein Beleg nur innerhalb von 24 Stunden und vor jeder Weitergabe; danach wird er mit Grund als ungültig markiert und bleibt samt Datei erhalten. Jede Löschung steht im Änderungsprotokoll.",
+  `Belege bekommen beim Erfassen eine feste ${MARKE.name}-Belegnummer. Endgültig löschen lässt sich ein Beleg nur innerhalb von 24 Stunden und vor jeder Weitergabe; danach wird er mit Grund als ungültig markiert und bleibt samt Datei erhalten. Jede Löschung steht im Änderungsprotokoll.`,
   "Mit dem Steuerberater-Paket bzw. einer abgegebenen Voranmeldung werden die enthaltenen Belege festgeschrieben; Änderungen danach nur mit Grund (Änderungsprotokoll im Paket).",
-  "Die Daten liegen verschlüsselt auf dem Gerät. Gesichert wird verschlüsselt (Datei oder iCloud) mit einem Passwort, das getrennt und sicher hinterlegt ist; zusätzlich gibt es ein offenes Archiv (CSV, JSON, PDF, XML) zum Lesen ohne Amtlos.",
+  `Die Daten liegen verschlüsselt auf dem Gerät. Gesichert wird verschlüsselt (Datei oder iCloud) mit einem Passwort, das getrennt und sicher hinterlegt ist; zusätzlich gibt es ein offenes Archiv (CSV, JSON, PDF, XML) zum Lesen ohne ${MARKE.name}.`,
   "„Alle Daten löschen“ ist gesperrt, solange aufbewahrungspflichtige Daten ohne aktuelle Sicherung auf dem Gerät liegen.",
   "Diese Verfahrensdokumentation wird beim Teilen festgeschrieben; Änderungen sind neue Fassungen mit Datum und Grund.",
 ];
@@ -104,7 +105,7 @@ export const verfahrensdokumentation: Vorlage = {
         { id: "kasse_art", art: "wahl", label: "Art der Kasse", optionen: KASSEN_ARTEN.map((t) => ({ wert: t, text: t })) },
         { id: "kasse_ablauf", art: "bausteine", label: "Ablauf an der Kasse", optionen: opt(KASSEN_ABLAUF), wenn: { feld: "kasse_art", ist: [KASSEN_ARTEN[0]!, KASSEN_ARTEN[1]!] } },
         { id: "kasse_zusatz", selten: true, art: "mehrzeilig", label: "Weitere Regeln zur Kasse", hilfe: "z. B. Wechselgeldbestand, wer zählt, Ausfall der Kasse oder der TSE", wenn: { feld: "kasse_art", ist: [KASSEN_ARTEN[0]!, KASSEN_ARTEN[1]!] } },
-        { id: "amtlos", art: "schalter", label: "Rechnungen, Belege und Kassenabschlüsse werden in Amtlos geführt", vorbelegung: true, hilfe: "Dann beschreibt die Verfahrensdokumentation auch die Abläufe in Amtlos: Festschreibung, Korrektur mit Grund, Storno, ungültige Belege, Sicherung und Löschsperre." },
+        { id: "amtlos", art: "schalter", label: `Rechnungen, Belege und Kassenabschlüsse werden in ${MARKE.name} geführt`, vorbelegung: true, hilfe: `Dann beschreibt die Verfahrensdokumentation auch die Abläufe in ${MARKE.name}: Festschreibung, Korrektur mit Grund, Storno, ungültige Belege, Sicherung und Löschsperre.` },
       ],
     },
     {
@@ -119,7 +120,7 @@ export const verfahrensdokumentation: Vorlage = {
     },
     {
       titel: "Änderungen",
-      hilfe: "Wenn sich ein Ablauf oder Programm ändert: hier mit Datum festhalten. Geteilt wird die Verfahrensdokumentation festgeschrieben; jede Änderung danach ist eine neue Fassung mit Grund, die alten Fassungen bleiben in Amtlos erhalten.",
+      hilfe: `Wenn sich ein Ablauf oder Programm ändert: hier mit Datum festhalten. Geteilt wird die Verfahrensdokumentation festgeschrieben; jede Änderung danach ist eine neue Fassung mit Grund, die alten Fassungen bleiben in ${MARKE.name} erhalten.`,
       felder: [
         {
           id: "aenderungen",
@@ -165,7 +166,7 @@ export const verfahrensdokumentation: Vorlage = {
           ...(text(d, "kasse_art")
             ? [{ titel: "Kasse", rand: "§ 146 Abs. 1, § 146a AO", inhalt: `<p>${esc(text(d, "kasse_art"))}.</p>${auswahl(d, "kasse_ablauf").length ? punkte(auswahl(d, "kasse_ablauf").map((w) => neufassung(w))) : ""}${zeilen(text(d, "kasse_zusatz"))}` }]
             : []),
-          ...(ja(d, "amtlos") ? [{ titel: "Abläufe in Amtlos", rand: "GoBD Tz. 3.2.4, 8, 9", inhalt: punkte(AMTLOS_ABLAEUFE) }] : []),
+          ...(ja(d, "amtlos") ? [{ titel: `Abläufe in ${MARKE.name}`, rand: "GoBD Tz. 3.2.4, 8, 9", inhalt: punkte(AMTLOS_ABLAEUFE) }] : []),
           {
             titel: "Technische Systemdokumentation und Betriebsdokumentation",
             rand: "GoBD Tz. 10.1",

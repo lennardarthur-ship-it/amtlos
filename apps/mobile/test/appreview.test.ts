@@ -7,6 +7,7 @@ import { SYNC_DATENARTEN, mitBuild } from "../app.config";
 import { knopfText, preisZeile } from "../src/pro/bezahltext";
 import { hilfeZiel } from "../src/rechtliches";
 import { T as TEXT } from "../src/texte";
+import { MARKE } from "@amtlos/marke";
 import { fehlerbericht } from "../src/ui/fehlerbericht";
 
 const hier = path.dirname(fileURLToPath(import.meta.url));
@@ -64,7 +65,7 @@ describe("Fehlerbericht der Fehlergrenze", () => {
     const e = new Error("x ist undefined");
     e.stack = ["Error: x ist undefined", ...Array.from({ length: 40 }, (_, i) => `    at f${i} (app.js:${i})`)].join("\n");
     const b = fehlerbericht(e, "\n    in Heute\n    in Rahmen", { version: "1.0.0", plattform: "ios 18.0", zeit: new Date("2026-10-20T10:00:00Z") });
-    expect(b).toMatch(/^Amtlos 1\.0\.0 · ios 18\.0 · 2026-10-20T10:00:00\.000Z/);
+    expect(b.startsWith(`${MARKE.name} 1.0.0 · ios 18.0 · 2026-10-20T10:00:00.000Z`)).toBe(true);
     expect(b).toMatch(/Error: x ist undefined/);
     expect(b).toMatch(/weitere Zeilen/);
     expect(b).toMatch(/in Heute/);

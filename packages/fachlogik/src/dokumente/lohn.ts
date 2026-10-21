@@ -6,6 +6,7 @@ import { KOPF_LINIE, ZELLE_LINIE, abschnitt, angaben, ankreuzen, cent, datumDe, 
 import { mindestlohnAm, minijobGrenzeAm } from "./personal.js";
 import { MINIJOB, SV } from "./bausteine.js";
 import type { Daten, Eintrag, Vorlage } from "./typen.js";
+import { MARKE } from "@amtlos/marke";
 
 const minuten = (hhmm: string): number | null => {
   const m = /^([01]?\d|2[0-3]):([0-5]\d)$/.exec(hhmm.trim());
@@ -205,9 +206,9 @@ export const arbeitszeitnachweis: Vorlage = {
       felder: [
         { id: "name", art: "text", label: "Name der beschäftigten Person", pflicht: true },
         // R12 (Kurier #11): sichtbar; eingetragen begrenzt er die Arbeitstage
-        { id: "monat", art: "text", label: "Monat", vorschlaege: monatsVorschlaege(), hilfe: "z. B. Oktober 2026. Leer lassen: Amtlos nimmt den Monat aus den Arbeitstagen. Eingetragen müssen alle Arbeitstage in diesem Monat liegen." },
+        { id: "monat", art: "text", label: "Monat", vorschlaege: monatsVorschlaege(), hilfe: `z. B. Oktober 2026. Leer lassen: ${MARKE.name} nimmt den Monat aus den Arbeitstagen. Eingetragen müssen alle Arbeitstage in diesem Monat liegen.` },
         { id: "beschaeftigt_seit", selten: true, art: "datum", label: "Beschäftigt seit", hilfe: "Aus „Mitarbeiter“ übernommen. Arbeitstage davor sind ein Fehler." },
-        { id: "art", selten: true, art: "wahl", label: "Art der Beschäftigung", optionen: BESCHAEFTIGUNGSARTEN, hilfe: "Aus „Mitarbeiter“. Beim Minijob rechnet Amtlos Stunden × Lohn gegen die Minijob-Grenze." },
+        { id: "art", selten: true, art: "wahl", label: "Art der Beschäftigung", optionen: BESCHAEFTIGUNGSARTEN, hilfe: `Aus „Mitarbeiter“. Beim Minijob rechnet ${MARKE.name} Stunden × Lohn gegen die Minijob-Grenze.` },
         { id: "entgelt_art", selten: true, art: "wahl", label: "Entgelt", optionen: ENTGELT_ARTEN },
         { id: "stundenlohn", selten: true, art: "betrag", label: "Stundenlohn brutto (€)", wenn: { feld: "entgelt_art", ist: "monat", nicht: true } },
         { id: "monatsgehalt", selten: true, art: "betrag", label: "Monatsgehalt brutto (€)", wenn: { feld: "entgelt_art", ist: "monat" } },
@@ -222,7 +223,7 @@ export const arbeitszeitnachweis: Vorlage = {
         },
         { id: "leerzeilen", selten: true, art: "schalter", label: "Leere Zeilen zum Eintragen von Hand anhängen", vorbelegung: false },
         // R12 (Zoll #3): Erfassungszeitpunkt je Tag als Spalte
-        { id: "erfasst_spalte", selten: true, art: "schalter", label: "Spalte „Erfasst am“ drucken", hilfe: "Amtlos merkt sich je Arbeitstag, wann er erfasst und zuletzt geändert wurde." },
+        { id: "erfasst_spalte", selten: true, art: "schalter", label: "Spalte „Erfasst am“ drucken", hilfe: `${MARKE.name} merkt sich je Arbeitstag, wann er erfasst und zuletzt geändert wurde.` },
       ],
     },
     {
@@ -351,7 +352,7 @@ export const lohnkonto: Vorlage = {
   abschnitte: [
     {
       titel: "Stammdaten",
-      hilfe: "Amtlos rechnet keine Lohnsteuer und keine Beiträge – trag die Beträge aus deiner Lohnabrechnung ein.",
+      hilfe: `${MARKE.name} rechnet keine Lohnsteuer und keine Beiträge – trag die Beträge aus deiner Lohnabrechnung ein.`,
       felder: [
         { id: "name", art: "text", label: "Name", pflicht: true },
         { id: "jahr", art: "text", label: "Jahr", pflicht: true },

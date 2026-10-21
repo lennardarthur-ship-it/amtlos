@@ -1,0 +1,26 @@
+{
+  "name": "@amtlos/marke",
+  "version": "0.1.0",
+  "description": "Sichtbarer Produktname, Domain und Kontakt – einzige Quelle für App, Website, Store-Texte und Dokumente (docs/14-marke.md). Ohne Abhängigkeiten und ohne Node-APIs.",
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
+    "./marke.json": "./marke.json"
+  },
+  "scripts": {
+    "lint": "eslint index.js"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "marke.json"
+  ]
+}

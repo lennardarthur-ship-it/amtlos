@@ -5,6 +5,7 @@ import { sicherungErstellen, sicherungLesen, sicherungLesenMitDateien } from "..
 import { LEERER_STAND, anlegen, aufbewahrungspflichtig, ausgeben, belegLoeschen, belegSetzen, bezahltSetzen, felderSetzen, standAus, stornieren, ungesichert, zusammenfuehren, type Stand } from "../src/unterlagen/speicher";
 import { EUER_NICHT_ENTHALTEN, belegDateiname, euerUebernahme, jahreMitDaten, standardZeitraum, steuerpaket, zeitraeume } from "../src/unterlagen/steuerpaket";
 import { perioden, umsaetzeFuer } from "../src/unterlagen/ustAusRechnungen";
+import { MARKE } from "@amtlos/marke";
 
 const t = (d: string) => new Date(`${d}T09:00:00Z`);
 const BETRIEB = { ...LEERER_STAND.betrieb, name: "Salon Sonne", strasse: "Hauptstraße 1", plz: "80331", ort: "München", email: "info@salon.example", telefon: "089 1", steuernummer: "143/123/45678", iban: "DE89370400440532013000" };
@@ -120,7 +121,7 @@ describe("Paket für die Steuerberatung (E-133)", () => {
     const z = zeitraeume("2026-10-13").find((x) => x.name === "2026-Q4")!;
     expect(z).toEqual({ von: "2026-10-01", bis: "2026-12-31", name: "2026-Q4" });
     const p = steuerpaket(s, z, s.steuerberatung, { "f1.jpg": new Uint8Array([1, 2, 3]) }, "2026-10-13T12:00:00.000Z");
-    expect(p).toMatchObject({ rechnungen: 1, belege: 1, ohneXml: 0, dateiname: "Amtlos-Steuerberatung-Salon-Sonne-2026-Q4.zip" });
+    expect(p).toMatchObject({ rechnungen: 1, belege: 1, ohneXml: 0, dateiname: `${MARKE.name}-Steuerberatung-Salon-Sonne-2026-Q4.zip` });
     const inhalt = unzipSync(p.zip);
     // R12 GoBD: Amtlos-Belegnummer beim Erfassen fest vergeben – b1 wurde zuerst gespeichert → B2026-001
     expect(Object.keys(inhalt).sort()).toEqual(["Belege/B2026-001_2026-10-02_Mueller-Soehne_L-b1.jpg", "Belege_2026-Q4.csv", "Buchungsliste_2026-Q4.csv", "E-Rechnungen/2026-001.xml", "EXTF_Buchungsstapel_2026-Q4.csv", "Fragen_2026-Q4.txt", "LIESMICH.txt", "Rechnungen_2026-Q4.csv"].sort());
@@ -131,7 +132,7 @@ describe("Paket für die Steuerberatung (E-133)", () => {
     expect(re[2]).toBe("Summe 19 %;;;;;;;100,00;19,00;119,00;19 %;;;;");
     expect(re[3]).toBe("Summe gesamt;;;;;;;100,00;19,00;119,00;;;;0,00;");
     const be = strFromU8(inhalt["Belege_2026-Q4.csv"]!).replace(/^\uFEFF/, "").split("\r\n");
-    expect(be[0]).toBe("Amtlos-Belegnr.;Datum;Lieferant;Belegnummer (Lieferant);Belegfeld 1 (DATEV);Kategorie;Zeile Anlage EÜR;Konto (DATEV);Netto;USt;Vorsteuer;Brutto;Steuersätze;Zahlung;Zahltag (für EÜR verwendet);Datei;Notiz;Steuerschuldnerschaft;Im Buchungsstapel;Erfasst am;Festgeschrieben am;Änderungen (siehe Änderungsprotokoll)");
+    expect(be[0]).toBe(`${MARKE.name}-Belegnr.;Datum;Lieferant;Belegnummer (Lieferant);Belegfeld 1 (DATEV);Kategorie;Zeile Anlage EÜR;Konto (DATEV);Netto;USt;Vorsteuer;Brutto;Steuersätze;Zahlung;Zahltag (für EÜR verwendet);Datei;Notiz;Steuerschuldnerschaft;Im Buchungsstapel;Erfasst am;Festgeschrieben am;Änderungen (siehe Änderungsprotokoll)`);
     expect(be[1]).toBe("B2026-001;02.10.2026;Müller & Söhne;L-b1;L-b1;Waren und Material;Waren, Rohstoffe und Hilfsstoffe einschließlich der Nebenkosten;3400;100,00;19,00;19,00;119,00;19 %;Überweisung oder Karte;02.10.2026 (fehlt – Belegdatum verwendet);B2026-001_2026-10-02_Mueller-Soehne_L-b1.jpg;;;ja;02.10.2026, 10:00;;0");
     expect(be[2]).toBe("Summe;;;;;;;;100,00;19,00;19,00;119,00;;;;;;;;;;");
     expect(Array.from(inhalt["Belege/B2026-001_2026-10-02_Mueller-Soehne_L-b1.jpg"]!)).toEqual([1, 2, 3]);
@@ -144,7 +145,7 @@ describe("Paket für die Steuerberatung (E-133)", () => {
     expect(belegDateiname(beleg("y", "2026-01-31", 1, { lieferant: "Lohnbüro Weiß", nummer: "LA 01/2026", datei: "b.pdf" }))).toBe("2026-01-31_Lohnbuero-Weiss_LA-01-2026.pdf");
     expect(belegDateiname(beleg("z", "2026-02-01", 1, { lieferant: "Café Crème", nummer: null, datei: "c.jpg" }))).toBe("2026-02-01_Cafe-Creme.jpg");
     expect(belegDateiname(beleg("z", "2026-02-01", 1, { lieferant: "Café Crème", nummer: "Nr. 7", datei: "c.jpg" }), "B2026-004")).toBe("B2026-004_2026-02-01_Cafe-Creme_Nr-7.jpg");
-    expect(steuerpaket({ ...s, betrieb: { ...s.betrieb, name: "Café Morgenrot" } }, z, s.steuerberatung, {}, "2026-10-13T12:00:00.000Z").dateiname).toBe("Amtlos-Steuerberatung-Cafe-Morgenrot-2026-Q4.zip");
+    expect(steuerpaket({ ...s, betrieb: { ...s.betrieb, name: "Café Morgenrot" } }, z, s.steuerberatung, {}, "2026-10-13T12:00:00.000Z").dateiname).toBe(`${MARKE.name}-Steuerberatung-Cafe-Morgenrot-2026-Q4.zip`);
     // Hinweis: Paket nach Rechnungsdatum, Voranmeldung nach Leistungsdatum
     expect(strFromU8(inhalt["LIESMICH.txt"]!)).toMatch(/nach dem Leistungsdatum zu \(Soll-Versteuerung\).*abweichen/);
   });
@@ -173,7 +174,7 @@ describe("Paket für die Steuerberatung: LIESMICH, Fragen, Listen (Durchsicht St
     const s = jahr();
     const p = steuerpaket(s, JAHR, s.steuerberatung, {}, "2027-02-15T10:00:00.000Z");
     const l = strFromU8(unzipSync(p.zip)["LIESMICH.txt"]!);
-    for (const z of ["Mandant (Angaben aus der App)", "- Name: Salon Sonne", "- Rechtsform: Einzelunternehmen", "- Steuernummer: 143/123/45678", "- USt-IdNr.: DE123456789", "- Kleinunternehmer (§ 19 UStG): nein", "- Versteuerung: Soll (vereinbarte Entgelte)", "- Kontenrahmen: SKR03", "- Berater-/Mandantennummer: 1001 / 42", "- Zeitraum: 01.01.2026 bis 31.12.2026 (2026)", "- App: Amtlos 1.0.0", "- Erstellt am: 15.02.2027 10:00 Uhr (UTC)"]) expect(l, z).toContain(z);
+    for (const z of ["Mandant (Angaben aus der App)", "- Name: Salon Sonne", "- Rechtsform: Einzelunternehmen", "- Steuernummer: 143/123/45678", "- USt-IdNr.: DE123456789", "- Kleinunternehmer (§ 19 UStG): nein", "- Versteuerung: Soll (vereinbarte Entgelte)", "- Kontenrahmen: SKR03", "- Berater-/Mandantennummer: 1001 / 42", "- Zeitraum: 01.01.2026 bis 31.12.2026 (2026)", `- App: ${MARKE.name} 1.0.0`, "- Erstellt am: 15.02.2027 10:00 Uhr (UTC)"]) expect(l, z).toContain(z);
     expect(l).toContain("Nicht zusätzlich zu den Monats-/Quartalsstapeln importieren – gleiche Buchungen.");
     expect(l).toContain("- 2026-003 (Pat Privat): Privatkunde (ohne E-Mail erfasst) – keine E-Rechnung nötig");
     expect(p.ohneXml).toBe(1);
@@ -207,7 +208,8 @@ describe("Paket für die Steuerberatung: LIESMICH, Fragen, Listen (Durchsicht St
     expect(f).not.toContain("Stornos mit Bezug");
     expect(f).not.toContain("Gutschriften");
     // R11: Barbelege gegen Kasse – woher das Bargeld kam (Kassenminus)
-    expect(f).toMatch(/Bar bezahlte Belege ohne Kassenbuch in Amtlos \(im Stapel gegen Privateinlage – aus eigener Tasche bezahlt\)[^\n]*\r\n- B2026-/);
+    expect(f).toContain(`Bar bezahlte Belege ohne Kassenbuch in ${MARKE.name} (im Stapel gegen Privateinlage – aus eigener Tasche bezahlt)`);
+    expect(f).toMatch(/Bar bezahlte Belege ohne Kassenbuch in \S+ \(im Stapel gegen Privateinlage – aus eigener Tasche bezahlt\)[^\n]*\r\n- B2026-/);
     expect(p.fragen).toBe(8);
     // Q1: die stornierte Rechnung (Storno im April) gehört dazu; Bewirtung/Kfz fehlen
     const q = strFromU8(unzipSync(steuerpaket(s, Q1, s.steuerberatung, {}, "2026-04-10T08:00:00").zip)["Fragen_2026-Q1.txt"]!);

@@ -4,6 +4,7 @@ import { Datenbank, type Tx } from "@amtlos/server";
 import { Kontext, type Anfragekontext } from "./auth.js";
 import { pruefe } from "./hilfen.js";
 import { KONFIGURATION, type Konfiguration } from "./konfiguration.js";
+import { MARKE } from "@amtlos/marke";
 
 /** Chiffretext im Format der App (amtlos-tresor: JSON mit Nonce und Daten) – der Server prüft nur Form und Größe. */
 const Chiffre = (max: number) => z.string().min(20).max(max).regex(/^\{"format":"amtlos-tresor"/, "Kein verschlüsselter Inhalt");
@@ -15,7 +16,7 @@ const voll = () => new PayloadTooLargeException({ statusCode: 413, meldung: "Der
 /** HTTP 402: Synchronisation gehört zu Amtlos Pro (nur geprüft, wenn REVENUECAT_SECRET_KEY gesetzt ist). */
 class ProNoetig extends HttpException {
   constructor() {
-    super({ statusCode: 402, meldung: "Die Synchronisation gehört zu Amtlos Pro." }, 402);
+    super({ statusCode: 402, meldung: `Die Synchronisation gehört zu ${MARKE.proName}.` }, 402);
   }
 }
 

@@ -4,21 +4,37 @@
  *
  *   node werkzeuge/store-check.mjs                    # prüft das Profil „production“
  *   node werkzeuge/store-check.mjs --profile preview  # anderes EAS-Profil (oder EAS_BUILD_PROFILE)
+ *   node werkzeuge/store-check.mjs --texte            # nur die Store-Texte mit eingesetzter Marke ausgeben (für App Store Connect)
+ *
+ * Store-Texte (store/de.json) enthalten die Marke nur als Platzhalter ({{MARKE}}, {{MARKE_PRO}}); eingesetzt wird der
+ * Name aus packages/marke/marke.json (docs/14-marke.md).
  */
 /* global process, console, Buffer, URL */
 /* eslint-disable no-console -- Kommandozeilenwerkzeug */
 import fs from "node:fs";
 import path from "node:path";
+import { MARKE, PLATZHALTER, markeEinsetzenTief } from "../../../packages/marke/index.js";
 
 const APP = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const lies = (p) => fs.readFileSync(path.join(APP, p), "utf8");
+/** Store-Texte mit eingesetzter Marke */
+const storeRoh = lies("store/de.json");
+const storeJson = markeEinsetzenTief(JSON.parse(storeRoh));
+if (process.argv.includes("--texte")) {
+  console.log(JSON.stringify(storeJson, null, 2));
+  process.exit(0);
+}
 const offen = [];
 const ok = [];
 const pruefe = (bed, text) => (bed ? ok : offen).push(text);
 
 // Anbieter und Links aus src/rechtliches.ts (einfache Auswertung der Felder)
 const recht = lies("src/rechtliches.ts");
-const feld = (block, name) => new RegExp(`export const ${block} = \\{[\\s\\S]*?\\n\\s+${name}: "([^"]*)"`).exec(recht)?.[1] ?? "";
+// Werte als Zeichenkette ("…") oder aus der Marke (MARKE.email, MARKE.website …, packages/marke)
+const feld = (block, name) => {
+  const m = new RegExp(`export const ${block} = \\{[\\s\\S]*?\\n\\s+${name}: (?:"([^"]*)"|MARKE\\.(\\w+))`).exec(recht);
+  return m ? (m[1] ?? String(MARKE[m[2]] ?? "")) : "";
+};
 // leere Anbieterangaben zeigt die App als „folgt“ (Impressum, Datenschutz) – ein Store-Build darf so nicht raus
 for (const [n, t] of [["name", "Firma"], ["anschrift", "Anschrift"], ["vertretung", "Vertretung"], ["email", "E-Mail"]]) pruefe(feld("ANBIETER", n), `Impressum: ${t} (src/rechtliches.ts → ANBIETER.${n})`);
 for (const [n, t] of [["website", "Website"], ["datenschutz", "Datenschutzerklärung im Netz (Pflicht im App Store)"], ["support", "Support-URL (Pflicht im App Store)"]]) pruefe(feld("LINKS", n), `${t} (LINKS.${n})`);
@@ -53,7 +69,7 @@ const kauf = datenarten.find((d) => d.NSPrivacyCollectedDataType === "NSPrivacyC
 pruefe(kauf?.NSPrivacyCollectedDataTypePurposes?.includes("NSPrivacyCollectedDataTypePurposeAnalytics") && kauf?.NSPrivacyCollectedDataTypePurposes?.includes("NSPrivacyCollectedDataTypePurposeAppFunctionality"), "Privacy Manifest: Kaufhistorie mit Zweck App-Funktionalität und Analysen (RevenueCat)");
 // R10: „Analysen“ im Manifest (RevenueCat-Dashboard) und die Texte sagen dasselbe – keine eigenen Analysen, RevenueCat
 // wertet Käufe für die Abo-Verwaltung aus (Store-Prüfhinweise, Datenschutzhinweis der App, Website)
-const storeTexte = JSON.parse(lies("store/de.json"));
+const storeTexte = storeJson;
 const website = fs.readFileSync(path.join(APP, "../website/seite.html"), "utf8");
 pruefe(/evaluates purchases for subscription management/.test(storeTexte.pruefhinweise) && /RevenueCat[^"]*Abo-Verwaltung/.test(recht) && /RevenueCat[^<]*Abo-Verwaltung/.test(website) && !/sends no analytics/i.test(storeTexte.pruefhinweise), "Texte zu Analysen passen zum Privacy Manifest (Store-Prüfhinweise, Datenschutzhinweis, Website)");
 // Platzhalter im Sync-Zusatz (Hoster, Anmeldedienst) zählen nur für Builds mit Server
@@ -64,7 +80,9 @@ const nurSync = ["EmailAddress", "Name", "UserID"].map((x) => `NSPrivacyCollecte
 pruefe(!datenarten.some((d) => nurSync.includes(d.NSPrivacyCollectedDataType)) && fs.existsSync(path.join(APP, "app.config.ts")), "Privacy Manifest: E-Mail, Name, Benutzer-ID nur in Builds mit Sync (app.config.ts, nicht fest in app.json)");
 
 // Store-Texte
-const s = JSON.parse(lies("store/de.json"));
+const s = storeJson;
+// Marke nur als Platzhalter in store/de.json – kein fest geschriebener Name (docs/14-marke.md)
+pruefe(!/Amtlos/.test(storeRoh) && !storeRoh.includes(MARKE.name) && !/\{\{[A-Z_]+\}\}/.test(JSON.stringify(s)) && PLATZHALTER.length > 0, `Store-Texte nennen die Marke nur über Platzhalter ({{MARKE}} → „${MARKE.name}“)`);
 const b = (x) => Buffer.byteLength(x);
 pruefe(s.name.length <= 30, `Name ≤ 30 Zeichen (${s.name.length})`);
 pruefe(s.untertitel.length <= 30, `Untertitel ≤ 30 Zeichen (${s.untertitel.length})`);

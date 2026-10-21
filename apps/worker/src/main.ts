@@ -2,6 +2,7 @@ import nodemailer from "nodemailer";
 import { z } from "zod";
 import { Datenbank, ExpoPush, ProtokollVersand, erzeugeWarteschlange, type Nachricht, type PushNachricht, type Versand } from "@amtlos/server";
 import { arbeiterStarten, empfaengerPruefen, type Protokoll } from "./arbeit.js";
+import { MARKE } from "@amtlos/marke";
 
 const Konfig = z
   .object({
@@ -9,7 +10,7 @@ const Konfig = z
     WORKER_DATABASE_URL: z.string().min(1),
     WEB_URL: z.string().url().default("http://localhost:3000"),
     SMTP_URL: z.string().url().optional(),
-    MAIL_ABSENDER: z.string().default("Amtlos <erinnerung@amtlos.de>"),
+    MAIL_ABSENDER: z.string().default(`${MARKE.name} <erinnerung@${MARKE.domain}>`),
     // Push an die mobile App (E-108): aus, bis Anbieter und AVV geklärt sind (T-41)
     PUSH_ANBIETER: z.enum(["aus", "expo"]).default("aus"),
     EXPO_ZUGANGSTOKEN: z.string().optional(),

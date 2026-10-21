@@ -7,6 +7,9 @@
  * Für den Pflichten-Check (E-126) zusätzlich den ganzen Katalog für die Regel-Engine: alle Pflichten und Regelwerte,
  * nur deutsch, ohne die Prüfnotizen der Redaktion → src/pflichten/katalog.json.
  *
+ * Marke (docs/14-marke.md): Die redaktionellen Katalogtexte (catalog/, versioniert und geprüft) nennen die App „Amtlos“.
+ * Im Bündel steht stattdessen der sichtbare Name aus packages/marke/marke.json – nach einer Umbenennung neu bündeln.
+ *
  *   node werkzeuge/katalog-buendel.mjs
  */
 import fs from "node:fs";
@@ -19,6 +22,10 @@ const wurzel = path.resolve(hier, "../../..");
 const YAML = createRequire(path.join(wurzel, "packages/rules-engine/package.json"))("yaml");
 const ordner = path.join(wurzel, "catalog/pflichten");
 const { VORLAGEN } = await import(path.join(wurzel, "packages/fachlogik/dist/index.js"));
+const { MARKE } = await import(path.join(wurzel, "packages/marke/index.js"));
+/** Produktname der Katalogtexte („Amtlos“, „Amtlos Pro“) → sichtbare Marke, in allen Zeichenketten */
+const markeText = (t) => t.replace(/\bAmtlos Pro\b/g, MARKE.proName).replace(/\bAmtlos\b/g, MARKE.name);
+const mitMarke = (d) => (typeof d === "string" ? markeText(d) : Array.isArray(d) ? d.map(mitMarke) : d && typeof d === "object" ? Object.fromEntries(Object.entries(d).map(([k, v]) => [k, mitMarke(v)])) : d);
 const benutzt = new Set(VORLAGEN.flatMap((v) => v.pflichten));
 
 const pflichten = fs
@@ -37,7 +44,7 @@ const pflichten = fs
   }));
 const ziel = path.join(hier, "../src/unterlagen/katalog.json");
 fs.mkdirSync(path.dirname(ziel), { recursive: true });
-fs.writeFileSync(ziel, JSON.stringify(pflichten, null, 1) + "\n");
+fs.writeFileSync(ziel, JSON.stringify(mitMarke(pflichten), null, 1) + "\n");
 console.log(`✓ ${pflichten.length} Pflichten → src/unterlagen/katalog.json`);
 
 // Pflichten-Check (E-126): ganzer Katalog für @amtlos/rules-engine, Inhalte unverändert
@@ -59,5 +66,5 @@ if (!/^\d{4}-\d{2}-\d{2}$/.test(String(rechtsstandRoh?.datum))) throw new Error(
 const rechtsstand = { datum: String(rechtsstandRoh.datum), ...(rechtsstandRoh.hinweis ? { hinweis: String(rechtsstandRoh.hinweis) } : {}) };
 const zielVoll = path.join(hier, "../src/pflichten/katalog.json");
 fs.mkdirSync(path.dirname(zielVoll), { recursive: true });
-fs.writeFileSync(zielVoll, JSON.stringify({ rechtsstand, pflichten: voll, regelwerte }) + "\n");
+fs.writeFileSync(zielVoll, JSON.stringify(mitMarke({ rechtsstand, pflichten: voll, regelwerte })) + "\n");
 console.log(`✓ ${voll.length} Pflichten, ${regelwerte.length} Regelwerte, Rechtsstand ${rechtsstand.datum} (${Math.round(fs.statSync(zielVoll).size / 1024)} KB) → src/pflichten/katalog.json`);

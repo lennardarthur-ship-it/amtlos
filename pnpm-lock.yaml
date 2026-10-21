@@ -41,6 +41,9 @@ importers:
       '@amtlos/fristen':
         specifier: workspace:*
         version: link:../../packages/fristen
+      '@amtlos/marke':
+        specifier: workspace:*
+        version: link:../../packages/marke
       '@amtlos/rules-engine':
         specifier: workspace:*
         version: link:../../packages/rules-engine
@@ -114,6 +117,9 @@ importers:
       '@amtlos/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
+      '@amtlos/marke':
+        specifier: workspace:*
+        version: link:../../packages/marke
       '@amtlos/rules-engine':
         specifier: workspace:*
         version: link:../../packages/rules-engine
@@ -259,6 +265,9 @@ importers:
 
   apps/studio:
     dependencies:
+      '@amtlos/marke':
+        specifier: workspace:*
+        version: link:../../packages/marke
       '@amtlos/rules-engine':
         specifier: workspace:*
         version: link:../../packages/rules-engine
@@ -314,6 +323,9 @@ importers:
       '@amtlos/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
+      '@amtlos/marke':
+        specifier: workspace:*
+        version: link:../../packages/marke
       '@amtlos/web-kern':
         specifier: workspace:*
         version: link:../../packages/web-kern
@@ -348,6 +360,9 @@ importers:
 
   apps/worker:
     dependencies:
+      '@amtlos/marke':
+        specifier: workspace:*
+        version: link:../../packages/marke
       '@amtlos/server':
         specifier: workspace:*
         version: link:../../packages/server
@@ -370,13 +385,22 @@ importers:
       '@amtlos/fristen':
         specifier: workspace:*
         version: link:../fristen
+      '@amtlos/marke':
+        specifier: workspace:*
+        version: link:../marke
       qrcode-generator:
         specifier: 2.0.4
         version: 2.0.4
 
   packages/fristen: {}
 
-  packages/i18n: {}
+  packages/i18n:
+    dependencies:
+      '@amtlos/marke':
+        specifier: workspace:*
+        version: link:../marke
+
+  packages/marke: {}
 
   packages/rules-engine:
     dependencies:
@@ -408,6 +432,9 @@ importers:
       '@amtlos/fristen':
         specifier: workspace:*
         version: link:../fristen
+      '@amtlos/marke':
+        specifier: workspace:*
+        version: link:../marke
       '@amtlos/rules-engine':
         specifier: workspace:*
         version: link:../rules-engine

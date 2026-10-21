@@ -68,6 +68,7 @@ import { utf8 } from "./sicherung";
 import { GUTSCHRIFT_HINWEIS, istGutschrift, kuImZeitraum, zuordnungsTage } from "./ustAusRechnungen";
 import { absenderFuer, nichtZaehlend, type ProtokollEintrag, type Stand, type Unterlage } from "./speicher";
 import { kassenAbdeckung } from "./kasse";
+import { MARKE } from "@amtlos/marke";
 
 // 0 statt -0: ein Storno über 0,00 € steht als „0,00“ da, nicht als „-0,00“
 const betrag = (cent: number) => new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(cent === 0 ? 0 : cent / 100);
@@ -559,7 +560,7 @@ export function belegeCsv(s: Stand, z: Zeitraum, dateinamen: Map<string, string>
   });
   const summenZeile = ["Summe", "", "", "", "", "", "", "", betrag(summe.netto), betrag(summe.ust), betrag(summe.vorsteuer), betrag(summe.brutto), "", "", "", "", "", "", "", "", "", ""];
   return csv(
-    ["Amtlos-Belegnr.", "Datum", "Lieferant", "Belegnummer (Lieferant)", "Belegfeld 1 (DATEV)", "Kategorie", "Zeile Anlage EÜR", "Konto (DATEV)", "Netto", "USt", "Vorsteuer", "Brutto", "Steuersätze", "Zahlung", "Zahltag (für EÜR verwendet)", "Datei", "Notiz", "Steuerschuldnerschaft", "Im Buchungsstapel", "Erfasst am", "Festgeschrieben am", "Änderungen (siehe Änderungsprotokoll)"],
+    [`${MARKE.name}-Belegnr.`, "Datum", "Lieferant", "Belegnummer (Lieferant)", "Belegfeld 1 (DATEV)", "Kategorie", "Zeile Anlage EÜR", "Konto (DATEV)", "Netto", "USt", "Vorsteuer", "Brutto", "Steuersätze", "Zahlung", "Zahltag (für EÜR verwendet)", "Datei", "Notiz", "Steuerschuldnerschaft", "Im Buchungsstapel", "Erfasst am", "Festgeschrieben am", "Änderungen (siehe Änderungsprotokoll)"],
     zeilen.length ? [...zeilen, summenZeile] : [],
   );
 }
@@ -710,7 +711,7 @@ export function fragenText(s: Stand, z: Zeitraum, nummern: Map<string, string> =
   const dazu = (titel: string, zeilen: string[]) => zeilen.length && abschnitte.push({ titel, zeilen });
 
   dazu("Belege mit Zahlungsweg Überweisung/Karte ohne Zahltag – für die EÜR wurde das Belegdatum verwendet. Wann wurde bezahlt?", belege.filter((b) => b.zahlung === "bank" && !b.bezahlt).map((b) => bz(b)));
-  dazu("Belege ohne Belegnummer des Lieferanten – im Buchungsstapel steht die Amtlos-Belegnummer. Hat der Beleg eine Nummer?", belege.filter((b) => !belegnummerNormal(b.nummer)).map((b) => bz(b)));
+  dazu(`Belege ohne Belegnummer des Lieferanten – im Buchungsstapel steht die ${MARKE.name}-Belegnummer. Hat der Beleg eine Nummer?`, belege.filter((b) => !belegnummerNormal(b.nummer)).map((b) => bz(b)));
   const offen = gestellteRechnungen(s)
     .filter((u) => !istGutschrift(u) && String(u.daten.datum) <= z.bis)
     .map((u) => {
@@ -734,7 +735,7 @@ export function fragenText(s: Stand, z: Zeitraum, nummern: Map<string, string> =
   // R12: Barbelege ab dem ersten Kassenabschluss stehen im Kassenbuch der App – nur die übrigen sind eine Frage
   const ab = kasseAb(s.kasse);
   dazu(
-    kapitalgesellschaft(s) ? "Bar bezahlte Belege ohne Kassenbuch in Amtlos (im Stapel gegen Geldtransit): Aus welcher Kasse wurde bezahlt – Geschäftskasse mit Kassenbuch (bitte liefern) oder von einer Gesellschafterin ausgelegt?" : "Bar bezahlte Belege ohne Kassenbuch in Amtlos (im Stapel gegen Privateinlage – aus eigener Tasche bezahlt): Stimmt das, oder wurde aus einer Geschäftskasse mit eigenem Kassenbuch bezahlt (bitte liefern)?",
+    kapitalgesellschaft(s) ? `Bar bezahlte Belege ohne Kassenbuch in ${MARKE.name} (im Stapel gegen Geldtransit): Aus welcher Kasse wurde bezahlt – Geschäftskasse mit Kassenbuch (bitte liefern) oder von einer Gesellschafterin ausgelegt?` : `Bar bezahlte Belege ohne Kassenbuch in ${MARKE.name} (im Stapel gegen Privateinlage – aus eigener Tasche bezahlt): Stimmt das, oder wurde aus einer Geschäftskasse mit eigenem Kassenbuch bezahlt (bitte liefern)?`,
     belege.filter((b) => b.zahlung === "bar" && belegImStapel(b, { kapitalgesellschaft: kapitalgesellschaft(s) }) && !(ab && zahltag(b) >= ab)).map((b) => bz(b)),
   );
   const kz = s.kasse.filter((k) => imZeitraum(k.datum, z));
@@ -793,10 +794,10 @@ export function fragenText(s: Stand, z: Zeitraum, nummern: Map<string, string> =
     );
   const anzahl = abschnitte.reduce((a, x) => a + x.zeilen.length, 0);
   const text = [
-    `Amtlos – Fragen zum Zeitraum ${datumDe(z.von)} bis ${datumDe(z.bis)}`,
+    `${MARKE.name} – Fragen zum Zeitraum ${datumDe(z.von)} bis ${datumDe(z.bis)}`,
     `Betrieb: ${s.betrieb.name || "ohne Namen"}`,
     ``,
-    `Automatisch aus den erfassten Daten zusammengestellt: nur Sachverhalte, keine steuerliche Bewertung. Belege mit Amtlos-Belegnummer (wie in Belege_${z.name}.csv und im Dateinamen unter Belege/).`,
+    `Automatisch aus den erfassten Daten zusammengestellt: nur Sachverhalte, keine steuerliche Bewertung. Belege mit ${MARKE.name}-Belegnummer (wie in Belege_${z.name}.csv und im Dateinamen unter Belege/).`,
     // Kasse/Shop: steht einmal im LIESMICH unter „Wichtig“ (R10 – nicht doppelt)
     ...(abschnitte.length ? abschnitte.flatMap((a) => ["", a.titel, ...a.zeilen]) : ["", "Keine offenen Punkte gefunden."]),
   ].join("\r\n");
@@ -915,7 +916,7 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
   const rechtsform = rechtsformFuer(s);
   const dfv = s.profil["ust.dauerfristverlaengerung"] === true;
   const inhalt: Record<string, Uint8Array> = {};
-  inhalt[`EXTF_Buchungsstapel_${z.name}.csv`] = datevExtfBytes(datevExtf(buchungen, { beraternummer: sb.beraternummer, mandantennummer: sb.mandantennummer, wjBeginn: `${z.von.slice(0, 4)}-01-01`, von: z.von, bis: z.bis, kontenrahmen: sb.kontenrahmen, bezeichnung: `Amtlos ${z.name}`, erzeugtAm: jetzt }));
+  inhalt[`EXTF_Buchungsstapel_${z.name}.csv`] = datevExtfBytes(datevExtf(buchungen, { beraternummer: sb.beraternummer, mandantennummer: sb.mandantennummer, wjBeginn: `${z.von.slice(0, 4)}-01-01`, von: z.von, bis: z.bis, kontenrahmen: sb.kontenrahmen, bezeichnung: `${MARKE.name} ${z.name}`, erzeugtAm: jetzt }));
   inhalt[`Buchungsliste_${z.name}.csv`] = utf8(buchungslisteCsv(buchungen));
   // Rechnungs-PDFs (vom Aufrufer erzeugt): Rechnungen/<Nummer>_<Kunde>.pdf, dieselben Namen in der Spalte „Datei“
   const pdfs = o.rechnungsPdfs ? new Map<string, string>() : undefined;
@@ -973,7 +974,7 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
   const protokollZeilen = aenderungsprotokoll(s, z);
   if (protokollZeilen.length) inhalt[`Aenderungsprotokoll_${z.name}.csv`] = utf8(csv(["Zeitpunkt", "Bereich", "Beleg/Tag", "Vorgang", "Grund bzw. Inhalt"], protokollZeilen));
   const ungueltig = s.belegArchiv.filter((b) => imZeitraum(b.datum, z));
-  if (ungueltig.length) inhalt[`Belege_ungueltig_${z.name}.csv`] = utf8(csv(["Amtlos-Belegnr.", "Datum", "Lieferant", "Brutto", "Ungültig seit", "Grund", "Datei vorhanden"], ungueltig.map((b) => [nummern.get(b.id) ?? "", datumDe(b.datum), b.lieferant, betrag(belegSummen(b).brutto_cent), b.ungueltig ? zeitDe(b.ungueltig) : "", b.ungueltig_grund ?? "", b.datei ? "ja (beim Betrieb)" : "nein"])));
+  if (ungueltig.length) inhalt[`Belege_ungueltig_${z.name}.csv`] = utf8(csv([`${MARKE.name}-Belegnr.`, "Datum", "Lieferant", "Brutto", "Ungültig seit", "Grund", "Datei vorhanden"], ungueltig.map((b) => [nummern.get(b.id) ?? "", datumDe(b.datum), b.lieferant, betrag(belegSummen(b).brutto_cent), b.ungueltig ? zeitDe(b.ungueltig) : "", b.ungueltig_grund ?? "", b.datei ? "ja (beim Betrieb)" : "nein"])));
   const se = sachentnahmenFuer(s.sachentnahmen, z.von, z.bis);
   const skontoZm = gestellteRechnungen(s).filter((u) => (u.zahlungen ?? []).some((x) => x.minderung_cent && imZeitraum(x.datum, z)) && zmBetroffen(rechnungFuerBuchung(u, s.betrieb)));
   // „Wichtig“: an fester Stelle direkt nach den Mandantendaten, jeder Punkt nur einmal (R10)
@@ -995,8 +996,8 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
     ...(gutscheine.size ? [`${gutscheine.size} ${gutscheine.size === 1 ? "Rechnung" : "Rechnungen"} über Gutscheine zu 0 % ${gutscheine.size === 1 ? "steht" : "stehen"} nur in der Rechnungsliste, nicht im Buchungsstapel – Einzweck- oder Mehrzweck-Gutschein (§ 3 Abs. 13–15 UStG)? Siehe Fragen.`] : []),
     ...(barOhneKasse
       ? [kapital
-          ? `${barOhneKasse} ${barOhneKasse === 1 ? "Barbeleg steht" : "Barbelege stehen"} im Stapel gegen Geldtransit (${sb.kontenrahmen === "SKR03" ? "1360" : "1460"}), weil Amtlos ${ab ? "die Kasse erst ab " + datumDe(ab) : "keine Kasse"} führt und eine Gesellschaft keine Privatkonten hat – bitte auf die Geschäftskasse bzw. das Verrechnungskonto umbuchen (siehe Fragen).`
-          : `${barOhneKasse} ${barOhneKasse === 1 ? "Barbeleg steht" : "Barbelege stehen"} im Stapel gegen Privateinlage (${sb.kontenrahmen === "SKR03" ? "1890" : "2180"}), weil Amtlos ${ab ? "die Kasse erst ab " + datumDe(ab) : "keine Kasse"} führt – so entsteht weder ein negativer Kassenbestand noch ein Restsaldo auf Geldtransit. Wurde aus einer Geschäftskasse bezahlt, bitte umbuchen (siehe Fragen).`]
+          ? `${barOhneKasse} ${barOhneKasse === 1 ? "Barbeleg steht" : "Barbelege stehen"} im Stapel gegen Geldtransit (${sb.kontenrahmen === "SKR03" ? "1360" : "1460"}), weil ${MARKE.name} ${ab ? "die Kasse erst ab " + datumDe(ab) : "keine Kasse"} führt und eine Gesellschaft keine Privatkonten hat – bitte auf die Geschäftskasse bzw. das Verrechnungskonto umbuchen (siehe Fragen).`
+          : `${barOhneKasse} ${barOhneKasse === 1 ? "Barbeleg steht" : "Barbelege stehen"} im Stapel gegen Privateinlage (${sb.kontenrahmen === "SKR03" ? "1890" : "2180"}), weil ${MARKE.name} ${ab ? "die Kasse erst ab " + datumDe(ab) : "keine Kasse"} führt – so entsteht weder ein negativer Kassenbestand noch ein Restsaldo auf Geldtransit. Wurde aus einer Geschäftskasse bezahlt, bitte umbuchen (siehe Fragen).`]
       : []),
     ...(negativ.length ? [`Kassenbestand rechnerisch negativ am ${negativ.map(datumDe).slice(0, 5).join(", ")} (§ 146 Abs. 1 Satz 2 AO) – bitte Kassenbuch prüfen (fehlende Einlage oder Einnahme?).`] : []),
     ...(differenzen.length ? [`${differenzen.length} ${differenzen.length === 1 ? "Kassendifferenz" : "Kassendifferenzen"} laut Zählung (zusammen ${betrag(differenzen.reduce((a, d) => a + d.cent, 0))} €) – gebucht, damit Kassenbuch und Kassenkonto übereinstimmen: Überschuss Kasse an Erlöse 19 % (${sb.kontenrahmen === "SKR03" ? "8400" : "4400"}), Fehlbetrag sonstiger Aufwand (${sb.kontenrahmen === "SKR03" ? "4900" : "6300"}) an Kasse. Konten und Behandlung des Überschusses bitte mit der Kanzlei abstimmen.`] : []),
@@ -1011,12 +1012,12 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
     ...(se.anzahl ? [ku ? `Sachentnahmen (unentgeltliche Wertabgaben, netto ${betrag(se.netto7 + se.netto19)} €): als Kleinunternehmer nicht im Stapel – bitte mit der Kanzlei klären.` : `Sachentnahmen (unentgeltliche Wertabgaben, § 3 Abs. 1b UStG): 7 % netto ${betrag(se.netto7)} €, 19 % netto ${betrag(se.netto19)} € – im Stapel Privatentnahme an ${sb.kontenrahmen === "SKR03" ? "8915/8910" : "4610/4620"} (brutto, Konten bitte prüfen). Die Werte hat der Betrieb aus den BMF-Pauschbeträgen selbst eingetragen.`] : []),
     ...(skontoZm.length ? [`Skonto auf innergemeinschaftliche Lieferungen bzw. Leistungen an Unternehmen im EU-Ausland (${skontoZm.map((u) => String(u.daten.nummer ?? "")).join(", ")}): Die Bemessungsgrundlage hat sich geändert – Zusammenfassende Meldung berichtigen (§ 18a Abs. 10 UStG). Im Stapel auf eigenen Skontokonten (${sb.kontenrahmen === "SKR03" ? "8743/8741" : "4743/4741"}, bitte prüfen) mit USt-IdNr.`] : []),
     ...(xmlNeu.length ? [`${xmlNeu.length} ${xmlNeu.length === 1 ? "E-Rechnung wurde" : "E-Rechnungen wurden"} vor der Speicherung des Originals festgeschrieben (${xmlNeu.slice(0, 10).join(", ")}) – die XML-Datei ist aus den festgeschriebenen Daten neu erzeugt, nicht die versandte Datei.`] : []),
-    ...(protokollZeilen.length || ungueltig.length ? [`Änderungen nach der Festschreibung, Löschungen und ungültig markierte Belege stehen in ${[protokollZeilen.length ? `Aenderungsprotokoll_${z.name}.csv` : "", ungueltig.length ? `Belege_ungueltig_${z.name}.csv` : ""].filter(Boolean).join(" und ")} – so erklären sich Lücken in den Amtlos-Belegnummern.`] : []),
+    ...(protokollZeilen.length || ungueltig.length ? [`Änderungen nach der Festschreibung, Löschungen und ungültig markierte Belege stehen in ${[protokollZeilen.length ? `Aenderungsprotokoll_${z.name}.csv` : "", ungueltig.length ? `Belege_ungueltig_${z.name}.csv` : ""].filter(Boolean).join(" und ")} – so erklären sich Lücken in den ${MARKE.name}-Belegnummern.`] : []),
     ...(ku ? [] : [`Nullsteuersatz-Umsätze (§ 12 Abs. 3 UStG, Kz 87) stehen vorerst auf dem Konto für steuerfreie Umsätze (${sb.kontenrahmen === "SKR03" ? "8100" : "4100"}) – bitte bei Bedarf umbuchen.`].filter(() => alle.some((u) => eRechnungAus(u.daten, absenderFuer(s, u)).daten.steuerart === "nullsatz"))),
   ];
   inhalt["LIESMICH.txt"] = utf8(
     [
-      `Amtlos – Unterlagen für die Steuerberatung`,
+      `${MARKE.name} – Unterlagen für die Steuerberatung`,
       `Betrieb: ${s.betrieb.name || "ohne Namen"}`,
       `Zeitraum: ${datumDe(z.von)} bis ${datumDe(z.bis)}`,
       `Erstellt: ${datumDe(jetzt.slice(0, 10))}`,
@@ -1032,7 +1033,7 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
       `- Kontenrahmen: ${sb.kontenrahmen}`,
       `- Berater-/Mandantennummer: ${sb.beraternummer || "fehlt"} / ${sb.mandantennummer || "fehlt"}`,
       `- Zeitraum: ${datumDe(z.von)} bis ${datumDe(z.bis)} (${z.name})`,
-      `- App: Amtlos ${APP_VERSION}`,
+      `- App: ${MARKE.name} ${APP_VERSION}`,
       `- Erstellt am: ${datumDe(jetzt.slice(0, 10))}${uhrzeit ? ` ${uhrzeit[1]}:${uhrzeit[2]} Uhr${/Z$|[+-]00:?00$/.test(jetzt) ? " (UTC)" : ""}` : ""}`,
       ``,
       ...(wichtig.length ? [`Wichtig`, ...wichtig.map((w) => `- ${w}`), ``] : []),
@@ -1042,12 +1043,12 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
       `- Rechnungen_${z.name}.csv: ${rechnungen.length} gestellte Rechnungen mit Steuerart, Netto, USt, Brutto, Fälligkeit, Zahlungseingang und offenem Betrag; Summen je Steuersatz am Ende.`,
       ...(gutschriften.length ? [`- Gutschriften_${z.name}.csv: ${gutschriften.length} ${gutschriften.length === 1 ? "Gutschrift" : "Gutschriften"}, die der Betrieb als Leistungsempfänger ausgestellt hat – nicht in der Rechnungsliste; im Buchungsstapel als Aufwand (bezogene Leistungen).`] : []),
       ...(kasseImZeitraum.length ? [`- Kassenabschluesse_${z.name}.csv: ${kasseImZeitraum.length} Tagesabschlüsse (Z-Bons) mit Umsatz je Steuersatz, Zahlungsarten, Entnahmen/Einlagen, Bargeldbestand und Korrekturen.`] : []),
-      `- Belege_${z.name}.csv: ${belege.length} Belege mit Amtlos-Belegnummer, Kategorie, Konto, Vorsteuer und Zahltag; Summe am Ende.`,
+      `- Belege_${z.name}.csv: ${belege.length} Belege mit ${MARKE.name}-Belegnummer, Kategorie, Konto, Vorsteuer und Zahltag; Summe am Ende.`,
       `- Fragen_${z.name}.txt: ${fragen.anzahl ? `${fragen.anzahl} ${fragen.anzahl === 1 ? "Punkt" : "Punkte"} zum Klären (nur Sachverhalte aus den Daten)` : "keine offenen Punkte gefunden"}.`,
       `- E-Rechnungen/: XRechnung der Ausgangsrechnungen${gutschriften.length ? " und Gutschriften" : ""}${ohneXml ? ` (${ohneXml} ohne, siehe unten)` : ""}.`,
       ...(pdfs ? [`- Rechnungen/: PDFs der Rechnungen${gutschriften.length ? " und Gutschriften" : ""} (${pdfs.size}), Name = Nummer_Kunde.`] : []),
-      `- Nach dem Erstellen dieses Pakets schreibt Amtlos die enthaltenen Belege fest – ändern geht dann nur mit Grund (Änderungsprotokoll).`,
-      `- Belege/: Originaldateien (Fotos, PDFs, E-Rechnungen) – unverändert. Der Dateiname beginnt mit der Amtlos-Belegnummer (z. B. B${z.von.slice(0, 4)}-001); im Buchungsstapel steht in Belegfeld 1 die Belegnummer des Lieferanten, ohne sie die Amtlos-Belegnummer – genauso in der Belegliste.`,
+      `- Nach dem Erstellen dieses Pakets schreibt ${MARKE.name} die enthaltenen Belege fest – ändern geht dann nur mit Grund (Änderungsprotokoll).`,
+      `- Belege/: Originaldateien (Fotos, PDFs, E-Rechnungen) – unverändert. Der Dateiname beginnt mit der ${MARKE.name}-Belegnummer (z. B. B${z.von.slice(0, 4)}-001); im Buchungsstapel steht in Belegfeld 1 die Belegnummer des Lieferanten, ohne sie die ${MARKE.name}-Belegnummer – genauso in der Belegliste.`,
       ...(istJahr(z) ? [``, `Jahrespaket: Nicht zusätzlich zu den Monats-/Quartalsstapeln importieren – gleiche Buchungen.`] : []),
       ...(ohneXml ? [``, `Rechnungen ohne E-Rechnung (XRechnung)`, ...ohneXmlListe] : []),
       ``,
@@ -1072,7 +1073,7 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
           ]),
     ].join("\r\n"),
   );
-  return { zip: paketZippen(inhalt), dateiname: `Amtlos-Steuerberatung-${sicher(s.betrieb.name || "Betrieb")}-${z.name}.zip`, rechnungen: rechnungen.length, gutschriften: gutschriften.length, belege: belege.length, ohneXml, buchungen: buchungen.length, fragen: fragen.anzahl, pdfs: pdfs?.size ?? 0 };
+  return { zip: paketZippen(inhalt), dateiname: `${MARKE.name}-Steuerberatung-${sicher(s.betrieb.name || "Betrieb")}-${z.name}.zip`, rechnungen: rechnungen.length, gutschriften: gutschriften.length, belege: belege.length, ohneXml, buchungen: buchungen.length, fragen: fragen.anzahl, pdfs: pdfs?.size ?? 0 };
 }
 
 /** Zeiträume zur Auswahl: aktuelles und letztes Jahr, Quartale und Monate des laufenden Jahres bis heute. */

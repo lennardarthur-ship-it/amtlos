@@ -12,6 +12,7 @@
     "lint": "eslint src test"
   },
   "dependencies": {
+    "@amtlos/marke": "workspace:*",
     "@amtlos/server": "workspace:*",
     "nodemailer": "10.0.13",
     "pg-boss": "^10.1.0",

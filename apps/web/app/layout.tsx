@@ -3,9 +3,10 @@ import type { ReactNode } from "react";
 import { aktuelleMarke, markenStil } from "@/lib/marke";
 import { aktuelleSprache } from "@/lib/sprache";
 import "./globals.css";
+import { MARKE } from "@amtlos/marke";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const name = (await aktuelleMarke())?.name ?? "Amtlos";
+  const name = (await aktuelleMarke())?.name ?? MARKE.name;
   return {
     title: { default: name, template: `%s · ${name}` },
     description: "Alle Pflichten deines Unternehmens: erkannt, erklärt, terminiert.",

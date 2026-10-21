@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@amtlos/fristen": "workspace:*",
+    "@amtlos/marke": "workspace:*",
     "qrcode-generator": "2.0.4"
   },
   "files": [

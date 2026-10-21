@@ -2,8 +2,9 @@ import Link from "next/link";
 import { datumLang, fuelle } from "@amtlos/i18n";
 import { api } from "@/lib/api";
 import { t } from "@/lib/sprache";
+import { MARKE } from "@amtlos/marke";
 
-export const metadata = { title: "Frag Amtlos" };
+export const metadata = { title: `Frag ${MARKE.name}` };
 
 interface Treffer { pflicht_id: string; titel: string; kurz: string; erklaerung: string; rechtsgrundlage: string[]; quellen: { titel: string; url: string }[]; pruefung: { status: string; geprueft_am: string | null }; gilt_fuer_dich: boolean | null }
 interface Regelwert { id: string; bezeichnung: string; wert: unknown; einheit: string; gueltig_ab: string | null; quellen: { titel: string; url: string }[]; pruefung: { status: string } }

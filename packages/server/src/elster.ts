@@ -1,3 +1,4 @@
+import { MARKE } from "@amtlos/marke";
 /**
  * ELSTER-Anbindung (Spezifikation 7, Abschnitt 3/4): einziger Weg zu ELSTER ist ein Gateway mit der ERiC-Bibliothek
  * in einem isolierten Dienst (docs/01: services/eric-gateway). Amtlos übermittelt nur im Auftrag und mit dem
@@ -39,7 +40,7 @@ export class NichtVerfuegbaresElster implements ElsterGateway {
   status(): ElsterStatus {
     return {
       verfuegbar: false,
-      grund: "Die direkte Übermittlung an ELSTER ist noch nicht freigeschaltet. Dafür fehlen die Registrierung von Amtlos als Software-Hersteller bei ELSTER und eine rechtliche Klärung.",
+      grund: `Die direkte Übermittlung an ELSTER ist noch nicht freigeschaltet. Dafür fehlen die Registrierung von ${MARKE.name} als Software-Hersteller bei ELSTER und eine rechtliche Klärung.`,
       alternative: MEIN_ELSTER,
     };
   }

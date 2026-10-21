@@ -20,12 +20,16 @@ for paket in rules-engine fristen; do
   mkdir -p "$P/pakete/$paket"
   cp -r "$PAKETE/$paket/dist" "$P/pakete/$paket/"
 done
-mkdir -p "$P/pakete/i18n"
+mkdir -p "$P/pakete/i18n" "$P/pakete/marke"
 cp -r "$PAKETE/i18n/src" "$P/pakete/i18n/"
+# Marke (docs/14-marke.md): Name, Domain, Kontakt aus packages/marke/marke.json
+cp "$PAKETE/marke/index.js" "$PAKETE/marke/index.d.ts" "$PAKETE/marke/marke.json" "$P/pakete/marke/"
 find "$P/pakete/i18n/src" -name '*.test.ts' -delete
 find "$P/pakete" -name '*.map' -delete
-node - "$APP" "$P" <<'JS'
-const fs = require("node:fs");
+node --input-type=module - "$APP" "$P" <<'JS'
+import fs from "node:fs";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
 const [app, p] = process.argv.slice(2);
 const pkg = JSON.parse(fs.readFileSync(`${app}/package.json`, "utf8"));
 for (const k of Object.keys(pkg.dependencies)) if (k.startsWith("@amtlos/")) delete pkg.dependencies[k]; // über tsconfig-Pfade eingebunden
@@ -36,7 +40,12 @@ fs.writeFileSync(`${p}/package.json`, JSON.stringify({
   dependencies: pkg.dependencies,
   devDependencies: { ...pkg.devDependencies, typescript: `~${expoTs}` },
 }, null, 2) + "\n");
-fs.copyFileSync(`${app}/app.json`, `${p}/app.json`);
+// app.json mit eingesetzter Marke (im Repo setzt app.config.ts sie ein – das Testpaket hat kein app.config.ts)
+const marke = await import(`${app}/../../packages/marke/index.js`);
+const appJson = marke.markeEinsetzenTief(JSON.parse(fs.readFileSync(`${app}/app.json`, "utf8")));
+appJson.expo.name = marke.MARKE.name;
+appJson.expo.ios = { ...appJson.expo.ios, infoPlist: { ...appJson.expo.ios?.infoPlist, CFBundleDisplayName: marke.MARKE.name } };
+fs.writeFileSync(`${p}/app.json`, JSON.stringify(appJson, null, 2) + "\n");
 fs.writeFileSync(`${p}/tsconfig.json`, JSON.stringify({
   extends: "expo/tsconfig.base",
   compilerOptions: { strict: true, skipLibCheck: true, paths: {
@@ -44,12 +53,13 @@ fs.writeFileSync(`${p}/tsconfig.json`, JSON.stringify({
     "@amtlos/rules-engine": ["./pakete/rules-engine/dist/index.js"],
     "@amtlos/fristen": ["./pakete/fristen/dist/index.js"],
     "@amtlos/i18n": ["./pakete/i18n/src/index.ts"],
+    "@amtlos/marke": ["./pakete/marke/index.js"],
   } },
   include: ["index.ts", "src", "pakete"],
 }, null, 2) + "\n");
 JS
 cat > "$P/LIESMICH.txt" <<'TXT'
-Amtlos – Unterlagen für deinen Betrieb (Testversion fürs iPhone)
+{{MARKE}} – Unterlagen für deinen Betrieb (Testversion fürs iPhone)
 
 Dies ist nur ein Testpaket zum Ausprobieren in Expo Go – nicht der Quellcode. Quellcode, Tests, CI und
 Entscheidungen liegen im Git-Repository (GitHub: lennardarthur-ship-it/amtlos). Stand: Commit STAND_COMMIT.
@@ -92,15 +102,16 @@ Entscheidungen liegen im Git-Repository (GitHub: lennardarthur-ship-it/amtlos). 
      aus der Dateien-App) – E-Rechnungen füllen sich selbst aus. Die Vorsteuer landet in der Voranmeldung, Einnahmen
      und Ausgaben in der EÜR („Aus Rechnungen und Belegen übernehmen“).
    - „Mein Betrieb → Paket für die Steuerberatung“: ZIP mit DATEV-Buchungsstapel, Listen und Belegen.
-   - „Amtlos Pro“ (oben unter „Mein Betrieb“): In dieser Testversion gibt es keinen Kauf – „Pro testweise einschalten“
+   - „{{MARKE_PRO}}“ (oben unter „Mein Betrieb“): In dieser Testversion gibt es keinen Kauf – „Pro testweise einschalten“
      zeigt alle Funktionen (im späteren Store-Build gibt es diesen Knopf nicht). Ohne Pro: Rechnungen ohne Limit, 1 Vorlage im Monat als PDF, Pflichten im Überblick (Details, Erinnerungen und Kontrollmappe mit Pro), kein Logo/keine Hausfarbe, keine E-Rechnung.
-   - „Über Amtlos“: Impressum und Datenschutz (Angaben folgen vor dem Start), „Amtlos weiterempfehlen“.
+   - „Über {{MARKE}}“: Impressum und Datenschutz (Angaben folgen vor dem Start), „{{MARKE}} weiterempfehlen“.
    - Synchronisation zwischen Geräten (Konto, Ende-zu-Ende-verschlüsselt) ist eingebaut, in diesem Testpaket aber
-     aus: Sie braucht einen laufenden Amtlos-Server und einen Anmeldedienst. Ohne Server bleibt alles auf dem iPhone.
+     aus: Sie braucht einen laufenden {{MARKE}}-Server und einen Anmeldedienst. Ohne Server bleibt alles auf dem iPhone.
 
 Beenden: im Terminal Ctrl + C. Nächstes Mal reichen die Befehle „cd …“ und „npx expo start“.
 TXT
 STAND="$(git -C "$APP" rev-parse --short HEAD 2>/dev/null || echo unbekannt)"
 sed -i.bak "s/STAND_COMMIT/$STAND/" "$P/LIESMICH.txt" && rm -f "$P/LIESMICH.txt.bak"
+node --input-type=module -e 'import fs from "node:fs"; const { markeEinsetzen } = await import(process.argv[1]); fs.writeFileSync(process.argv[2], markeEinsetzen(fs.readFileSync(process.argv[2], "utf8")));' "$PAKETE/marke/index.js" "$P/LIESMICH.txt"
 (cd "$ZIEL" && zip -qr amtlos-app.zip amtlos-app -x 'amtlos-app/node_modules/*' 'amtlos-app/.expo/*')
 echo "✓ $P"

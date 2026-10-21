@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { PASSWORT_MINDESTLAENGE, SicherungsFehler, ausBase64, base64, schluesselAusPasswort, sicherungErstellen, sicherungLesen, sicherungMitSchluessel, sicherungsName } from "../src/unterlagen/sicherung";
 import { LEERER_STAND, allesLoeschenErlaubt, anlegen, aufbewahrungspflichtig, ausgeben, betriebSetzen, felderSetzen, personSetzen, sicherungFaellig, standAus, zusammenfuehren } from "../src/unterlagen/speicher";
 import { istTresor, tresorOeffnen, tresorSchliessen } from "../src/unterlagen/tresor";
+import { MARKE } from "@amtlos/marke";
 
 const zufall = (n: number) => new Uint8Array(randomBytes(n));
 const B = { ...LEERER_STAND.betrieb, name: "Salon Sonne", iban: "DE12 3456 7890 1234 5678 90", steuernummer: "143/123/45678" };
@@ -62,7 +63,7 @@ describe("Verschlüsselte Datensicherung", () => {
     const b = JSON.parse(sicherungErstellen(LEERER_STAND, "richtig-langes-passwort", zufall, new Date(), IT));
     expect(a.kdf.salz).not.toBe(b.kdf.salz);
     expect(a.daten).not.toBe(b.daten);
-    expect(sicherungsName("2026-10-12")).toBe("Amtlos-Sicherung-2026-10-12.amtlos");
+    expect(sicherungsName("2026-10-12")).toBe(`${MARKE.name}-Sicherung-2026-10-12.amtlos`);
   });
 
   it("kodiert Base64 verlustfrei in allen Längen", () => {

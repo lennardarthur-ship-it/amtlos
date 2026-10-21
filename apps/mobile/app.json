@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Amtlos",
+    "name": "{{MARKE}}",
     "slug": "amtlos",
     "scheme": "amtlos",
     "version": "1.0.0",
@@ -94,14 +94,14 @@
       [
         "expo-local-authentication",
         {
-          "faceIDPermission": "Amtlos nutzt Face ID, um deine Unterlagen vor fremdem Zugriff zu schützen."
+          "faceIDPermission": "{{MARKE}} nutzt Face ID, um deine Unterlagen vor fremdem Zugriff zu schützen."
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "Amtlos braucht Zugriff auf deine Fotos, damit du dein Logo oder ein Foto eines Belegs auswählen kannst.",
-          "cameraPermission": "Amtlos braucht die Kamera, damit du Kassenbons und Rechnungen als Beleg fotografieren kannst.",
+          "photosPermission": "{{MARKE}} braucht Zugriff auf deine Fotos, damit du dein Logo oder ein Foto eines Belegs auswählen kannst.",
+          "cameraPermission": "{{MARKE}} braucht die Kamera, damit du Kassenbons und Rechnungen als Beleg fotografieren kannst.",
           "microphonePermission": false
         }
       ],

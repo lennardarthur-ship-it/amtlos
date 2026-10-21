@@ -18,7 +18,7 @@ Reihenfolge: 1 → 2 → 3. Die Firma braucht man für das Apple-Konto, das Appl
 
 Apple sagt dazu wörtlich: „If you are a sole proprietor/single-person business, you must join as an individual and your legal name will appear as the seller“ und „We don’t accept DBAs, fictitious businesses, trade names, or branches.“ ([Apple Account Help](https://developer.apple.com/support/enrollment/)).
 
-**Empfehlung zum Abwägen (keine Rechts- oder Steuerberatung):** Amtlos verkauft Vorlagen und Hinweise zu Rechtspflichten. Wer die Haftung für Fehler begrenzen will, gründet eine UG oder GmbH. Lass die Wahl von einem Steuerberater durchrechnen.
+**Empfehlung zum Abwägen (keine Rechts- oder Steuerberatung):** Betriebsklar verkauft Vorlagen und Hinweise zu Rechtspflichten. Wer die Haftung für Fehler begrenzen will, gründet eine UG oder GmbH. Lass die Wahl von einem Steuerberater durchrechnen.
 
 ### 1.2 Anmelden
 
@@ -45,7 +45,7 @@ App, Website-Impressum, Datenschutzerklärung und Support-Seite nehmen alle dies
 
 ### 1.5 Website online stellen
 
-1. Domain sichern (z. B. amtlos.de – vorher Markenrecherche bei DPMA/EUIPO).
+1. Domain sichern (vorläufig betriebsklar.de, siehe docs/14-marke.md – amtlos.de ist vergeben; vorher Markenrecherche bei DPMA/EUIPO).
 2. Hoster für statische Seiten wählen, mit Server in der EU und Auftragsverarbeitungsvertrag (Art. 28 DSGVO).
 3. Mir Domain und Hoster nennen: Ich trage `seite.json → url` und `LINKS` (website, datenschutz, support) ein und ergänze in der Datenschutzerklärung den Abschnitt „Diese Website“ (Server-Protokolle beim Hoster).
 4. `node apps/website/bauen.mjs` und den Ordner `apps/website/dist` hochladen. Der Build bricht ab, solange etwas fehlt.
@@ -74,7 +74,7 @@ Für einen Build **mit** Synchronisation zusätzlich: Kontaktdaten → E-Mail-Ad
 
 ### 2.2 Verschlüsselung (Export-Compliance)
 
-Amtlos verschlüsselt Daten auf dem Gerät und in Sicherungen mit AES-256 aus der Bibliothek `@noble/ciphers` – ein Standardverfahren, aber **nicht** das des Apple-Betriebssystems. Deshalb steht in `app.json` `usesNonExemptEncryption: true`.
+Betriebsklar verschlüsselt Daten auf dem Gerät und in Sicherungen mit AES-256 aus der Bibliothek `@noble/ciphers` – ein Standardverfahren, aber **nicht** das des Apple-Betriebssystems. Deshalb steht in `app.json` `usesNonExemptEncryption: true`.
 
 Antworten in App Store Connect nach Apples Tabelle ([Export compliance documentation](https://developer.apple.com/help/app-store-connect/reference/export-compliance-documentation-for-encryption)):
 

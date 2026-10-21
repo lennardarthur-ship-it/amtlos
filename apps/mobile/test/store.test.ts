@@ -2,9 +2,11 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import { markeEinsetzenTief } from "@amtlos/marke";
 
 const hier = path.dirname(fileURLToPath(import.meta.url));
-const s = JSON.parse(readFileSync(path.resolve(hier, "../store/de.json"), "utf8")) as Record<string, unknown> & { bilder: { bildschirm: string; titel: string }[] };
+// Marke wie beim Einreichen eingesetzt ({{MARKE}} → packages/marke/marke.json)
+const s = markeEinsetzenTief(JSON.parse(readFileSync(path.resolve(hier, "../store/de.json"), "utf8"))) as Record<string, unknown> & { bilder: { bildschirm: string; titel: string }[] };
 
 describe("Store-Texte (E-132) halten die Grenzen des App Store ein", () => {
   it("Längen von Name, Untertitel, Werbetext, Schlüsselwörtern und Beschreibung", () => {

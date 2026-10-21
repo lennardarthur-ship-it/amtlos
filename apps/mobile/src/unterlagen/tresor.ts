@@ -6,6 +6,7 @@
  */
 import { gcm } from "@noble/ciphers/aes";
 import { ausBase64, ausUtf8, base64, utf8 } from "./sicherung";
+import { MARKE } from "@amtlos/marke";
 
 export const TRESOR_FORMAT = "amtlos-tresor";
 const ZUSATZ = `${TRESOR_FORMAT}:1`;
@@ -58,7 +59,7 @@ export function tresorVersion(text: string): 1 | 2 | null {
  */
 export function tresorOeffnen(text: string, schluessel: Uint8Array, kontext?: string): string {
   const d = JSON.parse(text) as Partial<Tresor>;
-  if (d.format !== TRESOR_FORMAT || (d.version !== 1 && d.version !== 2) || typeof d.nonce !== "string" || typeof d.daten !== "string") throw new Error("Kein Amtlos-Tresor");
+  if (d.format !== TRESOR_FORMAT || (d.version !== 1 && d.version !== 2) || typeof d.nonce !== "string" || typeof d.daten !== "string") throw new Error(`Kein ${MARKE.name}-Tresor`);
   if (d.version === 2 && kontext === undefined) throw new Error("Kontext fehlt");
   return ausUtf8(gcm(schluessel, ausBase64(d.nonce), utf8(d.version === 1 ? ZUSATZ : zusatz2(kontext!))).decrypt(ausBase64(d.daten)));
 }
@@ -92,7 +93,7 @@ export function tresorBytesSchliessen(klar: Uint8Array, schluessel: Uint8Array, 
 
 /** Binärformat entschlüsseln; wirft bei falschem Schlüssel, falschem Kontext oder veränderten Daten. */
 export function tresorBytesOeffnen(bytes: Uint8Array, schluessel: Uint8Array, kontext: string): Uint8Array {
-  if (!istBinaerTresor(bytes)) throw new Error("Kein Amtlos-Tresor");
+  if (!istBinaerTresor(bytes)) throw new Error(`Kein ${MARKE.name}-Tresor`);
   const n = BINAER_KENNUNG.length;
   return gcm(schluessel, bytes.subarray(n, n + 12), utf8(zusatz3(kontext))).decrypt(bytes.subarray(n + 12));
 }

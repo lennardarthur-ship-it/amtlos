@@ -1,9 +1,10 @@
 import type { MetadataRoute } from "next";
+import { MARKE } from "@amtlos/marke";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Amtlos",
-    short_name: "Amtlos",
+    name: MARKE.name,
+    short_name: MARKE.name,
     description: "Alle Pflichten deines Unternehmens: erkannt, erklärt, terminiert.",
     start_url: "/heute",
     display: "standalone",

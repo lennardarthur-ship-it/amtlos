@@ -2,21 +2,22 @@ import { createHash } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { Datenbank, ProtokollVersand, einladungsText, versendeEinladung } from "../src/index.js";
 import { DB_VERFUEGBAR, frischeDatenbank } from "../src/testhilfen.js";
+import { MARKE } from "@amtlos/marke";
 
 const h = (t: string) => createHash("sha256").update(t).digest();
 
 describe("Einladungstext", () => {
   it("nennt Unternehmen, Rolle, Link, Ablauf und den E-Mail-Vorbehalt", () => {
     const r = einladungsText({ unternehmen: "Café Morgenrot", rolle: "steuerberater", eingeladen_von: "Anna", laeuft_ab: new Date("2026-10-18T10:00:00Z") }, "https://x/einladung/abc");
-    expect(r.betreff).toBe("Einladung zu Café Morgenrot bei Amtlos");
-    expect(r.text).toContain("Anna lädt dich ein, bei Café Morgenrot in Amtlos mitzuarbeiten (Rolle: Steuerberatung)");
+    expect(r.betreff).toBe(`Einladung zu Café Morgenrot bei ${MARKE.name}`);
+    expect(r.text).toContain(`Anna lädt dich ein, bei Café Morgenrot in ${MARKE.name} mitzuarbeiten (Rolle: Steuerberatung)`);
     expect(r.text).toContain("https://x/einladung/abc");
     expect(r.text).toContain("18. Oktober 2026");
     expect(r.text).toContain("nur, wenn du dich mit dieser E-Mail-Adresse anmeldest");
     expect(einladungsText({ unternehmen: "U", rolle: "admin", eingeladen_von: null, laeuft_ab: new Date() }, "l").text).toMatch(/^Du bist eingeladen, bei U/);
     const en = einladungsText({ unternehmen: "U", rolle: "steuerberater", eingeladen_von: "Anna", laeuft_ab: new Date("2026-10-18T10:00:00Z"), sprache: "en" }, "l");
-    expect(en.betreff).toBe("Invitation to U on Amtlos");
-    expect(en.text).toContain("Anna invites you to work on U in Amtlos (role: Tax adviser)");
+    expect(en.betreff).toBe(`Invitation to U on ${MARKE.name}`);
+    expect(en.text).toContain(`Anna invites you to work on U in ${MARKE.name} (role: Tax adviser)`);
     expect(en.text).toContain("18 October 2026");
   });
 });
@@ -67,7 +68,7 @@ describe.skipIf(!DB_VERFUEGBAR)("Einladungen in der Datenbank", () => {
     const offen = await einladen(anna, "ole@example.org", "t2");
     const versand = new ProtokollVersand();
     expect(await versendeEinladung(worker, versand, "https://app.amtlos.test", { einladungId: offen, token: "t2" })).toBe("gesendet");
-    expect(versand.gesendet[0]).toMatchObject({ an: "ole@example.org", betreff: "Einladung zu Annas Café bei Amtlos" });
+    expect(versand.gesendet[0]).toMatchObject({ an: "ole@example.org", betreff: `Einladung zu Annas Café bei ${MARKE.name}` });
     expect(versand.gesendet[0]!.text).toContain("https://app.amtlos.test/einladung/t2");
     const abgelaufen = await einladen(anna, "alt@example.org", "t3", "mitarbeiter", -1);
     expect(await versendeEinladung(worker, versand, "x", { einladungId: abgelaufen, token: "t3" })).toBe("uebersprungen");

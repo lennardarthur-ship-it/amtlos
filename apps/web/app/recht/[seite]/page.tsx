@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Fusszeile } from "@/komponenten/fusszeile";
 import { Markenname } from "@/komponenten/markenname";
 import { t } from "@/lib/sprache";
+import { MARKE } from "@amtlos/marke";
 
 const SEITEN = ["impressum", "datenschutz", "agb"] as const;
 type Seite = (typeof SEITEN)[number];
@@ -27,7 +28,7 @@ export default async function RechtSeite({ params }: { params: Promise<{ seite: 
     name: e.RECHT_BETREIBER ?? "[Betreiber: Firma und Rechtsform]",
     anschrift: e.RECHT_ANSCHRIFT ?? "[Straße Hausnummer, PLZ Ort]",
     vertreten: e.RECHT_VERTRETEN ?? "[Vertretungsberechtigte Person]",
-    email: e.RECHT_EMAIL ?? "hallo@amtlos.de",
+    email: e.RECHT_EMAIL ?? MARKE.email,
     register: e.RECHT_REGISTER ?? "[Registergericht und Registernummer]",
     ust_id: e.RECHT_UST_ID ?? "[USt-IdNr.]",
     dsb: e.RECHT_DSB ?? "[Datenschutzbeauftragte:r, falls bestellt]",

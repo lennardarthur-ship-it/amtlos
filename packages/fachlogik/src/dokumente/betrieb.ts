@@ -6,6 +6,7 @@
 import { abschnitt, absatz, anschrift, cent, datumDe, dokument, euro, felder, liste, tabelle, text, uebertragung, unterschriften, zelle } from "./html.js";
 import { INTERESSE, RECHTSFORMEN } from "./bausteine.js";
 import type { Betrieb, Vorlage } from "./typen.js";
+import { MARKE } from "@amtlos/marke";
 
 const formNorm = (t: string) => t.toLocaleLowerCase("de").replace(/[\s.]/g, "");
 /**
@@ -94,7 +95,7 @@ export const gewerbeanmeldung: Vorlage = {
     },
     {
       titel: "Angaben zum Betrieb",
-      hilfe: "Name, Anschrift und Kontakt übernimmt Amtlos aus „Mein Betrieb“.",
+      hilfe: `Name, Anschrift und Kontakt übernimmt ${MARKE.name} aus „Mein Betrieb“.`,
       felder: [
         { id: "rechtsform", art: "wahl", label: "Rechtsform", optionen: RECHTSFORMEN.map((r) => ({ wert: r, text: r })), hilfe: "ohne Auswahl die Rechtsform aus „Mein Betrieb“, sonst Einzelunternehmen" },
         { id: "taetigkeit", art: "mehrzeilig", label: "Angemeldete Tätigkeit", hilfe: "so genau wie möglich, z. B. „Friseurhandwerk und Verkauf von Haarpflegeprodukten“", pflicht: true },

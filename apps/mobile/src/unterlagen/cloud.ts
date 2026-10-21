@@ -1,10 +1,13 @@
 /**
  * iCloud-Sicherung (E-129, vorbereitet): Im eigenen App-Build (Development/TestFlight) legt Amtlos verschlüsselte
- * Sicherungen im iCloud-Drive-Ordner „Amtlos“ ab. In Expo Go fehlt das native Modul – dann ist die Funktion
- * unsichtbar. Bibliothek: react-native-cloud-storage (iCloud Documents, Config-Plugin in app.json).
+ * Sicherungen im iCloud-Drive-Ordner „Amtlos“ ab (technischer Ordnername, bleibt bei einer Umbenennung der Marke – sonst
+ * fände die App vorhandene Sicherungen nicht mehr). Die Dateinamen tragen den sichtbaren Namen (`MARKE.name`); gelesen und
+ * aufgeräumt wird unabhängig vom Präfix, damit Sicherungen unter einem früheren Namen („Amtlos-Sicherung-…“) weiter zählen.
+ * In Expo Go fehlt das native Modul – dann ist die Funktion unsichtbar. Bibliothek: react-native-cloud-storage (iCloud Documents, Config-Plugin in app.json).
  */
 import type * as Bibliothek from "react-native-cloud-storage";
 import { schluesselKennung, sicherungsKdf } from "./sicherung";
+import { MARKE } from "@amtlos/marke";
 
 type Lib = typeof Bibliothek;
 let geladen: Lib | null | undefined;
@@ -21,8 +24,21 @@ function lib(): Lib | null {
   return geladen;
 }
 
+/** Technischer Ordnername in iCloud Drive – nicht mit der Marke ändern (docs/14-marke.md). */
 const ORDNER = "/Amtlos";
-export const AKTUELL = `${ORDNER}/Amtlos-Sicherung-aktuell.amtlos`;
+const sicherungsDatei = (teil: string) => `${ORDNER}/${MARKE.name}-Sicherung-${teil}.amtlos`;
+export const AKTUELL = sicherungsDatei("aktuell");
+/** Sicherungsdatei mit beliebigem Namenspräfix (auch unter einem früheren Markennamen, z. B. „Amtlos-Sicherung-…“) */
+const SICHERUNG = /^.+-Sicherung-(.+)\.amtlos$/;
+
+/** Pfad der aktuellen Sicherung: unter dem heutigen Namen, sonst die unter einem früheren Namen (Umbenennung der Marke). */
+async function aktuellerPfad(l: Lib): Promise<string | null> {
+  const { CloudStorage, CloudStorageScope } = l;
+  if (await CloudStorage.exists(AKTUELL, CloudStorageScope.Documents)) return AKTUELL;
+  if (!(await CloudStorage.exists(ORDNER, CloudStorageScope.Documents))) return null;
+  const alt = (await CloudStorage.readdir(ORDNER, CloudStorageScope.Documents)).filter((n) => SICHERUNG.exec(n)?.[1] === "aktuell").sort()[0];
+  return alt ? `${ORDNER}/${alt}` : null;
+}
 
 export async function cloudVerfuegbar(): Promise<boolean> {
   try {
@@ -56,14 +72,15 @@ export async function cloudSchreiben(text: string, jetzt = new Date()): Promise<
   if (!l) throw new Error("iCloud nicht verfügbar");
   const { CloudStorage, CloudStorageScope } = l;
   if (!(await CloudStorage.exists(ORDNER, CloudStorageScope.Documents))) await CloudStorage.mkdir(ORDNER, CloudStorageScope.Documents);
-  const tagesDatei = `${ORDNER}/Amtlos-Sicherung-Tag-${tag(jetzt)}.amtlos`;
+  const tagesDatei = sicherungsDatei(`Tag-${tag(jetzt)}`);
   if (!(await CloudStorage.exists(tagesDatei, CloudStorageScope.Documents))) {
     // Stand vom Tagesbeginn: die bisherige aktuelle Sicherung, sonst die neue
-    const vorher = (await CloudStorage.exists(AKTUELL, CloudStorageScope.Documents)) ? await CloudStorage.readFile(AKTUELL, CloudStorageScope.Documents).catch(() => null) : null;
+    const bisher = await aktuellerPfad(l);
+    const vorher = bisher ? await CloudStorage.readFile(bisher, CloudStorageScope.Documents).catch(() => null) : null;
     await CloudStorage.writeFile(tagesDatei, vorher ?? text, CloudStorageScope.Documents);
   }
   await CloudStorage.writeFile(AKTUELL, text, CloudStorageScope.Documents);
-  await CloudStorage.writeFile(`${ORDNER}/Amtlos-Sicherung-${kalenderwoche(jetzt)}.amtlos`, text, CloudStorageScope.Documents);
+  await CloudStorage.writeFile(sicherungsDatei(kalenderwoche(jetzt)), text, CloudStorageScope.Documents);
   await aufraeumen().catch(() => undefined);
 }
 
@@ -74,13 +91,16 @@ export const TAGE_BEHALTEN = 7;
 /** So viele beiseitegelegte Sicherungen („vorher“, z. B. vom alten iPhone) bleiben (G-5). */
 export const VORHER_BEHALTEN = 3;
 
-/** Welche Sicherungsdateien im Ordner zu löschen sind – je Art nur die neuesten behalten. */
+/**
+ * Welche Sicherungsdateien im Ordner zu löschen sind – je Art nur die neuesten behalten. Das Namenspräfix (Marke) zählt
+ * nicht: sortiert wird nach dem Teil hinter „-Sicherung-“, so zählen auch Sicherungen unter einem früheren Namen mit.
+ */
 export function zuLoeschen(namen: string[]): string[] {
   const art = (re: RegExp, behalten: number) => {
-    const l = namen.filter((n) => re.test(n)).sort();
-    return l.slice(0, Math.max(0, l.length - behalten));
+    const l = namen.map((n) => [n, SICHERUNG.exec(n)?.[1] ?? ""] as const).filter(([, teil]) => re.test(teil)).sort((a, b) => (a[1] < b[1] ? -1 : a[1] > b[1] ? 1 : a[0] < b[0] ? -1 : 1));
+    return l.slice(0, Math.max(0, l.length - behalten)).map(([n]) => n);
   };
-  return [...art(/^Amtlos-Sicherung-\d{4}-KW\d{2}\.amtlos$/, WOCHEN_BEHALTEN), ...art(/^Amtlos-Sicherung-Tag-\d{4}-\d{2}-\d{2}\.amtlos$/, TAGE_BEHALTEN), ...art(/^Amtlos-Sicherung-vorher-[\dT-]+\.amtlos$/, VORHER_BEHALTEN)];
+  return [...art(/^\d{4}-KW\d{2}$/, WOCHEN_BEHALTEN), ...art(/^Tag-\d{4}-\d{2}-\d{2}$/, TAGE_BEHALTEN), ...art(/^vorher-[\dT-]+$/, VORHER_BEHALTEN)];
 }
 
 /**
@@ -96,7 +116,7 @@ async function aufraeumen(): Promise<void> {
   const weg = new Set(zuLoeschen(namen));
   for (const n of weg) await CloudStorage.unlink(`${ORDNER}/${n}`, CloudStorageScope.Documents).catch(() => undefined);
   // Kennungen der verbliebenen Sicherungen – nur Belegordner ohne Sicherung werden gelöscht
-  const sicherungen = namen.filter((n) => /^Amtlos-Sicherung-.*\.amtlos$/.test(n) && !weg.has(n));
+  const sicherungen = namen.filter((n) => SICHERUNG.test(n) && !weg.has(n));
   const kennungen = new Set<string>();
   for (const n of sicherungen) {
     const text = await CloudStorage.readFile(`${ORDNER}/${n}`, CloudStorageScope.Documents).catch(() => null);
@@ -118,8 +138,8 @@ export async function cloudLesen(): Promise<string | null> {
     const l = lib();
     if (!l) return null;
     const { CloudStorage, CloudStorageScope } = l;
-    if (!(await CloudStorage.exists(AKTUELL, CloudStorageScope.Documents))) return null;
-    return await CloudStorage.readFile(AKTUELL, CloudStorageScope.Documents);
+    const pfad = await aktuellerPfad(l);
+    return pfad ? await CloudStorage.readFile(pfad, CloudStorageScope.Documents) : null;
   } catch {
     return null;
   }
@@ -168,5 +188,5 @@ export async function cloudBeiseitelegen(text: string, jetzt = new Date()): Prom
   const l = lib();
   if (!l) return;
   const { CloudStorage, CloudStorageScope } = l;
-  await CloudStorage.writeFile(`${ORDNER}/Amtlos-Sicherung-vorher-${jetzt.toISOString().slice(0, 16).replace(":", "-")}.amtlos`, text, CloudStorageScope.Documents);
+  await CloudStorage.writeFile(sicherungsDatei(`vorher-${jetzt.toISOString().slice(0, 16).replace(":", "-")}`), text, CloudStorageScope.Documents);
 }

@@ -15,6 +15,7 @@ import { formImNamen, istKapitalgesellschaft } from "./betrieb.js";
 import { AUFBEWAHRUNG, EINHEITEN, EUER_AUSGABEN, EUER_EINNAHMEN, KASSEN_ARTEN, RECHNUNGS_HINWEISE, TSE_ARTEN } from "./bausteine.js";
 import { KOPF_LINIE, LINIE_MITTEL, ZELLE_LINIE, abschnitt, absatz, ankreuzen, anschrift, auswahl, brief, cent, datumDe, dokument, esc, euro, felder, ibanText, kennzahlen, nachsatz, uebertragung, ja, liste, neufassung, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
 import type { Betrieb, Daten, Eintrag, Option, Vorlage } from "./typen.js";
+import { MARKE } from "@amtlos/marke";
 
 
 const KALENDER = new StandardKalender();
@@ -503,7 +504,7 @@ export const rechnung: Vorlage = {
       felder: [
         // R11 (Kosmetik #4): Bruttopreise für Privatkunden – die Summe trifft den Endpreis genau
         // R12 (UX #5): sichtbar über den Positionen und im Salon, Café bzw. bei reinen Privatkunden vorbelegt (profilStart); nicht bei Kleinunternehmern
-        { id: "preise_brutto", art: "schalter", label: "Preise inkl. Umsatzsteuer (brutto)", hilfe: "Unter „Einzelpreis“ steht der Endpreis (z. B. 45,00 €) – Netto und Umsatzsteuer rechnet Amtlos genau daraus.", vorbelegungJe: { friseur: true, kosmetik: true, gastro_cafe: true }, wenn: { feld: "kleinunternehmer", nicht: true } },
+        { id: "preise_brutto", art: "schalter", label: "Preise inkl. Umsatzsteuer (brutto)", hilfe: `Unter „Einzelpreis“ steht der Endpreis (z. B. 45,00 €) – Netto und Umsatzsteuer rechnet ${MARKE.name} genau daraus.`, vorbelegungJe: { friseur: true, kosmetik: true, gastro_cafe: true }, wenn: { feld: "kleinunternehmer", nicht: true } },
         {
           id: "positionen",
           art: "liste",
@@ -1057,7 +1058,7 @@ export const ustVoranmeldung: Vorlage = {
   namensFeld: "zeitraum",
   abschnitte: [
     { titel: "Zeitraum",
-      hilfe: "Die Voranmeldung übermittelst du elektronisch über ELSTER. Diese Unterlage rechnet die Zahlen dafür aus – aus deinen Rechnungen in Amtlos oder von Hand – und bleibt bei deinen Unterlagen.",
+      hilfe: `Die Voranmeldung übermittelst du elektronisch über ELSTER. Diese Unterlage rechnet die Zahlen dafür aus – aus deinen Rechnungen in ${MARKE.name} oder von Hand – und bleibt bei deinen Unterlagen.`,
       felder: [
         { id: "versteuerung", art: "wahl", label: "Wie versteuerst du?", optionen: VERSTEUERUNG, vorbelegung: "soll", hilfe: "Soll: Umsätze zählen im Zeitraum, in dem du die Leistung erbracht hast (§ 13 Abs. 1 Nr. 1 a UStG). Ist: im Zeitraum, in dem das Geld eingegangen ist (§ 13 Abs. 1 Nr. 1 b, § 20 UStG) – nur, wenn das Finanzamt es dir genehmigt hat; für freie Berufe (§ 20 Satz 1 Nr. 3 UStG) und bei Umsatz bis 800.000 € im Vorjahr ist das auf Antrag der übliche Weg." },
         { id: "zeitraum", art: "text", label: "Zeitraum", hilfe: "z. B. Oktober 2026 oder 3. Quartal 2026", pflicht: true },
@@ -1316,7 +1317,7 @@ export const kassenbuch: Vorlage = {
   namensFeld: "zeitraum",
   abschnitte: [
     { titel: "Zeitraum und Anfangsbestand",
-      hilfe: "Vorlage zum Ausdrucken: Sobald du das Kassenbuch teilst oder druckst, schreibt Amtlos es fest – danach lässt es sich nicht mehr ändern. Ein laufend geführtes, unveränderbares elektronisches Kassenbuch ist es nicht.",
+      hilfe: `Vorlage zum Ausdrucken: Sobald du das Kassenbuch teilst oder druckst, schreibt ${MARKE.name} es fest – danach lässt es sich nicht mehr ändern. Ein laufend geführtes, unveränderbares elektronisches Kassenbuch ist es nicht.`,
       felder: [
         { id: "zeitraum", art: "text", label: "Zeitraum", hilfe: "z. B. Oktober 2026", pflicht: true },
         { id: "anfang", art: "betrag", label: "Anfangsbestand (€)", pflicht: true },
@@ -1393,7 +1394,7 @@ export const kassenmeldung: Vorlage = {
     {
       // R12 (Bäckerei #3): weitere Betriebsstätten (Filialen) – je Betriebsstätte ein eigenes Blatt mit ihren Kassen
       titel: "Betriebsstätten",
-      hilfe: "Nur bei Filialen: Die Meldung geht je Betriebsstätte. Amtlos übernimmt sie aus „Mein Betrieb“. Kassen ohne Betriebsstätte gehören zum Betrieb unter der Anschrift aus „Mein Betrieb“.",
+      hilfe: `Nur bei Filialen: Die Meldung geht je Betriebsstätte. ${MARKE.name} übernimmt sie aus „Mein Betrieb“. Kassen ohne Betriebsstätte gehören zum Betrieb unter der Anschrift aus „Mein Betrieb“.`,
       felder: [
         {
           id: "betriebsstaetten",

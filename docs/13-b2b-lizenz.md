@@ -6,7 +6,7 @@ Vertrag mit einem Partner rechtlich bzw. steuerlich prüfen lassen.
 
 Drei Produkte:
 
-1. **Partner-Lizenzen** – eine Kammer, ein Verband oder eine Steuerkanzlei gibt ihren Mitgliedern Amtlos Pro. Technisch
+1. **Partner-Lizenzen** – eine Kammer, ein Verband oder eine Steuerkanzlei gibt ihren Mitgliedern Betriebsklar Pro. Technisch
    ausschließlich über **Apples Abo-Angebotscodes** (Offer Codes).
 2. **„Empfohlen von …“** – der Name (und ggf. das Logo) des Partners in der App. Reine Anzeige.
 3. **Fachbibliothek** – die Pakete `@amtlos/fristen`, `@amtlos/rules-engine`, `@amtlos/fachlogik` als Bibliothek für
@@ -23,7 +23,7 @@ App Review Guidelines ([developer.apple.com/app-store/review/guidelines](https:/
 - **3.1.3(c) Enterprise Services:** gilt nur für Apps, die „only … directly by you to organizations or groups for their
   employees or students“ verkauft werden; „Consumer, single user, or family sales must use in-app purchase.“
 
-Amtlos verkauft an einzelne Betriebe (Selbständige, kleine Firmen) – also Einzelkunden, nicht Mitarbeitende einer
+Betriebsklar verkauft an einzelne Betriebe (Selbständige, kleine Firmen) – also Einzelkunden, nicht Mitarbeitende einer
 Organisation. Eine Kammer, die Codes an ihre Mitglieder verteilt, ist kein Arbeitgeber dieser Mitglieder. Deshalb:
 
 - **Kein eigener Freischaltweg** in der iOS-App: keine Lizenzschlüssel, keine Partner-Codes, die Pro freischalten,
@@ -83,13 +83,13 @@ Quelle: [Set up subscription offer codes](https://developer.apple.com/help/app-s
   `presentCodeRedemptionSheet`, iOS 14+); Apple prüft den Code, die App fragt danach die Berechtigung bei RevenueCat
   neu ab. Später eingelöste Codes kommen über die Kundendaten-Beobachtung (`addCustomerInfoUpdateListener`) und beim
   Wechsel in den Vordergrund an.
-- Außerhalb der App: über den Einlöse-Link oder im App Store. Hat das Mitglied Amtlos noch nicht, bietet der App Store
+- Außerhalb der App: über den Einlöse-Link oder im App Store. Hat das Mitglied Betriebsklar noch nicht, bietet der App Store
   den Download an; beim ersten Start ist Pro schon da.
 - Im Web, in Expo Go und im Testmodus zeigt „Code einlösen“ nur einen Hinweis (Code im App Store einlösen).
 
 ### 2.4 Abrechnung mit dem Partner
 
-Apple stellt den Code kostenlos aus; Amtlos erhält für eingelöste Gratiscodes **keine** Zahlung über Apple. Die
+Apple stellt den Code kostenlos aus; Betriebsklar erhält für eingelöste Gratiscodes **keine** Zahlung über Apple. Die
 Vergütung durch den Partner (z. B. Pauschale je Codestapel oder je Einlösung) ist ein **eigener Vertrag zwischen dir und
 dem Partner außerhalb des App Stores**.
 
@@ -105,7 +105,7 @@ dem Partner außerhalb des App Stores**.
 - Vertrag mit dem Partner: Laufzeit, Anzahl Codes, Logo-Nutzungsrecht (Marke des Partners in der App), Haftung,
   Datenschutz (es werden keine Mitgliederdaten ausgetauscht – so festhalten), Kündigung, was nach Ablauf der
   Gratiszeit passiert (Verlängerung zum Normalpreis nur, wenn das Angebot mit Verlängerung angelegt wurde).
-- Ob eine Kammer (Körperschaft des öffentlichen Rechts) Amtlos überhaupt empfehlen/bezuschussen darf (Neutralität,
+- Ob eine Kammer (Körperschaft des öffentlichen Rechts) Betriebsklar überhaupt empfehlen/bezuschussen darf (Neutralität,
   Vergaberecht) – Sache des Partners, aber früh fragen.
 
 ### 2.5 Auswertung
@@ -120,7 +120,7 @@ prüfen (Filter nach Angebot). Die App selbst sendet nichts über Partner (Absch
 
 - **Heute:** kleine Zeile oben auf dem Blatt „Empfohlen von {Partner}“ (mit Logo, wenn vorhanden).
 - **Bezahlschirm:** „Empfohlen von {Partner}“ und der Knopf „Dein Zugang über {Partner}: Code einlösen“.
-- **Mein Betrieb → Über Amtlos → Partner-Code:** Code eingeben (Groß-/Kleinschreibung und Leerzeichen am Rand egal),
+- **Mein Betrieb → Über Betriebsklar → Partner-Code:** Code eingeben (Groß-/Kleinschreibung und Leerzeichen am Rand egal),
   Partner ansehen (Hinweis, Link), **Partner entfernen**, Code einlösen.
 - **Deep Link** `amtlos://partner/<code>`: Das Schema `amtlos` ist bereits registriert (Anmeldung); die App setzt einen
   bekannten Partner und meldet es. Kein neuer nativer Eintrag nötig. Unbekannte Codes: Hinweis, nichts wird gesetzt.

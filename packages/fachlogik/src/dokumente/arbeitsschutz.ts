@@ -6,6 +6,7 @@ import { BA_BAUSTEINE, ELEKTRO_FRISTEN, GEFAEHRDUNGEN, GEFAHRSTOFF_ANGABEN, MUTT
 import { KOPF_LINIE, LINIE, ZELLE_LINIE, nachsatz, abschnitt, absatz, angaben, ankreuzen, auswahl, datumDe, dokument, esc, ja, linien, liste, plusMonate, punkte, roh, tabelle, text, unterschriften, zelle, zellePunkte, zeilen } from "./html.js";
 import { GEFAEHRDUNGSFAKTOREN, RISIKO_STUFEN, optionen } from "./konstanten.js";
 import type { Daten, Eintrag, Option, Vorlage, Vorschlag } from "./typen.js";
+import { MARKE } from "@amtlos/marke";
 
 /** Teilnahmeliste mit Unterschriftsspalte; leere Zeilen zum Nachtragen von Hand. */
 export function teilnahmeTabelle(eintraege: Eintrag[], extra?: { kopf: string; feld: string; datum?: boolean }): string {
@@ -603,7 +604,7 @@ export const elektroPruefung: Vorlage = {
         { id: "pruefart", art: "wahl", label: "Art der Prüfung", optionen: [{ wert: "Wiederholungsprüfung", text: "Wiederholungsprüfung" }, { wert: "Erstprüfung", text: "Erstprüfung" }, { wert: "Prüfung nach Instandsetzung", text: "nach Instandsetzung" }], vorbelegung: "Wiederholungsprüfung", pflicht: true },
         { id: "umfang", art: "bausteine", label: "Umfang der Prüfung", optionen: ["Sichtprüfung", "Messung des Schutzleiterwiderstands", "Messung des Isolationswiderstands", "Messung des Schutzleiter- bzw. Berührungsstroms", "Funktionsprüfung"].map((t) => ({ wert: t, text: t })), vorbelegung: ["Sichtprüfung", "Messung des Schutzleiterwiderstands", "Messung des Isolationswiderstands", "Funktionsprüfung"], pflicht: true },
         { id: "norm", art: "text", label: "Prüfgrundlage", vorbelegung: { text: NORM }, vorschlaege: [NORM] },
-        { id: "einsatz", art: "wahl", label: "Einsatzbedingungen (Richtwert für die Prüffrist)", hilfe: "Ohne eigenes Datum je Gerät rechnet Amtlos die nächste Prüfung aus Prüfdatum und Richtwert.", optionen: ELEKTRO_FRISTEN.slice(0, 4).map((o) => ({ wert: o.wert, text: o.text, quelle: o.quelle })) },
+        { id: "einsatz", art: "wahl", label: "Einsatzbedingungen (Richtwert für die Prüffrist)", hilfe: `Ohne eigenes Datum je Gerät rechnet ${MARKE.name} die nächste Prüfung aus Prüfdatum und Richtwert.`, optionen: ELEKTRO_FRISTEN.slice(0, 4).map((o) => ({ wert: o.wert, text: o.text, quelle: o.quelle })) },
         { id: "leerzeilen", selten: true, art: "schalter", label: "Leere Zeilen zum Ausfüllen von Hand anhängen" },
       ],
     },

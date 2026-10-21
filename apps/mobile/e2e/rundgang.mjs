@@ -11,6 +11,7 @@ import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
+import { MARKE } from "../../../packages/marke/index.js";
 
 const require = createRequire(path.resolve(path.dirname(new URL(import.meta.url).pathname), "../../web/package.json"));
 const { chromium } = require("playwright-core");
@@ -398,7 +399,7 @@ try {
   await p.getByRole("tab", { name: "Mein Betrieb" }).click();
   await warte(800);
   pruefe((await sichtbar("Salon Sonne")) && (await sichtbar("Steuer und Bank")) && (await sichtbar("1 Kunde")), "Übersicht „Mein Betrieb“ fehlt (Kopf, Gruppen, Kundenzahl)");
-  pruefe((await sichtbar("Pro ist aktiv")) && (await sichtbar("Impressum")) && (await sichtbar("Amtlos weiterempfehlen")), "Pro-Status oder „Über Amtlos“ fehlt unter „Mein Betrieb“");
+  pruefe((await sichtbar("Pro ist aktiv")) && (await sichtbar("Impressum")) && (await sichtbar(`${MARKE.name} weiterempfehlen`)), `Pro-Status oder „Über ${MARKE.name}“ fehlt unter „Mein Betrieb“`);
   await foto("mein-betrieb");
   await tippe(p.getByRole("button", { name: /^Mitarbeiter/ }).locator("visible=true").last());
   await warte(800);
@@ -586,7 +587,7 @@ try {
   // Kontrollmappe, Steuerpaket und E-Rechnung öffnen den Bezahlschirm mit Anlass
   await p.getByRole("tab", { name: "Mein Betrieb" }).click();
   await warte(800);
-  await tippe(p.getByRole("button", { name: /^(Pro ist aktiv|Amtlos Pro)/ }).locator("visible=true").first());
+  await tippe(p.getByRole("button", { name: new RegExp(`^(Pro ist aktiv|${MARKE.proName})`) }).locator("visible=true").first());
   await warte(900);
   if (await sichtbar("Pro testweise ausschalten")) {
     await tippe(knopf("Pro testweise ausschalten"));

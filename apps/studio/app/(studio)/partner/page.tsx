@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { StudioFehler, partnerListe, partnerSpeichern, type PartnerDaten } from "@amtlos/server";
 import { darfRedigieren, datenbank, ich } from "@/lib/studio";
+import { MARKE } from "@amtlos/marke";
 
 export const metadata = { title: "Marktplatz-Partner" };
 
@@ -77,7 +78,7 @@ export default async function PartnerSeite({ searchParams }: { searchParams: Pro
       <h1 className="text-titel font-bold">Marktplatz-Partner</h1>
       <p className="lesetext" id="hinweis-neu">
         Geprüfte Steuerberatungen, Kanzleien, Fachkräfte für Arbeitssicherheit und Datenschutzbeauftragte. Sichtbar nur mit geprüfter Berufszulassung.
-        Keine Provision und keine Zahlung über Amtlos, solange das Vergütungsmodell nicht geklärt ist (J-4).
+        Keine Provision und keine Zahlung über {MARKE.name}, solange das Vergütungsmodell nicht geklärt ist (J-4).
       </p>
       {fehler ? <p role="alert" className="lesetext rounded-md border-2 border-frist bg-frist-hauch p-4">{fehler}</p> : null}
       {ok ? <p role="status" className="lesetext rounded-md bg-amt-hauch p-4 font-bold text-amt">Gespeichert.</p> : null}

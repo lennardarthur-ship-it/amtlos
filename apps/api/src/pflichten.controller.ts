@@ -12,6 +12,7 @@ import { erzeugeIcs } from "./ics.js";
 import { fortschritt, offeneVoraussetzungen, ordne } from "@amtlos/fachlogik";
 import { KONFIGURATION, type Konfiguration } from "./konfiguration.js";
 import { WARTESCHLANGE } from "./kern.controller.js";
+import { MARKE } from "@amtlos/marke";
 
 interface Zeile {
   id: string;
@@ -230,8 +231,8 @@ export class PflichtenController {
         );
         for (const { id } of ids)
           await tx.abfrage(
-            "insert into app.nachweis (unternehmen_id, pflicht_instanz_id, art, notiz, erstellt_von) values ($1, $2, 'bestaetigung', 'Vor dem Start bei Amtlos erledigt (Sammelbestätigung)', $3)",
-            [k.unternehmenId, id, k.kontoId],
+            "insert into app.nachweis (unternehmen_id, pflicht_instanz_id, art, notiz, erstellt_von) values ($1, $2, 'bestaetigung', $4, $3)",
+            [k.unternehmenId, id, k.kontoId, `Vor dem Start bei ${MARKE.name} erledigt (Sammelbestätigung)`],
           );
         if (ids.length) await neuberechnungEinreihen(this.boss, tx, { unternehmenId: k.unternehmenId!, ausgeloestDurch: "vor-start-erledigt" });
         return { erledigt: ids.length };
@@ -329,13 +330,13 @@ export class PflichtenController {
     );
     if (!abo) throw new NotFoundException();
     const { name, zeilen, sprache, weitere } = await this.db.imKontext({ kontoId: abo.konto_id, unternehmenId: abo.unternehmen_id }, async (tx) => ({
-      name: (await tx.eine<{ name: string }>("select name from app.unternehmen where id = $1", [abo.unternehmen_id]))?.name ?? "Amtlos",
+      name: (await tx.eine<{ name: string }>("select name from app.unternehmen where id = $1", [abo.unternehmen_id]))?.name ?? MARKE.name,
       sprache: (await tx.eine<{ sprache: "de" | "en" }>("select sprache from app.konto where id = $1", [abo.konto_id]))?.sprache ?? "de",
       zeilen: await tx.abfrage<Zeile>(`${ABFRAGE} and pi.status = 'offen' and pi.faellig_am is not null order by pi.faellig_am`, [abo.unternehmen_id]),
       weitere: await weitereTermine(tx, abo.unternehmen_id),
     }));
     const ics = erzeugeIcs(
-      `Amtlos – ${name}`,
+      `${MARKE.name} – ${name}`,
       zeilen.map((z) => ({
         uid: `${z.id}@amtlos`,
         datum: z.faellig_am!,

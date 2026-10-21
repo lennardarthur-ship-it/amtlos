@@ -29,6 +29,7 @@ import fs from "node:fs";
 import http from "node:http";
 import path from "node:path";
 import { createRequire } from "node:module";
+import { MARKE, markeEinsetzenTief } from "../../../packages/marke/index.js";
 
 const HIER = path.dirname(new URL(import.meta.url).pathname);
 const APP = path.resolve(HIER, "..");
@@ -48,7 +49,8 @@ const gebaut = path.join(OUT, ".demo-stand.mjs");
 execFileSync(path.join(esbuild, "bin/esbuild"), [path.join(HIER, "demo-stand.ts"), "--bundle", "--platform=node", "--format=esm", `--outfile=${gebaut}`, "--log-level=warning"]);
 const stand = execFileSync("node", [gebaut], { encoding: "utf8" }).trim();
 fs.rmSync(gebaut);
-const texte = JSON.parse(fs.readFileSync(path.join(APP, "store/de.json"), "utf8"));
+// Marke aus packages/marke/marke.json in die Store-Texte einsetzen ({{MARKE}} …, docs/14-marke.md)
+const texte = markeEinsetzenTief(JSON.parse(fs.readFileSync(path.join(APP, "store/de.json"), "utf8")));
 
 const srv = http.createServer((req, res) => {
   let p = path.join(DIR, decodeURIComponent(req.url.split("?")[0]));
@@ -215,7 +217,7 @@ if (WEB) {
   p{font-size:30px;line-height:1.35;margin:28px 0 0;color:#7fe3b8}
   .geraet{position:absolute;left:760px;top:70px;width:372px;border-radius:44px;padding:8px;background:linear-gradient(#f4f7f5,#cfd9d4);box-shadow:0 0 0 2px rgba(255,255,255,.18),0 30px 80px rgba(0,0,0,.45)}
   .geraet img{display:block;width:100%;border-radius:36px}
-  </style></head><body><div class="text"><div class="marke">Amtlos</div><h1>${titel}</h1><p>Pflichten-Check, Rechnungen und über 30 Vorlagen für kleine Betriebe – auf dem iPhone.</p></div>
+  </style></head><body><div class="text"><div class="marke">${MARKE.name}</div><h1>${titel}</h1><p>Pflichten-Check, Rechnungen und über 30 Vorlagen für kleine Betriebe – auf dem iPhone.</p></div>
   <div class="geraet"><img src="${png(texte.bilder[0].bildschirm)}"></div></body></html>`, { waitUntil: "load" });
   await og.screenshot({ path: path.join(WEB, "og.jpg"), type: "jpeg", quality: 85 });
 }

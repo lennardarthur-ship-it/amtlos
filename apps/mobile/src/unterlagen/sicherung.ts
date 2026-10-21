@@ -9,6 +9,7 @@ import { pbkdf2 } from "@noble/hashes/pbkdf2";
 import { sha256 } from "@noble/hashes/sha2";
 import { istBelegDateiname } from "@amtlos/fachlogik";
 import { StandFehler, dateienImStand, standAus, type Stand } from "./speicher";
+import { MARKE } from "@amtlos/marke";
 
 export const SICHERUNG_FORMAT = "amtlos-sicherung";
 /**
@@ -52,7 +53,7 @@ const ZUSATZ = `${SICHERUNG_FORMAT}:1`;
 
 export class SicherungsFehler extends Error {
   constructor(public art: "format" | "passwort") {
-    super(art === "format" ? "Keine Amtlos-Sicherung" : "Passwort falsch oder Datei beschädigt");
+    super(art === "format" ? `Keine ${MARKE.name}-Sicherung` : "Passwort falsch oder Datei beschädigt");
   }
 }
 
@@ -325,4 +326,4 @@ export function sicherungsDateiLesen(text: string, k: Uint8Array): Uint8Array | 
 }
 
 /** Dateiname mit Datum, ohne Angaben zum Betrieb. */
-export const sicherungsName = (heute: string) => `Amtlos-Sicherung-${heute}.amtlos`;
+export const sicherungsName = (heute: string) => `${MARKE.name}-Sicherung-${heute}.amtlos`;

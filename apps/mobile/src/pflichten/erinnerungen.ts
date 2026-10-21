@@ -4,6 +4,7 @@
  */
 import * as Notifications from "expo-notifications";
 import type { Erinnerung } from "./check";
+import { MARKE } from "@amtlos/marke";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({ shouldShowBanner: true, shouldShowList: true, shouldPlaySound: false, shouldSetBadge: false }),
@@ -28,7 +29,7 @@ export async function planen(plan: Erinnerung[]): Promise<void> {
     const date = new Date(j, m - 1, t, 9, 0, 0);
     if (date.getTime() <= jetzt) continue;
     await Notifications.scheduleNotificationAsync({
-      content: { title: e.titel, body: `Fällig am ${datumDe(e.termin)} – in Amtlos ansehen.`, data: { pflichtId: e.pflichtId } },
+      content: { title: e.titel, body: `Fällig am ${datumDe(e.termin)} – in ${MARKE.name} ansehen.`, data: { pflichtId: e.pflichtId } },
       trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date },
     });
   }

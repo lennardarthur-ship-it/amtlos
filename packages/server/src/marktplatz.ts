@@ -6,6 +6,7 @@
 import type { Datenbank } from "./datenbank.js";
 import type { Versand } from "./erinnerungen.js";
 import type { MarktplatzJob } from "./warteschlange.js";
+import { MARKE } from "@amtlos/marke";
 
 export const QUALIFIKATIONEN = ["steuerberater", "rechtsanwalt", "fachkraft_arbeitssicherheit", "datenschutzbeauftragter"] as const;
 
@@ -20,7 +21,7 @@ export function anfrageText(a: { nachricht: string; paket: string | null; daten:
   const zeilen = [
     `Guten Tag ${a.partner},`,
     "",
-    "über Amtlos hat Sie eine Anfrage erreicht.",
+    `über ${MARKE.name} hat Sie eine Anfrage erreicht.`,
     a.paket ? `Gewünschtes Paket: ${a.paket}` : "",
     "",
     "Nachricht:",
@@ -36,9 +37,9 @@ export function anfrageText(a: { nachricht: string; paket: string | null; daten:
     if (u.beschaeftigte !== undefined && u.beschaeftigte !== null) zeilen.push(`Beschäftigte: ${String(u.beschaeftigte)}`);
     if (u.bundesland) zeilen.push(`Bundesland: ${String(u.bundesland)}`);
   }
-  if (a.daten.offene_pflichten?.length) zeilen.push("", "Offene Pflichten laut Amtlos:", ...a.daten.offene_pflichten.map((p) => `– ${p}`));
-  zeilen.push("", "Bitte antworten Sie direkt an die Kontaktadresse. Amtlos ist an der Beauftragung und Vergütung nicht beteiligt.");
-  return { betreff: "Anfrage über Amtlos", text: zeilen.filter((z, i, l) => !(z === "" && l[i - 1] === "")).join("\n") };
+  if (a.daten.offene_pflichten?.length) zeilen.push("", `Offene Pflichten laut ${MARKE.name}:`, ...a.daten.offene_pflichten.map((p) => `– ${p}`));
+  zeilen.push("", `Bitte antworten Sie direkt an die Kontaktadresse. ${MARKE.name} ist an der Beauftragung und Vergütung nicht beteiligt.`);
+  return { betreff: `Anfrage über ${MARKE.name}`, text: zeilen.filter((z, i, l) => !(z === "" && l[i - 1] === "")).join("\n") };
 }
 
 /** Worker: Anfrage per E-Mail an den Partner senden (einmal; bereits versendete werden übersprungen). */

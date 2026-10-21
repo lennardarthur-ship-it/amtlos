@@ -1,3 +1,4 @@
+import { MARKE } from "@amtlos/marke";
 /**
  * Onboarding (Spezifikation 3.1): eine Frage-Gruppe je Schritt. Schlüssel = Profilfeld ohne "profil."
  * (E-061). Typ und erlaubte Werte müssen zu packages/rules-schema/fakten.json passen (Test in index.test.ts).
@@ -376,7 +377,7 @@ export const SCHRITTE: Schritt[] = [
         feld: "ust.voranmeldung_rhythmus",
         art: "auswahl",
         frage: { de: "Wie oft gibst du die Umsatzsteuer-Voranmeldung ab?", en: "How often do you file the advance VAT return?" },
-        hilfe: { de: "Das legt das Finanzamt fest; es steht in deinen ELSTER-Bescheiden, oder du fragst deine Steuerberatung. Wenn du es nicht weißt: „Weiß ich nicht“ – dann rechnet Amtlos mit der Steuer des Vorjahres, ohne diese Angabe vorläufig vierteljährlich.", en: "The tax office decides; you find it in your ELSTER notices or can ask your tax adviser. If you don't know: “I don't know” – Amtlos then uses last year's tax, without it provisionally quarterly." },
+        hilfe: { de: `Das legt das Finanzamt fest; es steht in deinen ELSTER-Bescheiden, oder du fragst deine Steuerberatung. Wenn du es nicht weißt: „Weiß ich nicht“ – dann rechnet ${MARKE.name} mit der Steuer des Vorjahres, ohne diese Angabe vorläufig vierteljährlich.`, en: `The tax office decides; you find it in your ELSTER notices or can ask your tax adviser. If you don't know: “I don't know” – ${MARKE.name} then uses last year's tax, without it provisionally quarterly.` },
         optionen: {
           monatlich: { de: "Monatlich", en: "Monthly" },
           quartalsweise: { de: "Vierteljährlich", en: "Quarterly" },

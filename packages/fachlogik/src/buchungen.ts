@@ -22,6 +22,7 @@
 import { belegKennung, belegSkonto, kategorieFuer, zahltag, type Beleg } from "./belege.js";
 import { summen, type Position } from "./rechnung.js";
 import { minderungNachSatz, type SatzBetrag } from "./skonto.js";
+import { MARKE } from "@amtlos/marke";
 
 export type Kontenrahmen = "SKR03" | "SKR04";
 
@@ -630,7 +631,7 @@ export function datevExtf(buchungen: Buchung[], o: DatevExtfOptionen): string {
     erzeugtAmAus(o.erzeugtAm), // 6 Erzeugt am
     "", // 7 Importiert
     inAnfz("RE"), // 8 Herkunft
-    inAnfz("Amtlos"), // 9 Exportiert von
+    inAnfz(MARKE.name), // 9 Exportiert von
     "", // 10 Importiert von
     nurZiffern(o.beraternummer), // 11 Beraternummer
     nurZiffern(o.mandantennummer), // 12 Mandantennummer
@@ -638,7 +639,7 @@ export function datevExtf(buchungen: Buchung[], o: DatevExtfOptionen): string {
     String(o.sachkontenlaenge ?? 4), // 14 Sachkontenlänge
     jjjjmmtt(o.von), // 15 Datum vom (JJJJMMTT – fachlich zu prüfen)
     jjjjmmtt(o.bis), // 16 Datum bis
-    inAnfz(kuerze(o.bezeichnung ?? "Amtlos Rechnungen und Belege", 30)), // 17 Bezeichnung
+    inAnfz(kuerze(o.bezeichnung ?? "Rechnungen und Belege", 30)), // 17 Bezeichnung (Marke steht in Feld 9; mit Marke würde ein langer Name gekürzt)
     "", // 18 Diktatkürzel
     "1", // 19 Buchungstyp: Finanzbuchführung
     "0", // 20 Rechnungslegungszweck: unabhängig

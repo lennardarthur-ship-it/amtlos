@@ -40,6 +40,7 @@ import { fussAngaben, fusszeileStempeln } from "../src/unterlagen/fusszeile";
 import { mitSchriften } from "../src/unterlagen/schriften";
 import { auswertung, type PflichtInfo } from "../src/pflichten/check";
 import * as D from "./jahr-szenario-salon-daten";
+import { MARKE } from "@amtlos/marke";
 
 export { RAENDER, fussAngaben, fusszeileStempeln, mitSchriften, unzipSync, D };
 
@@ -389,12 +390,12 @@ export function standBauen(): Bau {
       ], h),
     }) });
 
-  dok({ id: "verfahren", vorlage: "verfahrensdokumentation", datum: "2026-01-15", worum: "Verfahrensdokumentation (GoBD) der GmbH: doppelte Buchführung und Jahresabschluss durch die Steuerkanzlei; Amtlos für Rechnungen/Belege, SalonKasse Pro mit TSE, TerminFix, Online-Banking, DATEV Unternehmen online.",
+  dok({ id: "verfahren", vorlage: "verfahrensdokumentation", datum: "2026-01-15", worum: `Verfahrensdokumentation (GoBD) der GmbH: doppelte Buchführung und Jahresabschluss durch die Steuerkanzlei; ${MARKE.name} für Rechnungen/Belege, SalonKasse Pro mit TSE, TerminFix, Online-Banking, DATEV Unternehmen online.`,
     daten: () => ({ version: "1.1", verantwortlich: "Alex Sonnberg (Geschäftsführer)",
       organisation: "Salon Sonne GmbH, Friseursalon mit 6 Bedienplätzen und Styling-Service für Veranstaltungen. Geschäftsführer Alex Sonnberg (kaufmännisch: Buchhaltung, Einkauf) und Chris Sonnberg (Friseurmeisterin, Betriebsleitung). Zwei Friseurinnen in Vollzeit, eine in Teilzeit, ein Auszubildender. Öffnungszeiten Di–Sa 9–19 Uhr.",
       steuerberatung: "Buchführung und Jahresabschluss durch die Steuerberatung",
       systeme: eintraege("verfahrensdokumentation", "systeme", [
-        { name: "Amtlos (App, iPhone)", zweck: "Rechnungsprogramm und Belegerfassung", version: "seit 01/2026" },
+        { name: `${MARKE.name} (App, iPhone)`, zweck: "Rechnungsprogramm und Belegerfassung", version: "seit 01/2026" },
         { name: "SalonKasse Pro mit USB-TSE", zweck: "Kassensystem", version: "4.2, seit 04/2025" },
         { name: "TerminFix „Salon M“", zweck: "Online-Terminbuchung", version: "seit 03/2025" },
         { name: "Haspa Online-Banking", zweck: "Online-Banking", version: "seit 03/2025" },
@@ -403,15 +404,15 @@ export function standBauen(): Bau {
       belegeingang: ["Papier (Post/persönlich)", "E-Mail mit PDF-Anhang", "E-Rechnung (XRechnung/ZUGFeRD) per E-Mail oder Portal", "Kassensystem/Kassenbericht", "Kontoauszug/Bank-Schnittstelle", "Eigenbeleg"],
       belegart: ["originär Papier, Ablage in Papier (Muster 4.1)", "originär digital (Muster 4.3)"],
       ablage: ["Papierordner (chronologisch/nach Belegart)", "Upload an Steuerberater (z. B. Kanzlei-Portal)"],
-      erfassung: "Belege werden wöchentlich in Amtlos erfasst (Foto bzw. Datei) und monatlich als Paket an die Steuerkanzlei übermittelt (monatliche Umsatzsteuer-Voranmeldung, Ist-Versteuerung).\nZahlungseingänge zu Ausgangsrechnungen werden täglich anhand des Kontoauszugs in Amtlos vermerkt.\nAusgangsrechnungen werden fortlaufend nummeriert in Amtlos erstellt und beim Teilen festgeschrieben; Korrekturen nur per Stornorechnung.",
+      erfassung: `Belege werden wöchentlich in ${MARKE.name} erfasst (Foto bzw. Datei) und monatlich als Paket an die Steuerkanzlei übermittelt (monatliche Umsatzsteuer-Voranmeldung, Ist-Versteuerung).\nZahlungseingänge zu Ausgangsrechnungen werden täglich anhand des Kontoauszugs in ${MARKE.name} vermerkt.\nAusgangsrechnungen werden fortlaufend nummeriert in ${MARKE.name} erstellt und beim Teilen festgeschrieben; Korrekturen nur per Stornorechnung.`,
       scannen: false, sicherung_intervall: "täglich", sicherung_ort: ["Cloud-Backup", "durch Softwareanbieter/Rechenzentrum", "durch Steuerberater"], e_rechnung: true,
       zugriff: "Zugriff auf Buchhaltung und Belege nur für die Geschäftsführung und die Steuerberatung\nKasse: eigene Bedienerkennung je Person",
       kontrollen: "Tägliches Zählen der Kasse und Abgleich mit dem Kassenbericht\nMonatlicher Abgleich von Kontoauszügen und Buchungen\nVier-Augen-Prinzip bei Zahlungen über einem festgelegten Betrag",
-      aenderungen: eintraege("verfahrensdokumentation", "aenderungen", [{ datum: "2026-01-15", aenderung: "Umstellung der Rechnungsstellung und Belegerfassung auf Amtlos; E-Rechnungsempfang eingerichtet." }], "2026-01-15") }) });
+      aenderungen: eintraege("verfahrensdokumentation", "aenderungen", [{ datum: "2026-01-15", aenderung: `Umstellung der Rechnungsstellung und Belegerfassung auf ${MARKE.name}; E-Rechnungsempfang eingerichtet.` }], "2026-01-15") }) });
 
   dok({ id: "aufbewahrung", vorlage: "aufbewahrung", datum: "2026-01-15", worum: "Aufbewahrungsplan mit den Startzeilen der App und drei ergänzten Zeilen (Kassendaten, Lohnkonten, Gesellschaftsunterlagen).",
     daten: (h) => {
-      const start = (leereDatenVon("aufbewahrung", h).eintraege as Eintrag[]).map((e) => ({ ...e, letzte: "2026", ort: "Amtlos (verschlüsselt) und DATEV Unternehmen online; Papier im Büroschrank" }));
+      const start = (leereDatenVon("aufbewahrung", h).eintraege as Eintrag[]).map((e) => ({ ...e, letzte: "2026", ort: `${MARKE.name} (verschlüsselt) und DATEV Unternehmen online; Papier im Büroschrank` }));
       return { eintraege: [...start, ...eintraege("aufbewahrung", "eintraege", [
         { art: "Kassendaten: TSE-Export und DSFinV-K-Export (Einzelaufzeichnungen)", jahre: "10", letzte: "2026", ort: "SalonKasse-Cloud und externe Festplatte" },
         { art: "Lohnkonten (§ 41 Abs. 1 EStG)", jahre: "6", letzte: "2026", ort: "Lohnbüro Elbe und Personalordner" },
@@ -552,7 +553,7 @@ export function standBauen(): Bau {
         offen = erg.offen;
         s = felderSetzen(s, id, erg.werte, t(tag, 9));
         const u19 = ausEuro(erg.werte.umsatz_19 ?? "0") + em.k19;
-        s = felderSetzen(s, id, { umsatz_19: euro(u19), notiz: `Aus Rechnungen übernommen (Amtlos, Ist-Versteuerung, ${erg.anzahl} Zahlungseingänge/Erstattungen): 19 % ${erg.werte.umsatz_19} €. Vorsteuer aus ${erg.vorsteuerBelege} ${erg.vorsteuerBelege === 1 ? "Beleg" : "Belegen"}.\nZuzüglich Kassenumsätze laut Z-Bon (netto, 19 %): ${euro(em.k19)} €.` }, t(tag, 9));
+        s = felderSetzen(s, id, { umsatz_19: euro(u19), notiz: `Aus Rechnungen übernommen (${MARKE.name}, Ist-Versteuerung, ${erg.anzahl} Zahlungseingänge/Erstattungen): 19 % ${erg.werte.umsatz_19} €. Vorsteuer aus ${erg.vorsteuerBelege} ${erg.vorsteuerBelege === 1 ? "Beleg" : "Belegen"}.\nZuzüglich Kassenumsätze laut Z-Bon (netto, 19 %): ${euro(em.k19)} €.` }, t(tag, 9));
       } });
     vergleichText(`USt ${em.m}`, "Versteuerungsart in der Voranmeldung (aus „Mein Betrieb“)", versteuerung, "ist");
     vergleich(`USt ${em.m} (Übernahme, Ist)`, "Umsätze 19 % aus Rechnungen (nach Zahlungseingang)", ausEuro(app.umsatz_19 ?? "0"), em.r19);

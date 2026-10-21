@@ -5,6 +5,7 @@ import { Datenbank, aboStand, checkoutStarten, portalOeffnen, pruefeStripeSignat
 import { Kontext, KontoCache, MitUnternehmen, Oeffentlich, OhneAbo, type Anfragekontext } from "./auth.js";
 import { pruefe, uebersetzeDbFehler } from "./hilfen.js";
 import { KONFIGURATION, type Konfiguration } from "./konfiguration.js";
+import { MARKE } from "@amtlos/marke";
 
 export const STRIPE = Symbol("STRIPE");
 
@@ -37,7 +38,7 @@ export class KontoController {
   @Get("abo")
   async abo(@Kontext() k: Anfragekontext) {
     const stand = await this.db.imKontext(this.kontext(k), (tx) => aboStand(tx, k.unternehmenId!));
-    return { ...stand, bezahlen_moeglich: Boolean(this.stripe), plan_name: "Amtlos", testtage: this.k.ABO_TESTTAGE };
+    return { ...stand, bezahlen_moeglich: Boolean(this.stripe), plan_name: MARKE.name, testtage: this.k.ABO_TESTTAGE };
   }
 
   /** Startet den Bezahlvorgang bei Stripe; die Seite leitet auf die zurückgegebene Adresse weiter. */

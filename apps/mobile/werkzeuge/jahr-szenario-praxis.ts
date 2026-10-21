@@ -45,6 +45,7 @@ import { mitSchriften } from "../src/unterlagen/schriften";
 import { deckblattHtml, mappeDateiname, mappeZusammenfuegen, mappenAuswahl, seitenzahl, startSeiten } from "../src/unterlagen/kontrollmappe";
 import { auswertung, type Profil } from "../src/pflichten/check";
 import * as D from "./jahr-szenario-praxis-daten";
+import { MARKE } from "@amtlos/marke";
 
 export { RAENDER, fussAngaben, fusszeileStempeln, mitSchriften, unzipSync, D, deckblattHtml, mappeDateiname, mappeZusammenfuegen, seitenzahl, startSeiten };
 
@@ -432,12 +433,12 @@ export function standBauen(): Bau {
     vergleichText("VVT", "Patientenverwaltung mit Art. 9 Abs. 2 lit. h DSGVO", /Art\. 9 Abs\. 2 lit\. h/.test(h) ? "ja" : "nein", "ja");
   }
 
-  dok({ id: "verfahren", vorlage: "verfahrensdokumentation", datum: "2026-01-12", worum: "Verfahrensdokumentation (GoBD): EÜR durch die Steuerkanzlei; Amtlos für Privat- und Firmenrechnungen und Belege, TheraPlan (Termine, Patientenakte), Abrechnungszentrum für Kassenpatienten, EC-Terminal für Zuzahlungen und Verkauf am Empfang.",
+  dok({ id: "verfahren", vorlage: "verfahrensdokumentation", datum: "2026-01-12", worum: `Verfahrensdokumentation (GoBD): EÜR durch die Steuerkanzlei; ${MARKE.name} für Privat- und Firmenrechnungen und Belege, TheraPlan (Termine, Patientenakte), Abrechnungszentrum für Kassenpatienten, EC-Terminal für Zuzahlungen und Verkauf am Empfang.`,
     daten: () => ({ version: "1.2", verantwortlich: "Tom Reiter",
       organisation: "Einzelpraxis für Physiotherapie (freier Beruf), Inhaber Tom Reiter. Eine Physiotherapeutin in Teilzeit, eine Empfangskraft im Minijob. Heilbehandlungen steuerfrei nach § 4 Nr. 14 UStG, Wellness, Firmenkurse und Verkauf steuerpflichtig (Ist-Versteuerung, vierteljährliche Voranmeldung, Vorsteueraufteilung).",
       steuerberatung: "Jahresabschluss durch die Steuerberatung; laufende Buchführung im Betrieb",
       systeme: eintraege("verfahrensdokumentation", "systeme", [
-        { name: "Amtlos (App, iPad)", zweck: "Rechnungsprogramm und Belegerfassung", version: "seit 01/2026" },
+        { name: `${MARKE.name} (App, iPad)`, zweck: "Rechnungsprogramm und Belegerfassung", version: "seit 01/2026" },
         { name: "TheraPlan Praxis M", zweck: "Praxissoftware (Termine, Patientenakte, Online-Buchung)", version: "seit 07/2021" },
         { name: "Abrechnungszentrum Mitteldeutschland – Kundenportal", zweck: "Abrechnung mit den gesetzlichen Krankenkassen, Auszahlungsavise", version: "seit 07/2021" },
         { name: "EC-Terminal (Zahlungsdienstleister)", zweck: "Kartenzahlungen am Empfang (Zuzahlungen, Verkauf)", version: "seit 07/2021" },
@@ -446,15 +447,15 @@ export function standBauen(): Bau {
       belegeingang: ["E-Mail mit PDF-Anhang", "E-Rechnung (XRechnung/ZUGFeRD) per E-Mail oder Portal", "Download aus Kunden-/Lieferantenportal", "Papier (Post/persönlich)", "Kontoauszug/Bank-Schnittstelle", "Eigenbeleg"],
       belegart: ["originär digital (Muster 4.3)", "originär Papier, Ablage in Papier (Muster 4.1)"],
       ablage: ["Buchhaltungssoftware mit Belegarchiv", "Upload an Steuerberater (z. B. Kanzlei-Portal)", "Papierordner (chronologisch/nach Belegart)"],
-      erfassung: "Belege werden wöchentlich in Amtlos erfasst und vierteljährlich als Paket an die Steuerkanzlei übermittelt.\nKassenumsätze: Auszahlungsavise des Abrechnungszentrums (monatlich) und Tagesabschlüsse des EC-Terminals werden monatlich abgelegt und vierteljährlich in die Voranmeldung übernommen.\nPrivat- und Firmenrechnungen werden fortlaufend nummeriert in Amtlos erstellt und beim Teilen festgeschrieben; Korrekturen nur per Stornorechnung.",
+      erfassung: `Belege werden wöchentlich in ${MARKE.name} erfasst und vierteljährlich als Paket an die Steuerkanzlei übermittelt.\nKassenumsätze: Auszahlungsavise des Abrechnungszentrums (monatlich) und Tagesabschlüsse des EC-Terminals werden monatlich abgelegt und vierteljährlich in die Voranmeldung übernommen.\nPrivat- und Firmenrechnungen werden fortlaufend nummeriert in ${MARKE.name} erstellt und beim Teilen festgeschrieben; Korrekturen nur per Stornorechnung.`,
       scannen: false, sicherung_intervall: "täglich", sicherung_ort: ["Cloud-Backup", "durch Softwareanbieter/Rechenzentrum"], e_rechnung: true,
       zugriff: "Zugriff auf Buchhaltung und Belege nur für den Inhaber und die Steuerberatung; Patientenakte getrennt in TheraPlan mit eigenen Benutzerkonten",
       kontrollen: "Monatlicher Abgleich der Auszahlungsavise mit dem Kontoauszug\nMonatlicher Abgleich von Kontoauszügen und Buchungen\nVor der Zahlung: Eingangsrechnungen sachlich und rechnerisch prüfen",
-      aenderungen: eintraege("verfahrensdokumentation", "aenderungen", [{ datum: "2026-01-12", aenderung: "Privat- und Firmenrechnungen sowie Belegerfassung von TheraPlan bzw. Tabellenkalkulation auf Amtlos umgestellt." }], "2026-01-12") }) });
+      aenderungen: eintraege("verfahrensdokumentation", "aenderungen", [{ datum: "2026-01-12", aenderung: `Privat- und Firmenrechnungen sowie Belegerfassung von TheraPlan bzw. Tabellenkalkulation auf ${MARKE.name} umgestellt.` }], "2026-01-12") }) });
 
   dok({ id: "aufbewahrung", vorlage: "aufbewahrung", datum: "2026-01-12", worum: "Aufbewahrungsplan mit den Startzeilen der App und zwei ergänzten Zeilen (Patientendokumentation 10 Jahre nach § 630f BGB, Lohnkonten).",
     daten: (h) => {
-      const start = (leereDatenVon("aufbewahrung", h).eintraege as Eintrag[]).map((e) => ({ ...e, letzte: "2026", ort: "Amtlos (verschlüsselt), Cloud-Backup; Papier im Büroschrank" }));
+      const start = (leereDatenVon("aufbewahrung", h).eintraege as Eintrag[]).map((e) => ({ ...e, letzte: "2026", ort: `${MARKE.name} (verschlüsselt), Cloud-Backup; Papier im Büroschrank` }));
       return { eintraege: [...start, ...eintraege("aufbewahrung", "eintraege", [
         { art: "Patientendokumentation (Befund, Behandlungsverlauf, Verordnungskopien)", jahre: "10", letzte: "2026", ort: "TheraPlan (Cloud) und Patientenakten im verschlossenen Schrank" },
         { art: "Lohnkonten (§ 41 Abs. 1 EStG)", jahre: "6", letzte: "2026", ort: "Lohnbüro und Personalordner" },

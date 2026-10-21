@@ -18,6 +18,7 @@ import {
   pruefpunkteBuchungen,
   type AusgangsRechnungFuerBuchung,
 } from "../src/buchungen.js";
+import { MARKE } from "@amtlos/marke";
 
 const RE: AusgangsRechnungFuerBuchung = {
   id: "re-1",
@@ -127,7 +128,7 @@ describe("Buchungen und DATEV-Export (E-132)", () => {
     expect(zeile[DATEV_GUID]).toBe(`"${g}"`);
   });
 
-  it("Amtlos-Belegnummer je Jahr in der Reihenfolge der Erfassung; Belegnummer des Lieferanten normalisiert", () => {
+  it(`${MARKE.name}-Belegnummer je Jahr in der Reihenfolge der Erfassung; Belegnummer des Lieferanten normalisiert`, () => {
     const n = belegNummern([
       { id: "c", datum: "2026-03-01", erstellt: "2026-03-05T10:00:00Z" },
       { id: "a", datum: "2026-01-10", erstellt: "2026-01-12T10:00:00Z" },
@@ -156,7 +157,7 @@ describe("Buchungen und DATEV-Export (E-132)", () => {
     const zeilen = t.slice(0, -2).split("\r\n");
     expect(zeilen).toHaveLength(2 + buchungen.length);
     const kopf = zeilen[0]!;
-    expect(kopf.startsWith('"EXTF";700;21;"Buchungsstapel";13;20261013120000000;;"RE";"Amtlos";;12345;67890;20260101;4;20261001;20261031;"Amtlos Rechnungen und Belege";;1;0;0;"EUR";')).toBe(true);
+    expect(kopf.startsWith(`"EXTF";700;21;"Buchungsstapel";13;20261013120000000;;"RE";"${MARKE.name}";;12345;67890;20260101;4;20261001;20261031;"Rechnungen und Belege";;1;0;0;"EUR";`)).toBe(true);
     expect(kopf.split(";")).toHaveLength(31);
     expect(kopf.endsWith(';"EUR";;;;;"03";;;;')).toBe(true);
     expect(DATEV_SPALTEN).toHaveLength(125);

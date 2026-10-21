@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import fontkit from "@cantoo/fontkit";
 import { PDFDocument, rgb, type PDFFont, type PDFPage } from "@cantoo/pdf-lib";
 import { ALLERGENE, DATENPANNE_RISIKO, GEFAEHRDUNGSFAKTOREN, RISIKO_STUFEN, SCHUTZZIELE } from "@amtlos/fachlogik";
+import { MARKE } from "@amtlos/marke";
 
 /** Bezeichnungen liegen in @amtlos/fachlogik und werden mit den Dokumentvorlagen der App geteilt (E-121). */
 export { ALLERGENE, GEFAEHRDUNGSFAKTOREN, SCHUTZZIELE };
@@ -47,7 +48,7 @@ export async function unterweisungsprotokollPdf(p: UnterweisungsProtokoll): Prom
   const fett = await doc.embedFont(fs.readFileSync(path.join(SCHRIFTEN, "DejaVuSans-Bold.ttf")), { subset: true });
   doc.setTitle(`Unterweisung: ${p.thema}`);
   doc.setAuthor(p.unternehmen);
-  doc.setProducer("Amtlos");
+  doc.setProducer(MARKE.name);
   let seite: PDFPage = doc.addPage([595.28, 841.89]);
   let y = 790;
   const text = (t: string, x: number, g = 10, f: PDFFont = normal) => seite.drawText(t, { x, y, size: g, font: f, color: rgb(0.1, 0.12, 0.15) });
@@ -104,7 +105,7 @@ async function satz(titel: string, autor: string) {
   const fett = await doc.embedFont(fs.readFileSync(path.join(SCHRIFTEN, "DejaVuSans-Bold.ttf")), { subset: true });
   doc.setTitle(titel);
   doc.setAuthor(autor);
-  doc.setProducer("Amtlos");
+  doc.setProducer(MARKE.name);
   const s = { seite: doc.addPage([595.28, 841.89]) as PDFPage, y: 790 };
   const text = (t: string, x: number, g = 10, f: PDFFont = normal) => s.seite.drawText(t, { x, y: s.y, size: g, font: f, color: rgb(0.1, 0.12, 0.15) });
   const zeile = (a = 14) => {
@@ -182,7 +183,7 @@ export async function gefaehrdungsbeurteilungPdf(g: GefaehrdungsbeurteilungDaten
     s.absatz("Keine Gefährdungen erfasst.");
   }
   s.zeile(10);
-  s.absatz("Die Umsetzung und Wirksamkeit der Maßnahmen wird in Amtlos weiter dokumentiert. Bei neuen Arbeitsplätzen, Tätigkeiten oder nach Unfällen ist die Beurteilung zu überprüfen.", 50, 8, s.normal, 11);
+  s.absatz(`Die Umsetzung und Wirksamkeit der Maßnahmen wird in ${MARKE.name} weiter dokumentiert. Bei neuen Arbeitsplätzen, Tätigkeiten oder nach Unfällen ist die Beurteilung zu überprüfen.`, 50, 8, s.normal, 11);
   return s.fertig();
 }
 

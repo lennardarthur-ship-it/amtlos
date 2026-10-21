@@ -7,6 +7,7 @@ import { deckblattHtml, gehoertInMappe, mappeDateiname, mappeZusammenfuegen, map
 import { fehltFuer } from "../src/unterlagen/pruefung";
 import { LEERER_STAND, anlegen, ausgeben, betriebSetzen, felderSetzen, profilSetzen, type Stand } from "../src/unterlagen/speicher";
 import { fragenText, kassenHinweis, kassenLage, kassenSatzPaket, steuerpaket } from "../src/unterlagen/steuerpaket";
+import { MARKE } from "@amtlos/marke";
 
 const B = { name: "Café Mond", strasse: "Markt 2", plz: "54321", ort: "Beispielstadt", verantwortlich: "Robin Beispiel", telefon: "", email: "", steuernummer: "", ust_idnr: "", iban: "", bundesland: "Hessen" };
 const t = (d: string) => new Date(`${d}T09:00:00Z`);
@@ -36,7 +37,7 @@ describe("Kassenhinweis: Voranmeldung, EÜR und Paket kennen keine Kassenumsätz
     const basis: Stand = { ...LEERER_STAND, betrieb: B };
     const liesmich = (s: Stand) => strFromU8(unzipSync(steuerpaket(s, Q, s.steuerberatung, {}, "2026-04-10T08:00:00").zip)["LIESMICH.txt"]!);
     const mit = profilSetzen(basis, { "kasse.elektronisch": true });
-    expect(liesmich(mit).split("\r\n")[0]).toBe("Amtlos – Unterlagen für die Steuerberatung");
+    expect(liesmich(mit).split("\r\n")[0]).toBe(`${MARKE.name} – Unterlagen für die Steuerberatung`);
     expect(liesmich(mit)).toMatch(/\r\nWichtig\r\n- Betrieb mit Kasse: Kassenumsätze fehlen in diesem Paket\./);
     expect(liesmich(mit).split("Kassenumsätze").length).toBe(2);
     expect(fragenText(mit, Q).text).not.toContain("Kassenumsätze fehlen");

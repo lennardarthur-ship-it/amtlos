@@ -1,0 +1,13 @@
+{
+  "_hinweis": "Einzige Quelle für den sichtbaren Produktnamen (docs/14-marke.md). Nach einer Änderung: Store-Bilder, Website und Katalogbündel neu erzeugen. Der Abschnitt „technisch“ nur vor dem ersten Store-Release ändern.",
+  "name": "Betriebsklar",
+  "proName": "Betriebsklar Pro",
+  "domain": "betriebsklar.de",
+  "email": "hallo@betriebsklar.de",
+  "technisch": {
+    "_hinweis": "nur vor dem ersten Store-Release ändern – danach gehen Daten, Käufe und Links der Tester verloren. Maßgeblich bleibt apps/mobile/app.json (bundleIdentifier, android.package, scheme); apps/mobile/test/marke.test.ts prüft, dass beide übereinstimmen.",
+    "bundleId": "de.amtlos.app",
+    "scheme": "amtlos",
+    "dateiendungSicherung": ".amtlos"
+  }
+}

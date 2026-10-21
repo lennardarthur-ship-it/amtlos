@@ -15,6 +15,7 @@ import { InvoiceService, type Invoice } from "@e-invoice-eu/core";
 import { XMLParser } from "fast-xml-parser";
 import type { Tx } from "./datenbank.js";
 import { eRechnungsDokument, summen, type Einheit, type RechnungsDaten } from "@amtlos/fachlogik";
+import { MARKE } from "@amtlos/marke";
 export { EINHEIT_CODE, fehlendFuerERechnung, rundeCent, summen, type Einheit, type KundeDaten, type Position, type RechnungsDaten, type Steller, type Summen } from "@amtlos/fachlogik";
 
 // ---------------------------------------------------------------- Ablage (Objektspeicher)
@@ -111,7 +112,7 @@ export async function rechnungPdf(r: RechnungsDaten, kuHinweis: string): Promise
   const fett = await doc.embedFont(fs.readFileSync(path.join(SCHRIFTEN, "DejaVuSans-Bold.ttf")), { subset: true });
   doc.setTitle(`${r.art === "storno" ? "Stornorechnung" : "Rechnung"} ${r.nummer}`);
   doc.setAuthor(r.steller.name);
-  doc.setProducer("Amtlos");
+  doc.setProducer(MARKE.name);
   const s = summen(r.positionen, r.kleinunternehmer);
   const vz = r.art === "storno" ? -1 : 1;
 

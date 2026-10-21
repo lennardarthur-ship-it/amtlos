@@ -1,3 +1,4 @@
+import { MARKE } from "@amtlos/marke";
 /**
  * Fehlerbericht für „Fehlerbericht teilen“ auf der Fehlerseite (Fehlergrenze). Rein, damit er sich testen lässt.
  * Enthält nur Technisches – Fehlername, Meldung, Stack, Komponenten-Stack, App-Version, Plattform –, nie den Stand mit
@@ -16,7 +17,7 @@ export function fehlerbericht(fehler: unknown, komponenten: string | null | unde
   const e = fehler instanceof Error ? fehler : new Error(String(fehler));
   const meldung = e.message.length > MAX_MELDUNG ? `${e.message.slice(0, MAX_MELDUNG)} …` : e.message;
   return [
-    `Amtlos ${umgebung.version} · ${umgebung.plattform} · ${umgebung.zeit.toISOString()}`,
+    `${MARKE.name} ${umgebung.version} · ${umgebung.plattform} · ${umgebung.zeit.toISOString()}`,
     `${e.name}: ${meldung}`,
     e.stack ? `\nStack:\n${kuerzen(e.stack)}` : "",
     komponenten ? `\nKomponenten:\n${kuerzen(komponenten)}` : "",
