@@ -21,10 +21,12 @@ Stand: 2026-10-20 (E-142 bis E-144, App-Review-Vorprüfung R9). Alles, was im Co
 
 | Produkt-ID (Vorschlag) | Zeitraum | Einführungsangebot |
 |---|---|---|
-| `amtlos_pro_jahr` | 1 Jahr | 14 Tage kostenlos |
-| `amtlos_pro_monat` | 1 Monat | 14 Tage kostenlos |
+| `amtlos_pro_jahr` | 1 Jahr | 14 Tage kostenlos (Einführungsangebot „Kostenloser Testzeitraum“, 2 Wochen) |
+| `amtlos_pro_monat` | 1 Monat | 14 Tage kostenlos (Einführungsangebot „Kostenloser Testzeitraum“, 2 Wochen) |
 
-Die Preise wählst du in App Store Connect. Die App zeigt den Preis aus dem Store. Einen Vorschlag mit Begründung enthält der Go-to-Market-Plan.
+**Preise (E-156, Gründerentscheidung):** Monatsabo **9,99 €** als Einstieg; Jahresabo in der Spanne **79–99 €** – Apple bietet dafür u. a. die Preispunkte 79,99 €, 89,99 € und 99,99 €. Begründung: Der Nutzen sind vermiedene Bußgelder und Abmahnungen, nicht Bequemlichkeit. Zum Vergleich: 12 × 9,99 € = 119,88 €; das Jahresabo spart damit 17 % (99,99 €), 25 % (89,99 €) oder 33 % (79,99 €). Die App rechnet die Ersparnis selbst aus den Store-Preisen aus und zeigt nie einen Betrag aus dem Code. Preise wählst du in App Store Connect unter „Abopreise“ mit Basisland Deutschland; die übrigen Länder rechnet Apple um.
+
+**Nach 60 Tagen prüfen:** Umwandlung Testzeitraum → zahlend, Anteil Jahr/Monat, Kündigungen in den ersten 30 Tagen und Rückerstattungen (RevenueCat). Faustregel für die Entscheidung: Wandeln deutlich weniger Testzeiträume um als erwartet, liegt es eher am Nutzen der Probezeit als am Preis; kündigen viele Monatsabos nach dem ersten Monat, das Jahresabo stärker hervorheben. Preisänderungen gelten für Bestandskunden nur nach Apples Regeln (Erhöhung mit Zustimmung bzw. Benachrichtigung) – neue Preise am besten zuerst nur für Neukunden.
 
 **RevenueCat:** App anlegen (Bundle-ID `de.amtlos.app`), App-Store-Verbindung herstellen (In-App-Purchase-Schlüssel), Berechtigung **`pro`**, Offering **`default`** mit beiden Produkten (Jahr als erstes Paket). Den öffentlichen iOS-Schlüssel als EAS-Secret setzen:
 
@@ -44,7 +46,7 @@ Ohne den Schlüssel lässt sich Pro in einer Store-Version **nicht kaufen** – 
 
 **Mit dieser Version einreichen:** Beide Abos (`amtlos_pro_jahr`, `amtlos_pro_monat`) mit Review-Screenshot und Beschreibung an die App-Version hängen (das erste Abo muss zusammen mit einer Version geprüft werden). Paid Applications Agreement, Bank- und Steuerdaten müssen aktiv sein – sonst lädt die App keine Angebote („Die Angebote ließen sich nicht laden“) und Apple lehnt nach 2.1(b) ab.
 
-**Testzeitraum und Preis (App-Review R2/R3):** Die App zeigt den kostenlosen Testzeitraum nur, wenn RevenueCat das Apple-Konto als berechtigt meldet (`checkTrialOrIntroductoryPriceEligibility`); unbekannt oder nicht berechtigt → nur der Preis. Direkt über dem Kaufknopf steht gleich groß „14 Tage kostenlos, danach 49,99 € pro Jahr“ – Zeitraum und Betrag kommen aus dem Store (`priceString`), nie aus dem Code.
+**Testzeitraum und Preis (App-Review R2/R3):** Die App zeigt den kostenlosen Testzeitraum nur, wenn RevenueCat das Apple-Konto als berechtigt meldet (`checkTrialOrIntroductoryPriceEligibility`); unbekannt oder nicht berechtigt → nur der Preis. Direkt über dem Kaufknopf steht gleich groß „14 Tage kostenlos, danach 89,99 € pro Jahr“ – Zeitraum und Betrag kommen aus dem Store (`priceString`), nie aus dem Code.
 
 ## 4. Bauen und einreichen
 
