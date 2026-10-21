@@ -6,7 +6,7 @@
 
 ## 1. Anbieter und Geltungsbereich
 
-1.1 Diese Bedingungen gelten für die Nutzung der App „Betriebsklar“ (im Folgenden „App“) von Lang Ventures UG (haftungsbeschränkt), Gomaringer Str. 33, 72770 Reutlingen, vertreten durch Lennard Lang (Geschäftsführer), Registergericht und Registernummer: [nach Eintragung], USt-IdNr.: [nach Eintragung], E-Mail: hallo@betriebsklar.de (im Folgenden „wir“).
+1.1 Diese Bedingungen gelten für die Nutzung der App „Betriebsklar“ (im Folgenden „App“) von Lang Ventures UG (haftungsbeschränkt) i. G., Gomaringer Str. 33, 72770 Reutlingen, vertreten durch Lennard Lang (Geschäftsführer), Registergericht und Registernummer: [nach Eintragung], USt-IdNr.: [nach Eintragung], E-Mail: hallo@betriebsklar.de (im Folgenden „wir“).
 
 1.2 Die Bedingungen gelten für Unternehmer (§ 14 BGB) und Verbraucher (§ 13 BGB). Wo Regeln nur für eine Gruppe gelten, ist das gesagt.
 
@@ -66,7 +66,7 @@
 
 6.2 Wir dürfen die App ändern, wenn dafür ein triftiger Grund besteht – insbesondere, um sie an geänderte Gesetze oder Rechtsprechung anzupassen (Rechtsänderung), um Sicherheitslücken zu schließen oder die Sicherheit deiner Daten zu verbessern (Sicherheit) oder um sie an geänderte technische Bedingungen anzupassen, etwa an neue Versionen von iOS oder an Vorgaben von Apple (technische Anpassung). Dir entstehen dadurch keine zusätzlichen Kosten. Bezahlte Kernfunktionen von Betriebsklar Pro entfernen wir während eines laufenden Abozeitraums nicht ersatzlos.
 
-6.3 Über Änderungen informieren wir dich klar und verständlich, zum Beispiel in der App oder in den Hinweisen zum Update. Beeinträchtigt eine Änderung deinen Zugang zur App oder ihre Nutzbarkeit mehr als nur unerheblich, informieren wir dich als Verbraucher rechtzeitig vorher auf einem dauerhaften Datenträger über die Merkmale und den Zeitpunkt der Änderung und über dein Recht, den Vertrag dann innerhalb von 30 Tagen unentgeltlich zu beenden (§ 327r BGB).
+6.3 Über Änderungen informieren wir dich klar und verständlich, zum Beispiel in der App oder in den Hinweisen zum Update. Beeinträchtigt eine Änderung deinen Zugang zur App oder ihre Nutzbarkeit mehr als nur unerheblich, informieren wir dich als Verbraucher rechtzeitig vorher auf einem dauerhaften Datenträger über die Merkmale und den Zeitpunkt der Änderung und über dein Recht, den Vertrag dann innerhalb von 30 Tagen unentgeltlich zu beenden (§ 327r BGB). Beendest du den Vertrag aus diesem Grund, erstatten wir dir den Preis, den du für die Zeit danach im Voraus bezahlt hast, anteilig (§ 327r Abs. 4, § 327o BGB). Weil du über Apple bezahlt hast, läuft die Erstattung über Apple (reportaproblem.apple.com); wende dich an uns, wenn das nicht klappt – wir helfen dir dabei.
 
 > Prüfen: Umsetzung des Kündigungsrechts nach § 327r BGB bei einem Abo, das über Apple läuft (Beendigung des Vertrags mit uns, Erstattung über Apple).
 

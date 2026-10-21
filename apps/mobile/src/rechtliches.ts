@@ -4,8 +4,12 @@ import { MARKE } from "@amtlos/marke";
  * Leere Angaben zeigt die App als „folgt“, und `werkzeuge/store-check.mjs` meldet sie vor dem Einreichen.
  */
 export const ANBIETER = {
-  /** Firma mit Rechtsform, z. B. „Muster GmbH“ */
-  name: "Lang Ventures UG (haftungsbeschränkt)",
+  /**
+   * Firma mit Rechtsform, z. B. „Muster GmbH“. Bis zur Eintragung ins Handelsregister mit „i. G.“ (Vor-UG, persönliche
+   * Haftung nach § 11 Abs. 2 GmbHG – Nachkontrolle Dr. Weber, E-160). Nach der Eintragung „ i. G.“ entfernen und
+   * `register` füllen; docs/nutzungsbedingungen-entwurf.md Ziff. 1.1 gleich mit anpassen (die Website prüft das).
+   */
+  name: "Lang Ventures UG (haftungsbeschränkt) i. G.",
   /** Rechtsform ausgeschrieben – Impressum bei juristischen Personen (Vorprüfung 21.10.2026) */
   rechtsform: "Unternehmergesellschaft (haftungsbeschränkt)",
   /** Straße, PLZ, Ort – ladungsfähige Anschrift (§ 5 DDG) */
