@@ -63,7 +63,7 @@ export function mitVertretung(b: Betrieb, name = b.name.trim()): string {
 export const registerAus = (b: Betrieb) => [b.registergericht ?? "", b.registernummer ?? ""].map((x) => x.trim()).filter(Boolean).join(", ");
 
 /** Rechtsformen mit Eintrag im Handels- bzw. Gesellschaftsregister */
-const REGISTER_FORMEN = ["e. K.", "eGbR", "OHG", "KG", "GmbH & Co. KG", "UG (haftungsbeschränkt)", "GmbH"];
+export const REGISTER_FORMEN = ["e. K.", "eGbR", "OHG", "KG", "GmbH & Co. KG", "UG (haftungsbeschränkt)", "GmbH"];
 
 const PERSON = [
   { id: "name", art: "text" as const, label: "Vor- und Nachname", pflicht: true },

@@ -1,3 +1,4 @@
+import { nachweisAnhaengen, type SicherungsZiel } from "./unterlagen/sicherungNachweis";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import * as StoreReview from "expo-store-review";
@@ -100,6 +101,8 @@ interface Zustand {
   zusammenfuehren(s: Stand): Promise<Zusammenfuehrung>;
   /** Datensicherung erstellt – `stand` ist der gesicherte Stand (Änderungen danach bleiben ungesichert) */
   gesichert(stand?: Stand): void;
+  /** StB GoBD (D-11): Vollsicherung außerhalb des Geräts exportiert – Datum und Art als Nachweis festhalten */
+  sicherungNachweisen(ziel: SicherungsZiel): void;
   bezahltSetzen(id: string, datum: string | null): void;
   /** R12: Zahlungseingang mit Betrag (und ggf. Skonto/Minderung) vermerken */
   zahlungVermerken(id: string, z: Omit<Zahlung, "id">): void;
@@ -571,6 +574,12 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         aktuell.current = { ...aktuell.current, letzteSicherung: bis };
         setStand(aktuell.current);
         // nicht sofort ein zweites Mal den ganzen Stand verschlüsseln (R9 Performance) – mit der nächsten Pause speichern
+        planen();
+      },
+      sicherungNachweisen: (ziel) => {
+        // wie „gesichert“: der Nachweis ändert den Inhalt nicht (kein „geaendert“, sonst gälte alles als ungesichert)
+        aktuell.current = { ...aktuell.current, sicherungsNachweis: nachweisAnhaengen(aktuell.current.sicherungsNachweis, { am: new Date().toISOString(), ziel }) };
+        setStand(aktuell.current);
         planen();
       },
       bezahltSetzen: (id, datum) => {

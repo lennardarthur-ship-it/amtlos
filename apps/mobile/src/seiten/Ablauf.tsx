@@ -10,6 +10,7 @@ import { FassungenKarte, KorrekturSeite } from "./Fassungen";
 import { StaettenWahl } from "./BetriebStaetten";
 import { fehltFuer } from "../unterlagen/pruefung";
 import { offeneRechnungen, periodeText, perioden, umsaetzeFuer, type UstUebernahme, type Versteuerung } from "../unterlagen/ustAusRechnungen";
+import { ossFuer, ossQuartale, zmFuer, zmPerioden } from "../unterlagen/euMeldungen";
 import { useAmtlos } from "../zustand";
 import { mitVorlagenHinweis } from "../rechtshinweis";
 import { RechtsHinweis } from "./gemeinsam";
@@ -17,7 +18,7 @@ import { Abschluss, FormHinweis, betriebOeffnen, festschreibenHinweis, useTeilen
 import { AuswahlSeite } from "../ui/auswahlseite";
 import { AbsenderSeite } from "./Betrieb";
 import { useProSperre } from "./Pro";
-import { euerUebernahme, jahreMitDaten, kassenHinweis, kassenHinweisMit, kassenLage, type EuerUebernahme } from "../unterlagen/steuerpaket";
+import { EUER_GESPERRT, bilanzierendeGewinnermittlung, euerUebernahme, jahreMitDaten, kassenHinweis, kassenHinweisMit, kassenLage, type EuerUebernahme } from "../unterlagen/steuerpaket";
 import { kasseFuerUst } from "../unterlagen/kasse";
 import { Ansage, Felder, useAnsage } from "./felder";
 import { InfoSeite } from "./InfoSeite";
@@ -96,6 +97,8 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
           r.minderungen ? TEXT.r12_minderungen(r.minderungen) : "",
           r.gutschriften ? TEXT.aus_rechnungen_gutschriften(r.gutschriften) : "",
           r.ersatz ? TEXT.aus_rechnungen_ersatz(r.ersatz) : "",
+          r.ersatzNummern.length ? TEXT.stb_ersatz_nummern(r.ersatzNummern) : "",
+          r.oss ? TEXT.stb_oss_nicht_va(r.oss) : "",
           r.offen ? TEXT.aus_rechnungen_offen(r.offen) : "",
           r.vorsteuerBelege || r.ohneVorsteuer ? TEXT.aus_rechnungen_vorsteuer(r.vorsteuerBelege, r.ohneVorsteuer) : "",
           r.vorsteuerPruefen ? VORSTEUER_AUFTEILEN : "",
@@ -131,6 +134,9 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
           {r.minderungen ? <T v="caption" farbe={f.amtTief}>{TEXT.r12_minderungen(r.minderungen)}</T> : null}
           {r.gutschriften ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_gutschriften(r.gutschriften)}</T> : null}
           {r.ersatz ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_ersatz(r.ersatz)}</T> : null}
+          {/* StB-Prüfung (5.2): welche Rechnungen nach dem Rechnungsdatum zählen; OSS gehört nicht in die Voranmeldung */}
+          {r.ersatzNummern.length ? <T v="caption" farbe={f.bald}>{TEXT.stb_ersatz_nummern(r.ersatzNummern)}</T> : null}
+          {r.oss ? <T v="caption" farbe={f.bald}>{TEXT.stb_oss_nicht_va(r.oss)}</T> : null}
           {r.offen ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_offen(r.offen)}</T> : null}
           {r.vorsteuerBelege || r.ohneVorsteuer ? <T v="caption" farbe={f.amtTief}>{TEXT.aus_rechnungen_vorsteuer(r.vorsteuerBelege, r.ohneVorsteuer)}</T> : null}
           {r.vorsteuerPruefen ? <T v="caption" farbe={f.bald}>{VORSTEUER_AUFTEILEN}</T> : null}
@@ -144,6 +150,42 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
   );
 }
 
+/**
+ * StB-Prüfung (5.2, C-9): OSS-Erklärung bzw. Zusammenfassende Meldung aus den geteilten Rechnungen übernehmen – je
+ * Quartal (OSS) bzw. Monat oder Quartal (ZM).
+ */
+function EuAusRechnungen({ id, art }: { id: string; art: "oss" | "zm" }) {
+  const z = useAmtlos();
+  const f = useFarben();
+  const sperre = useProSperre();
+  const v: Versteuerung = z.stand.betrieb.versteuerung === "ist" ? "ist" : "soll";
+  const [ergebnis, setErgebnis] = useState<{ periode: string; anzahl: number; zeilen: number } | null>(null);
+  const liste = art === "oss" ? ossQuartale(z.stand.unterlagen, z.stand.betrieb, v) : zmPerioden(z.stand.unterlagen, z.stand.betrieb);
+  useAnsage(ergebnis ? TEXT.stb_eu_ok(ergebnis.anzahl, ergebnis.zeilen) : null);
+  if (!liste.length) return <T v="caption" leise stil={{ marginTop: 10 }}>{TEXT.stb_eu_leer[art]}</T>;
+  return (
+    <View style={{ marginTop: 16, padding: 16, borderRadius: RADIUS.karte, backgroundColor: f.amtHauch }}>
+      <T v="klein" fett farbe={f.amtTief}>{TEXT.mitPro(TEXT.stb_eu_titel[art], z.pro)}</T>
+      <T v="caption" farbe={f.amtTief}>{TEXT.stb_eu_text[art]}</T>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 6 }}>
+        <Wahl
+          wert={ergebnis?.periode ?? null}
+          aendern={(p) => {
+            if (!sperre("ust_uebernahme")) return;
+            const erg = art === "oss" ? ossFuer(z.stand.unterlagen, p, z.stand.betrieb, v) : zmFuer(z.stand.unterlagen, p, z.stand.betrieb);
+            if (!erg) return;
+            z.setzen(id, erg.werte as Daten);
+            setErgebnis({ periode: p, anzahl: erg.anzahl, zeilen: erg.zeilen.length });
+          }}
+          optionen={liste.map((p) => ({ wert: p, text: periodeText(p) }))}
+        />
+      </ScrollView>
+      {ergebnis ? <T v="caption" farbe={f.amtTief} stil={{ marginTop: 8 }}>{TEXT.stb_eu_ok(ergebnis.anzahl, ergebnis.zeilen)}</T> : null}
+      <T v="caption" farbe={f.bald} stil={{ marginTop: 4 }}>{art === "oss" ? TEXT.stb_oss_frist : TEXT.stb_zm_frist}</T>
+    </View>
+  );
+}
+
 /** EÜR (E-133): Einnahmen und Ausgaben eines Jahres aus bezahlten Rechnungen und Belegen übernehmen. */
 function EuerAusDaten({ id }: { id: string }) {
   const z = useAmtlos();
@@ -152,7 +194,9 @@ function EuerAusDaten({ id }: { id: string }) {
   const [ergebnis, setErgebnis] = useState<{ jahr: string; r: EuerUebernahme } | null>(null);
   const jahre = jahreMitDaten(z.stand);
   const kasse = ergebnis ? kassenHinweisMit(kassenLage(z.stand.profil), "euer", ergebnis.r.kasseFehlend) : null;
-  useAnsage(ergebnis ? [TEXT.euer_aus_daten_ok(ergebnis.r.rechnungen, ergebnis.r.belege), ergebnis.r.kassentage ? TEXT.r12_kasse_uebernommen(ergebnis.r.kassentage) : "", kasse?.text ?? "", ergebnis.r.unbezahlt ? TEXT.euer_unbezahlt(ergebnis.r.unbezahlt) : "", ergebnis.r.anlagen ? TEXT.euer_anlagen(ergebnis.r.anlagen) : "", ergebnis.r.hinweis].filter(Boolean).join(" ") : null);
+  useAnsage(ergebnis ? [TEXT.euer_aus_daten_ok(ergebnis.r.rechnungen, ergebnis.r.belege), ergebnis.r.kassentage ? TEXT.r12_kasse_uebernommen(ergebnis.r.kassentage) : "", kasse?.text ?? "", ergebnis.r.unbezahlt ? TEXT.euer_unbezahlt(ergebnis.r.unbezahlt) : "", ergebnis.r.anlagen ? TEXT.euer_anlagen(ergebnis.r.anlagen) : "", ergebnis.r.hinweis, ergebnis.r.ustVorschlag ?? ""].filter(Boolean).join(" ") : null);
+  // StB-Prüfung (E-4): bilanzierende Betriebe – keine EÜR-Übernahme, Hinweis „Bilanz statt EÜR“
+  if (bilanzierendeGewinnermittlung(z.stand)) return <View style={{ marginTop: 16 }}><Hinweis art="warnung" text={EUER_GESPERRT} /></View>;
   if (!jahre.length) return <T v="caption" leise stil={{ marginTop: 10 }}>{TEXT.euer_leer}</T>;
   return (
     <View style={{ marginTop: 16, padding: 16, borderRadius: RADIUS.karte, backgroundColor: f.amtHauch }}>
@@ -178,6 +222,8 @@ function EuerAusDaten({ id }: { id: string }) {
           {ergebnis.r.unbezahlt ? <T v="caption" farbe={f.bald}>{TEXT.euer_unbezahlt(ergebnis.r.unbezahlt)}</T> : null}
           {ergebnis.r.anlagen ? <T v="caption" farbe={f.bald}>{TEXT.euer_anlagen(ergebnis.r.anlagen)}</T> : null}
           <T v="caption" farbe={f.bald}>{ergebnis.r.hinweis}</T>
+          {/* StB-Prüfung (E-1): Vorschlag der USt-Zahlungen aus den eigenen Voranmeldungen */}
+          {ergebnis.r.ustVorschlag ? <T v="caption" farbe={f.amtTief}>{ergebnis.r.ustVorschlag}</T> : null}
         </View>
       ) : null}
     </View>
@@ -217,6 +263,7 @@ function Schritt({ v, a, index, id, daten, fehlt }: { v: Vorlage; a: VorlagenAbs
       {index === 0 && STAETTEN_VORLAGEN.has(v.id) && z.stand.betriebsstaetten.length ? <StaettenWahl wert={u?.betriebsstaette ?? person?.betriebsstaette ?? HAUPT_STAETTE} aendern={(st) => z.unterlageStaette(id, st)} hilfe={TEXT.r12p_staette_unterlage_hilfe} /> : null}
       {mitPerson ? <PersonenWahl v={v} id={id} daten={daten} /> : null}
       {v.ausRechnungen && index === 0 ? <AusRechnungen id={id} daten={daten} /> : null}
+      {v.ausEuRechnungen && index === 0 ? <EuAusRechnungen id={id} art={v.ausEuRechnungen} /> : null}
       {/* R10 UI: Kasse bzw. Shop laut Check – bei den Umsätzen immer sagen, dass sie dazugehören (nicht erst nach der Übernahme) */}
       {v.ausRechnungen && index === 1 && z.stand.kasse.length && kassenLage(z.stand.profil) !== "shop" ? (
         // R12: mit Kassenabschlüssen übernimmt die App die Kassenumsätze selbst

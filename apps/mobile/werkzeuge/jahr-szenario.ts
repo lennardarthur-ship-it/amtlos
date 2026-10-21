@@ -42,6 +42,7 @@ import { kassenDifferenzBuchungen, skontoBuchungenBelege, kassenBuchungen as kas
 import { LEERER_STAND, anlegen, ausgeben, belegSetzen, bezahltSetzen, felderSetzen, kasseSpeichern, personSetzen, profilSetzen, steuerberatungSetzen, stornieren, type Stand, type Unterlage } from "../src/unterlagen/speicher";
 import { euerUebernahme, steuerpaket, type PaketErgebnis } from "../src/unterlagen/steuerpaket";
 import { umsaetzeFuer } from "../src/unterlagen/ustAusRechnungen";
+import { zmFuer } from "../src/unterlagen/euMeldungen";
 import { kasseFuerUst } from "../src/unterlagen/kasse";
 import { fussAngaben, fusszeileStempeln } from "../src/unterlagen/fusszeile";
 import { mitSchriften } from "../src/unterlagen/schriften";
@@ -742,8 +743,19 @@ export function standBauen(): Bau {
     vergleich("Steuererklärung", "Vorsteuer im Jahr", vaSumme("vorsteuer"), j.vorsteuer);
   }
 
+  // ---------------------------------------------------------------- StB-Prüfung (C-9): Zusammenfassende Meldung August 2026 (igL 2026-012)
+  {
+    const zm = zmFuer(s.unterlagen, "2026-08", s.betrieb);
+    if (zm) {
+      dok({ id: "zm-2026-08", vorlage: "zm_meldung", datum: "2026-09-21", worum: "Zusammenfassende Meldung August 2026 (monatlich, Warenlieferung): „Aus Rechnungen übernehmen“ (zmFuer) – innergemeinschaftliche Lieferung 2026-012 an die Rösterei in Österreich, Art L, volle Euro.", daten: () => zm.werte as Daten });
+      infos.push(`Zusammenfassende Meldung August 2026: ${zm.zeilen.map((z) => `${z.ust_idnr} ${z.art} ${euro(z.betrag_cent)} €`).join(", ") || "keine Zeile"} (aus ${zm.anzahl} Rechnung).`);
+    }
+  }
+
   // ---------------------------------------------------------------- übersprungene Vorlagen
   uebersprungen.push(
+    // StB-Prüfung (5.2): keine Fernverkäufe an Privatpersonen im EU-Ausland
+    { id: "oss_meldung", titel: v("oss_meldung").titel, grund: "Keine Fernverkäufe bzw. Leistungen an Privatpersonen im EU-Ausland – kein OSS-Verfahren." },
     { id: "bilanz_guv", titel: v("bilanz_guv").titel, grund: "Einzelunternehmen ohne Handelsregistereintrag unter den Grenzen des § 141 AO – Gewinnermittlung per EÜR, keine Bilanz." },
     { id: "handelsregister", titel: v("handelsregister").titel, grund: "Kein Eintrag: Kleingewerbe/Einzelunternehmen ohne „e. K.“." },
     { id: "transparenzregister", titel: v("transparenzregister").titel, grund: "Gilt nur für juristische Personen und eingetragene Personengesellschaften, nicht für ein Einzelunternehmen." },

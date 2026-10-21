@@ -4,6 +4,7 @@
  * Demo-Modus der App genutzt.
  */
 export { emailGueltig, ibanGueltig, ibanNormal, plzGueltig } from "./pruefen.js";
+import type { Steuerart } from "./steuerart.js";
 export interface Position {
   bezeichnung: string;
   menge: number;
@@ -133,6 +134,12 @@ export function summen(positionen: Position[], kleinunternehmer: boolean): Summe
 export interface Steller {
   name: string; strasse: string; plz: string; ort: string; land: string; email: string; telefon?: string | null;
   steuernummer?: string | null; ust_idnr?: string | null; iban?: string | null; bic?: string | null;
+  /**
+   * StB-Prüfung (C-14): Registerangaben einer Gesellschaft – BT-30 „Seller legal registration identifier“ (z. B.
+   * „HRB 12345“) und BT-33 „Seller additional legal information“ (Rechtsform, Sitz, Registergericht, Geschäftsführung).
+   */
+  register?: string | null;
+  rechtliches?: string | null;
 }
 export interface KundeDaten {
   name: string; strasse?: string | null; plz?: string | null; ort?: string | null; land: string; email?: string | null;
@@ -146,8 +153,8 @@ export interface RechnungsDaten {
   leistungszeitraum?: { von: string; bis: string } | null;
   steller: Steller; kunde: KundeDaten; positionen: Position[]; kleinunternehmer: boolean; hinweis?: string | null;
   art?: "rechnung" | "storno"; storniert_nummer?: string | null;
-  /** Grund für 0 %: Steuerschuldnerschaft des Empfängers, innergemeinschaftliche Lieferung oder Steuerbefreiung (E-129) */
-  steuerart?: "standard" | "reverse_charge" | "igl" | "befreit" | "nullsatz";
+  /** Grund für 0 %: Steuerschuldnerschaft des Empfängers, innergemeinschaftliche Lieferung, Steuerbefreiung oder Nullsteuersatz (E-129, steuerart.ts) */
+  steuerart?: Steuerart;
   /** Bestellnummer des Käufers (BT-13) */
   bestellnummer?: string | null;
   /** Abschlagsrechnung vor Ausführung der Leistung: Leistungsdatum ist noch offen (§ 14 Abs. 4 Nr. 6 UStG) */
@@ -164,7 +171,58 @@ export interface RechnungsDaten {
    * innerhalb von `tage` Tagen ab Rechnungsdatum, bis `bis` (ISO). In der XRechnung als Zahlungsbedingung (BT-20).
    */
   skonto?: { prozent: number; tage: number; bis: string } | null;
+  /**
+   * StB-Prüfung (C-4): Schlussrechnung – die vorher gestellten Abschlagsrechnungen mit Entgelt und Steuer je Steuersatz
+   * werden abgesetzt (§ 14 Abs. 5 Satz 2 UStG, A 14.8 Abs. 10 UStAE). Die Positionen nennen die gesamte Leistung; zu
+   * zahlen ist der Rest. In der XRechnung als vorausbezahlter Betrag (BT-113) mit Verweis auf die Abschläge (BG-3).
+   */
+  abschlaege?: Abschlag[];
+  /** StB-Prüfung (C-6): Ersatzrechnung – Nummer der stornierten Rechnung, die diese Rechnung ersetzt (BG-3) */
+  ersetzt_nummer?: string | null;
+  /**
+   * StB-Prüfung (5.2, C-9): Fernverkauf bzw. Leistung an eine Privatperson im übrigen Gemeinschaftsgebiet mit der
+   * Umsatzsteuer des Bestimmungslands (§ 3c, § 3a Abs. 5 UStG) – gehört in die OSS-Erklärung (§ 18j UStG), nicht in die
+   * deutsche Voranmeldung. Die Positionen tragen dann den Steuersatz des Bestimmungslands.
+   */
+  oss?: { land: string; satz: number } | null;
 }
+
+/** Eine abgesetzte Abschlagsrechnung (Schlussrechnung, C-4): Nummer, Datum, Entgelt und Steuer je Steuersatz. */
+export interface Abschlag {
+  nummer: string;
+  datum?: string | null;
+  satz: number | null;
+  netto_cent: number;
+  ust_cent: number;
+}
+
+/** Summe der abgesetzten Abschläge (brutto, netto, Steuer). */
+export function abschlagsSumme(abschlaege: readonly Abschlag[] | null | undefined): { netto_cent: number; ust_cent: number; brutto_cent: number } {
+  const netto_cent = (abschlaege ?? []).reduce((a, x) => a + x.netto_cent, 0);
+  const ust_cent = (abschlaege ?? []).reduce((a, x) => a + x.ust_cent, 0);
+  return { netto_cent, ust_cent, brutto_cent: netto_cent + ust_cent };
+}
+
+/**
+ * Steuergruppen, die eine Rechnung noch zu versteuern hat: bei einer Schlussrechnung die Gruppen der gesamten Leistung
+ * abzüglich der Abschläge je Steuersatz (die Abschläge sind mit ihrer Zahlung schon versteuert, § 13 Abs. 1 Nr. 1 a
+ * Satz 4 UStG); sonst die Gruppen der Rechnung. Ohne Vorzeichen des Stornos.
+ */
+export function restGruppen(r: Pick<RechnungsDaten, "positionen" | "kleinunternehmer" | "abschlaege">): Summen["gruppen"] {
+  const g = summen(r.positionen, r.kleinunternehmer).gruppen.map((x) => ({ ...x }));
+  for (const a of r.abschlaege ?? []) {
+    const satz = r.kleinunternehmer ? null : a.satz;
+    const z = g.find((x) => x.satz === satz);
+    if (z) {
+      z.netto_cent -= a.netto_cent;
+      z.ust_cent -= a.ust_cent;
+    } else g.push({ satz, netto_cent: -a.netto_cent, ust_cent: -a.ust_cent });
+  }
+  return g;
+}
+
+/** Zu zahlender Betrag einer Rechnung: Rechnungsbetrag abzüglich abgesetzter Abschläge (Schlussrechnung). */
+export const zahlbetrag = (r: Pick<RechnungsDaten, "positionen" | "kleinunternehmer" | "abschlaege">) => summen(r.positionen, r.kleinunternehmer).brutto_cent - abschlagsSumme(r.abschlaege).brutto_cent;
 
 /** Was für eine gültige E-Rechnung (XRechnung) fehlt – als verständliche Liste. Leer = vollständig. */
 export function fehlendFuerERechnung(r: RechnungsDaten): string[] {

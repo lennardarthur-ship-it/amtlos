@@ -5,12 +5,13 @@
  * Nicht in der Mappe: Rechnungen, Belege, Steuer- und Buchhaltungsunterlagen, Register- und Website-Texte.
  */
 // CommonJS-Build wie in fusszeile.ts: die ESM-Variante von pdf-lib lässt sich von Metro nicht auflösen
+import { kassenbuchAnzeige } from "./kassenbuchAnzeige";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib/cjs/index";
 import { kassenSortiert, kassenSummen, kassenVermerk, zeitDe, type Kassenabschluss, type Kassensturz } from "@amtlos/fachlogik";
 import { BEREICHE, BESCHAEFTIGUNGSARTEN, belegNummern, cent, dateinamenTeil, kassenStandorte, kassenbuchDaten, standortVon, monatAus, monatsName, unterlagenName, vorlageFuer, type Beleg, type Bereich, type Daten, type Person, type Vorlage } from "@amtlos/fachlogik";
 import { euroText as euro } from "./ablage";
 import { fehltFuer } from "./pruefung";
-import { HAUPT_STAETTE, NACHWEIS_MONATE, geteiltAm, heute as heuteBerlin, nichtZaehlend, staetteVon, type Stand, type Unterlage } from "./speicher";
+import { HAUPT_STAETTE, NACHWEIS_MONATE, geteiltAm, heute as heuteBerlin, kassenbuchFest, nichtZaehlend, staetteVon, type Stand, type Unterlage } from "./speicher";
 import { MARKE } from "@amtlos/marke";
 
 /** Bereiche, deren Unterlagen bei Kontrollen (Gewerbeaufsicht, BG, Lebensmittelüberwachung, Datenschutz) vorzulegen sind */
@@ -354,7 +355,7 @@ export function kassenMappe(s: Pick<Stand, "unterlagen" | "kasse" | "belege" | "
       const d = kassenbuchDaten(s.kasse, s.belege, m, nummern, st);
       if (!d) continue;
       const letzter = s.kasse.filter((k) => k.datum.startsWith(m) && standortVon(k) === st).reduce((x, k) => (k.datum > x ? k.datum : x), `${m}-01`);
-      aus.push({ id: `kassenbuch-${m}${st ? `-${st}` : ""}`, vorlage: "kassenbuch", titel: `Kassenbuch ${monatsName(m)}${st ? ` · ${st}` : ""} (aus den Tagesabschlüssen)`, bereich: "steuern", datum: letzter, geteilt: false, daten: d as unknown as Daten });
+      aus.push({ id: `kassenbuch-${m}${st ? `-${st}` : ""}`, vorlage: "kassenbuch", titel: `Kassenbuch ${monatsName(m)}${st ? ` · ${st}` : ""} (aus den Tagesabschlüssen)`, bereich: "steuern", datum: letzter, geteilt: false, daten: kassenbuchAnzeige(s, d as unknown as Daten, kassenbuchFest(s, m, st), st) });
     }
   const erzeugt = new Set(monate.map((m) => monatsName(m).toLocaleLowerCase("de")));
   const aus2 = nichtZaehlend(s.unterlagen);

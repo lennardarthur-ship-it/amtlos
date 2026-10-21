@@ -3,6 +3,7 @@
  * gespeicherte Personen (Mitarbeiter, Kunden), fortlaufende Nummern, kurze Titel für Vorschläge.
  */
 import { BESCHAEFTIGUNGSARTEN, ENTGELT_ARTEN, STEUERKLASSEN } from "./lohn.js";
+import { KUNDEN_ARTEN } from "./kundenarten.js";
 
 /** R12: übliche Aufenthaltstitel (Vorschläge, frei änderbar). */
 const AUFENTHALTSTITEL = ["Aufenthaltserlaubnis", "Niederlassungserlaubnis", "Blaue Karte EU", "Erlaubnis zum Daueraufenthalt – EU", "Fiktionsbescheinigung", "Duldung mit Beschäftigungserlaubnis", "Aufenthaltsgestattung mit Beschäftigungserlaubnis"];
@@ -15,6 +16,8 @@ export const KURZ: Record<string, string> = {
   euer: "Einnahmen und Ausgaben eines Jahres – ergibt deinen Gewinn.",
   bilanz_guv: "Jahresabschluss für Kaufleute und Gesellschaften.",
   ust_voranmeldung: "Rechnet aus, wie viel Umsatzsteuer du ans Finanzamt zahlst.",
+  oss_meldung: "Stellt deine Verkäufe an Privatpersonen im EU-Ausland je Land und Steuersatz für den One-Stop-Shop zusammen.",
+  zm_meldung: "Stellt deine Lieferungen und Leistungen an Unternehmen im EU-Ausland je USt-IdNr. für die Meldung ans BZSt zusammen.",
   steuererklaerung: "Alle Zahlen und Belege für die Steuererklärung an einem Ort.",
   verfahrensdokumentation: "Beschreibt, wie du Belege sammelst, buchst und aufbewahrst.",
   kassenbuch: "Bargeld-Einnahmen und -Ausgaben Tag für Tag.",
@@ -68,7 +71,7 @@ export const ANLAESSE: Anlass[] = [
   { id: "einstellen", titel: "Ich stelle jemanden ein", text: "Arbeitsbedingungen, Anmeldung, Lohn, Unterweisung", vorlagen: ["nachweis_arbeitsbedingungen", "sv_meldedaten", "lohnkonto", "arbeitszeitnachweis", "ausweis_hinweis", "unterweisung", "gefaehrdungsbeurteilung", "datenschutzinformation", "ki_kompetenz", "ifsg_belehrung"] },
   { id: "gruenden", titel: "Ich gründe oder eröffne", text: "Gewerbe, Register, Kasse, Belege", vorlagen: ["gewerbeanmeldung", "handelsregister", "transparenzregister", "kassenmeldung", "verfahrensdokumentation", "aufbewahrung", "datenschutz_dokumentation", "gefaehrdungsbeurteilung"] },
   { id: "laufend", titel: "Im laufenden Betrieb", text: "Rechnungen, Kasse, Umsatzsteuer, Arbeitszeit", vorlagen: ["rechnung", "kassenbuch", "ust_voranmeldung", "arbeitszeitnachweis", "lohnkonto", "haccp"] },
-  { id: "steuern", titel: "Jahresabschluss und Steuern", text: "EÜR, Bilanz, Steuererklärung, Aufbewahrung", vorlagen: ["euer", "bilanz_guv", "steuererklaerung", "ust_voranmeldung", "aufbewahrung"] },
+  { id: "steuern", titel: "Jahresabschluss und Steuern", text: "EÜR, Bilanz, Steuererklärung, Aufbewahrung", vorlagen: ["euer", "bilanz_guv", "steuererklaerung", "ust_voranmeldung", "oss_meldung", "zm_meldung", "aufbewahrung"] },
   { id: "website", titel: "Ich mache eine Website", text: "Impressum, Datenschutzerklärung, Verträge", vorlagen: ["impressum", "datenschutzerklaerung_website", "avv"] },
   { id: "datenschutz", titel: "Kundendaten und Datenschutz", text: "Verzeichnis, Info-Blatt, Verträge", vorlagen: ["datenschutz_dokumentation", "datenschutzinformation", "avv", "datenschutzerklaerung_website", "datenpanne", "schluesselquittung", "anamnese_einwilligung", "video_hinweisschild"] },
   { id: "sicherheit", titel: "Sicherheit am Arbeitsplatz", text: "Gefahren, Unterweisung, Gefahrstoffe, Geräte", vorlagen: ["gefaehrdungsbeurteilung", "unterweisung", "betriebsanweisung", "gefahrstoffverzeichnis", "pruefprotokoll_elektro"] },
@@ -113,6 +116,8 @@ export const PERSONEN_FELDER: Record<PersonenArt, EinfachesFeld[]> = {
     // R10: Behörden brauchen die Leitweg-ID in der E-Rechnung (BT-10); Steuernummer für Gutschriften an Leistende
     { id: "leitweg_id", art: "text", label: "Leitweg-ID bzw. Käuferreferenz", hilfe: "bei Behörden und Kommunen Pflicht für die E-Rechnung", selten: true },
     { id: "steuernummer", art: "text", label: "Steuernummer", hilfe: "nur, wenn du für diesen Partner Gutschriften ausstellst", selten: true },
+    // StB-Prüfung (C-3, C-13): Privatperson (Aufbewahrungshinweis bei Grundstücksleistungen) bzw. öffentliche Stelle (Leitweg-ID)
+    { id: "art", art: "wahl", label: "Art des Kunden", optionen: KUNDEN_ARTEN, hilfe: "Privatperson: Hinweis auf die Aufbewahrungspflicht bei Leistungen an einem Grundstück. Öffentliche Stelle: Leitweg-ID für die E-Rechnung." },
   ],
 };
 

@@ -1,6 +1,6 @@
 import { memo, useEffect, useRef, useState } from "react";
 import { Image, Linking, View } from "react-native";
-import { KATEGORIEN, STEUERSAETZE, STEUERSCHULD_ARTEN, ZAHLUNGSWEGE, belegAusERechnung, belegGezahlt, belegSummen, cent, eRechnungAusPdf, eRechnungLesen, kaeuferFremd, kategorieFuer, steuerschuldBetrag, zeitDe, type Beleg } from "@amtlos/fachlogik";
+import { ANLAGE_ARTEN, KATEGORIEN, STEUERSAETZE, STEUERSCHULD_ARTEN, ZAHLUNGSWEGE, belegAusERechnung, belegGezahlt, belegSummen, cent, eRechnungAusPdf, eRechnungLesen, kaeuferFremd, kategorieFuer, steuerschuldBetrag, zeitDe, type Beleg } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { regelwert } from "../pflichten/check";
 import { AuswahlZeile } from "../ui/auswahlseite";
@@ -296,6 +296,8 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
         ) : null}
         <AuswahlZeile label={TEXT.beleg_kategorie} wert={b.kategorie} aendern={(w) => setze({ kategorie: w })} optionen={KATEGORIEN.map((x) => ({ wert: x.id, text: x.titel }))} />
         {k.hinweis ? <T v="caption" leise stil={{ marginTop: 4 }}>{k.hinweis}</T> : null}
+        {/* StB-Prüfung (B-10): Anlagenkonto nach Art des Anlageguts */}
+        {k.anlage ? <Wahl label={TEXT.stb_anlage_art} hilfe={TEXT.stb_anlage_art_hilfe} wert={b.anlage_art ?? "bga"} aendern={(w) => setze({ anlage_art: w })} optionen={ANLAGE_ARTEN} /> : null}
         <Wahl label={TEXT.beleg_zahlung} wert={b.zahlung} aendern={(w) => setze(w === "bar" && !b.bezahlt && b.datum ? { zahlung: w, bezahlt: b.datum } : { zahlung: w })} optionen={ZAHLUNGSWEGE} />
         <DatumFeld label={TEXT.beleg_bezahlt} hilfe={TEXT.beleg_bezahlt_hilfe} wert={b.bezahlt ?? null} aendern={(d) => setze({ bezahlt: d })} />
         {/* R12: beim Bezahlen abgezogenes Skonto – mindert die Vorsteuer im Monat der Zahlung (§ 17 UStG) */}

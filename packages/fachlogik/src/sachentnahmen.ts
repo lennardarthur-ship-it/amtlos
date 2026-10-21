@@ -12,7 +12,7 @@
  * DATEV-Stapel (Privatentnahmen an „Entnahme durch den Unternehmer … (Waren)“ 7 %/19 %, brutto, Automatik). Kleinunternehmer:
  * keine Umsatzsteuer, nicht im Stapel (mit der Kanzlei klären).
  */
-import { BUCHUNGSKONTEN, belegfeld1Aus, buchungsGuid, type Buchung, type Kontenrahmen } from "./buchungen.js";
+import { belegfeld1Aus, buchungsGuid, kontenFuer, type Buchung, type BuchungsOptionen, type Kontenrahmen } from "./buchungen.js";
 import { rundeCent } from "./rechnung.js";
 
 export interface Sachentnahme {
@@ -59,10 +59,13 @@ export function sachentnahmenFuer(l: readonly Sachentnahme[], von: string, bis: 
   return r;
 }
 
-/** Buchungen: Privatentnahmen an Entnahme 7 % bzw. 19 % (brutto, Automatikkonto) – nicht bei Kleinunternehmern. */
-export function sachentnahmeBuchungen(l: readonly Sachentnahme[], kontenrahmen: Kontenrahmen, o: { kleinunternehmer?: boolean } = {}): Buchung[] {
+/**
+ * Buchungen: Privatentnahmen (Feld 7) an Entnahme 7 % bzw. 19 % (Feld 8, brutto, Automatikkonto) – nicht bei
+ * Kleinunternehmern. StB-Prüfung (A-1): Sachkonto mit Steuer als Gegenkonto – richtig; Konten nach Kontenvorgaben.
+ */
+export function sachentnahmeBuchungen(l: readonly Sachentnahme[], kontenrahmen: Kontenrahmen, o: BuchungsOptionen & { kleinunternehmer?: boolean } = {}): Buchung[] {
   if (o.kleinunternehmer) return [];
-  const k = BUCHUNGSKONTEN[kontenrahmen];
+  const k = kontenFuer(kontenrahmen, o.vorgaben);
   const aus: Buchung[] = [];
   for (const x of l)
     for (const satz of [7, 19] as const) {

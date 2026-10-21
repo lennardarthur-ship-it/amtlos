@@ -28,7 +28,7 @@
  * Fachlich zu prüfen: PRUEFLISTE (R12).
  */
 import { belegGezahlt, belegKennung, istBelegDateiname, kategorieFuer, zahltag, type Beleg, type BelegSteuer } from "./belege.js";
-import { BUCHUNGSKONTEN, belegfeld1Aus, buchungsGuid, erloeskonto, type Buchung, type Kontenrahmen } from "./buchungen.js";
+import { belegfeld1Aus, buchungsGuid, erloeskonto, kontenFuer, type Buchung, type BuchungsOptionen, type Kontenrahmen } from "./buchungen.js";
 import { aufteilen, nettoAusBrutto } from "./skonto.js";
 
 /** Steuersätze an der Kasse */
@@ -723,9 +723,13 @@ export const kostenstelle = (standort: string) => belegfeld1Aus(standort).replac
  * - Kartentrinkgeld: Geldtransit an Kasse (durchlaufend, ohne Steuer). Bar kassierte Rechnungen: Kasse an Forderungen.
  * - Bewegungen mit Eigenbeleg-Nummer in Belegfeld 1: Geldtransit an Kasse, Privatentnahme an Kasse, Kasse an Privateinlage.
  * Leistungsdatum und „Datum Zuord. Steuerperiode“ = Tag des Abschlusses. Kassendifferenzen: `kassenDifferenzBuchungen`.
+ * StB-Prüfung (A-1): Kasse bzw. Geldtransit in Feld 7, Erlöskonto in Feld 8 – richtig. B-6: Einlagen und Entnahmen
+ * einer Kapitalgesellschaft über das Verrechnungskonto Gesellschafter statt Privatkonten; Konten nach Kontenvorgaben.
  */
-export function kassenBuchungen(abschluesse: readonly Kassenabschluss[], kontenrahmen: Kontenrahmen, o: { kleinunternehmer?: boolean } = {}): Buchung[] {
-  const k = BUCHUNGSKONTEN[kontenrahmen];
+export function kassenBuchungen(abschluesse: readonly Kassenabschluss[], kontenrahmen: Kontenrahmen, o: BuchungsOptionen & { kleinunternehmer?: boolean; kapitalgesellschaft?: boolean } = {}): Buchung[] {
+  const k = kontenFuer(kontenrahmen, o.vorgaben);
+  const privatEin = o.kapitalgesellschaft ? k.verrechnungGesellschafter : k.privateinlagen;
+  const privatAus = o.kapitalgesellschaft ? k.verrechnungGesellschafter : k.privatentnahmen;
   const aus: Buchung[] = [];
   for (const a of kassenSortiert(abschluesse)) {
     if (a.geschlossen && !a.bewegungen.length) continue;
@@ -779,7 +783,7 @@ export function kassenBuchungen(abschluesse: readonly Kassenabschluss[], kontenr
       l.forEach((r, i) => aus.push({ ...basis, betrag_cent: r.betrag_cent, soll_haben: "S", konto: k.kasse, gegenkonto: k.forderungen, ...(r.nummer ? { belegfeld1: belegfeld1Aus(r.nummer) } : {}), buchungstext: (r.nummer ? `Barzahlung RE ${r.nummer}${zb}` : `Barzahlungen auf Rechnungen${zb}`).slice(0, 60), ust_satz: null, art: "umbuchung", guid: buchungsGuid(i ? `${a.id}|rechnungen|${i}` : `${a.id}|rechnungen`, null), leistungsdatum: null, steuerperiode: null }));
     }
     a.bewegungen.forEach((b, i) => {
-      const [konto, gegen, text] = b.art === "entnahme" ? [k.privatentnahmen, k.kasse, "Privatentnahme Kasse"] : b.art === "einlage" ? [k.kasse, k.privateinlagen, "Privateinlage Kasse"] : [k.geldtransit, k.kasse, "Geldtransit Kasse an Bank"];
+      const [konto, gegen, text] = b.art === "entnahme" ? [privatAus, k.kasse, o.kapitalgesellschaft ? "Entnahme Kasse Gesellschafter" : "Privatentnahme Kasse"] : b.art === "einlage" ? [k.kasse, privatEin, o.kapitalgesellschaft ? "Einlage Kasse Gesellschafter" : "Privateinlage Kasse"] : [k.geldtransit, k.kasse, "Geldtransit Kasse an Bank"];
       aus.push({ ...basis, betrag_cent: b.betrag_cent, soll_haben: "S", konto, gegenkonto: gegen, ...(b.beleg_nr ? { belegfeld1: belegfeld1Aus(b.beleg_nr) } : {}), buchungstext: text, ust_satz: null, art: "umbuchung", guid: buchungsGuid(`${a.id}|bewegung|${i}`, null), leistungsdatum: null, steuerperiode: null });
     });
   }
@@ -788,20 +792,22 @@ export function kassenBuchungen(abschluesse: readonly Kassenabschluss[], kontenr
 
 /**
  * R12 GoBD: Kassendifferenzen laut Zählung buchen, damit das Kassenkonto dem Kassenbuch entspricht – Überschuss Kasse an
- * Erlöse 19 % (Kleinunternehmer: Konto § 19), Fehlbetrag sonstiger Aufwand an Kasse (ohne Vorsteuer). Konten und
- * steuerliche Behandlung mit der Kanzlei abstimmen (PRUEFLISTE).
+ * Erlöse 19 % (Kleinunternehmer: Konto § 19), Fehlbetrag Kasse (Feld 7, Haben) an sonstigen Aufwand (ohne Vorsteuer,
+ * StB-Prüfung A-1: Sachkonto als Gegenkonto). StB-Prüfung (A-9/B-9): Überschuss mit Kontenvorgabe auf ein Ertragskonto
+ * ohne Umsatzsteuer (z. B. 2700/4830), Fehlbetrag auf das vorgegebene Konto.
  */
-export function kassenDifferenzBuchungen(differenzen: readonly { datum: string; cent: number; standort?: string }[], kontenrahmen: Kontenrahmen, o: { kleinunternehmer?: boolean } = {}): Buchung[] {
-  const k = BUCHUNGSKONTEN[kontenrahmen];
+export function kassenDifferenzBuchungen(differenzen: readonly { datum: string; cent: number; standort?: string }[], kontenrahmen: Kontenrahmen, o: BuchungsOptionen & { kleinunternehmer?: boolean } = {}): Buchung[] {
+  const k = kontenFuer(kontenrahmen, o.vorgaben);
   return differenzen
     .filter((d) => d.cent)
     .map((d): Buchung => {
       const kost1 = d.standort ? kostenstelle(d.standort) : undefined;
       const satz = o.kleinunternehmer ? null : 19;
-      const basis = { datum: d.datum, betrag_cent: Math.abs(d.cent), soll_haben: "S" as const, bu_schluessel: "", belegfeld1: belegfeld1Aus(`KD${d.datum.replace(/-/g, "")}`), quelle_id: `kassendifferenz|${d.standort ?? ""}|${d.datum}`, ...(kost1 ? { kost1 } : {}) };
-      return d.cent > 0
-        ? { ...basis, konto: k.kasse, gegenkonto: erloeskonto(k, satz), buchungstext: "Kassendifferenz Überschuss lt. Zählung", ust_satz: satz, art: "einnahme", guid: buchungsGuid(`kassendifferenz|${d.standort ?? ""}|${d.datum}`, satz), leistungsdatum: d.datum, steuerperiode: d.datum }
-        : { ...basis, konto: k.kassendifferenzAufwand, gegenkonto: k.kasse, buchungstext: "Kassendifferenz Fehlbetrag lt. Zählung", ust_satz: null, art: "ausgabe", guid: buchungsGuid(`kassendifferenz|${d.standort ?? ""}|${d.datum}`, null) };
+      const basis = { datum: d.datum, betrag_cent: Math.abs(d.cent), bu_schluessel: "", belegfeld1: belegfeld1Aus(`KD${d.datum.replace(/-/g, "")}`), quelle_id: `kassendifferenz|${d.standort ?? ""}|${d.datum}`, ...(kost1 ? { kost1 } : {}) };
+      if (d.cent < 0) return { ...basis, soll_haben: "H", konto: k.kasse, gegenkonto: k.kassendifferenzAufwand, buchungstext: "Kassendifferenz Fehlbetrag lt. Zählung", ust_satz: null, art: "ausgabe", guid: buchungsGuid(`kassendifferenz|${d.standort ?? ""}|${d.datum}`, null) };
+      // Überschuss auf ein Ertragskonto ohne Umsatzsteuer (Hausregel der Kanzlei) – sonst Erlöse 19 % (GUID wie bisher)
+      if (k.kassendifferenzErtrag) return { ...basis, soll_haben: "S", konto: k.kasse, gegenkonto: k.kassendifferenzErtrag, buchungstext: "Kassendifferenz Überschuss lt. Zählung", ust_satz: null, art: "einnahme", guid: buchungsGuid(`kassendifferenz|${d.standort ?? ""}|${d.datum}`, null) };
+      return { ...basis, soll_haben: "S", konto: k.kasse, gegenkonto: erloeskonto(k, satz), buchungstext: "Kassendifferenz Überschuss lt. Zählung", ust_satz: satz, art: "einnahme", guid: buchungsGuid(`kassendifferenz|${d.standort ?? ""}|${d.datum}`, satz), leistungsdatum: d.datum, steuerperiode: d.datum };
     });
 }
 

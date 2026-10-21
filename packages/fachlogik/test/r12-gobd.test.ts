@@ -111,7 +111,8 @@ describe("Kasse: Zeitnähe, Grund, Eigenbelege, Differenzen, Kassensturz", () =>
   });
   it("Kassendifferenzen gebucht: Überschuss Kasse an Erlöse 19 %, Fehlbetrag Aufwand an Kasse", () => {
     const b = kassenDifferenzBuchungen([{ datum: "2026-05-02", cent: 230 }, { datum: "2026-05-03", cent: -150, standort: "" }], "SKR03");
-    expect(b.map((x) => [x.konto, x.gegenkonto, x.betrag_cent, x.ust_satz])).toEqual([["1000", "8400", 230, 19], ["4900", "1000", 150, null]]);
+    // StB-Prüfung (A-1): Fehlbetrag Kasse im Haben an Aufwand (Sachkonto als Gegenkonto)
+    expect(b.map((x) => [x.konto, x.gegenkonto, x.betrag_cent, x.ust_satz, x.soll_haben])).toEqual([["1000", "8400", 230, 19, "S"], ["1000", "4900", 150, null, "H"]]);
     expect(kassenDifferenzBuchungen([{ datum: "2026-05-02", cent: 230 }], "SKR04", { kleinunternehmer: true })[0]!.gegenkonto).toBe("4185");
     // Voranmeldung: Überschuss zum Regelsatz
     expect(kassenUmsatz([], "2026-05-01", "2026-05-31", false, { ueberschuesse: [{ datum: "2026-05-02", cent: 119 }] }).je[19]).toEqual({ brutto: 119, netto: 100, ust: 19 });
@@ -159,6 +160,6 @@ describe("Belegnummern (R12 GoBD)", () => {
   });
   it("Barbeleg bleibt Barbeleg: gegen Kasse ab dem ersten Abschluss", () => {
     const bar: Beleg = { id: "b", datum: "2026-05-02", lieferant: "X", kategorie: "waren", steuer: [{ satz: 7, brutto_cent: 1070 }], vorsteuer: true, zahlung: "bar", erstellt: "2026-05-02T08:00:00Z", geaendert: "2026-05-02T08:00:00Z" };
-    expect(buchungenAusBelegen([bar], "SKR03", { kasseAb: "2026-05-01" })[0]!.gegenkonto).toBe("1000");
+    expect(buchungenAusBelegen([bar], "SKR03", { kasseAb: "2026-05-01" })[0]!.konto).toBe("1000");
   });
 });

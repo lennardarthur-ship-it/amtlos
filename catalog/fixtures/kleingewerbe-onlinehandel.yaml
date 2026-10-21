@@ -41,6 +41,7 @@ erwartet:
   steuern.ust_voranmeldung: gilt
   steuern.ust_sondervorauszahlung: gilt_nicht
   steuern.zusammenfassende_meldung: gilt
+  steuern.oss_erklaerung: gilt
   steuern.vorauszahlung_est_kst: gilt
   steuern.vorauszahlung_gewst: gilt_nicht
   steuern.gewst_erklaerung: gilt
@@ -54,3 +55,5 @@ termine_enthaelt:
   # Q3: 10.10.2026 ist Samstag → Montag 12.10.
   steuern.ust_voranmeldung: [["2026-Q3", "2026-10-12"]]
   steuern.e_rechnung_versand_2028: [["einmalig", "2028-01-01"]]
+  # OSS: letzter Tag des Folgemonats, ohne Verschiebung – 31.10.2026 ist ein Samstag
+  steuern.oss_erklaerung: [["2026-Q3", "2026-10-31"]]

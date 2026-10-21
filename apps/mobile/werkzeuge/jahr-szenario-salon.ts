@@ -593,13 +593,14 @@ export function standBauen(): Bau {
     vergleichText("Bilanz/GuV 2026", "Bilanz geht auf (keine Zeile „Differenz – bitte prüfen“)", erg.some((z) => z[0].startsWith("Differenz")) ? "Differenz" : "geht auf", "geht auf");
   }
 
-  // EÜR: gilt für die GmbH nicht – was die App trotzdem anbietet bzw. ableitet
+  // EÜR: gilt für die GmbH nicht. StB-Prüfung (E-4): die App sperrt die Übernahme für bilanzierende Betriebe („Bilanz
+  // statt EÜR“) – erwartet sind deshalb leere Listen; die unabhängig gerechneten Zuflusswerte (D.euerZufluss) bleiben
+  // nur zur Dokumentation in SZENARIO.md.
   const euer = euerUebernahme(s, "2026");
   {
-    const ez = D.euerZufluss();
     const zahl = (l: Record<string, string>[], f: (x: Record<string, string>) => boolean) => l.filter(f).reduce((a, x) => a + ausEuro(x.betrag ?? "0"), 0);
-    vergleich("EÜR-Übernahme (gilt für GmbH nicht)", "Einnahmen netto aus 2026 bezahlten Rechnungen", zahl(euer.einnahmen, (x) => !/^Vereinnahmte Umsatzsteuer/.test(x.kategorie ?? "")), ez.reNetto);
-    vergleich("EÜR-Übernahme (gilt für GmbH nicht)", "Vorsteuer nach Zahlung", zahl(euer.ausgaben, (x) => x.kategorie === "Gezahlte Vorsteuerbeträge"), ez.vorsteuer);
+    vergleich("EÜR-Übernahme (gilt für GmbH nicht, gesperrt – E-4)", "Einnahmen netto aus 2026 bezahlten Rechnungen", zahl(euer.einnahmen, (x) => !/^Vereinnahmte Umsatzsteuer/.test(x.kategorie ?? "")), 0);
+    vergleich("EÜR-Übernahme (gilt für GmbH nicht, gesperrt – E-4)", "Vorsteuer nach Zahlung", zahl(euer.ausgaben, (x) => x.kategorie === "Gezahlte Vorsteuerbeträge"), 0);
     vergleichText("EÜR-Übernahme (gilt für GmbH nicht)", "Hinweis der Übernahme auf Rechtsform/Bilanzierungspflicht", /GmbH|Bilanz|Kapitalgesellschaft|Buchführungspflicht/.test(euer.hinweis) ? "ja" : "nein", "ja");
   }
 
@@ -626,6 +627,9 @@ export function standBauen(): Bau {
     { id: "ifsg_belehrung", titel: v("ifsg_belehrung").titel, grund: "Keine Tätigkeit mit Lebensmitteln nach § 42 IfSG." },
     { id: "kassenbuch", titel: v("kassenbuch").titel, grund: "Elektronisches Kassensystem mit TSE; Kassenbericht kommt aus dem System (keine offene Ladenkasse)." },
     { id: "datenpanne", titel: v("datenpanne").titel, grund: "Im Jahr 2026 gab es keine Datenpanne." },
+    // StB-Prüfung (5.2, C-9): OSS-Erklärung und Zusammenfassende Meldung (Übertragungshilfen, neu)
+    { id: "oss_meldung", titel: v("oss_meldung").titel, grund: "Keine Fernverkäufe bzw. Leistungen an Privatpersonen im EU-Ausland – kein OSS-Verfahren." },
+    { id: "zm_meldung", titel: v("zm_meldung").titel, grund: "Keine innergemeinschaftlichen Lieferungen oder Leistungen an Unternehmen im EU-Ausland." },
   );
   const genutzt = new Set(docs.map((d) => d.vorlage));
   for (const vl of VORLAGEN) if (!genutzt.has(vl.id) && !uebersprungen.some((u) => u.id === vl.id)) auffaellig.push(`Vorlage ${vl.id} weder erzeugt noch als übersprungen begründet.`);

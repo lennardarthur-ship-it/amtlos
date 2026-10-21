@@ -1,7 +1,7 @@
 # Katalog C.25 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.zusammenfassende_meldung
-version: 3
+version: 4
 katalog_nr: C.25
 titel:
   de: Zusammenfassende Meldung abgeben
@@ -12,7 +12,9 @@ erklaerung:
     bis zum 25. Tag nach Ablauf jedes Kalendermonats an das Bundeszentralamt für Steuern. Vierteljährlich reicht, wenn deine
     innergemeinschaftlichen Lieferungen je Quartal höchstens 50.000 € betragen; erbringst du nur sonstige Leistungen (keine
     Warenlieferungen), meldest du immer vierteljährlich. Kleinunternehmer geben keine Zusammenfassende Meldung ab (§ 18a Abs. 4 UStG).
-    Amtlos rechnet bei Warenlieferungen mit dem monatlichen Termin.
+    Amtlos rechnet bei Warenlieferungen mit dem monatlichen Termin. Ändert sich die Bemessungsgrundlage später (z. B. Skonto
+    oder Rücksendung), berichtigst du die Meldung für den ursprünglichen Zeitraum innerhalb eines Monats (§ 18a Abs. 10 UStG).
+    Amtlos stellt die Beträge je USt-IdNr. aus deinen Rechnungen zusammen (Vorlage „Zusammenfassende Meldung“); du übermittelst selbst.
 rechtsgrundlage:
 - § 18a UStG
 kategorie: steuern
@@ -69,7 +71,7 @@ sanktion:
   schwere: mittel
 automatisierung: formular_vorausfuellen
 aenderungsnotiz:
-  de: 'Frist ergänzt: bis zum 25. Tag nach Ablauf des Monats, vierteljährlich bei innergemeinschaftlichen Lieferungen bis 50.000 € je Quartal.'
+  de: 'Steuerliche Prüfung (Heckler und Busch, 21.10.2026, C-9): Vorlage „Zusammenfassende Meldung“ aus den Rechnungen, Hinweis auf die Berichtigung nach § 18a Abs. 10 UStG.'
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -81,6 +83,7 @@ fachlich_zu_pruefen:
 - 'Termine nach Steuerprüfung R11 (Befund 16): 25. nach Ablauf des Meldezeitraums; nur sonstige Leistungen vierteljährlich, mit Warenlieferungen monatlich (Wahl vierteljährlich bis 50.000 € je Quartal nicht abgefragt); Verschiebung nach § 108 Abs. 3 AO bestätigen'
 - 'Kleinunternehmer ausgenommen (§ 18a Abs. 4 UStG, Steuerprüfung R11 „eindeutig“)'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Steuerliche Prüfung 21.10.2026 (C-9): Pflicht mit Frist bestätigt; Zuordnung in der Vorlage – Lieferungen nach Rechnungsdatum (spätestens Monat nach der Lieferung, § 18a Abs. 8 UStG), sonstige Leistungen nach Ausführung – bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

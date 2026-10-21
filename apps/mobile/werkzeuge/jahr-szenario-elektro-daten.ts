@@ -54,19 +54,20 @@ export const BETRIEB = {
 export const INHABER = { name: "Jens Brandt", geburtsname: "", geburtsdatum: "1981-09-14", geburtsort: "Dortmund", wohnanschrift: "Am Remberg 37\n44269 Dortmund", meister: "Elektrotechnikermeister (Meisterprüfung 2011, Handwerkskammer Dortmund)" };
 export const GRUENDUNG = "2014-04-01";
 
+// StB-Prüfung (C-3): Privatkunden sind am Kunden als „Privatperson“ gemerkt (Aufbewahrungshinweis bei Grundstücksleistungen)
 export const KUNDEN = {
-  k1: { name: "Sabine und Thomas Kowalski", anschrift: "Harkortstraße 61\n44225 Dortmund" },
-  k2: { name: "Heinz Albers", anschrift: "Benninghofer Straße 140\n44267 Dortmund" },
-  k3: { name: "Dr. Miriam Osei", anschrift: "Am Gottesacker 12\n44143 Dortmund" },
-  k4: { name: "Lukas Tiedemann", anschrift: "Hörder Rathausstraße 4\n44263 Dortmund" },
+  k1: { name: "Sabine und Thomas Kowalski", anschrift: "Harkortstraße 61\n44225 Dortmund", art: "privat" },
+  k2: { name: "Heinz Albers", anschrift: "Benninghofer Straße 140\n44267 Dortmund", art: "privat" },
+  k3: { name: "Dr. Miriam Osei", anschrift: "Am Gottesacker 12\n44143 Dortmund", art: "privat" },
+  k4: { name: "Lukas Tiedemann", anschrift: "Hörder Rathausstraße 4\n44263 Dortmund", art: "privat" },
   k5: { name: "Bäckerei Hollmann GmbH & Co. KG", anschrift: "Faßstraße 22\n44263 Dortmund", email: "buchhaltung@baeckerei-hollmann.example" },
   k6: { name: "Hausverwaltung Rüdiger Lenz", anschrift: "Ruhrallee 85\n44139 Dortmund", email: "rechnungen@hv-lenz.example" },
   k7: { name: "Physiotherapie Anja Brück", anschrift: "Wellinghofer Straße 201\n44263 Dortmund", email: "praxis@physio-brueck.example" },
   k8: { name: "Hochbau Kemper GmbH", anschrift: "Martener Straße 410\n44379 Dortmund", email: "eingangsrechnungen@hochbau-kemper.example", ust_idnr: "DE814527390" },
   k9: { name: "Autohaus Sommer GmbH", anschrift: "Wittekindstraße 105\n44139 Dortmund", email: "kreditoren@autohaus-sommer.example" },
   k10: { name: "Wohnungsgenossenschaft Dortmund-Süd eG", anschrift: "Kirchhörder Straße 52\n44229 Dortmund", email: "technik@wg-dortmund-sued.example" },
-  k11: { name: "Udo Wessel", anschrift: "Am Hombruchsfeld 7\n44225 Dortmund" },
-  k12: { name: "Sarah und Can Demir", anschrift: "Am Zehnthof 9\n44269 Dortmund" },
+  k11: { name: "Udo Wessel", anschrift: "Am Hombruchsfeld 7\n44225 Dortmund", art: "privat" },
+  k12: { name: "Sarah und Can Demir", anschrift: "Am Zehnthof 9\n44269 Dortmund", art: "privat" },
   k13: { name: "Stadt Dortmund – Städtische Immobilienwirtschaft", anschrift: "Hövelstraße 8\n44137 Dortmund", email: "e-rechnung@siw.dortmund.example" },
 } as const;
 export type KundeId = keyof typeof KUNDEN;

@@ -15,6 +15,7 @@ import { kassenMonat, kassenMonate, offeneLadenkasse, ruhetage } from "../unterl
 import { pdfTeilen } from "../unterlagen/pdf";
 import { utf8 } from "../unterlagen/sicherung";
 import { dateiWaehlenBytes } from "../unterlagen/sicherungDatei";
+import { kassenbuchAnzeige } from "../unterlagen/kassenbuchAnzeige";
 import { HAUPT_STAETTE, alleStaetten, heute, kassenbuchFest, offenerBetrag, vaAbgegebenFuer } from "../unterlagen/speicher";
 import { istKleinunternehmer } from "../unterlagen/steuerpaket";
 import { offeneRechnungen } from "../unterlagen/ustAusRechnungen";
@@ -178,7 +179,8 @@ function KassenbuchSeite({ monat, standort }: { monat: string; standort: string 
   const fest = kassenbuchFest(z.stand, monat, standort);
   if (!daten) return <Unterseite titel={TEXT.r12g_kassenbuch_titel(monatText(monat))}>{null}</Unterseite>;
   const gleich = fest && JSON.stringify(fest.daten) === JSON.stringify(daten);
-  const html = dokumentHtml(v, daten, z.stand.betrieb);
+  // StB GoBD (D-9): „aus den Tagesabschlüssen, nur lesbar“ mit Fassung und Erstellungszeitpunkt auf jeder Seite
+  const html = dokumentHtml(v, kassenbuchAnzeige(z.stand, daten, fest, standort), z.stand.betrieb);
   const teilen = async () => {
     setLaedt(true);
     try {

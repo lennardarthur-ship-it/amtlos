@@ -15,3 +15,5 @@ export * from "./dateinamen.js";
 export * from "./skonto.js";
 export * from "./kasse.js";
 export * from "./sachentnahmen.js";
+export * from "./steuerart.js";
+export * from "./kontenvorgaben.js";

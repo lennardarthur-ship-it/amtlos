@@ -195,9 +195,9 @@ function paketNeuerungen(name, zr, inhalt, erg, kleinunternehmer, belegeRoh) {
   // R10: Belege, die nicht in den Stapel gehören (Personal, Auslagen einer GmbH), sind in der Belegliste markiert
   const fehlend = be.zeilen.filter((z) => !/^nein/.test(be.w(z, "Im Buchungsstapel") ?? "")).map((z) => be.w(z, "Belegfeld 1 (DATEV)")).filter((b) => !belegfelder.has(b));
   vergleich(bereich, "DATEV: Belegfeld 1 der Belegbuchungen = Spalte „Belegfeld 1 (DATEV)“ der Belegliste", fehlend.length ? fehlend.join(", ") : "alle gefunden", "alle gefunden");
-  const gi = extf[1].indexOf("Buchungs GUID");
+  const gi = extf[1].indexOf("Beleginfo - Inhalt 1"); // StB-Prüfung 3.1: GUID in Beleginfo 1, Feld 103 „Buchungs GUID“ leer
   const guids = ez.map((z) => z[gi]);
-  vergleich(bereich, "DATEV: Buchungs-GUID in jeder Zeile (36 Zeichen) und eindeutig", gi >= 0 && guids.every((g, i) => /^[0-9a-f-]{36}$/.test(g) && guids.indexOf(g) === i) ? "ja" : "nein", "ja");
+  vergleich(bereich, "DATEV: Buchungs-GUID in jeder Zeile (Beleginfo 1, 36 Zeichen) und eindeutig, Feld 103 leer", gi >= 0 && ez.every((z) => z[102] === "" && z[20] === "Buchungs-GUID") && guids.every((g, i) => /^[0-9a-f-]{36}$/.test(g) && guids.indexOf(g) === i) ? "ja" : "nein", "ja");
   const texte = ez.map((z) => z[13]);
   vergleich(bereich, "DATEV: Buchungstext höchstens 60 Zeichen, ohne Leerzeichen am Ende", texte.filter((t) => t.length > 60 || t !== t.trimEnd()).join(" | ") || "alle", "alle");
   const bl = liste(inhalt[`Buchungsliste_${zr.name}.csv`]);
@@ -265,7 +265,7 @@ function paketPruefen(name, zr, erg, ordner) {
   const erwBuchungen = summe(vg.map((x) => Object.values(x.s.gruppen).filter((g) => g.netto + g.ust !== 0).length)) + summe(bl.filter((b) => b.kategorie !== "personal").map((b) => b.saetze.filter((x) => x.betrag).length)) + erwKasse + erwSkonto; // R10: Personal nicht im Stapel
   vergleich(`Paket ${name}`, "DATEV: Anzahl Buchungen", zeilen.length, erwBuchungen);
   vergleich(`Paket ${name}`, "DATEV: Spalten je Zeile = Spalten im Kopf", zeilen.every((z) => z.length === extf[1].length) ? "ja" : "nein", "ja");
-  const kontoSumme = (konto) => summe(zeilen.filter((z) => z[7] === konto).map((z) => (z[1] === "H" ? -1 : 1) * centAus(z[0])));
+  const kontoSumme = (konto) => summe(zeilen.filter((z) => z[7] === konto).map((z) => (z[1] === "H" ? -1 : 1) * (z[117] === "1" ? -1 : 1) * centAus(z[0])));
   const erl = { 19: "8400", 7: "8300", 0: "8125" };
   for (const [satz, konto] of Object.entries(erl)) {
     // R12 GoBD: Kassenüberschuss als Erlös 19 %; Einzweck-Gutschein 7 % (Verkauf + / Einlösung −) gleicht sich im Monat aus
@@ -279,7 +279,8 @@ function paketPruefen(name, zr, erg, ordner) {
   // R12 GoBD: Kartenanteil direkt Geldtransit an Erlöse (bzw. an Gutschein-Verbindlichkeit), Trinkgeld und Bankeinzahlungen Geldtransit an Kasse
   vergleich(`Paket ${name}`, "DATEV: Geldtransit 1360 im Soll = Kartenzahlungen (mit Trinkgeld) + Bankeinzahlungen der Kasse", summe(zeilen.filter((z) => z[6] === "1360").map((z) => centAus(z[0]))), summe(kt.map((k) => k.b7 + k.b19 - k.bar)) + (im(SO.trinkgeld.datum) ? SO.trinkgeld.cent : 0) + summe(D.KASSEN_BEWEGUNGEN_ROH.filter((b) => im(b.datum) && b.art === "transit").map((b) => b.betrag)));
   vergleich(`Paket ${name}`, "DATEV: Kartenanteil nicht mehr über die Kasse (keine Buchung „Kartenzahlungen“ Geldtransit an Kasse)", zeilen.some((z) => z[6] === "1360" && z[7] === "1000" && /Kartenzahlungen/.test(z[13] ?? "")) ? "ja" : "nein", "nein");
-  vergleich(`Paket ${name}`, "DATEV: Barbelege gegen Kasse 1000 (kein Geldtransit)", zeilen.filter((z) => z[7] === "1360").length ? "Geldtransit" : "Kasse", "Kasse");
+  // StB-Prüfung (A-1): Belegbuchungen tragen das Zahlungskonto in Feld 7 – Geldtransit dort nur bei Kassenbuchungen (an Erlöse, Gutscheine, Kasse)
+  vergleich(`Paket ${name}`, "DATEV: Barbelege gegen Kasse 1000 (kein Geldtransit)", zeilen.filter((z) => z[6] === "1360" && !/^(8\d{3}|1000|1700)$/.test(z[7])).length ? "Geldtransit" : "Kasse", "Kasse");
   vergleich(`Paket ${name}`, "DATEV: Kopf Beraternummer/Mandant", `${extf[0][10]}/${extf[0][11]}`, "29098/10457");
   // Dateinamen: Umlaute umgeschrieben („Söhne“ → „Soehne“, „Lohnbüro“ → „Lohnbuero“), unabhängig nachgebaut
   const umschrift = (t) => t.replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/Ä/g, "Ae").replace(/Ö/g, "Oe").replace(/Ü/g, "Ue").replace(/ß/g, "ss").normalize("NFKD").replace(/[\u0300-\u036f]/g, "");

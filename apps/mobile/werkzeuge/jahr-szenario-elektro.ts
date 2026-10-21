@@ -298,7 +298,8 @@ export function standBauen(): Bau {
     const zahlbar = /<cbc:PayableAmount[^>]*>([-\d.]+)</.exec(xml)?.[1];
     vergleich("E-Rechnung " + x.nummer, "PayableAmount (BT-115)", Math.round(Number(zahlbar) * 100), x.vz * x.s.brutto);
     const codes = [...xml.matchAll(/<cbc:InvoicedQuantity unitCode="([^"]+)"/g)].map((m) => m[1]!);
-    const soll = x.r.pos.map((p) => ERW_CODE[p.einheit] ?? "C62");
+    // StB-Prüfung (C-16): Nachlässe (negativer Preis) stehen als AllowanceCharge auf Dokumentebene, nicht als Zeile – außer im Storno
+    const soll = x.r.pos.filter((p) => x.vz < 0 || p.preis >= 0).map((p) => ERW_CODE[p.einheit] ?? "C62");
     vergleichText("E-Rechnung " + x.nummer, `Einheiten-Codes (BT-130) für ${[...new Set(x.r.pos.map((p) => p.einheit))].join(", ")}`, codes.join(","), soll.join(","), codes.join(",") !== soll.join(",") ? "„m“ und „Std.“ (übliche Schreibweise im Handwerk) werden nicht erkannt und als Stück (C62) übertragen (packages/fachlogik/src/erechnung.ts:135–139)." : "");
     if (x.steuerart === "reverse_charge") {
       vergleichText("E-Rechnung " + x.nummer, "Steuerkategorie AE und Befreiungsgrund VATEX-EU-AE (§ 13b)", /<cbc:ID>AE<\/cbc:ID>/.test(xml) && /VATEX-EU-AE/.test(xml) ? "ja" : "nein", "ja");
@@ -320,7 +321,10 @@ export function standBauen(): Bau {
   {
     const u = s.unterlagen.find((y) => y.daten.nummer === "2026-017")!;
     const w = v("rechnung").pruefen?.(u.daten, s.betrieb) ?? [];
-    vergleichText("Rechnung 2026-017 (Privatkunde, Gartenbeleuchtung)", "App weist auf den fehlenden Aufbewahrungshinweis (§ 14 Abs. 4 Nr. 9, § 14b Abs. 1 Satz 5 UStG) hin", w.some((x) => /aufbewahr|14b|Grundstück/i.test(x)) ? "ja" : "nein", "ja", "Die Rechnung an eine Privatperson über eine Leistung am Grundstück ist ohne den Hinweis teilbar; die App fragt nicht, ob der Empfänger eine Privatperson ist.");
+    // StB-Prüfung (C-3): Kunde als „Privatperson“ gemerkt, Schalter „Leistung an einem Grundstück“ im Handwerk vorbelegt –
+    // der Hinweis steht dann von selbst auf der Rechnung (oder die Prüfung meldet ihn)
+    const html = v("rechnung").html(u.daten, s.betrieb);
+    vergleichText("Rechnung 2026-017 (Privatkunde, Gartenbeleuchtung)", "App weist auf den fehlenden Aufbewahrungshinweis (§ 14 Abs. 4 Nr. 9, § 14b Abs. 1 Satz 5 UStG) hin bzw. setzt ihn", w.some((x) => /aufbewahr|14b|Grundstück/i.test(x)) || /zwei Jahre aufzubewahren/.test(html) ? "ja" : "nein", "ja", "Die Rechnung an eine Privatperson über eine Leistung am Grundstück ist ohne den Hinweis teilbar; die App fragt nicht, ob der Empfänger eine Privatperson ist.");
   }
 
   // ---------------------------------------------------------------- Zahlungserinnerung (2026-023, fällig 17.11.2026, erinnert am 01.12.2026)
@@ -703,6 +707,9 @@ export function standBauen(): Bau {
   uebersprungen.push(
     { id: "bilanz_guv", titel: v("bilanz_guv").titel, grund: "Einzelunternehmen ohne Handelsregistereintrag unter den Grenzen des § 141 AO – Gewinnermittlung per EÜR." },
     { id: "handelsregister", titel: v("handelsregister").titel, grund: "Kein Eintrag (kein e. K.)." },
+    // StB-Prüfung (5.2, C-9): OSS-Erklärung und Zusammenfassende Meldung (Übertragungshilfen, neu)
+    { id: "oss_meldung", titel: v("oss_meldung").titel, grund: "Nur Kunden im Inland – kein OSS-Verfahren." },
+    { id: "zm_meldung", titel: v("zm_meldung").titel, grund: "Keine innergemeinschaftlichen Lieferungen oder Leistungen an Unternehmen im EU-Ausland." },
     { id: "transparenzregister", titel: v("transparenzregister").titel, grund: "Gilt nicht für Einzelunternehmen." },
     { id: "kassenbuch", titel: v("kassenbuch").titel, grund: "Keine Bareinnahmen; die wenigen Bareinkäufe laufen über die Portokasse des Inhabers (Belege b38–b40)." },
     { id: "kassenmeldung", titel: v("kassenmeldung").titel, grund: "Keine elektronische Kasse." },

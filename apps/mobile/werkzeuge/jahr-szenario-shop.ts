@@ -531,9 +531,15 @@ export function standBauen(): Bau {
   }
   infos.push(`Pflichten-Check: Kasse laut Profil „${kassenLage(s.profil)}“ – ohne elektronische Kasse sagt die App bei der USt-Übernahme nichts zu fehlenden Shop- und Marktumsätzen (kassenHinweis gibt null zurück bzw. nur „Falls du …“).`);
 
-  // ---------------------------------------------------------------- OSS (gibt es in der App nicht – nur dokumentiert)
+  // ---------------------------------------------------------------- OSS (StB-Prüfung 5.2/C-9: Pflicht mit Frist im Check und Vorlage „OSS-Erklärung“)
+  // Die Fernverkäufe kommen aus dem Shop-Bericht (keine Rechnungen in der App) – die Inhaberin trägt sie je Land und Satz in die Vorlage ein.
   const oss = D.ossQuartale();
-  for (const q of oss) vergleichText(`OSS ${q.quartal}`, `Erklärung beim BZSt (${q.laender.map((z) => `${z.land} ${euro(z.netto)} € → ${euro(z.steuer)} €`).join(", ")}; Summe ${euro(q.steuer)} €)`, "keine Vorlage, keine Pflicht im Check", "Vorlage oder Pflicht");
+  const ossPflicht = auswertung(s.profil, "2026-10-01", s.unterlagen).gilt.find((p) => p.id === "steuern.oss_erklaerung");
+  for (const q of oss) {
+    const ossDaten: Daten = { zeitraum: q.quartal, umsaetze: q.laender.map((z) => ({ land: z.land, satz: String(D.LAENDER[z.land].satz), netto: euro(z.netto) })) };
+    const steuer = ausEuro(v("oss_meldung").ergebnis!(ossDaten)[1]![1]);
+    vergleichText(`OSS ${q.quartal}`, `Erklärung beim BZSt (${q.laender.map((z) => `${z.land} ${euro(z.netto)} € → ${euro(z.steuer)} €`).join(", ")}; Summe ${euro(q.steuer)} €)`, `Vorlage: Steuer ${euro(steuer)} €${ossPflicht ? ", Pflicht im Check" : ", keine Pflicht im Check"}`, `Vorlage: Steuer ${euro(q.steuer)} €, Pflicht im Check`);
+  }
 
   // ---------------------------------------------------------------- EÜR 2026 (Übernahme + Shop, Markt, OSS, USt-Zahlungen, AfA von Hand)
   const eu = D.euerUnabhaengig();
@@ -634,6 +640,9 @@ export function standBauen(): Bau {
     { id: "bilanz_guv", titel: v("bilanz_guv").titel, grund: "Einzelunternehmen ohne Handelsregistereintrag unter den Grenzen des § 141 AO – Gewinnermittlung durch EÜR." },
     { id: "kassenmeldung", titel: v("kassenmeldung").titel, grund: "Keine elektronische Kasse (offene Ladenkasse am Markt)." },
     { id: "gewerbeanmeldung", titel: v("gewerbeanmeldung").titel, grund: "Gewerbe seit 2023 angemeldet; nicht Teil des Jahres 2026." },
+    // StB-Prüfung (5.2, C-9): OSS-Erklärung und Zusammenfassende Meldung (Übertragungshilfen, neu)
+    { id: "oss_meldung", titel: v("oss_meldung").titel, grund: "Die Fernverkäufe stehen im Bericht des Shopsystems, nicht in Rechnungen der App – die Vorlage ist mit den Zahlen je Quartal gerechnet (Vergleich „OSS 2026-Q3/Q4“), das PDF ist hier nicht erzeugt." },
+    { id: "zm_meldung", titel: v("zm_meldung").titel, grund: "Eine innergemeinschaftliche Lieferung (Händler in Österreich) – die Meldung ist mit der Pflicht im Check abgedeckt; das PDF ist hier nicht erzeugt." },
     { id: "handelsregister", titel: v("handelsregister").titel, grund: "Einzelunternehmen ohne Eintragung." },
     { id: "transparenzregister", titel: v("transparenzregister").titel, grund: "Keine Gesellschaft." },
     { id: "datenpanne", titel: v("datenpanne").titel, grund: "Im Jahr 2026 gab es keine Datenpanne." },

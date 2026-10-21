@@ -1,7 +1,7 @@
 /**
  * „Meine Unterlagen“ – reine Funktionen für Filter, Suche und die Summe offener Rechnungen (ohne Gerät testbar).
  */
-import { eRechnungAus, fehlendeAngaben, kategorieFuer, summen, unterlagenName, vorlageFuer, zahlungsStand, type Beleg, type Betrieb, type Daten } from "@amtlos/fachlogik";
+import { eRechnungAus, fehlendeAngaben, kategorieFuer, unterlagenName, vorlageFuer, zahlbetrag, zahlungsStand, type Beleg, type Betrieb, type Daten } from "@amtlos/fachlogik";
 import { istGutschrift, offeneRechnungen } from "./ustAusRechnungen";
 import { nummerDoppelt, type Stand, type Unterlage } from "./speicher";
 
@@ -51,7 +51,8 @@ export function rechnungBrutto(u: Unterlage, betrieb: Betrieb): number {
   const da = bruttoZwischen.get(u.daten);
   if (da !== undefined) return da;
   const { daten } = eRechnungAus(u.daten, betrieb);
-  const c = summen(daten.positionen, daten.kleinunternehmer).brutto_cent * (daten.art === "storno" ? -1 : 1);
+  // StB-Prüfung (C-4): Schlussrechnung – zu zahlen ist der Rest nach den abgesetzten Abschlägen
+  const c = zahlbetrag(daten) * (daten.art === "storno" ? -1 : 1);
   bruttoZwischen.set(u.daten, c);
   return c;
 }

@@ -4,16 +4,18 @@
  * E-Bilanz, Kassenmeldung), erstellt die App als ausgefüllte Unterlage zum Übertragen – sie übermittelt nichts.
  * Gliederungen fachlich zu prüfen (T-58).
  */
-import { KU_HINWEIS, einheitFuerMenge, fehlendFuerERechnung, mengeUngueltig, rundeCent, summen, type Position, type RechnungsDaten } from "../rechnung.js";
-import { einheitCode } from "../erechnung.js";
+import { KU_HINWEIS, abschlagsSumme, einheitFuerMenge, fehlendFuerERechnung, mengeUngueltig, rundeCent, summen, type Abschlag, type Position, type RechnungsDaten } from "../rechnung.js";
+import { einheitBekannt, einheitCode } from "../erechnung.js";
 import { giroCodeSvg } from "../girocode.js";
 import { BUNDESLAENDER, StandardKalender, verschiebe, type Bundesland } from "@amtlos/fristen";
 import { EUER_ZEILE_STEUERFREI, EUER_ZEILE_STEUERPFLICHTIG, KATEGORIEN } from "../belege.js";
 import { istEuAusland } from "../buchungen.js";
 import { prozentText, skontoAus, skontoBetrag } from "../skonto.js";
+import { STEUERART_NULLSATZ } from "../steuerart.js";
+import { KUNDEN_ARTEN } from "./kundenarten.js";
 import { formImNamen, istKapitalgesellschaft } from "./betrieb.js";
 import { AUFBEWAHRUNG, EINHEITEN, EUER_AUSGABEN, EUER_EINNAHMEN, KASSEN_ARTEN, RECHNUNGS_HINWEISE, TSE_ARTEN } from "./bausteine.js";
-import { KOPF_LINIE, LINIE_MITTEL, ZELLE_LINIE, abschnitt, absatz, ankreuzen, anschrift, auswahl, brief, cent, datumDe, dokument, esc, euro, felder, ibanText, kennzahlen, nachsatz, uebertragung, ja, liste, neufassung, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
+import { KOPF_LINIE, LINIE_MITTEL, ZELLE_LINIE, abschnitt, absatz, angaben, ankreuzen, anschrift, auswahl, brief, cent, datumDe, dokument, esc, euro, felder, ibanText, kennzahlen, nachsatz, steuerHinweis, uebertragung, ja, liste, neufassung, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
 import type { Betrieb, Daten, Eintrag, Option, Vorlage } from "./typen.js";
 import { MARKE } from "@amtlos/marke";
 
@@ -31,11 +33,21 @@ export function faelligAm(iso: string, tage: number, bundesland = ""): string {
   return verschiebe(roh, { regel: "naechster_werktag", kalender: land ? "bundesland" : "bundeseinheitlich" }, { bundesland: land }, KALENDER).datum;
 }
 
+/**
+ * StB-Prüfung (B-2, C-12, Prio 1): eigener Wert für den Nullsteuersatz nach § 12 Abs. 3 UStG (Photovoltaik) – steuerpflichtig
+ * zu 0 % (Kz 87, XRechnung „Z“), nicht steuerfrei. Steuerart dazu: STEUERART_NULLSATZ („nullsatz“, steuerart.ts).
+ */
+export const SATZ_NULLSATZ = "nullsatz";
 const SAETZE = [
   { wert: "19", text: "19 %" },
   { wert: "7", text: "7 %" },
   { wert: "0", text: "0 % / steuerfrei" },
+  { wert: SATZ_NULLSATZ, text: "0 % (§ 12 Abs. 3 UStG)" },
 ];
+/** Steuersatz einer Position aus dem gespeicherten Wert: „19“, „7“, „0“, „nullsatz“ (= 0 %); leer = 19. */
+export const satzZahl = (w: string | null | undefined): number => (w === SATZ_NULLSATZ ? 0 : Number(w || "19"));
+/** Position zum Nullsteuersatz (§ 12 Abs. 3 UStG)? */
+const nullsatzPos = (e: Eintrag) => text(e, "satz") === SATZ_NULLSATZ;
 /** Hinweis bei steuerpflichtigen Leistungen im Zusammenhang mit einem Grundstück an Privatpersonen (§ 14 Abs. 4 Nr. 9 UStG). */
 const GRUNDSTUECK_HINWEIS = "Sie sind gesetzlich verpflichtet, diese Rechnung, einen Zahlungsbeleg oder eine andere beweiskräftige Unterlage zwei Jahre aufzubewahren (§ 14b Abs. 1 Satz 5 UStG).";
 const ZAHLUNGS_HINWEIS = "Bitte geben Sie bei der Zahlung die Rechnungsnummer an.";
@@ -63,8 +75,10 @@ const ZIEL: Record<string, string> = { sofort: "sofort ohne Abzug", "7": "innerh
 
 /** Hinweis auf die Steuerbefreiung – nur, wenn eine Position mit 0 % abgerechnet wird (sonst stünde er bei reinen 19-%-Rechnungen). */
 function befreiungText(d: Daten): string {
-  const nullProzent = liste(d, "positionen").some((e) => (text(e, "bezeichnung") || text(e, "preis")) && Number(text(e, "satz") || "19") === 0);
-  return nullProzent ? text(d, "befreiung") : "";
+  const pos = liste(d, "positionen").filter((e) => text(e, "bezeichnung") || text(e, "preis"));
+  const nullProzent = pos.some((e) => satzZahl(text(e, "satz")) === 0);
+  // Nullsteuersatz gewählt: der Hinweis steht auch ohne eigenen Text auf der Rechnung (Prio 1)
+  return nullProzent ? text(d, "befreiung") || (pos.some(nullsatzPos) && !kuFuer(d) ? NULLSATZ_HINWEIS : "") : "";
 }
 
 /**
@@ -90,6 +104,8 @@ const RC_IM_TEXT = /(?:§\s*)?13\s*b(?![a-z])/i;
 const NULLSATZ_IM_TEXT = /§\s*12\s*Abs\.?\s*3/;
 /** Vorschlag für den Hinweis bei Photovoltaik zum Nullsteuersatz */
 export const NULLSATZ_HINWEIS = "Nullsteuersatz nach § 12 Abs. 3 UStG (Photovoltaikanlage)";
+/** Nullsteuersatz und eine steuerfreie 0-%-Position auf derselben Rechnung: Kz 87 und Kz 48/43 lassen sich so nicht trennen. */
+export const RECHNUNG_NULLSATZ_GEMISCHT = "Nullsteuersatz (§ 12 Abs. 3 UStG) und steuerfreie Positionen auf derselben Rechnung – bitte getrennte Rechnungen schreiben, damit Voranmeldung (Kz 87) und E-Rechnung (Kategorie Z) stimmen.";
 export const istNullsatzText = (t: string | null | undefined) => NULLSATZ_IM_TEXT.test(t ?? "");
 
 /** Ist die Unterlage eine Gutschrift (Abrechnung durch den Leistungsempfänger)? */
@@ -143,7 +159,7 @@ function steuerartAus(d: Daten): NonNullable<RechnungsDaten["steuerart"]> {
   const befreiung = befreiungText(d);
   if (hw.includes("reverse_charge") || (befreiung && RC_IM_TEXT.test(befreiung))) return "reverse_charge";
   if (hw.includes("igl")) return "igl";
-  if (befreiung && NULLSATZ_IM_TEXT.test(befreiung)) return "nullsatz";
+  if ((befreiung && NULLSATZ_IM_TEXT.test(befreiung)) || (!kuFuer(d) && positionenRoh(d).some(nullsatzPos))) return STEUERART_NULLSATZ;
   return befreiung ? "befreit" : "standard";
 }
 
@@ -229,15 +245,89 @@ function preisFelder(d: Daten, roh: number, satz: number | null): Pick<Position,
   return { preis_cent: rundeCent((roh * 100) / (100 + satz)), brutto_cent: roh };
 }
 
+const positionenRoh = (d: Daten) => liste(d, "positionen").filter((e) => text(e, "bezeichnung") || text(e, "preis"));
+/** Steuersatz einer Position – bei OSS (5.2) der Satz des Bestimmungslands statt 19 % bzw. 7 %. */
+function satzFuer(d: Daten, e: Eintrag): number {
+  const s = satzZahl(text(e, "satz"));
+  const oss = ossSatz(d);
+  return oss !== null && s > 0 ? oss : s;
+}
+
 function positionen(d: Daten): { e: Eintrag; p: Position }[] {
   const ku = kuFuer(d);
-  return liste(d, "positionen")
-    .filter((e) => text(e, "bezeichnung") || text(e, "preis"))
+  return positionenRoh(d).map((e) => {
+    const satz = satzFuer(d, e);
+    return { e, p: { bezeichnung: text(e, "bezeichnung"), menge: zahl(text(e, "menge")) ?? 1, einheit: "stueck", ...preisFelder(d, cent(text(e, "preis")) ?? 0, ku ? null : satz), ust_satz: satz } };
+  });
+}
+
+// ---------------------------------------------------------------- StB-Prüfung Heckler und Busch (21.10.2026): Rechnungen
+
+/**
+ * C-3/C-13: Art des Empfängers am Kunden gemerkt – Unternehmen, Privatperson oder öffentliche Stelle. Privatperson mit
+ * Leistung an einem Grundstück: Hinweis auf die Aufbewahrungspflicht (§ 14 Abs. 4 Satz 1 Nr. 9, § 14b Abs. 1 Satz 5
+ * UStG) steht von selbst auf der Rechnung; öffentliche Stelle: Leitweg-ID als Käuferreferenz (BT-10) nötig.
+ */
+export { KUNDEN_ARTEN };
+const kundeArt = (d: Daten) => text(d, "kunde_art");
+/** Aufbewahrungshinweis aus dem Schalter „Leistung an einem Grundstück“ (nur Privatpersonen, nicht bei Kleinunternehmern). */
+const grundstueckAuto = (d: Daten) => kundeArt(d) === "privat" && ja(d, "grundstueck_bezug") && !kuFuer(d) && !text(d, "storno_zu") && !gutschriftD(d);
+/** Hinweis „Aufbewahrungspflicht“ – gewählt oder aus dem Schalter */
+export const mitGrundstueckHinweis = (d: Daten) => auswahl(d, "hinweise").includes("grundstueck") || grundstueckAuto(d);
+export const RECHNUNG_LEITWEG_FEHLT = "Leitweg-ID der öffentlichen Stelle (Käuferreferenz, BT-10)";
+/** Leitweg-ID: Grobadressierung (2–12 Ziffern), optional Feinadressierung, zweistellige Prüfziffer – z. B. 05913000-00012-37 */
+export const leitwegFormatOk = (t: string) => /^\d{2,12}(?:-[0-9A-Za-z]{1,30})?-\d{2}$/.test(t.trim());
+export const RECHNUNG_LEITWEG_FORMAT = "Die Leitweg-ID hat nicht das übliche Format (z. B. 05913000-00012-37: Grobadressierung, Feinadressierung, zweistellige Prüfziffer) – bitte mit der Angabe des Auftraggebers vergleichen.";
+
+/**
+ * 5.2/C-9: Fernverkauf bzw. Leistung an eine Privatperson im übrigen Gemeinschaftsgebiet mit der Umsatzsteuer des
+ * Bestimmungslands (One-Stop-Shop, § 3c, § 18j UStG). Satz in Prozent mit höchstens zwei Nachkommastellen, 0 < x < 50.
+ */
+export function ossSatz(d: Daten): number | null {
+  if (!ja(d, "oss") || kuFuer(d)) return null;
+  const t = text(d, "oss_satz").trim().replace(/\s*%$/, "").replace(",", ".");
+  if (!/^\d{1,2}(?:\.\d{1,2})?$/.test(t)) return null;
+  const x = Number(t);
+  return x > 0 && x < 50 ? x : null;
+}
+/** Land einer Privatperson im übrigen Gemeinschaftsgebiet (ohne USt-IdNr.) – sonst null. */
+export function euPrivatLand(d: Daten): string | null {
+  if (text(d, "kunde_ust_idnr").trim() || kundeArt(d) === "unternehmen" || kundeArt(d) === "oeffentlich") return null;
+  const a = anschriftZerlegen(text(d, "kunde_anschrift"));
+  return a.land && istEuAusland(a.land) ? a.land : null;
+}
+export const RECHNUNG_OSS_SATZ = "Steuersatz des Bestimmungslands (OSS) in Prozent, z. B. 20 für Österreich";
+export const RECHNUNG_OSS_LAND = "OSS nur für Privatpersonen im EU-Ausland: Land in der letzten Zeile der Anschrift (z. B. Österreich) prüfen; mit USt-IdNr. ist der Empfänger ein Unternehmen.";
+export const RECHNUNG_OSS_VORSCHLAG = (land: string) => `Empfänger ist eine Privatperson in ${land}: Liegen deine Fernverkäufe bzw. Leistungen an Privatpersonen im EU-Ausland im Vorjahr und im laufenden Jahr zusammen bei höchstens 10.000 € (§ 3c Abs. 4 UStG), gilt die deutsche Umsatzsteuer. Darüber – oder wenn du darauf verzichtest – gilt die Steuer von ${land}: dann „OSS“ einschalten und den Steuersatz dort angeben. OSS-Umsätze gehören in die OSS-Erklärung beim BZSt, nicht in die deutsche Voranmeldung.`;
+
+/** C-4: Schlussrechnung – die gestellten Abschlagsrechnungen werden abgesetzt (§ 14 Abs. 5 Satz 2 UStG, A 14.8 Abs. 10 UStAE). */
+const schlussD = (d: Daten) => ja(d, "schluss") && !text(d, "storno_zu") && !gutschriftD(d) && !ja(d, "abschlag");
+/** Abgesetzte Abschläge aus der Liste „abschlaege“; Umsatzsteuer aus dem Entgelt, wenn nicht eingetragen. */
+export function abschlaegeAus(d: Daten): Abschlag[] {
+  if (!schlussD(d)) return [];
+  const ku = kuFuer(d);
+  return liste(d, "abschlaege")
+    .filter((e) => text(e, "nummer") || text(e, "netto"))
     .map((e) => {
-      const satz = Number(text(e, "satz") || "19");
-      return { e, p: { bezeichnung: text(e, "bezeichnung"), menge: zahl(text(e, "menge")) ?? 1, einheit: "stueck", ...preisFelder(d, cent(text(e, "preis")) ?? 0, ku ? null : satz), ust_satz: satz } };
+      const netto = cent(text(e, "netto")) ?? 0;
+      const satz = ku ? null : satzZahl(text(e, "satz"));
+      const ust = ku ? 0 : (cent(text(e, "ust")) ?? rundeCent((netto * (satz ?? 0)) / 100));
+      return { nummer: text(e, "nummer").trim(), datum: isoAus(text(e, "datum")) ?? null, satz, netto_cent: netto, ust_cent: ust };
     });
 }
+export const RECHNUNG_SCHLUSS_LEER = "Schlussrechnung: Abschlagsrechnungen mit Nummer und Entgelt angeben (oder den Schalter „Schlussrechnung“ ausschalten)";
+export const RECHNUNG_SCHLUSS_HOCH = "Schlussrechnung: Die abgesetzten Abschläge sind höher als der Rechnungsbetrag – bitte prüfen.";
+export const RECHNUNG_SCHLUSS_SATZ = "Schlussrechnung: Ein Abschlag hat einen Steuersatz, der in den Positionen nicht vorkommt – bitte prüfen.";
+
+/** B-12/C-8: Gutschriften mit eigenem Nummernkreis („GS-“), getrennt von den Rechnungsnummern. */
+export const GUTSCHRIFT_PRAEFIX = "GS-";
+export const istGutschriftNummer = (n: string) => /^GS[-/ ]/i.test(n.trim());
+export const RECHNUNG_GUTSCHRIFT_NUMMER = `Für Gutschriften empfiehlt sich ein eigener Nummernkreis, z. B. ${GUTSCHRIFT_PRAEFIX}${new Date().getFullYear()}-001 – getrennt von deinen Rechnungsnummern. Die nächste Gutschrift zählt dann darin weiter.`;
+/** C-17: Einheiten ohne eigenen Code in der E-Rechnung (dort Stück, C62). */
+export const RECHNUNG_EINHEIT_CODE = (e: string[]) => `Einheit ${e.map((x) => `„${x}“`).join(", ")} kennt die E-Rechnung nicht – sie wird dort als Stück (C62) übertragen. Übliche Einheiten wie Stunde, Tag, Meter, Pauschale, kg oder Liter haben einen eigenen Code.`;
+
+/** C-6: Ersatzrechnung – ersetzt eine stornierte Rechnung; die Änderung wirkt im Zeitraum des Stornos (§ 17 UStG). */
+const ersetztNummer = (d: Daten) => (!text(d, "storno_zu") ? text(d, "ersetzt_nummer").trim() : "");
 
 /** Verständliche Bezeichnungen für fehlendFuerERechnung */
 const E_FEHLT: Record<string, string> = {
@@ -391,7 +481,7 @@ export function eRechnungAus(d: Daten, b: Betrieb): { daten: RechnungsDaten; feh
     leistungsdatum,
     ...(leistungsdatum ? {} : { leistungszeitraum: leistungszeitraumAus(text(d, "leistung")) }),
     faellig_am: datum && ziel && ziel !== "sofort" ? faelligAm(datum, Number(ziel), b.bundesland) || null : null,
-    steller: { name: b.name.trim(), strasse: b.strasse.trim(), plz: b.plz.trim(), ort: b.ort.trim(), land: "DE", email: b.email.trim(), telefon: b.telefon.trim() || null, steuernummer: b.steuernummer.trim() || null, ust_idnr: b.ust_idnr.trim() || null, iban: b.iban.trim() || null },
+    steller: { name: b.name.trim(), strasse: b.strasse.trim(), plz: b.plz.trim(), ort: b.ort.trim(), land: "DE", email: b.email.trim(), telefon: b.telefon.trim() || null, steuernummer: b.steuernummer.trim() || null, ust_idnr: b.ust_idnr.trim() || null, iban: b.iban.trim() || null, ...registerAngaben(b) },
     // Leitweg-ID bzw. Käuferreferenz (BT-10), ohne sie wie bisher die Rechnungsnummer
     kunde: {
       name: text(d, "kunde_name"), strasse: a.strasse, plz: a.plz, ort: a.ort, land: a.land ?? "DE", email: text(d, "kunde_email") || null, ust_idnr: text(d, "kunde_ust_idnr") || null, kaeufer_referenz: text(d, "kunde_leitweg_id").trim() || null, geschaeftskunde: true,
@@ -404,7 +494,7 @@ export function eRechnungAus(d: Daten, b: Betrieb): { daten: RechnungsDaten; feh
     positionen: pos.map((e) => {
       const preis = cent(text(e, "preis")) ?? 0;
       // Storno: die Positionen tragen schon das umgedrehte Vorzeichen; `art: "storno"` dreht es für USt und XRechnung zurück
-      const satz = ku ? null : Number(text(e, "satz") || "19");
+      const satz = ku ? null : satzFuer(d, e);
       return { bezeichnung: text(e, "bezeichnung"), menge: zahl(text(e, "menge")) ?? 1, einheit: "stueck" as const, einheit_code: einheitCode(text(e, "einheit")), ...preisFelder(d, storno ? -preis : preis, satz), ust_satz: satz };
     }),
     kleinunternehmer: ku,
@@ -414,8 +504,14 @@ export function eRechnungAus(d: Daten, b: Betrieb): { daten: RechnungsDaten; feh
     befreiungsgrund: befreiung || null,
     // R12: Skonto (BT-20) – nicht für schon Bezahltes
     ...(skontoFuer(d, b.bundesland) && !(isoAus(text(d, "bezahlt_am")) && isoAus(text(d, "bezahlt_am"))! <= datum) ? { skonto: skontoFuer(d, b.bundesland) } : {}),
+    // StB-Prüfung: Schlussrechnung (C-4), Ersatzrechnung (C-6), OSS (5.2)
+    ...(abschlaegeAus(d).length ? { abschlaege: abschlaegeAus(d) } : {}),
+    ...(ersetztNummer(d) ? { ersetzt_nummer: ersetztNummer(d) } : {}),
+    ...(ossSatz(d) !== null && a.land ? { oss: { land: a.land, satz: ossSatz(d)! } } : {}),
   };
   const fehlt = fehlendFuerERechnung(daten).map((c) => E_FEHLT[c] ?? c);
+  // C-13: öffentliche Stelle ohne Leitweg-ID – die Eingangsplattformen weisen die XRechnung zurück
+  if (kundeArt(d) === "oeffentlich" && !gutschrift && !text(d, "kunde_leitweg_id").trim()) fehlt.push(RECHNUNG_LEITWEG_FEHLT);
   if (!a.land && a.plz) fehlt.push(E_LAND_FEHLT);
   if (!daten.nummer) fehlt.unshift("Rechnungsnummer");
   if (!datum) fehlt.unshift("Rechnungsdatum");
@@ -423,8 +519,20 @@ export function eRechnungAus(d: Daten, b: Betrieb): { daten: RechnungsDaten; feh
 }
 
 /** Art der Rechnung aus den Daten: Stornorechnung (storniert eine andere), Gutschrift (Hinweis „gutschrift“) oder Rechnung. */
-export function rechnungsTitel(d: Daten): "Rechnung" | "Stornorechnung" | "Gutschrift" | "Abschlagsrechnung" {
-  return text(d, "storno_zu") ? "Stornorechnung" : auswahl(d, "hinweise").includes("gutschrift") ? "Gutschrift" : ja(d, "abschlag") ? "Abschlagsrechnung" : "Rechnung";
+export function rechnungsTitel(d: Daten): "Rechnung" | "Stornorechnung" | "Gutschrift" | "Abschlagsrechnung" | "Schlussrechnung" {
+  return text(d, "storno_zu") ? "Stornorechnung" : auswahl(d, "hinweise").includes("gutschrift") ? "Gutschrift" : ja(d, "abschlag") ? "Abschlagsrechnung" : schlussD(d) ? "Schlussrechnung" : "Rechnung";
+}
+
+/**
+ * C-14: Registerangaben einer Gesellschaft für die E-Rechnung – BT-30 (Registernummer) und BT-33 (Rechtsform, Sitz,
+ * Registergericht, Geschäftsführung, § 35a GmbHG). Nur mit eingetragener Registernummer.
+ */
+function registerAngaben(b: Betrieb): { register?: string; rechtliches?: string } {
+  const nr = (b.registernummer ?? "").trim();
+  if (!nr) return {};
+  const form = (formImNamen(b.rechtsform ?? "") ?? formImNamen(b.name) ?? (b.rechtsform ?? "").trim()) || "";
+  const teile = [form, b.ort.trim() ? `Sitz ${b.ort.trim()}` : "", [(b.registergericht ?? "").trim(), nr].filter(Boolean).join(" "), (b.vertretung ?? "").trim() ? `Geschäftsführung: ${(b.vertretung ?? "").trim().replace(/\s*\n\s*/g, ", ")}` : ""].filter(Boolean);
+  return { register: nr, rechtliches: teile.join(", ") };
 }
 
 
@@ -450,10 +558,11 @@ export const rechnung: Vorlage = {
   id: "rechnung",
   gestalt: "brief",
   titel: "Rechnung",
-  beschreibung: "Rechnung mit allen Pflichtangaben nach § 14 Abs. 4 UStG – Positionen, Steuersätze, Zahlungsziel und Pflichthinweise zum Auswählen.",
+  // StB-Prüfung (C-1): „mit den Pflichtangaben nach § 14 UStG“ – Voraussetzung ist, dass Kundenart und Leistung richtig gewählt sind
+  beschreibung: "Rechnung mit den Pflichtangaben nach § 14 UStG – Positionen, Steuersätze, Zahlungsziel und Pflichthinweise zum Auswählen.",
   bereich: "steuern",
   pflichten: ["steuern.rechnungen_pflichtangaben"],
-  person: { art: "kunde", felder: { name: "kunde_name", anschrift: "kunde_anschrift", email: "kunde_email", ust_idnr: "kunde_ust_idnr", leitweg_id: "kunde_leitweg_id", steuernummer: "kunde_steuernummer" } },
+  person: { art: "kunde", felder: { name: "kunde_name", anschrift: "kunde_anschrift", email: "kunde_email", ust_idnr: "kunde_ust_idnr", leitweg_id: "kunde_leitweg_id", steuernummer: "kunde_steuernummer", art: "kunde_art" } },
   fortlaufend: "nummer",
   kundendokument: true,
   festschreiben: true,
@@ -483,6 +592,21 @@ export const rechnung: Vorlage = {
         { id: "bestellnummer", selten: true, art: "text", label: "Bestellnummer des Kunden", hilfe: "steht auf der Rechnung und in der E-Rechnung (BT-13)" },
         { id: "anlage", selten: true, art: "text", label: "Anlage", hilfe: "steht als „Anlage: …“ unter der Rechnung, z. B. Tourenliste oder Stundenzettel – die Datei selbst schickst du mit", vorschlaege: ["Tourenliste", "Stundenzettel", "Aufmaß", "Leistungsnachweis"] },
         { id: "abschlag", selten: true, art: "schalter", label: "Abschlagsrechnung (Anzahlung vor Fertigstellung)", hilfe: "Die Umsatzsteuer entsteht mit der Zahlung (§ 13 Abs. 1 Nr. 1 a Satz 4 UStG) – in der Voranmeldung zählt die Rechnung im Zeitraum des Zahlungseingangs. Als Leistungsdatum das voraussichtliche Datum angeben, nicht das Rechnungsdatum." },
+        // StB-Prüfung (C-4): Schlussrechnung setzt die Abschläge mit Entgelt und Steuer ab (§ 14 Abs. 5 Satz 2 UStG)
+        { id: "schluss", selten: true, art: "schalter", label: "Schlussrechnung (Abschläge absetzen)", hilfe: "Die Positionen nennen die gesamte Leistung; darunter werden die Abschlagsrechnungen mit Entgelt und Umsatzsteuer abgesetzt (§ 14 Abs. 5 Satz 2 UStG, A 14.8 Abs. 10 UStAE) – sonst schuldest du die Steuer der Abschläge doppelt (§ 14c UStG). In der Voranmeldung zählt nur der Rest; die Abschläge sind mit ihrer Zahlung schon versteuert.", wenn: { feld: "abschlag", nicht: true } },
+        {
+          id: "abschlaege", art: "liste", label: "Abgesetzte Abschlagsrechnungen", eintrag: "Abschlagsrechnung", titelFeld: "nummer", leerStarten: true, wenn: { feld: "schluss" },
+          hilfe: "je Abschlagsrechnung Nummer, Datum, Entgelt (netto) und Steuersatz – die Umsatzsteuer rechnet die App, wenn du sie nicht einträgst",
+          felder: [
+            { id: "nummer", art: "text", label: "Nummer der Abschlagsrechnung", pflicht: true },
+            { id: "datum", art: "datum", label: "Datum der Abschlagsrechnung" },
+            { id: "netto", art: "betrag", label: "Entgelt netto (€)", pflicht: true },
+            { id: "satz", art: "wahl", label: "Umsatzsteuer", optionen: SAETZE.filter((x) => x.wert !== SATZ_NULLSATZ), vorbelegung: "19" },
+            { id: "ust", art: "betrag", label: "Umsatzsteuer (€)", hilfe: "wie auf der Abschlagsrechnung; leer: Entgelt × Steuersatz" },
+          ],
+        },
+        // StB-Prüfung (C-6): Ersatzrechnung nach Storno – die Korrektur wirkt im Zeitraum des Stornos (§ 17 UStG)
+        { id: "ersetzt_nummer", selten: true, art: "text", label: "Ersetzt die stornierte Rechnung Nr.", hilfe: "Bei einer korrigierten Rechnung nach einem Storno: In der Voranmeldung zählt sie als Korrektur im Zeitraum des Stornos, nicht als neue Leistung (§ 17 UStG). Beim „Kopieren“ einer stornierten Rechnung trägt die App die Nummer selbst ein." },
       ],
     },
     {
@@ -491,6 +615,9 @@ export const rechnung: Vorlage = {
         { id: "kunde_name", art: "text", label: "Name oder Firma", pflicht: true },
         { id: "kunde_anschrift", art: "mehrzeilig", label: "Anschrift", hilfe: "Straße und Hausnummer, PLZ und Ort – im Ausland das Land in die letzte Zeile", pflicht: true },
         { id: "kunde_email", art: "text", label: "E-Mail des Empfängers", hilfe: "nötig für die E-Rechnung an Unternehmen" },
+        // StB-Prüfung (C-3, C-13): Art des Empfängers – wird beim Kunden gemerkt
+        { id: "kunde_art", art: "wahl", label: "Empfänger ist", optionen: KUNDEN_ARTEN, hilfe: "Privatperson: bei Leistungen an einem Grundstück steht der Hinweis auf die zweijährige Aufbewahrungspflicht auf der Rechnung (§ 14 Abs. 4 Satz 1 Nr. 9 UStG). Öffentliche Stelle: Für die E-Rechnung ist die Leitweg-ID Pflicht. Wird beim Kunden gemerkt." },
+        { id: "grundstueck_bezug", art: "schalter", label: "Leistung an einem Grundstück (Haus, Wohnung, Garten)", hilfe: "z. B. Elektroinstallation, Reparatur, Einbau, Gartenanlage, Reinigung einer Wohnung: Dann steht der Hinweis auf die zweijährige Aufbewahrungspflicht der Privatperson auf der Rechnung (§ 14b Abs. 1 Satz 5 UStG).", vorbelegungJe: { handwerk_allgemein: true, gebaeudereinigung: true }, wenn: { feld: "kunde_art", ist: "privat" } },
         { id: "anrede", selten: true, art: "text", label: "Anrede", hilfe: `Steht über dem Text der Rechnung; leer: an Privatpersonen „Guten Tag“ mit dem Namen, sonst „${ANREDE_STANDARD}“`, vorschlaege: [ANREDE_STANDARD, "Sehr geehrte Frau …", "Sehr geehrter Herr …", "Guten Tag …", "Hallo …"] },
         { id: "kunde_ust_idnr", selten: true, art: "text", label: "USt-IdNr. des Empfängers", hilfe: "nur bei innergemeinschaftlichen Leistungen oder Steuerschuldnerschaft des Empfängers; bei Gutschriften die des Leistenden" },
         { id: "kunde_leitweg_id", selten: true, art: "text", label: "Leitweg-ID bzw. Käuferreferenz", hilfe: "bei Behörden und Kommunen Pflicht für die E-Rechnung (z. B. 05913000-00012-37); wird beim Kunden gemerkt" },
@@ -529,6 +656,9 @@ export const rechnung: Vorlage = {
       felder: [
         // aus dem Pflichten-Check vorbelegt (ausProfil) – daher unter „Weitere Angaben“; eingeschaltet steht er ohnehin da
         { id: "kleinunternehmer", selten: true, art: "schalter", label: "Kleinunternehmer (§ 19 UStG)", hilfe: "Dann wird keine Umsatzsteuer ausgewiesen; der Hinweis auf die Steuerbefreiung steht auf der Rechnung." },
+        // StB-Prüfung (5.2, C-9): Fernverkauf an Privatpersonen im EU-Ausland über der Schwelle – Steuer des Bestimmungslands
+        { id: "oss", selten: true, art: "schalter", label: "OSS – Umsatzsteuer des Bestimmungslands (Privatperson im EU-Ausland)", hilfe: "Für Fernverkäufe und bestimmte Leistungen an Privatpersonen im EU-Ausland, wenn sie EU-weit im Vorjahr oder im laufenden Jahr über 10.000 € liegen (§ 3c Abs. 4 UStG) oder du auf die Schwelle verzichtest. Die Positionen mit Umsatzsteuer tragen dann den Steuersatz des Bestimmungslands; die Rechnung gehört in die OSS-Erklärung beim BZSt, nicht in die deutsche Voranmeldung.", wenn: { feld: "kleinunternehmer", nicht: true } },
+        { id: "oss_satz", art: "zahl", label: "Steuersatz im Bestimmungsland (%)", hilfe: "z. B. 20 (Österreich), 21 (Niederlande, Belgien), 20 (Frankreich) – ermäßigte Sätze je nach Ware", pflicht: true, wenn: { feld: "oss" } },
         { id: "leistender_steuer", selten: true, art: "wahl", label: "Umsatzsteuer des Leistenden (bei Gutschrift)", optionen: [{ wert: "regel", text: "weist Umsatzsteuer aus" }, { wert: "ku", text: "Kleinunternehmer (§ 19 UStG)" }], hilfe: "Bei einer Gutschrift richtet sich die Umsatzsteuer nach dem Leistenden, nicht nach dir. Ohne Auswahl gilt der Schalter „Kleinunternehmer“.", wenn: { feld: "hinweise", ist: "gutschrift" } },
         // R12 (Coach #18): bei Kleinunternehmern keine innergemeinschaftliche Lieferung; Steuerschuldnerschaft nur mit USt-IdNr. des Empfängers (EU-Ausland)
         { id: "hinweise", selten: true, art: "bausteine", label: "Pflichthinweise, falls zutreffend", optionen: [...RECHNUNGS_HINWEISE.filter((h) => h.wert !== "steuerfrei").map((h): Option => ({ wert: h.wert, text: h.wert === "gutschrift" ? GUTSCHRIFT_AUSWAHL : h.text, quelle: h.quelle, ...(KU_OHNE[h.wert] ? { wenn: KU_OHNE[h.wert] } : {}) })), { wert: "grundstueck", text: GRUNDSTUECK_HINWEIS, quelle: "§ 14 Abs. 4 Nr. 9, § 14b Abs. 1 Satz 5 UStG", wenn: { feld: "kleinunternehmer", nicht: true } }] },
@@ -547,6 +677,12 @@ export const rechnung: Vorlage = {
     [RECHNUNG_SKONTO_FALSCH]: "skonto_prozent",
     [RECHNUNG_SKONTO_FRIST]: "skonto_tage",
     [RECHNUNG_SKONTO_HOCH]: "skonto_prozent",
+    [RECHNUNG_NULLSATZ_GEMISCHT]: "positionen",
+    [RECHNUNG_OSS_SATZ]: "oss_satz",
+    [RECHNUNG_OSS_LAND]: "kunde_anschrift",
+    [RECHNUNG_SCHLUSS_LEER]: "abschlaege",
+    [RECHNUNG_SCHLUSS_HOCH]: "abschlaege",
+    [RECHNUNG_LEITWEG_FEHLT]: "kunde_leitweg_id",
     // was der E-Rechnung fehlt (eRechnungAus) – für „Ergänzen“ unter „Für die E-Rechnung fehlt noch“
     [E_FEHLT["kunde.anschrift"]!]: "kunde_anschrift",
     [E_LAND_FEHLT]: "kunde_anschrift",
@@ -594,8 +730,20 @@ export const rechnung: Vorlage = {
       else if (brutto < 0) f.push(RECHNUNG_NEGATIV);
     }
     if (pos.some((x) => mengeUngueltig(x.p.menge))) f.push(RECHNUNG_MENGE);
-    const nullProzent = positionen(d).some((x) => x.p.ust_satz === 0);
+    // Nullsteuersatz trägt seinen Hinweis selbst – Pflicht ist der Befreiungshinweis nur für steuerfreie 0-%-Positionen
+    const nullProzent = positionenRoh(d).some((e) => satzZahl(text(e, "satz")) === 0 && !nullsatzPos(e));
     if (nullProzent && !kuFuer(d) && !text(d, "befreiung") && !auswahl(d, "hinweise").some((h) => h === "reverse_charge" || h === "igl")) f.push("Hinweis auf die Steuerbefreiung (bei 0 %)");
+    // StB-Prüfung: Nullsteuersatz nicht mit steuerfreien Positionen mischen; OSS mit Satz und Land; Schlussrechnung mit Abschlägen
+    if (!kuFuer(d) && nullProzent && positionenRoh(d).some(nullsatzPos)) f.push(RECHNUNG_NULLSATZ_GEMISCHT);
+    if (ja(d, "oss") && !kuFuer(d) && !text(d, "storno_zu")) {
+      if (ossSatz(d) === null && text(d, "oss_satz").trim()) f.push(RECHNUNG_OSS_SATZ);
+      if (text(d, "kunde_anschrift").trim() && !euPrivatLand(d)) f.push(RECHNUNG_OSS_LAND);
+    }
+    if (schlussD(d)) {
+      const ab = abschlaegeAus(d);
+      if (!ab.length) f.push(RECHNUNG_SCHLUSS_LEER);
+      else if (pos.length && abschlagsSumme(ab).brutto_cent > summen(pos.map((x) => x.p), kuFuer(d)).brutto_cent) f.push(RECHNUNG_SCHLUSS_HOCH);
+    }
     // R11: Steuerschuldnerschaft bzw. igL mit Umsatzsteuer in den Positionen – Widerspruch (§ 14c Abs. 1 UStG); nicht bei Gutschriften und Kleinunternehmern
     if (!kuFuer(d) && !gutschriftD(d) && auswahl(d, "hinweise").some((h) => h === "reverse_charge" || h === "igl") && pos.some((x) => (x.p.ust_satz ?? 0) > 0)) f.push(RECHNUNG_RC_MIT_UST);
     if (ja(d, "abschlag") && leistungGleich(d) && !text(d, "storno_zu")) f.push(RECHNUNG_ABSCHLAG_LEISTUNG);
@@ -611,7 +759,13 @@ export const rechnung: Vorlage = {
     const gutschrift = istGutschriftD(d);
     const befreiung = befreiungText(d);
     if (befreiung && RC_IM_TEXT.test(befreiung) && !hw.includes("reverse_charge")) h.push(RECHNUNG_13B_TEXT);
-    if (!gutschrift && istOeffentlicherEmpfaenger(text(d, "kunde_name")) && !text(d, "kunde_leitweg_id").trim()) h.push(RECHNUNG_LEITWEG);
+    if (!gutschrift && kundeArt(d) !== "oeffentlich" && kundeArt(d) !== "privat" && istOeffentlicherEmpfaenger(text(d, "kunde_name")) && !text(d, "kunde_leitweg_id").trim()) h.push(RECHNUNG_LEITWEG);
+    // StB-Prüfung (C-13): Leitweg-ID im üblichen Format; (B-12) eigener Nummernkreis für Gutschriften; (C-17) Einheiten ohne Code
+    if (!gutschrift && text(d, "kunde_leitweg_id").trim() && kundeArt(d) === "oeffentlich" && !leitwegFormatOk(text(d, "kunde_leitweg_id"))) h.push(RECHNUNG_LEITWEG_FORMAT);
+    if (gutschrift && text(d, "nummer").trim() && !istGutschriftNummer(text(d, "nummer"))) h.push(RECHNUNG_GUTSCHRIFT_NUMMER);
+    const ohneCode = [...new Set(positionenRoh(d).map((e) => text(e, "einheit").trim()).filter((x) => x && !einheitBekannt(x)))];
+    if (ohneCode.length && kundeArt(d) !== "privat") h.push(RECHNUNG_EINHEIT_CODE(ohneCode));
+    if (schlussD(d) && abschlaegeAus(d).some((a) => !positionen(d).some((x) => (kuFuer(d) ? null : x.p.ust_satz) === a.satz))) h.push(RECHNUNG_SCHLUSS_SATZ);
     const eu = euUnternehmenLand(d);
     const rcOderIgl = hw.includes("reverse_charge") || hw.includes("igl");
     if (!gutschrift) {
@@ -633,7 +787,11 @@ export const rechnung: Vorlage = {
       if (sk && /^\d+$/.test(text(d, "zahlungsziel")) && sk.tage >= Number(text(d, "zahlungsziel"))) h.push(RECHNUNG_SKONTO_FRIST);
       if (sk && sk.prozent > 10) h.push(RECHNUNG_SKONTO_HOCH);
       // R12 (Kfz #11, Bäckerei #14): nur Bau und Ausbau, nur an Privatpersonen, nicht bei Fahrzeug-Leistungen
-      if (extra?.handwerk && !ku && !hw.includes("grundstueck") && !text(d, "kunde_ust_idnr").trim() && !text(d, "storno_zu") && !istOeffentlicherEmpfaenger(text(d, "kunde_name")) && !FIRMA.test(text(d, "kunde_name")) && !FAHRZEUG.test(b.name) && !positionen(d).some((x) => FAHRZEUG.test(x.p.bezeichnung)) && positionen(d).some((x) => (x.p.ust_satz ?? 0) > 0)) h.push(RECHNUNG_GRUNDSTUECK_VORSCHLAG);
+      // 5.2: Privatperson im EU-Ausland ohne OSS – auf die Lieferschwelle hinweisen
+      const euPrivat = euPrivatLand(d);
+      if (!ku && euPrivat && !ja(d, "oss") && !text(d, "storno_zu") && positionen(d).some((x) => (x.p.ust_satz ?? 0) > 0)) h.push(RECHNUNG_OSS_VORSCHLAG(euPrivat));
+      // C-3: mit „Empfänger ist Privatperson“ entscheidet der Schalter „Leistung an einem Grundstück“ – kein Vorschlag mehr
+      if (extra?.handwerk && !ku && !hw.includes("grundstueck") && !kundeArt(d) && !text(d, "kunde_ust_idnr").trim() && !text(d, "storno_zu") && !istOeffentlicherEmpfaenger(text(d, "kunde_name")) && !FIRMA.test(text(d, "kunde_name")) && !FAHRZEUG.test(b.name) && !positionen(d).some((x) => FAHRZEUG.test(x.p.bezeichnung)) && positionen(d).some((x) => (x.p.ust_satz ?? 0) > 0)) h.push(RECHNUNG_GRUNDSTUECK_VORSCHLAG);
       // R12 (Bäckerei #15): „Lieferung Oktober“ – Leistungszeitraum statt Rechnungsdatum?
       const monat = leistungGleich(d) && !text(d, "storno_zu") ? positionen(d).map((x) => MONAT_IM_TEXT.exec(x.p.bezeichnung)?.[1]).find(Boolean) : undefined;
       if (monat) h.push(RECHNUNG_MONAT_ZEITRAUM(monat[0]!.toLocaleUpperCase("de") + monat.slice(1).toLocaleLowerCase("de")));
@@ -646,7 +804,10 @@ export const rechnung: Vorlage = {
     const ku = kuFuer(d);
     const s = summen(positionen(d).map((x) => x.p), ku);
     // Kleinunternehmer: ohne Umsatzsteuer gibt es kein „Netto“ (R10, Befund Freiberuf)
-    return ku ? [["Rechnungsbetrag", euro(s.brutto_cent)]] : [["Netto", euro(s.netto_cent)], ["Umsatzsteuer", euro(s.ust_cent)], ["Rechnungsbetrag", euro(s.brutto_cent)]];
+    const ab = abschlagsSumme(abschlaegeAus(d));
+    const basis: [string, string][] = ku ? [["Rechnungsbetrag", euro(s.brutto_cent)]] : [["Netto", euro(s.netto_cent)], ["Umsatzsteuer", euro(s.ust_cent)], ["Rechnungsbetrag", euro(s.brutto_cent)]];
+    // C-4: Schlussrechnung – abgesetzte Abschläge und Rest
+    return ab.brutto_cent ? [...basis, ["abzüglich Abschläge", euro(-ab.brutto_cent)], ["Noch zu zahlen", euro(s.brutto_cent - ab.brutto_cent)]] : basis;
   },
   html(d, b) {
     const ku = kuFuer(d);
@@ -658,6 +819,10 @@ export const rechnung: Vorlage = {
     const storno = text(d, "storno_zu");
     // Gutschrift (§ 14 Abs. 2 Satz 2 UStG): der Leistungsempfänger rechnet ab und zahlt – keine Zahlungsaufforderung
     const gutschrift = auswahl(d, "hinweise").includes("gutschrift");
+    // C-4: Schlussrechnung – abgesetzte Abschläge und der Rest, der noch zu zahlen ist
+    const ab = abschlaegeAus(d);
+    const abSumme = abschlagsSumme(ab);
+    const zuZahlen = s.brutto_cent - abSumme.brutto_cent;
     const zeilenHtml = pos.map(({ e, p }, i) => [
       String(i + 1),
       zelle(p.bezeichnung),
@@ -673,7 +838,20 @@ export const rechnung: Vorlage = {
       // leere Vorlage: Zeile für die Umsatzsteuer mit Steuersatz zum Eintragen
       ...(leer && !ku ? [`<tr><td>Umsatzsteuer <span class="fuellen kurz"></span> %</td><td>&nbsp;</td></tr>`] : []),
       // Kleinbetragsrechnung (§ 33 Satz 1 Nr. 4 UStDV): der Steuersatz steht beim Gesamtbetrag („inkl. 19 % USt“)
-      `<tr class="gesamt"><td>${gutschrift ? "Gutschriftsbetrag" : !ku && !leer && kleinbetrag(d) && s.gruppen.length === 1 && (s.gruppen[0]!.satz ?? 0) > 0 ? `Rechnungsbetrag inkl. ${s.gruppen[0]!.satz} % USt` : "Rechnungsbetrag"}</td><td>${betrag(s.brutto_cent)}</td></tr>`,
+      ab.length
+        ? `<tr><td>Gesamtbetrag der Leistung</td><td>${betrag(s.brutto_cent)}</td></tr>`
+        : `<tr class="gesamt"><td>${gutschrift ? "Gutschriftsbetrag" : !ku && !leer && kleinbetrag(d) && s.gruppen.length === 1 && (s.gruppen[0]!.satz ?? 0) > 0 ? `Rechnungsbetrag inkl. ${s.gruppen[0]!.satz} % USt` : "Rechnungsbetrag"}</td><td>${betrag(s.brutto_cent)}</td></tr>`,
+      // C-4: Schlussrechnung – je Abschlag Entgelt und Umsatzsteuer getrennt absetzen (§ 14 Abs. 5 Satz 2 UStG)
+      ...ab.flatMap((a) => [
+        `<tr><td>abzüglich Abschlagsrechnung Nr. ${esc(a.nummer)}${a.datum ? ` vom ${datumDe(a.datum)}` : ""}: Entgelt</td><td>${euro(-a.netto_cent)}</td></tr>`,
+        ...(ku ? [] : [`<tr><td>abzüglich darauf entfallende Umsatzsteuer${a.satz !== null ? ` ${a.satz} %` : ""}</td><td>${euro(-a.ust_cent)}</td></tr>`]),
+      ]),
+      ...(ab.length
+        ? [
+            ...(ku ? [] : [`<tr><td>Verbleibendes Entgelt ${euro(s.netto_cent - abSumme.netto_cent)}, darauf Umsatzsteuer</td><td>${euro(s.ust_cent - abSumme.ust_cent)}</td></tr>`]),
+            `<tr class="gesamt"><td>Noch zu zahlen</td><td>${euro(zuZahlen)}</td></tr>`,
+          ]
+        : []),
     ].join("");
     const leistung = text(d, "leistung");
     const datum = text(d, "datum");
@@ -683,7 +861,7 @@ export const rechnung: Vorlage = {
     const schonBezahlt = !storno && !gutschrift && !leer && !!bezahltAm && !!datum && bezahltAm <= datum;
     const zahlbar = !storno && !gutschrift && !schonBezahlt;
     // Zahlungsaufforderung mit Verwendungszweck „Rechnung <Nummer>“ (unten, bei hinterlegter IBAN)
-    const mitVerwendungszweck = zahlbar && !!b.iban.trim() && (s.brutto_cent > 0 || leer);
+    const mitVerwendungszweck = zahlbar && !!b.iban.trim() && (zuZahlen > 0 || leer);
     const befreiung = befreiungText(d);
     // Kleinunternehmer mit Leistung an ein Unternehmen im EU-Ausland: Hinweis auf die Steuerschuldnerschaft statt § 19 (der Baustein steht unten)
     const kuRc = ku && auswahl(d, "hinweise").includes("reverse_charge");
@@ -692,14 +870,16 @@ export const rechnung: Vorlage = {
       ...(ku && !kuRc ? [KU_HINWEIS] : []),
       // „Gutschrift“ steht schon als Titel im Betreff
       ...auswahl(d, "hinweise").filter((w) => !(w === "gutschrift" && !storno)).map((w) => (w === "grundstueck" ? GRUNDSTUECK_HINWEIS : (RECHNUNGS_HINWEISE.find((h) => h.wert === w)?.text ?? ""))),
+      // C-3: Privatperson mit Leistung an einem Grundstück – Aufbewahrungshinweis ohne eigene Auswahl
+      grundstueckAuto(d) && !auswahl(d, "hinweise").includes("grundstueck") ? GRUNDSTUECK_HINWEIS : "",
       // ein kurzer Befreiungshinweis steht schon in der Summenzeile
       befreiungInSumme(befreiung) && !ku ? "" : befreiung,
       schonBezahlt ? `Der Rechnungsbetrag wurde am ${datumDe(bezahltAm)} bezahlt.` : "",
     ].filter((x) => x.trim());
     // R12: Skonto als Bedingung im Zahlungsblock (§ 14 Abs. 4 Satz 1 Nr. 7 UStG) – der GiroCode bleibt beim vollen Betrag
-    const sk = zahlbar && !leer && s.brutto_cent > 0 ? skontoFuer(d, b.bundesland) : null;
-    const skBetrag = sk ? skontoBetrag(s.brutto_cent, sk.prozent) : 0;
-    const skontoSatz = sk ? `Bei Zahlung bis zum ${datumDe(sk.bis)} gewähren wir ${prozentText(sk.prozent)} % Skonto (${euro(skBetrag)}); zu überweisen sind dann ${euro(s.brutto_cent - skBetrag)}.` : "";
+    const sk = zahlbar && !leer && zuZahlen > 0 ? skontoFuer(d, b.bundesland) : null;
+    const skBetrag = sk ? skontoBetrag(zuZahlen, sk.prozent) : 0;
+    const skontoSatz = sk ? `Bei Zahlung bis zum ${datumDe(sk.bis)} gewähren wir ${prozentText(sk.prozent)} % Skonto (${euro(skBetrag)}); zu überweisen sind dann ${euro(zuZahlen - skBetrag)}.` : "";
     const hinweise = [
       // leere Vorlage: statt „Zahlbar …“ die Zahlungsaufforderung mit Linie für das Datum (unten)
       text(d, "zahlungsziel") && zahlbar && !b.iban.trim() && !leer ? `Zahlbar ${ZIEL[text(d, "zahlungsziel")]}${text(d, "zahlungsziel") !== "sofort" && text(d, "datum") ? ` (bis ${datumDe(faelligAm(text(d, "datum"), Number(text(d, "zahlungsziel")), b.bundesland))})` : ""}.` : "",
@@ -716,14 +896,14 @@ export const rechnung: Vorlage = {
     const iban = b.iban.trim();
     // Zahlungsaufforderung mit Bankverbindung und GiroCode – nur aus den Angaben in „Mein Betrieb“ und der Rechnung
     // kein GiroCode für Empfänger außerhalb der EU (z. B. Schweiz) – dort zahlt kaum jemand per SEPA-Überweisung aus der Banking-App
-    const qr = zahlbar && iban && s.brutto_cent > 0 && !drittlandLand(d) ? giroCodeSvg({ name: b.name.trim(), iban, bic: b.bic ?? null, betragCent: s.brutto_cent, verwendungszweck: `Rechnung ${text(d, "nummer")}` }, 25) : null;
+    const qr = zahlbar && iban && zuZahlen > 0 && !drittlandLand(d) ? giroCodeSvg({ name: b.name.trim(), iban, bic: b.bic ?? null, betragCent: zuZahlen, verwendungszweck: `Rechnung ${text(d, "nummer")}` }, 25) : null;
     // Kontoinhaber vor der IBAN; Einzelunternehmen mit der Inhaberin bzw. dem Inhaber (Gesellschaften: nur die Firma)
     const empfaenger = b.name.trim() ? `Empfänger: ${esc(b.name.trim())}${b.verantwortlich.trim() && !(b.vertretung ?? "").trim() && !b.name.includes(b.verantwortlich.trim()) ? ` (${esc(b.verantwortlich.trim())})` : ""}<br>` : "";
     // BIC und Bank in einer Zeile („BIC … · Sparkasse …“) – spart eine Zeile im Zahlungsblock
     const bicBank = [b.bic?.trim() ? `BIC ${esc(b.bic.trim())}` : "", b.bank?.trim() ? esc(b.bank.trim()) : ""].filter(Boolean).join(" · ");
     const zahlung =
-      zahlbar && iban && s.brutto_cent > 0
-        ? `<div class="zahlung">${qr ? `<div class="qr">${qr}<small>${sk ? "GiroCode über den vollen Betrag" : "GiroCode – mit der Banking-App scannen"}</small></div>` : ""}<div class="text"><p>Bitte überweisen Sie <strong>${euro(s.brutto_cent)}</strong>${faellig ? ` bis zum <strong>${esc(faellig)}</strong>` : ziel === "sofort" ? " sofort ohne Abzug" : ""} auf das Konto</p><p>${empfaenger}<strong>IBAN ${esc(ibanText(iban))}</strong>${bicBank ? `<br>${bicBank}` : ""}<br>Verwendungszweck: Rechnung ${esc(text(d, "nummer"))}</p>${sk ? `<p>${esc(skontoSatz)}</p>` : ""}</div></div>`
+      zahlbar && iban && zuZahlen > 0
+        ? `<div class="zahlung">${qr ? `<div class="qr">${qr}<small>${sk ? "GiroCode über den vollen Betrag" : "GiroCode – mit der Banking-App scannen"}</small></div>` : ""}<div class="text"><p>Bitte überweisen Sie <strong>${euro(zuZahlen)}</strong>${faellig ? ` bis zum <strong>${esc(faellig)}</strong>` : ziel === "sofort" ? " sofort ohne Abzug" : ""} auf das Konto</p><p>${empfaenger}<strong>IBAN ${esc(ibanText(iban))}</strong>${bicBank ? `<br>${bicBank}` : ""}<br>Verwendungszweck: Rechnung ${esc(text(d, "nummer"))}</p>${sk ? `<p>${esc(skontoSatz)}</p>` : ""}</div></div>`
         : // leere Vorlage: Zahlungsaufforderung mit Linie für das Datum, mit Bankverbindung nur, wenn eine IBAN hinterlegt ist
           leer && !storno && !gutschrift
           ? `<div class="zahlung"><div class="text"><p>Bitte überweisen Sie den Rechnungsbetrag bis zum ${LINIE_MITTEL}${iban ? " auf das Konto" : "."}</p>${iban ? `<p>${empfaenger}<strong>IBAN ${esc(ibanText(iban))}</strong>${bicBank ? `<br>${bicBank}` : ""}<br>Verwendungszweck: Rechnung ${text(d, "nummer") ? esc(text(d, "nummer")) : LINIE_MITTEL}</p>` : ""}</div></div>`
@@ -734,7 +914,8 @@ export const rechnung: Vorlage = {
       titel,
       betreff: titel,
       // der Leistungszeitraum steht im Informationsblock („Leistungsdatum“ bzw. „Leistungszeitraum“), nicht noch einmal unter dem Betreff
-      unterBetreff: storno ? `Diese Rechnung storniert die Rechnung Nr. ${storno}${text(d, "storno_zu_datum") ? ` vom ${datumDe(text(d, "storno_zu_datum"))}` : ""}.` : undefined,
+      // C-6: Ersatzrechnung – Bezug auf die stornierte Rechnung, wenn er nicht schon in den Hinweisen steht
+      unterBetreff: storno ? `Diese Rechnung storniert die Rechnung Nr. ${storno}${text(d, "storno_zu_datum") ? ` vom ${datumDe(text(d, "storno_zu_datum"))}` : ""}.` : ersetztNummer(d) && !/ersetzt/i.test(text(d, "hinweis")) ? `Diese Rechnung ersetzt die stornierte Rechnung Nr. ${ersetztNummer(d)}.` : undefined,
       betrieb: b,
       stand: datumDe(datum),
       // Schweizer UID (CHE-…) heißt „UID/MWST-Nr.“, nicht USt-IdNr.
@@ -914,6 +1095,7 @@ export const euer: Vorlage = {
         abschnitt("Betriebsausgaben", aus.length ? tabelle(kopfZeile, z(aus), { breiten, zahlen: [3], summe: ["<strong>Summe</strong>", "", "", `<strong>${euro(a)}</strong>`] }) : leer ? tabelle(kopfZeile, [], { breiten, zahlen: [3], mindestens: EUER_LEER_AUSGABEN, hoch: true, summe: summeLeer }) : absatz("", "Keine Ausgaben erfasst.")) +
         (leer ? abschnitt("Absetzungen für Abnutzung", tabelle(["Wirtschaftsgut", "Betrag dieses Jahr"], [], { breiten: ["75%", "25%"], zahlen: [1], mindestens: 3, hoch: true, summe: ["<strong>Summe</strong>", ZELLE_LINIE] })) : "") +
         (afa.length ? abschnitt("Absetzungen für Abnutzung", tabelle(["Wirtschaftsgut", "Betrag dieses Jahr"], afa.map((x) => [zelle(text(x, "text")), euro(cent(text(x, "betrag")) ?? 0)]), { breiten: ["75%", "25%"], zahlen: [1], summe: ["<strong>Summe</strong>", `<strong>${euro(f)}</strong>`] })) : "") +
+        steuerHinweis("euer", MARKE.name) +
         uebertragung(["Anlage EÜR übermittelt am", "Transferticket (ELSTER)"]),
     });
   },
@@ -934,25 +1116,66 @@ const posten = (id: string, label: string, eintrag: string, hilfe: string) => ({
   felder: [{ id: "posten", art: "text" as const, label: "Posten", hilfe, pflicht: true }, { id: "betrag", art: "betrag" as const, label: "Betrag (€)", pflicht: true }],
 });
 
+/** StB GoBD (E-5): Angaben unter der Bilanz einer Kleinstkapitalgesellschaft statt Anhang (§ 264 Abs. 1 Satz 5 HGB). */
+export const BILANZ_KLEINST = "Die Gesellschaft ist eine Kleinstkapitalgesellschaft (§ 267a HGB) und stellt keinen Anhang auf (§ 264 Abs. 1 Satz 5 HGB). Angaben unter der Bilanz:";
+/** StB GoBD (E-4/E-5): Kapitalgesellschaften bilanzieren – diese Vorlage statt der EÜR. */
+export const BILANZ_STATT_EUER = "GmbH, UG und andere Kaufleute mit Buchführungspflicht (§ 238 HGB, § 140 AO) stellen eine Bilanz mit Gewinn- und Verlustrechnung auf – keine EÜR. Die Werte kommen aus der Buchführung der Kanzlei bzw. dem Buchhaltungsprogramm.";
+
+/** StB GoBD (E-5, § 245 HGB): wer den Jahresabschluss unterschreibt – alle Geschäftsführer bzw. alle persönlich haftenden Gesellschafter. */
+export function bilanzUnterzeichner(b: Betrieb): string[] {
+  const namen = (b.vertretung ?? "")
+    .split(/\s*(?:,|;|\n|\bund\b|\bsowie\b)\s*/)
+    .map((x) => x.trim())
+    .filter(Boolean);
+  if (istKapitalgesellschaft(b.rechtsform, b.name)) return namen.length ? namen.map((n) => `${n} (Geschäftsführung)`) : ["Geschäftsführer/in", "Geschäftsführer/in"];
+  if (istPersonengesellschaft(b.rechtsform, b.name)) return namen.length ? namen.map((n) => `${n} (persönlich haftende/r Gesellschafter/in)`) : ["Persönlich haftende/r Gesellschafter/in", "Persönlich haftende/r Gesellschafter/in"];
+  return [b.verantwortlich.trim() ? `${b.verantwortlich.trim()} (Kaufmann/Kauffrau)` : "Kaufmann/Kauffrau"];
+}
+
 export const bilanzGuv: Vorlage = {
   id: "bilanz_guv",
   gestalt: "formular",
   titel: "Bilanz und Gewinn- und Verlustrechnung",
-  beschreibung: "Vorläufige Übersicht – kein Jahresabschluss: Erträge und Aufwendungen, Vermögen und Kapital – mit Prüfung, ob Aktiva und Passiva aufgehen.",
+  beschreibung: "Vorlage – Werte aus der Buchführung der Kanzlei: Erträge, Aufwendungen und Ertragsteuern, Vermögen und Kapital, Angaben unter der Bilanz und Unterschriften – mit Prüfung, ob Aktiva und Passiva aufgehen.",
   bereich: "steuern",
   pflichten: ["steuern.buchfuehrungspflicht", "steuern.e_bilanz"],
-  grundlage: "§§ 238, 242 HGB; § 5b EStG",
+  grundlage: "§§ 238, 242, 245, 264, 266, 275 HGB; § 5b EStG",
   namensFeld: "stichtag",
   abschnitte: [
     { titel: "Stichtag",
-      hilfe: "Vorläufige Übersicht – kein Jahresabschluss. Die Zahlen kommen aus deiner Buchführung; den Jahresabschluss und die E-Bilanz ans Finanzamt erstellst du meist mit Buchhaltungsprogramm oder Steuerberatung.",
-      felder: [{ id: "stichtag", art: "datum", label: "Bilanzstichtag", pflicht: true }],
+      hilfe: `Vorlage – Werte aus der Buchführung der Kanzlei. ${BILANZ_STATT_EUER} Die E-Bilanz ans Finanzamt (§ 5b EStG) erstellt die Kanzlei bzw. das Buchhaltungsprogramm.`,
+      felder: [
+        { id: "stichtag", art: "datum", label: "Bilanzstichtag", pflicht: true },
+        { id: "aufgestellt", art: "datum", label: "Tag der Aufstellung", hilfe: "Den Jahresabschluss unterschreiben alle Geschäftsführer bzw. alle persönlich haftenden Gesellschafter mit Datum (§ 245 HGB)." },
+      ],
     },
-    { titel: "Gewinn- und Verlustrechnung", felder: [posten("ertraege", "Erträge", "Ertrag", "z. B. Umsatzerlöse"), posten("aufwendungen", "Aufwendungen", "Aufwand", "z. B. Materialaufwand, Personalaufwand")] },
+    {
+      titel: "Gewinn- und Verlustrechnung",
+      hilfe: "Kleinstkapitalgesellschaften dürfen die GuV verkürzt gliedern (§ 275 Abs. 5 HGB): Umsatzerlöse, sonstige Erträge, Materialaufwand, Personalaufwand, Abschreibungen, sonstige Aufwendungen, Steuern, Jahresüberschuss bzw. -fehlbetrag.",
+      felder: [
+        posten("ertraege", "Erträge", "Ertrag", "z. B. Umsatzerlöse"),
+        posten("aufwendungen", "Aufwendungen", "Aufwand", "z. B. Materialaufwand, Personalaufwand"),
+        { id: "ertragsteuern", art: "betrag", label: "Steuern vom Einkommen und vom Ertrag (€)", hilfe: "Körperschaft- und Gewerbesteuer des Jahres laut Kanzlei – steht vor dem Jahresüberschuss (§ 275 HGB)" },
+      ],
+    },
     { titel: "Bilanz", felder: [posten("aktiva", "Aktiva", "Aktivposten", "z. B. Betriebs- und Geschäftsausstattung, Bank"), posten("passiva", "Passiva", "Passivposten", "z. B. Eigenkapital, Verbindlichkeiten")] },
+    {
+      titel: "Angaben unter der Bilanz",
+      hilfe: "Nur für GmbH, UG und AG. Eine Kleinstkapitalgesellschaft (höchstens eine der Grenzen überschritten: 450.000 € Bilanzsumme, 900.000 € Umsatzerlöse, 10 Beschäftigte im Jahresdurchschnitt; § 267a HGB) braucht keinen Anhang, wenn diese Angaben unter der Bilanz stehen (§ 264 Abs. 1 Satz 5 HGB).",
+      felder: [
+        { id: "kleinst", art: "schalter", label: "Kleinstkapitalgesellschaft – Angaben unter der Bilanz statt Anhang", vorbelegung: true },
+        { id: "haftung", art: "mehrzeilig", label: "Haftungsverhältnisse (§ 251, § 268 Abs. 7 HGB)", hilfe: "z. B. Bürgschaften, Gewährleistungsverträge, Sicherheiten für fremde Verbindlichkeiten – sonst „Keine“", vorbelegung: { text: "Keine" }, wenn: { feld: "kleinst" } },
+        { id: "organkredite", art: "mehrzeilig", label: "Vorschüsse und Kredite an Geschäftsführung bzw. Aufsichtsrat (§ 285 Nr. 9 Buchst. c HGB)", hilfe: "Betrag, Zinssatz, wesentliche Bedingungen und Rückzahlungen – sonst „Keine“", vorbelegung: { text: "Keine" }, wenn: { feld: "kleinst" } },
+      ],
+    },
   ],
+  pruefen(_d, b) {
+    // Hinweis bleibt im Formular: Personenunternehmen ohne Buchführungspflicht ermitteln den Gewinn per EÜR
+    return istKapitalgesellschaft(b.rechtsform, b.name) && !b.vertretung?.trim() ? ["Geschäftsführung in „Mein Betrieb“ eintragen – alle Geschäftsführer unterschreiben den Jahresabschluss (§ 245 HGB)."] : [];
+  },
   ergebnis(d) {
-    const j = summe(liste(d, "ertraege"), "betrag") - summe(liste(d, "aufwendungen"), "betrag");
+    const st = cent(text(d, "ertragsteuern")) ?? 0;
+    const j = summe(liste(d, "ertraege"), "betrag") - summe(liste(d, "aufwendungen"), "betrag") - st;
     const akt = summe(liste(d, "aktiva"), "betrag");
     const pas = summe(liste(d, "passiva"), "betrag");
     return [[j >= 0 ? "Jahresüberschuss" : "Jahresfehlbetrag", euro(Math.abs(j))], ["Summe Aktiva", euro(akt)], ["Summe Passiva", euro(pas)], ...(akt !== pas ? ([["Differenz – bitte prüfen", euro(akt - pas)]] as [string, string][]) : [])];
@@ -981,21 +1204,45 @@ export const bilanzGuv: Vorlage = {
         ...(n ? {} : { mindestens: 12, hoch: true }),
       });
     };
-    const j = summe(l("ertraege"), "betrag") - summe(l("aufwendungen"), "betrag");
+    const kapital = istKapitalgesellschaft(b.rechtsform, b.name);
+    const st = cent(text(d, "ertragsteuern")) ?? 0;
+    const vorSteuern = summe(l("ertraege"), "betrag") - summe(l("aufwendungen"), "betrag");
+    const j = vorSteuern - st;
     // Vorlage zum Ausfüllen: kein errechnetes Ergebnis „0,00 €“
     const guvLeer = !l("ertraege").length && !l("aufwendungen").length;
+    // E-5: Ertragsteuern vor dem Jahresüberschuss – bei Kapitalgesellschaften immer, sonst wenn eingetragen (Gewerbesteuer)
+    const mitSteuern = kapital || guvLeer || Boolean(text(d, "ertragsteuern"));
     const akt = summe(l("aktiva"), "betrag");
     const pas = summe(l("passiva"), "betrag");
+    const kleinst = kapital && ja(d, "kleinst");
+    // Blatt zum Ausfüllen (keine Zahlen): Linien statt des Startwerts „Keine“
+    const blattLeer = guvLeer && !l("aktiva").length && !l("passiva").length;
+    const angabe = (k: string) => (blattLeer ? "" : text(d, k) || "Keine");
+    const aufgestellt = datumDe(text(d, "aufgestellt"));
+    const schluss = nachsatz(`Zu unterschreiben mit dem Datum der Aufstellung von ${kapital ? "allen Geschäftsführern" : istPersonengesellschaft(b.rechtsform, b.name) ? "allen persönlich haftenden Gesellschaftern" : "der Kauffrau bzw. dem Kaufmann"} (§ 245 HGB).`);
     return dokument({
       titel: "Jahresabschluss",
       betrieb: b,
-      // in der Reihenfolge der Abschnitte: erst die GuV, dann die Bilanz
-      unter: text(d, "stichtag") ? `Gewinn- und Verlustrechnung und Bilanz zum ${datumDe(text(d, "stichtag"))}` : "Gewinn- und Verlustrechnung und Bilanz",
-      meta: [b.steuernummer.trim() ? `Steuernummer: ${b.steuernummer.trim()}` : "", `Bilanzstichtag: ${datumDe(text(d, "stichtag")) || KOPF_LINIE}`].filter(Boolean).join("\n"),
+      // in der Reihenfolge der Abschnitte: erst die GuV, dann die Bilanz; E-5: klar als Vorlage mit Werten der Kanzlei
+      unter: `${text(d, "stichtag") ? `Gewinn- und Verlustrechnung und Bilanz zum ${datumDe(text(d, "stichtag"))}` : "Gewinn- und Verlustrechnung und Bilanz"} · Vorlage – Werte aus der Buchführung der Kanzlei`,
+      meta: [b.steuernummer.trim() ? `Steuernummer: ${b.steuernummer.trim()}` : "", `Bilanzstichtag: ${datumDe(text(d, "stichtag")) || KOPF_LINIE}`, `Aufgestellt am: ${aufgestellt || KOPF_LINIE}`].filter(Boolean).join("\n"),
       inhalt:
-        abschnitt("Gewinn- und Verlustrechnung", `<h3>Erträge</h3>${t("ertraege")}<h3>Aufwendungen</h3>${t("aufwendungen")}${kennzahlen([{ text: guvLeer ? "Jahresüberschuss bzw. Jahresfehlbetrag" : j >= 0 ? "Jahresüberschuss" : "Jahresfehlbetrag", betrag: guvLeer ? "&nbsp;" : euro(Math.abs(j)), fett: true }])}`) +
-        abschnitt("Bilanz", `${bilanz()}${akt !== pas ? `<p class="nachsatz"><strong>Aktiva und Passiva weichen um ${euro(akt - pas)} ab – bitte prüfen.</strong></p>` : ""}`) +
-        unterschriften(["Unterschrift"], { ortDatum: true }),
+        abschnitt(
+          "Gewinn- und Verlustrechnung",
+          `<h3>Erträge</h3>${t("ertraege")}<h3>Aufwendungen</h3>${t("aufwendungen")}${kennzahlen([
+            ...(mitSteuern
+              ? [
+                  { text: "Ergebnis vor Steuern vom Einkommen und vom Ertrag", betrag: guvLeer ? "&nbsp;" : euro(vorSteuern) },
+                  { text: "Steuern vom Einkommen und vom Ertrag", hinweis: "Körperschaft- und Gewerbesteuer", betrag: guvLeer && !text(d, "ertragsteuern") ? "&nbsp;" : euro(st) },
+                ]
+              : []),
+            { text: guvLeer ? "Jahresüberschuss bzw. Jahresfehlbetrag" : j >= 0 ? "Jahresüberschuss" : "Jahresfehlbetrag", betrag: guvLeer ? "&nbsp;" : euro(Math.abs(j)), fett: true },
+          ])}`,
+        ) +
+        // Hinweis und Satz zu § 245 HGB im letzten Abschnitt: so bleibt er mit den Unterschriften zusammen (Schlussblock)
+        abschnitt("Bilanz", `${bilanz()}${akt !== pas ? `<p class="nachsatz"><strong>Aktiva und Passiva weichen um ${euro(akt - pas)} ab – bitte prüfen.</strong></p>` : ""}${kleinst ? "" : (kapital ? nachsatz("Zum Jahresabschluss gehört ein Anhang (§§ 264, 284 ff. HGB) – er kommt aus der Buchführung der Kanzlei.") : "") + schluss}`) +
+        (kleinst ? abschnitt("Angaben unter der Bilanz", `<p>${esc(BILANZ_KLEINST)}</p>${angaben([["Haftungsverhältnisse (§ 251, § 268 Abs. 7 HGB)", angabe("haftung")], ["Vorschüsse und Kredite an Mitglieder der Geschäftsführung bzw. des Aufsichtsrats (§ 285 Nr. 9 Buchst. c HGB)", angabe("organkredite")]])}${schluss}`, { rand: "§ 264 Abs. 1 Satz 5 HGB" }) : "") +
+        unterschriften(bilanzUnterzeichner(b), { ortDatum: true }),
     });
   },
 };
@@ -1014,8 +1261,21 @@ function ust(d: Daten) {
   const v67 = cent(text(d, "vorsteuer_13b")) ?? 0;
   const svz = cent(text(d, "sondervorauszahlung")) ?? 0;
   const steuer = s19 + s7 + s47 + s85;
-  return { u19, u7, s19, s7, vst, s47, s85, v67, svz, steuer, zahllast: steuer - vst - v67 - svz };
+  // StB-Prüfung (5.2): Bemessungsgrundlagen im Vordruck in vollen Euro (Cent bleiben weg), die Steuer daraus – so rechnet ELSTER
+  const e19 = vollEuro(u19);
+  const e7 = vollEuro(u7);
+  const es19 = rundeCent((e19 * 19) / 100);
+  const es7 = rundeCent((e7 * 7) / 100);
+  const elsterSteuer = es19 + es7 + s47 + s85;
+  return { u19, u7, s19, s7, vst, s47, s85, v67, svz, steuer, zahllast: steuer - vst - v67 - svz, e19, e7, es19, es7, elsterSteuer, elsterZahllast: elsterSteuer - vst - v67 - svz };
 }
+
+/** Betrag in Cent ohne die Cent (volle Euro, zur Null hin abgeschnitten) – wie im Vordruck der Voranmeldung. */
+export const vollEuro = (c: number) => Math.trunc(c / 100) * 100;
+/** Volle Euro ohne Nachkommastellen: „15.427 €“ */
+const euroVoll = (c: number) => `${new Intl.NumberFormat("de-DE", { maximumFractionDigits: 0 }).format(Math.trunc(c / 100))} €`;
+/** Zeilen „Nr | Datum | Kunde | Netto“ der nach Rechnungsdatum zugeordneten Rechnungen (aus der Übernahme) */
+const zuordnungZeilen = (d: Daten) => text(d, "nach_rechnungsdatum").split("\n").map((z) => z.split(" | ").map((x) => x.trim())).filter((z) => z[0]);
 
 /** Welche Kennzahl für übrige Umsätze ohne Umsatzsteuer gilt (Vordruckmuster USt 1 A). */
 const KZ_FREI_HINWEIS = "welche Kennzahl gilt (z. B. 43 steuerfreie Umsätze mit Vorsteuerabzug, 21 nicht steuerbare sonstige Leistungen nach § 18b UStG, 45 übrige nicht steuerbare Umsätze, 87 Umsätze zum Nullsteuersatz nach § 12 Abs. 3 UStG), hängt von der Art des Umsatzes ab";
@@ -1097,12 +1357,17 @@ export const ustVoranmeldung: Vorlage = {
         { id: "vorsteuer_13b", selten: true, art: "betrag", label: "Vorsteuer aus Leistungen nach § 13b UStG (Kz 67) (€)", hilfe: "die selbst geschuldete Steuer aus Kz 47/85 – nur mit Vorsteuerabzug, also nicht als Kleinunternehmer" },
         { id: "sondervorauszahlung", selten: true, art: "betrag", label: "Abzug der Sondervorauszahlung (Kz 39) (€)", hilfe: "nur für Monatszahler mit Dauerfristverlängerung, in der Voranmeldung für Dezember (§§ 46–48 UStDV) – wer vierteljährlich abgibt, leistet keine Sondervorauszahlung" },
         { id: "notiz", selten: true, art: "mehrzeilig", label: "Notiz", hilfe: "z. B. Besonderheiten in diesem Zeitraum" },
+        // StB-Prüfung (5.2, Abschnitt 8): Zuordnungsannahmen der Übernahme – stehen auf dem PDF
+        { id: "nach_rechnungsdatum", selten: true, art: "mehrzeilig", label: "Nach Rechnungsdatum zugeordnete Rechnungen", hilfe: "trägt „Aus Rechnungen übernehmen“ ein: Rechnungen ohne erkennbares Leistungsdatum, je Zeile „Nummer | Rechnungsdatum | Kunde | Netto“" },
+        { id: "annahmen", selten: true, art: "mehrzeilig", label: "Weitere Zuordnungsannahmen", hilfe: "trägt „Aus Rechnungen übernehmen“ ein, z. B. Kassenumsätze aus dem Brutto aufgeteilt" },
       ],
     },
   ],
   ergebnis(d) {
     const x = ust(d);
-    return [["Umsatzsteuer", euro(x.steuer)], ["Vorsteuer", euro(x.vst + x.v67)], ...(x.svz ? ([["Sondervorauszahlung", euro(x.svz)]] as [string, string][]) : []), [x.zahllast >= 0 ? "Zahllast" : "Erstattung", euro(Math.abs(x.zahllast))]];
+    // 5.2: weicht die Zahllast aus vollen Euro ab, steht sie als letzte Zeile da – sie ist der Betrag, den ELSTER errechnet
+    const elster: [string, string][] = x.elsterZahllast !== x.zahllast ? [[`${x.elsterZahllast >= 0 ? "Zahllast" : "Erstattung"} laut ELSTER (volle Euro)`, euro(Math.abs(x.elsterZahllast))]] : [];
+    return [["Umsatzsteuer", euro(x.steuer)], ["Vorsteuer", euro(x.vst + x.v67)], ...(x.svz ? ([["Sondervorauszahlung", euro(x.svz)]] as [string, string][]) : []), [x.zahllast >= 0 ? "Zahllast" : "Erstattung", euro(Math.abs(x.zahllast))], ...elster];
   },
   html(d, b) {
     const x = ust(d);
@@ -1119,7 +1384,11 @@ export const ustVoranmeldung: Vorlage = {
     ];
     const mitRc = rc.some((z) => z.c);
     const betrag = (c: number) => (leer ? "&nbsp;" : euro(c));
-    const ueberschuss = !leer && x.zahllast < 0;
+    // 5.2: Bemessungsgrundlagen in vollen Euro
+    const voll = (c: number) => (leer ? "&nbsp;" : euroVoll(c));
+    const ueberschuss = !leer && x.elsterZahllast < 0;
+    const zuordnung = zuordnungZeilen(d);
+    const annahmen = text(d, "annahmen").split("\n").map((z) => z.trim()).filter(Boolean);
     return dokument({
       titel: "Umsatzsteuer-Voranmeldung",
       betrieb: b,
@@ -1129,20 +1398,21 @@ export const ustVoranmeldung: Vorlage = {
         abschnitt(
           "Steuerpflichtige Umsätze",
           kennzahlen([
-            { kz: "81", text: "Umsätze zum Steuersatz 19 %", hinweis: "Bemessungsgrundlage ohne Umsatzsteuer, im Vordruck in vollen Euro", betrag: betrag(x.u19) },
-            { text: "darauf Umsatzsteuer 19 % (rechnet ELSTER)", betrag: betrag(x.s19) },
-            { kz: "86", text: "Umsätze zum Steuersatz 7 %", hinweis: "Bemessungsgrundlage ohne Umsatzsteuer, im Vordruck in vollen Euro", betrag: betrag(x.u7) },
-            { text: "darauf Umsatzsteuer 7 % (rechnet ELSTER)", betrag: betrag(x.s7) },
+            { kz: "81", text: "Umsätze zum Steuersatz 19 %", hinweis: `Bemessungsgrundlage ohne Umsatzsteuer in vollen Euro${!leer && x.u19 !== x.e19 ? ` (erfasst ${euro(x.u19)})` : ""}`, betrag: voll(x.u19) },
+            { text: "darauf Umsatzsteuer 19 % (rechnet ELSTER aus vollen Euro)", betrag: betrag(x.es19) },
+            { kz: "86", text: "Umsätze zum Steuersatz 7 %", hinweis: `Bemessungsgrundlage ohne Umsatzsteuer in vollen Euro${!leer && x.u7 !== x.e7 ? ` (erfasst ${euro(x.u7)})` : ""}`, betrag: voll(x.u7) },
+            { text: "darauf Umsatzsteuer 7 % (rechnet ELSTER aus vollen Euro)", betrag: betrag(x.es7) },
           ]),
         ) +
         (ohneSteuer.length
-          ? abschnitt("Umsätze ohne Umsatzsteuer", kennzahlen(ohneSteuer.map((f) => ({ ...(f.kz ? { kz: f.kz } : {}), text: f.text, hinweis: f.hinweis, betrag: euro(f.cent) }))))
+          ? abschnitt("Umsätze ohne Umsatzsteuer", kennzahlen(ohneSteuer.map((f) => ({ ...(f.kz ? { kz: f.kz } : {}), text: f.text, hinweis: f.hinweis, betrag: f.kz ? euroVoll(f.cent) : euro(f.cent) }))))
           : "") +
-        (mitRc ? abschnitt("Steuerschuldnerschaft als Leistungsempfänger", kennzahlen(rc.map((z) => ({ kz: z.kz, text: z.text, ...(z.hinweis ? { hinweis: z.hinweis } : {}), betrag: euro(z.c) })))) : "") +
+        // Kz 46/84 sind Bemessungsgrundlagen (volle Euro), Kz 47/85 Steuerbeträge (mit Cent)
+        (mitRc ? abschnitt("Steuerschuldnerschaft als Leistungsempfänger", kennzahlen(rc.map((z) => ({ kz: z.kz, text: z.text, ...(z.hinweis ? { hinweis: z.hinweis } : {}), betrag: z.hinweis ? euroVoll(z.c) : euro(z.c) })))) : "") +
         abschnitt(
           "Vorsteuer und Zahllast",
           kennzahlen([
-            { text: "Umsatzsteuer gesamt", betrag: betrag(x.steuer) },
+            { text: "Umsatzsteuer gesamt (aus vollen Euro)", betrag: betrag(x.elsterSteuer) },
             { kz: "66", text: "Vorsteuerbeträge aus Rechnungen anderer Unternehmer", hinweis: "§ 15 Abs. 1 Satz 1 Nr. 1 UStG", betrag: betrag(x.vst) },
             ...(x.v67 ? [{ kz: "67", text: "Vorsteuerbeträge aus Leistungen im Sinne des § 13b UStG", hinweis: "§ 15 Abs. 1 Satz 1 Nr. 4 UStG", betrag: euro(x.v67) }] : []),
             ...(x.svz ? [{ kz: "39", text: "Abzug der festgesetzten Sondervorauszahlung für Dauerfristverlängerung", hinweis: "nur Monatszahler, in der Voranmeldung für Dezember (§§ 46–48 UStDV)", betrag: euro(x.svz) }] : []),
@@ -1150,15 +1420,26 @@ export const ustVoranmeldung: Vorlage = {
               kz: "83",
               text: leer ? "Verbleibende Umsatzsteuer-Vorauszahlung bzw. Überschuss" : ueberschuss ? "Verbleibender Überschuss (Erstattung)" : "Verbleibende Umsatzsteuer-Vorauszahlung",
               hinweis: ueberschuss ? "Überschuss: Betrag mit Minuszeichen übertragen" : leer ? `Vorauszahlung ${dfv ? UST_FRIST_DFV : "bis zum 10. Tag nach Ablauf des Zeitraums (§ 18 Abs. 1 UStG)"}; Überschuss mit Minuszeichen übertragen` : dfv ? UST_FRIST_DFV : UST_FRIST,
-              betrag: betrag(x.zahllast),
+              betrag: betrag(x.elsterZahllast),
               fett: true,
             },
           ]),
         ) +
+        // 5.2: rechnerisch aus den Cent-Beträgen – die Abweichung ist die Rundung des Vordrucks
+        (!leer && x.elsterZahllast !== x.zahllast ? nachsatz(`Aus den Cent-Beträgen gerechnet: ${x.zahllast >= 0 ? "Zahllast" : "Überschuss"} ${euro(Math.abs(x.zahllast))} (Abweichung ${euro(x.elsterZahllast - x.zahllast)} durch die Bemessungsgrundlagen in vollen Euro).`) : "") +
+        // 5.2, Abschnitt 8: Zuordnungsannahmen der Übernahme – je Rechnung, die nach dem Rechnungsdatum zugeordnet ist
+        (zuordnung.length || annahmen.length
+          ? abschnitt(
+              "Zuordnungsannahmen",
+              (zuordnung.length ? `<p>Ohne erkennbares Leistungsdatum nach dem Rechnungsdatum zugeordnet (bitte prüfen, ob die Leistung in diesem Zeitraum ausgeführt wurde):</p>${tabelle(["Rechnung", "Rechnungsdatum", "Kunde", "Netto"], zuordnung.map((z) => [zelle(z[0] ?? ""), zelle(z[1] ?? ""), zelle(z[2] ?? ""), zelle(z[3] ? `${z[3]} €` : "")]), { breiten: ["18%", "18%", "44%", "20%"], zahlen: [3] })}` : "") +
+                (annahmen.length ? `<ul>${annahmen.map((a) => `<li>${esc(a)}</li>`).join("")}</ul>` : ""),
+            )
+          : "") +
         // steuerfreie Umsätze ohne Vorsteuerabzug und Vorsteuer im selben Zeitraum: an die Aufteilung erinnern
         ((cent(text(d, "umsatz_48")) ?? 0) && x.vst > 0 ? nachsatz(VORSTEUER_AUFTEILEN) : "") +
         (text(d, "notiz") ? abschnitt("Notiz", absatz(text(d, "notiz"))) : "") +
-        nachsatz("Kennzahlen nach dem Vordruckmuster USt 1 A für 2026. Vor dem Übertragen gegen das aktuelle ELSTER-Formular prüfen; das Formular rechnet die Steuerbeträge selbst. ELSTER rechnet aus vollen Euro; maßgeblich ist der Betrag, den ELSTER errechnet.") +
+        nachsatz("Kennzahlen nach dem Vordruckmuster USt 1 A für 2026. Bemessungsgrundlagen in vollen Euro (Cent bleiben weg), Steuer- und Vorsteuerbeträge mit Cent. Vor dem Übertragen gegen das aktuelle ELSTER-Formular prüfen; das Formular rechnet die Steuerbeträge selbst – maßgeblich ist der Betrag, den ELSTER errechnet. OSS-Umsätze (Fernverkäufe mit der Steuer des Bestimmungslands) gehören nicht in diese Voranmeldung, sondern in die OSS-Erklärung beim BZSt.") +
+        steuerHinweis("va", MARKE.name) +
         uebertragung(["Übermittelt am", "Transferticket (ELSTER)", ueberschuss ? "Erstattung erhalten am" : "Gezahlt am"]),
     });
   },
@@ -1285,6 +1566,7 @@ export const steuererklaerung: Vorlage = {
             ? abschnitt("Weitere Angaben und Belege", tabelle(["Was", "Betrag", "Beleg"], [], { breiten: ["55%", "25%", "20%"], zahlen: [1], mindestens: 5, hoch: true }))
             : "") +
         (text(d, "notiz") ? abschnitt("Notizen", absatz(text(d, "notiz"))) : "") +
+        steuerHinweis("erklaerung", MARKE.name) +
         uebertragung(["Übermittelt am", "Transferticket (ELSTER)", "Bescheid vom"]),
     });
   },
@@ -1309,15 +1591,16 @@ export const kassenbuch: Vorlage = {
   id: "kassenbuch",
   grundlage: "§ 146 Abs. 1 AO",
   querformat: true,
-  titel: "Kassenbuch (Vorlage zum Ausdrucken)",
-  beschreibung: "Bargeld-Einnahmen und -Ausgaben mit laufendem Bestand – für Betriebe mit offener Ladenkasse. Ausgedruckt bzw. geteilt wird es festgeschrieben; ein laufend geführtes elektronisches Kassenbuch ersetzt es nicht.",
+  // StB GoBD (D-9): kein „Vorlage zum Ausdrucken“ – das Kassenbuch ist die Aufzeichnung selbst
+  titel: "Kassenbuch",
+  beschreibung: `Bargeld-Einnahmen und -Ausgaben mit laufendem Bestand. Führst du die Kasse in ${MARKE.name}, entsteht das Kassenbuch unter „Kasse“ aus den Tagesabschlüssen (nur lesbar, mit Fassung). Hier mit eigenen Einträgen, z. B. für eine offene Ladenkasse – geteilt bzw. gedruckt wird es festgeschrieben.`,
   festschreiben: true,
   bereich: "steuern",
   pflichten: [],
   namensFeld: "zeitraum",
   abschnitte: [
     { titel: "Zeitraum und Anfangsbestand",
-      hilfe: `Vorlage zum Ausdrucken: Sobald du das Kassenbuch teilst oder druckst, schreibt ${MARKE.name} es fest – danach lässt es sich nicht mehr ändern. Ein laufend geführtes, unveränderbares elektronisches Kassenbuch ist es nicht.`,
+      hilfe: `Sobald du das Kassenbuch teilst oder druckst, schreibt ${MARKE.name} es fest – danach lässt es sich nicht mehr ändern. Führst du die Kasse in ${MARKE.name}, nimm das Kassenbuch unter „Kasse“: Es entsteht aus den festgeschriebenen Tagesabschlüssen.`,
       felder: [
         { id: "zeitraum", art: "text", label: "Zeitraum", hilfe: "z. B. Oktober 2026", pflicht: true },
         { id: "anfang", art: "betrag", label: "Anfangsbestand (€)", pflicht: true },
@@ -1354,10 +1637,16 @@ export const kassenbuch: Vorlage = {
     const anfang = cent(text(d, "anfang")) ?? 0;
     // ohne Einträge: Blatt zum Eintragen von Hand mit hohen Leerzeilen
     const leer = !k.zeilen.length;
+    // StB GoBD (D-1, D-9): aus den Tagesabschlüssen der App erzeugt – nur lesbar, Fassung und Erstellungszeitpunkt auf jeder
+    // Seite (Fußzeile); die Einzelaufzeichnungen liegen beim Kassensystem. Die App setzt `quelle`, `kb_fassung`,
+    // `kb_erstellt` und `kb_einzel` nur zum Anzeigen (nicht in den festgeschriebenen Daten).
+    const ausKasse = text(d, "quelle") === "tagesabschluesse";
+    const fassung = ausKasse && text(d, "kb_fassung") ? `Fassung ${text(d, "kb_fassung")}${text(d, "kb_erstellt") ? ` · erstellt ${text(d, "kb_erstellt")}` : ""}` : "";
     return dokument({
       titel: "Kassenbuch",
       betrieb: b,
-      unter: [text(d, "zeitraum"), leer ? "Vorlage zum Ausdrucken" : ""].filter(Boolean).join(" · ") || undefined,
+      unter: [text(d, "zeitraum"), ausKasse ? KASSENBUCH_AUS_KASSE : leer ? "Blatt zum Führen von Hand" : ""].filter(Boolean).join(" · ") || undefined,
+      ...(fassung ? { fussRechts: fassung } : {}),
       // ohne Zeitraum: Linie zum Eintragen in der Kennungsleiste
       meta: text(d, "zeitraum") ? undefined : `Zeitraum: ${KOPF_LINIE}`,
       quer: true,
@@ -1368,10 +1657,20 @@ export const kassenbuch: Vorlage = {
           { breiten: ["11%", "10%", "39%", "13%", "13%", "14%"], zahlen: [3, 4, 5], ...(leer ? { mindestens: KASSENBUCH_LEER, hoch: true } : {}), summe: ["", "", `Summen und Endbestand ${esc(text(d, "zeitraum"))}`, ...(leer ? [ZELLE_LINIE, ZELLE_LINIE, ZELLE_LINIE] : [euro(k.zeilen.reduce((a, z) => a + z.ein, 0)), euro(k.zeilen.reduce((a, z) => a + z.aus, 0)), euro(k.ende)])] },
         ) +
         (k.negativ ? `<p><strong>Der Bestand war zwischendurch negativ – bitte prüfen.</strong></p>` : "") +
+        (ausKasse ? nachsatz(kassenbuchEinzel(text(d, "kb_einzel"))) : "") +
         unterschriften(["Geprüft am", "Unterschrift"]),
     });
   },
 };
+
+/** StB GoBD (D-9): Unterzeile des Kassenbuchs, das die App aus den Tagesabschlüssen erzeugt. */
+export const KASSENBUCH_AUS_KASSE = "aus den Tagesabschlüssen, nur lesbar";
+/**
+ * StB GoBD (D-1): Wo die Einzelaufzeichnungen liegen – `system`: Kassensystem mit TSE (aus Kassenmeldung bzw.
+ * Verfahrensdokumentation), leer: allgemein. Das Kassenbuch selbst führt nur den Bargeldbestand aus den Tagessummen.
+ */
+export const kassenbuchEinzel = (system: string) =>
+  `Einzelaufzeichnungen: ${system.trim() ? `Kassensystem ${system.trim()}` : "im Kassensystem"}, Export DSFinV-K und TSE-Export (§ 146 Abs. 1 Satz 1, § 146a AO). Dieses Kassenbuch zeigt nur den Bargeldbestand aus den festgeschriebenen Tagesabschlüssen (Tagessummen laut Z-Bon bzw. Kassenbericht); bei einer Kassen-Nachschau gehören Z-Bon, TSE-Export und Kassenbuch zusammen.`;
 
 /** Leeres Kassenbuch: Zeilen (samt Anfangsbestand) für zwei volle Querformatseiten – Seite 2 endet mit Summe und Unterschriften. */
 const KASSENBUCH_LEER = 29;

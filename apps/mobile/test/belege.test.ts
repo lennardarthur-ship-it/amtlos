@@ -175,7 +175,7 @@ describe("Paket für die Steuerberatung: LIESMICH, Fragen, Listen (Durchsicht St
     const p = steuerpaket(s, JAHR, s.steuerberatung, {}, "2027-02-15T10:00:00.000Z");
     const l = strFromU8(unzipSync(p.zip)["LIESMICH.txt"]!);
     for (const z of ["Mandant (Angaben aus der App)", "- Name: Salon Sonne", "- Rechtsform: Einzelunternehmen", "- Steuernummer: 143/123/45678", "- USt-IdNr.: DE123456789", "- Kleinunternehmer (§ 19 UStG): nein", "- Versteuerung: Soll (vereinbarte Entgelte)", "- Kontenrahmen: SKR03", "- Berater-/Mandantennummer: 1001 / 42", "- Zeitraum: 01.01.2026 bis 31.12.2026 (2026)", `- App: ${MARKE.name} 1.0.0`, "- Erstellt am: 15.02.2027 10:00 Uhr (UTC)"]) expect(l, z).toContain(z);
-    expect(l).toContain("Nicht zusätzlich zu den Monats-/Quartalsstapeln importieren – gleiche Buchungen.");
+    expect(l).toContain("Nicht zusätzlich zu den Monats-/Quartalsstapeln importieren – gleiche Buchungen (gleiche Buchungs-GUID in Beleginfo 1).");
     expect(l).toContain("- 2026-003 (Pat Privat): Privatkunde (ohne E-Mail erfasst) – keine E-Rechnung nötig");
     expect(p.ohneXml).toBe(1);
     // R10: der Kassensatz steht einmal unter „Wichtig“, nicht noch einmal unter „Nicht enthalten“

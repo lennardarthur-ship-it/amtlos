@@ -393,8 +393,10 @@ describe("Dokumentvorlagen", () => {
     expect(az).not.toContain("0:00 h");
     expect(az.match(/<tr><td>/g)).toHaveLength(31);
     expect(html("bilanz_guv", {})).not.toContain("0,00 €");
-    expect(html("kassenbuch", {})).toContain("Vorlage zum Ausdrucken");
-    expect(html("kassenbuch", { eintraege: [{ text: "Einnahmen", einnahme: "10" }] })).not.toContain("Vorlage zum Ausdrucken");
+    // StB GoBD (D-9): kein „Vorlage zum Ausdrucken“ mehr – das leere Blatt heißt „zum Führen von Hand“
+    expect(html("kassenbuch", {})).toContain("Blatt zum Führen von Hand");
+    expect(html("kassenbuch", {})).not.toContain("Vorlage zum Ausdrucken");
+    expect(html("kassenbuch", { eintraege: [{ text: "Einnahmen", einnahme: "10" }] })).not.toContain("Blatt zum Führen von Hand");
     // Rechtsform, Vertretung und Register aus „Mein Betrieb“
     const gmbh: Betrieb = { ...BETRIEB, name: "Salon Sonne GmbH", rechtsform: "GmbH", vertretung: "Alex Muster, Kim Muster", registergericht: "Amtsgericht München", registernummer: "HRB 1" };
     const imp = vorlageFuer("impressum")!.alsText!(leereDaten(vorlageFuer("impressum")!, gmbh, "2026-10-12"), gmbh);
@@ -538,7 +540,9 @@ describe("Dokumentvorlagen", () => {
     expect(uv).not.toContain("0,00 €");
     expect(uv).toContain(kopfLinie("Zeitraum"));
     expect(uv).not.toContain("wie hier angegeben");
-    expect(html("ust_voranmeldung", { vorsteuer: "50" })).toContain("ELSTER rechnet aus vollen Euro; maßgeblich ist der Betrag, den ELSTER errechnet.");
+    // StB-Prüfung (5.2): Bemessungsgrundlagen in vollen Euro, maßgeblich ist ELSTER
+    expect(html("ust_voranmeldung", { vorsteuer: "50" })).toContain("Bemessungsgrundlagen in vollen Euro (Cent bleiben weg)");
+    expect(html("ust_voranmeldung", { vorsteuer: "50" })).toContain("maßgeblich ist der Betrag, den ELSTER errechnet.");
     expect(html("ust_voranmeldung", { umsatz_19: "100" })).toContain("19,00 €");
     // Rechnung: leere Vorlage mit Umsatzsteuerzeile, Kleinunternehmer ohne; Leistungszeitraum
     expect(leer("rechnung")).toContain('Umsatzsteuer <span class="fuellen kurz"></span> %');

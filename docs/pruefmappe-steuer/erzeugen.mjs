@@ -169,12 +169,16 @@ const SACH = [
   ["Forderungen aus L+L ohne Kontokorrent (Ausgangsrechnungen, Skonto, auf Rechnung an der Kasse)", K3.forderungen, K4.forderungen, "–", "buchungen.ts BUCHUNGSKONTEN"],
   ["Verbindlichkeiten aus L+L ohne Kontokorrent (Belege mit Zahlungsweg Bank, Gutschriften)", K3.verbindlichkeiten, K4.verbindlichkeiten, "–", "buchungen.ts"],
   ["Kasse (Bargeld laut Tagesabschluss, Barbelege ab dem ersten Kassenabschluss)", K3.kasse, K4.kasse, "–", "buchungen.ts, kasse.ts"],
-  ["Geldtransit (Karten-/App-Zahlungen der Kasse, Bargeld zur Bank, Kartentrinkgeld; Barbelege einer Kapitalgesellschaft vor dem ersten Kassenabschluss)", K3.geldtransit, K4.geldtransit, "–", "kasse.ts, buchungen.ts belegGegenkonto"],
-  ["Privateinlagen (privat bezahlte Belege, Einlagen in die Kasse, Barbelege vor dem ersten Kassenabschluss); bei Kapitalgesellschaften werden privat bezahlte Belege nicht gebucht (nur Belegliste)",K3.privateinlagen, K4.privateinlagen, "–", "buchungen.ts belegGegenkonto, kasse.ts"],
+  ["Geldtransit (Karten-/App-Zahlungen der Kasse, Bargeld zur Bank, Kartentrinkgeld)", K3.geldtransit, K4.geldtransit, "–", "kasse.ts"],
+  ["Privateinlagen (privat bezahlte Belege, Einlagen in die Kasse, Barbelege vor dem ersten Kassenabschluss) – nicht bei Kapitalgesellschaften", K3.privateinlagen, K4.privateinlagen, "–", "buchungen.ts belegGegenkonto, kasse.ts"],
+  ["StB-Prüfung B-6: Verrechnungskonto Gesellschafter einer Kapitalgesellschaft (privat ausgelegte Belege, Barbelege vor dem ersten Kassenabschluss, Einlagen/Entnahmen der Kasse) – Standard laut Bericht, kanzleiabhängig", K3.verrechnungGesellschafter, K4.verrechnungGesellschafter, "–", "buchungen.ts belegGegenkonto, kasse.ts, Kontenvorgaben"],
+  ["StB-Prüfung A-4/B-6: Bank – Zahlungseingänge bilanzierender Betriebe (Bank an Forderungen), mit Kontenvorgabe „Belege gegen Bank“ auch Belege", K3.bank, K4.bank, "–", "buchungen.ts zahlungsBuchungenRechnung, Kontenvorgaben"],
   ["Privatentnahmen (Bargeld aus der Kasse, Gegenkonto der Sachentnahmen)", K3.privatentnahmen, K4.privatentnahmen, "–", "kasse.ts, sachentnahmen.ts"],
   ["Erlöse 19 % (auch Kassenüberschuss laut Zählung, Einlösung Mehrzweck-Gutschein)", K3.erloese[19], K4.erloese[19], "kein BU (Automatik vorausgesetzt)", "buchungen.ts erloeskonto, kasse.ts"],
   ["Erlöse 7 %", K3.erloese[7], K4.erloese[7], "kein BU (Automatik vorausgesetzt)", "buchungen.ts erloeskonto"],
-  ["Erlöse ohne USt: steuerfreie Umsätze (§ 4 Nr. 8 ff., z. B. Heilbehandlung § 4 Nr. 14) und vorerst Nullsteuersatz (Kz 87 offen)", K3.erloese[0], K4.erloese[0], "–", "buchungen.ts erloeskonto"],
+  ["Erlöse ohne USt: steuerfreie Umsätze (§ 4 Nr. 8 ff., z. B. Heilbehandlung § 4 Nr. 14), Kz 48", K3.erloese[0], K4.erloese[0], "–", "buchungen.ts erloeskonto"],
+  ["StB-Prüfung B-2: Erlöse Nullsteuersatz (§ 12 Abs. 3 UStG, Photovoltaik), Kz 87 – Nummer im Bericht offen („in Rewe nach Nullsteuersatz suchen“), Standard 8290/4290 laut Herstellerangaben", K3.erloese.nullsatz, K4.erloese.nullsatz, "kein BU (Automatik vorausgesetzt)", "buchungen.ts erloeskonto, Kontenvorgaben"],
+  ["OSS: Erlöse mit der Umsatzsteuer des Bestimmungslands (§ 18j UStG) – Land in Feld 40, Satz in Feld 41; UNSICHER", K3.erloese.oss, K4.erloese.oss, "kein BU (zu klären)", "buchungen.ts erloeskonto, Kontenvorgaben"],
   ["Erlöse Kleinunternehmer (§ 19 UStG)", K3.erloese.ku, K4.erloese.ku, "–", "buchungen.ts erloeskonto"],
   ["Erlöse steuerfreie innergemeinschaftliche Lieferung (mit USt-IdNr. in Feld „EU-Land u. UStID“)", K3.erloese.igl, K4.erloese.igl, "–", "buchungen.ts erloeskonto"],
   ["Erlöse § 13b im Inland (Leistungsempfänger schuldet die Steuer)", K3.erloese.rc13b, K4.erloese.rc13b, "–", "buchungen.ts erloeskonto"],
@@ -190,7 +194,11 @@ const SACH = [
   ["Erhaltene Skonti ohne Vorsteuer", K3.skontiErhalten[0], K4.skontiErhalten[0], "–", "buchungen.ts"],
   ["Gutschrift (§ 14 Abs. 2 Satz 2 UStG) als Aufwand „bezogene Leistungen“", K3.gutschrift, K4.gutschrift, "BU 9/8 bei ausgewiesener Steuer", "buchungen.ts gutschriftBuchungen"],
   ["Verkaufte, nicht eingelöste Mehrzweck-Gutscheine (§ 3 Abs. 15 UStG) – sonstige Verbindlichkeiten", K3.gutscheinVerbindlichkeit, K4.gutscheinVerbindlichkeit, "–", "kasse.ts"],
-  ["Kassendifferenz Fehlbetrag laut Zählung (sonstiger Aufwand, ohne Vorsteuer)", K3.kassendifferenzAufwand, K4.kassendifferenzAufwand, "–", "kasse.ts"],
+  ["Kassendifferenz Fehlbetrag laut Zählung (sonstiger Aufwand, ohne Vorsteuer; Überschuss: Erlöse 19 % oder per Kontenvorgabe z. B. 2700/4830 ohne USt)", K3.kassendifferenzAufwand, K4.kassendifferenzAufwand, "–", "kasse.ts, Kontenvorgaben"],
+  ["StB-Prüfung B-10: Anlagen – Maschinen", K3.anlagen.maschinen, K4.anlagen.maschinen, "BU 9/8 bei Vorsteuer", "buchungen.ts belegSachkonto, Kontenvorgaben"],
+  ["StB-Prüfung B-10: Anlagen – Betriebs- und Geschäftsausstattung (Standard der Kategorie „Anschaffung über 800 €“)", K3.anlagen.bga, K4.anlagen.bga, "BU 9/8 bei Vorsteuer", "buchungen.ts belegSachkonto"],
+  ["StB-Prüfung B-10: Anlagen – Fahrzeuge", K3.anlagen.kfz, K4.anlagen.kfz, "BU 9/8 bei Vorsteuer", "buchungen.ts belegSachkonto"],
+  ["StB-Prüfung B-10: Anlagen – Software", K3.anlagen.software, K4.anlagen.software, "BU 9/8 bei Vorsteuer", "buchungen.ts belegSachkonto"],
   ["Sachentnahme Waren 19 % (unentgeltliche Wertabgabe § 3 Abs. 1b UStG, brutto)", K3.sachentnahme[19], K4.sachentnahme[19], "kein BU (Automatik)", "sachentnahmen.ts"],
   ["Sachentnahme Waren 7 %", K3.sachentnahme[7], K4.sachentnahme[7], "kein BU (Automatik)", "sachentnahmen.ts"],
   ["§ 13b-Eingangsleistung: Bauleistung eines inländischen Unternehmers, mit Vorsteuerabzug", F.KONTEN_13B.SKR03.mit.bau, F.KONTEN_13B.SKR04.mit.bau, "kein BU (Automatik USt und VSt 19 %)", "buchungen.ts KONTEN_13B"],
@@ -199,10 +207,11 @@ const SACH = [
   ["§ 13b-Eingangsleistung: sonstige Leistung aus dem übrigen Gemeinschaftsgebiet, ohne Vorsteuerabzug", F.KONTEN_13B.SKR03.ohne.eu, F.KONTEN_13B.SKR04.ohne.eu, "kein BU (Automatik USt 19 %)", "buchungen.ts KONTEN_13B"],
 ];
 const HINWEIS = {
-  homeoffice: "Code: „Eigene Konten sind nicht sicher bekannt – vorerst die Konten von Sonstiges“",
+  homeoffice: "StB-Prüfung B-11: 4288/6348 „Aufwendungen für ein häusliches Arbeitszimmer“ (Nummer in Rewe prüfen), per Kontenvorgabe änderbar",
   personal: "nur in der Belegliste, nicht im Stapel (Lohn bucht die Lohnbuchhaltung)",
-  anlage: "Anlagegut; AfA bucht die App nicht",
-  bewirtung: "die Aufteilung in abziehbar/nicht abziehbar bucht die App nicht",
+  anlage: "Anlagegut; Konto nach Art (B-10: Maschinen, BGA, Kfz, Software – siehe oben); AfA bucht die App nicht",
+  bewirtung: "Aufteilung 70/30 (4650/4654) bucht die Kanzlei; die EÜR-Übernahme stellt nur 70 % als Ausgabe ein (E-3)",
+  waren: "Kleinunternehmer: 3200/5200 ohne BU statt 3400/5400 mit BU 40 (StB-Prüfung A-2)",
 };
 const markierung = (a, b) => ([a, b].some((k) => unsicher.has(k)) ? "**UNSICHER**" : "fachlich zu prüfen");
 const kt = ["# DATEV-Konten und BU-Schlüssel der App", "", "Aus dem Code erzeugt (`packages/fachlogik/src/buchungen.ts`, `belege.ts`, `kasse.ts`, `skonto.ts`, `sachentnahmen.ts`). Spalte „Markierung“: **UNSICHER** = im Code ausdrücklich als unsicher markiert (Kommentar mit „UNSICHER (PRUEFLISTE)“); „fachlich zu prüfen“ = im Code als zu prüfen vermerkt, aber nicht als unsicher. Kein Konto ist bisher von einer Steuerberatung bestätigt. Die Kontonummern stammen zum Teil von simulierten Steuerberater-Durchsichten („nach meinem Stand“).", "", "Die App bucht Bruttobeträge; ob ein Konto Automatikkonto ist, entscheidet über den BU-Schlüssel (siehe unten). Der Kontenrahmen (SKR03/SKR04) sowie Berater- und Mandantennummer stellt der Nutzer in der App ein.", "", "## Sachkonten, Erlöse, Skonto, Kasse, § 13b", "", "| Zweck | SKR03 | SKR04 | BU im Export | Quelle | Markierung |", "|---|---|---|---|---|---|"];
@@ -225,13 +234,14 @@ kt.push(`| ${F.BU_VORSTEUER[19]} | Vorsteuer 19 % | Aufwandskonto ohne Automatik
 kt.push(`| ${F.BU_VORSTEUER[7]} | Vorsteuer 7 % | wie oben, 7 % | fachlich zu prüfen |`);
 kt.push(`| ${F.BU_OHNE_STEUER} | Aufhebung der Automatik („keine Steuer“) | Automatikkonto, Beleg ohne Vorsteuerabzug (z. B. Kleinunternehmer) | fachlich zu prüfen (Fehler oder Warnung auf Nicht-Automatikkonten? T-113) |`);
 kt.push("| – | kein Schlüssel | Erlöse, Skonto- und § 13b-Konten (Automatik vorausgesetzt), Sätze 16 % / 5 % (2020) | fachlich zu prüfen |");
-kt.push("", "Automatikkonten laut Code: SKR03 " + F.AUTOMATIKKONTEN.SKR03.join(", ") + "; SKR04 " + F.AUTOMATIKKONTEN.SKR04.join(", ") + ".", "", "Nicht gebucht werden: Zahlungen vom Bankkonto (kommen aus dem Kontoauszug der Kanzlei), USt-Vorauszahlungen, AfA, Löhne. Bank (SKR03 1200, SKR04 1800) nennt der Code nur als Frage.", "", "## Prüfpunkte, die der Code selbst nennt (`pruefpunkteBuchungen()`)", "");
+kt.push("", "Automatikkonten laut Code: SKR03 " + F.AUTOMATIKKONTEN.SKR03.join(", ") + "; SKR04 " + F.AUTOMATIKKONTEN.SKR04.join(", ") + ".", "", "StB-Prüfung A-1: Bei Belegbuchungen steht das Zahlungskonto (Verbindlichkeiten, Kasse, Bank, Privat bzw. Verrechnungskonto) in Feld 7 „Konto“ im Haben, das Sachkonto mit BU-Schlüssel in Feld 8 „Gegenkonto“. Nicht gebucht werden: Zahlungen vom Bankkonto (Ausnahme: Zahlungseingänge auf Rechnungen bilanzierender Betriebe), USt-Vorauszahlungen, AfA, Löhne. Abweichende Konten der Kanzlei: Kontenvorgaben (kontenvorgaben.md).", "", "## Prüfpunkte, die der Code selbst nennt (`pruefpunkteBuchungen()`)", "");
 F.pruefpunkteBuchungen().forEach((p, i) => kt.push(`${i + 1}. ${p}`));
 kt.push("");
 fs.writeFileSync(path.join(ZIEL, "konten.md"), kt.join("\n"));
 
 // 6. README
 kopiere(path.join(HIER, "README.md"), path.join(ZIEL, "README.md"));
+kopiere(path.join(HIER, "kontenvorgaben.md"), path.join(ZIEL, "kontenvorgaben.md"));
 fs.rmSync(ROH, { recursive: true, force: true });
 const anzahl = (d) => fs.readdirSync(d, { recursive: true }).filter((f) => fs.statSync(path.join(d, f)).isFile()).length;
 console.log(`✓ Prüfmappe Steuer in ${ZIEL}: ${anzahl(vorlagen)} Vorlagen-PDFs, ${SZENARIEN.length} Szenarien (${anzahl(szenarien)} Dateien), ${zeilen.length} Pflichten, ${werte.length} Regelwerte, ${stb.length} Prüflisten-Punkte, ${SACH.length + F.KATEGORIEN.length} Kontenzeilen`);

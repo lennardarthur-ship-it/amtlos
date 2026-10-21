@@ -14,6 +14,7 @@ import { offenesArchiv } from "../unterlagen/archiv";
 import { pdfBytes } from "../unterlagen/pdf";
 import { gestellteRechnungen } from "../unterlagen/steuerpaket";
 import { betriebFuerDokument } from "../pro/regeln";
+import { letzteVollsicherung, nachweisText, vollsicherungFaellig } from "../unterlagen/sicherungNachweis";
 import { absenderFuer, dateienImStand, heute, sicherungFaellig, ungesichert, zusammenfuehren, type Stand } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { BuehnenBlatt } from "./gemeinsam";
@@ -68,6 +69,7 @@ export function SicherungSeite() {
   }, [z.stand.belege, z.stand.belegArchiv, z.stand.kasse, z.stand.mitarbeiter]);
   const gross = umfang.dateien > SICHERUNG_DATEIEN_WARNUNG || umfang.mb > SICHERUNG_MB_WARNUNG;
   const bereit = passwortBereit(pw, pw2);
+  const letzte = letzteVollsicherung(z.stand.sicherungsNachweis);
   const los = async () => {
     setMeldung(null);
     setLaedt(true);
@@ -89,6 +91,8 @@ export function SicherungSeite() {
         return;
       }
       z.gesichert(gesichert);
+      // StB GoBD (D-11): Nachweis der Vollsicherung außerhalb des Geräts (nur vollständig)
+      z.sicherungNachweisen("datei");
       setMeldung({ art: "erfolg", text: TEXT.sicherung_fertig });
       // fertig: Passwort aus dem Feld, Knopf wird zu „Fertig“ – keine doppelte Sicherung aus Versehen
       setPw("");
@@ -118,6 +122,8 @@ export function SicherungSeite() {
       {erledigt ? null : <PasswortPaar label={TEXT.passwort} pw={pw} pw2={pw2} setPw={setPw} setPw2={setPw2} />}
       <View style={{ marginTop: 18 }}>
         <Hinweis art="warnung" text={TEXT.sicherung_warnung} symbol="lock" />
+        {/* StB GoBD (D-11): Nachweis der letzten Vollsicherung außerhalb des Geräts */}
+        <Hinweis text={`${TEXT.stb_letzte_vollsicherung(letzte ? nachweisText(letzte) : null)} ${z.stand.cloudSicherung ? TEXT.stb_vollsicherung_icloud : TEXT.stb_vollsicherung_hinweis}`} symbol="clock" />
         {gross && !erledigt ? <Hinweis art="warnung" text={TEXT.sicherung_gross(umfang.dateien, umfang.mb)} symbol="icloud" /> : null}
         {fortschritt ? <Hinweis text={fortschritt} /> : null}
         {meldung ? <Hinweis art={meldung.art} text={meldung.text} /> : null}
@@ -144,9 +150,11 @@ export function OffenesArchiv() {
       await gleich();
       const s = z.stand;
       const dateien: Record<string, Uint8Array> = {};
+      let fehlend = 0;
       for (const n of dateienImStand(s)) {
         const b = await z.dateiLesen(n);
         if (b) dateien[n] = b;
+        else fehlend++;
       }
       const rechnungsPdfs: Record<string, Uint8Array> = {};
       const v = vorlageFuer("rechnung");
@@ -159,7 +167,11 @@ export function OffenesArchiv() {
         }
       setFortschritt(null);
       const a = offenesArchiv(s, dateien, new Date().toISOString(), { rechnungsPdfs });
-      if (await dateiTeilenBytes(a.dateiname, a.zip, "application/zip")) melden(TEXT.r12g_archiv_fertig);
+      if (await dateiTeilenBytes(a.dateiname, a.zip, "application/zip")) {
+        // StB GoBD (D-11): lesbare Vollsicherung außerhalb des Geräts – nur mit allen Belegdateien als Nachweis
+        if (!fehlend) z.sicherungNachweisen("archiv");
+        melden(TEXT.r12g_archiv_fertig);
+      }
     } catch {
       setFehler(true);
     } finally {
@@ -295,26 +307,33 @@ export function sicherungLohnt(s: Pick<Stand, "unterlagen" | "belege">, jetzt: D
   return jetzt.getTime() - new Date(zeiten[0]!).getTime() >= 7 * 86_400_000;
 }
 
-/** Hinweis „Zeit für eine Sicherung“ (E-129): ungesicherte Änderungen, letzte Sicherung älter als eine Woche. */
+/**
+ * Hinweis „Zeit für eine Sicherung“ (E-129): ungesicherte Änderungen, letzte Sicherung älter als eine Woche. Sonst
+ * StB GoBD (D-11): monatlich an die Vollsicherung außerhalb des Geräts erinnern (auch bei laufender iCloud-Sicherung).
+ */
 export function SicherungsKarte() {
   const z = useAmtlos();
   const nav = useNav();
   const f = useFarben();
-  const faellig = sicherungFaellig(z.stand, new Date());
+  const jetzt = new Date();
+  const faellig = sicherungFaellig(z.stand, jetzt);
   // erst, wenn es etwas Unersetzliches gibt: eine geteilte Rechnung oder einen Beleg – nicht schon nach einem Entwurf
   // R11 (UX #12): nicht gleich nach der ersten Rechnung – erst ab drei geteilten Unterlagen bzw. Belegen oder sieben Tage
   // nach dem ersten
-  const wertvoll = sicherungLohnt(z.stand, new Date());
-  if (!faellig || !wertvoll) return null;
+  const wertvoll = sicherungLohnt(z.stand, jetzt);
+  const voll = faellig ? null : vollsicherungFaellig(z.stand, jetzt, wertvoll);
+  if ((!faellig && !voll) || !wertvoll) return null;
+  const titel = faellig ? TEXT.sicherung_faellig_titel : TEXT.stb_vollsicherung_titel;
+  const satz = faellig ? TEXT.sicherung_faellig(faellig.tage) : TEXT.stb_vollsicherung_faellig(voll!.tage);
   return (
     // kompakt: eine Zeile mit Symbol, Satz und Pfeil – der Hinweis soll auffallen, nicht die Seite beherrschen
-    <Pressable accessibilityRole="button" accessibilityLabel={`${TEXT.sicherung_faellig_titel}. ${TEXT.sicherung_faellig(faellig.tage)}`} onPress={() => nav.oeffnen("sicherung", () => <SicherungSeite />, true)} style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 14, padding: 14, borderRadius: RADIUS.karte, backgroundColor: f.baldHauch, marginBottom: 18, opacity: pressed ? 0.75 : 1 })}>
+    <Pressable accessibilityRole="button" accessibilityLabel={`${titel}. ${satz}`} onPress={() => nav.oeffnen("sicherung", () => <SicherungSeite />, true)} style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 14, padding: 14, borderRadius: RADIUS.karte, backgroundColor: f.baldHauch, marginBottom: 18, opacity: pressed ? 0.75 : 1 })}>
       <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: f.baldKreis, alignItems: "center", justifyContent: "center" }}>
         <Symbol name="exclamationmark.shield" groesse={20} farbe={f.bald} gewicht="semibold" />
       </View>
       <View style={{ flex: 1 }}>
-        <T fett>{TEXT.sicherung_faellig_titel}</T>
-        <T v="caption" leise numberOfLines={2}>{TEXT.sicherung_faellig(faellig.tage)}</T>
+        <T fett>{titel}</T>
+        <T v="caption" leise numberOfLines={2}>{satz}</T>
       </View>
       <Symbol name="chevron.right" groesse={14} farbe={f.bald} gewicht="semibold" />
     </Pressable>

@@ -11,6 +11,7 @@
  *
  *   cd packages/fachlogik && npx tsc -p tsconfig.build.json
  *   cd apps/mobile && node werkzeuge/jahr-szenario-elektro.mjs [ausgabe]     # Standard: /tmp/claude-0/elektro
+ *   KOSIT=<ordner>    optional: KoSIT-Validator (<ordner>/v/validator-*.jar, <ordner>/cfg/scenarios.xml)
  *   CHROMIUM_PFAD=…   anderer Chromium (Standard /opt/pw-browsers/chromium)
  *
  * Voraussetzungen wie jahr-szenario.mjs: pnpm install, gebaute Pakete (@amtlos/fachlogik dist), Chromium, poppler.
@@ -260,8 +261,8 @@ function paketPruefen(name, zr, erg, ordner) {
   if (skontoBuchungen) vergleich(bereich, "DATEV: Skonto 2026-021 auf 8736 an 1410 (brutto)", summe(zeilen.filter((z) => z[6] === "8736" && z[7] === "1410").map((z) => centAus(z[0]))), summe(D.RECHNUNGEN.filter((r) => r.skonto && r.bezahlt >= zr.von && r.bezahlt <= zr.bis).map((r) => D.skontoVon(r).brutto)));
   vergleich(bereich, "DATEV: Spalten je Zeile = Spalten im Kopf", zeilen.every((z) => z.length === extf[1].length) ? "ja" : "nein", "ja");
   vergleich(bereich, "DATEV: Kopf Beraternummer/Mandant", `${extf[0][10]}/${extf[0][11]}`, "41522/30318");
-  const kontoSumme = (konto) => summe(zeilen.filter((z) => z[7] === konto || z[6] === konto).map((z) => (z[1] === "H" ? -1 : 1) * centAus(z[0])));
-  const kontoBetrag = (konto) => summe(zeilen.filter((z) => z[7] === konto).map((z) => (z[1] === "H" ? -1 : 1) * centAus(z[0])));
+  const kontoSumme = (konto) => summe(zeilen.filter((z) => z[7] === konto || z[6] === konto).map((z) => (z[1] === "H" ? -1 : 1) * (z[117] === "1" ? -1 : 1) * centAus(z[0])));
+  const kontoBetrag = (konto) => summe(zeilen.filter((z) => z[7] === konto).map((z) => (z[1] === "H" ? -1 : 1) * (z[117] === "1" ? -1 : 1) * centAus(z[0])));
   vergleich(bereich, "DATEV: Brutto auf Erlöskonto 8400 (19 %)", kontoBetrag("8400"), summe(vg.filter((x) => x.steuerart === "standard").map((x) => x.vz * ((x.s.gruppen["19"]?.netto ?? 0) + (x.s.gruppen["19"]?.ust ?? 0)))));
   const r13b = summe(vg.filter((x) => x.steuerart === "reverse_charge").map((x) => x.vz * x.s.netto));
   if (r13b) vergleich(bereich, "DATEV: § 13b-Bauleistungen auf SKR03 8337 (Konto laut buchungen.ts-Prüfpunkt)", kontoBetrag("8337"), r13b, `Die App bucht alle 0-%-Umsätze auf 8100 (dort ${D.eur(kontoBetrag("8100"))} €), packages/fachlogik/src/buchungen.ts:130, 431.`);
@@ -335,6 +336,32 @@ for (const d of bau.docs.filter((y) => y.vorlage === "impressum")) {
 for (const d of bau.docs.filter((y) => y.vorlage === "pruefprotokoll_elektro")) {
   const txt = pdftext(path.join(OUT, "pdf", d.datei)).replace(/\s+/g, " ");
   infos.push(`Prüfprotokoll ${d.datei}: Richtwert laut PDF „${(/Richtwert[^.]*\./.exec(txt) ?? ["–"])[0]}“.`);
+}
+
+// ---------------------------------------------------------------- KoSIT (optional; StB-Prüfung C-15: auch Salon, Shop, Elektro)
+let kosit = "nicht geprüft (Umgebungsvariable KOSIT nicht gesetzt)";
+const KOSIT = process.env.KOSIT;
+if (KOSIT && fs.existsSync(KOSIT)) {
+  const jar = fs.readdirSync(path.join(KOSIT, "v")).find((f) => /^validator-.*\.jar$/.test(f));
+  const sz = path.join(KOSIT, "cfg", "scenarios.xml");
+  const berichte = path.join(OUT, ".kosit");
+  fs.mkdirSync(berichte, { recursive: true });
+  const xmlDateien = bau.xmls.map((x) => path.join(OUT, "rechnungen", x.datei));
+  try {
+    execFileSync("java", ["-cp", `${path.join(KOSIT, "v", jar)}:${path.join(KOSIT, "v", "libs")}/*`, "de.kosit.validationtool.cmd.CommandLineApplication", "-s", sz, "-r", path.dirname(sz), "-o", berichte, ...xmlDateien], { stdio: "pipe" });
+  } catch {
+    /* Ergebnis steht in den Berichten */
+  }
+  const erg = xmlDateien.map((f) => {
+    const b = fs.readdirSync(berichte).find((r) => r.startsWith(path.basename(f, ".xml")) && r.includes("report") && r.endsWith(".xml"));
+    const txt = b ? fs.readFileSync(path.join(berichte, b), "utf8") : "";
+    const ok = /<rep:accept/.test(txt);
+    const warn = (txt.match(/<rep:message[^>]*level="warning"[^>]*>[^<]*/g) ?? []).length;
+    if (!ok) auffaellig.push(`KoSIT: ${path.basename(f)} nicht akzeptiert: ${(txt.match(/<rep:message[^>]*level="error"[^>]*>[^<]*/g) ?? []).slice(0, 3).map((m) => m.replace(/<[^>]*>/g, "")).join(" | ") || "kein Bericht"}`);
+    return `${path.basename(f)}: ${ok ? "akzeptiert" : "ABGELEHNT"}${warn ? ` (${warn} Warnungen)` : ""}`;
+  });
+  fs.rmSync(berichte, { recursive: true, force: true });
+  kosit = `KoSIT-Validator (${jar}, ${path.basename(KOSIT)}): ${erg.join("; ")}`;
 }
 
 // ---------------------------------------------------------------- PNG-Ansichten (60 dpi)
@@ -432,9 +459,10 @@ md.push("## Auffälligkeiten beim Erzeugen", "", "### Automatisch erkannt (Abwei
 md.push(...(auffaellig.length ? auffaellig.map((a) => `- ${a}`) : ["- keine"]), "");
 md.push("### Fachlich festgestellt (nicht automatisch prüfbar), mit Fundstelle und Vorschlag", "", ...(BEOBACHTUNGEN.length ? BEOBACHTUNGEN.map((b) => `- ${b}`) : ["- (noch nicht gepflegt)"]), "");
 md.push("## Durchsicht jeder PDF-Seite (PNG 60 dpi, von Hand)", "", ...(DURCHSICHT.length ? DURCHSICHT.map((b) => `- ${b}`) : ["- (noch nicht gepflegt)"]), "");
-md.push("## Hinweise der App und weitere Informationen", "", ...infos.map((i) => `- ${i}`), "- KoSIT-Validator: in diesem Lauf nicht geprüft.", "");
+md.push("## Hinweise der App und weitere Informationen", "", ...infos.map((i) => `- ${i}`), `- ${kosit}`, "");
 fs.writeFileSync(path.join(OUT, "SZENARIO.md"), md.join("\n"));
 
 console.log(`${bau.docs.length} Unterlagen, ${bau.xmls.length} XRechnungen, ${bau.belegDateien.length} Belegdateien, ${pdfs.length} PDFs → ${OUT}`);
 console.log(`Vergleiche: ${vergleiche.filter((x) => x.ok).length}/${vergleiche.length} ok; Auffälligkeiten: ${auffaellig.length}`);
+console.log(kosit);
 for (const a of auffaellig) console.log(`  - ${a}`);

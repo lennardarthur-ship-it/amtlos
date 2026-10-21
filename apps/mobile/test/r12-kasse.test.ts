@@ -36,11 +36,11 @@ function mitKasse(): Stand {
 
 describe("Stand: Migration 1 → 2, Lesen, Aufbewahrung", () => {
   it("hebt Version 1 auf 2 mit leerer Kasse; Kasse aus Version 2 bleibt erhalten", () => {
-    // R12 Personal: inzwischen Version 3 (Betriebsstätten, festgeschriebene Nachweise); Phase 2.3: Version 5 (Partner-ID); Vorprüfung Recht: Version 6 (Zustimmung)
-    expect(STAND_VERSION).toBe(6);
+    // R12 Personal: inzwischen Version 3 (Betriebsstätten, festgeschriebene Nachweise); Phase 2.3: Version 5 (Partner-ID); Vorprüfung Recht: Version 6 (Zustimmung); StB-Prüfung: Version 7 (Kontenvorgaben)
+    expect(STAND_VERSION).toBe(7);
     expect(MIGRATIONEN[1]!({ version: 1, belege: [] })).toMatchObject({ kasse: [] });
     const alt = standAus(JSON.stringify({ version: 1, betrieb: { name: "Alt" } }));
-    expect(alt.version).toBe(6);
+    expect(alt.version).toBe(7);
     expect(alt.kasse).toEqual([]);
     const s = mitKasse();
     const wieder = standAus(JSON.stringify(s));
@@ -197,9 +197,10 @@ describe("EÜR, DATEV-Stapel und Kontrollmappe mit Kasse", () => {
     expect(liste).toContain("01.04.2026;66,35;S;1000;8400");
     expect(liste).toContain("01.04.2026;59,65;S;1000;8300");
     expect(liste).not.toContain(";S;1360;1000;");
-    expect(liste).toMatch(/02\.04\.2026;10,70;S;3300;1000/);
+    // StB-Prüfung (A-1): Kasse bzw. Privateinlage in Feld 7 im Haben, Sachkonto als Gegenkonto
+    expect(liste).toMatch(/02\.04\.2026;10,70;H;1000;3300/);
     // vor dem ersten Abschluss: aus eigener Tasche (Privateinlage), nicht Geldtransit
-    expect(liste).toMatch(/30\.03\.2026;5,35;S;3300;1890/);
+    expect(liste).toMatch(/30\.03\.2026;5,35;H;1890;3300/);
     const l = datei(p, "LIESMICH.txt");
     expect(l).toContain("Kassenumsätze aus 3 Tagesabschlüssen");
     expect(l).not.toContain("Kassenumsätze fehlen");

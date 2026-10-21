@@ -68,7 +68,22 @@ export interface Beleg {
    * Voranmeldung steckt. Danach nur noch mit Grund änderbar (die vorige Fassung bleibt in `historie`), nie löschbar.
    */
   festgeschrieben?: string | null;
+  /**
+   * StB-Prüfung (B-10): Art des Anlageguts bei der Kategorie „Anschaffung über 800 €“ – bestimmt das Anlagenkonto
+   * (Maschinen, Betriebs- und Geschäftsausstattung, Fahrzeug, Software). Ohne Angabe: Betriebs- und Geschäftsausstattung.
+   */
+  anlage_art?: AnlageArt | null;
 }
+
+/** StB-Prüfung (B-10): Arten von Anlagegütern mit eigenem Anlagenkonto */
+export type AnlageArt = "maschinen" | "bga" | "kfz" | "software";
+export const ANLAGE_ARTEN: { wert: AnlageArt; text: string }[] = [
+  { wert: "bga", text: "Betriebs- und Geschäftsausstattung (Möbel, Geräte)" },
+  { wert: "maschinen", text: "Maschinen" },
+  { wert: "kfz", text: "Fahrzeug" },
+  { wert: "software", text: "Software" },
+];
+const anlageArtAus = (w: unknown): AnlageArt | null => (w === "maschinen" || w === "bga" || w === "kfz" || w === "software" ? w : null);
 
 export type Steuerschuld = "bau" | "eu";
 export const STEUERSCHULD_ARTEN: { wert: Steuerschuld; text: string }[] = [
@@ -92,6 +107,7 @@ export interface BelegFassung {
   datei?: string | null;
   steuerschuld?: Steuerschuld | null;
   skonto_cent?: number | null;
+  anlage_art?: AnlageArt | null;
   /** R12 GoBD: Grund, mit dem diese Fassung nach der Festschreibung ersetzt wurde */
   grund?: string | null;
 }
@@ -148,8 +164,9 @@ export const KATEGORIEN: Kategorie[] = [
   { id: "gwg", titel: "Geräte und Ausstattung bis 800 € netto", kurz: "GWG", euer: "Aufwendungen für geringwertige Wirtschaftsgüter nach § 6 Absatz 2 EStG", skr03: konto("4855"), skr04: konto("6260"), hinweis: "sofort abziehbar (§ 6 Abs. 2 EStG)" },
   { id: "anlage", titel: "Anschaffung über 800 € netto (wird abgeschrieben)", kurz: "Anlagegut", euer: "AfA auf unbewegliche Wirtschaftsgüter / bewegliche Wirtschaftsgüter / immaterielle Wirtschaftsgüter", skr03: konto("0420"), skr04: konto("0650"), anlage: true, hinweis: "keine sofortige Betriebsausgabe – Abschreibung über die Nutzungsdauer" },
   // R10: Tagespauschale (§ 4 Abs. 5 Satz 1 Nr. 6c EStG) bzw. Arbeitszimmer – eigene Zeile der Anlage EÜR; Eigenbeleg ohne Vorsteuer.
-  // Eigene Konten sind nicht sicher bekannt – vorerst die Konten von „Sonstiges“ (PRUEFLISTE).
-  { id: "homeoffice", titel: "Homeoffice-Pauschale bzw. Arbeitszimmer", kurz: "Homeoffice", euer: "Aufwendungen für ein häusliches Arbeitszimmer", skr03: konto("4900"), skr04: konto("6300"), hinweis: "Tagespauschale 6 € je Tag, höchstens 1.260 € im Jahr (§ 4 Abs. 5 Satz 1 Nr. 6c EStG) – als Eigenbeleg, ohne Vorsteuer" },
+  // StB-Prüfung (B-11): SKR03 4288 / SKR04 6348 „Aufwendungen für ein häusliches Arbeitszimmer“ („Nummer in Rewe prüfen“) –
+  // statt der Konten von „Sonstiges“; über die Kontenvorgaben der Kanzlei änderbar.
+  { id: "homeoffice", titel: "Homeoffice-Pauschale bzw. Arbeitszimmer", kurz: "Homeoffice", euer: "Aufwendungen für ein häusliches Arbeitszimmer", skr03: konto("4288"), skr04: konto("6348"), hinweis: "Tagespauschale 6 € je Tag, höchstens 1.260 € im Jahr (§ 4 Abs. 5 Satz 1 Nr. 6c EStG) – als Eigenbeleg, ohne Vorsteuer" },
   { id: "sonstiges", titel: "Sonstiges", kurz: "Sonstiges", euer: "Übrige unbeschränkt abziehbare Betriebsausgaben", skr03: konto("4900"), skr04: konto("6300") },
 ];
 
@@ -448,6 +465,7 @@ function fassungAus(roh: unknown): BelegFassung | null {
     datei: istBelegDateiname(r.datei) ? r.datei : null,
     ...(steuerschuldAus(r.steuerschuld) ? { steuerschuld: steuerschuldAus(r.steuerschuld) } : {}),
     ...(skontoAusRoh(r.skonto_cent) ? { skonto_cent: skontoAusRoh(r.skonto_cent) } : {}),
+    ...(anlageArtAus(r.anlage_art) ? { anlage_art: anlageArtAus(r.anlage_art) } : {}),
     ...(s("grund") ? { grund: s("grund").slice(0, 300) } : {}),
   };
 }
@@ -490,13 +508,14 @@ export function belegAus(roh: unknown): Beleg | null {
     ...(steuerschuldAus(r.steuerschuld) ? { steuerschuld: steuerschuldAus(r.steuerschuld) } : {}),
     ...(skontoAusRoh(r.skonto_cent) ? { skonto_cent: skontoAusRoh(r.skonto_cent) } : {}),
     ...(BELEGNUMMER.test(s("nr")) ? { nr: s("nr") } : {}),
+    ...(anlageArtAus(r.anlage_art) ? { anlage_art: anlageArtAus(r.anlage_art) } : {}),
     ...(/^\d{4}-\d{2}-\d{2}T/.test(s("festgeschrieben")) ? { festgeschrieben: s("festgeschrieben") } : {}),
   };
 }
 
 /** Inhalt eines Belegs als frühere Fassung (für das Änderungsprotokoll); `grund`: warum sie ersetzt wurde (R12 GoBD). */
 export function belegFassung(b: Beleg, bis: string, grund?: string): BelegFassung {
-  return { ...(grund ? { grund: grund.trim().slice(0, 300) } : {}), bis, datum: b.datum, lieferant: b.lieferant, nummer: b.nummer ?? null, kategorie: b.kategorie, steuer: b.steuer.map((x) => ({ ...x })), vorsteuer: b.vorsteuer, zahlung: b.zahlung, bezahlt: b.bezahlt ?? null, notiz: b.notiz ?? null, datei: b.datei ?? null, ...(b.steuerschuld ? { steuerschuld: b.steuerschuld } : {}), ...(b.skonto_cent ? { skonto_cent: b.skonto_cent } : {}) };
+  return { ...(grund ? { grund: grund.trim().slice(0, 300) } : {}), bis, datum: b.datum, lieferant: b.lieferant, nummer: b.nummer ?? null, kategorie: b.kategorie, steuer: b.steuer.map((x) => ({ ...x })), vorsteuer: b.vorsteuer, zahlung: b.zahlung, bezahlt: b.bezahlt ?? null, notiz: b.notiz ?? null, datei: b.datei ?? null, ...(b.steuerschuld ? { steuerschuld: b.steuerschuld } : {}), ...(b.skonto_cent ? { skonto_cent: b.skonto_cent } : {}), ...(b.anlage_art ? { anlage_art: b.anlage_art } : {}) };
 }
 
 /** Hat sich der Inhalt (nicht nur der Zeitstempel) eines Belegs geändert? */

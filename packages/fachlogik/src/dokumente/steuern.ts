@@ -6,7 +6,7 @@
 import { GOBD } from "./bausteine.js";
 import { mitVertretung } from "./betrieb.js";
 import { abschnitte, angaben, ankreuzen, auswahl, datumDe, dokument, esc, ja, liste, neufassung, punkte, stabileOption, tabelle, text, unterschriften, zelle, zeilen } from "./html.js";
-import type { Option, Vorlage } from "./typen.js";
+import type { Daten, Option, Vorlage } from "./typen.js";
 import { MARKE } from "@amtlos/marke";
 
 // Wert bleibt der frühere Text (gespeicherte Auswahlen), Anzeige und Druck in der Neufassung
@@ -26,6 +26,40 @@ const KASSEN_ABLAUF = [
   "Gutscheine: Einzweck-Gutscheine werden beim Verkauf versteuert, Mehrzweck-Gutscheine bei der Einlösung",
   "Bei Ausfall der Kasse oder der TSE wird der Ausfall mit Beginn, Ende und Grund dokumentiert und die Einnahmen werden in dieser Zeit von Hand aufgezeichnet",
 ];
+/**
+ * StB GoBD (D-10, AEAO zu § 146a Nr. 7): weitere Bausteine zum Kassenkapitel – Z-Bon, DSFinV-K-Export, Ausfall der TSE.
+ * Eigene Liste, damit gespeicherte Auswahlen der bisherigen Bausteine gültig bleiben.
+ */
+const KASSEN_TSE = [
+  "Der Z-Bon wird nach Geschäftsschluss gedruckt bzw. elektronisch erzeugt und aufbewahrt; Stornos, Trainingsbuchungen und Entnahmen stehen im Kassensystem, nicht nur auf Papier",
+  "Der DSFinV-K-Export und der TSE-Export werden mindestens monatlich erstellt, außerhalb der Kasse gespeichert und 10 Jahre aufbewahrt",
+  "Bei Ausfall der TSE wird die Kasse weiter genutzt, wenn der Beleg den Ausfall erkennen lässt; Beginn, Ende und Grund werden festgehalten, die Störung wird unverzüglich behoben (AEAO zu § 146a Nr. 7)",
+  "Fällt die ganze Kasse aus, werden die Einnahmen bis zur Reparatur einzeln von Hand aufgezeichnet (Datum, Betrag, Steuersatz) und die Aufzeichnungen aufbewahrt",
+  "Neue Kasse, neue TSE oder Außerbetriebnahme: Kassenmeldung innerhalb eines Monats über Mein ELSTER (§ 146a Abs. 4 AO)",
+];
+/** StB GoBD (D-10, GoBD Rz. 136 ff.): Kapitel „Ersetzendes Scannen“ – Erfassung, Fotoqualität, Kontrolle, Vernichtung. */
+const SCAN_REGELN = [
+  `Papierbelege werden zeitnah nach Eingang mit der Kamera in ${MARKE.name} fotografiert, spätestens bis zum Monatsende`,
+  "Vor dem Speichern wird jedes Foto geprüft: ganzer Beleg ohne abgeschnittene Ränder, lesbar (Aussteller, Datum, Beträge, Steuer), mehrseitige Belege vollständig; Farbe bleibt, wo sie Bedeutung hat",
+  `Jedes Foto bekommt beim Speichern eine feste ${MARKE.name}-Belegnummer und den Erfassungszeitpunkt; es wird nicht bearbeitet, Änderungen an den Angaben nur mit Grund (Änderungsprotokoll)`,
+  "Vollständigkeitskontrolle monatlich: Belege gegen Kontoauszug und Kasse abgleichen; fehlende Belege nachfordern oder einen Eigenbeleg erstellen",
+  "Der Papierbeleg wird erst vernichtet, wenn das Foto geprüft, der Beleg festgeschrieben (Steuerberater-Paket bzw. Voranmeldung) und eine Sicherung außerhalb des Geräts erstellt ist",
+  "Nicht vernichtet werden Belege, deren Original aufbewahrt werden muss (z. B. Zollbelege, notarielle Urkunden, Belege mit Wertpapiercharakter)",
+];
+/** StB GoBD (D-10, GoBD Rz. 100): internes Kontrollsystem – wer was prüft, realistisch für kleine Betriebe. */
+const IKS = [
+  `Kassensturz: Die Inhaberin bzw. der Inhaber zählt die Kasse mindestens monatlich unangekündigt und vergleicht mit dem Kassenbuch (Kassensturz mit Zählprotokoll in ${MARKE.name})`,
+  "Tagesabschluss: Wer die Kasse schließt, zählt den Bestand; Differenzen über 5 € werden am nächsten Tag von der Inhaberin bzw. dem Inhaber geprüft",
+  "Vier-Augen-Prinzip, wo es eine zweite Person gibt (z. B. Zählung gegenzeichnen); im Betrieb ohne weitere Person ersetzt durch die Plausibilitätsprüfung der Steuerberatung beim Verbuchen",
+  "Steuerberater-Pakete und Voranmeldungen gibt nur die Inhaberin bzw. die Geschäftsführung frei – vorher Abgleich mit den Kontoauszügen",
+  "Korrekturen an festgeschriebenen Rechnungen, Belegen und Tagesabschlüssen nur durch die Inhaberin bzw. die Geschäftsführung, immer mit Grund",
+  "Monatlich: Bank, Belege und offene Rechnungen abgleichen; Eingangsrechnungen vor der Zahlung sachlich und rechnerisch prüfen",
+  "Zugang zur App nur mit Gerätesperre bzw. Face ID; Zugangsdaten werden nicht weitergegeben",
+];
+/** StB GoBD (D-1): fester Satz im Kassenkapitel, wenn die Kassenabschlüsse in der App stehen. */
+const KASSE_EINZEL = (system: string) =>
+  `Einzelaufzeichnungen: ${system.trim() ? `Kassensystem ${system.trim()}` : "im Kassensystem"}, Export DSFinV-K (§ 146 Abs. 1 Satz 1, § 146a AO). ${MARKE.name} führt nur die Tagessummen aus dem Z-Bon bzw. Kassenbericht und den Bargeldbestand (Kassenbuch). Bei einer Kassen-Nachschau werden Z-Bon, TSE-Export und Kassenbuch zusammen vorgelegt.`;
+
 /** R12 GoBD: Abläufe in Amtlos (fester Text, wenn Amtlos genutzt wird). */
 const AMTLOS_ABLAEUFE = [
   "Rechnungen bekommen fortlaufende Nummern und werden beim ersten Teilen festgeschrieben – mit den Absenderdaten, dem Hash des geteilten PDFs und der XRechnung. Korrigiert wird nur per Stornorechnung.",
@@ -35,11 +69,31 @@ const AMTLOS_ABLAEUFE = [
   "Mit dem Steuerberater-Paket bzw. einer abgegebenen Voranmeldung werden die enthaltenen Belege festgeschrieben; Änderungen danach nur mit Grund (Änderungsprotokoll im Paket).",
   `Die Daten liegen verschlüsselt auf dem Gerät. Gesichert wird verschlüsselt (Datei oder iCloud) mit einem Passwort, das getrennt und sicher hinterlegt ist; zusätzlich gibt es ein offenes Archiv (CSV, JSON, PDF, XML) zum Lesen ohne ${MARKE.name}.`,
   "„Alle Daten löschen“ ist gesperrt, solange aufbewahrungspflichtige Daten ohne aktuelle Sicherung auf dem Gerät liegen.",
+  // StB GoBD (D-11): Vollsicherung außerhalb des Geräts mit Erinnerung und Nachweis
+  `Mindestens monatlich wird eine Vollsicherung außerhalb des Geräts erstellt (verschlüsselte Sicherungsdatei oder offenes Archiv – nicht nur das iCloud-Backup des iPhones); ${MARKE.name} erinnert daran, sobald die letzte älter als 30 Tage ist, und hält Datum und Art der letzten Sicherung als Nachweis fest.`,
+  // StB GoBD (D-3, GoBD Rz. 110): wie die Unveränderbarkeit technisch gesichert ist
+  `Unveränderbarkeit technisch: Festgeschriebene Rechnungen, Belege, Tagesabschlüsse und Kassenbücher lassen sich in ${MARKE.name} nicht überschreiben. Jede Korrektur legt eine neue Fassung mit Zeitpunkt und Grund an, die vorige bleibt lesbar; geteilte PDFs tragen einen SHA-256-Hash. Das Änderungsprotokoll und alle Fassungen gehen mit jedem Steuerberater-Paket und dem offenen Archiv mit. Eine Hash-Kette über die festgeschriebenen Abschlüsse gibt es noch nicht.`,
   "Diese Verfahrensdokumentation wird beim Teilen festgeschrieben; Änderungen sind neue Fassungen mit Datum und Grund.",
 ];
 
 /** Optionen der Auswahlfelder (wie im Formular) – auf dem leeren Blatt zum Ankreuzen. */
-const AUSWAHL_OPTIONEN: Record<string, string[]> = { belegeingang: GOBD.belegeingang, belegart: GOBD.belegart, ablage: GOBD.ablage, sicherung_ort: GOBD.sicherungOrt, sicherung_intervall: GOBD.sicherungIntervall };
+const AUSWAHL_OPTIONEN: Record<string, string[]> = { belegeingang: GOBD.belegeingang, belegart: GOBD.belegart, ablage: GOBD.ablage, sicherung_ort: GOBD.sicherungOrt, sicherung_intervall: GOBD.sicherungIntervall, iks: IKS };
+
+/** StB GoBD (D-1, D-10): Kapitel „Kasse“ – Art, Kassensystem und TSE, wo die Einzelaufzeichnungen liegen, Abläufe. */
+function kassenKapitel(d: Daten): string {
+  const art = text(d, "kasse_art");
+  const tse = art === KASSEN_ARTEN[0];
+  const system = [text(d, "kasse_system"), text(d, "kasse_tse") ? `TSE ${text(d, "kasse_tse")}` : ""].filter(Boolean).join(", ");
+  const bausteine = (k: string) => (auswahl(d, k).length ? punkte(auswahl(d, k).map((w) => neufassung(w))) : "");
+  return (
+    `<p>${esc(art)}.</p>` +
+    (tse ? angaben([["Kassensystem", text(d, "kasse_system")], ["TSE", text(d, "kasse_tse")]]) + `<p>${esc(ja(d, "amtlos") ? KASSE_EINZEL(system) : `Einzelaufzeichnungen: ${system ? `Kassensystem ${system}` : "im Kassensystem"}, Export DSFinV-K (§ 146 Abs. 1 Satz 1, § 146a AO).`)}</p>` : "") +
+    bausteine("kasse_ablauf") +
+    (tse ? bausteine("kasse_tse_ablauf") : "") +
+    // freie Ergänzung nur, wenn eingetragen (keine leeren Linien hinter den Bausteinen)
+    (text(d, "kasse_zusatz") ? zeilen(text(d, "kasse_zusatz")) : "")
+  );
+}
 
 export const verfahrensdokumentation: Vorlage = {
   id: "verfahrensdokumentation",
@@ -95,7 +149,8 @@ export const verfahrensdokumentation: Vorlage = {
         { id: "erfassung", art: "mehrzeilig", label: "Erfassung, Prüfung und Verbuchung", hilfe: "Wer erfasst Belege wann, wer prüft, wie wird gebucht", pflicht: true, vorschlaege: ["Belege werden wöchentlich erfasst und an die Steuerberatung übermittelt.", "Eingangsrechnungen werden vor der Zahlung sachlich und rechnerisch geprüft.", "Ausgangsrechnungen werden fortlaufend nummeriert im Rechnungsprogramm erstellt."] },
         { id: "scannen", art: "schalter", label: "Papierbelege werden gescannt (ersetzendes Scannen)" },
         { id: "papier", art: "wahl", label: "Was mit dem Papier nach dem Scannen passiert", optionen: opt(GOBD.papier), wenn: { feld: "scannen" } },
-        { id: "scan_ablauf", art: "mehrzeilig", label: "Ablauf des Scannens und Kontrolle", wenn: { feld: "scannen" }, vorschlaege: ["Scan zeitnah nach Eingang, vollständige und lesbare Wiedergabe wird vor der Ablage geprüft."] },
+        { id: "scan_regeln", art: "bausteine", label: "Ablauf, Fotoqualität, Kontrolle und Vernichtung", optionen: opt(SCAN_REGELN), vorbelegung: SCAN_REGELN, wenn: { feld: "scannen" } },
+        { id: "scan_ablauf", selten: true, art: "mehrzeilig", label: "Weitere Regeln zum Scannen", wenn: { feld: "scannen" }, vorschlaege: ["Scan zeitnah nach Eingang, vollständige und lesbare Wiedergabe wird vor der Ablage geprüft."] },
       ],
     },
     {
@@ -103,7 +158,11 @@ export const verfahrensdokumentation: Vorlage = {
       hilfe: "Wie Bareinnahmen aufgezeichnet werden. Bei einer elektronischen Kasse gehören deren Bedienungsanleitung, Programmierprotokolle und die Kassenmeldung zur Verfahrensdokumentation.",
       felder: [
         { id: "kasse_art", art: "wahl", label: "Art der Kasse", optionen: KASSEN_ARTEN.map((t) => ({ wert: t, text: t })) },
+        // StB GoBD (D-10): Kassensystem, TSE und Export – die Angaben stehen auch in der Kassenmeldung
+        { id: "kasse_system", art: "text", label: "Kassensystem (Hersteller, Modell, Software)", hilfe: "wie in der Kassenmeldung, z. B. „KassaVista Tablet-Kasse, Software 4.2“", wenn: { feld: "kasse_art", ist: KASSEN_ARTEN[0]! } },
+        { id: "kasse_tse", art: "text", label: "TSE (Art und Seriennummer)", hilfe: "z. B. „Cloud-TSE, Seriennummer 3f9a…“", wenn: { feld: "kasse_art", ist: KASSEN_ARTEN[0]! } },
         { id: "kasse_ablauf", art: "bausteine", label: "Ablauf an der Kasse", optionen: opt(KASSEN_ABLAUF), wenn: { feld: "kasse_art", ist: [KASSEN_ARTEN[0]!, KASSEN_ARTEN[1]!] } },
+        { id: "kasse_tse_ablauf", art: "bausteine", label: "Z-Bon, DSFinV-K-Export und Ausfall der TSE", optionen: opt(KASSEN_TSE), vorbelegung: KASSEN_TSE, wenn: { feld: "kasse_art", ist: KASSEN_ARTEN[0]! } },
         { id: "kasse_zusatz", selten: true, art: "mehrzeilig", label: "Weitere Regeln zur Kasse", hilfe: "z. B. Wechselgeldbestand, wer zählt, Ausfall der Kasse oder der TSE", wenn: { feld: "kasse_art", ist: [KASSEN_ARTEN[0]!, KASSEN_ARTEN[1]!] } },
         { id: "amtlos", art: "schalter", label: `Rechnungen, Belege und Kassenabschlüsse werden in ${MARKE.name} geführt`, vorbelegung: true, hilfe: `Dann beschreibt die Verfahrensdokumentation auch die Abläufe in ${MARKE.name}: Festschreibung, Korrektur mit Grund, Storno, ungültige Belege, Sicherung und Löschsperre.` },
       ],
@@ -113,9 +172,14 @@ export const verfahrensdokumentation: Vorlage = {
       felder: [
         { id: "sicherung_intervall", art: "wahl", label: "Datensicherung – wie oft", optionen: opt(GOBD.sicherungIntervall), vorbelegung: GOBD.sicherungIntervall[0], pflicht: true },
         { id: "sicherung_ort", art: "bausteine", label: "Datensicherung – wohin", optionen: opt(GOBD.sicherungOrt), pflicht: true },
+        // StB GoBD (D-11): Nachweis der letzten Vollsicherung außerhalb des Geräts – trägt die App aus „Daten sichern“ ein
+        { id: "sicherung_nachweis", art: "text", label: "Letzte Sicherung außerhalb des Geräts", hilfe: `Datum und Art, z. B. „15.10.2026, verschlüsselte Sicherungsdatei“ – ${MARKE.name} trägt die letzte Sicherung ein` },
         { id: "e_rechnung", art: "schalter", label: "E-Rechnungen werden empfangen", vorbelegung: true },
         { id: "zugriff", art: "mehrzeilig", label: "Zugriffsrechte", pflicht: true, vorschlaege: ["Zugriff auf Buchhaltung und Belege nur für Inhaber/in und Steuerberatung", "Jede Person hat ein eigenes Benutzerkonto mit Passwort"] },
-        { id: "kontrollen", art: "mehrzeilig", label: "Internes Kontrollsystem", hilfe: "Welche Prüfungen sicherstellen, dass alles vollständig und richtig ist", pflicht: true, vorschlaege: ["Monatlicher Abgleich von Kontoauszügen und Buchungen", "Tägliches Zählen der Kasse und Abgleich mit dem Kassenbericht", "Vier-Augen-Prinzip bei Zahlungen über einem festgelegten Betrag"] },
+        // StB GoBD (D-10, GoBD Rz. 100): wer prüft was – Bausteine; der freie Text ergänzt
+        { id: "iks", art: "bausteine", label: "Internes Kontrollsystem – wer prüft was", optionen: opt(IKS), hilfe: "Welche Prüfungen sicherstellen, dass alles vollständig und richtig ist. Im kleinen Betrieb ohne zweite Person ist ein Vier-Augen-Prinzip nicht möglich – dann gilt die Prüfung durch Inhaberin bzw. Inhaber und Steuerberatung." },
+        { id: "iks_wer", art: "text", label: "Verantwortlich für die Kontrollen", vorbelegung: "verantwortlich" },
+        { id: "kontrollen", art: "mehrzeilig", label: "Weitere Kontrollen", hilfe: "Welche Prüfungen sicherstellen, dass alles vollständig und richtig ist", vorschlaege: ["Monatlicher Abgleich von Kontoauszügen und Buchungen", "Tägliches Zählen der Kasse und Abgleich mit dem Kassenbericht", "Vier-Augen-Prinzip bei Zahlungen über einem festgelegten Betrag"] },
       ],
     },
     {
@@ -160,21 +224,28 @@ export const verfahrensdokumentation: Vorlage = {
             titel: "Anwenderdokumentation: Belegeingang, Erfassung und Ablage",
             rand: "GoBD Tz. 10.1",
             inhalt:
-              teil("Eingang der Belege", l("belegeingang")) + teil("Art der Belegablage", l("belegart")) + teil("Ablage", l("ablage")) + teil("Erfassung, Prüfung und Verbuchung", zeilen(text(d, "erfassung"))) +
-              (ja(d, "scannen") ? teil("Ersetzendes Scannen", `${text(d, "papier") ? `<p>${esc(text(d, "papier"))}.</p>` : ""}${zeilen(text(d, "scan_ablauf"))}`) : ""),
+              teil("Eingang der Belege", l("belegeingang")) + teil("Art der Belegablage", l("belegart")) + teil("Ablage", l("ablage")) + teil("Erfassung, Prüfung und Verbuchung", zeilen(text(d, "erfassung"))),
           },
-          ...(text(d, "kasse_art")
-            ? [{ titel: "Kasse", rand: "§ 146 Abs. 1, § 146a AO", inhalt: `<p>${esc(text(d, "kasse_art"))}.</p>${auswahl(d, "kasse_ablauf").length ? punkte(auswahl(d, "kasse_ablauf").map((w) => neufassung(w))) : ""}${zeilen(text(d, "kasse_zusatz"))}` }]
+          // StB GoBD (D-10, GoBD Rz. 136 ff.): eigenes Kapitel – Ablauf, Fotoqualität, Vollständigkeitskontrolle, Vernichtung
+          ...(ja(d, "scannen")
+            ? [{ titel: "Ersetzendes Scannen", rand: "GoBD Rz. 136 ff.", inhalt: `${text(d, "papier") ? `<p>${esc(neufassung(text(d, "papier")))}.</p>` : ""}${punkte(auswahl(d, "scan_regeln").map((w) => neufassung(w)))}${text(d, "scan_ablauf") ? zeilen(text(d, "scan_ablauf")) : ""}` }]
             : []),
+          ...(text(d, "kasse_art") ? [{ titel: "Kasse", rand: "§ 146 Abs. 1, § 146a AO; AEAO zu § 146a", inhalt: kassenKapitel(d) }] : []),
           ...(ja(d, "amtlos") ? [{ titel: `Abläufe in ${MARKE.name}`, rand: "GoBD Tz. 3.2.4, 8, 9", inhalt: punkte(AMTLOS_ABLAEUFE) }] : []),
           {
             titel: "Technische Systemdokumentation und Betriebsdokumentation",
             rand: "GoBD Tz. 10.1",
             inhalt:
               // Blatt zum Ausfüllen (noch keine Ablage gewählt): auch das Intervall zum Ankreuzen statt des Startwerts
-              teil("Datensicherung", leer || !text(d, "sicherung_intervall") ? `<p>Die Daten werden gesichert:</p>${ankreuzen(optionenVon("sicherung_intervall"), { nebeneinander: true })}<p>Wohin:</p>${l("sicherung_ort")}` : `<p>Die Daten werden ${esc(text(d, "sicherung_intervall"))} gesichert:</p>${l("sicherung_ort")}`) +
+              teil("Datensicherung", (leer || !text(d, "sicherung_intervall") ? `<p>Die Daten werden gesichert:</p>${ankreuzen(optionenVon("sicherung_intervall"), { nebeneinander: true })}<p>Wohin:</p>${l("sicherung_ort")}` : `<p>Die Daten werden ${esc(text(d, "sicherung_intervall"))} gesichert:</p>${l("sicherung_ort")}`) + angaben([["Letzte Sicherung außerhalb des Geräts", text(d, "sicherung_nachweis")]])) +
               (ja(d, "e_rechnung") ? teil("E-Rechnungen", `<p>${esc(GOBD.eRechnung)}</p>`) : "") +
-              teil("Zugriffsrechte", zeilen(text(d, "zugriff"))) + teil("Internes Kontrollsystem", zeilen(text(d, "kontrollen"))),
+              teil("Zugriffsrechte", zeilen(text(d, "zugriff"))),
+          },
+          // StB GoBD (D-10, GoBD Rz. 100 ff.): wer prüft Kassensturz, wer gibt Pakete frei
+          {
+            titel: "Internes Kontrollsystem",
+            rand: "GoBD Rz. 100 ff.",
+            inhalt: `${auswahl(d, "iks").length ? punkte(auswahl(d, "iks").map((w) => neufassung(w))) : text(d, "kontrollen") ? "" : ankreuzen(IKS)}${text(d, "kontrollen") || !auswahl(d, "iks").length ? zeilen(text(d, "kontrollen")) : ""}${angaben([["Verantwortlich für die Kontrollen", text(d, "iks_wer") || text(d, "verantwortlich")]])}`,
           },
           {
             titel: "Aufbewahrung und Änderungen",

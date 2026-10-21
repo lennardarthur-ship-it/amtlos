@@ -63,9 +63,15 @@ describe("Hinweis „keine Rechts- oder Steuerberatung“ mit Rechtsstand", () =
   });
 
   it("nie im PDF: die Unterlage gehört dem Betrieb", () => {
+    // StB GoBD (Prüfbericht Heckler und Busch, Abschnitt 8): Nur die Steuer-PDFs tragen „Übertragungshilfe … Keine
+    // Steuerberatung“ – auf Empfehlung der Kanzlei gehört dieser Hinweis auf das PDF, nicht nur in die App
+    const STEUER_PDFS = new Set(["ust_voranmeldung", "euer", "steuererklaerung", "lohnkonto"]);
     for (const v of VORLAGEN) {
       const html = dokumentHtml(v, {}, LEERER_STAND.betrieb);
-      expect(html, v.id).not.toMatch(/Rechtsberatung|Steuerberatung\.|Rechtsstand/);
+      // auch weitere Steuer-PDFs (z. B. ZM, OSS) dürfen ihn über steuerHinweis() tragen
+      const ohneSteuerHinweis = html.replace(/<p class="nachsatz steuerhinweis">[\s\S]*?<\/p>/, "");
+      if (STEUER_PDFS.has(v.id)) expect(html, v.id).toContain("<strong>Keine Steuerberatung</strong>");
+      expect(ohneSteuerHinweis, v.id).not.toMatch(/Rechtsberatung|Steuerberatung\.|Rechtsstand/);
       expect(html, v.id).not.toContain(PRUEFHINWEIS);
       expect(html, v.id).not.toContain(rechtsHinweis("vorlage").text);
     }

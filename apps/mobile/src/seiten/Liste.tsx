@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
-import { betragUnplausibel, cent, einheitFuerMenge, gruppenAusBranchen, mengeUngueltig, summen, zahl, eintragAusVorschlag, kurztitelListe, neuerEintrag, ohneVerdeckteFelder, sichtbar, unlesbar, unlesbarText, vorlageFuer, type Daten, type Eintrag, type EintragWert, type ListenFeld, type Vorschlag } from "@amtlos/fachlogik";
+import { betragUnplausibel, cent, satzZahl, einheitFuerMenge, gruppenAusBranchen, mengeUngueltig, summen, zahl, eintragAusVorschlag, kurztitelListe, neuerEintrag, ohneVerdeckteFelder, sichtbar, unlesbar, unlesbarText, vorlageFuer, type Daten, type Eintrag, type EintragWert, type ListenFeld, type Vorschlag } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { ChipLeiste, Fuss, HinzufuegenKnopf, Kaestchen, Karte, Knopf, Symbol, T, TextKnopf, Wahl, textAus } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
@@ -147,7 +147,8 @@ function Rechnung({ e, kleinunternehmer, brutto }: { e: Eintrag; kleinunternehme
   const preis = typeof e.preis === "string" ? cent(e.preis) : null;
   if (preis === null || !("menge" in e || "satz" in e)) return null;
   const menge = typeof e.menge === "string" && e.menge.trim() ? (zahl(e.menge) ?? 1) : 1;
-  const satz = kleinunternehmer ? null : Number(typeof e.satz === "string" && e.satz ? e.satz : "19");
+  // StB-Prüfung (Prio 1): „nullsatz“ (§ 12 Abs. 3 UStG) rechnet mit 0 %
+  const satz = kleinunternehmer ? null : satzZahl(typeof e.satz === "string" ? e.satz : "");
   // R12: mit Bruttopreisen wie auf der Rechnung aus dem Endpreis zurückgerechnet
   const mitBrutto = Boolean(brutto) && !kleinunternehmer && satz !== null && satz > 0;
   const s = summen([mitBrutto ? { bezeichnung: "", menge, einheit: "stueck", preis_cent: Math.round((preis * 100) / (100 + satz!)), brutto_cent: preis, ust_satz: satz } : { bezeichnung: "", menge, einheit: "stueck", preis_cent: preis, ust_satz: satz }], kleinunternehmer);

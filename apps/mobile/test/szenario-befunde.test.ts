@@ -10,7 +10,7 @@ import { EUER_KAPITALGESELLSCHAFT } from "@amtlos/fachlogik";
 import { auswertung } from "../src/pflichten/check";
 import { monatsSumme, offeneSumme } from "../src/unterlagen/ablage";
 import { LEERER_STAND, anlegen, ausgeben, bezahltSetzen, felderSetzen, leererBeleg, stornieren, type Stand } from "../src/unterlagen/speicher";
-import { EUER_NICHT_ENTHALTEN, euerUebernahme, istKleinunternehmer, steuerpaket } from "../src/unterlagen/steuerpaket";
+import { EUER_GESPERRT, EUER_NICHT_ENTHALTEN, euerUebernahme, istKleinunternehmer, steuerpaket } from "../src/unterlagen/steuerpaket";
 import { umsaetzeFuer } from "../src/unterlagen/ustAusRechnungen";
 import { MARKE } from "@amtlos/marke";
 
@@ -66,7 +66,8 @@ describe("Gutschrift ist für den Aussteller eine Ausgabe", () => {
     expect(gs).toContain("2026-003;03.09.2026;03.09.2026;;Jonas Kiefer Fotografie;;§ 19;700,00;0,00;700,00;§ 19;17.09.2026;10.09.2026;0,00;");
     const datev = strFromU8(inhalt["Buchungsliste_2026.csv"]!);
     // R10: Gutschrift als Aufwand (bezogene Leistungen), nicht als Erlös
-    expect(datev).toMatch(/;700,00;S;3100;1610;;2026-003;Gutschrift 2026-003 Jonas Kiefer Fotografie;/);
+    // StB-Prüfung (A-1): Verbindlichkeit in Feld 7 (Haben), Aufwand als Gegenkonto
+    expect(datev).toMatch(/;700,00;H;1610;3100;;2026-003;Gutschrift 2026-003 Jonas Kiefer Fotografie;/);
     expect(datev).toContain("Verlag Nord");
     const liesmich = strFromU8(inhalt["LIESMICH.txt"]!);
     expect(liesmich).toContain("Gutschriften_2026.csv: 1 Gutschrift");
@@ -138,9 +139,12 @@ describe("Soll/Ist und Kapitalgesellschaft", () => {
     expect(text(gmbh(""))).toMatch(/nach dem Leistungsdatum zu \(Soll-Versteuerung\)/);
   });
 
-  it("EÜR-Übernahme warnt bei Kapitalgesellschaften", () => {
-    expect(euerUebernahme(gmbh("ist"), "2026").hinweis.startsWith(EUER_KAPITALGESELLSCHAFT)).toBe(true);
-    expect(euerUebernahme(gmbh("ist"), "2026").hinweis).toContain("Kapitalgesellschaften erstellen eine Bilanz statt einer EÜR");
+  it("EÜR-Übernahme für Kapitalgesellschaften gesperrt (StB-Prüfung E-4), mit Kontenvorgabe „EÜR“ wieder mit Warnung", () => {
+    const gesperrt = euerUebernahme(gmbh("ist"), "2026");
+    expect(gesperrt).toMatchObject({ gesperrt: true, einnahmen: [], ausgaben: [], hinweis: EUER_GESPERRT });
+    expect(EUER_GESPERRT).toContain("Bilanz statt EÜR");
+    const euer = { ...gmbh("ist"), steuerberatung: { ...gmbh("ist").steuerberatung, kontenvorgaben: { gewinnermittlung: "euer" as const } } };
+    expect(euerUebernahme(euer, "2026").hinweis.startsWith(EUER_KAPITALGESELLSCHAFT)).toBe(true);
     expect(euerUebernahme({ ...gmbh("ist"), betrieb: { ...gmbh("ist").betrieb, rechtsform: "Einzelunternehmen", name: "Salon Sonne" } }, "2026").hinweis).toBe(EUER_NICHT_ENTHALTEN);
   });
 

@@ -39,7 +39,7 @@ import {
 import { unzipSync } from "fflate";
 import { LEERER_STAND, anlegen, ausgeben, belegSetzen, bezahltSetzen, felderSetzen, personSetzen, profilSetzen, steuerberatungSetzen, stornieren, type Stand, type Unterlage } from "../src/unterlagen/speicher";
 import { euerUebernahme, steuerpaket, type PaketErgebnis, type Zeitraum } from "../src/unterlagen/steuerpaket";
-import { umsaetzeFuer } from "../src/unterlagen/ustAusRechnungen";
+import { nurSteuerfreieUmsaetze, umsaetzeFuer } from "../src/unterlagen/ustAusRechnungen";
 import { fussAngaben, fusszeileStempeln } from "../src/unterlagen/fusszeile";
 import { mitSchriften } from "../src/unterlagen/schriften";
 import { deckblattHtml, mappeDateiname, mappeZusammenfuegen, mappenAuswahl, seitenzahl, startSeiten } from "../src/unterlagen/kontrollmappe";
@@ -315,7 +315,8 @@ export function standBauen(): Bau {
         auffaellig.push(`E-Rechnung ${b.nummer} ließ sich nicht lesen (eRechnungLesen → null).`);
         continue;
       }
-      const roh = belegAusERechnung(gelesen, b.id, jetzt, { kleinunternehmer: false });
+      // wie die App (seiten/Belege.tsx): bei nur steuerfreien Umsätzen startet der Vorsteuer-Schalter „aus“ (StB-Prüfung 5.2)
+      const roh = belegAusERechnung(gelesen, b.id, jetzt, { kleinunternehmer: false, nurSteuerfrei: nurSteuerfreieUmsaetze(s.unterlagen, s.betrieb) });
       infos.push(`E-Rechnung ${b.nummer} eingelesen: Lieferant „${roh.lieferant}“, Kategorie zunächst „${kategorieFuer(roh.kategorie).titel}“, Vorsteuer ${roh.vorsteuer ? "AN" : "aus"} – für ein Gerät, das nur der steuerfreien Heilbehandlung dient, von Hand auf „Anschaffung über 800 €“ und Vorsteuer aus gestellt. Notiz: ${(roh.notiz ?? "").replace(/\n/g, " | ")}`);
       vergleichText("E-Rechnung einlesen", `${b.nummer}: Vorsteuer-Schalter nach dem Einlesen (Gerät nur für steuerfreie Heilbehandlung → kein Abzug, § 15 Abs. 2 Nr. 1 UStG)`, roh.vorsteuer ? "an" : "aus", "aus");
       s = belegSetzen(s, { ...roh, kategorie: b.kategorie, vorsteuer: vst, bezahlt: b.bezahlt, datei: `${b.id}.xml` }, t(b.datum, 18));
@@ -694,6 +695,8 @@ export function standBauen(): Bau {
     gewerbeanmeldung: "Physiotherapie ist ein freier Beruf (§ 18 Abs. 1 Nr. 1 EStG, „ähnlicher Beruf“) – keine Gewerbeanmeldung; Verkauf von Therabändern in geringem Umfang (Abfärbung prüfen, § 15 Abs. 3 Nr. 1 EStG).",
     ifsg_belehrung: "Keine Lebensmittel.", allergene: "Keine Lebensmittel.", haccp: "Keine Lebensmittel.",
     hautschutzplan: "Vorschläge nur für Friseure; Feuchtarbeit in der Physiotherapie (Händedesinfektion statt Waschen) im Hygieneplan und in der Unterweisung berücksichtigt.",
+    // StB-Prüfung (5.2, C-9): nur Kunden im Inland
+    oss_meldung: "Nur Patienten und Kunden im Inland – kein OSS-Verfahren.", zm_meldung: "Keine Lieferungen oder Leistungen an Unternehmen im EU-Ausland.",
   };
   for (const [id, g] of Object.entries(grund)) uebersprungen.push({ id, titel: v(id).titel, grund: g });
   const genutzt = new Set(docs.map((d) => d.vorlage));

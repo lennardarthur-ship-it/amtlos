@@ -49,6 +49,7 @@ erwartet:
   steuern.ust_voranmeldung: gilt_nicht
   steuern.ust_sondervorauszahlung: gilt_nicht
   steuern.zusammenfassende_meldung: gilt_nicht
+  steuern.oss_erklaerung: gilt_nicht
   steuern.vorauszahlung_est_kst: gilt_nicht
   steuern.vorauszahlung_gewst: gilt_nicht
   steuern.est_erklaerung: gilt

@@ -8,6 +8,7 @@ import { allergenAushang, haccp, hautschutzplan, hygieneplan, ifsgBelehrung } fr
 import { anamnese, datenpanne, datenschutzDokumentation, datenschutzinformation, videoHinweis } from "./datenschutz.js";
 import { ausweisHinweis, kiKompetenz, nachweisArbeitsbedingungen, schluesselquittung } from "./personal.js";
 import { verfahrensdokumentation } from "./steuern.js";
+import { oss, zusammenfassendeMeldung } from "./eumeldungen.js";
 import { pdfDateiname } from "../dateinamen.js";
 import { GESTALT_MARKE, GRUNDLAGE_MARKE, RAENDER, RAENDER_MARKE, SEITE_MARKE, cent, esc, festeLeerzeichen, kennungFassen, seiteCss, zahl } from "./html.js";
 import type { Bereich, Betrieb, Daten, EinfachesFeld, Eintrag, Feld, Option, Vorlage, Vorschlag } from "./typen.js";
@@ -26,10 +27,14 @@ export { RECHNUNG_SKONTO_FALSCH, RECHNUNG_SKONTO_FRIST, RECHNUNG_SKONTO_HOCH, sk
 // R12 UX
 export { GMBH_ANGABEN, RECHNUNG_KU_GUTSCHEIN, RECHNUNG_MONAT_ZEITRAUM, gmbhAngabenFehlen, istPrivatperson, kleinbetrag, standardAnrede } from "./buchhaltung.js";
 export { vertretungLabel } from "./html.js";
-export { istKapitalgesellschaft, mitVertretung } from "./betrieb.js";
+export { REGISTER_FORMEN, istKapitalgesellschaft, mitVertretung, rechtsformAus, registerAus } from "./betrieb.js";
+export { RECHTSFORMEN } from "./bausteine.js";
 export { BESCHAEFTIGUNGSARTEN, ENTGELT_ARTEN, STEUERKLASSEN, arbeitsminuten, arbeitszeitPruefung, monatAus, monatSchluessel, stunden } from "./lohn.js";
 export { ANLAESSE, KURZ, PERSONEN_FELDER, kurztitel, kurztitelListe, naechsteNummer, personAus, personIn, personMerken, type Anlass } from "./ablauf.js";
 export { cent, fassungText, zahl } from "./html.js";
+// StB-Prüfung Heckler und Busch (21.10.2026): Rechnungen, Voranmeldung, OSS und ZM
+export { GUTSCHRIFT_PRAEFIX, KUNDEN_ARTEN, NULLSATZ_HINWEIS as NULLSATZ_TEXT, RECHNUNG_EINHEIT_CODE, RECHNUNG_GUTSCHRIFT_NUMMER, RECHNUNG_LEITWEG_FEHLT, RECHNUNG_LEITWEG_FORMAT, RECHNUNG_NULLSATZ_GEMISCHT, RECHNUNG_OSS_LAND, RECHNUNG_OSS_SATZ, RECHNUNG_OSS_VORSCHLAG, RECHNUNG_SCHLUSS_HOCH, RECHNUNG_SCHLUSS_LEER, RECHNUNG_SCHLUSS_SATZ, SATZ_NULLSATZ, abschlaegeAus, euPrivatLand, istGutschriftNummer, leitwegFormatOk, mitGrundstueckHinweis, ossSatz, satzZahl, vollEuro } from "./buchhaltung.js";
+export { EU_LAENDER_NAMEN, OSS_FRIST, OSS_NICHT_VA, ZM_ARTEN, ZM_FRIST, ZM_SKONTO, landName } from "./eumeldungen.js";
 
 export const BEREICHE: { id: Bereich; titel: string }[] = [
   { id: "steuern", titel: "Steuern und Buchhaltung" },
@@ -47,6 +52,8 @@ export const VORLAGEN: Vorlage[] = [
   euer,
   bilanzGuv,
   ustVoranmeldung,
+  oss,
+  zusammenfassendeMeldung,
   steuererklaerung,
   verfahrensdokumentation,
   kassenbuch,

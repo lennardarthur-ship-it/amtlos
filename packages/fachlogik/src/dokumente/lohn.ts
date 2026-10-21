@@ -2,7 +2,7 @@
  * Personal (E-121): Arbeitszeitnachweis, Lohnkonto, Daten für die Sozialversicherungsmeldung. Amtlos rechnet keine
  * Lohnsteuer und keine Beiträge – die Beträge kommen aus der Lohnabrechnung. Gliederungen fachlich zu prüfen (T-61).
  */
-import { KOPF_LINIE, ZELLE_LINIE, abschnitt, angaben, ankreuzen, cent, datumDe, dokument, esc, euro, fassungNachsatz, felder, ibanText, ja, liste, nachsatz, roh, summe, svNummerText, tabelle, text, unterschriften, zahlText, zelle, type Roh } from "./html.js";
+import { KOPF_LINIE, ZELLE_LINIE, abschnitt, angaben, ankreuzen, cent, datumDe, dokument, esc, euro, fassungNachsatz, felder, ibanText, ja, liste, roh, steuerHinweis, summe, svNummerText, tabelle, text, unterschriften, zahlText, zelle, type Roh } from "./html.js";
 import { mindestlohnAm, minijobGrenzeAm } from "./personal.js";
 import { MINIJOB, SV } from "./bausteine.js";
 import { BRANCHEN_2A, BRANCHEN_2A_TEXT, branche2aAusProfil } from "./konstanten.js";
@@ -344,8 +344,9 @@ const BETRAEGE: [string, string][] = [
 export const lohnkonto: Vorlage = {
   id: "lohnkonto",
   querformat: true,
-  titel: "Lohnkonto",
-  beschreibung: "Je beschäftigte Person die Stammdaten und für jeden Monat Lohn, Steuern und Beiträge – mit Jahressummen.",
+  // StB GoBD (E-7): Übersicht aus den Abrechnungen – das Lohnkonto nach § 4 LStDV führt das Lohnprogramm
+  titel: "Lohnkonto-Übersicht (aus den Abrechnungen)",
+  beschreibung: "Je beschäftigte Person die Stammdaten und für jeden Monat Lohn, Steuern und Beiträge aus der Lohnabrechnung – mit Jahressummen. Das Lohnkonto nach § 4 LStDV führt dein Lohnprogramm bzw. Lohnbüro; diese Übersicht ersetzt es nicht.",
   bereich: "personal",
   // nicht „Lohnabrechnung über geprüfte Software“ (personal.lohnabrechnung): das Lohnkonto ersetzt keine Lohnsoftware
   pflichten: ["personal.lohnsteuer_anmeldung"],
@@ -355,7 +356,7 @@ export const lohnkonto: Vorlage = {
   abschnitte: [
     {
       titel: "Stammdaten",
-      hilfe: `${MARKE.name} rechnet keine Lohnsteuer und keine Beiträge – trag die Beträge aus deiner Lohnabrechnung ein.`,
+      hilfe: `${MARKE.name} rechnet keine Lohnsteuer und keine Beiträge – trag die Beträge aus deiner Lohnabrechnung ein. Das Lohnkonto selbst (§ 4 LStDV, mit allen Pflichtangaben wie Großbuchstaben, Zuschlägen und Arbeitgeberanteilen) kommt aus dem Lohnprogramm.`,
       felder: [
         { id: "name", art: "text", label: "Name", pflicht: true },
         { id: "jahr", art: "text", label: "Jahr", pflicht: true },
@@ -404,9 +405,9 @@ export const lohnkonto: Vorlage = {
     const betrag = (e: Eintrag, k: string) => (text(e, k) ? euro(cent(text(e, k)) ?? 0) : STRICH);
     const spalteLeer = (k: string) => m.every((e) => !text(e, k));
     return dokument({
-      titel: "Lohnkonto",
+      titel: "Lohnkonto-Übersicht",
       betrieb: b,
-      unter: [text(d, "name"), text(d, "jahr")].filter(Boolean).join(" · ") || undefined,
+      unter: ["aus den Abrechnungen", text(d, "name"), text(d, "jahr")].filter(Boolean).join(" · "),
       // ohne Jahr: Linie zum Eintragen in der Kennungsleiste
       meta: text(d, "jahr") ? undefined : `Jahr: ${KOPF_LINIE}`,
       quer: true,
@@ -437,7 +438,9 @@ export const lohnkonto: Vorlage = {
           "Monate",
           (leer
             ? tabelle(kopf, [], { ...tabellenOptionen, mindestens: 12, hoch: true, summe: ["<strong>Summe</strong>", "", ...BETRAEGE.map(() => ZELLE_LINIE), ""] })
-            : tabelle(kopf, m.map((e) => [zelle(text(e, "monat")), datumDe(text(e, "zahltag")), ...BETRAEGE.map(([k]) => betrag(e, k)), ja(e, "unterbrechung") ? "U" : ""]), { ...tabellenOptionen, summe: ["<strong>Summe</strong>", "", ...BETRAEGE.map(([k]) => (spalteLeer(k) ? STRICH : `<strong>${euro(summe(m, k))}</strong>`)), ""] })) + nachsatz("* U = Unterbrechung ohne Lohnanspruch (§ 41 Abs. 1 EStG)"),
+            : tabelle(kopf, m.map((e) => [zelle(text(e, "monat")), datumDe(text(e, "zahltag")), ...BETRAEGE.map(([k]) => betrag(e, k)), ja(e, "unterbrechung") ? "U" : ""]), { ...tabellenOptionen, summe: ["<strong>Summe</strong>", "", ...BETRAEGE.map(([k]) => (spalteLeer(k) ? STRICH : `<strong>${euro(summe(m, k))}</strong>`)), ""] })) +
+            // StB GoBD (E-7, Abschnitt 8): Fußnote und Hinweis in einer Zeile, damit alle zwölf Monate auf ein Blatt passen
+            steuerHinweis("lohn", MARKE.name, { vorweg: "* U = Unterbrechung ohne Lohnanspruch (§ 41 Abs. 1 EStG).", kurz: true }),
         ),
     });
   },

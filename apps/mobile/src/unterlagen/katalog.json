@@ -812,6 +812,31 @@
   "geprueft": false
  },
  {
+  "id": "steuern.oss_erklaerung",
+  "titel": "OSS-Erklärung beim Bundeszentralamt für Steuern abgeben",
+  "kurz": "Verkaufst du an Privatpersonen in anderen EU-Ländern über der Lieferschwelle von 10.000 €, meldest du diese Umsätze vierteljährlich im One-Stop-Shop – bis zum Ende des Monats nach dem Quartal.",
+  "rechtsgrundlage": [
+   "§ 3c UStG",
+   "§ 16 Abs. 1d UStG",
+   "§ 18j UStG"
+  ],
+  "quellen": [
+   {
+    "titel": "Umsatzsteuergesetz § 18j",
+    "url": "https://www.gesetze-im-internet.de/ustg_1980/__18j.html"
+   },
+   {
+    "titel": "Umsatzsteuergesetz § 3c",
+    "url": "https://www.gesetze-im-internet.de/ustg_1980/__3c.html"
+   },
+   {
+    "titel": "Bundeszentralamt für Steuern – One-Stop-Shop EU-Regelung",
+    "url": "https://www.bzst.de/DE/Unternehmen/Umsatzsteuer/One-Stop-Shop_EU/one_stop_shop_eu_node.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
   "id": "steuern.rechnungen_pflichtangaben",
   "titel": "Rechnungen mit allen Pflichtangaben schreiben",
   "kurz": "Deine Rechnungen müssen bestimmte Angaben enthalten. Als Kleinunternehmer brauchst du einen Hinweis auf § 19 UStG.",
@@ -866,6 +891,21 @@
    {
     "titel": "Umsatzsteuergesetz § 18",
     "url": "https://www.gesetze-im-internet.de/ustg_1980/__18.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "steuern.zusammenfassende_meldung",
+  "titel": "Zusammenfassende Meldung abgeben",
+  "kurz": "Wenn du Lieferungen oder Leistungen an Unternehmen in anderen EU-Ländern erbringst, meldest du sie bis zum 25. nach Ablauf des Meldezeitraums in der Zusammenfassenden Meldung.",
+  "rechtsgrundlage": [
+   "§ 18a UStG"
+  ],
+  "quellen": [
+   {
+    "titel": "Umsatzsteuergesetz § 18a",
+    "url": "https://www.gesetze-im-internet.de/ustg_1980/__18a.html"
    }
   ],
   "geprueft": false

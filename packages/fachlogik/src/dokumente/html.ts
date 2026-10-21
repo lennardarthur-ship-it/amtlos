@@ -285,6 +285,29 @@ export function uebertragung(felderNamen: string[]): string {
 /** Hinweis am Dokumentende (Gesetzestext, Wiederholungsfrist) – klein, abgesetzt, kein Kasten. */
 export const nachsatz = (t: string) => `<p class="nachsatz">${esc(t)}</p>`;
 
+/** StB GoBD (Prüfbericht Heckler und Busch, Abschnitt 8): Wer die Verantwortung trägt – gleich auf jedem Steuer-PDF. */
+export const KEINE_STEUERBERATUNG = "Keine Steuerberatung – Vollständigkeit und steuerliche Beurteilung liegen beim Unternehmer bzw. seiner Steuerberatung.";
+/**
+ * StB GoBD (Abschnitt 8, § 2 StBerG): Hinweis „Übertragungshilfe, keine Steuerberatung“ auf den Steuer-PDFs – nicht nur in
+ * der App. Je PDF der Satz, was die Zahlen sind (Wortlaut nach dem Prüfbericht); Rechnungen, Hygieneplan usw. tragen ihn nicht.
+ */
+export const STEUER_HINWEISE = {
+  va: "Übertragungshilfe aus den erfassten Rechnungen, Belegen und Kassenabschlüssen.",
+  euer: "Übertragungshilfe für die Anlage EÜR: rechnerische Zusammenstellung, keine Gewinnermittlung im Sinne des § 4 Abs. 3 EStG durch {marke}.",
+  bilanz: "Vorlage – Werte aus der Buchführung der Kanzlei. Jahresabschluss und E-Bilanz (§ 5b EStG) erstellt die Steuerberatung bzw. das Buchhaltungsprogramm.",
+  erklaerung: "Übertragungshilfe: Zusammenstellung der erfassten Zahlen und Belege für ELSTER bzw. die Steuerberatung.",
+  lohn: "Übersicht aus den Lohnabrechnungen; das Lohnkonto nach § 4 LStDV führt das Lohnprogramm.",
+} as const;
+export type SteuerHinweisArt = keyof typeof STEUER_HINWEISE;
+/** Text des Hinweises (für Tests und die App) – `marke`: Name der App. */
+export const steuerHinweisText = (art: SteuerHinweisArt, marke: string, kurz = false) => `${STEUER_HINWEISE[art].replace("{marke}", marke)} ${kurz ? "Keine Steuerberatung." : KEINE_STEUERBERATUNG}`;
+/**
+ * Hinweiszeile am Ende eines Steuer-PDFs, „Keine Steuerberatung“ hervorgehoben. `vorweg`: Text davor in derselben Zeile
+ * (Fußnote); `kurz`: ohne den Satz zur Verantwortung (wo der Platz fehlt, z. B. Lohnkonto-Übersicht auf einem Blatt).
+ */
+export const steuerHinweis = (art: SteuerHinweisArt, marke: string, o: { vorweg?: string; kurz?: boolean } = {}) =>
+  `<p class="nachsatz steuerhinweis">${o.vorweg ? `${esc(o.vorweg)} ` : ""}${esc(steuerHinweisText(art, marke, o.kurz)).replace("Keine Steuerberatung", "<strong>Keine Steuerberatung</strong>")}</p>`;
+
 /**
  * R12: Fassung eines festschreibbaren Nachweises (Vorlagen mit `korrektur`). Die App schreibt `fassung_stand` (Tag der
  * letzten Änderung) und nach einer Korrektur `fassung_nr`, `fassung_ersetzt` (Tag der vorigen Fassung) und
@@ -417,6 +440,7 @@ ul.punkte li::marker { color: var(--akzent); }
 .hinweis { color: #4a535c; font-style: italic; }
 .klein { font-size: 8.3pt; color: #4a535c; }
 .nachsatz { margin-top: 5mm; font-size: 8.3pt; line-height: 1.4; color: #4a535c; }
+.nachsatz.steuerhinweis { border-top: 0.4pt solid #c9ced3; padding-top: 1.6mm; break-inside: avoid; break-after: avoid; }
 /* Form des Nachweises über den Unterschriften (NachwG in den Branchen nach § 2a SchwarzArbG) – eine Anweisung, gut lesbar */
 .schriftform { margin: 7mm 0 0; padding: 1.6mm 0 1.6mm 3mm; border-left: 0.8mm solid var(--akzent); font-family: ${SANS}; font-weight: 700; font-size: 9.6pt; color: #1a1f24; }
 .fuellen { display: inline-block; min-width: 55mm; border-bottom: 0.5pt solid #8a949c; height: 4.2mm; vertical-align: bottom; }
@@ -829,6 +853,7 @@ table.liste.lohn th { padding-top: 1.2mm; padding-bottom: 1mm; }
 .lohnkonto h2 { font-size: 11pt; margin-bottom: 1.2mm; padding-bottom: 0.6mm; }
 .lohnkonto .spalten3 table.angaben th, .lohnkonto .spalten3 table.angaben td { height: 5.4mm; padding-top: 0.9mm; padding-bottom: 0.8mm; line-height: 1.3; }
 .lohnkonto .nachsatz { margin-top: 1.2mm; font-size: 7.6pt; line-height: 1.25; }
+.lohnkonto .nachsatz.steuerhinweis { border-top: 0; padding-top: 0; }
 table.liste.lohn tr.summe td { background: var(--akzent-hauch); padding-top: 1.4mm; padding-bottom: 1.4mm; }
 /* Allergen-Matrix: eine Zeile je Speise, eine Spalte je Allergen (Bezeichnung senkrecht) */
 /* Spaltenköpfe: Kennbuchstaben A–N (Zuordnung in der Legende), enthalten = Punkt */
@@ -950,6 +975,8 @@ export interface DokumentOptionen {
   band?: string;
   /** zusätzliche Klasse am body (z. B. „ba“ für die Betriebsanweisung) */
   klasse?: string;
+  /** StB GoBD (D-9): rechts in der Fußzeile jeder Seite statt „Stand …“ (z. B. „Fassung 2 · erstellt 21.10.2026, 14:05“) */
+  fussRechts?: string;
 }
 
 const LEERE_TAGS = new Set(["br", "img", "col", "hr", "meta", "input", "wbr"]);
@@ -1097,7 +1124,7 @@ export function dokument(o: DokumentOptionen): string {
   const fussLinks = [b.name.trim(), o.titel].filter(Boolean).join(" · ");
   const g = o.gestalt ?? GESTALT_MARKE;
   const klassen = [`g-${g}`, o.quer ? "quer" : "", o.nummerierung === "zahl" ? "nummern-zahl" : "", o.klasse ?? ""].filter(Boolean).join(" ");
-  return `${kopf({ titel: o.titel, betrieb: b, fussLinks, fussRechts: stand ? `Stand ${stand}` : "", quer: o.quer, gestalt: o.gestalt, band: o.band })}<body class="${klassen}">
+  return `${kopf({ titel: o.titel, betrieb: b, fussLinks, fussRechts: o.fussRechts ?? (stand ? `Stand ${stand}` : ""), quer: o.quer, gestalt: o.gestalt, band: o.band })}<body class="${klassen}">
 <header class="kopfzeile"><div><div class="name">${b.name.trim() ? esc(b.name.trim()) : LINIE}</div>${adresse ? `<div class="adresse">${esc(adresse)}</div>` : ""}</div><div class="rechts"><div class="art">${esc(o.art ?? "")}</div>${logoHtml(b)}</div></header>
 ${o.vorTitel ?? ""}${festeLeerzeichen(`<h1>${esc(o.titel)}</h1>${unter ? `<p class="unter">${esc(unter)}</p>` : ""}`)}
 <dl class="kennung">${GRUNDLAGE_MARKE}${festeLeerzeichen(kopfDaten.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${v === KOPF_LINIE ? LINIE : esc(v)}</dd></div>`).join(""))}</dl>

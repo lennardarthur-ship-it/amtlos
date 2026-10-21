@@ -83,14 +83,14 @@ describe("Zustimmung im Stand (Migration 5 → 6)", () => {
   const mit = (z?: Stand["nutzungsbedingungen"]): Stand => ({ ...LEERER_STAND, ...(z ? { nutzungsbedingungen: z } : {}) });
 
   it("Version 6; ältere Stände haben keine Zustimmung, sonst bleibt alles", () => {
-    expect(STAND_VERSION).toBe(6);
+    expect(STAND_VERSION).toBe(7);
     expect(MIGRATIONEN[5]!({ version: 5, partnerId: "x" })).toEqual({ version: 5, partnerId: "x", nutzungsbedingungen: undefined });
     const alt = standAus(JSON.stringify({ version: 5, betrieb: { name: "Alt" } }));
-    expect(alt.version).toBe(6);
+    expect(alt.version).toBe(7);
     expect(alt.betrieb.name).toBe("Alt");
     expect("nutzungsbedingungen" in alt).toBe(false);
-    expect(migrieren({ version: 1 }).version).toBe(6);
-    expect(() => standAus(JSON.stringify({ version: 7 }))).toThrow();
+    expect(migrieren({ version: 1 }).version).toBe(7);
+    expect(() => standAus(JSON.stringify({ version: 8 }))).toThrow();
   });
 
   it("Fassung und Zeitpunkt bleiben beim Speichern und in der Sicherung erhalten; Unlesbares fällt weg", () => {

@@ -8,6 +8,7 @@
  * unabhängig gerechneten Erwartungswerten (werkzeuge/jahr-szenario-salon-daten.ts) und jeder Abweichung.
  *
  *   cd apps/mobile && node werkzeuge/jahr-szenario-salon.mjs [ausgabe]     # Standard: /tmp/claude-0/salon
+ *   KOSIT=<ordner>    optional: KoSIT-Validator (<ordner>/v/validator-*.jar, <ordner>/cfg/scenarios.xml)
  *   CHROMIUM_PFAD=…   anderer Chromium (Standard /opt/pw-browsers/chromium)
  *
  * Voraussetzungen wie jahr-szenario.mjs: pnpm install, gebaute Pakete (@amtlos/fachlogik dist), Chromium, poppler.
@@ -27,9 +28,9 @@ import { MARKE } from "../../../packages/marke/index.js";
  */
 const BEOBACHTUNGEN = [
   "**[schwer] § 2a SchwarzArbG: App widerspricht sich beim Friseurhandwerk.** Die Vorlagen sagen, Friseur- und Kosmetikbetriebe gehörten zu den Branchen nach § 2a SchwarzArbG (Arbeitszeitnachweis, `packages/fachlogik/src/dokumente/lohn.ts:101`; Nachweis der Arbeitsbedingungen, `packages/fachlogik/src/dokumente/personal.ts:54`). Der Pflichten-Check bietet bei „Gehört dein Betrieb zu einer dieser Branchen?“ aber keine Option dafür (`packages/i18n/src/fragen.ts:396–404`), und die Auslöser von `personal.sofortmeldung` und `personal.arbeitszeit_milog` im Katalog kennen sie nicht. Folge für den Salon: Sofortmeldung, Aufzeichnung nach § 17 MiLoG und die Unterschriftspflicht beim NachwG fehlen im Check, obwohl die Vorlagen sie für Friseure ansprechen. Vorschlag: rechtlich klären; je nach Ergebnis Option „Friseur- und Kosmetikgewerbe“ in fragen.ts und Katalog ergänzen (oder sie aus Beauty-Branche ableiten) – oder die beiden Vorlagentexte korrigieren.",
-  "**[schwer] EÜR wird der GmbH ohne Warnung angeboten.** Der Ablauf „Jahresabschluss und Steuern“ listet die EÜR für alle (`packages/fachlogik/src/dokumente/ablauf.ts:62`), `euerUebernahme` rechnet auch für eine GmbH und sagt nichts zur Rechtsform (`apps/mobile/src/unterlagen/steuerpaket.ts:86–106`). Der Pflichten-Check zeigt korrekt keine EÜR-Pflicht. Für Bilanz/GuV gibt es keinerlei Übernahme aus Rechnungen und Belegen – die Werte müssen vollständig von Hand kommen. Vorschlag: EÜR bei `rechtsform` ∈ {gmbh, ug, ek, gmbh_co_kg} ausblenden oder mit Hinweis „bilanzierungspflichtig – EÜR gilt nicht“; mittelfristig eine Übernahme für die GuV (Umsatzerlöse nach Leistungsdatum, Aufwand nach Belegdatum).",
+  "**[schwer → behoben] EÜR wird der GmbH ohne Warnung angeboten.** StB-Prüfung Heckler und Busch (E-4): `euerUebernahme` liefert für bilanzierende Betriebe (GmbH, UG, GmbH & Co. KG, e. K., Buchführungspflicht laut Finanzamt) nichts mehr und sagt „Bilanz statt EÜR“ (`apps/mobile/src/unterlagen/steuerpaket.ts`, `EUER_GESPERRT`); die Seite der Vorlage zeigt statt der Übernahme diesen Hinweis. Offen bleibt eine Übernahme für die GuV.",
   "**[mittel] Steuerberater-Paket bei Ist-Versteuerung falsch erklärt.** LIESMICH.txt sagt fest „Die Umsatzsteuer-Voranmeldung ordnet Rechnungen dagegen nach dem Leistungsdatum zu (Soll-Versteuerung)“ (`apps/mobile/src/unterlagen/steuerpaket.ts`, behoben: Text nach Soll/Ist) – für diesen Betrieb (Ist) gilt der Zahlungseingang. Vorschlag: Text nach `s.betrieb.versteuerung` wählen („… nach dem Zahlungseingang (Ist-Versteuerung, § 20 UStG); eine Stornorechnung zählt mit der vermerkten Erstattung“).",
-  "**[mittel] DATEV: privat bezahlter Beleg einer GmbH auf „Privateinlagen“.** `buchungenAusBelegen` bucht `zahlung: \"privat\"` immer gegen 1890 (SKR03) bzw. 2180 (SKR04) (`packages/fachlogik/src/buchungen.ts:78,147`). Eine Kapitalgesellschaft hat keine Privatkonten; hier hat die Geschäftsführerin vorgestreckt (Verbindlichkeit gegenüber Gesellschafterin). Vorschlag: bei Kapitalgesellschaften ein Verrechnungskonto Gesellschafter verwenden bzw. in der Beleg-Erfassung „von Gesellschafter/in ausgelegt“ anbieten; Konto mit der Steuerberatung festlegen.",
+  "**[mittel → behoben] DATEV: privat bezahlter Beleg einer GmbH.** StB-Prüfung (B-6): privat ausgelegte Belege und Barbelege vor dem ersten Kassenabschluss einer Kapitalgesellschaft stehen auf dem Verrechnungskonto Gesellschafter (Standard laut Bericht SKR03 0755 / SKR04 3560, über die Kontenvorgaben der Kanzlei änderbar). Außerdem Soll-Stapel mit Zahlungseingängen (A-4): Saldo 1410 im Jahrespaket = offene Forderungen 2026-017/-018.",
   "**[mittel] Unterweisung des jugendlichen Azubis: Frist ein Jahr statt halbjährlich.** Der Unterweisungsnachweis setzt immer „mindestens einmal jährlich … nächster Termin 10.08.2027“ (`packages/fachlogik/src/dokumente/arbeitsschutz.ts:200`), der Pflichten-Check (`arbeitsschutz.unterweisung_wiederholen`, P1Y) ebenso; `personal.jugendarbeitsschutz` ist im Katalog „dauerhaft/einmalig“ ohne Termine (halbjährliche Unterweisung § 29 Abs. 2 JArbSchG, Nachuntersuchung § 33 JArbSchG). Vorschlag: bei `beschaeftigte.jugendlich ≥ 1` eigene wiederkehrende Pflicht (6 Monate) bzw. in der Vorlage einen Schalter „Teilnehmende unter 18“ mit 6-Monats-Termin.",
   "**[mittel] Widersprüchliche Speicherdauer der Server-Logfiles.** Datenschutzerklärung: 7 Tage (Eingabe), Verzeichnis der Verarbeitungstätigkeiten aus dem Vorschlag „Betrieb der Website“: „IP-Adressen in Logfiles nach 30 Tagen“ (`packages/fachlogik/src/dokumente/bausteine.ts:1291`). Vorschlag: Löschfrist im Vorschlag aus `logfile_tage` der Datenschutzerklärung übernehmen oder neutral formulieren („laut Datenschutzerklärung“).",
   "**[mittel] Gewerbeanmeldung einer GmbH nur mit einer Person.** Die Vorlage hat einen einzigen Personenblock (`packages/fachlogik/src/dokumente/betrieb.ts:66–85`); bei einer GmbH mit zwei Geschäftsführern fehlen die Angaben zur zweiten vertretungsberechtigten Person, und nichts sagt, dass der Block die gesetzlichen Vertreter meint. Vorschlag: bei Rechtsform GmbH/UG Liste „Gesetzliche Vertreter“ wie in der Handelsregister-Vorlage.",
@@ -208,9 +209,9 @@ function paketNeuerungen(name, zr, inhalt, erg, kleinunternehmer, belegeRoh) {
   // R10: Belege, die nicht in den Stapel gehören (Personal, Auslagen einer GmbH), sind in der Belegliste markiert
   const fehlend = be.zeilen.filter((z) => !/^nein/.test(be.w(z, "Im Buchungsstapel") ?? "")).map((z) => be.w(z, "Belegfeld 1 (DATEV)")).filter((b) => !belegfelder.has(b));
   vergleich(bereich, "DATEV: Belegfeld 1 der Belegbuchungen = Spalte „Belegfeld 1 (DATEV)“ der Belegliste", fehlend.length ? fehlend.join(", ") : "alle gefunden", "alle gefunden");
-  const gi = extf[1].indexOf("Buchungs GUID");
+  const gi = extf[1].indexOf("Beleginfo - Inhalt 1"); // StB-Prüfung 3.1: GUID in Beleginfo 1, Feld 103 „Buchungs GUID“ leer
   const guids = ez.map((z) => z[gi]);
-  vergleich(bereich, "DATEV: Buchungs-GUID in jeder Zeile (36 Zeichen) und eindeutig", gi >= 0 && guids.every((g, i) => /^[0-9a-f-]{36}$/.test(g) && guids.indexOf(g) === i) ? "ja" : "nein", "ja");
+  vergleich(bereich, "DATEV: Buchungs-GUID in jeder Zeile (Beleginfo 1, 36 Zeichen) und eindeutig, Feld 103 leer", gi >= 0 && ez.every((z) => z[102] === "" && z[20] === "Buchungs-GUID") && guids.every((g, i) => /^[0-9a-f-]{36}$/.test(g) && guids.indexOf(g) === i) ? "ja" : "nein", "ja");
   const texte = ez.map((z) => z[13]);
   vergleich(bereich, "DATEV: Buchungstext höchstens 60 Zeichen, ohne Leerzeichen am Ende", texte.filter((t) => t.length > 60 || t !== t.trimEnd()).join(" | ") || "alle", "alle");
   const bl = liste(inhalt[`Buchungsliste_${zr.name}.csv`]);
@@ -262,15 +263,27 @@ function paketPruefen(name, zr, erg, ordner) {
   vergleich(`Paket ${name}`, "E-Rechnungen im Paket", Object.keys(inhalt).filter((p) => p.startsWith("E-Rechnungen/")).length, vg.length - ohneXml);
   const extf = csvLesen(inhalt[`EXTF_Buchungsstapel_${zr.name}.csv`], "latin1");
   const zeilen = extf.slice(2);
-  const erwBuchungen = summe(vg.map((x) => Object.values(x.s.gruppen).filter((g) => g.netto + g.ust !== 0).length)) + summe(bl.filter((b) => b.kategorie !== "personal" && b.zahlung !== "privat").map((b) => b.saetze.filter((x) => x.betrag).length)); // R10: Personal und GmbH-Auslagen nicht im Stapel
+  // R10: Personal nicht im Stapel. StB-Prüfung (B-6): privat ausgelegte Belege der GmbH jetzt im Stapel (Verrechnungskonto
+  // Gesellschafter); A-4: je Zahlungseingang bzw. Erstattung im Zeitraum eine Buchung Bank an Forderungen (Soll-Stapel GmbH)
+  const zahlungenImZeitraum = D.vorgaenge().filter((x) => x.bezahlt && im(x.bezahlt));
+  const erwBuchungen = summe(vg.map((x) => Object.values(x.s.gruppen).filter((g) => g.netto + g.ust !== 0).length)) + summe(bl.filter((b) => b.kategorie !== "personal").map((b) => b.saetze.filter((x) => x.betrag).length)) + zahlungenImZeitraum.length;
   vergleich(`Paket ${name}`, "DATEV: Anzahl Buchungen", zeilen.length, erwBuchungen);
   vergleich(`Paket ${name}`, "DATEV: Spalten je Zeile = Spalten im Kopf", zeilen.every((z) => z.length === extf[1].length) ? "ja" : "nein", "ja");
-  const kontoSumme = (konto) => summe(zeilen.filter((z) => z[7] === konto).map((z) => (z[1] === "H" ? -1 : 1) * centAus(z[0])));
+  const kontoSumme = (konto) => summe(zeilen.filter((z) => z[7] === konto).map((z) => (z[1] === "H" ? -1 : 1) * (z[117] === "1" ? -1 : 1) * centAus(z[0])));
   vergleich(`Paket ${name}`, "DATEV: Brutto auf Erlöskonto 8400 (19 %)", kontoSumme("8400"), summe(vg.map((x) => x.vz * x.s.brutto)));
   vergleich(`Paket ${name}`, "DATEV: Kopf Beraternummer/Mandant", `${extf[0][10]}/${extf[0][11]}`, "31877/20514");
+  // StB-Prüfung (A-4): Soll-Stapel mit Zahlungseingängen – im Jahrespaket steht auf 1410 genau der Bestand der offenen
+  // Forderungen zum 31.12. (unabhängig: Rechnungen 2026 ohne Storno und ohne Zahlung bis 31.12., wie in der Bilanz)
+  if (zr.name === "2026") {
+    const saldo1410 = summe(zeilen.map((z) => (z[6] === "1410" ? 1 : z[7] === "1410" ? -1 : 0) * (z[1] === "H" ? -1 : 1) * (z[117] === "1" ? -1 : 1) * centAus(z[0])));
+    vergleich(`Paket ${name}`, "DATEV: Saldo Forderungen 1410 zum 31.12. = offene Rechnungen (Soll-Stapel mit Zahlungseingängen, A-4)", saldo1410, summe(D.vorgaenge().filter((x) => x.art === "rechnung" && !x.r.storno && !(x.bezahlt && x.bezahlt <= zr.bis)).map((x) => x.s.brutto)));
+  }
   if (bl.some((b) => b.zahlung === "privat")) {
     const privat = zeilen.filter((z) => z[6] === "1890" || z[7] === "1890").length;
-    vergleich(`Paket ${name}`, "DATEV: privat bezahlter Beleg der GmbH nicht auf „Privateinlagen“ (SKR03 1890) – eine GmbH hat keine Privatkonten", privat ? `${privat} Buchung(en) gegen 1890` : "keine", "keine");
+    // StB-Prüfung (B-6): auf dem Verrechnungskonto Gesellschafter (Standard laut Bericht SKR03 0755) in Feld 7 – privat
+    // ausgelegte Belege und Barbelege (der Salon führt keine Kassenabschlüsse in der App, also „vor dem ersten Abschluss“)
+    const verrechnung = zeilen.filter((z) => z[6] === "0755").length;
+    vergleich(`Paket ${name}`, "DATEV: privat bezahlte und Barbelege der GmbH auf dem Verrechnungskonto 0755, nicht auf „Privateinlagen“ 1890 (Buchungen 0755 / 1890)", `${verrechnung} / ${privat}`, `${summe(bl.filter((b) => b.zahlung === "privat" || b.zahlung === "bar").map((b) => b.saetze.filter((x) => x.betrag).length))} / 0`);
   }
   const liesmich = Buffer.from(inhalt["LIESMICH.txt"]).toString("utf8");
   vergleich(`Paket ${name}`, "LIESMICH: erklärt die Zuordnung bei Ist-Versteuerung (Zahlungseingang statt Leistungsdatum)", /Ist-Versteuerung|vereinnahmte|nach (dem )?Zahlungseingang/.test(liesmich) ? "ja" : "nein", "ja");
@@ -316,6 +329,32 @@ for (const d of bau.docs.filter((y) => y.vorlage === "impressum" || y.vorlage ==
   const txt = pdftext(path.join(OUT, "pdf", d.datei)).replace(/\s+/g, " ");
   if (d.vorlage === "impressum") for (const [was, re] of [["USt-IdNr.", /DE361847295/], ["HRB 178432", /HRB 178432/], ["Chris Sonnberg", /Chris Sonnberg/], ["Stammkapital", /25\.000/]]) vergleich("Impressum (§ 5 DDG)", `enthält ${was}`, re.test(txt) ? "ja" : "nein", "ja");
   if (d.vorlage === "datenschutzerklaerung_website") for (const [was, re] of [["Terminbuchung", /Terminbuchung|Termin/], ["TerminFix", /TerminFix/], ["Instagram", /Instagram/]]) vergleich("Datenschutzerklärung", `enthält ${was}`, re.test(txt) ? "ja" : "nein", "ja");
+}
+
+// ---------------------------------------------------------------- KoSIT (optional; StB-Prüfung C-15: auch Salon, Shop, Elektro)
+let kosit = "nicht geprüft (Umgebungsvariable KOSIT nicht gesetzt)";
+const KOSIT = process.env.KOSIT;
+if (KOSIT && fs.existsSync(KOSIT)) {
+  const jar = fs.readdirSync(path.join(KOSIT, "v")).find((f) => /^validator-.*\.jar$/.test(f));
+  const sz = path.join(KOSIT, "cfg", "scenarios.xml");
+  const berichte = path.join(OUT, ".kosit");
+  fs.mkdirSync(berichte, { recursive: true });
+  const xmlDateien = bau.xmls.map((x) => path.join(OUT, "rechnungen", x.datei));
+  try {
+    execFileSync("java", ["-cp", `${path.join(KOSIT, "v", jar)}:${path.join(KOSIT, "v", "libs")}/*`, "de.kosit.validationtool.cmd.CommandLineApplication", "-s", sz, "-r", path.dirname(sz), "-o", berichte, ...xmlDateien], { stdio: "pipe" });
+  } catch {
+    /* Ergebnis steht in den Berichten */
+  }
+  const erg = xmlDateien.map((f) => {
+    const b = fs.readdirSync(berichte).find((r) => r.startsWith(path.basename(f, ".xml")) && r.includes("report") && r.endsWith(".xml"));
+    const txt = b ? fs.readFileSync(path.join(berichte, b), "utf8") : "";
+    const ok = /<rep:accept/.test(txt);
+    const warn = (txt.match(/<rep:message[^>]*level="warning"[^>]*>[^<]*/g) ?? []).length;
+    if (!ok) auffaellig.push(`KoSIT: ${path.basename(f)} nicht akzeptiert: ${(txt.match(/<rep:message[^>]*level="error"[^>]*>[^<]*/g) ?? []).slice(0, 3).map((m) => m.replace(/<[^>]*>/g, "")).join(" | ") || "kein Bericht"}`);
+    return `${path.basename(f)}: ${ok ? "akzeptiert" : "ABGELEHNT"}${warn ? ` (${warn} Warnungen)` : ""}`;
+  });
+  fs.rmSync(berichte, { recursive: true, force: true });
+  kosit = `KoSIT-Validator (${jar}, ${path.basename(KOSIT)}): ${erg.join("; ")}`;
 }
 
 // ---------------------------------------------------------------- PNG-Ansichten (60 dpi)
@@ -398,7 +437,7 @@ md.push("### Steuerberater-Pakete", "", `- Juni 2026: Rechnungen mit Rechnungsda
 md.push("## Vergleich App ↔ unabhängige Rechnung", "", `${vergleiche.filter((v) => v.ok).length} von ${vergleiche.length} Prüfungen stimmen. Abweichungen (✗) stehen zusätzlich unter „Auffälligkeiten“.`, "");
 md.push(tab(["", "Bereich", "Prüfung", "App", "erwartet"], vergleiche.map((v) => [v.ok ? "✓" : "✗", v.bereich, v.was, v.app, v.erwartet])), "");
 md.push("Übernahme „Aus Rechnungen“ (Ist) je Monat – Rohwerte der App vor dem Ergänzen der Kasse:", "", tab(["Monat", "Versteuerung", "Rechnungen", "umsatz_19", "umsatz_7", "umsatz_frei", "vorsteuer", "fertige VA: 19 % / Vorsteuer"], bau.ust.map((u) => [u.m, u.versteuerung, u.appAnzahl, u.app.umsatz_19, u.app.umsatz_7, u.app.umsatz_frei, u.app.vorsteuer, `${u.final.umsatz_19} / ${u.final.vorsteuer}`])), "");
-md.push("EÜR-Übernahme, die die App auch für die GmbH anbietet (gilt hier nicht, nur zur Dokumentation):", "", tab(["Liste", "Bezeichnung", "Zeile Anlage EÜR", "Betrag"], [...bau.euer.einnahmen.map((x) => ["Einnahme", x.text, x.kategorie, x.betrag]), ...bau.euer.ausgaben.map((x) => ["Ausgabe", x.text, x.kategorie, x.betrag])]), "", `Hinweis der Übernahme: „${bau.euer.hinweis}“`, "");
+md.push("EÜR-Übernahme für die GmbH (seit der StB-Prüfung E-4 gesperrt – die Listen sind leer):", "", tab(["Liste", "Bezeichnung", "Zeile Anlage EÜR", "Betrag"], [...bau.euer.einnahmen.map((x) => ["Einnahme", x.text, x.kategorie, x.betrag]), ...bau.euer.ausgaben.map((x) => ["Ausgabe", x.text, x.kategorie, x.betrag])]), "", `Hinweis der Übernahme: „${bau.euer.hinweis}“`, "");
 
 md.push(`## Pflichten-Check der App für den Salon (Stichtag ${D.de(bau.pflichten.stichtag)})`, "", "Profil: Beauty/Kosmetik + Handwerk (Anlage A), GmbH (eingetragen, 2 Gesellschafter, Kalenderjahr), Gewerbe, Hamburg, 4 Beschäftigte (1 Azubi, 1 unter 18, kein Minijob), Lohnsteuer monatlich, elektronische Kasse, Website, Regelbesteuerung, Steuerberatung, Gründung 01.04.2025, Kunden B2B/B2C Inland, Gefahrstoffe, elektrische Geräte, Kunden-, Beschäftigten- und Gesundheitsdaten, Dienstleister, KI-Nutzung.", "");
 md.push("### Gilt", "", tab(["Pflicht", "nächster Termin", "Termine 12 Mon.", "Vorlage laut App", "erzeugt", "Grund laut App"], bau.pflichten.gilt.map((p) => [`${p.titel} (\`${p.id}\`)`, p.termin ? D.de(p.termin) : "–", p.termine, p.vorlage ?? "–", p.vorlage ? (p.erzeugt ? "ja" : "**nein**") : "", p.grund])), "");
@@ -409,9 +448,10 @@ md.push("## Auffälligkeiten beim Erzeugen", "", "### Automatisch erkannt (Abwei
 md.push(...(auffaellig.length ? auffaellig.map((a) => `- ${a}`) : ["- keine"]), "");
 md.push("### Fachlich festgestellt (nicht automatisch prüfbar), mit Fundstelle und Vorschlag", "", ...(BEOBACHTUNGEN.length ? BEOBACHTUNGEN.map((b) => `- ${b}`) : ["- (noch nicht gepflegt)"]), "");
 md.push("## Durchsicht jeder PDF-Seite (PNG 60 dpi, von Hand)", "", ...(DURCHSICHT.length ? DURCHSICHT.map((b) => `- ${b}`) : ["- (noch nicht gepflegt)"]), "");
-md.push("## Hinweise der App und weitere Informationen", "", ...bau.infos.map((i) => `- ${i}`), "");
+md.push("## Hinweise der App und weitere Informationen", "", ...bau.infos.map((i) => `- ${i}`), `- ${kosit}`, "");
 fs.writeFileSync(path.join(OUT, "SZENARIO.md"), md.join("\n"));
 
 console.log(`${bau.docs.length} Unterlagen, ${bau.xmls.length} XRechnungen, ${bau.belegDateien.length} Belegdateien, ${pdfs.length} PDFs → ${OUT}`);
 console.log(`Vergleiche: ${vergleiche.filter((v) => v.ok).length}/${vergleiche.length} ok; Auffälligkeiten: ${auffaellig.length}`);
+console.log(kosit);
 for (const a of auffaellig) console.log(`  - ${a}`);

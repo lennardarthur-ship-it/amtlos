@@ -10,6 +10,7 @@
  * (werkzeuge/jahr-szenario-shop-daten.ts) und jeder Abweichung.
  *
  *   cd apps/mobile && node werkzeuge/jahr-szenario-shop.mjs [ausgabe]     # Standard: /tmp/claude-0/shop
+ *   KOSIT=<ordner>    optional: KoSIT-Validator (<ordner>/v/validator-*.jar, <ordner>/cfg/scenarios.xml)
  *   CHROMIUM_PFAD=…   anderer Chromium (Standard /opt/pw-browsers/chromium)
  *
  * Voraussetzungen wie jahr-szenario.mjs: pnpm install, gebaute Pakete (@amtlos/fachlogik dist), Chromium, poppler.
@@ -225,7 +226,7 @@ function paketPruefen(name, zr, erg, ordner) {
   const zeilen = extf.slice(2);
   vergleich(bereich, "DATEV: Spalten je Zeile = Spalten im Kopf", zeilen.every((z) => z.length === extf[1].length) ? "ja" : "nein", "ja");
   vergleich(bereich, "DATEV: Kopf Beraternummer/Mandant", `${extf[0][10]}/${extf[0][11]}`, "52190/10744");
-  const kontoSumme = (konto) => summe(zeilen.filter((z) => z[7] === konto).map((z) => (z[1] === "H" ? -1 : 1) * centAus(z[0])));
+  const kontoSumme = (konto) => summe(zeilen.filter((z) => z[7] === konto).map((z) => (z[1] === "H" ? -1 : 1) * (z[117] === "1" ? -1 : 1) * centAus(z[0])));
   vergleich(bereich, "DATEV: Brutto auf Erlöskonto 8400 (19 %)", kontoSumme("8400"), summe(vg.map((x) => x.vz * (x.s.gruppen["19"] ? x.s.gruppen["19"].netto + x.s.gruppen["19"].ust : 0))));
   if (vg.some((x) => x.r.igl)) vergleich(bereich, "DATEV: igL auf eigenem Erlöskonto (SKR03 8125 statt 8100 „steuerfrei“)", kontoSumme("8125") ? "8125" : kontoSumme("8100") ? "8100" : "–", "8125");
   // § 13b-Belege: im Stapel ohne Steuerschlüssel für Reverse Charge
@@ -234,7 +235,7 @@ function paketPruefen(name, zr, erg, ordner) {
     const kennungen = new Set(b13.map((b) => (b.nummer ?? "").replace(/[^A-Za-z0-9$&%*+\-/]/g, "").slice(0, 36)));
     const zeilen13 = zeilen.filter((z) => [...kennungen].some((k) => k && z[10].startsWith(k.slice(0, 12))));
     // R10: § 13b-Belege auf dem Automatikkonto 3123 (sonstige Leistung aus dem EU-Ausland, Vorsteuer und Umsatzsteuer)
-    vergleich(bereich, `DATEV: § 13b-Belege (${b13.map((b) => b.id).join(", ")}) auf dem § 13b-Konto 3123`, zeilen13.length ? ([...new Set(zeilen13.map((z) => `${z[6]}/${z[8] || "ohne BU"}`))].join(", ")) : "nicht gefunden", "3123/ohne BU");
+    vergleich(bereich, `DATEV: § 13b-Belege (${b13.map((b) => b.id).join(", ")}) auf dem § 13b-Konto 3123`, zeilen13.length ? ([...new Set(zeilen13.map((z) => `${z[7]}/${z[8] || "ohne BU"}`))].join(", ")) : "nicht gefunden", "3123/ohne BU");
   }
   const liesmich = Buffer.from(inhalt["LIESMICH.txt"]).toString("utf8");
   const fragen = inhalt[`Fragen_${zr.name}.txt`] ? Buffer.from(inhalt[`Fragen_${zr.name}.txt`]).toString("utf8") : "";
@@ -271,6 +272,32 @@ for (const d of bau.docs.filter((y) => y.vorlage === "impressum" || y.vorlage ==
     vergleich("Impressum (§ 5 DDG)", "keine Steuernummer", /43\/158\/02741/.test(txt) ? "Steuernummer steht drin" : "keine", "keine");
   }
   if (d.vorlage === "datenschutzerklaerung_website") for (const [was, re] of [["Shop-System (Hoster)", /Shopwerk/], ["Newsletter-Dienst", /Postfach Marketing/], ["Zahlungsdienstleister", /PayPal/], ["Einwilligungsbanner", /Einwilligungsbanner/], ["Hamburger Aufsichtsbehörde", /Hamburg/]]) vergleich("Datenschutzerklärung", `enthält ${was}`, re.test(txt) ? "ja" : "nein", "ja");
+}
+
+// ---------------------------------------------------------------- KoSIT (optional; StB-Prüfung C-15: auch Salon, Shop, Elektro)
+let kosit = "nicht geprüft (Umgebungsvariable KOSIT nicht gesetzt)";
+const KOSIT = process.env.KOSIT;
+if (KOSIT && fs.existsSync(KOSIT)) {
+  const jar = fs.readdirSync(path.join(KOSIT, "v")).find((f) => /^validator-.*\.jar$/.test(f));
+  const sz = path.join(KOSIT, "cfg", "scenarios.xml");
+  const berichte = path.join(OUT, ".kosit");
+  fs.mkdirSync(berichte, { recursive: true });
+  const xmlDateien = bau.xmls.map((x) => path.join(OUT, "rechnungen", x.datei));
+  try {
+    execFileSync("java", ["-cp", `${path.join(KOSIT, "v", jar)}:${path.join(KOSIT, "v", "libs")}/*`, "de.kosit.validationtool.cmd.CommandLineApplication", "-s", sz, "-r", path.dirname(sz), "-o", berichte, ...xmlDateien], { stdio: "pipe" });
+  } catch {
+    /* Ergebnis steht in den Berichten */
+  }
+  const erg = xmlDateien.map((f) => {
+    const b = fs.readdirSync(berichte).find((r) => r.startsWith(path.basename(f, ".xml")) && r.includes("report") && r.endsWith(".xml"));
+    const txt = b ? fs.readFileSync(path.join(berichte, b), "utf8") : "";
+    const ok = /<rep:accept/.test(txt);
+    const warn = (txt.match(/<rep:message[^>]*level="warning"[^>]*>[^<]*/g) ?? []).length;
+    if (!ok) auffaellig.push(`KoSIT: ${path.basename(f)} nicht akzeptiert: ${(txt.match(/<rep:message[^>]*level="error"[^>]*>[^<]*/g) ?? []).slice(0, 3).map((m) => m.replace(/<[^>]*>/g, "")).join(" | ") || "kein Bericht"}`);
+    return `${path.basename(f)}: ${ok ? "akzeptiert" : "ABGELEHNT"}${warn ? ` (${warn} Warnungen)` : ""}`;
+  });
+  fs.rmSync(berichte, { recursive: true, force: true });
+  kosit = `KoSIT-Validator (${jar}, ${path.basename(KOSIT)}): ${erg.join("; ")}`;
 }
 
 // ---------------------------------------------------------------- PNG-Ansichten (60 dpi)
@@ -373,9 +400,10 @@ md.push("## Auffälligkeiten beim Erzeugen", "", "### Automatisch erkannt (Abwei
 md.push(...(auffaellig.length ? auffaellig.map((a) => `- ${a}`) : ["- keine"]), "");
 md.push("### Fachlich festgestellt (nicht automatisch prüfbar), mit Fundstelle und Vorschlag", "", ...(BEOBACHTUNGEN.length ? BEOBACHTUNGEN.map((b) => `- ${b}`) : ["- (noch nicht gepflegt)"]), "");
 md.push("## Durchsicht jeder PDF-Seite (PNG 60 dpi, von Hand)", "", ...(DURCHSICHT.length ? DURCHSICHT.map((b) => `- ${b}`) : ["- (noch nicht gepflegt)"]), "");
-md.push("## Hinweise der App und weitere Informationen", "", ...bau.infos.map((i) => `- ${i}`), "");
+md.push("## Hinweise der App und weitere Informationen", "", ...bau.infos.map((i) => `- ${i}`), `- ${kosit}`, "");
 fs.writeFileSync(path.join(OUT, "SZENARIO.md"), md.join("\n"));
 
 console.log(`${bau.docs.length} Unterlagen, ${bau.xmls.length} XRechnungen, ${bau.belegDateien.length} Belegdateien, ${pdfs.length} PDFs → ${OUT}`);
 console.log(`Vergleiche: ${vergleiche.filter((v) => v.ok).length}/${vergleiche.length} ok; Auffälligkeiten: ${auffaellig.length}`);
+console.log(kosit);
 for (const a of auffaellig) console.log(`  - ${a}`);

@@ -2,8 +2,9 @@
  * Unterlagen und Betrieb – nur auf dem Gerät (E-121). Reine Funktionen über einem unveränderlichen Stand, damit sie
  * ohne Gerät testbar sind; zustand.tsx speichert den Stand in AsyncStorage.
  */
-import { KU_HINWEIS, belegNummern, eigenbelegeVergeben, grundGenuegt, kassensturzAus, kassenstuerzeVereinen, naechsteBelegnummer, sachentnahmeAus, ustZeitraum, xrechnungUbl, type Kassensturz, type Sachentnahme } from "@amtlos/fachlogik";
-import { LEERER_BETRIEB, eRechnungAus, kassenKorrektur, kassenabschlussAus, kassenInhalt, kassenVereinen, summen, zahlungenAus, zahlungsStand, type KassenInhalt, type Kassenabschluss, type Zahlung, belegAus, belegFassung, belegInhaltGeaendert, belegSummen, gruppenAusBranchen, leereDaten, type Beleg, naechsteNummer, personMerken as merken, vorlageFuer, type Betrieb, type Daten, type Eintrag, type Person, type PersonAngaben, type PersonenArt } from "@amtlos/fachlogik";
+import { letzteVollsicherung, nachweisText, nachweiseAus, type SicherungsNachweis } from "./sicherungNachweis";
+import { KU_HINWEIS, belegNummern, eigenbelegeVergeben, grundGenuegt, kassensturzAus, kassenstuerzeVereinen, kontenvorgabenAus, kontenvorgabenGesetzt, naechsteBelegnummer, sachentnahmeAus, ustZeitraum, xrechnungUbl, type Kassensturz, type Kontenvorgaben, type Sachentnahme } from "@amtlos/fachlogik";
+import { LEERER_BETRIEB, eRechnungAus, kassenKorrektur, kassenabschlussAus, kassenInhalt, kassenVereinen, zahlungenAus, zahlungsStand, type KassenInhalt, type Kassenabschluss, type Zahlung, belegAus, belegFassung, belegInhaltGeaendert, belegSummen, gruppenAusBranchen, istGutschriftNummer, leereDaten, type Beleg, naechsteNummer, zahlbetrag, personMerken as merken, vorlageFuer, type Betrieb, type Daten, type Eintrag, type Person, type PersonAngaben, type PersonenArt } from "@amtlos/fachlogik";
 import { partnerIdAus } from "../partner/partner";
 import { zustimmungAus, type Zustimmung } from "../rechtliches";
 
@@ -106,7 +107,7 @@ export interface Betriebsstaette {
 export const HAUPT_STAETTE = "haupt";
 
 export interface Stand {
-  version: 6;
+  version: 7;
   betrieb: Betrieb;
   unterlagen: Unterlage[];
   /** Belege und Eingangsrechnungen (E-133); Dateien liegen verschlüsselt daneben (unterlagen/dateien.ts) */
@@ -128,10 +129,15 @@ export interface Stand {
   letzteSicherung?: string;
   /** automatisch in iCloud sichern (nur im eigenen App-Build, E-129) */
   cloudSicherung: boolean;
+  /** StB GoBD (D-11): Nachweis der Vollsicherungen außerhalb des Geräts (Datum, Art), neueste zuletzt – gerätegebunden */
+  sicherungsNachweis?: SicherungsNachweis[];
   /** Pro testweise eingeschaltet – nur im Testmodus ohne App-Store-Anbindung (E-132) */
   proTest: boolean;
-  /** Angaben für das Steuerberater-Paket (E-133) */
-  steuerberatung: { kontenrahmen: "SKR03" | "SKR04"; beraternummer: string; mandantennummer: string };
+  /**
+   * Angaben für das Steuerberater-Paket (E-133). StB-Prüfung (B-6 u. a.): `kontenvorgaben` – abweichende Konten und
+   * Optionen der Kanzlei (fachlogik kontenvorgaben.ts); synchronisiert und gesichert mit dem Bereich „steuerberatung“.
+   */
+  steuerberatung: { kontenrahmen: "SKR03" | "SKR04"; beraternummer: string; mandantennummer: string; kontenvorgaben?: Kontenvorgaben };
   /**
    * Synchronisation (E-134): Löschvermerke („u:“ Unterlage, „b:“ Beleg, „m:“/„k:“ Person → ISO-Zeitpunkt), damit
    * Gelöschtes nicht von einem anderen Gerät zurückkommt; Zeitpunkte der letzten Änderung je Bereich (betrieb, profil,
@@ -179,7 +185,7 @@ export interface Stand {
 }
 
 /** Aktuelle Version des gespeicherten Stands. Höhere Versionen stammen aus einer neueren App und werden nie überschrieben. */
-export const STAND_VERSION = 6;
+export const STAND_VERSION = 7;
 
 /**
  * Migrationen: Eintrag n hebt einen Stand von Version n auf n + 1.
@@ -192,6 +198,8 @@ export const STAND_VERSION = 6;
  * - 4 → 5 (Phase 2.3): Partner-ID (`partnerId`) für „Empfohlen von …“ – anfangs nicht gesetzt.
  * - 5 → 6 (Vorprüfung Recht): Zustimmung zu den Nutzungsbedingungen (`nutzungsbedingungen`) – anfangs nicht gesetzt;
  *   die App fragt erst danach, wenn die eigenen Bedingungen freigegeben sind.
+ * - 6 → 7 (StB-Prüfung Heckler und Busch): Kontenvorgaben der Kanzlei (`steuerberatung.kontenvorgaben`) – anfangs keine,
+ *   es gelten die Standardkonten des Kontenrahmens; Vorhandenes wird nur bereinigt.
  */
 export const MIGRATIONEN: Record<number, (roh: Record<string, unknown>) => Record<string, unknown>> = {
   1: (roh) => ({ ...roh, kasse: Array.isArray(roh.kasse) ? roh.kasse : [] }),
@@ -231,6 +239,12 @@ export const MIGRATIONEN: Record<number, (roh: Record<string, unknown>) => Recor
   },
   4: (roh) => ({ ...roh, partnerId: undefined }),
   5: (roh) => ({ ...roh, nutzungsbedingungen: undefined }),
+  6: (roh) => {
+    if (!istObjekt(roh.steuerberatung)) return roh;
+    const v = kontenvorgabenAus(roh.steuerberatung.kontenvorgaben);
+    const { kontenvorgaben: _alt, ...rest } = roh.steuerberatung;
+    return { ...roh, steuerberatung: kontenvorgabenGesetzt(v) ? { ...rest, kontenvorgaben: v } : rest };
+  },
 };
 
 export class StandFehler extends Error {
@@ -254,7 +268,7 @@ export function migrieren(roh: Record<string, unknown>): Record<string, unknown>
   return { ...r, version: STAND_VERSION };
 }
 
-export const LEERER_STAND: Stand = { version: 6, kasse: [], kassenstuerze: [], sachentnahmen: [], protokoll: [], betriebsstaetten: [], betrieb: LEERER_BETRIEB, unterlagen: [], belege: [], mitarbeiter: [], kunden: [], profil: {}, erledigt: {}, erinnerungen: false, appSperre: false, cloudSicherung: false, proTest: false, bewertung: { erfolge: 0 }, steuerberatung: { kontenrahmen: "SKR03", beraternummer: "", mandantennummer: "" }, geloescht: {}, zeiten: {}, belegArchiv: [], fremd: { unterlagen: [], belege: [] } };
+export const LEERER_STAND: Stand = { version: 7, kasse: [], kassenstuerze: [], sachentnahmen: [], protokoll: [], betriebsstaetten: [], betrieb: LEERER_BETRIEB, unterlagen: [], belege: [], mitarbeiter: [], kunden: [], profil: {}, erledigt: {}, erinnerungen: false, appSperre: false, cloudSicherung: false, proTest: false, bewertung: { erfolge: 0 }, steuerberatung: { kontenrahmen: "SKR03", beraternummer: "", mandantennummer: "" }, geloescht: {}, zeiten: {}, belegArchiv: [], fremd: { unterlagen: [], belege: [] } };
 
 function profilAus(roh: unknown): Stand["profil"] {
   if (!roh || typeof roh !== "object" || Array.isArray(roh)) return {};
@@ -281,7 +295,8 @@ const vermerken = (s: Stand, schluessel: string, jetzt = new Date()): Stand => (
 function steuerberatungAus(roh: unknown): Stand["steuerberatung"] {
   const b = roh && typeof roh === "object" ? (roh as Record<string, unknown>) : {};
   const ziffern = (w: unknown) => (typeof w === "string" ? w.replace(/\D/g, "").slice(0, 7) : "");
-  return { kontenrahmen: b.kontenrahmen === "SKR04" ? "SKR04" : "SKR03", beraternummer: ziffern(b.beraternummer), mandantennummer: ziffern(b.mandantennummer) };
+  const kontenvorgaben = kontenvorgabenAus(b.kontenvorgaben);
+  return { kontenrahmen: b.kontenrahmen === "SKR04" ? "SKR04" : "SKR03", beraternummer: ziffern(b.beraternummer), mandantennummer: ziffern(b.mandantennummer), ...(kontenvorgabenGesetzt(kontenvorgaben) || kontenvorgaben.kanzlei ? { kontenvorgaben } : {}) };
 }
 
 function bewertungAus(roh: unknown): Stand["bewertung"] {
@@ -407,7 +422,7 @@ export function standAus(json: string | null): Stand {
   const partnerId = partnerIdAus(r.partnerId);
   const nutzungsbedingungen = zustimmungAus(r.nutzungsbedingungen);
   return belegNummernSichern({
-    version: 6,
+    version: 7,
     kasse: kassenVereinen([], kasse),
     kassenstuerze,
     sachentnahmen,
@@ -432,6 +447,7 @@ export function standAus(json: string | null): Stand {
     zeiten: isoKarte(r.zeiten),
     ...(iso(r.geaendert) ? { geaendert: iso(r.geaendert) } : {}),
     ...(iso(r.letzteSicherung) ? { letzteSicherung: iso(r.letzteSicherung) } : {}),
+    ...(nachweiseAus(r.sicherungsNachweis).length ? { sicherungsNachweis: nachweiseAus(r.sicherungsNachweis) } : {}),
     ...(partnerId ? { partnerId } : {}),
     ...(nutzungsbedingungen ? { nutzungsbedingungen } : {}),
   });
@@ -539,7 +555,8 @@ export function istLesbar(json: string | null): boolean {
 
 /** Nächste fortlaufende Nummer einer Vorlage aus allen vorhandenen Unterlagen (festgeschriebene lassen sich nicht löschen). */
 function naechste(s: Stand, vorlageId: string, feld: string, jetzt: Date): string {
-  const vorhanden = s.unterlagen.filter((u) => u.vorlage === vorlageId).map((u) => u.daten[feld]).filter((n): n is string => typeof n === "string");
+  // StB-Prüfung (B-12): Gutschriften mit eigenem Nummernkreis („GS-…“) zählen nicht in der Reihe der Rechnungsnummern
+  const vorhanden = s.unterlagen.filter((u) => u.vorlage === vorlageId).map((u) => u.daten[feld]).filter((n): n is string => typeof n === "string" && !(vorlageId === "rechnung" && istGutschriftNummer(n)));
   return naechsteNummer(vorhanden, heute(jetzt).slice(0, 4));
 }
 
@@ -606,6 +623,11 @@ export function anlegen(s: Stand, vorlageId: string, jetzt: Date, id = neueId())
   }
   // R12: Nachweise mit Fassungen tragen den Tag ihrer letzten Änderung („Fassung vom …“ im PDF)
   if (v.korrektur) daten.fassung_stand = heute(jetzt);
+  // StB GoBD (D-11): Verfahrensdokumentation mit dem Nachweis der letzten Vollsicherung außerhalb des Geräts
+  if (v.id === "verfahrensdokumentation") {
+    const n = letzteVollsicherung(s.sicherungsNachweis);
+    if (n) daten.sicherung_nachweis = nachweisText(n);
+  }
   // R12 (Bäckerei #3): Kassenmeldung mit den Betriebsstätten aus „Mein Betrieb“
   if (v.id === "kassenmeldung" && s.betriebsstaetten.length) daten.betriebsstaetten = s.betriebsstaetten.filter((b) => b.name.trim()).map((b) => ({ name: b.name.trim(), anschrift: [b.strasse.trim(), [b.plz.trim(), b.ort.trim()].filter(Boolean).join(" ")].filter(Boolean).join("\n") }));
   const u: Unterlage = { id, vorlage: v.id, daten, erstellt: jetzt.toISOString(), geaendert: jetzt.toISOString() };
@@ -805,6 +827,9 @@ export function kopieren(s: Stand, id: string, jetzt: Date, neu = neueId()): [St
   // die Kopie ist ein neuer Entwurf: kein Storno-Bezug, nicht ausgegeben, nicht festgeschrieben
   delete daten.storno_zu;
   delete daten.storno_zu_datum;
+  // StB-Prüfung (C-6): die Ersatzrechnung nennt die stornierte Rechnung (Voranmeldung: Korrektur im Zeitraum des Stornos; XRechnung BG-3)
+  if (ersetzt && alt.vorlage === "rechnung" && typeof alt.daten.nummer === "string") daten.ersetzt_nummer = alt.daten.nummer;
+  else delete daten.ersetzt_nummer;
   // R12: die Kopie eines Nachweises ist eine neue erste Fassung – ohne Fassungsangaben und Zeitstempel der Tage
   if (v?.korrektur) {
     for (const k of ["fassung_nr", "fassung_ersetzt", "fassung_grund"]) delete daten[k];
@@ -924,10 +949,10 @@ export function bezahltSetzen(s: Stand, id: string, datum: string | null, jetzt 
   return { ...s, unterlagen: s.unterlagen.map((u) => (u.id === id ? (datum ? (({ zahlungen: _z, ...rest }) => ({ ...rest, bezahlt: datum, bezahltGeaendert: g }))(u) : (({ bezahlt: _weg, zahlungen: _z, ...rest }) => ({ ...rest, bezahltGeaendert: g }))(u)) : u)) };
 }
 
-/** Rechnungsbetrag brutto (Storno negativ) – für Zahlungen. */
+/** Rechnungsbetrag brutto (Storno negativ) – für Zahlungen; StB-Prüfung (C-4): bei einer Schlussrechnung der Rest nach den Abschlägen. */
 function bruttoVon(s: Stand, u: Unterlage): number {
   const { daten } = eRechnungAus(u.daten, s.betrieb);
-  return summen(daten.positionen, daten.kleinunternehmer).brutto_cent;
+  return zahlbetrag(daten);
 }
 
 /** Zahlungen einer Rechnung: die Liste, sonst (ältere Daten, „als bezahlt markiert“) der ganze Betrag am Tag `bezahlt`. */

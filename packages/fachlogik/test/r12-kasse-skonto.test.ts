@@ -137,10 +137,12 @@ describe("Skonto bei Belegen (§ 17 Abs. 1 Satz 2 UStG) und DATEV", () => {
   });
   it("Barbelege: mit Kassenführung in Amtlos gegen Kasse, davor bzw. ohne gegen Privateinlage (R12 GoBD)", () => {
     const bar = beleg("b2", "2026-05-09", 1190, { zahlung: "bar" });
-    expect(buchungenAusBelegen([bar], "SKR03")[0]!.gegenkonto).toBe("1000");
-    expect(buchungenAusBelegen([bar], "SKR03", { kasseAb: "2026-05-01" })[0]!.gegenkonto).toBe("1000");
-    expect(buchungenAusBelegen([bar], "SKR03", { kasseAb: "2026-06-01" })[0]!.gegenkonto).toBe("1890");
-    expect(buchungenAusBelegen([bar], "SKR04", { kasseAb: null })[0]!.gegenkonto).toBe("2180");
+    expect(buchungenAusBelegen([bar], "SKR03")[0]!.konto).toBe("1000");
+    expect(buchungenAusBelegen([bar], "SKR03", { kasseAb: "2026-05-01" })[0]!.konto).toBe("1000");
+    expect(buchungenAusBelegen([bar], "SKR03", { kasseAb: "2026-06-01" })[0]!.konto).toBe("1890");
+    expect(buchungenAusBelegen([bar], "SKR04", { kasseAb: null })[0]!.konto).toBe("2180");
+    // StB-Prüfung (B-6): Kapitalgesellschaft vor dem ersten Kassenabschluss auf das Verrechnungskonto, nicht Geldtransit
+    expect(buchungenAusBelegen([bar], "SKR03", { kasseAb: null, kapitalgesellschaft: true })[0]!.konto).toBe("0755");
   });
 });
 

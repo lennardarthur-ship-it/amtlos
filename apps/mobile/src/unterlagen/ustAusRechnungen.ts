@@ -29,9 +29,18 @@
  *   betrifft nur die eigenen Umsätze).
  * - Ersatzrechnung nach Storno über die ausdrückliche Verknüpfung (`ersetzt`, gesetzt beim Kopieren aus der stornierten
  *   Rechnung); nur bei älteren Daten ohne Verknüpfung vorsichtig geraten: gleicher Kunde, gleicher Betrag, gleiche Leistung.
+ *
+ * StB-Prüfung Heckler und Busch (21.10.2026):
+ * - C-6: Ersatzrechnung auch über das Feld „Ersetzt die stornierte Rechnung Nr.“ – wirkt als Korrektur im Zeitraum des
+ *   Stornos (Nettoeffekt dort), nicht als neue Leistung.
+ * - C-4: Schlussrechnung zählt nur mit dem Rest nach den abgesetzten Abschlägen (die Abschläge sind mit ihrer Zahlung
+ *   schon versteuert, § 13 Abs. 1 Nr. 1 a Satz 4 UStG).
+ * - 5.2: OSS-Rechnungen (Steuer des Bestimmungslands) gehören nicht in die deutsche Voranmeldung – sie werden gezählt,
+ *   nicht übernommen. Rechnungen, die mangels Leistungsdatum nach dem Rechnungsdatum zugeordnet sind, stehen je Rechnung
+ *   in der Voranmeldung (Feld „nach_rechnungsdatum“), weitere Annahmen im Feld „annahmen“.
  */
 import { sachentnahmenFuer, type Sachentnahme } from "@amtlos/fachlogik";
-import { eRechnungAus, fehlendeTage, istEuAusland, kassenUmsatz, kennzahlBefreiung, steuerschuldFuer, summen, ustZeitraum, vorsteuerFuer, zahlungsAnteile, type Beleg, type Betrieb, type Kassenabschluss, type RechnungsDaten } from "@amtlos/fachlogik";
+import { eRechnungAus, fehlendeTage, istEuAusland, kassenUmsatz, kennzahlBefreiung, restGruppen, steuerschuldFuer, summen, ustZeitraum, vorsteuerFuer, zahlungsAnteile, type Beleg, type Betrieb, type Kassenabschluss, type RechnungsDaten } from "@amtlos/fachlogik";
 import { nichtZaehlend, type Unterlage } from "./speicher";
 import { MARKE } from "@amtlos/marke";
 
@@ -102,6 +111,9 @@ function korrekturen(unterlagen: Unterlage[], betrieb: Betrieb): Map<string, str
   const feste = festeRechnungen(unterlagen);
   // Originale, auf die irgendeine Rechnung (auch ein Entwurf) ausdrücklich verweist – für sie wird nicht geraten
   const verknuepft = new Set(unterlagen.map((u) => u.ersetzt).filter((x): x is string => !!x));
+  // C-6: Ersatzrechnung über die eingetragene Nummer der stornierten Rechnung
+  const ersetztNr = (x: Unterlage) => (typeof x.daten.ersetzt_nummer === "string" ? x.daten.ersetzt_nummer.trim() : "");
+  const nrVon = (x: Unterlage) => (typeof x.daten.nummer === "string" ? x.daten.nummer.trim() : "");
   for (const st of feste) {
     if (!istStornoU(st) || !st.stornoZuId) continue;
     const orig = feste.find((x) => x.id === st.stornoZuId);
@@ -110,8 +122,9 @@ function korrekturen(unterlagen: Unterlage[], betrieb: Betrieb): Map<string, str
     if (!leistung) continue;
     const betraege = betragsSchluessel(orig, betrieb);
     const kandidat = (x: Unterlage) => x.id !== orig.id && !istStornoU(x) && !x.storniertDurch;
-    const ersatz = verknuepft.has(orig.id)
-      ? feste.filter((x) => kandidat(x) && x.ersetzt === orig.id).sort((a, b) => (a.festgeschrieben ?? "").localeCompare(b.festgeschrieben ?? ""))[0]
+    const perNummer = nrVon(orig) ? feste.filter((x) => kandidat(x) && ersetztNr(x) === nrVon(orig)) : [];
+    const ersatz = verknuepft.has(orig.id) || perNummer.length
+      ? feste.filter((x) => kandidat(x) && (x.ersetzt === orig.id || (nrVon(orig) !== "" && ersetztNr(x) === nrVon(orig)))).sort((a, b) => (a.festgeschrieben ?? "").localeCompare(b.festgeschrieben ?? ""))[0]
       : feste.find((x) => kandidat(x) && x.erstellt > orig.erstellt && String(x.daten.datum) >= String(orig.daten.datum) && leistungVon(x, betrieb) === leistung && kundeVon(x) === kundeVon(orig) && betragsSchluessel(x, betrieb) === betraege);
     if (!ersatz) continue;
     const origTag = zuordnenEinfach(orig, "soll", betrieb).tag;
@@ -243,6 +256,10 @@ export interface UstUebernahme {
   kasseFehlend: string[] | null;
   /** R12: Rechnungen mit Skonto bzw. Minderung, die im Zeitraum mindern */
   minderungen: number;
+  /** StB-Prüfung (5.2): Nummern der Rechnungen ohne erkennbares Leistungsdatum (nach Rechnungsdatum zugeordnet) */
+  ersatzNummern: string[];
+  /** StB-Prüfung (5.2): OSS-Rechnungen im Zeitraum – nicht übernommen (OSS-Erklärung beim BZSt) */
+  oss: number;
 }
 
 /** R12: Kassenabschlüsse für die Voranmeldung – Ruhetage (Wochentage 0–6) und heutiger Tag für die fehlenden Tage. */
@@ -257,7 +274,12 @@ export interface KasseFuerUst {
 }
 
 /** Steuergruppen einer Rechnung mit Vorzeichen (Storno negativ). */
-const volleGruppen = (d: RechnungsDaten) => summen(d.positionen, d.kleinunternehmer).gruppen.map((g) => ({ satz: g.satz, netto_cent: g.netto_cent * (d.art === "storno" ? -1 : 1) }));
+const volleGruppen = (d: RechnungsDaten) => restGruppen(d).map((g) => ({ satz: g.satz, netto_cent: g.netto_cent * (d.art === "storno" ? -1 : 1) }));
+
+/** 5.2: OSS-Rechnung (Steuer des Bestimmungslands) – nicht in der deutschen Voranmeldung */
+export const istOssRechnung = (u: Unterlage) => u.daten.oss === true;
+
+const datumDe = (iso: string) => `${iso.slice(8, 10)}.${iso.slice(5, 7)}.${iso.slice(0, 4)}`;
 
 /**
  * Felder der Voranmeldung für einen Zeitraum („JJJJ-MM“ oder „JJJJ-Qn“). `kleinunternehmer`: Antwort im Pflichten-Check
@@ -295,9 +317,11 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
         }
       : {};
   const kasseFehlend = kasse?.abschluesse.length ? fehlendeTage(kasse.abschluesse, z.von, z.bis, kasse.ruhetage ?? [], kasse.heute) : null;
-  if (ku) return { werte: { zeitraum: periodeText(periode), ...rcWerte(false) }, anzahl: 0, ersatz: 0, offen: 0, vorsteuerBelege: 0, ohneVorsteuer: 0, kleinunternehmer: true, kuGemischt: false, gutschriften, vorsteuerPruefen: false, steuerschuldBelege: rc.anzahl, kasseTage: 0, kasseFehlend: null, minderungen: 0 };
-  // einzelne Kleinunternehmer-Rechnungen (z. B. aus der Zeit vor dem Wechsel zur Regelbesteuerung) zählen nicht mit
-  const im = alle.filter((x) => !kuRechnung(x.u));
+  if (ku) return { werte: { zeitraum: periodeText(periode), ...rcWerte(false) }, anzahl: 0, ersatz: 0, offen: 0, vorsteuerBelege: 0, ohneVorsteuer: 0, kleinunternehmer: true, kuGemischt: false, gutschriften, vorsteuerPruefen: false, steuerschuldBelege: rc.anzahl, kasseTage: 0, kasseFehlend: null, minderungen: 0, ersatzNummern: [], oss: 0 };
+  // einzelne Kleinunternehmer-Rechnungen (z. B. aus der Zeit vor dem Wechsel zur Regelbesteuerung) zählen nicht mit;
+  // 5.2: OSS-Rechnungen gehören in die OSS-Erklärung, nicht in die Voranmeldung
+  const ossImZeitraum = alle.filter((x) => !kuRechnung(x.u) && istOssRechnung(x.u)).length;
+  const im = alle.filter((x) => !kuRechnung(x.u) && !istOssRechnung(x.u));
   // R12: Posten je Rechnung – ganze Rechnung, Zahlung (Ist) oder Minderung (Soll) – mit Steuergruppen und Vorzeichen
   const posten: { daten: RechnungsDaten; gruppen: { satz: number | null; netto_cent: number }[] }[] = im.map(({ u }) => {
     const daten = eRechnungAus(u.daten, betrieb).daten;
@@ -306,9 +330,10 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
   const imZ = (tag: string) => tag >= z.von && tag <= z.bis;
   let minderungen = 0;
   for (const u of festeRechnungen(unterlagen)) {
-    if (kuRechnung(u) || istStornoU(u) || !u.zahlungen?.length) continue;
+    if (kuRechnung(u) || istStornoU(u) || istOssRechnung(u) || !u.zahlungen?.length) continue;
     const daten = eRechnungAus(u.daten, betrieb).daten;
-    const anteile = zahlungsAnteile(summen(daten.positionen, daten.kleinunternehmer).gruppen, u.zahlungen);
+    // C-4: bei einer Schlussrechnung verteilen sich die Zahlungen auf den Rest nach den Abschlägen
+    const anteile = zahlungsAnteile(restGruppen(daten), u.zahlungen);
     let mindert = false;
     for (const a of anteile) {
       if (!imZ(a.zahlung.datum)) continue;
@@ -353,6 +378,15 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
   // R12: Kassenumsätze nach dem Tag des Abschlusses (Netto je Monat aus dem Brutto)
   const ka = kasse?.abschluesse.length ? kassenUmsatz(kasse.abschluesse, z.von, z.bis, false, { ueberschuesse: kasse.ueberschuesse }) : null;
   const se = sachentnahmenFuer(kasse?.sachentnahmen ?? [], z.von, z.bis);
+  // 5.2: je Rechnung, die nach dem Rechnungsdatum zugeordnet ist – Nummer | Datum | Kunde | Netto
+  const ersatzListe = im.filter((x) => x.ersatz).map(({ u }) => {
+    const daten = eRechnungAus(u.daten, betrieb).daten;
+    return { nummer: daten.nummer, zeile: [daten.nummer, datumDe(daten.rechnungsdatum), daten.kunde.name.replace(/\s*\|\s*/g, " "), betragText(volleGruppen(daten).reduce((a, g) => a + g.netto_cent, 0))].join(" | ") };
+  });
+  const annahmen = [
+    ka?.tage ? `Kassenumsätze aus ${ka.tage} Tagesabschlüssen: Netto und Umsatzsteuer je Steuersatz aus dem Brutto herausgerechnet.` : "",
+    ossImZeitraum ? `${ossImZeitraum} OSS-Rechnung(en) mit der Steuer des Bestimmungslands nicht übernommen – sie gehören in die OSS-Erklärung beim BZSt.` : "",
+  ].filter(Boolean);
   return {
     vorsteuerBelege: vst.anzahl,
     ohneVorsteuer: vst.ohne,
@@ -367,6 +401,8 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
     kasseTage: ka?.tage ?? 0,
     kasseFehlend,
     minderungen,
+    ersatzNummern: ersatzListe.map((x) => x.nummer),
+    oss: ossImZeitraum,
     werte: {
       zeitraum: periodeText(periode),
       umsatz_19: betragText(summe((s) => s === 19) + (ka?.je[19].netto ?? 0) + se.netto19),
@@ -381,6 +417,9 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
       umsatz_frei: betragText(frei - verteilt + (ka?.je[0].netto ?? 0)),
       ...(belege.length || vstGutschriften ? { vorsteuer: betragText(vst.cent + vstGutschriften) } : {}),
       ...rcWerte(true),
+      // 5.2: Zuordnungsannahmen stehen auf dem PDF der Voranmeldung (leer überschreibt Werte einer früheren Übernahme)
+      nach_rechnungsdatum: ersatzListe.map((x) => x.zeile).join("\n"),
+      annahmen: annahmen.join("\n"),
     },
   };
 }

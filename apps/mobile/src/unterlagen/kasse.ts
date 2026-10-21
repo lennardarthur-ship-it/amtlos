@@ -3,7 +3,7 @@
  * Zeitraums durch Kassenabschlüsse (für Voranmeldung, EÜR, Paket) und Übersicht eines Monats. Die Rechnungen selbst
  * stehen in @amtlos/fachlogik (kasse.ts).
  */
-import { fehlendeTage, kassenStandorte, kassenSummen, kassenUmsatz, kassenVerlauf, kassenWarnungen, standortVon, tageText, zbonLuecken, type Kassenabschluss } from "@amtlos/fachlogik";
+import { fehlendeTage, kassenStandorte, kassenSummen, kassenUmsatz, kassenVerlauf, kassenWarnungen, kontenFuer, standortVon, tageText, zbonLuecken, type Kassenabschluss } from "@amtlos/fachlogik";
 import { heute as heuteBerlin, type Stand } from "./speicher";
 import type { KasseFuerUst } from "./ustAusRechnungen";
 
@@ -30,13 +30,17 @@ export function ruhetage(profil: Stand["profil"]): number[] {
   return Array.isArray(w) ? w.map(Number).filter((x) => Number.isInteger(x) && x >= 0 && x <= 6) : [];
 }
 
+/** StB-Prüfung (B-9): Kassenüberschuss mit Umsatzsteuer (Erlöse 19 %) – nicht, wenn die Kanzlei ein Ertragskonto ohne Steuer vorgibt. */
+export const ueberschussMitUst = (s: Partial<Pick<Stand, "steuerberatung">>) => !s.steuerberatung || !kontenFuer(s.steuerberatung.kontenrahmen, s.steuerberatung.kontenvorgaben).kassendifferenzErtrag;
+
 /** Kassenabschlüsse für `umsaetzeFuer`. */
-export const kasseFuerUst = (s: Pick<Stand, "profil" | "kasse"> & Partial<Pick<Stand, "belege" | "sachentnahmen">>, heute = heuteBerlin()): KasseFuerUst => ({
+export const kasseFuerUst = (s: Pick<Stand, "profil" | "kasse"> & Partial<Pick<Stand, "belege" | "sachentnahmen" | "steuerberatung">>, heute = heuteBerlin()): KasseFuerUst => ({
   abschluesse: s.kasse,
   ruhetage: ruhetage(s.profil),
   heute,
-  // R12 GoBD: Kassenüberschüsse (wie im Stapel als Erlös 19 %) und Sachentnahmen
-  ueberschuesse: kassenWarnungen(s.kasse, s.belege ?? []).differenzen.filter((d) => d.cent > 0),
+  // R12 GoBD: Kassenüberschüsse (wie im Stapel als Erlös 19 %) und Sachentnahmen. StB-Prüfung (B-9): mit Kontenvorgabe
+  // „Überschuss auf ein Ertragskonto ohne Umsatzsteuer“ zählen Überschüsse nicht zur Umsatzsteuer
+  ueberschuesse: ueberschussMitUst(s) ? kassenWarnungen(s.kasse, s.belege ?? []).differenzen.filter((d) => d.cent > 0) : [],
   sachentnahmen: s.sachentnahmen ?? [],
 });
 
@@ -79,7 +83,7 @@ export interface KassenMonat {
 const monatsEnde = (monat: string) => new Date(Date.UTC(Number(monat.slice(0, 4)), Number(monat.slice(5, 7)), 0)).toISOString().slice(0, 10);
 
 /** Übersicht eines Monats (JJJJ-MM) für die Seite „Kasse“. */
-export function kassenMonat(s: Pick<Stand, "profil" | "kasse" | "belege">, monat: string, heute = heuteBerlin()): KassenMonat {
+export function kassenMonat(s: Pick<Stand, "profil" | "kasse" | "belege"> & Partial<Pick<Stand, "steuerberatung">>, monat: string, heute = heuteBerlin()): KassenMonat {
   const von = `${monat}-01`;
   const bis = monatsEnde(monat);
   const abschluesse = s.kasse.filter((k) => k.datum >= von && k.datum <= bis);
@@ -104,7 +108,7 @@ export function kassenMonat(s: Pick<Stand, "profil" | "kasse" | "belege">, monat
     monat,
     abschluesse,
     brutto: sum((x) => x.brutto),
-    je: kassenUmsatz(s.kasse, von, bis, false, { ueberschuesse: warnungen.differenzen.filter((d) => d.cent > 0) }).je,
+    je: kassenUmsatz(s.kasse, von, bis, false, { ueberschuesse: ueberschussMitUst(s) ? warnungen.differenzen.filter((d) => d.cent > 0) : [] }).je,
     bar: sum((x) => x.bar),
     karte: sum((x) => x.karte),
     sonstige: sum((x) => x.sonstige),

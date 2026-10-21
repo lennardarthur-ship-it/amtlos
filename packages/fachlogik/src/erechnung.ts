@@ -3,7 +3,7 @@
  * Der Server macht daraus mit @e-invoice-eu/core CII und ZUGFeRD; die App schreibt das UBL-XML selbst (`xrechnungUbl`).
  * Beide prüft die CI mit dem KoSIT-Validator.
  */
-import { EINHEIT_CODE, summen, type RechnungsDaten } from "./rechnung.js";
+import { EINHEIT_CODE, abschlagsSumme, summen, type RechnungsDaten } from "./rechnung.js";
 import { istEuAusland } from "./buchungen.js";
 import { prozentText, skontoBetrag, zahlungsbedingungenMitSkonto } from "./skonto.js";
 
@@ -27,6 +27,14 @@ interface Partei {
  * - Steuerkategorien: Nullsteuersatz Z, Ausfuhrlieferung G (VATEX-EU-G, nur mit USt-IdNr. des Verkäufers – BR-G-02,
  *   sonst wie bisher E), Steuerschuldnerschaft eines Empfängers im Drittland O (VATEX-EU-O: nicht im Inland steuerbar).
  * - Abschlagsrechnung: Typ 326 (Teilrechnung) statt 380.
+ *
+ * StB-Prüfung Heckler und Busch (21.10.2026):
+ * - C-4: Schlussrechnung – die abgesetzten Abschläge als vorausbezahlter Betrag (BT-113) mit Verweis auf jede
+ *   Abschlagsrechnung (BG-3) und einer Anmerkung (BT-22) mit Entgelt und Steuer je Abschlag; zu zahlen ist der Rest.
+ * - C-6: Ersatzrechnung mit Verweis auf die stornierte Rechnung (BG-3).
+ * - C-14: Registerangaben einer Gesellschaft – BT-30 (CompanyID der PartyLegalEntity) und BT-33 (CompanyLegalForm).
+ * - C-16: Nachlässe (Positionen mit negativem Preis) als Abschlag auf Dokumentebene (BG-20, AllowanceCharge) statt als
+ *   Rechnungszeile mit negativer Menge; Stornorechnungen bleiben bei Zeilen (dort sind alle Beträge negativ).
  */
 export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record<string, unknown> {
   const s = summen(r.positionen, r.kleinunternehmer);
@@ -75,6 +83,27 @@ export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record
   const kennung = !(verkaeufer.ust_idnr && mitUstId) ? (verkaeufer.steuernummer || verkaeufer.ust_idnr || null) : null;
   const anschrift = (p: Partei) => ({ "cbc:StreetName": p.strasse ?? "", "cbc:CityName": p.ort ?? "", "cbc:PostalZone": p.plz ?? "", "cac:Country": { "cbc:IdentificationCode": p.land || "DE" } });
   const typ = r.art === "storno" ? "384" : gs ? "389" : r.abschlag ? "326" : "380";
+  // C-16: Nachlässe als Abschlag auf Dokumentebene (nicht bei Stornos – dort bleiben es Zeilen mit umgekehrtem Vorzeichen)
+  const nachlass = (i: number) => r.art !== "storno" && r.positionen[i]!.preis_cent < 0;
+  const zeilenIdx = r.positionen.map((_, i) => i).filter((i) => !nachlass(i));
+  const nachlassIdx = r.positionen.map((_, i) => i).filter(nachlass);
+  const zeilenSumme = zeilenIdx.reduce((a, i) => a + s.zeilen[i]!, 0);
+  const nachlassSumme = nachlassIdx.reduce((a, i) => a - s.zeilen[i]!, 0);
+  // C-4: Schlussrechnung – abgesetzte Abschläge (brutto) als vorausbezahlter Betrag
+  const abschlaege = !gs && r.art !== "storno" ? (r.abschlaege ?? []) : [];
+  const voraus = abschlagsSumme(abschlaege).brutto_cent;
+  const zahlbar = s.brutto_cent - voraus;
+  const verweise = [
+    ...(r.art === "storno" && r.storniert_nummer ? [r.storniert_nummer] : []),
+    ...(r.art !== "storno" && r.ersetzt_nummer ? [r.ersetzt_nummer] : []),
+    ...abschlaege.map((a) => a.nummer).filter(Boolean),
+  ];
+  const abschlagNotiz = abschlaege.length
+    ? `Abgesetzte Abschlagsrechnungen (§ 14 Abs. 5 Satz 2 UStG): ${abschlaege.map((a) => `Nr. ${a.nummer}${a.datum ? ` vom ${a.datum.slice(8, 10)}.${a.datum.slice(5, 7)}.${a.datum.slice(0, 4)}` : ""}: Entgelt ${betrag(a.netto_cent)} EUR, Umsatzsteuer ${a.satz === null ? "–" : `${a.satz} %`} ${betrag(a.ust_cent)} EUR`).join("; ")}. Bereits gezahlt: ${betrag(voraus)} EUR.`
+    : null;
+  // BT-30/BT-33: nur für den Betrieb als Verkäufer (bei einer Gutschrift ist der Leistende der Verkäufer)
+  const register = !gs ? (r.steller.register ?? "").trim() : "";
+  const rechtliches = !gs ? (r.steller.rechtliches ?? "").trim() : "";
   const doc: Record<string, unknown> = {
     "cbc:CustomizationID": "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0",
     "cbc:ProfileID": "urn:fdc:peppol.eu:2017:poacc:billing:01:1.0",
@@ -82,7 +111,7 @@ export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record
     "cbc:IssueDate": r.rechnungsdatum,
     ...(r.faellig_am ? { "cbc:DueDate": r.faellig_am } : {}),
     "cbc:InvoiceTypeCode": typ,
-    ...(r.hinweis || r.kleinunternehmer ? { "cbc:Note": [r.kleinunternehmer ? kuText : null, r.hinweis].filter(Boolean) } : {}),
+    ...(r.hinweis || r.kleinunternehmer || abschlagNotiz ? { "cbc:Note": [r.kleinunternehmer ? kuText : null, r.hinweis, abschlagNotiz].filter(Boolean) } : {}),
     "cbc:DocumentCurrencyCode": "EUR",
     // BT-10 ist in der XRechnung Pflicht: Leitweg-ID bzw. Käuferreferenz, ohne sie die Rechnungsnummer (Prüfpunkt T-07);
     // bei einer Gutschrift ist der Betrieb der Käufer – dann die Nummer
@@ -91,14 +120,15 @@ export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record
     ...(!r.leistungsdatum && r.leistungszeitraum ? { "cac:InvoicePeriod": { "cbc:StartDate": r.leistungszeitraum.von, "cbc:EndDate": r.leistungszeitraum.bis } } : {}),
     // Bestellnummer des Käufers (BT-13) – in UBL nach InvoicePeriod, vor BillingReference
     ...(r.bestellnummer ? { "cac:OrderReference": { "cbc:ID": r.bestellnummer } } : {}),
-    ...(r.art === "storno" && r.storniert_nummer ? { "cac:BillingReference": [{ "cac:InvoiceDocumentReference": { "cbc:ID": r.storniert_nummer } }] } : {}),
+    // BG-3: Storno → stornierte Rechnung; Ersatzrechnung → ersetzte Rechnung; Schlussrechnung → jede Abschlagsrechnung
+    ...(verweise.length ? { "cac:BillingReference": verweise.map((n) => ({ "cac:InvoiceDocumentReference": { "cbc:ID": n } })) } : {}),
     "cac:AccountingSupplierParty": {
       "cac:Party": {
         "cbc:EndpointID": verkaeufer.email ?? "", "cbc:EndpointID@schemeID": "EM",
         ...(kennung ? { "cac:PartyIdentification": [{ "cbc:ID": kennung }] } : {}),
         "cac:PostalAddress": anschrift(verkaeufer),
         ...(steuerSchemas.length ? { "cac:PartyTaxScheme": steuerSchemas } : {}),
-        "cac:PartyLegalEntity": { "cbc:RegistrationName": verkaeufer.name },
+        "cac:PartyLegalEntity": { "cbc:RegistrationName": verkaeufer.name, ...(register ? { "cbc:CompanyID": register } : {}), ...(rechtliches ? { "cbc:CompanyLegalForm": rechtliches } : {}) },
         "cac:Contact": { "cbc:Name": verkaeufer.name, "cbc:Telephone": verkaeufer.telefon ?? "", "cbc:ElectronicMail": verkaeufer.email ?? "" },
       },
     },
@@ -122,8 +152,24 @@ export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record
         ? { "cac:PaymentMeans": [{ "cbc:PaymentMeansCode": "58", "cac:PayeeFinancialAccount": { "cbc:ID": r.steller.iban.replace(/\s/g, ""), ...(r.steller.bic ? { "cac:FinancialInstitutionBranch": { "cbc:ID": r.steller.bic } } : {}) } }] }
         : {}),
     // R12: Skonto als Zahlungsbedingung (BT-20) – Zeile nach BR-DE-18, dann der Satz für Menschen; nur bei Rechnungen mit Zahlung
-    ...(r.skonto && !gs && r.art !== "storno" && s.brutto_cent > 0
-      ? { "cac:PaymentTerms": { "cbc:Note": zahlungsbedingungenMitSkonto(r.skonto, `Bei Zahlung bis zum ${r.skonto.bis.slice(8, 10)}.${r.skonto.bis.slice(5, 7)}.${r.skonto.bis.slice(0, 4)} (innerhalb von ${r.skonto.tage} Tagen) ${prozentText(r.skonto.prozent)} % Skonto (${betrag(skontoBetrag(s.brutto_cent, r.skonto.prozent))} EUR).`) } }
+    // Skonto vom zu zahlenden Betrag (BT-115) – bei einer Schlussrechnung vom Rest nach den Abschlägen
+    ...(r.skonto && !gs && r.art !== "storno" && zahlbar > 0
+      ? { "cac:PaymentTerms": { "cbc:Note": zahlungsbedingungenMitSkonto(r.skonto, `Bei Zahlung bis zum ${r.skonto.bis.slice(8, 10)}.${r.skonto.bis.slice(5, 7)}.${r.skonto.bis.slice(0, 4)} (innerhalb von ${r.skonto.tage} Tagen) ${prozentText(r.skonto.prozent)} % Skonto (${betrag(skontoBetrag(zahlbar, r.skonto.prozent))} EUR).`) } }
+      : {}),
+    // C-16: Nachlässe als Abschlag auf Dokumentebene (BG-20) mit Grund (BT-97) und Steuerkategorie (BT-95/96)
+    ...(nachlassIdx.length
+      ? {
+          "cac:AllowanceCharge": nachlassIdx.map((i) => {
+            const p = r.positionen[i]!;
+            const satz = r.kleinunternehmer ? null : p.ust_satz;
+            return {
+              "cbc:ChargeIndicator": "false",
+              "cbc:AllowanceChargeReason": p.bezeichnung || "Nachlass",
+              "cbc:Amount": betrag(-s.zeilen[i]!), "cbc:Amount@currencyID": "EUR",
+              "cac:TaxCategory": { ...kategorie(satz, true), "cac:TaxScheme": { "cbc:ID": "VAT" } },
+            };
+          }),
+        }
       : {}),
     "cac:TaxTotal": [
       {
@@ -136,13 +182,17 @@ export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record
       },
     ],
     "cac:LegalMonetaryTotal": {
-      "cbc:LineExtensionAmount": m(s.netto_cent).wert, "cbc:LineExtensionAmount@currencyID": "EUR",
+      // BR-CO-10/13: Summe der Zeilen, abzüglich Nachlässe auf Dokumentebene = Gesamtbetrag ohne Umsatzsteuer
+      "cbc:LineExtensionAmount": m(zeilenSumme).wert, "cbc:LineExtensionAmount@currencyID": "EUR",
       "cbc:TaxExclusiveAmount": m(s.netto_cent).wert, "cbc:TaxExclusiveAmount@currencyID": "EUR",
       "cbc:TaxInclusiveAmount": m(s.brutto_cent).wert, "cbc:TaxInclusiveAmount@currencyID": "EUR",
-      "cbc:PayableAmount": m(s.brutto_cent).wert, "cbc:PayableAmount@currencyID": "EUR",
+      ...(nachlassIdx.length ? { "cbc:AllowanceTotalAmount": betrag(nachlassSumme), "cbc:AllowanceTotalAmount@currencyID": "EUR" } : {}),
+      // BT-113: bereits gezahlte Abschläge (Schlussrechnung); BT-115 = Rest
+      ...(voraus ? { "cbc:PrepaidAmount": betrag(voraus), "cbc:PrepaidAmount@currencyID": "EUR" } : {}),
+      "cbc:PayableAmount": m(zahlbar).wert, "cbc:PayableAmount@currencyID": "EUR",
     },
-    "cac:InvoiceLine": r.positionen.map((p, i) => ({
-      "cbc:ID": String(i + 1),
+    "cac:InvoiceLine": zeilenIdx.map((i, n) => ({ p: r.positionen[i]!, i, n })).map(({ p, i, n }) => ({
+      "cbc:ID": String(n + 1),
       // Nachlass (negativer Preis): Preis bleibt positiv, die Menge wird negativ (BR-27: Preis nie negativ)
       "cbc:InvoicedQuantity": String(vz * Math.sign(p.preis_cent || 1) * p.menge), "cbc:InvoicedQuantity@unitCode": p.einheit_code ?? EINHEIT_CODE[p.einheit],
       "cbc:LineExtensionAmount": m(s.zeilen[i]!).wert, "cbc:LineExtensionAmount@currencyID": "EUR",
@@ -196,5 +246,13 @@ const CODE_JE_TEXT: Record<string, string> = {
   stunden: "HUR", minuten: "MIN", tage: "DAY", wochen: "WEE", monate: "MON", pauschalen: "LS", kilowattstunden: "KWH",
   stk: "C62", "stk.": "C62", std: "HUR", "std.": "HUR", h: "HUR", min: "MIN", "min.": "MIN", kg: "KGM", g: "GRM", l: "LTR", m: "MTR",
   "m²": "MTK", m2: "MTK", qm: "MTK", "m³": "MTQ", m3: "MTQ", km: "KMT", kwh: "KWH", "lfm": "MTR", "lfd. m": "MTR",
+  // StB-Prüfung (C-17): weitere Einheiten nach UN/ECE Rec. 20 – Jahr, Person, Paar, Satz, Tonne, kleine Längen und Mengen
+  jahr: "ANN", jahre: "ANN", person: "IE", personen: "IE", paar: "PR", satz: "SET", sätze: "SET", set: "SET", tonne: "TNE", tonnen: "TNE", t: "TNE",
+  milliliter: "MLT", ml: "MLT", zentimeter: "CMT", cm: "CMT", millimeter: "MMT", mm: "MMT", sekunde: "SEC", sekunden: "SEC",
+  stücke: "C62", "pausch.": "LS", psch: "LS", "psch.": "LS", pauschalpreis: "LS", tagessatz: "DAY", tagessätze: "DAY",
+  "laufende meter": "MTR", laufmeter: "MTR", "km.": "KMT", termin: "C62", termine: "C62",
 };
+/** Einheit aus dem Freitext → UN/ECE-Code (Rec. 20); unbekannte Einheiten als Stück (C62). */
 export const einheitCode = (text: string) => CODE_JE_TEXT[text.trim().toLowerCase()] ?? "C62";
+/** C-17: Ist die Einheit bekannt (eigener Code)? „Stück“ und leere Einheit zählen als bekannt. */
+export const einheitBekannt = (text: string) => !text.trim() || text.trim().toLowerCase() in CODE_JE_TEXT;

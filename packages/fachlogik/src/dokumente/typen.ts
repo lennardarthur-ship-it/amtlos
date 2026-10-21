@@ -206,6 +206,8 @@ export interface Vorlage {
   korrektur?: boolean;
   /** Umsätze lassen sich aus festgeschriebenen Rechnungen übernehmen (Umsatzsteuer-Voranmeldung, E-128) */
   ausRechnungen?: boolean;
+  /** StB-Prüfung (5.2, C-9): OSS-Erklärung bzw. Zusammenfassende Meldung aus den geteilten Rechnungen übernehmen */
+  ausEuRechnungen?: "oss" | "zm";
   /** lässt sich zusätzlich als E-Rechnung (XRechnung) teilen (E-128) */
   eRechnung?: boolean;
   /** Korrektur einer festgeschriebenen Unterlage nur per Storno (Rechnung) */

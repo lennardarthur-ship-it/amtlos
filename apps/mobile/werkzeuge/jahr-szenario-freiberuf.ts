@@ -512,6 +512,8 @@ export function standBauen(): Bau {
     gefaehrdungsbeurteilung: keinPersonal, unterweisung: keinPersonal, gefahrstoffverzeichnis: "Keine Gefahrstoffe, keine Beschäftigten.", betriebsanweisung: "Keine Gefahrstoffe, keine Beschäftigten.", pruefprotokoll_elektro: "DGUV V3 gilt für Unternehmer mit Beschäftigten (Unfallversicherung); ohne Beschäftigte nicht erzeugt.",
     handelsregister: "Freier Beruf, kein Handelsgewerbe – kein Eintrag.", transparenzregister: "Natürliche Person – keine Mitteilung.",
     ifsg_belehrung: "Keine Lebensmittel.", allergene: "Keine Lebensmittel.", haccp: "Keine Lebensmittel.", hautschutzplan: "Keine Beauty-Tätigkeit.", hygieneplan: "Keine Beauty-Tätigkeit.",
+    // StB-Prüfung (5.2, C-9): Kleinunternehmerin – keine OSS-Erklärung und keine Zusammenfassende Meldung (§ 18a Abs. 4 UStG)
+    oss_meldung: "Kleinunternehmerin – kein OSS-Verfahren.", zm_meldung: "Kleinunternehmerin – keine Zusammenfassende Meldung (§ 18a Abs. 4 UStG).",
   };
   for (const [id, g] of Object.entries(grund)) uebersprungen.push({ id, titel: v(id).titel, grund: g });
   const genutzt = new Set(docs.map((d) => d.vorlage));

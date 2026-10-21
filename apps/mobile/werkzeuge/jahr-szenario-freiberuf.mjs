@@ -212,9 +212,9 @@ function paketNeuerungen(name, zr, inhalt, erg, kleinunternehmer, belegeRoh) {
   // R10: Belege, die nicht in den Stapel gehören (Personal, Auslagen einer GmbH), sind in der Belegliste markiert
   const fehlend = be.zeilen.filter((z) => !/^nein/.test(be.w(z, "Im Buchungsstapel") ?? "")).map((z) => be.w(z, "Belegfeld 1 (DATEV)")).filter((b) => !belegfelder.has(b));
   vergleich(bereich, "DATEV: Belegfeld 1 der Belegbuchungen = Spalte „Belegfeld 1 (DATEV)“ der Belegliste", fehlend.length ? fehlend.join(", ") : "alle gefunden", "alle gefunden");
-  const gi = extf[1].indexOf("Buchungs GUID");
+  const gi = extf[1].indexOf("Beleginfo - Inhalt 1"); // StB-Prüfung 3.1: GUID in Beleginfo 1, Feld 103 „Buchungs GUID“ leer
   const guids = ez.map((z) => z[gi]);
-  vergleich(bereich, "DATEV: Buchungs-GUID in jeder Zeile (36 Zeichen) und eindeutig", gi >= 0 && guids.every((g, i) => /^[0-9a-f-]{36}$/.test(g) && guids.indexOf(g) === i) ? "ja" : "nein", "ja");
+  vergleich(bereich, "DATEV: Buchungs-GUID in jeder Zeile (Beleginfo 1, 36 Zeichen) und eindeutig, Feld 103 leer", gi >= 0 && ez.every((z) => z[102] === "" && z[20] === "Buchungs-GUID") && guids.every((g, i) => /^[0-9a-f-]{36}$/.test(g) && guids.indexOf(g) === i) ? "ja" : "nein", "ja");
   const texte = ez.map((z) => z[13]);
   vergleich(bereich, "DATEV: Buchungstext höchstens 60 Zeichen, ohne Leerzeichen am Ende", texte.filter((t) => t.length > 60 || t !== t.trimEnd()).join(" | ") || "alle", "alle");
   const bl = liste(inhalt[`Buchungsliste_${zr.name}.csv`]);
@@ -267,16 +267,17 @@ let paketInfo = {};
   const extf = csvLesen(inhalt["EXTF_Buchungsstapel_2026.csv"], "latin1");
   const zeilen = extf.slice(2);
   vergleich(`Paket ${name}`, "DATEV: Spalten je Zeile = Spalten im Kopf", zeilen.every((z) => z.length === extf[1].length) ? "ja" : "nein", "ja");
-  const kontoSumme = (konto) => summe(zeilen.filter((z) => z[7] === konto).map((z) => (z[1] === "H" ? -1 : 1) * centAus(z[0])));
+  const kontoSumme = (konto) => summe(zeilen.filter((z) => z[7] === konto).map((z) => (z[1] === "H" ? -1 : 1) * (z[117] === "1" ? -1 : 1) * centAus(z[0])));
   // R10: die Leistung an das EU-Unternehmen (Steuerschuldnerschaft des Empfängers) geht auf 8336, nicht auf 8195
   // R11: Ist-Versteuerung (EÜR) – im Stapel nur Rechnungen mit Zahlungseingang im Jahr
   const bezahltImJahr = umsatz.filter((x) => x.bezahlt && x.bezahlt.startsWith("2026-"));
   vergleich(`Paket ${name}`, "DATEV: Brutto auf Erlöskonto 8195 (Kleinunternehmer, SKR03) – nur bezahlte Ausgangsrechnungen im Inland/Drittland (Ist)", kontoSumme("8195"), summe(bezahltImJahr.filter((x) => D.KUNDE_ORT[x.kunde] !== "eu_b2b").map((x) => x.vz * x.s.brutto)));
   vergleich(`Paket ${name}`, "DATEV: Leistung an das EU-Unternehmen auf 8336 (Empfänger schuldet die Steuer)", kontoSumme("8336"), summe(bezahltImJahr.filter((x) => D.KUNDE_ORT[x.kunde] === "eu_b2b").map((x) => x.vz * x.s.brutto)));
   vergleich(`Paket ${name}`, "DATEV: keine Buchung auf 8400/8300 (Regelsteuer-Erlöse)", zeilen.filter((z) => z[7] === "8400" || z[7] === "8300").length, 0);
-  // R10: BU 40 nur auf Automatikkonten (Wareneingang); auf Konten ohne Automatik ohne Vorsteuer kein BU
-  const belegeMitSteuer = summe(D.BELEGE.filter((b) => b.kategorie === "waren").map((b) => b.saetze.filter((x) => x.satz > 0 && x.betrag).length));
-  vergleich(`Paket ${name}`, "DATEV: BU 40 nur auf Automatikkonten (ohne Vorsteuer), sonst kein BU-Schlüssel", zeilen.filter((z) => ["40", "9", "8"].includes(z[8])).length, belegeMitSteuer);
+  // StB-Prüfung (A-2): Kleinunternehmerin bucht Wareneingang auf das Konto ohne Vorsteuer 3200 ohne BU-Schlüssel (statt
+  // 3400/3300 mit BU 40, den Rewe auf Nicht-Automatikkonten abweist) – also nirgends ein BU-Schlüssel; je Satz eine Zeile
+  const warenZeilen = summe(D.BELEGE.filter((b) => b.kategorie === "waren").map((b) => b.saetze.filter((x) => x.betrag).length));
+  vergleich(`Paket ${name}`, "DATEV: kein BU-Schlüssel; Wareneingang auf 3200 (Zeilen BU / Zeilen 3200)", `${zeilen.filter((z) => ["40", "9", "8"].includes(z[8])).length} / ${zeilen.filter((z) => z[7] === "3200").length}`, `0 / ${warenZeilen}`);
   vergleich(`Paket ${name}`, "DATEV: Kopf Beraternummer/Mandant", `${extf[0][10]}/${extf[0][11]}`, "41077/20318");
   const liesmich = Buffer.from(inhalt["LIESMICH.txt"]).toString("utf8");
   if (/Umsatzsteuer-Voranmeldung/.test(liesmich)) auffaellig.push("Paket LIESMICH.txt erklärt die Zuordnung zur Umsatzsteuer-Voranmeldung (Leistungsdatum) – bei einer Kleinunternehmerin gibt es keine (außer § 13b); der Text ist für sie irreführend (apps/mobile/src/unterlagen/steuerpaket.ts).");

@@ -32,6 +32,7 @@ Eine iPhone-App für kleine Betriebe in Deutschland (Café, Salon, Handwerk, Pra
 | `regelwerte-steuer.csv` | Regelwerte (Grenzen, Sätze, Fristen) der Bereiche Steuern und Personal mit offenen Punkten |
 | `PRUEFLISTE-steuer.md` | Alle Punkte der Prüfliste mit „StB“ in der Spalte „Wer“, nach Thema; Anhang: offene Katalogpunkte |
 | `konten.md` | Alle DATEV-Konten und BU-Schlüssel der App (SKR03/SKR04) mit Zweck und Markierung „UNSICHER“ aus dem Code |
+| `kontenvorgaben.md` | Kontenvorgaben der Kanzlei: welche Konten die Kanzlei abweichend vorgeben kann, Standardkonten, Dateiformat der JSON-Datei für den Import in die App |
 
 `node docs/pruefmappe-steuer/erzeugen.mjs <ziel>` erzeugt die Mappe neu aus dem aktuellen Code (mit `KOSIT=<ordner>` zusätzlich die KoSIT-Prüfung der XRechnungen). Nicht enthalten sind die übrigen Szenario-Unterlagen (Arbeitsschutz, Datenschutz, Seitenbilder) – sie liegen in der Anwalts-Mappe bzw. im Szenario-Lauf.
 

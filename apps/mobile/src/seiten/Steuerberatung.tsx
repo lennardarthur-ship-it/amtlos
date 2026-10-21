@@ -4,11 +4,11 @@ import { betriebFuerDokument } from "../pro/regeln";
 import { pdfBytes } from "../unterlagen/pdf";
 import { View } from "react-native";
 import { T as TEXT } from "../texte";
-import { ChipLeiste, Feld, Fuss, Hinweis, Karte, Knopf, T, Wahl } from "../ui/bausteine";
+import { ChipLeiste, Feld, Fuss, Hinweis, Karte, Knopf, T, TextKnopf, Wahl } from "../ui/bausteine";
 import { useMeldung, useMeldungLeeren } from "../ui/meldung";
-import { Unterseite } from "../ui/navigation";
+import { Unterseite, useNav } from "../ui/navigation";
 import { kassenAbdeckung } from "../unterlagen/kasse";
-import { gestellteRechnungen, kapitalgesellschaft, kassenHinweisMit, kassenLage, standardZeitraum, steuerpaket, zeitraeume } from "../unterlagen/steuerpaket";
+import { bilanzierendeGewinnermittlung, gestellteRechnungen, kassenHinweisMit, kassenLage, standardZeitraum, steuerpaket, zeitraeume } from "../unterlagen/steuerpaket";
 import { dateiTeilenBytes } from "../unterlagen/sicherungDatei";
 import { absenderFuer, heute } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
@@ -16,6 +16,7 @@ import { Inhalt } from "./gemeinsam";
 import { useProSperre } from "./Pro";
 import type { Kanzlei } from "../partner/kanzleien";
 import { KanzleienAbschnitt, kanzleienSichtbar } from "./Kanzleien";
+import { KontenvorgabenSeite, kontenvorgabenAnzahl } from "./Kontenvorgaben";
 
 /** Ab so vielen MB warnt das Paket (R9 Performance): Es entsteht ganz im Arbeitsspeicher. */
 export const PAKET_MB_WARNUNG = 300;
@@ -30,6 +31,7 @@ const MONAT_JAHR = new Intl.DateTimeFormat("de-DE", { month: "long", year: "nume
  */
 export function SteuerberatungSeite({ kanzleienZuerst }: { kanzleienZuerst?: boolean } = {}) {
   const z = useAmtlos();
+  const nav = useNav();
   const melden = useMeldung();
   const leeren = useMeldungLeeren();
   // eine Meldung vom vorigen Bildschirm („Beleg gespeichert.“) läge sonst über dem Formular
@@ -142,13 +144,20 @@ export function SteuerberatungSeite({ kanzleienZuerst }: { kanzleienZuerst?: boo
           </View>
         </View>
         <T v="caption" leise stil={{ marginTop: 6 }}>{TEXT.steuerpaket_nummern_hilfe}</T>
+        {/* StB-Prüfung (B-6 u. a.): Kontenvorgaben der Kanzlei – Verrechnungskonto, Gutscheine, Kassendifferenz, Bank, Anlagen */}
+        <View style={{ marginTop: 10 }}>
+          <TextKnopf symbol="list.number" text={TEXT.stb_kv_einstieg} onPress={() => nav.oeffnen("kontenvorgaben", () => <KontenvorgabenSeite />, true)} />
+          <T v="caption" leise>{TEXT.stb_kv_einstieg_text(kontenvorgabenAnzahl(sb.kontenvorgaben))}</T>
+        </View>
         <View style={{ marginTop: 14 }}>
           {/* R10 UI: Kasse bzw. Shop laut Check – vor dem Kauf sagen, dass diese Umsätze im Paket fehlen */}
           {/* R12: mit Kassenabschlüssen nur fehlende Tage nennen */}
           {kassenVorab ? <Hinweis art="warnung" symbol="banknote" text={kassenVorab} /> : null}
           {/* R11 (Tischlerei #23): für Gesellschaften mit Bilanz ehrlich sagen, was das Paket ist – eine Zuarbeit, keine Buchführung */}
-          {kapitalgesellschaft(z.stand) ? <Hinweis text={TEXT.steuerpaket_bilanz} /> : null}
-          <Hinweis text={TEXT.steuerpaket_hinweis} />
+          {/* StB-Prüfung (A-4): bilanzierende Betriebe bekommen einen Soll-Stapel mit Zahlungseingängen */}
+          {bilanzierendeGewinnermittlung(z.stand) ? <Hinweis text={TEXT.stb_paket_bilanz} /> : null}
+          {/* StB-Prüfung (A-5): Festschreibung 0 – der Stapel wird beim Import nicht festgeschrieben */}
+          <Hinweis text={TEXT.stb_paket_hinweis} />
           {gross ? <Hinweis art="warnung" text={TEXT.steuerpaket_gross(mb)} /> : null}
           {ziel ? <Hinweis symbol="envelope" text={TEXT.kanzlei_senden_ziel(ziel.name, ziel.email)} /> : null}
           {fortschritt ? <Hinweis text={fortschritt} /> : null}

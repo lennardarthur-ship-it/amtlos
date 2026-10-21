@@ -87,7 +87,9 @@ describe("R11 Steuer: EÜR und Voranmeldung", () => {
     // geändertes Entgelt: Ersatzrechnung im Zeitraum des Stornos – dort wirkt nur die Differenz
     expect(umsaetzeFuer(s.unterlagen, "2026-Q2", s.betrieb, "soll")!.werte.umsatz_19).toBe("-200,00");
     // ohne Verknüpfung (alte Daten) und mit anderem Betrag: keine Zuordnung zum Storno
-    const alt = { ...s, unterlagen: s.unterlagen.map((u) => (u.id === "r2" ? (({ ersetzt: _w, ...rest }) => rest)(u) : u)) };
+    // StB-Prüfung (C-6): die Kopie trägt auch die Nummer der stornierten Rechnung (Feld „ersetzt_nummer“) – alte Daten haben beides nicht
+    expect(kopie!.daten.ersetzt_nummer).toBe("2026-001");
+    const alt = { ...s, unterlagen: s.unterlagen.map((u) => (u.id === "r2" ? (({ ersetzt: _w, ...rest }) => ({ ...rest, daten: (({ ersetzt_nummer: _n, ...d }) => d)(rest.daten) }))(u) : u)) };
     expect(umsaetzeFuer(alt.unterlagen, "2026-Q1", alt.betrieb, "soll")!.werte.umsatz_19).toBe("1.800,00");
   });
 
@@ -138,9 +140,10 @@ describe("R11 Steuer: Steuerberater-Paket", () => {
   it("§ 13b ohne Vorsteuerabzug auf 3143, LIESMICH beschreibt den echten Fall", () => {
     const s = stand({ belege: [beleg({ steuerschuld: "eu", vorsteuer: false })] });
     const p = steuerpaket(s, JAHR, SB, {}, "2027-01-10T08:00:00");
-    expect(datei(p, "Buchungsliste_2026.csv")).toMatch(/408,00;S;3143;1610;;/);
+    // StB-Prüfung (A-1): Verbindlichkeiten in Feld 7 (Haben), § 13b-Konto als Gegenkonto
+    expect(datei(p, "Buchungsliste_2026.csv")).toMatch(/408,00;H;1610;3143;;/);
     expect(datei(p, "LIESMICH.txt")).toContain("ohne Vorsteuerabzug auf 3140 bzw. 3143 (nur Umsatzsteuer)");
-    expect(datei(steuerpaket({ ...s, steuerberatung: { ...SB, kontenrahmen: "SKR04" } }, JAHR, { ...SB, kontenrahmen: "SKR04" }, {}, "2027-01-10T08:00:00"), "Buchungsliste_2026.csv")).toMatch(/;5943;3310;/);
+    expect(datei(steuerpaket({ ...s, steuerberatung: { ...SB, kontenrahmen: "SKR04" } }, JAHR, { ...SB, kontenrahmen: "SKR04" }, {}, "2027-01-10T08:00:00"), "Buchungsliste_2026.csv")).toMatch(/;3310;5943;/);
   });
 
   it("Barbelege: Warnung zum Kassenminus im LIESMICH; Gutschein zu 0 % nicht im Stapel, mit Frage", () => {
