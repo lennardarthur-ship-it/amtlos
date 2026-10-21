@@ -1006,6 +1006,17 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 
 **Gründerentscheidungen offen:** Anbietergesellschaft/Impressum, eigene Nutzungsbedingungen, Vermögensschadenhaftpflicht, Markenanmeldung; DATEV-Stapel als Pro-Leistung erst nach echtem Testimport; Freikontingent ohne Pflicht-Aushänge; Angebot/Aufmaß, Schlussrechnung mit Abschlagsverrechnung, Skonto, Mahnstufen, englische Rechnung, Belegerkennung, Hygieneschulung, Kassennachschau-Checkliste.
 
+
+### E-153 · Runde 11: Unternehmensberatung, Zweitmeinungen Recht und Steuer, UX-Review, vier Szenarien (2026-10-21)
+
+**Prüfer:** Unternehmensberater (Strategie/Venture), zweite Anwältin, zweite Steuerberaterin (USt), Produkt-/UX-Beraterin; Szenarien Foodtruck-Gründerin, Tischlerei GmbH, Gebäudereinigung mit Minijobs, Kosmetikstudio mit Eigenmarke und Wechsel aus § 19.
+
+**Urteile:** Berater: in heutiger Form kein Unicorn, investierbar mit Positionierung „Compliance-Autopilot für Kleinbetriebe mit Personal und Kontrollen“ und Vertrieb über Steuerberater und Innungen; Recht: go mit Auflagen (neue Gesetzeslage SchwarzArbMoDiG eingearbeitet); Steuer: dulden, Tendenz empfehlen für Soll-Versteuerer; UX: empfehlen, Noten 6–8.
+
+**Entschieden und umgesetzt:** siehe Commit „Runde 11“ – Katalog auf 167 Pflichten (neue Branchenliste, Gebäudereinigung, Jugendliche, Widerruf außerhalb von Geschäftsräumen u. a.), Gutschrift-XRechnung, Ist-Stapel, Kleinunternehmer-Stichtag, Brutto-Preise, Kleinbetragsrechnung, Check mit einer Hauptzahl und „Was hast du schon?“, Kontrollmappe auffindbar mit allen Monaten, „in Frage kommen“ statt „gelten“.
+
+**Gründerentscheidungen offen (zusätzlich zu E-152):** Fokusbranchen (Vorschlag Beauty und Gastro) und Store-Name; Pflicht-Nachweise aus dem Freikontingent; Rechnungsnummer erst beim Teilen; Katalog-Updates vom Server als Pro-Kern (die Notiz an Apple begründet das Abo heute mit Updates, die auch Gratis-Nutzer bekommen); Kanzlei-/Verbandslizenzen; anonyme Opt-in-Kennzahlen; Gutschein-Vorlage, Skonto, igE/§ 13b Drittland, Kassenabschluss, Schlussrechnung mit Abschlagsverrechnung, Shop-Bausteine Datenschutzerklärung.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)
