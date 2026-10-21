@@ -8,7 +8,7 @@ export const ANBIETER = {
   /** Straße, PLZ, Ort – ladungsfähige Anschrift (§ 5 DDG) */
   anschrift: "Gomaringer Str. 33, 72770 Reutlingen",
   /** vertretungsberechtigte Person(en) */
-  vertretung: "",
+  vertretung: "Lennard Lang (Geschäftsführer)",
   email: "",
   telefon: "",
   /** z. B. „Amtsgericht München, HRB 123456“ */
