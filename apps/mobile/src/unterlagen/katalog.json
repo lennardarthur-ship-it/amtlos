@@ -176,8 +176,8 @@
  },
  {
   "id": "branche.handwerk_gefaehrdung_gewerk",
-  "titel": "Gefährdungsbeurteilung je Gewerk",
-  "kurz": "Im Handwerk beurteilst du die Gefährdungen je Gewerk und Einsatzort – auch auf Baustellen beim Kunden.",
+  "titel": "Gefährdungsbeurteilung je Gewerk und Einsatzort ergänzen",
+  "kurz": "Im Handwerk ergänzt du die Gefährdungsbeurteilung um die Gefährdungen deines Gewerks – in der Werkstatt und bei Arbeiten beim Kunden.",
   "rechtsgrundlage": [
    "§§ 5, 6 ArbSchG"
   ],
@@ -251,6 +251,26 @@
   "geprueft": false
  },
  {
+  "id": "datenschutz.videoueberwachung",
+  "titel": "Videoüberwachung kennzeichnen und begründen",
+  "kurz": "Wenn du Videoüberwachung einsetzt, machst du sie erkennbar und dokumentierst den Zweck.",
+  "rechtsgrundlage": [
+   "Art. 6 Abs. 1 lit. f DSGVO",
+   "Art. 13 DSGVO"
+  ],
+  "quellen": [
+   {
+    "titel": "Datenschutz-Grundverordnung (EU) 2016/679",
+    "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679"
+   },
+   {
+    "titel": "EDSA-Leitlinien 3/2019 zur Verarbeitung personenbezogener Daten durch Videogeräte",
+    "url": "https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-32019-processing-personal-data-through-video_de"
+   }
+  ],
+  "geprueft": false
+ },
+ {
   "id": "datenschutz.vvt",
   "titel": "Verzeichnis der Verarbeitungstätigkeiten führen",
   "kurz": "Du führst ein Verzeichnis, welche Daten über Menschen du wofür verarbeitest.",
@@ -267,11 +287,13 @@
  },
  {
   "id": "gesellschaft.handelsregister_anmeldung",
-  "titel": "Gesellschaft im Handelsregister eintragen lassen",
-  "kurz": "Der Notar meldet die Gesellschaft zum Handelsregister an; mit der Eintragung entsteht die GmbH oder UG.",
+  "titel": "Gesellschaft im Register eintragen lassen",
+  "kurz": "Die Gesellschaft wird zum Handelsregister angemeldet, die Partnerschaftsgesellschaft zum Partnerschaftsregister – GmbH und UG entstehen erst mit der Eintragung.",
   "rechtsgrundlage": [
-   "HGB",
-   "GmbHG"
+   "§§ 7, 8 GmbHG",
+   "§ 106 HGB",
+   "§ 161 Abs. 2 HGB",
+   "§ 4 PartGG"
   ],
   "quellen": [
    {
@@ -281,6 +303,10 @@
    {
     "titel": "Handelsgesetzbuch",
     "url": "https://www.gesetze-im-internet.de/hgb/"
+   },
+   {
+    "titel": "Partnerschaftsgesellschaftsgesetz",
+    "url": "https://www.gesetze-im-internet.de/partgg/"
    }
   ],
   "geprueft": false
@@ -308,9 +334,10 @@
  {
   "id": "gruendung.gewerbeanzeige",
   "titel": "Gewerbe anmelden",
-  "kurz": "Melde dein Gewerbe bei der Gemeinde an, wenn du anfängst – und ebenso, wenn du umziehst oder aufhörst.",
+  "kurz": "Melde dein Gewerbe bei der Gemeinde an, wenn du anfängst – und ebenso, wenn du umziehst, die Tätigkeit wechselst oder erweiterst oder aufhörst.",
   "rechtsgrundlage": [
-   "§ 14 GewO"
+   "§ 14 GewO",
+   "§ 55c GewO"
   ],
   "quellen": [
    {
@@ -374,7 +401,8 @@
   "titel": "Arbeitszeit aufzeichnen",
   "kurz": "Du zeichnest die Arbeitszeit deiner Beschäftigten auf.",
   "rechtsgrundlage": [
-   "§ 3 Abs. 2 Nr. 1 ArbSchG (BAG, 13.9.2022 – 1 ABR 22/21)"
+   "§ 3 Abs. 2 Nr. 1 ArbSchG (BAG, 13.9.2022 – 1 ABR 22/21)",
+   "§ 16 Abs. 2 ArbZG"
   ],
   "quellen": [
    {
@@ -415,9 +443,10 @@
  {
   "id": "personal.ausweis_hinweis",
   "titel": "Schriftlich auf die Ausweispflicht hinweisen",
-  "kurz": "In deiner Branche weist du jede neue beschäftigte Person vor Arbeitsbeginn schriftlich darauf hin, dass sie bei der Arbeit einen Ausweis dabeihaben muss.",
+  "kurz": "In deiner Branche weist du jede neue beschäftigte Person spätestens bei Arbeitsbeginn schriftlich darauf hin, dass sie bei der Arbeit einen Ausweis dabeihaben muss.",
   "rechtsgrundlage": [
-   "§ 2a Abs. 2 SchwarzArbG"
+   "§ 2a Abs. 2 SchwarzArbG",
+   "§ 2a Abs. 1 SchwarzArbG"
   ],
   "quellen": [
    {

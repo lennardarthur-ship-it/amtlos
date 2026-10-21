@@ -66,11 +66,16 @@ describe("Brief nach DIN 5008", () => {
     expect(h).toContain(".g-brief .info { flex: none; margin: 5mm 0 0 15mm; width: 65mm; font-size: 8.5pt; }");
   });
 
-  it("Rechnung, Feinsatz: Infoblock mit Rechnungsdatum zuletzt (halbfett, abgesetzt), Betreff 13 pt, Spaltenbreiten, Summen ab der Mengenspalte, Gesamtlinie in Tinte", () => {
+  it("Rechnung, Feinsatz: Infoblock mit Rechnungsdatum nach der Nummer (halbfett), Betreff 13 pt, Spaltenbreiten, Summen ab der Mengenspalte, Gesamtlinie in Tinte", () => {
     const h = html("rechnung", RECHNUNG);
     const info = /<div class="info"><table>(.*?)<\/table>/.exec(h)![1]!;
     const k = [...info.matchAll(/<tr(?: class="(\w+)")?><td>([^<]*)<\/td>/g)].map((m) => (m[1] === "leer" ? "–" : m[2]! + (m[1] === "fett" ? "*" : "")));
-    expect(k).toEqual(["Rechnungsnummer", "Leistungsdatum", "Steuernummer", "Ansprechperson", "Telefon", "E-Mail", "–", "Rechnungsdatum*"]);
+    // R12 (UX #16): Nummer, Rechnungsdatum (halbfett), Leistungsdatum, Steuernummer – Kontakt abgesetzt darunter
+    // (Kleinbetragsrechnung bis 250 €: ohne Leistungsdatum, § 33 UStDV verlangt es nicht)
+    expect(k).toEqual(["Rechnungsnummer", "Rechnungsdatum*", "Steuernummer", "–", "Ansprechperson", "Telefon", "E-Mail"]);
+    const gross = html("rechnung", { ...RECHNUNG, positionen: [{ bezeichnung: "Brautfrisur", menge: "1", einheit: "", preis: "380", satz: "19" }] });
+    const k2 = [.../<div class="info"><table>(.*?)<\/table>/.exec(gross)![1]!.matchAll(/<tr(?: class="(\w+)")?><td>([^<]*)<\/td>/g)].map((m) => (m[1] === "leer" ? "–" : m[2]! + (m[1] === "fett" ? "*" : "")));
+    expect(k2.slice(0, 4)).toEqual(["Rechnungsnummer", "Rechnungsdatum*", "Leistungsdatum", "Steuernummer"]);
     expect(h).toContain(".g-brief .betreff { margin: 8mm 0 4.5mm; font-size: 13pt;");
     expect(h).toContain('<col style="width:5%"><col style="width:47%"><col style="width:13%"><col style="width:13%"><col style="width:7%"><col style="width:15%">');
     expect(h).toContain('<table class="summen">');

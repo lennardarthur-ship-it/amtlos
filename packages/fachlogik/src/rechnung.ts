@@ -160,7 +160,7 @@ export interface RechnungsDaten {
    */
   gutschrift?: boolean;
   /**
-   * R12: im Voraus vereinbarte Minderung des Entgelts (§ 14 Abs. 4 Satz 1 Nr. 8 UStG) – Skonto in Prozent bei Zahlung
+   * R12: im Voraus vereinbarte Minderung des Entgelts (§ 14 Abs. 4 Satz 1 Nr. 7 UStG) – Skonto in Prozent bei Zahlung
    * innerhalb von `tage` Tagen ab Rechnungsdatum, bis `bis` (ISO). In der XRechnung als Zahlungsbedingung (BT-20).
    */
   skonto?: { prozent: number; tage: number; bis: string } | null;

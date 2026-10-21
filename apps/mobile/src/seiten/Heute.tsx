@@ -1,12 +1,13 @@
 import { useMemo } from "react";
 import { Pressable, View } from "react-native";
 import { T as TEXT } from "../texte";
-import { Hinweis, Karte, Knopf, T, Zeile, useGrosseSchrift } from "../ui/bausteine";
+import { Hinweis, Karte, Knopf, T, Zeile, textAus, useGrosseSchrift } from "../ui/bausteine";
 import { useNav } from "../ui/navigation";
 import { SCHRIFT, useFarben } from "../ui/thema";
 import { stundeIn, zeitzoneAbweichend } from "../ui/zeit";
 import { euroText, monatsSumme, offeneSumme } from "../unterlagen/ablage";
-import { heute, sortiert, type Stand } from "../unterlagen/speicher";
+import { aufenthaltLaeuftAb, heute, sortiert, type Stand } from "../unterlagen/speicher";
+import { PersonSeite } from "./Betrieb";
 import { dringlichkeit, fortschritt, istErledigt } from "../pflichten/check";
 import { ANLAESSE } from "@amtlos/fachlogik";
 import { kontrollbereit } from "../unterlagen/kontrollmappe";
@@ -42,6 +43,7 @@ export function Heute() {
   const profil = useStandWahl((s) => s.profil);
   const erinnerungen = useStandWahl((s) => s.erinnerungen);
   const kasse = useStandWahl((s) => s.kasse);
+  const mitarbeiter = useStandWahl((s) => s.mitarbeiter);
   const nav = useNav();
   const starten = useStarten();
   const oeffnen = useOeffnen();
@@ -75,8 +77,10 @@ export function Heute() {
   const zeilen = ueberfaellig.length + naechste.length;
   const grosseSchrift = useGrosseSchrift();
 
+  // R12 (UX #23): große Schrift – kompakte Bühne: kleinerer Betrag, Plaketten nur für VoiceOver, Knöpfe nebeneinander ohne Symbol
+  const kompakt = grosseSchrift;
   const buehne = (
-    <View style={{ gap: 26 }}>
+    <View style={{ gap: kompakt ? 14 : 26 }}>
       {hatRechnungen && !offen.anzahl ? (
         // nichts offen (B2): kein großes „0,00 €“, sondern das Erfreuliche – alles bezahlt, dazu der Umsatz des Monats
         <Pressable
@@ -85,10 +89,12 @@ export function Heute() {
           accessibilityHint={TEXT.oeffnet_unterlagen}
           onPress={() => tabWechseln("meine")} style={({ pressed }) => ({ gap: 4, opacity: pressed ? 0.75 : 1 })}>
           <T v="klein" farbe={f.buehneLeise} stil={{ ...SCHRIFT.mittel }}>{TEXT.umsatz_monat(monatsName)}</T>
-          <GrosserBetrag cent={monat.cent} />
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
-            <BuehnenMarke text={TEXT.kachel_offen_text(0)} />
-          </View>
+          <GrosserBetrag cent={monat.cent} groesse={kompakt ? 40 : undefined} />
+          {kompakt ? null : (
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
+              <BuehnenMarke text={TEXT.kachel_offen_text(0)} />
+            </View>
+          )}
         </Pressable>
       ) : hatRechnungen ? (
         <Pressable
@@ -98,19 +104,20 @@ export function Heute() {
           accessibilityHint={TEXT.oeffnet_unterlagen}
           onPress={() => tabWechseln("meine")} style={({ pressed }) => ({ gap: 4, opacity: pressed ? 0.75 : 1 })}>
           <T v="klein" farbe={f.buehneLeise} stil={{ ...SCHRIFT.mittel }}>{TEXT.offen_bei_kunden}</T>
-          <GrosserBetrag cent={offen.cent} />
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
-            {offen.ueberfaellig ? <BuehnenMarke warnung text={TEXT.davon_ueberfaellig(offen.ueberfaellig)} /> : <BuehnenMarke text={TEXT.kachel_offen_text(offen.anzahl)} />}
-            <BuehnenMarke text={TEXT.monat_summe(monatsName, euroText(monat.cent))} />
+          <GrosserBetrag cent={offen.cent} groesse={kompakt ? 40 : undefined} />
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: kompakt ? 4 : 10 }}>
+            {/* kompakt nur das Überfällige – der Rest steht im Label */}
+            {offen.ueberfaellig ? <BuehnenMarke warnung text={TEXT.davon_ueberfaellig(offen.ueberfaellig)} /> : kompakt ? null : <BuehnenMarke text={TEXT.kachel_offen_text(offen.anzahl)} />}
+            {kompakt ? null : <BuehnenMarke text={TEXT.monat_summe(monatsName, euroText(monat.cent))} />}
           </View>
         </Pressable>
       ) : (
-        <T v="grossTitel" accessibilityRole="header" farbe={f.buehneText} stil={{ fontSize: 40, lineHeight: 44, letterSpacing: -1.4 }}>{TEXT.gruss(stunde)}</T>
+        <T v={kompakt ? "titel" : "grossTitel"} accessibilityRole="header" farbe={f.buehneText} stil={kompakt ? undefined : { fontSize: 40, lineHeight: 44, letterSpacing: -1.4 }}>{TEXT.gruss(stunde)}</T>
       )}
-      {/* große Schrift: untereinander, sonst brechen die Wörter mitten im Knopf */}
-      <View style={{ flexDirection: grosseSchrift ? "column" : "row", gap: 10 }}>
-        <Knopf buehne symbol="plus" text={TEXT.kurz_rechnung} onPress={() => starten("rechnung")} stil={{ flex: grosseSchrift ? undefined : 1, paddingHorizontal: 12 }} />
-        <Knopf glas symbol="doc.viewfinder" text={TEXT.kurz_beleg} onPress={() => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />)} stil={{ flex: grosseSchrift ? undefined : 1, paddingHorizontal: 12 }} />
+      {/* große Schrift: nebeneinander ohne Symbol – untereinander füllten die Knöpfe die halbe Bühne */}
+      <View style={{ flexDirection: "row", gap: 10 }}>
+        <Knopf buehne symbol={kompakt ? undefined : "plus"} text={TEXT.kurz_rechnung} onPress={() => starten("rechnung")} stil={{ flex: 1, paddingHorizontal: kompakt ? 8 : 12 }} />
+        <Knopf glas symbol={kompakt ? undefined : "doc.viewfinder"} text={TEXT.kurz_beleg} onPress={() => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />)} stil={{ flex: 1, paddingHorizontal: kompakt ? 8 : 12 }} />
       </View>
     </View>
   );
@@ -120,6 +127,14 @@ export function Heute() {
       {z.speicherFehler ? <Hinweis art="fehler" text={z.speicherFehlerArt === "schreiben" ? TEXT.speicher_fehler_schreiben : TEXT.speicher_fehler} /> : null}
       {/* R11 (UX #12): solange der Check fehlt, steht seine Einladung über jeder Erinnerung */}
       {gemacht ? <SicherungsKarte /> : null}
+      {/* R12 (Zoll #5): Aufenthaltstitel, die bald ablaufen – vor jeder anderen Erinnerung */}
+      {aufenthaltLaeuftAb({ mitarbeiter }, tag).length ? (
+        <Karte stil={{ marginBottom: 18 }}>
+          {aufenthaltLaeuftAb({ mitarbeiter }, tag).map((x, i, l) => (
+            <Zeile key={x.id} symbol="exclamationmark.triangle" ton={x.tage < 0 ? "frist" : "bald"} titel={TEXT.r12p_heute_aufenthalt(x.name, x.tage)} text={TEXT.r12p_heute_aufenthalt_text(textAus(x.bis))} onPress={() => nav.oeffnen(`person-${x.id}`, () => <PersonSeite art="mitarbeiter" id={x.id} />, true)} letzte={i === l.length - 1} />
+          ))}
+        </Karte>
+      ) : null}
       {/* R12: Betriebe mit Kasse oder Laden – der Tagesabschluss gehört zum Tag */}
       {kasseSichtbar({ profil, kasse }) ? (
         <Karte stil={{ marginBottom: 18 }}>

@@ -36,10 +36,11 @@ function mitKasse(): Stand {
 
 describe("Stand: Migration 1 → 2, Lesen, Aufbewahrung", () => {
   it("hebt Version 1 auf 2 mit leerer Kasse; Kasse aus Version 2 bleibt erhalten", () => {
-    expect(STAND_VERSION).toBe(2);
+    // R12 Personal: inzwischen Version 3 (Betriebsstätten, festgeschriebene Nachweise)
+    expect(STAND_VERSION).toBe(4);
     expect(MIGRATIONEN[1]!({ version: 1, belege: [] })).toMatchObject({ kasse: [] });
     const alt = standAus(JSON.stringify({ version: 1, betrieb: { name: "Alt" } }));
-    expect(alt.version).toBe(2);
+    expect(alt.version).toBe(4);
     expect(alt.kasse).toEqual([]);
     const s = mitKasse();
     const wieder = standAus(JSON.stringify(s));
@@ -190,24 +191,30 @@ describe("EÜR, DATEV-Stapel und Kontrollmappe mit Kasse", () => {
     s = belegSetzen(s, bar("b0", "2026-03-30", 535), t("2026-03-30"));
     const p = steuerpaket(s, { von: "2026-03-01", bis: "2026-04-30", name: "2026-Q" }, SB, {}, "2026-05-02T08:00:00");
     const liste = datei(p, "Buchungsliste_2026-Q.csv");
-    expect(liste).toContain("01.04.2026;119,00;S;1000;8400");
-    expect(liste).toContain("01.04.2026;107,00;S;1000;8300");
-    expect(liste).toContain("01.04.2026;100,00;S;1360;1000");
+    // R12 GoBD: Karte direkt Geldtransit an Erlöse (im Verhältnis 119 : 107), nur Bargeld über die Kasse
+    expect(liste).toContain("01.04.2026;52,65;S;1360;8400");
+    expect(liste).toContain("01.04.2026;47,35;S;1360;8300");
+    expect(liste).toContain("01.04.2026;66,35;S;1000;8400");
+    expect(liste).toContain("01.04.2026;59,65;S;1000;8300");
+    expect(liste).not.toContain(";S;1360;1000;");
     expect(liste).toMatch(/02\.04\.2026;10,70;S;3300;1000/);
-    expect(liste).toMatch(/30\.03\.2026;5,35;S;3300;1360/);
+    // vor dem ersten Abschluss: aus eigener Tasche (Privateinlage), nicht Geldtransit
+    expect(liste).toMatch(/30\.03\.2026;5,35;S;3300;1890/);
     const l = datei(p, "LIESMICH.txt");
     expect(l).toContain("Kassenumsätze aus 3 Tagesabschlüssen");
     expect(l).not.toContain("Kassenumsätze fehlen");
     expect(l).toContain("Geldtransit (1360)");
     expect(datei(p, "Kassenabschluesse_2026-Q.csv")).toContain("01.04.2026;;100;119,00;107,00");
+    expect(l).toContain("mit dem Saldovortrag des Kassenkontos (1000) abgleichen");
+    expect(l).toContain("außer privat bezahlten Belegen, Bewegungen der Kasse und Sachentnahmen");
   });
   it("Kontrollmappe „Kassennachschau“: Kassenbuch je Monat aus den Abschlüssen, Kassenmeldung, falls vorhanden", () => {
     let s = mitKasse();
-    expect(kassenMappe(s, "2026-05-01").map((e) => e.titel)).toEqual(["Kassenbuch April 2026 (aus den Tagesabschlüssen)"]);
+    expect(kassenMappe(s, "2026-05-01").map((e) => e.titel)).toEqual(["Tagesabschlüsse April 2026 und Mai 2026 (Z-Nummer, TSE, Korrekturen)", "Kassenbuch April 2026 (aus den Tagesabschlüssen)"]);
     const [s1] = anlegen(s, "kassenmeldung", t("2026-04-10"), "km");
     s = s1;
     const m = kassenMappe(s, "2026-05-01");
-    expect(m.map((e) => e.vorlage)).toEqual(["kassenbuch", "kassenmeldung"]);
-    expect(m[0]!.daten).toMatchObject({ zeitraum: "April 2026", anfang: "200,00" });
+    expect(m.map((e) => e.vorlage)).toEqual(["tagesabschluesse", "kassenbuch", "kassenmeldung"]);
+    expect(m[1]!.daten).toMatchObject({ zeitraum: "April 2026", anfang: "200,00" });
   });
 });

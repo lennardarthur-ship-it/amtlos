@@ -1,0 +1,65 @@
+# R12 (Rechtsprüfung Befund 11): EU-Verpackungsverordnung (PPWR) – Take-away, Radar
+schema_version: 1
+id: branche.gastro_ppwr_radar
+version: 1
+katalog_nr: H.1
+titel:
+  de: 'EU-Verpackungsverordnung: mitgebrachte Behälter und Mehrweg (ab 2027)'
+kurz:
+  de: Nach der EU-Verpackungsverordnung befüllen Take-away-Betriebe ab 12.2.2027 mitgebrachte Behälter; ab 12.2.2028 kommt ein Mehrwegangebot dazu, Kleinstunternehmen ausgenommen.
+erklaerung:
+  de: Die Verordnung (EU) 2025/40 über Verpackungen bringt für Speisen und Getränke zum Mitnehmen neue Pflichten. Bietest du an, mitgebrachte Behälter zu befüllen, informierst du seit dem 12.8.2026 über geeignete Behälter, Hygiene und die Verantwortung der Kundschaft. Ab dem 12.2.2027 müssen Kundinnen und Kunden ihre eigenen Behälter für kalte oder heiße Getränke und verzehrfertige Speisen nutzen können, ohne Aufpreis und mit gut sichtbarem Hinweis. Ab dem 12.2.2028 bietest du zusätzlich Mehrwegverpackungen aus einem Mehrwegsystem zur Wahl an; Kleinstunternehmen sind davon ausgenommen.
+rechtsgrundlage:
+- Verordnung (EU) 2025/40
+kategorie: branche
+branchen:
+- gastronomie_lebensmittel
+ausloeser:
+  all:
+  - feld: profil.taetigkeit.branchen
+    op: enthaelt
+    wert: gastronomie_lebensmittel
+    label:
+      de: Dein Betrieb gehört zur Gastronomie oder Lebensmittelbranche.
+  - feld: profil.gastro.to_go
+    op: ==
+    wert: true
+    label:
+      de: Du verkaufst Essen oder Getränke zum Mitnehmen in Einwegverpackungen.
+frist:
+  typ: absolut
+  datum: '2027-02-12'
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: beschlossen
+radar:
+  wahrscheinlichkeit: sicher
+  erwartet_ab: '2027-02-12'
+gueltig_ab: '2027-02-12'
+gueltig_bis: null
+quellen:
+- titel: WKO – EU-Verpackungsverordnung (PPWR) für Tourismus und Gastronomie
+  url: https://www.wko.at/tourismus-freizeitwirtschaft/eu-verpackungsverordnung-was-bedeutet-sie-fuer-den-tourismus
+  abgerufen: '2026-10-21'
+- titel: Verordnung (EU) 2025/40
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32025R0040
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Neu nach Rechtsprüfung R12 (Befund 11) – Termine laut WKO (österreichische Kammer), Artikelzuordnung und Anwendung in Deutschland unsicher: gegen den Verordnungstext lesen'
+- Ob die Befüllpflicht ab 12.2.2027 auch für Kleinstunternehmen gilt, unsicher; Verhältnis zu § 34 VerpackG und zum EWKFondsG (Gastronom als Hersteller?) offen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

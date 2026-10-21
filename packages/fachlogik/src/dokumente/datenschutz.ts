@@ -421,11 +421,22 @@ export const datenschutzinformation: Vorlage = {
  * Kundin trägt ein, was für die Behandlung wichtig ist, und willigt ausdrücklich ein; das unterschriebene Blatt ist der
  * Nachweis (Art. 7 Abs. 1). Keine Fragenliste zu Krankheiten – was abgefragt wird, entscheidet der Betrieb. Fachlich zu prüfen.
  */
+/** R12 (Coach #8): Anamnese für Behandlung, Kurs oder Training – Beispiele je Art statt nur „Allergien“. */
+const ANAMNESE_ART: Record<string, { label: string; wort: string; beispiele: string }> = {
+  behandlung: { label: "Behandlung", wort: "Behandlung", beispiele: "z. B. Allergien, Unverträglichkeiten, Hauterkrankungen, Medikamente, Schwangerschaft" },
+  kurs: { label: "Kurs", wort: "Kursteilnahme", beispiele: "z. B. Herz-Kreislauf, Bluthochdruck, Rücken oder Bandscheibe, Operationen, Schwangerschaft, Medikamente" },
+  training: { label: "Training", wort: "Training", beispiele: "z. B. Herz-Kreislauf, Bluthochdruck, Rücken oder Bandscheibe, Gelenke, Operationen, Schwangerschaft, Medikamente" },
+};
+const anamneseArt = (d: Parameters<typeof text>[0]) => ANAMNESE_ART[text(d, "art")] ?? ANAMNESE_ART.behandlung!;
+/** R12 (Coach #9): Text zum Übernehmen ins Buchungs- bzw. Anmeldeformular (ausdrücklich, gesondert, nicht vorangekreuzt). */
+export const anamneseOnlineText = (betrieb: string, wort: string) => `☐ Ich willige ausdrücklich ein, dass ${betrieb} meine Angaben zur Gesundheit für meine ${wort} verarbeitet (Art. 9 Abs. 2 lit. a DSGVO). Die Einwilligung ist freiwillig und jederzeit für die Zukunft widerrufbar (Art. 7 Abs. 3 DSGVO).`;
+
 export const anamnese: Vorlage = {
   id: "anamnese_einwilligung",
   titel: "Anamnese und Einwilligung",
-  beschreibung: "Angaben der Kundin oder des Kunden zur Gesundheit (z. B. Allergien, Unverträglichkeiten) mit ausdrücklicher, widerrufbarer Einwilligung – unterschrieben als Nachweis.",
-  bereich: "beauty",
+  beschreibung: "Angaben zur Gesundheit vor einer Behandlung, einem Kurs oder Training (z. B. Allergien, Herz-Kreislauf, Rücken) mit ausdrücklicher, widerrufbarer Einwilligung – unterschrieben oder elektronisch, als Nachweis.",
+  // R12 (Coach #8): neutral statt „Beauty und Kosmetik“ im Kopf – das Blatt nutzen auch Yoga, Training und Praxen
+  bereich: "datenschutz",
   pflichten: [],
   person: { art: "kunde", felder: { name: "name" } },
   grundlage: "Art. 7, Art. 9 Abs. 2 lit. a DSGVO",
@@ -433,31 +444,116 @@ export const anamnese: Vorlage = {
   abschnitte: [
     {
       titel: "Kundin oder Kunde",
-      hilfe: "Leer lassen, um das Blatt auszudrucken und von Hand ausfüllen zu lassen. Das unterschriebene Blatt aufbewahren – es weist die Einwilligung nach.",
+      hilfe: "Leer lassen, um das Blatt auszudrucken und von Hand ausfüllen zu lassen. Das unterschriebene Blatt aufbewahren – es weist die Einwilligung nach. Gib die Datenschutzinformation (eigene Vorlage) mit.",
       felder: [
+        { id: "art", art: "wahl", label: "Wofür", optionen: Object.entries(ANAMNESE_ART).map(([wert, a]) => ({ wert, text: a.label })), vorbelegung: "behandlung", vorbelegungJe: { unterricht: "kurs" } },
         { id: "name", art: "text", label: "Name" },
-        { id: "behandlung", art: "text", label: "Geplante Behandlung", hilfe: "z. B. Gesichtsbehandlung, Wimpernlifting" },
-        { id: "angaben", art: "mehrzeilig", label: "Angaben zur Gesundheit", hilfe: "z. B. Allergien, Unverträglichkeiten – nur, was für die Behandlung wichtig ist" },
+        { id: "behandlung", art: "text", label: "Geplante Behandlung, Kurs oder Training", hilfe: "z. B. Gesichtsbehandlung, Yoga-Kurs, Personal Training" },
+        { id: "angaben", art: "mehrzeilig", label: "Angaben zur Gesundheit", hilfe: "nur, was dafür wichtig ist – Beispiele stehen auf dem Blatt" },
         { id: "datum", art: "datum", label: "Datum", vorbelegung: "heute" },
+      ],
+    },
+    {
+      titel: "Speicherung und Einwilligung",
+      felder: [
+        { id: "speicherung", art: "text", label: "Speicherung bzw. Löschung", hilfe: "Wie lange du die Angaben aufbewahrst – steht auf dem Blatt", vorschlaege: ["bis zum Widerruf, längstens ein Jahr nach dem letzten Termin", "bis zum Ende des Kurses", "bis zum Ende der Zusammenarbeit"] },
+        { id: "elektronisch", art: "schalter", label: "Einwilligung elektronisch (z. B. Online-Kurs)", hilfe: "Statt Unterschrift ein eigenes, nicht vorangekreuztes Kästchen im Buchungsformular – der Text dafür steht auf dem Blatt. Den Zeitpunkt der Einwilligung aufbewahren (Art. 7 Abs. 1 DSGVO)." },
       ],
     },
   ],
   html(d, b) {
     const name = b.name.trim() || "____";
+    const art = anamneseArt(d);
+    // leer zum Ausdrucken: auch das Datum bleibt eine Linie (R12, Coach #8)
+    const leer = !text(d, "name") && !text(d, "angaben");
+    const datum = leer ? "" : text(d, "datum");
+    const elektronisch = ja(d, "elektronisch");
     return dokument({
       titel: "Anamnese und Einwilligung",
       betrieb: b,
       unter: text(d, "name") || undefined,
-      meta: `Kundin/Kunde: ${text(d, "name")}\nDatum: ${datumDe(text(d, "datum"))}`,
+      meta: `Kundin/Kunde: ${text(d, "name")}\nDatum: ${datumDe(datum)}`,
       inhalt:
-        abschnitt("Angaben", angaben([["Name", text(d, "name") ? null : ""], ["Geplante Behandlung", text(d, "behandlung") || ""], ["Datum", text(d, "datum") ? null : ""]])) +
-        abschnitt("Angaben zur Gesundheit", text(d, "angaben") ? zeilen(text(d, "angaben")) : `<p>z. B. Allergien, Unverträglichkeiten:</p>${absatz("")}${absatz("")}`) +
+        abschnitt("Angaben", angaben([["Name", text(d, "name") ? null : ""], [`Geplante ${art.label === "Kurs" ? "Kursteilnahme" : art.label}`, text(d, "behandlung") || ""], ["Datum", datum ? null : ""]])) +
+        abschnitt("Angaben zur Gesundheit", text(d, "angaben") ? zeilen(text(d, "angaben")) : `<p>${esc(art.beispiele)}:</p>${absatz("")}${absatz("")}`) +
         abschnitt(
           "Einwilligung",
-          absatz(`Ich willige ausdrücklich ein, dass ${name} meine oben genannten Angaben zur Gesundheit für meine Behandlung verarbeitet (Art. 9 Abs. 2 lit. a DSGVO).`) +
-            absatz("Die Einwilligung ist freiwillig. Ich kann sie jederzeit mit Wirkung für die Zukunft widerrufen (Art. 7 Abs. 3 DSGVO); die Verarbeitung bis zum Widerruf bleibt rechtmäßig."),
+          absatz(`Ich willige ausdrücklich ein, dass ${name} meine oben genannten Angaben zur Gesundheit für meine ${art.wort} verarbeitet (Art. 9 Abs. 2 lit. a DSGVO).`) +
+            absatz("Die Einwilligung ist freiwillig. Ich kann sie jederzeit mit Wirkung für die Zukunft widerrufen (Art. 7 Abs. 3 DSGVO); die Verarbeitung bis zum Widerruf bleibt rechtmäßig.") +
+            absatz(`Speicherung: ${text(d, "speicherung") || "bis zum Widerruf, längstens ____ nach dem letzten Termin"}. Danach werden die Angaben gelöscht.`) +
+            absatz("Die Informationen nach Art. 13 DSGVO (Datenschutzinformation) habe ich erhalten."),
         ) +
-        unterschriften(["Ort, Datum", "Unterschrift Kundin/Kunde"]),
+        (elektronisch
+          ? abschnitt("Elektronische Einwilligung", absatz("Die Einwilligung wurde elektronisch erteilt am: ____ (Datum, Uhrzeit, z. B. aus dem Buchungssystem).") + `<p class="klein">Text für das Buchungs- bzw. Anmeldeformular (eigenes Kästchen, nicht vorangekreuzt):</p>` + absatz(anamneseOnlineText(name, art.wort)))
+          : unterschriften(["Ort, Datum", "Unterschrift Kundin/Kunde"])),
+    });
+  },
+};
+
+/**
+ * R12 (Kfz #8): Hinweisschild Videoüberwachung – gestufte Information nach Art. 13 DSGVO nach dem Muster der
+ * Orientierungshilfe „Videoüberwachung durch nicht-öffentliche Stellen“ der Datenschutzkonferenz: vorn das Schild mit
+ * den wichtigsten Angaben (erste Ebene), dahinter die vollständige Information zum Aushängen bzw. Bereithalten (zweite
+ * Ebene). Beschäftigte sind ausdrücklich genannt, wenn sie mit erfasst werden. Fachlich zu prüfen (PRUEFLISTE).
+ */
+export const videoHinweis: Vorlage = {
+  id: "video_hinweisschild",
+  gestalt: "aushang",
+  titel: "Hinweisschild Videoüberwachung",
+  beschreibung: "Schild am Eingang zum überwachten Bereich nach Art. 13 DSGVO (Muster der Datenschutzkonferenz) – mit Zweck, Rechtsgrundlage, Speicherdauer und der vollständigen Information als zweiter Seite.",
+  bereich: "datenschutz",
+  pflichten: ["datenschutz.videoueberwachung"],
+  grundlage: "Art. 6 Abs. 1 lit. f, Art. 13 DSGVO",
+  ohneKopfangaben: true,
+  abschnitte: [
+    {
+      titel: "Überwachung",
+      hilfe: "Das Schild hängt gut sichtbar, bevor man den überwachten Bereich betritt. Die zweite Seite hängst du daneben aus oder hältst sie bereit (z. B. an der Kasse). Muster nach der Datenschutzkonferenz – fachlich zu prüfen.",
+      felder: [
+        { id: "bereich", art: "text", label: "Überwachter Bereich", hilfe: "z. B. Werkstatthof, Verkaufsraum, Eingang", pflicht: true, vorschlaege: ["Eingangsbereich", "Verkaufsraum", "Werkstatthof und Parkplatz", "Lager"] },
+        { id: "zwecke", art: "mehrzeilig", label: "Zwecke", pflicht: true, vorschlaege: ["Schutz vor Einbruch, Diebstahl und Sachbeschädigung", "Aufklärung von Straftaten", "Schutz der Beschäftigten und Kunden vor Übergriffen"] },
+        { id: "interessen", art: "mehrzeilig", label: "Berechtigte Interessen", hilfe: "warum die Überwachung nötig ist (Art. 6 Abs. 1 lit. f DSGVO) – z. B. frühere Einbrüche", pflicht: true, vorschlaege: ["Schutz des Eigentums nach wiederholten Einbrüchen und Diebstählen", "Beweissicherung bei Straftaten"] },
+        { id: "speicherdauer", art: "text", label: "Speicherdauer", vorbelegung: { text: "72 Stunden, danach automatische Löschung; länger nur, wenn ein Vorfall aufzuklären ist" }, vorschlaege: ["72 Stunden, danach automatische Löschung; länger nur, wenn ein Vorfall aufzuklären ist", "48 Stunden, danach automatische Löschung"] },
+        { id: "beschaeftigte", art: "schalter", label: "Auch Beschäftigte werden erfasst", hilfe: "Dann steht es auf dem Schild – und gehört in die Unterweisung bzw. Information der Beschäftigten" },
+        { id: "dsb", selten: true, art: "text", label: "Datenschutzbeauftragte/r (falls benannt)" },
+        { id: "empfaenger", selten: true, art: "text", label: "Empfänger", hilfe: "z. B. Polizei im Einzelfall, Dienstleister für die Technik", vorbelegung: { text: "im Einzelfall Polizei und Strafverfolgungsbehörden" } },
+        { id: "fundort", art: "text", label: "Weitere Informationen erhältlich", vorbelegung: { text: "an der Kasse bzw. am Empfang" }, vorschlaege: ["an der Kasse bzw. am Empfang", "als Aushang neben diesem Schild", "auf unserer Website"] },
+      ],
+    },
+  ],
+  pruefen: (_d, b) => [...(b.name.trim() ? [] : ["Name des Betriebs (Mein Betrieb)"]), ...(b.bundesland ? [] : ["Bundesland (Mein Betrieb) – für die zuständige Aufsichtsbehörde"])],
+  html(d, b) {
+    const a = aufsichtFuer(b);
+    const verantwortlich = [b.name, anschrift(b)].filter((x) => x.trim()).join(", ");
+    const kontakt = [b.telefon, b.email].filter((x) => x.trim()).join(", ");
+    const zwecke = text(d, "zwecke");
+    const schild =
+      `<p style="font-size:44pt;line-height:1;margin:2mm 0 4mm">&#128249;</p>` +
+      `<p style="font-size:16pt;font-weight:600;margin-bottom:4mm">Dieser Bereich wird videoüberwacht${text(d, "bereich") ? `: ${esc(text(d, "bereich"))}` : "."}</p>` +
+      angaben([
+        ["Verantwortlich", verantwortlich || ""],
+        ["Kontakt", kontakt || ""],
+        ...(text(d, "dsb") ? ([["Datenschutzbeauftragte/r", text(d, "dsb")]] as [string, string][]) : []),
+        ["Zwecke", zwecke ? zwecke.split("\n").join("; ") : ""],
+        ["Rechtsgrundlage", "Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse)"],
+        ["Berechtigte Interessen", text(d, "interessen") ? text(d, "interessen").split("\n").join("; ") : ""],
+        ["Speicherdauer", text(d, "speicherdauer") || ""],
+      ]) +
+      (ja(d, "beschaeftigte") ? absatz("Die Kameras erfassen auch Beschäftigte.") : "") +
+      absatz(`Weitere Informationen, insbesondere zu Ihren Rechten (Auskunft, Löschung, Widerspruch, Beschwerde), erhalten Sie ${text(d, "fundort") || "____"}.`);
+    const zweite = ([
+      { titel: "Verantwortlicher", rand: "Art. 13 Abs. 1 lit. a, b", inhalt: angaben([["Verantwortlicher", verantwortlich || ""], ["Kontakt", kontakt || ""], ["Datenschutzbeauftragte/r", text(d, "dsb") || null]]) },
+      { titel: "Zwecke und Rechtsgrundlage", rand: "Art. 13 Abs. 1 lit. c, d", inhalt: angaben([["Überwachter Bereich", text(d, "bereich") || ""], ["Zwecke", zwecke || ""], ["Rechtsgrundlage", "Art. 6 Abs. 1 lit. f DSGVO"], ["Berechtigte Interessen", text(d, "interessen") || ""]]) },
+      { titel: "Empfänger und Speicherdauer", rand: "Art. 13 Abs. 1 lit. e, Abs. 2 lit. a", inhalt: angaben([["Empfänger", text(d, "empfaenger") || "keine"], ["Speicherdauer", text(d, "speicherdauer") || ""]]) },
+      { titel: DSE.betroffenenrechte!.titel, rand: "Art. 13 Abs. 2 lit. b", inhalt: `<p>${esc(DSE.betroffenenrechte!.text.replace(/\{email\}/g, b.email.trim() || "____").replace(/\{link_einstellungen\}/g, "die angegebenen Kontaktwege"))}</p>` },
+      { titel: DSE.widerspruchsrecht!.titel, rand: "Art. 21", inhalt: `<p>${esc(DSE.widerspruchsrecht!.text.replace(/\{email\}/g, b.email.trim() || "____").replace(/\{link_einstellungen\}/g, "die angegebenen Kontaktwege"))}</p>` },
+      { titel: DSE.beschwerderecht!.titel, rand: "Art. 13 Abs. 2 lit. d", inhalt: `<p>${esc(DSE.beschwerderecht!.text.replace("{aufsichtsbehoerde_name}", a?.name ?? "____").replace("{aufsichtsbehoerde_ort}", a?.ort ?? "____").replace("{aufsichtsbehoerde_url}", a?.url ?? "____"))}</p>` },
+    ] as { titel: string; rand: string; inhalt: string }[]).map((t) => abschnitt(t.titel, t.inhalt)).join("");
+    return dokument({
+      titel: "Videoüberwachung",
+      betrieb: b,
+      gestalt: "aushang",
+      inhalt: schild + `<h2 class="neue-seite">Information nach Art. 13 DSGVO zur Videoüberwachung</h2><div class="klein">${zweite}</div>` + nachsatz("Muster nach der Orientierungshilfe Videoüberwachung der Datenschutzkonferenz – fachlich zu prüfen."),
     });
   },
 };

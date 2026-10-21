@@ -133,16 +133,15 @@ try {
   const radio = (name) => p.getByRole("radio", { name, exact: true }).locator("visible=true").last();
   await radio("Einzelunternehmen").click();
   await warte(800);
-  await radio("Gewerbe").click();
-  await warte(800);
-  await radio("Bayern").click();
-  await warte(800);
-  await feld("Wie viele Menschen arbeiten für dich, dich selbst nicht mitgezählt?").fill("3");
-  await knopf("Weiter").click();
-  // Fragen nach der Zahl der Beschäftigten (R10: Minijob, Löhne, Social Media …) der Reihe nach beantworten (Kasse ja, sonst nein, Zahlen 0)
-  for (let i = 0; i < 30; i++) {
+  // R12: Reihenfolge der Kernfragen ändert sich (Startdatum direkt nach der Rechtsform) – jede Frage am Inhalt erkennen
+  // (Gewerbe, Bayern, 3 Beschäftigte, Kasse ja, sonst nein, Zahlen 0)
+  for (let i = 0; i < 45; i++) {
     await warte(500);
     if (await sichtbar("Geschafft – dein Ergebnis steht")) break;
+    const menschen = p.getByLabel("Wie viele Menschen arbeiten für dich, dich selbst nicht mitgezählt?", { exact: true }).locator("visible=true");
+    if (await menschen.count()) { await menschen.last().fill("3"); await knopf("Weiter").click(); continue; }
+    if (await radio("Gewerbe").count()) { await radio("Gewerbe").click(); continue; }
+    if (await radio("Bayern").count()) { await radio("Bayern").click(); continue; }
     const datum = p.getByLabel("Wann hast du angefangen oder wann willst du anfangen?", { exact: true }).locator("visible=true");
     if (await datum.count()) { await datum.last().fill("01.03.2024"); await knopf("Weiter").click(); await warte(1200); continue; }
     // weitere Datumsfragen (R11, z. B. „Seit wann hast du die elektronische Kasse“)
@@ -167,25 +166,26 @@ try {
   await warte(600);
   pruefe(await sichtbar("Genauer machen · Frage 1 von"), "Zusatzfragen ohne eigenen Fortschritt");
   pruefe((await knopf("Überspringen").count()) > 0, "ohne Antwort kein „Überspringen“");
-  // das Ende des Checks erkennt man an der Hauptzahl (R11: „N Dinge sind jetzt dran“) und am Knopf – bei einem Betrieb,
-  // der länger als zwölf Monate läuft, „Weiter“ zu „Was hast du schon?“
-  const amEnde = async () => (await sichtbar(/sind jetzt dran|ist jetzt dran|nichts dringend/)) && (await p.getByRole("button", { name: /^(Deine Pflichten ansehen|Weiter)$/ }).locator("visible=true").count()) > 0;
-  for (let k = 0; k < 10 && !(await amEnde()); k++) {
+  // R12 (UX #1/#2): ein Betrieb, der seit 2024 läuft, sieht „Was hast du schon?“ vor der Hauptzahl – nach Bereichen,
+  // ohne „Alle auswählen“; danach das Ergebnis mit der endgültigen Zahl
+  const ergebnis = async () => (await sichtbar(/sind jetzt dran|ist jetzt dran|nichts dringend/)) && (await p.getByRole("button", { name: "Deine Pflichten ansehen", exact: true }).locator("visible=true").count()) > 0;
+  for (let k = 0; k < 10 && !(await sichtbar("Was hast du schon?")) && !(await ergebnis()); k++) {
     await knopf("Überspringen").click();
     await warte(500);
   }
-  pruefe((await amEnde()) && (await sichtbar(/^Insgesamt \d+ Pflichten/)), "Ergebnis des Checks fehlt (eine Hauptzahl groß, Gesamtzahl klein)");
-  // R11 (Berater d): was Lohnbüro bzw. Steuerberatung macht, steht nicht unter „Mit diesen 3 fängst du an“
-  pruefe(!(await sichtbar("Macht dein Lohnbüro")), "Aufgabe des Lohnbüros im Einstieg des Ergebnisses");
-  await foto("check-ergebnis");
-  // R11: Betrieb seit 2024 – „Was hast du schon?“ zum Abhaken in einem Durchgang
-  await knopf("Weiter").click();
-  await warte(900);
-  pruefe(await sichtbar("Was hast du schon?"), "Schritt „Was hast du schon?“ fehlt nach dem Check");
+  pruefe(await sichtbar("Was hast du schon?"), "Schritt „Was hast du schon?“ fehlt vor dem Ergebnis");
+  pruefe(!(await sichtbar("Alle auswählen")), "„Alle auswählen“ verleitet zum Durchwinken (R12 UX #19)");
+  pruefe(await sichtbar(/^(Gründung|Gesellschaft|Steuern|Personal|Arbeitsschutz|Datenschutz|IT-Sicherheit|Produkte|Deine Branche|Website und Online-Handel) \(\d+\)$/), "„Was hast du schon?“ nicht nach Bereichen gegliedert");
   await p.getByRole("checkbox").locator("visible=true").first().click();
   await warte(300);
   await foto("check-schon");
   await knopf("1 als erledigt übernehmen").click();
+  await warte(1200);
+  pruefe((await ergebnis()) && (await sichtbar(/^Insgesamt \d+ Pflichten/)), "Ergebnis des Checks fehlt (eine Hauptzahl groß, Gesamtzahl klein)");
+  // R11 (Berater d): was Lohnbüro bzw. Steuerberatung macht, steht nicht unter „Mit diesen 3 fängst du an“
+  pruefe(!(await sichtbar("Macht dein Lohnbüro")), "Aufgabe des Lohnbüros im Einstieg des Ergebnisses");
+  await foto("check-ergebnis");
+  await knopf("Deine Pflichten ansehen").click();
   await warte(1200);
   pruefe(befunde.length === 0, `Fehler nach dem Check (vom Check auf „Heute“): ${befunde.join(" | ")}`);
   pruefe((await p.getByRole("tab", { name: "Pflichten", selected: true }).count()) === 1, "nach dem Check nicht im Tab „Pflichten“ gelandet");
@@ -264,15 +264,19 @@ try {
   pruefe(await sichtbar(/Weitere Angaben \(\d+\)/), "seltene Felder nicht hinter „Weitere Angaben“");
   await knopf("Weiter").click();
   await warte();
+  // R12 (UX #5): im Salon sind Bruttopreise vorbelegt und der Schalter steht sichtbar über den Positionen
+  pruefe((await p.getByRole("switch", { name: "Preise inkl. Umsatzsteuer (brutto)", checked: true }).locator("visible=true").count()) > 0, "Bruttopreise im Salon nicht sichtbar vorbelegt");
   await tippe(p.getByRole("button", { name: /^Position 1/ }).locator("visible=true").last());
   await warte(800);
   await feld("Leistung oder Ware").fill("Haarschnitt");
   await feld("Menge").fill("2");
-  await feld("Einzelpreis netto (€)").fill("25");
+  // R12 (UX #14): Einheit im Salon „Pauschale“, in der Rechnung „2 Pauschalen“
+  pruefe((await sichtbar("2 Pauschalen")) || (await p.getByRole("radio", { name: "Pauschale", checked: true }).locator("visible=true").count()) > 0, "Einheit „Pauschale“ im Salon nicht vorbelegt");
+  await feld("Einzelpreis brutto (€)").fill("29,75");
   await foto("position");
   await knopf("Fertig").click();
   await warte(800);
-  pruefe(await sichtbar("59,50"), "Rechnungsbetrag nicht gerechnet (2 × 25 € + 19 %)");
+  pruefe(await sichtbar("59,50"), "Rechnungsbetrag nicht gerechnet (2 × 29,75 € brutto)");
   await knopf("Weiter").click();
   await warte();
   await tippe(p.getByRole("checkbox", { name: "Vielen Dank für Ihren Auftrag." }).locator("visible=true").last());
@@ -280,7 +284,7 @@ try {
   await warte(1500);
   pruefe(await sichtbar("Alle Pflichtangaben sind drin."), "Rechnung trotz aller Angaben nicht vollständig");
   // auf dem Papier (E-144): Positionen und Summe stehen da; Antippen springt zum Schritt und zurück
-  pruefe((await sichtbar("Haarschnitt")) && (await sichtbar("2 × 25,00 €")), "Positionen fehlen auf dem Papier");
+  pruefe((await sichtbar("Haarschnitt")) && (await sichtbar("2 × 29,75 €")), "Positionen fehlen auf dem Papier");
   await foto("abschluss");
   await tippe(p.getByRole("button", { name: /^Rechnungsempfänger(:| bearbeiten)/ }).locator("visible=true").last());
   await warte(800);
@@ -564,7 +568,7 @@ try {
   await feld("Passwort").fill("sonnenschein-2026");
   await knopf("Öffnen").click();
   await warte(2500);
-  pruefe(await sichtbar("Salon Sonne · 5 Unterlagen · 1 Beleg · 1 Mitarbeiter · 1 Kunde"), "Inhalt der Sicherung nicht angezeigt");
+  pruefe(await sichtbar("Salon Sonne · 5 Unterlagen · 1 Beleg · 1 Kassenabschluss · 1 Mitarbeiter · 1 Kunde"), "Inhalt der Sicherung nicht angezeigt");
   pruefe(await sichtbar("Nichts Neueres geht verloren"), "Zusammenführen statt Ersetzen nicht erklärt");
   await foto("wiederherstellen");
   await knopf("Jetzt wiederherstellen").click();

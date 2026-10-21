@@ -1,0 +1,19 @@
+persona: kleiner_betrieb
+beschreibung: "R12 (Nutzertest Kurier, 3a): Transporter über 2,5 t mit Auslandsfahrten – seit 1.7.2026 EU-Lenkzeiten mit Fahrtenschreiber, Gemeinschaftslizenz seit 21.5.2022"
+stichtag: "2026-10-21"
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: "2020-01-01"
+  profil.taetigkeit.branchen: [transport_logistik]
+  profil.beschaeftigte.gesamt: 0
+  profil.fahrzeuge.anzahl: 2
+  profil.fahrzeuge.gesamtmasse: [2_5_bis_2_8t]
+  profil.fahrzeuge.ausland: true
+  profil.nachunternehmer: false
+  profil.bundesland: BY
+erwartet:
+  branche.transport_lenkzeiten: gilt
+  branche.transport_erlaubnis: gilt
+  branche.transport_lenkzeiten_national: gilt_nicht
+  personal.nachunternehmerhaftung: gilt_nicht
+  arbeitsschutz.fahrzeuge_pruefen: gilt_nicht

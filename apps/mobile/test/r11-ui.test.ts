@@ -29,7 +29,7 @@ describe("Kontrollmappe (Reinigung #2, UX #5, Tischlerei #22)", () => {
   it("Zoll: alle Monate der letzten zwei Jahre je Person, mit Monat im Eintrag", () => {
     const a = mappenAuswahl(mitNachweisen(), "2026-10-20");
     const azn = a.eintraege.filter((e) => e.vorlage === "arbeitszeitnachweis");
-    expect(azn.map((e) => e.titel).sort()).toEqual(["Arbeitszeitnachweis · Amira · Oktober 2026", "Arbeitszeitnachweis · Amira · September 2026"]);
+    expect(azn.map((e) => e.titel).sort()).toEqual(["Arbeitszeitnachweis Oktober 2026 · Amira", "Arbeitszeitnachweis September 2026 · Amira"]);
     expect(azn.every((e) => fuerKontrolle(e.vorlage, "zoll"))).toBe(true);
   });
   it("unvollständige Unterlagen einzeln mit der Zahl fehlender Angaben", () => {
@@ -60,9 +60,12 @@ describe("Kontrollmappe (Reinigung #2, UX #5, Tischlerei #22)", () => {
 
 describe("„Was hast du schon?“ (Berater d)", () => {
   const profil = { "taetigkeit.branchen": ["handwerk"], rechtsform: "einzelunternehmen", "taetigkeit.einordnung": "gewerbe", bundesland: "NW", "beschaeftigte.gesamt": 2, "personal.lohn_durch": "steuerberatung", "kasse.elektronisch": true, "ust.kleinunternehmer": false, gruendungsdatum: "2019-04-01" };
-  it("erst ab zwölf Monaten seit Beginn", () => {
+  // R12 (UX #1): schon ab vier Wochen seit Beginn (vorher zwölf Monate)
+  it("ab vier Wochen seit Beginn", () => {
     expect(langBestehend(profil, "2026-10-20")).toBe(true);
-    expect(langBestehend({ gruendungsdatum: "2026-01-15" }, "2026-10-20")).toBe(false);
+    expect(langBestehend({ gruendungsdatum: "2026-01-15" }, "2026-10-20")).toBe(true);
+    expect(langBestehend({ gruendungsdatum: "2026-09-22" }, "2026-10-20")).toBe(true);
+    expect(langBestehend({ gruendungsdatum: "2026-09-23" }, "2026-10-20")).toBe(false);
     expect(langBestehend({}, "2026-10-20")).toBe(false);
   });
   it("nur einmalige, offene, echte Pflichten – nichts, was Lohnbüro oder Steuerberatung macht", () => {
@@ -98,6 +101,6 @@ describe("Silbentrennung (UX #11)", () => {
     expect(ohne(trennen("Jahresabschluss"))).toBe("Jah-res-ab-schluss");
     expect(ohne(trennen("wiederherstellen"))).toBe("wie-der-her-stel-len");
     expect(ohne(trennen("weiterempfehlen"))).toBe("wei-ter-emp-feh-len");
-    expect(ohne(trennen("Sicherheitsunterweisung"))).toBe("Sicher-heits-unterweisung");
+    expect(ohne(trennen("Sicherheitsunterweisung"))).toBe("Si-cher-heits-un-ter-wei-sung");
   });
 });

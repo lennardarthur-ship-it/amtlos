@@ -1,7 +1,7 @@
 # R11 (Nutzertest Gründerin Foodtruck): Reisegewerbekarte als eigene Pflicht, aus gruendung.erlaubnis_pruefen herausgelöst
 schema_version: 1
 id: gruendung.reisegewerbekarte
-version: 1
+version: 2
 katalog_nr: A.3
 titel:
   de: Reisegewerbekarte beantragen (§ 55 GewO)
@@ -9,13 +9,10 @@ kurz:
   de: Verkaufst du ohne feste Niederlassung oder ohne vorherige Bestellung – etwa auf Märkten oder von Ort zu Ort –, brauchst du vor
     dem Start in der Regel eine Reisegewerbekarte.
 erklaerung:
-  de: Ein Reisegewerbe betreibt, wer außerhalb seiner gewerblichen Niederlassung oder ohne eine solche Waren oder Leistungen anbietet,
-    ohne vorher bestellt worden zu sein. Dafür brauchst du eine Reisegewerbekarte vom Gewerbeamt (§ 55 GewO). Sie muss vor dem Start
-    vorliegen. Plane genug Vorlauf ein – für den Antrag brauchst du in der Regel ein Führungszeugnis und eine Auskunft aus dem
-    Gewerbezentralregister, die du selbst erst beantragen musst. Für Märkte, Messen und Volksfeste, die die Gemeinde festgesetzt hat,
-    gelten Ausnahmen (Titel IV GewO) – prüfe beim Gewerbeamt, ob du die Karte trotzdem brauchst.
+  de: Ein Reisegewerbe betreibt, wer außerhalb seiner gewerblichen Niederlassung oder ohne eine solche Waren oder Leistungen anbietet, ohne vorher bestellt worden zu sein. Dafür brauchst du eine Reisegewerbekarte vom Gewerbeamt (§ 55 GewO). Sie muss vor dem Start vorliegen. Plane genug Vorlauf ein – für den Antrag brauchst du in der Regel ein Führungszeugnis und eine Auskunft aus dem Gewerbezentralregister, die du selbst erst beantragen musst. Für Märkte, Messen und Volksfeste, die die Gemeinde festgesetzt hat, gelten Ausnahmen (Titel IV GewO) – prüfe beim Gewerbeamt, ob du die Karte trotzdem brauchst. Für bestimmte Tätigkeiten ohne Karte gilt stattdessen eine Anzeigepflicht (§ 55c GewO).
 rechtsgrundlage:
 - § 55 GewO
+- § 55c GewO
 kategorie: gruendung
 branchen:
 - gastronomie_lebensmittel
@@ -61,10 +58,11 @@ quellen:
   url: https://www.gesetze-im-internet.de/gewo/__55.html
   abgerufen: null
 fachlich_zu_pruefen:
+- 'R12 (Rechtsprüfung Befund 15): Anzeigepflicht nach § 55c GewO für reisegewerbekartenfreie Tätigkeiten – welche Fälle, bestätigen'
 - 'Dauer des Verfahrens (Nutzertest R11: 4–6 Wochen, je Behörde verschieden) – Erinnerung sechs und zwei Wochen vorher als Vorlauf, bestätigen'
-- 'Ausnahmen für festgesetzte Märkte, Messen und Volksfeste (Titel IV GewO, § 55a) nur als Prüfhinweis – wann die Karte trotzdem nötig ist; Reisegewerbe neben stehendem Gewerbe (Gewerbeanzeige und Karte)'
-- 'Unterlagen (Führungszeugnis, Auskunft aus dem Gewerbezentralregister) je Behörde bestätigen'
-- 'Folgen bei Nichterfüllung – Sanktion fachlich ergänzen'
+- Ausnahmen für festgesetzte Märkte, Messen und Volksfeste (Titel IV GewO, § 55a) nur als Prüfhinweis – wann die Karte trotzdem nötig ist; Reisegewerbe neben stehendem Gewerbe (Gewerbeanzeige und Karte)
+- Unterlagen (Führungszeugnis, Auskunft aus dem Gewerbezentralregister) je Behörde bestätigen
+- Folgen bei Nichterfüllung – Sanktion fachlich ergänzen
 pruefung:
   status: entwurf
   geprueft_von: null

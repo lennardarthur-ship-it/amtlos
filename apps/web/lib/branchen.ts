@@ -1,5 +1,5 @@
 /** Branchenpakete (Spezifikation 4 H): Werkzeuge je Branche. Pflichten kommen aus dem Katalog (Feld `branchen`). */
-export const BRANCHEN = ["gastronomie_lebensmittel", "handwerk", "beauty_kosmetik", "gebaeudereinigung", "bau", "transport_logistik", "onlinehandel", "it_agentur_freelancer", "gesundheit_pflege", "immobilien_finanzen"] as const;
+export const BRANCHEN = ["gastronomie_lebensmittel", "handwerk", "beauty_kosmetik", "gebaeudereinigung", "bau", "transport_logistik", "onlinehandel", "it_agentur_freelancer", "gesundheit_pflege", "immobilien_finanzen", "unterricht_sport_coaching"] as const;
 export type Branche = (typeof BRANCHEN)[number];
 
 export type Werkzeug = "w_eigenkontrollen" | "w_allergene" | "w_ifsg" | "w_gb" | "w_geraete" | "w_gefahrstoffe" | "w_online" | "w_dienstleister" | "w_schulungen";
@@ -22,6 +22,8 @@ export const WERKZEUGE: Partial<Record<Branche, Werkzeug[]>> = {
   bau: ["w_gb", "w_geraete"],
   onlinehandel: ["w_online"],
   it_agentur_freelancer: ["w_dienstleister", "w_schulungen"],
+  // R12 (Nutzertest Coach #5): Kurse und Training – Gesundheitsfragen der Teilnehmenden, Dienstleister (Buchung, Video)
+  unterricht_sport_coaching: ["w_dienstleister"],
 };
 
 /** Branchen aus dem Profil; Onlinehandel gilt auch, wenn ein Onlineshop angegeben ist. */

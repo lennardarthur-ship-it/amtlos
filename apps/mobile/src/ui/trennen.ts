@@ -1,97 +1,65 @@
 /**
- * Weiche Trennstellen (U+00AD) in langen Wortzusammensetzungen (G1): Auf schmalen Geräten (320 pt) oder mit großer
- * Schrift brächen „Rechnungsempfänger“, „Nutzungsbedingungen“ oder „Steuerberatung“ sonst mitten im Wort ohne
- * Trennstrich („Rechnungsempfänge / r“). Mit weicher Trennstelle steht der Strich an der Fuge – sonst unsichtbar.
- * Nur für die Anzeige; VoiceOver liest das Zeichen nicht.
+ * Weiche Trennstellen (U+00AD) in langen Wörtern (G1): Auf schmalen Geräten (320 pt) oder mit großer Schrift brächen
+ * „Rechnungsempfänger“, „Nutzungsbedingungen“ oder „Steuerberatung“ sonst mitten im Wort ohne Trennstrich
+ * („Rechnungsempfänge / r“). Mit weicher Trennstelle steht der Strich an einer Silbe – sonst unsichtbar. Nur für die
+ * Anzeige; VoiceOver liest das Zeichen nicht.
  *
- * R10: zuerst an bekannten Wortfugen („…beiträge“, „…kontrolle“), dann in noch langen Teilen nach Silben (einfache
- * Regel: vor dem letzten Mitlaut zwischen zwei Selbstlauten; „ch“, „ck“, „sch“, „ph“, „qu“ und Mitlaut + l/r bleiben
- * zusammen). Lieber eine Trennung an einer Silbe als ein Bruch mitten im Buchstaben ohne Strich.
+ * R12 (UX #8): echte deutsche Trennmuster (Liang/TeX, „hyph-de-1996“ der Trennmustermannschaft, Paket `hyphen`) statt
+ * eigener Faustregeln – die trennten „Freis-tel-lung“, „Videoü-ber-wa-chung“ und „Jugen-dar-beits-schutz“. Die
+ * Ausnahmeliste bleibt für Wörter, an denen auch die Muster zweifeln.
  */
-const SUFFIXE = "beratung|bedingungen|empfänger|mappe|beurteilung|erklärung|dokumentation|anweisung|verzeichnis|nachweis|anmeldung|meldung|aufbewahrung|unterweisung|sicherung|rechnung|bescheinigung|einstellungen|angaben|pflichten|unterlagen|versicherung|beiträge|beitrag|kontrolle|kontrollen|erzeugnisse|regelung|unternehmer|voranmeldung|verordnung|vorschrift|protokoll|verarbeitung|tätigkeiten|information|schutz|plan|liste|stelle|zeitraum|gesetz|steuer|pflicht|belehrung|arbeit|zeiten|zentrale|leistung|umsätze|schulung|prüfung|behörde|gewerbe|betrieb|lohn|daten|stoffe|stoff|mittel|geräte|gerät";
-/** letzte Wortfuge eines Wortteils: Vorderteil (≥ 3 Buchstaben), bekannter Wortteil, Rest (leer oder ≥ 3 Buchstaben) */
-const FUGE = new RegExp(`^(\\p{L}{3,})(${SUFFIXE})(\\p{L}{3,}|)$`, "u");
+import erzeugen from "hyphen";
+import muster from "hyphen/patterns/de-1996";
 
-/** Alle bekannten Wortfugen von hinten nach vorn: „Kleinunternehmerregelung“ → „Klein·unternehmer·regelung“. */
-function fugen(wort: string): { t: string; bekannt: boolean }[] {
-  const m = FUGE.exec(wort);
-  return m ? [...fugen(m[1]!), { t: m[2]! + m[3]!, bekannt: !m[3] }] : [{ t: wort, bekannt: false }];
-}
-
-const VOKAL = "aeiouyäöüAEIOUYÄÖÜ";
-const istVokal = (c: string) => VOKAL.includes(c);
-/** Mitlautgruppen, die am Silbenanfang zusammenbleiben (Trennung davor) */
-const ANFANG = /^(sch|ch|ck|ph|qu|th|[bdfgkp][lr]|tr)$/i;
-
-/** Silbentrennung eines Wortteils ohne Fugen: weiche Trennstellen, mindestens drei Buchstaben vorn und hinten. */
-function silben(teil: string): string {
-  if (teil.length < 9) return teil;
-  const z = [...teil];
-  const stellen: number[] = [];
-  let i = 0;
-  while (i < z.length) {
-    // nächster Selbstlaut, dann die Mitlaute bis zum folgenden Selbstlaut
-    while (i < z.length && !istVokal(z[i]!)) i++;
-    while (i < z.length && istVokal(z[i]!)) i++;
-    const a = i;
-    while (i < z.length && !istVokal(z[i]!)) i++;
-    if (i >= z.length) break;
-    const mitlaute = z.slice(a, i).join("");
-    if (!mitlaute) continue;
-    // Trennung vor dem letzten Mitlaut – außer die letzten zwei bzw. drei gehören zusammen
-    let vor = mitlaute.length - 1;
-    for (const n of [3, 2])
-      if (mitlaute.length >= n && ANFANG.test(mitlaute.slice(-n))) {
-        vor = mitlaute.length - n;
-        break;
-      }
-    stellen.push(a + vor);
-  }
-  let out = "";
-  z.forEach((c, k) => {
-    if (stellen.includes(k) && k >= 3 && z.length - k >= 3) out += "\u00AD";
-    out += c;
-  });
-  return out;
-}
+const WEICH = "\u00AD";
+let silbenTrenner: ((wort: string) => string) | null = null;
+const merker = new Map<string, string>();
 
 /**
- * R11 (UX #11): feste Trennstellen für Wörter, an denen die Silbenregel scheitert („wie-der-hers-tel-len“) – nach Duden.
- * Schlüssel klein geschrieben, „·“ markiert die Trennstelle.
+ * Feste Trennstellen nach Duden (R11 UX #11, R12) – Vorrang vor den Mustern. Schlüssel klein geschrieben, „·“ markiert
+ * die Trennstelle.
  */
 const AUSNAHMEN: Record<string, string> = Object.fromEntries(
-  ["wie·der·her·stel·len", "wei·ter·emp·feh·len", "Jah·res·ab·schluss", "Be·triebs·arzt", "Be·triebs·ärz·tin", "Fach·kraft", "Kon·troll·map·pe", "Ar·beits·zeit·nach·weis", "Schlüs·sel·quit·tung"].map((w) => [w.replace(/·/g, "").toLowerCase(), w]),
+  ["wie·der·her·stel·len", "wei·ter·emp·feh·len", "Jah·res·ab·schluss", "Be·triebs·arzt", "Be·triebs·ärz·tin", "Fach·kraft", "Kon·troll·map·pe", "Ar·beits·zeit·nach·weis", "Schlüs·sel·quit·tung", "Ur·instinkt", "be·inhal·tet"].map((w) => [w.replace(/·/g, "").toLowerCase(), w]),
 );
-/**
- * Bekannte erste Wortteile mit Fugen-s (R11, UX #11): „Betriebs·arzt“, nicht „Betrieb-sarzt“ – die Silbenregel trennt
- * sonst vor dem letzten Mitlaut und reißt das Fugen-s vom ersten Teil.
- */
-const VORNE = /^(betriebs|jahres|arbeits|geschäfts|sicherheits|gesundheits|unternehmens|wirtschafts|rechnungs|wieder|weiter)(\p{L}{3,})$/iu;
 
-/** Wortteil ohne bekannte Fuge: Ausnahme, sonst bekannter erster Wortteil, sonst Silben. */
-function teilTrennen(t: string): string {
-  const fest = AUSNAHMEN[t.toLowerCase()];
+/** Ein Wort nach den Mustern trennen – mindestens zwei Buchstaben vorn und hinten (wie TeX für Deutsch). */
+function wortTrennen(wort: string): string {
+  const fest = AUSNAHMEN[wort.toLowerCase()];
   if (fest) {
     // Groß- und Kleinschreibung des Originals behalten
     let i = 0;
-    return [...fest].map((c) => (c === "·" ? "\u00AD" : t[i++]!)).join("");
+    return [...fest].map((c) => (c === "·" ? WEICH : wort[i++]!)).join("");
   }
-  const m = VORNE.exec(t);
-  if (m) return `${m[1]!.length >= 10 ? silben(m[1]!) : m[1]}\u00AD${teilTrennen(m[2]!)}`;
-  return t.length >= 10 ? silben(t) : t;
+  const da = merker.get(wort);
+  if (da !== undefined) return da;
+  silbenTrenner ??= erzeugen(muster, { hyphenChar: WEICH });
+  const roh = silbenTrenner(wort);
+  // keine Trennstelle nach nur einem Buchstaben am Anfang bzw. vor nur einem am Ende
+  const teile = roh.split(WEICH);
+  const zusammen: string[] = [];
+  for (const t of teile) {
+    if (zusammen.length && (zusammen[zusammen.length - 1]!.length < 2 || t.length < 2)) zusammen[zusammen.length - 1] += t;
+    else zusammen.push(t);
+  }
+  const ergebnis = zusammen.join(WEICH);
+  if (merker.size < 5000) merker.set(wort, ergebnis);
+  return ergebnis;
 }
 
 export function trennen(text: string): string {
   // nur Wörter ab 12 Zeichen – kurze passen immer; Adressen und Links bleiben unverändert
   if (/@|:\/\/|www\./.test(text)) return text;
-  return text.replace(/\p{L}{12,}/gu, (wort) =>
-    AUSNAHMEN[wort.toLowerCase()]
-      ? teilTrennen(wort)
-      : fugen(wort)
-          // bekannte Wortteile („bedingungen“) bleiben ganz – getrennt wird nur, was sonst zu lang bliebe
-          .map(({ t, bekannt }) => (bekannt ? t : teilTrennen(t)))
-          .join("\u00AD"),
-  );
+  return text.replace(/\p{L}{12,}/gu, wortTrennen);
+}
+
+/**
+ * R12 (UX #18): keine verwaisten Zeichen am Zeilenumbruch – geschütztes Leerzeichen nach „§“, „§§“, „Art.“, „Abs.“ und
+ * „Nr.“ vor der Zahl; nach einem langen Wort (das notfalls mitten im Wort umbricht) kein Umbruch vor „?“ bzw. „!“
+ * (Wortverbinder U+2060). Nur für die Anzeige.
+ */
+export function schuetzen(text: string): string {
+  return text.replace(/(§§?|Art\.|Abs\.|Nr\.) (?=[\dIVX])/g, "$1\u00A0").replace(/(\p{L}{12,})([?!])/gu, "$1\u2060$2");
 }
 
 /** Arabische und hebräische Schrift (inkl. Präsentationsformen) */

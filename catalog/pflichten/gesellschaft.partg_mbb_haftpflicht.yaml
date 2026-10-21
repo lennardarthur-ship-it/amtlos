@@ -1,0 +1,50 @@
+# R12 (Rechtsprüfung Befund 1): PartG mbB – Haftungsbeschränkung nur mit Berufshaftpflichtversicherung
+schema_version: 1
+id: gesellschaft.partg_mbb_haftpflicht
+version: 1
+katalog_nr: B.15
+titel:
+  de: Berufshaftpflichtversicherung der PartG mbB unterhalten
+kurz:
+  de: Die Haftungsbeschränkung der PartG mbB gilt nur, solange die Partnerschaft die vom Berufsrecht vorgeschriebene Berufshaftpflichtversicherung unterhält.
+erklaerung:
+  de: In der Partnerschaftsgesellschaft mit beschränkter Berufshaftung haftet für Schäden aus fehlerhafter Berufsausübung nur das Gesellschaftsvermögen – aber nur, wenn die Partnerschaft eine zu diesem Zweck durch Gesetz vorgegebene Berufshaftpflichtversicherung unterhält (§ 8 Abs. 4 PartGG). Mindestversicherungssumme und weitere Anforderungen regelt das jeweilige Berufsrecht, etwa für Rechtsanwälte, Steuerberater oder Architekten. Der Name der Partnerschaft enthält den Zusatz „mit beschränkter Berufshaftung“ oder eine Abkürzung wie „mbB“.
+rechtsgrundlage:
+- § 8 Abs. 4 PartGG
+kategorie: gesellschaft
+ausloeser:
+  feld: profil.rechtsform
+  op: ==
+  wert: partg_mbb
+  label:
+    de: Dein Unternehmen ist eine PartG mbB.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du und deine Partner; Berufshaftpflichtversicherer
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Ohne die vorgeschriebene Versicherung entfällt die Haftungsbeschränkung – dann haften die Partner nach den allgemeinen Regeln auch persönlich (§ 8 Abs. 1, 2 PartGG).
+  schwere: hoch
+automatisierung: hinweis
+erledigung:
+  art: bestaetigen
+  bestaetigung:
+    de: Versicherung besteht
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Partnerschaftsgesellschaftsgesetz § 8
+  url: https://www.gesetze-im-internet.de/partgg/__8.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Neu nach Rechtsprüfung R12 (Befund 1) – Mindestsummen je Berufsrecht nicht abgebildet; Namenszusatz (§ 8 Abs. 4 S. 3 PartGG) bestätigen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

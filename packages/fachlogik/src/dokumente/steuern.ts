@@ -12,6 +12,31 @@ import type { Option, Vorlage } from "./typen.js";
 const opt = (l: string[]): Option[] => l.map((t) => stabileOption(t));
 const PROGRAMME = ["Buchhaltungsprogramm", "Kassensystem", "Rechnungsprogramm", "Online-Banking", "Belegscanner-App", "Upload-Portal der Steuerberatung", "Lohnprogramm", "Tabellenkalkulation"];
 
+/** R12 GoBD: Art der Kasse (Kassenkapitel). */
+const KASSEN_ARTEN = ["Elektronisches Kassensystem mit TSE (Einzelaufzeichnung je Verkauf)", "Offene Ladenkasse ohne elektronisches Kassensystem (Kassenbericht mit Zählung)", "Keine Bareinnahmen"];
+/** R12 GoBD: Bausteine zum Ablauf an der Kasse. */
+const KASSEN_ABLAUF = [
+  "Jeden Abend Tagesabschluss (Z-Bon) und Übernahme der Summen je Steuersatz, Karte, Trinkgeld, Gutscheine und Entnahmen in Amtlos am selben Tag",
+  "Der Bargeldbestand wird am Ende jedes Tages gezählt; Kassendifferenzen werden mit Grund vermerkt und gebucht",
+  "Offene Ladenkasse: Kassenbericht täglich mit Zählprotokoll; Bareinnahmen werden aus dem gezählten Bestand zurückgerechnet",
+  "Z-Bons, Einzelaufzeichnungen, DSFinV-K- und TSE-Export werden 10 Jahre aufbewahrt (§ 147 Abs. 1 Nr. 1, Abs. 3 AO)",
+  "Bankeinzahlungen, Privatentnahmen und -einlagen bekommen einen Eigenbeleg mit fortlaufender Nummer (Quittung als Foto)",
+  "Kartentrinkgeld für das Personal wird bar ausgezahlt und gesondert erfasst; Trinkgeld für die Inhaberin gehört zum Umsatz",
+  "Gutscheine: Einzweck-Gutscheine werden beim Verkauf versteuert, Mehrzweck-Gutscheine bei der Einlösung",
+  "Bei Ausfall der Kasse oder der TSE wird der Ausfall mit Beginn, Ende und Grund dokumentiert und die Einnahmen werden in dieser Zeit von Hand aufgezeichnet",
+];
+/** R12 GoBD: Abläufe in Amtlos (fester Text, wenn Amtlos genutzt wird). */
+const AMTLOS_ABLAEUFE = [
+  "Rechnungen bekommen fortlaufende Nummern und werden beim ersten Teilen festgeschrieben – mit den Absenderdaten, dem Hash des geteilten PDFs und der XRechnung. Korrigiert wird nur per Stornorechnung.",
+  "Tagesabschlüsse der Kasse sind ab dem Speichern festgeschrieben; „erfasst am“ und „festgeschrieben am“ werden gespeichert. Korrekturen sind nur mit Grund möglich, die vorige Fassung bleibt erhalten; Nacherfassungen werden gekennzeichnet. Tage nach dem aktuellen Datum lassen sich nicht erfassen.",
+  "Das Kassenbuch wird nur lesbar aus den Tagesabschlüssen erzeugt und beim ersten Teilen festgeschrieben (Inhalt mit SHA-256); nach einer Korrektur entsteht eine neue Fassung.",
+  "Belege bekommen beim Erfassen eine feste Amtlos-Belegnummer. Endgültig löschen lässt sich ein Beleg nur innerhalb von 24 Stunden und vor jeder Weitergabe; danach wird er mit Grund als ungültig markiert und bleibt samt Datei erhalten. Jede Löschung steht im Änderungsprotokoll.",
+  "Mit dem Steuerberater-Paket bzw. einer abgegebenen Voranmeldung werden die enthaltenen Belege festgeschrieben; Änderungen danach nur mit Grund (Änderungsprotokoll im Paket).",
+  "Die Daten liegen verschlüsselt auf dem Gerät. Gesichert wird verschlüsselt (Datei oder iCloud) mit einem Passwort, das getrennt und sicher hinterlegt ist; zusätzlich gibt es ein offenes Archiv (CSV, JSON, PDF, XML) zum Lesen ohne Amtlos.",
+  "„Alle Daten löschen“ ist gesperrt, solange aufbewahrungspflichtige Daten ohne aktuelle Sicherung auf dem Gerät liegen.",
+  "Diese Verfahrensdokumentation wird beim Teilen festgeschrieben; Änderungen sind neue Fassungen mit Datum und Grund.",
+];
+
 /** Optionen der Auswahlfelder (wie im Formular) – auf dem leeren Blatt zum Ankreuzen. */
 const AUSWAHL_OPTIONEN: Record<string, string[]> = { belegeingang: GOBD.belegeingang, belegart: GOBD.belegart, ablage: GOBD.ablage, sicherung_ort: GOBD.sicherungOrt, sicherung_intervall: GOBD.sicherungIntervall };
 
@@ -23,6 +48,10 @@ export const verfahrensdokumentation: Vorlage = {
   bereich: "steuern",
   pflichten: ["steuern.gobd_verfahrensdokumentation"],
   grundlage: "§§ 145–147 AO; GoBD",
+  // R12 GoBD (Betriebsprüfung #11): beim ersten Teilen festgeschrieben; Änderungen als neue Fassung mit Datum und Grund,
+  // jede frühere Fassung bleibt erhalten (GoBD Rz. 154: Änderungen versioniert nachvollziehbar)
+  festschreiben: true,
+  korrektur: true,
   abschnitte: [
     { titel: "Stand und Verantwortung",
       felder: [
@@ -69,6 +98,16 @@ export const verfahrensdokumentation: Vorlage = {
       ],
     },
     {
+      titel: "Kasse",
+      hilfe: "Wie Bareinnahmen aufgezeichnet werden. Bei einer elektronischen Kasse gehören deren Bedienungsanleitung, Programmierprotokolle und die Kassenmeldung zur Verfahrensdokumentation.",
+      felder: [
+        { id: "kasse_art", art: "wahl", label: "Art der Kasse", optionen: KASSEN_ARTEN.map((t) => ({ wert: t, text: t })) },
+        { id: "kasse_ablauf", art: "bausteine", label: "Ablauf an der Kasse", optionen: opt(KASSEN_ABLAUF), wenn: { feld: "kasse_art", ist: [KASSEN_ARTEN[0]!, KASSEN_ARTEN[1]!] } },
+        { id: "kasse_zusatz", selten: true, art: "mehrzeilig", label: "Weitere Regeln zur Kasse", hilfe: "z. B. Wechselgeldbestand, wer zählt, Ausfall der Kasse oder der TSE", wenn: { feld: "kasse_art", ist: [KASSEN_ARTEN[0]!, KASSEN_ARTEN[1]!] } },
+        { id: "amtlos", art: "schalter", label: "Rechnungen, Belege und Kassenabschlüsse werden in Amtlos geführt", vorbelegung: true, hilfe: "Dann beschreibt die Verfahrensdokumentation auch die Abläufe in Amtlos: Festschreibung, Korrektur mit Grund, Storno, ungültige Belege, Sicherung und Löschsperre." },
+      ],
+    },
+    {
       titel: "Technische Systemdokumentation und Betriebsdokumentation",
       felder: [
         { id: "sicherung_intervall", art: "wahl", label: "Datensicherung – wie oft", optionen: opt(GOBD.sicherungIntervall), vorbelegung: GOBD.sicherungIntervall[0], pflicht: true },
@@ -80,7 +119,7 @@ export const verfahrensdokumentation: Vorlage = {
     },
     {
       titel: "Änderungen",
-      hilfe: "Wenn sich ein Ablauf oder Programm ändert: hier mit Datum festhalten (die Verfahrensdokumentation wird versioniert aufbewahrt).",
+      hilfe: "Wenn sich ein Ablauf oder Programm ändert: hier mit Datum festhalten. Geteilt wird die Verfahrensdokumentation festgeschrieben; jede Änderung danach ist eine neue Fassung mit Grund, die alten Fassungen bleiben in Amtlos erhalten.",
       felder: [
         {
           id: "aenderungen",
@@ -123,6 +162,10 @@ export const verfahrensdokumentation: Vorlage = {
               teil("Eingang der Belege", l("belegeingang")) + teil("Art der Belegablage", l("belegart")) + teil("Ablage", l("ablage")) + teil("Erfassung, Prüfung und Verbuchung", zeilen(text(d, "erfassung"))) +
               (ja(d, "scannen") ? teil("Ersetzendes Scannen", `${text(d, "papier") ? `<p>${esc(text(d, "papier"))}.</p>` : ""}${zeilen(text(d, "scan_ablauf"))}`) : ""),
           },
+          ...(text(d, "kasse_art")
+            ? [{ titel: "Kasse", rand: "§ 146 Abs. 1, § 146a AO", inhalt: `<p>${esc(text(d, "kasse_art"))}.</p>${auswahl(d, "kasse_ablauf").length ? punkte(auswahl(d, "kasse_ablauf").map((w) => neufassung(w))) : ""}${zeilen(text(d, "kasse_zusatz"))}` }]
+            : []),
+          ...(ja(d, "amtlos") ? [{ titel: "Abläufe in Amtlos", rand: "GoBD Tz. 3.2.4, 8, 9", inhalt: punkte(AMTLOS_ABLAEUFE) }] : []),
           {
             titel: "Technische Systemdokumentation und Betriebsdokumentation",
             rand: "GoBD Tz. 10.1",
@@ -135,7 +178,7 @@ export const verfahrensdokumentation: Vorlage = {
           {
             titel: "Aufbewahrung und Änderungen",
             rand: "GoBD Tz. 10.1, 10.2",
-            inhalt: `<div${aenderungen.length <= 8 ? ' class="zusammen"' : ""}><p>Diese Verfahrensdokumentation wird als Organisationsunterlage aufbewahrt; Änderungen werden mit Datum festgehalten.</p>${aenderungen.length ? tabelle(["Datum", "Änderung"], aenderungen.map((x) => [datumDe(text(x, "datum")), zelle(text(x, "aenderung"))]), { breiten: ["18%", "82%"] }) : tabelle(["Datum", "Änderung"], [], { breiten: ["18%", "82%"], mindestens: 4, hoch: true })}</div>`,
+            inhalt: `<div${aenderungen.length <= 8 ? ' class="zusammen"' : ""}><p>Diese Verfahrensdokumentation wird als Organisationsunterlage 10 Jahre aufbewahrt (§ 147 Abs. 1 Nr. 1, Abs. 3 AO); Änderungen werden mit Datum festgehalten. Jede geteilte Fassung ist festgeschrieben, frühere Fassungen bleiben erhalten.</p>${text(d, "fassung_nr") ? `<p><strong>Fassung ${esc(text(d, "fassung_nr"))}</strong>${text(d, "fassung_ersetzt") ? ` – ersetzt die Fassung vom ${datumDe(text(d, "fassung_ersetzt"))}` : ""}${text(d, "fassung_grund") ? `. Grund: ${esc(text(d, "fassung_grund"))}` : ""}</p>` : ""}${aenderungen.length ? tabelle(["Datum", "Änderung"], aenderungen.map((x) => [datumDe(text(x, "datum")), zelle(text(x, "aenderung"))]), { breiten: ["18%", "82%"] }) : tabelle(["Datum", "Änderung"], [], { breiten: ["18%", "82%"], mindestens: 4, hoch: true })}</div>`,
           },
         ]) +
         // Kapitalgesellschaft: wer für den Betrieb unterschreibt (Geschäftsführung aus „Mein Betrieb“)

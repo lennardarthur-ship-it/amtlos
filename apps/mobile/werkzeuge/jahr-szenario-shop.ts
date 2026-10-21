@@ -198,6 +198,8 @@ export function standBauen(): Bau {
           id: r.id, vorlage: "rechnung", datum: r.datum, worum: r.worum, ordner: "rechnungen",
           daten: () => ({
             ...personIn(v("rechnung"), kunde),
+            // Preise im Szenario netto (seit R12 ist „brutto“ bei Café, Friseur und reinen Privatkunden vorbelegt)
+            preise_brutto: false,
             datum: r.datum,
             leistung_gleich: !r.leistung,
             leistung: r.leistung ? D.de(r.leistung) : "",

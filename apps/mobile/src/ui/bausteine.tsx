@@ -7,7 +7,8 @@ import { AccessibilityInfo, ActivityIndicator, Animated, Pressable, Text as RNTe
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { T as TEXT } from "../texte";
 import { datumLesen, isoAus, nurJahr, uhrzeitLesen } from "./datum";
-import { trennen } from "./trennen";
+import { schuetzen, trennen } from "./trennen";
+import { mehrfachUmschalten } from "./mehrfach";
 import { DatumWahl } from "./datumwahl";
 import { FussKontext } from "./fussHoehe";
 import { GROESSE, HAARLINIE, RADIUS, RAND, SCHRIFT, TASTATUR_FERTIG, ZIEL, istIos, useFarben, useWenigBewegung, weich, type Farben } from "./thema";
@@ -39,10 +40,11 @@ export function useGrosseSchrift(): boolean {
 export function T({ v = "basis", fett, leise, farbe, stil, children, ...rest }: { v?: Variante; fett?: boolean; leise?: boolean; farbe?: string; stil?: StyleProp<TextStyle>; children: ReactNode } & Omit<React.ComponentProps<typeof RNText>, "style">) {
   const f = useFarben();
   const { fontScale, width } = useWindowDimensions();
-  const eng = fontScale > GROSSE_SCHRIFT_AB || width < 360;
+  // R12 (UX #18): Überschriften immer mit Trennstellen – „Kleinunternehmerregelung?“ passte bei 393 pt nicht in die Zeile
+  const eng = fontScale > GROSSE_SCHRIFT_AB || width < 360 || UEBERSCHRIFT.has(v);
   return (
     <RNText {...rest} style={[STIL[v], fett && !UEBERSCHRIFT.has(v) ? { ...SCHRIFT.halb } : null, { color: farbe ?? (leise ? f.tinteLeise : f.tinte) }, stil]}>
-      {eng && typeof children === "string" ? trennen(children) : children}
+      {typeof children === "string" ? schuetzen(eng ? trennen(children) : children) : children}
     </RNText>
   );
 }
@@ -779,7 +781,8 @@ export function Schalter({ label, wert, aendern, hilfe }: { label: string; wert:
       {/* nur Anzeige – Zustand und Bedienung trägt die Zeile */}
       <View pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden>
         {/* Web: ohne activeThumbColor färbt react-native-web den Knopf im An-Zustand grün (A11) */}
-        <Switch value={wert} trackColor={{ true: f.haupt, false: f.linie }} thumbColor="#ffffff" ios_backgroundColor={f.linie} {...({ activeThumbColor: "#ffffff" } as object)} />
+        {/* R12 (Kurier #20): auch der innere Schalter trägt die Beschriftung – im Web taucht er sonst unbeschriftet auf */}
+        <Switch value={wert} accessibilityLabel={label} focusable={false} trackColor={{ true: f.haupt, false: f.linie }} thumbColor="#ffffff" ios_backgroundColor={f.linie} {...({ activeThumbColor: "#ffffff", tabIndex: -1, "aria-label": label } as object)} />
       </View>
     </Pressable>
   );
@@ -800,14 +803,14 @@ function ListenRahmen({ label, rolle, children }: { label: string; rolle?: "radi
  * Große Antwortkarte (Fragen im Pflichten-Check): eine Karte je Möglichkeit, gewählt mit grünem Rahmen und
  * Radiokreis bzw. Kästchen – wie in den besten Frage-Antwort-Apps, mit großen Tippflächen.
  */
-function AntwortKarte({ text, an, rolle, onPress }: { text: string; an: boolean; rolle: "radio" | "checkbox"; onPress: () => void }) {
+function AntwortKarte({ text, an, rolle, onPress, unter }: { text: string; an: boolean; rolle: "radio" | "checkbox"; onPress: () => void; /** R12: kleine Zeile darunter, z. B. „aus deiner Branche“ */ unter?: string }) {
   const f = useFarben();
   return (
     <Pressable
       accessibilityRole={rolle}
       accessibilityState={{ checked: an }}
       aria-checked={an}
-      accessibilityLabel={text}
+      accessibilityLabel={unter ? `${text}, ${unter}` : text}
       onPress={() => {
         if (istIos) void Haptics.selectionAsync();
         onPress();
@@ -819,10 +822,14 @@ function AntwortKarte({ text, an, rolle, onPress }: { text: string; an: boolean;
       ) : (
         <Kaestchen an={an} />
       )}
-      <T fett={an} stil={{ flex: 1 }}>{text}</T>
+      <View style={{ flex: 1 }}>
+        <T fett={an}>{text}</T>
+        {unter ? <T v="caption" leise stil={{ marginTop: 2 }}>{unter}</T> : null}
+      </View>
     </Pressable>
   );
 }
+
 
 /** Auswahl als Liste untereinander – für lange oder viele Optionen (Radio-Semantik). `gross`: Antwortkarten. */
 export function Auswahl<W extends string>({ label, wert, aendern, optionen, hilfe, ohneLabel, gross }: { label: string; wert: W | null; aendern: (w: W) => void; optionen: { wert: W; text: string }[]; hilfe?: string; ohneLabel?: boolean; gross?: boolean }) {
@@ -865,14 +872,14 @@ export function Auswahl<W extends string>({ label, wert, aendern, optionen, hilf
 }
 
 /** Mehrfachauswahl als Chips mit Kästchen (Checkbox-Semantik), z. B. Allergene. */
-export function MehrfachWahl({ label, werte, aendern, optionen, hilfe, ohneLabel, gross }: { label: string; werte: string[]; aendern: (w: string[]) => void; optionen: { wert: string; text: string }[]; hilfe?: string; ohneLabel?: boolean; gross?: boolean }) {
+export function MehrfachWahl({ label, werte, aendern, optionen, hilfe, ohneLabel, gross }: { label: string; werte: string[]; aendern: (w: string[]) => void; optionen: { wert: string; text: string; herkunft?: string }[]; hilfe?: string; ohneLabel?: boolean; gross?: boolean }) {
   if (gross)
     return (
       <View accessibilityLabel={label} style={{ gap: 10, marginTop: ohneLabel ? 8 : 20 }}>
         {ohneLabel ? null : <FeldKopf label={label} hilfe={hilfe} />}
         {optionen.map((o) => {
           const an = werte.includes(o.wert);
-          return <AntwortKarte key={o.wert} text={o.text} an={an} rolle="checkbox" onPress={() => aendern(an ? werte.filter((x) => x !== o.wert) : [...werte, o.wert])} />;
+          return <AntwortKarte key={o.wert} text={o.text} an={an} unter={an ? o.herkunft : undefined} rolle="checkbox" onPress={() => aendern(mehrfachUmschalten(werte, o.wert, optionen))} />;
         })}
       </View>
     );
@@ -882,7 +889,7 @@ export function MehrfachWahl({ label, werte, aendern, optionen, hilfe, ohneLabel
       <View accessibilityLabel={label} style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 9 }}>
         {optionen.map((o) => {
           const an = werte.includes(o.wert);
-          return <Chip key={o.wert} text={o.text} an={an} rolle="checkbox" kaestchen onPress={() => aendern(an ? werte.filter((x) => x !== o.wert) : [...werte, o.wert])} />;
+          return <Chip key={o.wert} text={o.text} an={an} rolle="checkbox" kaestchen onPress={() => aendern(mehrfachUmschalten(werte, o.wert, optionen))} />;
         })}
       </View>
     </View>
@@ -1066,16 +1073,18 @@ export function kurzUndRest(text: string, max = 88): [string, string] {
 }
 
 /** Satz unter dem Titel auf der Bühne: höchstens zwei Zeilen, der Rest hinter (i) zum Aufklappen. */
-export function BuehnenText({ text, stil }: { text: string; stil?: StyleProp<TextStyle> }) {
+export function BuehnenText({ text, stil, kompakt }: { text: string; stil?: StyleProp<TextStyle>; /** R12 (UX #23): bei großer Schrift ganz zugeklappt – nur „Mehr dazu“ */ kompakt?: boolean }) {
   const f = useFarben();
   const [offen, setOffen] = useState(false);
-  const [kurz, rest] = kurzUndRest(text);
+  const [kurz, rest] = kompakt && text.length > 60 ? ["", text] : kurzUndRest(text);
   if (!rest) return <T farbe={f.buehneLeise} stil={stil}>{text}</T>;
   return (
     <View>
-      <T farbe={f.buehneLeise} stil={stil}>
-        {offen ? text : kurz}
-      </T>
+      {offen || kurz ? (
+        <T farbe={f.buehneLeise} stil={stil}>
+          {offen ? text : kurz}
+        </T>
+      ) : null}
       <Pressable accessibilityRole="button" accessibilityLabel={offen ? TEXT.weniger : TEXT.mehr_dazu} accessibilityState={{ expanded: offen }} aria-expanded={offen} onPress={() => { weich(); setOffen(!offen); }} hitSlop={8} style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-start", minHeight: 36, opacity: pressed ? 0.6 : 1 })}>
         <Symbol name={offen ? "info.circle.fill" : "info.circle"} groesse={16} farbe={f.minze} />
         <T v="klein" fett farbe={f.minze}>{offen ? TEXT.weniger : TEXT.mehr_dazu}</T>

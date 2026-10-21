@@ -1,17 +1,14 @@
 # Katalog E.56 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: arbeitsschutz.arbeitsmedizinische_vorsorge
-version: 2
+version: 3
 katalog_nr: E.56
 titel:
   de: Arbeitsmedizinische Vorsorge anbieten
 kurz:
-  de: Du bietest arbeitsmedizinische Vorsorge an, zum Beispiel die Angebotsvorsorge bei Bildschirmarbeit.
+  de: Du bietest arbeitsmedizinische Vorsorge an oder veranlasst sie – je nach Tätigkeit, etwa bei Bildschirmarbeit, Lärm, Feuchtarbeit, Mehlstaub oder Schweißrauch.
 erklaerung:
-  de: Die Verordnung zur arbeitsmedizinischen Vorsorge regelt Pflicht-, Angebots- und Wunschvorsorge. Bei Bildschirmarbeit
-    ist Vorsorge anzubieten. Bei Feuchtarbeit (zum Beispiel Reinigung, Friseur, Küche) und bei Tätigkeiten mit biologischen Arbeitsstoffen
-    kann Angebots- oder Pflichtvorsorge nötig sein – prüfe das mit deinem Betriebsarzt. Bei Lärm ist Vorsorge ab 80 dB(A) anzubieten
-    und ab 85 dB(A) Pflicht (Anhang Teil 3 ArbMedVV).
+  de: Die Verordnung zur arbeitsmedizinischen Vorsorge regelt Pflicht-, Angebots- und Wunschvorsorge. Bei Bildschirmarbeit ist Vorsorge anzubieten. Bei Lärm ist Vorsorge ab 80 dB(A) anzubieten und ab 85 dB(A) Pflicht (Anhang Teil 3 ArbMedVV). Im Handwerk kommen oft Feuchtarbeit (zum Beispiel Reinigung, Friseur, Küche), Schweißrauch und Holzstaub hinzu, in Bäckereien Mehlstaub, in Pflege und Reinigung biologische Arbeitsstoffe. Je nach Dauer und Belastung ist dafür Angebots- oder Pflichtvorsorge nötig – prüfe das mit deinem Betriebsarzt.
 rechtsgrundlage:
 - ArbMedVV
 kategorie: arbeitsschutz
@@ -42,8 +39,9 @@ quellen:
   url: https://www.gesetze-im-internet.de/arbmedvv/
   abgerufen: null
 fachlich_zu_pruefen:
-- 'Lärm (80/85 dB(A), Anhang Teil 3) nach Nutzertest Tischlerei R11 ergänzt; Pflichtvorsorge bei Hartholzstaub (Anhang Teil 1) unsicher, nicht aufgenommen'
-- 'Feuchtarbeit und Biostoffe nur als Prüfhinweis (R11, Nutzertest Gebäudereinigung) – Stundengrenzen und Nummern im Anhang der ArbMedVV fachlich ergänzen'
+- 'R12 (Nutzertests Kfz #15, Bäckerei #6): Beispiele je Branche ohne Grenzwerte – Mehlstaub (laut Nutzertest Pflichtvorsorge über 4 mg/m³, Nummer im Anhang Teil 1 unsicher), Schweißrauch, Feuchtarbeit (Stundengrenzen) fachlich ergänzen'
+- Lärm (80/85 dB(A), Anhang Teil 3) nach Nutzertest Tischlerei R11 ergänzt; Pflichtvorsorge bei Hartholzstaub (Anhang Teil 1) unsicher, nicht aufgenommen
+- Feuchtarbeit und Biostoffe nur als Prüfhinweis (R11, Nutzertest Gebäudereinigung) – Stundengrenzen und Nummern im Anhang der ArbMedVV fachlich ergänzen
 - Anlässe und Fristen je Vorsorgeart fachlich ergänzen
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 pruefung:

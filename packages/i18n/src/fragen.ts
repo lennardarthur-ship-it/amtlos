@@ -83,14 +83,15 @@ export const SCHRITTE: Schritt[] = [
   {
     id: "gesellschaft",
     titel: { de: "Gesellschaft", en: "Company" },
-    nurWenn: { feld: "rechtsform", in: ["ug", "gmbh"] },
+    // R12 (Rechtsprüfung Befund 1): auch GmbH & Co. KG und Partnerschaftsgesellschaften werden eingetragen
+    nurWenn: { feld: "rechtsform", in: ["ug", "gmbh", "gmbh_co_kg", "partg", "partg_mbb"] },
     fragen: [
       {
         feld: "gesellschaft.handelsregister",
         schnell: true,
         art: "auswahl",
-        frage: { de: "Ist deine Gesellschaft schon im Handelsregister eingetragen?", en: "Is your company already entered in the commercial register?" },
-        hilfe: { de: "Danach richtet sich, welche Gründungsschritte noch anstehen.", en: "This decides which founding steps are still ahead." },
+        frage: { de: "Ist deine Gesellschaft schon im Register eingetragen?", en: "Is your company already entered in the register?" },
+        hilfe: { de: "Gemeint ist das Handelsregister, bei der Partnerschaftsgesellschaft das Partnerschaftsregister. Danach richtet sich, welche Gründungsschritte noch anstehen.", en: "This means the commercial register, for a partnership company the partnership register. This decides which founding steps are still ahead." },
         optionen: {
           nicht_beantragt: { de: "Noch nicht beantragt", en: "Not applied for yet" },
           beantragt: { de: "Beantragt, noch nicht eingetragen", en: "Applied for, not yet entered" },
@@ -120,8 +121,8 @@ export const SCHRITTE: Schritt[] = [
         art: "auswahl",
         frage: { de: "Ist deine Tätigkeit ein Gewerbe oder ein freier Beruf?", en: "Is your activity a trade or a liberal profession?" },
         hilfe: {
-          de: "Freie Berufe sind zum Beispiel Ärztinnen, Architekten, Journalistinnen, Übersetzer. Wenn du unsicher bist, wähle „Weiß ich nicht“.",
-          en: "Liberal professions include doctors, architects, journalists, translators. If unsure, choose “I don't know”.",
+          de: "Freie Berufe sind zum Beispiel Ärztinnen, Architekten, Journalistinnen, Übersetzer und unterrichtende oder erzieherische Tätigkeiten (§ 18 Abs. 1 Nr. 1 EStG), etwa Kurse und Unterricht. Wenn du unsicher bist, wähle „Weiß ich nicht“.",
+          en: "Liberal professions include doctors, architects, journalists, translators and teaching or educational activities (§ 18(1) no. 1 EStG), such as courses and lessons. If unsure, choose “I don't know”.",
         },
         optionen: {
           gewerbe: { de: "Gewerbe", en: "Trade" },
@@ -147,11 +148,13 @@ export const SCHRITTE: Schritt[] = [
           beauty_kosmetik: { de: "Beauty und Kosmetik (Friseur, Kosmetik, Nägel)", en: "Beauty and cosmetics (hairdresser, beauty salon, nails)" },
           bau: { de: "Bau (Hoch- und Tiefbau, Ausbau)", en: "Construction (building, civil engineering, finishing)" },
           gebaeudereinigung: { de: "Gebäudereinigung (Unterhalts-, Glas-, Praxis- und Büroreinigung)", en: "Building cleaning (maintenance, window, practice and office cleaning)" },
-          transport_logistik: { de: "Transport und Logistik (Spedition, Kurier, Taxi)", en: "Transport and logistics (haulage, courier, taxi)" },
+          transport_logistik: { de: "Transport und Logistik (Spedition, Kurier- und Paketdienst, Taxi)", en: "Transport and logistics (haulage, courier and parcel service, taxi)" },
           onlinehandel: { de: "Onlinehandel (eigener Shop, Marktplätze)", en: "Online retail (own shop, marketplaces)" },
           it_agentur_freelancer: { de: "IT, Agentur, Freelancer (Software, Design, Beratung)", en: "IT, agency, freelance (software, design, consulting)" },
           gesundheit_pflege: { de: "Gesundheit und Pflege (Praxis, Therapie, Pflegedienst)", en: "Health and care (practice, therapy, care service)" },
           immobilien_finanzen: { de: "Immobilien und Finanzen (Makler, Vermittlung, Verwaltung)", en: "Real estate and finance (brokerage, intermediation, management)" },
+          // R12 (Nutzertest Coach #5)
+          unterricht_sport_coaching: { de: "Unterricht, Kurse, Sport und Coaching (z. B. Yoga, Fitness, Nachhilfe)", en: "Teaching, courses, sport and coaching (e.g. yoga, fitness, tutoring)" },
           sonstige: { de: "Andere", en: "Other" },
         },
       },
@@ -160,8 +163,8 @@ export const SCHRITTE: Schritt[] = [
         art: "mehrfach",
         frage: { de: "Trifft eines davon auf dich zu?", en: "Does any of these apply to you?" },
         hilfe: {
-          de: "Bestimmte Selbstständige sind rentenversicherungspflichtig. Das betrifft zum Beispiel diese Gruppen.",
-          en: "Certain self-employed people must pay into the statutory pension scheme, for example these groups.",
+          de: "Bestimmte Selbstständige sind in der gesetzlichen Rentenversicherung pflichtversichert (§ 2 SGB VI) – Lehrende, Pflegepersonen und Selbstständige mit einem Auftraggeber nur, wenn sie regelmäßig keine versicherungspflichtigen Beschäftigten haben. Yoga-, Fitness- und Personal Trainer gelten in der Regel als Lehrende.",
+          en: "Certain self-employed people are compulsorily insured in the statutory pension scheme (§ 2 SGB VI) – teachers, carers and people with one client only if they regularly have no employees subject to insurance. Yoga, fitness and personal trainers usually count as teachers.",
         },
         optionen: {
           lehrende: { de: "Ich unterrichte (z. B. Lehrerin, Trainer, Coach)", en: "I teach (e.g. teacher, trainer, coach)" },
@@ -181,8 +184,8 @@ export const SCHRITTE: Schritt[] = [
       {
         feld: "erlaubnis.gewo_paragraphen",
         art: "mehrfach",
-        frage: { de: "Brauchst du für deine Tätigkeit eine dieser Erlaubnisse nach der Gewerbeordnung?", en: "Does your business need one of these permits under the Trade Regulation Act?" },
-        hilfe: { de: "Wenn du unsicher bist, lass alles leer und frag bei deinem Gewerbeamt nach.", en: "If unsure, leave this empty and ask your trade office." },
+        frage: { de: "Fällt deine Tätigkeit unter eine dieser Vorschriften?", en: "Is your business covered by one of these rules?" },
+        hilfe: { de: "Für diese Tätigkeiten verlangt die Gewerbeordnung eine Erlaubnis, eine Karte oder eine besondere Prüfung. Wenn du unsicher bist, lass alles leer und frag bei deinem Gewerbeamt nach.", en: "For these activities the Trade Regulation Act requires a permit, a card or a special check. If unsure, leave this empty and ask your trade office." },
         optionen: {
           "30": { de: "§ 30 Privatkrankenanstalten", en: "§ 30 Private clinics" },
           "31": { de: "§ 31 Bewachung auf Seeschiffen", en: "§ 31 Security on ships" },
@@ -199,6 +202,8 @@ export const SCHRITTE: Schritt[] = [
           "34f": { de: "§ 34f Finanzanlagenvermittlung", en: "§ 34f Financial investment mediation" },
           "34h": { de: "§ 34h Honorar-Finanzanlagenberatung", en: "§ 34h Fee-based investment advice" },
           "34i": { de: "§ 34i Immobiliardarlehensvermittlung", en: "§ 34i Mortgage credit mediation" },
+          // R12 (Rechtsprüfung Befund 6): überwachungsbedürftige Gewerbe
+          "38": { de: "§ 38 Gebrauchtwarenhandel, Schlüsseldienst, Detektei, Partner- oder Unterkunftsvermittlung", en: "§ 38 Second-hand trade, locksmith, detective agency, partner or accommodation brokerage" },
           "55": { de: "§ 55 Reisegewerbe (Reisegewerbekarte)", en: "§ 55 Itinerant trade" },
           keine: { de: "Keine davon", en: "None of these" },
         },
@@ -216,10 +221,10 @@ export const SCHRITTE: Schritt[] = [
       {
         feld: "ifsg.selbst",
         art: "auswahl",
-        frage: { de: "Arbeitest du selbst mit Lebensmitteln – zum Beispiel beim Kochen, Zubereiten oder Ausgeben?", en: "Do you work with food yourself – for example cooking, preparing or serving it?" },
+        frage: { de: "Arbeitest du selbst mit Lebensmitteln?", en: "Do you work with food yourself?" },
         hilfe: {
-          de: "Wer zum ersten Mal gewerbsmäßig mit Lebensmitteln nach § 42 IfSG arbeitet, braucht vorher eine Bescheinigung des Gesundheitsamts (früher „Gesundheitszeugnis“). Hast du schon eine aus einer früheren Tätigkeit, brauchst du keine neue.",
-          en: "Anyone who works commercially with food under § 42 IfSG for the first time needs a certificate from the public health office beforehand. If you already have one from earlier work, you don't need a new one.",
+          de: "Zum Beispiel beim Kochen, Zubereiten oder Ausgeben. Wer zum ersten Mal gewerbsmäßig mit Lebensmitteln nach § 42 IfSG arbeitet, braucht vorher eine Bescheinigung des Gesundheitsamts (früher „Gesundheitszeugnis“). Hast du schon eine aus einer früheren Tätigkeit, brauchst du keine neue.",
+          en: "For example cooking, preparing or serving it. Anyone who works commercially with food under § 42 IfSG for the first time needs a certificate from the public health office beforehand. If you already have one from earlier work, you don't need a new one.",
         },
         optionen: {
           erstmals: { de: "Ja, zum ersten Mal", en: "Yes, for the first time" },
@@ -291,8 +296,56 @@ export const SCHRITTE: Schritt[] = [
       {
         feld: "betriebsstaetten.anzahl",
         art: "zahl",
-        frage: { de: "An wie vielen Orten arbeitest du (Büro, Laden, Werkstatt)?", en: "At how many locations do you work (office, shop, workshop)?" },
-        hilfe: { de: "Zähle jede Betriebsstätte. Wenn du nur unterwegs oder bei Kunden arbeitest: 0.", en: "Count every business premises. If you only work on the road or at clients: 0." },
+        frage: { de: "Wie viele Betriebsstätten hast du (Laden, Büro, Werkstatt, Praxis)?", en: "How many business premises do you have (shop, office, workshop, practice)?" },
+        hilfe: {
+          de: "Zähle jeden Ort außerhalb deiner Wohnung, an dem du arbeitest, auch Filialen. Ein Arbeitszimmer in deiner eigenen Wohnung zählt nicht – dafür ist kein eigener Rundfunkbeitrag fällig. Wenn du nur zu Hause, unterwegs oder bei Kunden arbeitest: 0.",
+          en: "Count every place outside your home where you work, including branches. A study in your own home does not count – no separate broadcasting fee is due for it. If you only work at home, on the road or at clients: 0.",
+        },
+      },
+    ],
+  },
+  {
+    // R12 (Nutzertests Kurier, Kfz-Werkstatt): Firmenfahrzeuge und umweltrelevante Tätigkeiten
+    id: "fahrzeuge",
+    titel: { de: "Fahrzeuge und Umwelt", en: "Vehicles and environment" },
+    fragen: [
+      {
+        feld: "fahrzeuge.anzahl",
+        art: "zahl",
+        frage: { de: "Wie viele Firmenfahrzeuge nutzt dein Betrieb?", en: "How many company vehicles does your business use?" },
+        hilfe: { de: "Zugelassene Kraftfahrzeuge, die du beruflich nutzt – Pkw, Transporter, Lkw. Lastenräder zählen nicht. Keine: 0.", en: "Registered motor vehicles you use for work – cars, vans, trucks. Cargo bikes don't count. None: 0." },
+      },
+      {
+        feld: "fahrzeuge.gesamtmasse",
+        art: "mehrfach",
+        frage: { de: "Welche zulässige Gesamtmasse haben die Fahrzeuge?", en: "What is the permissible total mass of the vehicles?" },
+        hilfe: { de: "Steht im Fahrzeugschein (Feld F.2), bei Anhängern zusammen mit dem Anhänger. Davon hängen Fahrtenschreiber, Lenkzeiten und Erlaubnis ab.", en: "Shown in the registration certificate (field F.2), with a trailer including the trailer. Tachograph, driving times and licence depend on it." },
+        optionen: {
+          bis_2_5t: { de: "Bis 2,5 t (z. B. Pkw, kleiner Transporter)", en: "Up to 2.5 t (e.g. car, small van)" },
+          "2_5_bis_2_8t": { de: "Über 2,5 bis 2,8 t", en: "Over 2.5 up to 2.8 t" },
+          "2_8_bis_3_5t": { de: "Über 2,8 bis 3,5 t (z. B. Sprinter)", en: "Over 2.8 up to 3.5 t (e.g. large van)" },
+          ueber_3_5t: { de: "Über 3,5 t (Lkw)", en: "Over 3.5 t (truck)" },
+        },
+      },
+      {
+        feld: "fahrzeuge.ausland",
+        art: "janein",
+        frage: { de: "Fahrt ihr mit Waren auch ins Ausland?", en: "Do you also carry goods abroad?" },
+        hilfe: { de: "Grenzüberschreitende Fahrten oder Fahrten innerhalb eines anderen EU-Staats. Dafür gelten ab 2,5 t eigene Regeln.", en: "Cross-border trips or trips within another EU country. Separate rules apply from 2.5 t." },
+      },
+      {
+        feld: "umwelt.taetigkeiten",
+        art: "mehrfach",
+        frage: { de: "Was davon trifft auf deinen Betrieb zu?", en: "Which of these apply to your business?" },
+        hilfe: { de: "Für diese Tätigkeiten gelten Regeln zu Abfall, Rücknahme und Umweltschutz.", en: "Rules on waste, take-back and environmental protection apply to these activities." },
+        optionen: {
+          gefaehrliche_abfaelle: { de: "Es fallen gefährliche Abfälle an (z. B. Altöl, Ölfilter, Bremsflüssigkeit, ölige Lappen, Lösemittel)", en: "Hazardous waste arises (e.g. waste oil, oil filters, brake fluid, oily rags, solvents)" },
+          oelverkauf: { de: "Ich verkaufe Motor- oder Getriebeöl an Endverbraucher", en: "I sell engine or gear oil to end users" },
+          starterbatterien: { de: "Ich verkaufe Fahrzeugbatterien (Starterbatterien)", en: "I sell vehicle batteries (starter batteries)" },
+          klimaservice: { de: "Klimaanlagen-Service an Fahrzeugen", en: "Air-conditioning service on vehicles" },
+          abscheider: { de: "Wir haben einen Öl- oder Leichtflüssigkeitsabscheider (z. B. Waschplatz)", en: "We have an oil or light-liquid separator (e.g. washing bay)" },
+          keine: { de: "Nichts davon", en: "None of these" },
+        },
       },
     ],
   },
@@ -323,7 +376,7 @@ export const SCHRITTE: Schritt[] = [
         feld: "ust.voranmeldung_rhythmus",
         art: "auswahl",
         frage: { de: "Wie oft gibst du die Umsatzsteuer-Voranmeldung ab?", en: "How often do you file the advance VAT return?" },
-        hilfe: { de: "Das steht in deinen ELSTER-Bescheiden oder du fragst deine Steuerberatung. Wenn du es nicht weißt: „Weiß ich nicht“ – dann rechnet Amtlos mit der Steuer des Vorjahres.", en: "You find it in your ELSTER notices or can ask your tax adviser. If you don't know: “I don't know” – Amtlos then uses last year's tax." },
+        hilfe: { de: "Das legt das Finanzamt fest; es steht in deinen ELSTER-Bescheiden, oder du fragst deine Steuerberatung. Wenn du es nicht weißt: „Weiß ich nicht“ – dann rechnet Amtlos mit der Steuer des Vorjahres, ohne diese Angabe vorläufig vierteljährlich.", en: "The tax office decides; you find it in your ELSTER notices or can ask your tax adviser. If you don't know: “I don't know” – Amtlos then uses last year's tax, without it provisionally quarterly." },
         optionen: {
           monatlich: { de: "Monatlich", en: "Monthly" },
           quartalsweise: { de: "Vierteljährlich", en: "Quarterly" },
@@ -408,6 +461,38 @@ export const SCHRITTE: Schritt[] = [
         },
       },
       {
+        feld: "vertrieb.fernabsatz",
+        art: "janein",
+        frage: { de: "Nimmst du Aufträge von Privatkunden per Telefon, E-Mail oder Messenger an?", en: "Do you accept orders from private customers by phone, email or messenger?" },
+        hilfe: {
+          de: "Gemeint sind Aufträge, ohne dass ihr euch vorher persönlich trefft – etwa ein Angebot per E-Mail, das der Kunde per WhatsApp bestätigt. Das ist in der Regel ein Fernabsatzvertrag mit Widerrufsrecht (§ 312c BGB).",
+          en: "This means orders without meeting in person beforehand – e.g. a quote by email that the customer confirms via WhatsApp. This is usually a distance contract with a right of withdrawal (§ 312c BGB).",
+        },
+      },
+      {
+        feld: "verkauf.alkohol_tabak",
+        art: "mehrfach",
+        frage: { de: "Verkaufst oder schenkst du Alkohol oder Tabak aus?", en: "Do you sell or serve alcohol or tobacco?" },
+        hilfe: { de: "Auch E-Zigaretten und Shishas zählen als Tabak. Dann gilt der Jugendschutz.", en: "E-cigarettes and shishas count as tobacco too. Youth protection rules then apply." },
+        optionen: {
+          alkohol: { de: "Alkohol (Bier, Wein, Spirituosen)", en: "Alcohol (beer, wine, spirits)" },
+          tabak: { de: "Tabakwaren, E-Zigaretten oder Shishas", en: "Tobacco, e-cigarettes or shishas" },
+          keine: { de: "Nichts davon", en: "None of these" },
+        },
+      },
+      {
+        feld: "oeffentliche_wiedergabe",
+        art: "janein",
+        frage: { de: "Läuft bei dir Musik, Radio oder Fernsehen für Kundschaft oder Gäste?", en: "Do you play music, radio or TV for customers or guests?" },
+        hilfe: { de: "Auch Musik in Kursen oder im Wartebereich zählt. Das ist eine öffentliche Wiedergabe – dafür brauchst du eine Lizenz, etwa von der GEMA.", en: "Music in classes or in the waiting area counts too. This is a public performance – you need a licence for it, for example from GEMA." },
+      },
+      {
+        feld: "nachunternehmer",
+        art: "janein",
+        frage: { de: "Beauftragst du Subunternehmer?", en: "Do you hire subcontractors?" },
+        hilfe: { de: "Andere Firmen oder Solo-Selbstständige, die Aufträge ausführen, die du übernommen hast – zum Beispiel Fahrer, Reinigungs- oder Baufirmen.", en: "Other companies or solo self-employed people who carry out orders you took on – for example drivers, cleaning or construction firms." },
+      },
+      {
         feld: "gastro.to_go",
         art: "janein",
         frage: { de: "Verkaufst du Essen oder Getränke zum Mitnehmen in Einwegverpackungen?", en: "Do you sell food or drinks to take away in single-use packaging?" },
@@ -431,14 +516,14 @@ export const SCHRITTE: Schritt[] = [
       {
         feld: "produkte.hersteller",
         art: "janein",
-        frage: { de: "Stellst du eigene Produkte her, verkaufst du Produkte unter deinem eigenen Namen oder importierst du sie von außerhalb der EU?", en: "Do you make your own products, sell products under your own name or brand, or import them from outside the EU?" },
-        hilfe: { de: "Wenn du nur fertige Markenware anderer Hersteller weiterverkaufst oder verwendest: Nein.", en: "If you only resell or use finished branded goods from other manufacturers: No." },
+        frage: { de: "Bist du selbst Hersteller deiner Produkte?", en: "Are you the manufacturer of your products?" },
+        hilfe: { de: "Ja, wenn du eigene Produkte herstellst, unter deinem eigenen Namen verkaufst oder von außerhalb der EU importierst. Wenn du nur fertige Markenware anderer Hersteller weiterverkaufst oder verwendest: Nein.", en: "Yes if you make your own products, sell them under your own name or brand, or import them from outside the EU. If you only resell or use finished branded goods from other manufacturers: No." },
       },
       {
         feld: "produkte.erstinverkehrbringer",
         art: "janein",
-        frage: { de: "Bringst du Elektrogeräte oder Batterien selbst erstmals in Deutschland in Verkehr – als Hersteller, unter deiner eigenen Marke oder als Importeur?", en: "Do you place electrical devices or batteries on the German market for the first time yourself – as manufacturer, under your own brand or as importer?" },
-        hilfe: { de: "Kaufst du die Geräte bei einem Händler in Deutschland und verkaufst oder baust sie nur ein, ist das in der Regel nicht der Fall.", en: "If you buy the devices from a dealer in Germany and only resell or install them, this is usually not the case." },
+        frage: { de: "Bringst du Elektrogeräte oder Batterien erstmals in Deutschland in Verkehr?", en: "Do you place electrical devices or batteries on the German market for the first time?" },
+        hilfe: { de: "Also als Hersteller, unter deiner eigenen Marke oder als Importeur. Kaufst du die Geräte bei einem Händler in Deutschland und verkaufst oder baust sie nur ein, ist das in der Regel nicht der Fall.", en: "That is as manufacturer, under your own brand or as importer. If you buy the devices from a dealer in Germany and only resell or install them, this is usually not the case." },
       },
       {
         feld: "bauleistungen.fuer_unternehmen",
@@ -453,8 +538,8 @@ export const SCHRITTE: Schritt[] = [
       {
         feld: "online.social_media",
         art: "janein",
-        frage: { de: "Hast du ein geschäftliches Profil in sozialen Netzwerken (z. B. Instagram, Facebook, LinkedIn)?", en: "Do you have a business profile on social networks (e.g. Instagram, Facebook, LinkedIn)?" },
-        hilfe: { de: "Auch dort brauchst du ein Impressum.", en: "You need a legal notice (Impressum) there too." },
+        frage: { de: "Hast du ein Geschäftsprofil in sozialen Netzwerken?", en: "Do you have a business profile on social networks?" },
+        hilfe: { de: "Zum Beispiel bei Instagram, Facebook oder LinkedIn. Auch dort brauchst du ein Impressum.", en: "For example on Instagram, Facebook or LinkedIn. You need a legal notice (Impressum) there too." },
       },
       {
         feld: "handel.hohe_bargeschaefte",
@@ -463,19 +548,30 @@ export const SCHRITTE: Schritt[] = [
         hilfe: { de: "Wenn du nur Dienstleistungen verkaufst oder keine großen Beträge bar annimmst: Nein.", en: "If you only sell services or don't accept large amounts in cash: No." },
       },
       {
+        // R12 (Nutzertests Kurier #14, Coach #14): ohne Bargeld keine Kasse – „Keine Kasse, nur Rechnungen“
+        feld: "kasse.bargeld",
+        art: "janein",
+        frage: { de: "Nimmst du Bargeld an?", en: "Do you accept cash?" },
+        hilfe: { de: "Wenn du nur Rechnungen schreibst und per Überweisung oder Karte bezahlt wirst: Nein – dann brauchst du keine Kasse.", en: "If you only issue invoices and are paid by transfer or card: No – then you don't need a till." },
+      },
+      {
         feld: "kasse.elektronisch",
         art: "janein",
-        frage: { de: "Nutzt du eine elektronische Kasse?", en: "Do you use an electronic till?" },
+        frage: { de: "Nutzt du für das Bargeld eine elektronische Kasse?", en: "Do you use an electronic till for cash?" },
         hilfe: {
-          de: "Ein Kartenterminal allein ist keine Kasse, eine Kassen-App auf Handy oder Tablet schon. Ohne elektronische Kasse führst du eine offene Ladenkasse mit Kassenbericht. Weißt du es noch nicht, überspring die Frage.",
-          en: "A card terminal alone is not a till, but a till app on a phone or tablet is. Without an electronic till you keep an open cash box with a daily cash report. If you don't know yet, skip the question.",
+          de: "Ein Kartenterminal allein ist keine Kasse, eine Kassen-App auf Handy oder Tablet schon. Nimmst du Bargeld ohne elektronische Kasse an, führst du eine offene Ladenkasse mit Kassenbericht. Weißt du es noch nicht, überspring die Frage.",
+          en: "A card terminal alone is not a till, but a till app on a phone or tablet is. If you take cash without an electronic till, you keep an open cash box with a daily cash report. If you don't know yet, skip the question.",
         },
       },
       {
         feld: "kasse.angeschafft_am",
         art: "datum",
-        frage: { de: "Seit wann hast du die elektronische Kasse – oder wann schaffst du sie an?", en: "Since when have you had the electronic till – or when will you get it?" },
-        hilfe: { de: "Ab diesem Tag hast du einen Monat Zeit, sie dem Finanzamt zu melden.", en: "From this day you have one month to report it to the tax office." },
+        frage: { de: "Seit wann hast du eine elektronische Kasse – oder wann schaffst du sie an?", en: "Since when have you had an electronic till – or when will you get it?" },
+        // R12 (Nutzertest Bäckerei #12): mehrere Kassen – jede wird gemeldet
+        hilfe: {
+          de: "Ab diesem Tag hast du einen Monat Zeit, sie dem Finanzamt zu melden. Hast du mehrere Kassen, gib die erste an – jede weitere meldest du ebenso innerhalb eines Monats nach der Anschaffung, je Betriebsstätte.",
+          en: "From this day you have one month to report it to the tax office. If you have several tills, enter the first – you report each further till within one month of purchase as well, per business premises.",
+        },
       },
     ],
   },
@@ -512,7 +608,7 @@ export const SCHRITTE: Schritt[] = [
           bau: { de: "Baugewerbe", en: "Construction" },
           gastronomie: { de: "Gaststätten und Beherbergung (z. B. Restaurant, Café, Hotel)", en: "Restaurants and accommodation (e.g. restaurant, café, hotel)" },
           personenbefoerderung: { de: "Personenbeförderung", en: "Passenger transport" },
-          spedition_logistik: { de: "Spedition, Transport und Logistik", en: "Haulage, transport and logistics" },
+          spedition_logistik: { de: "Spedition, Transport und Logistik (auch Kurier-, Express- und Paketdienste)", en: "Haulage, transport and logistics (including courier, express and parcel services)" },
           schausteller: { de: "Schaustellergewerbe", en: "Fairground and showmen's trade" },
           gebaeudereinigung: { de: "Gebäudereinigung", en: "Building cleaning" },
           messebau: { de: "Auf- und Abbau von Messen und Ausstellungen", en: "Setting up and dismantling trade fairs and exhibitions" },
@@ -521,7 +617,7 @@ export const SCHRITTE: Schritt[] = [
           sicherheitsgewerbe: { de: "Wach- und Sicherheitsgewerbe", en: "Guarding and security services" },
           friseur: { de: "Friseurgewerbe", en: "Hairdressing" },
           kosmetik: { de: "Kosmetikgewerbe (z. B. Kosmetik-, Nagelstudio)", en: "Beauty trade (e.g. beauty or nail salon)" },
-          lieferdienste: { de: "Plattformbasierte Lieferdienste", en: "Platform-based delivery services" },
+          lieferdienste: { de: "Plattformbasierte Lieferdienste (Bestellungen kommen über eine App oder Online-Plattform, z. B. Essenslieferung)", en: "Platform-based delivery services (orders come via an app or online platform, e.g. food delivery)" },
           keine: { de: "Keine davon", en: "None of these" },
         },
       },
@@ -542,8 +638,11 @@ export const SCHRITTE: Schritt[] = [
       {
         feld: "personal.drittstaaten",
         art: "janein",
-        frage: { de: "Beschäftigst du Menschen, die keine Staatsangehörigkeit eines EU-Staats, aus Island, Liechtenstein, Norwegen oder der Schweiz haben?", en: "Do you employ people who are not nationals of an EU country, Iceland, Liechtenstein, Norway or Switzerland?" },
-        hilfe: { de: "Dann prüfst du vor Beginn, ob sie bei dir arbeiten dürfen, und bewahrst eine Kopie des Aufenthaltstitels auf.", en: "Then you check before they start whether they may work for you and keep a copy of the residence permit." },
+        frage: { de: "Beschäftigst du Menschen von außerhalb der EU?", en: "Do you employ people from outside the EU?" },
+        hilfe: {
+          de: "Gemeint sind Menschen ohne Staatsangehörigkeit eines EU-Staats, Islands, Liechtensteins, Norwegens oder der Schweiz. Dann prüfst du vor Beginn, ob sie bei dir arbeiten dürfen, und bewahrst eine Kopie des Aufenthaltstitels auf.",
+          en: "This means people who are not nationals of an EU country, Iceland, Liechtenstein, Norway or Switzerland. Then you check before they start whether they may work for you and keep a copy of the residence permit.",
+        },
       },
       {
         feld: "personal.lohnsteuer_anmeldezeitraum",
@@ -572,7 +671,25 @@ export const SCHRITTE: Schritt[] = [
         },
       },
       { feld: "arbeitsschutz.elektrische_geraete", art: "janein", frage: { de: "Nutzt ihr im Betrieb elektrische Geräte (z. B. Computer, Maschinen, Küchengeräte)?", en: "Do you use electrical equipment at work (e.g. computers, machines, kitchen appliances)?" } },
-      { feld: "arbeitsschutz.gefahrstoffe", art: "janein", frage: { de: "Arbeitet ihr mit Gefahrstoffen (z. B. Reinigungs-, Lösungs- oder Färbemittel mit Warnzeichen)?", en: "Do you work with hazardous substances (e.g. cleaning agents, solvents or dyes with warning symbols)?" } },
+      {
+        feld: "arbeitsschutz.gefahrstoffe",
+        art: "janein",
+        frage: { de: "Arbeitet ihr mit Gefahrstoffen?", en: "Do you work with hazardous substances?" },
+        // R12 (Nutzertest Bäckerei #6): Mehl hat kein Warnzeichen – Mehlstaub ist trotzdem ein Gefahrstoff
+        hilfe: {
+          de: "Zum Beispiel Reinigungs-, Lösungs- oder Färbemittel mit Warnzeichen – aber auch Mehlstaub in der Backstube, Holzstaub, Schweißrauch, Abgase oder Bremsenreiniger in der Werkstatt.",
+          en: "For example cleaning agents, solvents or dyes with warning symbols – but also flour dust in the bakery, wood dust, welding fumes, exhaust fumes or brake cleaner in the workshop.",
+        },
+      },
+      {
+        feld: "arbeitszeit.nachtarbeit",
+        art: "janein",
+        frage: { de: "Arbeitet bei dir jemand regelmäßig nachts?", en: "Does anyone work for you regularly at night?" },
+        hilfe: {
+          de: "Gemeint ist Arbeit von mehr als zwei Stunden zwischen 23 und 6 Uhr – in Bäckereien und Konditoreien zwischen 22 und 5 Uhr (§ 2 Abs. 3, 4 ArbZG).",
+          en: "This means more than two hours of work between 11 pm and 6 am – in bakeries and confectioneries between 10 pm and 5 am (§ 2(3), (4) ArbZG).",
+        },
+      },
     ],
   },
   {
@@ -590,6 +707,7 @@ export const SCHRITTE: Schritt[] = [
           videoueberwachung: { de: "Videoüberwachung", en: "Video surveillance" },
           newsletter: { de: "Newsletter", en: "Newsletter" },
           tracking: { de: "Tracking auf der Website", en: "Website tracking" },
+          ortung: { de: "Ortung von Fahrzeugen oder Beschäftigten (GPS, Telematik)", en: "Tracking of vehicles or staff (GPS, telematics)" },
           keine: { de: "Keine", en: "None" },
         },
       },

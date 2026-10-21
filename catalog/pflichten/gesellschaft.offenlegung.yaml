@@ -1,15 +1,14 @@
 # Katalog B.18 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.offenlegung
-version: 2
+version: 3
 katalog_nr: B.18
 titel:
   de: Jahresabschluss offenlegen
 kurz:
   de: Den Jahresabschluss reichst du spätestens zwölf Monate nach Ende des Geschäftsjahres beim Unternehmensregister ein.
 erklaerung:
-  de: Kapitalgesellschaften müssen ihren Jahresabschluss beim Unternehmensregister offenlegen, binnen zwölf Monaten nach Ende
-    des Geschäftsjahres. Kleinstkapitalgesellschaften können ihn stattdessen hinterlegen.
+  de: Kapitalgesellschaften und die GmbH & Co. KG (§ 264a HGB) müssen ihren Jahresabschluss beim Unternehmensregister offenlegen, binnen zwölf Monaten nach Ende des Geschäftsjahres. Kleinstkapitalgesellschaften können ihn stattdessen hinterlegen.
 begriffe:
 - begriff:
     de: Offenlegung
@@ -17,14 +16,16 @@ begriffe:
     de: Der Jahresabschluss wird öffentlich zugänglich beim Unternehmensregister eingereicht.
 rechtsgrundlage:
 - § 325 HGB
+- § 264a HGB
+- § 335 HGB
 kategorie: gesellschaft
 ausloeser:
   all:
-  - feld: abgeleitet.ist_kapitalgesellschaft
+  - feld: abgeleitet.ist_kapitalgesellschaft_oder_co_kg
     op: ==
     wert: true
     label:
-      de: Dein Unternehmen ist eine UG oder GmbH.
+      de: Dein Unternehmen ist eine UG, GmbH oder GmbH & Co. KG.
   # R11 (Nutzertest Tischlerei #1): die Pflicht gilt jeder UG/GmbH – ohne Angabe zum Geschäftsjahr wie meist mit dem Kalenderjahr
   - not:
       all:
@@ -53,7 +54,7 @@ kanal: portal
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Das Bundesamt für Justiz setzt ein Ordnungsgeld von 2.500 € bis 25.000 € fest (§ 335 Abs. 1 HGB). Wird die Offenlegung erst nach der Androhung nachgeholt, kann es herabgesetzt werden – bei Kleinstkapitalgesellschaften auf 500 €, bei kleinen Gesellschaften auf 1.000 € (§ 335 Abs. 4 HGB).
   schwere: hoch
 automatisierung: hinweis
 aktion:
@@ -71,13 +72,12 @@ quellen:
   url: https://www.unternehmensregister.de/
   abgerufen: null
 fachlich_zu_pruefen:
-- 'Ohne Angabe zum Geschäftsjahr gilt die Pflicht mit Terminen nach dem Kalenderjahr (R11, Nutzertest Tischlerei) – Rückfrage zum Geschäftsjahr bleibt in der App'
+- 'R12 (Rechtsprüfung Befunde 1 und 9): GmbH & Co. KG (§ 264a HGB); Sanktion § 335 Abs. 1 und 4 HGB – Beträge bestätigen'
+- Ohne Angabe zum Geschäftsjahr gilt die Pflicht mit Terminen nach dem Kalenderjahr (R11, Nutzertest Tischlerei) – Rückfrage zum Geschäftsjahr bleibt in der App
 - Frist „binnen 12 Monaten“ als 31.12. des Folgejahres umgesetzt (Kalenderjahr) – bestätigen
 - Verschiebung bei Fristende am Wochenende/Feiertag festlegen
 - 'Kleinstkapitalgesellschaft: Merkmale nicht in der Spezifikation – nur Hinweis auf Hinterlegung'
 - 'Erstes Rumpfgeschäftsjahr nach Gründung: Periodenbeginn prüfen'
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf
   geprueft_von: null

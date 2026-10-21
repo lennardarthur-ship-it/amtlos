@@ -194,6 +194,8 @@ export function standBauen(): Bau {
           id: r.id, vorlage: "rechnung", datum: r.datum, worum: r.worum, ordner: "rechnungen",
           daten: () => ({
             ...personIn(v("rechnung"), kunde),
+            // Preise im Szenario netto (seit R12 ist „brutto“ bei Café, Friseur und reinen Privatkunden vorbelegt)
+            preise_brutto: false,
             ...(r.kundeAbweichend ? { kunde_name: r.kundeAbweichend.name, kunde_anschrift: r.kundeAbweichend.anschrift } : {}),
             datum: r.datum,
             leistung_gleich: !r.leistung,

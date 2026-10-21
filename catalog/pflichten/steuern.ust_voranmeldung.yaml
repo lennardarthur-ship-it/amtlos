@@ -1,7 +1,7 @@
 # Katalog C.24. Zeigt: Rhythmus abhängig von Fakten, Regelwerte, Dauerfristverlängerung.
 schema_version: 1
 id: steuern.ust_voranmeldung
-version: 3
+version: 4
 katalog_nr: C.24
 titel:
   de: Umsatzsteuer-Voranmeldung abgeben
@@ -12,7 +12,9 @@ erklaerung:
     Wer Umsatzsteuer auf Rechnungen ausweist, gibt je nach Höhe der Steuer im Vorjahr
     monatlich oder vierteljährlich eine Voranmeldung über ELSTER ab. Liegt dein Umsatz über
     der Kleinunternehmergrenze, gilt die Pflicht sicher – offen ist dann nur, ob monatlich
-    oder vierteljährlich. Amtlos bereitet die Zahlen vor; du übermittelst selbst.
+    oder vierteljährlich. Den Rhythmus legt das Finanzamt fest – er steht in deinen Bescheiden.
+    Weißt du ihn nicht und kennt Amtlos die Steuer des Vorjahres nicht, rechnet Amtlos
+    vorläufig mit vierteljährlich. Amtlos bereitet die Zahlen vor; du übermittelst selbst.
 rechtsgrundlage: ["§ 18 UStG"]
 kategorie: steuern
 ausloeser:
@@ -82,6 +84,7 @@ frist:
                 - any:
                     - { feld: profil.ust.voranmeldung_rhythmus, op: nicht_vorhanden }
                     - { feld: profil.ust.voranmeldung_rhythmus, op: "==", wert: unklar }
+                - { feld: profil.ust.zahllast_vorjahr, op: vorhanden }
                 - feld: profil.ust.zahllast_vorjahr
                   op: ">"
                   wert: { regelwert: steuern.ust_va.grenze_monatlich }
@@ -95,10 +98,22 @@ frist:
                 - any:
                     - { feld: profil.ust.voranmeldung_rhythmus, op: nicht_vorhanden }
                     - { feld: profil.ust.voranmeldung_rhythmus, op: "==", wert: unklar }
+                - { feld: profil.ust.zahllast_vorjahr, op: vorhanden }
                 - feld: profil.ust.zahllast_vorjahr
                   op: "<="
                   wert: { regelwert: steuern.ust_va.grenze_monatlich }
+            # R12 (UX #3): „Weiß ich nicht“ ohne Steuer des Vorjahres ⇒ vorläufig vierteljährlich (mit Hinweis im Text)
+            - all:
+                - { feld: profil.ust.voranmeldung_rhythmus, op: vorhanden }
+                - { feld: profil.ust.voranmeldung_rhythmus, op: "==", wert: unklar }
+                - { feld: profil.ust.zahllast_vorjahr, op: nicht_vorhanden }
         dann: quartalsweise
+      # ohne Angabe zum Rhythmus und ohne Steuer des Vorjahres bleibt der Rhythmus offen (Rückfrage)
+      - wenn:
+          feld: profil.ust.zahllast_vorjahr
+          op: ">"
+          wert: { regelwert: steuern.ust_va.grenze_monatlich }
+        dann: monatlich
     sonst: quartalsweise
   faellig: { art: tag_nach_periodenende, monate_nach: 1, tag: 10 }
   verlaengerung:
@@ -131,6 +146,7 @@ fachlich_zu_pruefen:
   - "Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen (früherer Text war nicht belegt)"
   - "Befreiung bis Grenze ist laut Spezifikation 'möglich' (Ermessen Finanzamt?) – Auslöser bildet das als 'gilt nicht' ab; Formulierung prüfen"
   - "Neugründer: Aussetzung der monatlichen Pflicht 2021–2026 (Radar) – Rhythmus im Gründungs- und Folgejahr festlegen"
+  - "R12 (UX #3): Rhythmus „weiß ich nicht“ ohne Vorjahressteuer ⇒ vorläufig vierteljährlich (Produktentscheidung) – Rechtsfolge durch die Steuerprüfung bestätigen"
   - "Sondervorauszahlung 1/11 bei monatlicher Dauerfristverlängerung als eigene Pflicht anlegen"
   - "Verschiebung auf nächsten Werktag und Feiertagskalender (Bundesland) bestätigen"
   - "gueltig_ab: Datum der heutigen Fassung der Grenzen eintragen"

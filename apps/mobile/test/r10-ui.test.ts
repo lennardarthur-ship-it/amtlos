@@ -30,9 +30,10 @@ describe("Eingaben (Sabine #12, #13, Mehmet #21)", () => {
 
 describe("Trennstellen bei großer Schrift (Mehmet #10, #23)", () => {
   it("trennt an Fugen und in langen Teilen nach Silben", () => {
-    expect(ohne(trennen("Sozialversicherungsbeiträge"))).toBe("Sozial-ver-si-che-rungs-beiträge");
-    expect(ohne(trennen("Kleinunternehmerregelung"))).toBe("Klein-unternehmer-regelung");
-    expect(ohne(trennen("Temperaturkontrolle"))).toBe("Tem-pe-ra-tur-kontrolle");
+    // R12 (UX #8): TeX-Muster (hyph-de-1996) – an allen Silben, Fugen richtig
+    expect(ohne(trennen("Sozialversicherungsbeiträge"))).toBe("So-zi-al-ver-si-che-rungs-bei-trä-ge");
+    expect(ohne(trennen("Kleinunternehmerregelung"))).toBe("Klein-un-ter-neh-mer-re-ge-lung");
+    expect(ohne(trennen("Temperaturkontrolle"))).toBe("Tem-pe-ra-tur-kon-trol-le");
     expect(ohne(trennen("Hautschutzplan"))).toBe("Haut-schutz-plan");
     // kurze Wörter, Adressen und Links bleiben, wie sie sind
     expect(trennen("Pflichten")).toBe("Pflichten");

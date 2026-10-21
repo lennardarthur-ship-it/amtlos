@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from "react";
 import { View } from "react-native";
-import { PLATZHALTER, cent, passtZuGruppen, type Daten, type EinfachesFeld, type Eintrag, type EintragWert, type Option } from "@amtlos/fachlogik";
+import { PLATZHALTER, cent, optionSichtbar, passtZuGruppen, type Daten, type EinfachesFeld, type Eintrag, type EintragWert, type Option } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { Auswahl, BausteinListe, DatumFeld, Feld, MehrfachWahl, Schalter, T, TextKnopf, UhrzeitFeld, Wahl } from "./bausteine";
 import { RADIUS, useFarben } from "./thema";
@@ -137,12 +137,14 @@ function tastaturFuer(id: string): Partial<React.ComponentProps<typeof Feld>> {
  * Fritteuse, beim Elektriker keine Friseurchemikalien.
  */
 function BausteineNachBranche({ feld, werte, setzen }: { feld: Extract<EinfachesFeld, { art: "bausteine" }>; werte: string[]; setzen: (w: string[]) => void }) {
-  const { gruppen } = useContext(EingabeKontext);
+  const { gruppen, daten } = useContext(EingabeKontext);
   const [alle, setAlle] = useState(false);
-  const [da, rest] = aufteilen(feld.optionen, gruppen, werte);
+  // R12 (Coach #18): Bausteine mit Bedingung (z. B. nicht bei Kleinunternehmern) – gewählte bleiben sichtbar
+  const moeglich = feld.optionen.filter((o) => werte.includes(o.wert) || !daten || optionSichtbar(o, daten));
+  const [da, rest] = aufteilen(moeglich, gruppen, werte);
   return (
     <View>
-      <BausteinListe label={feld.label} hilfe={feld.hilfe} werte={werte} aendern={setzen} optionen={alle ? feld.optionen : da} />
+      <BausteinListe label={feld.label} hilfe={feld.hilfe} werte={werte} aendern={setzen} optionen={alle ? moeglich : da} />
       {rest.length ? <TextKnopf symbol={alle ? "chevron.up" : "chevron.down"} erweitert={alle} text={alle ? TEXT.weniger_themen : TEXT.weitere_themen(rest.length)} onPress={() => setAlle(!alle)} stil={{ marginTop: 6 }} /> : null}
     </View>
   );

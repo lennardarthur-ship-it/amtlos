@@ -5,7 +5,7 @@
 import { teilnahmeTabelle } from "./arbeitsschutz.js";
 import { mitVertretung } from "./betrieb.js";
 import { MINDESTLOHN, MINIJOB, NACHWG } from "./bausteine.js";
-import { abschnitt, absatz, angaben, anschrift, anschriftMehrzeilig, auswahl, cent, datumDe, dokument, euro, ja, liste, neufassung, parteien, punkte, stabileOption, tabelle, text, unterschriften, zahl, zahlText, zelle, zeilen } from "./html.js";
+import { abschnitt, absatz, angaben, anschrift, anschriftMehrzeilig, auswahl, cent, datumDe, dokument, euro, fassungNachsatz, ja, liste, neufassung, parteien, punkte, stabileOption, tabelle, text, unterschriften, zahl, zahlText, zelle, zeilen } from "./html.js";
 import { optionen } from "./konstanten.js";
 import type { Daten, Vorlage } from "./typen.js";
 
@@ -68,7 +68,10 @@ export const nachweisArbeitsbedingungen: Vorlage = {
   beschreibung: "Niederschrift aller Angaben nach § 2 Abs. 1 NachwG zum Unterschreiben und Aushändigen – mit Kündigungsregeln aus dem Gesetz und Prüfung gegen Mindestlohn und Mindesturlaub.",
   bereich: "personal",
   pflichten: ["personal.nachweisgesetz"],
-  person: { art: "mitarbeiter", felder: { name: "name", anschrift: "anschrift", beginn: "beginn", taetigkeit: "taetigkeit" } },
+  // R12 (Zoll #2, #9): nach dem Teilen festgeschrieben; eine Änderung (z. B. Lohnerhöhung) wird eine neue Fassung
+  festschreiben: true,
+  korrektur: true,
+  person: { art: "mitarbeiter", felder: { name: "name", anschrift: "anschrift", beginn: "beginn", taetigkeit: "taetigkeit", wochenstunden: "wochenstunden", entgelt_art: "entgelt_art" } },
   grundlage: "§ 2 Abs. 1 NachwG",
   namensFeld: "name",
   abschnitte: [
@@ -220,6 +223,7 @@ export const nachweisArbeitsbedingungen: Vorlage = {
         `<p class="klein">Diese Niederschrift hält die wesentlichen Vertragsbedingungen nach § 2 Abs. 1 Nachweisgesetz fest. Sie ersetzt keinen Arbeitsvertrag; bestehende vertragliche Vereinbarungen gelten weiter.</p>` +
         abschnitt("Vertragsparteien", parteien({ rolle: "Arbeitgeber", name: b.name, anschrift: anschriftMehrzeilig(b), zusatz: vertreten || undefined }, { rolle: "beschäftigte Person", name: text(d, "name"), anschrift: text(d, "anschrift") })) +
         punkteNw.join("") +
+        fassungNachsatz(d) +
         unterschriften([vertreten ? `Arbeitgeber/in, ${vertreten}` : "Arbeitgeber/in", "Beschäftigte Person (Erhalt bestätigt)"], { ortDatum: true }),
     });
   },
@@ -296,7 +300,10 @@ export const ausweisHinweis: Vorlage = {
   beschreibung: "Schriftlicher Hinweis an eine beschäftigte Person, bei der Arbeit einen Ausweis mitzuführen (§ 2a SchwarzArbG) – mit Unterschrift als Nachweis.",
   bereich: "personal",
   pflichten: ["personal.ausweis_hinweis"],
-  person: { art: "mitarbeiter", felder: { name: "name" } },
+  // R12 (Zoll #2, #6): festgeschrieben nach dem Teilen; Beginn aus „Mitarbeiter“ für die Prüfung „vor Beginn“
+  festschreiben: true,
+  korrektur: true,
+  person: { art: "mitarbeiter", felder: { name: "name", beginn: "beginn" } },
   grundlage: "§ 2a SchwarzArbG",
   namensFeld: "name",
   abschnitte: [
@@ -306,15 +313,23 @@ export const ausweisHinweis: Vorlage = {
       felder: [
         { id: "name", art: "text", label: "Name der beschäftigten Person", pflicht: true },
         { id: "datum", art: "datum", label: "Ausgehändigt am", vorbelegung: "heute", pflicht: true },
+        { id: "beginn", art: "datum", label: "Beginn der Beschäftigung", hilfe: "Aus „Mitarbeiter“. Der Hinweis muss vor diesem Tag ausgehändigt sein." },
       ],
     },
   ],
+  // R12 (Zoll #6): nach Beginn ausgehändigt – kein Fehlen einer Angabe, aber ein Verstoß, den das PDF dokumentiert
+  hinweise(d) {
+    const datum = text(d, "datum");
+    const beginn = text(d, "beginn");
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(datum) || !/^\d{4}-\d{2}-\d{2}$/.test(beginn) || datum <= beginn) return [];
+    return [`Der Hinweis ist auf den ${datumDe(datum)} datiert, die Beschäftigung begann am ${datumDe(beginn)}. Nach § 2a Abs. 2 SchwarzArbG ist er vor Beginn der Arbeit auszuhändigen. Trag das tatsächliche Datum ein – händige den Hinweis künftig vor dem ersten Arbeitstag aus.`];
+  },
   html(d, b) {
     return dokument({
       titel: "Hinweis auf die Ausweispflicht",
       betrieb: b,
       unter: text(d, "name") || undefined,
-      meta: `Beschäftigte Person: ${text(d, "name")}\nAusgehändigt am: ${datumDe(text(d, "datum"))}`,
+      meta: `Beschäftigte Person: ${text(d, "name")}\nBeginn der Beschäftigung: ${datumDe(text(d, "beginn"))}\nAusgehändigt am: ${datumDe(text(d, "datum"))}`,
       inhalt:
         (!text(d, "name") ? abschnitt("Angaben", angaben([["Beschäftigte Person", ""]])) : "") +
         abschnitt(
@@ -322,6 +337,7 @@ export const ausweisHinweis: Vorlage = {
           absatz("Bei der Erbringung von Dienst- oder Werkleistungen sind Sie verpflichtet, Ihren Personalausweis, Pass, Passersatz oder Ausweisersatz mitzuführen und den Behörden der Zollverwaltung auf Verlangen vorzulegen (§ 2a Abs. 1 SchwarzArbG).") +
             absatz("Mit Ihrer Unterschrift bestätigen Sie, dass Sie diesen Hinweis erhalten haben."),
         ) +
+        fassungNachsatz(d) +
         unterschriften(["Ort, Datum", "Unterschrift beschäftigte Person", "Unterschrift Arbeitgeber/in"]),
     });
   },

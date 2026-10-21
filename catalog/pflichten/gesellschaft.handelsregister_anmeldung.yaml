@@ -1,31 +1,32 @@
 # Katalog B.15 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.handelsregister_anmeldung
-version: 1
+version: 2
 katalog_nr: B.15
 titel:
-  de: Gesellschaft im Handelsregister eintragen lassen
+  de: Gesellschaft im Register eintragen lassen
 kurz:
-  de: Der Notar meldet die Gesellschaft zum Handelsregister an; mit der Eintragung entsteht die GmbH oder UG.
+  de: Die Gesellschaft wird zum Handelsregister angemeldet, die Partnerschaftsgesellschaft zum Partnerschaftsregister – GmbH und UG entstehen erst mit der Eintragung.
 erklaerung:
-  de: Zur Anmeldung gehört die Gesellschafterliste. Spätere Änderungen, etwa im Gesellschaftsvertrag oder bei der Geschäftsführung,
-    werden ebenfalls notariell angemeldet.
+  de: GmbH und UG meldet der Notar zum Handelsregister an. Zur Anmeldung gehört die Gesellschafterliste, und die Geschäftsführung versichert, dass die Einlagen geleistet sind (§§ 7, 8 GmbHG). Die GmbH & Co. KG meldest du ebenfalls über einen Notar zum Handelsregister an (§ 106 HGB i. V. m. § 161 Abs. 2 HGB), die Partnerschaftsgesellschaft zum Partnerschaftsregister (§ 4 PartGG). Spätere Änderungen, etwa im Gesellschaftsvertrag oder bei der Geschäftsführung, werden ebenfalls angemeldet.
 rechtsgrundlage:
-- HGB
-- GmbHG
+- §§ 7, 8 GmbHG
+- § 106 HGB
+- § 161 Abs. 2 HGB
+- § 4 PartGG
 kategorie: gesellschaft
 ausloeser:
   all:
-  - feld: abgeleitet.ist_kapitalgesellschaft
+  - feld: abgeleitet.ist_eingetragene_gesellschaft
     op: ==
     wert: true
     label:
-      de: Dein Unternehmen ist eine UG oder GmbH.
+      de: Deine Gesellschaft wird im Handels- oder Partnerschaftsregister eingetragen.
   - feld: profil.gesellschaft.handelsregister
     op: '!='
     wert: eingetragen
     label:
-      de: Deine Gesellschaft ist noch nicht im Handelsregister eingetragen.
+      de: Deine Gesellschaft ist noch nicht im Register eingetragen.
 phase: gruendung
 voraussetzungen:
 - gesellschaft.stammkapital_einzahlen
@@ -55,12 +56,14 @@ quellen:
 - titel: Handelsgesetzbuch
   url: https://www.gesetze-im-internet.de/hgb/
   abgerufen: null
+- titel: Partnerschaftsgesellschaftsgesetz
+  url: https://www.gesetze-im-internet.de/partgg/
+  abgerufen: null
 fachlich_zu_pruefen:
+- 'R12 (Rechtsprüfung Befund 1): auch GmbH & Co. KG (§ 106 HGB i. V. m. § 161 Abs. 2 HGB) und Partnerschaftsgesellschaft (§ 4 PartGG) – Voraussetzung Stammkapital gilt nur für GmbH und UG; Form der Anmeldung (§ 12 HGB, § 5 PartGG) bestätigen'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Einzelvorschriften (§§ 7, 8 GmbHG) zuordnen
 - Haftung vor Eintragung (Vorgesellschaft) als Hinweis ergänzen?
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf
   geprueft_von: null

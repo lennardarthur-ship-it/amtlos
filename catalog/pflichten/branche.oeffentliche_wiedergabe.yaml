@@ -1,0 +1,55 @@
+# R12 (Rechtsprüfung Befund 4, Nutzertest Coach #12): Musik und Fernsehen für Kundschaft – öffentliche Wiedergabe
+schema_version: 1
+id: branche.oeffentliche_wiedergabe
+version: 1
+katalog_nr: H.10
+titel:
+  de: Lizenz für Musik und Fernsehen im Betrieb
+kurz:
+  de: Läuft bei dir Musik, Radio oder Fernsehen für Kundschaft, Gäste oder Kursteilnehmende, brauchst du dafür eine Lizenz – der Rundfunkbeitrag deckt das nicht ab.
+erklaerung:
+  de: Musik, Radio oder Fernsehen, die du in Café, Laden, Salon, Wartebereich oder Kursraum für andere abspielst, sind eine öffentliche Wiedergabe (§§ 15, 19, 21, 22 UrhG). Dafür brauchst du die Erlaubnis der Rechteinhaber, in der Regel über die GEMA, die auch für andere Verwertungsgesellschaften einzieht. Der Rundfunkbeitrag deckt das nicht ab, ein privates Streaming-Abo auch nicht. Welcher Tarif passt – etwa für Kurse im Raum oder im Live-Stream –, klärst du mit der GEMA.
+rechtsgrundlage:
+- §§ 15, 19, 21, 22 UrhG
+kategorie: branche
+branchen:
+- gastronomie_lebensmittel
+- beauty_kosmetik
+- unterricht_sport_coaching
+ausloeser:
+  feld: profil.oeffentliche_wiedergabe
+  op: ==
+  wert: true
+  label:
+    de: Bei dir läuft Musik, Radio oder Fernsehen für Kundschaft oder Gäste.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: GEMA
+kanal: portal
+kosten: null
+sanktion:
+  text:
+    de: Bei Nutzung ohne Lizenz verlangt die GEMA die Vergütung nachträglich, in der Regel mit Zuschlag.
+  schwere: mittel
+automatisierung: hinweis
+einordnung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Urheberrechtsgesetz § 15
+  url: https://www.gesetze-im-internet.de/urhg/__15.html
+  abgerufen: null
+- titel: GEMA – Musiknutzer
+  url: https://www.gema.de/
+  abgerufen: null
+fachlich_zu_pruefen:
+- Neu nach Rechtsprüfung R12 (Befund 4) und Nutzertest Coach (#12) – Zuschlag bei Nutzung ohne Lizenz (Kontrollzuschlag) Höhe und Grundlage bestätigen
+- Lizenz bei Kursen in gemieteten Räumen und bei Live-Kursen per Videokonferenz – Tarif unsicher
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

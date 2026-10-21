@@ -1,0 +1,60 @@
+# R12 (Rechtsprüfung Befund 3): Jugendschutzgesetz – Abgabe von Alkohol und Tabak
+schema_version: 1
+id: branche.jugendschutz_abgabe
+version: 1
+katalog_nr: H.1
+titel:
+  de: Alkohol und Tabak nicht an Kinder und Jugendliche abgeben
+kurz:
+  de: Bier, Wein und Sekt gibst du nicht an unter 16-Jährige ab, Spirituosen, Tabak und E-Zigaretten nicht an unter 18-Jährige – im Zweifel lässt du dir das Alter nachweisen.
+erklaerung:
+  de: In Gaststätten und Verkaufsstellen dürfen Bier, Wein, Sekt und ähnliche Getränke nicht an Kinder und Jugendliche unter 16 Jahren abgegeben werden, Branntwein und branntweinhaltige Getränke, auch Mischgetränke, nicht an unter 18-Jährige; auch den Verzehr darfst du ihnen nicht gestatten (§ 9 Abs. 1 JuSchG). Tabakwaren, E-Zigaretten und Shishas gibst du nicht an Kinder und Jugendliche unter 18 Jahren ab und gestattest ihnen das Rauchen nicht (§ 10 Abs. 1, 4 JuSchG). Lass dir im Zweifel das Alter nachweisen (§ 2 Abs. 2 JuSchG) und weise dein Personal ein.
+rechtsgrundlage:
+- § 9 Abs. 1 JuSchG
+- § 10 JuSchG
+- § 2 Abs. 2 JuSchG
+kategorie: branche
+branchen:
+- gastronomie_lebensmittel
+ausloeser:
+  any:
+  - feld: profil.erlaubnis.alkohol
+    op: ==
+    wert: true
+    label:
+      de: Du schenkst alkoholische Getränke aus.
+  - feld: profil.verkauf.alkohol_tabak
+    op: enthaelt_eines
+    wert:
+    - alkohol
+    - tabak
+    label:
+      de: Du verkaufst oder schenkst Alkohol oder Tabak aus.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Kontrolle durch Ordnungsamt bzw. Jugendamt
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Bußgeld bis 50.000 € (§ 28 Abs. 1 Nr. 10, 12, Abs. 5 JuSchG).
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Jugendschutzgesetz § 28 (lxgesetze)
+  url: https://lxgesetze.de/juschg/28
+  abgerufen: '2026-10-21'
+fachlich_zu_pruefen:
+- Neu nach Rechtsprüfung R12 (Befund 3) – Nummern in § 28 Abs. 1 (Nr. 10 Alkohol, Nr. 12 Tabak) und Bußgeldrahmen über lxgesetze geprüft
+- Stand des „begleiteten Trinkens“ (§ 9 Abs. 2 JuSchG, Abschaffung politisch angekündigt) unsicher – nicht erwähnt
+- Rückverfolgbarkeit Tabak (Economic-Operator- und Facility-ID, DVO (EU) 2018/574) für Kioske – prüfen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

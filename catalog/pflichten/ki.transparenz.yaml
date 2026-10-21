@@ -1,16 +1,14 @@
 # Katalog F.65 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: ki.transparenz
-version: 4
+version: 5
 katalog_nr: F.65
 titel:
   de: KI-Inhalte und KI-Interaktion kennzeichnen
 kurz:
-  de: Seit 2.8.2026 müssen Menschen erkennen können, dass sie mit einer KI sprechen, etwa bei Chatbots; KI-erzeugte Inhalte kennzeichnest du.
+  de: Seit 2.8.2026 müssen Menschen erkennen können, dass sie mit einer KI sprechen, etwa bei Chatbots. Täuschend echte KI-Bilder, -Videos und -Töne (Deepfakes) kennzeichnest du.
 erklaerung:
-  de: Nach Art. 50 KI-Verordnung müssen Menschen erkennen können, dass sie mit einer KI interagieren (Abs. 1, seit 2.8.2026) oder
-    dass Inhalte KI-erzeugt sind (Abs. 2). Für generative KI-Systeme, die schon vor dem 2.8.2026 in Verkehr waren, gilt für die
-    maschinenlesbare Kennzeichnung eine Übergangsfrist bis 2.12.2026.
+  de: Nach Art. 50 KI-Verordnung müssen Menschen erkennen können, dass sie mit einer KI interagieren (Abs. 1, seit 2.8.2026). Anbieter generativer KI-Systeme kennzeichnen deren Ausgaben maschinenlesbar (Abs. 2); für Systeme, die schon vor dem 2.8.2026 in Verkehr waren, gilt dafür eine Übergangsfrist bis 2.12.2026. Wer KI nur einsetzt (Betreiber), kennzeichnet Deepfakes – täuschend echte Bilder, Videos oder Tonaufnahmen – sowie KI-erzeugte Texte, die die Öffentlichkeit über Angelegenheiten von öffentlichem Interesse informieren sollen (Abs. 4). Nicht jedes KI-Werbebild fällt darunter – entscheidend ist, ob es täuschend echt wirkt.
 rechtsgrundlage:
 - Art. 50 KI-VO
 kategorie: ki
@@ -46,8 +44,9 @@ quellen:
   url: https://www.fgs.de/news-and-insights/blog/detail/eu-ai-act-was-ab-dem-2-august-2026-gilt-und-was-verschoben-wurde
   abgerufen: '2026-10-20'
 fachlich_zu_pruefen:
+- 'R12 (Rechtsprüfung Befund 14): Anbieter (Art. 50 Abs. 2) und Betreiber (Abs. 4) getrennt dargestellt – Abgrenzung bei redaktionell geprüften Texten bestätigen'
 - 'Termine nach Digital-Omnibus VO (EU) 2026/1744 (in Kraft 27.7.2026) laut Rechtsprüfung R11 (Befund 8) und Kanzlei-Blog FGS: Art. 50 Abs. 1 seit 2.8.2026, Übergangsfrist Abs. 2 bis 2.12.2026 – im Amtsblatt gegenlesen'
-- 'Bußgeldrahmen Art. 99 KI-VO laut FGS unverändert – Absatz und KMU-Regel bestätigen'
+- Bußgeldrahmen Art. 99 KI-VO laut FGS unverändert – Absatz und KMU-Regel bestätigen
 - Welche Fälle des Art. 50 treffen auf Kleinbetriebe zu (Chatbot, Deepfake, generierte Texte)?
 - Vorbereitungs-Checkliste fachlich prüfen
 pruefung:

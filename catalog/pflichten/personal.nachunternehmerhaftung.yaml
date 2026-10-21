@@ -1,0 +1,57 @@
+# R12 (Nutzertest Kurier #5, Zoll #13): Haftung als Auftraggeber von Subunternehmern
+schema_version: 1
+id: personal.nachunternehmerhaftung
+version: 1
+katalog_nr: D.39
+titel:
+  de: Als Auftraggeber für den Mindestlohn bei Subunternehmern haften
+kurz:
+  de: Beauftragst du Subunternehmer, haftest du dafür, dass deren Beschäftigte den Mindestlohn bekommen – lass dir Nachweise geben.
+erklaerung:
+  de: Wer einen anderen Unternehmer mit Werk- oder Dienstleistungen beauftragt, haftet wie ein Bürge dafür, dass dieser und alle weiteren Nachunternehmer ihren Beschäftigten den Mindestlohn zahlen (§ 13 MiLoG i. V. m. § 14 AEntG). Im Baugewerbe und bei Paketdiensten haftest du außerdem für die Sozialversicherungsbeiträge der Nachunternehmer (§ 28e SGB IV). Lass dir deshalb vor und während der Zusammenarbeit Nachweise geben, etwa Unbedenklichkeitsbescheinigungen der Krankenkasse und der Berufsgenossenschaft, eine Erklärung zum Mindestlohn und die Gewerbeanmeldung, und vereinbare Kontrollrechte im Vertrag.
+rechtsgrundlage:
+- § 13 MiLoG
+- § 14 AEntG
+- § 28e SGB IV
+kategorie: personal
+branchen:
+- bau
+- gebaeudereinigung
+- transport_logistik
+ausloeser:
+  feld: profil.nachunternehmer
+  op: ==
+  wert: true
+  label:
+    de: Du beauftragst Subunternehmer.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Kontrolle durch den Zoll
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Zahlt ein Subunternehmer den Mindestlohn nicht, können dessen Beschäftigte den Lohn direkt von dir verlangen (§ 14 AEntG).
+  schwere: hoch
+automatisierung: hinweis
+einordnung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Mindestlohngesetz § 13
+  url: https://www.gesetze-im-internet.de/milog/__13.html
+  abgerufen: null
+- titel: IHK Regensburg – Paketboten-Schutz-Gesetz
+  url: https://www.ihk.de/regensburg/branchen/verkehr/nachrichten-verkehr/paketboten-schutz-gesetz-4628636
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Neu nach Nutzertests R12 (Kurier #5, Zoll #13) – § 28e Abs. 3a ff. SGB IV (Bau, Auftragswert) und Abs. 3f/3g (Paketboten-Schutz-Gesetz: Pakete bis 32 kg, Fahrzeuge bis 3,5 t?) fachlich prüfen; Apotheken-Botenfahrten als Pakete?'
+- Unfallversicherung (§ 150 Abs. 3 SGB VII) unsicher; Präqualifikation als Entlastung; Branchenmindestlöhne (AEntG) nicht abgebildet
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

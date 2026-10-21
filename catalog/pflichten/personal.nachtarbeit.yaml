@@ -1,0 +1,57 @@
+# R12 (Nutzertest Bäckerei #2): Nachtarbeit – Untersuchung und Ausgleich (§ 6 ArbZG)
+schema_version: 1
+id: personal.nachtarbeit
+version: 1
+katalog_nr: D.42
+titel:
+  de: 'Nachtarbeit: Untersuchung ermöglichen und ausgleichen'
+kurz:
+  de: Wer bei dir regelmäßig nachts arbeitet, kann sich vor Beginn und dann regelmäßig auf deine Kosten arbeitsmedizinisch untersuchen lassen und bekommt einen Ausgleich durch freie Tage oder Zuschlag.
+erklaerung:
+  de: Nachtzeit ist die Zeit von 23 bis 6 Uhr, in Bäckereien und Konditoreien von 22 bis 5 Uhr (§ 2 Abs. 3 ArbZG). Nachtarbeit ist Arbeit, die mehr als zwei Stunden der Nachtzeit umfasst (§ 2 Abs. 4 ArbZG); Nachtarbeitnehmer ist, wer normalerweise in Wechselschicht nachts arbeitet oder an mindestens 48 Tagen im Jahr (§ 2 Abs. 5 ArbZG). Nachtarbeitnehmer dürfen sich vor Beginn der Beschäftigung und danach in Abständen von nicht weniger als drei Jahren arbeitsmedizinisch untersuchen lassen, ab 50 Jahren jährlich; die Kosten trägst du, wenn du die Untersuchung nicht kostenlos durch einen Betriebsarzt anbietest (§ 6 Abs. 3 ArbZG). Für die Nachtarbeit gewährst du eine angemessene Zahl bezahlter freier Tage oder einen angemessenen Zuschlag, soweit kein Tarifvertrag gilt (§ 6 Abs. 5 ArbZG). Die werktägliche Arbeitszeit darf acht Stunden nur überschreiten, bis zu zehn Stunden, wenn innerhalb eines Kalendermonats oder von vier Wochen im Durchschnitt acht Stunden nicht überschritten werden (§ 6 Abs. 2 ArbZG).
+rechtsgrundlage:
+- § 2 Abs. 3–5 ArbZG
+- § 6 ArbZG
+kategorie: personal
+branchen:
+- gastronomie_lebensmittel
+- transport_logistik
+- gesundheit_pflege
+ausloeser:
+  all:
+  - feld: abgeleitet.hat_beschaeftigte
+    op: ==
+    wert: true
+    label:
+      de: Du beschäftigst mindestens eine Person.
+  - feld: profil.arbeitszeit.nachtarbeit
+    op: ==
+    wert: true
+    label:
+      de: Bei dir arbeitet jemand regelmäßig nachts.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Betriebsarzt
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Arbeitszeitgesetz § 6
+  url: https://www.gesetze-im-internet.de/arbzg/__6.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Neu nach Nutzertest R12 (Bäckerei #2) – Bußgeld (§ 22 ArbZG) fachlich ergänzen; Gefährdungsbaustein Nachtarbeit fehlt; Abgleich mit Angebotsvorsorge nach ArbMedVV'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

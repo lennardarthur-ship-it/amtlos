@@ -50,9 +50,10 @@ describe("Hinweis auf deutsche Zeit (G10)", () => {
 
 describe("Weiche Trennstellen (G1) und Schreibrichtung (G3)", () => {
   it("trennt lange Zusammensetzungen an der Fuge", () => {
-    expect(trennen("Rechnungsempfänger")).toBe("Rechnungs\u00ADempfänger");
-    expect(trennen("Nutzungsbedingungen")).toBe("Nutzungs\u00ADbedingungen");
-    expect(trennen("Paket für die Steuerberatung")).toBe("Paket für die Steuer\u00ADberatung");
+    // R12 (UX #8): Trennmuster statt Wortfugen-Liste – an jeder Silbe, die Fuge ist dabei
+    expect(trennen("Rechnungsempfänger")).toBe("Rech\u00ADnungs\u00ADemp\u00ADfän\u00ADger");
+    expect(trennen("Nutzungsbedingungen")).toBe("Nut\u00ADzungs\u00ADbe\u00ADdin\u00ADgun\u00ADgen");
+    expect(trennen("Paket für die Steuerberatung")).toBe("Paket für die Steu\u00ADer\u00ADbe\u00ADra\u00ADtung");
     expect(trennen("Heute")).toBe("Heute");
   });
   it("isoliert rechts-nach-links-Text, lässt lateinischen unverändert", () => {

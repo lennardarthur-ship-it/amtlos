@@ -1,0 +1,18 @@
+persona: kleiner_betrieb
+beschreibung: "R12 (Rechtsprüfung Befund 3): Kiosk mit Alkohol und Tabak ohne Gaststätte – Aushang (§ 3 JuSchG) und Abgabeverbote (§§ 9, 10 JuSchG)"
+stichtag: "2026-10-21"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2025-02-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [sonstige]
+  profil.beschaeftigte.gesamt: 0
+  profil.erlaubnis.gaststaette: false
+  profil.verkauf.alkohol_tabak: [alkohol, tabak]
+  profil.oeffentliche_wiedergabe: false
+  profil.bundesland: HH
+erwartet:
+  branche.jugendschutz_aushang: gilt
+  branche.jugendschutz_abgabe: gilt
+  branche.oeffentliche_wiedergabe: gilt_nicht
+  gesellschaft.istkaufmann_pruefen: gilt

@@ -1,15 +1,14 @@
 # Katalog B.16 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.transparenzregister
-version: 2
+version: 3
 katalog_nr: B.16
 titel:
   de: Wirtschaftlich Berechtigte ans Transparenzregister melden
 kurz:
   de: Melde, wer hinter deiner Gesellschaft steht, und halte die Angaben aktuell.
 erklaerung:
-  de: Gesellschaften müssen ihre wirtschaftlich Berechtigten dem Transparenzregister mitteilen und die Angaben bei Änderungen
-    aktualisieren.
+  de: Gesellschaften müssen ihre wirtschaftlich Berechtigten dem Transparenzregister mitteilen und die Angaben bei Änderungen aktualisieren. Das gilt für UG und GmbH ebenso wie für eingetragene Personengesellschaften, also auch für die GmbH & Co. KG und die Partnerschaftsgesellschaft (§ 20 Abs. 1 GwG) – seit 2024 auch für eine GbR, die sich ins Gesellschaftsregister eintragen lässt (eGbR).
 begriffe:
 - begriff:
     de: Wirtschaftlich Berechtigte
@@ -20,11 +19,11 @@ rechtsgrundlage:
 - § 20 GwG
 kategorie: gesellschaft
 ausloeser:
-  feld: abgeleitet.ist_kapitalgesellschaft
+  feld: abgeleitet.ist_eingetragene_gesellschaft
   op: ==
   wert: true
   label:
-    de: Dein Unternehmen ist eine UG oder GmbH.
+    de: Deine Gesellschaft wird im Handels- oder Partnerschaftsregister eingetragen.
 # R11 (Nutzertest Tischlerei #4): keine Gründungs-Phase – Altgesellschaften (vor 1.8.2021) hatten Nachmeldepflichten (§ 59 Abs. 8 GwG), Änderungen laufend
 frist:
   typ: dauerhaft
@@ -60,8 +59,8 @@ quellen:
   url: https://www.gesetze-im-internet.de/gwg_2017/
   abgerufen: null
 fachlich_zu_pruefen:
-- 'Einzelvorschriften §§ 19, 20 GwG zugeordnet (R11); Nachmeldepflicht für Gesellschaften vor 1.8.2021 (§ 59 Abs. 8 GwG) nur im Kommentar – Fristen bestätigen'
-- Gilt auch für GmbH & Co. KG und Personengesellschaften – Auslöser erweitern?
+- 'R12 (Rechtsprüfung Befund 1, K-205): Auslöser auf GmbH & Co. KG, PartG und PartG mbB erweitert (§ 20 Abs. 1 GwG, eingetragene Personengesellschaften); eGbR nur im Text – eigene Rechtsform „eGbR“ fehlt im Fragebogen'
+- Einzelvorschriften §§ 19, 20 GwG zugeordnet (R11); Nachmeldepflicht für Gesellschaften vor 1.8.2021 (§ 59 Abs. 8 GwG) nur im Kommentar – Fristen bestätigen
 - Frist nach Gründung und bei Änderung ergänzen
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 pruefung:

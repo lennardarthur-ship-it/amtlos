@@ -1,0 +1,59 @@
+# R12 (Rechtsprüfung Befund 6): Versicherungs-, Finanzanlagen- und Immobiliardarlehensvermittler – Vermittlerregister
+schema_version: 1
+id: gruendung.vermittlerregister
+version: 1
+katalog_nr: A.3
+titel:
+  de: Ins Vermittlerregister eintragen lassen
+kurz:
+  de: Als Versicherungs-, Finanzanlagen- oder Immobiliardarlehensvermittler lässt du dich nach der Erlaubnis ins Vermittlerregister eintragen und hältst die Angaben aktuell.
+erklaerung:
+  de: Wer eine Erlaubnis nach § 34d, § 34f, § 34h oder § 34i GewO hat, lässt sich unverzüglich nach Aufnahme der Tätigkeit in das Vermittlerregister eintragen, das die IHK führt (§ 11a GewO). Änderungen meldest du ebenfalls. Versicherungsvermittler bilden sich außerdem jedes Jahr weiter – das steht bei der Weiterbildungspflicht.
+rechtsgrundlage:
+- § 11a GewO
+- § 34d Abs. 10 GewO
+kategorie: gruendung
+branchen:
+- immobilien_finanzen
+ausloeser:
+  feld: profil.erlaubnis.gewo_paragraphen
+  op: enthaelt_eines
+  wert:
+  - 34d
+  - 34f
+  - 34h
+  - 34i
+  label:
+    de: Du hast eine Erlaubnis als Versicherungs-, Finanzanlagen- oder Immobiliardarlehensvermittler.
+phase: gruendung
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: IHK (Vermittlerregister)
+kanal: portal
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+erledigung:
+  art: bestaetigen
+  bestaetigung:
+    de: Im Vermittlerregister eingetragen
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Gewerbeordnung § 11a (lxgesetze)
+  url: https://lxgesetze.de/gewo/11a
+  abgerufen: '2026-10-21'
+fachlich_zu_pruefen:
+- Neu nach Rechtsprüfung R12 (Befund 6) – § 11a Abs. 1 GewO nennt § 34d Abs. 10, § 34f Abs. 5, § 34h Abs. 1 S. 4 und § 34i Abs. 8; Versicherungsberater (§ 34e) bestätigen
+- Frist „unverzüglich nach Aufnahme der Tätigkeit“ je Vorschrift bestätigen; Folgen fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

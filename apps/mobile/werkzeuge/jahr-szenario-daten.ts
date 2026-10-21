@@ -111,6 +111,8 @@ export interface Rechnung {
   storno?: { datum: string; nummer: string; id: string; grund: string };
   /** ersetzt die stornierte Rechnung mit dieser ID (Rechnungskorrektur) */
   ersetzt?: string;
+  /** R12 GoBD: bar in der Kasse kassiert – die Zahlung kommt aus dem Tagesabschluss (bar kassierte Rechnung) */
+  barKasse?: boolean;
   worum: string;
 }
 
@@ -205,8 +207,8 @@ export const RECHNUNGEN: Rechnung[] = [
       { bez: "Kaffeebohnen Espresso-Mischung", menge: 1.5, einheit: "Kilogramm", preis: 2400, satz: 7 },
       { bez: "Barista-Grundkurs (je Person, 3 Stunden)", menge: 2, einheit: "Person", preis: 4500, satz: 19 },
     ] },
-  { id: "r15", nummer: "2026-015", datum: "2026-11-12", leistung: "2026-11-11", ziel: "14", kunde: "k4", hinweis: DANKE, bezahlt: null,
-    worum: "Seniorennachmittag am 11.11.: Kuchen 7 %, Kaffee 19 %. Bleibt UNBEZAHLT (fällig 26.11., überfällig).",
+  { id: "r15", nummer: "2026-015", datum: "2026-11-12", leistung: "2026-11-11", ziel: "14", kunde: "k4", hinweis: DANKE, bezahlt: "2026-11-26", barKasse: true,
+    worum: "Seniorennachmittag am 11.11.: Kuchen 7 %, Kaffee 19 %. R12 GoBD: am 26.11. bar an der Kasse bezahlt – im Tagesabschluss als bar kassierte Rechnung gewählt (Zahlung an der Rechnung vermerkt, kein Kassenumsatz).",
     pos: [
       { bez: "Kuchen und Torten (Stück)", menge: 60, einheit: "Stück", preis: 320, satz: 7 },
       { bez: "Kaffee/Tee in der Pumpkanne (2 Liter)", menge: 10, einheit: "Stück", preis: 1200, satz: 19 },
@@ -279,6 +281,8 @@ export interface BelegRoh {
   datei: "pdf" | "xml";
   /** Positionen für den Beleg (Netto bei „netto“, Brutto bei „brutto“) */
   pos: BelegPos[];
+  /** R12 GoBD: bei der Zahlung abgezogenes Skonto (brutto) – mindert Vorsteuer und Ausgabe im Zeitraum der Zahlung */
+  skonto?: number;
   worum: string;
 }
 
@@ -388,7 +392,18 @@ export const BELEGE: BelegRoh[] = [
     pos: [{ text: "Prüfung ortsveränderlicher elektrischer Geräte nach DGUV V3 (12 Geräte)", satz: 19, betrag: 16000 }] }),
   einfach({ id: "b32", datum: "2026-11-05", lieferant: "Buchhaus am Markt", anschrift: "Markt 10\n04109 Leipzig", nummer: "Bon 11-0518", kategorie: "fortbildung", art: "brutto", vorsteuer: true, zahlung: "privat", bezahlt: null, datei: "pdf", worum: "Fachbuch, privat bezahlt (Einlage), 7 %",
     pos: [{ text: "Fachbuch „Allergenkennzeichnung in der Gastronomie“", satz: 7, betrag: 2990 }] }),
+  // R12 GoBD: erhaltenes Skonto auf eine Nicht-Waren-Ausgabe (Wartung) – mindert Ausgabe und Vorsteuer im Zahlmonat
+  einfach({ id: "b33", datum: "2026-11-03", lieferant: "Kältetechnik Möckern GmbH", anschrift: "Max-Liebermann-Straße 80\n04159 Leipzig", nummer: "KM-2214", kategorie: "sonstiges", art: "netto", vorsteuer: true, zahlung: "bank", bezahlt: "2026-11-10", skonto: 1142, datei: "pdf", worum: "Wartung Kühlzelle (19 %), bezahlt innerhalb von 7 Tagen mit 2 % Skonto (11,42 €)",
+    pos: [{ text: "Jahreswartung Kühlzelle und Kuchenvitrine", satz: 19, betrag: 48000 }] }),
 ];
+
+/** Skonto eines Belegs (einziger Steuersatz 19 % bzw. 7 %): netto und USt aus dem Brutto (wie die App) */
+export function belegSkontoUnabh(b: BelegRoh): { netto: number; ust: number } {
+  if (!b.skonto) return { netto: 0, ust: 0 };
+  const satz = b.saetze[0]!.satz;
+  const netto = rund((b.skonto * 100) / (100 + satz));
+  return { netto, ust: b.skonto - netto };
+}
 
 // ---------------------------------------------------------------- Kasse (elektronische Registrierkasse mit TSE)
 
@@ -422,6 +437,22 @@ export const KASSE_MAI: KassenTag[] = (() => {
 })();
 KASSE_BRUTTO["05"] = { b7: sum(KASSE_MAI.map((t) => t.b7)), b19: sum(KASSE_MAI.map((t) => t.b19)) };
 
+/**
+ * R12 GoBD: Sonderfälle an der Kasse im November – Kartentrinkgeld (bar ans Personal), Gutscheine (Verkauf am 14.11.,
+ * Einlösung am 21.11.; Einzweck 7 % und Mehrzweck), eine Korrektur (zuerst 10 € Karte zu wenig), eine Zählung mit
+ * Überschuss (gebucht als Erlös 19 %), eine bar kassierte Rechnung (2026-015) und ein Kassensturz. Der Café hat eine
+ * TSE-Kasse – einen Kassenbericht (retrograd) gibt es dort nicht.
+ */
+export const KASSE_SONDER = {
+  trinkgeld: { datum: "2026-11-07", cent: 1850 },
+  korrektur: { datum: "2026-11-10", karteZuWenig: 1000, grund: "Kartenumsatz laut Terminal-Abrechnung nachgetragen" },
+  gutscheinVerkauf: { datum: "2026-11-14", mehrzweck: 5000, einzweck7: 2140 },
+  gutscheinEinloesung: { datum: "2026-11-21", mehrzweck: 5000, einzweck7: 2140 },
+  barRechnung: { datum: "2026-11-26", rechnung: "r15" },
+  zaehlung: { datum: "2026-11-28", ueberschuss: 230 },
+  kassensturz: { datum: "2026-11-28" },
+};
+
 /** Netto und USt aus dem Bruttobetrag (Z-Bon weist je Satz aus) */
 const ausBruttoUnabh = (brutto: number, satz: number) => {
   const netto = rund((brutto * 100) / (100 + satz));
@@ -431,9 +462,12 @@ export const KASSE_MONATE = Object.keys(KASSE_BRUTTO)
   .sort()
   .map((m) => {
     const k = KASSE_BRUTTO[m]!;
-    const a7 = ausBruttoUnabh(k.b7, 7);
-    const a19 = ausBruttoUnabh(k.b19, 19);
-    return { monat: `2026-${m}`, b7: k.b7, b19: k.b19, n7: a7.netto, u7: a7.ust, n19: a19.netto, u19: a19.ust };
+    // R12 GoBD: Einzweck-Gutschein 7 % – Verkauf +, Einlösung − (im selben Monat); Kassenüberschuss als Umsatz 19 %
+    const b7 = k.b7 + (m === "11" ? KASSE_SONDER.gutscheinVerkauf.einzweck7 - KASSE_SONDER.gutscheinEinloesung.einzweck7 : 0);
+    const b19 = k.b19 + (m === "11" ? KASSE_SONDER.zaehlung.ueberschuss : 0);
+    const a7 = ausBruttoUnabh(b7, 7);
+    const a19 = ausBruttoUnabh(b19, 19);
+    return { monat: `2026-${m}`, b7, b19, n7: a7.netto, u7: a7.ust, n19: a19.netto, u19: a19.ust };
   });
 
 /**
@@ -489,12 +523,13 @@ export interface KassenBewegungRoh { datum: string; art: "transit" | "entnahme";
  * Kassenbuch der Bargeldkasse für das ganze Jahr (Bareinnahmen lt. Z-Bon, Barausgaben, Geldtransit zur Bank): dienstags vor
  * der Öffnung alles über 400 € zur Bank (auf volle 10 € abgerundet), Privatentnahme 200 € am 30.05.
  */
-const KASSENBUCH_JAHR: { eintraege: KbEintrag[]; bewegungen: KassenBewegungRoh[]; bestandVor: Map<string, number> } = (() => {
+const KASSENBUCH_JAHR: { eintraege: KbEintrag[]; bewegungen: KassenBewegungRoh[]; bestandVor: Map<string, number>; zaehlBestand: number } = (() => {
   const e: KbEintrag[] = [];
   const bewegungen: KassenBewegungRoh[] = [];
   const bestandVor = new Map<string, number>();
   let bestand = KASSE_ANFANG_JAHR;
   let transit = 1;
+  let zaehlBestand = 0;
   const barBelege = BELEGE.filter((b) => b.zahlung === "bar");
   for (const t of KASSE_TAGE) {
     bestandVor.set(t.datum, bestand);
@@ -510,16 +545,35 @@ const KASSENBUCH_JAHR: { eintraege: KbEintrag[]; bewegungen: KassenBewegungRoh[]
       e.push({ datum: t.datum, beleg: b.nummer ?? "ohne Nr.", text: `${b.lieferant}: ${b.pos.map((p) => p.text.split(" (")[0]).join(", ")}`.slice(0, 90), einnahme: 0, ausgabe: brutto });
       bestand -= brutto;
     }
-    e.push({ datum: t.datum, beleg: `Z ${t.zbon}`, text: `Tageseinnahmen bar lt. Z-Bon Nr. ${t.zbon} (Kassensystem mit TSE)`, einnahme: t.bar, ausgabe: 0 });
-    bestand += t.bar;
+    // R12 GoBD: Gutscheinverkauf erhöht, Gutscheineinlösung mindert die Bareinnahmen (Karte bleibt, wie sie war)
+    const gs = t.datum === KASSE_SONDER.gutscheinVerkauf.datum ? KASSE_SONDER.gutscheinVerkauf.mehrzweck + KASSE_SONDER.gutscheinVerkauf.einzweck7 : t.datum === KASSE_SONDER.gutscheinEinloesung.datum ? -(KASSE_SONDER.gutscheinEinloesung.mehrzweck + KASSE_SONDER.gutscheinEinloesung.einzweck7) : 0;
+    e.push({ datum: t.datum, beleg: `Z ${t.zbon}`, text: `Tageseinnahmen bar lt. Z-Bon Nr. ${t.zbon} (Kassensystem mit TSE)`, einnahme: t.bar + gs, ausgabe: 0 });
+    bestand += t.bar + gs;
+    if (t.datum === KASSE_SONDER.trinkgeld.datum) {
+      e.push({ datum: t.datum, beleg: `Z ${t.zbon}`, text: "Kartentrinkgeld bar an das Personal ausgezahlt", einnahme: 0, ausgabe: KASSE_SONDER.trinkgeld.cent });
+      bestand -= KASSE_SONDER.trinkgeld.cent;
+    }
+    if (t.datum === KASSE_SONDER.barRechnung.datum) {
+      const r = RECHNUNGEN.find((x) => x.id === KASSE_SONDER.barRechnung.rechnung)!;
+      const brutto = rechnungsSumme(r.pos).brutto;
+      e.push({ datum: t.datum, beleg: `RE ${r.nummer}`, text: `Barzahlung auf Rechnung ${r.nummer}`, einnahme: brutto, ausgabe: 0 });
+      bestand += brutto;
+    }
+    if (t.datum === KASSE_SONDER.zaehlung.datum) {
+      e.push({ datum: t.datum, beleg: "", text: "Kassendifferenz laut Zählung: Überschuss", einnahme: KASSE_SONDER.zaehlung.ueberschuss, ausgabe: 0 });
+      bestand += KASSE_SONDER.zaehlung.ueberschuss;
+      zaehlBestand = bestand;
+    }
     if (t.datum === "2026-05-30") {
       e.push({ datum: t.datum, beleg: "PE-05", text: "Privatentnahme Inhaberin (Eigenbeleg)", einnahme: 0, ausgabe: 20000 });
       bewegungen.push({ datum: t.datum, art: "entnahme", betrag: 20000 });
       bestand -= 20000;
     }
   }
-  return { eintraege: e, bewegungen, bestandVor };
+  return { eintraege: e, bewegungen, bestandVor, zaehlBestand };
 })();
+/** R12 GoBD: gezählter Bestand am Zähltag (rechnerisch + Überschuss) – so trägt ihn die Inhaberin ein */
+export const KASSE_GEZAEHLT = () => KASSENBUCH_JAHR.zaehlBestand;
 export const KASSEN_BEWEGUNGEN_ROH = KASSENBUCH_JAHR.bewegungen;
 /** Kassenbuch Mai: Anfangsbestand am 01.05. aus dem Jahresverlauf */
 export const KASSENBUCH_ANFANG = KASSENBUCH_JAHR.bestandVor.get(KASSE_MAI[0]!.datum)!;
@@ -615,7 +669,8 @@ export function ustQuartale(): UstQuartal[] {
     const km = KASSE_MONATE.filter((k) => quartal(`${k.monat}-01`) === q);
     const k19 = sum(km.map((k) => k.n19));
     const k7 = sum(km.map((k) => k.n7));
-    const vorsteuer = sum(BELEGE.filter((b) => quartal(b.datum) === q).map((b) => belegSumme(b).vorsteuer));
+    // Skonto mindert die Vorsteuer im Quartal der Zahlung (§ 17 Abs. 1 Satz 2 UStG)
+    const vorsteuer = sum(BELEGE.filter((b) => quartal(b.datum) === q).map((b) => belegSumme(b).vorsteuer)) - sum(BELEGE.filter((b) => b.vorsteuer && b.skonto && quartal(zahltagBeleg(b)) === q).map((b) => belegSkontoUnabh(b).ust));
     const bmg19 = r("19") + k19;
     const bmg7 = r("7") + k7;
     const ust = rund((bmg19 * 19) / 100) + rund((bmg7 * 7) / 100);
@@ -638,9 +693,10 @@ export function euerUnabhaengig() {
   let vorsteuer = 0;
   for (const b of imJahr) {
     const s = belegSumme(b);
-    vorsteuer += s.vorsteuer;
+    const sk = belegSkontoUnabh(b);
+    vorsteuer += s.vorsteuer - (b.vorsteuer ? sk.ust : 0);
     if (b.kategorie === "anlage") continue;
-    const betrag = b.vorsteuer ? s.netto : s.brutto;
+    const betrag = b.vorsteuer ? s.netto - sk.netto : s.brutto - sk.netto - sk.ust;
     nachKategorie[b.kategorie] ??= { betrag: 0, anzahl: 0 };
     nachKategorie[b.kategorie]!.betrag += betrag;
     nachKategorie[b.kategorie]!.anzahl++;

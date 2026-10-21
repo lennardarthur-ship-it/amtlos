@@ -32,7 +32,8 @@ export function BuehnenSeite({ ueber, titel, satz, rechts, buehne, children, ...
     <View style={{ flex: 1, backgroundColor: f.buehne }}>
       {sichtbar ? <StatusBar style="light" /> : null}
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets {...rest}>
-        <View style={{ paddingTop: inset.top + (ueber || rechts ? 14 : 28), paddingHorizontal: RAND, paddingBottom: 30, gap: 22, overflow: "hidden" }}>
+        {/* R12 (UX #23): bei großer Schrift kompakter – „Als Nächstes“ lag sonst hinter der Tab-Leiste */}
+        <View style={{ paddingTop: inset.top + (ueber || rechts ? (gross ? 6 : 14) : gross ? 14 : 28), paddingHorizontal: RAND, paddingBottom: gross ? 18 : 30, gap: gross ? 12 : 22, overflow: "hidden" }}>
           <BuehnenMotiv />
           {ueber || rechts ? (
             <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12, minHeight: 40 }}>

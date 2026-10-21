@@ -1,0 +1,26 @@
+persona: gesellschaft
+beschreibung: "R12 (Rechtsprüfung Befund 1): GmbH & Co. KG – Transparenzregister, Jahresabschluss und Offenlegung (§ 264a HGB), Insolvenzantragspflicht (§ 15a Abs. 1 S. 3 InsO); keine Körperschaftsteuer, kein Stammkapital"
+stichtag: "2026-10-21"
+fakten:
+  profil.rechtsform: gmbh_co_kg
+  profil.gruendungsdatum: "2024-03-01"
+  profil.taetigkeit.branchen: [handwerk]
+  profil.gesellschaft.handelsregister: eingetragen
+  profil.gesellschaft.geschaeftsjahr: kalenderjahr
+  profil.beschaeftigte.gesamt: 0
+  profil.bundesland: NW
+erwartet:
+  gesellschaft.transparenzregister: gilt
+  gesellschaft.jahresabschluss: gilt
+  gesellschaft.offenlegung: gilt
+  gesellschaft.offenlegung_abweichendes_gj: gilt_nicht
+  gesellschaft.insolvenzantragspflicht: gilt
+  gesellschaft.gf_pflichten_haftung: gilt
+  gesellschaft.handelsregister_anmeldung: gilt_nicht
+  gesellschaft.stammkapital_einzahlen: gilt_nicht
+  gesellschaft.partg_mbb_haftpflicht: gilt_nicht
+  gesellschaft.egbr_hinweis: gilt_nicht
+  gesellschaft.istkaufmann_pruefen: gilt_nicht
+  steuern.kst_erklaerung: gilt_nicht
+termine_enthaelt:
+  gesellschaft.offenlegung: [["2025", "2026-12-31"]]

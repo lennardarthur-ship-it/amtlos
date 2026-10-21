@@ -1,17 +1,18 @@
 # Katalog B.14 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.stammkapital_einzahlen
-version: 1
+version: 2
 katalog_nr: B.14
 titel:
   de: Stammkapital einzahlen
 kurz:
   de: Zahl das Stammkapital auf das Geschäftskonto ein, bevor die Gesellschaft zum Handelsregister angemeldet wird.
 erklaerung:
-  de: Bei der GmbH ist mindestens die Hälfte des Mindeststammkapitals von 25.000 € einzuzahlen. Bei der UG ab 1 € wird das
-    Stammkapital voll eingezahlt.
+  de: Bei der GmbH muss vor der Anmeldung auf jeden Geschäftsanteil mindestens ein Viertel eingezahlt sein, insgesamt mindestens die Hälfte des Mindeststammkapitals von 25.000 €, also 12.500 € (§ 7 Abs. 2 GmbHG). Bei der UG wird das Stammkapital vor der Anmeldung voll und in bar eingezahlt (§ 5a Abs. 2 GmbHG). In der Anmeldung versichert die Geschäftsführung, dass die Einlagen geleistet sind und endgültig zu ihrer freien Verfügung stehen (§ 8 Abs. 2 GmbHG).
 rechtsgrundlage:
-- GmbHG
+- § 7 Abs. 2 GmbHG
+- § 5a Abs. 2 GmbHG
+- § 8 Abs. 2 GmbHG
 kategorie: gesellschaft
 ausloeser:
   all:
@@ -52,12 +53,9 @@ quellen:
   url: https://www.gesetze-im-internet.de/gmbhg/
   abgerufen: null
 fachlich_zu_pruefen:
+- 'R12 (Rechtsprüfung Befund 16): ein Viertel je Geschäftsanteil, insgesamt mindestens 12.500 € (§ 7 Abs. 2 GmbHG), UG voll und bar (§ 5a Abs. 2), Versicherung in der Anmeldung (§ 8 Abs. 2) – Plausibilitätsprüfung im Handelsregister-Datenblatt (Mindestkapital, volle Euro) offen'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Reihenfolge „vor der Anmeldung“ bestätigen
-- 'UG: Volleinzahlung und Bareinlage (Spezifikation nennt nur „ab 1 €“) bestätigen'
-- 'Höhe der Einzahlung bei GmbH: Anteil je Geschäftsanteil oder insgesamt?'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf
   geprueft_von: null

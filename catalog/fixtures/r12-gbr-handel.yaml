@@ -1,0 +1,18 @@
+persona: kleiner_betrieb
+beschreibung: "R12 (Rechtsprüfung Befunde 5, 18): GbR mit Gewerbe – Hinweise Istkaufmann (§§ 1, 29 HGB, OHG nach § 105 Abs. 1) und Gesellschaftsregister (eGbR, § 707a BGB); kein Transparenzregister ohne Eintragung"
+stichtag: "2026-10-21"
+fakten:
+  profil.rechtsform: gbr
+  profil.gruendungsdatum: "2023-05-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [onlinehandel]
+  profil.beschaeftigte.gesamt: 0
+  profil.verkauf.alkohol_tabak: [keine]
+  profil.bundesland: SN
+erwartet:
+  gesellschaft.egbr_hinweis: gilt
+  gesellschaft.istkaufmann_pruefen: gilt
+  gesellschaft.transparenzregister: gilt_nicht
+  gesellschaft.handelsregister_anmeldung: gilt_nicht
+  branche.jugendschutz_aushang: unbekannt
+  branche.jugendschutz_abgabe: unbekannt

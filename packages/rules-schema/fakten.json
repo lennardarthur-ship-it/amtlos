@@ -58,6 +58,7 @@
         "it_agentur_freelancer",
         "gesundheit_pflege",
         "immobilien_finanzen",
+        "unterricht_sport_coaching",
         "sonstige"
       ],
       "herleitung": "aus WZ-Code abgeleitet, vom Nutzer bestätigt",
@@ -92,6 +93,7 @@
         "34f",
         "34h",
         "34i",
+        "38",
         "55",
         "keine"
       ],
@@ -238,6 +240,35 @@
       "ab": 2
     },
     {
+      "pfad": "profil.vertrieb.fernabsatz",
+      "typ": "bool",
+      "herleitung": "Onboarding (R12): Aufträge von Privatkunden per Telefon, E-Mail oder Messenger, ohne sie vorher persönlich zu treffen (Fernabsatz, § 312c BGB)",
+      "ab": 2
+    },
+    {
+      "pfad": "profil.verkauf.alkohol_tabak",
+      "typ": "enum_liste",
+      "werte": [
+        "alkohol",
+        "tabak",
+        "keine"
+      ],
+      "herleitung": "Onboarding (R12): Verkauf oder Ausschank von Alkohol bzw. Tabakwaren, E-Zigaretten oder Shishas – Jugendschutz (§§ 9, 10 JuSchG)",
+      "ab": 2
+    },
+    {
+      "pfad": "profil.oeffentliche_wiedergabe",
+      "typ": "bool",
+      "herleitung": "Onboarding (R12): Musik, Radio oder Fernsehen für Kundschaft, Gäste oder Kursteilnehmende (öffentliche Wiedergabe, §§ 15, 19, 21, 22 UrhG)",
+      "ab": 2
+    },
+    {
+      "pfad": "profil.nachunternehmer",
+      "typ": "bool",
+      "herleitung": "Onboarding (R12): beauftragt Subunternehmer oder Solo-Selbstständige mit übernommenen Aufträgen (Haftung als Auftraggeber, § 13 MiLoG, § 14 AEntG)",
+      "ab": 2
+    },
+    {
       "pfad": "profil.gastro.to_go",
       "typ": "bool",
       "herleitung": "Onboarding (R11): Speisen oder Getränke zum Mitnehmen in Einwegverpackungen (§§ 33, 34 VerpackG)",
@@ -290,6 +321,12 @@
       "ab": 7
     },
     {
+      "pfad": "profil.kasse.bargeld",
+      "typ": "bool",
+      "herleitung": "Onboarding (R12): nimmt Bargeld an – ohne Bargeld (nur Rechnungen, Überweisung, Karte) keine Frage nach der Kasse",
+      "ab": 2
+    },
+    {
       "pfad": "profil.kasse.elektronisch",
       "typ": "bool",
       "herleitung": "Onboarding",
@@ -310,7 +347,31 @@
     {
       "pfad": "profil.betriebsstaetten.anzahl",
       "typ": "ganzzahl",
-      "herleitung": "Onboarding",
+      "herleitung": "Onboarding (R12): Betriebsstätten außerhalb der eigenen Wohnung (Laden, Büro, Werkstatt, Praxis) – eine Betriebsstätte in einer beitragspflichtigen Wohnung ist beim Rundfunkbeitrag frei (§ 5 Abs. 5 Nr. 3 RBStV)",
+      "ab": 2
+    },
+    {
+      "pfad": "profil.fahrzeuge.anzahl",
+      "typ": "ganzzahl",
+      "herleitung": "Onboarding (R12): betrieblich genutzte, zugelassene Kraftfahrzeuge (Rundfunkbeitrag § 5 Abs. 2 Nr. 2 RBStV, DGUV Vorschrift 70)",
+      "ab": 2
+    },
+    {
+      "pfad": "profil.fahrzeuge.gesamtmasse",
+      "typ": "enum_liste",
+      "werte": [
+        "bis_2_5t",
+        "2_5_bis_2_8t",
+        "2_8_bis_3_5t",
+        "ueber_3_5t"
+      ],
+      "herleitung": "Onboarding (R12): zulässige Gesamtmasse der Firmenfahrzeuge (mit Anhänger) – Lenk- und Ruhezeiten, Fahrtenschreiber, GüKG",
+      "ab": 2
+    },
+    {
+      "pfad": "profil.fahrzeuge.ausland",
+      "typ": "bool",
+      "herleitung": "Onboarding (R12): Güterbeförderung auch grenzüberschreitend oder als Kabotage (VO (EG) Nr. 561/2006 ab 2,5 t seit 1.7.2026, Gemeinschaftslizenz)",
       "ab": 2
     },
     {
@@ -453,6 +514,26 @@
       "ab": 5
     },
     {
+      "pfad": "profil.arbeitszeit.nachtarbeit",
+      "typ": "bool",
+      "herleitung": "Onboarding (R12): Beschäftigte arbeiten regelmäßig mehr als zwei Stunden in der Nachtzeit (23–6 Uhr, in Bäckereien und Konditoreien 22–5 Uhr, § 2 Abs. 3, 4 ArbZG)",
+      "ab": 5
+    },
+    {
+      "pfad": "profil.umwelt.taetigkeiten",
+      "typ": "enum_liste",
+      "werte": [
+        "gefaehrliche_abfaelle",
+        "oelverkauf",
+        "starterbatterien",
+        "klimaservice",
+        "abscheider",
+        "keine"
+      ],
+      "herleitung": "Onboarding (R12): umweltrelevante Tätigkeiten – gefährliche Abfälle (§ 49 KrWG), Ölverkauf an Endverbraucher (§ 8 AltölV), Verkauf von Starterbatterien (§ 18 BattDG), Klimaservice an Fahrzeugen (F-Gase), Öl- bzw. Leichtflüssigkeitsabscheider",
+      "ab": 2
+    },
+    {
       "pfad": "abgeleitet.beschaeftigte.zaehlung_bdsg38",
       "typ": "ganzzahl",
       "herleitung": "[FACHLICH ZU PRÜFEN] Zählweise für § 38 BDSG",
@@ -492,6 +573,7 @@
         "videoueberwachung",
         "newsletter",
         "tracking",
+        "ortung",
         "keine"
       ],
       "herleitung": "Onboarding",
@@ -552,7 +634,7 @@
         "beantragt",
         "eingetragen"
       ],
-      "herleitung": "Onboarding / Gründungsassistent (Kapitalgesellschaft)",
+      "herleitung": "Onboarding / Gründungsassistent (Kapitalgesellschaft, R12 auch GmbH & Co. KG und Partnerschaftsgesellschaft: Handels- bzw. Partnerschaftsregister)",
       "ab": 3
     },
     {
@@ -562,7 +644,7 @@
         "kalenderjahr",
         "abweichend"
       ],
-      "herleitung": "Onboarding (Kapitalgesellschaft)",
+      "herleitung": "Onboarding (Kapitalgesellschaft, R12 auch GmbH & Co. KG)",
       "ab": 3
     },
     {
@@ -599,6 +681,18 @@
       "pfad": "abgeleitet.ist_kapitalgesellschaft",
       "typ": "bool",
       "herleitung": "rechtsform in {ug, gmbh}",
+      "ab": 2
+    },
+    {
+      "pfad": "abgeleitet.ist_kapitalgesellschaft_oder_co_kg",
+      "typ": "bool",
+      "herleitung": "rechtsform in {ug, gmbh, gmbh_co_kg} – keine natürliche Person haftet unbeschränkt (§ 264a HGB, § 15a Abs. 1 S. 3 InsO)",
+      "ab": 2
+    },
+    {
+      "pfad": "abgeleitet.ist_eingetragene_gesellschaft",
+      "typ": "bool",
+      "herleitung": "rechtsform in {ug, gmbh, gmbh_co_kg, partg, partg_mbb} – juristische Person oder eingetragene Personengesellschaft (§ 20 Abs. 1 GwG)",
       "ab": 2
     },
     {

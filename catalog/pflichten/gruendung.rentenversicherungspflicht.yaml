@@ -1,23 +1,24 @@
 # Katalog A.11 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gruendung.rentenversicherungspflicht
-version: 2
+version: 3
 katalog_nr: A.11
 titel:
-  de: Rentenversicherungspflicht melden
+  de: Rentenversicherungspflicht als Selbstständige prüfen und melden
 kurz:
-  de: Bestimmte Selbstständige sind rentenversicherungspflichtig und müssen sich innerhalb von drei Monaten bei der Deutschen
-    Rentenversicherung melden.
+  de: 'Bestimmte Selbstständige – etwa Lehrende und Trainer ohne versicherungspflichtige Beschäftigte – sind rentenversicherungspflichtig: Sie melden sich innerhalb von drei Monaten bei der Deutschen Rentenversicherung und zahlen laufend Beiträge.'
 erklaerung:
-  de: Pflichtversichert sind zum Beispiel Lehrende, Pflegepersonen, Handwerker in der Handwerksrolle und Selbstständige mit
-    nur einem Auftraggeber. Die Meldung an die Deutsche Rentenversicherung muss innerhalb von drei Monaten erfolgen.
+  de: 'Pflichtversichert sind zum Beispiel selbstständige Lehrerinnen und Erzieher, Pflegepersonen und Selbstständige, die auf Dauer und im Wesentlichen nur für einen Auftraggeber arbeiten – jeweils nur, wenn sie im Zusammenhang mit ihrer Tätigkeit regelmäßig keinen versicherungspflichtigen Arbeitnehmer beschäftigen (§ 2 S. 1 Nr. 1, 2 und 9 SGB VI) –, außerdem Handwerker in der Handwerksrolle (§ 2 S. 1 Nr. 8 SGB VI). Yoga-, Fitness- und Personal Trainer gelten bei der Deutschen Rentenversicherung in der Regel als Lehrende. Versicherungsfrei bleibt, wessen Arbeitseinkommen regelmäßig höchstens 603 € im Monat beträgt (geringfügige selbstständige Tätigkeit, § 5 Abs. 2 SGB VI, § 8 Abs. 3 SGB IV; ab 2027: 633 €). Die Meldung an die Deutsche Rentenversicherung muss innerhalb von drei Monaten nach Aufnahme der Tätigkeit erfolgen (§ 190a SGB VI); danach zahlst du laufend Beiträge.'
 rechtsgrundlage:
 - § 2 SGB VI
 - § 190a SGB VI
+- § 5 Abs. 2 SGB VI
+- § 25 Abs. 1 SGB IV
 kategorie: gruendung
 branchen:
 - gesundheit_pflege
 - it_agentur_freelancer
+- unterricht_sport_coaching
 ausloeser:
   feld: profil.rentenversicherung.pflichtgruppe
   op: enthaelt_eines
@@ -29,7 +30,6 @@ ausloeser:
   - sonstige
   label:
     de: Du gehörst zu einer Gruppe von Selbstständigen, die rentenversicherungspflichtig sein kann.
-phase: gruendung
 frist:
   typ: relativ
   bezug:
@@ -47,7 +47,7 @@ kanal: post
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Hast du dich nicht gemeldet, fordert die Rentenversicherung die Beiträge rückwirkend nach – in der Regel für vier Jahre nach Ablauf des Kalenderjahres, in dem sie fällig wurden, bei Vorsatz für 30 Jahre (§ 25 Abs. 1 SGB IV).
   schwere: hoch
 automatisierung: hinweis
 status_recht: in_kraft
@@ -61,9 +61,11 @@ quellen:
   url: https://www.gesetze-im-internet.de/sgb_6/__190a.html
   abgerufen: null
 fachlich_zu_pruefen:
+- 'R12 (Nutzertest Coach #1, #2): laufende Pflicht statt Gründungsschritt; Sanktion § 25 Abs. 1 SGB IV, Geringfügigkeitsgrenze 603 € (2027: 633 €) und Bedingung „kein versicherungspflichtiger Arbeitnehmer“ ergänzt – bestätigen'
+- Gelten Yoga-, Fitness- und Personal Trainer generell als Lehrende (auch reines 1:1-Training)? „In der Regel“ laut Nutzertest – unsicher
+- Merkmal „keine versicherungspflichtigen Beschäftigten“ nur über die Frage im Check (Einzelperson ohne Beschäftigte oder nur mit Minijobs) – ob Minijobs als versicherungspflichtige Arbeitnehmer zählen, bestätigen
 - Liste der Gruppen vollständig (§ 2 SGB VI)?
 - 'Fristbeginn: Aufnahme der Tätigkeit = Gründungsdatum?'
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 pruefung:
   status: entwurf
   geprueft_von: null

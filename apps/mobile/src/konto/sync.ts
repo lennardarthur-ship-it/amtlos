@@ -12,9 +12,9 @@
 import { gcm } from "@noble/ciphers/aes";
 import { pbkdf2 } from "@noble/hashes/pbkdf2";
 import { sha256 } from "@noble/hashes/sha2";
-import { kassenVereinen, type Person } from "@amtlos/fachlogik";
+import { kassenVereinen, kassenstuerzeVereinen, type Person } from "@amtlos/fachlogik";
 import { ITERATIONEN_HOECHSTENS, PASSWORT_MINDESTLAENGE, SICHERUNG_ITERATIONEN, ausBase64, base64, utf8 } from "../unterlagen/sicherung";
-import { belegeVereinen, fremdVereinen, mehrfachStorniert, nummernKonflikteVon, standAus, stornoVerweisePruefen, unterlagenZusammenfuehren, type Stand, type Unterlage } from "../unterlagen/speicher";
+import { belegNummernSichern, protokollVereinen, sachentnahmenVereinen, belegeVereinen, dateienImStand, staettenVereinen, fremdVereinen, mehrfachStorniert, nummernKonflikteVon, standAus, stornoVerweisePruefen, unterlagenZusammenfuehren, type Stand, type Unterlage } from "../unterlagen/speicher";
 import { tresorOeffnen, tresorSchliessen, tresorVersion } from "../unterlagen/tresor";
 
 export const SCHLUESSEL_FORMAT = "amtlos-schluessel";
@@ -185,10 +185,17 @@ export function syncZusammenfuehren(lokal: Stand, entfernt: Stand): SyncZusammen
     fremd: fremdVereinen(lokal.fremd, entfernt.fremd),
     // R12: Kassenabschlüsse sind festgeschrieben – nach ID vereinen, nie löschen; Korrekturen beider Geräte bleiben
     kasse: kassenVereinen(lokal.kasse, entfernt.kasse),
+    // R12: Betriebsstätten nach ID, die zuletzt geänderte gewinnt; Löschvermerke „s:“
+    betriebsstaetten: staettenVereinen(lokal.betriebsstaetten, entfernt.betriebsstaetten, geloescht),
+    // R12 GoBD: Kassenstürze und Protokoll nie verlieren; Sachentnahmen nach ID mit Löschvermerk „e:“
+    kassenstuerze: kassenstuerzeVereinen(lokal.kassenstuerze, entfernt.kassenstuerze),
+    protokoll: protokollVereinen(lokal.protokoll, entfernt.protokoll),
+    sachentnahmen: sachentnahmenVereinen(lokal.sachentnahmen, entfernt.sachentnahmen, geloescht),
     geloescht,
     zeiten,
   };
-  return { stand, nummernKonflikte: nummernKonflikteVon(stand), festKonflikte: u.konflikte, mehrfachStorniert: mehrfachStorniert(stand.unterlagen) };
+  const gesichert = belegNummernSichern(stand);
+  return { stand: gesichert, nummernKonflikte: nummernKonflikteVon(gesichert), festKonflikte: u.konflikte, mehrfachStorniert: mehrfachStorniert(gesichert.unterlagen) };
 }
 
 /** Schnittstelle zum Server – im Test ein Speicher im Arbeitsspeicher. */
@@ -252,34 +259,33 @@ export async function synchronisieren(u: SyncUmgebung): Promise<SyncErgebnis> {
     let runter = 0;
     const defekt: string[] = [];
     const fehlend: string[] = [];
-    // Belegdateien und Fotos der Z-Bons (R12)
-    for (const b of [...z.stand.belege, ...z.stand.belegArchiv, ...z.stand.kasse]) {
-      if (!b.datei) continue;
+    // Belegdateien, Fotos der Z-Bons (R12) und Kopien der Aufenthaltstitel (R12 Personal)
+    for (const datei of dateienImStand(z.stand)) {
       // zuerst gegen den Server prüfen, lokal nur nachsehen – gelesen und entschlüsselt wird erst zum Hochladen
-      const da = u.dateiVorhanden ? await u.dateiVorhanden(b.datei) : undefined;
-      const server = aufServer.has(b.datei);
+      const da = u.dateiVorhanden ? await u.dateiVorhanden(datei) : undefined;
+      const server = aufServer.has(datei);
       if (server && da) continue;
-      const lokal = da === false ? null : await u.dateiLokal(b.datei);
+      const lokal = da === false ? null : await u.dateiLokal(datei);
       if (lokal && !server) {
-        await u.api.dateiSpeichern(b.datei, dateiVerschluesseln(lokal, u.sync, u.zufall(12), u.konto === undefined ? undefined : b.datei));
+        await u.api.dateiSpeichern(datei, dateiVerschluesseln(lokal, u.sync, u.zufall(12), u.konto === undefined ? undefined : datei));
         hoch++;
       } else if (!lokal && server) {
-        const text = await u.api.dateiHolen(b.datei);
+        const text = await u.api.dateiHolen(datei);
         if (!text) {
-          fehlend.push(b.datei);
+          fehlend.push(datei);
           continue;
         }
         // eine beschädigte oder vertauschte Datei blockiert nicht die ganze Synchronisation (M5)
         let bytes: Uint8Array;
         try {
-          bytes = dateiEntschluesseln(text, u.sync, b.datei);
+          bytes = dateiEntschluesseln(text, u.sync, datei);
         } catch {
-          defekt.push(b.datei);
+          defekt.push(datei);
           continue;
         }
-        await u.dateiAblegen(b.datei, bytes);
+        await u.dateiAblegen(datei, bytes);
         runter++;
-      } else if (!lokal) fehlend.push(b.datei);
+      } else if (!lokal) fehlend.push(datei);
     }
     try {
       const zaehler = Math.max(gesehen, entfernt?.zaehler ?? 0) + 1;

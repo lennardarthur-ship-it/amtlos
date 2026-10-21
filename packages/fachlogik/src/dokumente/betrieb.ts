@@ -159,6 +159,10 @@ export const gewerbeanmeldung: Vorlage = {
   },
 };
 
+export const HR_KAPITAL_GMBH = "Stammkapital: bei einer GmbH mindestens 25.000 € (§ 5 Abs. 1 GmbHG)";
+export const HR_KAPITAL_UG = "Stammkapital: bei einer UG mindestens 1 € (§ 5a Abs. 1 GmbHG)";
+export const HR_KAPITAL_EURO = "Stammkapital und Geschäftsanteile in vollen Euro (§ 5 Abs. 2 GmbHG)";
+
 const HR_FORMEN = ["GmbH", "UG (haftungsbeschränkt)", "e. K.", "OHG", "KG", "GmbH & Co. KG"].map((r) => ({ wert: r, text: r }));
 
 export const handelsregister: Vorlage = {
@@ -186,6 +190,18 @@ export const handelsregister: Vorlage = {
     { titel: "Gesellschafter", felder: [{ id: "gesellschafter", art: "liste", label: "Gesellschafter", eintrag: "Gesellschafter/in", titelFeld: "name", felder: [...PERSON, { id: "anteil", art: "text", label: "Anteil", hilfe: "z. B. 12.500 € bzw. 50 %" }] }] },
     { titel: "Geschäftsführung bzw. Inhaber/in", felder: [{ id: "fuehrung", art: "liste", label: "Geschäftsführung", eintrag: "Person", titelFeld: "name", pflicht: true, felder: PERSON }, { id: "vertretung", art: "mehrzeilig", label: "Vertretungsregelung", hilfe: "z. B. vertritt allein; bei mehreren: gemeinsam oder einzeln" }] },
   ],
+  // R12 (Recht #16): Stammkapital der GmbH mindestens 25.000 €, in vollen Euro (§ 5 Abs. 1, 2 GmbHG); UG ab 1 € (§ 5a Abs. 1 GmbHG)
+  pruefen(d, b) {
+    const rechtsform = rechtsformAus(text(d, "rechtsform") || b.rechtsform, HR_FORMEN.map((o) => o.wert));
+    const c = cent(text(d, "kapital"));
+    if (c === null || !text(d, "kapital").trim()) return [];
+    const f: string[] = [];
+    if (rechtsform === "GmbH" && c < 2_500_000) f.push(HR_KAPITAL_GMBH);
+    if (rechtsform === "UG (haftungsbeschränkt)" && c < 100) f.push(HR_KAPITAL_UG);
+    if ((rechtsform === "GmbH" || rechtsform === "UG (haftungsbeschränkt)") && c % 100 !== 0) f.push(HR_KAPITAL_EURO);
+    return f;
+  },
+  pruefenZu: { [HR_KAPITAL_GMBH]: "kapital", [HR_KAPITAL_UG]: "kapital", [HR_KAPITAL_EURO]: "kapital" },
   html(d, b) {
     const ges = liste(d, "gesellschafter").filter((x) => text(x, "name"));
     const gf = liste(d, "fuehrung").filter((x) => text(x, "name"));

@@ -53,6 +53,13 @@ export function demoStand(heute = "2026-10-13"): Stand {
       "vertrieb.ausserhalb_geschaeftsraeume": false,
       "kasse.angeschafft_am": "2024-03-01",
       "online.social_media": true,
+      // R12: neue Kernfragen (Betriebsstätten, Azubis, Fernabsatz, Musik, Bargeld, Voranmeldung) – sonst „Check fast fertig“
+      "betriebsstaetten.anzahl": 1,
+      "beschaeftigte.azubi": 1,
+      "vertrieb.fernabsatz": false,
+      oeffentliche_wiedergabe: true,
+      "kasse.bargeld": true,
+      "ust.voranmeldung_rhythmus": "monatlich",
     },
     proTest: true,
     erinnerungen: true,
@@ -78,7 +85,8 @@ export function demoStand(heute = "2026-10-13"): Stand {
   ];
   for (const [id, datum, kunde, anschrift, pos, bezahlt] of rechnungen) {
     const [s1] = anlegen(s, "rechnung", t(datum), id);
-    s = felderSetzen(s1, id, { datum, kunde_name: kunde, kunde_anschrift: anschrift, positionen: pos.map(([bezeichnung, menge, preis]) => ({ bezeichnung, menge, einheit: "", preis, satz: "19" })), hinweis: "Vielen Dank für Ihren Auftrag." }, t(datum));
+    // R12: der Salon hat Bruttopreise vorbelegt – die Beispielpreise sind netto
+    s = felderSetzen(s1, id, { datum, preise_brutto: false, kunde_name: kunde, kunde_anschrift: anschrift, positionen: pos.map(([bezeichnung, menge, preis]) => ({ bezeichnung, menge, einheit: "", preis, satz: "19" })), hinweis: "Vielen Dank für Ihren Auftrag." }, t(datum));
     s = ausgeben(s, id, t(datum, 10));
     if (bezahlt) s = bezahltSetzen(s, id, bezahlt);
   }

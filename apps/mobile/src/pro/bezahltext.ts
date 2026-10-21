@@ -21,3 +21,21 @@ export function knopfText(o: { kaufAktiv: boolean; testmodus: boolean; gewaehlt?
   if (o.kaufAktiv) return o.gewaehlt?.test ? TEXT.pro_test_starten : TEXT.pro_abonnieren;
   return o.testmodus ? TEXT.pro_test_einschalten : null;
 }
+
+/**
+ * R12 (UX #12): Ersparnis des Jahresabos gegenüber zwölf Monatsabos in ganzen Prozent – nur aus den Store-Preisen;
+ * null, wenn einer fehlt oder sich nichts spart.
+ */
+export function ersparnis(liste: readonly Pick<Angebot, "zeitraum" | "betrag">[]): number | null {
+  const jahr = liste.find((a) => a.zeitraum === "jährlich")?.betrag;
+  const monat = liste.find((a) => a.zeitraum === "monatlich")?.betrag;
+  if (!jahr || !monat) return null;
+  const p = Math.floor((1 - jahr / (monat * 12)) * 100);
+  return p > 0 ? p : null;
+}
+
+/** R12 (UX #12): Monat, ab dem das Freikontingent wieder gilt („November“) – der Monat nach `jetzt` (deutsche Zeit). */
+export function naechsterMonat(jetzt: Date): string {
+  const [j, m] = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin", year: "numeric", month: "2-digit" }).format(jetzt).split("-").map(Number) as [number, number];
+  return new Intl.DateTimeFormat("de-DE", { month: "long", timeZone: "UTC" }).format(new Date(Date.UTC(j, m, 1)));
+}

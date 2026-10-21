@@ -1,24 +1,24 @@
 # Katalog B.17 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.insolvenzantragspflicht
-version: 3
+version: 4
 katalog_nr: B.17
 titel:
   de: Insolvenzantragspflicht kennen
 kurz:
   de: Bei Zahlungsunfähigkeit oder Überschuldung muss die Geschäftsführung rechtzeitig Insolvenz beantragen.
 erklaerung:
-  de: Die Insolvenzantragspflicht nach § 15a InsO trifft die Geschäftsführung. Der Antrag ist ohne schuldhaftes Zögern zu stellen,
-    spätestens drei Wochen nach Eintritt der Zahlungsunfähigkeit und sechs Wochen nach Eintritt der Überschuldung.
+  de: Die Insolvenzantragspflicht nach § 15a InsO trifft die Geschäftsführung. Der Antrag ist ohne schuldhaftes Zögern zu stellen, spätestens drei Wochen nach Eintritt der Zahlungsunfähigkeit und sechs Wochen nach Eintritt der Überschuldung. Bei der GmbH & Co. KG gilt das ebenso, weil keine natürliche Person unbeschränkt haftet; antragspflichtig ist dann die Geschäftsführung der Komplementär-GmbH (§ 15a Abs. 1 S. 3 InsO).
 rechtsgrundlage:
 - § 15a InsO
+- § 15b InsO
 kategorie: gesellschaft
 ausloeser:
-  feld: abgeleitet.ist_kapitalgesellschaft
+  feld: abgeleitet.ist_kapitalgesellschaft_oder_co_kg
   op: ==
   wert: true
   label:
-    de: Dein Unternehmen ist eine UG oder GmbH.
+    de: Dein Unternehmen ist eine UG, GmbH oder GmbH & Co. KG.
 frist:
   typ: dauerhaft
 wiederholung:
@@ -29,7 +29,7 @@ kanal: post
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Wer den Antrag nicht, nicht richtig oder nicht rechtzeitig stellt, macht sich strafbar: Freiheitsstrafe bis zu drei Jahren oder Geldstrafe, bei Fahrlässigkeit bis zu einem Jahr oder Geldstrafe (§ 15a Abs. 4, 5 InsO). Zahlungen nach Eintritt der Insolvenzreife muss die Geschäftsführung der Gesellschaft in der Regel ersetzen (§ 15b InsO).'
   schwere: hoch
 automatisierung: hinweis
 einordnung: hinweis
@@ -41,10 +41,10 @@ quellen:
   url: https://www.gesetze-im-internet.de/inso/__15a.html
   abgerufen: null
 fachlich_zu_pruefen:
-- 'Fristen drei bzw. sechs Wochen (§ 15a Abs. 1 InsO) im Text ergänzt (R11, Nutzertest Tischlerei) – bestätigen'
+- 'R12 (Rechtsprüfung Befunde 1 und 9): GmbH & Co. KG (§ 15a Abs. 1 S. 3 InsO); Sanktion § 15a Abs. 4, 5 InsO und Haftung § 15b InsO – bestätigen'
+- Fristen drei bzw. sechs Wochen (§ 15a Abs. 1 InsO) im Text ergänzt (R11, Nutzertest Tischlerei) – bestätigen
 - 'Fristen nach § 15a InsO als Regelwerte erfassen (Spezifikation: „Fristen aus Regeldaten“, Werte nicht genannt)'
 - 'Darstellung: allgemeine Information, keine Prüfung des Einzelfalls (RDG)'
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 pruefung:
   status: entwurf
   geprueft_von: null

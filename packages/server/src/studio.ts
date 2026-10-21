@@ -27,6 +27,8 @@ export const PASSENDE_QUALIFIKATION: Record<string, Qualifikation[]> = {
   online: ["rechtsanwalt"],
   produkte: ["rechtsanwalt"],
   branche: ["rechtsanwalt"],
+  // R12: Umwelt und Abfall (GewAbfV, KrWG, AltölV, F-Gase)
+  umwelt: ["rechtsanwalt", "fachkraft_arbeitssicherheit"],
 };
 
 export interface StudioKonto {

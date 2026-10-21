@@ -20,6 +20,7 @@ fakten:
   profil.kunden.regionen: [inland]
   profil.kasse.elektronisch: false
   profil.betriebsstaetten.anzahl: 0
+  profil.fahrzeuge.anzahl: 0
   profil.beschaeftigte.gesamt: 0
   profil.bundesland: NW
   profil.gemeinde_ags: "05315000"

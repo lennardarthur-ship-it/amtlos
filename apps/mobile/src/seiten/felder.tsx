@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { AccessibilityInfo, View } from "react-native";
-import { gruppenAusBranchen, ohneVerdeckteFelder, sichtbar, type Daten, type EinfachesFeld, type Eintrag, type EintragWert, type Feld, type ListenFeld } from "@amtlos/fachlogik";
+import { gruppenFuerBetrieb, ohneVerdeckteFelder, sichtbar, type Daten, type EinfachesFeld, type Eintrag, type EintragWert, type Feld, type ListenFeld } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { T, TextKnopf } from "../ui/bausteine";
 import { weich } from "../ui/thema";
@@ -31,7 +31,9 @@ export function Felder({ felder, werte, setze, fehlt, liste, kontext }: { felder
   const [alle, setAlle] = useState(false);
   // Branche aus dem Pflichten-Check: Vorschläge und Bausteine passend zum Betrieb (R10)
   const branchen = useStandWahl((s) => s.profil["taetigkeit.branchen"]);
-  const umfeld = useMemo(() => ({ gruppen: gruppenAusBranchen(branchen), daten: kontext ?? (werte as Daten) }), [branchen, kontext, werte]);
+  // R12: dazu Werkstatt, Bäckerei und Transport (Themen der Unterweisung)
+  const name = useStandWahl((s) => s.betrieb.name);
+  const umfeld = useMemo(() => ({ gruppen: gruppenFuerBetrieb(branchen, name), daten: kontext ?? (werte as Daten) }), [branchen, name, kontext, werte]);
   const sichtbareWerte = ohneVerdeckteFelder(felder, werte);
   const da = felder.filter((x) => sichtbar(x, sichtbareWerte));
   // unter „Fehlt noch“ genannt (auch „Anrede: Name statt „…“ eintragen“): Feld zeigen, nicht hinter „Weitere Angaben“

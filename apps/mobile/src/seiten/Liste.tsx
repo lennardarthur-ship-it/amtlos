@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
-import { betragUnplausibel, cent, mengeUngueltig, summen, zahl, eintragAusVorschlag, kurztitelListe, neuerEintrag, ohneVerdeckteFelder, sichtbar, unlesbar, unlesbarText, vorlageFuer, type Daten, type Eintrag, type EintragWert, type ListenFeld, type Vorschlag } from "@amtlos/fachlogik";
+import { betragUnplausibel, cent, einheitFuerMenge, gruppenAusBranchen, mengeUngueltig, summen, zahl, eintragAusVorschlag, kurztitelListe, neuerEintrag, ohneVerdeckteFelder, sichtbar, unlesbar, unlesbarText, vorlageFuer, type Daten, type Eintrag, type EintragWert, type ListenFeld, type Vorschlag } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { ChipLeiste, Fuss, HinzufuegenKnopf, Kaestchen, Karte, Knopf, Symbol, T, TextKnopf, Wahl } from "../ui/bausteine";
+import { ChipLeiste, Fuss, HinzufuegenKnopf, Kaestchen, Karte, Knopf, Symbol, T, TextKnopf, Wahl, textAus } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
 import { BLATT_OBEN, HAARLINIE, RADIUS, RAND, ZIEL, useFarben } from "../ui/thema";
 import { heute, personenSortiert } from "../unterlagen/speicher";
+import { naechsterTag, wocheKopieren } from "../unterlagen/arbeitszeit";
 import { minderjaehrig } from "../ui/datum";
 import { VORSCHLAG_GRUPPE } from "../pflichten/check";
 import { useAmtlos } from "../zustand";
@@ -18,7 +19,18 @@ import { Inhalt } from "./gemeinsam";
  * „Holz / Tischlerei“ bleibt bewusst ohne Zuordnung (der Check unterscheidet die Gewerke im Handwerk nicht): beim
  * Elektriker stünde sonst Hartholzstaub unter „Passend für dich“.
  */
-const GRUPPE_R11: Record<string, string[]> = { gebaeudereinigung: ["Gebäudereinigung"] };
+const GRUPPE_R11: Record<string, string[]> = { gebaeudereinigung: ["Gebäudereinigung"], transport_logistik: ["Transport / Kurier"] };
+
+/**
+ * R12 (Kfz #3, Bäckerei #6): Werkstatt und Bäckerei unterscheidet der Check nicht vom übrigen Handwerk – passend nur,
+ * wenn der Name des Betriebs es sagt (bzw. Bäckerei: Handwerk und Lebensmittel zusammen). Sonst als eigene Gruppe wählbar.
+ */
+export function passendeGruppen(branchen: readonly string[], betriebName: string): string[] {
+  const g = branchen.flatMap((b) => [...(VORSCHLAG_GRUPPE[b] ?? []), ...(GRUPPE_R11[b] ?? [])]);
+  if (/\b(kfz|auto|autohaus|werkstatt|reifen|karosserie|fahrzeug)/i.test(betriebName)) g.push("Kfz-Werkstatt");
+  if ((branchen.includes("handwerk") && branchen.includes("gastronomie_lebensmittel")) || /bäcker|backstube|konditor/i.test(betriebName)) g.push("Bäckerei");
+  return [...new Set(g)];
+}
 
 /** Filter „passend zu deinem Betrieb“ (mehrere Gruppen, z. B. Friseur und Kosmetik bei Beauty) */
 const PASSEND = "\u0001passend";
@@ -55,8 +67,10 @@ function feldIn(vorlageId: string, feldId: string): ListenFeld | undefined {
  * Rechnungspositionen bei Kleinunternehmern (R10, Befund Freiberuf): ohne Steuersatz und ohne „netto“ – es wird keine
  * Umsatzsteuer ausgewiesen.
  */
-function kuFelder(feld: ListenFeld, ku: boolean): ListenFeld["felder"] {
-  if (!ku || feld.id !== "positionen") return feld.felder;
+function kuFelder(feld: ListenFeld, ku: boolean, brutto = false): ListenFeld["felder"] {
+  if (feld.id !== "positionen") return feld.felder;
+  // R12 (UX #5): mit „Preise inkl. Umsatzsteuer“ heißt das Feld auch so – „netto“ führte Salon und Café in die Irre
+  if (!ku) return brutto ? feld.felder.map((x) => (x.id === "preis" ? { ...x, label: x.label.replace(/netto/, "brutto"), hilfe: undefined } : x)) : feld.felder;
   return feld.felder.filter((x) => x.id !== "satz").map((x) => (x.id === "preis" ? { ...x, label: x.label.replace(/\s*netto/, "") } : x));
 }
 
@@ -100,8 +114,8 @@ function EintragSeite({ id, feldId, index, neu }: { id: string; feldId: string; 
   return (
     <Unterseite titel={`${feld.eintrag} ${index + 1}`}>
       <Inhalt contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: BLATT_OBEN - 20, paddingBottom: 32 }}>
-        <Felder felder={kuFelder(feld, u?.daten.kleinunternehmer === true)} werte={e} fehlt={fehltIn(feld, e)} setze={setze} kontext={u?.daten} />
-        <Rechnung e={e} kleinunternehmer={u?.daten.kleinunternehmer === true} />
+        <Felder felder={kuFelder(feld, u?.daten.kleinunternehmer === true, u?.daten.preise_brutto === true)} werte={e} fehlt={fehltIn(feld, e)} setze={setze} kontext={u?.daten} />
+        <Rechnung e={e} kleinunternehmer={u?.daten.kleinunternehmer === true} brutto={u?.daten.preise_brutto === true} />
         <TextKnopf
           symbol="trash"
           gefahr
@@ -128,15 +142,19 @@ function EintragSeite({ id, feldId, index, neu }: { id: string; feldId: string; 
  * Rechnung der Position live unter den Feldern (B10): „2 × 25,00 € = 50,00 € netto · 59,50 € brutto“ – mit der
  * Summenrechnung der Fachlogik, damit hier dieselbe Zahl steht wie auf der Rechnung.
  */
-function Rechnung({ e, kleinunternehmer }: { e: Eintrag; kleinunternehmer: boolean }) {
+function Rechnung({ e, kleinunternehmer, brutto }: { e: Eintrag; kleinunternehmer: boolean; brutto?: boolean }) {
   const f = useFarben();
   const preis = typeof e.preis === "string" ? cent(e.preis) : null;
   if (preis === null || !("menge" in e || "satz" in e)) return null;
   const menge = typeof e.menge === "string" && e.menge.trim() ? (zahl(e.menge) ?? 1) : 1;
   const satz = kleinunternehmer ? null : Number(typeof e.satz === "string" && e.satz ? e.satz : "19");
-  const s = summen([{ bezeichnung: "", menge, einheit: "stueck", preis_cent: preis, ust_satz: satz }], kleinunternehmer);
+  // R12: mit Bruttopreisen wie auf der Rechnung aus dem Endpreis zurückgerechnet
+  const mitBrutto = Boolean(brutto) && !kleinunternehmer && satz !== null && satz > 0;
+  const s = summen([mitBrutto ? { bezeichnung: "", menge, einheit: "stueck", preis_cent: Math.round((preis * 100) / (100 + satz!)), brutto_cent: preis, ust_satz: satz } : { bezeichnung: "", menge, einheit: "stueck", preis_cent: preis, ust_satz: satz }], kleinunternehmer);
   const eur = (c: number) => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(c / 100);
-  const text = TEXT.position_rechnung(new Intl.NumberFormat("de-DE", { maximumFractionDigits: 4 }).format(menge), eur(preis), eur(s.netto_cent), kleinunternehmer ? null : eur(s.brutto_cent));
+  // R12 (UX #14): Einheit in der Mehrzahl („3 Stunden“)
+  const einheit = typeof e.einheit === "string" && e.einheit.trim() ? ` ${einheitFuerMenge(e.einheit, menge)}` : "";
+  const text = TEXT.position_rechnung(`${new Intl.NumberFormat("de-DE", { maximumFractionDigits: 4 }).format(menge)}${einheit}`, eur(preis), eur(s.netto_cent), kleinunternehmer ? null : eur(s.brutto_cent));
   return (
     <View accessibilityRole="summary" style={{ marginTop: 16, paddingVertical: 12, paddingHorizontal: 14, borderRadius: RADIUS.klein, backgroundColor: f.amtHauch }}>
       <T v="klein" fett farbe={f.amtTief} stil={{ fontVariant: ["tabular-nums"] }}>{text}</T>
@@ -157,7 +175,8 @@ function VorschlagSeite({ id, feldId }: { id: string; feldId: string }) {
   const alle = feld?.vorschlaege ?? [];
   const gruppen = [...new Set(alle.map((v) => v.gruppe).filter((g): g is string => Boolean(g)))];
   // Branche aus dem Pflichten-Check: passende Gruppen zuerst („Passend für dich“), damit beim Maler keine Friseurchemikalien stehen
-  const passend = gruppen.filter((g) => (Array.isArray(z.stand.profil["taetigkeit.branchen"]) ? (z.stand.profil["taetigkeit.branchen"] as string[]) : []).some((b) => [...(VORSCHLAG_GRUPPE[b] ?? []), ...(GRUPPE_R11[b] ?? [])].includes(g)));
+  const meine = passendeGruppen(Array.isArray(z.stand.profil["taetigkeit.branchen"]) ? (z.stand.profil["taetigkeit.branchen"] as string[]) : [], z.stand.betrieb.name);
+  const passend = gruppen.filter((g) => meine.includes(g));
   const [gruppe, setGruppe] = useState<string>(passend.length === 1 ? passend[0]! : passend.length > 1 ? PASSEND : "");
   const [gewaehlt, setGewaehlt] = useState<Set<string>>(new Set());
   const [offen, setOffen] = useState<string | null>(null);
@@ -258,12 +277,13 @@ export function ohneTitel(text: string, titel: string[]): string {
   return roh;
 }
 
-/** Rechnungsposition: „2 Stunde × 45,00 € = 90,00 €“ – damit man in der Liste sieht, was die Position kostet. */
+/** Rechnungsposition: „2 Stunden × 45,00 € = 90,00 €“ – damit man in der Liste sieht, was die Position kostet. */
 function betragszeile(e: Record<string, unknown>): string | null {
   const preis = typeof e.preis === "string" ? cent(e.preis) : null;
   if (preis === null) return null;
   const menge = typeof e.menge === "string" && e.menge.trim() ? (zahl(e.menge) ?? 1) : 1;
-  const einheit = typeof e.einheit === "string" && e.einheit.trim() ? ` ${e.einheit.trim()}` : "";
+  // R12 (UX #14): „3 Stunden“, „7 Termine“ – nicht „3 Stunde“
+  const einheit = typeof e.einheit === "string" && e.einheit.trim() ? ` ${einheitFuerMenge(e.einheit, menge)}` : "";
   const fmt = (c: number) => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(c / 100);
   return `${new Intl.NumberFormat("de-DE", { maximumFractionDigits: 4 }).format(menge)}${einheit} × ${fmt(preis)} = ${fmt(Math.round(menge * preis))}`;
 }
@@ -329,10 +349,37 @@ export function ListenSchritt({ feld, id }: { feld: ListenFeld; id: string }) {
         text={feld.vorschlaege?.length ? TEXT.eigener_eintrag(feld.eintrag) : TEXT.hinzufuegen(feld.eintrag)}
         onPress={() => {
           const liste = eintraegeVon(z.daten(id), feld);
-          z.setzen(id, { [feld.id]: [...liste, neuerEintrag(feld, z.stand.betrieb, heute())] });
+          // R12: Startwerte je Branche (Einheit) und wie die letzte Position (Steuersatz)
+          z.setzen(id, { [feld.id]: [...liste, neuerEintrag(feld, z.stand.betrieb, heute(), gruppenAusBranchen(z.stand.profil["taetigkeit.branchen"]), liste.at(-1))] });
           oeffnen(liste.length, true);
         }}
       />
+      {/* R12 (Kurier #11): Arbeitszeitnachweis schneller füllen – nächster Tag mit gleichen Zeiten, Woche kopieren */}
+      {feld.id === "tage" && z.stand.unterlagen.find((u) => u.id === id)?.vorlage === "arbeitszeitnachweis" ? <SchnellErfassen id={id} feld={feld} /> : null}
+    </View>
+  );
+}
+
+/** R12 (Kurier #11): „Nächster Tag mit gleichen Zeiten“ und „Woche kopieren“ – ein eingetragener Monat begrenzt die Tage. */
+function SchnellErfassen({ id, feld }: { id: string; feld: ListenFeld }) {
+  const z = useAmtlos();
+  const melden = useMeldung();
+  const daten = z.daten(id);
+  const tage = eintraegeVon(daten, feld);
+  const monat = typeof daten?.monat === "string" ? daten.monat : null;
+  const naechster = naechsterTag(tage, monat);
+  const woche = wocheKopieren(tage, monat);
+  if (!naechster && !woche.length) return null;
+  const dazu = (neu: Eintrag[]) => {
+    // leere Zeilen (nur Datum) zuerst entfernen – sonst blieben sie als unvollständige Tage stehen
+    const liste = eintraegeVon(z.daten(id), feld).filter((e) => benutzt(feld, e) && ["beginn", "ende", "pause", "einsatzort", "bemerkung"].some((k) => typeof e[k] === "string" && (e[k] as string).trim()));
+    z.setzen(id, { [feld.id]: [...liste, ...neu].sort((a, b) => String(a.datum ?? "").localeCompare(String(b.datum ?? ""))) });
+    melden(TEXT.r12p_tage_dazu(neu.length));
+  };
+  return (
+    <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 4 }}>
+      {naechster ? <TextKnopf symbol="plus.circle" text={TEXT.r12p_naechster_tag(textAus(String(naechster.datum)))} onPress={() => dazu([naechster])} /> : null}
+      {woche.length ? <TextKnopf symbol="doc.on.doc" text={TEXT.r12p_woche_kopieren(woche.length)} onPress={() => dazu(woche)} /> : null}
     </View>
   );
 }

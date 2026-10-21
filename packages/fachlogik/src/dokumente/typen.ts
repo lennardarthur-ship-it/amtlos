@@ -62,6 +62,11 @@ export interface Option {
    * Betrieb. Die App zeigt passende zuerst und den Rest unter „Weitere“ (siehe BRANCHEN_GRUPPEN).
    */
   gruppen?: string[];
+  /**
+   * R12: Baustein nur zeigen, wenn die Bedingung erfüllt ist (mehrere: eine genügt) – gewählte bleiben immer sichtbar,
+   * z. B. „innergemeinschaftliche Lieferung“ nicht bei Kleinunternehmern.
+   */
+  wenn?: Bedingung | Bedingung[];
 }
 
 /** Vorbereiteter Listeneintrag zum Übernehmen, z. B. eine typische Gefährdung mit Maßnahmen. */
@@ -93,6 +98,8 @@ interface FeldBasis {
   selten?: boolean;
   /** hervorgehoben (R10): Angabe, die nur der Betrieb kennt, z. B. der Produktname im Hautschutzplan */
   hervor?: boolean;
+  /** R12 (Listeneinträge): ein neuer Eintrag übernimmt den Wert des vorigen (z. B. Steuersatz der letzten Position) */
+  wieVorher?: boolean;
 }
 
 export type EinfachesFeld =
@@ -103,7 +110,7 @@ export type EinfachesFeld =
    * `vorbelegungGruppen`: die Vorbelegung gilt nur für diese Branchengruppen (z. B. „prüfende Elektrofachkraft“ = Inhaber
    * nur im Handwerk). `vorschlaegeAus`: Vorschläge aus einer anderen Liste derselben Unterlage (z. B. Kontrollpunkte).
    */
-  | (FeldBasis & { art: "text" | "mehrzeilig"; vorbelegung?: "verantwortlich" | "betrieb_kontakt" | { text: string }; vorschlaege?: string[]; vorschlagGruppen?: Record<string, string[]>; vorbelegungGruppen?: string[]; vorschlaegeAus?: { liste: string; feld: string } })
+  | (FeldBasis & { art: "text" | "mehrzeilig"; vorbelegung?: "verantwortlich" | "betrieb_kontakt" | { text: string }; vorschlaege?: string[]; vorschlagGruppen?: Record<string, string[]>; vorbelegungGruppen?: string[]; vorschlaegeAus?: { liste: string; feld: string }; /** R12: Startwert je Branchengruppe (erste passende), z. B. Einheit „Pauschale“ im Salon */ vorbelegungJe?: Record<string, string> })
   | (FeldBasis & { art: "datum"; vorbelegung?: "heute" })
   /** `jetzt`: Knopf „Jetzt“ setzt die aktuelle Uhrzeit */
   | (FeldBasis & { art: "uhrzeit"; jetzt?: boolean })
@@ -113,7 +120,8 @@ export type EinfachesFeld =
   | (FeldBasis & { art: "zahl"; vorbelegung?: string })
   /** `vorbelegungJe` (R11): Startwert je Branchengruppe des Betriebs (erste passende Gruppe), sonst `vorbelegung` */
   | (FeldBasis & { art: "wahl"; optionen: Option[]; vorbelegung?: string; vorbelegungJe?: Record<string, string> })
-  | (FeldBasis & { art: "schalter"; vorbelegung?: boolean })
+  /** `vorbelegungJe` (R12): Startwert je Branchengruppe, z. B. Bruttopreise im Salon und im Café */
+  | (FeldBasis & { art: "schalter"; vorbelegung?: boolean; vorbelegungJe?: Record<string, boolean> })
   | (FeldBasis & { art: "mehrfach"; optionen: Option[] })
   /** Textbausteine zum Ankreuzen (Liste untereinander, mit Quelle); gespeichert werden die Werte */
   | (FeldBasis & { art: "bausteine"; optionen: Option[]; vorbelegung?: string[] });
@@ -190,6 +198,12 @@ export interface Vorlage {
   ohneKopfangaben?: boolean;
   /** wird beim ersten Teilen oder Drucken festgeschrieben (GoBD): danach nicht mehr änderbar oder löschbar (E-127) */
   festschreiben?: boolean;
+  /**
+   * R12: Nachweis (Arbeitszeit, NachwG, Ausweis-Hinweis): wird wie eine Rechnung beim ersten Teilen festgeschrieben,
+   * korrigiert aber nicht per Storno, sondern als neue Fassung mit Datum und Grund – die alte Fassung bleibt erhalten.
+   * Zusammen mit `festschreiben`.
+   */
+  korrektur?: boolean;
   /** Umsätze lassen sich aus festgeschriebenen Rechnungen übernehmen (Umsatzsteuer-Voranmeldung, E-128) */
   ausRechnungen?: boolean;
   /** lässt sich zusätzlich als E-Rechnung (XRechnung) teilen (E-128) */
@@ -198,6 +212,11 @@ export interface Vorlage {
   storno?: boolean;
   /** Startwerte aus dem Pflichten-Check: Feld der Vorlage → Profilfeld (z. B. kleinunternehmer → ust.kleinunternehmer) */
   ausProfil?: Record<string, string>;
+  /**
+   * R12: Startwerte aus mehreren Antworten des Pflichten-Checks (z. B. Bruttopreise, wenn nur Privatkunden), die
+   * `ausProfil` nicht abbildet – beim Anlegen einer neuen Unterlage, pro Unterlage überschreibbar.
+   */
+  profilStart?(profil: Record<string, unknown>, betrieb?: Betrieb): Daten;
   /** Startwerte aus „Mein Betrieb“: Feld → Betriebsfeld (z. B. Soll-/Ist-Versteuerung) */
   ausBetrieb?: Record<string, keyof Betrieb>;
   /** Querformat (breite Tabellen, Aushänge) */

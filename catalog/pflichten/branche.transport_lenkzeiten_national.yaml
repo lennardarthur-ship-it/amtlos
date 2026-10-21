@@ -1,0 +1,56 @@
+# R12 (Nutzertest Kurier #2): Lenk- und Ruhezeiten im Inland für Fahrzeuge über 2,8 bis 3,5 t
+schema_version: 1
+id: branche.transport_lenkzeiten_national
+version: 1
+katalog_nr: H.5
+titel:
+  de: Lenk- und Ruhezeiten bei Transportern über 2,8 t
+kurz:
+  de: Im Inland gelten die Lenk- und Ruhezeiten schon für Fahrzeuge über 2,8 t bis 3,5 t – ohne Fahrtenschreiber zeichnest du sie mit Tageskontrollblättern auf.
+erklaerung:
+  de: Für die Güterbeförderung mit Fahrzeugen über 2,8 t bis 3,5 t zulässiger Gesamtmasse gelten im Inland ebenfalls die Lenk- und Ruhezeiten der Verordnung (EG) Nr. 561/2006; das regelt die Fahrpersonalverordnung. Ist kein Fahrtenschreiber eingebaut, führen die Fahrerinnen und Fahrer handschriftliche Tageskontrollblätter; ist einer eingebaut, wird er benutzt. Die Nachweise für den laufenden Tag und die vorangegangenen 28 Tage führen sie mit. Für Werkverkehr gibt es unter bestimmten Bedingungen Ausnahmen.
+rechtsgrundlage:
+- FPersV
+- Verordnung (EG) Nr. 561/2006
+kategorie: branche
+branchen:
+- transport_logistik
+ausloeser:
+  all:
+  - feld: profil.fahrzeuge.anzahl
+    op: '>='
+    wert: 1
+    label:
+      de: Du nutzt Firmenfahrzeuge.
+  - feld: profil.fahrzeuge.gesamtmasse
+    op: enthaelt
+    wert: 2_8_bis_3_5t
+    label:
+      de: Mindestens ein Fahrzeug hat über 2,8 bis 3,5 t zulässige Gesamtmasse.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Kontrolle durch Polizei und Gewerbeaufsicht
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: IHK München – Handzettel Kleinfahrzeuge (Stand 05/2026)
+  url: https://www.ihk-muenchen.de/ihk/Verkehr/Verkehrsausschuss/Handzettel-Kleinfahrzeuge-Stand-22_05_2026.pdf
+  abgerufen: '2026-10-21'
+fachlich_zu_pruefen:
+- 'Neu nach Nutzertest R12 (Kurier #2) laut IHK München (Handzettel Kleinfahrzeuge 05/2026) – genaue Fundstelle in der FPersV unsicher; Ausnahmen für Werkverkehr bestätigen'
+- § 21a ArbZG für Fahrer zwischen 2,8 und 3,5 t im Inlandsverkehr unsicher; Folgen fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

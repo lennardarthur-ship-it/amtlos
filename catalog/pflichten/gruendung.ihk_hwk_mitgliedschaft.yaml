@@ -1,7 +1,7 @@
 # Katalog A.7 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gruendung.ihk_hwk_mitgliedschaft
-version: 1
+version: 2
 katalog_nr: A.7
 titel:
   de: Mitgliedschaft in IHK oder Handwerkskammer
@@ -9,10 +9,10 @@ kurz:
   de: Als Gewerbetreibender bist du automatisch Mitglied der IHK oder Handwerkskammer und zahlst einen Beitrag nach deinem
     Ertrag.
 erklaerung:
-  de: Die Mitgliedschaft entsteht automatisch mit dem Gewerbe; du musst dich nicht selbst anmelden. Die Kammer meldet sich
-    bei dir und setzt den Beitrag fest.
+  de: Die Mitgliedschaft entsteht automatisch mit dem Gewerbe; du musst dich nicht selbst anmelden. Die Kammer meldet sich bei dir und setzt den Beitrag fest. Kleingewerbetreibende ohne Eintragung im Handelsregister sind bei der IHK beitragsfrei, solange ihr Gewerbeertrag 5.200 € im Jahr nicht übersteigt (§ 3 Abs. 3 IHKG).
 rechtsgrundlage:
 - IHKG
+- § 3 Abs. 3 IHKG
 - HwO
 kategorie: gruendung
 ausloeser:
@@ -45,10 +45,10 @@ quellen:
   url: https://www.gesetze-im-internet.de/ihkg/
   abgerufen: null
 fachlich_zu_pruefen:
+- 'R12 (Rechtsprüfung Befund 18): Beitragsfreistellung bis 5.200 € Gewerbeertrag (§ 3 Abs. 3 IHKG) – Betrag, Satz und Sonderregeln für Existenzgründer bestätigen; Handwerkskammern regeln Beiträge eigenständig'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Information ohne Handlung – als Hinweis darstellen?
 - Beitragstermine für den Jahreskalender (I) ergänzen
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf
   geprueft_von: null

@@ -11,6 +11,8 @@ import { RAENDER, type Gestalt } from "@amtlos/fachlogik";
 import { fussAngaben, fusszeileStempeln } from "./fusszeile";
 import { mitSchriften } from "./schriften";
 import { cacheDateiLoeschen } from "./aufraeumen";
+import { sha256 } from "@noble/hashes/sha2";
+import { bytesToHex } from "@noble/hashes/utils";
 
 /** A4 in Punkt (72 dpi). Ränder je Gestalt (E-129): unten Platz für die Fußzeile. */
 const A4 = { width: 595, height: 842 };
@@ -73,6 +75,25 @@ export async function pdfTeilen(html: string, dateiname: string, quer = false): 
   try {
     if (Platform.OS !== "ios" && !(await Sharing.isAvailableAsync())) return await druckenUri(uri);
     return await teilen(uri, { mimeType: "application/pdf", UTI: "com.adobe.pdf", titel: dateiname });
+  } finally {
+    cacheDateiLoeschen(uri);
+  }
+}
+
+/**
+ * R12 GoBD: wie `pdfTeilen`, liefert dazu den SHA-256 (hex) genau der geteilten PDF-Datei – für die Festschreibung einer
+ * Rechnung (Nachweis, welches PDF rausging). Im Web gibt es kein PDF (Fenster) – dann ohne Hash.
+ */
+export async function pdfTeilenMitHash(html: string, dateiname: string, quer = false): Promise<{ ok: boolean; sha256?: string }> {
+  if (Platform.OS === "web") {
+    imWebOeffnen(html);
+    return { ok: true };
+  }
+  const uri = await pdfErstellen(html, dateiname, quer);
+  try {
+    const sha = bytesToHex(sha256(new File(uri).bytesSync()));
+    const ok = Platform.OS !== "ios" && !(await Sharing.isAvailableAsync()) ? await druckenUri(uri) : await teilen(uri, { mimeType: "application/pdf", UTI: "com.adobe.pdf", titel: dateiname });
+    return { ok, sha256: sha };
   } finally {
     cacheDateiLoeschen(uri);
   }

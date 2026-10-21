@@ -876,7 +876,8 @@ describe("Vorlagen, fünfte Durchsicht (Jahres-Szenario Café)", () => {
 
   it("Anlässe: Beauty-Vorlagen (Hygiene-, Hautschutzplan) nur unter „Salon und Kosmetik“", () => {
     const beauty = VORLAGEN.filter((v) => v.bereich === "beauty").map((v) => v.id);
-    expect(beauty.sort()).toEqual(["anamnese_einwilligung", "hautschutzplan", "hygieneplan"]);
+    // R12 (Coach #8): die Anamnese ist neutral (Datenschutz) – sie gehört auch zu Kurs und Training
+    expect(beauty.sort()).toEqual(["hautschutzplan", "hygieneplan"]);
     for (const a of ANLAESSE) if (a.id !== "beauty") for (const id of beauty) expect(a.vorlagen, `${a.id}: ${id}`).not.toContain(id);
     expect(ANLAESSE.find((a) => a.id === "beauty")!.vorlagen).toEqual(expect.arrayContaining(beauty));
     expect(ANLAESSE.find((a) => a.id === "gastro")!.vorlagen).toEqual(["allergene", "haccp", "ifsg_belehrung"]);

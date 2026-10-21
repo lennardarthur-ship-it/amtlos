@@ -1,7 +1,7 @@
 # Katalog F.62 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: datenschutz.dsfa
-version: 2
+version: 3
 katalog_nr: F.62
 titel:
   de: Prüfen, ob eine Datenschutz-Folgenabschätzung nötig ist
@@ -9,9 +9,10 @@ kurz:
   de: Verarbeitest du besonders sensible Daten oder überwachst du mit Video, prüfst du, ob eine Datenschutz-Folgenabschätzung
     nötig ist.
 erklaerung:
-  de: Bei voraussichtlich hohem Risiko für die Betroffenen ist vorab eine Folgenabschätzung durchzuführen und zu dokumentieren.
+  de: Bei voraussichtlich hohem Risiko für die Betroffenen ist vorab eine Folgenabschätzung durchzuführen und zu dokumentieren. Arbeitest du allein mit den Daten deiner Patientinnen oder Kunden – etwa als Ärztin oder Therapeut, ähnlich wohl auch als Trainerin mit Gesundheitsfragebogen –, gilt das in der Regel nicht als umfangreiche Verarbeitung (Erwägungsgrund 91 DSGVO). Dann genügt es meist, kurz festzuhalten, warum keine Folgenabschätzung nötig ist.
 rechtsgrundlage:
 - Art. 35 DSGVO
+- Erwägungsgrund 91 DSGVO
 kategorie: datenschutz
 branchen:
 - gesundheit_pflege
@@ -48,6 +49,7 @@ quellen:
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679
   abgerufen: null
 fachlich_zu_pruefen:
+- 'R12 (Nutzertest Coach #13): Hinweis für einzelne Selbstständige nach Erwägungsgrund 91 S. 4 (dort: Ärzte, Gesundheitsberufe, Rechtsanwälte) – Übertragung auf Trainer und Coaches unsicher'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Auslöser (Gesundheitsdaten, Video) sind eine Vorauswahl – Liste der Aufsichtsbehörden (Muss-Liste) einbeziehen
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen

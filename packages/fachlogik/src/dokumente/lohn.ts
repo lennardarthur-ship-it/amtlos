@@ -2,7 +2,8 @@
  * Personal (E-121): Arbeitszeitnachweis, Lohnkonto, Daten für die Sozialversicherungsmeldung. Amtlos rechnet keine
  * Lohnsteuer und keine Beiträge – die Beträge kommen aus der Lohnabrechnung. Gliederungen fachlich zu prüfen (T-61).
  */
-import { KOPF_LINIE, ZELLE_LINIE, abschnitt, angaben, ankreuzen, cent, datumDe, dokument, esc, euro, felder, ibanText, ja, liste, nachsatz, roh, summe, svNummerText, tabelle, text, unterschriften, zelle, type Roh } from "./html.js";
+import { KOPF_LINIE, ZELLE_LINIE, abschnitt, angaben, ankreuzen, cent, datumDe, dokument, esc, euro, fassungNachsatz, felder, ibanText, ja, liste, nachsatz, roh, summe, svNummerText, tabelle, text, unterschriften, zahlText, zelle, type Roh } from "./html.js";
+import { mindestlohnAm, minijobGrenzeAm } from "./personal.js";
 import { MINIJOB, SV } from "./bausteine.js";
 import type { Daten, Eintrag, Vorlage } from "./typen.js";
 
@@ -24,6 +25,9 @@ export const stunden = (min: number) => {
   return `${Math.floor(m / 60)}:${String(m % 60).padStart(2, "0")} h`;
 };
 
+/** Hat ein Arbeitstag Inhalt (Zeiten, Pause, Ort oder Bemerkung)? Ein Tag nur mit Datum ist leer. */
+const mitInhalt = (x: Eintrag) => ["beginn", "ende", "pause", "einsatzort", "bemerkung"].some((k) => text(x, k));
+
 function zeiten(d: Daten) {
   // auch Tage nur mit Bemerkung (Urlaub, krank) bleiben stehen – ohne Dauer
   const z = liste(d, "tage")
@@ -37,17 +41,48 @@ const ISO_TAG = /^\d{4}-\d{2}-\d{2}$/;
 const monatVon = (iso: string) => `${MONATSNAMEN[Number(iso.slice(5, 7)) - 1]} ${iso.slice(0, 4)}`;
 
 /**
+ * R12: Tage, die zählen – mit Inhalt; hat kein Tag Inhalt (Blatt zum Eintragen von Hand bzw. neu angelegt), alle mit
+ * Datum. Leere Tage verschieben so weder Monat noch Zeitraum (Kurier #18).
+ */
+function zaehlendeTage(d: Daten): string[] {
+  const alle = liste(d, "tage");
+  const mit = alle.filter(mitInhalt);
+  return (mit.length ? mit : alle).map((x) => text(x, "datum")).filter((t) => ISO_TAG.test(t)).sort();
+}
+
+/**
  * Monat eines Arbeitszeitnachweises (R11, Reinigung #10): die eigene Angabe, sonst aus den Daten der Arbeitstage
  * („Oktober 2026“; über zwei Monate „September 2026 – Oktober 2026“). Leer, wenn nichts bekannt ist.
  */
 export function monatAus(d: Daten): string {
   const eigen = text(d, "monat");
   if (eigen) return eigen;
-  const tage = liste(d, "tage").map((x) => text(x, "datum")).filter((t) => ISO_TAG.test(t)).sort();
+  const tage = zaehlendeTage(d);
   if (!tage.length) return "";
   const von = monatVon(tage[0]!);
   const bis = monatVon(tage[tage.length - 1]!);
   return von === bis ? von : `${von} – ${bis}`;
+}
+
+/** R12: eingetragenen Monat lesen („Oktober 2026“, „10/2026“, „10.2026“, „2026-10“) → „2026-10“, sonst null. */
+export function monatSchluessel(t: string): string | null {
+  const s = t.trim();
+  const name = /^([A-Za-zäÄ]+)\.?\s+(\d{4})$/.exec(s);
+  if (name) {
+    const i = MONATSNAMEN.findIndex((m) => m.toLocaleLowerCase("de").startsWith(name[1]!.toLocaleLowerCase("de").slice(0, 3)));
+    return i >= 0 ? `${name[2]}-${String(i + 1).padStart(2, "0")}` : null;
+  }
+  const zahl = /^(\d{1,2})\s*[./-]\s*(\d{4})$/.exec(s);
+  if (zahl && Number(zahl[1]) >= 1 && Number(zahl[1]) <= 12) return `${zahl[2]}-${zahl[1]!.padStart(2, "0")}`;
+  const iso = /^(\d{4})-(\d{2})$/.exec(s);
+  return iso && Number(iso[2]) >= 1 && Number(iso[2]) <= 12 ? s : null;
+}
+
+/** Vorschläge für den Monat: dieser und der vorige (beim Laden des Moduls berechnet). */
+function monatsVorschlaege(jetzt = new Date()): string[] {
+  const j = jetzt.getFullYear();
+  const m = jetzt.getMonth();
+  return [monatVon(`${j}-${String(m + 1).padStart(2, "0")}-01`), monatVon(m === 0 ? `${j - 1}-12-01` : `${j}-${String(m).padStart(2, "0")}-01`)];
 }
 
 /** Branchen nach § 2a SchwarzArbG für den Hinweis im Nachweis (R11, Reinigung #9) – vorbelegt aus der Branche im Pflichten-Check. */
@@ -58,6 +93,20 @@ const AZN_BRANCHEN = [
   { wert: "friseur_kosmetik", text: "Friseur- und Kosmetikgewerbe" },
   { wert: "andere", text: "Andere Branche nach § 2a SchwarzArbG" },
   { wert: "keine", text: "Keine dieser Branchen" },
+];
+
+/** R12: Art der Beschäftigung – gleiche Werte in „Mitarbeiter“, Arbeitszeitnachweis und Personalfragebogen. */
+export const BESCHAEFTIGUNGSARTEN = [
+  { wert: "vollzeit", text: "Vollzeit" },
+  { wert: "teilzeit", text: "Teilzeit" },
+  { wert: "minijob", text: "Minijob" },
+  { wert: "kurzfristig", text: "Kurzfristig" },
+  { wert: "ausbildung", text: "Ausbildung (Azubi)" },
+  { wert: "werkstudent", text: "Werkstudent/in" },
+];
+export const ENTGELT_ARTEN = [
+  { wert: "stunde", text: "Stundenlohn" },
+  { wert: "monat", text: "Monatsgehalt" },
 ];
 
 /** Satz zur Aufzeichnungspflicht unter der Tabelle – je nach Branche aus dem Profil. */
@@ -71,23 +120,97 @@ function aufzeichnungsSatz(d: Daten): string {
   return `Aufzeichnungspflicht nach § 17 Abs. 1 MiLoG für Minijobs und die Branchen nach § 2a SchwarzArbG (u. a. Bau, Gastronomie, Gebäudereinigung, Friseur- und Kosmetikgewerbe): ${frist}`;
 }
 
+/** ISO-Tag plus n Tage. */
+const plusTage = (iso: string, n: number) => new Date(Date.UTC(Number(iso.slice(0, 4)), Number(iso.slice(5, 7)) - 1, Number(iso.slice(8, 10)) + n)).toISOString().slice(0, 10);
+const tageText = (l: string[]) => (l.length > 4 ? `${l.slice(0, 4).map(datumDe).join(", ")} und ${l.length - 4} weiteren Tagen` : l.map(datumDe).join(", "));
+
+/** Stunden als Dezimalzahl mit Komma, abgerundet auf zwei Stellen („43,38 h“) – für Höchststunden. */
+const stundenDezimal = (min: number) => `${zahlText(Math.floor((min / 60) * 100) / 100)} h`;
+
+/** R12: Stundenlohn bzw. Monatsgehalt aus dem Nachweis (Cent) – nach der gewählten Art; ohne Art, was eingetragen ist. */
+function entgelt(d: Daten): { stunde: number | null; monat: number | null } {
+  const art = text(d, "entgelt_art");
+  const s = cent(text(d, "stundenlohn"));
+  const m = cent(text(d, "monatsgehalt"));
+  return { stunde: art === "monat" ? null : s, monat: art === "stunde" ? null : s !== null && !art ? null : m };
+}
+
+/**
+ * R12 (Zoll #4, #14): Rechnungen zum Nachweis – Minijob-Grenze (§ 8 SGB IV), Mindestlohn (§ 1 MiLoG), Höchstarbeitszeit
+ * und Pausen (§§ 3, 4 ArbZG) und die Sieben-Tage-Frist (§ 17 Abs. 1 MiLoG). Nur Hinweise, die Aufzeichnung bleibt gültig.
+ */
+export function arbeitszeitPruefung(d: Daten): { hinweise: string[]; hoechstMinuten: number | null } {
+  const r: string[] = [];
+  const { z, gesamt } = zeiten(d);
+  const tage = zaehlendeTage(d);
+  const stichtag = tage.at(-1) ?? "";
+  const art = text(d, "art");
+  const e = entgelt(d);
+  const ml = stichtag ? mindestlohnAm(stichtag) : null;
+  const grenze = stichtag ? minijobGrenzeAm(stichtag) : null;
+  let hoechstMinuten: number | null = null;
+  if (art === "minijob" && grenze !== null) {
+    if (e.stunde) {
+      hoechstMinuten = Math.floor((grenze / e.stunde) * 60 * 100) / 100;
+      const verdienst = Math.round((gesamt / 60) * e.stunde);
+      if (gesamt && verdienst > grenze) r.push(`Minijob: ${stunden(gesamt)} × ${euro(e.stunde)} = ${euro(verdienst)} – das liegt über der Minijob-Grenze von ${euro(grenze)} im Monat (§ 8 SGB IV). Bei ${euro(e.stunde)} je Stunde sind höchstens ${stundenDezimal(hoechstMinuten)} im Monat möglich.`);
+    } else if (e.monat !== null && e.monat > grenze) r.push(`Minijob: Das Monatsgehalt von ${euro(e.monat)} liegt über der Minijob-Grenze von ${euro(grenze)} (§ 8 SGB IV).`);
+  }
+  // Mindestlohn gilt nicht für Auszubildende (dort Mindestausbildungsvergütung)
+  if (ml !== null && art !== "ausbildung") {
+    if (e.stunde !== null && e.stunde < ml) r.push(`Der Stundenlohn von ${euro(e.stunde)} liegt unter dem Mindestlohn von ${euro(ml)} (§ 1 MiLoG).`);
+    else if (e.stunde === null && e.monat !== null && gesamt > 0) {
+      const je = Math.floor(e.monat / (gesamt / 60));
+      if (je < ml) r.push(`Monatsgehalt ${euro(e.monat)} ÷ ${stunden(gesamt)} = ${euro(je)} je Stunde – das liegt unter dem Mindestlohn von ${euro(ml)} (§ 1 MiLoG). Sind alle Arbeitstage eingetragen?`);
+    }
+  }
+  // Arbeitszeitgesetz: mehr als 10 Stunden, zu kurze Pausen (> 6 h: 30 Minuten, > 9 h: 45 Minuten)
+  const lang = z.filter((t) => t.min !== null && t.min > 600).map((t) => text(t.x, "datum")).filter((t) => ISO_TAG.test(t));
+  if (lang.length) r.push(`Mehr als 10 Stunden Arbeitszeit am ${tageText(lang)} (§ 3 ArbZG). Bitte prüfen.`);
+  const ohnePause = z
+    .filter((t) => {
+      if (t.min === null) return false;
+      const p = Math.round(Number((text(t.x, "pause") || "0").replace(",", "."))) || 0;
+      return (t.min > 540 && p < 45) || (t.min > 360 && p < 30);
+    })
+    .map((t) => text(t.x, "datum"))
+    .filter((t) => ISO_TAG.test(t));
+  if (ohnePause.length) r.push(`Zu kurze Pause am ${tageText(ohnePause)}: Bei mehr als 6 Stunden Arbeit sind mindestens 30 Minuten, bei mehr als 9 Stunden 45 Minuten Pause vorgeschrieben (§ 4 ArbZG).`);
+  // Sieben-Tage-Frist: erfasst mehr als sieben Tage nach dem Arbeitstag (Zeitstempel der App)
+  const spaet = liste(d, "tage")
+    .filter((x) => ISO_TAG.test(text(x, "datum")) && ISO_TAG.test(text(x, "erfasst_am")) && text(x, "erfasst_am") > plusTage(text(x, "datum"), 7))
+    .map((x) => text(x, "datum"))
+    .sort();
+  if (spaet.length) r.push(`${spaet.length === 1 ? "Ein Arbeitstag wurde" : `${spaet.length} Arbeitstage wurden`} später als sieben Tage nach dem Arbeitstag erfasst (${tageText(spaet)}). Nach § 17 Abs. 1 MiLoG ist bis zum Ablauf des siebten Tages aufzuzeichnen.`);
+  return { hinweise: r, hoechstMinuten };
+}
+
 export const arbeitszeitnachweis: Vorlage = {
   id: "arbeitszeitnachweis",
   titel: "Arbeitszeitnachweis",
+  // R12 (Zoll #11): der Monat der Aufzeichnung im Namen – „Arbeitszeitnachweis Oktober 2026 · Rami Haddad“
+  titelFuer: (d) => (monatAus(d) ? `Arbeitszeitnachweis ${monatAus(d)}` : "Arbeitszeitnachweis"),
   beschreibung: "Beginn, Ende und Dauer der täglichen Arbeitszeit je Person und Monat – auch für Minijobs. Ausgefüllt oder als Blatt zum Eintragen von Hand.",
   bereich: "personal",
   pflichten: ["personal.arbeitszeit_aufzeichnung", "personal.arbeitszeit_milog"],
-  // „Beschäftigt seit“ für die Prüfung, ob ein Arbeitstag davor liegt (R11, Reinigung #10)
-  person: { art: "mitarbeiter", felder: { name: "name", beginn: "beschaeftigt_seit" } },
+  // R12 (Zoll #2): nach dem Teilen festgeschrieben, Korrektur als neue Fassung mit Grund
+  festschreiben: true,
+  korrektur: true,
+  // „Beschäftigt seit“ für die Prüfung, ob ein Arbeitstag davor liegt (R11, Reinigung #10); R12: Art und Entgelt
+  person: { art: "mitarbeiter", felder: { name: "name", beginn: "beschaeftigt_seit", art: "art", entgelt_art: "entgelt_art", stundenlohn: "stundenlohn", monatsgehalt: "monatsgehalt" } },
   grundlage: "§ 3 Abs. 2 Nr. 1 ArbSchG (BAG 13.09.2022 – 1 ABR 22/21); § 17 MiLoG",
   namensFeld: "name",
   abschnitte: [
     { titel: "Person und Monat",
       felder: [
         { id: "name", art: "text", label: "Name der beschäftigten Person", pflicht: true },
-        // R11: ohne Angabe aus den Arbeitstagen – Freitext nur noch, wer etwas anderes drucken will
-        { id: "monat", selten: true, art: "text", label: "Monat", hilfe: "Leer lassen: Amtlos nimmt den Monat aus den Arbeitstagen, z. B. Oktober 2026." },
-        { id: "beschaeftigt_seit", selten: true, art: "datum", label: "Beschäftigt seit", hilfe: "Aus „Mitarbeiter“ übernommen. Amtlos weist darauf hin, wenn ein Arbeitstag davor liegt." },
+        // R12 (Kurier #11): sichtbar; eingetragen begrenzt er die Arbeitstage
+        { id: "monat", art: "text", label: "Monat", vorschlaege: monatsVorschlaege(), hilfe: "z. B. Oktober 2026. Leer lassen: Amtlos nimmt den Monat aus den Arbeitstagen. Eingetragen müssen alle Arbeitstage in diesem Monat liegen." },
+        { id: "beschaeftigt_seit", selten: true, art: "datum", label: "Beschäftigt seit", hilfe: "Aus „Mitarbeiter“ übernommen. Arbeitstage davor sind ein Fehler." },
+        { id: "art", selten: true, art: "wahl", label: "Art der Beschäftigung", optionen: BESCHAEFTIGUNGSARTEN, hilfe: "Aus „Mitarbeiter“. Beim Minijob rechnet Amtlos Stunden × Lohn gegen die Minijob-Grenze." },
+        { id: "entgelt_art", selten: true, art: "wahl", label: "Entgelt", optionen: ENTGELT_ARTEN },
+        { id: "stundenlohn", selten: true, art: "betrag", label: "Stundenlohn brutto (€)", wenn: { feld: "entgelt_art", ist: "monat", nicht: true } },
+        { id: "monatsgehalt", selten: true, art: "betrag", label: "Monatsgehalt brutto (€)", wenn: { feld: "entgelt_art", ist: "monat" } },
         {
           id: "branche",
           selten: true,
@@ -98,6 +221,8 @@ export const arbeitszeitnachweis: Vorlage = {
           hilfe: "Aus deiner Branche im Pflichten-Check. Bestimmt den Satz unter der Tabelle.",
         },
         { id: "leerzeilen", selten: true, art: "schalter", label: "Leere Zeilen zum Eintragen von Hand anhängen", vorbelegung: false },
+        // R12 (Zoll #3): Erfassungszeitpunkt je Tag als Spalte
+        { id: "erfasst_spalte", selten: true, art: "schalter", label: "Spalte „Erfasst am“ drucken", hilfe: "Amtlos merkt sich je Arbeitstag, wann er erfasst und zuletzt geändert wurde." },
       ],
     },
     {
@@ -115,32 +240,43 @@ export const arbeitszeitnachweis: Vorlage = {
             { id: "beginn", art: "uhrzeit", label: "Beginn" },
             { id: "ende", art: "uhrzeit", label: "Ende" },
             { id: "pause", art: "zahl", label: "Pause (Minuten)" },
-            { id: "einsatzort", art: "text", label: "Einsatzort", hilfe: "z. B. Objekt, Kunde oder Baustelle" },
+            { id: "einsatzort", art: "text", label: "Einsatzort", hilfe: "z. B. Objekt, Kunde, Baustelle oder Filiale" },
             { id: "bemerkung", selten: true, art: "text", label: "Bemerkung", hilfe: "z. B. Urlaub, krank" },
           ],
         },
       ],
     },
   ],
-  ergebnis: (d) => [["Arbeitszeit im Monat", stunden(zeiten(d).gesamt)]],
+  ergebnis: (d) => {
+    const { hoechstMinuten } = arbeitszeitPruefung(d);
+    return [...(hoechstMinuten !== null ? ([["Höchstens im Minijob", stundenDezimal(hoechstMinuten)]] as [string, string][]) : []), ["Arbeitszeit im Monat", stunden(zeiten(d).gesamt)]];
+  },
   pruefen(d) {
-    // Beginn und Ende fehlen nur an Tagen ohne Bemerkung; ein Tag mit „Urlaub“ oder „krank“ braucht keine Uhrzeiten
-    const tage = liste(d, "tage").filter((x) => ["beginn", "ende", "pause", "bemerkung"].some((k) => text(x, k)));
-    return tage.flatMap((x, i) =>
+    const alle = liste(d, "tage");
+    // R12 (Kurier #1): hat irgendein Tag Inhalt, ist jeder Tag ohne Beginn und Ende unvollständig – auch ein leer
+    // angelegter. Nur das Blatt zum Eintragen von Hand (kein Tag mit Inhalt) braucht keine Uhrzeiten.
+    const tage = alle.some(mitInhalt) ? alle : [];
+    const f = tage.flatMap((x, i) =>
       text(x, "bemerkung")
         ? []
         : [["beginn", "Beginn"], ["ende", "Ende"]].filter(([k]) => !text(x, k!)).map(([, label]) => `Arbeitstag${tage.length > 1 ? ` ${i + 1}` : ""}: ${label}`),
     );
+    // R12 (Kurier #1, Zoll): Arbeitstage vor „Beschäftigt seit“ sind ein Fehler, keine bloße Warnung
+    const seit = text(d, "beschaeftigt_seit");
+    const daten = zaehlendeTage(d);
+    const vorher = ISO_TAG.test(seit) ? daten.filter((t) => t < seit) : [];
+    if (vorher.length) f.push(`${vorher.length === 1 ? `Der Arbeitstag am ${datumDe(vorher[0]!)} liegt` : `${vorher.length} Arbeitstage (ab ${datumDe(vorher[0]!)}) liegen`} vor „Beschäftigt seit“ (${datumDe(seit)}). Bitte Datum bzw. Beginn der Beschäftigung prüfen.`);
+    // R12 (Kurier #11): eingetragener Monat begrenzt die Tage
+    const m = monatSchluessel(text(d, "monat"));
+    const fremd = m ? daten.filter((t) => !t.startsWith(m)) : [];
+    if (fremd.length) f.push(`${fremd.length === 1 ? `Der Arbeitstag am ${datumDe(fremd[0]!)} liegt` : `${fremd.length} Arbeitstage (ab ${datumDe(fremd[0]!)}) liegen`} nicht im Monat ${text(d, "monat")}.`);
+    return f;
   },
   hinweise(d) {
     const r: string[] = [];
-    // R11 (Reinigung #10): Arbeitstag vor „Beschäftigt seit“ – meist ein Tippfehler im Datum oder beim Beginn
-    const seit = text(d, "beschaeftigt_seit");
-    const tage = liste(d, "tage").map((x) => text(x, "datum")).filter((t) => ISO_TAG.test(t)).sort();
-    const vorher = ISO_TAG.test(seit) ? tage.filter((t) => t < seit) : [];
-    if (vorher.length) r.push(`${vorher.length === 1 ? `Der Arbeitstag am ${datumDe(vorher[0]!)} liegt` : `${vorher.length} Arbeitstage (ab ${datumDe(vorher[0]!)}) liegen`} vor „Beschäftigt seit“ (${datumDe(seit)}). Bitte Datum bzw. Beginn der Beschäftigung prüfen.`);
-    if (tage.length && monatVon(tage[0]!) !== monatVon(tage[tage.length - 1]!)) r.push("Die Arbeitstage stammen aus mehreren Monaten. Üblich ist ein Nachweis je Person und Monat.");
-    return r;
+    const tage = zaehlendeTage(d);
+    if (!monatSchluessel(text(d, "monat")) && tage.length && monatVon(tage[0]!) !== monatVon(tage[tage.length - 1]!)) r.push("Die Arbeitstage stammen aus mehreren Monaten. Üblich ist ein Nachweis je Person und Monat.");
+    return [...r, ...arbeitszeitPruefung(d).hinweise];
   },
   html(d, b) {
     const { z, gesamt } = zeiten(d);
@@ -150,6 +286,27 @@ export const arbeitszeitnachweis: Vorlage = {
     // ohne Einträge: Blatt zum Eintragen von Hand – eine hohe Zeile je Tag, keine Summe „0:00 h“
     const leer = !z.length;
     const leerzeilen = leer ? 31 : ja(d, "leerzeilen") ? 31 - z.length : 0;
+    const mitErfasst = !leer && ja(d, "erfasst_spalte");
+    const erfasst = (x: Eintrag) => (text(x, "erfasst_am") ? `${datumDe(text(x, "erfasst_am"))}${text(x, "geaendert_am") && text(x, "geaendert_am") !== text(x, "erfasst_am") ? `<br><span class="klein">geändert ${datumDe(text(x, "geaendert_am"))}</span>` : ""}` : "");
+    const summeZeile = (n: number) => (ja(d, "leerzeilen") ? { summe: ["<strong>Summe der erfassten Tage</strong>", `<strong>${stunden(gesamt)}</strong>`, ...Array<string>(n - 5).fill("")], summeSpanne: 4 } : { summe: ["<strong>Summe</strong>", "", "", "", `<strong>${stunden(gesamt)}</strong>`, ...Array<string>(n - 5).fill("")] });
+    const grund = (x: Eintrag, min: number | null) => [datumDe(text(x, "datum")), esc(text(x, "beginn")), esc(text(x, "ende")), esc(text(x, "pause")), min === null ? "" : stunden(min)];
+    const tabelleHtml = mitErfasst
+      ? // R12: mit Spalte „Erfasst am“ – Breiten neu verteilt
+        ((kopf: string[], breiten: string[]) => tabelle(kopf, z.map(({ x, min }) => [...grund(x, min), ...(mitOrt ? [zelle(text(x, "einsatzort"))] : []), zelle(text(x, "bemerkung")), erfasst(x)]), { breiten, leerzeilen, hoch: ja(d, "leerzeilen"), zahlen: [3, 4], ...summeZeile(kopf.length) }))(
+          ["Datum", "Beginn", "Ende", "Pause (Min.)", "Dauer", ...(mitOrt ? ["Einsatzort"] : []), "Bemerkung", "Erfasst am"],
+          mitOrt ? ["12%", "9%", "9%", "10%", "10%", "19%", "17%", "14%"] : ["13%", "10%", "10%", "11%", "11%", "31%", "14%"],
+        )
+      : mitOrt
+        ? tabelle(
+            ["Datum", "Beginn", "Ende", "Pause (Min.)", "Dauer", "Einsatzort", "Bemerkung"],
+            z.map(({ x, min }) => [...grund(x, min), zelle(text(x, "einsatzort")), zelle(text(x, "bemerkung"))]),
+            { breiten: ["13%", "10%", "10%", "11%", "11%", "24%", "21%"], leerzeilen, hoch: ja(d, "leerzeilen"), zahlen: [3, 4], ...summeZeile(7) },
+          )
+        : tabelle(
+            ["Datum", "Beginn", "Ende", "Pause (Min.)", "Dauer", "Bemerkung"],
+            z.map(({ x, min }) => [...grund(x, min), zelle(text(x, "bemerkung"))]),
+            { breiten: ["15%", "12%", "12%", "13%", "13%", "35%"], leerzeilen, hoch: leer || ja(d, "leerzeilen"), zahlen: [3, 4], ...(leer ? { summe: ["<strong>Summe</strong>", "", "", "", ZELLE_LINIE, ""] } : summeZeile(6)) },
+          );
     return dokument({
       titel: "Arbeitszeitnachweis",
       betrieb: b,
@@ -158,18 +315,9 @@ export const arbeitszeitnachweis: Vorlage = {
       inhalt:
         // die Kennungsleiste lässt leere Angaben weg: dann je fehlender Angabe eine Zeile zum Eintragen von Hand
         (!text(d, "name") || !monat ? `<div style="margin-bottom:5mm">${felder([["Beschäftigte Person", text(d, "name") ? null : ""], ["Monat", monat ? null : ""]], { nummern: false })}</div>` : "") +
-        (mitOrt
-          ? tabelle(
-              ["Datum", "Beginn", "Ende", "Pause (Min.)", "Dauer", "Einsatzort", "Bemerkung"],
-              z.map(({ x, min }) => [datumDe(text(x, "datum")), esc(text(x, "beginn")), esc(text(x, "ende")), esc(text(x, "pause")), min === null ? "" : stunden(min), zelle(text(x, "einsatzort")), zelle(text(x, "bemerkung"))]),
-              { breiten: ["13%", "10%", "10%", "11%", "11%", "24%", "21%"], leerzeilen, hoch: ja(d, "leerzeilen"), zahlen: [3, 4], ...(ja(d, "leerzeilen") ? { summe: ["<strong>Summe der erfassten Tage</strong>", `<strong>${stunden(gesamt)}</strong>`, "", ""], summeSpanne: 4 } : { summe: ["<strong>Summe</strong>", "", "", "", `<strong>${stunden(gesamt)}</strong>`, "", ""] }) },
-            )
-          : tabelle(
-              ["Datum", "Beginn", "Ende", "Pause (Min.)", "Dauer", "Bemerkung"],
-              z.map(({ x, min }) => [datumDe(text(x, "datum")), esc(text(x, "beginn")), esc(text(x, "ende")), esc(text(x, "pause")), min === null ? "" : stunden(min), zelle(text(x, "bemerkung"))]),
-              { breiten: ["15%", "12%", "12%", "13%", "13%", "35%"], leerzeilen, hoch: leer || ja(d, "leerzeilen"), zahlen: [3, 4], ...(leer ? { summe: ["<strong>Summe</strong>", "", "", "", ZELLE_LINIE, ""] } : ja(d, "leerzeilen") ? { summe: ["<strong>Summe der erfassten Tage</strong>", `<strong>${stunden(gesamt)}</strong>`, ""], summeSpanne: 4 } : { summe: ["<strong>Summe</strong>", "", "", "", `<strong>${stunden(gesamt)}</strong>`, ""] }) },
-            )) +
+        tabelleHtml +
         `<p class="nachsatz">${esc(aufzeichnungsSatz(d))}</p>` +
+        fassungNachsatz(d) +
         unterschriften(["Unterschrift beschäftigte Person", "Unterschrift Arbeitgeber/in"]),
     });
   },
@@ -297,6 +445,7 @@ const ARTEN = [
   { wert: "minijob", text: "Minijob" },
   { wert: "kurzfristig", text: "Kurzfristig" },
   { wert: "ausbildung", text: "Ausbildung" },
+  { wert: "werkstudent", text: "Werkstudent/in" },
 ];
 
 export const svMeldedaten: Vorlage = {
@@ -306,7 +455,7 @@ export const svMeldedaten: Vorlage = {
   beschreibung: "Alle Angaben einer neuen beschäftigten Person, die du für die Anmeldung zur Sozialversicherung und die Lohnabrechnung brauchst – zum Unterschreiben.",
   bereich: "personal",
   pflichten: ["personal.sv_anmeldung", "personal.sofortmeldung"],
-  person: { art: "mitarbeiter", felder: { name: "name", geburtsname: "geburtsname", geburtsdatum: "geburtsdatum", geburtsort: "geburtsort", staatsangehoerigkeit: "staatsangehoerigkeit", anschrift: "anschrift", sv_nummer: "sv_nummer", steuer_id: "steuer_id", krankenkasse: "krankenkasse", iban: "iban", beginn: "beginn", taetigkeit: "taetigkeit" } },
+  person: { art: "mitarbeiter", felder: { name: "name", geburtsname: "geburtsname", geburtsdatum: "geburtsdatum", geburtsort: "geburtsort", staatsangehoerigkeit: "staatsangehoerigkeit", anschrift: "anschrift", sv_nummer: "sv_nummer", steuer_id: "steuer_id", krankenkasse: "krankenkasse", iban: "iban", beginn: "beginn", taetigkeit: "taetigkeit", art: "art", wochenstunden: "stunden" } },
   grundlage: "§ 28a SGB IV; DEÜV",
   namensFeld: "name",
   abschnitte: [

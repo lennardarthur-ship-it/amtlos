@@ -2,7 +2,8 @@
  * Skonto und andere Entgeltminderungen (R12) – reine Funktionen ohne Gerät.
  *
  * - Rechnung: im Voraus vereinbarte Minderung des Entgelts („x % bei Zahlung innerhalb von n Tagen“), die auf der Rechnung
- *   stehen muss (§ 14 Abs. 4 Satz 1 Nr. 8 UStG). Der GiroCode bleibt beim vollen Rechnungsbetrag.
+ *   stehen muss (§ 14 Abs. 4 Satz 1 Nr. 7 UStG; nach A 14.5 Abs. 19 UStAE genügt „x % Skonto bei Zahlung bis …“,
+ *   der Betrag muss nicht dastehen). Der GiroCode bleibt beim vollen Rechnungsbetrag.
  * - XRechnung: Skonto in den Zahlungsbedingungen (BT-20) in der Zeilenform nach BR-DE-18 – „#SKONTO#TAGE=14#PROZENT=2.00#“,
  *   danach ein Zeilenumbruch; der lesbare Satz folgt in der nächsten Zeile.
  * - Zahlungseingang: erhaltener Betrag; eine Differenz, die als Skonto bzw. Minderung vermerkt ist, ist eine Änderung der

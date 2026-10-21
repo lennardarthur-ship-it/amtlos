@@ -1,0 +1,23 @@
+persona: mehrere_branchen
+beschreibung: "R12 (Rechtsprüfung Befunde 6, 17): Bewachung mit Wachpersonen (§ 11b GewO, § 16 BewachV), Versicherungsvermittlung (§ 11a GewO), Gebrauchtwarenhandel (§ 38 GewO), Marktstand (Sondernutzung, §§ 64 ff. GewO)"
+stichtag: "2026-11-20"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2026-11-15"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [immobilien_finanzen, sonstige]
+  profil.erlaubnis.gewo_paragraphen: [34a, 34d, "38"]
+  profil.vertrieb.kanaele: [marktstand]
+  profil.beschaeftigte.gesamt: 2
+  profil.bundesland: HE
+ereignisse:
+  - { typ: erste_einstellung, datum: "2026-11-15" }
+  - { typ: einstellung, datum: "2026-11-15" }
+erwartet:
+  personal.bewacherregister: gilt
+  gruendung.vermittlerregister: gilt
+  gruendung.gewo38_zuverlaessigkeit: gilt
+  branche.mobiler_verkauf_standplatz: gilt
+  gruendung.reisegewerbekarte: gilt_nicht
+termine_enthaelt:
+  personal.bewacherregister: [["aenderung-20261115", "2026-11-14"]]

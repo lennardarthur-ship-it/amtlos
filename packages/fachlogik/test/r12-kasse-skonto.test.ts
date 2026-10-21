@@ -48,7 +48,7 @@ const RE: Daten = { nummer: "2026-021", datum: "2026-10-02", leistung_gleich: tr
 const ka = (id: string, datum: string, o: Partial<Kassenabschluss> = {}): Kassenabschluss => ({ id, datum, zbon: null, umsatz: [{ satz: 19, brutto_cent: 11900 }, { satz: 7, brutto_cent: 10700 }], karte_cent: 10000, sonstige_cent: 0, bewegungen: [], erstellt: `${datum}T20:00:00.000Z`, geaendert: `${datum}T20:00:00.000Z`, festgeschrieben: `${datum}T20:00:00.000Z`, ...o });
 const beleg = (id: string, datum: string, brutto: number, o: Partial<Beleg> = {}): Beleg => ({ id, datum, lieferant: "Großmarkt", nummer: `B-${id}`, kategorie: "waren", steuer: [{ satz: 19, brutto_cent: brutto }], vorsteuer: true, zahlung: "bank", bezahlt: null, notiz: null, datei: null, quelle: "hand", erstellt: `${datum}T08:00:00Z`, geaendert: `${datum}T08:00:00Z`, ...o });
 
-describe("Skonto auf der Rechnung (§ 14 Abs. 4 Satz 1 Nr. 8 UStG) und in der XRechnung (BT-20)", () => {
+describe("Skonto auf der Rechnung (§ 14 Abs. 4 Satz 1 Nr. 7 UStG) und in der XRechnung (BT-20)", () => {
   it("liest Prozent und Tage, rechnet die Frist wie das Zahlungsziel", () => {
     expect(skontoAus("2", "10")).toEqual({ prozent: 2, tage: 10 });
     expect(skontoAus("2,5", "14")).toEqual({ prozent: 2.5, tage: 14 });
@@ -135,12 +135,12 @@ describe("Skonto bei Belegen (§ 17 Abs. 1 Satz 2 UStG) und DATEV", () => {
     expect(l.map((x) => [x.konto, x.gegenkonto, x.betrag_cent, x.steuerperiode])).toEqual([["8736", "1410", 238, "2026-10-09"], ["8731", "1410", 214, "2026-10-09"]]);
     expect(skontoBuchungenRechnung({ ...r, kleinunternehmer: true }, [{ id: "z1", datum: "2026-10-09", brutto_cent: 452 }], "SKR04")[0]!.konto).toBe("4730");
   });
-  it("Barbelege: mit Kassenführung in Amtlos gegen Kasse, davor bzw. ohne gegen Geldtransit (kein Kassenminus)", () => {
+  it("Barbelege: mit Kassenführung in Amtlos gegen Kasse, davor bzw. ohne gegen Privateinlage (R12 GoBD)", () => {
     const bar = beleg("b2", "2026-05-09", 1190, { zahlung: "bar" });
     expect(buchungenAusBelegen([bar], "SKR03")[0]!.gegenkonto).toBe("1000");
     expect(buchungenAusBelegen([bar], "SKR03", { kasseAb: "2026-05-01" })[0]!.gegenkonto).toBe("1000");
-    expect(buchungenAusBelegen([bar], "SKR03", { kasseAb: "2026-06-01" })[0]!.gegenkonto).toBe("1360");
-    expect(buchungenAusBelegen([bar], "SKR04", { kasseAb: null })[0]!.gegenkonto).toBe("1460");
+    expect(buchungenAusBelegen([bar], "SKR03", { kasseAb: "2026-06-01" })[0]!.gegenkonto).toBe("1890");
+    expect(buchungenAusBelegen([bar], "SKR04", { kasseAb: null })[0]!.gegenkonto).toBe("2180");
   });
 });
 
@@ -236,17 +236,21 @@ describe("Kassenabschluss: Bestand, fehlende Tage, Umsatzsteuer, Kassenbuch, Buc
     const d = kassenbuchDaten(abschluesse, [bar], "2026-05")!;
     expect(d.zeitraum).toBe("Mai 2026");
     expect(d.anfang).toBe("200,00");
-    expect(d.eintraege.map((e) => e.text)).toEqual(["Tageseinnahmen bar lt. Z-Bon Nr. 1204", "Tageseinnahmen bar lt. Z-Bon Nr. 1205", "Großmarkt: Waren und Material", "Geldtransit zur Bank", "Tageseinnahmen bar lt. Z-Bon Nr. 1207", "Kassendifferenz laut Zählung"]);
+    expect(d.eintraege.map((e) => e.text!.split(" · ")[0])).toEqual(["Tageseinnahmen bar lt. Z-Bon Nr. 1204", "Tageseinnahmen bar lt. Z-Bon Nr. 1205", "Großmarkt: Waren und Material", "Geldtransit zur Bank", "Tageseinnahmen bar lt. Z-Bon Nr. 1207", "Kassendifferenz laut Zählung: Fehlbetrag (gebucht als Aufwand)"]);
+    // R12 GoBD: Erfassung steht im Kassenbuch
+    expect(d.eintraege[0]!.text).toContain("erfasst 02.05.2026, 22:00");
     const erg = vorlageFuer("kassenbuch")!.ergebnis!(d as unknown as Daten);
     expect(erg[0]![1].replace(/\u00a0/g, " ")).toBe("200,00 €");
     expect(kassenbuchDaten(abschluesse, [], "2026-07")).toBeNull();
   });
-  it("Buchungen: Kasse an Erlöse je Satz, Karte Geldtransit an Kasse, Transit, Leistungsdatum", () => {
+  it("Buchungen (R12 GoBD): Karte direkt Geldtransit an Erlöse je Satz, nur Bargeld über die Kasse, Transit, Leistungsdatum", () => {
     const l = kassenBuchungen(abschluesse.slice(0, 2), "SKR03");
-    expect(l.map((b) => [b.konto, b.gegenkonto, b.betrag_cent])).toEqual([["1000", "8400", 11900], ["1000", "8300", 10700], ["1360", "1000", 10000], ["1000", "8400", 11900], ["1000", "8300", 10700], ["1360", "1000", 10000], ["1360", "1000", 30000]]);
+    expect(l.map((b) => [b.konto, b.gegenkonto, b.betrag_cent])).toEqual([["1360", "8400", 5265], ["1360", "8300", 4735], ["1000", "8400", 6635], ["1000", "8300", 5965], ["1360", "8400", 5265], ["1360", "8300", 4735], ["1000", "8400", 6635], ["1000", "8300", 5965], ["1360", "1000", 30000]]);
     expect(l[0]).toMatchObject({ leistungsdatum: "2026-05-02", steuerperiode: "2026-05-02", belegfeld1: "Z1204", ust_satz: 19 });
+    // je Satz ergeben Karte und bar genau den Umsatz laut Z-Bon
+    expect(l.filter((b) => b.gegenkonto === "8400" && b.quelle_id === "a").reduce((x, b) => x + b.betrag_cent, 0)).toBe(11900);
     expect(new Set(l.map((b) => b.guid)).size).toBe(l.length);
     const skr04 = kassenBuchungen([ka("e", "2026-05-02", { bewegungen: [{ art: "entnahme", betrag_cent: 100 }, { art: "einlage", betrag_cent: 50 }] })], "SKR04", { kleinunternehmer: true });
-    expect(skr04.map((b) => [b.konto, b.gegenkonto])).toEqual([["1600", "4185"], ["1600", "4185"], ["1460", "1600"], ["2100", "1600"], ["1600", "2180"]]);
+    expect(skr04.map((b) => [b.konto, b.gegenkonto])).toEqual([["1460", "4185"], ["1600", "4185"], ["2100", "1600"], ["1600", "2180"]]);
   });
 });

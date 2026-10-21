@@ -1,0 +1,67 @@
+# R12 (Rechtsprüfung Befund 6): Bewachungsgewerbe – Wachpersonen vor dem Einsatz anmelden
+schema_version: 1
+id: personal.bewacherregister
+version: 1
+katalog_nr: A.3
+titel:
+  de: Wachpersonen im Bewacherregister anmelden
+kurz:
+  de: Im Bewachungsgewerbe meldest du jede Wachperson über das Bewacherregister an, bevor sie Bewachungsaufgaben übernimmt.
+erklaerung:
+  de: Gewerbetreibende mit Erlaubnis nach § 34a GewO, ihre Wachpersonen und die Betriebsleitung werden im Bewacherregister beim Statistischen Bundesamt geführt (§ 11b GewO). Jede Wachperson meldest du vor der Beschäftigung mit Bewachungsaufgaben an; einsetzen darfst du sie erst, wenn die Behörde ihre Zuverlässigkeit geprüft und dir das Ergebnis mitgeteilt hat (§ 16 Abs. 1, 2 BewachV). Endet die Beschäftigung, meldest du die Person innerhalb von sechs Wochen ab (§ 11b GewO).
+rechtsgrundlage:
+- § 11b GewO
+- § 16 BewachV
+kategorie: personal
+ausloeser:
+  all:
+  - feld: profil.erlaubnis.gewo_paragraphen
+    op: enthaelt
+    wert: 34a
+    label:
+      de: Du hast eine Erlaubnis für das Bewachungsgewerbe (§ 34a GewO).
+  - ereignis: einstellung
+    op: eingetreten
+    label:
+      de: Du stellst jemanden ein.
+frist:
+  typ: relativ
+  bezug:
+    ereignis: einstellung
+  versatz: P0D
+  zeitpunkt: vor_beginn
+  je_ereignis: true
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Bewacherregister (Statistisches Bundesamt)
+kanal: portal
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+erledigung:
+  art: bestaetigen
+  bestaetigung:
+    de: Im Bewacherregister angemeldet
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Bewachungsverordnung § 16
+  url: https://www.gesetze-im-internet.de/bewachv_2019/__16.html
+  abgerufen: '2026-10-21'
+- titel: Gewerbeordnung § 11b (lxgesetze)
+  url: https://lxgesetze.de/gewo/11b
+  abgerufen: '2026-10-21'
+fachlich_zu_pruefen:
+- Neu nach Rechtsprüfung R12 (Befund 6) – § 11b GewO und § 16 BewachV geprüft; Folgen bei Nichterfüllung fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

@@ -8,11 +8,13 @@ import { archivLoeschen, archivierteSchluessel, autoSchluesselLoeschen, nonce, s
 import { allesAbsagen } from "./pflichten/erinnerungen";
 import { cacheLeeren } from "./unterlagen/aufraeumen";
 import { istTresor, tresorOeffnen, tresorSchliessen } from "./unterlagen/tresor";
-import type { Beleg, Betrieb, Daten, KassenInhalt, Kassenabschluss, Person, PersonAngaben, PersonenArt, Zahlung } from "@amtlos/fachlogik";
+import type { Beleg, Betrieb, Daten, KassenInhalt, Kassenabschluss, Kassensturz, Sachentnahme, Person, PersonAngaben, PersonenArt, Zahlung } from "@amtlos/fachlogik";
 import { alleDateienEntfernen, ansichtenAufraeumen, dateiAblegen, dateiAnzeigen, dateiEntfernen, dateiGroesse, dateiHolen, dateiVorhanden } from "./unterlagen/dateien";
 import { base64, ausBase64, type Dateien } from "./unterlagen/sicherung";
 import { kontoVergessen } from "./konto/sitzung";
 import { syncZusammenfuehren } from "./konto/sync";
+import { dateienImStand, doppeltePerson, korrigieren, personenZusammenfuehren, staetteLoeschen, staetteSetzen, unterlageStaette, type Betriebsstaette } from "./unterlagen/speicher";
+import { belegeFestschreiben, kassenbuchFestschreiben, kassensturzSpeichern, sachentnahmeLoeschen, sachentnahmeSpeichern } from "./unterlagen/speicher";
 import { LEERER_STAND, StandFehler, ausgabeMoeglich, belegLoeschen, belegSetzen, neueId, steuerberatungSetzen, aendern, allesLoeschenErlaubt, anlegen, ausgeben, bezahltSetzen, kasseKorrigieren, kasseSpeichern, zahlungVermerken, zusammenfuehren, type Zusammenfuehrung, betriebSetzen, erledigtSetzen, felderSetzen, istLesbar, profilSetzen, stornieren, kopieren, loeschen, personLoeschen, personMerken, personSetzen, standAus, standGleich, type Stand, type Unterlage } from "./unterlagen/speicher";
 
 /** Alles liegt nur auf dem Gerät (E-121): kein Konto, kein Server. Seit E-129 verschlüsselt (Schlüssel im Schlüsselbund). */
@@ -78,7 +80,7 @@ interface Zustand {
    * Hat sich die Unterlage seitdem geändert (z. B. durch die Synchronisation), wird nicht festgeschrieben – false:
    * PDF neu erzeugen. Die Festschreibung wird sofort gespeichert (G3).
    */
-  ausgeben(id: string, daten?: Daten, pdfSha256?: string): boolean;
+  ausgeben(id: string, daten?: Daten, pdfSha256?: string, absender?: Betrieb): boolean;
   erinnerungenSetzen(an: boolean): void;
   stornieren(id: string): Unterlage | null;
   kopieren(id: string): Unterlage | null;
@@ -105,6 +107,26 @@ interface Zustand {
   kasseSpeichern(inhalt: KassenInhalt): Kassenabschluss;
   /** R12: Kassenabschluss korrigieren – nur mit Grund */
   kasseKorrigieren(id: string, inhalt: KassenInhalt, grund: string): void;
+  /** R12 GoBD: Kassensturz mit Zählprotokoll speichern (unveränderlich, sofort gespeichert) */
+  kassensturzSpeichern(k: Omit<Kassensturz, "id" | "zeitpunkt">): Kassensturz;
+  /** R12 GoBD: Sachentnahme (unentgeltliche Wertabgabe) speichern bzw. löschen (protokolliert) */
+  sachentnahmeSpeichern(e: Omit<Sachentnahme, "id" | "erstellt">): void;
+  sachentnahmeLoeschen(id: string): void;
+  /** R12 GoBD: Kassenbuch aus den Tagesabschlüssen beim Teilen festschreiben */
+  kassenbuchFestschreiben(monat: string, standort: string, daten: Daten, sha256: string): void;
+  /** R12 GoBD: Belege festschreiben (nach dem Steuerberater-Paket) */
+  belegeFestschreiben(ids: string[]): void;
+  /** R12 Personal: festgeschriebenen Nachweis korrigieren – neue Fassung mit Grund, die alte bleibt (sofort gespeichert) */
+  korrigieren(id: string, grund: string): void;
+  /** R12: Betriebsstätten (Filialen) */
+  staetteSetzen(st: Betriebsstaette): void;
+  staetteLoeschen(id: string): void;
+  /** R12: Unterlage einer Betriebsstätte zuordnen (auch festgeschrieben – keine Änderung am Inhalt) */
+  unterlageStaette(id: string, staette: string | null): void;
+  /** R12 (Kurier #13): andere Person gleichen Namens, falls vorhanden */
+  doppeltePerson(art: PersonenArt, id: string): Person | null;
+  /** R12: zwei Einträge derselben Person zusammenführen (`weg` wird gelöscht) */
+  personenZusammenfuehren(art: PersonenArt, bleibt: string, weg: string): void;
   appSperreSetzen(an: boolean): void;
   cloudSicherungSetzen(an: boolean): void;
   /** Amtlos Pro aktiv (Abo im App Store oder – nur im Testmodus – testweise eingeschaltet), E-132 */
@@ -116,7 +138,8 @@ interface Zustand {
   erfolg(): void;
   steuerberatungSetzen(sb: Stand["steuerberatung"]): void;
   /** Belege (E-133) */
-  belegSetzen(b: Beleg): void;
+  /** R12 GoBD: festgeschriebene Belege nur mit Grund – false, wenn die Änderung deshalb nicht übernommen wurde */
+  belegSetzen(b: Beleg, grund?: string): boolean;
   /**
    * Beleg löschen (H2): leer oder frisch erfasst – endgültig samt Datei („geloescht“); sonst als ungültig markiert,
    * Datensatz und Datei bleiben („ungueltig“). null, wenn es den Beleg nicht gibt.
@@ -474,12 +497,27 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       daten: (id) => aktuell.current.unterlagen.find((u) => u.id === id)?.daten,
       personMerken: (art, angaben) => setzen(personMerken(aktuell.current, art, angaben)),
       personSetzen: (art, p) => setzen(personSetzen(aktuell.current, art, p)),
-      personLoeschen: (art, id) => setzen(personLoeschen(aktuell.current, art, id)),
+      personLoeschen: (art, id) => {
+        const datei = aktuell.current[art === "mitarbeiter" ? "mitarbeiter" : "kunden"].find((p) => p.id === id)?.aufenthalt_datei;
+        const neu = personLoeschen(aktuell.current, art, id);
+        setzen(neu);
+        // R12: Kopie des Aufenthaltstitels mit der Person entfernen – wenn sie sonst niemand braucht
+        if (datei && !dateienImStand(neu).includes(datei)) dateiEntfernen(datei);
+      },
+      korrigieren: (id, grund) => {
+        setzen(korrigieren(aktuell.current, id, grund, new Date()));
+        schreiben();
+      },
+      staetteSetzen: (st) => setzen(staetteSetzen(aktuell.current, st)),
+      staetteLoeschen: (id) => setzen(staetteLoeschen(aktuell.current, id)),
+      unterlageStaette: (id, staette) => setzen(unterlageStaette(aktuell.current, id, staette)),
+      doppeltePerson: (art, id) => doppeltePerson(aktuell.current, art, id),
+      personenZusammenfuehren: (art, bleibt, weg) => setzen(personenZusammenfuehren(aktuell.current, art, bleibt, weg)),
       profilSetzen: (werte, bl) => setzen(profilSetzen(aktuell.current, werte, bl)),
       erledigtSetzen: (pid, datum, termin) => setzen(erledigtSetzen(aktuell.current, pid, datum, termin)),
-      ausgeben: (id, daten, pdfSha256) => {
+      ausgeben: (id, daten, pdfSha256, absender) => {
         if (!ausgabeMoeglich(aktuell.current, id, daten)) return false;
-        setzen(ausgeben(aktuell.current, id, new Date(), daten, pdfSha256));
+        setzen(ausgeben(aktuell.current, id, new Date(), daten, pdfSha256, absender));
         // Festschreibung sofort speichern, nicht erst nach der Wartezeit (G3)
         schreiben();
         return true;
@@ -529,7 +567,10 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       },
       zahlungVermerken: (id, zahlung) => setzen(zahlungVermerken(aktuell.current, id, zahlung)),
       kasseSpeichern: (inhalt) => {
-        const [s, k] = kasseSpeichern(aktuell.current, inhalt, new Date());
+        const [s0, k] = kasseSpeichern(aktuell.current, inhalt, new Date());
+        let s = s0;
+        // R12 GoBD: bar kassierte Rechnungen aus Amtlos – Zahlungseingang an der Rechnung gleich mit vermerken
+        for (const r of k.rechnungen_bar ?? []) s = zahlungVermerken(s, r.id, { datum: k.datum, betrag_cent: r.betrag_cent });
         setzen(s);
         // festgeschrieben: sofort speichern wie eine geteilte Rechnung (G3)
         schreiben();
@@ -544,7 +585,36 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       proAktualisieren: (aktiv) => (aktiv === undefined ? void proAktiv().then(setStorePro) : setStorePro(aktiv)),
       proTestSetzen: (an) => setzen({ ...aktuell.current, proTest: an }),
       steuerberatungSetzen: (sb) => setzen(steuerberatungSetzen(aktuell.current, sb)),
-      belegSetzen: (b) => setzen(belegSetzen(aktuell.current, b, new Date())),
+      belegSetzen: (b, grund) => {
+        const vorher = aktuell.current;
+        const neu = belegSetzen(vorher, b, new Date(), grund);
+        if (neu === vorher) return false;
+        setzen(neu);
+        if (grund) schreiben();
+        return true;
+      },
+      belegeFestschreiben: (ids) => {
+        setzen(belegeFestschreiben(aktuell.current, ids, new Date()));
+        schreiben();
+      },
+      kassensturzSpeichern: (k) => {
+        const [s, neu] = kassensturzSpeichern(aktuell.current, k, new Date());
+        setzen(s);
+        schreiben();
+        return neu;
+      },
+      sachentnahmeSpeichern: (e) => {
+        setzen(sachentnahmeSpeichern(aktuell.current, e, new Date()));
+        schreiben();
+      },
+      sachentnahmeLoeschen: (id) => {
+        setzen(sachentnahmeLoeschen(aktuell.current, id, new Date()));
+        schreiben();
+      },
+      kassenbuchFestschreiben: (monat, standort, daten, sha) => {
+        setzen(kassenbuchFestschreiben(aktuell.current, monat, standort, daten, sha, new Date()));
+        schreiben();
+      },
       belegLoeschen: (id, grund) => {
         const b = aktuell.current.belege.find((x) => x.id === id);
         if (!b) return null;
@@ -569,17 +639,17 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         const d: Dateien = {};
         const fehlend: string[] = [];
         const st = s ?? aktuell.current;
-        // auch die Fotos der Z-Bons (R12)
-        const alle = [...st.belege, ...st.belegArchiv, ...st.kasse];
+        // auch die Fotos der Z-Bons (R12) und die Kopien der Aufenthaltstitel (R12 Personal)
+        const alle = dateienImStand(st);
         let i = 0;
-        for (const b of alle) {
+        for (const name of alle) {
           i++;
-          if (!b.datei || d[b.datei]) continue;
+          if (d[name]) continue;
           fortschritt?.(i, alle.length);
           // eine fehlende oder unlesbare Datei nie still übergehen (H3) – die Sicherung wäre sonst unvollständig
-          const bytes = await dateiHolen(b.datei, schluessel.current).catch(() => null);
-          if (bytes) d[b.datei] = base64(bytes);
-          else fehlend.push(b.datei);
+          const bytes = await dateiHolen(name, schluessel.current).catch(() => null);
+          if (bytes) d[name] = base64(bytes);
+          else fehlend.push(name);
         }
         return { dateien: d, fehlend };
       },
@@ -601,8 +671,10 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         // inhaltlich vergleichen, gleiche Objekte überspringen (R9 Performance: vorher zweimal JSON.stringify des ganzen Stands)
         if (standGleich(neu, vorher)) return;
         // auf einem anderen Gerät gelöschte Belege: Datei hier auch entfernen (ungültig markierte behalten ihre Datei)
-        const bleiben = new Set([...neu.belege, ...neu.belegArchiv, ...neu.kasse].map((b) => b.datei).filter(Boolean));
+        const bleiben = new Set(dateienImStand(neu));
         for (const b of vorher.belege) if (b.datei && !bleiben.has(b.datei)) dateiEntfernen(b.datei);
+        // R12: Aufenthaltstitel einer auf einem anderen Gerät gelöschten Person
+        for (const p of vorher.mitarbeiter) if (p.aufenthalt_datei && !bleiben.has(p.aufenthalt_datei)) dateiEntfernen(p.aufenthalt_datei);
         setzen(neu);
       },
       dateiAblegenUnter: (name, bytes) => dateiAblegen(name, bytes, schluessel.current),
@@ -629,7 +701,7 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         frei.current = null;
         ausstehend.current = false;
         if (!nachLadefehler) {
-          for (const b of [...aktuell.current.belege, ...aktuell.current.belegArchiv, ...aktuell.current.kasse]) if (b.datei) dateiEntfernen(b.datei);
+          for (const name of dateienImStand(aktuell.current)) dateiEntfernen(name);
           // auch Reste: verwaiste Belegdateien, beiseitegelegte unlesbare Stände, Vorversion (E-143)
           alleDateienEntfernen();
           const reste = (await AsyncStorage.getAllKeys().catch(() => [] as readonly string[])).filter((k) => k.startsWith(`${SCHLUESSEL}.`));

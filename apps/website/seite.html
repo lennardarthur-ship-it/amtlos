@@ -105,6 +105,7 @@ p { margin: 0; }
 .chip[aria-pressed="true"] { background: var(--tinte); border-color: var(--tinte); color: var(--papier); }
 .ergebnis { border-top: 1px solid var(--linie-leise); padding-top: 1.1rem; display: grid; gap: .9rem; }
 .ergebnis-zahl { display: flex; align-items: baseline; gap: .7rem; flex-wrap: wrap; }
+.pruefstand { margin: 0; font-size: .875rem; line-height: 1.45; color: var(--tinte-2); border-left: 3px solid var(--amt); padding-left: .6rem; }
 .ergebnis-zahl strong { font: 700 3.4rem/1 var(--serif); color: var(--amt); font-variant-numeric: tabular-nums; }
 .balken { display: grid; gap: .4rem; }
 .balken div { display: grid; grid-template-columns: 9.5rem minmax(0, 1fr) 2rem; align-items: center; gap: .6rem; font-size: .875rem; }
@@ -214,6 +215,8 @@ details p { margin-top: .6rem; color: var(--tinte-2); }
           </div>
           <div class="ergebnis">
             <div class="ergebnis-zahl" aria-live="polite"><strong id="anzahl">41</strong><span id="satz">Pflichten kommen für dich in Frage.</span></div>
+            <!-- R12 (Recht #8): der Prüfstand direkt am Ergebnis, nicht erst in der Fußnote -->
+            <p class="pruefstand">Entwurf: Die Pflichten sind noch nicht von Fachleuten geprüft. Für deinen Einzelfall bleibt die Steuerberatung zuständig.</p>
             <div class="balken" id="balken"></div>
             <div class="beispiele" id="beispiele"></div>
             <p class="fussnote" id="fussnote"></p>
@@ -347,7 +350,7 @@ details p { margin-top: .6rem; color: var(--tinte-2); }
           <h2 id="s-fragen">Häufige Fragen</h2>
           <div style="margin-top:1.25rem">
 <!-- fragen -->
-            <details><summary>Ersetzt Amtlos meine Steuerberatung?</summary><p>Nein. Amtlos zeigt, welche Pflichten nach deinen Angaben in Frage kommen, und bereitet Unterlagen vor. Für Beratung im Einzelfall bleibt deine Steuerberaterin oder dein Steuerberater zuständig. Pflichten-Katalog und Vorlagen sind noch nicht abschließend von Fachleuten geprüft.</p></details>
+            <details><summary>Ersetzt Amtlos meine Steuerberatung?</summary><p>Nein. Amtlos zeigt, welche Pflichten nach deinen Angaben in Frage kommen, und bereitet Unterlagen vor. Für Beratung im Einzelfall bleibt deine Steuerberaterin oder dein Steuerberater zuständig. Pflichten-Katalog und Vorlagen sind noch nicht von Fachleuten geprüft.</p></details>
             <details><summary>Wo liegen meine Daten?</summary><p>Nur auf deinem iPhone, verschlüsselt. Amtlos hat kein Konto und keinen Server mit deinen Unterlagen. Eine Sicherung erstellst du selbst als verschlüsselte Datei oder automatisch in deinem iCloud Drive (<span class="pro-marke">Pro</span>).</p></details>
             <details><summary>Für wen ist Amtlos gedacht?</summary><p>Für Einzelunternehmen, Salons, Cafés, Handwerksbetriebe, Freelancer und kleine GmbHs in Deutschland – alle, die keine eigene Buchhaltungsabteilung haben.</p></details>
             <details><summary>Was passiert, wenn ich mein iPhone verliere?</summary><p>Deine Daten liegen nur auf dem iPhone. Hast du eine Sicherung – als verschlüsselte Datei oder automatisch in deinem iCloud Drive (<span class="pro-marke">Pro</span>) –, holst du sie auf dem neuen iPhone mit deinem Passwort zurück. Ohne Sicherung sind die Daten weg, denn Amtlos hat keine Kopie.</p></details>
@@ -400,7 +403,7 @@ function zeichnen() {
   document.getElementById("balken").innerHTML = p.kategorien.slice(0, 4).map(([k, n]) => `<div><span>${k}</span><span class="spur"><i style="width:${Math.round((n / max) * 100)}%"></i></span><span class="zahl">${n}</span></div>`).join("");
   document.getElementById("beispiele").innerHTML = p.beispiele.map((b) => `<div><em>${b.grund}</em><span>${b.titel}</span></div>`).join("");
   const name = DATEN.branchen.find((b) => b[0] === wahl.branche)[1];
-  document.getElementById("fussnote").textContent = `Beispiel: ${name}, Einzelunternehmen in Bayern, Start im November 2026${wahl.team === "3" ? ", drei Beschäftigte" : ""}. Aus dem Amtlos-Katalog, fachlich noch nicht abschließend geprüft.`;
+  document.getElementById("fussnote").textContent = `Beispiel: ${name}, Einzelunternehmen in Bayern, Start im November 2026${wahl.team === "3" ? ", drei Beschäftigte" : ""}. Aus dem Amtlos-Katalog.`;
 }
 chips("branchen", DATEN.branchen, "branche");
 chips("team", TEAM, "team");

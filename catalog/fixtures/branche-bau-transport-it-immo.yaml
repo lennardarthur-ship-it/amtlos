@@ -6,6 +6,9 @@ fakten:
   profil.gruendungsdatum: "2012-01-01"
   profil.taetigkeit.einordnung: gewerbe
   profil.taetigkeit.branchen: [bau, transport_logistik, it_agentur_freelancer, immobilien_finanzen]
+  # R12: Lenkzeiten und Erlaubnis nach Gesamtmasse – ein Lkw über 3,5 t
+  profil.fahrzeuge.anzahl: 2
+  profil.fahrzeuge.gesamtmasse: [ueber_3_5t]
   profil.erlaubnis.gewo_paragraphen: ["34c"]
   profil.beschaeftigte.gesamt: 15
   profil.rentenversicherung.pflichtgruppe: [keine]

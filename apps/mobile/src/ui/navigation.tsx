@@ -239,7 +239,8 @@ export function Unterseite({ titel, unter, children, rechts, schliessen }: { tit
       {titel ? (
         <View style={{ paddingHorizontal: RAND, paddingTop: 2, paddingBottom: 20 }}>
           <T v="titel" accessibilityRole="header" farbe={f.buehneText} numberOfLines={gross ? undefined : 3}>{trennen(titel)}</T>
-          {unter ? <BuehnenText text={unter} stil={{ marginTop: 6 }} /> : null}
+          {/* R12 (UX #23): bei großer Schrift den Satz zuklappen – der Kopf der Kontrollmappe nahm sonst den halben Bildschirm */}
+          {unter ? <BuehnenText text={unter} stil={{ marginTop: 6 }} kompakt={gross} /> : null}
         </View>
       ) : null}
       <View style={{ flex: 1, backgroundColor: f.papier, borderTopLeftRadius: RADIUS.buehne, borderTopRightRadius: RADIUS.buehne, overflow: "hidden" }}>{children}</View>

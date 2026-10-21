@@ -8,7 +8,7 @@ import { RADIUS, useFarben } from "../ui/thema";
 import { belegeFiltern, euroText, rechnungBrutto, filterVerfuegbar, filtern, offeneSumme, rechnungenSortiert, type Filter } from "../unterlagen/ablage";
 import { heute, sortiert, type Stand, type Unterlage } from "../unterlagen/speicher";
 import { useStandWahl } from "../zustand";
-import { BelegErfassen, BelegSeite, BelegZeile } from "./Belege";
+import { BelegErfassen, BelegSeite, BelegZeile, UngueltigeBelege } from "./Belege";
 import { BuehnenListe, BuehnenMarke, Gruppe, Leer } from "./gemeinsam";
 import { useOeffnen, useStarten } from "./starten";
 import { useErstellen } from "./Erstellen";
@@ -69,7 +69,8 @@ type Eintrag =
   | { art: "mehr"; key: string; anzahl: number }
   | { art: "belegKopf"; key: string; titel?: string }
   | { art: "beleg"; key: string; b: Beleg; erste: boolean; letzte: boolean }
-  | { art: "alleBelege"; key: string; anzahl: number };
+  | { art: "alleBelege"; key: string; anzahl: number }
+  | { art: "ungueltig"; key: string };
 
 /** Zeile als Teil einer Karte: erste und letzte mit runden Ecken – sieht aus wie eine Karte um die ganze Gruppe. */
 function KartenStueck({ erste, letzte, children }: { erste: boolean; letzte: boolean; children: ReactNode }) {
@@ -110,6 +111,7 @@ export function Meine() {
   const entwuerfe = useMemo(() => alle.filter((u) => u.vorlage === "rechnung" && !u.festgeschrieben).length, [alle]);
   const fehltJe = useFehltJe();
   const ueberJe = useUeberfaellig();
+  const archivAnzahl = useStandWahl((s) => s.belegArchiv).length;
   const eintraege = useMemo(() => {
     const e: Eintrag[] = [];
     const gruppen = liste.length ? nachMonat(liste.slice(0, zeigen), aktiv === "rechnungen" || aktiv === "offen") : [];
@@ -124,8 +126,10 @@ export function Meine() {
       gezeigt.forEach((b, i) => e.push({ art: "beleg", key: `b-${b.id}`, b, erste: i === 0, letzte: i === gezeigt.length - 1 }));
       if (aktiv === "alle" && belege.length > gezeigt.length) e.push({ art: "alleBelege", key: "alle-belege", anzahl: belege.length });
     }
+    // R12 GoBD: ungültig markierte Belege mit Grund einsehbar (unter „Belege“)
+    if (aktiv === "belege" && archivAnzahl) e.push({ art: "ungueltig", key: "ungueltig" });
     return e;
-  }, [liste, zeigen, aktiv, belege, betrieb]);
+  }, [liste, zeigen, aktiv, belege, betrieb, archivAnzahl]);
   const zeile = useCallback(
     (e: Eintrag) => {
       switch (e.art) {
@@ -154,6 +158,8 @@ export function Meine() {
           );
         case "alleBelege":
           return <TextKnopf text={TEXT.alle_belege(e.anzahl)} onPress={() => setFilter("belege")} />;
+        case "ungueltig":
+          return <UngueltigeBelege />;
       }
     },
     [f.tinteLeise, ueberJe, fehltJe, betrieb, oeffnen, belegOeffnen],
@@ -165,7 +171,11 @@ export function Meine() {
         <Knopf symbol="plus" text={TEXT.rechnung_schreiben} onPress={() => starten("rechnung")} />
         <Knopf ton symbol="doc.viewfinder" text={TEXT.beleg_erfassen} onPress={() => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />)} />
         <TextKnopf symbol="doc.text" text={TEXT.zu_den_unterlagen} onPress={erstellen.oeffnen} stil={{ alignSelf: "center" }} />
-        {mitKasse ? <Karte stil={{ marginTop: 8 }}><KasseZeile /></Karte> : null}
+        {/* R12 (UX #7): die Kontrollmappe auch im leeren Tab – ein neuer Betrieb sucht sie hier */}
+        <Karte stil={{ marginTop: 8 }}>
+          <Zeile symbol="folder" ton="blau" titel={TEXT.kontrollmappe_zeile} text={TEXT.r11_mappe_zeile_kurz} onPress={mappe} letzte={!mitKasse} />
+          {mitKasse ? <KasseZeile /> : null}
+        </Karte>
       </View>
     </Leer>
   ) : (

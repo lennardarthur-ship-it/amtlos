@@ -149,7 +149,7 @@ describe("R11 Steuer: Steuerberater-Paket", () => {
     const p = steuerpaket(s, JAHR, SB, {}, "2027-01-10T08:00:00");
     const l = datei(p, "LIESMICH.txt");
     // R12: ohne Kasse in Amtlos stehen Barbelege gegen Geldtransit – kein Kassenminus mehr
-    expect(l).toContain("im Stapel gegen Geldtransit (1360)");
+    expect(l).toContain("im Stapel gegen Privateinlage (1890)");
     expect(l).toContain("Gutscheine zu 0 %");
     expect(datei(p, "Buchungsliste_2026.csv")).not.toContain("RE 2026-");
     expect(datei(p, "Fragen_2026.txt")).toContain("Einzweck-Gutschein");

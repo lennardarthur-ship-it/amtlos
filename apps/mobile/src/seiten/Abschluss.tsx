@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { Pressable, Share, View } from "react-native";
-import { KU_HINWEIS, PRUEFHINWEIS, betragUnplausibel, skontoBetrag, skontoFuer, cent as centAus, dateinamenTeil, dokumentHtml, eRechnungAus, pdfDateiname, vorlageFuer, xrechnungUbl, type Vorlage } from "@amtlos/fachlogik";
+import { GMBH_ANGABEN, KU_HINWEIS, PRUEFHINWEIS, betragUnplausibel, skontoBetrag, skontoFuer, cent as centAus, dateinamenTeil, dokumentHtml, eRechnungAus, pdfDateiname, vorlageFuer, xrechnungUbl, type Vorlage } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { DatumFeld, Feld, Fuss, Hinweis, Karte, Knopf, Stempel, StempelAuftritt, Symbol, T, TextKnopf, Wahl, Zeile } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
@@ -9,14 +9,16 @@ import { BLATT_OBEN, HAARLINIE, RADIUS, RAND, SCHRIFT, useFarben } from "../ui/t
 import { Vorschau } from "../ui/Vorschau";
 import { Papier, PapierBlatt } from "./Papier";
 import { GrosserBetrag } from "./gemeinsam";
-import { drucken, pdfTeilen } from "../unterlagen/pdf";
+import { drucken, pdfTeilenMitHash } from "../unterlagen/pdf";
 import { NUMMER_DOPPELT, fehltFuer } from "../unterlagen/pruefung";
 import { dateiTeilen } from "../unterlagen/sicherungDatei";
-import { heute } from "../unterlagen/speicher";
+import { absenderFuer, heute } from "../unterlagen/speicher";
 import { euroText, faelligAm, offenBrutto, rechnungBrutto } from "../unterlagen/ablage";
 import { useAmtlos } from "../zustand";
 import { bestaetigen } from "../ui/bestaetigen";
 import { AbsenderSeite } from "./Betrieb";
+import { BetriebTeilSeite } from "./Absender";
+import { handwerkLaut, ohneZahlungsweg } from "./rechnungHinweise";
 import { Ablauf, fehltJeSchritt } from "./Ablauf";
 import { useProSperre } from "./Pro";
 import { FREI_JE_MONAT, ausgabeErlaubt, betriebFuerDokument, uebrig, zaehltFuerKontingent } from "../pro/regeln";
@@ -63,12 +65,14 @@ export function useTeilen(id: string) {
     // Synchronisation), wird nicht festgeschrieben
     const pdfDaten = u.daten;
     try {
-      const html = dokumentHtml(v, pdfDaten, betriebFuerDokument(z.stand.betrieb, z.pro));
-      const ok = art === "teilen" ? await pdfTeilen(html, pdfDateiname(v, u.daten, heute()), v.querformat) : await drucken(html, pdfDateiname(v, u.daten, heute()), v.querformat);
+      // R12 GoBD: festgeschrieben mit den festgehaltenen Absenderdaten; beim ersten Teilen werden die jetzigen festgehalten
+      const absender = absenderFuer(z.stand, u);
+      const html = dokumentHtml(v, pdfDaten, betriebFuerDokument(absender, z.pro));
+      const erg = art === "teilen" ? await pdfTeilenMitHash(html, pdfDateiname(v, u.daten, heute()), v.querformat) : { ok: await drucken(html, pdfDateiname(v, u.daten, heute()), v.querformat) };
       // abgebrochen: nichts festschreiben, nichts vom Freikontingent verbrauchen
-      if (!ok) return;
+      if (!erg.ok) return;
       const erstesMal = !u.ausgegeben;
-      if (!z.ausgeben(id, pdfDaten)) return melden(TEXT.pdf_geaendert, "info");
+      if (!z.ausgeben(id, pdfDaten, "sha256" in erg ? erg.sha256 : undefined, absender)) return melden(TEXT.pdf_geaendert, "info");
       if (erstesMal && v.festschreiben) z.erfolg();
     } catch {
       setFehler(TEXT.pdf_fehler);
@@ -84,13 +88,15 @@ export function useTeilen(id: string) {
     if (!u || !v?.eRechnung) return;
     setFehler(null);
     if (!sperre("e_rechnung")) return;
-    const { daten, fehlt } = eRechnungAus(u.daten, z.stand.betrieb);
+    const absender = absenderFuer(z.stand, u);
+    const { daten, fehlt } = eRechnungAus(u.daten, absender);
     const alle = [...new Set([...fehltFuer(z.stand, u), ...fehlt])];
     setEFehlt(alle);
     if (alle.length) return;
     const xmlDaten = u.daten;
     try {
-      if (await dateiTeilen(`E-Rechnung-${dateinamenTeil(daten.nummer, 60) || "ohne-Nummer"}.xml`, xrechnungUbl(daten, KU_HINWEIS), "application/xml") && !z.ausgeben(id, xmlDaten)) melden(TEXT.pdf_geaendert, "info");
+      // R12 GoBD: eine festgeschriebene Rechnung gibt ihr festgehaltenes Original weiter
+      if (await dateiTeilen(`E-Rechnung-${dateinamenTeil(daten.nummer, 60) || "ohne-Nummer"}.xml`, u.festgeschrieben && u.xml ? u.xml : xrechnungUbl(daten, KU_HINWEIS), "application/xml") && !z.ausgeben(id, xmlDaten, undefined, absender)) melden(TEXT.pdf_geaendert, "info");
     } catch {
       setFehler(TEXT.e_rechnung_fehler);
     }
@@ -98,11 +104,14 @@ export function useTeilen(id: string) {
   return { laedt, fehler, eFehlt, los: () => ausgabe("teilen"), drucken: () => ausgabe("drucken"), eRechnung };
 }
 
-/** R11: Handwerk oder Bau laut Pflichten-Check – dann schlägt die Rechnung den Grundstücks-Hinweis vor (§ 14 Abs. 4 Nr. 9 UStG). */
-const handwerkLaut = (profil: Record<string, unknown>) => {
-  const br = profil["taetigkeit.branchen"];
-  return Array.isArray(br) && br.some((x) => x === "handwerk" || x === "bau");
-};
+
+/** R12: Angabe aus „Mein Betrieb“ ergänzen – Gesellschaftsangaben (§ 35a GmbHG) bzw. Absender. */
+export function betriebOeffnen(nav: ReturnType<typeof useNav>, fehlt: string[]) {
+  const betrieb = fehlt.filter((x) => x.includes("Mein Betrieb"));
+  if (betrieb.length && betrieb.every((x) => x.includes(GMBH_ANGABEN))) nav.oeffnen("betrieb-gesellschaft", () => <BetriebTeilSeite teil="gesellschaft" />, true);
+  else nav.oeffnen("absender", () => <AbsenderSeite />, true);
+}
+
 
 function VorschauSeite({ id }: { id: string }) {
   const z = useAmtlos();
@@ -116,7 +125,7 @@ function VorschauSeite({ id }: { id: string }) {
       {/* das Dokument als Blatt Papier mit Rand und Schatten (E-144) */}
       <View style={{ flex: 1, padding: 16 }}>
         <View style={{ flex: 1, borderRadius: RADIUS.blatt, overflow: "hidden", backgroundColor: "#ffffff", shadowColor: "#063b29", shadowOpacity: 0.18, shadowRadius: 16, shadowOffset: { width: 0, height: 6 }, elevation: 6 }}>
-          <Vorschau html={dokumentHtml(v, u.daten, betriebFuerDokument(z.stand.betrieb, z.pro))} quer={v.querformat} />
+          <Vorschau html={dokumentHtml(v, u.daten, betriebFuerDokument(absenderFuer(z.stand, u), z.pro))} quer={v.querformat} />
         </View>
       </View>
       <Fuss ueber={teilen.fehler ? <Ansage text={teilen.fehler} farbe={f.frist} /> : festschreibenHinweis(v, Boolean(u.festgeschrieben)) ? <T v="caption" leise>{festschreibenHinweis(v, Boolean(u.festgeschrieben))}</T> : null}>
@@ -154,8 +163,8 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
   const storno = u.storniertDurch ? z.stand.unterlagen.find((x) => x.id === u.storniertDurch) : undefined;
   const imFormular = new Set(jeSchritt.flat());
   // Prüfungen außerhalb der Schritte: einem Schritt zuordnen, wenn ein Feld dort so heißt; sonst „Mein Betrieb“ bzw. ohne Sprung
-  const extra = alle.filter((x) => !imFormular.has(x)).map((x) => ({ text: x, schritt: x === NUMMER_DOPPELT ? nummerSchritt : schrittFuer(v, x), betrieb: x.includes("(Mein Betrieb)") }));
-  const html = dokumentHtml(v, d, betriebFuerDokument(z.stand.betrieb, z.pro));
+  const extra = alle.filter((x) => !imFormular.has(x)).map((x) => ({ text: x, schritt: x === NUMMER_DOPPELT ? nummerSchritt : schrittFuer(v, x), betrieb: x.includes("Mein Betrieb") }));
+  const html = dokumentHtml(v, d, betriebFuerDokument(absenderFuer(z.stand, u), z.pro));
   const rest = uebrig(z.stand.unterlagen, new Date());
   const zaehlt = !z.pro && !u.ausgegeben && zaehltFuerKontingent(u) && !(typeof d.storno_zu === "string" && d.storno_zu);
   const ergebnis = v.ergebnis?.(d) ?? [];
@@ -198,13 +207,22 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
             <View key={`${x.text}-${i}`} style={{ flexDirection: "row", alignItems: "center", gap: 8, minHeight: 44, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie }}>
               <T v="klein" stil={{ flex: 1 }}>{x.text}</T>
               {x.betrieb ? (
-                <TextKnopf text={TEXT.ergaenzen} label={`${TEXT.im_betrieb}: ${x.text}`} onPress={() => nav.oeffnen("absender", () => <AbsenderSeite />, true)} />
+                <TextKnopf text={TEXT.ergaenzen} label={`${TEXT.im_betrieb}: ${x.text}`} onPress={() => betriebOeffnen(nav, [x.text])} />
               ) : x.schritt >= 0 ? (
                 <TextKnopf text={TEXT.ergaenzen} label={`${TEXT.ergaenzen}: ${x.text}`} onPress={() => springen(x.schritt)} />
               ) : null}
             </View>
           ))}
           <T v="caption" leise stil={{ marginTop: 6 }}>{v.kundendokument ? TEXT.fehlt_kunde : TEXT.fehlt_text}</T>
+        </View>
+      ) : null}
+
+      {/* R12 (UX #4): „Alle Pflichtangaben sind drin“, aber kein Zahlungsweg – gelbe Zeile mit Sprung zur IBAN */}
+      {!fest && v.storno && ohneZahlungsweg(d, z.stand.betrieb.iban) ? (
+        <View accessibilityRole="summary" style={{ marginTop: 12, backgroundColor: f.baldHauch, borderRadius: RADIUS.karte, paddingHorizontal: 16, paddingVertical: 12, gap: 2 }}>
+          <T v="klein" fett>{TEXT.r12_iban_frage(kunde)}</T>
+          <T v="caption">{TEXT.r12_iban_text}</T>
+          <TextKnopf symbol="building.columns" text={TEXT.r12_iban_eintragen} onPress={() => nav.oeffnen("betrieb-bank", () => <BetriebTeilSeite teil="bank" />, true)} />
         </View>
       ) : null}
 
@@ -309,7 +327,8 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
                 }
               />
             ) : null
-          ) : (
+          ) : u.fassungen?.length ? null : (
+            // R12 Personal: ein Nachweis mit früheren Fassungen ist in der Korrektur – löschen geht nicht
             <TextKnopf
               symbol="trash"
               gefahr
@@ -339,14 +358,14 @@ function ERechnungFehlt({ v, fehlt, springen, gesperrt }: { v: Vorlage; fehlt: s
     <View accessibilityRole="summary" style={{ backgroundColor: f.baldHauch, borderRadius: RADIUS.karte, paddingHorizontal: 16, paddingVertical: 12, marginBottom: 10 }}>
       <T v="klein" fett>{TEXT.e_rechnung_fehlt}</T>
       {fehlt.map((x, i) => {
-        const betrieb = x.includes("(Mein Betrieb)");
+        const betrieb = x.includes("Mein Betrieb");
         // festgeschrieben: Angaben der Rechnung lassen sich nicht mehr ändern – nur „Mein Betrieb“
         const schritt = gesperrt ? -1 : x === NUMMER_DOPPELT ? v.abschnitte.findIndex((a) => a.felder.some((feld) => feld.id === v.fortlaufend)) : schrittFuer(v, x);
         return (
           <View key={x} style={{ flexDirection: "row", alignItems: "center", gap: 8, minHeight: 44, borderTopWidth: i ? HAARLINIE : 0, borderColor: f.linie }}>
             <T v="klein" stil={{ flex: 1 }}>{x}</T>
             {betrieb ? (
-              <TextKnopf text={TEXT.ergaenzen} label={`${TEXT.im_betrieb}: ${x}`} onPress={() => nav.oeffnen("absender", () => <AbsenderSeite />, true)} />
+              <TextKnopf text={TEXT.ergaenzen} label={`${TEXT.im_betrieb}: ${x}`} onPress={() => betriebOeffnen(nav, [x])} />
             ) : schritt >= 0 ? (
               <TextKnopf text={TEXT.ergaenzen} label={`${TEXT.ergaenzen}: ${x}`} onPress={() => springen(schritt)} />
             ) : null}

@@ -175,6 +175,47 @@ export const RECHNUNG_GRUNDSTUECK_VORSCHLAG = "Leistung an einem Grundstück (z.
 /** R11 (Tischlerei #13): Abschlagsrechnung mit „Leistungsdatum entspricht dem Rechnungsdatum“ – die Leistung ist noch nicht erbracht. */
 export const RECHNUNG_ABSCHLAG_LEISTUNG = "Abschlagsrechnung: Die Leistung ist noch nicht erbracht – „Leistungsdatum entspricht dem Rechnungsdatum“ ausschalten und das voraussichtliche Datum bzw. den Zeitraum der Leistung angeben, bei einer Anzahlung den Tag der Vereinnahmung, wenn er feststeht (§ 14 Abs. 4 Satz 1 Nr. 6 UStG).";
 /** Gutschein in einer Position zu 0 % (R11) – nicht als steuerfreier Erlös buchen */
+/** R12 (Coach #6): Vorauszahlung (10er-Karte, Gutschein, Anzahlung) – die Leistung folgt erst, das Leistungsdatum ist nicht das Rechnungsdatum. */
+const vorauszahlungD = (d: Daten) => ja(d, "vorauszahlung") && !text(d, "storno_zu");
+/** Leistungsdatum gleich dem Rechnungsdatum? Nicht bei einer Vorauszahlung (R12). */
+const leistungGleich = (d: Daten) => ja(d, "leistung_gleich") && !vorauszahlungD(d);
+
+/**
+ * R12 (Kfz #6): Angaben auf Geschäftsbriefen einer GmbH bzw. UG (§ 35a GmbHG): Rechtsform, Sitz, Registergericht,
+ * Registernummer und alle Geschäftsführer. Fehlt etwas in „Mein Betrieb“, steht es unter „Fehlt noch“ – mit dem
+ * Zusatz „(Mein Betrieb, § 35a GmbHG)“, damit die App gleich die Gesellschaftsangaben öffnet.
+ */
+export const GMBH_ANGABEN = "§ 35a GmbHG";
+export const GMBH_REGISTERGERICHT = `Registergericht (Mein Betrieb, ${GMBH_ANGABEN})`;
+export const GMBH_REGISTERNUMMER = `Registernummer, z. B. HRB 12345 (Mein Betrieb, ${GMBH_ANGABEN})`;
+export const GMBH_GESCHAEFTSFUEHRUNG = `Alle Geschäftsführerinnen und Geschäftsführer (Mein Betrieb, ${GMBH_ANGABEN})`;
+export const GMBH_SITZ = `Ort des Betriebs als Sitz der Gesellschaft (Mein Betrieb, ${GMBH_ANGABEN})`;
+export function gmbhAngabenFehlen(b: Betrieb): string[] {
+  if (!istKapitalgesellschaft(b.rechtsform, b.name) || (formImNamen(b.rechtsform ?? "") ?? formImNamen(b.name)) === "AG") return [];
+  const t = (x: string | undefined) => (x ?? "").trim();
+  return [!t(b.registergericht) ? GMBH_REGISTERGERICHT : "", !t(b.registernummer) ? GMBH_REGISTERNUMMER : "", !t(b.vertretung) ? GMBH_GESCHAEFTSFUEHRUNG : "", !t(b.ort) ? GMBH_SITZ : ""].filter(Boolean);
+}
+
+/** R12 (UX #15): Empfänger, der wie eine Privatperson heißt („Lea Schmitz“) – kein Firmenzusatz, keine Behörde, zwei bis vier Wörter. */
+const FIRMA = /\b(gmbh|ug|ag|kg|ohg|gbr|e\.\s?k\.?|e\.\s?v\.?|mbh|se|ltd|inc|co\.?|gesellschaft|firma|praxis|kanzlei|apotheke|verlag|verein|stiftung|schule|kita|hotel|restaurant|café|cafe|salon|studio|agentur|werkstatt|bäckerei|service|handel|bau|technik|logistik|spedition|klinik|zentrum|institut|gruppe|holding)\b/i;
+export function istPrivatperson(name: string): boolean {
+  const n = name.trim();
+  if (!n || /\d/.test(n) || FIRMA.test(n) || istOeffentlicherEmpfaenger(n) || /[&+@]/.test(n)) return false;
+  const woerter = n.split(/\s+/);
+  return woerter.length >= 2 && woerter.length <= 4 && woerter.every((w) => /^[\p{Lu}][\p{L}'’.-]*$/u.test(w) || /^(von|van|de|der|den|zu|da|di|del|la|le)$/i.test(w));
+}
+/** Anrede, wenn keine eigene angegeben ist: an Privatpersonen „Guten Tag Lea Schmitz“, sonst „Sehr geehrte Damen und Herren“. */
+export function standardAnrede(kunde: string): string {
+  return istPrivatperson(kunde) ? `Guten Tag ${kunde.trim().replace(/\s+/g, " ")}` : ANREDE_STANDARD;
+}
+
+/** R12 (Kfz #11): Fahrzeug-Leistungen (Werkstatt) – dann passt der Grundstücks-Hinweis nicht. */
+const FAHRZEUG = /\b(kfz|pkw|lkw|auto|fahrzeug|reifen|inspektion|ölwechsel|bremse|bremsen|hauptuntersuchung|abgasuntersuchung|karosserie|werkstatt|motor|getriebe|kupplung|auspuff)/i;
+/** R12 (Bäckerei #15): Monat in einer Position („Lieferung Oktober“), obwohl das Leistungsdatum das Rechnungsdatum ist. */
+const MONAT_IM_TEXT = /\b(januar|februar|märz|april|mai|juni|juli|august|september|oktober|november|dezember)\b/i;
+export const RECHNUNG_MONAT_ZEITRAUM = (monat: string) => `In einer Position steht „${monat}“: Ist das der Zeitraum der Leistung? Dann „Leistungsdatum entspricht dem Rechnungsdatum“ ausschalten und den Zeitraum eintragen (z. B. „${monat} ${new Date().getFullYear()}“) – sonst steht das Rechnungsdatum als Leistungsdatum auf der Rechnung.`;
+export const RECHNUNG_KU_GUTSCHEIN = "10er-Karte oder Gutschein als Kleinunternehmer: Für die Umsatzgrenze (§ 19 UStG) zählt beim Einzweck-Gutschein bzw. bei der Karte für eine bestimmte Leistung in der Regel schon der Verkauf, beim Mehrzweck-Gutschein erst die Einlösung (§ 3 Abs. 14 und 15 UStG) – im Zweifel mit der Steuerberatung klären.";
+
 export const gutscheinZuNull = (d: Daten) => !kuFuer(d) && positionen(d).some((x) => x.p.ust_satz === 0 && /gutschein/i.test(x.p.bezeichnung));
 export const RECHNUNG_RC_MIT_UST = "Pflichthinweis „Steuerschuldnerschaft des Leistungsempfängers“ bzw. „innergemeinschaftliche Lieferung“ gewählt, aber Positionen mit 19 % oder 7 % – bitte diese Positionen auf „0 % / steuerfrei“ stellen oder den Hinweis abwählen. Ausgewiesene Umsatzsteuer schuldest du sonst trotzdem (§ 14c Abs. 1 UStG).";
 
@@ -339,7 +380,8 @@ export function eRechnungAus(d: Daten, b: Betrieb): { daten: RechnungsDaten; feh
   const pos = liste(d, "positionen").filter((e) => text(e, "bezeichnung") || text(e, "preis"));
   const datum = text(d, "datum");
   const ziel = text(d, "zahlungsziel");
-  const leistungsdatum = ja(d, "leistung_gleich") ? datum || null : isoAus(text(d, "leistung"));
+  // R12: bei einer Vorauszahlung der Tag der Zahlung, wenn er feststeht (§ 14 Abs. 4 Satz 1 Nr. 6 UStG), sonst der angegebene Zeitraum
+  const leistungsdatum = leistungGleich(d) ? datum || null : vorauszahlungD(d) && !text(d, "leistung").trim() ? isoAus(text(d, "bezahlt_am")) : isoAus(text(d, "leistung"));
   // Gutschrift und ihr Storno: in der E-Rechnung ist der Leistende der Verkäufer (R11)
   const gutschrift = gutschriftD(d);
   const daten: RechnungsDaten = {
@@ -395,6 +437,14 @@ export const RECHNUNG_NEGATIV = "Rechnungsbetrag ist negativ – bitte die Preis
 /** Anrede der Rechnung, wenn keine eigene angegeben ist. */
 const ANREDE_STANDARD = "Sehr geehrte Damen und Herren";
 
+/** R12: Einheiten zur Auswahl in Rechnungspositionen – Dienstleistungen zuerst, dazu Termin und Kilometer. */
+const RECHNUNG_EINHEITEN = ["Stück", "Stunde", "Pauschale", "Termin", "Tag", "Monat", "Kilometer", ...EINHEITEN.filter((e) => !["Stück", "Stunde", "Pauschale", "Tag", "Monat", "Kilometer", "Minute", "Woche"].includes(e)).slice(0, 3)];
+/** R12 (Coach #18): Pflichthinweise, die Kleinunternehmer nur in besonderen Fällen brauchen (eine Bedingung genügt). */
+const KU_OHNE: Record<string, Option["wenn"]> = {
+  igl: { feld: "kleinunternehmer", nicht: true },
+  reverse_charge: [{ feld: "kleinunternehmer", nicht: true }, { feld: "kunde_ust_idnr" }],
+};
+
 export const rechnung: Vorlage = {
   id: "rechnung",
   gestalt: "brief",
@@ -414,19 +464,23 @@ export const rechnung: Vorlage = {
   titelFuer: rechnungsTitel,
   abschnitte: [
     { titel: "Eckdaten",
-      hilfe: "Am Ende teilst du die Rechnung als PDF – an Unternehmen zusätzlich als E-Rechnung (XRechnung).",
+      // R12 (Coach #19): Kleinunternehmer dürfen weiter Papier- bzw. PDF-Rechnungen ausstellen (§ 34a UStDV)
+      hilfe: "Am Ende teilst du die Rechnung als PDF. An Unternehmen geht sie zusätzlich als E-Rechnung (XRechnung) – für Kleinunternehmer möglich, aber keine Pflicht (§ 34a UStDV).",
       felder: [
         { id: "nummer", art: "text", label: "Rechnungsnummer", hilfe: "fortlaufend und nur einmal vergeben, z. B. 2026-001", pflicht: true },
         { id: "datum", art: "datum", label: "Rechnungsdatum", vorbelegung: "heute", pflicht: true },
-        { id: "leistung_gleich", art: "schalter", label: "Leistungsdatum entspricht dem Rechnungsdatum", vorbelegung: true },
-        { id: "leistung", art: "text", label: "Datum oder Zeitraum der Leistung", hilfe: "z. B. 12.10.2026 oder Oktober 2026", pflicht: true, wenn: { feld: "leistung_gleich", nicht: true } },
+        { id: "leistung_gleich", art: "schalter", label: "Leistungsdatum entspricht dem Rechnungsdatum", vorbelegung: true, wenn: { feld: "vorauszahlung", nicht: true } },
+        { id: "leistung", art: "text", label: "Datum oder Zeitraum der Leistung", hilfe: "z. B. 12.10.2026 oder Oktober 2026; bei einer Vorauszahlung, soweit schon bekannt", pflicht: true, wenn: { feld: "leistung_gleich", nicht: true } },
+        // R12 (Coach #6): 10er-Karte, Gutschein, Anzahlung – das Rechnungsdatum ist dann nicht das Leistungsdatum (§ 14 Abs. 4 Satz 1 Nr. 6 UStG)
+        { id: "vorauszahlung", selten: true, art: "schalter", label: "Vorauszahlung (Leistung folgt)", hilfe: "z. B. 10er-Karte, Gutschein oder Anzahlung: Auf der Rechnung steht dann kein Leistungsdatum, sondern „Leistung folgt“ – mit dem Zeitraum, falls schon bekannt, und dem Zahlungstag aus „Schon bezahlt am“." },
         { id: "zahlungsziel", art: "wahl", label: "Zahlungsziel", optionen: [{ wert: "7", text: "7 Tage" }, { wert: "14", text: "14 Tage" }, { wert: "30", text: "30 Tage" }, { wert: "sofort", text: "Sofort" }], vorbelegung: "14", hilfe: "Steht auf der Rechnung als „Zahlbar innerhalb von … Tagen“ mit dem Datum." },
-        // R12: Skonto als im Voraus vereinbarte Minderung des Entgelts (§ 14 Abs. 4 Satz 1 Nr. 8 UStG)
-        { id: "skonto", selten: true, art: "schalter", label: "Skonto bei schneller Zahlung", hilfe: "Steht im Zahlungsblock als Bedingung (§ 14 Abs. 4 Satz 1 Nr. 8 UStG) und in der E-Rechnung. Der GiroCode enthält den vollen Betrag. Zieht der Kunde Skonto ab, vermerkst du beim Zahlungseingang den erhaltenen Betrag." },
+        // R12: Skonto als im Voraus vereinbarte Minderung des Entgelts (§ 14 Abs. 4 Satz 1 Nr. 7 UStG)
+        { id: "skonto", selten: true, art: "schalter", label: "Skonto bei schneller Zahlung", hilfe: "Steht im Zahlungsblock als Bedingung (§ 14 Abs. 4 Satz 1 Nr. 7 UStG) und in der E-Rechnung. Der Satz „2 % Skonto bei Zahlung bis …“ genügt, der Betrag muss nicht dastehen (A 14.5 Abs. 19 UStAE). Der GiroCode enthält den vollen Betrag. Zieht der Kunde Skonto ab, vermerkst du beim Zahlungseingang den erhaltenen Betrag." },
         { id: "skonto_prozent", art: "zahl", label: "Skonto in Prozent", hilfe: "z. B. 2 oder 2,5", vorbelegung: "2", pflicht: true, wenn: { feld: "skonto" } },
         { id: "skonto_tage", art: "zahl", label: "bei Zahlung innerhalb von … Tagen", hilfe: "ab Rechnungsdatum, z. B. 10", vorbelegung: "10", pflicht: true, wenn: { feld: "skonto" } },
         { id: "bezahlt_am", selten: true, art: "datum", label: "Schon bezahlt am", hilfe: "z. B. bei Barzahlung, Vorkasse oder Zahlung im Onlineshop – bezahlt am oder vor dem Rechnungsdatum, entfällt die Zahlungsaufforderung" },
         { id: "bestellnummer", selten: true, art: "text", label: "Bestellnummer des Kunden", hilfe: "steht auf der Rechnung und in der E-Rechnung (BT-13)" },
+        { id: "anlage", selten: true, art: "text", label: "Anlage", hilfe: "steht als „Anlage: …“ unter der Rechnung, z. B. Tourenliste oder Stundenzettel – die Datei selbst schickst du mit", vorschlaege: ["Tourenliste", "Stundenzettel", "Aufmaß", "Leistungsnachweis"] },
         { id: "abschlag", selten: true, art: "schalter", label: "Abschlagsrechnung (Anzahlung vor Fertigstellung)", hilfe: "Die Umsatzsteuer entsteht mit der Zahlung (§ 13 Abs. 1 Nr. 1 a Satz 4 UStG) – in der Voranmeldung zählt die Rechnung im Zeitraum des Zahlungseingangs. Als Leistungsdatum das voraussichtliche Datum angeben, nicht das Rechnungsdatum." },
       ],
     },
@@ -436,7 +490,7 @@ export const rechnung: Vorlage = {
         { id: "kunde_name", art: "text", label: "Name oder Firma", pflicht: true },
         { id: "kunde_anschrift", art: "mehrzeilig", label: "Anschrift", hilfe: "Straße und Hausnummer, PLZ und Ort – im Ausland das Land in die letzte Zeile", pflicht: true },
         { id: "kunde_email", art: "text", label: "E-Mail des Empfängers", hilfe: "nötig für die E-Rechnung an Unternehmen" },
-        { id: "anrede", selten: true, art: "text", label: "Anrede", hilfe: `Steht über dem Text der Rechnung; leer: „${ANREDE_STANDARD}“`, vorschlaege: [ANREDE_STANDARD, "Sehr geehrte Frau …", "Sehr geehrter Herr …", "Guten Tag …", "Hallo …"] },
+        { id: "anrede", selten: true, art: "text", label: "Anrede", hilfe: `Steht über dem Text der Rechnung; leer: an Privatpersonen „Guten Tag“ mit dem Namen, sonst „${ANREDE_STANDARD}“`, vorschlaege: [ANREDE_STANDARD, "Sehr geehrte Frau …", "Sehr geehrter Herr …", "Guten Tag …", "Hallo …"] },
         { id: "kunde_ust_idnr", selten: true, art: "text", label: "USt-IdNr. des Empfängers", hilfe: "nur bei innergemeinschaftlichen Leistungen oder Steuerschuldnerschaft des Empfängers; bei Gutschriften die des Leistenden" },
         { id: "kunde_leitweg_id", selten: true, art: "text", label: "Leitweg-ID bzw. Käuferreferenz", hilfe: "bei Behörden und Kommunen Pflicht für die E-Rechnung (z. B. 05913000-00012-37); wird beim Kunden gemerkt" },
         { id: "kunde_steuernummer", selten: true, art: "text", label: "Steuernummer des Leistenden (bei Gutschrift)", hilfe: "Bei einer Gutschrift stehen Steuernummer oder USt-IdNr. des Leistenden auf dem Dokument (§ 14 Abs. 4 Nr. 2 UStG)", wenn: { feld: "hinweise", ist: "gutschrift" } },
@@ -448,7 +502,8 @@ export const rechnung: Vorlage = {
       titel: "Positionen",
       felder: [
         // R11 (Kosmetik #4): Bruttopreise für Privatkunden – die Summe trifft den Endpreis genau
-        { id: "preise_brutto", selten: true, art: "schalter", label: "Preise inkl. Umsatzsteuer (brutto)", hilfe: "Dann trägst du unter „Einzelpreis“ den Endpreis mit Umsatzsteuer ein (z. B. 45,00 €); Amtlos rechnet Netto und Umsatzsteuer daraus, der Rechnungsbetrag stimmt genau. Nicht bei Kleinunternehmern." },
+        // R12 (UX #5): sichtbar über den Positionen und im Salon, Café bzw. bei reinen Privatkunden vorbelegt (profilStart); nicht bei Kleinunternehmern
+        { id: "preise_brutto", art: "schalter", label: "Preise inkl. Umsatzsteuer (brutto)", hilfe: "Unter „Einzelpreis“ steht der Endpreis (z. B. 45,00 €) – Netto und Umsatzsteuer rechnet Amtlos genau daraus.", vorbelegungJe: { friseur: true, kosmetik: true, gastro_cafe: true }, wenn: { feld: "kleinunternehmer", nicht: true } },
         {
           id: "positionen",
           art: "liste",
@@ -459,9 +514,11 @@ export const rechnung: Vorlage = {
           felder: [
             { id: "bezeichnung", art: "text", label: "Leistung oder Ware", hilfe: "handelsübliche Bezeichnung bzw. Art und Umfang der Leistung", pflicht: true },
             { id: "menge", art: "zahl", label: "Menge", vorbelegung: "1" },
-            { id: "einheit", art: "text", label: "Einheit", vorschlaege: EINHEITEN.slice(0, 8), vorbelegung: { text: "Stück" } },
+            // R12 (UX #14): Dienstleistungen meist als Pauschale bzw. Stunde – je Branche vorbelegt
+            { id: "einheit", art: "text", label: "Einheit", vorschlaege: RECHNUNG_EINHEITEN, vorbelegung: { text: "Stück" }, vorbelegungJe: { friseur: "Pauschale", kosmetik: "Pauschale", handwerk_allgemein: "Stunde", gebaeudereinigung: "Pauschale", unterricht: "Termin" } },
             { id: "preis", art: "betrag", label: "Einzelpreis netto (€)", hilfe: "mit „Preise inkl. Umsatzsteuer“ der Bruttopreis", pflicht: true },
-            { id: "satz", art: "wahl", label: "Umsatzsteuer", optionen: SAETZE, vorbelegung: "19" },
+            // R12 (Bäckerei #15): eine neue Position übernimmt den Steuersatz der letzten
+            { id: "satz", art: "wahl", label: "Umsatzsteuer", optionen: SAETZE, vorbelegung: "19", wieVorher: true },
           ],
         },
       ],
@@ -472,7 +529,8 @@ export const rechnung: Vorlage = {
         // aus dem Pflichten-Check vorbelegt (ausProfil) – daher unter „Weitere Angaben“; eingeschaltet steht er ohnehin da
         { id: "kleinunternehmer", selten: true, art: "schalter", label: "Kleinunternehmer (§ 19 UStG)", hilfe: "Dann wird keine Umsatzsteuer ausgewiesen; der Hinweis auf die Steuerbefreiung steht auf der Rechnung." },
         { id: "leistender_steuer", selten: true, art: "wahl", label: "Umsatzsteuer des Leistenden (bei Gutschrift)", optionen: [{ wert: "regel", text: "weist Umsatzsteuer aus" }, { wert: "ku", text: "Kleinunternehmer (§ 19 UStG)" }], hilfe: "Bei einer Gutschrift richtet sich die Umsatzsteuer nach dem Leistenden, nicht nach dir. Ohne Auswahl gilt der Schalter „Kleinunternehmer“.", wenn: { feld: "hinweise", ist: "gutschrift" } },
-        { id: "hinweise", selten: true, art: "bausteine", label: "Pflichthinweise, falls zutreffend", optionen: [...RECHNUNGS_HINWEISE.filter((h) => h.wert !== "steuerfrei").map((h) => ({ wert: h.wert, text: h.wert === "gutschrift" ? GUTSCHRIFT_AUSWAHL : h.text, quelle: h.quelle })), { wert: "grundstueck", text: GRUNDSTUECK_HINWEIS, quelle: "§ 14 Abs. 4 Nr. 9, § 14b Abs. 1 Satz 5 UStG" }] },
+        // R12 (Coach #18): bei Kleinunternehmern keine innergemeinschaftliche Lieferung; Steuerschuldnerschaft nur mit USt-IdNr. des Empfängers (EU-Ausland)
+        { id: "hinweise", selten: true, art: "bausteine", label: "Pflichthinweise, falls zutreffend", optionen: [...RECHNUNGS_HINWEISE.filter((h) => h.wert !== "steuerfrei").map((h): Option => ({ wert: h.wert, text: h.wert === "gutschrift" ? GUTSCHRIFT_AUSWAHL : h.text, quelle: h.quelle, ...(KU_OHNE[h.wert] ? { wenn: KU_OHNE[h.wert] } : {}) })), { wert: "grundstueck", text: GRUNDSTUECK_HINWEIS, quelle: "§ 14 Abs. 4 Nr. 9, § 14b Abs. 1 Satz 5 UStG", wenn: { feld: "kleinunternehmer", nicht: true } }] },
         { id: "befreiung", selten: true, art: "text", label: "Hinweis auf die Steuerbefreiung (bei 0 %)", hilfe: "Pflicht, wenn eine Position steuerfrei ist – mit der Vorschrift. Bei Bauleistungen an Bauunternehmen und bei Gebäudereinigung an Gebäudereiniger (§ 13b Abs. 2 Nr. 4 und 8, Abs. 5 Satz 2 und 5 UStG) stattdessen den Pflichthinweis „Steuerschuldnerschaft des Leistungsempfängers“ wählen und die Positionen auf 0 % stellen. Gutscheine sind keine steuerfreien Umsätze (Einzweck-Gutschein: mit Umsatzsteuer abrechnen).", vorschlaege: ["Steuerfreie Leistung nach § 4 Nr. … UStG", NULLSATZ_HINWEIS] },
         { id: "hinweis", art: "mehrzeilig", label: "Weitere Hinweise", vorschlaege: ["Vielen Dank für Ihren Auftrag.", ZAHLUNGS_HINWEIS] },
       ],
@@ -505,7 +563,13 @@ export const rechnung: Vorlage = {
     [E_FEHLT["leistender.steuernummer_oder_ust_idnr"]!]: "kunde_steuernummer",
   },
   // Kleinbetragsrechnung bis 250 € (§ 33 UStDV): Name und Anschrift des Empfängers sind keine Pflicht (R11)
-  nichtPflicht: (d) => (kleinbetrag(d) ? ["kunde_name", "kunde_anschrift"] : []),
+  nichtPflicht: (d) => [...(kleinbetrag(d) ? ["kunde_name", "kunde_anschrift"] : []), ...(vorauszahlungD(d) ? ["leistung"] : [])],
+  // R12 (UX #5): Bruttopreise auch, wenn laut Pflichten-Check nur Privatpersonen kaufen (nicht bei Kleinunternehmern)
+  profilStart(profil) {
+    const seg = profil["kunden.segmente"];
+    const start: Daten = Array.isArray(seg) && seg.length === 1 && seg[0] === "b2c" && profil["ust.kleinunternehmer"] !== true ? { preise_brutto: true } : {};
+    return start;
+  },
   pruefen(d, b) {
     const f: string[] = [];
     if (!b.name.trim() || !anschrift(b)) f.push("Name und Anschrift des Betriebs (Mein Betrieb)");
@@ -513,6 +577,8 @@ export const rechnung: Vorlage = {
     if (istGutschriftD(d)) {
       if (!text(d, "kunde_steuernummer").trim() && !text(d, "kunde_ust_idnr").trim()) f.push(RECHNUNG_GUTSCHRIFT_STEUER);
     } else if (!b.steuernummer.trim() && !b.ust_idnr.trim()) f.push("Steuernummer oder USt-IdNr. (Mein Betrieb)");
+    // R12 (Kfz #6): GmbH bzw. UG ohne Registerangaben – Pflicht auf jedem Geschäftsbrief (§ 35a GmbHG)
+    f.push(...gmbhAngabenFehlen(b));
     // Anschrift des Empfängers: PLZ und Ort in der letzten Zeile (im Ausland: Land in der Zeile danach – dort keine Prüfung)
     const anschrift_ = text(d, "kunde_anschrift");
     if (anschrift_) {
@@ -531,7 +597,7 @@ export const rechnung: Vorlage = {
     if (nullProzent && !kuFuer(d) && !text(d, "befreiung") && !auswahl(d, "hinweise").some((h) => h === "reverse_charge" || h === "igl")) f.push("Hinweis auf die Steuerbefreiung (bei 0 %)");
     // R11: Steuerschuldnerschaft bzw. igL mit Umsatzsteuer in den Positionen – Widerspruch (§ 14c Abs. 1 UStG); nicht bei Gutschriften und Kleinunternehmern
     if (!kuFuer(d) && !gutschriftD(d) && auswahl(d, "hinweise").some((h) => h === "reverse_charge" || h === "igl") && pos.some((x) => (x.p.ust_satz ?? 0) > 0)) f.push(RECHNUNG_RC_MIT_UST);
-    if (ja(d, "abschlag") && ja(d, "leistung_gleich") && !text(d, "storno_zu")) f.push(RECHNUNG_ABSCHLAG_LEISTUNG);
+    if (ja(d, "abschlag") && leistungGleich(d) && !text(d, "storno_zu")) f.push(RECHNUNG_ABSCHLAG_LEISTUNG);
     // R12: Skonto nur mit lesbaren Angaben – sonst stünde eine unklare Bedingung auf der Rechnung
     if (ja(d, "skonto") && !text(d, "storno_zu") && (text(d, "skonto_prozent") || text(d, "skonto_tage")) && !skontoAus(text(d, "skonto_prozent"), text(d, "skonto_tage"))) f.push(RECHNUNG_SKONTO_FALSCH);
     return f;
@@ -556,7 +622,7 @@ export const rechnung: Vorlage = {
       if (typeof extra?.kleinunternehmer === "boolean" && extra.kleinunternehmer !== ja(d, "kleinunternehmer")) h.push(RECHNUNG_KU_PROFIL(extra.kleinunternehmer));
       // R11: Leistung vor bzw. nach dem Wechsel von der Kleinunternehmerregelung („Mein Betrieb“)
       const kuBis = isoAus(b.ku_bis ?? "");
-      const tag = ja(d, "leistung_gleich") ? isoAus(text(d, "datum")) : (isoAus(text(d, "leistung")) ?? leistungszeitraumAus(text(d, "leistung"))?.bis ?? null);
+      const tag = leistungGleich(d) ? isoAus(text(d, "datum")) : (isoAus(text(d, "leistung")) ?? leistungszeitraumAus(text(d, "leistung"))?.bis ?? null);
       if (kuBis && tag && !text(d, "storno_zu")) {
         if (tag <= kuBis && !ku) h.push(RECHNUNG_KU_ZEIT(datumDe(kuBis)));
         else if (tag > kuBis && ku) h.push(RECHNUNG_NACH_KU_ZEIT(datumDe(kuBis)));
@@ -565,7 +631,13 @@ export const rechnung: Vorlage = {
       const sk = ja(d, "skonto") ? skontoAus(text(d, "skonto_prozent"), text(d, "skonto_tage")) : null;
       if (sk && /^\d+$/.test(text(d, "zahlungsziel")) && sk.tage >= Number(text(d, "zahlungsziel"))) h.push(RECHNUNG_SKONTO_FRIST);
       if (sk && sk.prozent > 10) h.push(RECHNUNG_SKONTO_HOCH);
-      if (extra?.handwerk && !ku && !hw.includes("grundstueck") && !text(d, "kunde_ust_idnr").trim() && !text(d, "storno_zu") && positionen(d).some((x) => (x.p.ust_satz ?? 0) > 0)) h.push(RECHNUNG_GRUNDSTUECK_VORSCHLAG);
+      // R12 (Kfz #11, Bäckerei #14): nur Bau und Ausbau, nur an Privatpersonen, nicht bei Fahrzeug-Leistungen
+      if (extra?.handwerk && !ku && !hw.includes("grundstueck") && !text(d, "kunde_ust_idnr").trim() && !text(d, "storno_zu") && !istOeffentlicherEmpfaenger(text(d, "kunde_name")) && !FIRMA.test(text(d, "kunde_name")) && !FAHRZEUG.test(b.name) && !positionen(d).some((x) => FAHRZEUG.test(x.p.bezeichnung)) && positionen(d).some((x) => (x.p.ust_satz ?? 0) > 0)) h.push(RECHNUNG_GRUNDSTUECK_VORSCHLAG);
+      // R12 (Bäckerei #15): „Lieferung Oktober“ – Leistungszeitraum statt Rechnungsdatum?
+      const monat = leistungGleich(d) && !text(d, "storno_zu") ? positionen(d).map((x) => MONAT_IM_TEXT.exec(x.p.bezeichnung)?.[1]).find(Boolean) : undefined;
+      if (monat) h.push(RECHNUNG_MONAT_ZEITRAUM(monat[0]!.toLocaleUpperCase("de") + monat.slice(1).toLocaleLowerCase("de")));
+      // R12 (Coach #7): Kleinunternehmer mit 10er-Karte oder Gutschein – welches Jahr für die Umsatzgrenze zählt
+      if (ku && (vorauszahlungD(d) || positionen(d).some((x) => /gutschein|\d+er[-\s]?karte|zehnerkarte/i.test(x.p.bezeichnung)))) h.push(RECHNUNG_KU_GUTSCHEIN);
     }
     return h;
   },
@@ -604,6 +676,7 @@ export const rechnung: Vorlage = {
     ].join("");
     const leistung = text(d, "leistung");
     const datum = text(d, "datum");
+    const vorauszahlung = vorauszahlungD(d);
     // schon bezahlt (am oder vor dem Rechnungsdatum, z. B. bar oder im Onlineshop): keine Zahlungsaufforderung
     const bezahltAm = isoAus(text(d, "bezahlt_am"));
     const schonBezahlt = !storno && !gutschrift && !leer && !!bezahltAm && !!datum && bezahltAm <= datum;
@@ -622,7 +695,7 @@ export const rechnung: Vorlage = {
       befreiungInSumme(befreiung) && !ku ? "" : befreiung,
       schonBezahlt ? `Der Rechnungsbetrag wurde am ${datumDe(bezahltAm)} bezahlt.` : "",
     ].filter((x) => x.trim());
-    // R12: Skonto als Bedingung im Zahlungsblock (§ 14 Abs. 4 Satz 1 Nr. 8 UStG) – der GiroCode bleibt beim vollen Betrag
+    // R12: Skonto als Bedingung im Zahlungsblock (§ 14 Abs. 4 Satz 1 Nr. 7 UStG) – der GiroCode bleibt beim vollen Betrag
     const sk = zahlbar && !leer && s.brutto_cent > 0 ? skontoFuer(d, b.bundesland) : null;
     const skBetrag = sk ? skontoBetrag(s.brutto_cent, sk.prozent) : 0;
     const skontoSatz = sk ? `Bei Zahlung bis zum ${datumDe(sk.bis)} gewähren wir ${prozentText(sk.prozent)} % Skonto (${euro(skBetrag)}); zu überweisen sind dann ${euro(s.brutto_cent - skBetrag)}.` : "";
@@ -665,24 +738,30 @@ export const rechnung: Vorlage = {
       stand: datumDe(datum),
       // Schweizer UID (CHE-…) heißt „UID/MWST-Nr.“, nicht USt-IdNr.
       empfaenger: { name: text(d, "kunde_name"), anschrift: text(d, "kunde_anschrift"), zusatz: text(d, "kunde_ust_idnr") ? `${/^\s*CHE/i.test(text(d, "kunde_ust_idnr")) ? "UID/MWST-Nr." : "USt-IdNr."} ${text(d, "kunde_ust_idnr")}` : undefined },
-      // Reihenfolge nach DIN 5008: Bezugszeichen oben, das Datum abgesetzt als letzte Zeile (halbfett)
+      // R12 (UX #16): Nummer, Rechnungsdatum, Leistungsdatum, Steuernummer – die Daten der Rechnung zusammen oben, Kontakt darunter
       info: [
         ["Rechnungsnummer", text(d, "nummer"), true],
-        // ein einzelnes Datum heißt „Leistungsdatum“, alles andere (z. B. „Oktober 2026“, „02.03. – 27.03.2026“) „Leistungszeitraum“
-        [ja(d, "leistung_gleich") || isoAus(leistung) || !leistung.trim() ? "Leistungsdatum" : "Leistungszeitraum", ja(d, "leistung_gleich") ? datumDe(datum) : leistung],
+        ["Rechnungsdatum", datumDe(datum), true, true],
+        // ein einzelnes Datum heißt „Leistungsdatum“, alles andere (z. B. „Oktober 2026“, „02.03. – 27.03.2026“) „Leistungszeitraum“;
+        // R12: Vorauszahlung – „Leistung folgt“ (mit Zeitraum, falls bekannt); Kleinbetragsrechnung ohne Leistungsdatum (§ 33 UStDV)
+        ...((vorauszahlung
+          ? [[leistung.trim() ? (isoAus(leistung) ? "Leistungsdatum" : "Leistungszeitraum") : "Leistung", leistung.trim() ? `${leistung.trim()} (Leistung folgt)` : "folgt (Vorauszahlung)"], ...(bezahltAm ? [["Zahlung erhalten", datumDe(bezahltAm)]] : [])]
+          : leistungGleich(d) && !leer && kleinbetrag(d)
+            ? []
+            : [[leistungGleich(d) || isoAus(leistung) || !leistung.trim() ? "Leistungsdatum" : "Leistungszeitraum", leistungGleich(d) ? datumDe(datum) : leistung]]) as [string, string][]),
         ...(text(d, "bestellnummer").trim() ? ([["Ihre Bestellnummer", text(d, "bestellnummer").trim()]] as [string, string][]) : []),
         ...(text(d, "kunde_leitweg_id").trim() ? ([["Leitweg-ID", text(d, "kunde_leitweg_id").trim()]] as [string, string][]) : []),
         // Gutschrift: Steuernummer bzw. USt-IdNr. des Leistenden (§ 14 Abs. 4 Nr. 2 UStG) – nicht die des ausstellenden Betriebs
         ...(gutschrift && !storno
           ? ([["Steuernr. Leistender", text(d, "kunde_steuernummer").trim()], ["USt-IdNr. Leistender", text(d, "kunde_ust_idnr").trim()]] as [string, string][])
           : ([["Steuernummer", b.steuernummer.trim()], ["USt-IdNr.", b.ust_idnr.trim()]] as [string, string][])),
+        null,
         ["Ansprechperson", b.verantwortlich.trim()],
         ["Telefon", b.telefon.trim()],
         ["E-Mail", b.email.trim()],
-        null,
-        ["Rechnungsdatum", datumDe(datum), false, true],
       ],
-      anrede: anrede ? `${(text(d, "anrede") || ANREDE_STANDARD).replace(/[,\s]+$/, "")},` : undefined,
+      // R12 (UX #15): Privatperson ohne eigene Anrede – „Guten Tag Lea Schmitz“
+      anrede: anrede ? `${(text(d, "anrede") || standardAnrede(text(d, "kunde_name"))).replace(/[,\s]+$/, "")},` : undefined,
       inhalt:
         (anrede ? `<p>${esc(anrede)}</p>` : "") +
         `<section>${tabelle(["Pos.", "Leistung", "Menge", "Einzelpreis", ...(ku ? [] : ["USt"]), "Betrag"], zeilenHtml, { breiten: ku ? ["5%", "54%", "13%", "13%", "15%"] : ["5%", "47%", "13%", "13%", "7%", "15%"], zahlen: ku ? [2, 3, 4] : [2, 3, 4, 5], ...(leer ? { mindestens: 5, hoch: true } : {}) })}</section>` +
@@ -698,7 +777,10 @@ export const rechnung: Vorlage = {
         // R10 (Seite 2 nur mit Gruß): kurze Hinweise (z. B. „Vielen Dank für Ihren Auftrag.“) stehen im selben Absatz wie der
         // Gruß, und die Firma steht nicht noch einmal darunter (sie steht im Briefkopf) – so passt der Schluss öfter auf Seite 1
         (kurzerSchluss ? "" : hinweise.length ? `<div class="gruss">${hinweise.map((h) => `<p>${esc(h)}</p>`).join("")}</div>` : "") +
-        `<p class="gruss"${kurzerSchluss ? ' style="margin-top:2.4mm"' : ""}>${kurzerSchluss ? hinweise.map((h) => `${esc(h)}<br>`).join("") : ""}Mit freundlichen Grüßen<br>${esc(b.verantwortlich.trim() || b.name.trim())}</p></div></div>`,
+        `<p class="gruss"${kurzerSchluss ? ' style="margin-top:2.4mm"' : ""}>${kurzerSchluss ? hinweise.map((h) => `${esc(h)}<br>`).join("") : ""}Mit freundlichen Grüßen<br>${esc(b.verantwortlich.trim() || b.name.trim())}</p>` +
+        // R12 (Kurier #21): Anlage als Vermerk – die Datei selbst geht mit der E-Mail bzw. Nachricht
+        (text(d, "anlage").trim() ? `<p class="gruss" style="margin-top:3mm">Anlage: ${esc(text(d, "anlage").trim())}</p>` : "") +
+        `</div></div>`,
     });
   },
 };
@@ -1309,6 +1391,25 @@ export const kassenmeldung: Vorlage = {
       felder: [{ id: "stand", art: "datum", label: "Stand", vorbelegung: "heute" }],
     },
     {
+      // R12 (Bäckerei #3): weitere Betriebsstätten (Filialen) – je Betriebsstätte ein eigenes Blatt mit ihren Kassen
+      titel: "Betriebsstätten",
+      hilfe: "Nur bei Filialen: Die Meldung geht je Betriebsstätte. Amtlos übernimmt sie aus „Mein Betrieb“. Kassen ohne Betriebsstätte gehören zum Betrieb unter der Anschrift aus „Mein Betrieb“.",
+      felder: [
+        {
+          id: "betriebsstaetten",
+          art: "liste",
+          label: "Weitere Betriebsstätten",
+          eintrag: "Betriebsstätte",
+          titelFeld: "name",
+          leerStarten: true,
+          felder: [
+            { id: "name", art: "text", label: "Name", pflicht: true, hilfe: "z. B. Filiale Marktplatz" },
+            { id: "anschrift", art: "mehrzeilig", label: "Anschrift", pflicht: true },
+          ],
+        },
+      ],
+    },
+    {
       titel: "Kassen",
       felder: [
         {
@@ -1324,6 +1425,7 @@ export const kassenmeldung: Vorlage = {
             { id: "modell", art: "text", label: "Modell", pflicht: true },
             { id: "seriennummer", art: "text", label: "Seriennummer der Kasse", pflicht: true },
             { id: "software", selten: true, art: "text", label: "Software und Version" },
+            { id: "betriebsstaette", art: "text", label: "Betriebsstätte", hilfe: "Leer: Betrieb unter der Anschrift aus „Mein Betrieb“", vorschlaegeAus: { liste: "betriebsstaetten", feld: "name" } },
             { id: "anschaffung", art: "datum", label: "Angeschafft am", pflicht: true },
             { id: "tse_art", art: "text", label: "Art der zertifizierten technischen Sicherheitseinrichtung (TSE)", pflicht: true, vorschlaege: TSE_ARTEN },
             { id: "tse_seriennummer", art: "text", label: "Seriennummer der TSE", pflicht: true },
@@ -1356,16 +1458,30 @@ export const kassenmeldung: Vorlage = {
       : // leeres Blatt: ein Aufzeichnungssystem zum Ausfüllen von Hand (ein zweiter Block passt nicht mehr auf die Seite),
         // die TSE mit Art und Seriennummer in eigenen Zeilen
         [1].map((i) => ({ titel: `Aufzeichnungssystem ${i}`, zeilen: ["Art", "Hersteller / Modell", "Seriennummer", "Software", "Angeschafft am", "TSE – Art", "TSE – Seriennummer", "Zertifizierungs-ID", "Außer Betrieb genommen"].map((t): [string, string] => [t, ""]) }));
-    // Feldnummern laufen durch – gezählt werden nur die tatsächlich gedruckten Zeilen (Betriebsstätte: 01–03)
-    let nr = 4;
-    return dokument({
-      titel: "Kassenmeldung – Datenblatt",
-      betrieb: b,
-      meta: `Stand: ${datumDe(text(d, "stand")) || "–"}`,
-      inhalt:
-        `<p class="klein">Zum Übertragen in „Mein ELSTER“ (Mitteilung über elektronische Aufzeichnungssysteme nach § 146a Abs. 4 AO). Je Betriebsstätte eine Mitteilung mit allen Kassen.</p>` +
-        abschnitt("Betriebsstätte", felder([["Steuernummer", b.steuernummer], ["Name und Anschrift", [b.name, anschrift(b)].filter((x) => x.trim()).join(", ")], ["Anzahl der Aufzeichnungssysteme", k.length ? String(k.length) : ""]])) +
-        bloecke
+    // R12 (Bäckerei #3): je Betriebsstätte ein Blatt mit ihrer Anschrift und ihren Kassen (§ 146a Abs. 4 AO) – Kassen
+    // ohne Betriebsstätte gehören zum Betrieb (Anschrift aus „Mein Betrieb“)
+    const staetten = liste(d, "betriebsstaetten").filter((x) => text(x, "name"));
+    const schluessel = (n: string) => n.trim().toLocaleLowerCase("de");
+    const gruppen = new Map<string, { name: string; anschrift: string; idx: number[] }>();
+    k.forEach((x, i) => {
+      const n = text(x, "betriebsstaette");
+      const key = n && schluessel(n) !== schluessel(b.name) ? schluessel(n) : "";
+      if (!gruppen.has(key)) {
+        const st = staetten.find((y) => schluessel(text(y, "name")) === key);
+        gruppen.set(key, key ? { name: st ? text(st, "name") : n, anschrift: st ? text(st, "anschrift").replace(/\n+/g, ", ") : "", idx: [] } : { name: b.name, anschrift: anschrift(b), idx: [] });
+      }
+      gruppen.get(key)!.idx.push(i);
+    });
+    // ohne Kasse: ein Blatt für den Betrieb
+    const blaetter = gruppen.size ? [...gruppen.entries()].sort(([x], [y]) => (x === "" ? -1 : y === "" ? 1 : 0)).map(([, g]) => g) : [{ name: b.name, anschrift: anschrift(b), idx: [] as number[] }];
+    const blatt = (g: (typeof blaetter)[number], erstes: boolean) => {
+      // Feldnummern laufen je Blatt durch – gezählt werden nur die tatsächlich gedruckten Zeilen (Betriebsstätte: 01–03)
+      let nr = 4;
+      const eigene = g.idx.length ? g.idx.map((i) => bloecke[i]!).map((x, j) => ({ ...x, titel: x.titel.replace(/^Aufzeichnungssystem \d+/, `Aufzeichnungssystem ${j + 1}`) })) : k.length ? [] : bloecke;
+      return (
+        (erstes ? "" : '<div style="break-before:page;page-break-before:always"></div>') +
+        abschnitt(blaetter.length > 1 ? `Betriebsstätte ${blaetter.indexOf(g) + 1} von ${blaetter.length}` : "Betriebsstätte", felder([["Steuernummer", b.steuernummer], ["Name und Anschrift", [g.name, g.anschrift].filter((x) => x.trim()).join(", ")], ["Anzahl der Aufzeichnungssysteme", g.idx.length ? String(g.idx.length) : ""]])) +
+        eigene
           .map((x) => {
             const start = nr;
             nr += x.zeilen.filter(([, w]) => w !== null).length;
@@ -1373,7 +1489,16 @@ export const kassenmeldung: Vorlage = {
             return `<div class="zusammen">${abschnitt(x.titel, felder(x.zeilen, { start }))}</div>`;
           })
           .join("") +
-        uebertragung(["Gemeldet über Mein ELSTER am", "Transferticket"]),
+        uebertragung(["Gemeldet über Mein ELSTER am", "Transferticket"])
+      );
+    };
+    return dokument({
+      titel: "Kassenmeldung – Datenblatt",
+      betrieb: b,
+      meta: `Stand: ${datumDe(text(d, "stand")) || "–"}`,
+      inhalt:
+        `<p class="klein">Zum Übertragen in „Mein ELSTER“ (Mitteilung über elektronische Aufzeichnungssysteme nach § 146a Abs. 4 AO). Je Betriebsstätte eine Mitteilung mit allen Kassen${blaetter.length > 1 ? ` – hier ${blaetter.length} Blätter, eines je Betriebsstätte` : ""}.</p>` +
+        blaetter.map((g, i) => blatt(g, i === 0)).join(""),
     });
   },
 };

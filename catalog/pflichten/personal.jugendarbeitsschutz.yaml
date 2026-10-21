@@ -1,17 +1,14 @@
 # Katalog D.44 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.jugendarbeitsschutz
-version: 2
+version: 3
 katalog_nr: D.44
 titel:
   de: Jugendarbeitsschutz beachten
 kurz:
   de: Für Jugendliche gelten Erstuntersuchung, Arbeitszeitgrenzen und eine Aushangpflicht.
 erklaerung:
-  de: Wer Jugendliche beschäftigt, braucht vorab eine ärztliche Erstuntersuchung (§ 32 JArbSchG), muss besondere Arbeitszeitgrenzen
-    einhalten und das Jugendarbeitsschutzgesetz aushängen. Gefährliche Arbeiten – etwa an Maschinen mit erhöhter Unfallgefahr oder mit
-    Gefahrstoffen – sind nur eingeschränkt erlaubt (§ 22 JArbSchG); die Gefährdungsbeurteilung berücksichtigt Jugendliche eigens
-    (§ 28a JArbSchG). Halbjährliche Unterweisung und Nachuntersuchung nach einem Jahr sind eigene Pflichten.
+  de: Wer Jugendliche beschäftigt, braucht vorab eine ärztliche Erstuntersuchung (§ 32 JArbSchG), muss besondere Arbeitszeitgrenzen einhalten und das Jugendarbeitsschutzgesetz aushängen. Jugendliche arbeiten nur zwischen 6 und 20 Uhr (§ 14 Abs. 1 JArbSchG); in Bäckereien und Konditoreien dürfen Jugendliche über 16 Jahre ab 5 Uhr arbeiten, Jugendliche über 17 Jahre in Bäckereien ab 4 Uhr (§ 14 Abs. 2 Nr. 4, Abs. 3 JArbSchG). Gefährliche Arbeiten – etwa an Maschinen mit erhöhter Unfallgefahr oder mit Gefahrstoffen – sind nur eingeschränkt erlaubt (§ 22 JArbSchG); die Gefährdungsbeurteilung berücksichtigt Jugendliche eigens (§ 28a JArbSchG). Halbjährliche Unterweisung und Nachuntersuchung nach einem Jahr sind eigene Pflichten.
 rechtsgrundlage:
 - JArbSchG
 kategorie: personal
@@ -41,9 +38,13 @@ quellen:
 - titel: Jugendarbeitsschutzgesetz
   url: https://www.gesetze-im-internet.de/jarbschg/
   abgerufen: null
+- titel: Jugendarbeitsschutzgesetz § 14 (lxgesetze)
+  url: https://lxgesetze.de/jarbschg/14
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
+- 'R12 (Nutzertest Bäckerei #8): Bäckerei-Ausnahme § 14 Abs. 2 Nr. 4 und Abs. 3 JArbSchG (Wortlaut geprüft; der Nutzertest nannte Nr. 3); weitere Ausnahmen (Gaststätten, mehrschichtige Betriebe) nicht abgebildet'
 - Erstuntersuchung als eigene Pflicht je Einstellung mit Frist?
-- '§ 22 und § 28a JArbSchG als Hinweis ergänzt (R11, Nutzertest Tischlerei) – Ausnahmen für Auszubildende (§ 22 Abs. 2) bestätigen'
+- § 22 und § 28a JArbSchG als Hinweis ergänzt (R11, Nutzertest Tischlerei) – Ausnahmen für Auszubildende (§ 22 Abs. 2) bestätigen
 - Arbeitszeitgrenzen als Regelwerte
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation

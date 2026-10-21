@@ -38,6 +38,8 @@ export interface Angebot {
    * bzw. die Berechtigung unbekannt ist (App-Review R2)
    */
   test: string | null;
+  /** R12: Preis als Zahl aus dem Store (für „spart N %“ beim Jahresabo) – nie ein Betrag aus dem Code */
+  betrag?: number;
 }
 
 type RC = typeof import("react-native-purchases").default;
@@ -118,6 +120,7 @@ export async function angebote(): Promise<Angebot[]> {
       zeitraum: ZEITRAUM[pk.product.subscriptionPeriod ?? ""] ?? "",
       je: JE[pk.product.subscriptionPeriod ?? ""] ?? "",
       test: pk.product.introPrice && pk.product.introPrice.price === 0 && frei.has(pk.product.identifier) ? testText(pk.product.introPrice.period) : null,
+      betrag: typeof pk.product.price === "number" ? pk.product.price : undefined,
     }))
     .sort((a, b) => (a.zeitraum === "jährlich" ? -1 : b.zeitraum === "jährlich" ? 1 : 0));
 }

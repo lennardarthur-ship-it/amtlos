@@ -10,7 +10,7 @@ import { Unterseite } from "../ui/navigation";
 import { kassenAbdeckung } from "../unterlagen/kasse";
 import { gestellteRechnungen, kapitalgesellschaft, kassenHinweisMit, kassenLage, standardZeitraum, steuerpaket, zeitraeume } from "../unterlagen/steuerpaket";
 import { dateiTeilenBytes } from "../unterlagen/sicherungDatei";
-import { heute } from "../unterlagen/speicher";
+import { absenderFuer, heute } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { Inhalt } from "./gemeinsam";
 import { useProSperre } from "./Pro";
@@ -85,7 +85,7 @@ export function SteuerberatungSeite() {
       if (v)
         for (const [i, u] of rechnungenImZeitraum.entries()) {
           setFortschritt(TEXT.steuerpaket_fortschritt_pdfs(i + 1, rechnungenImZeitraum.length));
-          const bytes = await pdfBytes(dokumentHtml(v, u.daten, betriebFuerDokument(z.stand.betrieb, z.pro)), pdfDateiname(v, u.daten, heute()), v.querformat).catch(() => null);
+          const bytes = await pdfBytes(dokumentHtml(v, u.daten, betriebFuerDokument(absenderFuer(z.stand, u), z.pro)), pdfDateiname(v, u.daten, heute()), v.querformat).catch(() => null);
           if (bytes) rechnungsPdfs[u.id] = bytes;
         }
       setFortschritt(TEXT.steuerpaket_fortschritt_zip);
@@ -94,6 +94,8 @@ export function SteuerberatungSeite() {
       const p = steuerpaket(z.stand, zr, sb, dateien, new Date().toISOString(), { rechnungsPdfs });
       setFortschritt(null);
       if (!(await dateiTeilenBytes(p.dateiname, p.zip, "application/zip"))) return;
+      // R12 GoBD: was im Paket steckt, ist ab jetzt festgeschrieben (ändern nur mit Grund, nie löschen)
+      z.belegeFestschreiben(z.stand.belege.filter((b) => b.datum >= zr.von && b.datum <= zr.bis).map((b) => b.id));
       melden(TEXT.steuerpaket_fertig(p.buchungen));
       if (p.ohneXml) setHinweis(TEXT.steuerpaket_ohne_xml(p.ohneXml));
     } catch {

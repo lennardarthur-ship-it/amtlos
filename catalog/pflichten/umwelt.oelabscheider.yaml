@@ -1,0 +1,51 @@
+# R12 (Nutzertest Kfz #1): Öl- und Leichtflüssigkeitsabscheider – nur als Hinweis
+schema_version: 1
+id: umwelt.oelabscheider
+version: 1
+katalog_nr: U.4
+titel:
+  de: Öl- und Leichtflüssigkeitsabscheider warten und prüfen lassen
+kurz:
+  de: Hast du einen Abscheider, etwa am Waschplatz, lässt du ihn regelmäßig warten und prüfen – die Einzelheiten regeln Abwassersatzung und Wasserbehörde.
+erklaerung:
+  de: Abwasser mit Öl oder Kraftstoff, etwa vom Waschplatz oder Werkstattboden, läuft über einen Leichtflüssigkeitsabscheider. Betreiber lassen ihn regelmäßig warten, die Inhalte durch einen Fachbetrieb entsorgen und in festen Abständen prüfen. Welche Abstände und Nachweise gelten, ergibt sich aus der Abwassersatzung deiner Gemeinde und den Vorgaben der Wasserbehörde – frag dort nach.
+rechtsgrundlage:
+- Abwassersatzung der Gemeinde
+- Wasserrecht des Landes
+kategorie: umwelt
+branchen:
+- handwerk
+ausloeser:
+  feld: profil.umwelt.taetigkeiten
+  op: enthaelt
+  wert: abscheider
+  label:
+    de: Ihr habt einen Öl- oder Leichtflüssigkeitsabscheider.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Stadtentwässerung bzw. untere Wasserbehörde
+kanal: partner
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+einordnung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Wasserhaushaltsgesetz
+  url: https://www.gesetze-im-internet.de/whg_2009/
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Neu nach Nutzertest R12 (Kfz #1) nur als Hinweis – Anhang 49 AbwV, Generalinspektion alle 5 Jahre nach DIN 1999-100 und Eigenkontrolle unsicher'
+- AwSV für die Lagerung von Frisch- und Altöl (Schwellen) unsicher
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

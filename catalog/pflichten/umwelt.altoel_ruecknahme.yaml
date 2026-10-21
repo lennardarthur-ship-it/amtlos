@@ -1,0 +1,50 @@
+# R12 (Nutzertest Kfz #1): Altölverordnung – Rücknahme beim Ölverkauf
+schema_version: 1
+id: umwelt.altoel_ruecknahme
+version: 1
+katalog_nr: U.3
+titel:
+  de: Altöl zurücknehmen, wenn du Motor- oder Getriebeöl verkaufst
+kurz:
+  de: Verkaufst du Motor- oder Getriebeöl an Endverbraucher, richtest du vorher eine Annahmestelle für Altöl ein und weist Privatkunden mit einer Schrifttafel darauf hin.
+erklaerung:
+  de: Wer gewerbsmäßig Verbrennungsmotoren- oder Getriebeöl an Endverbraucher abgibt, richtet vor der Abgabe eine Annahmestelle für gebrauchte Öle ein oder weist eine solche durch eine vertragliche Vereinbarung nach (§ 8 Abs. 1 AltölV). Bei der Abgabe an private Endverbraucher weist du am Ort des Verkaufs mit leicht erkennbaren und lesbaren Schrifttafeln auf die Annahmestelle hin.
+rechtsgrundlage:
+- § 8 AltölV
+kategorie: umwelt
+branchen:
+- handwerk
+ausloeser:
+  feld: profil.umwelt.taetigkeiten
+  op: enthaelt
+  wert: oelverkauf
+  label:
+    de: Du verkaufst Motor- oder Getriebeöl an Endverbraucher.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+aktion:
+  art: abhaken
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Altölverordnung § 8
+  url: https://www.gesetze-im-internet.de/alt_lv/__8.html
+  abgerufen: '2026-10-21'
+fachlich_zu_pruefen:
+- 'Neu nach Nutzertest R12 (Kfz #1) – § 8 Abs. 1 AltölV geprüft; Annahme bis zur Menge des gekauften Öls (§ 8 Abs. 2) und Folgen fachlich ergänzen'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

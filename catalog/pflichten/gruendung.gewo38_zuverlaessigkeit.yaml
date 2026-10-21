@@ -1,0 +1,51 @@
+# R12 (Rechtsprüfung Befund 6): überwachungsbedürftige Gewerbe (§ 38 GewO)
+schema_version: 1
+id: gruendung.gewo38_zuverlaessigkeit
+version: 1
+katalog_nr: A.3
+titel:
+  de: Führungszeugnis und Auskunft aus dem Gewerbezentralregister beantragen (§ 38 GewO)
+kurz:
+  de: Für überwachungsbedürftige Gewerbe wie Gebrauchtwarenhandel oder Schlüsseldienst beantragst du nach der Gewerbeanzeige unverzüglich ein Führungszeugnis und eine Auskunft aus dem Gewerbezentralregister.
+erklaerung:
+  de: Überwachungsbedürftig sind unter anderem der Handel mit hochwertigen Gebrauchtwaren, Fahrzeugen, Edelmetallen, Schmuck und Altmetall, Auskunfteien und Detekteien, die Vermittlung von Ehen, Partnerschaften, Reisen und Unterkünften sowie Schlüsseldienste und der Einbau von Sicherungseinrichtungen (§ 38 Abs. 1 GewO). Nach der Gewerbeanzeige prüft die Behörde deine Zuverlässigkeit. Dafür beantragst du unverzüglich ein Führungszeugnis und eine Auskunft aus dem Gewerbezentralregister zur Vorlage bei der Behörde; tust du es nicht, holt die Behörde sie selbst ein.
+rechtsgrundlage:
+- § 38 Abs. 1 GewO
+kategorie: gruendung
+ausloeser:
+  feld: profil.erlaubnis.gewo_paragraphen
+  op: enthaelt
+  wert: '38'
+  label:
+    de: Dein Gewerbe ist überwachungsbedürftig (§ 38 GewO).
+phase: gruendung
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Gewerbeamt
+kanal: portal
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+erledigung:
+  art: bestaetigen
+  bestaetigung:
+    de: Führungszeugnis und Auskunft beantragt
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Gewerbeordnung § 38 (lxgesetze)
+  url: https://lxgesetze.de/gewo/38
+  abgerufen: '2026-10-21'
+fachlich_zu_pruefen:
+- Neu nach Rechtsprüfung R12 (Befund 6) – Liste nach § 38 Abs. 1 GewO (lxgesetze) zusammengefasst; Second-Hand-Shops mit nicht hochwertiger Ware abgrenzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

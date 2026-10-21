@@ -6,8 +6,8 @@ import { T as TEXT } from "../texte";
 import { useMeldung } from "../ui/meldung";
 import { BausteinListe, Fristblatt, Fuss, Hinweis, Kachel, Karte, Knopf, Schalter, SchnellKachel, Symbol, T, TextKnopf, Zeile, tageBis } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
-import { HAARLINIE, RADIUS, SCHRIFT, useFarben, weich } from "../ui/thema";
-import { KATEGORIE_TITEL, auswertung, beantwortet, dringlichkeit, erinnerungsPlan, erledigtDurch, fortschritt, frageZu, gruendungsSchritte, gueltigBis, haken, istErledigt, offeneFragenNachWirkung, offeneKernFragen, offeneVoraussetzungen, selten, zaehlung, type PflichtInfo } from "../pflichten/check";
+import { HAARLINIE, SCHRIFT, useFarben, weich } from "../ui/thema";
+import { AUSWEIS_JE_PERSON, KATEGORIE_TITEL, ZEIT_JE_PERSON, aufzeichnungsStand, auswertung, ausweisStand, beantwortet, dringlichkeit, erinnerungsPlan, erledigtDurch, fortschritt, frageZu, gruendungsSchritte, gueltigBis, haken, istErledigt, offeneFragenNachWirkung, offeneKernFragen, offeneVoraussetzungen, selten, zaehlung, type PflichtInfo } from "../pflichten/check";
 import { allesAbsagen, erinnerungenMoeglich, erlaubnisAnfragen, planen } from "../pflichten/erinnerungen";
 import { heute } from "../unterlagen/speicher";
 import { useAmtlos, useStandWahl } from "../zustand";
@@ -16,6 +16,7 @@ import { SicherungsKarte } from "./Sicherung";
 import { BuehnenBlatt, BuehnenKnopf, BuehnenSeite, Gruppe, Inhalt, datumKurz } from "./gemeinsam";
 import { useOeffnen, useStarten } from "./starten";
 import { useErstellen } from "./Erstellen";
+import { Jahresraster } from "./Jahresraster";
 
 const datumDe = (iso: string) => datumKurz(`${iso}T12:00:00Z`);
 const TAG_LANG = new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", weekday: "long", day: "numeric", month: "long", year: "numeric" });
@@ -31,7 +32,8 @@ export function useAuswertung() {
   const unterweisungen = useMemo(() => unterlagen.filter((u) => (u.vorlage === "unterweisung" || u.vorlage === "ifsg_belehrung") && u.ausgegeben && !u.storniertDurch), [unterlagen]);
   const schluessel = unterweisungen.map((u) => `${u.id}:${String(u.daten.datum ?? "")}`).join("|");
   // R10: aus „Mitarbeiter“ zählen Geburtsdatum (unter 18) und „Beschäftigt seit“ (Neueinstellung)
-  const personen = mitarbeiter.map((m) => `${m.geburtsdatum ?? ""}:${m.beginn ?? ""}`).join("|");
+  // R12 (Zoll #1, #6): Name, Art und „Beschäftigt bis“ bestimmen die Nachweise je Person
+  const personen = mitarbeiter.map((m) => `${m.name ?? ""}:${m.geburtsdatum ?? ""}:${m.beginn ?? ""}:${m.art ?? ""}:${m.ende ?? ""}:${m.staatsangehoerigkeit ?? ""}`).join("|");
   // `schluessel` und `personen` stehen für alles, was die Auswertung daraus liest – bewusst statt der Listen
   return useMemo(() => auswertung(profil, tag, unterweisungen, mitarbeiter), [profil, schluessel, personen, tag]);
 }
@@ -138,6 +140,7 @@ function PflichtDetail({ id }: { id: string }) {
       {durchUnterlage ? <Hinweis art="erfolg" text={laufendBis ? `${TEXT.erledigt_durch_unterlage} ${TEXT.r10_laufend_bis(datumDe(laufendBis))}` : TEXT.erledigt_durch_unterlage} /> : null}
       {p.einordnung !== "pflicht" ? <Hinweis text={TEXT.r10_einordnung[p.einordnung] ?? ""} /> : null}
       {lohnWer ? <Hinweis text={TEXT.r10_lohn_hinweis(lohnWer)} /> : null}
+      {gilt && !abgehakt ? <NachweisJePerson p={p} /> : null}
       {gilt && vorher.length ? <Hinweis text={TEXT.r11_erst_erledigen(vorher.map((x) => x.titel))} /> : null}
       {gilt && vorhanden ? (
         <Karte stil={{ marginTop: 8 }}>
@@ -187,6 +190,22 @@ function PflichtDetail({ id }: { id: string }) {
   );
 }
 
+/** R12 (Zoll #1, #6): für wen der Nachweis fehlt – Arbeitszeit nach § 17 MiLoG und Ausweis-Hinweis. */
+function NachweisJePerson({ p }: { p: PflichtInfo }) {
+  const z = useAmtlos();
+  if (p.id === ZEIT_JE_PERSON) {
+    const st = aufzeichnungsStand(p, z.stand);
+    if (st.erledigtDurch) return null;
+    const text = st.fehlend.length ? st.fehlend.map((x) => TEXT.r12_aufzeichnung_person(x.name, x.seit ? datumDe(x.seit) : null)).join(" ") : TEXT.r12_aufzeichnung_anzahl(st.abgedeckt, st.erforderlich);
+    return <Hinweis art="warnung" text={`${text} ${TEXT.r12_aufzeichnung_regel}`} />;
+  }
+  if (p.id === AUSWEIS_JE_PERSON && p.beschaeftigte?.length) {
+    const st = ausweisStand(p, z.stand);
+    return st.fehlend.length ? <Hinweis art="warnung" text={st.fehlend.map((x) => TEXT.r12_ausweis_person(x.name, x.grund)).join(" ")} /> : null;
+  }
+  return null;
+}
+
 /** Termin in Alltagssprache: „In 11 Tagen fällig“, „Morgen fällig“, „Seit 3 Tagen überfällig“ – weiter weg mit Datum. */
 export function fristText(termin: string, tag = heute()): string {
   const n = tageBis(termin, tag);
@@ -198,7 +217,7 @@ export function fristText(termin: string, tag = heute()): string {
 }
 
 /** Symbol je Bereich des Katalogs – vor Pflichten ohne Termin. */
-const BEREICH_SYMBOL_KAT: Record<string, string> = { gruendung: "flag", gesellschaft: "building.columns", steuern: "eurosign", personal: "person.2", arbeitsschutz: "hammer", datenschutz: "lock.shield", it_sicherheit: "lock", ki: "sparkles", online: "globe", produkte: "tray", branche: "storefront" };
+const BEREICH_SYMBOL_KAT: Record<string, string> = { gruendung: "flag", gesellschaft: "building.columns", steuern: "eurosign", personal: "person.2", arbeitsschutz: "hammer", datenschutz: "lock.shield", it_sicherheit: "lock", ki: "sparkles", online: "globe", produkte: "tray", branche: "storefront", umwelt: "trash" };
 
 export function PflichtZeile({ p, letzte, erledigt, ohneWichtig }: { p: PflichtInfo; letzte: boolean; erledigt: boolean; ohneWichtig?: boolean }) {
   const nav = useNav();
@@ -296,7 +315,7 @@ function PflichtenInhalt() {
         </Gruppe>
       ) : null}
       <ErinnerungsSchalter />
-      <KurzKlaeren offen={offen} unklar={a.unbekannt.length} />
+      <KurzKlaeren offen={offen} />
       <T v="gross" accessibilityRole="header" stil={{ marginTop: 30 }}>{TEXT.alle_nach_bereich}</T>
       {/* die vollständige Liste erst auf Wunsch – oben steht, was jetzt zu tun ist */}
       <TextKnopf erweitert={alleZeigen} symbol={alleZeigen ? "chevron.up" : "chevron.down"} text={alleZeigen ? TEXT.liste_verbergen : TEXT.r10_alle_zeigen(zahl.pflichten, zahl.hinweise, zahl.optionen)} onPress={() => { weich(); setAlleZeigen(!alleZeigen); }} />
@@ -371,7 +390,7 @@ function PflichtenInhalt() {
  * sonst verschwände eine Frage mitten in der Antwort (Mehrfachauswahl, Zahl nach der ersten Ziffer). Neu gewählt wird
  * erst, wenn man zurückkommt; beantwortete Fragen zeigen dann kein „klärt …“ mehr.
  */
-function KurzKlaeren({ offen, unklar }: { offen: { feld: string; anzahl: number }[]; unklar: number }) {
+function KurzKlaeren({ offen }: { offen: { feld: string; anzahl: number }[] }) {
   const z = useAmtlos();
   const nav = useNav();
   const f = useFarben();
@@ -384,7 +403,7 @@ function KurzKlaeren({ offen, unklar }: { offen: { feld: string; anzahl: number 
   if (!felder.length) return null;
   const weitere = offen.filter((o) => !felder.includes(o.feld));
   return (
-    <Gruppe titel={TEXT.kurz_klaeren_titel} fuss={TEXT.kurz_klaeren_text(unklar)}>
+    <Gruppe titel={TEXT.kurz_klaeren_titel} fuss={TEXT.r12_kurz_klaeren_text(offen.length)}>
       <View style={{ gap: 22 }}>
         {felder.map((feld) => {
           const fr = frageZu(feld);
@@ -497,46 +516,6 @@ function Start() {
   );
 }
 
-/** Monatskürzel und Termine je Monat für die nächsten zwölf Monate (ab dem laufenden Monat). */
-function jahresblick(gilt: PflichtInfo[], tag: string) {
-  const [j, m] = tag.split("-").map(Number) as [number, number];
-  return Array.from({ length: 12 }, (_, i) => {
-    const d = new Date(Date.UTC(j, m - 1 + i, 15));
-    const schluessel = d.toISOString().slice(0, 7);
-    const termine = gilt.reduce((n, p) => n + p.termine.filter((t) => t.startsWith(schluessel)).length, 0);
-    const fmt = (o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", ...o }).format(d);
-    return { schluessel, kurz: fmt({ month: "short" }).replace(".", ""), lang: fmt({ month: "long", year: "numeric" }), termine, jetzt: i === 0 };
-  });
-}
-
-/**
- * Jahresblick auf der Bühne (E-142): zwölf Monatskacheln ab jetzt, je Monat die Zahl der Termine aus den geltenden
- * Pflichten. Der laufende Monat in Minze, Monate mit Terminen getönt, ruhige Monate gestrichelt.
- */
-function Jahresblick({ gilt, tag }: { gilt: PflichtInfo[]; tag: string }) {
-  const f = useFarben();
-  const monate = useMemo(() => jahresblick(gilt, tag), [gilt, tag]);
-  // VoiceOver: eine Zusammenfassung für die ganze Reihe (nur Monate mit Terminen) statt zwölf einzelner Kacheln
-  const zusammen = TEXT.jahr_zusammen(monate.filter((m) => m.termine).map((m) => TEXT.monat_termine(m.lang, m.termine)));
-  return (
-    <View accessible accessibilityRole="summary" accessibilityLabel={zusammen} style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
-      {monate.map((mo) => (
-        <View
-          key={mo.schluessel}
-          accessible
-          accessibilityRole="text"
-          accessibilityLabel={TEXT.monat_termine(mo.lang, mo.termine)}
-          // R11 (UX #13): flach statt knopfartig – nur der laufende Monat ist hervorgehoben, die übrigen sind eine ruhige Leiste
-          style={{ width: "15.2%", flexGrow: 1, minHeight: 54, borderRadius: RADIUS.klein, padding: 7, justifyContent: "space-between", backgroundColor: mo.jetzt ? f.minze : "transparent", borderTopWidth: mo.jetzt ? 0 : 1, borderColor: mo.termine ? "rgba(127,227,184,0.55)" : "rgba(255,255,255,0.18)" }}
-        >
-          <T v="caption" maxFontSizeMultiplier={1.5} farbe={mo.jetzt ? f.buehneKnopfText : f.buehneLeise} stil={{ ...SCHRIFT.halb, fontSize: 12, lineHeight: 14 }}>{mo.kurz}</T>
-          {mo.termine ? <T maxFontSizeMultiplier={1.5} farbe={mo.jetzt ? f.buehneKnopfText : f.buehneText} stil={{ ...SCHRIFT.display, fontSize: 17, lineHeight: 19 }}>{String(mo.termine)}</T> : null}
-        </View>
-      ))}
-    </View>
-  );
-}
-
 /** Erster Tab (E-129, E-142): auf der Bühne der Fortschritt und das Jahr; vor dem Check die Einladung dazu. */
 export function PflichtenTab() {
   const z = useAmtlos();
@@ -564,7 +543,8 @@ export function PflichtenTab() {
           <View style={{ gap: 14 }}>
             <T v="klein" farbe={f.buehneLeise} stil={{ marginTop: -10 }}>{TEXT.r10_ergebnis_gesamt(zahl.pflichten, zahl.hinweise, zahl.optionen, selten(a.gilt))}</T>
             <T v="klein" fett accessibilityRole="header" farbe={f.buehneText} stil={{ marginTop: 8 }}>{TEXT.jahr_titel}</T>
-            <Jahresblick gilt={a.gilt} tag={tag} />
+            {/* R12 (UX #22): sechs Spalten, Monate antippbar (seiten/Jahresraster.tsx) */}
+            <Jahresraster gilt={a.gilt} tag={tag} />
           </View>
         ) : (
           <View style={{ gap: 18 }}>

@@ -16,7 +16,13 @@ export function mitAbgeleitetenFakten(profil: Fakten, stichtag: Datum): Fakten {
   const gruendung = profil["profil.gruendungsdatum"];
   const beschaeftigte = profil["profil.beschaeftigte.gesamt"];
 
-  if (typeof rechtsform === "string") f["abgeleitet.ist_kapitalgesellschaft"] = rechtsform === "ug" || rechtsform === "gmbh";
+  if (typeof rechtsform === "string") {
+    f["abgeleitet.ist_kapitalgesellschaft"] = rechtsform === "ug" || rechtsform === "gmbh";
+    // R12 (Rechtsprüfung Befund 1): GmbH & Co. KG – keine natürliche Person haftet unbeschränkt (§ 264a HGB, § 15a Abs. 1 S. 3 InsO)
+    f["abgeleitet.ist_kapitalgesellschaft_oder_co_kg"] = rechtsform === "ug" || rechtsform === "gmbh" || rechtsform === "gmbh_co_kg";
+    // R12: juristische Personen und eingetragene Personengesellschaften (§ 20 Abs. 1 GwG, Registeranmeldung)
+    f["abgeleitet.ist_eingetragene_gesellschaft"] = ["ug", "gmbh", "gmbh_co_kg", "partg", "partg_mbb"].includes(rechtsform);
+  }
   if (typeof einordnung === "string" && einordnung !== "unklar") f["abgeleitet.ist_gewerbe"] = einordnung === "gewerbe";
   if (typeof gruendung === "string") {
     const j = jahrVon(gruendung);
@@ -32,6 +38,8 @@ export function mitAbgeleitetenFakten(profil: Fakten, stichtag: Datum): Fakten {
 /** Aus welchen Profil-Fakten ein abgeleiteter Fakt entsteht – damit "Angabe fehlt" nach der richtigen Angabe fragt. */
 export const QUELLFAKTEN: Readonly<Record<string, readonly string[]>> = {
   "abgeleitet.ist_kapitalgesellschaft": ["profil.rechtsform"],
+  "abgeleitet.ist_kapitalgesellschaft_oder_co_kg": ["profil.rechtsform"],
+  "abgeleitet.ist_eingetragene_gesellschaft": ["profil.rechtsform"],
   "abgeleitet.ist_gewerbe": ["profil.taetigkeit.einordnung"],
   "abgeleitet.ist_gruendungsjahr": ["profil.gruendungsdatum"],
   "abgeleitet.ist_vorjahr_gruendungsjahr": ["profil.gruendungsdatum"],

@@ -58,6 +58,16 @@ export interface Beleg {
    * Die Vorsteuer mindert sich im Zeitraum der Zahlung, die Betriebsausgabe ist der gezahlte Betrag.
    */
   skonto_cent?: number | null;
+  /**
+   * R12 GoBD: Amtlos-Belegnummer („B2026-017“), beim Erfassen vergeben und dauerhaft gespeichert – sie ändert sich
+   * nicht, wenn ein anderer Beleg gelöscht wird oder sich das Belegdatum ändert.
+   */
+  nr?: string | null;
+  /**
+   * R12 GoBD: festgeschrieben (ISO) – sobald der Beleg in einem Steuerberater-Paket oder einer abgegebenen
+   * Voranmeldung steckt. Danach nur noch mit Grund änderbar (die vorige Fassung bleibt in `historie`), nie löschbar.
+   */
+  festgeschrieben?: string | null;
 }
 
 export type Steuerschuld = "bau" | "eu";
@@ -82,6 +92,8 @@ export interface BelegFassung {
   datei?: string | null;
   steuerschuld?: Steuerschuld | null;
   skonto_cent?: number | null;
+  /** R12 GoBD: Grund, mit dem diese Fassung nach der Festschreibung ersetzt wurde */
+  grund?: string | null;
 }
 
 /**
@@ -215,22 +227,42 @@ export function belegnummerNormal(s: string | null | undefined): string {
     .replace(/-+$/, "");
 }
 
+/** Form einer Amtlos-Belegnummer: „B2026-017“ */
+export const BELEGNUMMER = /^B(\d{4})-(\d{3,6})$/;
+
 /**
- * Laufende Amtlos-Belegnummer je Jahr des Belegdatums, z. B. „B2026-017“ – abgeleitet, nicht gespeichert. Gezählt wird
- * in der Reihenfolge der Erfassung (erstellt, dann Belegdatum, dann ID): so verschiebt ein nachträglich erfasster Beleg
- * mit früherem Datum die Nummern der schon weitergegebenen Belege nicht (nur Löschen verschiebt sie).
+ * Amtlos-Belegnummer je Beleg, z. B. „B2026-017“. R12 GoBD: Gespeicherte Nummern (`nr`, beim Erfassen vergeben) gelten
+ * unverändert. Nur Belege ohne Nummer (ältere Daten vor der Migration) bekommen eine abgeleitete – je Jahr des
+ * Belegdatums nach der höchsten vorhandenen Nummer, in der Reihenfolge der Erfassung (erstellt, Belegdatum, ID).
  */
-export function belegNummern(belege: Pick<Beleg, "id" | "datum" | "erstellt">[]): Map<string, string> {
+export function belegNummern(belege: Pick<Beleg, "id" | "datum" | "erstellt" | "nr">[]): Map<string, string> {
   const sortiert = [...belege].sort((a, b) => a.erstellt.localeCompare(b.erstellt) || a.datum.localeCompare(b.datum) || a.id.localeCompare(b.id));
   const zaehler = new Map<string, number>();
   const aus = new Map<string, string>();
   for (const b of sortiert) {
+    const m = b.nr ? BELEGNUMMER.exec(b.nr) : null;
+    if (!m) continue;
+    aus.set(b.id, b.nr!);
+    zaehler.set(m[1]!, Math.max(zaehler.get(m[1]!) ?? 0, Number(m[2])));
+  }
+  for (const b of sortiert) {
+    if (aus.has(b.id)) continue;
     const jahr = b.datum.slice(0, 4);
     const n = (zaehler.get(jahr) ?? 0) + 1;
     zaehler.set(jahr, n);
     aus.set(b.id, `B${jahr}-${String(n).padStart(3, "0")}`);
   }
   return aus;
+}
+
+/** Nächste freie Amtlos-Belegnummer für ein Jahr (YYYY) – nach der höchsten vergebenen (auch gelöschter, siehe `vergeben`). */
+export function naechsteBelegnummer(belege: readonly Pick<Beleg, "nr">[], jahr: string, vergeben: readonly string[] = []): string {
+  let max = 0;
+  for (const n of [...belege.map((b) => b.nr ?? ""), ...vergeben]) {
+    const m = BELEGNUMMER.exec(n);
+    if (m && m[1] === jahr) max = Math.max(max, Number(m[2]));
+  }
+  return `B${jahr}-${String(max + 1).padStart(3, "0")}`;
 }
 
 /** Kennung eines Belegs in DATEV (Belegfeld 1), Belegliste und Dateiname: Nummer des Lieferanten (normalisiert), sonst die Amtlos-Belegnummer. */
@@ -416,6 +448,7 @@ function fassungAus(roh: unknown): BelegFassung | null {
     datei: istBelegDateiname(r.datei) ? r.datei : null,
     ...(steuerschuldAus(r.steuerschuld) ? { steuerschuld: steuerschuldAus(r.steuerschuld) } : {}),
     ...(skontoAusRoh(r.skonto_cent) ? { skonto_cent: skontoAusRoh(r.skonto_cent) } : {}),
+    ...(s("grund") ? { grund: s("grund").slice(0, 300) } : {}),
   };
 }
 
@@ -456,12 +489,14 @@ export function belegAus(roh: unknown): Beleg | null {
     ...(historie.length ? { historie } : {}),
     ...(steuerschuldAus(r.steuerschuld) ? { steuerschuld: steuerschuldAus(r.steuerschuld) } : {}),
     ...(skontoAusRoh(r.skonto_cent) ? { skonto_cent: skontoAusRoh(r.skonto_cent) } : {}),
+    ...(BELEGNUMMER.test(s("nr")) ? { nr: s("nr") } : {}),
+    ...(/^\d{4}-\d{2}-\d{2}T/.test(s("festgeschrieben")) ? { festgeschrieben: s("festgeschrieben") } : {}),
   };
 }
 
-/** Inhalt eines Belegs als frühere Fassung (für das Änderungsprotokoll). */
-export function belegFassung(b: Beleg, bis: string): BelegFassung {
-  return { bis, datum: b.datum, lieferant: b.lieferant, nummer: b.nummer ?? null, kategorie: b.kategorie, steuer: b.steuer.map((x) => ({ ...x })), vorsteuer: b.vorsteuer, zahlung: b.zahlung, bezahlt: b.bezahlt ?? null, notiz: b.notiz ?? null, datei: b.datei ?? null, ...(b.steuerschuld ? { steuerschuld: b.steuerschuld } : {}), ...(b.skonto_cent ? { skonto_cent: b.skonto_cent } : {}) };
+/** Inhalt eines Belegs als frühere Fassung (für das Änderungsprotokoll); `grund`: warum sie ersetzt wurde (R12 GoBD). */
+export function belegFassung(b: Beleg, bis: string, grund?: string): BelegFassung {
+  return { ...(grund ? { grund: grund.trim().slice(0, 300) } : {}), bis, datum: b.datum, lieferant: b.lieferant, nummer: b.nummer ?? null, kategorie: b.kategorie, steuer: b.steuer.map((x) => ({ ...x })), vorsteuer: b.vorsteuer, zahlung: b.zahlung, bezahlt: b.bezahlt ?? null, notiz: b.notiz ?? null, datei: b.datei ?? null, ...(b.steuerschuld ? { steuerschuld: b.steuerschuld } : {}), ...(b.skonto_cent ? { skonto_cent: b.skonto_cent } : {}) };
 }
 
 /** Hat sich der Inhalt (nicht nur der Zeitstempel) eines Belegs geändert? */

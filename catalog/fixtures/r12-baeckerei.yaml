@@ -1,0 +1,27 @@
+persona: gastronomie
+beschreibung: "R12 (Nutzertest Bäckerei): e. K. mit drei Läden und Nachtarbeit – Nachtarbeitnehmer (§ 6 ArbZG), Zusatzstoffe bei loser Ware (§ 5 LMZDV), PPWR als Radar; ohne Alkohol und Tabak kein Jugendschutz"
+stichtag: "2026-10-21"
+fakten:
+  profil.rechtsform: ek
+  profil.gruendungsdatum: "2012-01-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [gastronomie_lebensmittel, handwerk]
+  profil.beschaeftigte.gesamt: 14
+  profil.beschaeftigte.jugendlich: 1
+  profil.arbeitszeit.nachtarbeit: true
+  profil.betriebsstaetten.anzahl: 3
+  profil.erlaubnis.gaststaette: false
+  profil.erlaubnis.alkohol: false
+  profil.verkauf.alkohol_tabak: [keine]
+  profil.gastro.to_go: true
+  profil.bundesland: BY
+erwartet:
+  personal.nachtarbeit: gilt
+  branche.gastro_zusatzstoffe: gilt
+  branche.gastro_ppwr_radar: gilt
+  branche.jugendschutz_aushang: gilt_nicht
+  branche.jugendschutz_abgabe: gilt_nicht
+  branche.gastro_lebensmittelregistrierung: gilt
+  gruendung.rundfunkbeitrag: gilt
+  umwelt.gewerbeabfall: gilt
+  personal.jugendarbeitsschutz: gilt

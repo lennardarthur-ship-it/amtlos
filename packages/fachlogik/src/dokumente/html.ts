@@ -283,6 +283,22 @@ export function uebertragung(felderNamen: string[]): string {
 /** Hinweis am Dokumentende (Gesetzestext, Wiederholungsfrist) – klein, abgesetzt, kein Kasten. */
 export const nachsatz = (t: string) => `<p class="nachsatz">${esc(t)}</p>`;
 
+/**
+ * R12: Fassung eines festschreibbaren Nachweises (Vorlagen mit `korrektur`). Die App schreibt `fassung_stand` (Tag der
+ * letzten Änderung) und nach einer Korrektur `fassung_nr`, `fassung_ersetzt` (Tag der vorigen Fassung) und
+ * `fassung_grund` in die Daten. Ohne Angaben: leer.
+ */
+export function fassungText(d: Daten): string {
+  const stand = text(d, "fassung_stand");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(stand)) return "";
+  const nr = Number(text(d, "fassung_nr")) || 1;
+  const ersetzt = text(d, "fassung_ersetzt");
+  const grund = text(d, "fassung_grund");
+  if (nr <= 1) return `Fassung vom ${datumDe(stand)}.`;
+  return `Fassung ${nr} vom ${datumDe(stand)}${ersetzt ? ` – ersetzt die Fassung vom ${datumDe(ersetzt)}` : ""}.${grund ? ` Grund der Korrektur: ${grund.replace(/\s+/g, " ").trim()}` : ""}`;
+}
+export const fassungNachsatz = (d: Daten) => (fassungText(d) ? nachsatz(fassungText(d)) : "");
+
 // ---------------------------------------------------------------- Gestalt, Farbe, Seite
 
 export type Gestalt = "brief" | "vertrag" | "aushang" | "nachweis" | "formular" | "handbuch";
@@ -853,6 +869,21 @@ function kopfZeilen(meta: string | undefined): [string, string][] {
     .map((t) => [t[0]!.trim(), t[1]!.trim()]);
 }
 
+/** R12: Bezeichnung der vertretungsberechtigten Personen nach der Rechtsform aus „Mein Betrieb“. */
+export function vertretungLabel(rechtsform: string | undefined): string {
+  const rf = (rechtsform ?? "").toLocaleLowerCase("de").replace(/[\s.]/g, "");
+  if (/^e(k|kfm|kfr|ingetragene)/.test(rf) || rf.includes("kaufm") || rf.includes("kauffrau") || rf === "einzelunternehmen") return "Inhaber/in";
+  if (/gmbh|ug|haftungsbeschr|^ag$/.test(rf)) return "Geschäftsführung";
+  if (/^(e?gbr|ohg|kg|partg|partgmbb)$/.test(rf)) return "Gesellschafter/innen";
+  return "Geschäftsführung";
+}
+/** Steht die Rechtsform schon im Namen des Betriebs („Aydın Autotechnik GmbH“)? */
+const rechtsformImNamen = (b: Betrieb) => {
+  const n = (x: string) => x.toLocaleLowerCase("de").replace(/[\s.()]/g, "");
+  const rf = n(b.rechtsform ?? "");
+  return !rf || n(b.name).includes(rf) || (rf.startsWith("ug") && /\bUG\b/.test(b.name));
+};
+
 /** Spalten der Geschäfts-Fußzeile aus „Mein Betrieb“ (leere entfallen). Zeilen mit **…** werden fett. */
 export function fussSpalten(b: Betrieb): string[][] {
   const t = (x: string | undefined) => (x ?? "").trim();
@@ -863,9 +894,10 @@ export function fussSpalten(b: Betrieb): string[][] {
     [
       t(b.steuernummer) ? `Steuernr. ${t(b.steuernummer)}` : "",
       t(b.ust_idnr) ? `USt-IdNr. ${t(b.ust_idnr)}` : "",
-      // Gesellschaften: Sitz, Registergericht und -nummer, Geschäftsführung (§ 35a GmbHG, § 37a HGB)
-      t(b.rechtsform) && t(b.registergericht) ? `Sitz ${t(b.ort)}, ${[t(b.registergericht), t(b.registernummer)].filter(Boolean).join(" ")}` : [t(b.registergericht), t(b.registernummer)].filter(Boolean).join(" "),
-      t(b.vertretung) ? `Geschäftsführung: ${t(b.vertretung)}` : "",
+      // Gesellschaften: Rechtsform (wenn nicht schon im Namen), Sitz, Registergericht und -nummer, Geschäftsführung (§ 35a GmbHG, § 37a HGB)
+      t(b.rechtsform) && t(b.registergericht) ? `${rechtsformImNamen(b) ? "" : `${t(b.rechtsform)}, `}Sitz ${t(b.ort)}, ${[t(b.registergericht), t(b.registernummer)].filter(Boolean).join(" ")}` : [t(b.registergericht), t(b.registernummer)].filter(Boolean).join(" "),
+      // R12 (Bäckerei #14): beim e. K. „Inhaber“, bei Personengesellschaften „Gesellschafter“, sonst „Geschäftsführung“
+      t(b.vertretung) ? `${vertretungLabel(b.rechtsform)}: ${t(b.vertretung)}` : "",
     ],
   ];
   return spalten.map((s) => s.filter(Boolean)).filter((s) => s.length);

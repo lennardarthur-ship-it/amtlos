@@ -7,15 +7,22 @@ import { fehlendeTage, kassenStandorte, kassenSummen, kassenUmsatz, kassenVerlau
 import { heute as heuteBerlin, type Stand } from "./speicher";
 import type { KasseFuerUst } from "./ustAusRechnungen";
 
-/** Kasse anbieten: elektronische Kasse oder Verkauf im Laden laut Check – oder es gibt schon Abschlüsse. */
+/**
+ * Kasse anbieten: elektronische Kasse, offene Ladenkasse (Bargeld ohne elektronische Kasse), Verkauf im Laden oder am
+ * Marktstand laut Check – oder es gibt schon Abschlüsse (R12 GoBD: der Marktstand mit offener Ladenkasse fehlte).
+ */
 export function kasseSichtbar(s: Pick<Stand, "profil" | "kasse">): boolean {
   if (s.kasse.length) return true;
   const k = s.profil["vertrieb.kanaele"];
-  return s.profil["kasse.elektronisch"] === true || (Array.isArray(k) && k.includes("ladengeschaeft"));
+  return s.profil["kasse.elektronisch"] === true || offeneLadenkasse(s.profil) || (Array.isArray(k) && (k.includes("ladengeschaeft") || k.includes("marktstand")));
 }
 
-/** Offene Ladenkasse (keine elektronische Kasse laut Check): Kassenbericht mit retrograder Ermittlung anbieten. */
-export const offeneLadenkasse = (profil: Stand["profil"]) => profil["kasse.elektronisch"] === false;
+/**
+ * Offene Ladenkasse: laut Check Bargeld-Einnahmen und ausdrücklich keine elektronische Kasse. Nur dann bietet Amtlos den
+ * Kassenbericht mit retrograder Ermittlung an – bei einer elektronischen Kasse sind die Einnahmen einzeln
+ * aufzuzeichnen (§ 146 Abs. 1 Satz 1, § 146a AO), eine Rückrechnung aus dem Bestand ist dort nicht zulässig.
+ */
+export const offeneLadenkasse = (profil: Stand["profil"]) => profil["kasse.elektronisch"] === false && profil["kasse.bargeld"] !== false;
 
 /** Ruhetage laut „Kasse“ (Wochentage 0 = Sonntag … 6 = Samstag), im Pflichten-Profil gespeichert (synchronisiert je Antwort). */
 export function ruhetage(profil: Stand["profil"]): number[] {
@@ -24,7 +31,14 @@ export function ruhetage(profil: Stand["profil"]): number[] {
 }
 
 /** Kassenabschlüsse für `umsaetzeFuer`. */
-export const kasseFuerUst = (s: Pick<Stand, "profil" | "kasse">, heute = heuteBerlin()): KasseFuerUst => ({ abschluesse: s.kasse, ruhetage: ruhetage(s.profil), heute });
+export const kasseFuerUst = (s: Pick<Stand, "profil" | "kasse"> & Partial<Pick<Stand, "belege" | "sachentnahmen">>, heute = heuteBerlin()): KasseFuerUst => ({
+  abschluesse: s.kasse,
+  ruhetage: ruhetage(s.profil),
+  heute,
+  // R12 GoBD: Kassenüberschüsse (wie im Stapel als Erlös 19 %) und Sachentnahmen
+  ueberschuesse: kassenWarnungen(s.kasse, s.belege ?? []).differenzen.filter((d) => d.cent > 0),
+  sachentnahmen: s.sachentnahmen ?? [],
+});
 
 /** Abdeckung eines Zeitraums: gar keine Abschlüsse (null), vollständig (leer) oder die fehlenden Tage. */
 export function kassenAbdeckung(s: Pick<Stand, "profil" | "kasse">, von: string, bis: string, heute = heuteBerlin()): string[] | null {
@@ -40,6 +54,12 @@ export interface KassenMonat {
   bar: number;
   karte: number;
   sonstige: number;
+  /** R12 GoBD */
+  trinkgeld: number;
+  app: number;
+  aufrechnung: number;
+  gutscheinVerkauf: number;
+  gutscheinEinloesung: number;
   ausgabenBar: number;
   entnahmen: number;
   einlagen: number;
@@ -84,10 +104,15 @@ export function kassenMonat(s: Pick<Stand, "profil" | "kasse" | "belege">, monat
     monat,
     abschluesse,
     brutto: sum((x) => x.brutto),
-    je: kassenUmsatz(s.kasse, von, bis).je,
+    je: kassenUmsatz(s.kasse, von, bis, false, { ueberschuesse: warnungen.differenzen.filter((d) => d.cent > 0) }).je,
     bar: sum((x) => x.bar),
     karte: sum((x) => x.karte),
     sonstige: sum((x) => x.sonstige),
+    trinkgeld: sum((x) => x.trinkgeld),
+    app: sum((x) => x.app),
+    aufrechnung: sum((x) => x.aufrechnung),
+    gutscheinVerkauf: sum((x) => x.gsVerkaufEz + x.gsVerkaufMz),
+    gutscheinEinloesung: sum((x) => x.gsEinlEz + x.gsEinlMz),
     ausgabenBar: tage.reduce((a, t) => a + t.ausgabenBar, 0),
     entnahmen: sum((x) => x.entnahmen),
     einlagen: sum((x) => x.einlagen),

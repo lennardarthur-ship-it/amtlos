@@ -24,11 +24,13 @@ import { UeberGruppe } from "./Recht";
 import { SteuerberatungSeite } from "./Steuerberatung";
 import { KontrollmappeSeite } from "./Kontrollmappe";
 import { KontoZeile } from "./Konto";
+import { MitarbeiterZusatz } from "./Mitarbeiter";
+import { StaettenSeite, staettenText } from "./BetriebStaetten";
 import { syncAngeboten } from "../konto/konfig";
 import { useKonto } from "../konto/konto";
 
 /** Eine gespeicherte Person bearbeiten (E-124). Eine neue Person ohne Namen verschwindet beim Verlassen wieder. */
-function PersonSeite({ art, id, neu }: { art: PersonenArt; id: string; neu?: boolean }) {
+export function PersonSeite({ art, id, neu }: { art: PersonenArt; id: string; neu?: boolean }) {
   const z = useAmtlos();
   const nav = useNav();
   const melden = useMeldung();
@@ -47,6 +49,8 @@ function PersonSeite({ art, id, neu }: { art: PersonenArt; id: string; neu?: boo
     <Unterseite titel={p.name.trim() || TEXT.person_neu[art]}>
       <Inhalt contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 4, paddingBottom: 32 }}>
         <Felder felder={PERSONEN_FELDER[art]} werte={p} fehlt={[]} setze={(k, w) => z.personSetzen(art, { ...p, [k]: typeof w === "string" ? w : null })} />
+        {/* R12 Personal: Betriebsstätte, Aufenthaltstitel, doppelter Name */}
+        {art === "mitarbeiter" ? <MitarbeiterZusatz p={p} /> : null}
         <TextKnopf
           symbol="trash"
           gefahr
@@ -390,9 +394,11 @@ export function Betrieb() {
       <ProZeile />
       <Gruppe titel={TEXT.betrieb_gruppe}>
         <Karte>
-          {teileSichtbar.map((t, i) => (
-            <Zeile key={t} symbol={TEIL_SYMBOL[t]} ton={TEIL_TON[t]} titel={TEXT.teil_titel[t]} text={zusammenfassung(b, t)} onPress={() => oeffneTeil(t)} letzte={i === teileSichtbar.length - 1} />
+          {teileSichtbar.map((t) => (
+            <Zeile key={t} symbol={TEIL_SYMBOL[t]} ton={TEIL_TON[t]} titel={TEXT.teil_titel[t]} text={zusammenfassung(b, t)} onPress={() => oeffneTeil(t)} />
           ))}
+          {/* R12 (Bäckerei #7): Betriebsstätten – der Betrieb ist Betriebsstätte 1 */}
+          <Zeile symbol="storefront" ton="blau" titel={TEXT.r12p_staetten_titel} text={staettenText(z.stand)} onPress={() => nav.oeffnen("staetten", () => <StaettenSeite betriebOeffnen={() => oeffneTeil("angaben")} />)} letzte />
         </Karte>
       </Gruppe>
       <CheckProfilZeile />
@@ -451,7 +457,7 @@ export function Betrieb() {
       <Gruppe fuss={syncAn ? `${TEXT.alles_loeschen_text} ${TEXT.r11_alles_loeschen_sync} ${TEXT.r11_alles_loeschen_kopien_sync}` : `${TEXT.alles_loeschen_text} ${TEXT.alles_loeschen_kopien_hinweis}`}>
         {frage && !darfLoeschen ? (
           <Karte stil={{ paddingVertical: 14, gap: 10 }}>
-            <T>{TEXT.loeschen_gesperrt(fest, regelwert("steuern.aufbewahrung.belege_jahre") ?? 8)}</T>
+            <T>{TEXT.r12p_loeschen_gesperrt(fest, regelwert("steuern.aufbewahrung.belege_jahre") ?? 8)}</T>
             <View style={{ flexDirection: "row", gap: 10 }}>
               <Knopf symbol="lock" text={TEXT.jetzt_sichern} onPress={() => { setFrage(false); nav.oeffnen("sicherung", () => <SicherungSeite />, true); }} stil={{ flex: 1 }} />
               <Knopf ton text={TEXT.abbrechen} onPress={() => setFrage(false)} stil={{ flex: 1 }} />

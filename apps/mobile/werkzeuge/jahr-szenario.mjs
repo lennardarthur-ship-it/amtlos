@@ -33,7 +33,8 @@ import { createRequire } from "node:module";
  * und sich nicht als Zahlvergleich automatisieren lassen. Bei jedem Lauf erneut prüfen und hier pflegen.
  */
 const BEOBACHTUNGEN = [
-  "**Kassenumsätze kommen seit R12 aus der App.** Die Inhaberin erfasst jeden Abend den Tagesabschluss (Umsatz je Satz brutto laut Z-Bon, Kartenanteil, Geldtransit/Privatentnahme). „Aus Rechnungen übernehmen“ (USt-VA) übernimmt die Kassenumsätze (Netto je Monat aus der Bruttosumme), „EÜR übernehmen“ stellt Kasseneinnahmen und Umsatzsteuer in eigene Zeilen, der DATEV-Stapel bucht Kasse an Erlöse und den Kartenanteil über Geldtransit 1360; die Barbelege des Mai stehen gegen Kasse, ein Kassenminus entsteht nicht. Vorher waren das rund 160.000 € netto, die von Hand ergänzt werden mussten.",
+  "**Kassenumsätze kommen seit R12 aus der App.** Die Inhaberin erfasst jeden Abend den Tagesabschluss (Umsatz je Satz brutto laut Z-Bon, Kartenanteil, Geldtransit/Privatentnahme). „Aus Rechnungen übernehmen“ (USt-VA) übernimmt die Kassenumsätze (Netto je Monat aus der Bruttosumme), „EÜR übernehmen“ stellt Kasseneinnahmen und Umsatzsteuer in eigene Zeilen, der DATEV-Stapel bucht nur das Bargeld über die Kasse und den Kartenanteil direkt Geldtransit 1360 an Erlöse; die Barbelege des Mai stehen gegen Kasse, ein Kassenminus entsteht nicht. Vorher waren das rund 160.000 € netto, die von Hand ergänzt werden mussten.",
+  "**R12 GoBD – Sonderfälle im November:** Kartentrinkgeld 18,50 € (07.11., bar ans Personal: Geldtransit an Kasse, kein Umsatz), Korrektur des 10.11. mit Grund (Historie, im Kassenbuch „korrigiert am …“), Gutscheine (14.11. verkauft: Mehrzweck 50 € an 1700, Einzweck 21,40 € zu 7 % als Erlös; 21.11. eingelöst: Mehrzweck Verbindlichkeit an Erlöse, Einzweck nicht noch einmal versteuert), Rechnung 2026-015 am 26.11. bar an der Kasse kassiert (Kasse an Forderungen, Zahlung an der Rechnung vermerkt), Kassensturz mit Zählprotokoll und Zählung am 28.11. mit 2,30 € Überschuss (gebucht als Erlös 19 %, in der VA Q4), Beleg b33 mit 2 % Skonto auf eine Wartung (gegen das Aufwandskonto 4900 mit BU 9). Einen Kassenbericht (retrograd) gibt es beim Café mit TSE-Kasse nicht – er ist nur bei offener Ladenkasse zulässig.",
   "**Quartalsübergreifende Rechnungskorrektur (2026-009 → Storno 2026-010 + neue Rechnung 2026-011, Leistung 20.06.):** `umsaetzeFuer` zählt die Stornorechnung im Zeitraum des Stornos (Q3, −40 Personen), die neue Rechnung aber nach ihrem Leistungsdatum im Q2. Dieselbe Leistung steht damit in Q2 doppelt (40 + 32 Personen: +768,00 € zu 7 %, +528,00 € zu 19 %), Q3 wird um 40 statt um 8 Personen gemindert. Das Jahr stimmt, die Quartale nicht (Zahllast Q2 +154,08 €, Q3 −154,08 €). Erwartet nach § 17 Abs. 1 / § 14c Abs. 1 UStG: Q2 mit dem ursprünglich berechneten Entgelt (40 Personen), Q3 nur die Differenz (−8 Personen). Fachlich bestätigen lassen; in den Notizen der VA Q3 erscheinen deshalb negative Rechnungsumsätze.",
   "**EÜR-Übernahme ohne USt-Zahlungen und ohne AfA:** Die an das Finanzamt gezahlten USt-Vorauszahlungen (hier 9.658,09 €) und die Abschreibung der Spülmaschine (575,00 €) muss man weiter von Hand eintragen; seit Oktober 2026 sagt die Übernahme das ausdrücklich („Nicht enthalten: … Umsatzsteuer-Vorauszahlungen … Abschreibungen (AfA) – bitte selbst ergänzen“). Ausrechnen tut die App beides nicht.",
   "**Innergemeinschaftliche Lieferung nach Österreich (2026-012):** Rechnung, XRechnung (VATEX-EU-IC, Lieferanschrift) und Kz-Hinweis in der VA sind in Ordnung, die EÜR-Übernahme stellt die 841,00 € in die Zeile „Umsatzsteuerfreie, nicht umsatzsteuerbare Betriebseinnahmen …“ (behoben Oktober 2026). Offen: DATEV bucht auf 8100 statt 8125 (in buchungen.ts als Prüfpunkt vermerkt), die VA hat kein eigenes Feld „Kz 41“ (nur „Umsätze ohne Umsatzsteuer“), und für die Zusammenfassende Meldung, die der Pflichten-Check bei Kunden in anderen EU-Ländern richtig anzeigt, gibt es keine Vorlage.",
@@ -251,19 +252,32 @@ function paketPruefen(name, zr, erg, ordner) {
   const zeilen = extf.slice(2);
   // R12: Tagesabschlüsse – je Tag 19 %, 7 %, Kartenanteil und die Bewegungen (Geldtransit, Privatentnahme)
   const kt = D.KASSE_TAGE.filter((k) => im(k.datum));
-  const erwKasse = summe(kt.map((k) => (k.b19 ? 1 : 0) + (k.b7 ? 1 : 0) + (k.b7 + k.b19 - k.bar ? 1 : 0))) + D.KASSEN_BEWEGUNGEN_ROH.filter((b) => im(b.datum)).length;
-  const erwBuchungen = summe(vg.map((x) => Object.values(x.s.gruppen).filter((g) => g.netto + g.ust !== 0).length)) + summe(bl.filter((b) => b.kategorie !== "personal").map((b) => b.saetze.filter((x) => x.betrag).length)) + erwKasse; // R10: Personal nicht im Stapel
+  // R12 GoBD: je Tag und Satz eine Buchung für den Kartenanteil (Geldtransit an Erlöse) und eine für den Baranteil
+  // (Kasse an Erlöse); Gutscheinverkauf: dazu Mehrzweck-Gutschein als drittes Ziel, Einlösung: Verbindlichkeit an Erlöse;
+  // Trinkgeld, bar kassierte Rechnung und Kassendifferenz je eine Buchung
+  const SO = D.KASSE_SONDER;
+  const saetze = (k) => (k.b19 ? 1 : 0) + (k.b7 ? 1 : 0);
+  const erwKasse =
+    summe(kt.map((k) => (k.datum === SO.gutscheinVerkauf.datum ? 2 * (saetze(k) + 1) : k.datum === SO.gutscheinEinloesung.datum ? 3 * saetze(k) : 2 * saetze(k)) + (k.datum === SO.trinkgeld.datum ? 1 : 0) + (k.datum === SO.barRechnung.datum ? 1 : 0) + (k.datum === SO.zaehlung.datum ? 1 : 0))) +
+    D.KASSEN_BEWEGUNGEN_ROH.filter((b) => im(b.datum)).length;
+  const erwSkonto = bl.filter((b) => b.skonto && im(b.bezahlt ?? b.datum)).length;
+  const erwBuchungen = summe(vg.map((x) => Object.values(x.s.gruppen).filter((g) => g.netto + g.ust !== 0).length)) + summe(bl.filter((b) => b.kategorie !== "personal").map((b) => b.saetze.filter((x) => x.betrag).length)) + erwKasse + erwSkonto; // R10: Personal nicht im Stapel
   vergleich(`Paket ${name}`, "DATEV: Anzahl Buchungen", zeilen.length, erwBuchungen);
   vergleich(`Paket ${name}`, "DATEV: Spalten je Zeile = Spalten im Kopf", zeilen.every((z) => z.length === extf[1].length) ? "ja" : "nein", "ja");
   const kontoSumme = (konto) => summe(zeilen.filter((z) => z[7] === konto).map((z) => (z[1] === "H" ? -1 : 1) * centAus(z[0])));
   const erl = { 19: "8400", 7: "8300", 0: "8125" };
   for (const [satz, konto] of Object.entries(erl)) {
-    const erw = summe(vg.map((x) => (x.vz * ((x.s.gruppen[satz]?.netto ?? 0) + (x.s.gruppen[satz]?.ust ?? 0))))) + (satz === "19" ? summe(kt.map((k) => k.b19)) : satz === "7" ? summe(kt.map((k) => k.b7)) : 0);
+    // R12 GoBD: Kassenüberschuss als Erlös 19 %; Einzweck-Gutschein 7 % (Verkauf + / Einlösung −) gleicht sich im Monat aus
+    const ueber = im(SO.zaehlung.datum) ? SO.zaehlung.ueberschuss : 0;
+    const ez = (im(SO.gutscheinVerkauf.datum) ? SO.gutscheinVerkauf.einzweck7 : 0) - (im(SO.gutscheinEinloesung.datum) ? SO.gutscheinEinloesung.einzweck7 : 0);
+    const erw = summe(vg.map((x) => (x.vz * ((x.s.gruppen[satz]?.netto ?? 0) + (x.s.gruppen[satz]?.ust ?? 0))))) + (satz === "19" ? summe(kt.map((k) => k.b19)) + ueber : satz === "7" ? summe(kt.map((k) => k.b7)) + ez : 0);
     if (!erw) continue;
     vergleich(`Paket ${name}`, `DATEV: Brutto auf Erlöskonto ${konto} (${satz} %${satz === "0" ? ", steuerfreie igL – SKR03 8125" : ", Rechnungen und Tagesabschlüsse"})`, kontoSumme(konto), erw);
   }
   // R12: Kartenanteil der Kasse über Geldtransit; Barbelege gegen Kasse (Amtlos führt die Kasse ab 01.01.)
-  vergleich(`Paket ${name}`, "DATEV: Geldtransit 1360 = Kartenzahlungen + Bankeinzahlungen der Kasse", summe(zeilen.filter((z) => z[6] === "1360" && z[7] === "1000").map((z) => centAus(z[0]))), summe(kt.map((k) => k.b7 + k.b19 - k.bar)) + summe(D.KASSEN_BEWEGUNGEN_ROH.filter((b) => im(b.datum) && b.art === "transit").map((b) => b.betrag)));
+  // R12 GoBD: Kartenanteil direkt Geldtransit an Erlöse (bzw. an Gutschein-Verbindlichkeit), Trinkgeld und Bankeinzahlungen Geldtransit an Kasse
+  vergleich(`Paket ${name}`, "DATEV: Geldtransit 1360 im Soll = Kartenzahlungen (mit Trinkgeld) + Bankeinzahlungen der Kasse", summe(zeilen.filter((z) => z[6] === "1360").map((z) => centAus(z[0]))), summe(kt.map((k) => k.b7 + k.b19 - k.bar)) + (im(SO.trinkgeld.datum) ? SO.trinkgeld.cent : 0) + summe(D.KASSEN_BEWEGUNGEN_ROH.filter((b) => im(b.datum) && b.art === "transit").map((b) => b.betrag)));
+  vergleich(`Paket ${name}`, "DATEV: Kartenanteil nicht mehr über die Kasse (keine Buchung „Kartenzahlungen“ Geldtransit an Kasse)", zeilen.some((z) => z[6] === "1360" && z[7] === "1000" && /Kartenzahlungen/.test(z[13] ?? "")) ? "ja" : "nein", "nein");
   vergleich(`Paket ${name}`, "DATEV: Barbelege gegen Kasse 1000 (kein Geldtransit)", zeilen.filter((z) => z[7] === "1360").length ? "Geldtransit" : "Kasse", "Kasse");
   vergleich(`Paket ${name}`, "DATEV: Kopf Beraternummer/Mandant", `${extf[0][10]}/${extf[0][11]}`, "29098/10457");
   // Dateinamen: Umlaute umgeschrieben („Söhne“ → „Soehne“, „Lohnbüro“ → „Lohnbuero“), unabhängig nachgebaut
@@ -421,7 +435,7 @@ md.push(tab(["Quartal", "Rechnungen 19 %", "Rechnungen 7 %", "igL 0 % (Kz 41)", 
 ]), "");
 md.push("### EÜR 2026 (Zufluss/Abfluss)", "");
 md.push(tab(["Posten", "Betrag €"], [
-  ["Einnahmen netto aus bezahlten Rechnungen (" + eu.reAnzahl + " Rechnungen; 2026-015 offen, 2026-016 bezahlt 2027)", e(eu.reNetto)],
+  ["Einnahmen netto aus bezahlten Rechnungen (" + eu.reAnzahl + " Rechnungen; 2026-015 bar an der Kasse am 26.11., 2026-016 bezahlt 2027)", e(eu.reNetto)],
   ["  davon steuerfreie igL (2026-012)", e(D.vorgaenge().filter((x) => x.bezahlt?.startsWith("2026")).reduce((a, x) => a + x.vz * (x.s.gruppen["0"]?.netto ?? 0), 0))],
   ["Vereinnahmte USt aus Rechnungen", e(eu.reUst)],
   ["Kasseneinnahmen netto", e(eu.kasseNetto)], ["Vereinnahmte USt Kasse", e(eu.kasseUst)],

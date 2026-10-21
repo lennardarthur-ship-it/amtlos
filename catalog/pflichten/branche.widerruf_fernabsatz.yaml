@@ -1,0 +1,61 @@
+# R12 (Rechtsprüfung Befund 2): Fernabsatz per Telefon, E-Mail oder Messenger – Widerrufsbelehrung
+schema_version: 1
+id: branche.widerruf_fernabsatz
+version: 1
+katalog_nr: G.68
+titel:
+  de: Bei Aufträgen per Telefon, E-Mail oder Messenger über das Widerrufsrecht belehren
+kurz:
+  de: Nimmst du Aufträge von Privatkunden per Telefon, E-Mail oder Messenger an, haben sie meist 14 Tage Widerrufsrecht – darüber belehrst du vor Vertragsschluss.
+erklaerung:
+  de: Schließt du einen Vertrag mit einem Verbraucher ausschließlich über Fernkommunikationsmittel – Telefon, E-Mail, Brief oder Messenger –, ist das ein Fernabsatzvertrag, wenn dein Betrieb für solche Verträge eingerichtet ist (§ 312c BGB). Der Kunde kann ihn 14 Tage lang widerrufen (§ 312g, § 355 BGB). Darüber informierst du vor Vertragsschluss und bestätigst den Vertrag mit der Belehrung auf einem dauerhaften Datenträger, etwa per E-Mail. Fehlt die Belehrung, läuft die Widerrufsfrist bis zu 12 Monate und 14 Tage (§ 356 Abs. 3 BGB); widerruft der Kunde dann, schuldet er für erbrachte Leistungen keinen Wertersatz (§ 357a Abs. 2 BGB). Bei Dienstleistungen erlischt das Widerrufsrecht, wenn du vollständig geleistet hast und der Kunde vorher ausdrücklich zugestimmt und bestätigt hat, dass er sein Widerrufsrecht dann verliert (§ 356 Abs. 4 BGB). Willst du vor Ablauf der Frist anfangen, lass dir das ausdrücklich vom Kunden verlangen und halte es fest.
+rechtsgrundlage:
+- § 312c BGB
+- § 312g BGB
+- § 356 Abs. 3 BGB
+- § 356 Abs. 4 BGB
+- § 357a Abs. 2 BGB
+kategorie: branche
+branchen:
+- handwerk
+- bau
+- beauty_kosmetik
+- gebaeudereinigung
+- unterricht_sport_coaching
+ausloeser:
+  feld: profil.vertrieb.fernabsatz
+  op: ==
+  wert: true
+  label:
+    de: Du nimmst Aufträge von Privatkunden per Telefon, E-Mail oder Messenger an.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Ohne Belehrung kann der Kunde bis zu 12 Monate und 14 Tage widerrufen und muss für erbrachte Leistungen in der Regel keinen Wertersatz zahlen (§ 356 Abs. 3, § 357a Abs. 2 BGB).
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Bürgerliches Gesetzbuch § 312c
+  url: https://www.gesetze-im-internet.de/bgb/__312c.html
+  abgerufen: null
+- titel: Bürgerliches Gesetzbuch § 356
+  url: https://www.gesetze-im-internet.de/bgb/__356.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- Neu nach Rechtsprüfung R12 (Befund 2) – Abgrenzung „für den Fernabsatz organisiertes Vertriebs- oder Dienstleistungssystem“ im Einzelfall unsicher
+- Muster-Widerrufsbelehrung und -formular für Dienstleistungen erst nach Prüfung
+- Ausnahme für Freizeitbetätigungen mit festem Termin (§ 312g Abs. 2 Nr. 9 BGB) bei Kursen unsicher
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

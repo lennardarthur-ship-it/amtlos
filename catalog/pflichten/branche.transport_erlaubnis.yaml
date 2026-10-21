@@ -1,26 +1,48 @@
 # Katalog H.5 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.transport_erlaubnis
-version: 1
+version: 2
 katalog_nr: H.5
 titel:
-  de: Erlaubnis für Güter- oder Personenbeförderung
+  de: Erlaubnis oder Lizenz für den Güterkraftverkehr
 kurz:
-  de: Für gewerblichen Güterkraftverkehr oder die Beförderung von Personen brauchst du in der Regel eine Erlaubnis oder Lizenz.
+  de: Für gewerblichen Güterkraftverkehr mit Fahrzeugen über 3,5 t brauchst du eine Erlaubnis, grenzüberschreitend schon über 2,5 t eine Gemeinschaftslizenz.
 erklaerung:
-  de: Ob und welche Erlaubnis nötig ist, hängt von Fahrzeuggewicht, Art der Beförderung und Gebiet ab.
+  de: Eine Erlaubnis nach dem Güterkraftverkehrsgesetz brauchst du für die gewerbliche Beförderung von Gütern mit Fahrzeugen, die einschließlich Anhänger mehr als 3,5 t zulässige Gesamtmasse haben (§§ 1, 3 GüKG). Für grenzüberschreitende Fahrten und Kabotage brauchst du eine Gemeinschaftslizenz – seit dem 21.5.2022 auch für Fahrzeuge über 2,5 t bis 3,5 t (Verordnung (EG) Nr. 1072/2009). Werkverkehr, also die Beförderung eigener Güter für eigene Zwecke, ist erlaubnisfrei (§ 1 Abs. 2, 3 GüKG). Für Taxi- und Mietwagenverkehr brauchst du unabhängig davon eine Genehmigung nach dem Personenbeförderungsgesetz.
 rechtsgrundlage:
-- GüKG
+- §§ 1, 3 GüKG
+- Verordnung (EG) Nr. 1072/2009
 - PBefG
 kategorie: branche
 branchen:
 - transport_logistik
 ausloeser:
-  feld: profil.taetigkeit.branchen
-  op: enthaelt
-  wert: transport_logistik
-  label:
-    de: Dein Betrieb gehört zu Transport und Logistik.
+  all:
+  - feld: profil.taetigkeit.branchen
+    op: enthaelt
+    wert: transport_logistik
+    label:
+      de: Dein Betrieb gehört zu Transport und Logistik.
+  - any:
+    - feld: profil.fahrzeuge.gesamtmasse
+      op: enthaelt
+      wert: ueber_3_5t
+      label:
+        de: Mindestens ein Fahrzeug hat mehr als 3,5 t zulässige Gesamtmasse.
+    - all:
+      - feld: profil.fahrzeuge.ausland
+        op: ==
+        wert: true
+        label:
+          de: Ihr fahrt mit Waren auch ins Ausland.
+      - feld: profil.fahrzeuge.gesamtmasse
+        op: enthaelt_eines
+        wert:
+        - 2_5_bis_2_8t
+        - 2_8_bis_3_5t
+        label:
+          de: Mindestens ein Fahrzeug hat mehr als 2,5 t zulässige Gesamtmasse.
+# R12 (Nutzertest Kurier #3): Schwelle nach GüKG statt „in der Regel“ (IHK Berlin)
 phase: gruendung
 frist:
   typ: dauerhaft
@@ -42,10 +64,13 @@ quellen:
 - titel: Güterkraftverkehrsgesetz
   url: https://www.gesetze-im-internet.de/g_kg_1998/
   abgerufen: null
+- titel: IHK Berlin – Güterkraftverkehr
+  url: https://www.ihk.de/berlin/produktmarken/branchen/verkehr/gueterkraftverkehr
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
+- 'R12 (Nutzertest Kurier #3): Erlaubnis über 3,5 t (§§ 1, 3 GüKG), Gemeinschaftslizenz über 2,5 t grenzüberschreitend seit 21.5.2022 (IHK Berlin) – Ausnahmen nach § 2 GüKG nicht abgebildet'
+- Personenbeförderung (Taxi, Mietwagen, PBefG) nur im Text – eigener Auslöser fehlt
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Schwellen (z. B. Fahrzeuggewicht) nicht in der Spezifikation
-- Personenbeförderung (Taxi, Mietwagen) getrennt?
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 pruefung:
   status: entwurf

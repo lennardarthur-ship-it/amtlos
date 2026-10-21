@@ -124,10 +124,14 @@ try {
   if (!(await p.getByText(/^Mappe mit \d+ Unterlagen teilen$/).locator("visible=true").count())) throw new Error("Kontrollmappe ohne Unterlagen");
   if (await p.getByText(/Angaben? fehl/).locator("visible=true").count()) throw new Error("Kontrollmappe zeigt unvollständige Unterlagen");
   // die Nachweise selbst ins Bild (nicht nur „Fehlt noch“): bis zur ersten Gruppe der Mappe scrollen
+  // R12 (UX #25): die Gruppenüberschrift genau an der Oberkante des Blatts – vorher schnitt das Bild eine Zeile halb ab
   const gruppe = p.getByText(/^Je Unterlage die zuletzt geteilte Fassung/).locator("visible=true").first();
-  await gruppe.evaluate((el) => el.scrollIntoView({ block: "start" }));
-  await p.mouse.move(196, 500);
-  await p.mouse.wheel(0, -110);
+  await gruppe.evaluate((el) => {
+    // Gruppe „Personal“ samt Überschrift: das Element mit Überschrift und Hilfetext
+    let kopf = el;
+    while (kopf.parentElement && !/^Personal/.test(kopf.parentElement.innerText ?? "")) kopf = kopf.parentElement;
+    (kopf.parentElement ?? el).scrollIntoView({ block: "start" });
+  });
   await warte(800);
   await foto("kontrollmappe");
 } finally {

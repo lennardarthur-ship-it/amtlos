@@ -1,7 +1,7 @@
 # Katalog D.39 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.mindestlohn
-version: 2
+version: 3
 katalog_nr: D.39
 titel:
   de: Mindestlohn zahlen
@@ -31,7 +31,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Bußgeld bis 500.000 €, wenn der Mindestlohn nicht oder nicht rechtzeitig gezahlt wird (§ 21 Abs. 1 Nr. 9, Abs. 3 MiLoG).
   schwere: hoch
 automatisierung: hinweis
 aktion:
@@ -44,10 +44,10 @@ quellen:
   url: https://www.gesetze-im-internet.de/milog/
   abgerufen: null
 fachlich_zu_pruefen:
-- 'Branchenmindestlöhne (AEntG, allgemeinverbindliche Tarifverträge) nur als Hinweis ohne Beträge (R11, Nutzertest Gebäudereinigung) – Branchen, Lohngruppen und Beträge 2026/2027 sowie Aufzeichnungspflicht nach § 19 AEntG fachlich ergänzen'
+- 'Sanktion nach Zoll-Prüfung R12 (Befund 17): § 21 Abs. 1 Nr. 9, Abs. 3 MiLoG'
+- Branchenmindestlöhne (AEntG, allgemeinverbindliche Tarifverträge) nur als Hinweis ohne Beträge (R11, Nutzertest Gebäudereinigung) – Branchen, Lohngruppen und Beträge 2026/2027 sowie Aufzeichnungspflicht nach § 19 AEntG fachlich ergänzen
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Ausnahmen (z. B. Azubis, Praktika) als Hinweis ergänzen?
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf

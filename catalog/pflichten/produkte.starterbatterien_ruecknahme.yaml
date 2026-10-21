@@ -1,0 +1,50 @@
+# R12 (Nutzertest Kfz #7): Händler von Fahrzeugbatterien – Rücknahme
+schema_version: 1
+id: produkte.starterbatterien_ruecknahme
+version: 1
+katalog_nr: G.72
+titel:
+  de: Altbatterien zurücknehmen, wenn du Fahrzeugbatterien verkaufst
+kurz:
+  de: Verkaufst du Starterbatterien, nimmst du alte Starterbatterien deiner Kunden kostenlos zurück.
+erklaerung:
+  de: Händler von Starter-, Industrie- und Elektrofahrzeugbatterien nehmen Altbatterien dieser Art vom Endnutzer im Geschäft oder in dessen Nähe unentgeltlich zurück – unabhängig von Marke, Herkunft und Zustand, soweit sie solche Batterien als Neubatterien anbieten oder angeboten haben (§ 18 BattDG). Verkaufst du online, richtest du Rückgabemöglichkeiten in zumutbarer Entfernung ein.
+rechtsgrundlage:
+- § 18 BattDG
+kategorie: produkte
+branchen:
+- handwerk
+ausloeser:
+  feld: profil.umwelt.taetigkeiten
+  op: enthaelt
+  wert: starterbatterien
+  label:
+    de: Du verkaufst Fahrzeugbatterien (Starterbatterien).
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+aktion:
+  art: abhaken
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Batterierecht-Durchführungsgesetz § 18 (lxgesetze)
+  url: https://lxgesetze.de/battdg/18
+  abgerufen: '2026-10-21'
+fachlich_zu_pruefen:
+- 'Neu nach Nutzertest R12 (Kfz #7) – Rücknahme nach § 18 BattDG geprüft; Pfand auf Starterbatterien (früher § 10 BattG) unter dem BattDG unsicher; Händlerpflichten für Gerätebatterien nicht abgebildet'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

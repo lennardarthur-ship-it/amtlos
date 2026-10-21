@@ -21,6 +21,7 @@ export function bausteinText(t: string, d: Daten, b: Betrieb): string {
     cookie_zwecke: text(d, "cookie_zwecke"), cookie_dauer: text(d, "cookie_dauer"), link_cookie_einstellungen: text(d, "link_einstellungen"), link_einstellungen: text(d, "link_einstellungen") || "die oben genannten Kontaktwege",
     themen: text(d, "newsletter_themen"), versanddienstleister: text(d, "newsletter_dienst"), netzwerke: text(d, "netzwerke"),
     anbieter_name: text(d, "termin_anbieter"), anbieter_anschrift: text(d, "termin_anschrift"),
+    video_anbieter: text(d, "video_anbieter"), video_anschrift: text(d, "video_anschrift"), zahlung_anbieter: text(d, "zahlung_anbieter"), zahlung_anschrift: text(d, "zahlung_anschrift"),
     aufsichtsbehoerde_name: a?.name ?? "", aufsichtsbehoerde_ort: a?.ort ?? "", aufsichtsbehoerde_url: a?.url ?? "",
   };
   return t
@@ -40,6 +41,39 @@ export function bausteinText(t: string, d: Daten, b: Betrieb): string {
 const alsHtml = (t: string) => `<p>${esc(t).replace(/\n/g, "<br>").replace(/\uE000/g, LINIE)}</p>`;
 const alsKlartext = (t: string) => t.replace(/\uE000/g, "[bitte ergänzen]");
 
+/**
+ * R12 (Coach #10): Bausteine für Online-Kurse per Videokonferenz und für Zahlungsdienstleister – mit Anbieter,
+ * Drittland und Garantie (Art. 13 Abs. 1 lit. f, Art. 44 ff. DSGVO). Nicht aus der Recherche, sondern von Hand –
+ * fachlich zu prüfen. `{drittland}` füllt `drittlandSatz`.
+ */
+const DSE_R12: Record<string, { titel: string; text: string; quelle?: string }> = {
+  videokonferenz: {
+    titel: "Online-Kurse und Beratungen per Videokonferenz",
+    text: "Für Online-Kurse und Beratungen nutzen wir den Dienst {video_anbieter}, {video_anschrift}. Dabei werden Ihr Name bzw. Anzeigename, Ihre E-Mail-Adresse, Bild- und Tondaten, Chat-Nachrichten sowie technische Daten (z. B. IP-Adresse, Gerät, Zeitpunkt der Teilnahme) verarbeitet. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Durchführung des gebuchten Kurses bzw. der Beratung). Der Anbieter verarbeitet die Daten in unserem Auftrag auf Grundlage eines Vertrags zur Auftragsverarbeitung nach Art. 28 DSGVO. {drittland} Wir zeichnen nichts auf, ohne Sie vorher zu fragen. Kamera und Mikrofon können Sie jederzeit selbst ausschalten.",
+    quelle: "Art. 6, 13, 28, 44 ff. DSGVO – fachlich zu prüfen",
+  },
+  zahlungsdienstleister: {
+    titel: "Zahlungsdienstleister",
+    text: "Bezahlen Sie online, geben wir die für die Zahlung nötigen Daten (z. B. Name, Betrag, Rechnungsnummer und gegebenenfalls Ihre E-Mail-Adresse) an den Zahlungsdienstleister {zahlung_anbieter}, {zahlung_anschrift}, weiter. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Abwicklung der Zahlung); soweit der Zahlungsdienstleister gesetzliche Pflichten erfüllt (z. B. zur Verhinderung von Geldwäsche), Art. 6 Abs. 1 lit. c DSGVO. Der Zahlungsdienstleister verarbeitet die Daten in eigener Verantwortung; es gelten zusätzlich seine Datenschutzhinweise. {drittland}",
+    quelle: "Art. 6, 13, 44 ff. DSGVO – fachlich zu prüfen",
+  },
+};
+const DSE_ALLE: Record<string, { titel: string; text: string; quelle?: string }> = { ...DSE, ...DSE_R12 };
+/** Garantie für die Übermittlung in ein Drittland (Art. 45, 46 DSGVO). */
+const GARANTIE: Record<string, string> = {
+  angemessenheit: "einen Angemessenheitsbeschluss der EU-Kommission (Art. 45 DSGVO; für die USA das EU-U.S. Data Privacy Framework, wenn der Anbieter zertifiziert ist)",
+  scc: "die EU-Standardvertragsklauseln (Art. 46 Abs. 2 lit. c DSGVO)",
+};
+/** Satz zur Drittlandübermittlung eines Bausteins: ohne Land „keine Übermittlung“, sonst Land und Garantie. */
+function drittlandSatz(d: Daten, praefix: "video" | "zahlung"): string {
+  const land = text(d, `${praefix}_drittland`).trim();
+  if (!land) return "Eine Übermittlung in Länder außerhalb der EU bzw. des EWR findet nicht statt.";
+  const g = GARANTIE[text(d, `${praefix}_garantie`)];
+  return `Dabei können Daten auch in ${land} verarbeitet werden. Die Übermittlung stützt sich auf ${g ?? FEHLT}.`;
+}
+/** R12 (Coach #17): § 257 HGB (Handelsbriefe) gilt nur für Kaufleute – sonst nur § 147 AO. */
+export const istKaufmann = (b: Betrieb) => Boolean((b.registernummer ?? "").trim()) || /e\.?\s?K|OHG|\bKG\b|GmbH|\bUG\b|\bAG\b|haftungsbeschr/i.test(`${b.rechtsform ?? ""} ${b.name}`);
+
 /** Bausteine der Datenschutzerklärung in fester Reihenfolge; „immer“ steht in jeder Erklärung. */
 const DSE_REIHE: { id: string; immer?: boolean }[] = [
   { id: "verantwortlicher", immer: true },
@@ -49,6 +83,8 @@ const DSE_REIHE: { id: string; immer?: boolean }[] = [
   { id: "cookies_einwilligung" },
   { id: "technisch_notwendige_cookies" },
   { id: "online_terminbuchung" },
+  { id: "videokonferenz" },
+  { id: "zahlungsdienstleister" },
   { id: "newsletter" },
   { id: "google_maps" },
   { id: "youtube" },
@@ -62,7 +98,7 @@ const DSE_REIHE: { id: string; immer?: boolean }[] = [
 ];
 /** Bausteine, die auf einer Einwilligung beruhen – zu ihnen gehört der Hinweis auf den Widerruf (Art. 7 Abs. 3 DSGVO). */
 const MIT_EINWILLIGUNG = ["cookies_einwilligung", "newsletter", "google_maps", "youtube", "google_fonts_extern"];
-const DSE_WAHL = DSE_REIHE.filter((x) => !x.immer && DSE[x.id]).map((x) => ({ wert: x.id, text: DSE[x.id]!.titel, quelle: DSE[x.id]!.quelle }));
+const DSE_WAHL = DSE_REIHE.filter((x) => !x.immer && DSE_ALLE[x.id]).map((x) => ({ wert: x.id, text: DSE_ALLE[x.id]!.titel, quelle: DSE_ALLE[x.id]!.quelle }));
 
 /** Rat an den Betreiber im Baustein „Google Fonts (extern)“ – gehört nicht in die veröffentlichte Erklärung (steht als Hilfe am Feld). */
 const FONTS_EMPFEHLUNG = /\s*Empfehlung: Schriftarten lokal einbinden, dann entfällt die Übermittlung\./;
@@ -83,8 +119,10 @@ function dseTeile(d: Daten, b: Betrieb): { titel: string; text: string }[] {
   const an = new Set(auswahl(d, "module"));
   // beide Schriftarten-Bausteine widersprechen sich: extern eingebunden geht vor (die Prüfung weist darauf hin)
   if (an.has("google_fonts_extern")) an.delete("google_fonts_lokal");
-  const teile = DSE_REIHE.filter((x) => (x.immer || an.has(x.id)) && DSE[x.id]).map((x) => {
-    const t = { titel: DSE[x.id]!.titel, text: bausteinText(DSE[x.id]!.text.replace(FONTS_EMPFEHLUNG, ""), d, b) };
+  const teile = DSE_REIHE.filter((x) => (x.immer || an.has(x.id)) && DSE_ALLE[x.id]).map((x) => {
+    const roh = DSE_ALLE[x.id]!.text.replace(FONTS_EMPFEHLUNG, "").replace("{drittland}", () => (x.id === "videokonferenz" ? drittlandSatz(d, "video") : x.id === "zahlungsdienstleister" ? drittlandSatz(d, "zahlung") : ""));
+    // R12 (Coach #17): ohne Kaufmannseigenschaft keine Handelsbriefe nach § 257 HGB
+    const t = { titel: DSE_ALLE[x.id]!.titel, text: bausteinText(istKaufmann(b) ? roh : roh.replace(/\(z\. B\. für Geschäftsbriefe, § 257 HGB, § 147 AO\)/, "(z. B. nach § 147 AO)"), d, b) };
     if (x.id === "online_terminbuchung" && text(d, "termin_art") === "plattform") return { ...t, text: t.text.replace(TERMIN_AV, TERMIN_PLATTFORM) };
     return x.id === "kontakt" && d.kontaktformular === false ? ohneKontaktformular(t) : t;
   });
@@ -98,6 +136,8 @@ function dseTeile(d: Daten, b: Betrieb): { titel: string; text: string }[] {
   teile.splice(rechte < 0 ? teile.length : rechte, 0, ...vorRechten);
   return teile;
 }
+
+export const DSE_OHNE_HOSTING = "Hosting nicht gewählt: Jede Website liegt bei einem Hosting-Anbieter – Baustein „Hosting“ wählen (außer du betreibst den Server selbst)";
 
 export const datenschutzerklaerungWebsite: Vorlage = {
   id: "datenschutzerklaerung_website",
@@ -132,6 +172,14 @@ export const datenschutzerklaerungWebsite: Vorlage = {
         { id: "termin_art", art: "wahl", label: "Art der Terminbuchung", optionen: [{ wert: "tool", text: "Reines Buchungstool (Auftragsverarbeiter)" }, { wert: "plattform", text: "Plattform mit eigenem Kundenkonto (eigene Verantwortung der Plattform)" }], vorbelegung: "tool", wenn: { feld: "module", ist: "online_terminbuchung" }, hilfe: "Ob die Plattform selbst verantwortlich ist, steht in ihren Bedingungen bzw. im Vertrag – bitte prüfen." },
         { id: "newsletter_themen", art: "text", label: "Inhalt des Newsletters", vorschlaege: ["Angebote und Neuigkeiten aus unserem Betrieb"], wenn: { feld: "module", ist: "newsletter" } },
         { id: "newsletter_dienst", art: "text", label: "Versanddienstleister des Newsletters", wenn: { feld: "module", ist: "newsletter" } },
+        { id: "video_anbieter", art: "text", label: "Anbieter der Videokonferenz", hilfe: "z. B. Zoom Communications, Microsoft (Teams), Jitsi", wenn: { feld: "module", ist: "videokonferenz" } },
+        { id: "video_anschrift", art: "text", label: "Anschrift des Videokonferenz-Anbieters", wenn: { feld: "module", ist: "videokonferenz" } },
+        { id: "video_drittland", art: "text", label: "Drittland (außerhalb EU/EWR), falls Daten dorthin gehen", hilfe: "z. B. USA – leer, wenn die Daten in der EU bleiben", wenn: { feld: "module", ist: "videokonferenz" } },
+        { id: "video_garantie", art: "wahl", label: "Garantie für das Drittland", optionen: [{ wert: "angemessenheit", text: "Angemessenheitsbeschluss (z. B. Data Privacy Framework)" }, { wert: "scc", text: "EU-Standardvertragsklauseln" }], wenn: { feld: "video_drittland" } },
+        { id: "zahlung_anbieter", art: "text", label: "Zahlungsdienstleister", hilfe: "z. B. PayPal (Europe) S.à r.l. et Cie, S.C.A., Stripe Payments Europe Ltd.", wenn: { feld: "module", ist: "zahlungsdienstleister" } },
+        { id: "zahlung_anschrift", art: "text", label: "Anschrift des Zahlungsdienstleisters", wenn: { feld: "module", ist: "zahlungsdienstleister" } },
+        { id: "zahlung_drittland", art: "text", label: "Drittland (außerhalb EU/EWR), falls Daten dorthin gehen", hilfe: "leer, wenn die Daten in der EU bleiben", wenn: { feld: "module", ist: "zahlungsdienstleister" } },
+        { id: "zahlung_garantie", art: "wahl", label: "Garantie für das Drittland", optionen: [{ wert: "angemessenheit", text: "Angemessenheitsbeschluss (z. B. Data Privacy Framework)" }, { wert: "scc", text: "EU-Standardvertragsklauseln" }], wenn: { feld: "zahlung_drittland" } },
         { id: "netzwerke", art: "text", label: "Verlinkte Netzwerke", vorschlaege: ["Instagram", "Facebook", "Instagram und Facebook", "LinkedIn"], wenn: { feld: "module", ist: "social_media_links" } },
         { id: "dsb", selten: true, art: "text", label: "Datenschutzbeauftragte/r (falls benannt)" },
         { id: "ergaenzung", selten: true, art: "mehrzeilig", label: "Weitere Verarbeitungen", hilfe: "nur falls deine Website noch etwas anderes nutzt" },
@@ -145,6 +193,8 @@ export const datenschutzerklaerungWebsite: Vorlage = {
     ...(auswahl(d, "module").includes("google_fonts_lokal") && auswahl(d, "module").includes("google_fonts_extern") ? ["Schriftarten: entweder lokal oder extern wählen"] : []),
     // nur ein Hinweis – der Baustein wird nicht von selbst ergänzt
     ...(auswahl(d, "module").some((m) => MIT_EINWILLIGUNG.includes(m)) && !auswahl(d, "module").includes("widerruf_einwilligung") ? ["Einwilligungen gewählt – Hinweis auf den Widerruf fehlt"] : []),
+    // R12 (Coach #16): jede Website liegt bei einem Hosting-Anbieter – ohne den Baustein fehlt meist ein Empfänger
+    ...(auswahl(d, "module").length && !auswahl(d, "module").includes("hosting") ? [DSE_OHNE_HOSTING] : []),
   ],
   alsText: (d, b) => ["Datenschutzerklärung", ...dseTeile(d, b).map((t) => `${t.titel}\n${alsKlartext(t.text)}`), text(d, "stand") ? `Stand: ${datumDe(text(d, "stand"))}` : ""].filter(Boolean).join("\n\n"),
   html(d, b) {
@@ -168,6 +218,9 @@ const VSBG: Record<string, string> = {
   bereit: "Wir sind bereit, an Streitbeilegungsverfahren vor der folgenden Verbraucherschlichtungsstelle teilzunehmen:",
   keine_angabe: "",
 };
+
+/** R12: Antwort im Pflichten-Check → Rechtsform im Impressum */
+const RECHTSFORM_AUS_CHECK: Record<string, string> = { einzelunternehmen: "Einzelunternehmen", freiberuf: "Einzelunternehmen", ek: "e. K.", gbr: "GbR", ug: "UG (haftungsbeschränkt)", gmbh: "GmbH" };
 
 /** Rechtsform: gewählt, sonst aus „Mein Betrieb“, sonst Einzelunternehmen. */
 const rechtsformImp = (d: Daten, b: Betrieb) => rechtsformAus(text(d, "rechtsform") || b.rechtsform, RECHTSFORMEN_IMP) || "Einzelunternehmen";
@@ -208,12 +261,21 @@ export const impressum: Vorlage = {
   // § 36 VSBG nur, wenn das Impressum eine Angabe zur Streitbeilegung enthält (R10, T-90)
   grundlageFuer: (d) => (text(d, "vsbg") && text(d, "vsbg") !== "keine_angabe" ? "§ 5 DDG; § 36 VSBG" : "§ 5 DDG"),
   ausBetrieb: { rechtsform: "rechtsform", vertreten: "vertretung", register_gericht: "registergericht", register_nr: "registernummer" },
+  // R12 (Coach #15): Rechtsform aus dem Pflichten-Check, wenn „Mein Betrieb“ keine nennt
+  // und Inhaber/in bzw. Geschäftsführung aus „Mein Betrieb“, damit das Feld nicht leer aussieht
+  profilStart(profil, b) {
+    const rf = RECHTSFORM_AUS_CHECK[String(profil.rechtsform ?? "")];
+    const wer = (b?.vertretung ?? "").trim() || (b?.verantwortlich ?? "").trim();
+    const start: Daten = { ...(rf ? { rechtsform: rf } : {}), ...(wer ? { vertreten: wer } : {}) };
+    return start;
+  },
   abschnitte: [
     { titel: "Angaben zum Unternehmen",
       hilfe: "Name, Anschrift, Telefon, E-Mail und USt-IdNr. übernimmt Amtlos aus „Mein Betrieb“. Die Steuernummer gehört nicht ins Impressum.",
       felder: [
         { id: "rechtsform", art: "wahl", label: "Rechtsform", optionen: RECHTSFORMEN_IMP.map((r) => ({ wert: r, text: r })), hilfe: "ohne Auswahl die Rechtsform aus „Mein Betrieb“, sonst Einzelunternehmen" },
-        { id: "vertreten", art: "text", label: "Inhaber/in bzw. vertretungsberechtigte Person", hilfe: "ohne Angabe die Geschäftsführung bzw. verantwortliche Person aus „Mein Betrieb“; bei mehreren alle nennen" },
+        // R12 (Coach #15): aus „Mein Betrieb“ vorbelegt (Inhaber/in bzw. Geschäftsführung)
+        { id: "vertreten", art: "text", label: "Inhaber/in bzw. vertretungsberechtigte Person", hilfe: "aus „Mein Betrieb“ übernommen; bei mehreren alle nennen" },
         { id: "kapital", selten: true, art: "text", label: "Stammkapital", hilfe: "nur bei GmbH/UG und nur, wenn du es angeben möchtest" },
         { id: "ausstehend", art: "text", label: "Ausstehende Einlagen", hilfe: "Gibst du das Kapital an, gehören die ausstehenden Einlagen dazu – bei voller Einzahlung „keine“", wenn: { feld: "kapital" }, vorschlaege: ["keine"] },
         { id: "register_gericht", art: "text", label: "Registergericht", hilfe: "nur bei Eintragung, z. B. Amtsgericht München" },

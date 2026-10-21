@@ -88,8 +88,10 @@ describe("Rechnungsprüfung R11", () => {
     expect(v.hinweise!({ ...RE, leistung_gleich: false, leistung: "15.12.2025" }, bKu)).toContain(RECHNUNG_KU_ZEIT("31.12.2025"));
     expect(v.hinweise!(RE, bKu).some((h) => h.includes("Kleinunternehmerzeit"))).toBe(false);
     expect(v.hinweise!({ ...RE, positionen: [{ bezeichnung: "Gutschein Massage", menge: "1", preis: "50", satz: "0" }], befreiung: "Gutschein" }, B)).toContain(RECHNUNG_GUTSCHEIN);
-    const privat = { ...RE, kunde_email: "" };
+    // R12: nur an Privatpersonen (§ 14 Abs. 4 Satz 1 Nr. 9 UStG) – an die Muster GmbH nicht
+    const privat = { ...RE, kunde_email: "", kunde_name: "Lea Schmitz" };
     expect(v.hinweise!(privat, B, { handwerk: true })).toContain(RECHNUNG_GRUNDSTUECK_VORSCHLAG);
+    expect(v.hinweise!({ ...privat, kunde_name: "Muster GmbH" }, B, { handwerk: true })).not.toContain(RECHNUNG_GRUNDSTUECK_VORSCHLAG);
     expect(v.hinweise!({ ...privat, hinweise: ["grundstueck"] }, B, { handwerk: true })).not.toContain(RECHNUNG_GRUNDSTUECK_VORSCHLAG);
     expect(v.hinweise!(privat, B)).not.toContain(RECHNUNG_GRUNDSTUECK_VORSCHLAG);
   });

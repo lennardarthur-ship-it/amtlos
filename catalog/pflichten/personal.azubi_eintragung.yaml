@@ -1,0 +1,66 @@
+# R12 (Nutzertest Kfz #10): Ausbildungsvertrag eintragen lassen (§ 36 BBiG)
+schema_version: 1
+id: personal.azubi_eintragung
+version: 1
+katalog_nr: D.45
+titel:
+  de: Ausbildungsvertrag ins Verzeichnis eintragen lassen
+kurz:
+  de: Den Ausbildungsvertrag meldest du gleich nach Abschluss bei deiner Kammer zur Eintragung ins Verzeichnis der Berufsausbildungsverhältnisse an.
+erklaerung:
+  de: Ausbildende beantragen unverzüglich nach Abschluss des Berufsausbildungsvertrags die Eintragung in das Verzeichnis der Berufsausbildungsverhältnisse bei der zuständigen Stelle – im Handwerk bei der Handwerkskammer (Lehrlingsrolle), sonst meist bei der IHK (§ 36 Abs. 1 BBiG). Eine Ausfertigung der Vertragsniederschrift fügst du bei. Ohne Eintragung wird der Azubi nicht zur Abschlussprüfung zugelassen.
+rechtsgrundlage:
+- § 36 Abs. 1 BBiG
+- § 43 Abs. 1 BBiG
+kategorie: personal
+branchen:
+- handwerk
+ausloeser:
+  all:
+  - feld: profil.beschaeftigte.azubi
+    op: '>='
+    wert: 1
+    label:
+      de: Du bildest aus.
+  - ereignis: einstellung
+    op: eingetreten
+    label:
+      de: Du stellst jemanden ein.
+frist:
+  typ: relativ
+  bezug:
+    ereignis: einstellung
+  versatz: P0D
+  zeitpunkt: spaetestens
+  je_ereignis: true
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Handwerkskammer bzw. IHK
+kanal: portal
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+erledigung:
+  art: bestaetigen
+  bestaetigung:
+    de: Eintragung beantragt
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Berufsbildungsgesetz § 36
+  url: https://www.gesetze-im-internet.de/bbig_2005/__36.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Neu nach Nutzertest R12 (Kfz #10) – Termin „unverzüglich nach Vertragsschluss“ als spätestens Ausbildungsbeginn abgebildet; Bußgeld (§ 101 BBiG) fachlich ergänzen'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

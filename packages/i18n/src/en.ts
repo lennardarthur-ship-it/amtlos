@@ -773,7 +773,7 @@ export const en: Texte = {
     text: "Obligations and tools added for your industry.",
     keine: "You haven't specified an industry yet.",
     angeben: "Specify industry",
-    namen: { gastronomie_lebensmittel: "Hospitality and food", handwerk: "Skilled trades", beauty_kosmetik: "Beauty and cosmetics", bau: "Construction", gebaeudereinigung: "Building cleaning", transport_logistik: "Transport and logistics", onlinehandel: "Online retail", it_agentur_freelancer: "IT, agency, freelance", gesundheit_pflege: "Health and care", immobilien_finanzen: "Real estate and finance", sonstige: "Other" },
+    namen: { gastronomie_lebensmittel: "Hospitality and food", handwerk: "Skilled trades", beauty_kosmetik: "Beauty and cosmetics", bau: "Construction", gebaeudereinigung: "Building cleaning", transport_logistik: "Transport and logistics", onlinehandel: "Online retail", it_agentur_freelancer: "IT, agency, freelance", gesundheit_pflege: "Health and care", immobilien_finanzen: "Real estate and finance", unterricht_sport_coaching: "Teaching, courses, sport and coaching", sonstige: "Other" },
     pflichten: "Obligations",
     werkzeuge: "Tools",
     keine_pflichten: "According to your details, nothing extra applies for this package right now.",

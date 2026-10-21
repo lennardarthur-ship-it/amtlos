@@ -2,7 +2,8 @@
  * Unterlagen und Betrieb – nur auf dem Gerät (E-121). Reine Funktionen über einem unveränderlichen Stand, damit sie
  * ohne Gerät testbar sind; zustand.tsx speichert den Stand in AsyncStorage.
  */
-import { LEERER_BETRIEB, eRechnungAus, kassenKorrektur, kassenabschlussAus, kassenInhalt, kassenVereinen, summen, zahlungenAus, zahlungsStand, type KassenInhalt, type Kassenabschluss, type Zahlung, belegAus, belegFassung, belegInhaltGeaendert, belegSummen, gruppenAusBranchen, leereDaten, type Beleg, naechsteNummer, personMerken as merken, vorlageFuer, type Betrieb, type Daten, type Person, type PersonAngaben, type PersonenArt } from "@amtlos/fachlogik";
+import { KU_HINWEIS, belegNummern, eigenbelegeVergeben, grundGenuegt, kassensturzAus, kassenstuerzeVereinen, naechsteBelegnummer, sachentnahmeAus, ustZeitraum, xrechnungUbl, type Kassensturz, type Sachentnahme } from "@amtlos/fachlogik";
+import { LEERER_BETRIEB, eRechnungAus, kassenKorrektur, kassenabschlussAus, kassenInhalt, kassenVereinen, summen, zahlungenAus, zahlungsStand, type KassenInhalt, type Kassenabschluss, type Zahlung, belegAus, belegFassung, belegInhaltGeaendert, belegSummen, gruppenAusBranchen, leereDaten, type Beleg, naechsteNummer, personMerken as merken, vorlageFuer, type Betrieb, type Daten, type Eintrag, type Person, type PersonAngaben, type PersonenArt } from "@amtlos/fachlogik";
 
 export interface Unterlage {
   id: string;
@@ -39,10 +40,66 @@ export interface Unterlage {
   konfliktKopieVon?: string;
   /** SHA-256 (hex) des geteilten PDFs, wenn beim Festschreiben bekannt (H1) */
   pdfSha256?: string;
+  /**
+   * R12: frühere, festgeschriebene Fassungen eines Nachweises (Vorlagen mit `korrektur`), älteste zuerst. Eine Korrektur
+   * legt die geltende Fassung hier ab; die Unterlage wird wieder Entwurf und beim nächsten Teilen neu festgeschrieben.
+   */
+  fassungen?: Fassung[];
+  /** R12: zugeordnete Betriebsstätte (ID aus `Stand.betriebsstaetten`, „haupt“ = Betrieb) – leer: alle */
+  betriebsstaette?: string;
+  /**
+   * R12 GoBD: Absenderdaten („Mein Betrieb“) zum Zeitpunkt der Festschreibung – eine festgeschriebene Rechnung zeigt
+   * immer diese Angaben, auch wenn sich Anschrift oder Bank später ändern (§ 14b UStG, Doppel der Rechnung).
+   */
+  absender?: Betrieb;
+  /** R12 GoBD: XRechnung (UBL) der festgeschriebenen Rechnung, wie sie ausgegeben wurde – das Paket nimmt dieses Original */
+  xml?: string;
+  /** R12 GoBD: Kassenbuch aus den Tagesabschlüssen – Monat und Standort, SHA-256 des festgeschriebenen Inhalts */
+  kassenbuch?: { monat: string; standort: string };
+  inhaltSha256?: string;
 }
 
+/**
+ * R12 GoBD: Protokoll von Löschungen und Korrekturen (nur anhängen, nie ändern) – geht ins Steuerberater-Paket und ins
+ * offene Archiv. „beleg_geloescht“: frisch erfasster Beleg endgültig gelöscht; „beleg_ungueltig“: als ungültig markiert;
+ * „beleg_korrigiert“: festgeschriebener Beleg mit Grund geändert; „sachentnahme_geloescht“.
+ */
+export interface ProtokollEintrag {
+  id: string;
+  zeitpunkt: string;
+  art: "beleg_geloescht" | "beleg_ungueltig" | "beleg_korrigiert" | "sachentnahme_geloescht";
+  /** ID des Belegs bzw. der Sachentnahme */
+  bezug: string;
+  /** Amtlos-Belegnummer (bleibt vergeben, auch wenn der Beleg gelöscht ist) */
+  nr?: string;
+  text: string;
+}
+
+/** R12: frühere Fassung eines festgeschriebenen Nachweises – nie gelöscht (Historie). */
+export interface Fassung {
+  daten: Daten;
+  festgeschrieben: string;
+  ausgegeben?: string;
+  pdfSha256?: string;
+  /** Grund, mit dem diese Fassung ihrerseits eine frühere ersetzte */
+  grund?: string;
+  /** wann sie durch eine Korrektur ersetzt wurde (ISO) */
+  ersetzt: string;
+}
+
+/** R12: Betriebsstätte (Filiale). Betriebsstätte 1 ist der Betrieb selbst (Anschrift aus „Mein Betrieb“, ID „haupt“). */
+export interface Betriebsstaette {
+  id: string;
+  name: string;
+  strasse: string;
+  plz: string;
+  ort: string;
+  geaendert?: string;
+}
+export const HAUPT_STAETTE = "haupt";
+
 export interface Stand {
-  version: 2;
+  version: 4;
   betrieb: Betrieb;
   unterlagen: Unterlage[];
   /** Belege und Eingangsrechnungen (E-133); Dateien liegen verschlüsselt daneben (unterlagen/dateien.ts) */
@@ -93,17 +150,64 @@ export interface Stand {
    * Fotos der Z-Bons liegen verschlüsselt wie Belegdateien.
    */
   kasse: Kassenabschluss[];
+  /** R12: weitere Betriebsstätten (Filialen) – Betriebsstätte 1 ist der Betrieb selbst und steht nicht in der Liste */
+  betriebsstaetten: Betriebsstaette[];
+  /** R12 GoBD: Kassenstürze mit Zählprotokoll (z. B. bei einer Kassennachschau) – unveränderlich */
+  kassenstuerze: Kassensturz[];
+  /** R12 GoBD: Sachentnahmen (unentgeltliche Wertabgaben) mit selbst eingetragenen Pauschbeträgen */
+  sachentnahmen: Sachentnahme[];
+  /** R12 GoBD: Lösch- und Korrekturprotokoll (nur anhängen) */
+  protokoll: ProtokollEintrag[];
 }
 
 /** Aktuelle Version des gespeicherten Stands. Höhere Versionen stammen aus einer neueren App und werden nie überschrieben. */
-export const STAND_VERSION = 2;
+export const STAND_VERSION = 4;
 
 /**
  * Migrationen: Eintrag n hebt einen Stand von Version n auf n + 1.
  * - 1 → 2 (R12): Kassenabschlüsse (`kasse`, anfangs leer).
+ * - 2 → 3 (R12 Personal): Betriebsstätten (anfangs leer); schon geteilte Nachweise (Vorlagen mit `korrektur`:
+ *   Arbeitszeit, NachwG, Ausweis-Hinweis) gelten ab dem Tag ihrer ersten Ausgabe als festgeschrieben.
+ * - 3 → 4 (R12 GoBD): Belege bekommen ihre bisher berechnete Amtlos-Belegnummer fest gespeichert (`nr`, auch ungültig
+ *   markierte); festgeschriebene Rechnungen halten die Absenderdaten fest (mangels Besserem die heutigen aus „Mein
+ *   Betrieb“); Kassenstürze, Sachentnahmen und Protokoll starten leer.
  */
 export const MIGRATIONEN: Record<number, (roh: Record<string, unknown>) => Record<string, unknown>> = {
   1: (roh) => ({ ...roh, kasse: Array.isArray(roh.kasse) ? roh.kasse : [] }),
+  2: (roh) => ({
+    ...roh,
+    betriebsstaetten: Array.isArray(roh.betriebsstaetten) ? roh.betriebsstaetten : [],
+    unterlagen: Array.isArray(roh.unterlagen)
+      ? (roh.unterlagen as unknown[]).map((u) => {
+          if (!istObjekt(u) || typeof u.vorlage !== "string" || !vorlageFuer(u.vorlage)?.korrektur || !u.ausgegeben || u.festgeschrieben) return u;
+          return { ...u, festgeschrieben: u.ausgegeben };
+        })
+      : roh.unterlagen,
+  }),
+  3: (roh) => {
+    const liste = (w: unknown) => (Array.isArray(w) ? (w as unknown[]) : []);
+    const alleBelege = [...liste(roh.belege), ...liste(roh.belegArchiv)].filter((b): b is Record<string, unknown> => istObjekt(b) && typeof b.id === "string" && typeof b.datum === "string" && /^\d{4}-\d{2}-\d{2}$/.test(b.datum));
+    const nummern = belegNummern(alleBelege.map((b) => ({ id: b.id as string, datum: b.datum as string, erstellt: String(b.erstellt ?? b.datum), nr: typeof b.nr === "string" ? b.nr : null })));
+    const mitNr = (w: unknown) => (Array.isArray(w) ? (w as unknown[]).map((b) => (istObjekt(b) && typeof b.id === "string" && !b.nr && nummern.get(b.id) ? { ...b, nr: nummern.get(b.id) } : b)) : w);
+    const betrieb = istObjekt(roh.betrieb) ? roh.betrieb : undefined;
+    return {
+      ...roh,
+      belege: mitNr(roh.belege),
+      belegArchiv: mitNr(roh.belegArchiv),
+      unterlagen: Array.isArray(roh.unterlagen)
+        ? (roh.unterlagen as unknown[]).map((u) => {
+            if (!istObjekt(u)) return u;
+            if (betrieb && u.vorlage === "rechnung" && u.festgeschrieben && !u.absender) return { ...u, absender: betrieb };
+            // Verfahrensdokumentation: ab jetzt festgeschrieben und versioniert – schon geteilte ab ihrer ersten Ausgabe
+            if (u.vorlage === "verfahrensdokumentation" && u.ausgegeben && !u.festgeschrieben) return { ...u, festgeschrieben: u.ausgegeben };
+            return u;
+          })
+        : roh.unterlagen,
+      kassenstuerze: liste(roh.kassenstuerze),
+      sachentnahmen: liste(roh.sachentnahmen),
+      protokoll: liste(roh.protokoll),
+    };
+  },
 };
 
 export class StandFehler extends Error {
@@ -127,7 +231,7 @@ export function migrieren(roh: Record<string, unknown>): Record<string, unknown>
   return { ...r, version: STAND_VERSION };
 }
 
-export const LEERER_STAND: Stand = { version: 2, kasse: [], betrieb: LEERER_BETRIEB, unterlagen: [], belege: [], mitarbeiter: [], kunden: [], profil: {}, erledigt: {}, erinnerungen: false, appSperre: false, cloudSicherung: false, proTest: false, bewertung: { erfolge: 0 }, steuerberatung: { kontenrahmen: "SKR03", beraternummer: "", mandantennummer: "" }, geloescht: {}, zeiten: {}, belegArchiv: [], fremd: { unterlagen: [], belege: [] } };
+export const LEERER_STAND: Stand = { version: 4, kasse: [], kassenstuerze: [], sachentnahmen: [], protokoll: [], betriebsstaetten: [], betrieb: LEERER_BETRIEB, unterlagen: [], belege: [], mitarbeiter: [], kunden: [], profil: {}, erledigt: {}, erinnerungen: false, appSperre: false, cloudSicherung: false, proTest: false, bewertung: { erfolge: 0 }, steuerberatung: { kontenrahmen: "SKR03", beraternummer: "", mandantennummer: "" }, geloescht: {}, zeiten: {}, belegArchiv: [], fremd: { unterlagen: [], belege: [] } };
 
 function profilAus(roh: unknown): Stand["profil"] {
   if (!roh || typeof roh !== "object" || Array.isArray(roh)) return {};
@@ -196,7 +300,25 @@ function unterlageAus(u: Record<string, unknown>): Unterlage {
   const z = zahlungenAus(u.zahlungen);
   if (z.length) r.zahlungen = z;
   else delete r.zahlungen;
+  // R12: Fassungen nie verwerfen – nur Unlesbares (kein Inhalt, kein Zeitpunkt) fällt weg
+  const f = Array.isArray(u.fassungen) ? (u.fassungen as unknown[]).filter((x): x is Fassung => istObjekt(x) && istObjekt(x.daten) && istIso(x.festgeschrieben) && istIso(x.ersetzt)) : [];
+  if (f.length) r.fassungen = f;
+  else delete r.fassungen;
+  if (typeof u.betriebsstaette !== "string" || !u.betriebsstaette) delete r.betriebsstaette;
+  // R12 GoBD: Absender-Schnappschuss nur als Objekt mit Text, XML nur als Text
+  if (istObjekt(u.absender)) r.absender = { ...LEERER_BETRIEB, ...Object.fromEntries(Object.entries(u.absender).filter(([, w]) => typeof w === "string")) } as Betrieb;
+  else delete r.absender;
+  if (typeof u.xml !== "string" || !u.xml.startsWith("<")) delete r.xml;
+  if (!(istObjekt(u.kassenbuch) && typeof u.kassenbuch.monat === "string" && typeof u.kassenbuch.standort === "string")) delete r.kassenbuch;
+  if (typeof u.inhaltSha256 !== "string") delete r.inhaltSha256;
   return r;
+}
+
+/** R12: Betriebsstätten lesen – unlesbare Einträge fallen weg. */
+function betriebsstaettenAus(roh: unknown): Betriebsstaette[] {
+  if (!Array.isArray(roh)) return [];
+  const t = (w: unknown) => (typeof w === "string" ? w : "");
+  return roh.filter((x): x is Record<string, unknown> => istObjekt(x) && typeof x.id === "string" && Boolean(x.id) && x.id !== HAUPT_STAETTE).map((x) => ({ id: x.id as string, name: t(x.name), strasse: t(x.strasse), plz: t(x.plz), ort: t(x.ort), ...(istIso(x.geaendert) ? { geaendert: x.geaendert } : {}) }));
 }
 
 /**
@@ -255,9 +377,16 @@ export function standAus(json: string | null): Stand {
     else fremdeKasse.push(k);
   }
   const iso = (w: unknown) => (typeof w === "string" && w ? w : undefined);
-  return {
-    version: 2,
+  const kassenstuerze = kassenstuerzeVereinen([], liste(r.kassenstuerze).map(kassensturzAus).filter((x): x is Kassensturz => x !== null));
+  const sachentnahmen = liste(r.sachentnahmen).map(sachentnahmeAus).filter((x): x is Sachentnahme => x !== null);
+  const protokoll = protokollAus(r.protokoll);
+  return belegNummernSichern({
+    version: 4,
     kasse: kassenVereinen([], kasse),
+    kassenstuerze,
+    sachentnahmen,
+    protokoll,
+    betriebsstaetten: betriebsstaettenAus(r.betriebsstaetten),
     betrieb,
     unterlagen,
     belege,
@@ -277,7 +406,59 @@ export function standAus(json: string | null): Stand {
     zeiten: isoKarte(r.zeiten),
     ...(iso(r.geaendert) ? { geaendert: iso(r.geaendert) } : {}),
     ...(iso(r.letzteSicherung) ? { letzteSicherung: iso(r.letzteSicherung) } : {}),
-  };
+  });
+}
+
+/** R12 GoBD: Protokoll lesen – Unlesbares fällt weg. */
+function protokollAus(roh: unknown): ProtokollEintrag[] {
+  const arten = ["beleg_geloescht", "beleg_ungueltig", "beleg_korrigiert", "sachentnahme_geloescht"];
+  return (Array.isArray(roh) ? (roh as unknown[]) : [])
+    .filter((x): x is Record<string, unknown> => istObjekt(x) && typeof x.id === "string" && istIso(x.zeitpunkt) && arten.includes(String(x.art)) && typeof x.bezug === "string")
+    .map((x) => ({ id: x.id as string, zeitpunkt: x.zeitpunkt as string, art: x.art as ProtokollEintrag["art"], bezug: x.bezug as string, ...(typeof x.nr === "string" && x.nr ? { nr: x.nr } : {}), text: typeof x.text === "string" ? x.text.slice(0, 500) : "" }));
+}
+
+/** R12 GoBD: Protokolle zweier Stände nach ID vereinen (nur anhängen). */
+export function protokollVereinen(a: readonly ProtokollEintrag[], b: readonly ProtokollEintrag[]): ProtokollEintrag[] {
+  const m = new Map(a.map((x) => [x.id, x]));
+  for (const x of b) if (!m.has(x.id)) m.set(x.id, x);
+  return [...m.values()].sort((x, y) => x.zeitpunkt.localeCompare(y.zeitpunkt) || x.id.localeCompare(y.id));
+}
+
+/** R12 GoBD: Sachentnahmen zweier Stände nach ID (gelöschte laut Löschvermerk „e:“ fallen weg). */
+export function sachentnahmenVereinen(a: readonly Sachentnahme[], b: readonly Sachentnahme[], geloescht: Record<string, string>): Sachentnahme[] {
+  const m = new Map(a.map((x) => [x.id, x]));
+  for (const x of b) if (!m.has(x.id)) m.set(x.id, x);
+  return [...m.values()].filter((x) => !geloescht[`e:${x.id}`]).sort((x, y) => x.datum.localeCompare(y.datum) || x.id.localeCompare(y.id));
+}
+
+/**
+ * R12 GoBD: Jeder Beleg hat eine feste Amtlos-Belegnummer. Belege ohne Nummer (z. B. von einem Gerät mit älterer App)
+ * bekommen die nächste freie; kommt eine Nummer doppelt vor (zwei Geräte offline), behält sie der zuerst erfasste bzw.
+ * festgeschriebene Beleg, der andere bekommt die nächste freie – solange er nicht festgeschrieben ist.
+ */
+export function belegNummernSichern(s: Stand): Stand {
+  const alle = [...s.belege, ...s.belegArchiv];
+  const ids = new Set(alle.map((b) => b.id));
+  // Nummern gelöschter Belege bleiben vergeben (keine Wiederverwendung)
+  const vergeben = s.protokoll.filter((p) => p.art === "beleg_geloescht" && !ids.has(p.bezug)).map((p) => p.nr ?? "").filter(Boolean);
+  const reihenfolge = [...alle].sort((a, b) => (a.festgeschrieben ? 0 : 1) - (b.festgeschrieben ? 0 : 1) || a.erstellt.localeCompare(b.erstellt) || a.id.localeCompare(b.id));
+  const gesehen = new Set<string>(vergeben);
+  const neu = new Map<string, string>();
+  const fest: { nr?: string | null }[] = alle.filter((b) => b.nr).map((b) => ({ nr: b.nr }));
+  for (const b of reihenfolge) {
+    if (b.nr && !gesehen.has(b.nr)) {
+      gesehen.add(b.nr);
+      continue;
+    }
+    if (b.nr && b.festgeschrieben) continue;
+    const nr = naechsteBelegnummer(fest, b.datum.slice(0, 4), [...gesehen]);
+    gesehen.add(nr);
+    fest.push({ nr });
+    neu.set(b.id, nr);
+  }
+  if (!neu.size) return s;
+  const setze = (l: Beleg[]) => l.map((b) => (neu.has(b.id) ? { ...b, nr: neu.get(b.id)! } : b));
+  return { ...s, belege: setze(s.belege), belegArchiv: setze(s.belegArchiv) };
 }
 
 // Formatter einmal anlegen (R9 Performance): ein neuer Intl.DateTimeFormat je Aufruf ist rund 70× langsamer
@@ -395,19 +576,86 @@ export function anlegen(s: Stand, vorlageId: string, jetzt: Date, id = neueId())
       if (opt) daten[feld] = opt.wert;
     } else daten[feld] = w;
   }
+  // R12: Nachweise mit Fassungen tragen den Tag ihrer letzten Änderung („Fassung vom …“ im PDF)
+  if (v.korrektur) daten.fassung_stand = heute(jetzt);
+  // R12 (Bäckerei #3): Kassenmeldung mit den Betriebsstätten aus „Mein Betrieb“
+  if (v.id === "kassenmeldung" && s.betriebsstaetten.length) daten.betriebsstaetten = s.betriebsstaetten.filter((b) => b.name.trim()).map((b) => ({ name: b.name.trim(), anschrift: [b.strasse.trim(), [b.plz.trim(), b.ort.trim()].filter(Boolean).join(" ")].filter(Boolean).join("\n") }));
   const u: Unterlage = { id, vorlage: v.id, daten, erstellt: jetzt.toISOString(), geaendert: jetzt.toISOString() };
   return [{ ...s, unterlagen: [u, ...s.unterlagen] }, u];
 }
 
+/** R12: Felder eines Arbeitstags, die seinen Inhalt ausmachen (ohne Zeitstempel). */
+const TAG_FELDER = ["datum", "beginn", "ende", "pause", "einsatzort", "bemerkung"] as const;
+const tagInhalt = (e: Eintrag) => TAG_FELDER.map((k) => (typeof e[k] === "string" ? (e[k] as string).trim() : "")).join("\u0000");
+const tagLeer = (e: Eintrag) => TAG_FELDER.slice(1).every((k) => !(typeof e[k] === "string" && (e[k] as string).trim()));
+/** Zeitstempel eines Arbeitstags entfernen (Kopie eines Tags, einer Woche oder des ganzen Nachweises). */
+export const ohneStempel = (e: Eintrag): Eintrag => (({ erfasst_am: _e, geaendert_am: _g, ...rest }) => rest)(e);
+
+/**
+ * R12 (Zoll #2, #3): Je Arbeitstag „erfasst am“ (sobald er Inhalt hat) und „geändert am“ (Inhalt später geändert) –
+ * Tage, die gleich geblieben sind, behalten ihre Stempel. Ein Tag ohne Stempel ist neu.
+ */
+export function tageStempeln(alt: Daten, neu: Daten, tag: string): Daten {
+  if (!Array.isArray(neu.tage)) return neu;
+  const vorher = Array.isArray(alt.tage) ? (alt.tage as Eintrag[]) : [];
+  const gleich = new Set(vorher.filter((e) => typeof e.erfasst_am === "string").map((e) => `${e.erfasst_am as string}\u0001${tagInhalt(e)}`));
+  // ein Tag ohne Stempel mit genau dem Inhalt eines gestempelten Tags ist derselbe Tag (z. B. neu sortiert eingelesen)
+  const nachInhalt = new Map(vorher.filter((e) => typeof e.erfasst_am === "string").map((e) => [tagInhalt(e), e]));
+  let geaendert = false;
+  const tage = (neu.tage as Eintrag[]).map((e) => {
+    if (!e || typeof e !== "object") return e;
+    if (typeof e.erfasst_am !== "string" || !e.erfasst_am) {
+      if (tagLeer(e)) return e;
+      geaendert = true;
+      const alt = nachInhalt.get(tagInhalt(e));
+      if (alt) return { ...e, erfasst_am: alt.erfasst_am as string, ...(typeof alt.geaendert_am === "string" ? { geaendert_am: alt.geaendert_am } : {}) };
+      return { ...e, erfasst_am: tag };
+    }
+    if (gleich.has(`${e.erfasst_am}\u0001${tagInhalt(e)}`) || e.erfasst_am === tag || e.geaendert_am === tag) return e;
+    geaendert = true;
+    return { ...e, geaendert_am: tag };
+  });
+  return geaendert ? { ...neu, tage } : neu;
+}
+
+/** R12: nach einer Änderung – Zeitstempel der Arbeitstage und Tag der Fassung (nur Vorlagen mit `korrektur`). */
+function nachAenderung(u: Unterlage, daten: Daten, jetzt: Date): Daten {
+  const v = vorlageFuer(u.vorlage);
+  if (!v?.korrektur) return daten;
+  const tag = heute(jetzt);
+  const d = u.vorlage === "arbeitszeitnachweis" ? tageStempeln(u.daten, daten, tag) : daten;
+  return d.fassung_stand === tag ? d : { ...d, fassung_stand: tag };
+}
+
 /** Festgeschriebene Unterlagen bleiben, wie sie sind (GoBD, E-127). */
 export function aendern(s: Stand, id: string, daten: Daten, jetzt: Date): Stand {
-  return { ...s, unterlagen: s.unterlagen.map((u) => (u.id === id && !u.festgeschrieben ? { ...u, daten, geaendert: jetzt.toISOString() } : u)) };
+  return { ...s, unterlagen: s.unterlagen.map((u) => (u.id === id && !u.festgeschrieben ? { ...u, daten: nachAenderung(u, daten, jetzt), geaendert: jetzt.toISOString() } : u)) };
 }
 
 /** Ein Feld setzen (bzw. mehrere) – liest den aktuellen Stand, damit schnelles Tippen nichts verliert. */
 export function felderSetzen(s: Stand, id: string, werte: Daten, jetzt: Date): Stand {
-  return { ...s, unterlagen: s.unterlagen.map((u) => (u.id === id && !u.festgeschrieben ? { ...u, daten: { ...u.daten, ...werte }, geaendert: jetzt.toISOString() } : u)) };
+  return { ...s, unterlagen: s.unterlagen.map((u) => (u.id === id && !u.festgeschrieben ? { ...u, daten: nachAenderung(u, { ...u.daten, ...werte }, jetzt), geaendert: jetzt.toISOString() } : u)) };
 }
+
+/**
+ * R12 (Zoll #2): festgeschriebenen Nachweis korrigieren – nur mit Grund. Die geltende Fassung kommt unverändert in die
+ * Historie (`fassungen`); die Unterlage wird mit Fassungsnummer, Datum der ersetzten Fassung und Grund wieder Entwurf
+ * und beim nächsten Teilen neu festgeschrieben. Die erste Ausgabe bleibt (die Pflicht bleibt erledigt).
+ */
+export function korrigieren(s: Stand, id: string, grund: string, jetzt: Date): Stand {
+  const u = s.unterlagen.find((x) => x.id === id);
+  if (!u || !u.festgeschrieben || !vorlageFuer(u.vorlage)?.korrektur || !grund.trim() || u.konfliktKopieVon) return s;
+  const iso = jetzt.toISOString();
+  const alterGrund = typeof u.daten.fassung_grund === "string" && u.daten.fassung_grund.trim() ? u.daten.fassung_grund.trim() : undefined;
+  const fassung: Fassung = { daten: u.daten, festgeschrieben: u.festgeschrieben, ...(u.ausgegeben ? { ausgegeben: u.ausgegeben } : {}), ...(u.pdfSha256 ? { pdfSha256: u.pdfSha256 } : {}), ...(alterGrund ? { grund: alterGrund } : {}), ersetzt: iso };
+  const fassungen = [...(u.fassungen ?? []), fassung];
+  const daten: Daten = { ...u.daten, fassung_nr: String(fassungen.length + 1), fassung_ersetzt: heute(new Date(u.festgeschrieben)), fassung_grund: grund.trim(), fassung_stand: heute(jetzt) };
+  const { festgeschrieben: _f, pdfSha256: _p, ...rest } = u;
+  return { ...s, unterlagen: s.unterlagen.map((x) => (x.id === id ? { ...rest, daten, geaendert: iso, fassungen } : x)) };
+}
+
+/** R12: Tag (YYYY-MM-DD), an dem die Fassung festgeschrieben bzw. zuletzt geteilt wurde. */
+export const geteiltAm = (u: Pick<Unterlage, "festgeschrieben" | "ausgegeben">) => (u.festgeschrieben ?? u.ausgegeben ?? null);
 
 /**
  * Lässt sich die Unterlage mit genau diesem Inhalt ausgeben (H1)? `daten` ist der Inhalt, aus dem das PDF erzeugt
@@ -424,19 +672,68 @@ export function ausgabeMoeglich(s: Stand, id: string, daten?: Daten): boolean {
  * Als PDF geteilt oder gedruckt: merken, und Vorlagen mit `festschreiben` festschreiben. Mit `daten` (Inhalt des PDFs)
  * nur, wenn die Unterlage noch genau diesen Inhalt hat – sonst bleibt der Stand unverändert (siehe `ausgabeMoeglich`).
  */
-export function ausgeben(s: Stand, id: string, jetzt: Date, daten?: Daten, pdfSha256?: string): Stand {
+export function ausgeben(s: Stand, id: string, jetzt: Date, daten?: Daten, pdfSha256?: string, absender?: Betrieb): Stand {
   if (!ausgabeMoeglich(s, id, daten)) return s;
-  return {
+  const vorher = s.unterlagen.find((u) => u.id === id);
+  const neu: Stand = {
     ...s,
     unterlagen: s.unterlagen.map((u) => {
       if (u.id !== id) return u;
-      const fest = vorlageFuer(u.vorlage)?.festschreiben;
+      const v = vorlageFuer(u.vorlage);
+      const fest = v?.festschreiben;
       if (u.ausgegeben && (!fest || u.festgeschrieben)) return u;
       const festschreiben = fest && !u.festgeschrieben;
-      return { ...u, ausgegeben: u.ausgegeben ?? jetzt.toISOString(), ...(festschreiben ? { festgeschrieben: jetzt.toISOString(), ...(pdfSha256 ? { pdfSha256 } : {}) } : {}) };
+      if (!festschreiben) return { ...u, ausgegeben: u.ausgegeben ?? jetzt.toISOString() };
+      // R12 GoBD: Absenderdaten und XRechnung so festhalten, wie sie jetzt ausgegeben werden (§ 14b UStG)
+      const betrieb = absender ?? s.betrieb;
+      const e = v?.eRechnung ? eRechnungAus(u.daten, betrieb) : null;
+      return { ...u, ausgegeben: u.ausgegeben ?? jetzt.toISOString(), festgeschrieben: jetzt.toISOString(), ...(pdfSha256 ? { pdfSha256 } : {}), ...(v?.eRechnung ? { absender: { ...betrieb } } : {}), ...(e && !e.fehlt.length ? { xml: xrechnungUbl(e.daten, KU_HINWEIS) } : {}) };
     }),
   };
+  // R12 GoBD: eine abgegebene (geteilte) Voranmeldung schreibt die Belege ihres Zeitraums fest
+  if (vorher?.vorlage === "ust_voranmeldung" && !vorher.ausgegeben) {
+    const z = zeitraumAusText(vorher.daten.zeitraum);
+    if (z) return belegeFestschreiben(neu, neu.belege.filter((b) => (b.datum >= z.von && b.datum <= z.bis) || (zahltagVon(b) >= z.von && zahltagVon(b) <= z.bis)).map((b) => b.id), jetzt);
+  }
+  return neu;
 }
+
+const zahltagVon = (b: Pick<Beleg, "datum" | "bezahlt">) => b.bezahlt || b.datum;
+const MONATSNAMEN = ["januar", "februar", "märz", "april", "mai", "juni", "juli", "august", "september", "oktober", "november", "dezember"];
+
+/**
+ * R12 GoBD: Zeitraum einer Voranmeldung aus ihrem Feld „Zeitraum“ (z. B. „Oktober 2026“, „3. Quartal 2026“, „Q3 2026“,
+ * „2026-10“, „2026-Q3“) – null, wenn er sich nicht eindeutig lesen lässt.
+ */
+export function zeitraumAusText(w: unknown): { von: string; bis: string; periode: string } | null {
+  if (typeof w !== "string") return null;
+  const t = w.trim().toLocaleLowerCase("de");
+  let periode: string | null = null;
+  let m = /^(\d{4})-(0[1-9]|1[0-2])$/.exec(t) ?? null;
+  if (m) periode = `${m[1]}-${m[2]}`;
+  m = periode ? null : /^(\d{4})-q([1-4])$/.exec(t);
+  if (m) periode = `${m[1]}-Q${m[2]}`;
+  m = periode ? null : /^([1-4])\.?\s*quartal\s+(\d{4})$/.exec(t) ?? /^q([1-4])\s*\/?\s*(\d{4})$/.exec(t);
+  if (m) periode = `${m[2]}-Q${m[1]}`;
+  m = periode ? null : /^([a-zä]+)\s+(\d{4})$/.exec(t);
+  if (m && MONATSNAMEN.includes(m[1]!)) periode = `${m[2]}-${String(MONATSNAMEN.indexOf(m[1]!) + 1).padStart(2, "0")}`;
+  if (!periode) return null;
+  const z = ustZeitraum(periode);
+  return z ? { von: z.von, bis: z.bis, periode } : null;
+}
+
+/** R12 GoBD: abgegebene (geteilte) Voranmeldung, deren Zeitraum diesen Tag enthält – ihr Zeitraum als Text, sonst null. */
+export function vaAbgegebenFuer(s: Pick<Stand, "unterlagen">, tag: string): string | null {
+  for (const u of s.unterlagen) {
+    if (u.vorlage !== "ust_voranmeldung" || !u.ausgegeben) continue;
+    const z = zeitraumAusText(u.daten.zeitraum);
+    if (z && tag >= z.von && tag <= z.bis) return String(u.daten.zeitraum).trim();
+  }
+  return null;
+}
+
+/** R12 GoBD: Absender einer Unterlage – bei festgeschriebenen Rechnungen der festgehaltene, sonst „Mein Betrieb“. */
+export const absenderFuer = (s: Pick<Stand, "betrieb">, u: Pick<Unterlage, "absender" | "festgeschrieben"> | undefined): Betrieb => (u?.festgeschrieben && u.absender ? u.absender : s.betrieb);
 
 /**
  * Storno (E-127): eine festgeschriebene Rechnung wird nicht geändert, sondern durch eine Stornorechnung mit neuer
@@ -475,15 +772,21 @@ export function kopieren(s: Stand, id: string, jetzt: Date, neu = neueId()): [St
   // die Kopie ist ein neuer Entwurf: kein Storno-Bezug, nicht ausgegeben, nicht festgeschrieben
   delete daten.storno_zu;
   delete daten.storno_zu_datum;
+  // R12: die Kopie eines Nachweises ist eine neue erste Fassung – ohne Fassungsangaben und Zeitstempel der Tage
+  if (v?.korrektur) {
+    for (const k of ["fassung_nr", "fassung_ersetzt", "fassung_grund"]) delete daten[k];
+    daten.fassung_stand = heute(jetzt);
+    if (Array.isArray(daten.tage)) daten.tage = (daten.tage as Eintrag[]).map(ohneStempel);
+  }
   // fortlaufend nummerierte Unterlagen (Rechnung) bekommen das heutige Datum – sonst passt die Nummernfolge nicht
   if (v?.fortlaufend && typeof daten.datum === "string") daten.datum = heute(jetzt);
   const u: Unterlage = { id: neu, vorlage: alt.vorlage, daten, erstellt: jetzt.toISOString(), geaendert: jetzt.toISOString(), ...(ersetzt ? { ersetzt } : {}) };
   return [{ ...s, unterlagen: [u, ...s.unterlagen] }, u];
 }
 
-/** Löschen – außer festgeschriebene Unterlagen (Korrektur nur per Storno). */
+/** Löschen – außer festgeschriebene Unterlagen (Korrektur nur per Storno bzw. neue Fassung) und Nachweise mit Fassungen. */
 export function loeschen(s: Stand, id: string): Stand {
-  const weg = s.unterlagen.find((u) => u.id === id && !u.festgeschrieben);
+  const weg = s.unterlagen.find((u) => u.id === id && !u.festgeschrieben && !u.fassungen?.length);
   if (!weg) return s;
   // ein verworfener Storno-Entwurf gibt die ursprüngliche Rechnung wieder frei
   return { ...vermerken(s, `u:${id}`), unterlagen: s.unterlagen.filter((u) => u.id !== id).map((u) => (u.storniertDurch === id ? (({ storniertDurch: _weg, ...rest }) => rest)(u) : u)) };
@@ -629,18 +932,100 @@ export function zahlungVermerken(s: Stand, id: string, z: Omit<Zahlung, "id">, j
 /** R12: neuer Kassenabschluss – gespeichert ist er festgeschrieben (GoBD). */
 export function kasseSpeichern(s: Stand, inhalt: KassenInhalt, jetzt = new Date(), id = neueId()): [Stand, Kassenabschluss] {
   const iso = jetzt.toISOString();
-  const k: Kassenabschluss = { id, ...kassenInhalt(inhalt), erstellt: iso, geaendert: iso, festgeschrieben: iso };
+  // R12 GoBD: Bewegungen bekommen ihre Eigenbeleg-Nummer beim Speichern
+  const k: Kassenabschluss = { id, ...kassenInhalt(eigenbelegeVergeben(inhalt, s.kasse)), erstellt: iso, geaendert: iso, festgeschrieben: iso };
   return [{ ...s, kasse: kassenVereinen(s.kasse, [k]) }, k];
 }
 
 /** R12: Kassenabschluss korrigieren – nur mit Grund, die vorige Fassung bleibt in der Historie. */
 export function kasseKorrigieren(s: Stand, id: string, inhalt: KassenInhalt, grund: string, jetzt = new Date()): Stand {
-  if (!grund.trim()) return s;
-  return { ...s, kasse: s.kasse.map((k) => (k.id === id ? kassenKorrektur(k, inhalt, grund, jetzt.toISOString()) : k)) };
+  // R12 GoBD: Grund mit mindestens 10 Zeichen; neue Bewegungen bekommen eine Eigenbeleg-Nummer
+  if (!grundGenuegt(grund)) return s;
+  return { ...s, kasse: s.kasse.map((k) => (k.id === id ? kassenKorrektur(k, eigenbelegeVergeben(inhalt, s.kasse), grund, jetzt.toISOString()) : k)) };
 }
 
-/** Unterlagen, die aufbewahrt werden müssen: festgeschriebene (Rechnungen, Kassenbuch), Belege (auch ungültig markierte) und Unbekanntes. */
-export const aufbewahrungspflichtig = (s: Stand): { id: string }[] => [...s.unterlagen.filter((u) => u.festgeschrieben), ...s.belege, ...s.belegArchiv, ...s.kasse, ...((s.fremd.kasse ?? []) as { id: string }[]), ...(s.fremd.unterlagen as { id: string }[]), ...(s.fremd.belege as { id: string }[])];
+/** R12 GoBD: Kassensturz speichern (unveränderlich). */
+export function kassensturzSpeichern(s: Stand, k: Omit<Kassensturz, "id" | "zeitpunkt">, jetzt = new Date(), id = neueId()): [Stand, Kassensturz] {
+  const neu = kassensturzAus({ ...k, id, zeitpunkt: jetzt.toISOString() })!;
+  return [{ ...s, kassenstuerze: kassenstuerzeVereinen(s.kassenstuerze, [neu]) }, neu];
+}
+
+/** R12 GoBD: Sachentnahme speichern. */
+export function sachentnahmeSpeichern(s: Stand, e: Omit<Sachentnahme, "id" | "erstellt">, jetzt = new Date(), id = neueId()): Stand {
+  const neu = sachentnahmeAus({ ...e, id, erstellt: jetzt.toISOString() });
+  return neu ? { ...s, sachentnahmen: [...s.sachentnahmen, neu].sort((a, b) => a.datum.localeCompare(b.datum)) } : s;
+}
+
+/** R12 GoBD: Sachentnahme löschen – mit Protokolleintrag und Löschvermerk („e:“). */
+export function sachentnahmeLoeschen(s: Stand, id: string, jetzt = new Date()): Stand {
+  const e = s.sachentnahmen.find((x) => x.id === id);
+  if (!e) return s;
+  const iso = jetzt.toISOString();
+  return { ...vermerken(s, `e:${id}`, jetzt), sachentnahmen: s.sachentnahmen.filter((x) => x.id !== id), protokoll: [...s.protokoll, { id: neueId(), zeitpunkt: iso, art: "sachentnahme_geloescht", bezug: id, text: `Sachentnahme ${e.datum} gelöscht (7 %: ${(e.netto7_cent / 100).toFixed(2)} €, 19 %: ${(e.netto19_cent / 100).toFixed(2)} € netto)` }] };
+}
+
+/**
+ * R12 GoBD: Kassenbuch eines Monats aus den Tagesabschlüssen festschreiben – beim ersten Teilen. Gibt es schon ein
+ * festgeschriebenes Kassenbuch für Monat und Standort mit anderem Inhalt (Tagesabschluss inzwischen korrigiert),
+ * kommt die bisherige Fassung in die Historie und die neue gilt (Fassung 2 …). Gleicher Inhalt: nichts ändert sich.
+ */
+export function kassenbuchFestschreiben(s: Stand, monat: string, standort: string, daten: Daten, sha256: string, jetzt = new Date(), id = neueId()): Stand {
+  const iso = jetzt.toISOString();
+  const alt = s.unterlagen.find((u) => u.vorlage === "kassenbuch" && u.kassenbuch?.monat === monat && u.kassenbuch.standort === standort && !u.konfliktKopieVon);
+  if (alt && alt.festgeschrieben && JSON.stringify(alt.daten) === JSON.stringify(daten)) return s;
+  if (alt && alt.festgeschrieben) {
+    const fassung: Fassung = { daten: alt.daten, festgeschrieben: alt.festgeschrieben, ...(alt.ausgegeben ? { ausgegeben: alt.ausgegeben } : {}), ...(alt.inhaltSha256 ? { pdfSha256: alt.inhaltSha256 } : {}), grund: "Tagesabschlüsse seit der Festschreibung korrigiert bzw. ergänzt", ersetzt: iso };
+    return { ...s, unterlagen: s.unterlagen.map((u) => (u.id === alt.id ? { ...u, daten, geaendert: iso, festgeschrieben: iso, ausgegeben: iso, inhaltSha256: sha256, fassungen: [...(u.fassungen ?? []), fassung] } : u)) };
+  }
+  const u: Unterlage = { id, vorlage: "kassenbuch", daten, erstellt: iso, geaendert: iso, ausgegeben: iso, festgeschrieben: iso, kassenbuch: { monat, standort }, inhaltSha256: sha256 };
+  return { ...s, unterlagen: [u, ...s.unterlagen] };
+}
+
+/** R12 GoBD: festgeschriebenes Kassenbuch zu Monat und Standort (oder undefined). */
+export const kassenbuchFest = (s: Pick<Stand, "unterlagen">, monat: string, standort: string) => s.unterlagen.find((u) => u.vorlage === "kassenbuch" && u.kassenbuch?.monat === monat && u.kassenbuch.standort === standort && u.festgeschrieben && !u.konfliktKopieVon);
+
+/** Monate, die Nachweise nach § 17 Abs. 1 MiLoG (Arbeitszeit) bzw. nach dem Ende der Beschäftigung aufbewahrt werden. */
+export const NACHWEIS_MONATE = 24;
+
+const plusMonateIso = (iso: string, n: number) => {
+  const [j, m, t] = iso.slice(0, 10).split("-").map(Number) as [number, number, number];
+  return new Date(Date.UTC(j, m - 1 + n, t)).toISOString().slice(0, 10);
+};
+const gleicherName = (a: unknown, b: unknown) => typeof a === "string" && typeof b === "string" && a.trim() !== "" && a.trim().toLocaleLowerCase("de") === b.trim().toLocaleLowerCase("de");
+
+/**
+ * R12 (Zoll #10): bis wann ein Nachweis (Vorlage mit `korrektur`) aufzubewahren ist – YYYY-MM-DD, „9999-12-31“ solange
+ * die Person beschäftigt ist; null für andere Vorlagen. Arbeitszeit: 24 Monate nach dem letzten Arbeitstag
+ * (§ 17 Abs. 1 MiLoG). NachwG-Nachweis und Ausweis-Hinweis: für die Dauer der Beschäftigung und danach noch 24 Monate
+ * (Prüfzeitraum der FKS); ohne gespeicherte Person 24 Monate nach der Ausgabe.
+ */
+export function aufbewahrenBis(s: Pick<Stand, "mitarbeiter">, u: Unterlage): string | null {
+  const v = vorlageFuer(u.vorlage);
+  if (!v?.korrektur) return null;
+  // R12 GoBD: Verfahrensdokumentation (Organisationsunterlage) – 10 Jahre (§ 147 Abs. 3 AO), solange sie die Aufzeichnungen beschreibt: immer
+  if (u.vorlage === "verfahrensdokumentation") return "9999-12-31";
+  const ab = (u.ausgegeben ?? u.festgeschrieben ?? u.geaendert).slice(0, 10);
+  if (u.vorlage === "arbeitszeitnachweis") {
+    const tage = (Array.isArray(u.daten.tage) ? (u.daten.tage as Eintrag[]) : []).map((x) => x?.datum).filter((d): d is string => typeof d === "string" && /^\d{4}-\d{2}-\d{2}$/.test(d)).sort();
+    return plusMonateIso(tage.at(-1) ?? ab, NACHWEIS_MONATE);
+  }
+  const p = s.mitarbeiter.find((m) => gleicherName(m.name, u.daten.name));
+  if (!p) return plusMonateIso(ab, NACHWEIS_MONATE);
+  return typeof p.ende === "string" && /^\d{4}-\d{2}-\d{2}$/.test(p.ende) ? plusMonateIso(p.ende > ab ? p.ende : ab, NACHWEIS_MONATE) : "9999-12-31";
+}
+
+/**
+ * Festgeschriebene Unterlagen, die aufzubewahren sind: alle Rechnungen und Kassenbücher; Nachweise (R12) mit Fassungen
+ * oder festgeschrieben, solange ihre Frist läuft.
+ */
+function festAufbewahren(s: Stand, u: Unterlage, tag: string): boolean {
+  if (!u.festgeschrieben && !u.fassungen?.length) return false;
+  const bis = aufbewahrenBis(s, u);
+  return bis === null ? Boolean(u.festgeschrieben) : bis >= tag;
+}
+
+/** Unterlagen, die aufbewahrt werden müssen: festgeschriebene (Rechnungen, Kassenbuch, Nachweise in ihrer Frist), Belege (auch ungültig markierte) und Unbekanntes. */
+export const aufbewahrungspflichtig = (s: Stand, tag = heute()): { id: string }[] => [...s.unterlagen.filter((u) => festAufbewahren(s, u, tag)), ...s.belege, ...s.belegArchiv, ...s.kasse, ...s.kassenstuerze, ...s.sachentnahmen, ...((s.fremd.kasse ?? []) as { id: string }[]), ...(s.fremd.unterlagen as { id: string }[]), ...(s.fremd.belege as { id: string }[])];
 
 /**
  * Ruhezeit für das Änderungsprotokoll der Belege (H2): War ein Beleg so lange unverändert, wird vor der nächsten
@@ -650,21 +1035,46 @@ export const BELEG_RUHE_MS = 10 * 60 * 1000;
 /** So lange nach dem Erfassen darf ein Beleg noch endgültig gelöscht werden (falsch erfasst, doppelt fotografiert). */
 export const BELEG_LOESCHBAR_MS = 24 * 60 * 60 * 1000;
 
-/** Beleg anlegen oder ändern (E-133). Änderungen an einem älteren Beleg werden protokolliert (H2). */
-export function belegSetzen(s: Stand, b: Beleg, jetzt: Date): Stand {
+/**
+ * Beleg anlegen oder ändern (E-133). Änderungen an einem älteren Beleg werden protokolliert (H2).
+ * R12 GoBD: Ein neuer Beleg bekommt sofort seine feste Amtlos-Belegnummer. Ein festgeschriebener Beleg (im Paket bzw.
+ * in einer abgegebenen Voranmeldung) ändert sich nur mit Grund (mindestens 10 Zeichen) – die vorige Fassung kommt mit
+ * diesem Grund sofort in die Historie und ins Protokoll; ohne Grund bleibt der Stand unverändert.
+ */
+export function belegSetzen(s: Stand, b: Beleg, jetzt: Date, grund?: string): Stand {
   const alt = s.belege.find((x) => x.id === b.id);
   // ungültig markierte Belege bleiben, wie sie sind
   if (!alt && s.belegArchiv.some((x) => x.id === b.id)) return s;
   const iso = jetzt.toISOString();
   const historie = [...(alt?.historie ?? [])];
-  if (alt && belegInhaltGeaendert(alt, b) && jetzt.getTime() - Date.parse(alt.geaendert) > BELEG_RUHE_MS) historie.push(belegFassung(alt, iso));
+  const geaendert = alt ? belegInhaltGeaendert(alt, b) : false;
+  let protokoll = s.protokoll;
+  if (alt?.festgeschrieben && geaendert) {
+    if (!grundGenuegt(grund)) return s;
+    historie.push(belegFassung(alt, iso, grund));
+    protokoll = [...protokoll, { id: neueId(), zeitpunkt: iso, art: "beleg_korrigiert", bezug: b.id, ...(alt.nr ? { nr: alt.nr } : {}), text: grund!.trim().slice(0, 300) }];
+  } else if (alt && geaendert && jetzt.getTime() - Date.parse(alt.geaendert) > BELEG_RUHE_MS) historie.push(belegFassung(alt, iso));
   const { historie: _h, ...rest } = b;
-  const neu: Beleg = { ...rest, geaendert: iso, ...(historie.length ? { historie } : {}) };
-  return { ...s, belege: alt ? s.belege.map((x) => (x.id === b.id ? neu : x)) : [neu, ...s.belege] };
+  // Nummer und Festschreibung gehören nicht zum Inhalt – sie bleiben, wie sie sind
+  const nr = alt?.nr ?? b.nr ?? naechsteBelegnummer([...s.belege, ...s.belegArchiv], b.datum.slice(0, 4), s.protokoll.map((p) => p.nr ?? "").filter(Boolean));
+  const neu: Beleg = { ...rest, nr, ...(alt?.festgeschrieben ? { festgeschrieben: alt.festgeschrieben } : {}), geaendert: iso, ...(historie.length ? { historie } : {}) };
+  return { ...s, protokoll, belege: alt ? s.belege.map((x) => (x.id === b.id ? neu : x)) : [neu, ...s.belege] };
 }
 
-/** Darf der Beleg endgültig gelöscht werden? Nur leer (nichts erfasst) oder frisch erfasst – sonst wird er ungültig markiert. */
+/** R12 GoBD: Belege festschreiben (Steuerberater-Paket, abgegebene Voranmeldung) – schon festgeschriebene behalten ihren Zeitpunkt. */
+export function belegeFestschreiben(s: Stand, ids: readonly string[], jetzt = new Date()): Stand {
+  const set = new Set(ids);
+  if (!s.belege.some((b) => set.has(b.id) && !b.festgeschrieben)) return s;
+  const iso = jetzt.toISOString();
+  return { ...s, belege: s.belege.map((b) => (set.has(b.id) && !b.festgeschrieben ? { ...b, festgeschrieben: iso, geaendert: iso } : b)) };
+}
+
+/**
+ * Darf der Beleg endgültig gelöscht werden? Nur leer (nichts erfasst) oder frisch erfasst (24 Stunden) und noch in
+ * keinem Paket bzw. keiner abgegebenen Voranmeldung (R12 GoBD) – sonst wird er ungültig markiert.
+ */
 export function belegEndgueltigLoeschbar(b: Beleg, jetzt = new Date()): boolean {
+  if (b.festgeschrieben) return false;
   const leer = !b.lieferant.trim() && !b.datei && !belegSummen(b).brutto_cent;
   return leer || jetzt.getTime() - Date.parse(b.erstellt) < BELEG_LOESCHBAR_MS;
 }
@@ -677,9 +1087,13 @@ export function belegEndgueltigLoeschbar(b: Beleg, jetzt = new Date()): boolean 
 export function belegLoeschen(s: Stand, id: string, jetzt = new Date(), grund = "In der App als ungültig markiert"): Stand {
   const b = s.belege.find((x) => x.id === id);
   if (!b) return s;
-  if (belegEndgueltigLoeschbar(b, jetzt)) return { ...vermerken(s, `b:${id}`, jetzt), belege: s.belege.filter((x) => x.id !== id) };
   const iso = jetzt.toISOString();
-  return { ...s, belege: s.belege.filter((x) => x.id !== id), belegArchiv: [{ ...b, ungueltig: iso, ungueltig_grund: grund, geaendert: iso }, ...s.belegArchiv.filter((x) => x.id !== id)] };
+  const leer = !b.lieferant.trim() && !b.datei && !belegSummen(b).brutto_cent;
+  // R12 GoBD: jede Löschung steht im Protokoll (außer einem leeren, nie ausgefüllten Beleg) – die Nummer bleibt vergeben
+  const eintrag = (art: ProtokollEintrag["art"], text: string): ProtokollEintrag => ({ id: neueId(), zeitpunkt: iso, art, bezug: id, ...(b.nr ? { nr: b.nr } : {}), text });
+  const beschreibung = `${b.lieferant.trim() || "ohne Lieferant"}, ${b.datum}, ${(belegSummen(b).brutto_cent / 100).toFixed(2).replace(".", ",")} € brutto`;
+  if (belegEndgueltigLoeschbar(b, jetzt)) return { ...vermerken(s, `b:${id}`, jetzt), belege: s.belege.filter((x) => x.id !== id), protokoll: leer ? s.protokoll : [...s.protokoll, eintrag("beleg_geloescht", `Innerhalb von 24 Stunden nach der Erfassung gelöscht: ${beschreibung}`)] };
+  return { ...s, belege: s.belege.filter((x) => x.id !== id), belegArchiv: [{ ...b, ungueltig: iso, ungueltig_grund: grund, geaendert: iso }, ...s.belegArchiv.filter((x) => x.id !== id)], protokoll: [...s.protokoll, eintrag("beleg_ungueltig", `Als ungültig markiert (${grund}): ${beschreibung}`)] };
 }
 
 /** Belege nach Belegdatum, neueste zuerst. */
@@ -800,9 +1214,13 @@ export interface Vereinigung {
 export function unterlagenVereinen(lokal: Unterlage, andere: Unterlage): Vereinigung {
   const fl = Boolean(lokal.festgeschrieben);
   const fa = Boolean(andere.festgeschrieben);
+  // R12: eine Korrektur (mehr Fassungen) ist neuer als die Fassung, die sie ersetzt – auch wenn diese festgeschrieben ist
+  const sl = lokal.fassungen?.length ?? 0;
+  const sa = andere.fassungen?.length ?? 0;
   let basis: Unterlage;
   let kopie: Unterlage | undefined;
-  if (fl && fa) {
+  if (sl !== sa) basis = sl > sa ? lokal : andere;
+  else if (fl && fa) {
     const dl = JSON.stringify(lokal.daten);
     const da = JSON.stringify(andere.daten);
     // zuerst festgeschrieben gewinnt; bei gleichem Zeitpunkt entscheidet der Inhalt – auf allen Geräten gleich
@@ -817,7 +1235,12 @@ export function unterlagenVereinen(lokal: Unterlage, andere: Unterlage): Vereini
   const r: Unterlage = { ...basis };
   const ausgegeben = frueher(lokal.ausgegeben, andere.ausgegeben);
   if (ausgegeben) r.ausgegeben = ausgegeben;
-  if (fl && fa) r.festgeschrieben = frueher(lokal.festgeschrieben, andere.festgeschrieben);
+  if (fl && fa && sl === sa) r.festgeschrieben = frueher(lokal.festgeschrieben, andere.festgeschrieben);
+  // R12: Fassungen beider Seiten – keine geht verloren (nach Zeitpunkt der Festschreibung)
+  const fassungen = new Map<string, Fassung>();
+  for (const f of [...(lokal.fassungen ?? []), ...(andere.fassungen ?? [])]) if (!fassungen.has(f.festgeschrieben)) fassungen.set(f.festgeschrieben, f);
+  if (fassungen.size) r.fassungen = [...fassungen.values()].sort((a, b) => a.festgeschrieben.localeCompare(b.festgeschrieben));
+  else delete r.fassungen;
   const storno = basis.storniertDurch ?? zweite.storniertDurch;
   if (storno) r.storniertDurch = storno;
   const zl = lokal.bezahltGeaendert ?? "";
@@ -961,11 +1384,126 @@ export function zusammenfuehren(aktuell: Stand, gesichert: Stand, jetzt = new Da
     fremd: fremdVereinen(aktuell.fremd, gesichert.fremd),
     // R12: Kassenabschlüsse nach ID – nie etwas verlieren, Korrekturen beider Seiten bleiben in der Historie
     kasse: kassenVereinen(aktuell.kasse, gesichert.kasse),
+    // R12: Betriebsstätten nach ID, die zuletzt geänderte gewinnt; auf dem Gerät gelöschte kommen nicht zurück
+    betriebsstaetten: staettenVereinen(aktuell.betriebsstaetten, gesichert.betriebsstaetten, geloescht),
+    // R12 GoBD: Kassenstürze und Protokoll nie verlieren; Sachentnahmen nach ID
+    kassenstuerze: kassenstuerzeVereinen(aktuell.kassenstuerze, gesichert.kassenstuerze),
+    protokoll: protokollVereinen(aktuell.protokoll, gesichert.protokoll),
+    sachentnahmen: sachentnahmenVereinen(aktuell.sachentnahmen, gesichert.sachentnahmen, aktuell.geloescht),
   };
-  return { stand, neu, behalten, aktualisiert, nummernKonflikte: nummernKonflikteVon(stand), festKonflikte: u.konflikte, mehrfachStorniert: mehrfachStorniert(stand.unterlagen) };
+  return { stand: belegNummernSichern(stand), neu, behalten, aktualisiert, nummernKonflikte: nummernKonflikteVon(stand), festKonflikte: u.konflikte, mehrfachStorniert: mehrfachStorniert(stand.unterlagen) };
 }
 
 /** Nummern, die in zwei verschiedenen Unterlagen derselben Vorlage vorkommen. */
 export function nummernKonflikteVon(s: Stand): string[] {
   return [...new Set(s.unterlagen.filter((u) => nummerDoppelt(s, u)).map(nummerVon))].filter(Boolean).sort();
+}
+
+/** R12: Betriebsstätten zweier Stände nach ID – die zuletzt geänderte gewinnt; mit Löschvermerk („s:“) älteres weg. */
+export function staettenVereinen(a: Betriebsstaette[], b: Betriebsstaette[], geloescht: Record<string, string>): Betriebsstaette[] {
+  const m = new Map(a.map((x) => [x.id, x]));
+  for (const x of b) {
+    const l = m.get(x.id);
+    if (!l || (l.geaendert ?? "") < (x.geaendert ?? "")) m.set(x.id, x);
+  }
+  return [...m.values()].filter((x) => !geloescht[`s:${x.id}`] || (x.geaendert ?? "") > geloescht[`s:${x.id}`]!);
+}
+
+/** R12: Name und Anschrift einer Betriebsstätte (ID „haupt“ bzw. leer: der Betrieb selbst). */
+export function staetteVon(s: Pick<Stand, "betrieb" | "betriebsstaetten">, id: string | null | undefined): { id: string; name: string; anschrift: string } {
+  const st = id && id !== HAUPT_STAETTE ? s.betriebsstaetten.find((x) => x.id === id) : undefined;
+  const b = st ?? { name: s.betrieb.name, strasse: s.betrieb.strasse, plz: s.betrieb.plz, ort: s.betrieb.ort };
+  return { id: st?.id ?? HAUPT_STAETTE, name: b.name.trim() || "Betrieb", anschrift: [b.strasse.trim(), [b.plz.trim(), b.ort.trim()].filter(Boolean).join(" ")].filter(Boolean).join(", ") };
+}
+
+/** R12: alle Betriebsstätten zur Auswahl – der Betrieb zuerst. */
+export const alleStaetten = (s: Pick<Stand, "betrieb" | "betriebsstaetten">) => [staetteVon(s, HAUPT_STAETTE), ...s.betriebsstaetten.map((x) => staetteVon(s, x.id))];
+
+/** R12: Anzahl der Betriebsstätten für den Pflichten-Check (Profil `betriebsstaetten.anzahl`): der Betrieb und die weiteren. */
+const mitStaettenAnzahl = (s: Stand): Stand => {
+  const n = 1 + s.betriebsstaetten.length;
+  return s.profil["betriebsstaetten.anzahl"] === n ? s : profilSetzen(s, { "betriebsstaetten.anzahl": n });
+};
+
+/** R12: Betriebsstätte anlegen oder ändern – schreibt die Anzahl ins Profil des Pflichten-Checks. */
+export function staetteSetzen(s: Stand, st: Betriebsstaette, jetzt = new Date()): Stand {
+  const neu = { ...st, geaendert: jetzt.toISOString() };
+  const liste = s.betriebsstaetten.some((x) => x.id === st.id) ? s.betriebsstaetten.map((x) => (x.id === st.id ? neu : x)) : [...s.betriebsstaetten, neu];
+  return mitStaettenAnzahl({ ...s, betriebsstaetten: liste });
+}
+
+/** R12: Betriebsstätte löschen (Zuordnungen von Personen und Unterlagen fallen auf den Betrieb zurück). */
+export function staetteLoeschen(s: Stand, id: string, jetzt = new Date()): Stand {
+  if (!s.betriebsstaetten.some((x) => x.id === id)) return s;
+  const unterlagen = s.unterlagen.map((u) => (u.betriebsstaette === id ? (({ betriebsstaette: _b, ...rest }) => rest)(u) : u));
+  const mitarbeiter = s.mitarbeiter.map((p): Person => (p.betriebsstaette === id ? { ...p, betriebsstaette: null, geaendert: jetzt.toISOString() } : p));
+  return mitStaettenAnzahl({ ...vermerken(s, `s:${id}`, jetzt), betriebsstaetten: s.betriebsstaetten.filter((x) => x.id !== id), unterlagen, mitarbeiter });
+}
+
+/**
+ * R12: alle verschlüsselt abgelegten Dateien des Stands – Belegfotos, Z-Bons und Kopien der Aufenthaltstitel
+ * (Mitarbeiter). Für Sicherung, Synchronisation und Aufräumen.
+ */
+export function dateienImStand(s: Pick<Stand, "belege" | "belegArchiv" | "kasse" | "mitarbeiter">): string[] {
+  // R12 GoBD: auch Fotos der Eigenbelege (Bankeinzahlung, Entnahme, Einlage) – aus der geltenden Fassung und der Historie
+  const bewegungen = s.kasse.flatMap((k) => [k, ...(k.historie ?? [])]).flatMap((k) => k.bewegungen.map((b) => b.datei));
+  const zbons = s.kasse.flatMap((k) => (k.historie ?? []).map((h) => h.datei));
+  return [...new Set([...s.belege, ...s.belegArchiv, ...s.kasse].map((b) => b.datei).concat(s.mitarbeiter.map((p) => p.aufenthalt_datei), bewegungen, zbons).filter((n): n is string => typeof n === "string" && n !== ""))];
+}
+
+/**
+ * R12 (Kurier #13): Gibt es schon eine andere Person mit diesem Namen? (gleich ohne Groß-/Kleinschreibung und
+ * Leerzeichen) – z. B. aus einer Vorlage gemerkt und danach von Hand noch einmal angelegt.
+ */
+export function doppeltePerson(s: Stand, art: PersonenArt, id: string): Person | null {
+  const l = s[PERSONEN_LISTE[art]];
+  const p = l.find((x) => x.id === id);
+  if (!p || !p.name.trim()) return null;
+  const norm = (n: string) => n.trim().replace(/\s+/g, " ").toLocaleLowerCase("de");
+  return l.find((x) => x.id !== id && norm(x.name) === norm(p.name)) ?? null;
+}
+
+/** R12: zwei Einträge derselben Person zusammenführen – leere Angaben des bleibenden Eintrags aus dem anderen ergänzen. */
+export function personenZusammenfuehren(s: Stand, art: PersonenArt, bleibt: string, weg: string, jetzt = new Date()): Stand {
+  const k = PERSONEN_LISTE[art];
+  const a = s[k].find((x) => x.id === bleibt);
+  const b = s[k].find((x) => x.id === weg);
+  if (!a || !b || a.id === b.id) return s;
+  const neu: Person = { ...a };
+  for (const [f, w] of Object.entries(b)) if (f !== "id" && f !== "geaendert" && typeof w === "string" && w.trim() && !(typeof neu[f] === "string" && (neu[f] as string).trim())) neu[f] = w;
+  return personLoeschen(personSetzen(s, art, neu, jetzt), art, weg);
+}
+
+/** R12 (Zoll #5): so viele Tage vor dem Ablauf eines Aufenthaltstitels erinnert „Heute“. */
+export const AUFENTHALT_VORLAUF_TAGE = 60;
+
+/**
+ * R12 (Zoll #5): Aufenthaltstitel beschäftigter Personen, die in den nächsten `vorlauf` Tagen ablaufen oder abgelaufen
+ * sind – nach Datum. Beendete Beschäftigungen zählen nicht.
+ */
+export function aufenthaltLaeuftAb(s: Pick<Stand, "mitarbeiter">, tag = heute(), vorlauf = AUFENTHALT_VORLAUF_TAGE): { id: string; name: string; bis: string; tage: number }[] {
+  const ms = (iso: string) => Date.UTC(Number(iso.slice(0, 4)), Number(iso.slice(5, 7)) - 1, Number(iso.slice(8, 10)));
+  return s.mitarbeiter
+    .filter((p) => typeof p.aufenthalt_bis === "string" && /^\d{4}-\d{2}-\d{2}$/.test(p.aufenthalt_bis) && p.name.trim() && !(typeof p.ende === "string" && /^\d{4}-\d{2}-\d{2}$/.test(p.ende) && p.ende < tag))
+    .map((p) => ({ id: p.id, name: p.name.trim(), bis: p.aufenthalt_bis as string, tage: Math.round((ms(p.aufenthalt_bis as string) - ms(tag)) / 864e5) }))
+    .filter((x) => x.tage <= vorlauf)
+    .sort((a, b) => a.bis.localeCompare(b.bis));
+}
+
+/** R12 (Bäckerei #7): Vorlagen, die sich einer Betriebsstätte zuordnen lassen (Hygiene, Lebensmittel, Arbeitszeit). */
+export const STAETTEN_VORLAGEN = new Set(["haccp", "ifsg_belehrung", "hygieneplan", "allergene", "reinigungsplan", "arbeitszeitnachweis"]);
+
+/**
+ * R12: Betriebsstätte einer Unterlage setzen – Zuordnung, kein Inhalt: geht auch bei festgeschriebenen Unterlagen
+ * (ändert weder Daten noch PDF). „haupt“ bzw. leer = Betrieb.
+ */
+export function unterlageStaette(s: Stand, id: string, staette: string | null, jetzt = new Date()): Stand {
+  return {
+    ...s,
+    unterlagen: s.unterlagen.map((u) => {
+      if (u.id !== id) return u;
+      const { betriebsstaette: _b, ...rest } = u;
+      return { ...rest, ...(staette ? { betriebsstaette: staette } : {}), geaendert: u.festgeschrieben ? u.geaendert : jetzt.toISOString() };
+    }),
+  };
 }

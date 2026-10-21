@@ -28,7 +28,7 @@ export interface EditorDaten {
 
 type P = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any -- frei strukturierter Entwurf, validiert beim Speichern
 
-const KATEGORIEN = ["gruendung", "gesellschaft", "steuern", "personal", "arbeitsschutz", "datenschutz", "it_sicherheit", "ki", "online", "produkte", "branche"];
+const KATEGORIEN = ["gruendung", "gesellschaft", "steuern", "personal", "arbeitsschutz", "datenschutz", "it_sicherheit", "ki", "online", "produkte", "branche", "umwelt"];
 const KANAELE = ["elster", "portal", "post", "notar", "intern_dokumentieren", "partner"];
 const AUTOMATISIERUNG = ["hinweis", "formular_vorausfuellen", "direkt_uebermitteln", "dokument_generator", "partner"];
 const STATUS_RECHT = ["in_kraft", "beschlossen", "entwurf", "geplant", "ausgelaufen"];

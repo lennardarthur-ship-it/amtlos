@@ -1,26 +1,48 @@
 # Katalog H.5 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.transport_lenkzeiten
-version: 1
+version: 2
 katalog_nr: H.5
 titel:
-  de: Lenk- und Ruhezeiten einhalten und aufzeichnen
+  de: Lenk- und Ruhezeiten einhalten und mit dem Fahrtenschreiber aufzeichnen
 kurz:
-  de: Für Fahrerinnen und Fahrer gelten Lenk- und Ruhezeiten, die mit dem Fahrtenschreiber aufgezeichnet werden.
+  de: Für Fahrzeuge über 3,5 t – grenzüberschreitend schon über 2,5 t – gelten die EU-Lenk- und Ruhezeiten; aufgezeichnet wird mit dem Fahrtenschreiber.
 erklaerung:
-  de: Die Regeln gelten für bestimmte Fahrzeugklassen. Daten aus Fahrtenschreibern müssen ausgelesen und aufbewahrt werden.
+  de: Die Lenk- und Ruhezeiten der Verordnung (EG) Nr. 561/2006 gelten für die Güterbeförderung mit Fahrzeugen über 3,5 t zulässiger Gesamtmasse (mit Anhänger). Seit dem 1.7.2026 gelten sie auch für Fahrzeuge über 2,5 t bis 3,5 t bei grenzüberschreitenden Fahrten und Kabotage; diese Fahrzeuge brauchen einen intelligenten Fahrtenschreiber der neuesten Generation. Die Daten aus Fahrtenschreiber und Fahrerkarte liest du regelmäßig aus und bewahrst sie auf. Für Werkverkehr bis 3,5 t gibt es unter bestimmten Bedingungen Ausnahmen (Art. 3 Buchst. ha VO (EG) Nr. 561/2006).
 rechtsgrundlage:
 - Verordnung (EG) Nr. 561/2006
+- Verordnung (EU) Nr. 165/2014
 - FPersG
 kategorie: branche
 branchen:
 - transport_logistik
 ausloeser:
-  feld: profil.taetigkeit.branchen
-  op: enthaelt
-  wert: transport_logistik
-  label:
-    de: Dein Betrieb gehört zu Transport und Logistik.
+  all:
+  - feld: profil.fahrzeuge.anzahl
+    op: '>='
+    wert: 1
+    label:
+      de: Du nutzt Firmenfahrzeuge.
+  - any:
+    - feld: profil.fahrzeuge.gesamtmasse
+      op: enthaelt
+      wert: ueber_3_5t
+      label:
+        de: Mindestens ein Fahrzeug hat mehr als 3,5 t zulässige Gesamtmasse.
+    - all:
+      - feld: profil.fahrzeuge.ausland
+        op: ==
+        wert: true
+        label:
+          de: Ihr fahrt mit Waren auch ins Ausland.
+      - feld: profil.fahrzeuge.gesamtmasse
+        op: enthaelt_eines
+        wert:
+        - 2_5_bis_2_8t
+        - 2_8_bis_3_5t
+        label:
+          de: Mindestens ein Fahrzeug hat mehr als 2,5 t zulässige Gesamtmasse.
+# R12 (Nutzertest Kurier #2): nicht mehr für jede Transportfirma – nach Gesamtmasse und Auslandsfahrten (IHK München, Handzettel Kleinfahrzeuge 05/2026)
 frist:
   typ: dauerhaft
 wiederholung:
@@ -41,9 +63,12 @@ quellen:
 - titel: Verordnung (EG) Nr. 561/2006
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32006R0561
   abgerufen: null
+- titel: IHK München – Handzettel Kleinfahrzeuge (Stand 05/2026)
+  url: https://www.ihk-muenchen.de/ihk/Verkehr/Verkehrsausschuss/Handzettel-Kleinfahrzeuge-Stand-22_05_2026.pdf
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
+- 'R12 (Nutzertest Kurier #2): Auslöser nach zulässiger Gesamtmasse und grenzüberschreitenden Fahrten (seit 1.7.2026 ab 2,5 t, IHK München) – Ausnahmen (Werkverkehr Art. 3 Buchst. ha, Handwerkerregelung) sowie Auslese- und Aufbewahrungsfristen fachlich ergänzen'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Fahrzeugklassen und Auslese-/Aufbewahrungsfristen nicht in der Spezifikation
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 pruefung:
   status: entwurf

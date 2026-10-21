@@ -1,0 +1,20 @@
+persona: freiberufler
+beschreibung: "R12 (Rechtsprüfung Befund 1): PartG mbB in Gründung – Anmeldung zum Partnerschaftsregister (§ 4 PartGG), Transparenzregister (§ 20 GwG), Berufshaftpflicht (§ 8 Abs. 4 PartGG); kein Jahresabschluss nach HGB"
+stichtag: "2026-10-21"
+fakten:
+  profil.rechtsform: partg_mbb
+  profil.gruendungsdatum: "2026-12-01"
+  profil.taetigkeit.einordnung: freiberuf
+  profil.taetigkeit.branchen: [it_agentur_freelancer]
+  profil.gesellschaft.handelsregister: nicht_beantragt
+  profil.beschaeftigte.gesamt: 0
+  profil.bundesland: BE
+erwartet:
+  gesellschaft.handelsregister_anmeldung: gilt
+  gesellschaft.transparenzregister: gilt
+  gesellschaft.partg_mbb_haftpflicht: gilt
+  gesellschaft.jahresabschluss: gilt_nicht
+  gesellschaft.offenlegung: gilt_nicht
+  gesellschaft.insolvenzantragspflicht: gilt_nicht
+  gesellschaft.stammkapital_einzahlen: gilt_nicht
+  gesellschaft.istkaufmann_pruefen: gilt_nicht

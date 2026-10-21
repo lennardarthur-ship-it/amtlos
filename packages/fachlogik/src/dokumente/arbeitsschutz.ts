@@ -115,6 +115,38 @@ const GEFAEHRDUNGEN_R11: Vorschlag[] = [
   },
 ];
 
+/**
+ * R12: Gruppen „Kfz-Werkstatt“ (Kfz #3), „Bäckerei“ (Bäckerei #6) und „Transport / Kurier“ (Kurier #9) – aus den
+ * Nutzertests; die Maßnahmen sind allgemeine Grundsätze. Wo die Fundstelle nicht sicher ist, sagt die Quelle „fachlich
+ * zu prüfen“ (PRUEFLISTE T-62).
+ */
+const g = (gruppe: string, titel: string, faktor: string, massnahme: string, quelle: string, risiko?: string): Vorschlag => ({ gruppe, titel, werte: { faktor, ...(risiko ? { risiko } : {}), beschreibung: titel, massnahme }, quelle });
+const KFZ = "Kfz-Werkstatt";
+const BAECKEREI = "Bäckerei";
+const TRANSPORT = "Transport / Kurier";
+const GEFAEHRDUNGEN_R12: Vorschlag[] = [
+  g(KFZ, "Hebebühne und Arbeitsgrube: Quetschen durch absinkende oder abrutschende Fahrzeuge, Absturz in die Grube.", "arbeitsmittel", "Fahrzeuge nur an den vom Hersteller vorgesehenen Aufnahmepunkten anheben; Hebebühne nur durch unterwiesene Beschäftigte bedienen.\nHebebühne mindestens jährlich durch eine befähigte Person prüfen lassen (§ 14 BetrSichV, DGUV Grundsatz 308-002).\nArbeitsgrube bei Nichtbenutzung abdecken bzw. absichern; Grubenrand kennzeichnen.", `§ 14 BetrSichV; DGUV Grundsatz 308-002 – ${PRUEFEN}`, "hoch"),
+  g(KFZ, "Abgase von Dieselmotoren beim Motorlauf in der Halle.", "einwirkungen", "Motoren in der Halle nur mit Abgasabsaugung am Auspuff laufen lassen; Motorlaufzeiten kurz halten.\nHalle ausreichend lüften; Gefährdung nach TRGS 554 beurteilen.", "TRGS 554"),
+  g(KFZ, "Hochvolt-Fahrzeuge (Elektro- und Hybridantrieb): elektrischer Schlag und Störlichtbogen.", "arbeitsmittel", "Arbeiten am Hochvolt-System nur durch dafür qualifizierte Beschäftigte (Qualifizierungsstufen nach DGUV Information 209-093).\nSpannungsfreiheit nach Herstellervorgabe herstellen, sichern und feststellen; Fahrzeug kennzeichnen und Arbeitsbereich absperren.\nIsolierte Werkzeuge und geeignete Schutzausrüstung bereitstellen und prüfen.", "DGUV Information 209-093", "hoch"),
+  g(KFZ, "Reifenmontage und -befüllung: Platzen des Reifens, Quetschen an der Montiermaschine, schwere Räder.", "arbeitsmittel", "Reifen nur mit Füllgerät mit Druckbegrenzung befüllen, große Reifen im Füllkäfig.\nMontiermaschine nur unterwiesen bedienen; nicht in den Bereich von Montierkopf und Felge greifen.\nRadheber bzw. Hebehilfen für schwere Räder bereitstellen.", `Nutzertest Kfz-Werkstatt – ${PRUEFEN}`),
+  g(KFZ, "Bremsenreiniger und Lösemittel: Dämpfe, Hautschäden, Brandgefahr.", "einwirkungen", "Ersatz prüfen (z. B. wässrige Reiniger, Bremsenwaschgerät statt Sprühdose).\nFür ausreichende Lüftung sorgen; Zündquellen fernhalten.\nIm Gefahrstoffverzeichnis führen, Betriebsanweisung und geeignete Schutzhandschuhe bereitstellen.", `GefStoffV – ${PRUEFEN}`),
+  g(KFZ, "Kältemittel beim Klimaanlagen-Service: Erfrierungen, Erstickungsgefahr in Gruben und tiefliegenden Bereichen.", "einwirkungen", "Klimaservice nur durch Beschäftigte mit Sachkunde; Kältemittel nur mit Absaug- und Recyclinggerät handhaben.\nNicht in Arbeitsgruben oder tiefliegenden Bereichen ablassen (Kältemittel sind schwerer als Luft).\nSchutzbrille und Kälteschutzhandschuhe tragen.", `Nutzertest Kfz-Werkstatt – ${PRUEFEN}`),
+  g(KFZ, "Batteriesäure und Knallgas beim Laden von Starterbatterien.", "einwirkungen", "Batterien nur in gut gelüfteten Bereichen laden; Funken, offenes Feuer und Rauchen fernhalten.\nSchutzbrille und säurefeste Handschuhe tragen; Augenspüleinrichtung bereithalten.", `Nutzertest Kfz-Werkstatt – ${PRUEFEN}`),
+  g(KFZ, "Druckluft: Verletzungen durch Abblasen, peitschende Schläuche, Lärm.", "arbeitsmittel", "Druckluft nie auf Personen richten; Kleidung und Haut nicht abblasen.\nSchläuche und Kupplungen regelmäßig kontrollieren und sichern.\nKompressor und Druckbehälter nach BetrSichV prüfen lassen.", `BetrSichV – ${PRUEFEN}`),
+  g(BAECKEREI, "Mehlstaub: Atemwegs- und Hauterkrankungen (Bäckerasthma).", "einwirkungen", "Staubarm arbeiten: Mehl nicht werfen oder abblasen, langsam einschütten, Knetmaschinen abdecken bzw. absaugen; staubarme Mehle und Trennmittel verwenden.\nFeucht reinigen oder saugen statt kehren.\nArbeitsmedizinische Vorsorge bei Mehlstaub anbieten bzw. veranlassen (ArbMedVV Anhang Teil 1).", `ArbMedVV Anhang Teil 1; BGN – ${PRUEFEN}`, "hoch"),
+  g(BAECKEREI, "Teig- und Knetmaschinen, Ausrollmaschinen: Einzug und Quetschen.", "arbeitsmittel", "Schutzgitter und Verriegelungen nicht überbrücken; nicht in laufende Maschinen greifen.\nReinigen nur bei stillstehender und gegen Wiedereinschalten gesicherter Maschine.\nMaschinen und Schutzeinrichtungen regelmäßig prüfen (§ 14 BetrSichV).", `§ 14 BetrSichV – ${PRUEFEN}`, "hoch"),
+  g(BAECKEREI, "Öfen, Stikkenöfen und Gärräume: Verbrennungen, heißer Dampf, Einschließen, kippende Stikkenwagen.", "arbeitsmittel", "Hitzeschutzhandschuhe bereitstellen; Ofentüren vorsichtig öffnen (Dampf).\nNotöffnung von Gär- und Kühlräumen von innen regelmäßig prüfen.\nStikkenwagen nicht überladen, Bremsen und Rollen prüfen.", `Nutzertest Bäckerei – ${PRUEFEN}`),
+  g(BAECKEREI, "Nachtarbeit und frühe Arbeitszeiten: Belastung der Gesundheit, Müdigkeit, Unfälle auf dem Arbeitsweg.", "ablaeufe_arbeitszeit", "Nachtarbeitnehmer vor Beginn und danach regelmäßig arbeitsmedizinisch untersuchen lassen, Kosten trägt der Betrieb (§ 6 Abs. 3 ArbZG); Ausgleich nach § 6 Abs. 5 ArbZG.\nSchichtpläne nach gesicherten arbeitswissenschaftlichen Erkenntnissen gestalten.\nJugendliche: in Bäckereien nur in den Grenzen des § 14 JArbSchG (z. B. über 16 Jahre ab 5 Uhr, über 17 Jahre ab 4 Uhr).", `§ 6 ArbZG; § 14 JArbSchG – ${PRUEFEN}`),
+  g(TRANSPORT, "Straßenverkehr: Unfälle bei der Auslieferung.", "arbeitsmittel", "Fahrzeuge mindestens jährlich durch eine sachkundige Person prüfen lassen (§ 57 DGUV Vorschrift 70); vor Fahrtbeginn Abfahrtkontrolle.\nNur geeignete, unterwiesene Fahrerinnen und Fahrer einsetzen (§ 35 DGUV Vorschrift 70); Führerscheine regelmäßig kontrollieren.\nNicht telefonieren oder Scanner bedienen während der Fahrt.", "§§ 35, 57 DGUV Vorschrift 70", "hoch"),
+  g(TRANSPORT, "Zeitdruck und lange Touren: psychische Belastung, Ermüdung.", "psychisch", "Touren realistisch planen, Pausen einplanen (§ 4 ArbZG).\nLenk- und Ruhezeiten einhalten, wo sie gelten; Rückmeldung der Fahrer zur Tourplanung einholen.", `Nutzertest Kurier – ${PRUEFEN}`),
+  g(TRANSPORT, "Ladungssicherung: verrutschende oder herabfallende Ladung.", "ablaeufe_arbeitszeit", "Ladung so verstauen und sichern, dass sie auch bei Vollbremsung oder Ausweichbewegung nicht verrutscht (§ 22 StVO); Zurrgurte, Trennnetze und Antirutschmatten bereitstellen.\nFahrer zur Ladungssicherung unterweisen.", `§ 22 StVO; VDI 2700 – ${PRUEFEN}`),
+  g(TRANSPORT, "Heben und Tragen von Paketen, Treppen: Belastung von Rücken und Gelenken.", "arbeitsmittel", "Sackkarre bzw. Treppensteiger bereitstellen; schwere Sendungen zu zweit tragen.\nUnterweisung zum rückengerechten Heben und Tragen (Lastenhandhabungsverordnung).", `LasthandhabV – ${PRUEFEN}`),
+  g(TRANSPORT, "Lastenrad: Stürze, Unfälle, Überladung.", "arbeitsmittel", "Vor dem ersten Einsatz einweisen; zulässiges Gesamtgewicht und Zuladung beachten.\nRäder regelmäßig warten (Bremsen, Beleuchtung, Reifen); Helm bereitstellen.", `Nutzertest Kurier – ${PRUEFEN}`),
+  g(TRANSPORT, "Witterung: Hitze, Kälte, Nässe und Glätte auf der Tour.", "einwirkungen", "Wetterschutzkleidung und bei Hitze Getränke bereitstellen; Sonnenschutz.\nBei Glätte Touren anpassen; Winterausrüstung der Fahrzeuge.", `Nutzertest Kurier – ${PRUEFEN}`),
+  g(TRANSPORT, "Hunde beim Zustellen: Bissverletzungen.", "sonstiges", "Grundstücke mit frei laufenden Hunden nicht betreten; Adressen an die Disposition melden.\nVerhalten gegenüber Hunden unterweisen.", `Nutzertest Kurier – ${PRUEFEN}`),
+  g(TRANSPORT, "Überfall und Gewalt (Bargeld, Wertsendungen).", "psychisch", "Möglichst bargeldlos kassieren; Bargeld nicht offen mitführen.\nVerhalten bei Überfall unterweisen; Erreichbarkeit und Notruf regeln; Betreuung nach einem Vorfall.", `Nutzertest Kurier – ${PRUEFEN}`),
+];
+
 /** Stichworte in eingetragenen Gefährdungen, die beim Mutterschutz meist Maßnahmen verlangen (R11, Tischlerei #17). */
 const MUSCH_STICHWORTE = /krebserzeugend|hartholz|holzstaub|lärm|gefahrstoff|lösemittel|biostoff|infektion|cmr/i;
 
@@ -151,7 +183,7 @@ export const gefaehrdungsbeurteilung: Vorlage = {
           titelFeld: "beschreibung",
           pflicht: true,
           leerStarten: true,
-          vorschlaege: [...GEFAEHRDUNGEN, ...GEFAEHRDUNGEN_EXTRA, ...GEFAEHRDUNGEN_R11],
+          vorschlaege: [...GEFAEHRDUNGEN, ...GEFAEHRDUNGEN_EXTRA, ...GEFAEHRDUNGEN_R11, ...GEFAEHRDUNGEN_R12],
           gruppenLabel: "Branche",
           felder: [
             { id: "beschreibung", art: "mehrzeilig", label: "Gefährdung", pflicht: true },
@@ -283,6 +315,24 @@ const UNTERWEISUNG_OPTIONEN: Option[] = [
     quelle: "DIN VDE 0105-100; DGUV Vorschrift 3",
     gruppen: ["handwerk_allgemein"],
   },
+  // R12 (Kfz #3, Bäckerei #6, Kurier #10): Themen für Werkstatt, Bäckerei und Fahrzeugführer – Gruppen aus gruppenFuerBetrieb
+  ...([
+    ["kfz_hebebuehne", "Hebebühne und Arbeitsgrube: Fahrzeuge sicher aufnehmen, Grube absichern", `DGUV Grundsatz 308-002 – ${PRUEFEN}`, "kfz_werkstatt"],
+    ["kfz_diesel", "Abgase von Dieselmotoren: Motor in der Halle nur mit Absaugung laufen lassen", "TRGS 554", "kfz_werkstatt"],
+    ["kfz_hochvolt", "Hochvolt-Fahrzeuge: Arbeiten nur mit passender Qualifikation, Spannungsfreiheit nach Herstellervorgabe", "DGUV Information 209-093", "kfz_werkstatt"],
+    ["kfz_reifen", "Reifenmontage und -befüllung: Füllgerät mit Druckbegrenzung, Füllkäfig, Radheber", `${PRUEFEN}`, "kfz_werkstatt"],
+    ["kfz_gefahrstoffe", "Bremsenreiniger, Kältemittel und Batteriesäure: Lüftung, Zündquellen, Schutzausrüstung", `GefStoffV – ${PRUEFEN}`, "kfz_werkstatt"],
+    ["kfz_druckluft", "Druckluft: nie auf Personen richten, Kleidung nicht abblasen", `${PRUEFEN}`, "kfz_werkstatt"],
+    ["baecker_mehlstaub", "Mehlstaub vermeiden: staubarm arbeiten, feucht reinigen, arbeitsmedizinische Vorsorge", `ArbMedVV; BGN – ${PRUEFEN}`, "baeckerei"],
+    ["baecker_maschinen", "Teig- und Knetmaschinen: nicht in laufende Maschinen greifen, Schutzeinrichtungen nicht überbrücken", `${PRUEFEN}`, "baeckerei"],
+    ["baecker_oefen", "Öfen, Stikkenöfen und Gärräume: Verbrennungen, Dampf, Notöffnung", `${PRUEFEN}`, "baeckerei"],
+    ["baecker_nacht", "Nachtarbeit: Untersuchung für Nachtarbeitnehmer und Ausgleich (§ 6 ArbZG)", "§ 6 ArbZG", "baeckerei"],
+    ["fahrer_eignung", "Fahrzeugführer: Eignung, Unterweisung, Abfahrtkontrolle und Verhalten bei Mängeln", `§ 35 DGUV Vorschrift 70 – ${PRUEFEN}`, "transport"],
+    ["fahrer_ladung", "Ladungssicherung: Ladung so sichern, dass sie bei Vollbremsung nicht verrutscht", "§ 22 StVO", "transport"],
+    ["fahrer_heben", "Heben und Tragen: Sackkarre, Treppen, schwere Sendungen zu zweit", `LasthandhabV – ${PRUEFEN}`, "transport"],
+    ["fahrer_lastenrad", "Lastenrad: Einweisung, Helm, Zuladung, Wartung", `${PRUEFEN}`, "transport"],
+    ["fahrer_tour", "Auf der Tour: Witterung, Hunde, Überfall – richtig verhalten", `${PRUEFEN}`, "transport"],
+  ] as const).map(([wert, text, quelle, gruppe]) => ({ wert, text, quelle, gruppen: [gruppe] })),
 ];
 
 export const unterweisung: Vorlage = {
@@ -307,7 +357,7 @@ export const unterweisung: Vorlage = {
         { id: "dauer", art: "text", label: "Dauer", vorschlaege: ["30 Minuten", "45 Minuten", "60 Minuten", "90 Minuten"] },
         { id: "durchgefuehrt_von", art: "text", label: "Durchgeführt von", vorbelegung: "verantwortlich", pflicht: true },
         // R11 (Reinigung #13): verständlich heißt auch in einer Sprache, die alle verstehen
-        { id: "sprache", art: "text", label: "Unterwiesen in Sprache", hilfe: "z. B. Deutsch oder Arabisch – die Unterweisung muss für alle verständlich sein (§ 12 Abs. 1 ArbSchG)", vorschlaege: ["Deutsch", "Englisch", "Arabisch", "Polnisch", "Rumänisch", "Türkisch", "Ukrainisch"] },
+        { id: "sprache", art: "text", label: "Unterwiesen in Sprache", hilfe: "z. B. Deutsch oder Arabisch – die Unterweisung muss für alle verständlich sein (§ 12 Abs. 1 ArbSchG)", vorschlaege: ["Deutsch", "Englisch", "Arabisch", "Dari/Farsi", "Polnisch", "Rumänisch", "Russisch", "Türkisch", "Ukrainisch"] },
         { id: "jugendliche", art: "schalter", label: "Mit Jugendlichen unter 18 Jahren", hilfe: "Dann ist die Unterweisung mindestens halbjährlich zu wiederholen (§ 29 Abs. 2 JArbSchG)" },
       ],
     },

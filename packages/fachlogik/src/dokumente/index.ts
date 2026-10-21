@@ -5,12 +5,12 @@ import { aufbewahrung, bilanzGuv, euer, kassenbuch, kassenmeldung, rechnung, ste
 import { arbeitszeitnachweis, lohnkonto, svMeldedaten } from "./lohn.js";
 import { auftragsverarbeitung, datenschutzerklaerungWebsite, impressum } from "./website.js";
 import { allergenAushang, haccp, hautschutzplan, hygieneplan, ifsgBelehrung } from "./branchen.js";
-import { anamnese, datenpanne, datenschutzDokumentation, datenschutzinformation } from "./datenschutz.js";
+import { anamnese, datenpanne, datenschutzDokumentation, datenschutzinformation, videoHinweis } from "./datenschutz.js";
 import { ausweisHinweis, kiKompetenz, nachweisArbeitsbedingungen, schluesselquittung } from "./personal.js";
 import { verfahrensdokumentation } from "./steuern.js";
 import { pdfDateiname } from "../dateinamen.js";
 import { GESTALT_MARKE, GRUNDLAGE_MARKE, RAENDER, RAENDER_MARKE, SEITE_MARKE, cent, esc, festeLeerzeichen, kennungFassen, seiteCss, zahl } from "./html.js";
-import type { Bereich, Betrieb, Daten, EinfachesFeld, Eintrag, Feld, Vorlage, Vorschlag } from "./typen.js";
+import type { Bereich, Betrieb, Daten, EinfachesFeld, Eintrag, Feld, Option, Vorlage, Vorschlag } from "./typen.js";
 
 export * from "./typen.js";
 export { ALLERGENE, DATENPANNE_RISIKO, GEFAEHRDUNGSFAKTOREN, RISIKO_STUFEN, SCHUTZZIELE } from "./konstanten.js";
@@ -22,10 +22,13 @@ export { EUER_KAPITALGESELLSCHAFT, GUTSCHRIFT_AUSWAHL, RECHNUNG_NEGATIV, RECHNUN
 // R10 Steuer
 export { NULLSATZ_HINWEIS, RECHNUNG_13B_TEXT, RECHNUNG_EU_19, RECHNUNG_GUTSCHRIFT_STEUER, RECHNUNG_KU_DRITTLAND, RECHNUNG_KU_EU, RECHNUNG_KU_IGL, RECHNUNG_KU_PROFIL, RECHNUNG_KU_RC, RECHNUNG_LEITWEG, UST_FRIST, UST_FRIST_DFV, drittlandLand, euUnternehmenLand, istNullsatzText, istOeffentlicherEmpfaenger, kuFuer } from "./buchhaltung.js";
 export { RECHNUNG_SKONTO_FALSCH, RECHNUNG_SKONTO_FRIST, RECHNUNG_SKONTO_HOCH, skontoFuer } from "./buchhaltung.js";
+// R12 UX
+export { GMBH_ANGABEN, RECHNUNG_KU_GUTSCHEIN, RECHNUNG_MONAT_ZEITRAUM, gmbhAngabenFehlen, istPrivatperson, kleinbetrag, standardAnrede } from "./buchhaltung.js";
+export { vertretungLabel } from "./html.js";
 export { istKapitalgesellschaft, mitVertretung } from "./betrieb.js";
-export { STEUERKLASSEN, arbeitsminuten, monatAus } from "./lohn.js";
+export { BESCHAEFTIGUNGSARTEN, ENTGELT_ARTEN, STEUERKLASSEN, arbeitsminuten, arbeitszeitPruefung, monatAus, monatSchluessel, stunden } from "./lohn.js";
 export { ANLAESSE, KURZ, PERSONEN_FELDER, kurztitel, kurztitelListe, naechsteNummer, personAus, personIn, personMerken, type Anlass } from "./ablauf.js";
-export { cent, zahl } from "./html.js";
+export { cent, fassungText, zahl } from "./html.js";
 
 export const BEREICHE: { id: Bereich; titel: string }[] = [
   { id: "steuern", titel: "Steuern und Buchhaltung" },
@@ -54,6 +57,7 @@ export const VORLAGEN: Vorlage[] = [
   auftragsverarbeitung,
   datenschutzinformation,
   datenpanne,
+  videoHinweis,
   // Personal
   arbeitszeitnachweis,
   nachweisArbeitsbedingungen,
@@ -100,11 +104,26 @@ export const BRANCHEN_GRUPPEN: Record<string, string[]> = {
   immobilien_finanzen: ["buero_laden"],
   // R11 (Reinigung): eigene Gruppe für Bausteine und Vorbelegungen der Gebäudereinigung
   gebaeudereinigung: ["gebaeudereinigung"],
+  // R12 (Coach #5): Unterricht, Kurse, Sport und Coaching – eigene Gruppe (Anamnese für Kurse, Einheit „Termin“)
+  unterricht_sport_coaching: ["unterricht"],
 };
 
 /** Branchengruppen eines Betriebs aus den Branchen im Pflichten-Check. */
 export function gruppenAusBranchen(branchen: unknown): string[] {
   return Array.isArray(branchen) ? [...new Set(branchen.flatMap((b) => BRANCHEN_GRUPPEN[String(b)] ?? []))] : [];
+}
+
+/**
+ * R12: Branchengruppen samt Gruppen, die der Check nicht unterscheidet – Transport (eigene Themen für Fahrzeugführer),
+ * Kfz-Werkstatt und Bäckerei (am Namen des Betriebs bzw. Handwerk mit Lebensmitteln). Für die Bausteine der App.
+ */
+export function gruppenFuerBetrieb(branchen: unknown, betriebName = ""): string[] {
+  const l = Array.isArray(branchen) ? branchen.map(String) : [];
+  const g = gruppenAusBranchen(l);
+  if (l.includes("transport_logistik")) g.push("transport");
+  if (/\b(kfz|auto|autohaus|werkstatt|reifen|karosserie|fahrzeug)/i.test(betriebName)) g.push("kfz_werkstatt");
+  if ((l.includes("handwerk") && l.includes("gastronomie_lebensmittel")) || /bäcker|backstube|konditor/i.test(betriebName)) g.push("baeckerei");
+  return [...new Set(g)];
 }
 
 /** Passt ein Baustein mit diesen Gruppen zum Betrieb? Ohne Gruppen am Baustein oder ohne bekannte Branche: ja. */
@@ -149,6 +168,11 @@ function startwert(f: EinfachesFeld, b: Betrieb, heute: string, gruppen?: readon
     case "mehrzeilig":
       // Vorbelegung nur für bestimmte Branchen (z. B. Inhaber als prüfende Elektrofachkraft im Handwerk)
       if (f.vorbelegungGruppen && !f.vorbelegungGruppen.some((g) => gruppen?.includes(g))) return "";
+      {
+        // R12: Startwert je Branche (z. B. Einheit „Pauschale“ im Salon)
+        const je = f.vorbelegungJe ? gruppen?.map((g) => f.vorbelegungJe![g]).find((w) => w !== undefined) : undefined;
+        if (je !== undefined) return je;
+      }
       if (typeof f.vorbelegung === "object") return f.vorbelegung.text;
       return f.vorbelegung === "verantwortlich" ? b.verantwortlich : f.vorbelegung === "betrieb_kontakt" ? [b.verantwortlich, b.telefon, b.email].filter((x) => x.trim()).join(", ") : "";
     case "datum":
@@ -162,8 +186,10 @@ function startwert(f: EinfachesFeld, b: Betrieb, heute: string, gruppen?: readon
       const je = f.vorbelegungJe ? gruppen?.map((g) => f.vorbelegungJe![g]).find((w) => w !== undefined) : undefined;
       return je ?? f.vorbelegung ?? null;
     }
-    case "schalter":
-      return f.vorbelegung ?? false;
+    case "schalter": {
+      const je = f.vorbelegungJe ? gruppen?.map((g) => f.vorbelegungJe![g]).find((w) => w !== undefined) : undefined;
+      return je ?? f.vorbelegung ?? false;
+    }
     case "mehrfach":
       return [];
     case "bausteine":
@@ -171,9 +197,29 @@ function startwert(f: EinfachesFeld, b: Betrieb, heute: string, gruppen?: readon
   }
 }
 
-/** Neuer Listeneintrag mit Startwerten. */
-export function neuerEintrag(f: Extract<Feld, { art: "liste" }>, b: Betrieb, heute: string): Eintrag {
-  return Object.fromEntries(f.felder.map((x) => [x.id, startwert(x, b, heute)]));
+/**
+ * Neuer Listeneintrag mit Startwerten. `gruppen`: Branchengruppen (Startwerte je Branche); `vorher`: der bisher letzte
+ * Eintrag – Felder mit `wieVorher` übernehmen dessen Wert (R12: Steuersatz der letzten Position).
+ */
+export function neuerEintrag(f: Extract<Feld, { art: "liste" }>, b: Betrieb, heute: string, gruppen?: readonly string[], vorher?: Eintrag): Eintrag {
+  return Object.fromEntries(
+    f.felder.map((x) => {
+      const alt = x.wieVorher && vorher ? vorher[x.id] : undefined;
+      return [x.id, alt !== undefined && alt !== null && alt !== "" ? alt : startwert(x, b, heute, gruppen)];
+    }),
+  );
+}
+
+/** R12: Ist ein Baustein angesichts der Eingaben sichtbar (`Option.wenn`, eine Bedingung genügt)? Gewählte zeigt die App immer. */
+export function optionSichtbar(o: Option, d: Daten | Eintrag): boolean {
+  if (!o.wenn) return true;
+  const liste = Array.isArray(o.wenn) ? o.wenn : [o.wenn];
+  return liste.some((w) => sichtbar({ id: "", label: "", art: "schalter", wenn: w }, d));
+}
+
+/** R12: Startwerte einer neuen Unterlage aus dem Pflichten-Check (`profilStart`), leer, wenn die Vorlage keine kennt. */
+export function profilStartwerte(v: Vorlage, profil: Record<string, unknown>, betrieb?: Betrieb): Daten {
+  return v.profilStart?.(profil, betrieb) ?? {};
 }
 
 /**
@@ -183,7 +229,7 @@ export function neuerEintrag(f: Extract<Feld, { art: "liste" }>, b: Betrieb, heu
 export function leereDaten(v: Vorlage, b: Betrieb, heute: string, gruppen?: readonly string[]): Daten {
   const d: Daten = {};
   for (const a of v.abschnitte)
-    for (const f of a.felder) d[f.id] = f.art === "liste" ? (f.start ? f.start.map((e) => ({ ...neuerEintrag(f, b, heute), ...e })) : f.leerStarten ? [] : [neuerEintrag(f, b, heute)]) : startwert(f, b, heute, gruppen);
+    for (const f of a.felder) d[f.id] = f.art === "liste" ? (f.start ? f.start.map((e) => ({ ...neuerEintrag(f, b, heute, gruppen), ...e })) : f.leerStarten ? [] : [neuerEintrag(f, b, heute, gruppen)]) : startwert(f, b, heute, gruppen);
   return d;
 }
 

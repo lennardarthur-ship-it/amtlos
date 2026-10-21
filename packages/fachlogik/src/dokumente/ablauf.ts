@@ -2,7 +2,10 @@
  * Hilfen für den geführten Ablauf der App (E-124): Anlässe statt Rechtsgebiete, kurze Beschreibungen in Alltagssprache,
  * gespeicherte Personen (Mitarbeiter, Kunden), fortlaufende Nummern, kurze Titel für Vorschläge.
  */
-import { STEUERKLASSEN } from "./lohn.js";
+import { BESCHAEFTIGUNGSARTEN, ENTGELT_ARTEN, STEUERKLASSEN } from "./lohn.js";
+
+/** R12: übliche Aufenthaltstitel (Vorschläge, frei änderbar). */
+const AUFENTHALTSTITEL = ["Aufenthaltserlaubnis", "Niederlassungserlaubnis", "Blaue Karte EU", "Erlaubnis zum Daueraufenthalt – EU", "Fiktionsbescheinigung", "Duldung mit Beschäftigungserlaubnis", "Aufenthaltsgestattung mit Beschäftigungserlaubnis"];
 import type { Daten, EinfachesFeld, Person, PersonAngaben, PersonenArt, Vorlage } from "./typen.js";
 
 /** Ein Satz je Vorlage, ohne Paragrafen – für Listen in der App. */
@@ -21,11 +24,12 @@ export const KURZ: Record<string, string> = {
   avv: "Vertrag mit Dienstleistern, die für dich mit Kundendaten arbeiten.",
   datenschutzinformation: "Info-Blatt für Kunden oder Mitarbeiter, was du mit ihren Daten machst.",
   datenpanne: "Wenn Daten verloren gehen oder in falsche Hände geraten.",
+  video_hinweisschild: "Schild für Kameras – mit Zweck und Speicherdauer.",
   arbeitszeitnachweis: "Arbeitszeiten deiner Mitarbeiter – auch für Minijobs.",
   // R11
   ausweis_hinweis: "Schriftlicher Hinweis auf die Ausweispflicht – mit Unterschrift.",
   schluesselquittung: "Wer welche Kundenschlüssel hat – mit Unterschrift.",
-  anamnese_einwilligung: "Gesundheitsangaben der Kundin mit Einwilligung.",
+  anamnese_einwilligung: "Gesundheitsangaben vor Behandlung, Kurs oder Training – mit Einwilligung.",
   nachweis_arbeitsbedingungen: "Die wichtigsten Arbeitsbedingungen schriftlich für neue Mitarbeiter.",
   sv_meldedaten: "Alle Angaben, die du für die Anmeldung neuer Mitarbeiter brauchst.",
   lohnkonto: "Lohn und Abzüge je Mitarbeiter über das Jahr.",
@@ -65,7 +69,7 @@ export const ANLAESSE: Anlass[] = [
   { id: "laufend", titel: "Im laufenden Betrieb", text: "Rechnungen, Kasse, Umsatzsteuer, Arbeitszeit", vorlagen: ["rechnung", "kassenbuch", "ust_voranmeldung", "arbeitszeitnachweis", "lohnkonto", "haccp"] },
   { id: "steuern", titel: "Jahresabschluss und Steuern", text: "EÜR, Bilanz, Steuererklärung, Aufbewahrung", vorlagen: ["euer", "bilanz_guv", "steuererklaerung", "ust_voranmeldung", "aufbewahrung"] },
   { id: "website", titel: "Ich mache eine Website", text: "Impressum, Datenschutzerklärung, Verträge", vorlagen: ["impressum", "datenschutzerklaerung_website", "avv"] },
-  { id: "datenschutz", titel: "Kundendaten und Datenschutz", text: "Verzeichnis, Info-Blatt, Verträge", vorlagen: ["datenschutz_dokumentation", "datenschutzinformation", "avv", "datenschutzerklaerung_website", "datenpanne", "schluesselquittung"] },
+  { id: "datenschutz", titel: "Kundendaten und Datenschutz", text: "Verzeichnis, Info-Blatt, Verträge", vorlagen: ["datenschutz_dokumentation", "datenschutzinformation", "avv", "datenschutzerklaerung_website", "datenpanne", "schluesselquittung", "anamnese_einwilligung", "video_hinweisschild"] },
   { id: "sicherheit", titel: "Sicherheit am Arbeitsplatz", text: "Gefahren, Unterweisung, Gefahrstoffe, Geräte", vorlagen: ["gefaehrdungsbeurteilung", "unterweisung", "betriebsanweisung", "gefahrstoffverzeichnis", "pruefprotokoll_elektro"] },
   { id: "gastro", titel: "Café, Restaurant, Lebensmittel", text: "Allergene, Eigenkontrollen, Hygiene", vorlagen: ["allergene", "haccp", "ifsg_belehrung"] },
   { id: "beauty", titel: "Salon und Kosmetik", text: "Hautschutz, Hygiene, Gefahrstoffe", vorlagen: ["hautschutzplan", "hygieneplan", "anamnese_einwilligung", "gefaehrdungsbeurteilung", "gefahrstoffverzeichnis", "betriebsanweisung"] },
@@ -81,8 +85,19 @@ export const PERSONEN_FELDER: Record<PersonenArt, EinfachesFeld[]> = {
     { id: "geburtsort", art: "text", label: "Geburtsort" },
     { id: "geburtsname", art: "text", label: "Geburtsname", hilfe: "falls abweichend", selten: true },
     { id: "staatsangehoerigkeit", art: "text", label: "Staatsangehörigkeit", vorschlaege: ["deutsch"] },
+    // R12 (Zoll #5): Aufenthaltstitel bei Staatsangehörigen außerhalb von EU, EWR und Schweiz – Kopie als Datei in der App
+    { id: "aufenthalt_art", art: "text", label: "Aufenthaltstitel", hilfe: "nur bei Staatsangehörigkeit außerhalb von EU, EWR und Schweiz", selten: true, wenn: { feld: "staatsangehoerigkeit", ist: ["deutsch", "Deutsch"], nicht: true }, vorschlaege: AUFENTHALTSTITEL },
+    { id: "aufenthalt_bis", art: "datum", label: "Aufenthaltstitel gültig bis", hilfe: "Amtlos erinnert auf „Heute“ rechtzeitig vor dem Ablauf", selten: true, wenn: { feld: "staatsangehoerigkeit", ist: ["deutsch", "Deutsch"], nicht: true } },
     { id: "taetigkeit", art: "text", label: "Tätigkeit" },
     { id: "beginn", art: "datum", label: "Beschäftigt seit" },
+    // R12 (Zoll #4, #8): Art, Umfang und Entgelt – für Minijob- und Mindestlohnprüfung und die Personalübersicht
+    { id: "art", art: "wahl", label: "Art der Beschäftigung", optionen: BESCHAEFTIGUNGSARTEN },
+    { id: "wochenstunden", art: "zahl", label: "Wochenstunden" },
+    { id: "entgelt_art", art: "wahl", label: "Entgelt", optionen: ENTGELT_ARTEN },
+    { id: "stundenlohn", art: "betrag", label: "Stundenlohn brutto (€)", wenn: { feld: "entgelt_art", ist: "monat", nicht: true } },
+    { id: "monatsgehalt", art: "betrag", label: "Monatsgehalt brutto (€)", wenn: { feld: "entgelt_art", ist: "monat" } },
+    { id: "sofortmeldung_am", art: "datum", label: "Sofortmeldung bestätigt am", hilfe: "für die Personalübersicht in der Kontrollmappe", selten: true },
+    { id: "ende", art: "datum", label: "Beschäftigt bis", hilfe: "Nachweise bleiben danach noch zwei Jahre aufbewahrt", selten: true },
     { id: "steuer_id", art: "text", label: "Steuer-Identifikationsnummer" },
     { id: "steuerklasse", art: "wahl", label: "Steuerklasse", optionen: STEUERKLASSEN },
     { id: "sv_nummer", art: "text", label: "Sozialversicherungsnummer" },

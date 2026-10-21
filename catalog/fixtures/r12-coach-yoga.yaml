@@ -1,0 +1,28 @@
+persona: solo_freiberufler
+beschreibung: "R12 (Nutzertest Coach): Yoga-Lehrerin seit 2023, allein – Rentenversicherungspflicht als laufende Pflicht (§ 2 S. 1 Nr. 1, § 190a SGB VI), Widerruf bei Aufträgen per Messenger (§ 312c BGB), Musik im Kurs (GEMA), Gesundheitsdaten; kein Rundfunkbeitrag ohne Betriebsstätte außerhalb der Wohnung"
+stichtag: "2026-10-21"
+fakten:
+  profil.rechtsform: freiberuf
+  profil.gruendungsdatum: "2023-03-01"
+  profil.taetigkeit.einordnung: freiberuf
+  profil.taetigkeit.branchen: [unterricht_sport_coaching]
+  profil.beschaeftigte.gesamt: 0
+  profil.rentenversicherung.pflichtgruppe: [lehrende]
+  profil.kunden.segmente: [b2c, b2b]
+  profil.vertrieb.fernabsatz: true
+  profil.oeffentliche_wiedergabe: true
+  profil.datenverarbeitung.arten: [kundendaten, gesundheitsdaten]
+  profil.betriebsstaetten.anzahl: 0
+  profil.fahrzeuge.anzahl: 0
+  profil.bundesland: BW
+erwartet:
+  gruendung.rentenversicherungspflicht: gilt
+  branche.widerruf_fernabsatz: gilt
+  branche.oeffentliche_wiedergabe: gilt
+  datenschutz.dsfa: gilt
+  gruendung.rundfunkbeitrag: gilt_nicht
+  umwelt.gewerbeabfall: gilt_nicht
+  gesellschaft.istkaufmann_pruefen: gilt_nicht
+  datenschutz.ortung: gilt_nicht
+termine_enthaelt:
+  gruendung.rentenversicherungspflicht: [["einmalig", "2023-06-01"]]

@@ -1,0 +1,35 @@
+persona: kleiner_betrieb
+beschreibung: "R12 (Nutzertest Kurier): 9 Beschäftigte, Transporter über 2,8 bis 3,5 t nur im Inland – keine EU-Lenkzeiten und keine GüKG-Erlaubnis, aber Lenkzeiten nach FPersV; Subunternehmer, Drittstaaten laufend, GPS-Ortung"
+stichtag: "2026-10-21"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2021-06-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [transport_logistik]
+  profil.beschaeftigte.gesamt: 9
+  profil.beschaeftigte.minijob: 4
+  profil.personal.sofortmeldebranchen: [spedition_logistik]
+  profil.personal.drittstaaten: true
+  profil.arbeitszeit.nachtarbeit: false
+  profil.fahrzeuge.anzahl: 6
+  profil.fahrzeuge.gesamtmasse: [2_8_bis_3_5t]
+  profil.fahrzeuge.ausland: false
+  profil.nachunternehmer: true
+  profil.datenverarbeitung.arten: [kundendaten, beschaeftigtendaten, ortung]
+  profil.betriebsstaetten.anzahl: 1
+  profil.bundesland: BE
+ereignisse:
+  - { typ: erste_einstellung, datum: "2021-06-01" }
+  - { typ: einstellung, datum: "2024-02-01" }
+erwartet:
+  branche.transport_lenkzeiten: gilt_nicht
+  branche.transport_lenkzeiten_national: gilt
+  branche.transport_erlaubnis: gilt_nicht
+  personal.nachunternehmerhaftung: gilt
+  personal.statusfeststellung_auftraggeber: gilt
+  personal.aufenthaltstitel_laufend: gilt
+  datenschutz.ortung: gilt
+  arbeitsschutz.fahrzeuge_pruefen: gilt
+  personal.fuehrerscheinkontrolle: gilt
+  personal.nachtarbeit: gilt_nicht
+  personal.arbeitszeit_milog: gilt

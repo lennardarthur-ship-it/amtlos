@@ -1,0 +1,39 @@
+persona: handwerk
+beschreibung: "R12 (Nutzertest Kfz): Werkstatt-GmbH mit 6 Beschäftigten und Azubi – Umwelt und Abfall (GewAbfV, KrWG, AltölV, Abscheider, F-Gase), Starterbatterien (§ 18 BattDG), Azubi-Schritte (§§ 14, 36 BBiG), Fahrzeuge (DGUV V70, § 21 StVG); keine Lenkzeiten unter 2,5 t"
+stichtag: "2026-10-21"
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: "2018-04-01"
+  profil.taetigkeit.branchen: [handwerk]
+  profil.handwerk.anlage: a
+  profil.gesellschaft.handelsregister: eingetragen
+  profil.beschaeftigte.gesamt: 6
+  profil.beschaeftigte.azubi: 1
+  profil.betriebsstaetten.anzahl: 1
+  profil.fahrzeuge.anzahl: 1
+  profil.fahrzeuge.gesamtmasse: [bis_2_5t]
+  profil.arbeitszeit.nachtarbeit: false
+  profil.umwelt.taetigkeiten: [gefaehrliche_abfaelle, oelverkauf, starterbatterien, klimaservice, abscheider]
+  profil.bundesland: NW
+ereignisse:
+  - { typ: erste_einstellung, datum: "2018-04-01" }
+  - { typ: einstellung, datum: "2026-08-01" }
+erwartet:
+  umwelt.gewerbeabfall: gilt
+  umwelt.gefaehrliche_abfaelle: gilt
+  umwelt.altoel_ruecknahme: gilt
+  umwelt.oelabscheider: gilt
+  umwelt.klima_sachkunde: gilt
+  produkte.starterbatterien_ruecknahme: gilt
+  personal.azubi_eintragung: gilt
+  personal.azubi_ausbildungsnachweis: gilt
+  arbeitsschutz.fahrzeuge_pruefen: gilt
+  arbeitsschutz.fahrer_unterweisung: gilt
+  personal.fuehrerscheinkontrolle: gilt
+  gruendung.rundfunkbeitrag: gilt
+  branche.transport_lenkzeiten: gilt_nicht
+  branche.transport_lenkzeiten_national: gilt_nicht
+  personal.nachtarbeit: gilt_nicht
+  branche.handwerk_gefaehrdung_gewerk: gilt
+termine_enthaelt:
+  personal.azubi_eintragung: [["aenderung-20260801", "2026-08-01"]]

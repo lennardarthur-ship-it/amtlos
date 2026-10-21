@@ -9,7 +9,7 @@ import { useNav } from "../ui/navigation";
 import { BuehnenBlatt } from "./gemeinsam";
 import { HAARLINIE, RADIUS, useFarben } from "../ui/thema";
 import { angebote, kaufAktiv, kaufen, paywallVerfuegbar, testmodus, wiederherstellen, type Angebot } from "../pro/kauf";
-import { knopfText, preisZeile } from "../pro/bezahltext";
+import { ersparnis, knopfText, naechsterMonat, preisZeile } from "../pro/bezahltext";
 import { FREI_JE_MONAT, PRO_VORTEILE, uebrig, type ProFunktion } from "../pro/regeln";
 import { useAmtlos } from "../zustand";
 import { syncAngeboten } from "../konto/konfig";
@@ -58,7 +58,8 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
     angebote()
       .then((l) => {
         setListe(l);
-        setWahl(l[0]?.id ?? null);
+        // R12 (UX #12): Jahresabo vorausgewählt
+        setWahl((l.find((a) => a.zeitraum === "jährlich") ?? l[0])?.id ?? null);
         if (!l.length) setFehler(TEXT.pro_laden_fehler);
       })
       .catch(() => {
@@ -113,6 +114,10 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
   const haupt = sortiert.slice(0, 4);
   const weitere = sortiert.slice(4);
   const rest = uebrig(z.stand.unterlagen, new Date());
+  // R12 (UX #12): „Immer kostenlos“ zugeklappt – der Pro-Nutzen steht vorn; der Ausweg ist ein eigener Knopf
+  const [freiOffen, setFreiOffen] = useState(false);
+  const spart = liste ? ersparnis(liste) : null;
+  const ausweg = grund === "pdf" && !z.pro ? TEXT.r12_pro_entwurf(naechsterMonat(new Date()), FREI_JE_MONAT) : null;
   return (
     <BuehnenBlatt
       fuss={
@@ -129,7 +134,11 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
           {z.pro ? (
             <Knopf ton text={TEXT.pro_aktiv} symbol="checkmark" onPress={nav.zurueck} stil={{ flex: 1 }} />
           ) : knopf ? (
-            <Knopf text={knopf} laedt={laedt} deaktiviert={kaufAktiv ? !wahl : !testmodus} onPress={() => void los()} stil={{ flex: 1 }} />
+            <View style={{ flex: 1, gap: 4 }}>
+              <Knopf text={knopf} laedt={laedt} deaktiviert={kaufAktiv ? !wahl : !testmodus} onPress={() => void los()} />
+              {/* R12 (UX #12): der Ausweg als zweiter Knopf – die Rechnung bleibt als Entwurf, am Monatsersten gibt es wieder freie */}
+              {ausweg ? <TextKnopf text={ausweg} onPress={nav.zurueck} stil={{ alignSelf: "center" }} /> : null}
+            </View>
           ) : (
             <Knopf ton text={TEXT.schliessen} onPress={nav.zurueck} stil={{ flex: 1 }} />
           )}
@@ -137,7 +146,8 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
       }
       // zuerst der Nutzen (B13): mehr Zeit, Steuerpaket, vorzeigbare Unterlagen – nicht Logo und Hausfarbe
       ueber={TEXT.pro_marke}
-      titel={TEXT.pro_wert_titel}
+      // R12 (UX #12): Überschrift aus dem Anlass („Rechnung 6 diesen Monat – mit Pro ohne Limit“)
+      titel={grund ? TEXT.r12_pro_anlass[grund](FREI_JE_MONAT) : TEXT.pro_wert_titel}
       unter={grund ? TEXT.pro_grund[grund](FREI_JE_MONAT) : TEXT.pro_wert_text}
     >
       {/* die vier stärksten Vorteile als Raster – der Grund, aus dem der Bezahlschirm aufging, steht vorn */}
@@ -158,7 +168,8 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
         </Karte>
       ) : null}
       <View style={{ marginTop: 10 }}>
-        <Hinweis art="erfolg" text={TEXT.pro_frei_bleibt} />
+        {freiOffen ? <Hinweis art="erfolg" text={TEXT.pro_frei_bleibt} /> : null}
+        <TextKnopf symbol={freiOffen ? "chevron.up" : "chevron.down"} erweitert={freiOffen} text={TEXT.r12_pro_frei_knopf} onPress={() => setFreiOffen(!freiOffen)} />
       </View>
       {!z.pro ? <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.pro_rest(rest, FREI_JE_MONAT)}</T> : null}
 
@@ -174,6 +185,8 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
                   <View style={{ width: 22, height: 22, borderRadius: 11, borderWidth: an ? 7 : 1.5, borderColor: an ? f.amt : f.rahmen, backgroundColor: f.blatt }} />
                   <View style={{ flex: 1 }}>
                     <T fett>{a.zeitraum ? TEXT.pro_zeitraum(a.zeitraum) : a.titel}</T>
+                    {/* R12 (UX #12): Ersparnis des Jahresabos – aus den Store-Preisen berechnet */}
+                    {a.zeitraum === "jährlich" && spart ? <T v="klein" fett farbe={f.amt}>{TEXT.r12_pro_spart(spart)}</T> : null}
                     {a.test ? <T v="klein" farbe={f.amt}>{TEXT.pro_test_zeitraum(a.test)}</T> : null}
                   </View>
                   <Betrag>{a.preis}</Betrag>

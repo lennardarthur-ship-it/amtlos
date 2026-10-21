@@ -1,0 +1,51 @@
+# R12 (Nutzertest Kfz #1): gefährliche Abfälle – Getrennthaltung, Entsorgung, Register
+schema_version: 1
+id: umwelt.gefaehrliche_abfaelle
+version: 1
+katalog_nr: U.2
+titel:
+  de: Gefährliche Abfälle getrennt halten, entsorgen und nachweisen
+kurz:
+  de: Altöl, Ölfilter, Bremsflüssigkeit, ölige Lappen und andere gefährliche Abfälle hältst du getrennt, gibst sie nur an zugelassene Entsorger und bewahrst die Nachweise auf.
+erklaerung:
+  de: Gefährliche Abfälle vermischst du nicht mit anderen Abfällen (§ 9a KrWG). Du übergibst sie einem dafür zugelassenen Entsorger und bewahrst die Belege auf, etwa Übernahmescheine oder Entsorgungsnachweise. Als Erzeuger gefährlicher Abfälle führst du ein Register über Art, Menge und Verbleib (§ 49 Abs. 3 KrWG); die Belege nach der Nachweisverordnung gehören dazu. Für kleine Mengen gelten Erleichterungen – frag deinen Entsorger oder die Abfallbehörde.
+rechtsgrundlage:
+- § 9a KrWG
+- § 49 KrWG
+- NachwV
+kategorie: umwelt
+branchen:
+- handwerk
+ausloeser:
+  feld: profil.umwelt.taetigkeiten
+  op: enthaelt
+  wert: gefaehrliche_abfaelle
+  label:
+    de: In deinem Betrieb fallen gefährliche Abfälle an.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; zugelassener Entsorger; untere Abfallbehörde
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Kreislaufwirtschaftsgesetz § 49
+  url: https://www.gesetze-im-internet.de/krwg/__49.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Neu nach Nutzertest R12 (Kfz #1) – § 9a KrWG (Vermischungsverbot) bestätigen; Kleinmengen unter 2 t im Jahr (§ 2 Abs. 2 NachwV): Nachweisführung entfällt, Übernahmescheine und Register bleiben? unsicher'
+- Folgen bei Nichterfüllung fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

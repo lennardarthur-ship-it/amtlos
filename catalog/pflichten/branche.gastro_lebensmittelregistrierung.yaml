@@ -1,17 +1,14 @@
 # Katalog H.1 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.gastro_lebensmittelregistrierung
-version: 2
+version: 3
 katalog_nr: H.1
 titel:
   de: Bei der Lebensmittelüberwachung registrieren
 kurz:
-  de: Bevor du Lebensmittel herstellst, behandelst oder verkaufst, registrierst du deinen Betrieb bei der Lebensmittelüberwachung.
+  de: Bevor du Lebensmittel herstellst, behandelst oder verkaufst, registrierst du jeden Betrieb bei der Lebensmittelüberwachung – auch jede neue Filiale.
 erklaerung:
-  de: Lebensmittelunternehmen müssen jeden Betrieb vor Beginn der Tätigkeit bei der zuständigen Behörde registrieren lassen – meist
-    beim Veterinär- und Lebensmittelüberwachungsamt des Kreises (Art. 6 Abs. 2 VO (EG) Nr. 852/2004). Stellst du selbst Lebensmittel
-    tierischen Ursprungs her oder verarbeitest sie (zum Beispiel als Metzgerei), kann statt der Registrierung eine Zulassung nötig
-    sein (Art. 4 VO (EG) Nr. 853/2004) – frag die Lebensmittelüberwachung.
+  de: Lebensmittelunternehmen müssen jeden Betrieb vor Beginn der Tätigkeit bei der zuständigen Behörde registrieren lassen – meist beim Veterinär- und Lebensmittelüberwachungsamt des Kreises (Art. 6 Abs. 2 VO (EG) Nr. 852/2004). Das gilt für jede Betriebsstätte, also auch für eine neue Filiale; wesentliche Änderungen der Tätigkeit und die Schließung eines Betriebs meldest du ebenfalls. Stellst du selbst Lebensmittel tierischen Ursprungs her oder verarbeitest sie (zum Beispiel als Metzgerei), kann statt der Registrierung eine Zulassung nötig sein (Art. 4 VO (EG) Nr. 853/2004) – frag die Lebensmittelüberwachung.
 rechtsgrundlage:
 - Art. 6 Abs. 2 Verordnung (EG) Nr. 852/2004
 - Art. 4 Verordnung (EG) Nr. 853/2004
@@ -35,7 +32,9 @@ frist:
     regel: keine
     kalender: bundeseinheitlich
 wiederholung:
-  art: einmalig
+  art: bei_aenderung
+  neu_ausloesen_bei:
+  - fakt: profil.betriebsstaetten.anzahl
 stelle:
   de: Lebensmittelüberwachung des Kreises bzw. der Stadt
 kanal: post
@@ -53,8 +52,9 @@ quellen:
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32004R0852
   abgerufen: null
 fachlich_zu_pruefen:
-- 'Frist „vor Beginn“ nach Rechtsprüfung R11 (Befund 13); laut Nutzertest nennt Art. 6 keinen Zeitpunkt – Termin vor dem Start bestätigen; Zuständigkeit beim Foodtruck (Wohnsitz oder Standort)?'
-- 'Zulassung nach Art. 4 VO (EG) Nr. 853/2004 nur als Hinweis (Eigenherstellung tierischer Erzeugnisse)'
+- 'R12 (Nutzertest Bäckerei #5): je Betrieb; neue Betriebsstätte über die Zahl der Betriebsstätten (neu_ausloesen_bei) – Filialen als eigene Objekte fehlen in der App'
+- Frist „vor Beginn“ nach Rechtsprüfung R11 (Befund 13); laut Nutzertest nennt Art. 6 keinen Zeitpunkt – Termin vor dem Start bestätigen; Zuständigkeit beim Foodtruck (Wohnsitz oder Standort)?
+- Zulassung nach Art. 4 VO (EG) Nr. 853/2004 nur als Hinweis (Eigenherstellung tierischer Erzeugnisse)
 - Zuständigkeit je Land
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation

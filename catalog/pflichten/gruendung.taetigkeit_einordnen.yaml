@@ -1,22 +1,22 @@
 # Katalog A.1 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gruendung.taetigkeit_einordnen
-version: 2
+version: 3
 katalog_nr: A.1
 titel:
   de: 'Tätigkeit einordnen: freier Beruf oder Gewerbe'
 kurz:
   de: Kläre, ob deine Tätigkeit ein freier Beruf oder ein Gewerbe ist – davon hängt ab, welche Anmeldungen du brauchst.
 erklaerung:
-  de: Ob du freiberuflich oder gewerblich tätig bist, entscheidet über die Gewerbeanzeige, die Gewerbesteuer und die Mitgliedschaft
-    in IHK oder Handwerkskammer. Solange das offen ist, kann Amtlos diese Pflichten nicht sicher bestimmen.
+  de: Ob du freiberuflich oder gewerblich tätig bist, entscheidet über die Gewerbeanzeige, die Gewerbesteuer und die Mitgliedschaft in IHK oder Handwerkskammer. Freiberuflich sind neben Berufen wie Ärztin, Architekt oder Journalistin auch unterrichtende und erzieherische Tätigkeiten (§ 18 Abs. 1 Nr. 1 EStG), etwa Kurse und Unterricht. Personal Training ohne Unterrichtscharakter kann dagegen gewerblich sein – das hängt vom Einzelfall ab. Gewerbesteuer fällt bei Einzelunternehmen und Personengesellschaften erst an, wenn der Gewerbeertrag den Freibetrag von 24.500 € übersteigt (§ 11 Abs. 1 GewStG). Solange die Einordnung offen ist, kann Amtlos diese Pflichten nicht sicher bestimmen.
 begriffe:
 - begriff:
     de: Freier Beruf
   erklaerung:
-    de: Bestimmte Tätigkeiten wie Ärztin, Architekt oder Journalistin, die kein Gewerbe sind.
+    de: Bestimmte Tätigkeiten wie Ärztin, Architekt, Journalistin oder Unterricht, die kein Gewerbe sind.
 rechtsgrundlage:
-- § 18 EStG
+- § 18 Abs. 1 Nr. 1 EStG
+- § 11 Abs. 1 GewStG
 kategorie: gruendung
 ausloeser:
   any:
@@ -55,6 +55,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/estg/__18.html
   abgerufen: null
 fachlich_zu_pruefen:
+- 'R12 (Nutzertest Coach #3, #4): unterrichtende Tätigkeit, Personal Training (Einzelfall, unsicher) und Freibetrag 24.500 € ergänzt; bei „Weiß ich nicht“ als offener Punkt „jetzt dran“'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Ist das eine Pflicht oder ein vorbereitender Schritt? Darstellung als Aufgabe bestätigen
 pruefung:

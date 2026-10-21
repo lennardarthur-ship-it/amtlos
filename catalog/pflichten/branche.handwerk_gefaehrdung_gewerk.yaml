@@ -1,15 +1,14 @@
 # Katalog H.2 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.handwerk_gefaehrdung_gewerk
-version: 2
+version: 3
 katalog_nr: H.2
 titel:
-  de: Gefährdungsbeurteilung je Gewerk
+  de: Gefährdungsbeurteilung je Gewerk und Einsatzort ergänzen
 kurz:
-  de: Im Handwerk beurteilst du die Gefährdungen je Gewerk und Einsatzort – auch auf Baustellen beim Kunden.
+  de: Im Handwerk ergänzt du die Gefährdungsbeurteilung um die Gefährdungen deines Gewerks – in der Werkstatt und bei Arbeiten beim Kunden.
 erklaerung:
-  de: Die allgemeine Gefährdungsbeurteilung wird im Handwerk je Gewerk und Tätigkeit konkretisiert – etwa für Maschinen, Stäube,
-    Lärm und Arbeiten auf Baustellen beim Kunden.
+  de: 'Das ist keine zweite Gefährdungsbeurteilung, sondern ein Teil der einen: Du konkretisierst sie je Gewerk und Tätigkeit – etwa für Maschinen, Hebebühnen, Stäube, Abgase, Lärm und Gefahrstoffe in der Werkstatt und für Arbeiten auf Baustellen oder in Wohnungen beim Kunden. Die Handlungshilfen deiner Berufsgenossenschaft helfen dabei.'
 rechtsgrundlage:
 - §§ 5, 6 ArbSchG
 kategorie: branche
@@ -41,6 +40,7 @@ sanktion:
     de: Die Folgen sind noch nicht fachlich erfasst.
   schwere: mittel
 automatisierung: dokument_generator
+einordnung: hinweis
 aktion:
   art: link
   ziel: vorlage.gefaehrdungsbeurteilung
@@ -52,6 +52,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/arbschg/__5.html
   abgerufen: null
 fachlich_zu_pruefen:
+- 'R12 (Nutzertest Kfz #12): als Hinweis zur Gefährdungsbeurteilung zusammengelegt statt doppelter Pflicht; Text nicht nur für Baustellen'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Vorlagen je Gewerk (BG-Handlungshilfen) – T-20
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen

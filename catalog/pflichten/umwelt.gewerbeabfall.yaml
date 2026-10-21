@@ -1,0 +1,49 @@
+# R12 (Nutzertest Kfz #1): Gewerbeabfallverordnung – Getrenntsammlung und Dokumentation
+schema_version: 1
+id: umwelt.gewerbeabfall
+version: 1
+katalog_nr: U.1
+titel:
+  de: Gewerbeabfälle getrennt sammeln und dokumentieren
+kurz:
+  de: Papier, Glas, Kunststoffe, Metalle, Holz, Textilien und Bioabfälle aus deinem Betrieb sammelst du getrennt und hältst fest, wie du sie entsorgst.
+erklaerung:
+  de: Wer gewerbliche Siedlungsabfälle erzeugt, sammelt Papier, Pappe und Karton, Glas, Kunststoffe, Metalle, Holz, Textilien und Bioabfälle getrennt und gibt sie vorrangig zur Vorbereitung zur Wiederverwendung oder zum Recycling weiter (§ 3 Abs. 1 GewAbfV). Die Getrenntsammlung dokumentierst du, etwa mit Lageplänen, Fotos, Liefer- oder Wiegescheinen und Entsorgungsverträgen (§ 3 Abs. 3 GewAbfV). Ist die Trennung technisch nicht möglich oder wirtschaftlich nicht zumutbar, gelten Ausnahmen, die du ebenfalls dokumentierst. Gefährliche Abfälle haben eigene Pflichten.
+rechtsgrundlage:
+- § 3 GewAbfV
+kategorie: umwelt
+ausloeser:
+  feld: profil.betriebsstaetten.anzahl
+  op: '>='
+  wert: 1
+  label:
+    de: Du hast eine Betriebsstätte außerhalb deiner Wohnung, in der gewerbliche Abfälle anfallen.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Kontrolle durch die untere Abfallbehörde
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+aktion:
+  art: abhaken
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Gewerbeabfallverordnung
+  url: https://www.gesetze-im-internet.de/gewabfv_2017/
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Neu nach Nutzertest R12 (Kfz #1, § 3 GewAbfV) – Auslöser über eine Betriebsstätte außerhalb der Wohnung; Kleinstbetriebe, die nur Behälter der Gemeinde nutzen, abgrenzen'
+- Ausnahmen (§ 3 Abs. 2) und Dokumentationsform (§ 3 Abs. 3) bestätigen; Folgen (§ 13 GewAbfV) fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

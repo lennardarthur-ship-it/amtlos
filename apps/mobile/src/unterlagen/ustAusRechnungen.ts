@@ -30,6 +30,7 @@
  * - Ersatzrechnung nach Storno über die ausdrückliche Verknüpfung (`ersetzt`, gesetzt beim Kopieren aus der stornierten
  *   Rechnung); nur bei älteren Daten ohne Verknüpfung vorsichtig geraten: gleicher Kunde, gleicher Betrag, gleiche Leistung.
  */
+import { sachentnahmenFuer, type Sachentnahme } from "@amtlos/fachlogik";
 import { eRechnungAus, fehlendeTage, istEuAusland, kassenUmsatz, kennzahlBefreiung, steuerschuldFuer, summen, ustZeitraum, vorsteuerFuer, zahlungsAnteile, type Beleg, type Betrieb, type Kassenabschluss, type RechnungsDaten } from "@amtlos/fachlogik";
 import { nichtZaehlend, type Unterlage } from "./speicher";
 
@@ -248,6 +249,10 @@ export interface KasseFuerUst {
   abschluesse: Kassenabschluss[];
   ruhetage?: number[];
   heute?: string;
+  /** R12 GoBD: Kassenüberschüsse laut Zählung (im Stapel als Erlös 19 % gebucht) */
+  ueberschuesse?: { datum: string; cent: number }[];
+  /** R12 GoBD: Sachentnahmen (unentgeltliche Wertabgaben, § 3 Abs. 1b UStG) – Kz 86/81 */
+  sachentnahmen?: Sachentnahme[];
 }
 
 /** Steuergruppen einer Rechnung mit Vorzeichen (Storno negativ). */
@@ -345,7 +350,8 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
   }, 0);
   const verteilt = ohne.igl + ohne.rc + ohne.kz21 + ohne.kz45 + ohne.kz87 + ohne.kz48 + ohne.kz43;
   // R12: Kassenumsätze nach dem Tag des Abschlusses (Netto je Monat aus dem Brutto)
-  const ka = kasse?.abschluesse.length ? kassenUmsatz(kasse.abschluesse, z.von, z.bis) : null;
+  const ka = kasse?.abschluesse.length ? kassenUmsatz(kasse.abschluesse, z.von, z.bis, false, { ueberschuesse: kasse.ueberschuesse }) : null;
+  const se = sachentnahmenFuer(kasse?.sachentnahmen ?? [], z.von, z.bis);
   return {
     vorsteuerBelege: vst.anzahl,
     ohneVorsteuer: vst.ohne,
@@ -362,8 +368,8 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
     minderungen,
     werte: {
       zeitraum: periodeText(periode),
-      umsatz_19: betragText(summe((s) => s === 19) + (ka?.je[19].netto ?? 0)),
-      umsatz_7: betragText(summe((s) => s === 7) + (ka?.je[7].netto ?? 0)),
+      umsatz_19: betragText(summe((s) => s === 19) + (ka?.je[19].netto ?? 0) + se.netto19),
+      umsatz_7: betragText(summe((s) => s === 7) + (ka?.je[7].netto ?? 0) + se.netto7),
       umsatz_igl: betragText(ohne.igl),
       umsatz_48: betragText(ohne.kz48),
       umsatz_13b: betragText(ohne.rc),

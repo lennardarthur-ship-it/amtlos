@@ -37,6 +37,8 @@ import {
   type Vorlage,
 } from "@amtlos/fachlogik";
 import { unzipSync } from "fflate";
+import { kasseKorrigieren, kassensturzSpeichern, offenerBetrag, zahlungVermerken } from "../src/unterlagen/speicher";
+import { kassenDifferenzBuchungen, skontoBuchungenBelege, kassenBuchungen as kassenBuchungenR12, type KassenInhalt } from "@amtlos/fachlogik";
 import { LEERER_STAND, anlegen, ausgeben, belegSetzen, bezahltSetzen, felderSetzen, kasseSpeichern, personSetzen, profilSetzen, steuerberatungSetzen, stornieren, type Stand, type Unterlage } from "../src/unterlagen/speicher";
 import { euerUebernahme, steuerpaket, type PaketErgebnis } from "../src/unterlagen/steuerpaket";
 import { umsaetzeFuer } from "../src/unterlagen/ustAusRechnungen";
@@ -197,6 +199,8 @@ export function standBauen(): Bau {
           id: r.id, vorlage: "rechnung", datum: r.datum, worum: r.worum, ordner: "rechnungen",
           daten: () => ({
             ...personIn(v("rechnung"), kunde),
+            // Preise im Szenario netto (seit R12 ist „brutto“ bei Café, Friseur und reinen Privatkunden vorbelegt)
+            preise_brutto: false,
             ...(r.kundeAbweichend ? { kunde_name: r.kundeAbweichend.name, kunde_anschrift: r.kundeAbweichend.anschrift } : {}),
             datum: r.datum,
             leistung_gleich: !r.leistung,
@@ -211,7 +215,8 @@ export function standBauen(): Bau {
         if (!u.festgeschrieben) auffaellig.push(`Rechnung ${r.nummer} ist nach dem Teilen nicht festgeschrieben.`);
         // R11: Ersatzrechnung wie in der App über „Kopie“ der stornierten Rechnung – sie merkt sich das Original (`ersetzt`)
         if (r.ersetzt) s = { ...s, unterlagen: s.unterlagen.map((x) => (x.id === r.id ? { ...x, ersetzt: r.ersetzt } : x)) };
-        if (r.bezahlt) s = bezahltSetzen(s, r.id, r.bezahlt, t(r.bezahlt, 15));
+        // R12 GoBD: bar an der Kasse bezahlt – die Zahlung kommt mit dem Tagesabschluss (unten)
+        if (r.bezahlt && !r.barKasse) s = bezahltSetzen(s, r.id, r.bezahlt, t(r.bezahlt, 15));
       },
     });
     if (r.storno) {
@@ -309,6 +314,7 @@ export function standBauen(): Bau {
         id: b.id, datum: b.datum, lieferant: b.lieferant, nummer: b.nummer, kategorie: b.kategorie,
         steuer: sm.jeSatz.map((x) => ({ satz: x.satz, brutto_cent: x.brutto })),
         vorsteuer: b.vorsteuer, zahlung: b.zahlung, bezahlt: b.bezahlt, notiz: b.notiz ?? null, datei: `${b.id}.pdf`, quelle: "foto", erstellt: jetzt, geaendert: jetzt,
+        ...(b.skonto ? { skonto_cent: b.skonto } : {}),
       };
       s = belegSetzen(s, beleg, t(b.datum, 18));
       belegDateien.push({ datei: `${b.id}.pdf`, html: belegHtml(b) });
@@ -321,9 +327,46 @@ export function standBauen(): Bau {
 
   // ---------------------------------------------------------------- R12: Tagesabschlüsse der Kasse (Z-Bons) für das ganze Jahr
   // wie die Inhaberin jeden Abend: Umsatz je Satz brutto, Kartenanteil, Geldtransit bzw. Privatentnahme des Tages
+  const SO = D.KASSE_SONDER;
   for (const [i, k] of D.KASSE_TAGE.entries()) {
     const bewegungen = D.KASSEN_BEWEGUNGEN_ROH.filter((b) => b.datum === k.datum).map((b) => ({ art: b.art, betrag_cent: b.betrag }));
-    [s] = kasseSpeichern(s, { datum: k.datum, zbon: String(k.zbon), umsatz: [{ satz: 19, brutto_cent: k.b19 }, { satz: 7, brutto_cent: k.b7 }], karte_cent: k.b7 + k.b19 - k.bar, sonstige_cent: 0, bewegungen, ...(i === 0 ? { anfang_cent: D.KASSE_ANFANG_JAHR } : {}) }, t(k.datum, 22), `z${k.zbon}`);
+    // R12 GoBD: Sonderfälle im November
+    const karte = k.b7 + k.b19 - k.bar;
+    const r15 = k.datum === SO.barRechnung.datum ? s.unterlagen.find((u) => u.id === SO.barRechnung.rechnung)! : null;
+    const inhalt: KassenInhalt = {
+      datum: k.datum, zbon: String(k.zbon), umsatz: [{ satz: 19, brutto_cent: k.b19 }, { satz: 7, brutto_cent: k.b7 }], karte_cent: karte, sonstige_cent: 0, bewegungen, ...(i === 0 ? { anfang_cent: D.KASSE_ANFANG_JAHR } : {}),
+      ...(k.datum === SO.trinkgeld.datum ? { karte_cent: karte + SO.trinkgeld.cent, trinkgeld_cent: SO.trinkgeld.cent } : {}),
+      ...(k.datum === SO.gutscheinVerkauf.datum ? { gutscheine: [{ vorgang: "verkauf" as const, art: "mehrzweck" as const, betrag_cent: SO.gutscheinVerkauf.mehrzweck }, { vorgang: "verkauf" as const, art: "einzweck" as const, satz: 7, betrag_cent: SO.gutscheinVerkauf.einzweck7 }] } : {}),
+      ...(k.datum === SO.gutscheinEinloesung.datum ? { gutscheine: [{ vorgang: "einloesung" as const, art: "mehrzweck" as const, betrag_cent: SO.gutscheinEinloesung.mehrzweck }, { vorgang: "einloesung" as const, art: "einzweck" as const, satz: 7, betrag_cent: SO.gutscheinEinloesung.einzweck7 }] } : {}),
+      ...(r15 ? { rechnungen_bar: [{ id: r15.id, nummer: String(r15.daten.nummer), betrag_cent: offenerBetrag(s, r15) }] } : {}),
+      ...(k.datum === SO.zaehlung.datum ? { gezaehlt_cent: D.KASSE_GEZAEHLT() } : {}),
+    };
+    if (k.datum === SO.korrektur.datum) {
+      // zuerst mit 10 € zu wenig Karte gespeichert, am nächsten Morgen mit Grund korrigiert
+      [s] = kasseSpeichern(s, { ...inhalt, karte_cent: karte - SO.korrektur.karteZuWenig }, t(k.datum, 22), `z${k.zbon}`);
+      s = kasseKorrigieren(s, `z${k.zbon}`, inhalt, SO.korrektur.grund, new Date(t(k.datum, 8).getTime() + 864e5));
+    } else [s] = kasseSpeichern(s, inhalt, t(k.datum, 22), `z${k.zbon}`);
+    // wie „Tagesabschluss speichern“ in der App: bar kassierte Rechnung an der Rechnung vermerken
+    if (r15) s = zahlungVermerken(s, r15.id, { datum: k.datum, betrag_cent: inhalt.rechnungen_bar![0]!.betrag_cent }, t(k.datum, 22));
+    // Kassensturz am Morgen des Zähltags (Zählprotokoll für die Kassennachschau)
+    if (k.datum === SO.kassensturz.datum) [s] = kassensturzSpeichern(s, { gezaehlt_cent: 41230, stueckelung: { "5000": 4, "2000": 6, "1000": 7, "500": 5, "200": 8, "100": 12, "50": 10, "20": 15, "10": 6, "5": 4, "2": 5, "1": 2 }, anwesend: "Jana Weber" }, t(k.datum, 9), "sturz1");
+  }
+  {
+    // R12 GoBD: Sonderfälle prüfen
+    const v = kassenVerlauf(s.kasse, s.belege);
+    const kor = s.kasse.find((x) => x.datum === SO.korrektur.datum)!;
+    vergleichText("Kasse (R12 GoBD)", "Korrektur mit Grund in der Historie", kor.historie?.[0]?.grund ?? "–", SO.korrektur.grund);
+    vergleichText("Kasse (R12 GoBD)", "Kassendifferenz am Zähltag (Überschuss)", String(v.differenzen.find((d) => d.datum === SO.zaehlung.datum)?.cent ?? 0), String(SO.zaehlung.ueberschuss));
+    vergleichText("Kasse (R12 GoBD)", "Rechnung 2026-015 nach der Barzahlung bezahlt", s.unterlagen.find((u) => u.id === SO.barRechnung.rechnung)!.bezahlt ?? "offen", SO.barRechnung.datum);
+    const kb = kassenbuchDaten(s.kasse, s.belege, "2026-11")!;
+    vergleichText("Kasse (R12 GoBD)", "Kassenbuch November: Trinkgeld, bar kassierte Rechnung, Korrektur, Überschuss", [kb.eintraege.some((e) => e.text!.startsWith("Kartentrinkgeld")), kb.eintraege.some((e) => e.beleg === "RE 2026-015"), kb.eintraege.some((e) => e.text!.includes("korrigiert am")), kb.eintraege.some((e) => e.text!.includes("Überschuss"))].every(Boolean) ? "ja" : "nein", "ja");
+    const b = [...kassenBuchungenR12(s.kasse.filter((x) => x.datum.startsWith("2026-11")), "SKR03"), ...kassenDifferenzBuchungen(v.differenzen, "SKR03")];
+    const hat = (konto: string, gegen: string, betrag?: number) => b.some((x) => x.konto === konto && x.gegenkonto === gegen && (betrag === undefined || x.betrag_cent === betrag));
+    vergleichText("Kasse (R12 GoBD)", "Stapel: Trinkgeld 1360 an 1000, Mehrzweck-Gutschein an 1700 (Verkauf) und 1700 an Erlöse (Einlösung), Überschuss 1000 an 8400, Barzahlung 1000 an 1410", [hat("1360", "1000", SO.trinkgeld.cent), b.filter((x) => x.gegenkonto === "1700").reduce((a, x) => a + x.betrag_cent, 0) === SO.gutscheinVerkauf.mehrzweck, b.filter((x) => x.konto === "1700").reduce((a, x) => a + x.betrag_cent, 0) === SO.gutscheinEinloesung.mehrzweck, hat("1000", "8400", SO.zaehlung.ueberschuss), hat("1000", "1410")].every(Boolean) ? "ja" : "nein", "ja");
+    vergleichText("Kasse (R12 GoBD)", "Stapel: Kartenzahlungen direkt Geldtransit an Erlöse (keine Buchung Geldtransit an Kasse außer Bank und Trinkgeld)", b.some((x) => x.konto === "1360" && x.gegenkonto === "1000" && x.buchungstext.startsWith("Kartenzahlungen")) ? "nein" : "ja", "ja");
+    const sk = skontoBuchungenBelege(s.belege.filter((x) => x.skonto_cent), "SKR03");
+    vergleichText("Beleg b33 (R12 GoBD)", "erhaltenes Skonto auf Wartung gegen das Aufwandskonto 4900 mit BU 9", sk.map((x) => `${x.konto}→${x.gegenkonto} BU ${x.bu_schluessel} ${x.betrag_cent}`).join(", "), "1610→4900 BU 9 1142");
+    vergleichText("Kasse (R12 GoBD)", "Kassensturz mit Zählprotokoll gespeichert", String(s.kassenstuerze.length), "1");
   }
   {
     const v = kassenVerlauf(s.kasse, s.belege);
@@ -657,7 +700,7 @@ export function standBauen(): Bau {
         vergleich("EÜR-Übernahme", `Kategorie ${titel}`, zeile ? ausEuro(zeile.betrag ?? "0") : 0, w.betrag);
       }
       if (uebernahme.anlagen !== 1) auffaellig.push(`EÜR-Übernahme meldet ${uebernahme.anlagen} Anlagen statt 1.`);
-      if (uebernahme.unbezahlt !== 1) infos.push(`EÜR-Übernahme meldet ${uebernahme.unbezahlt} unbezahlte Rechnungen des Jahres (erwartet 2: 2026-015 überfällig, 2026-016 bezahlt 2027 – die App zählt nur Rechnungen ohne Zahlungsvermerk).`);
+      if (uebernahme.unbezahlt !== 1) infos.push(`EÜR-Übernahme meldet ${uebernahme.unbezahlt} unbezahlte Rechnungen des Jahres (erwartet 1: 2026-016 bezahlt 2027 – die App zählt nur Rechnungen ohne Zahlungsvermerk; 2026-015 wurde bar an der Kasse bezahlt).`);
       // Kategorien der Übernahme gegen die Vorschlagsliste der EÜR-Vorlage
       const vsA = (feld("euer", "ausgaben").felder.find((f) => f.id === "kategorie") as { vorschlaege?: string[] }).vorschlaege ?? [];
       const vsE = (feld("euer", "einnahmen").felder.find((f) => f.id === "kategorie") as { vorschlaege?: string[] }).vorschlaege ?? [];

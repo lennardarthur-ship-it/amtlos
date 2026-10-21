@@ -24,10 +24,10 @@ describe("Arbeitszeitnachweis (Reinigung #9, #10)", () => {
     expect(html("arbeitszeitnachweis", { name: "Amira", tage })).toContain("<th>Einsatzort</th>");
     expect(html("arbeitszeitnachweis", { name: "Amira", tage: [tage[1]!] })).not.toContain("<th>Einsatzort</th>");
   });
-  it("weist auf Arbeitstage vor „Beschäftigt seit“ hin", () => {
-    const h = v("arbeitszeitnachweis").hinweise!({ name: "Amira", beschaeftigt_seit: "2026-11-01", tage }, B);
-    expect(h[0]).toMatch(/^2 Arbeitstage \(ab 05\.10\.2026\) liegen vor „Beschäftigt seit“ \(01\.11\.2026\)/);
-    expect(v("arbeitszeitnachweis").hinweise!({ name: "Amira", beschaeftigt_seit: "2026-10-01", tage }, B)).toEqual([]);
+  it("Arbeitstage vor „Beschäftigt seit“ sind ein Fehler (R12: nicht nur ein Hinweis)", () => {
+    const f = v("arbeitszeitnachweis").pruefen!({ name: "Amira", beschaeftigt_seit: "2026-11-01", tage }, B);
+    expect(f.at(-1)).toMatch(/^2 Arbeitstage \(ab 05\.10\.2026\) liegen vor „Beschäftigt seit“ \(01\.11\.2026\)/);
+    expect(v("arbeitszeitnachweis").pruefen!({ name: "Amira", beschaeftigt_seit: "2026-10-01", tage }, B)).toEqual([]);
   });
   it("Satz zur Aufzeichnungspflicht nach der Branche aus dem Profil", () => {
     expect(leereDaten(v("arbeitszeitnachweis"), B, "2026-10-20", ["gebaeudereinigung"]).branche).toBe("gebaeudereinigung");

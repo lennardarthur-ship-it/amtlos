@@ -61,8 +61,11 @@ describe("Rechnungen nach GoBD (E-127)", () => {
     // Fußleiste (im PDF auf jeder Seite, sonst am Ende): Sitz, Register, Geschäftsführung
     expect(html).toContain("Sitz München, Amtsgericht München HRB 123456");
     expect(html).toContain("Geschäftsführung: Robin Beispiel");
-    expect(html).toContain("Leistungsdatum");
-    expect(html).not.toContain("= Rechnungsdatum");
+    // R12 (Coach #6): die Kleinbetragsrechnung (bis 250 €) kommt ohne Leistungsdatum aus – ab 250 € steht es ausgeschrieben da
+    expect(html).not.toContain("Leistungsdatum");
+    const gross = dokumentHtml(vorlageFuer("rechnung")!, { ...s.unterlagen[0]!.daten, positionen: [{ bezeichnung: "Catering", menge: "1", einheit: "", preis: "300,00", satz: "19" }] }, B);
+    expect(gross).toContain("Leistungsdatum");
+    expect(gross).not.toContain("= Rechnungsdatum");
   });
 
   it("erkennt doppelte Nummern und nimmt die Kleinunternehmer-Angabe aus dem Check", () => {

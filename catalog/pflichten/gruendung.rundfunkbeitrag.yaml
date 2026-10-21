@@ -1,28 +1,39 @@
 # Katalog A.9 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gruendung.rundfunkbeitrag
-version: 1
+version: 2
 katalog_nr: A.9
 titel:
-  de: Rundfunkbeitrag für die Betriebsstätte anmelden
+  de: Rundfunkbeitrag für Betriebsstätten und Firmenfahrzeuge zahlen
 kurz:
-  de: Melde deine Betriebsstätte beim Beitragsservice für den Rundfunkbeitrag an.
+  de: Für jede Betriebsstätte außerhalb deiner Wohnung und für Firmenfahrzeuge zahlst du Rundfunkbeitrag – du meldest sie an und meldest Änderungen.
 erklaerung:
-  de: Für Betriebsstätten fällt der Rundfunkbeitrag an. Die Anmeldung machst du beim Beitragsservice.
+  de: 'Im nicht privaten Bereich zahlst du für jede Betriebsstätte einen Rundfunkbeitrag, gestaffelt nach der Zahl der Beschäftigten: mit bis zu acht Beschäftigten ein Drittel des Beitrags, mit neun bis 19 Beschäftigten einen ganzen Beitrag, mit mehr Beschäftigten entsprechend mehr (§ 5 Abs. 1 RBStV). Ein Arbeitsraum in deiner eigenen Wohnung ist frei, wenn für die Wohnung schon Rundfunkbeitrag gezahlt wird (§ 5 Abs. 5 Nr. 3 RBStV). Für betrieblich genutzte Kraftfahrzeuge zahlst du je Fahrzeug ein Drittel des Beitrags; je beitragspflichtiger Betriebsstätte ist ein Fahrzeug frei (§ 5 Abs. 2 Nr. 2 RBStV). Den Beginn, neue Betriebsstätten und Fahrzeuge sowie Änderungen meldest du dem Beitragsservice (§ 8 RBStV).'
 rechtsgrundlage:
-- Rundfunkbeitragsstaatsvertrag
+- § 5 RBStV
+- § 8 RBStV
 kategorie: gruendung
 ausloeser:
-  feld: profil.betriebsstaetten.anzahl
-  op: '>='
-  wert: 1
-  label:
-    de: Du hast mindestens eine Betriebsstätte.
-phase: gruendung
+  any:
+  - feld: profil.betriebsstaetten.anzahl
+    op: '>='
+    wert: 1
+    label:
+      de: Du hast mindestens eine Betriebsstätte außerhalb deiner Wohnung.
+  - feld: profil.fahrzeuge.anzahl
+    op: '>='
+    wert: 1
+    label:
+      de: Du nutzt Firmenfahrzeuge.
+# R12 (Rechtsprüfung Befund 7, Nutzertests Bäckerei #4, Kfz #9): laufende Beitragspflicht, kein einmaliger Gründungsschritt
 frist:
   typ: dauerhaft
 wiederholung:
-  art: einmalig
+  art: bei_aenderung
+  neu_ausloesen_bei:
+  - fakt: profil.betriebsstaetten.anzahl
+  - fakt: profil.fahrzeuge.anzahl
+  - fakt: profil.beschaeftigte.gesamt
 stelle:
   de: ARD ZDF Deutschlandradio Beitragsservice
 kanal: portal
@@ -32,6 +43,10 @@ sanktion:
     de: Die Folgen sind noch nicht fachlich erfasst.
   schwere: mittel
 automatisierung: hinweis
+erledigung:
+  art: bestaetigen
+  bestaetigung:
+    de: Beim Beitragsservice angemeldet
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -39,12 +54,15 @@ quellen:
 - titel: Rundfunkbeitrag für Unternehmen
   url: https://www.rundfunkbeitrag.de/
   abgerufen: null
+- titel: Rundfunkbeitragsstaatsvertrag § 5 (Bayern.Recht)
+  url: https://www.gesetze-bayern.de/Content/Document/RBeitrStV-5
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
+- 'R12 (Rechtsprüfung Befund 7, T-101): Wohnung frei (§ 5 Abs. 5 Nr. 3), Kfz (§ 5 Abs. 2 Nr. 2), Staffel (§ 5 Abs. 1) – Wortlaut über Bayern.Recht geprüft; laufende Pflicht je Betriebsstätte statt Gründungsschritt'
+- Anzeigepflichten nach § 8 RBStV (Frist, jährliche Meldung geänderter Beschäftigtenzahlen?) bestätigen; Hotel- und Gästezimmer (§ 5 Abs. 2 Nr. 1) nicht abgebildet
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Gilt auch für Arbeitsräume in der eigenen Wohnung?
 - Höhe nach Zahl der Beschäftigten – Staffel als Regelwert?
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf
   geprueft_von: null

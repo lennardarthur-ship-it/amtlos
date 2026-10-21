@@ -1,0 +1,58 @@
+# R12 (Rechtsprüfung Befund 3): Jugendschutzgesetz – Aushang
+schema_version: 1
+id: branche.jugendschutz_aushang
+version: 1
+katalog_nr: H.1
+titel:
+  de: Jugendschutzgesetz aushängen
+kurz:
+  de: In Gaststätten und Verkaufsstellen mit Alkohol oder Tabak hängst du die Jugendschutzvorschriften gut sichtbar aus.
+erklaerung:
+  de: Gewerbetreibende machen die für ihren Betrieb geltenden Vorschriften des Jugendschutzgesetzes durch einen deutlich sichtbaren und gut lesbaren Aushang bekannt (§ 3 Abs. 1 JuSchG) – in Gaststätten etwa die Regeln zum Aufenthalt von Kindern und Jugendlichen (§ 4 JuSchG), beim Verkauf von Alkohol und Tabak die Abgabeverbote (§§ 9, 10 JuSchG). Fertige Aushänge gibt es bei Kammern und Verbänden.
+rechtsgrundlage:
+- § 3 Abs. 1 JuSchG
+kategorie: branche
+branchen:
+- gastronomie_lebensmittel
+ausloeser:
+  any:
+  - feld: profil.erlaubnis.gaststaette
+    op: ==
+    wert: true
+    label:
+      de: Du betreibst eine Gaststätte.
+  - feld: profil.verkauf.alkohol_tabak
+    op: enthaelt_eines
+    wert:
+    - alkohol
+    - tabak
+    label:
+      de: Du verkaufst oder schenkst Alkohol oder Tabak aus.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Kontrolle durch Ordnungsamt bzw. Jugendamt
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Bußgeld bis 50.000 € (§ 28 Abs. 1 Nr. 1, Abs. 5 JuSchG).
+  schwere: mittel
+automatisierung: hinweis
+aktion:
+  art: abhaken
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Jugendschutzgesetz § 28 (lxgesetze)
+  url: https://lxgesetze.de/juschg/28
+  abgerufen: '2026-10-21'
+fachlich_zu_pruefen:
+- Neu nach Rechtsprüfung R12 (Befund 3) – Bußgeldrahmen § 28 Abs. 5 JuSchG über lxgesetze geprüft; Aushang auch für Verkaufsstellen ohne Alkohol und Tabak (§§ 11–13 JuSchG) nicht abgebildet
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

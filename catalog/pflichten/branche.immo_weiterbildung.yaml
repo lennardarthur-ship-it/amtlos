@@ -1,15 +1,14 @@
 # Katalog H.8 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.immo_weiterbildung
-version: 1
+version: 2
 katalog_nr: H.8
 titel:
   de: Weiterbildungspflicht (Immobilien und Finanzen)
 kurz:
   de: Für bestimmte erlaubnispflichtige Tätigkeiten gilt eine regelmäßige Weiterbildungspflicht – nur wo sie noch gilt.
 erklaerung:
-  de: Betroffen sind etwa Immobilienmakler, Wohnimmobilienverwalter und Versicherungsvermittler. Umfang und Nachweis regelt
-    die jeweilige Vorschrift.
+  de: Immobilienmakler und Wohnimmobilienverwalter bilden sich innerhalb von drei Kalenderjahren 20 Stunden weiter (§ 34c Abs. 2a GewO), Versicherungsvermittler 15 Stunden je Kalenderjahr (§ 34d Abs. 9 GewO). Die Nachweise bewahrst du auf und legst sie der Behörde auf Verlangen vor.
 rechtsgrundlage:
 - § 34c Abs. 2a GewO
 - § 34d Abs. 9 GewO
@@ -52,8 +51,9 @@ quellen:
   url: https://www.gesetze-im-internet.de/gewo/__34c.html
   abgerufen: null
 fachlich_zu_pruefen:
+- 'R12 (Rechtsprüfung Befund 6): Stunden ergänzt (§ 34c Abs. 2a: 20 Std. in 3 Jahren, § 34d Abs. 9: 15 Std. je Jahr); § 34f im Auslöser – eine gesetzliche Weiterbildungspflicht nach § 34f ist der Rechtsprüfung nicht bekannt, prüfen'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- „nur wo noch geltend“ – aktuellen Stand je Vorschrift prüfen
+- '„nur wo noch geltend“ – aktuellen Stand je Vorschrift prüfen'
 - Umfang (Stunden) und Zeitraum als Regelwerte
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation

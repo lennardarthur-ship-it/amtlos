@@ -146,7 +146,25 @@ export function AnlassSeite({ a }: { a: Anlass }) {
   );
 }
 
-export { Suchfeld };
+/**
+ * R12 (UX #21): Suchfeld im Tab „Unterlagen“ – „Kontrolle“, „Zoll“ oder „Nachweis“ finden dort die Kontrollmappe wie in
+ * „Neu erstellen“ (dieselbe Regel `KONTROLLE`), statt „Nichts gefunden“.
+ */
+function SuchfeldUnterlagen(props: React.ComponentProps<typeof Suchfeld>) {
+  const nav = useNav();
+  const s = props.wert.trim().toLowerCase();
+  return (
+    <View>
+      <Suchfeld {...props} />
+      {s && KONTROLLE.test(s) ? (
+        <Karte stil={{ marginTop: 10 }}>
+          <Zeile symbol="folder" ton="blau" titel={TEXT.kontrollmappe_zeile} text={TEXT.r11_mappe_zeile_kurz} onPress={() => nav.oeffnen("kontrollmappe", () => <KontrollmappeSeite />)} letzte />
+        </Karte>
+      ) : null}
+    </View>
+  );
+}
+export { SuchfeldUnterlagen as Suchfeld };
 
 const passt = (s: string) => (v: Vorlage) => !s || `${v.titel} ${KURZ[v.id] ?? ""} ${v.beschreibung}`.toLowerCase().includes(s);
 

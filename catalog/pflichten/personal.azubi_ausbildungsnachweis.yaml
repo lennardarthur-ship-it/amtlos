@@ -1,0 +1,62 @@
+# R12 (Nutzertest Kfz #10): Ausbildungsnachweis durchsehen (§ 14 Abs. 2 BBiG)
+schema_version: 1
+id: personal.azubi_ausbildungsnachweis
+version: 1
+katalog_nr: D.45
+titel:
+  de: Ausbildungsnachweis regelmäßig durchsehen
+kurz:
+  de: Du hältst Auszubildende an, ihren Ausbildungsnachweis zu führen, und siehst ihn regelmäßig durch.
+erklaerung:
+  de: Auszubildende führen einen schriftlichen oder elektronischen Ausbildungsnachweis (§ 13 S. 2 Nr. 7 BBiG). Als Ausbildender hältst du sie dazu an, gibst ihnen Gelegenheit, ihn während der Ausbildungszeit zu führen, und siehst ihn regelmäßig durch (§ 14 Abs. 2 BBiG). Der Nachweis ist Voraussetzung für die Zulassung zur Abschlussprüfung.
+rechtsgrundlage:
+- § 14 Abs. 2 BBiG
+- § 13 BBiG
+kategorie: personal
+branchen:
+- handwerk
+ausloeser:
+  all:
+  - feld: profil.beschaeftigte.azubi
+    op: '>='
+    wert: 1
+    label:
+      de: Du bildest aus.
+  - ereignis: einstellung
+    op: eingetreten
+    label:
+      de: Du stellst jemanden ein.
+frist:
+  typ: relativ
+  bezug:
+    ereignis: einstellung
+  versatz: P0D
+  zeitpunkt: spaetestens
+  je_ereignis: true
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: niedrig
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Berufsbildungsgesetz § 14
+  url: https://www.gesetze-im-internet.de/bbig_2005/__14.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Neu nach Nutzertest R12 (Kfz #10) – „regelmäßig“ ohne festen Abstand; Folgen fachlich ergänzen'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

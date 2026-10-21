@@ -1,0 +1,52 @@
+# R12 (Nutzertest Kurier #8): GPS- und Telematik-Ortung
+schema_version: 1
+id: datenschutz.ortung
+version: 1
+katalog_nr: F.63
+titel:
+  de: Ortung von Fahrzeugen und Beschäftigten datenschutzgerecht gestalten
+kurz:
+  de: Ortest du Fahrzeuge oder Beschäftigte per GPS oder Telematik, brauchst du eine Rechtsgrundlage, informierst die Betroffenen, legst Zweck und Löschfrist fest und schließt mit dem Anbieter einen Vertrag.
+erklaerung:
+  de: Ortungsdaten von Fahrzeugen, die Beschäftigte fahren, sind personenbezogene Daten. Du brauchst dafür eine Rechtsgrundlage, etwa die Erfüllung des Vertrags oder ein berechtigtes Interesse wie Tourenplanung, Diebstahlschutz oder Nachweise gegenüber Kunden (Art. 6 Abs. 1 Buchst. b oder f DSGVO), und wägst die Interessen der Beschäftigten ab. Lege fest, wofür du die Daten nutzt, und verwende sie nur dafür (Art. 5 Abs. 1 Buchst. b DSGVO); eine dauerhafte Leistungs- und Verhaltenskontrolle ist in der Regel unzulässig, in Pausen und Freizeit sollte die Ortung aus sein. Informiere die Beschäftigten vorher (Art. 13 DSGVO), lege eine Löschfrist fest und schließe mit dem Telematik-Anbieter einen Vertrag zur Auftragsverarbeitung (Art. 28 DSGVO). Ob eine Datenschutz-Folgenabschätzung nötig ist, prüfst du gesondert.
+rechtsgrundlage:
+- Art. 6 Abs. 1 DSGVO
+- Art. 5 Abs. 1 DSGVO
+- Art. 13 DSGVO
+- Art. 28 DSGVO
+kategorie: datenschutz
+branchen:
+- transport_logistik
+ausloeser:
+  feld: profil.datenverarbeitung.arten
+  op: enthaelt
+  wert: ortung
+  label:
+    de: Du ortest Fahrzeuge oder Beschäftigte.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Datenschutz-Grundverordnung
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Neu nach Nutzertest R12 (Kurier #8) – Rechtsgrundlage (§ 26 BDSG nach EuGH C-34/21 zweifelhaft) und DSFA (Muss-Liste der Datenschutzkonferenz, Ortung von Beschäftigten) unsicher'
+- Ohne Betriebsrat keine Betriebsvereinbarung – Rechtsgrundlage muss trotzdem tragen; Zustelldaten (Empfänger, Unterschrift, Foto) nicht abgebildet
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

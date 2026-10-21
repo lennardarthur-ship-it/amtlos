@@ -35,4 +35,4 @@ termine_enthaelt:
   # Rentenversicherung: drei Monate nach Beginn
   gruendung.rentenversicherungspflicht: [["einmalig", "2027-04-01"]]
 fehlende_fakten:
-  gruendung.rundfunkbeitrag: [profil.betriebsstaetten.anzahl]
+  gruendung.rundfunkbeitrag: [profil.betriebsstaetten.anzahl, profil.fahrzeuge.anzahl]

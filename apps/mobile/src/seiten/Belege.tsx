@@ -1,6 +1,6 @@
 import { memo, useEffect, useRef, useState } from "react";
 import { Image, Linking, View } from "react-native";
-import { KATEGORIEN, STEUERSAETZE, STEUERSCHULD_ARTEN, ZAHLUNGSWEGE, belegAusERechnung, belegGezahlt, belegSummen, cent, eRechnungAusPdf, eRechnungLesen, kaeuferFremd, kategorieFuer, steuerschuldBetrag, type Beleg } from "@amtlos/fachlogik";
+import { KATEGORIEN, STEUERSAETZE, STEUERSCHULD_ARTEN, ZAHLUNGSWEGE, belegAusERechnung, belegGezahlt, belegSummen, cent, eRechnungAusPdf, eRechnungLesen, kaeuferFremd, kategorieFuer, steuerschuldBetrag, zeitDe, type Beleg } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { regelwert } from "../pflichten/check";
 import { AuswahlZeile } from "../ui/auswahlseite";
@@ -179,7 +179,15 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
   const nav = useNav();
   const melden = useMeldung();
   const f = useFarben();
-  const b = z.stand.belege.find((x) => x.id === id);
+  const gespeichert = z.stand.belege.find((x) => x.id === id);
+  // R12 GoBD: festgeschriebener Beleg – Änderungen nur als Korrektur mit Grund (Entwurf bis „Korrektur speichern“)
+  const [entwurf, setEntwurf] = useState<Beleg | null>(null);
+  const [grund, setGrund] = useState("");
+  const [grundFehler, setGrundFehler] = useState(false);
+  const [ungueltigGrund, setUngueltigGrund] = useState("");
+  const fest = Boolean(gespeichert?.festgeschrieben);
+  const gesperrt = fest && !entwurf;
+  const b = entwurf ?? gespeichert;
   const zRef = useRef(z);
   zRef.current = z;
   // Betragsfelder als Text, damit Eingaben wie „12,“ nicht verloren gehen
@@ -198,7 +206,15 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
     [id, neu],
   );
   if (!b) return <Unterseite titel="">{null}</Unterseite>;
-  const setze = (werte: Partial<Beleg>) => z.belegSetzen({ ...b, ...werte });
+  const setze = (werte: Partial<Beleg>) => (fest ? (entwurf ? setEntwurf({ ...entwurf, ...werte }) : undefined) : void z.belegSetzen({ ...b, ...werte }));
+  const korrekturSpeichern = () => {
+    if (!entwurf) return;
+    if (!z.belegSetzen(entwurf, grund)) return setGrundFehler(true);
+    melden(TEXT.r12g_beleg_korrigiert);
+    setEntwurf(null);
+    setGrund("");
+    setGrundFehler(false);
+  };
   const s = belegSummen(b);
   const k = kategorieFuer(b.kategorie);
   const betragSetzen = (i: number, text: string) => {
@@ -216,6 +232,12 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
         </View>
       }
       fuss={
+        entwurf ? (
+          <Fuss ueber={<Feld label={TEXT.r12g_beleg_grund} hilfe={TEXT.r12g_beleg_grund_hilfe} wert={grund} aendern={(w) => { setGrund(w); setGrundFehler(false); }} fehler={grundFehler ? TEXT.r12g_grund_kurz : null} />}>
+            <Knopf ton text={TEXT.abbrechen} onPress={() => { setEntwurf(null); setGrund(""); }} stil={{ flex: 1 }} />
+            <Knopf symbol="checkmark" text={TEXT.r12g_beleg_korrektur_speichern} onPress={korrekturSpeichern} stil={{ flex: 1 }} />
+          </Fuss>
+        ) :
         <Fuss>
           <Knopf
             text={TEXT.fertig}
@@ -232,7 +254,12 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
       }
     >
         <DateiVorschau b={b} />
+        {/* R12 GoBD: feste Belegnummer und Erfassungszeitpunkt; festgeschrieben nur mit Grund änderbar */}
+        {b.nr ? <T v="caption" leise stil={{ marginTop: 6 }}>{TEXT.r12g_beleg_nr(b.nr, zeitDe(b.erstellt))}</T> : null}
+        {fest && gespeichert?.festgeschrieben ? <Hinweis art="info" symbol="lock" text={TEXT.r12g_beleg_fest(zeitDe(gespeichert.festgeschrieben))} /> : null}
+        {gesperrt ? <Knopf ton symbol="pencil" text={TEXT.r12g_beleg_korrigieren} onPress={() => setEntwurf(gespeichert!)} stil={{ marginTop: 8 }} /> : null}
         {b.quelle === "erechnung" ? <Hinweis art="erfolg" text={TEXT.beleg_aus_erechnung} /> : null}
+        <View pointerEvents={gesperrt ? "none" : "auto"} style={gesperrt ? { opacity: 0.6 } : undefined}>
         <Feld label={TEXT.beleg_lieferant} wert={b.lieferant} aendern={(w) => setze({ lieferant: w })} placeholder="z. B. Friseurbedarf Müller" />
         {/* R11 (Kosmetik #8): Belegdatum in der Kleinunternehmerzeit – Vorsteuer aus (lässt sich wieder einschalten) */}
         <DatumFeld label={TEXT.beleg_datum} hilfe={TEXT.beleg_datum_hilfe} wert={b.datum} aendern={(d) => d && setze(kuBis && d <= kuBis && d !== b.datum && b.vorsteuer ? { datum: d, vorsteuer: false } : { datum: d })} />
@@ -289,7 +316,16 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
             )}
           </View>
         ) : null}
-        <TextKnopf
+        </View>
+        {/* R12 GoBD: Änderungsprotokoll des Belegs */}
+        {b.historie?.length ? (
+          <View style={{ marginTop: 18, gap: 4 }}>
+            <T v="klein" fett accessibilityRole="header">{TEXT.r12g_beleg_protokoll}</T>
+            {[...b.historie].reverse().map((h) => <T key={h.bis} v="caption" leise>{TEXT.r12g_beleg_fassung(zeitDe(h.bis), `${h.lieferant || "ohne Lieferant"}, ${euro(h.steuer.reduce((a, x) => a + x.brutto_cent, 0))}, ${kategorieFuer(h.kategorie).titel}`, h.grund ?? null)}</T>)}
+          </View>
+        ) : null}
+        {entwurf || belegEndgueltigLoeschbar(b) ? null : <Feld label={TEXT.r12g_beleg_ungueltig_grund} hilfe={TEXT.r12g_beleg_ungueltig_grund_hilfe} wert={ungueltigGrund} aendern={setUngueltigGrund} optional />}
+        {entwurf ? null : <TextKnopf
           symbol="trash"
           gefahr
           text={belegEndgueltigLoeschbar(b) ? TEXT.loeschen : TEXT.beleg_ungueltig_knopf}
@@ -299,14 +335,32 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
             const endgueltig = belegEndgueltigLoeschbar(b);
             void bestaetigen(endgueltig ? { titel: TEXT.loeschen_wirklich, text: TEXT.beleg_loeschen_hinweis(jahre), ja: TEXT.loeschen_ja } : { titel: TEXT.beleg_ungueltig_wirklich, text: TEXT.beleg_ungueltig_text(jahre), ja: TEXT.beleg_ungueltig_ja }).then((ok) => {
               if (!ok) return;
-              const r = z.belegLoeschen(id, TEXT.beleg_ungueltig_grund);
+              const r = z.belegLoeschen(id, ungueltigGrund.trim() || TEXT.beleg_ungueltig_grund);
               melden(r === "ungueltig" ? TEXT.beleg_ungueltig_gesetzt : TEXT.geloescht, "info");
               nav.zurueck();
             });
           }}
           stil={{ marginTop: 24 }}
-        />
+        />}
     </BuehnenBlatt>
+  );
+}
+
+/** R12 GoBD: ungültig markierte Belege mit Grund – in der Belegliste einsehbar (Nummernlücken erklären sich). */
+export function UngueltigeBelege() {
+  const z = useAmtlos();
+  const [offen, setOffen] = useState(false);
+  const l = z.stand.belegArchiv;
+  if (!l.length) return null;
+  return (
+    <View style={{ marginTop: 24 }}>
+      <TextKnopf symbol={offen ? "chevron.up" : "chevron.down"} text={TEXT.r12g_belege_ungueltig(l.length)} erweitert={offen} onPress={() => setOffen(!offen)} />
+      {offen ? (
+        <Karte>
+          {l.map((b, i) => <Zeile key={b.id} symbol="xmark.circle" titel={`${b.nr ? `${b.nr} · ` : ""}${b.lieferant.trim() || TEXT.brutto}`} text={TEXT.r12g_beleg_ungueltig_zeile(b.ungueltig ? zeitDe(b.ungueltig) : "–", b.ungueltig_grund ?? "")} wert={euro(belegSummen(b).brutto_cent)} letzte={i === l.length - 1} />)}
+        </Karte>
+      ) : null}
+    </View>
   );
 }
 

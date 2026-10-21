@@ -8,8 +8,13 @@ import { RADIUS, useFarben } from "../ui/thema";
 import { PASSWORT_EMPFOHLEN, SicherungsFehler, fehlendeDateien, passwortSchwaeche, base64, schluesselAusPasswort, schluesselKennung, sicherungErstellen, sicherungLesenMitDateien, sicherungMitSchluessel, sicherungsDatei, sicherungsDateiLesen, sicherungsKdf, sicherungsName, type Dateien, type SicherungsSchluessel } from "../unterlagen/sicherung";
 import { cloudBeiseitelegen, cloudDateiLesen, cloudDateiSchreiben, cloudDateien, cloudLesen, cloudSchreiben, cloudVerfuegbar } from "../unterlagen/cloud";
 import { autoSchluesselHolen, autoSchluesselLoeschen, autoSchluesselSpeichern } from "../unterlagen/schluesselbund";
-import { dateiTeilen, dateiWaehlen, zufall } from "../unterlagen/sicherungDatei";
-import { heute, sicherungFaellig, ungesichert, zusammenfuehren, type Stand } from "../unterlagen/speicher";
+import { dateiTeilen, dateiTeilenBytes, dateiWaehlen, zufall } from "../unterlagen/sicherungDatei";
+import { dokumentHtml, pdfDateiname, vorlageFuer } from "@amtlos/fachlogik";
+import { offenesArchiv } from "../unterlagen/archiv";
+import { pdfBytes } from "../unterlagen/pdf";
+import { gestellteRechnungen } from "../unterlagen/steuerpaket";
+import { betriebFuerDokument } from "../pro/regeln";
+import { absenderFuer, dateienImStand, heute, sicherungFaellig, ungesichert, zusammenfuehren, type Stand } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { BuehnenBlatt } from "./gemeinsam";
 import { useProSperre } from "./Pro";
@@ -55,12 +60,12 @@ export function SicherungSeite() {
   // große Sicherung (R9 Performance): Die Sicherungsdatei entsteht ganz im Arbeitsspeicher – ab etwa 50 Belegdateien
   // oder 150 MB droht auf dem iPhone der Abbruch. Dann vorher warnen und die iCloud-Sicherung empfehlen.
   const umfang = useMemo(() => {
-    const namen = new Set([...z.stand.belege, ...z.stand.belegArchiv].map((b) => b.datei).filter((n): n is string => Boolean(n)));
+    const namen = new Set(dateienImStand(z.stand));
     let bytes = 0;
     for (const n of namen) bytes += z.dateiGroesse(n);
     // Base64 in der Sicherungsdatei: etwa ein Drittel mehr als die Datei selbst
     return { dateien: namen.size, mb: Math.round((bytes * 1.37) / 1e6) };
-  }, [z.stand.belege, z.stand.belegArchiv]);
+  }, [z.stand.belege, z.stand.belegArchiv, z.stand.kasse, z.stand.mitarbeiter]);
   const gross = umfang.dateien > SICHERUNG_DATEIEN_WARNUNG || umfang.mb > SICHERUNG_MB_WARNUNG;
   const bereit = passwortBereit(pw, pw2);
   const los = async () => {
@@ -117,7 +122,59 @@ export function SicherungSeite() {
         {fortschritt ? <Hinweis text={fortschritt} /> : null}
         {meldung ? <Hinweis art={meldung.art} text={meldung.text} /> : null}
       </View>
+      <OffenesArchiv />
     </BuehnenBlatt>
+  );
+}
+
+/**
+ * R12 GoBD: offenes Archiv (CSV/JSON, PDF, XML, Originaldateien) – lesbar ohne Amtlos und ohne Passwort über die
+ * Aufbewahrungsfrist (§ 147 Abs. 2 AO). Ergänzt die verschlüsselte Sicherung, ersetzt sie nicht.
+ */
+export function OffenesArchiv() {
+  const z = useAmtlos();
+  const melden = useMeldung();
+  const [laedt, setLaedt] = useState(false);
+  const [fortschritt, setFortschritt] = useState<string | null>(null);
+  const [fehler, setFehler] = useState(false);
+  const los = async () => {
+    setFehler(false);
+    setLaedt(true);
+    try {
+      await gleich();
+      const s = z.stand;
+      const dateien: Record<string, Uint8Array> = {};
+      for (const n of dateienImStand(s)) {
+        const b = await z.dateiLesen(n);
+        if (b) dateien[n] = b;
+      }
+      const rechnungsPdfs: Record<string, Uint8Array> = {};
+      const v = vorlageFuer("rechnung");
+      const rechnungen = gestellteRechnungen(s);
+      if (v)
+        for (const [i, u] of rechnungen.entries()) {
+          setFortschritt(TEXT.r12g_archiv_fortschritt(i + 1, rechnungen.length));
+          const bytes = await pdfBytes(dokumentHtml(v, u.daten, betriebFuerDokument(absenderFuer(s, u), z.pro)), pdfDateiname(v, u.daten, heute()), v.querformat).catch(() => null);
+          if (bytes) rechnungsPdfs[u.id] = bytes;
+        }
+      setFortschritt(null);
+      const a = offenesArchiv(s, dateien, new Date().toISOString(), { rechnungsPdfs });
+      if (await dateiTeilenBytes(a.dateiname, a.zip, "application/zip")) melden(TEXT.r12g_archiv_fertig);
+    } catch {
+      setFehler(true);
+    } finally {
+      setLaedt(false);
+      setFortschritt(null);
+    }
+  };
+  return (
+    <View style={{ marginTop: 24, gap: 8 }}>
+      <T fett accessibilityRole="header">{TEXT.r12g_archiv_titel}</T>
+      <T v="klein" leise>{TEXT.r12g_archiv_text}</T>
+      <Knopf ton symbol="folder" text={TEXT.r12g_archiv_knopf} laedt={laedt} onPress={() => void los()} />
+      {fortschritt ? <Hinweis text={fortschritt} /> : null}
+      {fehler ? <Hinweis art="fehler" text={TEXT.r12g_archiv_fehler} /> : null}
+    </View>
   );
 }
 
@@ -218,7 +275,7 @@ function Vorschau({ aktuell, gelesen }: { aktuell: Stand; gelesen: Stand }) {
   const z = zusammenfuehren(aktuell, gelesen);
   return (
     <View style={{ marginTop: 16, gap: 6 }}>
-      <Hinweis art="erfolg" text={TEXT.inhalt_sicherung(gelesen.betrieb.name, gelesen.unterlagen.length, gelesen.mitarbeiter.length, gelesen.kunden.length, gelesen.belege.length)} />
+      <Hinweis art="erfolg" text={TEXT.inhalt_sicherung(gelesen.betrieb.name, gelesen.unterlagen.length, gelesen.mitarbeiter.length, gelesen.kunden.length, gelesen.belege.length, gelesen.kasse.length)} />
       <Hinweis text={TEXT.zusammenfuehren_text(z.neu, z.aktualisiert, z.behalten)} />
       {z.nummernKonflikte.length ? <Hinweis art="fehler" text={TEXT.nummern_konflikt(z.nummernKonflikte)} /> : null}
       {z.festKonflikte.length ? <Hinweis art="fehler" text={TEXT.fest_konflikt(z.festKonflikte)} /> : null}
@@ -272,10 +329,10 @@ async function belegeHochladen(z: ReturnType<typeof useAmtlos>, k: SicherungsSch
   const kennung = schluesselKennung(k.salz);
   const da = await cloudDateien(kennung);
   let fehlend = 0;
-  for (const b of [...stand.belege, ...stand.belegArchiv]) {
-    if (!b.datei || da.has(b.datei)) continue;
-    const bytes = await z.dateiLesen(b.datei);
-    if (bytes) await cloudDateiSchreiben(kennung, b.datei, sicherungsDatei(bytes, k.schluessel, zufall));
+  for (const datei of dateienImStand(stand)) {
+    if (da.has(datei)) continue;
+    const bytes = await z.dateiLesen(datei);
+    if (bytes) await cloudDateiSchreiben(kennung, datei, sicherungsDatei(bytes, k.schluessel, zufall));
     else fehlend++;
   }
   return fehlend;
@@ -287,11 +344,11 @@ async function belegeAusCloud(text: string, stand: Stand, schluessel: Uint8Array
   if (!kdf) return vorhanden;
   const kennung = schluesselKennung(kdf.salz);
   const d: Dateien = { ...vorhanden };
-  for (const b of [...stand.belege, ...stand.belegArchiv]) {
-    if (!b.datei || d[b.datei]) continue;
-    const roh = await cloudDateiLesen(kennung, b.datei);
+  for (const datei of dateienImStand(stand)) {
+    if (d[datei]) continue;
+    const roh = await cloudDateiLesen(kennung, datei);
     const bytes = roh ? sicherungsDateiLesen(roh, schluessel) : null;
-    if (bytes) d[b.datei] = base64(bytes);
+    if (bytes) d[datei] = base64(bytes);
   }
   return d;
 }

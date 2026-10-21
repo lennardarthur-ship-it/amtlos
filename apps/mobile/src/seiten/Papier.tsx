@@ -81,7 +81,8 @@ function zeilen(felder: Feld[], d: Daten, nameFeld?: string): Zeile[] {
     else if (f.art === "mehrzeilig") z.push({ links: w, voll: true });
     else z.push({ links: f.label, rechts: w });
   }
-  return z.slice(0, 8);
+  // R12 (Zoll #15): mehr als acht Zeilen – sagen, dass es weitere gibt („… und 2 weitere“), statt still abzuschneiden
+  return z.length > 8 ? [...z.slice(0, 7), { links: TEXT.r12p_und_weitere(z.length - 7), voll: true }] : z;
 }
 
 /** Zwei Schatten wie bei echtem Papier (B12): ein enger Kontaktschatten und ein weicher, tiefer. */

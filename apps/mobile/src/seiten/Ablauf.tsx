@@ -1,15 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { ScrollView, View } from "react-native";
-import { VORSTEUER_AUFTEILEN, fehlendeAngaben, personAus, personIn, vorlageFuer, type Daten, type Vorlage, type VorlagenAbschnitt } from "@amtlos/fachlogik";
+import { VORSTEUER_AUFTEILEN, fehlendeAngaben, istPrivatperson, personAus, personIn, profilStartwerte, vorlageFuer, type Daten, type Vorlage, type VorlagenAbschnitt } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { Betrag, Fuss, Hinweis, Knopf,  T, TextKnopf, Wahl, ZurueckKnopf } from "../ui/bausteine";
 import { HellerStatus, TastaturRahmen, useKopf, useNav } from "../ui/navigation";
 import { RADIUS, RAND,  useFarben } from "../ui/thema";
-import { PERSONEN_LISTE, betriebFehlt, personenSortiert } from "../unterlagen/speicher";
+import { HAUPT_STAETTE, PERSONEN_LISTE, STAETTEN_VORLAGEN, betriebFehlt, personenSortiert } from "../unterlagen/speicher";
+import { FassungenKarte, KorrekturSeite } from "./Fassungen";
+import { StaettenWahl } from "./BetriebStaetten";
 import { fehltFuer } from "../unterlagen/pruefung";
 import { offeneRechnungen, periodeText, perioden, umsaetzeFuer, type UstUebernahme, type Versteuerung } from "../unterlagen/ustAusRechnungen";
 import { useAmtlos } from "../zustand";
-import { Abschluss, festschreibenHinweis, useTeilen } from "./Abschluss";
+import { Abschluss, betriebOeffnen, festschreibenHinweis, useTeilen } from "./Abschluss";
 import { AuswahlSeite } from "../ui/auswahlseite";
 import { AbsenderSeite } from "./Betrieb";
 import { useProSperre } from "./Pro";
@@ -37,7 +39,9 @@ function PersonenWahl({ v, id, daten }: { v: Vorlage; id: string; daten: Daten }
   const nav = useNav();
   if (!v.person) return null;
   const art = v.person.art;
-  const personen = personenSortiert(z.stand[PERSONEN_LISTE[art]]);
+  // R12 (Coach #21): Gesundheitsangaben nur von Personen – keine Firmenkunden aus den Rechnungen
+  const nurPersonen = v.id === "anamnese_einwilligung";
+  const personen = personenSortiert(z.stand[PERSONEN_LISTE[art]]).filter((p) => !nurPersonen || istPrivatperson(p.name));
   const name = typeof daten[v.person.felder.name ?? ""] === "string" ? (daten[v.person.felder.name!] as string).trim().toLocaleLowerCase("de") : "";
   const gewaehlt = personen.find((p) => p.name.trim().toLocaleLowerCase("de") === name)?.id ?? null;
   const waehlen = (pid: string) => {
@@ -58,7 +62,7 @@ function PersonenWahl({ v, id, daten }: { v: Vorlage; id: string; daten: Daten }
       {viele ? (
         <TextKnopf symbol="magnifyingglass" text={TEXT.alle_personen[art](personen.length)} onPress={() => nav.oeffnen(`personen-wahl-${art}`, () => <AuswahlSeite titel={TEXT.gespeicherte[art]} wert={gewaehlt} optionen={personen.map((p) => ({ wert: p.id, text: p.name }))} aendern={waehlen} />)} />
       ) : null}
-      <T v="caption" leise stil={{ marginTop: personen.length ? 4 : 0 }}>{TEXT.wird_gemerkt[art]}</T>
+      <T v="caption" leise stil={{ marginTop: personen.length ? 4 : 0 }}>{nurPersonen ? TEXT.r12_gemerkt_person : TEXT.wird_gemerkt[art]}</T>
     </View>
   );
 }
@@ -195,8 +199,13 @@ function SchrittKopf({ v, a, index }: { v: Vorlage; a: VorlagenAbschnitt; index:
 function Schritt({ v, a, index, id, daten, fehlt }: { v: Vorlage; a: VorlagenAbschnitt; index: number; id: string; daten: Daten; fehlt: string[] }) {
   const z = useAmtlos();
   const mitPerson = v.person && a.felder.some((x) => x.id === v.person!.felder.name);
+  const u = z.stand.unterlagen.find((x) => x.id === id);
+  // R12 (Bäckerei #7): Hygiene-, Lebensmittel- und Arbeitszeitnachweise einer Betriebsstätte zuordnen – ohne eigene
+  // Zuordnung gilt beim Arbeitszeitnachweis die Betriebsstätte der Person
+  const person = v.person ? z.stand.mitarbeiter.find((p) => typeof daten[v.person!.felder.name ?? ""] === "string" && p.name.trim().toLocaleLowerCase("de") === (daten[v.person!.felder.name!] as string).trim().toLocaleLowerCase("de")) : undefined;
   return (
     <View>
+      {index === 0 && STAETTEN_VORLAGEN.has(v.id) && z.stand.betriebsstaetten.length ? <StaettenWahl wert={u?.betriebsstaette ?? person?.betriebsstaette ?? HAUPT_STAETTE} aendern={(st) => z.unterlageStaette(id, st)} hilfe={TEXT.r12p_staette_unterlage_hilfe} /> : null}
       {mitPerson ? <PersonenWahl v={v} id={id} daten={daten} /> : null}
       {v.ausRechnungen && index === 0 ? <AusRechnungen id={id} daten={daten} /> : null}
       {/* R10 UI: Kasse bzw. Shop laut Check – bei den Umsätzen immer sagen, dass sie dazugehören (nicht erst nach der Übernahme) */}
@@ -243,6 +252,18 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
   const zRef = useRef(z);
   zRef.current = z;
   const weg = useRef(false);
+  // R12 (UX #5): Startwerte aus mehreren Antworten des Checks (z. B. Bruttopreise bei reinen Privatkunden) – nur bei einer
+  // neuen Unterlage; was so vorbelegt ist, gilt als unverändert (die leere Unterlage verschwindet beim Schließen weiter)
+  useEffect(() => {
+    if (!neu || !unterlage || !vorlage) return;
+    // nur, was noch leer ist – Angaben aus „Mein Betrieb“ (z. B. die Rechtsform) gehen vor
+    const leer = (w: unknown) => w === undefined || w === null || w === false || w === "" || (Array.isArray(w) && !w.length);
+    const start = Object.fromEntries(Object.entries(profilStartwerte(vorlage, z.stand.profil, z.stand.betrieb)).filter(([k]) => leer(unterlage.daten[k])));
+    if (!Object.keys(start).length) return;
+    z.setzen(id, start);
+    anfang.current = JSON.stringify({ ...unterlage.daten, ...start });
+    // nur beim Öffnen
+  }, []);
   // VoiceOver: neuer Schritt wird angesagt (der Fokus bleibt sonst auf „Weiter“)
   useAnsage(vorlage && schritt < n ? `${TEXT.schritt(schritt + 1, n)}: ${vorlage.abschnitte[schritt]?.titel ?? ""}` : null);
 
@@ -286,7 +307,8 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
   };
   const letzteZahl = ergebnis.at(-1);
   // fehlen Absender-Angaben (Mein Betrieb), führt der Hauptknopf direkt dorthin
-  const absenderFehlt = !fest && Boolean(vorlage.kundendokument) && fehltFuer(z.stand, unterlage).some((x) => x.includes("(Mein Betrieb)"));
+  const betriebFehlt_ = !fest && vorlage.kundendokument ? fehltFuer(z.stand, unterlage).filter((x) => x.includes("Mein Betrieb")) : [];
+  const absenderFehlt = betriebFehlt_.length > 0;
 
   return (
     <View style={{ flex: 1, backgroundColor: f.buehne }}>
@@ -305,7 +327,16 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
             </View>
           ) : null}
           {amAbschluss ? (
-            <Abschluss id={id} springen={gehe} fehler={null} drucken={teilen.drucken} eRechnung={teilen.eRechnung} eFehlt={teilen.eFehlt} />
+            <View>
+              <Abschluss id={id} springen={gehe} fehler={null} drucken={teilen.drucken} eRechnung={teilen.eRechnung} eFehlt={teilen.eFehlt} />
+              {/* R12 (Zoll #2): Fassungen eines festgeschriebenen Nachweises – die alten bleiben, mit Datum und Grund */}
+              {/* über der Papierfläche, die der Abschluss nach unten verlängert (absolut positioniert) */}
+              {vorlage.korrektur && unterlage.fassungen?.length ? (
+                <View style={{ zIndex: 2, marginHorizontal: -RAND, marginTop: -32, paddingHorizontal: RAND, paddingBottom: 32, backgroundColor: f.papier }}>
+                  <FassungenKarte id={id} />
+                </View>
+              ) : null}
+            </View>
           ) : (
             <Schritt v={vorlage} a={vorlage.abschnitte[schritt]!} index={schritt} id={id} daten={daten} fehlt={fehlt} />
           )}
@@ -319,7 +350,7 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
               <Ansage text={teilen.fehler} farbe={f.frist} />
             ) : amAbschluss && !absenderFehlt && festschreibenHinweis(vorlage, fest) ? (
               // vor dem ersten Teilen: was das Teilen bewirkt – direkt über dem Knopf, ohne Rückfrage
-              <T v="caption" leise>{festschreibenHinweis(vorlage, fest)}</T>
+              <T v="caption" leise>{vorlage.korrektur ? TEXT.r12p_wird_festgeschrieben : festschreibenHinweis(vorlage, fest)}</T>
             ) : !amAbschluss && letzteZahl && !/^0,00\s/.test(letzteZahl[1]) ? (
               <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                 <T v="klein" leise>{letzteZahl[0]}</T>
@@ -332,9 +363,13 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
             <ZurueckKnopf label={TEXT.vorheriger_schritt} onPress={() => gehe(schritt - 1)} />
           ) : null}
           {amAbschluss && absenderFehlt ? (
-            <Knopf text={TEXT.absender_ergaenzen} symbol="building.2" onPress={() => nav.oeffnen("absender", () => <AbsenderSeite />, true)} stil={{ flex: 1 }} />
+            <Knopf text={TEXT.absender_ergaenzen} symbol="building.2" onPress={() => betriebOeffnen(nav, betriebFehlt_)} stil={{ flex: 1 }} />
           ) : amAbschluss ? (
-            <Knopf text={TEXT.pdf_teilen} symbol="square.and.arrow.up" laedt={teilen.laedt} onPress={() => void teilen.los()} stil={{ flex: 1 }} />
+            <>
+              {/* R12 (Zoll #2): festgeschriebener Nachweis – Korrektur als neue Fassung mit Grund */}
+              {fest && vorlage.korrektur ? <Knopf ton symbol="pencil" text={TEXT.r12p_korrigieren} onPress={() => nav.oeffnen(`korrektur-${id}`, () => <KorrekturSeite id={id} />, true)} stil={{ flex: 1 }} /> : null}
+              <Knopf text={TEXT.pdf_teilen} symbol="square.and.arrow.up" laedt={teilen.laedt} onPress={() => void teilen.los()} stil={{ flex: 1 }} />
+            </>
           ) : (
             <Knopf text={schritt === n - 1 ? TEXT.zum_dokument : TEXT.weiter} onPress={() => gehe(schritt + 1)} stil={{ flex: 1 }} />
           )}

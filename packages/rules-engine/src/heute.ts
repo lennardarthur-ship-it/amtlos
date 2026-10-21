@@ -17,6 +17,8 @@ export const BEREICH_JE_KATEGORIE: Record<string, Bereich> = {
   gruendung: "gesellschaft",
   gesellschaft: "gesellschaft",
   branche: "gesellschaft",
+  // R12: Umwelt und Abfall – Kontrollen der Behörden vor Ort wie beim Arbeitsschutz
+  umwelt: "arbeitsschutz",
 };
 
 export interface Aufgabe {

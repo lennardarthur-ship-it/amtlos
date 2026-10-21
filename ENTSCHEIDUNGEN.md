@@ -1022,6 +1022,18 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 
 Der Gründer hat entschieden: Pflicht-Nachweise fallen aus dem Freikontingent heraus. Auf das Monatskontingent (weiter 5) zählen nur noch Rechnungen (einschließlich Gutschriften, ohne Stornos und Konfliktkopien). Hygieneplan, Unterweisung, Gefährdungsbeurteilung, Arbeitszeitnachweis, Allergenliste und alle übrigen Vorlagen lassen sich ohne Pro teilen. Grund (Runden 10/11): Eine Bezahlschranke vor einer gesetzlichen Pflicht wirkt wie Erpressung; Betriebe mit Personal hatten das Kontingent am ersten Abend aufgebraucht. Umgesetzt in `pro/regeln.ts` (`zaehltFuerKontingent`), Texte in App, Store, Website und Prüfhinweisen für Apple angepasst.
 
+### E-155 · Runde 12: Kassenabschluss, Skonto, Betriebs- und Zollprüfung (2026-10-21)
+
+**Gebaut (Gründerentscheidung):** Kassenabschluss (Tagesabschluss mit Festschreibung, Korrektur mit Grund, Kassenbuch nur lesbar mit Fassungen, Kassensturz mit Zählprotokoll, Kartentrinkgeld, Gutscheine Einzweck/Mehrzweck, „auf Rechnung“, bar kassierte Rechnungen, Eigenbelege, Kassendifferenzen gebucht, Sachentnahmen mit eigenen Beträgen) und Skonto (Rechnungsangabe § 14 Abs. 4 Satz 1 Nr. 7 UStG, XRechnung BT-20, Entgeltminderung im Zahlungszeitraum, erhaltene Skonti gegen das Aufwandskonto).
+
+**Prüfer:** Rechtsanwalt, Zollprüfer (FKS), Steuerberater (Kasse), Betriebsprüferin (GoBD/Kassennachschau), UX-/Produktberaterin; Szenarien Fitness-Coach, Kfz-Werkstatt, Bäckerei mit Filiale, Kurierdienst.
+
+**Urteile:** Steuer: dulden für Cafés mit TSE-Kasse (Kette Kasse ↔ VA ↔ EÜR ↔ Stapel auf den Cent); Betriebsprüfung: „mit Feststellungen“, Verwerfung drohte bei offener Ladenkasse wegen bearbeitbarem Kassenbuch – behoben. Alle zehn Hauptkorrekturen beider Berichte umgesetzt.
+
+**Entschieden und umgesetzt:** GoBD – feste Belegnummern (Stand 4), Löschen nur 24 h und vor Export, Festschreiben von Belegen nach Paket/VA, Änderungsprotokoll und ungültige Belege im Paket, Rechnungen mit Absender-Schnappschuss, Original-XML und PDF-Hash, Verfahrensdoku versioniert mit Kassenkapitel, 10 Jahre für Kassenaufzeichnungen, offenes Archiv. Personal/Zoll – Arbeitszeit-, NachwG- und Ausweis-Nachweise festgeschrieben mit Fassungen, „erfasst am“ je Tag, Aufbewahrungssperre, Mitarbeiterdaten (Art, Stunden, Lohn, Aufenthaltstitel), Minijob-/Mindestlohn-/ArbZG-Hinweise, Zoll-Mappe mit Personalübersicht und Dienstplan, Betriebsstätten (Stand 3). Katalog 197 Pflichten (u. a. GmbH & Co. KG/PartG, Fernabsatz, JuSchG, GEMA, Rundfunk je Betriebsstätte, Rentenversicherung Lehrende, Umwelt/Abfall, Nachtarbeit, Lenkzeiten/GüKG nach Gewicht, Nachunternehmerhaftung; Logikfehler unklare Gründungsschritte behoben; § 17 MiLoG erst erledigt bei aktueller Aufzeichnung je Person). UX – „Was hast du schon?“ ab 4 Wochen vor der Hauptzahl, echte Silbentrennung (hyphen, ISC), Bezahlschirm nach Anlass, IBAN-Hinweis, Vorauszahlung, § 35a GmbHG, neue GB-/Unterweisungsgruppen Kfz/Bäckerei/Kurier, Videoschild, neutrale Anamnese. Unsicheres: PRUEFLISTE T-118 bis T-121.
+
+**Gründerentscheidungen offen:** E-Rechnung hinter Pro trotz Empfangspflicht/Ausstellungspflicht 2027/28; „Amtlos Team“ (Pro je Mitarbeiter); 14 Tage Pro nach der ersten Rechnung; Fokusbranchen/Store-Name; Rechnungsnummer erst beim Teilen; Katalog-Updates vom Server als Pro-Kern; Gutschein-Vorlage, Schlussrechnung; Anbietergesellschaft/Impressum, Nutzungsbedingungen, Vermögensschadenhaftpflicht, Marke. Server: Migration 0021 (Kategorie „umwelt“) vor dem Katalog-Import einspielen.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

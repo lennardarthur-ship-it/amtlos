@@ -8,7 +8,7 @@ import { gcm } from "@noble/ciphers/aes";
 import { pbkdf2 } from "@noble/hashes/pbkdf2";
 import { sha256 } from "@noble/hashes/sha2";
 import { istBelegDateiname } from "@amtlos/fachlogik";
-import { StandFehler, standAus, type Stand } from "./speicher";
+import { StandFehler, dateienImStand, standAus, type Stand } from "./speicher";
 
 export const SICHERUNG_FORMAT = "amtlos-sicherung";
 /**
@@ -289,7 +289,7 @@ export function sicherungLesenMitDateien(text: string, passwort: string): { stan
  * Dateien ist nicht vollständig: Sie darf nicht als Sicherung zählen und „Alle Daten löschen“ nicht freigeben.
  */
 export function fehlendeDateien(stand: Stand, dateien: Dateien): string[] {
-  return [...new Set([...stand.belege, ...stand.belegArchiv, ...stand.kasse].map((b) => b.datei).filter((n): n is string => Boolean(n) && !dateien[n!]))];
+  return dateienImStand(stand).filter((n) => !dateien[n]);
 }
 
 /** Kennung eines Sicherungsschlüssels (aus dem Salz) – Ordnername der Belegdateien in iCloud. */

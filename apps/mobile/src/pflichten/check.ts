@@ -32,11 +32,19 @@ export const CHECK_FELDER = [
   "taetigkeit.branchen",
   "rechtsform",
   "gesellschaft.handelsregister",
+  // R12 (UX #20): das Startdatum steuert Gründungsschritte und „Was hast du schon?“ – direkt nach der Rechtsform
+  "gruendungsdatum",
   "taetigkeit.einordnung",
   "bundesland",
+  // R12 (Rechtsprüfung Befund 7, Bäckerei #4, Kfz #9): Betriebsstätten für Rundfunkbeitrag, Gewerbeabfall, Registrierung
+  "betriebsstaetten.anzahl",
   "beschaeftigte.gesamt",
   "beschaeftigte.minijob",
   "beschaeftigte.jugendlich",
+  // R12 (Kfz #9, Bäckerei #16): Azubis direkt nach „unter 18“
+  "beschaeftigte.azubi",
+  // R12 (Coach #1): Rentenversicherungspflicht selbstständiger Lehrender – laufende Beitragspflicht, im Kern-Check
+  "rentenversicherung.pflichtgruppe",
   "personal.sofortmeldebranchen",
   // R11 (Rechtsprüfung Befund 7, Nutzertests Gründerin und Gebäudereinigung): Lebensmittel, Drittstaaten
   "ifsg.beschaeftigte",
@@ -44,24 +52,42 @@ export const CHECK_FELDER = [
   "personal.lohn_durch",
   "arbeitsschutz.elektrische_geraete",
   "arbeitsschutz.gefahrstoffe",
+  // R12 (Bäckerei #2): Nachtarbeit; (Kurier #2–4, Kfz #1): Fahrzeuge und Umwelt
+  "arbeitszeit.nachtarbeit",
+  "fahrzeuge.anzahl",
+  "fahrzeuge.gesamtmasse",
+  "fahrzeuge.ausland",
+  "umwelt.taetigkeiten",
   "bauleistungen.fuer_unternehmen",
+  // R12 (Kurier #5, Zoll #13): Subunternehmer
+  "nachunternehmer",
   // R11 (Kosmetik #23, Rechtsprüfung Befund 10): Handwerksrolle bzw. Verzeichnis, Verträge beim Kunden zu Hause
   "handwerk.anlage",
   "vertrieb.ausserhalb_geschaeftsraeume",
-  // R11 (Nutzertest Gründerin #2): bei Gastronomie die Fragen, ohne die man nicht starten darf – vor dem Startdatum
+  // R12 (Rechtsprüfung Befund 2): Aufträge per Telefon, E-Mail oder Messenger (Fernabsatz)
+  "vertrieb.fernabsatz",
+  // R11 (Nutzertest Gründerin #2): bei Gastronomie die Fragen, ohne die man nicht starten darf
   "ifsg.selbst",
   "erlaubnis.gewo_paragraphen",
   "erlaubnis.gaststaette",
   "erlaubnis.alkohol",
+  // R12 (Rechtsprüfung Befunde 3, 4): Jugendschutz, Musik für Kundschaft
+  "verkauf.alkohol_tabak",
   "gastro.to_go",
+  "oeffentliche_wiedergabe",
+  // R12 (Coach #5, Kurier #8): Gesundheitsdaten der Teilnehmenden, Ortung der Fahrer
+  "datenverarbeitung.arten",
   "alg1_bezug",
+  // R12 (Kurier #14, Coach #14): erst Bargeld, dann Kasse – „keine Kasse, nur Rechnungen“
+  "kasse.bargeld",
   "kasse.elektronisch",
   "kasse.angeschafft_am",
   "online.website",
   "online.social_media",
   "ust.kleinunternehmer",
+  // R12 (UX #3): Rhythmus der Voranmeldung, sobald die Kleinunternehmerregelung verneint ist – sonst bleibt „Dein Jahr“ leer
+  "ust.voranmeldung_rhythmus",
   "steuerberater",
-  "gruendungsdatum",
 ] as const;
 
 const FRAGE = new Map<string, { frage: Frage; nurWenn?: { feld: string; in: string[] } }>();
@@ -82,10 +108,29 @@ const VORJAHR_FRAGEN = ["umsatz.vorjahr", "gewinn.vorjahr", "ust.zahllast_vorjah
 const KRAFT_RECHTSFORM_GEWERBE = ["ug", "gmbh", "gmbh_co_kg"];
 /** Jahr des Starts liegt im laufenden Jahr oder später (Europe/Berlin) – dann gibt es kein Vorjahr des Betriebs. */
 const ohneVorjahr = (p: Profil, heute = heuteBerlin()) => typeof p.gruendungsdatum === "string" && ISO.test(p.gruendungsdatum) && p.gruendungsdatum.slice(0, 4) >= heute.slice(0, 4);
+/** R12: Betrieb läuft seit mehr als sechs Monaten (wie `bestehend` in der Auswertung) */
+const laengerAlsBestand = (p: Profil, heute = heuteBerlin()) => typeof p.gruendungsdatum === "string" && ISO.test(p.gruendungsdatum) && p.gruendungsdatum <= plusMonate(heute, -BESTAND_AB_MONATEN);
+const zahl = (p: Profil, feld: string) => (typeof p[feld] === "number" ? (p[feld] as number) : null);
+const liste = (p: Profil, feld: string) => (Array.isArray(p[feld]) ? (p[feld] as string[]) : null);
+/** R12 (Coach #1): Einzelperson ohne versicherungspflichtige Beschäftigte – keine Beschäftigten oder nur Minijobs */
+const ohneVersicherungspflichtigeBeschaeftigte = (p: Profil) => ohneTeam(p) || (zahl(p, "beschaeftigte.gesamt") !== null && zahl(p, "beschaeftigte.minijob") === zahl(p, "beschaeftigte.gesamt"));
+/** R12 (Kurier #2): Fahrzeuge zwischen 2,5 und 3,5 t – nur dann entscheidet die Frage nach Auslandsfahrten */
+const MITTELSCHWER = ["2_5_bis_2_8t", "2_8_bis_3_5t"];
 
 /** Passt eine Frage überhaupt (immer, auch bei „Kurz klären“)? Bei 0 Beschäftigten keine Fragen zum Personal. */
 function passtImmer(feld: string, p: Profil): boolean {
   if (PERSONAL_FRAGEN.includes(feld) && ohneTeam(p)) return false;
+  // R12 (Coach #1): Gründungszuschuss gibt es nur vor dem Start – bei Bestandsbetrieben keine Frage nach Arbeitslosengeld
+  if (feld === "alg1_bezug" && laengerAlsBestand(p)) return false;
+  // R12: Rentenversicherungspflicht selbstständiger Personen – nicht für Kapitalgesellschaften
+  if (feld === "rentenversicherung.pflichtgruppe" && typeof p.rechtsform === "string" && KRAFT_RECHTSFORM_GEWERBE.includes(p.rechtsform)) return false;
+  // R12 (Kurier #2): ohne Firmenfahrzeuge keine Fragen zu Gewicht und Ausland; Ausland nur bei 2,5 bis 3,5 t
+  if ((feld === "fahrzeuge.gesamtmasse" || feld === "fahrzeuge.ausland") && zahl(p, "fahrzeuge.anzahl") === 0) return false;
+  if (feld === "fahrzeuge.ausland" && liste(p, "fahrzeuge.gesamtmasse") && !liste(p, "fahrzeuge.gesamtmasse")!.some((x) => MITTELSCHWER.includes(x))) return false;
+  // R12 (Kurier #14): wer kein Bargeld annimmt, braucht keine Kasse
+  if (feld === "kasse.elektronisch" && p["kasse.bargeld"] === false) return false;
+  // R12 (UX #3): wer die Kleinunternehmerregelung nutzt, gibt keine Voranmeldung ab
+  if (feld === "ust.voranmeldung_rhythmus" && p["ust.kleinunternehmer"] === true) return false;
   if (VORJAHR_FRAGEN.includes(feld) && ohneVorjahr(p)) return false;
   // R11 (Nutzertest Kosmetik #1): wer die Kleinunternehmerregelung nutzt, gibt keine Voranmeldung ab – keine Frage nach der Zahllast
   if ((feld === "ust.zahllast_vorjahr" || feld === "ust.dauerfristverlaengerung") && p["ust.kleinunternehmer"] === true) return false;
@@ -109,6 +154,21 @@ function passtImmer(feld: string, p: Profil): boolean {
 const FRAGE_PASST: Record<string, (p: Profil) => boolean> = {
   "beschaeftigte.minijob": mitTeam,
   "beschaeftigte.jugendlich": (p) => mitTeam(p) && inBranche(p, "handwerk", "bau", "beauty_kosmetik", "gastronomie_lebensmittel"),
+  "beschaeftigte.azubi": (p) => mitTeam(p) && inBranche(p, "handwerk", "bau", "beauty_kosmetik", "gastronomie_lebensmittel", "gesundheit_pflege"),
+  // R12 (Coach #1): Einzelpersonen ohne versicherungspflichtige Beschäftigte (§ 2 S. 1 Nr. 1, 2, 9 SGB VI)
+  "rentenversicherung.pflichtgruppe": (p) => typeof p.rechtsform === "string" && EINZELPERSON.includes(p.rechtsform) && ohneVersicherungspflichtigeBeschaeftigte(p),
+  "arbeitszeit.nachtarbeit": (p) => mitTeam(p) && inBranche(p, "gastronomie_lebensmittel", "transport_logistik", "gesundheit_pflege", "gebaeudereinigung"),
+  "fahrzeuge.anzahl": (p) => inBranche(p, "transport_logistik", "handwerk", "bau", "gebaeudereinigung"),
+  "fahrzeuge.gesamtmasse": (p) => inBranche(p, "transport_logistik") && (zahl(p, "fahrzeuge.anzahl") ?? 0) >= 1,
+  "fahrzeuge.ausland": (p) => inBranche(p, "transport_logistik") && (zahl(p, "fahrzeuge.anzahl") ?? 0) >= 1 && Boolean(liste(p, "fahrzeuge.gesamtmasse")?.some((x) => MITTELSCHWER.includes(x))),
+  "umwelt.taetigkeiten": (p) => inBranche(p, "handwerk"),
+  "nachunternehmer": (p) => inBranche(p, "bau", "gebaeudereinigung", "transport_logistik"),
+  "vertrieb.fernabsatz": (p) => inBranche(p, "handwerk", "bau", "beauty_kosmetik", "gebaeudereinigung", "unterricht_sport_coaching"),
+  // Gaststätte mit Alkohol löst den Jugendschutz schon aus; gefragt wird bei Läden, Kiosken und Lebensmittelbetrieben ohne Ausschank
+  "verkauf.alkohol_tabak": (p) => inBranche(p, "onlinehandel", "sonstige") || (inBranche(p, "gastronomie_lebensmittel") && p["erlaubnis.gaststaette"] === false),
+  "oeffentliche_wiedergabe": (p) => inBranche(p, "gastronomie_lebensmittel", "beauty_kosmetik", "unterricht_sport_coaching", "gesundheit_pflege"),
+  "datenverarbeitung.arten": (p) => inBranche(p, "unterricht_sport_coaching", "transport_logistik"),
+  "ust.voranmeldung_rhythmus": (p) => p["ust.kleinunternehmer"] === false,
   // R11 (Nutzertest Gebäudereinigung #3): ab einer beschäftigten Person für alle – außer Beauty und Gebäudereinigung, die die Branche schon auslöst
   "personal.sofortmeldebranchen": (p) => mitTeam(p) && !inBranche(p, "beauty_kosmetik", "gebaeudereinigung"),
   "ifsg.beschaeftigte": (p) => mitTeam(p) && inBranche(p, "gastronomie_lebensmittel"),
@@ -116,19 +176,43 @@ const FRAGE_PASST: Record<string, (p: Profil) => boolean> = {
   "handwerk.anlage": (p) => inBranche(p, "handwerk", "bau", "beauty_kosmetik"),
   "vertrieb.ausserhalb_geschaeftsraeume": (p) => inBranche(p, "handwerk", "bau", "beauty_kosmetik"),
   "ifsg.selbst": (p) => inBranche(p, "gastronomie_lebensmittel"),
-  "erlaubnis.gewo_paragraphen": (p) => inBranche(p, "gastronomie_lebensmittel"),
+  // R12 (UX #9): nur, wo eine Vorschrift der Gewerbeordnung typisch ist – mit den passenden Optionen (`GEWO_OPTIONEN`)
+  "erlaubnis.gewo_paragraphen": (p) => inBranche(p, "gastronomie_lebensmittel", "immobilien_finanzen", "gesundheit_pflege", "sonstige"),
   "erlaubnis.gaststaette": (p) => inBranche(p, "gastronomie_lebensmittel"),
   "erlaubnis.alkohol": (p) => inBranche(p, "gastronomie_lebensmittel"),
   "gastro.to_go": (p) => inBranche(p, "gastronomie_lebensmittel"),
   "alg1_bezug": (p) => inBranche(p, "gastronomie_lebensmittel") && (typeof p.gruendungsdatum !== "string" || ohneVorjahr(p)),
   "personal.lohn_durch": mitTeam,
   "arbeitsschutz.elektrische_geraete": (p) => mitTeam(p) && inBranche(p, "handwerk", "bau", "beauty_kosmetik"),
-  "arbeitsschutz.gefahrstoffe": (p) => mitTeam(p) && inBranche(p, "beauty_kosmetik", "handwerk", "bau"),
+  // R12 (Bäckerei #6): auch Lebensmittelbetriebe – Mehlstaub in der Backstube, Reinigungsmittel in der Küche
+  "arbeitsschutz.gefahrstoffe": (p) => mitTeam(p) && inBranche(p, "beauty_kosmetik", "handwerk", "bau", "gastronomie_lebensmittel"),
   "bauleistungen.fuer_unternehmen": (p) => inBranche(p, "handwerk", "bau"),
   "kasse.angeschafft_am": (p) => p["kasse.elektronisch"] === true,
-  "kasse.elektronisch": (p) => !freiberuflich(p) || inBranche(p, "gastronomie_lebensmittel", "beauty_kosmetik", "handwerk", "gesundheit_pflege"),
+  "kasse.bargeld": (p) => !freiberuflich(p) || inBranche(p, "gastronomie_lebensmittel", "beauty_kosmetik", "handwerk", "gesundheit_pflege", "unterricht_sport_coaching"),
+  "kasse.elektronisch": (p) => (!freiberuflich(p) || inBranche(p, "gastronomie_lebensmittel", "beauty_kosmetik", "handwerk", "gesundheit_pflege", "unterricht_sport_coaching")) && p["kasse.bargeld"] === true,
   "online.social_media": (p) => p["online.website"] === false,
 };
+
+/**
+ * R12 (UX #9): Optionen der Frage „Fällt deine Tätigkeit unter eine dieser Vorschriften?“ je Branche – ein Café sieht nicht
+ * „§ 31 Bewachung auf Seeschiffen“. Ohne passende Branche alle Optionen; schon gewählte Optionen bleiben immer sichtbar.
+ */
+const GEWO_OPTIONEN: Record<string, string[]> = {
+  // Spielgeräte in Gaststätten, Reisegewerbe (Foodtruck, Marktstand)
+  gastronomie_lebensmittel: ["33c", "33d", "55"],
+  immobilien_finanzen: ["34", "34b", "34c", "34d", "34e", "34f", "34h", "34i"],
+  gesundheit_pflege: ["30"],
+  // Schlüsseldienst und Einbau von Sicherungseinrichtungen (§ 38), Reisegewerbe
+  handwerk: ["38", "55"],
+  beauty_kosmetik: ["55"],
+};
+function frageFuerProfil(f: Frage, p: Profil): Frage {
+  if (f.feld !== "erlaubnis.gewo_paragraphen" || !f.optionen) return f;
+  const b = branchen(p);
+  if (!b.length || b.some((x) => !GEWO_OPTIONEN[x])) return f;
+  const erlaubt = new Set([...b.flatMap((x) => GEWO_OPTIONEN[x]!), "keine", ...(liste(p, f.feld) ?? [])]);
+  return { ...f, optionen: Object.fromEntries(Object.entries(f.optionen).filter(([k]) => erlaubt.has(k))) };
+}
 
 /** Antworten, die aus einer anderen folgen (R10): „Freiberuflich (ohne Gewerbe)“ ⇒ freier Beruf, solange nichts anderes gewählt ist. */
 export function folgeAntworten(feld: string, wert: Profil[string], profil: Profil): Profil {
@@ -152,8 +236,11 @@ export function checkFragen(profil: Profil, felder: readonly string[] = CHECK_FE
     .filter((x): x is { frage: Frage; nurWenn?: { feld: string; in: string[] } } => Boolean(x))
     .filter((x) => !x.nurWenn || x.nurWenn.in.includes(String(profil[x.nurWenn.feld])))
     .filter((x) => passtImmer(x.frage.feld, profil) && (frei.includes(x.frage.feld) || (FRAGE_PASST[x.frage.feld]?.(profil) ?? true)))
-    .map((x) => x.frage);
+    .map((x) => frageFuerProfil(x.frage, profil));
 }
+
+/** R12 (UX #17): Zahl der Kern-Fragen für dieses Profil – Höchstwert des Fortschrittsbalkens statt `CHECK_FELDER.length`. */
+export const checkFragenAnzahl = (profil: Profil) => checkFragen(profil).length;
 
 /** Kern-Fragen, die noch offen sind (für „Check fortsetzen“ nach einem Abbruch, Nutzertest Lea). */
 export const offeneKernFragen = (profil: Profil) => checkFragen(profil).filter((f) => !beantwortet(profil, f.feld)).map((f) => f.feld);
@@ -200,10 +287,31 @@ export interface PflichtInfo {
   voraussetzungen?: string[];
   /** R11: Teil der Gründungsschritte (Katalog `phase: gruendung`) – für die Reihenfolge „Vor dem Start“ */
   gruendungsschritt?: boolean;
+  /**
+   * R12 (Zoll #1, #6): Beschäftigte, für die der Nachweis je Person vorliegen muss (§ 17 MiLoG: alle bzw. die Minijobber;
+   * Ausweis-Hinweis: alle) – aus „Mitarbeiter“. `null`: die App kennt die Personen nicht (dann zählt `anzahlPersonen`).
+   */
+  beschaeftigte?: { name: string; beginn: string | null; neu: boolean }[] | null;
+  /** R12 (Zoll #1): so viele Personen brauchen laut Check eine Aufzeichnung, wenn die App sie nicht namentlich kennt */
+  anzahlPersonen?: number;
+  /** R12 (Kfz #13): Tag, ab dem die Pflicht gilt, wenn er in der Zukunft liegt (z. B. E-Rechnung ab 2028) – sonst null */
+  giltAb?: string | null;
 }
 
 /** R10: Pflichten, die je neu eingestellter Person zu erfüllen sind (Nutzertest Jonas: ein Nachweis für den Azubi erledigte sie für alle). */
 const JE_PERSON = new Set(["arbeitsschutz.erstunterweisung"]);
+/** R12 (Zoll #1): Arbeitszeit nach § 17 MiLoG – erledigt erst, wenn für jede betroffene Person eine aktuelle Aufzeichnung da ist. */
+export const ZEIT_JE_PERSON = "personal.arbeitszeit_milog";
+/** R12 (Zoll #6): Ausweis-Hinweis – je Person, bei neu Eingestellten vor bzw. spätestens am ersten Arbeitstag. */
+export const AUSWEIS_JE_PERSON = "personal.ausweis_hinweis";
+/** R12 (Bäckerei #11): Vorlagen, die eine Pflicht zusätzlich belegen (die Folgebelehrung füllt man mit derselben Vorlage aus). */
+const ZUSATZ_VORLAGEN: Record<string, string[]> = { "branche.gastro_ifsg_folgebelehrung": ["ifsg_belehrung"] };
+/** R12 (Kfz #13): Pflichten mit festem Datum, ab dem sie gelten (nicht „bis wann“) – vorher nicht als „schon erledigt“ abzuhaken. */
+const GILT_AB_TERMIN = new Set(["steuern.e_rechnung_versand_2027", "steuern.e_rechnung_versand_2028"]);
+/** R12 (Coach #3): offene Klärungen, die auch bei Bestandsbetrieben „jetzt dran“ sind statt „aus der Gründung“. */
+const OFFEN_TROTZ_BESTAND = new Set(["gruendung.taetigkeit_einordnen"]);
+/** Branchen nach § 2a SchwarzArbG, die die App ohne Rückfrage kennt (wie im Katalog) */
+const BRANCHE_2A = ["beauty_kosmetik", "gebaeudereinigung"];
 
 /** R10: Erledigung laut Katalog – einmalig (Standard), laufend je Zeitraum bzw. bis zum nächsten Termin, oder nur mit Bestätigung. */
 export interface Erledigungsart {
@@ -247,6 +355,7 @@ const text = (t: unknown) => (t && typeof t === "object" && typeof (t as { de?: 
 /** Vorlagen je Pflicht in der Reihenfolge von VORLAGEN – die erste ist die Hauptvorlage */
 const VORLAGEN_JE_PFLICHT = new Map<string, string[]>();
 for (const v of VORLAGEN) for (const p of v.pflichten) VORLAGEN_JE_PFLICHT.set(p, [...(VORLAGEN_JE_PFLICHT.get(p) ?? []), v.id]);
+for (const [p, ids] of Object.entries(ZUSATZ_VORLAGEN)) VORLAGEN_JE_PFLICHT.set(p, [...new Set([...(VORLAGEN_JE_PFLICHT.get(p) ?? []), ...ids])]);
 const SCHWERE = { hoch: 0, mittel: 1, niedrig: 2 } as const;
 
 /** Unterlage, soweit sie für abgeleitete Ereignisse zählt (Teil von `Unterlage` aus unterlagen/speicher.ts). */
@@ -300,6 +409,9 @@ export interface MitarbeiterFuerCheck {
   beginn?: string | null;
   /** R11: Freitext aus dem Personalfragebogen, z. B. „deutsch“, „polnisch“, „syrisch“ */
   staatsangehoerigkeit?: string | null;
+  /** R12: Art der Beschäftigung (vollzeit, teilzeit, minijob …) und „Beschäftigt bis“ */
+  art?: string | null;
+  ende?: string | null;
 }
 
 /** R11 (Nutzertest Gebäudereinigung #5): Staatsangehörigkeiten aus EU, EWR und Schweiz – ohne Aufenthaltstitel arbeitsberechtigt. */
@@ -319,12 +431,50 @@ const alter = (geburt: string, tag: string) => Number(tag.slice(0, 4)) - Number(
  * Jugendliche wie im Profil angegeben.
  */
 export function profilMitStand(profil: Profil, stichtag: string, mitarbeiter: readonly MitarbeiterFuerCheck[] = []): Profil {
+  profil = abgeleiteteAntworten(profil);
   // R11: gespeicherte Mitarbeiter aus Drittstaaten ⇒ „Beschäftigst du Menschen aus Drittstaaten?“ ist mit Ja beantwortet
   if (profil["personal.drittstaaten"] !== true && mitarbeiter.some((m) => drittstaat(m.staatsangehoerigkeit))) profil = { ...profil, "personal.drittstaaten": true };
   const jung = mitarbeiter.filter((m) => typeof m.geburtsdatum === "string" && ISO.test(m.geburtsdatum) && alter(m.geburtsdatum, stichtag) < 18 && alter(m.geburtsdatum, stichtag) >= 0).length;
   if (!jung) return profil;
   const angegeben = typeof profil["beschaeftigte.jugendlich"] === "number" ? (profil["beschaeftigte.jugendlich"] as number) : 0;
   return { ...profil, "beschaeftigte.jugendlich": Math.max(angegeben, jung) };
+}
+
+/** R12 (Coach #20): bei 0 Beschäftigten sind alle Zählungen 0 – sonst blieben Jugendarbeitsschutz, Minijob-Grenze usw. „hängt ab“. */
+const PERSONAL_NULL: Record<string, string | number | boolean> = {
+  "beschaeftigte.minijob": 0,
+  "beschaeftigte.azubi": 0,
+  "beschaeftigte.jugendlich": 0,
+  "beschaeftigte.schwanger": 0,
+  "beschaeftigte.schwerbehindert": 0,
+  "beschaeftigte.werkstudent": 0,
+  "beschaeftigte.vollzeit": 0,
+  "beschaeftigte.teilzeit": 0,
+  "personal.drittstaaten": false,
+  "arbeitszeit.nachtarbeit": false,
+  "ifsg.beschaeftigte": "keine",
+};
+/** R12 (Kurier #19): NIS2 erfasst kleine Unternehmen (unter 50 Beschäftigte, bis 10 Mio. € Umsatz) in der Regel nicht – außer IT-Dienste wie DNS oder Vertrauensdienste. */
+const NIS2_UMSATZ_GRENZE = 10_000_000;
+
+/**
+ * R12: Antworten, die aus anderen folgen – nur für die Auswertung, nicht gespeichert (die Frage selbst bleibt änderbar):
+ * 0 Beschäftigte ⇒ alle Zählungen 0 (Coach #20); Einzelperson ⇒ keine Investoren aus dem Ausland (die Frage wird ihr nicht
+ * gestellt); kein Bargeld ⇒ keine elektronische Kasse (Kurier #14); kleines Unternehmen ⇒ nicht von NIS2 erfasst (Kurier #19).
+ */
+export function abgeleiteteAntworten(profil: Profil): Profil {
+  const p: Profil = { ...profil };
+  const setze = (feld: string, wert: string | number | boolean) => {
+    if (!beantwortet(p, feld)) p[feld] = wert;
+  };
+  if (ohneTeam(p)) for (const [feld, wert] of Object.entries(PERSONAL_NULL)) setze(feld, wert);
+  if (typeof p.rechtsform === "string" && EINZELPERSON.includes(p.rechtsform)) setze("gesellschafter.auslaendische_investoren", false);
+  if (p["kasse.bargeld"] === false) setze("kasse.elektronisch", false);
+  const team = zahl(p, "beschaeftigte.gesamt");
+  const umsatz = zahl(p, "umsatz.vorjahr") ?? zahl(p, "umsatz.prognose_laufendes_jahr");
+  const klein = team !== null && team < 50 && ((umsatz !== null && umsatz <= NIS2_UMSATZ_GRENZE) || p["ust.kleinunternehmer"] === true);
+  if (klein && !inBranche(p, "it_agentur_freelancer")) setze("nis2.betroffen", "nein");
+  return p;
 }
 
 /** R11 (Nutzertest Tischlerei #2): „Warum für dich“ einer unklaren Pflicht als Bedingung („Gilt, wenn …“). */
@@ -376,6 +526,14 @@ export function auswertung(antworten: Profil, stichtag: string, unterlagen: read
   const lohnExtern = profil["personal.lohn_durch"] === "steuerberatung" || profil["personal.lohn_durch"] === "lohnbuero";
   const seit = plusMonate(stichtag, -BESTAND_AB_MONATEN);
   const neuePersonen = mitarbeiter.filter((m) => typeof m.beginn === "string" && ISO.test(m.beginn) && m.beginn > seit && typeof m.name === "string" && m.name.trim()).map((m) => m.name!.trim());
+  // R12 (Zoll #1, #6): wer gerade beschäftigt ist (begonnen, nicht seit mehr als sieben Tagen ausgeschieden), mit Namen
+  const aktuell = mitarbeiter.filter((m) => typeof m.name === "string" && m.name.trim() && !(typeof m.beginn === "string" && ISO.test(m.beginn) && m.beginn > plusMonate(stichtag, 1)) && !(typeof m.ende === "string" && ISO.test(m.ende) && m.ende < plusTage(stichtag, -7)));
+  const person = (m: MitarbeiterFuerCheck) => ({ name: m.name!.trim(), beginn: typeof m.beginn === "string" && ISO.test(m.beginn) ? m.beginn : null, neu: typeof m.beginn === "string" && ISO.test(m.beginn) && m.beginn > seit });
+  const alle2a = (liste(profil, "personal.sofortmeldebranchen") ?? []).some((x) => x !== "keine") || inBranche(profil, ...BRANCHE_2A);
+  const mitArt = aktuell.some((m) => typeof m.art === "string" && m.art);
+  // § 17 MiLoG: in den Branchen nach § 2a SchwarzArbG alle, sonst die Minijobber (Art aus „Mitarbeiter“; ohne Angabe nach Zahl)
+  const zeitPersonen = alle2a ? aktuell.map(person) : mitArt ? aktuell.filter((m) => m.art === "minijob").map(person) : null;
+  const zeitAnzahl = alle2a ? (zahl(profil, "beschaeftigte.gesamt") ?? 0) : (zahl(profil, "beschaeftigte.minijob") ?? 0);
   const ergebnisse = auswerten({ katalog: KATALOG, fakten, ereignisse, stichtag, kalender: new StandardKalender(), fenster: { von: stichtag, bis: plusMonate(stichtag, 12) } });
   const nachId = new Map(KATALOG.pflichten.map((p) => [p.id, p]));
   const info = (e: (typeof ergebnisse)[number]): PflichtInfo => {
@@ -396,6 +554,9 @@ export function auswertung(antworten: Profil, stichtag: string, unterlagen: read
       // R11 (Nutzertest Tischlerei #2): bei unklaren Pflichten als Bedingung, nicht als Tatsache
       grund: e.ergebnis === "unbekannt" ? bedingung(entscheidendeSaetze(e.begruendung)) : entscheidendeSaetze(e.begruendung).join(" ") || ("immer" in (p.ausloeser as object) ? IMMER : ""),
       vorlage: VORLAGEN_JE_PFLICHT.get(p.id)?.[0] ?? null,
+      ...(p.id === ZEIT_JE_PERSON ? { beschaeftigte: zeitPersonen && zeitPersonen.length ? zeitPersonen : null, anzahlPersonen: zeitAnzahl } : {}),
+      ...(p.id === AUSWEIS_JE_PERSON ? { beschaeftigte: aktuell.length ? aktuell.map(person) : null } : {}),
+      giltAb: p.gueltig_ab && p.gueltig_ab > stichtag ? p.gueltig_ab : GILT_AB_TERMIN.has(p.id) && p.frist.typ === "absolut" && p.frist.datum > stichtag ? p.frist.datum : null,
       vorlagen: VORLAGEN_JE_PFLICHT.get(p.id) ?? [],
       naechsterTermin: termin,
       termine,
@@ -420,7 +581,11 @@ export function auswertung(antworten: Profil, stichtag: string, unterlagen: read
   const aktiv = ergebnisse.filter((e) => !e.radar);
   const beginn = typeof profil.gruendungsdatum === "string" ? profil.gruendungsdatum : null;
   const bestehend = Boolean(beginn && beginn <= plusMonate(stichtag, -BESTAND_AB_MONATEN));
-  const ausGruendung = (e: (typeof ergebnisse)[number]) => bestehend && nachId.get(e.pflicht_id)?.phase === "gruendung";
+  // R12 (Coach #3): eine offene Klärung (Gewerbe oder freier Beruf? – „weiß ich nicht“) bleibt „jetzt dran“
+  const ausGruendung = (e: (typeof ergebnisse)[number]) => bestehend && nachId.get(e.pflicht_id)?.phase === "gruendung" && !OFFEN_TROTZ_BESTAND.has(e.pflicht_id);
+  // R12 (Coach #1): unklare Gründungsschritte verschwinden bei Bestandsbetrieben nicht – sie stehen unter „Hängt ab“, wenn eine
+  // Frage sie klären kann (z. B. Gewerbeanzeige bei „weiß ich nicht“); was keine passende Frage mehr hat (Gründungszuschuss), entfällt
+  const fragbar = (e: (typeof ergebnisse)[number]) => zuErfragendeFakten(e.fehlende_fakten).some((f) => f.startsWith("profil.") && FRAGE.has(f.slice(7)) && passtImmer(f.slice(7), profil));
   // R10: Einstellungs-Pflichten (je Einstellung) ohne Einstellung in den letzten sechs Monaten oder demnächst: „bei Neueinstellung“
   const grenze = plusMonate(stichtag, -BESTAND_AB_MONATEN);
   const neueEinstellung = ereignisse.some((x) => x.typ === "einstellung" && x.datum > grenze);
@@ -440,7 +605,7 @@ export function auswertung(antworten: Profil, stichtag: string, unterlagen: read
   return {
     gilt: sortiert(gilt.filter((e) => !ausGruendung(e) && !beiEinstellung(e)).map(info)),
     gruendung: sortiert(gilt.filter(ausGruendung).map(info)),
-    unbekannt: sortiert(aktiv.filter((e) => e.ergebnis === "unbekannt" && !ausGruendung(e)).map(info)),
+    unbekannt: sortiert(aktiv.filter((e) => e.ergebnis === "unbekannt" && (!ausGruendung(e) || fragbar(e))).map(info)),
     beiEinstellung: sortiert(gilt.filter((e) => !ausGruendung(e) && beiEinstellung(e)).map(info)),
     kommend,
   };
@@ -538,6 +703,9 @@ export function istErledigt(p: PflichtInfo, e: Erledigt): boolean {
 export function erledigtDurch(p: PflichtInfo, e: Erledigt): Erledigt["unterlagen"][number] | null {
   const heute = e.heute ?? heuteBerlin();
   const erl = p.erledigung ?? { art: "einmalig" };
+  // R12 (Zoll #1, #6): Nachweise je Person – Arbeitszeit nach § 17 MiLoG und Ausweis-Hinweis
+  if (p.id === ZEIT_JE_PERSON) return aufzeichnungsStand(p, e).erledigtDurch;
+  if (p.id === AUSWEIS_JE_PERSON && p.beschaeftigte?.length) return ausweisStand(p, e).erledigtDurch;
   if (!p.vorlage || p.wiederkehrend || erl.art === "bestaetigen") return null;
   const v = vorlageFuer(p.vorlage);
   if (!v) return null;
@@ -559,6 +727,71 @@ export function erledigtDurch(p: PflichtInfo, e: Erledigt): Erledigt["unterlagen
     .sort((x, y) => y.ausgegeben!.localeCompare(x.ausgegeben!));
   return passend[0] ?? null;
 }
+
+const namensSchluessel = (x: unknown) => (typeof x === "string" ? x.trim().toLowerCase() : "");
+type UnterlageE = Erledigt["unterlagen"][number];
+
+/**
+ * R12 (Zoll #1, Kurier #1): Stand der Arbeitszeitaufzeichnung nach § 17 MiLoG je Person. Eine Person ist abgedeckt, wenn
+ * ein Arbeitszeitnachweis (nicht storniert) für sie einen erfassten Tag – Beginn und Ende oder eine Bemerkung wie Urlaub –
+ * aus den letzten sieben Tagen oder aus dem laufenden Monat enthält (§ 17 Abs. 1 MiLoG: bis zum siebten Tag nach der Arbeit).
+ * `fehlend`: Personen ohne aktuelle Aufzeichnung mit dem Tag, seit dem sie fehlt (null: noch nie aufgezeichnet). Kennt die
+ * App die Personen nicht, zählt sie nur, ob so viele verschiedene Namen abgedeckt sind, wie der Check angibt.
+ */
+export function aufzeichnungsStand(p: PflichtInfo, e: Erledigt): { fehlend: { name: string; seit: string | null }[]; abgedeckt: number; erforderlich: number; erledigtDurch: UnterlageE | null } {
+  const heute = e.heute ?? heuteBerlin();
+  const grenze = plusTage(heute, -7);
+  const nachweise = e.unterlagen.filter((u) => u.vorlage === "arbeitszeitnachweis" && !u.storniertDurch);
+  const letzter = new Map<string, { tag: string; u: UnterlageE }>();
+  const imMonat = new Set<string>();
+  for (const u of nachweise) {
+    const wer = namensSchluessel(u.daten.name);
+    if (!wer) continue;
+    const tage = (Array.isArray(u.daten.tage) ? (u.daten.tage as Record<string, unknown>[]) : [])
+      .filter((t) => t && typeof t.datum === "string" && ISO.test(t.datum) && t.datum <= heute && ((typeof t.beginn === "string" && t.beginn && typeof t.ende === "string" && t.ende) || (typeof t.bemerkung === "string" && t.bemerkung.trim())))
+      .map((t) => t.datum as string)
+      .sort();
+    const tag = tage[tage.length - 1];
+    if (!tag) continue;
+    if (tage.some((t) => gleicherZeitraum(t, heute, "monat"))) imMonat.add(wer);
+    if (!letzter.has(wer) || letzter.get(wer)!.tag < tag) letzter.set(wer, { tag, u });
+  }
+  const aktuell = (wer: string) => imMonat.has(wer) || (letzter.get(wer)?.tag ?? "") >= grenze;
+  if (p.beschaeftigte?.length) {
+    const fehlend = p.beschaeftigte.filter((b) => !aktuell(b.name.toLowerCase())).map((b) => ({ name: b.name, seit: letzter.has(b.name.toLowerCase()) ? plusTage(letzter.get(b.name.toLowerCase())!.tag, 1) : null }));
+    const belege = p.beschaeftigte.map((b) => letzter.get(b.name.toLowerCase())?.u).filter((u): u is UnterlageE => Boolean(u));
+    return { fehlend, abgedeckt: p.beschaeftigte.length - fehlend.length, erforderlich: p.beschaeftigte.length, erledigtDurch: fehlend.length ? null : (belege[0] ?? null) };
+  }
+  const erforderlich = Math.max(1, p.anzahlPersonen ?? 1);
+  const abgedeckt = [...letzter.keys()].filter(aktuell).length;
+  const beleg = [...letzter.values()].filter((x) => aktuell(namensSchluessel(x.u.daten.name))).map((x) => x.u)[0] ?? null;
+  return { fehlend: [], abgedeckt, erforderlich, erledigtDurch: abgedeckt >= erforderlich ? beleg : null };
+}
+
+/**
+ * R12 (Zoll #6): Ausweis-Hinweis je beschäftigter Person – vollständig, geteilt, nicht storniert. Bei neu eingestellten Personen
+ * (Beschäftigt seit in den letzten sechs Monaten oder demnächst) muss er spätestens am ersten Arbeitstag ausgehändigt sein.
+ */
+export function ausweisStand(p: PflichtInfo, e: Erledigt): { fehlend: { name: string; grund: "fehlt" | "nach_beginn" }[]; erledigtDurch: UnterlageE | null } {
+  const v = vorlageFuer("ausweis_hinweis");
+  const fertige = e.unterlagen.filter((u) => u.vorlage === "ausweis_hinweis" && u.ausgegeben && !u.storniertDurch && (!v || fehlendeAngaben(v, u.daten as never, e.betrieb).length === 0));
+  const fehlend: { name: string; grund: "fehlt" | "nach_beginn" }[] = [];
+  let beleg: UnterlageE | null = null;
+  for (const b of p.beschaeftigte ?? []) {
+    const eigene = fertige.filter((u) => namensSchluessel(u.daten.name) === b.name.toLowerCase());
+    if (!eigene.length) {
+      fehlend.push({ name: b.name, grund: "fehlt" });
+      continue;
+    }
+    const rechtzeitig = !b.neu || !b.beginn ? eigene : eigene.filter((u) => typeof u.daten.datum === "string" && u.daten.datum <= b.beginn!);
+    if (!rechtzeitig.length) fehlend.push({ name: b.name, grund: "nach_beginn" });
+    else beleg ??= rechtzeitig[0]!;
+  }
+  return { fehlend, erledigtDurch: fehlend.length ? null : beleg };
+}
+
+/** R12 (Kfz #13): gilt erst in der Zukunft (z. B. E-Rechnungen versenden ab 2028) – nicht bei „Was hast du schon?“ abhaken. */
+export const inZukunft = (p: Pick<PflichtInfo, "giltAb">, heute: string = heuteBerlin()) => Boolean(p.giltAb && p.giltAb > heute);
 
 /**
  * Fortschritt über die geltenden Pflichten (ohne Gründungsschritte eines bestehenden Betriebs). R10: nur echte Pflichten –
@@ -589,6 +822,8 @@ export const KATEGORIE_TITEL: Record<string, string> = {
   online: "Website und Online-Handel",
   produkte: "Produkte",
   branche: "Deine Branche",
+  // R12 (Nutzertest Kfz #1)
+  umwelt: "Umwelt und Abfall",
 };
 
 /** Branche aus dem Profil → Gruppe in den Vorschlägen (z. B. Gefährdungen „Friseur“). */
@@ -600,6 +835,7 @@ export const VORSCHLAG_GRUPPE: Record<string, string[]> = {
   onlinehandel: ["Büro / Laden"],
   it_agentur_freelancer: ["Büro / Laden"],
   immobilien_finanzen: ["Büro / Laden"],
+  unterricht_sport_coaching: ["Büro / Laden"],
 };
 
 const plusTage = (iso: string, n: number) => {
@@ -622,8 +858,9 @@ export function dringlichkeit(a: Auswertung, e: Erledigt, heute: string) {
   const spaeter = plusTage(heute, 45);
   const mitTermin = selbst.filter((p) => p.naechsterTermin).sort((x, y) => x.naechsterTermin!.localeCompare(y.naechsterTermin!));
   const terminBald = mitTermin.filter((p) => p.naechsterTermin! <= bald);
-  // Hinweise und Optionen ohne Termin sind nie „dringend“
-  const wichtigOhne = selbst.filter((p) => !p.naechsterTermin && p.schwere === "hoch" && p.einordnung === "pflicht");
+  // Hinweise und Optionen ohne Termin sind nie „dringend“ (außer offenen Klärungen, R12)
+  // R12 (Coach #3): die offene Einordnung (Gewerbe oder freier Beruf?) ist ein Hinweis, aber „jetzt dran“
+  const wichtigOhne = selbst.filter((p) => !p.naechsterTermin && p.schwere === "hoch" && (p.einordnung === "pflicht" || OFFEN_TROTZ_BESTAND.has(p.id)));
   const jetzt = [...terminBald, ...wichtigOhne];
   const naechsteWochen = mitTermin.filter((p) => p.naechsterTermin! > bald && p.naechsterTermin! <= spaeter);
   const imBlick = offen.filter((p) => !jetzt.includes(p) && !naechsteWochen.includes(p));
