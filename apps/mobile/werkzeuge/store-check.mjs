@@ -56,7 +56,10 @@ pruefe(kauf?.NSPrivacyCollectedDataTypePurposes?.includes("NSPrivacyCollectedDat
 const storeTexte = JSON.parse(lies("store/de.json"));
 const website = fs.readFileSync(path.join(APP, "../website/seite.html"), "utf8");
 pruefe(/evaluates purchases for subscription management/.test(storeTexte.pruefhinweise) && /RevenueCat[^"]*Abo-Verwaltung/.test(recht) && /RevenueCat[^<]*Abo-Verwaltung/.test(website) && !/sends no analytics/i.test(storeTexte.pruefhinweise), "Texte zu Analysen passen zum Privacy Manifest (Store-Prüfhinweise, Datenschutzhinweis, Website)");
-pruefe(!recht.includes("[vor Veröffentlichung eintragen]"), "Datenschutzhinweis ohne Platzhalter (Garantie für die Übermittlung in die USA, Speicherdauer bei RevenueCat – src/rechtliches.ts)");
+// Platzhalter im Sync-Zusatz (Hoster, Anmeldedienst) zählen nur für Builds mit Server
+const rechtOhneKonst = recht.replace(/export const PLATZHALTER_RECHT.*\n/, "");
+const rechtOhneSync = process.env.EXPO_PUBLIC_API_URL ? rechtOhneKonst : rechtOhneKonst.replace(/export const DATENSCHUTZ_SYNC[\s\S]*?\n};\n/, "");
+pruefe(!rechtOhneSync.includes("[vor Veröffentlichung eintragen]"), "Datenschutzhinweis ohne Platzhalter (src/rechtliches.ts; mit Server auch Hoster und Anmeldedienst im Sync-Zusatz)");
 const nurSync = ["EmailAddress", "Name", "UserID"].map((x) => `NSPrivacyCollectedDataType${x}`);
 pruefe(!datenarten.some((d) => nurSync.includes(d.NSPrivacyCollectedDataType)) && fs.existsSync(path.join(APP, "app.config.ts")), "Privacy Manifest: E-Mail, Name, Benutzer-ID nur in Builds mit Sync (app.config.ts, nicht fest in app.json)");
 

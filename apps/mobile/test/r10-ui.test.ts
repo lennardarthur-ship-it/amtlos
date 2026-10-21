@@ -89,7 +89,8 @@ describe("Datenschutzhinweis nach Art. 13 (Recht #2, #3)", () => {
     for (const t of ["Rechtsgrundlagen", "Empfänger und Drittland", "Speicherdauer", "Musst du Daten angeben?", "Keine automatisierte Entscheidung", "Deine Rechte"]) expect(titel).toContain(t);
     const text = DATENSCHUTZ.abschnitte.map((a) => a.text).join(" ");
     expect(text).toContain("RevenueCat, Inc., USA");
-    expect(text).toContain("Garantie: [vor Veröffentlichung eintragen]");
+    expect(text).toContain("Standardvertragsklauseln der EU-Kommission (Art. 46 Abs. 2 lit. c DSGVO)");
+    expect(text).not.toContain("[vor Veröffentlichung eintragen]");
     expect(text).toMatch(/keine eigenen Analysen/);
     // keine erfundene Zertifizierung
     expect(text).not.toMatch(/Data Privacy Framework|zertifiziert/);
