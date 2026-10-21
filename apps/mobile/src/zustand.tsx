@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import * as StoreReview from "expo-store-review";
 import { AppState } from "react-native";
 import { sollFragen } from "./pro/bewertung";
-import { kaufAktiv, proAktiv, testmodus } from "./pro/kauf";
+import { kaufAktiv, proAktiv, proBeobachten, testmodus } from "./pro/kauf";
 import { archivLoeschen, archivierteSchluessel, autoSchluesselLoeschen, nonce, schluesselArchivieren, schluesselHolen, schluesselLoeschen, schluesselbundMoeglich } from "./unterlagen/schluesselbund";
 import { allesAbsagen } from "./pflichten/erinnerungen";
 import { cacheLeeren } from "./unterlagen/aufraeumen";
@@ -136,6 +136,8 @@ interface Zustand {
   /** Abo-Status beim Store neu abfragen (nach Kauf/Wiederherstellen und beim Start) */
   proAktualisieren(aktiv?: boolean): void;
   proTestSetzen(an: boolean): void;
+  /** Phase 2.3: Partner für „Empfohlen von …“ setzen bzw. entfernen (null) – nur Anzeige, schaltet nie etwas frei */
+  partnerSetzen(id: string | null): void;
   /** Erfolgsmoment (Rechnung geteilt, Check fertig, Zahlung vermerkt) – fragt ggf. nach einer Bewertung */
   erfolg(): void;
   steuerberatungSetzen(sb: Stand["steuerberatung"]): void;
@@ -262,7 +264,12 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
     const abo = AppState.addEventListener("change", (z) => {
       if (z === "active") void proAktiv().then(setStorePro);
     });
-    return () => abo.remove();
+    // Phase 2.3: eingelöste Angebotscodes, Verlängerung, Kündigung – RevenueCat meldet die Berechtigung
+    const beobachtung = proBeobachten(setStorePro);
+    return () => {
+      abo.remove();
+      beobachtung();
+    };
   }, []);
   const schluessel = useRef<Uint8Array | null>(null);
   const [verschluesselt, setVerschluesselt] = useState(false);
@@ -591,6 +598,10 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       cloudSicherungSetzen: (an) => setzen({ ...aktuell.current, cloudSicherung: an }),
       proAktualisieren: (aktiv) => (aktiv === undefined ? void proAktiv().then(setStorePro) : setStorePro(aktiv)),
       proTestSetzen: (an) => setzen({ ...aktuell.current, proTest: an }),
+      partnerSetzen: (id) => {
+        const { partnerId: _alt, ...rest } = aktuell.current;
+        setzen(id ? { ...rest, partnerId: id } : rest);
+      },
       steuerberatungSetzen: (sb) => setzen(steuerberatungSetzen(aktuell.current, sb)),
       belegSetzen: (b, grund) => {
         const vorher = aktuell.current;

@@ -1040,6 +1040,10 @@ Der Gründer hat entschieden: Pflicht-Nachweise fallen aus dem Freikontingent he
 
 **Phase 2.1 – Paywall umgedreht (hebt E-154 auf):** Kostenlos: Rechnungen ohne Limit (inkl. Gutschrift/Storno), Belege und E-Rechnungs-Empfang, Kasse/Kassenbuch, Pflichten-Überblick (Titel, Kurztext, Termin, Abhaken), Fristen in der App, alle Vorlagen ausfüllen und ansehen, Sicherung/Archiv. Pro: Vorlagen als PDF (1 Vorlage je Kalendermonat frei, `VORLAGEN_FREI_JE_MONAT`), Erinnerungen per Mitteilung, Kontrollmappe teilen, Pflicht-Details (Erklärung, Folgen, Rechtsgrundlage, Quellen), Steuerpaket, E-Rechnung erstellen, Briefkopf, iCloud, Sync. Schutzregeln: Ausgegebenes bleibt immer wieder teilbar, Entwürfe und Daten bleiben, Storno/Sicherung frei, Pro-Ende löscht nichts; „Ausfüllen“ aus der Pflicht bleibt frei (nur die PDF-Ausgabe zählt). Bezahlschirm „Pflichten erfüllen, Kontrollen bestehen“.
 
+**Phase 2.2 – Preise:** Monatsabo 9,99 €, Jahresabo 79–99 € (Apple-Preispunkte 79,99/89,99/99,99 €, Wahl beim Gründer), 14 Tage kostenlos als Einführungsangebot, Auswertung nach 60 Tagen (docs/11 §3). Beträge nur aus dem Store.
+
+**Phase 2.3 – B2B vorbereitet:** Keine eigenen Freischaltcodes (Richtlinie 3.1.1); Partner-Lizenzen über Apples Abo-Angebotscodes, in der App „Code einlösen“ (RevenueCat `presentCodeRedemptionSheet`). „Empfohlen von …“ als reine Anzeige mit gebündelter, leerer Partnerliste, Partner-Code und Link `amtlos://partner/<code>` (Stand 5, nur in der Sicherung). Pakete fristen, rules-engine, fachlogik als Bibliothek packbar und geprüft (`werkzeuge/bibliothek-pruefen.mjs`, README und Beispiel je Paket, `private` bleibt). Doku `docs/13-b2b-lizenz.md`. Offen: Weitergabe von Angebotscodes an zahlende Partner (Apple-Vertrag, Anwalt), Dauer kostenloser Code-Angebote, Lizenzvertrag/Haftung für die Bibliothek.
+
 **Hinweise an den Gründer:** Arbeitszeitnachweise je Person und Monat verbrauchen die freie Vorlage schnell (Fairness/UWG prüfen lassen, T-78); E-Rechnung hinter Pro trotz Ausstellungspflicht 2027/28; Kontingent zählt auch Ausgaben aus einer Pro-Zeit im selben Monat.
 
 ---

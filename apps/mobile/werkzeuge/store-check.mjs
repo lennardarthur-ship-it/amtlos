@@ -79,8 +79,41 @@ pruefe(/1 template per calendar month/.test(s.pruefhinweise) && /always be share
 const webBilder = path.join(APP, "../website/bilder");
 pruefe(s.bilder.every((x) => fs.existsSync(path.join(webBilder, `${x.bildschirm}.jpg`))) && fs.existsSync(path.join(webBilder, "og.jpg")), "Website-Bilder und Vorschaubild vorhanden (werkzeuge/store-bilder.mjs schreibt sie mit)");
 
+// Phase 2.3 (E-156): kein eigener Freischaltweg (App Review 3.1.1 – keine Lizenzschlüssel, QR-Codes o. Ä.). Pro kommt nur
+// aus der RevenueCat-Berechtigung (pro/kauf.ts) oder – nur im Testmodus – vom Testschalter; Partner-Codes sind reine Anzeige.
+{
+  const quellen = [];
+  const sammeln = (dir) => {
+    for (const e of fs.readdirSync(path.join(APP, dir), { withFileTypes: true })) {
+      const p = path.join(dir, e.name);
+      if (e.isDirectory()) sammeln(p);
+      else if (/\.(ts|tsx)$/.test(e.name)) quellen.push([p, lies(p)]);
+    }
+  };
+  sammeln("src");
+  const befunde = [];
+  const zustand = lies("src/zustand.tsx");
+  if (!zustand.includes("const pro = storePro || (testmodus && stand.proTest);")) befunde.push("zustand.tsx: Pro nicht mehr nur aus Store bzw. Testmodus");
+  // setStorePro nur mit Ergebnissen aus kauf.ts (proAktiv, proBeobachten) bzw. über proAktualisieren
+  const erlaubtSetzen = [/^\s*setStorePro\(an\);/, /\.then\(setStorePro\)/, /proBeobachten\(setStorePro\)/, /: setStorePro\(aktiv\)\)/, /useState\(false\)/];
+  for (const zeile of zustand.split("\n").filter((z) => z.includes("setStorePro") && !z.includes("const [storePro, setStorePro]"))) if (!erlaubtSetzen.some((r) => r.test(zeile))) befunde.push(`zustand.tsx: unerwartetes setStorePro – ${zeile.trim().slice(0, 80)}`);
+  for (const [p, q] of quellen) {
+    const rel = p.replace(/\\/g, "/");
+    // Berechtigungen lesen nur die Kauf-Module
+    if (/entitlements/.test(q) && !/src\/pro\/(kauf|code)\.ts$/.test(rel)) befunde.push(`${rel}: liest Berechtigungen außerhalb von pro/kauf.ts`);
+    // keine Lizenzschlüssel, Freischalt- oder Aktivierungscodes
+    if (/lizenzschl|license.?key|freischalt.?code|unlock.?code|aktivierungscode|activation.?code/i.test(q.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, ""))) befunde.push(`${rel}: Lizenzschlüssel/Freischaltcode im Code`);
+    // Pro auf „an“ setzen nur mit einem Ergebnis aus kauf.ts (Kauf, Wiederherstellen, Code einlösen, Konto verbinden)
+    if (/proAktualisieren\((true|aktiv)\)/.test(q) && !/from "\.\.\/pro\/kauf"/.test(q)) befunde.push(`${rel}: setzt Pro ohne kauf.ts`);
+    if (/proTestSetzen\(true\)/.test(q) && !/if \(!testmodus\) return;\s*\/\/[^\n]*\n\s*z\.proTestSetzen\(true\)/.test(q)) befunde.push(`${rel}: Testschalter außerhalb des Testmodus`);
+    // Partner-Branding berührt den Pro-Status nie
+    if (/src\/partner\//.test(rel) && /\bpro\b|proTest|proAktualisieren|setStorePro|entitlements/.test(q.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, ""))) befunde.push(`${rel}: Partner-Modul berührt Pro`);
+  }
+  pruefe(!befunde.length, `Kein eigener Freischaltweg (App Review 3.1.1): Pro nur aus RevenueCat-Berechtigung bzw. Testmodus, Partner-Code nur Anzeige${befunde.length ? ` – ${befunde.join("; ")}` : ""}`);
+}
+
 // Fachliche Freigabe
-const pl = fs.readFileSync(path.join(APP, "../../PRUEFLISTE.md"), "utf8");
+const pl =fs.readFileSync(path.join(APP, "../../PRUEFLISTE.md"), "utf8");
 pruefe(!/\| T-5[2-9] \|/.test(pl) || /T-52[^\n]*erledigt/i.test(pl), "Fachliche Freigabe der Vorlagen (PRUEFLISTE T-52 ff.) – vor dem Livegang durch Fachleute");
 
 for (const t of ok) console.log(`  ✓ ${t}`);

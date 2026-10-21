@@ -23,6 +23,7 @@ import { HAARLINIE, SCHRIFT, TASTATUR_FERTIG, istIos, useFarben } from "./ui/the
 import { AmtlosAnbieter, useAmtlos, type Tab } from "./zustand";
 import { KontoAnbieter } from "./konto/konto";
 import { Abdeckung } from "./sicherheit/abdeckung";
+import { PartnerLink } from "./seiten/Partner";
 
 void SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
@@ -324,6 +325,8 @@ export default function App() {
               <AutoSicherung />
               <Sperre>
                 <MeldungAnbieter imTab={tabsOben}>
+                  {/* Phase 2.3: amtlos://partner/<code> – nur „Empfohlen von …“, schaltet nichts frei */}
+                  <PartnerLink />
                   <Rahmen />
                 </MeldungAnbieter>
               </Sperre>

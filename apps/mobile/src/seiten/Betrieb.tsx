@@ -20,6 +20,8 @@ import { BuehnenSeite, Gruppe, Inhalt, datumKurz } from "./gemeinsam";
 import { CheckProfilZeile } from "./Pflichten";
 import { CloudZeile, SicherungSeite, WiederherstellenSeite } from "./Sicherung";
 import { ProZeile, useProSperre } from "./Pro";
+import { CodeEinloesenKnopf } from "./Partner";
+import { paywallVerfuegbar } from "../pro/kauf";
 import { UeberGruppe } from "./Recht";
 import { SteuerberatungSeite } from "./Steuerberatung";
 import { KontrollmappeSeite } from "./Kontrollmappe";
@@ -392,6 +394,8 @@ export function Betrieb() {
   return (
     <BuehnenSeite key={zaehler} ueber={betriebFehlt(b) ? undefined : TEXT.betrieb_titel} buehne={<BetriebKopf b={b} onPress={betriebFehlt(b) ? oeffneAlles : () => oeffneTeil("angaben")} />}>
       <ProZeile />
+      {/* Phase 2.3: Partner-Lizenzen über Apples Angebotscodes – Apples Einlöseblatt, nie ein eigener Freischaltweg */}
+      {paywallVerfuegbar && !z.pro ? <CodeEinloesenKnopf leise /> : null}
       <Gruppe titel={TEXT.betrieb_gruppe}>
         <Karte>
           {teileSichtbar.map((t) => (

@@ -105,16 +105,16 @@ describe("Aufbewahrung (Zoll #10)", () => {
 
 describe("Migration 2 → 3", () => {
   it("schon geteilte Nachweise werden festgeschrieben, Betriebsstätten leer; Rechnungsentwürfe bleiben", () => {
-    expect(STAND_VERSION).toBe(4);
+    expect(STAND_VERSION).toBe(5);
     const roh = { version: 2, betrieb: BETRIEB, unterlagen: [{ id: "x", vorlage: "arbeitszeitnachweis", daten: { name: "A" }, erstellt: "2026-08-01T08:00:00.000Z", geaendert: "2026-08-02T08:00:00.000Z", ausgegeben: "2026-09-01T08:00:00.000Z" }, { id: "y", vorlage: "unterweisung", daten: {}, erstellt: "2026-08-01T08:00:00.000Z", geaendert: "2026-08-01T08:00:00.000Z", ausgegeben: "2026-08-01T08:00:00.000Z" }] };
     const m = MIGRATIONEN[2]!(roh);
     expect((m.unterlagen as Record<string, unknown>[])[0]!.festgeschrieben).toBe("2026-09-01T08:00:00.000Z");
     expect((m.unterlagen as Record<string, unknown>[])[1]!.festgeschrieben).toBeUndefined();
     expect(m.betriebsstaetten).toEqual([]);
     const s = standAus(JSON.stringify(roh));
-    expect(s.version).toBe(4);
+    expect(s.version).toBe(5);
     expect(s.unterlagen[0]!.festgeschrieben).toBeTruthy();
-    expect(migrieren({ version: 1 }).version).toBe(4);
+    expect(migrieren({ version: 1 }).version).toBe(5);
   });
 });
 

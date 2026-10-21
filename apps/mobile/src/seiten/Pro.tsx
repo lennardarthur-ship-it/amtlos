@@ -14,6 +14,7 @@ import { PRO_VORTEILE, VORLAGEN_FREI_JE_MONAT, uebrig, type ProFunktion } from "
 import { useAmtlos } from "../zustand";
 import { syncAngeboten } from "../konto/konfig";
 import { DatenschutzSeite } from "./Recht";
+import { CodeEinloesenKnopf, PartnerHinweis, usePartner } from "./Partner";
 
 /** „Synchronisation“ nur zeigen, wenn dieser Build einen Server hat (E-134). */
 const VORTEILE = PRO_VORTEILE.filter((v) => v !== "sync" || syncAngeboten);
@@ -120,6 +121,12 @@ export function ProSeite({ grund, danach }: { grund?: ProFunktion; /** nach erfo
   const [freiOffen, setFreiOffen] = useState(false);
   const spart = liste ? ersparnis(liste) : null;
   const ausweg = grund === "pdf" && !z.pro ? TEXT.r12_pro_entwurf(naechsterMonat(new Date()), VORLAGEN_FREI_JE_MONAT) : null;
+  // Phase 2.3: Zugang über einen Partner (Kammer, Verband …) läuft über Apples Angebotscode – nie über einen eigenen Schlüssel
+  const partner = usePartner();
+  const nachCode = () => {
+    nav.zurueck();
+    danach?.();
+  };
   return (
     <BuehnenBlatt
       fuss={
@@ -152,6 +159,12 @@ export function ProSeite({ grund, danach }: { grund?: ProFunktion; /** nach erfo
       titel={grund ? TEXT.r12_pro_anlass[grund](VORLAGEN_FREI_JE_MONAT) : TEXT.pro_wert_titel}
       unter={grund ? TEXT.pro_grund[grund](VORLAGEN_FREI_JE_MONAT) : TEXT.pro_wert_text}
     >
+      {partner ? (
+        <View style={{ marginBottom: 12 }}>
+          <PartnerHinweis />
+          {!z.pro ? <CodeEinloesenKnopf text={TEXT.partner_zugang(partner.kurz ?? partner.name)} danach={nachCode} /> : null}
+        </View>
+      ) : null}
       {/* die vier stärksten Vorteile als Raster – der Grund, aus dem der Bezahlschirm aufging, steht vorn */}
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
         {haupt.map((v) => (
@@ -216,6 +229,8 @@ export function ProSeite({ grund, danach }: { grund?: ProFunktion; /** nach erfo
         <TextKnopf text={TEXT.datenschutz} leise onPress={() => nav.oeffnen("datenschutz", () => <DatenschutzSeite />)} />
         {kaufAktiv ? <TextKnopf text={TEXT.pro_wiederherstellen} leise onPress={() => void zurueckholen()} /> : null}
       </View>
+      {/* Phase 2.3: Abo-Angebotscode (z. B. von einem Partner) über Apples Einlöseblatt */}
+      {!z.pro && !partner ? <CodeEinloesenKnopf leise danach={nachCode} /> : null}
     </BuehnenBlatt>
   );
 }

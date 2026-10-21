@@ -6,6 +6,8 @@ import { Hinweis, Karte, T, Zeile } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { useFarben } from "../ui/thema";
 import { Inhalt, RechtsHinweis } from "./gemeinsam";
+import { PartnerSeite, partnerZeileText } from "./Partner";
+import { useStandWahl } from "../zustand";
 
 /**
  * Impressum der App (§ 5 DDG) aus `rechtliches.ts` – fehlende Angaben stehen als „folgt“ da. Das ist nur im
@@ -62,10 +64,13 @@ export function DatenschutzSeite() {
 /** Gruppe unter „Mein Betrieb“: Weiterempfehlen, Hilfe, Rechtliches. */
 export function UeberGruppe() {
   const nav = useNav();
+  const partnerId = useStandWahl((s) => s.partnerId);
   const hilfe = hilfeZiel(LINKS.support, ANBIETER.email);
   const teilen = () => void Share.share({ message: TEXT.empfehlen_text(LINKS.appStore || LINKS.website) }).catch(() => undefined);
   const zeilen = [
     { titel: TEXT.empfehlen, symbol: "square.and.arrow.up", onPress: teilen },
+    // Phase 2.3: „Empfohlen von …“ – nur Anzeige, schaltet nichts frei
+    { titel: TEXT.partner_titel, text: partnerZeileText(partnerId), symbol: "rosette", onPress: () => nav.oeffnen("partner", () => <PartnerSeite />) },
     ...(hilfe ? [{ titel: TEXT.hilfe_kontakt, symbol: "questionmark.circle", onPress: () => void Linking.openURL(hilfe) }] : []),
     { titel: TEXT.datenschutz, symbol: "hand.raised", onPress: () => nav.oeffnen("datenschutz", () => <DatenschutzSeite />) },
     { titel: TEXT.impressum, symbol: "info.circle", onPress: () => nav.oeffnen("impressum", () => <ImpressumSeite />) },
@@ -75,7 +80,7 @@ export function UeberGruppe() {
     <View>
       <Karte>
         {zeilen.map((z, i) => (
-          <Zeile key={z.titel} symbol={z.symbol} titel={z.titel} onPress={z.onPress} letzte={i === zeilen.length - 1} />
+          <Zeile key={z.titel} symbol={z.symbol} titel={z.titel} text={"text" in z ? z.text : undefined} onPress={z.onPress} letzte={i === zeilen.length - 1} />
         ))}
       </Karte>
       {/* Phase 1 (RDG): keine Rechts- oder Steuerberatung, mit Rechtsstand */}

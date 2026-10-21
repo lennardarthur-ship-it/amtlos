@@ -22,6 +22,7 @@ import { KasseZeile } from "./Kasse";
 import { kasseSichtbar } from "../unterlagen/kasse";
 import { useOeffnen, useStarten } from "./starten";
 import { UnterlageZeile, useFehltJe, useUeberfaellig } from "./Unterlagen";
+import { PartnerHinweis } from "./Partner";
 
 // Formatter einmal anlegen (R9 Performance)
 const WOCHENTAG = new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", weekday: "long", day: "numeric", month: "long" });
@@ -124,6 +125,8 @@ export function Heute() {
 
   return (
     <BuehnenSeite ueber={ueber} buehne={buehne}>
+      {/* Phase 2.3: „Empfohlen von …“ – kleine Zeile, nur wenn ein Partner eingetragen ist */}
+      <PartnerHinweis stil={{ marginTop: -4, marginBottom: 10 }} />
       {z.speicherFehler ? <Hinweis art="fehler" text={z.speicherFehlerArt === "schreiben" ? TEXT.speicher_fehler_schreiben : TEXT.speicher_fehler} /> : null}
       {/* R11 (UX #12): solange der Check fehlt, steht seine Einladung über jeder Erinnerung */}
       {gemacht ? <SicherungsKarte /> : null}

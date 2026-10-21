@@ -4,6 +4,7 @@
  */
 import { KU_HINWEIS, belegNummern, eigenbelegeVergeben, grundGenuegt, kassensturzAus, kassenstuerzeVereinen, naechsteBelegnummer, sachentnahmeAus, ustZeitraum, xrechnungUbl, type Kassensturz, type Sachentnahme } from "@amtlos/fachlogik";
 import { LEERER_BETRIEB, eRechnungAus, kassenKorrektur, kassenabschlussAus, kassenInhalt, kassenVereinen, summen, zahlungenAus, zahlungsStand, type KassenInhalt, type Kassenabschluss, type Zahlung, belegAus, belegFassung, belegInhaltGeaendert, belegSummen, gruppenAusBranchen, leereDaten, type Beleg, naechsteNummer, personMerken as merken, vorlageFuer, type Betrieb, type Daten, type Eintrag, type Person, type PersonAngaben, type PersonenArt } from "@amtlos/fachlogik";
+import { partnerIdAus } from "../partner/partner";
 
 export interface Unterlage {
   id: string;
@@ -104,7 +105,7 @@ export interface Betriebsstaette {
 export const HAUPT_STAETTE = "haupt";
 
 export interface Stand {
-  version: 4;
+  version: 5;
   betrieb: Betrieb;
   unterlagen: Unterlage[];
   /** Belege und Eingangsrechnungen (E-133); Dateien liegen verschlüsselt daneben (unterlagen/dateien.ts) */
@@ -163,10 +164,15 @@ export interface Stand {
   sachentnahmen: Sachentnahme[];
   /** R12 GoBD: Lösch- und Korrekturprotokoll (nur anhängen) */
   protokoll: ProtokollEintrag[];
+  /**
+   * Phase 2.3 (E-156): Partner, der Amtlos empfohlen hat („Empfohlen von …“, `partner/partner.ts`). Nur Anzeige – schaltet
+   * nie etwas frei. Bleibt auf dem Gerät und in der Datensicherung, wird nicht synchronisiert.
+   */
+  partnerId?: string;
 }
 
 /** Aktuelle Version des gespeicherten Stands. Höhere Versionen stammen aus einer neueren App und werden nie überschrieben. */
-export const STAND_VERSION = 4;
+export const STAND_VERSION = 5;
 
 /**
  * Migrationen: Eintrag n hebt einen Stand von Version n auf n + 1.
@@ -176,6 +182,7 @@ export const STAND_VERSION = 4;
  * - 3 → 4 (R12 GoBD): Belege bekommen ihre bisher berechnete Amtlos-Belegnummer fest gespeichert (`nr`, auch ungültig
  *   markierte); festgeschriebene Rechnungen halten die Absenderdaten fest (mangels Besserem die heutigen aus „Mein
  *   Betrieb“); Kassenstürze, Sachentnahmen und Protokoll starten leer.
+ * - 4 → 5 (Phase 2.3): Partner-ID (`partnerId`) für „Empfohlen von …“ – anfangs nicht gesetzt.
  */
 export const MIGRATIONEN: Record<number, (roh: Record<string, unknown>) => Record<string, unknown>> = {
   1: (roh) => ({ ...roh, kasse: Array.isArray(roh.kasse) ? roh.kasse : [] }),
@@ -213,6 +220,7 @@ export const MIGRATIONEN: Record<number, (roh: Record<string, unknown>) => Recor
       protokoll: liste(roh.protokoll),
     };
   },
+  4: (roh) => ({ ...roh, partnerId: undefined }),
 };
 
 export class StandFehler extends Error {
@@ -236,7 +244,7 @@ export function migrieren(roh: Record<string, unknown>): Record<string, unknown>
   return { ...r, version: STAND_VERSION };
 }
 
-export const LEERER_STAND: Stand = { version: 4, kasse: [], kassenstuerze: [], sachentnahmen: [], protokoll: [], betriebsstaetten: [], betrieb: LEERER_BETRIEB, unterlagen: [], belege: [], mitarbeiter: [], kunden: [], profil: {}, erledigt: {}, erinnerungen: false, appSperre: false, cloudSicherung: false, proTest: false, bewertung: { erfolge: 0 }, steuerberatung: { kontenrahmen: "SKR03", beraternummer: "", mandantennummer: "" }, geloescht: {}, zeiten: {}, belegArchiv: [], fremd: { unterlagen: [], belege: [] } };
+export const LEERER_STAND: Stand = { version: 5, kasse: [], kassenstuerze: [], sachentnahmen: [], protokoll: [], betriebsstaetten: [], betrieb: LEERER_BETRIEB, unterlagen: [], belege: [], mitarbeiter: [], kunden: [], profil: {}, erledigt: {}, erinnerungen: false, appSperre: false, cloudSicherung: false, proTest: false, bewertung: { erfolge: 0 }, steuerberatung: { kontenrahmen: "SKR03", beraternummer: "", mandantennummer: "" }, geloescht: {}, zeiten: {}, belegArchiv: [], fremd: { unterlagen: [], belege: [] } };
 
 function profilAus(roh: unknown): Stand["profil"] {
   if (!roh || typeof roh !== "object" || Array.isArray(roh)) return {};
@@ -386,8 +394,9 @@ export function standAus(json: string | null): Stand {
   const kassenstuerze = kassenstuerzeVereinen([], liste(r.kassenstuerze).map(kassensturzAus).filter((x): x is Kassensturz => x !== null));
   const sachentnahmen = liste(r.sachentnahmen).map(sachentnahmeAus).filter((x): x is Sachentnahme => x !== null);
   const protokoll = protokollAus(r.protokoll);
+  const partnerId = partnerIdAus(r.partnerId);
   return belegNummernSichern({
-    version: 4,
+    version: 5,
     kasse: kassenVereinen([], kasse),
     kassenstuerze,
     sachentnahmen,
@@ -412,6 +421,7 @@ export function standAus(json: string | null): Stand {
     zeiten: isoKarte(r.zeiten),
     ...(iso(r.geaendert) ? { geaendert: iso(r.geaendert) } : {}),
     ...(iso(r.letzteSicherung) ? { letzteSicherung: iso(r.letzteSicherung) } : {}),
+    ...(partnerId ? { partnerId } : {}),
   });
 }
 
@@ -1405,6 +1415,9 @@ export function zusammenfuehren(aktuell: Stand, gesichert: Stand, jetzt = new Da
     protokoll: protokollVereinen(aktuell.protokoll, gesichert.protokoll),
     sachentnahmen: sachentnahmenVereinen(aktuell.sachentnahmen, gesichert.sachentnahmen, aktuell.geloescht),
   };
+  // Phase 2.3: Partner aus der Sicherung nur übernehmen, wenn auf dem Gerät keiner gesetzt ist
+  const partnerId = aktuell.partnerId ?? gesichert.partnerId;
+  if (partnerId) stand.partnerId = partnerId;
   return { stand: belegNummernSichern(stand), neu, behalten, aktualisiert, nummernKonflikte: nummernKonflikteVon(stand), festKonflikte: u.konflikte, mehrfachStorniert: mehrfachStorniert(stand.unterlagen) };
 }
 

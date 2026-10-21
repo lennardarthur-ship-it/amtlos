@@ -5,6 +5,7 @@
  * Preise kommen immer aus dem Store – die App nennt keine eigenen Beträge.
  */
 import { Platform } from "react-native";
+import { codeEinloesenMit, type CodeErgebnis } from "./code";
 
 export const PRO_BERECHTIGUNG = "pro";
 const SCHLUESSEL = process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY ?? "";
@@ -169,4 +170,47 @@ export async function proKontoTrennen(): Promise<void> {
   const p = await laden();
   if (!p) return;
   await p.logOut().catch(() => undefined);
+}
+
+/**
+ * „Code einlösen“ möglich (Phase 2.3)? Nur mit echtem Kauf auf iOS – Apples Einlöseblatt für Abo-Angebotscodes gibt es
+ * erst ab iOS 14 und nur mit StoreKit. Im Web, in Expo Go und im Testmodus zeigt der Bezahlschirm stattdessen einen
+ * Hinweis (Code im App Store einlösen).
+ */
+export const codeEinloesenMoeglich = kaufAktiv && Platform.OS === "ios" && Number.parseInt(String(Platform.Version), 10) >= 14;
+
+/**
+ * Apples Einlöseblatt für Abo-Angebotscodes (z. B. den Code eines Partners) zeigen, danach die Berechtigung neu
+ * abfragen. „nicht_verfuegbar“ ohne Kauf (Web, Expo Go, Testmodus). Pro gilt nur, wenn RevenueCat die Berechtigung
+ * meldet – die App schaltet nie selbst frei (App Review 3.1.1).
+ */
+export async function codeEinloesen(): Promise<CodeErgebnis | "nicht_verfuegbar"> {
+  if (!codeEinloesenMoeglich) return "nicht_verfuegbar";
+  const p = await laden();
+  if (!p) return "nicht_verfuegbar";
+  return codeEinloesenMit({ blattZeigen: () => p.presentCodeRedemptionSheet(), cacheVerwerfen: () => p.invalidateCustomerInfoCache(), kundendaten: () => p.getCustomerInfo() }, PRO_BERECHTIGUNG);
+}
+
+/**
+ * Änderungen der Berechtigung beobachten (eingelöster Code, Verlängerung, Kündigung, Kauf auf einem anderen Gerät).
+ * Liefert die Abmeldung.
+ */
+export function proBeobachten(f: (aktiv: boolean) => void): () => void {
+  if (!kaufAktiv) return () => undefined;
+  let ab: (() => void) | null = null;
+  let aus = false;
+  void laden().then((p) => {
+    if (!p || aus) return;
+    const hoerer = (info: { entitlements: { active: Record<string, unknown> } }) => f(Boolean(info.entitlements.active[PRO_BERECHTIGUNG]));
+    try {
+      p.addCustomerInfoUpdateListener(hoerer);
+      ab = () => void p.removeCustomerInfoUpdateListener(hoerer);
+    } catch {
+      // ohne Beobachtung bleibt die Abfrage beim Wechsel in den Vordergrund
+    }
+  });
+  return () => {
+    aus = true;
+    ab?.();
+  };
 }

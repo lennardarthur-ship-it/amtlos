@@ -36,11 +36,11 @@ function mitKasse(): Stand {
 
 describe("Stand: Migration 1 → 2, Lesen, Aufbewahrung", () => {
   it("hebt Version 1 auf 2 mit leerer Kasse; Kasse aus Version 2 bleibt erhalten", () => {
-    // R12 Personal: inzwischen Version 3 (Betriebsstätten, festgeschriebene Nachweise)
-    expect(STAND_VERSION).toBe(4);
+    // R12 Personal: inzwischen Version 3 (Betriebsstätten, festgeschriebene Nachweise); Phase 2.3: Version 5 (Partner-ID)
+    expect(STAND_VERSION).toBe(5);
     expect(MIGRATIONEN[1]!({ version: 1, belege: [] })).toMatchObject({ kasse: [] });
     const alt = standAus(JSON.stringify({ version: 1, betrieb: { name: "Alt" } }));
-    expect(alt.version).toBe(4);
+    expect(alt.version).toBe(5);
     expect(alt.kasse).toEqual([]);
     const s = mitKasse();
     const wieder = standAus(JSON.stringify(s));

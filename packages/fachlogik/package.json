@@ -1,8 +1,11 @@
 {
   "name": "@amtlos/fachlogik",
   "version": "0.1.0",
+  "description": "Fachlogik für kleine Betriebe: Rechnungssummen, E-Rechnung (XRechnung), GiroCode, Belege, Kasse, Vorlagen als druckfertiges HTML – ohne Datenbank und ohne Node-APIs.",
+  "license": "UNLICENSED",
   "private": true,
   "type": "module",
+  "sideEffects": false,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -15,13 +18,16 @@
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "lint": "eslint src test"
+    "lint": "eslint src test",
+    "prepack": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.build.json",
+    "beispiel": "node beispiel/beispiel.mjs"
   },
   "dependencies": {
     "@amtlos/fristen": "workspace:*",
     "qrcode-generator": "2.0.4"
   },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ]
 }

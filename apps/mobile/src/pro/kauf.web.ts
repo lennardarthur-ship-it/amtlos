@@ -1,4 +1,5 @@
 /** Im Web (Tests) gibt es keinen App Store – immer Testmodus. Gleiche Schnittstelle wie kauf.ts. */
+import type { CodeErgebnis } from "./code";
 export const PRO_BERECHTIGUNG = "pro";
 export const kaufAktiv = false;
 export const testmodus = true;
@@ -17,3 +18,7 @@ export const kaufen = async (_id: string) => false;
 export const wiederherstellen = async () => false;
 export const proKontoVerbinden = async (_kontoId: string) => false;
 export const proKontoTrennen = async () => {};
+/** Phase 2.3: kein Einlöseblatt im Web – der Bezahlschirm zeigt einen Hinweis (Code im App Store einlösen). */
+export const codeEinloesenMoeglich = false;
+export const codeEinloesen = async (): Promise<CodeErgebnis | "nicht_verfuegbar"> => "nicht_verfuegbar";
+export const proBeobachten = (_f: (aktiv: boolean) => void) => () => {};

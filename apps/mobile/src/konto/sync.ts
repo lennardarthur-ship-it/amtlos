@@ -65,9 +65,9 @@ export function huelleOeffnen(text: string, passwort: string): Uint8Array {
   }
 }
 
-/** Was synchronisiert wird: alles außer gerätegebundenen Einstellungen. */
+/** Was synchronisiert wird: alles außer gerätegebundenen Einstellungen (dazu die Partner-ID, Phase 2.3 – sie bleibt auf dem Gerät). */
 export function syncInhalt(s: Stand): Stand {
-  const { appSperre: _a, cloudSicherung: _c, erinnerungen: _e, proTest: _p, bewertung: _b, letzteSicherung: _l, ...rest } = s;
+  const { appSperre: _a, cloudSicherung: _c, erinnerungen: _e, proTest: _p, bewertung: _b, letzteSicherung: _l, partnerId: _pa, ...rest } = s;
   return { ...rest, appSperre: false, cloudSicherung: false, erinnerungen: false, proTest: false, bewertung: { erfolge: 0 } } as Stand;
 }
 
