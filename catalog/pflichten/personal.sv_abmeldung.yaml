@@ -1,7 +1,7 @@
 # Katalog D.38 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.sv_abmeldung
-version: 2
+version: 3
 katalog_nr: D.38
 titel:
   de: Beschäftigte bei der Sozialversicherung abmelden
@@ -37,7 +37,7 @@ kanal: partner
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Bußgeld bis 25.000 € (§ 111 Abs. 1 Nr. 2, Abs. 4 SGB IV).
   schwere: hoch
 automatisierung: partner
 status_recht: in_kraft
@@ -47,10 +47,13 @@ quellen:
 - titel: Sozialgesetzbuch IV § 28a
   url: https://www.gesetze-im-internet.de/sgb_4/__28a.html
   abgerufen: null
+- titel: SGB IV § 111
+  url: https://www.gesetze-im-internet.de/sgb_4/__111.html
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
 - 'Frist nach Rechtsprüfung R11 (Befund 4): mit der nächsten Entgeltabrechnung, spätestens sechs Wochen nach Ende (§ 8 DEÜV) – als sechs Wochen nach dem Austritt abgebildet; bestätigen'
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- 'Vorprüfung 21.10.2026: Sanktion ergänzt – § 111 Abs. 1 Nr. 2 (Meldungen nach § 28a) und Abs. 4 gelesen'
 pruefung:
   status: entwurf
   geprueft_von: null

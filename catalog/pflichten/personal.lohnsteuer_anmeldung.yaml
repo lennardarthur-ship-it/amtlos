@@ -1,7 +1,7 @@
 # Katalog D.40 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.lohnsteuer_anmeldung
-version: 3
+version: 4
 katalog_nr: D.40
 titel:
   de: Lohnsteuer anmelden
@@ -62,7 +62,8 @@ kosten: null
 sanktion:
   text:
     de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: hoch
+  schwere: mittel
+dringend_ohne_termin: true
 automatisierung: hinweis
 status_recht: in_kraft
 gueltig_ab: null
@@ -75,6 +76,7 @@ fachlich_zu_pruefen:
 - 'Grenzen nach § 41a Abs. 2 EStG (über 5.000 € monatlich, über 1.080 € vierteljährlich) aus der Steuerprüfung R11 (Befund 18) im Text – weiter als Angabe des Nutzers; Hochrechnung im ersten Jahr bestätigen'
 - Verschiebung bei Fristende am Wochenende/Feiertag bestätigen
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 pruefung:
   status: entwurf
   geprueft_von: null

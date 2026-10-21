@@ -1,7 +1,7 @@
 # Katalog B.14 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.gesellschaftsvertrag_notar
-version: 1
+version: 2
 katalog_nr: B.14
 titel:
   de: Gesellschaftsvertrag beim Notar beurkunden
@@ -43,7 +43,8 @@ kosten: null
 sanktion:
   text:
     de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: hoch
+  schwere: mittel
+dringend_ohne_termin: true
 automatisierung: hinweis
 aktion:
   art: abhaken
@@ -61,6 +62,7 @@ fachlich_zu_pruefen:
 - 'Online-Beurkundung: Voraussetzungen und Grenzen ergänzen'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 pruefung:
   status: entwurf
   geprueft_von: null

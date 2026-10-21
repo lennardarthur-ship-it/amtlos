@@ -1,7 +1,7 @@
 # Beispiel aus Spezifikation 3.2 / Katalog E.50, in das Schema v1 überführt.
 schema_version: 1
 id: arbeitsschutz.gefaehrdungsbeurteilung
-version: 4
+version: 5
 katalog_nr: E.50
 titel:
   de: Gefährdungsbeurteilung erstellen
@@ -9,8 +9,8 @@ kurz:
   de: Bevor jemand bei dir arbeitet, schreibst du auf, welche Gefahren es an den Arbeitsplätzen gibt und was du dagegen tust.
 erklaerung:
   de: >-
-    Sobald du mindestens eine Person beschäftigst, musst du die Gefährdungen an jedem
-    Arbeitsplatz beurteilen, Schutzmaßnahmen festlegen und das dokumentieren.
+    Sobald du mindestens eine Person beschäftigst, sind die Gefährdungen an jedem
+    Arbeitsplatz zu beurteilen, Schutzmaßnahmen festzulegen und das zu dokumentieren.
     Amtlos erstellt dir dafür eine Vorlage passend zu deiner Branche.
 begriffe:
   - begriff: { de: Gefährdungsbeurteilung }
@@ -62,4 +62,5 @@ fachlich_zu_pruefen:
   - "Auslöser neu_ausloesen_bei: Liste der Anlässe vollständig?"
   - "gueltig_ab 1996-08-21 aus Spezifikation übernommen"
   - "Sanktion nach Rechtsprüfung R11 (Befund 3): direkte Bußgeldbewehrung über § 9 Abs. 1 Nr. 1 ArbStättV, § 22 BetrSichV, § 22 GefStoffV – Nummern und Höchstbetrag 5.000 € bestätigen"
+  - 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }

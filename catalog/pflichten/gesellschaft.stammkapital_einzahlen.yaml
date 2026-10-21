@@ -1,7 +1,7 @@
 # Katalog B.14 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.stammkapital_einzahlen
-version: 2
+version: 3
 katalog_nr: B.14
 titel:
   de: Stammkapital einzahlen
@@ -40,7 +40,8 @@ kosten: null
 sanktion:
   text:
     de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: hoch
+  schwere: mittel
+dringend_ohne_termin: true
 automatisierung: hinweis
 aktion:
   art: abhaken
@@ -56,6 +57,7 @@ fachlich_zu_pruefen:
 - 'R12 (Rechtsprüfung Befund 16): ein Viertel je Geschäftsanteil, insgesamt mindestens 12.500 € (§ 7 Abs. 2 GmbHG), UG voll und bar (§ 5a Abs. 2), Versicherung in der Anmeldung (§ 8 Abs. 2) – Plausibilitätsprüfung im Handelsregister-Datenblatt (Mindestkapital, volle Euro) offen'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 pruefung:
   status: entwurf
   geprueft_von: null

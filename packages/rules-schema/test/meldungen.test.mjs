@@ -20,6 +20,19 @@ test("Frist: Variante nach typ, Format in Klartext", () => {
   assert.deepEqual(pruefe({ frist: { typ: "relativ" } }), ["Frist: „bezug“ fehlt", "Frist: „Versatz“ fehlt", "Frist: „Verschiebung“ fehlt"]);
   assert.deepEqual(pruefe({ frist: { typ: "absolut", datum: "31.12.2026", verschiebung: { regel: "keine", kalender: "bundesland" } } }), ["Frist › Datum: hat nicht das richtige Format (Datum JJJJ-MM-TT)"]);
 });
+test("Schwere „hoch“ braucht benannte Folgen (Vorprüfung 21.10.2026)", () => {
+  const platzhalter = { text: { de: "Die Folgen sind noch nicht fachlich erfasst." } };
+  const meldung = "Folgen: Bei Schwere „hoch“ muss die Sanktion benannt sein (Platzhalter „noch nicht fachlich erfasst“) – Sanktion ergänzen oder Schwere auf „mittel“ setzen (für „Jetzt dran“ ohne Termin: dringend_ohne_termin: true)";
+  assert.deepEqual(pruefe({ sanktion: { ...platzhalter, schwere: "hoch" } }), [meldung]);
+  assert.deepEqual(pruefe({ sanktion: { ...platzhalter, schwere: "mittel" } }), []);
+  assert.deepEqual(pruefe({ sanktion: { text: { de: "Bußgeld bis 5.000 €." }, schwere: "hoch" } }), []);
+});
+test("dringend_ohne_termin: entkoppelt von der Schwere, nur als Wahrheitswert", () => {
+  const platzhalter = { text: { de: "Die Folgen sind noch nicht fachlich erfasst." } };
+  assert.deepEqual(pruefe({ sanktion: { ...platzhalter, schwere: "mittel" }, dringend_ohne_termin: true }), []);
+  assert.deepEqual(pruefe({ dringend_ohne_termin: "ja" }), ["Dringend ohne Termin: falscher Typ (erwartet boolean)"]);
+  assert.deepEqual(pruefe({ sanktion: { text: { de: "Bußgeld bis 5.000 €." }, schwere: "hoch" }, dringend_ohne_termin: true }), ["Dringend ohne Termin: bei Schwere „hoch“ überflüssig – Feld entfernen"]);
+});
 test("Querverweise", () => {
   assert.deepEqual(pruefe({ ausloeser: { feld: "profil.gibt_es_nicht", op: "==", wert: 1 } }), ["ausloeser: unbekannter Fakt 'profil.gibt_es_nicht'"]);
 });

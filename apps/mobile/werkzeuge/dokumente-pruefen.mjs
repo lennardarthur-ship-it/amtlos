@@ -43,8 +43,39 @@ const B = { ...F.LEERER_BETRIEB, name: "Salon Sonne GmbH", strasse: "Hauptstraß
 const HEUTE = "2026-10-13";
 const LANG = "Fachgerechte Reinigung und Desinfektion der Arbeitsflächen einschließlich Ablagen nach Herstellerangaben, dokumentiert im Protokoll";
 
+/**
+ * Realistische Angaben je Vorlage für „voll“ (Vorprüfung 21.10.2026): Namens- und Anschriftsfelder sollen für die Prüfung
+ * nach echten Angaben aussehen, nicht nach Fülltext („Fachgerechte Reinigung …“ als Anschrift). Überschreibt die
+ * erzeugten Werte; Listen hier haben realistische Längen.
+ */
+const REALISTISCH = {
+  nachweis_arbeitsbedingungen: {
+    name: "Jana Becker", anschrift: "Lindenstraße 12\n80469 München", branche: "friseur_kosmetik", beginn: "2026-11-01", taetigkeit: "Friseurin",
+    entgelt_art: "monat", entgelt_betrag: "2.650,00", wochenstunden: "38,5", tage_pro_woche: "5", verteilung: "Dienstag bis Samstag nach Dienstplan",
+    ueberstunden_verguetung: "Überstunden werden mit dem vereinbarten Stundenlohn zuzüglich eines Zuschlags von 25 % vergütet.",
+    bestandteile: [{ bezeichnung: "Samstagszuschlag", hoehe: "10 % des Stundenlohns für Arbeit am Samstag nach 14 Uhr" }, { bezeichnung: "Weihnachtsgeld", hoehe: "50 % eines Monatsgehalts, fällig mit dem Novembergehalt" }, { bezeichnung: "Vermögenswirksame Leistungen", hoehe: "40,00 € monatlich" }],
+    zuschlaege: "", provision: "5 % vom eigenen Dienstleistungsumsatz im Monat", faelligkeit: "am letzten Bankarbeitstag des laufenden Monats", auszahlung: "Überweisung auf das von der beschäftigten Person benannte Konto",
+    pausen: "nach § 4 ArbZG: mindestens 30 Minuten bei mehr als sechs Stunden, 45 Minuten bei mehr als neun Stunden", ruhezeit: "nach § 5 ArbZG: mindestens elf Stunden ununterbrochen nach Ende der täglichen Arbeitszeit",
+    schicht_text: "", abruf_text: "", ueberstunden_text: "bei unvorhersehbarem Arbeitsanfall, höchstens 10 Stunden im Monat", urlaub: "28",
+    fortbildung: "Ein Anspruch auf vom Arbeitgeber bereitgestellte Fortbildung besteht nicht.", bav_text: "Allianz Pensionskasse AG", bav_anschrift: "Reinsburgstraße 19\n70178 Stuttgart",
+    kuendigung_eigen: "", kollektiv_text: "", weitere: "Ansprüche aus dem Arbeitsverhältnis verfallen, wenn sie nicht innerhalb von drei Monaten nach Fälligkeit in Textform geltend gemacht werden; das gilt nicht für den Mindestlohn und für Ansprüche aus vorsätzlicher Pflichtverletzung.",
+    arbeitsort_text: "", ausgestellt_am: "2026-10-13",
+  },
+  datenschutzinformation: {
+    fuer_wen: "Kundinnen und Kunden des Salons", interessen: "Sicherer und störungsfreier Betrieb unserer IT\nDurchsetzung und Abwehr von Ansprüchen", ergaenzung: "",
+  },
+  avv: {
+    partner: "IT-Service Krüger e. K.", partner_anschrift: "Bahnhofstraße 4\n80335 München", hauptvertrag: "IT-Betreuungsvertrag vom 01.09.2026", weisung_ag: "Alex Sonnberg, hallo@salon-sonne.example", weisung_an: "Tom Krüger, support@it-krueger.example",
+    unterauftragnehmer: [{ name: "Hetzner Online GmbH", anschrift: "Industriestr. 25, 91710 Gunzenhausen", leistung: "Rechenzentrum für die Datensicherung", ort: "Deutschland" }, { name: "TeamViewer Germany GmbH", anschrift: "Bahnhofsplatz 2, 73033 Göppingen", leistung: "Fernwartung", ort: "EU" }],
+    ort_datum: "München",
+  },
+};
+
 /** Volle Daten: Pflicht- und Textfelder mittellang, Listen mit 12 Einträgen, Beträge fünfstellig. */
 function voll(v) {
+  return { ...vollErzeugt(v), ...(REALISTISCH[v.id] ?? {}) };
+}
+function vollErzeugt(v) {
   const d = F.leereDaten(v, B, HEUTE);
   const wert = (f, i) => {
     if (f.art === "text") return /name|von|person/i.test(f.label) ? "Maximiliane Großmann-Überlinger" : `${f.label} ${i + 1}`;
@@ -65,7 +96,10 @@ function voll(v) {
           for (const x of f.felder) if (["text", "mehrzeilig", "betrag", "zahl", "datum", "uhrzeit"].includes(x.art)) e[x.id] = x.art === "mehrzeilig" ? LANG : wert(x, i);
           return e;
         });
-      } else if (["text", "mehrzeilig", "betrag", "zahl", "uhrzeit"].includes(f.art) && !d[f.id]) d[f.id] = wert(f, 0);
+      } else if (["text", "mehrzeilig", "betrag", "zahl", "uhrzeit", "datum"].includes(f.art) && !d[f.id]) d[f.id] = wert(f, 0);
+      // Bausteine ohne Startauswahl (z. B. Verarbeitungen der Datenschutzinformation): die ersten vier passenden – sonst
+      // blieben die Abschnitte, die erst durch eine Auswahl entstehen, in „voll“ leer (Vorprüfung 21.10.2026, Befund 1)
+      else if (f.art === "bausteine" && !(d[f.id] ?? []).length) d[f.id] = f.optionen.filter((o) => F.optionSichtbar(o, d)).slice(0, 4).map((o) => o.wert);
     }
   return d;
 }

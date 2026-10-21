@@ -398,7 +398,7 @@ describe("Dokumentvorlagen", () => {
     // Rechtsform, Vertretung und Register aus „Mein Betrieb“
     const gmbh: Betrieb = { ...BETRIEB, name: "Salon Sonne GmbH", rechtsform: "GmbH", vertretung: "Alex Muster, Kim Muster", registergericht: "Amtsgericht München", registernummer: "HRB 1" };
     const imp = vorlageFuer("impressum")!.alsText!(leereDaten(vorlageFuer("impressum")!, gmbh, "2026-10-12"), gmbh);
-    expect(imp).toContain("Vertreten durch\nAlex Muster, Kim Muster");
+    expect(imp).toContain("Vertretungsberechtigte Geschäftsführung\nAlex Muster, Kim Muster");
     expect(imp).toContain("Registergericht: Amtsgericht München\nRegisternummer: HRB 1");
     expect(vorlageFuer("impressum")!.alsText!({ wirtschafts_id: "DE1" }, { ...gmbh, ust_idnr: "DE2" })).toContain("Umsatzsteuer-ID und Wirtschafts-ID");
     expect(html("gewerbeanmeldung", leereDaten(vorlageFuer("gewerbeanmeldung")!, gmbh, "2026-10-12"), gmbh)).toContain(">GmbH<");
@@ -794,7 +794,7 @@ describe("Vorlagen, vierte Durchsicht", () => {
     expect(sl).toContain("<h2>Geleistete Vorauszahlungen</h2>");
     expect(sl).toContain("<th>Was</th><th class=\"zahl\">Betrag</th><th>Beleg</th>");
     // AVV: Anlage am Ende des Paragraphen über die TOM (nicht allein über den Unterschriften), wenn die TOM darauf verweisen
-    const avvAnlage = html("avv", { tom: "siehe Anlage (TOM-Beschreibung des Auftragsverarbeiters)" });
+    const avvAnlage = html("avv", { partner: "IT-Service", gegenstand: "Wartung", tom: "siehe Anlage (TOM-Beschreibung des Auftragsverarbeiters)" });
     expect(avvAnlage).toContain("<h2>Technische und organisatorische Maßnahmen</h2><p>siehe Anlage (TOM-Beschreibung des Auftragsverarbeiters)</p><p>Anlage: Technische und organisatorische Maßnahmen des Auftragnehmers</p></section>");
     expect(avvAnlage).not.toContain("Auftragnehmers</p><div class=\"unterschriften");
     expect(html("avv", { tom: "Verschlüsselung" })).not.toContain("Anlage:");
@@ -823,7 +823,7 @@ describe("Vorlagen, vierte Durchsicht", () => {
     expect(vvt.match(/<span class="nr">2\.\d<\/span>/g)).toEqual(['<span class="nr">2.1</span>', '<span class="nr">2.2</span>', '<span class="nr">2.3</span>']);
     // Nachweis: Entgelt, Arbeitszeit und Urlaub als beschriftete Linien
     const nw = leer("nachweis_arbeitsbedingungen");
-    for (const k of ["Weitere Bestandteile", "Fälligkeit", "Auszahlung", "Ruhepausen", "Ruhezeit", "Arbeitstage pro Kalenderjahr"]) expect(nw.replace(/&nbsp;/g, " "), k).toContain(`<th>${k}</th>`);
+    for (const k of ["Vergütung von Überstunden", "Zuschläge, Zulagen, Prämien, Sonderzahlungen", "Fälligkeit", "Art der Auszahlung", "Ruhepausen", "Ruhezeit", "Arbeitstage pro Kalenderjahr"]) expect(nw.replace(/&nbsp;/g, " "), k).toContain(`<th>${k}</th>`);
     // Verfahrensdokumentation: Auswahlen zum Ankreuzen
     expect(leer("verfahrensdokumentation")).toMatch(/<h3>Eingang der Belege<\/h3><ul class="ankreuzen">/);
     // Rechnung: Zahlungsaufforderung mit Linie, Anschrift mit drei Linien

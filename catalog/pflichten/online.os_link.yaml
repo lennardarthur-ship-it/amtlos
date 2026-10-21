@@ -1,13 +1,12 @@
 # Katalog G.69 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.os_link
-version: 3
+version: 4
 katalog_nr: G.69
 titel:
   de: Link zur OS-Plattform entfernen
 kurz:
-  de: Die Pflicht zum Link auf die Online-Streitbeilegungsplattform der EU ist seit 20.07.2025 entfallen. Steht der Link noch auf
-    deiner Website, entferne ihn.
+  de: Die Pflicht zum Link auf die Online-Streitbeilegungsplattform der EU ist seit 20.07.2025 entfallen, die Plattform ist abgeschaltet. Steht der Link noch auf deiner Website, in AGB oder Impressum, entferne ihn.
 erklaerung:
   de: Die Verordnung (EU) Nr. 524/2013 über die Online-Streitbeilegung ist durch die Verordnung (EU) 2024/3228 mit Wirkung zum
     20.07.2025 aufgehoben, die Plattform eingestellt. Damit ist auch die Pflicht entfallen, auf sie zu verlinken. Ein Link auf
@@ -43,7 +42,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Keine eigene Pflicht mehr – ein Hinweis auf die abgeschaltete Plattform ist überholt.
   schwere: niedrig
 automatisierung: hinweis
 einordnung: hinweis
@@ -62,8 +61,12 @@ quellen:
 - titel: Verordnung (EU) Nr. 524/2013
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32013R0524
   abgerufen: null
+- titel: IHK Fulda – EU-Plattform zur Streitbeilegung wird abgeschafft
+  url: https://www.ihk.de/fulda/handel-dienstleistungen/eu-plattform-zur-streitbeilegung-wird-abgeschafft-6503696
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
 - 'Aufhebung zum 20.07.2025 durch VO (EU) 2024/3228 (R10, Rechtsprüfung) – Fundstelle der Quelle eintragen; ob ein noch vorhandener Link selbst ein Wettbewerbsrisiko ist, offen'
+- 'Vorprüfung 21.10.2026 (G.69): Link entfernen bestätigt (VO (EU) 2024/3228, Abschaltung und Wegfall der Linkpflicht 20.7.2025 laut IHK Fulda); Hinweistext im Online-Check (i18n os_link) angepasst'
 pruefung:
   status: entwurf
   geprueft_von: null

@@ -5,6 +5,7 @@
 import { KU_HINWEIS, belegNummern, eigenbelegeVergeben, grundGenuegt, kassensturzAus, kassenstuerzeVereinen, naechsteBelegnummer, sachentnahmeAus, ustZeitraum, xrechnungUbl, type Kassensturz, type Sachentnahme } from "@amtlos/fachlogik";
 import { LEERER_BETRIEB, eRechnungAus, kassenKorrektur, kassenabschlussAus, kassenInhalt, kassenVereinen, summen, zahlungenAus, zahlungsStand, type KassenInhalt, type Kassenabschluss, type Zahlung, belegAus, belegFassung, belegInhaltGeaendert, belegSummen, gruppenAusBranchen, leereDaten, type Beleg, naechsteNummer, personMerken as merken, vorlageFuer, type Betrieb, type Daten, type Eintrag, type Person, type PersonAngaben, type PersonenArt } from "@amtlos/fachlogik";
 import { partnerIdAus } from "../partner/partner";
+import { zustimmungAus, type Zustimmung } from "../rechtliches";
 
 export interface Unterlage {
   id: string;
@@ -105,7 +106,7 @@ export interface Betriebsstaette {
 export const HAUPT_STAETTE = "haupt";
 
 export interface Stand {
-  version: 5;
+  version: 6;
   betrieb: Betrieb;
   unterlagen: Unterlage[];
   /** Belege und Eingangsrechnungen (E-133); Dateien liegen verschlüsselt daneben (unterlagen/dateien.ts) */
@@ -169,10 +170,16 @@ export interface Stand {
    * nie etwas frei. Bleibt auf dem Gerät und in der Datensicherung, wird nicht synchronisiert.
    */
   partnerId?: string;
+  /**
+   * Vorprüfung 21.10.2026 (§ 305 Abs. 2 BGB): Zustimmung zu den eigenen Nutzungsbedingungen – Fassung und Zeitpunkt.
+   * Nur gesetzt, wenn die App danach gefragt hat (erst ab `NUTZUNGSBEDINGUNGEN.freigegeben`, rechtliches.ts). Bleibt auf
+   * dem Gerät und in der Datensicherung; beim Zusammenführen gewinnt die des Geräts.
+   */
+  nutzungsbedingungen?: Zustimmung;
 }
 
 /** Aktuelle Version des gespeicherten Stands. Höhere Versionen stammen aus einer neueren App und werden nie überschrieben. */
-export const STAND_VERSION = 5;
+export const STAND_VERSION = 6;
 
 /**
  * Migrationen: Eintrag n hebt einen Stand von Version n auf n + 1.
@@ -183,6 +190,8 @@ export const STAND_VERSION = 5;
  *   markierte); festgeschriebene Rechnungen halten die Absenderdaten fest (mangels Besserem die heutigen aus „Mein
  *   Betrieb“); Kassenstürze, Sachentnahmen und Protokoll starten leer.
  * - 4 → 5 (Phase 2.3): Partner-ID (`partnerId`) für „Empfohlen von …“ – anfangs nicht gesetzt.
+ * - 5 → 6 (Vorprüfung Recht): Zustimmung zu den Nutzungsbedingungen (`nutzungsbedingungen`) – anfangs nicht gesetzt;
+ *   die App fragt erst danach, wenn die eigenen Bedingungen freigegeben sind.
  */
 export const MIGRATIONEN: Record<number, (roh: Record<string, unknown>) => Record<string, unknown>> = {
   1: (roh) => ({ ...roh, kasse: Array.isArray(roh.kasse) ? roh.kasse : [] }),
@@ -221,6 +230,7 @@ export const MIGRATIONEN: Record<number, (roh: Record<string, unknown>) => Recor
     };
   },
   4: (roh) => ({ ...roh, partnerId: undefined }),
+  5: (roh) => ({ ...roh, nutzungsbedingungen: undefined }),
 };
 
 export class StandFehler extends Error {
@@ -244,7 +254,7 @@ export function migrieren(roh: Record<string, unknown>): Record<string, unknown>
   return { ...r, version: STAND_VERSION };
 }
 
-export const LEERER_STAND: Stand = { version: 5, kasse: [], kassenstuerze: [], sachentnahmen: [], protokoll: [], betriebsstaetten: [], betrieb: LEERER_BETRIEB, unterlagen: [], belege: [], mitarbeiter: [], kunden: [], profil: {}, erledigt: {}, erinnerungen: false, appSperre: false, cloudSicherung: false, proTest: false, bewertung: { erfolge: 0 }, steuerberatung: { kontenrahmen: "SKR03", beraternummer: "", mandantennummer: "" }, geloescht: {}, zeiten: {}, belegArchiv: [], fremd: { unterlagen: [], belege: [] } };
+export const LEERER_STAND: Stand = { version: 6, kasse: [], kassenstuerze: [], sachentnahmen: [], protokoll: [], betriebsstaetten: [], betrieb: LEERER_BETRIEB, unterlagen: [], belege: [], mitarbeiter: [], kunden: [], profil: {}, erledigt: {}, erinnerungen: false, appSperre: false, cloudSicherung: false, proTest: false, bewertung: { erfolge: 0 }, steuerberatung: { kontenrahmen: "SKR03", beraternummer: "", mandantennummer: "" }, geloescht: {}, zeiten: {}, belegArchiv: [], fremd: { unterlagen: [], belege: [] } };
 
 function profilAus(roh: unknown): Stand["profil"] {
   if (!roh || typeof roh !== "object" || Array.isArray(roh)) return {};
@@ -395,8 +405,9 @@ export function standAus(json: string | null): Stand {
   const sachentnahmen = liste(r.sachentnahmen).map(sachentnahmeAus).filter((x): x is Sachentnahme => x !== null);
   const protokoll = protokollAus(r.protokoll);
   const partnerId = partnerIdAus(r.partnerId);
+  const nutzungsbedingungen = zustimmungAus(r.nutzungsbedingungen);
   return belegNummernSichern({
-    version: 5,
+    version: 6,
     kasse: kassenVereinen([], kasse),
     kassenstuerze,
     sachentnahmen,
@@ -422,6 +433,7 @@ export function standAus(json: string | null): Stand {
     ...(iso(r.geaendert) ? { geaendert: iso(r.geaendert) } : {}),
     ...(iso(r.letzteSicherung) ? { letzteSicherung: iso(r.letzteSicherung) } : {}),
     ...(partnerId ? { partnerId } : {}),
+    ...(nutzungsbedingungen ? { nutzungsbedingungen } : {}),
   });
 }
 

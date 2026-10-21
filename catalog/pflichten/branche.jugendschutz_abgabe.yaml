@@ -1,7 +1,7 @@
 # R12 (Rechtsprüfung Befund 3): Jugendschutzgesetz – Abgabe von Alkohol und Tabak
 schema_version: 1
 id: branche.jugendschutz_abgabe
-version: 1
+version: 2
 katalog_nr: H.1
 titel:
   de: Alkohol und Tabak nicht an Kinder und Jugendliche abgeben
@@ -50,10 +50,14 @@ quellen:
 - titel: Jugendschutzgesetz § 28 (lxgesetze)
   url: https://lxgesetze.de/juschg/28
   abgerufen: '2026-10-21'
+- titel: Jugendschutzgesetz § 28
+  url: https://www.gesetze-im-internet.de/juschg/__28.html
+  abgerufen: null
 fachlich_zu_pruefen:
 - Neu nach Rechtsprüfung R12 (Befund 3) – Nummern in § 28 Abs. 1 (Nr. 10 Alkohol, Nr. 12 Tabak) und Bußgeldrahmen über lxgesetze geprüft
 - Stand des „begleiteten Trinkens“ (§ 9 Abs. 2 JuSchG, Abschaffung politisch angekündigt) unsicher – nicht erwähnt
 - Rückverfolgbarkeit Tabak (Economic-Operator- und Facility-ID, DVO (EU) 2018/574) für Kioske – prüfen
+- 'Vorprüfung 21.10.2026: Primärquelle § 28 JuSchG (gesetze-im-internet) ergänzt, nicht abgerufen'
 pruefung:
   status: entwurf
   geprueft_von: null

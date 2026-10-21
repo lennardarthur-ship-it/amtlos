@@ -1,7 +1,7 @@
 # Katalog D.44 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.jugendarbeitsschutz
-version: 3
+version: 4
 katalog_nr: D.44
 titel:
   de: Jugendarbeitsschutz beachten
@@ -28,7 +28,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Bußgeld bis 30.000 € (§ 58 Abs. 1, 4 JArbSchG).
   schwere: hoch
 automatisierung: hinweis
 status_recht: in_kraft
@@ -41,13 +41,19 @@ quellen:
 - titel: Jugendarbeitsschutzgesetz § 14 (lxgesetze)
   url: https://lxgesetze.de/jarbschg/14
   abgerufen: '2026-10-21'
+- titel: JArbSchG § 58
+  url: https://www.gesetze-im-internet.de/jarbschg/__58.html
+  abgerufen: null
+- titel: § 58 JArbSchG, Wortlaut (gesetze.legal)
+  url: https://gesetze.legal/bund/jarbschg/58
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
 - 'R12 (Nutzertest Bäckerei #8): Bäckerei-Ausnahme § 14 Abs. 2 Nr. 4 und Abs. 3 JArbSchG (Wortlaut geprüft; der Nutzertest nannte Nr. 3); weitere Ausnahmen (Gaststätten, mehrschichtige Betriebe) nicht abgebildet'
 - Erstuntersuchung als eigene Pflicht je Einstellung mit Frist?
 - § 22 und § 28a JArbSchG als Hinweis ergänzt (R11, Nutzertest Tischlerei) – Ausnahmen für Auszubildende (§ 22 Abs. 2) bestätigen
 - Arbeitszeitgrenzen als Regelwerte
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- 'Vorprüfung 21.10.2026: Sanktion ergänzt – § 58 Abs. 4 JArbSchG über gesetze.legal gelesen'
 pruefung:
   status: entwurf
   geprueft_von: null

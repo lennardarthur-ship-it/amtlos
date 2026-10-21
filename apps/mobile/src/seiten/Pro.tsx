@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Linking, Pressable, View } from "react-native";
-import { LINKS } from "../rechtliches";
+import { nutzungsLink } from "../rechtliches";
 import { T as TEXT } from "../texte";
 import { trennen } from "../ui/trennen";
 import { Betrag, Fuss, Hinweis, Kachel, Karte, Knopf, Symbol, T, TextKnopf, useGrosseSchrift } from "../ui/bausteine";
@@ -225,7 +225,7 @@ export function ProSeite({ grund, danach }: { grund?: ProFunktion; /** nach erfo
 
       <T v="caption" leise stil={{ marginTop: 18 }}>{TEXT.pro_abo_text}</T>
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 16, marginTop: 4 }}>
-        <TextKnopf text={TEXT.nutzungsbedingungen} leise onPress={() => void Linking.openURL(LINKS.nutzung)} />
+        <TextKnopf text={TEXT.nutzungsbedingungen} leise onPress={() => void Linking.openURL(nutzungsLink())} />
         <TextKnopf text={TEXT.datenschutz} leise onPress={() => nav.oeffnen("datenschutz", () => <DatenschutzSeite />)} />
         {kaufAktiv ? <TextKnopf text={TEXT.pro_wiederherstellen} leise onPress={() => void zurueckholen()} /> : null}
       </View>

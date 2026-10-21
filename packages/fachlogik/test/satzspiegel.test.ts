@@ -187,7 +187,7 @@ describe("weitere Vorlagen", () => {
     expect(ha).not.toContain("<dt>Kontrollpunkte</dt>");
     expect(html("gefahrstoffverzeichnis", { stoffe: [] })).not.toContain("Anzahl Gefahrstoffe");
     const g = html("gefaehrdungsbeurteilung", { gefaehrdungen: [], mitwirkung: "Fachkraft für Arbeitssicherheit.\nBetriebsarzt;" });
-    expect(g).toContain("<th>Gefährdung</th><th>Risiko</th><th>Schutzmaßnahmen</th><th>Umsetzung</th>");
+    expect(g).toContain("<th>Gefährdung</th><th>Risiko</th><th>Schutzmaßnahmen</th><th>Wer / bis wann</th><th>Erledigt am</th>");
     expect(g).toContain("Fachkraft für Arbeitssicherheit, Betriebsarzt</td>");
     expect(html("pruefprotokoll_elektro", { geraete: [] }).match(/<td>&nbsp;<\/td>/g)!.length).toBe(7 * 9);
   });

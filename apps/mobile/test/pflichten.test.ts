@@ -46,9 +46,10 @@ describe("Pflichten-Check", () => {
     const allein = auswertung({ ...cafe, "beschaeftigte.gesamt": 0 }, "2026-01-15");
     expect(ereignisseAusStand({ ...cafe, "beschaeftigte.gesamt": 0 }, "2026-01-15")).toEqual([]);
     for (const id of ["branche.gastro_ifsg_belehrung", "personal.nachweisgesetz", "personal.sv_anmeldung"]) expect(ids([...allein.gilt, ...allein.beiEinstellung]), id).not.toContain(id);
-    // Gründung in der Zukunft: Einstellung geplant, noch nicht eingetreten
+    // Gründung in der Zukunft: Einstellung geplant, noch nicht eingetreten – Vorprüfung 21.10.2026 (T-50): der Nachweis der
+    // Arbeitsbedingungen steht schon bei vereinbarter Einstellung an, Termin ist der erste Arbeitstag (§ 2 Abs. 1 Satz 9 NachwG)
     const spaeter = auswertung({ ...cafe, gruendungsdatum: "2026-06-01" }, "2026-01-15");
-    expect(ids(spaeter.gilt)).not.toContain("personal.nachweisgesetz");
+    expect(spaeter.gilt.find((p) => p.id === "personal.nachweisgesetz")?.naechsterTermin).toBe("2026-06-01");
   });
   it("ausgegebene Unterweisung ⇒ Wiederholung ein Jahr später; die Unterweisung selbst hakt die Wiederholung nicht ab", () => {
     const u = { vorlage: "unterweisung", daten: { datum: "2026-02-10", thema: "Jährliche Unterweisung" }, ausgegeben: "2026-02-10T10:00:00Z" };
@@ -160,7 +161,7 @@ describe("Pflichten-Check", () => {
     // jede offene Pflicht steht in genau einem Abschnitt
     expect(d.jetzt.length + d.naechsteWochen.length + d.imBlick.length).toBe(a.gilt.length);
     expect(new Set([...d.jetzt, ...d.naechsteWochen, ...d.imBlick].map((p) => p.id)).size).toBe(a.gilt.length);
-    for (const p of d.jetzt) expect(p.naechsterTermin ? p.naechsterTermin <= "2026-10-26" : p.schwere === "hoch", p.id).toBe(true);
+    for (const p of d.jetzt) expect(p.naechsterTermin ? p.naechsterTermin <= "2026-10-26" : p.schwere === "hoch" || p.dringendOhneTermin === true, p.id).toBe(true);
     for (const p of d.naechsteWochen) expect(p.naechsterTermin! > "2026-10-26" && p.naechsterTermin! <= "2026-11-26", p.id).toBe(true);
     // Erinnerungen: nur mit Termin, nie vor heute, höchstens 3 Tage vorher, sortiert und begrenzt
     const plan = erinnerungsPlan(a, leer, heute);
@@ -178,6 +179,23 @@ describe("Pflichten-Check", () => {
     const s = { ...erledigtSetzen(LEERER_STAND, p.id, heute, p.naechsterTermin), unterlagen: [] };
     expect(erinnerungsPlan(a, s, heute).some((e) => e.pflichtId === p.id)).toBe(false);
     expect(dringlichkeit(a, s, heute).jetzt.some((x) => x.id === p.id)).toBe(false);
+  });
+
+  it("stellt Pflichten mit dringend_ohne_termin auch bei Schwere „mittel“ und ohne Termin unter „Jetzt dran“", () => {
+    const heute = "2026-10-12";
+    const a = auswertung(salon, heute);
+    const leer = { erledigt: {}, unterlagen: [], betrieb: LEERER_STAND.betrieb };
+    const vorbild = a.gilt.find((x) => x.einordnung === "pflicht")!;
+    const basis: PflichtInfo = { ...vorbild, id: "test.dringend", titel: "Test", schwere: "mittel", dringendOhneTermin: false, naechsterTermin: null, termine: [], vorlage: null, vorlagen: [], lohnbuero: false, personen: [], wiederkehrend: false, erledigung: { art: "einmalig" } };
+    const dringend: PflichtInfo = { ...basis, dringendOhneTermin: true };
+    const ruhig: PflichtInfo = { ...basis, id: "test.ruhig" };
+    const d = dringlichkeit({ ...a, gilt: [...a.gilt, dringend, ruhig] }, leer, heute);
+    expect(d.jetzt.map((p) => p.id)).toContain("test.dringend");
+    expect(d.imBlick.map((p) => p.id)).toContain("test.ruhig");
+    // Katalog: die angezeigte Schwere bleibt „mittel“ (Folgen noch nicht erfasst), die Dringlichkeit trägt das eigene Feld
+    const haccp = KATALOG.pflichten.find((x) => x.id === "branche.gastro_haccp")!;
+    expect(haccp.sanktion.schwere).toBe("mittel");
+    expect(haccp.dringend_ohne_termin).toBe(true);
   });
 
   it("trennt Gründungsschritte bei bestehenden Betrieben ab und nennt Gründe", () => {

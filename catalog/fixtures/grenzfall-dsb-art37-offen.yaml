@@ -1,0 +1,15 @@
+persona: grenzfall
+beschreibung: 'Vorprüfung 21.10.2026 (F.61): 6 Beschäftigte, Gesundheitsdaten, Fälle nach Art. 37 Abs. 1 Buchst. b, c DSGVO bzw. § 38 Abs. 1 Satz 2 BDSG nicht beantwortet – Datenschutzbeauftragter hängt davon ab'
+stichtag: "2026-10-21"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2019-04-01"
+  profil.taetigkeit.einordnung: freiberuf
+  profil.beschaeftigte.gesamt: 6
+  profil.datenverarbeitung.arten: [kundendaten, gesundheitsdaten]
+  profil.bundesland: HE
+  profil.gemeinde_ags: "06412000"
+erwartet:
+  datenschutz.dsb: unbekannt
+fehlende_fakten:
+  datenschutz.dsb: [profil.datenschutz.dsb_gruende]

@@ -2,7 +2,7 @@
 # Rechtsstand 21.10.2026: NIS2UmsuCG seit 6.12.2025 in Kraft, Meldepflichten nach § 32 BSIG
 schema_version: 1
 id: it_sicherheit.nis2_meldepflichten
-version: 2
+version: 3
 katalog_nr: F.64
 titel:
   de: Sicherheitsvorfälle melden (NIS2)
@@ -14,11 +14,27 @@ rechtsgrundlage:
 - § 32 BSIG
 kategorie: it_sicherheit
 ausloeser:
-  feld: profil.nis2.betroffen
-  op: ==
-  wert: ja
-  label:
-    de: Dein Unternehmen fällt unter NIS2.
+  all:
+  - feld: profil.nis2.betroffen
+    op: ==
+    wert: ja
+    label:
+      de: Dein Unternehmen fällt unter NIS2.
+  # Vorprüfung 21.10.2026 (T-105): für Kleinstbetriebe ausgeblendet – wie die automatische Antwort „nein“ der App, IT-Branche ausgenommen
+  - any:
+    - feld: profil.beschaeftigte.gesamt
+      op: nicht_vorhanden
+    - feld: profil.beschaeftigte.gesamt
+      op: '>='
+      wert: 10
+    - all:
+      - feld: profil.taetigkeit.branchen
+        op: vorhanden
+      - feld: profil.taetigkeit.branchen
+        op: enthaelt
+        wert: it_agentur_freelancer
+    label:
+      de: Dein Betrieb ist kein Kleinstbetrieb außerhalb der IT-Branche.
 frist:
   typ: dauerhaft
 wiederholung:
@@ -29,7 +45,7 @@ kanal: portal
 kosten: null
 sanktion:
   text:
-    de: Bußgelder bis 10 Mio. € bzw. 2 % des Umsatzes sind möglich.
+    de: Bußgeld bis 10 Mio. € für besonders wichtige und bis 7 Mio. € für wichtige Einrichtungen, wenn eine Meldung fehlt, falsch oder zu spät ist; bei mehr als 500 Mio. € Gesamtumsatz bis 2 % bzw. 1,4 % des weltweiten Umsatzes (§ 65 Abs. 2 Nr. 4, Abs. 5 Satz 1 Nr. 1, Abs. 6, 7 BSIG).
   schwere: hoch
 automatisierung: hinweis
 status_recht: in_kraft
@@ -42,10 +58,19 @@ quellen:
 - titel: ADVANT Beiten – NIS-2-Umsetzungsgesetz in Kraft
   url: https://www.advant-beiten.com/aktuelles/nis-2-umsetzungsgesetz-in-kraft-neue-cybersicherheitspflichten-fuer-unternehmen
   abgerufen: '2026-10-21'
+- titel: BSI-Gesetz § 65 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/bsig_2025/__65.html
+  abgerufen: null
+- titel: § 65 BSIG, Wortlaut (gesetze.legal)
+  url: https://gesetze.legal/bund/bsig/65
+  abgerufen: '2026-10-21'
+- titel: BSI-Gesetz § 32
+  url: https://www.gesetze-im-internet.de/bsig_2025/__32.html
+  abgerufen: null
 fachlich_zu_pruefen:
 - 'Rechtsstand 21.10.2026: Meldestufen 24 Std./72 Std./1 Monat und § 32 BSIG laut Kanzleibeitrag ADVANT Beiten – Wortlaut von § 32 BSIG (Fristbeginn: Kenntnis) gegenlesen'
 - Haftung und Schulungspflicht der Geschäftsleitung als eigene Pflicht?
-- 'Bußgeldrahmen 10 Mio. €/2 % gilt für besonders wichtige Einrichtungen; für wichtige Einrichtungen niedriger – nach der Bußgeldvorschrift des BSIG differenzieren'
+- 'Vorprüfung 21.10.2026 (F.64): § 65 Abs. 5 Satz 1 Nr. 1 Buchst. a/b BSIG (10 Mio. €/7 Mio. €), Prozentgrenzen nach Abs. 6, 7 nur bei mehr als 500 Mio. € Gesamtumsatz; für Kleinstbetriebe (unter 10 Beschäftigte, nicht IT) ausgeblendet (T-105) – Umsatz- und Bilanzschwelle nicht abgebildet'
 pruefung:
   status: entwurf
   geprueft_von: null

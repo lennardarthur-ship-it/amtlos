@@ -1302,7 +1302,7 @@ export const VVT: Vorschlag[] = [
    "betroffene": "Besucherinnen und Besucher der Website",
    "datenarten": "IP-Adresse, Datum und Uhrzeit des Abrufs, abgerufene Seite/Datei, Browser- und Betriebssysteminformationen, Referrer-URL",
    "empfaenger": "Hosting-Dienstleister (Auftragsverarbeiter)",
-   "loeschfrist": "IP-Adressen in den Logfiles werden nach der Frist des Hosting-Anbieters gelöscht, die in der Datenschutzerklärung genannt ist (z. B. 7, 14 oder 30 Tage).",
+   "loeschfrist": "Server-Logfiles mit IP-Adressen werden nach 14 Tagen gelöscht.",
    "drittland": "keine Übermittlung in Drittländer"
   },
   "quelle": "BayLDA-Muster"
@@ -1344,7 +1344,7 @@ export const VVT: Vorschlag[] = [
    "betroffene": "Newsletter-Abonnenten, Bestandskunden",
    "datenarten": "E-Mail-Adresse, ggf. Name, Einwilligungsnachweis (Zeitpunkt, Wortlaut, Bestätigung), ggf. Öffnungs-/Klickdaten (nur mit Einwilligung)",
    "empfaenger": "Newsletter-Versanddienstleister (Auftragsverarbeiter)",
-   "loeschfrist": "Die Adresse wird nach Abmeldung oder Widerspruch unverzüglich aus dem Verteiler gelöscht; der Nachweis der Einwilligung wird zur Rechtsverteidigung aufbewahrt (Richtwert: 3 Jahre; Verjährung § 31 OWiG, § 195 BGB).",
+   "loeschfrist": "Die Adresse wird nach Abmeldung oder Widerspruch unverzüglich aus dem Verteiler gelöscht; der Nachweis der Einwilligung wird zur Rechtsverteidigung bis zu drei Jahre aufbewahrt (Verjährung § 195 BGB, § 31 OWiG).",
    "drittland": "keine Übermittlung in Drittländer"
   },
   "quelle": "DSK (Orientierungshilfe Werbung)"
@@ -1401,7 +1401,7 @@ export const VVT: Vorschlag[] = [
    "datenarten": "öffentliche Profilangaben, Kommentare, Nachrichten, Reaktionen, von der Plattform bereitgestellte Statistiken (Insights)",
    "empfaenger": "Plattformbetreiber (gemeinsam Verantwortlicher), ggf. mit Übermittlung in die USA",
    "loeschfrist": "Nachrichten nach Erledigung; im Übrigen nach den Einstellungen der Plattform.",
-   "drittland": "möglich: USA (Plattformbetreiber); Grundlage der Übermittlung: siehe Datenschutzhinweise des Anbieters"
+   "drittland": "möglich: USA (Plattformbetreiber, z. B. Meta Platforms, Inc.); Grundlage der Übermittlung: Angemessenheitsbeschluss der EU-Kommission zum EU-U.S. Data Privacy Framework (Art. 45 DSGVO, Durchführungsbeschluss (EU) 2023/1795) für danach zertifizierte Anbieter"
   },
   "quelle": "DSK; EuGH C-210/16"
  }
@@ -1795,7 +1795,7 @@ export const DSE: Record<string, { titel: string; text: string; quelle?: string;
  },
  "youtube": {
   "titel": "Eingebettete YouTube-Videos",
-  "text": "Wir binden Videos der Plattform YouTube (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland) im erweiterten Datenschutzmodus ein. Die Videos werden erst geladen, wenn Sie eingewilligt haben bzw. das Video aktiv starten; erst dann werden Daten wie Ihre IP-Adresse an YouTube/Google übermittelt und ggf. Cookies auf Ihrem Endgerät gespeichert, auch mit Übermittlung in die USA. Rechtsgrundlage ist Ihre Einwilligung (§ 25 Abs. 1 TDDDG, Art. 6 Abs. 1 lit. a DSGVO), die Sie jederzeit widerrufen können. Weitere Informationen: https://policies.google.com/privacy.",
+  "text": "Wir binden Videos der Plattform YouTube (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland) im erweiterten Datenschutzmodus ein. Die Videos werden erst geladen, wenn Sie eingewilligt haben bzw. das Video aktiv starten; erst dann werden Daten wie Ihre IP-Adresse an YouTube/Google übermittelt und ggf. Cookies auf Ihrem Endgerät gespeichert, auch mit Übermittlung in die USA. Rechtsgrundlage ist Ihre Einwilligung (§ 25 Abs. 1 TDDDG, Art. 6 Abs. 1 lit. a DSGVO), die Sie jederzeit widerrufen können. Für Übermittlungen in die USA stützt sich Google auf den Angemessenheitsbeschluss zum EU-US Data Privacy Framework, Durchführungsbeschluss (EU) 2023/1795. Weitere Informationen: https://policies.google.com/privacy.",
   "quelle": "DSK",
   "unsicher": true
  },
@@ -1807,7 +1807,7 @@ export const DSE: Record<string, { titel: string; text: string; quelle?: string;
  },
  "google_fonts_extern": {
   "titel": "Google Fonts (extern eingebunden)",
-  "text": "Wir binden Schriftarten von Google Fonts (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland) ein. Dabei stellt Ihr Browser eine Verbindung zu Servern von Google her, wobei insbesondere Ihre IP-Adresse übermittelt wird. Dies erfolgt nur, wenn Sie zuvor eingewilligt haben (Art. 6 Abs. 1 lit. a DSGVO); die Einwilligung können Sie jederzeit widerrufen. Empfehlung: Schriftarten lokal einbinden, dann entfällt die Übermittlung.",
+  "text": "Wir binden Schriftarten von Google Fonts (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland) ein. Dabei stellt Ihr Browser eine Verbindung zu Servern von Google her, wobei insbesondere Ihre IP-Adresse übermittelt wird, auch an Server in den USA. Dies erfolgt nur, wenn Sie zuvor eingewilligt haben (§ 25 Abs. 1 TDDDG, Art. 6 Abs. 1 lit. a DSGVO); die Einwilligung können Sie jederzeit widerrufen. Für Übermittlungen in die USA stützt sich Google auf den Angemessenheitsbeschluss zum EU-US Data Privacy Framework, Durchführungsbeschluss (EU) 2023/1795. Empfehlung: Schriftarten lokal einbinden, dann entfällt die Übermittlung.",
   "quelle": "Grundlage: Art. 6 Abs. 1 DSGVO. Keine Behördenquelle gefunden",
   "unsicher": true
  },

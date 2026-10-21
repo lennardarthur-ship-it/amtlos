@@ -2,7 +2,9 @@
  * Landingpage bauen (E-132): setzt die echten Zahlen aus dem Katalog (profile.json, erzeugt aus dem Pflichten-Check)
  * in seite.html ein und schreibt dist/ zum Hochladen: index.html (alles vor `<!-- /kopf -->` kommt in den <head>),
  * impressum.html, datenschutz.html und hilfe.html aus apps/mobile/src/rechtliches.ts (fehlende Angaben: „folgt vor dem
- * Start“ – nichts wird erfunden), 404.html, robots.txt, sitemap.xml, Bilder, Schriften (selbst gehostet, OFL), Favicon.
+ * Start“ – nichts wird erfunden), nutzungsbedingungen.html aus docs/nutzungsbedingungen-entwurf.md (ohne die Arbeitsnotizen
+ * mit „>“; solange NUTZUNGSBEDINGUNGEN.freigegeben false ist, als „Entwurf – noch nicht in Kraft“, noindex und nicht
+ * verlinkt), 404.html, robots.txt, sitemap.xml, Bilder, Schriften (selbst gehostet, OFL), Favicon.
  *
  * Adresse der Website (eine Stelle): seite.json → url, sonst LINKS.website aus rechtliches.ts. Daraus canonical,
  * og:url, absolutes og:image, JSON-LD url/image, robots.txt und sitemap.xml. Ohne Adresse entstehen relative Verweise
@@ -130,7 +132,9 @@ const stil = kopf.slice(kopf.indexOf("<style>"));
 const FOLGT = "folgt vor dem Start";
 const marke = /<a class="marke"[\s\S]*?<\/a>/.exec(rumpf)?.[0];
 if (!marke) throw new Error("Logo (<a class=\"marke\">) fehlt in seite.html");
-const fussNav = `<nav aria-label="Rechtliches"><a href="./">Startseite</a><a href="hilfe.html">Hilfe und Kontakt</a><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a></nav>`;
+const NB = recht.NUTZUNGSBEDINGUNGEN;
+// eigene Nutzungsbedingungen erst nach der Freigabe verlinken – bis dahin gilt Apples Standard-EULA
+const fussNav = `<nav aria-label="Rechtliches"><a href="./">Startseite</a><a href="hilfe.html">Hilfe und Kontakt</a><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a>${NB.freigegeben ? `<a href="nutzungsbedingungen.html">Nutzungsbedingungen</a>` : ""}</nav>`;
 // Unterseiten im Stil der Startseite: Logo im Kopf, gleiche Fußzeile; `wurzel` = "/" für 404.html (an jeder Adresse)
 const rechtsSeite = (titel, beschreibung, inhalt, { index = false, pfad = "", wurzel = "" } = {}) =>
   dokument(
@@ -146,7 +150,7 @@ schreibe(
   rechtsSeite(
     "Impressum",
     "Impressum von {{MARKE}}",
-    `<h1>Impressum</h1>\n${anbieterFehlt ? `<p class="hinweis">Die Angaben zum Anbieter folgen vor der Veröffentlichung.</p>\n` : ""}<p>Angaben nach § 5 DDG</p>\n<dl>${zeile("Anbieter", A.name)}${zeile("Anschrift", A.anschrift)}${zeile("Vertreten durch", A.vertretung)}${zeile("E-Mail", A.email)}${zeile("Telefon", A.telefon, false)}${zeile("Register", A.register, false)}${zeile("USt-IdNr.", A.ustIdNr, false)}</dl>`,
+    `<h1>Impressum</h1>\n${anbieterFehlt ? `<p class="hinweis">Die Angaben zum Anbieter folgen vor der Veröffentlichung.</p>\n` : ""}<p>Angaben nach § 5 DDG</p>\n<dl>${zeile("Anbieter", A.name)}${zeile("Rechtsform", A.rechtsform, false)}${zeile("Anschrift", A.anschrift)}${zeile("Vertreten durch", A.vertretung)}${zeile("E-Mail", A.email)}${zeile("Telefon", A.telefon, false)}${zeile("Registergericht und Registernummer", A.register, Boolean(A.rechtsform))}${zeile("USt-IdNr.", A.ustIdNr, false)}</dl>`,
   ),
 );
 const abschnitte = recht.datenschutzAbschnitte(false);
@@ -155,9 +159,30 @@ schreibe(
   rechtsSeite(
     "Datenschutz",
     "Datenschutzhinweis der App {{MARKE}} und dieser Website",
-    `<h1>Datenschutz</h1>\n${recht.DATENSCHUTZ.freigegeben ? "" : `<p class="hinweis">Entwurf – fachlich noch nicht freigegeben.</p>\n`}<h2>Verantwortlich</h2>\n<p>${A.name ? esc([A.name, A.anschrift, A.email].filter(Boolean).join(", ")) : `<span class="offen">Die Angaben zum Anbieter folgen vor der Veröffentlichung.</span>`}</p>\n<h2>Die App {{MARKE}}</h2>\n${abschnitte.map((a) => `<h3>${esc(a.titel)}</h3>\n<p>${esc(a.text)}</p>`).join("\n")}\n<h2>Diese Website</h2>\n<p>Diese Website setzt keine Cookies, nutzt kein Tracking und lädt keine Inhalte von fremden Servern; die Schriften liegen auf diesem Server.</p>\n<h3>Hosting und Server-Protokolle</h3>\n<p><span class="offen">Angaben zum Hosting folgen vor dem Start.</span></p>`,
+    `<h1>Datenschutz</h1>\n${recht.DATENSCHUTZ.freigegeben ? "" : `<p class="hinweis">Entwurf – fachlich noch nicht freigegeben.</p>\n`}<h2>Verantwortlich</h2>\n<p>${A.name ? `${esc([A.name, A.anschrift, A.email].filter(Boolean).join(", "))}${A.vertretung ? `<br>Vertreten durch ${esc(A.vertretung)}` : ""}` : `<span class="offen">Die Angaben zum Anbieter folgen vor der Veröffentlichung.</span>`}</p>\n<h2>Die App {{MARKE}}</h2>\n${abschnitte.map((a) => `<h3>${esc(a.titel)}</h3>\n<p>${esc(a.text)}</p>`).join("\n")}\n<h2>Diese Website</h2>\n<p>Diese Website setzt keine Cookies, nutzt kein Tracking und lädt keine Inhalte von fremden Servern.</p>\n<h3>Kurz-Check auf der Startseite</h3>\n<p>Der Kurz-Check rechnet nur in deinem Browser: Die Beispielzahlen sind in der Seite enthalten, deine Auswahl (Branche, Team) wird weder an einen Server gesendet noch gespeichert.</p>\n<h3>Schriftarten</h3>\n<p>Die Schrift Onest liegt auf diesem Server und wird nicht von einem fremden Anbieter (z. B. Google Fonts) geladen.</p>\n<h3>Hosting und Server-Protokolle</h3>\n<p><span class="offen">Angaben zum Hosting (Anbieter, Server-Protokolle, Speicherdauer, Auftragsverarbeitung) folgen, sobald der Hoster feststeht.</span></p>`,
   ),
 );
+
+// Nutzungsbedingungen aus docs/nutzungsbedingungen-entwurf.md: Überschrift 1 und Arbeitsnotizen („>“) entfallen,
+// „## …“ wird h2, jeder Absatz ein <p>, **fett** wird <strong>. Vor der Freigabe als Entwurf gekennzeichnet und noindex.
+{
+  const md = fs.readFileSync(path.resolve(HIER, "../../docs/nutzungsbedingungen-entwurf.md"), "utf8");
+  const absaetze = md.split(/\n\s*\n/).map((a) => a.trim()).filter((a) => a && !a.startsWith("# ") && !a.startsWith(">"));
+  const inline = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+  const html = absaetze.map((a) => (a.startsWith("## ") ? `<h2>${inline(a.slice(3))}</h2>` : `<p>${inline(a.replace(/\s*\n\s*/g, " "))}</p>`)).join("\n");
+  const fassung = /Fassung vom (\d{2})\.(\d{2})\.(\d{4})/.exec(md);
+  if (!fassung || `${fassung[3]}-${fassung[2]}-${fassung[1]}` !== NB.fassung) throw new Error(`docs/nutzungsbedingungen-entwurf.md: „Fassung vom …“ passt nicht zu NUTZUNGSBEDINGUNGEN.fassung (${NB.fassung})`);
+  if (A.name && !md.includes(A.name)) throw new Error("docs/nutzungsbedingungen-entwurf.md: Ziffer 1.1 nennt nicht ANBIETER.name aus rechtliches.ts");
+  schreibe(
+    "nutzungsbedingungen.html",
+    rechtsSeite(
+      "Nutzungsbedingungen",
+      "Nutzungsbedingungen der App {{MARKE}}",
+      `<h1>Nutzungsbedingungen</h1>\n${NB.freigegeben ? "" : `<p class="hinweis">Entwurf – noch nicht in Kraft. Bis zur Freigabe gilt für die App der <a href="${esc(recht.LINKS.nutzung)}">Standard-Lizenzvertrag von Apple</a>.</p>\n`}${html}`,
+      NB.freigegeben ? { index: true, pfad: "nutzungsbedingungen.html" } : {},
+    ),
+  );
+}
 
 // Hilfe und Kontakt (Support-URL im App Store): Kontakt aus ANBIETER (rechtliches.ts) wie in der App, dazu die Fragen
 const fragen = /<!-- fragen -->([\s\S]*?)<!-- \/fragen -->/.exec(rumpf)?.[1];
@@ -189,7 +214,7 @@ fs.rmSync(path.join(OUT, "sitemap.xml"), { force: true });
 if (url)
   fs.writeFileSync(
     path.join(OUT, "sitemap.xml"),
-    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${["", "hilfe.html"].map((p) => `  <url><loc>${esc(url)}/${p}</loc></url>`).join("\n")}\n</urlset>\n`,
+    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${["", "hilfe.html", ...(NB.freigegeben ? ["nutzungsbedingungen.html"] : [])].map((p) => `  <url><loc>${esc(url)}/${p}</loc></url>`).join("\n")}\n</urlset>\n`,
   );
 
 // Dateien
@@ -198,6 +223,8 @@ fs.cpSync(path.join(HIER, "schriften"), path.join(OUT, "schriften"), { recursive
 for (const d of ["favicon.svg", "apple-touch-icon.png"]) fs.copyFileSync(path.join(HIER, d), path.join(OUT, d));
 if (anbieterFehlt) offen.push("Anbieterangaben für das Impressum (ANBIETER in apps/mobile/src/rechtliches.ts, § 5 DDG) – Impressum zeigt „folgt vor dem Start“");
 if (!recht.DATENSCHUTZ.freigegeben) offen.push("Datenschutz fachlich freigeben (DATENSCHUTZ.freigegeben) und Angaben zum Hosting ergänzen");
+if (!NB.freigegeben) offen.push("Nutzungsbedingungen anwaltlich freigeben (NUTZUNGSBEDINGUNGEN.freigegeben) – nutzungsbedingungen.html zeigt „Entwurf – noch nicht in Kraft“");
+if (A.rechtsform && !A.register) offen.push("Registergericht und Registernummer (ANBIETER.register) nach der Eintragung – Impressum zeigt „folgt vor dem Start“");
 console.log(`✓ ${OUT}`);
 if (!appStoreId) console.log("  · Ohne App-ID (seite.json → appStoreId): kein Smart-App-Banner, im JSON-LD kein downloadUrl und kein Angebot");
 if (offen.length) {

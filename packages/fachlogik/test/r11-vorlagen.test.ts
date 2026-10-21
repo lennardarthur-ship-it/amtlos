@@ -34,7 +34,7 @@ describe("Arbeitszeitnachweis (Reinigung #9, #10)", () => {
     expect(leereDaten(v("arbeitszeitnachweis"), B, "2026-10-20", ["kosmetik"]).branche).toBe("friseur_kosmetik");
     expect(leereDaten(v("arbeitszeitnachweis"), B, "2026-10-20", []).branche).toBeNull();
     expect(html("arbeitszeitnachweis", { name: "Amira", tage, branche: "gebaeudereinigung" })).toContain("(hier: Gebäudereinigung)");
-    expect(html("arbeitszeitnachweis", { name: "Amira", tage })).toContain("Gebäudereinigung, Friseur- und Kosmetikgewerbe");
+    expect(html("arbeitszeitnachweis", { name: "Amira", tage })).toContain("Gebäudereinigung, Messebau, Fleischwirtschaft, Prostitution, Wach- und Sicherheitsgewerbe sowie seit 30.12.2025 Friseur- und Kosmetikgewerbe");
   });
 });
 
@@ -98,7 +98,7 @@ describe("Unterweisung, Hygieneplan, Datenschutz, NachwG", () => {
   });
   it("NachwG: Provision als eigene Zeile mit eigenem Datum", () => {
     const h = html("nachweis_arbeitsbedingungen", { name: "Kim", entgelt_art: "monat", entgelt_betrag: "3000", provision: "5 % vom eigenen Umsatz", provision_ab: "2026-07-01" });
-    expect(h).toContain("Provision ab 01.07.2026: 5 % vom eigenen Umsatz");
+    expect(h).toContain("<th>Provision</th><td>5 % vom eigenen Umsatz (ab 01.07.2026)</td>");
   });
 });
 

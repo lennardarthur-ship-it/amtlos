@@ -1,5 +1,5 @@
 import { Linking, Share, View } from "react-native";
-import { ANBIETER, DATENSCHUTZ, LINKS, datenschutzAbschnitte, hilfeZiel } from "../rechtliches";
+import { ANBIETER, DATENSCHUTZ, LINKS, datenschutzAbschnitte, hilfeZiel, nutzungsLink } from "../rechtliches";
 import { syncAngeboten } from "../konto/konfig";
 import { T as TEXT } from "../texte";
 import { Hinweis, Karte, T, Zeile } from "../ui/bausteine";
@@ -27,6 +27,7 @@ export function ImpressumSeite() {
       <Inhalt>
         <Karte stil={{ paddingTop: 0 }}>
           {zeile(TEXT.anbieter, ANBIETER.name)}
+          {ANBIETER.rechtsform ? zeile(TEXT.vr_rechtsform, ANBIETER.rechtsform) : null}
           {zeile(TEXT.anschrift, ANBIETER.anschrift)}
           {zeile(TEXT.vertreten_durch, ANBIETER.vertretung)}
           {zeile(TEXT.b_email, ANBIETER.email)}
@@ -47,7 +48,7 @@ export function DatenschutzSeite() {
         {/* Verantwortlicher mit Kontakt zuerst (Art. 13 Abs. 1 lit. a DSGVO) – aus ANBIETER, nie erfunden */}
         <View style={{ marginBottom: 18 }}>
           <T fett accessibilityRole="header">{TEXT.verantwortlich_titel}</T>
-          {ANBIETER.name ? <T v="klein" stil={{ marginTop: 4 }}>{TEXT.verantwortlich_ist(ANBIETER.name, ANBIETER.anschrift, ANBIETER.email)}</T> : <Hinweis text={TEXT.anbieter_folgt} />}
+          {ANBIETER.name ? <T v="klein" stil={{ marginTop: 4 }}>{TEXT.verantwortlich_ist(ANBIETER.name, ANBIETER.anschrift, ANBIETER.email)}{ANBIETER.vertretung ? ` ${TEXT.vr_vertreten(ANBIETER.vertretung)}` : ""}</T> : <Hinweis text={TEXT.anbieter_folgt} />}
         </View>
         {datenschutzAbschnitte(syncAngeboten).map((a) => (
           <View key={a.titel} style={{ marginBottom: 18 }}>
@@ -74,7 +75,7 @@ export function UeberGruppe() {
     ...(hilfe ? [{ titel: TEXT.hilfe_kontakt, symbol: "questionmark.circle", onPress: () => void Linking.openURL(hilfe) }] : []),
     { titel: TEXT.datenschutz, symbol: "hand.raised", onPress: () => nav.oeffnen("datenschutz", () => <DatenschutzSeite />) },
     { titel: TEXT.impressum, symbol: "info.circle", onPress: () => nav.oeffnen("impressum", () => <ImpressumSeite />) },
-    { titel: TEXT.nutzungsbedingungen, symbol: "doc.plaintext", onPress: () => void Linking.openURL(LINKS.nutzung) },
+    { titel: TEXT.nutzungsbedingungen, symbol: "doc.plaintext", onPress: () => void Linking.openURL(nutzungsLink()) },
   ];
   return (
     <View>

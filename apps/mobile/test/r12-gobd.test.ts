@@ -59,7 +59,7 @@ describe("Belege: feste Nummern, Festschreibung, Löschen, Protokoll", () => {
   it("Migration 3 → 4 speichert die bisher berechneten Nummern fest (auch ungültige); neue Belege bekommen die nächste", () => {
     const roh = { version: 3, betrieb: BETRIEB, belege: [beleg("b2", "2026-02-01", { erstellt: "2026-02-01T08:00:00Z" }), beleg("b1", "2026-01-05", { erstellt: "2026-01-05T08:00:00Z" })], belegArchiv: [{ ...beleg("b0", "2026-01-02", { erstellt: "2026-01-02T08:00:00Z" }), ungueltig: "2026-01-03T08:00:00Z", ungueltig_grund: "doppelt" }] };
     const m = migrieren(roh) as { belege: Beleg[]; belegArchiv: Beleg[]; version: number };
-    expect(m.version).toBe(5);
+    expect(m.version).toBe(6);
     expect(m.belegArchiv[0]!.nr).toBe("B2026-001");
     expect(m.belege.map((b) => b.nr)).toEqual(["B2026-003", "B2026-002"]);
     const s = standAus(JSON.stringify(roh));

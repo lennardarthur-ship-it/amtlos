@@ -5,8 +5,8 @@
 import { teilnahmeTabelle } from "./arbeitsschutz.js";
 import { mitVertretung } from "./betrieb.js";
 import { MINDESTLOHN, MINIJOB, NACHWG } from "./bausteine.js";
-import { abschnitt, absatz, angaben, anschrift, anschriftMehrzeilig, auswahl, cent, datumDe, dokument, euro, fassungNachsatz, ja, liste, neufassung, parteien, punkte, stabileOption, tabelle, text, unterschriften, zahl, zahlText, zelle, zeilen } from "./html.js";
-import { optionen } from "./konstanten.js";
+import { abschnitt, absatz, angaben, anschriftMehrzeilig, auswahl, cent, datumDe, dokument, esc, euro, fassungNachsatz, ja, liste, neufassung, parteien, punkte, stabileOption, tabelle, text, unterschriften, zahl, zahlText, zelle, zeilen } from "./html.js";
+import { BRANCHEN_2A, BRANCHEN_2A_TEXT, branche2aAusProfil, optionen } from "./konstanten.js";
 import type { Daten, Vorlage } from "./typen.js";
 
 /**
@@ -57,9 +57,22 @@ const KOLLEKTIV: Record<string, string> = { keine: "Auf das Arbeitsverhältnis f
 /** Text zum Kündigungsverfahren aus den gesetzlichen Regelungen (Schriftform, Fristen, Klagefrist). */
 function kuendigungText(d: Daten): string {
   if (text(d, "kuendigung_art") === "eigen") return text(d, "kuendigung_eigen");
+  const klage = "Will die beschäftigte Person geltend machen, dass eine Kündigung rechtsunwirksam ist, muss sie innerhalb von drei Wochen nach Zugang der schriftlichen Kündigung Klage beim Arbeitsgericht erheben (§ 4 KSchG).";
+  // Vorprüfung 21.10.2026 (T-93): ein befristetes Arbeitsverhältnis ist nur ordentlich kündbar, wenn das vereinbart ist
+  if (ja(d, "befristet") && d.befristet_kuendbar !== true)
+    return `Das Arbeitsverhältnis endet mit Ablauf der Befristung. Eine ordentliche Kündigung ist nicht vereinbart (§ 15 Abs. 4 TzBfG); das Recht zur außerordentlichen Kündigung (§ 626 BGB) bleibt unberührt. Die Kündigung bedarf der Schriftform (§ 623 BGB). ${klage}`;
   const probe = text(d, "probezeit") && text(d, "probezeit") !== "keine" ? " Während der vereinbarten Probezeit kann das Arbeitsverhältnis mit einer Frist von zwei Wochen gekündigt werden (§ 622 Abs. 3 BGB)." : "";
-  return `Die Kündigung bedarf der Schriftform (§ 623 BGB). Es gelten die gesetzlichen Kündigungsfristen nach § 622 BGB; die Grundkündigungsfrist beträgt ${NACHWG.kuendigungGrund.replace(/ \(§ 622 Abs\. 1 BGB\)/, "")}. Für die Kündigung durch den Arbeitgeber verlängert sie sich mit der Dauer des Arbeitsverhältnisses (§ 622 Abs. 2 BGB).${probe} Will die beschäftigte Person geltend machen, dass eine Kündigung rechtsunwirksam ist, muss sie innerhalb von drei Wochen nach Zugang der schriftlichen Kündigung Klage beim Arbeitsgericht erheben (§ 4 KSchG).`;
+  const befristet = ja(d, "befristet") ? " Die ordentliche Kündigung des befristeten Arbeitsverhältnisses ist vereinbart (§ 15 Abs. 4 TzBfG)." : "";
+  return `Die Kündigung bedarf der Schriftform (§ 623 BGB).${befristet} Es gelten die gesetzlichen Kündigungsfristen nach § 622 BGB; die Grundkündigungsfrist beträgt ${NACHWG.kuendigungGrund.replace(/ \(§ 622 Abs\. 1 BGB\)/, "")}. Für die Kündigung durch den Arbeitgeber verlängert sie sich mit der Dauer des Arbeitsverhältnisses (§ 622 Abs. 2 BGB).${probe} ${klage}`;
 }
+
+/** Vorprüfung 21.10.2026: Form je Branche – § 2a-Branchen Schriftform, sonst Textform mit Empfangsnachweis (§ 2 Abs. 1 NachwG). */
+const NW_BRANCHEN = [...BRANCHEN_2A, { wert: "keine", text: "Keine dieser Branchen" }];
+export const NACHWG_FORM_SCHRIFT = (branche: string) => `In deiner Branche (${branche}, § 2a Abs. 1 SchwarzArbG): ausdrucken, unterschreiben, aushändigen. Ein PDF per E-Mail oder Messenger genügt hier nicht – es gilt weiter die Schriftform (§ 2 Abs. 1 NachwG).`;
+export const NACHWG_FORM_TEXT = "PDF genügt (Textform, § 2 Abs. 1 NachwG): Das Dokument muss für die beschäftigte Person zugänglich, speicher- und ausdruckbar sein – lass dir den Empfang bestätigen (Empfangsnachweis), z. B. per Antwort-E-Mail. Verlangt die beschäftigte Person einen schriftlichen Nachweis, ausdrucken und unterschreiben.";
+export const NACHWG_FORM_OFFEN = `Form: In den Branchen nach § 2a Abs. 1 SchwarzArbG (${BRANCHEN_2A_TEXT}) gilt die Schriftform – ausdrucken, beide unterschreiben, aushändigen. Sonst genügt seit 1.1.2025 die Textform (z. B. PDF per E-Mail), wenn das Dokument speicher- und ausdruckbar ist und du einen Empfangsnachweis anforderst (§ 2 Abs. 1 NachwG). Wähle die Branche im Formular, dann steht hier, was für dich gilt.`;
+const BESTANDTEILE = ["Nachtzuschlag", "Sonntagszuschlag", "Feiertagszuschlag", "Weihnachtsgeld", "Urlaubsgeld", "Fahrtkostenzuschuss", "Sachbezug (z. B. Gutschein)", "Leistungsprämie", "Vermögenswirksame Leistungen"];
+const ABRUF_HINWEIS = "Die beschäftigte Person ist nur zur Arbeitsleistung verpflichtet, wenn ihr die Lage der Arbeitszeit jeweils mindestens vier Tage im Voraus mitgeteilt wird und die Arbeit im festgelegten Zeitrahmen liegt (§ 12 Abs. 3 TzBfG).";
 
 export const nachweisArbeitsbedingungen: Vorlage = {
   id: "nachweis_arbeitsbedingungen",
@@ -74,35 +87,67 @@ export const nachweisArbeitsbedingungen: Vorlage = {
   person: { art: "mitarbeiter", felder: { name: "name", anschrift: "anschrift", beginn: "beginn", taetigkeit: "taetigkeit", wochenstunden: "wochenstunden", entgelt_art: "entgelt_art" } },
   grundlage: "§ 2 Abs. 1 NachwG",
   namensFeld: "name",
+  // Vorprüfung 21.10.2026: Branche nach § 2a SchwarzArbG aus dem Pflichten-Check – bestimmt den Hinweis zur Form
+  profilStart(profil) {
+    const w = branche2aAusProfil(profil);
+    const start: Daten = w ? { branche: w } : {};
+    return start;
+  },
   abschnitte: [
     {
       titel: "Beschäftigte Person",
-      hilfe: "In Gastronomie, Friseur- und Kosmetikbetrieben und anderen Branchen nach § 2a SchwarzArbG muss die Niederschrift unterschrieben und ausgehändigt werden – das PDF hat dafür die Unterschriftsfelder.",
+      hilfe: "Name und Anschrift der beschäftigten Person gehören zu den Pflichtangaben (Nr. 1). Nr. 1, 7 und 8 müssen spätestens am ersten Arbeitstag vorliegen, Nr. 2–6, 9 und 10 bis zum siebten Kalendertag, die übrigen innerhalb eines Monats.",
       felder: [
         { id: "name", art: "text", label: "Vor- und Nachname", pflicht: true },
-        { id: "anschrift", art: "mehrzeilig", label: "Anschrift", pflicht: true },
+        { id: "anschrift", art: "mehrzeilig", label: "Anschrift (Straße, PLZ, Ort)", pflicht: true },
+        {
+          id: "branche",
+          art: "wahl",
+          label: "Branche – bestimmt die Form",
+          optionen: NW_BRANCHEN,
+          vorbelegungJe: { gastro_cafe: "gastronomie", friseur: "friseur_kosmetik", kosmetik: "friseur_kosmetik", gebaeudereinigung: "gebaeudereinigung" },
+          hilfe: "In den Branchen nach § 2a Abs. 1 SchwarzArbG (seit 30.12.2025 auch Friseur- und Kosmetikgewerbe) gilt die Schriftform: ausdrucken, beide unterschreiben, aushändigen. Sonst genügt seit 1.1.2025 ein PDF, wenn du dir den Empfang bestätigen lässt. Die beschäftigte Person kann immer einen unterschriebenen Nachweis verlangen.",
+        },
       ],
     },
     {
       titel: "Beginn, Ort und Tätigkeit",
       felder: [
         { id: "beginn", art: "datum", label: "Beginn des Arbeitsverhältnisses", pflicht: true },
-        { id: "befristet", art: "schalter", label: "Befristet" },
+        { id: "befristet", art: "schalter", label: "Befristet", hilfe: "Die Befristung selbst muss vor Arbeitsbeginn schriftlich vereinbart und von beiden unterschrieben sein (§ 14 Abs. 4 TzBfG) – dieser Nachweis ersetzt das nicht." },
         { id: "befristung_ende", art: "datum", label: "Enddatum", wenn: { feld: "befristet" }, pflicht: true },
+        { id: "befristet_kuendbar", art: "schalter", label: "Ordentliche Kündigung vereinbart", wenn: { feld: "befristet" }, hilfe: "Ein befristetes Arbeitsverhältnis ist nur ordentlich kündbar, wenn das einzelvertraglich oder im Tarifvertrag vereinbart ist (§ 15 Abs. 4 TzBfG)." },
         { id: "arbeitsort", art: "wahl", label: "Arbeitsort", optionen: optionen(ORT), vorbelegung: "betrieb" },
         { id: "arbeitsort_text", art: "text", label: "Ort", wenn: { feld: "arbeitsort", ist: "anders" }, pflicht: true },
         { id: "taetigkeit", art: "text", label: "Tätigkeit", hilfe: "kurze Beschreibung", pflicht: true, vorschlaege: ["Friseur/in", "Kosmetiker/in", "Servicekraft", "Küchenhilfe", "Koch/Köchin", "Verkäufer/in", "Bürokraft", "Geselle/Gesellin im Handwerk", "Aushilfe"] },
-        { id: "probezeit", art: "wahl", label: "Probezeit", optionen: optionen(PROBEZEIT), vorbelegung: "6" },
+        { id: "probezeit", art: "wahl", label: "Probezeit", optionen: optionen(PROBEZEIT), vorbelegung: "6", hilfe: "Bei einer Befristung muss die Probezeit im Verhältnis zur Dauer der Befristung und zur Art der Tätigkeit stehen (§ 15 Abs. 3 TzBfG)." },
       ],
     },
     {
       titel: "Arbeitsentgelt",
+      hilfe: "Nr. 7 verlangt jeden Bestandteil getrennt mit seiner Höhe: Grundvergütung, Vergütung von Überstunden, Zuschläge, Zulagen, Prämien und Sonderzahlungen.",
       felder: [
         { id: "entgelt_art", art: "wahl", label: "Art", optionen: optionen(ENTGELT), vorbelegung: "monat" },
         { id: "entgelt_betrag", art: "betrag", label: "Betrag brutto (€)", pflicht: true },
         // Minijob (R10): die Grenze steht mit dem Wert zum Ausstellungsdatum im Nachweis – nicht als Freitext mit Jahreszahl
         { id: "minijob", art: "schalter", label: "Minijob (geringfügig entlohnt)", hilfe: "Der Nachweis nennt die Minijob-Grenze, die am Ausstellungstag gilt" },
-        { id: "zuschlaege", art: "mehrzeilig", label: "Weitere Bestandteile", hilfe: "Vergütung von Überstunden, Zuschläge, Zulagen, Prämien, Sonderzahlungen – jeweils getrennt", vorschlaege: ["Keine weiteren Bestandteile.", "Überstunden werden mit dem vereinbarten Stundenlohn vergütet.", "Überstunden werden durch Freizeit ausgeglichen."] },
+        // Vorprüfung 21.10.2026: Überstundenvergütung als eigene Angabe (Nr. 7)
+        { id: "ueberstunden_verguetung", art: "text", label: "Vergütung von Überstunden", pflicht: true, hilfe: "auch wenn Überstunden nur ausnahmsweise vorkommen", vorschlaege: ["Überstunden werden mit dem vereinbarten Stundenlohn vergütet.", "Überstunden werden mit dem vereinbarten Stundenlohn zuzüglich eines Zuschlags von 25 % vergütet.", "Überstunden werden durch bezahlte Freizeit im Verhältnis 1 : 1 ausgeglichen."] },
+        {
+          id: "bestandteile",
+          art: "liste",
+          label: "Zuschläge, Zulagen, Prämien, Sonderzahlungen",
+          hilfe: "Jeder Bestandteil mit Bezeichnung und Höhe. Gibt es keine, leer lassen – im Nachweis steht dann „keine“.",
+          eintrag: "Bestandteil",
+          titelFeld: "bezeichnung",
+          leerStarten: true,
+          felder: [
+            { id: "bezeichnung", art: "text", label: "Bezeichnung", pflicht: true, vorschlaege: BESTANDTEILE },
+            { id: "hoehe", art: "text", label: "Höhe", pflicht: true, hilfe: "z. B. 50,00 € monatlich, 25 % des Stundenlohns, ein halbes Monatsgehalt im November" },
+          ],
+        },
+        // bis zur Vorprüfung ein Sammelfeld für alle Bestandteile – bleibt für gespeicherte Nachweise und Ergänzungen
+        { id: "zuschlaege", selten: true, art: "mehrzeilig", label: "Weitere Angaben zum Entgelt", hilfe: "z. B. Anrechnung oder Auszahlungsweise – Bestandteile mit Betrag bitte oben einzeln eintragen" },
         // R11 (Rechtsprüfung #18): Provision als eigener Bestandteil mit eigenem Datum – im Freitext wurde „ab …“ mehrdeutig
         { id: "provision", selten: true, art: "mehrzeilig", label: "Provision", hilfe: "z. B. 5 % vom eigenen Dienstleistungsumsatz im Monat" },
         { id: "provision_ab", selten: true, art: "datum", label: "Provision ab", wenn: { feld: "provision" } },
@@ -116,12 +161,16 @@ export const nachweisArbeitsbedingungen: Vorlage = {
         { id: "wochenstunden", art: "zahl", label: "Wöchentliche Arbeitszeit (Stunden)", pflicht: true },
         { id: "tage_pro_woche", art: "zahl", label: "Arbeitstage pro Woche", vorbelegung: "5", pflicht: true },
         { id: "verteilung", art: "text", label: "Verteilung", vorschlaege: ["Montag bis Freitag", "Dienstag bis Samstag", "nach Dienstplan"] },
-        { id: "pausen", art: "text", label: "Ruhepausen", pflicht: true, vorschlaege: ["nach § 4 ArbZG: mindestens 30 Minuten bei mehr als sechs Stunden, 45 Minuten bei mehr als neun Stunden"] },
-        { id: "ruhezeit", art: "text", label: "Ruhezeit", pflicht: true, vorschlaege: ["nach § 5 ArbZG: mindestens elf Stunden ununterbrochen nach Ende der täglichen Arbeitszeit"] },
+        { id: "pausen", art: "text", label: "Ruhepausen", pflicht: true, hilfe: "Gesetzlich (§ 4 ArbZG): mindestens 30 Minuten bei mehr als 6 Stunden, 45 Minuten bei mehr als 9 Stunden Arbeit, teilbar in Abschnitte von mindestens 15 Minuten.", vorschlaege: ["nach § 4 ArbZG: mindestens 30 Minuten bei mehr als sechs Stunden, 45 Minuten bei mehr als neun Stunden"] },
+        { id: "ruhezeit", art: "text", label: "Ruhezeit", pflicht: true, hilfe: "Gesetzlich (§ 5 ArbZG): mindestens 11 Stunden ohne Unterbrechung zwischen Arbeitsende und nächstem Arbeitsbeginn; Ausnahmen z. B. in Gaststätten (§ 5 Abs. 2 ArbZG).", vorschlaege: ["nach § 5 ArbZG: mindestens elf Stunden ununterbrochen nach Ende der täglichen Arbeitszeit"] },
         { id: "schicht", art: "schalter", label: "Schichtarbeit" },
         { id: "schicht_text", art: "mehrzeilig", label: "Schichtsystem, Rhythmus, Voraussetzungen für Änderungen", wenn: { feld: "schicht" }, pflicht: true },
-        { id: "abruf", art: "schalter", label: "Arbeit auf Abruf (§ 12 TzBfG)" },
-        { id: "abruf_text", art: "mehrzeilig", label: "Mindeststunden, Zeitrahmen, Ankündigungsfrist", wenn: { feld: "abruf" }, pflicht: true },
+        { id: "abruf", art: "schalter", label: "Arbeit auf Abruf (§ 12 TzBfG)", hilfe: "Die beschäftigte Person arbeitet nach Arbeitsanfall – dann verlangt Nr. 9 Mindeststunden, Zeitrahmen und Ankündigungsfrist." },
+        // Vorprüfung 21.10.2026: die Unterpunkte von Nr. 9 als eigene Felder
+        { id: "abruf_mindest", art: "zahl", label: "Mindestens zu vergütende Stunden pro Woche", wenn: { feld: "abruf" }, pflicht: true, hilfe: "Ohne Vereinbarung gelten 20 Stunden (§ 12 Abs. 1 TzBfG). Bei einer Mindestarbeitszeit darf höchstens 25 % mehr abgerufen werden (§ 12 Abs. 2 TzBfG)." },
+        { id: "abruf_zeitrahmen", art: "text", label: "Zeitrahmen (Referenztage und Referenzstunden)", wenn: { feld: "abruf" }, pflicht: true, vorschlaege: ["Montag bis Freitag, 8 bis 18 Uhr", "Montag bis Samstag, 7 bis 20 Uhr"] },
+        { id: "abruf_frist", art: "text", label: "Ankündigungsfrist", wenn: { feld: "abruf" }, pflicht: true, vorbelegung: { text: "mindestens vier Tage im Voraus" }, hilfe: "Gesetzlich mindestens vier Tage (§ 12 Abs. 3 TzBfG)" },
+        { id: "abruf_text", selten: true, art: "mehrzeilig", label: "Weitere Vereinbarungen zur Arbeit auf Abruf", wenn: { feld: "abruf" } },
         { id: "ueberstunden", art: "wahl", label: "Überstunden", optionen: [{ wert: "nein", text: "nicht vereinbart" }, { wert: "ja", text: "können angeordnet werden" }], vorbelegung: "nein" },
         { id: "ueberstunden_text", art: "text", label: "Voraussetzungen", wenn: { feld: "ueberstunden", ist: "ja" }, pflicht: true },
       ],
@@ -131,8 +180,10 @@ export const nachweisArbeitsbedingungen: Vorlage = {
       felder: [
         { id: "urlaub", art: "zahl", label: "Jahresurlaub (Arbeitstage)", pflicht: true, hilfe: "gesetzlich mindestens 20 Tage bei einer Fünf-Tage-Woche (§ 3 BUrlG)" },
         { id: "fortbildung", art: "text", label: "Fortbildung", vorschlaege: ["Ein Anspruch auf vom Arbeitgeber bereitgestellte Fortbildung besteht nicht."] },
-        { id: "bav", art: "schalter", label: "Betriebliche Altersversorgung über einen Versorgungsträger" },
-        { id: "bav_text", art: "text", label: "Name und Anschrift des Versorgungsträgers", wenn: { feld: "bav" }, pflicht: true },
+        { id: "bav", art: "schalter", label: "Betriebliche Altersversorgung über einen Versorgungsträger", hilfe: "Die Angabe entfällt, wenn der Versorgungsträger selbst zu dieser Information verpflichtet ist (Nr. 13)." },
+        // Vorprüfung 21.10.2026: Name UND Anschrift des Versorgungsträgers (Nr. 13); bav_text war bis dahin „Name und Anschrift“
+        { id: "bav_text", art: "text", label: "Name des Versorgungsträgers", wenn: { feld: "bav" }, pflicht: true },
+        { id: "bav_anschrift", art: "mehrzeilig", label: "Anschrift des Versorgungsträgers", wenn: { feld: "bav" }, pflicht: true },
       ],
     },
     {
@@ -140,8 +191,10 @@ export const nachweisArbeitsbedingungen: Vorlage = {
       felder: [
         { id: "kuendigung_art", art: "wahl", label: "Kündigung", optionen: [{ wert: "gesetz", text: "gesetzliche Regelungen" }, { wert: "eigen", text: "abweichend vereinbart" }], vorbelegung: "gesetz" },
         { id: "kuendigung_eigen", art: "mehrzeilig", label: "Vereinbarte Regelung (Schriftform, Fristen, Klagefrist)", wenn: { feld: "kuendigung_art", ist: "eigen" }, pflicht: true },
-        { id: "kollektiv", art: "wahl", label: "Tarifverträge, Betriebsvereinbarungen", optionen: [{ wert: "keine", text: "keine" }, { wert: "ja", text: "finden Anwendung" }], vorbelegung: "keine" },
+        { id: "kollektiv", art: "wahl", label: "Tarifverträge, Betriebsvereinbarungen", optionen: [{ wert: "keine", text: "keine" }, { wert: "ja", text: "finden Anwendung" }], vorbelegung: "keine", hilfe: "Allgemeinverbindliche Tarifverträge gelten auch ohne Mitgliedschaft im Arbeitgeberverband – z. B. in der Gebäudereinigung, teils regional im Friseurhandwerk. Nachschlagen: Verzeichnis der allgemeinverbindlichen Tarifverträge des BMAS." },
         { id: "kollektiv_text", art: "text", label: "Welche", wenn: { feld: "kollektiv", ist: "ja" }, pflicht: true },
+        // Vorprüfung 21.10.2026: die Liste in § 2 Abs. 1 NachwG ist nicht abschließend
+        { id: "weitere", art: "mehrzeilig", label: "Weitere Vereinbarungen", hilfe: "Ausschlussfristen und Wettbewerbsverbote gehören hinein, wenn sie vereinbart sind – die Liste in § 2 Abs. 1 NachwG ist nicht abschließend." },
         { id: "ausgestellt_am", art: "datum", label: "Ausgestellt am", vorbelegung: "heute" },
       ],
     },
@@ -159,47 +212,80 @@ export const nachweisArbeitsbedingungen: Vorlage = {
     if (ja(d, "minijob") && grenze !== null && monat !== null && monat > grenze) f.push(`Monatsentgelt (rechnerisch ${euro(monat)}) liegt über der Minijob-Grenze von ${euro(grenze)}`);
     return f;
   },
-  // beim Teilen (R10): Form und Empfangsnachweis – gerade per Messenger geteilte PDFs erfüllen sonst die Form nicht
-  hinweise: () => [
-    "Form: In den Branchen nach § 2a SchwarzArbG (z. B. Bau, Gaststätten und Beherbergung, Friseur- und Kosmetikbetriebe, Transport und Logistik, Gebäudereinigung) gilt die Schriftform – ausdrucken, beide unterschreiben, aushändigen. Sonst reicht die Textform (z. B. PDF per E-Mail) nur, wenn das Dokument speicher- und ausdruckbar ist und du einen Empfangsnachweis anforderst (§ 2 Abs. 1 NachwG).",
-  ],
+  // beim Teilen (R10): Form und Empfangsnachweis – gerade per Messenger geteilte PDFs erfüllen sonst die Form nicht;
+  // Vorprüfung 21.10.2026: je Branche, dazu die Hinweise zur Befristung (§§ 14, 15 TzBfG)
+  hinweise: (d) => {
+    const branche = BRANCHEN_2A.find((o) => o.wert === text(d, "branche"));
+    const r = [branche ? NACHWG_FORM_SCHRIFT(branche.text) : text(d, "branche") === "keine" ? NACHWG_FORM_TEXT : NACHWG_FORM_OFFEN];
+    if (ja(d, "befristet")) {
+      r.push("Befristung: Die Befristungsabrede muss vor Arbeitsbeginn schriftlich vereinbart und von beiden unterschrieben sein (§ 14 Abs. 4 TzBfG) – dieser Nachweis ersetzt sie nicht.");
+      if (text(d, "probezeit") && text(d, "probezeit") !== "keine") r.push("Probezeit bei Befristung: Sie muss im Verhältnis zur Dauer der Befristung und zur Art der Tätigkeit stehen (§ 15 Abs. 3 TzBfG).");
+    }
+    return r;
+  },
   html(d, b) {
     const ort = text(d, "arbeitsort") === "anders" ? `${ORT.anders} ${text(d, "arbeitsort_text")}` : (ORT[text(d, "arbeitsort")] ?? "");
     const entgelt = text(d, "entgelt_betrag") ? `${ENTGELT[text(d, "entgelt_art")] ?? ""}: ${euro(cent(text(d, "entgelt_betrag")) ?? 0)}` : "";
     const zeit = [text(d, "wochenstunden") ? `${zahlText(zahl(text(d, "wochenstunden")) ?? 0)} Stunden pro Woche` : "", text(d, "wochenstunden") && text(d, "tage_pro_woche") ? `an ${text(d, "tage_pro_woche")} Tagen` : "", text(d, "verteilung")].filter(Boolean).join(", ");
-    const zeilenNw: [string, string | null][] = [
-      ["1. Vertragsparteien", `Arbeitgeber: ${[b.name, anschrift(b)].filter((x) => x.trim()).join(", ")}\nBeschäftigte Person: ${[text(d, "name"), text(d, "anschrift").replace(/\n/g, ", ")].filter(Boolean).join(", ")}`],
+    // Blatt zum Ausfüllen von Hand: noch kein Name und kein Entgelt eingetragen
+    const leer = !text(d, "name") && !text(d, "entgelt_betrag");
+    const bestandteile = liste(d, "bestandteile").filter((x) => text(x, "bezeichnung") || text(x, "hoehe"));
+    const grenze = minijobGrenzeAm(stichtag(d));
+    // Nr. 7: jeder Bestandteil eine eigene Zeile (Bezeichnung – Höhe), Grundvergütung und Überstunden vorneweg
+    const nr7 = angaben([
+      ["Grundvergütung (brutto)", entgelt],
+      ["Minijob", ja(d, "minijob") && grenze !== null ? `Geringfügig entlohnte Beschäftigung: Das monatliche Arbeitsentgelt übersteigt die Minijob-Grenze von ${euro(grenze)} (Stand ${datumDe(stichtag(d))}) nicht.` : null],
+      ["Vergütung von Überstunden", text(d, "ueberstunden_verguetung")],
+      ...(bestandteile.length
+        ? bestandteile.map((x): [string, string] => [text(x, "bezeichnung") || "Bestandteil", text(x, "hoehe")])
+        : ([["Zuschläge, Zulagen, Prämien, Sonderzahlungen", leer ? "" : "keine", leer ? 3 : undefined]] as [string, string, number?][])),
+      ["Provision", text(d, "provision") ? `${text(d, "provision").replace(/\n+/g, " ")}${text(d, "provision_ab") ? ` (ab ${datumDe(text(d, "provision_ab"))})` : ""}` : null],
+      ["Weitere Angaben", text(d, "zuschlaege") || null],
+      ["Fälligkeit", text(d, "faelligkeit")],
+      ["Art der Auszahlung", text(d, "auszahlung")],
+    ]);
+    // Nr. 9: die vier Angaben bei Arbeit auf Abruf (Vereinbarung, Mindeststunden, Zeitrahmen, Ankündigungsfrist)
+    const nr9 = ja(d, "abruf")
+      ? angaben([
+          ["Vereinbarung", "Die beschäftigte Person erbringt ihre Arbeitsleistung entsprechend dem Arbeitsanfall (§ 12 TzBfG)."],
+          ["Mindestens zu vergütende Stunden", text(d, "abruf_mindest") ? `${zahlText(zahl(text(d, "abruf_mindest")) ?? 0)} Stunden pro Woche` : ""],
+          ["Zeitrahmen (Referenztage und -stunden)", text(d, "abruf_zeitrahmen")],
+          ["Ankündigungsfrist", text(d, "abruf_frist")],
+          ["Weitere Vereinbarungen", text(d, "abruf_text") || null],
+        ]) + `<p class="klein">${esc(ABRUF_HINWEIS)}</p>`
+      : null;
+    const zeilenNw: [string, string | null, string?][] = [
       ["2. Beginn", datumDe(text(d, "beginn"))],
       ["3. Befristung", ja(d, "befristet") ? `befristet bis ${datumDe(text(d, "befristung_ende"))}` : "unbefristet"],
       ["4. Arbeitsort", ort],
       ["5. Tätigkeit", text(d, "taetigkeit")],
       ["6. Probezeit", PROBEZEIT[text(d, "probezeit")] ?? ""],
-      ["7. Arbeitsentgelt", [entgelt, ja(d, "minijob") && minijobGrenzeAm(stichtag(d)) !== null ? `Geringfügig entlohnte Beschäftigung (Minijob): Das monatliche Arbeitsentgelt übersteigt die Minijob-Grenze von ${euro(minijobGrenzeAm(stichtag(d))!)} (Stand ${datumDe(stichtag(d))}) nicht.` : "", text(d, "zuschlaege"), text(d, "provision") ? `Provision${text(d, "provision_ab") ? ` ab ${datumDe(text(d, "provision_ab"))}` : ""}: ${text(d, "provision").replace(/\n+/g, " ")}` : "", text(d, "faelligkeit") ? `Fällig ${text(d, "faelligkeit")}.` : "", text(d, "auszahlung") ? `Auszahlung: ${text(d, "auszahlung")}.` : ""].filter(Boolean).join("\n")],
+      ["7. Arbeitsentgelt", null, nr7],
       ["8. Arbeitszeit, Pausen, Ruhezeiten", [zeit, text(d, "pausen") ? `Ruhepausen: ${text(d, "pausen").replace(/^\s*Ruhepausen:?\s*/i, "")}` : "", text(d, "ruhezeit") ? `Ruhezeit: ${text(d, "ruhezeit").replace(/^\s*Ruhezeit:?\s*/i, "")}` : "", ja(d, "schicht") ? `Schichtarbeit: ${text(d, "schicht_text")}` : ""].filter(Boolean).join("\n")],
-      ["9. Arbeit auf Abruf", ja(d, "abruf") ? text(d, "abruf_text") : "nicht vereinbart"],
+      ["9. Arbeit auf Abruf", nr9 ? null : "nicht vereinbart", nr9 ?? undefined],
       ["10. Überstunden", text(d, "ueberstunden") === "ja" ? `${UEBERSTUNDEN.ja} ${text(d, "ueberstunden_text")}` : UEBERSTUNDEN.nein!],
       ["11. Erholungsurlaub", text(d, "urlaub") ? `${text(d, "urlaub")} Arbeitstage pro Kalenderjahr` : ""],
       ["12. Fortbildung", text(d, "fortbildung") || "Ein Anspruch auf vom Arbeitgeber bereitgestellte Fortbildung besteht nicht."],
-      ["13. Betriebliche Altersversorgung", ja(d, "bav") ? (text(d, "bav_text") ? `Über den Versorgungsträger: ${text(d, "bav_text")}` : "") : "nicht zugesagt"],
+      ["13. Betriebliche Altersversorgung", ja(d, "bav") ? (text(d, "bav_text") || text(d, "bav_anschrift") ? `Über den Versorgungsträger: ${[text(d, "bav_text"), text(d, "bav_anschrift").replace(/\n+/g, ", ")].filter(Boolean).join(", ")}` : "") : "nicht zugesagt"],
       ["14. Kündigung", kuendigungText(d)],
       ["15. Tarifverträge, Vereinbarungen", text(d, "kollektiv") === "ja" ? `${KOLLEKTIV.ja} ${text(d, "kollektiv_text")}` : KOLLEKTIV.keine!],
+      ...(text(d, "weitere") ? ([["16. Weitere Vereinbarungen", text(d, "weitere")]] as [string, string][]) : []),
     ];
     // Blatt zum Ausfüllen: Punkte mit mehreren Angaben als beschriftete Linien – dieselben Teilangaben, die das
     // ausgefüllte Dokument nennt (statt zweier unbeschrifteter Linien)
     const leerAngaben: Record<string, string> = {
-      "7": angaben([[`${ENTGELT.monat!.replace(" (brutto)", "")} bzw. ${ENTGELT.stunde!}`, ""], ["Weitere Bestandteile", "", 2], ["Fälligkeit", ""], ["Auszahlung", ""]]),
       "8": angaben([["Stunden pro Woche", ""], ["Arbeitstage pro Woche", ""], ["Verteilung", ""], ["Ruhepausen", ""], ["Ruhezeit", ""], ["Schichtarbeit (falls vereinbart)", ""]]),
       "11": angaben([["Arbeitstage pro Kalenderjahr", ""]]),
     };
-    // Vertrag: Parteien in zwei Spalten, dann die 15 Punkte des § 2 Abs. 1 NachwG mit Randnummern
+    // Vertrag: Parteien in zwei Spalten, dann die Punkte des § 2 Abs. 1 NachwG mit Randnummern
     // Kapitalgesellschaft mit Geschäftsführung in „Mein Betrieb“: „vertreten durch …“ bei Partei und Unterschrift
     const vertreten = mitVertretung(b) !== b.name.trim() ? `vertreten durch ${(b.vertretung ?? "").trim()}` : "";
     // kompakt: aufeinanderfolgende Punkte mit kurzer, einzeiliger Angabe (Beginn, Befristung, Arbeitsort …) stehen als
     // Angabenzeilen unter einer gemeinsamen Randnummer („2.–6.“); längere Texte bleiben eigene Abschnitte. Wortlaut und
     // Reihenfolge aller Punkte bleiben gleich, die Nummerierung der Abschnitte läuft weiter (counter-increment).
-    const kurz = ([t, w]: [string, string | null]) => !leerAngaben[t.split(".")[0]!] && !(w ?? "").includes("\n") && (w ?? "").length <= 60;
+    const kurz = ([t, w, html]: [string, string | null, string?]) => !html && !leerAngaben[t.split(".")[0]!] && !(w ?? "").includes("\n") && (w ?? "").length <= 60;
     const punkteNw: string[] = [];
-    const rest = zeilenNw.slice(1);
+    const rest = zeilenNw;
     for (let i = 0; i < rest.length; ) {
       let j = i;
       while (j < rest.length && kurz(rest[j]!)) j++;
@@ -209,8 +295,9 @@ export const nachweisArbeitsbedingungen: Vorlage = {
         i = j;
         continue;
       }
-      const [t, w] = rest[i]!;
-      punkteNw.push(abschnitt(t.replace(/^\d+\.\s*/, ""), !w && leerAngaben[t.split(".")[0]!] ? leerAngaben[t.split(".")[0]!]! : absatz(w ?? "")));
+      const [t, w, html] = rest[i]!;
+      const nr = t.split(".")[0]!;
+      punkteNw.push(abschnitt(t.replace(/^\d+\.\s*/, ""), html ?? (!w && leerAngaben[nr] ? leerAngaben[nr]! : absatz(w ?? ""))));
       i++;
     }
     return dokument({
@@ -221,7 +308,7 @@ export const nachweisArbeitsbedingungen: Vorlage = {
       meta: `Beginn: ${datumDe(text(d, "beginn"))}\nAusgestellt: ${datumDe(text(d, "ausgestellt_am"))}`,
       inhalt:
         `<p class="klein">Diese Niederschrift hält die wesentlichen Vertragsbedingungen nach § 2 Abs. 1 Nachweisgesetz fest. Sie ersetzt keinen Arbeitsvertrag; bestehende vertragliche Vereinbarungen gelten weiter.</p>` +
-        abschnitt("Vertragsparteien", parteien({ rolle: "Arbeitgeber", name: b.name, anschrift: anschriftMehrzeilig(b), zusatz: vertreten || undefined }, { rolle: "beschäftigte Person", name: text(d, "name"), anschrift: text(d, "anschrift") })) +
+        abschnitt("Vertragsparteien", parteien({ rolle: "Arbeitgeber", name: b.name, anschrift: anschriftMehrzeilig(b), zusatz: vertreten || undefined }, { rolle: "beschäftigte Person", name: text(d, "name"), anschrift: text(d, "anschrift"), anschriftPflicht: true })) +
         punkteNw.join("") +
         fassungNachsatz(d) +
         unterschriften([vertreten ? `Arbeitgeber/in, ${vertreten}` : "Arbeitgeber/in", "Beschäftigte Person (Erhalt bestätigt)"], { ortDatum: true }),
@@ -244,16 +331,23 @@ const KI_THEMEN_FRUEHER: Record<string, string> = {
 };
 const kiOption = (t: string) => stabileOption(t, KI_THEMEN_FRUEHER);
 
+/**
+ * KI-Schulung (Vorprüfung 21.10.2026): Art. 4 KI-VO verlangt seit 27.07.2026 (Änderung durch VO (EU) 2026/1744,
+ * „Digital Omnibus“) Maßnahmen, die die KI-Kompetenz fördern – kein bestimmtes Niveau und keine Formvorschrift. Die
+ * Vorlage dokumentiert eine solche Maßnahme; Titel und Rechtsgrundlage sind entsprechend zurückhaltend.
+ */
+export const KI_GRUNDLAGE = "Art. 4 KI-VO (VO (EU) 2024/1689, geändert durch VO (EU) 2026/1744)";
 export const kiKompetenz: Vorlage = {
   id: "ki_kompetenz",
-  titel: "Nachweis KI-Kompetenz-Schulung",
-  beschreibung: "Wer wann zu welchen KI-Werkzeugen geschult wurde – Inhalte zum Ankreuzen, mit Unterschriften der Teilnehmenden.",
+  titel: "Dokumentation KI-Schulung",
+  beschreibung: "Wer wann zu welchen KI-Werkzeugen geschult wurde – Inhalte zum Ankreuzen, mit Unterschriften der Teilnehmenden. Belegt eine Maßnahme zur Förderung der KI-Kompetenz (Art. 4 KI-VO).",
   bereich: "personal",
   pflichten: ["ki.kompetenz"],
-  grundlage: "Art. 4 KI-VO (VO (EU) 2024/1689)",
+  grundlage: KI_GRUNDLAGE,
   namensFeld: "thema",
   abschnitte: [
     { titel: "Schulung",
+      hilfe: "Seit 27.07.2026 verlangt Art. 4 KI-VO, dass Betriebe, die KI-Systeme einsetzen, Maßnahmen zur Förderung der KI-Kompetenz ihrer Beschäftigten ergreifen – ein bestimmtes Niveau oder eine bestimmte Form schreibt das Gesetz nicht vor. Eine dokumentierte Schulung ist ein üblicher Weg.",
       felder: [
         { id: "thema", art: "text", label: "Bezeichnung", pflicht: true, vorschlaege: ["Grundschulung KI-Kompetenz", "Sicherer Umgang mit KI-Assistenten im Betrieb"] },
         { id: "ki_systeme", art: "mehrzeilig", label: "Eingesetzte KI-Werkzeuge", pflicht: true, vorschlaege: ["Textassistent (Chatbot)", "Übersetzungsprogramm", "Bildbearbeitung mit KI", "KI-Funktionen in der Buchhaltungs- oder Kassensoftware", "Online-Terminbuchung mit KI-Assistent"] },
@@ -276,7 +370,7 @@ export const kiKompetenz: Vorlage = {
   ],
   html(d, b) {
     return dokument({
-      titel: "Nachweis KI-Kompetenz-Schulung",
+      titel: "Dokumentation KI-Schulung",
       betrieb: b,
       unter: text(d, "thema") || undefined,
       meta: `Datum: ${datumDe(text(d, "datum"))}\nDurchgeführt von: ${text(d, "durchgefuehrt_von")}\nDauer: ${text(d, "dauer")}`,
@@ -312,8 +406,9 @@ export const ausweisHinweis: Vorlage = {
       hilfe: "Vor Beginn der Arbeit aushändigen und unterschreiben lassen. Den unterschriebenen Hinweis für die Dauer der Beschäftigung aufbewahren und bei einer Prüfung des Zolls vorlegen.",
       felder: [
         { id: "name", art: "text", label: "Name der beschäftigten Person", pflicht: true },
-        { id: "datum", art: "datum", label: "Ausgehändigt am", vorbelegung: "heute", pflicht: true },
-        { id: "beginn", art: "datum", label: "Beginn der Beschäftigung", hilfe: "Aus „Mitarbeiter“. Der Hinweis muss vor diesem Tag ausgehändigt sein." },
+        // Vorprüfung 21.10.2026: „Ausgehändigt am“ liegt vor dem Beginn – § 2a Abs. 2 SchwarzArbG verlangt den Hinweis vor Beginn der Arbeit
+        { id: "datum", art: "datum", label: "Ausgehändigt am", vorbelegung: "heute", pflicht: true, hilfe: "Vor Beginn der Arbeit – das Datum liegt vor dem ersten Arbeitstag, spätestens an diesem Tag vor Arbeitsbeginn (§ 2a Abs. 2 SchwarzArbG)." },
+        { id: "beginn", art: "datum", label: "Beginn der Beschäftigung", hilfe: "Aus „Mitarbeiter“. „Ausgehändigt am“ muss davor liegen." },
       ],
     },
   ],

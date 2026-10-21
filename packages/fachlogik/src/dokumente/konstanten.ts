@@ -14,6 +14,45 @@ export const GEFAEHRDUNGSFAKTOREN: Record<string, string> = {
 
 export const RISIKO_STUFEN: Record<string, string> = { gering: "gering", mittel: "mittel", hoch: "hoch" };
 
+/**
+ * Wirtschaftsbereiche nach § 2a Abs. 1 Nr. 1–11 SchwarzArbG in der Fassung des Gesetzes zur Modernisierung und
+ * Digitalisierung der Schwarzarbeitsbekämpfung (BGBl. 2025 I Nr. 369, in Kraft seit 30.12.2025): Nr. 4 umfasst
+ * plattformbasierte Lieferdienste, Nr. 11 das Friseur- und Kosmetikgewerbe; die Forstwirtschaft ist entfallen.
+ * Vorprüfung 21.10.2026 (T-99) – fachlich zu bestätigen. Werte wie im Pflichten-Check (`personal.sofortmeldebranchen`).
+ */
+export const BRANCHEN_2A: Option[] = [
+  { wert: "bau", text: "Baugewerbe" },
+  { wert: "gastronomie", text: "Gaststätten und Beherbergung" },
+  { wert: "personenbefoerderung", text: "Personenbeförderung" },
+  { wert: "spedition_logistik", text: "Spedition, Transport und Logistik (auch plattformbasierte Lieferdienste)" },
+  { wert: "schausteller", text: "Schaustellergewerbe" },
+  { wert: "gebaeudereinigung", text: "Gebäudereinigung" },
+  { wert: "messebau", text: "Auf- und Abbau von Messen und Ausstellungen" },
+  { wert: "fleischwirtschaft", text: "Fleischwirtschaft (ohne Fleischerhandwerk)" },
+  { wert: "prostitution", text: "Prostitutionsgewerbe" },
+  { wert: "sicherheitsgewerbe", text: "Wach- und Sicherheitsgewerbe" },
+  { wert: "friseur_kosmetik", text: "Friseur- und Kosmetikgewerbe" },
+];
+/** Die Branchen nach § 2a Abs. 1 SchwarzArbG in einem Satz (Fußtexte und Hinweise). */
+export const BRANCHEN_2A_TEXT = "Bau, Gaststätten und Beherbergung, Personenbeförderung, Spedition, Transport und Logistik (auch Lieferdienste), Schausteller, Gebäudereinigung, Messebau, Fleischwirtschaft, Prostitution, Wach- und Sicherheitsgewerbe sowie seit 30.12.2025 Friseur- und Kosmetikgewerbe";
+/** Pflichten-Check → Branche nach § 2a: „Sofortmeldebranchen“ (§ 28a Abs. 4 SGB IV, gleiche Liste) und Hauptbranche. */
+const AUS_SOFORTMELDUNG: Record<string, string> = { friseur: "friseur_kosmetik", kosmetik: "friseur_kosmetik", lieferdienste: "spedition_logistik" };
+const AUS_HAUPTBRANCHE: Record<string, string> = { beauty_kosmetik: "friseur_kosmetik", gebaeudereinigung: "gebaeudereinigung", bau: "bau" };
+/**
+ * Branche nach § 2a SchwarzArbG aus den Antworten im Pflichten-Check: erste passende Branche, „keine“, wenn die Frage nach
+ * den Sofortmeldebranchen beantwortet ist und nichts passt, sonst nichts (die App fragt dann im Formular).
+ */
+export function branche2aAusProfil(profil: Record<string, unknown>): string | undefined {
+  const sofort = profil["personal.sofortmeldebranchen"];
+  const haupt = profil["taetigkeit.branchen"];
+  const kandidaten = [
+    ...(Array.isArray(haupt) ? haupt.map((b) => AUS_HAUPTBRANCHE[String(b)]) : []),
+    ...(Array.isArray(sofort) ? sofort.map((b) => AUS_SOFORTMELDUNG[String(b)] ?? String(b)) : []),
+  ].filter((w): w is string => Boolean(w) && BRANCHEN_2A.some((o) => o.wert === w));
+  if (kandidaten.length) return kandidaten[0];
+  return Array.isArray(sofort) ? "keine" : undefined;
+}
+
 /** Schutzziele nach Art. 32 Abs. 1 DSGVO (Wortlaut fachlich zu prüfen, T-22). */
 export const SCHUTZZIELE: Record<string, string> = {
   pseudonymisierung_verschluesselung: "Pseudonymisierung und Verschlüsselung",

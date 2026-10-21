@@ -1,15 +1,14 @@
 # R11 (Nutzertest Gründerin Foodtruck): Reisegewerbekarte als eigene Pflicht, aus gruendung.erlaubnis_pruefen herausgelöst
 schema_version: 1
 id: gruendung.reisegewerbekarte
-version: 2
+version: 3
 katalog_nr: A.3
 titel:
   de: Reisegewerbekarte beantragen (§ 55 GewO)
 kurz:
-  de: Verkaufst du ohne feste Niederlassung oder ohne vorherige Bestellung – etwa auf Märkten oder von Ort zu Ort –, brauchst du vor
-    dem Start in der Regel eine Reisegewerbekarte.
+  de: Für den Verkauf ohne feste Niederlassung oder ohne vorherige Bestellung – etwa auf Märkten oder von Ort zu Ort – ist vor dem Start in der Regel eine Reisegewerbekarte vorgesehen. Ob du sie brauchst, klärt das Gewerbeamt.
 erklaerung:
-  de: Ein Reisegewerbe betreibt, wer außerhalb seiner gewerblichen Niederlassung oder ohne eine solche Waren oder Leistungen anbietet, ohne vorher bestellt worden zu sein. Dafür brauchst du eine Reisegewerbekarte vom Gewerbeamt (§ 55 GewO). Sie muss vor dem Start vorliegen. Plane genug Vorlauf ein – für den Antrag brauchst du in der Regel ein Führungszeugnis und eine Auskunft aus dem Gewerbezentralregister, die du selbst erst beantragen musst. Für Märkte, Messen und Volksfeste, die die Gemeinde festgesetzt hat, gelten Ausnahmen (Titel IV GewO) – prüfe beim Gewerbeamt, ob du die Karte trotzdem brauchst. Für bestimmte Tätigkeiten ohne Karte gilt stattdessen eine Anzeigepflicht (§ 55c GewO).
+  de: Ein Reisegewerbe betreibt, wer außerhalb seiner gewerblichen Niederlassung oder ohne eine solche Waren oder Leistungen anbietet, ohne vorher bestellt worden zu sein. Dafür brauchst du eine Reisegewerbekarte vom Gewerbeamt (§ 55 GewO). Sie muss vor dem Start vorliegen. Plane genug Vorlauf ein – für den Antrag brauchst du in der Regel ein Führungszeugnis und eine Auskunft aus dem Gewerbezentralregister, die du selbst erst beantragen musst. Für Märkte, Messen und Volksfeste, die die Gemeinde festgesetzt hat, gelten Ausnahmen (Titel IV GewO) – ob die Karte trotzdem nötig ist, klärt das Gewerbeamt. Für bestimmte Tätigkeiten ohne Karte gilt stattdessen eine Anzeigepflicht (§ 55c GewO).
 rechtsgrundlage:
 - § 55 GewO
 - § 55c GewO
@@ -44,7 +43,8 @@ kosten: null
 sanktion:
   text:
     de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: hoch
+  schwere: mittel
+dringend_ohne_termin: true
 automatisierung: hinweis
 erledigung:
   art: bestaetigen
@@ -63,6 +63,8 @@ fachlich_zu_pruefen:
 - Ausnahmen für festgesetzte Märkte, Messen und Volksfeste (Titel IV GewO, § 55a) nur als Prüfhinweis – wann die Karte trotzdem nötig ist; Reisegewerbe neben stehendem Gewerbe (Gewerbeanzeige und Karte)
 - Unterlagen (Führungszeugnis, Auskunft aus dem Gewerbezentralregister) je Behörde bestätigen
 - Folgen bei Nichterfüllung – Sanktion fachlich ergänzen
+- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
+- 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
   status: entwurf
   geprueft_von: null

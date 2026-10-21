@@ -7,7 +7,7 @@ import { useMeldung } from "../ui/meldung";
 import { BausteinListe, Fristblatt, Fuss, Hinweis, Kachel, Karte, Knopf, Schalter, SchnellKachel, Symbol, T, TextKnopf, Zeile, tageBis } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { HAARLINIE, SCHRIFT, useFarben, weich } from "../ui/thema";
-import { AUSWEIS_JE_PERSON, KATEGORIE_TITEL, ZEIT_JE_PERSON, aufzeichnungsStand, auswertung, ausweisStand, beantwortet, dringlichkeit, erinnerungsPlan, erledigtDurch, fortschritt, frageZu, gruendungsSchritte, gueltigBis, haken, istErledigt, offeneFragenNachWirkung, offeneKernFragen, offeneVoraussetzungen, selten, zaehlung, type PflichtInfo } from "../pflichten/check";
+import { AUSWEIS_JE_PERSON, KATEGORIE_TITEL, ZEIT_JE_PERSON, aufzeichnungsStand, auswertung, ausweisStand, beantwortet, dringendOhneTermin, dringlichkeit, erinnerungsPlan, erledigtDurch, fortschritt, frageZu, gruendungsSchritte, gueltigBis, haken, istErledigt, offeneFragenNachWirkung, offeneKernFragen, offeneVoraussetzungen, selten, zaehlung, type PflichtInfo } from "../pflichten/check";
 import { allesAbsagen, erinnerungenMoeglich, erlaubnisAnfragen, planen } from "../pflichten/erinnerungen";
 import { heute } from "../unterlagen/speicher";
 import { useAmtlos, useStandWahl } from "../zustand";
@@ -256,7 +256,7 @@ export function PflichtZeile({ p, letzte, erledigt, ohneWichtig }: { p: PflichtI
   const basis = erledigt ? TEXT.erledigt : termin ? (fern ? fristText(termin) : `${fristText(termin)}\u00a0· ${datumDe(termin).slice(0, 6)}`) : p.vorlage ? TEXT.unterlage_in_amtlos : p.kurz;
   // R10: was das Lohnbüro bzw. die Steuerberatung macht, steht dabei
   const unter = lohn && !erledigt ? `${lohn}\u00a0· ${basis}` : basis;
-  const wichtig = !erledigt && !ohneWichtig && p.schwere === "hoch" && p.einordnung === "pflicht";
+  const wichtig = !erledigt && !ohneWichtig && dringendOhneTermin(p) && p.einordnung === "pflicht";
   // R10: Hinweise und Optionen sichtbar als solche (Rechtsprüfung: getrennt zählen und anzeigen)
   const marke = p.einordnung !== "pflicht" ? { text: TEXT.r10_marke[p.einordnung] ?? "", ton: "leise" as const } : wichtig ? { text: TEXT.wichtig, ton: "bald" as const } : undefined;
   return (
@@ -312,7 +312,7 @@ function PflichtenInhalt() {
           <Karte>
             {d.jetzt.map((p, i) => (
               // sind alle „wichtig“, sagt das Wort nichts – dann zählt der Termin
-              <PflichtZeile key={p.id} p={p} erledigt={false} ohneWichtig={d.jetzt.every((x) => x.schwere === "hoch")} letzte={i === d.jetzt.length - 1} />
+              <PflichtZeile key={p.id} p={p} erledigt={false} ohneWichtig={d.jetzt.every(dringendOhneTermin)} letzte={i === d.jetzt.length - 1} />
             ))}
           </Karte>
         </Gruppe>

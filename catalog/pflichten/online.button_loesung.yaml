@@ -1,7 +1,7 @@
 # Katalog G.68 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.button_loesung
-version: 2
+version: 3
 katalog_nr: G.68
 titel:
   de: Bestellbutton eindeutig beschriften (Button-Lösung)
@@ -38,7 +38,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Ist der Bestellbutton nicht richtig beschriftet, kommt der Vertrag nicht zustande (§ 312j Abs. 4 BGB).
   schwere: hoch
 automatisierung: hinweis
 status_recht: in_kraft
@@ -48,10 +48,13 @@ quellen:
 - titel: Bürgerliches Gesetzbuch § 312j
   url: https://www.gesetze-im-internet.de/bgb/__312j.html
   abgerufen: null
+- titel: § 312j BGB, Wortlaut (lxgesetze.de)
+  url: https://lxgesetze.de/bgb/312j
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Zulässige Beschriftungen als Beispiele ergänzen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 21.10.2026: Sanktion ergänzt – § 312j Abs. 4 BGB gelesen'
 pruefung:
   status: entwurf
   geprueft_von: null

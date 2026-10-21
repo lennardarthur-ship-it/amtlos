@@ -28,6 +28,8 @@ export interface Aufgabe {
   anzeige_status: string; // offen | faellig_bald | ueberfaellig | angabe_fehlt | erledigt | nicht_zutreffend | entfallen
   faellig_am: Datum | null;
   schwere: "niedrig" | "mittel" | "hoch";
+  /** Katalog `dringend_ohne_termin`: gewichtet wie Schwere „hoch“, auch wenn die angezeigte Schwere niedriger ist */
+  dringend_ohne_termin?: boolean;
 }
 
 export type Ampel = "gruen" | "gelb" | "rot";
@@ -41,10 +43,11 @@ const GEWICHT = { hoch: 1, mittel: 1.5, niedrig: 2 } as const;
  * nicht als einzelne Aufgaben; Aufgaben ohne Datum zuletzt.
  */
 export function dringlichkeit(a: Aufgabe, heute: Datum): number {
+  const gewicht = a.dringend_ohne_termin ? GEWICHT.hoch : GEWICHT[a.schwere];
   if (a.anzeige_status === "ueberfaellig" && a.faellig_am) return -1_000_000 + differenzTage(heute, a.faellig_am);
-  if (a.anzeige_status === "angabe_fehlt") return 400 * GEWICHT[a.schwere];
-  if (!a.faellig_am) return 10_000 * GEWICHT[a.schwere];
-  return Math.max(0, differenzTage(heute, a.faellig_am)) * GEWICHT[a.schwere];
+  if (a.anzeige_status === "angabe_fehlt") return 400 * gewicht;
+  if (!a.faellig_am) return 10_000 * gewicht;
+  return Math.max(0, differenzTage(heute, a.faellig_am)) * gewicht;
 }
 
 const OFFEN = new Set(["offen", "faellig_bald", "ueberfaellig", "angabe_fehlt"]);

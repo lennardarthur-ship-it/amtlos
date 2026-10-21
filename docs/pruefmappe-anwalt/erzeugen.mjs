@@ -40,7 +40,7 @@ const tmp = path.join(ZIEL, ".rechtliches.mjs");
 execFileSync(path.join(pnpm, esb, "node_modules/esbuild/bin/esbuild"), [path.join(ROOT, "apps/mobile/src/rechtliches.ts"), "--bundle", "--format=esm", `--outfile=${tmp}`, "--log-level=warning"]);
 const recht = await import(tmp);
 fs.rmSync(tmp);
-const dse = ["# Datenschutzhinweis der App (Stand des Codes)", "", `Freigegeben: ${recht.DATENSCHUTZ.freigegeben ? "ja" : "nein (Entwurf)"}`, "", "Verantwortlicher: aus den Anbieterangaben (noch nicht eingetragen, wenn leer).", ""];
+const dse = ["# Datenschutzhinweis der App (Stand des Codes)", "", `Freigegeben: ${recht.DATENSCHUTZ.freigegeben ? "ja" : "nein (Entwurf)"}`, "", `Verantwortlicher (aus ANBIETER): ${[recht.ANBIETER.name, recht.ANBIETER.anschrift, recht.ANBIETER.vertretung && `vertreten durch ${recht.ANBIETER.vertretung}`, recht.ANBIETER.email].filter(Boolean).join(", ") || "noch nicht eingetragen"}`, "", `Nutzungsbedingungen freigegeben: ${recht.NUTZUNGSBEDINGUNGEN.freigegeben ? "ja" : "nein – in der App gilt Apples Standard-EULA, die Zustimmung beim Start ist aus"} (Fassung ${recht.NUTZUNGSBEDINGUNGEN.fassung})`, ""];
 for (const a of recht.DATENSCHUTZ.abschnitte) dse.push(`## ${a.titel}`, "", a.text, "");
 dse.push("## Zusatz für Builds mit Synchronisation", "");
 for (const a of Object.values(recht.DATENSCHUTZ_SYNC)) dse.push(`### ${a.titel}`, "", a.text, "");
@@ -51,10 +51,10 @@ const kopiere = (von, nach) => fs.existsSync(von) && fs.copyFileSync(von, path.j
 kopiere(path.join(HIER, "README.md"), "README.md");
 kopiere(path.join(ROOT, "docs/nutzungsbedingungen-entwurf.md"), "nutzungsbedingungen-entwurf.md");
 kopiere(path.join(HIER, "rdg-aenderungen.md"), "rdg-aenderungen.md");
-// Website: Datenschutzerklärung und Impressum, wie sie veröffentlicht würden (Entwurfs-Build)
+// Website: Datenschutzerklärung, Impressum, Hilfe und Nutzungsbedingungen, wie sie veröffentlicht würden (Entwurfs-Build)
 const web = path.join(ZIEL, ".website");
 execFileSync("node", [path.join(ROOT, "apps/website/bauen.mjs"), web, "--entwurf"], { stdio: "ignore" });
-for (const f of ["datenschutz.html", "impressum.html", "hilfe.html"]) fs.copyFileSync(path.join(web, f), path.join(ZIEL, `website-${f}`));
+for (const f of ["datenschutz.html", "impressum.html", "hilfe.html", "nutzungsbedingungen.html"]) fs.copyFileSync(path.join(web, f), path.join(ZIEL, `website-${f}`));
 fs.rmSync(web, { recursive: true, force: true });
 const pl = fs.readFileSync(path.join(ROOT, "PRUEFLISTE.md"), "utf8").split("\n");
 const auszug = pl.filter((z) => z.startsWith("|") && /\|\s*[^|]*(RA|DSB|Fach)[^|]*\|/.test(z));

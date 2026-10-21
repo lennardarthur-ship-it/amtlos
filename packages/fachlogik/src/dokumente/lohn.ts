@@ -5,6 +5,7 @@
 import { KOPF_LINIE, ZELLE_LINIE, abschnitt, angaben, ankreuzen, cent, datumDe, dokument, esc, euro, fassungNachsatz, felder, ibanText, ja, liste, nachsatz, roh, summe, svNummerText, tabelle, text, unterschriften, zahlText, zelle, type Roh } from "./html.js";
 import { mindestlohnAm, minijobGrenzeAm } from "./personal.js";
 import { MINIJOB, SV } from "./bausteine.js";
+import { BRANCHEN_2A, BRANCHEN_2A_TEXT, branche2aAusProfil } from "./konstanten.js";
 import type { Daten, Eintrag, Vorlage } from "./typen.js";
 import { MARKE } from "@amtlos/marke";
 
@@ -86,15 +87,11 @@ function monatsVorschlaege(jetzt = new Date()): string[] {
   return [monatVon(`${j}-${String(m + 1).padStart(2, "0")}-01`), monatVon(m === 0 ? `${j - 1}-12-01` : `${j}-${String(m).padStart(2, "0")}-01`)];
 }
 
-/** Branchen nach § 2a SchwarzArbG für den Hinweis im Nachweis (R11, Reinigung #9) – vorbelegt aus der Branche im Pflichten-Check. */
-const AZN_BRANCHEN = [
-  { wert: "gastronomie", text: "Gaststätten und Beherbergung" },
-  { wert: "bau", text: "Baugewerbe" },
-  { wert: "gebaeudereinigung", text: "Gebäudereinigung" },
-  { wert: "friseur_kosmetik", text: "Friseur- und Kosmetikgewerbe" },
-  { wert: "andere", text: "Andere Branche nach § 2a SchwarzArbG" },
-  { wert: "keine", text: "Keine dieser Branchen" },
-];
+/**
+ * Branchen nach § 2a Abs. 1 SchwarzArbG für den Hinweis im Nachweis (R11, Reinigung #9; Vorprüfung 21.10.2026, T-99:
+ * vollständige Liste der Neufassung) – vorbelegt aus dem Pflichten-Check. „andere“ gab es bis zur Vorprüfung als Sammeloption.
+ */
+const AZN_BRANCHEN = [...BRANCHEN_2A, { wert: "keine", text: "Keine dieser Branchen" }];
 
 /** R12: Art der Beschäftigung – gleiche Werte in „Mitarbeiter“, Arbeitszeitnachweis und Personalfragebogen. */
 export const BESCHAEFTIGUNGSARTEN = [
@@ -114,11 +111,11 @@ export const ENTGELT_ARTEN = [
 function aufzeichnungsSatz(d: Daten): string {
   const frist = "Beginn, Ende und Dauer der täglichen Arbeitszeit spätestens bis zum Ablauf des siebten Kalendertages nach dem Arbeitstag aufzeichnen. Die Aufzeichnungen mindestens zwei Jahre aufbewahren.";
   const b = text(d, "branche");
-  const name = AZN_BRANCHEN.find((x) => x.wert === b && b !== "keine" && b !== "andere")?.text;
-  if (name) return `Aufzeichnungspflicht nach § 17 Abs. 1 MiLoG für Branchen nach § 2a SchwarzArbG (hier: ${name}) und für Minijobs: ${frist}`;
-  if (b === "andere") return `Aufzeichnungspflicht nach § 17 Abs. 1 MiLoG für Branchen nach § 2a SchwarzArbG und für Minijobs: ${frist}`;
+  const name = BRANCHEN_2A.find((x) => x.wert === b)?.text;
+  if (name) return `Aufzeichnungspflicht nach § 17 Abs. 1 MiLoG für Branchen nach § 2a Abs. 1 SchwarzArbG (hier: ${name}) und für Minijobs: ${frist}`;
+  if (b === "andere") return `Aufzeichnungspflicht nach § 17 Abs. 1 MiLoG für Branchen nach § 2a Abs. 1 SchwarzArbG und für Minijobs: ${frist}`;
   if (b === "keine") return `Für Minijobs gilt die Aufzeichnungspflicht nach § 17 Abs. 1 MiLoG: ${frist}`;
-  return `Aufzeichnungspflicht nach § 17 Abs. 1 MiLoG für Minijobs und die Branchen nach § 2a SchwarzArbG (u. a. Bau, Gastronomie, Gebäudereinigung, Friseur- und Kosmetikgewerbe): ${frist}`;
+  return `Aufzeichnungspflicht nach § 17 Abs. 1 MiLoG für Minijobs und die Branchen nach § 2a Abs. 1 SchwarzArbG (${BRANCHEN_2A_TEXT}): ${frist}`;
 }
 
 /** ISO-Tag plus n Tage. */
@@ -200,6 +197,12 @@ export const arbeitszeitnachweis: Vorlage = {
   // „Beschäftigt seit“ für die Prüfung, ob ein Arbeitstag davor liegt (R11, Reinigung #10); R12: Art und Entgelt
   person: { art: "mitarbeiter", felder: { name: "name", beginn: "beschaeftigt_seit", art: "art", entgelt_art: "entgelt_art", stundenlohn: "stundenlohn", monatsgehalt: "monatsgehalt" } },
   grundlage: "§ 3 Abs. 2 Nr. 1 ArbSchG (BAG 13.09.2022 – 1 ABR 22/21); § 17 MiLoG",
+  // Vorprüfung 21.10.2026 (T-99): Branche nach § 2a SchwarzArbG auch aus der Frage nach den Sofortmeldebranchen
+  profilStart(profil) {
+    const w = branche2aAusProfil(profil);
+    const start: Daten = w ? { branche: w } : {};
+    return start;
+  },
   namensFeld: "name",
   abschnitte: [
     { titel: "Person und Monat",
@@ -219,7 +222,7 @@ export const arbeitszeitnachweis: Vorlage = {
           label: "Branche für den Hinweis zur Aufzeichnungspflicht",
           optionen: AZN_BRANCHEN,
           vorbelegungJe: { gastro_cafe: "gastronomie", friseur: "friseur_kosmetik", kosmetik: "friseur_kosmetik", gebaeudereinigung: "gebaeudereinigung" },
-          hilfe: "Aus deiner Branche im Pflichten-Check. Bestimmt den Satz unter der Tabelle.",
+          hilfe: "Aus deiner Branche im Pflichten-Check. Bestimmt den Satz unter der Tabelle. Die Branchen nach § 2a Abs. 1 SchwarzArbG: seit 30.12.2025 auch Friseur- und Kosmetikgewerbe.",
         },
         { id: "leerzeilen", selten: true, art: "schalter", label: "Leere Zeilen zum Eintragen von Hand anhängen", vorbelegung: false },
         // R12 (Zoll #3): Erfassungszeitpunkt je Tag als Spalte

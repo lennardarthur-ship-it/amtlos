@@ -138,6 +138,8 @@ interface Zustand {
   proTestSetzen(an: boolean): void;
   /** Phase 2.3: Partner für „Empfohlen von …“ setzen bzw. entfernen (null) – nur Anzeige, schaltet nie etwas frei */
   partnerSetzen(id: string | null): void;
+  /** Vorprüfung Recht (§ 305 Abs. 2 BGB): Zustimmung zu dieser Fassung der Nutzungsbedingungen mit Zeitpunkt speichern */
+  nutzungsbedingungenAnnehmen(fassung: string): void;
   /** Erfolgsmoment (Rechnung geteilt, Check fertig, Zahlung vermerkt) – fragt ggf. nach einer Bewertung */
   erfolg(): void;
   steuerberatungSetzen(sb: Stand["steuerberatung"]): void;
@@ -601,6 +603,10 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       partnerSetzen: (id) => {
         const { partnerId: _alt, ...rest } = aktuell.current;
         setzen(id ? { ...rest, partnerId: id } : rest);
+      },
+      nutzungsbedingungenAnnehmen: (fassung) => {
+        setzen({ ...aktuell.current, nutzungsbedingungen: { fassung, zeitpunkt: new Date().toISOString() } });
+        schreiben();
       },
       steuerberatungSetzen: (sb) => setzen(steuerberatungSetzen(aktuell.current, sb)),
       belegSetzen: (b, grund) => {

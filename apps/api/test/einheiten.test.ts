@@ -55,6 +55,9 @@ describe("Heute", () => {
     expect(heuteUebersicht([a({ kategorie: "arbeitsschutz", anzeige_status: "offen", faellig_am: "2027-06-01" })], heute).ampel.arbeitsschutz).toBe("gruen");
     expect(u.zaehler).toEqual({ offen: 4, ueberfaellig: 1, angabe_fehlt: 1, erledigt: 1, klar: 3, naechste_90: 3 });
     expect(dringlichkeit(a({ faellig_am: "2026-10-21", schwere: "hoch" }), heute)).toBeLessThan(dringlichkeit(a({ faellig_am: "2026-10-21", schwere: "niedrig" }), heute));
+    // Katalog dringend_ohne_termin: gewichtet wie „hoch“, auch wenn die angezeigte Schwere „mittel“ ist
+    expect(dringlichkeit(a({ faellig_am: null, schwere: "mittel", dringend_ohne_termin: true }), heute)).toBe(dringlichkeit(a({ faellig_am: null, schwere: "hoch" }), heute));
+    expect(dringlichkeit(a({ faellig_am: null, schwere: "mittel", dringend_ohne_termin: true }), heute)).toBeLessThan(dringlichkeit(a({ faellig_am: null, schwere: "mittel" }), heute));
   });
 });
 

@@ -1,7 +1,7 @@
 # Katalog B.19 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.kst_erklaerung
-version: 1
+version: 2
 katalog_nr: B.19
 titel:
   de: Körperschaftsteuererklärung abgeben
@@ -42,7 +42,8 @@ kosten: null
 sanktion:
   text:
     de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: hoch
+  schwere: mittel
+dringend_ohne_termin: true
 automatisierung: hinweis
 status_recht: in_kraft
 gueltig_ab: null
@@ -67,6 +68,7 @@ fachlich_zu_pruefen:
 - 'Verschiebung auf den nächsten Werktag nach § 108 Abs. 3 AO – Feiertagskalender des Bundeslands prüfen'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 pruefung:
   status: entwurf
   geprueft_von: null

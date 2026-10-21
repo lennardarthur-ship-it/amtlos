@@ -53,9 +53,21 @@ App, Website-Impressum, Datenschutzerklärung und Support-Seite nehmen alle dies
 ## 2. Datenschutz
 
 1. **Datenschutzhinweis prüfen lassen** (Anwalt Datenschutzrecht): Text in `apps/mobile/src/rechtliches.ts` → `DATENSCHUTZ`. Die Garantie für die USA-Übermittlung und die Speicherdauer bei RevenueCat sind jetzt aus dem Auftragsverarbeitungsvertrag von RevenueCat eingetragen (siehe unten). Nach der Freigabe setze ich `freigegeben: true`.
-2. **RevenueCat:** im Dashboard den Data Processing Addendum annehmen ([revenuecat.com/dpa](https://www.revenuecat.com/dpa)). Stand August 2026: Standardvertragsklauseln Modul 2, Daten bis Vertragsende, Rückgabe oder Löschung auf Anforderung innerhalb von 30 Tagen nach Vertragsende. Unterauftragnehmer in den USA, u. a. AWS, Google, Snowflake.
+2. **RevenueCat:** im Dashboard den Data Processing Addendum annehmen ([revenuecat.com/dpa](https://www.revenuecat.com/dpa)). Stand August 2026: Standardvertragsklauseln Modul 2 (Durchführungsbeschluss (EU) 2021/914), Daten bis Vertragsende; Rückgabe oder Löschung nach Vertragsende, wenn wir sie innerhalb von 30 Tagen nach Vertragsende verlangen, Backups nach RevenueCats Sicherungsroutinen (ohne Frist). Unterauftragnehmer in den USA, u. a. AWS, Google, Snowflake. Einzelne Kunden lassen sich über die API endgültig löschen (`DELETE /v1/subscribers/{app_user_id}`, läuft asynchron). Das EU-U.S. Data Privacy Framework nennen weder DPA noch Datenschutzerklärung von RevenueCat – im Datenschutzhinweis steht es deshalb nicht (Stand 21.10.2026).
 3. **App Store Connect → App-Datenschutz:** genau wie im Privacy Manifest (`apps/mobile/app.json`) – siehe Abschnitt 2.1.
 4. **Verschlüsselung (Exportkontrolle):** siehe Abschnitt 2.2.
+5. **Vorprüfung vom 21.10.2026 (Abschnitt 8) umgesetzt:** Verantwortlicher mit Vertretung aus `ANBIETER` (App und Website), SCC mit Fundstelle und DPA-Adresse, zuständige Aufsichtsbehörde (Sitz Reutlingen → LfDI Baden-Württemberg, Lautenschlagerstraße 20, 70173 Stuttgart), Speicherdauer bei RevenueCat ohne erfundene Frist, Push nur lokal. `freigegeben` bleibt `false` bis zur anwaltlichen Freigabe.
+6. **AVV für die Synchronisation anbieten** (vor dem ersten Build mit Sync): Nach der Vorprüfung (Frage 9, EuGH C-413/23 P) sind Metadaten (Dateinamen, Größen, Zeitpunkte) und Konto-Daten für uns personenbezogen, auch wenn die Inhalte Ende-zu-Ende-verschlüsselt sind. Dem Betrieb einen Auftragsverarbeitungsvertrag (Art. 28 DSGVO) für Kunden- und Mitarbeiterdaten anbieten, Hoster und Anmeldedienst als Unterauftragsverarbeiter nennen. Im Sync-Zusatz des Datenschutzhinweises stehen Hoster, Anmeldedienst und die Aufbewahrung der Server-Backups noch als Platzhalter – der Store-Check meldet sie für Builds mit Server.
+
+**Kandidaten für die PRUEFLISTE** (aus der Vorprüfung, noch nicht eingetragen):
+
+| Punkt | Wer |
+|---|---|
+| Frist nach Abo-Ende festlegen, nach der die Kaufdaten bei RevenueCat gelöscht werden (Produktentscheidung + Löschung über die RevenueCat-API), dann in „Speicherdauer“ nennen | Gründer, RA |
+| AVV für die Synchronisation anbieten (Betrieb als Verantwortlicher, Hoster und Anmeldedienst als Unterauftragsverarbeiter) – vor dem Sync-Build | RA, DSB |
+| Aufbewahrung der Server-Backups im Sync-Zusatz eintragen (Platzhalter) | Gründer |
+| DPF-Teilnahme von RevenueCat auf dataprivacyframework.gov prüfen; falls gelistet, Art. 45 DSGVO als primäre Grundlage nennen (T-112) | Gründer |
+| Haftungshöchstbetrag gegenüber Unternehmern: Festbetrag (z. B. 5.000 €) ja/nein (Nutzungsbedingungen Ziffer 8.2) | Gründer, RA |
 
 ### 2.1 App-Datenschutz in App Store Connect
 
@@ -88,7 +100,7 @@ Antworten in App Store Connect nach Apples Tabelle ([Export compliance documenta
 ## 3. Haftung für Vorlagen und Pflichten
 
 1. **Anwaltliche Prüfung** (Arbeitsrecht und Datenschutz): die Prüfmappe liegt in `docs/pruefmappe-anwalt/` (Vorlagen als PDF, Katalog als Liste, Fragenkatalog inklusive RDG). Die kritischen Vorlagen vollständig, den Rest stichprobenartig.
-2. **Nutzungsbedingungen:** Entwurf in `docs/nutzungsbedingungen-entwurf.md`. Erst nach anwaltlicher Prüfung veröffentlichen; dann trage ich die Adresse in `LINKS.nutzung` ein (heute: Apples Standard-EULA).
+2. **Nutzungsbedingungen:** „Fassung zur Freigabe“ in `docs/nutzungsbedingungen-entwurf.md` (Vorprüfung vom 21.10.2026, Abschnitt 9, eingearbeitet). Erst nach anwaltlicher Freigabe gilt sie: dann `NUTZUNGSBEDINGUNGEN.freigegeben: true` in `apps/mobile/src/rechtliches.ts`. Das schaltet um, was heute vorbereitet ist: App und Bezahlschirm verlinken `nutzungsbedingungen.html` statt Apples Standard-EULA (`LINKS.nutzung` bleibt als Rückfall stehen), die Website zeigt die Seite ohne „Entwurf“ und verlinkt sie, und die App fragt beim nächsten Start einmal nach der Zustimmung (§ 305 Abs. 2 BGB: Kästchen, Link zu Bedingungen und Datenschutzhinweis, gespeichert werden Fassung und Zeitpunkt; bei einer neuen `fassung` erneut). Zusätzlich in App Store Connect bei „Lizenzvertrag“ die eigenen Bedingungen hinterlegen und die Adresse in der Store-Beschreibung (`store/de.json`) anpassen. Der Store-Check meldet „Eigene Nutzungsbedingungen freigegeben“, solange der Schalter aus ist.
 3. **RDG:** Fragen im Fragenkatalog der Prüfmappe. Formulierungen in der App sind schon vorsichtig („kommt in Frage“, „nach deinen Angaben“); nach der Antwort des Anwalts passe ich sie an.
 4. **Vermögensschadenhaftpflicht** bzw. IT-/Berufshaftpflicht abschließen – Angebote mehrerer Versicherer vergleichen, Tätigkeit genau beschreiben („Software mit Hinweisen zu Rechtspflichten und Vorlagen, keine Rechts- oder Steuerberatung“).
 5. **Marke** anmelden (DPMA oder EUIPO), wenn die Recherche frei ist.

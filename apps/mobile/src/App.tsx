@@ -24,6 +24,7 @@ import { AmtlosAnbieter, useAmtlos, type Tab } from "./zustand";
 import { KontoAnbieter } from "./konto/konto";
 import { Abdeckung } from "./sicherheit/abdeckung";
 import { PartnerLink } from "./seiten/Partner";
+import { ZustimmungTor } from "./seiten/Zustimmung";
 
 void SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
@@ -327,7 +328,10 @@ export default function App() {
                 <MeldungAnbieter imTab={tabsOben}>
                   {/* Phase 2.3: amtlos://partner/<code> – nur „Empfohlen von …“, schaltet nichts frei */}
                   <PartnerLink />
-                  <Rahmen />
+                  {/* Vorprüfung Recht: Zustimmung zu den Nutzungsbedingungen – nur aktiv, wenn sie freigegeben sind */}
+                  <ZustimmungTor>
+                    <Rahmen />
+                  </ZustimmungTor>
                 </MeldungAnbieter>
               </Sperre>
               <TastaturLeiste />

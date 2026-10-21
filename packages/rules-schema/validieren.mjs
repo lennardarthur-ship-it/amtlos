@@ -31,6 +31,8 @@ const OPS_FUER_TYP = {
   text: ["==", "!=", "in", "nicht_in"],
 };
 const IMMER_ERLAUBT = ["vorhanden", "nicht_vorhanden"];
+/** Platzhalter des Startbestands für noch nicht erfasste Folgen (scripts/katalog_startbestand.py FOLGEN_PLATZHALTER) */
+const SANKTION_PLATZHALTER = /noch nicht fachlich erfasst/i;
 
 const FELDNAMEN = {
   bezeichnung: "Bezeichnung", einheit: "Einheit", wert: "Wert", katalog_nr: "Katalog-Nr.", fundstelle: "Fundstelle",
@@ -40,6 +42,7 @@ const FELDNAMEN = {
   gueltig_bis: "Gültig bis", begriffe: "Fachbegriffe", begriff: "Begriff", titel_quelle: "Titel", url: "Adresse", abgerufen: "Abgerufen am",
   de: "Deutsch", en: "Englisch", radar: "Radar", wahrscheinlichkeit: "Wahrscheinlichkeit", versatz: "Versatz", datum: "Datum",
   verschiebung: "Verschiebung", faellig: "Fälligkeit", termine: "Termine", rhythmus: "Rhythmus", id: "ID", schwere: "Schwere",
+  dringend_ohne_termin: "Dringend ohne Termin",
 };
 
 /** Ajv-Meldungen in verständliches Deutsch für die Redaktion. */
@@ -172,6 +175,11 @@ export function pruefePflichtObjekt(p, kontext) {
   }
   if (f?.je_ereignis && !f?.bezug?.ereignis) fehler.push("frist.je_ereignis: nur mit Bezug auf ein Ereignis möglich");
   for (const v of p.voraussetzungen ?? []) if (!kontext.pflichtIds.has(v)) fehler.push(`voraussetzungen: unbekannte Pflicht '${v}'`);
+  // Vorprüfung 21.10.2026: Schwere „hoch“ nie ohne benannte Folgen ausliefern – Sanktion ergänzen oder Schwere senken
+  if (p.sanktion?.schwere === "hoch" && SANKTION_PLATZHALTER.test(p.sanktion.text?.de ?? ""))
+    fehler.push("Folgen: Bei Schwere „hoch“ muss die Sanktion benannt sein (Platzhalter „noch nicht fachlich erfasst“) – Sanktion ergänzen oder Schwere auf „mittel“ setzen (für „Jetzt dran“ ohne Termin: dringend_ohne_termin: true)");
+  // Dringlichkeit ohne Termin ist von der angezeigten Schwere entkoppelt – bei „hoch“ ist die Angabe überflüssig
+  if (p.dringend_ohne_termin && p.sanktion?.schwere === "hoch") fehler.push("Dringend ohne Termin: bei Schwere „hoch“ überflüssig – Feld entfernen");
   if (kontext.prod) {
     if (p.pruefung?.status !== "freigegeben") fehler.push("prod: nicht freigegeben");
     for (const k of ["titel", "kurz", "erklaerung", "stelle"]) if (!p[k].en) fehler.push(`prod: englischer Text fehlt in '${k}'`);

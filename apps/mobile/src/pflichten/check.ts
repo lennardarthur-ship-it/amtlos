@@ -253,7 +253,13 @@ export interface PflichtInfo {
   kurz: string;
   erklaerung: string;
   kategorie: string;
+  /** angezeigte Einstufung der Folgen (Katalog `sanktion.schwere`) */
   schwere: "niedrig" | "mittel" | "hoch";
+  /**
+   * Katalog `dringend_ohne_termin`: auch ohne Termin „Jetzt dran“, unabhängig von der angezeigten Schwere (z. B. HACCP,
+   * deren Folgen noch nicht fachlich erfasst sind und deshalb nicht „hoch“ heißen dürfen)
+   */
+  dringendOhneTermin?: boolean;
   stelle: string;
   /** E-156: Folgen bei Versäumnis laut Katalog (Bußgeld …) – null, wenn sie noch nicht fachlich erfasst sind */
   sanktion?: string | null;
@@ -359,6 +365,10 @@ const VORLAGEN_JE_PFLICHT = new Map<string, string[]>();
 for (const v of VORLAGEN) for (const p of v.pflichten) VORLAGEN_JE_PFLICHT.set(p, [...(VORLAGEN_JE_PFLICHT.get(p) ?? []), v.id]);
 for (const [p, ids] of Object.entries(ZUSATZ_VORLAGEN)) VORLAGEN_JE_PFLICHT.set(p, [...new Set([...(VORLAGEN_JE_PFLICHT.get(p) ?? []), ...ids])]);
 const SCHWERE = { hoch: 0, mittel: 1, niedrig: 2 } as const;
+/** Dringlichkeit ohne Termin – Schwere „hoch“ oder Katalog `dringend_ohne_termin` (entkoppelt von der angezeigten Schwere) */
+export const dringendOhneTermin = (p: Pick<PflichtInfo, "schwere" | "dringendOhneTermin">) => p.schwere === "hoch" || Boolean(p.dringendOhneTermin);
+/** Rang für die Reihenfolge: dringende Pflichten wie Schwere „hoch“ */
+const rang = (p: PflichtInfo) => (dringendOhneTermin(p) ? SCHWERE.hoch : SCHWERE[p.schwere]);
 
 /** Unterlage, soweit sie für abgeleitete Ereignisse zählt (Teil von `Unterlage` aus unterlagen/speicher.ts). */
 export interface UnterlageFuerEreignis {
@@ -506,7 +516,7 @@ export function gruendungZuerstGeordnet(l: PflichtInfo[]): PflichtInfo[] {
     return t;
   };
   const tiefe = (p: PflichtInfo, n = 0): number => (n > 10 ? n : Math.max(0, ...(p.voraussetzungen ?? []).map((v) => (nachId.has(v) ? tiefe(nachId.get(v)!, n + 1) + 1 : 0))));
-  const geordnet = [...schritte].sort((a, b) => termin(a).localeCompare(termin(b)) || tiefe(a) - tiefe(b) || SCHWERE[a.schwere] - SCHWERE[b.schwere] || a.titel.localeCompare(b.titel, "de"));
+  const geordnet = [...schritte].sort((a, b) => termin(a).localeCompare(termin(b)) || tiefe(a) - tiefe(b) || rang(a) - rang(b) || a.titel.localeCompare(b.titel, "de"));
   let i = 0;
   return l.map((p) => (p.gruendungsschritt ? geordnet[i++]! : p));
 }
@@ -549,6 +559,7 @@ export function auswertung(antworten: Profil, stichtag: string, unterlagen: read
       erklaerung: text(p.erklaerung),
       kategorie: p.kategorie,
       schwere: p.sanktion?.schwere ?? "mittel",
+      ...(p.dringend_ohne_termin ? { dringendOhneTermin: true } : {}),
       // E-156: Folgen bei Versäumnis (Pro-Detail) – nur, wenn sie fachlich erfasst sind
       sanktion: p.sanktion?.text && !/noch nicht fachlich erfasst/.test(text(p.sanktion.text)) ? text(p.sanktion.text) : null,
       stelle: text(p.stelle),
@@ -581,7 +592,7 @@ export function auswertung(antworten: Profil, stichtag: string, unterlagen: read
       gruendungsschritt: p.phase === "gruendung",
     };
   };
-  const sortiert = (l: PflichtInfo[]) => gruendungZuerstGeordnet(l.sort((a, b) => SCHWERE[a.schwere] - SCHWERE[b.schwere] || (a.naechsterTermin ?? "9999").localeCompare(b.naechsterTermin ?? "9999") || a.titel.localeCompare(b.titel, "de")));
+  const sortiert = (l: PflichtInfo[]) => gruendungZuerstGeordnet(l.sort((a, b) => rang(a) - rang(b) || (a.naechsterTermin ?? "9999").localeCompare(b.naechsterTermin ?? "9999") || a.titel.localeCompare(b.titel, "de")));
   const aktiv = ergebnisse.filter((e) => !e.radar);
   const beginn = typeof profil.gruendungsdatum === "string" ? profil.gruendungsdatum : null;
   const bestehend = Boolean(beginn && beginn <= plusMonate(stichtag, -BESTAND_AB_MONATEN));
@@ -864,7 +875,7 @@ export function dringlichkeit(a: Auswertung, e: Erledigt, heute: string) {
   const terminBald = mitTermin.filter((p) => p.naechsterTermin! <= bald);
   // Hinweise und Optionen ohne Termin sind nie „dringend“ (außer offenen Klärungen, R12)
   // R12 (Coach #3): die offene Einordnung (Gewerbe oder freier Beruf?) ist ein Hinweis, aber „jetzt dran“
-  const wichtigOhne = selbst.filter((p) => !p.naechsterTermin && p.schwere === "hoch" && (p.einordnung === "pflicht" || OFFEN_TROTZ_BESTAND.has(p.id)));
+  const wichtigOhne = selbst.filter((p) => !p.naechsterTermin && dringendOhneTermin(p) && (p.einordnung === "pflicht" || OFFEN_TROTZ_BESTAND.has(p.id)));
   const jetzt = [...terminBald, ...wichtigOhne];
   const naechsteWochen = mitTermin.filter((p) => p.naechsterTermin! > bald && p.naechsterTermin! <= spaeter);
   const imBlick = offen.filter((p) => !jetzt.includes(p) && !naechsteWochen.includes(p));

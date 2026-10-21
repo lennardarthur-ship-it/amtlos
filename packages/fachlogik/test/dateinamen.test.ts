@@ -18,7 +18,7 @@ describe("Dateinamen", () => {
     const n = pdfDateiname(vorlageFuer("ki_kompetenz")!, { thema: "Sicherer Umgang mit KI-Assistenten im Betrieb" }, "2026-02-10");
     expect(n.endsWith("-2026-02-10.pdf")).toBe(true);
     expect(n.length).toBeLessThanOrEqual(84);
-    expect(n).toMatch(/^Nachweis-KI-Kompetenz-Schulung-Sicherer-Umgang-mit-KI-[A-Za-z-]*-2026-02-10\.pdf$/);
+    expect(n).toMatch(/^Dokumentation-KI-Schulung-Sicherer-Umgang-mit-KI-[A-Za-z-]*-2026-02-10\.pdf$/);
     expect(n).not.toMatch(/--/);
     // nicht mitten im Wort gekürzt
     expect(pdfDateiname(vorlageFuer("hygieneplan")!, { bereich: "Café Morgenrot – Küche, Theke und Gastraum" }, "2026-02-05")).toBe("Hygieneplan-Cafe-Morgenrot-Kueche-Theke-und-Gastraum-2026-02-05.pdf");

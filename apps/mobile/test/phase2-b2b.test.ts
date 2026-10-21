@@ -68,14 +68,14 @@ describe("Speichern, Migration, Sicherung, Synchronisation", () => {
   const mit = (id?: string): Stand => ({ ...LEERER_STAND, ...(id ? { partnerId: id } : {}) });
 
   it("Migration 4 → 5: Partner-ID anfangs nicht gesetzt", () => {
-    expect(STAND_VERSION).toBe(5);
+    expect(STAND_VERSION).toBe(6);
     expect(MIGRATIONEN[4]!({ version: 4, betrieb: {} })).toHaveProperty("partnerId", undefined);
     const alt = standAus(JSON.stringify({ version: 4, betrieb: { name: "Alt" } }));
-    expect(alt.version).toBe(5);
+    expect(alt.version).toBe(6);
     expect(alt.partnerId).toBeUndefined();
-    expect(migrieren({ version: 1 }).version).toBe(5);
+    expect(migrieren({ version: 1 }).version).toBe(6);
     // Stand aus einer neueren App bleibt unangetastet (Ladefehler „version“)
-    expect(() => standAus(JSON.stringify({ version: 6 }))).toThrow();
+    expect(() => standAus(JSON.stringify({ version: STAND_VERSION + 1 }))).toThrow();
   });
 
   it("Partner-ID überlebt Speichern und Laden; Unlesbares fällt weg", () => {

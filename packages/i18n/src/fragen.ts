@@ -712,6 +712,28 @@ export const SCHRITTE: Schritt[] = [
           keine: { de: "Keine", en: "None" },
         },
       },
+      // Vorprüfung 21.10.2026 (F.61): Datenschutzbeauftragter unabhängig von der Zahl (Art. 37 Abs. 1 Buchst. b, c DSGVO, § 38 Abs. 1 Satz 2 BDSG)
+      {
+        feld: "datenschutz.dsb_gruende",
+        art: "mehrfach",
+        frage: { de: "Trifft einer dieser Fälle auf deine Datenverarbeitung zu?", en: "Does any of these apply to your data processing?" },
+        optionen: {
+          kerntaetigkeit_ueberwachung: {
+            de: "Kern deines Geschäfts ist, Menschen umfangreich und regelmäßig zu beobachten (z. B. Ortung, Tracking oder Videoüberwachung als Dienstleistung)",
+            en: "The core of your business is extensive, regular monitoring of people (e.g. location tracking, web tracking or video surveillance as a service)",
+          },
+          kerntaetigkeit_besondere_daten: {
+            de: "Kern deines Geschäfts ist, in großem Umfang Gesundheitsdaten oder andere besondere Daten zu verarbeiten",
+            en: "The core of your business is processing health data or other special categories of data on a large scale",
+          },
+          dsfa_pflichtig: { de: "Für eine Verarbeitung ist eine Datenschutz-Folgenabschätzung nötig", en: "A data protection impact assessment is required for a processing operation" },
+          uebermittlung_marktforschung: {
+            de: "Du verarbeitest Daten geschäftsmäßig, um sie weiterzugeben, oder für Markt- und Meinungsforschung",
+            en: "You process data commercially in order to pass it on, or for market or opinion research",
+          },
+          keine: { de: "Nichts davon", en: "None of these" },
+        },
+      },
       {
         feld: "datenschutz.dienstleister",
         art: "janein",

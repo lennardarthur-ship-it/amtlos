@@ -1,12 +1,12 @@
 # Katalog E.52 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: arbeitsschutz.fasi_betriebsarzt
-version: 1
+version: 2
 katalog_nr: E.52
 titel:
   de: Fachkraft für Arbeitssicherheit und Betriebsarzt
 kurz:
-  de: Du brauchst eine sicherheitstechnische und betriebsärztliche Betreuung – für Kleinbetriebe auch im Unternehmermodell.
+  de: Betriebe mit Beschäftigten brauchen eine sicherheitstechnische und betriebsärztliche Betreuung – Kleinbetriebe auch im Unternehmermodell.
 erklaerung:
   de: Das Arbeitssicherheitsgesetz und die DGUV Vorschrift 2 verlangen eine Betreuung durch eine Fachkraft für Arbeitssicherheit
     und einen Betriebsarzt. Kleinbetriebe können das Unternehmermodell der Berufsgenossenschaft nutzen.
@@ -31,7 +31,8 @@ kosten: null
 sanktion:
   text:
     de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: hoch
+  schwere: mittel
+dringend_ohne_termin: true
 automatisierung: partner
 status_recht: in_kraft
 gueltig_ab: null
@@ -45,6 +46,8 @@ fachlich_zu_pruefen:
 - Grenzen für das Unternehmermodell je BG ergänzen
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
+- 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
   status: entwurf
   geprueft_von: null

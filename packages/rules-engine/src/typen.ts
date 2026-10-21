@@ -77,6 +77,8 @@ export interface Pflicht {
   frist: Frist;
   wiederholung: { art: "einmalig" | "periodisch" | "bei_aenderung" | "dauerhaft"; neu_ausloesen_bei?: ({ fakt: string } | { ereignis: string })[] };
   sanktion: { text: Text; schwere: "niedrig" | "mittel" | "hoch" };
+  /** Auch ohne Termin dringend („Jetzt dran“), unabhängig von der angezeigten Sanktionsschwere (Standard: false) */
+  dringend_ohne_termin?: boolean;
   status_recht: StatusRecht;
   gueltig_ab: Datum | null;
   gueltig_bis?: Datum | null;

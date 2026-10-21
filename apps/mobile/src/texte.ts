@@ -313,7 +313,8 @@ export const T = {
   erinnern_hilfe_frei: "Alle Fristen siehst du immer hier in der App. Mit Pro erinnert dich dein iPhone drei Tage vorher, jeweils um 9 Uhr.",
   // E-156: Pflicht-Details (Pro) – kompakter Hinweis statt der Details
   pro_pflicht_teaser_titel: "Mit Pro: Erklärung, Folgen, Schritte",
-  pro_pflicht_teaser_text: "Warum die Pflicht für dich gilt, wer zuständig ist, was bei Versäumnis droht, Rechtsgrundlage und Quellen – und die passende Vorlage zum Erledigen.",
+  // Vorprüfung Katalog (21.10.2026, Abschnitt 7 RDG): „kommt nach deinen Angaben in Frage“ statt „gilt für dich“
+  pro_pflicht_teaser_text: "Warum die Pflicht nach deinen Angaben in Frage kommt, wer zuständig ist, was bei Versäumnis droht, Rechtsgrundlage und Quellen – und die passende Vorlage zum Erledigen.",
   pro_pflicht_teaser_knopf: "Mit Pro ansehen",
   folgen: "Folgen bei Versäumnis",
   // E-156: Kontrollmappe (Pro) – jede Unterlage bleibt einzeln erreichbar
@@ -794,6 +795,20 @@ export const T = {
   kontrollmappe_art_leer: "Für diese Kontrolle ist noch keine fertige Unterlage da.",
   verantwortlich_titel: "Verantwortlich",
   datenschutz_entwurf: "Entwurf – dieser Hinweis ist fachlich noch nicht freigegeben.",
+  // Vorprüfung Recht (21.10.2026): Verantwortlicher mit Vertretung, Zustimmung zu den Nutzungsbedingungen (§ 305 Abs. 2 BGB)
+  vr_vertreten: (v: string) => `Vertreten durch ${v}.`,
+  vr_rechtsform: "Rechtsform",
+  vr_titel: "Nutzungsbedingungen",
+  vr_titel_neu: "Neue Nutzungsbedingungen",
+  vr_text: `Bevor du ${MARKE.name} nutzt: Bitte lies die Nutzungsbedingungen und den Datenschutzhinweis. Ein Konto brauchst du nicht – deine Angaben bleiben auf deinem iPhone.`,
+  vr_text_neu: (datum: string) => `Die Nutzungsbedingungen haben sich geändert (Fassung vom ${datum}). Bitte lies sie und stimme zu, um weiterzumachen. Deine Daten bleiben unverändert auf deinem iPhone.`,
+  vr_bedingungen_lesen: "Nutzungsbedingungen lesen",
+  vr_bedingungen_link: "Nutzungsbedingungen lesen, öffnet die Website",
+  vr_datenschutz_lesen: "Datenschutzhinweis lesen",
+  vr_datenschutz_zu: "Datenschutzhinweis ausblenden",
+  vr_akzeptieren: "Ich akzeptiere die Nutzungsbedingungen.",
+  vr_weiter: "Weiter",
+  vr_gespeichert: "Gespeichert werden nur die Fassung und der Zeitpunkt deiner Zustimmung – auf diesem iPhone.",
   // R11 UX
   r11_frage: (i: number) => `Frage ${i}`,
   r11_mehrere_moeglich: "Mehrere möglich",

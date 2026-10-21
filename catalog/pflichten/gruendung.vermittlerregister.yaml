@@ -1,7 +1,7 @@
 # R12 (Rechtsprüfung Befund 6): Versicherungs-, Finanzanlagen- und Immobiliardarlehensvermittler – Vermittlerregister
 schema_version: 1
 id: gruendung.vermittlerregister
-version: 1
+version: 2
 katalog_nr: A.3
 titel:
   de: Ins Vermittlerregister eintragen lassen
@@ -37,7 +37,8 @@ kosten: null
 sanktion:
   text:
     de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: hoch
+  schwere: mittel
+dringend_ohne_termin: true
 automatisierung: hinweis
 erledigung:
   art: bestaetigen
@@ -50,9 +51,13 @@ quellen:
 - titel: Gewerbeordnung § 11a (lxgesetze)
   url: https://lxgesetze.de/gewo/11a
   abgerufen: '2026-10-21'
+- titel: Gewerbeordnung § 11a
+  url: https://www.gesetze-im-internet.de/gewo/__11a.html
+  abgerufen: null
 fachlich_zu_pruefen:
 - Neu nach Rechtsprüfung R12 (Befund 6) – § 11a Abs. 1 GewO nennt § 34d Abs. 10, § 34f Abs. 5, § 34h Abs. 1 S. 4 und § 34i Abs. 8; Versicherungsberater (§ 34e) bestätigen
 - Frist „unverzüglich nach Aufnahme der Tätigkeit“ je Vorschrift bestätigen; Folgen fachlich ergänzen
+- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 pruefung:
   status: entwurf
   geprueft_von: null

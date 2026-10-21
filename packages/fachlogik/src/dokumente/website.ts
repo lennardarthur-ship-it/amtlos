@@ -3,11 +3,11 @@
  * Vertrag zur Auftragsverarbeitung mit den Pflichtinhalten nach Art. 28 Abs. 3 DSGVO. Texte aus bausteine.ts.
  */
 import { AVV_KLAUSELN, DSE } from "./bausteine.js";
-import { formGleich, formImNamen, mitVertretung, rechtsformAus } from "./betrieb.js";
+import { formGleich, formImNamen, istKapitalgesellschaft, mitVertretung, rechtsformAus } from "./betrieb.js";
 import { aufsichtFuer } from "./datenschutz.js";
-import { LINIE, abschnitt, abschnitte, angaben, anschrift, anschriftMehrzeilig, auswahl, datumDe, dokument, esc, ja, parteien, text, unterschriften, zeilen } from "./html.js";
+import { LINIE, abschnitt, abschnitte, angaben, ankreuzen, anschrift, anschriftMehrzeilig, auswahl, datumDe, dokument, esc, ja, liste, parteien, tabelle, text, unterschriften, zelle, zeilen } from "./html.js";
 import { optionen } from "./konstanten.js";
-import type { Betrieb, Daten, Vorlage } from "./typen.js";
+import type { Betrieb, Daten, EinfachesFeld, Vorlage } from "./typen.js";
 import { MARKE } from "@amtlos/marke";
 
 /** Markierung für eine fehlende Angabe; im Dokument eine Linie, im Text „[bitte ergänzen]“. */
@@ -60,17 +60,27 @@ const DSE_R12: Record<string, { titel: string; text: string; quelle?: string }> 
   },
 };
 const DSE_ALLE: Record<string, { titel: string; text: string; quelle?: string }> = { ...DSE, ...DSE_R12 };
-/** Garantie für die Übermittlung in ein Drittland (Art. 45, 46 DSGVO). */
-const GARANTIE: Record<string, string> = {
-  angemessenheit: "einen Angemessenheitsbeschluss der EU-Kommission (Art. 45 DSGVO; für die USA das EU-U.S. Data Privacy Framework, wenn der Anbieter zertifiziert ist)",
-  scc: "die EU-Standardvertragsklauseln (Art. 46 Abs. 2 lit. c DSGVO)",
-};
-/** Satz zur Drittlandübermittlung eines Bausteins: ohne Land „keine Übermittlung“, sonst Land und Garantie. */
+/**
+ * Ort der Verarbeitung und Garantie für ein Drittland (Art. 45, 46 DSGVO) – Vorprüfung 21.10.2026: eine Auswahl, die
+ * zum Satz in der Erklärung wird (nur EU/EWR, USA mit Data Privacy Framework, Standardvertragsklauseln). „angemessenheit“
+ * gab es bis dahin für alle Angemessenheitsbeschlüsse; gespeicherte Erklärungen drucken ihn weiter.
+ */
+const DRITTLAND_WAHL = [
+  { wert: "nur_eu", text: "nur in der EU bzw. im EWR" },
+  { wert: "dpf", text: "auch in den USA – Anbieter nach dem EU-U.S. Data Privacy Framework zertifiziert" },
+  { wert: "scc", text: "auch in einem Drittland – EU-Standardvertragsklauseln" },
+];
+const DPF = "den Angemessenheitsbeschluss der EU-Kommission zum EU-U.S. Data Privacy Framework (Art. 45 DSGVO, Durchführungsbeschluss (EU) 2023/1795); der Anbieter ist danach zertifiziert";
+const SCC = "die EU-Standardvertragsklauseln (Art. 46 Abs. 2 lit. c DSGVO, Durchführungsbeschluss (EU) 2021/914)";
+/** Satz zur Drittlandübermittlung eines Bausteins aus der Auswahl (und dem Land bei Standardvertragsklauseln). */
 function drittlandSatz(d: Daten, praefix: "video" | "zahlung"): string {
   const land = text(d, `${praefix}_drittland`).trim();
-  if (!land) return "Eine Übermittlung in Länder außerhalb der EU bzw. des EWR findet nicht statt.";
-  const g = GARANTIE[text(d, `${praefix}_garantie`)];
-  return `Dabei können Daten auch in ${land} verarbeitet werden. Die Übermittlung stützt sich auf ${g ?? FEHLT}.`;
+  const g = text(d, `${praefix}_garantie`);
+  if (g === "dpf") return `Dabei können Daten auch in den USA verarbeitet werden. Die Übermittlung stützt sich auf ${DPF}.`;
+  if (g === "scc") return `Dabei können Daten auch in ${land || FEHLT} verarbeitet werden. Die Übermittlung stützt sich auf ${SCC}.`;
+  if (g === "angemessenheit") return `Dabei können Daten auch in ${land || FEHLT} verarbeitet werden. Die Übermittlung stützt sich auf einen Angemessenheitsbeschluss der EU-Kommission (Art. 45 DSGVO${/USA|Vereinigte Staaten/i.test(land) ? "; für die USA das EU-U.S. Data Privacy Framework, Durchführungsbeschluss (EU) 2023/1795, wenn der Anbieter zertifiziert ist" : ""}).`;
+  if (g === "nur_eu" || !land) return "Eine Übermittlung in Länder außerhalb der EU bzw. des EWR findet nicht statt.";
+  return `Dabei können Daten auch in ${land} verarbeitet werden. Die Übermittlung stützt sich auf ${FEHLT}.`;
 }
 /** R12 (Coach #17): § 257 HGB (Handelsbriefe) gilt nur für Kaufleute – sonst nur § 147 AO. */
 export const istKaufmann = (b: Betrieb) => Boolean((b.registernummer ?? "").trim()) || /e\.?\s?K|OHG|\bKG\b|GmbH|\bUG\b|\bAG\b|haftungsbeschr/i.test(`${b.rechtsform ?? ""} ${b.name}`);
@@ -154,7 +164,7 @@ export const datenschutzerklaerungWebsite: Vorlage = {
       hilfe: `Verantwortliche Stelle, Kontakt und Aufsichtsbehörde übernimmt ${MARKE.name} aus „Mein Betrieb“.`,
       felder: [
         { id: "website", art: "text", label: "Adresse der Website", hilfe: "z. B. www.salon-sonne.de – ohne Angabe die Website aus „Mein Betrieb“" },
-        { id: "module", art: "bausteine", label: "Was nutzt deine Website?", hilfe: "Schriftarten: entweder lokal oder extern – am besten lokal einbinden, dann entfällt die Übermittlung an Google.", optionen: DSE_WAHL, vorbelegung: ["hosting", "server_logfiles", "kontakt", "widerruf_einwilligung"], pflicht: true },
+        { id: "module", art: "bausteine", label: "Was nutzt deine Website?", hilfe: "Schriftarten: entweder lokal oder extern – am besten lokal einbinden, dann entfällt die Übermittlung an Google. Extern eingebundene Google Fonts ohne Einwilligung hat das LG München I als Verstoß gewertet (Urteil vom 20.01.2022, 3 O 17493/20).", optionen: DSE_WAHL, vorbelegung: ["hosting", "server_logfiles", "kontakt", "widerruf_einwilligung"], pflicht: true },
       ],
     },
     {
@@ -175,12 +185,12 @@ export const datenschutzerklaerungWebsite: Vorlage = {
         { id: "newsletter_dienst", art: "text", label: "Versanddienstleister des Newsletters", wenn: { feld: "module", ist: "newsletter" } },
         { id: "video_anbieter", art: "text", label: "Anbieter der Videokonferenz", hilfe: "z. B. Zoom Communications, Microsoft (Teams), Jitsi", wenn: { feld: "module", ist: "videokonferenz" } },
         { id: "video_anschrift", art: "text", label: "Anschrift des Videokonferenz-Anbieters", wenn: { feld: "module", ist: "videokonferenz" } },
-        { id: "video_drittland", art: "text", label: "Drittland (außerhalb EU/EWR), falls Daten dorthin gehen", hilfe: "z. B. USA – leer, wenn die Daten in der EU bleiben", wenn: { feld: "module", ist: "videokonferenz" } },
-        { id: "video_garantie", art: "wahl", label: "Garantie für das Drittland", optionen: [{ wert: "angemessenheit", text: "Angemessenheitsbeschluss (z. B. Data Privacy Framework)" }, { wert: "scc", text: "EU-Standardvertragsklauseln" }], wenn: { feld: "video_drittland" } },
+        { id: "video_garantie", art: "wahl", label: "Wo verarbeitet der Anbieter die Daten?", optionen: DRITTLAND_WAHL, vorbelegung: "nur_eu", hilfe: "Steht in den Datenschutzhinweisen bzw. im Vertrag zur Auftragsverarbeitung des Anbieters. Ob ein US-Anbieter zertifiziert ist: dataprivacyframework.gov.", wenn: { feld: "module", ist: "videokonferenz" } },
+        { id: "video_drittland", art: "text", label: "Drittland", hilfe: "z. B. USA oder Kanada", wenn: { feld: "video_garantie", ist: ["nur_eu", "dpf"], nicht: true } },
         { id: "zahlung_anbieter", art: "text", label: "Zahlungsdienstleister", hilfe: "z. B. PayPal (Europe) S.à r.l. et Cie, S.C.A., Stripe Payments Europe Ltd.", wenn: { feld: "module", ist: "zahlungsdienstleister" } },
         { id: "zahlung_anschrift", art: "text", label: "Anschrift des Zahlungsdienstleisters", wenn: { feld: "module", ist: "zahlungsdienstleister" } },
-        { id: "zahlung_drittland", art: "text", label: "Drittland (außerhalb EU/EWR), falls Daten dorthin gehen", hilfe: "leer, wenn die Daten in der EU bleiben", wenn: { feld: "module", ist: "zahlungsdienstleister" } },
-        { id: "zahlung_garantie", art: "wahl", label: "Garantie für das Drittland", optionen: [{ wert: "angemessenheit", text: "Angemessenheitsbeschluss (z. B. Data Privacy Framework)" }, { wert: "scc", text: "EU-Standardvertragsklauseln" }], wenn: { feld: "zahlung_drittland" } },
+        { id: "zahlung_garantie", art: "wahl", label: "Wo verarbeitet der Zahlungsdienstleister die Daten?", optionen: DRITTLAND_WAHL, vorbelegung: "nur_eu", hilfe: "Steht in den Datenschutzhinweisen des Anbieters. Ob ein US-Anbieter zertifiziert ist: dataprivacyframework.gov.", wenn: { feld: "module", ist: "zahlungsdienstleister" } },
+        { id: "zahlung_drittland", art: "text", label: "Drittland", hilfe: "z. B. USA", wenn: { feld: "zahlung_garantie", ist: ["nur_eu", "dpf"], nicht: true } },
         { id: "netzwerke", art: "text", label: "Verlinkte Netzwerke", vorschlaege: ["Instagram", "Facebook", "Instagram und Facebook", "LinkedIn"], wenn: { feld: "module", ist: "social_media_links" } },
         { id: "dsb", selten: true, art: "text", label: "Datenschutzbeauftragte/r (falls benannt)" },
         { id: "ergaenzung", selten: true, art: "mehrzeilig", label: "Weitere Verarbeitungen", hilfe: "nur falls deine Website noch etwas anderes nutzt" },
@@ -224,15 +234,18 @@ const VSBG: Record<string, string> = {
 const RECHTSFORM_AUS_CHECK: Record<string, string> = { einzelunternehmen: "Einzelunternehmen", freiberuf: "Einzelunternehmen", ek: "e. K.", gbr: "GbR", ug: "UG (haftungsbeschränkt)", gmbh: "GmbH" };
 
 /** Rechtsform: gewählt, sonst aus „Mein Betrieb“, sonst Einzelunternehmen. */
-const rechtsformImp = (d: Daten, b: Betrieb) => rechtsformAus(text(d, "rechtsform") || b.rechtsform, RECHTSFORMEN_IMP) || "Einzelunternehmen";
+// Vorprüfung 21.10.2026: ohne Angabe die Rechtsform aus dem Namen („Salon Sonne GmbH“) – sonst stand bei einer GmbH „Inhaber/in“
+const rechtsformImp = (d: Daten, b: Betrieb) => rechtsformAus(text(d, "rechtsform") || b.rechtsform || formImNamen(b.name) || "", RECHTSFORMEN_IMP) || "Einzelunternehmen";
+/** Juristische Personen (§ 5 Abs. 1 Nr. 1 DDG): Rechtsform und Vertretungsberechtigte; Personengesellschaften ebenso vertreten. */
+const IMP_VERTRETUNG: Record<string, string> = { "Einzelunternehmen": "Inhaber/in", "e. K.": "Inhaber/in", GbR: "Vertretungsberechtigte Gesellschafter/innen", OHG: "Vertretungsberechtigte Gesellschafter/innen", KG: "Vertretungsberechtigte Gesellschafter/innen", "UG (haftungsbeschränkt)": "Vertretungsberechtigte Geschäftsführung", GmbH: "Vertretungsberechtigte Geschäftsführung" };
 
 function impressumTeile(d: Daten, b: Betrieb): { titel: string; text: string }[] {
   const rf = rechtsformImp(d, b);
   // Stammkapital als eigener Teil nach dem Registereintrag (nicht unter „Vertreten durch“)
   const kapital = text(d, "kapital") && /GmbH|UG/.test(rf) ? { titel: "Stammkapital", text: `${text(d, "kapital")}${text(d, "ausstehend") ? `\nAusstehende Einlagen: ${text(d, "ausstehend")}` : ""}` } : null;
   const t: { titel: string; text: string }[] = [
-    { titel: "Angaben gemäß § 5 DDG", text: [b.name.trim() + (!b.name.includes(rf) && rf !== "Einzelunternehmen" ? ` ${rf}` : ""), b.strasse, [b.plz, b.ort].filter(Boolean).join(" ")].filter((x) => x.trim()).join("\n") || FEHLT },
-    { titel: rf === "Einzelunternehmen" ? "Inhaber/in" : "Vertreten durch", text: text(d, "vertreten") || (b.vertretung ?? "").trim() || b.verantwortlich.trim() || FEHLT },
+    { titel: "Angaben gemäß § 5 DDG", text: [b.name.trim() + (!b.name.includes(rf) && rf !== "Einzelunternehmen" ? ` ${rf}` : ""), b.strasse, [b.plz, b.ort].filter(Boolean).join(" "), ...(rf !== "Einzelunternehmen" ? [`Rechtsform: ${rf}`] : [])].filter((x) => x.trim()).join("\n") || FEHLT },
+    { titel: IMP_VERTRETUNG[rf] ?? (istKapitalgesellschaft(rf) ? "Vertretungsberechtigte Geschäftsführung" : "Vertreten durch"), text: text(d, "vertreten") || (b.vertretung ?? "").trim() || b.verantwortlich.trim() || FEHLT },
     { titel: "Kontakt", text: [b.telefon ? `Telefon: ${b.telefon}` : "", `E-Mail: ${b.email.trim() || FEHLT}`].filter(Boolean).join("\n") },
   ];
   const gericht = text(d, "register_gericht") || (b.registergericht ?? "").trim();
@@ -241,6 +254,8 @@ function impressumTeile(d: Daten, b: Betrieb): { titel: string; text: string }[]
   if (kapital) t.push(kapital);
   const ids = [b.ust_idnr.trim() ? `Umsatzsteuer-Identifikationsnummer nach § 27a UStG: ${b.ust_idnr.trim()}` : "", text(d, "wirtschafts_id") ? `Wirtschafts-Identifikationsnummer nach § 139c AO: ${text(d, "wirtschafts_id")}` : ""].filter(Boolean);
   if (ids.length) t.push({ titel: b.ust_idnr.trim() && text(d, "wirtschafts_id") ? "Umsatzsteuer-ID und Wirtschafts-ID" : b.ust_idnr.trim() ? "Umsatzsteuer-ID" : "Wirtschafts-ID", text: ids.join("\n") });
+  // nur bei einer Tätigkeit, die eine behördliche Zulassung braucht (§ 5 Abs. 1 Nr. 3 DDG): das Feld hängt am Schalter
+  // „zulassung“; ältere Impressen ohne den Schalter fragt die Prüfung nach (pruefen)
   if (text(d, "aufsicht")) t.push({ titel: "Zuständige Aufsichtsbehörde", text: text(d, "aufsicht") });
   if (ja(d, "reglementiert")) t.push({ titel: "Berufsrechtliche Angaben", text: [
     // Kammer nur, wenn der Betrieb einer angehört (§ 5 Abs. 1 Nr. 5 Buchst. a DDG) – viele reglementierte Berufe haben keine
@@ -277,7 +292,7 @@ export const impressum: Vorlage = {
         { id: "rechtsform", art: "wahl", label: "Rechtsform", optionen: RECHTSFORMEN_IMP.map((r) => ({ wert: r, text: r })), hilfe: "ohne Auswahl die Rechtsform aus „Mein Betrieb“, sonst Einzelunternehmen" },
         // R12 (Coach #15): aus „Mein Betrieb“ vorbelegt (Inhaber/in bzw. Geschäftsführung)
         { id: "vertreten", art: "text", label: "Inhaber/in bzw. vertretungsberechtigte Person", hilfe: "aus „Mein Betrieb“ übernommen; bei mehreren alle nennen" },
-        { id: "kapital", selten: true, art: "text", label: "Stammkapital", hilfe: "nur bei GmbH/UG und nur, wenn du es angeben möchtest" },
+        { id: "kapital", selten: true, art: "text", label: "Stammkapital", hilfe: "Freiwillig, nur bei GmbH/UG. Nennst du es, gehören die ausstehenden Einlagen dazu (§ 5 Abs. 1 Nr. 1 DDG) – sonst leer lassen." },
         { id: "ausstehend", art: "text", label: "Ausstehende Einlagen", hilfe: "Gibst du das Kapital an, gehören die ausstehenden Einlagen dazu – bei voller Einzahlung „keine“", wenn: { feld: "kapital" }, vorschlaege: ["keine"] },
         { id: "register_gericht", art: "text", label: "Registergericht", hilfe: "nur bei Eintragung, z. B. Amtsgericht München" },
         { id: "register_nr", art: "text", label: "Registernummer", hilfe: "z. B. HRB 123456" },
@@ -287,7 +302,9 @@ export const impressum: Vorlage = {
     {
       titel: "Nur falls zutreffend",
       felder: [
-        { id: "aufsicht", selten: true, art: "text", label: "Zuständige Aufsichtsbehörde", hilfe: "wenn deine Tätigkeit eine behördliche Zulassung braucht" },
+        // Vorprüfung 21.10.2026: Aufsichtsbehörde nur bei zulassungspflichtiger Tätigkeit (§ 5 Abs. 1 Nr. 3 DDG)
+        { id: "zulassung", art: "schalter", label: "Tätigkeit braucht eine behördliche Zulassung", hilfe: "z. B. Gaststättenerlaubnis, Bewachungs- oder Maklererlaubnis – dann gehört die zuständige Aufsichtsbehörde ins Impressum (§ 5 Abs. 1 Nr. 3 DDG). Eine Gewerbeanmeldung allein ist keine Zulassung." },
+        { id: "aufsicht", art: "text", label: "Zuständige Aufsichtsbehörde", hilfe: "Behörde, die die Zulassung erteilt hat bzw. überwacht – Name und Anschrift", wenn: { feld: "zulassung" }, pflicht: true },
         { id: "reglementiert", art: "schalter", label: "Reglementierter Beruf", hilfe: "z. B. zulassungspflichtiges Handwerk mit Meisterpflicht" },
         { id: "kammer", art: "text", label: "Kammer", hilfe: "nur, wenn du einer Kammer angehörst – sonst leer lassen", wenn: { feld: "reglementiert" }, vorschlaege: ["Handwerkskammer"] },
         { id: "berufsbezeichnung", art: "text", label: "Gesetzliche Berufsbezeichnung", wenn: { feld: "reglementiert" }, vorschlaege: ["Friseurmeister/in", "Elektrotechnikermeister/in"] },
@@ -312,6 +329,8 @@ export const impressum: Vorlage = {
     // Hinweis: Name mit Rechtsform-Zusatz, der nicht zur gewählten Rechtsform passt („Salon Sonne GmbH“ als Einzelunternehmen)
     const imNamen = formImNamen(b.name);
     const rf = rechtsformImp(d, b);
+    // Aufsichtsbehörde aus der Zeit vor dem Schalter „behördliche Zulassung“: nachfragen, statt sie still zu drucken
+    if (text(d, "aufsicht") && d.zulassung === undefined) f.push("Aufsichtsbehörde eingetragen: Braucht deine Tätigkeit eine behördliche Zulassung? Dann den Schalter einschalten, sonst gehört die Behörde nicht ins Impressum.");
     if (imNamen && !formGleich(imNamen, rf)) f.push(`Der Name des Betriebs enthält die Rechtsform „${imNamen}“, gewählt ist „${rf}“ – bitte prüfen.`);
     return f;
   },
@@ -332,24 +351,56 @@ export const impressum: Vorlage = {
 
 const ROLLE = { auftraggeber: "Wir beauftragen einen Dienstleister", dienstleister: "Wir verarbeiten Daten für einen Kunden" };
 const DAUER = ["für die Laufzeit des Hauptvertrags", "unbefristet; kündbar mit dem Hauptvertrag"];
+/**
+ * Vorprüfung 21.10.2026 (AVV): Mindestinhalt nach Art. 28 Abs. 3 DSGVO war erfüllt, aber Anlagen nur als Freitext. Neu:
+ * Unterauftragsverarbeiter als Tabelle mit Genehmigungsart, TOM nach Kategorien (Art. 32 Abs. 1 lit. a–d), Ort der
+ * Verarbeitung mit Transfermechanismus, Weisungsberechtigte, Meldefrist mit Inhalt nach Art. 33 Abs. 3, Kontrollrechte,
+ * Laufzeit, Haftung – oder die Standardvertragsklauseln der Kommission nach Art. 28 Abs. 7 DSGVO. Fachlich zu prüfen.
+ */
+const AVV_MUSTER: Record<string, string> = { eigen: "Dieser Vertrag (Muster)", scc: "EU-Standardvertragsklauseln nach Art. 28 Abs. 7 DSGVO" };
+export const AVV_SCC_FUNDSTELLE = "Durchführungsbeschluss (EU) 2021/915 der Kommission vom 4. Juni 2021 (ABl. L 199 vom 7.6.2021, S. 18)";
+const GENEHMIGUNG: Record<string, string> = { gesondert: "gesonderte Genehmigung je Unterauftragsverarbeiter", allgemein: "allgemeine Genehmigung mit Einspruchsfrist" };
+const AVV_ORT: Record<string, string> = { eu: "nur in der EU bzw. im EWR", drittland: "auch in einem Drittland" };
+const AVV_TRANSFER: Record<string, string> = {
+  angemessenheit: "Angemessenheitsbeschluss der EU-Kommission (Art. 45 DSGVO; für die USA das EU-U.S. Data Privacy Framework, Durchführungsbeschluss (EU) 2023/1795, bei zertifizierten Empfängern)",
+  scc2: "EU-Standardvertragsklauseln, Modul 2 – Auftragnehmer selbst im Drittland (Art. 46 Abs. 2 lit. c DSGVO, Durchführungsbeschluss (EU) 2021/914)",
+  scc3: "EU-Standardvertragsklauseln, Modul 3 – Unterauftragsverarbeiter im Drittland (Art. 46 Abs. 2 lit. c DSGVO, Durchführungsbeschluss (EU) 2021/914)",
+};
+const MELDEFRIST: Record<string, string> = { "24": "innerhalb von 24 Stunden", "48": "innerhalb von 48 Stunden", unverzueglich: "unverzüglich" };
+const KONTROLLKOSTEN: Record<string, string> = { eigene: "Jede Partei trägt ihre eigenen Kosten der Kontrolle.", auftraggeber: "Der Auftraggeber erstattet dem Auftragnehmer den nachgewiesenen angemessenen Aufwand einer Vor-Ort-Kontrolle." };
+/** TOM nach den üblichen Kontrollkategorien, zugeordnet zu Art. 32 Abs. 1 lit. a–d DSGVO. */
+const AVV_TOM: { id: string; label: string; rand: string; vorschlaege: string[] }[] = [
+  { id: "tom_zutritt", label: "Zutrittskontrolle (Räume)", rand: "Art. 32 Abs. 1 lit. b", vorschlaege: ["Büroräume abgeschlossen; Schlüssel nur an berechtigte Personen, Ausgabe dokumentiert", "Server im Rechenzentrum mit Zutrittskontrolle"] },
+  { id: "tom_zugang", label: "Zugangskontrolle (Systeme)", rand: "Art. 32 Abs. 1 lit. b", vorschlaege: ["Persönliche Benutzerkonten mit sicheren Passwörtern und Zwei-Faktor-Anmeldung", "Bildschirmsperre nach kurzer Inaktivität"] },
+  { id: "tom_zugriff", label: "Zugriffskontrolle (Berechtigungen)", rand: "Art. 32 Abs. 1 lit. b", vorschlaege: ["Zugriff nur auf die Daten, die für die Aufgabe nötig sind; Berechtigungen werden regelmäßig geprüft"] },
+  { id: "tom_trennung", label: "Trennungskontrolle", rand: "Art. 32 Abs. 1 lit. b", vorschlaege: ["Daten des Auftraggebers getrennt von Daten anderer Kunden (eigener Mandant bzw. Ordner)"] },
+  { id: "tom_weitergabe", label: "Weitergabekontrolle (Übertragung, Verschlüsselung)", rand: "Art. 32 Abs. 1 lit. a, b", vorschlaege: ["Übertragung nur verschlüsselt (TLS); Datenträger und Geräte verschlüsselt"] },
+  { id: "tom_verfuegbarkeit", label: "Verfügbarkeit und Belastbarkeit", rand: "Art. 32 Abs. 1 lit. b", vorschlaege: ["Tägliche Datensicherung an einem getrennten Ort; Virenschutz und aktuelle Updates"] },
+  { id: "tom_wiederherstellung", label: "Wiederherstellung nach einem Zwischenfall", rand: "Art. 32 Abs. 1 lit. c", vorschlaege: ["Wiederherstellung aus der Datensicherung wird regelmäßig getestet"] },
+  { id: "tom_ueberpruefung", label: "Regelmäßige Überprüfung der Wirksamkeit", rand: "Art. 32 Abs. 1 lit. d", vorschlaege: ["Die Maßnahmen werden mindestens jährlich und bei Änderungen überprüft"] },
+];
 
 export const auftragsverarbeitung: Vorlage = {
   id: "avv",
   gestalt: "vertrag",
   titel: "Vertrag zur Auftragsverarbeitung (AVV)",
-  beschreibung: "Vertrag mit einem Dienstleister, der für dich Daten verarbeitet – mit allen Pflichtklauseln nach Art. 28 Abs. 3 DSGVO.",
+  beschreibung: "Vertrag mit einem kleinen Dienstleister, der für dich Daten verarbeitet – mit allen Pflichtklauseln nach Art. 28 Abs. 3 DSGVO, Unterauftragsverarbeitern und Maßnahmen nach Art. 32 DSGVO.",
   bereich: "datenschutz",
   pflichten: ["datenschutz.avv"],
   grundlage: "Art. 28 Abs. 3 DSGVO",
+  grundlageFuer: (d) => (text(d, "muster") === "scc" ? "Art. 28 Abs. 3, 7 DSGVO" : "Art. 28 Abs. 3 DSGVO"),
   namensFeld: "partner",
   abschnitte: [
     { titel: "Vertragspartner",
-      hilfe: "Viele Anbieter stellen einen eigenen Vertrag bereit – dann den unterschreiben und ablegen. Als Muster eignen sich auch die EU-Standardvertragsklauseln (Durchführungsbeschluss (EU) 2021/915).",
+      hilfe: "Große Dienstleister (Hosting, Kassensysteme, Buchungsplattformen) stellen meist einen eigenen Vertrag – dann den unterschreiben und ablegen. Diese Vorlage ist für kleine Dienstleister ohne eigenes Muster, z. B. IT-Betreuung oder Lohnbüro. Steuerberatung braucht in der Regel keinen solchen Vertrag.",
       felder: [
         { id: "rolle", art: "wahl", label: "Wer ist wer", optionen: optionen(ROLLE), vorbelegung: "auftraggeber" },
         { id: "partner", art: "text", label: "Vertragspartner", pflicht: true },
         { id: "partner_anschrift", art: "mehrzeilig", label: "Anschrift des Vertragspartners", pflicht: true },
         { id: "hauptvertrag", art: "text", label: "Zugrunde liegender Vertrag", hilfe: "z. B. Vertrag über Online-Terminbuchung vom …", pflicht: true },
+        { id: "muster", art: "wahl", label: "Vertragstext", optionen: optionen(AVV_MUSTER), vorbelegung: "eigen", hilfe: "Die EU-Standardvertragsklauseln (Durchführungsbeschluss (EU) 2021/915) sind ein amtliches Muster – mit ihnen entfällt die Diskussion über den Wortlaut. Das PDF füllt dann ihre Anhänge aus; den Klauseltext von EUR-Lex beilegen." },
+        { id: "weisung_ag", art: "text", label: "Weisungsberechtigt beim Auftraggeber", hilfe: "Name und Kontakt – wer dem Dienstleister Weisungen erteilen darf" },
+        { id: "weisung_an", art: "text", label: "Weisungsempfänger beim Auftragnehmer", hilfe: "Name und Kontakt der Ansprechperson beim Dienstleister" },
       ],
     },
     {
@@ -357,17 +408,72 @@ export const auftragsverarbeitung: Vorlage = {
       felder: [
         { id: "gegenstand", art: "mehrzeilig", label: "Gegenstand und Art der Verarbeitung", pflicht: true, vorschlaege: ["Bereitstellung und Betrieb eines Online-Terminbuchungssystems", "Hosting der Website", "Bereitstellung eines Kassensystems mit Cloud-Speicherung", "Durchführung der Lohnabrechnung", "Wartung und Betreuung der IT"] },
         { id: "zweck", art: "mehrzeilig", label: "Zweck der Verarbeitung", pflicht: true },
-        { id: "dauer", art: "text", label: "Dauer", pflicht: true, vorschlaege: DAUER },
+        { id: "dauer", art: "text", label: "Dauer", pflicht: true, vorschlaege: DAUER, hilfe: "Der Vertrag endet mit dem Hauptvertrag; die Pflichten gelten fort, bis alle Daten gelöscht oder zurückgegeben sind – das steht im PDF." },
         { id: "datenarten", art: "mehrzeilig", label: "Art der personenbezogenen Daten", pflicht: true, vorschlaege: ["Name", "Kontaktdaten (Telefon, E-Mail)", "Termine und gebuchte Leistungen", "Zahlungsdaten", "Beschäftigtendaten (Lohn, Steuer, Sozialversicherung)"] },
         { id: "betroffene", art: "mehrzeilig", label: "Kategorien betroffener Personen", pflicht: true, vorschlaege: ["Kundinnen und Kunden", "Interessenten", "Beschäftigte"] },
-        { id: "unterauftrag", art: "mehrzeilig", label: "Genehmigte Unterauftragsverarbeiter", hilfe: "Name, Anschrift, Leistung – oder „keine“", pflicht: true, vorschlaege: ["keine"] },
-        { id: "tom", art: "mehrzeilig", label: "Technische und organisatorische Maßnahmen des Auftragsverarbeiters", pflicht: true, vorschlaege: ["Die technischen und organisatorischen Maßnahmen des Auftragnehmers sind in der Anlage beschrieben."] },
+      ],
+    },
+    {
+      titel: "Ort der Verarbeitung",
+      felder: [
+        { id: "ort", art: "wahl", label: "Verarbeitung", optionen: optionen(AVV_ORT), vorbelegung: "eu" },
+        { id: "drittland_land", art: "text", label: "Drittland", wenn: { feld: "ort", ist: "drittland" }, pflicht: true, hilfe: "z. B. USA" },
+        { id: "drittland_garantie", art: "wahl", label: "Grundlage der Übermittlung", optionen: optionen(AVV_TRANSFER), wenn: { feld: "ort", ist: "drittland" }, pflicht: true, hilfe: "Modul 3 der Standardvertragsklauseln, wenn ein Unterauftragsverarbeiter des Dienstleisters im Drittland sitzt; Modul 2, wenn der Dienstleister selbst dort sitzt." },
+      ],
+    },
+    {
+      titel: "Unterauftragsverarbeiter",
+      hilfe: "Wen der Dienstleister seinerseits einsetzt (z. B. Rechenzentrum, E-Mail-Dienst). Keine: Liste leer lassen.",
+      felder: [
+        {
+          id: "unterauftragnehmer",
+          art: "liste",
+          label: "Genehmigte Unterauftragsverarbeiter",
+          eintrag: "Unterauftragsverarbeiter",
+          titelFeld: "name",
+          leerStarten: true,
+          felder: [
+            { id: "name", art: "text", label: "Name", pflicht: true },
+            { id: "anschrift", art: "text", label: "Anschrift", pflicht: true },
+            { id: "leistung", art: "text", label: "Leistung", pflicht: true, vorschlaege: ["Hosting / Rechenzentrum", "E-Mail-Dienst", "Fernwartung", "Datensicherung"] },
+            { id: "ort", art: "text", label: "Ort der Verarbeitung", vorschlaege: ["Deutschland", "EU", "USA"] },
+          ],
+        },
+        { id: "genehmigung", art: "wahl", label: "Neue Unterauftragsverarbeiter", optionen: optionen(GENEHMIGUNG), vorbelegung: "gesondert", hilfe: "Gesondert: jeder neue braucht deine vorherige Zustimmung. Allgemein: der Dienstleister kündigt neue vorher an, du kannst innerhalb der Frist widersprechen (Art. 28 Abs. 2 DSGVO)." },
+        { id: "einspruch_tage", art: "zahl", label: "Einspruchsfrist (Tage)", vorbelegung: "14", wenn: { feld: "genehmigung", ist: "allgemein" }, pflicht: true },
+        // bis zur Vorprüfung ein Freitextfeld – bleibt für gespeicherte Verträge
+        { id: "unterauftrag", selten: true, art: "mehrzeilig", label: "Weitere Angaben zu Unterauftragsverarbeitern" },
+      ],
+    },
+    {
+      titel: "Technische und organisatorische Maßnahmen (Art. 32 DSGVO)",
+      hilfe: "Was der Dienstleister zum Schutz der Daten tut – je Kategorie. Hat er eine eigene Beschreibung, genügt hier ein Verweis auf die Anlage.",
+      felder: [
+        ...AVV_TOM.map((t): EinfachesFeld => ({ id: t.id, art: "mehrzeilig", label: t.label, vorschlaege: t.vorschlaege })),
+        // bis zur Vorprüfung ein Feld für alle Maßnahmen – bleibt für gespeicherte Verträge und den Verweis auf eine Anlage
+        { id: "tom", selten: true, art: "mehrzeilig", label: "Weitere Maßnahmen bzw. Verweis auf eine Anlage", vorschlaege: ["Die technischen und organisatorischen Maßnahmen des Auftragnehmers sind ergänzend in der Anlage beschrieben."] },
+      ],
+    },
+    {
+      titel: "Meldung, Kontrolle und Unterschrift",
+      felder: [
+        { id: "meldefrist", art: "wahl", label: "Meldung von Datenschutzverletzungen an dich", optionen: optionen(MELDEFRIST), vorbelegung: "24", hilfe: "Du selbst musst binnen 72 Stunden an die Aufsichtsbehörde melden (Art. 33 Abs. 1 DSGVO) – eine feste Frist für den Dienstleister lässt dir dafür Zeit." },
+        { id: "kontrolle_tage", art: "zahl", label: "Ankündigung einer Vor-Ort-Kontrolle (Tage vorher)", vorbelegung: "14" },
+        { id: "kontrolle_kosten", art: "wahl", label: "Kosten einer Kontrolle", optionen: optionen(KONTROLLKOSTEN), vorbelegung: "eigene" },
+        { id: "zertifikate", art: "schalter", label: "Nachweis auch durch Zertifikate oder Prüfberichte", vorbelegung: true, hilfe: "z. B. ISO 27001 oder ein aktueller Prüfbericht – statt einer Kontrolle vor Ort" },
         { id: "ort_datum", art: "text", label: "Ort", hilfe: "für die Unterschrift" },
       ],
     },
   ],
+  pruefen(d) {
+    const f: string[] = [];
+    // TOM: mindestens eine Kategorie oder der Verweis auf die Anlage (Art. 28 Abs. 3 lit. c DSGVO)
+    if (!AVV_TOM.some((t) => text(d, t.id)) && !text(d, "tom")) f.push("Technische und organisatorische Maßnahmen (mindestens eine Kategorie oder Verweis auf eine Anlage)");
+    return f;
+  },
   html(d, b) {
     const ag = text(d, "rolle") !== "dienstleister";
+    const scc = text(d, "muster") === "scc";
     // der Betrieb als Partei: bei einer Kapitalgesellschaft mit Geschäftsführung in „Mein Betrieb“ „vertreten durch …“
     const vertreten = mitVertretung(b) !== b.name.trim() ? `vertreten durch ${(b.vertretung ?? "").trim()}` : undefined;
     // Hauptvertrag in Anführungszeichen; Anführungszeichen in der Eingabe werden zu halben („Vertrag ‚Salon M‘ vom …“)
@@ -376,24 +482,89 @@ export const auftragsverarbeitung: Vorlage = {
     const mitName = (rolle: string, name: string) => (name.trim() ? `${rolle} (${name.trim()})` : rolle);
     // mehrzeilige Angaben in einer Zeile: Satzzeichen am Zeilenende entfallen („Name., Kontaktdaten“)
     const reihe = (k: string) => text(d, k).split("\n").map((z) => z.trim().replace(/[.;,]+$/, "")).filter(Boolean).join(", ");
-    // Abschnitte in Reihenfolge; die Klausel (c) verweist auf den Paragraphen mit den technischen und organisatorischen Maßnahmen
+    // Blatt zum Ausfüllen von Hand: noch kein Vertragspartner und kein Gegenstand
+    const leer = !text(d, "partner") && !text(d, "gegenstand");
+    const unter = liste(d, "unterauftragnehmer").filter((x) => text(x, "name"));
+    const allgemein = text(d, "genehmigung") === "allgemein";
+    const tage = text(d, "einspruch_tage") || "14";
+    const ankuendigung = text(d, "kontrolle_tage") || "14";
+    const frist = MELDEFRIST[text(d, "meldefrist")] ?? MELDEFRIST["24"]!;
+    const gegenstand = angaben([
+      // leer: Gegenstand und Zweck mit zwei Linien zum Ausfüllen von Hand (Daten und Personen stehen in einer Zeile)
+      ["Gegenstand und Art", text(d, "gegenstand"), 2],
+      ["Zweck", text(d, "zweck"), 2],
+      ["Dauer", text(d, "dauer")],
+      ["Art der personenbezogenen Daten", reihe("datenarten")],
+      ["Kategorien betroffener Personen", reihe("betroffene")],
+    ]);
+    const unterTabelle =
+      unter.length || leer
+        ? tabelle(["Name", "Anschrift", "Leistung", "Ort der Verarbeitung"], unter.map((x) => [`<strong>${zelle(text(x, "name"))}</strong>`, zelle(text(x, "anschrift")), zelle(text(x, "leistung")), zelle(text(x, "ort"))]), { breiten: ["24%", "32%", "26%", "18%"], ...(unter.length ? {} : { mindestens: 3, hoch: true }) })
+        : `<p>${text(d, "unterauftrag") && !/^keine\.?$/i.test(text(d, "unterauftrag")) ? "" : "Der Auftragnehmer setzt derzeit keine Unterauftragsverarbeiter ein."}</p>`;
+    const unterWeitere = text(d, "unterauftrag") && !/^keine\.?$/i.test(text(d, "unterauftrag")) ? zeilen(text(d, "unterauftrag")) : "";
+    // leeres Blatt: Genehmigungsart und Ort zum Ankreuzen statt der Startauswahl
+    const genehmigungSatz = leer
+      ? ankreuzen(["Neue Unterauftragsverarbeiter setzt der Auftragnehmer nur nach vorheriger gesonderter schriftlicher Genehmigung des Auftraggebers ein.", `Allgemeine Genehmigung: Der Auftragnehmer informiert mindestens ${tage} Tage vorher; der Auftraggeber kann innerhalb dieser Frist Einspruch erheben.`])
+      : `<p>${
+          allgemein
+            ? `Der Auftraggeber erteilt eine allgemeine schriftliche Genehmigung zum Einsatz weiterer Unterauftragsverarbeiter (Art. 28 Abs. 2 DSGVO). Der Auftragnehmer informiert den Auftraggeber mindestens ${esc(tage)} Tage vor dem Einsatz oder Austausch eines Unterauftragsverarbeiters in Textform; der Auftraggeber kann innerhalb dieser Frist aus wichtigem datenschutzrechtlichem Grund Einspruch erheben. Bis dahin unterbleibt der Einsatz.`
+            : "Die oben genannten Unterauftragsverarbeiter gelten als genehmigt. Weitere setzt der Auftragnehmer nur nach vorheriger gesonderter schriftlicher Genehmigung des Auftraggebers ein (Art. 28 Abs. 2 DSGVO)."
+        } Der Auftragnehmer erlegt ihnen vertraglich dieselben Datenschutzpflichten auf (Art. 28 Abs. 4 DSGVO).</p>`;
+    // TOM je Kategorie mit Bezug zu Art. 32 Abs. 1 lit. a–d; ohne Angabe eine Linie (auch im ausgefüllten Vertrag sichtbar)
+    const tomTabelle = angaben(AVV_TOM.map((t) => [`${t.label} (${t.rand.replace("Art. 32 Abs. 1 ", "")})`, reihe(t.id) ? text(d, t.id) : text(d, "tom") && !leer ? null : "", leer ? 2 : 1]));
+    const tomWeitere = text(d, "tom") ? zeilen(text(d, "tom")) + (/Anlage/i.test(text(d, "tom")) ? "<p>Anlage: Technische und organisatorische Maßnahmen des Auftragnehmers</p>" : "") : "";
+    const ortSatz =
+      text(d, "ort") === "drittland"
+        ? `<p>Die Verarbeitung findet auch in folgendem Drittland statt: ${text(d, "drittland_land") ? esc(text(d, "drittland_land")) : LINIE}. Grundlage der Übermittlung: ${AVV_TRANSFER[text(d, "drittland_garantie")] ? esc(AVV_TRANSFER[text(d, "drittland_garantie")]!) : LINIE}.</p>`
+        : leer
+          ? ankreuzen(["Die Verarbeitung findet ausschließlich in der EU bzw. im EWR statt.", "Die Verarbeitung findet auch in einem Drittland statt: ____ – Grundlage: ____"])
+          : "<p>Die Verarbeitung findet ausschließlich in der Europäischen Union bzw. im Europäischen Wirtschaftsraum statt. Eine Verlagerung in ein Drittland ist nur mit vorheriger Zustimmung des Auftraggebers und unter den Voraussetzungen der Art. 44 ff. DSGVO zulässig.</p>";
+    const weisung = angaben([
+      ["Weisungsberechtigt beim Auftraggeber", text(d, "weisung_ag")],
+      ["Weisungsempfänger beim Auftragnehmer", text(d, "weisung_an")],
+    ]);
+    const parteienHtml = parteien(
+      { rolle: "Verantwortlicher, Auftraggeber", name: ag ? b.name : text(d, "partner"), anschrift: ag ? anschriftMehrzeilig(b) : text(d, "partner_anschrift"), zusatz: ag ? vertreten : undefined },
+      { rolle: "Auftragsverarbeiter, Auftragnehmer", name: ag ? text(d, "partner") : b.name, anschrift: ag ? text(d, "partner_anschrift") : anschriftMehrzeilig(b), zusatz: ag ? undefined : vertreten },
+    );
+    const unterschrift = unterschriften([mitName("Auftraggeber", ag ? mitVertretung(b) : text(d, "partner")), mitName("Auftragnehmer", ag ? text(d, "partner") : mitVertretung(b))], { ortDatum: true, orte: text(d, "rolle") === "dienstleister" ? ["", text(d, "ort_datum")] : [text(d, "ort_datum"), ""] });
+    const hauptSatz = `<p>Dieser Vertrag ergänzt den Vertrag ${hauptvertrag ? `„${esc(hauptvertrag)}“` : LINIE} (Hauptvertrag) und regelt die Verarbeitung personenbezogener Daten im Auftrag nach Art. 28 DSGVO.</p>`;
+    // Art. 28 Abs. 7 DSGVO: die Standardvertragsklauseln der Kommission – das PDF füllt deren Anhänge I–IV aus
+    if (scc)
+      return dokument({
+        titel: "Vertrag zur Auftragsverarbeitung",
+        betrieb: b,
+        unter: "nach den Standardvertragsklauseln gemäß Art. 28 Abs. 7 DSGVO",
+        meta: `Auftraggeber: ${ag ? b.name : text(d, "partner")}\nAuftragnehmer: ${ag ? text(d, "partner") : b.name}`,
+        inhalt:
+          parteienHtml +
+          hauptSatz +
+          abschnitt("Vereinbarung der Standardvertragsklauseln", `<p>Die Parteien vereinbaren für die Verarbeitung im Auftrag die Standardvertragsklauseln der Europäischen Kommission zwischen Verantwortlichen und Auftragsverarbeitern nach Art. 28 Abs. 7 DSGVO (${esc(AVV_SCC_FUNDSTELLE)}) in ihrem unveränderten Wortlaut; er liegt diesem Vertrag bei (EUR-Lex, CELEX 32021D0915). Die folgenden Angaben bilden die Anhänge der Klauseln.</p><p>Klausel 7.7 (Einsatz von Unterauftragsverarbeitern): ${allgemein ? `Option 2 – allgemeine schriftliche Genehmigung; der Auftragsverarbeiter unterrichtet den Verantwortlichen mindestens ${esc(tage)} Tage im Voraus.` : "Option 1 – vorherige gesonderte Genehmigung."}</p>`) +
+          abschnitt("Anhang I – Liste der Parteien", weisung) +
+          abschnitt("Anhang II – Beschreibung der Verarbeitung", gegenstand + ortSatz) +
+          abschnitt("Anhang III – Technische und organisatorische Maßnahmen", tomTabelle + tomWeitere) +
+          abschnitt("Anhang IV – Liste der Unterauftragsverarbeiter", unterTabelle + unterWeitere) +
+          unterschrift,
+      });
     const teile: [string, string][] = [
-      [
-        "Gegenstand, Dauer, Art und Zweck der Verarbeitung",
-        angaben([
-          // leer: Gegenstand und Zweck mit zwei Linien zum Ausfüllen von Hand (Daten und Personen stehen in einer Zeile)
-          ["Gegenstand und Art", text(d, "gegenstand"), 2],
-          ["Zweck", text(d, "zweck"), 2],
-          ["Dauer", text(d, "dauer")],
-          ["Art der personenbezogenen Daten", reihe("datenarten")],
-          ["Kategorien betroffener Personen", reihe("betroffene")],
-        ]),
-      ],
+      ["Gegenstand, Dauer, Art und Zweck der Verarbeitung", gegenstand],
       ["Pflichten des Auftragnehmers (Art. 28 Abs. 3 Satz 2 lit. a–h DSGVO)", ""],
-      ["Unterauftragsverarbeiter", zeilen(text(d, "unterauftrag"))],
+      ["Weisungen", weisung + "<p>Weisungen erteilt der Auftraggeber in Textform. Änderungen der Personen teilen sich die Parteien unverzüglich mit.</p>"],
+      ["Ort der Verarbeitung", ortSatz],
+      ["Unterauftragsverarbeiter", unterTabelle + unterWeitere + genehmigungSatz],
       // verweisen die TOM auf eine Anlage, wird sie am Ende dieses Paragraphen genannt (nicht allein über den Unterschriften)
-      ["Technische und organisatorische Maßnahmen", zeilen(text(d, "tom")) + (/Anlage/i.test(text(d, "tom")) ? "<p>Anlage: Technische und organisatorische Maßnahmen des Auftragnehmers</p>" : "")],
+      ["Technische und organisatorische Maßnahmen", tomTabelle + tomWeitere],
+      [
+        "Meldung von Datenschutzverletzungen",
+        `<p>Der Auftragnehmer meldet dem Auftraggeber eine Verletzung des Schutzes personenbezogener Daten ${esc(frist === "unverzüglich" ? "unverzüglich" : `unverzüglich, spätestens ${frist}`)} nach Bekanntwerden. Die Meldung enthält, soweit bekannt, die Angaben nach Art. 33 Abs. 3 DSGVO: Art der Verletzung mit Kategorien und ungefährer Zahl der betroffenen Personen und Datensätze, Name und Kontaktdaten einer Ansprechperson, wahrscheinliche Folgen sowie ergriffene oder vorgeschlagene Maßnahmen. Was noch nicht bekannt ist, reicht er unverzüglich nach (Art. 33 Abs. 4 DSGVO).</p>`,
+      ],
+      [
+        "Kontrollrechte",
+        `<p>Der Auftraggeber kann die Einhaltung dieses Vertrags überprüfen, auch durch eine Kontrolle vor Ort zu den üblichen Geschäftszeiten; sie wird mindestens ${esc(ankuendigung)} Tage vorher angekündigt, außer bei einem konkreten Verdacht auf einen Verstoß.${d.zertifikate !== false ? " Der Auftragnehmer kann die Einhaltung auch durch aktuelle Zertifikate oder Prüfberichte unabhängiger Stellen (z. B. nach ISO 27001) nachweisen; eine Kontrolle vor Ort bleibt möglich, wenn diese Nachweise nicht genügen." : ""} ${esc(KONTROLLKOSTEN[text(d, "kontrolle_kosten")] ?? KONTROLLKOSTEN.eigene!)}</p>`,
+      ],
       ["Rechte und Pflichten des Auftraggebers", "<p>Der Auftraggeber ist für die Rechtmäßigkeit der Verarbeitung verantwortlich und erteilt Weisungen in dokumentierter Form. Er ist berechtigt, die Einhaltung dieses Vertrags zu überprüfen.</p>"],
+      ["Laufzeit und Beendigung", "<p>Dieser Vertrag gilt für die Dauer des Hauptvertrags und endet mit ihm, ohne dass es einer gesonderten Kündigung bedarf. Die Pflichten des Auftragnehmers aus diesem Vertrag gelten fort, bis alle personenbezogenen Daten des Auftraggebers gelöscht oder zurückgegeben sind.</p>"],
+      ["Haftung", "<p>Für Schäden aus einer Verarbeitung, die gegen die DSGVO verstößt, haften die Parteien nach Art. 82 DSGVO. Haftungsbeschränkungen richten sich nach dem Hauptvertrag, soweit sie gesetzlich zulässig sind.</p>"],
     ];
     const tomNr = teile.findIndex(([t]) => t === "Technische und organisatorische Maßnahmen") + 1;
     teile[1]![1] = AVV_KLAUSELN.map((k) => `<p><strong>(${esc(k.lit)})</strong> ${esc(k.text.replace(/in Anlage \{nr\} beschrieben/, `in § ${tomNr} („Technische und organisatorische Maßnahmen“) dieses Vertrags beschrieben`))}</p>`).join("");
@@ -403,15 +574,12 @@ export const auftragsverarbeitung: Vorlage = {
       unter: "gemäß Art. 28 Abs. 3 DSGVO",
       meta: `Auftraggeber: ${ag ? b.name : text(d, "partner")}\nAuftragnehmer: ${ag ? text(d, "partner") : b.name}`,
       inhalt:
-        parteien(
-          { rolle: "Verantwortlicher, Auftraggeber", name: ag ? b.name : text(d, "partner"), anschrift: ag ? anschriftMehrzeilig(b) : text(d, "partner_anschrift"), zusatz: ag ? vertreten : undefined },
-          { rolle: "Auftragsverarbeiter, Auftragnehmer", name: ag ? text(d, "partner") : b.name, anschrift: ag ? text(d, "partner_anschrift") : anschriftMehrzeilig(b), zusatz: ag ? undefined : vertreten },
-        ) +
+        parteienHtml +
         // ohne Angabe: Linie zum Eintragen des Hauptvertrags statt den Satz wegzulassen
-        `<p>Dieser Vertrag ergänzt den Vertrag ${hauptvertrag ? `„${esc(hauptvertrag)}“` : LINIE} (Hauptvertrag) und regelt die Verarbeitung personenbezogener Daten im Auftrag nach Art. 28 DSGVO.</p>` +
+        hauptSatz +
         teile.map(([t, inhalt]) => abschnitt(t, inhalt)).join("") +
         // der Ort gilt für die eigene Unterschrift (Betrieb = Auftraggeber bzw. Dienstleister je nach „Wer ist wer“)
-        unterschriften([mitName("Auftraggeber", ag ? mitVertretung(b) : text(d, "partner")), mitName("Auftragnehmer", ag ? text(d, "partner") : mitVertretung(b))], { ortDatum: true, orte: text(d, "rolle") === "dienstleister" ? ["", text(d, "ort_datum")] : [text(d, "ort_datum"), ""] }),
+        unterschrift,
     });
   },
 };

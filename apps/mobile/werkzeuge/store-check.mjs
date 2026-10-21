@@ -38,7 +38,10 @@ const feld = (block, name) => {
 // leere Anbieterangaben zeigt die App als „folgt“ (Impressum, Datenschutz) – ein Store-Build darf so nicht raus
 for (const [n, t] of [["name", "Firma"], ["anschrift", "Anschrift"], ["vertretung", "Vertretung"], ["email", "E-Mail"]]) pruefe(feld("ANBIETER", n), `Impressum: ${t} (src/rechtliches.ts → ANBIETER.${n})`);
 for (const [n, t] of [["website", "Website"], ["datenschutz", "Datenschutzerklärung im Netz (Pflicht im App Store)"], ["support", "Support-URL (Pflicht im App Store)"]]) pruefe(feld("LINKS", n), `${t} (LINKS.${n})`);
-pruefe(/freigegeben: true/.test(recht), "Datenschutzhinweis der App fachlich freigegeben (DATENSCHUTZ.freigegeben, PRUEFLISTE T-77)");
+pruefe(/export const DATENSCHUTZ = \{\s*freigegeben: true/.test(recht), "Datenschutzhinweis der App fachlich freigegeben (DATENSCHUTZ.freigegeben, PRUEFLISTE T-77)");
+// Vorprüfung 21.10.2026: eigene Nutzungsbedingungen (docs/nutzungsbedingungen-entwurf.md) – bis zur anwaltlichen Freigabe
+// gilt Apples Standard-EULA (LINKS.nutzung), und die App fragt beim Start nicht nach der Zustimmung
+pruefe(/export const NUTZUNGSBEDINGUNGEN = \{[^}]*?freigegeben: true/.test(recht), "Eigene Nutzungsbedingungen freigegeben (NUTZUNGSBEDINGUNGEN.freigegeben, docs/nutzungsbedingungen-entwurf.md) – bis dahin gilt Apples Standard-EULA");
 
 // EAS und Abo
 const eas = JSON.parse(lies("eas.json"));

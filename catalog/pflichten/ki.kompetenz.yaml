@@ -1,16 +1,14 @@
 # Katalog F.65 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: ki.kompetenz
-version: 4
+version: 5
 katalog_nr: F.65
 titel:
-  de: KI-Kompetenz der Beschäftigten sicherstellen
+  de: KI-Kompetenz der Beschäftigten fördern
 kurz:
-  de: Wer im Unternehmen mit KI arbeitet, sollte ausreichende KI-Kompetenz haben – fördere sie durch Schulung und halte das fest.
+  de: Wer KI-Systeme einsetzt, ergreift Maßnahmen, um die KI-Kompetenz der Beschäftigten zu fördern – zum Beispiel mit einer kurzen Schulung.
 erklaerung:
-  de: Art. 4 KI-Verordnung gilt seit 2.2.2025. Nach dem Digital-Omnibus (VO (EU) 2026/1744) musst du die KI-Kompetenz deiner Beschäftigten
-    nicht mehr „sicherstellen“, sondern fördern (Amtsblatt vom 24.7.2026, in Kraft seit 27.7.2026). Eine kurze Schulung mit Nachweis bleibt
-    der sichere Weg; Amtlos bietet Schulungen mit Bestätigung.
+  de: Art. 4 KI-Verordnung verlangte seit 2.2.2025, ein ausreichendes Maß an KI-Kompetenz sicherzustellen. Seit dem Digital-Omnibus (VO (EU) 2026/1744, in Kraft seit 27.7.2026) verlangt Art. 4 nur noch Maßnahmen, die die KI-Kompetenz der Personen fördern, die in deinem Auftrag mit KI-Systemen arbeiten; ein bestimmtes Kompetenzniveau ist nicht mehr vorgeschrieben. Eine kurze Schulung mit Nachweis bleibt ein einfacher Weg, das zu zeigen; Amtlos bietet Schulungen mit Bestätigung.
 begriffe:
 - begriff:
     de: KI-Kompetenz
@@ -44,8 +42,10 @@ kosten: null
 sanktion:
   text:
     de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: mittel
+  schwere: niedrig
 automatisierung: dokument_generator
+aenderungsnotiz:
+  de: Seit 27.7.2026 verlangt Art. 4 KI-VO nur noch Maßnahmen zur Förderung der KI-Kompetenz (VO (EU) 2026/1744).
 aktion:
   art: link
   ziel: app.schulungen
@@ -63,11 +63,17 @@ quellen:
 - titel: Otto Schmidt – Wann gilt die KI-VO infolge der Änderungen durch die Digital-Omnibus-VO zur KI? (14.8.2026)
   url: https://www.otto-schmidt.de/news//wann-gilt-die-ki-vo-infolge-der-anderungen-durch-die-digital-omnibus-vo-zur-ki-2026-08-14.html
   abgerufen: '2026-10-21'
+- titel: Verordnung (EU) 2026/1744 (Digital-Omnibus zur KI)
+  url: https://eur-lex.europa.eu/eli/reg/2026/1744/oj
+  abgerufen: null
+- titel: IHK Lüneburg-Wolfsburg – Digital-Omnibus-Verordnung zur KI in Kraft getreten
+  url: https://www.ihk.de/ihklw/produkte/beratung-und-service/ecommerce-und-internet/digital-omnibus-verordnung-zur-ki-tritt-in-kraft-7142858
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
-- 'Art. 4 nach Digital-Omnibus VO (EU) 2026/1744 auf „fördern“ abgeschwächt (Rechtsprüfung R11 Befund 8, T-65; Quelle Kanzlei-Blog FGS) – Wortlaut im Amtsblatt gegenlesen; Einordnung als Pflicht oder Hinweis danach festlegen'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Inhalt und Umfang einer ausreichenden Schulung fachlich festlegen
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 21.10.2026 (F.65): Titel und Kurztext auf „fördern“ umgestellt, Schwere niedrig, Änderung als aenderungsnotiz (gültig_ab bleibt 2.2.2025, weil Art. 4 seitdem gilt). Neuer Wortlaut von Art. 4 nur sinngemäß belegt (IHK Lüneburg-Wolfsburg: „Maßnahmen ergreifen, um die KI-Kompetenz … zu fördern“; Opsio: „unterstützen“) – EUR-Lex war für das Recherchewerkzeug nicht abrufbar, Wortlaut im Amtsblatt gegenlesen; Einordnung als Hinweis statt Pflicht prüfen'
 pruefung:
   status: entwurf
   geprueft_von: null

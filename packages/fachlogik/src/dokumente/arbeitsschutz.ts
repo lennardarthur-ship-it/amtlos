@@ -18,8 +18,15 @@ export function teilnahmeTabelle(eintraege: Eintrag[], extra?: { kopf: string; f
 }
 
 const BEREICHE_VORSCHLAG = ["Salon", "Kosmetikkabine", "Küche", "Gastraum und Service", "Verkaufsraum", "Lager", "Werkstatt", "Baustelle beim Kunden", "Reinigungsobjekte beim Kunden", "Büro"];
-const GEFAEHRDUNG_KOPF = ["Gefährdung", "Risiko", "Schutzmaßnahmen", "Umsetzung"];
-const GEFAEHRDUNG_BREITEN = ["28%", "10%", "42%", "20%"];
+// Vorprüfung 21.10.2026 (§ 6 Abs. 1 ArbSchG): eigene Spalte „bis wann“ – ohne Termin ist „offen“ nicht nachprüfbar
+const GEFAEHRDUNG_KOPF = ["Gefährdung", "Risiko", "Schutzmaßnahmen", "Wer / bis wann", "Erledigt am"];
+const GEFAEHRDUNG_BREITEN = ["25%", "9%", "38%", "16%", "12%"];
+/** Risikostufen mit Bedeutung (Hilfetext und Legende im Dokument) – vereinfachte Skala, fachlich zu prüfen (Sifa). */
+export const RISIKO_SKALA = "gering: ein Schaden ist unwahrscheinlich oder nur leicht (z. B. kleiner Schnitt) – Maßnahmen bei nächster Gelegenheit; mittel: ein Schaden mit Ausfallzeit ist möglich – Maßnahmen zeitnah; hoch: ein schwerer oder bleibender Schaden ist wahrscheinlich – sofort handeln, notfalls die Tätigkeit einstellen.";
+/** § 5 Abs. 3 Nr. 1–6 ArbSchG – auch auf dem leeren Blatt je eine Überschrift (Vorprüfung 21.10.2026). */
+const FAKTOR_NR: Record<string, string> = { arbeitsstaette: "1", einwirkungen: "2", arbeitsmittel: "3", ablaeufe_arbeitszeit: "4", qualifikation: "5", psychisch: "6" };
+const MUSCH_FORTSCHREIBUNG = "Teilt eine Frau mit, dass sie schwanger ist oder stillt, legt der Arbeitgeber unverzüglich die nach dieser Beurteilung erforderlichen Schutzmaßnahmen fest und bietet ihr ein Gespräch über weitere Anpassungen ihrer Arbeitsbedingungen an (§ 10 Abs. 2 MuSchG); die Benachrichtigung der Aufsichtsbehörde regelt § 27 Abs. 1 MuSchG.";
+const JUGEND_SATZ = "Beurteilung der Arbeitsbedingungen vor Beginn der Beschäftigung Jugendlicher und bei wesentlicher Änderung (§ 28a JArbSchG) – unter Beachtung der Beschäftigungsverbote und -beschränkungen der §§ 22 bis 27 JArbSchG.";
 /**
  * Ergänzende Vorschläge (R10) zu den Bausteinen der Recherche: Arbeiten an elektrischen Anlagen (Elektrohandwerk) und
  * Jugendliche (§ 28a JArbSchG). Fachlich zu prüfen wie die übrigen Bausteine (PRUEFLISTE T-62).
@@ -160,6 +167,9 @@ export const gefaehrdungsbeurteilung: Vorlage = {
   bereich: "arbeitsschutz",
   pflichten: ["arbeitsschutz.gefaehrdungsbeurteilung", "personal.mutterschutz_gefaehrdungsbeurteilung", "branche.handwerk_gefaehrdung_gewerk"],
   grundlage: "§§ 5, 6 ArbSchG; § 10 MuSchG",
+  grundlageFuer: (d) => (ja(d, "jugendliche") ? "§§ 5, 6 ArbSchG; § 10 MuSchG; § 28a JArbSchG" : ""),
+  // „Davon unter 18 Jahren“ im Pflichten-Check: Abschnitt „Jugendliche“ vorbelegt
+  ausProfil: { jugendliche: "beschaeftigte.jugendlich" },
   namensFeld: "arbeitsbereich",
   abschnitte: [
     { titel: "Arbeitsbereich",
@@ -168,7 +178,7 @@ export const gefaehrdungsbeurteilung: Vorlage = {
         { id: "taetigkeiten", art: "mehrzeilig", label: "Tätigkeiten in diesem Bereich", hilfe: "Was wird hier gemacht – Tätigkeiten, Geräte, Stoffe" },
         { id: "beschaeftigte", selten: true, art: "zahl", label: "Beschäftigte in diesem Bereich" },
         { id: "beurteilt_von", art: "text", label: "Beurteilt von", vorbelegung: "verantwortlich", pflicht: true },
-        { id: "mitwirkung", selten: true, art: "mehrzeilig", label: "Mitgewirkt haben", vorschlaege: ["Fachkraft für Arbeitssicherheit", "Betriebsärztin / Betriebsarzt", "Beschäftigte des Bereichs"] },
+        { id: "mitwirkung", selten: true, art: "mehrzeilig", label: "Mitgewirkt haben", hilfe: "Fachkundige Unterstützung (ASiG, DGUV Vorschrift 2): Fachkraft für Arbeitssicherheit und Betriebsärztin bzw. Betriebsarzt – in kleinen Betrieben oft über das Unternehmermodell der Berufsgenossenschaft. Dazu die Beschäftigten des Bereichs.", vorschlaege: ["Fachkraft für Arbeitssicherheit", "Betriebsärztin / Betriebsarzt", "Betreuung im Unternehmermodell der Berufsgenossenschaft", "Beschäftigte des Bereichs"] },
         { id: "datum", art: "datum", label: "Datum der Beurteilung", vorbelegung: "heute", pflicht: true },
       ],
     },
@@ -189,22 +199,27 @@ export const gefaehrdungsbeurteilung: Vorlage = {
           felder: [
             { id: "beschreibung", art: "mehrzeilig", label: "Gefährdung", pflicht: true },
             { id: "massnahme", art: "mehrzeilig", label: "Schutzmaßnahmen", hilfe: "Eine Maßnahme je Zeile", pflicht: true },
-            { id: "risiko", art: "wahl", label: "Risiko", optionen: optionen(RISIKO_STUFEN), vorbelegung: "mittel" },
+            { id: "risiko", art: "wahl", label: "Risiko", optionen: optionen(RISIKO_STUFEN), vorbelegung: "mittel", hilfe: RISIKO_SKALA.replace(/^g/, "G") },
             // R11 (Tischlerei #18): beim eigenen Eintrag abgefragt – vorbelegt landete Holzstaub unter „Arbeitsstätte“
             { id: "faktor", art: "wahl", label: "Gefährdungsfaktor (§ 5 Abs. 3 ArbSchG)", optionen: optionen(GEFAEHRDUNGSFAKTOREN), pflicht: true, hilfe: "Bestimmt den Abschnitt im Dokument, z. B. Stäube und Gefahrstoffe unter „Einwirkungen“." },
             { id: "verantwortlich", art: "text", label: "Verantwortlich", vorbelegung: "verantwortlich" },
-            { id: "umsetzen_bis", art: "datum", label: "Umsetzen bis" },
+            { id: "umsetzen_bis", art: "datum", label: "Umsetzen bis", hilfe: "Termin, bis wann die Maßnahme umgesetzt sein soll – erscheint in der Spalte „Wer / bis wann“" },
             { id: "umgesetzt_am", selten: true, art: "datum", label: "Umgesetzt am" },
           ],
         },
       ],
     },
     {
-      titel: "Mutterschutz",
-      hilfe: "Die Beurteilung nach dem Mutterschutzgesetz ist für jeden Arbeitsplatz nötig – unabhängig davon, ob gerade jemand schwanger ist.",
+      titel: "Mutterschutz und Jugendliche",
+      hilfe: "Die Beurteilung nach dem Mutterschutzgesetz ist für jeden Arbeitsplatz nötig – unabhängig davon, ob gerade jemand schwanger ist. Teilt eine Beschäftigte mit, dass sie schwanger ist oder stillt, schreibst du diese Beurteilung für sie fort und legst die Schutzmaßnahmen unverzüglich fest (§ 10 Abs. 2 MuSchG).",
       felder: [
         { id: "mutterschutz_ergebnis", art: "wahl", label: "Ergebnis für schwangere oder stillende Frauen", optionen: MUTTERSCHUTZ, pflicht: true },
         { id: "mutterschutz_details", art: "mehrzeilig", label: "Gefährdungen und erforderliche Schutzmaßnahmen", hilfe: "z. B. kein Umgang mit bestimmten Chemikalien, Sitzgelegenheit, keine Nachtarbeit" },
+        // Vorprüfung 21.10.2026: § 14 Abs. 2 MuSchG – alle Beschäftigten über das Ergebnis informieren
+        { id: "mutterschutz_informiert", art: "datum", label: "Beschäftigte über das Ergebnis informiert am", hilfe: "Alle Personen, die bei dir beschäftigt sind, erfahren das Ergebnis und ob Schutzmaßnahmen nötig sind (§ 14 Abs. 2 MuSchG) – z. B. per Aushang oder in der Unterweisung." },
+        // Jugendliche (§ 28a JArbSchG) analog zum Mutterschutz – im selben Schritt, aus dem Pflichten-Check vorbelegt
+        { id: "jugendliche", selten: true, art: "schalter", label: "Jugendliche unter 18 Jahren in diesem Bereich", hilfe: "Auch Azubis und Praktikum: Ihre Arbeitsbedingungen beurteilst du vor Beginn der Beschäftigung (§ 28a JArbSchG)." },
+        { id: "jugendliche_details", art: "mehrzeilig", label: "Gefährdungen und Schutzmaßnahmen für Jugendliche", wenn: { feld: "jugendliche" }, pflicht: true, hilfe: "z. B. keine Arbeiten mit Gefahrstoffen ohne Aufsicht, keine Akkordarbeit, Arbeitszeit- und Pausenregeln (§§ 8–14 JArbSchG)", vorschlaege: ["Gefährliche Arbeiten nur, soweit zur Ausbildung nötig, und unter Aufsicht einer fachkundigen Person (§ 22 JArbSchG).", "Keine Akkord- oder Fließarbeit (§ 23 JArbSchG).", "Arbeitszeit höchstens 8 Stunden täglich und 40 Stunden wöchentlich; Pausen nach § 11 JArbSchG.", "Unterweisung vor Beginn und mindestens halbjährlich (§ 29 JArbSchG)."] },
       ],
     },
     {
@@ -234,24 +249,27 @@ export const gefaehrdungsbeurteilung: Vorlage = {
     const g = liste(d, "gefaehrdungen").filter((x) => text(x, "beschreibung") || text(x, "massnahme"));
     // beschriftet, damit Name und Daten ohne Spaltenkopf verständlich sind: „Wer: … · Frist: … · erledigt …“ (je eine Zeile)
     const lbl = (t: string) => `<span class="lbl">${t}</span> `;
-    const umsetzung = (x: Eintrag) =>
-      [
-        text(x, "verantwortlich") ? `${lbl("Wer:")}${esc(text(x, "verantwortlich"))}` : "",
-        text(x, "umsetzen_bis") ? `${lbl("Frist:")}${datumDe(text(x, "umsetzen_bis"))}` : "",
-        text(x, "umgesetzt_am") ? `${lbl("erledigt")}${datumDe(text(x, "umgesetzt_am"))}` : lbl("offen").trim(),
-      ]
-        .filter(Boolean)
-        .join("<br>");
+    // „Wer / bis wann“: Name und Termin je eine Zeile; ohne Termin eine kurze Linie zum Nachtragen
+    const werBis = (x: Eintrag) => [text(x, "verantwortlich") ? esc(text(x, "verantwortlich")) : "", text(x, "umsetzen_bis") ? `${lbl("bis")}${datumDe(text(x, "umsetzen_bis"))}` : `${lbl("bis")}${ZELLE_LINIE}`].filter(Boolean).join("<br>");
+    const erledigt = (x: Eintrag) => (text(x, "umgesetzt_am") ? datumDe(text(x, "umgesetzt_am")) : lbl("offen").trim());
     const teile = Object.entries(GEFAEHRDUNGSFAKTOREN)
       .map(([faktor, titel]) => {
         const l = g.filter((x) => (text(x, "faktor") || "sonstiges") === faktor);
         if (!l.length) return "";
         return abschnitt(
           titel,
-          tabelle(GEFAEHRDUNG_KOPF, l.map((x) => [zelle(text(x, "beschreibung")), esc(RISIKO_STUFEN[text(x, "risiko")] ?? text(x, "risiko")), zellePunkte(text(x, "massnahme")), umsetzung(x)]), { breiten: GEFAEHRDUNG_BREITEN }),
+          tabelle(GEFAEHRDUNG_KOPF, l.map((x) => [zelle(text(x, "beschreibung")), esc(RISIKO_STUFEN[text(x, "risiko")] ?? text(x, "risiko")), zellePunkte(text(x, "massnahme")), werBis(x), erledigt(x)]), { breiten: GEFAEHRDUNG_BREITEN }),
+          FAKTOR_NR[faktor] ? { rand: `§ 5 Abs. 3 Nr. ${FAKTOR_NR[faktor]}` } : "",
         );
       })
       .join("");
+    // leeres Blatt: die sechs Gefährdungsfaktoren des § 5 Abs. 3 ArbSchG je mit einer kleinen Tabelle – so wird keine
+    // Kategorie übersehen (Vorprüfung 21.10.2026)
+    const leereFaktoren = Object.entries(GEFAEHRDUNGSFAKTOREN)
+      .filter(([faktor]) => FAKTOR_NR[faktor])
+      .map(([faktor, titel]) => abschnitt(titel, tabelle(GEFAEHRDUNG_KOPF, [], { breiten: GEFAEHRDUNG_BREITEN, mindestens: 2, hoch: true }), { rand: `§ 5 Abs. 3 Nr. ${FAKTOR_NR[faktor]}` }))
+      .join("");
+    const legende = `<p class="klein">Risiko – ${esc(RISIKO_SKALA)}</p>`;
     const musch = MUTTERSCHUTZ.find((m) => m.wert === text(d, "mutterschutz_ergebnis"));
     // Blatt zum Ausfüllen (keine Gefährdung erfasst): Auswahlen zum Ankreuzen statt vorgedruckter Startwerte
     const leer = !g.length;
@@ -275,15 +293,19 @@ export const gefaehrdungsbeurteilung: Vorlage = {
             ["Datum", datumDe(text(d, "datum"))],
           ]),
         ) +
-        // ohne Einträge: leere Tabelle zum Ausfüllen von Hand
-        (teile || abschnitt("Gefährdungen und Maßnahmen", tabelle(GEFAEHRDUNG_KOPF, [], { breiten: GEFAEHRDUNG_BREITEN, mindestens: 6, hoch: true }))) +
+        // ohne Einträge: je Gefährdungsfaktor eine leere Tabelle zum Ausfüllen von Hand
+        (teile || leereFaktoren) +
+        legende +
         (d.mutterschutz !== false
           ? abschnitt(
               "Mutterschutz (§ 10 MuSchG)",
               // ohne Ergebnis: die drei möglichen Ergebnisse zum Ankreuzen; Einzelheiten unter eigener Zwischenüberschrift
-              `<p>Ergebnis der anlassunabhängigen Beurteilung für schwangere oder stillende Frauen:</p>${musch ? `<p><strong>${esc(musch.text)}</strong></p>` : ankreuzen(MUTTERSCHUTZ.map((m) => m.text))}${details ? `<h3>${musch?.wert === "keine_massnahmen" ? "Beurteilte Gefährdungen" : "Gefährdungen und Schutzmaßnahmen"}</h3>${zeilen(details)}` : ""}`,
+              `<p>Ergebnis der anlassunabhängigen Beurteilung für schwangere oder stillende Frauen:</p>${musch ? `<p><strong>${esc(musch.text)}</strong></p>` : ankreuzen(MUTTERSCHUTZ.map((m) => m.text))}${details ? `<h3>${musch?.wert === "keine_massnahmen" ? "Beurteilte Gefährdungen" : "Gefährdungen und Schutzmaßnahmen"}</h3>${zeilen(details)}` : ""}` +
+                angaben([["Beschäftigte informiert am (§ 14 Abs. 2 MuSchG)", datumDe(text(d, "mutterschutz_informiert"))]]) +
+                `<p class="klein">${esc(MUSCH_FORTSCHREIBUNG)}</p>`,
             )
           : "") +
+        (ja(d, "jugendliche") ? abschnitt("Jugendliche (§ 28a JArbSchG)", `<p>${esc(JUGEND_SATZ)}</p>${text(d, "jugendliche_details") ? zeilen(text(d, "jugendliche_details")) : absatz("")}`) : "") +
         abschnitt(
           "Wirksamkeit und Fortschreibung",
           angaben([
@@ -371,7 +393,8 @@ export const unterweisung: Vorlage = {
     },
     {
       titel: "Teilnehmende",
-      hilfe: "Namen eintragen – im PDF unterschreibt jede Person daneben. Freie Zeilen kommen automatisch dazu.",
+      // Vorprüfung 21.10.2026 (T-13): ein nur eingetippter Name ist als Nachweis schwach
+      hilfe: "Namen eintragen – im ausgedruckten PDF unterschreibt jede Person eigenhändig daneben. Ein nur eingetippter Name ist als Nachweis schwach; elektronisch nur mit einer Signatur, die die Person sicher zuordnet (z. B. qualifizierte elektronische Signatur). Freie Zeilen kommen automatisch dazu.",
       felder: [{ id: "teilnehmer", art: "liste", ausMitarbeitern: true, label: "Teilnehmende", eintrag: "Person", titelFeld: "name", felder: [{ id: "name", art: "text", label: "Name", pflicht: true }] }],
     },
   ],

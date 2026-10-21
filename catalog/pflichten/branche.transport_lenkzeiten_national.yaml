@@ -1,7 +1,7 @@
 # R12 (Nutzertest Kurier #2): Lenk- und Ruhezeiten im Inland für Fahrzeuge über 2,8 bis 3,5 t
 schema_version: 1
 id: branche.transport_lenkzeiten_national
-version: 1
+version: 2
 katalog_nr: H.5
 titel:
   de: Lenk- und Ruhezeiten bei Transportern über 2,8 t
@@ -38,7 +38,8 @@ kosten: null
 sanktion:
   text:
     de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: hoch
+  schwere: mittel
+dringend_ohne_termin: true
 automatisierung: hinweis
 status_recht: in_kraft
 gueltig_ab: null
@@ -47,9 +48,13 @@ quellen:
 - titel: IHK München – Handzettel Kleinfahrzeuge (Stand 05/2026)
   url: https://www.ihk-muenchen.de/ihk/Verkehr/Verkehrsausschuss/Handzettel-Kleinfahrzeuge-Stand-22_05_2026.pdf
   abgerufen: '2026-10-21'
+- titel: Fahrpersonalverordnung
+  url: https://www.gesetze-im-internet.de/fpersv/
+  abgerufen: null
 fachlich_zu_pruefen:
 - 'Neu nach Nutzertest R12 (Kurier #2) laut IHK München (Handzettel Kleinfahrzeuge 05/2026) – genaue Fundstelle in der FPersV unsicher; Ausnahmen für Werkverkehr bestätigen'
 - § 21a ArbZG für Fahrer zwischen 2,8 und 3,5 t im Inlandsverkehr unsicher; Folgen fachlich ergänzen
+- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 pruefung:
   status: entwurf
   geprueft_von: null

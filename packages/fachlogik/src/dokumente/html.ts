@@ -235,9 +235,11 @@ export function anschriftMehrzeilig(b: Betrieb): string {
 }
 
 /** Vertragsparteien in zwei Spalten („zwischen … und …“). Ohne Name und Anschrift: Linien für beides (Anschrift zwei Zeilen). */
-export function parteien(a: { rolle: string; name: string; anschrift?: string; zusatz?: string }, b: { rolle: string; name: string; anschrift?: string; zusatz?: string }): string {
-  const block = (p: typeof a, wort: string) =>
-    `<div class="partei"><div class="wort">${esc(wort)}</div><div class="name">${p.name.trim() ? esc(p.name.trim()) : LINIE}</div>${p.anschrift?.trim() ? `<div class="adresse">${esc(p.anschrift.trim()).replace(/\n/g, "<br>")}</div>` : !p.name.trim() ? `<div class="adresse">${LINIE}${LINIE}</div>` : ""}${p.zusatz ? `<div class="zusatz">${esc(p.zusatz)}</div>` : ""}<div class="rolle">– ${esc(p.rolle)} –</div></div>`;
+/** `anschriftPflicht`: fehlt nur die Anschrift (Name steht da), trotzdem Linien – z. B. beschäftigte Person im NachwG-Nachweis. */
+type Partei = { rolle: string; name: string; anschrift?: string; zusatz?: string; anschriftPflicht?: boolean };
+export function parteien(a: Partei, b: Partei): string {
+  const block = (p: Partei, wort: string) =>
+    `<div class="partei"><div class="wort">${esc(wort)}</div><div class="name">${p.name.trim() ? esc(p.name.trim()) : LINIE}</div>${p.anschrift?.trim() ? `<div class="adresse">${esc(p.anschrift.trim()).replace(/\n/g, "<br>")}</div>` : !p.name.trim() || p.anschriftPflicht ? `<div class="adresse">${LINIE}${LINIE}</div>` : ""}${p.zusatz ? `<div class="zusatz">${esc(p.zusatz)}</div>` : ""}<div class="rolle">– ${esc(p.rolle)} –</div></div>`;
   return `<div class="parteien">${block(a, "zwischen")}${block(b, "und")}</div>`;
 }
 

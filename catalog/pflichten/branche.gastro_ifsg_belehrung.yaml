@@ -1,7 +1,7 @@
 # Katalog H.1 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft · R10: aufgeteilt in Bescheinigung vor Beginn (§ 43 Abs. 1, branche.gastro_ifsg_bescheinigung), Belehrung nach Aufnahme der Tätigkeit (§ 43 Abs. 4, diese Pflicht) und Folgebelehrung alle zwei Jahre (branche.gastro_ifsg_folgebelehrung)
 schema_version: 1
 id: branche.gastro_ifsg_belehrung
-version: 3
+version: 4
 katalog_nr: H.1
 titel:
   de: Belehrung nach § 43 IfSG durch den Arbeitgeber
@@ -53,7 +53,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Bußgeld bis 25.000 €, wenn die Belehrung nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig durchgeführt wird (§ 73 Abs. 1a Nr. 16b, Abs. 2 IfSG).
   schwere: hoch
 automatisierung: dokument_generator
 aktion:
@@ -70,9 +70,13 @@ quellen:
 - titel: Infektionsschutzgesetz § 43
   url: https://www.gesetze-im-internet.de/ifsg/__43.html
   abgerufen: null
+- titel: IfSG § 73
+  url: https://www.gesetze-im-internet.de/ifsg/__73.html
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
 - '„Nach Aufnahme der Tätigkeit“ als spätestens am ersten Arbeitstag umgesetzt (R10) – Frist fachlich bestätigen'
 - Höhe und Nummer der Bußgeldvorschrift in § 73 IfSG unsicher – Sanktion fachlich ergänzen
+- 'Vorprüfung 21.10.2026: Sanktion ergänzt – § 73 Abs. 1a Nr. 16b (§ 43 Abs. 4 Satz 1) und Abs. 2 gelesen'
 pruefung:
   status: entwurf
   geprueft_von: null

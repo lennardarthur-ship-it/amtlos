@@ -1,7 +1,7 @@
 # R12 (Rechtsprüfung Befund 6): Bewachungsgewerbe – Wachpersonen vor dem Einsatz anmelden
 schema_version: 1
 id: personal.bewacherregister
-version: 1
+version: 2
 katalog_nr: A.3
 titel:
   de: Wachpersonen im Bewacherregister anmelden
@@ -43,7 +43,8 @@ kosten: null
 sanktion:
   text:
     de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: hoch
+  schwere: mittel
+dringend_ohne_termin: true
 automatisierung: hinweis
 erledigung:
   art: bestaetigen
@@ -61,6 +62,7 @@ quellen:
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
 - Neu nach Rechtsprüfung R12 (Befund 6) – § 11b GewO und § 16 BewachV geprüft; Folgen bei Nichterfüllung fachlich ergänzen
+- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 pruefung:
   status: entwurf
   geprueft_von: null

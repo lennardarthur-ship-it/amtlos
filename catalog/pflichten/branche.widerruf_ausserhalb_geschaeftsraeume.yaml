@@ -1,7 +1,7 @@
 # R11 (Rechtsprüfung Befund 10): Widerrufsrecht bei Verträgen außerhalb von Geschäftsräumen – Handwerk und mobile Dienstleister
 schema_version: 1
 id: branche.widerruf_ausserhalb_geschaeftsraeume
-version: 1
+version: 2
 katalog_nr: G.68
 titel:
   de: Bei Aufträgen beim Kunden zu Hause über das Widerrufsrecht belehren
@@ -12,13 +12,13 @@ erklaerung:
   de: Verträge, die du mit Verbrauchern außerhalb deiner Geschäftsräume schließt – etwa in der Wohnung beim Aufmaß oder unterwegs –,
     können sie 14 Tage lang widerrufen (§ 312b, § 312g BGB). Darüber informierst du vor Vertragsschluss und gibst die Belehrung und
     eine Abschrift des Vertrags auf Papier oder, wenn der Kunde zustimmt, auf einem anderen dauerhaften Datenträger heraus. Fehlt die
-    Belehrung, läuft die Widerrufsfrist bis zu 12 Monate und 14 Tage (§ 356 Abs. 3 BGB). Widerruft der Kunde dann, schuldet er für
+    Belehrung, läuft die Widerrufsfrist bis zu 12 Monate und 14 Tage (§ 356 Abs. 3, 4 BGB). Widerruft der Kunde dann, schuldet er für
     bereits erbrachte Leistungen in der Regel keinen Wertersatz (§ 357a Abs. 2 BGB). Willst du vor Ablauf der Frist anfangen, lass dir
     das ausdrücklich vom Kunden verlangen und halte es fest.
 rechtsgrundlage:
 - § 312b BGB
 - § 312g BGB
-- § 356 Abs. 3 BGB
+- § 356 Abs. 3, 4 BGB
 - § 357a Abs. 2 BGB
 kategorie: branche
 branchen:
@@ -41,7 +41,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Ohne Belehrung kann der Kunde bis zu 12 Monate und 14 Tage widerrufen und muss für erbrachte Leistungen in der Regel keinen Wertersatz zahlen (§ 356 Abs. 3, § 357a Abs. 2 BGB).
+    de: Ohne Belehrung kann der Kunde bis zu 12 Monate und 14 Tage widerrufen und muss für erbrachte Leistungen in der Regel keinen Wertersatz zahlen (§ 356 Abs. 3, 4, § 357a Abs. 2 BGB).
   schwere: hoch
 automatisierung: hinweis
 status_recht: in_kraft
@@ -57,11 +57,15 @@ quellen:
 - titel: Bürgerliches Gesetzbuch § 357a
   url: https://www.gesetze-im-internet.de/bgb/__357a.html
   abgerufen: null
+- titel: § 356 BGB in der Fassung ab 19.6.2026 (buzer.de)
+  url: https://www.buzer.de/356_BGB.htm
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
 - 'Neu nach Rechtsprüfung R11 (Befund 10) – Muster-Widerrufsbelehrung und Muster-Widerrufsformular für Verträge außerhalb von Geschäftsräumen erst nach Prüfung'
 - 'Ausnahmen als Hinweis ergänzen: dringende Reparaturen auf Wunsch des Kunden (§ 312g Abs. 2 Nr. 11 BGB), kleine sofort erbrachte und bezahlte Leistungen (§ 312 Abs. 2 Nr. 12 BGB) – bestätigen'
 - 'Form der Abschrift und Belehrung (Papier bzw. dauerhafter Datenträger, Art. 246a § 4 Abs. 2 EGBGB) bestätigen'
 - 'Auslöser über die Frage „Schließt du Verträge mit Privatkunden bei ihnen zu Hause oder unterwegs ab?“'
+- 'Vorprüfung 21.10.2026: Fundstelle der Höchstfrist (zwölf Monate und 14 Tage) seit 19.6.2026 in § 356 Abs. 4 Satz 1 BGB (BGBl. 2026 I Nr. 28, buzer.de) – Zitat auf „Abs. 3, 4“ angepasst (3 Stellen)'
 pruefung:
   status: entwurf
   geprueft_von: null

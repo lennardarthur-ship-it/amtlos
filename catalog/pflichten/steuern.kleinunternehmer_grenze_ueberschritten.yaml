@@ -1,15 +1,14 @@
 # Katalog C.23 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.kleinunternehmer_grenze_ueberschritten
-version: 2
+version: 3
 katalog_nr: C.23
 titel:
   de: 'Kleinunternehmergrenze überschritten: Umsatzsteuer prüfen'
 kurz:
-  de: Nach deinen Angaben liegt dein Umsatz über einer Kleinunternehmergrenze. Dann musst du Umsatzsteuer berechnen.
+  de: Nach deinen Angaben liegt dein Umsatz über einer Kleinunternehmergrenze. Für Umsätze über der Grenze sieht § 19 UStG Umsatzsteuer vor – ab wann genau, klären Finanzamt oder Steuerberatung.
 erklaerung:
-  de: Die Kleinunternehmerregelung endet ab dem Umsatz, der die Grenze überschreitet. Prüfe mit dem Finanzamt oder deiner
-    Steuerberatung, ab wann du Umsatzsteuer ausweisen und anmelden musst.
+  de: Die Kleinunternehmerregelung endet ab dem Umsatz, der die Grenze überschreitet. Ab wann du Umsatzsteuer ausweist und anmeldest, klären Finanzamt oder Steuerberatung mit dir.
 rechtsgrundlage:
 - § 19 UStG
 kategorie: steuern
@@ -68,7 +67,7 @@ ausloeser:
         wert:
           regelwert: steuern.ustg19.grenze_gruendungsjahr
         label:
-          de: Nach deinen Rechnungen in Amtlos liegt dein Umsatz im Gründungsjahr über der Grenze.
+          de: Deine Rechnungen in Amtlos summieren sich im Gründungsjahr auf mehr als 25.000 €; die Grenze im Gründungsjahr liegt bei 25.000 €.
     - all:
       - feld: abgeleitet.ist_gruendungsjahr
         op: ==
@@ -79,7 +78,7 @@ ausloeser:
         wert:
           regelwert: steuern.ustg19.grenze_laufendes_jahr
         label:
-          de: Nach deinen Rechnungen in Amtlos liegt dein Umsatz in diesem Jahr über der Grenze.
+          de: Deine Rechnungen in Amtlos summieren sich in diesem Jahr auf mehr als 100.000 €; die Grenze liegt bei 100.000 €.
 frist:
   typ: dauerhaft
 wiederholung:
@@ -108,6 +107,7 @@ fachlich_zu_pruefen:
 - Vor dem Start gibt es keinen Vorjahresumsatz – Vorjahresgrenze dann nicht geprüft
 - 'Prognose statt tatsächlicher Umsatz: bis Abschnitt 4 nur Profilangaben – Formulierung „nach deinen Angaben“ bestätigen'
 - Grenze inklusive/exklusive (K-18)
+- 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
   status: entwurf
   geprueft_von: null

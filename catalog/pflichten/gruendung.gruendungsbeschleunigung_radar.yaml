@@ -2,12 +2,12 @@
 # Rechtsstand 21.10.2026: Eckpunkte der Länder (März 2026), Gesetzentwurf des Bundes noch nicht bekannt
 schema_version: 1
 id: gruendung.gruendungsbeschleunigung_radar
-version: 2
+version: 3
 katalog_nr: A.0
 titel:
   de: Gründung in 24 Stunden (Gründungsbeschleunigungsgesetz, geplant)
 kurz:
-  de: Geplant ist, Gründungen digital und deutlich schneller zu ermöglichen.
+  de: 'Keine Pflicht, sondern ein Blick voraus: Geplant ist, Gründungen digital und deutlich schneller zu ermöglichen.'
 erklaerung:
   de: 'Bund und Länder haben am 4.12.2025 vereinbart, dass ein Gesetzentwurf für eine Gründung binnen 24 Stunden bis 31.12.2026 beschlossen werden soll. Berlin, Nordrhein-Westfalen und Bayern haben im März 2026 Eckpunkte für ein Gründungsbeschleunigungsgesetz vorgelegt; die Rechtsgrundlagen muss der Bund schaffen. Stand: Oktober 2026 – noch offen: Ein Gesetzentwurf des Bundes ist nicht bekannt. Amtlos passt den Gründungsassistenten an, sobald es konkret wird.'
 rechtsgrundlage:
@@ -39,6 +39,7 @@ sanktion:
     de: Keine – geplante Erleichterung.
   schwere: niedrig
 automatisierung: hinweis
+einordnung: hinweis
 status_recht: geplant
 radar:
   wahrscheinlichkeit: niedrig
@@ -59,6 +60,7 @@ fachlich_zu_pruefen:
 - 'Rechtsstand 21.10.2026: nur Eckpunkte der Länder und Zusage „Beschluss des Gesetzentwurfs bis 31.12.2026“, kein Bundesentwurf gefunden – vor Launch erneut prüfen'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „niedrig“)
+- 'Vorprüfung 21.10.2026 (A.0): bleibt Radar (status_recht geplant, radar), ausdrücklich als Hinweis eingeordnet – keine Pflicht, solange kein Gesetzentwurf vorliegt'
 pruefung:
   status: entwurf
   geprueft_von: null

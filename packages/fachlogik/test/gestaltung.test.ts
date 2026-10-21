@@ -123,7 +123,7 @@ describe("Gestaltung der Dokumente (E-130)", () => {
     expect(nw).toContain('<div class="adresse">Mondstraße 12<br>50667 Köln</div>');
     // Gefährdungsbeurteilung: Umsetzung beschriftet
     const gb = v("gefaehrdungsbeurteilung", { gefaehrdungen: [{ beschreibung: "Rutschgefahr", massnahme: "Matten", verantwortlich: "Lea", umsetzen_bis: "2026-11-01", faktor: "arbeitsstaette" }] });
-    expect(gb).toContain('<span class="lbl">Wer:</span> Lea<br><span class="lbl">Frist:</span> 01.11.2026<br><span class="lbl">offen</span>');
+    expect(gb).toContain('<td>Lea<br><span class="lbl">bis</span> 01.11.2026</td><td><span class="lbl">offen</span></td>');
   });
 
   it("typografische Durchsicht (Runde 8): CSS – Feldnummern, Randangaben, Erklärtext, Lohnkonto, Aushang, Inhaltsübersicht", () => {

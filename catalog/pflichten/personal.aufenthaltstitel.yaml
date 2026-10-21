@@ -1,7 +1,7 @@
 # R11 (Nutzertest Gebäudereinigung Befund 5): Prüf- und Aufbewahrungspflicht nach § 4a Abs. 5 AufenthG
 schema_version: 1
 id: personal.aufenthaltstitel
-version: 1
+version: 2
 katalog_nr: D.38
 titel:
   de: Aufenthaltstitel prüfen und Kopie aufbewahren
@@ -45,7 +45,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Wer jemanden ohne die erforderliche Erlaubnis beschäftigt, riskiert ein Bußgeld bis 500.000 € (§ 404 Abs. 2 Nr. 3, Abs. 3 SGB III).
   schwere: hoch
 automatisierung: hinweis
 status_recht: in_kraft
@@ -55,10 +55,17 @@ quellen:
 - titel: Aufenthaltsgesetz § 4a
   url: https://www.gesetze-im-internet.de/aufenthg_2004/__4a.html
   abgerufen: null
+- titel: SGB III § 404
+  url: https://www.gesetze-im-internet.de/sgb_3/__404.html
+  abgerufen: null
+- titel: § 404 SGB III, Wortlaut (lxgesetze.de)
+  url: https://lxgesetze.de/sgb-iii/404
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
 - 'Neu nach Nutzertest R11 (Gebäudereinigung): Prüfung vor Beginn und Kopie für die Dauer der Beschäftigung (§ 4a Abs. 5 S. 3 AufenthG) – Wortlaut bestätigen'
 - 'Erinnerung zum Ablauf des Titels (Feld „gültig bis“ bei Mitarbeitern) noch nicht abgebildet'
 - 'Folgen bei Nichterfüllung (§ 404 SGB III) – Sanktion fachlich ergänzen'
+- 'Vorprüfung 21.10.2026: Sanktion ergänzt – § 404 Abs. 2 Nr. 3 (Beschäftigung entgegen § 4a Abs. 5 AufenthG) und Abs. 3 über lxgesetze gelesen'
 pruefung:
   status: entwurf
   geprueft_von: null

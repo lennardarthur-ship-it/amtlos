@@ -1,7 +1,7 @@
 # Katalog F.63 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.cookie_einwilligung
-version: 2
+version: 3
 katalog_nr: F.63
 titel:
   de: Einwilligung für Cookies und Tracking einholen
@@ -31,7 +31,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Bußgeld bis 300.000 € (§ 28 Abs. 1 Nr. 13, Abs. 2 TDDDG).
   schwere: hoch
 automatisierung: hinweis
 status_recht: in_kraft
@@ -41,10 +41,16 @@ quellen:
 - titel: Telekommunikation-Digitale-Dienste-Datenschutz-Gesetz § 25
   url: https://www.gesetze-im-internet.de/ttdsg/__25.html
   abgerufen: null
+- titel: TDDDG § 28 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/ttdsg/__28.html
+  abgerufen: null
+- titel: § 28 TDDDG, Wortlaut (gesetze.legal)
+  url: https://gesetze.legal/bund/tdddg/28
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - URL des Gesetzes nach Umbenennung (TTDSG → TDDDG) prüfen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 21.10.2026: Sanktion ergänzt – § 28 Abs. 1 Nr. 13 (Speichern/Zugreifen entgegen § 25 Abs. 1 Satz 1) und Abs. 2 über gesetze.legal gelesen'
 pruefung:
   status: entwurf
   geprueft_von: null

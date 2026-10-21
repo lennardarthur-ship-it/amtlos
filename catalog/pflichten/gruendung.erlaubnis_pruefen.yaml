@@ -1,18 +1,17 @@
 # Katalog A.3 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gruendung.erlaubnis_pruefen
-version: 3
+version: 4
 katalog_nr: A.3
 titel:
   de: Erlaubnis für dein Gewerbe einholen
 kurz:
-  de: Für manche Gewerbe brauchst du eine Erlaubnis, bevor du anfängst – zum Beispiel als Makler, im Bewachungsgewerbe oder
-    für den Ausschank von Alkohol.
+  de: Für manche Gewerbe ist eine Erlaubnis vorgesehen, bevor du anfängst – zum Beispiel für Makler, das Bewachungsgewerbe oder den Ausschank von Alkohol. Ob sie für dich gilt, klärt das Gewerbeamt.
 erklaerung:
   de: Erlaubnispflichtig sind unter anderem Makler, Bewachung, Versicherungs- und Finanzanlagenvermittlung (§§ 30–34i GewO). Für
     Gaststätten kommt es auf das Land an – nach dem Gaststättengesetz des Bundes braucht nur der Ausschank alkoholischer Getränke
     eine Erlaubnis (§ 2 GastG), manche Länder verlangen statt einer Erlaubnis nur eine Anzeige. Für einzelne Feste gibt es eine
-    vorübergehende Gestattung (§ 12 GastG). Frag beim Gewerbeamt nach, was in deinem Land gilt. Die Erlaubnis muss vor Aufnahme
+    vorübergehende Gestattung (§ 12 GastG). Was in deinem Land gilt, klärt das Gewerbeamt. Die Erlaubnis muss vor Aufnahme
     der Tätigkeit vorliegen. Die Reisegewerbekarte ist eine eigene Pflicht.
 rechtsgrundlage:
 - §§ 30–34i GewO
@@ -75,7 +74,8 @@ kosten: null
 sanktion:
   text:
     de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: hoch
+  schwere: mittel
+dringend_ohne_termin: true
 automatisierung: hinweis
 status_recht: in_kraft
 gueltig_ab: null
@@ -88,6 +88,8 @@ fachlich_zu_pruefen:
 - 'Gaststättenrecht je Land: Erlaubnis oder nur Anzeige (Rechtsprüfung R11: mehrere Länder nur Anzeige, Sachsen vermutlich anzeigepflichtig; Gründerin: gilt in BW das Bundes-GastG?) – Text länderneutral, je Land prüfen'
 - 'Erlaubnis nur bei Alkoholausschank (§ 2 GastG, alkoholfreie Getränke nach § 2 Abs. 2 Nr. 1 erlaubnisfrei) – bestätigen'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
+- 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
   status: entwurf
   geprueft_von: null

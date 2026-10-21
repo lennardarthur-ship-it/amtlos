@@ -1,7 +1,7 @@
 # Katalog D.43 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.schwangerschaft_mitteilung
-version: 1
+version: 2
 katalog_nr: D.43
 titel:
   de: Schwangerschaft der Aufsichtsbehörde mitteilen
@@ -35,7 +35,7 @@ kanal: post
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Bußgeld bis 5.000 € (§ 32 Abs. 1 Nr. 11, Abs. 2 MuSchG).
   schwere: hoch
 automatisierung: hinweis
 status_recht: in_kraft
@@ -45,11 +45,17 @@ quellen:
 - titel: Mutterschutzgesetz § 27
   url: https://www.gesetze-im-internet.de/muschg_2018/__27.html
   abgerufen: null
+- titel: MuSchG § 32
+  url: https://www.gesetze-im-internet.de/muschg_2018/__32.html
+  abgerufen: null
+- titel: § 32 MuSchG, Wortlaut (gesetze.legal)
+  url: https://gesetze.legal/bund/muschg/32
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
 - Frist („unverzüglich“) steht nicht in der Spezifikation – als am Tag der Mitteilung eingetragen, fachlich ersetzen
 - Zuständige Behörde je Land
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- 'Vorprüfung 21.10.2026: Sanktion ergänzt – § 32 Abs. 1 Nr. 11 (§ 27 Abs. 1 Satz 1) und Abs. 2 über gesetze.legal gelesen'
 pruefung:
   status: entwurf
   geprueft_von: null

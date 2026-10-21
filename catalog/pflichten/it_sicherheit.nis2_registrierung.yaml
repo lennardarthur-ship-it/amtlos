@@ -2,7 +2,7 @@
 # Rechtsstand 21.10.2026: NIS2UmsuCG seit 6.12.2025 in Kraft, Registrierung nach § 33 BSIG
 schema_version: 1
 id: it_sicherheit.nis2_registrierung
-version: 2
+version: 3
 katalog_nr: F.64
 titel:
   de: Beim BSI registrieren (NIS2)
@@ -14,11 +14,27 @@ rechtsgrundlage:
 - § 33 BSIG
 kategorie: it_sicherheit
 ausloeser:
-  feld: profil.nis2.betroffen
-  op: ==
-  wert: ja
-  label:
-    de: Dein Unternehmen fällt unter NIS2.
+  all:
+  - feld: profil.nis2.betroffen
+    op: ==
+    wert: ja
+    label:
+      de: Dein Unternehmen fällt unter NIS2.
+  # Vorprüfung 21.10.2026 (T-105): für Kleinstbetriebe ausgeblendet – wie die automatische Antwort „nein“ der App, IT-Branche ausgenommen
+  - any:
+    - feld: profil.beschaeftigte.gesamt
+      op: nicht_vorhanden
+    - feld: profil.beschaeftigte.gesamt
+      op: '>='
+      wert: 10
+    - all:
+      - feld: profil.taetigkeit.branchen
+        op: vorhanden
+      - feld: profil.taetigkeit.branchen
+        op: enthaelt
+        wert: it_agentur_freelancer
+    label:
+      de: Dein Betrieb ist kein Kleinstbetrieb außerhalb der IT-Branche.
 frist:
   typ: absolut
   datum: '2026-07-31'
@@ -33,7 +49,7 @@ kanal: portal
 kosten: null
 sanktion:
   text:
-    de: Bußgelder bis 10 Mio. € bzw. 2 % des Umsatzes sind möglich.
+    de: Bußgeld bis 500.000 €, wenn die Registrierung fehlt, falsch oder verspätet ist (§ 65 Abs. 2 Nr. 6, Abs. 5 Satz 1 Nr. 5 BSIG).
   schwere: hoch
 automatisierung: hinweis
 status_recht: in_kraft
@@ -49,10 +65,16 @@ quellen:
 - titel: LocateRisk – BSI-Nachfrist für die NIS2-Registrierung bis 31.7.2026
   url: https://locaterisk.com/en/?p=8642
   abgerufen: '2026-10-21'
+- titel: BSI-Gesetz § 65 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/bsig_2025/__65.html
+  abgerufen: null
+- titel: § 65 BSIG, Wortlaut (gesetze.legal)
+  url: https://gesetze.legal/bund/bsig/65
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
 - 'Rechtsstand 21.10.2026: § 33 BSIG (drei Monate nach Betroffenheit), gesetzliche Frist für Bestandsunternehmen 6.3.2026, BSI-Kulanz bis 31.7.2026 (Quelle Dienstleister-Blog, BSI-Mitteilung nicht direkt gefunden) – bestätigen'
 - 'Frist bleibt als festes Datum 31.7.2026 – für später betroffene Unternehmen gilt „drei Monate ab Betroffenheit“; dafür fehlt ein Ereignis (z. B. „NIS2 betroffen seit“)'
-- 'Bußgeldrahmen 10 Mio. €/2 % gilt für besonders wichtige Einrichtungen; für wichtige Einrichtungen niedriger – nach der Bußgeldvorschrift des BSIG differenzieren'
+- 'Vorprüfung 21.10.2026 (F.64): Registrierung nach § 33 BSIG ist nach § 65 Abs. 2 Nr. 6, Abs. 5 Satz 1 Nr. 5 mit bis 500.000 € bedroht – der Rahmen 10 Mio. €/2 % gilt hier nicht; für Kleinstbetriebe (unter 10 Beschäftigte, nicht IT) ausgeblendet (T-105) – Umsatz- und Bilanzschwelle nicht abgebildet'
 pruefung:
   status: entwurf
   geprueft_von: null

@@ -1,7 +1,7 @@
 # Katalog G.68 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.kuendigungsbutton
-version: 2
+version: 3
 katalog_nr: G.68
 titel:
   de: Kündigungsbutton bei Abos
@@ -37,7 +37,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Fehlen Kündigungsbutton oder Bestätigungsseite, können Verbraucher jederzeit und ohne Kündigungsfrist kündigen (§ 312k Abs. 6 BGB).
   schwere: hoch
 automatisierung: hinweis
 aktion:
@@ -53,7 +53,7 @@ quellen:
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Vorgeschriebene Beschriftung und Ablauf (Bestätigungsseite) fachlich ergänzen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 21.10.2026: Sanktion ergänzt – § 312k Abs. 6 BGB gelesen'
 pruefung:
   status: entwurf
   geprueft_von: null

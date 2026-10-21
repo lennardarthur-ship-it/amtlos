@@ -1,7 +1,7 @@
 # Katalog D.40 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.sv_beitraege
-version: 1
+version: 2
 katalog_nr: D.40
 titel:
   de: Sozialversicherungsbeiträge zahlen
@@ -36,7 +36,7 @@ kanal: partner
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Für verspätet gezahlte Beiträge fällt je angefangenen Monat ein Säumniszuschlag von 1 % des rückständigen Betrags an (§ 24 Abs. 1 SGB IV); wer Beiträge vorenthält, macht sich strafbar (§ 266a StGB).
   schwere: hoch
 automatisierung: partner
 status_recht: in_kraft
@@ -46,10 +46,16 @@ quellen:
 - titel: Sozialgesetzbuch IV § 23
   url: https://www.gesetze-im-internet.de/sgb_4/__23.html
   abgerufen: null
+- titel: SGB IV § 24
+  url: https://www.gesetze-im-internet.de/sgb_4/__24.html
+  abgerufen: '2026-10-21'
+- titel: StGB § 266a
+  url: https://www.gesetze-im-internet.de/stgb/__266a.html
+  abgerufen: null
 fachlich_zu_pruefen:
 - 'Minijobs: Fälligkeit bei der Minijob-Zentrale gleich?'
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- 'Vorprüfung 21.10.2026: Sanktion ergänzt – § 24 Abs. 1 SGB IV gelesen; § 266a StGB nicht abgerufen (wie in personal.statusfeststellung_auftraggeber)'
 pruefung:
   status: entwurf
   geprueft_von: null

@@ -1,15 +1,14 @@
 # Katalog G.69 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.vsbg_hinweis
-version: 2
+version: 3
 katalog_nr: G.69
 titel:
   de: Hinweis zur Verbraucherstreitbeilegung
 kurz:
   de: Mit mehr als 10 Beschäftigten informierst du auf Website und in AGB, ob du an Streitbeilegungsverfahren teilnimmst.
 erklaerung:
-  de: Die Hinweispflicht nach § 36 VSBG gilt für Unternehmer mit mehr als 10 Beschäftigten, die eine Website unterhalten oder
-    AGB verwenden.
+  de: Die Hinweispflicht nach § 36 VSBG gilt für Unternehmer, die eine Website unterhalten oder AGB verwenden. Ausgenommen ist, wer am 31. Dezember des Vorjahres zehn oder weniger Personen beschäftigt hat (§ 36 Abs. 3 VSBG) – gezählt werden Personen, nicht Vollzeitstellen.
 rechtsgrundlage:
 - § 36 VSBG
 kategorie: online
@@ -52,11 +51,15 @@ quellen:
 - titel: Verbraucherstreitbeilegungsgesetz § 36
   url: https://www.gesetze-im-internet.de/vsbg/__36.html
   abgerufen: null
+- titel: § 36 VSBG, Wortlaut (lxgesetze.de)
+  url: https://lxgesetze.de/vsbg/36
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Zählweise (G-05)
 - Auslöser „Website oder AGB“ – AGB sind nicht im Profil
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 21.10.2026 (G-05): § 36 Abs. 3 VSBG gelesen (Stichtag 31.12. des Vorjahres, zehn oder weniger Personen) – Stichtag ist im Auslöser nicht abgebildet'
 pruefung:
   status: entwurf
   geprueft_von: null

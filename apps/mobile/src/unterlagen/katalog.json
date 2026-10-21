@@ -170,6 +170,10 @@
    {
     "titel": "Infektionsschutzgesetz § 43",
     "url": "https://www.gesetze-im-internet.de/ifsg/__43.html"
+   },
+   {
+    "titel": "IfSG § 73",
+    "url": "https://www.gesetze-im-internet.de/ifsg/__73.html"
    }
   ],
   "geprueft": false
@@ -327,6 +331,14 @@
    {
     "titel": "Geldwäschegesetz",
     "url": "https://www.gesetze-im-internet.de/gwg_2017/"
+   },
+   {
+    "titel": "Geldwäschegesetz § 56 (Bußgeldvorschriften)",
+    "url": "https://www.gesetze-im-internet.de/gwg_2017/__56.html"
+   },
+   {
+    "titel": "§ 56 GwG, Wortlaut (gesetze.legal, Spiegel des Bundesrechts)",
+    "url": "https://gesetze.legal/bund/gwg/56"
    }
   ],
   "geprueft": false
@@ -349,8 +361,8 @@
  },
  {
   "id": "ki.kompetenz",
-  "titel": "KI-Kompetenz der Beschäftigten sicherstellen",
-  "kurz": "Wer im Unternehmen mit KI arbeitet, sollte ausreichende KI-Kompetenz haben – fördere sie durch Schulung und halte das fest.",
+  "titel": "KI-Kompetenz der Beschäftigten fördern",
+  "kurz": "Wer KI-Systeme einsetzt, ergreift Maßnahmen, um die KI-Kompetenz der Beschäftigten zu fördern – zum Beispiel mit einer kurzen Schulung.",
   "rechtsgrundlage": [
    "Art. 4 KI-VO"
   ],
@@ -366,6 +378,14 @@
    {
     "titel": "Otto Schmidt – Wann gilt die KI-VO infolge der Änderungen durch die Digital-Omnibus-VO zur KI? (14.8.2026)",
     "url": "https://www.otto-schmidt.de/news//wann-gilt-die-ki-vo-infolge-der-anderungen-durch-die-digital-omnibus-vo-zur-ki-2026-08-14.html"
+   },
+   {
+    "titel": "Verordnung (EU) 2026/1744 (Digital-Omnibus zur KI)",
+    "url": "https://eur-lex.europa.eu/eli/reg/2026/1744/oj"
+   },
+   {
+    "titel": "IHK Lüneburg-Wolfsburg – Digital-Omnibus-Verordnung zur KI in Kraft getreten",
+    "url": "https://www.ihk.de/ihklw/produkte/beratung-und-service/ecommerce-und-internet/digital-omnibus-verordnung-zur-ki-tritt-in-kraft-7142858"
    }
   ],
   "geprueft": false
@@ -381,6 +401,10 @@
    {
     "titel": "DSGVO Art. 13",
     "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679"
+   },
+   {
+    "titel": "Art. 83 DSGVO, Wortlaut (gdpr-text.com)",
+    "url": "https://gdpr-text.com/es/read/article-83"
    }
   ],
   "geprueft": false
@@ -509,6 +533,10 @@
    {
     "titel": "Nachweisgesetz",
     "url": "https://www.gesetze-im-internet.de/nachwg/"
+   },
+   {
+    "titel": "Nachweisgesetz § 2",
+    "url": "https://www.gesetze-im-internet.de/nachwg/BJNR094610995.html"
    }
   ],
   "geprueft": false
@@ -580,7 +608,7 @@
  {
   "id": "steuern.buchfuehrungspflicht",
   "titel": "Doppelte Buchführung",
-  "kurz": "Du musst Bücher nach den Regeln der doppelten Buchführung führen und einen Jahresabschluss machen.",
+  "kurz": "Nach deinen Angaben kommt die doppelte Buchführung mit Jahresabschluss in Frage – für Kapitalgesellschaften immer, für andere je nach Rechtsform und Größe.",
   "rechtsgrundlage": [
    "§§ 238, 241a HGB",
    "§ 141 AO"

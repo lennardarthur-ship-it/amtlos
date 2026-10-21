@@ -21,7 +21,7 @@ Die Daten bleiben auf dem Gerät. Betriebsklar sieht keine Nutzerdaten.
 | `rdg-aenderungen.md` | Formulierungen, die für das RDG schon vorsichtiger gefasst wurden (alt → neu) |
 | `nutzungsbedingungen-entwurf.md` | Entwurf der Nutzungsbedingungen (aus `docs/`) |
 | `datenschutzhinweis-app.md` | Datenschutzhinweis der App, wie er in der App steht |
-| `website-datenschutz.html`, `website-impressum.html`, `website-hilfe.html` | Datenschutzerklärung, Impressum und Hilfe-Seite der Website, wie sie veröffentlicht würden (Abschnitt Hosting folgt nach Wahl des Hosters) |
+| `website-datenschutz.html`, `website-impressum.html`, `website-hilfe.html`, `website-nutzungsbedingungen.html` | Datenschutzerklärung, Impressum, Hilfe-Seite und Nutzungsbedingungen der Website, wie sie veröffentlicht würden (Abschnitt Hosting folgt nach Wahl des Hosters; Nutzungsbedingungen als „Entwurf – noch nicht in Kraft“) |
 | `PRUEFLISTE-auszug.md` | Offene fachliche Fragen aus der Entwicklung, nach Rechtsgebiet |
 
 `node docs/pruefmappe-anwalt/erzeugen.mjs <ziel>` erzeugt die Mappe neu aus dem aktuellen Code.
@@ -73,6 +73,31 @@ Alle übrigen Vorlagen (Unterweisung, Betriebsanweisung, Hygieneplan, HACCP, All
 
 10. Sind die Vorlagen als „Muster“ ausreichend gekennzeichnet? Welche Vorlagen dürfen nur mit anwaltlicher Anpassung verwendet werden?
 11. Sind Rechtsgrundlagen und Fristen in den Vorlagen richtig zitiert (Stand Oktober 2026)?
+
+## Stand nach Vorprüfung vom 21.10.2026
+
+Eine Vorprüfung (`docs/pruefberichte/2026-10-21-vorpruefung-phase-1.pdf`) hat die Abschnitte 8 und 9 vorbereitet. Sie ist **keine unterschriebene anwaltliche Stellungnahme**; ihre Vorschläge sind als Entwurf umgesetzt und warten auf Ihre Freigabe. Geändert wurde:
+
+**Datenschutzhinweis der App und Datenschutzerklärung der Website** (Frage 8)
+
+- Verantwortlicher aus den Anbieterangaben: Lang Ventures UG (haftungsbeschränkt), Gomaringer Str. 33, 72770 Reutlingen, vertreten durch Lennard Lang (Geschäftsführer) – in der App, auf der Website und im Impressum (dort zusätzlich die Rechtsform; Register und USt-IdNr. folgen nach der Eintragung).
+- Drittland: „Standardvertragsklauseln der EU-Kommission (Durchführungsbeschluss (EU) 2021/914, Modul 2), Art. 46 Abs. 2 lit. c DSGVO“ mit Fundstelle im Amtsblatt und der Adresse des Auftragsverarbeitungsvertrags von RevenueCat. Das Data Privacy Framework ist **nicht** genannt: Am 21.10.2026 ließ sich eine Teilnahme von RevenueCat nicht belegen (DPA und Datenschutzerklärung von RevenueCat erwähnen es nicht).
+- Speicherdauer bei RevenueCat: nur, was stimmt – für die Dauer unseres Vertrags, Löschung einzelner Kennungen auf unsere Anforderung, nach Vertragsende Löschung oder Rückgabe. Eine feste Frist nach Abo-Ende ist eine offene Produktentscheidung.
+- „Deine Rechte“ nennt die zuständige Aufsichtsbehörde (Sitz Reutlingen → Der Landesbeauftragte für den Datenschutz und die Informationsfreiheit Baden-Württemberg).
+- Erinnerungen: ausdrücklich nur lokal, keine Push-Mitteilungen über einen Server.
+- Sync-Zusatz (noch nicht ausgeliefert): Platzhalter für die Aufbewahrung der Server-Backups; ein AVV für die Synchronisation ist als Aufgabe vor dem Sync-Build vorgesehen (Frage 9).
+- Website „Diese Website“: Der Kurz-Check rechnet nur im Browser (keine Übertragung, keine Speicherung), Schriften liegen auf dem eigenen Server, Hosting folgt nach Wahl des Hosters.
+
+**Nutzungsbedingungen** (Frage 5) – jetzt „Fassung zur Freigabe“, weiter unveröffentlicht
+
+- Ziffer 1.1 mit Anbieterangaben, neue Ziffer 1.4 zur Einbeziehung (§ 305 Abs. 2 BGB), 2.3 ergänzt, 3.1 Familienfreigabe, neue 3.5 Nutzerpflichten, 4.3 neu gefasst (Widerruf über Apple), neue 5.4 („Wir werten keine Inhalte deiner Unterlagen aus.“), 6.2/6.3 Änderungsgründe, Information und Beendigungsrecht (§ 327r BGB), 7.2 Verjährung gegenüber Unternehmern, 8.3 als „insbesondere“-Beispiel, 10.2 Gerichtsstand Reutlingen, 10.4 VSBG-Satz, 11.2 Rechte Dritter, neue Ziffer 12 Dienste Dritter (RevenueCat, iCloud).
+- **Offen zur Entscheidung:** Haftungshöchstbetrag gegenüber Unternehmern bei leichter Fahrlässigkeit – Festbetrag (z. B. 5.000 €) ja/nein. Bis dahin gilt nur die Grenze „vertragstypischer, vorhersehbarer Schaden“ aus 8.2.
+- Die Bedingungen sind als Seite `nutzungsbedingungen.html` gebaut (als Entwurf gekennzeichnet, nicht verlinkt, noindex).
+
+**Zustimmung in der App** – vorbereitet, aber ausgeschaltet
+
+- Beim ersten Start und nach jeder neuen Fassung: Hinweis mit Link zu den Bedingungen und zum Datenschutzhinweis, ein anfangs leeres Kästchen „Ich akzeptiere die Nutzungsbedingungen.“ und „Weiter“. Kein Konto; gespeichert werden nur Fassung und Zeitpunkt auf dem Gerät. Bestehende Daten bleiben unverändert.
+- Aktiv erst, wenn Sie die Bedingungen freigeben (`NUTZUNGSBEDINGUNGEN.freigegeben`). Bis dahin gilt in der App Apples Standard-Lizenzvertrag.
 
 ## Was wir nach der Prüfung ändern
 

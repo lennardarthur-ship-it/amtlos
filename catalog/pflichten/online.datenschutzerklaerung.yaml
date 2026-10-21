@@ -1,7 +1,7 @@
 # Katalog G.66 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.datenschutzerklaerung
-version: 3
+version: 4
 katalog_nr: G.66
 titel:
   de: Datenschutzerklärung auf der Website
@@ -39,7 +39,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Bußgeld bis 20 Mio. € oder bis 4 % des weltweiten Jahresumsatzes, je nachdem, welcher Betrag höher ist (Art. 83 Abs. 5 Buchst. b DSGVO).
   schwere: hoch
 automatisierung: hinweis
 aktion:
@@ -56,11 +56,14 @@ quellen:
 - titel: DSGVO Art. 13
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679
   abgerufen: null
+- titel: Art. 83 DSGVO, Wortlaut (gdpr-text.com)
+  url: https://gdpr-text.com/es/read/article-83
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Vorlage erst nach fachlicher Prüfung (6.4)
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- 'Vorprüfung 21.10.2026: Sanktion ergänzt – Art. 83 Abs. 5 Buchst. b (Betroffenenrechte Art. 13); Wortlaut über gdpr-text.com gelesen'
 pruefung:
   status: entwurf
   geprueft_von: null

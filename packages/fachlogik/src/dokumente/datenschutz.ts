@@ -3,9 +3,9 @@
  * (E-121, E-123). Vorschläge aus Muster-Verzeichnissen der Aufsichtsbehörden, DSK und BSI (bausteine.ts).
  */
 import { AUFSICHT, DSE, PANNEN_ARTEN, PANNEN_SOFORT, TOM, VVT } from "./bausteine.js";
-import { LINIE_MITTEL, abschnitt, abschnitte, absatz, angaben, ankreuzen, anschrift, auswahl, datumDe, dokument, eintrag, esc, ja, liste, nachsatz, roh, tabelle, text, unterschriften, zelle, zeilen } from "./html.js";
+import { LINIE_MITTEL, abschnitt, abschnitte, absatz, angaben, ankreuzen, anschrift, auswahl, datumDe, dokument, eintrag, esc, ja, liste, nachsatz, roh, tabelle, text, unterschriften, zelle, zeilen, zusammen } from "./html.js";
 import { DATENPANNE_RISIKO, SCHUTZZIELE, optionen } from "./konstanten.js";
-import type { Betrieb, Vorlage } from "./typen.js";
+import type { Betrieb, Daten, Vorlage } from "./typen.js";
 
 export const BUNDESLAENDER = AUFSICHT.map((a) => a.land);
 /** Zuständige Datenschutz-Aufsichtsbehörde für nicht-öffentliche Stellen nach Bundesland (DSK-Liste). */
@@ -334,41 +334,109 @@ export const datenpanne: Vorlage = {
   },
 };
 
-const BEREITSTELLUNG: Record<string, string> = {
-  vertrag: "Die Bereitstellung der Daten ist für den Abschluss und die Durchführung des Vertrags erforderlich. Ohne diese Daten können wir den Vertrag nicht abschließen oder durchführen.",
-  gesetz: "Die Bereitstellung der Daten ist teilweise gesetzlich vorgeschrieben (z. B. für Steuer und Sozialversicherung) und im Übrigen für die Durchführung des Vertrags erforderlich. Ohne diese Daten können wir unsere gesetzlichen Pflichten nicht erfüllen und das Vertragsverhältnis nicht durchführen.",
-  freiwillig: "Die Bereitstellung der Daten ist freiwillig. Ohne die Daten können wir das jeweilige Angebot nicht oder nur eingeschränkt bereitstellen.",
+/**
+ * Pflicht zur Bereitstellung (Art. 13 Abs. 2 lit. e DSGVO) je Betroffenengruppe – Vorprüfung 21.10.2026 (T-65): ein Satz
+ * für alle war für Beschäftigte, Bewerbende und Website-Besucher falsch. Fachlich zu prüfen.
+ */
+export const DSI_GRUPPEN: Record<string, { label: string; fuer: string; bereitstellung: string[] }> = {
+  kundschaft: {
+    label: "Kundinnen und Kunden",
+    fuer: "Kundinnen und Kunden",
+    bereitstellung: [
+      "Die Angaben, die wir für einen Auftrag, eine Buchung oder einen Termin brauchen (z. B. Name, Kontaktdaten, gewünschte Leistung), sind für den Abschluss und die Durchführung des Vertrags erforderlich. Ohne diese Angaben können wir den Vertrag nicht schließen oder durchführen.",
+      "Weitere Angaben, etwa für den Newsletter, sind freiwillig. Gesetzlich verpflichtet, uns Daten bereitzustellen, sind Sie nicht.",
+    ],
+  },
+  beschaeftigte: {
+    label: "Beschäftigte und Bewerbende",
+    fuer: "Beschäftigte, Bewerberinnen und Bewerber",
+    bereitstellung: [
+      "Beschäftigte: Ein Teil der Angaben ist gesetzlich vorgeschrieben (z. B. Steuer-Identifikationsnummer und Sozialversicherungsnummer für Lohnsteuer und Sozialversicherung); die übrigen sind für die Durchführung des Arbeitsverhältnisses erforderlich. Ohne sie können wir unsere gesetzlichen Pflichten nicht erfüllen und das Arbeitsverhältnis nicht durchführen.",
+      "Bewerberinnen und Bewerber: Gesetzlich oder vertraglich verpflichtet, uns Daten bereitzustellen, sind Sie nicht. Ohne die Angaben, die wir für die Auswahl brauchen (z. B. Kontaktdaten, Lebenslauf, Qualifikationen), können wir Ihre Bewerbung jedoch nicht berücksichtigen.",
+    ],
+  },
+  lieferanten: {
+    label: "Lieferanten und Geschäftspartner",
+    fuer: "Lieferanten, Dienstleister und ihre Ansprechpersonen",
+    bereitstellung: [
+      "Die Angaben, die wir für Bestellungen, Aufträge und Zahlungen brauchen (z. B. Name, geschäftliche Kontaktdaten, Bankverbindung), sind für den Abschluss und die Durchführung des Vertrags erforderlich. Ohne sie können wir nicht mit Ihnen zusammenarbeiten. Gesetzlich verpflichtet, uns Daten bereitzustellen, sind Sie nicht.",
+    ],
+  },
 };
+/** Art. 14 DSGVO: Daten, die nicht bei der Person selbst erhoben werden (z. B. Ansprechpersonen bei Lieferanten) – Quelle. */
+export const DSI_QUELLE = "Haben wir Ihre Daten nicht bei Ihnen selbst erhoben, stammen sie von dem Unternehmen, für das Sie tätig sind (z. B. aus Angeboten, Rechnungen oder E-Mails), oder aus öffentlich zugänglichen Quellen wie dessen Website oder dem Handelsregister (Art. 14 Abs. 2 lit. f DSGVO).";
+/** Verarbeitungen je Gruppe: die App zeigt bei „Für wen“ nur die passenden Bausteine (gewählte bleiben sichtbar). */
+const VVT_GRUPPEN: Record<string, string[]> = {
+  "Kundenverwaltung / Kundenkartei": ["kundschaft"],
+  "Kundenkartei mit Gesundheitsangaben (z. B. Allergien, Unverträglichkeiten)": ["kundschaft"],
+  "Terminvereinbarung (telefonisch, vor Ort oder Online-Buchung)": ["kundschaft"],
+  "Rechnungsstellung und Buchhaltung": ["kundschaft", "lieferanten"],
+  "Lohn- und Gehaltsabrechnung": ["beschaeftigte"],
+  "Personalverwaltung (Personalakte, Arbeitszeit)": ["beschaeftigte"],
+  "Bewerbungsverfahren": ["beschaeftigte"],
+  "Betrieb der Website (Hosting, Server-Logfiles)": ["kundschaft"],
+  "Kontaktanfragen (Kontaktformular, E-Mail, Telefon)": ["kundschaft", "lieferanten"],
+  "Geschäftliche E-Mail-Kommunikation": ["kundschaft", "beschaeftigte", "lieferanten"],
+  "E-Mail-Newsletter / E-Mail-Werbung": ["kundschaft"],
+  "Videoüberwachung (z. B. Verkaufsraum, Eingang, Lager)": ["kundschaft", "beschaeftigte", "lieferanten"],
+  "Lieferanten- und Dienstleisterverwaltung": ["lieferanten"],
+  "Kassensystem und Zahlungsabwicklung (inkl. EC-/Kartenzahlung)": ["kundschaft", "beschaeftigte"],
+  "Unternehmensauftritt in sozialen Netzwerken (z. B. Facebook-/Instagram-Seite)": ["kundschaft"],
+};
+/**
+ * Gruppe der Information: gewählt, sonst (gespeicherte Informationen von vor der Vorprüfung) aus dem Freitext „Für wen“
+ * geschlossen, sonst Kundschaft.
+ */
+export function dsiGruppe(d: Daten): string {
+  const g = text(d, "gruppe");
+  if (DSI_GRUPPEN[g]) return g;
+  const fuer = text(d, "fuer_wen");
+  if (/besch[aä]ftig|mitarbeit|bewerb|personal/i.test(fuer)) return "beschaeftigte";
+  if (/liefer|dienstleist|gesch[aä]ftspartner/i.test(fuer)) return "lieferanten";
+  return "kundschaft";
+}
 /** R11 (Kosmetik #20, #24): Verarbeitungen mit eigenen Zusätzen in der Datenschutzinformation */
 const GESUNDHEIT = "Kundenkartei mit Gesundheitsangaben (z. B. Allergien, Unverträglichkeiten)";
 const TERMIN = "Terminvereinbarung (telefonisch, vor Ort oder Online-Buchung)";
+const WEBSITE = "Betrieb der Website (Hosting, Server-Logfiles)";
 /** Online-Terminbuchung: reines Werkzeug im Auftrag oder Plattform, bei der Kundschaft ein eigenes Konto hat */
 const BUCHUNG: Record<string, string> = { tool: "Reines Buchungstool (Auftragsverarbeiter)", plattform: "Plattform mit eigenem Kundenkonto (eigene Verantwortung der Plattform)" };
 const BUCHUNG_PLATTFORM_EMPFAENGER = "Betreiber der Buchungsplattform – haben Kundinnen und Kunden dort ein eigenes Konto, verarbeitet er die Daten auch in eigener Verantwortung (siehe dessen Datenschutzhinweise)";
 const GESUNDHEIT_FREIWILLIG = "Ausgenommen sind Angaben zur Gesundheit (z. B. Allergien): Ihre Angabe ist freiwillig; wir verarbeiten sie nur mit Ihrer ausdrücklichen Einwilligung (Art. 9 Abs. 2 lit. a DSGVO), die Sie jederzeit widerrufen können (Art. 7 Abs. 3 DSGVO).";
+/** Website-Logfiles: im Papierdokument der eingetragene Wert statt eines Verweises auf die Website-Erklärung (Vorprüfung). */
+const logfileFrist = (d: Daten) => {
+  const n = text(d, "logfile_tage") || "14";
+  return `Server-Logfiles mit IP-Adressen werden nach ${n === "1" ? "1 Tag" : `${n} Tagen`} gelöscht.`;
+};
 
 /** Stützt sich eine der gewählten Verarbeitungen auf berechtigte Interessen? */
 const mitLitF = (d: Parameters<Vorlage["html"]>[0]) => auswahl(d, "verarbeitungen").some((t) => /lit\. f/.test(String(VVT.find((v) => v.titel === t)?.werte.rechtsgrundlage ?? "")));
-const ZIELGRUPPE = ["Kundinnen und Kunden", "Beschäftigte", "Bewerberinnen und Bewerber", "Lieferanten und Geschäftspartner"];
 
 export const datenschutzinformation: Vorlage = {
   id: "datenschutzinformation",
   gestalt: "handbuch",
   titel: "Datenschutzinformation (Art. 13 DSGVO)",
-  beschreibung: "Informationsblatt für Kundschaft, Beschäftigte oder Bewerbende – Verarbeitungen ankreuzen, Zwecke, Rechtsgrundlagen und Speicherdauer kommen automatisch.",
+  beschreibung: "Informationsblatt für Kundschaft, Beschäftigte und Bewerbende oder Lieferanten – Verarbeitungen ankreuzen, Zwecke, Rechtsgrundlagen und Speicherdauer kommen automatisch.",
   bereich: "datenschutz",
   pflichten: ["datenschutz.informationspflichten"],
   grundlage: "Art. 13 DSGVO",
+  // Lieferanten: Daten der Ansprechpersonen kommen oft vom Unternehmen, nicht von der Person selbst (Art. 14 DSGVO)
+  grundlageFuer: (d) => (dsiGruppe(d) === "lieferanten" ? "Art. 13, 14 DSGVO" : "Art. 13 DSGVO"),
   namensFeld: "fuer_wen",
+  // ohne eigene Bezeichnung benennt die Gruppe die Unterlage („Datenschutzinformation für Beschäftigte und Bewerbende“)
+  titelFuer: (d) => (text(d, "fuer_wen") ? "Datenschutzinformation (Art. 13 DSGVO)" : `Datenschutzinformation für ${DSI_GRUPPEN[dsiGruppe(d)]!.label}`),
   abschnitte: [
     { titel: "Inhalt der Information",
+      hilfe: "Je Personengruppe eine eigene Information – für die Website gibt es die Datenschutzerklärung als eigene Vorlage.",
       felder: [
-        { id: "fuer_wen", art: "text", label: "Für wen", pflicht: true, vorschlaege: ZIELGRUPPE },
-        { id: "verarbeitungen", art: "bausteine", label: "Welche Verarbeitungen betreffen diese Personen?", optionen: VVT.map((v) => ({ wert: v.titel, text: v.titel, quelle: v.quelle })), pflicht: true },
-        { id: "dsb", selten: true, art: "text", label: "Datenschutzbeauftragte/r", hilfe: "nur falls benannt: Name und Kontakt" },
+        // Vorprüfung 21.10.2026: Gruppe als Auswahl – sie bestimmt die passenden Bausteine und die Pflicht zur Bereitstellung
+        { id: "gruppe", art: "wahl", label: "Für wen", optionen: Object.entries(DSI_GRUPPEN).map(([wert, g]) => ({ wert, text: g.label })), vorbelegung: "kundschaft" },
+        { id: "fuer_wen", selten: true, art: "text", label: "Bezeichnung im Dokument", hilfe: "nur falls abweichend, z. B. „Gäste unseres Cafés“ – sonst steht die Gruppe da" },
+        { id: "verarbeitungen", art: "bausteine", label: "Welche Verarbeitungen betreffen diese Personen?", optionen: VVT.map((v) => ({ wert: v.titel, text: v.titel, quelle: v.quelle, ...(VVT_GRUPPEN[v.titel] ? { wenn: { feld: "gruppe", ist: VVT_GRUPPEN[v.titel]! } } : {}) })), pflicht: true },
+        { id: "dsb", selten: true, art: "text", label: "Datenschutzbeauftragte/r", hilfe: "nur falls benannt: Name und Kontakt – sonst entfällt die Angabe" },
         { id: "buchung", art: "wahl", label: "Online-Terminbuchung", optionen: optionen(BUCHUNG), vorbelegung: "tool", wenn: { feld: "verarbeitungen", ist: TERMIN }, hilfe: "Haben deine Kundinnen und Kunden bei der Buchungsplattform ein eigenes Konto, ist die Plattform oft selbst verantwortlich – bitte im Vertrag bzw. bei der Plattform prüfen." },
+        { id: "logfile_tage", art: "zahl", label: "Server-Logfiles werden gelöscht nach (Tagen)", vorbelegung: "14", wenn: { feld: "verarbeitungen", ist: WEBSITE }, hilfe: "laut Hosting-Anbieter, z. B. 7, 14 oder 30 – derselbe Wert wie in der Datenschutzerklärung der Website" },
         { id: "interessen", art: "mehrzeilig", label: "Berechtigte Interessen", hilfe: "nötig, wenn eine Verarbeitung auf Art. 6 Abs. 1 lit. f DSGVO beruht – z. B. Schutz vor Diebstahl, Durchsetzung von Ansprüchen, sichere IT", vorschlaege: ["Sicherer und störungsfreier Betrieb unserer IT", "Durchsetzung und Abwehr von Ansprüchen", "Schutz vor Diebstahl und Vandalismus (Videoüberwachung)", "Information unserer Bestandskundschaft über eigene Angebote"] },
-        { id: "bereitstellung", art: "wahl", label: "Pflicht zur Bereitstellung der Daten", optionen: optionen(BEREITSTELLUNG), vorbelegung: "vertrag" },
         { id: "ergaenzung", selten: true, art: "mehrzeilig", label: "Ergänzungen", hilfe: "z. B. besondere Verarbeitungen in deinem Betrieb" },
         { id: "stand", art: "datum", label: "Stand", vorbelegung: "heute" },
       ],
@@ -384,32 +452,45 @@ export const datenschutzinformation: Vorlage = {
   html(d, b) {
     const gewaehlt = auswahl(d, "verarbeitungen").map((t) => VVT.find((v) => v.titel === t)).filter((v): v is (typeof VVT)[number] => Boolean(v));
     const a = aufsichtFuer(b);
+    const gruppe = dsiGruppe(d);
+    const g = DSI_GRUPPEN[gruppe]!;
+    const fuer = text(d, "fuer_wen") || g.fuer;
+    const lieferanten = gruppe === "lieferanten";
     const ersetze = (t: string) => t.replace(/\{email\}/g, b.email.trim() || "____").replace(/\{link_einstellungen\}/g, "die angegebenen Kontaktwege");
+    // je Verarbeitung Zweck, Rechtsgrundlage, Empfänger, Drittland, Speicherdauer; bei Lieferanten zusätzlich die
+    // Datenkategorien (Art. 14 Abs. 1 lit. d DSGVO)
+    const verarbeitung = (v: (typeof VVT)[number]) =>
+      angaben([
+        ["Zweck", String(v.werte.zweck ?? "")],
+        ["Rechtsgrundlage", String(v.werte.rechtsgrundlage ?? "")],
+        ["Datenkategorien", lieferanten ? String(v.werte.datenarten ?? "") : null],
+        ["Empfänger", v.titel === TERMIN && text(d, "buchung") === "plattform" ? BUCHUNG_PLATTFORM_EMPFAENGER : String(v.werte.empfaenger ?? "") || "keine"],
+        ["Übermittlung in Drittländer", String(v.werte.drittland ?? "") || "keine"],
+        ["Speicherdauer", v.titel === WEBSITE ? logfileFrist(d) : String(v.werte.loeschfrist ?? "")],
+      ]);
+    // Blatt zum Ausfüllen (nichts gewählt): drei Verarbeitungen mit beschrifteten Linien statt eines leeren Abschnitts
+    const leerVerarbeitung = () => angaben([["Verarbeitung", ""], ["Zweck", "", 2], ["Rechtsgrundlage", ""], ["Empfänger", ""], ["Übermittlung in Drittländer", ""], ["Speicherdauer", "", 2]]);
+    const zwecke = gewaehlt.length ? gewaehlt.map((v) => eintrag(v.titel, verarbeitung(v))).join("") : [1, 2, 3].map(() => zusammen(leerVerarbeitung())).join("");
     return dokument({
       titel: "Information zur Datenverarbeitung",
       betrieb: b,
-      unter: text(d, "fuer_wen") ? `für ${text(d, "fuer_wen")} nach Art. 13 DSGVO` : "nach Art. 13 DSGVO",
+      unter: `für ${fuer} nach ${lieferanten ? "Art. 13, 14" : "Art. 13"} DSGVO`,
       meta: `Stand: ${datumDe(text(d, "stand"))}`,
       inhalt: abschnitte([
+        // Datenschutzbeauftragte/r nur, wenn benannt (sonst keine Zeile, auch keine Linie)
         { titel: "Verantwortlicher", rand: "Art. 13 Abs. 1 lit. a, b", inhalt: angaben([["Verantwortlicher", [b.name, anschrift(b)].filter((x) => x.trim()).join(", ")], ["Kontakt", [b.telefon, b.email].filter((x) => x.trim()).join(", ")], ["Datenschutzbeauftragte/r", text(d, "dsb") || null]]) },
-        {
-          titel: "Zwecke, Rechtsgrundlagen, Empfänger und Speicherdauer",
-          rand: "Art. 13 Abs. 1 lit. c, e, Abs. 2 lit. a",
-          inhalt: gewaehlt.length
-            ? gewaehlt
-                .map((v) => eintrag(v.titel, angaben([["Zweck", String(v.werte.zweck ?? "")], ["Rechtsgrundlage", String(v.werte.rechtsgrundlage ?? "")], ["Empfänger", v.titel === TERMIN && text(d, "buchung") === "plattform" ? BUCHUNG_PLATTFORM_EMPFAENGER : String(v.werte.empfaenger ?? "") || "keine"], ["Übermittlung in Drittländer", String(v.werte.drittland ?? "") || "keine"], ["Speicherdauer", String(v.werte.loeschfrist ?? "")]])))
-                .join("")
-            : absatz(""),
-        },
+        { titel: "Zwecke, Rechtsgrundlagen, Empfänger und Speicherdauer", rand: "Art. 13 Abs. 1 lit. c, e, Abs. 2 lit. a", inhalt: zwecke },
         // Ergänzungen (weitere Verarbeitungen) gleich nach den Zwecken, nicht hinter den Rechten
         ...(text(d, "ergaenzung") ? [{ titel: "Ergänzungen", inhalt: zeilen(text(d, "ergaenzung")) }] : []),
+        // nur, wenn eine gewählte Verarbeitung auf Art. 6 Abs. 1 lit. f DSGVO beruht
         ...(mitLitF(d) ? [{ titel: "Berechtigte Interessen", rand: "Art. 13 Abs. 1 lit. d", inhalt: text(d, "interessen") ? zeilen(text(d, "interessen")) : absatz("") }] : []),
+        ...(lieferanten ? [{ titel: "Herkunft der Daten", rand: "Art. 14 Abs. 2 lit. f", inhalt: `<p>${esc(DSI_QUELLE)}</p>` }] : []),
         { titel: DSE.betroffenenrechte!.titel, rand: "Art. 13 Abs. 2 lit. b", inhalt: `<p>${esc(ersetze(DSE.betroffenenrechte!.text))}</p>` },
         { titel: DSE.widerspruchsrecht!.titel, rand: "Art. 21", inhalt: `<p>${esc(ersetze(DSE.widerspruchsrecht!.text))}</p>` },
         { titel: DSE.widerruf_einwilligung!.titel, rand: "Art. 13 Abs. 2 lit. c", inhalt: `<p>${esc(ersetze(DSE.widerruf_einwilligung!.text))}</p>` },
         { titel: DSE.beschwerderecht!.titel, rand: "Art. 13 Abs. 2 lit. d", inhalt: `<p>${esc(DSE.beschwerderecht!.text.replace("{aufsichtsbehoerde_name}", a?.name ?? "____").replace("{aufsichtsbehoerde_ort}", a?.ort ?? "____").replace("{aufsichtsbehoerde_url}", a?.url ?? "____"))}</p>` },
-        // R11 (Kosmetik #20): Gesundheitsangaben sind freiwillig – auch wenn die übrigen Daten für den Vertrag nötig sind
-        { titel: "Pflicht zur Bereitstellung", rand: "Art. 13 Abs. 2 lit. e", inhalt: `<p>${esc(BEREITSTELLUNG[text(d, "bereitstellung")] ?? "")}</p>${gewaehlt.some((v) => v.titel === GESUNDHEIT) && text(d, "bereitstellung") !== "freiwillig" ? `<p>${esc(GESUNDHEIT_FREIWILLIG)}</p>` : ""}` },
+        // je Gruppe (Vorprüfung, T-65); R11 (Kosmetik #20): Gesundheitsangaben sind freiwillig
+        { titel: "Pflicht zur Bereitstellung", rand: "Art. 13 Abs. 2 lit. e", inhalt: `${g.bereitstellung.map((t) => `<p>${esc(t)}</p>`).join("")}${gewaehlt.some((v) => v.titel === GESUNDHEIT) ? `<p>${esc(GESUNDHEIT_FREIWILLIG)}</p>` : ""}` },
         { titel: "Automatisierte Entscheidungen", rand: "Art. 13 Abs. 2 lit. f", inhalt: "<p>Eine automatisierte Entscheidungsfindung einschließlich Profiling findet nicht statt.</p>" },
       ]),
     });

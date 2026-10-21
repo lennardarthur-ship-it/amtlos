@@ -1,12 +1,12 @@
 # Katalog C.33 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.kasse_tse_belegausgabe
-version: 1
+version: 2
 katalog_nr: C.33
 titel:
   de: Kasse mit TSE betreiben und Belege ausgeben
 kurz:
-  de: Deine elektronische Kasse braucht eine technische Sicherheitseinrichtung (TSE), und du musst Belege ausgeben.
+  de: Elektronische Kassen brauchen eine technische Sicherheitseinrichtung (TSE), und zu jedem Verkauf ist ein Beleg auszugeben.
 erklaerung:
   de: Elektronische Aufzeichnungssysteme müssen durch eine zertifizierte technische Sicherheitseinrichtung geschützt sein.
     Zu jedem Geschäftsvorfall ist ein Beleg auszugeben.
@@ -49,6 +49,7 @@ quellen:
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
   status: entwurf
   geprueft_von: null

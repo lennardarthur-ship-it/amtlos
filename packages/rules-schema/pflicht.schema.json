@@ -240,9 +240,13 @@
             "mittel",
             "hoch"
           ],
-          "description": "Für die Priorisierung 'Als Nächstes tun'"
+          "description": "Einstufung der Folgen (angezeigt) und Gewicht für die Priorisierung 'Als Nächstes tun'"
         }
       }
+    },
+    "dringend_ohne_termin": {
+      "type": "boolean",
+      "description": "Auch ohne Termin dringend ('Jetzt dran'), unabhängig von der angezeigten Sanktionsschwere – z. B. wenn die Folgen noch nicht fachlich erfasst sind und die Schwere deshalb nicht 'hoch' sein darf. Standard: false; bei Schwere 'hoch' ohne Wirkung."
     },
     "automatisierung": {
       "enum": [

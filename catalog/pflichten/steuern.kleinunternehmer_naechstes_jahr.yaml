@@ -1,13 +1,12 @@
 # R10: neu (Nutzertest Freiberuf: Vorjahr unter 25.000 €, laufendes Jahr darüber, aber höchstens 100.000 € – ab 1.1. des Folgejahres Regelbesteuerung, § 19 Abs. 1 UStG)
 schema_version: 1
 id: steuern.kleinunternehmer_naechstes_jahr
-version: 1
+version: 2
 katalog_nr: C.23
 titel:
   de: Ab 1. Januar Regelbesteuerung
 kurz:
-  de: Nach deinen Angaben liegt dein Umsatz in diesem Jahr über 25.000 €. Dieses Jahr bleibst du Kleinunternehmer, ab 1. Januar
-    des nächsten Jahres gilt die Regelbesteuerung.
+  de: Nach deinen Angaben liegt dein Umsatz in diesem Jahr über 25.000 €. Nach § 19 UStG gilt die Kleinunternehmerregelung dann bis zum Jahresende weiter, ab 1. Januar des nächsten Jahres ist die Regelbesteuerung vorgesehen.
 erklaerung:
   de: 'Die Kleinunternehmerregelung setzt voraus, dass dein Umsatz im Vorjahr höchstens 25.000 € betrug. Überschreitest du diese
     Grenze in diesem Jahr, ohne über 100.000 € zu kommen, gilt die Regelung bis zum Jahresende weiter. Ab 1. Januar weist du auf
@@ -55,7 +54,7 @@ ausloeser:
         wert:
           regelwert: steuern.ustg19.grenze_vorjahr
         label:
-          de: Nach deinen Rechnungen in Amtlos liegt dein Umsatz in diesem Jahr über 25.000 €.
+          de: Deine Rechnungen in Amtlos summieren sich in diesem Jahr auf mehr als 25.000 €; die Grenze liegt bei 25.000 €.
       - feld: finanzen.umsatz.laufendes_jahr
         op: <=
         wert:
@@ -86,6 +85,7 @@ quellen:
 fachlich_zu_pruefen:
 - 'Neu (R10): Folgen der Regelbesteuerung ab 1.1. (Rechnungen mit USt, Voranmeldung, Vorsteuerabzug) – Formulierung und Vollständigkeit bestätigen, z. B. Rhythmus der Voranmeldung im Folgejahr'
 - 'Prognose statt tatsächlicher Umsatz – Formulierung „nach deinen Angaben“ bestätigen'
+- 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
   status: entwurf
   geprueft_von: null

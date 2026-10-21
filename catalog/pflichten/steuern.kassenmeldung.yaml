@@ -1,7 +1,7 @@
 # Katalog C.33 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.kassenmeldung
-version: 3
+version: 4
 katalog_nr: C.33
 titel:
   de: Elektronische Kasse beim Finanzamt melden
@@ -41,7 +41,8 @@ kosten: null
 sanktion:
   text:
     de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: hoch
+  schwere: mittel
+dringend_ohne_termin: true
 automatisierung: formular_vorausfuellen
 erledigung:
   art: bestaetigen
@@ -61,6 +62,7 @@ fachlich_zu_pruefen:
 - 'Bestandskassen (Meldefrist 31.7.2025): Pflicht für Kassen ohne gemeldetes Anschaffungsdatum abbilden'
 - Verschiebung bei Fristende am Wochenende festlegen
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (§ 379 Abs. 1 Satz 1 AO (gelesen auf gesetze-im-internet) nennt § 146a nur mit Abs. 1 (Nr. 4–6: Verwendung, Schutz, Vertrieb); Nr. 7 betrifft die Aufbewahrung nach § 147 AO. Eine Bußgeldnorm für die Mitteilung nach § 146a Abs. 4 AO wurde nicht gefunden – der Vorschlag „§ 379 Abs. 1 Nr. 7 AO, bis 25.000 €“ aus dem Prüfbericht trifft nicht zu) – nach Ergänzung wieder „hoch“'
 pruefung:
   status: entwurf
   geprueft_von: null

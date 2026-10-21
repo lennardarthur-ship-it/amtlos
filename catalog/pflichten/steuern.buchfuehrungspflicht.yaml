@@ -1,12 +1,12 @@
 # Katalog C.28 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.buchfuehrungspflicht
-version: 3
+version: 4
 katalog_nr: C.28
 titel:
   de: Doppelte Buchführung
 kurz:
-  de: Du musst Bücher nach den Regeln der doppelten Buchführung führen und einen Jahresabschluss machen.
+  de: Nach deinen Angaben kommt die doppelte Buchführung mit Jahresabschluss in Frage – für Kapitalgesellschaften immer, für andere je nach Rechtsform und Größe.
 erklaerung:
   de: 'Bücher nach den Regeln der doppelten Buchführung führen Kapitalgesellschaften und die GmbH & Co. KG immer. Eingetragene
     Kaufleute (e. K.) sind befreit, wenn sie an zwei aufeinanderfolgenden Abschlussstichtagen höchstens 800.000 € Umsatz und
@@ -118,7 +118,8 @@ kosten: null
 sanktion:
   text:
     de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: hoch
+  schwere: mittel
+dringend_ohne_termin: true
 automatisierung: partner
 erledigung:
   art: bestaetigen
@@ -148,6 +149,8 @@ fachlich_zu_pruefen:
 - '§ 141 AO erst nach Mitteilung des Finanzamts (§ 141 Abs. 2 AO) über die Frage „Mitteilung erhalten?“ umgesetzt (R10, Steuerprüfung)'
 - Grenze inklusive/exklusive
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
+- 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
   status: entwurf
   geprueft_von: null

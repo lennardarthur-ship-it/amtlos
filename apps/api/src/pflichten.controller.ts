@@ -194,7 +194,7 @@ export class PflichtenController {
     const zeilen = await this.db.imKontext({ kontoId: k.kontoId, unternehmenId: k.unternehmenId }, (tx) => this.laden(k, tx, "and pi.status <> 'entfallen'"));
     const karten = new Map(zeilen.map((z) => [`${z.pflicht_id}|${z.periode}`, karte(z, k.sprache)]));
     const u = heuteUebersicht(
-      zeilen.map((z) => ({ pflicht_id: z.pflicht_id, periode: z.periode, kategorie: z.daten.kategorie, anzeige_status: z.anzeige_status, faellig_am: z.faellig_am, schwere: z.daten.sanktion.schwere })),
+      zeilen.map((z) => ({ pflicht_id: z.pflicht_id, periode: z.periode, kategorie: z.daten.kategorie, anzeige_status: z.anzeige_status, faellig_am: z.faellig_am, schwere: z.daten.sanktion.schwere, dringend_ohne_termin: z.daten.dringend_ohne_termin === true })),
       heute(),
     );
     // Fristen vor dem Start bei Amtlos: beim ersten Profil oft längst erledigt – gesammelt bestätigen lassen

@@ -1,7 +1,7 @@
 # R12 (Nutzertest Kfz #1): gefährliche Abfälle – Getrennthaltung, Entsorgung, Register
 schema_version: 1
 id: umwelt.gefaehrliche_abfaelle
-version: 1
+version: 2
 katalog_nr: U.2
 titel:
   de: Gefährliche Abfälle getrennt halten, entsorgen und nachweisen
@@ -33,7 +33,8 @@ kosten: null
 sanktion:
   text:
     de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: hoch
+  schwere: mittel
+dringend_ohne_termin: true
 automatisierung: hinweis
 status_recht: in_kraft
 gueltig_ab: null
@@ -45,6 +46,7 @@ quellen:
 fachlich_zu_pruefen:
 - 'Neu nach Nutzertest R12 (Kfz #1) – § 9a KrWG (Vermischungsverbot) bestätigen; Kleinmengen unter 2 t im Jahr (§ 2 Abs. 2 NachwV): Nachweisführung entfällt, Übernahmescheine und Register bleiben? unsicher'
 - Folgen bei Nichterfüllung fachlich ergänzen
+- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 pruefung:
   status: entwurf
   geprueft_von: null

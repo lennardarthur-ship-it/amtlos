@@ -1,7 +1,7 @@
 # Katalog A.5 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gruendung.fragebogen_steuerliche_erfassung
-version: 2
+version: 3
 katalog_nr: A.5
 titel:
   de: Fragebogen zur steuerlichen Erfassung abgeben
@@ -41,7 +41,8 @@ kosten: null
 sanktion:
   text:
     de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: hoch
+  schwere: mittel
+dringend_ohne_termin: true
 automatisierung: formular_vorausfuellen
 aktion:
   art: uebermittlung
@@ -64,6 +65,7 @@ fachlich_zu_pruefen:
 - 'Fristbeginn: Aufnahme der Tätigkeit = Gründungsdatum im Profil? bestätigen'
 - Verschiebung bei Fristende am Wochenende/Feiertag festlegen
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 pruefung:
   status: entwurf
   geprueft_von: null

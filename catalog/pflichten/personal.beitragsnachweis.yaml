@@ -1,7 +1,7 @@
 # Katalog D.40 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.beitragsnachweis
-version: 1
+version: 2
 katalog_nr: D.40
 titel:
   de: Beitragsnachweis übermitteln
@@ -38,7 +38,8 @@ kosten: null
 sanktion:
   text:
     de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: hoch
+  schwere: mittel
+dringend_ohne_termin: true
 automatisierung: partner
 status_recht: in_kraft
 gueltig_ab: null
@@ -51,6 +52,7 @@ fachlich_zu_pruefen:
 - „Arbeitstage“ als Bankarbeitstage umgesetzt – bestätigen (G-13)
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (§ 111 Abs. 1 SGB IV (gelesen) nennt § 28f Abs. 3 nicht; Folgen (Schätzung durch die Einzugsstelle, Säumniszuschläge) fachlich klären) – nach Ergänzung wieder „hoch“'
 pruefung:
   status: entwurf
   geprueft_von: null

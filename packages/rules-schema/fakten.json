@@ -536,25 +536,25 @@
     {
       "pfad": "abgeleitet.beschaeftigte.zaehlung_bdsg38",
       "typ": "ganzzahl",
-      "herleitung": "[FACHLICH ZU PRÜFEN] Zählweise für § 38 BDSG",
+      "herleitung": "[FACHLICH ZU PRÜFEN] Zählweise für § 38 Abs. 1 Satz 1 BDSG: Personen (Köpfe, nicht Vollzeitstellen), die in der Regel ständig mit der automatisierten Verarbeitung personenbezogener Daten beschäftigt sind – auch Teilzeitkräfte, Auszubildende, Inhaber und nach herrschender Ansicht freie Mitarbeitende; nur wer ständig mit Datenverarbeitung zu tun hat. Nicht abgeleitet, die Zahl der Beschäftigten ist nur Obergrenze (G-05)",
       "ab": 6
     },
     {
       "pfad": "abgeleitet.beschaeftigte.arbeitsplaetze_sgb9",
       "typ": "ganzzahl",
-      "herleitung": "[FACHLICH ZU PRÜFEN] Zählweise Arbeitsplätze SGB IX",
+      "herleitung": "[FACHLICH ZU PRÜFEN] Zählweise Arbeitsplätze SGB IX: Stellen von Arbeitnehmern, Beamten, Auszubildenden (§ 156 Abs. 1); nicht Stellen unter 18 Wochenstunden und Stellen für höchstens acht Wochen (§ 156 Abs. 3); Teilzeitstellen ab 18 Stunden zählen voll, nicht anteilig; Ausbildungsstellen bei der Mindestzahl nicht mitgezählt (§ 157 Abs. 1). Nicht abgeleitet, die Zahl der Beschäftigten ist nur Obergrenze (G-05, T-16)",
       "ab": 5
     },
     {
       "pfad": "abgeleitet.beschaeftigte.zaehlung_hinschg",
       "typ": "ganzzahl",
-      "herleitung": "[FACHLICH ZU PRÜFEN] Zählweise HinSchG",
+      "herleitung": "[FACHLICH ZU PRÜFEN] Zählweise HinSchG: in der Regel beschäftigte Personen nach § 3 Abs. 8 HinSchG (Arbeitnehmer, Auszubildende, arbeitnehmerähnliche Personen u. a.), Köpfe ohne Teilzeit-Anteil; Schwelle 50 (§ 12 Abs. 2). Nicht abgeleitet (G-05)",
       "ab": 5
     },
     {
       "pfad": "abgeleitet.beschaeftigte.zaehlung_vsbg",
       "typ": "ganzzahl",
-      "herleitung": "[FACHLICH ZU PRÜFEN] Zählweise § 36 VSBG",
+      "herleitung": "[FACHLICH ZU PRÜFEN] Zählweise § 36 Abs. 3 VSBG: am 31. Dezember des Vorjahres beschäftigte Personen (Köpfe); die Pflicht gilt ab mehr als zehn. Nicht abgeleitet (G-05)",
       "ab": 7
     },
     {
@@ -578,6 +578,19 @@
       ],
       "herleitung": "Onboarding",
       "ab": 2
+    },
+    {
+      "pfad": "profil.datenschutz.dsb_gruende",
+      "typ": "enum_liste",
+      "werte": [
+        "kerntaetigkeit_ueberwachung",
+        "kerntaetigkeit_besondere_daten",
+        "dsfa_pflichtig",
+        "uebermittlung_marktforschung",
+        "keine"
+      ],
+      "herleitung": "Vorprüfung 21.10.2026 (F.61): Fälle, in denen ein Datenschutzbeauftragter unabhängig von der Zahl der Beschäftigten vorgesehen ist – Art. 37 Abs. 1 Buchst. b, c DSGVO (Kerntätigkeit umfangreiche Überwachung bzw. umfangreiche Verarbeitung besonderer Daten) und § 38 Abs. 1 Satz 2 BDSG (Datenschutz-Folgenabschätzung, geschäftsmäßige Übermittlung, Markt- oder Meinungsforschung); Angabe des Nutzers",
+      "ab": 6
     },
     {
       "pfad": "profil.ki.nutzung",

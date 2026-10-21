@@ -1,14 +1,14 @@
 # Katalog D.46 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.hinweisgeber_meldestelle
-version: 2
+version: 3
 katalog_nr: D.46
 titel:
   de: Interne Meldestelle einrichten (Hinweisgeberschutz)
 kurz:
   de: Ab 50 Beschäftigten richtest du eine interne Meldestelle für Hinweisgeber ein.
 erklaerung:
-  de: Das Hinweisgeberschutzgesetz verlangt ab 50 Beschäftigten eine interne Meldestelle.
+  de: Das Hinweisgeberschutzgesetz verlangt von Beschäftigungsgebern mit in der Regel mindestens 50 Beschäftigten eine interne Meldestelle (§ 12 Abs. 2 HinSchG). Gezählt werden Köpfe, nicht Vollzeitstellen – Beschäftigte sind neben Arbeitnehmern auch Auszubildende (§ 3 Abs. 8 HinSchG).
 rechtsgrundlage:
 - HinSchG
 kategorie: personal
@@ -44,12 +44,16 @@ quellen:
 - titel: Hinweisgeberschutzgesetz
   url: https://www.gesetze-im-internet.de/hinschg/
   abgerufen: null
+- titel: HinSchG § 12
+  url: https://www.gesetze-im-internet.de/hinschg/__12.html
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
 - 'Sanktion aus der Rechtsprüfung R11 (Befund 20): § 40 Abs. 2 Nr. 2, Abs. 6 HinSchG bis 20.000 € – bestätigen'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Zählweise (G-05)
 - Übergangsregeln für 50–249 Beschäftigte noch relevant?
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- 'Vorprüfung 21.10.2026 (G-05): § 12 Abs. 2 HinSchG gelesen („in der Regel mindestens 50 Beschäftigten“); Begriff § 3 Abs. 8 HinSchG nicht abgerufen – Zählung nach Köpfen bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

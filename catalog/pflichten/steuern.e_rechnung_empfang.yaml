@@ -1,12 +1,12 @@
 # Katalog C.30 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.e_rechnung_empfang
-version: 1
+version: 2
 katalog_nr: C.30
 titel:
   de: E-Rechnungen empfangen können
 kurz:
-  de: Seit 2025 musst du elektronische Rechnungen (XRechnung, ZUGFeRD) von anderen Unternehmen empfangen können.
+  de: Seit 2025 müssen Unternehmen elektronische Rechnungen (XRechnung, ZUGFeRD) von anderen Unternehmen empfangen können.
 erklaerung:
   de: Eine E-Rechnung ist ein strukturierter Datensatz. Eine PDF-Rechnung ist keine E-Rechnung.
 begriffe:
@@ -45,6 +45,7 @@ fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Gilt für alle Unternehmen, auch Kleinunternehmer – bestätigen
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
   status: entwurf
   geprueft_von: null

@@ -1,16 +1,14 @@
 # Katalog G.75 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: produkte.geldwaesche_gueterhaendler
-version: 3
+version: 4
 katalog_nr: G.75
 titel:
   de: Geldwäschegesetz bei hohen Bargeschäften
 kurz:
-  de: Als Güterhändler hast du bei Bargeschäften ab der Schwelle des Geldwäschegesetzes Sorgfaltspflichten.
+  de: Bei Barzahlungen ab 10.000 € – beim Handel mit Edelmetallen schon ab 2.000 € – sieht das Geldwäschegesetz Sorgfaltspflichten für Güterhändler vor.
 erklaerung:
-  de: Dazu gehören unter anderem die Identifizierung der Vertragspartner und ein Risikomanagement. Die Pflichten greifen bei
-    Barzahlungen ab 10.000 € (§ 10 Abs. 6a GwG), beim Handel mit Edelmetallen schon ab 2.000 €. Als Verpflichteter registrierst du
-    dich außerdem bei der Zentralstelle für Finanztransaktionsuntersuchungen (goAML), auch ohne Verdachtsfall (§ 45 Abs. 1 S. 2 GwG).
+  de: Dazu gehören unter anderem die Identifizierung der Vertragspartner und ein Risikomanagement. Die Pflichten greifen bei Transaktionen, bei denen du Barzahlungen über mindestens 10.000 € selbst oder durch Dritte annimmst oder leistest (§ 10 Abs. 6a Nr. 1 Buchst. c GwG), bei hochwertigen Gütern wie Edelmetallen schon ab 2.000 € (Buchst. b) und bei Kunstgegenständen ab einem Transaktionswert von 10.000 € (Buchst. a). Als Verpflichteter registrierst du dich außerdem bei der Zentralstelle für Finanztransaktionsuntersuchungen (goAML), auch ohne Verdachtsfall (§ 45 Abs. 1 S. 2 GwG).
 rechtsgrundlage:
 - § 10 Abs. 6a GwG
 - § 45 Abs. 1 GwG
@@ -44,7 +42,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Bußgeld bis 150.000 € bei Vorsatz, sonst bis 100.000 €, etwa wenn die Identifizierung fehlt; bei schwerwiegenden, wiederholten oder systematischen Verstößen bis 1 Mio. € oder bis zum Zweifachen des wirtschaftlichen Vorteils (§ 56 Abs. 1 Satz 1 Nr. 15, Abs. 3 GwG).
   schwere: hoch
 automatisierung: hinweis
 status_recht: in_kraft
@@ -54,12 +52,21 @@ quellen:
 - titel: Geldwäschegesetz
   url: https://www.gesetze-im-internet.de/gwg_2017/
   abgerufen: null
+- titel: § 10 GwG, Wortlaut (gesetze.legal)
+  url: https://gesetze.legal/bund/gwg/10
+  abgerufen: '2026-10-21'
+- titel: Geldwäschegesetz § 56 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/gwg_2017/__56.html
+  abgerufen: null
+- titel: § 56 GwG, Wortlaut (gesetze.legal, Spiegel des Bundesrechts)
+  url: https://gesetze.legal/bund/gwg/56
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- 'Schwellen 10.000 € bar und 2.000 € Edelmetalle (§ 10 Abs. 6a GwG) und goAML-Registrierung unabhängig von Verdachtsfällen (§ 45 Abs. 1 S. 2 GwG) aus der Rechtsprüfung R11 (Befund 17) – laut Prüferin unsicher, bestätigen; danach als Regelwert'
 - 'Bargeldobergrenze 10.000 € ab 10.07.2027 nach AMLR (VO (EU) 2024/1624) – unsicher, als Radar prüfen'
 - Immobilien- und Finanzbranche als Branchenmodul (H)
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 21.10.2026 (G.75): Schwellen § 10 Abs. 6a Nr. 1 Buchst. a–c GwG über gesetze.legal gelesen (10.000 € bar, 2.000 € bei hochwertigen Gütern nach § 1 Abs. 10 Satz 2 Nr. 1, 10.000 € Kunst) – dass Nr. 1 die Edelmetalle meint, noch gegen § 1 Abs. 10 GwG lesen'
+- 'Vorprüfung 21.10.2026: Sanktion ergänzt – § 56 Abs. 1 Nr. 15 (Identifizierung), Abs. 1 und 3 über gesetze.legal gelesen'
 pruefung:
   status: entwurf
   geprueft_von: null

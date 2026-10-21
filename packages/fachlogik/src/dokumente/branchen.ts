@@ -24,7 +24,9 @@ export const ifsgBelehrung: Vorlage = {
         { id: "datum", art: "datum", label: "Datum der Belehrung", vorbelegung: "heute", pflicht: true },
         { id: "belehrt_von", art: "text", label: "Belehrt von", vorbelegung: "verantwortlich", pflicht: true },
         { id: "inhalte", art: "bausteine", label: "Inhalte der Belehrung", optionen: IFSG.inhalte.map((t) => ({ ...stabileOption(t), quelle: "§§ 42, 43 IfSG" })), vorbelegung: IFSG.inhalte.slice(0, 5).map((t) => stabileOption(t).wert), pflicht: true },
-        { id: "liste_anhaengen", art: "schalter", label: "Tätigkeitsverbote und Lebensmittel nach § 42 IfSG im Dokument aufführen", vorbelegung: true },
+        { id: "liste_anhaengen", art: "schalter", label: "Tätigkeitsverbote, Krankheitszeichen und Lebensmittel nach § 42 IfSG im Dokument aufführen", vorbelegung: true, hilfe: "Mit den Krankheitszeichen in einfachen Worten – so ist der Inhalt der Belehrung im Dokument selbst festgehalten." },
+        // Vorprüfung 21.10.2026: Belehrungsinhalt ausformuliert oder das amtliche Merkblatt beilegen
+        { id: "merkblatt", art: "schalter", label: "Merkblatt des Gesundheitsamts beigelegt", hilfe: "Das Merkblatt zur Belehrung nach § 43 IfSG (vom Gesundheitsamt, beim Robert Koch-Institut auch in anderen Sprachen) ausdrucken und mit aushändigen – das Dokument nennt es dann als Anlage." },
       ],
     },
     {
@@ -68,9 +70,10 @@ export const ifsgBelehrung: Vorlage = {
         (ja(d, "liste_anhaengen")
           ? abschnitt(
               "Tätigkeitsverbote nach § 42 Abs. 1 IfSG",
-              `<p>Folgende Personen dürfen nicht tätig sein oder beschäftigt werden a) beim Herstellen, Behandeln oder Inverkehrbringen der unten genannten Lebensmittel, wenn sie dabei mit diesen in Berührung kommen, oder b) in Küchen von Gaststätten und sonstigen Einrichtungen mit oder zur Gemeinschaftsverpflegung:</p>${punkte(IFSG.personen)}<h3>Lebensmittel nach § 42 Abs. 2 IfSG</h3>${nummernListe(IFSG.lebensmittel)}`,
+              `<p>Folgende Personen dürfen nicht tätig sein oder beschäftigt werden a) beim Herstellen, Behandeln oder Inverkehrbringen der unten genannten Lebensmittel, wenn sie dabei mit diesen in Berührung kommen, oder b) in Küchen von Gaststätten und sonstigen Einrichtungen mit oder zur Gemeinschaftsverpflegung:</p>${punkte(IFSG.personen)}<h3>Woran Sie das erkennen</h3><p>Nicht arbeiten und den Arbeitgeber sofort informieren bei:</p>${punkte(IFSG.symptome)}<p>Bei solchen Krankheitszeichen ärztlichen Rat einholen und sagen, dass Sie mit Lebensmitteln arbeiten.</p><h3>Lebensmittel nach § 42 Abs. 2 IfSG</h3>${nummernListe(IFSG.lebensmittel)}`,
             )
           : "") +
+        (ja(d, "merkblatt") ? `<p>Anlage: Merkblatt zur Belehrung nach § 43 Abs. 1 Nr. 1 IfSG (Gesundheitsamt), ausgehändigt an alle Teilnehmenden.</p>` : "") +
         abschnitt("Teilnahme", `<p class="vor-tabelle">Mit meiner Unterschrift bestätige ich, dass ich belehrt wurde und mir keine Tatsachen für ein Tätigkeitsverbot bekannt sind. Treten Hinderungsgründe auf, teile ich dies unverzüglich mit.</p>${teilnahmeTabelle(liste(d, "teilnehmer"), { kopf: "Erstbelehrung vom", feld: "erstbelehrung_am", datum: true })}`) +
         nachsatz(`Die Belehrung ist nach Aufnahme der Tätigkeit und danach alle zwei Jahre zu wiederholen und zu dokumentieren (§ 43 Abs. 4 IfSG)${naechste ? `, nächste Belehrung spätestens am ${naechste}` : ""}.`) +
         unterschriften(["Ort, Datum", "Unterschrift der belehrenden Person"]),
@@ -500,6 +503,7 @@ function hygieneFuerDruck(d: Daten, b: Betrieb): Daten {
   };
 }
 
+export const HYGIENE_GRUNDLAGE_LEBENSMITTEL = "Art. 4 Abs. 2, Anhang II VO (EG) Nr. 852/2004; LMHV";
 export const hygieneplan: Vorlage = {
   id: "hygieneplan",
   gestalt: "aushang",
@@ -508,10 +512,19 @@ export const hygieneplan: Vorlage = {
   bereich: "beauty",
   pflichten: ["branche.beauty_hygieneplan"],
   grundlage: "Hygieneverordnung des Landes (auf Grundlage des IfSG)",
+  // Vorprüfung 21.10.2026 (T-104): Lebensmittelbetriebe nach EU-Lebensmittelhygienerecht, nicht nach der Landes-Hygieneverordnung
+  grundlageFuer: (d) => (text(d, "art") === "lebensmittel" ? HYGIENE_GRUNDLAGE_LEBENSMITTEL : ""),
   querformat: true,
   namensFeld: "bereich",
   abschnitte: [
-    { titel: "Bereich", hilfe: "Welche Anforderungen genau gelten, regelt die Hygieneverordnung deines Bundeslands. Desinfektionsmittel nach Herstellerangabe bzw. VAH-Liste einsetzen.", felder: [{ id: "bereich", art: "text", label: "Bereich", vorschlaege: ["Friseursalon", "Kosmetik", "Nagelstudio", "Fußpflege"] }] },
+    {
+      titel: "Bereich",
+      hilfe: "Friseur, Kosmetik, Nagelstudio, Fußpflege: Welche Anforderungen genau gelten, regelt die Hygieneverordnung deines Bundeslands. Lebensmittelbetriebe: VO (EG) Nr. 852/2004 und Lebensmittelhygiene-Verordnung (LMHV). Desinfektionsmittel nach Herstellerangabe bzw. VAH-Liste einsetzen.",
+      felder: [
+        { id: "art", art: "wahl", label: "Art des Betriebs", optionen: [{ wert: "beauty", text: "Friseur, Kosmetik, Nagelstudio, Fußpflege" }, { wert: "lebensmittel", text: "Lebensmittelbetrieb (Café, Küche, Bäckerei)" }], vorbelegung: "beauty", vorbelegungJe: { gastro_cafe: "lebensmittel" }, hilfe: "Bestimmt die Rechtsgrundlage im Dokument" },
+        { id: "bereich", art: "text", label: "Bereich", vorschlaege: ["Friseursalon", "Kosmetik", "Nagelstudio", "Fußpflege", "Küche", "Theke und Gastraum"] },
+      ],
+    },
     {
       titel: "Einträge",
       felder: [

@@ -2,7 +2,7 @@
 # Rechtsstand 21.10.2026: VerpackG seit 12.8.2026 durch VerpackDG (BGBl. 2026 I Nr. 207) abgelöst
 schema_version: 1
 id: produkte.verpackung
-version: 3
+version: 4
 katalog_nr: G.71
 titel:
   de: Verpackungen registrieren und lizenzieren
@@ -34,7 +34,7 @@ kanal: portal
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Bußgeld bis 100.000 €, wenn die Registrierung fehlt, und bis 200.000 €, wenn Verpackungen nicht an einem System beteiligt sind (§ 66 Abs. 1 Nr. 1, 3, Abs. 3 VerpackDG).
   schwere: hoch
 automatisierung: hinweis
 status_recht: in_kraft
@@ -50,11 +50,14 @@ quellen:
 - titel: WPK – Neues Verpackungsrecht in Kraft (13.8.2026)
   url: https://www.wpk.de/neu/neues-verpackungsrecht-in-kraft-hinweise-der-zentralen-stelle-verpackungsregister/
   abgerufen: '2026-10-21'
+- titel: Verpackungsrecht-Durchführungsgesetz § 66 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/verpackdg/__66.html
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
 - 'Rechtsstand 21.10.2026: Rechtsgrundlage von VerpackG auf §§ 6, 7 VerpackDG umgestellt (Inhaltsübersicht VerpackDG, IHK Karlsruhe); Wortlaut von §§ 6, 7 nicht abgerufen – Zeitpunkt „vor dem ersten Inverkehrbringen“ und Abgrenzung systembeteiligungspflichtig gegen den Gesetzestext lesen'
 - 'Neue Herstellerpflichten aus der PPWR (z. B. Herstellerregister nach Art. 44, Kennzeichnung) und B2B-Verpackungen (§ 68 Abs. 9 VerpackDG, Übergang bis 31.12.2027) nicht abgebildet'
 - „Vor dem ersten Inverkehrbringen“ als Frist mit Ereignis abbilden?
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen (§ 66 VerpackDG)
+- 'Vorprüfung 21.10.2026: Sanktion ergänzt – § 66 Abs. 1 Nr. 1 (Registrierung, § 6) und Nr. 3 (Systembeteiligung, § 7), Abs. 3 gelesen'
 pruefung:
   status: entwurf
   geprueft_von: null

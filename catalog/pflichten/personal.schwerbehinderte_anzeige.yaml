@@ -1,7 +1,7 @@
 # Katalog D.45 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.schwerbehinderte_anzeige
-version: 1
+version: 2
 katalog_nr: D.45
 titel:
   de: Anzeige und Ausgleichsabgabe (Schwerbehinderte)
@@ -9,10 +9,11 @@ kurz:
   de: Ab 20 Arbeitsplätzen zeigst du jedes Jahr bis 31.3. die Beschäftigung schwerbehinderter Menschen an und zahlst gegebenenfalls
     die Ausgleichsabgabe.
 erklaerung:
-  de: Betriebe ab 20 Arbeitsplätzen haben eine Beschäftigungsquote. Die Anzeige und die Ausgleichsabgabe sind bis zum 31.
-    März für das Vorjahr fällig.
+  de: Betriebe ab 20 Arbeitsplätzen haben eine Beschäftigungsquote. Die Anzeige und die Ausgleichsabgabe sind bis zum 31. März für das Vorjahr fällig. Als Arbeitsplätze zählen Stellen von Arbeitnehmern und Auszubildenden; Stellen mit weniger als 18 Wochenstunden – oft Minijobs – und Stellen für höchstens acht Wochen zählen nicht (§ 156 Abs. 1, 3 SGB IX). Teilzeitstellen ab 18 Stunden zählen voll, Ausbildungsstellen bleiben bei der Mindestzahl außer Betracht (§ 157 Abs. 1 SGB IX). Wer insgesamt weniger als 20 Personen beschäftigt, liegt sicher unter der Schwelle.
 rechtsgrundlage:
-- SGB IX
+- § 154 SGB IX
+- §§ 156, 157 SGB IX
+- § 163 SGB IX
 kategorie: personal
 ausloeser:
   all:
@@ -45,7 +46,8 @@ kosten: null
 sanktion:
   text:
     de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: hoch
+  schwere: mittel
+dringend_ohne_termin: true
 automatisierung: hinweis
 status_recht: in_kraft
 gueltig_ab: null
@@ -54,12 +56,16 @@ quellen:
 - titel: Sozialgesetzbuch IX
   url: https://www.gesetze-im-internet.de/sgb_9_2018/
   abgerufen: null
+- titel: § 156 SGB IX, Wortlaut (gesetze.legal)
+  url: https://gesetze.legal/bund/sgb_ix/156
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
 - Quote und Höhe der Abgabe als Regelwerte
-- Zählweise der Arbeitsplätze (G-05); wer insgesamt weniger als 20 beschäftigt, gilt als unter der Schwelle – bestätigen
 - Verschiebung bei 31.3. am Wochenende
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
+- 'Vorprüfung 21.10.2026 (G-05/T-16): Zählweise nach § 156 Abs. 1, 3 SGB IX (gelesen) – unter 18 Wochenstunden und bis acht Wochen zählen nicht; Teilzeit ab 18 Std. voll, nicht anteilig (der Prüfbericht nennt „Teilzeit anteilig“ – das gilt für § 23 KSchG, nicht für das SGB IX). Ausbildungsstellen nach § 157 Abs. 1 SGB IX nicht abgerufen. Die App zählt keine Arbeitsplätze (abgeleitet.beschaeftigte.arbeitsplaetze_sgb9 bleibt unbekannt), die Zahl der Beschäftigten dient nur als Obergrenze – bestätigen; Einzelvorschriften §§ 154, 163 SGB IX ohne Abruf zugeordnet'
 pruefung:
   status: entwurf
   geprueft_von: null

@@ -1,7 +1,7 @@
 # Katalog B.16 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.transparenzregister
-version: 3
+version: 4
 katalog_nr: B.16
 titel:
   de: Wirtschaftlich Berechtigte ans Transparenzregister melden
@@ -37,7 +37,7 @@ kanal: portal
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Bußgeld bis 150.000 € bei Vorsatz, sonst bis 100.000 €; bei schwerwiegenden, wiederholten oder systematischen Verstößen bis 1 Mio. € oder bis zum Zweifachen des wirtschaftlichen Vorteils (§ 56 Abs. 1 Satz 1 Nr. 55, Abs. 3 GwG).
   schwere: hoch
 automatisierung: hinweis
 aktion:
@@ -58,11 +58,17 @@ quellen:
 - titel: Geldwäschegesetz
   url: https://www.gesetze-im-internet.de/gwg_2017/
   abgerufen: null
+- titel: Geldwäschegesetz § 56 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/gwg_2017/__56.html
+  abgerufen: null
+- titel: § 56 GwG, Wortlaut (gesetze.legal, Spiegel des Bundesrechts)
+  url: https://gesetze.legal/bund/gwg/56
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
 - 'R12 (Rechtsprüfung Befund 1, K-205): Auslöser auf GmbH & Co. KG, PartG und PartG mbB erweitert (§ 20 Abs. 1 GwG, eingetragene Personengesellschaften); eGbR nur im Text – eigene Rechtsform „eGbR“ fehlt im Fragebogen'
 - Einzelvorschriften §§ 19, 20 GwG zugeordnet (R11); Nachmeldepflicht für Gesellschaften vor 1.8.2021 (§ 59 Abs. 8 GwG) nur im Kommentar – Fristen bestätigen
 - Frist nach Gründung und bei Änderung ergänzen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 21.10.2026: Sanktion ergänzt – § 56 Abs. 1 Nr. 55 (Mitteilung nach § 20 Abs. 1), Beträge Abs. 1 und 3 über gesetze.legal gelesen (gesetze-im-internet für das Werkzeug gesperrt); Staffelung nach dem Bußgeldkatalog des Bundesverwaltungsamts nicht abgebildet'
 pruefung:
   status: entwurf
   geprueft_von: null

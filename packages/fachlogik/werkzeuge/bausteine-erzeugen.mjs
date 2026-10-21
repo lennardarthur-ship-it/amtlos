@@ -71,7 +71,11 @@ const liste = (x) => (Array.isArray(x) ? x.join(", ") : (x ?? ""));
  * entfernt (Art. 6 Abs. 1 lit. b/c steht bereits da); Drittland aus dem Empfängertext übernommen.
  */
 const ohne26 = (t) => t.replace(/[;,]\s*(ergänzend )?Art\. 88 DSGVO i\. V\. m\. § 26( Abs\. 1)? BDSG/g, "");
-const drittland = (v) => (/USA/.test(liste(v.empfaenger)) ? "möglich: USA (Plattformbetreiber); Grundlage der Übermittlung: siehe Datenschutzhinweise des Anbieters" : "keine Übermittlung in Drittländer");
+/**
+ * Vorprüfung 21.10.2026 (Art. 13 Abs. 1 lit. f DSGVO): die Garantie selbst nennen, nicht auf die Hinweise des Anbieters
+ * verweisen – für Meta (Facebook, Instagram) der Angemessenheitsbeschluss zum EU-U.S. Data Privacy Framework.
+ */
+const drittland = (v) => (/USA/.test(liste(v.empfaenger)) ? "möglich: USA (Plattformbetreiber, z. B. Meta Platforms, Inc.); Grundlage der Übermittlung: Angemessenheitsbeschluss der EU-Kommission zum EU-U.S. Data Privacy Framework (Art. 45 DSGVO, Durchführungsbeschluss (EU) 2023/1795) für danach zertifizierte Anbieter" : "keine Übermittlung in Drittländer");
 const vvt = ds.vvt_verarbeitungen.map((v) => ({ titel: v.bezeichnung, werte: { bezeichnung: v.bezeichnung, zweck: v.zweck, rechtsgrundlage: ohne26(v.rechtsgrundlage), betroffene: liste(v.betroffene), datenarten: liste(v.datenarten), empfaenger: liste(v.empfaenger), loeschfrist: v.loeschfrist, drittland: drittland(v) }, quelle: beleg({ quelle: v.quelle }) }));
 const SCHUTZ = { pseudonymisierung_verschluesselung: "Verschlüsselung", vertraulichkeit: "Vertraulichkeit", integritaet: "Integrität", verfuegbarkeit_belastbarkeit: "Verfügbarkeit", wiederherstellung: "Wiederherstellung", ueberpruefung: "Überprüfung" };
 const tom = Object.entries(SCHUTZ).flatMap(([k, g]) => (ds.tom[k] ?? []).map((m) => ({ gruppe: g, titel: m.massnahme, werte: { schutzziel: k, massnahme: m.massnahme }, quelle: beleg({ quelle: m.quelle }) })));
@@ -173,11 +177,13 @@ const SETZE = [
   ["VVT", "Personalverwaltung (Personalakte, Arbeitszeit)", "quelle", "BayLDA-Muster"],
   ["VVT", "Bewerbungsverfahren", "werte.loeschfrist", "Unterlagen abgelehnter Bewerberinnen und Bewerber werden 6 Monate nach Abschluss des Bewerbungsverfahrens gelöscht. Grund: Ansprüche nach § 15 Abs. 4 AGG können binnen 2 Monaten ab Zugang der Ablehnung geltend gemacht werden; die Klagefrist beträgt 3 Monate nach schriftlicher Geltendmachung (§ 61b Abs. 1 ArbGG)."],
   ["VVT", "Bewerbungsverfahren", "quelle", "BayLDA-Muster; § 15 AGG; § 61b ArbGG"],
-  // keine feste Zahl: die Frist steht in der Datenschutzerklärung (Feld „Server-Logfiles werden gelöscht nach“) und hängt vom Hoster ab
-  ["VVT", "Betrieb der Website (Hosting, Server-Logfiles)", "werte.loeschfrist", "IP-Adressen in den Logfiles werden nach der Frist des Hosting-Anbieters gelöscht, die in der Datenschutzerklärung genannt ist (z. B. 7, 14 oder 30 Tage)."],
+  // Vorprüfung 21.10.2026: ein konkreter Wert statt „siehe Datenschutzerklärung“ (Papierdokumente an Kunden); die Frist hängt
+  // vom Hoster ab – im Verzeichnis anpassbar, in der Datenschutzinformation ein eigenes Feld (wie in der Website-Erklärung)
+  ["VVT", "Betrieb der Website (Hosting, Server-Logfiles)", "werte.loeschfrist", "Server-Logfiles mit IP-Adressen werden nach 14 Tagen gelöscht."],
   ["VVT", "Betrieb der Website (Hosting, Server-Logfiles)", "werte.empfaenger", "Hosting-Dienstleister (Auftragsverarbeiter)"],
   ["VVT", "Betrieb der Website (Hosting, Server-Logfiles)", "quelle", "BayLDA-Muster"],
-  ["VVT", "E-Mail-Newsletter / E-Mail-Werbung", "werte.loeschfrist", "Die Adresse wird nach Abmeldung oder Widerspruch unverzüglich aus dem Verteiler gelöscht; der Nachweis der Einwilligung wird zur Rechtsverteidigung aufbewahrt (Richtwert: 3 Jahre; Verjährung § 31 OWiG, § 195 BGB)."],
+  // Vorprüfung 21.10.2026 (T-106 Nr. 10): „bis zu drei Jahre“ wie in der Website-Datenschutzerklärung
+  ["VVT", "E-Mail-Newsletter / E-Mail-Werbung", "werte.loeschfrist", "Die Adresse wird nach Abmeldung oder Widerspruch unverzüglich aus dem Verteiler gelöscht; der Nachweis der Einwilligung wird zur Rechtsverteidigung bis zu drei Jahre aufbewahrt (Verjährung § 195 BGB, § 31 OWiG)."],
   ["VVT", "E-Mail-Newsletter / E-Mail-Werbung", "quelle", "DSK (Orientierungshilfe Werbung)"],
   ["VVT", "Videoüberwachung (z. B. Verkaufsraum, Eingang, Lager)", "werte.loeschfrist", "Aufnahmen werden in der Regel nach 72 Stunden gelöscht; länger nur zur Sicherung eines konkreten Vorfalls."],
   ["VVT", "Videoüberwachung (z. B. Verkaufsraum, Eingang, Lager)", "quelle", "DSK (Orientierungshilfe Videoüberwachung)"],
@@ -208,6 +214,10 @@ const ERSETZE = [
   ["DSE", "wenn Sie dem zuvor zugestimmt haben", "wenn Sie zuvor eingewilligt haben"],
   ["DSE", "wenn Sie dem zustimmen bzw. das Video aktiv starten", "wenn Sie eingewilligt haben bzw. das Video aktiv starten"],
   ["DSE", "zum EU-US Data Privacy Framework (Durchführungsbeschluss (EU) 2023/1795).", "zum EU-US Data Privacy Framework, Durchführungsbeschluss (EU) 2023/1795."],
+  // Vorprüfung 21.10.2026 (T-106 Nr. 9): YouTube und Google Fonts mit derselben Garantie für die USA wie Google Maps;
+  // Google Fonts mit § 25 TDDDG (Zugriff auf das Endgerät) wie die übrigen Einwilligungsbausteine
+  ["DSE", "auch mit Übermittlung in die USA. Rechtsgrundlage ist Ihre Einwilligung (§ 25 Abs. 1 TDDDG, Art. 6 Abs. 1 lit. a DSGVO), die Sie jederzeit widerrufen können. Weitere", "auch mit Übermittlung in die USA. Rechtsgrundlage ist Ihre Einwilligung (§ 25 Abs. 1 TDDDG, Art. 6 Abs. 1 lit. a DSGVO), die Sie jederzeit widerrufen können. Für Übermittlungen in die USA stützt sich Google auf den Angemessenheitsbeschluss zum EU-US Data Privacy Framework, Durchführungsbeschluss (EU) 2023/1795. Weitere"],
+  ["DSE", "wobei insbesondere Ihre IP-Adresse übermittelt wird. Dies erfolgt nur, wenn Sie zuvor eingewilligt haben (Art. 6 Abs. 1 lit. a DSGVO); die Einwilligung können Sie jederzeit widerrufen.", "wobei insbesondere Ihre IP-Adresse übermittelt wird, auch an Server in den USA. Dies erfolgt nur, wenn Sie zuvor eingewilligt haben (§ 25 Abs. 1 TDDDG, Art. 6 Abs. 1 lit. a DSGVO); die Einwilligung können Sie jederzeit widerrufen. Für Übermittlungen in die USA stützt sich Google auf den Angemessenheitsbeschluss zum EU-US Data Privacy Framework, Durchführungsbeschluss (EU) 2023/1795."],
   ["DSE", "einen Auftragsverarbeitungsvertrag geschlossen haben", "einen Vertrag zur Auftragsverarbeitung nach Art. 28 DSGVO geschlossen haben"],
   ["DSE", "auf Grundlage eines Vertrags nach Art. 28 DSGVO", "auf Grundlage eines Vertrags zur Auftragsverarbeitung nach Art. 28 DSGVO"],
   ["HYGIENE", " (Rahmenhygieneplan: > 1 Minute)", ", mindestens 1 Minute"],

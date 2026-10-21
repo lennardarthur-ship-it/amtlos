@@ -15,8 +15,6 @@ eintraege:
   en: If you have 20 or more workplaces, you report the employment of severely disabled persons every year by 31.3. and pay the compensatory levy (Ausgleichsabgabe) if applicable.
 - de: Ab 50 Beschäftigten richtest du eine interne Meldestelle für Hinweisgeber ein.
   en: If you have 50 or more employees, you set up an internal reporting channel for whistleblowers.
-- de: Ab dem 1. Januar 2027 musst du an Unternehmen E-Rechnungen schicken, wenn dein Vorjahresumsatz über 800.000 € liegt.
-  en: From 1 January 2027, you must send e-invoices to businesses if your previous year's revenue is above €800,000.
 - de: Ab dem 1. Januar 2028 schickst du an Unternehmen nur noch E-Rechnungen – Kleinunternehmer sind befreit.
   en: From 1 January 2028, you send only e-invoices to businesses – small businesses under the small business scheme are exempt.
 - de: Ab dem Umsatz über der Grenze fällt Umsatzsteuer an, auch wenn du sie nicht berechnet hast.
@@ -31,8 +29,6 @@ eintraege:
   en: As a managing director (Geschäftsführer), you have special duties and can be personally liable.
 - de: Als Gewerbetreibender bist du automatisch Mitglied der IHK oder Handwerkskammer und zahlst einen Beitrag nach deinem Ertrag.
   en: As a trader, you are automatically a member of the IHK or Chamber of Crafts and pay a fee based on your earnings.
-- de: Als Güterhändler hast du bei Bargeschäften ab der Schwelle des Geldwäschegesetzes Sorgfaltspflichten.
-  en: As a dealer in goods, you have due diligence obligations for cash transactions at or above the threshold of the Anti-Money Laundering Act (Geldwäschegesetz).
 - de: Als Kleinunternehmer darfst du bestimmte Umsatzgrenzen nicht überschreiten – sonst endet die Regelung.
   en: Under the small business scheme, you must not exceed certain revenue limits – otherwise the scheme ends.
 - de: Anfrage einer betroffenen Person beantworten
@@ -151,8 +147,6 @@ eintraege:
   en: Protect employee data
 - de: Bestellbutton eindeutig beschriften (Button-Lösung)
   en: Label the order button clearly (button solution)
-- de: Betriebe ab 20 Arbeitsplätzen haben eine Beschäftigungsquote. Die Anzeige und die Ausgleichsabgabe sind bis zum 31. März für das Vorjahr fällig.
-  en: Businesses with 20 or more workplaces have an employment quota. The report and the compensatory levy are due by 31 March for the previous year.
 - de: Betriebsarzt
   en: Company doctor
 - de: Betriebsnummer
@@ -189,8 +183,6 @@ eintraege:
   en: Federal Central Tax Office (Bundeszentralamt für Steuern)
 - de: Bundeszentralamt für Steuern (BZSt)
   en: Federal Central Tax Office (BZSt)
-- de: Bußgelder bis 10 Mio. € bzw. 2 % des Umsatzes sind möglich.
-  en: Fines of up to €10 million or 2% of revenue are possible.
 - de: Damit Amtlos die Termine der Lohnsteuer-Anmeldung berechnen kann, brauchst du den Anmeldezeitraum.
   en: So that Amtlos can calculate the dates for the payroll tax return (Lohnsteuer-Anmeldung), you need the filing period.
 - de: Das Arbeitssicherheitsgesetz und die DGUV Vorschrift 2 verlangen eine Betreuung durch eine Fachkraft für Arbeitssicherheit und einen Betriebsarzt. Kleinbetriebe können das Unternehmermodell der Berufsgenossenschaft
@@ -201,12 +193,8 @@ eintraege:
   en: The BFSG lists the affected products exhaustively. Check whether your products are among them.
 - de: Das Finanzamt hat Vorauszahlungen festgesetzt.
   en: The tax office has set prepayments.
-- de: Das Hinweisgeberschutzgesetz verlangt ab 50 Beschäftigten eine interne Meldestelle.
-  en: The Whistleblower Protection Act (HinSchG) requires an internal reporting channel from 50 employees.
 - de: Das Kapital, das die Gesellschafter bei der Gründung einer GmbH oder UG mindestens aufbringen.
   en: The minimum capital that the shareholders contribute when founding a GmbH or UG.
-- de: Das Nachweisgesetz verlangt, dass die wesentlichen Arbeitsbedingungen dokumentiert und der beschäftigten Person ausgehändigt werden.
-  en: The Verification Act (Nachweisgesetz) requires that the essential working conditions are documented and handed to the employee.
 - de: Das Verzeichnis beschreibt je Verarbeitung Zweck, betroffene Personen, Datenarten, Empfänger und Löschfristen. Amtlos hilft beim Anlegen und erzeugt das Verzeichnis als PDF.
   en: For each processing activity, the record describes the purpose, people affected, types of data, recipients and deletion periods. Amtlos helps you set it up and generates the record as a PDF.
 - de: Daten deiner Beschäftigten verarbeitest du nur, soweit es für das Arbeitsverhältnis nötig ist.
@@ -241,18 +229,10 @@ eintraege:
   en: Your business is a skilled trade business (Handwerksbetrieb).
 - de: Dein Geschäftsjahr weicht vom Kalenderjahr ab.
   en: Your financial year differs from the calendar year.
-- de: Dein Umsatz im Gründungsjahr hat 80 % der Grenze erreicht.
-  en: Your revenue in your founding year has reached 80% of the limit.
-- de: Dein Umsatz im Gründungsjahr hat 95 % der Grenze erreicht.
-  en: Your revenue in your founding year has reached 95% of the limit.
 - de: Dein Umsatz im Vorjahr lag über 800.000 €.
   en: Your revenue in the previous year was above €800,000.
 - de: Dein Umsatz im Vorjahr lag über der Grenze.
   en: Your revenue in the previous year was above the limit.
-- de: Dein Umsatz in diesem Jahr hat 80 % der Grenze erreicht.
-  en: Your revenue this year has reached 80% of the limit.
-- de: Dein Umsatz in diesem Jahr hat 95 % der Grenze erreicht.
-  en: Your revenue this year has reached 95% of the limit.
 - de: Dein Umsatz lag über 2 Mio. €.
   en: Your revenue was over €2 million.
 - de: Dein Unternehmen fällt unter NIS2.
@@ -283,8 +263,6 @@ eintraege:
   en: Your activity is a trade (Gewerbe).
 - de: Deine Website nutzt Tracking.
   en: Your website uses tracking.
-- de: Deine elektronische Kasse braucht eine technische Sicherheitseinrichtung (TSE), und du musst Belege ausgeben.
-  en: Your electronic cash register needs a technical security device (TSE), and you must issue receipts.
 - de: Den Anmeldezeitraum teilt dir das Finanzamt mit. Du findest ihn in deinen Unterlagen zur Lohnsteuer oder fragst deine Steuerberatung.
   en: The tax office (Finanzamt) tells you the filing period. You can find it in your payroll tax documents or ask your tax adviser.
 - de: Den Jahresabschluss reichst du spätestens zwölf Monate nach Ende deines Geschäftsjahres beim Unternehmensregister ein.
@@ -349,8 +327,6 @@ eintraege:
     davon ist mindestens die Hälfte einzuzahlen. Eine UG kann ab 1 € gegründet werden.
   en: Founding a GmbH or UG starts with the articles of association, which are notarised by a notary. Notarisation is also possible online. For a GmbH, the share capital is at least €25,000, of which at
     least half must be paid in. A UG can be founded from €1.
-- de: Die Hinweispflicht nach § 36 VSBG gilt für Unternehmer mit mehr als 10 Beschäftigten, die eine Website unterhalten oder AGB verwenden.
-  en: The notice obligation under § 36 VSBG applies to businesses with more than 10 employees that run a website or use terms and conditions.
 - de: Die Höhe steht im Bescheid deiner Gemeinde.
   en: The amount is stated in your municipality's tax notice.
 - de: Die Information nennt unter anderem Zweck, Rechtsgrundlage, Empfänger, Speicherdauer und die Rechte der Betroffenen.
@@ -359,8 +335,6 @@ eintraege:
   en: The annual return summarises the VAT for the whole year – without a tax adviser by 31 July of the following year, with a tax adviser by the end of February of the year after that (§ 149 AO).
 - de: Die Kleinunternehmerregelung endet ab dem Umsatz, der die Grenze überschreitet. Amtlos zählt dafür die Rechnungen, die du in Amtlos gestellt hast. Rechnungen außerhalb von Amtlos sind nicht enthalten.
   en: The small business scheme (Kleinunternehmerregelung) ends from the sale that exceeds the limit. For this, Amtlos counts the invoices you issued in Amtlos. Invoices outside Amtlos are not included.
-- de: Die Kleinunternehmerregelung endet ab dem Umsatz, der die Grenze überschreitet. Prüfe mit dem Finanzamt oder deiner Steuerberatung, ab wann du Umsatzsteuer ausweisen und anmelden musst.
-  en: The small business scheme (Kleinunternehmerregelung) ends from the sale that exceeds the limit. Check with the tax office (Finanzamt) or your tax adviser from when you must show and declare VAT.
 - de: Die Lebensmittelinformationsverordnung verlangt Angaben zu Allergenen. Amtlos führt eine Allergenliste je Gericht und erstellt daraus eine Übersicht zum Aushängen.
   en: The Food Information Regulation (LMIV) requires information on allergens. Amtlos keeps an allergen list per dish and creates an overview from it for you to post.
 - de: Die Lohnabrechnung selbst macht ein systemgeprüfter Partner; Amtlos liefert Stammdaten und Fristen.
@@ -373,8 +347,6 @@ eintraege:
   en: The mini-job limit is linked to the minimum wage. Amtlos keeps the values with their validity period.
 - de: Die Mitteilung an die zuständige Aufsichtsbehörde ist Pflicht des Arbeitgebers.
   en: Notifying the competent supervisory authority is the employer's obligation.
-- de: Die Pflicht folgt aus § 38 BDSG bzw. Art. 37 DSGVO. Die Bundesregierung plant, § 38 BDSG bis Ende 2026 zu streichen; ein Gesetz gibt es noch nicht.
-  en: The obligation follows from § 38 BDSG or Art. 37 GDPR. The federal government plans to remove § 38 BDSG by the end of 2026; there is no law yet.
 - de: Die Pflicht zum Versand strukturierter E-Rechnungen (XRechnung oder ZUGFeRD) gilt ab 1.1.2027 für Unternehmen mit mehr als 800.000 € Vorjahresumsatz. Kleinunternehmer sind befreit. Eine PDF-Rechnung
     ist keine E-Rechnung.
   en: The obligation to send structured e-invoices (XRechnung or ZUGFeRD) applies from 1.1.2027 to businesses with more than €800,000 in previous year's revenue. Small businesses under the small business
@@ -427,8 +399,6 @@ eintraege:
   en: You are unsure whether NIS2 applies to you.
 - de: Du bist unsicher, ob deine Tätigkeit ein Gewerbe oder ein freier Beruf ist.
   en: You are unsure whether your activity is a trade or a liberal profession.
-- de: Du brauchst eine sicherheitstechnische und betriebsärztliche Betreuung – für Kleinbetriebe auch im Unternehmermodell.
-  en: You need occupational safety and company doctor support – small businesses can also use the employer model (Unternehmermodell).
 - de: Du bringst verpackte Waren in Verkehr.
   en: You place packaged goods on the market.
 - de: Du erbringst Bauleistungen.
@@ -495,8 +465,6 @@ eintraege:
   en: You file wage tax returns with the tax office.
 - de: Du meldest dem Finanzamt regelmäßig, wie viel Umsatzsteuer du eingenommen und gezahlt hast, und überweist die Differenz.
   en: You regularly report to the tax office (Finanzamt) how much VAT you have collected and paid, and transfer the difference.
-- de: Du musst Bücher nach den Regeln der doppelten Buchführung führen und einen Jahresabschluss machen.
-  en: You must keep books according to the rules of double-entry bookkeeping and prepare annual financial statements.
 - de: Du nimmst hohe Barzahlungen für Waren an.
   en: You accept large cash payments for goods.
 - de: Du nutzt Dienstleister, die für dich Daten verarbeiten.
@@ -733,8 +701,6 @@ eintraege:
   en: Municipality (tax office, Steueramt)
 - de: Geplant ist eine Pflicht zur elektronischen Arbeitszeiterfassung, mit Übergangsfristen nach Betriebsgröße.
   en: An obligation to record working time electronically is planned, with transition periods depending on company size.
-- de: Geplant ist, Gründungen digital und deutlich schneller zu ermöglichen.
-  en: The plan is to make founding a company digital and much faster.
 - de: Gesellschafterliste aktualisieren
   en: Update the list of shareholders
 - de: Gesellschaftsvertrag beim Notar beurkunden
@@ -835,8 +801,6 @@ eintraege:
   en: Label AI content and AI interaction
 - de: KI-Kompetenz
   en: AI literacy
-- de: KI-Kompetenz der Beschäftigten sicherstellen
-  en: Ensure your employees' AI literacy
 - de: Kapitalgesellschaften zahlen Körperschaftsteuer und geben dafür jährlich eine Erklärung ab – ohne Steuerberatung bis 31. Juli des Folgejahres, mit Steuerberatung bis Ende Februar des übernächsten Jahres (§ 149 AO).
   en: Corporations pay corporate income tax and file an annual return for it – without a tax adviser by 31 July of the following year, with a tax adviser by the end of February of the year after that (§ 149 AO).
 - de: Kasse mit TSE betreiben und Belege ausgeben
@@ -963,16 +927,6 @@ eintraege:
     es weißt.
   en: NIS2 affects companies in certain sectors above a certain size. If you are affected, you must register with the BSI and report security incidents. Answer the question in your profile as soon as you
     know.
-- de: Nach deinen Angaben liegt dein Umsatz über einer Kleinunternehmergrenze. Dann musst du Umsatzsteuer berechnen.
-  en: According to your information, your revenue is above a small business limit. In that case you must charge VAT.
-- de: Nach deinen Rechnungen in Amtlos hast du 80 % der Kleinunternehmergrenze erreicht.
-  en: According to your invoices in Amtlos, you have reached 80% of the small business limit.
-- de: Nach deinen Rechnungen in Amtlos hast du 95 % der Kleinunternehmergrenze erreicht.
-  en: According to your invoices in Amtlos, you have reached 95% of the small business limit.
-- de: Nach deinen Rechnungen in Amtlos liegt dein Umsatz im Gründungsjahr über der Grenze.
-  en: According to your invoices in Amtlos, your revenue in your founding year is above the limit.
-- de: Nach deinen Rechnungen in Amtlos liegt dein Umsatz in diesem Jahr über der Grenze.
-  en: According to your invoices in Amtlos, your revenue this year is above the limit.
 - de: Nach dem Plattformen-Steuertransparenzgesetz (DAC7) melden Plattformen bestimmte Verkäufer. Amtlos erklärt, was gemeldet wird.
   en: Under the Platform Tax Transparency Act (Plattformen-Steuertransparenzgesetz, DAC7), platforms report certain sellers. Amtlos explains what is reported.
 - de: Nach jedem Geschäftsjahr erstellst du Bilanz und Gewinn- und Verlustrechnung; die Gesellschafter stellen den Abschluss fest.
@@ -1051,21 +1005,12 @@ eintraege:
   en: Avoid false self-employment
 - de: Schwangerschaft der Aufsichtsbehörde mitteilen
   en: Notify the supervisory authority of a pregnancy
-- de: Seit 19.6.2026 brauchen B2C-Online-Verträge mit Widerrufsrecht einen Widerrufsbutton – zweistufig, ohne Login, mit Eingangsbestätigung auf einem dauerhaften Datenträger.
-  en: 'Since 19.6.2026, B2C online contracts with a right of withdrawal need a withdrawal button: two-step, without login, with confirmation of receipt on a durable medium.'
-- de: Seit 2025 musst du elektronische Rechnungen (XRechnung, ZUGFeRD) von anderen Unternehmen empfangen können.
-  en: Since 2025, you must be able to receive electronic invoices (XRechnung, ZUGFeRD) from other businesses.
 - de: Seit 28.6.2025 müssen bestimmte Dienstleistungen wie Onlineshops barrierefrei sein – mit Barrierefreiheitserklärung.
   en: Since 28.6.2025, certain services such as online shops must be accessible, with an accessibility statement.
 - de: Setzt deine Website Tracking oder nicht notwendige Cookies ein, holst du vorher die Einwilligung der Besucher ein.
   en: If your website uses tracking or non-essential cookies, you get visitors' consent first.
 - de: Sicherheitsvorfälle melden (NIS2)
   en: Report security incidents (NIS2)
-- de: Sind in der Regel mindestens 20 Personen ständig mit der automatisierten Verarbeitung von Daten beschäftigt, benennst du einen Datenschutzbeauftragten.
-  en: If, as a rule, at least 20 people are constantly involved in the automated processing of data, you appoint a data protection officer.
-- de: Sobald du mindestens eine Person beschäftigst, musst du die Gefährdungen an jedem Arbeitsplatz beurteilen, Schutzmaßnahmen festlegen und das dokumentieren. Amtlos erstellt dir dafür eine Vorlage passend
-    zu deiner Branche.
-  en: As soon as you employ at least one person, you must assess the hazards at every workplace, define protective measures and document this. Amtlos creates a template for you that fits your industry.
 - de: Sofortmeldung bei Arbeitsbeginn
   en: Immediate notification when work starts
 - de: Sondervorauszahlung zur Umsatzsteuer leisten
@@ -1309,8 +1254,6 @@ eintraege:
   en: Now also applies to business profiles on social networks.
 - de: Link zur OS-Plattform entfernen
   en: Remove the link to the ODR platform
-- de: Die Pflicht zum Link auf die Online-Streitbeilegungsplattform der EU ist seit 20.07.2025 entfallen. Steht der Link noch auf deiner Website, entferne ihn.
-  en: The obligation to link to the EU online dispute resolution platform no longer applies since 20.07.2025. If the link is still on your website, remove it.
 - de: Die Verordnung (EU) Nr. 524/2013 über die Online-Streitbeilegung ist durch die Verordnung (EU) 2024/3228 mit Wirkung zum 20.07.2025 aufgehoben, die Plattform eingestellt. Damit ist auch die Pflicht entfallen, auf sie zu verlinken. Ein Link auf die eingestellte Plattform hilft niemandem – entferne ihn aus Impressum, Shop und AGB. Der Online-Check meldet, ob er noch auf deiner Website steht.
   en: Regulation (EU) No 524/2013 on online dispute resolution was repealed by Regulation (EU) 2024/3228 with effect from 20.07.2025, and the platform was shut down. This also ended the obligation to link to it. A link to the closed platform helps nobody – remove it from your legal notice, shop and terms. The online check reports whether it is still on your website.
 - de: Die Linkpflicht ist seit 20.07.2025 entfallen (Verordnung (EU) 2024/3228). Entferne den Link.
@@ -1411,16 +1354,12 @@ eintraege:
   en: The data sheet from Amtlos only prepares the report. It is done once you confirm that you transmitted it in ELSTER.
 - de: Ab 1. Januar Regelbesteuerung
   en: Standard VAT from 1 January
-- de: Nach deinen Angaben liegt dein Umsatz in diesem Jahr über 25.000 €. Dieses Jahr bleibst du Kleinunternehmer, ab 1. Januar des nächsten Jahres gilt die Regelbesteuerung.
-  en: According to your details, your turnover this year exceeds €25,000. You remain a small business this year; from 1 January of next year standard VAT taxation applies.
 - de: Die Kleinunternehmerregelung setzt voraus, dass dein Umsatz im Vorjahr höchstens 25.000 € betrug. Überschreitest du diese Grenze in diesem Jahr, ohne über 100.000 € zu kommen, gilt die Regelung bis zum Jahresende weiter. Ab 1. Januar weist du auf deinen Rechnungen Umsatzsteuer aus, gibst Umsatzsteuer-Voranmeldungen ab und kannst die Vorsteuer aus deinen Eingangsrechnungen abziehen. Stelle Rechnungsvorlage, Preise und Buchhaltung rechtzeitig um.
   en: The small business scheme requires that your turnover last year was no more than €25,000. If you exceed this limit this year without going over €100,000, the scheme continues until the end of the year. From 1 January you show VAT on your invoices, file advance VAT returns and can deduct input VAT from your purchase invoices. Adjust your invoice template, prices and bookkeeping in good time.
 - de: Dein Umsatz im Vorjahr lag höchstens bei 25.000 €.
   en: Your turnover last year was no more than €25,000.
 - de: Dein erwarteter Umsatz in diesem Jahr liegt über 25.000 €.
   en: Your expected turnover this year exceeds €25,000.
-- de: Nach deinen Rechnungen in Amtlos liegt dein Umsatz in diesem Jahr über 25.000 €.
-  en: According to your invoices in Amtlos, your turnover this year exceeds €25,000.
 - de: Ab 1. Januar fällt Umsatzsteuer an, auch wenn du sie nicht berechnest.
   en: From 1 January VAT is due, even if you do not charge it.
 - de: 'Die Kleinunternehmerregelung gilt, wenn dein Umsatz im Vorjahr höchstens 25.000 € betrug und im laufenden Jahr 100.000 € nicht übersteigt. Die 25.000 € beziehen sich also auf das Vorjahr: Liegt dein Umsatz in diesem Jahr über 25.000 €, aber höchstens bei 100.000 €, bleibst du dieses Jahr Kleinunternehmer – ab 1. Januar des nächsten Jahres gilt dann die Regelbesteuerung. Die 100.000 € sind die harte Grenze im laufenden Jahr: Ab dem Umsatz, mit dem du sie überschreitest, endet die Regelung sofort. Im Gründungsjahr gilt 25.000 € als harte Grenze für das laufende Jahr. Wer auf die Regelung verzichtet, ist fünf Jahre daran gebunden.'
@@ -1491,8 +1430,6 @@ eintraege:
   en: The data sheet from Amtlos only prepares the notification. It is done once you have submitted the trade notification to the trade office.
 - de: Das Impressum nennt unter anderem Name, Anschrift und Kontakt, bei Gesellschaften auch Vertretung und Register. Auch ein geschäftliches Profil zum Beispiel bei Instagram oder Facebook ist ein digitaler Dienst mit Impressumspflicht – verlinke dort dein Impressum. Erledigt ist es, wenn es auf deiner Website veröffentlicht und verlinkt ist.
   en: The legal notice states, among other things, name, address and contact details, for companies also representation and register. A business profile, for example on Instagram or Facebook, is also a digital service requiring a legal notice – link your legal notice there. It is done once it is published and linked on your website.
-- de: Dazu gehören unter anderem die Identifizierung der Vertragspartner und ein Risikomanagement. Die Pflichten greifen bei Barzahlungen ab 10.000 € (§ 10 Abs. 6a GwG), beim Handel mit Edelmetallen schon ab 2.000 €. Als Verpflichteter registrierst du dich außerdem bei der Zentralstelle für Finanztransaktionsuntersuchungen (goAML), auch ohne Verdachtsfall (§ 45 Abs. 1 S. 2 GwG).
-  en: These include identifying contracting parties and risk management. The obligations apply to cash payments from €10,000 (§ 10(6a) GwG), for trading in precious metals from €2,000. As an obliged entity you also register with the Financial Intelligence Unit (goAML), even without a suspicious case (§ 45(1) sentence 2 GwG).
 - de: Dein Betrieb ist groß genug oder in einer Branche, für die NIS2 auch ohne Größenschwelle gelten kann.
   en: Your business is large enough or in a sector to which NIS2 may apply regardless of size.
 - de: Dein Geschäftsjahr ist das Kalenderjahr (oder du hast nichts anderes angegeben).
@@ -1565,8 +1502,6 @@ eintraege:
   en: Once a year you report the previous year's wages to the employers' liability insurance association – usually via the payroll software.
 - de: Endet eine Beschäftigung, meldest du die Person mit der nächsten Lohnabrechnung bei der Krankenkasse ab, spätestens sechs Wochen nach dem Ende.
   en: When employment ends, you deregister the person with the health insurer with the next payroll, at the latest six weeks after the end.
-- de: Erlaubnispflichtig sind unter anderem Makler, Bewachung, Versicherungs- und Finanzanlagenvermittlung (§§ 30–34i GewO). Für Gaststätten kommt es auf das Land an – nach dem Gaststättengesetz des Bundes braucht nur der Ausschank alkoholischer Getränke eine Erlaubnis (§ 2 GastG), manche Länder verlangen statt einer Erlaubnis nur eine Anzeige. Für einzelne Feste gibt es eine vorübergehende Gestattung (§ 12 GastG). Frag beim Gewerbeamt nach, was in deinem Land gilt. Die Erlaubnis muss vor Aufnahme der Tätigkeit vorliegen. Die Reisegewerbekarte ist eine eigene Pflicht.
-  en: Permits are required among others for brokers, security services, insurance and financial investment intermediaries (§§ 30–34i GewO). For restaurants it depends on the federal state – under the federal Restaurants Act only serving alcoholic drinks needs a permit (§ 2 GastG); some states only require a notification instead of a permit. For single events there is a temporary permit (§ 12 GastG). Ask the trade office what applies in your state. The permit must be available before the activity starts. The itinerant trade card is a separate obligation.
 - de: Erledigt ist der Fragebogen erst, wenn du ihn in ELSTER übermittelt hast – vorher brauchst du das ELSTER-Konto.
   en: The questionnaire is only done once you have submitted it in ELSTER – for this you first need the ELSTER account.
 - de: Fehlt die Dokumentation oder ist sie unrichtig, unvollständig oder nicht rechtzeitig erstellt, droht direkt ein Bußgeld bis 5.000 € (§ 9 Abs. 1 Nr. 1 ArbStättV in Verbindung mit § 25 Abs. 1 Nr. 1 ArbSchG; ebenso § 22 BetrSichV und § 22 GefStoffV). Bei Arbeitsunfällen besteht außerdem ein Haftungsrisiko.
@@ -1581,8 +1516,6 @@ eintraege:
   en: Young people have a shorter interval than the annual briefing of other staff. Before employment starts and after significant changes you brief them on the hazards and protective measures; after that you repeat the briefing at least every six months (§ 29 JArbSchG). Six months after each briefing you record in Amtlos, Amtlos reminds you of the next one.
 - de: Für jede beschäftigte Person geht bis zum 15. Februar eine Jahresmeldung für das Vorjahr an die Krankenkasse.
   en: For each employee, an annual report for the previous year goes to the health insurer by 15 February.
-- de: Für manche Gewerbe brauchst du eine Erlaubnis, bevor du anfängst – zum Beispiel als Makler, im Bewachungsgewerbe oder für den Ausschank von Alkohol.
-  en: Some trades need a permit before you start – for example as a broker, in security services or for serving alcohol.
 - de: Gaststätten legen Preisverzeichnisse für Speisen und Getränke auf den Tischen aus oder legen sie jedem Gast vor der Bestellung und auf Verlangen bei der Abrechnung vor; alternativ hängen sie sie gut lesbar aus. Zusätzlich hängt neben dem Eingang ein Verzeichnis mit den Preisen der wesentlichen Speisen und Getränke (§ 7 PAngV). Die Preise sind Endpreise einschließlich Umsatzsteuer und Bedienung.
   en: Restaurants place price lists for food and drinks on the tables or present them to every guest before ordering and on request when paying; alternatively they display them legibly. In addition, a list with the prices of the main food and drinks is displayed next to the entrance (§ 7 PAngV). Prices are final prices including VAT and service.
 - de: Gebäudereinigung ist ein zulassungsfreies Handwerk (Anlage B1 der Handwerksordnung).
@@ -1623,8 +1556,6 @@ eintraege:
   en: Pay apprentices the minimum allowance
 - de: Nach der Arbeitsstättenverordnung triffst du Vorkehrungen gegen Brände. Wie viele Feuerlöscher du brauchst, richtet sich nach Größe und Brandgefährdung der Räume (Technische Regel für Arbeitsstätten ASR A2.2). Die Feuerlöscher lässt du regelmäßig, in der Regel alle zwei Jahre, von einer sachkundigen Person prüfen. Dazu kommen Brandschutzhelfer unter deinen Beschäftigten.
   en: Under the Workplaces Ordinance you take precautions against fire. How many fire extinguishers you need depends on the size and fire risk of the rooms (Technical Rule for Workplaces ASR A2.2). You have the fire extinguishers inspected regularly, as a rule every two years, by a competent person. In addition you need fire safety assistants among your staff.
-- de: Ohne Belehrung kann der Kunde bis zu 12 Monate und 14 Tage widerrufen und muss für erbrachte Leistungen in der Regel keinen Wertersatz zahlen (§ 356 Abs. 3, § 357a Abs. 2 BGB).
-  en: Without information on the right of withdrawal, the customer can withdraw for up to 12 months and 14 days and as a rule does not have to pay compensation for services already provided (§ 356(3), § 357a(2) BGB).
 - de: Ohne Bescheinigung nach 14 Monaten darfst du die jugendliche Person nicht weiter beschäftigen (§ 33 Abs. 3 JArbSchG).
   en: Without a certificate after 14 months you may not continue to employ the young person (§ 33(3) JArbSchG).
 - de: Ohne Kleinunternehmerregelung gibst du Voranmeldungen ab, solange das Finanzamt dich nicht befreit.
@@ -1647,10 +1578,6 @@ eintraege:
   en: Inform staff in writing about carrying ID
 - de: Verkaufst du Essen oder Getränke zum Mitnehmen in Einwegverpackungen aus Kunststoff oder Einwegbechern, bietest du auch Mehrweg an.
   en: If you sell food or drinks to take away in single-use plastic packaging or single-use cups, you also offer reusable packaging.
-- de: Verkaufst du ohne feste Niederlassung oder ohne vorherige Bestellung – etwa auf Märkten oder von Ort zu Ort –, brauchst du vor dem Start in der Regel eine Reisegewerbekarte.
-  en: If you sell without fixed premises or without prior order – for example at markets or from place to place – you usually need an itinerant trade card before you start.
-- de: Verträge, die du mit Verbrauchern außerhalb deiner Geschäftsräume schließt – etwa in der Wohnung beim Aufmaß oder unterwegs –, können sie 14 Tage lang widerrufen (§ 312b, § 312g BGB). Darüber informierst du vor Vertragsschluss und gibst die Belehrung und eine Abschrift des Vertrags auf Papier oder, wenn der Kunde zustimmt, auf einem anderen dauerhaften Datenträger heraus. Fehlt die Belehrung, läuft die Widerrufsfrist bis zu 12 Monate und 14 Tage (§ 356 Abs. 3 BGB). Widerruft der Kunde dann, schuldet er für bereits erbrachte Leistungen in der Regel keinen Wertersatz (§ 357a Abs. 2 BGB). Willst du vor Ablauf der Frist anfangen, lass dir das ausdrücklich vom Kunden verlangen und halte es fest.
-  en: Consumers can withdraw from contracts you conclude with them outside your business premises – for example at their home when measuring up or on the go – for 14 days (§ 312b, § 312g BGB). You inform them about this before the contract is concluded and hand over the information and a copy of the contract on paper or, if the customer agrees, on another durable medium. Without this information the withdrawal period runs for up to 12 months and 14 days (§ 356(3) BGB). If the customer then withdraws, as a rule they owe no compensation for services already provided (§ 357a(2) BGB). If you want to start before the period expires, have the customer expressly request this and keep a record.
 - de: Videoüberwachung braucht einen berechtigten Zweck, muss erkennbar sein (Hinweisschild) und gehört ins Verzeichnis der Verarbeitungstätigkeiten. Rechtsgrundlage ist für Unternehmen das berechtigte Interesse (Art. 6 Abs. 1 lit. f DSGVO) – du wägst es gegen die Interessen der Gefilmten ab und hältst das fest. Das Hinweisschild nennt nach Art. 13 DSGVO mindestens dich als Verantwortlichen, den Zweck und wo die weiteren Informationen stehen.
   en: Video surveillance needs a legitimate purpose, must be recognisable (sign) and belongs in the record of processing activities. For businesses the legal basis is legitimate interest (Art. 6(1)(f) GDPR) – you weigh it against the interests of the people filmed and record this. Under Art. 13 GDPR the sign states at least you as controller, the purpose and where further information can be found.
 - de: Vor Beginn brauchen Jugendliche die Bescheinigung über die Erstuntersuchung (§ 32 JArbSchG). Ein Jahr nach Aufnahme der ersten Beschäftigung lässt du dir die Bescheinigung über die erste Nachuntersuchung vorlegen (§ 33 JArbSchG). Liegt sie nach 14 Monaten nicht vor, darfst du die Person nicht weiter beschäftigen. Amtlos rechnet ab der Einstellung.
@@ -1669,8 +1596,6 @@ eintraege:
   en: Anyone who works with food at your business for the first time needs the certificate of the briefing by the public health office before the first working day.
 - de: Wer gewerbsmäßig leicht verderbliche Lebensmittel herstellt, behandelt oder in Verkehr bringt, braucht dafür Fachkenntnisse aus einer Schulung (§ 4 Lebensmittelhygiene-Verordnung). Als Lebensmittelunternehmer stellst du sicher, dass alle, die mit Lebensmitteln umgehen, ihrer Tätigkeit entsprechend in Hygiene geschult und überwacht werden (Anhang II Kapitel XII VO (EG) Nr. 852/2004). Halte die Schulungen mit Datum und Teilnehmenden fest.
   en: Anyone who commercially produces, handles or places perishable food on the market needs the specialist knowledge from training for this (§ 4 Food Hygiene Ordinance). As a food business operator you ensure that everyone handling food is supervised and trained in hygiene according to their activity (Annex II Chapter XII Regulation (EC) No 852/2004). Record the training with date and participants.
-- de: Wer im Unternehmen mit KI arbeitet, sollte ausreichende KI-Kompetenz haben – fördere sie durch Schulung und halte das fest.
-  en: Anyone working with AI in the business should have sufficient AI literacy – promote it through training and keep a record.
 - de: Wer nicht die Staatsangehörigkeit eines EU- oder EWR-Staats oder der Schweiz hat, darf nur arbeiten, wenn der Aufenthaltstitel das erlaubt. Als Arbeitgeber prüfst du vor Beginn, ob ein solcher Titel oder eine Erlaubnis zur Beschäftigung vorliegt, und bewahrst für die Dauer der Beschäftigung eine Kopie auf, auf Papier oder elektronisch (§ 4a Abs. 5 AufenthG). Achte auf das Ablaufdatum des Titels.
   en: Anyone who is not a national of an EU or EEA state or Switzerland may only work if their residence permit allows it. As employer you check before they start whether such a permit or a permission to work exists and keep a copy for the duration of employment, on paper or electronically (§ 4a(5) AufenthG). Watch the expiry date of the permit.
 - de: Zur Prüfung befähigte Person
@@ -1843,8 +1768,6 @@ eintraege:
   en: You sell or serve alcohol or tobacco.
 - de: 'EU-Verpackungsverordnung: mitgebrachte Behälter und Mehrweg (ab 2027)'
   en: 'EU Packaging Regulation: customers'' own containers and reusables (from 2027)'
-- de: Ein Reisegewerbe betreibt, wer außerhalb seiner gewerblichen Niederlassung oder ohne eine solche Waren oder Leistungen anbietet, ohne vorher bestellt worden zu sein. Dafür brauchst du eine Reisegewerbekarte vom Gewerbeamt (§ 55 GewO). Sie muss vor dem Start vorliegen. Plane genug Vorlauf ein – für den Antrag brauchst du in der Regel ein Führungszeugnis und eine Auskunft aus dem Gewerbezentralregister, die du selbst erst beantragen musst. Für Märkte, Messen und Volksfeste, die die Gemeinde festgesetzt hat, gelten Ausnahmen (Titel IV GewO) – prüfe beim Gewerbeamt, ob du die Karte trotzdem brauchst. Für bestimmte Tätigkeiten ohne Karte gilt stattdessen eine Anzeigepflicht (§ 55c GewO).
-  en: An itinerant trade is carried on by anyone who offers goods or services outside their business premises, or without any, without having been ordered beforehand. For this you need an itinerant trade card from the trade office (§ 55 GewO). It must be available before you start. Allow enough lead time – for the application you usually need a certificate of good conduct and an extract from the central trade register, which you must apply for yourself first. Exemptions apply to markets, fairs and festivals set by the municipality (Title IV GewO) – check with the trade office whether you still need the card. For certain activities without a card, a notification duty applies instead (§ 55c GewO).
 - de: Ein Verstoß ist eine Ordnungswidrigkeit (§ 7 Abs. 2 Nr. 1 LMZDV).
   en: A breach is an administrative offence (§ 7(2) no. 1 LMZDV).
 - de: Eine Erlaubnis nach dem Güterkraftverkehrsgesetz brauchst du für die gewerbliche Beförderung von Gütern mit Fahrzeugen, die einschließlich Anhänger mehr als 3,5 t zulässige Gesamtmasse haben (§§ 1, 3 GüKG). Für grenzüberschreitende Fahrten und Kabotage brauchst du eine Gemeinschaftslizenz – seit dem 21.5.2022 auch für Fahrzeuge über 2,5 t bis 3,5 t (Verordnung (EG) Nr. 1072/2009). Werkverkehr, also die Beförderung eigener Güter für eigene Zwecke, ist erlaubnisfrei (§ 1 Abs. 2, 3 GüKG). Für Taxi- und Mietwagenverkehr brauchst du unabhängig davon eine Genehmigung nach dem Personenbeförderungsgesetz.
@@ -1881,8 +1804,6 @@ eintraege:
   en: 'For food you sell loose – at the counter, in a restaurant or snack bar – you indicate certain additives: for example “with colouring”, “with preservative” or “preserved”, “with antioxidant”, “with flavour enhancer” or “with sweetener” (§ 5 LMZDV). Footnotes on the menu or a sign on the product are common. Instead, you can provide the information on a notice, in a written list or electronically, as long as you point to it clearly (§ 5(3) LMZDV). Allergen labelling is a separate obligation.'
 - de: Für die Güterbeförderung mit Fahrzeugen über 2,8 t bis 3,5 t zulässiger Gesamtmasse gelten im Inland ebenfalls die Lenk- und Ruhezeiten der Verordnung (EG) Nr. 561/2006; das regelt die Fahrpersonalverordnung. Ist kein Fahrtenschreiber eingebaut, führen die Fahrerinnen und Fahrer handschriftliche Tageskontrollblätter; ist einer eingebaut, wird er benutzt. Die Nachweise für den laufenden Tag und die vorangegangenen 28 Tage führen sie mit. Für Werkverkehr gibt es unter bestimmten Bedingungen Ausnahmen.
   en: For the carriage of goods with vehicles over 2.8 t up to 3.5 t permissible total mass, the driving and rest times of Regulation (EC) No 561/2006 also apply domestically; this is set out in the Drivers' Personnel Ordinance (FPersV). If no tachograph is fitted, drivers keep handwritten daily record sheets; if one is fitted, it is used. Drivers carry the records for the current day and the previous 28 days. For own-account transport there are exemptions under certain conditions.
-- de: Für gewerblichen Güterkraftverkehr mit Fahrzeugen über 3,5 t brauchst du eine Erlaubnis, grenzüberschreitend schon über 2,5 t eine Gemeinschaftslizenz.
-  en: For commercial road haulage with vehicles over 3.5 t you need a licence, across borders already over 2.5 t a Community licence.
 - de: Für jede Betriebsstätte außerhalb deiner Wohnung und für Firmenfahrzeuge zahlst du Rundfunkbeitrag – du meldest sie an und meldest Änderungen.
   en: You pay the broadcasting fee for every business premises outside your home and for company vehicles – you register them and report changes.
 - de: Für überwachungsbedürftige Gewerbe wie Gebrauchtwarenhandel oder Schlüsseldienst beantragst du nach der Gewerbeanzeige unverzüglich ein Führungszeugnis und eine Auskunft aus dem Gewerbezentralregister.
@@ -2029,8 +1950,6 @@ eintraege:
   en: Competent person, e.g. a car repair workshop
 - de: Scheinselbstständigkeit bei Subunternehmern vermeiden
   en: Avoid false self-employment among subcontractors
-- de: Schließt du einen Vertrag mit einem Verbraucher ausschließlich über Fernkommunikationsmittel – Telefon, E-Mail, Brief oder Messenger –, ist das ein Fernabsatzvertrag, wenn dein Betrieb für solche Verträge eingerichtet ist (§ 312c BGB). Der Kunde kann ihn 14 Tage lang widerrufen (§ 312g, § 355 BGB). Darüber informierst du vor Vertragsschluss und bestätigst den Vertrag mit der Belehrung auf einem dauerhaften Datenträger, etwa per E-Mail. Fehlt die Belehrung, läuft die Widerrufsfrist bis zu 12 Monate und 14 Tage (§ 356 Abs. 3 BGB); widerruft der Kunde dann, schuldet er für erbrachte Leistungen keinen Wertersatz (§ 357a Abs. 2 BGB). Bei Dienstleistungen erlischt das Widerrufsrecht, wenn du vollständig geleistet hast und der Kunde vorher ausdrücklich zugestimmt und bestätigt hat, dass er sein Widerrufsrecht dann verliert (§ 356 Abs. 4 BGB). Willst du vor Ablauf der Frist anfangen, lass dir das ausdrücklich vom Kunden verlangen und halte es fest.
-  en: If you conclude a contract with a consumer exclusively by means of distance communication – phone, email, letter or messenger – it is a distance contract if your business is set up for such contracts (§ 312c BGB). The customer can withdraw from it within 14 days (§ 312g, § 355 BGB). You inform them about this before the contract is concluded and confirm the contract together with the information on a durable medium, for example by email. If the information is missing, the withdrawal period runs for up to 12 months and 14 days (§ 356(3) BGB); if the customer then withdraws, they owe no compensation for services already provided (§ 357a(2) BGB). For services the right of withdrawal expires once you have provided the service in full and the customer has expressly agreed beforehand and confirmed that they will then lose the right of withdrawal (§ 356(4) BGB). If you want to start before the period ends, have the customer expressly request it and record this.
 - de: Seit 2.8.2026 müssen Menschen erkennen können, dass sie mit einer KI sprechen, etwa bei Chatbots. Täuschend echte KI-Bilder, -Videos und -Töne (Deepfakes) kennzeichnest du.
   en: Since 2.8.2026 people must be able to recognise that they are talking to an AI, for example with chatbots. You label deceptively real AI images, videos and audio (deepfakes).
 - de: Seit 2024 kann sich eine GbR ins Gesellschaftsregister eintragen lassen – nötig wird das, wenn sie etwa ein Grundstück erwerben oder sich an einer anderen Gesellschaft beteiligen will.
@@ -2041,8 +1960,6 @@ eintraege:
   en: Clarify the pitch for a food truck or sales stand
 - de: Stellt sich eine Beschäftigung heraus, zahlst du die Sozialversicherungsbeiträge nach, in der Regel für bis zu vier Jahre (§ 28e, § 25 SGB IV); wer Beiträge vorsätzlich vorenthält, macht sich strafbar (§ 266a StGB).
   en: If it turns out to be employment, you pay the social security contributions retrospectively, usually for up to four years (§ 28e, § 25 SGB IV); anyone who intentionally withholds contributions commits a criminal offence (§ 266a StGB).
-- de: Verbraucher haben bei Fernabsatzverträgen in der Regel ein Widerrufsrecht, über das du vor Vertragsschluss informieren musst. Bei Dienstleistungen, etwa Kursen oder Handwerksleistungen, erlischt das Widerrufsrecht, wenn du die Leistung vollständig erbracht hast und der Kunde vorher ausdrücklich zugestimmt und bestätigt hat, dass er sein Widerrufsrecht dann verliert (§ 356 Abs. 4 BGB). Beginnst du auf Verlangen des Kunden vor Ablauf der Widerrufsfrist, schuldet er bei einem Widerruf Wertersatz für das bereits Geleistete – aber nur, wenn du ihn ordnungsgemäß belehrt hast (§ 357a Abs. 2 BGB). Bei Freizeitangeboten mit festem Termin kann das Widerrufsrecht ausgeschlossen sein (§ 312g Abs. 2 Nr. 9 BGB); ob das für deine Kurse gilt, ist im Einzelfall zu prüfen.
-  en: Consumers usually have a right of withdrawal for distance contracts, which you must inform them about before the contract is concluded. For services, such as courses or craft services, the right of withdrawal expires once you have provided the service in full and the customer has expressly agreed beforehand and confirmed that they will then lose the right of withdrawal (§ 356(4) BGB). If you start at the customer's request before the withdrawal period ends, the customer owes compensation for what has already been provided if they withdraw – but only if you informed them properly (§ 357a(2) BGB). For leisure activities on a fixed date the right of withdrawal may be excluded (§ 312g(2) no. 9 BGB); whether this applies to your courses must be checked in the individual case.
 - de: Verkaufst du Motor- oder Getriebeöl an Endverbraucher, richtest du vorher eine Annahmestelle für Altöl ein und weist Privatkunden mit einer Schrifttafel darauf hin.
   en: If you sell engine or gear oil to end users, you set up a collection point for waste oil beforehand and point private customers to it with a sign.
 - de: Verkaufst du Starterbatterien, nimmst du alte Starterbatterien deiner Kunden kostenlos zurück.
@@ -2111,8 +2028,6 @@ eintraege:
   en: Extensive obligations apply to high-risk AI systems – in the areas listed in Annex III from 2.12.2027, for AI in products under Annex I from 2.8.2028.
 - de: Die Digital-Omnibus-Verordnung (EU) 2026/1744 hat die Hochrisiko-Pflichten der KI-Verordnung verschoben; sie ist am 24.7.2026 im Amtsblatt erschienen und seit 27.7.2026 in Kraft. Für Hochrisiko-KI in sensiblen Bereichen nach Anhang III (zum Beispiel Personalauswahl, Kreditwürdigkeit, Bildung) gelten die Pflichten ab 2.12.2027, für KI als Sicherheitsbauteil von Produkten nach Anhang I ab 2.8.2028. Betroffen sind vor allem Anbieter und Betreiber solcher Systeme.
   en: The Digital Omnibus Regulation (EU) 2026/1744 postponed the high-risk obligations of the AI Act; it was published in the Official Journal on 24.7.2026 and has been in force since 27.7.2026. For high-risk AI in sensitive areas under Annex III (for example recruitment, creditworthiness, education), the obligations apply from 2.12.2027; for AI as a safety component of products under Annex I, from 2.8.2028. Mainly providers and deployers of such systems are affected.
-- de: Art. 4 KI-Verordnung gilt seit 2.2.2025. Nach dem Digital-Omnibus (VO (EU) 2026/1744) musst du die KI-Kompetenz deiner Beschäftigten nicht mehr „sicherstellen“, sondern fördern (Amtsblatt vom 24.7.2026, in Kraft seit 27.7.2026). Eine kurze Schulung mit Nachweis bleibt der sichere Weg; Amtlos bietet Schulungen mit Bestätigung.
-  en: Art. 4 of the AI Act has applied since 2.2.2025. Under the Digital Omnibus (Regulation (EU) 2026/1744), you no longer have to "ensure" your employees' AI literacy but promote it (Official Journal of 24.7.2026, in force since 27.7.2026). A short training with proof remains the safe way; Amtlos offers trainings with confirmation.
 - de: 'Nach dem Entwurf des Bundesarbeitsministeriums (Juni 2026) sollen Beginn, Ende und Dauer der Arbeitszeit taggleich und elektronisch erfasst werden, geplant ab 1.1.2027. Für die elektronische Form sind Übergangsfristen nach Betriebsgröße vorgesehen (unter 250 Beschäftigten zwei Jahre, unter 50 Beschäftigten fünf Jahre); Betriebe mit bis zu 10 Beschäftigten müssen aufzeichnen, aber nicht elektronisch. Stand: Oktober 2026 – noch offen: Der Entwurf wird innerhalb der Bundesregierung abgestimmt, ein Kabinettsbeschluss liegt nicht vor. Ob der Termin 1.1.2027 hält, ist unsicher.'
   en: 'Under the draft of the Federal Ministry of Labour (June 2026), the start, end and duration of working time are to be recorded on the same day and electronically, planned from 1.1.2027. Transition periods by company size are planned for the electronic form (below 250 employees two years, below 50 employees five years); businesses with up to 10 employees must record, but not electronically. Status: October 2026 – still open: the draft is being coordinated within the federal government, there is no cabinet decision. Whether the date of 1.1.2027 will hold is uncertain.'
 - de: Arbeitgeber mit mindestens 150 Beschäftigten sollen nach der EU-Richtlinie erstmals bis 7.6.2027 über das Entgeltgefälle berichten.
@@ -2129,3 +2044,135 @@ eintraege:
   en: 'For the years 2021 to 2026, the advance return period in the year of founding and the following year depends on the expected tax (§ 18 Abs. 2 Satz 6 UStG). From 2027, the law again provides for sentence 4: in the year of founding and the following year, you file the advance return monthly. Status: October 2026 – an extension has not been adopted, but may still come. If you founded your business in 2026, clarify with the tax office or your tax adviser which filing rhythm applies to you in 2027.'
 - de: Noch keine – die Änderung gilt ab 2027.
   en: None yet – the change applies from 2027.
+- de: Ab dem 1. Januar 2027 sind Rechnungen an Unternehmen als E-Rechnung vorgeschrieben, wenn der Vorjahresumsatz über 800.000 € liegt.
+  en: From 1 January 2027, invoices to businesses must be e-invoices if the previous year's revenue is above €800,000.
+- de: Art. 4 KI-Verordnung verlangte seit 2.2.2025, ein ausreichendes Maß an KI-Kompetenz sicherzustellen. Seit dem Digital-Omnibus (VO (EU) 2026/1744, in Kraft seit 27.7.2026) verlangt Art. 4 nur noch Maßnahmen, die die KI-Kompetenz der Personen fördern, die in deinem Auftrag mit KI-Systemen arbeiten; ein bestimmtes Kompetenzniveau ist nicht mehr vorgeschrieben. Eine kurze Schulung mit Nachweis bleibt ein einfacher Weg, das zu zeigen; Amtlos bietet Schulungen mit Bestätigung.
+  en: Since 2.2.2025, Art. 4 of the AI Act required ensuring a sufficient level of AI literacy. Since the Digital Omnibus (Regulation (EU) 2026/1744, in force since 27.7.2026), Art. 4 only requires measures that promote the AI literacy of the people who work with AI systems on your behalf; a specific level of literacy is no longer prescribed. A short training with proof remains a simple way to show this; Amtlos offers training courses with confirmation.
+- de: Bei Barzahlungen ab 10.000 € – beim Handel mit Edelmetallen schon ab 2.000 € – sieht das Geldwäschegesetz Sorgfaltspflichten für Güterhändler vor.
+  en: For cash payments of €10,000 or more – €2,000 or more when trading in precious metals – the Anti-Money Laundering Act (Geldwäschegesetz) provides for due diligence obligations for dealers in goods.
+- de: Betriebe ab 20 Arbeitsplätzen haben eine Beschäftigungsquote. Die Anzeige und die Ausgleichsabgabe sind bis zum 31. März für das Vorjahr fällig. Als Arbeitsplätze zählen Stellen von Arbeitnehmern und Auszubildenden; Stellen mit weniger als 18 Wochenstunden – oft Minijobs – und Stellen für höchstens acht Wochen zählen nicht (§ 156 Abs. 1, 3 SGB IX). Teilzeitstellen ab 18 Stunden zählen voll, Ausbildungsstellen bleiben bei der Mindestzahl außer Betracht (§ 157 Abs. 1 SGB IX). Wer insgesamt weniger als 20 Personen beschäftigt, liegt sicher unter der Schwelle.
+  en: Businesses with 20 or more workplaces have an employment quota. The report and the compensatory levy are due by 31 March for the previous year. Workplaces are positions of employees and apprentices; positions with fewer than 18 hours a week – often mini-jobs – and positions for no more than eight weeks do not count (§ 156(1), (3) SGB IX). Part-time positions of 18 hours or more count in full; training positions are disregarded for the minimum number (§ 157(1) SGB IX). Anyone employing fewer than 20 people in total is safely below the threshold.
+- de: Betriebe mit Beschäftigten brauchen eine sicherheitstechnische und betriebsärztliche Betreuung – Kleinbetriebe auch im Unternehmermodell.
+  en: Businesses with employees need occupational safety and occupational health support – small businesses can also use the employer model.
+- de: Bußgeld bis 10 Mio. € für besonders wichtige und bis 7 Mio. € für wichtige Einrichtungen, wenn eine Meldung fehlt, falsch oder zu spät ist; bei mehr als 500 Mio. € Gesamtumsatz bis 2 % bzw. 1,4 % des weltweiten Umsatzes (§ 65 Abs. 2 Nr. 4, Abs. 5 Satz 1 Nr. 1, Abs. 6, 7 BSIG).
+  en: Fine of up to €10 million for particularly important entities and up to €7 million for important entities if a report is missing, incorrect or late; with total revenue above €500 million up to 2% or 1.4% of worldwide revenue (§ 65(2) no. 4, (5) sentence 1 no. 1, (6), (7) BSIG).
+- de: Bußgeld bis 10 Mio. € oder bis 2 % des weltweiten Jahresumsatzes, je nachdem, welcher Betrag höher ist (Art. 83 Abs. 4 Buchst. a DSGVO).
+  en: Fine of up to €10 million or up to 2% of worldwide annual turnover, whichever is higher (Art. 83(4)(a) GDPR).
+- de: Bußgeld bis 100.000 €, wenn die Registrierung fehlt, und bis 200.000 €, wenn Verpackungen nicht an einem System beteiligt sind (§ 66 Abs. 1 Nr. 1, 3, Abs. 3 VerpackDG).
+  en: Fine of up to €100,000 if registration is missing, and up to €200,000 if packaging is not participating in a system (§ 66(1) nos. 1, 3, (3) VerpackDG).
+- de: Bußgeld bis 150.000 € bei Vorsatz, sonst bis 100.000 €, etwa wenn die Identifizierung fehlt; bei schwerwiegenden, wiederholten oder systematischen Verstößen bis 1 Mio. € oder bis zum Zweifachen des wirtschaftlichen Vorteils (§ 56 Abs. 1 Satz 1 Nr. 15, Abs. 3 GwG).
+  en: Fine of up to €150,000 for intent, otherwise up to €100,000, for example if identification is missing; for serious, repeated or systematic violations up to €1 million or up to twice the economic benefit (§ 56(1) sentence 1 no. 15, (3) GwG).
+- de: Bußgeld bis 150.000 € bei Vorsatz, sonst bis 100.000 €; bei schwerwiegenden, wiederholten oder systematischen Verstößen bis 1 Mio. € oder bis zum Zweifachen des wirtschaftlichen Vorteils (§ 56 Abs. 1 Satz 1 Nr. 55, Abs. 3 GwG).
+  en: Fine of up to €150,000 for intent, otherwise up to €100,000; for serious, repeated or systematic violations up to €1 million or up to twice the economic benefit (§ 56(1) sentence 1 no. 55, (3) GwG).
+- de: Bußgeld bis 20 Mio. € oder bis 4 % des weltweiten Jahresumsatzes, je nachdem, welcher Betrag höher ist (Art. 83 Abs. 5 Buchst. b DSGVO).
+  en: Fine of up to €20 million or up to 4% of worldwide annual turnover, whichever is higher (Art. 83(5)(b) GDPR).
+- de: Bußgeld bis 25.000 € (§ 111 Abs. 1 Nr. 2, Abs. 4 SGB IV).
+  en: Fine of up to €25,000 (§ 111(1) no. 2, (4) SGB IV).
+- de: Bußgeld bis 25.000 €, wenn die Belehrung nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig durchgeführt wird (§ 73 Abs. 1a Nr. 16b, Abs. 2 IfSG).
+  en: Fine of up to €25,000 if the instruction is not carried out, not carried out correctly, completely or on time (§ 73(1a) no. 16b, (2) IfSG).
+- de: Bußgeld bis 30.000 € (§ 58 Abs. 1, 4 JArbSchG).
+  en: Fine of up to €30,000 (§ 58(1), (4) JArbSchG).
+- de: Bußgeld bis 300.000 € (§ 28 Abs. 1 Nr. 13, Abs. 2 TDDDG).
+  en: Fine of up to €300,000 (§ 28(1) no. 13, (2) TDDDG).
+- de: Bußgeld bis 5.000 € (§ 32 Abs. 1 Nr. 11, Abs. 2 MuSchG).
+  en: Fine of up to €5,000 (§ 32(1) no. 11, (2) MuSchG).
+- de: Bußgeld bis 5.000 €, wenn ein Arbeitsmittel nicht oder nicht rechtzeitig geprüft wird (§ 22 Abs. 1 Nr. 28 BetrSichV in Verbindung mit § 25 Abs. 1 Nr. 1, Abs. 2 ArbSchG).
+  en: Fine of up to €5,000 if work equipment is not inspected or not inspected on time (§ 22(1) no. 28 BetrSichV in conjunction with § 25(1) no. 1, (2) ArbSchG).
+- de: Bußgeld bis 500.000 €, wenn die Registrierung fehlt, falsch oder verspätet ist (§ 65 Abs. 2 Nr. 6, Abs. 5 Satz 1 Nr. 5 BSIG).
+  en: Fine of up to €500,000 if registration is missing, incorrect or late (§ 65(2) no. 6, (5) sentence 1 no. 5 BSIG).
+- de: Das Hinweisgeberschutzgesetz verlangt von Beschäftigungsgebern mit in der Regel mindestens 50 Beschäftigten eine interne Meldestelle (§ 12 Abs. 2 HinSchG). Gezählt werden Köpfe, nicht Vollzeitstellen – Beschäftigte sind neben Arbeitnehmern auch Auszubildende (§ 3 Abs. 8 HinSchG).
+  en: The Whistleblower Protection Act requires employers with usually at least 50 employees to have an internal reporting channel (§ 12(2) HinSchG). Heads are counted, not full-time positions – employees include apprentices as well as workers (§ 3(8) HinSchG).
+- de: Das Nachweisgesetz verlangt, dass die wesentlichen Arbeitsbedingungen dokumentiert und der beschäftigten Person ausgehändigt werden. Name und Anschrift der Vertragsparteien, Arbeitsentgelt und Arbeitszeit müssen spätestens am ersten Arbeitstag vorliegen, Beginn, Befristung, Arbeitsort, Tätigkeit, Probezeit, Arbeit auf Abruf und Überstunden spätestens am siebten Kalendertag, die übrigen Angaben binnen eines Monats (§ 2 Abs. 1 Satz 9 NachwG). Deshalb erscheint die Pflicht schon, sobald eine Einstellung mit Arbeitsbeginn eingetragen ist; der Termin ist der erste Arbeitstag.
+  en: The Documentation Act (Nachweisgesetz) requires that the essential working conditions are documented and handed to the employee. Names and addresses of the parties, pay and working hours must be provided by the first working day at the latest; start date, fixed term, place of work, duties, probation, on-call work and overtime by the seventh calendar day; the other details within one month (§ 2(1) sentence 9 NachwG). That is why this obligation appears as soon as a hiring with a start date has been entered; the due date is the first working day.
+- de: Dazu gehören unter anderem die Identifizierung der Vertragspartner und ein Risikomanagement. Die Pflichten greifen bei Transaktionen, bei denen du Barzahlungen über mindestens 10.000 € selbst oder durch Dritte annimmst oder leistest (§ 10 Abs. 6a Nr. 1 Buchst. c GwG), bei hochwertigen Gütern wie Edelmetallen schon ab 2.000 € (Buchst. b) und bei Kunstgegenständen ab einem Transaktionswert von 10.000 € (Buchst. a). Als Verpflichteter registrierst du dich außerdem bei der Zentralstelle für Finanztransaktionsuntersuchungen (goAML), auch ohne Verdachtsfall (§ 45 Abs. 1 S. 2 GwG).
+  en: These include identifying contracting partners and risk management. The obligations apply to transactions in which you receive or make cash payments of at least €10,000 yourself or through third parties (§ 10(6a) no. 1(c) GwG), for high-value goods such as precious metals from €2,000 (letter b) and for works of art from a transaction value of €10,000 (letter a). As an obliged entity you also register with the Financial Intelligence Unit (goAML), even without a suspicious case (§ 45(1) sentence 2 GwG).
+- de: Dein Betrieb ist kein Kleinstbetrieb außerhalb der IT-Branche.
+  en: Your business is not a micro business outside the IT sector.
+- de: Deine Rechnungen in Amtlos summieren sich auf mindestens 80 % der Kleinunternehmergrenze; die Grenze liegt bei 100.000 €, im Gründungsjahr bei 25.000 €.
+  en: Your invoices in Amtlos add up to at least 80% of the small business limit; the limit is €100,000, in the founding year €25,000.
+- de: Deine Rechnungen in Amtlos summieren sich auf mindestens 95 % der Kleinunternehmergrenze; die Grenze liegt bei 100.000 €, im Gründungsjahr bei 25.000 €.
+  en: Your invoices in Amtlos add up to at least 95% of the small business limit; the limit is €100,000, in the founding year €25,000.
+- de: Deine Rechnungen in Amtlos summieren sich im Gründungsjahr auf mehr als 25.000 €; die Grenze im Gründungsjahr liegt bei 25.000 €.
+  en: Your invoices in Amtlos add up to more than €25,000 in the founding year; the limit in the founding year is €25,000.
+- de: Deine Rechnungen in Amtlos summieren sich im Gründungsjahr auf mindestens 20.000 €; die Grenze im Gründungsjahr liegt bei 25.000 €.
+  en: Your invoices in Amtlos add up to at least €20,000 in the founding year; the limit in the founding year is €25,000.
+- de: Deine Rechnungen in Amtlos summieren sich im Gründungsjahr auf mindestens 23.750 €; die Grenze im Gründungsjahr liegt bei 25.000 €.
+  en: Your invoices in Amtlos add up to at least €23,750 in the founding year; the limit in the founding year is €25,000.
+- de: Deine Rechnungen in Amtlos summieren sich in diesem Jahr auf mehr als 100.000 €; die Grenze liegt bei 100.000 €.
+  en: Your invoices in Amtlos add up to more than €100,000 this year; the limit is €100,000.
+- de: Deine Rechnungen in Amtlos summieren sich in diesem Jahr auf mehr als 25.000 €; die Grenze liegt bei 25.000 €.
+  en: Your invoices in Amtlos add up to more than €25,000 this year; the limit is €25,000.
+- de: Deine Rechnungen in Amtlos summieren sich in diesem Jahr auf mindestens 80.000 €; die Grenze liegt bei 100.000 €.
+  en: Your invoices in Amtlos add up to at least €80,000 this year; the limit is €100,000.
+- de: Deine Rechnungen in Amtlos summieren sich in diesem Jahr auf mindestens 95.000 €; die Grenze liegt bei 100.000 €.
+  en: Your invoices in Amtlos add up to at least €95,000 this year; the limit is €100,000.
+- de: Deine Verarbeitung fällt unter Art. 37 Abs. 1 Buchst. b, c DSGVO oder § 38 Abs. 1 Satz 2 BDSG.
+  en: Your processing falls under Art. 37(1)(b), (c) GDPR or § 38(1) sentence 2 BDSG.
+- de: Die Hinweispflicht nach § 36 VSBG gilt für Unternehmer, die eine Website unterhalten oder AGB verwenden. Ausgenommen ist, wer am 31. Dezember des Vorjahres zehn oder weniger Personen beschäftigt hat (§ 36 Abs. 3 VSBG) – gezählt werden Personen, nicht Vollzeitstellen.
+  en: The information duty under § 36 VSBG applies to traders who run a website or use general terms and conditions. Exempt is anyone who employed ten or fewer people on 31 December of the previous year (§ 36(3) VSBG) – people are counted, not full-time positions.
+- de: Die Kleinunternehmerregelung endet ab dem Umsatz, der die Grenze überschreitet. Ab wann du Umsatzsteuer ausweist und anmeldest, klären Finanzamt oder Steuerberatung mit dir.
+  en: The small business scheme ends from the sale that exceeds the limit. The tax office or your tax adviser will clarify with you from when you show and file VAT.
+- de: Die Pflicht zum Link auf die Online-Streitbeilegungsplattform der EU ist seit 20.07.2025 entfallen, die Plattform ist abgeschaltet. Steht der Link noch auf deiner Website, in AGB oder Impressum, entferne ihn.
+  en: The obligation to link to the EU online dispute resolution platform has not applied since 20.07.2025, and the platform has been shut down. If the link is still on your website, in your terms and conditions or legal notice, remove it.
+- de: Du hast eine Einstellung vereinbart.
+  en: You have agreed to hire someone.
+- de: 'Ein Datenschutzbeauftragter ist in drei Fällen vorgesehen: wenn in der Regel mindestens 20 Personen ständig mit der automatisierten Verarbeitung personenbezogener Daten beschäftigt sind (§ 38 Abs. 1 Satz 1 BDSG) – gezählt werden Personen, nicht Vollzeitstellen, auch Teilzeitkräfte und Auszubildende; wenn die Kerntätigkeit in einer umfangreichen regelmäßigen und systematischen Überwachung von Personen oder in der umfangreichen Verarbeitung besonderer Daten wie Gesundheitsdaten besteht (Art. 37 Abs. 1 Buchst. b, c DSGVO); oder unabhängig von der Zahl, wenn eine Verarbeitung einer Datenschutz-Folgenabschätzung unterliegt oder Daten geschäftsmäßig zur Übermittlung oder für Markt- und Meinungsforschung verarbeitet werden (§ 38 Abs. 1 Satz 2 BDSG). Ob einer dieser Fälle vorliegt, klärt im Zweifel die Datenschutzaufsicht deines Landes. Die Bundesregierung plant, § 38 BDSG bis Ende 2026 zu streichen; ein Gesetz gibt es noch nicht.'
+  en: 'A data protection officer is required in three cases: if usually at least 20 people are constantly engaged in the automated processing of personal data (§ 38(1) sentence 1 BDSG) – people are counted, not full-time positions, including part-time staff and apprentices; if the core activity consists of extensive regular and systematic monitoring of people or of extensive processing of special categories of data such as health data (Art. 37(1)(b), (c) GDPR); or regardless of the number, if a processing operation is subject to a data protection impact assessment or data is processed commercially for transfer or for market or opinion research (§ 38(1) sentence 2 BDSG). If in doubt, the data protection authority of your federal state will clarify whether one of these cases applies. The federal government plans to abolish § 38 BDSG by the end of 2026; there is no law yet.'
+- de: Ein Datenschutzbeauftragter ist vorgesehen, wenn in der Regel mindestens 20 Personen ständig mit der automatisierten Verarbeitung personenbezogener Daten beschäftigt sind – unabhängig davon auch bei bestimmten Verarbeitungen, etwa umfangreicher Überwachung oder Gesundheitsdaten als Kerntätigkeit.
+  en: A data protection officer is required if usually at least 20 people are constantly engaged in the automated processing of personal data – and regardless of that for certain processing, such as extensive monitoring or health data as a core activity.
+- de: Ein Reisegewerbe betreibt, wer außerhalb seiner gewerblichen Niederlassung oder ohne eine solche Waren oder Leistungen anbietet, ohne vorher bestellt worden zu sein. Dafür brauchst du eine Reisegewerbekarte vom Gewerbeamt (§ 55 GewO). Sie muss vor dem Start vorliegen. Plane genug Vorlauf ein – für den Antrag brauchst du in der Regel ein Führungszeugnis und eine Auskunft aus dem Gewerbezentralregister, die du selbst erst beantragen musst. Für Märkte, Messen und Volksfeste, die die Gemeinde festgesetzt hat, gelten Ausnahmen (Titel IV GewO) – ob die Karte trotzdem nötig ist, klärt das Gewerbeamt. Für bestimmte Tätigkeiten ohne Karte gilt stattdessen eine Anzeigepflicht (§ 55c GewO).
+  en: An itinerant trade is carried on by anyone who offers goods or services outside their business premises, or without any, without having been ordered beforehand. For this you need an itinerant trade card from the trade office (§ 55 GewO). It must be available before you start. Allow enough lead time – for the application you usually need a certificate of good conduct and an extract from the central trade register, which you must apply for yourself first. Exemptions apply to markets, fairs and festivals set by the municipality (Title IV GewO) – the trade office will clarify whether you still need the card. For certain activities without a card, a notification duty applies instead (§ 55c GewO).
+- de: Elektronische Kassen brauchen eine technische Sicherheitseinrichtung (TSE), und zu jedem Verkauf ist ein Beleg auszugeben.
+  en: Electronic cash registers need a technical security device (TSE), and a receipt must be issued for every sale.
+- de: Erlaubnispflichtig sind unter anderem Makler, Bewachung, Versicherungs- und Finanzanlagenvermittlung (§§ 30–34i GewO). Für Gaststätten kommt es auf das Land an – nach dem Gaststättengesetz des Bundes braucht nur der Ausschank alkoholischer Getränke eine Erlaubnis (§ 2 GastG), manche Länder verlangen statt einer Erlaubnis nur eine Anzeige. Für einzelne Feste gibt es eine vorübergehende Gestattung (§ 12 GastG). Was in deinem Land gilt, klärt das Gewerbeamt. Die Erlaubnis muss vor Aufnahme der Tätigkeit vorliegen. Die Reisegewerbekarte ist eine eigene Pflicht.
+  en: Permits are required among others for brokers, security services, insurance and financial investment intermediaries (§§ 30–34i GewO). For restaurants it depends on the federal state – under the federal Restaurants Act only serving alcoholic drinks needs a permit (§ 2 GastG); some states only require a notification instead of a permit. For single events there is a temporary permit (§ 12 GastG). The trade office will clarify what applies in your state. The permit must be available before the activity starts. The itinerant trade card is a separate obligation.
+- de: Fehlen Kündigungsbutton oder Bestätigungsseite, können Verbraucher jederzeit und ohne Kündigungsfrist kündigen (§ 312k Abs. 6 BGB).
+  en: If the cancellation button or the confirmation page is missing, consumers can cancel at any time without notice (§ 312k(6) BGB).
+- de: Für den Verkauf ohne feste Niederlassung oder ohne vorherige Bestellung – etwa auf Märkten oder von Ort zu Ort – ist vor dem Start in der Regel eine Reisegewerbekarte vorgesehen. Ob du sie brauchst, klärt das Gewerbeamt.
+  en: For selling without a fixed establishment or without prior order – for example at markets or from place to place – an itinerant trade card is usually required before you start. The trade office will clarify whether you need one.
+- de: Für gewerblichen Güterkraftverkehr mit Fahrzeugen über 3,5 t ist eine Erlaubnis vorgesehen, grenzüberschreitend schon über 2,5 t eine Gemeinschaftslizenz. Ob sie für dich gilt, klärt die Erlaubnisbehörde.
+  en: Commercial road haulage with vehicles over 3.5 t requires a licence, cross-border haulage a Community licence from 2.5 t. The licensing authority will clarify whether this applies to you.
+- de: Für manche Gewerbe ist eine Erlaubnis vorgesehen, bevor du anfängst – zum Beispiel für Makler, das Bewachungsgewerbe oder den Ausschank von Alkohol. Ob sie für dich gilt, klärt das Gewerbeamt.
+  en: Some trades require a permit before you start – for example brokers, security services or serving alcohol. The trade office will clarify whether this applies to you.
+- de: Für verspätet gezahlte Beiträge fällt je angefangenen Monat ein Säumniszuschlag von 1 % des rückständigen Betrags an (§ 24 Abs. 1 SGB IV); wer Beiträge vorenthält, macht sich strafbar (§ 266a StGB).
+  en: For contributions paid late, a late-payment surcharge of 1% of the amount in arrears is due for each month or part of a month (§ 24(1) SGB IV); withholding contributions is a criminal offence (§ 266a StGB).
+- de: Ist der Bestellbutton nicht richtig beschriftet, kommt der Vertrag nicht zustande (§ 312j Abs. 4 BGB).
+  en: If the order button is not labelled correctly, the contract is not concluded (§ 312j(4) BGB).
+- de: KI-Kompetenz der Beschäftigten fördern
+  en: Promote AI literacy of employees
+- de: 'Keine Pflicht, sondern ein Blick voraus: Geplant ist, Gründungen digital und deutlich schneller zu ermöglichen.'
+  en: 'Not an obligation but a look ahead: the plan is to make founding a business digital and much faster.'
+- de: Keine eigene Pflicht mehr – ein Hinweis auf die abgeschaltete Plattform ist überholt.
+  en: No longer an obligation of its own – a reference to the shut-down platform is outdated.
+- de: Nach deinen Angaben ist deine Kerntätigkeit eine umfangreiche Überwachung oder Verarbeitung besonderer Daten, oder eine Verarbeitung braucht eine Datenschutz-Folgenabschätzung bzw. dient der Übermittlung oder Marktforschung.
+  en: According to your answers, your core activity is extensive monitoring or processing of special categories of data, or a processing operation requires a data protection impact assessment or serves transfer or market research.
+- de: Nach deinen Angaben kommt die doppelte Buchführung mit Jahresabschluss in Frage – für Kapitalgesellschaften immer, für andere je nach Rechtsform und Größe.
+  en: According to your answers, double-entry bookkeeping with annual financial statements may apply – always for corporations, for others depending on legal form and size.
+- de: Nach deinen Angaben liegt dein Umsatz in diesem Jahr über 25.000 €. Nach § 19 UStG gilt die Kleinunternehmerregelung dann bis zum Jahresende weiter, ab 1. Januar des nächsten Jahres ist die Regelbesteuerung vorgesehen.
+  en: According to your answers, your revenue this year is above €25,000. Under § 19 UStG the small business scheme then continues until the end of the year; from 1 January of the next year standard taxation is provided for.
+- de: Nach deinen Angaben liegt dein Umsatz über einer Kleinunternehmergrenze. Für Umsätze über der Grenze sieht § 19 UStG Umsatzsteuer vor – ab wann genau, klären Finanzamt oder Steuerberatung.
+  en: According to your answers, your revenue is above a small business limit. For sales above the limit, § 19 UStG provides for VAT – the tax office or your tax adviser will clarify from when exactly.
+- de: Ohne Belehrung kann der Kunde bis zu 12 Monate und 14 Tage widerrufen und muss für erbrachte Leistungen in der Regel keinen Wertersatz zahlen (§ 356 Abs. 3, 4, § 357a Abs. 2 BGB).
+  en: Without information on the right of withdrawal, the customer can withdraw for up to 12 months and 14 days and as a rule does not have to pay compensation for services already provided (§ 356(3), (4), § 357a(2) BGB).
+- de: Ohne ordnungsgemäße Belehrung beginnt die Widerrufsfrist nicht; das Widerrufsrecht erlischt dann erst spätestens 12 Monate und 14 Tage nach Vertragsschluss bzw. Erhalt der Ware (§ 356 Abs. 3, 4 BGB).
+  en: Without proper information the withdrawal period does not start; the right of withdrawal then only expires 12 months and 14 days after conclusion of the contract or receipt of the goods at the latest (§ 356(3), (4) BGB).
+- de: Schließt du einen Vertrag mit einem Verbraucher ausschließlich über Fernkommunikationsmittel – Telefon, E-Mail, Brief oder Messenger –, ist das ein Fernabsatzvertrag, wenn dein Betrieb für solche Verträge eingerichtet ist (§ 312c BGB). Der Kunde kann ihn 14 Tage lang widerrufen (§ 312g, § 355 BGB). Darüber informierst du vor Vertragsschluss und bestätigst den Vertrag mit der Belehrung auf einem dauerhaften Datenträger, etwa per E-Mail. Fehlt die Belehrung, läuft die Widerrufsfrist bis zu 12 Monate und 14 Tage (§ 356 Abs. 3, 4 BGB); widerruft der Kunde dann, schuldet er für erbrachte Leistungen keinen Wertersatz (§ 357a Abs. 2 BGB). Bei Dienstleistungen erlischt das Widerrufsrecht, wenn du vollständig geleistet hast und der Kunde vorher ausdrücklich zugestimmt und bestätigt hat, dass er sein Widerrufsrecht dann verliert (§ 356 Abs. 5 Nr. 2 BGB). Willst du vor Ablauf der Frist anfangen, lass dir das ausdrücklich vom Kunden verlangen und halte es fest.
+  en: If you conclude a contract with a consumer exclusively by means of distance communication – phone, email, letter or messenger – it is a distance contract if your business is set up for such contracts (§ 312c BGB). The customer can withdraw from it within 14 days (§ 312g, § 355 BGB). You inform them about this before the contract is concluded and confirm the contract together with the information on a durable medium, for example by email. If the information is missing, the withdrawal period runs for up to 12 months and 14 days (§ 356(3), (4) BGB); if the customer then withdraws, they owe no compensation for services already provided (§ 357a(2) BGB). For services the right of withdrawal expires once you have provided the service in full and the customer has expressly agreed beforehand and confirmed that they will then lose the right of withdrawal (§ 356(5) no. 2 BGB). If you want to start before the period ends, have the customer expressly request it and record this.
+- de: 'Seit 19.6.2026 brauchen B2C-Online-Verträge mit Widerrufsrecht eine Widerrufsfunktion ohne Login: eine Schaltfläche „Vertrag widerrufen“, danach eine Bestätigung „Widerruf bestätigen“ und eine Eingangsbestätigung auf einem dauerhaften Datenträger, etwa per E-Mail.'
+  en: 'Since 19.6.2026, B2C online contracts with a right of withdrawal need a withdrawal function without login: a button "Vertrag widerrufen" (withdraw from contract), then a confirmation "Widerruf bestätigen" (confirm withdrawal) and an acknowledgement of receipt on a durable medium, for example by email.'
+- de: Seit 2025 müssen Unternehmen elektronische Rechnungen (XRechnung, ZUGFeRD) von anderen Unternehmen empfangen können.
+  en: Since 2025, businesses must be able to receive electronic invoices (XRechnung, ZUGFeRD) from other businesses.
+- de: Seit 27.7.2026 verlangt Art. 4 KI-VO nur noch Maßnahmen zur Förderung der KI-Kompetenz (VO (EU) 2026/1744).
+  en: Since 27.7.2026, Art. 4 of the AI Act only requires measures to promote AI literacy (Regulation (EU) 2026/1744).
+- de: Sobald du mindestens eine Person beschäftigst, sind die Gefährdungen an jedem Arbeitsplatz zu beurteilen, Schutzmaßnahmen festzulegen und das zu dokumentieren. Amtlos erstellt dir dafür eine Vorlage passend zu deiner Branche.
+  en: As soon as you employ at least one person, the hazards at every workplace must be assessed, protective measures defined and this documented. Amtlos creates a template for you that fits your industry.
+- de: Verbraucher haben bei Fernabsatzverträgen in der Regel ein Widerrufsrecht, über das du vor Vertragsschluss informieren musst. Bei Dienstleistungen, etwa Kursen oder Handwerksleistungen, erlischt das Widerrufsrecht, wenn du die Leistung vollständig erbracht hast und der Kunde vorher ausdrücklich zugestimmt und bestätigt hat, dass er sein Widerrufsrecht dann verliert (§ 356 Abs. 5 Nr. 2 BGB). Beginnst du auf Verlangen des Kunden vor Ablauf der Widerrufsfrist, schuldet er bei einem Widerruf Wertersatz für das bereits Geleistete – aber nur, wenn du ihn ordnungsgemäß belehrt hast (§ 357a Abs. 2 BGB). Bei Freizeitangeboten mit festem Termin kann das Widerrufsrecht ausgeschlossen sein (§ 312g Abs. 2 Nr. 9 BGB); ob das für deine Kurse gilt, ist im Einzelfall zu prüfen.
+  en: Consumers usually have a right of withdrawal for distance contracts, which you must inform them about before the contract is concluded. For services, such as courses or craft services, the right of withdrawal expires once you have provided the service in full and the customer has expressly agreed beforehand and confirmed that they will then lose the right of withdrawal (§ 356(5) no. 2 BGB). If you start at the customer's request before the withdrawal period ends, the customer owes compensation for what has already been provided if they withdraw – but only if you informed them properly (§ 357a(2) BGB). For leisure activities on a fixed date the right of withdrawal may be excluded (§ 312g(2) no. 9 BGB); whether this applies to your courses must be checked in the individual case.
+- de: Verträge, die du mit Verbrauchern außerhalb deiner Geschäftsräume schließt – etwa in der Wohnung beim Aufmaß oder unterwegs –, können sie 14 Tage lang widerrufen (§ 312b, § 312g BGB). Darüber informierst du vor Vertragsschluss und gibst die Belehrung und eine Abschrift des Vertrags auf Papier oder, wenn der Kunde zustimmt, auf einem anderen dauerhaften Datenträger heraus. Fehlt die Belehrung, läuft die Widerrufsfrist bis zu 12 Monate und 14 Tage (§ 356 Abs. 3, 4 BGB). Widerruft der Kunde dann, schuldet er für bereits erbrachte Leistungen in der Regel keinen Wertersatz (§ 357a Abs. 2 BGB). Willst du vor Ablauf der Frist anfangen, lass dir das ausdrücklich vom Kunden verlangen und halte es fest.
+  en: Consumers can withdraw from contracts you conclude with them outside your business premises – for example at their home when measuring up or on the go – for 14 days (§ 312b, § 312g BGB). You inform them about this before the contract is concluded and hand over the information and a copy of the contract on paper or, if the customer agrees, on another durable medium. Without this information the withdrawal period runs for up to 12 months and 14 days (§ 356(3), (4) BGB). If the customer then withdraws, as a rule they owe no compensation for services already provided (§ 357a(2) BGB). If you want to start before the period expires, have the customer expressly request this and keep a record.
+- de: Wer KI-Systeme einsetzt, ergreift Maßnahmen, um die KI-Kompetenz der Beschäftigten zu fördern – zum Beispiel mit einer kurzen Schulung.
+  en: Anyone using AI systems takes measures to promote the AI literacy of employees – for example with a short training.
+- de: § 26a UStG nennt kein eigenes Bußgeld für die falsche Form. Eine Rechnung, die nicht als vorgeschriebene E-Rechnung ausgestellt wird, erfüllt § 14 UStG nicht – dein Kunde braucht eine solche Rechnung aber für den Vorsteuerabzug (§ 15 Abs. 1 Satz 1 Nr. 1 Satz 2 UStG). Wer eine Rechnung nicht oder nicht rechtzeitig ausstellt, riskiert ein Bußgeld bis 5.000 € (§ 26a Abs. 2 Nr. 1, Abs. 3 UStG).
+  en: § 26a UStG provides no separate fine for the wrong format. An invoice that is not issued as a required e-invoice does not meet § 14 UStG – but your customer needs such an invoice for input tax deduction (§ 15(1) sentence 1 no. 1 sentence 2 UStG). Anyone who does not issue an invoice or does not issue it on time risks a fine of up to €5,000 (§ 26a(2) no. 1, (3) UStG).
+- de: Du verarbeitest Gesundheitsdaten, überwachst per Video oder ortest Beschäftigte bzw. Fahrzeuge.
+  en: You process health data, use video surveillance or locate employees or vehicles.

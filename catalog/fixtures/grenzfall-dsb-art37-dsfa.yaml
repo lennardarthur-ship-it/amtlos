@@ -1,0 +1,14 @@
+persona: grenzfall
+beschreibung: 'Vorprüfung 21.10.2026 (F.61): 6 Beschäftigte, eine Verarbeitung braucht eine Datenschutz-Folgenabschätzung – Datenschutzbeauftragter unabhängig von der Zahl (§ 38 Abs. 1 Satz 2 BDSG)'
+stichtag: "2026-10-21"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2019-04-01"
+  profil.taetigkeit.einordnung: freiberuf
+  profil.beschaeftigte.gesamt: 6
+  profil.datenverarbeitung.arten: [kundendaten, gesundheitsdaten]
+  profil.datenschutz.dsb_gruende: [dsfa_pflichtig]
+  profil.bundesland: HE
+  profil.gemeinde_ags: "06412000"
+erwartet:
+  datenschutz.dsb: gilt

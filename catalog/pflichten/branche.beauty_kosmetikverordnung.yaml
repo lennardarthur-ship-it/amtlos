@@ -1,7 +1,7 @@
 # Katalog H.3 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.beauty_kosmetikverordnung
-version: 3
+version: 4
 katalog_nr: H.3
 titel:
   de: Kosmetikverordnung bei eigenen Produkten
@@ -47,7 +47,8 @@ kosten: null
 sanktion:
   text:
     de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: hoch
+  schwere: mittel
+dringend_ohne_termin: true
 automatisierung: hinweis
 aenderungsnotiz:
   de: Gilt erst, wenn du eigene Kosmetik herstellst, unter deinem Namen verkaufst oder von außerhalb der EU importierst – nicht beim
@@ -64,6 +65,7 @@ fachlich_zu_pruefen:
 - 'CPNP (Art. 13), Kennzeichnung (Art. 19), GMP (Art. 8), ernste unerwünschte Wirkungen (Art. 23), Herstellerbegriff (Art. 2 Abs. 1 lit. d) und verantwortliche Person (Art. 4) im Text (R11, Nutzertest Kosmetik) – Frist „vor dem ersten Inverkehrbringen“ ohne Termin; bestätigen'
 - 'Auslöser an die Frage „eigene Produkte, Eigenmarke oder Import von außerhalb der EU“ gekoppelt (R10) – Abgrenzung Herstellung ↔ Weiterverkauf bestätigen'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 pruefung:
   status: entwurf
   geprueft_von: null

@@ -1,7 +1,7 @@
 # Katalog F.62 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: datenschutz.dsfa
-version: 3
+version: 4
 katalog_nr: F.62
 titel:
   de: Prüfen, ob eine Datenschutz-Folgenabschätzung nötig ist
@@ -38,7 +38,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Bußgeld bis 10 Mio. € oder bis 2 % des weltweiten Jahresumsatzes, je nachdem, welcher Betrag höher ist (Art. 83 Abs. 4 Buchst. a DSGVO).
   schwere: hoch
 automatisierung: hinweis
 status_recht: in_kraft
@@ -48,11 +48,14 @@ quellen:
 - titel: DSGVO Art. 35
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679
   abgerufen: null
+- titel: Art. 83 DSGVO, Wortlaut (gdpr-text.com)
+  url: https://gdpr-text.com/es/read/article-83
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
 - 'R12 (Nutzertest Coach #13): Hinweis für einzelne Selbstständige nach Erwägungsgrund 91 S. 4 (dort: Ärzte, Gesundheitsberufe, Rechtsanwälte) – Übertragung auf Trainer und Coaches unsicher'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Auslöser (Gesundheitsdaten, Video) sind eine Vorauswahl – Liste der Aufsichtsbehörden (Muss-Liste) einbeziehen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 21.10.2026: Sanktion ergänzt – Art. 83 Abs. 4 Buchst. a nennt Art. 25 bis 39 (Art. 35); Wortlaut über gdpr-text.com gelesen, EUR-Lex für das Werkzeug gesperrt'
 pruefung:
   status: entwurf
   geprueft_von: null

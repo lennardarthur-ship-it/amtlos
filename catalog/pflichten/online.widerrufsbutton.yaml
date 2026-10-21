@@ -1,13 +1,12 @@
 # Katalog G.68 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.widerrufsbutton
-version: 3
+version: 4
 katalog_nr: G.68
 titel:
   de: Widerrufsbutton für Online-Verträge
 kurz:
-  de: Seit 19.6.2026 brauchen B2C-Online-Verträge mit Widerrufsrecht einen Widerrufsbutton – zweistufig, ohne Login, mit Eingangsbestätigung
-    auf einem dauerhaften Datenträger.
+  de: 'Seit 19.6.2026 brauchen B2C-Online-Verträge mit Widerrufsrecht eine Widerrufsfunktion ohne Login: eine Schaltfläche „Vertrag widerrufen“, danach eine Bestätigung „Widerruf bestätigen“ und eine Eingangsbestätigung auf einem dauerhaften Datenträger, etwa per E-Mail.'
 erklaerung:
   de: Schließt du Fernabsatzverträge mit Verbrauchern über eine Online-Benutzeroberfläche – Website oder App –, brauchst du eine
     Widerrufsfunktion (§ 356a BGB). Sie ist während der Widerrufsfrist ständig verfügbar, hervorgehoben und leicht zugänglich, gut
@@ -46,7 +45,8 @@ kosten: null
 sanktion:
   text:
     de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: hoch
+  schwere: mittel
+dringend_ohne_termin: true
 automatisierung: hinweis
 aktion:
   art: link
@@ -61,11 +61,15 @@ quellen:
 - titel: Richtlinie (EU) 2023/2673
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32023L2673
   abgerufen: null
+- titel: BGB § 356a
+  url: https://www.gesetze-im-internet.de/bgb/__356a.html
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- '§ 356a BGB, BGBl. 2026 I Nr. 28, in Kraft 19.6.2026, Beschriftungen und Eingangsbestätigung nach Rechtsprüfung R11 (Befund 9) und Noerr – Wortlaut im BGBl. gegenlesen'
 - 'Auslöser „Marktplatz“: verantwortlich bleibt der Unternehmer, Umsetzung durch den Plattformbetreiber – Hinweis prüfen'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (§ 356a BGB (gelesen) regelt keine eigene Rechtsfolge bei fehlender Widerrufsfunktion; Folgen (Fristbeginn? UWG?) fachlich klären) – nach Ergänzung wieder „hoch“'
+- 'Vorprüfung 21.10.2026 (G.68, T-29): Beschriftungen „Vertrag widerrufen“ / „Widerruf bestätigen“ (oder gleichbedeutend eindeutig) und Eingangsbestätigung auf dauerhaftem Datenträger mit Inhalt, Datum und Uhrzeit nach § 356a Abs. 1, 3, 4 BGB gelesen'
 pruefung:
   status: entwurf
   geprueft_von: null
