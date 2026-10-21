@@ -19,8 +19,9 @@
  * Belege einer Kapitalgesellschaft bleiben aus dem Stapel (nur Belegliste); Leistungsdatum und Datum der Steuerperiode
  * stehen in den Feldern 115/116; Forderungen und Verbindlichkeiten auf Konten ohne Kontokorrent.
  */
-import { belegKennung, kategorieFuer, type Beleg } from "./belege.js";
+import { belegKennung, belegSkonto, kategorieFuer, zahltag, type Beleg } from "./belege.js";
 import { summen, type Position } from "./rechnung.js";
+import { minderungNachSatz, type SatzBetrag } from "./skonto.js";
 
 export type Kontenrahmen = "SKR03" | "SKR04";
 
@@ -43,7 +44,8 @@ export interface Buchung {
   buchungstext: string;
   /** Steuersatz in Prozent; null bei Kleinunternehmern */
   ust_satz: number | null;
-  art: "einnahme" | "ausgabe" | "storno";
+  /** „umbuchung“ (R12): Geld zwischen Kasse, Geldtransit und Privat – weder Einnahme noch Ausgabe */
+  art: "einnahme" | "ausgabe" | "storno" | "umbuchung";
   /** ID der Rechnung oder des Belegs, aus dem die Buchung stammt */
   quelle_id: string;
   /** stabile Kennung der Buchung (36 Zeichen), abgeleitet aus Quelle und Steuersatz – DATEV-Feld „Buchungs GUID“ */
@@ -54,6 +56,8 @@ export interface Buchung {
   steuerperiode?: string | null;
   /** USt-IdNr. des Abnehmers bei innergemeinschaftlichen Lieferungen und EU-Leistungen – „EU-Land u. UStID (Bestimmung)“ */
   eu_ustid?: string | null;
+  /** R12: Kostenstelle (KOST1), z. B. Filiale einer Kasse */
+  kost1?: string;
 }
 
 /** Was eine Ausgangsrechnung für die Buchung braucht – Teilmenge der gespeicherten Rechnung. */
@@ -86,6 +90,12 @@ export interface AusgangsRechnungFuerBuchung {
   steuerperiode?: string | null;
   /** Gutschrift: der Betrieb (Aussteller, Leistungsempfänger) ist Kleinunternehmer – keine Vorsteuer */
   empfaenger_ku?: boolean;
+  /**
+   * R12 (Ist-Versteuerung mit Teilzahlungen): nur diese Beträge je Steuersatz buchen (brutto) statt der ganzen Rechnung –
+   * z. B. eine Zahlung samt Skonto. `guid_zusatz` unterscheidet mehrere Buchungen derselben Rechnung.
+   */
+  anteil?: SatzBetrag[];
+  guid_zusatz?: string;
 }
 
 /** Mitgliedstaaten der EU außer Deutschland (ISO 3166-1; Griechenland als GR) – für Erlöskonten und Hinweise. */
@@ -105,8 +115,9 @@ export const BU_VORSTEUER: Record<number, string> = { 19: "9", 7: "8" };
  * Vorsteuerabzug BU 40). Alle anderen Aufwandskonten sind ohne Automatik und brauchen BU 9/8 (fachlich zu prüfen).
  */
 export const AUTOMATIKKONTEN: Record<Kontenrahmen, readonly string[]> = {
-  SKR03: ["3400", "3300", "3120", "3123", "3140", "3143"],
-  SKR04: ["5400", "5300", "5920", "5923", "5940", "5943"],
+  // R12: Skontokonten mit Steuersatz (gewährte Skonti 19 %/7 %, erhaltene Skonti 19 %/7 % Vorsteuer) – PRUEFLISTE
+  SKR03: ["3400", "3300", "3120", "3123", "3140", "3143", "8736", "8731", "3736", "3731"],
+  SKR04: ["5400", "5300", "5920", "5923", "5940", "5943", "4736", "4731", "5736", "5731"],
 };
 
 /**
@@ -131,6 +142,14 @@ export const BUCHUNGSKONTEN: Record<
     verbindlichkeiten: string;
     kasse: string;
     privateinlagen: string;
+    /** R12: Privatentnahmen allgemein (Bargeld aus der Kasse) */
+    privatentnahmen: string;
+    /** R12: Geldtransit – Kartenzahlungen der Kasse bis zur Gutschrift auf dem Bankkonto, Bargeld auf dem Weg zur Bank */
+    geldtransit: string;
+    /** R12: gewährte Skonti je Steuersatz (0 = ohne Umsatzsteuer, auch Kleinunternehmer) – Minderung der Erlöse */
+    skontiGewaehrt: { 19: string; 7: string; 0: string };
+    /** R12: erhaltene Skonti je Steuersatz der Vorsteuer (0 = ohne Vorsteuer) – Minderung des Aufwands */
+    skontiErhalten: { 19: string; 7: string; 0: string };
     /**
      * Erlöskonten je Steuersatz; `ku` für Kleinunternehmer (§ 19 UStG), `0` für steuerfreie Umsätze (§ 4 Nr. 8 ff. UStG
      * und vorerst der Nullsteuersatz), `igl` innergemeinschaftliche Lieferung, `rc13b` § 13b-Umsatz im Inland, `eu`
@@ -143,8 +162,8 @@ export const BUCHUNGSKONTEN: Record<
   }
 > = {
   // Forderungen/Verbindlichkeiten ohne Kontokorrent (1410/1610 bzw. 1210/3310), damit beim Bankabruf kein OPOS nötig ist
-  SKR03: { forderungen: "1410", verbindlichkeiten: "1610", kasse: "1000", privateinlagen: "1890", erloese: { 19: "8400", 7: "8300", 0: "8100", ku: "8195", igl: "8125", rc13b: "8337", eu: "8336", drittland: "8338" }, gutschrift: "3100" },
-  SKR04: { forderungen: "1210", verbindlichkeiten: "3310", kasse: "1600", privateinlagen: "2180", erloese: { 19: "4400", 7: "4300", 0: "4100", ku: "4185", igl: "4125", rc13b: "4337", eu: "4336", drittland: "4338" }, gutschrift: "5900" },
+  SKR03: { forderungen: "1410", verbindlichkeiten: "1610", kasse: "1000", privateinlagen: "1890", privatentnahmen: "1800", geldtransit: "1360", skontiGewaehrt: { 19: "8736", 7: "8731", 0: "8730" }, skontiErhalten: { 19: "3736", 7: "3731", 0: "3730" }, erloese: { 19: "8400", 7: "8300", 0: "8100", ku: "8195", igl: "8125", rc13b: "8337", eu: "8336", drittland: "8338" }, gutschrift: "3100" },
+  SKR04: { forderungen: "1210", verbindlichkeiten: "3310", kasse: "1600", privateinlagen: "2180", privatentnahmen: "2100", geldtransit: "1460", skontiGewaehrt: { 19: "4736", 7: "4731", 0: "4730" }, skontiErhalten: { 19: "5736", 7: "5731", 0: "5730" }, erloese: { 19: "4400", 7: "4300", 0: "4100", ku: "4185", igl: "4125", rc13b: "4337", eu: "4336", drittland: "4338" }, gutschrift: "5900" },
 };
 
 /** BU-Schlüssel eines Aufwands: Automatikkonto ohne Vorsteuerabzug 40, Konto ohne Automatik mit Vorsteuer 9/8, sonst leer. */
@@ -192,7 +211,7 @@ export function buchungsGuid(quelle_id: string, satz: number | null): string {
   return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20, 32)}`;
 }
 
-function erloeskonto(k: (typeof BUCHUNGSKONTEN)[Kontenrahmen], satz: number | null, r?: Pick<AusgangsRechnungFuerBuchung, "steuerart" | "kunde_land">): string {
+export function erloeskonto(k: (typeof BUCHUNGSKONTEN)[Kontenrahmen], satz: number | null, r?: Pick<AusgangsRechnungFuerBuchung, "steuerart" | "kunde_land">): string {
   const land = (r?.kunde_land ?? "DE").toUpperCase();
   // Leistung an ein Unternehmen im übrigen Gemeinschaftsgebiet mit Steuerschuldnerschaft des Empfängers – auch bei
   // Kleinunternehmern (Ort der Leistung im Ausland, § 3a Abs. 2 UStG)
@@ -221,7 +240,8 @@ export function buchungenAusRechnungen(rechnungen: AusgangsRechnungFuerBuchung[]
     const storno = r.art === "storno";
     const kunde = kuerze(r.kunde, NAME_IM_TEXT);
     const buchungstext = kuerze(storno ? `Storno ${r.nummer}${r.storniert_nummer ? ` zu RE ${r.storniert_nummer}` : ""} ${kunde}` : `RE ${r.nummer} ${kunde}`, 60);
-    for (const g of summen(r.positionen, r.kleinunternehmer).gruppen) {
+    const gruppen = r.anteil ? r.anteil.map((a) => ({ satz: a.satz, netto_cent: a.netto_cent, ust_cent: a.ust_cent })) : summen(r.positionen, r.kleinunternehmer).gruppen;
+    for (const g of gruppen) {
       const brutto = g.netto_cent + g.ust_cent;
       if (!brutto) continue;
       // eine negative Summe (nur bei negativen Positionen) dreht die Seite ebenfalls um
@@ -238,7 +258,7 @@ export function buchungenAusRechnungen(rechnungen: AusgangsRechnungFuerBuchung[]
         ust_satz: g.satz,
         art: storno ? "storno" : "einnahme",
         quelle_id: r.id,
-        guid: buchungsGuid(r.id, g.satz),
+        guid: buchungsGuid(r.guid_zusatz ? `${r.id}|${r.guid_zusatz}` : r.id, g.satz),
         leistungsdatum: r.leistungsdatum ?? null,
         steuerperiode: r.steuerperiode ?? null,
         // USt-IdNr. des Abnehmers für Kz 41/21 und die Zusammenfassende Meldung
@@ -282,14 +302,92 @@ function gutschriftBuchungen(r: AusgangsRechnungFuerBuchung, kontenrahmen: Konte
   return aus;
 }
 
+/** Skontokonto je Steuersatz – 16 % und 5 % (2020) wie 19 % bzw. 7 % (PRUEFLISTE), ohne Satz das Konto ohne Steuer. */
+const skontoKonto = (konten: { 19: string; 7: string; 0: string }, satz: number | null) => (satz === null || satz <= 0 ? konten[0] : satz <= 7 ? konten[7] : konten[19]);
+
 /**
- * Je Beleg und Steuersatz eine Buchung Aufwandskonto (aus der Kategorie) an Verbindlichkeiten, bei Barzahlung an Kasse,
- * bei privater Zahlung an Privateinlagen – mit dem Bruttobetrag. Ohne Vorsteuerabzug bei Satz > 0: BU-Schlüssel 40.
+ * R12: gewährtes Skonto bzw. andere Minderung beim Zahlungseingang einer Ausgangsrechnung (§ 17 Abs. 1 UStG) – je
+ * Steuersatz „Gewährte Skonti“ an Forderungen, zum Tag der Zahlung (Feld 116 ebenso). Die Skontokonten mit Steuersatz
+ * sind Automatikkonten (kein BU-Schlüssel); Kleinunternehmer und 0 % auf das Konto ohne Umsatzsteuer.
+ */
+export function skontoBuchungenRechnung(r: Pick<AusgangsRechnungFuerBuchung, "id" | "nummer" | "kunde" | "kleinunternehmer" | "positionen">, minderungen: { id: string; datum: string; brutto_cent: number }[], kontenrahmen: Kontenrahmen): Buchung[] {
+  const k = BUCHUNGSKONTEN[kontenrahmen];
+  const gruppen = summen(r.positionen, r.kleinunternehmer).gruppen;
+  const aus: Buchung[] = [];
+  for (const m of minderungen) {
+    if (!m.brutto_cent) continue;
+    for (const a of minderungNachSatz(m.brutto_cent, gruppen)) {
+      if (!a.brutto_cent) continue;
+      aus.push({
+        datum: m.datum,
+        betrag_cent: Math.abs(a.brutto_cent),
+        soll_haben: a.brutto_cent < 0 ? "H" : "S",
+        konto: skontoKonto(k.skontiGewaehrt, r.kleinunternehmer ? null : a.satz),
+        gegenkonto: k.forderungen,
+        bu_schluessel: "",
+        belegfeld1: belegfeld1Aus(r.nummer),
+        buchungstext: kuerze(`Skonto RE ${r.nummer} ${kuerze(r.kunde, NAME_IM_TEXT)}`, 60),
+        ust_satz: r.kleinunternehmer ? null : a.satz,
+        art: "einnahme",
+        quelle_id: r.id,
+        guid: buchungsGuid(`${r.id}|skonto|${m.id}`, a.satz),
+        steuerperiode: m.datum,
+      });
+    }
+  }
+  return aus;
+}
+
+/** Gegenkonto eines Belegs nach Zahlungsweg – bar nur gegen Kasse, wenn Amtlos die Kasse an diesem Tag führt (R12). */
+function belegGegenkonto(b: Beleg, k: (typeof BUCHUNGSKONTEN)[Kontenrahmen], kasseAb: string | null | undefined): string {
+  if (b.zahlung === "privat") return k.privateinlagen;
+  if (b.zahlung !== "bar") return k.verbindlichkeiten;
+  // ohne Angabe wie bisher Kasse; mit Angabe: ab dem ersten Kassenabschluss Kasse, sonst Geldtransit (kein Kassenminus)
+  if (kasseAb === undefined) return k.kasse;
+  return kasseAb && zahltag(b) >= kasseAb ? k.kasse : k.geldtransit;
+}
+
+/**
+ * R12: erhaltenes Skonto eines Belegs – je Steuersatz Gegenkonto des Belegs (Verbindlichkeiten, Kasse, Privat) an
+ * „Erhaltene Skonti“, zum Zahltag. Mit Vorsteuerabzug die Konten mit Vorsteuer (Automatik), sonst das Konto ohne.
+ */
+export function skontoBuchungenBelege(belege: Beleg[], kontenrahmen: Kontenrahmen, o?: { nummern?: Map<string, string>; kapitalgesellschaft?: boolean; kleinunternehmer?: boolean; kasseAb?: string | null }): Buchung[] {
+  const k = BUCHUNGSKONTEN[kontenrahmen];
+  const aus: Buchung[] = [];
+  for (const b of belege) {
+    if (!b.skonto_cent || !belegImStapel(b, o)) continue;
+    const kat = kategorieFuer(b.kategorie);
+    const belegfeld1 = belegfeld1Aus(belegKennung(b, o?.nummern?.get(b.id) ?? belegfeld1Aus(b.id).slice(0, 12).toUpperCase()));
+    for (const a of belegSkonto(b)) {
+      const mitVst = b.vorsteuer && !o?.kleinunternehmer;
+      aus.push({
+        datum: zahltag(b),
+        betrag_cent: Math.abs(a.brutto_cent),
+        soll_haben: a.brutto_cent < 0 ? "H" : "S",
+        konto: belegGegenkonto(b, k, o?.kasseAb),
+        gegenkonto: skontoKonto(k.skontiErhalten, mitVst ? a.satz : null),
+        bu_schluessel: "",
+        belegfeld1,
+        buchungstext: kuerze(`Skonto ${kuerze(b.lieferant, NAME_IM_TEXT)} ${kat.kurz}`, 60),
+        ust_satz: a.satz,
+        art: "ausgabe",
+        quelle_id: b.id,
+        guid: buchungsGuid(`${b.id}|skonto`, a.satz),
+      });
+    }
+  }
+  return aus;
+}
+
+/**
+ * Je Beleg und Steuersatz eine Buchung Aufwandskonto (aus der Kategorie) an Verbindlichkeiten, bei Barzahlung an Kasse
+ * (R12: mit `kasseAb` nur ab dem ersten Kassenabschluss in Amtlos, davor bzw. ohne Kasse an Geldtransit), bei privater
+ * Zahlung an Privateinlagen – mit dem Bruttobetrag. Ohne Vorsteuerabzug bei Satz > 0: BU-Schlüssel 40.
  * Belegfeld 1: Nummer des Lieferanten (normalisiert, `belegnummerNormal`), sonst die Amtlos-Belegnummer aus
  * `o.nummern` (`belegNummern`), ohne diese die Beleg-ID in Kurzform. Buchungstext: Lieferant (höchstens 40 Zeichen)
  * und Kurzbezeichnung der Kategorie.
  */
-export function buchungenAusBelegen(belege: Beleg[], kontenrahmen: Kontenrahmen, o?: { nummern?: Map<string, string>; kapitalgesellschaft?: boolean; kleinunternehmer?: boolean }): Buchung[] {
+export function buchungenAusBelegen(belege: Beleg[], kontenrahmen: Kontenrahmen, o?: { nummern?: Map<string, string>; kapitalgesellschaft?: boolean; kleinunternehmer?: boolean; kasseAb?: string | null }): Buchung[] {
   const k = BUCHUNGSKONTEN[kontenrahmen];
   const aus: Buchung[] = [];
   for (const b of belege) {
@@ -298,7 +396,7 @@ export function buchungenAusBelegen(belege: Beleg[], kontenrahmen: Kontenrahmen,
     const konten = kontenrahmen === "SKR03" ? kat.skr03 : kat.skr04;
     // § 13b: mit Vorsteuerabzug die Konten „19 % Vorsteuer und 19 % Umsatzsteuer“, sonst „ohne Vorsteuer“ (R11)
     const k13b = b.steuerschuld ? KONTEN_13B[kontenrahmen][b.vorsteuer && !o?.kleinunternehmer ? "mit" : "ohne"] : null;
-    const gegenkonto = b.zahlung === "bar" ? k.kasse : b.zahlung === "privat" ? k.privateinlagen : k.verbindlichkeiten;
+    const gegenkonto = belegGegenkonto(b, k, o?.kasseAb);
     const buchungstext = kuerze(`${kuerze(b.lieferant, NAME_IM_TEXT)} ${kat.kurz}`, 60);
     const belegfeld1 = belegfeld1Aus(belegKennung(b, o?.nummern?.get(b.id) ?? belegfeld1Aus(b.id).slice(0, 12).toUpperCase()));
     for (const s of b.steuer) {
@@ -423,6 +521,8 @@ export const DATEV_GUID = DATEV_SPALTEN.indexOf("Buchungs GUID");
 export const DATEV_LEISTUNGSDATUM = DATEV_SPALTEN.indexOf("Leistungsdatum");
 export const DATEV_STEUERPERIODE = DATEV_SPALTEN.indexOf("Datum Zuord. Steuerperiode");
 export const DATEV_EU_USTID = DATEV_SPALTEN.indexOf("EU-Land u. UStID (Bestimmung)");
+/** Feld „KOST1 - Kostenstelle“ (R12, Filiale einer Kasse) */
+export const DATEV_KOST1 = DATEV_SPALTEN.indexOf("KOST1 - Kostenstelle");
 
 export interface DatevExtfOptionen {
   beraternummer?: string;
@@ -516,6 +616,7 @@ export function datevExtf(buchungen: Buchung[], o: DatevExtfOptionen): string {
     f[13] = inAnfz(kuerze(b.buchungstext, 60));
     if (b.guid) f[DATEV_GUID] = inAnfz(b.guid.slice(0, 36));
     if (b.eu_ustid) f[DATEV_EU_USTID] = inAnfz(b.eu_ustid.slice(0, 15));
+    if (b.kost1) f[DATEV_KOST1] = inAnfz(b.kost1.slice(0, 36));
     // Datumsfelder TTMMJJJJ – damit ordnet DATEV die Umsatzsteuer wie die Voranmeldung der App zu
     if (b.leistungsdatum) f[DATEV_LEISTUNGSDATUM] = ttmmjjjjOhnePunkt(b.leistungsdatum);
     if (b.steuerperiode) f[DATEV_STEUERPERIODE] = ttmmjjjjOhnePunkt(b.steuerperiode);
@@ -575,6 +676,8 @@ export function pruefpunkteBuchungen(): string[] {
     "Ist-Versteuerung (§ 20 UStG) ohne Bilanz (R11): Rechnungen stehen erst mit dem Zahlungseingang im Stapel – Forderungen (1410/1210) an Erlös mit dem Zahltag als Belegdatum und in Feld 116; unbezahlte Rechnungen stehen nur in der Rechnungsliste. Abschlagsrechnungen ebenso (auch bei Soll), weil die Steuer erst mit der Zahlung entsteht. Ob DATEV die Ist-Versteuerung so ohne OPOS richtig auflöst, ist offen – Testimport.",
     "Belegdatum im Format TTMM: das Jahr ergibt sich aus dem Stapelzeitraum. Alle Buchungen eines Stapels müssen in „Datum vom/bis“ und im Wirtschaftsjahr liegen – der Aufrufer muss je Zeitraum (Monat oder Jahr) einen eigenen Stapel erzeugen.",
     "Belege mit Zahlungsweg Bank werden gegen Verbindlichkeiten aus L+L ohne Kontokorrent gebucht, die Zahlung selbst nicht (sie kommt aus dem Kontoauszug der Steuerberatung). Bei Einnahmen-Überschuss-Rechnung ist der Zahlungstag maßgeblich – ob stattdessen direkt gegen Bank (SKR03 1200, SKR04 1800) gebucht werden soll, mit der Steuerberatung klären.",
+    "R12 Kasse: Tageseinnahmen je Steuersatz Kasse (1000/1600) an Erlöse 19 %/7 % (8400/8300 bzw. 4400/4300), 0 % an 8100/4100, Kleinunternehmer an 8195/4185; der Kartenanteil (und „sonstige“ Zahlungsarten) Geldtransit (1360/1460) an Kasse; Bargeld zur Bank Geldtransit an Kasse; Privatentnahme 1800/2100 an Kasse; Privateinlage Kasse an 1890/2180. Leistungsdatum und Feld 116 = Tag des Z-Bons. Kassendifferenzen laut Zählung werden nicht gebucht. Barbelege nur ab dem ersten Kassenabschluss gegen Kasse, sonst gegen Geldtransit.",
+    "R12 Skonto: gewährte Skonti SKR03 8736 (19 %), 8731 (7 %), 8730 (ohne USt, Kleinunternehmer, 0 %), SKR04 4736/4731/4730 an Forderungen zum Zahltag; erhaltene Skonti SKR03 3736/3731/3730, SKR04 5736/5731/5730 vom Gegenkonto des Belegs. Die Konten mit Steuersatz gelten als Automatikkonten (kein BU-Schlüssel). Bei Ist-Versteuerung wird je Zahlung der erhaltene Betrag plus Skonto als Erlös und das Skonto als Minderung gebucht.",
     "Belegfeld 1 wird auf die DATEV-zulässigen Zeichen (Ziffern, Buchstaben, $ & % * + - /) gekürzt, Umlaute werden umschrieben – stimmt die Zeichenliste? Textfelder werden nach Windows-1252 kodiert; andere Zeichen werden „?“.",
   ];
 }

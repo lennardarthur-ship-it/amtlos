@@ -254,7 +254,10 @@ function paketPruefen(name, zr, erg, ordner) {
   const extf = csvLesen(inhalt[`EXTF_Buchungsstapel_${zr.name}.csv`], "latin1");
   const zeilen = extf.slice(2);
   const erwBuchungen = summe(vg.map((x) => Object.values(x.s.gruppen).filter((g) => g.netto + g.ust !== 0).length)) + summe(bl.filter((b) => b.kategorie !== "personal").map((b) => b.saetze.filter((x) => x.betrag).length)); // R10: Personal nicht im Stapel
-  anzahl(bereich, "DATEV: Anzahl Buchungen", zeilen.length, erwBuchungen);
+  // R12: je Skonto beim Zahlungseingang im Zeitraum eine Buchung „Gewährte Skonti 19 %“ (8736) an Forderungen
+  const skontoBuchungen = D.RECHNUNGEN.filter((r) => r.skonto && r.bezahlt && r.bezahlt >= zr.von && r.bezahlt <= zr.bis).length;
+  anzahl(bereich, "DATEV: Anzahl Buchungen", zeilen.length, erwBuchungen + skontoBuchungen);
+  if (skontoBuchungen) vergleich(bereich, "DATEV: Skonto 2026-021 auf 8736 an 1410 (brutto)", summe(zeilen.filter((z) => z[6] === "8736" && z[7] === "1410").map((z) => centAus(z[0]))), summe(D.RECHNUNGEN.filter((r) => r.skonto && r.bezahlt >= zr.von && r.bezahlt <= zr.bis).map((r) => D.skontoVon(r).brutto)));
   vergleich(bereich, "DATEV: Spalten je Zeile = Spalten im Kopf", zeilen.every((z) => z.length === extf[1].length) ? "ja" : "nein", "ja");
   vergleich(bereich, "DATEV: Kopf Beraternummer/Mandant", `${extf[0][10]}/${extf[0][11]}`, "41522/30318");
   const kontoSumme = (konto) => summe(zeilen.filter((z) => z[7] === konto || z[6] === konto).map((z) => (z[1] === "H" ? -1 : 1) * centAus(z[0])));

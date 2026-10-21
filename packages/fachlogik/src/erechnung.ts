@@ -5,6 +5,7 @@
  */
 import { EINHEIT_CODE, summen, type RechnungsDaten } from "./rechnung.js";
 import { istEuAusland } from "./buchungen.js";
+import { prozentText, skontoBetrag, zahlungsbedingungenMitSkonto } from "./skonto.js";
 
 const betrag = (cent: number) => (cent / 100).toFixed(2);
 const geld = (cent: number) => ({ "@currencyID": "EUR" as const, wert: betrag(cent) });
@@ -120,6 +121,10 @@ export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record
       : r.steller.iban
         ? { "cac:PaymentMeans": [{ "cbc:PaymentMeansCode": "58", "cac:PayeeFinancialAccount": { "cbc:ID": r.steller.iban.replace(/\s/g, ""), ...(r.steller.bic ? { "cac:FinancialInstitutionBranch": { "cbc:ID": r.steller.bic } } : {}) } }] }
         : {}),
+    // R12: Skonto als Zahlungsbedingung (BT-20) – Zeile nach BR-DE-18, dann der Satz für Menschen; nur bei Rechnungen mit Zahlung
+    ...(r.skonto && !gs && r.art !== "storno" && s.brutto_cent > 0
+      ? { "cac:PaymentTerms": { "cbc:Note": zahlungsbedingungenMitSkonto(r.skonto, `Bei Zahlung bis zum ${r.skonto.bis.slice(8, 10)}.${r.skonto.bis.slice(5, 7)}.${r.skonto.bis.slice(0, 4)} (innerhalb von ${r.skonto.tage} Tagen) ${prozentText(r.skonto.prozent)} % Skonto (${betrag(skontoBetrag(s.brutto_cent, r.skonto.prozent))} EUR).`) } }
+      : {}),
     "cac:TaxTotal": [
       {
         "cbc:TaxAmount": m(s.ust_cent).wert, "cbc:TaxAmount@currencyID": "EUR",

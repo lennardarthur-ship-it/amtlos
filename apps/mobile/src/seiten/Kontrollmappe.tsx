@@ -7,7 +7,8 @@ import { ChipLeiste, Fuss, Hinweis, Karte, Knopf, Symbol, T, Zeile } from "../ui
 import { useMeldung, useMeldungLeeren } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
 import { HAARLINIE, useFarben, weich } from "../ui/thema";
-import { BG_NACHWEISE, BG_SCHLUESSEL, KONTROLLARTEN, bgVorhanden, datumDe, deckblattHtml, fehltInMappe, fuerKontrolle, mappeDateiname, mappeZusammenfuegen, mappenAuswahl, seitenzahl, startSeiten, type Kontrollart, type MappenEintrag } from "../unterlagen/kontrollmappe";
+import { kasseSichtbar } from "../unterlagen/kasse";
+import { BG_NACHWEISE, BG_SCHLUESSEL, KONTROLLARTEN, bgVorhanden, kassenMappe, datumDe, deckblattHtml, fehltInMappe, fuerKontrolle, mappeDateiname, mappeZusammenfuegen, mappenAuswahl, seitenzahl, startSeiten, type Kontrollart, type MappenEintrag } from "../unterlagen/kontrollmappe";
 import { istErledigt } from "../pflichten/check";
 import { useAuswertung } from "./Pflichten";
 import { useOeffnen, useStarten } from "./starten";
@@ -88,7 +89,10 @@ export function KontrollmappeSeite() {
   const oeffnen = useOeffnen();
   // Kontrollart (R10): nur, was die jeweilige Stelle prüft
   const [art, setArt] = useState<Kontrollart>("alle");
-  const eintraege = useMemo(() => alleEintraege.filter((e) => fuerKontrolle(e.vorlage, art)), [alleEintraege, art]);
+  // R12: Kassennachschau – Kassenbücher aus den Tagesabschlüssen, Kassenmeldung, Verfahrensdokumentation
+  const kasseEintraege = useMemo(() => kassenMappe(z.stand), [z.stand]);
+  const arten = KONTROLLARTEN.filter((k) => k !== "kasse" || kasseSichtbar(z.stand) || kasseEintraege.length > 0);
+  const eintraege = useMemo(() => (art === "kasse" ? kasseEintraege : alleEintraege.filter((e) => fuerKontrolle(e.vorlage, art))), [alleEintraege, kasseEintraege, art]);
   // „Fehlt noch“: offene Pflichten aus dem Check mit einer Vorlage, die in diese Mappe gehört
   const a = useAuswertung();
   const starten = useStarten();
@@ -126,8 +130,10 @@ export function KontrollmappeSeite() {
       for (const e of gewaehlt) {
         const u = z.stand.unterlagen.find((x) => x.id === e.id);
         const v = vorlageFuer(e.vorlage);
-        if (!u || !v) continue;
-        const bytes = await pdfBytes(dokumentHtml(v, u.daten, b), pdfDateiname(v, u.daten, tag), v.querformat);
+        // R12: Kassenbuch aus den Tagesabschlüssen hat keine gespeicherte Unterlage
+        const daten = e.daten ?? u?.daten;
+        if (!daten || !v) continue;
+        const bytes = await pdfBytes(dokumentHtml(v, daten, b), pdfDateiname(v, daten, tag), v.querformat);
         if (!bytes) throw new Error("pdf");
         teile.push(bytes);
         drin.push(e);
@@ -157,7 +163,7 @@ export function KontrollmappeSeite() {
   return (
     <Unterseite titel={TEXT.kontrollmappe_titel} unter={TEXT.kontrollmappe_text}>
       <Inhalt>
-        <ChipLeiste label={TEXT.kontrollmappe_art_label} wert={art} aendern={setArt} optionen={KONTROLLARTEN.map((k) => ({ wert: k, text: TEXT.kontrollmappe_arten[k]! }))} stil={{ marginTop: 0 }} />
+        <ChipLeiste label={TEXT.kontrollmappe_art_label} wert={art} aendern={setArt} optionen={arten.map((k) => ({ wert: k, text: TEXT.kontrollmappe_arten[k]! }))} stil={{ marginTop: 0 }} />
         <T v="caption" leise stil={{ marginTop: 8 }}>{TEXT.kontrollmappe_art_hilfe[art]}</T>
         {fehlt.length ? (
           <Gruppe titel={TEXT.kontrollmappe_fehlt_titel} hilfe={TEXT.kontrollmappe_fehlt_hilfe}>

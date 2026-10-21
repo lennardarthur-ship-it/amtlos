@@ -33,7 +33,7 @@ import { createRequire } from "node:module";
  * und sich nicht als Zahlvergleich automatisieren lassen. Bei jedem Lauf erneut prüfen und hier pflegen.
  */
 const BEOBACHTUNGEN = [
-  "**Kassenumsätze fehlen in der App ganz.** Ein Café macht den Großteil seines Umsatzes über die Kasse (hier ca. 160.000 € netto gegenüber ca. 7.000 € aus Rechnungen). Die App kennt keine Tageseinnahmen/Z-Bons: „Aus Rechnungen übernehmen“ (USt-VA), „EÜR übernehmen“ und das Steuerberater-Paket (DATEV-Stapel, Rechnungsliste) enthalten nur Rechnungen und Belege. Die Kassenumsätze wurden in den Voranmeldungen und der EÜR von Hand ergänzt; im DATEV-Stapel fehlen sie (seit Oktober 2026 nennt LIESMICH.txt sie unter „Nicht enthalten – bitte zusätzlich liefern“). Für Gastronomie-Kunden ist das der größte Unterschied zwischen App und Wirklichkeit.",
+  "**Kassenumsätze kommen seit R12 aus der App.** Die Inhaberin erfasst jeden Abend den Tagesabschluss (Umsatz je Satz brutto laut Z-Bon, Kartenanteil, Geldtransit/Privatentnahme). „Aus Rechnungen übernehmen“ (USt-VA) übernimmt die Kassenumsätze (Netto je Monat aus der Bruttosumme), „EÜR übernehmen“ stellt Kasseneinnahmen und Umsatzsteuer in eigene Zeilen, der DATEV-Stapel bucht Kasse an Erlöse und den Kartenanteil über Geldtransit 1360; die Barbelege des Mai stehen gegen Kasse, ein Kassenminus entsteht nicht. Vorher waren das rund 160.000 € netto, die von Hand ergänzt werden mussten.",
   "**Quartalsübergreifende Rechnungskorrektur (2026-009 → Storno 2026-010 + neue Rechnung 2026-011, Leistung 20.06.):** `umsaetzeFuer` zählt die Stornorechnung im Zeitraum des Stornos (Q3, −40 Personen), die neue Rechnung aber nach ihrem Leistungsdatum im Q2. Dieselbe Leistung steht damit in Q2 doppelt (40 + 32 Personen: +768,00 € zu 7 %, +528,00 € zu 19 %), Q3 wird um 40 statt um 8 Personen gemindert. Das Jahr stimmt, die Quartale nicht (Zahllast Q2 +154,08 €, Q3 −154,08 €). Erwartet nach § 17 Abs. 1 / § 14c Abs. 1 UStG: Q2 mit dem ursprünglich berechneten Entgelt (40 Personen), Q3 nur die Differenz (−8 Personen). Fachlich bestätigen lassen; in den Notizen der VA Q3 erscheinen deshalb negative Rechnungsumsätze.",
   "**EÜR-Übernahme ohne USt-Zahlungen und ohne AfA:** Die an das Finanzamt gezahlten USt-Vorauszahlungen (hier 9.658,09 €) und die Abschreibung der Spülmaschine (575,00 €) muss man weiter von Hand eintragen; seit Oktober 2026 sagt die Übernahme das ausdrücklich („Nicht enthalten: … Umsatzsteuer-Vorauszahlungen … Abschreibungen (AfA) – bitte selbst ergänzen“). Ausrechnen tut die App beides nicht.",
   "**Innergemeinschaftliche Lieferung nach Österreich (2026-012):** Rechnung, XRechnung (VATEX-EU-IC, Lieferanschrift) und Kz-Hinweis in der VA sind in Ordnung, die EÜR-Übernahme stellt die 841,00 € in die Zeile „Umsatzsteuerfreie, nicht umsatzsteuerbare Betriebseinnahmen …“ (behoben Oktober 2026). Offen: DATEV bucht auf 8100 statt 8125 (in buchungen.ts als Prüfpunkt vermerkt), die VA hat kein eigenes Feld „Kz 41“ (nur „Umsätze ohne Umsatzsteuer“), und für die Zusammenfassende Meldung, die der Pflichten-Check bei Kunden in anderen EU-Ländern richtig anzeigt, gibt es keine Vorlage.",
@@ -206,7 +206,8 @@ function paketNeuerungen(name, zr, inhalt, erg, kleinunternehmer, belegeRoh) {
   vergleich(bereich, "LIESMICH: Mandant-Block und „Nicht enthalten – bitte zusätzlich liefern“", /Mandant \(Angaben aus der App\)/.test(liesmich) && /Nicht enthalten – bitte zusätzlich liefern/.test(liesmich) && /Kassenumsätze/.test(liesmich) && /Lohnjournal/.test(liesmich) ? "ja" : "nein", "ja");
   // Kasse laut Pflichten-Check (ja): Hinweis auf fehlende Kassenumsätze ganz oben im LIESMICH und in den Fragen
   // R10: der Kassenhinweis steht einmal an fester Stelle (LIESMICH, Abschnitt „Wichtig“), nicht mehr vor dem Kopf und in den Fragen
-  vergleich(bereich, "LIESMICH: „Betrieb mit Kasse: Kassenumsätze fehlen in diesem Paket.“ einmal unter „Wichtig“", /\r\nWichtig\r\n- Betrieb mit Kasse: Kassenumsätze fehlen in diesem Paket\./.test(liesmich) && liesmich.split("Kassenumsätze").length === 2 ? "ja" : "nein", "ja");
+  // R12: mit Tagesabschlüssen in Amtlos sind die Kassenumsätze im Paket – der Satz sagt das einmal unter „Wichtig“
+  vergleich(bereich, "LIESMICH: „Kassenumsätze aus … Tagesabschlüssen (Z-Bons) sind enthalten“ einmal unter „Wichtig“, kein „fehlen“", /\r\nWichtig\r\n- Kassenumsätze aus \d+ Tagesabschlüssen \(Z-Bons\) sind enthalten/.test(liesmich) && liesmich.split("Kassenumsätze").length === 2 && !/Kassenumsätze fehlen/.test(liesmich) ? "ja" : "nein", "ja");
   vergleich(bereich, "Fragen: Kassenhinweis nicht doppelt", /Betrieb mit Kasse: Kassenumsätze fehlen in diesem Paket\./.test(fragen) ? "ja" : "nein", "nein");
   vergleich(bereich, "LIESMICH: Kleinunternehmer ja/nein", (/Kleinunternehmer \(§ 19 UStG\): (ja|nein)/.exec(liesmich) ?? [])[1] ?? "fehlt", kleinunternehmer ? "ja" : "nein");
   const jahr = /^\d{4}$/.test(zr.name);
@@ -248,16 +249,22 @@ function paketPruefen(name, zr, erg, ordner) {
   // DATEV: je Rechnung und Satz bzw. Beleg und Satz eine Buchung; Erlöskonten SKR03 (igl richtig: 8125)
   const extf = csvLesen(inhalt[`EXTF_Buchungsstapel_${zr.name}.csv`], "latin1");
   const zeilen = extf.slice(2);
-  const erwBuchungen = summe(vg.map((x) => Object.values(x.s.gruppen).filter((g) => g.netto + g.ust !== 0).length)) + summe(bl.filter((b) => b.kategorie !== "personal").map((b) => b.saetze.filter((x) => x.betrag).length)); // R10: Personal nicht im Stapel
+  // R12: Tagesabschlüsse – je Tag 19 %, 7 %, Kartenanteil und die Bewegungen (Geldtransit, Privatentnahme)
+  const kt = D.KASSE_TAGE.filter((k) => im(k.datum));
+  const erwKasse = summe(kt.map((k) => (k.b19 ? 1 : 0) + (k.b7 ? 1 : 0) + (k.b7 + k.b19 - k.bar ? 1 : 0))) + D.KASSEN_BEWEGUNGEN_ROH.filter((b) => im(b.datum)).length;
+  const erwBuchungen = summe(vg.map((x) => Object.values(x.s.gruppen).filter((g) => g.netto + g.ust !== 0).length)) + summe(bl.filter((b) => b.kategorie !== "personal").map((b) => b.saetze.filter((x) => x.betrag).length)) + erwKasse; // R10: Personal nicht im Stapel
   vergleich(`Paket ${name}`, "DATEV: Anzahl Buchungen", zeilen.length, erwBuchungen);
   vergleich(`Paket ${name}`, "DATEV: Spalten je Zeile = Spalten im Kopf", zeilen.every((z) => z.length === extf[1].length) ? "ja" : "nein", "ja");
   const kontoSumme = (konto) => summe(zeilen.filter((z) => z[7] === konto).map((z) => (z[1] === "H" ? -1 : 1) * centAus(z[0])));
   const erl = { 19: "8400", 7: "8300", 0: "8125" };
   for (const [satz, konto] of Object.entries(erl)) {
-    const erw = summe(vg.map((x) => (x.vz * ((x.s.gruppen[satz]?.netto ?? 0) + (x.s.gruppen[satz]?.ust ?? 0)))));
+    const erw = summe(vg.map((x) => (x.vz * ((x.s.gruppen[satz]?.netto ?? 0) + (x.s.gruppen[satz]?.ust ?? 0))))) + (satz === "19" ? summe(kt.map((k) => k.b19)) : satz === "7" ? summe(kt.map((k) => k.b7)) : 0);
     if (!erw) continue;
-    vergleich(`Paket ${name}`, `DATEV: Brutto auf Erlöskonto ${konto} (${satz} %${satz === "0" ? ", steuerfreie igL – SKR03 8125" : ""})`, kontoSumme(konto), erw);
+    vergleich(`Paket ${name}`, `DATEV: Brutto auf Erlöskonto ${konto} (${satz} %${satz === "0" ? ", steuerfreie igL – SKR03 8125" : ", Rechnungen und Tagesabschlüsse"})`, kontoSumme(konto), erw);
   }
+  // R12: Kartenanteil der Kasse über Geldtransit; Barbelege gegen Kasse (Amtlos führt die Kasse ab 01.01.)
+  vergleich(`Paket ${name}`, "DATEV: Geldtransit 1360 = Kartenzahlungen + Bankeinzahlungen der Kasse", summe(zeilen.filter((z) => z[6] === "1360" && z[7] === "1000").map((z) => centAus(z[0]))), summe(kt.map((k) => k.b7 + k.b19 - k.bar)) + summe(D.KASSEN_BEWEGUNGEN_ROH.filter((b) => im(b.datum) && b.art === "transit").map((b) => b.betrag)));
+  vergleich(`Paket ${name}`, "DATEV: Barbelege gegen Kasse 1000 (kein Geldtransit)", zeilen.filter((z) => z[7] === "1360").length ? "Geldtransit" : "Kasse", "Kasse");
   vergleich(`Paket ${name}`, "DATEV: Kopf Beraternummer/Mandant", `${extf[0][10]}/${extf[0][11]}`, "29098/10457");
   // Dateinamen: Umlaute umgeschrieben („Söhne“ → „Soehne“, „Lohnbüro“ → „Lohnbuero“), unabhängig nachgebaut
   const umschrift = (t) => t.replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/Ä/g, "Ae").replace(/Ö/g, "Oe").replace(/Ü/g, "Ue").replace(/ß/g, "ss").normalize("NFKD").replace(/[\u0300-\u036f]/g, "");
@@ -392,7 +399,7 @@ md.push(tab(["ID", "Datum", "Lieferant / Nr.", "Kategorie", "je Satz: netto + US
   return [b.id, D.de(b.datum), `${b.lieferant}${b.nummer ? ` / ${b.nummer}` : ""}`, b.kategorie, sm.jeSatz.map((x) => `${x.satz} %: ${e(x.netto)} + ${e(x.ust)}`).join("<br>"), e(sm.brutto), b.vorsteuer ? e(sm.vorsteuer) : "nein", `${b.zahlung}${b.bezahlt ? `, bezahlt ${D.de(b.bezahlt)}` : ""}`, `belege/${b.id}.${b.datei}`, b.worum];
 })), "");
 
-md.push("## Eingaben: Kasse, Lohn, Annahmen", "", "Kassenumsätze laut monatlicher Z-Bon-Summe (brutto je Satz; Mai = Summe der Tageswerte im Kassenbuch). Die App kennt diese Umsätze nicht – sie wurden in Voranmeldungen und EÜR von Hand ergänzt.", "");
+md.push("## Eingaben: Kasse, Lohn, Annahmen", "", "Kassenumsätze laut monatlicher Z-Bon-Summe (brutto je Satz; Mai = Summe der Tageswerte im Kassenbuch). Seit R12 als Tagesabschlüsse in der App erfasst (Monatssumme auf die Öffnungstage Di–So verteilt, Ruhetag Montag) – Voranmeldung, EÜR und Stapel übernehmen sie von dort.", "");
 md.push(tab(["Monat", "Brutto 7 %", "Netto 7 %", "USt 7 %", "Brutto 19 %", "Netto 19 %", "USt 19 %"], [...D.KASSE_MONATE.map((k) => [k.monat, e(k.b7), e(k.n7), e(k.u7), e(k.b19), e(k.n19), e(k.u19)]), ["Summe", e(summe(D.KASSE_MONATE.map((k) => k.b7))), e(summe(D.KASSE_MONATE.map((k) => k.n7))), e(summe(D.KASSE_MONATE.map((k) => k.u7))), e(summe(D.KASSE_MONATE.map((k) => k.b19))), e(summe(D.KASSE_MONATE.map((k) => k.n19))), e(summe(D.KASSE_MONATE.map((k) => k.u19)))]]), "");
 md.push(`- Kassenbuch Mai: Anfangsbestand ${e(D.KASSENBUCH_ANFANG)} €, ${D.KASSENBUCH_MAI.length} Einträge, Bareinnahmen ${e(summe(D.KASSENBUCH_MAI.map((x) => x.einnahme)))} €, Ausgaben ${e(summe(D.KASSENBUCH_MAI.map((x) => x.ausgabe)))} €, **Endbestand ${e(D.kassenbuchEnde())} €**.`,
   `- Lohn Köchin: ${e(D.LOHN_M1[0].brutto)} € (Jan–Jun), ${e(D.LOHN_M1[6].brutto)} € (Jul–Dez); Jahresbrutto ${e(summe(D.LOHN_M1.map((m) => m.brutto)))} €, LSt ${e(summe(D.LOHN_M1.map((m) => m.lohnsteuer)))} €, SV AN ${e(summe(D.LOHN_M1.map((m) => m.sv_an)))} €, AG-Anteile ${e(summe(D.LOHN_M1.map((m) => m.sv_ag)))} € (LSt-Werte sind Annahmen „vom Lohnbüro“, nicht nachgerechnet).`,
@@ -432,7 +439,7 @@ md.push("### Steuerberater-Pakete", "", `- Q4 2026: Rechnungen mit Rechnungsdatu
 
 md.push("## Vergleich App ↔ unabhängige Rechnung", "", `${vergleiche.filter((v) => v.ok).length} von ${vergleiche.length} Prüfungen stimmen. Abweichungen (✗) stehen zusätzlich unter „Auffälligkeiten“.`, "");
 md.push(tab(["", "Bereich", "Prüfung", "App", "erwartet"], vergleiche.map((v) => [v.ok ? "✓" : "✗", v.bereich, v.was, v.app, v.erwartet])), "");
-md.push("Übernahme „Aus Rechnungen“ je Quartal (Rohwerte der App, vor dem Ergänzen der Kasse):", "", tab(["Quartal", "Rechnungen", "umsatz_19", "umsatz_7", "umsatz_frei", "vorsteuer", "fertige VA: 19 % / 7 % / frei / Vorsteuer"], bau.ust.map((u) => [u.q, u.appAnzahl, u.app.umsatz_19, u.app.umsatz_7, u.app.umsatz_frei, u.app.vorsteuer, `${u.final.umsatz_19} / ${u.final.umsatz_7} / ${u.final.umsatz_frei} / ${u.final.vorsteuer}`])), "");
+md.push("Übernahme „Aus Rechnungen übernehmen“ je Quartal (Rechnungen und Tagesabschlüsse, nichts von Hand ergänzt):", "", tab(["Quartal", "Rechnungen", "umsatz_19", "umsatz_7", "umsatz_frei", "vorsteuer", "fertige VA: 19 % / 7 % / frei / Vorsteuer"], bau.ust.map((u) => [u.q, u.appAnzahl, u.app.umsatz_19, u.app.umsatz_7, u.app.umsatz_frei, u.app.vorsteuer, `${u.final.umsatz_19} / ${u.final.umsatz_7} / ${u.final.umsatz_frei} / ${u.final.vorsteuer}`])), "");
 md.push("EÜR-Übernahme der App (Rohzeilen):", "", tab(["Liste", "Bezeichnung", "Zeile Anlage EÜR", "Betrag"], [...bau.euer.uebernahme.einnahmen.map((x) => ["Einnahme", x.text, x.kategorie, x.betrag]), ...bau.euer.uebernahme.ausgaben.map((x) => ["Ausgabe", x.text, x.kategorie, x.betrag])]), "", `Ergebnis der fertigen EÜR (Formular): ${bau.euer.ergebnis.map(([a, b]) => `${a} ${b}`).join(", ")}.`, "");
 
 md.push("## Pflichten-Check der App für das Café", "", "Profil: Gastronomie und Lebensmittel, Einzelunternehmen, Gewerbe, Sachsen, 2 Beschäftigte, elektronische Kasse, Website, Regelbesteuerung, Steuerberatung, Gründung 01.03.2022 (Stichtag 15.01.2026).", "");

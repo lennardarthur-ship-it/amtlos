@@ -7,7 +7,8 @@ import { T as TEXT } from "../texte";
 import { ChipLeiste, Feld, Fuss, Hinweis, Karte, Knopf, T, Wahl } from "../ui/bausteine";
 import { useMeldung, useMeldungLeeren } from "../ui/meldung";
 import { Unterseite } from "../ui/navigation";
-import { gestellteRechnungen, kapitalgesellschaft, kassenLage, standardZeitraum, steuerpaket, zeitraeume } from "../unterlagen/steuerpaket";
+import { kassenAbdeckung } from "../unterlagen/kasse";
+import { gestellteRechnungen, kapitalgesellschaft, kassenHinweisMit, kassenLage, standardZeitraum, steuerpaket, zeitraeume } from "../unterlagen/steuerpaket";
 import { dateiTeilenBytes } from "../unterlagen/sicherungDatei";
 import { heute } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
@@ -102,6 +103,9 @@ export function SteuerberatungSeite() {
       setFortschritt(null);
     }
   };
+  const fehlend = zr ? kassenAbdeckung(z.stand, zr.von, zr.bis) : null;
+  const lage = kassenLage(z.stand.profil);
+  const kassenVorab = fehlend !== null ? kassenHinweisMit(lage, "ust", fehlend)?.text ?? null : lage !== "keine" && lage !== "unbekannt" ? (lage === "shop" ? TEXT.shop_paket_vorab : TEXT.kasse_paket_vorab) : null;
   return (
     <Unterseite titel={TEXT.steuerpaket_titel} unter={TEXT.steuerpaket_text}>
       <Inhalt>
@@ -125,7 +129,8 @@ export function SteuerberatungSeite() {
         <T v="caption" leise stil={{ marginTop: 6 }}>{TEXT.steuerpaket_nummern_hilfe}</T>
         <View style={{ marginTop: 14 }}>
           {/* R10 UI: Kasse bzw. Shop laut Check – vor dem Kauf sagen, dass diese Umsätze im Paket fehlen */}
-          {kassenLage(z.stand.profil) !== "keine" && kassenLage(z.stand.profil) !== "unbekannt" ? <Hinweis art="warnung" symbol="banknote" text={kassenLage(z.stand.profil) === "shop" ? TEXT.shop_paket_vorab : TEXT.kasse_paket_vorab} /> : null}
+          {/* R12: mit Kassenabschlüssen nur fehlende Tage nennen */}
+          {kassenVorab ? <Hinweis art="warnung" symbol="banknote" text={kassenVorab} /> : null}
           {/* R11 (Tischlerei #23): für Gesellschaften mit Bilanz ehrlich sagen, was das Paket ist – eine Zuarbeit, keine Buchführung */}
           {kapitalgesellschaft(z.stand) ? <Hinweis text={TEXT.steuerpaket_bilanz} /> : null}
           <Hinweis text={TEXT.steuerpaket_hinweis} />

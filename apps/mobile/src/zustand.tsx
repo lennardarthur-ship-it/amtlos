@@ -8,12 +8,12 @@ import { archivLoeschen, archivierteSchluessel, autoSchluesselLoeschen, nonce, s
 import { allesAbsagen } from "./pflichten/erinnerungen";
 import { cacheLeeren } from "./unterlagen/aufraeumen";
 import { istTresor, tresorOeffnen, tresorSchliessen } from "./unterlagen/tresor";
-import type { Beleg, Betrieb, Daten, Person, PersonAngaben, PersonenArt } from "@amtlos/fachlogik";
+import type { Beleg, Betrieb, Daten, KassenInhalt, Kassenabschluss, Person, PersonAngaben, PersonenArt, Zahlung } from "@amtlos/fachlogik";
 import { alleDateienEntfernen, ansichtenAufraeumen, dateiAblegen, dateiAnzeigen, dateiEntfernen, dateiGroesse, dateiHolen, dateiVorhanden } from "./unterlagen/dateien";
 import { base64, ausBase64, type Dateien } from "./unterlagen/sicherung";
 import { kontoVergessen } from "./konto/sitzung";
 import { syncZusammenfuehren } from "./konto/sync";
-import { LEERER_STAND, StandFehler, ausgabeMoeglich, belegLoeschen, belegSetzen, neueId, steuerberatungSetzen, aendern, allesLoeschenErlaubt, anlegen, ausgeben, bezahltSetzen, zusammenfuehren, type Zusammenfuehrung, betriebSetzen, erledigtSetzen, felderSetzen, istLesbar, profilSetzen, stornieren, kopieren, loeschen, personLoeschen, personMerken, personSetzen, standAus, standGleich, type Stand, type Unterlage } from "./unterlagen/speicher";
+import { LEERER_STAND, StandFehler, ausgabeMoeglich, belegLoeschen, belegSetzen, neueId, steuerberatungSetzen, aendern, allesLoeschenErlaubt, anlegen, ausgeben, bezahltSetzen, kasseKorrigieren, kasseSpeichern, zahlungVermerken, zusammenfuehren, type Zusammenfuehrung, betriebSetzen, erledigtSetzen, felderSetzen, istLesbar, profilSetzen, stornieren, kopieren, loeschen, personLoeschen, personMerken, personSetzen, standAus, standGleich, type Stand, type Unterlage } from "./unterlagen/speicher";
 
 /** Alles liegt nur auf dem Gerät (E-121): kein Konto, kein Server. Seit E-129 verschlüsselt (Schlüssel im Schlüsselbund). */
 const SCHLUESSEL = "amtlos.unterlagen.v1";
@@ -99,6 +99,12 @@ interface Zustand {
   /** Datensicherung erstellt – `stand` ist der gesicherte Stand (Änderungen danach bleiben ungesichert) */
   gesichert(stand?: Stand): void;
   bezahltSetzen(id: string, datum: string | null): void;
+  /** R12: Zahlungseingang mit Betrag (und ggf. Skonto/Minderung) vermerken */
+  zahlungVermerken(id: string, z: Omit<Zahlung, "id">): void;
+  /** R12: Tagesabschluss der Kasse speichern (festgeschrieben, sofort gespeichert) */
+  kasseSpeichern(inhalt: KassenInhalt): Kassenabschluss;
+  /** R12: Kassenabschluss korrigieren – nur mit Grund */
+  kasseKorrigieren(id: string, inhalt: KassenInhalt, grund: string): void;
   appSperreSetzen(an: boolean): void;
   cloudSicherungSetzen(an: boolean): void;
   /** Amtlos Pro aktiv (Abo im App Store oder – nur im Testmodus – testweise eingeschaltet), E-132 */
@@ -521,6 +527,18 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         if (datum && u && u.vorlage === "rechnung" && !u.festgeschrieben && !String(u.daten.bezahlt_am ?? "").trim()) s = felderSetzen(s, id, { bezahlt_am: datum }, new Date());
         setzen(s);
       },
+      zahlungVermerken: (id, zahlung) => setzen(zahlungVermerken(aktuell.current, id, zahlung)),
+      kasseSpeichern: (inhalt) => {
+        const [s, k] = kasseSpeichern(aktuell.current, inhalt, new Date());
+        setzen(s);
+        // festgeschrieben: sofort speichern wie eine geteilte Rechnung (G3)
+        schreiben();
+        return k;
+      },
+      kasseKorrigieren: (id, inhalt, grund) => {
+        setzen(kasseKorrigieren(aktuell.current, id, inhalt, grund, new Date()));
+        schreiben();
+      },
       appSperreSetzen: (an) => setzen({ ...aktuell.current, appSperre: an }),
       cloudSicherungSetzen: (an) => setzen({ ...aktuell.current, cloudSicherung: an }),
       proAktualisieren: (aktiv) => (aktiv === undefined ? void proAktiv().then(setStorePro) : setStorePro(aktiv)),
@@ -551,7 +569,8 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         const d: Dateien = {};
         const fehlend: string[] = [];
         const st = s ?? aktuell.current;
-        const alle = [...st.belege, ...st.belegArchiv];
+        // auch die Fotos der Z-Bons (R12)
+        const alle = [...st.belege, ...st.belegArchiv, ...st.kasse];
         let i = 0;
         for (const b of alle) {
           i++;
@@ -582,7 +601,7 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         // inhaltlich vergleichen, gleiche Objekte überspringen (R9 Performance: vorher zweimal JSON.stringify des ganzen Stands)
         if (standGleich(neu, vorher)) return;
         // auf einem anderen Gerät gelöschte Belege: Datei hier auch entfernen (ungültig markierte behalten ihre Datei)
-        const bleiben = new Set([...neu.belege, ...neu.belegArchiv].map((b) => b.datei).filter(Boolean));
+        const bleiben = new Set([...neu.belege, ...neu.belegArchiv, ...neu.kasse].map((b) => b.datei).filter(Boolean));
         for (const b of vorher.belege) if (b.datei && !bleiben.has(b.datei)) dateiEntfernen(b.datei);
         setzen(neu);
       },
@@ -610,7 +629,7 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         frei.current = null;
         ausstehend.current = false;
         if (!nachLadefehler) {
-          for (const b of [...aktuell.current.belege, ...aktuell.current.belegArchiv]) if (b.datei) dateiEntfernen(b.datei);
+          for (const b of [...aktuell.current.belege, ...aktuell.current.belegArchiv, ...aktuell.current.kasse]) if (b.datei) dateiEntfernen(b.datei);
           // auch Reste: verwaiste Belegdateien, beiseitegelegte unlesbare Stände, Vorversion (E-143)
           alleDateienEntfernen();
           const reste = (await AsyncStorage.getAllKeys().catch(() => [] as readonly string[])).filter((k) => k.startsWith(`${SCHLUESSEL}.`));

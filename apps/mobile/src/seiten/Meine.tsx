@@ -15,6 +15,8 @@ import { useErstellen } from "./Erstellen";
 import { Suchfeld, UnterlageZeile, useFehltJe, useUeberfaellig } from "./Unterlagen";
 import { BelegErfassenSeite } from "./Belege";
 import { useKontrollmappeOeffnen } from "./Kontrollmappe";
+import { KasseZeile } from "./Kasse";
+import { kasseSichtbar } from "../unterlagen/kasse";
 
 /** Ab so vielen Unterlagen lohnt sich die Suche. */
 const SUCHE_AB = 6;
@@ -80,6 +82,9 @@ export function Meine() {
   const unterlagen = useStandWahl((s) => s.unterlagen);
   const belegeAlle = useStandWahl((s) => s.belege);
   const betrieb = useStandWahl((s) => s.betrieb);
+  const profil = useStandWahl((s) => s.profil);
+  const kasse = useStandWahl((s) => s.kasse);
+  const mitKasse = kasseSichtbar({ profil, kasse });
   const f = useFarben();
   const erstellen = useErstellen();
   const nav = useNav();
@@ -153,20 +158,23 @@ export function Meine() {
     },
     [f.tinteLeise, ueberJe, fehltJe, betrieb, oeffnen, belegOeffnen],
   );
-  const leer = !alle.length && !belegeAlle.length;
+  const leer = !alle.length && !belegeAlle.length && !kasse.length;
   const kopf = leer ? (
     <Leer text={TEXT.meine_leer} unter={TEXT.meine_leer_text}>
       <View style={{ gap: 10 }}>
         <Knopf symbol="plus" text={TEXT.rechnung_schreiben} onPress={() => starten("rechnung")} />
         <Knopf ton symbol="doc.viewfinder" text={TEXT.beleg_erfassen} onPress={() => nav.oeffnen("beleg-erfassen", () => <BelegErfassenSeite />)} />
         <TextKnopf symbol="doc.text" text={TEXT.zu_den_unterlagen} onPress={erstellen.oeffnen} stil={{ alignSelf: "center" }} />
+        {mitKasse ? <Karte stil={{ marginTop: 8 }}><KasseZeile /></Karte> : null}
       </View>
     </Leer>
   ) : (
     <View>
       {/* R11 (UX #1): die Kontrollmappe dort, wo man bei einer Kontrolle sucht – nicht nur unter „Mein Betrieb“ */}
       <Karte stil={{ marginBottom: 14 }}>
-        <Zeile symbol="folder" ton="blau" titel={TEXT.kontrollmappe_zeile} text={TEXT.r11_mappe_zeile_kurz} onPress={mappe} letzte />
+        <Zeile symbol="folder" ton="blau" titel={TEXT.kontrollmappe_zeile} text={TEXT.r11_mappe_zeile_kurz} onPress={mappe} letzte={!mitKasse} />
+        {/* R12: Kasse (Tagesabschlüsse) bei Betrieben mit Kasse oder Laden */}
+        {mitKasse ? <KasseZeile /> : null}
       </Karte>
       {alle.length + belegeAlle.length >= SUCHE_AB ? (
         <View style={{ marginBottom: 12 }}>

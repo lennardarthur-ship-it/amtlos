@@ -148,7 +148,8 @@ describe("R11 Steuer: Steuerberater-Paket", () => {
     s = rechnung(s, "r1", "2026-12-01", "50,00", { satz: "0", bezeichnung: "Gutschein Gesichtsbehandlung", befreiung: "nicht steuerbar" });
     const p = steuerpaket(s, JAHR, SB, {}, "2027-01-10T08:00:00");
     const l = datei(p, "LIESMICH.txt");
-    expect(l).toContain("negativen Kassenbestand (§ 146 Abs. 1 Satz 2 AO)");
+    // R12: ohne Kasse in Amtlos stehen Barbelege gegen Geldtransit – kein Kassenminus mehr
+    expect(l).toContain("im Stapel gegen Geldtransit (1360)");
     expect(l).toContain("Gutscheine zu 0 %");
     expect(datei(p, "Buchungsliste_2026.csv")).not.toContain("RE 2026-");
     expect(datei(p, "Fragen_2026.txt")).toContain("Einzweck-Gutschein");

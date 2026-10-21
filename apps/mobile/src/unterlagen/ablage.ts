@@ -1,7 +1,7 @@
 /**
  * „Meine Unterlagen“ – reine Funktionen für Filter, Suche und die Summe offener Rechnungen (ohne Gerät testbar).
  */
-import { eRechnungAus, fehlendeAngaben, kategorieFuer, summen, unterlagenName, vorlageFuer, type Beleg, type Betrieb, type Daten } from "@amtlos/fachlogik";
+import { eRechnungAus, fehlendeAngaben, kategorieFuer, summen, unterlagenName, vorlageFuer, zahlungsStand, type Beleg, type Betrieb, type Daten } from "@amtlos/fachlogik";
 import { istGutschrift, offeneRechnungen } from "./ustAusRechnungen";
 import { nummerDoppelt, type Stand, type Unterlage } from "./speicher";
 
@@ -56,6 +56,12 @@ export function rechnungBrutto(u: Unterlage, betrieb: Betrieb): number {
   return c;
 }
 
+/** R12: offener Betrag einer Rechnung (brutto) – nach Teilzahlungen und Skonto/Minderung; bezahlt: 0. */
+export function offenBrutto(u: Unterlage, betrieb: Betrieb): number {
+  if (u.bezahlt) return 0;
+  return zahlungsStand(rechnungBrutto(u, betrieb), u.zahlungen ?? []).offen;
+}
+
 /** Fälligkeit einer Rechnung nach ihrem eigenen Zahlungsziel (Rechnungsdatum + Tage; „sofort“ = Rechnungsdatum). */
 export function faelligAm(u: Unterlage): string | null {
   const datum = typeof u.daten.datum === "string" && /^\d{4}-\d{2}-\d{2}$/.test(u.daten.datum) ? u.daten.datum : null;
@@ -79,7 +85,7 @@ export function tageUeberfaellig(u: Unterlage, heute: string, offen: Set<string>
 /** Offene (geteilte, unbezahlte, nicht stornierte) Rechnungen: Anzahl, Bruttosumme in Cent, davon überfällig. */
 export function offeneSumme(unterlagen: Unterlage[], betrieb: Betrieb, heute?: string): { anzahl: number; cent: number; ueberfaellig: number } {
   const offen = offeneRechnungen(unterlagen).filter((u) => !istStorno(u));
-  const cent = offen.reduce((a, u) => a + rechnungBrutto(u, betrieb), 0);
+  const cent = offen.reduce((a, u) => a + offenBrutto(u, betrieb), 0);
   const ids = new Set(offen.map((u) => u.id));
   return { anzahl: offen.length, cent, ueberfaellig: heute ? offen.filter((u) => tageUeberfaellig(u, heute, ids) > 0).length : 0 };
 }

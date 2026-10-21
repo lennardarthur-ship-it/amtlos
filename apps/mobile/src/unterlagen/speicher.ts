@@ -2,7 +2,7 @@
  * Unterlagen und Betrieb – nur auf dem Gerät (E-121). Reine Funktionen über einem unveränderlichen Stand, damit sie
  * ohne Gerät testbar sind; zustand.tsx speichert den Stand in AsyncStorage.
  */
-import { LEERER_BETRIEB, belegAus, belegFassung, belegInhaltGeaendert, belegSummen, gruppenAusBranchen, leereDaten, type Beleg, naechsteNummer, personMerken as merken, vorlageFuer, type Betrieb, type Daten, type Person, type PersonAngaben, type PersonenArt } from "@amtlos/fachlogik";
+import { LEERER_BETRIEB, eRechnungAus, kassenKorrektur, kassenabschlussAus, kassenInhalt, kassenVereinen, summen, zahlungenAus, zahlungsStand, type KassenInhalt, type Kassenabschluss, type Zahlung, belegAus, belegFassung, belegInhaltGeaendert, belegSummen, gruppenAusBranchen, leereDaten, type Beleg, naechsteNummer, personMerken as merken, vorlageFuer, type Betrieb, type Daten, type Person, type PersonAngaben, type PersonenArt } from "@amtlos/fachlogik";
 
 export interface Unterlage {
   id: string;
@@ -20,6 +20,11 @@ export interface Unterlage {
   bezahlt?: string;
   /** wann die Zahlung zuletzt vermerkt oder entfernt wurde (ISO) – entscheidet beim Zusammenführen zweier Fassungen */
   bezahltGeaendert?: string;
+  /**
+   * R12: einzelne Zahlungseingänge mit Betrag und ggf. Skonto/Minderung. Ohne Liste gilt `bezahlt` als Zahlung des
+   * ganzen Betrags (wie bisher). `bezahlt` steht, sobald nichts mehr offen ist. Gehört wie `bezahlt` nicht zum Inhalt.
+   */
+  zahlungen?: Zahlung[];
   /** Stornorechnung: ID der stornierten Rechnung (M1) – die Nummer allein ist bei doppelt vergebenen Nummern mehrdeutig */
   stornoZuId?: string;
   /**
@@ -37,7 +42,7 @@ export interface Unterlage {
 }
 
 export interface Stand {
-  version: 1;
+  version: 2;
   betrieb: Betrieb;
   unterlagen: Unterlage[];
   /** Belege und Eingangsrechnungen (E-133); Dateien liegen verschlüsselt daneben (unterlagen/dateien.ts) */
@@ -82,17 +87,24 @@ export interface Stand {
    * Belege mit unlesbaren Kernangaben. Sie werden unverändert aufbewahrt und weitergereicht, nur nicht angezeigt –
    * nie verworfen (GoBD).
    */
-  fremd: { unterlagen: Record<string, unknown>[]; belege: Record<string, unknown>[] };
+  fremd: { unterlagen: Record<string, unknown>[]; belege: Record<string, unknown>[]; kasse?: Record<string, unknown>[] };
+  /**
+   * R12: Kassenabschlüsse (Tagesumsätze laut Z-Bon). Gespeichert = festgeschrieben; Korrektur nur mit Grund (Historie).
+   * Fotos der Z-Bons liegen verschlüsselt wie Belegdateien.
+   */
+  kasse: Kassenabschluss[];
 }
 
 /** Aktuelle Version des gespeicherten Stands. Höhere Versionen stammen aus einer neueren App und werden nie überschrieben. */
-export const STAND_VERSION = 1;
+export const STAND_VERSION = 2;
 
 /**
- * Migrationen: Eintrag n hebt einen Stand von Version n auf n + 1. Noch keine nötig – das Gerüst steht, damit eine
- * künftige Änderung am Format nicht in `standAus` versteckt werden muss.
+ * Migrationen: Eintrag n hebt einen Stand von Version n auf n + 1.
+ * - 1 → 2 (R12): Kassenabschlüsse (`kasse`, anfangs leer).
  */
-export const MIGRATIONEN: Record<number, (roh: Record<string, unknown>) => Record<string, unknown>> = {};
+export const MIGRATIONEN: Record<number, (roh: Record<string, unknown>) => Record<string, unknown>> = {
+  1: (roh) => ({ ...roh, kasse: Array.isArray(roh.kasse) ? roh.kasse : [] }),
+};
 
 export class StandFehler extends Error {
   /** „unlesbar“: kein gültiges JSON bzw. kein Objekt; „version“: aus einer neueren App-Version */
@@ -115,7 +127,7 @@ export function migrieren(roh: Record<string, unknown>): Record<string, unknown>
   return { ...r, version: STAND_VERSION };
 }
 
-export const LEERER_STAND: Stand = { version: 1, betrieb: LEERER_BETRIEB, unterlagen: [], belege: [], mitarbeiter: [], kunden: [], profil: {}, erledigt: {}, erinnerungen: false, appSperre: false, cloudSicherung: false, proTest: false, bewertung: { erfolge: 0 }, steuerberatung: { kontenrahmen: "SKR03", beraternummer: "", mandantennummer: "" }, geloescht: {}, zeiten: {}, belegArchiv: [], fremd: { unterlagen: [], belege: [] } };
+export const LEERER_STAND: Stand = { version: 2, kasse: [], betrieb: LEERER_BETRIEB, unterlagen: [], belege: [], mitarbeiter: [], kunden: [], profil: {}, erledigt: {}, erinnerungen: false, appSperre: false, cloudSicherung: false, proTest: false, bewertung: { erfolge: 0 }, steuerberatung: { kontenrahmen: "SKR03", beraternummer: "", mandantennummer: "" }, geloescht: {}, zeiten: {}, belegArchiv: [], fremd: { unterlagen: [], belege: [] } };
 
 function profilAus(roh: unknown): Stand["profil"] {
   if (!roh || typeof roh !== "object" || Array.isArray(roh)) return {};
@@ -181,6 +193,9 @@ function unterlageAus(u: Record<string, unknown>): Unterlage {
   else delete r.festgeschrieben;
   for (const k of ["storniertDurch", "stornoZuId", "ersetzt", "konfliktKopieVon", "pdfSha256", "bezahlt"] as const) if (typeof u[k] !== "string" || !u[k]) delete r[k];
   if (!istIso(u.bezahltGeaendert)) delete r.bezahltGeaendert;
+  const z = zahlungenAus(u.zahlungen);
+  if (z.length) r.zahlungen = z;
+  else delete r.zahlungen;
   return r;
 }
 
@@ -228,14 +243,26 @@ export function standAus(json: string | null): Stand {
     if (!g) fremdeBelege.push(b);
     else (g.ungueltig ? belegArchiv : belege).push(g);
   }
+  // R12: Kassenabschlüsse – unlesbare bleiben unverändert in `fremd.kasse` (Aufbewahrungspflicht)
+  const kasse: Kassenabschluss[] = [];
+  const fremdeKasse: Record<string, unknown>[] = [];
+  const kasseGesehen = new Set<string>();
+  for (const k of [...liste(r.kasse), ...liste(fremdRoh.kasse)]) {
+    if (typeof k.id === "string" && kasseGesehen.has(k.id)) continue;
+    if (typeof k.id === "string") kasseGesehen.add(k.id);
+    const g = kassenabschlussAus(k);
+    if (g) kasse.push(g);
+    else fremdeKasse.push(k);
+  }
   const iso = (w: unknown) => (typeof w === "string" && w ? w : undefined);
   return {
-    version: 1,
+    version: 2,
+    kasse: kassenVereinen([], kasse),
     betrieb,
     unterlagen,
     belege,
     belegArchiv,
-    fremd: { unterlagen: fremdeUnterlagen, belege: fremdeBelege },
+    fremd: { unterlagen: fremdeUnterlagen, belege: fremdeBelege, ...(fremdeKasse.length ? { kasse: fremdeKasse } : {}) },
     mitarbeiter: personenAus(r.mitarbeiter),
     kunden: personenAus(r.kunden),
     profil: profilAus(r.profil),
@@ -551,15 +578,69 @@ export const standGleich = (a: Stand, b: Stand) => gleicherInhalt({ ...a, geaend
 
 export const betriebFehlt = (b: Betrieb) => !b.name.trim();
 
-/** Zahlungseingang einer Rechnung setzen bzw. entfernen (E-129). */
+/**
+ * Zahlungseingang einer Rechnung setzen bzw. entfernen (E-129): der ganze Betrag an diesem Tag. Einzelne Zahlungen
+ * (R12) fallen dabei weg – „bezahlt“ heißt hier: vollständig.
+ */
 export function bezahltSetzen(s: Stand, id: string, datum: string | null, jetzt = new Date()): Stand {
   // eigener Zeitstempel: beim Zusammenführen gewinnt so auch das Entfernen einer Zahlung
   const g = jetzt.toISOString();
-  return { ...s, unterlagen: s.unterlagen.map((u) => (u.id === id ? (datum ? { ...u, bezahlt: datum, bezahltGeaendert: g } : (({ bezahlt: _weg, ...rest }) => ({ ...rest, bezahltGeaendert: g }))(u)) : u)) };
+  return { ...s, unterlagen: s.unterlagen.map((u) => (u.id === id ? (datum ? (({ zahlungen: _z, ...rest }) => ({ ...rest, bezahlt: datum, bezahltGeaendert: g }))(u) : (({ bezahlt: _weg, zahlungen: _z, ...rest }) => ({ ...rest, bezahltGeaendert: g }))(u)) : u)) };
+}
+
+/** Rechnungsbetrag brutto (Storno negativ) – für Zahlungen. */
+function bruttoVon(s: Stand, u: Unterlage): number {
+  const { daten } = eRechnungAus(u.daten, s.betrieb);
+  return summen(daten.positionen, daten.kleinunternehmer).brutto_cent;
+}
+
+/** Zahlungen einer Rechnung: die Liste, sonst (ältere Daten, „als bezahlt markiert“) der ganze Betrag am Tag `bezahlt`. */
+export function zahlungenVon(s: Stand, u: Unterlage): Zahlung[] {
+  if (u.zahlungen?.length) return u.zahlungen;
+  return u.bezahlt ? [{ id: `${u.id}-voll`, datum: u.bezahlt, betrag_cent: bruttoVon(s, u) }] : [];
+}
+
+/** Offener Betrag einer Rechnung (brutto) nach allen Zahlungen und Minderungen. */
+export function offenerBetrag(s: Stand, u: Unterlage): number {
+  const brutto = bruttoVon(s, u);
+  if (u.bezahlt && !u.zahlungen?.length) return 0;
+  return zahlungsStand(brutto, u.zahlungen ?? []).offen;
+}
+
+/**
+ * R12: Zahlungseingang mit Betrag vermerken – optional mit Skonto bzw. Minderung (§ 17 UStG). Ist danach nichts mehr
+ * offen, gilt die Rechnung ab diesem Tag als bezahlt; sonst bleibt der Rest offen (Teilzahlung).
+ */
+export function zahlungVermerken(s: Stand, id: string, z: Omit<Zahlung, "id">, jetzt = new Date(), zid = neueId()): Stand {
+  const u = s.unterlagen.find((x) => x.id === id);
+  if (!u || u.vorlage !== "rechnung") return s;
+  const neu: Zahlung = { id: zid, datum: z.datum, betrag_cent: Math.max(0, Math.round(z.betrag_cent)), ...(z.minderung_cent ? { minderung_cent: Math.max(0, Math.round(z.minderung_cent)), art: z.art ?? "skonto" } : {}) };
+  if (!neu.betrag_cent && !neu.minderung_cent) return s;
+  // eine ältere Vollzahlung ohne Liste wird zur ersten Zahlung
+  const zahlungen = [...zahlungenVon(s, u), neu];
+  const alle = zahlungenAus(zahlungen);
+  const offen = zahlungsStand(bruttoVon(s, u), alle).offen;
+  const g = jetzt.toISOString();
+  const { bezahlt: _b, ...rest } = u;
+  const letzter = alle[alle.length - 1]!.datum;
+  return { ...s, unterlagen: s.unterlagen.map((x) => (x.id === id ? { ...rest, zahlungen: alle, bezahltGeaendert: g, ...(offen === 0 ? { bezahlt: letzter } : {}) } : x)) };
+}
+
+/** R12: neuer Kassenabschluss – gespeichert ist er festgeschrieben (GoBD). */
+export function kasseSpeichern(s: Stand, inhalt: KassenInhalt, jetzt = new Date(), id = neueId()): [Stand, Kassenabschluss] {
+  const iso = jetzt.toISOString();
+  const k: Kassenabschluss = { id, ...kassenInhalt(inhalt), erstellt: iso, geaendert: iso, festgeschrieben: iso };
+  return [{ ...s, kasse: kassenVereinen(s.kasse, [k]) }, k];
+}
+
+/** R12: Kassenabschluss korrigieren – nur mit Grund, die vorige Fassung bleibt in der Historie. */
+export function kasseKorrigieren(s: Stand, id: string, inhalt: KassenInhalt, grund: string, jetzt = new Date()): Stand {
+  if (!grund.trim()) return s;
+  return { ...s, kasse: s.kasse.map((k) => (k.id === id ? kassenKorrektur(k, inhalt, grund, jetzt.toISOString()) : k)) };
 }
 
 /** Unterlagen, die aufbewahrt werden müssen: festgeschriebene (Rechnungen, Kassenbuch), Belege (auch ungültig markierte) und Unbekanntes. */
-export const aufbewahrungspflichtig = (s: Stand): { id: string }[] => [...s.unterlagen.filter((u) => u.festgeschrieben), ...s.belege, ...s.belegArchiv, ...(s.fremd.unterlagen as { id: string }[]), ...(s.fremd.belege as { id: string }[])];
+export const aufbewahrungspflichtig = (s: Stand): { id: string }[] => [...s.unterlagen.filter((u) => u.festgeschrieben), ...s.belege, ...s.belegArchiv, ...s.kasse, ...((s.fremd.kasse ?? []) as { id: string }[]), ...(s.fremd.unterlagen as { id: string }[]), ...(s.fremd.belege as { id: string }[])];
 
 /**
  * Ruhezeit für das Änderungsprotokoll der Belege (H2): War ein Beleg so lange unverändert, wird vor der nächsten
@@ -606,7 +687,7 @@ export const belegeSortiert = (s: Stand) => [...s.belege].sort((a, b) => b.datum
 
 /** Seit der letzten Datensicherung geändert (oder nie gesichert)? */
 export function ungesichert(s: Stand): boolean {
-  if (!s.letzteSicherung) return s.unterlagen.length > 0 || s.belege.length > 0 || s.belegArchiv.length > 0 || s.mitarbeiter.length > 0 || s.kunden.length > 0;
+  if (!s.letzteSicherung) return s.unterlagen.length > 0 || s.belege.length > 0 || s.kasse.length > 0 || s.belegArchiv.length > 0 || s.mitarbeiter.length > 0 || s.kunden.length > 0;
   return Boolean(s.geaendert && s.geaendert > s.letzteSicherung);
 }
 
@@ -618,7 +699,7 @@ export const allesLoeschenErlaubt = (s: Stand) => aufbewahrungspflichtig(s).leng
 
 /** Tage seit der letzten Sicherung, wenn eine fällig ist (ungesicherte Änderungen, älter als `nach` Tage), sonst null. */
 export function sicherungFaellig(s: Stand, jetzt: Date, nach = 7): { tage: number | null } | null {
-  if (!ungesichert(s) || (s.unterlagen.length === 0 && s.belege.length === 0)) return null;
+  if (!ungesichert(s) || (s.unterlagen.length === 0 && s.belege.length === 0 && s.kasse.length === 0)) return null;
   if (!s.letzteSicherung) return { tage: null };
   const tage = Math.floor((jetzt.getTime() - Date.parse(s.letzteSicherung)) / 864e5);
   return tage >= nach ? { tage } : null;
@@ -728,7 +809,7 @@ export function unterlagenVereinen(lokal: Unterlage, andere: Unterlage): Vereini
     basis = lokal.festgeschrieben! < andere.festgeschrieben! ? lokal : andere.festgeschrieben! < lokal.festgeschrieben! ? andere : dl <= da ? lokal : andere;
     const zweite = basis === lokal ? andere : lokal;
     if (dl !== da) {
-      const { storniertDurch: _s, bezahlt: _b, bezahltGeaendert: _bg, ...rest } = zweite;
+      const { storniertDurch: _s, bezahlt: _b, bezahltGeaendert: _bg, zahlungen: _z, ...rest } = zweite;
       kopie = { ...rest, id: `${lokal.id}-konflikt-${kurzHash(JSON.stringify(zweite.daten))}`, konfliktKopieVon: lokal.id };
     }
   } else basis = fl !== fa ? (fl ? lokal : andere) : lokal.geaendert >= andere.geaendert ? lokal : andere;
@@ -744,8 +825,11 @@ export function unterlagenVereinen(lokal: Unterlage, andere: Unterlage): Vereini
   const quelle = zl || za ? (zl >= za ? lokal : andere) : lokal.bezahlt ? lokal : andere;
   delete r.bezahlt;
   delete r.bezahltGeaendert;
+  delete r.zahlungen;
   if (quelle.bezahlt) r.bezahlt = quelle.bezahlt;
   if (quelle.bezahltGeaendert) r.bezahltGeaendert = quelle.bezahltGeaendert;
+  // R12: die Zahlungen gehören zum Zahlungsvermerk – sie kommen aus derselben Fassung wie `bezahlt`
+  if (quelle.zahlungen?.length) r.zahlungen = quelle.zahlungen;
   return kopie ? { u: r, kopie } : { u: r };
 }
 
@@ -804,7 +888,8 @@ export function fremdVereinen(a: Stand["fremd"], b: Stand["fremd"]): Stand["frem
     }
     return [...m.values()];
   };
-  return { unterlagen: vereinen(a.unterlagen, b.unterlagen), belege: vereinen(a.belege, b.belege) };
+  const kasse = vereinen(a.kasse ?? [], b.kasse ?? []);
+  return { unterlagen: vereinen(a.unterlagen, b.unterlagen), belege: vereinen(a.belege, b.belege), ...(kasse.length ? { kasse } : {}) };
 }
 
 export interface Zusammenfuehrung {
@@ -874,6 +959,8 @@ export function zusammenfuehren(aktuell: Stand, gesichert: Stand, jetzt = new Da
     erledigt,
     geloescht,
     fremd: fremdVereinen(aktuell.fremd, gesichert.fremd),
+    // R12: Kassenabschlüsse nach ID – nie etwas verlieren, Korrekturen beider Seiten bleiben in der Historie
+    kasse: kassenVereinen(aktuell.kasse, gesichert.kasse),
   };
   return { stand, neu, behalten, aktualisiert, nummernKonflikte: nummernKonflikteVon(stand), festKonflikte: u.konflikte, mehrfachStorniert: mehrfachStorniert(stand.unterlagen) };
 }

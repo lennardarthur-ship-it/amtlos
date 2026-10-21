@@ -206,7 +206,7 @@ describe("Paket für die Steuerberatung: LIESMICH, Fragen, Listen (Durchsicht St
     expect(f).not.toContain("Stornos mit Bezug");
     expect(f).not.toContain("Gutschriften");
     // R11: Barbelege gegen Kasse – woher das Bargeld kam (Kassenminus)
-    expect(f).toMatch(/Bar bezahlte Belege \(im Stapel gegen Kasse\)[^\n]*\r\n- B2026-/);
+    expect(f).toMatch(/Bar bezahlte Belege ohne Kassenbuch in Amtlos \(im Stapel gegen Geldtransit\)[^\n]*\r\n- B2026-/);
     expect(p.fragen).toBe(8);
     // Q1: die stornierte Rechnung (Storno im April) gehört dazu; Bewirtung/Kfz fehlen
     const q = strFromU8(unzipSync(steuerpaket(s, Q1, s.steuerberatung, {}, "2026-04-10T08:00:00").zip)["Fragen_2026-Q1.txt"]!);

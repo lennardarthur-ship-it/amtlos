@@ -12,7 +12,7 @@
 import { gcm } from "@noble/ciphers/aes";
 import { pbkdf2 } from "@noble/hashes/pbkdf2";
 import { sha256 } from "@noble/hashes/sha2";
-import type { Person } from "@amtlos/fachlogik";
+import { kassenVereinen, type Person } from "@amtlos/fachlogik";
 import { ITERATIONEN_HOECHSTENS, PASSWORT_MINDESTLAENGE, SICHERUNG_ITERATIONEN, ausBase64, base64, utf8 } from "../unterlagen/sicherung";
 import { belegeVereinen, fremdVereinen, mehrfachStorniert, nummernKonflikteVon, standAus, stornoVerweisePruefen, unterlagenZusammenfuehren, type Stand, type Unterlage } from "../unterlagen/speicher";
 import { tresorOeffnen, tresorSchliessen, tresorVersion } from "../unterlagen/tresor";
@@ -183,6 +183,8 @@ export function syncZusammenfuehren(lokal: Stand, entfernt: Stand): SyncZusammen
     mitarbeiter: nachId<Person>(lokal.mitarbeiter, entfernt.mitarbeiter, geloescht, "m:"),
     kunden: nachId<Person>(lokal.kunden, entfernt.kunden, geloescht, "k:"),
     fremd: fremdVereinen(lokal.fremd, entfernt.fremd),
+    // R12: Kassenabschlüsse sind festgeschrieben – nach ID vereinen, nie löschen; Korrekturen beider Geräte bleiben
+    kasse: kassenVereinen(lokal.kasse, entfernt.kasse),
     geloescht,
     zeiten,
   };
@@ -250,7 +252,8 @@ export async function synchronisieren(u: SyncUmgebung): Promise<SyncErgebnis> {
     let runter = 0;
     const defekt: string[] = [];
     const fehlend: string[] = [];
-    for (const b of [...z.stand.belege, ...z.stand.belegArchiv]) {
+    // Belegdateien und Fotos der Z-Bons (R12)
+    for (const b of [...z.stand.belege, ...z.stand.belegArchiv, ...z.stand.kasse]) {
       if (!b.datei) continue;
       // zuerst gegen den Server prüfen, lokal nur nachsehen – gelesen und entschlüsselt wird erst zum Hochladen
       const da = u.dateiVorhanden ? await u.dateiVorhanden(b.datei) : undefined;

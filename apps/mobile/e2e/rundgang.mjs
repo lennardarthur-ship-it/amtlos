@@ -217,6 +217,32 @@ try {
   await warte(800);
   pruefe(await sichtbar(/^2 von \d+/), "Abhaken zählt nicht im Fortschritt");
   await foto("start-mit-pflichten");
+
+  // R12: Kassenabschluss – Betrieb mit Kasse sieht „Kasse“ auf „Heute“; Tagesabschluss in wenigen Feldern
+  await p.getByRole("tab", { name: "Heute" }).click();
+  await warte(800);
+  await tippe(p.getByRole("button", { name: /^Kasse: Tagesabschlüsse/ }).locator("visible=true").last());
+  await warte(900);
+  pruefe(await sichtbar("Noch keine Tagesabschlüsse"), "Kasse ohne leeren Zustand");
+  await tippe(knopf("Tagesabschluss erfassen"));
+  await warte(900);
+  await feld("Umsatz 19 % (brutto)").fill("238,00");
+  await feld("Umsatz 7 % (brutto)").fill("107,00");
+  await feld("Davon mit Karte").fill("145,00");
+  await warte(300);
+  pruefe(await sichtbar("Bar eingenommen (Umsatz): 200,00 €"), "Bareinnahmen werden nicht live gerechnet");
+  await foto("kasse-tagesabschluss");
+  await tippe(knopf("Tagesabschluss speichern"));
+  await warte(1200);
+  pruefe((await sichtbar("1 Tagesabschluss")) && (await sichtbar("Umsatz 19 % (brutto)")), "Tagesabschluss nicht in der Monatsübersicht");
+  await foto("kasse-monat");
+  await tippe(p.getByRole("button", { name: /^(Mo|Di|Mi|Do|Fr|Sa|So), \d{2}\.\d{2}\.\d{4}/ }).locator("visible=true").last());
+  await warte(900);
+  pruefe((await sichtbar("Korrigieren")) && !(await sichtbar("Tagesabschluss speichern")), "gespeicherter Tag ist nicht festgeschrieben");
+  await zurueck();
+  await warte(800);
+  await zurueck();
+  await warte(800);
   await neu();
   await warte(800);
 

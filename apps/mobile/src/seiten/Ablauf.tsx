@@ -13,7 +13,8 @@ import { Abschluss, festschreibenHinweis, useTeilen } from "./Abschluss";
 import { AuswahlSeite } from "../ui/auswahlseite";
 import { AbsenderSeite } from "./Betrieb";
 import { useProSperre } from "./Pro";
-import { euerUebernahme, jahreMitDaten, kassenHinweis, kassenLage, type EuerUebernahme } from "../unterlagen/steuerpaket";
+import { euerUebernahme, jahreMitDaten, kassenHinweis, kassenHinweisMit, kassenLage, type EuerUebernahme } from "../unterlagen/steuerpaket";
+import { kasseFuerUst } from "../unterlagen/kasse";
 import { Ansage, Felder, useAnsage } from "./felder";
 import { InfoSeite } from "./InfoSeite";
 import { ListenSchritt } from "./Liste";
@@ -72,11 +73,12 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
   const sperre = useProSperre();
   const v: Versteuerung = daten.versteuerung === "ist" ? "ist" : "soll";
   const [uebernommen, setUebernommen] = useState<{ periode: string; v: Versteuerung; r: UstUebernahme } | null>(null);
-  const liste = perioden(z.stand.unterlagen, z.stand.betrieb, v, z.stand.belege);
+  const liste = perioden(z.stand.unterlagen, z.stand.betrieb, v, z.stand.belege, z.stand.kasse);
   const offen = v === "ist" ? offeneRechnungen(z.stand.unterlagen).length : 0;
   const r = uebernommen && uebernommen.v === v ? uebernommen.r : null;
   // Kleinunternehmer geben keine Voranmeldung ab – dann kein Kassenhinweis
-  const kasse = r && !r.kleinunternehmer ? kassenHinweis(kassenLage(z.stand.profil), "ust") : null;
+  // R12: mit Kassenabschlüssen nur noch fehlende Tage nennen
+  const kasse = r && !r.kleinunternehmer ? kassenHinweisMit(kassenLage(z.stand.profil), "ust", r.kasseFehlend) : null;
   // Ergebnis und Warnungen der Übernahme ansagen (VoiceOver bemerkt die neuen Zeilen sonst nicht)
   useAnsage(
     r
@@ -84,6 +86,8 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
           r.kleinunternehmer ? (r.steuerschuldBelege ? TEXT.ust_ku_13b : TEXT.aus_rechnungen_ku) : TEXT.aus_rechnungen_ok(r.anzahl),
           r.kuGemischt ? TEXT.ust_ku_gemischt : "",
           kasse?.text ?? "",
+          r.kasseTage ? TEXT.r12_kasse_uebernommen(r.kasseTage) : "",
+          r.minderungen ? TEXT.r12_minderungen(r.minderungen) : "",
           r.gutschriften ? TEXT.aus_rechnungen_gutschriften(r.gutschriften) : "",
           r.ersatz ? TEXT.aus_rechnungen_ersatz(r.ersatz) : "",
           r.offen ? TEXT.aus_rechnungen_offen(r.offen) : "",
@@ -104,7 +108,7 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
           aendern={(p) => {
             if (!sperre("ust_uebernahme")) return;
             const ku = z.stand.profil["ust.kleinunternehmer"];
-            const erg = umsaetzeFuer(z.stand.unterlagen, p, z.stand.betrieb, v, z.stand.belege, typeof ku === "boolean" ? ku : undefined);
+            const erg = umsaetzeFuer(z.stand.unterlagen, p, z.stand.betrieb, v, z.stand.belege, typeof ku === "boolean" ? ku : undefined, kasseFuerUst(z.stand));
             if (!erg) return;
             z.setzen(id, erg.werte);
             setUebernommen({ periode: p, v, r: erg });
@@ -117,6 +121,8 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
           {r.kleinunternehmer ? <T v="caption" farbe={f.bald}>{r.steuerschuldBelege ? TEXT.ust_ku_13b : TEXT.aus_rechnungen_ku}</T> : <T v="caption" farbe={f.amtTief}>{TEXT.aus_rechnungen_ok(r.anzahl)}</T>}
           {r.kuGemischt ? <T v="caption" farbe={f.bald}>{TEXT.ust_ku_gemischt}</T> : null}
           {kasse ? <Hinweis art={kasse.warnung ? "warnung" : "info"} symbol="banknote" text={kasse.text} /> : null}
+          {r.kasseTage ? <T v="caption" farbe={f.amtTief}>{TEXT.r12_kasse_uebernommen(r.kasseTage)}</T> : null}
+          {r.minderungen ? <T v="caption" farbe={f.amtTief}>{TEXT.r12_minderungen(r.minderungen)}</T> : null}
           {r.gutschriften ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_gutschriften(r.gutschriften)}</T> : null}
           {r.ersatz ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_ersatz(r.ersatz)}</T> : null}
           {r.offen ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_offen(r.offen)}</T> : null}
@@ -139,8 +145,8 @@ function EuerAusDaten({ id }: { id: string }) {
   const sperre = useProSperre();
   const [ergebnis, setErgebnis] = useState<{ jahr: string; r: EuerUebernahme } | null>(null);
   const jahre = jahreMitDaten(z.stand);
-  const kasse = ergebnis ? kassenHinweis(kassenLage(z.stand.profil), "euer") : null;
-  useAnsage(ergebnis ? [TEXT.euer_aus_daten_ok(ergebnis.r.rechnungen, ergebnis.r.belege), kasse?.text ?? "", ergebnis.r.unbezahlt ? TEXT.euer_unbezahlt(ergebnis.r.unbezahlt) : "", ergebnis.r.anlagen ? TEXT.euer_anlagen(ergebnis.r.anlagen) : "", ergebnis.r.hinweis].filter(Boolean).join(" ") : null);
+  const kasse = ergebnis ? kassenHinweisMit(kassenLage(z.stand.profil), "euer", ergebnis.r.kasseFehlend) : null;
+  useAnsage(ergebnis ? [TEXT.euer_aus_daten_ok(ergebnis.r.rechnungen, ergebnis.r.belege), ergebnis.r.kassentage ? TEXT.r12_kasse_uebernommen(ergebnis.r.kassentage) : "", kasse?.text ?? "", ergebnis.r.unbezahlt ? TEXT.euer_unbezahlt(ergebnis.r.unbezahlt) : "", ergebnis.r.anlagen ? TEXT.euer_anlagen(ergebnis.r.anlagen) : "", ergebnis.r.hinweis].filter(Boolean).join(" ") : null);
   if (!jahre.length) return <T v="caption" leise stil={{ marginTop: 10 }}>{TEXT.euer_leer}</T>;
   return (
     <View style={{ marginTop: 16, padding: 16, borderRadius: RADIUS.karte, backgroundColor: f.amtHauch }}>
@@ -161,6 +167,7 @@ function EuerAusDaten({ id }: { id: string }) {
       {ergebnis ? (
         <View style={{ marginTop: 8, gap: 4 }}>
           <T v="caption" farbe={f.amtTief}>{TEXT.euer_aus_daten_ok(ergebnis.r.rechnungen, ergebnis.r.belege)}</T>
+          {ergebnis.r.kassentage ? <T v="caption" farbe={f.amtTief}>{TEXT.r12_kasse_uebernommen(ergebnis.r.kassentage)}</T> : null}
           {kasse ? <Hinweis art={kasse.warnung ? "warnung" : "info"} symbol="banknote" text={kasse.text} /> : null}
           {ergebnis.r.unbezahlt ? <T v="caption" farbe={f.bald}>{TEXT.euer_unbezahlt(ergebnis.r.unbezahlt)}</T> : null}
           {ergebnis.r.anlagen ? <T v="caption" farbe={f.bald}>{TEXT.euer_anlagen(ergebnis.r.anlagen)}</T> : null}
@@ -193,7 +200,12 @@ function Schritt({ v, a, index, id, daten, fehlt }: { v: Vorlage; a: VorlagenAbs
       {mitPerson ? <PersonenWahl v={v} id={id} daten={daten} /> : null}
       {v.ausRechnungen && index === 0 ? <AusRechnungen id={id} daten={daten} /> : null}
       {/* R10 UI: Kasse bzw. Shop laut Check – bei den Umsätzen immer sagen, dass sie dazugehören (nicht erst nach der Übernahme) */}
-      {v.ausRechnungen && index === 1 && kassenHinweis(kassenLage(z.stand.profil), "ust")?.warnung ? <Hinweis art="warnung" symbol="banknote" text={kassenLage(z.stand.profil) === "shop" ? TEXT.shop_ust_schritt : TEXT.kasse_ust_schritt} /> : null}
+      {v.ausRechnungen && index === 1 && z.stand.kasse.length && kassenLage(z.stand.profil) !== "shop" ? (
+        // R12: mit Kassenabschlüssen übernimmt die App die Kassenumsätze selbst
+        <Hinweis art="info" symbol="banknote" text={TEXT.r12_kasse_ust_schritt} />
+      ) : v.ausRechnungen && index === 1 && kassenHinweis(kassenLage(z.stand.profil), "ust")?.warnung ? (
+        <Hinweis art="warnung" symbol="banknote" text={kassenLage(z.stand.profil) === "shop" ? TEXT.shop_ust_schritt : TEXT.kasse_ust_schritt} />
+      ) : null}
       {v.id === "euer" && index === 0 ? <EuerAusDaten id={id} /> : null}
       <Felder felder={a.felder} werte={daten} fehlt={fehlt} setze={(k, w) => z.setzen(id, { [k]: w })} liste={(f) => <ListenSchritt feld={f} id={id} />} />
     </View>

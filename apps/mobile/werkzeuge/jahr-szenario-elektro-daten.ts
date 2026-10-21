@@ -114,6 +114,8 @@ export interface Rechnung {
   schlussZu?: string;
   /** Skonto in Prozent, das der Kunde bei der Zahlung abgezogen hat */
   skonto?: number;
+  /** R12: Skontofrist in Tagen ab Rechnungsdatum (steht auf der Rechnung) */
+  skontoTage?: number;
   /** Leitweg-ID des öffentlichen Auftraggebers (gehört in BT-10 der XRechnung) */
   leitweg?: string;
   /** Zahlungserinnerung (Tag, an dem sie geschickt wird) */
@@ -189,9 +191,9 @@ export const RECHNUNGEN: Rechnung[] = [
     hinweis: "Leitweg-ID: 05913000-00012-37 · Bestellnummer SIW-2026-4471 · Kita Lindenhorster Straße 12.\nVielen Dank für Ihren Auftrag.", bezahlt: "2026-10-21",
     worum: "ÖFFENTLICHER AUFTRAGGEBER (Stadt): LED-Umrüstung einer Kita – die XRechnung braucht die Leitweg-ID als Käuferreferenz (BT-10); die App hat kein Feld dafür, sie steht nur im Hinweis.",
     pos: [p("LED-Panel 62×62, 30 W, UGR<19", 64, "Stück", 9800), p("Notleuchte LED mit Selbsttest", 14, "Stück", 18500), p("Arbeitszeit Geselle", 88, "Stunde", 6800), p("Arbeitszeit Auszubildender", 40, "Stunde", 3200), p("Prüfung Sicherheitsbeleuchtung und Protokoll", 1, "Pauschale", 28000)] },
-  { id: "r21", nummer: "2026-021", datum: "2026-10-02", leistung: "2026-09-28", ziel: "30", kunde: "k10", skonto: 2,
-    hinweis: "Bei Zahlung bis zum 12.10.2026 gewähren wir 2 % Skonto auf den Rechnungsbetrag.\nVielen Dank für Ihren Auftrag.", bezahlt: "2026-10-09",
-    worum: "SKONTO: Leistung 28.09. (Q3), Kunde zahlt am 09.10. mit 2 % Skonto – Minderung im Q4 (§ 17 UStG) und geringerer Zufluss in der EÜR; die App kann nur „bezahlt“ vermerken.",
+  { id: "r21", nummer: "2026-021", datum: "2026-10-02", leistung: "2026-09-28", ziel: "30", kunde: "k10", skonto: 2, skontoTage: 10,
+    hinweis: "Vielen Dank für Ihren Auftrag.", bezahlt: "2026-10-09",
+    worum: "SKONTO: Rechnung mit „2 % Skonto bei Zahlung innerhalb von 10 Tagen“ (bis 12.10.2026, Zahlungsblock und XRechnung BT-20). Leistung 28.09. (Q3), Kunde zahlt am 09.10. mit 2 % Skonto – seit R12 als Zahlungseingang mit Skonto vermerkt: Minderung im Q4 (§ 17 UStG) und geringerer Zufluss in der EÜR.",
     pos: [p("Prüfung der Gemeinschaftsanlagen nach DIN VDE 0105-100, je Stromkreis", 144, "Stück", 950), p("Arbeitszeit Geselle", 21, "Stunde", 6800), p("Prüfprotokoll und Mängelbericht je Haus", 3, "Pauschale", 6500)] },
   { id: "r22", nummer: "2026-022", datum: "2026-10-15", leistung: "2026-10-14", ziel: "14", kunde: "k7", hinweis: DANKE, bezahlt: "2026-10-27",
     worum: "Praxis: Zuleitung Klimagerät (18 m in „m“, 3,5 Std. in „Std.“).",

@@ -10,6 +10,7 @@ import { giroCodeSvg } from "../girocode.js";
 import { BUNDESLAENDER, StandardKalender, verschiebe, type Bundesland } from "@amtlos/fristen";
 import { EUER_ZEILE_STEUERFREI, EUER_ZEILE_STEUERPFLICHTIG, KATEGORIEN } from "../belege.js";
 import { istEuAusland } from "../buchungen.js";
+import { prozentText, skontoAus, skontoBetrag } from "../skonto.js";
 import { formImNamen, istKapitalgesellschaft } from "./betrieb.js";
 import { AUFBEWAHRUNG, EINHEITEN, EUER_AUSGABEN, EUER_EINNAHMEN, KASSEN_ARTEN, RECHNUNGS_HINWEISE, TSE_ARTEN } from "./bausteine.js";
 import { KOPF_LINIE, LINIE_MITTEL, ZELLE_LINIE, abschnitt, absatz, ankreuzen, anschrift, auswahl, brief, cent, datumDe, dokument, esc, euro, felder, ibanText, kennzahlen, nachsatz, uebertragung, ja, liste, neufassung, summe, tabelle, text, unterschriften, zahl, zahlText, zelle } from "./html.js";
@@ -64,6 +65,21 @@ function befreiungText(d: Daten): string {
   const nullProzent = liste(d, "positionen").some((e) => (text(e, "bezeichnung") || text(e, "preis")) && Number(text(e, "satz") || "19") === 0);
   return nullProzent ? text(d, "befreiung") : "";
 }
+
+/**
+ * R12: Skonto der Rechnung (Schalter „Skonto“, Prozent, Tage) mit dem letzten Tag der Skontofrist – Rechnungsdatum plus
+ * Tage, auf den nächsten Werktag verschoben wie das Zahlungsziel. Nicht bei Storno und Gutschrift.
+ */
+export function skontoFuer(d: Daten, bundesland = ""): { prozent: number; tage: number; bis: string } | null {
+  if (!ja(d, "skonto") || text(d, "storno_zu") || auswahl(d, "hinweise").includes("gutschrift")) return null;
+  const b = skontoAus(text(d, "skonto_prozent"), text(d, "skonto_tage"));
+  const datum = text(d, "datum");
+  if (!b || !/^\d{4}-\d{2}-\d{2}$/.test(datum)) return null;
+  return { ...b, bis: faelligAm(datum, b.tage, bundesland) };
+}
+export const RECHNUNG_SKONTO_FALSCH = "Skonto: Prozent (über 0, unter 100, z. B. 2 oder 2,5) und Tage (z. B. 10) angeben";
+export const RECHNUNG_SKONTO_FRIST = "Die Skontofrist ist nicht kürzer als das Zahlungsziel – bitte Tage prüfen.";
+export const RECHNUNG_SKONTO_HOCH = "Skonto über 10 % ist ungewöhnlich hoch – bitte prüfen.";
 
 // ---------------------------------------------------------------- R10 Steuer: Steuerart, Gutschrift, Ausland
 
@@ -353,6 +369,8 @@ export function eRechnungAus(d: Daten, b: Betrieb): { daten: RechnungsDaten; feh
     ...(storno ? { art: "storno" as const, storniert_nummer: storno } : {}),
     steuerart,
     befreiungsgrund: befreiung || null,
+    // R12: Skonto (BT-20) – nicht für schon Bezahltes
+    ...(skontoFuer(d, b.bundesland) && !(isoAus(text(d, "bezahlt_am")) && isoAus(text(d, "bezahlt_am"))! <= datum) ? { skonto: skontoFuer(d, b.bundesland) } : {}),
   };
   const fehlt = fehlendFuerERechnung(daten).map((c) => E_FEHLT[c] ?? c);
   if (!a.land && a.plz) fehlt.push(E_LAND_FEHLT);
@@ -403,6 +421,10 @@ export const rechnung: Vorlage = {
         { id: "leistung_gleich", art: "schalter", label: "Leistungsdatum entspricht dem Rechnungsdatum", vorbelegung: true },
         { id: "leistung", art: "text", label: "Datum oder Zeitraum der Leistung", hilfe: "z. B. 12.10.2026 oder Oktober 2026", pflicht: true, wenn: { feld: "leistung_gleich", nicht: true } },
         { id: "zahlungsziel", art: "wahl", label: "Zahlungsziel", optionen: [{ wert: "7", text: "7 Tage" }, { wert: "14", text: "14 Tage" }, { wert: "30", text: "30 Tage" }, { wert: "sofort", text: "Sofort" }], vorbelegung: "14", hilfe: "Steht auf der Rechnung als „Zahlbar innerhalb von … Tagen“ mit dem Datum." },
+        // R12: Skonto als im Voraus vereinbarte Minderung des Entgelts (§ 14 Abs. 4 Satz 1 Nr. 8 UStG)
+        { id: "skonto", selten: true, art: "schalter", label: "Skonto bei schneller Zahlung", hilfe: "Steht im Zahlungsblock als Bedingung (§ 14 Abs. 4 Satz 1 Nr. 8 UStG) und in der E-Rechnung. Der GiroCode enthält den vollen Betrag. Zieht der Kunde Skonto ab, vermerkst du beim Zahlungseingang den erhaltenen Betrag." },
+        { id: "skonto_prozent", art: "zahl", label: "Skonto in Prozent", hilfe: "z. B. 2 oder 2,5", vorbelegung: "2", pflicht: true, wenn: { feld: "skonto" } },
+        { id: "skonto_tage", art: "zahl", label: "bei Zahlung innerhalb von … Tagen", hilfe: "ab Rechnungsdatum, z. B. 10", vorbelegung: "10", pflicht: true, wenn: { feld: "skonto" } },
         { id: "bezahlt_am", selten: true, art: "datum", label: "Schon bezahlt am", hilfe: "z. B. bei Barzahlung, Vorkasse oder Zahlung im Onlineshop – bezahlt am oder vor dem Rechnungsdatum, entfällt die Zahlungsaufforderung" },
         { id: "bestellnummer", selten: true, art: "text", label: "Bestellnummer des Kunden", hilfe: "steht auf der Rechnung und in der E-Rechnung (BT-13)" },
         { id: "abschlag", selten: true, art: "schalter", label: "Abschlagsrechnung (Anzahlung vor Fertigstellung)", hilfe: "Die Umsatzsteuer entsteht mit der Zahlung (§ 13 Abs. 1 Nr. 1 a Satz 4 UStG) – in der Voranmeldung zählt die Rechnung im Zeitraum des Zahlungseingangs. Als Leistungsdatum das voraussichtliche Datum angeben, nicht das Rechnungsdatum." },
@@ -463,6 +485,9 @@ export const rechnung: Vorlage = {
     [RECHNUNG_MENGE]: "positionen",
     [RECHNUNG_RC_MIT_UST]: "positionen",
     [RECHNUNG_ABSCHLAG_LEISTUNG]: "leistung_gleich",
+    [RECHNUNG_SKONTO_FALSCH]: "skonto_prozent",
+    [RECHNUNG_SKONTO_FRIST]: "skonto_tage",
+    [RECHNUNG_SKONTO_HOCH]: "skonto_prozent",
     // was der E-Rechnung fehlt (eRechnungAus) – für „Ergänzen“ unter „Für die E-Rechnung fehlt noch“
     [E_FEHLT["kunde.anschrift"]!]: "kunde_anschrift",
     [E_LAND_FEHLT]: "kunde_anschrift",
@@ -507,6 +532,8 @@ export const rechnung: Vorlage = {
     // R11: Steuerschuldnerschaft bzw. igL mit Umsatzsteuer in den Positionen – Widerspruch (§ 14c Abs. 1 UStG); nicht bei Gutschriften und Kleinunternehmern
     if (!kuFuer(d) && !gutschriftD(d) && auswahl(d, "hinweise").some((h) => h === "reverse_charge" || h === "igl") && pos.some((x) => (x.p.ust_satz ?? 0) > 0)) f.push(RECHNUNG_RC_MIT_UST);
     if (ja(d, "abschlag") && ja(d, "leistung_gleich") && !text(d, "storno_zu")) f.push(RECHNUNG_ABSCHLAG_LEISTUNG);
+    // R12: Skonto nur mit lesbaren Angaben – sonst stünde eine unklare Bedingung auf der Rechnung
+    if (ja(d, "skonto") && !text(d, "storno_zu") && (text(d, "skonto_prozent") || text(d, "skonto_tage")) && !skontoAus(text(d, "skonto_prozent"), text(d, "skonto_tage"))) f.push(RECHNUNG_SKONTO_FALSCH);
     return f;
   },
   // Hinweise, die nicht am Teilen hindern (Kleinunternehmer mit Steuerschuldnerschaft war vorher ein Hindernis – R10)
@@ -535,6 +562,9 @@ export const rechnung: Vorlage = {
         else if (tag > kuBis && ku) h.push(RECHNUNG_NACH_KU_ZEIT(datumDe(kuBis)));
       }
       if (gutscheinZuNull(d)) h.push(RECHNUNG_GUTSCHEIN);
+      const sk = ja(d, "skonto") ? skontoAus(text(d, "skonto_prozent"), text(d, "skonto_tage")) : null;
+      if (sk && /^\d+$/.test(text(d, "zahlungsziel")) && sk.tage >= Number(text(d, "zahlungsziel"))) h.push(RECHNUNG_SKONTO_FRIST);
+      if (sk && sk.prozent > 10) h.push(RECHNUNG_SKONTO_HOCH);
       if (extra?.handwerk && !ku && !hw.includes("grundstueck") && !text(d, "kunde_ust_idnr").trim() && !text(d, "storno_zu") && positionen(d).some((x) => (x.p.ust_satz ?? 0) > 0)) h.push(RECHNUNG_GRUNDSTUECK_VORSCHLAG);
     }
     return h;
@@ -592,9 +622,15 @@ export const rechnung: Vorlage = {
       befreiungInSumme(befreiung) && !ku ? "" : befreiung,
       schonBezahlt ? `Der Rechnungsbetrag wurde am ${datumDe(bezahltAm)} bezahlt.` : "",
     ].filter((x) => x.trim());
+    // R12: Skonto als Bedingung im Zahlungsblock (§ 14 Abs. 4 Satz 1 Nr. 8 UStG) – der GiroCode bleibt beim vollen Betrag
+    const sk = zahlbar && !leer && s.brutto_cent > 0 ? skontoFuer(d, b.bundesland) : null;
+    const skBetrag = sk ? skontoBetrag(s.brutto_cent, sk.prozent) : 0;
+    const skontoSatz = sk ? `Bei Zahlung bis zum ${datumDe(sk.bis)} gewähren wir ${prozentText(sk.prozent)} % Skonto (${euro(skBetrag)}); zu überweisen sind dann ${euro(s.brutto_cent - skBetrag)}.` : "";
     const hinweise = [
       // leere Vorlage: statt „Zahlbar …“ die Zahlungsaufforderung mit Linie für das Datum (unten)
       text(d, "zahlungsziel") && zahlbar && !b.iban.trim() && !leer ? `Zahlbar ${ZIEL[text(d, "zahlungsziel")]}${text(d, "zahlungsziel") !== "sofort" && text(d, "datum") ? ` (bis ${datumDe(faelligAm(text(d, "datum"), Number(text(d, "zahlungsziel")), b.bundesland))})` : ""}.` : "",
+      // ohne IBAN (kein Zahlungsblock): die Skonto-Bedingung bei den Hinweisen
+      skontoSatz && !b.iban.trim() ? skontoSatz : "",
       // Stornorechnung: der Hinweis zur Zahlung aus der ursprünglichen Rechnung passt nicht mehr; mit Zahlungsaufforderung
       // steht die Rechnungsnummer schon als Verwendungszweck darin – der Satz wäre doppelt und kostete eine Zeile
       ...text(d, "hinweis").split("\n").filter((h) => !((text(d, "storno_zu") || mitVerwendungszweck || schonBezahlt) && h.trim() === ZAHLUNGS_HINWEIS)),
@@ -613,7 +649,7 @@ export const rechnung: Vorlage = {
     const bicBank = [b.bic?.trim() ? `BIC ${esc(b.bic.trim())}` : "", b.bank?.trim() ? esc(b.bank.trim()) : ""].filter(Boolean).join(" · ");
     const zahlung =
       zahlbar && iban && s.brutto_cent > 0
-        ? `<div class="zahlung">${qr ? `<div class="qr">${qr}<small>GiroCode – mit der Banking-App scannen</small></div>` : ""}<div class="text"><p>Bitte überweisen Sie <strong>${euro(s.brutto_cent)}</strong>${faellig ? ` bis zum <strong>${esc(faellig)}</strong>` : ziel === "sofort" ? " sofort ohne Abzug" : ""} auf das Konto</p><p>${empfaenger}<strong>IBAN ${esc(ibanText(iban))}</strong>${bicBank ? `<br>${bicBank}` : ""}<br>Verwendungszweck: Rechnung ${esc(text(d, "nummer"))}</p></div></div>`
+        ? `<div class="zahlung">${qr ? `<div class="qr">${qr}<small>${sk ? "GiroCode über den vollen Betrag" : "GiroCode – mit der Banking-App scannen"}</small></div>` : ""}<div class="text"><p>Bitte überweisen Sie <strong>${euro(s.brutto_cent)}</strong>${faellig ? ` bis zum <strong>${esc(faellig)}</strong>` : ziel === "sofort" ? " sofort ohne Abzug" : ""} auf das Konto</p><p>${empfaenger}<strong>IBAN ${esc(ibanText(iban))}</strong>${bicBank ? `<br>${bicBank}` : ""}<br>Verwendungszweck: Rechnung ${esc(text(d, "nummer"))}</p>${sk ? `<p>${esc(skontoSatz)}</p>` : ""}</div></div>`
         : // leere Vorlage: Zahlungsaufforderung mit Linie für das Datum, mit Bankverbindung nur, wenn eine IBAN hinterlegt ist
           leer && !storno && !gutschrift
           ? `<div class="zahlung"><div class="text"><p>Bitte überweisen Sie den Rechnungsbetrag bis zum ${LINIE_MITTEL}${iban ? " auf das Konto" : "."}</p>${iban ? `<p>${empfaenger}<strong>IBAN ${esc(ibanText(iban))}</strong>${bicBank ? `<br>${bicBank}` : ""}<br>Verwendungszweck: Rechnung ${text(d, "nummer") ? esc(text(d, "nummer")) : LINIE_MITTEL}</p>` : ""}</div></div>`

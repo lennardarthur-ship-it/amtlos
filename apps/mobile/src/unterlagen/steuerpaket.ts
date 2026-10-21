@@ -37,6 +37,18 @@ import {
   xrechnungUbl,
   zahltag,
   ZAHLUNGSWEGE,
+  kasseAb,
+  kassenBuchungen,
+  kassenSummen,
+  kassenUmsatz,
+  kassenVerlauf,
+  kassenWarnungen,
+  standortVon,
+  skontoBuchungenBelege,
+  skontoBuchungenRechnung,
+  tageText,
+  zahlungsAnteile,
+  zbonLuecken,
   type AusgangsRechnungFuerBuchung,
   type Beleg,
   type Betrieb,
@@ -49,6 +61,7 @@ import { T as TEXT } from "../texte";
 import { utf8 } from "./sicherung";
 import { GUTSCHRIFT_HINWEIS, istGutschrift, kuImZeitraum, zuordnungsTage } from "./ustAusRechnungen";
 import { nichtZaehlend, type Stand, type Unterlage } from "./speicher";
+import { kassenAbdeckung } from "./kasse";
 
 // 0 statt -0: ein Storno über 0,00 € steht als „0,00“ da, nicht als „-0,00“
 const betrag = (cent: number) => new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(cent === 0 ? 0 : cent / 100);
@@ -94,8 +107,29 @@ export function kassenHinweis(lage: KassenLage, art: "ust" | "euer"): { text: st
   return lage === "kasse" ? { text: TEXT.kasse_euer, warnung: true } : { text: TEXT.kasse_euer_vielleicht, warnung: false };
 }
 
+/**
+ * R12: Hinweis nach einer Übernahme mit Blick auf die Kassenabschlüsse des Zeitraums: ohne Abschlüsse wie bisher; sind
+ * alle Tage erfasst, entfällt der Kassenhinweis (Shop-Umsätze bleiben ein Hinweis); fehlen Tage, werden sie genannt.
+ */
+export function kassenHinweisMit(lage: KassenLage, art: "ust" | "euer", fehlend: string[] | null): { text: string; warnung: boolean } | null {
+  if (fehlend === null) return kassenHinweis(lage, art);
+  const shop = lage === "shop" || lage === "kasse_shop" ? (art === "ust" ? TEXT.shop_ust : TEXT.shop_euer) : "";
+  const tage = fehlend.length ? TEXT.r12_kasse_tage_fehlen(tageText(fehlend)) : "";
+  const text = [tage, shop].filter(Boolean).join(" ");
+  return text ? { text, warnung: true } : null;
+}
+
 /** Satz für LIESMICH und Fragen im Paket – null, wenn der Betrieb laut Check weder Kasse noch Shop/Marktstand hat. */
-export function kassenSatzPaket(lage: KassenLage): string | null {
+export function kassenSatzPaket(lage: KassenLage, abdeckung?: { fehlend: string[] | null; tage: number }): string | null {
+  // R12: Kassenabschlüsse in Amtlos – enthalten; nur fehlende Tage nennen
+  if (abdeckung && abdeckung.fehlend !== null) {
+    const teile = [
+      abdeckung.tage ? `Kassenumsätze aus ${abdeckung.tage} ${abdeckung.tage === 1 ? "Tagesabschluss" : "Tagesabschlüssen"} (Z-Bons) sind enthalten: im Stapel Kasse an Erlöse, Kartenzahlungen über Geldtransit; Einzelheiten in Kassenabschluesse_*.csv.` : "",
+      abdeckung.fehlend.length ? `Tage ohne Kassenabschluss: ${tageText(abdeckung.fehlend)} – diese Umsätze fehlen, bitte nachreichen.` : "",
+      lage === "shop" || lage === "kasse_shop" ? "Betrieb mit Onlineshop, Online-Marktplatz, App oder Marktstand (laut Pflichten-Check): Diese Umsätze fehlen in diesem Paket. Bitte die Shop-, Plattform- und Zahlungsberichte zusätzlich liefern." : "",
+    ].filter(Boolean);
+    return teile.length ? teile.join("\r\n") : null;
+  }
   if (lage === "keine") return null;
   const satz = "Kassenumsätze fehlen in diesem Paket. Die Umsätze laut Tagesabschlüssen (Z-Bons) bzw. Kassenexport bitte zusätzlich liefern.";
   const shop = "Betrieb mit Onlineshop, Online-Marktplatz, App oder Marktstand (laut Pflichten-Check): Diese Umsätze fehlen in diesem Paket. Bitte die Shop-, Plattform- und Zahlungsberichte (z. B. Monatsabrechnungen, Auszahlungsübersichten) bzw. das Kassenbuch des Marktstands zusätzlich liefern.";
@@ -156,8 +190,20 @@ export function rechnungFuerBuchung(u: Unterlage, betrieb: Betrieb, o: { tage?: 
  * 0 % einer Rechnung mit Steuerart „igl“, „reverse_charge“ oder „befreit“ zählen als steuerfrei (eigene EÜR-Zeile).
  */
 export function einnahmenAusRechnungen(s: Stand): Einnahme[] {
-  return umsatzRechnungen(s)
-    .filter((u) => u.bezahlt)
+  // R12: Rechnungen mit einzelnen Zahlungen – je Zahlung der erhaltene Betrag (Skonto bzw. Minderung fließt nie zu)
+  const mitZahlungen: Einnahme[] = umsatzRechnungen(s)
+    .filter((u) => u.zahlungen?.length && !istStorno(u))
+    .flatMap((u) => {
+      const { daten } = eRechnungAus(u.daten, s.betrieb);
+      const frei = daten.steuerart && daten.steuerart !== "standard" && daten.steuerart !== "nullsatz";
+      const nichtSteuerbar = daten.kleinunternehmer && (daten.steuerart === "reverse_charge" || !!euUnternehmenLand(u.daten) || !!drittlandLand(u.daten));
+      return zahlungsAnteile(summen(daten.positionen, daten.kleinunternehmer).gruppen, u.zahlungen!).map((a) => {
+        const netto = a.erhalten.reduce((x, g) => x + g.netto_cent, 0);
+        return { tag: a.zahlung.datum, netto_cent: netto, ust_cent: a.erhalten.reduce((x, g) => x + g.ust_cent, 0), steuerfrei_cent: frei ? a.erhalten.filter((g) => g.satz === 0).reduce((x, g) => x + g.netto_cent, 0) : 0, nicht_steuerbar_cent: nichtSteuerbar ? netto : 0, kleinunternehmer: daten.kleinunternehmer };
+      });
+    });
+  return [...mitZahlungen, ...umsatzRechnungen(s)
+    .filter((u) => u.bezahlt && !(u.zahlungen?.length && !istStorno(u)))
     .map((u) => {
       const { daten } = eRechnungAus(u.daten, s.betrieb);
       const sm = summen(daten.positionen, daten.kleinunternehmer);
@@ -167,7 +213,7 @@ export function einnahmenAusRechnungen(s: Stand): Einnahme[] {
       // Kleinunternehmer: Leistungen an Unternehmen im Ausland sind nicht steuerbar – eigene „davon“-Zeile der Anlage EÜR
       const nichtSteuerbar = daten.kleinunternehmer && (daten.steuerart === "reverse_charge" || euUnternehmenLand(u.daten) || drittlandLand(u.daten)) ? sm.netto_cent : 0;
       return { tag: u.bezahlt!, netto_cent: vz * sm.netto_cent, ust_cent: vz * sm.ust_cent, steuerfrei_cent: vz * frei, nicht_steuerbar_cent: vz * nichtSteuerbar, kleinunternehmer: daten.kleinunternehmer };
-    });
+    })];
 }
 
 /** Gutschriften mit Zahlungsvermerk im Jahr – Ausgaben des Betriebs (bezogene Leistungen), R10. */
@@ -191,7 +237,9 @@ function gutschriftAusgaben(s: Stand, jahr: string): { netto: number; ust: numbe
 export function jahreMitDaten(s: Stand): string[] {
   const j = new Set<string>();
   for (const u of umsatzRechnungen(s)) if (u.bezahlt) j.add(u.bezahlt.slice(0, 4));
+  for (const u of umsatzRechnungen(s)) for (const z of u.zahlungen ?? []) j.add(z.datum.slice(0, 4));
   for (const b of s.belege) j.add(zahltag(b).slice(0, 4));
+  for (const k of s.kasse) if (!k.geschlossen) j.add(k.datum.slice(0, 4));
   return [...j].sort((a, b) => b.localeCompare(a));
 }
 
@@ -208,6 +256,10 @@ export interface EuerUebernahme {
   gutschriften: number;
   /** was die Übernahme nicht enthält und von Hand ergänzt werden muss (bei Kapitalgesellschaften mit Warnung vorab) */
   hinweis: string;
+  /** R12: übernommene Kassenabschlüsse mit Umsatz */
+  kassentage: number;
+  /** R12: Tage des Jahres ohne Kassenabschluss – null, wenn es keine Kassenabschlüsse gibt */
+  kasseFehlend: string[] | null;
 }
 
 /** Steht nach jeder Übernahme sichtbar da: Amtlos rechnet diese Posten nicht aus. */
@@ -240,6 +292,19 @@ export function euerUebernahme(s: Stand, jahr: string): EuerUebernahme {
     if (e.einnahmen_steuerfrei_cent) ein.push({ datum: "", text: "Steuerfreie und nicht steuerbare Umsätze aus Rechnungen", kategorie: EUER_ZEILE_STEUERFREI, betrag: betrag(e.einnahmen_steuerfrei_cent) });
   }
   if (e.ust_vereinnahmt_cent) ein.push({ datum: "", text: "Vereinnahmte Umsatzsteuer", kategorie: "Vereinnahmte Umsatzsteuer sowie Umsatzsteuer auf unentgeltliche Wertabgaben", betrag: betrag(e.ust_vereinnahmt_cent) });
+  // R12: Kasseneinnahmen laut Tagesabschlüssen – Zufluss am Tag des Abschlusses, eigene Zeilen
+  const kuKasse = istKleinunternehmer(s);
+  const ka = kassenUmsatz(s.kasse, `${jahr}-01-01`, `${jahr}-12-31`, kuKasse);
+  if (ka.tage) {
+    if (kuKasse) ein.push({ datum: "", text: `Kasseneinnahmen laut Tagesabschlüssen (${ka.tage} Tage)`, kategorie: "Umsatzsteuerlicher Kleinunternehmer", betrag: betrag(ka.je[0].brutto) });
+    else {
+      const netto = ka.je[19].netto + ka.je[7].netto;
+      if (netto) ein.push({ datum: "", text: `Kasseneinnahmen laut Tagesabschlüssen (netto, ${ka.tage} Tage)`, kategorie: EUER_ZEILE_STEUERPFLICHTIG, betrag: betrag(netto) });
+      if (ka.je[0].brutto) ein.push({ datum: "", text: "Kasseneinnahmen ohne Umsatzsteuer", kategorie: EUER_ZEILE_STEUERFREI, betrag: betrag(ka.je[0].brutto) });
+      const ust = ka.je[19].ust + ka.je[7].ust;
+      if (ust) ein.push({ datum: "", text: "Umsatzsteuer auf Kasseneinnahmen", kategorie: "Vereinnahmte Umsatzsteuer sowie Umsatzsteuer auf unentgeltliche Wertabgaben", betrag: betrag(ust) });
+    }
+  }
   const aus: Record<string, string>[] = e.ausgaben.zeilen.map((z) => ({ datum: "", text: `${z.kategorie.titel} (${z.anzahl} ${z.anzahl === 1 ? "Beleg" : "Belege"})`, kategorie: z.kategorie.euer, betrag: betrag(z.netto_cent) }));
   // Gutschriften (bezahlt im Jahr) sind Ausgaben: bezogene Leistungen; ausgewiesene Steuer des Leistenden als Vorsteuer, außer als Kleinunternehmer
   const gs = gutschriftAusgaben(s, jahr);
@@ -260,6 +325,8 @@ export function euerUebernahme(s: Stand, jahr: string): EuerUebernahme {
     unbezahlt: imJahr.filter((u) => !u.bezahlt && !u.storniertDurch && !istStorno(u) && !istGutschrift(u)).length,
     gutschriften,
     hinweis,
+    kassentage: ka.tage,
+    kasseFehlend: kassenAbdeckung(s, `${jahr}-01-01`, `${jahr}-12-31`),
   };
 }
 
@@ -310,6 +377,12 @@ export const rechnungDateiname = (nummer: string, kunde: string) => `${sicher(nu
 /** Offener Betrag einer Rechnung zum Stichtag: ohne Zahlungseingang bis dahin, nicht storniert, keine Stornorechnung. */
 function offenAm(s: Stand, u: Unterlage, bis: string, brutto: number): number {
   if (istStorno(u) || (u.bezahlt && u.bezahlt <= bis)) return 0;
+  // R12: Teilzahlungen und Minderungen bis zum Stichtag
+  if (u.zahlungen?.length) {
+    const storno0 = u.storniertDurch ? s.unterlagen.find((x) => x.id === u.storniertDurch) : undefined;
+    if (storno0 && String(storno0.daten.datum) <= bis) return 0;
+    return Math.max(0, brutto - u.zahlungen.filter((z) => z.datum <= bis).reduce((a, z) => a + z.betrag_cent + (z.minderung_cent ?? 0), 0));
+  }
   const storno = u.storniertDurch ? s.unterlagen.find((x) => x.id === u.storniertDurch) : undefined;
   if (storno && String(storno.daten.datum) <= bis) return 0;
   return brutto;
@@ -470,6 +543,61 @@ export function belegeCsv(s: Stand, z: Zeitraum, dateinamen: Map<string, string>
   );
 }
 
+/**
+ * R12: Kassenabschlüsse des Zeitraums als Liste – je Abschluss Umsatz je Steuersatz, Zahlungsarten, Bewegungen,
+ * Bargeldbestand, Zählung und Korrekturen; am Ende eine Summenzeile.
+ */
+export function kassenCsv(s: Stand, z: Zeitraum): string {
+  // je Standort ein eigener Verlauf
+  const tagJe = new Map<string, ReturnType<typeof kassenVerlauf>["tage"][number]>();
+  for (const st of new Set(s.kasse.map(standortVon))) for (const t of kassenVerlauf(s.kasse, s.belege, st).tage) tagJe.set(`${st}|${t.datum}`, t);
+  const summe = { b19: 0, b7: 0, b0: 0, karte: 0, sonstige: 0, bar: 0, rechnungen: 0, entnahmen: 0, einlagen: 0, transit: 0 };
+  const zeilen = s.kasse
+    .filter((k) => imZeitraum(k.datum, z))
+    .map((k) => {
+      const sm = kassenSummen(k);
+      const je = (satz: number) => (k.geschlossen ? 0 : k.umsatz.filter((u) => u.satz === satz).reduce((a, u) => a + u.brutto_cent, 0));
+      summe.b19 += je(19);
+      summe.b7 += je(7);
+      summe.b0 += je(0);
+      summe.karte += sm.karte;
+      summe.sonstige += sm.sonstige;
+      summe.bar += sm.bar;
+      summe.rechnungen += sm.rechnungen;
+      summe.entnahmen += sm.entnahmen;
+      summe.einlagen += sm.einlagen;
+      summe.transit += sm.transit;
+      const t = tagJe.get(`${standortVon(k)}|${k.datum}`);
+      const letzter = t && t.abschluesse[t.abschluesse.length - 1]?.id === k.id;
+      return [
+        datumDe(k.datum),
+        [standortVon(k), k.kasse_bez ?? ""].filter(Boolean).join(" · "),
+        k.geschlossen ? "geschlossen" : (k.zbon ?? ""),
+        betrag(je(19)),
+        betrag(je(7)),
+        betrag(je(0)),
+        betrag(sm.karte),
+        betrag(sm.sonstige),
+        betrag(sm.bar),
+        betrag(sm.rechnungen),
+        betrag(sm.entnahmen),
+        betrag(sm.einlagen),
+        betrag(sm.transit),
+        letzter && t ? betrag(t.soll) : "",
+        letzter && t && t.gezaehlt !== null ? betrag(t.gezaehlt) : "",
+        letzter && t && t.differenz ? betrag(t.differenz) : "",
+        k.kassenbericht ? "Kassenbericht (retrograd)" : "",
+        [k.tse_seriennr ? `TSE ${k.tse_seriennr}` : "", k.tse_von || k.tse_bis ? `TA ${k.tse_von ?? ""}–${k.tse_bis ?? ""}` : "", k.bediener ? `Bediener ${k.bediener}` : ""].filter(Boolean).join(", "),
+        (k.historie ?? []).map((h) => `${datumDe(h.bis.slice(0, 10))}: ${h.grund}`).join(" | "),
+      ];
+    });
+  const sz = ["Summe", "", "", betrag(summe.b19), betrag(summe.b7), betrag(summe.b0), betrag(summe.karte), betrag(summe.sonstige), betrag(summe.bar), betrag(summe.rechnungen), betrag(summe.entnahmen), betrag(summe.einlagen), betrag(summe.transit), "", "", "", "", "", ""];
+  return csv(
+    ["Datum", "Standort/Kasse", "Z-Bon", "Umsatz 19 % brutto", "Umsatz 7 % brutto", "Umsatz 0 % brutto", "Karte", "Sonstige Zahlungsarten", "Bar (Umsatz)", "Bar auf Rechnungen (kein Umsatz)", "Privatentnahme", "Privateinlage", "Geldtransit zur Bank", "Bestand rechnerisch", "Bestand gezählt", "Differenz", "Art", "TSE/Bediener", "Korrekturen (Tag: Grund)"],
+    zeilen.length ? [...zeilen, sz] : [],
+  );
+}
+
 /** Gutschein in einer Position zu 0 % (R11, Kosmetik #5) – keine Kleinunternehmer-Rechnung, keine Gutschrift. */
 function gutscheinZuNullU(u: Unterlage, betrieb: Betrieb): boolean {
   if (istGutschrift(u)) return false;
@@ -533,10 +661,17 @@ export function fragenText(s: Stand, z: Zeitraum, nummern: Map<string, string> =
     "Rechnungen über Gutscheine zu 0 % (nicht im Buchungsstapel): Einzweck-Gutschein (Leistung und Steuersatz stehen beim Verkauf fest, Umsatzsteuer schon bei Ausgabe, § 3 Abs. 14 UStG) oder Mehrzweck-Gutschein (Umsatzsteuer erst bei Einlösung, § 3 Abs. 15 UStG)?",
     gestellteRechnungen(s).filter((u) => imZeitraum(String(u.daten.datum), z) && gutscheinZuNullU(u, s.betrieb)).map((u) => rz(u)),
   );
+  // R12: Barbelege ab dem ersten Kassenabschluss stehen im Kassenbuch der App – nur die übrigen sind eine Frage
+  const ab = kasseAb(s.kasse);
   dazu(
-    "Bar bezahlte Belege (im Stapel gegen Kasse): Aus welcher Kasse wurde bezahlt – Geschäftskasse mit Kassenbuch (bitte liefern) oder privat?",
-    belege.filter((b) => b.zahlung === "bar" && belegImStapel(b, { kapitalgesellschaft: kapitalgesellschaft(s) })).map((b) => bz(b)),
+    "Bar bezahlte Belege ohne Kassenbuch in Amtlos (im Stapel gegen Geldtransit): Aus welcher Kasse wurde bezahlt – Geschäftskasse mit Kassenbuch (bitte liefern) oder privat?",
+    belege.filter((b) => b.zahlung === "bar" && belegImStapel(b, { kapitalgesellschaft: kapitalgesellschaft(s) }) && !(ab && zahltag(b) >= ab)).map((b) => bz(b)),
   );
+  const kz = s.kasse.filter((k) => imZeitraum(k.datum, z));
+  const luecken = zbonLuecken(kz);
+  if (luecken.length) dazu("Z-Bon-Nummern fehlen in der Folge der Kassenabschlüsse – gibt es dafür Tagesabschlüsse (z. B. Testbons, zweite Kasse)?", [`- ${luecken.slice(0, 20).join(", ")}${luecken.length > 20 ? " …" : ""}`]);
+  const diffs = kassenWarnungen(s.kasse, s.belege).differenzen.filter((d) => imZeitraum(d.datum, z));
+  if (diffs.length) dazu("Kassendifferenzen laut Zählung (nicht gebucht) – Ursache und Buchung?", diffs.map((d) => `- ${datumDe(d.datum)}${d.standort ? ` · ${d.standort}` : ""} · ${betrag(d.cent)} €`));
   dazu("Kfz-Kosten: Fahrzeug und privater Anteil?", belege.filter((b) => b.kategorie === "fahrzeug").map((b) => bz(b)));
   dazu("Bewirtung: Anlass und Teilnehmer?", belege.filter((b) => b.kategorie === "bewirtung").map((b) => bz(b)));
   dazu(
@@ -666,20 +801,43 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
   const abschlagStornoOhneZahlung = (u: Unterlage) => !istEuer && !istGutschrift(u) && abschlagU(u) && istStorno(u) && !s.unterlagen.find((x) => x.id === u.stornoZuId)?.bezahlt;
   // R11 (Kosmetik #5): Gutschein zu 0 % ist kein steuerfreier Umsatz – nicht auf 8100/4100 buchen, nur Liste und Frage
   const gutscheine = new Set(alle.filter((u) => gutscheinZuNullU(u, s.betrieb)).map((u) => u.id));
-  const imStapel = gestellteRechnungen(s).filter((u) => !gutscheine.has(u.id) && (nachZahlung(u) ? !!u.bezahlt && imZeitraum(u.bezahlt, z) : imZeitraum(String(u.daten.datum), z) && !abschlagStornoOhneZahlung(u)));
-  const ohneZahlung = alle.filter((u) => nachZahlung(u) && !u.bezahlt);
+  // R12: nach Zahlung mit einzelnen Zahlungen – je Zahlung gebucht (unten), nicht als Ganzes
+  const jeZahlung = (u: Unterlage) => nachZahlung(u) && !istStorno(u) && !!u.zahlungen?.length;
+  const imStapel = gestellteRechnungen(s).filter((u) => !gutscheine.has(u.id) && !jeZahlung(u) && (nachZahlung(u) ? !!u.bezahlt && imZeitraum(u.bezahlt, z) : imZeitraum(String(u.daten.datum), z) && !abschlagStornoOhneZahlung(u)));
+  const ohneZahlung = alle.filter((u) => nachZahlung(u) && !u.bezahlt && !u.zahlungen?.length);
   const ohneZahlungAbschlag = ohneZahlung.filter(abschlagU).length;
+  // R12: Zahlungen mit Skonto bzw. Minderung (§ 17 UStG) und Teilzahlungen
+  const zahlungsBuchungen = gestellteRechnungen(s)
+    .filter((u) => !gutscheine.has(u.id) && !istGutschrift(u) && !istStorno(u) && u.zahlungen?.length)
+    .flatMap((u) => {
+      const r = rechnungFuerBuchung(u, s.betrieb, { tage, betriebKu: ku });
+      const anteile = zahlungsAnteile(summen(r.positionen, r.kleinunternehmer).gruppen, u.zahlungen!).filter((a) => imZeitraum(a.zahlung.datum, z));
+      const minderungen = anteile.filter((a) => a.zahlung.minderung_cent).map((a) => ({ id: a.zahlung.id, datum: a.zahlung.datum, brutto_cent: a.minderung.reduce((x, m) => x + m.brutto_cent, 0) }));
+      // Ist: Erlös je Zahlung mit erhaltenem Betrag plus Skonto, zum Zahltag; Soll: der Erlös steht schon mit der Rechnung
+      const erloese = jeZahlung(u) ? buchungenAusRechnungen(anteile.map((a) => ({ ...r, datum: a.zahlung.datum, steuerperiode: a.zahlung.datum, guid_zusatz: a.zahlung.id, anteil: a.erhalten.map((e, i) => ({ satz: e.satz, brutto_cent: e.brutto_cent + a.minderung[i]!.brutto_cent, netto_cent: e.netto_cent + a.minderung[i]!.netto_cent, ust_cent: e.ust_cent + a.minderung[i]!.ust_cent })) })), sb.kontenrahmen) : [];
+      return [...erloese, ...skontoBuchungenRechnung(r, minderungen, sb.kontenrahmen)];
+    });
+  // R12: Kassenabschlüsse; Barbelege gegen Kasse erst ab dem ersten Abschluss in Amtlos
+  const ab = kasseAb(s.kasse);
+  const kasseImZeitraum = s.kasse.filter((k) => imZeitraum(k.datum, z));
+  const skontoBelege = s.belege.filter((b) => b.skonto_cent && imZeitraum(zahltag(b), z));
   // Gutschriften gehen als Aufwand in den Stapel (R10), Rechnungen als Erlös
   const buchungen = [
     ...buchungenAusRechnungen(imStapel.map((u) => ({ ...rechnungFuerBuchung(u, s.betrieb, { tage, betriebKu: ku }), ...(nachZahlung(u) ? { datum: u.bezahlt! } : {}) })), sb.kontenrahmen),
-    ...buchungenAusBelegen(belege, sb.kontenrahmen, { nummern, kapitalgesellschaft: kapital, kleinunternehmer: ku }),
+    ...zahlungsBuchungen,
+    ...buchungenAusBelegen(belege, sb.kontenrahmen, { nummern, kapitalgesellschaft: kapital, kleinunternehmer: ku, kasseAb: ab }),
+    ...skontoBuchungenBelege(skontoBelege, sb.kontenrahmen, { nummern, kapitalgesellschaft: kapital, kleinunternehmer: ku, kasseAb: ab }),
+    ...kassenBuchungen(kasseImZeitraum, sb.kontenrahmen, { kleinunternehmer: ku }),
   ].sort((a, b) => a.datum.localeCompare(b.datum));
   const nichtImStapel = belege.filter((b) => !belegImStapel(b, { kapitalgesellschaft: kapital }));
   const kuBis = /^\d{4}-\d{2}-\d{2}$/.test((s.betrieb.ku_bis ?? "").trim()) ? s.betrieb.ku_bis!.trim() : "";
   // R11 (Kosmetik #10): Buchungen, deren Steuerperiode (Feld 116) außerhalb des Stapelzeitraums liegt – zur Kontrolle nennen
   const fremdePeriode = buchungen.filter((b) => b.steuerperiode && !imZeitraum(b.steuerperiode, z));
-  // R11: Barbelege gehen gegen Kasse – Kasseneinnahmen kennt Amtlos nicht, ohne Kassenbuch ergibt das ein Kassenminus
-  const barImStapel = belege.filter((b) => b.zahlung === "bar" && belegImStapel(b, { kapitalgesellschaft: kapital })).length;
+  // R12: Barbelege ohne Kassenführung in Amtlos (vor dem ersten Abschluss) gehen gegen Geldtransit – kein Kassenminus
+  const barOhneKasse = belege.filter((b) => b.zahlung === "bar" && belegImStapel(b, { kapitalgesellschaft: kapital }) && !(ab && zahltag(b) >= ab)).length;
+  const warnungen = kassenWarnungen(s.kasse, s.belege);
+  const negativ = warnungen.negativ.filter((d) => imZeitraum(d.datum, z)).map((d) => d.datum);
+  const differenzen = warnungen.differenzen.filter((d) => imZeitraum(d.datum, z));
   const mit13b = belege.filter((b) => b.steuerschuld).length;
   const rechtsform = rechtsformFuer(s);
   const dfv = s.profil["ust.dauerfristverlaengerung"] === true;
@@ -730,7 +888,8 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
   const ohneXml = ohneXmlListe.length;
   const versteuerung = s.betrieb.versteuerung === "ist" ? "Ist (vereinnahmte Entgelte, § 20 UStG)" : s.betrieb.versteuerung === "soll" ? "Soll (vereinbarte Entgelte)" : "nicht angegeben (Soll angenommen)";
   const uhrzeit = /T(\d{2}):(\d{2})/.exec(jetzt);
-  const kassenSatz = kassenSatzPaket(kassenLage(s.profil));
+  const kassenSatz = kassenSatzPaket(kassenLage(s.profil), { fehlend: kassenAbdeckung(s, z.von, z.bis, jetzt.slice(0, 10) > z.bis ? undefined : jetzt.slice(0, 10)), tage: kasseImZeitraum.filter((k) => !k.geschlossen).length });
+  if (kasseImZeitraum.length) inhalt[`Kassenabschluesse_${z.name}.csv`] = utf8(kassenCsv(s, z));
   // „Wichtig“: an fester Stelle direkt nach den Mandantendaten, jeder Punkt nur einmal (R10)
   const wichtig = [
     ...(kassenSatz ? kassenSatz.split("\r\n") : []),
@@ -748,9 +907,11 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
       ? [`${fremdePeriode.length} ${fremdePeriode.length === 1 ? "Buchung hat" : "Buchungen haben"} im Feld „Datum Zuord. Steuerperiode“ einen Tag außerhalb des Stapelzeitraums (${[...new Set(fremdePeriode.map((b) => b.belegfeld1))].slice(0, 10).join(", ")}): Die Umsatzsteuer gehört nach der Zuordnung der App in einen anderen Voranmeldungszeitraum – bitte prüfen.`]
       : []),
     ...(gutscheine.size ? [`${gutscheine.size} ${gutscheine.size === 1 ? "Rechnung" : "Rechnungen"} über Gutscheine zu 0 % ${gutscheine.size === 1 ? "steht" : "stehen"} nur in der Rechnungsliste, nicht im Buchungsstapel – Einzweck- oder Mehrzweck-Gutschein (§ 3 Abs. 13–15 UStG)? Siehe Fragen.`] : []),
-    ...(barImStapel
-      ? [`${barImStapel} ${barImStapel === 1 ? "Barbeleg steht" : "Barbelege stehen"} im Stapel gegen Kasse (${sb.kontenrahmen === "SKR03" ? "1000" : "1600"}). Kasseneinnahmen und Bareinlagen kennt Amtlos nicht – ohne Kassenbuch ergibt das einen negativen Kassenbestand (§ 146 Abs. 1 Satz 2 AO). Bitte Kassenbuch liefern bzw. privat bar bezahlte Belege auf Privateinlage umbuchen (siehe Fragen).`]
+    ...(barOhneKasse
+      ? [`${barOhneKasse} ${barOhneKasse === 1 ? "Barbeleg steht" : "Barbelege stehen"} im Stapel gegen Geldtransit (${sb.kontenrahmen === "SKR03" ? "1360" : "1460"}), weil Amtlos ${ab ? "die Kasse erst ab " + datumDe(ab) : "keine Kasse"} führt – so entsteht kein negativer Kassenbestand. Bitte mit dem Kassenbuch abstimmen bzw. privat bar bezahlte Belege auf Privateinlage umbuchen (siehe Fragen).`]
       : []),
+    ...(negativ.length ? [`Kassenbestand rechnerisch negativ am ${negativ.map(datumDe).slice(0, 5).join(", ")} (§ 146 Abs. 1 Satz 2 AO) – bitte Kassenbuch prüfen (fehlende Einlage oder Einnahme?).`] : []),
+    ...(differenzen.length ? [`${differenzen.length} ${differenzen.length === 1 ? "Kassendifferenz" : "Kassendifferenzen"} laut Zählung (zusammen ${betrag(differenzen.reduce((a, d) => a + d.cent, 0))} €) – nicht gebucht, siehe Kassenabschluesse_${z.name}.csv.`] : []),
     ...(ku ? [] : [`Nullsteuersatz-Umsätze (§ 12 Abs. 3 UStG, Kz 87) stehen vorerst auf dem Konto für steuerfreie Umsätze (${sb.kontenrahmen === "SKR03" ? "8100" : "4100"}) – bitte bei Bedarf umbuchen.`].filter(() => alle.some((u) => eRechnungAus(u.daten, s.betrieb).daten.steuerart === "nullsatz"))),
   ];
   inhalt["LIESMICH.txt"] = utf8(
@@ -780,6 +941,7 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
       `- Buchungsliste_${z.name}.csv: dieselben Buchungen zum Lesen (Semikolon, UTF-8), mit stabiler Buchungs-GUID je Buchung.`,
       `- Rechnungen_${z.name}.csv: ${rechnungen.length} gestellte Rechnungen mit Steuerart, Netto, USt, Brutto, Fälligkeit, Zahlungseingang und offenem Betrag; Summen je Steuersatz am Ende.`,
       ...(gutschriften.length ? [`- Gutschriften_${z.name}.csv: ${gutschriften.length} ${gutschriften.length === 1 ? "Gutschrift" : "Gutschriften"}, die der Betrieb als Leistungsempfänger ausgestellt hat – nicht in der Rechnungsliste; im Buchungsstapel als Aufwand (bezogene Leistungen).`] : []),
+      ...(kasseImZeitraum.length ? [`- Kassenabschluesse_${z.name}.csv: ${kasseImZeitraum.length} Tagesabschlüsse (Z-Bons) mit Umsatz je Steuersatz, Zahlungsarten, Entnahmen/Einlagen, Bargeldbestand und Korrekturen.`] : []),
       `- Belege_${z.name}.csv: ${belege.length} Belege mit Amtlos-Belegnummer, Kategorie, Konto, Vorsteuer und Zahltag; Summe am Ende.`,
       `- Fragen_${z.name}.txt: ${fragen.anzahl ? `${fragen.anzahl} ${fragen.anzahl === 1 ? "Punkt" : "Punkte"} zum Klären (nur Sachverhalte aus den Daten)` : "keine offenen Punkte gefunden"}.`,
       `- E-Rechnungen/: XRechnung der Ausgangsrechnungen${gutschriften.length ? " und Gutschriften" : ""}${ohneXml ? ` (${ohneXml} ohne, siehe unten)` : ""}.`,

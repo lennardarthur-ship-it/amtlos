@@ -1,8 +1,8 @@
 import { useRef, useState } from "react";
 import { Pressable, Share, View } from "react-native";
-import { KU_HINWEIS, PRUEFHINWEIS, betragUnplausibel, cent as centAus, dateinamenTeil, dokumentHtml, eRechnungAus, pdfDateiname, vorlageFuer, xrechnungUbl, type Vorlage } from "@amtlos/fachlogik";
+import { KU_HINWEIS, PRUEFHINWEIS, betragUnplausibel, skontoBetrag, skontoFuer, cent as centAus, dateinamenTeil, dokumentHtml, eRechnungAus, pdfDateiname, vorlageFuer, xrechnungUbl, type Vorlage } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { DatumFeld, Fuss, Hinweis, Karte, Knopf, Stempel, StempelAuftritt, Symbol, T, TextKnopf, Zeile } from "../ui/bausteine";
+import { DatumFeld, Feld, Fuss, Hinweis, Karte, Knopf, Stempel, StempelAuftritt, Symbol, T, TextKnopf, Wahl, Zeile } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
 import { BLATT_OBEN, HAARLINIE, RADIUS, RAND, SCHRIFT, useFarben } from "../ui/thema";
@@ -13,7 +13,7 @@ import { drucken, pdfTeilen } from "../unterlagen/pdf";
 import { NUMMER_DOPPELT, fehltFuer } from "../unterlagen/pruefung";
 import { dateiTeilen } from "../unterlagen/sicherungDatei";
 import { heute } from "../unterlagen/speicher";
-import { euroText, faelligAm, rechnungBrutto } from "../unterlagen/ablage";
+import { euroText, faelligAm, offenBrutto, rechnungBrutto } from "../unterlagen/ablage";
 import { useAmtlos } from "../zustand";
 import { bestaetigen } from "../ui/bestaetigen";
 import { AbsenderSeite } from "./Betrieb";
@@ -366,6 +366,7 @@ function Zahlung({ id }: { id: string }) {
   const f = useFarben();
   const melden = useMeldung();
   const [anders, setAnders] = useState(false);
+  const [betragOffen, setBetragOffen] = useState(false);
   const u = z.stand.unterlagen.find((x) => x.id === id);
   const erstattung = typeof u?.daten.storno_zu === "string" && u.daten.storno_zu !== "";
   const vermerken = (d: string) => {
@@ -377,34 +378,92 @@ function Zahlung({ id }: { id: string }) {
   const faellig = faelligAm(u);
   const datumDe = (iso: string) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(`${iso}T12:00:00Z`));
   const ueberfaellig = !u.bezahlt && !erstattung && Boolean(faellig && faellig < heute());
+  // R12: offener Betrag nach Teilzahlungen und Skonto – auch für die Zahlungserinnerung
+  const offen = offenBrutto(u, z.stand.betrieb);
+  const zahlungen = u.zahlungen ?? [];
   // freundliche Zahlungserinnerung als Text ins Teilen-Menü – Mail, Nachrichten, WhatsApp; nichts wird verschickt, ohne dass man es sieht
   const erinnern = () => {
     const b = z.stand.betrieb;
     const nummer = typeof u.daten.nummer === "string" ? u.daten.nummer.trim() : "";
     const kunde = typeof u.daten.kunde_name === "string" ? u.daten.kunde_name.trim() : "";
-    const message = TEXT.erinnerung_text({ nummer, betrag: euroText(rechnungBrutto(u, b)), faellig: faellig ? datumDe(faellig) : "", kunde, iban: b.iban.trim(), absender: [b.verantwortlich.trim(), b.name.trim()].filter(Boolean).join("\n") });
+    const message = TEXT.erinnerung_text({ nummer, betrag: euroText(offen), faellig: faellig ? datumDe(faellig) : "", kunde, iban: b.iban.trim(), absender: [b.verantwortlich.trim(), b.name.trim()].filter(Boolean).join("\n") });
     void Share.share({ message, title: TEXT.erinnerung_senden }).catch(() => undefined);
   };
   return (
     <Karte stil={{ marginTop: 12, paddingVertical: 14, gap: 10 }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
         <View style={{ flex: 1 }}>
-          <T fett>{u.bezahlt ? (erstattung ? TEXT.erstattet_am(datumDe(u.bezahlt)) : TEXT.bezahlt_am(datumDe(u.bezahlt))) : TEXT.offen_zahlung}</T>
+          <T fett>{u.bezahlt ? (erstattung ? TEXT.erstattet_am(datumDe(u.bezahlt)) : TEXT.bezahlt_am(datumDe(u.bezahlt))) : zahlungen.length ? TEXT.r12_offen_rest(euroText(offen)) : TEXT.offen_zahlung}</T>
           {/* Fälligkeit nach dem Zahlungsziel der Rechnung – überfällig in Rot */}
           {!u.bezahlt && !erstattung && faellig ? <T v="klein" farbe={faellig < heute() ? f.frist : undefined} leise={faellig >= heute()}>{faellig < heute() ? TEXT.faellig_war(datumDe(faellig)) : TEXT.faellig_bis(datumDe(faellig))}</T> : null}
         </View>
       </View>
-      {u.bezahlt ? (
-        <TextKnopf symbol="xmark" text={TEXT.zahlung_entfernen} onPress={() => z.bezahltSetzen(id, null)} />
-      ) : (
+      {zahlungen.length ? (
+        <View accessibilityLabel={TEXT.r12_zahlung_titel} style={{ gap: 2 }}>
+          {zahlungen.map((x) => (
+            <T key={x.id} v="klein" leise>{TEXT.r12_zahlungen_liste(datumDe(x.datum), euroText(x.betrag_cent), x.minderung_cent ? TEXT.r12_minderung_kurz(euroText(x.minderung_cent), x.art ?? "skonto") : "")}</T>
+          ))}
+        </View>
+      ) : null}
+      {u.bezahlt || zahlungen.length ? <TextKnopf symbol="xmark" text={zahlungen.length ? TEXT.r12_zahlungen_entfernen : TEXT.zahlung_entfernen} onPress={() => z.bezahltSetzen(id, null)} /> : null}
+      {!u.bezahlt ? (
         <View style={{ gap: 4 }}>
           {/* nach dem Teilen ist „bezahlt“ der nächste Schritt (B1) – als Hauptknopf; überfällig zuerst die Erinnerung */}
           {ueberfaellig ? <Knopf symbol="envelope" text={TEXT.erinnerung_senden} onPress={erinnern} /> : null}
-          <Knopf ton={ueberfaellig} symbol="checkmark" text={erstattung ? TEXT.als_erstattet : TEXT.als_bezahlt_markieren} onPress={() => vermerken(heute())} stil={ueberfaellig ? { marginTop: 6 } : undefined} />
-          {anders ? <DatumFeld label={TEXT.anderes_datum} wert={null} aendern={(d) => d && vermerken(d)} /> : <TextKnopf text={TEXT.anderes_datum} onPress={() => setAnders(true)} />}
+          {zahlungen.length ? null : <Knopf ton={ueberfaellig} symbol="checkmark" text={erstattung ? TEXT.als_erstattet : TEXT.als_bezahlt_markieren} onPress={() => vermerken(heute())} stil={ueberfaellig ? { marginTop: 6 } : undefined} />}
+          {zahlungen.length ? null : anders ? <DatumFeld label={TEXT.anderes_datum} wert={null} aendern={(d) => d && vermerken(d)} /> : <TextKnopf text={TEXT.anderes_datum} onPress={() => setAnders(true)} />}
+          {/* R12: erhaltener Betrag – Teilzahlung, Skonto oder Minderung (§ 17 UStG) */}
+          {erstattung ? null : betragOffen || zahlungen.length ? <BetragErhalten id={id} offen={offen} fertig={() => setBetragOffen(false)} /> : <TextKnopf symbol="eurosign" text={TEXT.r12_betrag_erhalten} onPress={() => setBetragOffen(true)} />}
         </View>
-      )}
+      ) : null}
       <T v="caption" leise>{TEXT.bezahlt_hilfe}</T>
     </Karte>
+  );
+}
+
+const BETRAG_FELD = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false });
+
+/**
+ * R12: Zahlungseingang mit Betrag. Fehlt etwas, entscheidet man: Rest bleibt offen (Teilzahlung), Skonto oder Minderung –
+ * dann mindert die Differenz Umsatz und Umsatzsteuer im Zeitraum der Zahlung (§ 17 UStG). Innerhalb der Skontofrist ist der
+ * Betrag nach Skonto vorbelegt und „Skonto“ gewählt.
+ */
+function BetragErhalten({ id, offen, fertig }: { id: string; offen: number; fertig: () => void }) {
+  const z = useAmtlos();
+  const melden = useMeldung();
+  const u = z.stand.unterlagen.find((x) => x.id === id);
+  const [datum, setDatum] = useState<string>(heute());
+  const sk = u && !u.zahlungen?.length ? skontoFuer(u.daten, z.stand.betrieb.bundesland) : null;
+  const skBetrag = sk && u ? skontoBetrag(rechnungBrutto(u, z.stand.betrieb), sk.prozent) : 0;
+  const inFrist = Boolean(sk && datum <= sk.bis);
+  const [text, setText] = useState(() => BETRAG_FELD.format((sk && heute() <= sk.bis ? offen - skBetrag : offen) / 100));
+  const [rest, setRest] = useState<"offen" | "skonto" | "minderung">(sk && heute() <= sk.bis ? "skonto" : "offen");
+  if (!u) return null;
+  const betrag = centAus(text);
+  const differenz = betrag === null ? 0 : offen - betrag;
+  const datumDe = (iso: string) => `${iso.slice(8, 10)}.${iso.slice(5, 7)}.${iso.slice(0, 4)}`;
+  const speichern = () => {
+    if (betrag === null || betrag < 0) return;
+    const minderung = differenz > 0 && rest !== "offen" ? differenz : 0;
+    z.zahlungVermerken(id, { datum, betrag_cent: Math.min(betrag, offen), ...(minderung ? { minderung_cent: minderung, art: rest === "minderung" ? "minderung" : "skonto" } : {}) });
+    melden(TEXT.r12_zahlung_vermerkt(euroText(betrag)));
+    z.erfolg();
+    fertig();
+  };
+  return (
+    <View style={{ gap: 6, marginTop: 6 }}>
+      <T v="klein" fett accessibilityRole="header">{TEXT.r12_zahlung_titel}</T>
+      <DatumFeld label={TEXT.r12_zahlung_datum} wert={datum} aendern={(d) => d && setDatum(d)} />
+      <Feld label={TEXT.r12_zahlung_betrag} wert={text} aendern={setText} keyboardType="decimal-pad" placeholder="0,00" fehler={text.trim() && betrag === null ? TEXT.betrag_falsch : betrag !== null && betrag > offen ? TEXT.r12_ueberzahlt : null} />
+      {sk ? <T v="caption" leise>{inFrist ? TEXT.r12_skonto_passt(euroText(skBetrag), datumDe(sk.bis)) : TEXT.r12_skonto_spaet(datumDe(sk.bis))}</T> : null}
+      {differenz > 0 && betrag !== null ? (
+        <View style={{ gap: 4 }}>
+          <T v="klein">{TEXT.r12_zahlung_rest(euroText(differenz))}</T>
+          <Wahl wert={rest} aendern={setRest} optionen={[{ wert: "offen" as const, text: TEXT.r12_rest_offen }, { wert: "skonto" as const, text: TEXT.r12_rest_skonto }, { wert: "minderung" as const, text: TEXT.r12_rest_minderung }]} />
+          {rest !== "offen" ? <T v="caption" leise>{TEXT.r12_minderung_hilfe}</T> : null}
+        </View>
+      ) : null}
+      <Knopf ton symbol="checkmark" text={TEXT.r12_zahlung_vermerken} deaktiviert={betrag === null || betrag <= 0 && differenz <= 0} onPress={speichern} />
+    </View>
   );
 }

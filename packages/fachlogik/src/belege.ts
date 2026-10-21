@@ -6,6 +6,7 @@
  */
 import { umschreiben } from "./dateinamen.js";
 import { rundeCent } from "./rechnung.js";
+import { minderungNachSatz, type SatzBetrag } from "./skonto.js";
 
 export type Zahlungsweg = "bank" | "bar" | "privat";
 export type BelegQuelle = "hand" | "foto" | "erechnung";
@@ -52,6 +53,11 @@ export interface Beleg {
    * UStG). Die Beträge in `steuer` sind dann die Rechnungsbeträge ohne Umsatzsteuer (Bemessungsgrundlage).
    */
   steuerschuld?: Steuerschuld | null;
+  /**
+   * R12: bei der Zahlung abgezogenes Skonto (brutto, in Cent) – eine Minderung des Entgelts (§ 17 Abs. 1 Satz 2 UStG):
+   * Die Vorsteuer mindert sich im Zeitraum der Zahlung, die Betriebsausgabe ist der gezahlte Betrag.
+   */
+  skonto_cent?: number | null;
 }
 
 export type Steuerschuld = "bau" | "eu";
@@ -75,6 +81,7 @@ export interface BelegFassung {
   notiz?: string | null;
   datei?: string | null;
   steuerschuld?: Steuerschuld | null;
+  skonto_cent?: number | null;
 }
 
 /**
@@ -177,6 +184,25 @@ export function belegSummen(b: Pick<Beleg, "steuer" | "vorsteuer"> & { steuersch
 }
 
 /**
+ * R12: Skonto eines Belegs je Steuersatz (brutto, netto, Steuer) – aufgeteilt nach den Bruttobeträgen. Leer ohne Skonto
+ * und bei § 13b-Belegen (dort ändert sich die selbst geschuldete Steuer – nicht abgebildet, PRUEFLISTE).
+ */
+export function belegSkonto(b: Pick<Beleg, "steuer" | "skonto_cent"> & { steuerschuld?: Steuerschuld | null }): SatzBetrag[] {
+  const m = b.skonto_cent ?? 0;
+  if (!m || b.steuerschuld) return [];
+  return minderungNachSatz(
+    m,
+    b.steuer.map((s) => {
+      const a = ausBrutto(s.brutto_cent, s.satz);
+      return { satz: s.satz, netto_cent: a.netto_cent, ust_cent: a.ust_cent };
+    }),
+  ).filter((x) => x.brutto_cent);
+}
+
+/** Tatsächlich gezahlter Betrag eines Belegs (brutto abzüglich Skonto). */
+export const belegGezahlt = (b: Pick<Beleg, "steuer" | "skonto_cent" | "vorsteuer"> & { steuerschuld?: Steuerschuld | null }) => belegSummen(b).brutto_cent - (b.steuerschuld ? 0 : (b.skonto_cent ?? 0));
+
+/**
  * Belegnummer des Lieferanten in einer Form, die DATEV (Belegfeld 1), Dateinamen und Listen gleich zeigen: Umlaute
  * umgeschrieben, alles außer Buchstaben und Ziffern zu „-“ zusammengezogen, höchstens 36 Zeichen („LA 01/2026“ →
  * „LA-01-2026“).
@@ -213,20 +239,27 @@ export const belegKennung = (b: Pick<Beleg, "nummer">, amtlosNr: string) => bele
 /** Tag, nach dem ein Beleg der EÜR zugeordnet wird: Zahlung (Abfluss), sonst Belegdatum. */
 export const zahltag = (b: Pick<Beleg, "datum" | "bezahlt">) => b.bezahlt || b.datum;
 
-/** Vorsteuer eines Zeitraums (nach Belegdatum – die Rechnung liegt vor, § 15 Abs. 1 Nr. 1 UStG; T-79). */
-export function vorsteuerFuer(belege: Beleg[], von: string, bis: string): { cent: number; anzahl: number; ohne: number } {
+/**
+ * Vorsteuer eines Zeitraums (nach Belegdatum – die Rechnung liegt vor, § 15 Abs. 1 Nr. 1 UStG; T-79). R12: Skonto mindert
+ * die Vorsteuer im Zeitraum der Zahlung (§ 17 Abs. 1 Satz 2 UStG) – `skonto_cent` ist diese Minderung (negativ, in `cent` enthalten).
+ */
+export function vorsteuerFuer(belege: Beleg[], von: string, bis: string): { cent: number; anzahl: number; ohne: number; skonto_cent: number } {
   let cent = 0;
   let anzahl = 0;
   let ohne = 0;
+  let skonto = 0;
   for (const b of belege) {
-    if (b.ungueltig || b.datum < von || b.datum > bis) continue;
+    if (b.ungueltig) continue;
+    const tag = zahltag(b);
+    if (b.vorsteuer && b.skonto_cent && tag >= von && tag <= bis) skonto -= belegSkonto(b).reduce((a, x) => a + x.ust_cent, 0);
+    if (b.datum < von || b.datum > bis) continue;
     const s = belegSummen(b);
     if (b.vorsteuer && s.ust_cent) {
       cent += s.ust_cent;
       anzahl++;
     } else if (s.ust_cent) ohne++;
   }
-  return { cent, anzahl, ohne };
+  return { cent: cent + skonto, anzahl, ohne, skonto_cent: skonto };
 }
 
 /** Steuersatz einer § 13b-Eingangsleistung: der erfasste Satz, bei 0 % der Regelsatz 19 %. */
@@ -289,13 +322,17 @@ export function ausgabenFuer(belege: Beleg[], jahr: string): { zeilen: EuerAusga
     if (b.ungueltig || !zahltag(b).startsWith(`${jahr}-`)) continue;
     const k = kategorieFuer(b.kategorie);
     const s = belegSummen(b);
-    vorsteuer += s.vorsteuer_cent;
+    // R12: Skonto mindert Ausgabe und Vorsteuer – gezahlt ist der Betrag nach Abzug (§ 11 Abs. 2 EStG)
+    const sk = belegSkonto(b);
+    const skNetto = sk.reduce((a, x) => a + x.netto_cent, 0);
+    const skUst = sk.reduce((a, x) => a + x.ust_cent, 0);
+    vorsteuer += s.vorsteuer_cent - (b.vorsteuer ? skUst : 0);
     if (k.anlage) {
       anlagen.push(b);
       continue;
     }
     // ohne Vorsteuerabzug ist der Bruttobetrag die Betriebsausgabe
-    const betrag = b.vorsteuer ? s.netto_cent : s.brutto_cent;
+    const betrag = b.vorsteuer ? s.netto_cent - skNetto : s.brutto_cent - skNetto - skUst;
     const z = nach.get(k.id) ?? { kategorie: k, netto_cent: 0, anzahl: 0 };
     z.netto_cent += betrag;
     z.anzahl++;
@@ -378,8 +415,12 @@ function fassungAus(roh: unknown): BelegFassung | null {
     notiz: s("notiz") || null,
     datei: istBelegDateiname(r.datei) ? r.datei : null,
     ...(steuerschuldAus(r.steuerschuld) ? { steuerschuld: steuerschuldAus(r.steuerschuld) } : {}),
+    ...(skontoAusRoh(r.skonto_cent) ? { skonto_cent: skontoAusRoh(r.skonto_cent) } : {}),
   };
 }
+
+/** Skonto eines Belegs: ganze Cent größer 0, sonst nichts */
+const skontoAusRoh = (w: unknown): number | null => (typeof w === "number" && Number.isInteger(w) && w > 0 ? w : null);
 
 const steuerschuldAus = (w: unknown): Steuerschuld | null => (w === "bau" || w === "eu" ? w : null);
 
@@ -414,12 +455,13 @@ export function belegAus(roh: unknown): Beleg | null {
     ...(s("ungueltig") ? { ungueltig: s("ungueltig"), ungueltig_grund: s("ungueltig_grund") || null } : {}),
     ...(historie.length ? { historie } : {}),
     ...(steuerschuldAus(r.steuerschuld) ? { steuerschuld: steuerschuldAus(r.steuerschuld) } : {}),
+    ...(skontoAusRoh(r.skonto_cent) ? { skonto_cent: skontoAusRoh(r.skonto_cent) } : {}),
   };
 }
 
 /** Inhalt eines Belegs als frühere Fassung (für das Änderungsprotokoll). */
 export function belegFassung(b: Beleg, bis: string): BelegFassung {
-  return { bis, datum: b.datum, lieferant: b.lieferant, nummer: b.nummer ?? null, kategorie: b.kategorie, steuer: b.steuer.map((x) => ({ ...x })), vorsteuer: b.vorsteuer, zahlung: b.zahlung, bezahlt: b.bezahlt ?? null, notiz: b.notiz ?? null, datei: b.datei ?? null, ...(b.steuerschuld ? { steuerschuld: b.steuerschuld } : {}) };
+  return { bis, datum: b.datum, lieferant: b.lieferant, nummer: b.nummer ?? null, kategorie: b.kategorie, steuer: b.steuer.map((x) => ({ ...x })), vorsteuer: b.vorsteuer, zahlung: b.zahlung, bezahlt: b.bezahlt ?? null, notiz: b.notiz ?? null, datei: b.datei ?? null, ...(b.steuerschuld ? { steuerschuld: b.steuerschuld } : {}), ...(b.skonto_cent ? { skonto_cent: b.skonto_cent } : {}) };
 }
 
 /** Hat sich der Inhalt (nicht nur der Zeitstempel) eines Belegs geändert? */

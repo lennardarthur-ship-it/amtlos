@@ -6,7 +6,7 @@
  */
 // CommonJS-Build wie in fusszeile.ts: die ESM-Variante von pdf-lib lässt sich von Metro nicht auflösen
 import { PDFDocument } from "pdf-lib/cjs/index";
-import { BEREICHE, dateinamenTeil, monatAus, unterlagenName, vorlageFuer, type Bereich, type Vorlage } from "@amtlos/fachlogik";
+import { BEREICHE, belegNummern, dateinamenTeil, kassenStandorte, kassenbuchDaten, standortVon, monatAus, monatsName, unterlagenName, vorlageFuer, type Bereich, type Daten, type Vorlage } from "@amtlos/fachlogik";
 import { fehltFuer } from "./pruefung";
 import { heute as heuteBerlin, nichtZaehlend, type Stand, type Unterlage } from "./speicher";
 
@@ -37,6 +37,8 @@ export interface MappenEintrag {
   datum: string;
   /** schon geteilt oder gedruckt (sonst: vollständig, aber noch nicht ausgegeben) */
   geteilt: boolean;
+  /** R12: ohne gespeicherte Unterlage – Inhalt für das PDF (Kassenbuch aus den Tagesabschlüssen) */
+  daten?: Daten;
 }
 
 export interface MappenAuswahl {
@@ -177,9 +179,9 @@ export const bgVorhanden = (erledigt: Record<string, string>) => BG_NACHWEISE.fi
  * Kontrollarten (R10): Jede Stelle bekommt nur, was sie prüft – die Lebensmittelkontrolle keine Gehälter (Datenminimierung,
  * Art. 5 Abs. 1 lit. c DSGVO). „alle“ bündelt wie bisher alles.
  */
-export type Kontrollart = "alle" | "hygiene" | "zoll" | "bg" | "datenschutz";
-export const KONTROLLARTEN: Kontrollart[] = ["alle", "hygiene", "zoll", "bg", "datenschutz"];
-const JE_KONTROLLE: Record<Exclude<Kontrollart, "alle">, ReadonlySet<string>> = {
+export type Kontrollart = "alle" | "hygiene" | "zoll" | "bg" | "datenschutz" | "kasse";
+export const KONTROLLARTEN: Kontrollart[] = ["alle", "hygiene", "zoll", "bg", "datenschutz", "kasse"];
+const JE_KONTROLLE: Record<Exclude<Kontrollart, "alle" | "kasse">, ReadonlySet<string>> = {
   hygiene: new Set(["ifsg_belehrung", "allergene", "haccp", "hygieneplan"]),
   zoll: new Set(["arbeitszeitnachweis", "nachweis_arbeitsbedingungen", "ausweis_hinweis"]),
   bg: new Set(["gefaehrdungsbeurteilung", "unterweisung", "gefahrstoffverzeichnis", "betriebsanweisung", "pruefprotokoll_elektro", "hautschutzplan"]),
@@ -189,8 +191,49 @@ const JE_KONTROLLE: Record<Exclude<Kontrollart, "alle">, ReadonlySet<string>> = 
 /** Gehört eine Vorlage in die Mappe für diese Kontrollart? */
 export function fuerKontrolle(vorlageId: string, art: Kontrollart): boolean {
   const v = vorlageFuer(vorlageId);
+  if (art === "kasse") return KASSEN_VORLAGEN.has(vorlageId);
   if (!v || !gehoertInMappe(v)) return false;
   return art === "alle" || JE_KONTROLLE[art].has(vorlageId);
+}
+
+/** R12: Vorlagen der Kassennachschau */
+const KASSEN_VORLAGEN = new Set(["kassenbuch", "kassenmeldung", "verfahrensdokumentation"]);
+
+/**
+ * R12: Mappe für die Kassennachschau (§ 146b AO) – nur, was es gibt: Kassenbuch je Monat aus den Tagesabschlüssen
+ * (höchstens 24 Monate), selbst geführte Kassenbücher anderer Monate, die neueste Kassenmeldung und
+ * Verfahrensdokumentation. Neueste zuerst.
+ */
+export function kassenMappe(s: Pick<Stand, "unterlagen" | "kasse" | "belege" | "belegArchiv">, heute = heuteBerlin()): MappenEintrag[] {
+  const grenze = minusMonate(heute, MONATE_IN_MAPPE).slice(0, 7);
+  const monate = [...new Set(s.kasse.map((k) => k.datum.slice(0, 7)))].filter((m) => m >= grenze).sort((a, b) => b.localeCompare(a));
+  const nummern = belegNummern([...s.belege, ...s.belegArchiv]);
+  const aus: MappenEintrag[] = [];
+  // je Monat und Standort (Filiale) ein Kassenbuch
+  for (const m of monate)
+    for (const st of kassenStandorte(s.kasse)) {
+      const d = kassenbuchDaten(s.kasse, s.belege, m, nummern, st);
+      if (!d) continue;
+      const letzter = s.kasse.filter((k) => k.datum.startsWith(m) && standortVon(k) === st).reduce((x, k) => (k.datum > x ? k.datum : x), `${m}-01`);
+      aus.push({ id: `kassenbuch-${m}${st ? `-${st}` : ""}`, vorlage: "kassenbuch", titel: `Kassenbuch ${monatsName(m)}${st ? ` · ${st}` : ""} (aus den Tagesabschlüssen)`, bereich: "steuern", datum: letzter, geteilt: false, daten: d as unknown as Daten });
+    }
+  const erzeugt = new Set(monate.map((m) => monatsName(m).toLocaleLowerCase("de")));
+  const aus2 = nichtZaehlend(s.unterlagen);
+  const neueste = new Map<string, Unterlage>();
+  for (const u of s.unterlagen) {
+    if (aus2.has(u.id) || !KASSEN_VORLAGEN.has(u.vorlage)) continue;
+    const z = typeof u.daten.zeitraum === "string" ? u.daten.zeitraum.trim().toLocaleLowerCase("de") : "";
+    if (u.vorlage === "kassenbuch" && (!z || erzeugt.has(z))) continue;
+    const g = u.vorlage === "kassenbuch" ? `kassenbuch|${z}` : u.vorlage;
+    const zeit = (x: Unterlage) => `${x.ausgegeben || x.festgeschrieben ? "1" : "0"}${x.ausgegeben ?? x.geaendert}`;
+    const b = neueste.get(g);
+    if (!b || zeit(u) > zeit(b)) neueste.set(g, u);
+  }
+  for (const u of neueste.values()) {
+    const v = vorlageFuer(u.vorlage)!;
+    aus.push({ id: u.id, vorlage: v.id, titel: unterlagenName(v, u.daten), bereich: v.bereich, datum: datumVon(u), geteilt: Boolean(u.ausgegeben || u.festgeschrieben) });
+  }
+  return aus;
 }
 
 /** Was eine offene Pflicht braucht, um in der Mappe zu fehlen: Titel und die Vorlagen dazu. */

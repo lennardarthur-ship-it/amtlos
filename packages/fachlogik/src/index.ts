@@ -12,3 +12,5 @@ export * from "./belege.js";
 export * from "./erechnungLesen.js";
 export * from "./buchungen.js";
 export * from "./dateinamen.js";
+export * from "./skonto.js";
+export * from "./kasse.js";

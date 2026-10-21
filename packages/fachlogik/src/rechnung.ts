@@ -159,6 +159,11 @@ export interface RechnungsDaten {
    * XRechnung ist der Leistende (`kunde`) der Verkäufer (BG-4) und der Betrieb der Käufer (BG-7), Typ 389.
    */
   gutschrift?: boolean;
+  /**
+   * R12: im Voraus vereinbarte Minderung des Entgelts (§ 14 Abs. 4 Satz 1 Nr. 8 UStG) – Skonto in Prozent bei Zahlung
+   * innerhalb von `tage` Tagen ab Rechnungsdatum, bis `bis` (ISO). In der XRechnung als Zahlungsbedingung (BT-20).
+   */
+  skonto?: { prozent: number; tage: number; bis: string } | null;
 }
 
 /** Was für eine gültige E-Rechnung (XRechnung) fehlt – als verständliche Liste. Leer = vollständig. */

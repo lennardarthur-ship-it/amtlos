@@ -1,6 +1,6 @@
 import { memo, useEffect, useRef, useState } from "react";
 import { Image, Linking, View } from "react-native";
-import { KATEGORIEN, STEUERSAETZE, STEUERSCHULD_ARTEN, ZAHLUNGSWEGE, belegAusERechnung, belegSummen, cent, eRechnungAusPdf, eRechnungLesen, kaeuferFremd, kategorieFuer, steuerschuldBetrag, type Beleg } from "@amtlos/fachlogik";
+import { KATEGORIEN, STEUERSAETZE, STEUERSCHULD_ARTEN, ZAHLUNGSWEGE, belegAusERechnung, belegGezahlt, belegSummen, cent, eRechnungAusPdf, eRechnungLesen, kaeuferFremd, kategorieFuer, steuerschuldBetrag, type Beleg } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { regelwert } from "../pflichten/check";
 import { AuswahlZeile } from "../ui/auswahlseite";
@@ -188,6 +188,8 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
   const ku = istKleinunternehmer(z.stand);
   const kuBis = (z.stand.betrieb.ku_bis ?? "").trim();
   const [vorsteuerOffen, setVorsteuerOffen] = useState(false);
+  // R12: Skonto beim Bezahlen als Text, damit „4,“ beim Tippen nicht verloren geht
+  const [skontoText, setSkontoText] = useState(() => betragText(b?.skonto_cent ?? 0));
   useEffect(
     () => () => {
       const jetzt = zRef.current.stand.belege.find((x) => x.id === id);
@@ -269,6 +271,13 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
         {k.hinweis ? <T v="caption" leise stil={{ marginTop: 4 }}>{k.hinweis}</T> : null}
         <Wahl label={TEXT.beleg_zahlung} wert={b.zahlung} aendern={(w) => setze(w === "bar" && !b.bezahlt && b.datum ? { zahlung: w, bezahlt: b.datum } : { zahlung: w })} optionen={ZAHLUNGSWEGE} />
         <DatumFeld label={TEXT.beleg_bezahlt} hilfe={TEXT.beleg_bezahlt_hilfe} wert={b.bezahlt ?? null} aendern={(d) => setze({ bezahlt: d })} />
+        {/* R12: beim Bezahlen abgezogenes Skonto – mindert die Vorsteuer im Monat der Zahlung (§ 17 UStG) */}
+        {b.steuerschuld ? null : (
+          <View>
+            <Feld label={TEXT.r12_beleg_skonto} hilfe={TEXT.r12_beleg_skonto_hilfe} wert={skontoText} aendern={(w) => { setSkontoText(w); const c = cent(w); setze({ skonto_cent: c && c > 0 && c < s.brutto_cent ? c : null }); }} keyboardType="decimal-pad" placeholder="0,00" optional fehler={skontoText.trim() && (cent(skontoText) === null || (cent(skontoText) ?? 0) >= s.brutto_cent) ? TEXT.betrag_falsch : null} />
+            {b.skonto_cent ? <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.r12_beleg_gezahlt(euro(belegGezahlt(b)))}</T> : null}
+          </View>
+        )}
         <Feld label={TEXT.beleg_notiz} wert={b.notiz ?? ""} aendern={(w) => setze({ notiz: w || null })} mehrzeilig />
         {ku ? (
           <View style={{ marginTop: 14 }}>

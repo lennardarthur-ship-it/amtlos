@@ -17,6 +17,8 @@ import { BelegErfassenSeite } from "./Belege";
 import { BlattKopf, BuehnenMarke, BuehnenSeite, GrosserBetrag } from "./gemeinsam";
 import { Balken, Einladung, PflichtZeile, checkGemacht, nichtsDranText, useAuswertung } from "./Pflichten";
 import { SicherungsKarte } from "./Sicherung";
+import { KasseZeile } from "./Kasse";
+import { kasseSichtbar } from "../unterlagen/kasse";
 import { useOeffnen, useStarten } from "./starten";
 import { UnterlageZeile, useFehltJe, useUeberfaellig } from "./Unterlagen";
 
@@ -39,6 +41,7 @@ export function Heute() {
   const betrieb = useStandWahl((s) => s.betrieb);
   const profil = useStandWahl((s) => s.profil);
   const erinnerungen = useStandWahl((s) => s.erinnerungen);
+  const kasse = useStandWahl((s) => s.kasse);
   const nav = useNav();
   const starten = useStarten();
   const oeffnen = useOeffnen();
@@ -117,6 +120,12 @@ export function Heute() {
       {z.speicherFehler ? <Hinweis art="fehler" text={z.speicherFehlerArt === "schreiben" ? TEXT.speicher_fehler_schreiben : TEXT.speicher_fehler} /> : null}
       {/* R11 (UX #12): solange der Check fehlt, steht seine Einladung über jeder Erinnerung */}
       {gemacht ? <SicherungsKarte /> : null}
+      {/* R12: Betriebe mit Kasse oder Laden – der Tagesabschluss gehört zum Tag */}
+      {kasseSichtbar({ profil, kasse }) ? (
+        <Karte stil={{ marginBottom: 18 }}>
+          <KasseZeile />
+        </Karte>
+      ) : null}
       {gemacht ? (
         <View>
           <BlattKopf erste titel={TEXT.als_naechstes} rechts={TEXT.alle_pflichten} onPress={() => tabWechseln("pflichten")} />

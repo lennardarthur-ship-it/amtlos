@@ -35,7 +35,7 @@ import {
   type Vorlage,
 } from "@amtlos/fachlogik";
 import { unzipSync } from "fflate";
-import { LEERER_STAND, anlegen, ausgeben, belegSetzen, bezahltSetzen, felderSetzen, kopieren, personSetzen, profilSetzen, steuerberatungSetzen, stornieren, type Stand, type Unterlage } from "../src/unterlagen/speicher";
+import { LEERER_STAND, anlegen, ausgeben, belegSetzen, bezahltSetzen, felderSetzen, kopieren, offenerBetrag, zahlungVermerken, personSetzen, profilSetzen, steuerberatungSetzen, stornieren, type Stand, type Unterlage } from "../src/unterlagen/speicher";
 import { euerUebernahme, steuerpaket, type PaketErgebnis } from "../src/unterlagen/steuerpaket";
 import { offeneRechnungen, umsaetzeFuer } from "../src/unterlagen/ustAusRechnungen";
 import { euroText, faelligAm, offeneIds, rechnungBrutto, tageUeberfaellig } from "../src/unterlagen/ablage";
@@ -207,6 +207,8 @@ export function standBauen(): Bau {
     hinweise: r.hinweise ?? [],
     befreiung: r.befreiung ?? "",
     hinweis: r.hinweis,
+    // R12: Skonto als Bedingung der Rechnung (Zahlungsblock, XRechnung BT-20)
+    ...(r.skonto ? { skonto: true, skonto_prozent: String(r.skonto), skonto_tage: String(r.skontoTage ?? 10) } : {}),
     // R10: Abschlagsrechnung (Steuer mit Zahlung) und Leitweg-ID der Stadt (BT-10)
     abschlag: r.abschlag === true,
     kunde_leitweg_id: r.leitweg ?? "",
@@ -235,7 +237,16 @@ export function standBauen(): Bau {
         const warn = v("rechnung").pruefen?.(u.daten, s.betrieb) ?? [];
         if (warn.length) infos.push(`Rechnung ${r.nummer}: Prüfung der App meldet „${warn.join("“, „")}“.`);
         // Zahlungseingänge aus 2027 erst nach dem Erinnerungstest setzen – hier nur, was 2026 passiert
-        if (r.bezahlt && r.bezahlt.startsWith("2026-")) s = bezahltSetzen(s, r.id, r.bezahlt, t(r.bezahlt, 15));
+        if (r.bezahlt && r.bezahlt.startsWith("2026-")) {
+          // R12: mit Skonto – Zahlungseingang mit Betrag, Differenz als Skonto (§ 17 UStG)
+          if (r.skonto) {
+            const sk = D.skontoVon(r);
+            s = zahlungVermerken(s, r.id, { datum: r.bezahlt, betrag_cent: D.rechnungsSumme(r.pos).brutto - sk.brutto, minderung_cent: sk.brutto, art: "skonto" }, t(r.bezahlt, 15), `${r.id}-zahlung`);
+            const z = unterlage(r.id);
+            vergleichText(`Rechnung ${r.nummer} (Skonto)`, "nach Zahlung mit Skonto bezahlt, nichts offen", `${z.bezahlt ?? "offen"} / ${euro(offenerBetrag(s, z))}`, `${r.bezahlt} / 0,00`);
+            vergleichText(`Rechnung ${r.nummer} (Skonto)`, "XRechnung: Skonto-Zeile in BT-20", /#SKONTO#TAGE=\d+#PROZENT=2\.00#\n/.test(xrechnungUbl(eRechnungAus(z.daten, s.betrieb).daten, KU_HINWEIS)) ? "ja" : "nein", "ja");
+          } else s = bezahltSetzen(s, r.id, r.bezahlt, t(r.bezahlt, 15));
+        }
       },
     });
     if (r.storno) {
@@ -604,7 +615,7 @@ export function standBauen(): Bau {
         s = felderSetzen(s, id, { ...erg.werte, notiz: `Aus Rechnungen übernommen (Amtlos, ${erg.anzahl} Rechnungen, davon ${erg.ersatz} nach Rechnungsdatum zugeordnet). Vorsteuer aus ${erg.vorsteuerBelege} Belegen${erg.ohneVorsteuer ? `, ${erg.ohneVorsteuer} mit USt ohne Vorsteuerabzug` : ""}.` }, t(vaDatum[i]!, 9));
       } });
     const u = unterlage(id);
-    const grund19 = eq.skonto19 ? `Skonto-Minderung ${euro(eq.skonto19)} € (Zahlung 2026-021 am 09.10. mit 2 %) fehlt – die App kann beim Zahlungseingang keinen Betrag/Abzug vermerken.` : "";
+    const grund19 = eq.skonto19 ? `Skonto-Minderung ${euro(eq.skonto19)} € (Zahlung 2026-021 am 09.10. mit 2 %) – seit R12 als Minderung im Zeitraum der Zahlung vermerkt.` : "";
     // Rechnungen, die die App wegen eines Leistungszeitraums (Text statt Datum) nach dem Rechnungsdatum einordnet, bzw. Abschläge
     const verschoben = D.vorgaenge().filter((x) => x.art === "rechnung" && (x.r.abschlag || (x.r.leistungText && !/^\d{2}\.\d{2}\.\d{4}$/.test(x.r.leistungText))) && D.steuerQuartal(x).q !== D.quartal(x.datum) && (D.steuerQuartal(x).q === eq.q || D.quartal(x.datum) === eq.q));
     const grundAbschlag = verschoben.map((x) => `${x.nummer} (${x.r.abschlag ? "Abschlag vor Ausführung, Steuer mit Zahlung am " + D.de(x.bezahlt!) + " – Mindest-Ist, § 13 Abs. 1 Nr. 1 a Satz 4 UStG" : "Leistungszeitraum „" + x.r.leistungText + "“ endet im " + D.steuerQuartal(x).q}) zählt die App nach dem Rechnungsdatum ${D.de(x.datum)} in ${D.quartal(x.datum)}, gesetzlich in ${D.steuerQuartal(x).q}`).join("; ");
@@ -622,13 +633,13 @@ export function standBauen(): Bau {
   // ---------------------------------------------------------------- EÜR 2026 (Übernahme + USt-Zahlungen und AfA von Hand)
   const eu = D.euerUnabhaengig();
   let uebernahme!: ReturnType<typeof euerUebernahme>;
-  dok({ id: "euer", vorlage: "euer", datum: "2027-02-15", worum: "EÜR 2026: „Aus Rechnungen und Belegen übernehmen“, danach wie von der App verlangt ergänzt: an das Finanzamt gezahlte USt (Q4/2025, Q1–Q3/2026) und AfA Installationstester. Skonto nicht korrigiert (die App weist nicht darauf hin).",
+  dok({ id: "euer", vorlage: "euer", datum: "2027-02-15", worum: "EÜR 2026: „Aus Rechnungen und Belegen übernehmen“, danach wie von der App verlangt ergänzt: an das Finanzamt gezahlte USt (Q4/2025, Q1–Q3/2026) und AfA Installationstester. Skonto kommt aus dem Zahlungseingang (R12).",
     daten: () => ({}),
     danach: () => {
       uebernahme = euerUebernahme(s, "2026");
       s = felderSetzen(s, "euer", { jahr: "2026", einnahmen: uebernahme.einnahmen, ausgaben: uebernahme.ausgaben }, t("2027-02-15", 9));
       const zahl = (l: Record<string, string>[], k: string) => l.filter((x) => x.kategorie === k).reduce((a, x) => a + ausEuro(x.betrag ?? "0"), 0);
-      const skontoGrund = `Skonto 2026-021 (${euro(eu.skontoSumme)} € brutto) mindert den Zufluss; die App übernimmt den vollen Rechnungsbetrag.`;
+      const skontoGrund = `Skonto 2026-021 (${euro(eu.skontoSumme)} € brutto) mindert den Zufluss (seit R12 beim Zahlungseingang vermerkt).`;
       vergleich("EÜR-Übernahme", "Umsatzsteuerpflichtige Betriebseinnahmen (19 % netto + Nullsteuersatz PV)", zahl(uebernahme.einnahmen, EUER_ZEILE_STEUERPFLICHTIG), eu.rePflichtig, `${skontoGrund} PV zum Nullsteuersatz (${euro(eu.reNull)} €) stellt die App in die Zeile „umsatzsteuerfrei …“ (Steuerart „befreit“, apps/mobile/src/unterlagen/steuerpaket.ts:117).`);
       vergleich("EÜR-Übernahme", "Einnahmen für die der Empfänger die USt nach § 13b schuldet (Zeile „steuerfrei … § 13b“)", zahl(uebernahme.einnahmen, EUER_ZEILE_STEUERFREI), eu.re13b, "Nullsteuersatz-PV gehört nicht in diese Zeile (fachlich bestätigen).");
       vergleich("EÜR-Übernahme", "Vereinnahmte USt aus Rechnungen", zahl(uebernahme.einnahmen, "Vereinnahmte Umsatzsteuer sowie Umsatzsteuer auf unentgeltliche Wertabgaben"), eu.reUst, skontoGrund);
@@ -655,7 +666,7 @@ export function standBauen(): Bau {
   const euerErgebnis = v("euer").ergebnis!(unterlage("euer").daten);
   {
     const g = euerErgebnis.find((z) => z[0] === "Gewinn" || z[0] === "Verlust")!;
-    const grund = `Skonto ${euro(eu.skontoSumme)} € nicht abgezogen.`;
+    const grund = `Skonto ${euro(eu.skontoSumme)} € beim Zahlungseingang abgezogen (R12).`;
     vergleich("EÜR 2026 (fertig)", "Summe Betriebseinnahmen", ausEuro(euerErgebnis[0]![1]), eu.einnahmen, grund);
     vergleich("EÜR 2026 (fertig)", "Summe Betriebsausgaben", ausEuro(euerErgebnis[1]![1]), eu.ausgaben);
     vergleich("EÜR 2026 (fertig)", "AfA", ausEuro(euerErgebnis[2]![1]), eu.afa);

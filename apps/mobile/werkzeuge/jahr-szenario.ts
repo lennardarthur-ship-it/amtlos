@@ -20,6 +20,9 @@ import {
   eRechnungLesen,
   eintragAusVorschlag,
   fehlendeAngaben,
+  fehlendeTage,
+  kassenVerlauf,
+  kassenbuchDaten,
   kategorieFuer,
   neuerEintrag,
   pdfDateiname,
@@ -34,9 +37,10 @@ import {
   type Vorlage,
 } from "@amtlos/fachlogik";
 import { unzipSync } from "fflate";
-import { LEERER_STAND, anlegen, ausgeben, belegSetzen, bezahltSetzen, felderSetzen, personSetzen, profilSetzen, steuerberatungSetzen, stornieren, type Stand, type Unterlage } from "../src/unterlagen/speicher";
+import { LEERER_STAND, anlegen, ausgeben, belegSetzen, bezahltSetzen, felderSetzen, kasseSpeichern, personSetzen, profilSetzen, steuerberatungSetzen, stornieren, type Stand, type Unterlage } from "../src/unterlagen/speicher";
 import { euerUebernahme, steuerpaket, type PaketErgebnis } from "../src/unterlagen/steuerpaket";
 import { umsaetzeFuer } from "../src/unterlagen/ustAusRechnungen";
+import { kasseFuerUst } from "../src/unterlagen/kasse";
 import { fussAngaben, fusszeileStempeln } from "../src/unterlagen/fusszeile";
 import { mitSchriften } from "../src/unterlagen/schriften";
 import { auswertung } from "../src/pflichten/check";
@@ -75,7 +79,7 @@ export interface Bau {
   xmls: { datei: string; xml: string; nummer: string }[];
   ohneXml: { nummer: string; fehlt: string[] }[];
   vergleiche: { bereich: string; was: string; app: string; erwartet: string; ok: boolean }[];
-  ust: { q: string; app: Record<string, string>; appAnzahl: number; kasse: { k19: number; k7: number }; final: Record<string, string> }[];
+  ust: { q: string; app: Record<string, string>; appAnzahl: number; kasse: { k19: number; k7: number; tage: number }; final: Record<string, string> }[];
   euer: { uebernahme: ReturnType<typeof euerUebernahme>; final: Daten; ergebnis: [string, string][] };
   uebersprungen: { id: string; titel: string; grund: string }[];
   /** Pflichten-Check der App für das Café (Stichtag 15.01.2026) */
@@ -109,6 +113,8 @@ export function standBauen(): Bau {
     bundesland: "SN",
     "beschaeftigte.gesamt": 2,
     "kasse.elektronisch": true,
+    // R12: montags Ruhetag – zählt nicht als fehlender Kassenabschluss
+    "kasse.ruhetage": ["1"],
     "online.website": true,
     "ust.kleinunternehmer": false,
     steuerberater: true,
@@ -311,6 +317,25 @@ export function standBauen(): Bau {
     const erw = D.belegSumme(b);
     vergleich(`Beleg ${b.id} ${b.lieferant}`, "Brutto", app.brutto_cent, erw.brutto);
     vergleich(`Beleg ${b.id} ${b.lieferant}`, "Vorsteuer (App rechnet aus Brutto, Beleg weist aus)", app.vorsteuer_cent, erw.vorsteuer);
+  }
+
+  // ---------------------------------------------------------------- R12: Tagesabschlüsse der Kasse (Z-Bons) für das ganze Jahr
+  // wie die Inhaberin jeden Abend: Umsatz je Satz brutto, Kartenanteil, Geldtransit bzw. Privatentnahme des Tages
+  for (const [i, k] of D.KASSE_TAGE.entries()) {
+    const bewegungen = D.KASSEN_BEWEGUNGEN_ROH.filter((b) => b.datum === k.datum).map((b) => ({ art: b.art, betrag_cent: b.betrag }));
+    [s] = kasseSpeichern(s, { datum: k.datum, zbon: String(k.zbon), umsatz: [{ satz: 19, brutto_cent: k.b19 }, { satz: 7, brutto_cent: k.b7 }], karte_cent: k.b7 + k.b19 - k.bar, sonstige_cent: 0, bewegungen, ...(i === 0 ? { anfang_cent: D.KASSE_ANFANG_JAHR } : {}) }, t(k.datum, 22), `z${k.zbon}`);
+  }
+  {
+    const v = kassenVerlauf(s.kasse, s.belege);
+    vergleichText("Kasse (Tagesabschlüsse)", "Anzahl Tagesabschlüsse 2026 (Di–So geöffnet)", String(s.kasse.length), String(D.KASSE_TAGE.length));
+    vergleichText("Kasse (Tagesabschlüsse)", "Tage ohne Abschluss 2026 (Ruhetag Montag)", fehlendeTage(s.kasse, "2026-01-01", "2026-12-31", [1]).join(", ") || "keine", "keine");
+    vergleichText("Kasse (Tagesabschlüsse)", "Tage mit negativem Bargeldbestand", v.negativ.join(", ") || "keine", "keine");
+    const mai = v.tage.filter((x) => x.datum.startsWith("2026-05"));
+    vergleich("Kasse (Tagesabschlüsse)", "Bargeld am 31.05. (App, mit Barbelegen b17–b19)", mai[mai.length - 1]!.ende, D.kassenbuchEnde());
+    vergleich("Kasse (Tagesabschlüsse)", "Bargeld am Jahresende", v.tage[v.tage.length - 1]!.ende, D.kasseJahresende());
+    const kb = kassenbuchDaten(s.kasse, s.belege, "2026-05")!;
+    vergleich("Kasse (Tagesabschlüsse)", "Kassenbuch Mai aus der App: Anfangsbestand", cent(kb.anfang) ?? 0, D.KASSENBUCH_ANFANG);
+    vergleich("Kasse (Tagesabschlüsse)", "Kassenbuch Mai aus der App: Endbestand (Vorlage „Kassenbuch“)", ausEuro(vorlageFuer("kassenbuch")!.ergebnis!(kb as unknown as Daten)[0]![1]), D.kassenbuchEnde());
   }
 
   // ---------------------------------------------------------------- Unterlagen zum Betrieb (Vorlagen)
@@ -568,8 +593,9 @@ export function standBauen(): Bau {
     vergleich("Kassenbuch Mai", "Endbestand", ausEuro(erg[0]![1]), D.kassenbuchEnde());
   }
 
-  // ---------------------------------------------------------------- Umsatzsteuer-Voranmeldungen Q1–Q4 (Übernahme aus Rechnungen + Kasse von Hand)
+  // ---------------------------------------------------------------- Umsatzsteuer-Voranmeldungen Q1–Q4 (Übernahme aus Rechnungen und Tagesabschlüssen)
   const erwartetQ = D.ustQuartale();
+  const periodeVon = (iso: string) => `${iso.slice(0, 4)}-Q${Math.floor((Number(iso.slice(5, 7)) - 1) / 3) + 1}`;
   const ust: Bau["ust"] = [];
   const vaDatum = ["2026-04-08", "2026-07-08", "2026-10-08", "2027-01-08"];
   for (const [i, eq] of erwartetQ.entries()) {
@@ -577,40 +603,37 @@ export function standBauen(): Bau {
     let app: Record<string, string> = {};
     let anzahl = 0;
     const id = `ust-q${i + 1}`;
-    dok({ id, vorlage: "ust_voranmeldung", datum: vaDatum[i]!, worum: `USt-Voranmeldung ${i + 1}. Quartal 2026: Umsätze und Vorsteuer mit „Aus Rechnungen übernehmen“ (umsaetzeFuer, Soll), danach die Kassenumsätze laut Z-Bons von Hand addiert (19 %: ${euro(eq.k19)} €, 7 %: ${euro(eq.k7)} €).`,
+    let kasseTage = 0;
+    dok({ id, vorlage: "ust_voranmeldung", datum: vaDatum[i]!, worum: `USt-Voranmeldung ${i + 1}. Quartal 2026: Umsätze und Vorsteuer mit „Aus Rechnungen übernehmen“ (umsaetzeFuer, Soll) – seit R12 samt Kassenumsätzen aus den Tagesabschlüssen (19 %: ${euro(eq.k19)} €, 7 %: ${euro(eq.k7)} € netto), nichts von Hand ergänzt.`,
       daten: () => ({}),
       danach: () => {
-        const erg = umsaetzeFuer(s.unterlagen, periode, s.betrieb, "soll", s.belege);
+        const erg = umsaetzeFuer(s.unterlagen, periode, s.betrieb, "soll", s.belege, undefined, kasseFuerUst(s, vaDatum[i]!));
         if (!erg) {
           auffaellig.push(`umsaetzeFuer(${periode}) lieferte null.`);
           return;
         }
         app = erg.werte;
         anzahl = erg.anzahl;
-        s = felderSetzen(s, id, erg.werte, t(vaDatum[i]!, 9));
+        kasseTage = erg.kasseTage;
+        vergleichText(`USt ${periode} (Kasse)`, "Tage ohne Kassenabschluss (Kassenhinweis entfällt)", erg.kasseFehlend?.join(", ") || "keine", "keine");
+        s = felderSetzen(s, id, { ...erg.werte, notiz: `Aus Rechnungen und Tagesabschlüssen übernommen (Amtlos, ${erg.anzahl} Rechnungen, ${erg.kasseTage} Kassenabschlüsse${eq.r0 ? "; innergemeinschaftliche Lieferung, Kz 41 – Zusammenfassende Meldung abgeben" : ""}). Vorsteuer aus ${erg.vorsteuerBelege} Belegen.` }, t(vaDatum[i]!, 9));
         if (erg.ersatz) infos.push(`${periode}: ${erg.ersatz} Rechnung(en) ohne eindeutiges Leistungsdatum nach Rechnungsdatum zugeordnet.`);
-        // Kasse dazu (wie eine Inhaberin es tun müsste – die App kennt die Kassenumsätze nicht)
-        const u19 = ausEuro(erg.werte.umsatz_19 ?? "0") + eq.k19;
-        const u7 = ausEuro(erg.werte.umsatz_7 ?? "0") + eq.k7;
-        s = felderSetzen(s, id, {
-          umsatz_19: euro(u19), umsatz_7: euro(u7),
-          notiz: `Aus Rechnungen übernommen (Amtlos, ${erg.anzahl} Rechnungen): 19 % ${erg.werte.umsatz_19} €, 7 % ${erg.werte.umsatz_7} €, Kz 41 ${erg.werte.umsatz_igl} €, weitere ohne USt ${erg.werte.umsatz_frei} €${eq.r0 ? " (innergemeinschaftliche Lieferung, Kz 41; Zusammenfassende Meldung abgeben)" : ""}. Vorsteuer aus ${erg.vorsteuerBelege} Belegen.\nZuzüglich Kassenumsätze laut Z-Bons (netto): 19 % ${euro(eq.k19)} €, 7 % ${euro(eq.k7)} €.`,
-        }, t(vaDatum[i]!, 9));
       } });
     const u = unterlage(id);
-    vergleich(`USt ${periode} (Übernahme aus Rechnungen)`, "Umsätze 19 %", ausEuro(app.umsatz_19 ?? "0"), eq.r19);
-    vergleich(`USt ${periode} (Übernahme aus Rechnungen)`, "Umsätze 7 %", ausEuro(app.umsatz_7 ?? "0"), eq.r7);
+    vergleich(`USt ${periode} (Übernahme Rechnungen + Kasse)`, "Umsätze 19 % (Kz 81)", ausEuro(app.umsatz_19 ?? "0"), eq.r19 + eq.k19);
+    vergleich(`USt ${periode} (Übernahme Rechnungen + Kasse)`, "Umsätze 7 % (Kz 86)", ausEuro(app.umsatz_7 ?? "0"), eq.r7 + eq.k7);
     vergleich(`USt ${periode} (Übernahme aus Rechnungen)`, "Umsätze ohne USt (igl, Kz 41)", ausEuro(app.umsatz_igl ?? "0"), eq.r0);
     vergleich(`USt ${periode} (Übernahme aus Belegen)`, "Vorsteuer", ausEuro(app.vorsteuer ?? "0"), eq.vorsteuer);
+    vergleichText(`USt ${periode} (Kasse)`, "übernommene Tagesabschlüsse", String(kasseTage), String(D.KASSE_TAGE.filter((k) => periodeVon(k.datum) === periode).length));
     const erg = v("ust_voranmeldung").ergebnis!(u.daten);
     vergleich(`USt ${periode} (fertige Voranmeldung)`, "Zahllast (mit Cent)", ausEuro(erg[2]![1]) * (erg[2]![0] === "Erstattung" ? -1 : 1), eq.zahllast);
-    ust.push({ q: periode, app, appAnzahl: anzahl, kasse: { k19: eq.k19, k7: eq.k7 }, final: Object.fromEntries(["umsatz_19", "umsatz_7", "umsatz_igl", "umsatz_48", "umsatz_13b", "umsatz_frei", "vorsteuer"].map((k) => [k, String(u.daten[k] ?? "")])) });
+    ust.push({ q: periode, app, appAnzahl: anzahl, kasse: { k19: eq.k19, k7: eq.k7, tage: kasseTage }, final: Object.fromEntries(["umsatz_19", "umsatz_7", "umsatz_igl", "umsatz_48", "umsatz_13b", "umsatz_frei", "vorsteuer"].map((k) => [k, String(u.daten[k] ?? "")])) });
   }
 
   // ---------------------------------------------------------------- EÜR 2026 (Übernahme + Kasse, USt-Zahlungen, AfA von Hand)
   const eu = D.euerUnabhaengig();
   let uebernahme!: ReturnType<typeof euerUebernahme>;
-  dok({ id: "euer", vorlage: "euer", datum: "2027-02-15", worum: "EÜR 2026: „Aus Rechnungen und Belegen übernehmen“ (euerUebernahme), danach von Hand ergänzt: Kasseneinnahmen netto und USt, an das Finanzamt gezahlte USt (Q4/2025, Q1–Q3/2026), AfA Haubenspülmaschine.",
+  dok({ id: "euer", vorlage: "euer", datum: "2027-02-15", worum: "EÜR 2026: „Aus Rechnungen und Belegen übernehmen“ (euerUebernahme, seit R12 mit den Kasseneinnahmen aus den Tagesabschlüssen), danach von Hand ergänzt: an das Finanzamt gezahlte USt (Q4/2025, Q1–Q3/2026), AfA Haubenspülmaschine.",
     daten: () => ({}),
     danach: () => {
       uebernahme = euerUebernahme(s, "2026");
@@ -618,10 +641,14 @@ export function standBauen(): Bau {
       const zahl = (l: Record<string, string>[], k: string) => l.filter((x) => x.kategorie === k).reduce((a, x) => a + ausEuro(x.betrag ?? "0"), 0);
       // igl gehört in die Zeile „Umsatzsteuerfreie … Betriebseinnahmen“, nicht zu den steuerpflichtigen
       const igl = D.vorgaenge().filter((x) => x.bezahlt?.startsWith("2026-")).reduce((a, x) => a + x.vz * (x.s.gruppen["0"]?.netto ?? 0), 0);
-      vergleich("EÜR-Übernahme", "Einnahmen netto aus bezahlten Rechnungen, steuerpflichtig", zahl(uebernahme.einnahmen, EUER_ZEILE_STEUERPFLICHTIG), eu.reNetto - igl);
+      const kasseZeile = (anfang: string) => uebernahme.einnahmen.filter((x) => (x.text ?? "").startsWith(anfang)).reduce((a, x) => a + ausEuro(x.betrag ?? "0"), 0);
+      vergleich("EÜR-Übernahme", "Einnahmen netto aus bezahlten Rechnungen, steuerpflichtig", zahl(uebernahme.einnahmen, EUER_ZEILE_STEUERPFLICHTIG) - kasseZeile("Kasseneinnahmen laut"), eu.reNetto - igl);
+      // R12: Kasseneinnahmen kommen aus den Tagesabschlüssen (vorher von Hand ergänzt)
+      vergleich("EÜR-Übernahme", "Kasseneinnahmen netto (Tagesabschlüsse)", kasseZeile("Kasseneinnahmen laut"), eu.kasseNetto);
+      vergleich("EÜR-Übernahme", "Umsatzsteuer auf Kasseneinnahmen", kasseZeile("Umsatzsteuer auf Kasseneinnahmen"), eu.kasseUst);
       vergleich("EÜR-Übernahme", "Einnahmen netto aus bezahlten Rechnungen, steuerfrei (igL 2026-012)", zahl(uebernahme.einnahmen, EUER_ZEILE_STEUERFREI), igl);
       vergleichText("EÜR-Übernahme", "Hinweis: USt-Vorauszahlungen und AfA selbst ergänzen", /Umsatzsteuer-Vorauszahlungen/.test(uebernahme.hinweis) && /AfA/.test(uebernahme.hinweis) ? "ja" : "nein", "ja");
-      vergleich("EÜR-Übernahme", "Vereinnahmte USt aus Rechnungen", zahl(uebernahme.einnahmen, "Vereinnahmte Umsatzsteuer sowie Umsatzsteuer auf unentgeltliche Wertabgaben"), eu.reUst);
+      vergleich("EÜR-Übernahme", "Vereinnahmte USt aus Rechnungen", zahl(uebernahme.einnahmen, "Vereinnahmte Umsatzsteuer sowie Umsatzsteuer auf unentgeltliche Wertabgaben") - kasseZeile("Umsatzsteuer auf Kasseneinnahmen"), eu.reUst);
       vergleich("EÜR-Übernahme", "Gezahlte Vorsteuer", zahl(uebernahme.ausgaben, "Gezahlte Vorsteuerbeträge"), eu.vorsteuer);
       vergleich("EÜR-Übernahme", "Betriebsausgaben aus Belegen (ohne Vorsteuer, ohne Anlage)", uebernahme.ausgaben.filter((x) => x.kategorie !== "Gezahlte Vorsteuerbeträge").reduce((a, x) => a + ausEuro(x.betrag ?? "0"), 0), eu.ausgabenBelege);
       for (const [kat, w] of Object.entries(eu.nachKategorie)) {
@@ -638,9 +665,7 @@ export function standBauen(): Bau {
       for (const x of uebernahme.einnahmen) if (!vsE.includes(x.kategorie ?? "")) auffaellig.push(`EÜR-Übernahme: Einnahmen-Zeile „${x.kategorie}“ steht nicht in der Vorschlagsliste der EÜR-Vorlage.`);
       // von Hand ergänzen
       const d = unterlage("euer").daten;
-      const ein = [...(d.einnahmen as Eintrag[]),
-        { datum: "", text: "Kasseneinnahmen laut Z-Bons (netto), Januar–Dezember", kategorie: "Umsatzsteuerpflichtige Betriebseinnahmen", betrag: euro(eu.kasseNetto) },
-        { datum: "", text: "Umsatzsteuer auf Kasseneinnahmen", kategorie: "Vereinnahmte Umsatzsteuer sowie Umsatzsteuer auf unentgeltliche Wertabgaben", betrag: euro(eu.kasseUst) }];
+      const ein = [...(d.einnahmen as Eintrag[])];
       const qz = D.ustQuartale();
       const aus = [...(d.ausgaben as Eintrag[]),
         { datum: D.UST_Q4_2025.gezahlt, text: "USt-Vorauszahlung Q4/2025", kategorie: "An das Finanzamt gezahlte und gegebenenfalls verrechnete Umsatzsteuer", betrag: euro(D.UST_Q4_2025.betrag) },
@@ -665,7 +690,7 @@ export function standBauen(): Bau {
     daten: (h) => ({ jahr: "2026", arten: ["est", "gewst", "ust"], gewinn: `${gewinn[0] === "Verlust" ? "-" : ""}${gewinn[1].replace(/[€\s\u00a0]/g, "")}`, umsatz: euro(vaSumme("umsatz_19") + vaSumme("umsatz_7") + (vaSumme("umsatz_frei") + vaSumme("umsatz_igl") + vaSumme("umsatz_48") + vaSumme("umsatz_13b"))), ust_jahr: euro(ustJahr), vorsteuer_jahr: euro(vaSumme("vorsteuer")),
       vorauszahlungen: eintraege("steuererklaerung", "vorauszahlungen", [...[1, 2, 3, 4].map((q) => ({ art: `Einkommensteuer Q${q}`, betrag: "1.850,00" })), ...[1, 2, 3, 4].map((q) => ({ art: `Gewerbesteuer Q${q}`, betrag: "220,00" }))], h),
       weiteres: eintraege("steuererklaerung", "weiteres", [{ was: "Kranken- und Pflegeversicherung (freiwillig gesetzlich, AOK PLUS)", betrag: "5.874,00", beleg: true }, { was: "Basisrente (Rürup), Beiträge 2026", betrag: "2.400,00", beleg: true }, { was: "Spende an den Kunstverein Plagwitz e. V.", betrag: "150,00", beleg: false }], h),
-      notiz: "Kassenumsätze sind in den Voranmeldungen von Hand ergänzt (Z-Bons). Innergemeinschaftliche Lieferung nach Österreich: Zusammenfassende Meldung für das 3. Quartal abgegeben." }) });
+      notiz: "Kassenumsätze kommen aus den Tagesabschlüssen in Amtlos (Z-Bons). Innergemeinschaftliche Lieferung nach Österreich: Zusammenfassende Meldung für das 3. Quartal abgegeben." }) });
   {
     const j = D.jahresSummen();
     vergleich("Steuererklärung", "Umsätze im Jahr netto (Summe der Voranmeldungen)", vaSumme("umsatz_19") + vaSumme("umsatz_7") + (vaSumme("umsatz_frei") + vaSumme("umsatz_igl") + vaSumme("umsatz_48") + vaSumme("umsatz_13b")), j.r19 + j.r7 + j.r0 + j.k19 + j.k7);

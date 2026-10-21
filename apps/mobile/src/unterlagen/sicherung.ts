@@ -289,7 +289,7 @@ export function sicherungLesenMitDateien(text: string, passwort: string): { stan
  * Dateien ist nicht vollständig: Sie darf nicht als Sicherung zählen und „Alle Daten löschen“ nicht freigeben.
  */
 export function fehlendeDateien(stand: Stand, dateien: Dateien): string[] {
-  return [...new Set([...stand.belege, ...stand.belegArchiv].map((b) => b.datei).filter((n): n is string => Boolean(n) && !dateien[n!]))];
+  return [...new Set([...stand.belege, ...stand.belegArchiv, ...stand.kasse].map((b) => b.datei).filter((n): n is string => Boolean(n) && !dateien[n!]))];
 }
 
 /** Kennung eines Sicherungsschlüssels (aus dem Salz) – Ordnername der Belegdateien in iCloud. */

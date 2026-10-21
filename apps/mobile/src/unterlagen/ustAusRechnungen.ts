@@ -30,7 +30,7 @@
  * - Ersatzrechnung nach Storno über die ausdrückliche Verknüpfung (`ersetzt`, gesetzt beim Kopieren aus der stornierten
  *   Rechnung); nur bei älteren Daten ohne Verknüpfung vorsichtig geraten: gleicher Kunde, gleicher Betrag, gleiche Leistung.
  */
-import { eRechnungAus, istEuAusland, kennzahlBefreiung, steuerschuldFuer, summen, umsaetzeNachSatz, ustZeitraum, vorsteuerFuer, type Beleg, type Betrieb } from "@amtlos/fachlogik";
+import { eRechnungAus, fehlendeTage, istEuAusland, kassenUmsatz, kennzahlBefreiung, steuerschuldFuer, summen, ustZeitraum, vorsteuerFuer, zahlungsAnteile, type Beleg, type Betrieb, type Kassenabschluss, type RechnungsDaten } from "@amtlos/fachlogik";
 import { nichtZaehlend, type Unterlage } from "./speicher";
 
 export type Versteuerung = "soll" | "ist";
@@ -159,8 +159,11 @@ export function zuordnungsTage(unterlagen: Unterlage[], betrieb: Betrieb, v: Ver
 }
 
 /** Monate und Quartale mit zuordenbaren Rechnungen – neueste zuerst. */
-export function perioden(unterlagen: Unterlage[], betrieb: Betrieb, v: Versteuerung = "soll", belege: Beleg[] = []): string[] {
+export function perioden(unterlagen: Unterlage[], betrieb: Betrieb, v: Versteuerung = "soll", belege: Beleg[] = [], kasse: Kassenabschluss[] = []): string[] {
   const set = new Set<string>();
+  // R12: Zeiträume mit Kassenabschlüssen und mit Zahlungen (Skonto, Teilzahlungen)
+  for (const k of kasse) if (!k.geschlossen) for (const p of periodenVon(k.datum)) set.add(p);
+  for (const u of unterlagen) for (const z of u.zahlungen ?? []) for (const p of periodenVon(z.datum)) set.add(p);
   // Vorsteuer aus Belegen zählt nach Belegdatum (E-133) – auch Zeiträume nur mit Belegen
   for (const b of belege) for (const p of periodenVon(b.datum)) set.add(p);
   const korr = korrekturen(unterlagen, betrieb);
@@ -232,14 +235,30 @@ export interface UstUebernahme {
   vorsteuerPruefen: boolean;
   /** § 13b-Belege im Zeitraum (Kz 46/47, 84/85, 67) */
   steuerschuldBelege: number;
+  /** R12: Kassenabschlüsse mit Umsatz im Zeitraum (übernommen) */
+  kasseTage: number;
+  /** R12: Tage im Zeitraum ohne Kassenabschluss – null, wenn es noch gar keinen Kassenabschluss gibt */
+  kasseFehlend: string[] | null;
+  /** R12: Rechnungen mit Skonto bzw. Minderung, die im Zeitraum mindern */
+  minderungen: number;
 }
+
+/** R12: Kassenabschlüsse für die Voranmeldung – Ruhetage (Wochentage 0–6) und heutiger Tag für die fehlenden Tage. */
+export interface KasseFuerUst {
+  abschluesse: Kassenabschluss[];
+  ruhetage?: number[];
+  heute?: string;
+}
+
+/** Steuergruppen einer Rechnung mit Vorzeichen (Storno negativ). */
+const volleGruppen = (d: RechnungsDaten) => summen(d.positionen, d.kleinunternehmer).gruppen.map((g) => ({ satz: g.satz, netto_cent: g.netto_cent * (d.art === "storno" ? -1 : 1) }));
 
 /**
  * Felder der Voranmeldung für einen Zeitraum („JJJJ-MM“ oder „JJJJ-Qn“). `kleinunternehmer`: Antwort im Pflichten-Check
  * („ust.kleinunternehmer“); ohne Antwort gilt als Kleinunternehmer, wessen Rechnungen im Zeitraum alle Kleinunternehmer-
  * Rechnungen sind. Dann wird nichts übernommen – auch keine Vorsteuer.
  */
-export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: Betrieb, v: Versteuerung = "soll", belege: Beleg[] = [], kleinunternehmer?: boolean): UstUebernahme | null {
+export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: Betrieb, v: Versteuerung = "soll", belege: Beleg[] = [], kleinunternehmer?: boolean, kasse?: KasseFuerUst): UstUebernahme | null {
   const z = ustZeitraum(periode);
   if (!z) return null;
   const korr = korrekturen(unterlagen, betrieb);
@@ -250,6 +269,8 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
   });
   const gutschriften = gutschriftenListe.length;
   const alle = festeRechnungen(unterlagen)
+    // R12: Ist mit einzelnen Zahlungen – die Zahlungen zählen je für sich (unten), nicht die ganze Rechnung
+    .filter((u) => !(v === "ist" && u.zahlungen?.length && !istStornoU(u)))
     .map((u) => zuordnen(u, v, betrieb, korr))
     .filter((x) => x.tag && x.tag >= z.von && x.tag <= z.bis);
   const kuZeitraum = kuImZeitraum(alle.map((x) => x.u), kleinunternehmer) ?? false;
@@ -267,17 +288,39 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
           ...(mitVorsteuer && rc.vorsteuer_cent ? { vorsteuer_13b: betragText(rc.vorsteuer_cent) } : {}),
         }
       : {};
-  if (ku) return { werte: { zeitraum: periodeText(periode), ...rcWerte(false) }, anzahl: 0, ersatz: 0, offen: 0, vorsteuerBelege: 0, ohneVorsteuer: 0, kleinunternehmer: true, kuGemischt: false, gutschriften, vorsteuerPruefen: false, steuerschuldBelege: rc.anzahl };
+  const kasseFehlend = kasse?.abschluesse.length ? fehlendeTage(kasse.abschluesse, z.von, z.bis, kasse.ruhetage ?? [], kasse.heute) : null;
+  if (ku) return { werte: { zeitraum: periodeText(periode), ...rcWerte(false) }, anzahl: 0, ersatz: 0, offen: 0, vorsteuerBelege: 0, ohneVorsteuer: 0, kleinunternehmer: true, kuGemischt: false, gutschriften, vorsteuerPruefen: false, steuerschuldBelege: rc.anzahl, kasseTage: 0, kasseFehlend: null, minderungen: 0 };
   // einzelne Kleinunternehmer-Rechnungen (z. B. aus der Zeit vor dem Wechsel zur Regelbesteuerung) zählen nicht mit
   const im = alle.filter((x) => !kuRechnung(x.u));
-  const rechnungen = im.map(({ u }) => eRechnungAus(u.daten, betrieb).daten);
-  const gruppen = umsaetzeNachSatz(rechnungen.map((daten) => ({ art: daten.art ?? "rechnung", kleinunternehmer: daten.kleinunternehmer, positionen: daten.positionen })));
-  const summe = (f: (s: number | null) => boolean) => gruppen.filter((g) => f(g.satz)).reduce((a, g) => a + g.netto_cent, 0);
+  // R12: Posten je Rechnung – ganze Rechnung, Zahlung (Ist) oder Minderung (Soll) – mit Steuergruppen und Vorzeichen
+  const posten: { daten: RechnungsDaten; gruppen: { satz: number | null; netto_cent: number }[] }[] = im.map(({ u }) => {
+    const daten = eRechnungAus(u.daten, betrieb).daten;
+    return { daten, gruppen: volleGruppen(daten) };
+  });
+  const imZ = (tag: string) => tag >= z.von && tag <= z.bis;
+  let minderungen = 0;
+  for (const u of festeRechnungen(unterlagen)) {
+    if (kuRechnung(u) || istStornoU(u) || !u.zahlungen?.length) continue;
+    const daten = eRechnungAus(u.daten, betrieb).daten;
+    const anteile = zahlungsAnteile(summen(daten.positionen, daten.kleinunternehmer).gruppen, u.zahlungen);
+    let mindert = false;
+    for (const a of anteile) {
+      if (!imZ(a.zahlung.datum)) continue;
+      // Ist: je Zahlung der erhaltene Betrag; Soll: die Minderung (§ 17 UStG) im Zeitraum der Zahlung
+      if (v === "ist") posten.push({ daten, gruppen: a.erhalten.map((x) => ({ satz: x.satz, netto_cent: x.netto_cent })) });
+      else if (a.minderung.some((x) => x.brutto_cent)) {
+        posten.push({ daten, gruppen: a.minderung.map((x) => ({ satz: x.satz, netto_cent: -x.netto_cent })) });
+        mindert = true;
+      }
+    }
+    if (mindert) minderungen++;
+  }
+  const summe = (f: (s: number | null) => boolean) => posten.reduce((a, p) => a + p.gruppen.filter((g) => f(g.satz)).reduce((b, g) => b + g.netto_cent, 0), 0);
   // Umsätze zu 0 % nach Kennzahl: igL → Kz 41; Steuerschuldnerschaft des Empfängers im Inland → Kz 60, an Unternehmen im
   // EU-Ausland → Kz 21, außerhalb der EU → Kz 45; Nullsteuersatz → Kz 87; Befreiung nach § 4 Nr. 8–29 → Kz 48, Nr. 1 a–7 → Kz 43
   const ohne = { igl: 0, rc: 0, kz21: 0, kz45: 0, kz87: 0, kz48: 0, kz43: 0 };
-  for (const daten of rechnungen) {
-    const null0 = summen(daten.positionen, daten.kleinunternehmer).gruppen.filter((g) => g.satz === 0).reduce((a, g) => a + g.netto_cent, 0) * (daten.art === "storno" ? -1 : 1);
+  for (const { daten, gruppen } of posten) {
+    const null0 = gruppen.filter((g) => g.satz === 0).reduce((a, g) => a + g.netto_cent, 0);
     const land = (daten.kunde.land ?? "DE").toUpperCase();
     if (daten.steuerart === "igl") ohne.igl += null0;
     else if (daten.steuerart === "reverse_charge") {
@@ -301,6 +344,8 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
     return a + summen(daten.positionen, daten.kleinunternehmer).ust_cent * (daten.art === "storno" ? -1 : 1);
   }, 0);
   const verteilt = ohne.igl + ohne.rc + ohne.kz21 + ohne.kz45 + ohne.kz87 + ohne.kz48 + ohne.kz43;
+  // R12: Kassenumsätze nach dem Tag des Abschlusses (Netto je Monat aus dem Brutto)
+  const ka = kasse?.abschluesse.length ? kassenUmsatz(kasse.abschluesse, z.von, z.bis) : null;
   return {
     vorsteuerBelege: vst.anzahl,
     ohneVorsteuer: vst.ohne,
@@ -312,10 +357,13 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
     gutschriften,
     vorsteuerPruefen: ohne.kz48 > 0 && vst.cent > 0,
     steuerschuldBelege: rc.anzahl,
+    kasseTage: ka?.tage ?? 0,
+    kasseFehlend,
+    minderungen,
     werte: {
       zeitraum: periodeText(periode),
-      umsatz_19: betragText(summe((s) => s === 19)),
-      umsatz_7: betragText(summe((s) => s === 7)),
+      umsatz_19: betragText(summe((s) => s === 19) + (ka?.je[19].netto ?? 0)),
+      umsatz_7: betragText(summe((s) => s === 7) + (ka?.je[7].netto ?? 0)),
       umsatz_igl: betragText(ohne.igl),
       umsatz_48: betragText(ohne.kz48),
       umsatz_13b: betragText(ohne.rc),
@@ -323,7 +371,7 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
       umsatz_45: betragText(ohne.kz45),
       umsatz_87: betragText(ohne.kz87),
       umsatz_43: betragText(ohne.kz43),
-      umsatz_frei: betragText(frei - verteilt),
+      umsatz_frei: betragText(frei - verteilt + (ka?.je[0].netto ?? 0)),
       ...(belege.length || vstGutschriften ? { vorsteuer: betragText(vst.cent + vstGutschriften) } : {}),
       ...rcWerte(true),
     },

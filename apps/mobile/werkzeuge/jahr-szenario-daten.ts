@@ -436,20 +436,73 @@ export const KASSE_MONATE = Object.keys(KASSE_BRUTTO)
     return { monat: `2026-${m}`, b7: k.b7, b19: k.b19, n7: a7.netto, u7: a7.ust, n19: a19.netto, u19: a19.ust };
   });
 
-/** Kassenbuch der Bargeldkasse für Mai 2026 (Bareinnahmen lt. Z-Bon, Barausgaben, Geldtransit zur Bank) */
-export const KASSENBUCH_ANFANG = 41230;
+/**
+ * R12: Tagesabschlüsse für das ganze Jahr – Mai mit den Tageswerten oben, die übrigen Monate: die Monatssumme je Satz auf
+ * die Öffnungstage (Di–So) verteilt (letzter Tag nimmt den Rest), Bar-Anteil 38–48 %; Z-Bon-Nummern lückenlos (Mai
+ * beginnt wie bisher mit 1204). So gibt die App die Kassenumsätze selbst in Voranmeldung, EÜR und Stapel.
+ */
+const offeneTage = (m: string) => {
+  const tage: string[] = [];
+  const ende = new Date(Date.UTC(2026, Number(m), 0)).getUTCDate();
+  for (let t = 1; t <= ende; t++) {
+    const iso = `2026-${m}-${String(t).padStart(2, "0")}`;
+    if (new Date(`${iso}T12:00:00Z`).getUTCDay() !== 1) tage.push(iso);
+  }
+  return tage;
+};
+export const KASSE_TAGE: KassenTag[] = (() => {
+  const r = zufall(20261231);
+  const monate = Object.keys(KASSE_BRUTTO).sort();
+  const vorMai = monate.filter((m) => m < "05").reduce((a, m) => a + offeneTage(m).length, 0);
+  let zbon = 1204 - vorMai;
+  const alle: KassenTag[] = [];
+  for (const m of monate) {
+    if (m === "05") {
+      alle.push(...KASSE_MAI);
+      zbon = KASSE_MAI[KASSE_MAI.length - 1]!.zbon + 1;
+      continue;
+    }
+    const tage = offeneTage(m);
+    const w = tage.map((d) => { const wt = new Date(`${d}T12:00:00Z`).getUTCDay(); return (wt === 0 || wt === 6 ? 1.6 : 1) * (0.85 + 0.3 * r()); });
+    const sw = sum(w);
+    const k = KASSE_BRUTTO[m]!;
+    let rest7 = k.b7;
+    let rest19 = k.b19;
+    tage.forEach((d, i) => {
+      const letzter = i === tage.length - 1;
+      const b7 = letzter ? rest7 : Math.round((k.b7 * w[i]!) / sw);
+      const b19 = letzter ? rest19 : Math.round((k.b19 * w[i]!) / sw);
+      rest7 -= b7;
+      rest19 -= b19;
+      alle.push({ datum: d, zbon: zbon++, b7, b19, bar: Math.round((b7 + b19) * (0.38 + 0.1 * r())) });
+    });
+  }
+  return alle;
+})();
+
+/** Bargeldkasse 01.01.2026 (Anfangsbestand des ersten Tagesabschlusses in der App) */
+export const KASSE_ANFANG_JAHR = 41230;
 export interface KbEintrag { datum: string; beleg: string; text: string; einnahme: number; ausgabe: number }
-export const KASSENBUCH_MAI: KbEintrag[] = (() => {
+/** Bewegungen der Bargeldkasse je Tag (Geldtransit dienstags, Privatentnahme 30.05.) – für die Tagesabschlüsse der App */
+export interface KassenBewegungRoh { datum: string; art: "transit" | "entnahme"; betrag: number }
+/**
+ * Kassenbuch der Bargeldkasse für das ganze Jahr (Bareinnahmen lt. Z-Bon, Barausgaben, Geldtransit zur Bank): dienstags vor
+ * der Öffnung alles über 400 € zur Bank (auf volle 10 € abgerundet), Privatentnahme 200 € am 30.05.
+ */
+const KASSENBUCH_JAHR: { eintraege: KbEintrag[]; bewegungen: KassenBewegungRoh[]; bestandVor: Map<string, number> } = (() => {
   const e: KbEintrag[] = [];
-  let bestand = KASSENBUCH_ANFANG;
+  const bewegungen: KassenBewegungRoh[] = [];
+  const bestandVor = new Map<string, number>();
+  let bestand = KASSE_ANFANG_JAHR;
   let transit = 1;
-  const barBelege = BELEGE.filter((b) => b.zahlung === "bar" && b.datum.startsWith("2026-05"));
-  for (const t of KASSE_MAI) {
-    // dienstags vor Öffnung: Bargeld bis auf 400 € Wechselgeld zur Bank bringen
+  const barBelege = BELEGE.filter((b) => b.zahlung === "bar");
+  for (const t of KASSE_TAGE) {
+    bestandVor.set(t.datum, bestand);
     const wt = new Date(`${t.datum}T12:00:00Z`).getUTCDay();
     if (wt === 2 && bestand > 40000) {
       const betrag = Math.floor((bestand - 40000) / 1000) * 1000;
-      e.push({ datum: t.datum, beleg: `GT-05-${String(transit++).padStart(2, "0")}`, text: "Geldtransit: Einzahlung Sparkasse (Tagesumsätze)", einnahme: 0, ausgabe: betrag });
+      e.push({ datum: t.datum, beleg: `GT-${t.datum.slice(5, 7)}-${String(transit++).padStart(2, "0")}`, text: "Geldtransit: Einzahlung Sparkasse (Tagesumsätze)", einnahme: 0, ausgabe: betrag });
+      bewegungen.push({ datum: t.datum, art: "transit", betrag });
       bestand -= betrag;
     }
     for (const b of barBelege.filter((x) => x.datum === t.datum)) {
@@ -461,12 +514,19 @@ export const KASSENBUCH_MAI: KbEintrag[] = (() => {
     bestand += t.bar;
     if (t.datum === "2026-05-30") {
       e.push({ datum: t.datum, beleg: "PE-05", text: "Privatentnahme Inhaberin (Eigenbeleg)", einnahme: 0, ausgabe: 20000 });
+      bewegungen.push({ datum: t.datum, art: "entnahme", betrag: 20000 });
       bestand -= 20000;
     }
   }
-  return e;
+  return { eintraege: e, bewegungen, bestandVor };
 })();
+export const KASSEN_BEWEGUNGEN_ROH = KASSENBUCH_JAHR.bewegungen;
+/** Kassenbuch Mai: Anfangsbestand am 01.05. aus dem Jahresverlauf */
+export const KASSENBUCH_ANFANG = KASSENBUCH_JAHR.bestandVor.get(KASSE_MAI[0]!.datum)!;
+export const KASSENBUCH_MAI: KbEintrag[] = KASSENBUCH_JAHR.eintraege.filter((x) => x.datum.startsWith("2026-05"));
 export const kassenbuchEnde = () => KASSENBUCH_ANFANG + sum(KASSENBUCH_MAI.map((x) => x.einnahme - x.ausgabe));
+/** Bargeld am Jahresende (unabhängig gerechnet) */
+export const kasseJahresende = () => KASSE_ANFANG_JAHR + sum(KASSENBUCH_JAHR.eintraege.map((x) => x.einnahme - x.ausgabe));
 
 // ---------------------------------------------------------------- weitere Annahmen
 

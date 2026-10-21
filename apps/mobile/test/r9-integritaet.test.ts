@@ -172,7 +172,7 @@ describe("M4 und Versionsprüfung – nichts verwerfen, nichts überschreiben", 
     }
     const k = zufallsSchluessel(zufall);
     expect(() => standEntschluesseln(tresorSchliessen(JSON.stringify({ version: 99 }), k, zufall(12)), k)).toThrow(SyncFehler);
-    const datei = sicherungErstellen({ ...LEERER_STAND, version: 99 as 1 }, "sonnenschein-2026", zufall, new Date(), 1000);
+    const datei = sicherungErstellen({ ...LEERER_STAND, version: 99 as Stand["version"] }, "sonnenschein-2026", zufall, new Date(), 1000);
     expect(() => sicherungLesenMitDateien(datei, "sonnenschein-2026")).toThrow(SicherungsFehler);
   });
 
