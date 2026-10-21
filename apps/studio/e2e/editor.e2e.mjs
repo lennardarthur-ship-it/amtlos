@@ -91,7 +91,13 @@ try {
     const vorher = p.url();
     await Promise.all([p.waitForURL((u) => u.href !== vorher || true), eintrag.getByRole("button", { name: "Speichern" }).click()]);
     await p.waitForLoadState("networkidle");
-    pruefe(await p.getByText(/geprüft am \d{4}-\d{2}-\d{2}/).count(), "Übersetzung wurde nicht als geprüft markiert");
+    const geprueft = await p
+      .getByText(/geprüft am \d{4}-\d{2}-\d{2}/)
+      .first()
+      .waitFor({ timeout: 15000 })
+      .then(() => true)
+      .catch(() => false);
+    pruefe(geprueft, "Übersetzung wurde nicht als geprüft markiert");
   } else pruefe(false, "Übersetzung „Gefährdungsbeurteilung erstellen“ fehlt");
 
   // White-Label-Marken: Redaktion darf nicht, Plattform-Admin legt eine Marke für 127.0.0.1 an (für den Web-Rundgang)
