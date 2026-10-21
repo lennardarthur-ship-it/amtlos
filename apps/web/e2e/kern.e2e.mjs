@@ -4,6 +4,7 @@
  * Web-App ohne AMTLOS_UMFANG (E2E_KERN_URL, Standard http://localhost:3002) mit AUTH_MODUS=dev, API und Worker.
  */
 import { chromium } from "playwright-core";
+import { MARKE } from "@amtlos/marke";
 
 const B = process.env.E2E_KERN_URL ?? "http://localhost:3002";
 const fehler = [];
@@ -26,7 +27,7 @@ try {
   }
   await p.goto(`${B}/mehr`);
   const mehr = await p.locator("main a").allInnerTexts();
-  pruefe(!mehr.some((t) => /Experten|Frag Amtlos|Was kommt|Mandanten/.test(t)), `„Mehr“ zeigt versteckte Module: ${mehr.join(" | ")}`);
+  pruefe(!mehr.some((t) => new RegExp(`Experten|Frag (Amtlos|${MARKE.name})|Was kommt|Mandanten`).test(t)), `„Mehr“ zeigt versteckte Module: ${mehr.join(" | ")}`);
   await p.goto(`${B}/personal`);
   pruefe((await p.getByRole("heading", { name: "Arbeitsschutz" }).count()) === 0, "Arbeitsschutz-Werkzeuge sichtbar");
   await p.goto(`${B}/personal/zeiten`);

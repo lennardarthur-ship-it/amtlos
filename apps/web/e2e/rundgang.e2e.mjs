@@ -8,6 +8,7 @@
 import fs from "node:fs";
 import http from "node:http";
 import path from "node:path";
+import { MARKE } from "@amtlos/marke";
 import AxeBuilder from "@axe-core/playwright";
 import { chromium } from "playwright-core";
 
@@ -519,7 +520,7 @@ async function marke() {
     const p = await ctx.newPage();
     await p.goto(`${url.origin}/anmelden`);
     if (await p.getByText("Kanzlei Beispiel").count()) {
-      pruefe(await p.getByText("mit Amtlos").count(), `${farbschema}-marke: Zusatz „mit Amtlos“ fehlt`);
+      pruefe(await p.getByText(`mit ${MARKE.name}`).count(), `${farbschema}-marke: Zusatz „mit ${MARKE.name}“ fehlt`);
       pruefe((await p.title()).endsWith("· Kanzlei Beispiel"), `${farbschema}-marke: Seitentitel ohne Marke (${await p.title()})`);
       const farbe = await p.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--color-amt").trim());
       pruefe(farbe === (farbschema === "light" ? "#1f4e8c" : "#8fb8ff"), `${farbschema}-marke: Markenfarbe nicht gesetzt (${farbe})`);
