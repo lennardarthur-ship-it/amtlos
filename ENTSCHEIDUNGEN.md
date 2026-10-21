@@ -1046,6 +1046,10 @@ Der Gründer hat entschieden: Pflicht-Nachweise fallen aus dem Freikontingent he
 
 **Hinweise an den Gründer:** Arbeitszeitnachweise je Person und Monat verbrauchen die freie Vorlage schnell (Fairness/UWG prüfen lassen, T-78); E-Rechnung hinter Pro trotz Ausstellungspflicht 2027/28; Kontingent zählt auch Ausgaben aus einer Pro-Zeit im selben Monat.
 
+### E-157 · Anwaltliche Prüfung beauftragt (2026-10-21, Gründerentscheidung)
+
+Der Gründer beauftragt Kanzlei Weber & Merz (Dr. Ulrich Weber) mit allen vier Modulen zum Paketpreis von 7.000 € netto: A – RDG-Einschätzung inkl. Formulierungsvorschlägen (Lieferung bis 13.11.2026), B – vollständige Prüfung NachwG-Nachweis, AVV, Datenschutzinformation, Gefährdungsbeurteilung (rechtlicher Rahmen), C – Nutzungsbedingungen fertigstellen sowie Datenschutzhinweis App (mit/ohne Sync) und Datenschutzerklärung Website, D – Stichprobe zehn Vorlagen und 30 Katalogeinträge „hoch“ (B–D bis Mitte Dezember 2026). Nicht enthalten: Steuerthemen (Steuerberatung), sicherheitstechnische Inhalte der Gefährdungsbeurteilung (Fachkraft für Arbeitssicherheit), englische Texte, übrige Prüflisten-Punkte (250 €/h). Vorrangig mitgeprüft: T-99 (§ 2a SchwarzArbG). Nach jedem Prüfvermerk: Änderungen umsetzen, Prüfliste mit Datum und Prüfer schließen, Katalog `pruefung.status: geprueft`.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)
