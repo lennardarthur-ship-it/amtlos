@@ -9,7 +9,7 @@ export const ANBIETER = {
   anschrift: "Gomaringer Str. 33, 72770 Reutlingen",
   /** vertretungsberechtigte Person(en) */
   vertretung: "Lennard Lang (Geschäftsführer)",
-  email: "",
+  email: "hallo@amtlos.de",
   telefon: "",
   /** z. B. „Amtsgericht München, HRB 123456“ */
   register: "",
@@ -18,11 +18,11 @@ export const ANBIETER = {
 
 export const LINKS = {
   /** Website des Anbieters, z. B. „https://amtlos.de“ – auch für „Erstellt mit Amtlos“ und Weiterempfehlen */
-  website: "",
+  website: "https://amtlos.de",
   /** Datenschutzerklärung im Netz (Pflichtangabe im App Store) */
-  datenschutz: "",
+  datenschutz: "https://amtlos.de/datenschutz.html",
   /** Support-Seite oder E-Mail-Link (Pflichtangabe im App Store) */
-  support: "",
+  support: "https://amtlos.de/hilfe.html",
   /** Nutzungsbedingungen: Apples Standard-Lizenzvertrag, solange keine eigenen AGB gelten */
   nutzung: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/",
   /** App-Store-Seite, sobald die App veröffentlicht ist (Weiterempfehlen) */
