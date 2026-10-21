@@ -21,6 +21,7 @@ Die Daten bleiben auf dem Gerät. Betriebsklar sieht keine Nutzerdaten.
 | `rdg-aenderungen.md` | Formulierungen, die für das RDG schon vorsichtiger gefasst wurden (alt → neu) |
 | `nutzungsbedingungen-entwurf.md` | Entwurf der Nutzungsbedingungen (aus `docs/`) |
 | `datenschutzhinweis-app.md` | Datenschutzhinweis der App, wie er in der App steht |
+| `website-datenschutz.html`, `website-impressum.html`, `website-hilfe.html` | Datenschutzerklärung, Impressum und Hilfe-Seite der Website, wie sie veröffentlicht würden (Abschnitt Hosting folgt nach Wahl des Hosters) |
 | `PRUEFLISTE-auszug.md` | Offene fachliche Fragen aus der Entwicklung, nach Rechtsgebiet |
 
 `node docs/pruefmappe-anwalt/erzeugen.mjs <ziel>` erzeugt die Mappe neu aus dem aktuellen Code.

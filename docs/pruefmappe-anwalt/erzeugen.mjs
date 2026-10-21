@@ -51,6 +51,11 @@ const kopiere = (von, nach) => fs.existsSync(von) && fs.copyFileSync(von, path.j
 kopiere(path.join(HIER, "README.md"), "README.md");
 kopiere(path.join(ROOT, "docs/nutzungsbedingungen-entwurf.md"), "nutzungsbedingungen-entwurf.md");
 kopiere(path.join(HIER, "rdg-aenderungen.md"), "rdg-aenderungen.md");
+// Website: Datenschutzerklärung und Impressum, wie sie veröffentlicht würden (Entwurfs-Build)
+const web = path.join(ZIEL, ".website");
+execFileSync("node", [path.join(ROOT, "apps/website/bauen.mjs"), web, "--entwurf"], { stdio: "ignore" });
+for (const f of ["datenschutz.html", "impressum.html", "hilfe.html"]) fs.copyFileSync(path.join(web, f), path.join(ZIEL, `website-${f}`));
+fs.rmSync(web, { recursive: true, force: true });
 const pl = fs.readFileSync(path.join(ROOT, "PRUEFLISTE.md"), "utf8").split("\n");
 const auszug = pl.filter((z) => z.startsWith("|") && /\|\s*[^|]*(RA|DSB|Fach)[^|]*\|/.test(z));
 fs.writeFileSync(path.join(ZIEL, "PRUEFLISTE-auszug.md"), ["# Offene Fragen für Rechtsanwalt, Datenschutz und Fachleute", "", "| Nr. | Punkt | Wer | Quelle |", "|---|---|---|---|", ...auszug].join("\n") + "\n");
