@@ -134,11 +134,11 @@ describe("Datenschutzhinweis nach der Vorprüfung (Abschnitt 8)", () => {
     }
   });
 
-  it("Speicherdauer RevenueCat: was stimmt, keine erfundene Frist", () => {
+  it("Speicherdauer RevenueCat: Löschfrist nach Abo-Ende (Gründerentscheidung E-159), umgesetzt mit werkzeuge/revenuecat-loeschen.mjs", () => {
     const t = abschnitt(false, "Speicherdauer");
-    expect(t).toContain("für die Dauer unseres Vertrags mit RevenueCat");
-    expect(t).toContain("Auf unsere Anforderung löscht RevenueCat");
-    expect(t).not.toMatch(/\d+\s*(Tage|Tagen|Monate|Monaten)/);
+    expect(t).toContain("solange dein Abo besteht");
+    expect(t).toContain("Spätestens vier Monate nach Ende deines Abos");
+    expect(t).toContain("Endet unser Vertrag, löscht RevenueCat die Daten");
   });
 
   it("Deine Rechte nennen die zuständige Aufsichtsbehörde (Sitz Reutlingen → Baden-Württemberg)", () => {
@@ -196,10 +196,10 @@ describe("Nutzungsbedingungen – Fassung zur Freigabe (Abschnitt 9)", () => {
       expect(klauseln).toContain(s);
   });
 
-  it("Haftungshöhe gegenüber Unternehmern: nur die Vorhersehbarkeitsgrenze, Festbetrag als offene Entscheidung", () => {
+  it("Haftungshöhe gegenüber Unternehmern: Festbetrag 5.000 € je Schadensfall (Gründerentscheidung E-159), keine Grenze nach Jahresentgelt", () => {
     expect(klauseln).toContain("begrenzt auf den vertragstypischen, vorhersehbaren Schaden");
-    expect(klauseln).not.toMatch(/Entgelte der letzten|5\.000/);
-    expect(md).toMatch(/> Entscheidung \(Gründer und Anwalt\): .*Festbetrag \(z\. B\. 5\.000 €\) ja\/nein/);
+    expect(klauseln).toContain("8.2a Gegenüber Unternehmern ist unsere Haftung nach Ziffer 8.2 auf 5.000 € je Schadensfall begrenzt.");
+    expect(klauseln).not.toMatch(/Entgelte der letzten/);
     expect(klauseln).not.toMatch(/\[[^\]]*(Prüfung zu formulieren|Sitz des Anbieters|Firma, Rechtsform)[^\]]*\]/);
   });
 });

@@ -82,7 +82,9 @@
 
 8.2 Bei leichter Fahrlässigkeit haften wir nur bei Verletzung einer wesentlichen Vertragspflicht (einer Pflicht, deren Erfüllung die ordnungsgemäße Durchführung des Vertrags erst ermöglicht und auf deren Einhaltung du regelmäßig vertrauen darfst), und zwar begrenzt auf den vertragstypischen, vorhersehbaren Schaden.
 
-> Entscheidung (Gründer und Anwalt): Haftungshöchstbetrag gegenüber Unternehmern bei leichter Fahrlässigkeit – Festbetrag (z. B. 5.000 €) ja/nein. Bis zur Entscheidung gilt nur die Grenze „vertragstypischer, vorhersehbarer Schaden“ aus 8.2. Eine Grenze „höchstens die Entgelte der letzten zwölf Monate“ ist laut Vorprüfung bei einem Abo von ca. 100 €/Jahr und möglichen Bußgeldern im fünfstelligen Bereich angreifbar und deshalb nicht aufgenommen.
+8.2a Gegenüber Unternehmern ist unsere Haftung nach Ziffer 8.2 auf 5.000 € je Schadensfall begrenzt.
+
+> Entscheidung des Gründers (21.10.2026): Haftung so gering wie zulässig. Festbetrag 5.000 € je Schadensfall gegenüber Unternehmern nach dem Vorschlag im Prüfbericht von Dr. Weber (Abschnitt 9). Ein niedrigerer Betrag erhöht das Risiko, dass die Klausel nach § 307 BGB unwirksam ist – dann haften wir unbegrenzt. Mit der Deckungssumme der Vermögensschadenhaftpflicht abstimmen.
 
 8.3 Im Übrigen ist die Haftung ausgeschlossen. Das gilt insbesondere für Bußgelder, Abmahnkosten oder Steuernachzahlungen, die entstehen, weil du dich ohne eigene Prüfung oder Beratung auf allgemeine Informationen oder Muster der App verlassen hast – es sei denn, ein Fall von 8.1 oder 8.2 liegt vor.
 

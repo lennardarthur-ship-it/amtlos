@@ -104,3 +104,13 @@ Antworten in App Store Connect nach Apples Tabelle ([Export compliance documenta
 3. **RDG:** Fragen im Fragenkatalog der Prüfmappe. Formulierungen in der App sind schon vorsichtig („kommt in Frage“, „nach deinen Angaben“); nach der Antwort des Anwalts passe ich sie an.
 4. **Vermögensschadenhaftpflicht** bzw. IT-/Berufshaftpflicht abschließen – Angebote mehrerer Versicherer vergleichen, Tätigkeit genau beschreiben („Software mit Hinweisen zu Rechtspflichten und Vorlagen, keine Rechts- oder Steuerberatung“).
 5. **Marke** anmelden (DPMA oder EUIPO), wenn die Recherche frei ist.
+
+## 4. Nach dem Start: Löschfrist bei RevenueCat einhalten (E-159)
+
+Der Datenschutzhinweis verspricht: Daten bei RevenueCat werden spätestens vier Monate nach Abo-Ende gelöscht. Dafür einmal im Monat:
+
+1. In RevenueCat unter „Scheduled Data Exports“ den Export (Version 3) einrichten und die neueste CSV herunterladen.
+2. Probelauf: `node werkzeuge/revenuecat-loeschen.mjs export.csv` – zeigt die fälligen App-Kennungen (Abo-Ende vor mehr als 90 Tagen).
+3. Löschen: `REVENUECAT_SECRET_KEY=sk_… node werkzeuge/revenuecat-loeschen.mjs export.csv --ausfuehren` (geheimer Schlüssel aus RevenueCat → Projekt → API-Schlüssel; nie ins Repository).
+
+Prüfen, ob die Scheduled Data Exports im gebuchten RevenueCat-Tarif enthalten sind; sonst die Liste der abgelaufenen Kunden anders beschaffen.
