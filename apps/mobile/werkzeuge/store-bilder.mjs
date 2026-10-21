@@ -12,10 +12,11 @@
  * Rechtsgrundlage und Quellen gescrollt), `lupe.oben` setzt die Höhe der Lupe (Standard 1500 px).
  *
  * Jede Aufnahme prüft, dass zu sehen ist, was die Bildzeile in store/de.json verspricht (R9: Bild 1 zeigte „Heute“
- * statt „Pflichten“, Bild 3 keine Vorlagen, Bild 4 keine Quelle). Mein Betrieb wird ohne Pro aufgenommen.
+ * statt „Pflichten“, Bild 3 keine Vorlagen, Bild 4 keine Quelle; R11: Bild 1 ohne „Pflichten-Check nicht fertig“,
+ * Bild 6 die Kontrollmappe mit Unterlagen).
  *
- * Zusätzlich (nur hell) die Bilder der Website: <website>/<bildschirm>.jpg (464 × 1006, passend zu width/height in
- * apps/website/seite.html) und <website>/og.jpg (1200 × 630, Vorschaubild für geteilte Links). Standard für <website>
+ * Zusätzlich (nur hell) die Bilder der Website: <website>/<bildschirm>.jpg (928 × 2012, doppelte Auflösung zu
+ * width/height 464 × 1006 in apps/website/seite.html) und <website>/og.jpg (1200 × 630, Vorschaubild für geteilte Links). Standard für <website>
  * ist apps/website/bilder; WEBSITE=0 schaltet das ab.
  *
  *   cd apps/mobile && CI=1 npx expo export --platform web --output-dir /tmp/expo-web
@@ -80,6 +81,7 @@ try {
   await warte(2500);
   // Bild 1 „Welche Pflichten gelten für dich?“: der Tab „Pflichten“ (nicht „Heute“)
   await tab("Pflichten");
+  if (await p.getByText(/Pflichten-Check (nicht|fast) fertig/).locator("visible=true").count()) throw new Error("Bild 1 zeigt einen unfertigen Check (Demo-Stand ergänzen)");
   await foto("pflichten");
   // Bild 4 „Mit Grund und Quelle“: erste Pflicht unter „Jetzt dran“ (welche das ist, hängt vom Tag ab) – oben mit
   // Titel und Termin, dazu derselbe Bildschirm bis Rechtsgrundlage und Quellen gescrollt (Lupe und Website-Bild)
@@ -115,16 +117,19 @@ try {
   await foto("vorlagen");
   await knopf("Schließen").click();
   await warte(700);
-  // Bild 6 „Mein Betrieb“ ohne Pro (M7): sonst stünde dort „Pro ist aktiv – Alle Funktionen sind frei“
-  await p.evaluate(() => {
-    const s = JSON.parse(localStorage.getItem("amtlos.unterlagen.v1"));
-    localStorage.setItem("amtlos.unterlagen.v1", JSON.stringify({ ...s, proTest: false }));
-  });
-  await p.reload();
-  await warte(2500);
-  await tab("Mein Betrieb");
-  if (await p.getByText("Pro ist aktiv").locator("visible=true").count()) throw new Error("Mein Betrieb zeigt noch „Pro ist aktiv“");
-  await foto("betrieb");
+  // Bild 6 „Bereit für die Kontrolle“ (R11, UX #23): die Kontrollmappe mit den Nachweisen aus dem Demo-Stand – nicht leer
+  await tab("Unterlagen");
+  await p.getByRole("button", { name: /^Kontrollmappe/ }).locator("visible=true").first().click();
+  await warte(1200);
+  if (!(await p.getByText(/^Mappe mit \d+ Unterlagen teilen$/).locator("visible=true").count())) throw new Error("Kontrollmappe ohne Unterlagen");
+  if (await p.getByText(/Angaben? fehl/).locator("visible=true").count()) throw new Error("Kontrollmappe zeigt unvollständige Unterlagen");
+  // die Nachweise selbst ins Bild (nicht nur „Fehlt noch“): bis zur ersten Gruppe der Mappe scrollen
+  const gruppe = p.getByText(/^Je Unterlage die zuletzt geteilte Fassung/).locator("visible=true").first();
+  await gruppe.evaluate((el) => el.scrollIntoView({ block: "start" }));
+  await p.mouse.move(196, 500);
+  await p.mouse.wheel(0, -110);
+  await warte(800);
+  await foto("kontrollmappe");
 } finally {
   srv.close();
 }
@@ -184,12 +189,13 @@ for (const [i, b] of texte.bilder.entries()) {
   await satz.screenshot({ path: path.join(OUT, `store-${i + 1}-${b.bildschirm}${schema === "dark" ? "-dunkel" : ""}.png`) });
 }
 
-// Website: dieselben Bildschirme als JPG (464 × 1006) und ein Vorschaubild für geteilte Links (1200 × 630)
+// Website: dieselben Bildschirme als JPG in doppelter Auflösung (928 × 2012 für 464 × 1006, R11 UX #22) und ein
+// Vorschaubild für geteilte Links (1200 × 630, wie von den Plattformen erwartet)
 if (WEB) {
   fs.mkdirSync(WEB, { recursive: true });
-  const web = await browser.newPage({ viewport: { width: 464, height: 1006 }, deviceScaleFactor: 1 });
+  const web = await browser.newPage({ viewport: { width: 464, height: 1006 }, deviceScaleFactor: 2 });
   // Datei der Website → Aufnahme; „pflicht“ zeigt auf der Website Rechtsgrundlage und Quellen (Bildunterschrift „Mit Grund und Quelle“)
-  const WEB_BILDER = { pflichten: "pflichten", rechnung: "rechnung", vorlagen: "vorlagen", pflicht: "pflicht-quellen", ablage: "ablage", betrieb: "betrieb" };
+  const WEB_BILDER = { pflichten: "pflichten", rechnung: "rechnung", vorlagen: "vorlagen", pflicht: "pflicht-quellen", ablage: "ablage", kontrollmappe: "kontrollmappe" };
   for (const [datei, name] of Object.entries(WEB_BILDER)) {
     await web.setContent(`<!doctype html><html><body style="margin:0"><img src="${png(name)}" style="display:block;width:464px;height:1006px"></body></html>`, { waitUntil: "load" });
     await web.screenshot({ path: path.join(WEB, `${datei}.jpg`), type: "jpeg", quality: 82 });

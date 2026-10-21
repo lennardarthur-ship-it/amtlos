@@ -1,7 +1,7 @@
 # Katalog D.39 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.mindestlohn
-version: 1
+version: 2
 katalog_nr: D.39
 titel:
   de: Mindestlohn zahlen
@@ -9,6 +9,9 @@ kurz:
   de: Du zahlst allen Beschäftigten mindestens den gesetzlichen Mindestlohn.
 erklaerung:
   de: Der Mindestlohn beträgt 13,90 € je Stunde ab 1.1.2026 und 14,60 € ab 1.1.2027. Amtlos führt die Werte mit Gültigkeitszeitraum.
+    In manchen Branchen gelten höhere Branchenmindestlöhne aus allgemeinverbindlichen Tarifverträgen oder Verordnungen nach dem
+    Arbeitnehmer-Entsendegesetz, zum Beispiel in der Gebäudereinigung, in Teilen des Bau- und Ausbaugewerbes und in der Pflege.
+    Prüfe, ob einer für deinen Betrieb gilt – Amtlos kennt die Beträge noch nicht.
 rechtsgrundlage:
 - MiLoG
 kategorie: personal
@@ -41,6 +44,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/milog/
   abgerufen: null
 fachlich_zu_pruefen:
+- 'Branchenmindestlöhne (AEntG, allgemeinverbindliche Tarifverträge) nur als Hinweis ohne Beträge (R11, Nutzertest Gebäudereinigung) – Branchen, Lohngruppen und Beträge 2026/2027 sowie Aufzeichnungspflicht nach § 19 AEntG fachlich ergänzen'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Ausnahmen (z. B. Azubis, Praktika) als Hinweis ergänzen?
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen

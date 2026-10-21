@@ -1,0 +1,98 @@
+# R11 (Rechtsprüfung Befund 2): Hinweispflicht nach § 2a Abs. 2 SchwarzArbG für die Branchen nach § 2a Abs. 1 (SchwarzArbMoDiG)
+schema_version: 1
+id: personal.ausweis_hinweis
+version: 1
+katalog_nr: D.38
+titel:
+  de: Schriftlich auf die Ausweispflicht hinweisen
+kurz:
+  de: In deiner Branche weist du jede neue beschäftigte Person vor Arbeitsbeginn schriftlich darauf hin, dass sie bei der Arbeit
+    einen Ausweis dabeihaben muss.
+erklaerung:
+  de: In den Branchen nach § 2a Schwarzarbeitsbekämpfungsgesetz müssen Beschäftigte bei der Arbeit ihren Personalausweis, Pass
+    oder ein Ersatzpapier mitführen und dem Zoll auf Verlangen vorlegen. Du weist jede Person nachweislich und schriftlich auf
+    diese Pflicht hin, und zwar vor Beginn der Arbeit. Den Hinweis bewahrst du für die Dauer der Beschäftigung auf und legst ihn
+    bei einer Prüfung durch den Zoll vor. Ein Satz im Arbeitsvertrag oder ein eigenes Blatt mit Unterschrift reicht.
+rechtsgrundlage:
+- § 2a Abs. 2 SchwarzArbG
+kategorie: personal
+branchen:
+- bau
+- gastronomie_lebensmittel
+- transport_logistik
+- beauty_kosmetik
+- gebaeudereinigung
+ausloeser:
+  all:
+  - any:
+    - feld: profil.personal.sofortmeldebranchen
+      op: enthaelt_eines
+      wert:
+      - bau
+      - gastronomie
+      - personenbefoerderung
+      - spedition_logistik
+      - schausteller
+      - gebaeudereinigung
+      - messebau
+      - fleischwirtschaft
+      - prostitution
+      - sicherheitsgewerbe
+      - friseur
+      - kosmetik
+      - lieferdienste
+      label:
+        de: Dein Betrieb gehört zu einer Branche nach § 2a Schwarzarbeitsbekämpfungsgesetz.
+    - feld: profil.taetigkeit.branchen
+      op: enthaelt_eines
+      wert:
+      - beauty_kosmetik
+      - gebaeudereinigung
+      label:
+        de: Deine Branche (Gebäudereinigung, seit 2026 auch Friseur und Kosmetik) gehört zu den Branchen nach § 2a Schwarzarbeitsbekämpfungsgesetz.
+  - ereignis: einstellung
+    op: eingetreten
+    label:
+      de: Du stellst jemanden ein.
+frist:
+  typ: relativ
+  bezug:
+    ereignis: einstellung
+  versatz: P0D
+  zeitpunkt: vor_beginn
+  je_ereignis: true
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Kontrolle durch den Zoll (Finanzkontrolle Schwarzarbeit)
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Schwarzarbeitsbekämpfungsgesetz § 2a
+  url: https://www.gesetze-im-internet.de/schwarzarbg_2004/__2a.html
+  abgerufen: null
+- titel: HWK Chemnitz – Merkblatt SchwarzArbMoDiG (Stand Januar 2026)
+  url: https://www.hwk-chemnitz.de/fileadmin/user_upload/Betriebsfuehrung/Handwerks-und-Gewerberolle/schwarzarbeit/Merkblatt_SchwarzArbMoDiG.pdf
+  abgerufen: '2026-10-20'
+- titel: CMS – Gesetz zur Modernisierung der Schwarzarbeitsbekämpfung beschlossen
+  url: https://cms.law/de/deu/legal-updates/gesetz-zur-modernisierung-der-schwarzarbeitsbekaempfung-beschlossen
+  abgerufen: '2026-10-20'
+fachlich_zu_pruefen:
+- 'Wortlaut § 2a Abs. 2 SchwarzArbG n. F. im BGBl. gegenlesen: „nachweislich und schriftlich“ und Aufbewahrung laut HWK Chemnitz; „vor Erbringung der Dienst- oder Werkleistung“ laut CMS (neu); Hinweispflicht bestand schon vor dem SchwarzArbMoDiG'
+- 'Ob ein Satz im Arbeitsvertrag als Hinweis genügt – bestätigen'
+- 'Bußgeld (§ 8 SchwarzArbG) – Nummer und Höhe fachlich ergänzen'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

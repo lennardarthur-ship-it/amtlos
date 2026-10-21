@@ -12,6 +12,13 @@ export interface Position {
   ust_satz: number | null; // Prozent; null bei Kleinunternehmern
   /** UN/ECE-Code der Einheit, wenn die Einheit frei eingegeben wurde (App, E-128) – sonst aus `einheit` */
   einheit_code?: string;
+  /**
+   * R11: Bruttopreis je Einheit, wenn die Rechnung mit Preisen inkl. Umsatzsteuer geschrieben ist (B2C). Dann rechnet
+   * `summen` vom Brutto aus: der Bruttobetrag stimmt genau, Netto und Steuer werden je Steuersatz daraus abgeleitet
+   * (die Steuer weicht von Netto × Satz höchstens um 1 Cent ab – zulässig nach BR-CO-17). `preis_cent` ist dann der
+   * daraus gerundete Nettopreis.
+   */
+  brutto_cent?: number;
 }
 export type Einheit = "stueck" | "stunde" | "tag" | "monat" | "pauschal" | "kilogramm";
 /** UN/ECE Recommendation 20 – technische Codes für die E-Rechnung */
@@ -85,13 +92,38 @@ export interface Summen {
 
 export function summen(positionen: Position[], kleinunternehmer: boolean): Summen {
   // Mengen haben höchstens vier Nachkommastellen: als ganze Zehntausendstel rechnen, sonst rundet Gleitkomma falsch (0,57 × 1,50 € = 0,8549…)
-  const zeilen = positionen.map((p) => rundeCent((Math.round(p.menge * 10_000) * p.preis_cent) / 10_000));
+  const mal = (menge: number, cent: number) => rundeCent((Math.round(menge * 10_000) * cent) / 10_000);
+  const satzVon = (p: Position) => (kleinunternehmer ? null : p.ust_satz);
+  // R11: Bruttopreise (nur mit Steuersatz > 0): Zeilen-Brutto genau, Netto je Satz aus dem Brutto der Gruppe
+  const brutto = (p: Position) => p.brutto_cent !== undefined && (satzVon(p) ?? 0) > 0;
+  const zeilenBrutto = positionen.map((p) => (brutto(p) ? mal(p.menge, p.brutto_cent!) : 0));
+  const zeilen = positionen.map((p, i) => (brutto(p) ? rundeCent((zeilenBrutto[i]! * 100) / (100 + satzVon(p)!)) : mal(p.menge, p.preis_cent)));
+  const bruttoJeSatz = new Map<number, number>();
+  positionen.forEach((p, i) => {
+    if (brutto(p)) bruttoJeSatz.set(satzVon(p)!, (bruttoJeSatz.get(satzVon(p)!) ?? 0) + zeilenBrutto[i]!);
+  });
+  // Netto der Gruppe aus dem Brutto; die Rundungsdifferenz der Zeilen trägt die betragsmäßig größte Zeile (BR-S-08: Summe der Zeilen = Gruppe)
+  for (const [satz, b] of bruttoJeSatz) {
+    const idx = positionen.map((p, i) => i).filter((i) => brutto(positionen[i]!) && satzVon(positionen[i]!) === satz);
+    const ziel = rundeCent((b * 100) / (100 + satz));
+    const diff = ziel - idx.reduce((a, i) => a + zeilen[i]!, 0);
+    if (diff) {
+      const gross = idx.reduce((m, i) => (Math.abs(zeilen[i]!) > Math.abs(zeilen[m]!) ? i : m), idx[0]!);
+      zeilen[gross] = zeilen[gross]! + diff;
+    }
+  }
   const nachSatz = new Map<number | null, number>();
   positionen.forEach((p, i) => {
-    const satz = kleinunternehmer ? null : p.ust_satz;
+    const satz = satzVon(p);
     nachSatz.set(satz, (nachSatz.get(satz) ?? 0) + zeilen[i]!);
   });
-  const gruppen = [...nachSatz].map(([satz, netto]) => ({ satz, netto_cent: netto, ust_cent: satz === null ? 0 : rundeCent((netto * satz) / 100) }));
+  const gruppen = [...nachSatz].map(([satz, netto]) => {
+    // Gruppen nur aus Bruttopreisen: Steuer = Brutto − Netto; gemischt (selten): Brutto-Anteil genau, Netto-Anteil wie bisher
+    const b = satz !== null && satz > 0 ? (bruttoJeSatz.get(satz) ?? 0) : 0;
+    const nettoAusBrutto = satz !== null && satz > 0 ? positionen.reduce((a, p, i) => a + (brutto(p) && satzVon(p) === satz ? zeilen[i]! : 0), 0) : 0;
+    const ust = satz === null ? 0 : b ? b - nettoAusBrutto + rundeCent(((netto - nettoAusBrutto) * satz) / 100) : rundeCent((netto * satz) / 100);
+    return { satz, netto_cent: netto, ust_cent: ust };
+  });
   const netto_cent = zeilen.reduce((a, b) => a + b, 0);
   const ust_cent = gruppen.reduce((a, g) => a + g.ust_cent, 0);
   return { zeilen, gruppen, netto_cent, ust_cent, brutto_cent: netto_cent + ust_cent };
@@ -105,6 +137,8 @@ export interface Steller {
 export interface KundeDaten {
   name: string; strasse?: string | null; plz?: string | null; ort?: string | null; land: string; email?: string | null;
   ust_idnr?: string | null; kaeufer_referenz?: string | null; geschaeftskunde: boolean;
+  /** R11: bei einer Gutschrift ist der Kunde der Leistende (Verkäufer, BG-4) – seine Steuernummer und Telefon (BG-6) */
+  steuernummer?: string | null; telefon?: string | null;
 }
 export interface RechnungsDaten {
   nummer: string; rechnungsdatum: string; leistungsdatum?: string | null; faellig_am?: string | null;
@@ -120,10 +154,16 @@ export interface RechnungsDaten {
   abschlag?: boolean;
   /** Hinweis auf die Steuerbefreiung (bei „befreit“) */
   befreiungsgrund?: string | null;
+  /**
+   * R11: Gutschrift (§ 14 Abs. 2 Satz 2 UStG) – der Betrieb (`steller`) rechnet als Leistungsempfänger ab. In der
+   * XRechnung ist der Leistende (`kunde`) der Verkäufer (BG-4) und der Betrieb der Käufer (BG-7), Typ 389.
+   */
+  gutschrift?: boolean;
 }
 
 /** Was für eine gültige E-Rechnung (XRechnung) fehlt – als verständliche Liste. Leer = vollständig. */
 export function fehlendFuerERechnung(r: RechnungsDaten): string[] {
+  if (r.gutschrift) return fehlendFuerGutschrift(r);
   const f: string[] = [];
   const s = r.steller;
   if (!s.name || !s.strasse || !s.plz || !s.ort) f.push("steller.anschrift");
@@ -145,6 +185,28 @@ export function fehlendFuerERechnung(r: RechnungsDaten): string[] {
     if ((art === "reverse_charge" || art === "igl") && !r.kunde.ust_idnr) f.push("kunde.ust_idnr");
     if ((art === "befreit" || art === "nullsatz") && !r.befreiungsgrund) f.push("steuer.befreiungsgrund");
   }
+  return f;
+}
+
+/**
+ * R11: Was der E-Rechnung einer Gutschrift fehlt. Verkäufer ist der Leistende: Anschrift, E-Mail (BT-34), Telefon
+ * (BR-DE-6) und Steuernummer oder USt-IdNr. (§ 14 Abs. 4 Nr. 2 UStG, BR-CO-26); Käufer ist der Betrieb (Anschrift, E-Mail).
+ * Eine IBAN des Betriebs braucht es nicht – er zahlt selbst.
+ */
+function fehlendFuerGutschrift(r: RechnungsDaten): string[] {
+  const f: string[] = [];
+  const l = r.kunde;
+  if (!l.name || !l.strasse || !l.plz || !l.ort) f.push("leistender.anschrift");
+  if (!l.email) f.push("leistender.email");
+  if (!l.telefon) f.push("leistender.telefon");
+  if (!l.steuernummer && !l.ust_idnr) f.push("leistender.steuernummer_oder_ust_idnr");
+  if (!r.steller.name || !r.steller.strasse || !r.steller.plz || !r.steller.ort) f.push("steller.anschrift");
+  if (!r.steller.email) f.push("steller.email");
+  if (!r.positionen.length) f.push("positionen");
+  if (r.positionen.some((p) => !p.bezeichnung || !(p.menge > 0) || !Number.isInteger(p.preis_cent))) f.push("positionen.ungueltig");
+  if (!r.kleinunternehmer && r.positionen.some((p) => p.ust_satz === null)) f.push("positionen.steuersatz");
+  if (!r.leistungsdatum && !r.leistungszeitraum) f.push("leistungsdatum");
+  if (!r.kleinunternehmer && r.positionen.some((p) => p.ust_satz === 0) && (r.steuerart ?? "standard") === "standard") f.push("steuer.grund_null");
   return f;
 }
 

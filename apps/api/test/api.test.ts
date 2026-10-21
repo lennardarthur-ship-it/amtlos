@@ -825,7 +825,7 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
     beforeAll(async () => {
       gina = await token("gina");
       u = (await http().post("/v1/unternehmen").set("Authorization", `Bearer ${gina}`).send({ name: "Ginas Bistro" }).expect(201)).body.id;
-      await alsGina(http().put("/v1/profil")).send({ daten: { rechtsform: "einzelunternehmen", gruendungsdatum: "2020-05-01", "taetigkeit.einordnung": "gewerbe", "taetigkeit.branchen": ["gastronomie_lebensmittel"], "beschaeftigte.gesamt": 0, gemeinde_ags: "06414000" } }).expect(200);
+      await alsGina(http().put("/v1/profil")).send({ daten: { rechtsform: "einzelunternehmen", gruendungsdatum: "2020-05-01", "taetigkeit.einordnung": "gewerbe", "taetigkeit.branchen": ["gastronomie_lebensmittel"], "beschaeftigte.gesamt": 0, gemeinde_ags: "06414000", "ifsg.beschaeftigte": "erstmals" } }).expect(200);
       await neuberechnen(worker, u, "test", { kalender: new StandardKalender() });
     });
 
@@ -902,7 +902,8 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       const neugruender = r.eintraege.find((e) => e.pflicht_id === "steuern.ust_va_neugruender_radar");
       expect(neugruender).toMatchObject({ art: "radar", betroffen: "ja", erwartet_ab: "2027-01-01" });
       expect(neugruender!.vorbereitung.length).toBeGreaterThan(0);
-      expect(r.eintraege.find((e) => e.pflicht_id === "ki.transparenz")).toMatchObject({ wahrscheinlichkeit: "sicher" });
+      // R11 (Rechtsprüfung Befund 8): Art. 50 Abs. 1 KI-VO gilt seit 2.8.2026 – keine Radar-Regel mehr, sondern in Kraft
+      expect(r.eintraege.some((e) => e.pflicht_id === "ki.transparenz")).toBe(false);
       expect(r.eintraege.some((e) => e.pflicht_id === "gruendung.berufsgenossenschaft")).toBe(false); // keine normalen Pflichten
       expect(Array.isArray(r.werte)).toBe(true);
     });

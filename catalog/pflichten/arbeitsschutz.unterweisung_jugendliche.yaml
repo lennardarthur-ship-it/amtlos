@@ -1,0 +1,61 @@
+# R11 (Rechtsprüfung T-100/T-111, Nutzertest Tischlerei Befund 7): halbjährliche Unterweisung Jugendlicher als eigene Pflicht
+schema_version: 1
+id: arbeitsschutz.unterweisung_jugendliche
+version: 1
+katalog_nr: E.51
+titel:
+  de: Jugendliche halbjährlich unterweisen
+kurz:
+  de: Beschäftigte unter 18 unterweist du vor Beginn und danach mindestens alle sechs Monate über Unfall- und Gesundheitsgefahren.
+erklaerung:
+  de: Für Jugendliche gilt ein kürzerer Abstand als die jährliche Unterweisung der übrigen Beschäftigten. Vor Beginn der Beschäftigung
+    und bei wesentlichen Änderungen unterweist du sie über die Gefahren und die Schutzmaßnahmen; danach wiederholst du die Unterweisung
+    mindestens halbjährlich (§ 29 JArbSchG). Sechs Monate nach jeder Unterweisung, die du in Amtlos erfasst, erinnert Amtlos an die nächste.
+rechtsgrundlage:
+- § 29 JArbSchG
+kategorie: arbeitsschutz
+ausloeser:
+  feld: profil.beschaeftigte.jugendlich
+  op: '>='
+  wert: 1
+  label:
+    de: Du beschäftigst Jugendliche.
+frist:
+  typ: relativ
+  bezug:
+    ereignis: unterweisung_durchgefuehrt
+  versatz: P6M
+  zeitpunkt: spaetestens
+  je_ereignis: true
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: dokument_generator
+aktion:
+  art: link
+  ziel: app.unterweisungen
+  nachweis_erforderlich: true
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Jugendarbeitsschutzgesetz § 29
+  url: https://www.gesetze-im-internet.de/jarbschg/__29.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- '„Mindestens halbjährlich“ als sechs Monate nach jeder erfassten Unterweisung umgesetzt – die Unterweisung im Betrieb gilt für alle; je Jugendlichem nicht unterschieden'
+- 'Folgen bei Nichterfüllung (§ 58 JArbSchG) – Sanktion fachlich ergänzen'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

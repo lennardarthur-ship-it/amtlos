@@ -5,7 +5,7 @@
 import { teilnahmeTabelle } from "./arbeitsschutz.js";
 import { mitVertretung } from "./betrieb.js";
 import { MINDESTLOHN, MINIJOB, NACHWG } from "./bausteine.js";
-import { abschnitt, absatz, angaben, anschrift, anschriftMehrzeilig, auswahl, cent, datumDe, dokument, euro, ja, liste, neufassung, parteien, punkte, stabileOption, text, unterschriften, zahl, zahlText, zeilen } from "./html.js";
+import { abschnitt, absatz, angaben, anschrift, anschriftMehrzeilig, auswahl, cent, datumDe, dokument, euro, ja, liste, neufassung, parteien, punkte, stabileOption, tabelle, text, unterschriften, zahl, zahlText, zelle, zeilen } from "./html.js";
 import { optionen } from "./konstanten.js";
 import type { Daten, Vorlage } from "./typen.js";
 
@@ -100,6 +100,9 @@ export const nachweisArbeitsbedingungen: Vorlage = {
         // Minijob (R10): die Grenze steht mit dem Wert zum Ausstellungsdatum im Nachweis – nicht als Freitext mit Jahreszahl
         { id: "minijob", art: "schalter", label: "Minijob (geringfügig entlohnt)", hilfe: "Der Nachweis nennt die Minijob-Grenze, die am Ausstellungstag gilt" },
         { id: "zuschlaege", art: "mehrzeilig", label: "Weitere Bestandteile", hilfe: "Vergütung von Überstunden, Zuschläge, Zulagen, Prämien, Sonderzahlungen – jeweils getrennt", vorschlaege: ["Keine weiteren Bestandteile.", "Überstunden werden mit dem vereinbarten Stundenlohn vergütet.", "Überstunden werden durch Freizeit ausgeglichen."] },
+        // R11 (Rechtsprüfung #18): Provision als eigener Bestandteil mit eigenem Datum – im Freitext wurde „ab …“ mehrdeutig
+        { id: "provision", selten: true, art: "mehrzeilig", label: "Provision", hilfe: "z. B. 5 % vom eigenen Dienstleistungsumsatz im Monat" },
+        { id: "provision_ab", selten: true, art: "datum", label: "Provision ab", wenn: { feld: "provision" } },
         { id: "faelligkeit", art: "text", label: "Fälligkeit", pflicht: true, vorschlaege: FAELLIG },
         { id: "auszahlung", art: "text", label: "Art der Auszahlung", pflicht: true, vorschlaege: ["Überweisung auf das von der beschäftigten Person benannte Konto"] },
       ],
@@ -155,7 +158,7 @@ export const nachweisArbeitsbedingungen: Vorlage = {
   },
   // beim Teilen (R10): Form und Empfangsnachweis – gerade per Messenger geteilte PDFs erfüllen sonst die Form nicht
   hinweise: () => [
-    "Form: In den Branchen nach § 2a SchwarzArbG (z. B. Bau, Gaststätten und Beherbergung, Transport und Logistik, Gebäudereinigung) gilt die Schriftform – ausdrucken, beide unterschreiben, aushändigen. Sonst reicht die Textform (z. B. PDF per E-Mail) nur, wenn das Dokument speicher- und ausdruckbar ist und du einen Empfangsnachweis anforderst (§ 2 Abs. 1 NachwG).",
+    "Form: In den Branchen nach § 2a SchwarzArbG (z. B. Bau, Gaststätten und Beherbergung, Friseur- und Kosmetikbetriebe, Transport und Logistik, Gebäudereinigung) gilt die Schriftform – ausdrucken, beide unterschreiben, aushändigen. Sonst reicht die Textform (z. B. PDF per E-Mail) nur, wenn das Dokument speicher- und ausdruckbar ist und du einen Empfangsnachweis anforderst (§ 2 Abs. 1 NachwG).",
   ],
   html(d, b) {
     const ort = text(d, "arbeitsort") === "anders" ? `${ORT.anders} ${text(d, "arbeitsort_text")}` : (ORT[text(d, "arbeitsort")] ?? "");
@@ -168,7 +171,7 @@ export const nachweisArbeitsbedingungen: Vorlage = {
       ["4. Arbeitsort", ort],
       ["5. Tätigkeit", text(d, "taetigkeit")],
       ["6. Probezeit", PROBEZEIT[text(d, "probezeit")] ?? ""],
-      ["7. Arbeitsentgelt", [entgelt, ja(d, "minijob") && minijobGrenzeAm(stichtag(d)) !== null ? `Geringfügig entlohnte Beschäftigung (Minijob): Das monatliche Arbeitsentgelt übersteigt die Minijob-Grenze von ${euro(minijobGrenzeAm(stichtag(d))!)} (Stand ${datumDe(stichtag(d))}) nicht.` : "", text(d, "zuschlaege"), text(d, "faelligkeit") ? `Fällig ${text(d, "faelligkeit")}.` : "", text(d, "auszahlung") ? `Auszahlung: ${text(d, "auszahlung")}.` : ""].filter(Boolean).join("\n")],
+      ["7. Arbeitsentgelt", [entgelt, ja(d, "minijob") && minijobGrenzeAm(stichtag(d)) !== null ? `Geringfügig entlohnte Beschäftigung (Minijob): Das monatliche Arbeitsentgelt übersteigt die Minijob-Grenze von ${euro(minijobGrenzeAm(stichtag(d))!)} (Stand ${datumDe(stichtag(d))}) nicht.` : "", text(d, "zuschlaege"), text(d, "provision") ? `Provision${text(d, "provision_ab") ? ` ab ${datumDe(text(d, "provision_ab"))}` : ""}: ${text(d, "provision").replace(/\n+/g, " ")}` : "", text(d, "faelligkeit") ? `Fällig ${text(d, "faelligkeit")}.` : "", text(d, "auszahlung") ? `Auszahlung: ${text(d, "auszahlung")}.` : ""].filter(Boolean).join("\n")],
       ["8. Arbeitszeit, Pausen, Ruhezeiten", [zeit, text(d, "pausen") ? `Ruhepausen: ${text(d, "pausen").replace(/^\s*Ruhepausen:?\s*/i, "")}` : "", text(d, "ruhezeit") ? `Ruhezeit: ${text(d, "ruhezeit").replace(/^\s*Ruhezeit:?\s*/i, "")}` : "", ja(d, "schicht") ? `Schichtarbeit: ${text(d, "schicht_text")}` : ""].filter(Boolean).join("\n")],
       ["9. Arbeit auf Abruf", ja(d, "abruf") ? text(d, "abruf_text") : "nicht vereinbart"],
       ["10. Überstunden", text(d, "ueberstunden") === "ja" ? `${UEBERSTUNDEN.ja} ${text(d, "ueberstunden_text")}` : UEBERSTUNDEN.nein!],
@@ -279,6 +282,103 @@ export const kiKompetenz: Vorlage = {
         abschnitt("Inhalte", (auswahl(d, "themen").length ? punkte(auswahl(d, "themen").map((w) => neufassung(w, KI_THEMEN_FRUEHER))) : absatz("")) + (text(d, "inhalt") ? zeilen(text(d, "inhalt")) : "")) +
         abschnitt("Teilnahme", `<p class="vor-tabelle">Mit meiner Unterschrift bestätige ich die Teilnahme an der Schulung.</p>${teilnahmeTabelle(liste(d, "teilnehmer"))}`) +
         unterschriften(["Ort, Datum", "Unterschrift der schulenden Person"]),
+    });
+  },
+};
+
+/**
+ * R11 (Nutzertest Reinigung #4, Katalog personal.ausweis_hinweis): schriftlicher Hinweis auf die Pflicht, bei der Arbeit
+ * einen Ausweis mitzuführen (§ 2a SchwarzArbG) – mit Unterschrift als Nachweis. Wortlaut nah am Gesetz, fachlich zu prüfen.
+ */
+export const ausweisHinweis: Vorlage = {
+  id: "ausweis_hinweis",
+  titel: "Hinweis auf die Ausweispflicht",
+  beschreibung: "Schriftlicher Hinweis an eine beschäftigte Person, bei der Arbeit einen Ausweis mitzuführen (§ 2a SchwarzArbG) – mit Unterschrift als Nachweis.",
+  bereich: "personal",
+  pflichten: ["personal.ausweis_hinweis"],
+  person: { art: "mitarbeiter", felder: { name: "name" } },
+  grundlage: "§ 2a SchwarzArbG",
+  namensFeld: "name",
+  abschnitte: [
+    {
+      titel: "Beschäftigte Person",
+      hilfe: "Vor Beginn der Arbeit aushändigen und unterschreiben lassen. Den unterschriebenen Hinweis für die Dauer der Beschäftigung aufbewahren und bei einer Prüfung des Zolls vorlegen.",
+      felder: [
+        { id: "name", art: "text", label: "Name der beschäftigten Person", pflicht: true },
+        { id: "datum", art: "datum", label: "Ausgehändigt am", vorbelegung: "heute", pflicht: true },
+      ],
+    },
+  ],
+  html(d, b) {
+    return dokument({
+      titel: "Hinweis auf die Ausweispflicht",
+      betrieb: b,
+      unter: text(d, "name") || undefined,
+      meta: `Beschäftigte Person: ${text(d, "name")}\nAusgehändigt am: ${datumDe(text(d, "datum"))}`,
+      inhalt:
+        (!text(d, "name") ? abschnitt("Angaben", angaben([["Beschäftigte Person", ""]])) : "") +
+        abschnitt(
+          "Hinweis nach § 2a Abs. 2 SchwarzArbG",
+          absatz("Bei der Erbringung von Dienst- oder Werkleistungen sind Sie verpflichtet, Ihren Personalausweis, Pass, Passersatz oder Ausweisersatz mitzuführen und den Behörden der Zollverwaltung auf Verlangen vorzulegen (§ 2a Abs. 1 SchwarzArbG).") +
+            absatz("Mit Ihrer Unterschrift bestätigen Sie, dass Sie diesen Hinweis erhalten haben."),
+        ) +
+        unterschriften(["Ort, Datum", "Unterschrift beschäftigte Person", "Unterschrift Arbeitgeber/in"]),
+    });
+  },
+};
+
+/**
+ * R11 (Nutzertest Reinigung #14): Schlüsselquittung – welche Schlüssel eines Kunden oder Objekts wer wann erhalten und
+ * zurückgegeben hat. Ohne rechtliche Aussagen; eine Vertraulichkeitsverpflichtung ist fachlich offen (PRUEFLISTE).
+ */
+export const schluesselquittung: Vorlage = {
+  id: "schluesselquittung",
+  titel: "Schlüsselquittung",
+  beschreibung: "Welche Schlüssel eines Kunden oder Objekts wer wann erhalten und zurückgegeben hat – mit Unterschriften.",
+  bereich: "personal",
+  pflichten: [],
+  namensFeld: "objekt",
+  abschnitte: [
+    {
+      titel: "Objekt",
+      felder: [
+        { id: "objekt", art: "text", label: "Kunde bzw. Objekt", pflicht: true, hilfe: "z. B. Praxis Dr. Muster, Hauptstraße 1" },
+        { id: "empfaenger", art: "text", label: "Schlüssel erhalten von (Name)", hilfe: "beschäftigte Person, die die Schlüssel bekommt", pflicht: true },
+        { id: "datum", art: "datum", label: "Übergeben am", vorbelegung: "heute", pflicht: true },
+      ],
+    },
+    {
+      titel: "Schlüssel",
+      felder: [
+        {
+          id: "schluessel",
+          art: "liste",
+          label: "Schlüssel",
+          eintrag: "Schlüssel",
+          titelFeld: "bezeichnung",
+          pflicht: true,
+          felder: [
+            { id: "bezeichnung", art: "text", label: "Bezeichnung", pflicht: true, hilfe: "z. B. Haustür, Büro 2. OG, Transponder" },
+            { id: "nummer", art: "text", label: "Schlüssel-Nr." },
+            { id: "anzahl", art: "zahl", label: "Anzahl", vorbelegung: "1" },
+            { id: "zurueck_am", art: "datum", label: "Zurückgegeben am" },
+          ],
+        },
+      ],
+    },
+  ],
+  html(d, b) {
+    const s = liste(d, "schluessel").filter((x) => text(x, "bezeichnung"));
+    return dokument({
+      titel: "Schlüsselquittung",
+      betrieb: b,
+      unter: text(d, "objekt") || undefined,
+      meta: `Objekt: ${text(d, "objekt")}\nErhalten von: ${text(d, "empfaenger")}\nÜbergeben am: ${datumDe(text(d, "datum"))}`,
+      inhalt:
+        ((a) => (a ? abschnitt("Angaben", a) : ""))(angaben([["Kunde bzw. Objekt", text(d, "objekt") ? null : ""], ["Erhalten von", text(d, "empfaenger") ? null : ""], ["Übergeben am", text(d, "datum") ? null : ""]])) +
+        abschnitt("Schlüssel", tabelle(["Bezeichnung", "Schlüssel-Nr.", "Anzahl", "Zurückgegeben am"], s.map((x) => [zelle(text(x, "bezeichnung")), zelle(text(x, "nummer")), zelle(text(x, "anzahl")), text(x, "zurueck_am") ? datumDe(text(x, "zurueck_am")) : ""]), { breiten: ["42%", "20%", "12%", "26%"], ...(s.length ? { leerzeilen: 2 } : { mindestens: 5 }), hoch: true })) +
+        abschnitt("Bestätigung", absatz("Die oben genannten Schlüssel habe ich erhalten. Ich bewahre sie sorgfältig auf, gebe sie nicht an Dritte weiter und melde einen Verlust sofort.")) +
+        unterschriften(["Ort, Datum", "Unterschrift Empfänger/in", "Unterschrift Arbeitgeber/in"]),
     });
   },
 };

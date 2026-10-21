@@ -1,15 +1,15 @@
 # Katalog G.66 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.datenschutzerklaerung
-version: 2
+version: 3
 katalog_nr: G.66
 titel:
   de: Datenschutzerklärung auf der Website
 kurz:
   de: Auf deiner Website informierst du in einer Datenschutzerklärung über die Verarbeitung von Daten.
 erklaerung:
-  de: Die Datenschutzerklärung muss von jeder Seite erreichbar sein. Inhaltlich folgt sie den Informationspflichten der DSGVO
-    (Katalog F).
+  de: Die Datenschutzerklärung muss von jeder Seite erreichbar sein. Inhaltlich folgt sie den Informationspflichten der DSGVO.
+    Erledigt ist sie, wenn sie auf deiner Website veröffentlicht ist.
 rechtsgrundlage:
 - Art. 13 DSGVO
 kategorie: online
@@ -45,6 +45,10 @@ automatisierung: hinweis
 aktion:
   art: link
   ziel: app.onlinecheck
+erledigung:
+  art: bestaetigen
+  bestaetigung:
+    de: Auf der Website veröffentlicht
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null

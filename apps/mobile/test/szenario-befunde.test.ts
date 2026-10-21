@@ -70,8 +70,9 @@ describe("Gutschrift ist für den Aussteller eine Ausgabe", () => {
     const liesmich = strFromU8(inhalt["LIESMICH.txt"]!);
     expect(liesmich).toContain("Gutschriften_2026.csv: 1 Gutschrift");
     expect(liesmich).toContain("im Buchungsstapel als Aufwand (bezogene Leistungen)");
-    // die XRechnung der Gutschrift bleibt im Paket (Rechnungsart unverändert, fachlich offen)
-    expect(Object.keys(inhalt).filter((k) => k.startsWith("E-Rechnungen/"))).toHaveLength(3);
+    // R11: XRechnung der Gutschrift nur mit allen Angaben des Leistenden (Verkäufer, Typ 389) – hier fehlt das Telefon
+    expect(Object.keys(inhalt).filter((k) => k.startsWith("E-Rechnungen/"))).toHaveLength(2);
+    expect(liesmich).toMatch(/- 2026-003 \(Jonas Kiefer Fotografie\): Angaben fehlen: [^\r]*Telefon des Leistenden/);
     // ohne Gutschrift keine leere Liste
     const ohne = unzipSync(steuerpaket({ ...s, unterlagen: s.unterlagen.filter((u) => u.id !== "g1") }, JAHR, SB, {}, "2027-01-20T12:00:00.000Z").zip);
     expect(Object.keys(ohne)).not.toContain("Gutschriften_2026.csv");

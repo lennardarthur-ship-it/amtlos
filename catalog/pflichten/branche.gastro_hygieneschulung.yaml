@@ -1,0 +1,56 @@
+# R11 (Rechtsprüfung T-114): Hygieneschulung nach § 4 LMHV und Anhang II Kapitel XII VO (EG) Nr. 852/2004
+schema_version: 1
+id: branche.gastro_hygieneschulung
+version: 1
+katalog_nr: H.1
+titel:
+  de: Lebensmittelhygiene schulen
+kurz:
+  de: Wer bei dir mit leicht verderblichen Lebensmitteln arbeitet – auch du selbst –, braucht eine Schulung in Lebensmittelhygiene.
+erklaerung:
+  de: Wer gewerbsmäßig leicht verderbliche Lebensmittel herstellt, behandelt oder in Verkehr bringt, braucht dafür Fachkenntnisse aus
+    einer Schulung (§ 4 Lebensmittelhygiene-Verordnung). Als Lebensmittelunternehmer stellst du sicher, dass alle, die mit Lebensmitteln
+    umgehen, ihrer Tätigkeit entsprechend in Hygiene geschult und überwacht werden (Anhang II Kapitel XII VO (EG) Nr. 852/2004). Halte
+    die Schulungen mit Datum und Teilnehmenden fest.
+rechtsgrundlage:
+- § 4 LMHV
+- Anhang II Kapitel XII VO (EG) Nr. 852/2004
+kategorie: branche
+branchen:
+- gastronomie_lebensmittel
+ausloeser:
+  feld: profil.taetigkeit.branchen
+  op: enthaelt
+  wert: gastronomie_lebensmittel
+  label:
+    de: Dein Betrieb gehört zur Gastronomie oder Lebensmittelbranche.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Kontrolle durch die Lebensmittelüberwachung
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Lebensmittelhygiene-Verordnung § 4
+  url: https://www.gesetze-im-internet.de/lmhv_2007/__4.html
+  abgerufen: null
+- titel: Verordnung (EG) Nr. 852/2004
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32004R0852
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Neu nach Rechtsprüfung R11 (T-114) – Wiederholungsabstand und Nachweisform fachlich festlegen; Abgrenzung zur IfSG-Belehrung'
+- 'Folgen bei Nichterfüllung – Sanktion fachlich ergänzen'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

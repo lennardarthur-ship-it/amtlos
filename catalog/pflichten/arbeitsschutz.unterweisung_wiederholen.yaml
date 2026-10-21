@@ -1,7 +1,7 @@
 # Katalog E.51 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: arbeitsschutz.unterweisung_wiederholen
-version: 2
+version: 3
 katalog_nr: E.51
 titel:
   de: Unterweisung jährlich wiederholen
@@ -56,7 +56,7 @@ quellen:
   abgerufen: null
 fachlich_zu_pruefen:
 - „Mindestens jährlich“ als ein Jahr nach der letzten Unterweisung umgesetzt – bestätigen
-- Kürzere Fristen für Jugendliche (JArbSchG) ergänzen
+- 'Kürzere Frist für Jugendliche als eigene Pflicht arbeitsschutz.unterweisung_jugendliche (R11)'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 pruefung:
   status: entwurf

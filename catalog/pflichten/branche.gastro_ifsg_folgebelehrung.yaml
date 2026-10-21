@@ -1,7 +1,7 @@
 # R10: aus branche.gastro_ifsg_belehrung herausgelöst (Rechtsprüfung: Belehrung durch den Arbeitgeber „im Weiteren alle zwei Jahre“, § 43 Abs. 4 IfSG)
 schema_version: 1
 id: branche.gastro_ifsg_folgebelehrung
-version: 1
+version: 2
 katalog_nr: H.1
 titel:
   de: Belehrung nach § 43 IfSG alle zwei Jahre wiederholen
@@ -24,6 +24,14 @@ ausloeser:
     wert: gastronomie_lebensmittel
     label:
       de: Dein Betrieb gehört zur Gastronomie oder Lebensmittelbranche.
+  # R11 (Rechtsprüfung Befund 7): nur für Beschäftigte, die mit Lebensmitteln nach § 42 IfSG arbeiten – nicht für Bürokräfte
+  - feld: profil.ifsg.beschaeftigte
+    op: in
+    wert:
+    - erstmals
+    - bescheinigung
+    label:
+      de: Beschäftigte arbeiten bei dir mit Lebensmitteln.
   - feld: abgeleitet.hat_beschaeftigte
     op: ==
     wert: true

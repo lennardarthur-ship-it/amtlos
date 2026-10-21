@@ -1,5 +1,5 @@
 persona: solo
-beschreibung: Freiberuflerin ohne Beschäftigte, keine Angaben zu Daten, KI und NIS2 – nur der NIS2-Check fragt nach
+beschreibung: "Freiberuflerin ohne Beschäftigte, keine Angaben zu Daten, KI und NIS2 – R11: NIS2-Check bei unter 50 Beschäftigten ohne IT-Branche ausgeblendet"
 stichtag: "2026-10-11"
 fakten:
   profil.rechtsform: freiberuf
@@ -12,6 +12,6 @@ erwartet:
   datenschutz.vvt: unbekannt
   datenschutz.avv: unbekannt
   datenschutz.dsb: gilt_nicht
-  it_sicherheit.nis2_pruefen: gilt
+  it_sicherheit.nis2_pruefen: gilt_nicht
   ki.kompetenz: unbekannt
   ki.transparenz: unbekannt

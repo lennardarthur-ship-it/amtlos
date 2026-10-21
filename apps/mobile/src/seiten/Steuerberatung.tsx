@@ -7,7 +7,7 @@ import { T as TEXT } from "../texte";
 import { ChipLeiste, Feld, Fuss, Hinweis, Karte, Knopf, T, Wahl } from "../ui/bausteine";
 import { useMeldung, useMeldungLeeren } from "../ui/meldung";
 import { Unterseite } from "../ui/navigation";
-import { gestellteRechnungen, kassenLage, standardZeitraum, steuerpaket, zeitraeume } from "../unterlagen/steuerpaket";
+import { gestellteRechnungen, kapitalgesellschaft, kassenLage, standardZeitraum, steuerpaket, zeitraeume } from "../unterlagen/steuerpaket";
 import { dateiTeilenBytes } from "../unterlagen/sicherungDatei";
 import { heute } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
@@ -126,6 +126,8 @@ export function SteuerberatungSeite() {
         <View style={{ marginTop: 14 }}>
           {/* R10 UI: Kasse bzw. Shop laut Check – vor dem Kauf sagen, dass diese Umsätze im Paket fehlen */}
           {kassenLage(z.stand.profil) !== "keine" && kassenLage(z.stand.profil) !== "unbekannt" ? <Hinweis art="warnung" symbol="banknote" text={kassenLage(z.stand.profil) === "shop" ? TEXT.shop_paket_vorab : TEXT.kasse_paket_vorab} /> : null}
+          {/* R11 (Tischlerei #23): für Gesellschaften mit Bilanz ehrlich sagen, was das Paket ist – eine Zuarbeit, keine Buchführung */}
+          {kapitalgesellschaft(z.stand) ? <Hinweis text={TEXT.steuerpaket_bilanz} /> : null}
           <Hinweis text={TEXT.steuerpaket_hinweis} />
           {gross ? <Hinweis art="warnung" text={TEXT.steuerpaket_gross(mb)} /> : null}
           {fortschritt ? <Hinweis text={fortschritt} /> : null}

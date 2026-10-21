@@ -13,6 +13,13 @@ import { useAmtlos } from "../zustand";
 import { Ansage, Felder, gefuellt } from "./felder";
 import { Inhalt } from "./gemeinsam";
 
+/**
+ * R11: Vorschlagsgruppen der Branchen, die der Pflichten-Check (VORSCHLAG_GRUPPE) noch nicht kennt – Gebäudereinigung.
+ * „Holz / Tischlerei“ bleibt bewusst ohne Zuordnung (der Check unterscheidet die Gewerke im Handwerk nicht): beim
+ * Elektriker stünde sonst Hartholzstaub unter „Passend für dich“.
+ */
+const GRUPPE_R11: Record<string, string[]> = { gebaeudereinigung: ["Gebäudereinigung"] };
+
 /** Filter „passend zu deinem Betrieb“ (mehrere Gruppen, z. B. Friseur und Kosmetik bei Beauty) */
 const PASSEND = "\u0001passend";
 
@@ -150,7 +157,7 @@ function VorschlagSeite({ id, feldId }: { id: string; feldId: string }) {
   const alle = feld?.vorschlaege ?? [];
   const gruppen = [...new Set(alle.map((v) => v.gruppe).filter((g): g is string => Boolean(g)))];
   // Branche aus dem Pflichten-Check: passende Gruppen zuerst („Passend für dich“), damit beim Maler keine Friseurchemikalien stehen
-  const passend = gruppen.filter((g) => (Array.isArray(z.stand.profil["taetigkeit.branchen"]) ? (z.stand.profil["taetigkeit.branchen"] as string[]) : []).some((b) => (VORSCHLAG_GRUPPE[b] ?? []).includes(g)));
+  const passend = gruppen.filter((g) => (Array.isArray(z.stand.profil["taetigkeit.branchen"]) ? (z.stand.profil["taetigkeit.branchen"] as string[]) : []).some((b) => [...(VORSCHLAG_GRUPPE[b] ?? []), ...(GRUPPE_R11[b] ?? [])].includes(g)));
   const [gruppe, setGruppe] = useState<string>(passend.length === 1 ? passend[0]! : passend.length > 1 ? PASSEND : "");
   const [gewaehlt, setGewaehlt] = useState<Set<string>>(new Set());
   const [offen, setOffen] = useState<string | null>(null);
@@ -164,8 +171,10 @@ function VorschlagSeite({ id, feldId }: { id: string; feldId: string }) {
   const kurzVon = (v: Vorschlag) => kurzAlle[alle.indexOf(v)] ?? v.titel;
   // erste lange Angabe eines Vorschlags (z. B. Schutzmaßnahmen) als Details
   const details = (v: Vorschlag) => feld.felder.filter((x) => x.id !== feld.titelFeld && (x.art === "text" || x.art === "mehrzeilig") && typeof v.werte[x.id] === "string" && (v.werte[x.id] as string).length > 0).slice(0, 2);
-  const uebernehmen = () => {
-    const neu = alle.filter((v) => gewaehlt.has(v.titel)).map((v) => eintragAusVorschlag(feld, v, z.stand.betrieb, heute()));
+  // R11 (Berater d, #13): „Alle übernehmen“ als Hauptweg – alle sichtbaren, noch nicht übernommenen Vorschläge
+  const offenSichtbar = liste.filter((v) => !istDa(v));
+  const uebernehmen = (auswahl: Set<string> = gewaehlt) => {
+    const neu = alle.filter((v) => auswahl.has(v.titel)).map((v) => eintragAusVorschlag(feld, v, z.stand.betrieb, heute()));
     const behalten = eintraegeVon(z.daten(id), feld).filter((e) => benutzt(feld, e));
     z.setzen(id, { [feld.id]: [...behalten, ...neu] });
     melden(TEXT.uebernommen(neu.length));
@@ -222,8 +231,12 @@ function VorschlagSeite({ id, feldId }: { id: string; feldId: string }) {
           })}
         </Karte>
       </Inhalt>
-      <Fuss>
-        <Knopf text={gewaehlt.size ? TEXT.uebernehmen(gewaehlt.size) : TEXT.nichts_gewaehlt} deaktiviert={!gewaehlt.size} symbol="plus" onPress={uebernehmen} stil={{ flex: 1 }} />
+      <Fuss ueber={gewaehlt.size && offenSichtbar.length > gewaehlt.size ? <TextKnopf text={TEXT.r11_alle_uebernehmen(offenSichtbar.length)} onPress={() => uebernehmen(new Set(offenSichtbar.map((v) => v.titel)))} stil={{ alignSelf: "center" }} /> : undefined}>
+        {gewaehlt.size ? (
+          <Knopf text={TEXT.uebernehmen(gewaehlt.size)} symbol="plus" onPress={() => uebernehmen()} stil={{ flex: 1 }} />
+        ) : (
+          <Knopf text={offenSichtbar.length ? TEXT.r11_alle_uebernehmen(offenSichtbar.length) : TEXT.nichts_gewaehlt} deaktiviert={!offenSichtbar.length} symbol="plus" onPress={() => uebernehmen(new Set(offenSichtbar.map((v) => v.titel)))} stil={{ flex: 1 }} />
+        )}
       </Fuss>
     </Unterseite>
   );

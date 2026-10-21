@@ -1,7 +1,7 @@
 # Katalog A.5 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gruendung.fragebogen_steuerliche_erfassung
-version: 1
+version: 2
 katalog_nr: A.5
 titel:
   de: Fragebogen zur steuerlichen Erfassung abgeben
@@ -47,6 +47,12 @@ aktion:
   art: uebermittlung
   ziel: elster.fragebogen
   nachweis_erforderlich: true
+erledigung:
+  art: bestaetigen
+  bestaetigung:
+    de: In ELSTER übermittelt
+aenderungsnotiz:
+  de: Erledigt ist der Fragebogen erst, wenn du ihn in ELSTER übermittelt hast – vorher brauchst du das ELSTER-Konto.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null

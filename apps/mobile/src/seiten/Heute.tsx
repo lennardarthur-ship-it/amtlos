@@ -1,13 +1,17 @@
 import { useMemo } from "react";
 import { Pressable, View } from "react-native";
 import { T as TEXT } from "../texte";
-import { Hinweis, Karte, Knopf, T, useGrosseSchrift } from "../ui/bausteine";
+import { Hinweis, Karte, Knopf, T, Zeile, useGrosseSchrift } from "../ui/bausteine";
 import { useNav } from "../ui/navigation";
 import { SCHRIFT, useFarben } from "../ui/thema";
 import { stundeIn, zeitzoneAbweichend } from "../ui/zeit";
 import { euroText, monatsSumme, offeneSumme } from "../unterlagen/ablage";
 import { heute, sortiert, type Stand } from "../unterlagen/speicher";
 import { dringlichkeit, fortschritt, istErledigt } from "../pflichten/check";
+import { ANLAESSE } from "@amtlos/fachlogik";
+import { kontrollbereit } from "../unterlagen/kontrollmappe";
+import { useKontrollmappeOeffnen } from "./Kontrollmappe";
+import { AnlassSeite } from "./Unterlagen";
 import { useAktionen, useAmtlosStatus, useStandWahl } from "../zustand";
 import { BelegErfassenSeite } from "./Belege";
 import { BlattKopf, BuehnenMarke, BuehnenSeite, GrosserBetrag } from "./gemeinsam";
@@ -44,11 +48,15 @@ export function Heute() {
   const tag = heute();
   const gemacht = checkGemacht(profil);
 
-  const { naechste, fs } = useMemo(() => {
+  const { naechste, fs, bereit } = useMemo(() => {
     const e = { erledigt, unterlagen, betrieb };
     const d = dringlichkeit(a, e, tag);
-    return { naechste: [...d.jetzt, ...d.naechsteWochen].slice(0, 3), fs: fortschritt(a, e) };
+    // R11 (Berater d): „Kontrollbereit: x von y Nachweisen“ – offene Pflichten mit Vorlage, die in die Mappe gehört
+    const bereit = kontrollbereit({ unterlagen, betrieb }, a.gilt.filter((p) => !istErledigt(p, e)), tag);
+    return { naechste: [...d.jetzt, ...d.naechsteWochen].slice(0, 3), fs: fortschritt(a, e), bereit };
   }, [a, erledigt, unterlagen, betrieb, tag]);
+  const mappe = useKontrollmappeOeffnen();
+  const gruenden = ANLAESSE.find((x) => x.id === "gruenden");
   const offen = useMemo(() => offeneSumme(unterlagen, betrieb, tag), [unterlagen, betrieb, tag]);
   const monat = useMemo(() => monatsSumme(unterlagen, betrieb, tag.slice(0, 7)), [unterlagen, betrieb, tag]);
   // überfällige Rechnungen gehören zu „Als Nächstes“ – Geld, das fehlt, ist dringender als jede Liste
@@ -107,7 +115,8 @@ export function Heute() {
   return (
     <BuehnenSeite ueber={ueber} buehne={buehne}>
       {z.speicherFehler ? <Hinweis art="fehler" text={z.speicherFehlerArt === "schreiben" ? TEXT.speicher_fehler_schreiben : TEXT.speicher_fehler} /> : null}
-      <SicherungsKarte />
+      {/* R11 (UX #12): solange der Check fehlt, steht seine Einladung über jeder Erinnerung */}
+      {gemacht ? <SicherungsKarte /> : null}
       {gemacht ? (
         <View>
           <BlattKopf erste titel={TEXT.als_naechstes} rechts={TEXT.alle_pflichten} onPress={() => tabWechseln("pflichten")} />
@@ -131,9 +140,23 @@ export function Heute() {
               <T v="caption" leise stil={{ ...SCHRIFT.halb }}>{TEXT.fortschritt_text(fs.fertig, fs.gesamt)}</T>
             </View>
           ) : null}
+          {bereit.gesamt ? (
+            <Karte stil={{ marginTop: 18 }}>
+              <Zeile symbol="folder" ton="blau" titel={TEXT.r11_kontrollbereit(bereit.da, bereit.gesamt)} text={TEXT.r11_kontrollbereit_text} onPress={mappe} letzte />
+            </Karte>
+          ) : null}
         </View>
       ) : (
-        <Einladung />
+        <View>
+          <Einladung />
+          {/* R11 (Gründerin #17): wer gerade gründet, hat noch nichts zu rechnen – ein eigener Einstieg */}
+          {!unterlagen.length && gruenden ? (
+            <Karte stil={{ marginTop: 14 }}>
+              <Zeile symbol="flag" titel={TEXT.r11_gruende_titel} text={TEXT.r11_gruende_text} onPress={() => nav.oeffnen("anlass-gruenden", () => <AnlassSeite a={gruenden} />)} letzte />
+            </Karte>
+          ) : null}
+          <SicherungsKarte />
+        </View>
       )}
 
       {zuletzt.length ? (

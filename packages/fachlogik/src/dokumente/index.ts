@@ -5,8 +5,8 @@ import { aufbewahrung, bilanzGuv, euer, kassenbuch, kassenmeldung, rechnung, ste
 import { arbeitszeitnachweis, lohnkonto, svMeldedaten } from "./lohn.js";
 import { auftragsverarbeitung, datenschutzerklaerungWebsite, impressum } from "./website.js";
 import { allergenAushang, haccp, hautschutzplan, hygieneplan, ifsgBelehrung } from "./branchen.js";
-import { datenpanne, datenschutzDokumentation, datenschutzinformation } from "./datenschutz.js";
-import { kiKompetenz, nachweisArbeitsbedingungen } from "./personal.js";
+import { anamnese, datenpanne, datenschutzDokumentation, datenschutzinformation } from "./datenschutz.js";
+import { ausweisHinweis, kiKompetenz, nachweisArbeitsbedingungen, schluesselquittung } from "./personal.js";
 import { verfahrensdokumentation } from "./steuern.js";
 import { pdfDateiname } from "../dateinamen.js";
 import { GESTALT_MARKE, GRUNDLAGE_MARKE, RAENDER, RAENDER_MARKE, SEITE_MARKE, cent, esc, festeLeerzeichen, kennungFassen, seiteCss, zahl } from "./html.js";
@@ -22,7 +22,7 @@ export { EUER_KAPITALGESELLSCHAFT, GUTSCHRIFT_AUSWAHL, RECHNUNG_NEGATIV, RECHNUN
 // R10 Steuer
 export { NULLSATZ_HINWEIS, RECHNUNG_13B_TEXT, RECHNUNG_EU_19, RECHNUNG_GUTSCHRIFT_STEUER, RECHNUNG_KU_DRITTLAND, RECHNUNG_KU_EU, RECHNUNG_KU_IGL, RECHNUNG_KU_PROFIL, RECHNUNG_KU_RC, RECHNUNG_LEITWEG, UST_FRIST, UST_FRIST_DFV, drittlandLand, euUnternehmenLand, istNullsatzText, istOeffentlicherEmpfaenger, kuFuer } from "./buchhaltung.js";
 export { istKapitalgesellschaft, mitVertretung } from "./betrieb.js";
-export { STEUERKLASSEN, arbeitsminuten } from "./lohn.js";
+export { STEUERKLASSEN, arbeitsminuten, monatAus } from "./lohn.js";
 export { ANLAESSE, KURZ, PERSONEN_FELDER, kurztitel, kurztitelListe, naechsteNummer, personAus, personIn, personMerken, type Anlass } from "./ablauf.js";
 export { cent, zahl } from "./html.js";
 
@@ -59,6 +59,8 @@ export const VORLAGEN: Vorlage[] = [
   svMeldedaten,
   lohnkonto,
   kiKompetenz,
+  ausweisHinweis,
+  schluesselquittung,
   // Arbeitsschutz
   gefaehrdungsbeurteilung,
   unterweisung,
@@ -76,6 +78,7 @@ export const VORLAGEN: Vorlage[] = [
   haccp,
   hautschutzplan,
   hygieneplan,
+  anamnese,
 ];
 
 export function vorlageFuer(id: string): Vorlage | undefined {
@@ -94,6 +97,8 @@ export const BRANCHEN_GRUPPEN: Record<string, string[]> = {
   onlinehandel: ["buero_laden"],
   it_agentur_freelancer: ["buero_laden"],
   immobilien_finanzen: ["buero_laden"],
+  // R11 (Reinigung): eigene Gruppe für Bausteine und Vorbelegungen der Gebäudereinigung
+  gebaeudereinigung: ["gebaeudereinigung"],
 };
 
 /** Branchengruppen eines Betriebs aus den Branchen im Pflichten-Check. */
@@ -152,8 +157,10 @@ function startwert(f: EinfachesFeld, b: Betrieb, heute: string, gruppen?: readon
     case "betrag":
     case "zahl":
       return f.vorbelegung ?? "";
-    case "wahl":
-      return f.vorbelegung ?? null;
+    case "wahl": {
+      const je = f.vorbelegungJe ? gruppen?.map((g) => f.vorbelegungJe![g]).find((w) => w !== undefined) : undefined;
+      return je ?? f.vorbelegung ?? null;
+    }
     case "schalter":
       return f.vorbelegung ?? false;
     case "mehrfach":
@@ -202,13 +209,15 @@ export function unlesbarText(f: Feld): string {
 export function fehlendeAngaben(v: Vorlage, d: Daten, b?: Betrieb): string[] {
   const fehlt: string[] = [];
   const sichtbar_ = ohneVerdeckte(v, d);
+  const frei = new Set(v.nichtPflicht?.(d) ?? []);
   for (const a of v.abschnitte)
     for (const f of a.felder) {
       if (!sichtbar(f, sichtbar_)) continue;
       if (f.art === "liste") {
         const eintraege = (Array.isArray(d[f.id]) ? d[f.id] : []) as Eintrag[];
         const genutzt = eintraege.filter((e) => benutzt(f, e));
-        if (f.pflicht && !genutzt.length) fehlt.push(`mindestens ein Eintrag: ${f.eintrag}`);
+        // R11 (UX #15): ohne zweiten Doppelpunkt hinter „Fehlt:“
+        if (f.pflicht && !genutzt.length) fehlt.push(`mindestens ein Eintrag „${f.eintrag}“`);
         genutzt.forEach((e, i) => {
           const vor = `${f.eintrag}${genutzt.length > 1 ? ` ${i + 1}` : ""}: `;
           for (const x of f.felder) {
@@ -218,7 +227,7 @@ export function fehlendeAngaben(v: Vorlage, d: Daten, b?: Betrieb): string[] {
             else if (platzhalterOffen(x, e[x.id])) fehlt.push(`${vor}${platzhalterText(x)}`);
           }
         });
-      } else if (f.pflicht && !gefuellt(d[f.id])) fehlt.push(f.label);
+      } else if (f.pflicht && !frei.has(f.id) && !gefuellt(d[f.id])) fehlt.push(f.label);
       else if (unlesbar(f, d[f.id])) fehlt.push(unlesbarText(f));
       // „Guten Tag …“ (R10): ein nicht ersetzter Platzhalter stünde wörtlich auf dem PDF
       else if (platzhalterOffen(f, d[f.id])) fehlt.push(platzhalterText(f));

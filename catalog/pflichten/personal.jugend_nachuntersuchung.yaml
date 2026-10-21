@@ -1,0 +1,62 @@
+# R11 (Nutzertest Tischlerei Befund 7): Nachuntersuchung nach § 33 JArbSchG als eigene Pflicht
+schema_version: 1
+id: personal.jugend_nachuntersuchung
+version: 1
+katalog_nr: D.44
+titel:
+  de: Ärztliche Nachuntersuchung Jugendlicher nach einem Jahr
+kurz:
+  de: Ein Jahr nach Beginn lässt du dir von Jugendlichen die Bescheinigung über die erste Nachuntersuchung vorlegen.
+erklaerung:
+  de: Vor Beginn brauchen Jugendliche die Bescheinigung über die Erstuntersuchung (§ 32 JArbSchG). Ein Jahr nach Aufnahme der ersten
+    Beschäftigung lässt du dir die Bescheinigung über die erste Nachuntersuchung vorlegen (§ 33 JArbSchG). Liegt sie nach 14 Monaten
+    nicht vor, darfst du die Person nicht weiter beschäftigen. Amtlos rechnet ab der Einstellung.
+rechtsgrundlage:
+- § 33 JArbSchG
+kategorie: personal
+ausloeser:
+  all:
+  - feld: profil.beschaeftigte.jugendlich
+    op: '>='
+    wert: 1
+    label:
+      de: Du beschäftigst Jugendliche.
+  - ereignis: einstellung
+    op: eingetreten
+    label:
+      de: Du stellst jemanden ein.
+frist:
+  typ: relativ
+  bezug:
+    ereignis: einstellung
+  versatz: P1Y
+  zeitpunkt: spaetestens
+  je_ereignis: true
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Untersuchung durch eine Ärztin oder einen Arzt
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Ohne Bescheinigung nach 14 Monaten darfst du die jugendliche Person nicht weiter beschäftigen (§ 33 Abs. 3 JArbSchG).
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Jugendarbeitsschutzgesetz § 33
+  url: https://www.gesetze-im-internet.de/jarbschg/__33.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Termin ein Jahr nach jeder Einstellung – Amtlos unterscheidet Jugendliche bei der Einstellung nicht; Bezug „erste Beschäftigung“ bestätigen'
+- 'Beschäftigungsverbot nach 14 Monaten (§ 33 Abs. 3 JArbSchG) und Bußgeld (§ 58 JArbSchG) bestätigen'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

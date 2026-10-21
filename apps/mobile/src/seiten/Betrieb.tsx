@@ -5,7 +5,7 @@ import { BUNDESLAENDER, HAUSFARBEN, PERSONEN_FELDER, VERSTEUERUNG, VORLAGEN, ema
 import { T as TEXT } from "../texte";
 import { logoWaehlen } from "../unterlagen/logo";
 import { AuswahlZeile } from "../ui/auswahlseite";
-import { type Ton, Feld, Fuss, Initialen, Karte, Knopf, Schalter, Suchfeld, Symbol, T, TextKnopf, Wahl, Zeile } from "../ui/bausteine";
+import { type Ton, DatumFeld, Feld, Fuss, Initialen, Karte, Knopf, Schalter, Suchfeld, Symbol, T, TextKnopf, Wahl, Zeile } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
 import { RAND, RADIUS, useFarben, weich } from "../ui/thema";
@@ -25,6 +25,7 @@ import { SteuerberatungSeite } from "./Steuerberatung";
 import { KontrollmappeSeite } from "./Kontrollmappe";
 import { KontoZeile } from "./Konto";
 import { syncAngeboten } from "../konto/konfig";
+import { useKonto } from "../konto/konto";
 
 /** Eine gespeicherte Person bearbeiten (E-124). Eine neue Person ohne Namen verschwindet beim Verlassen wieder. */
 function PersonSeite({ art, id, neu }: { art: PersonenArt; id: string; neu?: boolean }) {
@@ -68,6 +69,12 @@ function PersonSeite({ art, id, neu }: { art: PersonenArt; id: string; neu?: boo
   );
 }
 
+/** Beschäftigte laut Pflichten-Check (0, wenn unbekannt) – für die Brücke „aus dem Check – jetzt eintragen“. */
+function ausCheckBeschaeftigte(profil: Record<string, unknown>): number {
+  const n = profil["beschaeftigte.gesamt"];
+  return typeof n === "number" && n > 0 ? n : 0;
+}
+
 /** Gespeicherte Mitarbeiter bzw. Kunden – eigene Seite mit Liste und „hinzufügen“. */
 function PersonenSeite({ art }: { art: PersonenArt }) {
   const z = useAmtlos();
@@ -98,7 +105,7 @@ function PersonenSeite({ art }: { art: PersonenArt }) {
             ))}
           </Karte>
         ) : !s ? (
-          <T v="klein" leise stil={{ marginTop: 14 }}>{TEXT.personen_leer[art]}</T>
+          <T v="klein" leise stil={{ marginTop: 14 }}>{art === "mitarbeiter" && ausCheckBeschaeftigte(z.stand.profil) ? TEXT.r11_mitarbeiter_bruecke_text(ausCheckBeschaeftigte(z.stand.profil)) : TEXT.personen_leer[art]}</T>
         ) : null}
         <Knopf ton symbol="plus" text={TEXT.person_hinzufuegen[art]} onPress={anlegen} stil={{ marginTop: 16 }} />
       </Inhalt>
@@ -226,7 +233,10 @@ export function BetriebFormular({ teil, teile }: { teil?: Teil; teile?: Teil[] }
                 <Feld label={TEXT.b_bic} {...feld("bic")} autoCapitalize="characters" autoCorrect={false} spellCheck={false} />
               </View>
             </View>
-            <Wahl label={TEXT.b_versteuerung} hilfe={TEXT.b_versteuerung_hilfe} wert={b.versteuerung || null} aendern={(w) => feld("versteuerung").aendern(w)} optionen={VERSTEUERUNG} />
+            {/* R11 (Kosmetik #25): Soll ist der Normalfall und vorausgewählt; Ist nur auf Antrag */}
+            <Wahl label={TEXT.b_versteuerung} hilfe={TEXT.b_versteuerung_hilfe} wert={b.versteuerung || "soll"} aendern={(w) => feld("versteuerung").aendern(w)} optionen={VERSTEUERUNG.map((o) => ({ wert: o.wert, text: TEXT.r11_versteuerung[o.wert] ?? o.text }))} />
+            {/* R11 (Kosmetik #2/#8): Wechsel von der Kleinunternehmerregelung – bis wann galt sie? */}
+            <DatumFeld label={TEXT.b_ku_bis} hilfe={TEXT.b_ku_bis_hilfe} wert={b.ku_bis || null} aendern={(w) => feld("ku_bis").aendern(w ?? "")} ohneHeute />
           </Karte>
         </View>
       ) : null}
@@ -369,6 +379,11 @@ export function Betrieb() {
       </Unterseite>
     ));
   const personen = (art: PersonenArt) => personenSortiert(z.stand[PERSONEN_LISTE[art]]);
+  // R11 (UX #14, Berater #17): Sätze zur Synchronisation nur, wenn sie auf diesem Gerät eingerichtet ist
+  const konto = useKonto();
+  const syncAn = syncAngeboten && konto.status === "aktiv";
+  // R11 (Berater d): Beschäftigte laut Check, aber noch niemand eingetragen – Brücke zur Liste
+  const ausCheck = ausCheckBeschaeftigte(z.stand.profil);
   const teileSichtbar = TEILE.filter((t) => t !== "gesellschaft" || mitGesellschaft(z.stand.profil, b));
   return (
     <BuehnenSeite key={zaehler} ueber={betriebFehlt(b) ? undefined : TEXT.betrieb_titel} buehne={<BetriebKopf b={b} onPress={betriebFehlt(b) ? oeffneAlles : () => oeffneTeil("angaben")} />}>
@@ -400,7 +415,7 @@ export function Betrieb() {
                 key={art}
                 symbol={art === "mitarbeiter" ? "person.2" : "person.crop.circle"} ton={art === "mitarbeiter" ? "lila" : "blau"}
                 titel={art === "mitarbeiter" ? TEXT.mitarbeiter_titel : TEXT.kunden_titel}
-                text={l.length ? TEXT.personen_anzahl[art](l.length) : TEXT.personen_leer_kurz[art]}
+                text={l.length ? TEXT.personen_anzahl[art](l.length) : art === "mitarbeiter" && ausCheck ? TEXT.r11_mitarbeiter_bruecke(ausCheck) : TEXT.personen_leer_kurz[art]}
                 onPress={() => nav.oeffnen(`personen-${art}`, () => <PersonenSeite art={art} />)}
                 letzte={i === 1}
               />
@@ -408,7 +423,7 @@ export function Betrieb() {
           })}
         </Karte>
       </Gruppe>
-      <Gruppe titel={TEXT.daten_titel} fuss={syncAngeboten ? TEXT.daten_text_sync : TEXT.daten_text}>
+      <Gruppe titel={TEXT.daten_titel} fuss={syncAn ? TEXT.daten_text_sync : syncAngeboten ? TEXT.r11_daten_text_ohne_sync : TEXT.daten_text}>
         <Datenschutz />
         <KontoZeile />
         <CloudZeile />
@@ -433,7 +448,7 @@ export function Betrieb() {
           />
         </Karte>
       ) : null}
-      <Gruppe fuss={`${TEXT.alles_loeschen_text} ${TEXT.alles_loeschen_kopien_hinweis}`}>
+      <Gruppe fuss={syncAn ? `${TEXT.alles_loeschen_text} ${TEXT.r11_alles_loeschen_sync} ${TEXT.r11_alles_loeschen_kopien_sync}` : `${TEXT.alles_loeschen_text} ${TEXT.alles_loeschen_kopien_hinweis}`}>
         {frage && !darfLoeschen ? (
           <Karte stil={{ paddingVertical: 14, gap: 10 }}>
             <T>{TEXT.loeschen_gesperrt(fest, regelwert("steuern.aufbewahrung.belege_jahre") ?? 8)}</T>

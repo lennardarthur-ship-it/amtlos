@@ -98,6 +98,12 @@ export function useTeilen(id: string) {
   return { laedt, fehler, eFehlt, los: () => ausgabe("teilen"), drucken: () => ausgabe("drucken"), eRechnung };
 }
 
+/** R11: Handwerk oder Bau laut Pflichten-Check – dann schlägt die Rechnung den Grundstücks-Hinweis vor (§ 14 Abs. 4 Nr. 9 UStG). */
+const handwerkLaut = (profil: Record<string, unknown>) => {
+  const br = profil["taetigkeit.branchen"];
+  return Array.isArray(br) && br.some((x) => x === "handwerk" || x === "bau");
+};
+
 function VorschauSeite({ id }: { id: string }) {
   const z = useAmtlos();
   const f = useFarben();
@@ -256,7 +262,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
         {v.storno && betragUnplausibel(rechnungBrutto(u, z.stand.betrieb)) ? <Hinweis art="warnung" text={TEXT.betrag_unplausibel} /> : null}
         {/* R10: fachliche Hinweise der Vorlage (Leitweg-ID, EU-Kunde, Abweichung vom Pflichten-Check) – kein Hindernis */}
         {!fest
-          ? (v.hinweise?.(d, z.stand.betrieb, { kleinunternehmer: typeof z.stand.profil["ust.kleinunternehmer"] === "boolean" ? (z.stand.profil["ust.kleinunternehmer"] as boolean) : null }) ?? []).map((h) => <Hinweis key={h} art="warnung" text={h} />)
+          ? (v.hinweise?.(d, z.stand.betrieb, { kleinunternehmer: typeof z.stand.profil["ust.kleinunternehmer"] === "boolean" ? (z.stand.profil["ust.kleinunternehmer"] as boolean) : null, handwerk: handwerkLaut(z.stand.profil) }) ?? []).map((h) => <Hinweis key={h} art="warnung" text={h} />)
           : null}
         {zaehlt ? <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.pro_rest(rest, FREI_JE_MONAT)}</T> : null}
         <T v="caption" leise stil={{ marginTop: 4 }}>{PRUEFHINWEIS}</T>

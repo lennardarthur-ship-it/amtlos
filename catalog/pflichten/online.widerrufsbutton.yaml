@@ -1,7 +1,7 @@
 # Katalog G.68 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.widerrufsbutton
-version: 2
+version: 3
 katalog_nr: G.68
 titel:
   de: Widerrufsbutton für Online-Verträge
@@ -9,9 +9,13 @@ kurz:
   de: Seit 19.6.2026 brauchen B2C-Online-Verträge mit Widerrufsrecht einen Widerrufsbutton – zweistufig, ohne Login, mit Eingangsbestätigung
     auf einem dauerhaften Datenträger.
 erklaerung:
-  de: Verbraucher müssen den Widerruf online so einfach erklären können wie den Vertragsschluss.
+  de: Schließt du Fernabsatzverträge mit Verbrauchern über eine Online-Benutzeroberfläche – Website oder App –, brauchst du eine
+    Widerrufsfunktion (§ 356a BGB). Sie ist während der Widerrufsfrist ständig verfügbar, hervorgehoben und leicht zugänglich, gut
+    lesbar mit „Vertrag widerrufen“ beschriftet und führt zu einer Bestätigungsfunktion „Widerruf bestätigen“. Danach schickst du
+    unverzüglich eine Eingangsbestätigung auf einem dauerhaften Datenträger, zum Beispiel per E-Mail, mit Inhalt des Widerrufs sowie
+    Datum und Uhrzeit des Eingangs. Pass auch deine Widerrufsbelehrung an das neue Muster an.
 rechtsgrundlage:
-- BGB (Umsetzung der Richtlinie (EU) 2023/2673)
+- § 356a BGB
 kategorie: online
 branchen:
 - onlinehandel
@@ -51,15 +55,17 @@ status_recht: in_kraft
 gueltig_ab: '2026-06-19'
 gueltig_bis: null
 quellen:
+- titel: Noerr – Umsetzungsgesetz zum Widerrufsbutton veröffentlicht (BGBl. 2026 I Nr. 28)
+  url: https://www.noerr.com/de/insights/umsetzungsgesetz-zum-widerrufsbutton-veroeffentlicht
+  abgerufen: '2026-10-20'
 - titel: Richtlinie (EU) 2023/2673
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32023L2673
   abgerufen: null
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Fundstelle im BGB nach Umsetzung ergänzen
-- Beschriftung des Buttons fachlich ergänzen
+- '§ 356a BGB, BGBl. 2026 I Nr. 28, in Kraft 19.6.2026, Beschriftungen und Eingangsbestätigung nach Rechtsprüfung R11 (Befund 9) und Noerr – Wortlaut im BGBl. gegenlesen'
+- 'Auslöser „Marktplatz“: verantwortlich bleibt der Unternehmer, Umsetzung durch den Plattformbetreiber – Hinweis prüfen'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf
   geprueft_von: null

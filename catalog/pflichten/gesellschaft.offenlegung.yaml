@@ -1,7 +1,7 @@
 # Katalog B.18 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.offenlegung
-version: 1
+version: 2
 katalog_nr: B.18
 titel:
   de: Jahresabschluss offenlegen
@@ -25,11 +25,16 @@ ausloeser:
     wert: true
     label:
       de: Dein Unternehmen ist eine UG oder GmbH.
-  - feld: profil.gesellschaft.geschaeftsjahr
-    op: ==
-    wert: kalenderjahr
+  # R11 (Nutzertest Tischlerei #1): die Pflicht gilt jeder UG/GmbH – ohne Angabe zum Geschäftsjahr wie meist mit dem Kalenderjahr
+  - not:
+      all:
+      - feld: profil.gesellschaft.geschaeftsjahr
+        op: vorhanden
+      - feld: profil.gesellschaft.geschaeftsjahr
+        op: ==
+        wert: abweichend
     label:
-      de: Dein Geschäftsjahr ist das Kalenderjahr.
+      de: Dein Geschäftsjahr ist das Kalenderjahr (oder du hast nichts anderes angegeben).
 frist:
   typ: wiederkehrend
   rhythmus: jaehrlich
@@ -66,6 +71,7 @@ quellen:
   url: https://www.unternehmensregister.de/
   abgerufen: null
 fachlich_zu_pruefen:
+- 'Ohne Angabe zum Geschäftsjahr gilt die Pflicht mit Terminen nach dem Kalenderjahr (R11, Nutzertest Tischlerei) – Rückfrage zum Geschäftsjahr bleibt in der App'
 - Frist „binnen 12 Monaten“ als 31.12. des Folgejahres umgesetzt (Kalenderjahr) – bestätigen
 - Verschiebung bei Fristende am Wochenende/Feiertag festlegen
 - 'Kleinstkapitalgesellschaft: Merkmale nicht in der Spezifikation – nur Hinweis auf Hinterlegung'

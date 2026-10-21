@@ -1,0 +1,16 @@
+persona: gastronomie
+beschreibung: "R11 (Rechtsprüfung Befund 7): neue Küchenkraft bringt ihre Bescheinigung mit – keine neue Bescheinigung, aber die Belehrung durch den Arbeitgeber"
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2018-01-01"
+  profil.taetigkeit.branchen: [gastronomie_lebensmittel]
+  profil.beschaeftigte.gesamt: 2
+  profil.ifsg.beschaeftigte: bescheinigung
+  profil.bundesland: HE
+ereignisse:
+  - { typ: erste_einstellung, datum: "2018-01-01" }
+  - { typ: einstellung, datum: "2026-10-01" }
+erwartet:
+  branche.gastro_ifsg_bescheinigung: gilt_nicht
+  branche.gastro_ifsg_belehrung: gilt

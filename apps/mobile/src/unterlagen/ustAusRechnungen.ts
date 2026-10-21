@@ -20,6 +20,15 @@
  *   auch für Kleinunternehmer (ohne Kz 67); Vorsteuer aus Gutschriften.
  * - Kleinunternehmer je Zeitraum: Sind alle Rechnungen des Zeitraums Kleinunternehmer-Rechnungen (bzw. keine), gilt
  *   das für diesen Zeitraum – auch wenn der Pflichten-Check heute etwas anderes sagt (Wechsel zum Jahreswechsel).
+ *
+ * R11 (Steuerberatung):
+ * - Rechnungen mit Umsatzsteuer werden immer übernommen, auch in einem Zeitraum, der sonst als Kleinunternehmer-Zeitraum
+ *   gilt (Überschreiten der 100.000 €, § 19 Abs. 1 Satz 2 UStG n. F.; sonst schuldet man die Steuer nach § 14c, Kz 69).
+ *   Vorsteuer dann erst aus Belegen ab der ersten solchen Rechnung.
+ * - Vorsteuer aus Gutschriften zählt unabhängig von Soll/Ist ab Leistung und Gutschrift (§ 15 Abs. 1 Nr. 1 UStG; § 20
+ *   betrifft nur die eigenen Umsätze).
+ * - Ersatzrechnung nach Storno über die ausdrückliche Verknüpfung (`ersetzt`, gesetzt beim Kopieren aus der stornierten
+ *   Rechnung); nur bei älteren Daten ohne Verknüpfung vorsichtig geraten: gleicher Kunde, gleicher Betrag, gleiche Leistung.
  */
 import { eRechnungAus, istEuAusland, kennzahlBefreiung, steuerschuldFuer, summen, umsaetzeNachSatz, ustZeitraum, vorsteuerFuer, type Beleg, type Betrieb } from "@amtlos/fachlogik";
 import { nichtZaehlend, type Unterlage } from "./speicher";
@@ -82,12 +91,15 @@ const kundeVon = (u: Unterlage) => (typeof u.daten.kunde_name === "string" ? u.d
 const istStornoU = (u: Unterlage) => typeof u.daten.storno_zu === "string" && u.daten.storno_zu.trim() !== "";
 
 /**
- * Soll: abweichende Zuordnung bei Storno und Ersatzrechnung (siehe Kopf). Ersatzrechnung = geteilte Rechnung an denselben
- * Kunden mit derselben Leistung wie die stornierte, erstellt nach ihr. Liefert Unterlage-ID → Tag.
+ * Soll: abweichende Zuordnung bei Storno und Ersatzrechnung (siehe Kopf). Ersatzrechnung = geteilte Rechnung mit
+ * `ersetzt` = stornierte Rechnung (R11). Ohne Verknüpfung (ältere Daten) nur bei gleichem Kunden, gleichen Beträgen und
+ * gleicher Leistung, erstellt nach dem Original – dann ein rein formales Storno. Liefert Unterlage-ID → Tag.
  */
 function korrekturen(unterlagen: Unterlage[], betrieb: Betrieb): Map<string, string> {
   const aus = new Map<string, string>();
   const feste = festeRechnungen(unterlagen);
+  // Originale, auf die irgendeine Rechnung (auch ein Entwurf) ausdrücklich verweist – für sie wird nicht geraten
+  const verknuepft = new Set(unterlagen.map((u) => u.ersetzt).filter((x): x is string => !!x));
   for (const st of feste) {
     if (!istStornoU(st) || !st.stornoZuId) continue;
     const orig = feste.find((x) => x.id === st.stornoZuId);
@@ -95,8 +107,10 @@ function korrekturen(unterlagen: Unterlage[], betrieb: Betrieb): Map<string, str
     const leistung = leistungVon(orig, betrieb);
     if (!leistung) continue;
     const betraege = betragsSchluessel(orig, betrieb);
-    // gleicher Kunde oder (z. B. bei korrigiertem Empfängernamen) gleiche Beträge – immer dieselbe Leistung, erstellt nach dem Original
-    const ersatz = feste.find((x) => x.id !== orig.id && !istStornoU(x) && !x.storniertDurch && x.erstellt > orig.erstellt && String(x.daten.datum) >= String(orig.daten.datum) && leistungVon(x, betrieb) === leistung && (kundeVon(x) === kundeVon(orig) || betragsSchluessel(x, betrieb) === betraege));
+    const kandidat = (x: Unterlage) => x.id !== orig.id && !istStornoU(x) && !x.storniertDurch;
+    const ersatz = verknuepft.has(orig.id)
+      ? feste.filter((x) => kandidat(x) && x.ersetzt === orig.id).sort((a, b) => (a.festgeschrieben ?? "").localeCompare(b.festgeschrieben ?? ""))[0]
+      : feste.find((x) => kandidat(x) && x.erstellt > orig.erstellt && String(x.daten.datum) >= String(orig.daten.datum) && leistungVon(x, betrieb) === leistung && kundeVon(x) === kundeVon(orig) && betragsSchluessel(x, betrieb) === betraege);
     if (!ersatz) continue;
     const origTag = zuordnenEinfach(orig, "soll", betrieb).tag;
     if (!origTag) continue;
@@ -125,6 +139,17 @@ function zuordnenEinfach(u: Unterlage, v: Versteuerung, betrieb: Betrieb): Zuord
   return { u, tag: u.daten.datum as string, ersatz: true };
 }
 
+/**
+ * Gutschrift (R11): Vorsteuer ab Leistung und Gutschrift – unabhängig von Soll/Ist (§ 15 Abs. 1 Nr. 1 UStG); es zählt
+ * der spätere der beiden Tage, beim Storno der Gutschrift ihr Datum.
+ */
+function gutschriftTag(u: Unterlage, betrieb: Betrieb): string {
+  const datum = String(u.daten.datum);
+  if (istStornoU(u)) return datum;
+  const leistung = leistungVon(u, betrieb);
+  return leistung && leistung > datum ? leistung : datum;
+}
+
 const periodenVon = (tag: string) => [tag.slice(0, 7), `${tag.slice(0, 4)}-Q${Math.floor((Number(tag.slice(5, 7)) - 1) / 3) + 1}`];
 
 /** Tag der Zuordnung zur Steuerperiode je geteilter Rechnung (wie in der Voranmeldung) – für DATEV-Feld 116. */
@@ -143,7 +168,27 @@ export function perioden(unterlagen: Unterlage[], betrieb: Betrieb, v: Versteuer
     const z = zuordnen(u, v, betrieb, korr);
     if (z.tag) for (const p of periodenVon(z.tag)) set.add(p);
   }
+  for (const u of gestellt(unterlagen)) if (istGutschrift(u)) for (const p of periodenVon(gutschriftTag(u, betrieb))) set.add(p);
+  // R11 (Kosmetik #10): keine Voranmeldung für Zeiträume, die ganz in der Kleinunternehmerzeit liegen („Mein Betrieb“)
+  const kuBis = (betrieb.ku_bis ?? "").trim();
+  if (kuBis) for (const p of [...set]) if ((ustZeitraum(p)?.bis ?? "") <= kuBis) set.delete(p);
   return [...set].sort((a, b) => b.localeCompare(a) || (a.includes("Q") ? 1 : -1));
+}
+
+/**
+ * R11: Der Betrieb hat bisher nur steuerfreie Umsätze ohne Vorsteuerabzug (§ 4 Nr. 8–29 UStG): alle geteilten
+ * Rechnungen (ohne Gutschriften und Kleinunternehmer-Rechnungen) nur zu 0 % mit Steuerbefreiung, Kz 48. Dann ist die
+ * Vorsteuer beim Einlesen einer E-Rechnung zunächst aus (§ 15 Abs. 2 UStG).
+ */
+export function nurSteuerfreieUmsaetze(unterlagen: Unterlage[], betrieb: Betrieb): boolean {
+  const r = festeRechnungen(unterlagen).filter((u) => !kuRechnung(u) && !istStornoU(u));
+  return (
+    r.length > 0 &&
+    r.every((u) => {
+      const { daten } = eRechnungAus(u.daten, betrieb);
+      return daten.steuerart === "befreit" && kennzahlBefreiung(daten.befreiungsgrund) === "48" && daten.positionen.every((p) => p.ust_satz === 0);
+    })
+  );
 }
 
 /** Festgeschriebene Rechnungen ohne vermerkten Zahlungseingang (nicht storniert, keine Stornorechnung, keine Gutschrift). */
@@ -173,6 +218,11 @@ export interface UstUebernahme {
   ohneVorsteuer: number;
   /** Kleinunternehmer: nichts übernommen (`werte` enthält nur den Zeitraum) */
   kleinunternehmer: boolean;
+  /**
+   * R11: Zeitraum gilt als Kleinunternehmer-Zeitraum, enthält aber Rechnungen mit Umsatzsteuer – diese sind übernommen
+   * (Überschreiten der Umsatzgrenze bzw. § 14c UStG, Text TEXT.ust_ku_gemischt).
+   */
+  kuGemischt: boolean;
   /** Gutschriften im Zeitraum – keine Umsätze, nicht übernommen */
   gutschriften: number;
   /**
@@ -193,16 +243,20 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
   const z = ustZeitraum(periode);
   if (!z) return null;
   const korr = korrekturen(unterlagen, betrieb);
-  const imZeitraum = (u: Unterlage) => {
-    const x = zuordnen(u, v, betrieb, korr);
-    return x.tag !== null && x.tag >= z.von && x.tag <= z.bis;
-  };
-  const gutschriftenListe = gestellt(unterlagen).filter((u) => istGutschrift(u) && imZeitraum(u));
+  const gutschriftenListe = gestellt(unterlagen).filter((u) => {
+    if (!istGutschrift(u)) return false;
+    const tag = gutschriftTag(u, betrieb);
+    return tag >= z.von && tag <= z.bis;
+  });
   const gutschriften = gutschriftenListe.length;
   const alle = festeRechnungen(unterlagen)
     .map((u) => zuordnen(u, v, betrieb, korr))
     .filter((x) => x.tag && x.tag >= z.von && x.tag <= z.bis);
-  const ku = kuImZeitraum(alle.map((x) => x.u), kleinunternehmer) ?? false;
+  const kuZeitraum = kuImZeitraum(alle.map((x) => x.u), kleinunternehmer) ?? false;
+  // R11: Rechnungen mit Umsatzsteuer immer übernehmen – auch im Kleinunternehmer-Zeitraum (§ 19 Abs. 1 Satz 2 n. F., § 14c)
+  const mitUst = alle.filter((x) => !kuRechnung(x.u));
+  const kuGemischt = kuZeitraum && mitUst.length > 0;
+  const ku = kuZeitraum && !kuGemischt;
   // § 13b-Eingangsleistungen: die Steuer schulden auch Kleinunternehmer (Kz 46/47, 84/85), Vorsteuer (Kz 67) nur mit Abzug
   const rc = steuerschuldFuer(belege, z.von, z.bis);
   const rcWerte = (mitVorsteuer: boolean): Record<string, string> =>
@@ -213,7 +267,7 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
           ...(mitVorsteuer && rc.vorsteuer_cent ? { vorsteuer_13b: betragText(rc.vorsteuer_cent) } : {}),
         }
       : {};
-  if (ku) return { werte: { zeitraum: periodeText(periode), ...rcWerte(false) }, anzahl: 0, ersatz: 0, offen: 0, vorsteuerBelege: 0, ohneVorsteuer: 0, kleinunternehmer: true, gutschriften, vorsteuerPruefen: false, steuerschuldBelege: rc.anzahl };
+  if (ku) return { werte: { zeitraum: periodeText(periode), ...rcWerte(false) }, anzahl: 0, ersatz: 0, offen: 0, vorsteuerBelege: 0, ohneVorsteuer: 0, kleinunternehmer: true, kuGemischt: false, gutschriften, vorsteuerPruefen: false, steuerschuldBelege: rc.anzahl };
   // einzelne Kleinunternehmer-Rechnungen (z. B. aus der Zeit vor dem Wechsel zur Regelbesteuerung) zählen nicht mit
   const im = alle.filter((x) => !kuRechnung(x.u));
   const rechnungen = im.map(({ u }) => eRechnungAus(u.daten, betrieb).daten);
@@ -238,7 +292,9 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
     }
   }
   const frei = summe((s) => s === null || s === 0);
-  const vst = vorsteuerFuer(belege, z.von, z.bis);
+  // gemischter Zeitraum: Vorsteuer erst aus Belegen ab der ersten Rechnung mit Umsatzsteuer (vorher Kleinunternehmer)
+  const vstAb = kuGemischt ? mitUst.map((x) => x.tag!).sort()[0]! : z.von;
+  const vst = vorsteuerFuer(belege, vstAb > z.von ? vstAb : z.von, z.bis);
   // Gutschriften: die ausgewiesene Umsatzsteuer des Leistenden ist für den Betrieb Vorsteuer (§ 15 Abs. 1 Nr. 1 UStG)
   const vstGutschriften = gutschriftenListe.reduce((a, u) => {
     const { daten } = eRechnungAus(u.daten, betrieb);
@@ -252,6 +308,7 @@ export function umsaetzeFuer(unterlagen: Unterlage[], periode: string, betrieb: 
     ersatz: im.filter((x) => x.ersatz).length,
     offen: v === "ist" ? offeneRechnungen(unterlagen).length : 0,
     kleinunternehmer: false,
+    kuGemischt,
     gutschriften,
     vorsteuerPruefen: ohne.kz48 > 0 && vst.cent > 0,
     steuerschuldBelege: rc.anzahl,

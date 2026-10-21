@@ -1,7 +1,7 @@
 # Katalog H.1 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft · R10: aufgeteilt in Bescheinigung vor Beginn (§ 43 Abs. 1, branche.gastro_ifsg_bescheinigung), Belehrung nach Aufnahme der Tätigkeit (§ 43 Abs. 4, diese Pflicht) und Folgebelehrung alle zwei Jahre (branche.gastro_ifsg_folgebelehrung)
 schema_version: 1
 id: branche.gastro_ifsg_belehrung
-version: 2
+version: 3
 katalog_nr: H.1
 titel:
   de: Belehrung nach § 43 IfSG durch den Arbeitgeber
@@ -23,6 +23,14 @@ ausloeser:
     wert: gastronomie_lebensmittel
     label:
       de: Dein Betrieb gehört zur Gastronomie oder Lebensmittelbranche.
+  # R11 (Rechtsprüfung Befund 7): nur für Beschäftigte, die mit Lebensmitteln nach § 42 IfSG arbeiten – nicht für Bürokräfte
+  - feld: profil.ifsg.beschaeftigte
+    op: in
+    wert:
+    - erstmals
+    - bescheinigung
+    label:
+      de: Beschäftigte arbeiten bei dir mit Lebensmitteln.
   - ereignis: einstellung
     op: eingetreten
     label:

@@ -1,20 +1,22 @@
 # Katalog A.3 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gruendung.erlaubnis_pruefen
-version: 2
+version: 3
 katalog_nr: A.3
 titel:
   de: Erlaubnis für dein Gewerbe einholen
 kurz:
   de: Für manche Gewerbe brauchst du eine Erlaubnis, bevor du anfängst – zum Beispiel als Makler, im Bewachungsgewerbe oder
-    in der Gastronomie.
+    für den Ausschank von Alkohol.
 erklaerung:
-  de: Erlaubnispflichtig sind unter anderem Makler, Bewachung, Versicherungs- und Finanzanlagenvermittlung (§§ 30–34i GewO),
-    Gaststätten nach dem Gaststättenrecht der Länder und das Reisegewerbe (Reisegewerbekarte). Die Erlaubnis muss vor Aufnahme
-    der Tätigkeit vorliegen.
+  de: Erlaubnispflichtig sind unter anderem Makler, Bewachung, Versicherungs- und Finanzanlagenvermittlung (§§ 30–34i GewO). Für
+    Gaststätten kommt es auf das Land an – nach dem Gaststättengesetz des Bundes braucht nur der Ausschank alkoholischer Getränke
+    eine Erlaubnis (§ 2 GastG), manche Länder verlangen statt einer Erlaubnis nur eine Anzeige. Für einzelne Feste gibt es eine
+    vorübergehende Gestattung (§ 12 GastG). Frag beim Gewerbeamt nach, was in deinem Land gilt. Die Erlaubnis muss vor Aufnahme
+    der Tätigkeit vorliegen. Die Reisegewerbekarte ist eine eigene Pflicht.
 rechtsgrundlage:
 - §§ 30–34i GewO
-- Gaststättenrecht der Länder
+- § 2 GastG bzw. Gaststättenrecht der Länder
 kategorie: gruendung
 branchen:
 - gastronomie_lebensmittel
@@ -40,14 +42,20 @@ ausloeser:
     - 34f
     - 34h
     - 34i
-    - '55'
     label:
       de: Deine Tätigkeit fällt unter eine erlaubnispflichtige Vorschrift der Gewerbeordnung.
-  - feld: profil.erlaubnis.gaststaette
-    op: ==
-    wert: true
-    label:
-      de: Du betreibst eine Gaststätte.
+  # R11 (Rechtsprüfung Befund 12, Nutzertest Gründerin): nur mit Alkoholausschank (§ 2 GastG); § 55 als eigene Pflicht
+  - all:
+    - feld: profil.erlaubnis.gaststaette
+      op: ==
+      wert: true
+      label:
+        de: Du betreibst eine Gaststätte.
+    - feld: profil.erlaubnis.alkohol
+      op: ==
+      wert: true
+      label:
+        de: Du schenkst alkoholische Getränke aus.
 phase: gruendung
 frist:
   typ: relativ
@@ -77,8 +85,8 @@ quellen:
   url: https://www.gesetze-im-internet.de/gewo/
   abgerufen: null
 fachlich_zu_pruefen:
-- Reisegewerbekarte (§ 55 GewO) als eigene Pflicht führen?
-- 'Gaststättenrecht je Land: Zuständigkeit und Erlaubnisfreiheit einzelner Länder prüfen'
+- 'Gaststättenrecht je Land: Erlaubnis oder nur Anzeige (Rechtsprüfung R11: mehrere Länder nur Anzeige, Sachsen vermutlich anzeigepflichtig; Gründerin: gilt in BW das Bundes-GastG?) – Text länderneutral, je Land prüfen'
+- 'Erlaubnis nur bei Alkoholausschank (§ 2 GastG, alkoholfreie Getränke nach § 2 Abs. 2 Nr. 1 erlaubnisfrei) – bestätigen'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 pruefung:
   status: entwurf

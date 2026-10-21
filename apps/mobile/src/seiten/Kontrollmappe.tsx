@@ -5,12 +5,12 @@ import { betriebFuerDokument } from "../pro/regeln";
 import { T as TEXT } from "../texte";
 import { ChipLeiste, Fuss, Hinweis, Karte, Knopf, Symbol, T, Zeile } from "../ui/bausteine";
 import { useMeldung, useMeldungLeeren } from "../ui/meldung";
-import { Unterseite } from "../ui/navigation";
+import { Unterseite, useNav } from "../ui/navigation";
 import { HAARLINIE, useFarben, weich } from "../ui/thema";
-import { KONTROLLARTEN, datumDe, deckblattHtml, fehltInMappe, fuerKontrolle, mappeDateiname, mappeZusammenfuegen, mappenAuswahl, seitenzahl, startSeiten, type Kontrollart, type MappenEintrag } from "../unterlagen/kontrollmappe";
+import { BG_NACHWEISE, BG_SCHLUESSEL, KONTROLLARTEN, bgVorhanden, datumDe, deckblattHtml, fehltInMappe, fuerKontrolle, mappeDateiname, mappeZusammenfuegen, mappenAuswahl, seitenzahl, startSeiten, type Kontrollart, type MappenEintrag } from "../unterlagen/kontrollmappe";
 import { istErledigt } from "../pflichten/check";
 import { useAuswertung } from "./Pflichten";
-import { useStarten } from "./starten";
+import { useOeffnen, useStarten } from "./starten";
 import { pdfBytes } from "../unterlagen/pdf";
 import { dateiTeilenBytes } from "../unterlagen/sicherungDatei";
 import { heute } from "../unterlagen/speicher";
@@ -45,6 +45,35 @@ function MappenZeile({ e, an, umschalten, letzte }: { e: MappenEintrag; an: bool
   );
 }
 
+/** Ein Nachweis ohne Vorlage (BG-Besichtigung) zum Abhaken: „vorhanden“ (R11, Tischlerei #22). */
+function PapierZeile({ titel, an, umschalten, letzte }: { titel: string; an: boolean; umschalten: () => void; letzte: boolean }) {
+  const f = useFarben();
+  return (
+    <Pressable
+      accessibilityRole="checkbox"
+      accessibilityState={{ checked: an }}
+      aria-checked={an}
+      accessibilityLabel={`${titel}, ${an ? TEXT.r11_vorhanden : TEXT.r11_nicht_vorhanden}`}
+      onPress={() => {
+        weich();
+        umschalten();
+      }}
+      style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 14, opacity: pressed ? 0.6 : 1 })}
+    >
+      <View style={{ width: 24, height: 24, borderRadius: 7, borderWidth: an ? 0 : 2, borderColor: f.rahmen, backgroundColor: an ? f.amt : f.papier, alignItems: "center", justifyContent: "center" }}>
+        {an ? <Symbol name="checkmark" groesse={14} farbe={f.amtText} gewicht="bold" /> : null}
+      </View>
+      <View style={{ flex: 1, minWidth: 0, paddingVertical: 13, minHeight: 52, justifyContent: "center", borderBottomWidth: letzte ? 0 : HAARLINIE, borderColor: f.linie }}>
+        <T fett={an}>{titel}</T>
+        <T v="klein" leise stil={{ marginTop: 1 }}>{an ? TEXT.r11_vorhanden : TEXT.r11_nicht_vorhanden}</T>
+      </View>
+    </Pressable>
+  );
+}
+
+/** Für welche Kontrollarten die Liste der BG-Nachweise ohne Vorlage erscheint */
+const MIT_PAPIER: Kontrollart[] = ["alle", "bg"];
+
 /**
  * Kontrollmappe: die aktuellen Nachweise (Arbeitsschutz, Hygiene, Lebensmittel, Datenschutz, Personal) in einem PDF –
  * Deckblatt mit Inhaltsverzeichnis, danach jede ausgewählte Unterlage. Das PDF entsteht auf dem Gerät.
@@ -55,7 +84,8 @@ export function KontrollmappeSeite() {
   const melden = useMeldung();
   const leeren = useMeldungLeeren();
   useEffect(() => leeren(), [leeren]);
-  const { eintraege: alleEintraege, unvollstaendig } = useMemo(() => mappenAuswahl(z.stand), [z.stand]);
+  const { eintraege: alleEintraege, unvollstaendigListe } = useMemo(() => mappenAuswahl(z.stand), [z.stand]);
+  const oeffnen = useOeffnen();
   // Kontrollart (R10): nur, was die jeweilige Stelle prüft
   const [art, setArt] = useState<Kontrollart>("alle");
   const eintraege = useMemo(() => alleEintraege.filter((e) => fuerKontrolle(e.vorlage, art)), [alleEintraege, art]);
@@ -76,6 +106,9 @@ export function KontrollmappeSeite() {
     else neu.add(id);
     setAb(neu);
   };
+  // unvollständige Unterlagen dieser Kontrollart – mit dem Weg zum Ergänzen (R11, UX #2/#5)
+  const halb = unvollstaendigListe.filter((x) => fuerKontrolle(x.vorlage, art));
+  const papier = MIT_PAPIER.includes(art);
   const gruppen = BEREICHE.map((b) => ({ ...b, liste: eintraege.filter((e) => e.bereich === b.id) })).filter((g) => g.liste.length);
 
   const los = async () => {
@@ -105,7 +138,7 @@ export function KontrollmappeSeite() {
       let deck: Uint8Array | null = null;
       for (let i = 0; i < 2; i++) {
         const start = startSeiten(deckSeiten, seiten);
-        deck = await pdfBytes(deckblattHtml(z.stand.betrieb.name, tag, drin.map((e, j) => ({ ...e, seite: start[j] })), art === "alle" ? undefined : TEXT.kontrollmappe_arten[art]), "Kontrollmappe-Deckblatt.pdf");
+        deck = await pdfBytes(deckblattHtml(z.stand.betrieb.name, tag, drin.map((e, j) => ({ ...e, seite: start[j] })), art === "alle" ? undefined : TEXT.kontrollmappe_arten[art], papier ? bgVorhanden(z.stand.erledigt) : []), "Kontrollmappe-Deckblatt.pdf");
         if (!deck) throw new Error("pdf");
         const n = await seitenzahl(deck);
         if (n === deckSeiten) break;
@@ -135,6 +168,15 @@ export function KontrollmappeSeite() {
             </Karte>
           </Gruppe>
         ) : null}
+        {halb.length ? (
+          <Gruppe titel={TEXT.r11_mappe_halb_titel(halb.length)} hilfe={TEXT.r11_mappe_halb_hilfe}>
+            <Karte>
+              {halb.map((x, i) => (
+                <Zeile key={x.id} symbol="exclamationmark.circle" ton="bald" titel={x.titel} text={TEXT.r11_mappe_halb_zeile(x.fehlt)} onPress={() => oeffnen(x.id)} letzte={i === halb.length - 1} />
+              ))}
+            </Karte>
+          </Gruppe>
+        ) : null}
         {eintraege.length ? (
           gruppen.map((g, gi) => (
             <Gruppe key={g.id} titel={g.titel} hilfe={gi === 0 ? TEXT.kontrollmappe_gruppe_hilfe : undefined}>
@@ -150,18 +192,31 @@ export function KontrollmappeSeite() {
             <Hinweis text={alleEintraege.length ? TEXT.kontrollmappe_art_leer : TEXT.kontrollmappe_leer} />
           </View>
         )}
-        <View style={{ marginTop: 14 }}>
-          {unvollstaendig ? <Hinweis text={TEXT.kontrollmappe_unvollstaendig(unvollstaendig)} /> : null}
-        </View>
+        {papier ? (
+          <Gruppe titel={TEXT.r11_bg_titel} hilfe={TEXT.r11_bg_hilfe}>
+            <Karte>
+              {BG_NACHWEISE.map((n, i) => {
+                const an = Boolean(z.stand.erledigt[BG_SCHLUESSEL(n.id)]);
+                return <PapierZeile key={n.id} titel={n.titel} an={an} umschalten={() => z.erledigtSetzen(BG_SCHLUESSEL(n.id), an ? null : heute())} letzte={i === BG_NACHWEISE.length - 1} />;
+              })}
+            </Karte>
+          </Gruppe>
+        ) : null}
       </Inhalt>
       <Fuss
         ueber={
-          // Fehler direkt über dem Knopf – im Inhalt läge er unter der Leiste
-          fehler ? <Ansage text={fehler} farbe={f.frist} /> : eintraege.length ? <T v="caption" leise accessibilityLiveRegion="polite">{TEXT.kontrollmappe_auswahl(gewaehlt.length, eintraege.length)}</T> : undefined
+          // Fehler direkt über dem Knopf – im Inhalt läge er unter der Leiste; ohne Auswahl sagt ein Satz, warum der Knopf ruht
+          fehler ? <Ansage text={fehler} farbe={f.frist} /> : gewaehlt.length ? <T v="caption" leise accessibilityLiveRegion="polite">{TEXT.kontrollmappe_auswahl(gewaehlt.length, eintraege.length)}</T> : <T v="caption" leise accessibilityLiveRegion="polite">{eintraege.length ? TEXT.r11_mappe_nichts_gewaehlt : TEXT.r11_mappe_leer_knopf}</T>
         }
       >
-        <Knopf text={TEXT.kontrollmappe_teilen(gewaehlt.length)} symbol="square.and.arrow.up" laedt={laedt} deaktiviert={!gewaehlt.length} onPress={() => void los()} stil={{ flex: 1 }} />
+        <Knopf text={gewaehlt.length ? TEXT.kontrollmappe_teilen(gewaehlt.length) : TEXT.r11_mappe_teilen} symbol="square.and.arrow.up" laedt={laedt} deaktiviert={!gewaehlt.length} onPress={() => void los()} stil={{ flex: 1 }} />
       </Fuss>
     </Unterseite>
   );
+}
+
+/** Kontrollmappe öffnen – von „Heute“, „Unterlagen“ und „Mein Betrieb“ aus (R11, UX #1). */
+export function useKontrollmappeOeffnen() {
+  const nav = useNav();
+  return () => nav.oeffnen("kontrollmappe", () => <KontrollmappeSeite />, true);
 }

@@ -73,7 +73,7 @@ try {
   await p.goto(ADRESSE);
   await warte(2500);
   // Start auf „Heute“ (E-142): Bühne mit Rechnung und Beleg, auf dem Blatt die Einladung zum Check
-  pruefe((await sichtbar("Welche Pflichten gelten für dich?")) && (await p.getByRole("button", { name: "Rechnung", exact: true }).count()) > 0, "„Heute“ mit Einladung und schnellen Wegen fehlt beim Start");
+  pruefe((await sichtbar("Welche Pflichten kommen für dich in Frage?")) && (await p.getByRole("button", { name: "Rechnung", exact: true }).count()) > 0, "„Heute“ mit Einladung und schnellen Wegen fehlt beim Start");
   await foto("start-pflichten");
   await neu();
   await warte(800);
@@ -116,7 +116,7 @@ try {
   // Pflichten-Check (E-126): Fragen beantworten, Ergebnis, Pflichten, Unterlage zur Pflicht
   await p.getByRole("tab", { name: "Pflichten" }).click();
   await warte(800);
-  pruefe(await sichtbar("Welche Pflichten gelten für dich?"), "Einladung zum Pflichten-Check fehlt");
+  pruefe(await sichtbar("Welche Pflichten kommen für dich in Frage?"), "Einladung zum Pflichten-Check fehlt");
   // gestartet über die Karte auf „Heute“: am Ende schließt der Check und wechselt zum Tab „Pflichten“ – derselbe
   // Durchgang ändert Navigation und Tab-Zustand (früher weißer Bildschirm, React-Fehler #185)
   await p.getByRole("tab", { name: "Heute" }).click();
@@ -145,6 +145,8 @@ try {
     if (await sichtbar("Geschafft – dein Ergebnis steht")) break;
     const datum = p.getByLabel("Wann hast du angefangen oder wann willst du anfangen?", { exact: true }).locator("visible=true");
     if (await datum.count()) { await datum.last().fill("01.03.2024"); await knopf("Weiter").click(); await warte(1200); continue; }
+    // weitere Datumsfragen (R11, z. B. „Seit wann hast du die elektronische Kasse“)
+    if (await sichtbar(/^Seit wann /)) { await p.getByRole("textbox").locator("visible=true").last().fill("01.03.2024"); await knopf("Weiter").click(); await warte(1200); continue; }
     if (await sichtbar("Wer macht die Löhne")) { await radio("Ein Lohnbüro").click(); continue; }
     const ja = p.getByRole("radio", { name: "Ja", exact: true }).locator("visible=true");
     if ((await sichtbar(/Kasse/)) && (await ja.count())) { await ja.last().click(); continue; }
@@ -165,17 +167,27 @@ try {
   await warte(600);
   pruefe(await sichtbar("Genauer machen · Frage 1 von"), "Zusatzfragen ohne eigenen Fortschritt");
   pruefe((await knopf("Überspringen").count()) > 0, "ohne Antwort kein „Überspringen“");
-  // der Pflichten-Tab darunter zeigt schon „Für deinen Betrieb gelten …“ – das Ende des Checks erkennt man am Knopf
-  const amEnde = async () => (await p.getByRole("button", { name: "Deine Pflichten ansehen", exact: true }).locator("visible=true").count()) > 0;
+  // das Ende des Checks erkennt man an der Hauptzahl (R11: „N Dinge sind jetzt dran“) und am Knopf – bei einem Betrieb,
+  // der länger als zwölf Monate läuft, „Weiter“ zu „Was hast du schon?“
+  const amEnde = async () => (await sichtbar(/sind jetzt dran|ist jetzt dran|nichts dringend/)) && (await p.getByRole("button", { name: /^(Deine Pflichten ansehen|Weiter)$/ }).locator("visible=true").count()) > 0;
   for (let k = 0; k < 10 && !(await amEnde()); k++) {
     await knopf("Überspringen").click();
     await warte(500);
   }
-  pruefe((await amEnde()) && (await sichtbar("Für deinen Betrieb:")) && (await sichtbar(/^Insgesamt \d+ Pflichten/)), "Ergebnis des Checks fehlt (bald Anstehendes groß, Gesamtzahl klein)");
+  pruefe((await amEnde()) && (await sichtbar(/^Insgesamt \d+ Pflichten/)), "Ergebnis des Checks fehlt (eine Hauptzahl groß, Gesamtzahl klein)");
+  // R11 (Berater d): was Lohnbüro bzw. Steuerberatung macht, steht nicht unter „Mit diesen 3 fängst du an“
+  pruefe(!(await sichtbar("Macht dein Lohnbüro")), "Aufgabe des Lohnbüros im Einstieg des Ergebnisses");
   await foto("check-ergebnis");
-  await knopf("Deine Pflichten ansehen").click();
+  // R11: Betrieb seit 2024 – „Was hast du schon?“ zum Abhaken in einem Durchgang
+  await knopf("Weiter").click();
+  await warte(900);
+  pruefe(await sichtbar("Was hast du schon?"), "Schritt „Was hast du schon?“ fehlt nach dem Check");
+  await p.getByRole("checkbox").locator("visible=true").first().click();
+  await warte(300);
+  await foto("check-schon");
+  await knopf("1 als erledigt übernehmen").click();
   await warte(1200);
-  pruefe(befunde.length === 0, `Fehler nach „Deine Pflichten ansehen“ (vom Check auf „Heute“): ${befunde.join(" | ")}`);
+  pruefe(befunde.length === 0, `Fehler nach dem Check (vom Check auf „Heute“): ${befunde.join(" | ")}`);
   pruefe((await p.getByRole("tab", { name: "Pflichten", selected: true }).count()) === 1, "nach dem Check nicht im Tab „Pflichten“ gelandet");
   // Bühne (E-142): das Jahr mit den Terminen je Monat
   pruefe((await sichtbar("Dein Jahr")) && (await p.getByLabel(/: \d+ Termine?$/).count()) > 0, "Jahresblick fehlt im Pflichten-Tab");
@@ -187,7 +199,8 @@ try {
   await warte(500);
   pruefe((await sichtbar("Hautschutzplan aushängen")) && (await sichtbar("Elektronische Kasse beim Finanzamt melden")) && !(await sichtbar("Impressum auf der Website")), "Pflichten passen nicht zum Profil (Beauty, Kasse, keine Website)");
   pruefe(await sichtbar("Aus der Gründung"), "Gründungsschritte des bestehenden Betriebs nicht abgetrennt");
-  pruefe(await sichtbar("0 von"), "Fortschritt fehlt");
+  // eine Pflicht ist schon aus „Was hast du schon?“ abgehakt (R11)
+  pruefe(await sichtbar(/^1 von \d+/), "Fortschritt fehlt (oder „Was hast du schon?“ hat nicht abgehakt)");
   await foto("pflichten");
   await tippe(p.getByRole("button", { name: /^Hautschutzplan aushängen/ }).locator("visible=true").last());
   await warte(900);
@@ -202,7 +215,7 @@ try {
   await warte(500);
   await zurueck();
   await warte(800);
-  pruefe(await sichtbar("1 von"), "Abhaken zählt nicht im Fortschritt");
+  pruefe(await sichtbar(/^2 von \d+/), "Abhaken zählt nicht im Fortschritt");
   await foto("start-mit-pflichten");
   await neu();
   await warte(800);

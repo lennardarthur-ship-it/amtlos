@@ -1,7 +1,7 @@
 # R10: aus gruendung.handwerksrolle herausgelöst (Rechtsprüfung: Anlage B1/B2 kommen in das Verzeichnis nach § 19 HwO, Anzeige bei Beginn nach § 18 HwO)
 schema_version: 1
 id: gruendung.handwerk_verzeichnis
-version: 1
+version: 2
 katalog_nr: A.4
 titel:
   de: Im Verzeichnis der Handwerkskammer eintragen (Anlage B)
@@ -21,14 +21,22 @@ rechtsgrundlage:
 kategorie: gruendung
 branchen:
 - handwerk
+- gebaeudereinigung
 ausloeser:
-  feld: profil.handwerk.anlage
-  op: in
-  wert:
-  - b1
-  - b2
-  label:
-    de: Dein Betrieb ist ein zulassungsfreies Handwerk oder handwerksähnliches Gewerbe (Anlage B der Handwerksordnung).
+  any:
+  - feld: profil.handwerk.anlage
+    op: in
+    wert:
+    - b1
+    - b2
+    label:
+      de: Dein Betrieb ist ein zulassungsfreies Handwerk oder handwerksähnliches Gewerbe (Anlage B der Handwerksordnung).
+  # R11 (Nutzertest Gebäudereinigung): Gebäudereiniger ist ein zulassungsfreies Handwerk (Anlage B1 Nr. 33 HwO)
+  - feld: profil.taetigkeit.branchen
+    op: enthaelt
+    wert: gebaeudereinigung
+    label:
+      de: Gebäudereinigung ist ein zulassungsfreies Handwerk (Anlage B1 der Handwerksordnung).
 phase: gruendung
 frist:
   typ: relativ
@@ -58,6 +66,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/hwo/
   abgerufen: null
 fachlich_zu_pruefen:
+- 'Gebäudereinigung als Anlage B1 (Nr. 33) automatisch ausgelöst (R11) – Nummer der Anlage bestätigen'
 - 'Anzeige „bei Beginn“ (§ 18 HwO, gleichzeitig mit der Gewerbeanzeige) als „spätestens am Tag des Beginns“ umgesetzt (R10, Rechtsprüfung) – bestätigen'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 pruefung:

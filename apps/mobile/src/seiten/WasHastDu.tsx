@@ -1,0 +1,49 @@
+import { useState } from "react";
+import { ScrollView, View } from "react-native";
+import { T as TEXT } from "../texte";
+import { BausteinListe, Fuss, Hinweis, Knopf, T, TextKnopf } from "../ui/bausteine";
+import { useMeldung } from "../ui/meldung";
+import { RAND, useFarben } from "../ui/thema";
+import type { PflichtInfo } from "../pflichten/check";
+import { heute } from "../unterlagen/speicher";
+import { useAmtlos } from "../zustand";
+
+/**
+ * R11 (Berater d): „Was hast du schon?“ – ein Durchgang zum Abhaken nach dem Check, für Betriebe älter als zwölf Monate.
+ * Abgehakt wird mit derselben Handlung wie in der Pflicht („Als erledigt markieren“ bzw. die Bestätigung) – jederzeit
+ * in der Pflicht zurücknehmbar.
+ */
+export function WasHastDuSchon({ liste, fertig }: { liste: PflichtInfo[]; fertig: () => void }) {
+  const z = useAmtlos();
+  const f = useFarben();
+  const melden = useMeldung();
+  const [gewaehlt, setGewaehlt] = useState<string[]>([]);
+  const uebernehmen = () => {
+    const tag = heute();
+    for (const id of gewaehlt) z.erledigtSetzen(id, tag);
+    if (gewaehlt.length) melden(TEXT.r11_schon_fertig(gewaehlt.length));
+    fertig();
+  };
+  return (
+    <View style={{ flex: 1, backgroundColor: f.papier }}>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 12, paddingBottom: 32 }}>
+        <T v="titel" accessibilityRole="header">{TEXT.r11_schon_titel}</T>
+        <T leise stil={{ marginTop: 8 }}>{TEXT.r11_schon_text}</T>
+        <BausteinListe
+          label={TEXT.r11_schon_label(liste.length)}
+          werte={gewaehlt}
+          aendern={setGewaehlt}
+          // bei „bestätigen“ (Kasse gemeldet …) steht dabei, was der Haken bestätigt
+          optionen={liste.map((p) => ({ wert: p.id, text: p.titel, quelle: p.erledigung.art === "bestaetigen" && p.erledigung.bestaetigung ? TEXT.r11_schon_bestaetigt(p.erledigung.bestaetigung) : undefined }))}
+        />
+        {liste.length > 1 ? <TextKnopf symbol="checkmark.circle" text={gewaehlt.length === liste.length ? TEXT.r11_schon_keine : TEXT.r11_schon_alle} onPress={() => setGewaehlt(gewaehlt.length === liste.length ? [] : liste.map((p) => p.id))} /> : null}
+        <View style={{ marginTop: 12 }}>
+          <Hinweis text={TEXT.r11_schon_hinweis} />
+        </View>
+      </ScrollView>
+      <Fuss>
+        <Knopf symbol="checkmark" text={gewaehlt.length ? TEXT.r11_schon_uebernehmen(gewaehlt.length) : TEXT.r11_schon_nichts} onPress={uebernehmen} stil={{ flex: 1 }} />
+      </Fuss>
+    </View>
+  );
+}

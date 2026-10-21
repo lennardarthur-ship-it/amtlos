@@ -1,7 +1,7 @@
 # Katalog D.42 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.arbeitszeit_milog
-version: 2
+version: 3
 katalog_nr: D.42
 titel:
   de: Arbeitszeit nach § 17 MiLoG aufzeichnen
@@ -9,7 +9,8 @@ kurz:
   de: Für Minijobber und in den Branchen nach § 2a Schwarzarbeitsbekämpfungsgesetz zeichnest du laufend Beginn, Ende und Dauer der Arbeitszeit auf.
 erklaerung:
   de: § 17 MiLoG verlangt Aufzeichnungen für geringfügig Beschäftigte und für Beschäftigte in den Branchen nach § 2a Schwarzarbeitsbekämpfungsgesetz
-    (zum Beispiel Bau, Gaststätten und Hotels, Transport und Logistik, Gebäudereinigung). Aufzuzeichnen ist spätestens bis zum Ablauf
+    (zum Beispiel Bau, Gaststätten und Hotels, Transport und Logistik, Gebäudereinigung, seit 2026 auch Friseur- und Kosmetikbetriebe).
+    Aufzuzeichnen ist spätestens bis zum Ablauf
     des siebten Tages nach der Arbeitsleistung; die Aufzeichnungen bewahrst du zwei Jahre auf. Das ist eine laufende Pflicht – ein
     Arbeitszeitnachweis gilt für seinen Monat.
 rechtsgrundlage:
@@ -24,11 +25,6 @@ ausloeser:
     label:
       de: Du beschäftigst mindestens eine Person.
   - any:
-    - feld: profil.beschaeftigte.minijob
-      op: '>='
-      wert: 1
-      label:
-        de: Du beschäftigst Minijobber.
     - feld: profil.personal.sofortmeldebranchen
       op: enthaelt_eines
       wert:
@@ -37,15 +33,30 @@ ausloeser:
       - personenbefoerderung
       - spedition_logistik
       - schausteller
-      - forstwirtschaft
       - gebaeudereinigung
       - messebau
       - fleischwirtschaft
       - prostitution
       - sicherheitsgewerbe
-      # Branchen nach § 2a SchwarzArbG (eigene Liste, auf die § 17 MiLoG verweist) – derzeit deckungsgleich mit § 28a Abs. 4 SGB IV
+      - friseur
+      - kosmetik
+      - lieferdienste
+      # Branchen nach § 2a SchwarzArbG (eigene Liste, auf die § 17 MiLoG verweist) – deckungsgleich mit § 28a Abs. 4 SGB IV (SchwarzArbMoDiG)
       label:
         de: Dein Betrieb gehört zu einer Branche nach § 2a Schwarzarbeitsbekämpfungsgesetz.
+    - feld: profil.taetigkeit.branchen
+      op: enthaelt_eines
+      wert:
+      - beauty_kosmetik
+      - gebaeudereinigung
+      label:
+        de: Deine Branche (Gebäudereinigung, seit 2026 auch Friseur und Kosmetik) gehört zu den Branchen nach § 2a Schwarzarbeitsbekämpfungsgesetz.
+    # R11: Branche zuerst – „Warum für dich“ nennt dann die § 2a-Branche, nicht nur Minijobs (Nutzertest Gebäudereinigung)
+    - feld: profil.beschaeftigte.minijob
+      op: '>='
+      wert: 1
+      label:
+        de: Du beschäftigst Minijobber.
 frist:
   typ: dauerhaft
 wiederholung:
@@ -63,7 +74,7 @@ erledigung:
   art: laufend
   zeitraum: monat
 aenderungsnotiz:
-  de: Die Aufzeichnung ist eine laufende Pflicht – ein Arbeitszeitnachweis erledigt sie nur für seinen Monat. Die Branchenliste ist vollständig.
+  de: Branchenliste nach dem Gesetz zur Modernisierung der Schwarzarbeitsbekämpfung – neu Friseur, Kosmetik und plattformbasierte Lieferdienste, die Forstwirtschaft entfällt.
 aktion:
   art: link
   ziel: app.zeiterfassung
@@ -74,9 +85,18 @@ quellen:
 - titel: Mindestlohngesetz § 17
   url: https://www.gesetze-im-internet.de/milog/__17.html
   abgerufen: null
+- titel: TK – Sofortmeldung zu Beschäftigungsbeginn (Branchenkatalog ab 1.1.2026)
+  url: https://www.tk.de/firmenkunden/fachthemen/meldeverfahren-fachthemen/sofortmeldung-zu-beschaeftigungsbeginn-2035960
+  abgerufen: '2026-10-20'
+- titel: HWK Chemnitz – Merkblatt SchwarzArbMoDiG (Stand Januar 2026)
+  url: https://www.hwk-chemnitz.de/fileadmin/user_upload/Betriebsfuehrung/Handwerks-und-Gewerberolle/schwarzarbeit/Merkblatt_SchwarzArbMoDiG.pdf
+  abgerufen: '2026-10-20'
+- titel: CMS – Gesetz zur Modernisierung der Schwarzarbeitsbekämpfung beschlossen
+  url: https://cms.law/de/deu/legal-updates/gesetz-zur-modernisierung-der-schwarzarbeitsbekaempfung-beschlossen
+  abgerufen: '2026-10-20'
 fachlich_zu_pruefen:
 - 'Fristen (7. Tag, zwei Jahre Aufbewahrung) im Text ergänzt (R10, Rechtsprüfung bestätigt) – als Termin nicht abgebildet; laufend je Kalendermonat'
-- '§ 2a SchwarzArbG: Aufnahme von Friseur- und Kosmetikgewerbe (Gesetz zur Modernisierung der Schwarzarbeitsbekämpfung) – ob und ab wann in Kraft (T-99)'
+- '§ 2a SchwarzArbG nach SchwarzArbMoDiG (R11, Rechtsprüfung T-99; TK, HWK Chemnitz, CMS): Friseur, Kosmetik, Lieferdienste neu, Forstwirtschaft und Fleischerhandwerk gestrichen – Liste im BGBl. gegenlesen'
 - 'Sanktion aus der Rechtsprüfung R10 (G-16) übernommen – Fundstelle bestätigen'
 pruefung:
   status: entwurf

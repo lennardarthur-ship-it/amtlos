@@ -1,7 +1,7 @@
 # Katalog D.38 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.sofortmeldung
-version: 2
+version: 3
 katalog_nr: D.38
 titel:
   de: Sofortmeldung bei Arbeitsbeginn
@@ -10,8 +10,9 @@ kurz:
 erklaerung:
   de: 'In den Branchen nach § 28a Abs. 4 SGB IV ist eine Sofortmeldung spätestens bei Arbeitsbeginn Pflicht: Baugewerbe, Gaststätten-
     und Beherbergungsgewerbe, Personenbeförderung, Speditions-, Transport- und damit verbundenes Logistikgewerbe, Schaustellergewerbe,
-    Forstwirtschaft, Gebäudereinigung, Auf- und Abbau von Messen und Ausstellungen, Fleischwirtschaft, Prostitutionsgewerbe sowie
-    Wach- und Sicherheitsgewerbe. Die Anmeldung zur Sozialversicherung mit der ersten Lohnabrechnung kommt dazu.'
+    Gebäudereinigung, Auf- und Abbau von Messen und Ausstellungen, Fleischwirtschaft (ohne Fleischerhandwerk), Prostitutionsgewerbe,
+    Wach- und Sicherheitsgewerbe sowie seit 1.1.2026 Friseur- und Kosmetikgewerbe und plattformbasierte Lieferdienste. Die
+    Forstwirtschaft gehört seitdem nicht mehr dazu. Die Anmeldung zur Sozialversicherung mit der ersten Lohnabrechnung kommt dazu.'
 rechtsgrundlage:
 - § 28a Abs. 4 SGB IV
 kategorie: personal
@@ -19,24 +20,37 @@ branchen:
 - bau
 - gastronomie_lebensmittel
 - transport_logistik
+- beauty_kosmetik
+- gebaeudereinigung
 ausloeser:
   all:
-  - feld: profil.personal.sofortmeldebranchen
-    op: enthaelt_eines
-    wert:
-    - bau
-    - gastronomie
-    - personenbefoerderung
-    - spedition_logistik
-    - schausteller
-    - forstwirtschaft
-    - gebaeudereinigung
-    - messebau
-    - fleischwirtschaft
-    - prostitution
-    - sicherheitsgewerbe
-    label:
-      de: Dein Betrieb gehört zu einer Branche mit Sofortmeldepflicht.
+  - any:
+    - feld: profil.personal.sofortmeldebranchen
+      op: enthaelt_eines
+      wert:
+      - bau
+      - gastronomie
+      - personenbefoerderung
+      - spedition_logistik
+      - schausteller
+      - gebaeudereinigung
+      - messebau
+      - fleischwirtschaft
+      - prostitution
+      - sicherheitsgewerbe
+      - friseur
+      - kosmetik
+      - lieferdienste
+      label:
+        de: Dein Betrieb gehört zu einer Branche mit Sofortmeldepflicht.
+    # R11: Gebäudereinigung sowie (seit 1.1.2026, SchwarzArbMoDiG) Friseur und Kosmetik – die Hauptbranche reicht
+    - feld: profil.taetigkeit.branchen
+      op: enthaelt_eines
+      wert:
+      - beauty_kosmetik
+      - gebaeudereinigung
+      label:
+        de: Deine Branche (Gebäudereinigung, seit 2026 auch Friseur und Kosmetik) gehört zu den Branchen mit Sofortmeldepflicht.
   - ereignis: einstellung
     op: eingetreten
     label:
@@ -69,7 +83,7 @@ erledigung:
   bestaetigung:
     de: Über das Lohnprogramm gemeldet
 aenderungsnotiz:
-  de: Die Branchenliste ist jetzt vollständig nach § 28a Abs. 4 SGB IV, unter anderem mit Hotels, Spedition, Transport und Logistik.
+  de: Branchenliste nach dem Gesetz zur Modernisierung der Schwarzarbeitsbekämpfung – neu Friseur, Kosmetik und plattformbasierte Lieferdienste, die Forstwirtschaft entfällt.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -77,9 +91,18 @@ quellen:
 - titel: Sozialgesetzbuch IV § 28a
   url: https://www.gesetze-im-internet.de/sgb_4/__28a.html
   abgerufen: null
+- titel: TK – Sofortmeldung zu Beschäftigungsbeginn (Branchenkatalog ab 1.1.2026)
+  url: https://www.tk.de/firmenkunden/fachthemen/meldeverfahren-fachthemen/sofortmeldung-zu-beschaeftigungsbeginn-2035960
+  abgerufen: '2026-10-20'
+- titel: HWK Chemnitz – Merkblatt SchwarzArbMoDiG (Stand Januar 2026)
+  url: https://www.hwk-chemnitz.de/fileadmin/user_upload/Betriebsfuehrung/Handwerks-und-Gewerberolle/schwarzarbeit/Merkblatt_SchwarzArbMoDiG.pdf
+  abgerufen: '2026-10-20'
+- titel: CMS – Gesetz zur Modernisierung der Schwarzarbeitsbekämpfung beschlossen
+  url: https://cms.law/de/deu/legal-updates/gesetz-zur-modernisierung-der-schwarzarbeitsbekaempfung-beschlossen
+  abgerufen: '2026-10-20'
 fachlich_zu_pruefen:
 - „Bei Arbeitsbeginn“ als spätestens am Tag des Beginns umgesetzt – bestätigen
-- 'Branchenliste nach § 28a Abs. 4 SGB IV vervollständigt (R10, Rechtsprüfung): Beherbergung unter „Gastronomie“, Spedition/Transport/Logistik, Schausteller, Forstwirtschaft, Prostitutionsgewerbe – Zuordnung von Elektro- und Ausbaugewerken zum Baugewerbe offen'
+- 'Branchenliste nach SchwarzArbMoDiG (R11, Rechtsprüfung; bestätigt durch TK, HWK Chemnitz, CMS): neu Friseur, Kosmetik, plattformbasierte Lieferdienste; Forstwirtschaft und Fleischerhandwerk gestrichen (laut HWK „befristet“) – Wortlaut im BGBl. gegenlesen; Inkrafttreten 30.12.2025 (HWK) bzw. 1.1.2026 (TK, CMS); Nagelstudios dem Kosmetikgewerbe zugeordnet; Zuordnung von Elektro- und Ausbaugewerken zum Baugewerbe offen'
 - 'Sanktion aus der Rechtsprüfung R10 (G-16) übernommen – Fundstelle bestätigen'
 pruefung:
   status: entwurf

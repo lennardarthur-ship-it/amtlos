@@ -21,7 +21,8 @@ erwartet:
   gruendung.rentenversicherungspflicht: gilt
   gruendung.statusfeststellung: gilt
   gruendung.ust_idnr: gilt
-  steuern.zusammenfassende_meldung: gilt
+  # R11 (Steuerprüfung 16): Kleinunternehmer geben keine Zusammenfassende Meldung ab (§ 18a Abs. 4 UStG)
+  steuern.zusammenfassende_meldung: gilt_nicht
   # Noch nicht gestartet: keine Vorjahresgrenze; Prognose 30.000 € < 100.000 € → nicht überschritten
   steuern.kleinunternehmer_grenze_ueberschritten: gilt_nicht
   steuern.euer: gilt

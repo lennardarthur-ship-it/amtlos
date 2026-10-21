@@ -376,6 +376,9 @@ export function kaeuferFremd(r: Pick<GeleseneRechnung, "empfaenger">, betrieb: {
   return true;
 }
 
+/** R11: Notiz, wenn die Vorsteuer aus ist, weil der Betrieb nur steuerfreie Umsätze ohne Vorsteuerabzug hat. */
+export const NUR_STEUERFREI_HINWEIS = "Vorsteuer ausgeschaltet: Deine Rechnungen sind bisher nur steuerfrei ohne Vorsteuerabzug (§ 4 Nr. 8–29 UStG) – dann ist keine Vorsteuer abziehbar (§ 15 Abs. 2 UStG). Dient die Eingangsleistung auch steuerpflichtigen Umsätzen, bitte prüfen.";
+
 /** Hinweis im Beleg, wenn die E-Rechnung an einen anderen Käufer gerichtet ist (§ 15 Abs. 1 Nr. 1 UStG). */
 export const KAEUFER_FREMD = (name: string) => `Die E-Rechnung ist an „${name}“ gerichtet, nicht an deinen Betrieb – ohne Rechnung an dich ist kein Vorsteuerabzug möglich (§ 15 Abs. 1 Nr. 1 UStG). Vorsteuer ausgeschaltet, bitte prüfen.`;
 
@@ -384,8 +387,10 @@ export const KAEUFER_FREMD = (name: string) => `Die E-Rechnung ist an „${name}
  * ausgewiesen ist, Zahlung per Bank, noch nicht bezahlt. Sätze außer 19/7/0 und Besonderheiten (Reverse Charge,
  * innergemeinschaftlicher Erwerb) landen als Hinweis in der Notiz. Kategorie: Sonstiges – die Zuordnung macht der Betrieb.
  * Kleinunternehmer (§ 19 UStG, `o.kleinunternehmer`): Vorsteuer-Schalter aus – wie beim Beleg von Hand.
+ * R11: ebenso, wenn der Betrieb nur steuerfreie Umsätze ohne Vorsteuerabzug hat (§ 4 Nr. 8–29, § 15 Abs. 2 UStG,
+ * `o.nurSteuerfrei`) – mit Hinweis in der Notiz; der Schalter lässt sich wieder einschalten.
  */
-export function belegAusERechnung(r: GeleseneRechnung, id: string, jetztIso: string, o: { kleinunternehmer?: boolean; betrieb?: { name: string; plz?: string | null; verantwortlich?: string | null } } = {}): Beleg {
+export function belegAusERechnung(r: GeleseneRechnung, id: string, jetztIso: string, o: { kleinunternehmer?: boolean; nurSteuerfrei?: boolean; betrieb?: { name: string; plz?: string | null; verantwortlich?: string | null } } = {}): Beleg {
   const hinweise: string[] = [];
   // R10: fremd adressierte E-Rechnung – Warnung in der Notiz und kein Vorsteuerabzug
   const fremd = !!o.betrieb && kaeuferFremd(r, o.betrieb);
@@ -412,6 +417,8 @@ export function belegAusERechnung(r: GeleseneRechnung, id: string, jetztIso: str
   const steuerschuld: Beleg["steuerschuld"] = ae ? (auslandId && auslandId !== "DE" ? "eu" : "bau") : null;
   if (r.saetze.some((s) => s.kategorie === "AE")) hinweise.push(ae ? "Steuerschuldnerschaft des Leistungsempfängers (Reverse Charge): als § 13b-Beleg übernommen – die Umsatzsteuer meldest du selbst an (bitte die Art der Leistung prüfen)." : "Steuerschuldnerschaft des Leistungsempfängers (Reverse Charge): Umsatzsteuer selbst anmelden und als Vorsteuer abziehen.");
   if (r.saetze.some((s) => s.kategorie === "K")) hinweise.push("Innergemeinschaftlicher Erwerb: Erwerbsteuer selbst anmelden und als Vorsteuer abziehen.");
+  const ohneAbzug = !!o.nurSteuerfrei && !o.kleinunternehmer && !fremd && (r.summen.ust_cent > 0 || !!steuerschuld);
+  if (ohneAbzug) hinweise.push(NUR_STEUERFREI_HINWEIS);
   const notiz = [
     r.verwendungszweck ? `Verwendungszweck: ${r.verwendungszweck}` : null,
     r.lieferant.iban ? `IBAN: ${r.lieferant.iban}` : null,
@@ -427,7 +434,7 @@ export function belegAusERechnung(r: GeleseneRechnung, id: string, jetztIso: str
     nummer: r.nummer || null,
     kategorie: "sonstiges",
     steuer,
-    vorsteuer: !fremd && !o.kleinunternehmer && (r.summen.ust_cent > 0 || !!steuerschuld),
+    vorsteuer: !fremd && !o.kleinunternehmer && !o.nurSteuerfrei && (r.summen.ust_cent > 0 || !!steuerschuld),
     zahlung: "bank",
     bezahlt: null,
     notiz: notiz || null,

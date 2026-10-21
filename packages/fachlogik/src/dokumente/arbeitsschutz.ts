@@ -16,7 +16,7 @@ export function teilnahmeTabelle(eintraege: Eintrag[], extra?: { kopf: string; f
   return tabelle(kopf, zeilen, { breiten: extra ? ["38%", "22%", "40%"] : ["45%", "55%"], ...(zeilen.length ? { leerzeilen: 2, schluss: 3 } : { mindestens: 6 }), hoch: true, klasse: "teilnahme" });
 }
 
-const BEREICHE_VORSCHLAG = ["Salon", "Kosmetikkabine", "Küche", "Gastraum und Service", "Verkaufsraum", "Lager", "Werkstatt", "Baustelle beim Kunden", "Büro"];
+const BEREICHE_VORSCHLAG = ["Salon", "Kosmetikkabine", "Küche", "Gastraum und Service", "Verkaufsraum", "Lager", "Werkstatt", "Baustelle beim Kunden", "Reinigungsobjekte beim Kunden", "Büro"];
 const GEFAEHRDUNG_KOPF = ["Gefährdung", "Risiko", "Schutzmaßnahmen", "Umsetzung"];
 const GEFAEHRDUNG_BREITEN = ["28%", "10%", "42%", "20%"];
 /**
@@ -45,6 +45,78 @@ const GEFAEHRDUNGEN_EXTRA: Vorschlag[] = [
     quelle: "§§ 22, 28a, 29 JArbSchG",
   },
 ];
+
+/**
+ * R11: Gruppen „Gebäudereinigung“ und „Holz / Tischlerei“ – die Gefährdungen nennen die Nutzertests (Reinigung #11,
+ * Tischlerei #5, #8); die Maßnahmen sind allgemeine Grundsätze. Alles fachlich zu prüfen (PRUEFLISTE T-62), die Quelle
+ * sagt es dazu.
+ */
+const PRUEFEN = "fachlich zu prüfen";
+const GEFAEHRDUNGEN_R11: Vorschlag[] = [
+  {
+    gruppe: "Gebäudereinigung",
+    titel: "Alleinarbeit: Reinigung allein im Objekt, oft außerhalb der üblichen Arbeitszeit.",
+    werte: { faktor: "ablaeufe_arbeitszeit", beschreibung: "Alleinarbeit: Reinigung allein im Objekt, oft außerhalb der üblichen Arbeitszeit.", massnahme: "Erreichbarkeit regeln (z. B. Mobiltelefon, vereinbarte Meldezeiten).\nErste Hilfe und Notruf für allein arbeitende Beschäftigte organisieren." },
+    quelle: `Nutzertest Gebäudereinigung – ${PRUEFEN}`,
+  },
+  {
+    gruppe: "Gebäudereinigung",
+    titel: "Arbeit im fremden Betrieb: Gefahren im Objekt des Auftraggebers.",
+    werte: { faktor: "ablaeufe_arbeitszeit", beschreibung: "Arbeit im fremden Betrieb: Gefahren im Objekt des Auftraggebers (z. B. Maschinen, Gefahrstoffe, Zutrittsbereiche).", massnahme: "Mit dem Auftraggeber die Gefahren im Objekt und die Schutzmaßnahmen abstimmen (§ 8 ArbSchG).\nBeschäftigte über die Gefahren im jeweiligen Objekt unterweisen." },
+    quelle: `§ 8 ArbSchG – ${PRUEFEN}`,
+  },
+  {
+    gruppe: "Gebäudereinigung",
+    titel: "Mischen von Reinigungsmitteln: gefährliche Reaktionen, Haut- und Atemwegsreizungen.",
+    werte: { faktor: "einwirkungen", beschreibung: "Mischen von Reinigungsmitteln: gefährliche Reaktionen, Haut- und Atemwegsreizungen.", massnahme: "Reinigungsmittel nicht mischen; nur in Originalbehältern oder gekennzeichneten Gefäßen aufbewahren.\nDosierhilfen verwenden; Betriebsanweisung und Unterweisung zu den eingesetzten Reinigungsmitteln." },
+    quelle: `Nutzertest Gebäudereinigung – ${PRUEFEN}`,
+  },
+  {
+    gruppe: "Gebäudereinigung",
+    titel: "Stich- und Infektionsgefahr durch Abfall in Arztpraxen.",
+    werte: { faktor: "einwirkungen", beschreibung: "Stich- und Infektionsgefahr durch Abfall in Arztpraxen (z. B. Kanülen im Müll).", massnahme: "Abfälle nicht mit der Hand nachdrücken oder umfüllen; mit der Praxis stichfeste Abfallbehälter vereinbaren.\nGeeignete Schutzhandschuhe bereitstellen; Vorgehen nach einer Stich- oder Schnittverletzung festlegen." },
+    quelle: `Nutzertest Gebäudereinigung – ${PRUEFEN}`,
+  },
+  {
+    gruppe: "Gebäudereinigung",
+    titel: "Wege und Fahrten zwischen den Objekten.",
+    werte: { faktor: "ablaeufe_arbeitszeit", beschreibung: "Wege und Fahrten zwischen den Objekten: Unfälle im Straßenverkehr, Zeitdruck.", massnahme: "Touren mit ausreichend Zeit planen.\nFirmenfahrzeuge regelmäßig prüfen lassen; Geräte und Mittel im Fahrzeug sichern." },
+    quelle: `Nutzertest Gebäudereinigung – ${PRUEFEN}`,
+  },
+  {
+    gruppe: "Holz / Tischlerei",
+    titel: "Hartholzstaub (krebserzeugend) beim Sägen, Fräsen und Schleifen.",
+    werte: { faktor: "einwirkungen", risiko: "hoch", beschreibung: "Hartholzstaub (krebserzeugend) beim Sägen, Fräsen und Schleifen.", massnahme: "Staub an der Entstehungsstelle absaugen; Maschinen an eine geeignete Absaugung anschließen.\nNicht trocken kehren oder mit Druckluft abblasen, sondern absaugen.\nArbeitsmedizinische Vorsorge prüfen." },
+    quelle: `TRGS 553 – ${PRUEFEN}`,
+  },
+  {
+    gruppe: "Holz / Tischlerei",
+    titel: "Brand- und Explosionsgefahr durch Holzstaub und Absaugung.",
+    werte: { faktor: "einwirkungen", risiko: "hoch", beschreibung: "Brand- und Explosionsgefahr durch Holzstaub, Späne und die Absauganlage.", massnahme: "Absaugung und Späneabfuhr regelmäßig warten und reinigen; Staubablagerungen vermeiden.\nZündquellen fernhalten; geeignete Feuerlöscher bereithalten." },
+    quelle: `Nutzertest Tischlerei – ${PRUEFEN}`,
+  },
+  {
+    gruppe: "Holz / Tischlerei",
+    titel: "Holzbearbeitungsmaschinen: Rückschlag und Schnittverletzungen.",
+    werte: { faktor: "arbeitsmittel", risiko: "hoch", beschreibung: "Holzbearbeitungsmaschinen (z. B. Kreissäge, Fräse, Hobel): Rückschlag des Werkstücks und Schnittverletzungen.", massnahme: "Schutzeinrichtungen verwenden und nicht entfernen; Schiebestock bzw. Zuführhilfen benutzen.\nMaschinen nur durch unterwiesene Beschäftigte bedienen lassen.\nMaschinen und Schutzeinrichtungen regelmäßig prüfen (§ 14 BetrSichV)." },
+    quelle: `§ 14 BetrSichV – ${PRUEFEN}`,
+  },
+  {
+    gruppe: "Holz / Tischlerei",
+    titel: "Spritzlackieren: Lösemitteldämpfe, Farbnebel und Brandgefahr.",
+    werte: { faktor: "einwirkungen", beschreibung: "Spritzlackieren: Lösemitteldämpfe, Farbnebel und Brandgefahr.", massnahme: "Nur mit wirksamer Absaugung bzw. Lüftung lackieren.\nGefahrstoffverzeichnis und Betriebsanweisung für Lacke und Verdünner; geeigneten Atemschutz bereitstellen.\nZündquellen fernhalten." },
+    quelle: `Nutzertest Tischlerei – ${PRUEFEN}`,
+  },
+  {
+    gruppe: "Holz / Tischlerei",
+    titel: "Lärm an Holzbearbeitungsmaschinen.",
+    werte: { faktor: "einwirkungen", beschreibung: "Lärm an Holzbearbeitungsmaschinen.", massnahme: "Lärmarme Maschinen und Werkzeuge auswählen; Lärmbereiche kennzeichnen.\nGehörschutz bereitstellen und tragen lassen (LärmVibrationsArbSchV).\nArbeitsmedizinische Vorsorge anbieten ab 80 dB(A), Pflichtvorsorge ab 85 dB(A) (ArbMedVV Anhang Teil 3)." },
+    quelle: `LärmVibrationsArbSchV; ArbMedVV – ${PRUEFEN}`,
+  },
+];
+
+/** Stichworte in eingetragenen Gefährdungen, die beim Mutterschutz meist Maßnahmen verlangen (R11, Tischlerei #17). */
+const MUSCH_STICHWORTE = /krebserzeugend|hartholz|holzstaub|lärm|gefahrstoff|lösemittel|biostoff|infektion|cmr/i;
 
 const WIRKSAM: Record<string, string> = { wirksam: "Die Maßnahmen sind umgesetzt und wirksam.", teilweise: "Die Maßnahmen sind teilweise wirksam; Nachbesserung siehe Bemerkung.", offen: "Die Wirksamkeit ist noch zu überprüfen." };
 
@@ -79,13 +151,14 @@ export const gefaehrdungsbeurteilung: Vorlage = {
           titelFeld: "beschreibung",
           pflicht: true,
           leerStarten: true,
-          vorschlaege: [...GEFAEHRDUNGEN, ...GEFAEHRDUNGEN_EXTRA],
+          vorschlaege: [...GEFAEHRDUNGEN, ...GEFAEHRDUNGEN_EXTRA, ...GEFAEHRDUNGEN_R11],
           gruppenLabel: "Branche",
           felder: [
             { id: "beschreibung", art: "mehrzeilig", label: "Gefährdung", pflicht: true },
             { id: "massnahme", art: "mehrzeilig", label: "Schutzmaßnahmen", hilfe: "Eine Maßnahme je Zeile", pflicht: true },
             { id: "risiko", art: "wahl", label: "Risiko", optionen: optionen(RISIKO_STUFEN), vorbelegung: "mittel" },
-            { id: "faktor", art: "wahl", label: "Gefährdungsfaktor (§ 5 Abs. 3 ArbSchG)", optionen: optionen(GEFAEHRDUNGSFAKTOREN), vorbelegung: "arbeitsstaette" },
+            // R11 (Tischlerei #18): beim eigenen Eintrag abgefragt – vorbelegt landete Holzstaub unter „Arbeitsstätte“
+            { id: "faktor", art: "wahl", label: "Gefährdungsfaktor (§ 5 Abs. 3 ArbSchG)", optionen: optionen(GEFAEHRDUNGSFAKTOREN), pflicht: true, hilfe: "Bestimmt den Abschnitt im Dokument, z. B. Stäube und Gefahrstoffe unter „Einwirkungen“." },
             { id: "verantwortlich", art: "text", label: "Verantwortlich", vorbelegung: "verantwortlich" },
             { id: "umsetzen_bis", art: "datum", label: "Umsetzen bis" },
             { id: "umgesetzt_am", selten: true, art: "datum", label: "Umgesetzt am" },
@@ -111,6 +184,14 @@ export const gefaehrdungsbeurteilung: Vorlage = {
       ],
     },
   ],
+  hinweise(d) {
+    // R11 (Tischlerei #17): „keine Schutzmaßnahmen erforderlich“ trotz Gefahrstoffen, krebserzeugender Stäube oder Lärm
+    const g = liste(d, "gefaehrdungen").filter((x) => text(x, "beschreibung") || text(x, "massnahme"));
+    const kritisch = g.filter((x) => MUSCH_STICHWORTE.test(`${text(x, "beschreibung")} ${text(x, "massnahme")}`));
+    return text(d, "mutterschutz_ergebnis") === "keine_massnahmen" && kritisch.length
+      ? [`Mutterschutz: Du hast ${kritisch.length === 1 ? "eine Gefährdung" : `${kritisch.length} Gefährdungen`} wie Gefahrstoffe, krebserzeugende Stäube oder Lärm eingetragen, aber „keine Schutzmaßnahmen erforderlich“ gewählt. Bitte das Ergebnis prüfen (§§ 10, 11 MuSchG).`]
+      : [];
+  },
   pruefen(d) {
     // „umgesetzt und wirksam“ passt nicht zu Maßnahmen ohne Umsetzungsdatum (Hinweis, kein Hindernis)
     const g = liste(d, "gefaehrdungen").filter((x) => text(x, "beschreibung") || text(x, "massnahme"));
@@ -209,7 +290,8 @@ export const unterweisung: Vorlage = {
   titel: "Unterweisungsnachweis",
   beschreibung: "Wann du wen zu welchen Gefahren und Schutzmaßnahmen unterwiesen hast – Themen zum Ankreuzen, mit Unterschriften und nächstem Termin.",
   bereich: "arbeitsschutz",
-  pflichten: ["arbeitsschutz.erstunterweisung", "arbeitsschutz.unterweisung_wiederholen"],
+  // R11: auch die halbjährliche Unterweisung Jugendlicher (Katalog: arbeitsschutz.unterweisung_jugendliche)
+  pflichten: ["arbeitsschutz.erstunterweisung", "arbeitsschutz.unterweisung_wiederholen", "arbeitsschutz.unterweisung_jugendliche"],
   grundlage: "§ 12 ArbSchG; § 4 Abs. 1 DGUV Vorschrift 1",
   // mit Jugendlichen gehört § 29 JArbSchG in den Kopf – er bestimmt den halbjährlichen Termin (R10)
   grundlageFuer: (d) => (ja(d, "jugendliche") ? "§ 12 ArbSchG; § 29 JArbSchG; § 4 Abs. 1 DGUV Vorschrift 1" : ""),
@@ -224,6 +306,8 @@ export const unterweisung: Vorlage = {
         { id: "datum", art: "datum", label: "Datum", vorbelegung: "heute", pflicht: true },
         { id: "dauer", art: "text", label: "Dauer", vorschlaege: ["30 Minuten", "45 Minuten", "60 Minuten", "90 Minuten"] },
         { id: "durchgefuehrt_von", art: "text", label: "Durchgeführt von", vorbelegung: "verantwortlich", pflicht: true },
+        // R11 (Reinigung #13): verständlich heißt auch in einer Sprache, die alle verstehen
+        { id: "sprache", art: "text", label: "Unterwiesen in Sprache", hilfe: "z. B. Deutsch oder Arabisch – die Unterweisung muss für alle verständlich sein (§ 12 Abs. 1 ArbSchG)", vorschlaege: ["Deutsch", "Englisch", "Arabisch", "Polnisch", "Rumänisch", "Türkisch", "Ukrainisch"] },
         { id: "jugendliche", art: "schalter", label: "Mit Jugendlichen unter 18 Jahren", hilfe: "Dann ist die Unterweisung mindestens halbjährlich zu wiederholen (§ 29 Abs. 2 JArbSchG)" },
       ],
     },
@@ -250,14 +334,14 @@ export const unterweisung: Vorlage = {
       betrieb: b,
       unter: text(d, "thema") || undefined,
       // Anlass und Dauer in der Kennungsleiste (die Bezeichnung steht schon als Unterzeile unter dem Titel)
-      meta: `Datum: ${datumDe(text(d, "datum"))}\nDurchgeführt von: ${text(d, "durchgefuehrt_von")}\nAnlass: ${ANLASS_KURZ[text(d, "anlass")] ?? ""}\nDauer: ${text(d, "dauer")}\nNächste Unterweisung: ${naechste ? `bis ${naechste}` : ""}`,
+      meta: `Datum: ${datumDe(text(d, "datum"))}\nDurchgeführt von: ${text(d, "durchgefuehrt_von")}\nAnlass: ${ANLASS_KURZ[text(d, "anlass")] ?? ""}\nDauer: ${text(d, "dauer")}\nSprache: ${text(d, "sprache")}\nNächste Unterweisung: ${naechste ? `bis ${naechste}` : ""}`,
       inhalt:
         // in der Kennungsleiste entfallen leere Angaben – dann hier als Linie zum Eintragen
         ((a) => (a ? abschnitt("Angaben", a) : ""))(
           angaben([["Bezeichnung", text(d, "thema") ? null : ""], ["Anlass", ANLASS[text(d, "anlass")] ? null : ""], ["Datum", text(d, "datum") ? null : ""], ["Dauer", text(d, "dauer") ? null : ""], ["Durchgeführt von", text(d, "durchgefuehrt_von") ? null : ""]]),
         ) +
         abschnitt("Inhalte der Unterweisung", (themen.length ? punkte(themen) : absatz("")) + (text(d, "inhalt") ? `<h3>Betriebsspezifische Ergänzungen</h3>${zeilen(text(d, "inhalt"))}` : "")) +
-        abschnitt("Teilnahme", `<p class="vor-tabelle">Mit meiner Unterschrift bestätige ich, dass ich an der Unterweisung teilgenommen und die Inhalte verstanden habe.</p>${teilnahmeTabelle(liste(d, "teilnehmer"))}`) +
+        abschnitt("Teilnahme", `<p class="vor-tabelle">Mit meiner Unterschrift bestätige ich, dass ich an der Unterweisung${text(d, "sprache") ? ` (unterwiesen in Sprache: ${esc(text(d, "sprache"))})` : ""} teilgenommen und die Inhalte verstanden habe.</p>${teilnahmeTabelle(liste(d, "teilnehmer"))}`) +
         // der Hinweis zur Wiederholung steht als Fußnote nach den Unterschriften: so bleibt die letzte Teilnahmezeile mit
         // den Unterschriften zusammen (Schlussblock), statt dass eine Folgeseite nur Hinweis und Unterschriften trägt
         unterschriften(["Ort, Datum", "Unterschrift der unterweisenden Person"]) +

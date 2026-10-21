@@ -1,7 +1,7 @@
 # Beispiel aus Spezifikation 3.2 / Katalog E.50, in das Schema v1 überführt.
 schema_version: 1
 id: arbeitsschutz.gefaehrdungsbeurteilung
-version: 3
+version: 4
 katalog_nr: E.50
 titel:
   de: Gefährdungsbeurteilung erstellen
@@ -42,7 +42,7 @@ stelle:
 kanal: intern_dokumentieren
 kosten: null
 sanktion:
-  text: { de: "Ein Bußgeld droht erst, wenn du einer vollziehbaren Anordnung der Aufsichtsbehörde nicht folgst (§ 25 Abs. 1 Nr. 2 ArbSchG); bei Arbeitsunfällen besteht ein Haftungsrisiko." }
+  text: { de: "Fehlt die Dokumentation oder ist sie unrichtig, unvollständig oder nicht rechtzeitig erstellt, droht direkt ein Bußgeld bis 5.000 € (§ 9 Abs. 1 Nr. 1 ArbStättV in Verbindung mit § 25 Abs. 1 Nr. 1 ArbSchG; ebenso § 22 BetrSichV und § 22 GefStoffV). Bei Arbeitsunfällen besteht außerdem ein Haftungsrisiko." }
   schwere: hoch
 automatisierung: dokument_generator
 dokumente: [vorlage.gefaehrdungsbeurteilung.<branche>]
@@ -61,4 +61,5 @@ fachlich_zu_pruefen:
   - "Frist: 'vor Arbeitsbeginn' als Auslegung bestätigen"
   - "Auslöser neu_ausloesen_bei: Liste der Anlässe vollständig?"
   - "gueltig_ab 1996-08-21 aus Spezifikation übernommen"
+  - "Sanktion nach Rechtsprüfung R11 (Befund 3): direkte Bußgeldbewehrung über § 9 Abs. 1 Nr. 1 ArbStättV, § 22 BetrSichV, § 22 GefStoffV – Nummern und Höchstbetrag 5.000 € bestätigen"
 pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }

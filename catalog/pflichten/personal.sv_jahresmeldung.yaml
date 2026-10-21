@@ -1,17 +1,18 @@
 # Katalog D.38 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.sv_jahresmeldung
-version: 1
+version: 2
 katalog_nr: D.38
 titel:
   de: Jahresmeldung zur Sozialversicherung
 kurz:
-  de: Für jede beschäftigte Person geht einmal im Jahr eine Jahresmeldung an die Krankenkasse.
+  de: Für jede beschäftigte Person geht bis zum 15. Februar eine Jahresmeldung für das Vorjahr an die Krankenkasse.
 erklaerung:
-  de: Die Jahresmeldung (DEÜV) übermittelt das Lohnprogramm für alle, die über den Jahreswechsel beschäftigt sind.
+  de: Die Jahresmeldung übermittelt das Lohnprogramm für alle, die über den Jahreswechsel beschäftigt sind – bis zum 15. Februar
+    des Folgejahres (§ 10 DEÜV). Die Jahresmeldung zur Unfallversicherung ist eine eigene Meldung.
 rechtsgrundlage:
 - § 28a SGB IV
-- DEÜV
+- § 10 DEÜV
 kategorie: personal
 ausloeser:
   feld: abgeleitet.hat_beschaeftigte
@@ -20,9 +21,17 @@ ausloeser:
   label:
     de: Du beschäftigst mindestens eine Person.
 frist:
-  typ: dauerhaft
+  typ: wiederkehrend
+  rhythmus: jaehrlich
+  faellig:
+    art: feste_termine
+    termine:
+    - 02-15
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
 wiederholung:
-  art: einmalig
+  art: periodisch
 stelle:
   de: Krankenkasse (über Lohnprogramm)
 kanal: partner
@@ -40,8 +49,8 @@ quellen:
   url: https://www.gesetze-im-internet.de/sgb_4/__28a.html
   abgerufen: null
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Termin der Jahresmeldung als Regeldaten ergänzen (für den Jahreskalender I)
+- 'Termin 15.02. des Folgejahres nach Rechtsprüfung R11 (Befund 5, § 10 DEÜV) – Verschiebung bei Wochenende bestätigen'
+- 'UV-Jahresmeldung (§ 28a Abs. 2a SGB IV) gesondert – Termin unsicher, prüfen'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:

@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { Pressable, View } from "react-native";
 import { T as TEXT } from "../texte";
 import type { Beleg } from "@amtlos/fachlogik";
-import { Betrag, ChipLeiste, Karte, Knopf, T, TextKnopf } from "../ui/bausteine";
+import { Betrag, ChipLeiste, Karte, Knopf, T, TextKnopf, Zeile } from "../ui/bausteine";
 import { useNav } from "../ui/navigation";
 import { RADIUS, useFarben } from "../ui/thema";
 import { belegeFiltern, euroText, rechnungBrutto, filterVerfuegbar, filtern, offeneSumme, rechnungenSortiert, type Filter } from "../unterlagen/ablage";
@@ -14,6 +14,7 @@ import { useOeffnen, useStarten } from "./starten";
 import { useErstellen } from "./Erstellen";
 import { Suchfeld, UnterlageZeile, useFehltJe, useUeberfaellig } from "./Unterlagen";
 import { BelegErfassenSeite } from "./Belege";
+import { useKontrollmappeOeffnen } from "./Kontrollmappe";
 
 /** Ab so vielen Unterlagen lohnt sich die Suche. */
 const SUCHE_AB = 6;
@@ -85,6 +86,7 @@ export function Meine() {
   const oeffnen = useOeffnen();
   const belegOeffnen = useCallback((id: string) => nav.oeffnen(`beleg-${id}`, () => <BelegSeite id={id} />, true), [nav]);
   const starten = useStarten();
+  const mappe = useKontrollmappeOeffnen();
   const [filter, setFilter] = useState<Filter>("alle");
   const [suche, setSuche] = useState("");
   // viele Unterlagen: in Schritten zeigen, damit die Liste flüssig bleibt
@@ -162,6 +164,10 @@ export function Meine() {
     </Leer>
   ) : (
     <View>
+      {/* R11 (UX #1): die Kontrollmappe dort, wo man bei einer Kontrolle sucht – nicht nur unter „Mein Betrieb“ */}
+      <Karte stil={{ marginBottom: 14 }}>
+        <Zeile symbol="folder" ton="blau" titel={TEXT.kontrollmappe_zeile} text={TEXT.r11_mappe_zeile_kurz} onPress={mappe} letzte />
+      </Karte>
       {alle.length + belegeAlle.length >= SUCHE_AB ? (
         <View style={{ marginBottom: 12 }}>
           <Suchfeld wert={suche} setzen={setSuche} label={TEXT.meine_suchen} />

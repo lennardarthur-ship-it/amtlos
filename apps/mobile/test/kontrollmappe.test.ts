@@ -98,7 +98,7 @@ describe("Kontrollmappe: Auswahl der Unterlagen", () => {
   });
 
   it("leerer Stand: keine Einträge", () => {
-    expect(mappenAuswahl(LEERER_STAND)).toEqual({ eintraege: [], unvollstaendig: 0 });
+    expect(mappenAuswahl(LEERER_STAND)).toEqual({ eintraege: [], unvollstaendig: 0, unvollstaendigListe: [] });
   });
 });
 

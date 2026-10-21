@@ -205,7 +205,9 @@ describe("Paket für die Steuerberatung: LIESMICH, Fragen, Listen (Durchsicht St
     // Storno im selben Jahr: kein Bezug zu einem anderen Zeitraum; keine Gutschriften
     expect(f).not.toContain("Stornos mit Bezug");
     expect(f).not.toContain("Gutschriften");
-    expect(p.fragen).toBe(7);
+    // R11: Barbelege gegen Kasse – woher das Bargeld kam (Kassenminus)
+    expect(f).toMatch(/Bar bezahlte Belege \(im Stapel gegen Kasse\)[^\n]*\r\n- B2026-/);
+    expect(p.fragen).toBe(8);
     // Q1: die stornierte Rechnung (Storno im April) gehört dazu; Bewirtung/Kfz fehlen
     const q = strFromU8(unzipSync(steuerpaket(s, Q1, s.steuerberatung, {}, "2026-04-10T08:00:00").zip)["Fragen_2026-Q1.txt"]!);
     expect(q).toMatch(/Stornos mit Bezug zu einem anderen Zeitraum[^\n]*\r\n- 2026-002 · 28\.03\.2026 · Kim Beispiel · 238,00 € brutto · storniert durch 2026-004 vom 03\.04\.2026 \(anderer Zeitraum\)/);

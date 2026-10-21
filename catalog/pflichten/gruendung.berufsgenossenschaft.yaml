@@ -1,7 +1,7 @@
 # Katalog A.8
 schema_version: 1
 id: gruendung.berufsgenossenschaft
-version: 1
+version: 2
 katalog_nr: A.8
 titel:
   de: Bei der Berufsgenossenschaft anmelden
@@ -37,6 +37,10 @@ sanktion:
   schwere: mittel
 automatisierung: hinweis
 aktion: { art: link, ziel: bg.zustaendigkeit, nachweis_erforderlich: true }
+erledigung:
+  art: bestaetigen
+  bestaetigung:
+    de: Bei der Berufsgenossenschaft angemeldet
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null

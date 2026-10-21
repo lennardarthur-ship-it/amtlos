@@ -7,7 +7,7 @@ import { useMeldung } from "../ui/meldung";
 import { BausteinListe, Fristblatt, Fuss, Hinweis, Kachel, Karte, Knopf, Schalter, SchnellKachel, Symbol, T, TextKnopf, Zeile, tageBis } from "../ui/bausteine";
 import { Unterseite, useNav } from "../ui/navigation";
 import { HAARLINIE, RADIUS, SCHRIFT, useFarben, weich } from "../ui/thema";
-import { KATEGORIE_TITEL, auswertung, beantwortet, dringlichkeit, erinnerungsPlan, erledigtDurch, fortschritt, frageZu, gruendungsSchritte, gueltigBis, haken, istErledigt, offeneFragenNachWirkung, offeneKernFragen, selten, zaehlung, type PflichtInfo } from "../pflichten/check";
+import { KATEGORIE_TITEL, auswertung, beantwortet, dringlichkeit, erinnerungsPlan, erledigtDurch, fortschritt, frageZu, gruendungsSchritte, gueltigBis, haken, istErledigt, offeneFragenNachWirkung, offeneKernFragen, offeneVoraussetzungen, selten, zaehlung, type PflichtInfo } from "../pflichten/check";
 import { allesAbsagen, erinnerungenMoeglich, erlaubnisAnfragen, planen } from "../pflichten/erinnerungen";
 import { heute } from "../unterlagen/speicher";
 import { useAmtlos, useStandWahl } from "../zustand";
@@ -62,7 +62,10 @@ function PflichtDetail({ id }: { id: string }) {
   const gilt = a.gilt.includes(p) || a.gruendung.includes(p) || a.beiEinstellung.includes(p);
   const abgehakt = istErledigt(p, { ...z.stand, unterlagen: [] });
   // wiederkehrend: der Haken gilt für den nächsten Termin, danach ist die Pflicht wieder offen
+  // R11 (Nutzertest Gründerin #7, E-087): erst abhakbar, wenn die Voraussetzungen erledigt sind (z. B. ELSTER-Konto vor dem Fragebogen)
+  const vorher = abgehakt ? [] : offeneVoraussetzungen(p, a, z.stand);
   const abhaken = () => {
+    if (vorher.length) return melden(TEXT.r11_erst_erledigen(vorher.map((x) => x.titel)));
     z.erledigtSetzen(p.id, abgehakt ? null : heute(), abgehakt ? null : p.wiederkehrend ? p.naechsterTermin : null);
     melden(abgehakt ? TEXT.haken_entfernt : TEXT.als_erledigt_vermerkt);
   };
@@ -113,7 +116,12 @@ function PflichtDetail({ id }: { id: string }) {
           // der nächste Termin groß: Tage bis dahin und das Datum – das Wichtigste zuerst
           <View style={{ flexDirection: "row", alignItems: "flex-end", gap: 12, marginTop: 6 }}>
             {/* die Zahl steht daneben in Worten („In 11 Tagen fällig“) – für VoiceOver verborgen */}
-            <T accessibilityElementsHidden importantForAccessibility="no" aria-hidden maxFontSizeMultiplier={1.4} farbe={tage < 0 ? "#ffc9c4" : f.minze} stil={{ ...SCHRIFT.display, fontSize: 52, lineHeight: 54, letterSpacing: -2 }}>{String(Math.abs(tage))}</T>
+            {/* R11 (Gründerin #15): die Zahl beschriftet – „noch 42 Tage“ statt einer nackten „42“ */}
+            <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={{ alignItems: "flex-start" }}>
+              <T v="caption" maxFontSizeMultiplier={1.4} farbe={f.buehneLeise} stil={{ ...SCHRIFT.halb }}>{TEXT.r11_tage_vor(tage)}</T>
+              <T maxFontSizeMultiplier={1.4} farbe={tage < 0 ? "#ffc9c4" : f.minze} stil={{ ...SCHRIFT.display, fontSize: 52, lineHeight: 54, letterSpacing: -2 }}>{String(Math.abs(tage))}</T>
+              <T v="caption" maxFontSizeMultiplier={1.4} farbe={f.buehneLeise} stil={{ ...SCHRIFT.halb, marginTop: -2 }}>{TEXT.r11_tage_nach(tage)}</T>
+            </View>
             <View style={{ paddingBottom: 6, flex: 1 }}>
               <T fett farbe={f.buehneText}>{fristText(termin)}</T>
               <T v="klein" farbe={f.buehneLeise}>{TAG_LANG.format(new Date(`${termin}T12:00:00Z`))}</T>
@@ -130,6 +138,7 @@ function PflichtDetail({ id }: { id: string }) {
       {durchUnterlage ? <Hinweis art="erfolg" text={laufendBis ? `${TEXT.erledigt_durch_unterlage} ${TEXT.r10_laufend_bis(datumDe(laufendBis))}` : TEXT.erledigt_durch_unterlage} /> : null}
       {p.einordnung !== "pflicht" ? <Hinweis text={TEXT.r10_einordnung[p.einordnung] ?? ""} /> : null}
       {lohnWer ? <Hinweis text={TEXT.r10_lohn_hinweis(lohnWer)} /> : null}
+      {gilt && vorher.length ? <Hinweis text={TEXT.r11_erst_erledigen(vorher.map((x) => x.titel))} /> : null}
       {gilt && vorhanden ? (
         <Karte stil={{ marginTop: 8 }}>
           <Zeile symbol="doc.text" ton="amt" titel={TEXT.deine_unterlage(vorlageFuer(vorhanden.vorlage)?.titel ?? vorhanden.vorlage)} text={vorhanden.ausgegeben ? TEXT.unterlage_geteilt_am(datumKurz(vorhanden.ausgegeben)) : TEXT.unterlage_entwurf_vom(datumKurz(vorhanden.geaendert))} onPress={() => oeffnen(vorhanden.id)} letzte />
@@ -168,7 +177,7 @@ function PflichtDetail({ id }: { id: string }) {
         <Gruppe titel={TEXT.quellen}>
           <Karte>
             {p.quellen.map((q, i) => (
-              <Zeile key={q.url} titel={q.titel} text={q.url.replace(/^https?:\/\//, "").split("/")[0]} rechts={<Symbol name="arrow.right" groesse={16} />} onPress={() => void Linking.openURL(q.url)} letzte={i === p.quellen.length - 1} />
+              <Zeile key={q.url} titel={q.titel} text={q.url.replace(/^https?:\/\//, "").split("/")[0]} rechts={<Symbol name="arrow.right" groesse={16} />} onPress={() => void Linking.openURL(q.url)} link letzte={i === p.quellen.length - 1} />
             ))}
           </Karte>
         </Gruppe>
@@ -248,7 +257,7 @@ function PflichtenInhalt() {
   return (
     <View>
       {kernOffen.length ? (
-        <Gruppe erste titel={TEXT.r10_check_fortsetzen_titel} fuss={TEXT.r10_check_fortsetzen_text(kernOffen.length)}>
+        <Gruppe erste titel={TEXT.r10_check_fortsetzen_titel} fuss={TEXT.r10_check_fortsetzen_text(kernOffen.length, frageZu(kernOffen[0]!)?.frage.de, offen.find((o) => o.feld === kernOffen[0])?.anzahl ?? 0)}>
           <Knopf ton symbol="checklist" text={TEXT.r10_check_fortsetzen} onPress={() => nav.oeffnen("nachfragen", () => <CheckAblauf felder={kernOffen} />, true)} />
         </Gruppe>
       ) : null}
@@ -517,7 +526,8 @@ function Jahresblick({ gilt, tag }: { gilt: PflichtInfo[]; tag: string }) {
           accessible
           accessibilityRole="text"
           accessibilityLabel={TEXT.monat_termine(mo.lang, mo.termine)}
-          style={{ width: "15.2%", flexGrow: 1, minHeight: 54, borderRadius: RADIUS.klein, padding: 7, justifyContent: "space-between", backgroundColor: mo.jetzt ? f.minze : mo.termine ? "rgba(127,227,184,0.16)" : "transparent", borderWidth: mo.jetzt || mo.termine ? 0 : 1.5, borderStyle: "dashed", borderColor: "rgba(255,255,255,0.3)" }}
+          // R11 (UX #13): flach statt knopfartig – nur der laufende Monat ist hervorgehoben, die übrigen sind eine ruhige Leiste
+          style={{ width: "15.2%", flexGrow: 1, minHeight: 54, borderRadius: RADIUS.klein, padding: 7, justifyContent: "space-between", backgroundColor: mo.jetzt ? f.minze : "transparent", borderTopWidth: mo.jetzt ? 0 : 1, borderColor: mo.termine ? "rgba(127,227,184,0.55)" : "rgba(255,255,255,0.18)" }}
         >
           <T v="caption" maxFontSizeMultiplier={1.5} farbe={mo.jetzt ? f.buehneKnopfText : f.buehneLeise} stil={{ ...SCHRIFT.halb, fontSize: 12, lineHeight: 14 }}>{mo.kurz}</T>
           {mo.termine ? <T maxFontSizeMultiplier={1.5} farbe={mo.jetzt ? f.buehneKnopfText : f.buehneText} stil={{ ...SCHRIFT.display, fontSize: 17, lineHeight: 19 }}>{String(mo.termine)}</T> : null}

@@ -1,0 +1,24 @@
+persona: gastronomie
+beschreibung: "R11 (Rechtsprüfung Befund 7): Hotel mit neuer Bürokraft – keine IfSG-Bescheinigung und keine Belehrung; Inhaberin arbeitet nicht mit Lebensmitteln; Alkoholausschank → Erlaubnis prüfen"
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: "2015-01-01"
+  profil.taetigkeit.branchen: [gastronomie_lebensmittel]
+  profil.beschaeftigte.gesamt: 6
+  profil.ifsg.beschaeftigte: keine
+  profil.ifsg.selbst: keine
+  profil.erlaubnis.gaststaette: true
+  profil.erlaubnis.alkohol: true
+  profil.gastro.to_go: false
+  profil.bundesland: BY
+ereignisse:
+  - { typ: erste_einstellung, datum: "2015-01-01" }
+  - { typ: einstellung, datum: "2026-09-15" }
+erwartet:
+  branche.gastro_ifsg_bescheinigung: gilt_nicht
+  branche.gastro_ifsg_belehrung: gilt_nicht
+  branche.gastro_ifsg_folgebelehrung: gilt_nicht
+  branche.gastro_ifsg_bescheinigung_selbst: gilt_nicht
+  gruendung.erlaubnis_pruefen: gilt
+  branche.gastro_mehrweg: gilt_nicht

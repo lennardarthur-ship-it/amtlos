@@ -22,6 +22,10 @@ export const KURZ: Record<string, string> = {
   datenschutzinformation: "Info-Blatt für Kunden oder Mitarbeiter, was du mit ihren Daten machst.",
   datenpanne: "Wenn Daten verloren gehen oder in falsche Hände geraten.",
   arbeitszeitnachweis: "Arbeitszeiten deiner Mitarbeiter – auch für Minijobs.",
+  // R11
+  ausweis_hinweis: "Schriftlicher Hinweis auf die Ausweispflicht – mit Unterschrift.",
+  schluesselquittung: "Wer welche Kundenschlüssel hat – mit Unterschrift.",
+  anamnese_einwilligung: "Gesundheitsangaben der Kundin mit Einwilligung.",
   nachweis_arbeitsbedingungen: "Die wichtigsten Arbeitsbedingungen schriftlich für neue Mitarbeiter.",
   sv_meldedaten: "Alle Angaben, die du für die Anmeldung neuer Mitarbeiter brauchst.",
   lohnkonto: "Lohn und Abzüge je Mitarbeiter über das Jahr.",
@@ -56,15 +60,15 @@ export interface Anlass {
  * Kosmetik“, nicht in allgemeinen Anlässen und nicht bei Gastronomie (dort die HACCP-Eigenkontrollen).
  */
 export const ANLAESSE: Anlass[] = [
-  { id: "einstellen", titel: "Ich stelle jemanden ein", text: "Arbeitsbedingungen, Anmeldung, Lohn, Unterweisung", vorlagen: ["nachweis_arbeitsbedingungen", "sv_meldedaten", "lohnkonto", "arbeitszeitnachweis", "unterweisung", "gefaehrdungsbeurteilung", "datenschutzinformation", "ki_kompetenz", "ifsg_belehrung"] },
+  { id: "einstellen", titel: "Ich stelle jemanden ein", text: "Arbeitsbedingungen, Anmeldung, Lohn, Unterweisung", vorlagen: ["nachweis_arbeitsbedingungen", "sv_meldedaten", "lohnkonto", "arbeitszeitnachweis", "ausweis_hinweis", "unterweisung", "gefaehrdungsbeurteilung", "datenschutzinformation", "ki_kompetenz", "ifsg_belehrung"] },
   { id: "gruenden", titel: "Ich gründe oder eröffne", text: "Gewerbe, Register, Kasse, Belege", vorlagen: ["gewerbeanmeldung", "handelsregister", "transparenzregister", "kassenmeldung", "verfahrensdokumentation", "aufbewahrung", "datenschutz_dokumentation", "gefaehrdungsbeurteilung"] },
   { id: "laufend", titel: "Im laufenden Betrieb", text: "Rechnungen, Kasse, Umsatzsteuer, Arbeitszeit", vorlagen: ["rechnung", "kassenbuch", "ust_voranmeldung", "arbeitszeitnachweis", "lohnkonto", "haccp"] },
   { id: "steuern", titel: "Jahresabschluss und Steuern", text: "EÜR, Bilanz, Steuererklärung, Aufbewahrung", vorlagen: ["euer", "bilanz_guv", "steuererklaerung", "ust_voranmeldung", "aufbewahrung"] },
   { id: "website", titel: "Ich mache eine Website", text: "Impressum, Datenschutzerklärung, Verträge", vorlagen: ["impressum", "datenschutzerklaerung_website", "avv"] },
-  { id: "datenschutz", titel: "Kundendaten und Datenschutz", text: "Verzeichnis, Info-Blatt, Verträge", vorlagen: ["datenschutz_dokumentation", "datenschutzinformation", "avv", "datenschutzerklaerung_website", "datenpanne"] },
+  { id: "datenschutz", titel: "Kundendaten und Datenschutz", text: "Verzeichnis, Info-Blatt, Verträge", vorlagen: ["datenschutz_dokumentation", "datenschutzinformation", "avv", "datenschutzerklaerung_website", "datenpanne", "schluesselquittung"] },
   { id: "sicherheit", titel: "Sicherheit am Arbeitsplatz", text: "Gefahren, Unterweisung, Gefahrstoffe, Geräte", vorlagen: ["gefaehrdungsbeurteilung", "unterweisung", "betriebsanweisung", "gefahrstoffverzeichnis", "pruefprotokoll_elektro"] },
   { id: "gastro", titel: "Café, Restaurant, Lebensmittel", text: "Allergene, Eigenkontrollen, Hygiene", vorlagen: ["allergene", "haccp", "ifsg_belehrung"] },
-  { id: "beauty", titel: "Salon und Kosmetik", text: "Hautschutz, Hygiene, Gefahrstoffe", vorlagen: ["hautschutzplan", "hygieneplan", "gefaehrdungsbeurteilung", "gefahrstoffverzeichnis", "betriebsanweisung"] },
+  { id: "beauty", titel: "Salon und Kosmetik", text: "Hautschutz, Hygiene, Gefahrstoffe", vorlagen: ["hautschutzplan", "hygieneplan", "anamnese_einwilligung", "gefaehrdungsbeurteilung", "gefahrstoffverzeichnis", "betriebsanweisung"] },
   { id: "panne", titel: "Daten verloren oder gestohlen", text: "Datenpanne festhalten und melden", vorlagen: ["datenpanne"] },
 ];
 

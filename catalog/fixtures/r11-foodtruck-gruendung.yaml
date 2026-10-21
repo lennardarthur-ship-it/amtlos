@@ -1,0 +1,32 @@
+persona: gastronomie
+beschreibung: "R11 (Nutzertest Gründerin Foodtruck): Start am 1.12., allein, erstmals mit Lebensmitteln, Reisegewerbe, nur alkoholfreie Getränke, To-go – eigene IfSG-Bescheinigung, Reisegewerbekarte und Lebensmittelregistrierung vor dem Start, keine Gaststättenerlaubnis"
+stichtag: "2026-10-20"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2026-12-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [gastronomie_lebensmittel]
+  profil.beschaeftigte.gesamt: 0
+  profil.ifsg.selbst: erstmals
+  profil.erlaubnis.gewo_paragraphen: ["55"]
+  profil.erlaubnis.gaststaette: true
+  profil.erlaubnis.alkohol: false
+  profil.gastro.to_go: true
+  profil.kunden.segmente: [b2c]
+  profil.vertrieb.kanaele: [marktstand]
+  profil.gewinn.prognose_laufendes_jahr: 2000
+  profil.bundesland: BW
+erwartet:
+  branche.gastro_ifsg_bescheinigung_selbst: gilt
+  gruendung.reisegewerbekarte: gilt
+  gruendung.erlaubnis_pruefen: gilt_nicht
+  branche.gastro_lebensmittelregistrierung: gilt
+  branche.gastro_mehrweg: gilt
+  branche.gastro_hygieneschulung: gilt
+  branche.gastro_preisverzeichnis: gilt
+  branche.gastro_ifsg_bescheinigung: gilt_nicht
+  it_sicherheit.nis2_pruefen: gilt_nicht
+termine_enthaelt:
+  branche.gastro_ifsg_bescheinigung_selbst: [["einmalig", "2026-11-30"]]
+  gruendung.reisegewerbekarte: [["einmalig", "2026-11-30"]]
+  branche.gastro_lebensmittelregistrierung: [["einmalig", "2026-11-30"]]

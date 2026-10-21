@@ -101,7 +101,7 @@ describe("Dokumentvorlagen", () => {
   it("nennt fehlende Pflichtangaben – auch in Listeneinträgen und nur für sichtbare Felder", () => {
     const g = vorlageFuer("gefaehrdungsbeurteilung")!;
     const d = leereDaten(g, BETRIEB, "2026-10-12");
-    expect(fehlendeAngaben(g, d)).toEqual(["Arbeitsbereich oder Gewerk", "mindestens ein Eintrag: Gefährdung", "Ergebnis für schwangere oder stillende Frauen"]);
+    expect(fehlendeAngaben(g, d)).toEqual(["Arbeitsbereich oder Gewerk", "mindestens ein Eintrag „Gefährdung“", "Ergebnis für schwangere oder stillende Frauen"]);
     d.arbeitsbereich = "Küche";
     d.gefaehrdungen = [{ faktor: "arbeitsstaette", beschreibung: "Rutschgefahr", risiko: "mittel", massnahme: "", verantwortlich: "", umsetzen_bis: null, umgesetzt_am: null }];
     d.mutterschutz_ergebnis = "keine_massnahmen";
@@ -876,7 +876,7 @@ describe("Vorlagen, fünfte Durchsicht (Jahres-Szenario Café)", () => {
 
   it("Anlässe: Beauty-Vorlagen (Hygiene-, Hautschutzplan) nur unter „Salon und Kosmetik“", () => {
     const beauty = VORLAGEN.filter((v) => v.bereich === "beauty").map((v) => v.id);
-    expect(beauty.sort()).toEqual(["hautschutzplan", "hygieneplan"]);
+    expect(beauty.sort()).toEqual(["anamnese_einwilligung", "hautschutzplan", "hygieneplan"]);
     for (const a of ANLAESSE) if (a.id !== "beauty") for (const id of beauty) expect(a.vorlagen, `${a.id}: ${id}`).not.toContain(id);
     expect(ANLAESSE.find((a) => a.id === "beauty")!.vorlagen).toEqual(expect.arrayContaining(beauty));
     expect(ANLAESSE.find((a) => a.id === "gastro")!.vorlagen).toEqual(["allergene", "haccp", "ifsg_belehrung"]);
@@ -890,7 +890,9 @@ describe("Vorlagen, fünfte Durchsicht (Jahres-Szenario Café)", () => {
     expect(kunden.werte.rechtsgrundlage).not.toContain("Gesundheit");
     expect(kunden.werte.datenarten).not.toContain("Gesundheit");
     const gesund = vorschlaege.find((x) => x.titel === "Kundenkartei mit Gesundheitsangaben (z. B. Allergien, Unverträglichkeiten)")!;
-    expect(gesund.werte.rechtsgrundlage).toContain("Bei Gesundheitsangaben (z. B. Allergien/Unverträglichkeiten) ausdrückliche Einwilligung nach Art. 9 Abs. 2 lit. a DSGVO.");
+    // R11 (Kosmetik #20): eigener Zweck, Freiwilligkeit und Widerruf
+    expect(gesund.werte.rechtsgrundlage).toContain("ausdrückliche Einwilligung nach Art. 9 Abs. 2 lit. a DSGVO – freiwillig und jederzeit widerrufbar");
+    expect(gesund.werte.zweck).toMatch(/^Sichere Behandlung/);
     expect(JSON.stringify(vorschlaege)).not.toContain("Friseur-Kundenkartei");
   });
 

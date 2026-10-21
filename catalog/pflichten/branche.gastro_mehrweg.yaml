@@ -1,0 +1,63 @@
+# R11 (Rechtsprüfung T-114, Nutzertest Gründerin): Mehrweg-Angebotspflicht §§ 33, 34 VerpackG
+schema_version: 1
+id: branche.gastro_mehrweg
+version: 1
+katalog_nr: G.73
+titel:
+  de: Mehrweg zum Mitnehmen anbieten
+kurz:
+  de: Verkaufst du Essen oder Getränke zum Mitnehmen in Einwegverpackungen aus Kunststoff oder Einwegbechern, bietest du auch Mehrweg an.
+erklaerung:
+  de: Wer Speisen in Einwegkunststoffverpackungen oder Getränke in Einwegbechern erst beim Verkauf befüllt, muss sie auch in einer
+    Mehrwegverpackung anbieten – nicht teurer und gut sichtbar mit einem Hinweis (§ 33 VerpackG). Ausgenommen sind kleine Betriebe
+    mit höchstens fünf Beschäftigten und höchstens 80 m² Verkaufsfläche; sie müssen stattdessen auf Wunsch mitgebrachte Behälter der
+    Kundschaft befüllen und darauf hinweisen (§ 34 VerpackG).
+rechtsgrundlage:
+- § 33 VerpackG
+- § 34 VerpackG
+kategorie: branche
+branchen:
+- gastronomie_lebensmittel
+ausloeser:
+  all:
+  - feld: profil.taetigkeit.branchen
+    op: enthaelt
+    wert: gastronomie_lebensmittel
+    label:
+      de: Dein Betrieb gehört zur Gastronomie oder Lebensmittelbranche.
+  - feld: profil.gastro.to_go
+    op: ==
+    wert: true
+    label:
+      de: Du verkaufst Essen oder Getränke zum Mitnehmen in Einwegverpackungen.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Kontrolle durch die Abfallbehörde des Landes
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Verpackungsgesetz § 33
+  url: https://www.gesetze-im-internet.de/verpackg/__33.html
+  abgerufen: null
+- titel: Verpackungsgesetz § 34
+  url: https://www.gesetze-im-internet.de/verpackg/__34.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Neu nach Rechtsprüfung R11 (T-114): Ausnahme nur bei höchstens 5 Beschäftigten UND höchstens 80 m² – Zählweise der Beschäftigten und Verkaufsfläche beim Foodtruck prüfen'
+- 'LUCID-Registrierung für Serviceverpackungen (§ 9 VerpackG) und Herstellereigenschaft nach EWKFondsG offen (Nutzertest Gründerin)'
+- 'Folgen bei Nichterfüllung (§ 36 VerpackG) – Sanktion fachlich ergänzen'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

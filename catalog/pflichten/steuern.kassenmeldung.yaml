@@ -1,7 +1,7 @@
 # Katalog C.33 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.kassenmeldung
-version: 2
+version: 3
 katalog_nr: C.33
 titel:
   de: Elektronische Kasse beim Finanzamt melden
@@ -26,9 +26,10 @@ frist:
     ereignis: kasse_angeschafft
   versatz: P1M
   zeitpunkt: spaetestens
+  # R11 (Steuerprüfung 19): Fristende am Wochenende oder Feiertag nach § 108 Abs. 3 AO – laut Prüferin unsicher
   verschiebung:
-    regel: keine
-    kalender: bundeseinheitlich
+    regel: naechster_werktag
+    kalender: bundesland
 wiederholung:
   art: bei_aenderung
   neu_ausloesen_bei:
@@ -56,6 +57,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/ao_1977/__146a.html
   abgerufen: null
 fachlich_zu_pruefen:
+- 'Verschiebung auf den nächsten Werktag nach § 108 Abs. 3 AO (Steuerprüfung R11 Befund 19, „dürfte greifen“, unsicher) – bestätigen'
 - 'Bestandskassen (Meldefrist 31.7.2025): Pflicht für Kassen ohne gemeldetes Anschaffungsdatum abbilden'
 - Verschiebung bei Fristende am Wochenende festlegen
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen

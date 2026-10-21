@@ -1,25 +1,33 @@
 # Katalog B.22 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.foerderprogramme
-version: 2
+version: 3
 katalog_nr: B.22
 titel:
   de: Förderprogramme prüfen (Option)
 kurz:
-  de: Für Startups gibt es Förderprogramme wie EXIST, INVEST, KfW-Programme und Programme der Länder.
+  de: Für Gründungen gibt es Förderprogramme – etwa den Gründungszuschuss der Arbeitsagentur, Gründungskredite der KfW und der Förderbanken
+    der Länder und geförderte Gründungsberatung; für Startups mit Kapitalgesellschaft auch EXIST und INVEST.
 erklaerung:
-  de: Amtlos zeigt passende Förderprogramme, sobald das Matching nach Profil fachlich hinterlegt ist. Fristen und Antragsunterlagen
-    hängen vom Programm ab.
+  de: Welche Programme passen, hängt von Rechtsform, Branche, Land und Vorhaben ab. Einen Überblick gibt die Förderdatenbank des
+    Bundes; die IHK oder Handwerkskammer berät kostenlos. Fristen und Antragsunterlagen hängen vom Programm ab – viele Programme
+    musst du vor dem Start beantragen.
 rechtsgrundlage:
 - Förderrichtlinien des Bundes und der Länder
 kategorie: gesellschaft
 ausloeser:
+  # R11 (Nutzertest Tischlerei #20): für bestehende Betriebe nicht mehr – nur bei Gründung, im Gründungsjahr und im Jahr danach
   any:
-  - feld: abgeleitet.ist_kapitalgesellschaft
+  - feld: abgeleitet.ist_gruendungsjahr
     op: ==
     wert: true
     label:
-      de: Dein Unternehmen ist eine UG oder GmbH.
+      de: Du hast dein Unternehmen in diesem Jahr gegründet.
+  - feld: abgeleitet.ist_vorjahr_gruendungsjahr
+    op: ==
+    wert: true
+    label:
+      de: Du hast dein Unternehmen im Vorjahr gegründet.
   - feld: abgeleitet.noch_nicht_gestartet
     op: ==
     wert: true
@@ -49,6 +57,7 @@ quellen:
 fachlich_zu_pruefen:
 - Option, keine Pflicht
 - Matching-Kriterien und Fristen je Programm fachlich hinterlegen
+- 'Nur noch bei Gründung, im Gründungs- und im Folgejahr (R11, Nutzertests Gründerin und Tischlerei) – Programme für Solo-Gründungen (Gründungszuschuss, Förderbanken der Länder, IHK-Beratung) je Land hinterlegen'
 pruefung:
   status: entwurf
   geprueft_von: null

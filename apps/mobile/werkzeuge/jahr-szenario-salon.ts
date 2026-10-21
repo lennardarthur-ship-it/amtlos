@@ -119,7 +119,8 @@ export function standBauen(): Bau {
     "beschaeftigte.minijob": 0,
     "beschaeftigte.azubi": 1,
     "beschaeftigte.jugendlich": 1,
-    "personal.sofortmeldebranchen": ["keine"],
+    // R11: Friseurgewerbe gehört seit 1.1.2026 zu § 28a Abs. 4 SGB IV und § 2a SchwarzArbG (SchwarzArbMoDiG)
+    "personal.sofortmeldebranchen": ["friseur"],
     "personal.lohnsteuer_anmeldezeitraum": "monatlich",
     "kasse.elektronisch": true,
     "online.website": true,

@@ -1,7 +1,7 @@
 # Katalog E.56 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: arbeitsschutz.arbeitsmedizinische_vorsorge
-version: 1
+version: 2
 katalog_nr: E.56
 titel:
   de: Arbeitsmedizinische Vorsorge anbieten
@@ -9,7 +9,9 @@ kurz:
   de: Du bietest arbeitsmedizinische Vorsorge an, zum Beispiel die Angebotsvorsorge bei Bildschirmarbeit.
 erklaerung:
   de: Die Verordnung zur arbeitsmedizinischen Vorsorge regelt Pflicht-, Angebots- und Wunschvorsorge. Bei Bildschirmarbeit
-    ist Vorsorge anzubieten.
+    ist Vorsorge anzubieten. Bei Feuchtarbeit (zum Beispiel Reinigung, Friseur, Küche) und bei Tätigkeiten mit biologischen Arbeitsstoffen
+    kann Angebots- oder Pflichtvorsorge nötig sein – prüfe das mit deinem Betriebsarzt. Bei Lärm ist Vorsorge ab 80 dB(A) anzubieten
+    und ab 85 dB(A) Pflicht (Anhang Teil 3 ArbMedVV).
 rechtsgrundlage:
 - ArbMedVV
 kategorie: arbeitsschutz
@@ -40,6 +42,8 @@ quellen:
   url: https://www.gesetze-im-internet.de/arbmedvv/
   abgerufen: null
 fachlich_zu_pruefen:
+- 'Lärm (80/85 dB(A), Anhang Teil 3) nach Nutzertest Tischlerei R11 ergänzt; Pflichtvorsorge bei Hartholzstaub (Anhang Teil 1) unsicher, nicht aufgenommen'
+- 'Feuchtarbeit und Biostoffe nur als Prüfhinweis (R11, Nutzertest Gebäudereinigung) – Stundengrenzen und Nummern im Anhang der ArbMedVV fachlich ergänzen'
 - Anlässe und Fristen je Vorsorgeart fachlich ergänzen
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 pruefung:

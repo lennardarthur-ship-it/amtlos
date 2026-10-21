@@ -38,11 +38,25 @@ export const CHECK_FELDER = [
   "beschaeftigte.minijob",
   "beschaeftigte.jugendlich",
   "personal.sofortmeldebranchen",
+  // R11 (Rechtsprüfung Befund 7, Nutzertests Gründerin und Gebäudereinigung): Lebensmittel, Drittstaaten
+  "ifsg.beschaeftigte",
+  "personal.drittstaaten",
   "personal.lohn_durch",
   "arbeitsschutz.elektrische_geraete",
   "arbeitsschutz.gefahrstoffe",
   "bauleistungen.fuer_unternehmen",
+  // R11 (Kosmetik #23, Rechtsprüfung Befund 10): Handwerksrolle bzw. Verzeichnis, Verträge beim Kunden zu Hause
+  "handwerk.anlage",
+  "vertrieb.ausserhalb_geschaeftsraeume",
+  // R11 (Nutzertest Gründerin #2): bei Gastronomie die Fragen, ohne die man nicht starten darf – vor dem Startdatum
+  "ifsg.selbst",
+  "erlaubnis.gewo_paragraphen",
+  "erlaubnis.gaststaette",
+  "erlaubnis.alkohol",
+  "gastro.to_go",
+  "alg1_bezug",
   "kasse.elektronisch",
+  "kasse.angeschafft_am",
   "online.website",
   "online.social_media",
   "ust.kleinunternehmer",
@@ -61,11 +75,26 @@ const ohneTeam = (p: Profil) => p["beschaeftigte.gesamt"] === 0;
 const freiberuflich = (p: Profil) => p.rechtsform === "freiberuf" || p["taetigkeit.einordnung"] === "freiberuf";
 /** Einzelpersonen ohne Gesellschaft (Investoren-Frage nur für Gesellschaften, Nutzertest R10) */
 export const EINZELPERSON = ["einzelunternehmen", "freiberuf", "ek"];
-const PERSONAL_FRAGEN = ["beschaeftigte.minijob", "beschaeftigte.azubi", "beschaeftigte.jugendlich", "beschaeftigte.schwanger", "personal.sofortmeldebranchen", "personal.lohnsteuer_anmeldezeitraum", "personal.lohn_durch", "arbeitsschutz.elektrische_geraete", "arbeitsschutz.gefahrstoffe"];
+const PERSONAL_FRAGEN = ["beschaeftigte.minijob", "beschaeftigte.azubi", "beschaeftigte.jugendlich", "beschaeftigte.schwanger", "personal.sofortmeldebranchen", "personal.lohnsteuer_anmeldezeitraum", "personal.lohn_durch", "arbeitsschutz.elektrische_geraete", "arbeitsschutz.gefahrstoffe", "ifsg.beschaeftigte", "personal.drittstaaten"];
+/** R11 (Nutzertest Gründerin #9, E-076): Fragen zum Vorjahr – vor dem Start bzw. im Gründungsjahr gibt es kein Vorjahr */
+const VORJAHR_FRAGEN = ["umsatz.vorjahr", "gewinn.vorjahr", "ust.zahllast_vorjahr", "ust.dauerfristverlaengerung", "vorauszahlung.est_kst", "vorauszahlung.gewst"];
+/** R11 (Nutzertest Tischlerei #21): UG, GmbH und GmbH & Co. KG sind kraft Rechtsform gewerblich (§ 2 Abs. 2 GewStG) */
+const KRAFT_RECHTSFORM_GEWERBE = ["ug", "gmbh", "gmbh_co_kg"];
+/** Jahr des Starts liegt im laufenden Jahr oder später (Europe/Berlin) – dann gibt es kein Vorjahr des Betriebs. */
+const ohneVorjahr = (p: Profil, heute = heuteBerlin()) => typeof p.gruendungsdatum === "string" && ISO.test(p.gruendungsdatum) && p.gruendungsdatum.slice(0, 4) >= heute.slice(0, 4);
 
 /** Passt eine Frage überhaupt (immer, auch bei „Kurz klären“)? Bei 0 Beschäftigten keine Fragen zum Personal. */
 function passtImmer(feld: string, p: Profil): boolean {
   if (PERSONAL_FRAGEN.includes(feld) && ohneTeam(p)) return false;
+  if (VORJAHR_FRAGEN.includes(feld) && ohneVorjahr(p)) return false;
+  // R11 (Nutzertest Kosmetik #1): wer die Kleinunternehmerregelung nutzt, gibt keine Voranmeldung ab – keine Frage nach der Zahllast
+  if ((feld === "ust.zahllast_vorjahr" || feld === "ust.dauerfristverlaengerung") && p["ust.kleinunternehmer"] === true) return false;
+  if (feld === "taetigkeit.einordnung" && typeof p.rechtsform === "string" && KRAFT_RECHTSFORM_GEWERBE.includes(p.rechtsform)) return false;
+  // R11: Lebensmittel-Fragen nach § 42 IfSG nur in der Gastronomie und Lebensmittelbranche
+  if ((feld === "ifsg.beschaeftigte" || feld === "ifsg.selbst" || feld === "gastro.to_go") && !inBranche(p, "gastronomie_lebensmittel")) return false;
+  // Alkoholausschank nur bei Gaststätte bzw. Getränkeausschank; Anschaffung der Kasse nur mit elektronischer Kasse
+  if (feld === "erlaubnis.alkohol" && p["erlaubnis.gaststaette"] !== true) return false;
+  if (feld === "kasse.angeschafft_am" && p["kasse.elektronisch"] !== true) return false;
   // „Freiberuflich (ohne Gewerbe)“ beantwortet die Frage nach Gewerbe oder freiem Beruf schon (Nutzertest Lea)
   if (feld === "taetigkeit.einordnung" && p.rechtsform === "freiberuf") return false;
   if (feld === "gesellschafter.auslaendische_investoren" && typeof p.rechtsform === "string" && EINZELPERSON.includes(p.rechtsform)) return false;
@@ -80,11 +109,23 @@ function passtImmer(feld: string, p: Profil): boolean {
 const FRAGE_PASST: Record<string, (p: Profil) => boolean> = {
   "beschaeftigte.minijob": mitTeam,
   "beschaeftigte.jugendlich": (p) => mitTeam(p) && inBranche(p, "handwerk", "bau", "beauty_kosmetik", "gastronomie_lebensmittel"),
-  "personal.sofortmeldebranchen": (p) => mitTeam(p) && inBranche(p, "gastronomie_lebensmittel", "bau", "transport_logistik"),
+  // R11 (Nutzertest Gebäudereinigung #3): ab einer beschäftigten Person für alle – außer Beauty und Gebäudereinigung, die die Branche schon auslöst
+  "personal.sofortmeldebranchen": (p) => mitTeam(p) && !inBranche(p, "beauty_kosmetik", "gebaeudereinigung"),
+  "ifsg.beschaeftigte": (p) => mitTeam(p) && inBranche(p, "gastronomie_lebensmittel"),
+  "personal.drittstaaten": (p) => mitTeam(p) && inBranche(p, "gebaeudereinigung", "bau", "gastronomie_lebensmittel", "transport_logistik"),
+  "handwerk.anlage": (p) => inBranche(p, "handwerk", "bau", "beauty_kosmetik"),
+  "vertrieb.ausserhalb_geschaeftsraeume": (p) => inBranche(p, "handwerk", "bau", "beauty_kosmetik"),
+  "ifsg.selbst": (p) => inBranche(p, "gastronomie_lebensmittel"),
+  "erlaubnis.gewo_paragraphen": (p) => inBranche(p, "gastronomie_lebensmittel"),
+  "erlaubnis.gaststaette": (p) => inBranche(p, "gastronomie_lebensmittel"),
+  "erlaubnis.alkohol": (p) => inBranche(p, "gastronomie_lebensmittel"),
+  "gastro.to_go": (p) => inBranche(p, "gastronomie_lebensmittel"),
+  "alg1_bezug": (p) => inBranche(p, "gastronomie_lebensmittel") && (typeof p.gruendungsdatum !== "string" || ohneVorjahr(p)),
   "personal.lohn_durch": mitTeam,
   "arbeitsschutz.elektrische_geraete": (p) => mitTeam(p) && inBranche(p, "handwerk", "bau", "beauty_kosmetik"),
   "arbeitsschutz.gefahrstoffe": (p) => mitTeam(p) && inBranche(p, "beauty_kosmetik", "handwerk", "bau"),
   "bauleistungen.fuer_unternehmen": (p) => inBranche(p, "handwerk", "bau"),
+  "kasse.angeschafft_am": (p) => p["kasse.elektronisch"] === true,
   "kasse.elektronisch": (p) => !freiberuflich(p) || inBranche(p, "gastronomie_lebensmittel", "beauty_kosmetik", "handwerk", "gesundheit_pflege"),
   "online.social_media": (p) => p["online.website"] === false,
 };
@@ -92,6 +133,8 @@ const FRAGE_PASST: Record<string, (p: Profil) => boolean> = {
 /** Antworten, die aus einer anderen folgen (R10): „Freiberuflich (ohne Gewerbe)“ ⇒ freier Beruf, solange nichts anderes gewählt ist. */
 export function folgeAntworten(feld: string, wert: Profil[string], profil: Profil): Profil {
   if (feld === "rechtsform" && wert === "freiberuf" && !beantwortet(profil, "taetigkeit.einordnung")) return { "taetigkeit.einordnung": "freiberuf" };
+  // R11 (Nutzertest Tischlerei #21): UG/GmbH sind kraft Rechtsform gewerblich – keine Frage „Gewerbe oder freier Beruf?“
+  if (feld === "rechtsform" && typeof wert === "string" && KRAFT_RECHTSFORM_GEWERBE.includes(wert) && !beantwortet(profil, "taetigkeit.einordnung")) return { "taetigkeit.einordnung": "gewerbe" };
   return {};
 }
 /** Reihenfolge im Fragenkatalog – vom Alltäglichen zum Speziellen; entscheidet bei gleicher Wirkung */
@@ -153,6 +196,10 @@ export interface PflichtInfo {
    * in den letzten sechs Monaten oder demnächst) – erledigt erst, wenn alle in einer geteilten Unterweisung stehen.
    */
   personen: string[];
+  /** R11 (Nutzertest Gründerin #7, E-087): Pflichten, die vorher erledigt sein müssen (Katalog `voraussetzungen`, z. B. ELSTER-Konto vor dem Fragebogen) */
+  voraussetzungen?: string[];
+  /** R11: Teil der Gründungsschritte (Katalog `phase: gruendung`) – für die Reihenfolge „Vor dem Start“ */
+  gruendungsschritt?: boolean;
 }
 
 /** R10: Pflichten, die je neu eingestellter Person zu erfüllen sind (Nutzertest Jonas: ein Nachweis für den Azubi erledigte sie für alle). */
@@ -188,7 +235,7 @@ export interface Auswertung {
  * R10: Lohn-Meldungen und -Termine, die ein Lohnbüro bzw. die Steuerberatung übernimmt, wenn sie die Löhne macht
  * (Frage „Wer macht die Löhne?“, Nutzertest Sabine) – sie stehen dann nicht bei „Jetzt dran“.
  */
-export const LOHN_PFLICHTEN = new Set(["personal.beitragsnachweis", "personal.lohnsteuer_anmeldung", "personal.sv_jahresmeldung", "personal.sv_anmeldung", "personal.sofortmeldung", "personal.sv_abmeldung", "personal.lohnabrechnung", "personal.umlagen_eau"]);
+export const LOHN_PFLICHTEN = new Set(["personal.beitragsnachweis", "personal.lohnnachweis_bg", "personal.lohnsteuer_anmeldung", "personal.sv_jahresmeldung", "personal.sv_anmeldung", "personal.sofortmeldung", "personal.sv_abmeldung", "personal.lohnabrechnung", "personal.umlagen_eau"]);
 
 /** Grund für Pflichten, deren Auslöser im Katalog „immer“ ist */
 const IMMER = "Gilt für jedes Unternehmen, unabhängig von deinen Angaben.";
@@ -232,6 +279,9 @@ export function ereignisseAusStand(profil: Profil, stichtag: string, unterlagen:
     // R10: „Beschäftigt seit“ der gespeicherten Mitarbeiter – je Person eine Einstellung (wie beim Server je Beschäftigtem)
     for (const tag of new Set(mitarbeiter.map((m) => m.beginn).filter((d): d is string => typeof d === "string" && ISO.test(d) && d !== datum))) ereignisse.push({ typ: "einstellung", datum: tag });
   }
+  // R11 (Nutzertest Gründerin #10): Anschaffung der elektronischen Kasse aus dem Profil – die Meldefrist läuft erst ab dann
+  const kasse = profil["kasse.angeschafft_am"];
+  if (profil["kasse.elektronisch"] === true && typeof kasse === "string" && ISO.test(kasse)) ereignisse.push({ typ: "kasse_angeschafft", datum: kasse });
   for (const u of unterlagen) {
     if (!u.ausgegeben || u.storniertDurch) continue;
     const d = u.daten.datum;
@@ -248,6 +298,16 @@ export interface MitarbeiterFuerCheck {
   name?: string | null;
   geburtsdatum?: string | null;
   beginn?: string | null;
+  /** R11: Freitext aus dem Personalfragebogen, z. B. „deutsch“, „polnisch“, „syrisch“ */
+  staatsangehoerigkeit?: string | null;
+}
+
+/** R11 (Nutzertest Gebäudereinigung #5): Staatsangehörigkeiten aus EU, EWR und Schweiz – ohne Aufenthaltstitel arbeitsberechtigt. */
+const EU_EWR_CH = /^(deutsch|deutschland|belgisch|bulgarisch|dänisch|daenisch|estnisch|finnisch|französisch|franzoesisch|griechisch|irisch|italienisch|kroatisch|lettisch|litauisch|luxemburgisch|maltesisch|niederländisch|niederlaendisch|österreichisch|oesterreichisch|polnisch|portugiesisch|rumänisch|rumaenisch|schwedisch|slowakisch|slowenisch|spanisch|tschechisch|ungarisch|zyprisch|isländisch|islaendisch|liechtensteinisch|norwegisch|schweizerisch|schweizer|eu|ewr)$/i;
+/** Staatsangehörigkeit eindeutig außerhalb von EU, EWR und Schweiz? Mehrere Angaben (z. B. „deutsch, türkisch“): eine aus der EU genügt. */
+export function drittstaat(text: string | null | undefined): boolean {
+  const teile = (text ?? "").split(/[,/;]|\bund\b/).map((x) => x.trim().toLowerCase()).filter(Boolean);
+  return teile.length > 0 && !teile.some((t) => EU_EWR_CH.test(t));
 }
 
 /** Alter in vollen Jahren am Stichtag (ISO-Daten). */
@@ -259,10 +319,50 @@ const alter = (geburt: string, tag: string) => Number(tag.slice(0, 4)) - Number(
  * Jugendliche wie im Profil angegeben.
  */
 export function profilMitStand(profil: Profil, stichtag: string, mitarbeiter: readonly MitarbeiterFuerCheck[] = []): Profil {
+  // R11: gespeicherte Mitarbeiter aus Drittstaaten ⇒ „Beschäftigst du Menschen aus Drittstaaten?“ ist mit Ja beantwortet
+  if (profil["personal.drittstaaten"] !== true && mitarbeiter.some((m) => drittstaat(m.staatsangehoerigkeit))) profil = { ...profil, "personal.drittstaaten": true };
   const jung = mitarbeiter.filter((m) => typeof m.geburtsdatum === "string" && ISO.test(m.geburtsdatum) && alter(m.geburtsdatum, stichtag) < 18 && alter(m.geburtsdatum, stichtag) >= 0).length;
   if (!jung) return profil;
   const angegeben = typeof profil["beschaeftigte.jugendlich"] === "number" ? (profil["beschaeftigte.jugendlich"] as number) : 0;
   return { ...profil, "beschaeftigte.jugendlich": Math.max(angegeben, jung) };
+}
+
+/** R11 (Nutzertest Tischlerei #2): „Warum für dich“ einer unklaren Pflicht als Bedingung („Gilt, wenn …“). */
+function bedingung(saetze: string[]): string {
+  if (!saetze.length) return "";
+  return `Gilt, wenn das zutrifft: ${saetze.map((x) => `„${x.replace(/\.$/, "")}“`).join(", ")}.`;
+}
+
+/**
+ * R11 (Nutzertest Gründerin #7): Gründungsschritte in zeitlicher Reihenfolge und nach Voraussetzungen – die Voraussetzung
+ * (z. B. ELSTER-Konto, ohne eigenen Termin) steht vor dem, was auf sie wartet (Fragebogen). Die übrigen Pflichten bleiben
+ * an ihrem Platz; nur die Plätze der Gründungsschritte werden neu belegt.
+ */
+export function gruendungZuerstGeordnet(l: PflichtInfo[]): PflichtInfo[] {
+  const schritte = l.filter((p) => p.gruendungsschritt);
+  if (schritte.length < 2) return l;
+  const nachId = new Map(schritte.map((p) => [p.id, p]));
+  // wirksamer Termin: der eigene oder der früheste Termin eines Schritts, der auf diesen wartet
+  const wirksam = new Map<string, string>();
+  const termin = (p: PflichtInfo, besucht = new Set<string>()): string => {
+    if (wirksam.has(p.id)) return wirksam.get(p.id)!;
+    if (besucht.has(p.id)) return p.naechsterTermin ?? "9999";
+    besucht.add(p.id);
+    let t = p.naechsterTermin ?? "9999";
+    for (const q of schritte) if (q.voraussetzungen?.includes(p.id)) t = [t, termin(q, besucht)].sort()[0]!;
+    wirksam.set(p.id, t);
+    return t;
+  };
+  const tiefe = (p: PflichtInfo, n = 0): number => (n > 10 ? n : Math.max(0, ...(p.voraussetzungen ?? []).map((v) => (nachId.has(v) ? tiefe(nachId.get(v)!, n + 1) + 1 : 0))));
+  const geordnet = [...schritte].sort((a, b) => termin(a).localeCompare(termin(b)) || tiefe(a) - tiefe(b) || SCHWERE[a.schwere] - SCHWERE[b.schwere] || a.titel.localeCompare(b.titel, "de"));
+  let i = 0;
+  return l.map((p) => (p.gruendungsschritt ? geordnet[i++]! : p));
+}
+
+/** R11 (Nutzertest Gründerin #7, E-087): Voraussetzungen, die in dieser Auswertung gelten und noch nicht erledigt sind. */
+export function offeneVoraussetzungen(p: PflichtInfo, a: Auswertung, e: Erledigt): PflichtInfo[] {
+  const alle = [...a.gilt, ...a.gruendung, ...a.beiEinstellung];
+  return (p.voraussetzungen ?? []).map((id) => alle.find((x) => x.id === id)).filter((x): x is PflichtInfo => Boolean(x) && !istErledigt(x!, e));
 }
 
 /**
@@ -293,7 +393,8 @@ export function auswertung(antworten: Profil, stichtag: string, unterlagen: read
       rechtsgrundlage: p.rechtsgrundlage ?? [],
       quellen: (p.quellen ?? []).filter((q): q is { titel: string; url: string } => Boolean(q.url)),
       // die Sätze, die das Ergebnis tragen – auch bei zusammengesetzten Auslösern („weil du … und …“)
-      grund: entscheidendeSaetze(e.begruendung).join(" ") || ("immer" in (p.ausloeser as object) ? IMMER : ""),
+      // R11 (Nutzertest Tischlerei #2): bei unklaren Pflichten als Bedingung, nicht als Tatsache
+      grund: e.ergebnis === "unbekannt" ? bedingung(entscheidendeSaetze(e.begruendung)) : entscheidendeSaetze(e.begruendung).join(" ") || ("immer" in (p.ausloeser as object) ? IMMER : ""),
       vorlage: VORLAGEN_JE_PFLICHT.get(p.id)?.[0] ?? null,
       vorlagen: VORLAGEN_JE_PFLICHT.get(p.id) ?? [],
       naechsterTermin: termin,
@@ -311,9 +412,11 @@ export function auswertung(antworten: Profil, stichtag: string, unterlagen: read
       erledigung: { art: p.erledigung?.art ?? "einmalig", ...(p.erledigung?.zeitraum ? { zeitraum: p.erledigung.zeitraum } : {}), ...(p.erledigung?.naechster_termin_aus ? { naechsterTerminAus: p.erledigung.naechster_termin_aus } : {}), ...(p.erledigung?.bestaetigung ? { bestaetigung: text(p.erledigung.bestaetigung) } : {}) },
       lohnbuero: lohnExtern && LOHN_PFLICHTEN.has(p.id),
       personen: JE_PERSON.has(p.id) ? neuePersonen : [],
+      voraussetzungen: (p as Pflicht & { voraussetzungen?: string[] }).voraussetzungen ?? [],
+      gruendungsschritt: p.phase === "gruendung",
     };
   };
-  const sortiert = (l: PflichtInfo[]) => l.sort((a, b) => SCHWERE[a.schwere] - SCHWERE[b.schwere] || (a.naechsterTermin ?? "9999").localeCompare(b.naechsterTermin ?? "9999") || a.titel.localeCompare(b.titel, "de"));
+  const sortiert = (l: PflichtInfo[]) => gruendungZuerstGeordnet(l.sort((a, b) => SCHWERE[a.schwere] - SCHWERE[b.schwere] || (a.naechsterTermin ?? "9999").localeCompare(b.naechsterTermin ?? "9999") || a.titel.localeCompare(b.titel, "de")));
   const aktiv = ergebnisse.filter((e) => !e.radar);
   const beginn = typeof profil.gruendungsdatum === "string" ? profil.gruendungsdatum : null;
   const bestehend = Boolean(beginn && beginn <= plusMonate(stichtag, -BESTAND_AB_MONATEN));
@@ -513,7 +616,8 @@ export function dringlichkeit(a: Auswertung, e: Erledigt, heute: string) {
   const ee = { ...e, heute: e.heute ?? heute };
   // R10: was das Lohnbüro bzw. die Steuerberatung erledigt, steht nicht bei „Jetzt dran“ (bleibt „Im Blick“)
   const offen = a.gilt.filter((p) => !istErledigt(p, ee));
-  const selbst = offen.filter((p) => !p.lohnbuero);
+  // R11 (Nutzertest Gebäudereinigung #7): die Sofortmeldung bleibt „jetzt dran“, auch wenn das Lohnbüro meldet – es braucht die Daten vor Arbeitsbeginn
+  const selbst = offen.filter((p) => !p.lohnbuero || p.id === "personal.sofortmeldung");
   const bald = plusTage(heute, 14);
   const spaeter = plusTage(heute, 45);
   const mitTermin = selbst.filter((p) => p.naechsterTermin).sort((x, y) => x.naechsterTermin!.localeCompare(y.naechsterTermin!));

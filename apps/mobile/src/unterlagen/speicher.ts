@@ -23,6 +23,11 @@ export interface Unterlage {
   /** Stornorechnung: ID der stornierten Rechnung (M1) – die Nummer allein ist bei doppelt vergebenen Nummern mehrdeutig */
   stornoZuId?: string;
   /**
+   * Ersatzrechnung (R11): ID der stornierten Rechnung, die diese Rechnung ersetzt – gesetzt, wenn die Kopie aus einer
+   * stornierten Rechnung bzw. ihrem Storno angelegt wird. Die Voranmeldung ordnet Storno und Ersatz danach zu.
+   */
+  ersetzt?: string;
+  /**
    * Konfliktkopie (K1): Zwei Geräte haben dieselbe Unterlage mit verschiedenem Inhalt festgeschrieben. Gültig bleibt die
    * zuerst festgeschriebene; die andere Fassung bleibt als Kopie erhalten, zählt aber nirgends mit (nicht gültig).
    */
@@ -174,7 +179,7 @@ function unterlageAus(u: Record<string, unknown>): Unterlage {
   else delete r.ausgegeben;
   if (u.festgeschrieben) r.festgeschrieben = istIso(u.festgeschrieben) ? u.festgeschrieben : (r.ausgegeben ?? geaendert);
   else delete r.festgeschrieben;
-  for (const k of ["storniertDurch", "stornoZuId", "konfliktKopieVon", "pdfSha256", "bezahlt"] as const) if (typeof u[k] !== "string" || !u[k]) delete r[k];
+  for (const k of ["storniertDurch", "stornoZuId", "ersetzt", "konfliktKopieVon", "pdfSha256", "bezahlt"] as const) if (typeof u[k] !== "string" || !u[k]) delete r[k];
   if (!istIso(u.bezahltGeaendert)) delete r.bezahltGeaendert;
   return r;
 }
@@ -425,10 +430,17 @@ export function stornieren(s: Stand, id: string, jetzt: Date, neu = neueId()): [
   return [{ ...s, unterlagen: [u, ...s.unterlagen.map((x) => (x.id === id ? { ...x, storniertDurch: neu } : x))] }, u];
 }
 
-/** Kopie, z. B. für den nächsten Monat oder einen weiteren Arbeitsbereich. */
+/**
+ * Kopie, z. B. für den nächsten Monat oder einen weiteren Arbeitsbereich. R11: Die Kopie einer stornierten Rechnung –
+ * oder ihrer Stornorechnung, dann mit den Daten der ursprünglichen Rechnung – ist die Ersatzrechnung und merkt sich
+ * das Original (`ersetzt`).
+ */
 export function kopieren(s: Stand, id: string, jetzt: Date, neu = neueId()): [Stand, Unterlage | null] {
-  const alt = s.unterlagen.find((u) => u.id === id);
-  if (!alt) return [s, null];
+  const gewaehlt = s.unterlagen.find((u) => u.id === id);
+  if (!gewaehlt) return [s, null];
+  const stornoVon = gewaehlt.stornoZuId ? s.unterlagen.find((u) => u.id === gewaehlt.stornoZuId) : undefined;
+  const alt = stornoVon ?? gewaehlt;
+  const ersetzt = stornoVon ? stornoVon.id : alt.storniertDurch && !alt.daten.storno_zu ? alt.id : undefined;
   const daten = JSON.parse(JSON.stringify(alt.daten)) as Daten;
   const v = vorlageFuer(alt.vorlage);
   // eine kopierte Rechnung bekommt die nächste Nummer – Nummern dürfen nur einmal vorkommen
@@ -438,7 +450,7 @@ export function kopieren(s: Stand, id: string, jetzt: Date, neu = neueId()): [St
   delete daten.storno_zu_datum;
   // fortlaufend nummerierte Unterlagen (Rechnung) bekommen das heutige Datum – sonst passt die Nummernfolge nicht
   if (v?.fortlaufend && typeof daten.datum === "string") daten.datum = heute(jetzt);
-  const u: Unterlage = { id: neu, vorlage: alt.vorlage, daten, erstellt: jetzt.toISOString(), geaendert: jetzt.toISOString() };
+  const u: Unterlage = { id: neu, vorlage: alt.vorlage, daten, erstellt: jetzt.toISOString(), geaendert: jetzt.toISOString(), ...(ersetzt ? { ersetzt } : {}) };
   return [{ ...s, unterlagen: [u, ...s.unterlagen] }, u];
 }
 

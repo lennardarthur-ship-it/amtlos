@@ -1,7 +1,7 @@
 # Katalog C.24. Zeigt: Rhythmus abhängig von Fakten, Regelwerte, Dauerfristverlängerung.
 schema_version: 1
 id: steuern.ust_voranmeldung
-version: 2
+version: 3
 katalog_nr: C.24
 titel:
   de: Umsatzsteuer-Voranmeldung abgeben
@@ -49,6 +49,11 @@ ausloeser:
           op: ">"
           wert: { regelwert: steuern.ust_va.grenze_befreiung }
           label: { de: Deine Umsatzsteuer im Vorjahr lag über der Grenze für eine Befreiung. }
+        # R11 (Nutzertest Kosmetik #1): bis 2.000 € Vorjahressteuer kann das Finanzamt befreien (§ 18 Abs. 2 S. 3 UStG) – ohne
+        # Befreiung (Rhythmus „keine“) bleibt die Pflicht; der Rhythmus folgt dann aus der Zahllast
+        - feld: profil.ust.zahllast_vorjahr
+          op: vorhanden
+          label: { de: "Du hast im Vorjahr Umsatzsteuer angemeldet. Bei höchstens 2.000 € kann dich das Finanzamt von der Voranmeldung befreien – nur dann entfällt sie." }
         - feld: abgeleitet.ist_gruendungsjahr
           op: "=="
           wert: true
@@ -57,6 +62,12 @@ ausloeser:
           op: "=="
           wert: true
           label: { de: Du hast dein Unternehmen im Vorjahr gegründet. }
+        # R11 (Nutzertest Tischlerei #1): ohne Kleinunternehmerregelung und ohne Befreiung gilt die Pflicht sicher (§ 18 Abs. 1 UStG) –
+        # offen ist dann nur der Rhythmus
+        - feld: profil.ust.kleinunternehmer
+          op: "=="
+          wert: false
+          label: { de: "Ohne Kleinunternehmerregelung gibst du Voranmeldungen ab, solange das Finanzamt dich nicht befreit." }
 frist:
   typ: wiederkehrend
   # R10: zuerst der angegebene Rhythmus; ohne Angabe (oder „weiß nicht“) nach der Zahllast des Vorjahres

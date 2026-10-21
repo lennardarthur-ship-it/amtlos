@@ -82,6 +82,7 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
     r
       ? [
           r.kleinunternehmer ? (r.steuerschuldBelege ? TEXT.ust_ku_13b : TEXT.aus_rechnungen_ku) : TEXT.aus_rechnungen_ok(r.anzahl),
+          r.kuGemischt ? TEXT.ust_ku_gemischt : "",
           kasse?.text ?? "",
           r.gutschriften ? TEXT.aus_rechnungen_gutschriften(r.gutschriften) : "",
           r.ersatz ? TEXT.aus_rechnungen_ersatz(r.ersatz) : "",
@@ -114,6 +115,7 @@ function AusRechnungen({ id, daten }: { id: string; daten: Daten }) {
       {r ? (
         <View style={{ marginTop: 8, gap: 4 }}>
           {r.kleinunternehmer ? <T v="caption" farbe={f.bald}>{r.steuerschuldBelege ? TEXT.ust_ku_13b : TEXT.aus_rechnungen_ku}</T> : <T v="caption" farbe={f.amtTief}>{TEXT.aus_rechnungen_ok(r.anzahl)}</T>}
+          {r.kuGemischt ? <T v="caption" farbe={f.bald}>{TEXT.ust_ku_gemischt}</T> : null}
           {kasse ? <Hinweis art={kasse.warnung ? "warnung" : "info"} symbol="banknote" text={kasse.text} /> : null}
           {r.gutschriften ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_gutschriften(r.gutschriften)}</T> : null}
           {r.ersatz ? <T v="caption" farbe={f.bald}>{TEXT.aus_rechnungen_ersatz(r.ersatz)}</T> : null}

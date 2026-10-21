@@ -105,16 +105,21 @@ export const BU_VORSTEUER: Record<number, string> = { 19: "9", 7: "8" };
  * Vorsteuerabzug BU 40). Alle anderen Aufwandskonten sind ohne Automatik und brauchen BU 9/8 (fachlich zu prüfen).
  */
 export const AUTOMATIKKONTEN: Record<Kontenrahmen, readonly string[]> = {
-  SKR03: ["3400", "3300", "3120", "3123"],
-  SKR04: ["5400", "5300"],
+  SKR03: ["3400", "3300", "3120", "3123", "3140", "3143"],
+  SKR04: ["5400", "5300", "5920", "5923", "5940", "5943"],
 };
 
 /**
- * Konten für § 13b-Eingangsleistungen (Automatik: Vorsteuer und Umsatzsteuer). Nur SKR03 ist hier hinterlegt (3120
- * Bauleistung Inland, 3123 sonstige Leistung EU); in SKR04 bleibt das Kategorie-Konto – die Steuerberatung bucht um
- * (PRUEFLISTE).
+ * Konten für § 13b-Eingangsleistungen (Automatik: Umsatzsteuer, mit Vorsteuerabzug auch die Vorsteuer): Bauleistung eines
+ * im Inland ansässigen Unternehmers bzw. sonstige Leistung eines im übrigen Gemeinschaftsgebiet ansässigen Unternehmers.
+ * R11: auch ohne Vorsteuerabzug (Kleinunternehmer, steuerfreie Umsätze nach § 4 Nr. 8 ff.) – Konten „ohne Vorsteuer und
+ * 19 % Umsatzsteuer“, sonst fehlte die Steuer (Kz 47/85) im Stapel. SKR03 3120/3123 bzw. 3140/3143, SKR04 5920/5923
+ * bzw. 5940/5943 – nach Angabe der Steuerberatung, gegen den Kontenrahmen prüfen (PRUEFLISTE).
  */
-export const KONTEN_13B: Record<Kontenrahmen, { bau: string; eu: string } | null> = { SKR03: { bau: "3120", eu: "3123" }, SKR04: null };
+export const KONTEN_13B: Record<Kontenrahmen, { mit: { bau: string; eu: string }; ohne: { bau: string; eu: string } }> = {
+  SKR03: { mit: { bau: "3120", eu: "3123" }, ohne: { bau: "3140", eu: "3143" } },
+  SKR04: { mit: { bau: "5920", eu: "5923" }, ohne: { bau: "5940", eu: "5943" } },
+};
 
 /** Sachkonten je Kontenrahmen – fachlich zu prüfen. Aufwandskonten stehen in der Kategorie (belege.ts). */
 export const BUCHUNGSKONTEN: Record<
@@ -201,9 +206,9 @@ function erloeskonto(k: (typeof BUCHUNGSKONTEN)[Kontenrahmen], satz: number | nu
 
 /**
  * Je Rechnung und Steuersatz eine Buchung Forderungen an Erlöse mit dem Bruttobetrag (das Automatikkonto rechnet die
- * Umsatzsteuer selbst). Stornos als einfache Umkehrbuchung (Soll und Haben getauscht). Die Versteuerungsart ändert die
- * Buchungen nicht – sie steht in den Mandantenstammdaten der Steuerberatung (Prüfpunkt). Gutschriften (auch ihre
- * Stornos) sind keine Erlöse und werden übersprungen.
+ * Umsatzsteuer selbst). Stornos als einfache Umkehrbuchung (Soll und Haben getauscht). Gebucht wird zum Datum in
+ * `datum` – bei Ist-Versteuerung ohne Bilanz und bei Abschlagsrechnungen gibt der Aufrufer den Zahltag mit und lässt
+ * Unbezahltes weg (R11, Prüfpunkt). Gutschriften (auch ihre Stornos) werden als Aufwand gebucht.
  */
 export function buchungenAusRechnungen(rechnungen: AusgangsRechnungFuerBuchung[], kontenrahmen: Kontenrahmen, _o?: { versteuerung?: "soll" | "ist" }): Buchung[] {
   const k = BUCHUNGSKONTEN[kontenrahmen];
@@ -284,21 +289,22 @@ function gutschriftBuchungen(r: AusgangsRechnungFuerBuchung, kontenrahmen: Konte
  * `o.nummern` (`belegNummern`), ohne diese die Beleg-ID in Kurzform. Buchungstext: Lieferant (höchstens 40 Zeichen)
  * und Kurzbezeichnung der Kategorie.
  */
-export function buchungenAusBelegen(belege: Beleg[], kontenrahmen: Kontenrahmen, o?: { nummern?: Map<string, string>; kapitalgesellschaft?: boolean }): Buchung[] {
+export function buchungenAusBelegen(belege: Beleg[], kontenrahmen: Kontenrahmen, o?: { nummern?: Map<string, string>; kapitalgesellschaft?: boolean; kleinunternehmer?: boolean }): Buchung[] {
   const k = BUCHUNGSKONTEN[kontenrahmen];
   const aus: Buchung[] = [];
   for (const b of belege) {
     if (!belegImStapel(b, o)) continue;
     const kat = kategorieFuer(b.kategorie);
     const konten = kontenrahmen === "SKR03" ? kat.skr03 : kat.skr04;
-    const k13b = b.steuerschuld && b.vorsteuer ? KONTEN_13B[kontenrahmen] : null;
+    // § 13b: mit Vorsteuerabzug die Konten „19 % Vorsteuer und 19 % Umsatzsteuer“, sonst „ohne Vorsteuer“ (R11)
+    const k13b = b.steuerschuld ? KONTEN_13B[kontenrahmen][b.vorsteuer && !o?.kleinunternehmer ? "mit" : "ohne"] : null;
     const gegenkonto = b.zahlung === "bar" ? k.kasse : b.zahlung === "privat" ? k.privateinlagen : k.verbindlichkeiten;
     const buchungstext = kuerze(`${kuerze(b.lieferant, NAME_IM_TEXT)} ${kat.kurz}`, 60);
     const belegfeld1 = belegfeld1Aus(belegKennung(b, o?.nummern?.get(b.id) ?? belegfeld1Aus(b.id).slice(0, 12).toUpperCase()));
     for (const s of b.steuer) {
       if (!s.brutto_cent) continue;
-      // § 13b mit Vorsteuerabzug: Automatikkonto für Steuer und Vorsteuer (SKR03); sonst das Kategorie-Konto ohne Steuer
-      const konto = k13b ? k13b[b.steuerschuld!] : b.steuerschuld ? (konten[19] ?? "") : (konten[s.satz] ?? konten[19] ?? "");
+      // § 13b: Automatikkonto für die Steuer (und ggf. die Vorsteuer); sonst das Kategorie-Konto
+      const konto = k13b ? k13b[b.steuerschuld!] : (konten[s.satz] ?? konten[19] ?? "");
       aus.push({
         datum: b.datum,
         betrag_cent: Math.abs(s.brutto_cent),
@@ -559,14 +565,14 @@ export function pruefpunkteBuchungen(): string[] {
     "Erlöskonten nach Steuerart: igL 8125/4125 (mit „EU-Land u. UStID“), § 13b im Inland 8337/4337, sonstige Leistung an Unternehmen im übrigen Gemeinschaftsgebiet (Empfänger schuldet die Steuer, Kz 21) 8336/4336, im Drittland steuerbare Leistung 8338/4338 – die Steuerberatung nannte 8338 für die EU-Leistung; nach unserem Stand ist 8338 das Drittlandkonto und 8336 das EU-Konto. Bitte prüfen. Nullsteuersatz (§ 12 Abs. 3 UStG, Kz 87) bleibt vorerst auf 8100/4100 – Konto für Kz 87 offen.",
     "Automatikkonten: nur SKR03 3400/3300 (Wareneingang 19/7 %), 3120/3123 (§ 13b) und SKR04 5400/5300 gelten als Automatikkonten (kein BU, ohne Vorsteuerabzug BU 40). Alle anderen Kategorie-Konten (z. B. 4930, 4600, 4210, 3100, 0420) gelten als Konten ohne Automatik und bekommen bei Vorsteuer BU 9 (19 %) bzw. 8 (7 %). Für die Sätze 16 % und 5 % (2. Halbjahr 2020) setzt der Export keinen BU-Schlüssel.",
     "BU-Schlüssel 40 („keine Steuer“ bei Automatikkonten) wird nur noch auf Automatikkonten gesetzt, wenn ein Beleg keinen Vorsteuerabzug erlaubt – weist DATEV BU 40 auf Konten ohne Automatik ab oder warnt es nur?",
-    "§ 13b-Eingangsleistungen: SKR03 3120 (Bauleistung eines im Inland ansässigen Unternehmers) bzw. 3123 (sonstige Leistung eines im übrigen Gemeinschaftsgebiet ansässigen Unternehmers) als Automatikkonten für Umsatzsteuer und Vorsteuer. SKR04-Gegenstücke und das Konto für Kleinunternehmer (Steuer ohne Vorsteuerabzug) sind nicht hinterlegt – dort bleibt das Kategorie-Konto ohne Steuer.",
+    "§ 13b-Eingangsleistungen (R11): mit Vorsteuerabzug SKR03 3120 (Bauleistung eines im Inland ansässigen Unternehmers) bzw. 3123 (sonstige Leistung eines im übrigen Gemeinschaftsgebiet ansässigen Unternehmers), SKR04 5920/5923; ohne Vorsteuerabzug (Kleinunternehmer, Belege mit „Vorsteuer abziehbar“ aus) SKR03 3140/3143, SKR04 5940/5943 – alle als Automatikkonten für die Umsatzsteuer (und ggf. Vorsteuer) 19 %. Kontonummern nach Angabe der simulierten Steuerberatung („nach meinem Stand“), gegen den aktuellen Kontenrahmen prüfen; 7-%-Fälle sind nicht abgebildet.",
     "Gutschriften (§ 14 Abs. 2 Satz 2 UStG) werden als Aufwand auf „bezogene Leistungen“ (SKR03 3100, SKR04 5900) an Verbindlichkeiten gebucht, mit BU 9/8 bei ausgewiesener Steuer – passendes Aufwandskonto je nach Leistung mit der Steuerberatung klären.",
     "Personal-Belege und privat ausgelegte Belege einer Kapitalgesellschaft stehen nur in der Belegliste, nicht im Stapel. Verrechnungskonto Gesellschafter (z. B. SKR03 0755) mit der Steuerberatung festlegen.",
     "Felder 115 „Leistungsdatum“ und 116 „Datum Zuord. Steuerperiode“ (TTMMJJJJ) sind bei Ausgangsrechnungen gefüllt; Feld 40 „EU-Land u. UStID (Bestimmung)“ bei igL und EU-Leistungen – Format und Feldnummern prüfen.",
     "Stornos werden als einfache Umkehrbuchung (Soll und Haben getauscht) ausgegeben, nicht als Generalumkehr (Feld „Generalumkehr (GU)“ bzw. negativer Umsatz). Folgen für Verkehrszahlen und Umsatzstatistik mit der Steuerberatung klären.",
     "Die Spaltenliste der Buchungszeile (125 Felder, Version 700, Formatversion 13) ist aus dem Gedächtnis nachgebaut; gefüllt werden die ersten 14 Felder und „Buchungs GUID“ (Feld 103, stabile GUID aus Quelle und Steuersatz – darf der Export sie setzen, und steht sie an der richtigen Stelle?). Reihenfolge, Anzahl und Bezeichnungen gegen den DATEV-Schnittstellen-Entwicklungsleitfaden prüfen.",
     "Dateikopf: „Datum vom“ und „Datum bis“ stehen als JJJJMMTT (nicht TTMMJJJJ), Feld 27 trägt den Kontenrahmen („03“/„04“), Festschreibung 0, Rechnungslegungszweck 0, Herkunft „RE“ – gegen die Formatbeschreibung prüfen. Berater- und Mandantennummer sind beim Import Pflicht.",
-    "Ist-Versteuerung (§ 20 UStG) ändert die Buchungen nicht: gebucht wird Forderung an Erlös zum Rechnungsdatum, die Versteuerungsart steht in den Mandantenstammdaten. Reicht das, oder soll bei Ist-Versteuerung erst mit der Zahlung gebucht werden (Zufluss, § 11 EStG)?",
+    "Ist-Versteuerung (§ 20 UStG) ohne Bilanz (R11): Rechnungen stehen erst mit dem Zahlungseingang im Stapel – Forderungen (1410/1210) an Erlös mit dem Zahltag als Belegdatum und in Feld 116; unbezahlte Rechnungen stehen nur in der Rechnungsliste. Abschlagsrechnungen ebenso (auch bei Soll), weil die Steuer erst mit der Zahlung entsteht. Ob DATEV die Ist-Versteuerung so ohne OPOS richtig auflöst, ist offen – Testimport.",
     "Belegdatum im Format TTMM: das Jahr ergibt sich aus dem Stapelzeitraum. Alle Buchungen eines Stapels müssen in „Datum vom/bis“ und im Wirtschaftsjahr liegen – der Aufrufer muss je Zeitraum (Monat oder Jahr) einen eigenen Stapel erzeugen.",
     "Belege mit Zahlungsweg Bank werden gegen Verbindlichkeiten aus L+L ohne Kontokorrent gebucht, die Zahlung selbst nicht (sie kommt aus dem Kontoauszug der Steuerberatung). Bei Einnahmen-Überschuss-Rechnung ist der Zahlungstag maßgeblich – ob stattdessen direkt gegen Bank (SKR03 1200, SKR04 1800) gebucht werden soll, mit der Steuerberatung klären.",
     "Belegfeld 1 wird auf die DATEV-zulässigen Zeichen (Ziffern, Buchstaben, $ & % * + - /) gekürzt, Umlaute werden umschrieben – stimmt die Zeichenliste? Textfelder werden nach Windows-1252 kodiert; andere Zeichen werden „?“.",

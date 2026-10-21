@@ -1,0 +1,74 @@
+# R11 (Nutzertest Gründerin Foodtruck, K-062): Bescheinigung nach § 43 Abs. 1 IfSG auch für die Inhaberin bzw. den Inhaber – als Gründungsschritt vor dem Start
+schema_version: 1
+id: branche.gastro_ifsg_bescheinigung_selbst
+version: 1
+katalog_nr: H.1
+titel:
+  de: Eigene Bescheinigung des Gesundheitsamts vor dem Start (§ 43 IfSG)
+kurz:
+  de: Arbeitest du selbst zum ersten Mal mit Lebensmitteln, brauchst du vor dem Start die Bescheinigung über die Belehrung durch
+    das Gesundheitsamt.
+erklaerung:
+  de: Die Bescheinigung nach § 43 Abs. 1 IfSG (früher „Gesundheitszeugnis“) brauchst auch du selbst, wenn du gewerbsmäßig mit
+    Lebensmitteln nach § 42 IfSG arbeitest – zum Beispiel beim Kochen, Zubereiten oder Ausgeben. Die Belehrung macht das Gesundheitsamt
+    oder ein beauftragter Arzt; vereinbare den Termin früh. Bei Aufnahme der Tätigkeit darf die Bescheinigung höchstens drei Monate
+    alt sein. Hast du schon eine aus einer früheren Tätigkeit, brauchst du keine neue.
+rechtsgrundlage:
+- § 43 Abs. 1 IfSG
+kategorie: branche
+branchen:
+- gastronomie_lebensmittel
+ausloeser:
+  all:
+  - feld: profil.taetigkeit.branchen
+    op: enthaelt
+    wert: gastronomie_lebensmittel
+    label:
+      de: Dein Betrieb gehört zur Gastronomie oder Lebensmittelbranche.
+  - feld: profil.ifsg.selbst
+    op: ==
+    wert: erstmals
+    label:
+      de: Du arbeitest selbst zum ersten Mal mit Lebensmitteln.
+phase: gruendung
+frist:
+  typ: relativ
+  bezug:
+    fakt: profil.gruendungsdatum
+  versatz: P0D
+  zeitpunkt: vor_beginn
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+  erinnerung:
+  - P30D
+  - P7D
+wiederholung:
+  art: einmalig
+stelle:
+  de: Gesundheitsamt bzw. beauftragter Arzt
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Bußgeld bis 25.000 € (§ 73 IfSG).
+  schwere: hoch
+automatisierung: hinweis
+erledigung:
+  art: bestaetigen
+  bestaetigung:
+    de: Bescheinigung liegt vor
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Infektionsschutzgesetz § 43
+  url: https://www.gesetze-im-internet.de/ifsg/__43.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Gilt nach § 43 Abs. 1 IfSG für jede Person, die erstmalig gewerbsmäßig mit Lebensmitteln nach § 42 arbeitet, auch für Inhaber (Nutzertest R11, K-062) – bestätigen'
+- 'Sanktion § 73 Abs. 1a IfSG, bis 25.000 € laut Rechtsprüfung R11 (Befund 20) „wahrscheinlich“ – Nummer und Höhe bestätigen'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

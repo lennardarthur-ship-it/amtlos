@@ -1,0 +1,49 @@
+# R11 (Nutzertest Tischlerei Befund 16): Mindestausbildungsvergütung nach § 17 BBiG
+schema_version: 1
+id: personal.ausbildungsverguetung
+version: 1
+katalog_nr: D.39
+titel:
+  de: Mindestvergütung für Auszubildende zahlen
+kurz:
+  de: Auszubildenden zahlst du mindestens die Mindestausbildungsvergütung nach dem Berufsbildungsgesetz – der Mindestlohn gilt für sie nicht.
+erklaerung:
+  de: Für Auszubildende gilt nicht der gesetzliche Mindestlohn (§ 22 Abs. 3 MiLoG), sondern eine angemessene Vergütung, mindestens
+    die Mindestausbildungsvergütung nach § 17 BBiG. Sie steigt mit jedem Ausbildungsjahr und wird jährlich angepasst; ein geltender
+    Tarifvertrag kann höhere Sätze vorsehen. Amtlos kennt die Beträge noch nicht – frag deine Kammer.
+rechtsgrundlage:
+- § 17 BBiG
+- § 22 Abs. 3 MiLoG
+kategorie: personal
+ausloeser:
+  feld: profil.beschaeftigte.azubi
+  op: '>='
+  wert: 1
+  label:
+    de: Du bildest aus.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Beratung durch IHK oder Handwerkskammer
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Berufsbildungsgesetz § 17
+  url: https://www.gesetze-im-internet.de/bbig_2005/__17.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Neu nach Nutzertest R11 (Tischlerei) – Beträge je Ausbildungsjahr 2026/2027 als Regelwert ergänzen'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

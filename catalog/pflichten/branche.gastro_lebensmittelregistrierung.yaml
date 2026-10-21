@@ -1,17 +1,20 @@
 # Katalog H.1 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.gastro_lebensmittelregistrierung
-version: 1
+version: 2
 katalog_nr: H.1
 titel:
   de: Bei der Lebensmittelüberwachung registrieren
 kurz:
   de: Bevor du Lebensmittel herstellst, behandelst oder verkaufst, registrierst du deinen Betrieb bei der Lebensmittelüberwachung.
 erklaerung:
-  de: Lebensmittelunternehmen müssen jeden Betrieb bei der zuständigen Behörde registrieren lassen – meist beim Veterinär-
-    und Lebensmittelüberwachungsamt des Kreises.
+  de: Lebensmittelunternehmen müssen jeden Betrieb vor Beginn der Tätigkeit bei der zuständigen Behörde registrieren lassen – meist
+    beim Veterinär- und Lebensmittelüberwachungsamt des Kreises (Art. 6 Abs. 2 VO (EG) Nr. 852/2004). Stellst du selbst Lebensmittel
+    tierischen Ursprungs her oder verarbeitest sie (zum Beispiel als Metzgerei), kann statt der Registrierung eine Zulassung nötig
+    sein (Art. 4 VO (EG) Nr. 853/2004) – frag die Lebensmittelüberwachung.
 rechtsgrundlage:
-- Art. 6 Verordnung (EG) Nr. 852/2004
+- Art. 6 Abs. 2 Verordnung (EG) Nr. 852/2004
+- Art. 4 Verordnung (EG) Nr. 853/2004
 kategorie: branche
 branchen:
 - gastronomie_lebensmittel
@@ -23,7 +26,14 @@ ausloeser:
     de: Dein Betrieb gehört zur Gastronomie oder Lebensmittelbranche.
 phase: gruendung
 frist:
-  typ: dauerhaft
+  typ: relativ
+  bezug:
+    fakt: profil.gruendungsdatum
+  versatz: P0D
+  zeitpunkt: vor_beginn
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
 wiederholung:
   art: einmalig
 stelle:
@@ -43,7 +53,8 @@ quellen:
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32004R0852
   abgerufen: null
 fachlich_zu_pruefen:
-- Frist „vor Aufnahme der Tätigkeit“ als Gründungsschritt mit Termin?
+- 'Frist „vor Beginn“ nach Rechtsprüfung R11 (Befund 13); laut Nutzertest nennt Art. 6 keinen Zeitpunkt – Termin vor dem Start bestätigen; Zuständigkeit beim Foodtruck (Wohnsitz oder Standort)?'
+- 'Zulassung nach Art. 4 VO (EG) Nr. 853/2004 nur als Hinweis (Eigenherstellung tierischer Erzeugnisse)'
 - Zuständigkeit je Land
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation

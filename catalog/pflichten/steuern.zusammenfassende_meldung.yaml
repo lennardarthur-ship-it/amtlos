@@ -1,21 +1,28 @@
 # Katalog C.25 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.zusammenfassende_meldung
-version: 2
+version: 3
 katalog_nr: C.25
 titel:
   de: Zusammenfassende Meldung abgeben
 kurz:
-  de: Wenn du Leistungen an Unternehmen in anderen EU-Ländern erbringst, meldest du sie in der Zusammenfassenden Meldung.
+  de: Wenn du Lieferungen oder Leistungen an Unternehmen in anderen EU-Ländern erbringst, meldest du sie bis zum 25. nach Ablauf des Meldezeitraums in der Zusammenfassenden Meldung.
 erklaerung:
   de: Die Zusammenfassende Meldung ist bei innergemeinschaftlichen Leistungen an Unternehmen (B2B) abzugeben. Du übermittelst sie
     bis zum 25. Tag nach Ablauf jedes Kalendermonats an das Bundeszentralamt für Steuern. Vierteljährlich reicht, wenn deine
-    innergemeinschaftlichen Lieferungen je Quartal höchstens 50.000 € betragen.
+    innergemeinschaftlichen Lieferungen je Quartal höchstens 50.000 € betragen; erbringst du nur sonstige Leistungen (keine
+    Warenlieferungen), meldest du immer vierteljährlich. Kleinunternehmer geben keine Zusammenfassende Meldung ab (§ 18a Abs. 4 UStG).
+    Amtlos rechnet bei Warenlieferungen mit dem monatlichen Termin.
 rechtsgrundlage:
 - § 18a UStG
 kategorie: steuern
 ausloeser:
   all:
+  - feld: profil.ust.kleinunternehmer
+    op: ==
+    wert: false
+    label:
+      de: Du nutzt die Kleinunternehmerregelung nicht.
   - feld: profil.kunden.segmente
     op: enthaelt
     wert: b2b
@@ -27,7 +34,29 @@ ausloeser:
     label:
       de: Du hast Kunden in anderen EU-Ländern.
 frist:
-  typ: dauerhaft
+  typ: wiederkehrend
+  # R11 (Steuerprüfung 16): nur sonstige Leistungen → vierteljährlich; mit Warenlieferungen monatlich (vierteljährlich bis 50.000 € je Quartal, nicht abgefragt)
+  rhythmus:
+    waehle:
+    - wenn:
+        feld: profil.produkte.arten
+        op: enthaelt_eines
+        wert:
+        - physisch
+        - verpackung
+        - elektrogeraete
+        - batterien
+        - lebensmittel
+        - kosmetik
+      dann: monatlich
+    sonst: quartalsweise
+  faellig:
+    art: tag_nach_periodenende
+    monate_nach: 1
+    tag: 25
+  verschiebung:
+    regel: naechster_werktag
+    kalender: bundeseinheitlich
 wiederholung:
   art: periodisch
 stelle:
@@ -49,11 +78,9 @@ quellen:
   url: https://www.gesetze-im-internet.de/ustg_1980/__18a.html
   abgerufen: null
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- 'Frist (25. Tag nach Monatsende, vierteljährlich bei igL bis 50.000 € je Quartal, § 18a UStG) nur im Text ergänzt (R10, Steuerprüfung) – als Termine abbilden, sobald der Meldezeitraum abgefragt wird'
-- 'Kleinunternehmer ausgenommen (§ 18a Abs. 4 UStG)? Laut Steuerprüfung R10 „meines Wissens befreit“ – vor dem Ändern des Auslösers bestätigen'
+- 'Termine nach Steuerprüfung R11 (Befund 16): 25. nach Ablauf des Meldezeitraums; nur sonstige Leistungen vierteljährlich, mit Warenlieferungen monatlich (Wahl vierteljährlich bis 50.000 € je Quartal nicht abgefragt); Verschiebung nach § 108 Abs. 3 AO bestätigen'
+- 'Kleinunternehmer ausgenommen (§ 18a Abs. 4 UStG, Steuerprüfung R11 „eindeutig“)'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf
   geprueft_von: null

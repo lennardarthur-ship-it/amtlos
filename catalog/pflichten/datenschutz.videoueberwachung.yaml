@@ -1,7 +1,7 @@
 # Katalog F.62 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: datenschutz.videoueberwachung
-version: 1
+version: 2
 katalog_nr: F.62
 titel:
   de: Videoüberwachung kennzeichnen und begründen
@@ -9,10 +9,12 @@ kurz:
   de: Wenn du Videoüberwachung einsetzt, machst du sie erkennbar und dokumentierst den Zweck.
 erklaerung:
   de: Videoüberwachung braucht einen berechtigten Zweck, muss erkennbar sein (Hinweisschild) und gehört ins Verzeichnis der
-    Verarbeitungstätigkeiten.
+    Verarbeitungstätigkeiten. Rechtsgrundlage ist für Unternehmen das berechtigte Interesse (Art. 6 Abs. 1 lit. f DSGVO) – du wägst es
+    gegen die Interessen der Gefilmten ab und hältst das fest. Das Hinweisschild nennt nach Art. 13 DSGVO mindestens dich als Verantwortlichen,
+    den Zweck und wo die weiteren Informationen stehen.
 rechtsgrundlage:
-- § 4 BDSG
-- Art. 6, 13 DSGVO
+- Art. 6 Abs. 1 lit. f DSGVO
+- Art. 13 DSGVO
 kategorie: datenschutz
 ausloeser:
   feld: profil.datenverarbeitung.arten
@@ -37,15 +39,18 @@ status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
 quellen:
-- titel: Bundesdatenschutzgesetz § 4
-  url: https://www.gesetze-im-internet.de/bdsg_2018/__4.html
+- titel: Datenschutz-Grundverordnung (EU) 2016/679
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679
+  abgerufen: null
+- titel: EDSA-Leitlinien 3/2019 zur Verarbeitung personenbezogener Daten durch Videogeräte
+  url: https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-32019-processing-personal-data-through-video_de
   abgerufen: null
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Speicherdauer der Aufnahmen fachlich ergänzen
 - 'Beschäftigte: Mitbestimmung/Information'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- 'Rechtsgrundlage nach Rechtsprüfung R11 (Befund 16): Art. 6 Abs. 1 lit. f DSGVO statt § 4 BDSG (für Private nicht anwendbar, BVerwG 6 C 2.18), Hinweisschild nach Art. 13 (EDSA-Leitlinien 3/2019)'
 pruefung:
   status: entwurf
   geprueft_von: null

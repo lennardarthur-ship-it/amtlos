@@ -197,7 +197,8 @@ export function standBauen(): Bau {
             // R10: beim EU-Unternehmen (NL) folgt die Nutzerin dem Hinweis der App und wählt die Steuerschuldnerschaft des Empfängers
             hinweise: r.gutschrift ? ["gutschrift"] : D.KUNDE_ORT[r.kunde] === "eu_b2b" ? ["reverse_charge"] : [],
             // Gutschrift: der Fotograf ist selbst Kleinunternehmer (seine Steuernummer kommt aus dem Kunden)
-            ...(r.gutschrift ? { leistender_steuer: "ku" } : {}),
+            // R11: Telefon des Leistenden – Pflicht für die E-Rechnung der Gutschrift (Verkäufer, BR-DE-6)
+            ...(r.gutschrift ? { leistender_steuer: "ku", kunde_telefon: "0761 4829377" } : {}),
             hinweis: r.hinweis,
           }),
           danach: (x) => {
@@ -451,9 +452,11 @@ export function standBauen(): Bau {
       uebernahme = euerUebernahme(s, "2026");
       s = felderSetzen(s, "euer", { jahr: "2026", einnahmen: uebernahme.einnahmen, ausgaben: uebernahme.ausgaben }, t("2027-02-20", 9));
       const zahl = (l: Record<string, string>[], k: string) => l.filter((x) => x.kategorie === k).reduce((a, x) => a + ausEuro(x.betrag ?? "0"), 0);
-      // R10: die nicht steuerbaren Umsätze (NL, CH) stehen in der eigenen „davon“-Zeile, die Kleinunternehmer-Zeile enthält den Rest
-      vergleich("EÜR-Übernahme", "Einnahmen in Zeile „Umsatzsteuerlicher Kleinunternehmer“ (ohne Gutschrift, ohne nicht steuerbare)", zahl(uebernahme.einnahmen, "Umsatzsteuerlicher Kleinunternehmer"), eu.einnahmen - eu.einnahmenAusland);
-      vergleich("EÜR-Übernahme", "davon nicht steuerbare Umsätze (NL, CH) in eigener Zeile", zahl(uebernahme.einnahmen, "Nicht steuerbare Umsätze sowie Umsätze nach § 19 Absatz 3 Satz 1 Nummer 1 und 2 UStG"), eu.einnahmenAusland);
+      // R11: die Kleinunternehmer-Zeile enthält den Gesamtbetrag; die nicht steuerbaren Umsätze (NL, CH) nur als „davon“ (im Text, keine eigene Zeile – sonst doppelt)
+      vergleich("EÜR-Übernahme", "Einnahmen in Zeile „Umsatzsteuerlicher Kleinunternehmer“ (Gesamtbetrag ohne Gutschrift)", zahl(uebernahme.einnahmen, "Umsatzsteuerlicher Kleinunternehmer"), eu.einnahmen);
+      const davon = /davon nicht steuerbar[^:]*: ([\d.]+,\d{2}) €/.exec(uebernahme.einnahmen.find((x) => x.kategorie === "Umsatzsteuerlicher Kleinunternehmer")?.text ?? "")?.[1];
+      vergleich("EÜR-Übernahme", "davon nicht steuerbare Umsätze (NL, CH) im Text der Kleinunternehmer-Zeile", davon ? ausEuro(davon) : 0, eu.einnahmenAusland);
+      vergleich("EÜR-Übernahme", "keine eigene Zeile für die nicht steuerbaren Umsätze (keine Doppelzählung)", zahl(uebernahme.einnahmen, "Nicht steuerbare Umsätze sowie Umsätze nach § 19 Absatz 3 Satz 1 Nummer 1 und 2 UStG"), 0);
       vergleich("EÜR-Übernahme", "keine Zeile „Vereinnahmte Umsatzsteuer“", zahl(uebernahme.einnahmen, "Vereinnahmte Umsatzsteuer sowie Umsatzsteuer auf unentgeltliche Wertabgaben"), 0);
       vergleich("EÜR-Übernahme", "keine Zeile „Gezahlte Vorsteuerbeträge“", zahl(uebernahme.ausgaben, "Gezahlte Vorsteuerbeträge"), 0);
       vergleich("EÜR-Übernahme", "Betriebsausgaben aus Belegen (brutto, ohne Anlage)", uebernahme.ausgaben.filter((x) => !(x.text ?? "").startsWith("Gutschriften an Leistende")).reduce((a, x) => a + ausEuro(x.betrag ?? "0"), 0), eu.ausgabenBelege);

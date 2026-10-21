@@ -1,0 +1,56 @@
+# R11 (Nutzertest Tischlerei Befund 6): Feuerlöscher nach ASR A2.2
+schema_version: 1
+id: arbeitsschutz.feuerloescher
+version: 1
+katalog_nr: E.54
+titel:
+  de: Feuerlöscher bereitstellen und prüfen lassen
+kurz:
+  de: In deiner Arbeitsstätte stehen ausreichend Feuerlöscher bereit, die regelmäßig von einer sachkundigen Person geprüft werden.
+erklaerung:
+  de: Nach der Arbeitsstättenverordnung triffst du Vorkehrungen gegen Brände. Wie viele Feuerlöscher du brauchst, richtet sich nach
+    Größe und Brandgefährdung der Räume (Technische Regel für Arbeitsstätten ASR A2.2). Die Feuerlöscher lässt du regelmäßig, in der
+    Regel alle zwei Jahre, von einer sachkundigen Person prüfen. Dazu kommen Brandschutzhelfer unter deinen Beschäftigten.
+rechtsgrundlage:
+- § 4 Abs. 3 ArbStättV
+- ASR A2.2
+kategorie: arbeitsschutz
+ausloeser:
+  feld: abgeleitet.hat_beschaeftigte
+  op: ==
+  wert: true
+  label:
+    de: Du beschäftigst mindestens eine Person.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Sachkundige Person (Feuerlöscher-Wartung)
+kanal: partner
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+erledigung:
+  art: laufend
+  zeitraum: jahr
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Arbeitsstättenverordnung
+  url: https://www.gesetze-im-internet.de/arbst_ttv_2004/
+  abgerufen: null
+- titel: ASR A2.2 Maßnahmen gegen Brände (BAuA)
+  url: https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A2-2.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Neu nach Nutzertest R11 (Tischlerei) – Prüfabstand „in der Regel alle zwei Jahre“ und Norm (§ 4 Abs. 3 ArbStättV, ASR A2.2) bestätigen; Abgrenzung zur Pflicht Erste Hilfe/Brandschutzhelfer'
+- 'Folgen bei Nichterfüllung – Sanktion fachlich ergänzen'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

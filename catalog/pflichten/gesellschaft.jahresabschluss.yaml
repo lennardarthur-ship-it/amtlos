@@ -1,7 +1,7 @@
 # Katalog B.18 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.jahresabschluss
-version: 1
+version: 2
 katalog_nr: B.18
 titel:
   de: Jahresabschluss aufstellen und feststellen
@@ -9,16 +9,18 @@ kurz:
   de: Nach jedem Geschäftsjahr erstellst du Bilanz und Gewinn- und Verlustrechnung; die Gesellschafter stellen den Abschluss
     fest.
 erklaerung:
-  de: Zum Jahresabschluss gehören Bilanz und Gewinn- und Verlustrechnung. Die Gesellschafter stellen ihn fest. Die Bilanz
-    geht außerdem elektronisch als E-Bilanz ans Finanzamt.
+  de: Zum Jahresabschluss gehören Bilanz und Gewinn- und Verlustrechnung. Die Geschäftsführung stellt ihn in den ersten drei
+    Monaten nach Ende des Geschäftsjahres auf, kleine Gesellschaften spätestens nach sechs Monaten (§ 264 Abs. 1 HGB). Die
+    Gesellschafter stellen ihn innerhalb von acht Monaten fest, kleine Gesellschaften innerhalb von elf Monaten (§ 42a Abs. 2 GmbHG).
+    Die Bilanz geht außerdem elektronisch als E-Bilanz ans Finanzamt.
 begriffe:
 - begriff:
     de: E-Bilanz
   erklaerung:
     de: Die Bilanz in elektronischer Form, die ans Finanzamt übermittelt wird.
 rechtsgrundlage:
-- HGB
-- GmbHG
+- § 264 Abs. 1 HGB
+- § 42a Abs. 2 GmbHG
 kategorie: gesellschaft
 ausloeser:
   feld: abgeleitet.ist_kapitalgesellschaft
@@ -47,6 +49,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/hgb/
   abgerufen: null
 fachlich_zu_pruefen:
+- 'Fristen Aufstellung (3 bzw. 6 Monate, § 264 Abs. 1 HGB) und Feststellung (8 bzw. 11 Monate, § 42a Abs. 2 GmbHG) im Text (R11, Nutzertest Tischlerei) – als Termine abbilden, Größenklasse abfragen'
 - Fristen für Aufstellung und Feststellung als Regeldaten ergänzen
 - Jährliche Wiederholung abbilden, sobald Fristen feststehen
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen

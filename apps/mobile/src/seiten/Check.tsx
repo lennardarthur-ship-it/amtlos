@@ -5,19 +5,41 @@ import { T as TEXT } from "../texte";
 import { Auswahl, DatumFeld, Fakt, Feld, Fuss, Hinweis, Stempel, Symbol, Karte, Knopf, MehrfachWahl, T, TextKnopf, ZurueckKnopf } from "../ui/bausteine";
 import { HellerStatus, TastaturRahmen, useKopf, useNav } from "../ui/navigation";
 import { BLATT_OBEN, RADIUS, RAND, SCHRIFT, useFarben } from "../ui/thema";
-import { CHECK_FELDER, auswertung, beantwortet, checkFragen, dringlichkeit, folgeAntworten, selten, zaehlung, zusatzFragen, type Profil } from "../pflichten/check";
+import { CHECK_FELDER, auswertung, beantwortet, checkFragen, dringlichkeit, folgeAntworten, offeneFragenNachWirkung, selten, zaehlung, zusatzFragen, type Profil } from "../pflichten/check";
 import { heute } from "../unterlagen/speicher";
 import { PflichtZeile } from "./Pflichten";
+import { langBestehend, schonDaKandidaten } from "./schonDa";
+import { WasHastDuSchon } from "./WasHastDu";
 import { useAmtlos } from "../zustand";
 
+/**
+ * R11 (UX #3/#5): Branchen aus Schritt 1, die auch Sofortmelde-Branchen sind – vorbelegt, damit niemand „Gastronomie“
+ * zweimal angibt. Nur, solange die Sofortmelde-Frage noch unbeantwortet ist.
+ */
+const SOFORTMELDE_AUS_BRANCHE: Record<string, string> = { gastronomie_lebensmittel: "gastronomie", bau: "bau", transport_logistik: "spedition_logistik", gebaeudereinigung: "gebaeudereinigung" };
+const sofortmeldeAus = (branchen: Wert | undefined) => (Array.isArray(branchen) ? [...new Set(branchen.map((b) => SOFORTMELDE_AUS_BRANCHE[b]).filter((x): x is string => Boolean(x)))].sort() : []);
+/** Vorbelegung nur, solange die Frage offen ist oder noch genau die frühere Vorbelegung trägt (nie eine eigene Antwort überschreiben). */
+function sofortmeldeVorbelegung(profil: Profil, branchen: Wert): Profil {
+  const jetzt = profil["personal.sofortmeldebranchen"];
+  const frueher = sofortmeldeAus(profil["taetigkeit.branchen"]);
+  const offen = !beantwortet(profil, "personal.sofortmeldebranchen") || (Array.isArray(jetzt) && frueher.length > 0 && [...jetzt].sort().join() === frueher.join());
+  if (!offen) return {};
+  const neu = sofortmeldeAus(branchen);
+  return neu.length ? { "personal.sofortmeldebranchen": neu } : beantwortet(profil, "personal.sofortmeldebranchen") ? { "personal.sofortmeldebranchen": null } : {};
+}
+
 type Wert = Profil[string];
+/** R11 (Nutzertest Gründerin #8): Ja/Nein-Fragen mit „Weiß ich nicht“ */
+const WEISS_NICHT = ["kasse.elektronisch", "ust.kleinunternehmer"];
 
 /**
  * Eingabe je Fragenart aus dem Fragebogen (packages/i18n/fragen.ts). `aufBlur`: Zahlen und Text erst beim Verlassen
  * des Felds (oder mit der Eingabetaste) übernehmen – wo jede Antwort sofort neu rechnet („Kurz klären“).
  */
 export function Antwort({ f, wert, setzen, aufBlur }: { f: Frage; wert: Wert | undefined; setzen: (w: Wert, weiter?: boolean) => void; aufBlur?: boolean }) {
-  const optionen = Object.entries(f.optionen ?? {}).map(([k, t]) => ({ wert: k, text: t.de }));
+  const roh = Object.entries(f.optionen ?? {}).map(([k, t]) => ({ wert: k, text: t.de }));
+  // R11 (UX #5): bei Mehrfachauswahl „Keine davon“ zuerst – als zwölfte Option lag sie unter dem sichtbaren Bereich
+  const optionen = f.art === "mehrfach" ? [...roh.filter((o) => o.wert.startsWith("keine")), ...roh.filter((o) => !o.wert.startsWith("keine"))] : roh;
   switch (f.art) {
     case "auswahl":
       return <Auswahl gross ohneLabel label={f.frage.de} wert={typeof wert === "string" ? wert : null} aendern={(w) => setzen(w, true)} optionen={optionen} />;
@@ -30,10 +52,12 @@ export function Antwort({ f, wert, setzen, aufBlur }: { f: Frage; wert: Wert | u
           ohneLabel
           label={f.frage.de}
           wert={wert === true ? "ja" : wert === false ? "nein" : null}
-          aendern={(w) => setzen(w === "ja", true)}
+          // R11 (Nutzertest Gründerin #8): „Weiß ich nicht“ bei Kasse und Kleinunternehmerregelung – lässt die Angabe offen
+          aendern={(w) => setzen(w === "unklar" ? null : w === "ja", true)}
           optionen={[
             { wert: "ja", text: TEXT.ja },
             { wert: "nein", text: TEXT.nein },
+            ...(WEISS_NICHT.includes(f.feld) ? [{ wert: "unklar", text: TEXT.r11_weiss_nicht }] : []),
           ]}
         />
       );
@@ -85,17 +109,6 @@ function Fortschritt({ n, aktuell, label }: { n: number; aktuell: number; label?
   );
 }
 
-/** Zählkachel auf der Bühne (B6): große Zahl, kurzes Wort darunter. */
-function Zahl({ zahl, text }: { zahl: number; text: string }) {
-  const f = useFarben();
-  return (
-    <View accessible accessibilityRole="text" accessibilityLabel={`${zahl} ${text}`} style={{ flex: 1, minHeight: 76, padding: 12, borderRadius: RADIUS.klein, backgroundColor: f.buehneFlaeche, justifyContent: "space-between" }}>
-      <T maxFontSizeMultiplier={1.4} farbe={f.buehneText} stil={{ ...SCHRIFT.display, fontSize: 28, lineHeight: 32, letterSpacing: -0.8, fontVariant: ["tabular-nums"] }}>{String(zahl)}</T>
-      <T v="caption" maxFontSizeMultiplier={1.6} farbe={f.buehneLeise} stil={{ ...SCHRIFT.halb }}>{text}</T>
-    </View>
-  );
-}
-
 /**
  * Pflichten-Check (E-126): eine Frage je Bildschirm, Auswahl springt gleich weiter. Ohne `felder` der ganze Check mit
  * Einleitung (inkl. Prüfhinweis) und Ergebnis; mit `felder` nur diese Nachfragen (z. B. für unklare Pflichten).
@@ -131,7 +144,14 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
   const [zwischen, setZwischen] = useState(false);
   const zwischenschirm = zwischen && extraN > 0 && i === basisN;
   const frage = i >= 0 && !amEnde && !(zwischen && extraN > 0 && i === basisN) ? fragen[i] : undefined;
-  const schrittText = frage ? (extra.includes(frage.feld) ? TEXT.zusatz_schritt(i - basisN + 1, extraN) : TEXT.schritt(i + 1, basisN)) : "";
+  // R11 (UX #6/#7): „Frage 5“ ohne wandernde Gesamtzahl; der Balken geht von der Höchstzahl der Grundfragen aus
+  const schrittText = frage ? (extra.includes(frage.feld) ? TEXT.zusatz_schritt(i - basisN + 1, extraN) : voll ? TEXT.r11_frage(i + 1) : TEXT.schritt(i + 1, basisN)) : "";
+  // R11 (UX #2/#4): übersprungene Grundfragen – auf dem Zwischenschirm beim Namen nennen und direkt anbieten
+  const uebersprungen = voll ? fragen.slice(0, basisN).filter((q) => !beantwortet(z.stand.profil, q.feld)) : [];
+  // nach „Offene Frage beantworten“: danach zurück zum Zwischenschirm statt durch alle Fragen danach
+  const [nachtrag, setNachtrag] = useState(false);
+  // R11 (Berater d): „Was hast du schon?“ nach dem Ergebnis, für Betriebe älter als zwölf Monate
+  const [schon, setSchon] = useState(false);
   // neue Frage ansagen – sonst merkt VoiceOver den Wechsel nicht (der Fokus bleibt auf dem Weiter-Knopf)
   useEffect(() => {
     if (frage) AccessibilityInfo.announceForAccessibility(`${schrittText}: ${frage.frage.de}`);
@@ -139,12 +159,17 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
   const weiter = () => {
     if (zeit.current) clearTimeout(zeit.current);
     if (i + 1 >= fragen.length && !voll) return nav.zurueck();
+    if (nachtrag) {
+      setNachtrag(false);
+      setZwischen(true);
+      return setI(basisN);
+    }
     setI(i + 1);
   };
   const setzen = (feld: string, w: Wert, springen?: boolean) => {
     const bl = feld === "bundesland" && typeof w === "string" ? frage?.optionen?.[w]?.de : undefined;
     // R10: was aus der Antwort folgt, gleich mit (z. B. „Freiberuflich“ ⇒ freier Beruf, keine zweite Frage danach)
-    z.profilSetzen({ ...folgeAntworten(feld, w, z.stand.profil), [feld]: w }, bl);
+    z.profilSetzen({ ...folgeAntworten(feld, w, z.stand.profil), ...(feld === "taetigkeit.branchen" ? sofortmeldeVorbelegung(z.stand.profil, w) : {}), [feld]: w }, bl);
     // mit VoiceOver nicht von selbst weiterspringen – sonst verliert man unangekündigt die Frage
     if (springen && !vorleser.current) {
       if (zeit.current) clearTimeout(zeit.current);
@@ -166,18 +191,30 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
   }, [voll, amEnde, zusatz, z.stand.profil, liste]);
   const a = useMemo(() => (amEnde && voll && zusatz ? auswertung(z.stand.profil, heute(), z.stand.unterlagen, z.stand.mitarbeiter) : null), [amEnde, voll, zusatz, z.stand.profil, z.stand.unterlagen, z.stand.mitarbeiter]);
   const d = useMemo(() => (a ? dringlichkeit(a, { erledigt: z.stand.erledigt, unterlagen: z.stand.unterlagen, betrieb: z.stand.betrieb }, heute()) : null), [a, z.stand.erledigt, z.stand.unterlagen, z.stand.betrieb]);
-  const bald = d?.jetzt.length ?? 0;
   // R10: Pflichten, Hinweise und Optionen getrennt (Rechtsprüfung) – „Mit diesen fängst du an“ nur echte Pflichten
   const zahl = a ? zaehlung(a.gilt) : { pflichten: 0, hinweise: 0, optionen: 0 };
-  const pflichtenListe = a ? a.gilt.filter((p) => p.einordnung === "pflicht") : [];
+  // R11 (Berater d, UX #9): eine Hauptzahl – was jetzt dran ist (wie „Jetzt dran“ im Pflichten-Tab). Was Lohnbüro bzw.
+  // Steuerberatung erledigt, zählt nicht mit und steht nie unter „Mit diesen 3 fängst du an“; die Liste kommt aus
+  // derselben Rechnung wie die Zahl.
+  const jetztDran = d?.jetzt ?? [];
+  const anfangen = (jetztDran.length ? jetztDran : a ? a.gilt.filter((p) => p.einordnung === "pflicht" && !p.lohnbuero) : []).slice(0, 3);
+  const genauer = useMemo(() => (a ? offeneFragenNachWirkung(a, z.stand.profil).length : 0), [a, z.stand.profil]);
+  const schonListe = useMemo(() => (a && langBestehend(z.stand.profil, heute()) ? schonDaKandidaten(a, { erledigt: z.stand.erledigt, unterlagen: z.stand.unterlagen, betrieb: z.stand.betrieb }) : []), [a, z.stand.profil, z.stand.erledigt, z.stand.unterlagen, z.stand.betrieb]);
+  const schliessen = () => {
+    // „Pflichten“ ist der erste Tab (E-129): Check schließen und dorthin wechseln
+    z.erfolg();
+    nav.zurueck();
+    z.tabWechseln("pflichten");
+  };
   // Auftakt, Zwischenstand und Ergebnis auf der Bühne (E-144); die Fragen selbst auf hellem Grund
-  const buehne = i < 0 || zwischenschirm || Boolean(a);
+  const buehne = !schon && (i < 0 || zwischenschirm || Boolean(a));
   useKopf({ titel: TEXT.check_titel, schliessen: true, buehne });
+  if (schon && a) return <WasHastDuSchon liste={schonListe} fertig={schliessen} />;
 
   return (
     <View style={{ flex: 1, backgroundColor: buehne ? f.buehne : f.papier }}>
       {buehne ? <HellerStatus /> : null}
-      {buehne ? null : i < basisN ? <Fortschritt n={basisN} aktuell={Math.max(0, i)} label={schrittText} /> : extraN && !zwischenschirm && !amEnde ? <Fortschritt n={extraN} aktuell={i - basisN} label={schrittText} /> : <Fortschritt n={1} aktuell={1} />}
+      {buehne ? null : i < basisN ? <Fortschritt n={voll ? Math.max(basisN, CHECK_FELDER.length) : basisN} aktuell={Math.max(0, i)} label={schrittText} /> : extraN && !zwischenschirm && !amEnde ? <Fortschritt n={extraN} aktuell={i - basisN} label={schrittText} /> : <Fortschritt n={1} aktuell={1} />}
       <TastaturRahmen grund={buehne ? f.buehne : undefined}>
         <ScrollView key={i} contentContainerStyle={{ paddingHorizontal: RAND, paddingTop: 12, paddingBottom: a ? 0 : 32, flexGrow: 1 }} keyboardShouldPersistTaps="handled">
           {i < 0 ? (
@@ -196,7 +233,9 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
           ) : zwischenschirm ? (
             <View style={{ paddingTop: 16 }}>
               <Stempel groesse={72} farbe={f.minze} />
-              <T v="titel" accessibilityRole="header" farbe={f.buehneText} stil={{ marginTop: 18 }}>{TEXT.zwischen_titel}</T>
+              <T v="titel" accessibilityRole="header" farbe={f.buehneText} stil={{ marginTop: 18 }}>{uebersprungen.length ? TEXT.r11_fast_titel(uebersprungen.length) : TEXT.zwischen_titel}</T>
+              {/* R11 (UX #4): die übersprungene Frage beim Namen – „Geschafft“ und danach „nicht fertig“ widersprachen sich */}
+              {uebersprungen.length ? <T farbe={f.buehneText} stil={{ marginTop: 10, ...SCHRIFT.halb }}>{TEXT.r11_fast_frage(uebersprungen[0]!.frage.de, uebersprungen.length)}</T> : null}
               <T farbe={f.buehneLeise} stil={{ marginTop: 10 }}>{TEXT.zwischen_text(extraN)}</T>
             </View>
           ) : frage ? (
@@ -204,6 +243,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
               <T v="caption" leise>{schrittText}</T>
               <T v="titel" accessibilityRole="header" stil={{ marginTop: 4 }}>{frage.frage.de}</T>
               {frage.hilfe ? <T leise stil={{ marginTop: 8 }}>{frage.hilfe.de}</T> : null}
+              {frage.art === "mehrfach" ? <T v="caption" leise stil={{ marginTop: 8 }}>{TEXT.r11_mehrere_moeglich}</T> : null}
               <View style={{ marginTop: 12 }}>
                 <Antwort key={frage.feld} f={frage} wert={z.stand.profil[frage.feld]} setzen={(w, s) => setzen(frage.feld, w, s)} />
               </View>
@@ -212,22 +252,19 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
             <View style={{ flexGrow: 1 }}>
               <View style={{ paddingTop: 12, paddingBottom: 28 }}>
                 <Stempel groesse={72} farbe={f.minze} />
-                {/* groß, was bald ansteht; die Gesamtzahl klein – „47 Pflichten“ allein erschlägt */}
-                <T v="titel" accessibilityRole="header" farbe={f.buehneText} stil={{ marginTop: 18 }}>{TEXT.r10_ergebnis_bald(d?.termine ?? 0, d?.ohneTermin ?? 0)}</T>
-                <T v="klein" farbe={f.buehneLeise} stil={{ marginTop: 8 }}>{TEXT.r10_ergebnis_gesamt(zahl.pflichten, zahl.hinweise, zahl.optionen, selten(a.gilt))}</T>
-                {/* drei Zahlen auf einen Blick (B6): Pflichten (ohne Hinweise und Optionen), bald fällig, mit Vorlage in Amtlos */}
-                <View style={{ flexDirection: "row", gap: 8, marginTop: 18 }}>
-                  <Zahl zahl={zahl.pflichten} text={TEXT.ergebnis_zahlen.pflichten} />
-                  <Zahl zahl={bald} text={TEXT.ergebnis_zahlen.bald} />
-                  <Zahl zahl={a.gilt.filter((p) => p.vorlage).length} text={TEXT.ergebnis_zahlen.vorlage} />
+                {/* R11 (Berater d): eine Hauptzahl – was jetzt dran ist; alles andere klein darunter bzw. im Blatt */}
+                <View accessible accessibilityRole="header" accessibilityLabel={TEXT.r11_ergebnis_label(jetztDran.length)} style={{ marginTop: 18 }}>
+                  <T maxFontSizeMultiplier={1.4} farbe={f.buehneText} stil={{ ...SCHRIFT.display, fontSize: 56, lineHeight: 60, letterSpacing: -2, fontVariant: ["tabular-nums"] }}>{String(jetztDran.length)}</T>
+                  <T v="titel" farbe={f.buehneText} stil={{ marginTop: 2 }}>{TEXT.r11_ergebnis_haupt(jetztDran.length)}</T>
                 </View>
+                <T v="klein" farbe={f.buehneLeise} stil={{ marginTop: 8 }}>{TEXT.r10_ergebnis_gesamt(zahl.pflichten, zahl.hinweise, zahl.optionen, selten(a.gilt))}</T>
               </View>
               <View style={{ flexGrow: 1, marginHorizontal: -RAND, paddingHorizontal: RAND, paddingTop: BLATT_OBEN, paddingBottom: 32, backgroundColor: f.papier, borderTopLeftRadius: RADIUS.buehne, borderTopRightRadius: RADIUS.buehne }}>
-              {pflichtenListe.length ? (
+              {anfangen.length ? (
                 <View>
-                  <T v="gross">{TEXT.ergebnis_anfangen(Math.min(3, pflichtenListe.length))}</T>
+                  <T v="gross">{TEXT.ergebnis_anfangen(anfangen.length)}</T>
                   <Karte stil={{ marginTop: 10 }}>
-                    {pflichtenListe.slice(0, 3).map((p, k, l) => (
+                    {anfangen.map((p, k, l) => (
                       <PflichtZeile key={p.id} p={p} erledigt={false} ohneWichtig letzte={k === l.length - 1} />
                     ))}
                   </Karte>
@@ -236,10 +273,10 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
               <Karte stil={{ marginTop: 16 }}>
                 {[
                   { symbol: "doc.text", ton: "amt" as const, text: TEXT.ergebnis_vorlagen(a.gilt.filter((p) => p.vorlage).length) },
-                  ...(pflichtenListe.some((p) => p.schwere === "hoch") ? [{ symbol: "exclamationmark.circle", ton: "bald" as const, text: TEXT.ergebnis_wichtig(pflichtenListe.filter((p) => p.schwere === "hoch").length) }] : []),
                   ...(a.gruendung.length ? [{ symbol: "flag", ton: "leise" as const, text: TEXT.ergebnis_gruendung(a.gruendung.length) }] : []),
                   ...(a.beiEinstellung.length ? [{ symbol: "person.2", ton: "leise" as const, text: TEXT.r10_bei_einstellung_titel(a.beiEinstellung.length) }] : []),
-                  ...(a.unbekannt.length ? [{ symbol: "questionmark.circle", ton: "leise" as const, text: TEXT.ergebnis_unbekannt(a.unbekannt.length) }] : []),
+                  // „37 weitere hängen ab“ war mehr als die Pflichten selbst – stattdessen, wie viele Antworten es genauer machen
+                  ...(a.unbekannt.length ? [{ symbol: "questionmark.circle", ton: "leise" as const, text: genauer ? TEXT.r11_ergebnis_genauer(genauer) : TEXT.ergebnis_unbekannt(a.unbekannt.length) }] : []),
                 ].map((x, k, l) => (
                   <Fakt key={x.symbol} symbol={x.symbol} ton={x.ton} text={x.text} letzte={k === l.length - 1} />
                 ))}
@@ -260,7 +297,15 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
           {i < 0 ? (
             <Knopf buehne text={TEXT.check_starten} onPress={() => setI(0)} stil={{ flex: 1 }} />
           ) : zwischenschirm ? (
-            <Knopf buehne text={TEXT.zwischen_ergebnis} onPress={() => { setZwischen(false); setI(fragen.length); }} stil={{ flex: 1 }} />
+            uebersprungen.length ? (
+              // R11 (UX #2): bei übersprungenen Grundfragen ist „Offene Frage beantworten“ der Hauptweg
+              <View style={{ flex: 1, gap: 8 }}>
+                <Knopf buehne text={TEXT.r11_offene_beantworten} onPress={() => { setZwischen(false); setNachtrag(true); setI(fragen.indexOf(uebersprungen[0]!)); }} />
+                <Knopf glas text={TEXT.zwischen_ergebnis} onPress={() => { setZwischen(false); setI(fragen.length); }} />
+              </View>
+            ) : (
+              <Knopf buehne text={TEXT.zwischen_ergebnis} onPress={() => { setZwischen(false); setI(fragen.length); }} stil={{ flex: 1 }} />
+            )
           ) : frage ? (
             // ohne Antwort heißt der Knopf „Überspringen“ – nie ein grauer, scheinbar gesperrter „Weiter“-Knopf
             <Knopf ton={!beantwortet(z.stand.profil, frage.feld)} text={beantwortet(z.stand.profil, frage.feld) ? TEXT.weiter : TEXT.check_ueberspringen} onPress={weiter} stil={{ flex: 1 }} />
@@ -268,16 +313,8 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
             // kurz bevor die Zusatzfragen feststehen: kein Knopf, der den Check vorzeitig schließt
             <Knopf text={TEXT.weiter} deaktiviert onPress={() => undefined} stil={{ flex: 1 }} />
           ) : (
-            <Knopf
-              text={TEXT.pflichten_ansehen}
-              onPress={() => {
-                // „Pflichten“ ist der erste Tab (E-129): Check schließen und dorthin wechseln
-                z.erfolg();
-                nav.zurueck();
-                z.tabWechseln("pflichten");
-              }}
-              stil={{ flex: 1 }}
-            />
+            // R11 (Berater d): bestehender Betrieb – erst „Was hast du schon?“, dann in den Pflichten-Tab
+            <Knopf text={schonListe.length ? TEXT.r11_schon_weiter : TEXT.pflichten_ansehen} onPress={() => (schonListe.length ? setSchon(true) : schliessen())} stil={{ flex: 1 }} />
           )}
         </Fuss>
       </TastaturRahmen>

@@ -1,7 +1,7 @@
 # Katalog A.2 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gruendung.gewerbeanzeige
-version: 1
+version: 2
 katalog_nr: A.2
 titel:
   de: Gewerbe anmelden
@@ -40,13 +40,19 @@ kanal: portal
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Bußgeld bis 1.000 € (§ 146 Abs. 2 GewO).
   schwere: hoch
 automatisierung: formular_vorausfuellen
 aktion:
   art: link
   ziel: portal.gewerbeanzeige
   nachweis_erforderlich: true
+erledigung:
+  art: bestaetigen
+  bestaetigung:
+    de: Anzeige beim Gewerbeamt eingereicht
+aenderungsnotiz:
+  de: Das Datenblatt aus Amtlos bereitet die Anzeige nur vor. Erledigt ist sie, wenn du die Gewerbeanzeige beim Gewerbeamt eingereicht hast.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -55,9 +61,9 @@ quellen:
   url: https://www.gesetze-im-internet.de/gewo/__14.html
   abgerufen: null
 fachlich_zu_pruefen:
+- 'Sanktion aus der Rechtsprüfung R11 (Befund 20): § 146 Abs. 2 GewO bis 1.000 € – Nummer bestätigen'
 - 'Frist „bei Beginn“: als spätestens am Tag des Beginns umgesetzt – bestätigen'
 - 'Ummeldung und Abmeldung: Fristen ergänzen'
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 pruefung:
   status: entwurf
   geprueft_von: null

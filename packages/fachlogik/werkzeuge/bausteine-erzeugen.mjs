@@ -299,6 +299,29 @@ for (const [liste, titel, neuerTitel, allgemein] of TEILEN) {
   }
   daten[liste].splice(i + 1, 0, kopie);
 }
+/**
+ * R11 (Nutzertest Kosmetik #20, Rechtsprüfung #11): eigene Zwecke und Löschregel für die Kundenkartei mit
+ * Gesundheitsangaben (Einwilligung freiwillig und widerrufbar), Krankheitszeiten als Gesundheitsdaten. Fachlich zu prüfen
+ * (PRUEFLISTE T-62); nach dem Abtrennen gesetzt, weil es den Vorschlag vorher nicht gibt.
+ */
+const NACH_TEILEN = [
+  ["VVT", "Kundenkartei mit Gesundheitsangaben (z. B. Allergien, Unverträglichkeiten)", "werte.zweck", "Sichere Behandlung: Berücksichtigung von Allergien, Unverträglichkeiten und Gegenanzeigen (Kontraindikationen)"],
+  ["VVT", "Kundenkartei mit Gesundheitsangaben (z. B. Allergien, Unverträglichkeiten)", "werte.rechtsgrundlage", "Gesundheitsangaben: ausdrückliche Einwilligung nach Art. 9 Abs. 2 lit. a DSGVO – freiwillig und jederzeit widerrufbar (Art. 7 Abs. 3 DSGVO); die Einwilligung wird nachgewiesen (Art. 7 Abs. 1 DSGVO). Übrige Kundendaten: Art. 6 Abs. 1 lit. b DSGVO."],
+  ["VVT", "Kundenkartei mit Gesundheitsangaben (z. B. Allergien, Unverträglichkeiten)", "werte.empfaenger", "IT-/Software-Dienstleister (Auftragsverarbeiter)"],
+  ["VVT", "Kundenkartei mit Gesundheitsangaben (z. B. Allergien, Unverträglichkeiten)", "werte.loeschfrist", "Gesundheitsangaben werden gelöscht, sobald die Einwilligung widerrufen wird oder sie für die Behandlung nicht mehr benötigt werden (Art. 17 Abs. 1 lit. a, b DSGVO)."],
+  ["VVT", "Kundenkartei mit Gesundheitsangaben (z. B. Allergien, Unverträglichkeiten)", "quelle", (t) => `${t}; Art. 7, Art. 9 Abs. 2 lit. a DSGVO`],
+  ["VVT", "Personalverwaltung (Personalakte, Arbeitszeit)", "werte.rechtsgrundlage", (t) => `${t.replace(/\.$/, "")}; Krankheitszeiten (Arbeitsunfähigkeit) als Gesundheitsdaten zusätzlich Art. 9 Abs. 2 lit. b DSGVO`],
+];
+for (const [liste, schluessel, pfad, neu] of NACH_TEILEN) {
+  const eintrag = daten[liste].find((x) => x.titel === schluessel);
+  if (!eintrag) throw new Error(`Korrektur nach dem Teilen: ${liste} „${schluessel}“ nicht gefunden`);
+  const teile = pfad.split(".");
+  const ziel = teile.slice(0, -1).reduce((o, k) => o[k], eintrag);
+  const feld = teile.at(-1);
+  const alt = ziel[feld];
+  ziel[feld] = typeof neu === "function" ? neu(alt) : neu;
+  if (ziel[feld] === alt) throw new Error(`Korrektur nach dem Teilen greift nicht mehr: ${liste} „${schluessel}“ ${pfad}`);
+}
 for (const [liste, alt, neu] of ERSETZE) {
   const vorher = JSON.stringify(daten[liste]);
   if (!vorher.includes(alt)) throw new Error(`Ersetzung greift nicht mehr: ${liste} „${alt}“`);

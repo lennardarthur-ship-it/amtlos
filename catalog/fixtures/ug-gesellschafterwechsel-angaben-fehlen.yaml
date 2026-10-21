@@ -17,6 +17,7 @@ erwartet:
   gesellschaft.gesellschaftsvertrag_notar: unbekannt
   gesellschaft.handelsregister_anmeldung: unbekannt
   # Ohne Geschäftsjahr: beide Offenlegungs-Varianten offen
-  gesellschaft.offenlegung: unbekannt
+  # R11 (Nutzertest Tischlerei): ohne Angabe zum Geschäftsjahr gilt die Offenlegung nach dem Kalenderjahr
+  gesellschaft.offenlegung: gilt
   gesellschaft.offenlegung_abweichendes_gj: unbekannt
   gesellschaft.mitarbeiterbeteiligung: gilt_nicht

@@ -1,5 +1,5 @@
 persona: grenzfall
-beschreibung: Vorjahres-Zahllast exakt 2.000 € – Befreiungsgrenze ist nicht überschritten
+beschreibung: "Vorjahres-Zahllast exakt 2.000 € – R11 (Nutzertest Kosmetik): das Finanzamt kann befreien (§ 18 Abs. 2 S. 3 UStG), ohne Befreiung bleibt die Voranmeldung, vierteljährlich"
 stichtag: "2026-10-11"
 fakten:
   profil.rechtsform: einzelunternehmen
@@ -9,4 +9,6 @@ fakten:
   profil.beschaeftigte.gesamt: 0
   profil.bundesland: BE
 erwartet:
-  steuern.ust_voranmeldung: gilt_nicht
+  steuern.ust_voranmeldung: gilt
+termine_enthaelt:
+  steuern.ust_voranmeldung: [["2026-Q3", "2026-10-12"]]

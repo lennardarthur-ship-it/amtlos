@@ -1,7 +1,7 @@
 # Katalog B.16 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.transparenzregister
-version: 1
+version: 2
 katalog_nr: B.16
 titel:
   de: Wirtschaftlich Berechtigte ans Transparenzregister melden
@@ -16,7 +16,8 @@ begriffe:
   erklaerung:
     de: Die Menschen, denen eine Gesellschaft letztlich gehört oder die sie kontrollieren.
 rechtsgrundlage:
-- GwG
+- § 19 GwG
+- § 20 GwG
 kategorie: gesellschaft
 ausloeser:
   feld: abgeleitet.ist_kapitalgesellschaft
@@ -24,7 +25,7 @@ ausloeser:
   wert: true
   label:
     de: Dein Unternehmen ist eine UG oder GmbH.
-phase: gruendung
+# R11 (Nutzertest Tischlerei #4): keine Gründungs-Phase – Altgesellschaften (vor 1.8.2021) hatten Nachmeldepflichten (§ 59 Abs. 8 GwG), Änderungen laufend
 frist:
   typ: dauerhaft
 wiederholung:
@@ -44,6 +45,10 @@ aktion:
   art: link
   ziel: portal.transparenzregister
   nachweis_erforderlich: true
+erledigung:
+  art: bestaetigen
+  bestaetigung:
+    de: Im Transparenzregister gemeldet
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -55,11 +60,10 @@ quellen:
   url: https://www.gesetze-im-internet.de/gwg_2017/
   abgerufen: null
 fachlich_zu_pruefen:
-- Einzelvorschriften (§§ 19, 20 GwG) zuordnen
+- 'Einzelvorschriften §§ 19, 20 GwG zugeordnet (R11); Nachmeldepflicht für Gesellschaften vor 1.8.2021 (§ 59 Abs. 8 GwG) nur im Kommentar – Fristen bestätigen'
 - Gilt auch für GmbH & Co. KG und Personengesellschaften – Auslöser erweitern?
 - Frist nach Gründung und bei Änderung ergänzen
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf
   geprueft_von: null

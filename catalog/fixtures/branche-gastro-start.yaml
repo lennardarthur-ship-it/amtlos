@@ -7,6 +7,8 @@ fakten:
   profil.taetigkeit.einordnung: gewerbe
   profil.taetigkeit.branchen: [gastronomie_lebensmittel]
   profil.erlaubnis.gaststaette: true
+  profil.erlaubnis.alkohol: true
+  profil.ifsg.beschaeftigte: erstmals
   profil.beschaeftigte.gesamt: 1
   profil.kunden.segmente: [b2c]
   profil.vertrieb.kanaele: [ladengeschaeft]

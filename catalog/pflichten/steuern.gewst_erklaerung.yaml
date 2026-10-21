@@ -1,7 +1,7 @@
 # Katalog C.27 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.gewst_erklaerung
-version: 1
+version: 2
 katalog_nr: C.27
 titel:
   de: Gewerbesteuererklärung abgeben
@@ -20,11 +20,25 @@ rechtsgrundlage:
 kategorie: steuern
 ausloeser:
   any:
-  - feld: abgeleitet.ist_gewerbe
-    op: ==
-    wert: true
-    label:
-      de: Deine Tätigkeit ist ein Gewerbe.
+  # R11 (Nutzertest Kosmetik #6, Gründerin): Einzelunternehmen und Personengesellschaften nur über 24.500 € Gewerbeertrag
+  # (§ 25 Abs. 1 Nr. 1 GewStDV) – Gewinn als Näherung; ohne Angabe „hängt ab“
+  - all:
+    - feld: abgeleitet.ist_gewerbe
+      op: ==
+      wert: true
+      label:
+        de: Deine Tätigkeit ist ein Gewerbe.
+    - any:
+      - feld: profil.gewinn.vorjahr
+        op: '>'
+        wert: 24500
+        label:
+          de: Dein Gewinn im Vorjahr lag über dem Freibetrag von 24.500 €.
+      - feld: profil.gewinn.prognose_laufendes_jahr
+        op: '>'
+        wert: 24500
+        label:
+          de: Dein erwarteter Gewinn in diesem Jahr liegt über dem Freibetrag von 24.500 €.
   - feld: abgeleitet.ist_kapitalgesellschaft
     op: ==
     wert: true
@@ -72,6 +86,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/gewstg/
   abgerufen: null
 fachlich_zu_pruefen:
+- 'Einzelunternehmen und Personengesellschaften nur bei Gewerbeertrag über 24.500 € (§ 25 Abs. 1 Nr. 1 GewStDV), sonst auf Aufforderung des Finanzamts oder zur Feststellung eines Verlusts – Gewinn als Näherung für den Gewerbeertrag (Hinzurechnungen nicht berücksichtigt); Nutzertests R11 Kosmetik und Gründerin, bestätigen'
 - Fristen nach § 149 Abs. 2 und 3 AO ergänzt (E-129, Quelle Recherche 13.10.2026 über dejure.org und Finanzamt BW) – gegen amtliche Fassung prüfen
 - Übergangsfristen Art. 97 § 36 EGAO (Veranlagungszeiträume bis 2024) sind nicht abgebildet – ab Veranlagungszeitraum 2025 gilt § 149 AO regulär
 - Vorabanforderung nach § 149 Abs. 4 AO (frühere Frist im Einzelfall) und Fristverlängerung auf Antrag nicht abgebildet

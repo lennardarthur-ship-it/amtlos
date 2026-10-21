@@ -294,7 +294,7 @@ export function standBauen(): Bau {
     }
     if (x.r.leitweg) vergleichText("E-Rechnung " + x.nummer, "Käuferreferenz BT-10 = Leitweg-ID des öffentlichen Auftraggebers", /<cbc:BuyerReference>([^<]*)/.exec(xml)?.[1] ?? "–", x.r.leitweg, "Die Rechnungsvorlage hat kein Feld für Leitweg-ID/Käuferreferenz; eRechnungAus setzt keine kaeufer_referenz, BT-10 bekommt die Rechnungsnummer (packages/fachlogik/src/dokumente/buchhaltung.ts:139–170). Rechnungseingangsplattformen des Bundes/der Länder weisen eine XRechnung ohne Leitweg-ID zurück.");
     if (x.steuerart === "nullsatz") infos.push(`E-Rechnung ${x.nummer} (PV, Nullsteuersatz): Steuerkategorie ${/<cac:ClassifiedTaxCategory>\s*<cbc:ID>([A-Z]+)/.exec(xml)?.[1] ?? "?"}, Befreiungsgrund „${/<cbc:TaxExemptionReason>([^<]*)/.exec(xml)?.[1] ?? "–"}“ (fachlich klären: E „befreit“ oder Z „Nullsatz“).`);
-    if (x.r.abschlag || x.r.schlussZu) infos.push(`E-Rechnung ${x.nummer} (${x.r.abschlag ? "Abschlagsrechnung" : "Schlussrechnung"}): InvoiceTypeCode ${/<cbc:InvoiceTypeCode>(\d+)/.exec(xml)?.[1] ?? "?"} (die App kennt keine Teil-/Abschlagsrechnung, UNTDID 1001 „326“ bzw. „875“ ff.).`);
+    if (x.r.abschlag || x.r.schlussZu) infos.push(`E-Rechnung ${x.nummer} (${x.r.abschlag ? "Abschlagsrechnung" : "Schlussrechnung"}): InvoiceTypeCode ${/<cbc:InvoiceTypeCode>(\d+)/.exec(xml)?.[1] ?? "?"} (R11: Abschlagsrechnung als Teilrechnung 326; 875 ff. für Bau und die Schlussrechnung 877 kennt die App nicht).`);
   }
   const privat = D.RECHNUNGEN.filter((r) => !("email" in D.KUNDEN[r.kunde])).map((r) => r.nummer);
   infos.push(`Ohne XRechnung (App: Angaben fehlen): ${ohneXml.map((o) => `${o.nummer} (${o.fehlt.join(", ")})`).join("; ") || "keine"}. Erwartet: nur Privatkunden ohne E-Mail (${privat.join(", ")}).`);

@@ -227,6 +227,17 @@ function Vorschau({ aktuell, gelesen }: { aktuell: Stand; gelesen: Stand }) {
   );
 }
 
+/**
+ * Lohnt die Erinnerung an eine Sicherung? Erst wenn es etwas Unersetzliches gibt – mindestens drei geteilte Unterlagen
+ * bzw. Belege, oder das erste davon ist mindestens sieben Tage alt (R11, UX #12).
+ */
+export function sicherungLohnt(s: Pick<Stand, "unterlagen" | "belege">, jetzt: Date): boolean {
+  const zeiten = [...s.unterlagen.filter((u) => u.festgeschrieben || u.ausgegeben).map((u) => (u.festgeschrieben ?? u.ausgegeben)!), ...s.belege.map((b) => b.erstellt)].filter(Boolean).sort();
+  if (!zeiten.length) return false;
+  if (zeiten.length >= 3) return true;
+  return jetzt.getTime() - new Date(zeiten[0]!).getTime() >= 7 * 86_400_000;
+}
+
 /** Hinweis „Zeit für eine Sicherung“ (E-129): ungesicherte Änderungen, letzte Sicherung älter als eine Woche. */
 export function SicherungsKarte() {
   const z = useAmtlos();
@@ -234,7 +245,9 @@ export function SicherungsKarte() {
   const f = useFarben();
   const faellig = sicherungFaellig(z.stand, new Date());
   // erst, wenn es etwas Unersetzliches gibt: eine geteilte Rechnung oder einen Beleg – nicht schon nach einem Entwurf
-  const wertvoll = z.stand.belege.length > 0 || z.stand.unterlagen.some((u) => u.vorlage === "rechnung" && (u.festgeschrieben || u.ausgegeben));
+  // R11 (UX #12): nicht gleich nach der ersten Rechnung – erst ab drei geteilten Unterlagen bzw. Belegen oder sieben Tage
+  // nach dem ersten
+  const wertvoll = sicherungLohnt(z.stand, new Date());
   if (!faellig || !wertvoll) return null;
   return (
     // kompakt: eine Zeile mit Symbol, Satz und Pfeil – der Hinweis soll auffallen, nicht die Seite beherrschen

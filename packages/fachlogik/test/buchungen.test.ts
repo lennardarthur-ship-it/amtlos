@@ -220,12 +220,18 @@ describe("R10 Steuerberatung: BU-Schlüssel, Erlöskonten, § 13b, Felder 115/11
     expect(buchungenAusBelegen([{ ...BELEG, kategorie: "kfz_steuer", vorsteuer: false, steuer: [{ satz: 0, brutto_cent: 18000 }] }], "SKR03")[0]?.konto).toBe("4510");
     expect(buchungenAusBelegen([{ ...BELEG, kategorie: "kfz_versicherung", vorsteuer: false, steuer: [{ satz: 0, brutto_cent: 50000 }] }], "SKR03")[0]?.konto).toBe("4520");
   });
-  it("§ 13b-Belege: SKR03 3120/3123 ohne BU, SKR04 Kategorie-Konto; ohne Vorsteuerabzug (Kleinunternehmer) Kategorie-Konto", () => {
+  it("§ 13b-Belege (R11): mit Vorsteuerabzug 3120/3123 bzw. 5920/5923, ohne 3140/3143 bzw. 5940/5943 – jeweils ohne BU", () => {
     const eu = { ...BELEG, kategorie: "buero", steuerschuld: "eu" as const, steuer: [{ satz: 0, brutto_cent: 5000 }] };
     expect(buchungenAusBelegen([eu], "SKR03")[0]).toMatchObject({ konto: "3123", bu_schluessel: "", betrag_cent: 5000 });
     expect(buchungenAusBelegen([{ ...eu, steuerschuld: "bau" }], "SKR03")[0]?.konto).toBe("3120");
-    expect(buchungenAusBelegen([eu], "SKR04")[0]).toMatchObject({ konto: "6815", bu_schluessel: "" });
-    expect(buchungenAusBelegen([{ ...eu, vorsteuer: false }], "SKR03")[0]).toMatchObject({ konto: "4930", bu_schluessel: "" });
+    expect(buchungenAusBelegen([eu], "SKR04")[0]).toMatchObject({ konto: "5923", bu_schluessel: "" });
+    expect(buchungenAusBelegen([{ ...eu, steuerschuld: "bau" }], "SKR04")[0]?.konto).toBe("5920");
+    // ohne Vorsteuerabzug (Schalter aus, z. B. Heilberuf) bzw. Kleinunternehmer: Konten „ohne Vorsteuer, 19 % USt“
+    expect(buchungenAusBelegen([{ ...eu, vorsteuer: false }], "SKR03")[0]).toMatchObject({ konto: "3143", bu_schluessel: "" });
+    expect(buchungenAusBelegen([{ ...eu, steuerschuld: "bau", vorsteuer: false }], "SKR03")[0]?.konto).toBe("3140");
+    expect(buchungenAusBelegen([eu], "SKR03", { kleinunternehmer: true })[0]?.konto).toBe("3143");
+    expect(buchungenAusBelegen([{ ...eu, vorsteuer: false }], "SKR04")[0]?.konto).toBe("5943");
+    expect(buchungenAusBelegen([{ ...eu, steuerschuld: "bau", vorsteuer: false }], "SKR04")[0]?.konto).toBe("5940");
   });
   it("Erlöskonto nach Steuerart: igL 8125 mit USt-IdNr., § 13b Inland 8337, EU-Leistung 8336, Drittland 8338", () => {
     const igl = buchungenAusRechnungen([{ ...RE, positionen: POS(0), steuerart: "igl", kunde_land: "AT", kunde_ust_idnr: "ATU 12345678" }], "SKR03")[0]!;

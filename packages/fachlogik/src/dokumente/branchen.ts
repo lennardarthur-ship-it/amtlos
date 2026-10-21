@@ -7,7 +7,7 @@ import { teilnahmeTabelle } from "./arbeitsschutz.js";
 import { ALLERGENE_UMFANG, HACCP, HAUTSCHUTZ_FRISEUR, HYGIENE, IFSG, LOSE_WARE } from "./bausteine.js";
 import { KOPF_LINIE, ZELLE_LINIE, abschnitt, absatz, angaben, auswahl, datumDe, dokument, esc, ja, liste, nachsatz, neufassung, plusMonate, punkte, stabileOption, tabelle, text, unterschriften, zelle } from "./html.js";
 import { ALLERGENE, optionen } from "./konstanten.js";
-import type { Vorlage } from "./typen.js";
+import type { Betrieb, Daten, Vorlage } from "./typen.js";
 
 export const ifsgBelehrung: Vorlage = {
   id: "ifsg_belehrung",
@@ -480,6 +480,26 @@ const HYGIENE_SPALTEN: [string, string, string][] = [
   ["wer", "Wer", "12%"],
 ];
 
+/** Bayern-spezifischer Zusatz in einem Baustein (R11, Kosmetik #16): nur drucken, wenn der Betrieb in Bayern liegt */
+const NUR_BAYERN = /\s*\(Bayern: [^)]*\)/g;
+/** „Wer“ aus den Bausteinen (Beschäftigte, Reinigungskraft, Arbeitgeber …) – ohne Beschäftigte steht dort die verantwortliche Person */
+const WER_AUS_BAUSTEINEN = new Set(HYGIENE.map((v) => (typeof v.werte.wer === "string" ? v.werte.wer.trim() : "")).filter(Boolean));
+
+/** Einträge des Hygieneplans für den Druck: Landeszusatz nur im passenden Land, „Wer“ bei Ein-Personen-Betrieben. */
+function hygieneFuerDruck(d: Daten, b: Betrieb): Daten {
+  const bayern = /bayern/i.test(b.bundesland ?? "");
+  const allein = d.mit_beschaeftigten === false;
+  const wer = text(d, "erstellt_von") || b.verantwortlich;
+  return {
+    ...d,
+    eintraege: liste(d, "eintraege").map((x) => ({
+      ...x,
+      ...(bayern ? {} : Object.fromEntries(["was", "wann", "womit", "wie"].map((k) => [k, text(x, k).replace(NUR_BAYERN, "")]))),
+      ...(allein && wer && WER_AUS_BAUSTEINEN.has(text(x, "wer")) ? { wer } : {}),
+    })),
+  };
+}
+
 export const hygieneplan: Vorlage = {
   id: "hygieneplan",
   gestalt: "aushang",
@@ -518,8 +538,11 @@ export const hygieneplan: Vorlage = {
       felder: [
         { id: "erstellt_von", art: "text", label: "Verantwortlich", vorbelegung: "verantwortlich" },
         { id: "datum", art: "datum", label: "Stand", vorbelegung: "heute" },
+        // R11 (Kosmetik #18): ohne Beschäftigte (laut Pflichten-Check) steht unter „Wer“ die verantwortliche Person
+        { id: "mit_beschaeftigten", selten: true, art: "schalter", label: "Mit Beschäftigten", vorbelegung: true, hilfe: "Aus dem Pflichten-Check. Ohne Beschäftigte steht unter „Wer“ die verantwortliche Person statt „Beschäftigte“." },
       ],
     },
   ],
-  html: (d, b) => plan({ titel: "Hygieneplan", unter: text(d, "bereich") || undefined, d, b, spalten: HYGIENE_SPALTEN, feld: "eintraege" }),
+  ausProfil: { mit_beschaeftigten: "beschaeftigte.gesamt" },
+  html: (d, b) => plan({ titel: "Hygieneplan", unter: text(d, "bereich") || undefined, d: hygieneFuerDruck(d, b), b, spalten: HYGIENE_SPALTEN, feld: "eintraege" }),
 };

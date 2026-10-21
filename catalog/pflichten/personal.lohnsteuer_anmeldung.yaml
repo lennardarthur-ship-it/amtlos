@@ -1,15 +1,16 @@
 # Katalog D.40 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.lohnsteuer_anmeldung
-version: 2
+version: 3
 katalog_nr: D.40
 titel:
   de: Lohnsteuer anmelden
 kurz:
   de: Bis zum 10. nach Ende des Anmeldezeitraums meldest du die Lohnsteuer beim Finanzamt an.
 erklaerung:
-  de: Den Anmeldezeitraum (monatlich, vierteljährlich oder jährlich) bestimmt das Finanzamt nach der Lohnsteuer des Vorjahres.
-    Trag ihn in deinem Profil ein; Amtlos berechnet daraus die Termine.
+  de: Der Anmeldezeitraum folgt aus der Lohnsteuer des Vorjahres (§ 41a Abs. 2 EStG) – über 5.000 € monatlich, über 1.080 € vierteljährlich,
+    sonst jährlich. Im ersten Jahr zählt die aufs Jahr hochgerechnete Lohnsteuer des ersten vollen Monats. Trag den Zeitraum in deinem
+    Profil ein; Amtlos berechnet daraus die Termine.
 rechtsgrundlage:
 - § 41a EStG
 kategorie: personal
@@ -71,10 +72,9 @@ quellen:
   url: https://www.gesetze-im-internet.de/estg/__41a.html
   abgerufen: null
 fachlich_zu_pruefen:
-- Grenzen für den Anmeldezeitraum (nach Vorjahres-Lohnsteuer) stehen nicht in der Spezifikation – deshalb Angabe des Nutzers
+- 'Grenzen nach § 41a Abs. 2 EStG (über 5.000 € monatlich, über 1.080 € vierteljährlich) aus der Steuerprüfung R11 (Befund 18) im Text – weiter als Angabe des Nutzers; Hochrechnung im ersten Jahr bestätigen'
 - Verschiebung bei Fristende am Wochenende/Feiertag bestätigen
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf
   geprueft_von: null

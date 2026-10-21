@@ -339,6 +339,14 @@ const BEREITSTELLUNG: Record<string, string> = {
   gesetz: "Die Bereitstellung der Daten ist teilweise gesetzlich vorgeschrieben (z. B. für Steuer und Sozialversicherung) und im Übrigen für die Durchführung des Vertrags erforderlich. Ohne diese Daten können wir unsere gesetzlichen Pflichten nicht erfüllen und das Vertragsverhältnis nicht durchführen.",
   freiwillig: "Die Bereitstellung der Daten ist freiwillig. Ohne die Daten können wir das jeweilige Angebot nicht oder nur eingeschränkt bereitstellen.",
 };
+/** R11 (Kosmetik #20, #24): Verarbeitungen mit eigenen Zusätzen in der Datenschutzinformation */
+const GESUNDHEIT = "Kundenkartei mit Gesundheitsangaben (z. B. Allergien, Unverträglichkeiten)";
+const TERMIN = "Terminvereinbarung (telefonisch, vor Ort oder Online-Buchung)";
+/** Online-Terminbuchung: reines Werkzeug im Auftrag oder Plattform, bei der Kundschaft ein eigenes Konto hat */
+const BUCHUNG: Record<string, string> = { tool: "Reines Buchungstool (Auftragsverarbeiter)", plattform: "Plattform mit eigenem Kundenkonto (eigene Verantwortung der Plattform)" };
+const BUCHUNG_PLATTFORM_EMPFAENGER = "Betreiber der Buchungsplattform – haben Kundinnen und Kunden dort ein eigenes Konto, verarbeitet er die Daten auch in eigener Verantwortung (siehe dessen Datenschutzhinweise)";
+const GESUNDHEIT_FREIWILLIG = "Ausgenommen sind Angaben zur Gesundheit (z. B. Allergien): Ihre Angabe ist freiwillig; wir verarbeiten sie nur mit Ihrer ausdrücklichen Einwilligung (Art. 9 Abs. 2 lit. a DSGVO), die Sie jederzeit widerrufen können (Art. 7 Abs. 3 DSGVO).";
+
 /** Stützt sich eine der gewählten Verarbeitungen auf berechtigte Interessen? */
 const mitLitF = (d: Parameters<Vorlage["html"]>[0]) => auswahl(d, "verarbeitungen").some((t) => /lit\. f/.test(String(VVT.find((v) => v.titel === t)?.werte.rechtsgrundlage ?? "")));
 const ZIELGRUPPE = ["Kundinnen und Kunden", "Beschäftigte", "Bewerberinnen und Bewerber", "Lieferanten und Geschäftspartner"];
@@ -358,6 +366,7 @@ export const datenschutzinformation: Vorlage = {
         { id: "fuer_wen", art: "text", label: "Für wen", pflicht: true, vorschlaege: ZIELGRUPPE },
         { id: "verarbeitungen", art: "bausteine", label: "Welche Verarbeitungen betreffen diese Personen?", optionen: VVT.map((v) => ({ wert: v.titel, text: v.titel, quelle: v.quelle })), pflicht: true },
         { id: "dsb", selten: true, art: "text", label: "Datenschutzbeauftragte/r", hilfe: "nur falls benannt: Name und Kontakt" },
+        { id: "buchung", art: "wahl", label: "Online-Terminbuchung", optionen: optionen(BUCHUNG), vorbelegung: "tool", wenn: { feld: "verarbeitungen", ist: TERMIN }, hilfe: "Haben deine Kundinnen und Kunden bei der Buchungsplattform ein eigenes Konto, ist die Plattform oft selbst verantwortlich – bitte im Vertrag bzw. bei der Plattform prüfen." },
         { id: "interessen", art: "mehrzeilig", label: "Berechtigte Interessen", hilfe: "nötig, wenn eine Verarbeitung auf Art. 6 Abs. 1 lit. f DSGVO beruht – z. B. Schutz vor Diebstahl, Durchsetzung von Ansprüchen, sichere IT", vorschlaege: ["Sicherer und störungsfreier Betrieb unserer IT", "Durchsetzung und Abwehr von Ansprüchen", "Schutz vor Diebstahl und Vandalismus (Videoüberwachung)", "Information unserer Bestandskundschaft über eigene Angebote"] },
         { id: "bereitstellung", art: "wahl", label: "Pflicht zur Bereitstellung der Daten", optionen: optionen(BEREITSTELLUNG), vorbelegung: "vertrag" },
         { id: "ergaenzung", selten: true, art: "mehrzeilig", label: "Ergänzungen", hilfe: "z. B. besondere Verarbeitungen in deinem Betrieb" },
@@ -388,7 +397,7 @@ export const datenschutzinformation: Vorlage = {
           rand: "Art. 13 Abs. 1 lit. c, e, Abs. 2 lit. a",
           inhalt: gewaehlt.length
             ? gewaehlt
-                .map((v) => eintrag(v.titel, angaben([["Zweck", String(v.werte.zweck ?? "")], ["Rechtsgrundlage", String(v.werte.rechtsgrundlage ?? "")], ["Empfänger", String(v.werte.empfaenger ?? "") || "keine"], ["Übermittlung in Drittländer", String(v.werte.drittland ?? "") || "keine"], ["Speicherdauer", String(v.werte.loeschfrist ?? "")]])))
+                .map((v) => eintrag(v.titel, angaben([["Zweck", String(v.werte.zweck ?? "")], ["Rechtsgrundlage", String(v.werte.rechtsgrundlage ?? "")], ["Empfänger", v.titel === TERMIN && text(d, "buchung") === "plattform" ? BUCHUNG_PLATTFORM_EMPFAENGER : String(v.werte.empfaenger ?? "") || "keine"], ["Übermittlung in Drittländer", String(v.werte.drittland ?? "") || "keine"], ["Speicherdauer", String(v.werte.loeschfrist ?? "")]])))
                 .join("")
             : absatz(""),
         },
@@ -399,9 +408,56 @@ export const datenschutzinformation: Vorlage = {
         { titel: DSE.widerspruchsrecht!.titel, rand: "Art. 21", inhalt: `<p>${esc(ersetze(DSE.widerspruchsrecht!.text))}</p>` },
         { titel: DSE.widerruf_einwilligung!.titel, rand: "Art. 13 Abs. 2 lit. c", inhalt: `<p>${esc(ersetze(DSE.widerruf_einwilligung!.text))}</p>` },
         { titel: DSE.beschwerderecht!.titel, rand: "Art. 13 Abs. 2 lit. d", inhalt: `<p>${esc(DSE.beschwerderecht!.text.replace("{aufsichtsbehoerde_name}", a?.name ?? "____").replace("{aufsichtsbehoerde_ort}", a?.ort ?? "____").replace("{aufsichtsbehoerde_url}", a?.url ?? "____"))}</p>` },
-        { titel: "Pflicht zur Bereitstellung", rand: "Art. 13 Abs. 2 lit. e", inhalt: `<p>${esc(BEREITSTELLUNG[text(d, "bereitstellung")] ?? "")}</p>` },
+        // R11 (Kosmetik #20): Gesundheitsangaben sind freiwillig – auch wenn die übrigen Daten für den Vertrag nötig sind
+        { titel: "Pflicht zur Bereitstellung", rand: "Art. 13 Abs. 2 lit. e", inhalt: `<p>${esc(BEREITSTELLUNG[text(d, "bereitstellung")] ?? "")}</p>${gewaehlt.some((v) => v.titel === GESUNDHEIT) && text(d, "bereitstellung") !== "freiwillig" ? `<p>${esc(GESUNDHEIT_FREIWILLIG)}</p>` : ""}` },
         { titel: "Automatisierte Entscheidungen", rand: "Art. 13 Abs. 2 lit. f", inhalt: "<p>Eine automatisierte Entscheidungsfindung einschließlich Profiling findet nicht statt.</p>" },
       ]),
+    });
+  },
+};
+
+/**
+ * R11 (Nutzertest Kosmetik #19): Angaben zur Gesundheit und Einwilligung (Art. 9 Abs. 2 lit. a, Art. 7 DSGVO) – die
+ * Kundin trägt ein, was für die Behandlung wichtig ist, und willigt ausdrücklich ein; das unterschriebene Blatt ist der
+ * Nachweis (Art. 7 Abs. 1). Keine Fragenliste zu Krankheiten – was abgefragt wird, entscheidet der Betrieb. Fachlich zu prüfen.
+ */
+export const anamnese: Vorlage = {
+  id: "anamnese_einwilligung",
+  titel: "Anamnese und Einwilligung",
+  beschreibung: "Angaben der Kundin oder des Kunden zur Gesundheit (z. B. Allergien, Unverträglichkeiten) mit ausdrücklicher, widerrufbarer Einwilligung – unterschrieben als Nachweis.",
+  bereich: "beauty",
+  pflichten: [],
+  person: { art: "kunde", felder: { name: "name" } },
+  grundlage: "Art. 7, Art. 9 Abs. 2 lit. a DSGVO",
+  namensFeld: "name",
+  abschnitte: [
+    {
+      titel: "Kundin oder Kunde",
+      hilfe: "Leer lassen, um das Blatt auszudrucken und von Hand ausfüllen zu lassen. Das unterschriebene Blatt aufbewahren – es weist die Einwilligung nach.",
+      felder: [
+        { id: "name", art: "text", label: "Name" },
+        { id: "behandlung", art: "text", label: "Geplante Behandlung", hilfe: "z. B. Gesichtsbehandlung, Wimpernlifting" },
+        { id: "angaben", art: "mehrzeilig", label: "Angaben zur Gesundheit", hilfe: "z. B. Allergien, Unverträglichkeiten – nur, was für die Behandlung wichtig ist" },
+        { id: "datum", art: "datum", label: "Datum", vorbelegung: "heute" },
+      ],
+    },
+  ],
+  html(d, b) {
+    const name = b.name.trim() || "____";
+    return dokument({
+      titel: "Anamnese und Einwilligung",
+      betrieb: b,
+      unter: text(d, "name") || undefined,
+      meta: `Kundin/Kunde: ${text(d, "name")}\nDatum: ${datumDe(text(d, "datum"))}`,
+      inhalt:
+        abschnitt("Angaben", angaben([["Name", text(d, "name") ? null : ""], ["Geplante Behandlung", text(d, "behandlung") || ""], ["Datum", text(d, "datum") ? null : ""]])) +
+        abschnitt("Angaben zur Gesundheit", text(d, "angaben") ? zeilen(text(d, "angaben")) : `<p>z. B. Allergien, Unverträglichkeiten:</p>${absatz("")}${absatz("")}`) +
+        abschnitt(
+          "Einwilligung",
+          absatz(`Ich willige ausdrücklich ein, dass ${name} meine oben genannten Angaben zur Gesundheit für meine Behandlung verarbeitet (Art. 9 Abs. 2 lit. a DSGVO).`) +
+            absatz("Die Einwilligung ist freiwillig. Ich kann sie jederzeit mit Wirkung für die Zukunft widerrufen (Art. 7 Abs. 3 DSGVO); die Verarbeitung bis zum Widerruf bleibt rechtmäßig."),
+        ) +
+        unterschriften(["Ort, Datum", "Unterschrift Kundin/Kunde"]),
     });
   },
 };

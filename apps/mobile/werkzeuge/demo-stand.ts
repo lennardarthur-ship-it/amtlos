@@ -5,6 +5,7 @@
  *
  *   node werkzeuge/store-bilder.mjs   (baut diese Datei mit esbuild und nutzt den Stand)
  */
+import { eintragAusVorschlag, vorlageFuer, type Eintrag, type ListenFeld } from "@amtlos/fachlogik";
 import { auswertung } from "../src/pflichten/check";
 import { LEERER_STAND, anlegen, ausgeben, bezahltSetzen, erledigtSetzen, felderSetzen, personSetzen, type Stand } from "../src/unterlagen/speicher";
 
@@ -41,6 +42,17 @@ export function demoStand(heute = "2026-10-13"): Stand {
       "ust.kleinunternehmer": false,
       steuerberater: false,
       gruendungsdatum: "2024-03-01",
+      // R11 (UX #1): alle Kernfragen beantwortet – sonst zeigt Store-Bild 1 „Pflichten-Check nicht fertig“
+      "beschaeftigte.minijob": 0,
+      "beschaeftigte.jugendlich": 1,
+      "personal.lohn_durch": "steuerberatung",
+      "personal.sofortmeldebranchen": ["friseur"],
+      "arbeitsschutz.elektrische_geraete": true,
+      "arbeitsschutz.gefahrstoffe": true,
+      "handwerk.anlage": "a",
+      "vertrieb.ausserhalb_geschaeftsraeume": false,
+      "kasse.angeschafft_am": "2024-03-01",
+      "online.social_media": true,
     },
     proTest: true,
     erinnerungen: true,
@@ -70,14 +82,22 @@ export function demoStand(heute = "2026-10-13"): Stand {
     s = ausgeben(s, id, t(datum, 10));
     if (bezahlt) s = bezahltSetzen(s, id, bezahlt);
   }
-  for (const [id, vorlage, tag] of [
-    ["h1", "hygieneplan", "2026-09-15"],
-    ["g1", "gefaehrdungsbeurteilung", "2026-09-18"],
-    ["s1", "hautschutzplan", "2026-09-18"],
-    ["n1", "nachweis_arbeitsbedingungen", "2026-10-05"],
-  ] as const) {
+  // R11 (UX #1, #23): vollständige, geteilte Nachweise – die Kontrollmappe ist nicht leer, „N Angaben fehlen“ steht nirgends
+  const liste = (vorlage: string, feld: string) => vorlageFuer(vorlage)!.abschnitte.flatMap((x) => x.felder).find((f) => f.id === feld) as ListenFeld;
+  const aus = (vorlage: string, feld: string, passt: (gruppe?: string) => boolean, n: number): Eintrag[] =>
+    (liste(vorlage, feld).vorschlaege ?? []).filter((v) => passt(v.gruppe)).slice(0, n).map((v) => eintragAusVorschlag(liste(vorlage, feld), v, s.betrieb, heute));
+  const nachweise: [string, string, string, Record<string, unknown>][] = [
+    ["h1", "hygieneplan", "2026-09-15", { bereich: "Friseursalon", eintraege: aus("hygieneplan", "eintraege", () => true, 18) }],
+    ["g1", "gefaehrdungsbeurteilung", "2026-09-18", { arbeitsbereich: "Salon", taetigkeiten: "Schneiden, Färben, Waschen, Föhnen", gefaehrdungen: aus("gefaehrdungsbeurteilung", "gefaehrdungen", (g) => g === "Friseur", 8), mutterschutz_ergebnis: "umgestaltung", mutterschutz_details: "Kein Umgang mit Färbe- und Dauerwellmitteln; Sitzgelegenheit; keine Tätigkeiten mit Feuchtarbeit über zwei Stunden." }],
+    ["s1", "hautschutzplan", "2026-09-18", { bereich: "Salon", eintraege: aus("hautschutzplan", "eintraege", () => true, 6), produkt_schutz: "Hautschutzcreme (Beispiel)", produkt_handschuhe: "Nitril-Einmalhandschuhe", produkt_reinigung: "milde Waschlotion", produkt_pflege: "Pflegecreme" }],
+    ["n1", "nachweis_arbeitsbedingungen", "2026-10-05", { name: "Sam Muster", anschrift: "Lindenweg 7\n80335 München", beginn: "2026-11-01", taetigkeit: "Friseur/in", entgelt_betrag: "2.600,00", faelligkeit: "am letzten Bankarbeitstag des Monats", auszahlung: "Überweisung auf das von der beschäftigten Person benannte Konto", wochenstunden: "38", pausen: "nach § 4 ArbZG: mindestens 30 Minuten bei mehr als sechs Stunden, 45 Minuten bei mehr als neun Stunden", ruhezeit: "nach § 5 ArbZG: mindestens elf Stunden ununterbrochen nach Ende der täglichen Arbeitszeit", urlaub: "28" }],
+    ["u1", "unterweisung", "2026-09-20", { thema: "Jährliche Unterweisung Arbeitsschutz", datum: "2026-09-20", dauer: "45 Minuten", sprache: "Deutsch", jugendliche: true, teilnehmer: [{ name: "Sam Muster" }, { name: "Lea Wagner" }] }],
+    ["a1", "arbeitszeitnachweis", "2026-10-01", { name: "Lea Wagner", tage: ["01", "02", "03", "08", "09", "10", "15", "16", "17", "22", "23", "24"].map((tg) => ({ datum: `2026-09-${tg}`, beginn: "09:00", ende: "15:30", pause: "30", einsatzort: "", bemerkung: "" })) }],
+  ];
+  for (const [id, vorlage, tag, werte] of nachweise) {
     const [s1] = anlegen(s, vorlage, t(tag), id);
-    s = s1;
+    s = felderSetzen(s1, id, werte as never, t(tag));
+    s = ausgeben(s, id, t(tag, 11));
   }
   // ein Teil der Pflichten ist abgehakt – der Fortschritt soll echt aussehen
   const a = auswertung(s.profil, heute);

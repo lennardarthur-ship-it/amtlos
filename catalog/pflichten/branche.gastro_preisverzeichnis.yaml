@@ -1,0 +1,52 @@
+# R11 (Rechtsprüfung T-114): Preisverzeichnis in Gaststätten nach § 7 PAngV
+schema_version: 1
+id: branche.gastro_preisverzeichnis
+version: 1
+katalog_nr: G.70
+titel:
+  de: Preisverzeichnis für Speisen und Getränke
+kurz:
+  de: In deiner Gaststätte legst du ein Preisverzeichnis aus und hängst neben dem Eingang die Preise der wichtigsten Speisen und Getränke aus.
+erklaerung:
+  de: Gaststätten legen Preisverzeichnisse für Speisen und Getränke auf den Tischen aus oder legen sie jedem Gast vor der Bestellung
+    und auf Verlangen bei der Abrechnung vor; alternativ hängen sie sie gut lesbar aus. Zusätzlich hängt neben dem Eingang ein
+    Verzeichnis mit den Preisen der wesentlichen Speisen und Getränke (§ 7 PAngV). Die Preise sind Endpreise einschließlich
+    Umsatzsteuer und Bedienung.
+rechtsgrundlage:
+- § 7 PAngV
+kategorie: branche
+branchen:
+- gastronomie_lebensmittel
+ausloeser:
+  feld: profil.erlaubnis.gaststaette
+  op: ==
+  wert: true
+  label:
+    de: Du betreibst eine Gaststätte.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Kontrolle durch das Ordnungsamt
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: niedrig
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Preisangabenverordnung § 7
+  url: https://www.gesetze-im-internet.de/pangv_2022/__7.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Neu nach Rechtsprüfung R11 (T-114) – Wortlaut § 7 PAngV (Tisch, Vorlage, Aushang, Eingang) bestätigen'
+- 'Folgen bei Nichterfüllung (§ 20 PAngV) – Sanktion fachlich ergänzen'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

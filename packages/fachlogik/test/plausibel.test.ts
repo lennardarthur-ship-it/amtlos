@@ -65,7 +65,7 @@ describe("Rechnung: Plausibilität vor dem Teilen", () => {
     expect(r.abschnitte.flatMap((a) => a.felder).find((f) => f.id === "kleinunternehmer")?.selten).toBe(true);
     // eine neue, unberührte Position zählt nicht als Eintrag
     const d = leereDaten(r, BETRIEB, "2026-10-12");
-    expect(fehlendeAngaben(r, d)).toContain("mindestens ein Eintrag: Position");
+    expect(fehlendeAngaben(r, d)).toContain("mindestens ein Eintrag „Position“");
   });
 });
 

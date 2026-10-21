@@ -262,7 +262,7 @@ for (const x of D.vorgaenge()) {
   if (x.r.igl && x.art === "rechnung") {
     for (const [was, re] of [["USt-IdNr. der Kundin ATU68215437", /ATU68215437/], ["eigene USt-IdNr. DE347215896", /DE347215896/], ["Hinweis steuerfreie innergemeinschaftliche Lieferung", /innergemeinschaftliche Lieferung/]]) vergleich(`Rechnung ${x.nummer} (§ 14a Abs. 3 UStG)`, `PDF enthält ${was}`, re.test(txt) ? "ja" : "nein", "ja");
   }
-  if (x.nummer === "2026-001") vergleich("Rechnung 2026-001 (Einzelunternehmen)", "Inhaberin im Zahlungsblock (Empfänger: Kerzenwerk Lina Hoff (Lina Hoff))", /Kerzenwerk Lina Hoff \(Lina Hoff\)/.test(txt) ? "ja" : "nein", "ja");
+  if (x.nummer === "2026-001") vergleich("Rechnung 2026-001 (Einzelunternehmen)", "Zahlungsblock ohne doppelten Namen – die Inhaberin steht schon in der Firma (R11: „Empfänger: Kerzenwerk Lina Hoff“)", /Empfänger: Kerzenwerk Lina Hoff(?! \(Lina Hoff\))/.test(txt) ? "ja" : "nein", "ja");
 }
 for (const d of bau.docs.filter((y) => y.vorlage === "impressum" || y.vorlage === "datenschutzerklaerung_website")) {
   const txt = pdftext(path.join(OUT, "pdf", d.datei)).replace(/\s+/g, " ");

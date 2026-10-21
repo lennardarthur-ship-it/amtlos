@@ -1,7 +1,7 @@
 # Katalog D.46 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.hinweisgeber_meldestelle
-version: 1
+version: 2
 katalog_nr: D.46
 titel:
   de: Interne Meldestelle einrichten (Hinweisgeberschutz)
@@ -34,7 +34,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Bußgeld bis 20.000 €, wenn keine interne Meldestelle eingerichtet ist (§ 40 Abs. 2 Nr. 2, Abs. 6 HinSchG).
   schwere: hoch
 automatisierung: hinweis
 status_recht: in_kraft
@@ -45,10 +45,10 @@ quellen:
   url: https://www.gesetze-im-internet.de/hinschg/
   abgerufen: null
 fachlich_zu_pruefen:
+- 'Sanktion aus der Rechtsprüfung R11 (Befund 20): § 40 Abs. 2 Nr. 2, Abs. 6 HinSchG bis 20.000 € – bestätigen'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Zählweise (G-05)
 - Übergangsregeln für 50–249 Beschäftigte noch relevant?
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf

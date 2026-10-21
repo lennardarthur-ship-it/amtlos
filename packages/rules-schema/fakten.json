@@ -52,6 +52,7 @@
         "handwerk",
         "beauty_kosmetik",
         "bau",
+        "gebaeudereinigung",
         "transport_logistik",
         "onlinehandel",
         "it_agentur_freelancer",
@@ -101,6 +102,12 @@
       "pfad": "profil.erlaubnis.gaststaette",
       "typ": "bool",
       "herleitung": "Onboarding",
+      "ab": 2
+    },
+    {
+      "pfad": "profil.erlaubnis.alkohol",
+      "typ": "bool",
+      "herleitung": "Onboarding (R11): Ausschank alkoholischer Getränke – nur dafür braucht es nach § 2 GastG eine Erlaubnis",
       "ab": 2
     },
     {
@@ -225,6 +232,18 @@
       "ab": 2
     },
     {
+      "pfad": "profil.vertrieb.ausserhalb_geschaeftsraeume",
+      "typ": "bool",
+      "herleitung": "Onboarding (R11): Verträge mit Verbrauchern bei ihnen zu Hause oder unterwegs (außerhalb von Geschäftsräumen, § 312b BGB)",
+      "ab": 2
+    },
+    {
+      "pfad": "profil.gastro.to_go",
+      "typ": "bool",
+      "herleitung": "Onboarding (R11): Speisen oder Getränke zum Mitnehmen in Einwegverpackungen (§§ 33, 34 VerpackG)",
+      "ab": 2
+    },
+    {
       "pfad": "profil.produkte.arten",
       "typ": "enum_liste",
       "werte": [
@@ -274,6 +293,12 @@
       "pfad": "profil.kasse.elektronisch",
       "typ": "bool",
       "herleitung": "Onboarding",
+      "ab": 2
+    },
+    {
+      "pfad": "profil.kasse.angeschafft_am",
+      "typ": "datum",
+      "herleitung": "Onboarding (R11): Anschaffung der elektronischen Kasse (auch geplant) – die App leitet daraus das Ereignis kasse_angeschafft ab",
       "ab": 2
     },
     {
@@ -351,15 +376,45 @@
         "personenbefoerderung",
         "spedition_logistik",
         "schausteller",
-        "forstwirtschaft",
         "gebaeudereinigung",
         "messebau",
         "fleischwirtschaft",
         "prostitution",
         "sicherheitsgewerbe",
+        "friseur",
+        "kosmetik",
+        "lieferdienste",
         "keine"
       ],
-      "herleitung": "Onboarding; Branchen nach § 28a Abs. 4 SGB IV (R10 vervollständigt; „gastronomie“ = Gaststätten und Beherbergung)",
+      "herleitung": "Onboarding; Branchen nach § 28a Abs. 4 SGB IV und § 2a SchwarzArbG in der Fassung des SchwarzArbMoDiG (ab 30.12.2025/1.1.2026: neu Friseur, Kosmetik, plattformbasierte Lieferdienste; Forstwirtschaft gestrichen; „fleischwirtschaft“ ohne Fleischerhandwerk; „gastronomie“ = Gaststätten und Beherbergung)",
+      "ab": 5
+    },
+    {
+      "pfad": "profil.ifsg.beschaeftigte",
+      "typ": "enum",
+      "werte": [
+        "erstmals",
+        "bescheinigung",
+        "keine"
+      ],
+      "herleitung": "Onboarding (R11): Arbeiten Beschäftigte mit Lebensmitteln nach § 42 IfSG – erstmals (Bescheinigung nach § 43 Abs. 1 nötig), alle schon mit Bescheinigung, oder niemand (z. B. nur Büro)",
+      "ab": 5
+    },
+    {
+      "pfad": "profil.ifsg.selbst",
+      "typ": "enum",
+      "werte": [
+        "erstmals",
+        "bescheinigung",
+        "keine"
+      ],
+      "herleitung": "Onboarding (R11): Inhaberin bzw. Inhaber arbeitet selbst mit Lebensmitteln nach § 42 IfSG – erstmals, schon mit Bescheinigung, oder gar nicht",
+      "ab": 2
+    },
+    {
+      "pfad": "profil.personal.drittstaaten",
+      "typ": "bool",
+      "herleitung": "Onboarding (R11): Beschäftigte ohne Staatsangehörigkeit eines EU-, EWR-Staats oder der Schweiz (§ 4a Abs. 5 AufenthG); die App setzt den Wert auch aus der Staatsangehörigkeit gespeicherter Mitarbeiter",
       "ab": 5
     },
     {

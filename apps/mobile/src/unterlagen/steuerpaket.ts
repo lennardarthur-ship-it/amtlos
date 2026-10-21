@@ -11,6 +11,7 @@ import {
   EUER_KAPITALGESELLSCHAFT,
   EUER_ZEILE_STEUERFREI,
   EUER_ZEILE_STEUERPFLICHTIG,
+  KONTEN_13B,
   KU_HINWEIS,
   buchungenAusBelegen,
   buchungenAusRechnungen,
@@ -216,6 +217,9 @@ export const EUER_NICHT_ENTHALTEN =
 export const EUER_SHOP_NICHT_ENTHALTEN =
   "Ebenfalls nicht enthalten: Einnahmen aus Onlineshop, Online-Marktplätzen, App und Marktstand (laut Shop-, Plattform- und Zahlungsberichten bzw. Kassenbuch), auch Fernverkäufe in andere EU-Länder (OSS) und die dafür gezahlte Umsatzsteuer – bitte selbst ergänzen.";
 
+/** „davon“-Zeile zur Kleinunternehmer-Zeile der Anlage EÜR (Wortlaut aus der Zeilenliste) */
+export const EUER_KU_DAVON = "Nicht steuerbare Umsätze sowie Umsätze nach § 19 Absatz 3 Satz 1 Nummer 1 und 2 UStG";
+
 /** Einträge für die Vorlage „EÜR“ (Listen `einnahmen` und `ausgaben`) aus den Daten eines Jahres. */
 export function euerUebernahme(s: Stand, jahr: string): EuerUebernahme {
   const einnahmen = einnahmenAusRechnungen(s);
@@ -226,9 +230,10 @@ export function euerUebernahme(s: Stand, jahr: string): EuerUebernahme {
   if (ku) {
     // ohne „(netto)“: bei Kleinunternehmern gibt es keine Umsatzsteuer, der Betrag ist der Rechnungsbetrag. Nicht steuerbare
     // Umsätze (Ausland) als eigene Zeile – in der Anlage EÜR die „davon“-Zeile zur Kleinunternehmer-Zeile
+    // R11: Die Kleinunternehmer-Zeile enthält den Gesamtbetrag; die nicht steuerbaren Umsätze sind in der Anlage EÜR nur
+    // eine „davon“-Zeile – hier im Text, damit die Summe der Einnahmen nicht doppelt zählt
     const ns = e.einnahmen_nicht_steuerbar_cent;
-    if (e.einnahmen_netto_cent - ns) ein.push({ datum: "", text: "Umsätze aus Rechnungen", kategorie: "Umsatzsteuerlicher Kleinunternehmer", betrag: betrag(e.einnahmen_netto_cent - ns) });
-    if (ns) ein.push({ datum: "", text: "Nicht steuerbare Umsätze aus Rechnungen (Leistungen an Unternehmen im Ausland; in der Anlage EÜR „davon“ zur Kleinunternehmer-Zeile)", kategorie: "Nicht steuerbare Umsätze sowie Umsätze nach § 19 Absatz 3 Satz 1 Nummer 1 und 2 UStG", betrag: betrag(ns) });
+    if (e.einnahmen_netto_cent) ein.push({ datum: "", text: ns ? `Umsätze aus Rechnungen – davon nicht steuerbar (Leistungen an Unternehmen im Ausland): ${betrag(ns)} €, in der Anlage EÜR in die „davon“-Zeile „${EUER_KU_DAVON}“` : "Umsätze aus Rechnungen", kategorie: "Umsatzsteuerlicher Kleinunternehmer", betrag: betrag(e.einnahmen_netto_cent) });
   } else {
     if (pflichtig) ein.push({ datum: "", text: "Umsätze aus Rechnungen (netto)", kategorie: EUER_ZEILE_STEUERPFLICHTIG, betrag: betrag(pflichtig) });
     // ohne Beispiel: die Zeile sammelt igL, § 13b-Umsätze und Steuerbefreiungen (z. B. Heilbehandlungen)
@@ -421,7 +426,7 @@ export const ZAHLTAG_FEHLT = "fehlt – Belegdatum verwendet";
  * Belegliste mit Amtlos-Belegnummer, Belegfeld 1 wie im DATEV-Stapel, Aufwandskonto, Zahltag (für die EÜR) und einer
  * Summenzeile am Ende. `nummern` aus `belegNummern([...s.belege, ...s.belegArchiv])` – ohne Angabe selbst abgeleitet.
  */
-export function belegeCsv(s: Stand, z: Zeitraum, dateinamen: Map<string, string> = new Map(), kontenrahmen: Kontenrahmen = s.steuerberatung.kontenrahmen, nummern: Map<string, string> = belegNummern([...s.belege, ...s.belegArchiv])): string {
+export function belegeCsv(s: Stand, z: Zeitraum, dateinamen: Map<string, string> = new Map(), kontenrahmen: Kontenrahmen = s.steuerberatung.kontenrahmen, nummern: Map<string, string> = belegNummern([...s.belege, ...s.belegArchiv]), ku: boolean = istKleinunternehmer(s)): string {
   const summe = { netto: 0, ust: 0, vorsteuer: 0, brutto: 0 };
   const zeilen = belegeImZeitraum(s, z).map((b) => {
     const sm = belegSummen(b);
@@ -433,7 +438,7 @@ export function belegeCsv(s: Stand, z: Zeitraum, dateinamen: Map<string, string>
     const konten = kontenrahmen === "SKR03" ? kat.skr03 : kat.skr04;
     // dasselbe Konto wie im Stapel (auch § 13b-Konten); Belege, die nicht in den Stapel gehen, mit Vermerk
     const imStapel = belegImStapel(b, { kapitalgesellschaft: kapitalgesellschaft(s) });
-    const gebucht = buchungenAusBelegen([b], kontenrahmen).map((x) => x.konto);
+    const gebucht = buchungenAusBelegen([b], kontenrahmen, { kleinunternehmer: ku }).map((x) => x.konto);
     const konto = [...new Set(gebucht.length ? gebucht : b.steuer.filter((x) => x.brutto_cent).map((x) => konten[x.satz] ?? konten[19] ?? ""))].join(", ");
     const nr = nummern.get(b.id) ?? "";
     return [
@@ -463,6 +468,26 @@ export function belegeCsv(s: Stand, z: Zeitraum, dateinamen: Map<string, string>
     ["Amtlos-Belegnr.", "Datum", "Lieferant", "Belegnummer (Lieferant)", "Belegfeld 1 (DATEV)", "Kategorie", "Zeile Anlage EÜR", "Konto (DATEV)", "Netto", "USt", "Vorsteuer", "Brutto", "Steuersätze", "Zahlung", "Zahltag (für EÜR verwendet)", "Datei", "Notiz", "Steuerschuldnerschaft", "Im Buchungsstapel"],
     zeilen.length ? [...zeilen, summenZeile] : [],
   );
+}
+
+/** Gutschein in einer Position zu 0 % (R11, Kosmetik #5) – keine Kleinunternehmer-Rechnung, keine Gutschrift. */
+function gutscheinZuNullU(u: Unterlage, betrieb: Betrieb): boolean {
+  if (istGutschrift(u)) return false;
+  const { daten } = eRechnungAus(u.daten, betrieb);
+  return !daten.kleinunternehmer && daten.positionen.some((p) => p.ust_satz === 0 && /gutschein/i.test(p.bezeichnung));
+}
+
+/** LIESMICH (R11): wohin die § 13b-Belege im Stapel gebucht sind – mit bzw. ohne Vorsteuerabzug. */
+function steuerschuldSatz(belege: Beleg[], kontenrahmen: Kontenrahmen, ku: boolean): string {
+  const l = belege.filter((b) => b.steuerschuld);
+  const mit = l.filter((b) => b.vorsteuer && !ku).length;
+  const ohne = l.length - mit;
+  const k = KONTEN_13B[kontenrahmen];
+  const teile = [
+    mit ? `mit Vorsteuerabzug auf ${k.mit.bau} (Bauleistung Inland) bzw. ${k.mit.eu} (sonstige Leistung EU)` : "",
+    ohne ? `ohne Vorsteuerabzug${ku ? " (Kleinunternehmer)" : ""} auf ${k.ohne.bau} bzw. ${k.ohne.eu} (nur Umsatzsteuer)` : "",
+  ].filter(Boolean);
+  return `${l.length} ${l.length === 1 ? "Beleg" : "Belege"} mit Steuerschuldnerschaft des Leistungsempfängers (§ 13b UStG) – im Stapel ${teile.join(", ")}. Kontonummern bitte gegen den Kontenrahmen prüfen.`;
 }
 
 /** Grund, warum eine Rechnung keine E-Rechnung im Paket hat – Privatkunde (nur die E-Mail fehlt) oder fehlende Angaben. */
@@ -503,6 +528,14 @@ export function fragenText(s: Stand, z: Zeitraum, nummern: Map<string, string> =
   dazu(
     kapitalgesellschaft(s) ? "Privat ausgelegte Belege (Kapitalgesellschaft – nicht im Buchungsstapel, da es keine Privatkonten gibt): Wer hat ausgelegt, auf welches Verrechnungskonto?" : "Privat bezahlte Belege (Zahlungsweg „privat bezahlt“):",
     belege.filter((b) => b.zahlung === "privat").map((b) => bz(b)),
+  );
+  dazu(
+    "Rechnungen über Gutscheine zu 0 % (nicht im Buchungsstapel): Einzweck-Gutschein (Leistung und Steuersatz stehen beim Verkauf fest, Umsatzsteuer schon bei Ausgabe, § 3 Abs. 14 UStG) oder Mehrzweck-Gutschein (Umsatzsteuer erst bei Einlösung, § 3 Abs. 15 UStG)?",
+    gestellteRechnungen(s).filter((u) => imZeitraum(String(u.daten.datum), z) && gutscheinZuNullU(u, s.betrieb)).map((u) => rz(u)),
+  );
+  dazu(
+    "Bar bezahlte Belege (im Stapel gegen Kasse): Aus welcher Kasse wurde bezahlt – Geschäftskasse mit Kassenbuch (bitte liefern) oder privat?",
+    belege.filter((b) => b.zahlung === "bar" && belegImStapel(b, { kapitalgesellschaft: kapitalgesellschaft(s) })).map((b) => bz(b)),
   );
   dazu("Kfz-Kosten: Fahrzeug und privater Anteil?", belege.filter((b) => b.kategorie === "fahrzeug").map((b) => bz(b)));
   dazu("Bewirtung: Anlass und Teilnehmer?", belege.filter((b) => b.kategorie === "bewirtung").map((b) => bz(b)));
@@ -546,6 +579,13 @@ export function fragenText(s: Stand, z: Zeitraum, nummern: Map<string, string> =
     belege.filter((b) => b.steuerschuld).map((b) => bz(b, ` · ${b.steuerschuld === "eu" ? "sonstige Leistung EU" : "Bauleistung Inland"} · Steuer ${betrag(steuerschuldBetrag(b))} €`)),
   );
 
+  // R11 (Kosmetik #11): Wechsel von der Kleinunternehmerregelung – Vorsteuerberichtigung nur als Frage (unsicher, § 44 UStDV)
+  const kuBisF = (s.betrieb.ku_bis ?? "").trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(kuBisF) && kuBisF >= `${Number(z.von.slice(0, 4)) - 1}-01-01` && kuBisF <= z.bis)
+    dazu(
+      `Wechsel von der Kleinunternehmerregelung zur Regelbesteuerung nach dem ${datumDe(kuBisF)}: Gibt es Waren- oder Materialbestand und Anlagegüter aus der Kleinunternehmerzeit, die jetzt für steuerpflichtige Umsätze genutzt werden? Dann ist eine Vorsteuerberichtigung nach § 15a UStG möglich (Bagatellgrenzen nach § 44 UStDV – bitte prüfen).`,
+      ["- (Angabe des Betriebs)"],
+    );
   const anzahl = abschnitte.reduce((a, x) => a + x.zeilen.length, 0);
   const text = [
     `Amtlos – Fragen zum Zeitraum ${datumDe(z.von)} bis ${datumDe(z.bis)}`,
@@ -583,6 +623,8 @@ export interface PaketOptionen {
 }
 
 const ja = (b: boolean) => (b ? "ja" : "nein");
+/** Folgetag (ISO) */
+const tagDanach = (iso: string) => new Date(Date.UTC(Number(iso.slice(0, 4)), Number(iso.slice(5, 7)) - 1, Number(iso.slice(8, 10)) + 1)).toISOString().slice(0, 10);
 
 /**
  * ZIP des Pakets (R9 Performance): Fotos, PDFs und andere schon komprimierte Dateien unkomprimiert ablegen (Level 0) –
@@ -615,9 +657,29 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
   const belege = belegeImZeitraum(s, z);
   const kapital = kapitalgesellschaft(s);
   const tage = zuordnungsTage(s.unterlagen, s.betrieb, ist ? "ist" : "soll");
+  // R11: Ist-Versteuerung ohne Bilanz und Abschlagsrechnungen (Steuer entsteht mit der Zahlung): Erlös erst mit dem
+  // Zahlungseingang, zum Zahltag – Unbezahltes steht nur in der Rechnungsliste. Ein Storno eines Abschlags (Soll) zählt
+  // nur, wenn der Abschlag bezahlt war.
+  const istEuer = ist && !kapital;
+  const abschlagU = (u: Unterlage) => u.daten.abschlag === true;
+  const nachZahlung = (u: Unterlage) => !istGutschrift(u) && (istEuer || (abschlagU(u) && !istStorno(u)));
+  const abschlagStornoOhneZahlung = (u: Unterlage) => !istEuer && !istGutschrift(u) && abschlagU(u) && istStorno(u) && !s.unterlagen.find((x) => x.id === u.stornoZuId)?.bezahlt;
+  // R11 (Kosmetik #5): Gutschein zu 0 % ist kein steuerfreier Umsatz – nicht auf 8100/4100 buchen, nur Liste und Frage
+  const gutscheine = new Set(alle.filter((u) => gutscheinZuNullU(u, s.betrieb)).map((u) => u.id));
+  const imStapel = gestellteRechnungen(s).filter((u) => !gutscheine.has(u.id) && (nachZahlung(u) ? !!u.bezahlt && imZeitraum(u.bezahlt, z) : imZeitraum(String(u.daten.datum), z) && !abschlagStornoOhneZahlung(u)));
+  const ohneZahlung = alle.filter((u) => nachZahlung(u) && !u.bezahlt);
+  const ohneZahlungAbschlag = ohneZahlung.filter(abschlagU).length;
   // Gutschriften gehen als Aufwand in den Stapel (R10), Rechnungen als Erlös
-  const buchungen = [...buchungenAusRechnungen(alle.map((u) => rechnungFuerBuchung(u, s.betrieb, { tage, betriebKu: ku })), sb.kontenrahmen), ...buchungenAusBelegen(belege, sb.kontenrahmen, { nummern, kapitalgesellschaft: kapital })].sort((a, b) => a.datum.localeCompare(b.datum));
+  const buchungen = [
+    ...buchungenAusRechnungen(imStapel.map((u) => ({ ...rechnungFuerBuchung(u, s.betrieb, { tage, betriebKu: ku }), ...(nachZahlung(u) ? { datum: u.bezahlt! } : {}) })), sb.kontenrahmen),
+    ...buchungenAusBelegen(belege, sb.kontenrahmen, { nummern, kapitalgesellschaft: kapital, kleinunternehmer: ku }),
+  ].sort((a, b) => a.datum.localeCompare(b.datum));
   const nichtImStapel = belege.filter((b) => !belegImStapel(b, { kapitalgesellschaft: kapital }));
+  const kuBis = /^\d{4}-\d{2}-\d{2}$/.test((s.betrieb.ku_bis ?? "").trim()) ? s.betrieb.ku_bis!.trim() : "";
+  // R11 (Kosmetik #10): Buchungen, deren Steuerperiode (Feld 116) außerhalb des Stapelzeitraums liegt – zur Kontrolle nennen
+  const fremdePeriode = buchungen.filter((b) => b.steuerperiode && !imZeitraum(b.steuerperiode, z));
+  // R11: Barbelege gehen gegen Kasse – Kasseneinnahmen kennt Amtlos nicht, ohne Kassenbuch ergibt das ein Kassenminus
+  const barImStapel = belege.filter((b) => b.zahlung === "bar" && belegImStapel(b, { kapitalgesellschaft: kapital })).length;
   const mit13b = belege.filter((b) => b.steuerschuld).length;
   const rechtsform = rechtsformFuer(s);
   const dfv = s.profil["ust.dauerfristverlaengerung"] === true;
@@ -651,7 +713,7 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
     dateinamen.set(b.id, name);
     inhalt[`Belege/${name}`] = dateien[b.datei]!;
   }
-  inhalt[`Belege_${z.name}.csv`] = utf8(belegeCsv(s, z, dateinamen, sb.kontenrahmen, nummern));
+  inhalt[`Belege_${z.name}.csv`] = utf8(belegeCsv(s, z, dateinamen, sb.kontenrahmen, nummern, ku));
   const fragen = fragenText(s, z, nummern);
   inhalt[`Fragen_${z.name}.txt`] = utf8(fragen.text);
   const ohneXmlListe: string[] = [];
@@ -673,7 +735,22 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
   const wichtig = [
     ...(kassenSatz ? kassenSatz.split("\r\n") : []),
     ...(nichtImStapel.length ? [`${nichtImStapel.length} ${nichtImStapel.length === 1 ? "Beleg steht" : "Belege stehen"} nur in der Belegliste, nicht im Buchungsstapel: Personal (Lohn bucht die Lohnbuchhaltung)${kapital ? " und privat ausgelegte Belege der Gesellschaft (Verrechnungskonto Gesellschafter bitte festlegen)" : ""}.`] : []),
-    ...(mit13b ? [`${mit13b} ${mit13b === 1 ? "Beleg" : "Belege"} mit Steuerschuldnerschaft des Leistungsempfängers (§ 13b UStG)${sb.kontenrahmen === "SKR03" ? " – im Stapel auf 3120 (Bauleistung Inland) bzw. 3123 (sonstige Leistung EU)" : " – im Stapel auf dem Kategorie-Konto ohne Steuer, bitte auf das § 13b-Konto umbuchen"}${ku ? "; Kleinunternehmer: ohne Vorsteuerabzug, bitte Konto prüfen" : ""}.`] : []),
+    // R11: Konten je nach Vorsteuerabzug – der Satz beschreibt, was im Stapel tatsächlich steht
+    ...(mit13b ? [steuerschuldSatz(belege, sb.kontenrahmen, ku)] : []),
+    ...(ohneZahlung.length
+      ? [
+          istEuer
+            ? `Ist-Versteuerung: Rechnungen stehen erst mit dem Zahlungseingang im Buchungsstapel (Belegdatum und Feld „Datum Zuord. Steuerperiode“ = Zahltag). ${ohneZahlung.length} ${ohneZahlung.length === 1 ? "Rechnung" : "Rechnungen"} dieses Zeitraums ohne Zahlungsvermerk ${ohneZahlung.length === 1 ? "steht" : "stehen"} nur in der Rechnungsliste. Bitte vor dem Import prüfen, ob DATEV das ohne OPOS richtig zuordnet (Testimport).`
+            : `${ohneZahlungAbschlag} ${ohneZahlungAbschlag === 1 ? "Abschlagsrechnung" : "Abschlagsrechnungen"} ohne Zahlungsvermerk ${ohneZahlungAbschlag === 1 ? "steht" : "stehen"} nur in der Rechnungsliste, nicht im Buchungsstapel – die Umsatzsteuer entsteht erst mit der Zahlung (§ 13 Abs. 1 Nr. 1 a Satz 4 UStG); bezahlte Abschläge stehen mit dem Zahltag im Stapel.`,
+        ]
+      : []),
+    ...(fremdePeriode.length
+      ? [`${fremdePeriode.length} ${fremdePeriode.length === 1 ? "Buchung hat" : "Buchungen haben"} im Feld „Datum Zuord. Steuerperiode“ einen Tag außerhalb des Stapelzeitraums (${[...new Set(fremdePeriode.map((b) => b.belegfeld1))].slice(0, 10).join(", ")}): Die Umsatzsteuer gehört nach der Zuordnung der App in einen anderen Voranmeldungszeitraum – bitte prüfen.`]
+      : []),
+    ...(gutscheine.size ? [`${gutscheine.size} ${gutscheine.size === 1 ? "Rechnung" : "Rechnungen"} über Gutscheine zu 0 % ${gutscheine.size === 1 ? "steht" : "stehen"} nur in der Rechnungsliste, nicht im Buchungsstapel – Einzweck- oder Mehrzweck-Gutschein (§ 3 Abs. 13–15 UStG)? Siehe Fragen.`] : []),
+    ...(barImStapel
+      ? [`${barImStapel} ${barImStapel === 1 ? "Barbeleg steht" : "Barbelege stehen"} im Stapel gegen Kasse (${sb.kontenrahmen === "SKR03" ? "1000" : "1600"}). Kasseneinnahmen und Bareinlagen kennt Amtlos nicht – ohne Kassenbuch ergibt das einen negativen Kassenbestand (§ 146 Abs. 1 Satz 2 AO). Bitte Kassenbuch liefern bzw. privat bar bezahlte Belege auf Privateinlage umbuchen (siehe Fragen).`]
+      : []),
     ...(ku ? [] : [`Nullsteuersatz-Umsätze (§ 12 Abs. 3 UStG, Kz 87) stehen vorerst auf dem Konto für steuerfreie Umsätze (${sb.kontenrahmen === "SKR03" ? "8100" : "4100"}) – bitte bei Bedarf umbuchen.`].filter(() => alle.some((u) => eRechnungAus(u.daten, s.betrieb).daten.steuerart === "nullsatz"))),
   ];
   inhalt["LIESMICH.txt"] = utf8(
@@ -688,7 +765,7 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
       `- Rechtsform: ${rechtsform ? `${rechtsform.text}${rechtsform.ausCheck ? " (laut Pflichten-Check)" : ""}` : "nicht angegeben"}`,
       `- Steuernummer: ${s.betrieb.steuernummer.trim() || "nicht angegeben"}`,
       `- USt-IdNr.: ${s.betrieb.ust_idnr.trim() || "nicht angegeben"}`,
-      `- Kleinunternehmer (§ 19 UStG): ${ja(ku)}`,
+      `- Kleinunternehmer (§ 19 UStG): ${kuBis ? `bis ${datumDe(kuBis)}, ab ${datumDe(tagDanach(kuBis))} regelbesteuert (laut App)` : ja(ku)}`,
       `- Versteuerung: ${versteuerung}`,
       ...(ku ? [] : [`- Dauerfristverlängerung (laut Pflichten-Check): ${s.profil["ust.dauerfristverlaengerung"] === undefined ? "nicht angegeben" : ja(dfv)}`]),
       `- Kontenrahmen: ${sb.kontenrahmen}`,
@@ -719,12 +796,14 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
       `- Abschreibungen (AfA) und Anlagenverzeichnis.`,
       `- Lohnjournal bzw. Lohnabrechnungen.`,
       ``,
-      `Zuordnung: Rechnungen nach Rechnungsdatum, Belege nach Belegdatum. Im Buchungsstapel stehen bei Rechnungen das Leistungsdatum (Feld „Leistungsdatum“) und der Tag, nach dem die App die Umsatzsteuer zuordnet (Feld „Datum Zuord. Steuerperiode“). Forderungen und Verbindlichkeiten gehen auf die Konten ohne Kontokorrent (${sb.kontenrahmen === "SKR03" ? "1410/1610" : "1210/3310"}).${pdfs ? "" : " Die PDFs der Ausgangsrechnungen liegen beim Betrieb."}`,
+      `Zuordnung: Rechnungen nach Rechnungsdatum${istEuer ? " (im Buchungsstapel nach Zahlungseingang)" : ""}, Belege nach Belegdatum. Im Buchungsstapel stehen bei Rechnungen das Leistungsdatum (Feld „Leistungsdatum“) und der Tag, nach dem die App die Umsatzsteuer zuordnet (Feld „Datum Zuord. Steuerperiode“). Forderungen und Verbindlichkeiten gehen auf die Konten ohne Kontokorrent (${sb.kontenrahmen === "SKR03" ? "1410/1610" : "1210/3310"}).${pdfs ? "" : " Die PDFs der Ausgangsrechnungen liegen beim Betrieb."}`,
       // Kleinunternehmer geben in der Regel keine Voranmeldung ab – dann kein Satz dazu; sonst nach „Mein Betrieb“ (Soll/Ist)
       ...(ku
         ? []
         : [
-            ist
+            istEuer
+              ? `Die Umsatzsteuer-Voranmeldung ordnet Rechnungen wie der Buchungsstapel nach dem Zahlungseingang zu (Ist-Versteuerung, § 20 UStG); eine Stornorechnung zählt mit der vermerkten Erstattung. Die Rechnungsliste bleibt nach Rechnungsdatum.`
+              : ist
               ? `Die Umsatzsteuer-Voranmeldung ordnet Rechnungen dagegen nach dem Zahlungseingang zu (Ist-Versteuerung, § 20 UStG); eine Stornorechnung zählt mit der vermerkten Erstattung – an den Grenzen eines Zeitraums können die Summen dieses Pakets deshalb von der Voranmeldung abweichen.`
               : `Die Umsatzsteuer-Voranmeldung ordnet Rechnungen dagegen nach dem Leistungsdatum zu (Soll-Versteuerung) – an den Grenzen eines Zeitraums können die Summen dieses Pakets deshalb von der Voranmeldung abweichen.`,
           ]),

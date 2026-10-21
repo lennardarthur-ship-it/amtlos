@@ -55,14 +55,42 @@ function silben(teil: string): string {
   return out;
 }
 
+/**
+ * R11 (UX #11): feste Trennstellen für Wörter, an denen die Silbenregel scheitert („wie-der-hers-tel-len“) – nach Duden.
+ * Schlüssel klein geschrieben, „·“ markiert die Trennstelle.
+ */
+const AUSNAHMEN: Record<string, string> = Object.fromEntries(
+  ["wie·der·her·stel·len", "wei·ter·emp·feh·len", "Jah·res·ab·schluss", "Be·triebs·arzt", "Be·triebs·ärz·tin", "Fach·kraft", "Kon·troll·map·pe", "Ar·beits·zeit·nach·weis", "Schlüs·sel·quit·tung"].map((w) => [w.replace(/·/g, "").toLowerCase(), w]),
+);
+/**
+ * Bekannte erste Wortteile mit Fugen-s (R11, UX #11): „Betriebs·arzt“, nicht „Betrieb-sarzt“ – die Silbenregel trennt
+ * sonst vor dem letzten Mitlaut und reißt das Fugen-s vom ersten Teil.
+ */
+const VORNE = /^(betriebs|jahres|arbeits|geschäfts|sicherheits|gesundheits|unternehmens|wirtschafts|rechnungs|wieder|weiter)(\p{L}{3,})$/iu;
+
+/** Wortteil ohne bekannte Fuge: Ausnahme, sonst bekannter erster Wortteil, sonst Silben. */
+function teilTrennen(t: string): string {
+  const fest = AUSNAHMEN[t.toLowerCase()];
+  if (fest) {
+    // Groß- und Kleinschreibung des Originals behalten
+    let i = 0;
+    return [...fest].map((c) => (c === "·" ? "\u00AD" : t[i++]!)).join("");
+  }
+  const m = VORNE.exec(t);
+  if (m) return `${m[1]!.length >= 10 ? silben(m[1]!) : m[1]}\u00AD${teilTrennen(m[2]!)}`;
+  return t.length >= 10 ? silben(t) : t;
+}
+
 export function trennen(text: string): string {
   // nur Wörter ab 12 Zeichen – kurze passen immer; Adressen und Links bleiben unverändert
   if (/@|:\/\/|www\./.test(text)) return text;
   return text.replace(/\p{L}{12,}/gu, (wort) =>
-    fugen(wort)
-      // bekannte Wortteile („bedingungen“) bleiben ganz – getrennt wird nur, was sonst zu lang bliebe
-      .map(({ t, bekannt }) => (!bekannt && t.length >= 10 ? silben(t) : t))
-      .join("\u00AD"),
+    AUSNAHMEN[wort.toLowerCase()]
+      ? teilTrennen(wort)
+      : fugen(wort)
+          // bekannte Wortteile („bedingungen“) bleiben ganz – getrennt wird nur, was sonst zu lang bliebe
+          .map(({ t, bekannt }) => (bekannt ? t : teilTrennen(t)))
+          .join("\u00AD"),
   );
 }
 

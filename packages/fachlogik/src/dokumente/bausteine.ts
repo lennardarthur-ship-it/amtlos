@@ -1213,15 +1213,15 @@ export const VVT: Vorschlag[] = [
   "titel": "Kundenkartei mit Gesundheitsangaben (z. B. Allergien, Unverträglichkeiten)",
   "werte": {
    "bezeichnung": "Kundenkartei mit Gesundheitsangaben (z. B. Allergien, Unverträglichkeiten)",
-   "zweck": "Bearbeitung von Aufträgen und Kundenbeziehungen einschließlich Rechnungsstellung; ggf. postalische Werbung an Bestandskunden",
-   "rechtsgrundlage": "Art. 6 Abs. 1 lit. b DSGVO (Vertrag/vorvertragliche Maßnahmen); Art. 6 Abs. 1 lit. c DSGVO i. V. m. § 147 AO, § 257 HGB (Aufbewahrung); Art. 6 Abs. 1 lit. f DSGVO (postalische Bestandskundenwerbung). Bei Gesundheitsangaben (z. B. Allergien/Unverträglichkeiten) ausdrückliche Einwilligung nach Art. 9 Abs. 2 lit. a DSGVO.",
+   "zweck": "Sichere Behandlung: Berücksichtigung von Allergien, Unverträglichkeiten und Gegenanzeigen (Kontraindikationen)",
+   "rechtsgrundlage": "Gesundheitsangaben: ausdrückliche Einwilligung nach Art. 9 Abs. 2 lit. a DSGVO – freiwillig und jederzeit widerrufbar (Art. 7 Abs. 3 DSGVO); die Einwilligung wird nachgewiesen (Art. 7 Abs. 1 DSGVO). Übrige Kundendaten: Art. 6 Abs. 1 lit. b DSGVO.",
    "betroffene": "Kundinnen und Kunden, Interessenten",
    "datenarten": "Name, Anschrift, Kontaktdaten (Telefon, E-Mail), Angaben zum Auftrag / Leistungshistorie, ggf. Bankverbindung, ggf. Gesundheitsdaten (nur mit ausdrücklicher Einwilligung)",
-   "empfaenger": "Steuerberater (eigenständiger Verantwortlicher), IT-/Software-Dienstleister (Auftragsverarbeiter)",
-   "loeschfrist": "Kundenstammdaten werden gelöscht, sobald sie für den Zweck nicht mehr erforderlich sind und keine Aufbewahrungspflicht mehr besteht (z. B. wenn über mehrere Jahre keine Aufträge mehr erteilt werden). Rechnungsrelevante Unterlagen: Buchungsbelege 8 Jahre (§ 147 Abs. 1 Nr. 4, Abs. 3 AO; § 257 Abs. 1 Nr. 4, Abs. 4 HGB), Geschäftsbriefe 6 Jahre (§ 147 Abs. 1 Nr. 2, 3 AO; § 257 Abs. 1 Nr. 2, 3 HGB), jeweils ab Ende des Kalenderjahres.",
+   "empfaenger": "IT-/Software-Dienstleister (Auftragsverarbeiter)",
+   "loeschfrist": "Gesundheitsangaben werden gelöscht, sobald die Einwilligung widerrufen wird oder sie für die Behandlung nicht mehr benötigt werden (Art. 17 Abs. 1 lit. a, b DSGVO).",
    "drittland": "keine Übermittlung in Drittländer"
   },
-  "quelle": "BayLDA"
+  "quelle": "BayLDA; Art. 7, Art. 9 Abs. 2 lit. a DSGVO"
  },
  {
   "titel": "Terminvereinbarung (telefonisch, vor Ort oder Online-Buchung)",
@@ -1270,7 +1270,7 @@ export const VVT: Vorschlag[] = [
   "werte": {
    "bezeichnung": "Personalverwaltung (Personalakte, Arbeitszeit)",
    "zweck": "Personaladministration, Personalführung, Arbeitszeitverwaltung",
-   "rechtsgrundlage": "Art. 6 Abs. 1 lit. b und lit. c DSGVO (Arbeitsvertrag; arbeitsrechtliche Pflichten, z. B. Arbeitszeitaufzeichnung)",
+   "rechtsgrundlage": "Art. 6 Abs. 1 lit. b und lit. c DSGVO (Arbeitsvertrag; arbeitsrechtliche Pflichten, z. B. Arbeitszeitaufzeichnung); Krankheitszeiten (Arbeitsunfähigkeit) als Gesundheitsdaten zusätzlich Art. 9 Abs. 2 lit. b DSGVO",
    "betroffene": "Beschäftigte, Auszubildende",
    "datenarten": "Name, Anschrift, Vertragsdaten, Zeitwirtschaftsdaten, Daten zur Arbeitsleistung, Leistungsbeurteilungen, Urlaubs- und Krankheitszeiten (ohne Diagnosen)",
    "empfaenger": "Steuerberater / Lohnbüro, ggf. Anbieter der Zeiterfassungssoftware (Auftragsverarbeiter)",

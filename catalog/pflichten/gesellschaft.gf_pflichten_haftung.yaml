@@ -1,17 +1,25 @@
 # Katalog B.17 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.gf_pflichten_haftung
-version: 2
+version: 3
 katalog_nr: B.17
 titel:
   de: Pflichten und Haftung der Geschäftsführung kennen
 kurz:
   de: Als Geschäftsführerin oder Geschäftsführer hast du besondere Pflichten und kannst persönlich haften.
 erklaerung:
-  de: Die Geschäftsführung einer GmbH oder UG hat gesetzliche Pflichten. Wer sie verletzt, kann persönlich haften. Amtlos
-    erklärt die Pflichten allgemein; für deinen Einzelfall hilft eine Rechtsberatung.
+  de: Die Geschäftsführung einer GmbH oder UG hat gesetzliche Pflichten. Wer sie verletzt, kann persönlich haften. Dazu gehören
+    vor allem, die Sozialversicherungsbeiträge der Beschäftigten abzuführen (§ 266a StGB), Steuern zu erklären und zu zahlen
+    (§§ 34, 69 AO), nach Eintritt der Insolvenzreife keine Zahlungen mehr zu leisten (§ 15b InsO), bei Verlust der Hälfte des
+    Stammkapitals die Gesellschafterversammlung einzuberufen (§ 49 Abs. 3 GmbHG) und die Gesellschafterliste aktuell zu halten
+    (§ 40 GmbHG). Für deinen Einzelfall hilft eine Rechtsberatung.
 rechtsgrundlage:
-- GmbHG
+- § 43 GmbHG
+- § 266a StGB
+- §§ 34, 69 AO
+- § 15b InsO
+- § 49 Abs. 3 GmbHG
+- § 40 GmbHG
 kategorie: gesellschaft
 ausloeser:
   feld: abgeleitet.ist_kapitalgesellschaft
@@ -43,6 +51,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/gmbhg/
   abgerufen: null
 fachlich_zu_pruefen:
+- 'Normen aus dem Nutzertest Tischlerei (R11) ergänzt – Auswahl und Rechtsgrundlage § 43 GmbHG bestätigen'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Inhalt der Erklärung (welche Pflichten, § 43 GmbHG) fachlich festlegen – Spezifikation nennt nur „Pflichten und Haftung
   erklären“

@@ -446,7 +446,7 @@ export function Abschnitt({ titel, rechts, children }: { titel?: string; rechts?
  * Zeile in einer Liste: tippbar, Haarlinie unten (eingerückt ab dem Text, wie in iOS). `symbol` setzt eine getönte
  * Kachel davor, `links` ein eigenes Element (z. B. Status-Kreis).
  */
-export function Zeile({ links, symbol, ton, titel, text, wert, marke, rechts, onPress, letzte, gefahr, label }: { links?: ReactNode; symbol?: string; ton?: Ton; titel: string; text?: string; wert?: string; marke?: { text: string; ton: Ton }; rechts?: ReactNode; onPress?: () => void; letzte?: boolean; gefahr?: boolean; label?: string }) {
+export function Zeile({ links, symbol, ton, titel, text, wert, marke, rechts, onPress, letzte, gefahr, label, link }: { links?: ReactNode; symbol?: string; ton?: Ton; titel: string; text?: string; wert?: string; marke?: { text: string; ton: Ton }; rechts?: ReactNode; onPress?: () => void; letzte?: boolean; gefahr?: boolean; label?: string; /** R11 (UX #18): öffnet eine Website – VoiceOver sagt „Link“ und dass man die App verlässt */ link?: boolean }) {
   const f = useFarben();
   // große Schrift: nichts abschneiden – die Zeile wird dann eben höher
   const gross = useGrosseSchrift();
@@ -479,7 +479,7 @@ export function Zeile({ links, symbol, ton, titel, text, wert, marke, rechts, on
   );
   if (!onPress) return inhalt(false);
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress}>
+    <Pressable accessibilityRole={link ? "link" : "button"} accessibilityLabel={label} accessibilityHint={link ? TEXT.r11_oeffnet_website : undefined} onPress={onPress}>
       {({ pressed }) => inhalt(pressed)}
     </Pressable>
   );
@@ -561,9 +561,11 @@ export function feldRahmen(f: Farben, zustand: { fokus?: boolean; fehler?: boole
   return {
     minHeight: 50,
     borderRadius: RADIUS.klein,
-    borderWidth: 2,
-    borderColor: zustand.fehler ? f.frist : zustand.fokus ? f.amt : "transparent",
-    paddingHorizontal: 14,
+    // R11 (UX #17): ohne Fokus ein feiner Rand in `linie` – die Füllung allein hob sich kaum ab; Fokus und Fehler 2 pt
+    // (der Innenabstand gleicht den breiteren Rand aus, nichts springt)
+    borderWidth: zustand.fehler || zustand.fokus ? 2 : 1,
+    borderColor: zustand.fehler ? f.frist : zustand.fokus ? f.amt : f.linie,
+    paddingHorizontal: zustand.fehler || zustand.fokus ? 14 : 15,
     // überall dieselbe gefüllte graue Fläche mit Fokusrahmen (A7) – auf dem Blatt wie in Karten klar abgegrenzt
     backgroundColor: f.flaeche,
   };

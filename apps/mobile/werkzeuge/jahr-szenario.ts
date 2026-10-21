@@ -132,6 +132,9 @@ export function standBauen(): Bau {
     "beschaeftigte.azubi": 0,
     "beschaeftigte.jugendlich": 0,
     "personal.sofortmeldebranchen": ["gastronomie"],
+    // R11 (Rechtsprüfung Befund 7): IfSG-Pflichten nur bei Arbeit mit Lebensmitteln, Bescheinigung nur erstmals
+    "ifsg.beschaeftigte": "erstmals",
+    "ifsg.selbst": "bescheinigung",
     "arbeitsschutz.elektrische_geraete": true,
     "arbeitsschutz.gefahrstoffe": true,
     "datenverarbeitung.arten": ["kundendaten", "beschaeftigtendaten"],
@@ -200,6 +203,8 @@ export function standBauen(): Bau {
         });
         if (u.daten.nummer !== r.nummer) auffaellig.push(`Rechnungsnummer: erwartet ${r.nummer}, App vergab ${String(u.daten.nummer)}.`);
         if (!u.festgeschrieben) auffaellig.push(`Rechnung ${r.nummer} ist nach dem Teilen nicht festgeschrieben.`);
+        // R11: Ersatzrechnung wie in der App über „Kopie“ der stornierten Rechnung – sie merkt sich das Original (`ersetzt`)
+        if (r.ersetzt) s = { ...s, unterlagen: s.unterlagen.map((x) => (x.id === r.id ? { ...x, ersetzt: r.ersetzt } : x)) };
         if (r.bezahlt) s = bezahltSetzen(s, r.id, r.bezahlt, t(r.bezahlt, 15));
       },
     });

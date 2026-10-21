@@ -66,6 +66,21 @@
   "geprueft": false
  },
  {
+  "id": "arbeitsschutz.unterweisung_jugendliche",
+  "titel": "Jugendliche halbjährlich unterweisen",
+  "kurz": "Beschäftigte unter 18 unterweist du vor Beginn und danach mindestens alle sechs Monate über Unfall- und Gesundheitsgefahren.",
+  "rechtsgrundlage": [
+   "§ 29 JArbSchG"
+  ],
+  "quellen": [
+   {
+    "titel": "Jugendarbeitsschutzgesetz § 29",
+    "url": "https://www.gesetze-im-internet.de/jarbschg/__29.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
   "id": "arbeitsschutz.unterweisung_wiederholen",
   "titel": "Unterweisung jährlich wiederholen",
   "kurz": "Mindestens einmal im Jahr wiederholst du die Unterweisung.",
@@ -275,7 +290,8 @@
   "titel": "Wirtschaftlich Berechtigte ans Transparenzregister melden",
   "kurz": "Melde, wer hinter deiner Gesellschaft steht, und halte die Angaben aktuell.",
   "rechtsgrundlage": [
-   "GwG"
+   "§ 19 GwG",
+   "§ 20 GwG"
   ],
   "quellen": [
    {
@@ -307,7 +323,7 @@
  {
   "id": "ki.kompetenz",
   "titel": "KI-Kompetenz der Beschäftigten sicherstellen",
-  "kurz": "Wer im Unternehmen mit KI arbeitet, braucht ausreichende KI-Kompetenz – sorge für Schulung und halte sie fest.",
+  "kurz": "Wer im Unternehmen mit KI arbeitet, sollte ausreichende KI-Kompetenz haben – fördere sie durch Schulung und halte das fest.",
   "rechtsgrundlage": [
    "Art. 4 KI-VO"
   ],
@@ -315,6 +331,10 @@
    {
     "titel": "KI-Verordnung (EU) 2024/1689",
     "url": "https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32024R1689"
+   },
+   {
+    "titel": "FGS – EU AI Act, was ab dem 2. August 2026 gilt und was verschoben wurde",
+    "url": "https://www.fgs.de/news-and-insights/blog/detail/eu-ai-act-was-ab-dem-2-august-2026-gilt-und-was-verschoben-wurde"
    }
   ],
   "geprueft": false
@@ -376,6 +396,41 @@
    {
     "titel": "Mindestlohngesetz § 17",
     "url": "https://www.gesetze-im-internet.de/milog/__17.html"
+   },
+   {
+    "titel": "TK – Sofortmeldung zu Beschäftigungsbeginn (Branchenkatalog ab 1.1.2026)",
+    "url": "https://www.tk.de/firmenkunden/fachthemen/meldeverfahren-fachthemen/sofortmeldung-zu-beschaeftigungsbeginn-2035960"
+   },
+   {
+    "titel": "HWK Chemnitz – Merkblatt SchwarzArbMoDiG (Stand Januar 2026)",
+    "url": "https://www.hwk-chemnitz.de/fileadmin/user_upload/Betriebsfuehrung/Handwerks-und-Gewerberolle/schwarzarbeit/Merkblatt_SchwarzArbMoDiG.pdf"
+   },
+   {
+    "titel": "CMS – Gesetz zur Modernisierung der Schwarzarbeitsbekämpfung beschlossen",
+    "url": "https://cms.law/de/deu/legal-updates/gesetz-zur-modernisierung-der-schwarzarbeitsbekaempfung-beschlossen"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "personal.ausweis_hinweis",
+  "titel": "Schriftlich auf die Ausweispflicht hinweisen",
+  "kurz": "In deiner Branche weist du jede neue beschäftigte Person vor Arbeitsbeginn schriftlich darauf hin, dass sie bei der Arbeit einen Ausweis dabeihaben muss.",
+  "rechtsgrundlage": [
+   "§ 2a Abs. 2 SchwarzArbG"
+  ],
+  "quellen": [
+   {
+    "titel": "Schwarzarbeitsbekämpfungsgesetz § 2a",
+    "url": "https://www.gesetze-im-internet.de/schwarzarbg_2004/__2a.html"
+   },
+   {
+    "titel": "HWK Chemnitz – Merkblatt SchwarzArbMoDiG (Stand Januar 2026)",
+    "url": "https://www.hwk-chemnitz.de/fileadmin/user_upload/Betriebsfuehrung/Handwerks-und-Gewerberolle/schwarzarbeit/Merkblatt_SchwarzArbMoDiG.pdf"
+   },
+   {
+    "titel": "CMS – Gesetz zur Modernisierung der Schwarzarbeitsbekämpfung beschlossen",
+    "url": "https://cms.law/de/deu/legal-updates/gesetz-zur-modernisierung-der-schwarzarbeitsbekaempfung-beschlossen"
    }
   ],
   "geprueft": false
@@ -436,6 +491,18 @@
    {
     "titel": "Sozialgesetzbuch IV § 28a",
     "url": "https://www.gesetze-im-internet.de/sgb_4/__28a.html"
+   },
+   {
+    "titel": "TK – Sofortmeldung zu Beschäftigungsbeginn (Branchenkatalog ab 1.1.2026)",
+    "url": "https://www.tk.de/firmenkunden/fachthemen/meldeverfahren-fachthemen/sofortmeldung-zu-beschaeftigungsbeginn-2035960"
+   },
+   {
+    "titel": "HWK Chemnitz – Merkblatt SchwarzArbMoDiG (Stand Januar 2026)",
+    "url": "https://www.hwk-chemnitz.de/fileadmin/user_upload/Betriebsfuehrung/Handwerks-und-Gewerberolle/schwarzarbeit/Merkblatt_SchwarzArbMoDiG.pdf"
+   },
+   {
+    "titel": "CMS – Gesetz zur Modernisierung der Schwarzarbeitsbekämpfung beschlossen",
+    "url": "https://cms.law/de/deu/legal-updates/gesetz-zur-modernisierung-der-schwarzarbeitsbekaempfung-beschlossen"
    }
   ],
   "geprueft": false

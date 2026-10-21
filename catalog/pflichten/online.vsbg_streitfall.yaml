@@ -1,0 +1,50 @@
+# R11 (Rechtsprüfung T-112): Informationspflicht nach § 37 VSBG nach Entstehen einer Streitigkeit – unabhängig von der Betriebsgröße
+schema_version: 1
+id: online.vsbg_streitfall
+version: 1
+katalog_nr: G.69
+titel:
+  de: Im Streitfall auf die Verbraucherschlichtung hinweisen
+kurz:
+  de: Kannst du einen Streit mit einem Verbraucher nicht beilegen, nennst du ihm eine zuständige Schlichtungsstelle und sagst, ob du teilnimmst.
+erklaerung:
+  de: Konnte eine Streitigkeit aus einem Vertrag mit einem Verbraucher nicht beigelegt werden, weist du in Textform auf eine für ihn
+    zuständige Verbraucherschlichtungsstelle mit Anschrift und Website hin. Dabei sagst du, ob du an einem Verfahren dort teilnimmst
+    oder teilnehmen musst (§ 37 VSBG). Das gilt unabhängig von der Größe deines Betriebs – auch wenn du auf der Website nichts angeben musst.
+rechtsgrundlage:
+- § 37 VSBG
+kategorie: online
+ausloeser:
+  feld: profil.kunden.segmente
+  op: enthaelt
+  wert: b2c
+  label:
+    de: Du verkaufst an Verbraucher.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: niedrig
+automatisierung: hinweis
+einordnung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Verbraucherstreitbeilegungsgesetz § 37
+  url: https://www.gesetze-im-internet.de/vsbg/__37.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Neu nach Rechtsprüfung R11 (T-112) – ob das VSBG 2025/26 geändert wurde, ist laut Prüferin unsicher; Wortlaut bestätigen'
+- 'Als Hinweis geführt, weil die Pflicht erst mit einer Streitigkeit entsteht'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

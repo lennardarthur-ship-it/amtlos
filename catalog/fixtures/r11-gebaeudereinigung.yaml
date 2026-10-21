@@ -1,0 +1,27 @@
+persona: kleiner_betrieb
+beschreibung: "R11 (Nutzertest Gebäudereinigung): Hauptbranche Gebäudereinigung löst Sofortmeldung, § 17 MiLoG, Ausweis-Hinweis und Verzeichnis der Handwerkskammer (Anlage B1) aus; Beschäftigte aus Drittstaaten → Aufenthaltstitel prüfen"
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2026-08-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [gebaeudereinigung]
+  profil.beschaeftigte.gesamt: 4
+  profil.beschaeftigte.minijob: 0
+  profil.personal.drittstaaten: true
+  profil.kunden.segmente: [b2b]
+  profil.bundesland: NW
+ereignisse:
+  - { typ: erste_einstellung, datum: "2026-08-01" }
+  - { typ: einstellung, datum: "2026-10-05" }
+erwartet:
+  personal.sofortmeldung: gilt
+  personal.arbeitszeit_milog: gilt
+  personal.ausweis_hinweis: gilt
+  gruendung.handwerk_verzeichnis: gilt
+  personal.aufenthaltstitel: gilt
+  branche.gastro_ifsg_bescheinigung: gilt_nicht
+  online.vsbg_streitfall: gilt_nicht
+  arbeitsschutz.arbeitsmittel_pruefen: gilt
+termine_enthaelt:
+  personal.aufenthaltstitel: [["aenderung-20261005", "2026-10-04"]]

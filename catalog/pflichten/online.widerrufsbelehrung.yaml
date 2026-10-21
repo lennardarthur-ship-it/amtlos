@@ -1,7 +1,7 @@
 # Katalog G.68 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.widerrufsbelehrung
-version: 2
+version: 3
 katalog_nr: G.68
 titel:
   de: Über das Widerrufsrecht belehren
@@ -56,6 +56,8 @@ fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Muster-Widerrufsbelehrung erst nach Prüfung
 - Ausnahmen vom Widerrufsrecht als Hinweis
+- 'Muster nach Gestaltungshinweis 3 (Widerrufsbutton, Anlage 1 zu Art. 246a § 1 Abs. 2 S. 2 EGBGB) anpassen (Rechtsprüfung R11 Befund 9)'
+- 'Verträge außerhalb von Geschäftsräumen als eigene Pflicht (branche.widerruf_ausserhalb_geschaeftsraeume)'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:

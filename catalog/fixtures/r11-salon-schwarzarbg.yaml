@@ -1,0 +1,46 @@
+persona: kleiner_betrieb
+beschreibung: "R11 (Rechtsprüfung Befund 1, 2, 10; T-99/T-100): Friseursalon mit Team und Azubi unter 18 – Sofortmeldung, § 17 MiLoG und Ausweis-Hinweis über die Branche (SchwarzArbMoDiG), halbjährliche Unterweisung und Nachuntersuchung, Widerruf bei Terminen zu Hause, Preisaushang"
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2019-03-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [beauty_kosmetik]
+  profil.beschaeftigte.gesamt: 3
+  profil.beschaeftigte.minijob: 0
+  profil.beschaeftigte.jugendlich: 1
+  profil.beschaeftigte.azubi: 1
+  profil.kunden.segmente: [b2c]
+  profil.vertrieb.kanaele: [ladengeschaeft]
+  profil.vertrieb.ausserhalb_geschaeftsraeume: true
+  profil.produkte.arten: [dienstleistung]
+  profil.erlaubnis.gaststaette: false
+  profil.bundesland: SN
+ereignisse:
+  - { typ: erste_einstellung, datum: "2019-03-01" }
+  - { typ: einstellung, datum: "2026-09-01" }
+  - { typ: unterweisung_durchgefuehrt, datum: "2026-09-01" }
+erwartet:
+  personal.sofortmeldung: gilt
+  personal.arbeitszeit_milog: gilt
+  personal.ausweis_hinweis: gilt
+  arbeitsschutz.unterweisung_jugendliche: gilt
+  personal.jugend_nachuntersuchung: gilt
+  branche.widerruf_ausserhalb_geschaeftsraeume: gilt
+  branche.preisverzeichnis_dienstleistung: gilt
+  branche.gastro_preisverzeichnis: gilt_nicht
+  online.vsbg_streitfall: gilt
+  it_sicherheit.nis2_pruefen: gilt_nicht
+  personal.aufenthaltstitel: unbekannt
+  personal.ausbildungsverguetung: gilt
+  personal.lohnnachweis_bg: gilt
+  arbeitsschutz.feuerloescher: gilt
+  arbeitsschutz.arbeitsmittel_pruefen: gilt_nicht
+termine_enthaelt:
+  personal.lohnnachweis_bg: [["2027-02", "2027-02-16"]]
+  personal.sofortmeldung: [["aenderung-20260901", "2026-09-01"]]
+  personal.ausweis_hinweis: [["aenderung-20260901", "2026-08-31"]]
+  arbeitsschutz.unterweisung_jugendliche: [["aenderung-20260901", "2027-03-01"]]
+  personal.jugend_nachuntersuchung: [["aenderung-20260901", "2027-09-01"]]
+fehlende_fakten:
+  personal.aufenthaltstitel: [profil.personal.drittstaaten]

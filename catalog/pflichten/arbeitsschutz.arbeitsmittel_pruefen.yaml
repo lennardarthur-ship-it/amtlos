@@ -1,0 +1,68 @@
+# R11 (Nutzertest Tischlerei Befund 6): Prüfung von Arbeitsmitteln nach § 14 BetrSichV – Maschinen, Leitern, Absauganlagen
+schema_version: 1
+id: arbeitsschutz.arbeitsmittel_pruefen
+version: 1
+katalog_nr: E.53
+titel:
+  de: Arbeitsmittel prüfen lassen
+kurz:
+  de: Maschinen, Leitern, Absauganlagen und andere Arbeitsmittel lässt du regelmäßig durch eine befähigte Person prüfen und hältst das fest.
+erklaerung:
+  de: Arbeitsmittel, deren Sicherheit von der Montage oder vom Zustand abhängt, lässt du vor der ersten Verwendung und danach
+    wiederkehrend von einer zur Prüfung befähigten Person prüfen (§ 14 BetrSichV). Art, Umfang und Abstände der Prüfungen legst du in
+    der Gefährdungsbeurteilung fest (§ 3 Abs. 6 BetrSichV). Die Ergebnisse dokumentierst du. Elektrische Geräte haben eine eigene Pflicht.
+rechtsgrundlage:
+- § 3 Abs. 6 BetrSichV
+- § 14 BetrSichV
+kategorie: arbeitsschutz
+branchen:
+- handwerk
+- bau
+- gebaeudereinigung
+ausloeser:
+  all:
+  - feld: abgeleitet.hat_beschaeftigte
+    op: ==
+    wert: true
+    label:
+      de: Du beschäftigst mindestens eine Person.
+  - feld: profil.taetigkeit.branchen
+    op: enthaelt_eines
+    wert:
+    - handwerk
+    - bau
+    - gebaeudereinigung
+    label:
+      de: In deiner Branche arbeitet ihr mit Maschinen, Leitern oder anderen prüfpflichtigen Arbeitsmitteln.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Zur Prüfung befähigte Person
+kanal: partner
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+erledigung:
+  art: laufend
+  zeitraum: jahr
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Betriebssicherheitsverordnung § 14
+  url: https://www.gesetze-im-internet.de/betrsichv_2015/__14.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Neu nach Nutzertest R11 (Tischlerei) – Auslöser über die Branche (Handwerk, Bau, Gebäudereinigung); auch für andere Betriebe mit Leitern oder Maschinen?'
+- 'Prüffristen kommen aus der Gefährdungsbeurteilung – als „laufend je Jahr“ abgebildet; Prüfprotokoll-Vorlage fehlt'
+- 'Fahrzeuge (DGUV Vorschrift 70 § 57, jährlich) und Lärm (LärmVibrationsArbSchV) als eigene Pflichten – Fakten „Firmenfahrzeuge“ und „laute Maschinen“ fehlen noch'
+- 'Folgen bei Nichterfüllung (§ 22 BetrSichV) – Sanktion fachlich ergänzen'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

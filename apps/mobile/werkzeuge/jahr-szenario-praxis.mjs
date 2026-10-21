@@ -258,8 +258,10 @@ function paketPruefen(name, zr, ordner) {
   vergleich(bereich, "DATEV: Spalten je Zeile = Spalten im Kopf", zeilen.every((z) => z.length === extf[1].length) ? "ja" : "nein", "ja");
   vergleich(bereich, "DATEV: Kopf Beraternummer/Mandant", `${extf[0][10]}/${extf[0][11]}`, "52114/30871");
   const kontoSumme = (konto) => summe(zeilen.filter((z) => z[7] === konto).map((z) => (z[1] === "H" ? -1 : 1) * centAus(z[0])));
-  vergleich(bereich, "DATEV: Brutto auf 8400 (19 %) = 19-%-Anteil der Rechnungen inkl. USt", kontoSumme("8400"), summe(vg.map((x) => x.vz * (x.s.pflichtig + x.s.ust))));
-  vergleich(bereich, "DATEV: Brutto auf 8100 (steuerfreie Umsätze § 4 Nr. 8 ff.) = steuerfreie Positionen", kontoSumme("8100"), summe(vg.map((x) => x.vz * x.s.frei)));
+  // R11: Ist-Versteuerung (EÜR) – im Stapel stehen die Rechnungen mit Zahlungseingang im Zeitraum, zum Zahltag
+  const vgIst = D.vorgaenge().filter((x) => x.bezahlt && inZr(x.bezahlt));
+  vergleich(bereich, "DATEV: Brutto auf 8400 (19 %) = 19-%-Anteil der im Zeitraum bezahlten Rechnungen inkl. USt (Ist)", kontoSumme("8400"), summe(vgIst.map((x) => x.vz * (x.s.pflichtig + x.s.ust))));
+  vergleich(bereich, "DATEV: Brutto auf 8100 (steuerfreie Umsätze § 4 Nr. 8 ff.) = steuerfreie Positionen der im Zeitraum bezahlten Rechnungen (Ist)", kontoSumme("8100"), summe(vgIst.map((x) => x.vz * x.s.frei)));
   // R10: BU 40 nur auf Automatikkonten (Wareneingang 3400/3300); auf Konten ohne Automatik ohne Vorsteuer kein BU, mit Vorsteuer BU 9/8
   const AUTOMATIK = ["3400", "3300", "3120", "3123"];
   vergleich(bereich, "DATEV: kein BU 40 auf Konten ohne Automatik", zeilen.filter((z) => z[8] === "40" && !AUTOMATIK.includes(z[6])).length, 0);

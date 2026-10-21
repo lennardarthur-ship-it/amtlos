@@ -1,18 +1,20 @@
 # Katalog E.57 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: arbeitsschutz.unfallanzeige
-version: 1
+version: 2
 katalog_nr: E.57
 titel:
   de: Arbeitsunfall der Berufsgenossenschaft anzeigen
 kurz:
   de: Ist jemand nach einem Arbeitsunfall mehr als drei Tage arbeitsunfähig, zeigst du den Unfall binnen drei Tagen der BG
-    an.
+    an, nachdem du davon erfahren hast.
 erklaerung:
-  de: Die Unfallanzeige ist nötig, wenn die Arbeitsunfähigkeit mehr als drei Tage dauert. Amtlos legt die Frist ab dem Unfalltag
-    an; ob die Grenze erreicht ist, entscheidest du beim Erledigen.
+  de: Die Unfallanzeige ist nötig, wenn die Arbeitsunfähigkeit mehr als drei Tage dauert. Die drei Tage laufen ab dem Tag, an dem
+    du vom Unfall erfahren hast (§ 193 Abs. 4 SGB VII). Amtlos rechnet ab dem Tag, den du beim Unfall einträgst – hast du später
+    davon erfahren, trag diesen Tag ein. Tödliche Unfälle und Unfälle mit vielen Verletzten meldest du sofort, zum Beispiel telefonisch.
+    Ob die Grenze erreicht ist, entscheidest du beim Erledigen.
 rechtsgrundlage:
-- § 193 SGB VII
+- § 193 Abs. 4 SGB VII
 kategorie: arbeitsschutz
 ausloeser:
   ereignis: arbeitsunfall
@@ -37,7 +39,7 @@ kanal: portal
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Bußgeld bis 2.500 € (§ 209 SGB VII).
   schwere: hoch
 automatisierung: hinweis
 status_recht: in_kraft
@@ -48,9 +50,9 @@ quellen:
   url: https://www.gesetze-im-internet.de/sgb_7/__193.html
   abgerufen: null
 fachlich_zu_pruefen:
-- 'Fristbeginn: Unfalltag oder Kenntnis der AU über drei Tage? bestätigen'
+- 'Fristbeginn nach Rechtsprüfung R11 (Befund 6): Kenntnis des Unternehmers – Termin hängt am eingetragenen Tag; sofortige Meldung bei tödlichen und Massenunfällen nur im Text'
+- 'Sanktion § 209 SGB VII bis 2.500 € aus der Rechtsprüfung R11 (Befund 20) – Nummer unsicher, bestätigen'
 - AU-Tage aus dem Ereignis (Payload au_tage) in die Bedingung aufnehmen, sobald Ereignis-Payload auswertbar ist
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf

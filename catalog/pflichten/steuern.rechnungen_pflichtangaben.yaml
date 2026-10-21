@@ -1,7 +1,7 @@
 # Katalog C.29 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.rechnungen_pflichtangaben
-version: 1
+version: 2
 katalog_nr: C.29
 titel:
   de: Rechnungen mit allen Pflichtangaben schreiben
@@ -31,6 +31,10 @@ sanktion:
 automatisierung: hinweis
 aktion:
   art: abhaken
+# R11 (Nutzertest Kosmetik #28): laufende Pflicht – gilt für jede Rechnung, ein Haken nur für das Kalenderjahr
+erledigung:
+  art: laufend
+  zeitraum: jahr
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null

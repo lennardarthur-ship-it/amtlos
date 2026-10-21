@@ -13,6 +13,7 @@ import { ausUtf8 } from "../unterlagen/sicherung";
 import { dateiTeilenBytes, dateiWaehlenBytes } from "../unterlagen/sicherungDatei";
 import { belegEndgueltigLoeschbar, leererBeleg, neueId } from "../unterlagen/speicher";
 import { istKleinunternehmer } from "../unterlagen/steuerpaket";
+import { nurSteuerfreieUmsaetze } from "../unterlagen/ustAusRechnungen";
 import { useAmtlos } from "../zustand";
 import { bestaetigen } from "../ui/bestaetigen";
 import { BuehnenBlatt, GrosserBetrag, datumKurz } from "./gemeinsam";
@@ -36,6 +37,8 @@ export function useBelegErfassen() {
   const melden = useMeldung();
   // Startwert für „Vorsteuer abziehbar“: aus der Antwort im Pflichten-Check
   const ku = z.stand.profil["ust.kleinunternehmer"] === true;
+  // R11: Rechnungsdatum der E-Rechnung in der Kleinunternehmerzeit („Mein Betrieb“) – Vorsteuer aus
+  const kuZeit = (datum: string | null) => !!datum && !!z.stand.betrieb.ku_bis && datum <= z.stand.betrieb.ku_bis;
   // Kamera verweigert: bleibender Hinweis mit „Einstellungen öffnen“ statt einer Meldung, die gleich wieder verschwindet
   const [kameraVerweigert, setKameraVerweigert] = useState(false);
   const oeffnen = (b: Beleg, neu: boolean) => nav.oeffnen(`beleg-${b.id}`, () => <BelegSeite id={b.id} neu={neu} />, true);
@@ -68,7 +71,7 @@ export function useBelegErfassen() {
         if (gelesen) {
           // R10: Käufer der E-Rechnung gegen „Mein Betrieb“ prüfen – fremd adressiert: Vorsteuer aus, Warnung
           const betrieb = { name: z.stand.betrieb.name, plz: z.stand.betrieb.plz, verantwortlich: z.stand.betrieb.verantwortlich };
-          const b = { ...belegAusERechnung(gelesen, neueId(), new Date().toISOString(), { kleinunternehmer: ku, betrieb }), datei: name };
+          const b = { ...belegAusERechnung(gelesen, neueId(), new Date().toISOString(), { kleinunternehmer: ku || kuZeit(gelesen.datum), nurSteuerfrei: nurSteuerfreieUmsaetze(z.stand.unterlagen, z.stand.betrieb), betrieb }), datei: name };
           anlegen(b, false);
           if (kaeuferFremd(gelesen, betrieb)) melden(TEXT.beleg_kaeufer_fremd, "info");
           else melden(TEXT.erechnung_gelesen(gelesen.lieferant.name, euro(gelesen.summen.brutto_cent)));
@@ -183,6 +186,7 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
   const [betraege, setBetraege] = useState<string[]>(() => (b?.steuer ?? []).map((s) => betragText(s.brutto_cent)));
   // Kleinunternehmer ziehen keine Vorsteuer ab: der Schalter steht dann unter „Weitere Angaben“ (außer er ist an)
   const ku = istKleinunternehmer(z.stand);
+  const kuBis = (z.stand.betrieb.ku_bis ?? "").trim();
   const [vorsteuerOffen, setVorsteuerOffen] = useState(false);
   useEffect(
     () => () => {
@@ -228,7 +232,9 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
         <DateiVorschau b={b} />
         {b.quelle === "erechnung" ? <Hinweis art="erfolg" text={TEXT.beleg_aus_erechnung} /> : null}
         <Feld label={TEXT.beleg_lieferant} wert={b.lieferant} aendern={(w) => setze({ lieferant: w })} placeholder="z. B. Friseurbedarf Müller" />
-        <DatumFeld label={TEXT.beleg_datum} hilfe={TEXT.beleg_datum_hilfe} wert={b.datum} aendern={(d) => d && setze({ datum: d })} />
+        {/* R11 (Kosmetik #8): Belegdatum in der Kleinunternehmerzeit – Vorsteuer aus (lässt sich wieder einschalten) */}
+        <DatumFeld label={TEXT.beleg_datum} hilfe={TEXT.beleg_datum_hilfe} wert={b.datum} aendern={(d) => d && setze(kuBis && d <= kuBis && d !== b.datum && b.vorsteuer ? { datum: d, vorsteuer: false } : { datum: d })} />
+        {kuBis && b.datum <= kuBis ? <Hinweis art={b.vorsteuer ? "warnung" : "info"} text={TEXT.beleg_ku_zeit(`${kuBis.slice(8, 10)}.${kuBis.slice(5, 7)}.${kuBis.slice(0, 4)}`)} /> : null}
         <Feld label={TEXT.beleg_nummer} wert={b.nummer ?? ""} aendern={(w) => setze({ nummer: w || null })} />
         {b.steuer.map((x, i) => (
           <View key={i}>

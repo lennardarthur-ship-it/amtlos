@@ -1,15 +1,16 @@
 # Katalog F.65 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: ki.kompetenz
-version: 2
+version: 3
 katalog_nr: F.65
 titel:
   de: KI-Kompetenz der Beschäftigten sicherstellen
 kurz:
-  de: Wer im Unternehmen mit KI arbeitet, braucht ausreichende KI-Kompetenz – sorge für Schulung und halte sie fest.
+  de: Wer im Unternehmen mit KI arbeitet, sollte ausreichende KI-Kompetenz haben – fördere sie durch Schulung und halte das fest.
 erklaerung:
-  de: Die Pflicht nach Art. 4 KI-Verordnung gilt seit 2.2.2025, durchgesetzt wird sie ab August 2026. Amtlos bietet Schulungen
-    mit Bestätigung als Nachweis.
+  de: Art. 4 KI-Verordnung gilt seit 2.2.2025. Nach dem Digital-Omnibus (VO (EU) 2026/1744) musst du die KI-Kompetenz deiner Beschäftigten
+    nicht mehr „sicherstellen“, sondern fördern – das ist noch nicht im Amtsblatt gegengelesen. Eine kurze Schulung mit Nachweis bleibt
+    der sichere Weg; Amtlos bietet Schulungen mit Bestätigung.
 begriffe:
 - begriff:
     de: KI-Kompetenz
@@ -56,10 +57,13 @@ quellen:
 - titel: KI-Verordnung (EU) 2024/1689
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32024R1689
   abgerufen: null
+- titel: FGS – EU AI Act, was ab dem 2. August 2026 gilt und was verschoben wurde
+  url: https://www.fgs.de/news-and-insights/blog/detail/eu-ai-act-was-ab-dem-2-august-2026-gilt-und-was-verschoben-wurde
+  abgerufen: '2026-10-20'
 fachlich_zu_pruefen:
+- 'Art. 4 nach Digital-Omnibus VO (EU) 2026/1744 auf „fördern“ abgeschwächt (Rechtsprüfung R11 Befund 8, T-65; Quelle Kanzlei-Blog FGS) – Wortlaut im Amtsblatt gegenlesen; Einordnung als Pflicht oder Hinweis danach festlegen'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Inhalt und Umfang einer ausreichenden Schulung fachlich festlegen
-- Genauer Beginn der Durchsetzung („ab August 2026“) – Datum ergänzen
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 pruefung:
   status: entwurf

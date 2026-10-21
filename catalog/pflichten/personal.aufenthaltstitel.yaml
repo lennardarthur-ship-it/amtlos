@@ -1,0 +1,65 @@
+# R11 (Nutzertest Gebäudereinigung Befund 5): Prüf- und Aufbewahrungspflicht nach § 4a Abs. 5 AufenthG
+schema_version: 1
+id: personal.aufenthaltstitel
+version: 1
+katalog_nr: D.38
+titel:
+  de: Aufenthaltstitel prüfen und Kopie aufbewahren
+kurz:
+  de: Beschäftigst du Menschen ohne EU-, EWR- oder Schweizer Staatsangehörigkeit, prüfst du vor Beginn, ob sie bei dir arbeiten
+    dürfen, und bewahrst eine Kopie des Aufenthaltstitels auf.
+erklaerung:
+  de: Wer nicht die Staatsangehörigkeit eines EU- oder EWR-Staats oder der Schweiz hat, darf nur arbeiten, wenn der Aufenthaltstitel
+    das erlaubt. Als Arbeitgeber prüfst du vor Beginn, ob ein solcher Titel oder eine Erlaubnis zur Beschäftigung vorliegt, und
+    bewahrst für die Dauer der Beschäftigung eine Kopie auf, auf Papier oder elektronisch (§ 4a Abs. 5 AufenthG). Achte auf das
+    Ablaufdatum des Titels.
+rechtsgrundlage:
+- § 4a Abs. 5 AufenthG
+kategorie: personal
+ausloeser:
+  all:
+  - feld: profil.personal.drittstaaten
+    op: ==
+    wert: true
+    label:
+      de: Du beschäftigst Menschen ohne EU-, EWR- oder Schweizer Staatsangehörigkeit.
+  - ereignis: einstellung
+    op: eingetreten
+    label:
+      de: Du stellst jemanden ein.
+frist:
+  typ: relativ
+  bezug:
+    ereignis: einstellung
+  versatz: P0D
+  zeitpunkt: vor_beginn
+  je_ereignis: true
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Kontrolle durch den Zoll
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Aufenthaltsgesetz § 4a
+  url: https://www.gesetze-im-internet.de/aufenthg_2004/__4a.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Neu nach Nutzertest R11 (Gebäudereinigung): Prüfung vor Beginn und Kopie für die Dauer der Beschäftigung (§ 4a Abs. 5 S. 3 AufenthG) – Wortlaut bestätigen'
+- 'Erinnerung zum Ablauf des Titels (Feld „gültig bis“ bei Mitarbeitern) noch nicht abgebildet'
+- 'Folgen bei Nichterfüllung (§ 404 SGB III) – Sanktion fachlich ergänzen'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

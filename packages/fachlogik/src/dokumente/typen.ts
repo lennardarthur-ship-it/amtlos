@@ -28,6 +28,11 @@ export interface Betrieb {
   vertretung?: string;
   /** Umsatzsteuer nach vereinbarten („soll“) oder vereinnahmten („ist“) Entgelten (§§ 16, 20 UStG) */
   versteuerung?: string;
+  /**
+   * R11: Kleinunternehmer (§ 19 UStG) bis einschließlich diesem Tag (ISO), danach regelbesteuert – leer, wenn es keinen
+   * Wechsel gab. Rechnungen und Belege aus der Zeit davor prüft die App gegen diesen Tag.
+   */
+  ku_bis?: string;
   /** Logo als Data-URL (PNG/JPEG), erscheint im Briefkopf */
   logo?: string;
   /** Hausfarbe für Briefkopf und Akzente (#rrggbb) */
@@ -39,7 +44,7 @@ export interface Betrieb {
   website?: string;
 }
 
-export const LEERER_BETRIEB: Betrieb = { name: "", strasse: "", plz: "", ort: "", verantwortlich: "", telefon: "", email: "", steuernummer: "", ust_idnr: "", iban: "", bundesland: "", rechtsform: "", registergericht: "", registernummer: "", vertretung: "", versteuerung: "", logo: "", farbe: "", bank: "", bic: "", website: "" };
+export const LEERER_BETRIEB: Betrieb = { name: "", strasse: "", plz: "", ort: "", verantwortlich: "", telefon: "", email: "", steuernummer: "", ust_idnr: "", iban: "", bundesland: "", rechtsform: "", registergericht: "", registernummer: "", vertretung: "", versteuerung: "", ku_bis: "", logo: "", farbe: "", bank: "", bic: "", website: "" };
 
 /** Ein Wert in einem Listeneintrag. */
 export type EintragWert = string | boolean | string[] | null;
@@ -106,7 +111,8 @@ export type EinfachesFeld =
   | (FeldBasis & { art: "betrag"; vorbelegung?: string })
   /** Zahl, gespeichert wie eingegeben („1,5“) */
   | (FeldBasis & { art: "zahl"; vorbelegung?: string })
-  | (FeldBasis & { art: "wahl"; optionen: Option[]; vorbelegung?: string })
+  /** `vorbelegungJe` (R11): Startwert je Branchengruppe des Betriebs (erste passende Gruppe), sonst `vorbelegung` */
+  | (FeldBasis & { art: "wahl"; optionen: Option[]; vorbelegung?: string; vorbelegungJe?: Record<string, string> })
   | (FeldBasis & { art: "schalter"; vorbelegung?: boolean })
   | (FeldBasis & { art: "mehrfach"; optionen: Option[] })
   /** Textbausteine zum Ankreuzen (Liste untereinander, mit Quelle); gespeichert werden die Werte */
@@ -201,13 +207,15 @@ export interface Vorlage {
   html(daten: Daten, betrieb: Betrieb): string;
   /** Ergebnis zum Anzeigen in der App (Summen, Zahllast …) */
   ergebnis?(daten: Daten): [string, string][];
+  /** Pflichtfelder, die bei diesen Angaben keine Pflicht sind (R11: Empfänger bei der Kleinbetragsrechnung) */
+  nichtPflicht?(daten: Daten): string[];
   /** Fehlende Angaben außerhalb des Formulars, z. B. in „Mein Betrieb“ */
   pruefen?(daten: Daten, betrieb: Betrieb): string[];
   /**
    * Hinweise, die nicht am Teilen hindern (R10): z. B. Leitweg-ID bei Behörden, EU-Kunde mit 19 %, Abweichung vom
    * Pflichten-Check. `extra.kleinunternehmer`: Antwort im Pflichten-Check, falls vorhanden.
    */
-  hinweise?(daten: Daten, betrieb: Betrieb, extra?: { kleinunternehmer?: boolean | null }): string[];
+  hinweise?(daten: Daten, betrieb: Betrieb, extra?: { kleinunternehmer?: boolean | null; /** R11: Handwerk oder Bau laut Pflichten-Check */ handwerk?: boolean }): string[];
   /** Meldung aus `pruefen` → Feld, bei dem man sie behebt (für „Ergänzen“ im Abschluss) */
   pruefenZu?: Record<string, string>;
   /** Reiner Text zum Kopieren, z. B. für die Website */

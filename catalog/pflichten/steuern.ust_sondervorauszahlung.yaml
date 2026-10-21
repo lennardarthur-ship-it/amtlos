@@ -1,7 +1,7 @@
 # Katalog C.24 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.ust_sondervorauszahlung
-version: 2
+version: 3
 katalog_nr: C.24
 titel:
   de: Sondervorauszahlung zur Umsatzsteuer leisten
@@ -26,12 +26,29 @@ ausloeser:
     wert: true
     label:
       de: Du hast eine Dauerfristverlängerung.
-  - feld: profil.ust.zahllast_vorjahr
-    op: '>'
-    wert:
-      regelwert: steuern.ust_va.grenze_monatlich
-    label:
-      de: Du gibst die Voranmeldung monatlich ab.
+  # R11 (Steuerprüfung 17): nur Monatszahler (§§ 46–48 UStDV) – Rhythmus „monatlich“ oder Vorjahressteuer über der Monatsgrenze
+  - any:
+    - feld: profil.ust.voranmeldung_rhythmus
+      op: ==
+      wert: monatlich
+      label:
+        de: Du gibst die Voranmeldung monatlich ab.
+    - all:
+      - not:
+          all:
+          - feld: profil.ust.voranmeldung_rhythmus
+            op: vorhanden
+          - feld: profil.ust.voranmeldung_rhythmus
+            op: in
+            wert:
+            - quartalsweise
+            - keine
+      - feld: profil.ust.zahllast_vorjahr
+        op: '>'
+        wert:
+          regelwert: steuern.ust_va.grenze_monatlich
+        label:
+          de: Deine Umsatzsteuer im Vorjahr lag über der Grenze für die monatliche Voranmeldung.
 frist:
   typ: wiederkehrend
   rhythmus: keiner
@@ -67,6 +84,7 @@ quellen:
   abgerufen: null
 fachlich_zu_pruefen:
 - 'Termin 10.02. und 1/11 der Vorjahres-Vorauszahlungen ergänzt (R10, Steuerprüfung) – Verschiebung auf den nächsten Werktag bestätigen'
+- 'Nur Monatszahler (§§ 46–48 UStDV, Steuerprüfung R11 Befund 17) – Auslöser über Rhythmus „monatlich“ oder Vorjahressteuer; Text zu Kz 39 in der App beim Steuer-Agenten'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 pruefung:
   status: entwurf

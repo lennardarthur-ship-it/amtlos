@@ -1,7 +1,7 @@
 # Katalog B.21 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.awv_meldung
-version: 1
+version: 2
 katalog_nr: B.21
 titel:
   de: Auslandszahlungen nach AWV melden
@@ -9,8 +9,8 @@ kurz:
   de: Bei grenzüberschreitenden Zahlungen über der Meldegrenze – zum Beispiel Investorengeld aus dem Ausland – besteht eine
     Meldepflicht.
 erklaerung:
-  de: Die Außenwirtschaftsverordnung verlangt Meldungen bei grenzüberschreitenden Zahlungen über einer Meldegrenze. Die Grenze
-    steht als Regelwert in Amtlos, sobald sie fachlich freigegeben ist.
+  de: Die Außenwirtschaftsverordnung verlangt Meldungen bei grenzüberschreitenden Zahlungen über einer Meldegrenze. Frag bei
+    deiner Bank oder der Bundesbank nach der aktuellen Grenze.
 rechtsgrundlage:
 - AWV
 kategorie: gesellschaft

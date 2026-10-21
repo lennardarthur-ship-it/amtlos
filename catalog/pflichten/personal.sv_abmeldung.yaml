@@ -1,17 +1,18 @@
 # Katalog D.38 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.sv_abmeldung
-version: 1
+version: 2
 katalog_nr: D.38
 titel:
   de: Beschäftigte bei der Sozialversicherung abmelden
 kurz:
-  de: Endet eine Beschäftigung, meldest du die Person bei der Krankenkasse ab.
+  de: Endet eine Beschäftigung, meldest du die Person mit der nächsten Lohnabrechnung bei der Krankenkasse ab, spätestens sechs Wochen nach dem Ende.
 erklaerung:
-  de: Die Abmeldung (DEÜV) geht an die Krankenkasse bzw. die Minijob-Zentrale, über das Lohnprogramm.
+  de: Die Abmeldung geht über das Lohnprogramm an die Krankenkasse bzw. die Minijob-Zentrale. Sie ist mit der ersten folgenden Entgeltabrechnung
+    fällig, spätestens sechs Wochen nach dem Ende der Beschäftigung (§ 8 DEÜV). Amtlos zeigt den spätesten Termin.
 rechtsgrundlage:
 - § 28a SGB IV
-- DEÜV
+- § 8 DEÜV
 kategorie: personal
 ausloeser:
   ereignis: austritt
@@ -22,7 +23,7 @@ frist:
   typ: relativ
   bezug:
     ereignis: austritt
-  versatz: P0D
+  versatz: P6W
   zeitpunkt: spaetestens
   je_ereignis: true
   verschiebung:
@@ -47,7 +48,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/sgb_4/__28a.html
   abgerufen: null
 fachlich_zu_pruefen:
-- Frist der Abmeldung steht nicht in der Spezifikation – als spätestens am Ende der Beschäftigung eingetragen, fachlich ersetzen
+- 'Frist nach Rechtsprüfung R11 (Befund 4): mit der nächsten Entgeltabrechnung, spätestens sechs Wochen nach Ende (§ 8 DEÜV) – als sechs Wochen nach dem Austritt abgebildet; bestätigen'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:

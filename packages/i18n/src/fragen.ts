@@ -146,6 +146,7 @@ export const SCHRITTE: Schritt[] = [
           handwerk: { de: "Handwerk (z. B. Elektro, Sanitär, Tischlerei, Kfz)", en: "Skilled trades (e.g. electrical, plumbing, carpentry, car repair)" },
           beauty_kosmetik: { de: "Beauty und Kosmetik (Friseur, Kosmetik, Nägel)", en: "Beauty and cosmetics (hairdresser, beauty salon, nails)" },
           bau: { de: "Bau (Hoch- und Tiefbau, Ausbau)", en: "Construction (building, civil engineering, finishing)" },
+          gebaeudereinigung: { de: "Gebäudereinigung (Unterhalts-, Glas-, Praxis- und Büroreinigung)", en: "Building cleaning (maintenance, window, practice and office cleaning)" },
           transport_logistik: { de: "Transport und Logistik (Spedition, Kurier, Taxi)", en: "Transport and logistics (haulage, courier, taxi)" },
           onlinehandel: { de: "Onlinehandel (eigener Shop, Marktplätze)", en: "Online retail (own shop, marketplaces)" },
           it_agentur_freelancer: { de: "IT, Agentur, Freelancer (Software, Design, Beratung)", en: "IT, agency, freelance (software, design, consulting)" },
@@ -203,6 +204,29 @@ export const SCHRITTE: Schritt[] = [
         },
       },
       { feld: "erlaubnis.gaststaette", art: "janein", frage: { de: "Betreibst du eine Gaststätte oder schenkst Getränke aus?", en: "Do you run a restaurant or serve drinks?" } },
+      {
+        feld: "erlaubnis.alkohol",
+        art: "janein",
+        frage: { de: "Schenkst du alkoholische Getränke aus?", en: "Do you serve alcoholic drinks?" },
+        hilfe: {
+          de: "Nach dem Gaststättengesetz des Bundes braucht nur der Ausschank von Alkohol eine Erlaubnis (§ 2 GastG); manche Länder verlangen nur eine Anzeige. Für einzelne Feste gibt es eine vorübergehende Gestattung (§ 12 GastG).",
+          en: "Under the federal Restaurants Act only serving alcohol needs a permit (§ 2 GastG); some federal states only require a notification. For single events there is a temporary permit (§ 12 GastG).",
+        },
+      },
+      {
+        feld: "ifsg.selbst",
+        art: "auswahl",
+        frage: { de: "Arbeitest du selbst mit Lebensmitteln – zum Beispiel beim Kochen, Zubereiten oder Ausgeben?", en: "Do you work with food yourself – for example cooking, preparing or serving it?" },
+        hilfe: {
+          de: "Wer zum ersten Mal gewerbsmäßig mit Lebensmitteln nach § 42 IfSG arbeitet, braucht vorher eine Bescheinigung des Gesundheitsamts (früher „Gesundheitszeugnis“). Hast du schon eine aus einer früheren Tätigkeit, brauchst du keine neue.",
+          en: "Anyone who works commercially with food under § 42 IfSG for the first time needs a certificate from the public health office beforehand. If you already have one from earlier work, you don't need a new one.",
+        },
+        optionen: {
+          erstmals: { de: "Ja, zum ersten Mal", en: "Yes, for the first time" },
+          bescheinigung: { de: "Ja, ich habe schon eine Bescheinigung des Gesundheitsamts", en: "Yes, I already have a certificate from the public health office" },
+          keine: { de: "Nein", en: "No" },
+        },
+      },
       {
         feld: "handwerk.anlage",
         art: "auswahl",
@@ -281,7 +305,10 @@ export const SCHRITTE: Schritt[] = [
         schnell: true,
         art: "janein",
         frage: { de: "Nutzt du die Kleinunternehmerregelung?", en: "Do you use the small business scheme (Kleinunternehmerregelung)?" },
-        hilfe: { de: "Dann weist du auf Rechnungen keine Umsatzsteuer aus.", en: "Then your invoices show no VAT." },
+        hilfe: {
+          de: "Dann weist du auf Rechnungen keine Umsatzsteuer aus und kannst keine Vorsteuer abziehen. Möglich, wenn dein Umsatz im Vorjahr höchstens 25.000 € war und im laufenden Jahr 100.000 € nicht übersteigt; im Gründungsjahr zählen 25.000 €. Lohnt sich bei großen Anschaffungen oft nicht. Weißt du es noch nicht, überspring die Frage.",
+          en: "Then your invoices show no VAT and you cannot deduct input VAT. Possible if your turnover last year was at most €25,000 and does not exceed €100,000 this year; in the founding year €25,000 counts. Often not worth it with large purchases. If you don't know yet, skip the question.",
+        },
       },
       { feld: "umsatz.vorjahr", art: "betrag", frage: { de: "Wie hoch war dein Umsatz im letzten Jahr (in Euro)?", en: "What was your turnover last year (in euros)?" } },
       { feld: "umsatz.prognose_laufendes_jahr", art: "betrag", frage: { de: "Welchen Umsatz erwartest du dieses Jahr?", en: "What turnover do you expect this year?" } },
@@ -372,6 +399,21 @@ export const SCHRITTE: Schritt[] = [
         },
       },
       {
+        feld: "vertrieb.ausserhalb_geschaeftsraeume",
+        art: "janein",
+        frage: { de: "Schließt du Verträge mit Privatkunden bei ihnen zu Hause oder unterwegs ab?", en: "Do you make contracts with private customers at their home or on the go?" },
+        hilfe: {
+          de: "Zum Beispiel ein Auftrag, den du beim Kunden in der Wohnung unterschreiben lässt. Dann hat der Kunde ein Widerrufsrecht wie im Onlinehandel (§ 312b BGB).",
+          en: "For example an order you have signed at the customer's home. The customer then has a right of withdrawal as in online retail (§ 312b BGB).",
+        },
+      },
+      {
+        feld: "gastro.to_go",
+        art: "janein",
+        frage: { de: "Verkaufst du Essen oder Getränke zum Mitnehmen in Einwegverpackungen?", en: "Do you sell food or drinks to take away in single-use packaging?" },
+        hilfe: { de: "Zum Beispiel Kaffeebecher, Salatschalen oder Boxen aus Kunststoff.", en: "For example coffee cups, salad bowls or plastic boxes." },
+      },
+      {
         feld: "produkte.arten",
         art: "mehrfach",
         frage: { de: "Was verkaufst du?", en: "What do you sell?" },
@@ -420,7 +462,21 @@ export const SCHRITTE: Schritt[] = [
         frage: { de: "Nimmst du für Waren hohe Barzahlungen an (in Höhe der Schwelle des Geldwäschegesetzes)?", en: "Do you accept large cash payments for goods (at the threshold of the Anti-Money Laundering Act)?" },
         hilfe: { de: "Wenn du nur Dienstleistungen verkaufst oder keine großen Beträge bar annimmst: Nein.", en: "If you only sell services or don't accept large amounts in cash: No." },
       },
-      { feld: "kasse.elektronisch", art: "janein", frage: { de: "Nutzt du eine elektronische Kasse?", en: "Do you use an electronic till?" } },
+      {
+        feld: "kasse.elektronisch",
+        art: "janein",
+        frage: { de: "Nutzt du eine elektronische Kasse?", en: "Do you use an electronic till?" },
+        hilfe: {
+          de: "Ein Kartenterminal allein ist keine Kasse, eine Kassen-App auf Handy oder Tablet schon. Ohne elektronische Kasse führst du eine offene Ladenkasse mit Kassenbericht. Weißt du es noch nicht, überspring die Frage.",
+          en: "A card terminal alone is not a till, but a till app on a phone or tablet is. Without an electronic till you keep an open cash box with a daily cash report. If you don't know yet, skip the question.",
+        },
+      },
+      {
+        feld: "kasse.angeschafft_am",
+        art: "datum",
+        frage: { de: "Seit wann hast du die elektronische Kasse – oder wann schaffst du sie an?", en: "Since when have you had the electronic till – or when will you get it?" },
+        hilfe: { de: "Ab diesem Tag hast du einen Monat Zeit, sie dem Finanzamt zu melden.", en: "From this day you have one month to report it to the tax office." },
+      },
     ],
   },
   {
@@ -446,28 +502,57 @@ export const SCHRITTE: Schritt[] = [
         feld: "personal.sofortmeldebranchen",
         art: "mehrfach",
         frage: { de: "Gehört dein Betrieb zu einer dieser Branchen?", en: "Does your business belong to one of these sectors?" },
-        hilfe: { de: "In diesen Branchen musst du neue Beschäftigte sofort bei Arbeitsbeginn melden.", en: "In these sectors new staff must be reported immediately when they start." },
-        // Branchen nach § 28a Abs. 4 SGB IV (R10 vervollständigt)
+        hilfe: {
+          de: "In diesen Branchen meldest du neue Beschäftigte sofort bei Arbeitsbeginn, zeichnest die Arbeitszeit auf und weist auf die Ausweispflicht hin. Seit 2026 gehören Friseur- und Kosmetikbetriebe dazu.",
+          en: "In these sectors you report new staff immediately when they start, record working time and inform them about carrying ID. Since 2026 this includes hairdressers and beauty salons.",
+        },
+        // Branchen nach § 28a Abs. 4 SGB IV und § 2a SchwarzArbG nach dem SchwarzArbMoDiG (R11: neu Friseur, Kosmetik,
+        // plattformbasierte Lieferdienste; Forstwirtschaft gestrichen; Fleischwirtschaft ohne Fleischerhandwerk)
         optionen: {
           bau: { de: "Baugewerbe", en: "Construction" },
           gastronomie: { de: "Gaststätten und Beherbergung (z. B. Restaurant, Café, Hotel)", en: "Restaurants and accommodation (e.g. restaurant, café, hotel)" },
           personenbefoerderung: { de: "Personenbeförderung", en: "Passenger transport" },
           spedition_logistik: { de: "Spedition, Transport und Logistik", en: "Haulage, transport and logistics" },
           schausteller: { de: "Schaustellergewerbe", en: "Fairground and showmen's trade" },
-          forstwirtschaft: { de: "Forstwirtschaft", en: "Forestry" },
           gebaeudereinigung: { de: "Gebäudereinigung", en: "Building cleaning" },
           messebau: { de: "Auf- und Abbau von Messen und Ausstellungen", en: "Setting up and dismantling trade fairs and exhibitions" },
-          fleischwirtschaft: { de: "Fleischwirtschaft", en: "Meat industry" },
+          fleischwirtschaft: { de: "Fleischwirtschaft (ohne Fleischerhandwerk)", en: "Meat industry (excluding butchers' trade)" },
           prostitution: { de: "Prostitutionsgewerbe", en: "Prostitution trade" },
           sicherheitsgewerbe: { de: "Wach- und Sicherheitsgewerbe", en: "Guarding and security services" },
+          friseur: { de: "Friseurgewerbe", en: "Hairdressing" },
+          kosmetik: { de: "Kosmetikgewerbe (z. B. Kosmetik-, Nagelstudio)", en: "Beauty trade (e.g. beauty or nail salon)" },
+          lieferdienste: { de: "Plattformbasierte Lieferdienste", en: "Platform-based delivery services" },
           keine: { de: "Keine davon", en: "None of these" },
         },
+      },
+      {
+        feld: "ifsg.beschaeftigte",
+        art: "auswahl",
+        frage: { de: "Arbeiten Beschäftigte bei dir mit Lebensmitteln?", en: "Do any of your staff work with food?" },
+        hilfe: {
+          de: "Gemeint ist Herstellen, Behandeln oder Ausgeben von Lebensmitteln nach § 42 IfSG, etwa in Küche, Theke oder Service. Reine Bürokräfte zählen nicht. Wer schon eine Bescheinigung des Gesundheitsamts hat, braucht keine neue – deine Belehrung als Arbeitgeber brauchen alle.",
+          en: "This means producing, handling or serving food under § 42 IfSG, e.g. in the kitchen, at the counter or in service. Office staff don't count. Anyone who already has a certificate from the public health office doesn't need a new one – all of them need your briefing as employer.",
+        },
+        optionen: {
+          erstmals: { de: "Ja, mindestens eine Person zum ersten Mal", en: "Yes, at least one person for the first time" },
+          bescheinigung: { de: "Ja, alle haben schon eine Bescheinigung des Gesundheitsamts", en: "Yes, all already have a certificate from the public health office" },
+          keine: { de: "Nein, niemand (z. B. nur Büro)", en: "No, nobody (e.g. office only)" },
+        },
+      },
+      {
+        feld: "personal.drittstaaten",
+        art: "janein",
+        frage: { de: "Beschäftigst du Menschen, die keine Staatsangehörigkeit eines EU-Staats, aus Island, Liechtenstein, Norwegen oder der Schweiz haben?", en: "Do you employ people who are not nationals of an EU country, Iceland, Liechtenstein, Norway or Switzerland?" },
+        hilfe: { de: "Dann prüfst du vor Beginn, ob sie bei dir arbeiten dürfen, und bewahrst eine Kopie des Aufenthaltstitels auf.", en: "Then you check before they start whether they may work for you and keep a copy of the residence permit." },
       },
       {
         feld: "personal.lohnsteuer_anmeldezeitraum",
         art: "auswahl",
         frage: { de: "Wie oft meldest du die Lohnsteuer an?", en: "How often do you file the wage tax return?" },
-        hilfe: { de: "Das legt das Finanzamt fest. Wenn du es nicht weißt, frag deine Steuerberatung oder wähle „Weiß ich nicht“.", en: "The tax office decides this. If you don't know, ask your tax adviser or choose “I don't know”." },
+        hilfe: {
+          de: "Das folgt aus der Lohnsteuer des Vorjahres (§ 41a Abs. 2 EStG): über 5.000 € monatlich, über 1.080 € vierteljährlich, sonst jährlich. Im ersten Jahr zählt die aufs Jahr hochgerechnete Lohnsteuer des ersten Monats. Wenn du es nicht weißt, frag deine Steuerberatung.",
+          en: "It follows from last year's wage tax (§ 41a(2) EStG): over €5,000 monthly, over €1,080 quarterly, otherwise yearly. In the first year the first month's wage tax projected to a full year counts. If you don't know, ask your tax adviser.",
+        },
         optionen: {
           monatlich: { de: "Monatlich", en: "Monthly" },
           quartalsweise: { de: "Vierteljährlich", en: "Quarterly" },

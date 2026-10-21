@@ -46,7 +46,11 @@ function wert(f: Feld, w: unknown): string {
 
 /** Ein Listeneintrag als Zeile: Bezeichnung links, bei Menge und Preis „2 × 25,00 €“ rechts. */
 function eintragZeile(f: Extract<Feld, { art: "liste" }>, e: Eintrag): Zeile | null {
-  const titel = typeof e[f.titelFeld] === "string" ? (e[f.titelFeld] as string).trim() : "";
+  const roh = typeof e[f.titelFeld] === "string" ? (e[f.titelFeld] as string).trim() : "";
+  // R11 (Reinigung #18): Datum als TT.MM.JJJJ (Arbeitstage), nicht „2026-10-05“; dazu Beginn bis Ende, wenn eingetragen
+  const istDatum = /^\d{4}-\d{2}-\d{2}$/.test(roh);
+  const zeit = istDatum && typeof e.beginn === "string" && typeof e.ende === "string" && e.beginn && e.ende ? ` · ${e.beginn}–${e.ende}` : "";
+  const titel = istDatum ? `${textAus(roh)}${zeit}` : roh;
   const preisFeld = f.felder.find((x) => x.art === "betrag");
   const preis = preisFeld && typeof e[preisFeld.id] === "string" ? cent(e[preisFeld.id] as string) : null;
   const mengeFeld = f.felder.find((x) => x.art === "zahl");

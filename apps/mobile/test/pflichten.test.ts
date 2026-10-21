@@ -26,7 +26,7 @@ describe("Pflichten-Check", () => {
     expect(offeneFragenNachWirkung(auswertung(allein, "2026-10-13"), allein).map((o) => o.feld)).not.toEqual(expect.arrayContaining(["beschaeftigte.minijob"]));
   });
   it("bestehender Betrieb mit Beschäftigten: Pflichten mit Auslöser „einstellung“ gelten (Ereignisse wie auf dem Server)", () => {
-    const cafe: Profil = { "taetigkeit.branchen": ["gastronomie_lebensmittel"], rechtsform: "einzelunternehmen", "taetigkeit.einordnung": "gewerbe", bundesland: "SN", "beschaeftigte.gesamt": 2, "kasse.elektronisch": true, "online.website": true, "ust.kleinunternehmer": false, steuerberater: true, gruendungsdatum: "2022-03-01" };
+    const cafe: Profil = { "taetigkeit.branchen": ["gastronomie_lebensmittel"], rechtsform: "einzelunternehmen", "taetigkeit.einordnung": "gewerbe", bundesland: "SN", "beschaeftigte.gesamt": 2, "kasse.elektronisch": true, "online.website": true, "ust.kleinunternehmer": false, steuerberater: true, gruendungsdatum: "2022-03-01", "ifsg.beschaeftigte": "erstmals" };
     expect(ereignisseAusStand(cafe, "2026-01-15")).toEqual([
       { typ: "einstellung", datum: "2022-03-01" },
       { typ: "erste_einstellung", datum: "2022-03-01" },

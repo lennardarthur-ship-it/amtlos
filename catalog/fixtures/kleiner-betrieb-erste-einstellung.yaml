@@ -11,6 +11,7 @@ fakten:
   profil.rentenversicherung.pflichtgruppe: [keine]
   profil.erlaubnis.gewo_paragraphen: [keine]
   profil.erlaubnis.gaststaette: true
+  profil.erlaubnis.alkohol: true
   profil.handwerk.anlage: keine
   profil.umsatz.vorjahr: 240000
   profil.umsatz.prognose_laufendes_jahr: 250000

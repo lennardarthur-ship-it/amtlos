@@ -75,12 +75,17 @@ function ohneKontaktformular(t: { titel: string; text: string }): { titel: strin
   return { titel: t.titel.replace(/, Telefon oder Kontaktformular$/, " oder Telefon"), text: t.text.replace(/per E-Mail, telefonisch oder über das Kontaktformular/, "per E-Mail oder telefonisch") };
 }
 
+/** Terminbuchung über eine Plattform mit eigenem Kundenkonto (R11): statt des Satzes zur Auftragsverarbeitung */
+const TERMIN_AV = "Der Anbieter verarbeitet die Daten in unserem Auftrag auf Grundlage eines Vertrags zur Auftragsverarbeitung nach Art. 28 DSGVO.";
+const TERMIN_PLATTFORM = "Legen Sie bei dem Anbieter ein eigenes Kundenkonto an, verarbeitet er Ihre Daten auch in eigener Verantwortung; Einzelheiten finden Sie in den Datenschutzhinweisen des Anbieters.";
+
 function dseTeile(d: Daten, b: Betrieb): { titel: string; text: string }[] {
   const an = new Set(auswahl(d, "module"));
   // beide Schriftarten-Bausteine widersprechen sich: extern eingebunden geht vor (die Prüfung weist darauf hin)
   if (an.has("google_fonts_extern")) an.delete("google_fonts_lokal");
   const teile = DSE_REIHE.filter((x) => (x.immer || an.has(x.id)) && DSE[x.id]).map((x) => {
     const t = { titel: DSE[x.id]!.titel, text: bausteinText(DSE[x.id]!.text.replace(FONTS_EMPFEHLUNG, ""), d, b) };
+    if (x.id === "online_terminbuchung" && text(d, "termin_art") === "plattform") return { ...t, text: t.text.replace(TERMIN_AV, TERMIN_PLATTFORM) };
     return x.id === "kontakt" && d.kontaktformular === false ? ohneKontaktformular(t) : t;
   });
   const rechte = teile.findIndex((t) => t.titel === DSE.betroffenenrechte?.titel);
@@ -123,6 +128,8 @@ export const datenschutzerklaerungWebsite: Vorlage = {
         { id: "cookie_dauer", art: "text", label: "Wann diese Cookies gelöscht werden", vorschlaege: ["nach Ende der Sitzung", "nach 12 Monaten"], wenn: { feld: "module", ist: "technisch_notwendige_cookies" } },
         { id: "termin_anbieter", art: "text", label: "Anbieter der Online-Terminbuchung", wenn: { feld: "module", ist: "online_terminbuchung" } },
         { id: "termin_anschrift", art: "text", label: "Anschrift des Terminbuchungs-Anbieters", wenn: { feld: "module", ist: "online_terminbuchung" } },
+        // R11 (Kosmetik #24): Marktplatz-Plattformen mit eigenem Kundenkonto sind oft selbst verantwortlich
+        { id: "termin_art", art: "wahl", label: "Art der Terminbuchung", optionen: [{ wert: "tool", text: "Reines Buchungstool (Auftragsverarbeiter)" }, { wert: "plattform", text: "Plattform mit eigenem Kundenkonto (eigene Verantwortung der Plattform)" }], vorbelegung: "tool", wenn: { feld: "module", ist: "online_terminbuchung" }, hilfe: "Ob die Plattform selbst verantwortlich ist, steht in ihren Bedingungen bzw. im Vertrag – bitte prüfen." },
         { id: "newsletter_themen", art: "text", label: "Inhalt des Newsletters", vorschlaege: ["Angebote und Neuigkeiten aus unserem Betrieb"], wenn: { feld: "module", ist: "newsletter" } },
         { id: "newsletter_dienst", art: "text", label: "Versanddienstleister des Newsletters", wenn: { feld: "module", ist: "newsletter" } },
         { id: "netzwerke", art: "text", label: "Verlinkte Netzwerke", vorschlaege: ["Instagram", "Facebook", "Instagram und Facebook", "LinkedIn"], wenn: { feld: "module", ist: "social_media_links" } },

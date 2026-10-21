@@ -58,8 +58,11 @@ function Kapsel({ state, navigation }: BottomTabBarProps) {
   const symbol = knopf < 44 ? 19 : 21;
   // Wort in der Pille nur, wenn es neben den anderen Symbolen Platz hat – geschätzt aus der Wortlänge (halbfett,
   // 15 pt, eher breit gerechnet) und der Schriftgröße; sonst nur Symbole (lange drücken zeigt den Namen groß, iOS)
+  // R11 (UX #11, Berater #15): bei normaler Schrift und ab 375 pt Breite steht unter jedem Symbol sein Name (11 pt
+  // halbfett); bei großer Schrift oder schmalen Geräten wie bisher nur Symbole und das Wort in der aktiven Pille
+  const beschriftet = fontScale <= 1.15 && width >= 375;
   const mitWort = (id: Tab) => {
-    if (fontScale > 1.35) return false;
+    if (beschriftet || fontScale > 1.35) return false;
     const wort = TEXT.tabs_kurz[id].length * 15 * 0.62 * Math.max(1, fontScale);
     return (n - 1) * knopf + 2 * pillenRand + symbol + 7 + wort <= platz;
   };
@@ -86,10 +89,11 @@ function Kapsel({ state, navigation }: BottomTabBarProps) {
                   if (!an && !e.defaultPrevented) navigation.navigate(r.name);
                 }}
                 hitSlop={4}
-                style={({ pressed }) => ({ height: 52, ...(wort ? { paddingHorizontal: pillenRand } : { width: knopf }), flexShrink: wort ? 1 : 0, minWidth: 0, borderRadius: 26, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7, backgroundColor: an ? "rgba(127,227,184,0.16)" : "transparent", opacity: pressed ? 0.7 : 1 })}
+                style={({ pressed }) => ({ height: 52, ...(wort ? { paddingHorizontal: pillenRand } : beschriftet ? { flex: 1, maxWidth: 72 } : { width: knopf }), flexShrink: wort ? 1 : 0, minWidth: 0, borderRadius: 26, flexDirection: beschriftet ? "column" : "row", alignItems: "center", justifyContent: "center", gap: beschriftet ? 2 : 7, backgroundColor: an ? "rgba(127,227,184,0.16)" : "transparent", opacity: pressed ? 0.7 : 1 })}
               >
-                <Symbol name={an ? k.symbolAn : k.symbol} groesse={symbol} farbe={an ? f.minze : "rgba(255,255,255,0.72)"} gewicht={an ? "semibold" : "regular"} />
+                <Symbol name={an ? k.symbolAn : k.symbol} groesse={beschriftet ? 19 : symbol} farbe={an ? f.minze : "rgba(255,255,255,0.72)"} gewicht={an ? "semibold" : "regular"} />
                 {wort ? <T v="klein" farbe={f.minze} stil={{ ...SCHRIFT.bold, flexShrink: 1 }} numberOfLines={1} maxFontSizeMultiplier={1.35}>{TEXT.tabs_kurz[k.id]}</T> : null}
+                {beschriftet ? <T farbe={an ? f.minze : "rgba(255,255,255,0.72)"} stil={{ ...SCHRIFT.halb, fontSize: 11, lineHeight: 13 }} numberOfLines={1} maxFontSizeMultiplier={1.15}>{TEXT.tabs_kurz[k.id]}</T> : null}
               </Pressable>
             );
           })}

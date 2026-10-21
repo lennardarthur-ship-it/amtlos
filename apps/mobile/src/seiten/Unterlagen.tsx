@@ -13,6 +13,12 @@ import { BetriebFormular } from "./Betrieb";
 import { BEREICH_SYMBOL, BuehnenBlatt, Gruppe, Inhalt, datumKurz } from "./gemeinsam";
 import { useOeffnen, useStarten, useZiel } from "./starten";
 import { BelegErfassenSeite } from "./Belege";
+import { KontrollmappeSeite } from "./Kontrollmappe";
+
+/** R11 (UX #1): Suchbegriffe, bei denen die Kontrollmappe als erster Treffer erscheint */
+const KONTROLLE = /kontroll|mappe|prüf|pruef|zoll|gesundheitsamt|lebensmittel(ü|ue)berwachung|gewerbeaufsicht|berufsgenossenschaft|\bbg\b|nachweis/;
+/** R11 (Berater d): Anlass der eigenen Branche zuerst – „Salon und Kosmetik“ stand hinter „Café, Restaurant“ */
+const ANLASS_JE_BRANCHE: Record<string, string> = { gastronomie_lebensmittel: "gastro", beauty_kosmetik: "beauty" };
 
 /** Symbol je Anlass. */
 /** Ton je Anlass (B11): ruhig grün, nur „Wenn etwas schiefgeht“ in Bernstein – Wort und Symbol tragen die Bedeutung. */
@@ -130,7 +136,7 @@ function VorlagenListe({ liste }: { liste: Vorlage[] }) {
   );
 }
 
-function AnlassSeite({ a }: { a: Anlass }) {
+export function AnlassSeite({ a }: { a: Anlass }) {
   return (
     <Unterseite titel={a.titel} unter={a.text}>
       <Inhalt>
@@ -145,8 +151,14 @@ export { Suchfeld };
 const passt = (s: string) => (v: Vorlage) => !s || `${v.titel} ${KURZ[v.id] ?? ""} ${v.beschreibung}`.toLowerCase().includes(s);
 
 function Treffer({ s, setzen }: { s: string; setzen?: (w: string) => void }) {
+  const ziel = useZiel();
   const liste = VORLAGEN.filter(passt(s));
-  if (liste.length) return <View>{<VorlagenListe liste={liste} />}</View>;
+  const mappe = KONTROLLE.test(s) ? (
+    <Karte stil={{ marginBottom: liste.length ? 12 : 0 }}>
+      <Zeile symbol="folder" ton="blau" titel={TEXT.kontrollmappe_zeile} text={TEXT.r11_mappe_zeile_kurz} onPress={() => ziel((n) => n.oeffnen("kontrollmappe", () => <KontrollmappeSeite />))} letzte />
+    </Karte>
+  ) : null;
+  if (liste.length || mappe) return <View>{mappe}{liste.length ? <VorlagenListe liste={liste} /> : null}</View>;
   // nichts gefunden (B7): nicht nur „nichts da“, sondern Vorschläge, mit denen es weitergeht
   return (
     <View style={{ gap: 12 }}>
@@ -208,6 +220,12 @@ export function Unterlagen(_: { schliessen?: boolean }) {
   const grosseSchrift = useGrosseSchrift();
   const s = suche.trim().toLowerCase();
   const zuletzt = useMemo(() => sortiert({ unterlagen } as Stand).slice(0, 3), [unterlagen]);
+  const profil = useStandWahl((x) => x.profil);
+  const anlaesse = useMemo(() => {
+    const branchen = Array.isArray(profil["taetigkeit.branchen"]) ? (profil["taetigkeit.branchen"] as string[]) : [];
+    const eigene = new Set(branchen.map((b) => ANLASS_JE_BRANCHE[b]).filter(Boolean));
+    return [...ANLAESSE.filter((a) => eigene.has(a.id)), ...ANLAESSE.filter((a) => !eigene.has(a.id))];
+  }, [profil]);
   const zuAnlass = (a: Anlass) => (a.vorlagen.length === 1 ? starten(a.vorlagen[0]!) : nav.oeffnen(`anlass-${a.id}`, () => <AnlassSeite a={a} />));
   return (
     <BuehnenBlatt
@@ -261,8 +279,8 @@ export function Unterlagen(_: { schliessen?: boolean }) {
 
           <Gruppe erste={!zuletzt.length && !betriebFehlt(betrieb)} titel={TEXT.wofuer}>
             <Karte>
-              {ANLAESSE.map((a, i) => (
-                <Zeile key={a.id} symbol={ANLASS_SYMBOL[a.id] ?? "doc.text"} ton={ANLASS_TON[a.id] ?? "amt"} titel={a.titel} text={a.text} onPress={() => zuAnlass(a)} letzte={i === ANLAESSE.length - 1} />
+              {anlaesse.map((a, i) => (
+                <Zeile key={a.id} symbol={ANLASS_SYMBOL[a.id] ?? "doc.text"} ton={ANLASS_TON[a.id] ?? "amt"} titel={a.titel} text={a.text} onPress={() => zuAnlass(a)} letzte={i === anlaesse.length - 1} />
               ))}
             </Karte>
           </Gruppe>

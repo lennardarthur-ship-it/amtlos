@@ -1,14 +1,19 @@
 # Katalog H.3 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.beauty_kosmetikverordnung
-version: 2
+version: 3
 katalog_nr: H.3
 titel:
   de: Kosmetikverordnung bei eigenen Produkten
 kurz:
   de: Stellst du eigene Kosmetikprodukte her oder bringst sie unter deinem Namen in Verkehr, gelten die Pflichten der EU-Kosmetikverordnung.
 erklaerung:
-  de: Dazu gehören eine verantwortliche Person, eine Sicherheitsbewertung und eine Produktinformationsdatei.
+  de: Wer Kosmetik herstellt oder unter eigenem Namen bzw. eigener Marke in Verkehr bringt, gilt als Hersteller (Art. 2 Abs. 1 lit. d
+    Kosmetikverordnung). Vor dem ersten Inverkehrbringen brauchst du eine verantwortliche Person in der EU – das bist du selbst oder
+    jemand, den du schriftlich benennst, zum Beispiel dein Lohnhersteller (Art. 4) –, eine Sicherheitsbewertung und eine
+    Produktinformationsdatei, die Herstellung nach guter Herstellungspraxis (Art. 8) und die Notifizierung im CPNP-Portal der EU
+    (Art. 13). Auf der Verpackung stehen die Pflichtangaben nach Art. 19, etwa Inhaltsstoffe, Mindesthaltbarkeit und Name der
+    verantwortlichen Person. Ernste unerwünschte Wirkungen meldest du der Behörde (Art. 23).
 rechtsgrundlage:
 - Verordnung (EG) Nr. 1223/2009
 kategorie: branche
@@ -56,7 +61,7 @@ quellen:
   abgerufen: null
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Notifizierung (CPNP) und Kennzeichnung ergänzen
+- 'CPNP (Art. 13), Kennzeichnung (Art. 19), GMP (Art. 8), ernste unerwünschte Wirkungen (Art. 23), Herstellerbegriff (Art. 2 Abs. 1 lit. d) und verantwortliche Person (Art. 4) im Text (R11, Nutzertest Kosmetik) – Frist „vor dem ersten Inverkehrbringen“ ohne Termin; bestätigen'
 - 'Auslöser an die Frage „eigene Produkte, Eigenmarke oder Import von außerhalb der EU“ gekoppelt (R10) – Abgrenzung Herstellung ↔ Weiterverkauf bestätigen'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 pruefung:

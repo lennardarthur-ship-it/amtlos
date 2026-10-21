@@ -1,15 +1,16 @@
 # Katalog F.65 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: ki.transparenz
-version: 3
+version: 4
 katalog_nr: F.65
 titel:
   de: KI-Inhalte und KI-Interaktion kennzeichnen
 kurz:
-  de: Ab 2.12.2026 gelten Transparenz- und Kennzeichnungspflichten, etwa für Chatbots und KI-erzeugte Inhalte.
+  de: Seit 2.8.2026 müssen Menschen erkennen können, dass sie mit einer KI sprechen, etwa bei Chatbots; KI-erzeugte Inhalte kennzeichnest du.
 erklaerung:
-  de: Nach Art. 50 KI-Verordnung müssen Menschen erkennen können, dass sie mit einer KI interagieren oder Inhalte KI-erzeugt
-    sind.
+  de: Nach Art. 50 KI-Verordnung müssen Menschen erkennen können, dass sie mit einer KI interagieren (Abs. 1, seit 2.8.2026) oder
+    dass Inhalte KI-erzeugt sind (Abs. 2). Für generative KI-Systeme, die schon vor dem 2.8.2026 in Verkehr waren, gilt für die
+    maschinenlesbare Kennzeichnung eine Übergangsfrist bis 2.12.2026.
 rechtsgrundlage:
 - Art. 50 KI-VO
 kategorie: ki
@@ -22,11 +23,7 @@ ausloeser:
   label:
     de: Ihr bietet eigene KI-Produkte oder -Funktionen an.
 frist:
-  typ: absolut
-  datum: '2026-12-02'
-  verschiebung:
-    regel: keine
-    kalender: bundeseinheitlich
+  typ: dauerhaft
 wiederholung:
   art: einmalig
 stelle:
@@ -35,26 +32,23 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Bußgeld bis 15 Mio. € oder 3 % des weltweiten Jahresumsatzes, bei kleinen und mittleren Unternehmen der niedrigere Betrag (Art. 99 KI-VO).
   schwere: mittel
 automatisierung: hinweis
-status_recht: beschlossen
-radar:
-  wahrscheinlichkeit: sicher
-  erwartet_ab: '2026-12-02'
-  vorbereitung:
-  - de: Auflisten, wo ihr KI-Inhalte veröffentlicht oder Chatbots einsetzt
-  - de: Kennzeichnung für Chatbots und KI-erzeugte Inhalte vorbereiten
-gueltig_ab: '2026-12-02'
+status_recht: in_kraft
+gueltig_ab: '2026-08-02'
 gueltig_bis: null
 quellen:
 - titel: KI-Verordnung (EU) 2024/1689
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32024R1689
   abgerufen: null
+- titel: FGS – EU AI Act, was ab dem 2. August 2026 gilt und was verschoben wurde
+  url: https://www.fgs.de/news-and-insights/blog/detail/eu-ai-act-was-ab-dem-2-august-2026-gilt-und-was-verschoben-wurde
+  abgerufen: '2026-10-20'
 fachlich_zu_pruefen:
+- 'Termine nach Digital-Omnibus VO (EU) 2026/1744 (in Kraft 27.7.2026) laut Rechtsprüfung R11 (Befund 8) und Kanzlei-Blog FGS: Art. 50 Abs. 1 seit 2.8.2026, Übergangsfrist Abs. 2 bis 2.12.2026 – im Amtsblatt gegenlesen'
+- 'Bußgeldrahmen Art. 99 KI-VO laut FGS unverändert – Absatz und KMU-Regel bestätigen'
 - Welche Fälle des Art. 50 treffen auf Kleinbetriebe zu (Chatbot, Deepfake, generierte Texte)?
-- Nach dem 2.12.2026 auf in_kraft umstellen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 - Vorbereitungs-Checkliste fachlich prüfen
 pruefung:
   status: entwurf

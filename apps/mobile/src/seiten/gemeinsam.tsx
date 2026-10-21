@@ -1,11 +1,11 @@
 import { useIsFocused } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { useCallback, type ReactElement, type ReactNode } from "react";
-import { FlatList, Platform, Pressable, ScrollView, View, type ScrollViewProps } from "react-native";
+import { FlatList, Platform, Pressable, ScrollView, View, useWindowDimensions, type ScrollViewProps } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Bereich } from "@amtlos/fachlogik";
 import { euroText } from "../unterlagen/ablage";
-import { BuehnenText, Motiv, Stempel, T, useGrosseSchrift } from "../ui/bausteine";
+import { BuehnenText, Motiv, Symbol, T, useGrosseSchrift } from "../ui/bausteine";
 import { HellerStatus, TastaturRahmen, useImBlatt, useKopf, type KopfKnopfDef } from "../ui/navigation";
 import { BLATT_OBEN, RADIUS, RAND, SCHRIFT, schattenStil, useFarben } from "../ui/thema";
 import { trennen } from "../ui/trennen";
@@ -110,14 +110,22 @@ export function BuehnenListe<T>({ ueber, titel, buehne, kopf, fuss, daten, zeile
 }
 
 /** Betrag groß wie in Finanz-Apps: Euro weiß, Cent und Zeichen gedämpft. */
-export function GrosserBetrag({ cent, groesse = 60, label }: { cent: number; groesse?: number; label?: string }) {
+export function GrosserBetrag({ cent, groesse: wunsch = 60, label }: { cent: number; groesse?: number; label?: string }) {
   const f = useFarben();
+  const { width, fontScale } = useWindowDimensions();
   const text = euroText(cent);
   const komma = text.lastIndexOf(",");
   const vorn = komma > 0 ? text.slice(0, komma) : text;
   const hinten = komma > 0 ? text.slice(komma) : "";
+  // R11 (UX #10): immer einzeilig – bei großer Schrift oder langem Betrag kleiner (bis 60 %), nie „701,6 / 1 €“.
+  // Geschätzt (Ziffern der Display-Schrift ≈ 0,6 em), weil adjustsFontSizeToFit im Web nicht greift.
+  // bewusst ohne Obergrenze gerechnet: lieber etwas kleiner als ein abgeschnittener Betrag
+  const skala = Math.max(1, fontScale);
+  const breite = text.length * wunsch * 0.6 * skala;
+  const platz = Math.max(200, width - 2 * RAND);
+  const groesse = Math.round(wunsch * Math.max(0.6, Math.min(1, platz / breite)));
   return (
-    <T accessibilityLabel={label ?? text} maxFontSizeMultiplier={1.4} farbe={f.buehneText} stil={{ ...SCHRIFT.display, fontSize: groesse, lineHeight: groesse * 1.07, letterSpacing: -groesse * 0.04, fontVariant: ["tabular-nums"] }}>
+    <T accessibilityLabel={label ?? text} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6} maxFontSizeMultiplier={1.4} farbe={f.buehneText} stil={{ ...SCHRIFT.display, fontSize: groesse, lineHeight: groesse * 1.07, letterSpacing: -groesse * 0.04, fontVariant: ["tabular-nums"] }}>
       {vorn}
       <T maxFontSizeMultiplier={1.4} farbe="rgba(255,255,255,0.72)" stil={{ ...SCHRIFT.display, fontSize: groesse, lineHeight: groesse * 1.07, letterSpacing: -groesse * 0.04 }}>{hinten}</T>
     </T>
@@ -202,15 +210,18 @@ export function BlattKopf({ titel, rechts, onPress, erste }: { titel: string; re
 }
 
 /**
- * Leerer Zustand als Einladung (B7): der Amtlos-Stempel groß und leise (wie ein Abdruck), ein warmer Satz, was jetzt
- * sinnvoll ist, und die Handlung dazu. `symbol` bleibt für ältere Aufrufe, der Stempel ersetzt es.
+ * Leerer Zustand als Einladung (B7): ein großes, leises Symbol (Standard: Ordner), ein warmer Satz, was jetzt sinnvoll
+ * ist, und die Handlung dazu.
  */
-export function Leer({ text, unter, children }: { text: string; unter?: string; children?: ReactNode; symbol?: string }) {
+export function Leer({ text, unter, children, symbol = "folder" }: { text: string; unter?: string; children?: ReactNode; symbol?: string }) {
   const f = useFarben();
   return (
     <View style={[{ paddingTop: 28, paddingBottom: 20, paddingHorizontal: 20, borderRadius: RADIUS.karte, backgroundColor: f.blatt, gap: 18, alignItems: "stretch", borderWidth: 0 }, schattenStil(f)]}>
       <View style={{ alignItems: "center", gap: 8 }}>
-        <Stempel groesse={96} farbe={f.amt} grund={f.amtHauch} />
+        {/* R11 (UX #16): ein Ordner statt des Erfolgshakens – der Haken heißt sonst „erledigt“ */}
+        <View style={{ width: 96, height: 96, borderRadius: 48, backgroundColor: f.amtHauch, alignItems: "center", justifyContent: "center" }}>
+          <Symbol name={symbol} groesse={42} farbe={f.amt} gewicht="regular" />
+        </View>
         <T v="gross" stil={{ textAlign: "center", marginTop: 14 }}>{text}</T>
         {unter ? <T leise stil={{ textAlign: "center", maxWidth: 300 }}>{unter}</T> : null}
       </View>

@@ -6,16 +6,16 @@
  */
 // CommonJS-Build wie in fusszeile.ts: die ESM-Variante von pdf-lib lässt sich von Metro nicht auflösen
 import { PDFDocument } from "pdf-lib/cjs/index";
-import { BEREICHE, dateinamenTeil, unterlagenName, vorlageFuer, type Bereich, type Vorlage } from "@amtlos/fachlogik";
+import { BEREICHE, dateinamenTeil, monatAus, unterlagenName, vorlageFuer, type Bereich, type Vorlage } from "@amtlos/fachlogik";
 import { fehltFuer } from "./pruefung";
-import { nichtZaehlend, type Stand, type Unterlage } from "./speicher";
+import { heute as heuteBerlin, nichtZaehlend, type Stand, type Unterlage } from "./speicher";
 
 /** Bereiche, deren Unterlagen bei Kontrollen (Gewerbeaufsicht, BG, Lebensmittelüberwachung, Datenschutz) vorzulegen sind */
 const MAPPE_BEREICHE: Bereich[] = ["arbeitsschutz", "beauty", "gastro", "personal", "datenschutz"];
 /** aus „Personal“ nur die Nachweise – Lohnkonto und Personalfragebogen sind Lohn- bzw. Meldedaten, keine Kontrollnachweise */
-const PERSONAL_NACHWEISE = new Set(["arbeitszeitnachweis", "nachweis_arbeitsbedingungen", "ki_kompetenz"]);
-/** Text für die eigene Website, kein Nachweis */
-const NICHT_IN_MAPPE = new Set(["datenschutzerklaerung_website"]);
+const PERSONAL_NACHWEISE = new Set(["arbeitszeitnachweis", "nachweis_arbeitsbedingungen", "ki_kompetenz", "ausweis_hinweis"]);
+/** Text für die eigene Website bzw. Gesundheitsangaben von Kundinnen (R11) – kein Nachweis für eine Kontrolle */
+const NICHT_IN_MAPPE = new Set(["datenschutzerklaerung_website", "anamnese_einwilligung"]);
 /** Namensfelder, die nur den Zeitraum bzw. Tag benennen: dann zählt nur die neueste Fassung (z. B. HACCP je Monat) */
 const ZEIT_FELDER = new Set(["zeitraum", "datum", "jahr", "stichtag"]);
 /** Datum, das eine Unterlage trägt („Stand“, „Datum“) – in dieser Reihenfolge */
@@ -43,12 +43,37 @@ export interface MappenAuswahl {
   eintraege: MappenEintrag[];
   /** Unterlagen passender Vorlagen, die weder geteilt noch vollständig sind – sie fehlen in der Mappe */
   unvollstaendig: number;
+  /** R11 (UX #5): dieselben Unterlagen einzeln – mit der Zahl fehlender Angaben, zum Ergänzen */
+  unvollstaendigListe: { id: string; vorlage: string; titel: string; fehlt: number }[];
+}
+
+/**
+ * Arbeitszeitnachweise (R11, Reinigung #2): je Person und Monat ein eigener Eintrag – die FKS prüft alle Monate, nicht
+ * nur den letzten. Aufbewahrt werden die Aufzeichnungen mindestens zwei Jahre (§ 17 Abs. 1 MiLoG); ältere gehören nicht
+ * mehr in die Mappe.
+ */
+const JE_MONAT = new Set(["arbeitszeitnachweis"]);
+const MONATE_IN_MAPPE = 24;
+
+/** Neuester Arbeitstag eines Nachweises (YYYY-MM-DD) oder null. */
+function letzterTag(u: Unterlage): string | null {
+  const tage = Array.isArray(u.daten.tage) ? (u.daten.tage as { datum?: unknown }[]).map((x) => x?.datum).filter(istDatum).map((d) => d.slice(0, 10)).sort() : [];
+  return tage.at(-1) ?? null;
+}
+
+function minusMonate(iso: string, n: number): string {
+  const [j, m, t] = iso.split("-").map(Number) as [number, number, number];
+  return new Date(Date.UTC(j, m - 1 - n, Math.min(t, 28))).toISOString().slice(0, 10);
 }
 
 const istDatum = (w: unknown): w is string => typeof w === "string" && /^\d{4}-\d{2}-\d{2}/.test(w);
 
 function datumVon(u: Unterlage): string {
   for (const k of DATUM_FELDER) if (istDatum(u.daten[k])) return (u.daten[k] as string).slice(0, 10);
+  if (JE_MONAT.has(u.vorlage)) {
+    const t = letzterTag(u);
+    if (t) return t;
+  }
   return (u.ausgegeben ?? u.geaendert).slice(0, 10);
 }
 
@@ -62,26 +87,39 @@ const GRUPPE_ZUSATZ: Record<string, string> = { pruefprotokoll_elektro: "einsatz
 function gruppe(v: Vorlage, u: Unterlage): string {
   const feld = v.namensFeld && !ZEIT_FELDER.has(v.namensFeld) ? u.daten[v.namensFeld] : null;
   const name = typeof feld === "string" ? feld.trim().split("\n")[0]!.toLocaleLowerCase("de") : "";
-  const z = GRUPPE_ZUSATZ[v.id] ? u.daten[GRUPPE_ZUSATZ[v.id]!] : null;
+  const z = JE_MONAT.has(v.id) ? monatAus(u.daten) : GRUPPE_ZUSATZ[v.id] ? u.daten[GRUPPE_ZUSATZ[v.id]!] : null;
   return `${v.id}\u0000${name}${typeof z === "string" && z.trim() ? `\u0000${z.trim().toLocaleLowerCase("de")}` : ""}`;
+}
+
+/** Name in der Mappe: bei Nachweisen je Monat mit dem Monat („Arbeitszeitnachweis · Amira · Oktober 2026“). */
+function mappenTitel(v: Vorlage, u: Unterlage): string {
+  const name = unterlagenName(v, u.daten);
+  const monat = JE_MONAT.has(v.id) ? monatAus(u.daten) : "";
+  return monat ? `${name} · ${monat}` : name;
 }
 
 /**
  * Je Vorlage (und Namensfeld) die neueste geteilte Unterlage; ist keine geteilt, die neueste vollständige. Sortiert nach
  * Bereich (Reihenfolge wie in „Vorlagen“) und Titel.
  */
-export function mappenAuswahl(s: Stand): MappenAuswahl {
+export function mappenAuswahl(s: Pick<Stand, "unterlagen" | "betrieb">, heute = heuteBerlin()): MappenAuswahl {
   const beste = new Map<string, { u: Unterlage; v: Vorlage; geteilt: boolean; zeit: string }>();
   const ohne = new Set<string>();
+  const grenze = minusMonate(heute, MONATE_IN_MAPPE);
   // Konfliktkopien (K1) gelten nicht – in die Mappe kommt nur die gültige Fassung
   const aus = nichtZaehlend(s.unterlagen);
   for (const u of s.unterlagen) {
     if (aus.has(u.id)) continue;
     const v = vorlageFuer(u.vorlage);
     if (!v || !gehoertInMappe(v)) continue;
+    // Arbeitszeit älter als zwei Jahre: Aufbewahrungsfrist nach § 17 MiLoG vorbei – nicht mehr in die Mappe
+    if (JE_MONAT.has(v.id)) {
+      const t = letzterTag(u);
+      if (t && t < grenze) continue;
+    }
     const geteilt = Boolean(u.ausgegeben || u.festgeschrieben);
     const g = gruppe(v, u);
-    if (!geteilt && fehltFuer(s, u).length) {
+    if (!geteilt && fehltFuer(s as Stand, u).length) {
       ohne.add(u.id);
       continue;
     }
@@ -92,17 +130,48 @@ export function mappenAuswahl(s: Stand): MappenAuswahl {
   }
   const rang = (b: Bereich) => BEREICHE.findIndex((x) => x.id === b);
   const eintraege = [...beste.values()]
-    .map(({ u, v, geteilt }) => ({ id: u.id, vorlage: v.id, titel: unterlagenName(v, u.daten), bereich: v.bereich, datum: datumVon(u), geteilt }))
+    .map(({ u, v, geteilt }) => ({ id: u.id, vorlage: v.id, titel: mappenTitel(v, u), bereich: v.bereich, datum: datumVon(u), geteilt }))
     .sort((a, b) => rang(a.bereich) - rang(b.bereich) || a.titel.localeCompare(b.titel, "de") || b.datum.localeCompare(a.datum));
   // eine unvollständige Unterlage zählt nicht als fehlend, wenn ihre Gruppe schon eine bessere Fassung hat
   const vertreten = new Set([...beste.keys()]);
-  let unvollstaendig = 0;
+  const unvollstaendigListe: MappenAuswahl["unvollstaendigListe"] = [];
   for (const id of ohne) {
     const u = s.unterlagen.find((x) => x.id === id)!;
-    if (!vertreten.has(gruppe(vorlageFuer(u.vorlage)!, u))) unvollstaendig++;
+    const v = vorlageFuer(u.vorlage)!;
+    if (!vertreten.has(gruppe(v, u))) unvollstaendigListe.push({ id: u.id, vorlage: v.id, titel: mappenTitel(v, u), fehlt: fehltFuer(s as Stand, u).length });
   }
-  return { eintraege, unvollstaendig };
+  unvollstaendigListe.sort((a, b) => rang(vorlageFuer(a.vorlage)!.bereich) - rang(vorlageFuer(b.vorlage)!.bereich) || a.titel.localeCompare(b.titel, "de"));
+  return { eintraege, unvollstaendig: unvollstaendigListe.length, unvollstaendigListe };
 }
+
+/**
+ * R11 (Berater d): „Kontrollbereit: x von y Nachweisen“ – x: Unterlagen, die in die Mappe kommen; y: dazu die offenen
+ * Pflichten mit Vorlage, die für eine Kontrolle noch fehlen, und unvollständige Unterlagen ohne fertige Fassung.
+ */
+export function kontrollbereit(s: Pick<Stand, "unterlagen" | "betrieb">, offen: readonly PflichtMitVorlagen[], heute = heuteBerlin()): { da: number; gesamt: number } {
+  const a = mappenAuswahl(s, heute);
+  const fehlt = fehltInMappe(offen, a.eintraege, "alle");
+  // eine unvollständige Unterlage, deren Vorlage schon unter „fehlt“ steht, nicht doppelt zählen
+  const fehltVorlagen = new Set(fehlt.map((x) => x.vorlage));
+  const halb = a.unvollstaendigListe.filter((x) => !fehltVorlagen.has(x.vorlage)).length;
+  return { da: a.eintraege.length, gesamt: a.eintraege.length + fehlt.length + halb };
+}
+
+/**
+ * R11 (Tischlerei #22): Nachweise für eine BG-Besichtigung, für die es keine Vorlage in Amtlos gibt – nur zum Abhaken
+ * („vorhanden“), ohne Aussage, ob und in welcher Form sie im Einzelfall verlangt sind. Gespeichert wie ein Haken unter
+ * `erledigt` mit dem Schlüssel `nachweis.bg.<id>`.
+ */
+export const BG_NACHWEISE: { id: string; titel: string }[] = [
+  { id: "betreuung", titel: "Betreuung durch Fachkraft für Arbeitssicherheit und Betriebsarzt" },
+  { id: "ersthelfer", titel: "Ersthelfer im Betrieb" },
+  { id: "verbandbuch", titel: "Verbandbuch (Dokumentation der Erste-Hilfe-Leistungen)" },
+  { id: "pruefungen", titel: "Prüfnachweise für Arbeitsmittel (z. B. Leitern, Maschinen, Absaugung, Feuerlöscher)" },
+  { id: "vorsorge", titel: "Nachweise zur arbeitsmedizinischen Vorsorge" },
+];
+export const BG_SCHLUESSEL = (id: string) => `nachweis.bg.${id}`;
+/** Titel der als vorhanden markierten BG-Nachweise. */
+export const bgVorhanden = (erledigt: Record<string, string>) => BG_NACHWEISE.filter((n) => erledigt[BG_SCHLUESSEL(n.id)]).map((n) => n.titel);
 
 /**
  * Kontrollarten (R10): Jede Stelle bekommt nur, was sie prüft – die Lebensmittelkontrolle keine Gehälter (Datenminimierung,
@@ -112,7 +181,7 @@ export type Kontrollart = "alle" | "hygiene" | "zoll" | "bg" | "datenschutz";
 export const KONTROLLARTEN: Kontrollart[] = ["alle", "hygiene", "zoll", "bg", "datenschutz"];
 const JE_KONTROLLE: Record<Exclude<Kontrollart, "alle">, ReadonlySet<string>> = {
   hygiene: new Set(["ifsg_belehrung", "allergene", "haccp", "hygieneplan"]),
-  zoll: new Set(["arbeitszeitnachweis", "nachweis_arbeitsbedingungen"]),
+  zoll: new Set(["arbeitszeitnachweis", "nachweis_arbeitsbedingungen", "ausweis_hinweis"]),
   bg: new Set(["gefaehrdungsbeurteilung", "unterweisung", "gefahrstoffverzeichnis", "betriebsanweisung", "pruefprotokoll_elektro", "hautschutzplan"]),
   datenschutz: new Set(["datenschutz_dokumentation", "avv", "datenschutzinformation", "datenpanne"]),
 };
@@ -158,7 +227,7 @@ const bereichTitel = (b: Bereich) => BEREICHE.find((x) => x.id === b)?.titel ?? 
  * Deckblatt: Betrieb, Datum, Inhaltsverzeichnis mit Titel, Datum und – wenn bekannt – Seite in der Mappe. Die Meta-Tags
  * geben der Fußzeile (fusszeile.ts) Betrieb und Stand.
  */
-export function deckblattHtml(betrieb: string, heute: string, eintraege: (MappenEintrag & { seite?: number })[], art?: string): string {
+export function deckblattHtml(betrieb: string, heute: string, eintraege: (MappenEintrag & { seite?: number })[], art?: string, papier: string[] = []): string {
   const name = betrieb.trim() || "Betrieb";
   // viele Einträge: engere Zeilen, damit das Inhaltsverzeichnis nicht mit wenigen Zeilen auf eine zweite Seite läuft
   const eng = eintraege.length > 9;
@@ -181,6 +250,7 @@ th{font-size:8.5pt;font-weight:600;text-align:left;color:#5b6670;padding:0 2mm 1
 th.s{text-align:right}
 .t{font-weight:600}.b{font-size:8.5pt;color:#5b6670;margin-top:.5mm}
 .hinweis{margin-top:8mm;font-size:8.5pt;color:#5b6670}
+h2.papier{margin-top:7mm}ul.papier{margin:0;padding-left:5mm}ul.papier li{margin:1mm 0}
 body.eng h1{margin:3mm 0 1mm;font-size:22pt}body.eng .stand{margin-bottom:6mm}body.eng td{padding:1.5mm 2mm}body.eng .hinweis{margin-top:5mm}
 </style></head><body class="g-nachweis${eng ? " eng" : ""}">
 <div class="art">Kontrollmappe${art ? ` · ${esc(art)}` : ""}</div>
@@ -189,6 +259,7 @@ body.eng h1{margin:3mm 0 1mm;font-size:22pt}body.eng .stand{margin-bottom:6mm}bo
 <p class="stand">Zusammengestellt am ${datumDe(heute)} · ${eintraege.length} ${eintraege.length === 1 ? "Unterlage" : "Unterlagen"}</p>
 <h2>Inhalt</h2>
 <table><thead><tr><th></th><th>Unterlage</th><th>Datum</th><th class="s">Seite</th></tr></thead><tbody>${zeilen}</tbody></table>
+${papier.length ? `<h2 class="papier">Außerdem im Betrieb vorhanden (nicht in dieser Mappe)</h2><ul class="papier">${papier.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}
 <p class="hinweis">Jede Unterlage folgt mit eigener Fußzeile und eigenen Seitenzahlen; die Seite im Inhalt zählt die Mappe von vorn.</p>
 </body></html>`;
 }

@@ -32,20 +32,71 @@ function zeiten(d: Daten) {
   return { z, gesamt: z.reduce((a, t) => a + (t.min ?? 0), 0) };
 }
 
+const MONATSNAMEN = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+const ISO_TAG = /^\d{4}-\d{2}-\d{2}$/;
+const monatVon = (iso: string) => `${MONATSNAMEN[Number(iso.slice(5, 7)) - 1]} ${iso.slice(0, 4)}`;
+
+/**
+ * Monat eines Arbeitszeitnachweises (R11, Reinigung #10): die eigene Angabe, sonst aus den Daten der Arbeitstage
+ * („Oktober 2026“; über zwei Monate „September 2026 – Oktober 2026“). Leer, wenn nichts bekannt ist.
+ */
+export function monatAus(d: Daten): string {
+  const eigen = text(d, "monat");
+  if (eigen) return eigen;
+  const tage = liste(d, "tage").map((x) => text(x, "datum")).filter((t) => ISO_TAG.test(t)).sort();
+  if (!tage.length) return "";
+  const von = monatVon(tage[0]!);
+  const bis = monatVon(tage[tage.length - 1]!);
+  return von === bis ? von : `${von} – ${bis}`;
+}
+
+/** Branchen nach § 2a SchwarzArbG für den Hinweis im Nachweis (R11, Reinigung #9) – vorbelegt aus der Branche im Pflichten-Check. */
+const AZN_BRANCHEN = [
+  { wert: "gastronomie", text: "Gaststätten und Beherbergung" },
+  { wert: "bau", text: "Baugewerbe" },
+  { wert: "gebaeudereinigung", text: "Gebäudereinigung" },
+  { wert: "friseur_kosmetik", text: "Friseur- und Kosmetikgewerbe" },
+  { wert: "andere", text: "Andere Branche nach § 2a SchwarzArbG" },
+  { wert: "keine", text: "Keine dieser Branchen" },
+];
+
+/** Satz zur Aufzeichnungspflicht unter der Tabelle – je nach Branche aus dem Profil. */
+function aufzeichnungsSatz(d: Daten): string {
+  const frist = "Beginn, Ende und Dauer der täglichen Arbeitszeit spätestens bis zum Ablauf des siebten Kalendertages nach dem Arbeitstag aufzeichnen. Die Aufzeichnungen mindestens zwei Jahre aufbewahren.";
+  const b = text(d, "branche");
+  const name = AZN_BRANCHEN.find((x) => x.wert === b && b !== "keine" && b !== "andere")?.text;
+  if (name) return `Aufzeichnungspflicht nach § 17 Abs. 1 MiLoG für Branchen nach § 2a SchwarzArbG (hier: ${name}) und für Minijobs: ${frist}`;
+  if (b === "andere") return `Aufzeichnungspflicht nach § 17 Abs. 1 MiLoG für Branchen nach § 2a SchwarzArbG und für Minijobs: ${frist}`;
+  if (b === "keine") return `Für Minijobs gilt die Aufzeichnungspflicht nach § 17 Abs. 1 MiLoG: ${frist}`;
+  return `Aufzeichnungspflicht nach § 17 Abs. 1 MiLoG für Minijobs und die Branchen nach § 2a SchwarzArbG (u. a. Bau, Gastronomie, Gebäudereinigung, Friseur- und Kosmetikgewerbe): ${frist}`;
+}
+
 export const arbeitszeitnachweis: Vorlage = {
   id: "arbeitszeitnachweis",
   titel: "Arbeitszeitnachweis",
   beschreibung: "Beginn, Ende und Dauer der täglichen Arbeitszeit je Person und Monat – auch für Minijobs. Ausgefüllt oder als Blatt zum Eintragen von Hand.",
   bereich: "personal",
   pflichten: ["personal.arbeitszeit_aufzeichnung", "personal.arbeitszeit_milog"],
-  person: { art: "mitarbeiter", felder: { name: "name" } },
+  // „Beschäftigt seit“ für die Prüfung, ob ein Arbeitstag davor liegt (R11, Reinigung #10)
+  person: { art: "mitarbeiter", felder: { name: "name", beginn: "beschaeftigt_seit" } },
   grundlage: "§ 3 Abs. 2 Nr. 1 ArbSchG (BAG 13.09.2022 – 1 ABR 22/21); § 17 MiLoG",
   namensFeld: "name",
   abschnitte: [
     { titel: "Person und Monat",
       felder: [
         { id: "name", art: "text", label: "Name der beschäftigten Person", pflicht: true },
-        { id: "monat", art: "text", label: "Monat", hilfe: "z. B. Oktober 2026", pflicht: true },
+        // R11: ohne Angabe aus den Arbeitstagen – Freitext nur noch, wer etwas anderes drucken will
+        { id: "monat", selten: true, art: "text", label: "Monat", hilfe: "Leer lassen: Amtlos nimmt den Monat aus den Arbeitstagen, z. B. Oktober 2026." },
+        { id: "beschaeftigt_seit", selten: true, art: "datum", label: "Beschäftigt seit", hilfe: "Aus „Mitarbeiter“ übernommen. Amtlos weist darauf hin, wenn ein Arbeitstag davor liegt." },
+        {
+          id: "branche",
+          selten: true,
+          art: "wahl",
+          label: "Branche für den Hinweis zur Aufzeichnungspflicht",
+          optionen: AZN_BRANCHEN,
+          vorbelegungJe: { gastro_cafe: "gastronomie", friseur: "friseur_kosmetik", kosmetik: "friseur_kosmetik", gebaeudereinigung: "gebaeudereinigung" },
+          hilfe: "Aus deiner Branche im Pflichten-Check. Bestimmt den Satz unter der Tabelle.",
+        },
         { id: "leerzeilen", selten: true, art: "schalter", label: "Leere Zeilen zum Eintragen von Hand anhängen", vorbelegung: false },
       ],
     },
@@ -64,6 +115,7 @@ export const arbeitszeitnachweis: Vorlage = {
             { id: "beginn", art: "uhrzeit", label: "Beginn" },
             { id: "ende", art: "uhrzeit", label: "Ende" },
             { id: "pause", art: "zahl", label: "Pause (Minuten)" },
+            { id: "einsatzort", art: "text", label: "Einsatzort", hilfe: "z. B. Objekt, Kunde oder Baustelle" },
             { id: "bemerkung", selten: true, art: "text", label: "Bemerkung", hilfe: "z. B. Urlaub, krank" },
           ],
         },
@@ -80,25 +132,44 @@ export const arbeitszeitnachweis: Vorlage = {
         : [["beginn", "Beginn"], ["ende", "Ende"]].filter(([k]) => !text(x, k!)).map(([, label]) => `Arbeitstag${tage.length > 1 ? ` ${i + 1}` : ""}: ${label}`),
     );
   },
+  hinweise(d) {
+    const r: string[] = [];
+    // R11 (Reinigung #10): Arbeitstag vor „Beschäftigt seit“ – meist ein Tippfehler im Datum oder beim Beginn
+    const seit = text(d, "beschaeftigt_seit");
+    const tage = liste(d, "tage").map((x) => text(x, "datum")).filter((t) => ISO_TAG.test(t)).sort();
+    const vorher = ISO_TAG.test(seit) ? tage.filter((t) => t < seit) : [];
+    if (vorher.length) r.push(`${vorher.length === 1 ? `Der Arbeitstag am ${datumDe(vorher[0]!)} liegt` : `${vorher.length} Arbeitstage (ab ${datumDe(vorher[0]!)}) liegen`} vor „Beschäftigt seit“ (${datumDe(seit)}). Bitte Datum bzw. Beginn der Beschäftigung prüfen.`);
+    if (tage.length && monatVon(tage[0]!) !== monatVon(tage[tage.length - 1]!)) r.push("Die Arbeitstage stammen aus mehreren Monaten. Üblich ist ein Nachweis je Person und Monat.");
+    return r;
+  },
   html(d, b) {
     const { z, gesamt } = zeiten(d);
+    const monat = monatAus(d);
+    // Einsatzort als eigene Spalte nur, wenn er irgendwo eingetragen ist
+    const mitOrt = z.some(({ x }) => text(x, "einsatzort"));
     // ohne Einträge: Blatt zum Eintragen von Hand – eine hohe Zeile je Tag, keine Summe „0:00 h“
     const leer = !z.length;
     const leerzeilen = leer ? 31 : ja(d, "leerzeilen") ? 31 - z.length : 0;
     return dokument({
       titel: "Arbeitszeitnachweis",
       betrieb: b,
-      unter: [text(d, "name"), text(d, "monat")].filter(Boolean).join(", ") || undefined,
-      meta: `Beschäftigte Person: ${text(d, "name")}\nMonat: ${text(d, "monat")}`,
+      unter: [text(d, "name"), monat].filter(Boolean).join(", ") || undefined,
+      meta: `Beschäftigte Person: ${text(d, "name")}\nMonat: ${monat}`,
       inhalt:
         // die Kennungsleiste lässt leere Angaben weg: dann je fehlender Angabe eine Zeile zum Eintragen von Hand
-        (!text(d, "name") || !text(d, "monat") ? `<div style="margin-bottom:5mm">${felder([["Beschäftigte Person", text(d, "name") ? null : ""], ["Monat", text(d, "monat") ? null : ""]], { nummern: false })}</div>` : "") +
-        tabelle(
-          ["Datum", "Beginn", "Ende", "Pause (Min.)", "Dauer", "Bemerkung"],
-          z.map(({ x, min }) => [datumDe(text(x, "datum")), esc(text(x, "beginn")), esc(text(x, "ende")), esc(text(x, "pause")), min === null ? "" : stunden(min), zelle(text(x, "bemerkung"))]),
-          { breiten: ["15%", "12%", "12%", "13%", "13%", "35%"], leerzeilen, hoch: leer || ja(d, "leerzeilen"), zahlen: [3, 4], ...(leer ? { summe: ["<strong>Summe</strong>", "", "", "", ZELLE_LINIE, ""] } : ja(d, "leerzeilen") ? { summe: ["<strong>Summe der erfassten Tage</strong>", `<strong>${stunden(gesamt)}</strong>`, ""], summeSpanne: 4 } : { summe: ["<strong>Summe</strong>", "", "", "", `<strong>${stunden(gesamt)}</strong>`, ""] }) },
-        ) +
-        `<p class="nachsatz">Aufzeichnungspflicht nach § 17 Abs. 1 MiLoG für Minijobs und die Branchen nach § 2a SchwarzArbG (u. a. Gastronomie, Friseur- und Kosmetikgewerbe, Bau): Beginn, Ende und Dauer der täglichen Arbeitszeit spätestens bis zum Ablauf des siebten Kalendertages nach dem Arbeitstag aufzeichnen. Die Aufzeichnungen mindestens zwei Jahre aufbewahren.</p>` +
+        (!text(d, "name") || !monat ? `<div style="margin-bottom:5mm">${felder([["Beschäftigte Person", text(d, "name") ? null : ""], ["Monat", monat ? null : ""]], { nummern: false })}</div>` : "") +
+        (mitOrt
+          ? tabelle(
+              ["Datum", "Beginn", "Ende", "Pause (Min.)", "Dauer", "Einsatzort", "Bemerkung"],
+              z.map(({ x, min }) => [datumDe(text(x, "datum")), esc(text(x, "beginn")), esc(text(x, "ende")), esc(text(x, "pause")), min === null ? "" : stunden(min), zelle(text(x, "einsatzort")), zelle(text(x, "bemerkung"))]),
+              { breiten: ["13%", "10%", "10%", "11%", "11%", "24%", "21%"], leerzeilen, hoch: ja(d, "leerzeilen"), zahlen: [3, 4], ...(ja(d, "leerzeilen") ? { summe: ["<strong>Summe der erfassten Tage</strong>", `<strong>${stunden(gesamt)}</strong>`, "", ""], summeSpanne: 4 } : { summe: ["<strong>Summe</strong>", "", "", "", `<strong>${stunden(gesamt)}</strong>`, "", ""] }) },
+            )
+          : tabelle(
+              ["Datum", "Beginn", "Ende", "Pause (Min.)", "Dauer", "Bemerkung"],
+              z.map(({ x, min }) => [datumDe(text(x, "datum")), esc(text(x, "beginn")), esc(text(x, "ende")), esc(text(x, "pause")), min === null ? "" : stunden(min), zelle(text(x, "bemerkung"))]),
+              { breiten: ["15%", "12%", "12%", "13%", "13%", "35%"], leerzeilen, hoch: leer || ja(d, "leerzeilen"), zahlen: [3, 4], ...(leer ? { summe: ["<strong>Summe</strong>", "", "", "", ZELLE_LINIE, ""] } : ja(d, "leerzeilen") ? { summe: ["<strong>Summe der erfassten Tage</strong>", `<strong>${stunden(gesamt)}</strong>`, ""], summeSpanne: 4 } : { summe: ["<strong>Summe</strong>", "", "", "", `<strong>${stunden(gesamt)}</strong>`, ""] }) },
+            )) +
+        `<p class="nachsatz">${esc(aufzeichnungsSatz(d))}</p>` +
         unterschriften(["Unterschrift beschäftigte Person", "Unterschrift Arbeitgeber/in"]),
     });
   },

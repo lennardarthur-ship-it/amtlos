@@ -4,16 +4,46 @@
  * Beide prüft die CI mit dem KoSIT-Validator.
  */
 import { EINHEIT_CODE, summen, type RechnungsDaten } from "./rechnung.js";
+import { istEuAusland } from "./buchungen.js";
 
 const betrag = (cent: number) => (cent / 100).toFixed(2);
 const geld = (cent: number) => ({ "@currencyID": "EUR" as const, wert: betrag(cent) });
 
-/** Rechnung → UBL-Struktur als JSON (Format der Bibliothek @e-invoice-eu/core auf dem Server, hier auch Grundlage für das XML der App). */
+/** Ausfuhrlieferung (§ 4 Nr. 1 Buchst. a UStG) im Befreiungshinweis */
+const AUSFUHR_IM_TEXT = /§\s*4\s+Nr\.\s*1\s*(?:Buchst\.\s*)?a(?![a-zäöü])/i;
+
+interface Partei {
+  name: string; strasse?: string | null; plz?: string | null; ort?: string | null; land: string; email?: string | null; telefon?: string | null;
+  steuernummer?: string | null; ust_idnr?: string | null;
+}
+
+/**
+ * Rechnung → UBL-Struktur als JSON (Format der Bibliothek @e-invoice-eu/core auf dem Server, hier auch Grundlage für das XML der App).
+ *
+ * R11 (Steuerberatung):
+ * - Gutschrift (§ 14 Abs. 2 Satz 2 UStG): Typ 389, Verkäufer (BG-4) ist der Leistende mit seiner Steuernummer bzw.
+ *   USt-IdNr., Käufer (BG-7) der Betrieb, der die Gutschrift ausstellt.
+ * - Steuerkategorien: Nullsteuersatz Z, Ausfuhrlieferung G (VATEX-EU-G, nur mit USt-IdNr. des Verkäufers – BR-G-02,
+ *   sonst wie bisher E), Steuerschuldnerschaft eines Empfängers im Drittland O (VATEX-EU-O: nicht im Inland steuerbar).
+ * - Abschlagsrechnung: Typ 326 (Teilrechnung) statt 380.
+ */
 export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record<string, unknown> {
   const s = summen(r.positionen, r.kleinunternehmer);
-  // Steuerkategorie (UNTDID 5305): S Normal, E befreit (auch Kleinunternehmer), AE Steuerschuldnerschaft des Empfängers, K innergemeinschaftliche Lieferung
-  const null0 = r.steuerart === "reverse_charge" ? "AE" : r.steuerart === "igl" ? "K" : "E";
-  const kategorie = (satz: number | null) => (satz === null ? { "cbc:ID": "E", "cbc:Percent": "0" } : satz === 0 ? { "cbc:ID": null0, "cbc:Percent": "0" } : { "cbc:ID": "S", "cbc:Percent": String(satz) });
+  const gs = r.gutschrift === true;
+  // Verkäufer und Käufer: bei einer Gutschrift rechnet der Betrieb (steller) als Käufer über die Leistung des Kunden ab
+  const betrieb: Partei = r.steller;
+  const gegenueber: Partei = r.kunde;
+  const verkaeufer = gs ? gegenueber : betrieb;
+  const kaeufer = gs ? betrieb : gegenueber;
+  const land = (r.kunde.land || "DE").toUpperCase();
+  // Steuerschuldnerschaft eines Unternehmens im Drittland: im Inland nicht steuerbar (O) – nur, wenn die ganze Rechnung 0 % ist (BR-O-11 ff.)
+  const drittlandO = !r.kleinunternehmer && r.steuerart === "reverse_charge" && land !== "DE" && !istEuAusland(land) && s.gruppen.every((g) => g.satz === 0);
+  const ausfuhrG = r.steuerart === "befreit" && AUSFUHR_IM_TEXT.test(r.befreiungsgrund ?? "") && !!verkaeufer.ust_idnr;
+  // Steuerkategorie (UNTDID 5305): S Normal, E befreit (auch Kleinunternehmer), AE Steuerschuldnerschaft des Empfängers,
+  // K innergemeinschaftliche Lieferung, Z Nullsteuersatz, G Ausfuhr, O nicht steuerbar
+  const null0 = r.steuerart === "reverse_charge" ? (drittlandO ? "O" : "AE") : r.steuerart === "igl" ? "K" : r.steuerart === "nullsatz" ? "Z" : ausfuhrG ? "G" : "E";
+  // O: in der Position ohne Steuersatz (BR-O-05), in der Aufschlüsselung mit 0 % – XRechnung verlangt BT-119 (BR-DE-14)
+  const kategorie = (satz: number | null, zeile = false) => (satz === null ? { "cbc:ID": "E", "cbc:Percent": "0" } : satz === 0 ? (null0 === "O" && zeile ? { "cbc:ID": "O" } : { "cbc:ID": null0, "cbc:Percent": "0" }) : { "cbc:ID": "S", "cbc:Percent": String(satz) });
   // Kleinunternehmer mit Leistung an ein Unternehmen im EU-Ausland: Hinweis auf die Steuerschuldnerschaft statt § 19 (Kategorie bleibt E)
   const kuText = r.kleinunternehmer && r.steuerart === "reverse_charge" ? "Steuerschuldnerschaft des Leistungsempfängers" : kuHinweis;
   const befreiung = (satz: number | null): Record<string, string> =>
@@ -21,28 +51,41 @@ export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record
       ? { "cbc:TaxExemptionReason": kuText }
       : satz !== 0
         ? {}
-        : r.steuerart === "reverse_charge"
-          ? { "cbc:TaxExemptionReasonCode": "VATEX-EU-AE", "cbc:TaxExemptionReason": "Steuerschuldnerschaft des Leistungsempfängers" }
-          : r.steuerart === "igl"
-            ? { "cbc:TaxExemptionReasonCode": "VATEX-EU-IC", "cbc:TaxExemptionReason": "Steuerfreie innergemeinschaftliche Lieferung" }
-            : { "cbc:TaxExemptionReason": r.befreiungsgrund ?? "" };
+        : null0 === "O"
+          ? { "cbc:TaxExemptionReasonCode": "VATEX-EU-O", "cbc:TaxExemptionReason": "Nicht im Inland steuerbare Leistung (Steuerschuldnerschaft des Leistungsempfängers)" }
+          : null0 === "AE"
+            ? { "cbc:TaxExemptionReasonCode": "VATEX-EU-AE", "cbc:TaxExemptionReason": "Steuerschuldnerschaft des Leistungsempfängers" }
+            : null0 === "K"
+              ? { "cbc:TaxExemptionReasonCode": "VATEX-EU-IC", "cbc:TaxExemptionReason": "Steuerfreie innergemeinschaftliche Lieferung" }
+              : null0 === "Z"
+                ? {} // Nullsteuersatz: kein Befreiungsgrund (BR-Z-10)
+                : null0 === "G"
+                  ? { "cbc:TaxExemptionReasonCode": "VATEX-EU-G", "cbc:TaxExemptionReason": r.befreiungsgrund || "Steuerfreie Ausfuhrlieferung" }
+                  : { "cbc:TaxExemptionReason": r.befreiungsgrund ?? "" };
   const vz = r.art === "storno" ? -1 : 1; // Storno: Rechnungskorrektur mit negativen Beträgen (Typ 384)
   const m = (cent: number) => geld(vz * cent);
+  // nicht steuerbar (O): keine USt-IdNr. von Verkäufer und Käufer (BR-O-02)
+  const mitUstId = null0 !== "O";
   const steuerSchemas = [
-    ...(r.steller.ust_idnr ? [{ "cbc:CompanyID": r.steller.ust_idnr, "cac:TaxScheme": { "cbc:ID": "VAT" } }] : []),
-    ...(r.steller.steuernummer ? [{ "cbc:CompanyID": r.steller.steuernummer, "cac:TaxScheme": { "cbc:ID": "FC" } }] : []),
+    ...(verkaeufer.ust_idnr && mitUstId ? [{ "cbc:CompanyID": verkaeufer.ust_idnr, "cac:TaxScheme": { "cbc:ID": "VAT" } }] : []),
+    ...(verkaeufer.steuernummer ? [{ "cbc:CompanyID": verkaeufer.steuernummer, "cac:TaxScheme": { "cbc:ID": "FC" } }] : []),
   ];
+  // BR-CO-26: ohne USt-IdNr. braucht der Verkäufer eine Kennung (BT-29) – die Steuernummer (Prüfpunkt T-11), bei O ohne Steuernummer die USt-IdNr.
+  const kennung = !(verkaeufer.ust_idnr && mitUstId) ? (verkaeufer.steuernummer || verkaeufer.ust_idnr || null) : null;
+  const anschrift = (p: Partei) => ({ "cbc:StreetName": p.strasse ?? "", "cbc:CityName": p.ort ?? "", "cbc:PostalZone": p.plz ?? "", "cac:Country": { "cbc:IdentificationCode": p.land || "DE" } });
+  const typ = r.art === "storno" ? "384" : gs ? "389" : r.abschlag ? "326" : "380";
   const doc: Record<string, unknown> = {
     "cbc:CustomizationID": "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0",
     "cbc:ProfileID": "urn:fdc:peppol.eu:2017:poacc:billing:01:1.0",
     "cbc:ID": r.nummer,
     "cbc:IssueDate": r.rechnungsdatum,
     ...(r.faellig_am ? { "cbc:DueDate": r.faellig_am } : {}),
-    "cbc:InvoiceTypeCode": r.art === "storno" ? "384" : "380",
+    "cbc:InvoiceTypeCode": typ,
     ...(r.hinweis || r.kleinunternehmer ? { "cbc:Note": [r.kleinunternehmer ? kuText : null, r.hinweis].filter(Boolean) } : {}),
     "cbc:DocumentCurrencyCode": "EUR",
-    // BT-10 ist in der XRechnung Pflicht: Leitweg-ID bzw. Käuferreferenz, ohne sie die Rechnungsnummer (Prüfpunkt T-07)
-    "cbc:BuyerReference": r.kunde.kaeufer_referenz || r.nummer,
+    // BT-10 ist in der XRechnung Pflicht: Leitweg-ID bzw. Käuferreferenz, ohne sie die Rechnungsnummer (Prüfpunkt T-07);
+    // bei einer Gutschrift ist der Betrieb der Käufer – dann die Nummer
+    "cbc:BuyerReference": (!gs && r.kunde.kaeufer_referenz) || r.nummer,
     // Leistungszeitraum statt Leistungsdatum (BG-14: BT-73 Beginn, BT-74 Ende)
     ...(!r.leistungsdatum && r.leistungszeitraum ? { "cac:InvoicePeriod": { "cbc:StartDate": r.leistungszeitraum.von, "cbc:EndDate": r.leistungszeitraum.bis } } : {}),
     // Bestellnummer des Käufers (BT-13) – in UBL nach InvoicePeriod, vor BillingReference
@@ -50,30 +93,33 @@ export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record
     ...(r.art === "storno" && r.storniert_nummer ? { "cac:BillingReference": [{ "cac:InvoiceDocumentReference": { "cbc:ID": r.storniert_nummer } }] } : {}),
     "cac:AccountingSupplierParty": {
       "cac:Party": {
-        "cbc:EndpointID": r.steller.email, "cbc:EndpointID@schemeID": "EM",
-        // BR-CO-26: ohne USt-IdNr. braucht der Verkäufer eine Kennung (BT-29) – wir setzen die Steuernummer ein (Prüfpunkt T-11)
-        ...(!r.steller.ust_idnr && r.steller.steuernummer ? { "cac:PartyIdentification": [{ "cbc:ID": r.steller.steuernummer }] } : {}),
-        "cac:PostalAddress": { "cbc:StreetName": r.steller.strasse, "cbc:CityName": r.steller.ort, "cbc:PostalZone": r.steller.plz, "cac:Country": { "cbc:IdentificationCode": r.steller.land } },
+        "cbc:EndpointID": verkaeufer.email ?? "", "cbc:EndpointID@schemeID": "EM",
+        ...(kennung ? { "cac:PartyIdentification": [{ "cbc:ID": kennung }] } : {}),
+        "cac:PostalAddress": anschrift(verkaeufer),
         ...(steuerSchemas.length ? { "cac:PartyTaxScheme": steuerSchemas } : {}),
-        "cac:PartyLegalEntity": { "cbc:RegistrationName": r.steller.name },
-        "cac:Contact": { "cbc:Name": r.steller.name, "cbc:Telephone": r.steller.telefon ?? "", "cbc:ElectronicMail": r.steller.email },
+        "cac:PartyLegalEntity": { "cbc:RegistrationName": verkaeufer.name },
+        "cac:Contact": { "cbc:Name": verkaeufer.name, "cbc:Telephone": verkaeufer.telefon ?? "", "cbc:ElectronicMail": verkaeufer.email ?? "" },
       },
     },
     "cac:AccountingCustomerParty": {
       "cac:Party": {
-        ...(r.kunde.email ? { "cbc:EndpointID": r.kunde.email, "cbc:EndpointID@schemeID": "EM" } : {}),
-        "cac:PostalAddress": { "cbc:StreetName": r.kunde.strasse ?? "", "cbc:CityName": r.kunde.ort ?? "", "cbc:PostalZone": r.kunde.plz ?? "", "cac:Country": { "cbc:IdentificationCode": r.kunde.land } },
-        ...(r.kunde.ust_idnr ? { "cac:PartyTaxScheme": [{ "cbc:CompanyID": r.kunde.ust_idnr, "cac:TaxScheme": { "cbc:ID": "VAT" } }] } : {}),
-        "cac:PartyLegalEntity": { "cbc:RegistrationName": r.kunde.name },
+        ...(kaeufer.email ? { "cbc:EndpointID": kaeufer.email, "cbc:EndpointID@schemeID": "EM" } : {}),
+        "cac:PostalAddress": anschrift(kaeufer),
+        ...(kaeufer.ust_idnr && mitUstId ? { "cac:PartyTaxScheme": [{ "cbc:CompanyID": kaeufer.ust_idnr, "cac:TaxScheme": { "cbc:ID": "VAT" } }] } : {}),
+        "cac:PartyLegalEntity": { "cbc:RegistrationName": kaeufer.name },
       },
     },
     // Lieferanschrift mit Land (BT-80) ist bei innergemeinschaftlichen Lieferungen Pflicht (BR-IC-12, BR-DE-10/11): die Anschrift des Empfängers
     ...(r.leistungsdatum || r.steuerart === "igl"
-      ? { "cac:Delivery": { ...(r.leistungsdatum ? { "cbc:ActualDeliveryDate": r.leistungsdatum } : {}), ...(r.steuerart === "igl" ? { "cac:DeliveryLocation": { "cac:Address": { "cbc:StreetName": r.kunde.strasse ?? "", "cbc:CityName": r.kunde.ort ?? "", "cbc:PostalZone": r.kunde.plz ?? "", "cac:Country": { "cbc:IdentificationCode": r.kunde.land } } } } : {}) } }
+      ? { "cac:Delivery": { ...(r.leistungsdatum ? { "cbc:ActualDeliveryDate": r.leistungsdatum } : {}), ...(r.steuerart === "igl" ? { "cac:DeliveryLocation": { "cac:Address": anschrift(kaeufer) } } : {}) } }
       : {}),
-    ...(r.steller.iban
-      ? { "cac:PaymentMeans": [{ "cbc:PaymentMeansCode": "58", "cac:PayeeFinancialAccount": { "cbc:ID": r.steller.iban.replace(/\s/g, ""), ...(r.steller.bic ? { "cac:FinancialInstitutionBranch": { "cbc:ID": r.steller.bic } } : {}) } }] }
-      : {}),
+    // Zahlungsanweisung (BG-16, BR-DE-1): Überweisung auf das Konto des Betriebs; bei einer Gutschrift zahlt der Betrieb
+    // selbst – die Bankverbindung des Leistenden kennt die App nicht, daher „1“ (nicht festgelegt)
+    ...(gs
+      ? { "cac:PaymentMeans": [{ "cbc:PaymentMeansCode": "1" }] }
+      : r.steller.iban
+        ? { "cac:PaymentMeans": [{ "cbc:PaymentMeansCode": "58", "cac:PayeeFinancialAccount": { "cbc:ID": r.steller.iban.replace(/\s/g, ""), ...(r.steller.bic ? { "cac:FinancialInstitutionBranch": { "cbc:ID": r.steller.bic } } : {}) } }] }
+        : {}),
     "cac:TaxTotal": [
       {
         "cbc:TaxAmount": m(s.ust_cent).wert, "cbc:TaxAmount@currencyID": "EUR",
@@ -95,7 +141,7 @@ export function eRechnungsDokument(r: RechnungsDaten, kuHinweis: string): Record
       // Nachlass (negativer Preis): Preis bleibt positiv, die Menge wird negativ (BR-27: Preis nie negativ)
       "cbc:InvoicedQuantity": String(vz * Math.sign(p.preis_cent || 1) * p.menge), "cbc:InvoicedQuantity@unitCode": p.einheit_code ?? EINHEIT_CODE[p.einheit],
       "cbc:LineExtensionAmount": m(s.zeilen[i]!).wert, "cbc:LineExtensionAmount@currencyID": "EUR",
-      "cac:Item": { "cbc:Name": p.bezeichnung, "cac:ClassifiedTaxCategory": { ...kategorie(r.kleinunternehmer ? null : p.ust_satz), "cac:TaxScheme": { "cbc:ID": "VAT" } } },
+      "cac:Item": { "cbc:Name": p.bezeichnung, "cac:ClassifiedTaxCategory": { ...kategorie(r.kleinunternehmer ? null : p.ust_satz, true), "cac:TaxScheme": { "cbc:ID": "VAT" } } },
       "cac:Price": { "cbc:PriceAmount": betrag(Math.abs(p.preis_cent)), "cbc:PriceAmount@currencyID": "EUR" },
     })),
   };

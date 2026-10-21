@@ -1,0 +1,35 @@
+persona: gewerbe
+beschreibung: "R11 (Steuerprüfung 16–19, Rechtsprüfung Befund 4–6): ZM bei nur sonstigen Leistungen vierteljährlich am 25., Sondervorauszahlung über den Rhythmus „monatlich“, SV-Abmeldung sechs Wochen nach Austritt, Jahresmeldung bis 15.02., Kassenmeldung mit Verschiebung, Gewerbesteuer unter dem Freibetrag nicht"
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2018-01-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [it_agentur_freelancer]
+  profil.ust.kleinunternehmer: false
+  profil.ust.voranmeldung_rhythmus: monatlich
+  profil.ust.dauerfristverlaengerung: true
+  profil.kunden.segmente: [b2b]
+  profil.kunden.regionen: [inland, eu]
+  profil.produkte.arten: [dienstleistung]
+  profil.beschaeftigte.gesamt: 1
+  profil.kasse.elektronisch: true
+  profil.gewinn.vorjahr: 20000
+  profil.gewinn.prognose_laufendes_jahr: 24000
+  profil.bundesland: BE
+ereignisse:
+  - { typ: erste_einstellung, datum: "2018-01-01" }
+  - { typ: austritt, datum: "2026-09-30" }
+  - { typ: kasse_angeschafft, datum: "2026-09-12" }
+erwartet:
+  steuern.zusammenfassende_meldung: gilt
+  steuern.ust_sondervorauszahlung: gilt
+  personal.sv_abmeldung: gilt
+  personal.sv_jahresmeldung: gilt
+  steuern.kassenmeldung: gilt
+  steuern.gewst_erklaerung: gilt_nicht
+termine_enthaelt:
+  steuern.zusammenfassende_meldung: [["2026-Q3", "2026-10-26"]]
+  personal.sv_abmeldung: [["aenderung-20260930", "2026-11-11"]]
+  personal.sv_jahresmeldung: [["2027-02", "2027-02-15"]]
+  steuern.kassenmeldung: [["einmalig", "2026-10-12"]]

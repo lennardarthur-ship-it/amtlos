@@ -1,0 +1,59 @@
+# R11 (Nutzertest Tischlerei Befund 16): digitaler Lohnnachweis an die Unfallversicherung nach § 99 SGB VII
+schema_version: 1
+id: personal.lohnnachweis_bg
+version: 1
+katalog_nr: D.40
+titel:
+  de: Lohnnachweis an die Berufsgenossenschaft
+kurz:
+  de: Einmal im Jahr meldest du der Berufsgenossenschaft die Arbeitsentgelte des Vorjahres – meist über das Lohnprogramm.
+erklaerung:
+  de: Die Berufsgenossenschaft berechnet ihren Beitrag aus den Arbeitsentgelten. Dafür übermittelst du nach Ablauf jedes Kalenderjahres
+    den digitalen Lohnnachweis (§ 99 SGB VII), in der Regel über das Lohnprogramm oder deine Steuerberatung.
+rechtsgrundlage:
+- § 99 SGB VII
+kategorie: personal
+ausloeser:
+  feld: abgeleitet.hat_beschaeftigte
+  op: ==
+  wert: true
+  label:
+    de: Du beschäftigst mindestens eine Person.
+frist:
+  typ: wiederkehrend
+  rhythmus: jaehrlich
+  faellig:
+    art: feste_termine
+    termine:
+    - 02-16
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: periodisch
+stelle:
+  de: Berufsgenossenschaft (über Lohnprogramm)
+kanal: partner
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: partner
+erledigung:
+  art: bestaetigen
+  bestaetigung:
+    de: Lohnnachweis übermittelt
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Sozialgesetzbuch VII § 99
+  url: https://www.gesetze-im-internet.de/sgb_7/__99.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Neu nach Nutzertest R11 (Tischlerei; der Bericht nennt § 99 SGB IV, richtig SGB VII) – Termin 16.02. des Folgejahres aus dem DGUV-Verfahren, bestätigen; Abgrenzung zur UV-Jahresmeldung (§ 28a Abs. 2a SGB IV)'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

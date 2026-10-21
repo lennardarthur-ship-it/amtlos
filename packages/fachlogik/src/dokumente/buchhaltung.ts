@@ -76,6 +76,20 @@ export const NULLSATZ_HINWEIS = "Nullsteuersatz nach § 12 Abs. 3 UStG (Photovol
 export const istNullsatzText = (t: string | null | undefined) => NULLSATZ_IM_TEXT.test(t ?? "");
 
 /** Ist die Unterlage eine Gutschrift (Abrechnung durch den Leistungsempfänger)? */
+/**
+ * Kleinbetragsrechnung (§ 33 UStDV, R11): Gesamtbetrag bis 250 € brutto – Name und Anschrift des Empfängers sind dann
+ * keine Pflichtangabe; auf der Rechnung genügen Entgelt und Steuer in einer Summe mit dem Steuersatz. Nicht bei Storno,
+ * Gutschrift, Steuerschuldnerschaft des Empfängers oder innergemeinschaftlicher Lieferung (§ 33 Satz 3 UStDV).
+ */
+export const KLEINBETRAG_CENT = 25000;
+export function kleinbetrag(d: Daten): boolean {
+  if (text(d, "storno_zu") || auswahl(d, "hinweise").some((h) => h === "gutschrift" || h === "reverse_charge" || h === "igl")) return false;
+  const pos = positionen(d);
+  if (!pos.length) return false;
+  const brutto = summen(pos.map((x) => x.p), kuFuer(d)).brutto_cent;
+  return brutto > 0 && brutto <= KLEINBETRAG_CENT;
+}
+
 const istGutschriftD = (d: Daten) => !text(d, "storno_zu") && auswahl(d, "hinweise").includes("gutschrift");
 const gutschriftD = (d: Daten) => auswahl(d, "hinweise").includes("gutschrift");
 
@@ -130,11 +144,41 @@ export const RECHNUNG_KU_IGL = "Widerspruch: Kleinunternehmer und innergemeinsch
 export const RECHNUNG_KU_DRITTLAND = "Empfänger außerhalb der EU: Dienstleistungen an Unternehmen sind dort steuerbar, in Deutschland nicht (§ 3a Abs. 2 UStG). „Steuerfrei nach § 19 UStG“ ist dann ungenau – den Hinweis bitte mit der Steuerberatung klären.";
 export const RECHNUNG_KU_PROFIL = (profil: boolean) => `Der Schalter „Kleinunternehmer“ weicht vom Pflichten-Check ab (dort: ${profil ? "Kleinunternehmer" : "kein Kleinunternehmer"}) – bitte prüfen, welcher Stand für diese Rechnung gilt.`;
 export const RECHNUNG_GUTSCHRIFT_STEUER = "Steuernummer oder USt-IdNr. des Leistenden (bei Gutschrift)";
+/**
+ * R11 (Gebäudereinigung, Befund 1): Pflichthinweis „Steuerschuldnerschaft des Leistungsempfängers“ bzw. „innergemein-
+ * schaftliche Lieferung“, aber Positionen mit Umsatzsteuer – die ausgewiesene Steuer würde nach § 14c Abs. 1 UStG
+ * geschuldet. Hindert am Teilen.
+ */
+/** R11 (Kosmetik #2): Leistung aus der Kleinunternehmerzeit, aber die Rechnung weist Umsatzsteuer aus – und umgekehrt. */
+export const RECHNUNG_KU_ZEIT = (bis: string) => `Die Leistung stammt aus deiner Kleinunternehmerzeit (bis ${bis}, siehe „Mein Betrieb“): Dann gehört keine Umsatzsteuer auf die Rechnung, sondern der Hinweis nach § 19 UStG – Schalter „Kleinunternehmer“ einschalten. Weist du sie trotzdem aus, schuldest du sie (§ 14c Abs. 2 UStG).`;
+export const RECHNUNG_NACH_KU_ZEIT = (bis: string) => `Die Leistung liegt nach deiner Kleinunternehmerzeit (bis ${bis}, siehe „Mein Betrieb“): Dann gilt die Regelbesteuerung – Schalter „Kleinunternehmer“ bitte prüfen.`;
+/** R11 (Kosmetik #5): Gutschein zu 0 % – kein steuerfreier Umsatz (§ 3 Abs. 13–15 UStG). */
+export const RECHNUNG_GUTSCHEIN = "Gutschein zu 0 %: Ein Gutschein ist kein steuerfreier Umsatz. Einzweck-Gutschein (Leistung und Steuersatz stehen fest): Umsatzsteuer schon beim Verkauf (§ 3 Abs. 14 UStG) – also mit 19 % bzw. 7 % abrechnen. Mehrzweck-Gutschein: beim Verkauf keine Rechnung mit Umsatzsteuer, versteuert wird erst die Einlösung (§ 3 Abs. 15 UStG). Bitte mit der Steuerberatung klären; im Buchungsstapel steht diese Rechnung nicht.";
+/** R11 (Tischlerei #14): Handwerk/Bau an Privatkunden – Hinweis auf die Aufbewahrungspflicht vorschlagen. */
+export const RECHNUNG_GRUNDSTUECK_VORSCHLAG = "Leistung an einem Grundstück (z. B. Einbau, Reparatur am Haus) an eine Privatperson? Dann gehört der Hinweis auf die zweijährige Aufbewahrungspflicht auf die Rechnung (§ 14 Abs. 4 Satz 1 Nr. 9 UStG) – unter „Pflichthinweise“ wählen.";
+/** R11 (Tischlerei #13): Abschlagsrechnung mit „Leistungsdatum entspricht dem Rechnungsdatum“ – die Leistung ist noch nicht erbracht. */
+export const RECHNUNG_ABSCHLAG_LEISTUNG = "Abschlagsrechnung: Die Leistung ist noch nicht erbracht – „Leistungsdatum entspricht dem Rechnungsdatum“ ausschalten und das voraussichtliche Datum bzw. den Zeitraum der Leistung angeben, bei einer Anzahlung den Tag der Vereinnahmung, wenn er feststeht (§ 14 Abs. 4 Satz 1 Nr. 6 UStG).";
+/** Gutschein in einer Position zu 0 % (R11) – nicht als steuerfreier Erlös buchen */
+export const gutscheinZuNull = (d: Daten) => !kuFuer(d) && positionen(d).some((x) => x.p.ust_satz === 0 && /gutschein/i.test(x.p.bezeichnung));
+export const RECHNUNG_RC_MIT_UST = "Pflichthinweis „Steuerschuldnerschaft des Leistungsempfängers“ bzw. „innergemeinschaftliche Lieferung“ gewählt, aber Positionen mit 19 % oder 7 % – bitte diese Positionen auf „0 % / steuerfrei“ stellen oder den Hinweis abwählen. Ausgewiesene Umsatzsteuer schuldest du sonst trotzdem (§ 14c Abs. 1 UStG).";
+
+/**
+ * R11 (Kosmetik #4): Preise inkl. Umsatzsteuer – der eingetragene Preis ist brutto; `summen` rechnet davon aus, so dass
+ * der Rechnungsbetrag genau stimmt. Nettopreis je Einheit gerundet (für Tabelle und E-Rechnung). Nicht bei Kleinunternehmern.
+ */
+function preisFelder(d: Daten, roh: number, satz: number | null): Pick<Position, "preis_cent" | "brutto_cent"> {
+  if (!ja(d, "preise_brutto") || satz === null || satz <= 0) return { preis_cent: roh };
+  return { preis_cent: rundeCent((roh * 100) / (100 + satz)), brutto_cent: roh };
+}
 
 function positionen(d: Daten): { e: Eintrag; p: Position }[] {
+  const ku = kuFuer(d);
   return liste(d, "positionen")
     .filter((e) => text(e, "bezeichnung") || text(e, "preis"))
-    .map((e) => ({ e, p: { bezeichnung: text(e, "bezeichnung"), menge: zahl(text(e, "menge")) ?? 1, einheit: "stueck", preis_cent: cent(text(e, "preis")) ?? 0, ust_satz: Number(text(e, "satz") || "19") } }));
+    .map((e) => {
+      const satz = Number(text(e, "satz") || "19");
+      return { e, p: { bezeichnung: text(e, "bezeichnung"), menge: zahl(text(e, "menge")) ?? 1, einheit: "stueck", ...preisFelder(d, cent(text(e, "preis")) ?? 0, ku ? null : satz), ust_satz: satz } };
+    });
 }
 
 /** Verständliche Bezeichnungen für fehlendFuerERechnung */
@@ -154,6 +198,11 @@ const E_FEHLT: Record<string, string> = {
   "steuer.befreiungsgrund": "Hinweis auf die Steuerbefreiung",
   "steller.ust_idnr": "USt-IdNr. des Betriebs (Mein Betrieb)",
   "kunde.ust_idnr": "USt-IdNr. des Empfängers",
+  // R11: Gutschrift – Verkäufer in der E-Rechnung ist der Leistende (ohne diese Angaben entsteht nur das PDF)
+  "leistender.anschrift": "Anschrift des Leistenden (Empfänger der Gutschrift): Straße in der ersten, PLZ und Ort in der letzten Zeile",
+  "leistender.email": "E-Mail des Leistenden (Empfänger der Gutschrift)",
+  "leistender.telefon": "Telefon des Leistenden (Empfänger der Gutschrift)",
+  "leistender.steuernummer_oder_ust_idnr": "Steuernummer oder USt-IdNr. des Leistenden",
 };
 
 const E_LAND_FEHLT = "Land des Empfängers in der letzten Zeile der Anschrift (z. B. Österreich)";
@@ -275,6 +324,8 @@ export function eRechnungAus(d: Daten, b: Betrieb): { daten: RechnungsDaten; feh
   const datum = text(d, "datum");
   const ziel = text(d, "zahlungsziel");
   const leistungsdatum = ja(d, "leistung_gleich") ? datum || null : isoAus(text(d, "leistung"));
+  // Gutschrift und ihr Storno: in der E-Rechnung ist der Leistende der Verkäufer (R11)
+  const gutschrift = gutschriftD(d);
   const daten: RechnungsDaten = {
     nummer: text(d, "nummer"),
     rechnungsdatum: datum,
@@ -283,13 +334,19 @@ export function eRechnungAus(d: Daten, b: Betrieb): { daten: RechnungsDaten; feh
     faellig_am: datum && ziel && ziel !== "sofort" ? faelligAm(datum, Number(ziel), b.bundesland) || null : null,
     steller: { name: b.name.trim(), strasse: b.strasse.trim(), plz: b.plz.trim(), ort: b.ort.trim(), land: "DE", email: b.email.trim(), telefon: b.telefon.trim() || null, steuernummer: b.steuernummer.trim() || null, ust_idnr: b.ust_idnr.trim() || null, iban: b.iban.trim() || null },
     // Leitweg-ID bzw. Käuferreferenz (BT-10), ohne sie wie bisher die Rechnungsnummer
-    kunde: { name: text(d, "kunde_name"), strasse: a.strasse, plz: a.plz, ort: a.ort, land: a.land ?? "DE", email: text(d, "kunde_email") || null, ust_idnr: text(d, "kunde_ust_idnr") || null, kaeufer_referenz: text(d, "kunde_leitweg_id").trim() || null, geschaeftskunde: true },
+    kunde: {
+      name: text(d, "kunde_name"), strasse: a.strasse, plz: a.plz, ort: a.ort, land: a.land ?? "DE", email: text(d, "kunde_email") || null, ust_idnr: text(d, "kunde_ust_idnr") || null, kaeufer_referenz: text(d, "kunde_leitweg_id").trim() || null, geschaeftskunde: true,
+      // R11: bei einer Gutschrift ist der Empfänger der Leistende – Verkäufer in der E-Rechnung
+      ...(gutschrift ? { steuernummer: text(d, "kunde_steuernummer").trim() || null, telefon: text(d, "kunde_telefon").trim() || null } : {}),
+    },
+    ...(gutschrift ? { gutschrift: true } : {}),
     ...(text(d, "bestellnummer").trim() ? { bestellnummer: text(d, "bestellnummer").trim() } : {}),
     ...(ja(d, "abschlag") && !storno ? { abschlag: true } : {}),
     positionen: pos.map((e) => {
       const preis = cent(text(e, "preis")) ?? 0;
       // Storno: die Positionen tragen schon das umgedrehte Vorzeichen; `art: "storno"` dreht es für USt und XRechnung zurück
-      return { bezeichnung: text(e, "bezeichnung"), menge: zahl(text(e, "menge")) ?? 1, einheit: "stueck" as const, einheit_code: einheitCode(text(e, "einheit")), preis_cent: storno ? -preis : preis, ust_satz: ku ? null : Number(text(e, "satz") || "19") };
+      const satz = ku ? null : Number(text(e, "satz") || "19");
+      return { bezeichnung: text(e, "bezeichnung"), menge: zahl(text(e, "menge")) ?? 1, einheit: "stueck" as const, einheit_code: einheitCode(text(e, "einheit")), ...preisFelder(d, storno ? -preis : preis, satz), ust_satz: satz };
     }),
     kleinunternehmer: ku,
     hinweis: [befreiung, ...text(d, "hinweis").split("\n").filter((h) => !(storno && h.trim() === ZAHLUNGS_HINWEIS))].filter(Boolean).join("\n") || null,
@@ -348,7 +405,7 @@ export const rechnung: Vorlage = {
         { id: "zahlungsziel", art: "wahl", label: "Zahlungsziel", optionen: [{ wert: "7", text: "7 Tage" }, { wert: "14", text: "14 Tage" }, { wert: "30", text: "30 Tage" }, { wert: "sofort", text: "Sofort" }], vorbelegung: "14", hilfe: "Steht auf der Rechnung als „Zahlbar innerhalb von … Tagen“ mit dem Datum." },
         { id: "bezahlt_am", selten: true, art: "datum", label: "Schon bezahlt am", hilfe: "z. B. bei Barzahlung, Vorkasse oder Zahlung im Onlineshop – bezahlt am oder vor dem Rechnungsdatum, entfällt die Zahlungsaufforderung" },
         { id: "bestellnummer", selten: true, art: "text", label: "Bestellnummer des Kunden", hilfe: "steht auf der Rechnung und in der E-Rechnung (BT-13)" },
-        { id: "abschlag", selten: true, art: "schalter", label: "Abschlagsrechnung (Anzahlung vor Fertigstellung)", hilfe: "Die Umsatzsteuer entsteht mit der Zahlung (§ 13 Abs. 1 Nr. 1 a Satz 4 UStG) – in der Voranmeldung zählt die Rechnung im Zeitraum des Zahlungseingangs." },
+        { id: "abschlag", selten: true, art: "schalter", label: "Abschlagsrechnung (Anzahlung vor Fertigstellung)", hilfe: "Die Umsatzsteuer entsteht mit der Zahlung (§ 13 Abs. 1 Nr. 1 a Satz 4 UStG) – in der Voranmeldung zählt die Rechnung im Zeitraum des Zahlungseingangs. Als Leistungsdatum das voraussichtliche Datum angeben, nicht das Rechnungsdatum." },
       ],
     },
     {
@@ -361,11 +418,15 @@ export const rechnung: Vorlage = {
         { id: "kunde_ust_idnr", selten: true, art: "text", label: "USt-IdNr. des Empfängers", hilfe: "nur bei innergemeinschaftlichen Leistungen oder Steuerschuldnerschaft des Empfängers; bei Gutschriften die des Leistenden" },
         { id: "kunde_leitweg_id", selten: true, art: "text", label: "Leitweg-ID bzw. Käuferreferenz", hilfe: "bei Behörden und Kommunen Pflicht für die E-Rechnung (z. B. 05913000-00012-37); wird beim Kunden gemerkt" },
         { id: "kunde_steuernummer", selten: true, art: "text", label: "Steuernummer des Leistenden (bei Gutschrift)", hilfe: "Bei einer Gutschrift stehen Steuernummer oder USt-IdNr. des Leistenden auf dem Dokument (§ 14 Abs. 4 Nr. 2 UStG)", wenn: { feld: "hinweise", ist: "gutschrift" } },
+        // R11: die E-Rechnung einer Gutschrift nennt den Leistenden als Verkäufer – mit Telefon (BR-DE-6)
+        { id: "kunde_telefon", selten: true, art: "text", label: "Telefon des Leistenden (bei Gutschrift)", hilfe: "nur für die E-Rechnung der Gutschrift nötig; das PDF geht auch ohne", wenn: { feld: "hinweise", ist: "gutschrift" } },
       ],
     },
     {
       titel: "Positionen",
       felder: [
+        // R11 (Kosmetik #4): Bruttopreise für Privatkunden – die Summe trifft den Endpreis genau
+        { id: "preise_brutto", selten: true, art: "schalter", label: "Preise inkl. Umsatzsteuer (brutto)", hilfe: "Dann trägst du unter „Einzelpreis“ den Endpreis mit Umsatzsteuer ein (z. B. 45,00 €); Amtlos rechnet Netto und Umsatzsteuer daraus, der Rechnungsbetrag stimmt genau. Nicht bei Kleinunternehmern." },
         {
           id: "positionen",
           art: "liste",
@@ -377,7 +438,7 @@ export const rechnung: Vorlage = {
             { id: "bezeichnung", art: "text", label: "Leistung oder Ware", hilfe: "handelsübliche Bezeichnung bzw. Art und Umfang der Leistung", pflicht: true },
             { id: "menge", art: "zahl", label: "Menge", vorbelegung: "1" },
             { id: "einheit", art: "text", label: "Einheit", vorschlaege: EINHEITEN.slice(0, 8), vorbelegung: { text: "Stück" } },
-            { id: "preis", art: "betrag", label: "Einzelpreis netto (€)", pflicht: true },
+            { id: "preis", art: "betrag", label: "Einzelpreis netto (€)", hilfe: "mit „Preise inkl. Umsatzsteuer“ der Bruttopreis", pflicht: true },
             { id: "satz", art: "wahl", label: "Umsatzsteuer", optionen: SAETZE, vorbelegung: "19" },
           ],
         },
@@ -390,7 +451,7 @@ export const rechnung: Vorlage = {
         { id: "kleinunternehmer", selten: true, art: "schalter", label: "Kleinunternehmer (§ 19 UStG)", hilfe: "Dann wird keine Umsatzsteuer ausgewiesen; der Hinweis auf die Steuerbefreiung steht auf der Rechnung." },
         { id: "leistender_steuer", selten: true, art: "wahl", label: "Umsatzsteuer des Leistenden (bei Gutschrift)", optionen: [{ wert: "regel", text: "weist Umsatzsteuer aus" }, { wert: "ku", text: "Kleinunternehmer (§ 19 UStG)" }], hilfe: "Bei einer Gutschrift richtet sich die Umsatzsteuer nach dem Leistenden, nicht nach dir. Ohne Auswahl gilt der Schalter „Kleinunternehmer“.", wenn: { feld: "hinweise", ist: "gutschrift" } },
         { id: "hinweise", selten: true, art: "bausteine", label: "Pflichthinweise, falls zutreffend", optionen: [...RECHNUNGS_HINWEISE.filter((h) => h.wert !== "steuerfrei").map((h) => ({ wert: h.wert, text: h.wert === "gutschrift" ? GUTSCHRIFT_AUSWAHL : h.text, quelle: h.quelle })), { wert: "grundstueck", text: GRUNDSTUECK_HINWEIS, quelle: "§ 14 Abs. 4 Nr. 9, § 14b Abs. 1 Satz 5 UStG" }] },
-        { id: "befreiung", selten: true, art: "text", label: "Hinweis auf die Steuerbefreiung (bei 0 %)", hilfe: "Pflicht, wenn eine Position steuerfrei ist – mit der Vorschrift. Bei Bauleistungen an Unternehmen stattdessen den Pflichthinweis „Steuerschuldnerschaft des Leistungsempfängers“ wählen.", vorschlaege: ["Steuerfreie Leistung nach § 4 Nr. … UStG", NULLSATZ_HINWEIS] },
+        { id: "befreiung", selten: true, art: "text", label: "Hinweis auf die Steuerbefreiung (bei 0 %)", hilfe: "Pflicht, wenn eine Position steuerfrei ist – mit der Vorschrift. Bei Bauleistungen an Bauunternehmen und bei Gebäudereinigung an Gebäudereiniger (§ 13b Abs. 2 Nr. 4 und 8, Abs. 5 Satz 2 und 5 UStG) stattdessen den Pflichthinweis „Steuerschuldnerschaft des Leistungsempfängers“ wählen und die Positionen auf 0 % stellen. Gutscheine sind keine steuerfreien Umsätze (Einzweck-Gutschein: mit Umsatzsteuer abrechnen).", vorschlaege: ["Steuerfreie Leistung nach § 4 Nr. … UStG", NULLSATZ_HINWEIS] },
         { id: "hinweis", art: "mehrzeilig", label: "Weitere Hinweise", vorschlaege: ["Vielen Dank für Ihren Auftrag.", ZAHLUNGS_HINWEIS] },
       ],
     },
@@ -400,6 +461,8 @@ export const rechnung: Vorlage = {
     [RECHNUNG_NULL]: "positionen",
     [RECHNUNG_NEGATIV]: "positionen",
     [RECHNUNG_MENGE]: "positionen",
+    [RECHNUNG_RC_MIT_UST]: "positionen",
+    [RECHNUNG_ABSCHLAG_LEISTUNG]: "leistung_gleich",
     // was der E-Rechnung fehlt (eRechnungAus) – für „Ergänzen“ unter „Für die E-Rechnung fehlt noch“
     [E_FEHLT["kunde.anschrift"]!]: "kunde_anschrift",
     [E_LAND_FEHLT]: "kunde_anschrift",
@@ -411,7 +474,13 @@ export const rechnung: Vorlage = {
     [E_FEHLT.leistungsdatum!]: "leistung_gleich",
     [E_FEHLT["steuer.grund_null"]!]: "befreiung",
     [E_FEHLT["steuer.befreiungsgrund"]!]: "befreiung",
+    [E_FEHLT["leistender.anschrift"]!]: "kunde_anschrift",
+    [E_FEHLT["leistender.email"]!]: "kunde_email",
+    [E_FEHLT["leistender.telefon"]!]: "kunde_telefon",
+    [E_FEHLT["leistender.steuernummer_oder_ust_idnr"]!]: "kunde_steuernummer",
   },
+  // Kleinbetragsrechnung bis 250 € (§ 33 UStDV): Name und Anschrift des Empfängers sind keine Pflicht (R11)
+  nichtPflicht: (d) => (kleinbetrag(d) ? ["kunde_name", "kunde_anschrift"] : []),
   pruefen(d, b) {
     const f: string[] = [];
     if (!b.name.trim() || !anschrift(b)) f.push("Name und Anschrift des Betriebs (Mein Betrieb)");
@@ -435,10 +504,13 @@ export const rechnung: Vorlage = {
     if (pos.some((x) => mengeUngueltig(x.p.menge))) f.push(RECHNUNG_MENGE);
     const nullProzent = positionen(d).some((x) => x.p.ust_satz === 0);
     if (nullProzent && !kuFuer(d) && !text(d, "befreiung") && !auswahl(d, "hinweise").some((h) => h === "reverse_charge" || h === "igl")) f.push("Hinweis auf die Steuerbefreiung (bei 0 %)");
+    // R11: Steuerschuldnerschaft bzw. igL mit Umsatzsteuer in den Positionen – Widerspruch (§ 14c Abs. 1 UStG); nicht bei Gutschriften und Kleinunternehmern
+    if (!kuFuer(d) && !gutschriftD(d) && auswahl(d, "hinweise").some((h) => h === "reverse_charge" || h === "igl") && pos.some((x) => (x.p.ust_satz ?? 0) > 0)) f.push(RECHNUNG_RC_MIT_UST);
+    if (ja(d, "abschlag") && ja(d, "leistung_gleich") && !text(d, "storno_zu")) f.push(RECHNUNG_ABSCHLAG_LEISTUNG);
     return f;
   },
   // Hinweise, die nicht am Teilen hindern (Kleinunternehmer mit Steuerschuldnerschaft war vorher ein Hindernis – R10)
-  hinweise(d, _b, extra) {
+  hinweise(d, b, extra) {
     const h: string[] = [];
     const ku = kuFuer(d);
     const hw = auswahl(d, "hinweise");
@@ -455,6 +527,15 @@ export const rechnung: Vorlage = {
       else if (ku && drittlandLand(d) && text(d, "kunde_ust_idnr").trim()) h.push(RECHNUNG_KU_DRITTLAND);
       else if (!ku && eu && !rcOderIgl && positionen(d).some((x) => (x.p.ust_satz ?? 0) > 0)) h.push(RECHNUNG_EU_19(eu));
       if (typeof extra?.kleinunternehmer === "boolean" && extra.kleinunternehmer !== ja(d, "kleinunternehmer")) h.push(RECHNUNG_KU_PROFIL(extra.kleinunternehmer));
+      // R11: Leistung vor bzw. nach dem Wechsel von der Kleinunternehmerregelung („Mein Betrieb“)
+      const kuBis = isoAus(b.ku_bis ?? "");
+      const tag = ja(d, "leistung_gleich") ? isoAus(text(d, "datum")) : (isoAus(text(d, "leistung")) ?? leistungszeitraumAus(text(d, "leistung"))?.bis ?? null);
+      if (kuBis && tag && !text(d, "storno_zu")) {
+        if (tag <= kuBis && !ku) h.push(RECHNUNG_KU_ZEIT(datumDe(kuBis)));
+        else if (tag > kuBis && ku) h.push(RECHNUNG_NACH_KU_ZEIT(datumDe(kuBis)));
+      }
+      if (gutscheinZuNull(d)) h.push(RECHNUNG_GUTSCHEIN);
+      if (extra?.handwerk && !ku && !hw.includes("grundstueck") && !text(d, "kunde_ust_idnr").trim() && !text(d, "storno_zu") && positionen(d).some((x) => (x.p.ust_satz ?? 0) > 0)) h.push(RECHNUNG_GRUNDSTUECK_VORSCHLAG);
     }
     return h;
   },
@@ -488,7 +569,8 @@ export const rechnung: Vorlage = {
       ...(ku ? [] : s.gruppen.map((g) => `<tr><td>${g.satz === 0 ? nullProzentText(auswahl(d, "hinweise"), befreiungText(d)) : `Umsatzsteuer ${g.satz} %`} auf ${euro(g.netto_cent)}</td><td>${euro(g.ust_cent)}</td></tr>`)),
       // leere Vorlage: Zeile für die Umsatzsteuer mit Steuersatz zum Eintragen
       ...(leer && !ku ? [`<tr><td>Umsatzsteuer <span class="fuellen kurz"></span> %</td><td>&nbsp;</td></tr>`] : []),
-      `<tr class="gesamt"><td>${gutschrift ? "Gutschriftsbetrag" : "Rechnungsbetrag"}</td><td>${betrag(s.brutto_cent)}</td></tr>`,
+      // Kleinbetragsrechnung (§ 33 Satz 1 Nr. 4 UStDV): der Steuersatz steht beim Gesamtbetrag („inkl. 19 % USt“)
+      `<tr class="gesamt"><td>${gutschrift ? "Gutschriftsbetrag" : !ku && !leer && kleinbetrag(d) && s.gruppen.length === 1 && (s.gruppen[0]!.satz ?? 0) > 0 ? `Rechnungsbetrag inkl. ${s.gruppen[0]!.satz} % USt` : "Rechnungsbetrag"}</td><td>${betrag(s.brutto_cent)}</td></tr>`,
     ].join("");
     const leistung = text(d, "leistung");
     const datum = text(d, "datum");
@@ -526,7 +608,7 @@ export const rechnung: Vorlage = {
     // kein GiroCode für Empfänger außerhalb der EU (z. B. Schweiz) – dort zahlt kaum jemand per SEPA-Überweisung aus der Banking-App
     const qr = zahlbar && iban && s.brutto_cent > 0 && !drittlandLand(d) ? giroCodeSvg({ name: b.name.trim(), iban, bic: b.bic ?? null, betragCent: s.brutto_cent, verwendungszweck: `Rechnung ${text(d, "nummer")}` }, 25) : null;
     // Kontoinhaber vor der IBAN; Einzelunternehmen mit der Inhaberin bzw. dem Inhaber (Gesellschaften: nur die Firma)
-    const empfaenger = b.name.trim() ? `Empfänger: ${esc(b.name.trim())}${b.verantwortlich.trim() && !(b.vertretung ?? "").trim() && b.verantwortlich.trim() !== b.name.trim() ? ` (${esc(b.verantwortlich.trim())})` : ""}<br>` : "";
+    const empfaenger = b.name.trim() ? `Empfänger: ${esc(b.name.trim())}${b.verantwortlich.trim() && !(b.vertretung ?? "").trim() && !b.name.includes(b.verantwortlich.trim()) ? ` (${esc(b.verantwortlich.trim())})` : ""}<br>` : "";
     // BIC und Bank in einer Zeile („BIC … · Sparkasse …“) – spart eine Zeile im Zahlungsblock
     const bicBank = [b.bic?.trim() ? `BIC ${esc(b.bic.trim())}` : "", b.bank?.trim() ? esc(b.bank.trim()) : ""].filter(Boolean).join(" · ");
     const zahlung =
@@ -536,7 +618,7 @@ export const rechnung: Vorlage = {
           leer && !storno && !gutschrift
           ? `<div class="zahlung"><div class="text"><p>Bitte überweisen Sie den Rechnungsbetrag bis zum ${LINIE_MITTEL}${iban ? " auf das Konto" : "."}</p>${iban ? `<p>${empfaenger}<strong>IBAN ${esc(ibanText(iban))}</strong>${bicBank ? `<br>${bicBank}` : ""}<br>Verwendungszweck: Rechnung ${text(d, "nummer") ? esc(text(d, "nummer")) : LINIE_MITTEL}</p>` : ""}</div></div>`
           : "";
-    const anrede = text(d, "kunde_name") ? (storno ? `wir stornieren hiermit die oben genannte Rechnung und schreiben Ihnen den Betrag wie folgt gut:` : gutschrift ? `wir rechnen über die folgenden Leistungen ab und schreiben Ihnen den Betrag gut:` : `wie vereinbart berechnen wir Ihnen folgende Leistungen:`) : "";
+    const anrede = text(d, "kunde_name") ? (storno ? `wir stornieren hiermit die oben genannte Rechnung und schreiben Ihnen den Betrag wie folgt gut:` : gutschrift ? `wir rechnen über die folgenden Leistungen ab und schreiben Ihnen den Betrag gut:` : schonBezahlt ? `für die folgenden Leistungen, die Sie bereits bezahlt haben, erhalten Sie diese Rechnung:` : `wie vereinbart berechnen wir Ihnen folgende Leistungen:`) : "";
     const titel = `${rechnungsTitel(d)} ${text(d, "nummer")}`.trim();
     return brief({
       titel,
@@ -894,7 +976,7 @@ export const ustVoranmeldung: Vorlage = {
       felder: [
         { id: "vorsteuer", art: "betrag", label: "Vorsteuer aus Eingangsrechnungen (€)", pflicht: true },
         { id: "vorsteuer_13b", selten: true, art: "betrag", label: "Vorsteuer aus Leistungen nach § 13b UStG (Kz 67) (€)", hilfe: "die selbst geschuldete Steuer aus Kz 47/85 – nur mit Vorsteuerabzug, also nicht als Kleinunternehmer" },
-        { id: "sondervorauszahlung", selten: true, art: "betrag", label: "Abzug der Sondervorauszahlung (Kz 39) (€)", hilfe: "nur in der letzten Voranmeldung des Jahres (Dezember bzw. 4. Quartal) bei Dauerfristverlängerung" },
+        { id: "sondervorauszahlung", selten: true, art: "betrag", label: "Abzug der Sondervorauszahlung (Kz 39) (€)", hilfe: "nur für Monatszahler mit Dauerfristverlängerung, in der Voranmeldung für Dezember (§§ 46–48 UStDV) – wer vierteljährlich abgibt, leistet keine Sondervorauszahlung" },
         { id: "notiz", selten: true, art: "mehrzeilig", label: "Notiz", hilfe: "z. B. Besonderheiten in diesem Zeitraum" },
       ],
     },
@@ -944,7 +1026,7 @@ export const ustVoranmeldung: Vorlage = {
             { text: "Umsatzsteuer gesamt", betrag: betrag(x.steuer) },
             { kz: "66", text: "Vorsteuerbeträge aus Rechnungen anderer Unternehmer", hinweis: "§ 15 Abs. 1 Satz 1 Nr. 1 UStG", betrag: betrag(x.vst) },
             ...(x.v67 ? [{ kz: "67", text: "Vorsteuerbeträge aus Leistungen im Sinne des § 13b UStG", hinweis: "§ 15 Abs. 1 Satz 1 Nr. 4 UStG", betrag: euro(x.v67) }] : []),
-            ...(x.svz ? [{ kz: "39", text: "Abzug der festgesetzten Sondervorauszahlung für Dauerfristverlängerung", hinweis: "nur in der letzten Voranmeldung des Jahres", betrag: euro(x.svz) }] : []),
+            ...(x.svz ? [{ kz: "39", text: "Abzug der festgesetzten Sondervorauszahlung für Dauerfristverlängerung", hinweis: "nur Monatszahler, in der Voranmeldung für Dezember (§§ 46–48 UStDV)", betrag: euro(x.svz) }] : []),
             {
               kz: "83",
               text: leer ? "Verbleibende Umsatzsteuer-Vorauszahlung bzw. Überschuss" : ueberschuss ? "Verbleibender Überschuss (Erstattung)" : "Verbleibende Umsatzsteuer-Vorauszahlung",

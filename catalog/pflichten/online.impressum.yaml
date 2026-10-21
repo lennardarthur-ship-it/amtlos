@@ -1,7 +1,7 @@
 # Katalog G.66 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.impressum
-version: 3
+version: 4
 katalog_nr: G.66
 titel:
   de: Impressum auf Website und Social-Media-Profilen
@@ -11,7 +11,7 @@ kurz:
 erklaerung:
   de: Das Impressum nennt unter anderem Name, Anschrift und Kontakt, bei Gesellschaften auch Vertretung und Register. Auch ein
     geschäftliches Profil zum Beispiel bei Instagram oder Facebook ist ein digitaler Dienst mit Impressumspflicht – verlinke dort
-    dein Impressum. Der Online-Check prüft, ob es auf deiner Website verlinkt ist.
+    dein Impressum. Erledigt ist es, wenn es auf deiner Website veröffentlicht und verlinkt ist.
 rechtsgrundlage:
 - § 5 DDG
 kategorie: online
@@ -54,6 +54,10 @@ aenderungsnotiz:
 aktion:
   art: link
   ziel: app.onlinecheck
+erledigung:
+  art: bestaetigen
+  bestaetigung:
+    de: Auf der Website veröffentlicht
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null

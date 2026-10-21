@@ -1,7 +1,7 @@
 # Katalog F.64 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: it_sicherheit.nis2_pruefen
-version: 2
+version: 3
 katalog_nr: F.64
 titel:
   de: Prüfen, ob NIS2 für dich gilt
@@ -15,16 +15,35 @@ rechtsgrundlage:
 - BSIG
 kategorie: it_sicherheit
 ausloeser:
-  any:
-  - feld: profil.nis2.betroffen
-    op: nicht_vorhanden
+  all:
+  - any:
+    - feld: profil.nis2.betroffen
+      op: nicht_vorhanden
+      label:
+        de: Du hast noch nicht angegeben, ob NIS2 für dich gilt.
+    - feld: profil.nis2.betroffen
+      op: ==
+      wert: unklar
+      label:
+        de: Du bist unsicher, ob NIS2 für dich gilt.
+  # R11 (Nutzertests Gründerin, Kosmetik): Kleinbetriebe unter 50 Beschäftigten fallen nur in wenigen IT-nahen Sektoren
+  # größenunabhängig unter NIS2 – sonst nicht fragen
+  - not:
+      all:
+      - feld: profil.beschaeftigte.gesamt
+        op: <
+        wert: 50
+      - any:
+        - feld: profil.taetigkeit.branchen
+          op: nicht_vorhanden
+        - not:
+            feld: profil.taetigkeit.branchen
+            op: enthaelt_eines
+            wert:
+            - it_agentur_freelancer
+            - sonstige
     label:
-      de: Du hast noch nicht angegeben, ob NIS2 für dich gilt.
-  - feld: profil.nis2.betroffen
-    op: ==
-    wert: unklar
-    label:
-      de: Du bist unsicher, ob NIS2 für dich gilt.
+      de: Dein Betrieb ist groß genug oder in einer Branche, für die NIS2 auch ohne Größenschwelle gelten kann.
 frist:
   typ: dauerhaft
 wiederholung:
@@ -53,6 +72,7 @@ fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Sektoren und Größenschwellen stehen nicht in der Spezifikation – als Betroffenheitscheck fachlich ergänzen
 - Vorbereitender Schritt – Darstellung bestätigen
+- 'Ausgeblendet bei unter 50 Beschäftigten außer IT/Andere (R11) – Umsatz- und Bilanzschwelle (über 10 Mio. €) und größenunabhängige Sektoren (z. B. DNS, Vertrauensdienste, Telekommunikation) nicht abgebildet; bestätigen'
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf

@@ -1,7 +1,7 @@
 # Katalog G.73 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: produkte.gpsr
-version: 4
+version: 5
 katalog_nr: G.73
 titel:
   de: 'Produktsicherheit (GPSR): Angaben und verantwortliche Person'
@@ -65,7 +65,7 @@ quellen:
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Pflichten für Händler vs. Hersteller trennen
-- 'Lebensmittel als Auslöser entfernt (Art. 2 Abs. 3 GPSR, R10); Abgrenzung zur Kosmetikverordnung offen'
+- 'Lebensmittel als Auslöser entfernt (Art. 2 Abs. 3 GPSR, R10); Abgrenzung zur Kosmetikverordnung offen – bei Kosmetik geht die Kosmetikverordnung vor, GPSR nur ergänzend (Art. 2 Abs. 1); Umfang nach Art. 19 GPSR prüfen (Nutzertest Kosmetik R11)'
 - 'Händlerin fremder Markenware im Laden ohne Fernabsatz: nur Sorgfaltspflichten nach Art. 12 – Auslöser auf Hersteller/Importeur/Fernabsatz einschränken? Schwere „hoch“ für Händler angemessen?'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 pruefung:

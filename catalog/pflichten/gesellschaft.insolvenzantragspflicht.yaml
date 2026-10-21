@@ -1,15 +1,15 @@
 # Katalog B.17 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.insolvenzantragspflicht
-version: 2
+version: 3
 katalog_nr: B.17
 titel:
   de: Insolvenzantragspflicht kennen
 kurz:
   de: Bei Zahlungsunfähigkeit oder Überschuldung muss die Geschäftsführung rechtzeitig Insolvenz beantragen.
 erklaerung:
-  de: Die Insolvenzantragspflicht nach § 15a InsO trifft die Geschäftsführung. Die genauen Fristen stehen als geprüfte Regeldaten
-    in Amtlos, sobald sie fachlich freigegeben sind.
+  de: Die Insolvenzantragspflicht nach § 15a InsO trifft die Geschäftsführung. Der Antrag ist ohne schuldhaftes Zögern zu stellen,
+    spätestens drei Wochen nach Eintritt der Zahlungsunfähigkeit und sechs Wochen nach Eintritt der Überschuldung.
 rechtsgrundlage:
 - § 15a InsO
 kategorie: gesellschaft
@@ -41,6 +41,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/inso/__15a.html
   abgerufen: null
 fachlich_zu_pruefen:
+- 'Fristen drei bzw. sechs Wochen (§ 15a Abs. 1 InsO) im Text ergänzt (R11, Nutzertest Tischlerei) – bestätigen'
 - 'Fristen nach § 15a InsO als Regelwerte erfassen (Spezifikation: „Fristen aus Regeldaten“, Werte nicht genannt)'
 - 'Darstellung: allgemeine Information, keine Prüfung des Einzelfalls (RDG)'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen

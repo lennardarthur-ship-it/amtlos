@@ -772,7 +772,7 @@ export const de = {
     text: "Pflichten und Werkzeuge, die für deine Branche dazukommen.",
     keine: "Du hast noch keine Branche angegeben.",
     angeben: "Branche angeben",
-    namen: { gastronomie_lebensmittel: "Gastronomie und Lebensmittel", handwerk: "Handwerk", beauty_kosmetik: "Beauty und Kosmetik", bau: "Bau", transport_logistik: "Transport und Logistik", onlinehandel: "Onlinehandel", it_agentur_freelancer: "IT, Agentur, Freelancer", gesundheit_pflege: "Gesundheit und Pflege", immobilien_finanzen: "Immobilien und Finanzen", sonstige: "Sonstige" },
+    namen: { gastronomie_lebensmittel: "Gastronomie und Lebensmittel", handwerk: "Handwerk", beauty_kosmetik: "Beauty und Kosmetik", bau: "Bau", gebaeudereinigung: "Gebäudereinigung", transport_logistik: "Transport und Logistik", onlinehandel: "Onlinehandel", it_agentur_freelancer: "IT, Agentur, Freelancer", gesundheit_pflege: "Gesundheit und Pflege", immobilien_finanzen: "Immobilien und Finanzen", sonstige: "Sonstige" },
     pflichten: "Pflichten",
     werkzeuge: "Werkzeuge",
     keine_pflichten: "Für dieses Paket gilt nach deinen Angaben gerade nichts zusätzlich.",
