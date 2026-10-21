@@ -1,7 +1,8 @@
 # Katalog G.71 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Rechtsstand 21.10.2026: VerpackG seit 12.8.2026 durch VerpackDG (BGBl. 2026 I Nr. 207) abgelöst
 schema_version: 1
 id: produkte.verpackung
-version: 2
+version: 3
 katalog_nr: G.71
 titel:
   de: Verpackungen registrieren und lizenzieren
@@ -9,10 +10,11 @@ kurz:
   de: Bevor du verpackte Waren erstmals in Verkehr bringst, registrierst du dich im LUCID-Register und beteiligst dich an
     einem System.
 erklaerung:
-  de: Das Verpackungsgesetz verlangt Registrierung bei der Zentralen Stelle Verpackungsregister (LUCID) und Systembeteiligung
-    vor dem ersten Inverkehrbringen.
+  de: 'Seit 12.8.2026 gelten die EU-Verpackungsverordnung (EU) 2025/40 und das Verpackungsrecht-Durchführungsgesetz (VerpackDG), das das Verpackungsgesetz abgelöst hat. Du registrierst dich weiterhin bei der Zentralen Stelle Verpackungsregister (LUCID) und beteiligst Verpackungen, die typischerweise bei privaten Endverbrauchern anfallen, an einem System (§§ 6, 7 VerpackDG).'
 rechtsgrundlage:
-- VerpackG
+- § 6 VerpackDG
+- § 7 VerpackDG
+- Verordnung (EU) 2025/40
 kategorie: produkte
 branchen:
 - onlinehandel
@@ -39,12 +41,20 @@ status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
 quellen:
-- titel: Verpackungsgesetz
-  url: https://www.gesetze-im-internet.de/verpackg/
+- titel: Verpackungsrecht-Durchführungsgesetz
+  url: https://www.gesetze-im-internet.de/verpackdg/
   abgerufen: null
+- titel: IHK Karlsruhe – VerpackDG, deutsches Verpackungsgesetz novelliert (24.7.2026)
+  url: https://www.ihk.de/karlsruhe/fachthemen/umwelt/abfall/neues-verpackungsgesetz/verpackdg-deutsches-verpackungsgesetz-novelliert-7128006
+  abgerufen: '2026-10-21'
+- titel: WPK – Neues Verpackungsrecht in Kraft (13.8.2026)
+  url: https://www.wpk.de/neu/neues-verpackungsrecht-in-kraft-hinweise-der-zentralen-stelle-verpackungsregister/
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
+- 'Rechtsstand 21.10.2026: Rechtsgrundlage von VerpackG auf §§ 6, 7 VerpackDG umgestellt (Inhaltsübersicht VerpackDG, IHK Karlsruhe); Wortlaut von §§ 6, 7 nicht abgerufen – Zeitpunkt „vor dem ersten Inverkehrbringen“ und Abgrenzung systembeteiligungspflichtig gegen den Gesetzestext lesen'
+- 'Neue Herstellerpflichten aus der PPWR (z. B. Herstellerregister nach Art. 44, Kennzeichnung) und B2B-Verpackungen (§ 68 Abs. 9 VerpackDG, Übergang bis 31.12.2027) nicht abgebildet'
 - „Vor dem ersten Inverkehrbringen“ als Frist mit Ereignis abbilden?
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen (§ 66 VerpackDG)
 pruefung:
   status: entwurf
   geprueft_von: null

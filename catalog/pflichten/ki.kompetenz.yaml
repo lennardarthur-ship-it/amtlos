@@ -1,7 +1,7 @@
 # Katalog F.65 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: ki.kompetenz
-version: 3
+version: 4
 katalog_nr: F.65
 titel:
   de: KI-Kompetenz der Beschäftigten sicherstellen
@@ -9,7 +9,7 @@ kurz:
   de: Wer im Unternehmen mit KI arbeitet, sollte ausreichende KI-Kompetenz haben – fördere sie durch Schulung und halte das fest.
 erklaerung:
   de: Art. 4 KI-Verordnung gilt seit 2.2.2025. Nach dem Digital-Omnibus (VO (EU) 2026/1744) musst du die KI-Kompetenz deiner Beschäftigten
-    nicht mehr „sicherstellen“, sondern fördern – das ist noch nicht im Amtsblatt gegengelesen. Eine kurze Schulung mit Nachweis bleibt
+    nicht mehr „sicherstellen“, sondern fördern (Amtsblatt vom 24.7.2026, in Kraft seit 27.7.2026). Eine kurze Schulung mit Nachweis bleibt
     der sichere Weg; Amtlos bietet Schulungen mit Bestätigung.
 begriffe:
 - begriff:
@@ -60,6 +60,9 @@ quellen:
 - titel: FGS – EU AI Act, was ab dem 2. August 2026 gilt und was verschoben wurde
   url: https://www.fgs.de/news-and-insights/blog/detail/eu-ai-act-was-ab-dem-2-august-2026-gilt-und-was-verschoben-wurde
   abgerufen: '2026-10-20'
+- titel: Otto Schmidt – Wann gilt die KI-VO infolge der Änderungen durch die Digital-Omnibus-VO zur KI? (14.8.2026)
+  url: https://www.otto-schmidt.de/news//wann-gilt-die-ki-vo-infolge-der-anderungen-durch-die-digital-omnibus-vo-zur-ki-2026-08-14.html
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
 - 'Art. 4 nach Digital-Omnibus VO (EU) 2026/1744 auf „fördern“ abgeschwächt (Rechtsprüfung R11 Befund 8, T-65; Quelle Kanzlei-Blog FGS) – Wortlaut im Amtsblatt gegenlesen; Einordnung als Pflicht oder Hinweis danach festlegen'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen

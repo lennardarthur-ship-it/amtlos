@@ -259,8 +259,21 @@ export function validiereKatalog(katalogDir, optionen = {}) {
     for (const [id, e] of Object.entries(fx.erwartet)) if (!["gilt", "gilt_nicht", "unbekannt"].includes(e)) fehlerAus(datei, `${id}: Ergebnis '${e}' ungültig`);
   }
 
+  // ---------- Rechtsstand (catalog/rechtsstand.yaml) ----------
+  let rechtsstand = null;
+  const rsDatei = path.join(katalogDir, "rechtsstand.yaml");
+  if (fs.existsSync(rsDatei)) {
+    rechtsstand = YAML.parse(fs.readFileSync(rsDatei, "utf8"));
+    const datum = String(rechtsstand?.datum ?? "");
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(datum) || Number.isNaN(Date.parse(datum))) fehlerAus("rechtsstand.yaml", "datum muss ein Datum JJJJ-MM-TT sein");
+    if (rechtsstand?.hinweis != null && typeof rechtsstand.hinweis !== "string") fehlerAus("rechtsstand.yaml", "hinweis muss Text sein");
+    const erlaubt = new Set(["datum", "hinweis"]);
+    for (const k of Object.keys(rechtsstand ?? {})) if (!erlaubt.has(k)) fehlerAus("rechtsstand.yaml", `unbekanntes Feld '${k}'`);
+  } else if (prod) fehlerAus("rechtsstand.yaml", "prod: Rechtsstand fehlt");
+
   return {
     fehler,
+    rechtsstand,
     pflichten,
     regelwerte: [...regelwerte.values()].flat().map(({ datei: _d, ...rw }) => rw),
     fixtures,

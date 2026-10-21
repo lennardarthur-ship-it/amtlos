@@ -1,0 +1,14 @@
+persona: grenzfall
+beschreibung: Genau 150 Beschäftigte – Berichtspflicht nach Art. 9 Abs. 1 lit. b RL (EU) 2023/970 („150 bis 249“) im Radar, 149 nicht (Rechtsstand 21.10.2026)
+stichtag: "2026-10-21"
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: "2012-01-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.beschaeftigte.gesamt: 150
+  profil.bundesland: HE
+  profil.gemeinde_ags: "06412000"
+erwartet:
+  personal.entgelttransparenz_bericht: gilt
+termine_enthaelt:
+  personal.entgelttransparenz_bericht: [["einmalig", "2027-06-07"]]

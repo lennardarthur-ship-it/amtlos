@@ -1,16 +1,18 @@
 # R12 (Rechtsprüfung Befund 11): EU-Verpackungsverordnung (PPWR) – Take-away, Radar
+# Rechtsstand 21.10.2026: PPWR gilt seit 12.8.2026; Art. 32 bis 12.2.2027, Art. 33 bis 12.2.2028 (Kleinstunternehmen ausgenommen)
 schema_version: 1
 id: branche.gastro_ppwr_radar
-version: 1
+version: 2
 katalog_nr: H.1
 titel:
   de: 'EU-Verpackungsverordnung: mitgebrachte Behälter und Mehrweg (ab 2027)'
 kurz:
   de: Nach der EU-Verpackungsverordnung befüllen Take-away-Betriebe ab 12.2.2027 mitgebrachte Behälter; ab 12.2.2028 kommt ein Mehrwegangebot dazu, Kleinstunternehmen ausgenommen.
 erklaerung:
-  de: Die Verordnung (EU) 2025/40 über Verpackungen bringt für Speisen und Getränke zum Mitnehmen neue Pflichten. Bietest du an, mitgebrachte Behälter zu befüllen, informierst du seit dem 12.8.2026 über geeignete Behälter, Hygiene und die Verantwortung der Kundschaft. Ab dem 12.2.2027 müssen Kundinnen und Kunden ihre eigenen Behälter für kalte oder heiße Getränke und verzehrfertige Speisen nutzen können, ohne Aufpreis und mit gut sichtbarem Hinweis. Ab dem 12.2.2028 bietest du zusätzlich Mehrwegverpackungen aus einem Mehrwegsystem zur Wahl an; Kleinstunternehmen sind davon ausgenommen.
+  de: 'Die Verordnung (EU) 2025/40 über Verpackungen gilt seit 12.8.2026 und bringt für Speisen und Getränke zum Mitnehmen zwei Stufen. Bis 12.2.2027 müssen Kundinnen und Kunden kalte oder heiße Getränke und verzehrfertige Speisen in selbst mitgebrachte Behälter füllen lassen können – nicht teurer als in Einwegverpackung und mit gut sichtbarem Hinweis (Art. 32). Bis 12.2.2028 bietest du zusätzlich Mehrwegverpackungen aus einem Mehrwegsystem zur Wahl an (Art. 33); Kleinstunternehmen sind davon ausgenommen. Die deutsche Mehrwegangebotspflicht (§§ 60, 61 VerpackDG) gilt daneben weiter.'
 rechtsgrundlage:
-- Verordnung (EU) 2025/40
+- Art. 32 Verordnung (EU) 2025/40
+- Art. 33 Verordnung (EU) 2025/40
 kategorie: branche
 branchen:
 - gastronomie_lebensmittel
@@ -50,15 +52,25 @@ radar:
 gueltig_ab: '2027-02-12'
 gueltig_bis: null
 quellen:
+- titel: Verordnung (EU) 2025/40, Art. 32
+  url: https://lxgesetze.de/ppwr/32
+  abgerufen: '2026-10-21'
+- titel: Verordnung (EU) 2025/40, Art. 33
+  url: https://lxgesetze.de/ppwr/33
+  abgerufen: '2026-10-21'
 - titel: WKO – EU-Verpackungsverordnung (PPWR) für Tourismus und Gastronomie
   url: https://www.wko.at/tourismus-freizeitwirtschaft/eu-verpackungsverordnung-was-bedeutet-sie-fuer-den-tourismus
   abgerufen: '2026-10-21'
 - titel: Verordnung (EU) 2025/40
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32025R0040
   abgerufen: null
+- titel: IHK Karlsruhe – VerpackDG, deutsches Verpackungsgesetz novelliert (24.7.2026)
+  url: https://www.ihk.de/karlsruhe/fachthemen/umwelt/abfall/neues-verpackungsgesetz/verpackdg-deutsches-verpackungsgesetz-novelliert-7128006
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
-- 'Neu nach Rechtsprüfung R12 (Befund 11) – Termine laut WKO (österreichische Kammer), Artikelzuordnung und Anwendung in Deutschland unsicher: gegen den Verordnungstext lesen'
-- Ob die Befüllpflicht ab 12.2.2027 auch für Kleinstunternehmen gilt, unsicher; Verhältnis zu § 34 VerpackG und zum EWKFondsG (Gastronom als Hersteller?) offen
+- 'Rechtsstand 21.10.2026: Termine und Inhalt von Art. 32/33 aus der Textwiedergabe (lxgesetze) übernommen – gegen das Amtsblatt (EUR-Lex) lesen; frühere Angabe „Informationspflicht seit 12.8.2026“ (WKO) nicht bestätigt und entfernt'
+- 'Kleinstunternehmen-Ausnahme steht nur in Art. 33 Abs. 4; für Art. 32 keine Ausnahme im Text – Kleinbetriebe müssen nach § 61 VerpackDG ohnehin mitgebrachte Behälter befüllen'
+- 'Sanktion: Bußgeldvorschriften zur PPWR nach § 66 Abs. 2 VerpackDG ab 12.2.2027 (IHK Karlsruhe) – Tatbestand und Rahmen ergänzen; EWKFondsG (Gastronom als Hersteller?) offen'
 pruefung:
   status: entwurf
   geprueft_von: null

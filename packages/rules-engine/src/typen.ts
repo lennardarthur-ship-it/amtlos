@@ -97,9 +97,18 @@ export interface RegelwertVersion {
   [weitere: string]: unknown;
 }
 
+/** Rechtsstand des ganzen Katalogs (catalog/rechtsstand.yaml): Tag, bis zu dem die veränderlichen Einträge geprüft sind. */
+export interface Rechtsstand {
+  /** ISO-Datum, z. B. "2026-10-21" */
+  datum: Datum;
+  hinweis?: string;
+}
+
 export interface Katalog {
   pflichten: readonly Pflicht[];
   regelwerte: readonly RegelwertVersion[];
+  /** Fehlt bei Katalogen ohne catalog/rechtsstand.yaml (z. B. Tests, ältere Bündel) */
+  rechtsstand?: Rechtsstand;
 }
 
 /** Fakten nach fakten.json. Fehlende Schlüssel oder null bedeuten "unbekannt". */

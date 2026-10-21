@@ -1,27 +1,27 @@
 # Katalog D.47 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Rechtsstand 21.10.2026: Umsetzungsfrist 7.6.2026 verstrichen, deutsches Gesetz nicht beschlossen; Schwelle nach Art. 9 RL: 150 oder mehr
 schema_version: 1
 id: personal.entgelttransparenz_bericht
-version: 2
+version: 3
 katalog_nr: D.47
 titel:
   de: Bericht zur Entgelttransparenz (geplant)
 kurz:
-  de: Arbeitgeber mit mehr als 150 Beschäftigten sollen zum 7.6.2027 über die Entgeltgleichheit berichten.
+  de: Arbeitgeber mit mindestens 150 Beschäftigten sollen nach der EU-Richtlinie erstmals bis 7.6.2027 über das Entgeltgefälle berichten.
 erklaerung:
-  de: Die EU-Entgelttransparenzrichtlinie war bis 7.6.2026 umzusetzen; das deutsche Gesetz steht aus. Bis dahin gilt das bisherige
-    Entgelttransparenzgesetz weiter.
+  de: 'Die EU-Entgelttransparenzrichtlinie war bis 7.6.2026 umzusetzen; Deutschland hat die Frist verpasst. Nach der Richtlinie berichten Arbeitgeber mit 250 oder mehr Beschäftigten ab 7.6.2027 jährlich, mit 150 bis 249 Beschäftigten ab 7.6.2027 alle drei Jahre und mit 100 bis 149 Beschäftigten ab 7.6.2031 alle drei Jahre. Stand: Oktober 2026 – noch offen: Ein deutsches Umsetzungsgesetz ist nicht beschlossen, erst dieses legt die Stichtage für deinen Betrieb fest. Bis dahin gilt das bisherige Entgelttransparenzgesetz weiter.'
 rechtsgrundlage:
-- Richtlinie (EU) 2023/970
+- Art. 9 Richtlinie (EU) 2023/970
 - EntgTranspG
 kategorie: personal
 ausloeser:
   all:
   - feld: profil.beschaeftigte.gesamt
-    op: '>'
+    op: '>='
     wert:
       regelwert: personal.entgelttransparenz.berichtspflicht_schwelle
     label:
-      de: Du beschäftigst mehr als 150 Personen.
+      de: Du beschäftigst mindestens 150 Personen.
 frist:
   typ: absolut
   datum: '2027-06-07'
@@ -52,8 +52,18 @@ quellen:
 - titel: Entgelttransparenzgesetz
   url: https://www.gesetze-im-internet.de/entgtranspg/
   abgerufen: null
+- titel: Richtlinie (EU) 2023/970
+  url: https://eur-lex.europa.eu/eli/dir/2023/970/oj
+  abgerufen: null
+- titel: AfA Rechtsanwälte – Entgelttransparenzgesetz 2026 (29.6.2026)
+  url: https://www.afa-anwalt.de/news/entgelttransparenzgesetz-2026-rl-2023-970/
+  abgerufen: '2026-10-21'
+- titel: DATEV – Gesetzliche Änderungen Sommer 2026 (Entgelttransparenz)
+  url: https://www.datev.de/web/de/unternehmen/loesungen/themen-im-fokus/aktuelle-themen-fuer-unternehmen/gesetzliche-aenderungen-sommer-2026-entgelttransparenz-minijobs-pflege-ki
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
-- Status offen – Radar
+- 'Rechtsstand 21.10.2026: kein deutsches Umsetzungsgesetz, kein veröffentlichter Referentenentwurf (BT-Drs. 21/7026: Vorbereitungen laufen) – nationale Stichtage und Schwellen nach Verkündung übernehmen'
+- 'Schwelle auf „mindestens 150“ (≥) korrigiert: Art. 9 Abs. 1 lit. b RL „150 bis 249 Arbeitnehmer“ (laut AfA und weiteren Quellen; Richtlinientext in EUR-Lex gegenlesen); Gruppe 100–149 (ab 2031) nicht als eigene Regel abgebildet'
 - Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „hoch“, weil EU-Richtlinie)
 - Zählweise und Inhalt des Berichts nach Umsetzungsgesetz
 - Vorbereitungs-Checkliste fachlich prüfen

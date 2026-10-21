@@ -20,7 +20,9 @@ const MONATE = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "A
 
 /** Rechtsstand als JJJJ-MM. `katalog` nur für Tests – sonst der gebündelte Katalog. */
 export function rechtsstand(katalog: KatalogDaten = roh as unknown as KatalogDaten): string {
-  const eigen = typeof katalog.rechtsstand === "string" ? MONAT.exec(katalog.rechtsstand) : null;
+  const r = katalog.rechtsstand;
+  const datum = typeof r === "string" ? r : r && typeof r === "object" && typeof (r as { datum?: unknown }).datum === "string" ? (r as { datum: string }).datum : null;
+  const eigen = datum ? MONAT.exec(datum) : null;
   if (eigen) return `${eigen[1]}-${eigen[2]}`;
   const daten = (katalog.pflichten ?? []).flatMap((p) => [...(p.quellen ?? []).map((q) => q.abgerufen), p.pruefung?.geprueft_am]);
   const neuestes = daten

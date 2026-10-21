@@ -1,20 +1,18 @@
-# R11 (Rechtsprüfung T-114, Nutzertest Gründerin): Mehrweg-Angebotspflicht §§ 33, 34 VerpackG
+# R11 (Rechtsprüfung T-114, Nutzertest Gründerin): Mehrweg-Angebotspflicht, bis 11.8.2026 §§ 33, 34 VerpackG
+# Rechtsstand 21.10.2026: seit 12.8.2026 §§ 60, 61 VerpackDG (BGBl. 2026 I Nr. 207), inhaltlich gleich
 schema_version: 1
 id: branche.gastro_mehrweg
-version: 1
+version: 2
 katalog_nr: G.73
 titel:
   de: Mehrweg zum Mitnehmen anbieten
 kurz:
   de: Verkaufst du Essen oder Getränke zum Mitnehmen in Einwegverpackungen aus Kunststoff oder Einwegbechern, bietest du auch Mehrweg an.
 erklaerung:
-  de: Wer Speisen in Einwegkunststoffverpackungen oder Getränke in Einwegbechern erst beim Verkauf befüllt, muss sie auch in einer
-    Mehrwegverpackung anbieten – nicht teurer und gut sichtbar mit einem Hinweis (§ 33 VerpackG). Ausgenommen sind kleine Betriebe
-    mit höchstens fünf Beschäftigten und höchstens 80 m² Verkaufsfläche; sie müssen stattdessen auf Wunsch mitgebrachte Behälter der
-    Kundschaft befüllen und darauf hinweisen (§ 34 VerpackG).
+  de: 'Wer Speisen in Einwegkunststoffverpackungen oder Getränke in Einwegbechern erst beim Verkauf befüllt, muss sie auch in einer Mehrwegverpackung anbieten – nicht teurer und gut sichtbar mit einem Hinweis (§ 60 VerpackDG). Ausgenommen sind kleine Betriebe mit höchstens fünf Beschäftigten und höchstens 80 m² Verkaufsfläche; sie müssen stattdessen auf Wunsch mitgebrachte Behälter der Kundschaft befüllen und darauf hinweisen (§ 61 VerpackDG). Seit 12.8.2026 steht die Pflicht im Verpackungsrecht-Durchführungsgesetz, das das Verpackungsgesetz abgelöst hat.'
 rechtsgrundlage:
-- § 33 VerpackG
-- § 34 VerpackG
+- § 60 VerpackDG
+- § 61 VerpackDG
 kategorie: branche
 branchen:
 - gastronomie_lebensmittel
@@ -47,16 +45,20 @@ status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
 quellen:
-- titel: Verpackungsgesetz § 33
-  url: https://www.gesetze-im-internet.de/verpackg/__33.html
-  abgerufen: null
-- titel: Verpackungsgesetz § 34
-  url: https://www.gesetze-im-internet.de/verpackg/__34.html
-  abgerufen: null
+- titel: Verpackungsrecht-Durchführungsgesetz § 60
+  url: https://www.gesetze-im-internet.de/verpackdg/__60.html
+  abgerufen: '2026-10-21'
+- titel: Verpackungsrecht-Durchführungsgesetz § 61
+  url: https://www.gesetze-im-internet.de/verpackdg/__61.html
+  abgerufen: '2026-10-21'
+- titel: WPK – Neues Verpackungsrecht in Kraft (13.8.2026)
+  url: https://www.wpk.de/neu/neues-verpackungsrecht-in-kraft-hinweise-der-zentralen-stelle-verpackungsregister/
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
+- 'Rechtsstand 21.10.2026: Fundstellen von §§ 33, 34 VerpackG auf §§ 60, 61 VerpackDG umgestellt (VerpackDG seit 12.8.2026); Inhalt laut Gesetzestext gleich – Teilzeitzählung (0,5 bis 20 Std., 0,75 bis 30 Std.) und Lager-/Versandflächen bei Lieferung (§ 61 Abs. 1) ggf. als Hinweis ergänzen'
 - 'Neu nach Rechtsprüfung R11 (T-114): Ausnahme nur bei höchstens 5 Beschäftigten UND höchstens 80 m² – Zählweise der Beschäftigten und Verkaufsfläche beim Foodtruck prüfen'
-- 'LUCID-Registrierung für Serviceverpackungen (§ 9 VerpackG) und Herstellereigenschaft nach EWKFondsG offen (Nutzertest Gründerin)'
-- 'Folgen bei Nichterfüllung (§ 36 VerpackG) – Sanktion fachlich ergänzen'
+- 'LUCID-Registrierung für Serviceverpackungen (§ 6 VerpackDG) und Herstellereigenschaft nach EWKFondsG offen (Nutzertest Gründerin)'
+- 'Folgen bei Nichterfüllung (§ 66 VerpackDG) – Sanktion fachlich ergänzen'
 pruefung:
   status: entwurf
   geprueft_von: null

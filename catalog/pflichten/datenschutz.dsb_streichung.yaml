@@ -1,14 +1,15 @@
 # Katalog F.61 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Rechtsstand 21.10.2026: weiterhin nur angekündigt (Föderale Modernisierungsagenda), kein Gesetzentwurf
 schema_version: 1
 id: datenschutz.dsb_streichung
-version: 2
+version: 3
 katalog_nr: F.61
 titel:
   de: Wegfall der Schwelle nach § 38 BDSG (geplant)
 kurz:
-  de: Die Bundesregierung plant, die Benennungspflicht ab 20 Personen nach § 38 BDSG zu streichen.
+  de: Der Bund will bis Ende 2026 einen Gesetzentwurf einbringen, der die Benennungspflicht ab 20 Personen nach § 38 Abs. 1 BDSG aufhebt.
 erklaerung:
-  de: Geplant bis Ende 2026, noch kein Gesetz. Die Pflichten nach Art. 37 DSGVO blieben bestehen.
+  de: 'Bund und Länder haben am 4.12.2025 in der Föderalen Modernisierungsagenda vereinbart, dass der Bund bis 31.12.2026 eine Aufhebung des § 38 Abs. 1 BDSG einbringt. Das betrifft nur das Einbringen, nicht das Inkrafttreten. Stand: Oktober 2026 – noch offen: Ein Gesetzentwurf liegt nicht vor, bis zu einer Änderung gilt die Schwelle von 20 Personen weiter. Die Pflichten nach Art. 37 DSGVO blieben auch danach bestehen.'
 rechtsgrundlage:
 - § 38 BDSG
 kategorie: datenschutz
@@ -40,7 +41,7 @@ automatisierung: hinweis
 status_recht: geplant
 radar:
   wahrscheinlichkeit: mittel
-  erwartet_ab: '2026-12-31'
+  erwartet_ab: null
   vorbereitung:
   - de: Bis zur Änderung gilt § 38 BDSG weiter – Benennung nicht vorschnell aufheben
   - de: Prüfen, ob die Benennungspflicht nach Art. 37 DSGVO unabhängig davon besteht
@@ -50,11 +51,19 @@ quellen:
 - titel: Bundesdatenschutzgesetz § 38
   url: https://www.gesetze-im-internet.de/bdsg_2018/__38.html
   abgerufen: null
+- titel: Föderale Modernisierungsagenda (Beschluss vom 4.12.2025), Zweites Kapitel III Nr. 2.2
+  url: https://www.rlp.de/fileadmin/02/MPK_Vorsitz/Beschluesse_MPK_4._Dezember_2025_Berlin/Foederale_Modernisierungsagenda.pdf
+  abgerufen: '2026-10-21'
+- titel: Dr. Datenschutz – Fällt die Pflicht zum Datenschutzbeauftragten bis Ende 2026?
+  url: https://www.dr-datenschutz.de/faellt-die-pflicht-zum-datenschutzbeauftragten-bis-ende-2026/
+  abgerufen: '2026-10-21'
+- titel: § 38 BDSG Streichung – was jetzt gilt (Stand 24.7.2026)
+  url: https://gefahrgut-consulting.de/paragraf-38-bdsg-streichung/
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
+- 'Rechtsstand 21.10.2026: nur Ankündigung (Modernisierungsagenda, Koalitionsausschuss 2.7.2026), kein Referentenentwurf gefunden – vor Launch und zum Jahreswechsel erneut prüfen; erwartet_ab bewusst leer (Zusage betrifft nur das Einbringen bis 31.12.2026)'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Status offen – Radar
 - Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „mittel“)
-- „bis Ende 2026“ als erwartet ab 31.12.2026 eingetragen
 - Vorbereitungs-Checkliste fachlich prüfen
 pruefung:
   status: entwurf

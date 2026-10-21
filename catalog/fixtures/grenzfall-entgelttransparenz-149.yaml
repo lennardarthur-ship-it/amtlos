@@ -1,0 +1,12 @@
+persona: grenzfall
+beschreibung: 149 Beschäftigte – unter der Schwelle von 150 für den ersten Entgeltbericht 2027 (Rechtsstand 21.10.2026)
+stichtag: "2026-10-21"
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: "2012-01-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.beschaeftigte.gesamt: 149
+  profil.bundesland: HE
+  profil.gemeinde_ags: "06412000"
+erwartet:
+  personal.entgelttransparenz_bericht: gilt_nicht

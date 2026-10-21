@@ -1,16 +1,18 @@
 # Katalog C.21 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Rechtsstand 21.10.2026: § 18 Abs. 2 Satz 6 UStG gilt nur für 2021 bis 2026, keine Verlängerung beschlossen → ab 2027 wieder Satz 4
 schema_version: 1
 id: steuern.ust_va_neugruender_radar
-version: 1
+version: 2
 katalog_nr: C.21
 titel:
   de: Monatliche USt-Voranmeldung für Neugründer ab 2027
 kurz:
-  de: Die Aussetzung der monatlichen Voranmeldung für Neugründer endet am 31.12.2026 – ob sie verlängert wird, ist offen.
+  de: Die Ausnahme von der monatlichen Voranmeldung für Neugründer gilt nur bis einschließlich 2026 – eine Verlängerung ist bisher nicht beschlossen.
 erklaerung:
-  de: Ohne Verlängerung müssten Gründer im Gründungsjahr und im Folgejahr wieder monatlich Voranmeldungen abgeben.
+  de: 'Für die Jahre 2021 bis 2026 richtet sich der Voranmeldungszeitraum im Gründungsjahr und im Folgejahr nach der voraussichtlichen Steuer (§ 18 Abs. 2 Satz 6 UStG). Ab 2027 gilt nach dem Gesetz wieder Satz 4: Im Jahr der Gründung und im Folgejahr gibst du die Voranmeldung monatlich ab. Stand: Oktober 2026 – eine Verlängerung ist nicht beschlossen, kann aber noch kommen. Hast du 2026 gegründet, klärst du mit dem Finanzamt oder der Steuerberatung, welcher Rhythmus 2027 für dich gilt.'
 rechtsgrundlage:
-- § 18 Abs. 2 UStG
+- § 18 Abs. 2 Satz 4 UStG
+- § 18 Abs. 2 Satz 6 UStG
 kategorie: steuern
 ausloeser:
   any:
@@ -39,26 +41,31 @@ kanal: elster
 kosten: null
 sanktion:
   text:
-    de: Noch keine – mögliche Änderung.
+    de: Noch keine – die Änderung gilt ab 2027.
   schwere: mittel
 automatisierung: hinweis
-status_recht: geplant
+status_recht: beschlossen
 radar:
-  wahrscheinlichkeit: mittel
+  wahrscheinlichkeit: hoch
   erwartet_ab: '2027-01-01'
   vorbereitung:
   - de: Belege und Rechnungen monatlich vollständig halten
   - de: Mit der Steuerberatung klären, welcher Rhythmus ab 2027 gilt
-gueltig_ab: null
+gueltig_ab: '2027-01-01'
 gueltig_bis: null
 quellen:
 - titel: Umsatzsteuergesetz § 18
   url: https://www.gesetze-im-internet.de/ustg_1980/__18.html
-  abgerufen: null
+  abgerufen: '2026-10-21'
+  fundstelle: § 18 Abs. 2 Satz 4 und 6 UStG
+- titel: Haufe – Umsatzsteuer-Voranmeldung 2026, Voranmeldung bei Beginn der unternehmerischen Tätigkeit
+  url: https://www.haufe.de/id/beitrag/umsatzsteuer-voranmeldung-2026-15-voranmeldung-bei-beginn-der-unternehmerischen-taetigkeit-HI16943563.html
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
+- 'Rechtsstand 21.10.2026: Satz 6 im Gesetzestext weiter „2021 bis 2026“, keine Verlängerung gefunden; Status auf „beschlossen“ (Rückkehr zu Satz 4 ergibt sich aus dem geltenden Gesetz) – bis Jahresende auf Verlängerung im Jahressteuergesetz achten'
+- 'Gründung 2026: ob 2027 als „folgendes Kalenderjahr“ monatlich anzumelden ist, ohne Verwaltungsanweisung – mit BMF/Finanzamt klären'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Status offen – Radar
-- Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „mittel“)
+- Wahrscheinlichkeit „hoch“ gesetzt (geltendes Recht, Verlängerung offen) – bestätigen
 - Vorbereitungs-Checkliste fachlich prüfen
 pruefung:
   status: entwurf

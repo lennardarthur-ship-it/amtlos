@@ -1,5 +1,7 @@
 export interface KatalogPruefung {
   fehler: string[];
+  /** catalog/rechtsstand.yaml, null wenn nicht vorhanden */
+  rechtsstand: { datum: string; hinweis?: string } | null;
   pflichten: { datei: string; inhalt: Record<string, unknown> & { id: string; version: number } }[];
   regelwerte: (Record<string, unknown> & { id: string; version: number; wert: number; gueltig_ab: string; gueltig_bis?: string | null })[];
   fixtures: { datei: string; inhalt: Record<string, unknown> }[];

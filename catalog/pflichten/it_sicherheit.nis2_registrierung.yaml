@@ -1,16 +1,17 @@
 # Katalog F.64 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Rechtsstand 21.10.2026: NIS2UmsuCG seit 6.12.2025 in Kraft, Registrierung nach § 33 BSIG
 schema_version: 1
 id: it_sicherheit.nis2_registrierung
-version: 1
+version: 2
 katalog_nr: F.64
 titel:
   de: Beim BSI registrieren (NIS2)
 kurz:
-  de: Fällt dein Unternehmen unter NIS2, registrierst du es beim BSI. Die Nachfrist endete am 31.7.2026.
+  de: Fällt dein Unternehmen unter NIS2, registrierst du es spätestens drei Monate danach beim BSI. Die Nachfrist des BSI für Bestandsunternehmen endete am 31.7.2026.
 erklaerung:
-  de: Die Registrierung ist Voraussetzung für die Meldewege bei Sicherheitsvorfällen.
+  de: 'Das NIS-2-Umsetzungsgesetz gilt seit 6.12.2025. Wichtige und besonders wichtige Einrichtungen registrieren sich spätestens drei Monate, nachdem sie erstmals oder erneut darunter fallen, beim BSI (§ 33 BSIG). Für Unternehmen, die schon bei Inkrafttreten betroffen waren, lief die Frist am 6.3.2026 ab; das BSI hat Nachmeldungen bis 31.7.2026 hingenommen. Die Registrierung ist Voraussetzung für die Meldewege bei Sicherheitsvorfällen.'
 rechtsgrundlage:
-- BSIG (NIS2UmsuCG)
+- § 33 BSIG
 kategorie: it_sicherheit
 ausloeser:
   feld: profil.nis2.betroffen
@@ -36,16 +37,22 @@ sanktion:
   schwere: hoch
 automatisierung: hinweis
 status_recht: in_kraft
-gueltig_ab: null
+gueltig_ab: '2025-12-06'
 gueltig_bis: null
 quellen:
-- titel: BSI-Gesetz
-  url: https://www.gesetze-im-internet.de/bsig_2009/
-  abgerufen: null
+- titel: BSI-Gesetz § 33
+  url: https://www.gesetze-im-internet.de/bsig_2025/__33.html
+  abgerufen: '2026-10-21'
+- titel: ADVANT Beiten – NIS-2-Umsetzungsgesetz in Kraft
+  url: https://www.advant-beiten.com/aktuelles/nis-2-umsetzungsgesetz-in-kraft-neue-cybersicherheitspflichten-fuer-unternehmen
+  abgerufen: '2026-10-21'
+- titel: LocateRisk – BSI-Nachfrist für die NIS2-Registrierung bis 31.7.2026
+  url: https://locaterisk.com/en/?p=8642
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
-- Fundstelle im BSIG nach NIS2-Umsetzung prüfen
-- „Nachfrist“ – was gilt für Unternehmen, die erst später betroffen werden?
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- 'Rechtsstand 21.10.2026: § 33 BSIG (drei Monate nach Betroffenheit), gesetzliche Frist für Bestandsunternehmen 6.3.2026, BSI-Kulanz bis 31.7.2026 (Quelle Dienstleister-Blog, BSI-Mitteilung nicht direkt gefunden) – bestätigen'
+- 'Frist bleibt als festes Datum 31.7.2026 – für später betroffene Unternehmen gilt „drei Monate ab Betroffenheit“; dafür fehlt ein Ereignis (z. B. „NIS2 betroffen seit“)'
+- 'Bußgeldrahmen 10 Mio. €/2 % gilt für besonders wichtige Einrichtungen; für wichtige Einrichtungen niedriger – nach der Bußgeldvorschrift des BSIG differenzieren'
 pruefung:
   status: entwurf
   geprueft_von: null

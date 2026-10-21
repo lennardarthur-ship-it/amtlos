@@ -1,7 +1,7 @@
 # Katalog D.39 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.mindestlohn
-version: 3
+version: 4
 katalog_nr: D.39
 titel:
   de: Mindestlohn zahlen
@@ -43,7 +43,12 @@ quellen:
 - titel: Mindestlohngesetz
   url: https://www.gesetze-im-internet.de/milog/
   abgerufen: null
+- titel: Fünfte Mindestlohnanpassungsverordnung (MiLoV5) § 1
+  url: https://www.gesetze-im-internet.de/milov5/BJNR10C0A0025.html
+  abgerufen: '2026-10-21'
+  fundstelle: BGBl. 2025 I Nr. 268
 fachlich_zu_pruefen:
+- 'Rechtsstand 21.10.2026: 13,90 € ab 1.1.2026 und 14,60 € ab 1.1.2027 nach § 1 MiLoV5 vom 5.11.2025 bestätigt'
 - 'Sanktion nach Zoll-Prüfung R12 (Befund 17): § 21 Abs. 1 Nr. 9, Abs. 3 MiLoG'
 - Branchenmindestlöhne (AEntG, allgemeinverbindliche Tarifverträge) nur als Hinweis ohne Beträge (R11, Nutzertest Gebäudereinigung) – Branchen, Lohngruppen und Beträge 2026/2027 sowie Aufzeichnungspflicht nach § 19 AEntG fachlich ergänzen
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen

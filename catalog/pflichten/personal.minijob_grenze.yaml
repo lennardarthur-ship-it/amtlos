@@ -1,7 +1,7 @@
 # Katalog D.39 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.minijob_grenze
-version: 1
+version: 2
 katalog_nr: D.39
 titel:
   de: Minijob-Grenze beachten
@@ -40,7 +40,14 @@ quellen:
 - titel: Sozialgesetzbuch IV § 8
   url: https://www.gesetze-im-internet.de/sgb_4/__8.html
   abgerufen: null
+- titel: Bundesregierung – Mindestlohn jetzt bei 13,90 Euro (Minijob-Grenze 603 € / 633 €)
+  url: https://www.bundesregierung.de/breg-de/suche/mindestlohn-steigt-2391010
+  abgerufen: '2026-10-21'
+- titel: lohn-info.de – 633-Euro-Job ab 1. Januar 2027
+  url: https://lohn-info.de/633-euro-job.html
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
+- 'Rechtsstand 21.10.2026: 633 € ab 1.1.2027 folgt aus § 8 Abs. 1a SGB IV (14,60 € × 130 / 3, aufgerundet); Bekanntmachung des BMAS im Bundesanzeiger für 2027 steht noch aus – nach Veröffentlichung Quelle ergänzen; Übergangsbereich 2027: 633,01 € bis 2.000 €'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Folgen bei Überschreiten (gelegentliches Überschreiten) ergänzen
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen

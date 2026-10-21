@@ -53,7 +53,11 @@ const nurDeutsch = (d) => {
 const lesenAlle = (o) => fs.readdirSync(o).filter((f) => /\.ya?ml$/.test(f)).sort().map((f) => YAML.parse(fs.readFileSync(path.join(o, f), "utf8")));
 const voll = lesenAlle(ordner).map(({ fachlich_zu_pruefen: _weg, ...p }) => nurDeutsch(p));
 const regelwerte = lesenAlle(path.join(wurzel, "catalog/regelwerte")).flatMap((x) => (Array.isArray(x) ? x : [x])).map(nurDeutsch);
+// Rechtsstand des ganzen Katalogs (catalog/rechtsstand.yaml) → katalog.rechtsstand, in der App über rechtsstandText(KATALOG)
+const rechtsstandRoh = YAML.parse(fs.readFileSync(path.join(wurzel, "catalog/rechtsstand.yaml"), "utf8"));
+if (!/^\d{4}-\d{2}-\d{2}$/.test(String(rechtsstandRoh?.datum))) throw new Error("catalog/rechtsstand.yaml: datum (JJJJ-MM-TT) fehlt");
+const rechtsstand = { datum: String(rechtsstandRoh.datum), ...(rechtsstandRoh.hinweis ? { hinweis: String(rechtsstandRoh.hinweis) } : {}) };
 const zielVoll = path.join(hier, "../src/pflichten/katalog.json");
 fs.mkdirSync(path.dirname(zielVoll), { recursive: true });
-fs.writeFileSync(zielVoll, JSON.stringify({ pflichten: voll, regelwerte }) + "\n");
-console.log(`✓ ${voll.length} Pflichten, ${regelwerte.length} Regelwerte (${Math.round(fs.statSync(zielVoll).size / 1024)} KB) → src/pflichten/katalog.json`);
+fs.writeFileSync(zielVoll, JSON.stringify({ rechtsstand, pflichten: voll, regelwerte }) + "\n");
+console.log(`✓ ${voll.length} Pflichten, ${regelwerte.length} Regelwerte, Rechtsstand ${rechtsstand.datum} (${Math.round(fs.statSync(zielVoll).size / 1024)} KB) → src/pflichten/katalog.json`);

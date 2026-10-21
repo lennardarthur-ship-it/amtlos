@@ -1,17 +1,19 @@
 # Katalog F.65 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Rechtsstand 21.10.2026: Digital-Omnibus VO (EU) 2026/1744 (ABl. 24.7.2026, in Kraft 27.7.2026) – Anhang III ab 2.12.2027, Anhang I ab 2.8.2028
 schema_version: 1
 id: ki.hochrisiko
-version: 2
+version: 3
 katalog_nr: F.65
 titel:
-  de: Pflichten für Hochrisiko-KI (verschoben)
+  de: Pflichten für Hochrisiko-KI (ab 2.12.2027)
 kurz:
-  de: Für Hochrisiko-KI-Systeme gelten umfangreiche Pflichten – verschoben auf 2.12.2027 bzw. 2.8.2028.
+  de: Für Hochrisiko-KI-Systeme gelten umfangreiche Pflichten – in den Bereichen nach Anhang III ab 2.12.2027, für KI in Produkten nach Anhang I ab 2.8.2028.
 erklaerung:
-  de: Der „Digital Omnibus“ hat die Hochrisiko-Pflichten verschoben. Betroffen sind vor allem Anbieter und Betreiber von KI
-    in sensiblen Bereichen.
+  de: 'Die Digital-Omnibus-Verordnung (EU) 2026/1744 hat die Hochrisiko-Pflichten der KI-Verordnung verschoben; sie ist am 24.7.2026 im Amtsblatt erschienen und seit 27.7.2026 in Kraft. Für Hochrisiko-KI in sensiblen Bereichen nach Anhang III (zum Beispiel Personalauswahl, Kreditwürdigkeit, Bildung) gelten die Pflichten ab 2.12.2027, für KI als Sicherheitsbauteil von Produkten nach Anhang I ab 2.8.2028. Betroffen sind vor allem Anbieter und Betreiber solcher Systeme.'
 rechtsgrundlage:
 - KI-VO, Kapitel III
+- Art. 113 KI-VO
+- Verordnung (EU) 2026/1744
 kategorie: ki
 ausloeser:
   feld: profil.ki.eigene_produkte
@@ -34,22 +36,30 @@ sanktion:
 automatisierung: hinweis
 status_recht: beschlossen
 radar:
-  wahrscheinlichkeit: hoch
+  wahrscheinlichkeit: sicher
   erwartet_ab: '2027-12-02'
   vorbereitung:
   - de: Prüfen, ob eure KI-Produkte in einen Hochrisiko-Bereich fallen
   - de: Dokumentation und Risikomanagement der Produkte sichten
-gueltig_ab: null
+gueltig_ab: '2027-12-02'
 gueltig_bis: null
 quellen:
 - titel: KI-Verordnung (EU) 2024/1689
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32024R1689
   abgerufen: null
+- titel: Verordnung (EU) 2026/1744 (Digital Omnibus zur KI)
+  url: https://eur-lex.europa.eu/eli/reg/2026/1744/oj?locale=de
+  abgerufen: null
+- titel: Otto Schmidt – Wann gilt die KI-VO infolge der Änderungen durch die Digital-Omnibus-VO zur KI? (14.8.2026)
+  url: https://www.otto-schmidt.de/news//wann-gilt-die-ki-vo-infolge-der-anderungen-durch-die-digital-omnibus-vo-zur-ki-2026-08-14.html
+  abgerufen: '2026-10-21'
+- titel: FGS – EU AI Act, was ab dem 2. August 2026 gilt und was verschoben wurde
+  url: https://www.fgs.de/news-and-insights/blog/detail/eu-ai-act-was-ab-dem-2-august-2026-gilt-und-was-verschoben-wurde
+  abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
+- 'Rechtsstand 21.10.2026: Termine (Anhang III 2.12.2027, Anhang I 2.8.2028, Art. 113 Buchst. c) laut Otto Schmidt und FGS – Amtsblatttext (EUR-Lex) nicht direkt abgerufen, gegenlesen'
+- 'Status bleibt „beschlossen“ bis 2.12.2027; Anhang-I-Fälle (2.8.2028) und Bestandssysteme (Art. 111: bis 2.8.2030) nicht als eigene Regel abgebildet'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Status und Daten nach dem Digital Omnibus prüfen
-- Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „hoch“)
-- Welcher der beiden Termine gilt wofür?
 - Vorbereitungs-Checkliste fachlich prüfen
 pruefung:
   status: entwurf

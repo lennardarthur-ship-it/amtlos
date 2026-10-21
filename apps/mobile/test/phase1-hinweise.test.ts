@@ -16,6 +16,7 @@ describe("Rechtsstand", () => {
   it("aus dem Feld `rechtsstand` des Katalogs, sonst jüngstes Abrufdatum, sonst Ersatz", () => {
     expect(rechtsstand({ rechtsstand: "2026-11-01", pflichten: [] })).toBe("2026-11");
     expect(rechtsstand({ rechtsstand: "2027-01", pflichten: [] })).toBe("2027-01");
+    expect(rechtsstand({ rechtsstand: { datum: "2026-10-21", hinweis: "x" }, pflichten: [] })).toBe("2026-10");
     expect(rechtsstand({ pflichten: [{ quellen: [{ abgerufen: "2026-09-30" }, { abgerufen: null }], pruefung: { geprueft_am: "2026-10-02" } }, { quellen: null }] })).toBe("2026-10");
     expect(rechtsstand({ pflichten: [{ quellen: [{ abgerufen: null }] }] })).toBe(RECHTSSTAND_ERSATZ);
     expect(rechtsstand({ rechtsstand: "unbekannt" })).toBe(RECHTSSTAND_ERSATZ);

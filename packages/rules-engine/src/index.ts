@@ -8,3 +8,4 @@ export * from "./erklaerung.js";
 export * from "./klartext.js";
 export * from "./instanzen.js";
 export * from "./heute.js";
+export * from "./rechtsstand.js";

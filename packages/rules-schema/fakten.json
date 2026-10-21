@@ -271,7 +271,7 @@
     {
       "pfad": "profil.gastro.to_go",
       "typ": "bool",
-      "herleitung": "Onboarding (R11): Speisen oder Getränke zum Mitnehmen in Einwegverpackungen (§§ 33, 34 VerpackG)",
+      "herleitung": "Onboarding (R11): Speisen oder Getränke zum Mitnehmen in Einwegverpackungen (§§ 60, 61 VerpackDG, bis 11.8.2026 §§ 33, 34 VerpackG)",
       "ab": 2
     },
     {

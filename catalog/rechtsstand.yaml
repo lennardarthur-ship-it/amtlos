@@ -1,0 +1,5 @@
+# Rechtsstand des gesamten Katalogs: Bis zu diesem Tag wurden die veränderlichen Einträge (Radar, Schwellen, Beträge, Termine)
+# gegen amtliche und fachliche Quellen geprüft. Wird ins Gerätebündel übernommen (apps/mobile/werkzeuge/katalog-buendel.mjs)
+# und in der App als „Rechtsstand: Oktober 2026“ angezeigt (rechtsstandText aus @amtlos/rules-engine).
+datum: "2026-10-21"
+hinweis: Veränderliche Einträge (Gesetzesvorhaben, Schwellen und Beträge ab 1.1.2027) auf den Stand vom 21.10.2026 gebracht; offene Punkte stehen in fachlich_zu_pruefen.
