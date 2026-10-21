@@ -37,7 +37,7 @@ fs.writeFileSync(path.join(ZIEL, "katalog.csv"), "﻿" + [kopf, ...zeilen].map((
 const pnpm = path.join(ROOT, "node_modules/.pnpm");
 const esb = fs.readdirSync(pnpm).filter((d) => d.startsWith("esbuild@")).sort().at(-1);
 const tmp = path.join(ZIEL, ".rechtliches.mjs");
-execFileSync(path.join(pnpm, esb, "node_modules/esbuild/bin/esbuild"), [path.join(ROOT, "apps/mobile/src/rechtliches.ts"), "--format=esm", `--outfile=${tmp}`, "--log-level=warning"]);
+execFileSync(path.join(pnpm, esb, "node_modules/esbuild/bin/esbuild"), [path.join(ROOT, "apps/mobile/src/rechtliches.ts"), "--bundle", "--format=esm", `--outfile=${tmp}`, "--log-level=warning"]);
 const recht = await import(tmp);
 fs.rmSync(tmp);
 const dse = ["# Datenschutzhinweis der App (Stand des Codes)", "", `Freigegeben: ${recht.DATENSCHUTZ.freigegeben ? "ja" : "nein (Entwurf)"}`, "", "Verantwortlicher: aus den Anbieterangaben (noch nicht eingetragen, wenn leer).", ""];
