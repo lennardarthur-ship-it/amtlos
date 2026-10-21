@@ -1017,6 +1017,11 @@ Status: **angenommen** (vom Product Owner bestätigt) · **vorgeschlagen** (wart
 
 **Gründerentscheidungen offen (zusätzlich zu E-152):** Fokusbranchen (Vorschlag Beauty und Gastro) und Store-Name; Pflicht-Nachweise aus dem Freikontingent; Rechnungsnummer erst beim Teilen; Katalog-Updates vom Server als Pro-Kern (die Notiz an Apple begründet das Abo heute mit Updates, die auch Gratis-Nutzer bekommen); Kanzlei-/Verbandslizenzen; anonyme Opt-in-Kennzahlen; Gutschein-Vorlage, Skonto, igE/§ 13b Drittland, Kassenabschluss, Schlussrechnung mit Abschlagsverrechnung, Shop-Bausteine Datenschutzerklärung.
 
+
+### E-154 · Pflicht-Nachweise immer kostenlos (2026-10-21, Gründerentscheidung)
+
+Der Gründer hat entschieden: Pflicht-Nachweise fallen aus dem Freikontingent heraus. Auf das Monatskontingent (weiter 5) zählen nur noch Rechnungen (einschließlich Gutschriften, ohne Stornos und Konfliktkopien). Hygieneplan, Unterweisung, Gefährdungsbeurteilung, Arbeitszeitnachweis, Allergenliste und alle übrigen Vorlagen lassen sich ohne Pro teilen. Grund (Runden 10/11): Eine Bezahlschranke vor einer gesetzlichen Pflicht wirkt wie Erpressung; Betriebe mit Personal hatten das Kontingent am ersten Abend aufgebraucht. Umgesetzt in `pro/regeln.ts` (`zaehltFuerKontingent`), Texte in App, Store, Website und Prüfhinweisen für Apple angepasst.
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

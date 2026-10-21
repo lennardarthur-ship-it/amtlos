@@ -19,7 +19,7 @@ import { bestaetigen } from "../ui/bestaetigen";
 import { AbsenderSeite } from "./Betrieb";
 import { Ablauf, fehltJeSchritt } from "./Ablauf";
 import { useProSperre } from "./Pro";
-import { FREI_JE_MONAT, ausgabeErlaubt, betriebFuerDokument, uebrig } from "../pro/regeln";
+import { FREI_JE_MONAT, ausgabeErlaubt, betriebFuerDokument, uebrig, zaehltFuerKontingent } from "../pro/regeln";
 import { Ansage, useAnsage } from "./felder";
 
 /**
@@ -157,7 +157,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
   const extra = alle.filter((x) => !imFormular.has(x)).map((x) => ({ text: x, schritt: x === NUMMER_DOPPELT ? nummerSchritt : schrittFuer(v, x), betrieb: x.includes("(Mein Betrieb)") }));
   const html = dokumentHtml(v, d, betriebFuerDokument(z.stand.betrieb, z.pro));
   const rest = uebrig(z.stand.unterlagen, new Date());
-  const zaehlt = !z.pro && !u.ausgegeben && !(typeof d.storno_zu === "string" && d.storno_zu);
+  const zaehlt = !z.pro && !u.ausgegeben && zaehltFuerKontingent(u) && !(typeof d.storno_zu === "string" && d.storno_zu);
   const ergebnis = v.ergebnis?.(d) ?? [];
   const fertig = alle.length === 0;
   const datumDe = (iso: string) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(iso));

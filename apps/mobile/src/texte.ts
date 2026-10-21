@@ -484,7 +484,7 @@ export const T = {
   pro_titel: "Amtlos Pro",
   pro_unter: "Für alle, die Amtlos jeden Monat nutzen: unbegrenzt Unterlagen teilen, E-Rechnung und weniger Tipparbeit.",
   pro_grund: {
-    pdf: (n: number) => `Du hast diesen Monat ${n} Unterlagen kostenlos geteilt. Mit Pro teilst du so viele, wie du brauchst – deine Unterlagen bleiben in jedem Fall erhalten.`,
+    pdf: (n: number) => `Du hast diesen Monat ${n} Rechnungen kostenlos geteilt. Mit Pro schreibst du so viele, wie du brauchst – Pflicht-Nachweise wie Hygieneplan oder Unterweisung bleiben immer kostenlos.`,
     e_rechnung: (_: number) => "E-Rechnungen (XRechnung) für Firmenkunden gibt es mit Pro. Das PDF der Rechnung kannst du weiter teilen.",
     ust_uebernahme: (_: number) => "Mit Pro übernimmt Amtlos Umsätze, Vorsteuer, Einnahmen und Ausgaben aus Rechnungen und Belegen mit einem Tipp. Ohne Pro trägst du sie selbst ein.",
     icloud: (_: number) => "Die automatische iCloud-Sicherung gehört zu Pro. Die Sicherung als Datei bleibt kostenlos.",
@@ -493,7 +493,7 @@ export const T = {
     sync: (_: number) => "Die Synchronisation zwischen deinen Geräten gehört zu Pro. Deine Daten bleiben auf diesem Gerät, und die Sicherung als Datei bleibt kostenlos.",
   },
   pro_vorteil: {
-    pdf: { titel: "Unbegrenzt teilen", text: (n: number) => `Ohne Pro ${n} Unterlagen im Monat – mit Pro so viele, wie du willst.` },
+    pdf: { titel: "Unbegrenzt Rechnungen", text: (n: number) => `Ohne Pro ${n} Rechnungen im Monat – mit Pro so viele, wie du willst. Pflicht-Nachweise sind immer frei.` },
     e_rechnung: { titel: "E-Rechnung (XRechnung)", text: (_: number) => "Für Firmenkunden, auch ins EU-Ausland – das Format prüfen wir gegen den offiziellen Validator der KoSIT." },
     ust_uebernahme: { titel: "Werte für Umsatzsteuer-Voranmeldung und EÜR mit einem Tipp", text: (_: number) => "Umsätze, Vorsteuer, Einnahmen und Ausgaben aus Rechnungen und Belegen übernehmen – abgeben musst du selbst oder deine Steuerberatung." },
     steuerberater: { titel: "Paket für die Steuerberatung", text: (_: number) => "DATEV-Buchungsstapel, Listen und Belege als ZIP – für Monat, Quartal oder Jahr." },
@@ -501,8 +501,8 @@ export const T = {
     icloud: { titel: "Automatische iCloud-Sicherung", text: (_: number) => "Nach jeder Änderung, verschlüsselt mit deinem Passwort." },
     briefkopf: { titel: "Dein Briefkopf", text: (_: number) => "Logo und Hausfarbe auf jeder Rechnung und Unterlage." },
   },
-  pro_frei_bleibt: "Immer kostenlos: Pflichten-Check, Erinnerungen, alle Vorlagen ausfüllen, Belege und E-Rechnungen empfangen, Sicherung als Datei, Stornos und erneutes Teilen.",
-  pro_rest: (n: number, von: number) => (n === 0 ? `Diesen Monat sind alle ${von} kostenlosen Unterlagen geteilt.` : `Diesen Monat kannst du noch ${n} von ${von} Unterlagen kostenlos teilen.`),
+  pro_frei_bleibt: "Immer kostenlos: Pflichten-Check, Erinnerungen, alle Vorlagen ausfüllen, Pflicht-Nachweise wie Hygieneplan, Unterweisung oder Arbeitszeitnachweis teilen, Belege und E-Rechnungen empfangen, Sicherung als Datei, Stornos und erneutes Teilen.",
+  pro_rest: (n: number, von: number) => (n === 0 ? `Diesen Monat sind alle ${von} kostenlosen Rechnungen geteilt.` : `Diesen Monat kannst du noch ${n} von ${von} Rechnungen kostenlos teilen.`),
   pro_zeitraum: (z: string) => `Pro ${z}`,
   pro_nicht_verfuegbar: "Pro lässt sich in dieser Version noch nicht kaufen. Alle Grundfunktionen kannst du schon nutzen.",
   pro_test_zeitraum: (z: string) => `${z} kostenlos testen`,

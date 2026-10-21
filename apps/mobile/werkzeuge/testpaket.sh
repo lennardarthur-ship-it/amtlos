@@ -93,7 +93,7 @@ Entscheidungen liegen im Git-Repository (GitHub: lennardarthur-ship-it/amtlos). 
      und Ausgaben in der EÜR („Aus Rechnungen und Belegen übernehmen“).
    - „Mein Betrieb → Paket für die Steuerberatung“: ZIP mit DATEV-Buchungsstapel, Listen und Belegen.
    - „Amtlos Pro“ (oben unter „Mein Betrieb“): In dieser Testversion gibt es keinen Kauf – „Pro testweise einschalten“
-     zeigt alle Funktionen (im späteren Store-Build gibt es diesen Knopf nicht). Ohne Pro: 5 Unterlagen im Monat als PDF, kein Logo/keine Hausfarbe, keine E-Rechnung.
+     zeigt alle Funktionen (im späteren Store-Build gibt es diesen Knopf nicht). Ohne Pro: 5 Rechnungen im Monat als PDF (Pflicht-Nachweise immer frei), kein Logo/keine Hausfarbe, keine E-Rechnung.
    - „Über Amtlos“: Impressum und Datenschutz (Angaben folgen vor dem Start), „Amtlos weiterempfehlen“.
    - Synchronisation zwischen Geräten (Konto, Ende-zu-Ende-verschlüsselt) ist eingebaut, in diesem Testpaket aber
      aus: Sie braucht einen laufenden Amtlos-Server und einen Anmeldedienst. Ohne Server bleibt alles auf dem iPhone.

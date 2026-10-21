@@ -3,8 +3,9 @@
  *
  * Kostenlos bleibt alles, was jemand braucht, um Pflichten zu kennen und rechtlich sauber zu bleiben: Pflichten-Check,
  * Erinnerungen, alle Vorlagen ausfüllen und ansehen, Datensicherung als Datei, Wiederherstellen, Storno, erneutes
- * Teilen einer schon geteilten Unterlage. Begrenzt ist nur, wie viele Unterlagen im Monat zum ersten Mal als PDF
- * hinausgehen. Pro schaltet frei, was Zeit spart und was Profis brauchen.
+ * Teilen einer schon geteilten Unterlage und – seit E-154 – jeder Pflicht-Nachweis (Hygieneplan, Unterweisung,
+ * Gefährdungsbeurteilung, Arbeitszeitnachweis …): Eine Bezahlschranke vor einer Pflicht wäre falsch. Begrenzt ist nur,
+ * wie viele Rechnungen im Monat zum ersten Mal als PDF hinausgehen. Pro schaltet frei, was Zeit spart und was Profis brauchen.
  *
  * Grundsatz (GoBD, Datenschutz): Pro sperrt nie den Zugriff auf eigene Daten, nie eine Korrektur (Storno) und nie die
  * Sicherung – nur zusätzliche Bequemlichkeit.
@@ -12,7 +13,7 @@
 import type { Betrieb } from "@amtlos/fachlogik";
 import type { Unterlage } from "../unterlagen/speicher";
 
-/** Unterlagen, die kostenlos je Kalendermonat zum ersten Mal geteilt oder gedruckt werden dürfen. */
+/** Rechnungen, die kostenlos je Kalendermonat zum ersten Mal geteilt oder gedruckt werden dürfen (E-154). */
 export const FREI_JE_MONAT = 5;
 
 export type ProFunktion = "pdf" | "e_rechnung" | "ust_uebernahme" | "steuerberater" | "icloud" | "sync" | "briefkopf";
@@ -25,24 +26,27 @@ const BERLIN = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Berlin" });
 const monat = (iso: string | Date) => BERLIN.format(typeof iso === "string" ? new Date(iso) : iso).slice(0, 7);
 const istStorno = (u: Unterlage) => typeof u.daten.storno_zu === "string" && u.daten.storno_zu.trim() !== "";
 
+/** Zählt diese Unterlage aufs Freikontingent? Nur Rechnungen (auch Gutschriften); Pflicht-Nachweise sind immer frei (E-154). */
+export const zaehltFuerKontingent = (u: Pick<Unterlage, "vorlage">) => u.vorlage === "rechnung";
+
 /**
  * Im Monat von `jetzt` erstmals ausgegebene Unterlagen – ohne Stornorechnungen (Korrekturen zählen nie) und ohne
  * Konfliktkopien (K1: dieselbe Unterlage, auf einem zweiten Gerät geteilt; zählt wie in `nichtZaehlend` nicht mit).
  */
 export function verbraucht(unterlagen: Unterlage[], jetzt: Date): number {
   const m = monat(jetzt);
-  return unterlagen.filter((u) => u.ausgegeben && monat(u.ausgegeben) === m && !istStorno(u) && !u.konfliktKopieVon).length;
+  return unterlagen.filter((u) => zaehltFuerKontingent(u) && u.ausgegeben && monat(u.ausgegeben) === m && !istStorno(u) && !u.konfliktKopieVon).length;
 }
 
 /** Wie viele kostenlose erste Ausgaben in diesem Monat noch übrig sind. */
 export const uebrig = (unterlagen: Unterlage[], jetzt: Date) => Math.max(0, FREI_JE_MONAT - verbraucht(unterlagen, jetzt));
 
 /**
- * Darf diese Unterlage jetzt geteilt oder gedruckt werden? Mit Pro immer; sonst, wenn sie schon einmal ausgegeben
- * wurde, eine Stornorechnung ist oder das Monatskontingent reicht.
+ * Darf diese Unterlage jetzt geteilt oder gedruckt werden? Mit Pro immer; sonst, wenn sie kein Rechnungsdokument ist,
+ * schon einmal ausgegeben wurde, eine Stornorechnung ist oder das Monatskontingent reicht.
  */
 export function ausgabeErlaubt(unterlagen: Unterlage[], u: Unterlage, pro: boolean, jetzt: Date): boolean {
-  if (pro || u.ausgegeben || istStorno(u)) return true;
+  if (pro || u.ausgegeben || istStorno(u) || !zaehltFuerKontingent(u)) return true;
   return uebrig(unterlagen, jetzt) > 0;
 }
 

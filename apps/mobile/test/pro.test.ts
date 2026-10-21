@@ -4,7 +4,7 @@ import { FREI_JE_MONAT, ausgabeErlaubt, betriebFuerDokument, uebrig, verbraucht 
 import { LEERER_STAND, anlegen, ausgeben, felderSetzen, standAus, stornieren, type Stand } from "../src/unterlagen/speicher";
 
 const t = (d: string) => new Date(`${d}T09:00:00Z`);
-function geteilt(s: Stand, id: string, tag: string, vorlage = "hygieneplan"): Stand {
+function geteilt(s: Stand, id: string, tag: string, vorlage = "rechnung"): Stand {
   const [s1] = anlegen(s, vorlage, t(tag), id);
   return ausgeben(s1, id, t(tag));
 }
@@ -29,12 +29,22 @@ describe("Amtlos Pro (E-132): Freikontingent", () => {
     s = ausgeben(s, "r", t("2026-10-01"));
     for (let i = 0; i < FREI_JE_MONAT; i++) s = geteilt(s, `u${i}`, "2026-10-02");
     const [s2, st] = stornieren(s, "r", t("2026-10-03"), "st");
-    const [s3, neu] = anlegen(s2, "hygieneplan", t("2026-10-03"), "neu");
+    const [s3a, neu] = anlegen(s2, "rechnung", t("2026-10-03"), "neu");
+    const [s3, hyg] = anlegen(s3a, "hygieneplan", t("2026-10-03"), "hyg");
     const jetzt = t("2026-10-03");
+    // Pflicht-Nachweise zählen nie aufs Kontingent und sind immer frei (E-154)
+    expect(ausgabeErlaubt(s3.unterlagen, hyg, false, jetzt)).toBe(true);
     expect(ausgabeErlaubt(s3.unterlagen, s3.unterlagen.find((u) => u.id === "u0")!, false, jetzt)).toBe(true);
     expect(ausgabeErlaubt(s3.unterlagen, st!, false, jetzt)).toBe(true);
     expect(ausgabeErlaubt(s3.unterlagen, neu, false, jetzt)).toBe(false);
     expect(ausgabeErlaubt(s3.unterlagen, neu, true, jetzt)).toBe(true);
+  });
+
+  it("Pflicht-Nachweise verbrauchen nichts vom Kontingent (E-154)", () => {
+    let s = LEERER_STAND;
+    for (let i = 0; i < 8; i++) s = geteilt(s, `h${i}`, "2026-10-02", i % 2 ? "unterweisung" : "hygieneplan");
+    expect(verbraucht(s.unterlagen, t("2026-10-20"))).toBe(0);
+    expect(uebrig(s.unterlagen, t("2026-10-20"))).toBe(FREI_JE_MONAT);
   });
 
   it("Briefkopf (Logo, Hausfarbe) nur mit Pro im Dokument – gespeichert bleibt er", () => {

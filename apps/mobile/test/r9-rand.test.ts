@@ -65,7 +65,7 @@ describe("Weiche Trennstellen (G1) und Schreibrichtung (G3)", () => {
 describe("Kontingent: Konfliktkopien zählen nicht (K1)", () => {
   it("eine geteilte Konfliktkopie verbraucht keine freie Ausgabe", () => {
     const t = new Date("2026-10-05T09:00:00Z");
-    const [s1] = anlegen(LEERER_STAND, "hygieneplan", t, "u1");
+    const [s1] = anlegen(LEERER_STAND, "rechnung", t, "u1");
     const s2 = ausgeben(s1, "u1", t);
     const kopie: Unterlage = { ...s2.unterlagen[0]!, id: "u1-k", konfliktKopieVon: "u1" };
     expect(verbraucht([...s2.unterlagen, kopie], t)).toBe(1);
