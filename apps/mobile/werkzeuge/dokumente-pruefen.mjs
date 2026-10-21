@@ -52,13 +52,16 @@ const REALISTISCH = {
   nachweis_arbeitsbedingungen: {
     name: "Jana Becker", anschrift: "Lindenstraße 12\n80469 München", branche: "friseur_kosmetik", beginn: "2026-11-01", taetigkeit: "Friseurin",
     entgelt_art: "monat", entgelt_betrag: "2.650,00", wochenstunden: "38,5", tage_pro_woche: "5", verteilung: "Dienstag bis Samstag nach Dienstplan",
-    ueberstunden_verguetung: "Überstunden werden mit dem vereinbarten Stundenlohn zuzüglich eines Zuschlags von 25 % vergütet.",
+    // Nachkontrolle Dr. Weber (21.10.2026): Überstunden widerspruchsfrei – angeordnet (Nr. 10), gesondert vergütet mit dem
+    // rechnerischen Stundenlohn (Monatsgehalt, kein vereinbarter Stundenlohn) und mit dem Folgemonat fällig (Ausschlussfrist)
+    ueberstunden: "ja",
+    ueberstunden_verguetung: "Jede angeordnete Überstunde wird mit dem rechnerischen Stundenlohn (Monatsgehalt geteilt durch 167 Stunden) zuzüglich eines Zuschlags von 25 % vergütet und mit dem Gehalt des Folgemonats ausgezahlt.",
     bestandteile: [{ bezeichnung: "Samstagszuschlag", hoehe: "10 % des Stundenlohns für Arbeit am Samstag nach 14 Uhr" }, { bezeichnung: "Weihnachtsgeld", hoehe: "50 % eines Monatsgehalts, fällig mit dem Novembergehalt" }, { bezeichnung: "Vermögenswirksame Leistungen", hoehe: "40,00 € monatlich" }],
     zuschlaege: "", provision: "5 % vom eigenen Dienstleistungsumsatz im Monat", faelligkeit: "am letzten Bankarbeitstag des laufenden Monats", auszahlung: "Überweisung auf das von der beschäftigten Person benannte Konto",
     pausen: "nach § 4 ArbZG: mindestens 30 Minuten bei mehr als sechs Stunden, 45 Minuten bei mehr als neun Stunden", ruhezeit: "nach § 5 ArbZG: mindestens elf Stunden ununterbrochen nach Ende der täglichen Arbeitszeit",
     schicht_text: "", abruf_text: "", ueberstunden_text: "bei unvorhersehbarem Arbeitsanfall, höchstens 10 Stunden im Monat", urlaub: "28",
     fortbildung: "Ein Anspruch auf vom Arbeitgeber bereitgestellte Fortbildung besteht nicht.", bav_text: "Allianz Pensionskasse AG", bav_anschrift: "Reinsburgstraße 19\n70178 Stuttgart",
-    kuendigung_eigen: "", kollektiv_text: "", weitere: "Ansprüche aus dem Arbeitsverhältnis verfallen, wenn sie nicht innerhalb von drei Monaten nach Fälligkeit in Textform geltend gemacht werden; das gilt nicht für den Mindestlohn und für Ansprüche aus vorsätzlicher Pflichtverletzung.",
+    kuendigung_eigen: "", kollektiv_text: "", weitere: `${F.NACHWG_AUSSCHLUSSFRIST_BEISPIEL} ${F.NACHWG_AUSSCHLUSSFRIST_UEBERSTUNDEN}`,
     arbeitsort_text: "", ausgestellt_am: "2026-10-13",
   },
   datenschutzinformation: {
@@ -71,10 +74,30 @@ const REALISTISCH = {
   },
 };
 
+/**
+ * Hygieneplan (Nachkontrolle Dr. Weber): die Einträge passend zur Art des Betriebs – Beauty-Zeilen im Salon, die Zeilen
+ * „Gastronomie / Café“ im Lebensmittelbetrieb (sonst stünden Instrumentenaufbereitung und Hautdesinfektion im Café-Plan).
+ */
+function hygieneEintraege(v, d) {
+  if (v.id !== "hygieneplan") return d;
+  const f = v.abschnitte.flatMap((a) => a.felder).find((x) => x.id === "eintraege");
+  const lm = d.art === "lebensmittel";
+  return { ...d, eintraege: f.vorschlaege.filter((x) => (x.gruppe === "Gastronomie / Café") === lm).map((x) => F.eintragAusVorschlag(f, x, B, HEUTE)) };
+}
+
 /** Volle Daten: Pflicht- und Textfelder mittellang, Listen mit 12 Einträgen, Beträge fünfstellig. */
 function voll(v) {
-  return { ...vollErzeugt(v), ...(REALISTISCH[v.id] ?? {}) };
+  return hygieneEintraege(v, { ...vollErzeugt(v), ...(REALISTISCH[v.id] ?? {}) });
 }
+
+/**
+ * Weitere Varianten (Nachkontrolle Dr. Weber): Nachweis ohne § 2a-Branche (Textform, ohne Schriftform-Zeile) und
+ * Hygieneplan eines Lebensmittelbetriebs.
+ */
+const EXTRA = {
+  nachweis_arbeitsbedingungen: [["voll-textform", (v) => ({ ...voll(v), branche: "keine" })]],
+  hygieneplan: [["voll-lebensmittel", (v) => hygieneEintraege(v, { ...voll(v), art: "lebensmittel", bereich: "Küche, Theke und Gastraum" })], ["leer-lebensmittel", (v) => ({ ...F.leereDaten(v, B, HEUTE), art: "lebensmittel" })]],
+};
 function vollErzeugt(v) {
   const d = F.leereDaten(v, B, HEUTE);
   const wert = (f, i) => {
@@ -131,7 +154,7 @@ function auswahl(v) {
           return n;
         });
     }
-  return d;
+  return hygieneEintraege(v, d);
 }
 
 const MM = 72 / 25.4;
@@ -149,7 +172,7 @@ const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PFA
 const page = await (await browser.newContext({ locale: "de-DE" })).newPage();
 const befunde = [];
 for (const v of F.VORLAGEN) {
-  for (const [variante, daten] of [["leer", F.leereDaten(v, B, HEUTE)], ["voll", voll(v)], ["auswahl", auswahl(v)]]) {
+  for (const [variante, daten] of [["leer", F.leereDaten(v, B, HEUTE)], ["voll", voll(v)], ["auswahl", auswahl(v)], ...(EXTRA[v.id] ?? []).map(([n, f]) => [n, f(v)])]) {
     const name = `${v.id}-${variante}`;
     const html = F.mitSchriften(F.dokumentHtml(v, daten, B));
     const ang = F.fussAngaben(html);

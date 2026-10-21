@@ -1297,4 +1297,8 @@ export const T = {
   partner_keiner: "Kein Partner eingetragen",
   partner_datenschutz: `Der Partner-Code bleibt auf diesem Gerät und in deiner Datensicherung. ${MARKE.name} sendet ihn an niemanden – auch nicht an den Partner.`,
   partner_link: "Zum Partner",
+  // Nachkontrolle Vorlagen
+  nk_form_schrift_titel: "Schriftform: ausdrucken und unterschreiben",
+  nk_form_text_titel: "Textform: PDF genügt",
+  nk_form_offen_titel: "Form des Nachweises",
 };

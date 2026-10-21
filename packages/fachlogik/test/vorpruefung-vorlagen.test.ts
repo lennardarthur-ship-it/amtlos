@@ -114,7 +114,7 @@ describe("Nachweis der wesentlichen Arbeitsbedingungen (Befund 2)", () => {
   });
   it("Form je Branche: § 2a-Branchen Schriftform, sonst PDF mit Empfangsnachweis; Branche aus dem Pflichten-Check", () => {
     const h = (d: Daten) => v("nachweis_arbeitsbedingungen").hinweise!(d, B)[0]!;
-    expect(h({ branche: "friseur_kosmetik" })).toMatch(/^In deiner Branche \(Friseur- und Kosmetikgewerbe, § 2a Abs\. 1 SchwarzArbG\): ausdrucken, unterschreiben, aushändigen/);
+    expect(h({ branche: "friseur_kosmetik" })).toMatch(/^In deiner Branche gilt die Schriftform: Nachweis ausdrucken, eigenhändig unterschreiben und aushändigen .* Deine Branche: Friseur- und Kosmetikgewerbe\.$/);
     expect(h({ branche: "keine" })).toMatch(/^PDF genügt.*Empfang bestätigen/);
     expect(h({})).toMatch(/Wähle die Branche/);
     expect(v("nachweis_arbeitsbedingungen").hinweise!({ befristet: true, probezeit: "6" }, B).join(" ")).toMatch(/§ 14 Abs\. 4 TzBfG.*§ 15 Abs\. 3 TzBfG/);
@@ -236,7 +236,7 @@ describe("Impressum, KI-Schulung, IfSG, Hygieneplan, Unterweisung (Abschnitt 5)"
     expect(h).toContain("Anlage: Merkblatt zur Belehrung nach § 43 Abs. 1 Nr. 1 IfSG");
   });
   it("Hygieneplan: Rechtsgrundlage je Branche (T-104)", () => {
-    expect(html("hygieneplan", { art: "lebensmittel", eintraege: [] })).toContain("VO (EG) Nr. 852/2004; LMHV");
+    expect(html("hygieneplan", { art: "lebensmittel", eintraege: [] })).toContain("VO (EG) Nr. 852/2004; §§ 3, 4 LMHV");
     expect(html("hygieneplan", { art: "beauty", eintraege: [] })).toContain("Hygieneverordnung des Landes");
     expect(leereDaten(v("hygieneplan"), B, "2026-10-21", ["gastro_cafe"]).art).toBe("lebensmittel");
   });

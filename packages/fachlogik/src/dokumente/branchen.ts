@@ -7,7 +7,7 @@ import { teilnahmeTabelle } from "./arbeitsschutz.js";
 import { ALLERGENE_UMFANG, HACCP, HAUTSCHUTZ_FRISEUR, HYGIENE, IFSG, LOSE_WARE } from "./bausteine.js";
 import { KOPF_LINIE, ZELLE_LINIE, abschnitt, absatz, angaben, auswahl, datumDe, dokument, esc, ja, liste, nachsatz, neufassung, plusMonate, punkte, stabileOption, tabelle, text, unterschriften, zelle } from "./html.js";
 import { ALLERGENE, optionen } from "./konstanten.js";
-import type { Betrieb, Daten, Vorlage } from "./typen.js";
+import type { Betrieb, Daten, Eintrag, Vorlage, Vorschlag } from "./typen.js";
 
 export const ifsgBelehrung: Vorlage = {
   id: "ifsg_belehrung",
@@ -483,10 +483,49 @@ const HYGIENE_SPALTEN: [string, string, string][] = [
   ["wer", "Wer", "12%"],
 ];
 
+/**
+ * Nachkontrolle Dr. Weber (21.10.2026): Hygieneplan für Lebensmittelbetriebe nach den allgemeinen Hygienevorschriften
+ * (Art. 4 Abs. 2, Anhang II VO (EG) Nr. 852/2004) und der LMHV (§ 3 allgemeine Anforderungen, § 4 Schulung) – mit eigenen
+ * Themenbereichen statt der Beauty-Zeilen (Instrumentenaufbereitung, Hautdesinfektion). Die Eigenkontrollen nach HACCP
+ * (Art. 5) bleiben eine eigene Vorlage. Zahlen sind übliche Richtwerte; alles fachlich zu prüfen (Lebensmittelhygiene).
+ */
+export const HYGIENE_THEMEN_LEBENSMITTEL = ["Reinigung und Desinfektion", "Personalhygiene", "Schädlingsbekämpfung", "Temperaturkontrollen", "Wareneingang", "Trennung rein/unrein", "Abfall", "Trinkwasser", "Schulungen"] as const;
+const PRUEFEN_LM = "fachlich zu prüfen";
+const RICHTWERT = "üblicher Richtwert, fachlich zu prüfen";
+const lm = (thema: (typeof HYGIENE_THEMEN_LEBENSMITTEL)[number], was: string, wann: string, womit: string, wie: string, wer: string, quelle: string): Vorschlag => ({
+  gruppe: "Gastronomie / Café",
+  titel: was,
+  werte: { thema, was, wann, womit, wie, wer },
+  quelle: `${quelle} – ${PRUEFEN_LM}`,
+});
+export const HYGIENE_LEBENSMITTEL: Vorschlag[] = [
+  lm("Reinigung und Desinfektion", "Arbeitsflächen und Schneidbretter", "nach jedem Arbeitsgang; nach rohem Fleisch, Geflügel, Fisch oder Eiern sofort; zum Arbeitsende", "Reinigungsmittel; für Lebensmittelbereiche geeignetes Desinfektionsmittel (Produkt eintragen)", "grob reinigen, desinfizieren nach Herstellerangabe (Konzentration, Einwirkzeit), mit Trinkwasser nachspülen, wenn der Hersteller es vorgibt", "Beschäftigte", "Anhang II Kap. I, II, V VO (EG) Nr. 852/2004"),
+  lm("Reinigung und Desinfektion", "Geräte und Maschinen (z. B. Aufschnittmaschine, Mixer, Kaffeemaschine)", "nach Gebrauch, mindestens täglich", "Reinigungsmittel, Desinfektionsmittel", "vom Strom trennen, zerlegen, reinigen, desinfizieren, trocknen lassen, zusammensetzen", "Beschäftigte", "Anhang II Kap. V VO (EG) Nr. 852/2004"),
+  lm("Reinigung und Desinfektion", "Kühl- und Tiefkühlgeräte", "wöchentlich und bei Verschmutzung sofort; Tiefkühlgeräte bei Eisbildung abtauen", "Reinigungsmittel, Desinfektionsmittel", "ausräumen, Ware prüfen (Mindesthaltbarkeits- und Verbrauchsdatum), auswischen, desinfizieren, trocknen, wieder einräumen", "Beschäftigte", "Anhang II Kap. V VO (EG) Nr. 852/2004"),
+  lm("Reinigung und Desinfektion", "Geschirr, Besteck, Gläser", "nach Gebrauch", "Geschirrspülmaschine mit Reiniger und Klarspüler", "Spül- und Klarspültemperatur nach Herstellerangabe; Temperaturanzeige täglich ablesen", "Beschäftigte", "Anhang II Kap. II Nr. 2 VO (EG) Nr. 852/2004"),
+  lm("Reinigung und Desinfektion", "Fußböden, Wände, Abflüsse", "Fußböden täglich zum Arbeitsende; Wände und Abflüsse wöchentlich", "Bodenreiniger", "kehren, nass wischen, trocknen lassen; Abflüsse reinigen", "Beschäftigte", "Anhang II Kap. II Nr. 1 VO (EG) Nr. 852/2004"),
+  lm("Reinigung und Desinfektion", "Reinigungstücher und Reinigungsgeräte", "Tücher täglich wechseln, bei Verschmutzung sofort", "Waschmaschine, heißes Waschprogramm (60 °C – " + RICHTWERT + ")", "Tücher farbig nach Bereichen trennen; Reinigungsgeräte sauber und trocken aufbewahren", "Beschäftigte", "Anhang II Kap. I VO (EG) Nr. 852/2004"),
+  lm("Personalhygiene", "Händewaschen", "vor Arbeitsbeginn; nach Pausen und dem Toilettengang; nach rohem Fleisch, Geflügel oder Eiern; nach Abfall, Naseputzen, Rauchen", "Handwaschbecken mit Warm- und Kaltwasser, Flüssigseife, Einmalhandtücher", "gründlich waschen (etwa 30 Sekunden), mit Einmalhandtuch abtrocknen", "alle", "Anhang II Kap. I Nr. 4, Kap. VIII VO (EG) Nr. 852/2004"),
+  lm("Personalhygiene", "Arbeitskleidung und Schmuck", "täglich und bei Verschmutzung wechseln", "saubere Arbeitskleidung, Kopfbedeckung bzw. Haarnetz, Schürze", "Arbeitskleidung nur im Betrieb tragen; Ringe, Uhren, Armbänder ablegen; Fingernägel kurz und ohne Lack; Wunden an Händen wasserfest abdecken, Handschuh darüber", "alle", "Anhang II Kap. VIII Nr. 1 VO (EG) Nr. 852/2004"),
+  lm("Personalhygiene", "Krankheit (§ 42 IfSG)", "vor Arbeitsbeginn und sofort, wenn Krankheitszeichen auftreten", "Meldung an die verantwortliche Person", "Bei Durchfall, Erbrechen, Fieber, Gelbsucht oder infizierten Wunden: sofort melden und nicht mit Lebensmitteln arbeiten, bis ärztlich geklärt ist, dass kein Tätigkeitsverbot nach § 42 IfSG besteht", "alle", "§ 42 IfSG; Anhang II Kap. VIII Nr. 2 VO (EG) Nr. 852/2004"),
+  lm("Schädlingsbekämpfung", "Schädlingsmonitoring", "täglich Sichtkontrolle; Monitoringstellen nach Plan (z. B. monatlich – " + RICHTWERT + ")", "Klebefallen bzw. Monitore, Lageplan der Stellen; Fliegengitter", "auf Kot, Fraßspuren, Gespinste und Tiere achten; Befall sofort melden, Fachbetrieb beauftragen; Kontrollen und Maßnahmen aufschreiben", "verantwortliche Person", "Anhang II Kap. IX Nr. 4 VO (EG) Nr. 852/2004"),
+  lm("Temperaturkontrollen", "Kühlgeräte", "täglich zu Arbeitsbeginn", "Thermometer; Messprotokoll der Eigenkontrollen (HACCP)", "höchstens +7 °C (" + RICHTWERT + "; strengere Werte z. B. für Hackfleisch, Geflügel, Fisch nach Herstellerangabe); bei Abweichung Ursache beheben, Ware bewerten, eintragen", "Beschäftigte", "Anhang II Kap. IX Nr. 5 VO (EG) Nr. 852/2004"),
+  lm("Temperaturkontrollen", "Tiefkühlgeräte", "täglich zu Arbeitsbeginn", "Thermometer; Messprotokoll der Eigenkontrollen (HACCP)", "−18 °C oder kälter (" + RICHTWERT + "); bei Abweichung Ursache beheben, Ware bewerten, eintragen", "Beschäftigte", "Anhang II Kap. IX Nr. 5 VO (EG) Nr. 852/2004"),
+  lm("Wareneingang", "Wareneingang", "bei jeder Lieferung", "Thermometer, Lieferschein", "Verpackung, Kennzeichnung, Mindesthaltbarkeits- und Verbrauchsdatum prüfen; Temperatur gekühlter und tiefgekühlter Ware messen; Mängel zurückweisen; Kühlware sofort einräumen", "Beschäftigte", "Anhang II Kap. IX Nr. 1, 2 VO (EG) Nr. 852/2004"),
+  lm("Trennung rein/unrein", "Trennung rein/unrein", "ständig", "getrennte Arbeitsbereiche oder zeitliche Trennung; Schneidbretter nach Farben; abgedeckte Behälter", "rohe und verzehrfertige Lebensmittel getrennt lagern und bearbeiten (Rohes unten im Kühlgerät); Schmutzgeschirr, Abfall und Verpackungen nicht über Flächen für Lebensmittel; Reinigungsmittel getrennt von Lebensmitteln lagern", "alle", "Anhang II Kap. IX Nr. 3, Kap. I Nr. 10 VO (EG) Nr. 852/2004; § 3 LMHV"),
+  lm("Abfall", "Abfall und Speisereste", "mehrmals täglich und zum Arbeitsende leeren; Behälter wöchentlich reinigen", "verschließbare Behälter, möglichst mit Fußbedienung", "Abfall nicht in Räumen mit Lebensmitteln sammeln; Speisereste getrennt sammeln und über einen Entsorger abgeben; Abfallplatz sauber und frei von Schädlingen halten", "Beschäftigte", "Anhang II Kap. VI VO (EG) Nr. 852/2004"),
+  lm("Trinkwasser", "Trinkwasser und Eis", "laufend; nach längerem Stillstand Leitungen spülen", "Trinkwasser aus der Hausinstallation", "für Lebensmittel, Eis und das Reinigen von Flächen für Lebensmittel nur Trinkwasser verwenden; Eisbereiter und Wasserfilter nach Herstellerangabe reinigen bzw. wechseln", "Beschäftigte", "Anhang II Kap. VII VO (EG) Nr. 852/2004"),
+  lm("Schulungen", "Schulung Lebensmittelhygiene", "vor der ersten Tätigkeit und regelmäßig wiederholen (z. B. jährlich – " + RICHTWERT + ")", "Schulung nach § 4 LMHV und Anhang II Kap. XII VO (EG) Nr. 852/2004; Belehrung nach § 43 IfSG (eigene Vorlage)", "Inhalte: Personalhygiene, Reinigung, Temperaturen, Trennung rein/unrein, Allergene; Teilnahme mit Unterschrift festhalten", "verantwortliche Person", "§ 4 LMHV; Anhang II Kap. XII VO (EG) Nr. 852/2004"),
+];
+/** Querverweis auf die Eigenkontrollen und die Belehrung im Plan eines Lebensmittelbetriebs. */
+export const HYGIENE_VERWEIS_HACCP = "Eigenkontrollen nach HACCP (Kontrollpunkte, Temperaturen messen und eintragen, Korrekturmaßnahmen): eigene Vorlage „Eigenkontrollen (HACCP)“. Belehrung nach § 43 IfSG: eigene Vorlage.";
+/** Zeilen, die nur in Beauty-Betriebe gehören (Instrumentenaufbereitung, Haut, Kundschaft) – für den Hinweis im Lebensmittelbetrieb. */
+const BEAUTY_ZEILE = /Instrument|Haut|\bKund(?:e|en|in|innen)\b|Steril|Lanzett|Nagelhaut|Nagelstudio|Fußpflege|Haarwasch|Behandlungs|\bBlut/i;
+
 /** Bayern-spezifischer Zusatz in einem Baustein (R11, Kosmetik #16): nur drucken, wenn der Betrieb in Bayern liegt */
 const NUR_BAYERN = /\s*\(Bayern: [^)]*\)/g;
 /** „Wer“ aus den Bausteinen (Beschäftigte, Reinigungskraft, Arbeitgeber …) – ohne Beschäftigte steht dort die verantwortliche Person */
-const WER_AUS_BAUSTEINEN = new Set(HYGIENE.map((v) => (typeof v.werte.wer === "string" ? v.werte.wer.trim() : "")).filter(Boolean));
+const WER_AUS_BAUSTEINEN = new Set([...HYGIENE, ...HYGIENE_LEBENSMITTEL].map((v) => (typeof v.werte.wer === "string" ? v.werte.wer.trim() : "")).filter(Boolean));
 
 /** Einträge des Hygieneplans für den Druck: Landeszusatz nur im passenden Land, „Wer“ bei Ein-Personen-Betrieben. */
 function hygieneFuerDruck(d: Daten, b: Betrieb): Daten {
@@ -503,12 +542,47 @@ function hygieneFuerDruck(d: Daten, b: Betrieb): Daten {
   };
 }
 
-export const HYGIENE_GRUNDLAGE_LEBENSMITTEL = "Art. 4 Abs. 2, Anhang II VO (EG) Nr. 852/2004; LMHV";
+/**
+ * Plan eines Lebensmittelbetriebs: Einträge nach Themenbereichen geordnet (der Bereich steht über dem ersten Eintrag),
+ * ohne Einträge je Themenbereich eine Zeile zum Eintragen; darunter der Verweis auf die Eigenkontrollen (HACCP).
+ */
+function lebensmittelPlan(d: Daten, b: Betrieb): string {
+  const alle = liste(d, "eintraege").filter((x) => HYGIENE_SPALTEN.some(([id]) => text(x, id)));
+  const rang = (x: Eintrag) => {
+    const i = HYGIENE_THEMEN_LEBENSMITTEL.indexOf(text(x, "thema") as (typeof HYGIENE_THEMEN_LEBENSMITTEL)[number]);
+    return i < 0 ? HYGIENE_THEMEN_LEBENSMITTEL.length : i;
+  };
+  const sortiert = alle.map((x, i) => ({ x, i })).sort((p, q) => rang(p.x) - rang(q.x) || p.i - q.i).map((p) => p.x);
+  let zuletzt = "";
+  const zeilen = sortiert.map((x) => {
+    const thema = text(x, "thema");
+    const kopf = thema && thema !== zuletzt ? `<span class="thema">${esc(thema)}</span>` : "";
+    zuletzt = thema || zuletzt;
+    return HYGIENE_SPALTEN.map(([id], i) => (i === 0 ? `${kopf}<strong>${zelle(text(x, id))}</strong>` : zelle(text(x, id))));
+  });
+  const leer = HYGIENE_THEMEN_LEBENSMITTEL.map((t) => HYGIENE_SPALTEN.map((_, i) => (i === 0 ? `<span class="thema">${esc(t)}</span>` : "")));
+  const zeichen = sortiert.reduce((n, x) => n + HYGIENE_SPALTEN.reduce((m, [id]) => m + text(x, id).length, 0), 0);
+  const unter = text(d, "bereich") || undefined;
+  return dokument({
+    titel: "Hygieneplan",
+    betrieb: b,
+    unter,
+    quer: true,
+    klasse: `lebensmittel${zeichen > 1800 ? " kompakt" : ""}`,
+    meta: `${unter ? "" : `Bereich: ${KOPF_LINIE}\n`}Stand: ${datumDe(text(d, "datum"))}\nVerantwortlich: ${text(d, "erstellt_von")}`,
+    inhalt:
+      tabelle(HYGIENE_SPALTEN.map(([, k]) => k), zeilen.length ? zeilen : leer, { breiten: HYGIENE_SPALTEN.map(([, , w]) => w), ...(zeilen.length ? {} : { hoch: true }) }) +
+      `<p class="klein">${esc(HYGIENE_VERWEIS_HACCP)}</p>` +
+      unterschriften(["Ort, Datum", "Unterschrift Verantwortliche/r"]),
+  });
+}
+
+export const HYGIENE_GRUNDLAGE_LEBENSMITTEL = "Art. 4 Abs. 2, Art. 5, Anhang II VO (EG) Nr. 852/2004; §§ 3, 4 LMHV";
 export const hygieneplan: Vorlage = {
   id: "hygieneplan",
   gestalt: "aushang",
   titel: "Hygieneplan",
-  beschreibung: "Aushang: was wann womit und wie gereinigt und desinfiziert wird und wer es macht – mit Zeilen aus Rahmenhygieneplänen und dem BGW-Hygieneplan.",
+  beschreibung: "Aushang: was wann womit und wie gereinigt und desinfiziert wird und wer es macht – für Beauty-Betriebe mit Zeilen aus Rahmenhygieneplänen und dem BGW-Hygieneplan, für Lebensmittelbetriebe nach VO (EG) Nr. 852/2004 und LMHV.",
   bereich: "beauty",
   pflichten: ["branche.beauty_hygieneplan"],
   grundlage: "Hygieneverordnung des Landes (auf Grundlage des IfSG)",
@@ -519,9 +593,9 @@ export const hygieneplan: Vorlage = {
   abschnitte: [
     {
       titel: "Bereich",
-      hilfe: "Friseur, Kosmetik, Nagelstudio, Fußpflege: Welche Anforderungen genau gelten, regelt die Hygieneverordnung deines Bundeslands. Lebensmittelbetriebe: VO (EG) Nr. 852/2004 und Lebensmittelhygiene-Verordnung (LMHV). Desinfektionsmittel nach Herstellerangabe bzw. VAH-Liste einsetzen.",
+      hilfe: "Friseur, Kosmetik, Nagelstudio, Fußpflege: Welche Anforderungen genau gelten, regelt die Hygieneverordnung deines Bundeslands; Desinfektionsmittel nach Herstellerangabe bzw. VAH-Liste. Lebensmittelbetriebe: allgemeine Hygienevorschriften nach Art. 4 und Anhang II VO (EG) Nr. 852/2004 und Lebensmittelhygiene-Verordnung (LMHV) – die Vorschläge der Gruppe „Gastronomie / Café“ decken Reinigung und Desinfektion, Personalhygiene, Schädlinge, Temperaturen, Wareneingang, Trennung rein/unrein, Abfall, Trinkwasser und Schulungen ab. Die Eigenkontrollen nach HACCP haben eine eigene Vorlage.",
       felder: [
-        { id: "art", art: "wahl", label: "Art des Betriebs", optionen: [{ wert: "beauty", text: "Friseur, Kosmetik, Nagelstudio, Fußpflege" }, { wert: "lebensmittel", text: "Lebensmittelbetrieb (Café, Küche, Bäckerei)" }], vorbelegung: "beauty", vorbelegungJe: { gastro_cafe: "lebensmittel" }, hilfe: "Bestimmt die Rechtsgrundlage im Dokument" },
+        { id: "art", art: "wahl", label: "Art des Betriebs", optionen: [{ wert: "beauty", text: "Friseur, Kosmetik, Nagelstudio, Fußpflege" }, { wert: "lebensmittel", text: "Lebensmittelbetrieb (Café, Küche, Bäckerei)" }], vorbelegung: "beauty", vorbelegungJe: { gastro_cafe: "lebensmittel" }, hilfe: "Bestimmt die Rechtsgrundlage und den Aufbau des Plans. Für Lebensmittelbetriebe: Vorschläge der Gruppe „Gastronomie / Café“ – Zahlen darin sind übliche Richtwerte und fachlich zu prüfen." },
         { id: "bereich", art: "text", label: "Bereich", vorschlaege: ["Friseursalon", "Kosmetik", "Nagelstudio", "Fußpflege", "Küche", "Theke und Gastraum"] },
       ],
     },
@@ -536,13 +610,15 @@ export const hygieneplan: Vorlage = {
           titelFeld: "was",
           pflicht: true,
           leerStarten: true,
-          vorschlaege: HYGIENE,
+          vorschlaege: [...HYGIENE, ...HYGIENE_LEBENSMITTEL],
           felder: [
             { id: "was", art: "text", label: "Was", pflicht: true },
             { id: "wann", art: "mehrzeilig", label: "Wann / wie oft" },
             { id: "womit", art: "mehrzeilig", label: "Womit" },
             { id: "wie", art: "mehrzeilig", label: "Wie" },
             { id: "wer", art: "text", label: "Wer" },
+            // Nachkontrolle Dr. Weber: Themenbereich ordnet den Plan eines Lebensmittelbetriebs
+            { id: "thema", selten: true, art: "text", label: "Themenbereich (Lebensmittelbetrieb)", vorschlaege: [...HYGIENE_THEMEN_LEBENSMITTEL] },
           ],
         },
       ],
@@ -557,5 +633,18 @@ export const hygieneplan: Vorlage = {
     },
   ],
   ausProfil: { mit_beschaeftigten: "beschaeftigte.gesamt" },
-  html: (d, b) => plan({ titel: "Hygieneplan", unter: text(d, "bereich") || undefined, d: hygieneFuerDruck(d, b), b, spalten: HYGIENE_SPALTEN, feld: "eintraege" }),
+  // Nachkontrolle Dr. Weber: im Lebensmittelbetrieb keine Beauty-Zeilen; die Themenbereiche vollständig
+  hinweise(d) {
+    if (text(d, "art") !== "lebensmittel") return [];
+    const e = liste(d, "eintraege").filter((x) => text(x, "was"));
+    const r: string[] = [];
+    const beauty = e.filter((x) => BEAUTY_ZEILE.test(["was", "wann", "womit", "wie"].map((k) => text(x, k)).join(" "))).map((x) => text(x, "was"));
+    if (beauty.length) r.push(`Lebensmittelbetrieb: ${beauty.length === 1 ? "Der Eintrag" : "Die Einträge"} „${beauty.join("“, „")}“ ${beauty.length === 1 ? "gehört" : "gehören"} in einen Beauty-Betrieb – entferne ${beauty.length === 1 ? "ihn" : "sie"} und nimm die Vorschläge der Gruppe „Gastronomie / Café“.`);
+    if (e.some((x) => text(x, "thema"))) {
+      const fehlt = HYGIENE_THEMEN_LEBENSMITTEL.filter((t) => !e.some((x) => text(x, "thema") === t));
+      if (fehlt.length) r.push(`Lebensmittelbetrieb: Im Plan fehlt noch ${fehlt.join(", ")}.`);
+    }
+    return r;
+  },
+  html: (d, b) => (text(d, "art") === "lebensmittel" ? lebensmittelPlan(hygieneFuerDruck(d, b), b) : plan({ titel: "Hygieneplan", unter: text(d, "bereich") || undefined, d: hygieneFuerDruck(d, b), b, spalten: HYGIENE_SPALTEN, feld: "eintraege" })),
 };

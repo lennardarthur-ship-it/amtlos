@@ -1062,6 +1062,10 @@ Der „Prüfbericht Betriebsklar – Phase 1“ (docs/pruefberichte/2026-10-21-v
 
 **Löschfrist RevenueCat:** Daten zu einer App-Kennung werden spätestens vier Monate nach Abo-Ende gelöscht (90 Tage für Erstattungen und Rückbuchungen, monatlicher Lauf von `werkzeuge/revenuecat-loeschen.mjs` mit dem Scheduled Data Export von RevenueCat und `DELETE /v1/subscribers/{id}`); Datenschutzhinweis angepasst.
 
+### E-160 · Nachkontrolle Dr. Weber (2026-10-21)
+
+Dr. Weber bestätigt die Umsetzung des Prüfberichts. Nutzungsbedingungen: vollständig und richtig; 8.2a (5.000 €) gegenüber Unternehmern vertretbar; 6.3 um die Erstattung über Apple bei Beendigung nach § 327r BGB ergänzt. Freigabe zur Veröffentlichung erst, wenn (1) die UG eingetragen ist oder „i. G.“ genannt wird – umgesetzt: Anbieter heißt bis zur Eintragung „Lang Ventures UG (haftungsbeschränkt) i. G.“ (Vor-UG, persönliche Haftung § 11 Abs. 2 GmbHG; Start möglichst erst nach Eintragung) – und (2) Hoster, Logfile-Speicherdauer und Auftragsverarbeitung in der Website-Datenschutzerklärung stehen (wartet auf Hoster-Wahl). Vorlagen nachgebessert: Ausschlussfrist-Beispiel im NachwG-Nachweis mit Ausnahmen (Leben/Körper/Gesundheit, Vorsatz/grobe Fahrlässigkeit, Mindestlohn, unverzichtbare Ansprüche) und widerspruchsfreien Überstunden; Schriftform-Hinweis für § 2a-Branchen sichtbar im Ablauf, im Abschluss und auf dem PDF; Hygieneplan für Lebensmittelbetriebe nach VO (EG) 852/2004 und LMHV mit neun Themenbereichen. Kennzeichnung „geprüft von“ wäre ein eigener Auftrag (offen, Gründer).
+
 ---
 
 ## Offen (juristische Klärung, blockiert die jeweiligen Abschnitte)

@@ -417,6 +417,8 @@ ul.punkte li::marker { color: var(--akzent); }
 .hinweis { color: #4a535c; font-style: italic; }
 .klein { font-size: 8.3pt; color: #4a535c; }
 .nachsatz { margin-top: 5mm; font-size: 8.3pt; line-height: 1.4; color: #4a535c; }
+/* Form des Nachweises über den Unterschriften (NachwG in den Branchen nach § 2a SchwarzArbG) – eine Anweisung, gut lesbar */
+.schriftform { margin: 7mm 0 0; padding: 1.6mm 0 1.6mm 3mm; border-left: 0.8mm solid var(--akzent); font-family: ${SANS}; font-weight: 700; font-size: 9.6pt; color: #1a1f24; }
 .fuellen { display: inline-block; min-width: 55mm; border-bottom: 0.5pt solid #8a949c; height: 4.2mm; vertical-align: bottom; }
 .fuellen-block { margin: 0 0 2mm; }
 .fuellen-block .fuellen { display: block; width: 100%; height: 7mm; }
@@ -805,6 +807,10 @@ table.liste.raster tbody.geraet { page-break-inside: avoid; break-inside: avoid;
 .g-aushang.kompakt table.liste th { font-size: 8.2pt; padding: 1.4mm 2mm 1.2mm; }
 .g-aushang.kompakt table.liste td { padding: 1.2mm 2mm; }
 .g-aushang.kompakt table.liste:not(.matrix):not(.legende) td:first-child { font-size: 10.5pt; line-height: 1.2; }
+/* Hygieneplan Lebensmittelbetrieb: Themenbereich über dem ersten Eintrag des Bereichs */
+/* leeres Blatt: je Themenbereich Platz zum Eintragen von Hand */
+.g-aushang.lebensmittel table.liste.hoch td { height: 9.5mm; vertical-align: top; }
+.g-aushang.lebensmittel table.liste td .thema { display: block; margin-bottom: 0.8mm; font-size: 7.6pt; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--akzent); }
 .g-aushang.kompakt h1 { font-size: 22pt; margin-top: 4mm; }
 .g-aushang.kompakt .unter { font-size: 11pt; margin-bottom: 3mm; }
 .g-aushang.kompakt .kennung { margin-bottom: 3.5mm; }

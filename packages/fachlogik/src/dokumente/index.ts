@@ -16,7 +16,8 @@ export * from "./typen.js";
 export { ALLERGENE, DATENPANNE_RISIKO, GEFAEHRDUNGSFAKTOREN, RISIKO_STUFEN, SCHUTZZIELE } from "./konstanten.js";
 export { HAUSFARBEN, PRUEFHINWEIS, RAENDER, akzent, fussSpalten, type Gestalt } from "./html.js";
 export { BUNDESLAENDER, aufsichtFuer, berlinZuUtc } from "./datenschutz.js";
-export { mindestlohnAm, mindesturlaub, minijobGrenzeAm, stundenlohn } from "./personal.js";
+export { NACHWG_AUSSCHLUSSFRIST_BEISPIEL, NACHWG_AUSSCHLUSSFRIST_UEBERSTUNDEN, NACHWG_SCHRIFTFORM_HINWEIS, NACHWG_SCHRIFTFORM_PDF, mindestlohnAm, mindesturlaub, minijobGrenzeAm, stundenlohn } from "./personal.js";
+export { HYGIENE_LEBENSMITTEL, HYGIENE_THEMEN_LEBENSMITTEL, HYGIENE_VERWEIS_HACCP } from "./branchen.js";
 export { bausteinText } from "./website.js";
 export { EUER_KAPITALGESELLSCHAFT, GUTSCHRIFT_AUSWAHL, RECHNUNG_NEGATIV, RECHNUNG_NULL, RECHNUNG_PLZ_FEHLT, VERSTEUERUNG, VORSTEUER_AUFTEILEN, aufbewahrenBis, eRechnungAus, faelligAm, kennzahlBefreiung, leistungszeitraumAus, rechnungsTitel } from "./buchhaltung.js";
 // R10 Steuer

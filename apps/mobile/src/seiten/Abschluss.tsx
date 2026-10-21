@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { Pressable, Share, View } from "react-native";
-import { GMBH_ANGABEN, KU_HINWEIS, PRUEFHINWEIS, betragUnplausibel, skontoBetrag, skontoFuer, cent as centAus, dateinamenTeil, dokumentHtml, eRechnungAus, pdfDateiname, vorlageFuer, xrechnungUbl, type Vorlage } from "@amtlos/fachlogik";
+import { GMBH_ANGABEN, KU_HINWEIS, PRUEFHINWEIS, betragUnplausibel, skontoBetrag, skontoFuer, cent as centAus, dateinamenTeil, dokumentHtml, eRechnungAus, pdfDateiname, vorlageFuer, xrechnungUbl, type Daten, type Vorlage } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { DatumFeld, Feld, Fuss, Hinweis, Karte, Knopf, Stempel, StempelAuftritt, Symbol, T, TextKnopf, Wahl, Zeile } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
@@ -24,6 +24,29 @@ import { Ablauf, fehltJeSchritt } from "./Ablauf";
 import { useProSperre } from "./Pro";
 import { VORLAGEN_FREI_JE_MONAT, ausgabeErlaubt, betriebFuerDokument, eRechnungErlaubt, uebrig, zaehltFuerKontingent } from "../pro/regeln";
 import { Ansage, useAnsage } from "./felder";
+
+/**
+ * Nachkontrolle Dr. Weber (21.10.2026): Form der Unterlage als Kasten – am Anfang des Ablaufs und im Abschluss vor dem
+ * Teilen (NachwG: Schriftform in den Branchen nach § 2a SchwarzArbG, sonst Textform mit Empfangsnachweis).
+ */
+export function FormHinweis({ v, d, unten = 12 }: { v: Vorlage; d: Daten; unten?: number }) {
+  const f = useFarben();
+  const h = v.formHinweis?.(d);
+  if (!h) return null;
+  const schrift = h.form === "schrift";
+  const titel = schrift ? TEXT.nk_form_schrift_titel : h.form === "text" ? TEXT.nk_form_text_titel : TEXT.nk_form_offen_titel;
+  return (
+    <View accessible accessibilityLabel={`${titel}. ${h.text}`} style={{ flexDirection: "row", gap: 10, alignItems: "flex-start", padding: 14, borderRadius: RADIUS.karte, backgroundColor: schrift ? f.baldHauch : f.flaeche, marginBottom: unten }}>
+      <View style={{ paddingTop: 2 }}>
+        <Symbol name={schrift ? "printer" : "doc.text"} groesse={18} farbe={schrift ? f.bald : f.tinteLeise} gewicht="semibold" />
+      </View>
+      <View style={{ flex: 1, gap: 4 }}>
+        <T fett>{titel}</T>
+        <T v="klein">{h.text}</T>
+      </View>
+    </View>
+  );
+}
 
 /**
  * Satz direkt über „PDF teilen“, solange die Unterlage noch nicht festgeschrieben ist (E-127): was das erste Teilen
@@ -285,9 +308,14 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
         {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
         {/* Plausibilität (G6): nur ein Hinweis, kein Hindernis */}
         {v.storno && betragUnplausibel(rechnungBrutto(u, z.stand.betrieb)) ? <Hinweis art="warnung" text={TEXT.betrag_unplausibel} /> : null}
+        {/* Nachkontrolle Dr. Weber: die Form vor dem Teilen als eigener Kasten – Schriftform auch nach dem Teilen (ausdrucken) */}
+        {!fest || v.formHinweis?.(d)?.form === "schrift" ? <FormHinweis v={v} d={d} /> : null}
         {/* R10: fachliche Hinweise der Vorlage (Leitweg-ID, EU-Kunde, Abweichung vom Pflichten-Check) – kein Hindernis */}
         {!fest
-          ? (v.hinweise?.(d, z.stand.betrieb, { kleinunternehmer: typeof z.stand.profil["ust.kleinunternehmer"] === "boolean" ? (z.stand.profil["ust.kleinunternehmer"] as boolean) : null, handwerk: handwerkLaut(z.stand.profil) }) ?? []).map((h) => <Hinweis key={h} art="warnung" text={h} />)
+          ? (v.hinweise?.(d, z.stand.betrieb, { kleinunternehmer: typeof z.stand.profil["ust.kleinunternehmer"] === "boolean" ? (z.stand.profil["ust.kleinunternehmer"] as boolean) : null, handwerk: handwerkLaut(z.stand.profil) }) ?? [])
+              // steht schon im Kasten zur Form
+              .filter((h) => h !== v.formHinweis?.(d)?.text)
+              .map((h) => <Hinweis key={h} art="warnung" text={h} />)
           : null}
         {/* Phase 1 (RDG): in der App, nie im PDF – die Unterlage gehört dem Betrieb; Rechnungen ohne (Geschäftsvorgang) */}
         {mitVorlagenHinweis(v) ? <RechtsHinweis art="vorlage" oben={4} /> : null}
