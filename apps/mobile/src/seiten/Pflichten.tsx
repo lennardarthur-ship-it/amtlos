@@ -18,6 +18,8 @@ import { useOeffnen, useStarten } from "./starten";
 import { useErstellen } from "./Erstellen";
 import { Jahresraster } from "./Jahresraster";
 import { useProSperre } from "./Pro";
+import { kanzleienSichtbar } from "./Kanzleien";
+import { SteuerberatungSeite } from "./Steuerberatung";
 import { erinnerungenAbgleichen, erinnerungenAktiv, pflichtAnsicht } from "../pro/regeln";
 
 const datumDe = (iso: string) => datumKurz(`${iso}T12:00:00Z`);
@@ -58,6 +60,7 @@ function PflichtDetail({ id }: { id: string }) {
   const starten = useStarten();
   const oeffnen = useOeffnen();
   const melden = useMeldung();
+  const nav = useNav();
   const a = useAuswertung();
   const roh = [...a.gilt, ...a.gruendung, ...a.beiEinstellung, ...a.unbekannt].find((x) => x.id === id);
   if (!roh) return <Unterseite titel="">{null}</Unterseite>;
@@ -195,6 +198,12 @@ function PflichtDetail({ id }: { id: string }) {
             ))}
           </Karte>
         </Gruppe>
+      ) : null}
+      {/* docs/15: nur bei Steuer-Pflichten und nur, wenn Kanzleien gelistet sind – frei, ohne Pro */}
+      {p.kategorie === "steuern" && kanzleienSichtbar() ? (
+        <Karte stil={{ marginTop: 24 }}>
+          <Zeile symbol="briefcase" ton="amt" titel={TEXT.kanzlei_finden} text={TEXT.kanzlei_finden_text} onPress={() => nav.oeffnen("steuerberatung", () => <SteuerberatungSeite kanzleienZuerst />, true)} letzte />
+        </Karte>
       ) : null}
       <RechtsHinweis art="pflichten" />
     </BuehnenBlatt>

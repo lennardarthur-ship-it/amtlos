@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { dokumentHtml, pdfDateiname, vorlageFuer } from "@amtlos/fachlogik";
 import { betriebFuerDokument } from "../pro/regeln";
 import { pdfBytes } from "../unterlagen/pdf";
@@ -14,6 +14,8 @@ import { absenderFuer, heute } from "../unterlagen/speicher";
 import { useAmtlos } from "../zustand";
 import { Inhalt } from "./gemeinsam";
 import { useProSperre } from "./Pro";
+import type { Kanzlei } from "../partner/kanzleien";
+import { KanzleienAbschnitt, kanzleienSichtbar } from "./Kanzleien";
 
 /** Ab so vielen MB warnt das Paket (R9 Performance): Es entsteht ganz im Arbeitsspeicher. */
 export const PAKET_MB_WARNUNG = 300;
@@ -23,8 +25,10 @@ const MONAT_JAHR = new Intl.DateTimeFormat("de-DE", { month: "long", year: "nume
 /**
  * Paket für die Steuerberatung (E-133): Zeitraum wählen, Kontenrahmen und DATEV-Nummern angeben, ZIP teilen.
  * Das Paket entsteht auf dem Gerät; die Belegdateien werden dafür entschlüsselt.
+ * „Steuerberatung finden“ (docs/15) erscheint nur mit gelisteten Kanzleien; `kanzleienZuerst` stellt den Bereich nach
+ * oben (Einstieg aus einer Steuer-Pflicht).
  */
-export function SteuerberatungSeite() {
+export function SteuerberatungSeite({ kanzleienZuerst }: { kanzleienZuerst?: boolean } = {}) {
   const z = useAmtlos();
   const melden = useMeldung();
   const leeren = useMeldungLeeren();
@@ -52,6 +56,8 @@ export function SteuerberatungSeite() {
   const [fehler, setFehler] = useState<string | null>(null);
   const [hinweis, setHinweis] = useState<string | null>(null);
   const [fortschritt, setFortschritt] = useState<string | null>(null);
+  // Paket für eine gelistete Kanzlei: dasselbe Paket, im Teilen-Menü mit deren Adresse (Mail-Composer ist nicht eingebaut)
+  const [ziel, setZiel] = useState<Kanzlei | null>(null);
   const sb = z.stand.steuerberatung;
   const zr = liste.find((x) => x.name === wahl)!;
   const anzahlR = gestellteRechnungen(z.stand).filter((u) => String(u.daten.datum) >= zr.von && String(u.daten.datum) <= zr.bis).length;
@@ -64,9 +70,11 @@ export function SteuerberatungSeite() {
   }, [z.stand.belege, zr.von, zr.bis, anzahlR]);
   const gross = mb > PAKET_MB_WARNUNG;
   const nameVon = (n: string) => (/^\d{4}$/.test(n) ? `Jahr ${n}` : /Q(\d)$/.test(n) ? `${n.slice(-1)}. Quartal ${n.slice(0, 4)}` : MONAT_JAHR.format(new Date(`${n}-01T00:00:00Z`)));
-  const los = async () => {
+  const los = async (kanzlei?: Kanzlei) => {
     setFehler(null);
     setHinweis(null);
+    setZiel(kanzlei ?? null);
+    // Pro wie bisher – auch für das Paket an eine Kanzlei; Liste und Kontakt bleiben frei
     if (!sperre("steuerberater")) return;
     setLaedt(true);
     try {
@@ -105,12 +113,17 @@ export function SteuerberatungSeite() {
       setFortschritt(null);
     }
   };
+  // das Kanzlei-Blatt ruft nach dem Schließen den jeweils aktuellen Stand der Seite auf
+  const losRef = useRef(los);
+  losRef.current = los;
+  const kanzleien = <KanzleienAbschnitt senden={(k) => void losRef.current(k)} kannSenden={Boolean(anzahlR || anzahlB)} pro={z.pro} erste={kanzleienZuerst} />;
   const fehlend = zr ? kassenAbdeckung(z.stand, zr.von, zr.bis) : null;
   const lage = kassenLage(z.stand.profil);
   const kassenVorab = fehlend !== null ? kassenHinweisMit(lage, "ust", fehlend)?.text ?? null : lage !== "keine" && lage !== "unbekannt" ? (lage === "shop" ? TEXT.shop_paket_vorab : TEXT.kasse_paket_vorab) : null;
   return (
     <Unterseite titel={TEXT.steuerpaket_titel} unter={TEXT.steuerpaket_text}>
       <Inhalt>
+        {kanzleienZuerst && kanzleienSichtbar() ? <View style={{ marginBottom: 30 }}>{kanzleien}</View> : null}
         <T v="klein" fett>{TEXT.steuerpaket_zeitraum}</T>
         {/* scrollt zum vorausgewählten Zeitraum, mit Seitenrand davor (A16) */}
         <ChipLeiste wert={wahl} aendern={setWahl} optionen={liste.map((x) => ({ wert: x.name, text: nameVon(x.name) }))} stil={{ marginTop: 8 }} />
@@ -137,10 +150,12 @@ export function SteuerberatungSeite() {
           {kapitalgesellschaft(z.stand) ? <Hinweis text={TEXT.steuerpaket_bilanz} /> : null}
           <Hinweis text={TEXT.steuerpaket_hinweis} />
           {gross ? <Hinweis art="warnung" text={TEXT.steuerpaket_gross(mb)} /> : null}
+          {ziel ? <Hinweis symbol="envelope" text={TEXT.kanzlei_senden_ziel(ziel.name, ziel.email)} /> : null}
           {fortschritt ? <Hinweis text={fortschritt} /> : null}
           {hinweis ? <Hinweis text={hinweis} /> : null}
           {fehler ? <Hinweis art="fehler" text={fehler} /> : null}
         </View>
+        {kanzleienZuerst ? null : kanzleien}
       </Inhalt>
       <Fuss>
         <Knopf text={TEXT.mitPro(gross ? TEXT.trotzdem_erstellen : TEXT.steuerpaket_teilen, z.pro)} symbol="square.and.arrow.up" laedt={laedt} deaktiviert={!anzahlR && !anzahlB} onPress={() => void los()} stil={{ flex: 1 }} />
