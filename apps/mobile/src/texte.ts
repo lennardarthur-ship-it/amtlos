@@ -33,7 +33,7 @@ export const T = {
   datum_deutsche_zeit: (datum: string) => `${datum} · deutsche Zeit`,
   gruss: (stunde: number) => (stunde < 11 ? "Guten Morgen" : stunde < 18 ? "Guten Tag" : "Guten Abend"),
   als_naechstes: "Als Nächstes",
-  alle_pflichten: "Alle Pflichten",
+  alle_pflichten: "Zur Liste",
   /** Satz nach „nichts dringend“ – verspricht nur eine Erinnerung, wenn sie eingeschaltet ist */
   nichts_dran_erinnerung: (an: boolean) => (an ? "Dein iPhone erinnert dich drei Tage vor dem nächsten Termin." : "Schalte „An Fristen erinnern“ ein, dann meldet sich dein iPhone vor dem nächsten Termin."),
   offen_label: (betrag: string, zusatz: string, monat: string) => `Offen bei Kunden: ${betrag}, ${zusatz}. ${monat}`,
@@ -251,7 +251,11 @@ export const T = {
   check_titel: "Pflichten-Check",
   check_einleitung_titel: "Welche Pflichten kommen für deinen Betrieb in Frage?",
   check_einleitung_text: "Ein paar kurze Fragen, etwa drei Minuten. Amtlos zeigt danach auf deinem iPhone, welche Pflichten nach deinen Angaben in Frage kommen – und welche Unterlagen du dafür brauchst.",
-  check_hinweis: "Wichtig: Die Pflichten und Vorlagen in Amtlos sind noch nicht von Fachleuten geprüft. Sie ersetzen keine Rechts- oder Steuerberatung. Prüfe Ergebnisse, bevor du dich darauf verlässt.",
+  check_hinweis: "Wichtig: Amtlos zeigt allgemeine Informationen zu typischen Pflichten und Vorlagen – keine Rechts- oder Steuerberatung. Pflichten und Vorlagen sind noch nicht von Fachleuten geprüft. Prüfe Ergebnisse, bevor du dich darauf verlässt.",
+  // Phase 1 (RDG): ruhige Hinweise unter Pflichten, Vorlagen und „Rechtliches“ – zusammen mit dem Rechtsstand (src/rechtshinweis.ts)
+  hinweis_pflichten: "Allgemeine Informationen zu typischen Pflichten für Betriebe wie deinen – keine Rechts- oder Steuerberatung. Aus dem Amtlos-Katalog, fachlich noch nicht geprüft.",
+  hinweis_vorlage: "Vorlage, keine Rechts- oder Steuerberatung. Prüfe die Angaben für deinen Betrieb – im Zweifel mit Anwalt oder Steuerberatung.",
+  hinweis_recht: "Amtlos gibt allgemeine Informationen und Vorlagen – keine Rechts- oder Steuerberatung.",
   check_starten: "Los geht’s",
   check_ueberspringen: "Überspringen",
   ja: "Ja",
@@ -265,10 +269,10 @@ export const T = {
   pflichten_karte_titel: "Welche Pflichten kommen für dich in Frage?",
   pflichten_karte_text: "Ein paar Fragen, etwa drei Minuten.",
   pflichten_einladung: "Ein paar Fragen zu deinem Betrieb, etwa drei Minuten. Danach zeigt Amtlos, welche Pflichten nach deinen Angaben in Frage kommen, was jetzt dran ist – und erinnert dich an Termine.",
-  pflichten_tab_unter: "Was gilt, was jetzt dran ist.",
+  pflichten_tab_unter: "Was in Frage kommt, was jetzt dran ist.",
   start_so_hilft: "So hilft dir Amtlos",
   start_punkte: [
-    { symbol: "checklist", titel: "Pflichten kennen", text: "Ein Check mit ein paar Fragen zeigt, was für deinen Betrieb gilt – mit Terminen und Erinnerungen." },
+    { symbol: "checklist", titel: "Pflichten kennen", text: "Ein Check mit ein paar Fragen zeigt, welche Pflichten nach deinen Angaben in Frage kommen – mit Terminen und Erinnerungen." },
     { symbol: "doc.text", titel: "Unterlagen erstellen", text: "Über 30 Vorlagen, Schritt für Schritt ausgefüllt, fertig als PDF – vom Hygieneplan bis zur Datenschutzerklärung." },
     { symbol: "eurosign.circle", titel: "Rechnungen schreiben", text: "Fortlaufend nummeriert und nach dem Teilen unveränderbar. Als E-Rechnung (Pro) – und die Umsätze für deine Umsatzsteuer-Voranmeldung übernimmst du mit einem Tipp (Pro)." },
     { symbol: "lock.shield", titel: "Alles bleibt bei dir", text: "Verschlüsselt auf deinem iPhone – ein Konto brauchst du nicht." },
@@ -276,7 +280,7 @@ export const T = {
   start_rechnung: "Rechnung schreiben",
   start_vorlagen: "Alle Vorlagen ansehen",
   nichts_dran: "Gerade ist nichts dringend.",
-  ergebnis_bald: (n: number) => (n === 0 ? "Für deinen Betrieb: in den nächsten 2\u00a0Wochen nichts Dringendes" : n === 1 ? "Für deinen Betrieb: 1\u00a0Sache in den nächsten 2\u00a0Wochen" : `Für deinen Betrieb: ${n}\u00a0Dinge in den nächsten 2\u00a0Wochen`),
+  ergebnis_bald: (n: number) => (n === 0 ? "Nach deinen Angaben: in den nächsten 2\u00a0Wochen nichts Dringendes" : n === 1 ? "Nach deinen Angaben: 1\u00a0Sache in den nächsten 2\u00a0Wochen" : `Nach deinen Angaben: ${n}\u00a0Dinge in den nächsten 2\u00a0Wochen`),
   ergebnis_gesamt: (n: number, selten: boolean) => `Insgesamt ${n === 1 ? "1 Pflicht" : `${n} Pflichten`}${selten && n > 1 ? ", viele davon nur einmal im Jahr" : ""}.`,
   schon_erledigt_titel: "Schon erledigt?",
   schon_erledigt_text: "Dein Betrieb ist noch jung. Hake ab, was du bei der Gründung schon erledigt hast.",
@@ -302,7 +306,7 @@ export const T = {
   pflicht_titel: "Pflicht",
   jetzt_dran: (n: number) => `Jetzt dran (${n})`,
   naechste_wochen: (n: number) => `In den nächsten Wochen (${n})`,
-  alle_nach_bereich: "Alle Pflichten nach Bereich",
+  alle_nach_bereich: "Pflichten nach Bereich",
   erinnern: "An Fristen erinnern",
   erinnern_hilfe: "Dein iPhone erinnert dich drei Tage vor den nächsten Terminen, jeweils um 9 Uhr.",
   erinnern_verweigert: "Mitteilungen sind für Amtlos ausgeschaltet. Schalte sie in den Einstellungen unter Mitteilungen › Amtlos ein, dann erinnert dich dein iPhone an Fristen.",
@@ -358,7 +362,7 @@ export const T = {
   pro_wert_text: "Unterlagen ohne Limit teilen, das Paket für die Steuerberatung mit einem Tipp, Umsatzsteuer und EÜR aus deinen Rechnungen – alles jederzeit vorzeigbar.",
   pro_kachel: { pdf: "Ohne Limit teilen", e_rechnung: "E-Rechnung", ust_uebernahme: "Werte für USt und EÜR per Tipp", steuerberater: "Paket für die Steuerberatung", sync: "Auf allen Geräten", icloud: "iCloud-Sicherung", briefkopf: "Dein Briefkopf" },
   pro_ausserdem: "Außerdem mit Pro",
-  warum: "Warum für dich",
+  warum: "Warum sie in Frage kommt",
   zustaendig: "Zuständig",
   einstufung: "Wie wichtig",
   schwere: { hoch: "hoch", mittel: "mittel", niedrig: "niedrig" },
@@ -785,7 +789,7 @@ export const T = {
   r11_ergebnis_genauer: (n: number) => (n === 1 ? "Mit 1 weiteren Antwort wird die Liste genauer – im Pflichten-Tab unter „Kurz klären“." : `Mit ${n} weiteren Antworten wird die Liste genauer – im Pflichten-Tab unter „Kurz klären“.`),
   r11_schon_weiter: "Weiter",
   r11_schon_titel: "Was hast du schon?",
-  r11_schon_text: "Dein Betrieb läuft schon – vieles davon ist sicher erledigt. Hake ab, was du schon hast. Danach siehst du, was wirklich noch offen ist.",
+  r11_schon_text: "Dein Betrieb läuft schon – vieles davon hast du vermutlich erledigt. Hake ab, was du schon hast. Danach siehst du, was nach deinen Angaben noch offen ist.",
   r11_schon_label: (n: number) => (n === 1 ? "1 Pflicht, die oft schon erledigt ist" : `${n} Pflichten, die oft schon erledigt sind`),
   r11_schon_bestaetigt: (was: string) => `Abhaken heißt: „${was}“`,
   r11_schon_alle: "Alle auswählen",
@@ -794,7 +798,7 @@ export const T = {
   r11_schon_uebernehmen: (n: number) => (n === 1 ? "1 als erledigt übernehmen" : `${n} als erledigt übernehmen`),
   r11_schon_nichts: "Weiter ohne Haken",
   r11_schon_fertig: (n: number) => (n === 1 ? "1 Pflicht als erledigt vermerkt." : `${n} Pflichten als erledigt vermerkt.`),
-  r11_kontrollbereit: (da: number, gesamt: number) => `Kontrollbereit: ${da} von ${gesamt} ${gesamt === 1 ? "Nachweis" : "Nachweisen"}`,
+  r11_kontrollbereit: (da: number, gesamt: number) => `Für Kontrollen: ${da} von ${gesamt} ${gesamt === 1 ? "Nachweis" : "Nachweisen"} da`,
   r11_kontrollbereit_text: "Kontrollmappe öffnen – was fehlt, steht dort",
   r11_mappe_zeile_kurz: "Nachweise für Kontrollen in einem PDF",
   r11_mappe_halb_titel: (n: number) => (n === 1 ? "1 Unterlage noch nicht vollständig" : `${n} Unterlagen noch nicht vollständig`),
@@ -838,10 +842,10 @@ export const T = {
   // R10 Pflichten
   r10_ergebnis_bald: (termine: number, ohne: number) =>
     termine === 0 && ohne === 0
-      ? "Für deinen Betrieb: in den nächsten 2\u00a0Wochen nichts Dringendes"
+      ? "Nach deinen Angaben: in den nächsten 2\u00a0Wochen nichts Dringendes"
       : termine === 0
-        ? `Für deinen Betrieb: keine Termine in den nächsten 2\u00a0Wochen, ${ohne === 1 ? "1\u00a0wichtige Aufgabe" : `${ohne}\u00a0wichtige Aufgaben`}`
-        : `Für deinen Betrieb: ${termine === 1 ? "1\u00a0Termin" : `${termine}\u00a0Termine`} in den nächsten 2\u00a0Wochen${ohne ? `, dazu ${ohne === 1 ? "1\u00a0wichtige Aufgabe" : `${ohne}\u00a0wichtige Aufgaben`}` : ""}`,
+        ? `Nach deinen Angaben: keine Termine in den nächsten 2\u00a0Wochen, ${ohne === 1 ? "1\u00a0wichtige Aufgabe" : `${ohne}\u00a0wichtige Aufgaben`}`
+        : `Nach deinen Angaben: ${termine === 1 ? "1\u00a0Termin" : `${termine}\u00a0Termine`} in den nächsten 2\u00a0Wochen${ohne ? `, dazu ${ohne === 1 ? "1\u00a0wichtige Aufgabe" : `${ohne}\u00a0wichtige Aufgaben`}` : ""}`,
   r10_zaehlung: (p: number, h: number, o: number): string => {
     const teile = [p === 1 ? "1 Pflicht" : `${p} Pflichten`, ...(h ? [h === 1 ? "1 Hinweis" : `${h} Hinweise`] : []), ...(o ? [o === 1 ? "1 Option" : `${o} Optionen`] : [])];
     return teile.length > 1 ? `${teile.slice(0, -1).join(", ")} und ${teile[teile.length - 1]}` : teile[0]!;

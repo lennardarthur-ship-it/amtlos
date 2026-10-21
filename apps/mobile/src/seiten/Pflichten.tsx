@@ -13,7 +13,7 @@ import { heute } from "../unterlagen/speicher";
 import { useAmtlos, useStandWahl } from "../zustand";
 import { Antwort, CheckAblauf } from "./Check";
 import { SicherungsKarte } from "./Sicherung";
-import { BuehnenBlatt, BuehnenKnopf, BuehnenSeite, Gruppe, Inhalt, datumKurz } from "./gemeinsam";
+import { BuehnenBlatt, BuehnenKnopf, BuehnenSeite, Gruppe, Inhalt, RechtsHinweis, datumKurz } from "./gemeinsam";
 import { useOeffnen, useStarten } from "./starten";
 import { useErstellen } from "./Erstellen";
 import { Jahresraster } from "./Jahresraster";
@@ -185,7 +185,7 @@ function PflichtDetail({ id }: { id: string }) {
           </Karte>
         </Gruppe>
       ) : null}
-      <T v="caption" leise stil={{ marginTop: 16 }}>{TEXT.pflichten_quelle}</T>
+      <RechtsHinweis art="pflichten" />
     </BuehnenBlatt>
   );
 }
@@ -379,7 +379,7 @@ function PflichtenInhalt() {
         </Gruppe>
       ) : null}
       <TextKnopf symbol="pencil" text={TEXT.angaben_aendern} onPress={() => nav.oeffnen("check", () => <CheckAblauf einleitung={false} />, true)} stil={{ marginTop: 20 }} />
-      <T v="caption" leise stil={{ marginTop: 8 }}>{TEXT.pflichten_quelle}</T>
+      <RechtsHinweis art="pflichten" oben={8} />
     </View>
   );
 }
@@ -512,6 +512,7 @@ function Start() {
           ))}
         </Karte>
       </Gruppe>
+      <RechtsHinweis art="pflichten" oben={24} />
     </View>
   );
 }

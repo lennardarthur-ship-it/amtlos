@@ -5,7 +5,8 @@ import { Karte, Symbol, T, Zeile } from "../ui/bausteine";
 import { Unterseite } from "../ui/navigation";
 import { useFarben } from "../ui/thema";
 import { pflichtenFuer, rechtsgrundlagen } from "../unterlagen/katalog";
-import { BEREICH_SYMBOL, Gruppe, Inhalt } from "./gemeinsam";
+import { mitVorlagenHinweis } from "../rechtshinweis";
+import { BEREICH_SYMBOL, Gruppe, Inhalt, RechtsHinweis } from "./gemeinsam";
 
 /** „Wozu brauche ich das?“ – Zweck, Rechtsgrundlage und Quellen einer Vorlage, nur auf Nachfrage (E-124). */
 export function InfoSeite({ id }: { id: string }) {
@@ -49,7 +50,8 @@ export function InfoSeite({ id }: { id: string }) {
           </Gruppe>
         ) : null}
         {/* Prüfstand als ruhige Fußnote (R10) – deutlich gesagt wird er einmal zu Beginn des Pflichten-Checks */}
-        <T v="caption" leise stil={{ marginTop: 20 }}>{PRUEFHINWEIS}</T>
+        {mitVorlagenHinweis(v) ? <RechtsHinweis art="vorlage" oben={20} /> : null}
+        <T v="caption" leise stil={{ marginTop: mitVorlagenHinweis(v) ? 4 : 20 }}>{PRUEFHINWEIS}</T>
       </Inhalt>
     </Unterseite>
   );

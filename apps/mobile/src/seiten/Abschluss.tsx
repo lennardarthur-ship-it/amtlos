@@ -8,7 +8,8 @@ import { Unterseite, useNav } from "../ui/navigation";
 import { BLATT_OBEN, HAARLINIE, RADIUS, RAND, SCHRIFT, useFarben } from "../ui/thema";
 import { Vorschau } from "../ui/Vorschau";
 import { Papier, PapierBlatt } from "./Papier";
-import { GrosserBetrag } from "./gemeinsam";
+import { GrosserBetrag, RechtsHinweis } from "./gemeinsam";
+import { mitVorlagenHinweis } from "../rechtshinweis";
 import { drucken, pdfTeilenMitHash } from "../unterlagen/pdf";
 import { NUMMER_DOPPELT, fehltFuer } from "../unterlagen/pruefung";
 import { dateiTeilen } from "../unterlagen/sicherungDatei";
@@ -283,6 +284,8 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
           ? (v.hinweise?.(d, z.stand.betrieb, { kleinunternehmer: typeof z.stand.profil["ust.kleinunternehmer"] === "boolean" ? (z.stand.profil["ust.kleinunternehmer"] as boolean) : null, handwerk: handwerkLaut(z.stand.profil) }) ?? []).map((h) => <Hinweis key={h} art="warnung" text={h} />)
           : null}
         {zaehlt ? <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.pro_rest(rest, FREI_JE_MONAT)}</T> : null}
+        {/* Phase 1 (RDG): in der App, nie im PDF – die Unterlage gehört dem Betrieb; Rechnungen ohne (Geschäftsvorgang) */}
+        {mitVorlagenHinweis(v) ? <RechtsHinweis art="vorlage" oben={4} /> : null}
         <T v="caption" leise stil={{ marginTop: 4 }}>{PRUEFHINWEIS}</T>
 
         <T v="gross" accessibilityRole="header" stil={{ marginTop: 30, marginBottom: 11 }}>{TEXT.mehr}</T>

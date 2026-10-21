@@ -55,8 +55,22 @@ async function rechtliches() {
   return m;
 }
 
+// Rechtsstand aus dem gebündelten Pflichten-Katalog – dieselbe Quelle wie die App (src/pflichten/rechtsstand.ts)
+async function rechtsstand() {
+  const pnpm = path.resolve(HIER, "../../node_modules/.pnpm");
+  const ordner = fs.readdirSync(pnpm).filter((d) => d.startsWith("esbuild@")).sort().at(-1);
+  const ziel = path.join(OUT, ".rechtsstand.mjs");
+  execFileSync(path.join(pnpm, ordner, "node_modules/esbuild/bin/esbuild"), [path.resolve(HIER, "../mobile/src/pflichten/rechtsstand.ts"), "--bundle", "--format=esm", `--outfile=${ziel}`, "--log-level=warning"]);
+  const m = await import(`${ziel}?${Date.now()}`);
+  fs.rmSync(ziel);
+  return m.rechtsstandText();
+}
+
 fs.mkdirSync(path.join(OUT, "bilder"), { recursive: true });
 const recht = await rechtliches();
+const RECHTSSTAND = await rechtsstand();
+// Phase 1 (RDG): Hinweis in der Fußzeile jeder Seite
+const FUSS_HINWEIS = `Allgemeine Informationen und Vorlagen – keine Rechts- oder Steuerberatung. ${esc(RECHTSSTAND)}.`;
 const url = (cfg.url || recht.LINKS.website || "").replace(/\/+$/, "");
 if (url && !/^https:\/\/[^/\s]+\.[^/\s]+$/.test(url)) throw new Error(`Adresse der Website ungültig: „${url}“ (https://…, ohne Pfad)`);
 if (!url) offen.push("Adresse der Website (apps/website/seite.json → url oder LINKS.website in apps/mobile/src/rechtliches.ts) – ohne sie fehlen canonical, og:url, absolutes og:image und sitemap.xml");
@@ -84,6 +98,8 @@ const extra = [
 const ganz = lies("seite.html")
   .replace("__PROFILE__", JSON.stringify(JSON.parse(lies("profile.json"))))
   .replace("__KOPF_EXTRA__", extra)
+  .replace("__RECHTSSTAND__", esc(RECHTSSTAND))
+  .replace("__FUSS_HINWEIS__", FUSS_HINWEIS)
   .replace("__OG_BILD__", `${url ? `${url}/` : ""}bilder/og.jpg`)
   .replace("__JSON_LD__", JSON.stringify(jsonLd).replace(/</g, "\\u003c"));
 const [kopf, rumpf] = ganz.split("<!-- /kopf -->");
@@ -107,7 +123,7 @@ const fussNav = `<nav aria-label="Rechtliches"><a href="./">Startseite</a><a hre
 const rechtsSeite = (titel, beschreibung, inhalt, { index = false, pfad = "", wurzel = "" } = {}) =>
   dokument(
     `<title>${titel} – Amtlos</title>\n<meta name="description" content="${esc(beschreibung)}">\n${index ? (url ? `<link rel="canonical" href="${esc(url)}/${pfad}">` : "") : `<meta name="robots" content="noindex">`}\n<link rel="icon" href="${wurzel}favicon.svg" type="image/svg+xml">\n<link rel="apple-touch-icon" href="${wurzel}apple-touch-icon.png">\n${wurzel ? stil.replace(/url\(schriften\//g, `url(${wurzel}schriften/`) : stil}\n<style>.recht{max-width:46rem;padding-block:1.5rem 3rem}.recht h1{font-size:clamp(2rem,4vw,2.75rem)}.recht h2{font-size:1.3rem;margin-top:2rem}.recht h3{font-size:1.05rem;margin-top:1.25rem}.recht p,.recht dl{margin-top:.6rem}.recht dt{font-weight:600;margin-top:1rem;font-size:.9375rem;color:var(--tinte-2)}.recht dd{margin:0}.recht .offen{color:var(--tinte-2);font-style:italic}.hinweis{margin-top:1.25rem;padding:.9rem 1.1rem;border-radius:.6rem;background:var(--amt-hauch);color:var(--amt-tief);font-weight:600}</style>`,
-    `<a class="springen" href="#inhalt">Zum Inhalt springen</a>\n<div class="breite">\n<header class="kopf">${marke.replace('href="./"', `href="${wurzel || "./"}"`)}</header>\n<main class="recht" id="inhalt">\n${inhalt}\n</main>\n<footer class="fuss"><span>© 2026 Amtlos</span>${wurzel ? fussNav.replace(/href="(?:\.\/)?/g, `href="${wurzel}`) : fussNav}</footer>\n</div>`,
+    `<a class="springen" href="#inhalt">Zum Inhalt springen</a>\n<div class="breite">\n<header class="kopf">${marke.replace('href="./"', `href="${wurzel || "./"}"`)}</header>\n<main class="recht" id="inhalt">\n${inhalt}\n</main>\n<footer class="fuss"><p class="fuss-hinweis">${FUSS_HINWEIS}</p><span>© 2026 Amtlos</span>${wurzel ? fussNav.replace(/href="(?:\.\/)?/g, `href="${wurzel}`) : fussNav}</footer>\n</div>`,
   );
 const A = recht.ANBIETER;
 const wert = (w) => (w ? esc(w) : `<span class="offen">${FOLGT}</span>`);

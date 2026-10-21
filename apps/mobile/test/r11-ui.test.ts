@@ -43,7 +43,7 @@ describe("Kontrollmappe (Reinigung #2, UX #5, Tischlerei #22)", () => {
     const s = mitNachweisen();
     const k = kontrollbereit(s, [{ id: "arbeitsschutz.gefaehrdungsbeurteilung", titel: "GB", vorlagen: ["gefaehrdungsbeurteilung"] }, { id: "arbeitsschutz.erstunterweisung", titel: "UW", vorlagen: ["unterweisung"] }], "2026-10-20");
     expect(k).toEqual({ da: 2, gesamt: 4 });
-    expect(TEXT.r11_kontrollbereit(2, 4)).toBe("Kontrollbereit: 2 von 4 Nachweisen");
+    expect(TEXT.r11_kontrollbereit(2, 4)).toBe("Für Kontrollen: 2 von 4 Nachweisen da");
   });
   it("BG-Nachweise ohne Vorlage: abhaken, auf dem Deckblatt „vorhanden“", () => {
     let s = mitNachweisen();

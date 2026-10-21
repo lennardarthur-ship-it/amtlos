@@ -117,7 +117,7 @@ try {
   await foto("vorlagen");
   await knopf("Schließen").click();
   await warte(700);
-  // Bild 6 „Bereit für die Kontrolle“ (R11, UX #23): die Kontrollmappe mit den Nachweisen aus dem Demo-Stand – nicht leer
+  // Bild 6 „Nachweise für die Kontrolle“ (R11, UX #23): die Kontrollmappe mit den Nachweisen aus dem Demo-Stand – nicht leer
   await tab("Unterlagen");
   await p.getByRole("button", { name: /^Kontrollmappe/ }).locator("visible=true").first().click();
   await warte(1200);

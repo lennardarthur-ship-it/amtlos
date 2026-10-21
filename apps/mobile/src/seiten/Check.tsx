@@ -11,6 +11,7 @@ import { PflichtZeile } from "./Pflichten";
 import { langBestehend, schonDaKandidaten } from "./schonDa";
 import { WasHastDuSchon } from "./WasHastDu";
 import { useAmtlos } from "../zustand";
+import { rechtsHinweis } from "../rechtshinweis";
 
 /**
  * R11 (UX #3/#5): Branchen aus Schritt 1, die auch Sofortmelde-Branchen sind – vorbelegt, damit niemand „Gastronomie“
@@ -296,7 +297,8 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
                 ))}
               </Karte>
               <View style={{ marginTop: 18 }}>
-                <Hinweis text={TEXT.pflichten_quelle} />
+                {/* Phase 1 (RDG): keine Rechts- oder Steuerberatung, mit Rechtsstand */}
+                <Hinweis text={rechtsHinweis("pflichten").ganz} />
               </View>
               <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: -1000, height: 1000, backgroundColor: f.papier }} />
               </View>

@@ -4,6 +4,7 @@ import { useCallback, type ReactElement, type ReactNode } from "react";
 import { FlatList, Platform, Pressable, ScrollView, View, useWindowDimensions, type ScrollViewProps } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Bereich } from "@amtlos/fachlogik";
+import { rechtsHinweis, type HinweisArt } from "../rechtshinweis";
 import { euroText } from "../unterlagen/ablage";
 import { BuehnenText, Motiv, Symbol, T, useGrosseSchrift } from "../ui/bausteine";
 import { HellerStatus, TastaturRahmen, useImBlatt, useKopf, type KopfKnopfDef } from "../ui/navigation";
@@ -252,6 +253,19 @@ export function Gruppe({ titel, children, fuss, hilfe, erste }: { titel?: string
       {children}
       {fuss ? <T v="caption" leise stil={{ marginTop: 8 }}>{fuss}</T> : null}
     </View>
+  );
+}
+
+/**
+ * Phase 1 (RDG): ruhige Fußzeile „keine Rechts- oder Steuerberatung“ mit Rechtsstand – ein Text, damit VoiceOver beides
+ * zusammen liest. Nie im PDF (src/rechtshinweis.ts).
+ */
+export function RechtsHinweis({ art, farbe, oben = 16 }: { art: HinweisArt; farbe?: string; oben?: number }) {
+  const h = rechtsHinweis(art);
+  return (
+    <T v="caption" leise={!farbe} farbe={farbe} stil={{ marginTop: oben }} testID={`rechtshinweis-${art}`}>
+      {`${h.text}\n${h.stand}`}
+    </T>
   );
 }
 

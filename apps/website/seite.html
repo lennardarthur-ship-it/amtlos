@@ -168,6 +168,7 @@ details summary::-webkit-details-marker { display: none; }
 details p { margin-top: .6rem; color: var(--tinte-2); }
 
 .fuss { border-top: 1px solid var(--linie); padding-block: 2rem 3rem; display: flex; align-items: center; flex-wrap: wrap; gap: 1rem 2rem; justify-content: space-between; font-size: .875rem; color: var(--tinte-2); }
+.fuss-hinweis { flex-basis: 100%; margin: 0; font-size: .8125rem; color: var(--tinte-3); }
 .fuss nav { display: flex; gap: 0 1.25rem; flex-wrap: wrap; }
 .fuss nav a { display: inline-flex; align-items: center; min-height: 2.75rem; }
 .pro-marke { font-size: .75em; font-weight: 700; color: var(--amt-tief); background: var(--amt-hauch); border-radius: 999px; padding: .05rem .45rem; white-space: nowrap; vertical-align: .08em; }
@@ -192,7 +193,7 @@ details p { margin-top: .6rem; color: var(--tinte-2); }
         <h1>Welche Pflichten kommen für deinen Betrieb in Frage?</h1>
         <p class="unter">Amtlos zeigt dir, welche Pflichten nach deinen Angaben für deinen Betrieb in Frage kommen, und erstellt Rechnungen und Unterlagen dazu. Auf dem iPhone, ohne Konto.</p>
         <ul class="punkte">
-          <li>Pflichten-Check mit Begründung, Rechtsgrundlage und Terminen</li>
+          <li>Pflichten-Check: typische Pflichten nach deinen Angaben, mit Rechtsgrundlage, Quelle und Terminen</li>
           <li><span>Rechnungen fortlaufend nummeriert, mit GiroCode – als E-Rechnung (XRechnung) mit <span class="pro-marke">Pro</span></span></li>
           <li>Über 30 Vorlagen, Schritt für Schritt ausgefüllt, fertig als PDF</li>
         </ul>
@@ -203,7 +204,7 @@ details p { margin-top: .6rem; color: var(--tinte-2); }
       </div>
 
       <div class="check" role="region" aria-labelledby="check-titel">
-        <div class="check-kopf"><span id="check-titel">Pflichten-Check · Kurzfassung</span><span>Stand Katalog 2026</span></div>
+        <div class="check-kopf"><span id="check-titel">Pflichten-Check · Kurzfassung</span><span>__RECHTSSTAND__</span></div>
         <div class="check-inhalt">
           <div class="frage">
             <span class="frage-titel" id="f-branche">Was machst du?</span>
@@ -214,9 +215,9 @@ details p { margin-top: .6rem; color: var(--tinte-2); }
             <div class="chips" role="group" aria-labelledby="f-team" id="team"></div>
           </div>
           <div class="ergebnis">
-            <div class="ergebnis-zahl" aria-live="polite"><strong id="anzahl">41</strong><span id="satz">Pflichten kommen für dich in Frage.</span></div>
+            <div class="ergebnis-zahl" aria-live="polite"><strong id="anzahl">41</strong><span id="satz">Pflichten kommen nach deinen Angaben in Frage.</span></div>
             <!-- R12 (Recht #8): der Prüfstand direkt am Ergebnis, nicht erst in der Fußnote -->
-            <p class="pruefstand">Entwurf: Die Pflichten sind noch nicht von Fachleuten geprüft. Für deinen Einzelfall bleibt die Steuerberatung zuständig.</p>
+            <p class="pruefstand"><strong>Keine Rechts- oder Steuerberatung:</strong> Der Kurz-Check zeigt typische Pflichten für Betriebe wie deinen. Entwurf, noch nicht von Fachleuten geprüft – für deinen Einzelfall helfen Anwalt oder Steuerberatung.</p>
             <div class="balken" id="balken"></div>
             <div class="beispiele" id="beispiele"></div>
             <p class="fussnote" id="fussnote"></p>
@@ -350,7 +351,7 @@ details p { margin-top: .6rem; color: var(--tinte-2); }
           <h2 id="s-fragen">Häufige Fragen</h2>
           <div style="margin-top:1.25rem">
 <!-- fragen -->
-            <details><summary>Ersetzt Amtlos meine Steuerberatung?</summary><p>Nein. Amtlos zeigt, welche Pflichten nach deinen Angaben in Frage kommen, und bereitet Unterlagen vor. Für Beratung im Einzelfall bleibt deine Steuerberaterin oder dein Steuerberater zuständig. Pflichten-Katalog und Vorlagen sind noch nicht von Fachleuten geprüft.</p></details>
+            <details><summary>Ersetzt Amtlos Rechts- oder Steuerberatung?</summary><p>Nein. Amtlos gibt allgemeine Informationen dazu, welche Pflichten nach deinen Angaben in Frage kommen, und Vorlagen für deine Unterlagen. Für Beratung im Einzelfall bleiben Anwalt, Steuerberaterin oder Steuerberater zuständig. Pflichten-Katalog und Vorlagen sind noch nicht von Fachleuten geprüft.</p></details>
             <details><summary>Wo liegen meine Daten?</summary><p>Nur auf deinem iPhone, verschlüsselt. Amtlos hat kein Konto und keinen Server mit deinen Unterlagen. Eine Sicherung erstellst du selbst als verschlüsselte Datei oder automatisch in deinem iCloud Drive (<span class="pro-marke">Pro</span>).</p></details>
             <details><summary>Für wen ist Amtlos gedacht?</summary><p>Für Einzelunternehmen, Salons, Cafés, Handwerksbetriebe, Freelancer und kleine GmbHs in Deutschland – alle, die keine eigene Buchhaltungsabteilung haben.</p></details>
             <details><summary>Was passiert, wenn ich mein iPhone verliere?</summary><p>Deine Daten liegen nur auf dem iPhone. Hast du eine Sicherung – als verschlüsselte Datei oder automatisch in deinem iCloud Drive (<span class="pro-marke">Pro</span>) –, holst du sie auf dem neuen iPhone mit deinem Passwort zurück. Ohne Sicherung sind die Daten weg, denn Amtlos hat keine Kopie.</p></details>
@@ -366,6 +367,7 @@ details p { margin-top: .6rem; color: var(--tinte-2); }
   </main>
 
   <footer class="fuss">
+    <p class="fuss-hinweis">__FUSS_HINWEIS__</p>
     <span>© 2026 Amtlos</span>
     <nav aria-label="Rechtliches"><a href="hilfe.html">Hilfe und Kontakt</a><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a></nav>
   </footer>

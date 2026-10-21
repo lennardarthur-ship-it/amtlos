@@ -11,6 +11,8 @@ import { StaettenWahl } from "./BetriebStaetten";
 import { fehltFuer } from "../unterlagen/pruefung";
 import { offeneRechnungen, periodeText, perioden, umsaetzeFuer, type UstUebernahme, type Versteuerung } from "../unterlagen/ustAusRechnungen";
 import { useAmtlos } from "../zustand";
+import { mitVorlagenHinweis } from "../rechtshinweis";
+import { RechtsHinweis } from "./gemeinsam";
 import { Abschluss, betriebOeffnen, festschreibenHinweis, useTeilen } from "./Abschluss";
 import { AuswahlSeite } from "../ui/auswahlseite";
 import { AbsenderSeite } from "./Betrieb";
@@ -338,7 +340,11 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
               ) : null}
             </View>
           ) : (
-            <Schritt v={vorlage} a={vorlage.abschnitte[schritt]!} index={schritt} id={id} daten={daten} fehlt={fehlt} />
+            <View>
+              <Schritt v={vorlage} a={vorlage.abschnitte[schritt]!} index={schritt} id={id} daten={daten} fehlt={fehlt} />
+              {/* Phase 1 (RDG): ruhig unter den Feldern jedes Schritts – nicht bei Rechnungen */}
+              {mitVorlagenHinweis(vorlage) ? <RechtsHinweis art="vorlage" oben={24} /> : null}
+            </View>
           )}
           {amAbschluss ? null : <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: -1000, height: 1000, backgroundColor: f.papier }} />}
           </View>
