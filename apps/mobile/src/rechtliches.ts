@@ -6,7 +6,7 @@ export const ANBIETER = {
   /** Firma mit Rechtsform, z. B. „Amtlos GmbH“ */
   name: "Lang Ventures UG (haftungsbeschränkt)",
   /** Straße, PLZ, Ort – ladungsfähige Anschrift (§ 5 DDG) */
-  anschrift: "",
+  anschrift: "Gomaringer Str. 33, 72770 Reutlingen",
   /** vertretungsberechtigte Person(en) */
   vertretung: "",
   email: "",
