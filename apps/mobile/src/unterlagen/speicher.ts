@@ -54,6 +54,11 @@ export interface Unterlage {
   absender?: Betrieb;
   /** R12 GoBD: XRechnung (UBL) der festgeschriebenen Rechnung, wie sie ausgegeben wurde – das Paket nimmt dieses Original */
   xml?: string;
+  /**
+   * E-156: Zeitpunkt, zu dem die E-Rechnung (XRechnung) dieser Rechnung zum ersten Mal geteilt wurde – danach lässt sie
+   * sich immer wieder teilen, auch ohne Pro (eigene Daten)
+   */
+  eRechnungGeteilt?: string;
   /** R12 GoBD: Kassenbuch aus den Tagesabschlüssen – Monat und Standort, SHA-256 des festgeschriebenen Inhalts */
   kassenbuch?: { monat: string; standort: string };
   inhaltSha256?: string;
@@ -297,6 +302,7 @@ function unterlageAus(u: Record<string, unknown>): Unterlage {
   else delete r.festgeschrieben;
   for (const k of ["storniertDurch", "stornoZuId", "ersetzt", "konfliktKopieVon", "pdfSha256", "bezahlt"] as const) if (typeof u[k] !== "string" || !u[k]) delete r[k];
   if (!istIso(u.bezahltGeaendert)) delete r.bezahltGeaendert;
+  if (!istIso(u.eRechnungGeteilt)) delete r.eRechnungGeteilt;
   const z = zahlungenAus(u.zahlungen);
   if (z.length) r.zahlungen = z;
   else delete r.zahlungen;
@@ -672,8 +678,13 @@ export function ausgabeMoeglich(s: Stand, id: string, daten?: Daten): boolean {
  * Als PDF geteilt oder gedruckt: merken, und Vorlagen mit `festschreiben` festschreiben. Mit `daten` (Inhalt des PDFs)
  * nur, wenn die Unterlage noch genau diesen Inhalt hat – sonst bleibt der Stand unverändert (siehe `ausgabeMoeglich`).
  */
-export function ausgeben(s: Stand, id: string, jetzt: Date, daten?: Daten, pdfSha256?: string, absender?: Betrieb): Stand {
+export function ausgeben(s: Stand, id: string, jetzt: Date, daten?: Daten, pdfSha256?: string, absender?: Betrieb, eRechnung?: boolean): Stand {
   if (!ausgabeMoeglich(s, id, daten)) return s;
+  // E-156: als E-Rechnung geteilt – vermerken (danach immer wieder teilbar, auch ohne Pro)
+  if (eRechnung) {
+    const mit = ausgeben(s, id, jetzt, daten, pdfSha256, absender);
+    return { ...mit, unterlagen: mit.unterlagen.map((u) => (u.id === id && !u.eRechnungGeteilt ? { ...u, eRechnungGeteilt: jetzt.toISOString() } : u)) };
+  }
   const vorher = s.unterlagen.find((u) => u.id === id);
   const neu: Stand = {
     ...s,
@@ -1235,6 +1246,9 @@ export function unterlagenVereinen(lokal: Unterlage, andere: Unterlage): Vereini
   const r: Unterlage = { ...basis };
   const ausgegeben = frueher(lokal.ausgegeben, andere.ausgegeben);
   if (ausgegeben) r.ausgegeben = ausgegeben;
+  // E-156: einmal als E-Rechnung geteilt bleibt geteilt – aus jeder Fassung, das frühere Datum
+  const eRechnung = frueher(lokal.eRechnungGeteilt, andere.eRechnungGeteilt);
+  if (eRechnung) r.eRechnungGeteilt = eRechnung;
   if (fl && fa && sl === sa) r.festgeschrieben = frueher(lokal.festgeschrieben, andere.festgeschrieben);
   // R12: Fassungen beider Seiten – keine geht verloren (nach Zeitpunkt der Festschreibung)
   const fassungen = new Map<string, Fassung>();

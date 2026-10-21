@@ -255,6 +255,8 @@ export interface PflichtInfo {
   kategorie: string;
   schwere: "niedrig" | "mittel" | "hoch";
   stelle: string;
+  /** E-156: Folgen bei Versäumnis laut Katalog (Bußgeld …) – null, wenn sie noch nicht fachlich erfasst sind */
+  sanktion?: string | null;
   rechtsgrundlage: string[];
   quellen: { titel: string; url: string }[];
   /** Grund laut Katalog, z. B. „Du beschäftigst mindestens eine Person.“ */
@@ -547,6 +549,8 @@ export function auswertung(antworten: Profil, stichtag: string, unterlagen: read
       erklaerung: text(p.erklaerung),
       kategorie: p.kategorie,
       schwere: p.sanktion?.schwere ?? "mittel",
+      // E-156: Folgen bei Versäumnis (Pro-Detail) – nur, wenn sie fachlich erfasst sind
+      sanktion: p.sanktion?.text && !/noch nicht fachlich erfasst/.test(text(p.sanktion.text)) ? text(p.sanktion.text) : null,
       stelle: text(p.stelle),
       rechtsgrundlage: p.rechtsgrundlage ?? [],
       quellen: (p.quellen ?? []).filter((q): q is { titel: string; url: string } => Boolean(q.url)),

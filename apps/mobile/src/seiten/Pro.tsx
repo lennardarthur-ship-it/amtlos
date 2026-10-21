@@ -10,26 +10,26 @@ import { BuehnenBlatt } from "./gemeinsam";
 import { HAARLINIE, RADIUS, useFarben } from "../ui/thema";
 import { angebote, kaufAktiv, kaufen, paywallVerfuegbar, testmodus, wiederherstellen, type Angebot } from "../pro/kauf";
 import { ersparnis, knopfText, naechsterMonat, preisZeile } from "../pro/bezahltext";
-import { FREI_JE_MONAT, PRO_VORTEILE, uebrig, type ProFunktion } from "../pro/regeln";
+import { PRO_VORTEILE, VORLAGEN_FREI_JE_MONAT, uebrig, type ProFunktion } from "../pro/regeln";
 import { useAmtlos } from "../zustand";
 import { syncAngeboten } from "../konto/konfig";
 import { DatenschutzSeite } from "./Recht";
 
 /** „Synchronisation“ nur zeigen, wenn dieser Build einen Server hat (E-134). */
 const VORTEILE = PRO_VORTEILE.filter((v) => v !== "sync" || syncAngeboten);
-/** Reihenfolge nach Nutzen (B13): gesparte Zeit und das Paket für die Steuerberatung zuerst, der Briefkopf zuletzt. */
-const NACH_NUTZEN: ProFunktion[] = ["steuerberater", "ust_uebernahme", "pdf", "e_rechnung", "icloud", "sync", "briefkopf"];
-const VORTEIL_SYMBOL: Record<ProFunktion, string> = { pdf: "square.and.arrow.up", e_rechnung: "doc.text", ust_uebernahme: "percent", steuerberater: "briefcase", sync: "arrow.triangle.2.circlepath", icloud: "icloud", briefkopf: "paintpalette" };
+/** Reihenfolge nach Nutzen (E-156): „Pflichten erfüllen, Kontrollen bestehen“ – Vorlagen als PDF, Erinnerungen, Kontrollmappe zuerst. */
+const NACH_NUTZEN: ProFunktion[] = PRO_VORTEILE;
+const VORTEIL_SYMBOL: Record<ProFunktion, string> = { pdf: "square.and.arrow.up", erinnerungen: "bell", kontrollmappe: "folder", pflicht_details: "checklist", e_rechnung: "doc.text", ust_uebernahme: "percent", steuerberater: "briefcase", sync: "arrow.triangle.2.circlepath", icloud: "icloud", briefkopf: "paintpalette" };
 
 /** Vorteil als Kachel im 2×2-Raster: Symbol, kurzer Titel, ein Satz. */
 function VorteilKachel({ v }: { v: ProFunktion }) {
   const f = useFarben();
   const gross = useGrosseSchrift();
   return (
-    <View accessible accessibilityRole="text" accessibilityLabel={`${TEXT.pro_vorteil[v].titel}. ${TEXT.pro_vorteil[v].text(FREI_JE_MONAT)}`} style={{ flexBasis: gross ? "100%" : "46%", flexGrow: 1, padding: 14, borderRadius: RADIUS.karte, backgroundColor: f.blatt, gap: 8 }}>
+    <View accessible accessibilityRole="text" accessibilityLabel={`${TEXT.pro_vorteil[v].titel}. ${TEXT.pro_vorteil[v].text(VORLAGEN_FREI_JE_MONAT)}`} style={{ flexBasis: gross ? "100%" : "46%", flexGrow: 1, padding: 14, borderRadius: RADIUS.karte, backgroundColor: f.blatt, gap: 8 }}>
       <Kachel symbol={VORTEIL_SYMBOL[v]} groesse={36} />
       <T fett stil={{ marginTop: 2 }}>{trennen(TEXT.pro_kachel[v])}</T>
-      <T v="caption" leise>{TEXT.pro_vorteil[v].text(FREI_JE_MONAT)}</T>
+      <T v="caption" leise>{trennen(TEXT.pro_vorteil[v].text(VORLAGEN_FREI_JE_MONAT))}</T>
     </View>
   );
 }
@@ -41,7 +41,7 @@ function VorteilKachel({ v }: { v: ProFunktion }) {
  * zeigt keinen Kaufknopf (App-Review B2). Der Preis nach dem Testzeitraum steht gleich groß direkt über dem Knopf (R3).
  * Pflichtangaben für Abos (Verlängerung, Kündigung, Nutzungsbedingungen, Datenschutz) stehen unter dem Knopf.
  */
-export function ProSeite({ grund }: { grund?: ProFunktion }) {
+export function ProSeite({ grund, danach }: { grund?: ProFunktion; /** nach erfolgreichem Kauf bzw. Einschalten (z. B. Erinnerungen einschalten) */ danach?: () => void }) {
   const z = useAmtlos();
   const nav = useNav();
   const f = useFarben();
@@ -73,6 +73,7 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
     if (aktiv) {
       melden(text);
       nav.zurueck();
+      danach?.();
     }
   };
   const los = async () => {
@@ -82,7 +83,8 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
       // nur der Testschalter – nicht den Store-Status setzen, sonst bliebe Pro nach „testweise ausschalten“ an (M3)
       z.proTestSetzen(true);
       melden(TEXT.pro_test_an);
-      return nav.zurueck();
+      nav.zurueck();
+      return danach?.();
     }
     if (!wahl) return;
     setLaedt(true);
@@ -117,7 +119,7 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
   // R12 (UX #12): „Immer kostenlos“ zugeklappt – der Pro-Nutzen steht vorn; der Ausweg ist ein eigener Knopf
   const [freiOffen, setFreiOffen] = useState(false);
   const spart = liste ? ersparnis(liste) : null;
-  const ausweg = grund === "pdf" && !z.pro ? TEXT.r12_pro_entwurf(naechsterMonat(new Date()), FREI_JE_MONAT) : null;
+  const ausweg = grund === "pdf" && !z.pro ? TEXT.r12_pro_entwurf(naechsterMonat(new Date()), VORLAGEN_FREI_JE_MONAT) : null;
   return (
     <BuehnenBlatt
       fuss={
@@ -136,7 +138,7 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
           ) : knopf ? (
             <View style={{ flex: 1, gap: 4 }}>
               <Knopf text={knopf} laedt={laedt} deaktiviert={kaufAktiv ? !wahl : !testmodus} onPress={() => void los()} />
-              {/* R12 (UX #12): der Ausweg als zweiter Knopf – die Rechnung bleibt als Entwurf, am Monatsersten gibt es wieder freie */}
+              {/* R12 (UX #12), E-156: der Ausweg als zweiter Knopf – die Vorlage bleibt als Entwurf, am Monatsersten ist wieder eine frei */}
               {ausweg ? <TextKnopf text={ausweg} onPress={nav.zurueck} stil={{ alignSelf: "center" }} /> : null}
             </View>
           ) : (
@@ -144,11 +146,11 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
           )}
         </Fuss>
       }
-      // zuerst der Nutzen (B13): mehr Zeit, Steuerpaket, vorzeigbare Unterlagen – nicht Logo und Hausfarbe
+      // zuerst der Nutzen (E-156): Pflichten erfüllen, Kontrollen bestehen – nicht Logo und Hausfarbe
       ueber={TEXT.pro_marke}
-      // R12 (UX #12): Überschrift aus dem Anlass („Rechnung 6 diesen Monat – mit Pro ohne Limit“)
-      titel={grund ? TEXT.r12_pro_anlass[grund](FREI_JE_MONAT) : TEXT.pro_wert_titel}
-      unter={grund ? TEXT.pro_grund[grund](FREI_JE_MONAT) : TEXT.pro_wert_text}
+      // R12 (UX #12): Überschrift aus dem Anlass („Vorlage 2 diesen Monat – mit Pro ohne Limit“)
+      titel={grund ? TEXT.r12_pro_anlass[grund](VORLAGEN_FREI_JE_MONAT) : TEXT.pro_wert_titel}
+      unter={grund ? TEXT.pro_grund[grund](VORLAGEN_FREI_JE_MONAT) : TEXT.pro_wert_text}
     >
       {/* die vier stärksten Vorteile als Raster – der Grund, aus dem der Bezahlschirm aufging, steht vorn */}
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
@@ -171,7 +173,7 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
         {freiOffen ? <Hinweis art="erfolg" text={TEXT.pro_frei_bleibt} /> : null}
         <TextKnopf symbol={freiOffen ? "chevron.up" : "chevron.down"} erweitert={freiOffen} text={TEXT.r12_pro_frei_knopf} onPress={() => setFreiOffen(!freiOffen)} />
       </View>
-      {!z.pro ? <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.pro_rest(rest, FREI_JE_MONAT)}</T> : null}
+      {!z.pro ? <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.pro_rest(rest, VORLAGEN_FREI_JE_MONAT)}</T> : null}
 
       {kaufAktiv ? (
         liste === null ? (
@@ -218,13 +220,16 @@ export function ProSeite({ grund }: { grund?: ProFunktion }) {
   );
 }
 
-/** Prüft eine Pro-Funktion: mit Pro true, sonst öffnet sich der Bezahlschirm (mit Grund) und es kommt false zurück. */
+/**
+ * Prüft eine Pro-Funktion: mit Pro true, sonst öffnet sich der Bezahlschirm (mit Grund) und es kommt false zurück.
+ * `danach` läuft, wenn Pro auf dem Bezahlschirm aktiv wird (z. B. die Erinnerungen gleich einschalten).
+ */
 export function useProSperre() {
   const z = useAmtlos();
   const nav = useNav();
-  return (f: ProFunktion): boolean => {
+  return (f: ProFunktion, danach?: () => void): boolean => {
     if (z.pro) return true;
-    nav.oeffnen("pro", () => <ProSeite grund={f} />, true);
+    nav.oeffnen("pro", () => <ProSeite grund={f} danach={danach} />, true);
     return false;
   };
 }
@@ -246,7 +251,7 @@ export function ProZeile() {
         <Kachel symbol={z.pro ? "checkmark.seal.fill" : "sparkles"} ton="amt" />
         <View style={{ flex: 1 }}>
           <T fett>{z.pro ? TEXT.pro_aktiv : TEXT.pro_titel}</T>
-          <T v="klein" leise>{z.pro ? TEXT.pro_aktiv_text : TEXT.pro_rest(rest, FREI_JE_MONAT)}</T>
+          <T v="klein" leise>{z.pro ? TEXT.pro_aktiv_text : TEXT.pro_rest(rest, VORLAGEN_FREI_JE_MONAT)}</T>
         </View>
         <Symbol name="chevron.right" groesse={14} farbe={f.zeiger} gewicht="semibold" />
       </View>

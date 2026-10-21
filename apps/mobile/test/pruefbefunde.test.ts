@@ -7,7 +7,8 @@ const B = { ...LEERER_STAND.betrieb, name: "Salon Sonne" };
 describe("Befunde der Qualitätsprüfung (2026-10-13)", () => {
   it("Freikontingent zählt nach deutschem Kalendermonat, nicht nach UTC", () => {
     // 31.10. 23:30 Uhr in Berlin = 31.10. 22:30 UTC; 1.11. 00:30 Uhr in Berlin = 31.10. 23:30 UTC
-    const s = ausgeben(anlegen({ ...LEERER_STAND, betrieb: B }, "rechnung", new Date("2026-10-31T23:30:00Z"), "r1")[0], "r1", new Date("2026-10-31T23:30:00Z"));
+    // E-156: aufs Kontingent zählen Vorlagen (hier ein Hygieneplan), nicht Rechnungen
+    const s = ausgeben(anlegen({ ...LEERER_STAND, betrieb: B }, "hygieneplan", new Date("2026-10-31T23:30:00Z"), "r1")[0], "r1", new Date("2026-10-31T23:30:00Z"));
     expect(verbraucht(s.unterlagen, new Date("2026-11-01T10:00:00Z"))).toBe(1);
     expect(verbraucht(s.unterlagen, new Date("2026-10-31T12:00:00Z"))).toBe(0);
   });

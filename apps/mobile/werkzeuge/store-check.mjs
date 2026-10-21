@@ -73,6 +73,9 @@ pruefe(b(s.schluesselwoerter) <= 100, `Schlüsselwörter ≤ 100 Byte (${b(s.sch
 pruefe(s.beschreibung.length <= 4000, `Beschreibung ≤ 4000 Zeichen (${s.beschreibung.length})`);
 pruefe(/Nutzungsbedingungen: https:\/\//.test(s.beschreibung), "Beschreibung verlinkt die Nutzungsbedingungen (Pflicht bei Abos)");
 pruefe(/\(Pro\)/.test(s.beschreibung), "Beschreibung kennzeichnet Pro-Funktionen (Richtlinie 2.3.2)");
+// E-156: Bezahlschranke umgekehrt – Rechnungen frei, Vorlagen-PDF, Erinnerungen, Kontrollmappe, Pflicht-Details mit Pro
+pruefe(/Erinnerung[^\n]*\(Pro\)/.test(s.beschreibung) && /Kontrollmappe[^\n]*\(Pro\)/.test(s.beschreibung) && /Rechtsgrundlage[^\n]*\(Pro\)/.test(s.beschreibung) && /Rechnungen als PDF ohne Limit/.test(s.beschreibung) && !/5 Rechnungen/.test(s.beschreibung), "Beschreibung: Pro-Funktionen nach E-156 gekennzeichnet (Erinnerungen, Kontrollmappe, Pflicht-Details), Rechnungen kostenlos");
+pruefe(/1 template per calendar month/.test(s.pruefhinweise) && /always be shared or printed again/.test(s.pruefhinweise) && /How to see the paywall/.test(s.pruefhinweise) && !/6th invoice/.test(s.pruefhinweise), "Prüfhinweise für Apple erklären kostenlos und Pro (E-156) und wie man den Bezahlschirm testet");
 const webBilder = path.join(APP, "../website/bilder");
 pruefe(s.bilder.every((x) => fs.existsSync(path.join(webBilder, `${x.bildschirm}.jpg`))) && fs.existsSync(path.join(webBilder, "og.jpg")), "Website-Bilder und Vorschaubild vorhanden (werkzeuge/store-bilder.mjs schreibt sie mit)");
 

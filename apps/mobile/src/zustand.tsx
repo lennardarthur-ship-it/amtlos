@@ -80,7 +80,7 @@ interface Zustand {
    * Hat sich die Unterlage seitdem geändert (z. B. durch die Synchronisation), wird nicht festgeschrieben – false:
    * PDF neu erzeugen. Die Festschreibung wird sofort gespeichert (G3).
    */
-  ausgeben(id: string, daten?: Daten, pdfSha256?: string, absender?: Betrieb): boolean;
+  ausgeben(id: string, daten?: Daten, pdfSha256?: string, absender?: Betrieb, eRechnung?: boolean): boolean;
   erinnerungenSetzen(an: boolean): void;
   stornieren(id: string): Unterlage | null;
   kopieren(id: string): Unterlage | null;
@@ -131,6 +131,8 @@ interface Zustand {
   cloudSicherungSetzen(an: boolean): void;
   /** Amtlos Pro aktiv (Abo im App Store oder – nur im Testmodus – testweise eingeschaltet), E-132 */
   pro: boolean;
+  /** E-156: der Store hat geantwortet (bzw. es gibt keinen Kauf) – erst dann gilt „kein Pro“ als sicher */
+  proBekannt: boolean;
   /** Abo-Status beim Store neu abfragen (nach Kauf/Wiederherstellen und beim Start) */
   proAktualisieren(aktiv?: boolean): void;
   proTestSetzen(an: boolean): void;
@@ -167,7 +169,7 @@ interface Zustand {
 }
 
 /** Zustandswerte ohne den Stand (ändern sich selten) */
-type StatusFelder = "bereit" | "ladefehler" | "ladefehlerArt" | "verschluesselt" | "speicherFehler" | "speicherFehlerArt" | "tab" | "pro";
+type StatusFelder = "bereit" | "ladefehler" | "ladefehlerArt" | "verschluesselt" | "speicherFehler" | "speicherFehlerArt" | "tab" | "pro" | "proBekannt";
 export type AmtlosStatus = Pick<Zustand, StatusFelder>;
 /** Handlungen – über die ganze Laufzeit dieselben Funktionen (R9 Performance: kein Neuzeichnen wegen neuer Funktionen) */
 export type AmtlosAktionen = Omit<Zustand, StatusFelder | "stand">;
@@ -249,9 +251,14 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
   }, []);
 
   const [storePro, setStorePro] = useState(false);
+  // E-156: erst wenn der Store geantwortet hat, steht fest, ob Pro fehlt – vorher keine Erinnerungen absagen
+  const [proBekannt, setProBekannt] = useState(!kaufAktiv);
   useEffect(() => {
     if (!kaufAktiv) return;
-    void proAktiv().then(setStorePro);
+    void proAktiv().then((an) => {
+      setStorePro(an);
+      setProBekannt(true);
+    });
     const abo = AppState.addEventListener("change", (z) => {
       if (z === "active") void proAktiv().then(setStorePro);
     });
@@ -478,8 +485,8 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
 
   const pro = storePro || (testmodus && stand.proTest);
   const status = useMemo<AmtlosStatus>(
-    () => ({ bereit, ladefehler, ladefehlerArt, verschluesselt, speicherFehler: speicherFehlerArt !== null, speicherFehlerArt, tab, pro }),
-    [bereit, ladefehler, ladefehlerArt, verschluesselt, speicherFehlerArt, tab, pro],
+    () => ({ bereit, ladefehler, ladefehlerArt, verschluesselt, speicherFehler: speicherFehlerArt !== null, speicherFehlerArt, tab, pro, proBekannt }),
+    [bereit, ladefehler, ladefehlerArt, verschluesselt, speicherFehlerArt, tab, pro, proBekannt],
   );
 
   // alle Abhängigkeiten sind selbst stabil (useCallback ohne wechselnde Werte) – die Handlungen bleiben dieselben
@@ -515,9 +522,9 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
       personenZusammenfuehren: (art, bleibt, weg) => setzen(personenZusammenfuehren(aktuell.current, art, bleibt, weg)),
       profilSetzen: (werte, bl) => setzen(profilSetzen(aktuell.current, werte, bl)),
       erledigtSetzen: (pid, datum, termin) => setzen(erledigtSetzen(aktuell.current, pid, datum, termin)),
-      ausgeben: (id, daten, pdfSha256, absender) => {
+      ausgeben: (id, daten, pdfSha256, absender, eRechnung) => {
         if (!ausgabeMoeglich(aktuell.current, id, daten)) return false;
-        setzen(ausgeben(aktuell.current, id, new Date(), daten, pdfSha256, absender));
+        setzen(ausgeben(aktuell.current, id, new Date(), daten, pdfSha256, absender, eRechnung));
         // Festschreibung sofort speichern, nicht erst nach der Wartezeit (G3)
         schreiben();
         return true;

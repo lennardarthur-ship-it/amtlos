@@ -25,6 +25,13 @@ describe("Store-Texte (E-132) halten die Grenzen des App Store ein", () => {
     expect(s.beschreibung).toMatch(/Nutzungsbedingungen: https:\/\/www\.apple\.com\/legal\/internet-services\/itunes\/dev\/stdeula\//);
     expect(s.beschreibung).toMatch(/E-Rechnung \(XRechnung\)[^\n]*\(Pro\)/);
     expect(s.beschreibung).toMatch(/Steuerberatung[^\n]*\(Pro\)/);
+    // E-156: Rechnungen kostenlos; Erinnerungen, Kontrollmappe und Pflicht-Details gekennzeichnet; Prüfhinweise mit Testweg
+    expect(s.beschreibung).toMatch(/Rechnungen als PDF ohne Limit/);
+    expect(s.beschreibung).toMatch(/Erinnerung[^\n]*\(Pro\)/);
+    expect(s.beschreibung).toMatch(/Kontrollmappe[^\n]*\(Pro\)/);
+    expect(s.beschreibung).not.toMatch(/5 Rechnungen/);
+    expect(s.pruefhinweise).toMatch(/1 template per calendar month/);
+    expect(s.pruefhinweise).toMatch(/How to see the paywall/);
     // XRechnung an Behörden braucht die Leitweg-ID – die App fragt sie nicht ab, also kein Versprechen
     expect(JSON.stringify(s)).not.toMatch(/Behörde/);
     expect((s.neu as string).length).toBeGreaterThan(0);

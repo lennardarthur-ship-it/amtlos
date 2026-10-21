@@ -22,7 +22,7 @@ import { BetriebTeilSeite } from "./Absender";
 import { handwerkLaut, ohneZahlungsweg } from "./rechnungHinweise";
 import { Ablauf, fehltJeSchritt } from "./Ablauf";
 import { useProSperre } from "./Pro";
-import { FREI_JE_MONAT, ausgabeErlaubt, betriebFuerDokument, uebrig, zaehltFuerKontingent } from "../pro/regeln";
+import { VORLAGEN_FREI_JE_MONAT, ausgabeErlaubt, betriebFuerDokument, eRechnungErlaubt, uebrig, zaehltFuerKontingent } from "../pro/regeln";
 import { Ansage, useAnsage } from "./felder";
 
 /**
@@ -59,7 +59,7 @@ export function useTeilen(id: string) {
     if (!u || !v) return;
     setFehler(null);
     if (v.kundendokument && fehltFuer(z.stand, u).length) return setFehler(TEXT.erst_vollstaendig);
-    // Freikontingent (E-132): erneutes Teilen und Stornos gehen immer
+    // E-156: Rechnungen immer, Vorlagen mit Pro oder als kostenlose Vorlage des Monats; erneutes Teilen und Stornos gehen immer
     if (!ausgabeErlaubt(z.stand.unterlagen, u, z.pro, new Date()) && !sperre("pdf")) return;
     setLaedt(art === "teilen");
     // der Inhalt, aus dem das PDF entsteht (H1): Ändert er sich, während das Teilen-Menü offen ist (z. B. durch die
@@ -88,7 +88,8 @@ export function useTeilen(id: string) {
     const v = u ? vorlageFuer(u.vorlage) : undefined;
     if (!u || !v?.eRechnung) return;
     setFehler(null);
-    if (!sperre("e_rechnung")) return;
+    // E-156: Erstellen gehört zu Pro – eine schon einmal geteilte E-Rechnung geht immer wieder hinaus
+    if (!eRechnungErlaubt(u, z.pro) && !sperre("e_rechnung")) return;
     const absender = absenderFuer(z.stand, u);
     const { daten, fehlt } = eRechnungAus(u.daten, absender);
     const alle = [...new Set([...fehltFuer(z.stand, u), ...fehlt])];
@@ -97,12 +98,19 @@ export function useTeilen(id: string) {
     const xmlDaten = u.daten;
     try {
       // R12 GoBD: eine festgeschriebene Rechnung gibt ihr festgehaltenes Original weiter
-      if (await dateiTeilen(`E-Rechnung-${dateinamenTeil(daten.nummer, 60) || "ohne-Nummer"}.xml`, u.festgeschrieben && u.xml ? u.xml : xrechnungUbl(daten, KU_HINWEIS), "application/xml") && !z.ausgeben(id, xmlDaten, undefined, absender)) melden(TEXT.pdf_geaendert, "info");
+      if (await dateiTeilen(`E-Rechnung-${dateinamenTeil(daten.nummer, 60) || "ohne-Nummer"}.xml`, u.festgeschrieben && u.xml ? u.xml : xrechnungUbl(daten, KU_HINWEIS), "application/xml") && !z.ausgeben(id, xmlDaten, undefined, absender, true)) melden(TEXT.pdf_geaendert, "info");
     } catch {
       setFehler(TEXT.e_rechnung_fehler);
     }
   };
-  return { laedt, fehler, eFehlt, los: () => ausgabe("teilen"), drucken: () => ausgabe("drucken"), eRechnung };
+  // ohne Pro und ohne freie Vorlage: „PDF teilen · Pro“ – man soll nicht erst beim Tippen gegen den Bezahlschirm laufen
+  const u = z.stand.unterlagen.find((x) => x.id === id);
+  const frei = !u || ausgabeErlaubt(z.stand.unterlagen, u, z.pro, new Date());
+  // E-156: ohne Pro bei einer noch nie ausgegebenen Vorlage – wie viele Vorlagen diesen Monat noch frei sind (über dem Knopf)
+  const zaehlt = Boolean(u && !z.pro && !u.ausgegeben && zaehltFuerKontingent(u) && !(typeof u.daten.storno_zu === "string" && u.daten.storno_zu));
+  const rest = zaehlt ? uebrig(z.stand.unterlagen, new Date()) : 0;
+  const kontingent = zaehlt ? { text: TEXT.pro_rest(rest, VORLAGEN_FREI_JE_MONAT), leer: rest === 0 } : null;
+  return { laedt, fehler, eFehlt, frei, kontingent, los: () => ausgabe("teilen"), drucken: () => ausgabe("drucken"), eRechnung };
 }
 
 
@@ -129,8 +137,8 @@ function VorschauSeite({ id }: { id: string }) {
           <Vorschau html={dokumentHtml(v, u.daten, betriebFuerDokument(absenderFuer(z.stand, u), z.pro))} quer={v.querformat} />
         </View>
       </View>
-      <Fuss ueber={teilen.fehler ? <Ansage text={teilen.fehler} farbe={f.frist} /> : festschreibenHinweis(v, Boolean(u.festgeschrieben)) ? <T v="caption" leise>{festschreibenHinweis(v, Boolean(u.festgeschrieben))}</T> : null}>
-        <Knopf text={TEXT.pdf_teilen} symbol="square.and.arrow.up" laedt={teilen.laedt} onPress={() => void teilen.los()} stil={{ flex: 1 }} />
+      <Fuss ueber={teilen.fehler ? <Ansage text={teilen.fehler} farbe={f.frist} /> : teilen.kontingent ? <T v="caption" leise>{teilen.kontingent.text}</T> : festschreibenHinweis(v, Boolean(u.festgeschrieben)) ? <T v="caption" leise>{festschreibenHinweis(v, Boolean(u.festgeschrieben))}</T> : null}>
+        <Knopf text={TEXT.mitPro(TEXT.pdf_teilen, teilen.frei)} symbol="square.and.arrow.up" laedt={teilen.laedt} onPress={() => void teilen.los()} stil={{ flex: 1 }} />
       </Fuss>
     </Unterseite>
   );
@@ -166,8 +174,6 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
   // Prüfungen außerhalb der Schritte: einem Schritt zuordnen, wenn ein Feld dort so heißt; sonst „Mein Betrieb“ bzw. ohne Sprung
   const extra = alle.filter((x) => !imFormular.has(x)).map((x) => ({ text: x, schritt: x === NUMMER_DOPPELT ? nummerSchritt : schrittFuer(v, x), betrieb: x.includes("Mein Betrieb") }));
   const html = dokumentHtml(v, d, betriebFuerDokument(absenderFuer(z.stand, u), z.pro));
-  const rest = uebrig(z.stand.unterlagen, new Date());
-  const zaehlt = !z.pro && !u.ausgegeben && zaehltFuerKontingent(u) && !(typeof d.storno_zu === "string" && d.storno_zu);
   const ergebnis = v.ergebnis?.(d) ?? [];
   const fertig = alle.length === 0;
   const datumDe = (iso: string) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(iso));
@@ -283,7 +289,6 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
         {!fest
           ? (v.hinweise?.(d, z.stand.betrieb, { kleinunternehmer: typeof z.stand.profil["ust.kleinunternehmer"] === "boolean" ? (z.stand.profil["ust.kleinunternehmer"] as boolean) : null, handwerk: handwerkLaut(z.stand.profil) }) ?? []).map((h) => <Hinweis key={h} art="warnung" text={h} />)
           : null}
-        {zaehlt ? <T v="caption" leise stil={{ marginTop: 4 }}>{TEXT.pro_rest(rest, FREI_JE_MONAT)}</T> : null}
         {/* Phase 1 (RDG): in der App, nie im PDF – die Unterlage gehört dem Betrieb; Rechnungen ohne (Geschäftsvorgang) */}
         {mitVorlagenHinweis(v) ? <RechtsHinweis art="vorlage" oben={4} /> : null}
         <T v="caption" leise stil={{ marginTop: 4 }}>{PRUEFHINWEIS}</T>
@@ -292,8 +297,8 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
         {eFehlt.length ? <ERechnungFehlt v={v} fehlt={eFehlt} springen={springen} gesperrt={fest} /> : null}
         <Karte>
           {[
-            ...(v.eRechnung && eRechnung ? [{ symbol: "doc.text", titel: TEXT.mitPro(TEXT.e_rechnung, z.pro), los: () => void eRechnung() }] : []),
-            { symbol: "printer", titel: TEXT.drucken, los: () => void druckenLos() },
+            ...(v.eRechnung && eRechnung ? [{ symbol: "doc.text", titel: TEXT.mitPro(TEXT.e_rechnung, eRechnungErlaubt(u, z.pro)), los: () => void eRechnung() }] : []),
+            { symbol: "printer", titel: TEXT.mitPro(TEXT.drucken, ausgabeErlaubt(z.stand.unterlagen, u, z.pro, new Date())), los: () => void druckenLos() },
             ...(v.alsText ? [{ symbol: "doc.on.doc", titel: TEXT.als_text, los: () => void Share.share({ message: v.alsText!(d, z.stand.betrieb) }).catch(() => undefined) }] : []),
             {
               symbol: "plus.circle",

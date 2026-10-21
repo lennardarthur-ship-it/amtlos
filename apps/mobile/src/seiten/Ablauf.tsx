@@ -354,9 +354,14 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
             amAbschluss && teilen.fehler ? (
               // direkt über dem Knopf – oben im Inhalt sähe man den Hinweis nach dem Scrollen nicht
               <Ansage text={teilen.fehler} farbe={f.frist} />
+            ) : amAbschluss && teilen.kontingent?.leer ? (
+              // E-156: die kostenlose Vorlage des Monats ist verbraucht – darum „PDF teilen · Pro“
+              <T v="caption" leise>{teilen.kontingent.text}</T>
             ) : amAbschluss && !absenderFehlt && festschreibenHinweis(vorlage, fest) ? (
               // vor dem ersten Teilen: was das Teilen bewirkt – direkt über dem Knopf, ohne Rückfrage
               <T v="caption" leise>{vorlage.korrektur ? TEXT.r12p_wird_festgeschrieben : festschreibenHinweis(vorlage, fest)}</T>
+            ) : amAbschluss && teilen.kontingent ? (
+              <T v="caption" leise>{teilen.kontingent.text}</T>
             ) : !amAbschluss && letzteZahl && !/^0,00\s/.test(letzteZahl[1]) ? (
               <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                 <T v="klein" leise>{letzteZahl[0]}</T>
@@ -374,7 +379,7 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
             <>
               {/* R12 (Zoll #2): festgeschriebener Nachweis – Korrektur als neue Fassung mit Grund */}
               {fest && vorlage.korrektur ? <Knopf ton symbol="pencil" text={TEXT.r12p_korrigieren} onPress={() => nav.oeffnen(`korrektur-${id}`, () => <KorrekturSeite id={id} />, true)} stil={{ flex: 1 }} /> : null}
-              <Knopf text={TEXT.pdf_teilen} symbol="square.and.arrow.up" laedt={teilen.laedt} onPress={() => void teilen.los()} stil={{ flex: 1 }} />
+              <Knopf text={TEXT.mitPro(TEXT.pdf_teilen, teilen.frei)} symbol="square.and.arrow.up" laedt={teilen.laedt} onPress={() => void teilen.los()} stil={{ flex: 1 }} />
             </>
           ) : (
             <Knopf text={schritt === n - 1 ? TEXT.zum_dokument : TEXT.weiter} onPress={() => gehe(schritt + 1)} stil={{ flex: 1 }} />

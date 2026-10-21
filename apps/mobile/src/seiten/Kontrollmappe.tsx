@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Platform, Pressable, View } from "react-native";
 import { BEREICHE, dokumentHtml, pdfDateiname, vorlageFuer } from "@amtlos/fachlogik";
-import { betriebFuerDokument } from "../pro/regeln";
+import { betriebFuerDokument, kontrollmappeErlaubt } from "../pro/regeln";
+import { useProSperre } from "./Pro";
 import { T as TEXT } from "../texte";
 import { ChipLeiste, Feld, Fuss, Hinweis, Karte, Knopf, MehrfachWahl, Schalter, Symbol, T, Zeile } from "../ui/bausteine";
 import { useMeldung, useMeldungLeeren } from "../ui/meldung";
@@ -21,32 +22,42 @@ import { useAmtlos } from "../zustand";
 import { Ansage } from "./felder";
 import { Gruppe, Inhalt } from "./gemeinsam";
 
-/** Eine Unterlage zum An- und Abwählen: Kästchen, Titel, Datum und ob sie schon geteilt ist. */
-function MappenZeile({ e, an, umschalten, letzte }: { e: MappenEintrag; an: boolean; umschalten: () => void; letzte: boolean }) {
+/**
+ * Eine Unterlage zum An- und Abwählen: Kästchen, Titel, Datum und ob sie schon geteilt ist. E-156: Das Auge öffnet
+ * die Unterlage selbst – so bleibt jede einzeln erreichbar, auch ohne Pro (die Mappe als PDF gehört zu Pro).
+ */
+function MappenZeile({ e, an, umschalten, letzte, oeffnen }: { e: MappenEintrag; an: boolean; umschalten: () => void; letzte: boolean; oeffnen?: () => void }) {
   const f = useFarben();
   // R12 (Zoll #12): „Aufzeichnung bis … · geteilt am …“, Entwürfe „nicht abgeschlossen“, NachwG „gültig ab …“
   const zusatz = eintragZusatz(e);
   const unter = e.aufzeichnungBis || e.gueltigAb || e.datei || e.html || e.korrekturLaeuft ? zusatz : e.geteilt ? (e.geteiltAm && e.geteiltAm !== e.datum ? TEXT.r12p_mappe_geteilt_am(datumDe(e.datum), datumDe(e.geteiltAm)) : TEXT.kontrollmappe_geteilt(datumDe(e.datum))) : TEXT.kontrollmappe_entwurf(datumDe(e.datum));
   return (
-    <Pressable
-      accessibilityRole="checkbox"
-      accessibilityState={{ checked: an }}
-      aria-checked={an}
-      accessibilityLabel={`${e.titel}, ${unter}`}
-      onPress={() => {
-        weich();
-        umschalten();
-      }}
-      style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 14, opacity: pressed ? 0.6 : 1 })}
-    >
-      <View style={{ width: 24, height: 24, borderRadius: 7, borderWidth: an ? 0 : 2, borderColor: f.rahmen, backgroundColor: an ? f.amt : f.papier, alignItems: "center", justifyContent: "center" }}>
-        {an ? <Symbol name="checkmark" groesse={14} farbe={f.amtText} gewicht="bold" /> : null}
-      </View>
-      <View style={{ flex: 1, minWidth: 0, paddingVertical: 13, minHeight: 58, justifyContent: "center", borderBottomWidth: letzte ? 0 : HAARLINIE, borderColor: f.linie }}>
-        <T fett={an} leise={!an}>{e.titel}</T>
-        <T v="klein" leise stil={{ marginTop: 1 }}>{unter}</T>
-      </View>
-    </Pressable>
+    <View style={{ flexDirection: "row", alignItems: "center", borderBottomWidth: letzte ? 0 : HAARLINIE, borderColor: f.linie }}>
+      <Pressable
+        accessibilityRole="checkbox"
+        accessibilityState={{ checked: an }}
+        aria-checked={an}
+        accessibilityLabel={`${e.titel}, ${unter}`}
+        onPress={() => {
+          weich();
+          umschalten();
+        }}
+        style={({ pressed }) => ({ flex: 1, flexDirection: "row", alignItems: "center", gap: 14, opacity: pressed ? 0.6 : 1 })}
+      >
+        <View style={{ width: 24, height: 24, borderRadius: 7, borderWidth: an ? 0 : 2, borderColor: f.rahmen, backgroundColor: an ? f.amt : f.papier, alignItems: "center", justifyContent: "center" }}>
+          {an ? <Symbol name="checkmark" groesse={14} farbe={f.amtText} gewicht="bold" /> : null}
+        </View>
+        <View style={{ flex: 1, minWidth: 0, paddingVertical: 13, minHeight: 58, justifyContent: "center" }}>
+          <T fett={an} leise={!an}>{e.titel}</T>
+          <T v="klein" leise stil={{ marginTop: 1 }}>{unter}</T>
+        </View>
+      </Pressable>
+      {oeffnen ? (
+        <Pressable accessibilityRole="button" accessibilityLabel={TEXT.mappe_unterlage_oeffnen(e.titel)} onPress={oeffnen} hitSlop={6} style={({ pressed }) => ({ width: 44, height: 44, alignItems: "center", justifyContent: "center", opacity: pressed ? 0.6 : 1 })}>
+          <Symbol name="eye" groesse={18} farbe={f.amt} />
+        </Pressable>
+      ) : null}
+    </View>
   );
 }
 
@@ -98,6 +109,7 @@ export function KontrollmappeSeite() {
   const tag = heute();
   const { eintraege: alleEintraege, unvollstaendigListe } = useMemo(() => mappenAuswahl(z.stand), [z.stand]);
   const oeffnen = useOeffnen();
+  const sperre = useProSperre();
   // Kontrollart (R10): nur, was die jeweilige Stelle prüft
   const [art, setArt] = useState<Kontrollart>("alle");
   // R12 (Bäckerei #7): Mappe für eine Betriebsstätte
@@ -157,6 +169,8 @@ export function KontrollmappeSeite() {
 
   const los = async () => {
     setFehler(null);
+    // E-156: die Mappe zusammenstellen und teilen gehört zu Pro
+    if (!kontrollmappeErlaubt(z.pro) && !sperre("kontrollmappe")) return;
     if (Platform.OS === "web") {
       setFehler(TEXT.kontrollmappe_web);
       return;
@@ -235,6 +249,7 @@ export function KontrollmappeSeite() {
           <ChipLeiste label={TEXT.r12p_mappe_staette_label} wert={staette ?? "alle"} aendern={(w) => setStaette(w === "alle" ? null : w)} optionen={[{ wert: "alle", text: TEXT.r12p_mappe_alle_staetten }, ...staetten.map((x) => ({ wert: x.id, text: x.name }))]} stil={{ marginTop: 14 }} />
         ) : null}
         {art === "zoll" ? <View style={{ marginTop: 12 }}><Hinweis art="info" symbol="printer" text={TEXT.r12p_mappe_bereithalten} /></View> : null}
+        {!z.pro ? <View style={{ marginTop: 12 }}><Hinweis symbol="sparkles" text={TEXT.pro_mappe_frei} /></View> : null}
         {fehlt.length ? (
           <Gruppe titel={TEXT.kontrollmappe_fehlt_titel} hilfe={TEXT.kontrollmappe_fehlt_hilfe}>
             <Karte>
@@ -281,7 +296,7 @@ export function KontrollmappeSeite() {
             <Gruppe key={g.id} titel={g.titel} hilfe={gi === 0 ? TEXT.kontrollmappe_gruppe_hilfe : undefined}>
               <Karte>
                 {g.liste.map((e, i) => (
-                  <MappenZeile key={e.id} e={e} an={!ab.has(e.id)} umschalten={() => umschalten(e.id)} letzte={i === g.liste.length - 1} />
+                  <MappenZeile key={e.id} e={e} an={!ab.has(e.id)} umschalten={() => umschalten(e.id)} letzte={i === g.liste.length - 1} oeffnen={!e.datei && !e.html && !e.daten && z.stand.unterlagen.some((x) => x.id === e.id) ? () => oeffnen(e.id) : undefined} />
                 ))}
               </Karte>
             </Gruppe>
@@ -321,7 +336,7 @@ export function KontrollmappeSeite() {
           fehler ? <Ansage text={fehler} farbe={f.frist} /> : gewaehlt.length ? <T v="caption" leise accessibilityLiveRegion="polite">{TEXT.kontrollmappe_auswahl(gewaehlt.length, eintraege.length)}</T> : <T v="caption" leise accessibilityLiveRegion="polite">{eintraege.length ? TEXT.r11_mappe_nichts_gewaehlt : TEXT.r11_mappe_leer_knopf}</T>
         }
       >
-        <Knopf text={gewaehlt.length ? TEXT.kontrollmappe_teilen(gewaehlt.length) : TEXT.r11_mappe_teilen} symbol="square.and.arrow.up" laedt={laedt} deaktiviert={!gewaehlt.length} onPress={() => void los()} stil={{ flex: 1 }} />
+        <Knopf text={z.pro && gewaehlt.length ? TEXT.kontrollmappe_teilen(gewaehlt.length) : TEXT.mitPro(TEXT.r11_mappe_teilen, z.pro)} symbol="square.and.arrow.up" laedt={laedt} deaktiviert={!gewaehlt.length} onPress={() => void los()} stil={{ flex: 1 }} />
       </Fuss>
     </Unterseite>
   );

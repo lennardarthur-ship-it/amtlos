@@ -17,6 +17,8 @@ import { BuehnenBlatt, BuehnenKnopf, BuehnenSeite, Gruppe, Inhalt, RechtsHinweis
 import { useOeffnen, useStarten } from "./starten";
 import { useErstellen } from "./Erstellen";
 import { Jahresraster } from "./Jahresraster";
+import { useProSperre } from "./Pro";
+import { erinnerungenAbgleichen, erinnerungenAktiv, pflichtAnsicht } from "../pro/regeln";
 
 const datumDe = (iso: string) => datumKurz(`${iso}T12:00:00Z`);
 const TAG_LANG = new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", weekday: "long", day: "numeric", month: "long", year: "numeric" });
@@ -57,11 +59,13 @@ function PflichtDetail({ id }: { id: string }) {
   const oeffnen = useOeffnen();
   const melden = useMeldung();
   const a = useAuswertung();
-  const p = [...a.gilt, ...a.gruendung, ...a.beiEinstellung, ...a.unbekannt].find((x) => x.id === id);
-  if (!p) return <Unterseite titel="">{null}</Unterseite>;
+  const roh = [...a.gilt, ...a.gruendung, ...a.beiEinstellung, ...a.unbekannt].find((x) => x.id === id);
+  if (!roh) return <Unterseite titel="">{null}</Unterseite>;
+  // E-156: ohne Pro der Überblick (Titel, Kurztext, Termin, Abhaken) – die Details als kurzer Hinweis auf Pro
+  const p = pflichtAnsicht(roh, z.pro);
   // schon angefangen? Dann die vorhandene Unterlage öffnen statt mit „Ausfüllen“ eine zweite anzulegen
   const vorhanden = p.vorlage ? z.stand.unterlagen.filter((u) => u.vorlage === p.vorlage && !u.storniertDurch).sort((x, y) => (y.ausgegeben ?? y.geaendert).localeCompare(x.ausgegeben ?? x.geaendert))[0] : undefined;
-  const gilt = a.gilt.includes(p) || a.gruendung.includes(p) || a.beiEinstellung.includes(p);
+  const gilt = a.gilt.includes(roh) || a.gruendung.includes(roh) || a.beiEinstellung.includes(roh);
   const abgehakt = istErledigt(p, { ...z.stand, unterlagen: [] });
   // wiederkehrend: der Haken gilt für den nächsten Termin, danach ist die Pflicht wieder offen
   // R11 (Nutzertest Gründerin #7, E-087): erst abhakbar, wenn die Voraussetzungen erledigt sind (z. B. ELSTER-Konto vor dem Fragebogen)
@@ -99,6 +103,7 @@ function PflichtDetail({ id }: { id: string }) {
         <>
           {/* R10 UI (Mehmet #24): schon durch eine Unterlage erledigt – kein zweites „Erledigt“ daneben */}
           {durchUnterlage && !bestaetigen ? null : <Knopf ton text={abgehakt ? (bestaetigen ? TEXT.r10_bestaetigen_entfernen : TEXT.haken_entfernen_kurz) : bestaetigen ?? TEXT.als_erledigt_kurz} symbol={abgehakt ? "xmark" : "checkmark"} onPress={abhaken} stil={{ flex: 1 }} />}
+          {/* die eigene Unterlage öffnet immer; die Vorlage zur Pflicht starten gehört zu den Pro-Details (E-156) */}
           {vorhanden ? <Knopf text={TEXT.unterlage_oeffnen_kurz} onPress={() => oeffnen(vorhanden.id)} stil={{ flex: 1.3 }} /> : <Knopf text={TEXT.unterlage_erstellen_kurz} symbol="plus" onPress={() => starten(p.vorlage!)} stil={{ flex: 1.3 }} />}
         </>
       ) : (
@@ -153,6 +158,7 @@ function PflichtDetail({ id }: { id: string }) {
       {gilt && p.erledigung.art === "laufend" ? <Hinweis text={p.erledigung.zeitraum ? TEXT.r10_laufend(p.erledigung.zeitraum, zeitraumText(heute())) : TEXT.r10_laufend_termin} /> : null}
       {gilt && bestaetigen && !abgehakt ? <Hinweis text={TEXT.r10_bestaetigen_hinweis(bestaetigen)} /> : null}
       {p.wiederkehrend && p.naechsterTermin ? <Hinweis text={TEXT.wiederkehrend_hinweis(datumDe(p.naechsterTermin))} /> : null}
+      {p.teaser ? <ProTeaser /> : null}
       <Karte stil={{ marginTop: 8, paddingTop: 0 }}>
         {p.grund ? zeile(TEXT.warum, p.grund) : null}
         {/* der Termin steht oben auf der Bühne – hier nur, wenn die Pflicht abgehakt ist */}
@@ -161,6 +167,11 @@ function PflichtDetail({ id }: { id: string }) {
         {zeile(TEXT.einstufung, TEXT.schwere[p.schwere])}
       </Karte>
       {p.erklaerung ? <T v="klein" stil={{ marginTop: 16 }}>{p.erklaerung}</T> : null}
+      {p.sanktion ? (
+        <Gruppe titel={TEXT.folgen}>
+          <T v="klein">{p.sanktion}</T>
+        </Gruppe>
+      ) : null}
       {gilt && p.vorlagen.length > 1 ? (
         // mehrere Vorlagen zu einer Pflicht (z. B. Gefahrstoffverzeichnis und Betriebsanweisung): alle zum Ausfüllen
         <Gruppe titel={TEXT.vorlagen_zur_pflicht}>
@@ -187,6 +198,22 @@ function PflichtDetail({ id }: { id: string }) {
       ) : null}
       <RechtsHinweis art="pflichten" />
     </BuehnenBlatt>
+  );
+}
+
+/** E-156: an Stelle der Pflicht-Details ohne Pro – was Pro dazu zeigt, ein Knopf zum Bezahlschirm. */
+function ProTeaser() {
+  const f = useFarben();
+  const sperre = useProSperre();
+  return (
+    <View style={{ marginTop: 8, padding: 16, borderRadius: 14, backgroundColor: f.amtHauch, gap: 4 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+        <Symbol name="sparkles" groesse={18} farbe={f.amtTief} />
+        <T fett farbe={f.amtTief} stil={{ flex: 1 }}>{TEXT.pro_pflicht_teaser_titel}</T>
+      </View>
+      <T v="klein">{TEXT.pro_pflicht_teaser_text}</T>
+      <TextKnopf symbol="chevron.right" text={TEXT.pro_pflicht_teaser_knopf} onPress={() => void sperre("pflicht_details")} />
+    </View>
   );
 }
 
@@ -291,7 +318,7 @@ function PflichtenInhalt() {
         </Gruppe>
       ) : (
         <Gruppe erste={!kernOffen.length} titel={TEXT.jetzt_dran(0)}>
-          <Hinweis art="erfolg" text={nichtsDranText(z.stand.erinnerungen)} />
+          <Hinweis art="erfolg" text={nichtsDranText(erinnerungenAktiv(z.stand.erinnerungen, z.pro))} />
         </Gruppe>
       )}
       <SchonErledigt />
@@ -561,21 +588,29 @@ export function PflichtenTab() {
   );
 }
 
-/** Lokale Erinnerungen an Fristen einschalten (ohne Server). */
+/**
+ * Lokale Erinnerungen an Fristen einschalten (ohne Server). E-156: Mitteilungen gehören zu Pro – die Fristen selbst
+ * stehen für alle in der App. Ohne Pro öffnet der Schalter den Bezahlschirm; wird Pro dort aktiv, fragt Amtlos nach
+ * der Erlaubnis und schaltet ein. Im Web (Vorschau, Rundgang) gibt es keine Mitteilungen – dort steht der Schalter nur
+ * ohne Pro, als Weg zum Bezahlschirm.
+ */
 function ErinnerungsSchalter() {
   const z = useAmtlos();
+  const sperre = useProSperre();
   const [fehler, setFehler] = useState(false);
-  if (!erinnerungenMoeglich) return null;
+  if (!erinnerungenMoeglich && z.pro) return null;
+  const einschalten = () => void erlaubnisAnfragen().then((ok) => (ok ? z.erinnerungenSetzen(true) : setFehler(true)));
   return (
     <Karte stil={{ marginTop: 16, paddingBottom: 12 }}>
       <Schalter
-        label={TEXT.erinnern}
-        hilfe={TEXT.erinnern_hilfe}
-        wert={z.stand.erinnerungen}
+        label={TEXT.mitPro(TEXT.erinnern, z.pro)}
+        hilfe={z.pro ? TEXT.erinnern_hilfe : TEXT.erinnern_hilfe_frei}
+        wert={erinnerungenAktiv(z.stand.erinnerungen, z.pro)}
         aendern={(an) => {
           setFehler(false);
           if (!an) return z.erinnerungenSetzen(false);
-          void erlaubnisAnfragen().then((ok) => (ok ? z.erinnerungenSetzen(true) : setFehler(true)));
+          if (!sperre("erinnerungen", erinnerungenMoeglich ? einschalten : undefined)) return;
+          einschalten();
         }}
       />
       {/* bleibt stehen, bis man es erneut versucht – mit dem Weg in die Einstellungen */}
@@ -593,14 +628,17 @@ function ErinnerungsSchalter() {
 export function ErinnerungsPlaner() {
   const z = useAmtlos();
   const a = useAuswertung();
-  const plan = useMemo(() => (z.stand.erinnerungen ? erinnerungsPlan(a, z.stand, heute()) : []), [a, z.stand]);
+  // E-156: Mitteilungen nur mit Pro – endet Pro, werden die geplanten abgesagt; kommt Pro (wieder), neu geplant
+  const aktiv = erinnerungenAktiv(z.stand.erinnerungen, z.pro);
+  const plan = useMemo(() => (aktiv ? erinnerungsPlan(a, z.stand, heute()) : []), [a, z.stand, aktiv]);
   const schluessel = JSON.stringify(plan);
   useEffect(() => {
-    if (!erinnerungenMoeglich || !z.bereit) return;
-    const zeit = setTimeout(() => void (z.stand.erinnerungen ? planen(plan) : allesAbsagen()).catch(() => undefined), 800);
+    // erst absagen, wenn feststeht, dass Pro fehlt (Store-Antwort beim Start) – sonst verschwänden Mitteilungen kurz
+    if (!erinnerungenMoeglich || !z.bereit || !z.proBekannt) return;
+    const zeit = setTimeout(() => void erinnerungenAbgleichen(z.stand.erinnerungen, z.pro, plan, { planen, allesAbsagen }).catch(() => undefined), 800);
     return () => clearTimeout(zeit);
-    // nur bei geändertem Plan neu setzen (der Plan steckt im Schlüssel)
-  }, [schluessel, z.stand.erinnerungen, z.bereit]);
+    // nur bei geändertem Plan oder Pro-Stand neu setzen (der Plan steckt im Schlüssel)
+  }, [schluessel, z.stand.erinnerungen, z.pro, z.proBekannt, z.bereit]);
   return null;
 }
 
