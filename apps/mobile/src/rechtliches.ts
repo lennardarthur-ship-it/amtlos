@@ -4,7 +4,7 @@
  */
 export const ANBIETER = {
   /** Firma mit Rechtsform, z. B. „Amtlos GmbH“ */
-  name: "",
+  name: "Lang Ventures UG (haftungsbeschränkt)",
   /** Straße, PLZ, Ort – ladungsfähige Anschrift (§ 5 DDG) */
   anschrift: "",
   /** vertretungsberechtigte Person(en) */
