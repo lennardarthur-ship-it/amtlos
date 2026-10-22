@@ -1,7 +1,7 @@
 # Katalog B.14 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.stammkapital_einzahlen
-version: 3
+version: 4
 katalog_nr: B.14
 titel:
   de: Stammkapital einzahlen
@@ -39,9 +39,8 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: mittel
-dringend_ohne_termin: true
+    de: 'Wer in der Anmeldung falsch versichert, dass die Einlagen geleistet sind, macht sich strafbar: Freiheitsstrafe bis zu drei Jahren oder Geldstrafe (§ 82 Abs. 1 Nr. 1 GmbHG). Vor der Eintragung besteht die Gesellschaft als solche nicht; wer in ihrem Namen handelt, haftet persönlich (§ 11 Abs. 1, 2 GmbHG).'
+  schwere: hoch
 automatisierung: hinweis
 aktion:
   art: abhaken
@@ -53,11 +52,16 @@ quellen:
 - titel: GmbH-Gesetz
   url: https://www.gesetze-im-internet.de/gmbhg/
   abgerufen: null
+- titel: § 82 GmbHG, Wortlaut (lxgesetze.de)
+  url: https://lxgesetze.de/gmbhg/82
+  abgerufen: '2026-10-22'
+- titel: § 11 GmbHG, Wortlaut (lexmea.de)
+  url: https://lexmea.de/de/gesetz/gmbhg/11
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'R12 (Rechtsprüfung Befund 16): ein Viertel je Geschäftsanteil, insgesamt mindestens 12.500 € (§ 7 Abs. 2 GmbHG), UG voll und bar (§ 5a Abs. 2), Versicherung in der Anmeldung (§ 8 Abs. 2) – Plausibilitätsprüfung im Handelsregister-Datenblatt (Mindestkapital, volle Euro) offen'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Folge der Nichteinzahlung selbst (Ablehnung der Eintragung, § 9c GmbHG) nicht gelesen; Strafnorm betrifft die falsche Versicherung); Schwere nach Vorprüfung wieder „hoch“, dringend_ohne_termin entfernt'
 pruefung:
   status: entwurf
   geprueft_von: null

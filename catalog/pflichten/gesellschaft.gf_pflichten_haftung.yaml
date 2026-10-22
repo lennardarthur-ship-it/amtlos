@@ -1,7 +1,7 @@
 # Katalog B.17 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.gf_pflichten_haftung
-version: 4
+version: 5
 katalog_nr: B.17
 titel:
   de: Pflichten und Haftung der Geschäftsführung kennen
@@ -34,7 +34,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Wer als Geschäftsführung ihre Pflichten verletzt, haftet der Gesellschaft für den Schaden (§ 43 Abs. 2 GmbHG) und für Steuern, die deshalb nicht oder nicht rechtzeitig festgesetzt oder gezahlt werden (§ 69 AO). Zahlungen nach Eintritt der Insolvenzreife muss sie der Gesellschaft erstatten (§ 15b Abs. 1, 4 InsO). Wer Sozialversicherungsbeiträge nicht abführt, macht sich strafbar: Freiheitsstrafe bis zu fünf Jahren oder Geldstrafe (§ 266a Abs. 1 StGB). Wer den Verlust der Hälfte des Stammkapitals nicht anzeigt, wird mit Freiheitsstrafe bis zu drei Jahren oder Geldstrafe bestraft, bei Fahrlässigkeit bis zu einem Jahr (§ 84 GmbHG). Für eine nicht eingereichte Gesellschafterliste haftet die Geschäftsführung den Betroffenen und den Gläubigern (§ 40 Abs. 3 GmbHG).'
   schwere: mittel
 automatisierung: hinweis
 einordnung: hinweis
@@ -47,12 +47,30 @@ quellen:
 - titel: GmbH-Gesetz
   url: https://www.gesetze-im-internet.de/gmbhg/
   abgerufen: null
+- titel: GmbH-Gesetz § 43
+  url: https://www.gesetze-im-internet.de/gmbhg/__43.html
+  abgerufen: '2026-10-22'
+- titel: Abgabenordnung § 69 (Haftung der Vertreter)
+  url: https://www.gesetze-im-internet.de/ao_1977/__69.html
+  abgerufen: '2026-10-22'
+- titel: § 15b InsO, Wortlaut (lxgesetze.de)
+  url: https://lxgesetze.de/inso/15b
+  abgerufen: '2026-10-22'
+- titel: Strafgesetzbuch § 266a
+  url: https://www.gesetze-im-internet.de/stgb/__266a.html
+  abgerufen: '2026-10-22'
+- titel: § 84 GmbHG, Wortlaut (lexmea.de)
+  url: https://lexmea.de/en/gesetz/gmbhg/84
+  abgerufen: '2026-10-22'
+- titel: GmbH-Gesetz § 40
+  url: https://www.gesetze-im-internet.de/gmbhg/__40.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'R12 (Rechtsprüfung Befunde 1 und 10): Kapitalerhaltung (§§ 30, 31, 43 Abs. 3 GmbHG) ergänzt; GmbH & Co. KG einbezogen – Übertragung auf die KG (Auszahlungen an Kommanditisten, § 30 GmbHG entsprechend) bestätigen'
 - Normen aus dem Nutzertest Tischlerei (R11) ergänzt – Auswahl und Rechtsgrundlage § 43 GmbHG bestätigen
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Inhalt der Erklärung (welche Pflichten, § 43 GmbHG) fachlich festlegen – Spezifikation nennt nur „Pflichten und Haftung erklären“
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Folgen je genannter Vorschrift aus dem Wortlaut; Schwere „mittel“ belassen (Hinweis-Pflicht) – „hoch“ fachlich erwägen)'
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf

@@ -1,7 +1,7 @@
 # Katalog C.32 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.aufbewahrung
-version: 2
+version: 3
 katalog_nr: C.32
 titel:
   de: Unterlagen aufbewahren
@@ -29,7 +29,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 25.000 €, wenn Unterlagen nach § 147 Abs. 1 AO nicht oder nicht für die vorgeschriebene Dauer aufbewahrt werden und dadurch Steuerverkürzungen ermöglicht werden (§ 379 Abs. 1 Satz 1 Nr. 7, Abs. 6 AO); für Rechnungen nach § 14b UStG bis 5.000 € (§ 26a Abs. 2 Nr. 2, Abs. 3 UStG). Werden Handelsbücher vor Ablauf der Fristen beiseitegeschafft oder vernichtet, ist das strafbar, wenn später die Zahlungen eingestellt werden oder ein Insolvenzverfahren eröffnet oder mangels Masse abgelehnt wird (§ 283b Abs. 1 Nr. 2, Abs. 3 StGB).'
   schwere: mittel
 automatisierung: hinweis
 aenderungsnotiz:
@@ -44,9 +44,21 @@ quellen:
 - titel: Handelsgesetzbuch § 257
   url: https://www.gesetze-im-internet.de/hgb/__257.html
   abgerufen: null
+- titel: Abgabenordnung § 379 (Steuergefährdung)
+  url: https://www.gesetze-im-internet.de/ao_1977/__379.html
+  abgerufen: '2026-10-22'
+- titel: UStG § 26a (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/ustg_1980/__26a.html
+  abgerufen: '2026-10-22'
+- titel: Strafgesetzbuch § 283b
+  url: https://www.gesetze-im-internet.de/stgb/__283b.html
+  abgerufen: '2026-10-22'
+- titel: Strafgesetzbuch § 283 (Abs. 6)
+  url: https://www.gesetze-im-internet.de/stgb/__283.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Fristbeginn (Ende des Kalenderjahres) und Aufbewahrungsdauern als Regelwerte führen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (§ 379 Abs. 1 Nr. 7 setzt voraus, dass Steuerverkürzungen ermöglicht werden; Schwere „mittel“ belassen – „hoch“ fachlich erwägen)'
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf

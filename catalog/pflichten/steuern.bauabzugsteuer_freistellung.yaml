@@ -1,7 +1,7 @@
 # Katalog C.35 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.bauabzugsteuer_freistellung
-version: 2
+version: 3
 katalog_nr: C.35
 titel:
   de: Freistellungsbescheinigung für Bauleistungen beantragen
@@ -43,7 +43,7 @@ kanal: post
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Ohne gültige Freistellungsbescheinigung muss dein Auftraggeber 15 % der Gegenleistung einbehalten und für dich ans Finanzamt abführen, sofern die Gegenleistungen im Kalenderjahr 5.000 € (bei bestimmten Vermietern 15.000 €) übersteigen (§ 48 Abs. 1 Satz 1, Abs. 2 Satz 1 EStG).'
   schwere: mittel
 automatisierung: hinweis
 status_recht: in_kraft
@@ -53,11 +53,14 @@ quellen:
 - titel: Einkommensteuergesetz § 48b
   url: https://www.gesetze-im-internet.de/estg/__48b.html
   abgerufen: null
+- titel: Einkommensteuergesetz § 48
+  url: https://www.gesetze-im-internet.de/estg/__48.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Auch Handwerksbetriebe mit Bauleistungen erfassen (Branche handwerk)?
 - Gültigkeitsdauer der Bescheinigung und Erneuerung ergänzen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Grenze 15.000 € gilt für Leistungsempfänger mit ausschließlich steuerfreien Umsätzen nach § 4 Nr. 12 UStG)'
 pruefung:
   status: entwurf
   geprueft_von: null

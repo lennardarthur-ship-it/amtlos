@@ -1,7 +1,7 @@
 # Katalog C.28 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.buchfuehrungspflicht
-version: 4
+version: 5
 katalog_nr: C.28
 titel:
   de: Doppelte Buchführung
@@ -117,9 +117,8 @@ kanal: partner
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: mittel
-dringend_ohne_termin: true
+    de: 'Bußgeld bis 25.000 €, wenn buchungspflichtige Geschäftsvorfälle nicht oder unrichtig aufgezeichnet werden und dadurch Steuerverkürzungen ermöglicht werden (§ 379 Abs. 1 Satz 1 Nr. 3, Abs. 6 AO). Wer gesetzlich vorgeschriebene Handelsbücher nicht führt oder die Bilanz nicht rechtzeitig aufstellt, macht sich strafbar, wenn später die Zahlungen eingestellt werden oder ein Insolvenzverfahren eröffnet oder mangels Masse abgelehnt wird: Freiheitsstrafe bis zu zwei Jahren oder Geldstrafe (§ 283b Abs. 1 Nr. 1, 3, Abs. 3 StGB).'
+  schwere: hoch
 automatisierung: partner
 erledigung:
   art: bestaetigen
@@ -142,14 +141,22 @@ quellen:
 - titel: Handelsgesetzbuch § 238
   url: https://www.gesetze-im-internet.de/hgb/__238.html
   abgerufen: null
+- titel: Abgabenordnung § 379 (Steuergefährdung)
+  url: https://www.gesetze-im-internet.de/ao_1977/__379.html
+  abgerufen: '2026-10-22'
+- titel: Strafgesetzbuch § 283b
+  url: https://www.gesetze-im-internet.de/stgb/__283b.html
+  abgerufen: '2026-10-22'
+- titel: Strafgesetzbuch § 283 (Abs. 6)
+  url: https://www.gesetze-im-internet.de/stgb/__283.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - 'e. K. nach § 241a HGB (R10, Steuerprüfung): Zwei-Jahres-Betrachtung vereinfacht über das Vorjahr bzw. im Gründungsjahr über die Schätzung; Jahresüberschuss = angegebener Gewinn'
 - Im Gründungsjahr und vor dem Start gibt es keine Vorjahreswerte – § 141-Grenzen dann als nicht überschritten behandelt
 - '§ 141 AO erst nach Mitteilung des Finanzamts (§ 141 Abs. 2 AO) über die Frage „Mitteilung erhalten?“ umgesetzt (R10, Steuerprüfung)'
 - Grenze inklusive/exklusive
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen; Schwere nach Vorprüfung wieder „hoch“, dringend_ohne_termin entfernt'
 - 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
   status: entwurf

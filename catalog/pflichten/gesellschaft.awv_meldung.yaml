@@ -1,7 +1,7 @@
 # Katalog B.21 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.awv_meldung
-version: 2
+version: 3
 katalog_nr: B.21
 titel:
   de: Auslandszahlungen nach AWV melden
@@ -30,7 +30,7 @@ kanal: portal
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 30.000 €, wenn eine meldepflichtige Zahlung nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig gemeldet wird (§ 81 Abs. 2 Nr. 19 AWV in Verbindung mit § 19 Abs. 3 Nr. 1 Buchst. b, Abs. 6 AWG).'
   schwere: mittel
 automatisierung: hinweis
 status_recht: in_kraft
@@ -40,12 +40,21 @@ quellen:
 - titel: Außenwirtschaftsverordnung
   url: https://www.gesetze-im-internet.de/awv_2013/
   abgerufen: null
+- titel: Außenwirtschaftsverordnung § 81
+  url: https://www.gesetze-im-internet.de/awv_2013/__81.html
+  abgerufen: '2026-10-22'
+- titel: Außenwirtschaftsgesetz § 19
+  url: https://www.gesetze-im-internet.de/awg_2013/__19.html
+  abgerufen: '2026-10-22'
+- titel: Außenwirtschaftsverordnung § 67
+  url: https://www.gesetze-im-internet.de/awv_2013/__67.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Meldegrenze als Regelwert erfassen (nicht in der Spezifikation)
 - Meldefrist ergänzen
 - Auch ohne Investoren bei Auslandszahlungen über der Grenze – weiterer Auslöser?
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (§ 81 Abs. 2 Nr. 19 AWV (Meldung nach § 67 Abs. 1) und § 19 Abs. 6 AWG gelesen; Meldegrenze laut § 67 Abs. 2 Nr. 1 AWV 50.000 € – Erklärung nennt keine Grenze, ggf. ergänzen)'
 pruefung:
   status: entwurf
   geprueft_von: null

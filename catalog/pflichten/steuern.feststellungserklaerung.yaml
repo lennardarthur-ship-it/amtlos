@@ -1,7 +1,7 @@
 # R10: neu (Steuerprüfung: bei Personengesellschaften gibt die Gesellschaft die Feststellungserklärung ab, § 180 AO; die Gesellschafter die ESt)
 schema_version: 1
 id: steuern.feststellungserklaerung
-version: 1
+version: 2
 katalog_nr: C.27
 titel:
   de: Erklärung zur gesonderten und einheitlichen Feststellung abgeben
@@ -50,7 +50,7 @@ kanal: elster
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Gibst du die Erklärung zu spät ab, kann das Finanzamt einen Verspätungszuschlag festsetzen; wird sie nicht binnen 14 Monaten nach Ablauf des Kalenderjahres abgegeben, muss es das in der Regel. Er beträgt für jeden angefangenen Monat 25 €, höchstens 25.000 € (§ 152 Abs. 6, Abs. 10 AO). Die Abgabe kann das Finanzamt außerdem mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO).'
   schwere: mittel
 automatisierung: formular_vorausfuellen
 status_recht: in_kraft
@@ -63,10 +63,19 @@ quellen:
 - titel: Abgabenordnung § 149 (Abgabe der Steuererklärungen)
   url: https://dejure.org/gesetze/AO/149.html
   abgerufen: 2026-10-13
+- titel: Abgabenordnung § 152 (Verspätungszuschlag)
+  url: https://www.gesetze-im-internet.de/ao_1977/__152.html
+  abgerufen: '2026-10-22'
+- titel: Abgabenordnung § 328 (Zwangsmittel)
+  url: https://www.gesetze-im-internet.de/ao_1977/__328.html
+  abgerufen: '2026-10-22'
+- titel: § 329 AO (Zwangsgeld), Wortlaut (lexetius.com)
+  url: https://lexetius.com/AO/329,2
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Neu nach Steuerprüfung R10 (§ 180 AO, eindeutig); Fristen wie bei der Einkommensteuer (§ 149 AO über § 181 Abs. 1 AO) übernommen – bestätigen'
 - 'Ausnahme für Gesellschaften mit nur einem Beteiligten bzw. Fälle ohne Feststellung (§ 180 Abs. 3 AO) nicht abgebildet'
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (§ 152 Abs. 6 AO (Erklärungen zur gesonderten Feststellung) gelesen)'
 pruefung:
   status: entwurf
   geprueft_von: null

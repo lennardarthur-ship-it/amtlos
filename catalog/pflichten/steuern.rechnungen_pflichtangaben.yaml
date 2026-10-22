@@ -1,7 +1,7 @@
 # Katalog C.29 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.rechnungen_pflichtangaben
-version: 2
+version: 3
 katalog_nr: C.29
 titel:
   de: Rechnungen mit allen Pflichtangaben schreiben
@@ -26,7 +26,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: '§ 26a UStG nennt kein eigenes Bußgeld für fehlende Pflichtangaben; wer eine Rechnung nicht oder nicht rechtzeitig ausstellt, riskiert bis 5.000 € (§ 26a Abs. 2 Nr. 1, Abs. 3 UStG). Weist du mehr Umsatzsteuer aus, als du schuldest, oder Steuer, obwohl du dazu nicht berechtigt bist, schuldest du den ausgewiesenen Betrag (§ 14c Abs. 1, 2 UStG). Dein Kunde braucht eine Rechnung nach § 14 UStG für den Vorsteuerabzug (§ 15 Abs. 1 Satz 1 Nr. 1 Satz 2 UStG).'
   schwere: mittel
 automatisierung: hinweis
 aktion:
@@ -42,10 +42,19 @@ quellen:
 - titel: Umsatzsteuergesetz § 14
   url: https://www.gesetze-im-internet.de/ustg_1980/__14.html
   abgerufen: null
+- titel: UStG § 26a (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/ustg_1980/__26a.html
+  abgerufen: '2026-10-22'
+- titel: Umsatzsteuergesetz § 14c
+  url: https://www.gesetze-im-internet.de/ustg_1980/__14c.html
+  abgerufen: '2026-10-22'
+- titel: § 15 UStG, Wortlaut (lxgesetze.de)
+  url: https://lxgesetze.de/ustg/15
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Liste der Pflichtangaben und Kleinbetragsgrenze als Inhalt ergänzen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Kleinunternehmer mit Steuerausweis als Fall des § 14c Abs. 2 nicht ausdrücklich im Wortlaut – bestätigen)'
 pruefung:
   status: entwurf
   geprueft_von: null

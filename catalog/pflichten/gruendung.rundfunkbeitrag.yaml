@@ -1,7 +1,7 @@
 # Katalog A.9 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gruendung.rundfunkbeitrag
-version: 2
+version: 3
 katalog_nr: A.9
 titel:
   de: Rundfunkbeitrag für Betriebsstätten und Firmenfahrzeuge zahlen
@@ -40,7 +40,7 @@ kanal: portal
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Ordnungswidrig handelt, wer den Beginn der Beitragspflicht nicht fristgerecht anzeigt oder den Beitrag länger als sechs Monate nicht zahlt; verfolgt wird nur auf Antrag der Landesrundfunkanstalt (§ 12 Abs. 1 Nr. 1, 3, Abs. 3 RBStV). Eine Höhe nennt der Staatsvertrag nicht – dann gilt bis 1.000 € (§ 17 Abs. 1 OWiG).'
   schwere: mittel
 automatisierung: hinweis
 erledigung:
@@ -57,12 +57,18 @@ quellen:
 - titel: Rundfunkbeitragsstaatsvertrag § 5 (Bayern.Recht)
   url: https://www.gesetze-bayern.de/Content/Document/RBeitrStV-5
   abgerufen: '2026-10-21'
+- titel: Rundfunkbeitragsstaatsvertrag § 12 (Bayern.Recht)
+  url: https://www.gesetze-bayern.de/Content/Document/RBeitrStV-12
+  abgerufen: '2026-10-22'
+- titel: § 17 OWiG, Wortlaut (lxgesetze.de)
+  url: https://lxgesetze.de/owig/17
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'R12 (Rechtsprüfung Befund 7, T-101): Wohnung frei (§ 5 Abs. 5 Nr. 3), Kfz (§ 5 Abs. 2 Nr. 2), Staffel (§ 5 Abs. 1) – Wortlaut über Bayern.Recht geprüft; laufende Pflicht je Betriebsstätte statt Gründungsschritt'
 - Anzeigepflichten nach § 8 RBStV (Frist, jährliche Meldung geänderter Beschäftigtenzahlen?) bestätigen; Hotel- und Gästezimmer (§ 5 Abs. 2 Nr. 1) nicht abgebildet
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Höhe nach Zahl der Beschäftigten – Staffel als Regelwert?
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (§ 12 RBStV über Bayern.Recht gelesen (Staatsvertrag, in allen Ländern gleich))'
 pruefung:
   status: entwurf
   geprueft_von: null

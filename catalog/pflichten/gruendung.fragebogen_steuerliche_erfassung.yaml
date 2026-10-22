@@ -1,7 +1,7 @@
 # Katalog A.5 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gruendung.fragebogen_steuerliche_erfassung
-version: 3
+version: 4
 katalog_nr: A.5
 titel:
   de: Fragebogen zur steuerlichen Erfassung abgeben
@@ -40,7 +40,7 @@ kanal: elster
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: '§ 379 Abs. 2 Nr. 1 AO erfasst nur Mitteilungen nach § 138 Abs. 2 AO – für die Angaben zur steuerlichen Erfassung ist kein eigenes Bußgeld vorgesehen. Das Finanzamt kann sie mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO).'
   schwere: mittel
 dringend_ohne_termin: true
 automatisierung: formular_vorausfuellen
@@ -61,10 +61,19 @@ quellen:
 - titel: Abgabenordnung § 138
   url: https://www.gesetze-im-internet.de/ao_1977/__138.html
   abgerufen: null
+- titel: Abgabenordnung § 379 (Steuergefährdung)
+  url: https://www.gesetze-im-internet.de/ao_1977/__379.html
+  abgerufen: '2026-10-22'
+- titel: Abgabenordnung § 328 (Zwangsmittel)
+  url: https://www.gesetze-im-internet.de/ao_1977/__328.html
+  abgerufen: '2026-10-22'
+- titel: § 329 AO (Zwangsgeld), Wortlaut (lexetius.com)
+  url: https://lexetius.com/AO/329,2
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Fristbeginn: Aufnahme der Tätigkeit = Gründungsdatum im Profil? bestätigen'
 - Verschiebung bei Fristende am Wochenende/Feiertag festlegen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Schwere „mittel“ mit dringend_ohne_termin belassen: Wortlaut ergibt kein Bußgeld, „hoch“ fachlich entscheiden)'
 - 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 pruefung:
   status: entwurf

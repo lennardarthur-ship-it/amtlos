@@ -1,7 +1,7 @@
 # R12 (Rechtsprüfung Befund 6): Versicherungs-, Finanzanlagen- und Immobiliardarlehensvermittler – Vermittlerregister
 schema_version: 1
 id: gruendung.vermittlerregister
-version: 2
+version: 3
 katalog_nr: A.3
 titel:
   de: Ins Vermittlerregister eintragen lassen
@@ -36,9 +36,8 @@ kanal: portal
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: mittel
-dringend_ohne_termin: true
+    de: 'Bußgeld bis 5.000 €, wenn du dich als Versicherungs- oder Finanzanlagenvermittler nicht, nicht richtig oder nicht rechtzeitig eintragen lässt oder Änderungen nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig mitteilst (§ 144 Abs. 2 Nr. 8, 9, Abs. 4 GewO).'
+  schwere: hoch
 automatisierung: hinweis
 erledigung:
   art: bestaetigen
@@ -54,10 +53,13 @@ quellen:
 - titel: Gewerbeordnung § 11a
   url: https://www.gesetze-im-internet.de/gewo/__11a.html
   abgerufen: null
+- titel: § 144 GewO, Wortlaut (lxgesetze.de)
+  url: https://lxgesetze.de/gewo/144
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Neu nach Rechtsprüfung R12 (Befund 6) – § 11a Abs. 1 GewO nennt § 34d Abs. 10, § 34f Abs. 5, § 34h Abs. 1 S. 4 und § 34i Abs. 8; Versicherungsberater (§ 34e) bestätigen
-- Frist „unverzüglich nach Aufnahme der Tätigkeit“ je Vorschrift bestätigen; Folgen fachlich ergänzen
-- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
+- Frist „unverzüglich nach Aufnahme der Tätigkeit“ je Vorschrift bestätigen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Nr. 8 nennt § 34d Abs. 10 Satz 1, § 34f Abs. 5 oder 6 Satz 1; Nr. 9 auch § 34i Abs. 8 Nr. 3 – Eintragung nach § 34h und § 34i ohne eigenen Bußgeldtatbestand gefunden); Schwere nach Vorprüfung wieder „hoch“, dringend_ohne_termin entfernt'
 pruefung:
   status: entwurf
   geprueft_von: null

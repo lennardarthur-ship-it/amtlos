@@ -1,7 +1,7 @@
 # Katalog B.18 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.offenlegung_abweichendes_gj
-version: 3
+version: 4
 katalog_nr: B.18
 titel:
   de: Jahresabschluss offenlegen (abweichendes Geschäftsjahr)
@@ -35,9 +35,8 @@ kanal: portal
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: mittel
-dringend_ohne_termin: true
+    de: 'Das Bundesamt für Justiz setzt ein Ordnungsgeld von 2.500 € bis 25.000 € fest (§ 335 Abs. 1 HGB). Wird die Offenlegung erst nach der Androhung nachgeholt, kann es herabgesetzt werden – bei Kleinstkapitalgesellschaften auf 500 €, bei kleinen Gesellschaften auf 1.000 € (§ 335 Abs. 4 HGB).'
+  schwere: hoch
 automatisierung: hinweis
 status_recht: in_kraft
 gueltig_ab: null
@@ -46,12 +45,14 @@ quellen:
 - titel: Handelsgesetzbuch § 325
   url: https://www.gesetze-im-internet.de/hgb/__325.html
   abgerufen: null
+- titel: § 335 HGB, Wortlaut (lxgesetze.de)
+  url: https://lxgesetze.de/hgb/335
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'R12 (Rechtsprüfung Befund 1): GmbH & Co. KG (§ 264a HGB) einbezogen'
 - 'Frist: Termin für abweichendes Geschäftsjahr berechnen (Angabe des Geschäftsjahresendes im Profil nötig)'
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Text wie gesellschaft.offenlegung; § 335 Abs. 1 und 4 HGB über lxgesetze gelesen); Schwere nach Vorprüfung wieder „hoch“, dringend_ohne_termin entfernt'
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
-- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 pruefung:
   status: entwurf
   geprueft_von: null

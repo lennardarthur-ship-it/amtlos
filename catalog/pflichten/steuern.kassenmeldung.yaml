@@ -1,7 +1,7 @@
 # Katalog C.33 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.kassenmeldung
-version: 4
+version: 5
 katalog_nr: C.33
 titel:
   de: Elektronische Kasse beim Finanzamt melden
@@ -40,7 +40,7 @@ kanal: elster
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: '§ 379 AO nennt die Mitteilung nach § 146a Abs. 4 AO nicht – ein eigenes Bußgeld ist dafür nicht vorgesehen. Das Finanzamt kann die Mitteilung mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO).'
   schwere: mittel
 dringend_ohne_termin: true
 automatisierung: formular_vorausfuellen
@@ -56,12 +56,21 @@ gueltig_bis: null
 quellen:
 - titel: Abgabenordnung § 146a
   url: https://www.gesetze-im-internet.de/ao_1977/__146a.html
-  abgerufen: null
+  abgerufen: '2026-10-22'
+- titel: Abgabenordnung § 379 (Steuergefährdung)
+  url: https://www.gesetze-im-internet.de/ao_1977/__379.html
+  abgerufen: '2026-10-22'
+- titel: Abgabenordnung § 328 (Zwangsmittel)
+  url: https://www.gesetze-im-internet.de/ao_1977/__328.html
+  abgerufen: '2026-10-22'
+- titel: § 329 AO (Zwangsgeld), Wortlaut (lexetius.com)
+  url: https://lexetius.com/AO/329,2
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Verschiebung auf den nächsten Werktag nach § 108 Abs. 3 AO (Steuerprüfung R11 Befund 19, „dürfte greifen“, unsicher) – bestätigen'
 - 'Bestandskassen (Meldefrist 31.7.2025): Pflicht für Kassen ohne gemeldetes Anschaffungsdatum abbilden'
 - Verschiebung bei Fristende am Wochenende festlegen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Schwere „mittel“ mit dringend_ohne_termin belassen: Wortlaut ergibt kein Bußgeld, „hoch“ fachlich entscheiden)'
 - 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (§ 379 Abs. 1 Satz 1 AO (gelesen auf gesetze-im-internet) nennt § 146a nur mit Abs. 1 (Nr. 4–6: Verwendung, Schutz, Vertrieb); Nr. 7 betrifft die Aufbewahrung nach § 147 AO. Eine Bußgeldnorm für die Mitteilung nach § 146a Abs. 4 AO wurde nicht gefunden – der Vorschlag „§ 379 Abs. 1 Nr. 7 AO, bis 25.000 €“ aus dem Prüfbericht trifft nicht zu) – nach Ergänzung wieder „hoch“'
 pruefung:
   status: entwurf

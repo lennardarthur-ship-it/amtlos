@@ -1,7 +1,7 @@
 # Katalog C.30 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.e_rechnung_versand_2028
-version: 1
+version: 2
 katalog_nr: C.30
 titel:
   de: E-Rechnungen versenden (ab 2028)
@@ -42,7 +42,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: '§ 26a UStG nennt kein eigenes Bußgeld für die falsche Form. Eine Rechnung, die nicht als vorgeschriebene E-Rechnung ausgestellt wird, erfüllt § 14 UStG nicht – dein Kunde braucht eine solche Rechnung aber für den Vorsteuerabzug (§ 15 Abs. 1 Satz 1 Nr. 1 Satz 2 UStG). Wer eine Rechnung nicht oder nicht rechtzeitig ausstellt, riskiert ein Bußgeld bis 5.000 € (§ 26a Abs. 2 Nr. 1, Abs. 3 UStG).'
   schwere: mittel
 automatisierung: hinweis
 aktion:
@@ -54,9 +54,18 @@ quellen:
 - titel: Umsatzsteuergesetz § 14
   url: https://www.gesetze-im-internet.de/ustg_1980/__14.html
   abgerufen: null
+- titel: UStG § 26a (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/ustg_1980/__26a.html
+  abgerufen: '2026-10-22'
+- titel: § 15 UStG, Wortlaut (lxgesetze.de)
+  url: https://lxgesetze.de/ustg/15
+  abgerufen: '2026-10-22'
+- titel: § 14 UStG, Wortlaut (lxgesetze.de)
+  url: https://lxgesetze.de/ustg/14
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Rechtsstatus und gueltig_ab festlegen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Text wie steuern.e_rechnung_versand_2027; ob eine Papierrechnung im Pflichtbereich als „nicht ausgestellt“ im Sinne von § 26a Abs. 2 Nr. 1 gilt, offen)'
 pruefung:
   status: entwurf
   geprueft_von: null

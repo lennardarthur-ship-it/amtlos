@@ -1,7 +1,7 @@
 # Katalog C.25 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: steuern.zusammenfassende_meldung
-version: 4
+version: 5
 katalog_nr: C.25
 titel:
   de: Zusammenfassende Meldung abgeben
@@ -67,7 +67,7 @@ kanal: elster
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Bußgeld bis 5.000 €, wenn die Zusammenfassende Meldung nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig abgegeben oder nicht rechtzeitig berichtigt wird (§ 26a Abs. 2 Nr. 5, Abs. 3 UStG).'
   schwere: mittel
 automatisierung: formular_vorausfuellen
 aenderungsnotiz:
@@ -79,10 +79,13 @@ quellen:
 - titel: Umsatzsteuergesetz § 18a
   url: https://www.gesetze-im-internet.de/ustg_1980/__18a.html
   abgerufen: null
+- titel: UStG § 26a (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/ustg_1980/__26a.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Termine nach Steuerprüfung R11 (Befund 16): 25. nach Ablauf des Meldezeitraums; nur sonstige Leistungen vierteljährlich, mit Warenlieferungen monatlich (Wahl vierteljährlich bis 50.000 € je Quartal nicht abgefragt); Verschiebung nach § 108 Abs. 3 AO bestätigen'
 - 'Kleinunternehmer ausgenommen (§ 18a Abs. 4 UStG, Steuerprüfung R11 „eindeutig“)'
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Zuständig ist das Bundeszentralamt für Steuern (§ 26a Abs. 4 UStG))'
 - 'Steuerliche Prüfung 21.10.2026 (C-9): Pflicht mit Frist bestätigt; Zuordnung in der Vorlage – Lieferungen nach Rechnungsdatum (spätestens Monat nach der Lieferung, § 18a Abs. 8 UStG), sonstige Leistungen nach Ausführung – bestätigen'
 pruefung:
   status: entwurf

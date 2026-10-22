@@ -1,7 +1,7 @@
 # R11 (Nutzertest Gründerin Foodtruck): Reisegewerbekarte als eigene Pflicht, aus gruendung.erlaubnis_pruefen herausgelöst
 schema_version: 1
 id: gruendung.reisegewerbekarte
-version: 3
+version: 4
 katalog_nr: A.3
 titel:
   de: Reisegewerbekarte beantragen (§ 55 GewO)
@@ -42,9 +42,8 @@ kanal: portal
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: mittel
-dringend_ohne_termin: true
+    de: 'Bußgeld bis 5.000 €, wenn du ein Reisegewerbe ohne die erforderliche Erlaubnis nach § 55 Abs. 2 GewO betreibst (§ 145 Abs. 1 Nr. 1 Buchst. b, Abs. 4 GewO).'
+  schwere: hoch
 automatisierung: hinweis
 erledigung:
   art: bestaetigen
@@ -57,13 +56,15 @@ quellen:
 - titel: Gewerbeordnung § 55
   url: https://www.gesetze-im-internet.de/gewo/__55.html
   abgerufen: null
+- titel: § 145 GewO, Wortlaut (lxgesetze.de)
+  url: https://lxgesetze.de/gewo/145
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'R12 (Rechtsprüfung Befund 15): Anzeigepflicht nach § 55c GewO für reisegewerbekartenfreie Tätigkeiten – welche Fälle, bestätigen'
 - 'Dauer des Verfahrens (Nutzertest R11: 4–6 Wochen, je Behörde verschieden) – Erinnerung sechs und zwei Wochen vorher als Vorlauf, bestätigen'
 - Ausnahmen für festgesetzte Märkte, Messen und Volksfeste (Titel IV GewO, § 55a) nur als Prüfhinweis – wann die Karte trotzdem nötig ist; Reisegewerbe neben stehendem Gewerbe (Gewerbeanzeige und Karte)
 - Unterlagen (Führungszeugnis, Auskunft aus dem Gewerbezentralregister) je Behörde bestätigen
-- Folgen bei Nichterfüllung – Sanktion fachlich ergänzen
-- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
+- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Für Finanzanlagenvermittlung im Reisegewerbe gilt Buchst. a (bis 50.000 €) – hier nicht genannt); Schwere nach Vorprüfung wieder „hoch“, dringend_ohne_termin entfernt'
 - 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
   status: entwurf
