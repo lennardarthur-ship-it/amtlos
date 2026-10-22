@@ -1,7 +1,7 @@
 # Katalog D.40 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.lohnsteuer_anmeldung
-version: 5
+version: 6
 katalog_nr: D.40
 titel:
   de: Lohnsteuer anmelden
@@ -62,8 +62,7 @@ kosten: null
 sanktion:
   text:
     de: 'Gibst du die Lohnsteuer-Anmeldung nicht oder nicht fristgerecht ab, kann das Finanzamt einen Verspätungszuschlag festsetzen. Er richtet sich nach Dauer und Häufigkeit der Fristüberschreitung und der Höhe der Steuer und beträgt höchstens 25.000 € (§ 152 Abs. 1, 8, 10 AO).'
-  schwere: mittel
-dringend_ohne_termin: true
+  schwere: hoch
 automatisierung: hinweis
 status_recht: in_kraft
 gueltig_ab: null
@@ -75,11 +74,6 @@ quellen:
 - titel: 'Abgabenordnung § 152'
   url: https://www.gesetze-im-internet.de/ao_1977/__152.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Grenzen nach § 41a Abs. 2 EStG (über 5.000 € monatlich, über 1.080 € vierteljährlich) aus der Steuerprüfung R11 (Befund 18) im Text – weiter als Angabe des Nutzers; Hochrechnung im ersten Jahr bestätigen'
-- Verschiebung bei Fristende am Wochenende/Feiertag bestätigen
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 152 AO amtlich gelesen: kein zwingender Zuschlag nach Abs. 2 (jährliche Lohnsteueranmeldung in Abs. 3 Nr. 4 ausgenommen), Bemessung nach Abs. 8 – ob Abs. 8 auch die jährliche Anmeldung erfasst, gegenlesen; Zwangsgeld und Säumniszuschlag nicht geprüft; Schwere bleibt bis zur fachlichen Bestätigung „mittel“) – fachlich zu bestätigen'
-- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 pruefung:
   status: entwurf
   geprueft_von: null

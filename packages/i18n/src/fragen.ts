@@ -164,8 +164,8 @@ export const SCHRITTE: Schritt[] = [
         art: "mehrfach",
         frage: { de: "Trifft eines davon auf dich zu?", en: "Does any of these apply to you?" },
         hilfe: {
-          de: "Bestimmte Selbstständige sind in der gesetzlichen Rentenversicherung pflichtversichert (§ 2 SGB VI) – Lehrende, Pflegepersonen und Selbstständige mit einem Auftraggeber nur, wenn sie regelmäßig keine versicherungspflichtigen Beschäftigten haben. Yoga-, Fitness- und Personal Trainer gelten in der Regel als Lehrende.",
-          en: "Certain self-employed people are compulsorily insured in the statutory pension scheme (§ 2 SGB VI) – teachers, carers and people with one client only if they regularly have no employees subject to insurance. Yoga, fitness and personal trainers usually count as teachers.",
+          de: "Bestimmte Selbstständige sind in der gesetzlichen Rentenversicherung pflichtversichert (§ 2 SGB VI) – Lehrende, Pflegepersonen und Selbstständige mit einem Auftraggeber nur, wenn sie regelmäßig keine versicherungspflichtigen Beschäftigten haben. Ein Minijobber zählt als versicherungspflichtig, wenn er sich nicht von der Rentenversicherungspflicht hat befreien lassen (§ 6 Abs. 1b SGB VI). Yoga-, Fitness- und Personal Trainer gelten in der Regel als Lehrende.",
+          en: "Certain self-employed people are compulsorily insured in the statutory pension scheme (§ 2 SGB VI) – teachers, carers and people with one client only if they regularly have no employees subject to insurance. A mini-jobber counts as subject to insurance unless exempted from compulsory pension insurance (§ 6 Abs. 1b SGB VI). Yoga, fitness and personal trainers usually count as teachers.",
         },
         optionen: {
           lehrende: { de: "Ich unterrichte (z. B. Lehrerin, Trainer, Coach)", en: "I teach (e.g. teacher, trainer, coach)" },
@@ -277,6 +277,16 @@ export const SCHRITTE: Schritt[] = [
         art: "janein",
         frage: { de: "Sind Investoren aus dem Ausland an deinem Unternehmen beteiligt oder geplant?", en: "Are investors from abroad involved in your business or planned?" },
         hilfe: { de: "Zum Beispiel Gesellschafter, stille Beteiligte oder Geldgeber mit Sitz im Ausland. Wenn nicht: Nein.", en: "For example shareholders, silent partners or backers based abroad. If not: No." },
+      },
+      // Freigabe Weber 22.10.2026 (B.21): AWV-Meldepflicht für alle Zahlungen von oder an Gebietsfremde über 50.000 €, nicht nur bei Investoren
+      {
+        feld: "auslandszahlungen.ueber_meldegrenze",
+        art: "janein",
+        frage: { de: "Erhältst du Zahlungen aus dem Ausland oder leistest du Zahlungen ins Ausland von mehr als 50.000 € je Zahlung?", en: "Do you receive payments from abroad or make payments abroad of more than €50,000 per payment?" },
+        hilfe: {
+          de: "Gemeint sind Zahlungen von oder an Personen und Unternehmen mit Sitz im Ausland, etwa Investorengeld, Darlehen oder Honorare. Zahlungen für die Ein- oder Ausfuhr von Waren zählen nicht. Wenn nicht: Nein.",
+          en: "This means payments from or to people and businesses based abroad, for example investor money, loans or fees. Payments for importing or exporting goods do not count. If not: No.",
+        },
       },
     ],
   },

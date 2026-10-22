@@ -1,7 +1,7 @@
 # Katalog D.40 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.sv_beitraege
-version: 2
+version: 3
 katalog_nr: D.40
 titel:
   de: Sozialversicherungsbeiträge zahlen
@@ -9,7 +9,7 @@ kurz:
   de: Die Beiträge zur Sozialversicherung sind am drittletzten Bankarbeitstag des Monats fällig.
 erklaerung:
   de: Fällig sind die Beiträge am drittletzten Bankarbeitstag des laufenden Monats. Das Lohnprogramm berechnet sie; die Krankenkassen
-    ziehen sie in der Regel ein.
+    ziehen sie in der Regel ein. Das gilt auch für die Beiträge an die Minijob-Zentrale.
 rechtsgrundlage:
 - § 23 SGB IV
 kategorie: personal
@@ -52,10 +52,6 @@ quellen:
 - titel: StGB § 266a
   url: https://www.gesetze-im-internet.de/stgb/__266a.html
   abgerufen: null
-fachlich_zu_pruefen:
-- 'Minijobs: Fälligkeit bei der Minijob-Zentrale gleich?'
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
-- 'Vorprüfung 21.10.2026: Sanktion ergänzt – § 24 Abs. 1 SGB IV gelesen; § 266a StGB nicht abgerufen (wie in personal.statusfeststellung_auftraggeber)'
 pruefung:
   status: entwurf
   geprueft_von: null

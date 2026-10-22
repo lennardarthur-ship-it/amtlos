@@ -1,4 +1,5 @@
 # Katalog B.17 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Offen (Produkt, kein Prüfpunkt): Fristen nach § 15a InsO als Regelwerte erfassen
 schema_version: 1
 id: gesellschaft.insolvenzantragspflicht
 version: 4
@@ -40,11 +41,6 @@ quellen:
 - titel: Insolvenzordnung § 15a
   url: https://www.gesetze-im-internet.de/inso/__15a.html
   abgerufen: null
-fachlich_zu_pruefen:
-- 'R12 (Rechtsprüfung Befunde 1 und 9): GmbH & Co. KG (§ 15a Abs. 1 S. 3 InsO); Sanktion § 15a Abs. 4, 5 InsO und Haftung § 15b InsO – bestätigen'
-- Fristen drei bzw. sechs Wochen (§ 15a Abs. 1 InsO) im Text ergänzt (R11, Nutzertest Tischlerei) – bestätigen
-- 'Fristen nach § 15a InsO als Regelwerte erfassen (Spezifikation: „Fristen aus Regeldaten“, Werte nicht genannt)'
-- 'Darstellung: allgemeine Information, keine Prüfung des Einzelfalls (RDG)'
 pruefung:
   status: entwurf
   geprueft_von: null

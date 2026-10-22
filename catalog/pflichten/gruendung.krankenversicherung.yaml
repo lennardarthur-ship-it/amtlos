@@ -1,17 +1,17 @@
 # Katalog A.10 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gruendung.krankenversicherung
-version: 1
+version: 2
 katalog_nr: A.10
 titel:
   de: Krankenversicherung über die Selbstständigkeit informieren
 kurz:
-  de: Sag deiner Krankenversicherung, dass du selbstständig bist. Hauptberuflich Selbstständige versichern sich selbst.
+  de: 'Sag deiner Krankenversicherung unverzüglich, dass du selbstständig bist. Hauptberuflich Selbstständige versichern sich selbst.'
 erklaerung:
-  de: Mit der Selbstständigkeit kann sich deine Krankenversicherung ändern. Wer hauptberuflich selbstständig ist, kümmert
-    sich selbst um seine Versicherung und die Beiträge.
+  de: 'Mit der Selbstständigkeit kann sich deine Krankenversicherung ändern. Das betrifft dich als Person – als Einzelunternehmerin, Gesellschafter oder, je nach Status, als Geschäftsführerin einer GmbH. Wer hauptberuflich selbstständig ist, kümmert sich selbst um seine Versicherung und die Beiträge. Machst du dich im Nebenerwerb selbstständig, teilst du der Kasse den Umfang mit, damit sie prüfen kann, ob die Selbstständigkeit hauptberuflich ist. Änderungen der Verhältnisse teilst du unverzüglich mit (§ 206 Abs. 1 SGB V).'
 rechtsgrundlage:
-- SGB V
+- § 206 Abs. 1 SGB V
+- § 5 Abs. 5 SGB V
 kategorie: gruendung
 ausloeser:
   immer: true
@@ -26,7 +26,7 @@ kanal: post
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Keine Sanktion für die Information selbst; Änderungen der Verhältnisse sind der Krankenkasse unverzüglich mitzuteilen (§ 206 Abs. 1 SGB V), Verstoß bis 2.500 € (§ 307 Abs. 1, 2 SGB V). Wer hauptberuflich selbstständig ist, verliert die Versicherungspflicht als Arbeitnehmer (§ 5 Abs. 5 SGB V) und muss sich freiwillig oder privat versichern.'
   schwere: mittel
 automatisierung: hinweis
 aktion:
@@ -38,12 +38,6 @@ quellen:
 - titel: Sozialgesetzbuch V
   url: https://www.gesetze-im-internet.de/sgb_5/
   abgerufen: null
-fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Für welche Rechtsformen und Rollen (z. B. GmbH-Geschäftsführer) gilt das?
-- 'Nebenerwerb: was genau ist zu melden?'
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf
   geprueft_von: null

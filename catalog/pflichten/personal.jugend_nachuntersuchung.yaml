@@ -1,14 +1,14 @@
 # R11 (Nutzertest Tischlerei Befund 7): Nachuntersuchung nach § 33 JArbSchG als eigene Pflicht
 schema_version: 1
 id: personal.jugend_nachuntersuchung
-version: 2
+version: 3
 katalog_nr: D.44
 titel:
   de: Ärztliche Nachuntersuchung Jugendlicher nach einem Jahr
 kurz:
   de: Ein Jahr nach Aufnahme der ersten Beschäftigung lässt du dir von Jugendlichen die Bescheinigung über die erste Nachuntersuchung vorlegen – nach neun Monaten erinnerst du sie daran.
 erklaerung:
-  de: 'Ein Jahr nach Aufnahme der ersten Beschäftigung lässt du dir von Jugendlichen die Bescheinigung über die erste Nachuntersuchung vorlegen; die Untersuchung darf höchstens drei Monate zurückliegen (§ 33 Abs. 1 JArbSchG). Neun Monate nach Beginn weist du die jugendliche Person nachdrücklich auf den Termin hin und forderst sie auf, die Nachuntersuchung machen zu lassen (§ 33 Abs. 1 Satz 2 JArbSchG). Liegt die Bescheinigung 14 Monate nach Aufnahme der ersten Beschäftigung nicht vor, darfst du die Person nicht weiter beschäftigen (§ 33 Abs. 3 JArbSchG). Amtlos rechnet ab der Einstellung und erinnert drei Monate vor dem Termin – hat die Person schon vorher anderswo gearbeitet, zählt der Beginn dieser ersten Beschäftigung. Die Erstuntersuchung vor Beginn ist eine eigene Pflicht. Ein Gesetzesantrag (BR-Drs. 735/25) will die Untersuchungen ändern; er ist nicht in Kraft.'
+  de: 'Ein Jahr nach Aufnahme der ersten Beschäftigung lässt du dir von Jugendlichen die Bescheinigung über die erste Nachuntersuchung vorlegen; die Untersuchung darf höchstens drei Monate zurückliegen (§ 33 Abs. 1 JArbSchG). Neun Monate nach Beginn weist du die jugendliche Person nachdrücklich auf den Termin hin und forderst sie auf, die Nachuntersuchung machen zu lassen (§ 33 Abs. 1 Satz 2 JArbSchG). Liegt die Bescheinigung 14 Monate nach Aufnahme der ersten Beschäftigung nicht vor, darfst du die Person nicht weiter beschäftigen (§ 33 Abs. 3 JArbSchG). Amtlos rechnet ab der Einstellung und erinnert drei Monate vor dem Termin – hat die Person schon vorher anderswo gearbeitet, zählt der Beginn dieser ersten Beschäftigung. Wechselt sie aus einem anderen Betrieb zu dir, genügt die dort vorgelegte Bescheinigung. Die Erstuntersuchung vor Beginn ist eine eigene Pflicht. Ein Gesetzesantrag (BR-Drs. 735/25) will die Untersuchungen ändern; er ist nicht in Kraft.'
 rechtsgrundlage:
 - § 33 Abs. 1, 3 JArbSchG
 kategorie: personal
@@ -56,9 +56,6 @@ quellen:
 - titel: Jugendarbeitsschutzgesetz (§§ 32, 33)
   url: https://www.gesetze-im-internet.de/jarbschg/BJNR009650976.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Prüfergebnis Sifa 22.10.2026: Bezug ist die Aufnahme der ersten Beschäftigung – Amtlos kennt nur die Einstellung und unterscheidet Jugendliche dabei nicht (Termin je Einstellung, Erinnerung drei Monate vorher = nach neun Monaten)'
-- 'Bußgeld (§ 58 JArbSchG) für § 33 nicht einzeln geprüft'
 pruefung:
   status: entwurf
   geprueft_von: null

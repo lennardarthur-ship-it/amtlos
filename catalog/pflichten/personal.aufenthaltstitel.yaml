@@ -1,7 +1,8 @@
 # R11 (Nutzertest Gebäudereinigung Befund 5): Prüf- und Aufbewahrungspflicht nach § 4a Abs. 5 AufenthG
+# Offen (Produkt, kein Prüfpunkt): Erinnerung zum Ablauf des Titels (Feld „gültig bis“ bei Mitarbeitern) – laut Freigabe Weber 22.10.2026 sinnvoll
 schema_version: 1
 id: personal.aufenthaltstitel
-version: 2
+version: 3
 katalog_nr: D.38
 titel:
   de: Aufenthaltstitel prüfen und Kopie aufbewahren
@@ -12,9 +13,10 @@ erklaerung:
   de: Wer nicht die Staatsangehörigkeit eines EU- oder EWR-Staats oder der Schweiz hat, darf nur arbeiten, wenn der Aufenthaltstitel
     das erlaubt. Als Arbeitgeber prüfst du vor Beginn, ob ein solcher Titel oder eine Erlaubnis zur Beschäftigung vorliegt, und
     bewahrst für die Dauer der Beschäftigung eine Kopie auf, auf Papier oder elektronisch (§ 4a Abs. 5 AufenthG). Achte auf das
-    Ablaufdatum des Titels.
+    Ablaufdatum des Titels. Endet die Beschäftigung vorzeitig, teilst du das der Ausländerbehörde binnen vier Wochen mit (§ 4a Abs. 5 S. 3 Nr. 3 AufenthG).
 rechtsgrundlage:
 - § 4a Abs. 5 AufenthG
+- § 98 Abs. 2a Nr. 2 AufenthG
 kategorie: personal
 ausloeser:
   all:
@@ -45,7 +47,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Wer jemanden ohne die erforderliche Erlaubnis beschäftigt, riskiert ein Bußgeld bis 500.000 € (§ 404 Abs. 2 Nr. 3, Abs. 3 SGB III).
+    de: Wer jemanden ohne die erforderliche Erlaubnis beschäftigt, riskiert ein Bußgeld bis 500.000 € (§ 404 Abs. 2 Nr. 3, Abs. 3 SGB III). Endet die Beschäftigung vorzeitig und teilst du das der Ausländerbehörde nicht binnen vier Wochen mit, riskierst du bis 30.000 € (§ 98 Abs. 2a Nr. 2, Abs. 5 AufenthG); für eine fehlende Kopie sieht § 98 AufenthG kein eigenes Bußgeld vor.
   schwere: hoch
 automatisierung: hinweis
 status_recht: in_kraft
@@ -61,11 +63,11 @@ quellen:
 - titel: § 404 SGB III, Wortlaut (lxgesetze.de)
   url: https://lxgesetze.de/sgb-iii/404
   abgerufen: '2026-10-21'
+- titel: '§ 98 AufenthG, Wortlaut (gesetze.legal)'
+  url: https://gesetze.legal/bund/aufenthg/98
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Neu nach Nutzertest R11 (Gebäudereinigung): Prüfung vor Beginn und Kopie für die Dauer der Beschäftigung (§ 4a Abs. 5 S. 3 AufenthG) – Wortlaut bestätigen'
-- 'Erinnerung zum Ablauf des Titels (Feld „gültig bis“ bei Mitarbeitern) noch nicht abgebildet'
-- 'Folgen bei Nichterfüllung (§ 404 SGB III) – Sanktion fachlich ergänzen'
-- 'Vorprüfung 21.10.2026: Sanktion ergänzt – § 404 Abs. 2 Nr. 3 (Beschäftigung entgegen § 4a Abs. 5 AufenthG) und Abs. 3 über lxgesetze gelesen'
+- 'Freigabe RA Dr. Weber 22.10.2026: Ergänzung „Bußgeld für fehlende Kopie/Mitteilung – § 98 Abs. 2a Nr. 1, 2, Abs. 5 AufenthG (Höhe am Wortlaut prüfen)“ nur teilweise umgesetzt: Laut Wortlaut (gesetze.legal, anwalt24.de, 22.10.2026) erfasst Abs. 2a Nr. 2 die Mitteilung nach § 4a Abs. 5 Satz 3 Nr. 3 (bis 30.000 €, Abs. 5) – übernommen; Abs. 2a Nr. 1 betrifft die Beauftragung mit Dienst- oder Werkleistungen (§ 4a Abs. 5 Satz 1, bis 500.000 €), für die Kopie (Satz 3 Nr. 2) gibt es keinen Tatbestand – Abweichung vom Prüfer bestätigen lassen'
 pruefung:
   status: entwurf
   geprueft_von: null

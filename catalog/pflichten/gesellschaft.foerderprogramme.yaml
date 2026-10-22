@@ -1,4 +1,5 @@
 # Katalog B.22 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Offen (Produkt, kein Prüfpunkt): Programme, Matching-Kriterien und Fristen je Land als Daten pflegen (Freigabe Weber 22.10.2026: keine rechtliche Anmerkung)
 schema_version: 1
 id: gesellschaft.foerderprogramme
 version: 3
@@ -54,10 +55,6 @@ quellen:
 - titel: Förderdatenbank des Bundes
   url: https://www.foerderdatenbank.de/
   abgerufen: null
-fachlich_zu_pruefen:
-- Option, keine Pflicht
-- Matching-Kriterien und Fristen je Programm fachlich hinterlegen
-- 'Nur noch bei Gründung, im Gründungs- und im Folgejahr (R11, Nutzertests Gründerin und Tischlerei) – Programme für Solo-Gründungen (Gründungszuschuss, Förderbanken der Länder, IHK-Beratung) je Land hinterlegen'
 pruefung:
   status: entwurf
   geprueft_von: null

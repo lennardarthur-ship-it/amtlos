@@ -1,7 +1,7 @@
-# R11 (Nutzertest Tischlerei Befund 16): digitaler Lohnnachweis an die Unfallversicherung nach § 99 SGB VII
+# R11 (Nutzertest Tischlerei Befund 16): digitaler Lohnnachweis an die Unfallversicherung (§ 165 Abs. 1 SGB VII i. V. m. § 99 SGB IV)
 schema_version: 1
 id: personal.lohnnachweis_bg
-version: 2
+version: 3
 katalog_nr: D.40
 titel:
   de: Lohnnachweis an die Berufsgenossenschaft
@@ -9,9 +9,10 @@ kurz:
   de: Einmal im Jahr meldest du der Berufsgenossenschaft die Arbeitsentgelte des Vorjahres – meist über das Lohnprogramm.
 erklaerung:
   de: Die Berufsgenossenschaft berechnet ihren Beitrag aus den Arbeitsentgelten. Dafür übermittelst du nach Ablauf jedes Kalenderjahres
-    den digitalen Lohnnachweis (§ 99 SGB VII), in der Regel über das Lohnprogramm oder deine Steuerberatung.
+    bis zum 16. Februar des Folgejahres den digitalen Lohnnachweis (§ 165 Abs. 1 SGB VII in Verbindung mit § 99 SGB IV), in der Regel über das Lohnprogramm oder deine Steuerberatung. Die Jahresmeldung zur Unfallversicherung je beschäftigter Person ist eine eigene Meldung.
 rechtsgrundlage:
-- § 99 SGB VII
+- § 165 Abs. 1 SGB VII
+- § 99 SGB IV
 kategorie: personal
 ausloeser:
   feld: abgeleitet.hat_beschaeftigte
@@ -37,7 +38,7 @@ kanal: partner
 kosten: null
 sanktion:
   text:
-    de: 'Bußgeld bis 25.000 €, wenn der Lohnnachweis nicht, nicht richtig, nicht vollständig, nicht in der vorgeschriebenen Weise oder nicht rechtzeitig übermittelt wird (§ 111 Abs. 1 Nr. 5, Abs. 4 SGB IV in Verbindung mit § 99 Abs. 1 Satz 1 SGB IV).'
+    de: 'Bußgeld bis 2.500 €, wenn der Lohnnachweis nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig gemeldet wird (§ 209 Abs. 1 Nr. 5 Buchst. a, Abs. 3 SGB VII in Verbindung mit § 165 Abs. 1 SGB VII).'
   schwere: mittel
 automatisierung: partner
 erledigung:
@@ -57,9 +58,14 @@ quellen:
 - titel: 'Sozialgesetzbuch IV § 99'
   url: https://www.gesetze-im-internet.de/sgb_4/__99.html
   abgerufen: '2026-10-22'
+- titel: '§ 209 SGB VII, Wortlaut (lxgesetze.de)'
+  url: https://lxgesetze.de/sgb-vii/209
+  abgerufen: '2026-10-22'
+- titel: '§ 111 SGB IV, Wortlaut (lxgesetze.de)'
+  url: https://lxgesetze.de/sgb-iv/111
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Neu nach Nutzertest R11 (Tischlerei; der Bericht nennt § 99 SGB IV, richtig SGB VII) – Termin 16.02. des Folgejahres aus dem DGUV-Verfahren, bestätigen; Abgrenzung zur UV-Jahresmeldung (§ 28a Abs. 2a SGB IV)'
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 111 Abs. 1 Nr. 5 SGB IV und § 99 Abs. 1 Satz 1 SGB IV (Übermittlung bis 16. Februar, Pflicht nach § 165 Abs. 1 Satz 1 SGB VII) amtlich gelesen; Rechtsgrundlage nennt „§ 99 SGB VII“ – vermutlich § 165 Abs. 1 SGB VII mit § 99 SGB IV gemeint; Verhältnis zu § 209 Abs. 1 Nr. 5a SGB VII (bis 2.500 €) klären) – fachlich zu bestätigen'
+- 'Freigabe RA Dr. Weber 22.10.2026: Rechtsgrundlage und Sanktion wie empfohlen mit 2.500 € (§ 209 Abs. 1 Nr. 5 Buchst. a, Abs. 3 SGB VII; Wortlaut lxgesetze.de, Stand 12.5.2026 – eine Nr. 5a gibt es nicht). Prüfauftrag „ob daneben § 111 Abs. 1 Nr. 5 SGB IV greift“: Der Wortlaut nennt den Lohnnachweis „entgegen § 99 Absatz 1 Satz 1“ ausdrücklich, Geldbuße bis 25.000 € (§ 111 Abs. 4 SGB IV; lxgesetze.de, Stand 24.7.2026) – Verhältnis der beiden Normen und Anzeige mit dem Prüfer klären'
 pruefung:
   status: entwurf
   geprueft_von: null

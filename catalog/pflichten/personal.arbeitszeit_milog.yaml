@@ -1,7 +1,7 @@
 # Katalog D.42 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.arbeitszeit_milog
-version: 3
+version: 4
 katalog_nr: D.42
 titel:
   de: Arbeitszeit nach § 17 MiLoG aufzeichnen
@@ -67,7 +67,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Bußgeld bis 30.000 € (§ 21 MiLoG).
+    de: 'Bußgeld bis 30.000 € (§ 21 Abs. 1 Nr. 7, Abs. 3 MiLoG).'
   schwere: hoch
 automatisierung: hinweis
 erledigung:
@@ -94,10 +94,6 @@ quellen:
 - titel: CMS – Gesetz zur Modernisierung der Schwarzarbeitsbekämpfung beschlossen
   url: https://cms.law/de/deu/legal-updates/gesetz-zur-modernisierung-der-schwarzarbeitsbekaempfung-beschlossen
   abgerufen: '2026-10-20'
-fachlich_zu_pruefen:
-- 'Fristen (7. Tag, zwei Jahre Aufbewahrung) im Text ergänzt (R10, Rechtsprüfung bestätigt) – als Termin nicht abgebildet; laufend je Kalendermonat'
-- '§ 2a SchwarzArbG nach SchwarzArbMoDiG (R11, Rechtsprüfung T-99; TK, HWK Chemnitz, CMS): Friseur, Kosmetik, Lieferdienste neu, Forstwirtschaft und Fleischerhandwerk gestrichen – Liste im BGBl. gegenlesen'
-- 'Sanktion aus der Rechtsprüfung R10 (G-16) übernommen – Fundstelle bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

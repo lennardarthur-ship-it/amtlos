@@ -1,18 +1,20 @@
 # R12 (Rechtsprüfung Befund 18): MoPeG – Gesellschaftsregister für die GbR
 schema_version: 1
 id: gesellschaft.egbr_hinweis
-version: 1
+version: 2
 katalog_nr: B.16
 titel:
   de: GbR ins Gesellschaftsregister eintragen? (eGbR)
 kurz:
   de: Seit 2024 kann sich eine GbR ins Gesellschaftsregister eintragen lassen – nötig wird das, wenn sie etwa ein Grundstück erwerben oder sich an einer anderen Gesellschaft beteiligen will.
 erklaerung:
-  de: Seit dem 1.1.2024 gibt es das Gesellschaftsregister für die GbR (§ 707 BGB). Die Eintragung ist freiwillig. Faktisch nötig wird sie, wenn die GbR Rechte an Grundstücken erwerben (§ 47 Abs. 2 GBO) oder sich an einer anderen Gesellschaft beteiligen will, die in einem Register steht. Nach der Eintragung führt die Gesellschaft den Zusatz „eingetragene Gesellschaft bürgerlichen Rechts“ oder „eGbR“ (§ 707a Abs. 2 BGB) und meldet ihre wirtschaftlich Berechtigten dem Transparenzregister (§ 20 Abs. 1 GwG).
+  de: Seit dem 1.1.2024 gibt es das Gesellschaftsregister für die GbR (§ 707 BGB). Die Eintragung ist freiwillig. Faktisch nötig wird sie, wenn die GbR Rechte an Grundstücken erwerben (§ 47 Abs. 2 GBO) oder sich an einer anderen Gesellschaft beteiligen will, die in einem Register steht – etwa an einer GmbH (Gesellschafterliste, § 40 Abs. 1 S. 3 GmbHG), an einer Aktiengesellschaft (Aktienregister, § 67 AktG) oder an einer eingetragenen GbR (§ 707a Abs. 1 S. 2 BGB). Nach der Eintragung führt die Gesellschaft den Zusatz „eingetragene Gesellschaft bürgerlichen Rechts“ oder „eGbR“ (§ 707a Abs. 2 BGB) und meldet als eingetragene GbR ihre wirtschaftlich Berechtigten dem Transparenzregister (§ 20 Abs. 1 GwG).
 rechtsgrundlage:
 - § 707 BGB
-- § 707a Abs. 2 BGB
+- § 707a BGB
 - § 47 Abs. 2 GBO
+- § 40 Abs. 1 S. 3 GmbHG
+- § 67 AktG
 - § 20 Abs. 1 GwG
 kategorie: gesellschaft
 ausloeser:
@@ -43,7 +45,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/bgb/__707.html
   abgerufen: null
 fachlich_zu_pruefen:
-- Neu nach Rechtsprüfung R12 (Befund 18) – Fälle, in denen die Eintragung faktisch nötig ist (Grundbuch, Gesellschafterliste § 40 GmbHG, Beteiligungen), bestätigen; Rechtsform „eGbR“ fehlt im Fragebogen
+- 'Freigabe RA Dr. Weber 22.10.2026: „Rechtsform ‚eGbR‘ im Fragebogen ergänzen“ – nicht umgesetzt: eine neue Rechtsform berührt fakten.json, die abgeleiteten Fakten der Regel-Engine (ist_eingetragene_gesellschaft u. a.), die Fragen in packages/i18n, check.ts und die Auslöser anderer Einträge (z. B. Transparenzregister, Istkaufmann) – Entscheidung des Hauptbearbeiters'
 pruefung:
   status: entwurf
   geprueft_von: null

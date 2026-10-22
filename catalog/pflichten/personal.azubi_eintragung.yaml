@@ -1,14 +1,14 @@
 # R12 (Nutzertest Kfz #10): Ausbildungsvertrag eintragen lassen (§ 36 BBiG)
 schema_version: 1
 id: personal.azubi_eintragung
-version: 2
+version: 3
 katalog_nr: D.45
 titel:
   de: Ausbildungsvertrag ins Verzeichnis eintragen lassen
 kurz:
   de: Den Ausbildungsvertrag meldest du gleich nach Abschluss bei deiner Kammer zur Eintragung ins Verzeichnis der Berufsausbildungsverhältnisse an.
 erklaerung:
-  de: Ausbildende beantragen unverzüglich nach Abschluss des Berufsausbildungsvertrags die Eintragung in das Verzeichnis der Berufsausbildungsverhältnisse bei der zuständigen Stelle – im Handwerk bei der Handwerkskammer (Lehrlingsrolle), sonst meist bei der IHK (§ 36 Abs. 1 BBiG). Eine Ausfertigung der Vertragsniederschrift fügst du bei. Ohne Eintragung wird der Azubi nicht zur Abschlussprüfung zugelassen.
+  de: Ausbildende beantragen unverzüglich nach Abschluss des Berufsausbildungsvertrags die Eintragung in das Verzeichnis der Berufsausbildungsverhältnisse bei der zuständigen Stelle – im Handwerk bei der Handwerkskammer (Lehrlingsrolle), sonst meist bei der IHK (§ 36 Abs. 1 BBiG) – am besten gleich nach der Unterschrift; als spätesten Termin zeigt Amtlos den Ausbildungsbeginn. Eine Ausfertigung der Vertragsniederschrift fügst du bei. Ohne Eintragung wird der Azubi nicht zur Abschlussprüfung zugelassen.
 rechtsgrundlage:
 - § 36 Abs. 1 BBiG
 - § 43 Abs. 1 BBiG
@@ -61,9 +61,6 @@ quellen:
 - titel: 'Berufsbildungsgesetz § 101'
   url: https://www.gesetze-im-internet.de/bbig_2005/__101.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Neu nach Nutzertest R12 (Kfz #10) – Termin „unverzüglich nach Vertragsschluss“ als spätestens Ausbildungsbeginn abgebildet; Bußgeld (§ 101 BBiG) fachlich ergänzen'
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 101 Abs. 1 Nr. 9 (§ 36 Abs. 1 Satz 1, auch i. V. m. Satz 4) und Abs. 2 BBiG amtlich gelesen) – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

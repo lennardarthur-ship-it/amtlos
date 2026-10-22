@@ -548,7 +548,7 @@
  {
   "id": "gesellschaft.transparenzregister",
   "titel": "Wirtschaftlich Berechtigte ans Transparenzregister melden",
-  "kurz": "Melde, wer hinter deiner Gesellschaft steht, und halte die Angaben aktuell.",
+  "kurz": "Melde unverzüglich, wer hinter deiner Gesellschaft steht, und halte die Angaben aktuell.",
   "rechtsgrundlage": [
    "§ 19 GwG",
    "§ 20 GwG"
@@ -709,7 +709,7 @@
  {
   "id": "personal.ausweis_hinweis",
   "titel": "Schriftlich auf die Ausweispflicht hinweisen",
-  "kurz": "In deiner Branche weist du jede neue beschäftigte Person spätestens bei Arbeitsbeginn schriftlich darauf hin, dass sie bei der Arbeit einen Ausweis dabeihaben muss.",
+  "kurz": "In deiner Branche weist du jede neue beschäftigte Person vor Arbeitsbeginn schriftlich darauf hin, dass sie bei der Arbeit einen Ausweis dabeihaben muss.",
   "rechtsgrundlage": [
    "§ 2a Abs. 2 SchwarzArbG",
    "§ 2a Abs. 1 SchwarzArbG"
@@ -775,7 +775,7 @@
  {
   "id": "personal.nachweisgesetz",
   "titel": "Arbeitsbedingungen schriftlich festhalten",
-  "kurz": "Für jede neue beschäftigte Person hältst du die wesentlichen Arbeitsbedingungen schriftlich oder in zulässiger Form fest.",
+  "kurz": "Für jede neue beschäftigte Person hältst du die wesentlichen Arbeitsbedingungen schriftlich oder in Textform fest – in den Branchen nach dem Schwarzarbeitsbekämpfungsgesetz, seit 30.12.2025 auch im Friseur- und Kosmetikgewerbe, bleibt es bei der Schriftform.",
   "rechtsgrundlage": [
    "NachwG"
   ],
@@ -787,6 +787,10 @@
    {
     "titel": "Nachweisgesetz § 2",
     "url": "https://www.gesetze-im-internet.de/nachwg/BJNR094610995.html"
+   },
+   {
+    "titel": "Nachweisgesetz § 2, geltende Fassung (buzer.de)",
+    "url": "https://www.buzer.de/gesetz/5010/al0-210457.htm"
    }
   ],
   "geprueft": false

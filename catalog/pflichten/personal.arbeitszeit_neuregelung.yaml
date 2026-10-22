@@ -1,5 +1,7 @@
 # Katalog D.42 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 # Rechtsstand 21.10.2026: Referentenentwurf BMAS (Juni 2026) in der Ressortabstimmung, kein Kabinettsbeschluss
+# Freigabe RA Dr. Weber 22.10.2026: als Entwurf/Radar korrekt; keine Angaben zu Fristen bestätigbar, solange kein Kabinettsbeschluss vorliegt – vor dem Launch Stand prüfen
+# Offen (Produkt, kein Prüfpunkt): Schwelle 10 als Regelwert führen, sobald beschlossen
 schema_version: 1
 id: personal.arbeitszeit_neuregelung
 version: 3
@@ -59,12 +61,7 @@ quellen:
   url: https://www.handwerksblatt.de/themen-specials/arbeitszeit-erfassen-aber-wie/elektronische-erfassung-der-arbeitszeit-wird-pflicht
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
-- 'Rechtsstand 21.10.2026: Referentenentwurf vom Juni 2026 in der Ressortabstimmung, kein Kabinettsbeschluss – Inkrafttreten 1.1.2027 laut Entwurf, nach Fachpresse unrealistisch; erwartet_ab und gueltig_ab nach Kabinettsbeschluss anpassen'
-- 'Übergangsfristen laut Handwerksblatt (unter 250: zwei Jahre, unter 50: fünf Jahre; 1.10.2026 zusätzlich „ab 250 mindestens ein Jahr“) – gegen den Entwurfstext prüfen'
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „mittel“)
-- Schwelle 10 als Regelwert führen, sobald beschlossen
-- Vorbereitungs-Checkliste fachlich prüfen
+- 'Übergangsfristen laut Handwerksblatt (unter 250: zwei Jahre, unter 50: fünf Jahre; 1.10.2026 zusätzlich „ab 250 mindestens ein Jahr“) – gegen den Entwurfstext prüfen; laut Freigabe Weber 22.10.2026 sind Angaben zu Fristen nicht bestätigbar, solange kein Kabinettsbeschluss vorliegt'
 pruefung:
   status: entwurf
   geprueft_von: null

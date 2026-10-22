@@ -1,15 +1,14 @@
 # Katalog D.40 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.umlagen_eau
-version: 1
+version: 2
 katalog_nr: D.40
 titel:
   de: Umlagen U1/U2/U3 und eAU-Abruf
 kurz:
   de: Für Beschäftigte zahlst du Umlagen (U1, U2, U3) und rufst Arbeitsunfähigkeitsbescheinigungen elektronisch ab.
 erklaerung:
-  de: Die Umlagen finanzieren die Erstattung von Entgeltfortzahlung, Mutterschaftsleistungen und das Insolvenzgeld. Die eAU
-    rufst du bei der Krankenkasse ab, meist über das Lohnprogramm.
+  de: 'Die Umlagen finanzieren die Erstattung von Entgeltfortzahlung (U1), Mutterschaftsleistungen (U2) und das Insolvenzgeld (U3). Die U1 zahlen nur Betriebe mit in der Regel höchstens 30 Beschäftigten (§ 1 Abs. 1 AAG), die U2 alle Arbeitgeber, die U3 ebenfalls alle (§ 358 SGB III). Du zahlst sie mit den Beiträgen und meldest sie mit dem Beitragsnachweis. Die eAU rufst du bei der Krankenkasse ab, meist über das Lohnprogramm.'
 begriffe:
 - begriff:
     de: eAU
@@ -17,6 +16,7 @@ begriffe:
     de: Elektronische Arbeitsunfähigkeitsbescheinigung, die du bei der Krankenkasse abrufst.
 rechtsgrundlage:
 - AAG
+- § 358 SGB III
 - § 109 SGB IV
 kategorie: personal
 ausloeser:
@@ -35,7 +35,7 @@ kanal: partner
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Die Umlagen sind Teil des Gesamtsozialversicherungsbeitrags: bei Verspätung Säumniszuschlag 1 % je Monat (§ 24 SGB IV). Für den eAU-Abruf ist keine Sanktion vorgesehen; ohne Abruf fehlt der Nachweis der Arbeitsunfähigkeit.'
   schwere: mittel
 automatisierung: hinweis
 status_recht: in_kraft
@@ -45,11 +45,6 @@ quellen:
 - titel: Aufwendungsausgleichsgesetz
   url: https://www.gesetze-im-internet.de/aag/
   abgerufen: null
-fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Welche Umlage gilt für wen (z. B. U1 nach Betriebsgröße) – fachlich ergänzen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf
   geprueft_von: null

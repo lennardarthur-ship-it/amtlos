@@ -1,7 +1,7 @@
 # Katalog B.21 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.investitionspruefung_hinweis
-version: 2
+version: 3
 katalog_nr: B.21
 titel:
   de: Investitionsprüfung in sensiblen Sektoren beachten
@@ -9,11 +9,11 @@ kurz:
   de: Wenn ausländische Investoren in ein Unternehmen in einem sensiblen Sektor einsteigen, kann eine Investitionsprüfung
     nötig sein.
 erklaerung:
-  de: Bei Beteiligungen ausländischer Investoren an Unternehmen in sensiblen Sektoren kann der Staat die Investition prüfen.
-    Amtlos gibt hier nur einen allgemeinen Hinweis.
+  de: 'Bei Beteiligungen ausländischer Investoren an Unternehmen in sensiblen Sektoren kann der Staat die Investition prüfen. Welche Sektoren sensibel sind und ab welchem Anteil an den Stimmrechten (je nach Sektor 10 %, 20 % oder 25 %) geprüft wird, regelt die Außenwirtschaftsverordnung (§ 55a AWV). Amtlos gibt hier nur einen allgemeinen Hinweis.'
 rechtsgrundlage:
 - AWG
 - AWV
+- § 55a AWV
 kategorie: gesellschaft
 ausloeser:
   feld: profil.gesellschafter.auslaendische_investoren
@@ -26,7 +26,7 @@ frist:
 wiederholung:
   art: einmalig
 stelle:
-  de: Bundesministerium für Wirtschaft und Klimaschutz
+  de: 'Bundesministerium für Wirtschaft und Energie (BMWE)'
 kanal: post
 kosten: null
 sanktion:
@@ -42,10 +42,6 @@ quellen:
 - titel: Außenwirtschaftsgesetz
   url: https://www.gesetze-im-internet.de/awg_2013/
   abgerufen: null
-fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Hinweis laut Spezifikation – sensible Sektoren und Schwellen fachlich ergänzen
-- Zuständiges Ministerium (Bezeichnung) aktuell?
 pruefung:
   status: entwurf
   geprueft_von: null

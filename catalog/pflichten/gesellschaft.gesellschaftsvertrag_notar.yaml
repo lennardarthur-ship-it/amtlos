@@ -1,23 +1,24 @@
 # Katalog B.14 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.gesellschaftsvertrag_notar
-version: 3
+version: 4
 katalog_nr: B.14
 titel:
   de: Gesellschaftsvertrag beim Notar beurkunden
 kurz:
   de: Für eine UG oder GmbH lässt du den Gesellschaftsvertrag notariell beurkunden – auch online möglich.
 erklaerung:
-  de: Die Gründung einer GmbH oder UG beginnt mit dem Gesellschaftsvertrag, den ein Notar beurkundet. Die Beurkundung ist
-    auch online möglich. Für die GmbH beträgt das Stammkapital mindestens 25.000 €, davon ist mindestens die Hälfte einzuzahlen.
-    Eine UG kann ab 1 € gegründet werden.
+  de: 'Die Gründung einer GmbH oder UG beginnt mit dem Gesellschaftsvertrag, den ein Notar beurkundet (§ 2 GmbHG). Die Beurkundung ist auch online per Videokommunikation beim Notar möglich, auch mit dem Musterprotokoll (§ 2 Abs. 3 GmbHG). Für die GmbH beträgt das Stammkapital mindestens 25.000 €, davon ist mindestens die Hälfte einzuzahlen. Eine UG kann ab 1 € gegründet werden.'
 begriffe:
 - begriff:
     de: Stammkapital
   erklaerung:
     de: Das Kapital, das die Gesellschafter bei der Gründung einer GmbH oder UG mindestens aufbringen.
 rechtsgrundlage:
-- GmbHG
+- § 2 GmbHG
+- § 3 GmbHG
+- § 5 GmbHG
+- § 7 GmbHG
 kategorie: gesellschaft
 ausloeser:
   all:
@@ -64,12 +65,6 @@ quellen:
 - titel: § 11 GmbHG, Wortlaut (lexmea.de)
   url: https://lexmea.de/de/gesetz/gmbhg/11
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Einzelne Vorschriften (z. B. § 2 GmbHG Form, § 5 Stammkapital, § 7 Einzahlung) zuordnen
-- 'Online-Beurkundung: Voraussetzungen und Grenzen ergänzen'
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Formnichtigkeit nach § 125 Satz 1 BGB; Heilung durch Eintragung nicht geprüft); Schwere nach Vorprüfung wieder „hoch“, dringend_ohne_termin entfernt'
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf
   geprueft_von: null

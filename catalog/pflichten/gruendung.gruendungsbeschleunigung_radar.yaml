@@ -1,5 +1,6 @@
 # Katalog A.0 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 # Rechtsstand 21.10.2026: Eckpunkte der Länder (März 2026), Gesetzentwurf des Bundes noch nicht bekannt
+# Freigabe RA Dr. Weber 22.10.2026: als Radar/Hinweis freigegeben – vor dem Launch Stand des Gesetzentwurfs prüfen; ohne Bundesentwurf bleibt es beim Hinweis
 schema_version: 1
 id: gruendung.gruendungsbeschleunigung_radar
 version: 3
@@ -56,11 +57,6 @@ quellen:
 - titel: Bayerisches Wirtschaftsministerium – Pressemitteilung 116/2026
   url: https://www.stmwi.bayern.de/presse/pressemeldungen/116-2026/
   abgerufen: '2026-10-21'
-fachlich_zu_pruefen:
-- 'Rechtsstand 21.10.2026: nur Eckpunkte der Länder und Zusage „Beschluss des Gesetzentwurfs bis 31.12.2026“, kein Bundesentwurf gefunden – vor Launch erneut prüfen'
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Wahrscheinlichkeit steht nicht in der Spezifikation (Platzhalter „niedrig“)
-- 'Vorprüfung 21.10.2026 (A.0): bleibt Radar (status_recht geplant, radar), ausdrücklich als Hinweis eingeordnet – keine Pflicht, solange kein Gesetzentwurf vorliegt'
 pruefung:
   status: entwurf
   geprueft_von: null

@@ -68,10 +68,6 @@ quellen:
 - titel: Handwerksordnung § 118
   url: https://www.gesetze-im-internet.de/hwo/__118.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Gebäudereinigung als Anlage B1 (Nr. 33) automatisch ausgelöst (R11) – Nummer der Anlage bestätigen'
-- 'Anzeige „bei Beginn“ (§ 18 HwO, gleichzeitig mit der Gewerbeanzeige) als „spätestens am Tag des Beginns“ umgesetzt (R10, Rechtsprüfung) – bestätigen'
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

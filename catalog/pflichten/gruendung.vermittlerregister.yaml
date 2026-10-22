@@ -1,17 +1,18 @@
 # R12 (Rechtsprüfung Befund 6): Versicherungs-, Finanzanlagen- und Immobiliardarlehensvermittler – Vermittlerregister
 schema_version: 1
 id: gruendung.vermittlerregister
-version: 3
+version: 4
 katalog_nr: A.3
 titel:
   de: Ins Vermittlerregister eintragen lassen
 kurz:
-  de: Als Versicherungs-, Finanzanlagen- oder Immobiliardarlehensvermittler lässt du dich nach der Erlaubnis ins Vermittlerregister eintragen und hältst die Angaben aktuell.
+  de: Als Versicherungsvermittler oder Versicherungsberater, Finanzanlagen- oder Immobiliardarlehensvermittler lässt du dich nach der Erlaubnis ins Vermittlerregister eintragen und hältst die Angaben aktuell.
 erklaerung:
-  de: Wer eine Erlaubnis nach § 34d, § 34f, § 34h oder § 34i GewO hat, lässt sich unverzüglich nach Aufnahme der Tätigkeit in das Vermittlerregister eintragen, das die IHK führt (§ 11a GewO). Änderungen meldest du ebenfalls. Versicherungsvermittler bilden sich außerdem jedes Jahr weiter – das steht bei der Weiterbildungspflicht.
+  de: Wer eine Erlaubnis nach § 34d, § 34f, § 34h oder § 34i GewO hat – als Versicherungsberater auch nach § 34e GewO (§ 34e Abs. 2 GewO) –, lässt sich unverzüglich nach Aufnahme der Tätigkeit in das Vermittlerregister eintragen, das die IHK führt (§ 11a GewO). Änderungen meldest du ebenfalls. Versicherungsvermittler bilden sich außerdem jedes Jahr weiter – das steht bei der Weiterbildungspflicht.
 rechtsgrundlage:
 - § 11a GewO
 - § 34d Abs. 10 GewO
+- § 34e Abs. 2 GewO
 kategorie: gruendung
 branchen:
 - immobilien_finanzen
@@ -20,11 +21,12 @@ ausloeser:
   op: enthaelt_eines
   wert:
   - 34d
+  - 34e
   - 34f
   - 34h
   - 34i
   label:
-    de: Du hast eine Erlaubnis als Versicherungs-, Finanzanlagen- oder Immobiliardarlehensvermittler.
+    de: Du hast eine Erlaubnis als Versicherungsvermittler oder Versicherungsberater, Finanzanlagen- oder Immobiliardarlehensvermittler.
 phase: gruendung
 frist:
   typ: dauerhaft
@@ -56,10 +58,6 @@ quellen:
 - titel: § 144 GewO, Wortlaut (lxgesetze.de)
   url: https://lxgesetze.de/gewo/144
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- Neu nach Rechtsprüfung R12 (Befund 6) – § 11a Abs. 1 GewO nennt § 34d Abs. 10, § 34f Abs. 5, § 34h Abs. 1 S. 4 und § 34i Abs. 8; Versicherungsberater (§ 34e) bestätigen
-- Frist „unverzüglich nach Aufnahme der Tätigkeit“ je Vorschrift bestätigen
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Nr. 8 nennt § 34d Abs. 10 Satz 1, § 34f Abs. 5 oder 6 Satz 1; Nr. 9 auch § 34i Abs. 8 Nr. 3 – Eintragung nach § 34h und § 34i ohne eigenen Bußgeldtatbestand gefunden); Schwere nach Vorprüfung wieder „hoch“, dringend_ohne_termin entfernt'
 pruefung:
   status: entwurf
   geprueft_von: null

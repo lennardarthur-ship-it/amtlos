@@ -1,4 +1,5 @@
 # Katalog D.44 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Offen (Produkt, kein Prüfpunkt): weitere Ausnahmen (Gaststätten, mehrschichtige Betriebe) und Arbeitszeitgrenzen als Regelwerte
 schema_version: 1
 id: personal.jugendarbeitsschutz
 version: 5
@@ -50,13 +51,6 @@ quellen:
 - titel: § 58 JArbSchG, Wortlaut (gesetze.legal)
   url: https://gesetze.legal/bund/jarbschg/58
   abgerufen: '2026-10-21'
-fachlich_zu_pruefen:
-- 'R12 (Nutzertest Bäckerei #8): Bäckerei-Ausnahme § 14 Abs. 2 Nr. 4 und Abs. 3 JArbSchG (Wortlaut geprüft; der Nutzertest nannte Nr. 3); weitere Ausnahmen (Gaststätten, mehrschichtige Betriebe) nicht abgebildet'
-- 'Erstuntersuchung als eigene Pflicht personal.jugend_erstuntersuchung (Prüfergebnis Sifa 22.10.2026)'
-- § 22 und § 28a JArbSchG als Hinweis ergänzt (R11, Nutzertest Tischlerei) – Ausnahmen für Auszubildende (§ 22 Abs. 2) bestätigen
-- Arbeitszeitgrenzen als Regelwerte
-- 'Aushang § 47 und Arbeitszeitaushang § 48 JArbSchG nach Prüfergebnis Sifa 22.10.2026 ergänzt (§ 48 erst ab drei Jugendlichen, Wortlaut geprüft)'
-- 'Vorprüfung 21.10.2026: Sanktion ergänzt – § 58 Abs. 4 JArbSchG über gesetze.legal gelesen'
 pruefung:
   status: entwurf
   geprueft_von: null

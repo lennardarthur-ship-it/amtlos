@@ -1,4 +1,5 @@
 # Katalog D.39 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Offen (Produkt, kein Prüfpunkt): Bekanntmachung des BMAS zur Geringfügigkeitsgrenze 2027 nach Veröffentlichung als Quelle ergänzen
 schema_version: 1
 id: personal.minijob_grenze
 version: 3
@@ -49,11 +50,6 @@ quellen:
 - titel: 'Sozialgesetzbuch IV § 8 (lxgesetze.de)'
   url: https://lxgesetze.de/sgb-iv/8
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Rechtsstand 21.10.2026: 633 € ab 1.1.2027 folgt aus § 8 Abs. 1a SGB IV (14,60 € × 130 / 3, aufgerundet); Bekanntmachung des BMAS im Bundesanzeiger für 2027 steht noch aus – nach Veröffentlichung Quelle ergänzen; Übergangsbereich 2027: 633,01 € bis 2.000 €'
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 8 Abs. 1 Nr. 1, Abs. 1b SGB IV über lxgesetze.de gelesen (Stand 24.7.2026); Beginn der Versicherungspflicht nach § 8 Abs. 2 Satz 3, 4 SGB IV nicht in den Text übernommen) – fachlich zu bestätigen'
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf
   geprueft_von: null

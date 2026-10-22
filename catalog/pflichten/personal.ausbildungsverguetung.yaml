@@ -1,7 +1,7 @@
 # R11 (Nutzertest Tischlerei Befund 16): Mindestausbildungsvergütung nach § 17 BBiG
 schema_version: 1
 id: personal.ausbildungsverguetung
-version: 1
+version: 2
 katalog_nr: D.39
 titel:
   de: Mindestvergütung für Auszubildende zahlen
@@ -9,10 +9,11 @@ kurz:
   de: Auszubildenden zahlst du mindestens die Mindestausbildungsvergütung nach dem Berufsbildungsgesetz – der Mindestlohn gilt für sie nicht.
 erklaerung:
   de: Für Auszubildende gilt nicht der gesetzliche Mindestlohn (§ 22 Abs. 3 MiLoG), sondern eine angemessene Vergütung, mindestens
-    die Mindestausbildungsvergütung nach § 17 BBiG. Sie steigt mit jedem Ausbildungsjahr und wird jährlich angepasst; ein geltender
-    Tarifvertrag kann höhere Sätze vorsehen. Amtlos kennt die Beträge noch nicht – frag deine Kammer.
+    die Mindestausbildungsvergütung nach § 17 BBiG. Sie steigt mit jedem Ausbildungsjahr und wird jährlich angepasst. Gilt für dich ein
+    Tarifvertrag, geht dessen Vergütung vor (§ 17 Abs. 3, 4 BBiG). Amtlos kennt die Beträge noch nicht – frag deine Kammer.
 rechtsgrundlage:
 - § 17 BBiG
+- § 25 BBiG
 - § 22 Abs. 3 MiLoG
 kategorie: personal
 ausloeser:
@@ -31,7 +32,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Eine Vergütung unter der Mindestausbildungsvergütung ist unwirksam; Auszubildende können die Differenz nachfordern (§ 17 Abs. 1, § 25 BBiG). Kein Bußgeld.'
   schwere: mittel
 automatisierung: hinweis
 status_recht: in_kraft
@@ -42,7 +43,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/bbig_2005/__17.html
   abgerufen: null
 fachlich_zu_pruefen:
-- 'Neu nach Nutzertest R11 (Tischlerei) – Beträge je Ausbildungsjahr 2026/2027 als Regelwert ergänzen'
+- 'Freigabe RA Dr. Weber 22.10.2026: Folgen umgesetzt. Beträge NICHT übernommen – seine Werte „2026: 682/805/921/955 €“ sind die Mindestausbildungsvergütung für einen Ausbildungsbeginn 2025; für Beginn 2026 nennen Handwerksblatt und BIBB 724/854/977/1.014 €, für 2027 laut BIBB-Pressemitteilung 764/902/1.031/1.070 € (Bekanntmachung im BGBl. am 7.10.2026, BGBl. 2026 I Nr. 287) – Beträge nach Bestätigung durch den Prüfer als Regelwert'
 pruefung:
   status: entwurf
   geprueft_von: null

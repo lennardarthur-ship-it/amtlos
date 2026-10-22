@@ -1,17 +1,22 @@
 # Katalog A.8
 schema_version: 1
 id: gruendung.berufsgenossenschaft
-version: 3
+version: 4
 katalog_nr: A.8
 titel:
   de: Bei der Berufsgenossenschaft anmelden
 kurz:
-  de: Innerhalb einer Woche nach Gründung meldest du dein Unternehmen bei der zuständigen Berufsgenossenschaft an – auch ohne Mitarbeiter.
+  de: Innerhalb einer Woche nach Beginn deiner Tätigkeit meldest du dein Unternehmen bei der zuständigen Berufsgenossenschaft an – auch ohne Mitarbeiter.
 erklaerung:
   de: >-
     Die Berufsgenossenschaft ist die gesetzliche Unfallversicherung für Betriebe.
     Welche zuständig ist, hängt von deiner Branche ab. Ob du dich selbst als
     Unternehmer versichern musst, hängt ebenfalls von der Branche ab.
+    Die Woche beginnt mit der Aufnahme der Tätigkeit, nicht mit der Gründung
+    einer Gesellschaft (§ 192 Abs. 1 SGB VII). Anmelden muss sich jedes
+    Unternehmen, unabhängig von Rechtsform und Beschäftigten – ausgenommen
+    Unternehmen, für die eine Unfallkasse oder die Sozialversicherung für
+    Landwirtschaft, Forsten und Gartenbau (SVLFG) zuständig ist.
 begriffe:
   - begriff: { de: Berufsgenossenschaft }
     erklaerung: { de: Die Unfallversicherung für Arbeitsunfälle und Berufskrankheiten in deiner Branche. }
@@ -54,8 +59,4 @@ quellen:
   - titel: § 192 SGB VII, Wortlaut (lxgesetze.de)
     url: https://lxgesetze.de/sgb-vii/192
     abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-  - 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (§ 209 Abs. 1 Nr. 8 nennt § 192 Abs. 1 Nr. 1 bis 3 und Abs. 4 Satz 1; Höchstbetrag „übrige Fälle“ nach Abs. 3)'
-  - "Auslöser 'immer': gilt das für alle Rechtsformen und Freiberufler ohne Beschäftigte? Ausnahmen (z. B. andere Unfallversicherungsträger) erfassen"
-  - "Fristbeginn: Gründungsdatum vs. Aufnahme der Tätigkeit"
 pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }

@@ -1,14 +1,14 @@
 # Katalog A.2 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gruendung.gewerbeanzeige
-version: 3
+version: 4
 katalog_nr: A.2
 titel:
   de: Gewerbe anmelden
 kurz:
   de: Melde dein Gewerbe bei der Gemeinde an, wenn du anfängst – und ebenso, wenn du umziehst, die Tätigkeit wechselst oder erweiterst oder aufhörst.
 erklaerung:
-  de: Die Gewerbeanzeige machst du bei deiner Gemeinde, meist online. Die Gebühr hängt von der Gemeinde ab. Das Gewerbeamt informiert danach Finanzamt, IHK oder Handwerkskammer und weitere Stellen. Ummelden musst du auch, wenn du die Tätigkeit wechselst oder auf Waren oder Leistungen ausdehnst, die bei Betrieben der angemeldeten Art nicht geschäftsüblich sind (§ 14 Abs. 1 S. 2 Nr. 2 GewO). Für bestimmte Reisegewerbe ohne Reisegewerbekarte gilt eine eigene Anzeigepflicht (§ 55c GewO).
+  de: Die Gewerbeanzeige machst du bei deiner Gemeinde, meist online. Die Gebühr hängt von der Gemeinde ab. Das Gewerbeamt informiert danach Finanzamt, IHK oder Handwerkskammer und weitere Stellen. Ummelden musst du auch, wenn du die Tätigkeit wechselst oder auf Waren oder Leistungen ausdehnst, die bei Betrieben der angemeldeten Art nicht geschäftsüblich sind (§ 14 Abs. 1 S. 2 Nr. 2 GewO). Die Anzeige erstattest du gleichzeitig mit dem Beginn, Um- und Abmeldung ebenso gleichzeitig mit der Änderung oder der Aufgabe des Betriebs (§ 14 Abs. 1 GewO). Für bestimmte Reisegewerbe ohne Reisegewerbekarte gilt eine eigene Anzeigepflicht (§ 55c GewO).
 rechtsgrundlage:
 - § 14 GewO
 - § 55c GewO
@@ -61,11 +61,6 @@ quellen:
 - titel: Gewerbeordnung § 14
   url: https://www.gesetze-im-internet.de/gewo/__14.html
   abgerufen: null
-fachlich_zu_pruefen:
-- 'R12 (Rechtsprüfung Befund 15): Ummeldung bei Wechsel oder Ausdehnung (§ 14 Abs. 1 S. 2 Nr. 2 GewO) über das Ereignis neue_taetigkeit; § 55c GewO nur im Text'
-- 'Sanktion aus der Rechtsprüfung R11 (Befund 20): § 146 Abs. 2 GewO bis 1.000 € – Nummer bestätigen'
-- 'Frist „bei Beginn“: als spätestens am Tag des Beginns umgesetzt – bestätigen'
-- 'Ummeldung und Abmeldung: Fristen ergänzen'
 pruefung:
   status: entwurf
   geprueft_von: null

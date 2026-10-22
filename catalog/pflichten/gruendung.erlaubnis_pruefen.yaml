@@ -1,7 +1,7 @@
 # Katalog A.3 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gruendung.erlaubnis_pruefen
-version: 5
+version: 6
 katalog_nr: A.3
 titel:
   de: Erlaubnis für dein Gewerbe einholen
@@ -73,7 +73,7 @@ kanal: portal
 kosten: null
 sanktion:
   text:
-    de: 'Wer ein erlaubnispflichtiges Gewerbe ohne Erlaubnis betreibt, riskiert ein Bußgeld bis 5.000 €, bei Finanzanlagenvermittlung und Honorar-Finanzanlagenberatung bis 50.000 € (§ 144 Abs. 1 Nr. 1, Abs. 4 GewO). Eine Gaststätte ohne die nach § 2 Abs. 1 GastG erforderliche Erlaubnis kostet bis 5.000 € (§ 28 Abs. 1 Nr. 1, Abs. 3 GastG) – soweit in deinem Land das Gaststättengesetz des Bundes gilt.'
+    de: 'Wer ein erlaubnispflichtiges Gewerbe ohne Erlaubnis betreibt, riskiert ein Bußgeld bis 5.000 €, bei Finanzanlagenvermittlung und Honorar-Finanzanlagenberatung bis 50.000 € (§ 144 Abs. 1 Nr. 1, Abs. 4 GewO). Eine Gaststätte ohne die nach § 2 Abs. 1 GastG erforderliche Erlaubnis kostet bis 5.000 € (§ 28 Abs. 1 Nr. 1, Abs. 3 GastG) – soweit in deinem Land das Gaststättengesetz des Bundes gilt. In Ländern mit Anzeigepflicht gelten die Bußgelder des Landesgesetzes.'
   schwere: hoch
 automatisierung: hinweis
 status_recht: in_kraft
@@ -89,11 +89,6 @@ quellen:
 - titel: Gaststättengesetz § 28
   url: https://www.gesetze-im-internet.de/gastg/__28.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Gaststättenrecht je Land: Erlaubnis oder nur Anzeige (Rechtsprüfung R11: mehrere Länder nur Anzeige, Sachsen vermutlich anzeigepflichtig; Gründerin: gilt in BW das Bundes-GastG?) – Text länderneutral, je Land prüfen'
-- 'Erlaubnis nur bei Alkoholausschank (§ 2 GastG, alkoholfreie Getränke nach § 2 Abs. 2 Nr. 1 erlaubnisfrei) – bestätigen'
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (§ 144 Abs. 1 Nr. 1 Buchst. b–o, Abs. 4 GewO (Buchst. m, n: 50.000 €) und § 28 Abs. 1 Nr. 1, Abs. 3 GastG gelesen; Landesgaststättengesetze nicht geprüft); Schwere nach Vorprüfung wieder „hoch“, dringend_ohne_termin entfernt'
-- 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
   status: entwurf
   geprueft_von: null

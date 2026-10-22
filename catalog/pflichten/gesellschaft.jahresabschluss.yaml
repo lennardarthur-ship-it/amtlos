@@ -1,4 +1,5 @@
 # Katalog B.18 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Offen (Produkt, kein Prüfpunkt): Aufstellung (3/6 Monate) und Feststellung (8/11 Monate) als Termine mit Größenklasse und jährlicher Wiederholung abbilden
 schema_version: 1
 id: gesellschaft.jahresabschluss
 version: 5
@@ -52,13 +53,6 @@ quellen:
 - titel: Strafgesetzbuch § 283 (Abs. 6)
   url: https://www.gesetze-im-internet.de/stgb/__283.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'R12 (Rechtsprüfung Befund 1): GmbH & Co. KG nach § 264a HGB einbezogen – Feststellung bei der KG nach Gesellschaftsvertrag (kein § 42a GmbHG)'
-- Fristen Aufstellung (3 bzw. 6 Monate, § 264 Abs. 1 HGB) und Feststellung (8 bzw. 11 Monate, § 42a Abs. 2 GmbHG) im Text (R11, Nutzertest Tischlerei) – als Termine abbilden, Größenklasse abfragen
-- Fristen für Aufstellung und Feststellung als Regeldaten ergänzen
-- Jährliche Wiederholung abbilden, sobald Fristen feststehen
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen („Kein eigenes Bußgeld“: § 334 HGB (Inhalt des Abschlusses) nicht gegengelesen – bestätigen; Strafbarkeit nur unter der Bedingung des § 283 Abs. 6 StGB); Schwere nach Vorprüfung wieder „hoch“, dringend_ohne_termin entfernt'
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf
   geprueft_von: null

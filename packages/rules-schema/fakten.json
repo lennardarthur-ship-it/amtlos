@@ -658,6 +658,12 @@
       "ab": 3
     },
     {
+      "pfad": "profil.auslandszahlungen.ueber_meldegrenze",
+      "typ": "bool",
+      "herleitung": "Onboarding: Zahlungen von oder an Gebietsfremde über 50.000 € (Meldegrenze § 67 Abs. 2 Nr. 1 AWV, Freigabe Weber 22.10.2026)",
+      "ab": 3
+    },
+    {
       "pfad": "profil.gesellschaft.handelsregister",
       "typ": "enum",
       "werte": [
