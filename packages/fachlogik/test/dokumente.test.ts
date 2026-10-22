@@ -94,7 +94,9 @@ describe("Dokumentvorlagen", () => {
     expect(d.gefaehrdungen).toEqual([]); // Start über Vorschläge
     expect(Array.isArray(leereDaten(vorlageFuer("rechnung")!, BETRIEB, "2026-10-12").positionen) && (leereDaten(vorlageFuer("rechnung")!, BETRIEB, "2026-10-12").positionen as unknown[]).length).toBe(1);
     const liste = g.abschnitte[1]!.felder[0]!;
-    expect(liste.art === "liste" && neuerEintrag(liste, BETRIEB, "2026-10-12").risiko).toBe("mittel");
+    // E-167 (Sifa, Blatt „D Risikoskala“): kein vorbelegtes Risiko – Schwere und Wahrscheinlichkeit starten leer
+    expect(liste.art === "liste" && neuerEintrag(liste, BETRIEB, "2026-10-12").schwere).toBeNull();
+    expect(liste.art === "liste" && neuerEintrag(liste, BETRIEB, "2026-10-12").wahrscheinlichkeit).toBeNull();
     expect(vorlageFuer("datenpanne") && leereDaten(vorlageFuer("datenpanne")!, BETRIEB, "2026-10-12").kontakt).toBe("Alex Muster, 0123 456, info@example.de");
   });
 
@@ -103,7 +105,7 @@ describe("Dokumentvorlagen", () => {
     const d = leereDaten(g, BETRIEB, "2026-10-12");
     expect(fehlendeAngaben(g, d)).toEqual(["Arbeitsbereich oder Gewerk", "mindestens ein Eintrag „Gefährdung“", "Ergebnis für schwangere oder stillende Frauen"]);
     d.arbeitsbereich = "Küche";
-    d.gefaehrdungen = [{ faktor: "arbeitsstaette", beschreibung: "Rutschgefahr", risiko: "mittel", massnahme: "", verantwortlich: "", umsetzen_bis: null, umgesetzt_am: null }];
+    d.gefaehrdungen = [{ faktor: "arbeitsstaette", beschreibung: "Rutschgefahr", schwere: "mittel", wahrscheinlichkeit: "moeglich", massnahme: "", verantwortlich: "", umsetzen_bis: null, umgesetzt_am: null }];
     d.mutterschutz_ergebnis = "keine_massnahmen";
     expect(fehlendeAngaben(g, d)).toEqual(["Gefährdung: Schutzmaßnahmen"]);
 
@@ -555,7 +557,7 @@ describe("Dokumentvorlagen", () => {
     const pp = leer("pruefprotokoll_elektro");
     expect(pp).toContain(kopfLinie("Geprüft von"));
     // Prüfgrundlage ist vorbelegt (R10) und steht auch auf dem leeren Blatt
-    expect(pp).toContain("<th>Prüfgrundlage</th><td>DIN EN 50678 (VDE&nbsp;0701) / DIN EN 50699 (VDE&nbsp;0702)</td>");
+    expect(pp).toContain("<th>Prüfgrundlage</th><td>DIN EN 50678 (VDE&nbsp;0701):2021-02 (nach Instandsetzung) / DIN EN 50699 (VDE&nbsp;0702):2021-06 (Wiederholungsprüfung)</td>");
     expect(pp).toMatch(/<th>Prüfgerät<\/th><td><span class="fuellen zeile">/);
     expect(leer("kassenbuch")).toContain(kopfLinie("Zeitraum"));
     const se = leer("steuererklaerung");

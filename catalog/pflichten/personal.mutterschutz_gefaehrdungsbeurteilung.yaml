@@ -1,7 +1,7 @@
 # Katalog D.43 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.mutterschutz_gefaehrdungsbeurteilung
-version: 1
+version: 2
 katalog_nr: D.43
 titel:
   de: Mutterschutz in der Gefährdungsbeurteilung
@@ -48,9 +48,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/muschg_2018/__10.html
   abgerufen: null
 fachlich_zu_pruefen:
-- Frist „vor Arbeitsbeginn“ wie E.50 – bestätigen
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf
   geprueft_von: null

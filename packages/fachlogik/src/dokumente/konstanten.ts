@@ -15,6 +15,31 @@ export const GEFAEHRDUNGSFAKTOREN: Record<string, string> = {
 export const RISIKO_STUFEN: Record<string, string> = { gering: "gering", mittel: "mittel", hoch: "hoch" };
 
 /**
+ * E-167 (Sifa-Durchsicht 22.10.2026, Blatt „D Risikoskala“): Risiko aus Schwere des möglichen Schadens ×
+ * Wahrscheinlichkeit – kein vorbelegter Wert; erst wenn beides gewählt ist, steht eine Stufe fest.
+ */
+export const SCHWERE: Record<string, string> = { leicht: "leicht (z. B. kleiner Schnitt, ohne Ausfallzeit)", mittel: "mittel (mit Ausfallzeit)", schwer: "schwer (bleibender Schaden oder tödlich)" };
+export const SCHWERE_KURZ: Record<string, string> = { leicht: "leicht", mittel: "mittel", schwer: "schwer" };
+export const WAHRSCHEINLICHKEIT: Record<string, string> = { unwahrscheinlich: "unwahrscheinlich", moeglich: "möglich", wahrscheinlich: "wahrscheinlich" };
+/** Matrix nach Vorschlag der Sifa: Zeile Schwere, Spalte Wahrscheinlichkeit. */
+export const RISIKO_MATRIX: Record<string, Record<string, "gering" | "mittel" | "hoch">> = {
+  leicht: { unwahrscheinlich: "gering", moeglich: "gering", wahrscheinlich: "mittel" },
+  mittel: { unwahrscheinlich: "gering", moeglich: "mittel", wahrscheinlich: "hoch" },
+  schwer: { unwahrscheinlich: "mittel", moeglich: "hoch", wahrscheinlich: "hoch" },
+};
+/** Risikostufe aus Schwere und Wahrscheinlichkeit; leer, solange eines fehlt (keine Vorbelegung „mittel“). */
+export function risikoAus(schwere: string | null | undefined, wahrscheinlichkeit: string | null | undefined): "gering" | "mittel" | "hoch" | "" {
+  return (schwere && wahrscheinlichkeit && RISIKO_MATRIX[schwere]?.[wahrscheinlichkeit]) || "";
+}
+/** Handlungsbedarf je Stufe (unverändert aus der bisherigen Skala, Blatt „D Risikoskala“ bestätigt). */
+export const HANDLUNGSBEDARF: Record<string, string> = { hoch: "sofort handeln, notfalls die Tätigkeit einstellen", mittel: "zeitnah handeln, mit Termin", gering: "bei Gelegenheit handeln, beobachten" };
+/**
+ * E-167 (Blatt „B Vorlagen“): feste Unterpunkte der „Sonstigen Gefährdungen“ – die sechs Faktoren des § 5 Abs. 3 ArbSchG
+ * bleiben unverändert (auch für Server und API), die Unterpunkte gliedern nur den Abschnitt „Sonstige“.
+ */
+export const SONSTIGE_UNTERPUNKTE: Record<string, string> = { brand: "Brand- und Explosionsgefährdung", elektrisch: "Elektrische Gefährdung", notfall: "Notfallorganisation (Erste Hilfe, Flucht und Rettung)", weitere: "Weitere Gefährdungen" };
+
+/**
  * Wirtschaftsbereiche nach § 2a Abs. 1 Nr. 1–11 SchwarzArbG in der Fassung des Gesetzes zur Modernisierung und
  * Digitalisierung der Schwarzarbeitsbekämpfung (BGBl. 2025 I Nr. 369, in Kraft seit 30.12.2025): Nr. 4 umfasst
  * plattformbasierte Lieferdienste, Nr. 11 das Friseur- und Kosmetikgewerbe; die Forstwirtschaft ist entfallen.

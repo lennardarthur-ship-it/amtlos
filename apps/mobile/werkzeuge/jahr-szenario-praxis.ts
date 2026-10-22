@@ -506,11 +506,11 @@ export function standBauen(): Bau {
       gefaehrdungen: [
         ...KOSMETIK.map((x) => vorschlag("gefaehrdungsbeurteilung", "gefaehrdungen", x, h, MASS)),
         ...eintraege("gefaehrdungsbeurteilung", "gefaehrdungen", [
-          { beschreibung: "Heben, Halten und Umlagern von Patientinnen und Patienten (Transfer von Rollstuhl auf Liege, Mobilisation), Arbeiten in Rumpfbeuge an der Liege.", massnahme: "Elektrisch höhenverstellbare Liegen auf Arbeitshöhe einstellen; Transfer zu zweit oder mit Rutschbrett; rückengerechte Arbeitsweise in der Unterweisung üben.", risiko: "mittel", faktor: "einwirkungen", ...MASS },
-          { beschreibung: "Aktive Medizinprodukte (Reizstrom-/Ultraschall-Kombigerät, Heißluftstrahler): Fehlbedienung, Verbrennung, Stromunfall bei Patientinnen, Patienten und Beschäftigten.", massnahme: "Anwendung nur nach Einweisung (§ 10 MPBetreibV) und Eintrag ins Medizinproduktebuch; sicherheitstechnische Kontrolle nach Herstellervorgabe (§ 11 MPBetreibV); Bestandsverzeichnis führen.", risiko: "mittel", faktor: "arbeitsmittel", ...MASS },
-          { beschreibung: "Verbrennungen beim Erwärmen und Auflegen von Fango (Paraffinwärmeschrank, bis ca. 70 °C).", massnahme: "Temperatur vor dem Auflegen prüfen; Schutzhandschuhe beim Entnehmen; Wärmeschrank nur durch eingewiesene Personen.", risiko: "gering", faktor: "einwirkungen", ...MASS },
-          { beschreibung: "Hausbesuche: Wegeunfälle, Alleinarbeit, beengte und ungeeignete Behandlungsplätze in Wohnungen, Haustiere.", massnahme: "Hausbesuchsplan mit Erreichbarkeit per Mobiltelefon; mobile Liege nur zu zweit tragen bzw. Trolley; Hausbesuch abbrechen, wenn Arbeitsplatz unsicher.", risiko: "gering", faktor: "ablaeufe_arbeitszeit", ...MASS },
-          { beschreibung: "Infektionsgefährdung durch engen Körperkontakt (Tröpfchen, Schmierinfektion, Hautpilz), auch ohne Blutkontakt (Biostoffverordnung, TRBA 250 – prüfen).", massnahme: "Händehygiene nach Hygieneplan; Liegenauflage je Patient wechseln; Angebotsvorsorge und Impfangebot über den Betriebsarzt.", risiko: "mittel", faktor: "einwirkungen", ...MASS },
+          { beschreibung: "Heben, Halten und Umlagern von Patientinnen und Patienten (Transfer von Rollstuhl auf Liege, Mobilisation), Arbeiten in Rumpfbeuge an der Liege.", massnahme: "Elektrisch höhenverstellbare Liegen auf Arbeitshöhe einstellen; Transfer zu zweit oder mit Rutschbrett; rückengerechte Arbeitsweise in der Unterweisung üben.", schwere: "mittel", wahrscheinlichkeit: "moeglich", faktor: "einwirkungen", ...MASS },
+          { beschreibung: "Aktive Medizinprodukte (Reizstrom-/Ultraschall-Kombigerät, Heißluftstrahler): Fehlbedienung, Verbrennung, Stromunfall bei Patientinnen, Patienten und Beschäftigten.", massnahme: "Anwendung nur nach Einweisung (§ 10 MPBetreibV) und Eintrag ins Medizinproduktebuch; sicherheitstechnische Kontrolle nach Herstellervorgabe (§ 11 MPBetreibV); Bestandsverzeichnis führen.", schwere: "mittel", wahrscheinlichkeit: "moeglich", faktor: "arbeitsmittel", ...MASS },
+          { beschreibung: "Verbrennungen beim Erwärmen und Auflegen von Fango (Paraffinwärmeschrank, bis ca. 70 °C).", massnahme: "Temperatur vor dem Auflegen prüfen; Schutzhandschuhe beim Entnehmen; Wärmeschrank nur durch eingewiesene Personen.", schwere: "leicht", wahrscheinlichkeit: "moeglich", faktor: "einwirkungen", ...MASS },
+          { beschreibung: "Hausbesuche: Wegeunfälle, Alleinarbeit, beengte und ungeeignete Behandlungsplätze in Wohnungen, Haustiere.", massnahme: "Hausbesuchsplan mit Erreichbarkeit per Mobiltelefon; mobile Liege nur zu zweit tragen bzw. Trolley; Hausbesuch abbrechen, wenn Arbeitsplatz unsicher.", schwere: "leicht", wahrscheinlichkeit: "moeglich", faktor: "ablaeufe_arbeitszeit", ...MASS },
+          { beschreibung: "Infektionsgefährdung durch engen Körperkontakt (Tröpfchen, Schmierinfektion, Hautpilz), auch ohne Blutkontakt (Biostoffverordnung, TRBA 250 – prüfen).", massnahme: "Händehygiene nach Hygieneplan; Liegenauflage je Patient wechseln; Angebotsvorsorge und Impfangebot über den Betriebsarzt.", schwere: "mittel", wahrscheinlichkeit: "moeglich", faktor: "einwirkungen", ...MASS },
         ], h),
       ],
       mutterschutz_ergebnis: "umgestaltung", mutterschutz_details: "Kein Heben und Umlagern von Patientinnen und Patienten über 5 kg regelmäßig bzw. 10 kg gelegentlich (§ 11 Abs. 5 MuSchG); keine Behandlung von Patientinnen und Patienten mit bekannter Infektion; Hausbesuche nur nach Einzelfallprüfung; Sitzgelegenheit und zusätzliche Pausen.",
@@ -521,7 +521,7 @@ export function standBauen(): Bau {
     daten: (h) => ({ arbeitsbereich: "Empfang und Wartebereich", taetigkeiten: "Terminvergabe am Telefon und vor Ort, Kassieren der Zuzahlungen (EC-Terminal und bar), Verkauf von Therabändern und Tapes, Bildschirmarbeit in der Praxissoftware", beschaeftigte: "1", beurteilt_von: "Tom Reiter", mitwirkung: "Beschäftigte des Bereichs", datum: "2026-02-03",
       gefaehrdungen: [
         ...BUERO.map((x) => vorschlag("gefaehrdungsbeurteilung", "gefaehrdungen", x, h, MASS)),
-        ...eintraege("gefaehrdungsbeurteilung", "gefaehrdungen", [{ beschreibung: "Aufgebrachte oder aggressive Patientinnen und Patienten am Empfang (Wartezeiten, Zuzahlungen), Bargeld in der Kassenlade.", massnahme: "Bargeld gering halten, Abschöpfung täglich; deeskalierende Gesprächsführung in der Unterweisung; Therapeut im Haus während der Empfangszeiten.", risiko: "gering", faktor: "psychisch", ...MASS }], h),
+        ...eintraege("gefaehrdungsbeurteilung", "gefaehrdungen", [{ beschreibung: "Aufgebrachte oder aggressive Patientinnen und Patienten am Empfang (Wartezeiten, Zuzahlungen), Bargeld in der Kassenlade.", massnahme: "Bargeld gering halten, Abschöpfung täglich; deeskalierende Gesprächsführung in der Unterweisung; Therapeut im Haus während der Empfangszeiten.", schwere: "leicht", wahrscheinlichkeit: "moeglich", faktor: "psychisch", ...MASS }], h),
       ],
       mutterschutz_ergebnis: "keine_massnahmen", wirksamkeit: "wirksam", wirksamkeit_am: "2026-09-08", fortschreibung: "jährlich und bei Änderungen" }) });
 
@@ -699,11 +699,17 @@ export function standBauen(): Bau {
     handelsregister: "Freier Beruf – kein Handelsgewerbe.", transparenzregister: "Natürliche Person – keine Mitteilung.",
     gewerbeanmeldung: "Physiotherapie ist ein freier Beruf (§ 18 Abs. 1 Nr. 1 EStG, „ähnlicher Beruf“) – keine Gewerbeanmeldung; Verkauf von Therabändern in geringem Umfang (Abfärbung prüfen, § 15 Abs. 3 Nr. 1 EStG).",
     ifsg_belehrung: "Keine Lebensmittel.", allergene: "Keine Lebensmittel.", haccp: "Keine Lebensmittel.",
-    hautschutzplan: "Vorschläge nur für Friseure; Feuchtarbeit in der Physiotherapie (Händedesinfektion statt Waschen) im Hygieneplan und in der Unterweisung berücksichtigt.",
+    hautschutzplan: "Im Szenario nicht erstellt (Musterzeilen für Praxen gibt es seit E-167); Feuchtarbeit in der Physiotherapie (Händedesinfektion statt Waschen) im Hygieneplan und in der Unterweisung berücksichtigt.",
     // StB-Prüfung (5.2, C-9): nur Kunden im Inland
     oss_meldung: "Nur Patienten und Kunden im Inland – kein OSS-Verfahren.", zm_meldung: "Keine Lieferungen oder Leistungen an Unternehmen im EU-Ausland.",
   };
   for (const [id, g] of Object.entries(grund)) uebersprungen.push({ id, titel: v(id).titel, grund: g });
+  // E-167 (Sifa-Durchsicht): neue Vorlagen Betriebsanweisung Maschinen und Biostoffe, Expositionsverzeichnis
+  uebersprungen.push(
+    { id: "betriebsanweisung_maschine", titel: v("betriebsanweisung_maschine").titel, grund: "Therapiegeräte werden nach der Gebrauchsanweisung (Medizinprodukte) benutzt; keine Maschine mit eigener Betriebsanweisung." },
+    { id: "betriebsanweisung_biostoffe", titel: v("betriebsanweisung_biostoffe").titel, grund: "Physiotherapie ohne invasive Tätigkeiten – keine nennenswerte Exposition gegenüber Biostoffen angenommen; Hygiene über den Hygieneplan (Einstufung fachlich prüfen)." },
+    { id: "expositionsverzeichnis", titel: v("expositionsverzeichnis").titel, grund: "Keine Tätigkeiten mit Gefahrstoffen der Kategorie 1A/1B." },
+  );
   const genutzt = new Set(docs.map((d) => d.vorlage));
   for (const vl of VORLAGEN) if (!genutzt.has(vl.id) && !uebersprungen.some((u) => u.id === vl.id)) auffaellig.push(`Vorlage ${vl.id} weder erzeugt noch als übersprungen begründet.`);
 

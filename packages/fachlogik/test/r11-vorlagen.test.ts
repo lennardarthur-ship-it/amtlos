@@ -44,9 +44,11 @@ describe("Gefährdungsbeurteilung (Reinigung #11, Tischlerei #5, #17, #18)", () 
     const vs = liste.art === "liste" ? liste.vorschlaege ?? [] : [];
     const r = vs.filter((x) => x.gruppe === "Gebäudereinigung");
     const h = vs.filter((x) => x.gruppe === "Holz / Tischlerei");
-    expect(r.length).toBe(5);
+    // E-167: sechs weitere Gefährdungen der Gebäudereinigung aus der Sifa-Durchsicht; Fachquellen statt „Nutzertest“
+    expect(r.length).toBe(11);
     expect(h.length).toBe(5);
-    for (const x of [...r, ...h]) expect(x.quelle).toMatch(/fachlich zu prüfen$/);
+    for (const x of [...r, ...h]) expect(x.quelle).not.toMatch(/Nutzertest/);
+    expect([...r, ...h].filter((x) => /fachlich zu prüfen$/.test(x.quelle!)).length).toBe(2);
     expect(h.some((x) => /Hartholzstaub/.test(x.titel) && /TRGS 553/.test(x.quelle!))).toBe(true);
     expect(r.some((x) => /§ 8 ArbSchG/.test(String(x.werte.massnahme)))).toBe(true);
   });
@@ -57,7 +59,7 @@ describe("Gefährdungsbeurteilung (Reinigung #11, Tischlerei #5, #17, #18)", () 
   });
   it("Mutterschutz: Hinweis bei Holzstaub oder Lärm und „keine Schutzmaßnahmen erforderlich“", () => {
     const d = { gefaehrdungen: [{ beschreibung: "Hartholzstaub beim Schleifen", massnahme: "Absaugung" }], mutterschutz_ergebnis: "keine_massnahmen" };
-    expect(v("gefaehrdungsbeurteilung").hinweise!(d, B)[0]).toMatch(/Mutterschutz: .*§§ 10, 11 MuSchG/);
+    expect(v("gefaehrdungsbeurteilung").hinweise!(d, B)[0]).toMatch(/Mutterschutz: .*§§ 9 bis 12 MuSchG/);
     expect(v("gefaehrdungsbeurteilung").hinweise!({ ...d, mutterschutz_ergebnis: "umgestaltung" }, B)).toEqual([]);
   });
 });

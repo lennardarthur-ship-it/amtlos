@@ -1,12 +1,12 @@
 # R12 (Nutzertest Bäckerei #2): Nachtarbeit – Untersuchung und Ausgleich (§ 6 ArbZG)
 schema_version: 1
 id: personal.nachtarbeit
-version: 1
+version: 2
 katalog_nr: D.42
 titel:
   de: 'Nachtarbeit: Untersuchung ermöglichen und ausgleichen'
 kurz:
-  de: Wer bei dir regelmäßig nachts arbeitet, kann sich vor Beginn und dann regelmäßig auf deine Kosten arbeitsmedizinisch untersuchen lassen und bekommt einen Ausgleich durch freie Tage oder Zuschlag.
+  de: Wer bei dir als Nachtarbeitnehmer arbeitet, kann sich vor Beginn und danach alle drei Jahre, ab 50 Jahren jährlich, auf deine Kosten arbeitsmedizinisch untersuchen lassen und bekommt einen Ausgleich durch freie Tage oder Zuschlag.
 erklaerung:
   de: Nachtzeit ist die Zeit von 23 bis 6 Uhr, in Bäckereien und Konditoreien von 22 bis 5 Uhr (§ 2 Abs. 3 ArbZG). Nachtarbeit ist Arbeit, die mehr als zwei Stunden der Nachtzeit umfasst (§ 2 Abs. 4 ArbZG); Nachtarbeitnehmer ist, wer normalerweise in Wechselschicht nachts arbeitet oder an mindestens 48 Tagen im Jahr (§ 2 Abs. 5 ArbZG). Nachtarbeitnehmer dürfen sich vor Beginn der Beschäftigung und danach in Abständen von nicht weniger als drei Jahren arbeitsmedizinisch untersuchen lassen, ab 50 Jahren jährlich; die Kosten trägst du, wenn du die Untersuchung nicht kostenlos durch einen Betriebsarzt anbietest (§ 6 Abs. 3 ArbZG). Für die Nachtarbeit gewährst du eine angemessene Zahl bezahlter freier Tage oder einen angemessenen Zuschlag, soweit kein Tarifvertrag gilt (§ 6 Abs. 5 ArbZG). Die werktägliche Arbeitszeit darf acht Stunden nur überschreiten, bis zu zehn Stunden, wenn innerhalb eines Kalendermonats oder von vier Wochen im Durchschnitt acht Stunden nicht überschritten werden (§ 6 Abs. 2 ArbZG).
 rechtsgrundlage:
@@ -28,7 +28,7 @@ ausloeser:
     op: ==
     wert: true
     label:
-      de: Bei dir arbeitet jemand regelmäßig nachts.
+      de: Bei dir arbeitet jemand regelmäßig nachts – in Wechselschicht oder an mindestens 48 Tagen im Jahr (Nachtarbeitnehmer, § 2 Abs. 5 ArbZG).
 frist:
   typ: dauerhaft
 wiederholung:
@@ -49,8 +49,12 @@ quellen:
 - titel: Arbeitszeitgesetz § 6
   url: https://www.gesetze-im-internet.de/arbzg/__6.html
   abgerufen: null
+- titel: Arbeitszeitgesetz (§§ 2, 6, 16, 22)
+  url: https://www.gesetze-im-internet.de/arbzg/BJNR117100994.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Neu nach Nutzertest R12 (Bäckerei #2) – Bußgeld (§ 22 ArbZG) fachlich ergänzen; Gefährdungsbaustein Nachtarbeit fehlt; Abgleich mit Angebotsvorsorge nach ArbMedVV'
+- 'Neu nach Nutzertest R12 (Bäckerei #2) – Folgen fachlich ergänzen (§ 6 Abs. 3 ArbZG steht nicht in § 22 Abs. 1 ArbZG); Gefährdungsbaustein Nachtarbeit fehlt'
+- 'Prüfergebnis Sifa 22.10.2026: Untersuchung nach § 6 Abs. 3 ArbZG ist keine Vorsorge nach ArbMedVV; Auslöser über die Frage „regelmäßig nachts“ mit Hilfetext nach § 2 Abs. 5 ArbZG – eigene Angabe „Nachtarbeitnehmer“ wäre genauer'
 pruefung:
   status: entwurf
   geprueft_von: null

@@ -1,0 +1,58 @@
+# Prüfergebnis Sifa 22.10.2026 (C Fehlende Pflichten „Lärm: Gehörschutz, Lärmbereiche“): LärmVibrationsArbSchV
+schema_version: 1
+id: arbeitsschutz.laerm
+version: 1
+katalog_nr: E.53
+titel:
+  de: 'Lärm: messen, Gehörschutz und Lärmbereiche'
+kurz:
+  de: Ist es an Arbeitsplätzen laut, etwa an Holzbearbeitungsmaschinen, mit Schlagschraubern oder Trennschleifern, ermittelst du die Lärmbelastung und sorgst ab 80 dB(A) für Gehörschutz.
+erklaerung:
+  de: 'In der Gefährdungsbeurteilung ermittelst du, ob Beschäftigte Lärm ausgesetzt sind – wenn nötig mit Messungen durch eine fachkundige Person (§ 3, § 4 LärmVibrationsArbSchV). Die Auslösewerte liegen bei 80 und 85 dB(A) Tages-Lärmexpositionspegel bzw. 135 und 137 dB(C) Spitzenschalldruckpegel (§ 6). Technische Maßnahmen wie leisere Maschinen und Kapselung gehen vor (§ 7 Abs. 1). Ab dem unteren Auslösewert stellst du Gehörschutz bereit und unterweist die Beschäftigten, ab dem oberen Auslösewert müssen sie ihn tragen (§ 8, § 11). Bereiche, in denen der obere Auslösewert überschritten werden kann, kennzeichnest du als Lärmbereich und stellst ein Lärmminderungsprogramm auf (§ 7 Abs. 4, 5). Arbeitsmedizinische Vorsorge ist ab 80 dB(A) anzubieten und ab 85 dB(A) Pflicht – das steht bei der Vorsorge. Für Vibrationen (zum Beispiel Bohrhammer, Rüttelplatte) gilt dieselbe Verordnung.'
+rechtsgrundlage:
+- LärmVibrationsArbSchV
+kategorie: arbeitsschutz
+einordnung: hinweis
+branchen:
+- handwerk
+- bau
+ausloeser:
+  all:
+  - feld: abgeleitet.hat_beschaeftigte
+    op: ==
+    wert: true
+    label:
+      de: Du beschäftigst mindestens eine Person.
+  - feld: profil.taetigkeit.branchen
+    op: enthaelt_eines
+    wert:
+    - handwerk
+    - bau
+    label:
+      de: In Handwerk und Bau gibt es oft laute Maschinen und Werkzeuge.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; fachkundige Person für Messungen
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Bußgeld bis 5.000 € bei Verstößen gegen die Lärm- und Vibrations-Arbeitsschutzverordnung, etwa ohne Gefährdungsbeurteilung, Gehörschutz oder Unterweisung (§ 16 Abs. 1 LärmVibrationsArbSchV in Verbindung mit § 25 Abs. 1 Nr. 1, Abs. 2 ArbSchG).
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Lärm- und Vibrations-Arbeitsschutzverordnung
+  url: https://www.gesetze-im-internet.de/l_rmvibrationsarbschv/BJNR026110007.html
+  abgerufen: '2026-10-22'
+fachlich_zu_pruefen:
+- 'Neu nach Prüfergebnis Sifa 22.10.2026 – als Hinweis über die Branche (Amtlos fragt die Lärmbelastung nicht ab); einzelne Nummern in § 16 Abs. 1 nicht abgerufen; Gehörschutz-Unterweisung und Lärmbereiche als Bausteine der Gefährdungsbeurteilung'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

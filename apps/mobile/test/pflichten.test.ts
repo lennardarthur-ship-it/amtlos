@@ -41,7 +41,8 @@ describe("Pflichten-Check", () => {
     // neue Mitarbeiterin mit „Beschäftigt seit“ ⇒ die Einstellungs-Pflichten sind wieder dran
     const neu = auswertung(cafe, "2026-01-15", [], [{ name: "Ina", beginn: "2026-01-20" }]);
     expect(ids(neu.gilt)).toEqual(expect.arrayContaining(einstellung));
-    expect(neu.gilt.find((p) => p.id === "arbeitsschutz.erstunterweisung")!.naechsterTermin).toBe("2026-01-19");
+    // Prüfergebnis Sifa 22.10.2026: rechtlich genügt der erste Arbeitstag vor Arbeitsbeginn (Erinnerung am Vortag)
+    expect(neu.gilt.find((p) => p.id === "arbeitsschutz.erstunterweisung")!.naechsterTermin).toBe("2026-01-20");
     // ohne Beschäftigte keine Einstellung, also auch keine dieser Pflichten
     const allein = auswertung({ ...cafe, "beschaeftigte.gesamt": 0 }, "2026-01-15");
     expect(ereignisseAusStand({ ...cafe, "beschaeftigte.gesamt": 0 }, "2026-01-15")).toEqual([]);

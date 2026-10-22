@@ -1,51 +1,52 @@
-# Katalog E.53 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog E.53 · Startbestand aus Spezifikation Abschnitt 4 (E-054); Prüfergebnis Sifa 22.10.2026 (C Katalog E.53): geteilt in
+# Erste-Hilfe-Organisation (arbeitsschutz.erste_hilfe_organisation), Ersthelfer (diese Pflicht) und Brandschutzhelfer (arbeitsschutz.brandschutzhelfer)
 schema_version: 1
 id: arbeitsschutz.erste_hilfe
-version: 1
+version: 2
 katalog_nr: E.53
 titel:
-  de: Erste Hilfe und Brandschutz organisieren
+  de: Ersthelfer bestimmen und fortbilden
 kurz:
-  de: Ab 2 Versicherten brauchst du Ersthelfer, Verbandmaterial und ein Verbandbuch; außerdem Brandschutzhelfer.
+  de: Sind bei der Arbeit mindestens zwei Personen anwesend, sorgst du für ausgebildete Ersthelfer und lässt sie alle zwei Jahre fortbilden.
 erklaerung:
-  de: Ersthelfer ab 2 Versicherten, Erste-Hilfe-Material, Verbandbuch und Brandschutzhelfer nach ASR A2.2.
+  de: 'Bei 2 bis 20 anwesenden Versicherten brauchst du mindestens einen Ersthelfer, bei mehr Anwesenden je nach Betriebsart 5 oder 10 Prozent (§ 26 Abs. 1 DGUV Vorschrift 1). Ersthelfer werden bei einer von der BG ermächtigten Stelle ausgebildet und in der Regel alle zwei Jahre fortgebildet (§ 26 Abs. 2, 3 DGUV Vorschrift 1); die Kosten der Lehrgänge trägt meist die BG. Als Inhaberin oder Inhaber zählst du nur mit, wenn du selbst versichert bist – Amtlos zählt vorsichtshalber alle Anwesenden, also schon ab der ersten beschäftigten Person. Plane Vertretungen für Urlaub, Krankheit und Schichten ein. Verbandkasten, Notruf-Aushang und Verbandbuch sind eine eigene Pflicht, Brandschutzhelfer ebenfalls.'
 rechtsgrundlage:
-- DGUV Vorschrift 1
-- ASR A2.2
+- § 26 DGUV Vorschrift 1
 kategorie: arbeitsschutz
 ausloeser:
-  feld: profil.beschaeftigte.gesamt
-  op: '>='
-  wert:
-    regelwert: arbeitsschutz.ersthelfer.schwelle_versicherte
+  feld: abgeleitet.hat_beschaeftigte
+  op: ==
+  wert: true
   label:
-    de: Du hast mindestens 2 Versicherte.
+    de: Du beschäftigst mindestens eine Person – mit dir sind damit in der Regel mindestens zwei Personen anwesend.
 frist:
   typ: dauerhaft
 wiederholung:
   art: einmalig
 stelle:
-  de: Du selbst
+  de: Du selbst; Ausbildung bei einer ermächtigten Stelle
 kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: mittel
+    de: Bußgeld bis 10.000 €, wenn die erforderlichen Ersthelfer fehlen (§ 32 DGUV Vorschrift 1 in Verbindung mit § 209 Abs. 1 Nr. 1, Abs. 3 SGB VII).
+  schwere: hoch
 automatisierung: hinweis
+aenderungsnotiz:
+  de: Ersthelfer zählen jetzt ab zwei anwesenden Personen (du selbst zählst mit); Verbandkasten und Verbandbuch sowie Brandschutzhelfer sind eigene Pflichten.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
 quellen:
-- titel: ASR A2.2
-  url: https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A2-2.html
-  abgerufen: null
+- titel: DGUV Vorschrift 1 (UK BB, § 26)
+  url: https://www.ukbb.de/fileadmin/user_upload/cms/download_user/Praevention/Erste_Hilfe/DGUV_Vorschrift_1.pdf
+  abgerufen: '2026-10-22'
+- titel: DGUV Vorschrift 1 (UKBW, §§ 24, 32)
+  url: https://www.ukbw.de/fileadmin/user_upload/Mediathek/UVV/DGUV_Vorschrift_1.pdf
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- „Versicherte“ = Beschäftigte? (Unternehmer zählt mit?)
-- Anzahl Ersthelfer und Brandschutzhelfer je Betriebsgröße als Regelwerte
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- 'Prüfergebnis Sifa 22.10.2026: „Versicherte“ – Inhaber zählt nur, wenn selbst versichert; konservativ alle Anwesenden gezählt, Auslöser deshalb ab einer beschäftigten Person (Regelwert arbeitsschutz.ersthelfer.schwelle_versicherte = 2 bleibt Rechtsstand, wird im Auslöser nicht mehr verglichen)'
+- Anzahl der Ersthelfer über 20 Anwesende (5 % bzw. 10 % je Betriebsart) als Regelwerte
 pruefung:
   status: entwurf
   geprueft_von: null

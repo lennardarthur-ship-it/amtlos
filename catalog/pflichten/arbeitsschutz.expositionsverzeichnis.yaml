@@ -1,0 +1,75 @@
+# Prüfergebnis Sifa 22.10.2026 (C Fehlende Pflichten „Expositionsverzeichnis“, C Katalog E.55, Hinweise Nr. 8): § 10a GefStoffV
+schema_version: 1
+id: arbeitsschutz.expositionsverzeichnis
+version: 1
+katalog_nr: E.55
+titel:
+  de: Expositionsverzeichnis bei krebserzeugenden Stoffen führen
+kurz:
+  de: Arbeiten Beschäftigte mit krebserzeugenden, erbgutverändernden oder fortpflanzungsgefährdenden Stoffen der Kategorie 1A oder 1B, führst du ein Expositionsverzeichnis.
+erklaerung:
+  de: 'Ergibt die Gefährdungsbeurteilung eine Gefährdung durch Tätigkeiten mit krebserzeugenden, keimzellmutagenen oder reproduktionstoxischen Gefahrstoffen der Kategorie 1A oder 1B, führst du ein Verzeichnis der betroffenen Beschäftigten mit Art, Dauer, Häufigkeit und Höhe der Exposition (§ 10a Abs. 1 GefStoffV). Typisch sind Hartholzstaub (Eiche, Buche) in der Tischlerei, Dieselmotoremissionen in der Kfz-Werkstatt und Quarzstaub oder Asbest auf Baustellen. Das Verzeichnis bewahrst du nach Ende der Exposition 40 Jahre auf, bei nur reproduktionstoxischen Stoffen 5 Jahre (§ 10a Abs. 2 GefStoffV); scheidet jemand aus, händigst du ihm seinen Auszug aus. Die Aufbewahrung kannst du an die Zentrale Expositionsdatenbank (ZED) der DGUV abgeben (§ 10a Abs. 3 GefStoffV). Die Einzelheiten erläutert die TRGS 410.'
+rechtsgrundlage:
+- § 10a GefStoffV
+- TRGS 410
+kategorie: arbeitsschutz
+einordnung: hinweis
+branchen:
+- handwerk
+- bau
+ausloeser:
+  all:
+  - feld: abgeleitet.hat_beschaeftigte
+    op: ==
+    wert: true
+    label:
+      de: Du beschäftigst mindestens eine Person.
+  - feld: profil.arbeitsschutz.gefahrstoffe
+    op: ==
+    wert: true
+    label:
+      de: Ihr arbeitet mit Gefahrstoffen.
+  - feld: profil.taetigkeit.branchen
+    op: enthaelt_eines
+    wert:
+    - handwerk
+    - bau
+    label:
+      de: In Handwerk und Bau kommen krebserzeugende Stoffe wie Hartholzstaub, Dieselabgase oder Quarzstaub häufig vor.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Zentrale Expositionsdatenbank (ZED) der DGUV
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Bußgeld bis 50.000 €, wenn das Expositionsverzeichnis nicht, nicht richtig oder nicht vollständig geführt oder nicht lange genug aufbewahrt wird (§ 22 Abs. 1 Nr. 17a, 17b GefStoffV in Verbindung mit § 26 Abs. 1 Nr. 8 Buchst. b, Abs. 3 ChemG).
+  schwere: hoch
+automatisierung: dokument_generator
+dokumente:
+- vorlage.expositionsverzeichnis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Gefahrstoffverordnung (Stand 17.12.2025, § 10a)
+  url: https://www.gesetze-im-internet.de/gefstoffv_2010/BJNR164400010.html
+  abgerufen: '2026-10-22'
+- titel: Gefahrstoffverordnung § 22
+  url: https://www.gesetze-im-internet.de/gefstoffv_2010/__22.html
+  abgerufen: '2026-10-22'
+- titel: DGUV IFA – Expositionsverzeichnis
+  url: https://dguv.de/ifa/praxishilfen/taetigkeiten-mit-krebserzeugenden-gefahrstoffen/gefaehrdungsbeurteilung/expositionsverzeichnis/index.jsp
+  abgerufen: '2026-10-22'
+- titel: Haufe – § 10a GefStoffV Expositionsverzeichnis (laut Prüfergebnis Sifa)
+  url: https://www.haufe.de/id/beitrag/novellierung-der-gefahrstoffverordnung-fokus-krebserz-11-10a-expositionsverzeichnis-auch-fuer-reproduktionstoxische-stoffe-kat-1a-oder-1b-HI16494225.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Neu nach Prüfergebnis Sifa 22.10.2026 – als Hinweis über Branche und Gefahrstoff-Angabe (Amtlos fragt Kategorie 1A/1B nicht ab); Vorlage vorlage.expositionsverzeichnis verknüpft; Verzicht nach TRGS 410 (z. B. bei Einhaltung der Akzeptanzkonzentration) nicht abgebildet'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

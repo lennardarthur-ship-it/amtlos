@@ -516,26 +516,61 @@ const HAUT: [string, string, string][] = [
   ["pflege", "Hautpflege", "19%"],
 ];
 
+/**
+ * E-167 (Sifa-Durchsicht, Blatt „B Vorlagen“, Frage 6): Musterzeilen auch für Kosmetik/Nagel, Gastronomie,
+ * Gebäudereinigung, Praxis, Kfz, Bäckerei und Bau – nach TRGS 401 formuliert, noch nicht fachlich geprüft (T-153). Dazu
+ * Händedesinfektion (Praxis, Kosmetik) und Material/Norm der Handschuhe.
+ */
+const HAUT_SCHUTZ = "Hautschutzmittel vor der Arbeit und nach den Pausen – unter Handschuhen nur ein handschuhverträgliches Präparat";
+const HAUT_REINIGUNG = "Hände nur bei Verschmutzung mit mildem Reinigungsmittel waschen; gut abtrocknen";
+const HAUT_PFLEGE = "Nach dem Waschen, vor Pausen und nach Arbeitsende Hände eincremen";
+const haut = (gruppe: string, anlass: string, handschuhe: string, norm: string, extra: Partial<Record<"schutz" | "reinigung" | "pflege" | "desinfektion", string>> = {}): Vorschlag => ({
+  gruppe,
+  titel: anlass,
+  werte: { anlass, schutz: extra.schutz ?? HAUT_SCHUTZ, handschuhe, handschuh_norm: norm, reinigung: extra.reinigung ?? HAUT_REINIGUNG, pflege: extra.pflege ?? HAUT_PFLEGE, ...(extra.desinfektion ? { desinfektion: extra.desinfektion } : {}) },
+  quelle: "TRGS 401 – fachlich zu prüfen",
+});
+const DESINF_BEHANDLUNG = "vor und nach jeder Behandlung und nach dem Ausziehen der Handschuhe";
+export const HAUTSCHUTZ_WEITERE: Vorschlag[] = [
+  haut("Kosmetik", "Nagelmodellage: Kleber, Acrylate, Gele und Aktivatoren", "Nitril-Einmalhandschuhe, nach jeder Kundin bzw. jedem Kunden wechseln", "Nitril, DIN EN ISO 374", { desinfektion: DESINF_BEHANDLUNG }),
+  haut("Kosmetik", "Kosmetische Behandlung und Fußpflege mit möglichem Blutkontakt", "Flüssigkeitsdichte Einmalhandschuhe", "Nitril, DIN EN ISO 374 bzw. DIN EN 455", { desinfektion: DESINF_BEHANDLUNG }),
+  haut("Gastronomie / Café", "Spülen und Arbeiten in der Spülküche (Feuchtarbeit)", "Flüssigkeitsdichte Handschuhe mit Stulpe, darunter Baumwoll-Unterziehhandschuhe", "DIN EN ISO 374", { reinigung: "Hände mit pH-hautneutralem Flüssigsyndet waschen; gut abtrocknen" }),
+  haut("Gastronomie / Café", "Reinigung mit Grill- und Backofenreinigern", "Chemikalienschutzhandschuhe mit langer Stulpe, dazu Schutzbrille", "nach Sicherheitsdatenblatt, DIN EN ISO 374"),
+  haut("Gebäudereinigung", "Nassreinigung (Feuchtarbeit)", "Flüssigkeitsdichte Schutzhandschuhe, darunter Baumwoll-Unterziehhandschuhe", "DIN EN ISO 374"),
+  haut("Gebäudereinigung", "Sanitär- und Grundreinigung mit sauren oder alkalischen Reinigern", "Chemikalienschutzhandschuhe mit Stulpe, dazu Schutzbrille", "nach Sicherheitsdatenblatt, DIN EN ISO 374"),
+  haut("Praxis / Gesundheit", "Untersuchung und Behandlung", "Medizinische Einmalhandschuhe bei möglichem Kontakt mit Blut oder Körperflüssigkeiten", "DIN EN 455", { desinfektion: "vor und nach jedem Patientenkontakt, nach Kontakt mit potenziell infektiösem Material und nach dem Ausziehen der Handschuhe" }),
+  haut("Praxis / Gesundheit", "Instrumenten- und Flächendesinfektion", "Chemikalienschutzhandschuhe – Untersuchungshandschuhe schützen nicht ausreichend", "Nitril, DIN EN ISO 374"),
+  haut("Kfz-Werkstatt", "Arbeiten mit Altöl, Kraftstoff und Kühlschmierstoff", "Chemikalienschutzhandschuhe", "Nitril, DIN EN ISO 374", { reinigung: "Lösemittelfreie Hautreiniger verwenden, nie Kraftstoff oder Verdünner; gut abtrocknen" }),
+  haut("Kfz-Werkstatt", "Montage- und Reparaturarbeiten mit starker Verschmutzung", "Montagehandschuhe", "DIN EN 388", { reinigung: "Handreiniger mit Reibemittel nur bei starker Verschmutzung; gut abtrocknen" }),
+  haut("Bäckerei", "Teigherstellung und Arbeiten mit Mehl und Teig", "Bei Hautproblemen lebensmitteltaugliche Einmalhandschuhe", "lebensmitteltauglich"),
+  haut("Bäckerei", "Reinigung von Maschinen, Blechen und Backstube", "Chemikalienschutzhandschuhe mit Stulpe", "DIN EN ISO 374"),
+  haut("Handwerk", "Arbeiten mit Zement, Mörtel und Beton", "Nitrilbeschichtete Baumwollhandschuhe bzw. Chemikalienschutzhandschuhe; chromatarmen Zement verwenden", "DIN EN ISO 374"),
+  haut("Handwerk", "Arbeiten mit Epoxidharz und PU-Schaum", "Nitril-Einmalhandschuhe nach Herstellerangabe, nach Gebrauch entsorgen", "Nitril, DIN EN ISO 374"),
+];
+/** Händedesinfektion als eigene Spalte, sobald eine Zeile sie nennt (E-167). */
+const HAUT_DESINFEKTION: [string, string, string] = ["desinfektion", "Händedesinfektion", "15%"];
+
 /** Produkte des Betriebs je Spalte (R10): stehen im Plan fett über den Anweisungen – leer als Linie zum Eintragen. */
 const HAUT_PRODUKTE: [string, string][] = [
   ["schutz", "produkt_schutz"],
   ["handschuhe", "produkt_handschuhe"],
   ["reinigung", "produkt_reinigung"],
   ["pflege", "produkt_pflege"],
+  ["desinfektion", "produkt_desinfektion"],
 ];
 
 export const hautschutzplan: Vorlage = {
   id: "hautschutzplan",
   gestalt: "aushang",
   titel: "Hautschutzplan",
-  beschreibung: "Aushang auf einem Blatt: wann welcher Hautschutz, welche Handschuhe, welche Reinigung und Pflege – mit den Zeilen aus dem Muster-Hautschutzplan der TRGS 530 und der BGW und deinen Produkten.",
+  beschreibung: "Aushang auf einem Blatt: wann welcher Hautschutz, welche Handschuhe, welche Reinigung und Pflege – mit den Zeilen aus dem Muster-Hautschutzplan der TRGS 530 und der BGW, Musterzeilen für weitere Branchen und deinen Produkten.",
   bereich: "beauty",
   pflichten: ["branche.beauty_hautschutzplan"],
   grundlage: "TRGS 401; TRGS 530",
   querformat: true,
   namensFeld: "bereich",
   abschnitte: [
-    { titel: "Bereich", felder: [{ id: "bereich", art: "text", label: "Bereich", vorschlaege: ["Salon", "Kosmetikkabine", "Nagelstudio"] }] },
+    { titel: "Bereich", felder: [{ id: "bereich", art: "text", label: "Bereich", vorschlaege: ["Salon", "Kosmetikkabine", "Nagelstudio", "Küche und Spülküche", "Reinigungsobjekte", "Behandlungsräume der Praxis", "Werkstatt", "Backstube", "Baustelle"] }] },
     {
       titel: "Tätigkeiten",
       hilfe: "Wähle die Tätigkeiten aus dem Muster. Die Produkte, die bei dir stehen, trägst du im nächsten Schritt ein.",
@@ -548,11 +583,14 @@ export const hautschutzplan: Vorlage = {
           titelFeld: "anlass",
           pflicht: true,
           leerStarten: true,
-          vorschlaege: HAUTSCHUTZ_FRISEUR,
+          vorschlaege: [...HAUTSCHUTZ_FRISEUR, ...HAUTSCHUTZ_WEITERE],
+          gruppenLabel: "Branche",
           felder: [
             { id: "anlass", art: "text", label: "Tätigkeit", pflicht: true },
             { id: "schutz", art: "mehrzeilig", label: "Hautschutz vor der Tätigkeit" },
             { id: "handschuhe", art: "mehrzeilig", label: "Schutzhandschuhe" },
+            { id: "handschuh_norm", art: "text", label: "Handschuh: Material / Norm", hilfe: "z. B. Nitril, DIN EN ISO 374 – laut Sicherheitsdatenblatt bzw. Hersteller" },
+            { id: "desinfektion", art: "mehrzeilig", label: "Händedesinfektion", hilfe: "z. B. in Praxis und Kosmetik: wann die Hände desinfiziert werden" },
             { id: "reinigung", art: "mehrzeilig", label: "Hautreinigung" },
             { id: "pflege", art: "mehrzeilig", label: "Hautpflege" },
           ],
@@ -567,6 +605,7 @@ export const hautschutzplan: Vorlage = {
         { id: "produkt_handschuhe", art: "text", label: "Schutzhandschuhe", hilfe: "Produkt bzw. Material", hervor: true },
         { id: "produkt_reinigung", art: "text", label: "Hautreinigungsmittel", hilfe: "Produktname", hervor: true },
         { id: "produkt_pflege", art: "text", label: "Hautpflegemittel", hilfe: "Produktname", hervor: true },
+        { id: "produkt_desinfektion", art: "text", label: "Händedesinfektionsmittel", hilfe: "Produktname – nur wenn der Plan Händedesinfektion nennt", hervor: true, selten: true },
       ],
     },
     { titel: "Verantwortlich und Stand",
@@ -577,17 +616,22 @@ export const hautschutzplan: Vorlage = {
     },
   ],
   html(d, b) {
-    const eintraege = liste(d, "eintraege").filter((x) => HAUT.some(([id]) => text(x, id)));
+    // Material/Norm unter den Handschuhen; Händedesinfektion als Spalte, sobald eine Zeile sie nennt (E-167)
+    const eintraege = liste(d, "eintraege")
+      .filter((x) => HAUT.some(([id]) => text(x, id)))
+      .map((x) => (text(x, "handschuh_norm") ? { ...x, handschuhe: [text(x, "handschuhe"), `Material/Norm: ${text(x, "handschuh_norm")}`].filter(Boolean).join("\n") } : x));
+    const mitDesinfektion = eintraege.some((x) => text(x, "desinfektion"));
+    const HAUT_SP = mitDesinfektion ? [...HAUT, HAUT_DESINFEKTION] : HAUT;
     // Zeile „Produkt“ unter dem Kopf: je Spalte das Produkt des Betriebs (fett), sonst eine Linie zum Eintragen
     const produkt = (spalte: string) => {
       const feld = HAUT_PRODUKTE.find(([s]) => s === spalte)?.[1];
       return feld ? (text(d, feld) ? `<strong>${zelle(text(d, feld))}</strong>` : ZELLE_LINIE) : "<strong>Produkt</strong>";
     };
-    const kopf = `<thead><tr>${HAUT.map(([, k]) => `<th>${esc(k)}</th>`).join("")}</tr></thead>`;
-    const roh = eintraege.length ? eintraege.map((x) => HAUT.map(([id], i) => (i === 0 ? `<strong>${zelle(text(x, id))}</strong>` : zelle(text(x, id))))) : Array.from({ length: 6 }, () => HAUT.map(() => "&nbsp;"));
+    const kopf = `<thead><tr>${HAUT_SP.map(([, k]) => `<th>${esc(k)}</th>`).join("")}</tr></thead>`;
+    const roh = eintraege.length ? eintraege.map((x) => HAUT_SP.map(([id], i) => (i === 0 ? `<strong>${zelle(text(x, id))}</strong>` : zelle(text(x, id))))) : Array.from({ length: 6 }, () => HAUT_SP.map(() => "&nbsp;"));
     // gleiche Anweisung in mehreren Zeilen (z. B. Hautpflege) steht einmal in der Zeile „Für alle Tätigkeiten“ – so passt
     // der Plan auf ein Blatt und liest sich am Waschplatz schneller (R10)
-    const gemeinsam = HAUT.map((_, s) => {
+    const gemeinsam = HAUT_SP.map((_, s) => {
       if (s === 0 || roh.length < 3) return "";
       const zahl = new Map<string, number>();
       for (const r of roh) if (r[s] && r[s] !== "&nbsp;") zahl.set(r[s]!, (zahl.get(r[s]!) ?? 0) + 1);
@@ -595,11 +639,11 @@ export const hautschutzplan: Vorlage = {
       return n >= 2 ? w : "";
     });
     // Zeile „Produkt“: das Produkt des Betriebs und darunter die Anweisung, die für alle Tätigkeiten gilt
-    const produkte = `<tr class="produkte">${HAUT.map(([id], sp) => `<td>${sp === 0 ? (gemeinsam.some(Boolean) ? "<strong>Produkt, für alle Tätigkeiten</strong>" : "<strong>Produkt</strong>") : `${produkt(id)}${gemeinsam[sp] ? `<div class="alle">${gemeinsam[sp]}</div>` : ""}`}</td>`).join("")}</tr>`;
+    const produkte = `<tr class="produkte">${HAUT_SP.map(([id], sp) => `<td>${sp === 0 ? (gemeinsam.some(Boolean) ? "<strong>Produkt, für alle Tätigkeiten</strong>" : "<strong>Produkt</strong>") : `${produkt(id)}${gemeinsam[sp] ? `<div class="alle">${gemeinsam[sp]}</div>` : ""}`}</td>`).join("")}</tr>`;
     const zeichen = roh.reduce((n, r) => n + r.reduce((m, c, sp) => m + (gemeinsam[sp] && c === gemeinsam[sp] ? 0 : c.replace(/<[^>]+>/g, "").length), 0), 0) + gemeinsam.join("").length;
     const zeilen = roh.map((r) => `<tr>${r.map((c, s) => `<td>${gemeinsam[s] && c === gemeinsam[s] ? "" : c}</td>`).join("")}</tr>`).join("");
     // Tätigkeit und Handschuhe unterscheiden sich je Zeile – sie bekommen mehr Breite als die gemeinsamen Spalten
-    const breiten = gemeinsam.some(Boolean) ? ["24%", "14%", "28%", "17%", "17%"] : HAUT.map(([, , w]) => w);
+    const breiten = mitDesinfektion ? (gemeinsam.some(Boolean) ? ["20%", "12%", "24%", "15%", "14%", "15%"] : ["19%", "15%", "19%", "16%", "16%", "15%"]) : gemeinsam.some(Boolean) ? ["24%", "14%", "28%", "17%", "17%"] : HAUT.map(([, , w]) => w);
     const cols = `<colgroup>${breiten.map((w) => `<col style="width:${w}">`).join("")}</colgroup>`;
     return dokument({
       titel: "Hautschutzplan",

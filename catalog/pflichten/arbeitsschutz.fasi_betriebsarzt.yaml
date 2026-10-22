@@ -1,18 +1,17 @@
-# Katalog E.52 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog E.52 · Startbestand aus Spezifikation Abschnitt 4 (E-054); Prüfergebnis Sifa 22.10.2026 (C Katalog E.52, Frage 13) eingearbeitet
 schema_version: 1
 id: arbeitsschutz.fasi_betriebsarzt
-version: 2
+version: 3
 katalog_nr: E.52
 titel:
   de: Fachkraft für Arbeitssicherheit und Betriebsarzt
 kurz:
-  de: Betriebe mit Beschäftigten brauchen eine sicherheitstechnische und betriebsärztliche Betreuung – Kleinbetriebe auch im Unternehmermodell.
+  de: Ab der ersten beschäftigten Person brauchst du eine sicherheitstechnische und betriebsärztliche Betreuung – als Regelbetreuung oder, in kleineren Betrieben, im Unternehmermodell deiner BG.
 erklaerung:
-  de: Das Arbeitssicherheitsgesetz und die DGUV Vorschrift 2 verlangen eine Betreuung durch eine Fachkraft für Arbeitssicherheit
-    und einen Betriebsarzt. Kleinbetriebe können das Unternehmermodell der Berufsgenossenschaft nutzen.
+  de: 'Ab der ersten beschäftigten Person verlangen das Arbeitssicherheitsgesetz und die DGUV Vorschrift 2 eine Betreuung durch eine Fachkraft für Arbeitssicherheit und einen Betriebsarzt. Du hast die Wahl: Regelbetreuung – bei bis zu 10 Beschäftigten nach Anlage 1 der DGUV Vorschrift 2 mit Grundbetreuung und anlassbezogener Betreuung, per Vertrag mit einer Fachkraft für Arbeitssicherheit und einem Betriebsarzt oder einem überbetrieblichen Dienst – oder, je nach BG, die alternative bedarfsorientierte Betreuung (Unternehmermodell, meist bis 50 Beschäftigte; die BGN etwa für mehr als 10 bis 50 Beschäftigte, darunter ein Kompetenzzentren-Modell). Im Unternehmermodell nimmst du selbst an Schulungen der BG teil und holst dir bei Bedarf anlassbezogen Fachleute dazu. Bist du noch nicht betreut, wähle die Regelbetreuung oder melde dich bei deiner BG zum Unternehmermodell an – bis dahin fehlt dir die fachliche Beratung zur Gefährdungsbeurteilung. Ein Gesetzesantrag (BR-Drs. 735/25) zur Schwelle von 50 Beschäftigten ist nicht in Kraft.'
 rechtsgrundlage:
 - ASiG
-- DGUV Vorschrift 2
+- § 2 DGUV Vorschrift 2 mit Anlagen 1 bis 3
 kategorie: arbeitsschutz
 ausloeser:
   feld: abgeleitet.hat_beschaeftigte
@@ -30,24 +29,27 @@ kanal: partner
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: mittel
-dringend_ohne_termin: true
+    de: Bußgeld bis 10.000 €, wenn die Betreuung fehlt (Bußgeldvorschrift der DGUV Vorschrift 2 deiner BG in Verbindung mit § 209 Abs. 1 Nr. 1, Abs. 3 SGB VII).
+  schwere: hoch
 automatisierung: partner
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
+aenderungsnotiz:
+  de: Betreuungsformen (Regelbetreuung, Unternehmermodell) erklärt; Folgen ergänzt.
 quellen:
 - titel: Arbeitssicherheitsgesetz
   url: https://www.gesetze-im-internet.de/asig/
   abgerufen: null
+- titel: DGUV Vorschrift 2 (UKBW, § 2, Anlagen 1 bis 3)
+  url: https://live.relaunch.ukbw.de/fileadmin/user_upload/Mediathek/UVV/DGUV_Vorschrift_2.pdf
+  abgerufen: '2026-10-22'
+- titel: BGN – Unternehmermodell DGUV Vorschrift 2 (laut Prüfergebnis Sifa)
+  url: https://www.bgn.de/praevention-arbeitshilfen/unsere-leistungen/arbeitsmedizinische-und-sicherheitstechnische-betreuung/unternehmermodell/Update_DGUV_Vorschrift2_Unternehmermodell.pdf
+  abgerufen: null
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Grenzen für das Unternehmermodell je BG ergänzen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
-- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
-- 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
+- 'Prüfergebnis Sifa 22.10.2026: Paragraf der Bußgeldvorschrift je BG prüfen – in der abgerufenen Fassung der UKBW keine eigene Bußgeldvorschrift gefunden; Höchstbetrag nach § 209 Abs. 3 SGB VII'
+- Grenzen für das Unternehmermodell je BG als Daten ergänzen
 pruefung:
   status: entwurf
   geprueft_von: null

@@ -527,11 +527,11 @@ export function standBauen(): Bau {
       gefaehrdungen: [
         ...vorschlaegeGruppe("gefaehrdungsbeurteilung", "gefaehrdungen", "Handwerk", h, GB_EXTRA),
         ...eintraege("gefaehrdungsbeurteilung", "gefaehrdungen", [
-          { beschreibung: "Elektrischer Schlag beim Arbeiten an oder in der Nähe aktiver Teile (Fehlersuche, Erweiterung bestehender Anlagen, Zählerschrank).", massnahme: "Arbeiten nur im spannungsfreien Zustand nach den fünf Sicherheitsregeln (DIN VDE 0105-100): freischalten, gegen Wiedereinschalten sichern, Spannungsfreiheit feststellen, erden und kurzschließen, benachbarte aktive Teile abdecken. Arbeiten unter Spannung nur nach gesonderter Gefährdungsbeurteilung durch den Meister.", risiko: "hoch", faktor: "arbeitsmittel", ...GB_EXTRA },
-          { beschreibung: "Störlichtbogen beim Arbeiten in Hausanschlusskästen, Zählerschränken und Hauptverteilungen.", massnahme: "Störlichtbogen-Gesichtsschutz Klasse 2, isolierende Handschuhe Klasse 0, schwer entflammbare Kleidung; nur Elektrofachkräfte.", risiko: "hoch", faktor: "einwirkungen", ...GB_EXTRA },
-          { beschreibung: "Zusammenarbeit mit anderen Gewerken auf Baustellen (Gerüste, offene Schlitze, Kernbohrungen des Subunternehmers).", massnahme: "Abstimmung mit dem Bauleiter und dem Koordinator nach Baustellenverordnung; SiGe-Plan einsehen; gegenseitige Unterrichtung (§ 8 ArbSchG).", risiko: "mittel", faktor: "ablaeufe_arbeitszeit", ...GB_EXTRA },
-          { beschreibung: "Auszubildender unter 18 Jahren: elektrotechnische Arbeiten, Leitern, Lärm und Staub auf Baustellen.", massnahme: "Nur unter Aufsicht einer Elektrofachkraft (§ 22 JArbSchG, Ausbildungszweck); keine Arbeiten unter Spannung, keine Alleinarbeit; Arbeitszeit höchstens 8 Std./Tag; halbjährliche Unterweisung (§ 29 JArbSchG); Erst- und Nachuntersuchung (§§ 32, 33 JArbSchG).", risiko: "mittel", faktor: "qualifikation", ...GB_EXTRA },
-          { beschreibung: "Alleinarbeit im Notdienst (abends, am Wochenende).", massnahme: "Notdienst nur durch Gesellen; Mobiltelefon, Meldung bei Beginn und Ende an den Meister; keine Arbeiten unter Spannung im Notdienst.", risiko: "mittel", faktor: "ablaeufe_arbeitszeit", ...GB_EXTRA },
+          { beschreibung: "Elektrischer Schlag beim Arbeiten an oder in der Nähe aktiver Teile (Fehlersuche, Erweiterung bestehender Anlagen, Zählerschrank).", massnahme: "Arbeiten nur im spannungsfreien Zustand nach den fünf Sicherheitsregeln (DIN VDE 0105-100): freischalten, gegen Wiedereinschalten sichern, Spannungsfreiheit feststellen, erden und kurzschließen, benachbarte aktive Teile abdecken. Arbeiten unter Spannung nur nach gesonderter Gefährdungsbeurteilung durch den Meister.", schwere: "schwer", wahrscheinlichkeit: "moeglich", faktor: "arbeitsmittel", ...GB_EXTRA },
+          { beschreibung: "Störlichtbogen beim Arbeiten in Hausanschlusskästen, Zählerschränken und Hauptverteilungen.", massnahme: "Störlichtbogen-Gesichtsschutz Klasse 2, isolierende Handschuhe Klasse 0, schwer entflammbare Kleidung; nur Elektrofachkräfte.", schwere: "schwer", wahrscheinlichkeit: "moeglich", faktor: "einwirkungen", ...GB_EXTRA },
+          { beschreibung: "Zusammenarbeit mit anderen Gewerken auf Baustellen (Gerüste, offene Schlitze, Kernbohrungen des Subunternehmers).", massnahme: "Abstimmung mit dem Bauleiter und dem Koordinator nach Baustellenverordnung; SiGe-Plan einsehen; gegenseitige Unterrichtung (§ 8 ArbSchG).", schwere: "mittel", wahrscheinlichkeit: "moeglich", faktor: "ablaeufe_arbeitszeit", ...GB_EXTRA },
+          { beschreibung: "Auszubildender unter 18 Jahren: elektrotechnische Arbeiten, Leitern, Lärm und Staub auf Baustellen.", massnahme: "Nur unter Aufsicht einer Elektrofachkraft (§ 22 JArbSchG, Ausbildungszweck); keine Arbeiten unter Spannung, keine Alleinarbeit; Arbeitszeit höchstens 8 Std./Tag; halbjährliche Unterweisung (§ 29 JArbSchG); Erst- und Nachuntersuchung (§§ 32, 33 JArbSchG).", schwere: "mittel", wahrscheinlichkeit: "moeglich", faktor: "qualifikation", ...GB_EXTRA },
+          { beschreibung: "Alleinarbeit im Notdienst (abends, am Wochenende).", massnahme: "Notdienst nur durch Gesellen; Mobiltelefon, Meldung bei Beginn und Ende an den Meister; keine Arbeiten unter Spannung im Notdienst.", schwere: "mittel", wahrscheinlichkeit: "moeglich", faktor: "ablaeufe_arbeitszeit", ...GB_EXTRA },
         ], h),
       ],
       mutterschutz_ergebnis: "umgestaltung", mutterschutz_details: "Keine Arbeiten unter Spannung oder in der Nähe aktiver Teile, keine Arbeiten auf Leitern und Gerüsten, kein Heben über 5 kg regelmäßig; Tätigkeiten in der Werkstatt (Vorkonfektion, Prüfung von Geräten) nach Einzelfallprüfung.",
@@ -541,8 +541,8 @@ export function standBauen(): Bau {
       gefaehrdungen: [
         ...["Absturz von Anlege", "Gehörschäden", "Gesundheitsschäden durch Gefahrstoffe", "Stromschlag durch beschädigte", "Unfälle mit Kraftfahrzeugen", "Schwere körperliche Belastung"].map((x) => vorschlag("gefaehrdungsbeurteilung", "gefaehrdungen", x, h, GB_EXTRA)),
         ...eintraege("gefaehrdungsbeurteilung", "gefaehrdungen", [
-          { beschreibung: "Prüfplatz für die eigene Prüfung ortsveränderlicher Geräte (DGUV V3): Prüfspannung, Berührung bei Isolationsmessung.", massnahme: "Prüfplatz mit Not-Aus und Fehlerstrom-Schutz; Prüfung nur durch Elektrofachkräfte; Prüfgerät jährlich kalibriert.", risiko: "mittel", faktor: "arbeitsmittel", ...GB_EXTRA },
-          { beschreibung: "Umkippende Kabeltrommeln und überladene Regale im Lager.", massnahme: "Trommelständer, Regale gegen Umkippen gesichert, Belastungsangaben angebracht.", risiko: "gering", faktor: "arbeitsstaette", ...GB_EXTRA },
+          { beschreibung: "Prüfplatz für die eigene Prüfung ortsveränderlicher Geräte (DGUV V3): Prüfspannung, Berührung bei Isolationsmessung.", massnahme: "Prüfplatz mit Not-Aus und Fehlerstrom-Schutz; Prüfung nur durch Elektrofachkräfte; Prüfgerät jährlich kalibriert.", schwere: "mittel", wahrscheinlichkeit: "moeglich", faktor: "arbeitsmittel", ...GB_EXTRA },
+          { beschreibung: "Umkippende Kabeltrommeln und überladene Regale im Lager.", massnahme: "Trommelständer, Regale gegen Umkippen gesichert, Belastungsangaben angebracht.", schwere: "leicht", wahrscheinlichkeit: "moeglich", faktor: "arbeitsstaette", ...GB_EXTRA },
         ], h),
       ],
       mutterschutz_ergebnis: "keine_massnahmen", mutterschutz_details: "Werkstatttätigkeiten ohne Heben schwerer Lasten möglich.", wirksamkeit: "wirksam", wirksamkeit_am: "2026-09-17", fortschreibung: "bei Änderungen von Tätigkeiten, Arbeitsmitteln oder Arbeitsstoffen, nach Unfällen sowie jährlich" }) });
@@ -720,6 +720,12 @@ export function standBauen(): Bau {
     { id: "haccp", titel: v("haccp").titel, grund: "Kein Lebensmittelbetrieb." },
     { id: "hautschutzplan", titel: v("hautschutzplan").titel, grund: "Beauty-Vorlage; Hautschutz ist für das Elektrohandwerk in der Gefährdungsbeurteilung (Gießharz, PU-Schaum) behandelt." },
     { id: "hygieneplan", titel: v("hygieneplan").titel, grund: "Beauty-Vorlage." },
+  );
+  // E-167 (Sifa-Durchsicht): neue Vorlagen Betriebsanweisung Maschinen und Biostoffe, Expositionsverzeichnis
+  uebersprungen.push(
+    { id: "betriebsanweisung_maschine", titel: v("betriebsanweisung_maschine").titel, grund: "Elektrowerkzeuge werden nach der Betriebsanleitung benutzt; eine eigene Betriebsanweisung ist im Szenario nicht erstellt (Pflichten-Check nennt sie – siehe Auffälligkeiten)." },
+    { id: "betriebsanweisung_biostoffe", titel: v("betriebsanweisung_biostoffe").titel, grund: "Keine Tätigkeiten mit Biostoffen im Sinne der BioStoffV." },
+    { id: "expositionsverzeichnis", titel: v("expositionsverzeichnis").titel, grund: "Im Szenario keine Tätigkeiten mit Gefahrstoffen der Kategorie 1A/1B erfasst (Pflichten-Check nennt das Verzeichnis – siehe Auffälligkeiten)." },
   );
   const genutzt = new Set(docs.map((d) => d.vorlage));
   for (const vl of VORLAGEN) if (!genutzt.has(vl.id) && !uebersprungen.some((u) => u.id === vl.id)) auffaellig.push(`Vorlage ${vl.id} weder erzeugt noch als übersprungen begründet.`);

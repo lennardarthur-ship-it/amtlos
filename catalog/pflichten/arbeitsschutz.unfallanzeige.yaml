@@ -1,26 +1,23 @@
-# Katalog E.57 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog E.57 · Startbestand aus Spezifikation Abschnitt 4 (E-054); Prüfergebnis Sifa 22.10.2026 (C Katalog E.57, bestätigt) eingearbeitet
 schema_version: 1
 id: arbeitsschutz.unfallanzeige
-version: 2
+version: 3
 katalog_nr: E.57
 titel:
   de: Arbeitsunfall der Berufsgenossenschaft anzeigen
 kurz:
-  de: Ist jemand nach einem Arbeitsunfall mehr als drei Tage arbeitsunfähig, zeigst du den Unfall binnen drei Tagen der BG
-    an, nachdem du davon erfahren hast.
+  de: Stirbt jemand durch einen Arbeitsunfall oder ist er danach mehr als drei Tage arbeitsunfähig, zeigst du den Unfall binnen drei Tagen der BG an, nachdem du davon erfahren hast.
 erklaerung:
-  de: Die Unfallanzeige ist nötig, wenn die Arbeitsunfähigkeit mehr als drei Tage dauert. Die drei Tage laufen ab dem Tag, an dem
-    du vom Unfall erfahren hast (§ 193 Abs. 4 SGB VII). Amtlos rechnet ab dem Tag, den du beim Unfall einträgst – hast du später
-    davon erfahren, trag diesen Tag ein. Tödliche Unfälle und Unfälle mit vielen Verletzten meldest du sofort, zum Beispiel telefonisch.
-    Ob die Grenze erreicht ist, entscheidest du beim Erledigen.
+  de: 'Anzeigen musst du einen Unfall, wenn die verletzte Person stirbt oder mehr als drei Tage arbeitsunfähig ist; den Unfalltag zählst du dabei nicht mit (§ 193 Abs. 1 SGB VII). Das gilt auch für Wegeunfälle auf dem Weg zur oder von der Arbeit. Die Anzeige erstattest du binnen drei Tagen, nachdem du vom Unfall erfahren hast (§ 193 Abs. 4 SGB VII), mit dem Formular nach der Unfallversicherungs-Anzeigeverordnung (UVAV), meist im Portal deiner BG. Tödliche Unfälle und Unfälle mit vielen Verletzten meldest du sofort, zum Beispiel telefonisch. Amtlos legt die Aufgabe bei jedem gemeldeten Arbeitsunfall an, weil die Dauer der Arbeitsunfähigkeit oft erst später feststeht, und rechnet ab dem Tag, den du beim Unfall einträgst – hast du später davon erfahren, trag diesen Tag ein. Bleibt die Arbeitsunfähigkeit bei höchstens drei Tagen, trifft die Anzeige nicht zu; den Eintrag ins Verbandbuch brauchst du trotzdem.'
 rechtsgrundlage:
-- § 193 Abs. 4 SGB VII
+- § 193 Abs. 1, 4 SGB VII
+- UVAV
 kategorie: arbeitsschutz
 ausloeser:
   ereignis: arbeitsunfall
   op: eingetreten
   label:
-    de: Es gab einen Arbeitsunfall.
+    de: Es gab einen Arbeitsunfall – anzuzeigen ist er bei Tod oder mehr als drei Tagen Arbeitsunfähigkeit.
 frist:
   typ: relativ
   bezug:
@@ -39,21 +36,26 @@ kanal: portal
 kosten: null
 sanktion:
   text:
-    de: Bußgeld bis 2.500 € (§ 209 SGB VII).
+    de: Bußgeld bis 2.500 €, wenn die Anzeige nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig erstattet wird (§ 209 Abs. 1 Nr. 9, Abs. 3 SGB VII).
   schwere: hoch
 automatisierung: hinweis
+aenderungsnotiz:
+  de: Anzuzeigen ist ein Arbeitsunfall nur bei Tod oder mehr als drei Tagen Arbeitsunfähigkeit; das Verbandbuch ist jetzt eine eigene Pflicht.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
 quellen:
 - titel: Sozialgesetzbuch VII § 193
   url: https://www.gesetze-im-internet.de/sgb_7/__193.html
+  abgerufen: '2026-10-22'
+- titel: Unfallversicherungs-Anzeigeverordnung (UVAV)
+  url: https://www.gesetze-im-internet.de/uvav_2024/BJNR0C00B0023.html
+  abgerufen: null
+- titel: § 209 SGB VII (BGN-Vorschriftenportal, laut Prüfergebnis Sifa 22.10.2026 bestätigt)
+  url: https://vorschriften.bgn-branchenwissen.de/daten/gv/sgb7/209.htm
   abgerufen: null
 fachlich_zu_pruefen:
-- 'Fristbeginn nach Rechtsprüfung R11 (Befund 6): Kenntnis des Unternehmers – Termin hängt am eingetragenen Tag; sofortige Meldung bei tödlichen und Massenunfällen nur im Text'
-- 'Sanktion § 209 SGB VII bis 2.500 € aus der Rechtsprüfung R11 (Befund 20) – Nummer unsicher, bestätigen'
-- AU-Tage aus dem Ereignis (Payload au_tage) in die Bedingung aufnehmen, sobald Ereignis-Payload auswertbar ist
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- 'Prüfergebnis Sifa 22.10.2026 (bestätigt): Auslöser Tod oder mehr als drei Tage AU – Amtlos kennt die AU-Tage beim Melden nicht (Ereignis ohne Payload auswertbar), deshalb Aufgabe bei jedem Unfall mit „trifft nicht zu“; Bedingung auf au_tage > 3 oder tödlich umstellen, sobald das Meldeformular die Angaben erfasst und die Engine Payload auswertet (Technik)'
 pruefung:
   status: entwurf
   geprueft_von: null

@@ -687,8 +687,8 @@ export const SCHRITTE: Schritt[] = [
         art: "janein",
         frage: { de: "Arbeitet bei dir jemand regelmäßig nachts?", en: "Does anyone work for you regularly at night?" },
         hilfe: {
-          de: "Gemeint ist Arbeit von mehr als zwei Stunden zwischen 23 und 6 Uhr – in Bäckereien und Konditoreien zwischen 22 und 5 Uhr (§ 2 Abs. 3, 4 ArbZG).",
-          en: "This means more than two hours of work between 11 pm and 6 am – in bakeries and confectioneries between 10 pm and 5 am (§ 2(3), (4) ArbZG).",
+          de: "Gemeint ist Arbeit von mehr als zwei Stunden zwischen 23 und 6 Uhr – in Bäckereien und Konditoreien zwischen 22 und 5 Uhr (§ 2 Abs. 3, 4 ArbZG) –, und zwar in Wechselschicht oder an mindestens 48 Tagen im Jahr (Nachtarbeitnehmer, § 2 Abs. 5 ArbZG).",
+          en: "This means more than two hours of work between 11 pm and 6 am – in bakeries and confectioneries between 10 pm and 5 am (§ 2(3), (4) ArbZG) – in rotating shifts or on at least 48 days a year (night worker, § 2(5) ArbZG).",
         },
       },
     ],

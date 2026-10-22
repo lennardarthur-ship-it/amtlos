@@ -1,7 +1,7 @@
 /**
  * Bausteine aus der Recherche vom 12.10.2026 (docs/recherche/2026-10-12) – ERZEUGT von werkzeuge/bausteine-erzeugen.mjs,
  * nicht von Hand ändern. Jeder Baustein trägt einen Kurzbeleg; „unsicher“ = nicht wörtlich an der Primärquelle geprüft.
- * Fachliche Abnahme: PRUEFLISTE T-62.
+ * Fachliche Durchsicht Arbeitsschutz vom 22.10.2026 eingearbeitet (E-167, Zuordnung in sifa.ts); Abnahme: PRUEFLISTE T-62.
  */
 import type { Option, Vorschlag } from "./typen.js";
 
@@ -14,7 +14,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Ausrutschen, Stolpern und Stürzen durch glatte Böden, Schmierfilme, Unebenheiten oder verrutschende Fußmatten.",
    "massnahme": "Rutschhemmenden, leicht zu reinigenden Bodenbelag verwenden (mindestens Bewertungsgruppe R 9).\nFußmatten gegen Verrutschen sichern; Bodenschäden sofort beseitigen.\nReinigungsmittel ohne Schmierfilm und sparsam einsetzen."
   },
-  "quelle": "BGW"
+  "quelle": "BGW-Branchenhilfe Friseur"
  },
  {
   "gruppe": "Friseur",
@@ -24,7 +24,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Versperrte Verkehrs- und Fluchtwege, zu enge Bewegungsflächen, herumstehende bewegliche Geräte.",
    "massnahme": "Geeignete Abstellflächen für bewegliche Geräte (z. B. Climazone) schaffen; ausreichend Bewegungsfläche am Arbeitsplatz.\nFluchtwege und Notausgänge dauerhaft frei halten und kennzeichnen; Flucht- und Rettungsplan erstellen."
   },
-  "quelle": "BGW"
+  "quelle": "ASR A1.8; ASR A2.3; BGW"
  },
  {
   "gruppe": "Friseur",
@@ -34,7 +34,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Unzureichende Frischluftzufuhr, dadurch Belastung durch Dämpfe und Aerosole von Friseurchemikalien.",
    "massnahme": "Lüftung mit Richtwert 100 m³ Frischluft pro Stunde und Beschäftigtem sicherstellen, auch im Winter (Abluftventilatoren, RLT-Anlage oder Querlüftung).\nHaarspray nur in ausreichend belüfteten Räumen versprühen."
   },
-  "quelle": "TRGS 530"
+  "quelle": "TRGS 530 Nr. 5.2 Abs. 1"
  },
  {
   "gruppe": "Friseur",
@@ -42,9 +42,9 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "einwirkungen",
    "beschreibung": "Feuchtarbeit (Haare waschen, Arbeiten an feuchtem Haar, häufiges Händewaschen) als Hauptrisikofaktor für Handekzeme.",
-   "massnahme": "Unvermeidbare Feuchtarbeit auf mehrere Beschäftigte verteilen; hautbelastende und nicht belastende Tätigkeiten abwechseln.\nFeuchtarbeit möglichst unter 4 Stunden täglich halten, angestrebt unter 2 Stunden.\nBeim Haarewaschen langstulpige Einmalhandschuhe (Nitril oder Vinyl) tragen; Hautschutz- und Händehygieneplan anwenden."
+   "massnahme": "Unvermeidbare Feuchtarbeit auf mehrere Beschäftigte verteilen; hautbelastende und nicht belastende Tätigkeiten abwechseln.\nFeuchtarbeit möglichst unter 4 Stunden täglich halten, angestrebt unter 2 Stunden.\nBeim Haarewaschen langstulpige Einmalhandschuhe (Nitril oder Vinyl) tragen; Hautschutz- und Händehygieneplan anwenden.\nFeuchtarbeit von mehr als 2 Stunden je Tag: Angebotsvorsorge; ab 4 Stunden je Tag: Pflichtvorsorge (ArbMedVV)."
   },
-  "quelle": "BGW"
+  "quelle": "TRGS 530 Nr. 5.3 Abs. 2; ArbMedVV Anhang Teil 1 Abs. 1 Nr. 2a, Abs. 2 Nr. 2e"
  },
  {
   "gruppe": "Friseur",
@@ -54,7 +54,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Hautkontakt mit Friseurchemikalien (Färbe-, Blondier-, Dauerwellmittel) kann zu Allergien und Hautreizungen führen.",
    "massnahme": "Fertig portionierte Packungen bevorzugen; sorgfältig dosieren.\nEigener Misch- und Umfüllplatz mit flüssigkeitsdichter, abwaschbarer Arbeitsfläche (entfällt bei geschlossenen Systemen).\nMischen und Auftragen nur mit geeigneten Applikatoren.\nBeim Färben, Blondieren, Dauerwellen und Mischen Friseur-Einmalhandschuhe (DIN EN ISO 374-6) tragen und nach einmaligem Gebrauch entsorgen."
   },
-  "quelle": "TRGS 530"
+  "quelle": "TRGS 530 Nr. 5.2 Abs. 2, 5.4; DIN EN ISO 374-6:2025-11"
  },
  {
   "gruppe": "Friseur",
@@ -64,7 +64,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Einatmen von Stäuben (Blondiermittel), Dämpfen (Dauerwelle) und Sprühnebel (Haarspray) reizt die Atemwege.",
    "massnahme": "Für ausreichende Lüftung sorgen.\nSprühnebel, Stäube und Dämpfe nicht einatmen; nicht in Richtung Augen sprühen."
   },
-  "quelle": "TRGS 530"
+  "quelle": "TRGS 530 Nr. 5.2, 5.3 Abs. 3"
  },
  {
   "gruppe": "Friseur",
@@ -74,7 +74,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Hautschäden durch Reinigungs- und Desinfektionsmittel.",
    "massnahme": "Desinfektion im Wischverfahren statt Sprühen oder Vernebeln; Desinfektionsmittelbäder abdecken.\nChemikalienbeständige Schutzhandschuhe (DIN EN ISO 374), ggf. mit längerem Schaft, bei Reinigung und Desinfektion tragen."
   },
-  "quelle": "BGW"
+  "quelle": "BGW; TRGS 525; TRGS 401"
  },
  {
   "gruppe": "Friseur",
@@ -82,9 +82,10 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "sonstiges",
    "beschreibung": "Brand- und Explosionsgefahr durch alkoholische Desinfektionsmittel, Spraydosen und entzündbare Flüssigkeiten.",
-   "massnahme": "Brennbare Flüssigkeiten nicht an Arbeitsplätzen, unter Treppen oder in Fluchtwegen lagern; am Arbeitsplatz höchstens den Tagesbedarf.\nSpraydosen nicht über 50 °C erwärmen, nicht in offene Flammen oder beim Rauchen sprühen.\nFeuerlöscher bereitstellen (bis 50 m² Grundfläche Schaumlöscher A/B mit 6 Löschmitteleinheiten), alle zwei Jahre prüfen lassen."
+   "massnahme": "Brennbare Flüssigkeiten nicht an Arbeitsplätzen, unter Treppen oder in Fluchtwegen lagern; am Arbeitsplatz höchstens den Tagesbedarf.\nSpraydosen nicht über 50 °C erwärmen, nicht in offene Flammen oder beim Rauchen sprühen.\nFeuerlöscher bereitstellen (bis 50 m² Grundfläche 6 Löschmitteleinheiten, z. B. Schaumlöscher für die Brandklassen A und B), alle zwei Jahre prüfen lassen.",
+   "unterpunkt": "brand"
   },
-  "quelle": "BGW"
+  "quelle": "ASR A2.2 Tab. 3, Nr. 5.4; BGW"
  },
  {
   "gruppe": "Friseur",
@@ -94,7 +95,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Absturz von Leitern oder Tritten, umkippende Regale, herabfallende Kartons.",
    "massnahme": "Nur geeignete Aufstiegshilfen verwenden; schadhafte Leitern sofort aussortieren.\nLeitern im Bestands- und Wartungsplan erfassen und regelmäßig prüfen; Standsicherheit von Regalen regelmäßig prüfen.\nSchwere Lasten unten, leichte oben lagern."
   },
-  "quelle": "BGW"
+  "quelle": "DGUV Information 208-016; § 14 BetrSichV; BGW"
  },
  {
   "gruppe": "Friseur",
@@ -104,7 +105,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Elektrische Gefährdung durch nicht geprüfte oder beschädigte Elektrogeräte und Anlagen.",
    "massnahme": "Alle Geräte und Anlagen in einem Bestands- und Wartungsplan erfassen und Prüftermine festlegen.\nPrüfungen termin- und fachgerecht durchführen lassen und Ergebnisse dokumentieren."
   },
-  "quelle": "BGW"
+  "quelle": "DGUV Vorschrift 3; § 14 BetrSichV; BGW"
  },
  {
   "gruppe": "Friseur",
@@ -124,7 +125,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Stress und Hektik in Stoßzeiten, zu lange Arbeitszeiten, fehlende oder zu kurze Pausen und Ruhezeiten.",
    "massnahme": "In Spitzenzeiten ausreichend Personal einsetzen; Zeitpuffer für Übergaben und Pausen einplanen.\nDienstplanung unter Einbeziehung der Wünsche der Beschäftigten.\nHöchstarbeitszeit, Pausen und Ruhezeiten einhalten; Mehrarbeit dokumentieren."
   },
-  "quelle": "BGW"
+  "quelle": "ArbZG; BGW"
  },
  {
   "gruppe": "Friseur",
@@ -132,9 +133,9 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "psychisch",
    "beschreibung": "Zeitdruck, Konflikte im Team, unzufriedene Kundschaft sowie Aggressionen und Übergriffe.",
-   "massnahme": "Aufgaben, Zuständigkeiten und Entscheidungskompetenzen klar regeln, dokumentieren und kommunizieren.\nVerhalten in Notsituationen festlegen; Arbeitspläne so gestalten, dass niemand allein arbeitet.\nBei Konflikten mit Kundschaft Rückendeckung geben und Vermittlungsgespräche anbieten."
+   "massnahme": "Aufgaben, Zuständigkeiten und Entscheidungskompetenzen klar regeln, dokumentieren und kommunizieren.\nVerhalten in Notsituationen festlegen; Alleinarbeit möglichst vermeiden, sonst Notruf und Erreichbarkeit regeln.\nBei Konflikten mit Kundschaft Rückendeckung geben und Vermittlungsgespräche anbieten."
   },
-  "quelle": "BGW"
+  "quelle": "BGW; DGUV Regel 112-139"
  },
  {
   "gruppe": "Friseur",
@@ -144,7 +145,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Fehlende Kenntnisse über Gefahrstoffe, Hautschutz und Hygieneregeln.",
    "massnahme": "Regelmäßig unterweisen und die Unterweisung mit Betriebsanweisung, Reinigungs- und Desinfektionsplan sowie Hautschutzplan verknüpfen.\nUnterweisung dokumentieren (z. B. mit dem Unterweisungsnachweis)."
   },
-  "quelle": "BGW"
+  "quelle": "§ 12 ArbSchG; § 14 GefStoffV; BGW"
  },
  {
   "gruppe": "Friseur",
@@ -152,9 +153,10 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "sonstiges",
    "beschreibung": "Verzögerte Hilfe bei Unfällen und Notfällen.",
-   "massnahme": "Verbandkasten nach DIN 13157 (Typ C) bereitstellen; Standort allen Beschäftigten bekannt machen.\nAnschrift und Telefonnummer des Rettungsdienstes deutlich aushängen."
+   "massnahme": "Verbandkasten nach DIN 13157 (Typ C) bereitstellen; Standort allen Beschäftigten bekannt machen.\nAnschrift und Telefonnummer des Rettungsdienstes deutlich aushängen.",
+   "unterpunkt": "notfall"
   },
-  "quelle": "BGW"
+  "quelle": "ASR A4.3 Tab. 1; DIN 13157; BGW"
  },
  {
   "gruppe": "Kosmetik",
@@ -164,7 +166,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Stolpern, Ausrutschen und Stürzen durch nasse Böden, Schmierfilme, Stufen oder Kabel.",
    "massnahme": "Rutschhemmende Böden und Schmutzfangmatten; Kabel bündeln; Stufenkanten markieren.\nGrundreinigung außerhalb des Publikumsverkehrs; nasse Bereiche mit Warnschildern kennzeichnen.\nFlache, rutschhemmende Schuhe tragen."
   },
-  "quelle": "BGW 04-05-080, Stand 03/2023, S. 27–28"
+  "quelle": "BGW 04-05-080, Stand 03/2023, S. 27–28; ASR A1.5"
  },
  {
   "gruppe": "Kosmetik",
@@ -172,9 +174,9 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "arbeitsstaette",
    "beschreibung": "Unzureichende Beleuchtung bei Präzisionsarbeiten sowie an Eingang und Treppen.",
-   "massnahme": "Arbeitsplätze für Kosmetik- und Sticharbeiten mit mindestens 750 Lux beleuchten (ASR A3.4 beachten).\nEingang und Treppen ausreichend ausleuchten."
+   "massnahme": "Arbeitsplätze für Präzisionsarbeiten (Maniküre, Pediküre, Permanent-Make-up) mit mindestens 750 Lux beleuchten – Empfehlung der BGW; ASR A3.4 Anhang 3 nennt für Kosmetik keinen eigenen Wert (Haarpflege: 500 Lux).\nEingang und Treppen ausreichend ausleuchten."
   },
-  "quelle": "BGW 04-05-080, S. 28, 31, 36, 39; ebenso BGW Sichere Seiten Friseur/Arbeitsplatz (Kosmetik 750 Lux)"
+  "quelle": "BGW 04-05-080 (750 Lux: Empfehlung der BGW); ASR A3.4 Anhang 3"
  },
  {
   "gruppe": "Kosmetik",
@@ -184,7 +186,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Hautbelastung durch Feuchtarbeit, häufiges Händewaschen, langes Handschuhtragen sowie Desinfektions- und Reinigungsmittel.",
    "massnahme": "Feucht- und Trockenarbeit wechseln und zeitlich begrenzen.\npH-neutrale, farb- und duftstofffreie Hautreinigungsmittel und rückfettende Händedesinfektion bereitstellen; Hautschutz- und Händehygieneplan aufstellen.\nLatexfreie Schutzhandschuhe verwenden."
   },
-  "quelle": "BGW 04-05-080, S. 21–22"
+  "quelle": "BGW 04-05-080, S. 21–22; TRGS 401"
  },
  {
   "gruppe": "Kosmetik",
@@ -212,9 +214,9 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "einwirkungen",
    "beschreibung": "Infektionsgefahr (z. B. Hepatitis, HIV) durch Blutkontakt sowie Stich- und Schnittverletzungen.",
-   "massnahme": "Einweglanzetten bzw. Instrumente mit Sicherheitssystem und durchstichsichere Entsorgungsbehälter verwenden.\nInstrumente nach jedem Hautkontakt desinfizieren bzw. aufbereiten; Hygieneplan aufstellen; Verletzungen im Verbandbuch dokumentieren.\nEinmalhandschuhe tragen und beschädigte sofort wechseln."
+   "massnahme": "Einweglanzetten bzw. Instrumente mit Sicherheitssystem und durchstichsichere Entsorgungsbehälter verwenden.\nInstrumente nach jedem Hautkontakt desinfizieren bzw. aufbereiten; Hygieneplan nach der Hygieneverordnung des Landes aufstellen; Verletzungen im Verbandbuch dokumentieren.\nEinmalhandschuhe tragen und beschädigte sofort wechseln.\nNach einer Stich- oder Schnittverletzung sofort Durchgangsarzt bzw. Betriebsarzt aufsuchen; eine HIV-Postexpositionsprophylaxe (PEP) sollte möglichst innerhalb von 2 Stunden beginnen."
   },
-  "quelle": "BGW 04-05-080, S. 35–36, 39–40, 42"
+  "quelle": "§ 11 BioStoffV; TRBA 250 (sinngemäß); BGW"
  },
  {
   "gruppe": "Kosmetik",
@@ -232,9 +234,9 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "einwirkungen",
    "beschreibung": "Augenschäden durch optische Strahlung bei Laser- und IPL-Anwendungen.",
-   "massnahme": "Nur zugelassene Geräte einsetzen; Anwendung nur durch fachkundige Personen (NiSV beachten).\nGeeignete Laser- bzw. Lichtschutzbrille tragen."
+   "massnahme": "Nur zugelassene Geräte einsetzen; Anwendung nur durch fachkundige Personen (NiSV beachten).\nGeeignete Laser- bzw. Lichtschutzbrille tragen.\nBei Lasern der Klassen 3R, 3B und 4 einen Laserschutzbeauftragten bestellen (§ 5 Abs. 2 OStrV); Fachkunde nach NiSV."
   },
-  "quelle": "BGW 04-05-080, S. 40"
+  "quelle": "OStrV; TROS Laserstrahlung; NiSV"
  },
  {
   "gruppe": "Kosmetik",
@@ -244,7 +246,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Stromschlag und Brandgefahr durch beschädigte Geräte, Leitungen oder Lampen, besonders bei Feuchtigkeit.",
    "massnahme": "Geräte mit CE-/GS-Kennzeichnung beschaffen; Fehlerstrom-Schutzschalter (FI/RCD) einsetzen.\nSicht- und Funktionskontrolle vor Benutzung; defekte Geräte sofort aus dem Verkehr ziehen.\nWiederkehrende Prüfung ortsveränderlicher Geräte (je nach Fehlerquote 6 Monate bis 2 Jahre) durch Elektrofachkraft oder befähigte Person."
   },
-  "quelle": "BGW 04-05-080, S. 25–26"
+  "quelle": "DGUV Vorschrift 3, Durchführungsanweisung zu § 5, Tabelle 1B; BGW 04-05-080, S. 25–26"
  },
  {
   "gruppe": "Kosmetik",
@@ -282,9 +284,10 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "sonstiges",
    "beschreibung": "Brand durch elektrische Defekte, überhitzte Geräte und entzündbare Desinfektions- und Reinigungsmittel.",
-   "massnahme": "Geeignete Feuerlöscher und Rauchmelder; Fluchtwege kennzeichnen und freihalten.\nBrennbare Stoffe getrennt lagern; Brandschutzhelfer benennen; Unterweisung und Räumungsübungen."
+   "massnahme": "Geeignete Feuerlöscher und Rauchmelder; Fluchtwege kennzeichnen und freihalten.\nBrennbare Stoffe getrennt lagern; Brandschutzhelfer benennen; Unterweisung und Räumungsübungen.",
+   "unterpunkt": "brand"
   },
-  "quelle": "BGW 04-05-080, S. 19–20"
+  "quelle": "ASR A2.2; BGW 04-05-080, S. 19–20"
  },
  {
   "gruppe": "Gastronomie / Café",
@@ -292,9 +295,9 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "arbeitsstaette",
    "beschreibung": "Ausrutschen und Stürzen auf nassen oder fettigen Böden.",
-   "massnahme": "Ablaufrinnen bzw. Abläufe unter Kippbratpfannen, Kochkesseln und Entleerungsöffnungen.\nNach der Reinigung möglichst trockenwischen; nasse Bereiche sperren oder kennzeichnen; Speisereste sofort entfernen.\nRutschhemmende Schuhe tragen."
+   "massnahme": "Ablaufrinnen bzw. Abläufe unter Kippbratpfannen, Kochkesseln und Entleerungsöffnungen.\nNach der Reinigung möglichst trockenwischen; nasse Bereiche sperren oder kennzeichnen; Speisereste sofort entfernen.\nRutschhemmende Schuhe tragen.\nBodenbelag in der gewerblichen Küche und im Spülraum mindestens Bewertungsgruppe R 12."
   },
-  "quelle": "DGUV Regel 110-003, Abschn. 3.3.2, 3.5, 3.7"
+  "quelle": "DGUV Regel 110-003, Abschn. 3.3.2, 3.5, 3.7; ASR A1.5 Anhang 2; BGN ASI 4.40"
  },
  {
   "gruppe": "Gastronomie / Café",
@@ -302,9 +305,9 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "arbeitsstaette",
    "beschreibung": "Hohe Temperatur und Feuchte sowie Schadstoffe in der Atemluft durch unzureichende Küchenlüftung; Brandlast im Abluftsystem.",
-   "massnahme": "Abluftanlage mit ausreichend dimensionierter Haube und Aerosolabscheidern; Gasgeräte mit der Lüftung koppeln.\nKüchenlüftung vor den Kochgeräten einschalten; Abscheider je nach Verschmutzung, spätestens alle 14 Tage reinigen."
+   "massnahme": "Abluftanlage mit ausreichend dimensionierter Haube und Aerosolabscheidern; Gasgeräte mit der Lüftung koppeln.\nKüchenlüftung vor den Kochgeräten einschalten; Aerosolabscheider nach Herstellerangabe und Verschmutzung reinigen; Abluftleitungen regelmäßig reinigen lassen (VDI 2052)."
   },
-  "quelle": "DGUV Regel 110-003, Abschn. 3.3.3"
+  "quelle": "DGUV Regel 110-003; VDI 2052 – fachlich zu prüfen"
  },
  {
   "gruppe": "Gastronomie / Café",
@@ -312,9 +315,9 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "arbeitsstaette",
    "beschreibung": "Eingeschlossenwerden und Kälteeinwirkung in Kühl- und Tiefkühlräumen.",
-   "massnahme": "Kühlraumtüren von innen entriegelbar; Ausgänge mit Sicherheitsbeleuchtung oder nachleuchtender Markierung.\nVor dem Abschließen prüfen, dass sich niemand mehr im Kühlraum befindet.\nWarme Kleidung bzw. Kälteschutzkleidung bei längerem Aufenthalt."
+   "massnahme": "Kühlraumtüren von innen entriegelbar; Ausgänge mit Sicherheitsbeleuchtung oder nachleuchtender Markierung.\nVor dem Abschließen prüfen, dass sich niemand mehr im Kühlraum befindet.\nWarme Kleidung bzw. Kälteschutzkleidung bei längerem Aufenthalt.\nBegehbare Tiefkühlräume mit einer Notrufeinrichtung ausstatten."
   },
-  "quelle": "DGUV Regel 110-003, Abschn. 3.1"
+  "quelle": "DGUV Regel 110-003, Abschn. 3.1 – fachlich zu prüfen"
  },
  {
   "gruppe": "Gastronomie / Café",
@@ -348,13 +351,39 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
  },
  {
   "gruppe": "Gastronomie / Café",
-  "titel": "Fettbrand und Fettexplosion an Fritteusen durch Überhitzung oder Wassereintrag.",
+  "titel": "Fettbrand und Fettexplosion an Fritteusen durch Überhitzung oder Wassereintrag (Fettmenge bis 50 l).",
   "werte": {
    "faktor": "sonstiges",
-   "beschreibung": "Fettbrand und Fettexplosion an Fritteusen durch Überhitzung oder Wassereintrag.",
-   "massnahme": "Abstand bzw. Abtrennung zu wasserführenden Geräten; keine Wasserzapfstelle in der Nähe.\nFeuerlöscher der Brandklasse F bereitstellen (bis 50 l Fett mindestens ein geeigneter Löscher).\nFritteusen nie unbeaufsichtigt betreiben; Fett rechtzeitig wechseln; eine im Löschen geübte Person muss anwesend sein."
+   "beschreibung": "Fettbrand und Fettexplosion an Fritteusen durch Überhitzung oder Wassereintrag (Fettmenge bis 50 l).",
+   "massnahme": "Abstand bzw. Abtrennung zu wasserführenden Geräten; keine Wasserzapfstelle in der Nähe.\nFritteusen nie unbeaufsichtigt betreiben; Fett rechtzeitig wechseln.\nFettbrandlöscher der Brandklasse F bereitstellen; Löschvermögen mindestens Fettmenge plus 25 % Reserve (z. B. 20 l Fett → 25 F).",
+   "unterpunkt": "brand",
+   "schwere": "schwer"
   },
-  "quelle": "DGUV Regel 110-003, Abschn. 3.3.1"
+  "quelle": "BGN ASI 2.15 Nr. 4; DGUV Regel 110-003, Abschn. 3.3.1"
+ },
+ {
+  "gruppe": "Gastronomie / Café",
+  "titel": "Fettbrand und Fettexplosion an Fritteusen durch Überhitzung oder Wassereintrag (Fettmenge 50 bis 100 l).",
+  "werte": {
+   "faktor": "sonstiges",
+   "beschreibung": "Fettbrand und Fettexplosion an Fritteusen durch Überhitzung oder Wassereintrag (Fettmenge 50 bis 100 l).",
+   "massnahme": "Abstand bzw. Abtrennung zu wasserführenden Geräten; keine Wasserzapfstelle in der Nähe.\nFritteusen nie unbeaufsichtigt betreiben; Fett rechtzeitig wechseln.\nFettbrandlöscher der Brandklasse F bereitstellen; Löschvermögen mindestens Fettmenge plus 25 % Reserve (z. B. 20 l Fett → 25 F).\nZusätzlich eine benannte, im Löschen geübte Person und ständige Beobachtung der Fritteuse – oder eine ortsfeste Löscheinrichtung.",
+   "unterpunkt": "brand",
+   "schwere": "schwer"
+  },
+  "quelle": "BGN ASI 2.15 Nr. 4; DGUV Regel 110-003, Abschn. 3.3.1"
+ },
+ {
+  "gruppe": "Gastronomie / Café",
+  "titel": "Fettbrand und Fettexplosion an Fritteusen durch Überhitzung oder Wassereintrag (Fettmenge über 100 l).",
+  "werte": {
+   "faktor": "sonstiges",
+   "beschreibung": "Fettbrand und Fettexplosion an Fritteusen durch Überhitzung oder Wassereintrag (Fettmenge über 100 l).",
+   "massnahme": "Abstand bzw. Abtrennung zu wasserführenden Geräten; keine Wasserzapfstelle in der Nähe.\nFritteusen nie unbeaufsichtigt betreiben; Fett rechtzeitig wechseln.\nOrtsfeste Löscheinrichtung (Fettbrand-Löschanlage) vorsehen.",
+   "unterpunkt": "brand",
+   "schwere": "schwer"
+  },
+  "quelle": "BGN ASI 2.15 Nr. 4; DGUV Regel 110-003, Abschn. 3.3.1"
  },
  {
   "gruppe": "Gastronomie / Café",
@@ -362,9 +391,9 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "einwirkungen",
    "beschreibung": "Hautbelastung durch Wasser und Reinigungsmittel (Feuchtarbeit), insbesondere in der Spülküche.",
-   "massnahme": "Wasserkontakt und Handschuhtragezeiten begrenzen.\nHautschutzplan aufstellen (wann welche Handschuhe und Pflege).\nBaumwoll-Unterziehhandschuhe unter flüssigkeitsdichten Handschuhen; pH-hautneutrales Flüssigsyndet."
+   "massnahme": "Wasserkontakt und Handschuhtragezeiten begrenzen.\nHautschutzplan aufstellen (wann welche Handschuhe und Pflege).\nBaumwoll-Unterziehhandschuhe unter flüssigkeitsdichten Handschuhen; pH-hautneutrales Flüssigsyndet.\nFeuchtarbeit von mehr als 2 Stunden je Tag: Angebotsvorsorge; ab 4 Stunden je Tag: Pflichtvorsorge (ArbMedVV)."
   },
-  "quelle": "DGUV Regel 110-003, Abschn. 3.2, 3.5"
+  "quelle": "DGUV Regel 110-003; TRGS 401; ArbMedVV Anhang Teil 1"
  },
  {
   "gruppe": "Gastronomie / Café",
@@ -374,7 +403,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Verätzungen und Reizungen durch Reinigungsmittel sowie Dämpfe und Aerosole beim Reinigen.",
    "massnahme": "Reiniger mit möglichst geringem Gefährdungspotenzial einsetzen.\nAusreichende Belüftung; Sprühlanze statt Hochdruckreiniger.\nNach Anleitung dosieren; Betriebsanweisung und Unterweisung zu Reinigungsmitteln.\nSchutzhandschuhe tragen."
   },
-  "quelle": "DGUV Regel 110-003, Abschn. 3.7"
+  "quelle": "DGUV Regel 110-003, Abschn. 3.7; § 7 GefStoffV"
  },
  {
   "gruppe": "Gastronomie / Café",
@@ -382,9 +411,9 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "einwirkungen",
    "beschreibung": "Lärm in der Spülküche durch Geschirr und Geschirrwagen.",
-   "massnahme": "Lärmarme Geschirrwagen und Räder; raumakustische Maßnahmen.\nArbeitsmedizinische Vorsorge anbieten, wenn 80 dB(A) erreicht werden.\nGehörschutz ab einem Expositionspegel von 80 dB(A) bereitstellen."
+   "massnahme": "Lärmarme Geschirrwagen und Räder; raumakustische Maßnahmen.\nArbeitsmedizinische Vorsorge anbieten, wenn 80 dB(A) erreicht werden.\nGehörschutz ab einem Expositionspegel von 80 dB(A) bereitstellen.\nAb 85 dB(A) muss Gehörschutz getragen werden; Lärmbereich kennzeichnen."
   },
-  "quelle": "DGUV Regel 110-003, Abschn. 3.5"
+  "quelle": "§§ 7, 8 LärmVibrationsArbSchV; ArbMedVV Anhang Teil 3"
  },
  {
   "gruppe": "Gastronomie / Café",
@@ -394,7 +423,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Muskel-Skelett-Belastung durch Heben und Tragen schwerer Gebinde und Kochgeschirre.",
    "massnahme": "Transporthilfsmittel und Transportwagen nutzen; kleinere Gebinde einkaufen.\nSchwere Lasten zu zweit tragen; Belastung mit der Leitmerkmalmethode beurteilen.\nSicherheitsschuhe beim Transport schwerer Gebinde."
   },
-  "quelle": "DGUV Regel 110-003, Abschn. 3.1, 3.3.2, 3.4"
+  "quelle": "DGUV Regel 110-003, Abschn. 3.1, 3.3.2, 3.4; LasthandhabV"
  },
  {
   "gruppe": "Gastronomie / Café",
@@ -404,7 +433,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Umkippen oder Herabfallen von Lagergut.",
    "massnahme": "Regale standsicher aufstellen.\nSchwere Lasten unten, leichtere oben lagern; Lagerbereiche eindeutig zuweisen."
   },
-  "quelle": "DGUV Regel 110-003, Abschn. 3.1"
+  "quelle": "DGUV Regel 110-003, Abschn. 3.1; DIN EN 15635"
  },
  {
   "gruppe": "Gastronomie / Café",
@@ -424,7 +453,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Unerkannte Mängel und Verschleiß an Geräten und Schutzeinrichtungen.",
    "massnahme": "Wartung nach Herstellerangaben; Instandhaltung nur durch fachkundiges Personal.\nWiederkehrende Prüfungen über die Gefährdungsbeurteilung festlegen (befähigte Personen).\nSicherheitseinrichtungen arbeitstäglich vor Arbeitsbeginn auf Funktion prüfen."
   },
-  "quelle": "DGUV Regel 110-003, Abschn. 3.8"
+  "quelle": "DGUV Regel 110-003, Abschn. 3.8; §§ 3 Abs. 6, 14 BetrSichV"
  },
  {
   "gruppe": "Handwerk",
@@ -432,9 +461,9 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "arbeitsmittel",
    "beschreibung": "Absturz von Anlege- oder Stehleitern durch Standunsicherheit, Abrutschen oder schadhafte Leitern.",
-   "massnahme": "Leitern nur einsetzen, wenn kein sichereres Arbeitsmittel möglich ist.\nAnlegeleitern gegen Ausgleiten sichern (Anlegewinkel 65–75° bei Sprossen), 1 m überstehen lassen; Stehleitern nur mit Spreizsicherung, oberste Stufen nicht betreten.\nLeitern jährlich prüfen und im Prüfbuch dokumentieren; schadhafte Leitern aussondern."
+   "massnahme": "Leitern nur einsetzen, wenn kein sichereres Arbeitsmittel möglich ist.\nAnlegeleitern gegen Ausgleiten sichern (Anlegewinkel 65–75° bei Sprossen, 60–70° bei Stufen), 1 m überstehen lassen; Stehleitern nur mit Spreizsicherung, oberste Stufen nicht betreten.\nLeitern regelmäßig durch eine befähigte Person prüfen lassen, Frist nach der Gefährdungsbeurteilung (in der Regel jährlich), und im Prüfbuch dokumentieren; schadhafte Leitern aussondern."
   },
-  "quelle": "BG BAU Bausteine B 131, B 132 (Stand 07/2021); BG ETEM S285 (Stand 11/23)"
+  "quelle": "DGUV Information 208-016; §§ 3 Abs. 6, 14 BetrSichV"
  },
  {
   "gruppe": "Handwerk",
@@ -444,7 +473,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Absturz an Kanten, Öffnungen und Treppenläufen.",
    "massnahme": "Seitenschutz an Treppenläufen, Wandöffnungen und Verkehrswegen ab 1,00 m, an übrigen Arbeitsplätzen ab 2,00 m Absturzhöhe.\nÖffnungen umwehren oder fest abdecken."
   },
-  "quelle": "BG BAU Baustein B 100"
+  "quelle": "ASR A2.1 Nr. 4.1; BG BAU Baustein B 100"
  },
  {
   "gruppe": "Handwerk",
@@ -454,7 +483,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Gehörschäden durch Lärm von Maschinen und Werkzeugen.",
    "massnahme": "Lärmarme Verfahren und lärmgeminderte Geräte einsetzen; Maschinen warten (scharfe Werkzeuge, intakte Gehäuse).\nAb dem oberen Auslösewert (85 dB(A)) Lärmbereiche kennzeichnen und Lärmminderungsprogramm aufstellen; ab dem unteren Auslösewert (80 dB(A)) unterweisen und Vorsorge anbieten.\nGehörschutz ab 80 dB(A) bereitstellen, ab 85 dB(A) tragen."
   },
-  "quelle": "DGUV-Handlungshilfe „Lärm in der Bauwirtschaft“, Stand 02/2011 (Auslösewerte nach LärmVibrationsArbSchV)"
+  "quelle": "§§ 6–8 LärmVibrationsArbSchV; ArbMedVV Anhang Teil 3; DGUV-Handlungshilfe „Lärm in der Bauwirtschaft“"
  },
  {
   "gruppe": "Handwerk",
@@ -462,9 +491,9 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "einwirkungen",
    "beschreibung": "Einatmen von mineralischem, quarzhaltigem Staub beim Schneiden, Schleifen und Bohren.",
-   "massnahme": "Quarzärmere Materialien prüfen.\nStaubarme Verfahren und direkt abgesaugte Geräte mit Entstauber mindestens Klasse M; Nassbearbeitung.\nMit Industriesaugern (Klasse M oder höher) reinigen statt Kehren oder Abblasen mit Druckluft."
+   "massnahme": "Quarzärmere Materialien prüfen.\nStaubarme Verfahren und direkt abgesaugte Geräte mit Entstauber mindestens Klasse M; Nassbearbeitung.\nMit Industriesaugern (Klasse M oder höher) reinigen statt Kehren oder Abblasen mit Druckluft.\nAtemschutz nur als letzte Stufe, wenn diese Maßnahmen nicht ausreichen."
   },
-  "quelle": "BG BAU Baustein C 317, Stand 07/2021"
+  "quelle": "TRGS 559; BG BAU Baustein C 317"
  },
  {
   "gruppe": "Handwerk",
@@ -474,7 +503,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Gesundheitsschäden durch Gefahrstoffe (z. B. Lösemittel, Säuren, Laugen).",
    "massnahme": "Prüfen, ob Stoffe durch weniger schädliche ersetzt werden können.\nSicherheitsdatenblatt für jeden Gefahrstoff bereithalten; Betriebsanweisung erstellen.\nBeschäftigte tätigkeitsbezogen anhand der Betriebsanweisung unterweisen."
   },
-  "quelle": "BG ETEM"
+  "quelle": "§§ 6, 7, 14 GefStoffV; BG ETEM"
  },
  {
   "gruppe": "Handwerk",
@@ -482,9 +511,9 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "einwirkungen",
    "beschreibung": "Hautgefährdung durch Baustoffe, Reinigungsmittel und Feuchtigkeit.",
-   "massnahme": "Ersatzstoffe bzw. Verfahren mit weniger Hautkontakt prüfen.\nChemikalienschutzhandschuhe mit passender Durchbruchszeit tragen; bei Schwitzen Baumwoll-Unterziehhandschuhe.\nHautschutzplan: Hautschutzmittel vor Exposition, schonende Reinigung, Hautpflege in Pausen und nach der Arbeit."
+   "massnahme": "Ersatzstoffe bzw. Verfahren mit weniger Hautkontakt prüfen (z. B. chromatarmer Zement).\nChemikalienschutzhandschuhe mit passender Durchbruchszeit tragen; bei Schwitzen Baumwoll-Unterziehhandschuhe.\nHautschutzplan: Hautschutzmittel vor Exposition, schonende Reinigung, Hautpflege in Pausen und nach der Arbeit."
   },
-  "quelle": "BG BAU"
+  "quelle": "TRGS 401; BG BAU"
  },
  {
   "gruppe": "Handwerk",
@@ -492,9 +521,9 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "einwirkungen",
    "beschreibung": "UV-Strahlung bei Arbeiten im Freien.",
-   "massnahme": "Beschattung des Arbeitsplatzes.\nArbeiten in der Mittagszeit vermeiden.\nKörperbedeckende Kleidung, Kopfschutz, Sonnenschutzbrille; Sonnenschutzmittel mindestens LSF 30, alle 2 Stunden erneuern."
+   "massnahme": "Beschattung des Arbeitsplatzes.\nArbeiten in der Mittagszeit vermeiden.\nKörperbedeckende Kleidung, Kopfschutz, Sonnenschutzbrille; Sonnenschutzmittel mindestens LSF 30, alle 2 Stunden erneuern.\nAngebotsvorsorge bei Tätigkeiten im Freien mit intensiver UV-Belastung von regelmäßig 1 Stunde oder mehr je Tag (ArbMedVV Anhang Teil 3)."
   },
-  "quelle": "BG BAU"
+  "quelle": "BG BAU; ArbMedVV Anhang Teil 3 Abs. 2; AMR 13.3"
  },
  {
   "gruppe": "Handwerk",
@@ -504,7 +533,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Stromschlag durch beschädigte Leitungen und elektrische Betriebsmittel.",
    "massnahme": "Auf Baustellen Steckdosen bis 32 A über Fehlerstrom-Schutzeinrichtung (RCD) mit höchstens 30 mA absichern.\nNur regelmäßig geprüfte Betriebsmittel einsetzen; RCD-Funktion arbeitstäglich kontrollieren.\nArbeiten an elektrischen Anlagen nur durch Elektrofachkräfte."
   },
-  "quelle": "BG BAU Bausteine B 171, B 172; A 002"
+  "quelle": "DGUV Information 203-006; DGUV Vorschrift 3, Durchführungsanweisung zu § 5, Tabelle 1A; BG BAU Bausteine B 171, B 172, A 002"
  },
  {
   "gruppe": "Handwerk",
@@ -512,9 +541,9 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "arbeitsmittel",
    "beschreibung": "Unfälle mit Kraftfahrzeugen durch technische Mängel oder ungesicherte Ladung.",
-   "massnahme": "Feste Trennwände, Einbauten und Zurrösen; Ladungssicherung mit Netzen oder Spanngurten.\nRegelmäßige Prüfung durch Fachbetrieb; Fahrerlaubnisse regelmäßig kontrollieren."
+   "massnahme": "Feste Trennwände, Einbauten und Zurrösen; Ladungssicherung mit Netzen oder Spanngurten.\nFahrzeuge mindestens jährlich durch eine sachkundige Person prüfen lassen (§ 57 DGUV Vorschrift 70); Fahrerlaubnisse regelmäßig kontrollieren."
   },
-  "quelle": "BG ETEM"
+  "quelle": "§ 57 DGUV Vorschrift 70"
  },
  {
   "gruppe": "Handwerk",
@@ -524,7 +553,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Schwere körperliche Belastung durch Heben, Tragen, Zwangshaltungen und Knien.",
    "massnahme": "Technische Hilfsmittel für den Materialtransport einsetzen (z. B. Schubkarre, Transportzange, Saugheber); höhenverstellbare Geräte nutzen.\nLastgewichte und Gebindegrößen reduzieren; Transportwege kurz halten; Haltungswechsel und Kurzpausen einplanen.\nIn rückengerechter Hebe- und Tragetechnik unterweisen; Knieschutz verwenden."
   },
-  "quelle": "BG BAU Baustein D 506, Stand 07/2021"
+  "quelle": "LasthandhabV; BG BAU Baustein D 506"
  },
  {
   "gruppe": "Handwerk",
@@ -532,9 +561,10 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "sonstiges",
    "beschreibung": "Brand- und Explosionsgefahr durch Druckgasflaschen (z. B. Flüssiggas).",
-   "massnahme": "Flaschen gegen Umfallen sichern, Ventile schützen; Lagerung in Kellern, Fluren und Treppenräumen unzulässig.\nNur mit geschlossenen Ventilen und Schutzkappen transportieren, auf Fahrzeugen verzurren; Feuerlöscher mitführen."
+   "massnahme": "Flaschen gegen Umfallen sichern, Ventile schützen; Lagerung in Kellern, Fluren und Treppenräumen unzulässig.\nNur mit geschlossenen Ventilen und Schutzkappen transportieren, auf Fahrzeugen verzurren; Feuerlöscher mitführen.",
+   "unterpunkt": "brand"
   },
-  "quelle": "BG BAU Bausteine A 063, A 064, A 065"
+  "quelle": "TRGS 510; DGUV Vorschrift 79; BG BAU Bausteine A 063, A 064, A 065"
  },
  {
   "gruppe": "Handwerk",
@@ -544,7 +574,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Fehlende oder defekte persönliche Schutzausrüstung bzw. fehlende Kenntnis über deren Benutzung.",
    "massnahme": "Bedarfsgerechte PSA bereitstellen (z. B. Helm, Sicherheitsschuhe, Schutzbrille, Gehörschutz, Handschuhe).\nBeschäftigte im Umgang mit der PSA unterweisen."
   },
-  "quelle": "BG ETEM"
+  "quelle": "PSA-BV; BG ETEM"
  },
  {
   "gruppe": "Handwerk",
@@ -554,7 +584,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Arbeitsbedingte psychische Belastungen (z. B. Über-/Unterforderung, Stress, soziale Konflikte).",
    "massnahme": "Problembereiche unter Einbindung der Beschäftigten ermitteln (z. B. Befragung).\nLösungen erarbeiten und umsetzen."
   },
-  "quelle": "BG ETEM"
+  "quelle": "§ 5 Abs. 3 Nr. 6 ArbSchG; GDA; BG ETEM"
  },
  {
   "gruppe": "Büro / Laden",
@@ -564,7 +594,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Stolpern, Ausrutschen und Stürzen auf Böden und Verkehrswegen.",
    "massnahme": "Ebene, trittsichere Böden; Stolperstellen und Schwellen beseitigen; Sauberlaufzonen.\nWege frei und sauber halten; rutschhemmende Reinigungsmittel; Schnee und Eis im Außenbereich entfernen.\nGeeignetes Schuhwerk tragen."
   },
-  "quelle": "BGHW"
+  "quelle": "ASR A1.5; BGHW"
  },
  {
   "gruppe": "Büro / Laden",
@@ -572,9 +602,9 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "arbeitsstaette",
    "beschreibung": "Ungünstiges Raumklima (Kälte, Zugluft, Hitze).",
-   "massnahme": "Zugluft vermeiden (Türschleier, Windfang); Sonnenschutz außen.\nBüro: Mindesttemperatur 20 °C; bei mehr als 26 °C Getränke und Trinkpausen anbieten."
+   "massnahme": "Zugluft vermeiden (Türschleier, Windfang); Sonnenschutz außen.\nBei leichter, sitzender Tätigkeit mindestens 20 °C; ab 26 °C sollen, ab 30 °C müssen Maßnahmen nach ASR A3.5 ergriffen werden (z. B. Getränke, Lockerung der Kleiderordnung); über 35 °C ist der Raum ohne solche Maßnahmen nicht als Arbeitsraum geeignet."
   },
-  "quelle": "BGHW"
+  "quelle": "ASR A3.5 Nr. 4.2 Tab. 1, Nr. 4.4"
  },
  {
   "gruppe": "Büro / Laden",
@@ -584,7 +614,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Unzureichende oder blendende Beleuchtung.",
    "massnahme": "Nennbeleuchtungsstärken einhalten (z. B. Verkaufsraum 300 Lux, Büro 500 Lux); flimmerfreie Leuchten.\nBlendung durch Sonne mit Jalousien oder Rollos vermeiden; Leuchtenabdeckungen reinigen."
   },
-  "quelle": "BGHW"
+  "quelle": "ASR A3.4 Anhang 3 Nr. 4.2, 24.1, 24.2; BGHW"
  },
  {
   "gruppe": "Büro / Laden",
@@ -592,9 +622,9 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "ablaeufe_arbeitszeit",
    "beschreibung": "Einseitige Körperhaltung bei Bildschirmarbeit.",
-   "massnahme": "Höhenverstellbarer Schreibtisch (mind. 80 × 160 cm) mit ausreichender Beinfreiheit und ergonomischer Stuhl.\nRegelmäßige Unterbrechung des Sitzens ermöglichen."
+   "massnahme": "Arbeitsfläche mindestens 160 × 80 cm (bei einem Bildschirm und wenig Papier 120 × 80 cm) mit ausreichender Beinfreiheit, ergonomischer Stuhl; höhenverstellbarer Tisch empfohlen.\nRegelmäßige Unterbrechung des Sitzens ermöglichen."
   },
-  "quelle": "BG ETEM"
+  "quelle": "ASR A6 Nr. 6.3.10; DGUV Information 215-410"
  },
  {
   "gruppe": "Büro / Laden",
@@ -604,7 +634,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Visuelle Belastung bei Bildschirmarbeit.",
    "massnahme": "Ausreichend großer, einstellbarer, reflexionsfreier Bildschirm; Aufstellung 90° zum Lichteinfall.\nArbeitsmedizinische Vorsorge (Augen/Sehvermögen) anbieten."
   },
-  "quelle": "BG ETEM"
+  "quelle": "ASR A6; ArbMedVV Anhang Teil 4 Abs. 2 Nr. 1; BG ETEM"
  },
  {
   "gruppe": "Büro / Laden",
@@ -614,7 +644,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Absturz von Leitern und Tritten.",
    "massnahme": "Ausreichend geeignete Leitern und Tritte bereitstellen; keine Kisten oder Stühle als Ersatz.\nStandsicher aufstellen, nicht übersteigen oder seitlich hinauslehnen; vor Gebrauch auf Mängel prüfen."
   },
-  "quelle": "BGHW"
+  "quelle": "DGUV Information 208-016; BGHW"
  },
  {
   "gruppe": "Büro / Laden",
@@ -634,7 +664,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Elektrische Gefährdung durch beschädigte Geräte und Leitungen.",
    "massnahme": "Leitungen nicht durch Tür- oder Fensteröffnungen führen; keine hintereinander gesteckten Mehrfachsteckdosen.\nGeräte und Leitungen vor Gebrauch auf Schäden prüfen; schadhafte Geräte sofort aus dem Verkehr ziehen, Reparatur nur durch Elektrofachkraft.\nElektrische Geräte regelmäßig prüfen lassen."
   },
-  "quelle": "BGHW"
+  "quelle": "DGUV Vorschrift 3; BGHW"
  },
  {
   "gruppe": "Büro / Laden",
@@ -642,9 +672,9 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "arbeitsmittel",
    "beschreibung": "Umstürzende Regale und herabfallendes Lagergut.",
-   "massnahme": "Regale standsicher aufstellen; Anfahrschutz anbringen.\nZulässige Fach- und Feldlasten einhalten; Regale regelmäßig prüfen, Mängel sofort melden."
+   "massnahme": "Regale standsicher aufstellen; Anfahrschutz anbringen.\nZulässige Fach- und Feldlasten einhalten; Regale regelmäßig sichtprüfen und mindestens jährlich durch eine befähigte Person inspizieren lassen (DIN EN 15635); Mängel sofort melden."
   },
-  "quelle": "BGHW"
+  "quelle": "DIN EN 15635; § 14 BetrSichV; BGHW"
  },
  {
   "gruppe": "Büro / Laden",
@@ -654,7 +684,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Belastung durch Heben, Tragen, Ziehen und Schieben von Waren.",
    "massnahme": "Hebe- und Transporthilfen bereitstellen.\nKleinere Gebinde bestellen; schwere Gebinde unten lagern; schwere Lasten zu zweit tragen oder aufteilen; Tätigkeiten wechseln."
   },
-  "quelle": "BGHW"
+  "quelle": "LasthandhabV; BGHW"
  },
  {
   "gruppe": "Büro / Laden",
@@ -684,7 +714,7 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
    "beschreibung": "Psychische Belastungen durch Arbeitsinhalt, Arbeitsorganisation oder soziale Beziehungen.",
    "massnahme": "Belastungen mit anerkannten Verfahren erfassen (Beobachtung, Befragung, Workshop) und Beschäftigte einbinden.\nMaßnahmen ableiten, umsetzen und ihre Wirksamkeit dokumentieren."
   },
-  "quelle": "BGHW"
+  "quelle": "GDA-Leitlinie; BGHW"
  },
  {
   "gruppe": "Büro / Laden",
@@ -692,19 +722,20 @@ export const GEFAEHRDUNGEN: Vorschlag[] = [
   "werte": {
    "faktor": "sonstiges",
    "beschreibung": "Brandentstehung und unzureichende Möglichkeiten zur Brandbekämpfung und Flucht.",
-   "massnahme": "Geeignete Feuerlöscher in ausreichender Zahl (Prüfung alle zwei Jahre); Standorte kennzeichnen und freihalten.\nNicht benötigte Geräte abschalten; Sicherheitsabstand zu brennbarem Material; Brandschutztüren nicht festkeilen.\nAusreichend Beschäftigte im Umgang mit Feuerlöscheinrichtungen unterweisen und üben lassen."
+   "massnahme": "Geeignete Feuerlöscher in ausreichender Zahl (Prüfung alle zwei Jahre); Standorte kennzeichnen und freihalten.\nNicht benötigte Geräte abschalten; Sicherheitsabstand zu brennbarem Material; Brandschutztüren nicht festkeilen.\nAusreichend Beschäftigte im Umgang mit Feuerlöscheinrichtungen unterweisen und üben lassen.",
+   "unterpunkt": "brand"
   },
-  "quelle": "BGHW A 131 (Stand 06/2022); § 22 Abs. 2 DGUV Vorschrift 1"
+  "quelle": "ASR A2.2; BGHW A 131 (Stand 06/2022); § 22 Abs. 2 DGUV Vorschrift 1"
  },
  {
-  "gruppe": "Büro / Laden",
   "titel": "Unzureichende Erste Hilfe bei Unfällen.",
   "werte": {
    "faktor": "sonstiges",
    "beschreibung": "Unzureichende Erste Hilfe bei Unfällen.",
-   "massnahme": "Verbandmaterial bereitstellen und regelmäßig prüfen.\nErsthelfer benennen und ausbilden (bei 2 bis 20 anwesenden Versicherten mindestens ein Ersthelfer; darüber in Verwaltungs- und Handelsbetrieben 5 %), alle zwei Jahre fortbilden.\nJede Erste-Hilfe-Leistung dokumentieren (z. B. Verbandbuch) und fünf Jahre verfügbar halten."
+   "massnahme": "Verbandmaterial bereitstellen und regelmäßig prüfen.\nErsthelfer benennen und ausbilden (bei 2 bis 20 anwesenden Versicherten mindestens ein Ersthelfer; darüber in Verwaltungs- und Handelsbetrieben 5 %, in sonstigen Betrieben 10 %), in der Regel alle zwei Jahre fortbilden.\nJede Erste-Hilfe-Leistung dokumentieren (z. B. Verbandbuch) und fünf Jahre verfügbar halten.",
+   "unterpunkt": "notfall"
   },
-  "quelle": "§§ 24 Abs. 6, 26 Abs. 1 DGUV Vorschrift 1"
+  "quelle": "§§ 24 Abs. 6, 26 Abs. 1, 3 DGUV Vorschrift 1"
  }
 ];
 
@@ -730,7 +761,7 @@ export const UNTERWEISUNGSTHEMEN: (Option & { branchen: string[] })[] = [
  {
   "wert": "gefaehrdungen_am_eigenen_arbeitsplatz_un",
   "text": "Gefährdungen am eigenen Arbeitsplatz und festgelegte Schutzmaßnahmen (Ergebnis der Gefährdungsbeurteilung)",
-  "quelle": "§ 12 ArbSchG",
+  "quelle": "§ 12 Abs. 1 ArbSchG; § 4 Abs. 1 DGUV Vorschrift 1",
   "branchen": [
    "alle"
   ]
@@ -738,7 +769,7 @@ export const UNTERWEISUNGSTHEMEN: (Option & { branchen: string[] })[] = [
  {
   "wert": "erste_hilfe_ersthelfer_standort_verbandk",
   "text": "Erste Hilfe: Ersthelfer, Standort Verbandkasten, Notrufnummer, Dokumentation im Verbandbuch",
-  "quelle": "§§ 24, 26 DGUV Vorschrift 1; BGHW A 131",
+  "quelle": "§§ 24, 26 DGUV Vorschrift 1; ASR A4.3; BGHW A 131",
   "branchen": [
    "alle"
   ]
@@ -746,7 +777,7 @@ export const UNTERWEISUNGSTHEMEN: (Option & { branchen: string[] })[] = [
  {
   "wert": "brandschutz_verhalten_im_brandfall_umgan",
   "text": "Brandschutz: Verhalten im Brandfall, Umgang mit Feuerlöschern, Flucht- und Rettungswege",
-  "quelle": "§ 22 Abs. 2 DGUV Vorschrift 1",
+  "quelle": "§ 22 Abs. 2 DGUV Vorschrift 1; ASR A2.2 Nr. 7",
   "branchen": [
    "alle"
   ]
@@ -754,7 +785,7 @@ export const UNTERWEISUNGSTHEMEN: (Option & { branchen: string[] })[] = [
  {
   "wert": "stolper_rutsch_und_sturzgefahren_ordnung",
   "text": "Stolper-, Rutsch- und Sturzgefahren; Ordnung und Sauberkeit auf Verkehrswegen",
-  "quelle": "BGHW",
+  "quelle": "ASR A1.5; BGHW",
   "branchen": [
    "alle"
   ]
@@ -762,7 +793,7 @@ export const UNTERWEISUNGSTHEMEN: (Option & { branchen: string[] })[] = [
  {
   "wert": "sichere_benutzung_von_leitern_und_tritte",
   "text": "Sichere Benutzung von Leitern und Tritten",
-  "quelle": "BG ETEM",
+  "quelle": "DGUV Information 208-016",
   "branchen": [
    "alle"
   ]
@@ -770,15 +801,15 @@ export const UNTERWEISUNGSTHEMEN: (Option & { branchen: string[] })[] = [
  {
   "wert": "elektrische_geraete_sichtpruefung_vor_be",
   "text": "Elektrische Geräte: Sichtprüfung vor Benutzung, Mängel melden, defekte Geräte nicht benutzen",
-  "quelle": "BGW",
+  "quelle": "§ 4 Abs. 5 BetrSichV; DGUV Vorschrift 3",
   "branchen": [
    "alle"
   ]
  },
  {
   "wert": "gefahrstoffe_inhalt_der_betriebsanweisun",
-  "text": "Gefahrstoffe: Inhalt der Betriebsanweisungen, Gefahren, Schutzmaßnahmen, Zugang zu Sicherheitsdatenblättern",
-  "quelle": "BGN",
+  "text": "Gefahrstoffe: Inhalt der Betriebsanweisungen, Gefahren, Schutzmaßnahmen, Zugang zu Sicherheitsdatenblättern – Unterweisung mündlich anhand der Betriebsanweisung, mit Unterschrift der Unterwiesenen (§ 14 Abs. 2 GefStoffV)",
+  "quelle": "§ 14 Abs. 2 GefStoffV",
   "branchen": [
    "alle"
   ]
@@ -794,7 +825,7 @@ export const UNTERWEISUNGSTHEMEN: (Option & { branchen: string[] })[] = [
  {
   "wert": "persoenliche_schutzausruestung_auswahl_b",
   "text": "Persönliche Schutzausrüstung: Auswahl, Benutzung, Pflege",
-  "quelle": "BG ETEM",
+  "quelle": "§ 3 PSA-BV; DGUV Regel 112-989",
   "branchen": [
    "alle"
   ]
@@ -802,7 +833,7 @@ export const UNTERWEISUNGSTHEMEN: (Option & { branchen: string[] })[] = [
  {
   "wert": "heben_und_tragen_hilfsmittel_rueckengere",
   "text": "Heben und Tragen: Hilfsmittel, rückengerechte Technik",
-  "quelle": "BG BAU",
+  "quelle": "LasthandhabV; Leitmerkmalmethode (BAuA)",
   "branchen": [
    "gastro_cafe",
    "handwerk_allgemein",
@@ -812,7 +843,7 @@ export const UNTERWEISUNGSTHEMEN: (Option & { branchen: string[] })[] = [
  {
   "wert": "psychische_belastungen_verhalten_bei_kon",
   "text": "Psychische Belastungen: Verhalten bei Konflikten, Aggression und Übergriffen, Unterstützungsangebote",
-  "quelle": "BGW",
+  "quelle": "§ 5 Abs. 3 Nr. 6 ArbSchG; BGW",
   "branchen": [
    "alle"
   ]
@@ -828,7 +859,7 @@ export const UNTERWEISUNGSTHEMEN: (Option & { branchen: string[] })[] = [
  {
   "wert": "feuchtarbeit_und_hautschutz_im_salon_hau",
   "text": "Feuchtarbeit und Hautschutz im Salon (Hautschutz- und Händehygieneplan)",
-  "quelle": "BGW",
+  "quelle": "TRGS 401; TRGS 530; BGW",
   "branchen": [
    "friseur",
    "kosmetik"
@@ -837,7 +868,7 @@ export const UNTERWEISUNGSTHEMEN: (Option & { branchen: string[] })[] = [
  {
   "wert": "infektionsschutz_und_hygiene_stich_und_s",
   "text": "Infektionsschutz und Hygiene: Stich- und Schnittverletzungen, Umgang mit Blut, Instrumentenaufbereitung",
-  "quelle": "BGW",
+  "quelle": "BioStoffV; BGW",
   "branchen": [
    "kosmetik"
   ]
@@ -853,15 +884,15 @@ export const UNTERWEISUNGSTHEMEN: (Option & { branchen: string[] })[] = [
  {
   "wert": "fritteusen_verbruehungsrisiko_und_fettbr",
   "text": "Fritteusen: Verbrühungsrisiko und Fettbrand, Löschen mit Brandklasse-F-Löscher",
-  "quelle": "BGN",
+  "quelle": "BGN ASI 2.15",
   "branchen": [
    "gastro_cafe"
   ]
  },
  {
   "wert": "laerm_gehoerschutz_ab_80_85_db_a",
-  "text": "Lärm: Gehörschutz ab 80/85 dB(A)",
-  "quelle": "BG BAU",
+  "text": "Lärm: Gehörschutz bereitstellen ab 80 dB(A), tragen ab 85 dB(A)",
+  "quelle": "§ 8 LärmVibrationsArbSchV",
   "branchen": [
    "handwerk_allgemein",
    "gastro_cafe"
@@ -870,7 +901,7 @@ export const UNTERWEISUNGSTHEMEN: (Option & { branchen: string[] })[] = [
  {
   "wert": "staubarmes_arbeiten_absaugung_nassbearbe",
   "text": "Staubarmes Arbeiten (Absaugung, Nassbearbeitung, Reinigung mit Industriesauger)",
-  "quelle": "BG BAU",
+  "quelle": "TRGS 559; TRGS 553; BG BAU",
   "branchen": [
    "handwerk_allgemein"
   ]
@@ -886,7 +917,7 @@ export const UNTERWEISUNGSTHEMEN: (Option & { branchen: string[] })[] = [
  {
   "wert": "bildschirmarbeit_einstellung_von_tisch_s",
   "text": "Bildschirmarbeit: Einstellung von Tisch, Stuhl und Bildschirm",
-  "quelle": "BG ETEM",
+  "quelle": "ASR A6",
   "branchen": [
    "buero_laden"
   ]
@@ -935,8 +966,8 @@ export const BA_BAUSTEINE: Record<string, Option[]> = {
  "schutzmassnahmen": [
   {
    "wert": "schutzhandschuhe_bei_den_gekennzeichnete",
-   "text": "Schutzhandschuhe bei den gekennzeichneten Tätigkeiten tragen.",
-   "quelle": "TRGS 530"
+   "text": "Beim Mischen, Auftragen und Auswaschen Schutzhandschuhe (Typ und Material laut Hautschutzplan) tragen.",
+   "quelle": "TRGS 530 Nr. 5.4; TRGS 555 Nr. 3.1 Abs. 9"
   },
   {
    "wert": "schutzhandschuhe_nur_mit_sauberen_trocke",
@@ -946,17 +977,17 @@ export const BA_BAUSTEINE: Record<string, Option[]> = {
   {
    "wert": "beschaedigte_handschuhe_sofort_austausch",
    "text": "Beschädigte Handschuhe sofort austauschen.",
-   "quelle": "BGW"
+   "quelle": "TRGS 401; BGW"
   },
   {
    "wert": "chemikalienschutzhandschuhe_regelmaessig",
-   "text": "Chemikalienschutzhandschuhe regelmäßig, spätestens arbeitstäglich wechseln; maximale Tragedauer beachten.",
-   "quelle": "TRGS 401 Nr. 5.5.3 Abs. 4"
+   "text": "Einmalhandschuhe nach jedem Gebrauch entsorgen; wiederverwendbare Chemikalienschutzhandschuhe nach Herstellerangabe (Tragedauer, Permeationszeit) wechseln.",
+   "quelle": "TRGS 401; TRGS 530 Nr. 5.4 Abs. 3"
   },
   {
    "wert": "bei_aetzenden_stoffen_schutzbrille_trage",
    "text": "Bei ätzenden Stoffen Schutzbrille tragen.",
-   "quelle": "BGW 04-05-080, S. 21–22"
+   "quelle": "TRGS 555; BGW 04-05-080, S. 21–22"
   },
   {
    "wert": "produkte_nur_nach_herstellerangaben_anwe",
@@ -966,32 +997,32 @@ export const BA_BAUSTEINE: Record<string, Option[]> = {
   {
    "wert": "desinfektion_im_wischverfahren_durchfueh",
    "text": "Desinfektion im Wischverfahren durchführen; nicht sprühen oder vernebeln.",
-   "quelle": "BGW"
+   "quelle": "TRGS 525; BGW"
   },
   {
    "wert": "fuer_ausreichende_lueftung_sorgen_sprueh",
-   "text": "Für ausreichende Lüftung sorgen; Sprühnebel, Stäube und Dämpfe nicht einatmen.",
-   "quelle": "TRGS 530"
+   "text": "Lüftung (Fenster bzw. Abluft) während der Anwendung eingeschaltet lassen; Sprühnebel, Stäube und Dämpfe nicht einatmen.",
+   "quelle": "TRGS 530 Nr. 5.2; TRGS 555 Nr. 3.1 Abs. 9"
   },
   {
    "wert": "am_arbeitsplatz_nicht_essen_trinken_oder",
    "text": "Am Arbeitsplatz nicht essen, trinken oder rauchen.",
-   "quelle": "TRGS 530"
+   "quelle": "TRGS 500; TRGS 530"
   },
   {
    "wert": "gefahrstoffe_moeglichst_in_originalbehae",
    "text": "Gefahrstoffe möglichst in Originalbehältern aufbewahren; abgefüllte Stoffe korrekt beschriften; niemals in Lebensmittel- oder Getränkebehälter abfüllen.",
-   "quelle": "BGW"
+   "quelle": "§ 8 GefStoffV; TRGS 510"
   },
   {
    "wert": "gefahrstoffe_getrennt_von_lebensmitteln_",
    "text": "Gefahrstoffe getrennt von Lebensmitteln und nicht über Augenhöhe lagern.",
-   "quelle": "BGW"
+   "quelle": "TRGS 510"
   },
   {
    "wert": "am_arbeitsplatz_hoechstens_den_tagesbeda",
    "text": "Am Arbeitsplatz höchstens den Tagesbedarf an entzündbaren Flüssigkeiten bereithalten.",
-   "quelle": "BGW"
+   "quelle": "TRGS 510"
   },
   {
    "wert": "verunreinigte_oder_mit_chemikalien_getra",
@@ -1024,35 +1055,35 @@ export const BA_BAUSTEINE: Record<string, Option[]> = {
  "erste_hilfe": [
   {
    "wert": "nach_augenkontakt_mit_viel_wasser_spuele",
-   "text": "Nach Augenkontakt: mit viel Wasser spülen und ärztlichen Rat einholen.",
-   "quelle": "TRGS 530"
+   "text": "Nach Augenkontakt: Augen sofort bei geöffnetem Lidspalt mindestens 10 Minuten mit Wasser spülen (Augenspülflasche), dann Augenarzt.",
+   "quelle": "TRGS 555 Nr. 3.2.7; Sicherheitsdatenblatt Abschnitt 4"
   },
   {
    "wert": "nach_hautkontakt_mit_viel_wasser_spuelen",
    "text": "Nach Hautkontakt: mit viel Wasser spülen; bei Beschwerden ärztlichen Rat einholen.",
-   "quelle": "TRGS 530"
+   "quelle": "TRGS 555 Nr. 3.2.7"
   },
   {
    "wert": "nach_einatmen_bei_beschwerden_aerztliche",
-   "text": "Nach Einatmen: bei Beschwerden ärztlichen Rat einholen.",
-   "quelle": "TRGS 530"
+   "text": "Nach Einatmen: an die frische Luft; bei Beschwerden ärztlichen Rat einholen.",
+   "quelle": "TRGS 555 Nr. 3.2.7"
   },
   {
    "wert": "nach_verschlucken_aerztlichen_rat_einhol",
-   "text": "Nach Verschlucken: ärztlichen Rat einholen.",
-   "quelle": "TRGS 530"
+   "text": "Nach Verschlucken: Mund ausspülen, kein Erbrechen herbeiführen, sofort ärztlichen Rat einholen bzw. Giftnotruf anrufen.",
+   "quelle": "TRGS 555 Nr. 3.2.7"
   },
   {
    "wert": "zum_arzt_gebrauchsanweisung_oder_packung",
    "text": "Zum Arzt Gebrauchsanweisung oder Packung bzw. Behältnis des Produkts mitnehmen.",
-   "quelle": "TRGS 530"
+   "quelle": "TRGS 555"
   }
  ],
  "entsorgung": [
   {
    "wert": "entsorgung_mit_der_oertlichen_gewerbeabf",
    "text": "Abfälle nur über die im Betrieb festgelegten Entsorgungswege entsorgen.",
-   "quelle": "BGW"
+   "quelle": "TRGS 555 Nr. 3.2.8"
   },
   {
    "wert": "restentleerte_spraydosen_sicher_entsorge",
@@ -1062,7 +1093,7 @@ export const BA_BAUSTEINE: Record<string, Option[]> = {
   {
    "wert": "nicht_mehr_benoetigte_produkte_fachgerec",
    "text": "Nicht mehr benötigte Produkte fachgerecht entsorgen.",
-   "quelle": "BGHW"
+   "quelle": "TRGS 555 Nr. 3.2.8"
   }
  ]
 };
@@ -1073,12 +1104,12 @@ export const HAUTSCHUTZ_FRISEUR: Vorschlag[] = [
   "titel": "Shampoonieren, Kopfmassage mit Haarbehandlungsmitteln, Pflegemittel auftragen/auswaschen",
   "werte": {
    "anlass": "Shampoonieren, Kopfmassage mit Haarbehandlungsmitteln, Pflegemittel auftragen/auswaschen",
-   "schutz": "Hände mit Hautschutzpräparat eincremen",
+   "schutz": "Hände mit Hautschutzpräparat eincremen – unter Handschuhen nur ein laut Hersteller handschuhverträgliches Präparat, sonst Hautschutz in Phasen ohne Handschuhe",
    "handschuhe": "Einmalhandschuhe aus Nitril oder Vinyl mit langen Stulpen über das Handgelenk (alternativ Waschhandschuhe)",
    "reinigung": "Hände nur bei Verschmutzung waschen, ggf. mit pH-hautneutralem Reinigungsmittel; gut abtrocknen",
    "pflege": "Nach dem Waschen, vor Pausen und nach Arbeitsende Hände mit Hautpflegepräparat eincremen"
   },
-  "quelle": "TRGS 530 / BGW"
+  "quelle": "TRGS 401; TRGS 530"
  },
  {
   "gruppe": "Friseur",
@@ -1090,7 +1121,7 @@ export const HAUTSCHUTZ_FRISEUR: Vorschlag[] = [
    "reinigung": "Hände nur bei Verschmutzung waschen, ggf. mit pH-hautneutralem Reinigungsmittel; gut abtrocknen",
    "pflege": "Nach dem Waschen, vor Pausen und nach Arbeitsende Hände mit Hautpflegepräparat eincremen"
   },
-  "quelle": "TRGS 530 / BGW"
+  "quelle": "TRGS 530 Nr. 5.4; DIN EN ISO 374-6:2025-11"
  },
  {
   "gruppe": "Friseur",
@@ -1102,7 +1133,7 @@ export const HAUTSCHUTZ_FRISEUR: Vorschlag[] = [
    "reinigung": "Hände nur bei Verschmutzung waschen, ggf. mit pH-hautneutralem Reinigungsmittel; gut abtrocknen",
    "pflege": "Nach dem Waschen, vor Pausen und nach Arbeitsende Hände mit Hautpflegepräparat eincremen"
   },
-  "quelle": "TRGS 530 / BGW"
+  "quelle": "TRGS 530; BGW"
  },
  {
   "gruppe": "Friseur",
@@ -1114,7 +1145,7 @@ export const HAUTSCHUTZ_FRISEUR: Vorschlag[] = [
    "reinigung": "Hände nur bei Verschmutzung waschen, ggf. mit pH-hautneutralem Reinigungsmittel; gut abtrocknen",
    "pflege": "Nach dem Waschen, vor Pausen und nach Arbeitsende Hände mit Hautpflegepräparat eincremen"
   },
-  "quelle": "TRGS 530 / BGW"
+  "quelle": "TRGS 530; BGW"
  },
  {
   "gruppe": "Friseur",
@@ -1126,7 +1157,7 @@ export const HAUTSCHUTZ_FRISEUR: Vorschlag[] = [
    "reinigung": "Hände nur bei Verschmutzung waschen, ggf. mit pH-hautneutralem Reinigungsmittel; gut abtrocknen",
    "pflege": "Nach dem Waschen, vor Pausen und nach Arbeitsende Hände mit Hautpflegepräparat eincremen"
   },
-  "quelle": "TRGS 530 / BGW"
+  "quelle": "TRGS 401; TRGS 530; BGW"
  },
  {
   "gruppe": "Friseur",
@@ -1138,7 +1169,7 @@ export const HAUTSCHUTZ_FRISEUR: Vorschlag[] = [
    "reinigung": "",
    "pflege": ""
   },
-  "quelle": "TRGS 530 / BGW"
+  "quelle": "TRGS 401; TRGS 530; BGW"
  }
 ];
 
@@ -1181,8 +1212,7 @@ export const ELEKTRO_FRISTEN: (Option & { unsicher?: boolean })[] = [
  {
   "wert": "fehlerstrom_differenzstrom_und_fehlerspa",
   "text": "Fehlerstrom-, Differenzstrom- und Fehlerspannungs-Schutzschalter: Betätigen der Prüfeinrichtung durch den Benutzer: Richtwert stationäre Anlagen: 6 Monate; nichtstationäre Anlagen: arbeitstäglich",
-  "quelle": "DGUV Vorschrift 3, Durchführungsanweisung zu § 5, Tabelle 1A",
-  "unsicher": true
+  "quelle": "DGUV Vorschrift 3, Durchführungsanweisung zu § 5, Tabelle 1A (Herstellerangaben können abweichen)"
  }
 ];
 

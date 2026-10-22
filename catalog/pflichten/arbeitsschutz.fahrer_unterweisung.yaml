@@ -1,14 +1,14 @@
 # R12 (Nutzertest Kurier #4, 3a): Fahrer beauftragen und unterweisen (§ 35 DGUV Vorschrift 70), Ladungssicherung (§ 22 StVO)
 schema_version: 1
 id: arbeitsschutz.fahrer_unterweisung
-version: 1
+version: 2
 katalog_nr: E.52
 titel:
   de: Fahrerinnen und Fahrer beauftragen, unterweisen und Ladung sichern
 kurz:
   de: Firmenfahrzeuge lässt du nur von geeigneten, unterwiesenen Personen fahren, die du ausdrücklich beauftragst – und sorgst dafür, dass die Ladung gesichert ist.
 erklaerung:
-  de: Mit dem selbstständigen Führen von Fahrzeugen beauftragst du nur Personen, die mindestens 18 Jahre alt, körperlich und geistig geeignet, im Führen des Fahrzeugs unterwiesen sind und ihre Befähigung nachgewiesen haben (§ 35 DGUV Vorschrift 70). Unterweise sie zu Abfahrtkontrolle, Verhalten bei Pannen und Ladungssicherung. Die Ladung ist so zu verstauen und zu sichern, dass sie selbst bei Vollbremsung oder plötzlicher Ausweichbewegung nicht verrutscht, umfällt, hin- und herrollt oder herabfällt (§ 22 Abs. 1 StVO).
+  de: Mit dem selbstständigen Führen von Fahrzeugen beauftragst du nur Personen, die mindestens 18 Jahre alt, körperlich und geistig geeignet, im Führen des Fahrzeugs unterwiesen sind und ihre Befähigung nachgewiesen haben (§ 35 DGUV Vorschrift 70). Die Beauftragung schriftlich festzuhalten ist nicht vorgeschrieben, aber als Nachweis empfehlenswert. Unterweise sie zu Abfahrtkontrolle, Verhalten bei Pannen und Ladungssicherung. Die Ladung ist so zu verstauen und zu sichern, dass sie selbst bei Vollbremsung oder plötzlicher Ausweichbewegung nicht verrutscht, umfällt, hin- und herrollt oder herabfällt (§ 22 Abs. 1 StVO).
 rechtsgrundlage:
 - § 35 DGUV Vorschrift 70
 - § 22 Abs. 1 StVO
@@ -51,7 +51,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/stvo_2013/__22.html
   abgerufen: null
 fachlich_zu_pruefen:
-- 'Neu nach Nutzertest R12 (Kurier #4) – schriftliche Beauftragung und Wiederholung der Unterweisung bestätigen; Unterweisungsthemen Fahrzeug in der Vorlage fehlen'
+- 'Prüfergebnis Sifa 22.10.2026 (frei): § 35 DGUV Vorschrift 70 verlangt die Bestimmung durch den Unternehmer, Schriftform empfohlen, nicht vorgeschrieben – Unterweisungsthemen Fahrzeug in der Vorlage fehlen; Sanktion fachlich ergänzen'
 pruefung:
   status: entwurf
   geprueft_von: null

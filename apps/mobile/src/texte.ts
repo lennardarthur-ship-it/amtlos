@@ -1393,6 +1393,8 @@ export const T = {
   nk_form_schrift_titel: "Schriftform: ausdrucken und unterschreiben",
   nk_form_text_titel: "Textform: PDF genügt",
   nk_form_offen_titel: "Form des Nachweises",
+  // Sifa Vorlagen
+  sifa_unterschrift_titel: "Unterschriften auf Papier nötig",
   // Gewerbe online anmelden (§ 14 GewO) – geführte Seite mit den Angaben des Vordrucks GewA 1
   go_titel: "Gewerbe online anmelden",
   go_einstieg: "Online anmelden – Schritt für Schritt",

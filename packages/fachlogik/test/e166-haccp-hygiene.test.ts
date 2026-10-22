@@ -155,11 +155,13 @@ describe("Branchengruppen: Foodtruck und Praxis", () => {
   it("Praxis / Gesundheit: Gefährdungen mit BioStoffV und TRBA 250, Röntgen nur als Hinweis; Unterweisungsthemen", () => {
     expect(gruppenFuerBetrieb(["gesundheit_pflege"])).toEqual(["praxis"]);
     const gb = liste("gefaehrdungsbeurteilung", "gefaehrdungen").vorschlaege!.filter((x) => x.gruppe === "Praxis / Gesundheit");
-    expect(gb.length).toBe(5);
+    // E-167: dazu vier Gefährdungen aus der Sifa-Durchsicht (Gewalt, Laser, Narkosegase, Mutterschutz bei Biostoffen)
+    expect(gb.length).toBe(9);
     const t = JSON.stringify(gb);
     for (const s of ["TRBA 250", "§ 11 Abs. 3 BioStoffV", "Abwurfbehälter", "TRGS 525", "TRGS 401", "Strahlenschutz"]) expect(t, s).toContain(s);
-    expect(gb.find((x) => /Röntgen/.test(x.titel))!.quelle).toMatch(/unsicher, nur Hinweis/);
-    for (const x of gb.filter((x) => !/Röntgen/.test(x.titel))) expect(x.quelle, x.titel).toMatch(/fachlich zu prüfen$/);
+    // E-167: Prüfstand der Durchsicht – nur „offen“ behält „fachlich zu prüfen“ (Stichverletzung, Desinfektionsmittel)
+    expect(gb.find((x) => /Röntgen/.test(x.titel))!.quelle).toMatch(/StrlSchV/);
+    expect(gb.filter((x) => /fachlich zu prüfen$/.test(x.quelle ?? "")).map((x) => x.titel.slice(0, 20))).toEqual(["Stich- und Schnittve", "Desinfektionsmittel:", "Gewalt und Aggressio", "Narkosegase und Lach", "Mutterschutz bei Bio"]);
     const themen = (feld("unterweisung", "themen") as { optionen: Option[] }).optionen.filter((o) => o.gruppen?.includes("praxis"));
     expect(themen.map((o) => o.wert)).toEqual(["praxis_biostoffe", "praxis_nadelstich", "praxis_desinfektion"]);
   });

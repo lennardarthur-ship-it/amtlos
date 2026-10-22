@@ -22,3 +22,7 @@ erwartet:
   branche.beauty_kosmetikverordnung: gilt
   arbeitsschutz.gefahrstoffe: gilt
   branche.bau_soka: gilt_nicht
+  # Prüfergebnis Sifa 22.10.2026: Hinweise für Handwerk mit Gefahrstoffen
+  arbeitsschutz.expositionsverzeichnis: gilt
+  arbeitsschutz.laerm: gilt
+  arbeitsschutz.fremdfirmen_abstimmung: gilt

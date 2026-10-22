@@ -1,16 +1,17 @@
-# R11 (Nutzertest Tischlerei Befund 6): Feuerlöscher nach ASR A2.2
+# R11 (Nutzertest Tischlerei Befund 6): Feuerlöscher nach ASR A2.2; Prüfergebnis Sifa 22.10.2026 (C Katalog E.54, frei): Prüfabstand bestätigt
 schema_version: 1
 id: arbeitsschutz.feuerloescher
-version: 1
+version: 2
 katalog_nr: E.54
 titel:
   de: Feuerlöscher bereitstellen und prüfen lassen
 kurz:
-  de: In deiner Arbeitsstätte stehen ausreichend Feuerlöscher bereit, die regelmäßig von einer sachkundigen Person geprüft werden.
+  de: In deiner Arbeitsstätte stehen ausreichend Feuerlöscher bereit, die spätestens alle zwei Jahre von einer sachkundigen Person geprüft werden.
 erklaerung:
-  de: Nach der Arbeitsstättenverordnung triffst du Vorkehrungen gegen Brände. Wie viele Feuerlöscher du brauchst, richtet sich nach
-    Größe und Brandgefährdung der Räume (Technische Regel für Arbeitsstätten ASR A2.2). Die Feuerlöscher lässt du regelmäßig, in der
-    Regel alle zwei Jahre, von einer sachkundigen Person prüfen. Dazu kommen Brandschutzhelfer unter deinen Beschäftigten.
+  de: Nach der Arbeitsstättenverordnung triffst du Vorkehrungen gegen Brände und lässt Löschgeräte regelmäßig auf ihre Funktionsfähigkeit prüfen
+    (§ 4 Abs. 3 ArbStättV). Wie viele Feuerlöscher du brauchst, richtet sich nach Größe und Brandgefährdung der Räume (Technische Regel für
+    Arbeitsstätten ASR A2.2). Die Feuerlöscher lässt du spätestens alle zwei Jahre von einer sachkundigen Person prüfen. Brandschutzhelfer
+    unter deinen Beschäftigten sind eine eigene Pflicht.
 rechtsgrundlage:
 - § 4 Abs. 3 ArbStättV
 - ASR A2.2
@@ -41,15 +42,15 @@ status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
 quellen:
-- titel: Arbeitsstättenverordnung
-  url: https://www.gesetze-im-internet.de/arbst_ttv_2004/
-  abgerufen: null
+- titel: Arbeitsstättenverordnung § 4
+  url: https://www.gesetze-im-internet.de/arbst_ttv_2004/__4.html
+  abgerufen: '2026-10-22'
 - titel: ASR A2.2 Maßnahmen gegen Brände (BAuA)
   url: https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A2-2.html
   abgerufen: null
 fachlich_zu_pruefen:
-- 'Neu nach Nutzertest R11 (Tischlerei) – Prüfabstand „in der Regel alle zwei Jahre“ und Norm (§ 4 Abs. 3 ArbStättV, ASR A2.2) bestätigen; Abgrenzung zur Pflicht Erste Hilfe/Brandschutzhelfer'
 - 'Folgen bei Nichterfüllung – Sanktion fachlich ergänzen'
+- 'Prüfabstand „spätestens alle zwei Jahre“ laut Prüfergebnis Sifa 22.10.2026 bestätigt – die Erledigung gilt in Amtlos weiter nur für das Kalenderjahr (laufend je Jahr); Abstand aus einem Prüfnachweis übernehmen, sobald es eine Vorlage gibt (Technik)'
 pruefung:
   status: entwurf
   geprueft_von: null

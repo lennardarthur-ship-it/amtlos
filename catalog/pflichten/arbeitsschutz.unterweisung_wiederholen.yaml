@@ -1,7 +1,7 @@
 # Katalog E.51 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: arbeitsschutz.unterweisung_wiederholen
-version: 3
+version: 4
 katalog_nr: E.51
 titel:
   de: Unterweisung jährlich wiederholen
@@ -12,7 +12,7 @@ erklaerung:
     Hast du deine letzte Unterweisung noch nicht in Amtlos erfasst, erfasse sie – dann kennt Amtlos den nächsten Termin.
 rechtsgrundlage:
 - § 12 ArbSchG
-- DGUV Vorschrift 1
+- § 4 Abs. 1 DGUV Vorschrift 1
 kategorie: arbeitsschutz
 # gilt mit Beschäftigten auch ohne eine in Amtlos erfasste Unterweisung (z. B. Betrieb mit Beschäftigten seit Jahren);
 # den Termin gibt es erst mit dem Ereignis „unterweisung_durchgefuehrt“
@@ -54,8 +54,10 @@ quellen:
 - titel: Arbeitsschutzgesetz § 12
   url: https://www.gesetze-im-internet.de/arbschg/__12.html
   abgerufen: null
+- titel: DGUV Vorschrift 1 (UKBW, § 4)
+  url: https://www.ukbw.de/fileadmin/user_upload/Mediathek/UVV/DGUV_Vorschrift_1.pdf
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- „Mindestens jährlich“ als ein Jahr nach der letzten Unterweisung umgesetzt – bestätigen
 - 'Kürzere Frist für Jugendliche als eigene Pflicht arbeitsschutz.unterweisung_jugendliche (R11)'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 pruefung:

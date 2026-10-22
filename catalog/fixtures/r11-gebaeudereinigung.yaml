@@ -23,5 +23,8 @@ erwartet:
   branche.gastro_ifsg_bescheinigung: gilt_nicht
   online.vsbg_streitfall: gilt_nicht
   arbeitsschutz.arbeitsmittel_pruefen: gilt
+  arbeitsschutz.biostoffe: gilt
+  arbeitsschutz.fremdfirmen_abstimmung: gilt
+  branche.beauty_hautschutzplan: gilt
 termine_enthaelt:
   personal.aufenthaltstitel: [["aenderung-20261005", "2026-10-04"]]

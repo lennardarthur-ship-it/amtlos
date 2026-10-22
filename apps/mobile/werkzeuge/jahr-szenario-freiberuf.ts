@@ -516,6 +516,12 @@ export function standBauen(): Bau {
     oss_meldung: "Kleinunternehmerin – kein OSS-Verfahren.", zm_meldung: "Kleinunternehmerin – keine Zusammenfassende Meldung (§ 18a Abs. 4 UStG).",
   };
   for (const [id, g] of Object.entries(grund)) uebersprungen.push({ id, titel: v(id).titel, grund: g });
+  // E-167 (Sifa-Durchsicht): neue Vorlagen Betriebsanweisung Maschinen und Biostoffe, Expositionsverzeichnis
+  uebersprungen.push(
+    { id: "betriebsanweisung_maschine", titel: v("betriebsanweisung_maschine").titel, grund: "Keine Beschäftigten, keine Maschinen." },
+    { id: "betriebsanweisung_biostoffe", titel: v("betriebsanweisung_biostoffe").titel, grund: "Keine Beschäftigten, keine Biostoffe." },
+    { id: "expositionsverzeichnis", titel: v("expositionsverzeichnis").titel, grund: "Keine Beschäftigten, keine Gefahrstoffe." },
+  );
   const genutzt = new Set(docs.map((d) => d.vorlage));
   for (const vl of VORLAGEN) if (!genutzt.has(vl.id) && !uebersprungen.some((u) => u.id === vl.id)) auffaellig.push(`Vorlage ${vl.id} weder erzeugt noch als übersprungen begründet.`);
 

@@ -4,6 +4,8 @@ Stand: Oktober 2026. Diese Mappe ist für eine **Fachkraft für Arbeitssicherhei
 
 Anbieter: Lang Ventures UG (haftungsbeschränkt) i. G., Reutlingen. App: **Betriebsklar** (iPhone).
 
+> **Zweite Fassung nach der Durchsicht vom 22.10.2026 (E-167).** Das Ergebnis der Durchsicht (`docs/pruefberichte/2026-10-22-arbeitsschutz-pruefergebnis.xlsx`) ist eingearbeitet. Die Nummern B-001 bis B-197 sind die der Durchsicht (Zuordnung in `packages/fachlogik/src/dokumente/sifa.ts`), neue Bausteine folgen ab B-198; die Spalte „Durchsicht 22.10.2026“ nennt Ergebnis und Prüfstand. Neu zur Durchsicht: Vorlagen „Betriebsanweisung Maschinen“, „Betriebsanweisung Biostoffe“ und „Expositionsverzeichnis“, Risikoskala Schwere × Wahrscheinlichkeit, Abschnitt „Prüfungen der Arbeitsmittel“ in der Gefährdungsbeurteilung, Unterschriftspflicht bei Gefahr- und Biostoff-Unterweisungen. Offene Punkte: PRUEFLISTE T-150 bis T-155. Eine Freigabe („geprüft von“) steht noch aus – das Ergebnis trägt noch keinen Namen.
+
 ## Was Betriebsklar im Arbeitsschutz tut
 
 Betriebsklar ist eine iPhone-App für kleine Betriebe in Deutschland. Für den Arbeitsschutz heißt das:
@@ -21,7 +23,7 @@ Betriebsklar ist eine iPhone-App für kleine Betriebe in Deutschland. Für den A
 
 | Datei | Inhalt |
 |---|---|
-| `vorlagen/*.pdf` | Jede Arbeitsschutz-Vorlage in drei Fassungen: `-leer` (Startwerte, zum Ausfüllen von Hand), `-voll` (realistisch ausgefüllt), `-auswahl` (jede Auswahl umgestellt, alle Schalter an – so erscheinen auch die Abschnitte, die erst durch eine Auswahl entstehen). Vorlagen: `gefaehrdungsbeurteilung`, `unterweisung`, `gefahrstoffverzeichnis`, `betriebsanweisung`, `pruefprotokoll_elektro`, `hautschutzplan` |
+| `vorlagen/*.pdf` | Jede Arbeitsschutz-Vorlage in drei Fassungen: `-leer` (Startwerte, zum Ausfüllen von Hand), `-voll` (realistisch ausgefüllt), `-auswahl` (jede Auswahl umgestellt, alle Schalter an – so erscheinen auch die Abschnitte, die erst durch eine Auswahl entstehen). Vorlagen: `gefaehrdungsbeurteilung`, `unterweisung`, `gefahrstoffverzeichnis`, `betriebsanweisung`, `betriebsanweisung_maschine`, `betriebsanweisung_biostoffe`, `expositionsverzeichnis`, `pruefprotokoll_elektro`, `hautschutzplan`; bei der Unterweisung zusätzlich `-voll-gefahrstoffe` |
 | `bausteine.md` | Alle Bausteine dieser Vorlagen nach Branchengruppe und Vorlage: Baustein, Inhalt (Maßnahmen), automatisch herausgezogene Kennzahlen, Quelle, Markierung („fachlich zu prüfen“, „unsicher“, „Nutzertest“, „ohne Quelle“). Am Ende die kurzen Auswahllisten und die festen Texte (Risikoskala, Gefährdungsfaktoren, Pflichtangaben Gefahrstoffverzeichnis, Gliederung Betriebsanweisung, Prüffristen) |
 | `bausteine.csv` | Dieselben Bausteine als Tabelle (Semikolon, UTF-8, für Excel), eine Zeile je Baustein mit Nummer B-…, zum Kommentieren |
 | `katalog-arbeitsschutz.csv` | Katalogeinträge der Kategorie `arbeitsschutz` und die Arbeitsschutz-Einträge aus Personal und Branchen (JArbSchG, MuSchG, ArbZG/Nachtarbeit, Arbeitszeit, Aushänge, Führerscheinkontrolle, Hautschutzplan, Gefährdungsbeurteilung je Gewerk, Baustellenverordnung, Lenk- und Ruhezeiten) – gleiche Spalten wie die Anwalts-Mappe |

@@ -1,0 +1,51 @@
+# Prüfergebnis Sifa 22.10.2026 (C Fehlende Pflichten „Flucht- und Rettungsplan, Räumungsübung“)
+schema_version: 1
+id: arbeitsschutz.flucht_rettungsplan
+version: 1
+katalog_nr: E.54
+titel:
+  de: Flucht- und Rettungsplan prüfen
+kurz:
+  de: Erfordern Lage, Ausdehnung oder Nutzung deiner Arbeitsstätte es, hängst du einen Flucht- und Rettungsplan aus und übst die Räumung.
+erklaerung:
+  de: 'Einen Flucht- und Rettungsplan brauchst du, wenn Lage, Ausdehnung und Art der Benutzung der Arbeitsstätte es erfordern (§ 4 Abs. 4 ArbStättV) – etwa bei unübersichtlichen Fluchtwegen, mehreren Geschossen, vielen Kundinnen und Kunden oder erhöhter Brandgefährdung. Ob das so ist, hältst du in der Gefährdungsbeurteilung fest. Der Plan wird an geeigneten Stellen ausgehängt oder ausgelegt; gestaltet wird er nach ASR A2.3 (Grundriss, Fluchtwege, Sammelstelle, Verhalten im Brandfall und bei Unfällen). Nach dem Plan übst du in angemessenen Zeitabständen, wie die Arbeitsstätte geräumt wird. Für ein kleines Ladenlokal mit direktem Ausgang ins Freie ist oft kein Plan nötig.'
+rechtsgrundlage:
+- § 4 Abs. 4 ArbStättV
+- ASR A2.3
+kategorie: arbeitsschutz
+einordnung: hinweis
+ausloeser:
+  feld: abgeleitet.hat_beschaeftigte
+  op: ==
+  wert: true
+  label:
+    de: Du beschäftigst mindestens eine Person.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Arbeitsstättenverordnung § 4
+  url: https://www.gesetze-im-internet.de/arbst_ttv_2004/__4.html
+  abgerufen: '2026-10-22'
+- titel: ASR A2.3 Fluchtwege und Notausgänge (BAuA)
+  url: https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A2-3.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Neu nach Prüfergebnis Sifa 22.10.2026 – als Hinweis (nur wenn Lage, Ausdehnung oder Art der Arbeitsstätte es erfordern); Kriterien und Übungsabstand nach ASR A2.3 nicht abgerufen; Sanktion fachlich ergänzen'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

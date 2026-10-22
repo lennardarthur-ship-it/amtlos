@@ -516,7 +516,7 @@
     {
       "pfad": "profil.arbeitszeit.nachtarbeit",
       "typ": "bool",
-      "herleitung": "Onboarding (R12): Beschäftigte arbeiten regelmäßig mehr als zwei Stunden in der Nachtzeit (23–6 Uhr, in Bäckereien und Konditoreien 22–5 Uhr, § 2 Abs. 3, 4 ArbZG)",
+      "herleitung": "Onboarding (R12): Beschäftigte arbeiten regelmäßig mehr als zwei Stunden in der Nachtzeit (23–6 Uhr, in Bäckereien und Konditoreien 22–5 Uhr, § 2 Abs. 3, 4 ArbZG); Nachtarbeitnehmer in Wechselschicht oder an mindestens 48 Tagen im Jahr (§ 2 Abs. 5 ArbZG, Prüfergebnis Sifa 22.10.2026)",
       "ab": 5
     },
     {

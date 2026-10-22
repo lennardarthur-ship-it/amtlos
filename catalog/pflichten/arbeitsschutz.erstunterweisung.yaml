@@ -1,18 +1,17 @@
-# Katalog E.51 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog E.51 · Startbestand aus Spezifikation Abschnitt 4 (E-054); Prüfergebnis Sifa 22.10.2026 (C Katalog E.51) eingearbeitet
 schema_version: 1
 id: arbeitsschutz.erstunterweisung
-version: 2
+version: 3
 katalog_nr: E.51
 titel:
   de: Vor Arbeitsbeginn unterweisen
 kurz:
-  de: Jede neue Person unterweist du vor dem ersten Arbeitstag zu den Gefahren und Schutzmaßnahmen.
+  de: Jede neue Person unterweist du vor Aufnahme der Tätigkeit zu den Gefahren und Schutzmaßnahmen – spätestens am ersten Arbeitstag vor Arbeitsbeginn.
 erklaerung:
-  de: Die Unterweisung erklärt die Gefährdungen am Arbeitsplatz und die Schutzmaßnahmen aus der Gefährdungsbeurteilung. Amtlos
-    protokolliert sie digital mit Unterschrift.
+  de: 'Die Unterweisung erklärt die Gefährdungen am Arbeitsplatz und die Schutzmaßnahmen aus der Gefährdungsbeurteilung; sie findet während der Arbeitszeit statt, bei der Einstellung vor Aufnahme der Tätigkeit (§ 12 Abs. 1 ArbSchG, § 4 Abs. 1 DGUV Vorschrift 1). Rechtlich genügt es, wenn du am ersten Arbeitstag vor Arbeitsbeginn unterweist – Amtlos erinnert dich am Tag davor. Amtlos protokolliert die Unterweisung digital; bei Gefahrstoffen und Biostoffen bestätigen die Unterwiesenen sie durch Unterschrift (§ 14 Abs. 2 GefStoffV, § 14 Abs. 3 BioStoffV).'
 rechtsgrundlage:
-- § 12 ArbSchG
-- DGUV Vorschrift 1
+- § 12 Abs. 1 ArbSchG
+- § 4 Abs. 1 DGUV Vorschrift 1
 kategorie: arbeitsschutz
 ausloeser:
   ereignis: einstellung
@@ -26,8 +25,10 @@ frist:
   bezug:
     ereignis: einstellung
   versatz: P0D
-  zeitpunkt: vor_beginn
+  zeitpunkt: spaetestens
   je_ereignis: true
+  erinnerung:
+  - P1D
   verschiebung:
     regel: keine
     kalender: bundeseinheitlich
@@ -39,9 +40,8 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: mittel
-dringend_ohne_termin: true
+    de: '§ 12 ArbSchG ist nicht unmittelbar bußgeldbewehrt: Die Aufsicht kann die Unterweisung anordnen, ein Verstoß gegen die Anordnung kostet bis 5.000 € (§ 25 Abs. 1 Nr. 2 Buchst. a, Abs. 2 ArbSchG). Bei Gefahrstoffen, Biostoffen und Arbeitsmitteln ist die fehlende Unterweisung direkt bußgeldbewehrt (§ 22 Abs. 1 Nr. 25 GefStoffV, § 20 Abs. 1 Nr. 23 BioStoffV, § 22 Abs. 1 Nr. 26 BetrSichV).'
+  schwere: hoch
 automatisierung: dokument_generator
 aktion:
   art: link
@@ -50,14 +50,26 @@ aktion:
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
+aenderungsnotiz:
+  de: Termin ist jetzt der erste Arbeitstag (Erinnerung am Tag davor); Folgen ergänzt.
 quellen:
 - titel: Arbeitsschutzgesetz § 12
   url: https://www.gesetze-im-internet.de/arbschg/__12.html
   abgerufen: null
+- titel: Arbeitsschutzgesetz (§§ 12, 25)
+  url: https://www.gesetze-im-internet.de/arbschg/BJNR124610996.html
+  abgerufen: '2026-10-22'
+- titel: Gefahrstoffverordnung § 22
+  url: https://www.gesetze-im-internet.de/gefstoffv_2010/__22.html
+  abgerufen: '2026-10-22'
+- titel: Biostoffverordnung (§§ 14, 20)
+  url: https://www.gesetze-im-internet.de/biostoffv_2013/BJNR251410013.html
+  abgerufen: '2026-10-22'
+- titel: Betriebssicherheitsverordnung (§§ 12, 22)
+  url: https://www.gesetze-im-internet.de/betrsichv_2015/BJNR004910015.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- „vor Arbeitsaufnahme“ als spätestens am Tag davor umgesetzt – bestätigen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
+- 'Prüfergebnis Sifa 22.10.2026: Spezialnormen gegengeprüft (§ 22 Abs. 1 Nr. 25 GefStoffV, § 20 Abs. 1 Nr. 23 BioStoffV, § 22 Abs. 1 Nr. 26 BetrSichV, § 25 Abs. 1 Nr. 2 Buchst. a ArbSchG) – Schwere „hoch“ trotz nur mittelbarer Bußgeldbewehrung nach ArbSchG fachlich bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

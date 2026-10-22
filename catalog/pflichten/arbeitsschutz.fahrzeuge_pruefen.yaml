@@ -1,14 +1,14 @@
 # R12 (Nutzertest Kurier #4, 3a): Fahrzeuge jährlich prüfen (§ 57 DGUV Vorschrift 70)
 schema_version: 1
 id: arbeitsschutz.fahrzeuge_pruefen
-version: 1
+version: 2
 katalog_nr: E.53
 titel:
   de: Firmenfahrzeuge jährlich durch einen Sachkundigen prüfen lassen
 kurz:
   de: Fahrzeuge, die deine Beschäftigten fahren, lässt du mindestens einmal im Jahr durch einen Sachkundigen auf ihren betriebssicheren Zustand prüfen und hältst das fest.
 erklaerung:
-  de: Fahrzeuge sind bei Bedarf, mindestens aber einmal jährlich, durch einen Sachkundigen auf ihren betriebssicheren Zustand zu prüfen; die Ergebnisse hältst du schriftlich fest (§ 57 DGUV Vorschrift 70). Die Hauptuntersuchung ersetzt diese Prüfung nicht.
+  de: Fahrzeuge sind bei Bedarf, mindestens aber einmal jährlich, durch einen Sachkundigen auf ihren betriebssicheren Zustand zu prüfen; die Ergebnisse hältst du schriftlich fest (§ 57 DGUV Vorschrift 70). Die Hauptuntersuchung ersetzt diese Prüfung nicht automatisch – sie prüft die Verkehrssicherheit, nicht den betriebssicheren Zustand für die Arbeit, etwa Aufbauten, Ladebordwand oder Ladungssicherung.
 rechtsgrundlage:
 - § 57 DGUV Vorschrift 70
 kategorie: arbeitsschutz
@@ -53,7 +53,7 @@ quellen:
   url: https://publikationen.dguv.de/
   abgerufen: null
 fachlich_zu_pruefen:
-- 'Neu nach Nutzertest R12 (Kurier #4, eindeutig falsch 3a.5) – Aufbewahrung der Prüfergebnisse und Verhältnis zur Hauptuntersuchung bestätigen; Prüfprotokoll-Vorlage fehlt'
+- 'Prüfergebnis Sifa 22.10.2026 (frei): § 57 DGUV Vorschrift 70 „bei Bedarf, mindestens jährlich“ bestätigt; Aufbewahrungsdauer der Prüfergebnisse und Sanktion fachlich ergänzen; Prüfprotokoll-Vorlage fehlt'
 pruefung:
   status: entwurf
   geprueft_von: null

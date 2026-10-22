@@ -512,16 +512,16 @@ export function standBauen(): Bau {
   dok({ id: "gb-kueche", vorlage: "gefaehrdungsbeurteilung", datum: "2026-02-05", worum: "Gefährdungsbeurteilung Küche: 9 Gastro-Vorschläge der App (Rutschen, Lüftung, Schnitt, Glasbruch, Verbrennung, Feuchtarbeit, Reinigungsmittel, Heben, Lagergut, Gerätemängel) plus eigene Zeile Siebträger/Dampflanze; Mutterschutz: Umgestaltung.",
     daten: (h) => ({ arbeitsbereich: "Küche", taetigkeiten: "Zubereitung von Frühstück, Mittagstisch, Kuchen und Catering; Spülen (Haubenspülmaschine); Wareneingang und Lagerung", beschaeftigte: "2", beurteilt_von: "Jana Weber", mitwirkung: "Beschäftigte des Bereichs\nFachkraft für Arbeitssicherheit", datum: "2026-02-05",
       gefaehrdungen: gb("kueche", ["Ausrutschen und Stürzen", "Hohe Temperatur und Feuchte", "Schnittverletzungen an Messern", "Schnittverletzungen durch Glasbruch", "Verbrennungen und Verbrühungen", "Hautbelastung durch Wasser", "Verätzungen und Reizungen", "Muskel-Skelett-Belastung", "Unerkannte Mängel"],
-        [{ beschreibung: "Verbrühung an Dampflanze und Brühgruppe der Siebträgermaschine sowie beim Entleeren der Haubenspülmaschine.", massnahme: "Dampflanze nur mit Kännchen öffnen, Haube erst nach Ende des Programms öffnen; Unterweisung neuer Beschäftigter am Gerät.", risiko: "mittel", faktor: "arbeitsmittel" }], h),
+        [{ beschreibung: "Verbrühung an Dampflanze und Brühgruppe der Siebträgermaschine sowie beim Entleeren der Haubenspülmaschine.", massnahme: "Dampflanze nur mit Kännchen öffnen, Haube erst nach Ende des Programms öffnen; Unterweisung neuer Beschäftigter am Gerät.", schwere: "mittel", wahrscheinlichkeit: "moeglich", faktor: "arbeitsmittel" }], h),
       mutterschutz_ergebnis: "umgestaltung", mutterschutz_details: "Kein Heben über 5 kg regelmäßig bzw. 10 kg gelegentlich, keine Arbeiten an Spülmaschine und Herd mit Verbrühungsgefahr, kein Umgang mit ätzenden Reinigern (Ofenreiniger), Sitzgelegenheit und zusätzliche Pausen.",
       wirksamkeit: "wirksam", wirksamkeit_am: "2026-09-15", bemerkung: "Begehung mit der Fachkraft für Arbeitssicherheit am 15.09.2026, keine neuen Gefährdungen.", fortschreibung: "bei Änderungen von Tätigkeiten, Arbeitsmitteln oder Arbeitsstoffen, nach Unfällen sowie jährlich" }) });
   dok({ id: "gb-service", vorlage: "gefaehrdungsbeurteilung", datum: "2026-02-05", worum: "Gefährdungsbeurteilung Gastraum und Service: Rutschen, Glasbruch, heiße Getränke, Tragen, Gästekontakt (Vorschläge) plus eigene Zeilen Kellertreppe zum Lager, Bargeld/Überfall, Außengastronomie; Mutterschutz: keine Maßnahmen nötig über die allgemeinen hinaus.",
     daten: (h) => ({ arbeitsbereich: "Gastraum und Service", taetigkeiten: "Bedienung im Gastraum und auf der Terrasse, Kasse, Zubereitung von Kaffeegetränken an der Theke, Abräumen", beschaeftigte: "2", beurteilt_von: "Jana Weber", datum: "2026-02-05",
       gefaehrdungen: gb("service", ["Ausrutschen und Stürzen", "Schnittverletzungen durch Glasbruch", "Verbrennungen und Verbrühungen", "Muskel-Skelett-Belastung", "Psychische Belastung"],
         [
-          { beschreibung: "Sturz auf der steilen Kellertreppe zum Getränkelager beim Tragen von Kisten.", massnahme: "Handlauf beidseitig, Stufenkanten markiert, Beleuchtung mit Bewegungsmelder; Kisten nur einzeln tragen, Sackkarre oben.", risiko: "hoch", faktor: "arbeitsstaette" },
-          { beschreibung: "Überfall oder Bedrohung beim Kassenabschluss und beim Geldtransport zur Bank.", massnahme: "Bargeldbestand klein halten (Abschöpfen in den Tresor), Geldtransport unregelmäßig und nicht allein, Unterweisung „Verhalten bei Überfällen“.", risiko: "mittel", faktor: "psychisch" },
-          { beschreibung: "Sonne, Hitze und Kälte beim Bedienen auf der Terrasse.", massnahme: "Sonnenschirme, Trinkwasser, Arbeitskleidung nach Witterung, Arbeitswechsel innen/außen.", risiko: "gering", faktor: "einwirkungen" },
+          { beschreibung: "Sturz auf der steilen Kellertreppe zum Getränkelager beim Tragen von Kisten.", massnahme: "Handlauf beidseitig, Stufenkanten markiert, Beleuchtung mit Bewegungsmelder; Kisten nur einzeln tragen, Sackkarre oben.", schwere: "schwer", wahrscheinlichkeit: "moeglich", faktor: "arbeitsstaette" },
+          { beschreibung: "Überfall oder Bedrohung beim Kassenabschluss und beim Geldtransport zur Bank.", massnahme: "Bargeldbestand klein halten (Abschöpfen in den Tresor), Geldtransport unregelmäßig und nicht allein, Unterweisung „Verhalten bei Überfällen“.", schwere: "mittel", wahrscheinlichkeit: "moeglich", faktor: "psychisch" },
+          { beschreibung: "Sonne, Hitze und Kälte beim Bedienen auf der Terrasse.", massnahme: "Sonnenschirme, Trinkwasser, Arbeitskleidung nach Witterung, Arbeitswechsel innen/außen.", schwere: "leicht", wahrscheinlichkeit: "moeglich", faktor: "einwirkungen" },
         ], h),
       mutterschutz_ergebnis: "keine_massnahmen", mutterschutz_details: "Allgemeine Maßnahmen genügen: kein Tragen schwerer Kisten über die Kellertreppe, Sitzgelegenheit.", wirksamkeit: "wirksam", wirksamkeit_am: "2026-09-15", fortschreibung: "bei Änderungen von Tätigkeiten, Arbeitsmitteln oder Arbeitsstoffen, nach Unfällen sowie jährlich" }) });
 
@@ -764,6 +764,12 @@ export function standBauen(): Bau {
     { id: "handelsregister", titel: v("handelsregister").titel, grund: "Kein Eintrag: Kleingewerbe/Einzelunternehmen ohne „e. K.“." },
     { id: "transparenzregister", titel: v("transparenzregister").titel, grund: "Gilt nur für juristische Personen und eingetragene Personengesellschaften, nicht für ein Einzelunternehmen." },
     { id: "datenpanne", titel: v("datenpanne").titel, grund: "Im Jahr 2026 gab es keine Datenpanne – die Vorlage wird nur im Ernstfall ausgefüllt." },
+  );
+  // E-167 (Sifa-Durchsicht): neue Vorlagen Betriebsanweisung Maschinen und Biostoffe, Expositionsverzeichnis
+  uebersprungen.push(
+    { id: "betriebsanweisung_maschine", titel: v("betriebsanweisung_maschine").titel, grund: "Kaffeemaschine und Spülmaschine werden nach der Betriebsanleitung des Herstellers benutzt; eine eigene Betriebsanweisung ist im Szenario nicht erstellt (Pflichten-Check nennt sie – siehe Auffälligkeiten)." },
+    { id: "betriebsanweisung_biostoffe", titel: v("betriebsanweisung_biostoffe").titel, grund: "Keine Tätigkeiten mit Biostoffen im Sinne der BioStoffV." },
+    { id: "expositionsverzeichnis", titel: v("expositionsverzeichnis").titel, grund: "Keine Tätigkeiten mit krebserzeugenden, keimzellmutagenen oder reproduktionstoxischen Gefahrstoffen der Kategorie 1A/1B." },
   );
   const genutzt = new Set(docs.map((d) => d.vorlage));
   for (const vl of VORLAGEN) if (!genutzt.has(vl.id) && !uebersprungen.some((u) => u.id === vl.id)) auffaellig.push(`Vorlage ${vl.id} weder erzeugt noch als übersprungen begründet.`);

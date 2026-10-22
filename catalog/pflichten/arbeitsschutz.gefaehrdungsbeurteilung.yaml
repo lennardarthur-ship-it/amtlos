@@ -1,7 +1,7 @@
 # Beispiel aus Spezifikation 3.2 / Katalog E.50, in das Schema v1 überführt.
 schema_version: 1
 id: arbeitsschutz.gefaehrdungsbeurteilung
-version: 5
+version: 6
 katalog_nr: E.50
 titel:
   de: Gefährdungsbeurteilung erstellen
@@ -11,7 +11,11 @@ erklaerung:
   de: >-
     Sobald du mindestens eine Person beschäftigst, sind die Gefährdungen an jedem
     Arbeitsplatz zu beurteilen, Schutzmaßnahmen festzulegen und das zu dokumentieren.
-    Amtlos erstellt dir dafür eine Vorlage passend zu deiner Branche.
+    Amtlos erstellt dir dafür eine Vorlage passend zu deiner Branche. Überprüfe die Beurteilung bei Änderungen der
+    Arbeitsstätte, der Tätigkeiten, Arbeitsmittel oder Arbeitsstoffe, nach Unfällen und Beinaheunfällen, bei
+    Berufskrankheiten oder Gesundheitsbeschwerden, nach Ergebnissen der arbeitsmedizinischen Vorsorge, bei neuen
+    Vorschriften oder Erkenntnissen und wenn du Jugendliche beschäftigst oder eine Beschäftigte dir ihre
+    Schwangerschaft mitteilt.
 begriffe:
   - begriff: { de: Gefährdungsbeurteilung }
     erklaerung: { de: "Eine schriftliche Liste, welche Gefahren es bei der Arbeit gibt und wie du sie verringerst." }
@@ -37,12 +41,13 @@ wiederholung:
     - ereignis: neuer_arbeitsplatz
     - ereignis: neue_taetigkeit
     - ereignis: arbeitsunfall
+    - ereignis: schwangerschaft_mitgeteilt
 stelle:
   de: Arbeitgeber selbst; Kontrolle durch Berufsgenossenschaft und Gewerbeaufsicht
 kanal: intern_dokumentieren
 kosten: null
 sanktion:
-  text: { de: "Fehlt die Dokumentation oder ist sie unrichtig, unvollständig oder nicht rechtzeitig erstellt, droht direkt ein Bußgeld bis 5.000 € (§ 9 Abs. 1 Nr. 1 ArbStättV in Verbindung mit § 25 Abs. 1 Nr. 1 ArbSchG; ebenso § 22 BetrSichV und § 22 GefStoffV). Bei Arbeitsunfällen besteht außerdem ein Haftungsrisiko." }
+  text: { de: "Fehlt die Dokumentation oder ist sie unrichtig, unvollständig oder nicht rechtzeitig erstellt, droht direkt ein Bußgeld bis 5.000 € (§ 9 Abs. 1 Nr. 1 ArbStättV in Verbindung mit § 25 Abs. 1 Nr. 1 ArbSchG; ebenso § 22 Abs. 1 Nr. 1, 6 BetrSichV); bei Gefahrstoffen bis 50.000 € (§ 22 Abs. 1 Nr. 1a GefStoffV in Verbindung mit § 26 Abs. 1 Nr. 8 Buchst. b, Abs. 3 ChemG). Bei Arbeitsunfällen besteht außerdem ein Haftungsrisiko." }
   schwere: hoch
 automatisierung: dokument_generator
 dokumente: [vorlage.gefaehrdungsbeurteilung.<branche>]
@@ -57,10 +62,19 @@ quellen:
   - titel: Arbeitsschutzgesetz § 6
     url: https://www.gesetze-im-internet.de/arbschg/__6.html
     abgerufen: null
+  - titel: Betriebssicherheitsverordnung (§ 22)
+    url: https://www.gesetze-im-internet.de/betrsichv_2015/BJNR004910015.html
+    abgerufen: '2026-10-22'
+  - titel: Gefahrstoffverordnung § 22
+    url: https://www.gesetze-im-internet.de/gefstoffv_2010/__22.html
+    abgerufen: '2026-10-22'
+  - titel: Chemikaliengesetz § 26
+    url: https://www.gesetze-im-internet.de/chemg/__26.html
+    abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
   - "Frist: 'vor Arbeitsbeginn' als Auslegung bestätigen"
-  - "Auslöser neu_ausloesen_bei: Liste der Anlässe vollständig?"
+  - "Prüfergebnis Sifa 22.10.2026 (B-117, plausibel): Anlässe im Text ergänzt; als Auslöser nur die Ereignisse, die Amtlos kennt (neuer Arbeitsplatz, neue Tätigkeit, Arbeitsunfall, Mitteilung einer Schwangerschaft) – Fundstellen § 3 Abs. 7 BetrSichV, § 6 Abs. 9 GefStoffV im Wortlaut prüfen"
   - "gueltig_ab 1996-08-21 aus Spezifikation übernommen"
-  - "Sanktion nach Rechtsprüfung R11 (Befund 3): direkte Bußgeldbewehrung über § 9 Abs. 1 Nr. 1 ArbStättV, § 22 BetrSichV, § 22 GefStoffV – Nummern und Höchstbetrag 5.000 € bestätigen"
+  - "Prüfergebnis Sifa 22.10.2026 (plausibel, Nummern gegenprüfen): § 22 Abs. 1 Nr. 1, 6 BetrSichV und § 22 Abs. 1 Nr. 1a GefStoffV gelesen – GefStoffV verweist auf § 26 ChemG (bis 50.000 €), nicht auf das ArbSchG; § 9 Abs. 1 Nr. 1 ArbStättV nicht erneut abgerufen"
   - 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }

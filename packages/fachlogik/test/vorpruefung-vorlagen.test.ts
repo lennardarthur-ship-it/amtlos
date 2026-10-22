@@ -186,9 +186,11 @@ describe("Gefährdungsbeurteilung (Abschnitt 4)", () => {
     expect(h).toContain("<th>Wer / bis wann</th>");
     expect(h).toContain("<th>Beschäftigte informiert am (§ 14 Abs. 2 MuSchG)</th><td>20.10.2026</td>");
     expect(h).toContain("§ 10 Abs. 2 MuSchG");
-    expect(h).toMatch(/Risiko – gering: .*mittel: .*hoch: /);
+    // E-167: Legende als Matrix Schwere × Wahrscheinlichkeit
+    expect(h).toContain("<h3>Risiko: Schwere × Wahrscheinlichkeit</h3>");
+    expect(h).toContain("bisherige Einstufung – neu bewerten");
     expect(feld("gefaehrdungsbeurteilung", "mitwirkung").hilfe).toMatch(/Fachkraft für Arbeitssicherheit.*Unternehmermodell/);
-    expect((v("gefaehrdungsbeurteilung").abschnitte[1]!.felder[0] as { felder: Feld[] }).felder.find((f) => f.id === "risiko")!.hilfe).toMatch(/^Gering: .*mittel: .*hoch: /);
+    expect((v("gefaehrdungsbeurteilung").abschnitte[1]!.felder[0] as { felder: Feld[] }).felder.find((f) => f.id === "wahrscheinlichkeit")!.hilfe).toMatch(/^Risiko aus Schwere und Wahrscheinlichkeit: hoch, .*gering, .*sonst mittel/);
   });
   it("leeres Blatt mit den sechs Gefährdungsfaktoren des § 5 Abs. 3 ArbSchG", () => {
     const h = html("gefaehrdungsbeurteilung", leereDaten(v("gefaehrdungsbeurteilung"), B, "2026-10-21"));
@@ -241,7 +243,7 @@ describe("Impressum, KI-Schulung, IfSG, Hygieneplan, Unterweisung (Abschnitt 5)"
     expect(leereDaten(v("hygieneplan"), B, "2026-10-21", ["gastro_cafe"]).art).toBe("lebensmittel");
   });
   it("Unterweisung: Unterschrift statt eingetipptem Namen empfohlen (T-13)", () => {
-    expect(v("unterweisung").abschnitte[2]!.hilfe).toMatch(/eigenhändig.*eingetippter Name ist als Nachweis schwach/);
+    expect(v("unterweisung").abschnitte[2]!.hilfe).toMatch(/Gefahrstoffen und Biostoffen ist die Unterschrift vorgeschrieben.*eingetippter Name als Nachweis schwach/);
   });
 });
 

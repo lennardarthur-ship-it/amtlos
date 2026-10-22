@@ -1,7 +1,7 @@
 # R11 (Rechtsprüfung T-100/T-111, Nutzertest Tischlerei Befund 7): halbjährliche Unterweisung Jugendlicher als eigene Pflicht
 schema_version: 1
 id: arbeitsschutz.unterweisung_jugendliche
-version: 1
+version: 2
 katalog_nr: E.51
 titel:
   de: Jugendliche halbjährlich unterweisen
@@ -10,7 +10,8 @@ kurz:
 erklaerung:
   de: Für Jugendliche gilt ein kürzerer Abstand als die jährliche Unterweisung der übrigen Beschäftigten. Vor Beginn der Beschäftigung
     und bei wesentlichen Änderungen unterweist du sie über die Gefahren und die Schutzmaßnahmen; danach wiederholst du die Unterweisung
-    mindestens halbjährlich (§ 29 JArbSchG). Sechs Monate nach jeder Unterweisung, die du in Amtlos erfasst, erinnert Amtlos an die nächste.
+    mindestens halbjährlich (§ 29 JArbSchG). Die Frist läuft für jede jugendliche Person ab ihrer letzten Unterweisung. Amtlos erinnert
+    sechs Monate nach der letzten Unterweisung, die du in Amtlos erfasst – unterweist du Jugendliche einzeln, erfasse jede Unterweisung.
 rechtsgrundlage:
 - § 29 JArbSchG
 kategorie: arbeitsschutz
@@ -52,8 +53,11 @@ quellen:
 - titel: Jugendarbeitsschutzgesetz § 29
   url: https://www.gesetze-im-internet.de/jarbschg/__29.html
   abgerufen: null
+- titel: Jugendarbeitsschutzgesetz (§ 29)
+  url: https://www.gesetze-im-internet.de/jarbschg/BJNR009650976.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- '„Mindestens halbjährlich“ als sechs Monate nach jeder erfassten Unterweisung umgesetzt – die Unterweisung im Betrieb gilt für alle; je Jugendlichem nicht unterschieden'
+- 'Prüfergebnis Sifa 22.10.2026 (offen, Technik): Frist je Jugendlichem ab dessen letzter Unterweisung führen – Amtlos rechnet ab der letzten erfassten Unterweisung im Betrieb, ohne Personen zu unterscheiden'
 - 'Folgen bei Nichterfüllung (§ 58 JArbSchG) – Sanktion fachlich ergänzen'
 pruefung:
   status: entwurf

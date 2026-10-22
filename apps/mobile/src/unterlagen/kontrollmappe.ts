@@ -312,7 +312,8 @@ const JE_KONTROLLE: Record<Exclude<Kontrollart, "alle" | "kasse">, ReadonlySet<s
   // R12: dazu Kopien der Aufenthaltstitel und – auf Verlangen – Lohnkonten (eigene Einträge ohne Vorlage)
   zoll: new Set(["arbeitszeitnachweis", "nachweis_arbeitsbedingungen", "ausweis_hinweis", "aufenthaltstitel", "lohnkonto"]),
   umwelt: new Set(["entsorgungsbelege", "gefahrstoffverzeichnis"]),
-  bg: new Set(["gefaehrdungsbeurteilung", "unterweisung", "gefahrstoffverzeichnis", "betriebsanweisung", "pruefprotokoll_elektro", "hautschutzplan"]),
+  // E-167: Betriebsanweisungen für Maschinen und Biostoffe, Expositionsverzeichnis
+  bg: new Set(["gefaehrdungsbeurteilung", "unterweisung", "gefahrstoffverzeichnis", "betriebsanweisung", "betriebsanweisung_maschine", "betriebsanweisung_biostoffe", "expositionsverzeichnis", "pruefprotokoll_elektro", "hautschutzplan"]),
   datenschutz: new Set(["datenschutz_dokumentation", "avv", "datenschutzinformation", "datenpanne"]),
 };
 

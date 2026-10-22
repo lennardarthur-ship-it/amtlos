@@ -1,5 +1,49 @@
 [
  {
+  "id": "arbeitsschutz.betriebsanweisung_arbeitsmittel",
+  "titel": "Betriebsanweisungen für Maschinen und Arbeitsmittel",
+  "kurz": "Bevor Beschäftigte eine Maschine oder ein anderes Arbeitsmittel zum ersten Mal benutzen, stellst du ihnen eine schriftliche Betriebsanweisung zur Verfügung und unterweist sie.",
+  "rechtsgrundlage": [
+   "§ 12 BetrSichV"
+  ],
+  "quellen": [
+   {
+    "titel": "Betriebssicherheitsverordnung (§§ 12, 22)",
+    "url": "https://www.gesetze-im-internet.de/betrsichv_2015/BJNR004910015.html"
+   },
+   {
+    "titel": "Betriebssicherheitsverordnung § 12",
+    "url": "https://www.gesetze-im-internet.de/betrsichv_2015/__12.html"
+   },
+   {
+    "titel": "Arbeitsschutzgesetz (§ 25)",
+    "url": "https://www.gesetze-im-internet.de/arbschg/BJNR124610996.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "arbeitsschutz.biostoffe",
+  "titel": "Biostoffe: Gefährdung beurteilen, Betriebsanweisung und Unterweisung",
+  "kurz": "Haben Beschäftigte Kontakt mit Blut, Körperflüssigkeiten, Schimmel oder Keimen, beurteilst du das, schreibst eine Betriebsanweisung und unterweist jährlich mit Unterschrift.",
+  "rechtsgrundlage": [
+   "§§ 4, 7 BioStoffV",
+   "§ 14 BioStoffV",
+   "TRBA 250"
+  ],
+  "quellen": [
+   {
+    "titel": "Biostoffverordnung (Stand 11.5.2026)",
+    "url": "https://www.gesetze-im-internet.de/biostoffv_2013/BJNR251410013.html"
+   },
+   {
+    "titel": "Biostoffverordnung § 14",
+    "url": "https://www.gesetze-im-internet.de/biostoffv_2013/__14.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
   "id": "arbeitsschutz.dguv_v3",
   "titel": "Elektrische Geräte prüfen lassen",
   "kurz": "Elektrische Geräte und Anlagen lässt du regelmäßig prüfen (DGUV Vorschrift 3).",
@@ -7,6 +51,10 @@
    "DGUV Vorschrift 3"
   ],
   "quellen": [
+   {
+    "titel": "DGUV Vorschrift 3 (VBG-Fassung, § 9)",
+    "url": "https://cdn.vbg.de/media/4d4d9675222842eb908cfe7c27afad8b/dld:attachment/DGUV_Vorschrift_3_Elektrische_Anlagen_und_Betriebsmittel.pdf"
+   },
    {
     "titel": "DGUV Vorschrift 3",
     "url": "https://publikationen.dguv.de/regelwerk/dguv-vorschriften/"
@@ -17,15 +65,59 @@
  {
   "id": "arbeitsschutz.erstunterweisung",
   "titel": "Vor Arbeitsbeginn unterweisen",
-  "kurz": "Jede neue Person unterweist du vor dem ersten Arbeitstag zu den Gefahren und Schutzmaßnahmen.",
+  "kurz": "Jede neue Person unterweist du vor Aufnahme der Tätigkeit zu den Gefahren und Schutzmaßnahmen – spätestens am ersten Arbeitstag vor Arbeitsbeginn.",
   "rechtsgrundlage": [
-   "§ 12 ArbSchG",
-   "DGUV Vorschrift 1"
+   "§ 12 Abs. 1 ArbSchG",
+   "§ 4 Abs. 1 DGUV Vorschrift 1"
   ],
   "quellen": [
    {
     "titel": "Arbeitsschutzgesetz § 12",
     "url": "https://www.gesetze-im-internet.de/arbschg/__12.html"
+   },
+   {
+    "titel": "Arbeitsschutzgesetz (§§ 12, 25)",
+    "url": "https://www.gesetze-im-internet.de/arbschg/BJNR124610996.html"
+   },
+   {
+    "titel": "Gefahrstoffverordnung § 22",
+    "url": "https://www.gesetze-im-internet.de/gefstoffv_2010/__22.html"
+   },
+   {
+    "titel": "Biostoffverordnung (§§ 14, 20)",
+    "url": "https://www.gesetze-im-internet.de/biostoffv_2013/BJNR251410013.html"
+   },
+   {
+    "titel": "Betriebssicherheitsverordnung (§§ 12, 22)",
+    "url": "https://www.gesetze-im-internet.de/betrsichv_2015/BJNR004910015.html"
+   }
+  ],
+  "geprueft": false
+ },
+ {
+  "id": "arbeitsschutz.expositionsverzeichnis",
+  "titel": "Expositionsverzeichnis bei krebserzeugenden Stoffen führen",
+  "kurz": "Arbeiten Beschäftigte mit krebserzeugenden, erbgutverändernden oder fortpflanzungsgefährdenden Stoffen der Kategorie 1A oder 1B, führst du ein Expositionsverzeichnis.",
+  "rechtsgrundlage": [
+   "§ 10a GefStoffV",
+   "TRGS 410"
+  ],
+  "quellen": [
+   {
+    "titel": "Gefahrstoffverordnung (Stand 17.12.2025, § 10a)",
+    "url": "https://www.gesetze-im-internet.de/gefstoffv_2010/BJNR164400010.html"
+   },
+   {
+    "titel": "Gefahrstoffverordnung § 22",
+    "url": "https://www.gesetze-im-internet.de/gefstoffv_2010/__22.html"
+   },
+   {
+    "titel": "DGUV IFA – Expositionsverzeichnis",
+    "url": "https://dguv.de/ifa/praxishilfen/taetigkeiten-mit-krebserzeugenden-gefahrstoffen/gefaehrdungsbeurteilung/expositionsverzeichnis/index.jsp"
+   },
+   {
+    "titel": "Haufe – § 10a GefStoffV Expositionsverzeichnis (laut Prüfergebnis Sifa)",
+    "url": "https://www.haufe.de/id/beitrag/novellierung-der-gefahrstoffverordnung-fokus-krebserz-11-10a-expositionsverzeichnis-auch-fuer-reproduktionstoxische-stoffe-kat-1a-oder-1b-HI16494225.html"
    }
   ],
   "geprueft": false
@@ -46,6 +138,18 @@
    {
     "titel": "Arbeitsschutzgesetz § 6",
     "url": "https://www.gesetze-im-internet.de/arbschg/__6.html"
+   },
+   {
+    "titel": "Betriebssicherheitsverordnung (§ 22)",
+    "url": "https://www.gesetze-im-internet.de/betrsichv_2015/BJNR004910015.html"
+   },
+   {
+    "titel": "Gefahrstoffverordnung § 22",
+    "url": "https://www.gesetze-im-internet.de/gefstoffv_2010/__22.html"
+   },
+   {
+    "titel": "Chemikaliengesetz § 26",
+    "url": "https://www.gesetze-im-internet.de/chemg/__26.html"
    }
   ],
   "geprueft": false
@@ -53,14 +157,27 @@
  {
   "id": "arbeitsschutz.gefahrstoffe",
   "titel": "Gefahrstoffverzeichnis und Betriebsanweisungen",
-  "kurz": "Wenn ihr mit Gefahrstoffen arbeitet, führst du ein Verzeichnis und schreibst Betriebsanweisungen.",
+  "kurz": "Wenn ihr mit Gefahrstoffen arbeitet, führst du ein Verzeichnis, schreibst Betriebsanweisungen und unterweist jährlich mündlich mit Unterschrift.",
   "rechtsgrundlage": [
-   "GefStoffV"
+   "§ 6 Abs. 12, 13 GefStoffV",
+   "§ 14 GefStoffV"
   ],
   "quellen": [
    {
-    "titel": "Gefahrstoffverordnung",
-    "url": "https://www.gesetze-im-internet.de/gefstoffv_2010/"
+    "titel": "Gefahrstoffverordnung (Stand 17.12.2025)",
+    "url": "https://www.gesetze-im-internet.de/gefstoffv_2010/BJNR164400010.html"
+   },
+   {
+    "titel": "Gefahrstoffverordnung § 14",
+    "url": "https://www.gesetze-im-internet.de/gefstoffv_2010/__14.html"
+   },
+   {
+    "titel": "Gefahrstoffverordnung § 22",
+    "url": "https://www.gesetze-im-internet.de/gefstoffv_2010/__22.html"
+   },
+   {
+    "titel": "Chemikaliengesetz § 26",
+    "url": "https://www.gesetze-im-internet.de/chemg/__26.html"
    }
   ],
   "geprueft": false
@@ -76,6 +193,10 @@
    {
     "titel": "Jugendarbeitsschutzgesetz § 29",
     "url": "https://www.gesetze-im-internet.de/jarbschg/__29.html"
+   },
+   {
+    "titel": "Jugendarbeitsschutzgesetz (§ 29)",
+    "url": "https://www.gesetze-im-internet.de/jarbschg/BJNR009650976.html"
    }
   ],
   "geprueft": false
@@ -86,12 +207,16 @@
   "kurz": "Mindestens einmal im Jahr wiederholst du die Unterweisung.",
   "rechtsgrundlage": [
    "§ 12 ArbSchG",
-   "DGUV Vorschrift 1"
+   "§ 4 Abs. 1 DGUV Vorschrift 1"
   ],
   "quellen": [
    {
     "titel": "Arbeitsschutzgesetz § 12",
     "url": "https://www.gesetze-im-internet.de/arbschg/__12.html"
+   },
+   {
+    "titel": "DGUV Vorschrift 1 (UKBW, § 4)",
+    "url": "https://www.ukbw.de/fileadmin/user_upload/Mediathek/UVV/DGUV_Vorschrift_1.pdf"
    }
   ],
   "geprueft": false
@@ -101,13 +226,21 @@
   "titel": "Hautschutzplan aushängen",
   "kurz": "Für Tätigkeiten mit Feuchtarbeit oder hautbelastenden Stoffen legst du in einem Hautschutzplan Schutz, Reinigung und Pflege fest.",
   "rechtsgrundlage": [
-   "TRGS 401",
-   "GefStoffV"
+   "TRGS 401 in Verbindung mit §§ 7, 14 GefStoffV",
+   "TRGS 530"
   ],
   "quellen": [
    {
     "titel": "TRGS 401",
     "url": "https://www.baua.de/DE/Angebote/Regelwerk/TRGS/TRGS-401.html"
+   },
+   {
+    "titel": "TRGS 530 Nr. 5 (BGN-Vorschriftenportal, laut Prüfergebnis Sifa)",
+    "url": "https://vorschriften.bgn-branchenwissen.de/daten/tr/trgs530/5.htm"
+   },
+   {
+    "titel": "Gefahrstoffverordnung (Stand 17.12.2025)",
+    "url": "https://www.gesetze-im-internet.de/gefstoffv_2010/BJNR164400010.html"
    }
   ],
   "geprueft": false

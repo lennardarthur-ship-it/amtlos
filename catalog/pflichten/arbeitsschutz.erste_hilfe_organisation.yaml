@@ -1,0 +1,51 @@
+# Prüfergebnis Sifa 22.10.2026 (C Fehlende Pflichten „Erste-Hilfe-Organisation ab 1 Beschäftigtem“): Abspaltung aus E.53
+schema_version: 1
+id: arbeitsschutz.erste_hilfe_organisation
+version: 1
+katalog_nr: E.53
+titel:
+  de: Erste Hilfe organisieren
+kurz:
+  de: Ab der ersten beschäftigten Person hältst du Verbandkasten, Notruf-Aushang und ein Verbandbuch bereit.
+erklaerung:
+  de: 'Du sorgst dafür, dass bei einem Unfall sofort Hilfe geholt werden kann und Erste Hilfe geleistet wird (§ 24 DGUV Vorschrift 1, § 10 ArbSchG): Erste-Hilfe-Material in ausreichender Menge, gut erreichbar und gekennzeichnet – Art und Zahl der Verbandkästen richten sich nach der Zahl der Beschäftigten und der Gefährdung (§ 25 DGUV Vorschrift 1, ASR A4.3). Ein Aushang nennt Notruf, Ersthelfer und das Verhalten bei Unfällen (§ 24 Abs. 5 DGUV Vorschrift 1). Jede Erste-Hilfe-Leistung wird dokumentiert, zum Beispiel im Verbandbuch, und die Dokumentation fünf Jahre lang vertraulich aufbewahrt (§ 24 Abs. 6 DGUV Vorschrift 1). Ersthelfer sind eine eigene Pflicht.'
+rechtsgrundlage:
+- §§ 24, 25 DGUV Vorschrift 1
+- ASR A4.3
+- § 10 Abs. 1 ArbSchG
+kategorie: arbeitsschutz
+ausloeser:
+  feld: abgeleitet.hat_beschaeftigte
+  op: ==
+  wert: true
+  label:
+    de: Du beschäftigst mindestens eine Person.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Bußgeld bis 10.000 €, wenn Erste-Hilfe-Material oder Meldeeinrichtungen fehlen oder Erste-Hilfe-Leistungen nicht dokumentiert werden (§ 32 DGUV Vorschrift 1 in Verbindung mit § 209 Abs. 1 Nr. 1, Abs. 3 SGB VII).
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: DGUV Vorschrift 1 (UKBW, §§ 24, 25, 32)
+  url: https://www.ukbw.de/fileadmin/user_upload/Mediathek/UVV/DGUV_Vorschrift_1.pdf
+  abgerufen: '2026-10-22'
+- titel: ASR A4.3 Erste-Hilfe-Räume, Mittel und Einrichtungen zur Ersten Hilfe (BAuA)
+  url: https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A4-3.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Neu nach Prüfergebnis Sifa 22.10.2026 (C Fehlende Pflichten) – Anzahl der Verbandkästen je Beschäftigtenzahl und Betriebsart (ASR A4.3 Tabelle) als Regelwerte; Vorlage Verbandbuch fehlt'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

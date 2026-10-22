@@ -1,0 +1,64 @@
+# Prüfergebnis Sifa 22.10.2026 (C Katalog D.44 personal.jugend_nachuntersuchung): Erstuntersuchung § 32 JArbSchG als eigene Pflicht je Einstellung
+schema_version: 1
+id: personal.jugend_erstuntersuchung
+version: 1
+katalog_nr: D.44
+titel:
+  de: Ärztliche Erstuntersuchung Jugendlicher vor Beginn
+kurz:
+  de: Stellst du Jugendliche ein, die ins Berufsleben eintreten, lässt du dir vor Beginn die Bescheinigung über die ärztliche Erstuntersuchung vorlegen.
+erklaerung:
+  de: 'Ein Jugendlicher, der in das Berufsleben eintritt, darf nur beschäftigt werden, wenn er innerhalb der letzten 14 Monate vor Beginn von einer Ärztin oder einem Arzt untersucht worden ist und dir die Bescheinigung darüber vorliegt (§ 32 Abs. 1 JArbSchG). Die Untersuchung ist für die Jugendlichen kostenlos; den Berechtigungsschein gibt es bei der Gemeinde. Amtlos legt die Aufgabe bei jeder Einstellung an, solange du Jugendliche beschäftigst – betrifft die Einstellung eine erwachsene Person oder war die jugendliche Person schon vorher beschäftigt, trifft sie nicht zu. Die erste Nachuntersuchung nach einem Jahr ist eine eigene Pflicht.'
+rechtsgrundlage:
+- § 32 JArbSchG
+kategorie: personal
+ausloeser:
+  all:
+  - feld: profil.beschaeftigte.jugendlich
+    op: '>='
+    wert: 1
+    label:
+      de: Du beschäftigst Jugendliche.
+  - ereignis: einstellung
+    op: eingetreten
+    label:
+      de: Du stellst jemanden ein.
+frist:
+  typ: relativ
+  bezug:
+    ereignis: einstellung
+  versatz: P0D
+  zeitpunkt: spaetestens
+  je_ereignis: true
+  erinnerung:
+  - P14D
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Untersuchung durch eine Ärztin oder einen Arzt
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Ohne Bescheinigung darfst du die jugendliche Person nicht beschäftigen (§ 32 Abs. 1 JArbSchG); Verstöße kosten bis 30.000 € (§ 58 Abs. 1, 4 JArbSchG).
+  schwere: hoch
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Jugendarbeitsschutzgesetz (§§ 32, 33)
+  url: https://www.gesetze-im-internet.de/jarbschg/BJNR009650976.html
+  abgerufen: '2026-10-22'
+- titel: § 58 JArbSchG, Wortlaut (gesetze.legal)
+  url: https://gesetze.legal/bund/jarbschg/58
+  abgerufen: '2026-10-21'
+fachlich_zu_pruefen:
+- 'Neu nach Prüfergebnis Sifa 22.10.2026 – Amtlos unterscheidet Jugendliche bei der Einstellung nicht (Aufgabe je Einstellung); Nummer in § 58 Abs. 1 JArbSchG für § 32 nicht einzeln geprüft; BR-Drs. 735/25 (NRW) will §§ 32, 33 ändern – nicht in Kraft, beobachten'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

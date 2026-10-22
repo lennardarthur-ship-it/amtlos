@@ -383,6 +383,21 @@ try {
   await knopf("Fertig").click();
   await warte(800);
   pruefe((await p.getByRole("button", { name: /^Gefährdung \d/ }).locator("visible=true").count()) === 2, "leerer eigener Eintrag nicht verworfen");
+  // E-167 (Sifa, Blatt „D Risikoskala“): Risiko aus Schwere × Wahrscheinlichkeit – ohne Vorbelegung, je Eintrag wählen
+  for (const i of [0, 1]) {
+    await tippe(p.getByRole("button", { name: /^Gefährdung \d/ }).locator("visible=true").nth(i));
+    await warte(700);
+    await tippe(p.getByRole("radio", { name: /^mittel \(mit Ausfallzeit\)/ }).locator("visible=true").last());
+    await tippe(p.getByRole("radio", { name: "möglich", exact: true }).locator("visible=true").last());
+    if (i === 0) await foto("gefaehrdung-risiko");
+    await knopf("Fertig").click();
+    await warte(700);
+  }
+  await knopf("Weiter").click();
+  await warte();
+  // E-167: Schritt „Prüfungen der Arbeitsmittel“ (§ 3 Abs. 6 BetrSichV) – freiwillig, hier übersprungen
+  pruefe(await sichtbar("Prüfungen der Arbeitsmittel"), "Schritt „Prüfungen der Arbeitsmittel“ fehlt");
+  await foto("gefaehrdung-pruefungen");
   await knopf("Weiter").click();
   await warte();
   await tippe(p.getByRole("radio", { name: /keine Schutzmaßnahmen erforderlich/ }).locator("visible=true").last());

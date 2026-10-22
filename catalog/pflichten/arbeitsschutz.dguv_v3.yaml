@@ -1,7 +1,7 @@
 # Katalog E.54 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: arbeitsschutz.dguv_v3
-version: 3
+version: 4
 katalog_nr: E.54
 titel:
   de: Elektrische Geräte prüfen lassen
@@ -38,8 +38,8 @@ kanal: partner
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: mittel
+    de: Bußgeld bis 10.000 €, wenn elektrische Anlagen und Betriebsmittel nicht geprüft werden (§ 9 DGUV Vorschrift 3 in Verbindung mit § 209 Abs. 1 Nr. 1, Abs. 3 SGB VII).
+  schwere: hoch
 automatisierung: hinweis
 erledigung:
   art: laufend
@@ -50,13 +50,14 @@ status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
 quellen:
+- titel: DGUV Vorschrift 3 (VBG-Fassung, § 9)
+  url: https://cdn.vbg.de/media/4d4d9675222842eb908cfe7c27afad8b/dld:attachment/DGUV_Vorschrift_3_Elektrische_Anlagen_und_Betriebsmittel.pdf
+  abgerufen: '2026-10-22'
 - titel: DGUV Vorschrift 3
   url: https://publikationen.dguv.de/regelwerk/dguv-vorschriften/
   abgerufen: null
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Prüffristen je Geräteart als Regelwerte (nicht in der Spezifikation)
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Prüfergebnis Sifa 22.10.2026: Prüffristen kommen aus der Gefährdungsbeurteilung, Richtwerte Tabellen 1A/1B bestätigt; § 9 DGUV Vorschrift 3 (Verstöße gegen §§ 3, 5 Abs. 1 bis 3, 6, 7) über die VBG-Fassung gelesen'
 pruefung:
   status: entwurf
   geprueft_von: null

@@ -69,6 +69,9 @@ erwartet:
   steuern.kasse_tse_belegausgabe: gilt
   steuern.bauabzugsteuer_freistellung: gilt_nicht
   arbeitsschutz.gefaehrdungsbeurteilung: gilt
+  # Prüfergebnis Sifa 22.10.2026: Ersthelfer konservativ ab zwei Anwesenden (Inhaber + 1 Beschäftigte)
+  arbeitsschutz.erste_hilfe: gilt
+  arbeitsschutz.sicherheitsbeauftragte: gilt_nicht
 termine_enthaelt:
   # September: 10.10. + 1 Monat Dauerfristverlängerung = 10.11.2026 (Dienstag)
   steuern.ust_voranmeldung: [["2026-09", "2026-11-10"], ["2026-10", "2026-12-10"]]

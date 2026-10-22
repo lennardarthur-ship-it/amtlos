@@ -35,7 +35,7 @@ const pnpm = path.join(ROOT, "node_modules/.pnpm");
 const esb = fs.readdirSync(pnpm).filter((d) => d.startsWith("esbuild@")).sort().at(-1);
 const eintrag = path.join(ROH, "eintrag.ts");
 const gebaut = path.join(ROH, "fachlogik.mjs");
-fs.writeFileSync(eintrag, `export * from "${path.join(DOK, "index.ts")}";\nexport { RISIKO_SKALA } from "${path.join(DOK, "arbeitsschutz.ts")}";\nexport * as BS from "${path.join(DOK, "bausteine.ts")}";\n`);
+fs.writeFileSync(eintrag, `export * from "${path.join(DOK, "index.ts")}";\nexport * as BS from "${path.join(DOK, "bausteine.ts")}";\n`);
 execFileSync(path.join(pnpm, esb, "node_modules/esbuild/bin/esbuild"), [eintrag, "--bundle", "--platform=node", "--format=esm", `--outfile=${gebaut}`, "--log-level=warning"]);
 const F = await import(gebaut);
 
@@ -63,11 +63,12 @@ for (const wert of Object.values(F.BS)) {
   const listen = Array.isArray(wert) ? [wert] : wert && typeof wert === "object" ? Object.values(wert).filter(Array.isArray) : [];
   for (const l of listen) for (const o of l) if (o && typeof o === "object" && typeof o.text === "string" && !ausBausteinen.has(o.text)) ausBausteinen.set(o.text, { quelle: o.quelle ?? "", unsicher: Boolean(o.unsicher) });
 }
-const FELD = { beschreibung: "Gefährdung", massnahme: "Maßnahmen", faktor: "Faktor", risiko: "Risiko (vorbelegt)", anlass: "Tätigkeit", schutz: "Hautschutz", handschuhe: "Handschuhe", reinigung: "Reinigung", pflege: "Pflege" };
+const FELD = { beschreibung: "Gefährdung", massnahme: "Maßnahmen", faktor: "Faktor", unterpunkt: "Unterpunkt", risiko: "Risiko (vorbelegt)", schwere: "Schwere (Vorschlag)", anlass: "Tätigkeit", schutz: "Hautschutz", handschuhe: "Handschuhe", handschuh_norm: "Material/Norm", desinfektion: "Händedesinfektion", reinigung: "Reinigung", pflege: "Pflege", arbeitsmittel: "Arbeitsmittel", pruefart: "Prüfart", frist: "Frist", befaehigt: "Befähigte Person" };
 const inhaltAus = (werte, titel) =>
   Object.entries(werte ?? {})
     .filter(([k, w]) => w && !(k === "beschreibung" && w === titel) && k !== "anlass")
-    .map(([k, w]) => `${FELD[k] ?? k}: ${k === "faktor" ? (F.GEFAEHRDUNGSFAKTOREN[w] ?? w) : String(w)}`)
+    .filter(([k]) => k !== "arbeitsmittel")
+    .map(([k, w]) => `${FELD[k] ?? k}: ${k === "faktor" ? (F.GEFAEHRDUNGSFAKTOREN[w] ?? w) : k === "unterpunkt" ? (F.SONSTIGE_UNTERPUNKTE[w] ?? w) : String(w)}`)
     .join("\n");
 function* felderVon(v) {
   for (const a of v.abschnitte) {
@@ -126,16 +127,32 @@ for (const b of bausteine.filter(kurz)) {
 }
 bausteine.splice(0, bausteine.length, ...bausteine.filter((b) => !kurz(b)));
 for (const b of bausteine) Object.assign(b, { gruppen: gruppenVon(b), kennzahlen: kennzahlen(b), markierung: markierung(b) });
-bausteine.forEach((b, i) => (b.nr = `B-${String(i + 1).padStart(3, "0")}`));
+// E-167: Nummern der Durchsicht vom 22.10.2026 bleiben erhalten (src/dokumente/sifa.ts); neue Bausteine zählen ab B-198
+// weiter, geteilte (B-036 Fettbrand) bekommen Buchstaben
+const SIFA = new Map(F.SIFA_PRUEFUNG.map((e) => [`${e.vorlage}|${e.feld}|${e.titel}`, e]));
+const vergeben = new Map();
+let naechsteNr = Math.max(...F.SIFA_PRUEFUNG.map((e) => Number(e.nr.slice(2)))) + 1;
+for (const b of bausteine) {
+  const e = SIFA.get(`${b.vorlageId}|${b.feld}|${b.titel}`);
+  if (e) {
+    const n = vergeben.get(e.nr) ?? 0;
+    vergeben.set(e.nr, n + 1);
+    Object.assign(b, { nr: n ? `${e.nr}${"abcdefgh"[n]}` : e.nr, pruefung: `${e.ergebnis} · ${e.pruefstand}${e.grund ? ` (${e.grund})` : ""}` });
+  } else Object.assign(b, { nr: `B-${String(naechsteNr++).padStart(3, "0")}`, pruefung: "neu nach der Durchsicht vom 22.10.2026 – noch nicht geprüft" });
+}
+const fehlendeNr = F.SIFA_PRUEFUNG.filter((e) => !bausteine.some((b) => b.nr === e.nr));
+bausteine.sort((a, b) => a.nr.localeCompare(b.nr, "de", { numeric: true }));
 fs.writeFileSync(
   path.join(ZIEL, "bausteine.csv"),
-  csv([["Nr", "Branchengruppe", "Gruppe in der App", "Vorlage", "Feld", "Art", "Baustein", "Inhalt", "Kennzahlen im Text", "Quelle (Kurzbeleg)", "Markierung"], ...bausteine.map((b) => [b.nr, b.gruppen.join(", "), b.gruppeApp, b.vorlage, b.feld, b.art, b.titel, b.inhalt, b.kennzahlen, b.quelle, b.markierung])]),
+  csv([["Nr", "Branchengruppe", "Gruppe in der App", "Vorlage", "Feld", "Art", "Baustein", "Inhalt", "Kennzahlen im Text", "Quelle (Kurzbeleg)", "Markierung", "Durchsicht 22.10.2026 (Ergebnis · Prüfstand)"], ...bausteine.map((b) => [b.nr, b.gruppen.join(", "), b.gruppeApp, b.vorlage, b.feld, b.art, b.titel, b.inhalt, b.kennzahlen, b.quelle, b.markierung, b.pruefung])]),
 );
 const zaehle = (re) => bausteine.filter((b) => re.test(b.markierung)).length;
 const bm = [
   "# Bausteine der Arbeitsschutz-Vorlagen",
   "",
   `Aus dem Code erzeugt am ${new Date().toISOString().slice(0, 10)} (\`packages/fachlogik/src/dokumente/bausteine.ts\` – erzeugt von \`packages/fachlogik/werkzeuge/bausteine-erzeugen.mjs\` aus der Recherche \`docs/recherche/2026-10-12\` –, ergänzt in \`arbeitsschutz.ts\` und \`branchen.ts\`). Es steht alles, was die App in den Vorlagen ${VORLAGEN.map((v) => `„${v.titel}“`).join(", ")} zum Antippen anbietet. Der Betrieb übernimmt einen Baustein und passt ihn an; nichts davon ist bisher fachlich freigegeben (PRUEFLISTE T-62).`,
+  "",
+  `Stand nach der fachlichen Durchsicht vom 22.10.2026 (E-167): Die Nummern B-001 bis B-197 sind die der Durchsicht (Zuordnung in \`packages/fachlogik/src/dokumente/sifa.ts\`), neue Bausteine folgen ab B-198. Spalte „Durchsicht“: Ergebnis und Prüfstand der Durchsicht bzw. „neu“.`,
   "",
   `**${bausteine.length} Bausteine**, davon ${zaehle(/fachlich zu prüfen/)} im Code „fachlich zu prüfen“, ${zaehle(/unsicher/)} „unsicher“ (nicht wörtlich an der Primärquelle geprüft), ${zaehle(/Nutzertest/)} mit Quelle „Nutzertest“ (aus simulierten Nutzertests, Maßnahmen sind allgemeine Grundsätze), ${zaehle(/ohne Quelle/)} ohne Quelle. Die Nummern (B-…) sind die der CSV-Datei, damit Antworten zugeordnet werden können.`,
   "",
@@ -151,8 +168,8 @@ for (const g of [...GRUPPEN.map(([n]) => n), OHNE]) {
   for (const v of VORLAGEN) {
     const lv = l.filter((b) => b.vorlageId === v.id);
     if (!lv.length) continue;
-    bm.push(`### ${v.titel}`, "", "| Nr. | Feld / Art | Baustein | Inhalt | Kennzahlen | Quelle | Markierung |", "|---|---|---|---|---|---|---|");
-    for (const b of lv) bm.push(`| ${b.nr} | ${md(b.feld)} (${b.art}) | ${md(b.titel)} | ${md(b.inhalt)} | ${md(b.kennzahlen)} | ${md(b.quelle)} | ${md(b.markierung)} |`);
+    bm.push(`### ${v.titel}`, "", "| Nr. | Feld / Art | Baustein | Inhalt | Kennzahlen | Quelle | Markierung | Durchsicht 22.10.2026 |", "|---|---|---|---|---|---|---|---|");
+    for (const b of lv) bm.push(`| ${b.nr} | ${md(b.feld)} (${b.art}) | ${md(b.titel)} | ${md(b.inhalt)} | ${md(b.kennzahlen)} | ${md(b.quelle)} | ${md(b.markierung)} | ${md(b.pruefung)} |`);
     bm.push("");
   }
 }
@@ -160,7 +177,7 @@ for (const g of [...GRUPPEN.map(([n]) => n), OHNE]) {
 bm.push("## Kurze Auswahllisten (ohne Quelle)", "", "Antippbare Kurzangaben der Vorlagen; Gruppen in Klammern (Kennungen aus `BRANCHEN_GRUPPEN`).", "");
 for (const l of listen) bm.push(`- **${l.vorlage} – ${l.feld}:** ${l.werte.join(" · ")}`);
 bm.push("", "## Feste Texte und Skalen der Vorlagen", "");
-bm.push("### Risikoskala der Gefährdungsbeurteilung (`RISIKO_SKALA`, im Code „vereinfachte Skala, fachlich zu prüfen (Sifa)“)", "", F.RISIKO_SKALA, "");
+bm.push("### Risikoskala der Gefährdungsbeurteilung (`RISIKO_SKALA`, `RISIKO_MATRIX` – Vorschlag der Durchsicht, Blatt „D Risikoskala“)", "", F.RISIKO_SKALA, "", "| Schwere \\ Wahrscheinlichkeit | " + Object.values(F.WAHRSCHEINLICHKEIT).join(" | ") + " |", "|---|---|---|---|", ...Object.entries(F.SCHWERE).map(([s, t]) => `| ${t} | ${Object.keys(F.WAHRSCHEINLICHKEIT).map((w) => F.RISIKO_MATRIX[s][w]).join(" | ")} |`), "");
 bm.push("### Gefährdungsfaktoren (Abschnitte der Gefährdungsbeurteilung, § 5 Abs. 3 ArbSchG, „sonstige“ ergänzt)", "", ...Object.values(F.GEFAEHRDUNGSFAKTOREN).map((t, i) => `${i + 1}. ${t}`), "");
 bm.push("### Pflichtangaben im Gefahrstoffverzeichnis (Fußtext, § 6 Abs. 12 GefStoffV)", "", ...F.BS.GEFAHRSTOFF_ANGABEN.map((t) => `- ${t}`), "");
 bm.push("### Gliederung der Betriebsanweisung (Recherche, TRGS 555)", "", "| Nr. | Abschnitt | Inhalt |", "|---|---|---|", ...F.BS.BA_GLIEDERUNG.map((g) => `| ${g.nr} | ${md(g.abschnitt)} | ${md(g.inhalt)} |`), "");
@@ -235,5 +252,6 @@ fs.rmSync(ROH, { recursive: true, force: true });
 const pdfs = fs.existsSync(vorlagen) ? fs.readdirSync(vorlagen).length : 0;
 console.log(`✓ Prüfmappe Arbeitsschutz in ${ZIEL}: ${pdfs} Vorlagen-PDFs (${VORLAGEN.length} Vorlagen), ${bausteine.length} Bausteine (${zaehle(/fachlich zu prüfen/)} fachlich zu prüfen, ${zaehle(/unsicher/)} unsicher), ${zeilen.length} Pflichten, ${werte.length} Regelwerte, ${sifa.length + fach.length} Prüflisten-Punkte (+${kenntnis.length} zur Kenntnis, ${kZeilen.length} Katalogpunkte)`);
 if (befunde.length) console.log(`! Satzspiegel-Befunde des Prüfwerkzeugs zu diesen Vorlagen:\n${befunde.join("\n")}`);
+if (fehlendeNr.length) console.log(`! Bausteine der Durchsicht nicht mehr gefunden: ${fehlendeNr.map((e) => e.nr).join(", ")}`);
 if (fehlendeVorlagen.length) console.log(`! Vorlagen nicht erzeugt: ${fehlendeVorlagen.join(", ")}`);
 if (fehlendeIds.length) console.log(`! Katalogeinträge nicht gefunden: ${fehlendeIds.join(", ")}`);

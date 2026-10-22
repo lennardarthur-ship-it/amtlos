@@ -1,0 +1,75 @@
+# Prüfergebnis Sifa 22.10.2026 (C Fehlende Pflichten „Betriebsanweisung Arbeitsmittel“, Frage 10, Hinweise Nr. 6): § 12 Abs. 2 BetrSichV
+schema_version: 1
+id: arbeitsschutz.betriebsanweisung_arbeitsmittel
+version: 1
+katalog_nr: E.53
+titel:
+  de: Betriebsanweisungen für Maschinen und Arbeitsmittel
+kurz:
+  de: Bevor Beschäftigte eine Maschine oder ein anderes Arbeitsmittel zum ersten Mal benutzen, stellst du ihnen eine schriftliche Betriebsanweisung zur Verfügung und unterweist sie.
+erklaerung:
+  de: 'Vor der ersten Verwendung stellst du den Beschäftigten eine schriftliche Betriebsanweisung in verständlicher Form und Sprache zur Verfügung (§ 12 Abs. 2 BetrSichV) – etwa für Aufschnittmaschine, Teigknetmaschine, Kreissäge, Hebebühne, Kompressor oder Reinigungsmaschine. Das gilt nicht für Arbeitsmittel, für die der Hersteller keine Gebrauchsanleitung mitliefern muss. Statt einer eigenen Betriebsanweisung darfst du die mitgelieferte Gebrauchsanleitung bereitstellen, wenn sie die nötigen Angaben enthält. Außerdem unterweist du die Beschäftigten vor der ersten Verwendung tätigkeitsbezogen und danach mindestens einmal jährlich und hältst Datum und Namen schriftlich fest (§ 12 Abs. 1 BetrSichV).'
+rechtsgrundlage:
+- § 12 BetrSichV
+kategorie: arbeitsschutz
+branchen:
+- gastronomie_lebensmittel
+- handwerk
+- bau
+- gebaeudereinigung
+- beauty_kosmetik
+- transport_logistik
+- gesundheit_pflege
+ausloeser:
+  all:
+  - feld: abgeleitet.hat_beschaeftigte
+    op: ==
+    wert: true
+    label:
+      de: Du beschäftigst mindestens eine Person.
+  - feld: profil.taetigkeit.branchen
+    op: enthaelt_eines
+    wert:
+    - gastronomie_lebensmittel
+    - handwerk
+    - bau
+    - gebaeudereinigung
+    - beauty_kosmetik
+    - transport_logistik
+    - gesundheit_pflege
+    label:
+      de: In deiner Branche arbeitet ihr mit Maschinen oder Geräten, für die der Hersteller eine Gebrauchsanleitung mitliefert.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Bußgeld bis 5.000 €, wenn die Betriebsanweisung oder die Unterweisung fehlt oder zu spät kommt (§ 22 Abs. 1 Nr. 25 bis 27 BetrSichV in Verbindung mit § 25 Abs. 1 Nr. 1, Abs. 2 ArbSchG).
+  schwere: hoch
+automatisierung: dokument_generator
+dokumente:
+- vorlage.betriebsanweisung_maschine
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Betriebssicherheitsverordnung (§§ 12, 22)
+  url: https://www.gesetze-im-internet.de/betrsichv_2015/BJNR004910015.html
+  abgerufen: '2026-10-22'
+- titel: Betriebssicherheitsverordnung § 12
+  url: https://www.gesetze-im-internet.de/betrsichv_2015/__12.html
+  abgerufen: null
+- titel: Arbeitsschutzgesetz (§ 25)
+  url: https://www.gesetze-im-internet.de/arbschg/BJNR124610996.html
+  abgerufen: '2026-10-22'
+fachlich_zu_pruefen:
+- 'Neu nach Prüfergebnis Sifa 22.10.2026 – Auslöser über Branchen mit Maschinen (Büro, Onlinehandel, IT ausgenommen); Vorlage „Betriebsanweisung Maschinen“ (vorlage.betriebsanweisung_maschine) verknüpft'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

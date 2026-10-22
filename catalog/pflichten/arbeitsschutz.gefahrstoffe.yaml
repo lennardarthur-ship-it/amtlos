@@ -1,21 +1,23 @@
-# Katalog E.55 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog E.55 · Startbestand aus Spezifikation Abschnitt 4 (E-054); Prüfergebnis Sifa 22.10.2026 (C Katalog E.55) eingearbeitet
 schema_version: 1
 id: arbeitsschutz.gefahrstoffe
-version: 2
+version: 3
 katalog_nr: E.55
 titel:
   de: Gefahrstoffverzeichnis und Betriebsanweisungen
 kurz:
-  de: Wenn ihr mit Gefahrstoffen arbeitet, führst du ein Verzeichnis und schreibst Betriebsanweisungen.
+  de: Wenn ihr mit Gefahrstoffen arbeitet, führst du ein Verzeichnis, schreibst Betriebsanweisungen und unterweist jährlich mündlich mit Unterschrift.
 erklaerung:
-  de: Die Gefahrstoffverordnung verlangt ein Verzeichnis der Gefahrstoffe und Betriebsanweisungen für die Beschäftigten.
+  de: 'Die Gefahrstoffverordnung verlangt ein Verzeichnis der Gefahrstoffe mit Bezeichnung, Einstufung, Mengenbereich, Arbeitsbereich und Verweis auf das Sicherheitsdatenblatt (§ 6 Abs. 12 GefStoffV) und für die Beschäftigten schriftliche Betriebsanweisungen auf Grundlage der Gefährdungsbeurteilung (§ 14 Abs. 1 GefStoffV). Anhand der Betriebsanweisung unterweist du mündlich und arbeitsplatzbezogen – vor Aufnahme der Beschäftigung und danach mindestens jährlich; Inhalt und Zeitpunkt hältst du schriftlich fest, und die Unterwiesenen bestätigen die Unterweisung durch Unterschrift (§ 14 Abs. 2 GefStoffV). Ein eingetippter Name genügt dafür nicht. Ergibt die Gefährdungsbeurteilung nur Tätigkeiten mit geringer Gefährdung (§ 6 Abs. 13 GefStoffV), entfällt das Verzeichnis (§ 6 Abs. 12 Satz 3), und die weitergehenden Schutzmaßnahmen sind nicht nötig – das begründest du in der Gefährdungsbeurteilung. Bei krebserzeugenden, keimzellmutagenen oder reproduktionstoxischen Stoffen der Kategorie 1A oder 1B kommt das Expositionsverzeichnis als eigene Pflicht hinzu.'
 rechtsgrundlage:
-- GefStoffV
+- § 6 Abs. 12, 13 GefStoffV
+- § 14 GefStoffV
 kategorie: arbeitsschutz
 branchen:
 - beauty_kosmetik
 - handwerk
 - bau
+- gastronomie_lebensmittel
 ausloeser:
   all:
   - feld: abgeleitet.hat_beschaeftigte
@@ -38,21 +40,29 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: mittel
-dringend_ohne_termin: true
+    de: Bußgeld bis 50.000 €, wenn das Gefahrstoffverzeichnis fehlt, die Betriebsanweisung nicht zugänglich ist oder nicht mündlich unterwiesen wird (§ 22 Abs. 1 Nr. 2, 24, 25 GefStoffV in Verbindung mit § 26 Abs. 1 Nr. 8 Buchst. b, Abs. 3 ChemG).
+  schwere: hoch
 automatisierung: dokument_generator
+aenderungsnotiz:
+  de: Unterweisung mündlich, jährlich und mit Unterschrift; Ausnahme bei geringer Gefährdung; Bußgeld ergänzt.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
 quellen:
-- titel: Gefahrstoffverordnung
-  url: https://www.gesetze-im-internet.de/gefstoffv_2010/
-  abgerufen: null
+- titel: Gefahrstoffverordnung (Stand 17.12.2025)
+  url: https://www.gesetze-im-internet.de/gefstoffv_2010/BJNR164400010.html
+  abgerufen: '2026-10-22'
+- titel: Gefahrstoffverordnung § 14
+  url: https://www.gesetze-im-internet.de/gefstoffv_2010/__14.html
+  abgerufen: '2026-10-22'
+- titel: Gefahrstoffverordnung § 22
+  url: https://www.gesetze-im-internet.de/gefstoffv_2010/__22.html
+  abgerufen: '2026-10-22'
+- titel: Chemikaliengesetz § 26
+  url: https://www.gesetze-im-internet.de/chemg/__26.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
+- 'Prüfergebnis Sifa 22.10.2026: Unterschrift der Unterwiesenen nach § 14 Abs. 2 GefStoffV – die Unterweisungsvorlage bestätigt bisher mit eingetipptem Namen (Vorlage, T-13); Höchstbetrag 50.000 € über § 26 Abs. 3 ChemG statt 5.000 € nach ArbSchG – rechtlich bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

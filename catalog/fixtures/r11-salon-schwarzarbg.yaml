@@ -35,7 +35,11 @@ erwartet:
   personal.ausbildungsverguetung: gilt
   personal.lohnnachweis_bg: gilt
   arbeitsschutz.feuerloescher: gilt
-  arbeitsschutz.arbeitsmittel_pruefen: gilt_nicht
+  # Prüfergebnis Sifa 22.10.2026: Arbeitsmittel (Leitern, Regale, Geräte) gibt es in fast allen Branchen
+  arbeitsschutz.arbeitsmittel_pruefen: gilt
+  arbeitsschutz.biostoffe: gilt
+  arbeitsschutz.betriebsanweisung_arbeitsmittel: gilt
+  branche.beauty_hautschutzplan: gilt
 termine_enthaelt:
   personal.lohnnachweis_bg: [["2027-02", "2027-02-16"]]
   personal.sofortmeldung: [["aenderung-20260901", "2026-09-01"]]

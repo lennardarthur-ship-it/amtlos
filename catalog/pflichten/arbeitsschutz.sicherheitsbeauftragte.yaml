@@ -1,0 +1,52 @@
+# Prüfergebnis Sifa 22.10.2026 (C Fehlende Pflichten „Sicherheitsbeauftragte“): § 22 SGB VII n. F. (anzuwenden ab 29.5.2026)
+schema_version: 1
+id: arbeitsschutz.sicherheitsbeauftragte
+version: 1
+katalog_nr: E.52
+titel:
+  de: Sicherheitsbeauftragte bestellen
+kurz:
+  de: Ab regelmäßig 50 Beschäftigten bestellst du Sicherheitsbeauftragte – ab 21 Beschäftigten schon dann, wenn die Gefährdungsbeurteilung eine besondere Gefährdung ergibt.
+erklaerung:
+  de: 'Seit der Neuregelung von § 22 SGB VII (anzuwenden ab 29.5.2026) bestellen Unternehmen mit regelmäßig 50 oder mehr Beschäftigten Sicherheitsbeauftragte; Zahl und Auswahl richten sich nach den Unfall- und Gesundheitsgefahren und der Zahl der Beschäftigten. Bei mehr als 20 und weniger als 50 Beschäftigten ist ein Sicherheitsbeauftragter nur nötig, wenn nach der Gefährdungsbeurteilung eine besondere Gefährdung für Leben und Gesundheit besteht; die Berufsgenossenschaft kann die Kriterien festlegen und die Bestellung anordnen. Sicherheitsbeauftragte unterstützen dich ehrenamtlich bei der Umsetzung des Arbeitsschutzes und nehmen an Lehrgängen der BG teil.'
+rechtsgrundlage:
+- § 22 Abs. 1 SGB VII
+kategorie: arbeitsschutz
+ausloeser:
+  feld: profil.beschaeftigte.gesamt
+  op: '>'
+  wert: 20
+  label:
+    de: Du beschäftigst mehr als 20 Personen.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Berufsgenossenschaft
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: '2026-05-29'
+gueltig_bis: null
+quellen:
+- titel: § 22 SGB VII (lxgesetze, Stand 12.5.2026)
+  url: https://lxgesetze.de/sgb-vii/22
+  abgerufen: '2026-10-22'
+- titel: Haufe – Gesetzesradar 316, Bestellung von Sicherheitsbeauftragten
+  url: https://www.haufe.de/id/beitrag/gesetzesradar-316-bestellung-von-sicherheitsbeauftragten-HI17181802.html
+  abgerufen: '2026-10-22'
+- titel: HWK Cottbus – Neuregelung Sicherheitsbeauftragte (laut Prüfergebnis Sifa)
+  url: https://www.hwk-cottbus.de/artikel/bundestag-erhoeht-schwellenwert-fuer-sicherheitsbeauftragte-7,0,10305.html
+  abgerufen: null
+fachlich_zu_pruefen:
+- 'Neu nach Prüfergebnis Sifa 22.10.2026 – Inkrafttreten (anzuwenden ab 29.5.2026, BGBl. 2026 I Nr. 140) und Wortlaut „regelmäßig 50 oder mehr“ am amtlichen Text prüfen; Zählweise der Beschäftigten (G-05); 21–49 nur bei besonderer Gefährdung – Amtlos zeigt die Pflicht ab 21 an; Sanktion fachlich ergänzen'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

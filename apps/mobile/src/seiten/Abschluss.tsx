@@ -35,8 +35,9 @@ export function FormHinweis({ v, d, unten = 12 }: { v: Vorlage; d: Daten; unten?
   const f = useFarben();
   const h = v.formHinweis?.(d);
   if (!h) return null;
-  const schrift = h.form === "schrift";
-  const titel = schrift ? TEXT.nk_form_schrift_titel : h.form === "text" ? TEXT.nk_form_text_titel : TEXT.nk_form_offen_titel;
+  // E-167: Unterschrift der Unterwiesenen (Gefahrstoffe/Biostoffe) wie die Schriftform hervorgehoben
+  const schrift = h.form === "schrift" || h.form === "unterschrift";
+  const titel = h.form === "unterschrift" ? TEXT.sifa_unterschrift_titel : schrift ? TEXT.nk_form_schrift_titel : h.form === "text" ? TEXT.nk_form_text_titel : TEXT.nk_form_offen_titel;
   return (
     <View accessible accessibilityLabel={`${titel}. ${h.text}`} style={{ flexDirection: "row", gap: 10, alignItems: "flex-start", padding: 14, borderRadius: RADIUS.karte, backgroundColor: schrift ? f.baldHauch : f.flaeche, marginBottom: unten }}>
       <View style={{ paddingTop: 2 }}>
@@ -317,7 +318,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
         {/* Plausibilität (G6): nur ein Hinweis, kein Hindernis */}
         {v.storno && betragUnplausibel(rechnungBrutto(u, z.stand.betrieb)) ? <Hinweis art="warnung" text={TEXT.betrag_unplausibel} /> : null}
         {/* Nachkontrolle Dr. Weber: die Form vor dem Teilen als eigener Kasten – Schriftform auch nach dem Teilen (ausdrucken) */}
-        {!fest || v.formHinweis?.(d)?.form === "schrift" ? <FormHinweis v={v} d={d} /> : null}
+        {!fest || v.formHinweis?.(d)?.form === "schrift" || v.formHinweis?.(d)?.form === "unterschrift" ? <FormHinweis v={v} d={d} /> : null}
         {/* R10: fachliche Hinweise der Vorlage (Leitweg-ID, EU-Kunde, Abweichung vom Pflichten-Check) – kein Hindernis */}
         {!fest
           ? (v.hinweise?.(d, z.stand.betrieb, { kleinunternehmer: typeof z.stand.profil["ust.kleinunternehmer"] === "boolean" ? (z.stand.profil["ust.kleinunternehmer"] as boolean) : null, handwerk: handwerkLaut(z.stand.profil) }) ?? [])

@@ -1,7 +1,7 @@
 # Katalog D.42 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.arbeitszeit_aufzeichnung
-version: 3
+version: 4
 katalog_nr: D.42
 titel:
   de: Arbeitszeit aufzeichnen
@@ -48,9 +48,8 @@ quellen:
 fachlich_zu_pruefen:
 - 'R12 (Nutzertest Bäckerei #9): § 16 Abs. 2 ArbZG ergänzt – Aufzeichnung der Sonn- und Feiertagsarbeit bestätigen'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Fundstelle der BAG-Entscheidung prüfen
 - Anforderungen an die Form (bis zur Neuregelung) fachlich formulieren
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen (Prüfergebnis Sifa 22.10.2026 – offen, Rechtsanwalt)'
 pruefung:
   status: entwurf
   geprueft_von: null

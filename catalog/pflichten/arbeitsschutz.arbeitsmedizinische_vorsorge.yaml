@@ -1,16 +1,18 @@
-# Katalog E.56 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog E.56 · Startbestand aus Spezifikation Abschnitt 4 (E-054); Prüfergebnis Sifa 22.10.2026 (C Katalog E.56, Frage 15, bestätigt) eingearbeitet
 schema_version: 1
 id: arbeitsschutz.arbeitsmedizinische_vorsorge
-version: 3
+version: 4
 katalog_nr: E.56
 titel:
   de: Arbeitsmedizinische Vorsorge anbieten
 kurz:
   de: Du bietest arbeitsmedizinische Vorsorge an oder veranlasst sie – je nach Tätigkeit, etwa bei Bildschirmarbeit, Lärm, Feuchtarbeit, Mehlstaub oder Schweißrauch.
 erklaerung:
-  de: Die Verordnung zur arbeitsmedizinischen Vorsorge regelt Pflicht-, Angebots- und Wunschvorsorge. Bei Bildschirmarbeit ist Vorsorge anzubieten. Bei Lärm ist Vorsorge ab 80 dB(A) anzubieten und ab 85 dB(A) Pflicht (Anhang Teil 3 ArbMedVV). Im Handwerk kommen oft Feuchtarbeit (zum Beispiel Reinigung, Friseur, Küche), Schweißrauch und Holzstaub hinzu, in Bäckereien Mehlstaub, in Pflege und Reinigung biologische Arbeitsstoffe. Je nach Dauer und Belastung ist dafür Angebots- oder Pflichtvorsorge nötig – prüfe das mit deinem Betriebsarzt.
+  de: 'Die Verordnung zur arbeitsmedizinischen Vorsorge unterscheidet Pflichtvorsorge (du veranlasst sie, ohne sie darf die Tätigkeit nicht ausgeübt werden), Angebotsvorsorge (du bietest sie an) und Wunschvorsorge. Häufige Anlässe nach dem Anhang der ArbMedVV: Feuchtarbeit von regelmäßig mehr als zwei Stunden je Tag – Angebot, ab vier Stunden – Pflicht (Teil 1 Abs. 2 Nr. 2 Buchst. e, Abs. 1 Nr. 2 Buchst. a); Mehlstaub – Angebot bei Einhaltung, Pflicht bei Überschreitung von 4 mg/m³ (Teil 1 Abs. 2 Nr. 2 Buchst. j, Abs. 1 Nr. 2 Buchst. j); Schweißrauch – Angebot bei Einhaltung, Pflicht bei Überschreitung von 3 mg/m³ (Teil 1 Abs. 2 Nr. 2 Buchst. f, Abs. 1 Nr. 2 Buchst. b); Hartholzstaub (Teil 1 Abs. 1 Nr. 1); Lärm – Angebot ab 80, Pflicht ab 85 dB(A) (Teil 3 Abs. 2 Nr. 1, Abs. 1 Nr. 3); Bildschirmarbeit – Angebot (Teil 4 Abs. 2 Nr. 1); Arbeit im Freien mit natürlicher UV-Strahlung von regelmäßig einer Stunde oder mehr je Tag – Angebot (Teil 3 Abs. 2 Nr. 5); Tätigkeiten mit Kontakt zu Blut und Körperflüssigkeiten im Gesundheitsdienst, etwa mit Hepatitis-B- und Hepatitis-C-Viren – Pflicht (Teil 2 Abs. 1 Nr. 3). Bei Kosmetik mit Blutkontakt (zum Beispiel Permanent-Make-up, Fußpflege) bewertet der Betriebsarzt Vorsorge und Impfangebot. Friseurchemikalien sind außer über die Feuchtarbeit kein eigener Anlass. Über jede Vorsorge führst du eine Vorsorgekartei (§ 3 Abs. 4 ArbMedVV); die Abstände richten sich nach der Arbeitsmedizinischen Regel AMR 2.1 – das klärst du mit deinem Betriebsarzt. Die Untersuchung von Nachtarbeitnehmern (§ 6 Abs. 3 ArbZG) und die Untersuchungen Jugendlicher (§§ 32, 33 JArbSchG) sind keine Vorsorge nach der ArbMedVV und eigene Pflichten.'
 rechtsgrundlage:
-- ArbMedVV
+- ArbMedVV mit Anhang
+- § 3 Abs. 4 ArbMedVV
+- AMR 2.1
 kategorie: arbeitsschutz
 ausloeser:
   feld: abgeleitet.hat_beschaeftigte
@@ -34,15 +36,17 @@ automatisierung: hinweis
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
+aenderungsnotiz:
+  de: Anlässe mit Fundstellen im Anhang der ArbMedVV, Vorsorgekartei und Fristen nach AMR 2.1 ergänzt.
 quellen:
 - titel: Verordnung zur arbeitsmedizinischen Vorsorge
   url: https://www.gesetze-im-internet.de/arbmedvv/
   abgerufen: null
+- titel: ArbMedVV Anhang
+  url: https://www.gesetze-im-internet.de/arbmedvv/anhang.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'R12 (Nutzertests Kfz #15, Bäckerei #6): Beispiele je Branche ohne Grenzwerte – Mehlstaub (laut Nutzertest Pflichtvorsorge über 4 mg/m³, Nummer im Anhang Teil 1 unsicher), Schweißrauch, Feuchtarbeit (Stundengrenzen) fachlich ergänzen'
-- Lärm (80/85 dB(A), Anhang Teil 3) nach Nutzertest Tischlerei R11 ergänzt; Pflichtvorsorge bei Hartholzstaub (Anhang Teil 1) unsicher, nicht aufgenommen
-- Feuchtarbeit und Biostoffe nur als Prüfhinweis (R11, Nutzertest Gebäudereinigung) – Stundengrenzen und Nummern im Anhang der ArbMedVV fachlich ergänzen
-- Anlässe und Fristen je Vorsorgeart fachlich ergänzen
+- 'Prüfergebnis Sifa 22.10.2026 (bestätigt): Fristen je Vorsorgeart nach AMR 2.1 und Bewertung Kosmetik mit Blutkontakt durch einen Betriebsarzt bestätigen lassen (Frage 15); Auslöser für alle Betriebe mit Beschäftigten – Anlässe je Branche nicht als Bedingung'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 pruefung:
   status: entwurf

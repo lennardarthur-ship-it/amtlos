@@ -56,13 +56,30 @@ erwartet:
   arbeitsschutz.gefahrstoffe: gilt_nicht
   arbeitsschutz.arbeitsmedizinische_vorsorge: gilt
   arbeitsschutz.unfallanzeige: gilt
+  # Prüfergebnis Sifa 22.10.2026: Katalog-Ergänzungen Arbeitsschutz
+  arbeitsschutz.verbandbuch: gilt
+  arbeitsschutz.erste_hilfe_organisation: gilt
+  arbeitsschutz.brandschutzhelfer: gilt
+  arbeitsschutz.flucht_rettungsplan: gilt
+  arbeitsschutz.arbeitsmittel_pruefen: gilt
+  arbeitsschutz.betriebsanweisung_arbeitsmittel: gilt
+  branche.gastro_schankanlage_fluessiggas: gilt
+  branche.beauty_hautschutzplan: gilt
+  personal.jugend_erstuntersuchung: gilt
+  # 12 Beschäftigte: Sicherheitsbeauftragte erst ab mehr als 20; keine Gefahrstoffe, keine Biostoff-Branche
+  arbeitsschutz.sicherheitsbeauftragte: gilt_nicht
+  arbeitsschutz.expositionsverzeichnis: gilt_nicht
+  arbeitsschutz.biostoffe: gilt_nicht
+  arbeitsschutz.laerm: gilt_nicht
 termine_enthaelt:
   # je Einstellung eine Instanz (je_ereignis)
   personal.sofortmeldung: [["aenderung-20260901", "2026-09-01"], ["aenderung-20261102", "2026-11-02"]]
   # § 6 DEÜV: mit der ersten Entgeltabrechnung, spätestens sechs Wochen nach Beginn (R10)
   personal.sv_anmeldung: [["aenderung-20260901", "2026-10-13"], ["aenderung-20261102", "2026-12-14"]]
-  # vor Arbeitsaufnahme: spätestens am Tag davor
-  arbeitsschutz.erstunterweisung: [["aenderung-20261102", "2026-11-01"]]
+  # Prüfergebnis Sifa 22.10.2026: rechtlich genügt der erste Arbeitstag vor Arbeitsbeginn (Erinnerung am Vortag)
+  arbeitsschutz.erstunterweisung: [["aenderung-20261102", "2026-11-02"]]
+  arbeitsschutz.verbandbuch: [["aenderung-20261005", "2026-10-05"]]
+  personal.jugend_erstuntersuchung: [["aenderung-20261102", "2026-11-02"]]
   arbeitsschutz.unterweisung_wiederholen: [["aenderung-20251115", "2026-11-15"]]
   arbeitsschutz.unfallanzeige: [["aenderung-20261005", "2026-10-08"]]
   personal.schwangerschaft_mitteilung: [["aenderung-20261001", "2026-10-01"]]

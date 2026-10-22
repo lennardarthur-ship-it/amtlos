@@ -139,9 +139,33 @@ function lebensmittelVoll(v) {
   return {};
 }
 
+/**
+ * E-167 (Sifa-Durchsicht): realistische Angaben für die Arbeitsschutz-Vorlagen – Risiko aus Schwere und Wahrscheinlichkeit
+ * (sonst stünde in „voll“ überall eine Linie), Prüffristen mit letzter Prüfung, im Prüfprotokoll kein „nächste Prüfung =
+ * Prüfdatum“ mehr (der Termin kommt als Vorschlag aus dem Richtwert), die neuen Vorlagen mit ihren Vorschlägen.
+ */
+const W = ["moeglich", "unwahrscheinlich", "wahrscheinlich"];
+function arbeitsschutzVoll(v, d) {
+  const feld = (id) => v.abschnitte.flatMap((a) => a.felder).find((x) => x.id === id);
+  const vorschlaegeVon = (id) => (feld(id)?.vorschlaege ?? []).join("\n");
+  if (v.id === "gefaehrdungsbeurteilung")
+    return {
+      ...d,
+      gefaehrdungen: (d.gefaehrdungen ?? []).map((e, i) => ({ ...e, schwere: e.schwere || ["mittel", "leicht", "schwer"][i % 3], wahrscheinlichkeit: W[i % 3] })),
+      pruefungen: (d.pruefungen ?? []).slice(0, 6).map((e) => ({ ...e, letzte: "2026-02-10", naechste: null })),
+      schutzbeduerftig: ["jugendliche", "schwangere"],
+    };
+  if (v.id === "pruefprotokoll_elektro") return { ...d, einsatz: feld("einsatz").optionen[3].wert, qualifikation: "efk", geraete: (d.geraete ?? []).map((e) => ({ ...e, naechste: null })) };
+  if (v.id === "betriebsanweisung_maschine") return { ...d, maschine: "Aufschnittmaschine", arbeitsbereich: "Küche", nummer: "BA-M-01", gefahren: vorschlaegeVon("gefahren").split("\n").slice(0, 2).join("\n"), schutz: vorschlaegeVon("schutz").split("\n").slice(0, 4).join("\n"), stoerung: vorschlaegeVon("stoerung"), unfall: vorschlaegeVon("unfall"), instandhaltung: vorschlaegeVon("instandhaltung"), beschraenkung: "", notruf: "Notruf 112 · Ersthelferin: Mara Lindner, Tel. 0151 2345678" };
+  if (v.id === "betriebsanweisung_biostoffe") return { ...d, taetigkeit: "Blutentnahme und Injektionen", biostoffe: "Krankheitserreger in Blut und Körperflüssigkeiten (z. B. Hepatitis-B-, Hepatitis-C-Virus, HIV)", schutzstufe: "2", nummer: "BA-B-01", gefahren: vorschlaegeVon("gefahren").split("\n").slice(0, 2).join("\n"), schutz: vorschlaegeVon("schutz"), unfall: vorschlaegeVon("unfall").split("\n").slice(0, 3).join("\n"), entsorgung: vorschlaegeVon("entsorgung"), vorsorge: "", beschraenkung: "", notruf: "Notruf 112 · Ersthelfer: Dr. Jonas Weber, Tel. 0151 9876543" };
+  if (v.id === "expositionsverzeichnis")
+    return { ...d, eintraege: [["Ole Holm", "Schleifen und Fräsen von Eiche und Buche", "Hartholzstaub (z. B. Eiche, Buche)", "unter 2 mg/m³ (Messung vom 12.03.2026)", "2019-08-01", "etwa 6 Stunden je Woche"], ["Finn Berger", "Zuschnitt an der Formatkreissäge", "Hartholzstaub (z. B. Eiche, Buche)", "unter 1 mg/m³ (Abschätzung nach TRGS 553)", "2024-09-01", "etwa 3 Stunden je Woche"], ["Kai Demir", "Motorlauf bei der Fehlersuche in der Halle", "Dieselmotoremissionen", "Absaugung am Auspuff; Abschätzung nach TRGS 554", "2025-01-15", "etwa 1 Stunde je Woche"]].map(([name, taetigkeit, stoff, hoehe, von, dauer]) => ({ name, taetigkeit, stoff, kategorie: "k", hoehe, von, bis: null, dauer })) };
+  return d;
+}
+
 /** Volle Daten: Pflicht- und Textfelder mittellang, Listen mit 12 Einträgen, Beträge fünfstellig. */
 function voll(v) {
-  return hygieneEintraege(v, { ...vollErzeugt(v), ...(REALISTISCH[v.id] ?? {}), ...(v.bereich === "gastro" ? lebensmittelVoll(v) : {}) });
+  return hygieneEintraege(v, arbeitsschutzVoll(v, { ...vollErzeugt(v), ...(REALISTISCH[v.id] ?? {}), ...(v.bereich === "gastro" ? lebensmittelVoll(v) : {}) }));
 }
 
 /**
@@ -149,6 +173,8 @@ function voll(v) {
  * Hygieneplan eines Lebensmittelbetriebs.
  */
 const EXTRA = {
+  // E-167: Unterweisung Gefahrstoffe – Hinweis zur Unterschrift über der Teilnahmeliste
+  unterweisung: [["voll-gefahrstoffe", (v) => ({ ...voll(v), thema: "Unterweisung Gefahrstoffe", themen: ["gefahrstoffe_inhalt_der_betriebsanweisun", "friseurchemikalien_faerbe_blondier_dauer", "hautschutz_hautschutzplan_richtige_schut"], ba_nummer: "BA-01, BA-02", verstaendnis: "Fragen zu den Inhalten", teilnehmer: [{ name: "Jana Becker" }, { name: "Lea Kim" }, { name: "Mehmet Aydın" }], unterschriften_papier: true })]],
   nachweis_arbeitsbedingungen: [["voll-textform", (v) => ({ ...voll(v), branche: "keine" })]],
   hygieneplan: [["voll-lebensmittel", (v) => hygieneEintraege(v, { ...voll(v), art: "lebensmittel", bereich: "Backstube, Theke und Gastraum", erstellt_von: "Mara Lindner" })], ["leer-lebensmittel", (v) => ({ ...F.leereDaten(v, B_LM, HEUTE), art: "lebensmittel" })]],
 };

@@ -1,19 +1,20 @@
 # Katalog D.48 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.aushangpflichtige_gesetze
-version: 1
+version: 2
 katalog_nr: D.48
 titel:
   de: Aushangpflichtige Gesetze aushängen
 kurz:
   de: Je nach Belegschaft hängst du bestimmte Gesetze im Betrieb aus, zum Beispiel ArbZG, AGG, MuSchG und JArbSchG.
 erklaerung:
-  de: Welche Gesetze auszuhängen sind, hängt von der Belegschaft ab. Amtlos stellt die Liste zusammen.
+  de: 'Welche Gesetze du aushängst, auslegst oder elektronisch zugänglich machst, hängt von der Belegschaft ab. Ab der ersten beschäftigten Person – das Arbeitszeitgesetz mit den geltenden Rechtsverordnungen, Tarifverträgen und Betriebsvereinbarungen (§ 16 Abs. 1 ArbZG) und das AGG mit § 61b ArbGG und der Angabe, wo die Beschwerdestelle ist (§ 12 Abs. 5 AGG). Bei regelmäßig mehr als drei beschäftigten Frauen das Mutterschutzgesetz (§ 26 MuSchG). Ab einer beschäftigten jugendlichen Person das Jugendarbeitsschutzgesetz mit der Anschrift der Aufsichtsbehörde (§ 47 JArbSchG), ab drei Jugendlichen zusätzlich Beginn und Ende der Arbeitszeit und der Pausen (§ 48 JArbSchG). Dazu machst du die Unfallverhütungsvorschriften deiner BG zugänglich (§ 12 DGUV Vorschrift 1) und hängst die Hinweise zur Ersten Hilfe mit Notruf und Ersthelfern aus (§ 24 Abs. 5 DGUV Vorschrift 1).'
 rechtsgrundlage:
-- ArbZG
-- AGG
-- MuSchG
-- JArbSchG
+- § 16 Abs. 1 ArbZG
+- § 12 Abs. 5 AGG
+- § 26 MuSchG
+- §§ 47, 48 JArbSchG
+- §§ 12, 24 Abs. 5 DGUV Vorschrift 1
 kategorie: personal
 ausloeser:
   feld: abgeleitet.hat_beschaeftigte
@@ -31,7 +32,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: Fehlt der Aushang des Arbeitszeitgesetzes, droht ein Bußgeld bis 5.000 € (§ 22 Abs. 1 Nr. 8, Abs. 2 ArbZG); für die übrigen Aushänge sind die Folgen noch nicht fachlich erfasst.
   schwere: niedrig
 automatisierung: hinweis
 aktion:
@@ -40,13 +41,22 @@ status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
 quellen:
-- titel: Arbeitszeitgesetz
-  url: https://www.gesetze-im-internet.de/arbzg/
-  abgerufen: null
+- titel: Arbeitszeitgesetz (§§ 16, 22)
+  url: https://www.gesetze-im-internet.de/arbzg/BJNR117100994.html
+  abgerufen: '2026-10-22'
+- titel: AGG § 12
+  url: https://www.gesetze-im-internet.de/agg/__12.html
+  abgerufen: '2026-10-22'
+- titel: Mutterschutzgesetz § 26
+  url: https://www.gesetze-im-internet.de/muschg_2018/__26.html
+  abgerufen: '2026-10-22'
+- titel: Jugendarbeitsschutzgesetz (§§ 47, 48)
+  url: https://www.gesetze-im-internet.de/jarbschg/BJNR009650976.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
+- 'Prüfergebnis Sifa 22.10.2026 umgesetzt (Liste je Belegschaft); abweichend vom Prüfergebnis gilt § 48 JArbSchG erst ab drei Jugendlichen (Wortlaut geprüft); Amtlos zeigt die Liste für alle, ohne nach Zahl der Frauen und Jugendlichen zu filtern'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Liste je Belegschaft (z. B. MuSchG ab wie vielen Frauen?) fachlich festlegen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- Folgen der übrigen Aushänge (AGG, MuSchG, JArbSchG) fachlich ergänzen
 pruefung:
   status: entwurf
   geprueft_von: null

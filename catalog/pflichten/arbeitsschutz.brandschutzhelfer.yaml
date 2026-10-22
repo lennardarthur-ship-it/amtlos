@@ -1,0 +1,55 @@
+# Prüfergebnis Sifa 22.10.2026 (C Fehlende Pflichten „Brandschutzhelfer“; C Katalog E.53/E.54): aus Erste Hilfe herausgelöst
+schema_version: 1
+id: arbeitsschutz.brandschutzhelfer
+version: 1
+katalog_nr: E.54
+titel:
+  de: Brandschutzhelfer benennen und ausbilden
+kurz:
+  de: Du benennst genug Beschäftigte als Brandschutzhelfer – in der Regel 5 Prozent – und lässt sie im Umgang mit Feuerlöschern ausbilden.
+erklaerung:
+  de: 'Eine ausreichende Zahl von Beschäftigten machst du durch Unterweisung und Übung mit dem Löschen von Entstehungsbränden vertraut (§ 10 Abs. 2 ArbSchG, § 22 Abs. 2 DGUV Vorschrift 1). Nach ASR A2.2 Abschnitt 7.3 ergibt sich die Zahl aus der Gefährdungsbeurteilung; ein Anteil von 5 Prozent der Beschäftigten reicht in der Regel. Mehr brauchst du bei erhöhter Brandgefährdung, vielen Personen oder großen Flächen; Schichtbetrieb, Urlaub und Krankheit planst du ein. Die Ausbildung besteht aus Theorie und einer praktischen Löschübung; empfohlen ist eine Auffrischung alle drei bis fünf Jahre (DGUV Information 205-023). In kleinen Betrieben bist oft du selbst die erste Brandschutzhelferin oder der erste Brandschutzhelfer.'
+rechtsgrundlage:
+- § 10 Abs. 2 ArbSchG
+- § 22 Abs. 2 DGUV Vorschrift 1
+- ASR A2.2 Abschnitt 7.3
+- DGUV Information 205-023
+kategorie: arbeitsschutz
+ausloeser:
+  feld: abgeleitet.hat_beschaeftigte
+  op: ==
+  wert: true
+  label:
+    de: Du beschäftigst mindestens eine Person.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Ausbildung z. B. bei Feuerwehr oder Brandschutzdienstleister
+kanal: partner
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: ASR A2.2 Maßnahmen gegen Brände (BAuA)
+  url: https://www.baua.de/DE/Angebote/Regelwerk/ASR/ASR-A2-2.html
+  abgerufen: null
+- titel: Haufe – Brandschutzhelfer (ASR A2.2 Abschnitt 7.3, 5 Prozent)
+  url: https://haufe.de/id/beitrag/brandschutzhelfer-HI2990068.html
+  abgerufen: '2026-10-22'
+- titel: DGUV Vorschrift 1 (UKBW, § 22)
+  url: https://www.ukbw.de/fileadmin/user_upload/Mediathek/UVV/DGUV_Vorschrift_1.pdf
+  abgerufen: '2026-10-22'
+fachlich_zu_pruefen:
+- 'Neu nach Prüfergebnis Sifa 22.10.2026 – Auffrischung alle drei bis fünf Jahre nur Empfehlung (DGUV Information 205-023, nicht abgerufen); Sanktion fachlich ergänzen (§ 22 DGUV Vorschrift 1 steht nicht in § 32)'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

@@ -42,6 +42,9 @@ export const KURZ: Record<string, string> = {
   unterweisung: "Nachweis, dass du dein Team über Sicherheit informiert hast.",
   gefahrstoffverzeichnis: "Liste aller gefährlichen Stoffe im Betrieb.",
   betriebsanweisung: "Aushang zum sicheren Umgang mit einem Gefahrstoff.",
+  betriebsanweisung_maschine: "Aushang zum sicheren Umgang mit einer Maschine.",
+  betriebsanweisung_biostoffe: "Aushang zum Schutz vor Infektionen, z. B. in Praxis und Kosmetik.",
+  expositionsverzeichnis: "Wer mit krebserzeugenden Stoffen wie Holzstaub oder Dieselabgasen arbeitet.",
   pruefprotokoll_elektro: "Prüfung der elektrischen Geräte im Betrieb.",
   impressum: "Pflichtangaben für deine Website.",
   gewerbeanmeldung: "Alle Angaben für die Anmeldung beim Gewerbeamt.",
@@ -74,9 +77,9 @@ export const ANLAESSE: Anlass[] = [
   { id: "steuern", titel: "Jahresabschluss und Steuern", text: "EÜR, Bilanz, Steuererklärung, Aufbewahrung", vorlagen: ["euer", "bilanz_guv", "steuererklaerung", "ust_voranmeldung", "oss_meldung", "zm_meldung", "aufbewahrung"] },
   { id: "website", titel: "Ich mache eine Website", text: "Impressum, Datenschutzerklärung, Verträge", vorlagen: ["impressum", "datenschutzerklaerung_website", "avv"] },
   { id: "datenschutz", titel: "Kundendaten und Datenschutz", text: "Verzeichnis, Info-Blatt, Verträge", vorlagen: ["datenschutz_dokumentation", "datenschutzinformation", "avv", "datenschutzerklaerung_website", "datenpanne", "schluesselquittung", "anamnese_einwilligung", "video_hinweisschild"] },
-  { id: "sicherheit", titel: "Sicherheit am Arbeitsplatz", text: "Gefahren, Unterweisung, Gefahrstoffe, Geräte", vorlagen: ["gefaehrdungsbeurteilung", "unterweisung", "betriebsanweisung", "gefahrstoffverzeichnis", "pruefprotokoll_elektro"] },
+  { id: "sicherheit", titel: "Sicherheit am Arbeitsplatz", text: "Gefahren, Unterweisung, Gefahrstoffe, Geräte", vorlagen: ["gefaehrdungsbeurteilung", "unterweisung", "betriebsanweisung", "betriebsanweisung_maschine", "betriebsanweisung_biostoffe", "gefahrstoffverzeichnis", "expositionsverzeichnis", "pruefprotokoll_elektro"] },
   { id: "gastro", titel: "Café, Restaurant, Lebensmittel", text: "Allergene, Eigenkontrollen, Hygiene", vorlagen: ["allergene", "haccp", "ifsg_belehrung"] },
-  { id: "beauty", titel: "Salon und Kosmetik", text: "Hautschutz, Hygiene, Gefahrstoffe", vorlagen: ["hautschutzplan", "hygieneplan", "anamnese_einwilligung", "gefaehrdungsbeurteilung", "gefahrstoffverzeichnis", "betriebsanweisung"] },
+  { id: "beauty", titel: "Salon und Kosmetik", text: "Hautschutz, Hygiene, Gefahrstoffe", vorlagen: ["hautschutzplan", "hygieneplan", "anamnese_einwilligung", "gefaehrdungsbeurteilung", "gefahrstoffverzeichnis", "betriebsanweisung", "betriebsanweisung_biostoffe"] },
   { id: "panne", titel: "Daten verloren oder gestohlen", text: "Datenpanne festhalten und melden", vorlagen: ["datenpanne"] },
 ];
 

@@ -1,0 +1,69 @@
+# Prüfergebnis Sifa 22.10.2026 (C Fehlende Pflichten „Unterweisung/Abstimmung Fremdfirmen und Arbeit beim Kunden“): § 8 ArbSchG, §§ 5, 6 DGUV V1
+schema_version: 1
+id: arbeitsschutz.fremdfirmen_abstimmung
+version: 1
+katalog_nr: E.51
+titel:
+  de: Arbeitsschutz mit Auftraggebern und anderen Firmen abstimmen
+kurz:
+  de: Arbeiten deine Beschäftigten beim Kunden oder zusammen mit anderen Firmen, stimmst du die Schutzmaßnahmen ab und unterweist sie zu den Gefahren vor Ort.
+erklaerung:
+  de: 'Arbeiten Beschäftigte mehrerer Arbeitgeber an einem Arbeitsplatz, arbeiten die Arbeitgeber zusammen, unterrichten sich gegenseitig über die Gefahren und stimmen die Schutzmaßnahmen ab (§ 8 Abs. 1 ArbSchG, § 6 DGUV Vorschrift 1). Ist es zur Vermeidung gegenseitiger Gefährdungen nötig, bestimmt ihr eine Person, die die Arbeiten aufeinander abstimmt. Arbeiten deine Leute in fremden Betrieben oder Wohnungen, lässt du dir die Gefahren vor Ort nennen und unterweist sie dazu (§ 8 Abs. 2 ArbSchG). Vergibst du selbst Aufträge an Fremdfirmen, gibst du ihnen die Sicherheitsanforderungen mit und hilfst bei deren Gefährdungsbeurteilung (§ 5 DGUV Vorschrift 1). Auf Baustellen kommen die Pflichten nach der Baustellenverordnung hinzu.'
+rechtsgrundlage:
+- § 8 ArbSchG
+- §§ 5, 6 DGUV Vorschrift 1
+kategorie: arbeitsschutz
+branchen:
+- handwerk
+- bau
+- gebaeudereinigung
+ausloeser:
+  all:
+  - feld: abgeleitet.hat_beschaeftigte
+    op: ==
+    wert: true
+    label:
+      de: Du beschäftigst mindestens eine Person.
+  - any:
+    - feld: profil.taetigkeit.branchen
+      op: enthaelt_eines
+      wert:
+      - handwerk
+      - bau
+      - gebaeudereinigung
+      label:
+        de: In deiner Branche arbeitet ihr oft beim Kunden oder zusammen mit anderen Firmen.
+    - feld: profil.vertrieb.kanaele
+      op: enthaelt
+      wert: vor_ort_beim_kunden
+      label:
+        de: Ihr arbeitet vor Ort bei Kundinnen und Kunden.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Auftraggeber und andere Arbeitgeber vor Ort
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Arbeitsschutzgesetz (§ 8)
+  url: https://www.gesetze-im-internet.de/arbschg/BJNR124610996.html
+  abgerufen: '2026-10-22'
+- titel: DGUV Vorschrift 1 (UKBW, §§ 5, 6)
+  url: https://www.ukbw.de/fileadmin/user_upload/Mediathek/UVV/DGUV_Vorschrift_1.pdf
+  abgerufen: '2026-10-22'
+fachlich_zu_pruefen:
+- 'Neu nach Prüfergebnis Sifa 22.10.2026 – § 8 ArbSchG und §§ 5, 6 DGUV Vorschrift 1 nicht unmittelbar bußgeldbewehrt (§§ 5, 6 nicht in § 32 DGUV V1); Unterweisungsthema „Arbeit beim Kunden“ in der Vorlage'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

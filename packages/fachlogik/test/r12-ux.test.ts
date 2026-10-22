@@ -90,8 +90,8 @@ describe("Rechnung R12", () => {
 describe("Vorlagen R12", () => {
   it("Gefährdungen und Unterweisung für Werkstatt, Bäckerei und Kurier (Kfz #3, Bäckerei #6, Kurier #9/#10)", () => {
     const gb = (v("gefaehrdungsbeurteilung").abschnitte.flatMap((a) => a.felder).find((x) => x.id === "gefaehrdungen") as ListenFeld).vorschlaege!;
-    for (const [gruppe, n] of [["Kfz-Werkstatt", 8], ["Bäckerei", 4], ["Transport / Kurier", 8]] as const) expect(gb.filter((x) => x.gruppe === gruppe).length, gruppe).toBe(n);
-    expect(gb.find((x) => x.titel.startsWith("Abgase von Dieselmotoren"))!.quelle).toBe("TRGS 554");
+    for (const [gruppe, n] of [["Kfz-Werkstatt", 12], ["Bäckerei", 6], ["Transport / Kurier", 10]] as const) expect(gb.filter((x) => x.gruppe === gruppe).length, gruppe).toBe(n);
+    expect(gb.find((x) => x.titel.startsWith("Abgase von Dieselmotoren"))!.quelle).toBe("TRGS 554; § 10a GefStoffV");
     expect(gb.filter((x) => x.gruppe === "Kfz-Werkstatt").some((x) => /fachlich zu prüfen/.test(x.quelle ?? ""))).toBe(true);
     const themen = (v("unterweisung").abschnitte.flatMap((a) => a.felder).find((x) => x.id === "themen") as { optionen: { wert: string; gruppen?: string[] }[] }).optionen;
     expect(themen.filter((t) => t.gruppen?.includes("transport")).map((t) => t.wert)).toContain("fahrer_eignung");

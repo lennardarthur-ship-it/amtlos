@@ -247,7 +247,7 @@ export interface Vorlage {
    * Branchen nach § 2a SchwarzArbG, sonst Textform). Die App zeigt den Text als Kasten am Anfang des Ablaufs und im
    * Abschluss vor dem Teilen. `offen`: die Angabe, die die Form bestimmt, fehlt noch.
    */
-  formHinweis?(daten: Daten): { form: "schrift" | "text" | "offen"; text: string } | null;
+  formHinweis?(daten: Daten): { form: "schrift" | "text" | "offen" | "unterschrift"; text: string } | null;
   /** Meldung aus `pruefen` → Feld, bei dem man sie behebt (für „Ergänzen“ im Abschluss) */
   pruefenZu?: Record<string, string>;
   /** Reiner Text zum Kopieren, z. B. für die Website */

@@ -466,8 +466,8 @@ export function standBauen(): Bau {
       gefaehrdungen: [
         ...vorschlaegeGruppe("gefaehrdungsbeurteilung", "gefaehrdungen", "Friseur", h, { verantwortlich: "Chris Sonnberg", umsetzen_bis: "2026-03-31", umgesetzt_am: "2026-03-15" }),
         ...eintraege("gefaehrdungsbeurteilung", "gefaehrdungen", [
-          { beschreibung: "Jugendlicher Auszubildender (17 Jahre): Umgang mit Gefahrstoffen (Färbe-, Blondier-, Dauerwellmittel) nur, soweit für das Ausbildungsziel erforderlich und unter Aufsicht (§ 22 JArbSchG); Arbeitszeitgrenzen (§§ 8, 14, 15 JArbSchG).", massnahme: "Färben und Blondieren nur unter Aufsicht einer Fachkraft; keine Arbeit nach 20 Uhr, 5-Tage-Woche, Berufsschultage anrechnen; halbjährliche Unterweisung (§ 29 JArbSchG); Erstuntersuchung und Nachuntersuchung (§§ 32, 33 JArbSchG) im Personalordner.", risiko: "mittel", faktor: "qualifikation", verantwortlich: "Chris Sonnberg", umsetzen_bis: "2026-03-31", umgesetzt_am: "2026-02-10" },
-          { beschreibung: "Styling bei Kunden vor Ort (Hotel, Fotostudio): fremde Arbeitsplätze, Transport von Koffern und Geräten, Stolperstellen durch Kabel, ungeprüfte Steckdosen.", massnahme: "Rollkoffer statt Tragen; eigene geprüfte Verlängerung mit FI-Adapter; Kabel abkleben; Arbeitsplatz vor Ort vorher besprechen.", risiko: "gering", faktor: "arbeitsstaette", verantwortlich: "Alex Sonnberg", umsetzen_bis: "2026-03-31", umgesetzt_am: "2026-03-01" },
+          { beschreibung: "Jugendlicher Auszubildender (17 Jahre): Umgang mit Gefahrstoffen (Färbe-, Blondier-, Dauerwellmittel) nur, soweit für das Ausbildungsziel erforderlich und unter Aufsicht (§ 22 JArbSchG); Arbeitszeitgrenzen (§§ 8, 14, 15 JArbSchG).", massnahme: "Färben und Blondieren nur unter Aufsicht einer Fachkraft; keine Arbeit nach 20 Uhr, 5-Tage-Woche, Berufsschultage anrechnen; halbjährliche Unterweisung (§ 29 JArbSchG); Erstuntersuchung und Nachuntersuchung (§§ 32, 33 JArbSchG) im Personalordner.", schwere: "mittel", wahrscheinlichkeit: "moeglich", faktor: "qualifikation", verantwortlich: "Chris Sonnberg", umsetzen_bis: "2026-03-31", umgesetzt_am: "2026-02-10" },
+          { beschreibung: "Styling bei Kunden vor Ort (Hotel, Fotostudio): fremde Arbeitsplätze, Transport von Koffern und Geräten, Stolperstellen durch Kabel, ungeprüfte Steckdosen.", massnahme: "Rollkoffer statt Tragen; eigene geprüfte Verlängerung mit FI-Adapter; Kabel abkleben; Arbeitsplatz vor Ort vorher besprechen.", schwere: "leicht", wahrscheinlichkeit: "moeglich", faktor: "arbeitsstaette", verantwortlich: "Alex Sonnberg", umsetzen_bis: "2026-03-31", umgesetzt_am: "2026-03-01" },
         ], h),
       ],
       mutterschutz_ergebnis: "umgestaltung", mutterschutz_details: "Kein Umgang mit Blondier- und Dauerwellmitteln sowie keine Tätigkeiten mit Stoffen, die als sensibilisierend (H317, H334) eingestuft sind; Färben nur mit Handschuhen und Absaugung im Farbraum nach Einzelfallprüfung; Sitzgelegenheit und zusätzliche Pausen; kein Styling-Einsatz außer Haus mit schwerem Gepäck.",
@@ -630,6 +630,12 @@ export function standBauen(): Bau {
     // StB-Prüfung (5.2, C-9): OSS-Erklärung und Zusammenfassende Meldung (Übertragungshilfen, neu)
     { id: "oss_meldung", titel: v("oss_meldung").titel, grund: "Keine Fernverkäufe bzw. Leistungen an Privatpersonen im EU-Ausland – kein OSS-Verfahren." },
     { id: "zm_meldung", titel: v("zm_meldung").titel, grund: "Keine innergemeinschaftlichen Lieferungen oder Leistungen an Unternehmen im EU-Ausland." },
+  );
+  // E-167 (Sifa-Durchsicht): neue Vorlagen Betriebsanweisung Maschinen und Biostoffe, Expositionsverzeichnis
+  uebersprungen.push(
+    { id: "betriebsanweisung_maschine", titel: v("betriebsanweisung_maschine").titel, grund: "Föhne, Glätteisen und Trockenhauben werden nach der Betriebsanleitung benutzt; eine eigene Betriebsanweisung ist im Szenario nicht erstellt (Pflichten-Check nennt sie – siehe Auffälligkeiten)." },
+    { id: "betriebsanweisung_biostoffe", titel: v("betriebsanweisung_biostoffe").titel, grund: "Friseurtätigkeiten ohne Behandlungen mit Blutkontakt – Hygiene über den Hygieneplan; ob eine Betriebsanweisung Biostoffe nötig ist, klärt die Gefährdungsbeurteilung (Pflichten-Check nennt sie – siehe Auffälligkeiten)." },
+    { id: "expositionsverzeichnis", titel: v("expositionsverzeichnis").titel, grund: "Keine Gefahrstoffe der Kategorie 1A/1B im Gefahrstoffverzeichnis des Salons (Pflichten-Check nennt das Verzeichnis – siehe Auffälligkeiten)." },
   );
   const genutzt = new Set(docs.map((d) => d.vorlage));
   for (const vl of VORLAGEN) if (!genutzt.has(vl.id) && !uebersprungen.some((u) => u.id === vl.id)) auffaellig.push(`Vorlage ${vl.id} weder erzeugt noch als übersprungen begründet.`);

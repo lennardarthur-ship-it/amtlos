@@ -1,40 +1,37 @@
 # R11 (Nutzertest Tischlerei Befund 6): Prüfung von Arbeitsmitteln nach § 14 BetrSichV – Maschinen, Leitern, Absauganlagen
+# Prüfergebnis Sifa 22.10.2026 (C Katalog E.53, C Fehlende Pflichten „Prüfung Leitern/Tritte, Regale“): Auslöser auf alle Betriebe mit Beschäftigten erweitert
 schema_version: 1
 id: arbeitsschutz.arbeitsmittel_pruefen
-version: 3
+version: 4
 katalog_nr: E.53
 titel:
   de: Arbeitsmittel prüfen lassen
 kurz:
-  de: Maschinen, Leitern, Hebebühnen, Druckbehälter und andere Arbeitsmittel lässt du regelmäßig durch eine befähigte Person prüfen und hältst das fest.
+  de: Leitern, Tritte, Regale, Maschinen, Hebebühnen, Druckbehälter und andere Arbeitsmittel lässt du regelmäßig durch eine befähigte Person prüfen und hältst das fest.
 erklaerung:
-  de: 'Arbeitsmittel, deren Sicherheit von der Montage oder vom Zustand abhängt, lässt du vor der ersten Verwendung und danach wiederkehrend von einer zur Prüfung befähigten Person prüfen (§ 14 BetrSichV). Art, Umfang und Abstände der Prüfungen legst du in der Gefährdungsbeurteilung fest (§ 3 Abs. 6 BetrSichV). Die Ergebnisse dokumentierst du. In Kfz-Werkstätten gehören Hebebühnen dazu: Sie werden vor der ersten Inbetriebnahme und danach in der Regel jährlich von einer befähigten Person geprüft (§ 14 BetrSichV, DGUV Grundsatz 308-002). Druckbehälter wie der Druckluftbehälter eines Kompressors werden nach §§ 15, 16 und Anhang 2 Abschnitt 4 BetrSichV geprüft – ab bestimmten Größen durch eine zugelassene Überwachungsstelle. Elektrische Geräte haben eine eigene Pflicht.'
+  de: 'Arbeitsmittel gibt es in fast jedem Betrieb: Leitern und Tritte, Lagerregale, Aufschnitt- und Knetmaschinen, Hebebühnen und Hubgeräte, Kompressoren, Druckluftgeräte und Getränkeschankanlagen. Arbeitsmittel, deren Sicherheit von der Montage abhängt, lässt du vor der ersten Verwendung prüfen; Arbeitsmittel, die schädigenden Einflüssen ausgesetzt sind, prüft eine zur Prüfung befähigte Person wiederkehrend (§ 14 BetrSichV). Art, Umfang und Abstände der Prüfungen legst du in der Gefährdungsbeurteilung fest (§ 3 Abs. 6 BetrSichV); die Ergebnisse zeichnest du auf und bewahrst sie auf (§ 14 Abs. 7 BetrSichV). Für Leitern und Tritte hilft die DGUV Information 208-016, für Lagerregale die DIN EN 15635 (Sichtkontrollen und jährliche Inspektion durch eine fachkundige Person). In Kfz-Werkstätten gehören Hebebühnen dazu: Sie werden vor der ersten Inbetriebnahme und danach in der Regel jährlich geprüft (DGUV Grundsatz 308-002). Druckbehälter wie der Druckluftbehälter eines Kompressors werden nach §§ 15, 16 und Anhang 2 Abschnitt 4 BetrSichV geprüft – ab bestimmten Größen durch eine zugelassene Überwachungsstelle. Firmenfahrzeuge (DGUV Vorschrift 70) und elektrische Geräte (DGUV Vorschrift 3) haben eigene Pflichten.'
 rechtsgrundlage:
 - § 3 Abs. 6 BetrSichV
 - § 14 BetrSichV
 - §§ 15, 16 BetrSichV
 - Anhang 2 Abschnitt 4 BetrSichV
 - DGUV Grundsatz 308-002
+- DGUV Information 208-016
+- DIN EN 15635
 kategorie: arbeitsschutz
 branchen:
 - handwerk
 - bau
 - gebaeudereinigung
+- gastronomie_lebensmittel
+- onlinehandel
+- transport_logistik
 ausloeser:
-  all:
-  - feld: abgeleitet.hat_beschaeftigte
-    op: ==
-    wert: true
-    label:
-      de: Du beschäftigst mindestens eine Person.
-  - feld: profil.taetigkeit.branchen
-    op: enthaelt_eines
-    wert:
-    - handwerk
-    - bau
-    - gebaeudereinigung
-    label:
-      de: In deiner Branche arbeitet ihr mit Maschinen, Leitern oder anderen prüfpflichtigen Arbeitsmitteln.
+  feld: abgeleitet.hat_beschaeftigte
+  op: ==
+  wert: true
+  label:
+    de: Du beschäftigst mindestens eine Person – Leitern, Regale, Maschinen oder andere prüfpflichtige Arbeitsmittel gibt es in fast jedem Betrieb.
 frist:
   typ: dauerhaft
 wiederholung:
@@ -45,32 +42,34 @@ kanal: partner
 kosten: null
 sanktion:
   text:
-    de: Bußgeld bis 5.000 €, wenn ein Arbeitsmittel nicht oder nicht rechtzeitig geprüft wird (§ 22 Abs. 1 Nr. 28 BetrSichV in Verbindung mit § 25 Abs. 1 Nr. 1, Abs. 2 ArbSchG).
+    de: Bußgeld bis 5.000 €, wenn ein Arbeitsmittel nicht oder nicht rechtzeitig geprüft wird oder das Ergebnis nicht aufgezeichnet wird (§ 22 Abs. 1 Nr. 28, 30 BetrSichV in Verbindung mit § 25 Abs. 1 Nr. 1, Abs. 2 ArbSchG).
   schwere: hoch
 automatisierung: hinweis
 erledigung:
   art: laufend
   zeitraum: jahr
+aenderungsnotiz:
+  de: Gilt jetzt für alle Betriebe mit Beschäftigten – auch Leitern, Tritte und Regale sind zu prüfen.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
 quellen:
+- titel: Betriebssicherheitsverordnung (§§ 3, 12, 14, 22)
+  url: https://www.gesetze-im-internet.de/betrsichv_2015/BJNR004910015.html
+  abgerufen: '2026-10-22'
 - titel: Betriebssicherheitsverordnung § 14
   url: https://www.gesetze-im-internet.de/betrsichv_2015/__14.html
   abgerufen: null
 - titel: BetrSichV § 22
   url: https://www.gesetze-im-internet.de/betrsichv_2015/__22.html
   abgerufen: '2026-10-21'
-- titel: ArbSchG § 25
-  url: https://www.gesetze-im-internet.de/arbschg/__25.html
-  abgerufen: null
+- titel: Arbeitsschutzgesetz (§ 25)
+  url: https://www.gesetze-im-internet.de/arbschg/BJNR124610996.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'R12 (Nutzertest Kfz #4): Hebebühnen (jährlich, DGUV Grundsatz 308-002) und Druckbehälter (§§ 15, 16 und Anhang 2 Abschnitt 4 BetrSichV) ergänzt – Schwellen (Druck × Volumen) für die zugelassene Überwachungsstelle unsicher; Prüfprotokoll mit Prüfbuch als Vorlage fehlt'
-- Fahrzeuge (DGUV Vorschrift 70 § 57) als eigene Pflicht arbeitsschutz.fahrzeuge_pruefen (R12); Lärm (LärmVibrationsArbSchV) offen
-- Neu nach Nutzertest R11 (Tischlerei) – Auslöser über die Branche (Handwerk, Bau, Gebäudereinigung); auch für andere Betriebe mit Leitern oder Maschinen?
+- 'Prüfergebnis Sifa 22.10.2026 (offen): Schwellen (Druck × Volumen) nach Anhang 2 Abschnitt 4 BetrSichV, ab denen eine zugelassene Überwachungsstelle prüft, durch einen Sachverständigen bestätigen lassen; Prüfprotokoll mit Prüfbuch als Vorlage fehlt'
+- Lärm (LärmVibrationsArbSchV) als eigene Pflicht arbeitsschutz.laerm (Prüfergebnis Sifa 22.10.2026)
 - Prüffristen kommen aus der Gefährdungsbeurteilung – als „laufend je Jahr“ abgebildet; Prüfprotokoll-Vorlage fehlt
-- Folgen bei Nichterfüllung (§ 22 BetrSichV) – Sanktion fachlich ergänzen
-- 'Vorprüfung 21.10.2026: Sanktion ergänzt – § 22 Abs. 1 Nr. 28 BetrSichV gelesen; Betrag nach § 25 Abs. 2 ArbSchG wie in arbeitsschutz.gefaehrdungsbeurteilung, nicht erneut abgerufen'
 pruefung:
   status: entwurf
   geprueft_von: null

@@ -803,6 +803,16 @@ table.liste.raster tbody.geraet { page-break-inside: avoid; break-inside: avoid;
 .g-aushang.ba .kasten.stoff .inhalt > div { flex: 1; }
 .g-aushang.ba .kasten.stoff .inhalt dt { font-size: 7.6pt; color: #4a535c; margin-bottom: 0.6mm; }
 .g-aushang.ba .kasten.stoff .inhalt dd { margin: 0; font-weight: 600; font-size: 11pt; }
+.g-aushang.ba .kasten.stoff .inhalt.ghs-zeile { border-top: 0.6pt solid #d5d9dd; padding-top: 1.8mm; }
+.g-aushang.ba .kasten.stoff .inhalt.ghs-zeile > div { flex: 0 0 34mm; }
+.g-aushang.ba .kasten.stoff .inhalt.ghs-zeile > div.breit { flex: 1; }
+.g-aushang.ba .kasten.stoff .inhalt.ghs-zeile dd { font-size: 9.6pt; font-weight: 400; }
+.g-aushang.ba .kasten.stoff .inhalt.ghs-zeile dd b { font-size: 11pt; }
+.ghs-eintrag { display: inline-flex; align-items: center; gap: 2mm; margin: 0 4mm 1mm 0; white-space: nowrap; }
+.ghs { display: inline-flex; align-items: center; justify-content: center; width: 5.2mm; height: 5.2mm; margin: 1.2mm; border: 1.3pt solid #c8102e; background: #fff; transform: rotate(45deg); }
+.ghs span { transform: rotate(-45deg); font-size: 5.6pt; font-weight: 700; color: #1a1f24; }
+table.risikomatrix td, table.risikomatrix th { text-align: center; }
+table.risikomatrix td:first-child, table.risikomatrix th:first-child { text-align: left; }
 .g-aushang.ba .notruf { margin-top: 2mm; padding: 2mm 4mm; border: 1.2pt solid #1a1f24; font-weight: 700; font-size: 11pt; }
 .g-aushang .unterschriften { margin-top: 8mm; }
 .g-aushang.ba .unterschriften { margin-top: 4mm; }

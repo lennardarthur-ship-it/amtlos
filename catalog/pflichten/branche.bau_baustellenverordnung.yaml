@@ -1,17 +1,17 @@
-# Katalog H.4 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog H.4 · Startbestand aus Spezifikation Abschnitt 4 (E-054); Prüfergebnis Sifa 22.10.2026 (C Katalog H.4): Rolle Bauherr ↔ Auftragnehmer
 schema_version: 1
 id: branche.bau_baustellenverordnung
-version: 1
+version: 2
 katalog_nr: H.4
 titel:
   de: Baustellenverordnung beachten
 kurz:
-  de: Auf Baustellen gelten zusätzliche Pflichten zum Arbeitsschutz, etwa Vorankündigung, Koordination und Sicherheitsplan.
+  de: Auf Baustellen beachtest du als ausführende Firma die Hinweise des Koordinators und den Sicherheits- und Gesundheitsschutzplan; Vorankündigung, Plan und Koordinator sind Sache des Bauherrn.
 erklaerung:
-  de: Welche Pflichten greifen, hängt von Größe und Dauer der Baustelle und der Zahl der beteiligten Firmen ab; meist trifft
-    sie den Bauherrn.
+  de: 'Die Baustellenverordnung verteilt die Pflichten nach Rollen. Der Bauherr kündigt größere Baustellen mindestens zwei Wochen vor Einrichtung der Behörde an – bei mehr als 30 Arbeitstagen mit mehr als 20 gleichzeitig Beschäftigten oder mehr als 500 Personentagen (§ 2 Abs. 2 BaustellV) –, lässt einen Sicherheits- und Gesundheitsschutzplan (SiGe-Plan) erstellen, wenn mehrere Arbeitgeber tätig sind und eine Vorankündigung nötig ist oder besonders gefährliche Arbeiten anfallen (§ 2 Abs. 3), und bestellt bei mehreren Arbeitgebern einen Koordinator (§ 3 Abs. 1). Als ausführende Firma triffst du die Schutzmaßnahmen für deine Arbeiten, berücksichtigst die Hinweise des Koordinators und den SiGe-Plan und informierst deine Beschäftigten darüber (§ 5 BaustellV). Baust du selbst als Bauherr, etwa die eigene Halle, treffen die Pflichten nach §§ 2 und 3 dich.'
 rechtsgrundlage:
-- BaustellV
+- § 5 BaustellV
+- §§ 2, 3 BaustellV (Bauherr)
 kategorie: branche
 branchen:
 - bau
@@ -26,7 +26,7 @@ frist:
 wiederholung:
   art: einmalig
 stelle:
-  de: Bauherr bzw. Koordinator
+  de: Du selbst; Bauherr und Koordinator
 kanal: intern_dokumentieren
 kosten: null
 sanktion:
@@ -37,15 +37,14 @@ automatisierung: hinweis
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
+aenderungsnotiz:
+  de: Rollen geklärt – Vorankündigung, SiGe-Plan und Koordinator sind Bauherrenpflichten.
 quellen:
 - titel: Baustellenverordnung
-  url: https://www.gesetze-im-internet.de/baustellv/
-  abgerufen: null
+  url: https://www.gesetze-im-internet.de/baustellv/BJNR128300998.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Schwellen (Dauer, Beschäftigte) nicht in der Spezifikation
-- Rolle des Betriebs (Bauherr ↔ Auftragnehmer)
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
+- 'Prüfergebnis Sifa 22.10.2026 umgesetzt (Bauherrenpflichten §§ 2, 3; Auftragnehmer § 5 BaustellV) – Bußgeld nach § 7 BaustellV betrifft nur Vorankündigung und SiGe-Plan (Bauherr); Folgen für ausführende Firmen fachlich ergänzen'
 pruefung:
   status: entwurf
   geprueft_von: null

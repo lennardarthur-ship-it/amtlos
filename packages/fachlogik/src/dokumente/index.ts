@@ -1,5 +1,6 @@
 /** Dokumentvorlagen (E-121): Verzeichnis und Hilfen für Formulare. */
-import { betriebsanweisung, elektroPruefung, gefaehrdungsbeurteilung, gefahrstoffverzeichnis, unterweisung } from "./arbeitsschutz.js";
+import { betriebsanweisung, elektroPruefung, expositionsverzeichnis, gefaehrdungsbeurteilung, gefahrstoffverzeichnis, unterweisung } from "./arbeitsschutz.js";
+import { betriebsanweisungBiostoffe, betriebsanweisungMaschine } from "./betriebsanweisungen.js";
 import { gewerbeanmeldung, handelsregister, transparenzregister } from "./betrieb.js";
 import { aufbewahrung, bilanzGuv, euer, kassenbuch, kassenmeldung, rechnung, steuererklaerung, ustVoranmeldung } from "./buchhaltung.js";
 import { arbeitszeitnachweis, lohnkonto, svMeldedaten } from "./lohn.js";
@@ -14,7 +15,11 @@ import { GESTALT_MARKE, GRUNDLAGE_MARKE, RAENDER, RAENDER_MARKE, SEITE_MARKE, ce
 import type { Bereich, Betrieb, Daten, EinfachesFeld, Eintrag, Feld, Option, Vorlage, Vorschlag } from "./typen.js";
 
 export * from "./typen.js";
-export { ALLERGENE, DATENPANNE_RISIKO, GEFAEHRDUNGSFAKTOREN, RISIKO_STUFEN, SCHUTZZIELE } from "./konstanten.js";
+export { ALLERGENE, DATENPANNE_RISIKO, GEFAEHRDUNGSFAKTOREN, HANDLUNGSBEDARF, RISIKO_MATRIX, RISIKO_STUFEN, SCHUTZZIELE, SCHWERE, SONSTIGE_UNTERPUNKTE, WAHRSCHEINLICHKEIT, risikoAus } from "./konstanten.js";
+// E-167 (Sifa-Durchsicht Arbeitsschutz)
+export { ELEKTRO_GRENZWERTE, EXPO_HINWEIS, GHS, PRUEF_VORSCHLAEGE, RISIKO_SKALA, UNTERSCHRIFT_FEHLT, UNTERSCHRIFT_TEXT, UNTERSCHRIFT_THEMEN, mitUnterschriftPflicht, naechstePruefung, risikoEintrag } from "./arbeitsschutz.js";
+export { HAUTSCHUTZ_WEITERE } from "./branchen.js";
+export { SIFA_PRUEFUNG, type SifaEintrag } from "./sifa.js";
 export { HAUSFARBEN, PRUEFHINWEIS, RAENDER, akzent, fussSpalten, type Gestalt } from "./html.js";
 export { BUNDESLAENDER, aufsichtFuer, berlinZuUtc } from "./datenschutz.js";
 export { NACHWG_AUSSCHLUSSFRIST_BEISPIEL, NACHWG_AUSSCHLUSSFRIST_UEBERSTUNDEN, NACHWG_SCHRIFTFORM_HINWEIS, NACHWG_SCHRIFTFORM_PDF, mindestlohnAm, mindesturlaub, minijobGrenzeAm, stundenlohn } from "./personal.js";
@@ -81,6 +86,10 @@ export const VORLAGEN: Vorlage[] = [
   unterweisung,
   gefahrstoffverzeichnis,
   betriebsanweisung,
+  // E-167 (Sifa-Durchsicht): Betriebsanweisungen für Maschinen und Biostoffe, Expositionsverzeichnis
+  betriebsanweisungMaschine,
+  betriebsanweisungBiostoffe,
+  expositionsverzeichnis,
   elektroPruefung,
   // Betrieb, Register, Website
   impressum,
