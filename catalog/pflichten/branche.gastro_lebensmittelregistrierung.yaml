@@ -1,7 +1,7 @@
 # Katalog H.1 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.gastro_lebensmittelregistrierung
-version: 5
+version: 6
 katalog_nr: H.1
 titel:
   de: Bei der Lebensmittelüberwachung registrieren
@@ -36,12 +36,12 @@ wiederholung:
   neu_ausloesen_bei:
   - fakt: profil.betriebsstaetten.anzahl
 stelle:
-  de: Lebensmittelüberwachung des Kreises bzw. der Stadt
+  de: Lebensmittelüberwachung bzw. Veterinäramt deines Kreises oder deiner Stadt
 kanal: post
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Keine eigene Bußgeldvorschrift (Art. 6 VO (EG) Nr. 852/2004 fehlt in der LMRStV). Die Lebensmittelüberwachung kann den Betrieb bis zur Registrierung beanstanden und Maßnahmen anordnen (§ 39 LFGB).'
   schwere: mittel
 dringend_ohne_termin: true
 automatisierung: hinweis
@@ -52,15 +52,17 @@ quellen:
 - titel: Verordnung (EG) Nr. 852/2004
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32004R0852
   abgerufen: null
+- titel: Lebensmittelrechtliche Straf- und Bußgeldverordnung § 2 (Wortlaut über lxgesetze)
+  url: https://lxgesetze.de/lmrstv/2
+  abgerufen: '2026-10-22'
+- titel: Lebensmittel- und Futtermittelgesetzbuch § 39 (Wortlaut über lxgesetze)
+  url: https://lxgesetze.de/lfgb/39
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'R12 (Nutzertest Bäckerei #5): je Betrieb; neue Betriebsstätte über die Zahl der Betriebsstätten (neu_ausloesen_bei) – Filialen als eigene Objekte fehlen in der App'
-- Frist „vor Beginn“ nach Rechtsprüfung R11 (Befund 13); laut Nutzertest nennt Art. 6 keinen Zeitpunkt – Termin vor dem Start bestätigen
-- 'Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Frage 12, ✔): Auslöser und Text richtig, „vor Beginn“ ist Praxis; Foodtruck: zuständig ist die Behörde am Betriebssitz (Standort des Fahrzeugs bzw. Wohnsitz), nicht am Verkaufsplatz – ergänzt; Zulassung nach Art. 4 VO (EG) Nr. 853/2004 als Hinweis so belassen; Ablage der Registrierungsbestätigung (Frage 15) ergänzt – Bericht noch nicht unterschrieben'
-- Zulassung nach Art. 4 VO (EG) Nr. 853/2004 nur als Hinweis (Eigenherstellung tierischer Erzeugnisse)
-- Zuständigkeit je Land
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
-- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
+- 'Rückmeldung Lebensmittel (Tim Baum, 22.10.2026, ändern): Folgen bei Verstoß übernommen (§ 2 LMRStV ohne Art. 6 VO (EG) Nr. 852/2004 und § 39 LFGB am 22.10.2026 gelesen); Frist „vor Beginn“ fachlich bestätigt (Art. 6 Abs. 2: Meldung jedes Betriebs vor Aufnahme der Tätigkeit); Zuständigkeit als „Lebensmittelüberwachung bzw. Veterinäramt deines Kreises oder deiner Stadt“'
+- 'Schwere „mittel“ belassen – keine eigene Bußgeldvorschrift; T. Baum hat zur Schwere nichts angegeben'
+- 'Zulassung nach Art. 4 VO (EG) Nr. 853/2004 nur als Hinweis (Eigenherstellung tierischer Erzeugnisse)'
 pruefung:
   status: entwurf
   geprueft_von: null

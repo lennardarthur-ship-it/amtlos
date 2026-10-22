@@ -1,7 +1,7 @@
 # Katalog H.1 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.gastro_haccp
-version: 5
+version: 6
 katalog_nr: H.1
 titel:
   de: Eigenkontrollen nach HACCP
@@ -45,15 +45,14 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: mittel
-dringend_ohne_termin: true
+    de: 'Keine eigene Bußgeldvorschrift (der Tatbestand fehlt in der LMRStV, die für VO (EG) Nr. 852/2004 nur Art. 4 mit Anhang I/II bewehrt). Die Lebensmittelüberwachung kann die nötigen Maßnahmen anordnen (§ 39 LFGB; Art. 138 VO (EU) 2017/625). Hygienemängel nach Anhang II (z. B. Lagerung, Reinigung, Abfall) sind dagegen bußgeldbewehrt (§ 2 LMRStV i. V. m. § 60 Abs. 4 Nr. 2 Buchst. a LFGB).'
+  schwere: hoch
 automatisierung: dokument_generator
 erledigung:
   art: laufend
   zeitraum: monat
 aenderungsnotiz:
-  de: 'Die Vorlage enthält jetzt Gefahrenanalyse, kritische Kontrollpunkte, Verifizierung und Dokumentation (22.10.2026). Die Eigenkontrollen bleiben eine laufende Pflicht – ein Kontrollprotokoll erledigt sie nur für seinen Monat.'
+  de: 'Nach der fachlichen Prüfung Lebensmittelhygiene (22.10.2026): Die Folgen bei Verstößen sind jetzt erfasst. Die Eigenkontrollen bleiben eine laufende Pflicht – ein Kontrollprotokoll erledigt sie nur für seinen Monat.'
 aktion:
   art: link
   ziel: app.eigenkontrollen
@@ -76,16 +75,23 @@ quellen:
 - titel: BGN – Leitlinie für eine gute Lebensmittelhygienepraxis in ortsveränderlichen Betriebsstätten (2018)
   url: https://bgn-branchenwissen.de/praxishilfen-von-a-z/foodtrucks/lebensmittelhygienepraxis.pdf
   abgerufen: '2026-10-22'
+- titel: Lebensmittelrechtliche Straf- und Bußgeldverordnung § 2 (Wortlaut über lxgesetze)
+  url: https://lxgesetze.de/lmrstv/2
+  abgerufen: '2026-10-22'
+- titel: Lebensmittel- und Futtermittelgesetzbuch § 60 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/lfgb/__60.html
+  abgerufen: '2026-10-22'
+- titel: Lebensmittel- und Futtermittelgesetzbuch § 39 (Wortlaut über lxgesetze)
+  url: https://lxgesetze.de/lfgb/39
+  abgerufen: '2026-10-22'
+- titel: Verordnung (EU) 2017/625, Artikel 138 (Wortlaut über gesetze.legal)
+  url: https://gesetze.legal/eu/vo_eu_2017_625/138
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Grenzwerte (z. B. Kühltemperaturen) und Kontrollhäufigkeit nicht in der Spezifikation – Betrieb legt sie fest; Vorschläge
-  fachlich ergänzen
-- 'Leitlinien je Branchengruppe (Prüfbericht Lebensmittelhygiene, Tim Baum, 22.10.2026, Frage 1): Liste des Lebensmittelverbands (Stand 7/2026) und BGN-Leitlinie verlinkt; DEHOGA- und Bäckerhandwerk-Leitlinie nur mit Titel – kein frei abrufbarer Link geprüft (laut Liste Bezug über DEHOGA-Shop bzw. Zentralverband)'
-- 'Fettabscheider, Wartung Kühlgeräte, Eichung Waagen nur als Hinweis (Prüfbericht Frage 15: „Hinweis genügt“); Fundstellen (Abwassersatzung, Eichrecht) nicht geprüft'
-- 'E-166: Vorlage um Gefahrenanalyse, CCP-Entscheidung (Entscheidungsbaum nach Codex CXC 1-1969, Fassung 2023), Verifizierung und Dokumentation ergänzt – Umfang für kleine Betriebe im Rahmen der Flexibilität (Bekanntmachung 2022/C 355/01, Anhang II nur auszugsweise gelesen) fachlich bestätigen'
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
-- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
+- 'Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen'
+- 'Grenzwerte (z. B. Kühltemperaturen) und Kontrollhäufigkeit nicht in der Spezifikation – Betrieb legt sie fest; Vorschläge fachlich ergänzen'
+- 'Rückmeldung Lebensmittel (Tim Baum, 22.10.2026, ändern): Folgen bei Verstoß übernommen und Schwere wieder „hoch“ – § 2 LMRStV (Art. 4 Abs. 1, 2 mit Anhang I Teil A und einzelnen Nummern aus Anhang II VO (EG) Nr. 852/2004; kein Art. 5), § 60 Abs. 4 Nr. 2 Buchst. a, Abs. 5 LFGB, § 39 LFGB und Art. 138 VO (EU) 2017/625 am 22.10.2026 am Wortlaut gelesen; Umfang der Vorlage im Rahmen der Flexibilität bestätigt (Bekanntmachung 2022/C 355/01, Abschnitt 4.2 und Anhang I Nr. 5); DEHOGA- und Bäckerhandwerk-Leitlinie mit Titel und Bezugsquelle genügen; Fettabscheider, Wartung und Eichung als Hinweis ohne Fundstelle genügen'
+- 'Rechtsgrundlage ergänzt, steht nicht in der Spezifikation'
 pruefung:
   status: entwurf
   geprueft_von: null

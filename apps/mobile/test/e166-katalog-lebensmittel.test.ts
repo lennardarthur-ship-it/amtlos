@@ -42,18 +42,34 @@ describe("Prüfbericht Lebensmittelhygiene: Wassertank im Check", () => {
 describe("Prüfbericht Lebensmittelhygiene: neue und geänderte Katalogeinträge", () => {
   it("abgepackte Ware: Frage im Check der Lebensmittelbranche, Kennzeichnung nur bei Ja", () => {
     expect(felder(cafe)).toContain("gastro.vorverpackt");
-    expect(felder(feinkost)).not.toContain("gastro.vorverpackt");
+    // Rückmeldung T. Baum 22.10.2026: Onlinehändler mit Lebensmitteln werden ebenfalls gefragt, ohne Lebensmittel nicht
+    expect(felder(feinkost)).toContain("gastro.vorverpackt");
+    expect(felder({ ...feinkost, "produkte.arten": ["physisch"] })).not.toContain("gastro.vorverpackt");
     expect(finde(auswertung(cafe, "2026-10-22"), "branche.gastro_kennzeichnung_vorverpackt")!.offeneFragen).toContain("gastro.vorverpackt");
     expect(ids(auswertung({ ...cafe, "gastro.vorverpackt": true }, "2026-10-22").gilt)).toContain("branche.gastro_kennzeichnung_vorverpackt");
     expect(finde(auswertung({ ...cafe, "gastro.vorverpackt": false }, "2026-10-22"), "branche.gastro_kennzeichnung_vorverpackt")).toBeUndefined();
+  });
+  it("abgepackte Ware im Onlinehandel mit Lebensmitteln (Rückmeldung T. Baum): Kennzeichnung bei Ja, Abgrenzung zu loser Ware im Text", () => {
+    expect(finde(auswertung(feinkost, "2026-10-22"), "branche.gastro_kennzeichnung_vorverpackt")!.offeneFragen).toContain("gastro.vorverpackt");
+    expect(ids(auswertung({ ...feinkost, "gastro.vorverpackt": true }, "2026-10-22").gilt)).toContain("branche.gastro_kennzeichnung_vorverpackt");
+    expect(finde(auswertung({ ...feinkost, "gastro.vorverpackt": true, "produkte.arten": ["physisch"] }, "2026-10-22"), "branche.gastro_kennzeichnung_vorverpackt")).toBeUndefined();
+    const t = text(pflicht("branche.gastro_kennzeichnung_vorverpackt").erklaerung);
+    expect(t).toMatch(/gilt als lose Ware\s+\(Art\. 44 Abs\. 1 LMIV\)/);
+    expect(t).toMatch(/Selbstbedienung[^.]*\(§ 4 Abs\. 1 LMIDV\)/);
   });
   it("Rückverfolgbarkeit auch im Onlinehandel mit Lebensmitteln, nicht ohne Lebensmittel", () => {
     expect(ids(auswertung(feinkost, "2026-10-22").gilt)).toContain("branche.gastro_rueckverfolgbarkeit");
     expect(finde(auswertung({ ...feinkost, "produkte.arten": ["physisch"] }, "2026-10-22"), "branche.gastro_rueckverfolgbarkeit")).toBeUndefined();
     expect(text(pflicht("branche.gastro_rueckverfolgbarkeit").erklaerung)).toMatch(/Ware sperren, Lebensmittelüberwachung informieren \(Art\. 19 VO \(EG\) Nr\. 178\/2002\)/);
   });
+  it("Acrylamid nur, wer selbst backt oder frittiert (Rückmeldung T. Baum): Frage nur in der Lebensmittelbranche", () => {
+    expect(felder(cafe)).toContain("gastro.backen_frittieren");
+    expect(felder(feinkost)).not.toContain("gastro.backen_frittieren");
+    expect(finde(auswertung(cafe, "2026-10-22"), "branche.gastro_acrylamid")!.offeneFragen).toContain("gastro.backen_frittieren");
+    expect(finde(auswertung({ ...cafe, "gastro.backen_frittieren": false }, "2026-10-22"), "branche.gastro_acrylamid")).toBeUndefined();
+  });
   it("Kontaktmaterialien und Acrylamid als Hinweis für Lebensmittelbetriebe, alle als Entwurf", () => {
-    const a = auswertung(cafe, "2026-10-22");
+    const a = auswertung({ ...cafe, "gastro.backen_frittieren": true }, "2026-10-22");
     for (const id of ["branche.gastro_kontaktmaterialien", "branche.gastro_acrylamid"]) {
       expect(ids(a.gilt)).toContain(id);
       expect(finde(a, id)!.einordnung).toBe("hinweis");
@@ -64,7 +80,7 @@ describe("Prüfbericht Lebensmittelhygiene: neue und geänderte Katalogeinträge
   it("Hygieneschulung: Nachweis, jährliche Wiederholung, Abgrenzung zur IfSG-Belehrung, Ausnahme Berufsausbildung", () => {
     const t = text(pflicht("branche.gastro_hygieneschulung").erklaerung);
     expect(t).toMatch(/§ 4 Abs\. 1 Satz 2 LMHV/);
-    expect(t).toMatch(/einmal im Jahr \(DIN 10514\)/);
+    expect(t).toMatch(/Wiederholung einmal im Jahr \(DIN 10514\) – eine gesetzliche Frist dafür gibt es nicht/);
     expect(t).toMatch(/eigene Unterschriftsliste/);
     expect(t).toMatch(/§ 4 Abs\. 2 LMHV/);
     expect(finde(auswertung(cafe, "2026-10-22"), "branche.gastro_hygieneschulung")!.erledigung).toEqual({ art: "laufend", zeitraum: "jahr" });

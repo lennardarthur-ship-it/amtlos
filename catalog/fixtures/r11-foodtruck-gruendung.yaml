@@ -34,7 +34,8 @@ erwartet:
   branche.gastro_rueckverfolgbarkeit: gilt
   branche.gastro_kennzeichnung_vorverpackt: gilt_nicht
   branche.gastro_kontaktmaterialien: gilt
-  branche.gastro_acrylamid: gilt
+  # Rückmeldung Lebensmittel T. Baum 22.10.2026: Acrylamid hängt an „Backst du selbst oder frittierst du?“ – hier nicht beantwortet
+  branche.gastro_acrylamid: unbekannt
 termine_enthaelt:
   branche.gastro_ifsg_bescheinigung_selbst: [["einmalig", "2026-11-30"]]
   gruendung.reisegewerbekarte: [["einmalig", "2026-11-30"]]

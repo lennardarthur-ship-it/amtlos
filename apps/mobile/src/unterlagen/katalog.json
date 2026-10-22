@@ -330,6 +330,22 @@
    {
     "titel": "BGN – Leitlinie für eine gute Lebensmittelhygienepraxis in ortsveränderlichen Betriebsstätten (2018)",
     "url": "https://bgn-branchenwissen.de/praxishilfen-von-a-z/foodtrucks/lebensmittelhygienepraxis.pdf"
+   },
+   {
+    "titel": "Lebensmittelrechtliche Straf- und Bußgeldverordnung § 2 (Wortlaut über lxgesetze)",
+    "url": "https://lxgesetze.de/lmrstv/2"
+   },
+   {
+    "titel": "Lebensmittel- und Futtermittelgesetzbuch § 60 (Bußgeldvorschriften)",
+    "url": "https://www.gesetze-im-internet.de/lfgb/__60.html"
+   },
+   {
+    "titel": "Lebensmittel- und Futtermittelgesetzbuch § 39 (Wortlaut über lxgesetze)",
+    "url": "https://lxgesetze.de/lfgb/39"
+   },
+   {
+    "titel": "Verordnung (EU) 2017/625, Artikel 138 (Wortlaut über gesetze.legal)",
+    "url": "https://gesetze.legal/eu/vo_eu_2017_625/138"
    }
   ],
   "geprueft": false
@@ -340,8 +356,7 @@
   "kurz": "Wer bei dir mit leicht verderblichen Lebensmitteln arbeitet – auch du selbst –, braucht eine Schulung in Lebensmittelhygiene.",
   "rechtsgrundlage": [
    "§ 4 LMHV",
-   "Anhang II Kapitel XII VO (EG) Nr. 852/2004",
-   "DIN 10514"
+   "Anhang II Kapitel XII VO (EG) Nr. 852/2004"
   ],
   "quellen": [
    {
@@ -359,6 +374,10 @@
    {
     "titel": "Lebensmittel- und Futtermittelgesetzbuch § 60 (Bußgeldvorschriften)",
     "url": "https://www.gesetze-im-internet.de/lfgb/__60.html"
+   },
+   {
+    "titel": "DIN 10514:2024-07 Lebensmittelhygiene – Hygieneschulung (Empfehlung zur jährlichen Wiederholung, keine Rechtsgrundlage)",
+    "url": "https://www.dinmedia.de/de/norm/din-10514/381020683"
    }
   ],
   "geprueft": false
