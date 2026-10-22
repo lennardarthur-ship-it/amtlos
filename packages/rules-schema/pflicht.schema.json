@@ -478,6 +478,13 @@
             "null"
           ],
           "format": "date"
+        },
+        "geprueft_version": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "Version des Eintrags, die geprüft wurde. Weicht `version` davon ab, gilt der Eintrag als ungeprüft, bis er erneut geprüft ist (E-171)."
         }
       }
     }

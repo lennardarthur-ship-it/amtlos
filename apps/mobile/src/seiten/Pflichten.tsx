@@ -213,7 +213,7 @@ export function PflichtDetail({ id }: { id: string }) {
           <Zeile symbol="briefcase" ton="amt" titel={TEXT.kanzlei_finden} text={TEXT.kanzlei_finden_text} onPress={() => nav.oeffnen("steuerberatung", () => <SteuerberatungSeite kanzleienZuerst />, true)} letzte />
         </Karte>
       ) : null}
-      <RechtsHinweis art="pflichten" />
+      <RechtsHinweis art="pflichten" pflicht={p} />
     </BuehnenBlatt>
   );
 }

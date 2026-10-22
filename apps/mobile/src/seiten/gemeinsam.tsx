@@ -260,8 +260,8 @@ export function Gruppe({ titel, children, fuss, hilfe, erste }: { titel?: string
  * Phase 1 (RDG): ruhige Fußzeile „keine Rechts- oder Steuerberatung“ mit Rechtsstand – ein Text, damit VoiceOver beides
  * zusammen liest. Nie im PDF (src/rechtshinweis.ts).
  */
-export function RechtsHinweis({ art, farbe, oben = 16 }: { art: HinweisArt; farbe?: string; oben?: number }) {
-  const h = rechtsHinweis(art);
+export function RechtsHinweis({ art, farbe, oben = 16, pflicht }: { art: HinweisArt; farbe?: string; oben?: number; pflicht?: { pruefVermerk: string | null } }) {
+  const h = rechtsHinweis(art, undefined, pflicht);
   return (
     <T v="caption" leise={!farbe} farbe={farbe} stil={{ marginTop: oben }} testID={`rechtshinweis-${art}`}>
       {`${h.text}\n${h.stand}`}

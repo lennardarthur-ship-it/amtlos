@@ -11,7 +11,7 @@ import { PflichtZeile } from "./Pflichten";
 import { langBestehend, schonDaKandidaten } from "./schonDa";
 import { WasHastDuSchon } from "./WasHastDu";
 import { useAmtlos } from "../zustand";
-import { rechtsHinweis } from "../rechtshinweis";
+import { checkHinweis, rechtsHinweis } from "../rechtshinweis";
 
 /**
  * R11 (UX #3/#5): Branchen aus Schritt 1, die auch Sofortmelde-Branchen sind – vorbelegt, damit niemand „Gastronomie“
@@ -242,7 +242,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
               </View>
               <View style={{ marginTop: 26, flexDirection: "row", gap: 10, padding: 14, borderRadius: RADIUS.knopf, backgroundColor: f.buehneFlaeche }}>
                 <Symbol name="info.circle" groesse={17} farbe={f.minze} gewicht="semibold" />
-                <T v="klein" farbe={f.buehneLeise} stil={{ flex: 1 }}>{TEXT.check_hinweis}</T>
+                <T v="klein" farbe={f.buehneLeise} stil={{ flex: 1 }}>{checkHinweis()}</T>
               </View>
             </View>
           ) : zwischenschirm ? (

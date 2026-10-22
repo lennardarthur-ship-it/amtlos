@@ -10,6 +10,7 @@ import { StandardKalender, plusMonate } from "@amtlos/fristen";
 import { SCHRITTE, type Frage } from "@amtlos/i18n";
 import { auswerten, entscheidendeSaetze, zuErfragendeFakten, type Ereignis, type Katalog, type Pflicht } from "@amtlos/rules-engine";
 import roh from "./katalog.json";
+import { istGeprueft, pruefVermerk, type PruefungRoh } from "./pruefer";
 
 export const KATALOG = roh as unknown as Katalog;
 
@@ -289,7 +290,10 @@ export interface PflichtInfo {
   offeneFragen: string[];
   /** wiederkehrend (z. B. jährlich): „erledigt“ gilt nur bis zum nächsten Termin */
   wiederkehrend: boolean;
+  /** E-171: fachlich geprüft in der aktuellen Version */
   geprueft: boolean;
+  /** E-171: Vermerk für die Details („Inhalt fachlich geprüft, Stand …“), null wenn ungeprüft */
+  pruefVermerk: string | null;
   /** R10: Pflicht, Hinweis oder freiwillige Option (Katalog `einordnung`) – im Ergebnis getrennt gezählt */
   einordnung: "pflicht" | "hinweis" | "option";
   /** R10: wann die Pflicht als erledigt gilt (Katalog `erledigung`) */
@@ -559,7 +563,7 @@ export function auswertung(antworten: Profil, stichtag: string, unterlagen: read
   const ergebnisse = auswerten({ katalog: KATALOG, fakten, ereignisse, stichtag, kalender: new StandardKalender(), fenster: { von: stichtag, bis: plusMonate(stichtag, 12) } });
   const nachId = new Map(KATALOG.pflichten.map((p) => [p.id, p]));
   const info = (e: (typeof ergebnisse)[number]): PflichtInfo => {
-    const p = nachId.get(e.pflicht_id) as Pflicht & { stelle?: unknown; quellen?: { titel: string; url?: string }[]; pruefung?: { status?: string } };
+    const p = nachId.get(e.pflicht_id) as Pflicht & { stelle?: unknown; quellen?: { titel: string; url?: string }[]; pruefung?: PruefungRoh };
     const termine = e.termine.map((t) => t.faellig_am).filter((d) => d >= stichtag).sort();
     const termin = termine[0] ?? null;
     return {
@@ -589,7 +593,8 @@ export function auswertung(antworten: Profil, stichtag: string, unterlagen: read
         .filter((f) => f.startsWith("profil."))
         .map((f) => f.slice("profil.".length))
         .filter((f) => FRAGE.has(f)),
-      geprueft: p.pruefung?.status === "freigegeben",
+      geprueft: istGeprueft(p.version, p.pruefung),
+      pruefVermerk: pruefVermerk(p.version, p.pruefung),
       // je Ereignis mit kommendem Termin (z. B. Unterweisung ein Jahr nach der letzten): „erledigt“ gilt nur für diesen
       // Termin – sonst hakte die Unterweisung, aus der der Termin entsteht, ihre eigene Wiederholung schon ab
       // R10: mehrere vergangene Einstellungen machen eine Pflicht je Einstellung nicht „wiederkehrend“ – nur kommende Termine zählen
