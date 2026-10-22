@@ -1,7 +1,7 @@
 # Katalog E.51 · Startbestand aus Spezifikation Abschnitt 4 (E-054); Prüfergebnis Sifa 22.10.2026 (C Katalog E.51) eingearbeitet
 schema_version: 1
 id: arbeitsschutz.erstunterweisung
-version: 4
+version: 5
 katalog_nr: E.51
 titel:
   de: Vor Arbeitsbeginn unterweisen
@@ -40,7 +40,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: '§ 12 ArbSchG ist nicht unmittelbar bußgeldbewehrt: Die Aufsicht kann die Unterweisung anordnen, ein Verstoß gegen die Anordnung kostet bis 5.000 € (§ 25 Abs. 1 Nr. 2 Buchst. a, Abs. 2 ArbSchG). Bei Gefahrstoffen, Biostoffen und Arbeitsmitteln ist die fehlende Unterweisung direkt bußgeldbewehrt: bei Gefahrstoffen bis 50.000 € (§ 22 Abs. 1 Nr. 25 GefStoffV in Verbindung mit § 26 Abs. 1 Nr. 8 Buchst. b, Abs. 3 ChemG), bei Biostoffen und Arbeitsmitteln bis 5.000 € (§ 20 Abs. 1 Nr. 23 BioStoffV, § 22 Abs. 1 Nr. 26 BetrSichV in Verbindung mit § 25 Abs. 1 Nr. 1, Abs. 2 ArbSchG).'
+    de: '§ 12 ArbSchG ist nicht unmittelbar bußgeldbewehrt: Die Aufsicht kann die Unterweisung anordnen, ein Verstoß gegen die Anordnung kostet bis 30.000 € (§ 25 Abs. 1 Nr. 2 Buchst. a, Abs. 2 ArbSchG). Bei Gefahrstoffen, Biostoffen und Arbeitsmitteln ist die fehlende Unterweisung direkt bußgeldbewehrt: bei Gefahrstoffen bis 50.000 € (§ 22 Abs. 1 Nr. 25 GefStoffV in Verbindung mit § 26 Abs. 1 Nr. 8 Buchst. b, Abs. 3 ChemG), bei Biostoffen und Arbeitsmitteln bis 5.000 € (§ 20 Abs. 1 Nr. 23 BioStoffV, § 22 Abs. 1 Nr. 26 BetrSichV in Verbindung mit § 25 Abs. 1 Nr. 1, Abs. 2 ArbSchG).'
   schwere: hoch
 automatisierung: dokument_generator
 aktion:
