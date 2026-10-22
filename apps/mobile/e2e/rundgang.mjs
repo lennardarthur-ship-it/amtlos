@@ -125,7 +125,8 @@ try {
   await warte(800);
   await knopf("Pflichten-Check starten").click();
   await warte(800);
-  pruefe(await sichtbar("noch nicht von Fachleuten geprüft"), "Prüfhinweis fehlt in der Einleitung des Checks");
+  // E-171: Wortlaut je nach Prüfstand des Katalogs (keine/teilweise/alle) – der Beratungs-Hinweis steht immer da
+  pruefe(await sichtbar("keine Rechts- oder Steuerberatung"), "Prüfhinweis fehlt in der Einleitung des Checks");
   await foto("check-einleitung");
   await knopf("Los geht’s").click();
   await warte();
