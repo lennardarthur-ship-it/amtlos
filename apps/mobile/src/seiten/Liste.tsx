@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
-import { betragUnplausibel, cent, satzZahl, einheitFuerMenge, gruppenAusBranchen, mengeUngueltig, summen, zahl, eintragAusVorschlag, kurztitelListe, neuerEintrag, ohneVerdeckteFelder, sichtbar, unlesbar, unlesbarText, vorlageFuer, type Daten, type Eintrag, type EintragWert, type ListenFeld, type Vorschlag } from "@amtlos/fachlogik";
+import { betragUnplausibel, cent, satzZahl, einheitFuerMenge, gruppenAusBranchen, mengeUngueltig, mobilerVerkauf, summen, zahl, eintragAusVorschlag, kurztitelListe, neuerEintrag, ohneVerdeckteFelder, sichtbar, unlesbar, unlesbarText, vorlageFuer, type Daten, type Eintrag, type EintragWert, type ListenFeld, type Vorschlag } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { ChipLeiste, Fuss, HinzufuegenKnopf, Kaestchen, Karte, Knopf, Symbol, T, TextKnopf, Wahl, textAus } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
@@ -19,16 +19,19 @@ import { Inhalt } from "./gemeinsam";
  * „Holz / Tischlerei“ bleibt bewusst ohne Zuordnung (der Check unterscheidet die Gewerke im Handwerk nicht): beim
  * Elektriker stünde sonst Hartholzstaub unter „Passend für dich“.
  */
-const GRUPPE_R11: Record<string, string[]> = { gebaeudereinigung: ["Gebäudereinigung"], transport_logistik: ["Transport / Kurier"] };
+const GRUPPE_R11: Record<string, string[]> = { gebaeudereinigung: ["Gebäudereinigung"], transport_logistik: ["Transport / Kurier"], gesundheit_pflege: ["Praxis / Gesundheit"] };
 
 /**
  * R12 (Kfz #3, Bäckerei #6): Werkstatt und Bäckerei unterscheidet der Check nicht vom übrigen Handwerk – passend nur,
  * wenn der Name des Betriebs es sagt (bzw. Bäckerei: Handwerk und Lebensmittel zusammen). Sonst als eigene Gruppe wählbar.
+ * E-166: Foodtruck / mobiler Verkauf aus Reisegewerbe oder Marktstand (Profil) bzw. dem Namen; Praxen über die Branche.
  */
-export function passendeGruppen(branchen: readonly string[], betriebName: string): string[] {
+export function passendeGruppen(branchen: readonly string[], betriebName: string, profil: Record<string, unknown> = {}): string[] {
   const g = branchen.flatMap((b) => [...(VORSCHLAG_GRUPPE[b] ?? []), ...(GRUPPE_R11[b] ?? [])]);
   if (/\b(kfz|auto|autohaus|werkstatt|reifen|karosserie|fahrzeug)/i.test(betriebName)) g.push("Kfz-Werkstatt");
   if ((branchen.includes("handwerk") && branchen.includes("gastronomie_lebensmittel")) || /bäcker|backstube|konditor/i.test(betriebName)) g.push("Bäckerei");
+  // E-166: Foodtruck und mobiler Verkauf (Reisegewerbe oder Marktstand laut Check, oder am Namen erkennbar)
+  if (mobilerVerkauf({ ...profil, "taetigkeit.branchen": [...branchen] }, betriebName)) g.push("Foodtruck / mobiler Verkauf");
   return [...new Set(g)];
 }
 
@@ -176,7 +179,7 @@ function VorschlagSeite({ id, feldId }: { id: string; feldId: string }) {
   const alle = feld?.vorschlaege ?? [];
   const gruppen = [...new Set(alle.map((v) => v.gruppe).filter((g): g is string => Boolean(g)))];
   // Branche aus dem Pflichten-Check: passende Gruppen zuerst („Passend für dich“), damit beim Maler keine Friseurchemikalien stehen
-  const meine = passendeGruppen(Array.isArray(z.stand.profil["taetigkeit.branchen"]) ? (z.stand.profil["taetigkeit.branchen"] as string[]) : [], z.stand.betrieb.name);
+  const meine = passendeGruppen(Array.isArray(z.stand.profil["taetigkeit.branchen"]) ? (z.stand.profil["taetigkeit.branchen"] as string[]) : [], z.stand.betrieb.name, z.stand.profil);
   const passend = gruppen.filter((g) => meine.includes(g));
   const [gruppe, setGruppe] = useState<string>(passend.length === 1 ? passend[0]! : passend.length > 1 ? PASSEND : "");
   const [gewaehlt, setGewaehlt] = useState<Set<string>>(new Set());

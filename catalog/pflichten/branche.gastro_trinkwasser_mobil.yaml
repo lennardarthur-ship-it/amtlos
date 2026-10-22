@@ -1,0 +1,93 @@
+# E-166 (Prüfmappe Lebensmittelhygiene, Frage 14): Wassertank im Foodtruck – mobile Wasserversorgungsanlage nach TrinkwV
+schema_version: 1
+id: branche.gastro_trinkwasser_mobil
+version: 1
+katalog_nr: H.1
+titel:
+  de: Wassertank im Foodtruck beim Gesundheitsamt anzeigen
+kurz:
+  de: Hat dein Foodtruck oder Verkaufsstand einen eigenen Wassertank, zeigst du die Inbetriebnahme spätestens vier Wochen vorher beim Gesundheitsamt an und hältst das Wasser hygienisch einwandfrei.
+erklaerung:
+  de: >-
+    Ein Wassertank mit Leitungen in einem Fahrzeug oder Verkaufsstand ist eine mobile Wasserversorgungsanlage (§ 2 Nr. 2
+    Buchst. d TrinkwV). Wer daraus im Rahmen einer gewerblichen Tätigkeit Trinkwasser bereitstellt, zeigt dem
+    Gesundheitsamt die Inbetriebnahme und Wiederinbetriebnahme sowie wesentliche bauliche oder betriebstechnische
+    Veränderungen spätestens vier Wochen vorher an, die Stilllegung innerhalb von drei Tagen (§ 11 Abs. 2 TrinkwV).
+    Schließt du dich am Standplatz nur zeitweise an eine Wasserleitung an (z. B. Standrohr des Veranstalters), gilt das
+    als zeitweilige Wasserversorgungsanlage (§ 2 Nr. 2 Buchst. f TrinkwV) – frag beim Gesundheitsamt bzw. Veranstalter
+    nach den Regeln. Gesundheitsämter verlangen in ihren Merkblättern unter anderem Schläuche und Materialien, die für
+    Trinkwasser geeignet sind, regelmäßige Reinigung und eine Untersuchung des Wassers durch eine zugelassene
+    Untersuchungsstelle (in Dortmund zum Beispiel jährlich). Unabhängig davon brauchst du nach dem
+    Lebensmittelhygienerecht genug Trinkwasser für Lebensmittel und zum Händewaschen (Anhang II Kapitel III und VII
+    VO (EG) Nr. 852/2004). Amtlos fragt nicht ab, ob dein Fahrzeug einen Wassertank hat – ohne Tank entfällt die Anzeige.
+rechtsgrundlage:
+- § 2 Nr. 2 Buchst. d, f TrinkwV
+- § 11 Abs. 2 TrinkwV
+- Anhang II Kapitel III Nr. 2 Buchst. e, Kapitel VII Verordnung (EG) Nr. 852/2004
+kategorie: branche
+branchen:
+- gastronomie_lebensmittel
+ausloeser:
+  all:
+  - feld: profil.taetigkeit.branchen
+    op: enthaelt
+    wert: gastronomie_lebensmittel
+    label:
+      de: Dein Betrieb gehört zur Gastronomie oder Lebensmittelbranche.
+  - any:
+    - feld: profil.erlaubnis.gewo_paragraphen
+      op: enthaelt
+      wert: '55'
+      label:
+        de: Du betreibst ein Reisegewerbe.
+    - feld: profil.vertrieb.kanaele
+      op: enthaelt
+      wert: marktstand
+      label:
+        de: Du verkaufst am Marktstand.
+frist:
+  typ: relativ
+  bezug:
+    fakt: profil.gruendungsdatum
+  versatz: -P4W
+  zeitpunkt: spaetestens
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
+wiederholung:
+  art: einmalig
+stelle:
+  de: Gesundheitsamt des Kreises bzw. der Stadt
+kanal: post
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+aenderungsnotiz:
+  de: 'Neu nach der Vorbereitung der fachlichen Prüfung Lebensmittelhygiene (22.10.2026): Anzeige einer mobilen Wasserversorgungsanlage (§ 11 Abs. 2 TrinkwV).'
+status_recht: in_kraft
+gueltig_ab: '2023-06-24'
+gueltig_bis: null
+quellen:
+- titel: Trinkwasserverordnung § 2 (Begriffsbestimmungen)
+  url: https://www.gesetze-im-internet.de/trinkwv_2023/__2.html
+  abgerufen: '2026-10-22'
+- titel: Trinkwasserverordnung § 11 (Anzeigepflichten)
+  url: https://www.gesetze-im-internet.de/trinkwv_2023/__11.html
+  abgerufen: '2026-10-22'
+- titel: Gesundheitsamt Dortmund – Merkblatt für Betreiber von mobilen Versorgungsanlagen an Bord von Land-, Wasser- und Luftfahrzeugen (Stand Juli 2025)
+  url: https://www.dortmund.de/dortmund/projekte/rathaus/verwaltung/gesundheitsamt/downloads/merkblatt_fuer_betreiber_von__mobilen_versorgungsanlagen_an_bord_von_land-_wasser-_und_luftfahrzeugen.pdf
+  abgerufen: '2026-10-22'
+fachlich_zu_pruefen:
+- 'Neu (E-166): § 2 Nr. 2 Buchst. d, f und § 11 Abs. 2 TrinkwV am Wortlaut geprüft (gesetze-im-internet.de, 22.10.2026)'
+- 'Unklar: Stellt ein Foodtruck „im Rahmen einer gewerblichen Tätigkeit Trinkwasser bereit“, wenn er das Tankwasser nur zum Zubereiten und Händewaschen nutzt? Merkblätter der Gesundheitsämter (Dortmund) gehen davon aus – fachlich bzw. rechtlich bestätigen'
+- 'Untersuchungspflichten (Umfang, Häufigkeit) und Fundstelle in der TrinkwV nicht geprüft – nur Merkblatt Dortmund (jährlich, zugelassene Untersuchungsstelle)'
+- 'Auslöser: Der Check fragt den Wassertank nicht ab – die Pflicht „kommt in Frage“ bei Lebensmitteln mit Reisegewerbe oder Marktstand; Frist vier Wochen vor dem Start bezieht sich auf das Gründungsdatum, nicht auf die Inbetriebnahme des Tanks'
+- 'Gültig ab: Inkrafttreten der TrinkwV 2023 (24.6.2023) laut Verordnung gegenlesen'
+- Folgen bei Nichterfüllung (Ordnungswidrigkeit nach TrinkwV) nicht geprüft – Sanktion fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

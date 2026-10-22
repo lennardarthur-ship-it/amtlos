@@ -17,7 +17,7 @@ export function teilnahmeTabelle(eintraege: Eintrag[], extra?: { kopf: string; f
   return tabelle(kopf, zeilen, { breiten: extra ? ["38%", "22%", "40%"] : ["45%", "55%"], ...(zeilen.length ? { leerzeilen: 2, schluss: 3 } : { mindestens: 6 }), hoch: true, klasse: "teilnahme" });
 }
 
-const BEREICHE_VORSCHLAG = ["Salon", "Kosmetikkabine", "Küche", "Gastraum und Service", "Verkaufsraum", "Lager", "Werkstatt", "Baustelle beim Kunden", "Reinigungsobjekte beim Kunden", "Büro"];
+const BEREICHE_VORSCHLAG = ["Salon", "Kosmetikkabine", "Küche", "Gastraum und Service", "Verkaufsraum", "Lager", "Werkstatt", "Baustelle beim Kunden", "Reinigungsobjekte beim Kunden", "Behandlungsräume der Praxis", "Büro"];
 // Vorprüfung 21.10.2026 (§ 6 Abs. 1 ArbSchG): eigene Spalte „bis wann“ – ohne Termin ist „offen“ nicht nachprüfbar
 const GEFAEHRDUNG_KOPF = ["Gefährdung", "Risiko", "Schutzmaßnahmen", "Wer / bis wann", "Erledigt am"];
 const GEFAEHRDUNG_BREITEN = ["25%", "9%", "38%", "16%", "12%"];
@@ -155,6 +155,21 @@ const GEFAEHRDUNGEN_R12: Vorschlag[] = [
   g(TRANSPORT, "Überfall und Gewalt (Bargeld, Wertsendungen).", "psychisch", "Möglichst bargeldlos kassieren; Bargeld nicht offen mitführen.\nVerhalten bei Überfall unterweisen; Erreichbarkeit und Notruf regeln; Betreuung nach einem Vorfall.", `Nutzertest Kurier – ${PRUEFEN}`),
 ];
 
+/**
+ * E-166: Gruppe „Praxis / Gesundheit“ (Arzt-, Zahnarzt-, Therapiepraxen, Pflege) – Biostoffe nach BioStoffV und TRBA 250,
+ * Stich- und Schnittverletzungen (§ 11 BioStoffV, wörtlich geprüft; TRBA 250 Nr. 4.2.5 laut KomNet-Dialog 7857),
+ * Desinfektionsmittel (BGW „Gefahrstoffe in der Arztpraxis“, Stand 2004; TRGS 525), Hautschutz (TRGS 401) und Röntgen nur
+ * als Hinweis auf das Strahlenschutzrecht. Fachlich zu prüfen (Sifa, Betriebsarzt; PRUEFLISTE T-132).
+ */
+const PRAXIS = "Praxis / Gesundheit";
+const GEFAEHRDUNGEN_PRAXIS: Vorschlag[] = [
+  g(PRAXIS, "Biostoffe bei Untersuchung und Behandlung: Infektionen durch Blut, Körperflüssigkeiten und Ausscheidungen.", "einwirkungen", "Tätigkeiten mit Biostoffen nach BioStoffV und TRBA 250 beurteilen und einer Schutzstufe zuordnen.\nWirksame Desinfektionsverfahren festlegen (§ 11 Abs. 1 BioStoffV); Hygieneplan mit Händehygiene, Flächen- und Instrumentendesinfektion.\nGeeignete Schutzhandschuhe und Schutzkleidung bereitstellen.\nArbeitsmedizinische Vorsorge nach ArbMedVV Anhang Teil 2 prüfen; Impfungen anbieten, soweit das Infektionsrisiko tätigkeitsbedingt erhöht ist (§ 6 Abs. 2 ArbMedVV).", `BioStoffV; TRBA 250; § 6 Abs. 2 ArbMedVV – ${PRUEFEN}`),
+  g(PRAXIS, "Stich- und Schnittverletzungen durch gebrauchte Kanülen und scharfe Instrumente (Nadelstichverletzungen).", "einwirkungen", "Spitze und scharfe Instrumente durch solche mit Sicherheitsmechanismus ersetzen, soweit technisch möglich und zur Vermeidung einer Infektion erforderlich (§ 11 Abs. 2 BioStoffV).\nGebrauchte Kanülen nicht in die Schutzkappe zurückstecken (§ 11 Abs. 3 BioStoffV).\nStich- und bruchfeste, eindeutig gekennzeichnete Abwurfbehälter möglichst nah am Verwendungsort bereitstellen; nicht umfüllen (§ 11 Abs. 4 BioStoffV; TRBA 250 Nr. 4.2.5).\nVorgehen nach einer Stichverletzung festlegen und aushängen: Blutfluss fördern, desinfizieren, Durchgangsarzt bzw. Betriebsarzt aufsuchen, im Verbandbuch eintragen; Beschäftigte über Verletzungen mit organisatorischen oder technischen Ursachen informieren (§ 11 Abs. 5 BioStoffV).", `§ 11 BioStoffV; TRBA 250 Nr. 4.2.5 – ${PRUEFEN}`, "hoch"),
+  g(PRAXIS, "Desinfektionsmittel: Reizungen von Haut und Atemwegen, Allergien.", "einwirkungen", "Desinfektionsmittel im Gefahrstoffverzeichnis führen und eine Betriebsanweisung erstellen (GefStoffV, TRGS 525).\nFlächen wischen statt sprühen; Lösungen mit Dosierhilfe und nicht mit heißem Wasser ansetzen; lüften.\nChemikalienbeständige Schutzhandschuhe tragen (z. B. aus Nitril) – Untersuchungshandschuhe schützen nicht ausreichend vor Chemikalien.", `BGW „Gefahrstoffe in der Arztpraxis“; TRGS 525 – ${PRUEFEN}`),
+  g(PRAXIS, "Hautbelastung durch häufige Händedesinfektion, Händewaschen und langes Tragen von Handschuhen (Feuchtarbeit).", "einwirkungen", "Feuchtarbeit nach TRGS 401 beurteilen; Hautschutzplan mit Hautschutz, Hautreinigung und Hautpflege aufstellen.\nHandschuhe nur so lange wie nötig tragen; bei längerem Tragen Unterziehhandschuhe aus Baumwolle.\nArbeitsmedizinische Vorsorge bei Feuchtarbeit nach ArbMedVV Anhang Teil 1 anbieten bzw. veranlassen.", `TRGS 401; ArbMedVV Anhang Teil 1 – ${PRUEFEN}`),
+  g(PRAXIS, "Röntgen und andere ionisierende Strahlung (nur Hinweis).", "sonstiges", "Röntgen und Strahlenschutz regeln das Strahlenschutzgesetz und die Strahlenschutzverordnung mit eigenen Pflichten (z. B. Fachkunde, Strahlenschutzverantwortliche und -beauftragte, Unterweisung) – nicht Gegenstand dieser Beurteilung; mit der zuständigen Strahlenschutzbehörde klären.", "StrlSchG; StrlSchV – unsicher, nur Hinweis"),
+];
+
 /** Stichworte in eingetragenen Gefährdungen, die beim Mutterschutz meist Maßnahmen verlangen (R11, Tischlerei #17). */
 const MUSCH_STICHWORTE = /krebserzeugend|hartholz|holzstaub|lärm|gefahrstoff|lösemittel|biostoff|infektion|cmr/i;
 
@@ -194,7 +209,7 @@ export const gefaehrdungsbeurteilung: Vorlage = {
           titelFeld: "beschreibung",
           pflicht: true,
           leerStarten: true,
-          vorschlaege: [...GEFAEHRDUNGEN, ...GEFAEHRDUNGEN_EXTRA, ...GEFAEHRDUNGEN_R11, ...GEFAEHRDUNGEN_R12],
+          vorschlaege: [...GEFAEHRDUNGEN, ...GEFAEHRDUNGEN_EXTRA, ...GEFAEHRDUNGEN_R11, ...GEFAEHRDUNGEN_R12, ...GEFAEHRDUNGEN_PRAXIS],
           gruppenLabel: "Branche",
           felder: [
             { id: "beschreibung", art: "mehrzeilig", label: "Gefährdung", pflicht: true },
@@ -355,6 +370,10 @@ const UNTERWEISUNG_OPTIONEN: Option[] = [
     ["fahrer_heben", "Heben und Tragen: Sackkarre, Treppen, schwere Sendungen zu zweit", `LasthandhabV – ${PRUEFEN}`, "transport"],
     ["fahrer_lastenrad", "Lastenrad: Einweisung, Helm, Zuladung, Wartung", `${PRUEFEN}`, "transport"],
     ["fahrer_tour", "Auf der Tour: Witterung, Hunde, Überfall – richtig verhalten", `${PRUEFEN}`, "transport"],
+    // E-166: Praxen (Gesundheit und Pflege)
+    ["praxis_biostoffe", "Biostoffe: Händehygiene, Schutzhandschuhe, Desinfektion nach Hygieneplan, Impfangebot", `BioStoffV; TRBA 250 – ${PRUEFEN}`, "praxis"],
+    ["praxis_nadelstich", "Stich- und Schnittverletzungen: Kanülen nicht zurückstecken, Abwurfbehälter, Vorgehen nach einer Verletzung", "§ 11 BioStoffV", "praxis"],
+    ["praxis_desinfektion", "Desinfektionsmittel sicher anwenden: wischen statt sprühen, richtig dosieren, geeignete Handschuhe", `TRGS 525 – ${PRUEFEN}`, "praxis"],
   ] as const).map(([wert, text, quelle, gruppe]) => ({ wert, text, quelle, gruppen: [gruppe] })),
 ];
 

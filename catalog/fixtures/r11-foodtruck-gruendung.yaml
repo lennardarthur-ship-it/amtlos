@@ -26,7 +26,10 @@ erwartet:
   branche.gastro_preisverzeichnis: gilt
   branche.gastro_ifsg_bescheinigung: gilt_nicht
   it_sicherheit.nis2_pruefen: gilt_nicht
+  branche.gastro_trinkwasser_mobil: gilt
+  branche.gastro_rueckverfolgbarkeit: gilt
 termine_enthaelt:
   branche.gastro_ifsg_bescheinigung_selbst: [["einmalig", "2026-11-30"]]
   gruendung.reisegewerbekarte: [["einmalig", "2026-11-30"]]
   branche.gastro_lebensmittelregistrierung: [["einmalig", "2026-11-30"]]
+  branche.gastro_trinkwasser_mobil: [["einmalig", "2026-11-03"]]

@@ -523,7 +523,8 @@ describe("Dokumentvorlagen", () => {
     const pruefe = (id: string, d: Daten, b: Betrieb = BETRIEB) => vorlageFuer(id)!.pruefen!(d, b);
     const kopfLinie = (titel: string) => `<dt>${titel}</dt><dd><span class="fuellen"></span></dd>`;
     // HACCP: Quellen stehen im Feld „quelle“, nicht im Drucktext; beide Grenzwerte bleiben stehen
-    const haccp = vorlageFuer("haccp")!.abschnitte.flatMap((a) => a.felder).find((f) => f.art === "liste")!;
+    // E-166: die Kontrollpunkte sind nicht mehr die erste Liste (davor Gefahrenanalyse und CCP)
+    const haccp = vorlageFuer("haccp")!.abschnitte.flatMap((a) => a.felder).find((f) => f.id === "punkte")!;
     const vorschlaege = haccp.art === "liste" ? haccp.vorschlaege! : [];
     for (const v of vorschlaege) for (const k of ["grenzwert", "haeufigkeit", "korrektur"]) expect(String(v.werte[k])).not.toMatch(/Mainz|LAVES|BfR|BgVV|DGF|Älterer Wert/);
     const heiss = vorschlaege.find((v) => v.titel.startsWith("Heißhalten"))!;

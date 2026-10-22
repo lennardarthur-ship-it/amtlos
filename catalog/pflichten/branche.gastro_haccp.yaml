@@ -1,16 +1,22 @@
 # Katalog H.1 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.gastro_haccp
-version: 3
+version: 4
 katalog_nr: H.1
 titel:
   de: Eigenkontrollen nach HACCP
 kurz:
   de: Du kontrollierst und dokumentierst regelmäßig die kritischen Punkte deiner Lebensmittelhygiene, zum Beispiel Kühltemperaturen.
 erklaerung:
-  de: Lebensmittelunternehmen müssen ein Verfahren nach den HACCP-Grundsätzen einrichten und die Kontrollen dokumentieren.
-    Das ist ein ständiges Verfahren mit laufender Dokumentation, keine einmalige Aufgabe. Amtlos bietet Kontrolllisten mit Grenzwerten,
-    die du festlegst – ein Protokoll gilt für seinen Monat.
+  de: >-
+    Lebensmittelunternehmen müssen ein ständiges Verfahren nach den sieben HACCP-Grundsätzen einrichten (Art. 5 Abs. 2
+    VO (EG) Nr. 852/2004): Gefahren ermitteln, kritische Kontrollpunkte bestimmen, Grenzwerte festlegen, die
+    Kontrollpunkte überwachen, Korrekturmaßnahmen festlegen, regelmäßig verifizieren und alles dokumentieren. Kleine
+    Betriebe dürfen das einfach halten – Dokumente und Aufzeichnungen müssen der Art und Größe des Betriebs angemessen
+    sein; wo die Gefahrenanalyse keinen kritischen Kontrollpunkt ergibt, genügt die gute Hygienepraxis. Das ist eine
+    laufende Aufgabe, keine einmalige. Amtlos bietet eine Vorlage mit Gefahrenanalyse je Arbeitsschritt, kritischen
+    Kontrollpunkten, Kontrolllisten mit Grenzwerten, die du festlegst, und Messprotokoll – ein Protokoll gilt für seinen
+    Monat.
 rechtsgrundlage:
 - Art. 5 Verordnung (EG) Nr. 852/2004
 kategorie: branche
@@ -40,7 +46,7 @@ erledigung:
   art: laufend
   zeitraum: monat
 aenderungsnotiz:
-  de: Die Eigenkontrollen sind eine laufende Pflicht – ein Kontrollprotokoll erledigt sie nur für seinen Monat.
+  de: 'Die Vorlage enthält jetzt Gefahrenanalyse, kritische Kontrollpunkte, Verifizierung und Dokumentation (22.10.2026). Die Eigenkontrollen bleiben eine laufende Pflicht – ein Kontrollprotokoll erledigt sie nur für seinen Monat.'
 aktion:
   art: link
   ziel: app.eigenkontrollen
@@ -51,11 +57,18 @@ quellen:
 - titel: Verordnung (EG) Nr. 852/2004
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32004R0852
   abgerufen: null
+- titel: Verordnung (EG) Nr. 852/2004, Artikel 5 (Wortlaut über gesetze.legal)
+  url: https://gesetze.legal/eu/vo_eg_2004_852/5
+  abgerufen: '2026-10-22'
+- titel: Bekanntmachung der Kommission zur Umsetzung von Managementsystemen für Lebensmittelsicherheit (2022/C 355/01)
+  url: https://umwelt-online.de/recht/eu/22a/22a_c355_01_bek.htm
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Grenzwerte (z. B. Kühltemperaturen) und Kontrollhäufigkeit nicht in der Spezifikation – Betrieb legt sie fest; Vorschläge
   fachlich ergänzen
 - Leitlinien für gute Hygienepraxis je Branche verlinken
+- 'E-166: Vorlage um Gefahrenanalyse, CCP-Entscheidung (Entscheidungsbaum nach Codex CXC 1-1969, Fassung 2023), Verifizierung und Dokumentation ergänzt – Umfang für kleine Betriebe im Rahmen der Flexibilität (Bekanntmachung 2022/C 355/01, Anhang II nur auszugsweise gelesen) fachlich bestätigen'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 - 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'

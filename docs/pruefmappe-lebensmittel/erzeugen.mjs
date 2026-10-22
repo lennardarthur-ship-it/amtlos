@@ -65,27 +65,31 @@ for (const wert of Object.values(F.BS)) {
   for (const l of listen) for (const o of l) if (o && typeof o === "object" && typeof o.text === "string" && !ausBausteinen.has(o.text)) ausBausteinen.set(o.text, { quelle: o.quelle ?? "", unsicher: Boolean(o.unsicher) });
 }
 // dieselben Objekte wie in den Vorschlägen des Hygieneplans (Titel wie „Händewaschen“ gibt es auch bei Beauty)
-const LEBENSMITTEL = new Set(F.HYGIENE_LEBENSMITTEL);
+// E-166: dazu die Zeilen für Bäckerei und Foodtruck / mobilen Verkauf
+const LEBENSMITTEL = new Set([...F.HYGIENE_LEBENSMITTEL, ...F.HYGIENE_BAECKEREI, ...F.HYGIENE_FOODTRUCK]);
 const BEAUTY = /Friseur|Kosmetik|Nagel|Fußpflege/;
-const FELD = { grenzwert: "Grenzwert", haeufigkeit: "Häufigkeit", korrektur: "Korrekturmaßnahme", thema: "Themenbereich", wann: "Wann / wie oft", womit: "Womit", wie: "Wie", wer: "Wer" };
-const inhaltAus = (werte, titel) =>
+const FELD = { grenzwert: "Grenzwert", haeufigkeit: "Häufigkeit", korrektur: "Korrekturmaßnahme", thema: "Themenbereich", wann: "Wann / wie oft", womit: "Womit", wie: "Wie", wer: "Wer", arten: "Art der Gefahr", gefahr: "Gefahr", lenkung: "Lenkungsmaßnahme", ccp: "CCP", begruendung: "Begründung", ueberwachung: "Überwachung: wie" };
+// E-166: Felder der Gefahrenanalyse und der CCP heißen teils anders als im Hygieneplan
+const FELD_HACCP = { wer: "Überwachung: wer", wann: "Überwachung: wie oft" };
+const inhaltAus = (werte, titel, haccp = false) =>
   Object.entries(werte ?? {})
-    .filter(([k, w]) => w && !["punkt", "was", "thema"].includes(k) && w !== titel)
-    .map(([k, w]) => `${FELD[k] ?? k}: ${String(w)}`)
+    .filter(([k, w]) => (Array.isArray(w) ? w.length : w) && !["punkt", "was", "thema", "schritt"].includes(k) && w !== titel)
+    .map(([k, w]) => `${(haccp && FELD_HACCP[k]) || FELD[k] || k}: ${Array.isArray(w) ? w.join(", ") : String(w)}`)
     .join("\n");
 function* felderVon(v) {
   for (const a of v.abschnitte) {
     for (const f of a.felder) {
-      yield { f, feld: f.label };
-      if (f.art === "liste") for (const u of f.felder) yield { f: u, feld: `${f.label} › ${u.label}` };
+      yield { f, feld: f.label, abschnitt: a.titel };
+      if (f.art === "liste") for (const u of f.felder) yield { f: u, feld: `${f.label} › ${u.label}`, abschnitt: a.titel };
     }
   }
 }
 const bausteine = [];
 for (const v of VORLAGEN) {
-  for (const { f, feld } of felderVon(v)) {
-    const neu = (x) => bausteine.push({ vorlage: v.id === "hygieneplan" ? "Hygieneplan (Lebensmittelbetrieb)" : v.titel, vorlageId: v.id, feld, ...x });
-    if (f.art === "liste") for (const s of (f.vorschlaege ?? []).filter((s) => v.id !== "hygieneplan" || LEBENSMITTEL.has(s))) neu({ art: "Vorschlag (Eintrag)", gruppeApp: s.gruppe ?? "", thema: s.werte?.thema ?? "", titel: s.titel, inhalt: inhaltAus(s.werte, s.titel), quelle: s.quelle ?? "" });
+  for (const { f, feld, abschnitt } of felderVon(v)) {
+    // E-166: in der HACCP-Vorlage gliedern die Abschnitte (Gefahrenanalyse, CCP, Verifizierung …) die Bausteine
+    const neu = (x) => bausteine.push({ vorlage: v.id === "hygieneplan" ? "Hygieneplan (Lebensmittelbetrieb)" : v.titel, vorlageId: v.id, feld, ...(v.id === "haccp" ? { thema: abschnitt } : {}), ...x });
+    if (f.art === "liste") for (const s of (f.vorschlaege ?? []).filter((s) => v.id !== "hygieneplan" || LEBENSMITTEL.has(s))) neu({ art: "Vorschlag (Eintrag)", gruppeApp: s.gruppe ?? "", thema: s.werte?.thema ?? (v.id === "haccp" ? ({ gefahren: "Gefahrenanalyse", ccps: "Kritische Kontrollpunkte (CCP)", punkte: "Kontrollpunkte der Eigenkontrollen" }[f.id] ?? "") : ""), titel: s.titel, inhalt: inhaltAus(s.werte, s.titel, v.id === "haccp"), quelle: s.quelle ?? "" });
     // Die 14 Allergene haben keinen Kurzbeleg je Option; konstanten.ts nennt Anhang II LMIV und „Bezeichnungen fachlich zu prüfen, E-099“
     const allergen = f.art === "mehrfach" && f.optionen.length === Object.keys(F.ALLERGENE).length;
     if (f.optionen && (f.art === "bausteine" || allergen || f.optionen.some((o) => o.quelle))) for (const o of f.optionen) neu({ art: f.art === "bausteine" ? "Textbaustein" : "Auswahl", gruppeApp: (o.gruppen ?? []).join(", "), titel: o.text, inhalt: allergen ? "Bezeichnungen fachlich zu prüfen (E-099)" : "", quelle: o.quelle ?? (allergen ? "Anhang II LMIV" : (ausBausteinen.get(o.text)?.quelle ?? "")), unsicher: Boolean(o.unsicher || ausBausteinen.get(o.text)?.unsicher) });
@@ -122,11 +126,11 @@ const zaehle = (re) => bausteine.filter((b) => re.test(b.markierung)).length;
 const bm = [
   "# Bausteine der Lebensmittel-Vorlagen",
   "",
-  `Aus dem Code erzeugt am ${new Date().toISOString().slice(0, 10)} (\`packages/fachlogik/src/dokumente/bausteine.ts\` – erzeugt von \`packages/fachlogik/werkzeuge/bausteine-erzeugen.mjs\` aus der Recherche \`docs/recherche/2026-10-12/lebensmittel_beauty.json\`, mit Korrekturen der Druckfassung –, ergänzt in \`branchen.ts\`: Hygieneplan für Lebensmittelbetriebe). Es steht alles, was die App in den Vorlagen ${VORLAGEN.map((v) => `„${v.titel}“`).join(", ")} (nur Lebensmittelbetrieb) zum Antippen anbietet. Der Betrieb übernimmt einen Baustein und passt ihn an; nichts davon ist bisher fachlich freigegeben (PRUEFLISTE T-34, T-57, T-94).`,
+  `Aus dem Code erzeugt am ${new Date().toISOString().slice(0, 10)} (\`packages/fachlogik/src/dokumente/bausteine.ts\` – erzeugt von \`packages/fachlogik/werkzeuge/bausteine-erzeugen.mjs\` aus der Recherche \`docs/recherche/2026-10-12/lebensmittel_beauty.json\`, mit Korrekturen der Druckfassung –, ergänzt in \`branchen.ts\`: Hygieneplan für Lebensmittelbetriebe, und in \`haccp.ts\` (E-166): Gefahrenanalyse, kritische Kontrollpunkte, Verifizierung, Aufzeichnungen, Hygieneplan-Zeilen für Bäckerei und Foodtruck). Es steht alles, was die App in den Vorlagen ${VORLAGEN.map((v) => `„${v.titel}“`).join(", ")} (nur Lebensmittelbetrieb) zum Antippen anbietet. Der Betrieb übernimmt einen Baustein und passt ihn an; nichts davon ist bisher fachlich freigegeben (PRUEFLISTE T-34, T-57, T-94).`,
   "",
   `**${bausteine.length} Bausteine**, davon ${zaehle(/Temperaturwert/)} mit Temperaturwert (alle „fachlich zu prüfen“), ${zaehle(/zwei Behördenwerte/)} mit zwei verschiedenen Behördenwerten, ${zaehle(/(^|; )fachlich zu prüfen/)} im Code ausdrücklich „fachlich zu prüfen“ bzw. „üblicher Richtwert, fachlich zu prüfen“, ${zaehle(/unsicher/)} „unsicher“, ${zaehle(/ohne Quelle/)} ohne Quelle. Die Nummern (L-…) sind die der CSV-Datei.`,
   "",
-  "**Branchen:** Die Bausteine für Lebensmittelbetriebe haben im Code nur die Gruppe „Gastronomie / Café“ (Hygieneplan) bzw. keine Gruppe (HACCP, Allergene, IfSG). Bäckerei, Foodtruck, Imbiss und Laden mit Lebensmitteln sehen dieselben Bausteine; eigene Bausteine für sie gibt es nicht. Die Gruppe „Bäckerei“ im Code betrifft nur den Arbeitsschutz.",
+  "**Branchen (seit E-166):** Gefahrenanalyse und kritische Kontrollpunkte der HACCP-Vorlage sowie die Hygieneplan-Zeilen gibt es für die Gruppen „Gastronomie / Café“, „Bäckerei“ und „Foodtruck / mobiler Verkauf“ (Spalte „Gruppe in der App“). Die App zeigt die passende Gruppe zuerst: Bäckerei bei Handwerk und Lebensmitteln bzw. am Namen, Foodtruck bei Lebensmitteln mit Reisegewerbe oder Marktstand bzw. am Namen. Die Kontrollpunkte der Eigenkontrollen, Allergene und IfSG haben keine Gruppe. Eine Gruppe für Metzgereien gibt es nicht (keine eigene Branche im Pflichten-Check).",
   "",
   "Spalte „Kennzahlen“: automatisch herausgezogene Temperaturen, Zeiten und Häufigkeiten – zum schnellen Abgleich, nicht vollständig.",
   "",
@@ -149,6 +153,7 @@ bm.push("", "## Feste Texte der Vorlagen", "");
 bm.push("### Allergenliste: die 14 Hauptallergene (Anhang II LMIV) mit Erläuterung", "", "| Nr. | Bezeichnung in der App | Erläuterung auf dem Aushang (Recherche) |", "|---|---|---|", ...Object.values(F.ALLERGENE).map((a, i) => `| ${i + 1} | ${md(a)} | ${md(F.BS.ALLERGENE_UMFANG[i]?.umfasst ?? "")} |`), "");
 bm.push("### Allergene bei loser Ware (Recherche, `LOSE_WARE`)", "", `Rechtsgrundlage (Fußtext des Aushangs): ${F.BS.LOSE_WARE.rechtsgrundlage}`, "", `Anforderung: ${F.BS.LOSE_WARE.anforderung}`, "", "Schriftliche Formen:", ...F.BS.LOSE_WARE.formen.map((t) => `- ${t}`), "");
 bm.push("### Belehrung nach § 43 IfSG: Tätigkeitsverbote, Krankheitszeichen, Lebensmittel (Abschnitt „Tätigkeitsverbote nach § 42 Abs. 1 IfSG“)", "", "Personen (§ 42 Abs. 1 IfSG):", ...F.BS.IFSG.personen.map((t) => `- ${t}`), "", "Krankheitszeichen („Woran Sie das erkennen“):", ...F.BS.IFSG.symptome.map((t) => `- ${t}`), "", "Lebensmittel (§ 42 Abs. 2 IfSG):", ...F.BS.IFSG.lebensmittel.map((t) => `- ${t}`), "");
+bm.push("### HACCP: Prozessschritte, Entscheidungshilfe für CCP, Flexibilität, Aufbewahrung (E-166)", "", `Prozessschritte auf dem leeren Blatt: ${F.PROZESSSCHRITTE.join(", ")}`, "", `Entscheidungshilfe (${F.CCP_FRAGEN_QUELLE}):`, ...F.CCP_FRAGEN.map((t, i) => `${i + 1}. ${t}`), "", `Begründungen zum Antippen: ${F.CCP_BEGRUENDUNG.join(" · ")}`, "", `Fußtext Flexibilität: ${F.HACCP_FLEXIBEL}`, "", `Aufbewahrung (Startwert): ${F.HACCP_AUFBEWAHRUNG}`, "");
 bm.push("### Hygieneplan Lebensmittelbetrieb: Themenbereiche und Querverweis", "", ...F.HYGIENE_THEMEN_LEBENSMITTEL.map((t, i) => `${i + 1}. ${t}`), "", `Fußtext: ${F.HYGIENE_VERWEIS_HACCP}`, "");
 fs.writeFileSync(path.join(ZIEL, "bausteine.md"), bm.join("\n"));
 

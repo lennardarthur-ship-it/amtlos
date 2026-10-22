@@ -5,7 +5,8 @@
  */
 import { teilnahmeTabelle } from "./arbeitsschutz.js";
 import { ALLERGENE_UMFANG, HACCP, HAUTSCHUTZ_FRISEUR, HYGIENE, IFSG, LOSE_WARE } from "./bausteine.js";
-import { KOPF_LINIE, ZELLE_LINIE, abschnitt, absatz, angaben, auswahl, datumDe, dokument, esc, ja, liste, nachsatz, neufassung, plusMonate, punkte, stabileOption, tabelle, text, unterschriften, zelle } from "./html.js";
+import { AUFZEICHNUNGEN, CCP_BEGRUENDUNG, CCP_FRAGEN, CCP_FRAGEN_QUELLE, CCP_VORSCHLAEGE, GEFAHRENANALYSE, GEFAHR_ARTEN, GEFAHR_KURZ, HACCP_AUFBEWAHRUNG, HACCP_FLEXIBEL, HYGIENE_BAECKEREI, HYGIENE_FOODTRUCK, PROZESSSCHRITTE, VERIFIZIERUNG } from "./haccp.js";
+import { KOPF_LINIE, ZELLE_LINIE, abschnitt, absatz, angaben, ankreuzen, auswahl, datumDe, dokument, esc, ja, liste, nachsatz, neufassung, plusMonate, punkte, stabileOption, tabelle, text, unterschriften, zelle, zusammen } from "./html.js";
 import { ALLERGENE, optionen } from "./konstanten.js";
 import type { Betrieb, Daten, Eintrag, Vorlage, Vorschlag } from "./typen.js";
 
@@ -173,20 +174,133 @@ export const allergenAushang: Vorlage = {
 /** Geräte für das Monatsraster zum Antippen (neben den eigenen Kontrollpunkten). */
 const RASTER_GERAETE = ["Kühlschrank 1", "Kühlschrank 2", "Tiefkühltruhe", "Kühltheke", "Getränkekühlschrank", "Warmhaltetheke", "Spülmaschine (Nachspültemperatur)"];
 
+/** E-166: CCP-Entscheidung in der Gefahrenanalyse. */
+const CCP_WAHL = [
+  { wert: "ja", text: "ja – kritischer Kontrollpunkt" },
+  { wert: "nein", text: "nein – Basishygiene genügt" },
+  { wert: "offen", text: "noch offen" },
+];
+/** Normalisierter Vergleich von Prozessschritten („Erhitzen“ ↔ „Erhitzen – Kerntemperatur“). */
+const schrittNorm = (t: string) => t.trim().replace(/\s+/g, " ").toLocaleLowerCase("de");
+const gleicherSchritt = (a: string, b: string) => {
+  const x = schrittNorm(a);
+  const y = schrittNorm(b);
+  return Boolean(x && y) && (x === y || y.startsWith(`${x} `) || x.startsWith(`${y} `) || y.startsWith(`${x}–`) || x.startsWith(`${y}–`));
+};
+
+/** E-166: Abschnitte Gefahrenanalyse, CCP und Verifizierung/Dokumentation der HACCP-Vorlage (HTML). */
+function haccpKern(d: Daten): string {
+  const g = liste(d, "gefahren").filter((x) => text(x, "schritt") || text(x, "gefahr"));
+  const c = liste(d, "ccps").filter((x) => text(x, "schritt") || text(x, "grenzwert"));
+  const art = (x: Eintrag) => auswahl(x, "arten").map((a) => GEFAHR_KURZ[a] ?? a).join(", ");
+  const ccpZelle = (x: Eintrag) => {
+    const w = text(x, "ccp");
+    const kurz = w === "ja" ? "<strong>ja</strong>" : w === "nein" ? "nein" : "";
+    return `${kurz}${text(x, "begruendung") ? `${kurz ? "<br>" : ""}<span class="klein">${zelle(text(x, "begruendung"))}</span>` : ""}`;
+  };
+  const gZeilen = g.length
+    ? g.map((x) => [`<strong>${zelle(text(x, "schritt"))}</strong>`, `${art(x) ? `<span class="klein">${esc(art(x))}</span><br>` : ""}${zelle(text(x, "gefahr"))}`, zelle(text(x, "lenkung")), ccpZelle(x)])
+    : PROZESSSCHRITTE.map((s) => [`<strong>${esc(s)}</strong>`, "", "", '<span class="klein">ja · nein</span>']);
+  const fragen = `<div class="zusammen"><h3>Entscheidungshilfe: Ist der Schritt ein kritischer Kontrollpunkt (CCP)?</h3><p class="klein">Je Gefahr die Fragen der Reihe nach beantworten:</p>${nummernListe(CCP_FRAGEN)}<p class="klein">${esc(CCP_FRAGEN_QUELLE)}.</p></div>`;
+  const ueberwachung = (x: Eintrag) => [["Wie", text(x, "ueberwachung")], ["Wer", text(x, "wer")], ["Wie oft", text(x, "wann")]].filter(([, w]) => w).map(([k, w]) => `<span class="klein">${k}:</span> ${zelle(w!)}`).join("<br>");
+  const cZeilen = c.length
+    ? c.map((x) => [`<strong>${zelle(text(x, "schritt"))}</strong>${text(x, "gefahr") ? `<br><span class="klein">${zelle(text(x, "gefahr"))}</span>` : ""}`, zelle(text(x, "grenzwert")), ueberwachung(x), zelle(text(x, "korrektur"))])
+    : Array.from({ length: 4 }, () => ["", "", '<span class="klein">Wie:<br>Wer:<br>Wie oft:</span>', ""]);
+  const verif = auswahl(d, "verifizierung").map((w) => VERIFIZIERUNG.find((o) => o.wert === w)?.text ?? w);
+  const aufz = auswahl(d, "aufzeichnungen").map((w) => AUFZEICHNUNGEN.find((o) => o.wert === w)?.text ?? w);
+  return (
+    abschnitt(
+      "Gefahrenanalyse",
+      `<p class="klein vor-tabelle">Je Arbeitsschritt: Welche Gefahr kann entstehen (biologisch, chemisch, physikalisch, Allergene), was lenkt sie, und ist der Schritt ein kritischer Kontrollpunkt (CCP)?</p>` +
+        tabelle(["Prozessschritt", "Gefahr", "Lenkungsmaßnahme", "CCP?"], gZeilen, { breiten: ["17%", "33%", "36%", "14%"], ...(g.length ? {} : { hoch: true }) }) +
+        fragen,
+      { rand: "Art. 5 Abs. 2 lit. a, b" },
+    ) +
+    abschnitt(
+      "Kritische Kontrollpunkte (CCP)",
+      tabelle(["CCP / Prozessschritt", "Grenzwert", "Überwachung", "Korrekturmaßnahme"], cZeilen, { breiten: ["20%", "24%", "28%", "28%"], ...(c.length ? {} : { hoch: true }) }),
+      { rand: "Art. 5 Abs. 2 lit. c–e" },
+    ) +
+    abschnitt(
+      "Verifizierung und Dokumentation",
+      // je Teil Überschrift, Liste und Angabe zusammen (kein Umbruch mitten in der Liste)
+      zusammen(`<h3>Verifizierung: So prüfen wir, ob das Verfahren wirkt</h3>${verif.length ? punkte(verif) : ankreuzen(VERIFIZIERUNG.map((o) => o.text))}${angaben([["Nächste Überprüfung", datumDe(text(d, "naechste_pruefung"))]])}`) +
+        zusammen(`<h3>Aufzeichnungen</h3>${aufz.length ? punkte(aufz) : ankreuzen(AUFZEICHNUNGEN.map((o) => o.text))}${angaben([["Aufbewahrung", text(d, "aufbewahrung")]])}`) +
+        `<p class="klein">${esc(HACCP_FLEXIBEL)}</p>`,
+      { rand: "Art. 5 Abs. 2 lit. f, g; Abs. 4" },
+    )
+  );
+}
+
 export const haccp: Vorlage = {
   id: "haccp",
   titel: "Eigenkontrollen (HACCP)",
-  beschreibung: "Kontrollpunkte mit Grenzwerten und Korrekturmaßnahmen aus Merkblättern der Lebensmittelüberwachung – plus Messprotokoll, ausgefüllt oder zum Eintragen von Hand.",
+  beschreibung: "Gefahrenanalyse je Arbeitsschritt, kritische Kontrollpunkte mit Grenzwert, Überwachung und Korrekturmaßnahme, Verifizierung und Dokumentation – plus Kontrollpunkte aus Merkblättern der Lebensmittelüberwachung und Messprotokoll, ausgefüllt oder zum Eintragen von Hand.",
   bereich: "gastro",
   pflichten: ["branche.gastro_haccp"],
   grundlage: "Art. 5 VO (EG) Nr. 852/2004",
   querformat: true,
   namensFeld: "zeitraum",
   abschnitte: [
-    { titel: "Zeitraum",
+    { titel: "Zeitraum und Verantwortung",
+      hilfe: HACCP_FLEXIBEL,
       felder: [
         { id: "zeitraum", art: "text", label: "Zeitraum", hilfe: "z. B. Oktober 2026", pflicht: true },
+        // E-166: wer das Verfahren verantwortet und wann die Gefahrenanalyse zuletzt durchgesehen wurde
+        { id: "verantwortlich", art: "text", label: "Verantwortlich für das HACCP-Verfahren", vorbelegung: "verantwortlich" },
+        { id: "stand", art: "datum", label: "Stand der Gefahrenanalyse", vorbelegung: "heute" },
         { id: "leerzeilen", selten: true, art: "schalter", label: "Leere Zeilen zum Eintragen von Hand anhängen", vorbelegung: true },
+      ],
+    },
+    {
+      // E-166 (Art. 5 Abs. 2 Buchst. a, b): Gefahrenanalyse je Prozessschritt mit CCP-Entscheidung
+      titel: "Gefahrenanalyse",
+      hilfe: "Geh deine Arbeitsschritte vom Wareneingang bis zur Ausgabe durch: Welche Gefahr kann entstehen, was tust du dagegen, und ist der Schritt ein kritischer Kontrollpunkt (CCP)? Die Vorschläge gibt es für Café und Gastronomie, Bäckerei und Foodtruck – übernimm nur, was bei dir vorkommt, und pass es an.",
+      felder: [
+        {
+          id: "gefahren",
+          art: "liste",
+          label: "Gefahrenanalyse",
+          eintrag: "Prozessschritt",
+          titelFeld: "schritt",
+          leerStarten: true,
+          vorschlaege: GEFAHRENANALYSE,
+          gruppenLabel: "Branche",
+          felder: [
+            { id: "schritt", art: "text", label: "Prozessschritt", pflicht: true, vorschlaege: [...PROZESSSCHRITTE] },
+            { id: "arten", art: "mehrfach", label: "Art der Gefahr", optionen: GEFAHR_ARTEN },
+            { id: "gefahr", art: "mehrzeilig", label: "Gefahr", pflicht: true },
+            { id: "lenkung", art: "mehrzeilig", label: "Lenkungsmaßnahme", pflicht: true, hilfe: "Was du tust, damit die Gefahr nicht eintritt – z. B. kühlen, durcherhitzen, trennen, reinigen." },
+            { id: "ccp", art: "wahl", label: "Kritischer Kontrollpunkt (CCP)?", optionen: CCP_WAHL, vorbelegung: "offen", hilfe: `Entscheidungshilfe, Fragen der Reihe nach: ${CCP_FRAGEN.map((f, i) => `${i + 1}. ${f}`).join(" ")}` },
+            { id: "begruendung", art: "text", label: "Begründung", vorschlaege: CCP_BEGRUENDUNG },
+          ],
+        },
+      ],
+    },
+    {
+      // E-166 (Art. 5 Abs. 2 Buchst. c–e): Grenzwert, Überwachung (wer, wie, wie oft) und Korrekturmaßnahme je CCP
+      titel: "Kritische Kontrollpunkte",
+      hilfe: "Für jeden Schritt, den du als CCP bestimmt hast: Grenzwert, wie und wie oft wer misst, und was bei einer Abweichung passiert. Die Zahlen sind Vorschläge mit Quelle – prüfe sie für deinen Betrieb.",
+      felder: [
+        {
+          id: "ccps",
+          art: "liste",
+          label: "Kritische Kontrollpunkte",
+          eintrag: "CCP",
+          titelFeld: "schritt",
+          leerStarten: true,
+          vorschlaege: CCP_VORSCHLAEGE,
+          gruppenLabel: "Branche",
+          felder: [
+            { id: "schritt", art: "text", label: "CCP / Prozessschritt", pflicht: true, vorschlaegeAus: { liste: "gefahren", feld: "schritt" } },
+            { id: "gefahr", art: "text", label: "Gefahr" },
+            { id: "grenzwert", art: "mehrzeilig", label: "Grenzwert", pflicht: true },
+            { id: "ueberwachung", art: "mehrzeilig", label: "Überwachung: wie", vorschlaege: ["Einstichthermometer in die dickste Stelle", "Thermometer im Gerät ablesen", "Sichtkontrolle"] },
+            { id: "wer", art: "text", label: "Überwachung: wer", vorschlaege: ["Inhaber/in", "Koch / Köchin", "Beschäftigte", "Standbetreiber/in"] },
+            { id: "wann", art: "text", label: "Überwachung: wie oft", vorschlaege: ["bei jeder Charge", "täglich zu Arbeitsbeginn", "bei jeder Lieferung", "stichprobenartig je Verkaufstag"] },
+            { id: "korrektur", art: "mehrzeilig", label: "Korrekturmaßnahme", pflicht: true },
+          ],
+        },
       ],
     },
     {
@@ -209,6 +323,17 @@ export const haccp: Vorlage = {
             { id: "korrektur", art: "mehrzeilig", label: "Korrekturmaßnahme", pflicht: true },
           ],
         },
+      ],
+    },
+    {
+      // E-166 (Art. 5 Abs. 2 Buchst. f, g; Abs. 4): Verifizierung und Dokumentation
+      titel: "Verifizierung und Dokumentation",
+      hilfe: "Wie du regelmäßig prüfst, ob dein Verfahren wirkt, welche Aufzeichnungen du führst und wie lange du sie aufbewahrst. Die Verordnung nennt keine feste Aufbewahrungsdauer.",
+      felder: [
+        { id: "verifizierung", art: "bausteine", label: "Verifizierung", optionen: VERIFIZIERUNG },
+        { id: "naechste_pruefung", art: "datum", label: "Nächste Überprüfung des Verfahrens" },
+        { id: "aufzeichnungen", art: "bausteine", label: "Aufzeichnungen", optionen: AUFZEICHNUNGEN },
+        { id: "aufbewahrung", art: "text", label: "Aufbewahrung der Aufzeichnungen", vorbelegung: { text: HACCP_AUFBEWAHRUNG }, hilfe: "Art. 5 Abs. 4 Buchst. c VO (EG) Nr. 852/2004 verlangt einen „angemessenen Zeitraum“ – frag deine Lebensmittelüberwachung, was sie erwartet." },
       ],
     },
     {
@@ -239,12 +364,26 @@ export const haccp: Vorlage = {
       ],
     },
   ],
+  // E-166: Gefahrenanalyse und CCP passen zusammen – Hinweise, die nicht am Teilen hindern
+  hinweise(d) {
+    const g = liste(d, "gefahren").filter((x) => text(x, "schritt"));
+    const c = liste(d, "ccps").filter((x) => text(x, "schritt"));
+    const r: string[] = [];
+    if (!g.length) r.push("HACCP: Die Gefahrenanalyse fehlt noch (Art. 5 Abs. 2 Buchst. a VO (EG) Nr. 852/2004) – übernimm die Vorschläge für deinen Betrieb und pass sie an.");
+    const ohne = g.filter((x) => text(x, "ccp") === "ja" && !c.some((y) => gleicherSchritt(text(x, "schritt"), text(y, "schritt")))).map((x) => text(x, "schritt"));
+    if (ohne.length) r.push(`HACCP: ${ohne.length === 1 ? "Der Schritt" : "Die Schritte"} „${ohne.join("“, „")}“ ${ohne.length === 1 ? "ist" : "sind"} als kritischer Kontrollpunkt bestimmt – trag unter „Kritische Kontrollpunkte“ Grenzwert, Überwachung und Korrekturmaßnahme ein.`);
+    const offen = g.filter((x) => text(x, "ccp") === "offen" || !text(x, "ccp")).map((x) => text(x, "schritt"));
+    if (offen.length) r.push(`HACCP: Noch nicht entschieden, ob ein kritischer Kontrollpunkt vorliegt: „${offen.join("“, „")}“ – die Entscheidungshilfe steht beim Feld „Kritischer Kontrollpunkt (CCP)?“.`);
+    return r;
+  },
   html(d, b) {
     const p = liste(d, "punkte").filter((x) => text(x, "punkt"));
     const m = liste(d, "messungen").filter((x) => text(x, "kontrollpunkt") || text(x, "wert"));
     // Grenzwert zur Messung aus den Kontrollpunkten (gleicher Name, ohne Groß-/Kleinschreibung und Leerzeichen)
     const norm = (t: string) => t.trim().replace(/\s+/g, " ").toLocaleLowerCase("de");
-    const grenzwert = (kp: string) => p.find((x) => norm(text(x, "punkt")) === norm(kp)) ?? null;
+    // E-166: auch die kritischen Kontrollpunkte (Name = Prozessschritt) liefern den Grenzwert
+    const mitCcp = [...p, ...liste(d, "ccps").filter((x) => text(x, "schritt") && text(x, "grenzwert")).map((x) => ({ ...x, punkt: text(x, "schritt") }))];
+    const grenzwert = (kp: string) => mitCcp.find((x) => norm(text(x, "punkt")) === norm(kp)) ?? null;
     // Messungen heißen meist nach dem Gerät („Kühlschrank Küche“): Passt keine zu einem Kontrollpunkt, entfällt die
     // Spalte „Grenzwert“ statt leer zu bleiben. Das leere Protokoll zum Eintragen von Hand behält sie.
     const mitGrenzwert = !m.length || m.some((x) => grenzwert(text(x, "kontrollpunkt")));
@@ -254,10 +393,12 @@ export const haccp: Vorlage = {
       betrieb: b,
       unter: text(d, "zeitraum") || undefined,
       quer: true,
-      meta: `Zeitraum: ${text(d, "zeitraum")}${p.length ? `\nKontrollpunkte: ${p.length}` : ""}`,
+      meta: `Zeitraum: ${text(d, "zeitraum")}${text(d, "verantwortlich") ? `\nVerantwortlich: ${text(d, "verantwortlich")}` : ""}${text(d, "stand") ? `\nStand der Gefahrenanalyse: ${datumDe(text(d, "stand"))}` : ""}${p.length ? `\nKontrollpunkte: ${p.length}` : ""}`,
       inhalt:
         // die Kennungsleiste lässt einen leeren Zeitraum weg: dann ein Feld zum Eintragen
         (text(d, "zeitraum") ? "" : angaben([["Zeitraum", ""]])) +
+        // E-166: Kern des HACCP-Verfahrens vor den Eigenkontrollen
+        haccpKern(d) +
         abschnitt(
           "Kontrollpunkte, Grenzwerte und Korrekturmaßnahmen",
           tabelle(["Kontrollpunkt", "Grenzwert", "Häufigkeit", "Korrekturmaßnahme"], p.map((x) => [`<strong>${zelle(text(x, "punkt"))}</strong>`, zelle(text(x, "grenzwert")), zelle(text(x, "haeufigkeit")), zelle(text(x, "korrektur"))]), { breiten: ["20%", "24%", "20%", "36%"], ...(p.length ? {} : { mindestens: 6, hoch: true }) }),
@@ -525,7 +666,7 @@ const BEAUTY_ZEILE = /Instrument|Haut|\bKund(?:e|en|in|innen)\b|Steril|Lanzett|N
 /** Bayern-spezifischer Zusatz in einem Baustein (R11, Kosmetik #16): nur drucken, wenn der Betrieb in Bayern liegt */
 const NUR_BAYERN = /\s*\(Bayern: [^)]*\)/g;
 /** „Wer“ aus den Bausteinen (Beschäftigte, Reinigungskraft, Arbeitgeber …) – ohne Beschäftigte steht dort die verantwortliche Person */
-const WER_AUS_BAUSTEINEN = new Set([...HYGIENE, ...HYGIENE_LEBENSMITTEL].map((v) => (typeof v.werte.wer === "string" ? v.werte.wer.trim() : "")).filter(Boolean));
+const WER_AUS_BAUSTEINEN = new Set([...HYGIENE, ...HYGIENE_LEBENSMITTEL, ...HYGIENE_BAECKEREI, ...HYGIENE_FOODTRUCK].map((v) => (typeof v.werte.wer === "string" ? v.werte.wer.trim() : "")).filter(Boolean));
 
 /** Einträge des Hygieneplans für den Druck: Landeszusatz nur im passenden Land, „Wer“ bei Ein-Personen-Betrieben. */
 function hygieneFuerDruck(d: Daten, b: Betrieb): Daten {
@@ -593,10 +734,10 @@ export const hygieneplan: Vorlage = {
   abschnitte: [
     {
       titel: "Bereich",
-      hilfe: "Friseur, Kosmetik, Nagelstudio, Fußpflege: Welche Anforderungen genau gelten, regelt die Hygieneverordnung deines Bundeslands; Desinfektionsmittel nach Herstellerangabe bzw. VAH-Liste. Lebensmittelbetriebe: allgemeine Hygienevorschriften nach Art. 4 und Anhang II VO (EG) Nr. 852/2004 und Lebensmittelhygiene-Verordnung (LMHV) – die Vorschläge der Gruppe „Gastronomie / Café“ decken Reinigung und Desinfektion, Personalhygiene, Schädlinge, Temperaturen, Wareneingang, Trennung rein/unrein, Abfall, Trinkwasser und Schulungen ab. Die Eigenkontrollen nach HACCP haben eine eigene Vorlage.",
+      hilfe: "Friseur, Kosmetik, Nagelstudio, Fußpflege: Welche Anforderungen genau gelten, regelt die Hygieneverordnung deines Bundeslands; Desinfektionsmittel nach Herstellerangabe bzw. VAH-Liste. Lebensmittelbetriebe: allgemeine Hygienevorschriften nach Art. 4 und Anhang II VO (EG) Nr. 852/2004 und Lebensmittelhygiene-Verordnung (LMHV) – die Vorschläge der Gruppe „Gastronomie / Café“ decken Reinigung und Desinfektion, Personalhygiene, Schädlinge, Temperaturen, Wareneingang, Trennung rein/unrein, Abfall, Trinkwasser und Schulungen ab; dazu kommen Zeilen für Bäckerei sowie für Foodtruck und mobilen Verkauf (Wassertank, Handwaschgelegenheit, Kühlung unterwegs, Abfall und Abwasser, Standplatzwechsel). Die Eigenkontrollen nach HACCP haben eine eigene Vorlage.",
       felder: [
-        { id: "art", art: "wahl", label: "Art des Betriebs", optionen: [{ wert: "beauty", text: "Friseur, Kosmetik, Nagelstudio, Fußpflege" }, { wert: "lebensmittel", text: "Lebensmittelbetrieb (Café, Küche, Bäckerei)" }], vorbelegung: "beauty", vorbelegungJe: { gastro_cafe: "lebensmittel" }, hilfe: "Bestimmt die Rechtsgrundlage und den Aufbau des Plans. Für Lebensmittelbetriebe: Vorschläge der Gruppe „Gastronomie / Café“ – Zahlen darin sind übliche Richtwerte und fachlich zu prüfen." },
-        { id: "bereich", art: "text", label: "Bereich", vorschlaege: ["Friseursalon", "Kosmetik", "Nagelstudio", "Fußpflege", "Küche", "Theke und Gastraum"] },
+        { id: "art", art: "wahl", label: "Art des Betriebs", optionen: [{ wert: "beauty", text: "Friseur, Kosmetik, Nagelstudio, Fußpflege" }, { wert: "lebensmittel", text: "Lebensmittelbetrieb (Café, Küche, Bäckerei, Foodtruck)" }], vorbelegung: "beauty", vorbelegungJe: { gastro_cafe: "lebensmittel" }, hilfe: "Bestimmt die Rechtsgrundlage und den Aufbau des Plans. Für Lebensmittelbetriebe: Vorschläge der Gruppen „Gastronomie / Café“, „Bäckerei“ und „Foodtruck / mobiler Verkauf“ – Zahlen darin sind übliche Richtwerte und fachlich zu prüfen." },
+        { id: "bereich", art: "text", label: "Bereich", vorschlaege: ["Friseursalon", "Kosmetik", "Nagelstudio", "Fußpflege", "Küche", "Theke und Gastraum", "Backstube und Verkauf", "Foodtruck"] },
       ],
     },
     {
@@ -610,7 +751,7 @@ export const hygieneplan: Vorlage = {
           titelFeld: "was",
           pflicht: true,
           leerStarten: true,
-          vorschlaege: [...HYGIENE, ...HYGIENE_LEBENSMITTEL],
+          vorschlaege: [...HYGIENE, ...HYGIENE_LEBENSMITTEL, ...HYGIENE_BAECKEREI, ...HYGIENE_FOODTRUCK],
           felder: [
             { id: "was", art: "text", label: "Was", pflicht: true },
             { id: "wann", art: "mehrzeilig", label: "Wann / wie oft" },
@@ -639,7 +780,7 @@ export const hygieneplan: Vorlage = {
     const e = liste(d, "eintraege").filter((x) => text(x, "was"));
     const r: string[] = [];
     const beauty = e.filter((x) => BEAUTY_ZEILE.test(["was", "wann", "womit", "wie"].map((k) => text(x, k)).join(" "))).map((x) => text(x, "was"));
-    if (beauty.length) r.push(`Lebensmittelbetrieb: ${beauty.length === 1 ? "Der Eintrag" : "Die Einträge"} „${beauty.join("“, „")}“ ${beauty.length === 1 ? "gehört" : "gehören"} in einen Beauty-Betrieb – entferne ${beauty.length === 1 ? "ihn" : "sie"} und nimm die Vorschläge der Gruppe „Gastronomie / Café“.`);
+    if (beauty.length) r.push(`Lebensmittelbetrieb: ${beauty.length === 1 ? "Der Eintrag" : "Die Einträge"} „${beauty.join("“, „")}“ ${beauty.length === 1 ? "gehört" : "gehören"} in einen Beauty-Betrieb – entferne ${beauty.length === 1 ? "ihn" : "sie"} und nimm die Vorschläge für Lebensmittelbetriebe („Gastronomie / Café“, „Bäckerei“, „Foodtruck / mobiler Verkauf“).`);
     if (e.some((x) => text(x, "thema"))) {
       const fehlt = HYGIENE_THEMEN_LEBENSMITTEL.filter((t) => !e.some((x) => text(x, "thema") === t));
       if (fehlt.length) r.push(`Lebensmittelbetrieb: Im Plan fehlt noch ${fehlt.join(", ")}.`);

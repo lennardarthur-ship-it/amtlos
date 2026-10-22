@@ -35,5 +35,7 @@ erwartet:
   branche.transport_lenkzeiten_national: gilt_nicht
   personal.nachtarbeit: gilt_nicht
   branche.handwerk_gefaehrdung_gewerk: gilt
+  branche.gastro_rueckverfolgbarkeit: gilt_nicht
+  branche.gastro_trinkwasser_mobil: gilt_nicht
 termine_enthaelt:
   personal.azubi_eintragung: [["aenderung-20260801", "2026-08-01"]]

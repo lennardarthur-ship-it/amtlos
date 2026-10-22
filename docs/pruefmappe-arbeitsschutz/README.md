@@ -33,8 +33,8 @@ Betriebsklar ist eine iPhone-App für kleine Betriebe in Deutschland. Für den A
 ## Woher die Bausteine kommen
 
 - **Recherche vom 12.10.2026** (`docs/recherche/2026-10-12/arbeitsschutz.json`): Gefährdungen und Maßnahmen für Friseur, Kosmetik, Gastronomie/Café, Handwerk und Büro/Laden, Unterweisungsthemen, Betriebsanweisungs-Bausteine, Muster-Hautschutzplan Friseur, Prüffristen DGUV V3, Mutterschutz-Ergebnisse – mit Quellen (BGW, BGN, DGUV-Regeln, TRGS 401/530/555, ASR, DGUV Vorschrift 1 und 3). Das Skript `packages/fachlogik/werkzeuge/bausteine-erzeugen.mjs` übernimmt sie ohne Umformulierung nach `bausteine.ts`; „unsicher“ heißt dort „nicht wörtlich an der Primärquelle geprüft“.
-- **Ergänzungen im Code** (`arbeitsschutz.ts`): Elektrische Anlagen und Jugendliche (§ 28a JArbSchG), Gebäudereinigung und Holz/Tischlerei, Kfz-Werkstatt, Bäckerei und Transport/Kurier. Diese Gruppen stammen aus simulierten Nutzertests; die Maßnahmen sind allgemeine Grundsätze, die Quelle sagt „fachlich zu prüfen“, wo die Fundstelle nicht sicher ist, oder „Nutzertest“, wo es keine Fachquelle gibt.
-- **Branchengruppen:** Gastronomie/Café, Bäckerei, Friseur, Kosmetik, Handwerk/Bau (inkl. Holz/Tischlerei), Kfz-Werkstatt, Transport/Kurier, Gebäudereinigung, Büro/Laden. Eine eigene Gruppe für **Praxen (Gesundheit)** gibt es nicht – dort zeigt die App alle Bausteine ungefiltert.
+- **Ergänzungen im Code** (`arbeitsschutz.ts`): Elektrische Anlagen und Jugendliche (§ 28a JArbSchG), Gebäudereinigung und Holz/Tischlerei, Kfz-Werkstatt, Bäckerei und Transport/Kurier; seit E-166 Praxis/Gesundheit (Biostoffe nach BioStoffV/TRBA 250, Nadelstichverletzungen nach § 11 BioStoffV, Desinfektionsmittel nach BGW/TRGS 525, Hautschutz nach TRGS 401, Röntgen nur als Hinweis). Die übrigen Gruppen stammen aus simulierten Nutzertests; die Maßnahmen sind allgemeine Grundsätze, die Quelle sagt „fachlich zu prüfen“, wo die Fundstelle nicht sicher ist, oder „Nutzertest“, wo es keine Fachquelle gibt.
+- **Branchengruppen:** Gastronomie/Café, Bäckerei, Friseur, Kosmetik, Handwerk/Bau (inkl. Holz/Tischlerei), Kfz-Werkstatt, Transport/Kurier, Gebäudereinigung, Büro/Laden und seit E-166 **Praxis/Gesundheit** (Branche „Gesundheit und Pflege“ im Check; fünf Gefährdungen, drei Unterweisungsthemen).
 
 ## Prüfumfang – Vorschlag
 
@@ -74,11 +74,11 @@ Verdichtet aus `PRUEFLISTE-arbeitsschutz.md` (Nummern in Klammern).
 
 ### Bausteine (A)
 
-1. Sind die Gefährdungen je Branchengruppe vollständig – was fehlt aus Ihrer Sicht in Gastronomie, Bäckerei, Friseur, Kosmetik, Handwerk/Bau, Kfz-Werkstatt, Transport/Kurier, Gebäudereinigung und Büro/Laden? (T-20, T-62)
+1. Sind die Gefährdungen je Branchengruppe vollständig – was fehlt aus Ihrer Sicht in Gastronomie, Bäckerei, Friseur, Kosmetik, Handwerk/Bau, Kfz-Werkstatt, Transport/Kurier, Gebäudereinigung, Büro/Laden und Praxis/Gesundheit? (T-20, T-62, T-132)
 2. Stimmen die Maßnahmen und ihre Rangfolge nach dem STOP-Prinzip? Soll der Hilfetext die Substitution ausdrücklich nennen?
 3. Stimmen die Kennzahlen und Grenzwerte in den Bausteinen mit den genannten Quellen überein (R 9, 100 m³/h, Beleuchtungsstärken, Raumtemperaturen, Löschmitteleinheiten, Feuchtarbeit, Lärm, 30 mA, Prüffristen)? Wo soll die Quelle genauer werden (Abschnitt, Tabelle)? (T-62)
 4. Welche Fachquelle gehört zu den Bausteinen mit „Nutzertest“ bzw. „fachlich zu prüfen“ (Gebäudereinigung, Holz/Tischlerei, Kfz mit TRGS 554 und DGUV Information 209-093, Bäckerei mit Mehlstaub und Nachtarbeit, Transport/Kurier mit DGUV V70 und Ladungssicherung)? (T-121)
-5. Welche Branchenhilfen sollten wir für Gruppen ohne eigene Bausteine nutzen, vor allem Praxen (BGW) und Einzelhandel (BGHW)? Reicht der eine Baustein „Elektrische Anlagen“ für das Elektrohandwerk?
+5. Praxen (neu, E-166): Stimmen die fünf Bausteine (Biostoffe/TRBA 250 mit Schutzstufe und Impfangebot nach § 6 Abs. 2 ArbMedVV, Nadelstich nach § 11 BioStoffV, Desinfektionsmittel – Quelle ist eine BGW-Broschüre von 2004 –, Hautschutz/Feuchtarbeit, Röntgen nur als Hinweis), und fehlt etwas (z. B. Gewalt durch Patienten, Laser, Narkosegase)? Welche Branchenhilfe sollten wir für den Einzelhandel (BGHW) nutzen? Reicht der eine Baustein „Elektrische Anlagen“ für das Elektrohandwerk? (T-132)
 6. Hautschutz: Der Musterplan deckt nur Friseure ab. Brauchen Kosmetik, Nagelstudio, Gastronomie und Gebäudereinigung eigene Zeilen? DIN EN ISO 374-6 als Friseurhandschuh und „Sticharbeiten“ belegen. (T-90)
 
 ### Vorlagen (B)
@@ -99,6 +99,15 @@ Verdichtet aus `PRUEFLISTE-arbeitsschutz.md` (Nummern in Klammern).
 
 15. Sind die Vorsorgeanlässe in Bausteinen und Katalog richtig zugeordnet – Feuchtarbeit, Mehlstaub, Lärm, Nachtarbeit (§ 6 Abs. 3 ArbZG), Nachuntersuchung Jugendlicher (§ 33 JArbSchG) –, und fehlen für die Branchen typische Anlässe der ArbMedVV (z. B. Tätigkeiten mit Biostoffen in Praxen und Kosmetik, Hautkontakt mit Friseurchemikalien)? (Katalog E.56)
 
+## Offene Lücken
+
+Stand nach E-166 (22.10.2026). Geschlossen: eigene Gruppe Praxis/Gesundheit für Gefährdungsbeurteilung und Unterweisung. Weiter offen:
+
+- **Praxis/Gesundheit:** TRBA 250 Nr. 4.2.5 nur über einen KomNet-Dialog (2022) zitiert, nicht an der aktuellen Fassung der BAuA; BGW-Quelle zu Desinfektionsmitteln von 2004; Strahlenschutz (Röntgen) nur als Hinweis, „unsicher“; kein Hautschutzplan-Muster für Praxen; Gewalt, Laser, Narkosegase nicht abgedeckt.
+- **Gruppen ohne eigene Bausteine:** Einzelhandel (BGHW) über „Büro / Laden“; Elektrohandwerk nur mit dem Baustein „Elektrische Anlagen“; Foodtruck nutzt die Gastronomie-Bausteine.
+- **Bausteine „Nutzertest“ bzw. „fachlich zu prüfen“** (Gebäudereinigung, Holz/Tischlerei, Kfz, Bäckerei, Transport) weiter ohne belastbare Fachquelle (T-121).
+- **Hautschutzplan:** Musterzeilen nur für Friseure (T-90); Betriebsanweisungen für Maschinen (§ 12 BetrSichV) ohne Vorlage.
+
 ## Nicht Gegenstand dieser Prüfung
 
 - **Rechtliches:** Das hat Rechtsanwalt Dr. Weber geprüft (Prüfbericht vom 21.10.2026): Gefährdungsbeurteilung im Abgleich mit ArbSchG, MuSchG und JArbSchG, RDG, Nutzungsbedingungen, Datenschutz. Sein Bericht hält ausdrücklich fest, dass die fachliche Freigabe der Bausteine (Risikobewertung, Grenzwerte) zur Fachkraft für Arbeitssicherheit gehört und nicht zur Anwältin; die Kennzahlen müssten je Baustein mit Quelle freigegeben werden (T-62). Gefahrstoff-Bausteine und Prüfprotokoll Elektro hat er an die Fachkraft für Arbeitssicherheit bzw. Elektrofachkraft verwiesen. Seine rechtlichen Ergänzungen (Spalte „bis wann“, Information nach § 14 Abs. 2 MuSchG, Abschnitt Jugendliche, leeres Blatt mit den sechs Faktoren) sind umgesetzt.
@@ -112,4 +121,4 @@ Wenn Ihnen dabei trotzdem etwas auffällt, nehmen wir jeden Hinweis gern.
 - **Bausteine aus der Recherche:** Korrekturen gehen in die Druckfassung von `bausteine.ts` (Korrekturliste in `packages/fachlogik/werkzeuge/bausteine-erzeugen.mjs`, die Recherche selbst bleibt unverändert); die Bausteine aus den Nutzertests ändern wir in `arbeitsschutz.ts`. Freigegebene Bausteine bekommen die bestätigte Quelle, „fachlich zu prüfen“ und „Nutzertest“ entfallen; gestrichene Bausteine verschwinden aus der App.
 - **Vorlagen:** Strukturänderungen setzen wir in den Vorlagen um und prüfen die PDFs erneut mit `werkzeuge/dokumente-pruefen.mjs`.
 - **Katalog:** Geprüfte Pflichten bekommen `pruefung.status: geprueft`, `geprueft_von`, `geprueft_am` – die App zeigt dann nicht mehr „noch nicht von Fachleuten geprüft“.
-- Jede Anmerkung wird in `ENTSCHEIDUNGEN.md` dokumentiert und in `PRUEFLISTE.md` mit Datum und Prüfer als erledigt markiert (vor allem T-18 bis T-21, T-56, T-61, T-62, T-90, T-121).
+- Jede Anmerkung wird in `ENTSCHEIDUNGEN.md` dokumentiert und in `PRUEFLISTE.md` mit Datum und Prüfer als erledigt markiert (vor allem T-18 bis T-21, T-56, T-61, T-62, T-90, T-121, T-132).

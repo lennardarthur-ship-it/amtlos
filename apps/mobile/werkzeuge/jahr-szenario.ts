@@ -608,8 +608,12 @@ export function standBauen(): Bau {
   messungen.push({ datum: "2026-05-05", uhrzeit: "09:30", kontrollpunkt: "Wareneingang Großmarkt (Molkereiprodukte)", wert: "6,2 °C, Verpackung einwandfrei, MHD ok", in_ordnung: "ja", kuerzel: "SK" });
   messungen.push({ datum: "2026-05-12", uhrzeit: "09:15", kontrollpunkt: "Wareneingang Großmarkt (Tiefkühlware)", wert: "−19,5 °C", in_ordnung: "ja", kuerzel: "SK" });
   messungen.sort((a, b) => String(a.datum).localeCompare(String(b.datum)) || String(a.uhrzeit).localeCompare(String(b.uhrzeit)));
-  dok({ id: "haccp", vorlage: "haccp", datum: "2026-05-16", worum: "HACCP-Eigenkontrollen Mai 2026 (1.–15.05.): 9 Kontrollpunkte aus den App-Vorschlägen (Kühlung, Milchprodukte, Konditorwaren, Tiefkühlung, Kaltspeisen, Abkühlen, Wareneingang, Reinigung, Schädlinge); tägliche Messungen, eine Abweichung am 12.05. (Kuchenvitrine 9,1 °C) mit Korrektur.",
+  dok({ id: "haccp", vorlage: "haccp", datum: "2026-05-16", worum: "HACCP-Eigenkontrollen Mai 2026 (1.–15.05.): Gefahrenanalyse mit 8 Prozessschritten und 4 CCP (E-166), 9 Kontrollpunkte aus den App-Vorschlägen (Kühlung, Milchprodukte, Konditorwaren, Tiefkühlung, Kaltspeisen, Abkühlen, Wareneingang, Reinigung, Schädlinge); tägliche Messungen, eine Abweichung am 12.05. (Kuchenvitrine 9,1 °C) mit Korrektur.",
     daten: (h) => ({ zeitraum: "Mai 2026", leerzeilen: false,
+      // E-166: Gefahrenanalyse und kritische Kontrollpunkte aus den Vorschlägen „Gastronomie / Café“ (ohne Regenerieren)
+      gefahren: ["Wareneingang", "Lagerung gekühlt", "Lagerung tiefgekühlt", "Zubereitung", "Erhitzen", "Heißhalten", "Abkühlen", "Ausgabe"].map((x) => vorschlag("haccp", "gefahren", x, h)),
+      ccps: ["Erhitzen – Kerntemperatur", "Heißhalten", "Abkühlen", "Lagerung gekühlt – Kühltemperatur"].map((x) => vorschlag("haccp", "ccps", x, h)),
+      verifizierung: ["protokolle_durchsehen", "thermometer", "abweichungen", "aenderungen"], aufzeichnungen: ["konzept", "messungen", "wareneingang", "reinigung", "schulung"],
       punkte: ["Kühllagerung allgemein", "Kühlung Milcherzeugnisse", "Kühlung feine Backwaren", "Tiefkühlung", "Ausgabetemperatur Kaltspeisen", "Abkühlen heißer Speisen", "Wareneingangskontrolle", "Reinigung und Desinfektion", "Schädlingsmonitoring"].map((x) => vorschlag("haccp", "punkte", x, h)),
       messungen: eintraege("haccp", "messungen", messungen, h) }) });
 

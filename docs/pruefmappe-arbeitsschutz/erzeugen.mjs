@@ -98,6 +98,8 @@ const GRUPPEN = [
   ["Gebäudereinigung", /Gebäudereinigung|gebaeudereinigung/],
   ["Büro / Laden", /Büro|buero_laden/],
   ["Unterricht / Sport / Coaching", /unterricht/],
+  // E-166: Praxen (Gesundheit und Pflege)
+  ["Praxis / Gesundheit", /Praxis|praxis/],
 ];
 const OHNE = "Alle Branchen (ohne Gruppe)";
 const gruppenVon = (b) => {
@@ -137,7 +139,7 @@ const bm = [
   "",
   `**${bausteine.length} Bausteine**, davon ${zaehle(/fachlich zu prüfen/)} im Code „fachlich zu prüfen“, ${zaehle(/unsicher/)} „unsicher“ (nicht wörtlich an der Primärquelle geprüft), ${zaehle(/Nutzertest/)} mit Quelle „Nutzertest“ (aus simulierten Nutzertests, Maßnahmen sind allgemeine Grundsätze), ${zaehle(/ohne Quelle/)} ohne Quelle. Die Nummern (B-…) sind die der CSV-Datei, damit Antworten zugeordnet werden können.`,
   "",
-  "**Wie die App filtert:** Vorschläge mit einer Gruppe zeigt die App Betrieben dieser Branchengruppe zuerst, die übrigen unter „Weitere“; Bausteine ohne Gruppe gelten für alle. Die Branchengruppe folgt aus den Branchen im Pflichten-Check (`BRANCHEN_GRUPPEN`); Kfz-Werkstatt und Bäckerei erkennt die App zusätzlich am Namen des Betriebs, Transport an der Branche „Transport und Logistik“ (`gruppenFuerBetrieb`). Eine eigene Gruppe für Praxen (Gesundheit) gibt es nicht – dort filtert die App nicht und zeigt alle Bausteine. Bausteine für mehrere Gruppen stehen unten in jeder dieser Gruppen.",
+  "**Wie die App filtert:** Vorschläge mit einer Gruppe zeigt die App Betrieben dieser Branchengruppe zuerst, die übrigen unter „Weitere“; Bausteine ohne Gruppe gelten für alle. Die Branchengruppe folgt aus den Branchen im Pflichten-Check (`BRANCHEN_GRUPPEN`); Kfz-Werkstatt und Bäckerei erkennt die App zusätzlich am Namen des Betriebs, Transport an der Branche „Transport und Logistik“, Praxen an der Branche „Gesundheit und Pflege“ (`gruppenFuerBetrieb`; Gruppe „Praxis / Gesundheit“ seit E-166). Bausteine für mehrere Gruppen stehen unten in jeder dieser Gruppen.",
   "",
   "Spalte „Kennzahlen“: automatisch herausgezogene Zahlenwerte (Grenzwerte, Häufigkeiten, Prüffristen, Bewertungsgruppen) – zum schnellen Abgleich, nicht vollständig. Spalte „Markierung“: wie im Code bzw. in der Quelle vermerkt.",
   "",

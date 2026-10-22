@@ -19,6 +19,8 @@ export { HAUSFARBEN, PRUEFHINWEIS, RAENDER, akzent, fussSpalten, type Gestalt } 
 export { BUNDESLAENDER, aufsichtFuer, berlinZuUtc } from "./datenschutz.js";
 export { NACHWG_AUSSCHLUSSFRIST_BEISPIEL, NACHWG_AUSSCHLUSSFRIST_UEBERSTUNDEN, NACHWG_SCHRIFTFORM_HINWEIS, NACHWG_SCHRIFTFORM_PDF, mindestlohnAm, mindesturlaub, minijobGrenzeAm, stundenlohn } from "./personal.js";
 export { HYGIENE_LEBENSMITTEL, HYGIENE_THEMEN_LEBENSMITTEL, HYGIENE_VERWEIS_HACCP } from "./branchen.js";
+// E-166: HACCP-Kern (Gefahrenanalyse, CCP, Verifizierung) und Hygieneplan-Zeilen für Bäckerei und Foodtruck
+export { AUFZEICHNUNGEN, CCP_BEGRUENDUNG, CCP_FRAGEN, CCP_FRAGEN_QUELLE, CCP_VORSCHLAEGE, GEFAHRENANALYSE, GEFAHR_ARTEN, HACCP_AUFBEWAHRUNG, HACCP_FLEXIBEL, HYGIENE_BAECKEREI, HYGIENE_FOODTRUCK, PROZESSSCHRITTE, VERIFIZIERUNG } from "./haccp.js";
 export { bausteinText } from "./website.js";
 export { EUER_KAPITALGESELLSCHAFT, GUTSCHRIFT_AUSWAHL, RECHNUNG_NEGATIV, RECHNUNG_NULL, RECHNUNG_PLZ_FEHLT, VERSTEUERUNG, VORSTEUER_AUFTEILEN, aufbewahrenBis, eRechnungAus, faelligAm, kennzahlBefreiung, leistungszeitraumAus, rechnungsTitel } from "./buchhaltung.js";
 // R10 Steuer
@@ -131,7 +133,19 @@ export function gruppenFuerBetrieb(branchen: unknown, betriebName = ""): string[
   if (l.includes("transport_logistik")) g.push("transport");
   if (/\b(kfz|auto|autohaus|werkstatt|reifen|karosserie|fahrzeug)/i.test(betriebName)) g.push("kfz_werkstatt");
   if ((l.includes("handwerk") && l.includes("gastronomie_lebensmittel")) || /bäcker|backstube|konditor/i.test(betriebName)) g.push("baeckerei");
+  // E-166: Praxen (Gesundheit und Pflege) – eigene Themen der Unterweisung (Biostoffe, Nadelstich, Desinfektionsmittel)
+  if (l.includes("gesundheit_pflege")) g.push("praxis");
   return [...new Set(g)];
+}
+
+/**
+ * E-166: Foodtruck bzw. mobiler Verkauf von Lebensmitteln – Lebensmittelbranche mit Reisegewerbe oder Marktstand laut
+ * Pflichten-Check (wie die Pflicht `branche.gastro_trinkwasser_mobil`) oder am Namen des Betriebs erkennbar.
+ */
+export function mobilerVerkauf(profil: Record<string, unknown>, betriebName = ""): boolean {
+  const liste = (k: string) => (Array.isArray(profil[k]) ? (profil[k] as unknown[]).map(String) : []);
+  if (!liste("taetigkeit.branchen").includes("gastronomie_lebensmittel")) return false;
+  return liste("vertrieb.kanaele").includes("marktstand") || liste("erlaubnis.gewo_paragraphen").includes("55") || /food\s?truck|imbisswagen|verkaufswagen|street\s?food/i.test(betriebName);
 }
 
 /** Passt ein Baustein mit diesen Gruppen zum Betrieb? Ohne Gruppen am Baustein oder ohne bekannte Branche: ja. */

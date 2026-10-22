@@ -40,6 +40,14 @@ fs.rmSync(quelle);
 fs.rmSync(gebaut);
 
 const B = { ...F.LEERER_BETRIEB, name: "Salon Sonne GmbH", strasse: "Hauptstraße 1", plz: "80331", ort: "München", bundesland: "Bayern", verantwortlich: "Alex Sonnberg", telefon: "089 123456", email: "hallo@salon-sonne.example", website: "www.salon-sonne.example", steuernummer: "143/123/45678", ust_idnr: "DE123456789", iban: "DE89370400440532013000", bank: "Beispielbank", bic: "COBADEFFXXX", rechtsform: "GmbH", registergericht: "Amtsgericht München", registernummer: "HRB 271234", vertretung: "Alex Sonnberg, Chris Sonnberg", farbe: "#702434" };
+/**
+ * E-166: Beispielbetrieb für die Lebensmittel-Vorlagen (HACCP, Hygieneplan eines Lebensmittelbetriebs, Allergenliste,
+ * Belehrung nach § 43 IfSG) – ein Café mit Backstube statt des Salons. Erfunden.
+ */
+const B_LM = { ...F.LEERER_BETRIEB, name: "Café-Bäckerei Lindenblüte", strasse: "Marktplatz 3", plz: "72764", ort: "Reutlingen", bundesland: "Baden-Württemberg", verantwortlich: "Mara Lindner", telefon: "07121 345678", email: "hallo@cafe-lindenbluete.example", website: "www.cafe-lindenbluete.example", steuernummer: "68/123/45678", ust_idnr: "DE234567891", iban: "DE89370400440532013000", bank: "Beispielbank", bic: "COBADEFFXXX", rechtsform: "Einzelunternehmen", farbe: "#6b4a2b" };
+/** Vorlagen bzw. Fassungen eines Lebensmittelbetriebs: Bereich „gastro“ und die Fassungen „-lebensmittel“ des Hygieneplans. */
+const lebensmittel = (v, variante) => v.bereich === "gastro" || variante.includes("lebensmittel");
+const betriebFuer = (v, variante) => (lebensmittel(v, variante) ? B_LM : B);
 const HEUTE = "2026-10-13";
 const LANG = "Fachgerechte Reinigung und Desinfektion der Arbeitsflächen einschließlich Ablagen nach Herstellerangaben, dokumentiert im Protokoll";
 
@@ -78,16 +86,62 @@ const REALISTISCH = {
  * Hygieneplan (Nachkontrolle Dr. Weber): die Einträge passend zur Art des Betriebs – Beauty-Zeilen im Salon, die Zeilen
  * „Gastronomie / Café“ im Lebensmittelbetrieb (sonst stünden Instrumentenaufbereitung und Hautdesinfektion im Café-Plan).
  */
+const LM_GRUPPEN = ["Gastronomie / Café", "Bäckerei", "Foodtruck / mobiler Verkauf"];
 function hygieneEintraege(v, d) {
   if (v.id !== "hygieneplan") return d;
   const f = v.abschnitte.flatMap((a) => a.felder).find((x) => x.id === "eintraege");
   const lm = d.art === "lebensmittel";
-  return { ...d, eintraege: f.vorschlaege.filter((x) => (x.gruppe === "Gastronomie / Café") === lm).map((x) => F.eintragAusVorschlag(f, x, B, HEUTE)) };
+  // E-166: Café mit Backstube – Zeilen „Gastronomie / Café“ und „Bäckerei“; Beauty-Fassungen ohne Lebensmittel-Zeilen
+  const passt = (x) => (lm ? ["Gastronomie / Café", "Bäckerei"].includes(x.gruppe) : !LM_GRUPPEN.includes(x.gruppe));
+  return { ...d, eintraege: f.vorschlaege.filter(passt).map((x) => F.eintragAusVorschlag(f, x, lm ? B_LM : B, HEUTE)) };
+}
+
+/** E-166: realistische Lebensmittel-Angaben des Beispielbetriebs (Café mit Backstube). */
+function lebensmittelVoll(v) {
+  const feld = (id) => v.abschnitte.flatMap((a) => a.felder).find((x) => x.id === id);
+  const aus = (id, gruppen) => feld(id).vorschlaege.filter((x) => gruppen.includes(x.gruppe)).map((x) => F.eintragAusVorschlag(feld(id), x, B_LM, HEUTE));
+  if (v.id === "haccp") {
+    const messungen = [
+      ["2026-10-01", "07:30", "Kühllagerung allgemein – Temperaturkontrolle Kühleinrichtungen", "5,1 °C", "ja", "", "ML"],
+      ["2026-10-01", "07:35", "Kühlung feine Backwaren / Konditorwaren mit nicht durcherhitzter Füllung oder Auflage; Feinkost-, Obst-/Gemüsesalate, belegte Brötchen, Desserts", "6,0 °C", "ja", "", "TK"],
+      ["2026-10-01", "11:40", "Erhitzen – Kerntemperatur", "78 °C (Quiche)", "ja", "", "TK"],
+      ["2026-10-02", "07:30", "Kühllagerung allgemein – Temperaturkontrolle Kühleinrichtungen", "8,4 °C", "nein", "Tür der Kühlung stand offen; geschlossen, Ware geprüft (unter 2 Stunden, in Ordnung); Nachmessung 08:15 Uhr: 5,6 °C", "ML"],
+      ["2026-10-02", "09:10", "Wareneingangskontrolle", "Milchprodukte 5,8 °C, Verpackung einwandfrei, MHD in Ordnung", "ja", "", "ML"],
+      ["2026-10-02", "12:05", "Heißhalten", "66 °C (Suppe)", "ja", "", "TK"],
+      ["2026-10-03", "07:30", "Tiefkühlung (Tiefkühltruhe/-raum, tiefgefrorene Lebensmittel)", "−19,5 °C", "ja", "", "ML"],
+      ["2026-10-03", "14:30", "Abkühlen", "Vanillecreme: 14:30 Uhr 70 °C, 16:45 Uhr 9 °C", "ja", "", "TK"],
+    ].map(([datum, uhrzeit, kontrollpunkt, wert, in_ordnung, massnahme, kuerzel]) => ({ datum, uhrzeit, kontrollpunkt, wert, in_ordnung, massnahme, kuerzel }));
+    return {
+      zeitraum: "Oktober 2026", verantwortlich: "Mara Lindner", stand: "2026-10-01", leerzeilen: false,
+      gefahren: aus("gefahren", ["Gastronomie / Café", "Bäckerei"]),
+      ccps: aus("ccps", ["Gastronomie / Café", "Bäckerei"]),
+      punkte: feld("punkte").vorschlaege.filter((x) => /^(Kühllagerung allgemein|Kühlung Milcherzeugnisse|Kühlung feine Backwaren|Kühlung Eiprodukte|Tiefkühlung|Heißhalten|Abkühlen|Wareneingangskontrolle|Reinigung und Desinfektion|Schädlingsmonitoring)/.test(x.titel)).map((x) => F.eintragAusVorschlag(feld("punkte"), x, B_LM, HEUTE)),
+      verifizierung: ["protokolle_durchsehen", "thermometer", "abweichungen", "aenderungen", "regelmaessig"], naechste_pruefung: "2027-04-01",
+      aufzeichnungen: ["konzept", "messungen", "wareneingang", "reinigung", "schulung", "schaedlinge"],
+      messungen,
+    };
+  }
+  if (v.id === "allergene") {
+    const g = [
+      ["Butterbrezel", "Backwaren", ["gluten", "milch"], "Weizen"], ["Dinkel-Vollkornbrötchen", "Backwaren", ["gluten", "sesam"], "Dinkel"], ["Käsekuchen", "Kuchen und Torten", ["gluten", "eier", "milch"], "Weizen"],
+      ["Schwarzwälder Kirschtorte", "Kuchen und Torten", ["gluten", "eier", "milch"], "Weizen"], ["Nussecke", "Kuchen und Torten", ["gluten", "eier", "milch", "schalenfruechte", "soja"], "Weizen", "Haselnuss"],
+      ["Quiche Lorraine", "Mittagstisch", ["gluten", "eier", "milch", "sellerie"], "Weizen"], ["Linsensuppe", "Mittagstisch", ["sellerie", "senf"]], ["Obstsalat", "Frühstück", []],
+      ["Cappuccino", "Heißgetränke", ["milch"]], ["Hafer-Latte", "Heißgetränke", ["gluten"], "Hafer"], ["Espresso", "Heißgetränke", []], ["Apfelschorle", "Kaltgetränke", []],
+    ];
+    return { stand: "2026-10-01", legende: true, gerichte: g.map(([name, kategorie, allergene, getreide = "", nuesse = ""]) => ({ name, kategorie, allergene, getreide, nuesse, keine: allergene.length === 0 })) };
+  }
+  if (v.id === "ifsg_belehrung") {
+    return {
+      datum: "2026-10-01", belehrt_von: "Mara Lindner",
+      teilnehmer: [["Tom Kessler", "2024-03-04", "2024-03-15", false], ["Aylin Demir", "2026-09-10", "2026-10-01", true], ["Jonas Weber", "2025-06-02", "2025-06-16", false], ["Lena Hofmann", "2023-11-20", "2023-12-01", false]].map(([name, erstbelehrung_am, erster_arbeitstag, erstmals]) => ({ name, erstbelehrung_am, erster_arbeitstag, erstmals })),
+    };
+  }
+  return {};
 }
 
 /** Volle Daten: Pflicht- und Textfelder mittellang, Listen mit 12 Einträgen, Beträge fünfstellig. */
 function voll(v) {
-  return hygieneEintraege(v, { ...vollErzeugt(v), ...(REALISTISCH[v.id] ?? {}) });
+  return hygieneEintraege(v, { ...vollErzeugt(v), ...(REALISTISCH[v.id] ?? {}), ...(v.bereich === "gastro" ? lebensmittelVoll(v) : {}) });
 }
 
 /**
@@ -96,10 +150,11 @@ function voll(v) {
  */
 const EXTRA = {
   nachweis_arbeitsbedingungen: [["voll-textform", (v) => ({ ...voll(v), branche: "keine" })]],
-  hygieneplan: [["voll-lebensmittel", (v) => hygieneEintraege(v, { ...voll(v), art: "lebensmittel", bereich: "Küche, Theke und Gastraum" })], ["leer-lebensmittel", (v) => ({ ...F.leereDaten(v, B, HEUTE), art: "lebensmittel" })]],
+  hygieneplan: [["voll-lebensmittel", (v) => hygieneEintraege(v, { ...voll(v), art: "lebensmittel", bereich: "Backstube, Theke und Gastraum", erstellt_von: "Mara Lindner" })], ["leer-lebensmittel", (v) => ({ ...F.leereDaten(v, B_LM, HEUTE), art: "lebensmittel" })]],
 };
 function vollErzeugt(v) {
-  const d = F.leereDaten(v, B, HEUTE);
+  const BB = betriebFuer(v, "voll");
+  const d = F.leereDaten(v, BB, HEUTE);
   const wert = (f, i) => {
     if (f.art === "text") return /name|von|person/i.test(f.label) ? "Maximiliane Großmann-Überlinger" : `${f.label} ${i + 1}`;
     if (f.art === "mehrzeilig") return `${LANG}.\nZweite Zeile mit weiteren Angaben.`;
@@ -114,8 +169,8 @@ function vollErzeugt(v) {
       if (f.art === "liste") {
         const vs = f.vorschlaege ?? [];
         d[f.id] = Array.from({ length: Math.max(12, Math.min(vs.length, 20)) }, (_, i) => {
-          if (vs.length) return F.eintragAusVorschlag(f, vs[i % vs.length], B, HEUTE);
-          const e = F.neuerEintrag(f, B, HEUTE);
+          if (vs.length) return F.eintragAusVorschlag(f, vs[i % vs.length], BB, HEUTE);
+          const e = F.neuerEintrag(f, BB, HEUTE);
           for (const x of f.felder) if (["text", "mehrzeilig", "betrag", "zahl", "datum", "uhrzeit"].includes(x.art)) e[x.id] = x.art === "mehrzeilig" ? LANG : wert(x, i);
           return e;
         });
@@ -172,9 +227,9 @@ const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PFA
 const page = await (await browser.newContext({ locale: "de-DE" })).newPage();
 const befunde = [];
 for (const v of F.VORLAGEN) {
-  for (const [variante, daten] of [["leer", F.leereDaten(v, B, HEUTE)], ["voll", voll(v)], ["auswahl", auswahl(v)], ...(EXTRA[v.id] ?? []).map(([n, f]) => [n, f(v)])]) {
+  for (const [variante, daten] of [["leer", F.leereDaten(v, betriebFuer(v, "leer"), HEUTE)], ["voll", voll(v)], ["auswahl", auswahl(v)], ...(EXTRA[v.id] ?? []).map(([n, f]) => [n, f(v)])]) {
     const name = `${v.id}-${variante}`;
-    const html = F.mitSchriften(F.dokumentHtml(v, daten, B));
+    const html = F.mitSchriften(F.dokumentHtml(v, daten, betriebFuer(v, variante)));
     const ang = F.fussAngaben(html);
     const [o, r, u, l] = F.RAENDER[ang.gestalt] ?? F.RAENDER.nachweis;
     const quer = !!v.querformat;
