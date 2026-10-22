@@ -1,13 +1,13 @@
 # R10: aus branche.gastro_ifsg_belehrung herausgelöst (Rechtsprüfung: Bescheinigung nach § 43 Abs. 1 IfSG vor Beginn, nicht älter als drei Monate)
 schema_version: 1
 id: branche.gastro_ifsg_bescheinigung
-version: 2
+version: 3
 katalog_nr: H.1
 titel:
   de: Bescheinigung des Gesundheitsamts vor dem ersten Arbeitstag (§ 43 IfSG)
 kurz:
   de: Wer bei dir zum ersten Mal mit Lebensmitteln arbeitet, braucht vor dem ersten Arbeitstag die Bescheinigung über die Belehrung durch
-    das Gesundheitsamt.
+    das Gesundheitsamt; sie darf bei Arbeitsbeginn nicht älter als drei Monate sein (§ 43 Abs. 1 IfSG).
 erklaerung:
   de: Die Erstbelehrung macht das Gesundheitsamt oder ein beauftragter Arzt. Die Bescheinigung darf bei Aufnahme der Tätigkeit
     höchstens drei Monate alt sein; du bewahrst sie im Betrieb auf. Das gilt nur für die erstmalige Tätigkeit mit Lebensmitteln nach
@@ -66,7 +66,7 @@ quellen:
   abgerufen: null
 fachlich_zu_pruefen:
 - 'Nur erstmalige Tätigkeit (§ 43 Abs. 1 IfSG, Rechtsprüfung R11 Befund 7) – Auslöser über die Frage „Arbeiten Beschäftigte mit Lebensmitteln?“ (erstmals / schon mit Bescheinigung / niemand); je Person nicht abbildbar'
-- 'Sanktion § 73 Abs. 1a IfSG, bis 25.000 € laut Rechtsprüfung R11 (Befund 20) „wahrscheinlich“ – Nummer und Höhe bestätigen'
+- 'Rückmeldung Lebensmittel (Tim Baum, 22.10.2026, ändern): Kurztext um „nicht älter als drei Monate“ ergänzt (§ 43 Abs. 1 Satz 1 IfSG: „eine nicht mehr als drei Monate alte Bescheinigung“, am 22.10.2026 gelesen); Auslöser und Folgen fachlich in Ordnung, Höhe laut T. Baum von RA Dr. Weber bestätigt'
 pruefung:
   status: entwurf
   geprueft_von: null

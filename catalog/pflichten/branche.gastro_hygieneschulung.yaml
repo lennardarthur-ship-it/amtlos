@@ -2,7 +2,7 @@
 # Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Frage 12): Nachweis, jährliche Wiederholung, Abgrenzung zur IfSG-Belehrung
 schema_version: 1
 id: branche.gastro_hygieneschulung
-version: 3
+version: 4
 katalog_nr: H.1
 titel:
   de: Lebensmittelhygiene schulen
@@ -15,8 +15,8 @@ erklaerung:
     dass alle, die mit Lebensmitteln umgehen, ihrer Tätigkeit entsprechend in Hygiene geschult und überwacht werden
     (Anhang II Kapitel XII VO (EG) Nr. 852/2004). Die Fachkenntnisse musst du der Lebensmittelüberwachung auf Verlangen
     nachweisen (§ 4 Abs. 1 Satz 2 LMHV) – bei Kontrollen wird der Schulungsnachweis verlangt. Halte jede Schulung deshalb
-    schriftlich fest: Datum, Themen, wer geschult hat und wer teilgenommen hat, mit Unterschrift. Üblich ist eine
-    Wiederholung einmal im Jahr (DIN 10514). Die Hygieneschulung ist nicht dasselbe wie die Belehrung nach dem
+    schriftlich fest: Datum, Themen, wer geschult hat und wer teilgenommen hat, mit Unterschrift. Empfohlen ist eine
+    Wiederholung einmal im Jahr (DIN 10514) – eine gesetzliche Frist dafür gibt es nicht. Die Hygieneschulung ist nicht dasselbe wie die Belehrung nach dem
     Infektionsschutzgesetz: Die IfSG-Belehrung geht um Krankheiten, die Hygieneschulung um Fachwissen zur
     Lebensmittelhygiene. Du kannst beides am selben Termin machen, brauchst aber für jede eine eigene Unterschriftsliste.
     Wer eine Berufsausbildung mit Lebensmittelhygiene abgeschlossen hat, zum Beispiel als Bäcker/in oder Koch/Köchin,
@@ -24,7 +24,6 @@ erklaerung:
 rechtsgrundlage:
 - § 4 LMHV
 - Anhang II Kapitel XII VO (EG) Nr. 852/2004
-- DIN 10514
 kategorie: branche
 branchen:
 - gastronomie_lebensmittel
@@ -51,7 +50,7 @@ erledigung:
   art: laufend
   zeitraum: jahr
 aenderungsnotiz:
-  de: 'Nach der fachlichen Prüfung Lebensmittelhygiene (22.10.2026): Die Schulung hältst du schriftlich fest und wiederholst sie einmal im Jahr – erledigt gilt sie jeweils für ein Kalenderjahr.'
+  de: 'Nach der fachlichen Prüfung Lebensmittelhygiene (22.10.2026): Die Schulung hältst du schriftlich fest; empfohlen ist eine Wiederholung einmal im Jahr – erledigt gilt sie jeweils für ein Kalenderjahr.'
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -68,10 +67,12 @@ quellen:
 - titel: Lebensmittel- und Futtermittelgesetzbuch § 60 (Bußgeldvorschriften)
   url: https://www.gesetze-im-internet.de/lfgb/__60.html
   abgerufen: '2026-10-22'
+- titel: DIN 10514:2024-07 Lebensmittelhygiene – Hygieneschulung (Empfehlung zur jährlichen Wiederholung, keine Rechtsgrundlage)
+  url: https://www.dinmedia.de/de/norm/din-10514/381020683
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Frage 12, ✎): Nachweis nach § 4 Abs. 1 Satz 2 LMHV, jährliche Wiederholung (DIN 10514), Abgrenzung zur IfSG-Belehrung und Ausnahme § 4 Abs. 2 LMHV ergänzt – Bericht noch nicht unterschrieben; Vorlage „Schulungsnachweis Lebensmittelhygiene“ wird verknüpft'
-- 'Wiederholung „einmal im Jahr“ als Kalenderjahr umgesetzt (erledigung laufend/jahr) – DIN 10514 selbst nicht eingesehen'
-- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 10 Nr. 3 und § 4 Abs. 1 LMHV, § 60 Abs. 2 Nr. 26 Buchst. a, Abs. 5 LFGB gelesen; der Nachweis auf Verlangen (§ 4 Abs. 1 Satz 2 LMHV) ist in § 10 LMHV nicht genannt – fachlich zu bestätigen'
+- 'Rückmeldung Lebensmittel (Tim Baum, 22.10.2026, ändern): DIN 10514 aus der Rechtsgrundlage genommen und als Quelle geführt; jährliche Wiederholung als Empfehlung, keine gesetzliche Frist; Folgen bestätigt (Bußgeld knüpft an das Arbeiten ohne Fachkenntnisse an, § 10 Nr. 3 LMHV, nicht an den fehlenden Nachweis); Ausnahme § 4 Abs. 2 LMHV und Abgrenzung zur IfSG-Belehrung bestätigt'
+- 'Erledigung bleibt laufend je Kalenderjahr (erledigung laufend/jahr) – bildet die empfohlene jährliche Wiederholung ab, keine gesetzliche Frist; T. Baum hat dazu nichts angegeben'
 pruefung:
   status: entwurf
   geprueft_von: null

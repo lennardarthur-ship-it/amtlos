@@ -1,12 +1,12 @@
 # E-166 (Prüfmappe Lebensmittelhygiene, Frage 14): Wassertank im Foodtruck – mobile Wasserversorgungsanlage nach TrinkwV
 schema_version: 1
 id: branche.gastro_trinkwasser_mobil
-version: 3
+version: 4
 katalog_nr: H.1
 titel:
   de: Wassertank im Foodtruck beim Gesundheitsamt anzeigen
 kurz:
-  de: Hat dein Foodtruck oder Verkaufsstand einen eigenen Wassertank, zeigst du die Inbetriebnahme spätestens vier Wochen vorher beim Gesundheitsamt an und hältst das Wasser hygienisch einwandfrei.
+  de: Hat dein Foodtruck oder Verkaufsstand einen eigenen Wassertank, zeigst du die Inbetriebnahme spätestens vier Wochen vorher beim Gesundheitsamt an und hältst das Wasser hygienisch einwandfrei. Auch die Wiederinbetriebnahme, z. B. nach der Winterpause, zeigst du vier Wochen vorher an, die Stilllegung innerhalb von drei Tagen danach (§ 11 Abs. 2 TrinkwV).
 erklaerung:
   de: >-
     Ein Wassertank mit Leitungen in einem Fahrzeug oder Verkaufsstand ist eine mobile Wasserversorgungsanlage (§ 2 Nr. 2
@@ -96,11 +96,9 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Neu (E-166): § 2 Nr. 1 Buchst. b, Nr. 2 Buchst. d, f und § 11 Abs. 2 TrinkwV am Wortlaut geprüft (gesetze-im-internet.de, 22.10.2026)'
-- 'Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Frage 14, ✔): Anzeige auch, wenn das Tankwasser nur zum Zubereiten und Händewaschen dient (§ 2 Nr. 1 Buchst. b, Nr. 2 Buchst. d TrinkwV); Untersuchung nach Vorgabe des Gesundheitsamts, üblich jährlich; Check fragt den Wassertank ab, Frist ab Inbetriebnahme – umgesetzt, Bericht noch nicht unterschrieben'
-- 'Untersuchungspflichten: Fundstelle in der TrinkwV 2023 nicht genannt (laut Prüfbericht „Umfang und Turnus nach Festlegung des Gesundheitsamts“)'
-- 'Wiederinbetriebnahme (z. B. nach der Saisonpause) und Stilllegung nur im Text – keine eigene Frist'
+- 'Rückmeldung Lebensmittel (Tim Baum, 22.10.2026, ändern): Wiederinbetriebnahme (vier Wochen vorher, § 11 Abs. 2 Satz 1 Nr. 1, Satz 2 TrinkwV) und Stilllegung (drei Tage danach, Nr. 4) im Kurztext ergänzt, ohne eigene Frist – am 22.10.2026 am Wortlaut gelesen; Untersuchung „nach Festlegung des Gesundheitsamts, üblich einmal jährlich“ bleibt; Fundstelle der Folgen plausibel, Höhe laut T. Baum von RA Dr. Weber bestätigt'
 - 'Gültig ab: Inkrafttreten der TrinkwV 2023 (24.6.2023) laut Verordnung gegenlesen'
-- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 72 Nr. 1 TrinkwV (§ 11 Abs. 1, Abs. 2 Satz 1 bis 3, Abs. 3) und § 73 Abs. 2 IfSG (Nr. 24 nicht unter den Fällen bis 2.500 €) gelesen; Folgen bei Mängeln der Wasserqualität nicht ergänzt – fachlich zu bestätigen'
+- 'Folgen bei Mängeln der Wasserqualität nicht ergänzt'
 pruefung:
   status: entwurf
   geprueft_von: null

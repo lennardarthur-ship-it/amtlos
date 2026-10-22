@@ -574,7 +574,20 @@ export const SCHRITTE: Schritt[] = [
         feld: "gastro.vorverpackt",
         art: "janein",
         frage: { de: "Verkaufst du selbst abgepackte Lebensmittel?", en: "Do you sell food that you package yourself?" },
-        hilfe: { de: "Zum Beispiel Kekse, Marmelade oder Granola, die du abfüllst und ins Regal stellst.", en: "For example biscuits, jam or granola that you pack and put on the shelf." },
+        hilfe: {
+          de: "Zum Beispiel Kekse, Marmelade oder Granola, die du abfüllst und ins Regal stellst oder verschickst. Brot oder Gebäck, das du an der Theke für den Verkauf am selben Tag oder auf Wunsch der Kundschaft einpackst, zählt nicht dazu.",
+          en: "For example biscuits, jam or granola that you pack and put on the shelf or ship. Bread or pastries that you pack at the counter for sale on the same day or at the customer's request do not count.",
+        },
+      },
+      // Rückmeldung Lebensmittel T. Baum 22.10.2026: Acrylamid nur, wer selbst backt oder frittiert (VO (EU) 2017/2158)
+      {
+        feld: "gastro.backen_frittieren",
+        art: "janein",
+        frage: { de: "Backst du selbst oder frittierst du?", en: "Do you bake yourself or deep-fry?" },
+        hilfe: {
+          de: "Zum Beispiel Brot, Brötchen, Kuchen oder Pommes frites. Dann hältst du Acrylamid mit einfachen Maßnahmen gering.",
+          en: "For example bread, rolls, cakes or French fries. You then keep acrylamide low with simple measures.",
+        },
       },
       // Prüfbericht Lebensmittelhygiene 22.10.2026 (Frage 14): Wassertank im Foodtruck oder Stand (§ 11 Abs. 2 TrinkwV)
       {

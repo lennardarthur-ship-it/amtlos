@@ -81,6 +81,8 @@ export const CHECK_FELDER = [
   "gastro.to_go",
   // Prüfbericht Lebensmittelhygiene 22.10.2026 (Frage 14): abgepackte Ware im Regal; Wassertank im Foodtruck oder Stand
   "gastro.vorverpackt",
+  // Rückmeldung Lebensmittel T. Baum 22.10.2026: Acrylamid nur, wer selbst backt oder frittiert
+  "gastro.backen_frittieren",
   "gastro.wassertank",
   "gastro.wassertank_ab",
   "oeffentliche_wiedergabe",
@@ -151,7 +153,9 @@ function passtImmer(feld: string, p: Profil): boolean {
   if (feld === "ust.zm_meldezeitraum" && p["ust.kleinunternehmer"] === true) return false;
   if (feld === "taetigkeit.einordnung" && typeof p.rechtsform === "string" && KRAFT_RECHTSFORM_GEWERBE.includes(p.rechtsform)) return false;
   // R11: Lebensmittel-Fragen nach § 42 IfSG nur in der Gastronomie und Lebensmittelbranche
-  if ((feld === "ifsg.beschaeftigte" || feld === "ifsg.selbst" || feld === "gastro.to_go" || feld === "gastro.vorverpackt" || feld === "gastro.wassertank") && !inBranche(p, "gastronomie_lebensmittel")) return false;
+  if ((feld === "ifsg.beschaeftigte" || feld === "ifsg.selbst" || feld === "gastro.to_go" || feld === "gastro.backen_frittieren" || feld === "gastro.wassertank") && !inBranche(p, "gastronomie_lebensmittel")) return false;
+  // Rückmeldung T. Baum 22.10.2026: selbst abgepackte Lebensmittel auch im Onlinehandel mit Lebensmitteln
+  if (feld === "gastro.vorverpackt" && !inBranche(p, "gastronomie_lebensmittel") && !(inBranche(p, "onlinehandel") && (liste(p, "produkte.arten")?.includes("lebensmittel") ?? true))) return false;
   // Inbetriebnahme des Wassertanks nur, wenn es einen gibt (wie die Anschaffung der Kasse)
   if (feld === "gastro.wassertank_ab" && p["gastro.wassertank"] !== true) return false;
   // Prüfvermerk RA Dr. Weber 22.10.2026: Beginn der NIS2-Betroffenheit nur, wenn das Unternehmen darunter fällt
@@ -201,7 +205,8 @@ const FRAGE_PASST: Record<string, (p: Profil) => boolean> = {
   "erlaubnis.gaststaette": (p) => inBranche(p, "gastronomie_lebensmittel"),
   "erlaubnis.alkohol": (p) => inBranche(p, "gastronomie_lebensmittel"),
   "gastro.to_go": (p) => inBranche(p, "gastronomie_lebensmittel"),
-  "gastro.vorverpackt": (p) => inBranche(p, "gastronomie_lebensmittel"),
+  "gastro.vorverpackt": (p) => inBranche(p, "gastronomie_lebensmittel") || (inBranche(p, "onlinehandel") && Boolean(liste(p, "produkte.arten")?.includes("lebensmittel"))),
+  "gastro.backen_frittieren": (p) => inBranche(p, "gastronomie_lebensmittel"),
   // Wassertank nur beim mobilen Verkauf – Reisegewerbe oder Marktstand (wie der Auslöser von branche.gastro_trinkwasser_mobil)
   "gastro.wassertank": (p) => inBranche(p, "gastronomie_lebensmittel") && (Boolean(liste(p, "erlaubnis.gewo_paragraphen")?.includes("55")) || Boolean(liste(p, "vertrieb.kanaele")?.includes("marktstand"))),
   "gastro.wassertank_ab": (p) => p["gastro.wassertank"] === true,

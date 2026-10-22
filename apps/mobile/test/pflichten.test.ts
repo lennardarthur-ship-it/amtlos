@@ -196,10 +196,11 @@ describe("Pflichten-Check", () => {
     const d = dringlichkeit({ ...a, gilt: [...a.gilt, dringend, ruhig] }, leer, heute);
     expect(d.jetzt.map((p) => p.id)).toContain("test.dringend");
     expect(d.imBlick.map((p) => p.id)).toContain("test.ruhig");
-    // Katalog: die angezeigte Schwere bleibt „mittel“ (Folgen noch nicht erfasst), die Dringlichkeit trägt das eigene Feld
-    const haccp = KATALOG.pflichten.find((x) => x.id === "branche.gastro_haccp")!;
-    expect(haccp.sanktion.schwere).toBe("mittel");
-    expect(haccp.dringend_ohne_termin).toBe(true);
+    // Katalog: die angezeigte Schwere bleibt „mittel“ (keine eigene Bußgeldvorschrift), die Dringlichkeit trägt das eigene Feld
+    // (HACCP ist nach der Rückmeldung T. Baum 22.10.2026 wieder „hoch“ – Beispiel jetzt die Lebensmittelregistrierung)
+    const registrierung = KATALOG.pflichten.find((x) => x.id === "branche.gastro_lebensmittelregistrierung")!;
+    expect(registrierung.sanktion.schwere).toBe("mittel");
+    expect(registrierung.dringend_ohne_termin).toBe(true);
   });
 
   it("trennt Gründungsschritte bei bestehenden Betrieben ab und nennt Gründe", () => {

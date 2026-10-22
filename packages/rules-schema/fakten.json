@@ -313,7 +313,13 @@
     {
       "pfad": "profil.gastro.vorverpackt",
       "typ": "bool",
-      "herleitung": "Onboarding (Prüfbericht Lebensmittelhygiene 22.10.2026, Frage 14): verkauft selbst abgepackte Lebensmittel, z. B. Kekse, Marmelade oder Granola im Regal – Kennzeichnung nach Art. 9 LMIV",
+      "herleitung": "Onboarding (Prüfbericht Lebensmittelhygiene 22.10.2026, Frage 14): verkauft selbst abgepackte Lebensmittel, z. B. Kekse, Marmelade oder Granola im Regal oder im Onlineversand – Kennzeichnung nach Art. 9 LMIV; gefragt in der Lebensmittelbranche und bei Onlinehandel mit Lebensmitteln (Rückmeldung T. Baum 22.10.2026)",
+      "ab": 2
+    },
+    {
+      "pfad": "profil.gastro.backen_frittieren",
+      "typ": "bool",
+      "herleitung": "Onboarding (Rückmeldung Lebensmittel T. Baum 22.10.2026): backt selbst (Brot, Backwaren) oder frittiert (z. B. Pommes frites) – Acrylamid-Minimierung nach Art. 2 VO (EU) 2017/2158",
       "ab": 2
     },
     {

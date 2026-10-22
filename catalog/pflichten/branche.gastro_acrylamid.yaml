@@ -1,7 +1,7 @@
 # Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Frage 1 zu L-032 und Frage 14 (c)): Acrylamid minimieren nach VO (EU) 2017/2158
 schema_version: 1
 id: branche.gastro_acrylamid
-version: 2
+version: 3
 katalog_nr: H.1
 titel:
   de: Acrylamid beim Backen und Frittieren gering halten
@@ -13,10 +13,10 @@ erklaerung:
     und andere frittierte Kartoffelerzeugnisse. Betriebe, die solche Lebensmittel herstellen, wenden die
     Minimierungsmaßnahmen der Verordnung (EU) 2017/2158 an: Gibst du nur im eigenen Laden oder an örtliche Einzelhändler
     ab, gelten die Maßnahmen nach Anhang II Teil A (Art. 2 Abs. 2); die Maßnahmen nach Anhang II Teil B kommen nur für
-    zentral gesteuerte Filial- und Franchisebetriebe hinzu (Art. 2 Abs. 3). Zum Beispiel: goldgelb statt dunkelbraun backen und
-    frittieren, Backzeit und -temperatur nach Rezeptur einhalten, Frittierfett höchstens 175 °C heiß. Die
-    Lebensmittelüberwachung prüft das vor allem bei Bäckereien. Amtlos fragt nicht ab, ob du backst oder eine Fritteuse
-    nutzt – trifft beides nicht zu, betrifft dich das nicht.
+    zentral gesteuerte Filial- und Franchisebetriebe hinzu (Art. 2 Abs. 3). Teil-A-Betriebe brauchen keine Probenahmen,
+    müssen die Maßnahmen aber anwenden und auf Nachfrage zeigen können, z. B. Farbkarte für Pommes/Toast,
+    Frittiertemperatur höchstens 175 °C, Backwaren goldgelb statt dunkelbraun. Backzeit und -temperatur hältst du nach
+    Rezeptur ein. Die Lebensmittelüberwachung prüft das vor allem bei Bäckereien.
 rechtsgrundlage:
 - Art. 2 Abs. 2 mit Anhang II Teil A Verordnung (EU) 2017/2158
 - Art. 2 Abs. 3 mit Anhang II Teil B Verordnung (EU) 2017/2158 (zusätzlich für zentral gesteuerte Filial- und Franchisebetriebe)
@@ -25,11 +25,18 @@ einordnung: hinweis
 branchen:
 - gastronomie_lebensmittel
 ausloeser:
-  feld: profil.taetigkeit.branchen
-  op: enthaelt
-  wert: gastronomie_lebensmittel
-  label:
-    de: Dein Betrieb gehört zur Gastronomie oder Lebensmittelbranche.
+  all:
+  - feld: profil.taetigkeit.branchen
+    op: enthaelt
+    wert: gastronomie_lebensmittel
+    label:
+      de: Dein Betrieb gehört zur Gastronomie oder Lebensmittelbranche.
+  # Rückmeldung T. Baum 22.10.2026: Abfrage „Backst du selbst oder frittierst du?“ statt nur über die Branche
+  - feld: profil.gastro.backen_frittieren
+    op: ==
+    wert: true
+    label:
+      de: Du backst selbst oder frittierst.
 frist:
   typ: dauerhaft
 wiederholung:
@@ -40,13 +47,13 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Keine eigene Bußgeldvorschrift (der Tatbestand fehlt in der LMRStV, die für VO (EG) Nr. 852/2004 nur Art. 4 mit Anhang I/II bewehrt). Die Lebensmittelüberwachung kann die nötigen Maßnahmen anordnen (§ 39 LFGB; Art. 138 VO (EU) 2017/625).'
   schwere: mittel
 automatisierung: hinweis
 aktion:
   art: abhaken
 aenderungsnotiz:
-  de: 'Neu nach der fachlichen Prüfung Lebensmittelhygiene (22.10.2026): Acrylamid beim Backen und Frittieren gering halten.'
+  de: 'Nach der fachlichen Prüfung Lebensmittelhygiene (22.10.2026): Der Check fragt jetzt, ob du selbst backst oder frittierst. Dazu, was kleine Betriebe zeigen können müssen, und die Folgen bei Verstößen.'
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -60,12 +67,20 @@ quellen:
 - titel: Food Standards Scotland – Acrylamide Regulation Guidance (Art. 2 Abs. 2 und 3)
   url: https://www.foodstandards.gov.scot/sites/default/files/2025-07/Acrylamide_Regulation_Guidance.pdf
   abgerufen: '2026-10-22'
+- titel: Lebensmittelrechtliche Straf- und Bußgeldverordnung § 2 (Wortlaut über lxgesetze)
+  url: https://lxgesetze.de/lmrstv/2
+  abgerufen: '2026-10-22'
+- titel: Lebensmittel- und Futtermittelgesetzbuch § 39 (Wortlaut über lxgesetze)
+  url: https://lxgesetze.de/lfgb/39
+  abgerufen: '2026-10-22'
+- titel: Verordnung (EU) 2017/625, Artikel 138 (Wortlaut über gesetze.legal)
+  url: https://gesetze.legal/eu/vo_eu_2017_625/138
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Neu nach Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Frage 1 zu L-032 und Frage 14 (c), ✎) als Hinweis – Bericht noch nicht unterschrieben'
-- 'Teil A/B nach dem berichtigten Prüfbericht (22.10.2026, Frage 1 zu L-032) geklärt: kleine Betriebe Art. 2 Abs. 2 mit Anhang II Teil A, Teil B nach Art. 2 Abs. 3 nur zusätzlich für zentral gesteuerte Filial- und Franchisebetriebe – am 22.10.2026 über Inhaltsübersicht (umwelt-online), Merkblatt Chemnitz und FSS-Leitfaden bestätigt (EUR-Lex nicht abrufbar)'
-- 'Als Hinweis über die Branche – Amtlos fragt weder „Bäckerei“ noch „Fritteuse“ ab; Bäckerei nur in den Vorlagen erkennbar (Handwerk mit Lebensmitteln oder Name des Betriebs)'
-- 'Frittierfett höchstens 175 °C laut Prüfbericht (L-075: DGF, BGN-Leitlinie 2018)'
-- 'Folgen bei Nichterfüllung – Sanktion fachlich ergänzen (laut Bericht nicht Gegenstand der fachlichen Prüfung)'
+- 'Rückmeldung Lebensmittel (Tim Baum, 22.10.2026, ändern): Teil A/B bestätigt (Art. 2 Abs. 2 mit Anhang II Teil A; Teil B nach Art. 2 Abs. 3 nur zusätzlich für zentral gesteuerte Filial- und Franchisebetriebe), Satz zu Teil-A-Betrieben und Folgen bei Verstoß übernommen – § 2 LMRStV (nur Art. 4 Abs. 1, 2 mit Anhang I/II VO (EG) Nr. 852/2004), § 39 LFGB und Art. 138 VO (EU) 2017/625 am 22.10.2026 am Wortlaut gelesen (lxgesetze, gesetze.legal)'
+- 'Auslöser jetzt mit der Frage „Backst du selbst oder frittierst du?“ (profil.gastro.backen_frittieren), wie von T. Baum vorgeschlagen'
+- 'Schwere „mittel“ belassen – keine eigene Bußgeldvorschrift; T. Baum hat zur Schwere nichts angegeben'
+- 'Frittierfett höchstens 175 °C laut Prüfbericht (L-075: DGF, BGN-Leitlinie 2018) und Rückmeldung T. Baum'
 pruefung:
   status: entwurf
   geprueft_von: null

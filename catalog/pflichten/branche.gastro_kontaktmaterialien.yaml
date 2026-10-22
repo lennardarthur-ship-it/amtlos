@@ -1,7 +1,7 @@
 # Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Frage 14 (b), Frage 15): Materialien mit Lebensmittelkontakt – Konformitätserklärungen
 schema_version: 1
 id: branche.gastro_kontaktmaterialien
-version: 1
+version: 2
 katalog_nr: H.1
 titel:
   de: Konformitätserklärungen für Verpackungen und Behälter ablegen
@@ -37,13 +37,13 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: mittel
+    de: 'Keine eigene Bußgeldvorschrift gegenüber dem Betrieb. Die Pflicht zur Konformitätserklärung (Art. 16 VO (EG) Nr. 1935/2004, Art. 15 VO (EU) Nr. 10/2011) trifft den Lieferanten. Die Lebensmittelüberwachung fragt die Erklärungen aber bei Kontrollen ab und kann Maßnahmen anordnen (§ 39 LFGB).'
+  schwere: niedrig
 automatisierung: hinweis
 aktion:
   art: abhaken
 aenderungsnotiz:
-  de: 'Neu nach der fachlichen Prüfung Lebensmittelhygiene (22.10.2026): Konformitätserklärungen für Materialien mit Lebensmittelkontakt.'
+  de: 'Nach der fachlichen Prüfung Lebensmittelhygiene (22.10.2026): Folgen ergänzt – die Pflicht zur Konformitätserklärung trifft den Lieferanten, die Lebensmittelüberwachung fragt sie aber ab.'
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -54,10 +54,12 @@ quellen:
 - titel: Verordnung (EU) Nr. 10/2011, Artikel 15 (Wortlaut über gesetze.legal)
   url: https://gesetze.legal/eu/vo_eu_2011_10/15
   abgerufen: '2026-10-22'
+- titel: Lebensmittel- und Futtermittelgesetzbuch § 39 (Wortlaut über lxgesetze)
+  url: https://lxgesetze.de/lfgb/39
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Neu nach Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Frage 14 (b) und Frage 15, ✎) als Hinweis – Bericht noch nicht unterschrieben; Art. 16 VO (EG) Nr. 1935/2004 und Art. 15 VO (EU) Nr. 10/2011 am Wortlaut gelesen (gesetze.legal: Erklärung auf allen Stufen außer dem Einzelhandel)'
+- 'Rückmeldung Lebensmittel (Tim Baum, 22.10.2026, ändern): Folgen bei Verstoß übernommen (§ 39 LFGB am 22.10.2026 gelesen), Schwere „niedrig“; Kurztext bleibt – „außer Einzelhandel“ in Art. 16 VO (EG) Nr. 1935/2004 meint den Verkauf von Bedarfsgegenständen an Verbraucher, nicht den Gastronomiebetrieb als Abnehmer'
 - 'Als Hinweis über die Branche – Amtlos fragt nicht ab, welche Verpackungen und Behälter der Betrieb nutzt'
-- 'Folgen bei Nichterfüllung – Sanktion fachlich ergänzen (laut Bericht nicht Gegenstand der fachlichen Prüfung)'
 pruefung:
   status: entwurf
   geprueft_von: null
