@@ -32,6 +32,11 @@ export const PRUEFER: Record<string, Pruefer> = {
     wortlaut: VERMERK_NEUTRAL_TEXT,
     nennung: false,
   },
+  "Tim Baum (Lebensmittelfachbeauftragter)": {
+    // 22.10.2026: ohne Namen – nur „fachlich geprüft (Stand …)“ (neutraler Vermerk)
+    wortlaut: VERMERK_NEUTRAL_TEXT,
+    nennung: false,
+  },
   "StB Lutz Busch": {
     wortlaut: "Fachlich durchgesehen von StB Lutz Busch, Kanzlei Heckler und Busch (Stand {stand}) – ohne Gewähr für den Einzelfall.",
     // Prüfvermerk vom 22.10.2026 noch ohne Unterschrift (T-160)
