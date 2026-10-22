@@ -9,6 +9,10 @@
  */
 const datumDe = (iso: string) => iso.split("-").reverse().join(".");
 
+const VERMERK_NEUTRAL_TEXT = "Inhalt fachlich geprüft, Stand {stand}. Die Prüfung betrifft die allgemeinen Inhalte, nicht deinen Einzelfall.";
+/** Neutraler Vermerk, solange der Name nicht genannt werden darf. */
+export const VERMERK_NEUTRAL = VERMERK_NEUTRAL_TEXT;
+
 interface Pruefer {
   /** Wortlaut, den der Prüfer freigegeben hat; {stand} = Datum der Prüfung (TT.MM.JJJJ) */
   wortlaut: string;
@@ -23,6 +27,11 @@ export const PRUEFER: Record<string, Pruefer> = {
     // Prüfvermerk vom 22.10.2026 noch ohne Unterschrift; Pflege und Widerruf „in einer gesonderten Vereinbarung“ (offen, T-160)
     nennung: false,
   },
+  "Thomas Koch (Fachkraft für Arbeitssicherheit)": {
+    // 22.10.2026: ausdrücklich ohne Namen – nur „Inhalt fachlich geprüft, Stand …“ (neutraler Vermerk)
+    wortlaut: VERMERK_NEUTRAL_TEXT,
+    nennung: false,
+  },
   "StB Lutz Busch": {
     wortlaut: "Fachlich durchgesehen von StB Lutz Busch, Kanzlei Heckler und Busch (Stand {stand}) – ohne Gewähr für den Einzelfall.",
     // Prüfvermerk vom 22.10.2026 noch ohne Unterschrift (T-160)
@@ -30,8 +39,7 @@ export const PRUEFER: Record<string, Pruefer> = {
   },
 };
 
-/** Neutraler Vermerk, solange der Name nicht genannt werden darf. */
-export const VERMERK_NEUTRAL = "Inhalt fachlich geprüft, Stand {stand}. Die Prüfung betrifft die allgemeinen Inhalte, nicht deinen Einzelfall.";
+
 
 export interface PruefungRoh {
   status?: string;

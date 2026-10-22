@@ -20,7 +20,7 @@
     "url": "https://www.gesetze-im-internet.de/arbschg/BJNR124610996.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "arbeitsschutz.biostoffe",
@@ -42,7 +42,7 @@
     "url": "https://www.gesetze-im-internet.de/biostoffv_2013/__14.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "arbeitsschutz.dguv_v3",
@@ -61,7 +61,7 @@
     "url": "https://publikationen.dguv.de/regelwerk/dguv-vorschriften/"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "arbeitsschutz.erstunterweisung",
@@ -93,7 +93,7 @@
     "url": "https://www.gesetze-im-internet.de/betrsichv_2015/BJNR004910015.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "arbeitsschutz.expositionsverzeichnis",
@@ -121,7 +121,7 @@
     "url": "https://www.haufe.de/id/beitrag/novellierung-der-gefahrstoffverordnung-fokus-krebserz-11-10a-expositionsverzeichnis-auch-fuer-reproduktionstoxische-stoffe-kat-1a-oder-1b-HI16494225.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "arbeitsschutz.gefaehrdungsbeurteilung",
@@ -181,7 +181,7 @@
     "url": "https://www.gesetze-im-internet.de/chemg/__26.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "arbeitsschutz.unterweisung_jugendliche",
@@ -204,7 +204,7 @@
     "url": "https://lxgesetze.de/jarbschg/59"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "arbeitsschutz.unterweisung_wiederholen",
@@ -228,7 +228,7 @@
     "url": "https://www.gesetze-im-internet.de/arbschg/BJNR124610996.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "branche.beauty_hautschutzplan",
@@ -252,7 +252,7 @@
     "url": "https://www.gesetze-im-internet.de/gefstoffv_2010/BJNR164400010.html"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "branche.beauty_hygieneplan",
@@ -403,7 +403,7 @@
     "url": "https://lxgesetze.de/arbschg/22"
    }
   ],
-  "geprueft": false
+  "geprueft": true
  },
  {
   "id": "datenschutz.avv",
