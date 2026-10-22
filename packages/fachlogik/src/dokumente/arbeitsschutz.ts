@@ -584,7 +584,7 @@ const UNTERWEISUNG_OPTIONEN: Option[] = [
 /**
  * E-167 (Sifa-Durchsicht, Blatt „B Vorlagen“, B-124): Gefahrstoffe und Biostoffe – Unterweisung mündlich und
  * arbeitsplatzbezogen, Inhalt und Zeitpunkt schriftlich festhalten und von den Unterwiesenen durch Unterschrift bestätigen
- * lassen (§ 14 Abs. 2 GefStoffV, § 14 Abs. 2 BioStoffV). Ein eingetippter Name genügt dafür nicht: Die App verlangt die
+ * lassen (§ 14 Abs. 2 GefStoffV, § 14 Abs. 3 BioStoffV). Ein eingetippter Name genügt dafür nicht: Die App verlangt die
  * Bestätigung „Unterschriften auf Papier eingeholt“, bevor „Alle Pflichtangaben“ erscheint.
  */
 export const UNTERSCHRIFT_THEMEN = [
@@ -601,10 +601,10 @@ export const UNTERSCHRIFT_THEMEN = [
 ];
 /** Themen mit Gefahrstoffen oder Biostoffen gewählt? */
 export const mitUnterschriftPflicht = (d: Daten) => auswahl(d, "themen").some((w) => UNTERSCHRIFT_THEMEN.includes(w));
-export const UNTERSCHRIFT_TEXT = "Gefahrstoffe und Biostoffe: Die Unterweisung erfolgt mündlich und arbeitsplatzbezogen. Inhalt und Zeitpunkt werden schriftlich festgehalten und von den Unterwiesenen durch Unterschrift bestätigt (§ 14 Abs. 2 GefStoffV, § 14 Abs. 2 BioStoffV). Ein eingetippter Name genügt dafür nicht – PDF ausdrucken, jede Person unterschreiben lassen und den Nachweis aufbewahren. Eine reine App- oder E-Learning-Unterweisung reicht für diese Themen nicht.";
+export const UNTERSCHRIFT_TEXT = "Gefahrstoffe und Biostoffe: Die Unterweisung erfolgt mündlich und arbeitsplatzbezogen. Inhalt und Zeitpunkt werden schriftlich festgehalten und von den Unterwiesenen durch Unterschrift bestätigt (§ 14 Abs. 2 GefStoffV, § 14 Abs. 3 BioStoffV). Ein eingetippter Name genügt dafür nicht – PDF ausdrucken, jede Person unterschreiben lassen und den Nachweis aufbewahren. Eine reine App- oder E-Learning-Unterweisung reicht für diese Themen nicht.";
 export const UNTERSCHRIFT_FEHLT = "Unterschriften der Unterwiesenen auf Papier einholen und bestätigen (Gefahrstoffe/Biostoffe, § 14 Abs. 2 GefStoffV)";
 /** Satz im PDF über der Teilnahmeliste (Gefahrstoffe/Biostoffe). */
-const UNTERSCHRIFT_PDF = "Gefahrstoffe/Biostoffe: Unterweisung mündlich und arbeitsplatzbezogen; jede unterwiesene Person bestätigt Inhalt und Zeitpunkt mit ihrer eigenhändigen Unterschrift (§ 14 Abs. 2 GefStoffV, § 14 Abs. 2 BioStoffV).";
+const UNTERSCHRIFT_PDF = "Gefahrstoffe/Biostoffe: Unterweisung mündlich und arbeitsplatzbezogen; jede unterwiesene Person bestätigt Inhalt und Zeitpunkt mit ihrer eigenhändigen Unterschrift (§ 14 Abs. 2 GefStoffV, § 14 Abs. 3 BioStoffV).";
 
 export const unterweisung: Vorlage = {
   id: "unterweisung",
@@ -651,7 +651,7 @@ export const unterweisung: Vorlage = {
       hilfe: "Namen eintragen – im ausgedruckten PDF unterschreibt jede Person eigenhändig daneben. Bei Gefahrstoffen und Biostoffen ist die Unterschrift vorgeschrieben (§ 14 Abs. 2 GefStoffV); bei den übrigen Themen ist ein nur eingetippter Name als Nachweis schwach. Freie Zeilen kommen automatisch dazu.",
       felder: [
         { id: "teilnehmer", art: "liste", ausMitarbeitern: true, label: "Teilnehmende", eintrag: "Person", titelFeld: "name", felder: [{ id: "name", art: "text", label: "Name", pflicht: true }] },
-        { id: "unterschriften_papier", art: "schalter", label: "Unterschriften auf Papier eingeholt", hilfe: "Erst ankreuzen, wenn alle Unterwiesenen den ausgedruckten Nachweis eigenhändig unterschrieben haben – ein eingetippter Name genügt bei Gefahrstoffen und Biostoffen nicht (§ 14 Abs. 2 GefStoffV, § 14 Abs. 2 BioStoffV).", wenn: { feld: "themen", ist: UNTERSCHRIFT_THEMEN } },
+        { id: "unterschriften_papier", art: "schalter", label: "Unterschriften auf Papier eingeholt", hilfe: "Erst ankreuzen, wenn alle Unterwiesenen den ausgedruckten Nachweis eigenhändig unterschrieben haben – ein eingetippter Name genügt bei Gefahrstoffen und Biostoffen nicht (§ 14 Abs. 2 GefStoffV, § 14 Abs. 3 BioStoffV).", wenn: { feld: "themen", ist: UNTERSCHRIFT_THEMEN } },
       ],
     },
   ],

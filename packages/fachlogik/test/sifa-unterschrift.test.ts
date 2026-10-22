@@ -26,7 +26,7 @@ describe("Unterweisung Gefahrstoffe und Biostoffe", () => {
   it("die App bietet den eingetippten Namen dafür nicht als genügend an", () => {
     const h = v.formHinweis!(gefahr)!;
     expect(h.form).toBe("unterschrift");
-    expect(h.text).toMatch(/mündlich und arbeitsplatzbezogen.*Unterschrift bestätigt \(§ 14 Abs\. 2 GefStoffV, § 14 Abs\. 2 BioStoffV\)\. Ein eingetippter Name genügt dafür nicht/);
+    expect(h.text).toMatch(/mündlich und arbeitsplatzbezogen.*Unterschrift bestätigt \(§ 14 Abs\. 2 GefStoffV, § 14 Abs\. 3 BioStoffV\)\. Ein eingetippter Name genügt dafür nicht/);
     expect(v.abschnitte[1]!.hilfe).toMatch(/mündlich und arbeitsplatzbezogen.*reine App- oder E-Learning-Unterweisung reicht dafür nicht/);
   });
   it("PDF: Unterschriftsspalte je Person, Hinweis zur Pflicht, Rechtsgrundlage, Betriebsanweisung und Verständniskontrolle", () => {
