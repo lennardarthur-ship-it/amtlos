@@ -698,7 +698,7 @@ export function standBauen(): Bau {
     ki_kompetenz: "Keine KI-Werkzeuge im Einsatz (Profil ki.nutzung = nein).",
     handelsregister: "Freier Beruf – kein Handelsgewerbe.", transparenzregister: "Natürliche Person – keine Mitteilung.",
     gewerbeanmeldung: "Physiotherapie ist ein freier Beruf (§ 18 Abs. 1 Nr. 1 EStG, „ähnlicher Beruf“) – keine Gewerbeanmeldung; Verkauf von Therabändern in geringem Umfang (Abfärbung prüfen, § 15 Abs. 3 Nr. 1 EStG).",
-    ifsg_belehrung: "Keine Lebensmittel.", allergene: "Keine Lebensmittel.", haccp: "Keine Lebensmittel.",
+    ifsg_belehrung: "Keine Lebensmittel.", allergene: "Keine Lebensmittel.", haccp: "Keine Lebensmittel.", hygieneschulung: "Keine Lebensmittel.",
     hautschutzplan: "Im Szenario nicht erstellt (Musterzeilen für Praxen gibt es seit E-167); Feuchtarbeit in der Physiotherapie (Händedesinfektion statt Waschen) im Hygieneplan und in der Unterweisung berücksichtigt.",
     // StB-Prüfung (5.2, C-9): nur Kunden im Inland
     oss_meldung: "Nur Patienten und Kunden im Inland – kein OSS-Verfahren.", zm_meldung: "Keine Lieferungen oder Leistungen an Unternehmen im EU-Ausland.",

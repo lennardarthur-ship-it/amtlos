@@ -9,11 +9,11 @@ Anbieter: Lang Ventures UG (haftungsbeschränkt) i. G., Reutlingen. App: **Betri
 Betriebsklar ist eine iPhone-App für kleine Betriebe in Deutschland. Für Lebensmittelbetriebe heißt das:
 
 1. **Pflichten-Check:** Wer im Check die Branche „Gastronomie und Lebensmittel“ angibt, sieht aus einem festen Katalog u. a. Registrierung bei der Lebensmittelüberwachung, Eigenkontrollen nach HACCP, Rückverfolgbarkeit, beim Foodtruck die Anzeige des Wassertanks, Hygieneschulung, Belehrung nach § 43 IfSG (Bescheinigung des Gesundheitsamts, Belehrung durch den Arbeitgeber, Wiederholung alle zwei Jahre), Allergenkennzeichnung, Zusatzstoffe bei loser Ware, Mehrweg zum Mitnehmen und die EU-Verpackungsverordnung. Regelbasiert, keine KI, keine Einzelfallprüfung.
-2. **Vorlagen, die der Betrieb selbst ausfüllt** und als PDF ausgibt: Eigenkontrollen (HACCP) mit Gefahrenanalyse je Prozessschritt, kritischen Kontrollpunkten (Grenzwert, Überwachung, Korrekturmaßnahme), Verifizierung und Dokumentation, dazu Kontrollpunkte, Messprotokoll und Monatsraster zum Aushängen (seit E-166), Hygieneplan für Lebensmittelbetriebe, Allergenliste zum Aushängen, Belehrung durch den Arbeitgeber nach § 43 IfSG.
+2. **Vorlagen, die der Betrieb selbst ausfüllt** und als PDF ausgibt: Eigenkontrollen (HACCP) mit Gefahrenanalyse je Prozessschritt, kritischen Kontrollpunkten (Grenzwert, Überwachung, Korrekturmaßnahme), Verifizierung und Dokumentation, dazu Kontrollpunkte, Messprotokoll und Monatsraster zum Aushängen (seit E-166), Hygieneplan für Lebensmittelbetriebe, Allergenliste zum Aushängen (seit dem Prüfbericht vom 22.10.2026 mit Getreide- und Nussart als Pflicht, „Enthält:“ je Speise und Zusatzstoffen als Ziffern), Belehrung durch den Arbeitgeber nach § 43 IfSG, Schulungsnachweis Lebensmittelhygiene nach § 4 LMHV (neu nach dem Prüfbericht).
 3. **Bausteine als Vorschläge:** Gefahrenanalyse und kritische Kontrollpunkte je Branchengruppe (Café/Gastronomie, Bäckerei, Foodtruck); Kontrollpunkte mit Grenzwert, Häufigkeit und Korrekturmaßnahme; Hygieneplan-Zeilen nach Themenbereichen (auch für Bäckerei und Foodtruck); Belehrungsinhalte. Jeder Baustein trägt einen Kurzbeleg (z. B. „Lebensmittelüberwachung Mainz“, „LAVES Niedersachsen“, „Anhang II Kap. IX VO (EG) Nr. 852/2004“). Temperaturwerte und übliche Richtwerte sind im Code als **fachlich zu prüfen** markiert; wo zwei Behörden verschiedene Werte nennen, stehen beide da (PRUEFLISTE T-94). Kein Baustein ist bisher fachlich freigegeben; die App zeigt bei den Vorlagen den Hinweis „Die Vorlagen sind noch nicht von Fachleuten geprüft. Prüfe die Inhalte, bevor du sie verwendest.“
-4. **Kontrollmappe:** Die aktuellen Nachweise (darunter HACCP, Hygieneplan, Allergenliste, Belehrung) in einem PDF für eine Kontrolle der Lebensmittelüberwachung.
+4. **Kontrollmappe:** Die aktuellen Nachweise (darunter HACCP, Hygieneplan, Allergenliste, Belehrung, Schulungsnachweis) in einem PDF für eine Kontrolle der Lebensmittelüberwachung.
 
-**Was die App nicht tut:** Sie analysiert und entscheidet nichts selbst – Gefahrenanalyse und CCP-Festlegung sind Vorschläge mit einer Entscheidungshilfe in einfachen Worten, die der Betrieb übernimmt und anpasst. Keine Rezepturen oder Etiketten für vorverpackte Ware, keine Vorlage für Zusatzstoffe und keine für die Hygieneschulung (beides nur als Hinweis im Katalog). Die Verantwortung bleibt beim Lebensmittelunternehmer.
+**Was die App nicht tut:** Sie analysiert und entscheidet nichts selbst – Gefahrenanalyse und CCP-Festlegung sind Vorschläge mit einer Entscheidungshilfe in einfachen Worten, die der Betrieb übernimmt und anpasst. Keine Rezepturen oder Etiketten für vorverpackte Ware; Zusatzstoffe stehen seit dem Prüfbericht vom 22.10.2026 in der Allergenliste (keine eigene Vorlage). Die Verantwortung bleibt beim Lebensmittelunternehmer.
 
 **Daten:** Alles bleibt auf dem Gerät. Betriebsklar sieht keine Nutzerdaten. Die Beispiele in den PDFs sind erfunden.
 
@@ -53,7 +53,7 @@ Betriebsklar ist eine iPhone-App für kleine Betriebe in Deutschland. Für Leben
 
 ### C. Allergenliste (LMIV / LMIDV)
 
-`allergene-*.pdf`: Matrix Speise × 14 Allergene, Getreide- bzw. Nussart optional, „keines der 14 Hauptallergene“ nur nach ausdrücklicher Bestätigung, Erläuterung der Allergene auf eigenem Blatt, Hinweis „Informationen zu Allergenen erhalten Sie in dieser Übersicht und auf Nachfrage bei unserem Personal.“, Fußnote Art. 44 LMIV i. V. m. § 4 LMIDV.
+`allergene-*.pdf`: Matrix Speise × 14 Allergene, Getreide- bzw. Nussart (nach dem Prüfbericht vom 22.10.2026: Pflicht, Mehrfachauswahl, unter der Speise als „Enthält: …“; Zusatzstoffe als Ziffern mit eigener Legende; lateinische Namen entfallen), „keines der 14 Hauptallergene“ nur nach ausdrücklicher Bestätigung, Erläuterung der Allergene auf eigenem Blatt, Hinweis „Informationen zu Allergenen erhalten Sie in dieser Übersicht und auf Nachfrage bei unserem Personal.“, Fußnote Art. 44 LMIV i. V. m. § 4 LMIDV.
 
 ### D. Belehrung nach § 43 IfSG
 
@@ -106,7 +106,7 @@ Stand nach E-166 (22.10.2026). Geschlossen: Gefahrenanalyse, CCP mit Entscheidun
 - **Bekanntmachung 2022/C 355/01:** Anhang II (HACCP-Flexibilität) nur auszugsweise gelesen; ob Kleinbetriebe ohne CCP mit der guten Hygienepraxis auskommen, bitte bestätigen.
 - **Trinkwasser im Foodtruck:** Anwendung von § 11 Abs. 2 TrinkwV auf Tanks, die nur zum Zubereiten und Händewaschen dienen, und die Untersuchungspflichten (nur aus dem Merkblatt Dortmund) sind ungeklärt; der Check fragt den Tank nicht ab.
 - **Rückverfolgbarkeit:** nur über die Branche ausgelöst (nicht für Onlinehändler mit Lebensmitteln ohne diese Branche); Durchführungsverordnung (EU) Nr. 931/2011 nur als Hinweis.
-- **Keine Vorlage** für Zusatzstoffe, Hygieneschulung (Schulungsnachweis), Kennzeichnung vorverpackter Ware, Materialien mit Lebensmittelkontakt; keine Gruppe für Metzgereien.
+- **Keine Vorlage** für Kennzeichnung vorverpackter Ware, Materialien mit Lebensmittelkontakt; keine Gruppe für Metzgereien.
 - **Folgen bei Nichterfüllung** (Bußgelder) für HACCP, Registrierung, Rückverfolgbarkeit und Trinkwasser nicht erfasst.
 
 ## Nicht Gegenstand dieser Prüfung

@@ -21,7 +21,7 @@ describe("Platzhalter „…“ und fehlender Betrieb (Jonas #2, Lea #5, Mehmet 
   });
   it("sagt „Fast fertig: Name des Betriebs“, solange der Betrieb keinen Namen hat", () => {
     const a = v("allergene");
-    const d = { ...leereDaten(a, LEERER_BETRIEB, HEUTE), gerichte: [{ name: "Apfelkuchen", allergene: ["gluten"], keine: false }] };
+    const d = { ...leereDaten(a, LEERER_BETRIEB, HEUTE), gerichte: [{ name: "Apfelkuchen", allergene: ["gluten"], getreidearten: ["weizen"], keine: false }] };
     expect(fehlendeAngaben(a, d, LEERER_BETRIEB)).toEqual([BETRIEBSNAME_FEHLT]);
     expect(fehlendeAngaben(a, d, B)).toEqual([]);
     // Vorlagen, die den Namen schon selbst prüfen, melden ihn nicht doppelt
@@ -91,8 +91,12 @@ describe("Branchen (Sabine #11, Mehmet #13, #15, #20)", () => {
     expect(i.hinweise?.({ teilnehmer: [{ ...d.teilnehmer[0]!, erstmals: false }] }, B)).toEqual([]);
   });
   it("Allergene: welches Getreide, welche Nüsse", () => {
-    const h = html("allergene", { gerichte: [{ name: "Nusskuchen", allergene: ["gluten", "schalenfruechte"], getreide: "Dinkel", nuesse: "Haselnuss" }] });
-    expect(h).toContain("Getreide: Dinkel · Nüsse: Haselnuss");
+    // Prüfbericht Lebensmittelhygiene (Frage 9): Arten als Auswahl, in der Zeile „Enthält:“; ältere Listen mit Freitext
+    // zeigen diesen, bis die Art gewählt ist
+    const h = html("allergene", { gerichte: [{ name: "Nusskuchen", allergene: ["gluten", "schalenfruechte"], getreidearten: ["dinkel"], nussarten: ["haselnuesse"] }] });
+    expect(h).toContain("Enthält: Weizen (Dinkel), Haselnüsse");
+    const alt = html("allergene", { gerichte: [{ name: "Nusskuchen", allergene: ["gluten", "schalenfruechte"], getreide: "Dinkel", nuesse: "Haselnuss" }] });
+    expect(alt).toContain("Enthält: Dinkel, Haselnuss");
   });
 });
 

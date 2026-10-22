@@ -1,7 +1,7 @@
 /**
  * Prüfmappe für die fachliche Prüfung Lebensmittelhygiene erzeugen (analog docs/pruefmappe-anwalt, -steuer und
  * -arbeitsschutz): Lebensmittel-Vorlagen als PDF (HACCP, Hygieneplan Lebensmittel, Allergenliste, Belehrung nach § 43
- * IfSG), alle vorformulierten Bausteine dieser Vorlagen mit Quelle und Markierung (Markdown und CSV), Katalogeinträge zu
+ * IfSG, Schulungsnachweis nach § 4 LMHV), alle vorformulierten Bausteine dieser Vorlagen mit Quelle und Markierung (Markdown und CSV), Katalogeinträge zu
  * Lebensmittelhygiene, Allergenen, Zusatzstoffen, IfSG, Registrierung und Verpackung als CSV und der Prüflisten-Auszug.
  *
  *   node docs/pruefmappe-lebensmittel/erzeugen.mjs <ziel>      # z. B. /tmp/pruefmappe-lebensmittel
@@ -92,9 +92,12 @@ for (const v of VORLAGEN) {
     // E-166: in der HACCP-Vorlage gliedern die Abschnitte (Gefahrenanalyse, CCP, Verifizierung …) die Bausteine
     const neu = (x) => bausteine.push({ vorlage: v.id === "hygieneplan" ? "Hygieneplan (Lebensmittelbetrieb)" : v.titel, vorlageId: v.id, feld, ...(v.id === "haccp" ? { thema: abschnitt } : {}), ...x });
     if (f.art === "liste") for (const s of (f.vorschlaege ?? []).filter((s) => v.id !== "hygieneplan" || LEBENSMITTEL.has(s))) neu({ art: "Vorschlag (Eintrag)", gruppeApp: s.gruppe ?? "", thema: s.werte?.thema ?? (v.id === "haccp" ? ({ gefahren: "Gefahrenanalyse", ccps: "Kritische Kontrollpunkte (CCP)", punkte: "Kontrollpunkte der Eigenkontrollen" }[f.id] ?? "") : ""), titel: s.titel, inhalt: inhaltAus(s.werte, s.titel, v.id === "haccp"), quelle: s.quelle ?? "" });
-    // Die 14 Allergene haben keinen Kurzbeleg je Option; konstanten.ts nennt Anhang II LMIV und „Bezeichnungen fachlich zu prüfen, E-099“
+    // Die 14 Allergene haben keinen Kurzbeleg je Option (Anhang II LMIV); Bezeichnungen bestätigt im Prüfbericht
+    // Lebensmittelhygiene vom 22.10.2026 (Frage 9, L-007 bis L-020 ✔) – die Markierung „fachlich zu prüfen (E-099)“ entfällt.
+    // Getreide- und Nussarten sowie Zusatzstoffe (neu nach dem Prüfbericht) stehen unter „Feste Texte“, nicht als
+    // nummerierte Bausteine – so bleiben die Nummern L-001 bis L-120 des Prüfberichts gleich.
     const allergen = f.art === "mehrfach" && f.optionen.length === Object.keys(F.ALLERGENE).length;
-    if (f.optionen && (f.art === "bausteine" || allergen || f.optionen.some((o) => o.quelle))) for (const o of f.optionen) neu({ art: f.art === "bausteine" ? "Textbaustein" : "Auswahl", gruppeApp: (o.gruppen ?? []).join(", "), titel: o.text, inhalt: allergen ? "Bezeichnungen fachlich zu prüfen (E-099)" : "", quelle: o.quelle ?? (allergen ? "Anhang II LMIV" : (ausBausteinen.get(o.text)?.quelle ?? "")), unsicher: Boolean(o.unsicher || ausBausteinen.get(o.text)?.unsicher) });
+    if (f.optionen && (f.art === "bausteine" || allergen || f.optionen.some((o) => o.quelle))) for (const o of f.optionen) neu({ art: f.art === "bausteine" ? "Textbaustein" : "Auswahl", gruppeApp: (o.gruppen ?? []).join(", "), titel: o.text, inhalt: allergen ? "Bezeichnung bestätigt (Prüfbericht 22.10.2026, Frage 9)" : "", quelle: o.quelle ?? (allergen ? "Anhang II LMIV" : (ausBausteinen.get(o.text)?.quelle ?? "")), unsicher: Boolean(o.unsicher || ausBausteinen.get(o.text)?.unsicher) });
     if (f.art !== "liste") for (const s of (f.vorschlaege ?? []).filter((s) => !BEAUTY.test(s))) neu({ art: "Formulierung", gruppeApp: (f.vorschlagGruppen?.[s] ?? []).join(", "), titel: s, inhalt: "", quelle: ausBausteinen.get(s)?.quelle ?? "", unsicher: Boolean(ausBausteinen.get(s)?.unsicher) });
   }
 }
@@ -154,8 +157,25 @@ bm.push("## Kurze Auswahllisten (ohne Quelle)", "");
 for (const l of listen) bm.push(`- **${l.vorlage} – ${l.feld}:** ${l.werte.join(" · ")}`);
 bm.push("", "## Feste Texte der Vorlagen", "");
 bm.push("### Allergenliste: die 14 Hauptallergene (Anhang II LMIV) mit Erläuterung", "", "| Nr. | Bezeichnung in der App | Erläuterung auf dem Aushang (Recherche) |", "|---|---|---|", ...Object.values(F.ALLERGENE).map((a, i) => `| ${i + 1} | ${md(a)} | ${md(F.BS.ALLERGENE_UMFANG[i]?.umfasst ?? "")} |`), "");
+bm.push(
+  "### Allergenliste: Getreide- und Nussart, „Enthält:“, Zusatzstoffe, Hilfetexte (Prüfbericht 22.10.2026)",
+  "",
+  `Getreideart (Pflicht bei A, Mehrfachauswahl): ${F.GETREIDEARTEN.map((o) => o.text).join(", ")}. Fußnote auf dem Aushang: ${F.WEIZENARTEN_FUSSNOTE}`,
+  "",
+  `Schalenfrüchte (Pflicht bei H, Mehrfachauswahl): ${F.NUSSARTEN.map((o) => o.text).join(", ")}. Lateinische Namen erscheinen auf dem Aushang nicht mehr.`,
+  "",
+  "Je Speise steht unter dem Namen „Enthält: …“ (§ 4 LMIDV); die Legende der Kennbuchstaben beginnt mit „Enthält:“.",
+  "",
+  `Zusatzstoffe als Ziffern hinter dem Namen, Legende unter der Allergen-Legende (1–11: ${F.ZUSATZSTOFFE_QUELLE.lmzdv}; 12, 13: ${F.ZUSATZSTOFFE_QUELLE.weitere}):`,
+  ...F.ZUSATZSTOFFE.map((o, i) => `${i + 1}. ${o.text}`),
+  "",
+  "Hilfetexte in der App:",
+  ...Object.values(F.ALLERGENE_HILFE).map((t) => `- ${t}`),
+  "",
+);
 bm.push("### Allergene bei loser Ware (Recherche, `LOSE_WARE`)", "", `Rechtsgrundlage (Fußtext des Aushangs): ${F.BS.LOSE_WARE.rechtsgrundlage}`, "", `Anforderung: ${F.BS.LOSE_WARE.anforderung}`, "", "Schriftliche Formen:", ...F.BS.LOSE_WARE.formen.map((t) => `- ${t}`), "");
-bm.push("### Belehrung nach § 43 IfSG: Tätigkeitsverbote, Krankheitszeichen, Lebensmittel (Abschnitt „Tätigkeitsverbote nach § 42 Abs. 1 IfSG“)", "", "Personen (§ 42 Abs. 1 IfSG):", ...F.BS.IFSG.personen.map((t) => `- ${t}`), "", "Krankheitszeichen („Woran Sie das erkennen“):", ...F.BS.IFSG.symptome.map((t) => `- ${t}`), "", "Lebensmittel (§ 42 Abs. 2 IfSG):", ...F.BS.IFSG.lebensmittel.map((t) => `- ${t}`), "");
+bm.push("### Belehrung nach § 43 IfSG: Tätigkeitsverbote, Krankheitszeichen, Lebensmittel (Abschnitt „Tätigkeitsverbote nach § 42 Abs. 1 IfSG“)", "", "Personen (§ 42 Abs. 1 IfSG):", ...F.BS.IFSG.personen.map((t) => `- ${t}`), "", "Krankheitszeichen („Woran Sie das erkennen“):", ...F.BS.IFSG.symptome.map((t) => `- ${t}`), "", `Danach (Prüfbericht 22.10.2026, D): ${F.IFSG_HAUSHALT}`, "", `Hilfetext „Teilnehmende“: ${F.IFSG_WER}`, "", "Lebensmittel (§ 42 Abs. 2 IfSG):", ...F.BS.IFSG.lebensmittel.map((t) => `- ${t}`), "");
+bm.push("### Schulungsnachweis Lebensmittelhygiene (§ 4 LMHV, neu nach dem Prüfbericht 22.10.2026, Frage 12)", "", "Die Themen stehen oben als Textbausteine der Vorlage (Sachgebiete der Anlage 1 LMHV und Ergänzungen aus dem Prüfbericht). Hilfetexte:", ...Object.values(F.SCHULUNG_HILFE).map((t) => `- ${t}`), "");
 bm.push("### HACCP: Prozessschritte, Entscheidungshilfe für CCP, Flexibilität, Aufbewahrung (E-166)", "", `Prozessschritte auf dem leeren Blatt: ${F.PROZESSSCHRITTE.join(", ")}`, "", `Entscheidungshilfe (${F.CCP_FRAGEN_QUELLE}):`, ...F.CCP_FRAGEN.map((t, i) => `${i + 1}. ${t}`), "", `Hinweis unter der Entscheidungshilfe: ${F.CCP_HINWEIS}`, "", `Begründungen zum Antippen: ${F.CCP_BEGRUENDUNG.join(" · ")}`, "", `Kennzeichnung in der CCP-Tabelle: ${F.GHP_HINWEIS}`, "", `Hilfetext Grenzwert: ${F.GRENZWERT_HILFE}`, "", `Fußtext Flexibilität: ${F.HACCP_FLEXIBEL}`, "", `Hinweis in der App (Messungen): ${F.HACCP_VEREINFACHT}`, "", `Aufbewahrung (Startwert): ${F.HACCP_AUFBEWAHRUNG} (${F.HACCP_AUFBEWAHRUNG_QUELLE})`, "", `Fester Satz bei den Aufzeichnungen: ${F.HACCP_RUECKRUF}`, "");
 bm.push("### Hygieneplan Lebensmittelbetrieb: Themenbereiche und Querverweis", "", ...F.HYGIENE_THEMEN_LEBENSMITTEL.map((t, i) => `${i + 1}. ${t}${F.HYGIENE_THEMEN_NEU.includes(t) ? " (neu nach dem Prüfbericht)" : ""}`), "", `Fußtext: ${F.HYGIENE_VERWEIS_HACCP}`, "");
 fs.writeFileSync(path.join(ZIEL, "bausteine.md"), bm.join("\n"));

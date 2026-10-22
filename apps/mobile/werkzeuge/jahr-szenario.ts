@@ -572,19 +572,25 @@ export function standBauen(): Bau {
   // Gastronomie
   dok({ id: "ifsg", vorlage: "ifsg_belehrung", datum: "2026-02-10", worum: "Folgebelehrung nach § 43 Abs. 4 IfSG für Köchin (Erstbelehrung 15.02.2022) und Minijobber (Erstbelehrung 20.08.2025), alle sechs Inhalte, Liste nach § 42 angehängt.",
     daten: (h) => ({ belehrt_von: "Jana Weber", inhalte: (leereDatenVon("ifsg_belehrung", h).inhalte as string[]).concat(["bei Krankheitszeichen ärztlichen Rat einholen und mitteilen, dass man mit Lebensmitteln arbeitet (Merkblatt Gesundheitsamt)"]), liste_anhaengen: true,
-      teilnehmer: eintraege("ifsg_belehrung", "teilnehmer", [{ name: "Sabine Krüger", erstbelehrung_am: "2022-02-15" }, { name: "Leon Schubert", erstbelehrung_am: "2025-08-20" }], h) }) });
+      teilnehmer: eintraege("ifsg_belehrung", "teilnehmer", [{ name: "Sabine Krüger", erstbelehrung_am: "2022-02-15", letzte_belehrung_am: "2024-02-12" }, { name: "Leon Schubert", erstbelehrung_am: "2025-08-20" }], h) }) });
+  // Prüfbericht Lebensmittelhygiene (22.10.2026, Frage 12): Schulungsnachweis nach § 4 LMHV am selben Termin, eigene Liste
+  dok({ id: "hygieneschulung", vorlage: "hygieneschulung", datum: "2026-02-10", worum: "Jährliche Hygieneschulung nach § 4 LMHV für Köchin und Minijobber am Termin der IfSG-Belehrung – eigene Unterschriftsliste.",
+    daten: () => ({ thema: "Jährliche Hygieneschulung", datum: "2026-02-10", dauer: "60 Minuten", geschult_von: "Jana Weber", themen: ["herstellung", "warenkontrolle", "behandlung", "kuehlung_lagerung", "reinigung", "personalhygiene", "allergene"],
+      teilnehmer: [{ name: "Sabine Krüger", taetigkeit: "Küche" }, { name: "Leon Schubert", taetigkeit: "Service und Theke" }] }) });
 
-  const GERICHTE: [string, string, string[]][] = [
-    ["Croissant mit Butter und Konfitüre", "Frühstück", ["gluten", "eier", "milch"]],
-    ["Rührei mit Schnittlauch und Bauernbrot", "Frühstück", ["gluten", "eier", "milch"]],
-    ["Avocadobrot mit Sesam und Chili (Sauerteig)", "Frühstück", ["gluten", "sesam"]],
-    ["Granola-Bowl mit Joghurt, Beeren und Haselnüssen", "Frühstück", ["gluten", "milch", "schalenfruechte"]],
-    ["Quiche Lorraine mit Blattsalat", "Hauptgerichte", ["gluten", "eier", "milch"]],
+  // Prüfbericht Lebensmittelhygiene (22.10.2026, Frage 9): Getreide- und Nussart als Pflichtangabe
+  const GERICHTE: [string, string, string[], Record<string, string[]>?][] = [
+    ["Croissant mit Butter und Konfitüre", "Frühstück", ["gluten", "eier", "milch"], { getreidearten: ["weizen"] }],
+    ["Rührei mit Schnittlauch und Bauernbrot", "Frühstück", ["gluten", "eier", "milch"], { getreidearten: ["weizen", "roggen"] }],
+    ["Avocadobrot mit Sesam und Chili (Sauerteig)", "Frühstück", ["gluten", "sesam"], { getreidearten: ["roggen", "weizen"] }],
+    ["Granola-Bowl mit Joghurt, Beeren und Haselnüssen", "Frühstück", ["gluten", "milch", "schalenfruechte"], { getreidearten: ["hafer"], nussarten: ["haselnuesse"] }],
+    ["Quiche Lorraine mit Blattsalat", "Hauptgerichte", ["gluten", "eier", "milch"], { getreidearten: ["weizen"] }],
     ["Tomatensuppe mit Basilikum (Gemüsefond mit Sellerie)", "Hauptgerichte", ["sellerie"]],
     ["Linsensalat mit Senf-Dressing", "Hauptgerichte", ["senf"]],
-    ["Käsekuchen nach Omas Art", "Kuchen und Torten", ["gluten", "eier", "milch"]],
-    ["Rüblitorte mit Mandeln und Frischkäsehaube", "Kuchen und Torten", ["gluten", "eier", "milch", "schalenfruechte"]],
-    ["Leipziger Lerche (Mürbeteig, Marzipan, Kirsche)", "Kuchen und Torten", ["gluten", "eier", "milch", "schalenfruechte"]],
+    ["Käsekuchen nach Omas Art", "Kuchen und Torten", ["gluten", "eier", "milch"], { getreidearten: ["weizen"] }],
+    ["Rüblitorte mit Mandeln und Frischkäsehaube", "Kuchen und Torten", ["gluten", "eier", "milch", "schalenfruechte"], { getreidearten: ["dinkel"], nussarten: ["mandeln"] }],
+    // Prüfbericht Frage 13: Zusatzstoffe als Ziffern (kandierte Belegkirsche mit Farbstoff)
+    ["Leipziger Lerche (Mürbeteig, Marzipan, Kirsche)", "Kuchen und Torten", ["gluten", "eier", "milch", "schalenfruechte"], { getreidearten: ["weizen"], nussarten: ["mandeln"], zusatzstoffe: ["farbstoff"] }],
     ["Obstsalat der Saison", "Desserts", []],
     ["Cappuccino mit Kuhmilch", "Heißgetränke", ["milch"]],
     ["Espresso", "Heißgetränke", []],
@@ -592,7 +598,7 @@ export function standBauen(): Bau {
     ["Weißweinschorle", "Kaltgetränke", ["schwefeldioxid"]],
   ];
   dok({ id: "allergene", vorlage: "allergene", datum: "2026-03-01", worum: "Allergenliste mit 15 Speisen und Getränken; bei Obstsalat, Espresso und Limonade ist der Schalter „Enthält keines der 14 Hauptallergene“ gesetzt.",
-    daten: (h) => ({ stand: "2026-03-01", legende: true, gerichte: eintraege("allergene", "gerichte", GERICHTE.map(([name, kategorie, allergene]) => ({ name, kategorie, allergene, keine: allergene.length === 0 })), h) }) });
+    daten: (h) => ({ stand: "2026-03-01", legende: true, gerichte: eintraege("allergene", "gerichte", GERICHTE.map(([name, kategorie, allergene, extra]) => ({ name, kategorie, allergene, ...extra, keine: allergene.length === 0 })), h) }) });
 
   const messungen: Eintrag[] = [];
   for (let tag = 1; tag <= 15; tag++) {

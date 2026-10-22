@@ -9,7 +9,7 @@ import { useMeldung, useMeldungLeeren } from "../ui/meldung";
 import { Unterseite, useNav } from "../ui/navigation";
 import { HAARLINIE, useFarben, weich } from "../ui/thema";
 import { kasseSichtbar } from "../unterlagen/kasse";
-import { BG_SCHLUESSEL, UMWELT_NACHWEISE, UMWELT_SCHLUESSEL, aufenthaltEintraege, bestaetigtOhneUnterlage, bgNachweiseFuer, bgVorhandenAm, dateiAlsPdf, eintragZusatz, entsorgungEintraege, kassenMappe, datumDe, deckblattHtml, fehltInMappe, fuerKontrolle, inStaette, kontrollartenFuer, lohnkontoEintraege, mappeDateiname, mappeZusammenfuegen, mappenAuswahl, personalUebersicht, seitenzahl, startSeiten, umweltVorhanden, type Kontrollart, type MappenEintrag } from "../unterlagen/kontrollmappe";
+import { BG_SCHLUESSEL, UMWELT_NACHWEISE, UMWELT_SCHLUESSEL, aufenthaltEintraege, bestaetigtOhneUnterlage, bgNachweiseFuer, bgVorhandenAm, dateiAlsPdf, eintragZusatz, entsorgungEintraege, kassenMappe, datumDe, deckblattHtml, fehltInMappe, fuerKontrolle, inStaette, kontrollartenFuer, lohnkontoEintraege, mappeDateiname, mitIfsgBescheinigungen, mappeZusammenfuegen, mappenAuswahl, personalUebersicht, seitenzahl, startSeiten, umweltVorhanden, type Kontrollart, type MappenEintrag } from "../unterlagen/kontrollmappe";
 import { istErledigt } from "../pflichten/check";
 import { useAuswertung } from "./Pflichten";
 import { useOeffnen, useStarten } from "./starten";
@@ -217,7 +217,7 @@ export function KontrollmappeSeite() {
         staette: staette ? [staetteVon(z.stand, staette).name, staetteVon(z.stand, staette).anschrift].filter(Boolean).join(", ") : undefined,
         personal,
         dienstplan: mitPersonal ? { namen: z.stand.mitarbeiter.filter((p) => dienst.includes(p.id)).map((p) => p.name.trim()), text: dienstText } : undefined,
-        hinweis: art === "zoll" ? TEXT.r12p_mappe_bereithalten : undefined,
+        hinweis: art === "zoll" ? TEXT.r12p_mappe_bereithalten : mitIfsgBescheinigungen(drin.map((e) => e.vorlage)) ? TEXT.lm_mappe_ifsg_bescheinigungen : undefined,
       };
       // Deckblatt zweimal, falls das Inhaltsverzeichnis über eine Seite hinausgeht – dann verschieben sich die Seiten
       let deckSeiten = 1;

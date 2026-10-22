@@ -671,6 +671,7 @@ export function standBauen(): Bau {
     { id: "hygieneplan", titel: v("hygieneplan").titel, grund: "Vorlage und Vorschläge für Beauty-Studios (Instrumente, Behandlung, IfSG); für die Herstellung von Kosmetik gilt die gute Herstellungspraxis (Art. 8 VO (EG) Nr. 1223/2009) – passt nicht (siehe Auffälligkeiten)." },
     { id: "ifsg_belehrung", titel: v("ifsg_belehrung").titel, grund: "Kein Lebensmittelbetrieb." },
     { id: "allergene", titel: v("allergene").titel, grund: "Kein Lebensmittelbetrieb." },
+    { id: "hygieneschulung", titel: v("hygieneschulung").titel, grund: "Kein Lebensmittelbetrieb." },
     { id: "haccp", titel: v("haccp").titel, grund: "Kein Lebensmittelbetrieb." },
   );
   // E-167 (Sifa-Durchsicht): neue Vorlagen Betriebsanweisung Maschinen und Biostoffe, Expositionsverzeichnis

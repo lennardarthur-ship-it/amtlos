@@ -122,18 +122,29 @@ function lebensmittelVoll(v) {
     };
   }
   if (v.id === "allergene") {
+    // Prüfbericht Lebensmittelhygiene (22.10.2026): Getreide- und Nussart als Auswahl, Zusatzstoffe als Ziffern
     const g = [
-      ["Butterbrezel", "Backwaren", ["gluten", "milch"], "Weizen"], ["Dinkel-Vollkornbrötchen", "Backwaren", ["gluten", "sesam"], "Dinkel"], ["Käsekuchen", "Kuchen und Torten", ["gluten", "eier", "milch"], "Weizen"],
-      ["Schwarzwälder Kirschtorte", "Kuchen und Torten", ["gluten", "eier", "milch"], "Weizen"], ["Nussecke", "Kuchen und Torten", ["gluten", "eier", "milch", "schalenfruechte", "soja"], "Weizen", "Haselnuss"],
-      ["Quiche Lorraine", "Mittagstisch", ["gluten", "eier", "milch", "sellerie"], "Weizen"], ["Linsensuppe", "Mittagstisch", ["sellerie", "senf"]], ["Obstsalat", "Frühstück", []],
-      ["Cappuccino", "Heißgetränke", ["milch"]], ["Hafer-Latte", "Heißgetränke", ["gluten"], "Hafer"], ["Espresso", "Heißgetränke", []], ["Apfelschorle", "Kaltgetränke", []],
+      ["Butterbrezel", "Backwaren", ["gluten", "milch"], ["weizen"]], ["Dinkel-Vollkornbrötchen", "Backwaren", ["gluten", "sesam"], ["dinkel"]], ["Käsekuchen", "Kuchen und Torten", ["gluten", "eier", "milch"], ["weizen"]],
+      ["Schwarzwälder Kirschtorte", "Kuchen und Torten", ["gluten", "eier", "milch"], ["weizen"], [], ["farbstoff"]], ["Nussecke", "Kuchen und Torten", ["gluten", "eier", "milch", "schalenfruechte", "soja"], ["weizen"], ["haselnuesse", "mandeln"]],
+      ["Quiche Lorraine", "Mittagstisch", ["gluten", "eier", "milch", "sellerie"], ["weizen"]], ["Linsensuppe", "Mittagstisch", ["sellerie", "senf"]], ["Obstsalat", "Frühstück", []],
+      ["Cappuccino", "Heißgetränke", ["milch"]], ["Hafer-Latte", "Heißgetränke", ["gluten"], ["hafer"]], ["Espresso", "Heißgetränke", []], ["Apfelschorle", "Kaltgetränke", []], ["Bitter Lemon", "Kaltgetränke", [], [], [], ["chinin", "suessungsmittel"]],
     ];
-    return { stand: "2026-10-01", legende: true, gerichte: g.map(([name, kategorie, allergene, getreide = "", nuesse = ""]) => ({ name, kategorie, allergene, getreide, nuesse, keine: allergene.length === 0 })) };
+    return { stand: "2026-10-01", legende: true, gerichte: g.map(([name, kategorie, allergene, getreidearten = [], nussarten = [], zusatzstoffe = []]) => ({ name, kategorie, allergene, getreidearten, nussarten, zusatzstoffe, keine: allergene.length === 0 })) };
   }
   if (v.id === "ifsg_belehrung") {
     return {
       datum: "2026-10-01", belehrt_von: "Mara Lindner",
-      teilnehmer: [["Tom Kessler", "2024-03-04", "2024-03-15", false], ["Aylin Demir", "2026-09-10", "2026-10-01", true], ["Jonas Weber", "2025-06-02", "2025-06-16", false], ["Lena Hofmann", "2023-11-20", "2023-12-01", false]].map(([name, erstbelehrung_am, erster_arbeitstag, erstmals]) => ({ name, erstbelehrung_am, erster_arbeitstag, erstmals })),
+      // Prüfbericht Lebensmittelhygiene (D): letzte Belehrung durch den Arbeitgeber je Person
+      teilnehmer: [["Tom Kessler", "2024-03-04", "2024-03-15", false, "2025-03-17"], ["Aylin Demir", "2026-09-10", "2026-10-01", true, ""], ["Jonas Weber", "2025-06-02", "2025-06-16", false, "2025-06-16"], ["Lena Hofmann", "2023-11-20", "2023-12-01", false, "2025-03-17"]].map(([name, erstbelehrung_am, erster_arbeitstag, erstmals, letzte_belehrung_am]) => ({ name, erstbelehrung_am, erster_arbeitstag, erstmals, letzte_belehrung_am })),
+    };
+  }
+  // Prüfbericht Lebensmittelhygiene (Frage 12): Schulungsnachweis nach § 4 LMHV
+  if (v.id === "hygieneschulung") {
+    return {
+      thema: "Jährliche Hygieneschulung", datum: "2026-10-01", dauer: "90 Minuten", geschult_von: "Mara Lindner",
+      themen: ["eigenschaften", "herstellung", "warenkontrolle", "eigenkontrollen", "behandlung", "kuehlung_lagerung", "reinigung", "personalhygiene", "schaedlinge", "allergene"],
+      inhalt: "Kerntemperatur der Quiche messen und eintragen\nAllergenliste nach Rezeptänderung aktualisieren",
+      teilnehmer: [["Tom Kessler", "Backstube"], ["Aylin Demir", "Service und Theke"], ["Jonas Weber", "Küche"], ["Lena Hofmann", "Verkauf"]].map(([name, taetigkeit]) => ({ name, taetigkeit })),
     };
   }
   return {};

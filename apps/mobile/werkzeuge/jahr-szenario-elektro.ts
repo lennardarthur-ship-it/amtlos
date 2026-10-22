@@ -717,6 +717,7 @@ export function standBauen(): Bau {
     { id: "datenpanne", titel: v("datenpanne").titel, grund: "Keine Datenpanne im Jahr 2026." },
     { id: "ifsg_belehrung", titel: v("ifsg_belehrung").titel, grund: "Kein Lebensmittelbetrieb." },
     { id: "allergene", titel: v("allergene").titel, grund: "Kein Lebensmittelbetrieb." },
+    { id: "hygieneschulung", titel: v("hygieneschulung").titel, grund: "Kein Lebensmittelbetrieb." },
     { id: "haccp", titel: v("haccp").titel, grund: "Kein Lebensmittelbetrieb." },
     { id: "hautschutzplan", titel: v("hautschutzplan").titel, grund: "Beauty-Vorlage; Hautschutz ist für das Elektrohandwerk in der Gefährdungsbeurteilung (Gießharz, PU-Schaum) behandelt." },
     { id: "hygieneplan", titel: v("hygieneplan").titel, grund: "Beauty-Vorlage." },

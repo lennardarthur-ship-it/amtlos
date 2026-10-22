@@ -55,6 +55,7 @@ export const KURZ: Record<string, string> = {
   haccp: "Kontrollen von Temperatur, Sauberkeit und Lieferungen.",
   hautschutzplan: "Wie dein Team die Haut bei der Arbeit schützt.",
   hygieneplan: "Was wann womit gereinigt und desinfiziert wird.",
+  hygieneschulung: "Nachweis, dass dein Team in Lebensmittelhygiene geschult ist.",
 };
 
 export interface Anlass {
@@ -78,7 +79,7 @@ export const ANLAESSE: Anlass[] = [
   { id: "website", titel: "Ich mache eine Website", text: "Impressum, Datenschutzerklärung, Verträge", vorlagen: ["impressum", "datenschutzerklaerung_website", "avv"] },
   { id: "datenschutz", titel: "Kundendaten und Datenschutz", text: "Verzeichnis, Info-Blatt, Verträge", vorlagen: ["datenschutz_dokumentation", "datenschutzinformation", "avv", "datenschutzerklaerung_website", "datenpanne", "schluesselquittung", "anamnese_einwilligung", "video_hinweisschild"] },
   { id: "sicherheit", titel: "Sicherheit am Arbeitsplatz", text: "Gefahren, Unterweisung, Gefahrstoffe, Geräte", vorlagen: ["gefaehrdungsbeurteilung", "unterweisung", "betriebsanweisung", "betriebsanweisung_maschine", "betriebsanweisung_biostoffe", "gefahrstoffverzeichnis", "expositionsverzeichnis", "pruefprotokoll_elektro"] },
-  { id: "gastro", titel: "Café, Restaurant, Lebensmittel", text: "Allergene, Eigenkontrollen, Hygiene", vorlagen: ["allergene", "haccp", "ifsg_belehrung"] },
+  { id: "gastro", titel: "Café, Restaurant, Lebensmittel", text: "Allergene, Eigenkontrollen, Hygiene", vorlagen: ["allergene", "haccp", "ifsg_belehrung", "hygieneschulung"] },
   { id: "beauty", titel: "Salon und Kosmetik", text: "Hautschutz, Hygiene, Gefahrstoffe", vorlagen: ["hautschutzplan", "hygieneplan", "anamnese_einwilligung", "gefaehrdungsbeurteilung", "gefahrstoffverzeichnis", "betriebsanweisung", "betriebsanweisung_biostoffe"] },
   { id: "panne", titel: "Daten verloren oder gestohlen", text: "Datenpanne festhalten und melden", vorlagen: ["datenpanne"] },
 ];

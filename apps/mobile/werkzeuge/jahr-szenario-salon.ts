@@ -623,6 +623,7 @@ export function standBauen(): Bau {
   uebersprungen.push(
     { id: "euer", titel: v("euer").titel, grund: "GmbH: Formkaufmann (§ 6 HGB, § 13 Abs. 3 GmbHG), buchführungspflichtig nach § 238 HGB / § 140 AO – Gewinnermittlung durch Bestandsvergleich (Bilanz und GuV), keine EÜR. Die App bietet die EÜR trotzdem an (siehe Auffälligkeiten)." },
     { id: "allergene", titel: v("allergene").titel, grund: "Kein Lebensmittelbetrieb (Kundenkaffee wird kostenlos gereicht)." },
+    { id: "hygieneschulung", titel: v("hygieneschulung").titel, grund: "Kein Umgang mit leicht verderblichen Lebensmitteln (§ 4 LMHV)." },
     { id: "haccp", titel: v("haccp").titel, grund: "Kein Lebensmittelbetrieb." },
     { id: "ifsg_belehrung", titel: v("ifsg_belehrung").titel, grund: "Keine Tätigkeit mit Lebensmitteln nach § 42 IfSG." },
     { id: "kassenbuch", titel: v("kassenbuch").titel, grund: "Elektronisches Kassensystem mit TSE; Kassenbericht kommt aus dem System (keine offene Ladenkasse)." },
