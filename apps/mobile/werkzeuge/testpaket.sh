@@ -104,7 +104,11 @@ Entscheidungen liegen im Git-Repository (GitHub: lennardarthur-ship-it/amtlos). 
    - „Mein Betrieb → Paket für die Steuerberatung“: ZIP mit DATEV-Buchungsstapel, Listen und Belegen.
    - „{{MARKE_PRO}}“ (oben unter „Mein Betrieb“): In dieser Testversion gibt es keinen Kauf – „Pro testweise einschalten“
      zeigt alle Funktionen (im späteren Store-Build gibt es diesen Knopf nicht). Ohne Pro: Rechnungen ohne Limit, 1 Vorlage im Monat als PDF, Pflichten im Überblick (Details, Erinnerungen und Kontrollmappe mit Pro), kein Logo/keine Hausfarbe, keine E-Rechnung.
-   - „Über {{MARKE}}“: Impressum und Datenschutz (Angaben folgen vor dem Start), „{{MARKE}} weiterempfehlen“.
+   - „Über {{MARKE}}“: Impressum (Anbieter, Anschrift, Vertretung, E-Mail; Handelsregister und USt-IdNr. folgen nach
+     der Eintragung der UG), Datenschutzerklärung und Nutzungsbedingungen (fertig, Freigabe durch den Anwalt nach der
+     Eintragung – bis dahin als Entwurf gekennzeichnet), „{{MARKE}} weiterempfehlen“.
+   - Pflichten und Vorlagen tragen den Hinweis „fachlich noch nicht geprüft“: Der Katalog (215 Einträge) ist noch
+     nicht Eintrag für Eintrag freigegeben, bei 116 Einträgen sind die Folgen (Bußgeld usw.) noch nicht erfasst.
    - Synchronisation zwischen Geräten (Konto, Ende-zu-Ende-verschlüsselt) ist eingebaut, in diesem Testpaket aber
      aus: Sie braucht einen laufenden {{MARKE}}-Server und einen Anmeldedienst. Ohne Server bleibt alles auf dem iPhone.
 
