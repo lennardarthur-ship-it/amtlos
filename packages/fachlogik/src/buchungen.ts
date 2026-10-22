@@ -26,8 +26,12 @@
  *   („Buchungs-GUID“). Feld 114 „Festschreibung“ = 0, solange der Stapel ungeprüft ist. Stornos mit Generalumkehr
  *   (Feld 118 = 1) auf der ursprünglichen Soll/Haben-Seite.
  * - A-2: Kleinunternehmer buchen Wareneingang auf das Konto ohne Vorsteuer (SKR03 3200, SKR04 5200) statt 3400 + BU 40.
- * - A-4/B-6: Bilanzierende Betriebe: Zahlungseingänge Bank an Forderungen; Kapitalgesellschaften buchen privat
- *   ausgelegte Belege auf das Verrechnungskonto Gesellschafter (SKR03 0755, SKR04 3560) statt Privateinlage/Geldtransit.
+ * - A-4/B-6: Bilanzierende Betriebe: Zahlungseingänge Bank an Forderungen (nur mit Kontenvorgabe, Standard aus – Nachtrag
+ *   22.10.2026); Kapitalgesellschaften buchen privat
+ *   ausgelegte Belege auf das Verrechnungskonto Gesellschafter (SKR03 0731, SKR04 3560 UNSICHER) statt Privateinlage/Geldtransit.
+ *   Korrektur der Kanzlei vom 22.10.2026: 0755 (im Bericht vom 21.10.) ist das Konto für offene Ausschüttungen; Standard
+ *   SKR03 0731 „Verbindlichkeiten gegenüber Gesellschaftern – Restlaufzeit bis 1 Jahr“. SKR04-Gegenstück zu 0731 laut
+ *   Kanzlei folgt (nach dem Testimport) – bis dahin bleibt 3560.
  * - B-2: Nullsteuersatz (§ 12 Abs. 3 UStG) auf ein eigenes Erlöskonto mit Kz-87-Automatik.
  * - B-4/B-9/B-10/B-11: einzelne Konten über die Kontenvorgaben der Kanzlei (kontenvorgaben.ts, `kontenFuer`).
  */
@@ -131,6 +135,16 @@ export interface AusgangsRechnungFuerBuchung {
   oss?: { land: string; satz: number } | null;
 }
 
+/**
+ * OSS, Feld 40 „EU-Land u. UStID (Bestimmung)“: bei Fernverkäufen und Leistungen an Privatpersonen nur das
+ * Länderkennzeichen des Bestimmungslands, keine USt-IdNr. (Nachtrag der Kanzlei Heckler und Busch vom 22.10.2026).
+ * Kennzeichen wie in der USt-IdNr. bzw. im OSS-Verfahren – Griechenland „EL“ statt ISO „GR“.
+ */
+export const ossLandKennzeichen = (land: string) => {
+  const l = land.trim().toUpperCase().slice(0, 2);
+  return l === "GR" ? "EL" : l;
+};
+
 /** Mitgliedstaaten der EU außer Deutschland (ISO 3166-1; Griechenland als GR) – für Erlöskonten und Hinweise. */
 export const EU_LAENDER = ["AT", "BE", "BG", "CY", "CZ", "DK", "EE", "ES", "FI", "FR", "GR", "HR", "HU", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PL", "PT", "RO", "SE", "SI", "SK"] as const;
 export const istEuAusland = (land: string | null | undefined) => !!land && (EU_LAENDER as readonly string[]).includes(land.toUpperCase());
@@ -176,8 +190,9 @@ export const BUCHUNGSKONTEN: Record<
     bank: string;
     /**
      * StB-Prüfung (B-6, Frage 7): Verrechnungskonto Gesellschafter einer Kapitalgesellschaft – „Verbindlichkeiten
-     * gegenüber Gesellschaftern, Restlaufzeit bis 1 Jahr“, Standard laut Bericht SKR03 0755 / SKR04 3560,
-     * kanzleiabhängig (Kontenvorgaben).
+     * gegenüber Gesellschaftern – Restlaufzeit bis 1 Jahr“, Standard SKR03 0731 (korrigierter Bericht vom 22.10.2026;
+     * 0755 ist das Konto für offene Ausschüttungen), kanzleiabhängig (Kontenvorgaben).
+     * UNSICHER (PRUEFLISTE): SKR04 3560 ist der bisherige Standard – SKR04-Gegenstück zu 0731 laut Kanzlei folgt.
      */
     verrechnungGesellschafter: string;
     /** StB-Prüfung (B-11): Homeoffice-Pauschale bzw. häusliches Arbeitszimmer – SKR03 4288 / SKR04 6348 („Nummer in Rewe prüfen“) */
@@ -214,9 +229,10 @@ export const BUCHUNGSKONTEN: Record<
     erloese: { 19: string; 7: string; 0: string; ku: string; igl: string; rc13b: string; eu: string; drittland: string; nullsatz: string; oss: string };
     /*
      * Koordination Rechnungen (OSS, § 18j UStG): `erloese.oss` – „Erlöse aus im anderen EU-Land steuerpflichtigen
-     * Lieferungen“ SKR03 8320 / SKR04 4320 (DATEV-Bereich 8320–8329 bzw. 4320–4329 laut Herstellerangabe Lexware), mit
-     * Land in Feld 40 und Steuersatz des Bestimmungslands in Feld 41. UNSICHER (PRUEFLISTE): Konto für sonstige Leistungen
-     * und Steuerschlüssel mit der Kanzlei klären – über die Kontenvorgaben änderbar.
+     * Lieferungen“ SKR03 8320 / SKR04 4320 (DATEV-Bereich 8320–8329 bzw. 4320–4329), Kontenbereich von der Kanzlei Heckler
+     * und Busch bestätigt (Nachtrag 22.10.2026). Land in Feld 40 (bei Privatpersonen nur das Länderkennzeichen, keine
+     * USt-IdNr.) und Steuersatz des Bestimmungslands in Feld 41. Offen (PRUEFLISTE T-128): Steuerschlüssel – über die
+     * Kontenvorgaben änderbar.
      */
     /** Aufwandskonto für Gutschriften (bezogene Leistungen) */
     gutschrift: string;
@@ -249,7 +265,8 @@ export const BUCHUNGSKONTEN: Record<
   }
 > = {
   // Forderungen/Verbindlichkeiten ohne Kontokorrent (1410/1610 bzw. 1210/3310), damit beim Bankabruf kein OPOS nötig ist
-  SKR03: { bank: "1200", verrechnungGesellschafter: "0755", homeoffice: "4288", anlagen: { maschinen: "0400", bga: "0420", kfz: "0320", software: "0027" }, forderungen: "1410", verbindlichkeiten: "1610", kasse: "1000", privateinlagen: "1890", privatentnahmen: "1800", geldtransit: "1360", skontiGewaehrt: { 19: "8736", 7: "8731", 0: "8730" }, skontiErhalten: { 19: "3736", 7: "3731", 0: "3730" }, erloese: { 19: "8400", 7: "8300", 0: "8100", ku: "8195", igl: "8125", rc13b: "8337", eu: "8336", drittland: "8338", nullsatz: "8290", oss: "8320" }, gutschrift: "3100", gutscheinVerbindlichkeit: "1700", kassendifferenzAufwand: "4900", kassendifferenzErtrag: "", sachentnahme: { 19: "8910", 7: "8915" }, skontiGewaehrtIgl: "8743", skontiGewaehrtRc: "8741" },
+  SKR03: { bank: "1200", verrechnungGesellschafter: "0731", homeoffice: "4288", anlagen: { maschinen: "0400", bga: "0420", kfz: "0320", software: "0027" }, forderungen: "1410", verbindlichkeiten: "1610", kasse: "1000", privateinlagen: "1890", privatentnahmen: "1800", geldtransit: "1360", skontiGewaehrt: { 19: "8736", 7: "8731", 0: "8730" }, skontiErhalten: { 19: "3736", 7: "3731", 0: "3730" }, erloese: { 19: "8400", 7: "8300", 0: "8100", ku: "8195", igl: "8125", rc13b: "8337", eu: "8336", drittland: "8338", nullsatz: "8290", oss: "8320" }, gutschrift: "3100", gutscheinVerbindlichkeit: "1700", kassendifferenzAufwand: "4900", kassendifferenzErtrag: "", sachentnahme: { 19: "8910", 7: "8915" }, skontiGewaehrtIgl: "8743", skontiGewaehrtRc: "8741" },
+  // UNSICHER: verrechnungGesellschafter 3560 – SKR04-Gegenstück zu 0731 laut Kanzlei folgt
   SKR04: { bank: "1800", verrechnungGesellschafter: "3560", homeoffice: "6348", anlagen: { maschinen: "0440", bga: "0650", kfz: "0520", software: "0135" }, forderungen: "1210", verbindlichkeiten: "3310", kasse: "1600", privateinlagen: "2180", privatentnahmen: "2100", geldtransit: "1460", skontiGewaehrt: { 19: "4736", 7: "4731", 0: "4730" }, skontiErhalten: { 19: "5736", 7: "5731", 0: "5730" }, erloese: { 19: "4400", 7: "4300", 0: "4100", ku: "4185", igl: "4125", rc13b: "4337", eu: "4336", drittland: "4338", nullsatz: "4290", oss: "4320" }, gutschrift: "5900", gutscheinVerbindlichkeit: "3500", kassendifferenzAufwand: "6300", kassendifferenzErtrag: "", sachentnahme: { 19: "4620", 7: "4610" }, skontiGewaehrtIgl: "4743", skontiGewaehrtRc: "4741" },
 };
 
@@ -344,7 +361,7 @@ export function buchungsGuid(quelle_id: string, satz: number | null): string {
 
 export function erloeskonto(k: Konten, satz: number | null, r?: Pick<AusgangsRechnungFuerBuchung, "steuerart" | "kunde_land"> & { oss?: AusgangsRechnungFuerBuchung["oss"] }): string {
   const land = (r?.kunde_land ?? "DE").toUpperCase();
-  // OSS: Steuer des Bestimmungslands – eigenes Erlöskonto, nicht die Inlandskonten 8400/8300 (UNSICHER, Kontenvorgaben)
+  // OSS: Steuer des Bestimmungslands – eigenes Erlöskonto (8320/4320, Kontenbereich von der Kanzlei bestätigt), nicht 8400/8300
   if (r?.oss && satz !== null && satz > 0) return k.erloese.oss;
   // Leistung an ein Unternehmen im übrigen Gemeinschaftsgebiet mit Steuerschuldnerschaft des Empfängers – auch bei
   // Kleinunternehmern (Ort der Leistung im Ausland, § 3a Abs. 2 UStG)
@@ -403,7 +420,8 @@ export function buchungenAusRechnungen(rechnungen: AusgangsRechnungFuerBuchung[]
         leistungsdatum: r.leistungsdatum ?? null,
         steuerperiode: r.steuerperiode ?? null,
         // USt-IdNr. des Abnehmers für Kz 41/21 und die Zusammenfassende Meldung
-        eu_ustid: (g.satz === 0 || g.satz === null) && (r.steuerart === "igl" || (r.steuerart === "reverse_charge" && istEuAusland(r.kunde_land))) && r.kunde_ust_idnr ? r.kunde_ust_idnr.replace(/\s/g, "").toUpperCase() : r.oss && g.satz ? r.oss.land.toUpperCase().slice(0, 2) : null,
+        // OSS (Nachtrag 22.10.2026): bei Fernverkäufen an Privatpersonen nur das Länderkennzeichen, nie eine USt-IdNr.
+        eu_ustid: r.oss && g.satz ? ossLandKennzeichen(r.oss.land) : (g.satz === 0 || g.satz === null) && (r.steuerart === "igl" || (r.steuerart === "reverse_charge" && istEuAusland(r.kunde_land))) && r.kunde_ust_idnr ? r.kunde_ust_idnr.replace(/\s/g, "").toUpperCase() : null,
         ...(r.oss && g.satz ? { eu_steuersatz: r.oss.satz } : {}),
         ...(storno ? { generalumkehr: true } : {}),
       });
@@ -468,7 +486,7 @@ export const zmBetroffen = (r: Pick<AusgangsRechnungFuerBuchung, "steuerart" | "
  * schuldet, auf eigene Konten (UNSICHER, PRUEFLISTE) und mit der USt-IdNr. des Empfängers – sonst mindert DATEV
  * Kz 41/60/21 und die Zusammenfassende Meldung nicht. StB-Prüfung (A-1): diese Reihenfolge ist richtig.
  */
-export function skontoBuchungenRechnung(r: Pick<AusgangsRechnungFuerBuchung, "id" | "nummer" | "kunde" | "kleinunternehmer" | "positionen"> & Partial<Pick<AusgangsRechnungFuerBuchung, "steuerart" | "kunde_land" | "kunde_ust_idnr" | "abschlaege">>, minderungen: { id: string; datum: string; brutto_cent: number }[], kontenrahmen: Kontenrahmen, o?: BuchungsOptionen): Buchung[] {
+export function skontoBuchungenRechnung(r: Pick<AusgangsRechnungFuerBuchung, "id" | "nummer" | "kunde" | "kleinunternehmer" | "positionen"> & Partial<Pick<AusgangsRechnungFuerBuchung, "steuerart" | "kunde_land" | "kunde_ust_idnr" | "abschlaege" | "oss">>, minderungen: { id: string; datum: string; brutto_cent: number }[], kontenrahmen: Kontenrahmen, o?: BuchungsOptionen): Buchung[] {
   const k = kontenFuer(kontenrahmen, o?.vorgaben);
   const gruppen = restGruppen(r);
   const sonder = skontoSonderfall(r);
@@ -479,11 +497,15 @@ export function skontoBuchungenRechnung(r: Pick<AusgangsRechnungFuerBuchung, "id
     for (const a of minderungNachSatz(m.brutto_cent, gruppen)) {
       if (!a.brutto_cent) continue;
       const nullSatz = a.satz === 0 || a.satz === null;
+      // OSS: Minderung der Erlöse des Bestimmungslands auf dem OSS-Erlöskonto mit Land (Feld 40) und Satz (Feld 41) –
+      // nicht auf „Gewährte Skonti 19 %“, sonst minderte DATEV die deutsche Umsatzsteuer
+      const oss = r.oss && !nullSatz ? r.oss : null;
       aus.push({
         datum: m.datum,
         betrag_cent: Math.abs(a.brutto_cent),
         soll_haben: a.brutto_cent < 0 ? "H" : "S",
-        konto: sonder && nullSatz ? (sonder === "igl" ? k.skontiGewaehrtIgl : k.skontiGewaehrtRc) : skontoKonto(k.skontiGewaehrt, r.kleinunternehmer ? null : a.satz),
+        konto: oss ? k.erloese.oss : sonder && nullSatz ? (sonder === "igl" ? k.skontiGewaehrtIgl : k.skontiGewaehrtRc) : skontoKonto(k.skontiGewaehrt, r.kleinunternehmer ? null : a.satz),
+        ...(oss ? { eu_ustid: ossLandKennzeichen(oss.land), eu_steuersatz: oss.satz } : {}),
         ...(sonder && nullSatz && ustid ? { eu_ustid: ustid } : {}),
         gegenkonto: k.forderungen,
         bu_schluessel: "",
@@ -916,12 +938,12 @@ export function pruefpunkteBuchungen(): string[] {
     "StB-Prüfung (A-1): Belegbuchungen (Eingangsbelege, Gutschriften, Kassenfehlbeträge) mit dem Zahlungskonto (Verbindlichkeiten, Kasse, Bank, Privat bzw. Verrechnungskonto) in Feld 7 „Konto“ im Haben und dem Sachkonto mit BU-Schlüssel in Feld 8 „Gegenkonto“ – im Testimport prüfen, ob Rewe den Schlüssel so annimmt.",
     "§ 13b-Eingangsleistungen (R11): mit Vorsteuerabzug SKR03 3120 (Bauleistung eines im Inland ansässigen Unternehmers) bzw. 3123 (sonstige Leistung eines im übrigen Gemeinschaftsgebiet ansässigen Unternehmers), SKR04 5920/5923; ohne Vorsteuerabzug (Kleinunternehmer, Belege mit „Vorsteuer abziehbar“ aus) SKR03 3140/3143, SKR04 5940/5943 – alle als Automatikkonten für die Umsatzsteuer (und ggf. Vorsteuer) 19 %. Kontonummern nach Angabe der simulierten Steuerberatung („nach meinem Stand“), gegen den aktuellen Kontenrahmen prüfen; 7-%-Fälle sind nicht abgebildet.",
     "Gutschriften (§ 14 Abs. 2 Satz 2 UStG) werden als Aufwand auf „bezogene Leistungen“ (SKR03 3100, SKR04 5900) an Verbindlichkeiten gebucht, mit BU 9/8 bei ausgewiesener Steuer – passendes Aufwandskonto je nach Leistung mit der Steuerberatung klären.",
-    "Personal-Belege stehen nur in der Belegliste, nicht im Stapel. StB-Prüfung (B-6): privat ausgelegte Belege und Barbelege vor dem ersten Kassenabschluss einer Kapitalgesellschaft auf das Verrechnungskonto Gesellschafter, Standard laut Bericht SKR03 0755 / SKR04 3560 („Verbindlichkeiten gegenüber Gesellschaftern, Restlaufzeit bis 1 Jahr“) – im DATEV-SKR03 heißt 0755 nach unserem Stand „… für offene Ausschüttungen“, 0731 „Restlaufzeit bis 1 Jahr“: bitte bestätigen; kanzleiabhängig über die Kontenvorgaben.",
+    "Personal-Belege stehen nur in der Belegliste, nicht im Stapel. StB-Prüfung (B-6): privat ausgelegte Belege und Barbelege vor dem ersten Kassenabschluss einer Kapitalgesellschaft auf das Verrechnungskonto Gesellschafter, Standard SKR03 0731 „Verbindlichkeiten gegenüber Gesellschaftern – Restlaufzeit bis 1 Jahr“ (korrigierter Bericht vom 22.10.2026; 0755 ist das Konto für offene Ausschüttungen); SKR04 vorläufig 3560 – UNSICHER, das SKR04-Gegenstück zu 0731 nennt die Kanzlei nach dem Testimport; kanzleiabhängig über die Kontenvorgaben.",
     "Felder 115 „Leistungsdatum“ und 116 „Datum Zuord. Steuerperiode“ (TTMMJJJJ) sind bei Ausgangsrechnungen gefüllt; Feld 40 „EU-Land u. UStID (Bestimmung)“ bei igL und EU-Leistungen – Format und Feldnummern prüfen.",
     "StB-Prüfung (3.1): Stornos als Generalumkehr (Feld 118 = 1) auf der ursprünglichen Soll/Haben-Seite; Feld 114 „Festschreibung“ = 0 in jeder Zeile (Kopf Feld 21 ebenfalls 0).",
     "Spaltenliste der Buchungszeile (125 Felder, Version 700, Formatversion 13): laut StB-Prüfung (3.1) formal konform. Feld 103 „Buchungs GUID“ bleibt leer (wird von DATEV verwendet); die stabile Kennung aus Quelle und Steuersatz steht in Beleginfo 1 (Art „Buchungs-GUID“, Inhalt die GUID).",
     "Dateikopf: „Datum vom“ und „Datum bis“ stehen als JJJJMMTT (nicht TTMMJJJJ), Feld 27 trägt den Kontenrahmen („03“/„04“), Festschreibung 0, Rechnungslegungszweck 0, Herkunft „RE“ – gegen die Formatbeschreibung prüfen. Berater- und Mandantennummer sind beim Import Pflicht.",
-    "StB-Prüfung (A-4): Bilanzierende Betriebe (GmbH, UG, AG, GmbH & Co. KG, e. K., Buchführungspflicht nach § 141 AO – Kontenvorgabe geht vor) bekommen einen Soll-Stapel: Forderungen an Erlöse zum Rechnungsdatum (Feld 115 Leistungsdatum), Zahlungseingänge Bank (SKR03 1200, SKR04 1800) an Forderungen zum Zahltag – zum Stichtag steht der offene Betrag auf dem Forderungskonto. Die Kanzlei darf die Zahlungen aus dem Kontoauszug dann nicht noch einmal buchen (Kontenvorgabe „Zahlungseingänge buchen“ aus). EÜR-Übernahme für bilanzierende Betriebe gesperrt (E-4).",
+    "StB-Prüfung (A-4): Bilanzierende Betriebe (GmbH, UG, AG, GmbH & Co. KG, e. K., Buchführungspflicht nach § 141 AO – Kontenvorgabe geht vor) bekommen einen Soll-Stapel: Forderungen an Erlöse zum Rechnungsdatum (Feld 115 Leistungsdatum). Zahlungseingänge Bank (SKR03 1200, SKR04 1800) an Forderungen zum Zahltag nur mit der Kontenvorgabe „Zahlungseingänge buchen“ – Standard aus (Nachtrag der Kanzlei vom 22.10.2026: die Kanzlei bucht die Bank aus dem Kontoauszug; bis dahin stehen alle Rechnungen als Forderung, LIESMICH nennt Saldo und offene Forderungen laut Rechnungsliste). EÜR-Übernahme für bilanzierende Betriebe gesperrt (E-4).",
     "Ist-Versteuerung (§ 20 UStG) ohne Bilanz (R11): Rechnungen stehen erst mit dem Zahlungseingang im Stapel – Forderungen (1410/1210) an Erlös mit dem Zahltag als Belegdatum und in Feld 116; unbezahlte Rechnungen stehen nur in der Rechnungsliste. Abschlagsrechnungen ebenso (auch bei Soll), weil die Steuer erst mit der Zahlung entsteht. Ob DATEV die Ist-Versteuerung so ohne OPOS richtig auflöst, ist offen – Testimport.",
     "Belegdatum im Format TTMM: das Jahr ergibt sich aus dem Stapelzeitraum. Alle Buchungen eines Stapels müssen in „Datum vom/bis“ und im Wirtschaftsjahr liegen – der Aufrufer muss je Zeitraum (Monat oder Jahr) einen eigenen Stapel erzeugen.",
     "Belege mit Zahlungsweg Bank werden gegen Verbindlichkeiten aus L+L ohne Kontokorrent gebucht, die Zahlung selbst nicht (sie kommt aus dem Kontoauszug der Steuerberatung). StB-Prüfung (B-6): Kontenvorgabe „Belege gegen Bank“ bucht sie direkt gegen Bank (SKR03 1200, SKR04 1800) – Hausregel der Kanzlei.",

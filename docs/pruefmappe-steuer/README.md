@@ -105,7 +105,7 @@ Verdichtet aus `PRUEFLISTE-steuer.md` (Nummern in Klammern).
 4. § 13b-Eingangsleistungen auf 3120/3123 bzw. ohne Vorsteuerabzug 3140/3143 (SKR04 5920/5923/5940/5943) – richtig, auch für Kleinunternehmer? (T-115, T-117)
 5. Die als UNSICHER markierten Konten (Mehrzweck-Gutscheine, Sachentnahmen, Skonto auf igL/§ 13b) und die Kassendifferenzen (Fehlbetrag 4900/6300, Überschuss als Erlös 19 %) – „mit der Kanzlei abstimmen“ laut Code. (T-118)
 6. Ist-Versteuerung: Rechnungen erst mit dem Zahlungseingang im Stapel (Forderungen an Erlöse zum Zahltag), ohne OPOS – löst DATEV das richtig auf? Stornos als einfache Umkehrbuchung statt Generalumkehr – Folgen? (T-117)
-7. GmbH: privat ausgelegte Belege eines Gesellschafters stehen nur in der Belegliste, nicht im Stapel (früher Privateinlagen 1890, T-100) – welches Verrechnungskonto soll die App buchen (z. B. SKR03 0755)? Barbelege einer GmbH vor dem ersten Kassenabschluss gehen an Geldtransit – richtig?
+7. GmbH: privat ausgelegte Belege eines Gesellschafters stehen nur in der Belegliste, nicht im Stapel (früher Privateinlagen 1890, T-100) – welches Verrechnungskonto soll die App buchen (z. B. SKR03 0755)? Barbelege einer GmbH vor dem ersten Kassenabschluss gehen an Geldtransit – richtig? *(Beantwortet im korrigierten Bericht vom 22.10.2026: SKR03 0731, auch für Barbelege; SKR04-Unterkonto folgt – siehe UMSETZUNG.md.)*
 
 ### Umsatzsteuer
 

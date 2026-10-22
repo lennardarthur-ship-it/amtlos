@@ -199,7 +199,7 @@ describe("Buchungen und DATEV-Export (E-132)", () => {
   it("Prüfpunkte sind nicht leer und nennen BU 40, Generalumkehr, Feldliste und Ist-Versteuerung", () => {
     const p = pruefpunkteBuchungen();
     expect(p.length).toBeGreaterThanOrEqual(6);
-    for (const w of ["BU-Schlüssel 40", "Generalumkehr", "125 Felder", "Ist-Versteuerung", "TTMM", "8290", "0755", "Feld 7"]) expect(p.some((s) => s.includes(w)), w).toBe(true);
+    for (const w of ["BU-Schlüssel 40", "Generalumkehr", "125 Felder", "Ist-Versteuerung", "TTMM", "8290", "0731", "Feld 7"]) expect(p.some((s) => s.includes(w)), w).toBe(true);
   });
 });
 
@@ -216,7 +216,7 @@ describe("R10 Steuerberatung: BU-Schlüssel, Erlöskonten, § 13b, Felder 115/11
   });
   it("Personal-Belege bleiben aus dem Stapel; privat ausgelegte Belege einer Kapitalgesellschaft auf das Verrechnungskonto (B-6)", () => {
     expect(buchungenAusBelegen([{ ...BELEG, kategorie: "personal" }], "SKR03")).toEqual([]);
-    expect(buchungenAusBelegen([{ ...BELEG, zahlung: "privat" }], "SKR03", { kapitalgesellschaft: true })[0]).toMatchObject({ konto: "0755", gegenkonto: "4650", soll_haben: "H" });
+    expect(buchungenAusBelegen([{ ...BELEG, zahlung: "privat" }], "SKR03", { kapitalgesellschaft: true })[0]).toMatchObject({ konto: "0731", gegenkonto: "4650", soll_haben: "H" });
     expect(buchungenAusBelegen([{ ...BELEG, zahlung: "privat" }], "SKR04", { kapitalgesellschaft: true })[0]?.konto).toBe("3560");
     expect(buchungenAusBelegen([{ ...BELEG, zahlung: "privat" }], "SKR03")).toHaveLength(1);
   });

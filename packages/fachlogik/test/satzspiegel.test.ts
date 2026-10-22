@@ -118,7 +118,15 @@ describe("Brief nach DIN 5008", () => {
     expect(h).toContain("IBAN DE89 3704 0044 0532 0130 00");
     expect(h.match(/06\.10\.2026 – 09\.10\.2026/g)).toHaveLength(1);
     const rc = html("rechnung", { ...RECHNUNG, hinweise: ["reverse_charge"], positionen: [{ bezeichnung: "Schulung", menge: "1", einheit: "", preis: "100,00", satz: "0" }] }, { ...B, ust_idnr: "DE123456789" });
-    expect(rc).toContain("Umsatzsteuer 0&nbsp;% (Steuerschuldnerschaft des Leistungsempfängers) auf 100,00");
+    // StB-Prüfung C-2 (Nachtrag 22.10.2026): keine Zeile „Umsatzsteuer 0 % … 0,00 €“, sondern „entfällt“ ohne Betrag
+    const flach = (x: string) => x.replace(/&nbsp;/g, " ");
+    expect(flach(rc)).toContain("<tr><td>Umsatzsteuer: entfällt (§ 13b UStG)</td><td></td></tr>");
+    expect(flach(rc)).not.toMatch(/Umsatzsteuer 0 %/);
+    const igl = html("rechnung", { ...RECHNUNG, hinweise: ["igl"], kunde_ust_idnr: "ATU12345678", positionen: [{ bezeichnung: "Kerzen", menge: "10", einheit: "", preis: "10,00", satz: "0" }] }, { ...B, ust_idnr: "DE123456789" });
+    expect(flach(igl)).toContain("<tr><td>Umsatzsteuer: entfällt (steuerfreie innergemeinschaftliche Lieferung, § 4 Nr. 1b UStG)</td><td></td></tr>");
+    expect(flach(igl)).not.toMatch(/Umsatzsteuer 0 %/);
+    // andere 0-%-Gründe (Befreiung, Nullsteuersatz) behalten Satz und Bemessungsgrundlage
+    expect(flach(html("rechnung", { ...RECHNUNG, befreiung: "Steuerfrei nach § 4 Nr. 14 UStG", positionen: [{ bezeichnung: "Behandlung", menge: "1", einheit: "", preis: "50,00", satz: "0" }] }))).toContain("Umsatzsteuer 0 % (Steuerfrei nach § 4 Nr. 14 UStG) auf 50,00");
     const storno = html("rechnung", { ...RECHNUNG, storno_zu: "2026-046", hinweis: "Vielen Dank für Ihren Auftrag.\nBitte geben Sie bei der Zahlung die Rechnungsnummer an." });
     expect(storno).toContain("Vielen Dank für Ihren Auftrag.");
     expect(storno).not.toContain("Bitte geben Sie bei der Zahlung");

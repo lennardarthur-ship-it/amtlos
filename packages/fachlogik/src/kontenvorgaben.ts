@@ -35,7 +35,10 @@ export interface Kontenvorgaben {
   konten?: Partial<Record<KontenvorgabeKonto, string>>;
   /** Belege mit Zahlungsweg „Überweisung oder Karte“ direkt gegen Bank statt gegen Verbindlichkeiten (B-6 „Bank statt 1610“) */
   belegeGegenBank?: boolean;
-  /** bilanzierende Betriebe: Zahlungseingänge auf Rechnungen buchen (Bank an Forderungen) – Standard ja (A-4) */
+  /**
+   * bilanzierende Betriebe: Zahlungseingänge auf Rechnungen buchen (Bank an Forderungen, A-4) – Standard NEIN (Nachtrag der
+   * Kanzlei vom 22.10.2026: Kanzleien buchen die Bank aus dem Kontoauszug)
+   */
   zahlungenBuchen?: boolean;
   /** Gewinnermittlung festlegen; ohne Angabe nach Rechtsform bzw. Mitteilung des Finanzamts (A-4/E-4) */
   gewinnermittlung?: "bilanz" | "euer";
@@ -46,7 +49,7 @@ export interface Kontenvorgaben {
 
 /** Felder der Kontenvorgaben in der Reihenfolge der Anzeige – mit Bezeichnung und Herkunft des Standards. */
 export const KONTENVORGABE_FELDER: readonly { id: KontenvorgabeKonto; titel: string; hilfe?: string }[] = [
-  { id: "verrechnungGesellschafter", titel: "Verrechnungskonto Gesellschafter", hilfe: "Kapitalgesellschaft: privat ausgelegte Belege und Barbelege vor dem ersten Kassenabschluss (statt Privateinlage/Geldtransit), Einlagen und Entnahmen der Kasse." },
+  { id: "verrechnungGesellschafter", titel: "Verrechnungskonto Gesellschafter", hilfe: "Kapitalgesellschaft: privat ausgelegte Belege und Barbelege vor dem ersten Kassenabschluss (statt Privateinlage/Geldtransit), Einlagen und Entnahmen der Kasse. Standard SKR03 0731 „Verbindlichkeiten gegenüber Gesellschaftern – Restlaufzeit bis 1 Jahr“; SKR04 vorläufig 3560 (Gegenstück zu 0731 bitte von der Kanzlei)." },
   { id: "bank", titel: "Bank", hilfe: "Zahlungseingänge bilanzierender Betriebe; mit „Belege gegen Bank“ auch Belege per Überweisung oder Karte." },
   { id: "forderungen", titel: "Forderungen aus Lieferungen und Leistungen" },
   { id: "verbindlichkeiten", titel: "Verbindlichkeiten aus Lieferungen und Leistungen" },
@@ -106,7 +109,7 @@ export interface KontenvorgabenImport {
 /**
  * Kontenvorgaben aus der JSON-Datei der Kanzlei lesen. Format (Version 1):
  * `{ "format": "kontenvorgaben", "version": 1, "kanzlei": "…", "stand": "JJJJ-MM-TT", "kontenrahmen": "SKR03",
- *    "konten": { "verrechnungGesellschafter": "0755", … }, "optionen": { "belegeGegenBank": false, "zahlungenBuchen": true,
+ *    "konten": { "verrechnungGesellschafter": "0731", … }, "optionen": { "belegeGegenBank": false, "zahlungenBuchen": false,
  *    "gewinnermittlung": "bilanz" } }` – alle Angaben außer `konten` bzw. `optionen` freiwillig.
  * Wirft einen Fehler mit lesbarer Meldung, wenn die Datei kein solches Objekt ist.
  */

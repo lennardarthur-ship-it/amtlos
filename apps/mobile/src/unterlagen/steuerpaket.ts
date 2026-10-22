@@ -230,7 +230,9 @@ export function einnahmenAusRechnungen(s: Stand): Einnahme[] {
       // Schlussrechnung: nur der Rest nach Abzug der Abschläge fließt zu (restGruppen, C-4)
       return zahlungsAnteile(restGruppen(daten), u.zahlungen!).map((a) => {
         const netto = a.erhalten.reduce((x, g) => x + g.netto_cent, 0);
-        return { tag: a.zahlung.datum, netto_cent: netto, ust_cent: a.erhalten.reduce((x, g) => x + g.ust_cent, 0), steuerfrei_cent: frei ? a.erhalten.filter((g) => g.satz === 0).reduce((x, g) => x + g.netto_cent, 0) : 0, nicht_steuerbar_cent: nichtSteuerbar ? netto : 0, kleinunternehmer: daten.kleinunternehmer };
+        // OSS: im Inland nicht steuerbar – Zeile „… nicht umsatzsteuerbare Betriebseinnahmen“ (Nachtrag 22.10.2026)
+        const oss = daten.oss ? a.erhalten.filter((g) => g.satz).reduce((x, g) => x + g.netto_cent, 0) : 0;
+        return { tag: a.zahlung.datum, netto_cent: netto, ust_cent: a.erhalten.reduce((x, g) => x + g.ust_cent, 0), steuerfrei_cent: (frei ? a.erhalten.filter((g) => g.satz === 0).reduce((x, g) => x + g.netto_cent, 0) : 0) + oss, nicht_steuerbar_cent: nichtSteuerbar ? netto : 0, kleinunternehmer: daten.kleinunternehmer };
       });
     });
   return [...mitZahlungen, ...umsatzRechnungen(s)
@@ -242,7 +244,8 @@ export function einnahmenAusRechnungen(s: Stand): Einnahme[] {
       const sm = { gruppen: rest, netto_cent: rest.reduce((a, g) => a + g.netto_cent, 0), ust_cent: rest.reduce((a, g) => a + g.ust_cent, 0) };
       const vz = istStorno(u) ? -1 : 1;
       // Nullsteuersatz (§ 12 Abs. 3 UStG) ist steuerpflichtig zu 0 % – Zeile „umsatzsteuerpflichtig“, nicht „steuerfrei“ (R10)
-      const frei = daten.steuerart && daten.steuerart !== "standard" && daten.steuerart !== "nullsatz" ? sm.gruppen.filter((g) => g.satz === 0).reduce((a, g) => a + g.netto_cent, 0) : 0;
+      // OSS-Rechnungen (Steuer des Bestimmungslands): im Inland nicht steuerbar – ebenfalls diese Zeile (Nachtrag 22.10.2026)
+      const frei = (daten.steuerart && daten.steuerart !== "standard" && daten.steuerart !== "nullsatz" ? sm.gruppen.filter((g) => g.satz === 0).reduce((a, g) => a + g.netto_cent, 0) : 0) + (daten.oss ? sm.gruppen.filter((g) => g.satz).reduce((a, g) => a + g.netto_cent, 0) : 0);
       // Kleinunternehmer: Leistungen an Unternehmen im Ausland sind nicht steuerbar – eigene „davon“-Zeile der Anlage EÜR
       const nichtSteuerbar = daten.kleinunternehmer && (daten.steuerart === "reverse_charge" || euUnternehmenLand(u.daten) || drittlandLand(u.daten)) ? sm.netto_cent : 0;
       return { tag: u.bezahlt!, netto_cent: vz * sm.netto_cent, ust_cent: vz * sm.ust_cent, steuerfrei_cent: vz * frei, nicht_steuerbar_cent: vz * nichtSteuerbar, kleinunternehmer: daten.kleinunternehmer };
@@ -361,7 +364,7 @@ export function euerUebernahme(s: Stand, jahr: string): EuerUebernahme {
     if (e.einnahmen_netto_cent) ein.push({ datum: "", text: ns ? `Umsätze aus Rechnungen – davon nicht steuerbar (Leistungen an Unternehmen im Ausland): ${betrag(ns)} €, in der Anlage EÜR in die „davon“-Zeile „${EUER_KU_DAVON}“` : "Umsätze aus Rechnungen", kategorie: "Umsatzsteuerlicher Kleinunternehmer", betrag: betrag(e.einnahmen_netto_cent) });
   } else {
     if (pflichtig) ein.push({ datum: "", text: "Umsätze aus Rechnungen (netto)", kategorie: EUER_ZEILE_STEUERPFLICHTIG, betrag: betrag(pflichtig) });
-    // ohne Beispiel: die Zeile sammelt igL, § 13b-Umsätze und Steuerbefreiungen (z. B. Heilbehandlungen)
+    // ohne Beispiel: die Zeile sammelt igL, § 13b-Umsätze, Steuerbefreiungen (z. B. Heilbehandlungen) und OSS-Fernverkäufe
     if (e.einnahmen_steuerfrei_cent) ein.push({ datum: "", text: "Steuerfreie und nicht steuerbare Umsätze aus Rechnungen", kategorie: EUER_ZEILE_STEUERFREI, betrag: betrag(e.einnahmen_steuerfrei_cent) });
   }
   if (e.ust_vereinnahmt_cent) ein.push({ datum: "", text: "Vereinnahmte Umsatzsteuer", kategorie: "Vereinnahmte Umsatzsteuer sowie Umsatzsteuer auf unentgeltliche Wertabgaben", betrag: betrag(e.ust_vereinnahmt_cent) });
@@ -998,10 +1001,11 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
       const erloese = jeZahlung(u) ? buchungenAusRechnungen(anteile.map((a) => ({ ...r, datum: a.zahlung.datum, steuerperiode: a.zahlung.datum, guid_zusatz: a.zahlung.id, anteil: a.erhalten.map((e, i) => ({ satz: e.satz, brutto_cent: e.brutto_cent + a.minderung[i]!.brutto_cent, netto_cent: e.netto_cent + a.minderung[i]!.netto_cent, ust_cent: e.ust_cent + a.minderung[i]!.ust_cent })) })), sb.kontenrahmen, bo) : [];
       return [...erloese, ...skontoBuchungenRechnung(r, minderungen, sb.kontenrahmen, bo)];
     });
-  // StB-Prüfung (A-4): bilanzierende Betriebe – Zahlungseingänge Bank an Forderungen (Kontenvorgabe „Zahlungseingänge
-  // buchen“, Standard ja), damit zum Stichtag die offenen Forderungen auf dem Forderungskonto stehen. Bar an der Kasse
-  // kassierte Rechnungen bucht schon die Kasse (Kasse an Forderungen); Gutschriften und Gutscheine zu 0 % nicht.
-  const zahlungenBuchen = bilanz && vorgaben?.zahlungenBuchen !== false;
+  // StB-Prüfung (A-4): bilanzierende Betriebe – Zahlungseingänge Bank an Forderungen nur mit der Kontenvorgabe
+  // „Zahlungseingänge buchen“. Nachtrag 22.10.2026 (Kanzlei Heckler und Busch): Standard AUS – Kanzleien buchen die Bank
+  // aus dem Kontoauszug; sonst stünden die Zahlungen doppelt im Mandanten. Bar an der Kasse kassierte Rechnungen bucht
+  // schon die Kasse (Kasse an Forderungen); Gutschriften und Gutscheine zu 0 % nicht.
+  const zahlungenBuchen = bilanz && vorgaben?.zahlungenBuchen === true;
   const barKassiert = new Set(s.kasse.flatMap((x) => (x.rechnungen_bar ?? []).map((r) => r.id)).filter(Boolean));
   const zahlungsEingaenge = zahlungenBuchen
     ? gestellteRechnungen(s)
@@ -1031,6 +1035,11 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
   // StB-Prüfung (A-4): Saldo des Forderungskontos im Stapel (Generalumkehr mit umgekehrtem Vorzeichen) – bei
   // bilanzierenden Betrieben mit Zahlungseingängen die offenen Forderungen aus Rechnungen des Zeitraums zum Stichtag
   const saldo = (konto: string) => buchungen.reduce((a, b) => a + (b.konto === konto ? buchungsVorzeichen(b) * b.betrag_cent : 0) - (b.gegenkonto === konto ? buchungsVorzeichen(b) * b.betrag_cent : 0), 0);
+  // A-4 (Nachtrag 22.10.2026): offene Forderungen zum Stichtag aus den Rechnungen des Zeitraums – wie die Rechnungsliste
+  const offenZumEnde = rechnungen.reduce((a, u) => {
+    const r = rechnungFuerBuchung(u, s.betrieb);
+    return a + offenAm(s, u, z.bis, istStorno(u) ? summen(r.positionen, r.kleinunternehmer).brutto_cent : zahlbetrag(r));
+  }, 0);
   const nichtImStapel = belege.filter((b) => !belegImStapel(b, { kapitalgesellschaft: kapital }));
   const kuBis = /^\d{4}-\d{2}-\d{2}$/.test((s.betrieb.ku_bis ?? "").trim()) ? s.betrieb.ku_bis!.trim() : "";
   // R11 (Kosmetik #10): Buchungen, deren Steuerperiode (Feld 116) außerhalb des Stapelzeitraums liegt – zur Kontrolle nennen
@@ -1148,12 +1157,16 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
     // OSS (§ 18j UStG): Erlöse mit der Steuer des Bestimmungslands auf eigenem Konto, Land und Satz in Feld 40/41
     ...((() => {
       const oss = alle.filter((u) => !istGutschrift(u) && eRechnungAus(u.daten, absenderFuer(s, u)).daten.oss);
-      return oss.length ? [`${oss.length} OSS-${oss.length === 1 ? "Rechnung" : "Rechnungen"} (${oss.map((u) => String(u.daten.nummer ?? "")).slice(0, 10).join(", ")}) mit der Umsatzsteuer des Bestimmungslands: im Stapel auf ${k.erloese.oss} mit Land in Feld 40 und Steuersatz in Feld 41 – sie gehören in die OSS-Erklärung beim BZSt, nicht in die deutsche Voranmeldung. Konto und Steuerschlüssel bitte prüfen (Kontenvorgaben).`] : [];
+      return oss.length ? [`${oss.length} OSS-${oss.length === 1 ? "Rechnung" : "Rechnungen"} (${oss.map((u) => String(u.daten.nummer ?? "")).slice(0, 10).join(", ")}) mit der Umsatzsteuer des Bestimmungslands: im Stapel auf ${k.erloese.oss} mit Land in Feld 40 und Steuersatz in Feld 41 – sie gehören in die OSS-Erklärung beim BZSt, nicht in die deutsche Voranmeldung. Feld 40 trägt nur das Länderkennzeichen (Privatpersonen, keine USt-IdNr.). Steuerschlüssel bitte prüfen (Konto über die Kontenvorgaben).`] : [];
     })()),
     // StB-Prüfung (A-4): Soll-Stapel bilanzierender Betriebe mit Zahlungseingängen und offenen Forderungen zum Stichtag
     ...(bilanz
       ? [
-          `Bilanzierender Betrieb${rechtsform ? ` (${rechtsform.text})` : ""}: Soll-Stapel – Rechnungen stehen mit dem Rechnungsdatum als Forderungen an Erlöse im Stapel (Leistungsdatum in Feld 115)${zahlungenBuchen ? `, Zahlungseingänge als Bank (${k.bank}) an Forderungen (${k.forderungen}) zum Zahltag. Saldo ${k.forderungen} aus diesem Stapel zum ${datumDe(z.bis)}: ${betrag(saldo(k.forderungen))} € (offene Forderungen, siehe Rechnungsliste). Beim Buchen der Kontoauszüge diese Zahlungseingänge nicht noch einmal buchen – oder in den Kontenvorgaben „Zahlungseingänge buchen“ ausschalten` : " – Zahlungseingänge kommen aus dem Kontoauszug (Kontenvorgabe)"}.${ist ? " Ist-Versteuerung: Feld „Datum Zuord. Steuerperiode“ trägt den Zahltag; alternativ im Mandantenstamm „Ist“ mit OPOS – bitte beim Testimport prüfen." : ""}`,
+          `Bilanzierender Betrieb${rechtsform ? ` (${rechtsform.text})` : ""}: Soll-Stapel – Rechnungen stehen mit dem Rechnungsdatum als Forderungen an Erlöse im Stapel (Leistungsdatum in Feld 115)${
+            zahlungenBuchen
+              ? `, Zahlungseingänge als Bank (${k.bank}) an Forderungen (${k.forderungen}) zum Zahltag (Kontenvorgabe „Zahlungseingänge buchen“). Saldo ${k.forderungen} aus diesem Stapel zum ${datumDe(z.bis)}: ${betrag(saldo(k.forderungen))} € (offene Forderungen, siehe Rechnungsliste). Beim Buchen der Kontoauszüge diese Zahlungseingänge nicht noch einmal buchen – oder in den Kontenvorgaben „Zahlungseingänge buchen“ ausschalten.`
+              : `. Zahlungseingänge sind nicht gebucht – die Kanzlei bucht die Bank aus dem Kontoauszug (Bank an Forderungen ${k.forderungen}). Deshalb stehen im Stapel alle Rechnungen des Zeitraums als Forderung: Saldo ${k.forderungen} aus diesem Stapel zum ${datumDe(z.bis)}: ${betrag(saldo(k.forderungen))} €. Erst nach dem Buchen der Kontoauszüge bleiben die offenen Forderungen stehen – laut Rechnungsliste zum ${datumDe(z.bis)}: ${betrag(offenZumEnde)} €. Wer die Zahlungseingänge aus ${MARKE.name} übernehmen will: in den Kontenvorgaben „Zahlungseingänge buchen“ einschalten – dann die Zahlungen aus dem Kontoauszug nicht noch einmal buchen.`
+          }${ist ? " Ist-Versteuerung: Feld „Datum Zuord. Steuerperiode“ trägt den Zahltag; alternativ im Mandantenstamm „Ist“ mit OPOS – bitte beim Testimport prüfen." : ""}`,
         ]
       : []),
   ];

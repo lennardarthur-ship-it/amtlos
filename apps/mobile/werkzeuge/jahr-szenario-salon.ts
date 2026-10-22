@@ -699,6 +699,12 @@ export function pakete(s: Stand, dateien: Record<string, Uint8Array>): { monat: 
   };
 }
 
+/** Nachtrag StB 22.10.2026: Jahrespaket mit der Kontenvorgabe „Zahlungseingänge buchen“ (Standard aus) – Gegenprobe A-4 */
+export function jahrMitZahlungen(s: Stand, dateien: Record<string, Uint8Array>): PaketErgebnis {
+  const sb = { ...s.steuerberatung, kontenvorgaben: { ...s.steuerberatung.kontenvorgaben, zahlungenBuchen: true } };
+  return steuerpaket(s, { von: "2026-01-01", bis: "2026-12-31", name: "2026" }, sb, dateien, "2027-02-15T10:00:00");
+}
+
 // ---------------------------------------------------------------- Belegdateien (so, wie die Lieferanten sie ausstellen würden)
 
 const esc = (x: string) => x.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");

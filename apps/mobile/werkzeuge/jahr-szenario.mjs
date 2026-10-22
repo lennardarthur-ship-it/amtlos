@@ -320,6 +320,11 @@ for (const x of D.vorgaenge()) {
   const txt = pdftext(path.join(OUT, "rechnungen", d.datei));
   const soll = `${x.vz < 0 ? "-" : ""}${D.eur(x.s.brutto)}`;
   if (!txt.replace(/\s+/g, " ").includes(soll)) auffaellig.push(`PDF ${d.datei}: Rechnungsbetrag ${soll} € nicht im Text gefunden.`);
+  // StB-Prüfung C-2 (Nachtrag 22.10.2026): igL ohne Zeile „Umsatzsteuer 0 % … 0,00 €“, stattdessen „entfällt“ ohne Betrag
+  if (x.art === "rechnung" && x.r.hinweise?.includes("igl")) {
+    const flach = txt.replace(/\s+/g, " ");
+    vergleich(`PDF ${x.nummer} (igL, C-2)`, "Summenzeile „Umsatzsteuer: entfällt (steuerfreie innergemeinschaftliche Lieferung, § 4 Nr. 1b UStG)“ statt „Umsatzsteuer 0 %“", flach.includes("Umsatzsteuer: entfällt (steuerfreie innergemeinschaftliche Lieferung, § 4 Nr. 1b UStG)") && !/Umsatzsteuer 0 %/.test(flach) ? "ja" : "nein", "ja");
+  }
 }
 
 // Rechnungen mit Folgeseite, auf der nur noch Hinweise und Gruß stehen

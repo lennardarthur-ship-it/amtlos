@@ -142,7 +142,7 @@ describe("Skonto bei Belegen (§ 17 Abs. 1 Satz 2 UStG) und DATEV", () => {
     expect(buchungenAusBelegen([bar], "SKR03", { kasseAb: "2026-06-01" })[0]!.konto).toBe("1890");
     expect(buchungenAusBelegen([bar], "SKR04", { kasseAb: null })[0]!.konto).toBe("2180");
     // StB-Prüfung (B-6): Kapitalgesellschaft vor dem ersten Kassenabschluss auf das Verrechnungskonto, nicht Geldtransit
-    expect(buchungenAusBelegen([bar], "SKR03", { kasseAb: null, kapitalgesellschaft: true })[0]!.konto).toBe("0755");
+    expect(buchungenAusBelegen([bar], "SKR03", { kasseAb: null, kapitalgesellschaft: true })[0]!.konto).toBe("0731");
   });
 });
 

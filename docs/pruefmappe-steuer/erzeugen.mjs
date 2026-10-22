@@ -56,7 +56,7 @@ const SZENARIEN = [
   { ordner: "6-elektro", skript: "jahr-szenario-elektro.mjs", titel: "Elektro Brandt (Handwerk, Skonto, § 13b)" },
 ];
 // Unterlagen, die eine Kanzlei bekäme bzw. für die steuerliche Prüfung braucht (ohne Arbeitsschutz, Datenschutz, PNG)
-const STEUER_PDF = /Umsatzsteuer-Voranmeldung|Einnahmen-Ueberschuss|Bilanz|Unterlagen-zur-Steuererklaerung|Kassenbuch|Kassenmeldung|Lohnkonto|Personalfragebogen|Verfahrensdokumentation|Aufbewahrungsplan/;
+const STEUER_PDF = /Umsatzsteuer-Voranmeldung|OSS-Erklaerung|Zusammenfassende-Meldung|Einnahmen-Ueberschuss|Bilanz|Unterlagen-zur-Steuererklaerung|Kassenbuch|Kassenmeldung|Lohnkonto|Personalfragebogen|Verfahrensdokumentation|Aufbewahrungsplan/;
 const szenarien = path.join(ZIEL, "szenarien");
 fs.rmSync(szenarien, { recursive: true, force: true });
 const uebersicht = [];
@@ -171,14 +171,14 @@ const SACH = [
   ["Kasse (Bargeld laut Tagesabschluss, Barbelege ab dem ersten Kassenabschluss)", K3.kasse, K4.kasse, "–", "buchungen.ts, kasse.ts"],
   ["Geldtransit (Karten-/App-Zahlungen der Kasse, Bargeld zur Bank, Kartentrinkgeld)", K3.geldtransit, K4.geldtransit, "–", "kasse.ts"],
   ["Privateinlagen (privat bezahlte Belege, Einlagen in die Kasse, Barbelege vor dem ersten Kassenabschluss) – nicht bei Kapitalgesellschaften", K3.privateinlagen, K4.privateinlagen, "–", "buchungen.ts belegGegenkonto, kasse.ts"],
-  ["StB-Prüfung B-6: Verrechnungskonto Gesellschafter einer Kapitalgesellschaft (privat ausgelegte Belege, Barbelege vor dem ersten Kassenabschluss, Einlagen/Entnahmen der Kasse) – Standard laut Bericht, kanzleiabhängig", K3.verrechnungGesellschafter, K4.verrechnungGesellschafter, "–", "buchungen.ts belegGegenkonto, kasse.ts, Kontenvorgaben"],
+  ["StB-Prüfung B-6: Verrechnungskonto Gesellschafter einer Kapitalgesellschaft (privat ausgelegte Belege, Barbelege vor dem ersten Kassenabschluss, Einlagen/Entnahmen der Kasse) – SKR03 0731 „Verbindlichkeiten gegenüber Gesellschaftern – Restlaufzeit bis 1 Jahr“ (korrigierter Bericht vom 22.10.2026, nicht 0755); SKR04 3560 UNSICHER – SKR04-Gegenstück zu 0731 laut Kanzlei folgt; kanzleiabhängig", K3.verrechnungGesellschafter, K4.verrechnungGesellschafter, "–", "buchungen.ts belegGegenkonto, kasse.ts, Kontenvorgaben"],
   ["StB-Prüfung A-4/B-6: Bank – Zahlungseingänge bilanzierender Betriebe (Bank an Forderungen), mit Kontenvorgabe „Belege gegen Bank“ auch Belege", K3.bank, K4.bank, "–", "buchungen.ts zahlungsBuchungenRechnung, Kontenvorgaben"],
   ["Privatentnahmen (Bargeld aus der Kasse, Gegenkonto der Sachentnahmen)", K3.privatentnahmen, K4.privatentnahmen, "–", "kasse.ts, sachentnahmen.ts"],
   ["Erlöse 19 % (auch Kassenüberschuss laut Zählung, Einlösung Mehrzweck-Gutschein)", K3.erloese[19], K4.erloese[19], "kein BU (Automatik vorausgesetzt)", "buchungen.ts erloeskonto, kasse.ts"],
   ["Erlöse 7 %", K3.erloese[7], K4.erloese[7], "kein BU (Automatik vorausgesetzt)", "buchungen.ts erloeskonto"],
   ["Erlöse ohne USt: steuerfreie Umsätze (§ 4 Nr. 8 ff., z. B. Heilbehandlung § 4 Nr. 14), Kz 48", K3.erloese[0], K4.erloese[0], "–", "buchungen.ts erloeskonto"],
   ["StB-Prüfung B-2: Erlöse Nullsteuersatz (§ 12 Abs. 3 UStG, Photovoltaik), Kz 87 – Nummer im Bericht offen („in Rewe nach Nullsteuersatz suchen“), Standard 8290/4290 laut Herstellerangaben", K3.erloese.nullsatz, K4.erloese.nullsatz, "kein BU (Automatik vorausgesetzt)", "buchungen.ts erloeskonto, Kontenvorgaben"],
-  ["OSS: Erlöse mit der Umsatzsteuer des Bestimmungslands (§ 18j UStG) – Land in Feld 40, Satz in Feld 41; UNSICHER", K3.erloese.oss, K4.erloese.oss, "kein BU (zu klären)", "buchungen.ts erloeskonto, Kontenvorgaben"],
+  ["OSS: Erlöse mit der Umsatzsteuer des Bestimmungslands (§ 18j UStG) – Land in Feld 40 (bei Privatpersonen nur das Länderkennzeichen), Satz in Feld 41; Kontenbereich von der Kanzlei bestätigt (Nachtrag 22.10.2026)", K3.erloese.oss, K4.erloese.oss, "kein BU (Steuerschlüssel zu klären)", "buchungen.ts erloeskonto, Kontenvorgaben"],
   ["Erlöse Kleinunternehmer (§ 19 UStG)", K3.erloese.ku, K4.erloese.ku, "–", "buchungen.ts erloeskonto"],
   ["Erlöse steuerfreie innergemeinschaftliche Lieferung (mit USt-IdNr. in Feld „EU-Land u. UStID“)", K3.erloese.igl, K4.erloese.igl, "–", "buchungen.ts erloeskonto"],
   ["Erlöse § 13b im Inland (Leistungsempfänger schuldet die Steuer)", K3.erloese.rc13b, K4.erloese.rc13b, "–", "buchungen.ts erloeskonto"],
@@ -242,6 +242,8 @@ fs.writeFileSync(path.join(ZIEL, "konten.md"), kt.join("\n"));
 // 6. README
 kopiere(path.join(HIER, "README.md"), path.join(ZIEL, "README.md"));
 kopiere(path.join(HIER, "kontenvorgaben.md"), path.join(ZIEL, "kontenvorgaben.md"));
+// Umsetzung des Prüfberichts Heckler und Busch (mit Nachtrag vom 22.10.2026)
+kopiere(path.join(HIER, "umsetzung-2026-10-22.md"), path.join(ZIEL, "UMSETZUNG.md"));
 fs.rmSync(ROH, { recursive: true, force: true });
 const anzahl = (d) => fs.readdirSync(d, { recursive: true }).filter((f) => fs.statSync(path.join(d, f)).isFile()).length;
 console.log(`✓ Prüfmappe Steuer in ${ZIEL}: ${anzahl(vorlagen)} Vorlagen-PDFs, ${SZENARIEN.length} Szenarien (${anzahl(szenarien)} Dateien), ${zeilen.length} Pflichten, ${werte.length} Regelwerte, ${stb.length} Prüflisten-Punkte, ${SACH.length + F.KATEGORIEN.length} Kontenzeilen`);

@@ -30,7 +30,7 @@ const BEOBACHTUNGEN = [
   "**[schwer] § 2a SchwarzArbG: App widerspricht sich beim Friseurhandwerk.** Die Vorlagen sagen, Friseur- und Kosmetikbetriebe gehörten zu den Branchen nach § 2a SchwarzArbG (Arbeitszeitnachweis, `packages/fachlogik/src/dokumente/lohn.ts:101`; Nachweis der Arbeitsbedingungen, `packages/fachlogik/src/dokumente/personal.ts:54`). Der Pflichten-Check bietet bei „Gehört dein Betrieb zu einer dieser Branchen?“ aber keine Option dafür (`packages/i18n/src/fragen.ts:396–404`), und die Auslöser von `personal.sofortmeldung` und `personal.arbeitszeit_milog` im Katalog kennen sie nicht. Folge für den Salon: Sofortmeldung, Aufzeichnung nach § 17 MiLoG und die Unterschriftspflicht beim NachwG fehlen im Check, obwohl die Vorlagen sie für Friseure ansprechen. Vorschlag: rechtlich klären; je nach Ergebnis Option „Friseur- und Kosmetikgewerbe“ in fragen.ts und Katalog ergänzen (oder sie aus Beauty-Branche ableiten) – oder die beiden Vorlagentexte korrigieren.",
   "**[schwer → behoben] EÜR wird der GmbH ohne Warnung angeboten.** StB-Prüfung Heckler und Busch (E-4): `euerUebernahme` liefert für bilanzierende Betriebe (GmbH, UG, GmbH & Co. KG, e. K., Buchführungspflicht laut Finanzamt) nichts mehr und sagt „Bilanz statt EÜR“ (`apps/mobile/src/unterlagen/steuerpaket.ts`, `EUER_GESPERRT`); die Seite der Vorlage zeigt statt der Übernahme diesen Hinweis. Offen bleibt eine Übernahme für die GuV.",
   "**[mittel] Steuerberater-Paket bei Ist-Versteuerung falsch erklärt.** LIESMICH.txt sagt fest „Die Umsatzsteuer-Voranmeldung ordnet Rechnungen dagegen nach dem Leistungsdatum zu (Soll-Versteuerung)“ (`apps/mobile/src/unterlagen/steuerpaket.ts`, behoben: Text nach Soll/Ist) – für diesen Betrieb (Ist) gilt der Zahlungseingang. Vorschlag: Text nach `s.betrieb.versteuerung` wählen („… nach dem Zahlungseingang (Ist-Versteuerung, § 20 UStG); eine Stornorechnung zählt mit der vermerkten Erstattung“).",
-  "**[mittel → behoben] DATEV: privat bezahlter Beleg einer GmbH.** StB-Prüfung (B-6): privat ausgelegte Belege und Barbelege vor dem ersten Kassenabschluss einer Kapitalgesellschaft stehen auf dem Verrechnungskonto Gesellschafter (Standard laut Bericht SKR03 0755 / SKR04 3560, über die Kontenvorgaben der Kanzlei änderbar). Außerdem Soll-Stapel mit Zahlungseingängen (A-4): Saldo 1410 im Jahrespaket = offene Forderungen 2026-017/-018.",
+  "**[mittel → behoben] DATEV: privat bezahlter Beleg einer GmbH.** StB-Prüfung (B-6): privat ausgelegte Belege und Barbelege vor dem ersten Kassenabschluss einer Kapitalgesellschaft stehen auf dem Verrechnungskonto Gesellschafter (Standard SKR03 0731 laut korrigiertem Bericht vom 22.10.2026, SKR04 vorläufig 3560; über die Kontenvorgaben der Kanzlei änderbar). Außerdem Soll-Stapel (A-4): Zahlungseingänge bucht die App seit dem Nachtrag vom 22.10.2026 nur mit der Kontenvorgabe „Zahlungseingänge buchen“ (Standard aus) – im Jahrespaket steht deshalb auf 1410 die Summe aller Rechnungen 2026, die LIESMICH erklärt das und nennt die offenen Forderungen 2026-017/-018 laut Rechnungsliste; mit der Vorgabe ist der Saldo 1410 = offene Forderungen (Gegenprobe).",
   "**[mittel] Unterweisung des jugendlichen Azubis: Frist ein Jahr statt halbjährlich.** Der Unterweisungsnachweis setzt immer „mindestens einmal jährlich … nächster Termin 10.08.2027“ (`packages/fachlogik/src/dokumente/arbeitsschutz.ts:200`), der Pflichten-Check (`arbeitsschutz.unterweisung_wiederholen`, P1Y) ebenso; `personal.jugendarbeitsschutz` ist im Katalog „dauerhaft/einmalig“ ohne Termine (halbjährliche Unterweisung § 29 Abs. 2 JArbSchG, Nachuntersuchung § 33 JArbSchG). Vorschlag: bei `beschaeftigte.jugendlich ≥ 1` eigene wiederkehrende Pflicht (6 Monate) bzw. in der Vorlage einen Schalter „Teilnehmende unter 18“ mit 6-Monats-Termin.",
   "**[mittel] Widersprüchliche Speicherdauer der Server-Logfiles.** Datenschutzerklärung: 7 Tage (Eingabe), Verzeichnis der Verarbeitungstätigkeiten aus dem Vorschlag „Betrieb der Website“: „IP-Adressen in Logfiles nach 30 Tagen“ (`packages/fachlogik/src/dokumente/bausteine.ts:1291`). Vorschlag: Löschfrist im Vorschlag aus `logfile_tage` der Datenschutzerklärung übernehmen oder neutral formulieren („laut Datenschutzerklärung“).",
   "**[mittel] Gewerbeanmeldung einer GmbH nur mit einer Person.** Die Vorlage hat einen einzigen Personenblock (`packages/fachlogik/src/dokumente/betrieb.ts:66–85`); bei einer GmbH mit zwei Geschäftsführern fehlen die Angaben zur zweiten vertretungsberechtigten Person, und nichts sagt, dass der Block die gesetzlichen Vertreter meint. Vorschlag: bei Rechtsform GmbH/UG Liste „Gesetzliche Vertreter“ wie in der Handelsregister-Vorlage.",
@@ -264,26 +264,40 @@ function paketPruefen(name, zr, erg, ordner) {
   const extf = csvLesen(inhalt[`EXTF_Buchungsstapel_${zr.name}.csv`], "latin1");
   const zeilen = extf.slice(2);
   // R10: Personal nicht im Stapel. StB-Prüfung (B-6): privat ausgelegte Belege der GmbH jetzt im Stapel (Verrechnungskonto
-  // Gesellschafter); A-4: je Zahlungseingang bzw. Erstattung im Zeitraum eine Buchung Bank an Forderungen (Soll-Stapel GmbH)
-  const zahlungenImZeitraum = D.vorgaenge().filter((x) => x.bezahlt && im(x.bezahlt));
-  const erwBuchungen = summe(vg.map((x) => Object.values(x.s.gruppen).filter((g) => g.netto + g.ust !== 0).length)) + summe(bl.filter((b) => b.kategorie !== "personal").map((b) => b.saetze.filter((x) => x.betrag).length)) + zahlungenImZeitraum.length;
+  // Gesellschafter). A-4, Nachtrag 22.10.2026: Zahlungseingänge (Bank an Forderungen) nur mit der Kontenvorgabe
+  // „Zahlungseingänge buchen“ – Standard aus, also keine Zahlungsbuchungen im Stapel
+  const erwBuchungen = summe(vg.map((x) => Object.values(x.s.gruppen).filter((g) => g.netto + g.ust !== 0).length)) + summe(bl.filter((b) => b.kategorie !== "personal").map((b) => b.saetze.filter((x) => x.betrag).length));
+  vergleich(`Paket ${name}`, "DATEV: keine Zahlungseingänge Bank 1200 im Stapel (Kontenvorgabe „Zahlungseingänge buchen“ Standard aus)", String(zeilen.filter((z) => z[6] === "1200" || z[7] === "1200").length), "0");
   vergleich(`Paket ${name}`, "DATEV: Anzahl Buchungen", zeilen.length, erwBuchungen);
   vergleich(`Paket ${name}`, "DATEV: Spalten je Zeile = Spalten im Kopf", zeilen.every((z) => z.length === extf[1].length) ? "ja" : "nein", "ja");
   const kontoSumme = (konto) => summe(zeilen.filter((z) => z[7] === konto).map((z) => (z[1] === "H" ? -1 : 1) * (z[117] === "1" ? -1 : 1) * centAus(z[0])));
   vergleich(`Paket ${name}`, "DATEV: Brutto auf Erlöskonto 8400 (19 %)", kontoSumme("8400"), summe(vg.map((x) => x.vz * x.s.brutto)));
   vergleich(`Paket ${name}`, "DATEV: Kopf Beraternummer/Mandant", `${extf[0][10]}/${extf[0][11]}`, "31877/20514");
-  // StB-Prüfung (A-4): Soll-Stapel mit Zahlungseingängen – im Jahrespaket steht auf 1410 genau der Bestand der offenen
-  // Forderungen zum 31.12. (unabhängig: Rechnungen 2026 ohne Storno und ohne Zahlung bis 31.12., wie in der Bilanz)
+  // StB-Prüfung (A-4), Nachtrag 22.10.2026: ohne Zahlungseingänge steht auf 1410 die Summe aller Rechnungen des Jahres
+  // (Stornos negativ, unabhängig aus den Rohdaten); die LIESMICH nennt Saldo und die offenen Forderungen zum 31.12.
+  // (Rechnungen 2026 ohne Storno und ohne Zahlung bis 31.12., wie in der Bilanz)
   if (zr.name === "2026") {
     const saldo1410 = summe(zeilen.map((z) => (z[6] === "1410" ? 1 : z[7] === "1410" ? -1 : 0) * (z[1] === "H" ? -1 : 1) * (z[117] === "1" ? -1 : 1) * centAus(z[0])));
-    vergleich(`Paket ${name}`, "DATEV: Saldo Forderungen 1410 zum 31.12. = offene Rechnungen (Soll-Stapel mit Zahlungseingängen, A-4)", saldo1410, summe(D.vorgaenge().filter((x) => x.art === "rechnung" && !x.r.storno && !(x.bezahlt && x.bezahlt <= zr.bis)).map((x) => x.s.brutto)));
+    const alleRechnungen = summe(vg.map((x) => x.vz * x.s.brutto));
+    const offen = summe(D.vorgaenge().filter((x) => x.art === "rechnung" && !x.r.storno && !(x.bezahlt && x.bezahlt <= zr.bis)).map((x) => x.s.brutto));
+    vergleich(`Paket ${name}`, "DATEV: Saldo Forderungen 1410 zum 31.12. = alle Rechnungen 2026 (Soll-Stapel ohne Zahlungseingänge, A-4/Nachtrag)", saldo1410, alleRechnungen);
+    const lm = Buffer.from(inhalt["LIESMICH.txt"]).toString("utf8");
+    vergleich(`Paket ${name}`, "LIESMICH: erklärt „Zahlungseingänge nicht gebucht“, nennt Saldo 1410 und offene Forderungen laut Rechnungsliste", /Zahlungseingänge sind nicht gebucht/.test(lm) && lm.includes(`Saldo 1410 aus diesem Stapel zum 31.12.2026: ${D.eur(alleRechnungen)} €`) && lm.includes(`laut Rechnungsliste zum 31.12.2026: ${D.eur(offen)} €`) ? "ja" : "nein", "ja");
+    vergleich(`Paket ${name}`, "LIESMICH: Hinweis auf die Kontenvorgabe „Zahlungseingänge buchen“", /„Zahlungseingänge buchen“ einschalten/.test(lm) ? "ja" : "nein", "ja");
+    // Gegenprobe mit der Kontenvorgabe „Zahlungseingänge buchen“: je Zahlung bzw. Erstattung eine Buchung, Saldo 1410 = offen
+    const mit = csvLesen(S.unzipSync(S.jahrMitZahlungen(s, belegBytes).zip)[`EXTF_Buchungsstapel_${zr.name}.csv`], "latin1").slice(2);
+    const zahlungenImZeitraum = D.vorgaenge().filter((x) => x.bezahlt && im(x.bezahlt));
+    vergleich(`Paket ${name} (Vorgabe „Zahlungseingänge buchen“)`, "DATEV: Anzahl Buchungen = ohne Vorgabe + je Zahlungseingang/Erstattung eine", String(mit.length), String(erwBuchungen + zahlungenImZeitraum.length));
+    const saldoMit = summe(mit.map((z) => (z[6] === "1410" ? 1 : z[7] === "1410" ? -1 : 0) * (z[1] === "H" ? -1 : 1) * (z[117] === "1" ? -1 : 1) * centAus(z[0])));
+    vergleich(`Paket ${name} (Vorgabe „Zahlungseingänge buchen“)`, "DATEV: Saldo Forderungen 1410 zum 31.12. = offene Rechnungen (A-4)", saldoMit, offen);
   }
   if (bl.some((b) => b.zahlung === "privat")) {
     const privat = zeilen.filter((z) => z[6] === "1890" || z[7] === "1890").length;
-    // StB-Prüfung (B-6): auf dem Verrechnungskonto Gesellschafter (Standard laut Bericht SKR03 0755) in Feld 7 – privat
-    // ausgelegte Belege und Barbelege (der Salon führt keine Kassenabschlüsse in der App, also „vor dem ersten Abschluss“)
-    const verrechnung = zeilen.filter((z) => z[6] === "0755").length;
-    vergleich(`Paket ${name}`, "DATEV: privat bezahlte und Barbelege der GmbH auf dem Verrechnungskonto 0755, nicht auf „Privateinlagen“ 1890 (Buchungen 0755 / 1890)", `${verrechnung} / ${privat}`, `${summe(bl.filter((b) => b.zahlung === "privat" || b.zahlung === "bar").map((b) => b.saetze.filter((x) => x.betrag).length))} / 0`);
+    // StB-Prüfung (B-6): auf dem Verrechnungskonto Gesellschafter (SKR03 0731 laut korrigiertem Bericht vom 22.10.2026,
+    // nicht 0755) in Feld 7 – privat ausgelegte Belege und Barbelege (der Salon führt keine Kassenabschlüsse in der App,
+    // also „vor dem ersten Abschluss“)
+    const verrechnung = zeilen.filter((z) => z[6] === "0731").length;
+    vergleich(`Paket ${name}`, "DATEV: privat bezahlte und Barbelege der GmbH auf dem Verrechnungskonto 0731, nicht auf 0755 oder „Privateinlagen“ 1890 (Buchungen 0731 / 0755 / 1890)", `${verrechnung} / ${zeilen.filter((z) => z[6] === "0755" || z[7] === "0755").length} / ${privat}`, `${summe(bl.filter((b) => b.zahlung === "privat" || b.zahlung === "bar").map((b) => b.saetze.filter((x) => x.betrag).length))} / 0 / 0`);
   }
   const liesmich = Buffer.from(inhalt["LIESMICH.txt"]).toString("utf8");
   vergleich(`Paket ${name}`, "LIESMICH: erklärt die Zuordnung bei Ist-Versteuerung (Zahlungseingang statt Leistungsdatum)", /Ist-Versteuerung|vereinnahmte|nach (dem )?Zahlungseingang/.test(liesmich) ? "ja" : "nein", "ja");

@@ -79,10 +79,15 @@ export const KUNDEN = {
   k6: { name: "Jonas Albers", anschrift: "Holtenauer Straße 129\n24105 Kiel" },
   k7: { name: "Nordwind Consulting GmbH", anschrift: "Neuer Wall 50\n20354 Hamburg", email: "office@nordwind-consulting.example" },
   k8: { name: "Tanja Möller", anschrift: "Am Felde 9\n22765 Hamburg" },
+  // Nachtrag StB 22.10.2026: Privatpersonen im EU-Ausland, die per E-Mail (nicht über den Shop) bestellen – OSS-Rechnungen
+  k9: { name: "Katharina Weber", anschrift: "Gumpendorfer Straße 72\n1060 Wien\nÖsterreich" },
+  k10: { name: "Sanne de Vries", anschrift: "Oudegracht 211\n3511 NG Utrecht\nNiederlande" },
+  k11: { name: "Camille Rousseau", anschrift: "12 Rue Mercière\n69002 Lyon\nFrankreich" },
+  k12: { name: "Pieter Claes", anschrift: "Korenlei 9\n9000 Gent\nBelgien" },
 } as const;
 export type KundeId = keyof typeof KUNDEN;
-/** Steuerart der Kundschaft: Inland, Unternehmen in Österreich (igL) */
-export const KUNDE_ORT: Record<KundeId, "inland" | "eu_b2b"> = { k1: "inland", k2: "inland", k3: "eu_b2b", k4: "inland", k5: "inland", k6: "inland", k7: "inland", k8: "inland" };
+/** Steuerart der Kundschaft: Inland, Unternehmen in Österreich (igL), Privatperson im EU-Ausland (OSS) */
+export const KUNDE_ORT: Record<KundeId, "inland" | "eu_b2b" | "eu_b2c"> = { k1: "inland", k2: "inland", k3: "eu_b2b", k4: "inland", k5: "inland", k6: "inland", k7: "inland", k8: "inland", k9: "eu_b2c", k10: "eu_b2c", k11: "eu_b2c", k12: "eu_b2c" };
 
 export const MITARBEITERIN = {
   m1: {
@@ -113,6 +118,12 @@ export interface Rechnung {
   ersetzt?: string;
   /** Rechnung zu einer Shop-Bestellung, deren Umsatz schon im Shop-Bericht steht (Brutto laut Shop) */
   shopBestellung?: { nr: string; brutto: number };
+  /**
+   * Nachtrag StB 22.10.2026: Fernverkauf an eine Privatperson im EU-Ausland nach Überschreiten der EU-Schwelle (§ 3c
+   * Abs. 4 UStG, 17.07.2026) – Steuer des Bestimmungslands (Regelsatz laut `LAENDER`), OSS-Erklärung beim BZSt, nicht in
+   * der deutschen Voranmeldung. Die Positionen stehen mit „19“ in den Rohdaten; gerechnet wird mit dem Satz des Landes.
+   */
+  oss?: Land;
   worum: string;
 }
 
@@ -123,6 +134,9 @@ const SEIFE = "Naturseife 100 g, kaltgerührt (kosmetisches Mittel)";
 const STUMPEN = "Stumpenkerze Rapswachs 7 × 12 cm";
 const SET = "Geschenkset „Winterlicht“ (Duftkerze und zwei Naturseifen)";
 const VERSAND = "Versandkostenpauschale Großhandel";
+/** Hinweis auf OSS-Rechnungen (Ware wird versandt, Ort der Lieferung im Bestimmungsland, § 3c Abs. 1 UStG) */
+const OSS_HINWEIS = (land: "AT" | "NL" | "FR" | "BE") =>
+  `Fernverkauf: Die Lieferung ist in ${{ AT: "Österreich", NL: "den Niederlanden", FR: "Frankreich", BE: "Belgien" }[land]} steuerbar (§ 3c UStG); berechnet ist die Umsatzsteuer des Bestimmungslands.\nVielen Dank für Ihre Bestellung.`;
 const IGL_HINWEIS = "Lieferung an: Wohnkultur Steiner GmbH, Herrengasse 17, 8010 Graz, Österreich. Beförderung durch HanseVersand Paketdienst GmbH.\nVielen Dank für Ihre Bestellung.";
 
 export const RECHNUNGEN: Rechnung[] = [
@@ -180,6 +194,21 @@ export const RECHNUNGEN: Rechnung[] = [
   { id: "r19", nummer: "2026-019", datum: "2026-12-15", leistung: "2026-12-14", ziel: "30", kunde: "k5", hinweis: DANKE, bezahlt: "2027-01-12",
     worum: "Händlerin Lübeck: Nachbestellung Weihnachten – zum 31.12. offen (USt Dezember, Einnahme erst 2027).",
     pos: [p(KERZE, 48, "Stück", 1120), p(SEIFE, 48, "Stück", 395), p(SET, 24, "Stück", 2250), p(VERSAND, 1, "Pauschale", 1490)] },
+  // ---- Nachtrag StB 22.10.2026 (Heckler und Busch): Fernverkäufe an Privatpersonen in AT, NL, FR, BE per E-Mail-Bestellung
+  // (nicht über den Shop, also nicht im Shop-Bericht) nach Überschreiten der EU-Schwelle am 17.07. – OSS mit dem Regelsatz
+  // des Bestimmungslands; im DATEV-Stapel auf 8320 mit Land in Feld 40 (ohne USt-IdNr.) und Satz in Feld 41.
+  { id: "r20", nummer: "2026-020", datum: "2026-12-16", leistung: "2026-12-15", ziel: "7", kunde: "k9", oss: "AT", hinweis: OSS_HINWEIS("AT"), bezahlt: "2026-12-18",
+    worum: "OSS-FERNVERKAUF nach Wien (Privatkundin, Bestellung per E-Mail): 12 Geschenksets, Versand Österreich – österreichische USt 20 %, OSS-Erklärung Q4, nicht in der deutschen Voranmeldung.",
+    pos: [p(SET, 12, "Stück", 2250), p("Versand nach Österreich", 1, "Pauschale", 1290)] },
+  { id: "r21", nummer: "2026-021", datum: "2026-12-17", leistung: "2026-12-16", ziel: "7", kunde: "k10", oss: "NL", hinweis: OSS_HINWEIS("NL"), bezahlt: "2026-12-22",
+    worum: "OSS-FERNVERKAUF nach Utrecht (Privatkundin): 24 Duftkerzen für eine Hochzeit – niederländische USt 21 %.",
+    pos: [p(KERZE, 24, "Stück", 1120), p("Versand in die Niederlande", 1, "Pauschale", 1490)] },
+  { id: "r22", nummer: "2026-022", datum: "2026-12-18", leistung: "2026-12-17", ziel: "7", kunde: "k11", oss: "FR", hinweis: OSS_HINWEIS("FR"), bezahlt: "2026-12-23",
+    worum: "OSS-FERNVERKAUF nach Lyon (Privatkundin): 6 Geschenksets und 10 Naturseifen – französische USt 20 %.",
+    pos: [p(SET, 6, "Stück", 2250), p(SEIFE, 10, "Stück", 395), p("Versand nach Frankreich", 1, "Pauschale", 1690)] },
+  { id: "r23", nummer: "2026-023", datum: "2026-12-21", leistung: "2026-12-18", ziel: "14", kunde: "k12", oss: "BE", hinweis: OSS_HINWEIS("BE"), bezahlt: "2027-01-08",
+    worum: "OSS-FERNVERKAUF nach Gent (Privatkunde): 36 Mini-Kerzen mit Banderole als Gastgeschenke – belgische USt 21 %; zum 31.12. offen (Soll: OSS Q4, Einnahme erst 2027).",
+    pos: [p("Gastgeschenk Mini-Kerze 60 g mit Banderole", 36, "Stück", 420), p("Personalisierung der Banderolen (Namen und Datum)", 1, "Pauschale", 4500), p("Versand nach Belgien", 1, "Pauschale", 1490)] },
 ];
 
 // ---------------------------------------------------------------- Onlineshop (Umsatzberichte „Shopwerk“, Beträge BRUTTO)
@@ -191,6 +220,12 @@ export const RECHNUNGEN: Rechnung[] = [
  */
 export interface ShopMonat { monat: string; de: number; erstattung: number; euDe: number; eu: Partial<Record<Land, number>> }
 export type Land = "AT" | "NL" | "FR" | "BE";
+/**
+ * Regelsteuersätze der Bestimmungsländer 2026 (Kerzen und Seifen: Regelsatz). Nachtrag StB 22.10.2026 geprüft am
+ * 22.10.2026: AT 20 %, NL 21 %, FR 20 %, BE 21 % – Quelle: VATupdate, „Global VAT Rates by Country (2026) – Standard and
+ * Reduced Rates“ (25.07.2026), https://www.vatupdate.com/2026/07/25/global-vat-rates-by-country-2026-standard-and-reduced-rates/
+ * (Änderungen 2026 dort nur bei ermäßigten Sätzen: AT Lebensmittel, NL Beherbergung, BE Gastronomie).
+ */
 export const LAENDER: Record<Land, { name: string; satz: number }> = { AT: { name: "Österreich", satz: 20 }, NL: { name: "Niederlande", satz: 21 }, FR: { name: "Frankreich", satz: 20 }, BE: { name: "Belgien", satz: 21 } };
 
 export const SHOP: ShopMonat[] = [
@@ -395,13 +430,17 @@ export const AFA = { beleg: "b29", jahre: 8, monate: 11, altbestand: 42000 };
 // ---------------------------------------------------------------- unabhängige Rechnung
 
 export interface RechnungsSumme { netto: number; ust: number; brutto: number; gruppen: Record<string, { netto: number; ust: number }> }
-/** Zeile = Menge × Preis (auf Cent gerundet), USt je Satz aus der Netto-Summe des Satzes */
-export function rechnungsSumme(pos: Pos[]): RechnungsSumme {
+/**
+ * Zeile = Menge × Preis (auf Cent gerundet), USt je Satz aus der Netto-Summe des Satzes. `ossSatz`: Fernverkauf (OSS) –
+ * Positionen mit Steuer tragen den Satz des Bestimmungslands statt 19 %.
+ */
+export function rechnungsSumme(pos: Pos[], ossSatz?: number): RechnungsSumme {
   const gruppen: Record<string, { netto: number; ust: number }> = {};
   for (const x of pos) {
     const zeile = rund((Math.round(x.menge * 10000) * x.preis) / 10000);
-    gruppen[x.satz] ??= { netto: 0, ust: 0 };
-    gruppen[x.satz]!.netto += zeile;
+    const satz = ossSatz && x.satz > 0 ? ossSatz : x.satz;
+    gruppen[satz] ??= { netto: 0, ust: 0 };
+    gruppen[satz]!.netto += zeile;
   }
   for (const [satz, g] of Object.entries(gruppen)) g.ust = rund((g.netto * Number(satz)) / 100);
   const netto = sum(Object.values(gruppen).map((g) => g.netto));
@@ -433,7 +472,7 @@ export interface Vorgang { nummer: string; art: "rechnung" | "storno"; datum: st
 export function vorgaenge(): Vorgang[] {
   const l: Vorgang[] = [];
   for (const r of RECHNUNGEN) {
-    const s = rechnungsSumme(r.pos);
+    const s = rechnungsSumme(r.pos, r.oss ? LAENDER[r.oss].satz : undefined);
     const leistung = r.leistung ?? r.datum;
     const ustTag = r.bezahlt && r.bezahlt < leistung ? r.bezahlt : leistung;
     l.push({ nummer: r.nummer, art: "rechnung", datum: r.datum, leistung, bezahlt: r.bezahlt, vz: 1, s, kunde: r.kunde, r, ustMonat: monat(ustTag) });
@@ -467,6 +506,8 @@ export function schwelle() {
 export interface UstMonat {
   m: string;
   nummern: string[];
+  /** OSS-Rechnungen mit Steuerentstehung in diesem Monat – nicht in der Voranmeldung (Hinweis der Übernahme) */
+  oss: string[];
   /** aus Rechnungen (Soll) */
   r19: number; r0igl: number;
   shop19: number; markt19: number;
@@ -481,7 +522,8 @@ export interface UstMonat {
 export function ustMonate(monate = MONATE_2026): UstMonat[] {
   const v = vorgaenge();
   return monate.map((m) => {
-    const im = v.filter((x) => x.ustMonat === m);
+    // OSS-Rechnungen (Steuer des Bestimmungslands) gehören nicht in die deutsche Voranmeldung
+    const im = v.filter((x) => x.ustMonat === m && !x.r.oss);
     const r19 = sum(im.map((x) => x.vz * (x.s.gruppen["19"]?.netto ?? 0)));
     const r0igl = sum(im.filter((x) => x.r.igl).map((x) => x.vz * (x.s.gruppen["0"]?.netto ?? 0)));
     const sh = shopMonat(m);
@@ -495,7 +537,7 @@ export function ustMonate(monate = MONATE_2026): UstMonat[] {
     const elsterKz47 = rund((voll(kz46) * 19) / 100);
     const elsterUst = rund((voll(kz81) * 19) / 100) + elsterKz47;
     return {
-      m, nummern: im.map((x) => x.nummer), r19, r0igl, shop19: sh.netto19, markt19: sh.marktNetto, kz81, kz41: r0igl, kz46, kz47, kz66, kz67,
+      m, nummern: im.map((x) => x.nummer), oss: v.filter((x) => x.ustMonat === m && x.r.oss).map((x) => x.nummer), r19, r0igl, shop19: sh.netto19, markt19: sh.marktNetto, kz81, kz41: r0igl, kz46, kz47, kz66, kz67,
       ust, zahllast: ust - kz66 - kz67, elsterZahllast: elsterUst - kz66 - elsterKz47, b13: bl.filter((b) => b.p13b).map((b) => b.id),
     };
   });
@@ -507,17 +549,44 @@ export function jahresSummen() {
   return { r19: s((x) => x.r19), shop19: s((x) => x.shop19), markt19: s((x) => x.markt19), kz81: s((x) => x.kz81), kz41: s((x) => x.kz41), kz46: s((x) => x.kz46), kz47: s((x) => x.kz47), kz66: s((x) => x.kz66), kz67: s((x) => x.kz67), ust: s((x) => x.ust), zahllast: s((x) => x.zahllast), elsterZahllast: s((x) => x.elsterZahllast) };
 }
 
-/** OSS-Erklärung je Quartal und Land: Bemessungsgrundlage (Summe der Monats-Netto) und Steuer = Netto × Satz */
+/**
+ * OSS-Rechnungen (Nachtrag StB 22.10.2026) je Quartal der Steuerentstehung (Soll: Leistung, § 13 Abs. 1 Nr. 1 a UStG)
+ * und Land: Netto, Steuer und Brutto je Rechnung, wie sie im DATEV-Stapel auf 8320 stehen sollen.
+ */
+export function ossRechnungen() {
+  return vorgaenge()
+    .filter((x) => x.r.oss)
+    .map((x) => {
+      const land = x.r.oss!;
+      const satz = LAENDER[land].satz;
+      const g = x.s.gruppen[String(satz)]!;
+      return { nummer: x.nummer, datum: x.datum, quartal: quartalVon(x.ustMonat), land, satz, netto: x.vz * g.netto, ust: x.vz * g.ust, brutto: x.vz * (g.netto + g.ust), bezahlt: x.bezahlt, kunde: x.kunde };
+    });
+}
+
+/**
+ * OSS-Erklärung je Quartal und Land: Bemessungsgrundlage (Summe der Monats-Netto aus dem Shop-Bericht plus Netto der
+ * OSS-Rechnungen) und Steuer = Netto × Satz (je Land eine Zeile, wie in der Vorlage)
+ */
 export function ossQuartale() {
-  const q: Record<string, { land: Land; netto: number; brutto: number; steuer: number }[]> = {};
+  const q: Record<string, { land: Land; netto: number; brutto: number; steuer: number; ausRechnungen: number }[]> = {};
+  const zeile = (qq: string, land: Land) => {
+    q[qq] ??= [];
+    return q[qq]!.find((x) => x.land === land) ?? q[qq]![q[qq]!.push({ land, netto: 0, brutto: 0, steuer: 0, ausRechnungen: 0 }) - 1]!;
+  };
   for (const sh of SHOP) {
     const qq = quartalVon(sh.monat);
     for (const o of shopMonat(sh.monat).oss) {
-      q[qq] ??= [];
-      const z = q[qq]!.find((x) => x.land === o.land) ?? q[qq]![q[qq]!.push({ land: o.land, netto: 0, brutto: 0, steuer: 0 }) - 1]!;
+      const z = zeile(qq, o.land);
       z.netto += o.netto;
       z.brutto += o.brutto;
     }
+  }
+  for (const r of ossRechnungen()) {
+    const z = zeile(r.quartal, r.land);
+    z.netto += r.netto;
+    z.brutto += r.brutto;
+    z.ausRechnungen += r.netto;
   }
   for (const l of Object.values(q)) for (const z of l) z.steuer = rund((z.netto * LAENDER[z.land].satz) / 100);
   return Object.entries(q).map(([quartal, laender]) => ({ quartal, laender, steuer: sum(laender.map((z) => z.steuer)), netto: sum(laender.map((z) => z.netto)), brutto: sum(laender.map((z) => z.brutto)), zahlung: OSS_ZAHLUNG[quartal] ?? null }));
@@ -532,6 +601,9 @@ export function euerUnabhaengig() {
   const v = vorgaenge().filter((x) => x.bezahlt?.startsWith(J) && x.art === "rechnung");
   const reNettoPflichtig = sum(v.map((x) => x.s.gruppen["19"]?.netto ?? 0));
   const reFrei = sum(v.map((x) => x.s.gruppen["0"]?.netto ?? 0));
+  // OSS-Rechnungen: in Deutschland nicht steuerbar (Zeile „… nicht umsatzsteuerbare Betriebseinnahmen“); die vereinnahmte
+  // ausländische Umsatzsteuer steht mit in `reUst` (Zeile „Vereinnahmte Umsatzsteuer“), wie beim Shop-Bericht
+  const reOssNetto = sum(v.filter((x) => x.r.oss).map((x) => x.s.gruppen[String(LAENDER[x.r.oss!].satz)]!.netto));
   const reUst = sum(v.map((x) => x.s.ust));
   // Shop und Markt: Zufluss im Monat des Berichts (Zahlungen werden bei Bestellung eingezogen), Erstattungen mindern
   const sm = MONATE_2026.map(shopMonat);
@@ -561,10 +633,10 @@ export function euerUnabhaengig() {
   const anlage = BELEGE.find((b) => b.id === AFA.beleg)!;
   const afaNeu = rund((belegSumme(anlage).netto / AFA.jahre) * (AFA.monate / 12));
   const afa = afaNeu + AFA.altbestand;
-  const einnahmen = reNettoPflichtig + reFrei + reUst + shopNetto19 + shopUst19 + ossNetto + ossUst + marktNetto + marktUst + vaErstattet;
+  const einnahmen = reNettoPflichtig + reFrei + reOssNetto + reUst + shopNetto19 + shopUst19 + ossNetto + ossUst + marktNetto + marktUst + vaErstattet;
   const ausgaben = ausgabenBelege + vorsteuer + vaGezahlt + ossGezahlt;
   return {
-    reNettoPflichtig, reFrei, reUst, reAnzahl: v.length, shopNetto19, shopUst19, ossNetto, ossUst, marktNetto, marktUst, vaGezahlt, vaErstattet, ossGezahlt,
+    reNettoPflichtig, reFrei, reOssNetto, reUst, reAnzahl: v.length, shopNetto19, shopUst19, ossNetto, ossUst, marktNetto, marktUst, vaGezahlt, vaErstattet, ossGezahlt,
     nachKategorie, ausgabenBelege, vorsteuer, afaNeu, afa, einnahmen, ausgaben, gewinn: einnahmen - ausgaben - afa, belegeImJahr: imJahr.length,
     offen: sum(vorgaenge().filter((x) => x.art === "rechnung" && !x.r.storno && !(x.bezahlt ?? "9999").startsWith(J)).map((x) => x.s.brutto)),
   };

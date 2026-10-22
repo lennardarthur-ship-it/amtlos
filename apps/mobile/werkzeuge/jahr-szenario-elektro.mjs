@@ -306,6 +306,8 @@ for (const x of D.vorgaenge()) {
   if (x.steuerart === "reverse_charge") {
     vergleich(`PDF ${x.nummer} (§ 13b)`, "Hinweis „Steuerschuldnerschaft des Leistungsempfängers“ (§ 14a Abs. 5 UStG)", /Steuerschuldnerschaft des Leistungsempfängers/.test(txt) ? "ja" : "nein", "ja");
     vergleich(`PDF ${x.nummer} (§ 13b)`, "keine Umsatzsteuer ausgewiesen (keine Zeile „Umsatzsteuer 19 %“)", /Umsatzsteuer 19 %/.test(txt) ? "19 % ausgewiesen" : "keine", "keine");
+    // StB-Prüfung C-2 (Nachtrag 22.10.2026): „Umsatzsteuer: entfällt (§ 13b UStG)“ statt „Umsatzsteuer 0 % … 0,00 €“
+    vergleich(`PDF ${x.nummer} (§ 13b, C-2)`, "Summenzeile „Umsatzsteuer: entfällt (§ 13b UStG)“ statt „Umsatzsteuer 0 %“", txt.includes("Umsatzsteuer: entfällt (§ 13b UStG)") && !/Umsatzsteuer 0 %/.test(txt) ? "ja" : "nein", "ja");
     vergleich(`PDF ${x.nummer} (§ 13b)`, "USt-IdNr. des Leistungsempfängers und des Leistenden", /DE814527390/.test(txt) && /DE297641853/.test(txt) ? "ja" : "nein", "ja");
   }
   if (x.r.hinweise?.includes("grundstueck")) vergleich(`PDF ${x.nummer} (Privatkunde)`, "Aufbewahrungshinweis § 14 Abs. 4 Nr. 9 UStG", /zwei Jahre aufzubewahren/.test(txt) ? "ja" : "nein", "ja");

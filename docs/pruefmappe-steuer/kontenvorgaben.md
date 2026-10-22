@@ -32,7 +32,7 @@ Eine JSON-Datei (UTF-8, mit oder ohne BOM), z. B. `kontenvorgaben.json`:
   },
   "optionen": {
     "belegeGegenBank": false,
-    "zahlungenBuchen": true,
+    "zahlungenBuchen": false,
     "gewinnermittlung": "bilanz"
   }
 }
@@ -49,7 +49,7 @@ Eine JSON-Datei (UTF-8, mit oder ohne BOM), z. B. `kontenvorgaben.json`:
 
 | Schlüssel | Bedeutung | Standard SKR03 | Standard SKR04 | Quelle des Standards |
 |---|---|---|---|---|
-| `verrechnungGesellschafter` | Kapitalgesellschaft: privat ausgelegte Belege, Barbelege vor dem ersten Kassenabschluss, Einlagen/Entnahmen der Kasse | 0755 | 3560 | Bericht B-6 („Verbindlichkeiten gegenüber Gesellschaftern, Restlaufzeit bis 1 Jahr“) – im DATEV-SKR03 heißt 0755 nach unserem Stand „… für offene Ausschüttungen“, 0731 „Restlaufzeit bis 1 Jahr“: bitte festlegen |
+| `verrechnungGesellschafter` | Kapitalgesellschaft: privat ausgelegte Belege, Barbelege vor dem ersten Kassenabschluss, Einlagen/Entnahmen der Kasse | 0731 | 3560 (**unsicher**) | Bericht B-6, korrigiert am 22.10.2026: SKR03 0731 „Verbindlichkeiten gegenüber Gesellschaftern – Restlaufzeit bis 1 Jahr“ (0755 ist das Konto für offene Ausschüttungen und hier falsch). **SKR04: Gegenstück zu 0731 laut Kanzlei folgt** (nach dem Testimport) – bis dahin bleibt 3560 |
 | `bank` | Zahlungseingänge bilanzierender Betriebe; mit `belegeGegenBank` auch Belege per Überweisung/Karte | 1200 | 1800 | bisheriger Prüfpunkt |
 | `forderungen` | Forderungen aus L+L (ohne Kontokorrent) | 1410 | 1210 | bisher |
 | `verbindlichkeiten` | Verbindlichkeiten aus L+L (ohne Kontokorrent) | 1610 | 3310 | bisher |
@@ -61,7 +61,7 @@ Eine JSON-Datei (UTF-8, mit oder ohne BOM), z. B. `kontenvorgaben.json`:
 | `kassendifferenzAufwand` | Kassenfehlbetrag laut Zählung | 4900 | 6300 | bisher |
 | `kassendifferenzErtrag` | Kassenüberschuss laut Zählung – leer: Erlöse 19 %; ein anderes Konto wird **ohne Umsatzsteuer** gebucht (dann zählt der Überschuss auch in Voranmeldung und EÜR-Übernahme nicht als Umsatz 19 %) | (Erlöse 19 %) | (Erlöse 19 %) | Bericht A-9/B-9: alternativ 2700 / 4830 „Sonstige Erträge“ |
 | `erloesNullsatz` | Erlöse zum Nullsteuersatz (§ 12 Abs. 3 UStG, PV), Kz 87 | 8290 | 4290 | Bericht B-2 nennt keine Nummer („in Rewe nach Nullsteuersatz bzw. § 12 Abs. 3 suchen“); 8290/4290 „Erlöse 0 % USt“ laut Herstellerangaben (microdat, Lexware) – **unsicher** |
-| `erloesOss` | Erlöse mit der Umsatzsteuer des Bestimmungslands (OSS, § 18j UStG); Land in Feld 40, Steuersatz in Feld 41 | 8320 | 4320 | „Erlöse aus im anderen EU-Land steuerpflichtigen Lieferungen“ laut Herstellerangabe (Lexware) – **unsicher**, Konto für sonstige Leistungen und Steuerschlüssel mit der Kanzlei klären |
+| `erloesOss` | Erlöse mit der Umsatzsteuer des Bestimmungslands (OSS, § 18j UStG); Land in Feld 40 (bei Privatpersonen nur das Länderkennzeichen), Steuersatz in Feld 41 | 8320 | 4320 | „Erlöse aus im anderen EU-Land steuerpflichtigen Lieferungen“; Kontenbereich 8320 ff./4320 ff. von der Kanzlei bestätigt (Nachtrag 22.10.2026) – Steuerschlüssel offen |
 | `homeoffice` | Homeoffice-Pauschale / häusliches Arbeitszimmer | 4288 | 6348 | Bericht B-11 („Nummer in Rewe prüfen“) |
 | `anlageMaschinen` | Anlagegut „Maschinen“ | 0400 | 0440 | Bericht B-10 |
 | `anlageBga` | Anlagegut „Betriebs- und Geschäftsausstattung“ (Standard der Kategorie „Anschaffung über 800 €“) | 0420 | 0650 | Bericht B-10 |
@@ -75,8 +75,8 @@ Die Art des Anlageguts wählt der Betrieb beim Beleg der Kategorie „Anschaffun
 | Schlüssel | Werte | Wirkung |
 |---|---|---|
 | `belegeGegenBank` | `true` / `false` (Standard) | Belege mit Zahlungsweg „Überweisung oder Karte“ direkt gegen `bank` statt gegen `verbindlichkeiten` |
-| `zahlungenBuchen` | `true` (Standard) / `false` | Nur bilanzierende Betriebe: Zahlungseingänge auf Rechnungen als Bank an Forderungen (Soll-Stapel, Befund A-4). Aus, wenn die Kanzlei die Zahlungen aus dem Kontoauszug bucht – sonst doppelt |
-| `gewinnermittlung` | `"bilanz"` / `"euer"` / fehlt | Fehlt: nach Rechtsform (GmbH, UG, AG, GmbH & Co. KG, e. K.) bzw. Mitteilung des Finanzamts (§ 141 AO) – Bilanz; sonst EÜR. Bei Bilanz sperrt die App die EÜR-Übernahme (E-4) und gibt einen Soll-Stapel mit Zahlungseingängen aus |
+| `zahlungenBuchen` | `true` / `false` (Standard) | Nur bilanzierende Betriebe: Zahlungseingänge auf Rechnungen als Bank an Forderungen (Soll-Stapel, Befund A-4). **Standard aus** (Nachtrag der Kanzlei vom 22.10.2026): Kanzleien buchen die Bank aus dem Kontoauszug; im Stapel stehen dann alle Rechnungen des Zeitraums als Forderung, `LIESMICH.txt` nennt den Saldo und die laut Rechnungsliste offenen Forderungen. Ein nur, wenn die Kanzlei die Zahlungseingänge aus der App übernimmt – dann nicht noch einmal aus dem Kontoauszug buchen |
+| `gewinnermittlung` | `"bilanz"` / `"euer"` / fehlt | Fehlt: nach Rechtsform (GmbH, UG, AG, GmbH & Co. KG, e. K.) bzw. Mitteilung des Finanzamts (§ 141 AO) – Bilanz; sonst EÜR. Bei Bilanz sperrt die App die EÜR-Übernahme (E-4) und gibt einen Soll-Stapel aus (Zahlungseingänge nur mit `zahlungenBuchen`) |
 
 ## Grenze
 

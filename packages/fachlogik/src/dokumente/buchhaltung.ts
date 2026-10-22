@@ -62,10 +62,20 @@ export const GUTSCHRIFT_AUSWAHL = "Gutschrift – Abrechnung durch den Leistungs
  */
 const BEFREIUNG_IN_SUMME = 90;
 const befreiungInSumme = (befreiung: string) => !!befreiung && !befreiung.includes("\n") && befreiung.length <= BEFREIUNG_IN_SUMME;
+/**
+ * StB-Prüfung C-2 (Nachtrag 22.10.2026): Bei § 13b und igL steht statt „Umsatzsteuer 0 % … 0,00 €“ eine Zeile ohne
+ * Steuersatz und ohne Betrag – sonst könnte sie als Steuerausweis bzw. Steuersatz missverstanden werden.
+ */
+export const UST_ENTFAELLT_13B = "Umsatzsteuer: entfällt (§ 13b UStG)";
+export const UST_ENTFAELLT_IGL = "Umsatzsteuer: entfällt (steuerfreie innergemeinschaftliche Lieferung, § 4 Nr. 1b UStG)";
+/** C-2: Summenzeile „Umsatzsteuer: entfällt …“ statt 0 % – null, wenn die Rechnung weder § 13b noch igL ist. */
+function ustEntfaellt(hinweise: string[]): string | null {
+  if (hinweise.includes("reverse_charge")) return UST_ENTFAELLT_13B;
+  if (hinweise.includes("igl")) return UST_ENTFAELLT_IGL;
+  return null;
+}
 /** Bezeichnung der 0-%-Zeile in der Summe: mit dem gewählten Grund statt pauschal „steuerfrei“ (Texte wie in den Pflichthinweisen). */
 function nullProzentText(hinweise: string[], befreiung: string): string {
-  if (hinweise.includes("reverse_charge")) return `Umsatzsteuer 0 % (${RECHNUNGS_HINWEISE.find((h) => h.wert === "reverse_charge")!.text})`;
-  if (hinweise.includes("igl")) return "Umsatzsteuer 0 % (steuerfreie innergemeinschaftliche Lieferung)";
   // der eigene Text (z. B. Steuerbefreiung nach § 4 UStG oder Nullsteuersatz) – kein pauschales „steuerfrei“
   if (befreiungInSumme(befreiung)) return `Umsatzsteuer 0 % (${befreiung.replace(/\.$/, "")})`;
   if (befreiung) return "Umsatzsteuer 0 % (siehe Hinweis)";
@@ -834,7 +844,13 @@ export const rechnung: Vorlage = {
     const summenZeilen = [
       // Kleinunternehmer: ohne Umsatzsteuer gibt es kein „netto“
       `<tr><td>${ku ? "Summe" : "Summe netto"}</td><td>${betrag(s.netto_cent)}</td></tr>`,
-      ...(ku ? [] : s.gruppen.map((g) => `<tr><td>${g.satz === 0 ? nullProzentText(auswahl(d, "hinweise"), befreiungText(d)) : `Umsatzsteuer ${g.satz} %`} auf ${euro(g.netto_cent)}</td><td>${euro(g.ust_cent)}</td></tr>`)),
+      ...(ku
+        ? []
+        : s.gruppen.map((g) => {
+            // C-2: § 13b bzw. igL ohne Satz und Betrag („entfällt“), sonst der Satz mit Bemessungsgrundlage und Steuer
+            const entfaellt = g.satz === 0 ? ustEntfaellt(auswahl(d, "hinweise")) : null;
+            return entfaellt ? `<tr><td>${entfaellt}</td><td></td></tr>` : `<tr><td>${g.satz === 0 ? nullProzentText(auswahl(d, "hinweise"), befreiungText(d)) : `Umsatzsteuer ${g.satz} %`} auf ${euro(g.netto_cent)}</td><td>${euro(g.ust_cent)}</td></tr>`;
+          })),
       // leere Vorlage: Zeile für die Umsatzsteuer mit Steuersatz zum Eintragen
       ...(leer && !ku ? [`<tr><td>Umsatzsteuer <span class="fuellen kurz"></span> %</td><td>&nbsp;</td></tr>`] : []),
       // Kleinbetragsrechnung (§ 33 Satz 1 Nr. 4 UStDV): der Steuersatz steht beim Gesamtbetrag („inkl. 19 % USt“)

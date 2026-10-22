@@ -95,7 +95,7 @@ export function KontenvorgabenSeite() {
         </Karte>
         <T v="klein" fett stil={{ marginTop: 22 }}>{TEXT.stb_kv_optionen}</T>
         <Schalter label={TEXT.stb_kv_bank} hilfe={TEXT.stb_kv_bank_hilfe} wert={v.belegeGegenBank === true} aendern={(x) => setzen({ ...v, belegeGegenBank: x })} />
-        <Schalter label={TEXT.stb_kv_zahlungen} hilfe={TEXT.stb_kv_zahlungen_hilfe} wert={v.zahlungenBuchen !== false} aendern={(x) => setzen({ ...v, zahlungenBuchen: x })} />
+        <Schalter label={TEXT.stb_kv_zahlungen} hilfe={TEXT.stb_kv_zahlungen_hilfe} wert={v.zahlungenBuchen === true} aendern={(x) => setzen({ ...v, zahlungenBuchen: x })} />
         <Wahl
           label={TEXT.stb_kv_gewinn}
           hilfe={TEXT.stb_kv_gewinn_hilfe}
