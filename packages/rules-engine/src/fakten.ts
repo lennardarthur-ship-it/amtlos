@@ -22,6 +22,13 @@ export function mitAbgeleitetenFakten(profil: Fakten, stichtag: Datum): Fakten {
     f["abgeleitet.ist_kapitalgesellschaft_oder_co_kg"] = rechtsform === "ug" || rechtsform === "gmbh" || rechtsform === "gmbh_co_kg";
     // R12: juristische Personen und eingetragene Personengesellschaften (§ 20 Abs. 1 GwG, Registeranmeldung)
     f["abgeleitet.ist_eingetragene_gesellschaft"] = ["ug", "gmbh", "gmbh_co_kg", "partg", "partg_mbb"].includes(rechtsform);
+    // Freigabe Weber 22.10.2026 (B.16): die GbR ist eingetragene Personengesellschaft erst mit dem Eintrag im
+    // Gesellschaftsregister (eGbR, § 707 BGB) – Angabe wie bei den anderen Gesellschaften; ohne Angabe unbekannt (E-033)
+    if (rechtsform === "gbr") {
+      const register = profil["profil.gesellschaft.handelsregister"];
+      if (typeof register === "string") f["abgeleitet.ist_eingetragene_gesellschaft"] = register === "eingetragen";
+      else delete f["abgeleitet.ist_eingetragene_gesellschaft"];
+    }
   }
   if (typeof einordnung === "string" && einordnung !== "unklar") f["abgeleitet.ist_gewerbe"] = einordnung === "gewerbe";
   if (typeof gruendung === "string") {
@@ -44,7 +51,8 @@ export function mitAbgeleitetenFakten(profil: Fakten, stichtag: Datum): Fakten {
 export const QUELLFAKTEN: Readonly<Record<string, readonly string[]>> = {
   "abgeleitet.ist_kapitalgesellschaft": ["profil.rechtsform"],
   "abgeleitet.ist_kapitalgesellschaft_oder_co_kg": ["profil.rechtsform"],
-  "abgeleitet.ist_eingetragene_gesellschaft": ["profil.rechtsform"],
+  // bei der GbR entscheidet zusätzlich der Eintrag im Gesellschaftsregister (eGbR)
+  "abgeleitet.ist_eingetragene_gesellschaft": ["profil.rechtsform", "profil.gesellschaft.handelsregister"],
   "abgeleitet.ist_gewerbe": ["profil.taetigkeit.einordnung"],
   "abgeleitet.ist_gruendungsjahr": ["profil.gruendungsdatum"],
   "abgeleitet.ist_vorjahr_gruendungsjahr": ["profil.gruendungsdatum"],
@@ -53,9 +61,15 @@ export const QUELLFAKTEN: Readonly<Record<string, readonly string[]>> = {
   "abgeleitet.hat_beschaeftigte": ["profil.beschaeftigte.gesamt"],
 };
 
-/** Ersetzt abgeleitete Fakten durch die Angaben, die der Nutzer machen kann. */
-export function zuErfragendeFakten(fakten: Iterable<string>): string[] {
+/**
+ * Ersetzt abgeleitete Fakten durch die Angaben, die der Nutzer machen kann. Mit `bekannt` entfallen Quellangaben, die
+ * schon vorliegen (z. B. die Rechtsform „GbR“, wenn nur der Registereintrag fehlt).
+ */
+export function zuErfragendeFakten(fakten: Iterable<string>, bekannt?: Fakten): string[] {
   const ergebnis = new Set<string>();
-  for (const f of fakten) for (const q of QUELLFAKTEN[f] ?? [f]) ergebnis.add(q);
+  for (const f of fakten) {
+    const quellen = QUELLFAKTEN[f] ?? [f];
+    for (const q of quellen) if (!bekannt || quellen.length === 1 || bekannt[q] === undefined || bekannt[q] === null) ergebnis.add(q);
+  }
   return [...ergebnis];
 }

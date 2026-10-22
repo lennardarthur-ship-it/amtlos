@@ -1,0 +1,65 @@
+# Prüfvermerk RA Dr. Weber 22.10.2026 (G.72): Vertreiberpflichten (Rücknahme von Gerätebatterien) als eigener Hinweis
+# Wortlaut gelesen am 22.10.2026: § 14 BattDG, Art. 62 VO (EU) 2023/1542, § 4 Abs. 2 und § 60 BattDG
+schema_version: 1
+id: produkte.geraetebatterien_ruecknahme
+version: 1
+katalog_nr: G.72
+titel:
+  de: Altbatterien zurücknehmen, wenn du Gerätebatterien verkaufst
+kurz:
+  de: Verkaufst du Gerätebatterien oder Batterien für leichte Verkehrsmittel, nimmst du Altbatterien dieser Art von Endnutzern kostenlos zurück – auch ohne Neukauf.
+erklaerung:
+  de: 'Händler nehmen Geräte-Altbatterien und Altbatterien für leichte Verkehrsmittel (LV-Altbatterien, etwa aus E-Bikes und E-Scootern) vom Endnutzer im Geschäft oder in unmittelbarer Nähe unentgeltlich zurück – unabhängig von chemischer Zusammensetzung, Marke, Herkunft, Baugröße und Beschaffenheit und ohne dass ein Neukauf verlangt werden darf (Art. 62 Abs. 1 VO (EU) 2023/1542, § 14 Abs. 1 Satz 1 BattDG). Die Pflicht gilt für die Batteriekategorien, die du als Neubatterien führst oder geführt hast, und für die Mengen, die Endnutzer üblicherweise abgeben; Geräte mit eingebauten Altbatterien fallen nicht darunter – für sie gilt das Elektrogesetz (§ 14 Abs. 1 Satz 2 bis 4 BattDG). Verkaufst du im Fernabsatz, richtest du Rückgabemöglichkeiten in zumutbarer Entfernung zu deinen Kunden ein (§ 14 Abs. 2 BattDG, Art. 62 Abs. 4, 5 VO (EU) 2023/1542). Die zurückgenommenen Altbatterien überlässt du einer für die Batteriekategorie zugelassenen Organisation für Herstellerverantwortung (§ 14 Abs. 3 BattDG). Batterien bereitstellen darfst du nur, wenn Endnutzer Altbatterien bei dir zurückgeben können (§ 4 Abs. 2 BattDG).'
+rechtsgrundlage:
+- § 14 BattDG
+- § 4 Abs. 2 BattDG
+- Art. 62 Verordnung (EU) 2023/1542
+kategorie: produkte
+branchen:
+- onlinehandel
+ausloeser:
+  feld: profil.produkte.arten
+  op: enthaelt
+  wert: batterien
+  label:
+    de: Du verkaufst Batterien oder Geräte mit Batterien.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Organisation für Herstellerverantwortung
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: 'Bußgeld bis 100.000 €, wenn du Batterien bereitstellst, ohne deine Rücknahmepflichten zu erfüllen (§ 60 Abs. 1 Nr. 1 Buchst. b, Abs. 3 in Verbindung mit § 4 Abs. 2 BattDG) oder zurückgenommene Altbatterien keiner Organisation für Herstellerverantwortung überlässt (§ 60 Abs. 1 Nr. 6, Abs. 3 in Verbindung mit § 14 Abs. 3 Satz 1 BattDG); bis 10.000 €, wenn du eine Altbatterie nicht, nicht richtig oder nicht vollständig zurücknimmst (§ 60 Abs. 2 Nr. 26, Abs. 3 BattDG in Verbindung mit Art. 62 Abs. 1 VO (EU) 2023/1542).'
+  schwere: mittel
+automatisierung: hinweis
+einordnung: pflicht
+aktion:
+  art: abhaken
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Batterierecht-Durchführungsgesetz § 14 (Rücknahmepflichten der Händler), Wortlaut (gesetze.legal)
+  url: https://gesetze.legal/bund/battdg/14
+  abgerufen: '2026-10-22'
+- titel: Art. 62 VO (EU) 2023/1542 (Pflichten der Händler), Wortlaut (gesetze.legal)
+  url: https://gesetze.legal/eu/vo_eu_2023_1542/62
+  abgerufen: '2026-10-22'
+- titel: Batterierecht-Durchführungsgesetz § 4 (Verkehrsverbote)
+  url: https://www.gesetze-im-internet.de/battdg/__4.html
+  abgerufen: '2026-10-22'
+- titel: Batterierecht-Durchführungsgesetz § 60 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/battdg/__60.html
+  abgerufen: '2026-10-22'
+fachlich_zu_pruefen:
+- 'neu am 22.10.2026, Prüfung durch RA Dr. Weber ausstehend'
+- 'Auslöser „Batterien“ im Sortiment (profil.produkte.arten) – das Profil unterscheidet nicht nach Batteriekategorie; wer nur Geräte mit eingebauten Batterien oder nur Starterbatterien verkauft, fällt nicht unter § 14 BattDG (Starterbatterien: produkte.starterbatterien_ruecknahme)'
+- 'Sanktion: § 60 Abs. 1 Nr. 1 Buchst. b, Nr. 6 und Abs. 2 Nr. 26, Abs. 3 BattDG am 22.10.2026 gelesen (gesetze-im-internet.de) – Höhe je Nummer fachlich zu bestätigen'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

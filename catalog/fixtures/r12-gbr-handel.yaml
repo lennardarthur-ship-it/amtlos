@@ -3,6 +3,8 @@ beschreibung: "R12 (Rechtsprüfung Befunde 5, 18): GbR mit Gewerbe – Hinweise 
 stichtag: "2026-10-21"
 fakten:
   profil.rechtsform: gbr
+  # Freigabe Weber 22.10.2026: Registerfrage auch für die GbR (Gesellschaftsregister) – hier nicht eingetragen
+  profil.gesellschaft.handelsregister: nicht_beantragt
   profil.gruendungsdatum: "2023-05-01"
   profil.taetigkeit.einordnung: gewerbe
   profil.taetigkeit.branchen: [onlinehandel]

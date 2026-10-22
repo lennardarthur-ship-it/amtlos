@@ -1,14 +1,14 @@
 # R12 (Nutzertest Kfz #2): Klimaanlagen-Service an Fahrzeugen – Sachkunde für F-Gase
 schema_version: 1
 id: umwelt.klima_sachkunde
-version: 2
+version: 3
 katalog_nr: U.5
 titel:
   de: Klimaanlagen an Fahrzeugen nur mit Sachkunde warten
 kurz:
   de: Wer Klimaanlagen in Fahrzeugen befüllt, wartet oder Kältemittel absaugt, braucht eine Bescheinigung über die Sachkunde für fluorierte Treibhausgase.
 erklaerung:
-  de: Arbeiten an Fahrzeug-Klimaanlagen, bei denen Kältemittel zurückgewonnen oder nachgefüllt wird, dürfen nur Personen mit einer Bescheinigung über ihre Sachkunde ausführen. Das regeln die EU-F-Gase-Verordnung (EU) 2024/573 und die Chemikalien-Klimaschutzverordnung. Halte die Bescheinigungen deiner Mitarbeitenden bereit.
+  de: Arbeiten an Fahrzeug-Klimaanlagen, bei denen Kältemittel zurückgewonnen oder nachgefüllt wird, dürfen nur Personen mit einer Bescheinigung über ihre Sachkunde ausführen. Das regeln die EU-F-Gase-Verordnung (EU) 2024/573 und die Chemikalien-Klimaschutzverordnung. Halte die Bescheinigungen deiner Mitarbeitenden bereit. Bescheinigungen nach der früheren F-Gase-Verordnung (EU) Nr. 517/2014 bleiben unter den Bedingungen gültig, unter denen sie ausgestellt wurden; wer eine solche Bescheinigung hat, nimmt aber spätestens am 12.3.2029 erstmals an einem Auffrischungskurs teil oder schließt ein Bewertungsverfahren ab (Art. 10 Abs. 9 VO (EU) 2024/573).
 rechtsgrundlage:
 - Verordnung (EU) 2024/573
 - ChemKlimaschutzV
@@ -42,6 +42,10 @@ status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
 quellen:
+- titel: Art. 10 VO (EU) 2024/573 (Schulung und Zertifizierung), Wortlaut (gesetze.legal)
+  url: https://gesetze.legal/eu/vo_eu_2024_573/10
+  abgerufen: '2026-10-22'
+  fundstelle: Art. 10 Abs. 1 UAbs. 2 Buchst. a, Abs. 9
 - titel: Umweltbundesamt – Übersicht über Sachkundebescheinigungen und Unternehmenszertifikate
   url: https://www.umweltbundesamt.de/system/files/medien/10594/bilder/dateien/%C3%9Cbersicht%20%C3%BCber%20Sachkundebescheinigungen%20und%20Unternehmenszertifikate.pdf
   abgerufen: '2026-10-22'
@@ -55,7 +59,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/chemg/__26.html
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Neu nach Nutzertest R12 (Kfz #2) – genaue Artikel der VO (EU) 2024/573 und § 5 ChemKlimaschutzV unsicher. Prüfvermerk RA Dr. Weber 22.10.2026: Art. 10 VO (EU) 2024/573 i. V. m. ChemKlimaschutzV und Sanktion § 26 ChemG bestätigt; Zusatz „alte Bescheinigungen bleiben gültig, müssen aber nach der neuen VO aktualisiert werden (Art. 10 Abs. 7 – Frist prüfen)“ nicht übernommen: Art. 10 Abs. 7 am 22.10.2026 nicht abrufbar (EUR-Lex-Seite abgeschnitten); § 17 Abs. 2 ChemKlimaschutzV 2026 (gelesen) lässt alte Sachkundebescheinigungen bis 12.3.2029 weitergelten (Nr. 1), ob das die Kfz-Bescheinigungen nach VO (EG) Nr. 307/2008 erfasst, ist offen'
+- 'Neu nach Nutzertest R12 (Kfz #2) – genaue Artikel der VO (EU) 2024/573 und § 5 ChemKlimaschutzV unsicher. Prüfvermerk RA Dr. Weber 22.10.2026: Art. 10 VO (EU) 2024/573 i. V. m. ChemKlimaschutzV und Sanktion § 26 ChemG bestätigt; Zusatz „alte Bescheinigungen bleiben gültig, müssen aber nach der neuen VO aktualisiert werden (Art. 10 Abs. 7 – Frist prüfen)“: am 22.10.2026 am Wortlaut gelesen (gesetze.legal) – die Regel steht in Art. 10 Abs. 9, nicht in Abs. 7 (Abs. 7: Zertifikate nur nach bestandenem Bewertungsverfahren); Abs. 9 Satz 1: Zertifikate und Ausbildungsbescheinigungen nach VO (EU) Nr. 517/2014 bleiben gültig, Satz 3: erste Auffrischung oder Bewertung spätestens am 12.3.2029 – so in die Erklärung übernommen (Fundstelle Abs. 9); § 17 Abs. 2 ChemKlimaschutzV 2026 (gelesen) lässt alte Sachkundebescheinigungen bis 12.3.2029 weitergelten (Nr. 1), ob das die Kfz-Bescheinigungen nach VO (EG) Nr. 307/2008 erfasst, ist offen'
 - 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 5 Abs. 1 und § 16 Abs. 2 Nr. 3 ChemKlimaschutzV 2026, § 26 Abs. 1 Nr. 7 Buchst. a, Abs. 3 ChemG; Zuordnung der Kfz-Klimaanlagen zu Art. 10 Abs. 1 UAbs. 2 VO (EU) 2024/573 laut UBA-Übersicht gelesen; Rechtsgrundlage auf ChemKlimaschutzV 2026 (§§ 5, 6) präzisieren – fachlich zu bestätigen'
 pruefung:
   status: entwurf

@@ -60,6 +60,8 @@ export const CHECK_FELDER = [
   "fahrzeuge.anzahl",
   "fahrzeuge.gesamtmasse",
   "fahrzeuge.ausland",
+  // Prüfvermerk RA Dr. Weber 22.10.2026 (H.5): Werkverkehr erlaubnisfrei, Personenbeförderung mit Genehmigung
+  "fahrzeuge.befoerderung",
   "umwelt.taetigkeiten",
   "bauleistungen.fuer_unternehmen",
   // R12 (Kurier #5, Zoll #13): Subunternehmer
@@ -134,6 +136,10 @@ function passtImmer(feld: string, p: Profil): boolean {
   // R12 (Kurier #2): ohne Firmenfahrzeuge keine Fragen zu Gewicht und Ausland; Ausland nur bei 2,5 bis 3,5 t
   if ((feld === "fahrzeuge.gesamtmasse" || feld === "fahrzeuge.ausland") && zahl(p, "fahrzeuge.anzahl") === 0) return false;
   if (feld === "fahrzeuge.ausland" && liste(p, "fahrzeuge.gesamtmasse") && !liste(p, "fahrzeuge.gesamtmasse")!.some((x) => MITTELSCHWER.includes(x))) return false;
+  if (feld === "fahrzeuge.befoerderung" && zahl(p, "fahrzeuge.anzahl") === 0) return false;
+  // Prüfvermerk RA Dr. Weber 22.10.2026: Produktliste nach § 1 Abs. 2 BFSG nur bei Elektrogeräten, erstes Inverkehrbringen nur bei verpackter Ware
+  if (feld === "produkte.bfsg_produkte" && liste(p, "produkte.arten") && !liste(p, "produkte.arten")!.includes("elektrogeraete")) return false;
+  if (feld === "produkte.verpackung_ab" && liste(p, "produkte.arten") && !liste(p, "produkte.arten")!.includes("verpackung")) return false;
   // R12 (Kurier #14): wer kein Bargeld annimmt, braucht keine Kasse
   if (feld === "kasse.elektronisch" && p["kasse.bargeld"] === false) return false;
   // R12 (UX #3): wer die Kleinunternehmerregelung nutzt, gibt keine Voranmeldung ab
@@ -173,6 +179,7 @@ const FRAGE_PASST: Record<string, (p: Profil) => boolean> = {
   "arbeitszeit.nachtarbeit": (p) => mitTeam(p) && inBranche(p, "gastronomie_lebensmittel", "transport_logistik", "gesundheit_pflege", "gebaeudereinigung"),
   "fahrzeuge.anzahl": (p) => inBranche(p, "transport_logistik", "handwerk", "bau", "gebaeudereinigung"),
   "fahrzeuge.gesamtmasse": (p) => inBranche(p, "transport_logistik") && (zahl(p, "fahrzeuge.anzahl") ?? 0) >= 1,
+  "fahrzeuge.befoerderung": (p) => inBranche(p, "transport_logistik") && (zahl(p, "fahrzeuge.anzahl") ?? 0) >= 1,
   "fahrzeuge.ausland": (p) => inBranche(p, "transport_logistik") && (zahl(p, "fahrzeuge.anzahl") ?? 0) >= 1 && Boolean(liste(p, "fahrzeuge.gesamtmasse")?.some((x) => MITTELSCHWER.includes(x))),
   "umwelt.taetigkeiten": (p) => inBranche(p, "handwerk"),
   "nachunternehmer": (p) => inBranche(p, "bau", "gebaeudereinigung", "transport_logistik"),

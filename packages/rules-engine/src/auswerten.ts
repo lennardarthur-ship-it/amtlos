@@ -101,7 +101,7 @@ export function auswerten(e: Eingabe): PflichtErgebnis[] {
         radar: RADAR.has(p.status_recht),
         ergebnis: begruendung.ergebnis,
         begruendung,
-        fehlende_fakten: zuErfragendeFakten(fehlend),
+        fehlende_fakten: zuErfragendeFakten(fehlend, fakten),
         regelwerte_genutzt: regelwerteGenutzt,
         termine,
         hinweise,

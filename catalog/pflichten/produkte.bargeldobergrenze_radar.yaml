@@ -1,0 +1,75 @@
+# Prüfvermerk RA Dr. Weber 22.10.2026 (G.75): Bargeldobergrenze 10.000 € ab 10.7.2027 nach Art. 80 AMLR – „als Radar richtig“
+# Wortlaut gelesen am 22.10.2026: Art. 80 Abs. 1, 4 und Art. 90 VO (EU) 2024/1624 (Haufe-Normtext, Springlex)
+schema_version: 1
+id: produkte.bargeldobergrenze_radar
+version: 1
+katalog_nr: G.75
+titel:
+  de: 'Bargeldobergrenze 10.000 € (ab 10.7.2027)'
+kurz:
+  de: Ab 10.7.2027 darfst du für Waren oder Dienstleistungen keine Barzahlungen über 10.000 € mehr annehmen oder leisten – auch nicht in mehreren zusammenhängenden Teilbeträgen.
+erklaerung:
+  de: 'Die EU-Geldwäscheverordnung (EU) 2024/1624 gilt ab 10.7.2027 (Art. 90). Personen, die mit Gütern handeln oder Dienstleistungen erbringen, dürfen dann Barzahlungen nur bis höchstens 10.000 € oder den Gegenwert in anderer Währung entgegennehmen oder vornehmen – egal, ob in einem Vorgang oder in mehreren Vorgängen, zwischen denen eine Verbindung zu bestehen scheint (Art. 80 Abs. 1). Ausgenommen sind Zahlungen zwischen Privatpersonen, die nicht beruflich handeln, und Zahlungen oder Einlagen in den Räumen von Banken und Zahlungsdienstleistern (Art. 80 Abs. 4). Die Mitgliedstaaten dürfen niedrigere Obergrenzen festlegen (Art. 80 Abs. 2). Bis dahin gelten die Sorgfaltspflichten des Geldwäschegesetzes bei hohen Bargeschäften weiter.'
+rechtsgrundlage:
+- Art. 80 Verordnung (EU) 2024/1624
+- Art. 90 Verordnung (EU) 2024/1624
+kategorie: produkte
+ausloeser:
+  all:
+  - feld: profil.produkte.arten
+    op: enthaelt_eines
+    wert:
+    - physisch
+    - elektrogeraete
+    - batterien
+    - kosmetik
+    - lebensmittel
+    label:
+      de: Du verkaufst Waren.
+  - feld: profil.handel.hohe_bargeschaefte
+    op: ==
+    wert: true
+    label:
+      de: Du nimmst hohe Barzahlungen für Waren an.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Noch keine – die Obergrenze gilt ab 10.7.2027; die Sanktionen legen die Mitgliedstaaten fest (Art. 80 Abs. 5 VO (EU) 2024/1624).
+  schwere: mittel
+automatisierung: hinweis
+einordnung: hinweis
+status_recht: beschlossen
+radar:
+  wahrscheinlichkeit: sicher
+  erwartet_ab: '2027-07-10'
+  vorbereitung:
+  - de: Prüfen, bei welchen Geschäften Barzahlungen über 10.000 € vorkommen
+  - de: Kundschaft auf Überweisung oder Kartenzahlung umstellen
+gueltig_ab: '2027-07-10'
+gueltig_bis: null
+quellen:
+- titel: Art. 80 VO (EU) 2024/1624 – Begrenzung von Barzahlungen großer Beträge (Haufe, Normtext)
+  url: https://www.haufe.de/id/norm/verordnung-eu-20241624-des-europaeischen-parlaments-un-art-80-begrenzung-barzahlungen-grosser-betraege-fuer-gueter-oder-dienstleistungen-HI17071721_p80.html
+  abgerufen: '2026-10-22'
+  fundstelle: Art. 80 Abs. 1, 4
+- titel: Art. 90 VO (EU) 2024/1624 – Inkrafttreten und Geltungsbeginn (Haufe, Normtext)
+  url: https://www.haufe.de/id/norm/verordnung-eu-20241624-des-europaeischen-parlaments-un-art-90-inkrafttreten-und-geltungsbeginn-HI17071721_p90.html
+  abgerufen: '2026-10-22'
+- titel: Art. 80 AMLR (VO (EU) 2024/1624, ABl. L 2024/1624 vom 19.6.2024) – Springlex
+  url: https://www.springlex.eu/de/packages/aml/amlr-regulation/article-80/
+  abgerufen: '2026-10-22'
+fachlich_zu_pruefen:
+- 'neu am 22.10.2026, Prüfung durch RA Dr. Weber ausstehend'
+- 'Auslöser wie produkte.geldwaesche_gueterhaendler (Warenverkauf mit hohen Barzahlungen) – Art. 80 erfasst auch Dienstleistungen und das Leisten von Barzahlungen; das Profil fragt hohe Barzahlungen nur für Waren ab'
+- 'Sanktion: Art. 80 Abs. 5 verlangt Sanktionen der Mitgliedstaaten; deutsche Bußgeldnorm am 22.10.2026 nicht gesucht – ergänzen, sobald geregelt. Amtsblatt-Text (EUR-Lex) nicht abgerufen, Wortlaut aus Haufe-Normtext und Springlex'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

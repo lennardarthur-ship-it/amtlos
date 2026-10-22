@@ -2,7 +2,7 @@
 # Rechtsstand 21.10.2026: VerpackG seit 12.8.2026 durch VerpackDG (BGBl. 2026 I Nr. 207) abgelöst – Fundstelle am 22.10.2026 belegt
 schema_version: 1
 id: produkte.verpackung
-version: 5
+version: 6
 katalog_nr: G.71
 titel:
   de: Verpackungen registrieren und lizenzieren
@@ -24,8 +24,17 @@ ausloeser:
   wert: verpackung
   label:
     de: Du bringst verpackte Waren in Verkehr.
+# Prüfvermerk RA Dr. Weber 22.10.2026: Frist am ersten Inverkehrbringen – Datum nur von Betrieben, die damit noch nicht begonnen haben
+# (profil.produkte.verpackung_ab); ohne Datum kein Termin, Bestandsbetriebe bekommen also keine überfällige Frist
 frist:
-  typ: dauerhaft
+  typ: relativ
+  bezug:
+    fakt: profil.produkte.verpackung_ab
+  versatz: P0D
+  zeitpunkt: vor_beginn
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
 wiederholung:
   art: einmalig
 stelle:
@@ -60,7 +69,7 @@ quellen:
 fachlich_zu_pruefen:
 - 'Prüfvermerk RA Dr. Weber 22.10.2026 (Fundstelle belegen): VerpackDG vom 13.7.2026, BGBl. 2026 I Nr. 207, in Kraft 12.8.2026 (Art. 8 Abs. 7) am 22.10.2026 auf gesetze-im-internet.de belegt; § 6 Abs. 1 Satz 1 „vor dem erstmaligen Bereitstellen“, § 7 Abs. 1 Satz 1 „vor der Bereitstellung“ gelesen. Abgrenzung systembeteiligungspflichtig nicht weiter geprüft'
 - 'Neue Herstellerpflichten aus der PPWR (z. B. Herstellerregister nach Art. 44, Kennzeichnung) und B2B-Verpackungen (§ 68 Abs. 9 VerpackDG, Übergang bis 31.12.2027) nicht abgebildet'
-- 'Prüfvermerk RA Dr. Weber 22.10.2026: Frist mit Ereignis „erstes Inverkehrbringen“ abbilden – nicht umgesetzt (kein Ereignis im Ereigniskatalog, bräuchte eine neue Datumsfrage; Bestandsbetriebe bekämen eine überfällige Frist), nur im Text; Sanktionen plausibel'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: Frist mit Ereignis „erstes Inverkehrbringen“ – umgesetzt als relative Frist (vor Beginn) zur neuen Angabe profil.produkte.verpackung_ab („Ab wann bringst du zum ersten Mal verpackte Waren in Verkehr?“, nur bei verpackter Ware, ausdrücklich nur für Betriebe, die noch nicht begonnen haben); ohne Datum kein Termin – Bestandsbetriebe bekommen keine überfällige Frist; Sanktionen plausibel'
 pruefung:
   status: entwurf
   geprueft_von: null

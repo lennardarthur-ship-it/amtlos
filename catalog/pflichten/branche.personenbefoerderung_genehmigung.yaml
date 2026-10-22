@@ -1,0 +1,65 @@
+# Prüfvermerk RA Dr. Weber 22.10.2026 (H.5, branche.transport_erlaubnis): „Personenbeförderung (PBefG) eigener Auslöser“
+# Wortlaut gelesen am 22.10.2026: § 1 Abs. 1, 2, § 2 Abs. 1 Satz 1, § 61 Abs. 1 Nr. 1, Abs. 2 PBefG (gesetze-im-internet.de)
+schema_version: 1
+id: branche.personenbefoerderung_genehmigung
+version: 1
+katalog_nr: H.5
+titel:
+  de: Genehmigung für die Personenbeförderung
+kurz:
+  de: Wer Personen entgeltlich oder geschäftsmäßig mit Kraftfahrzeugen befördert – etwa mit Taxi, Mietwagen oder Bus –, braucht eine Genehmigung nach dem Personenbeförderungsgesetz.
+erklaerung:
+  de: 'Das Personenbeförderungsgesetz gilt für die entgeltliche oder geschäftsmäßige Beförderung von Personen; als Entgelt zählen auch wirtschaftliche Vorteile (§ 1 Abs. 1 PBefG). Wer mit Kraftfahrzeugen im Linienverkehr oder im Gelegenheitsverkehr – dazu gehören Taxi- und Mietwagenverkehr – Personen befördert, muss eine Genehmigung haben (§ 2 Abs. 1 Satz 1 PBefG). Ausgenommen sind Fahrten mit Personenkraftwagen, die unentgeltlich sind oder deren Gesamtentgelt je Kilometer den Betrag nach § 5 Abs. 2 Satz 1 des Bundesreisekostengesetzes nicht übersteigt (§ 1 Abs. 2 PBefG). Die Genehmigung beantragst du vor dem Start bei der zuständigen Genehmigungsbehörde deines Landes.'
+rechtsgrundlage:
+- §§ 1, 2 PBefG
+kategorie: branche
+branchen:
+- transport_logistik
+ausloeser:
+  all:
+  - feld: profil.taetigkeit.branchen
+    op: enthaelt
+    wert: transport_logistik
+    label:
+      de: Dein Betrieb gehört zu Transport und Logistik.
+  - feld: profil.fahrzeuge.befoerderung
+    op: enthaelt
+    wert: personen
+    label:
+      de: Ihr befördert Personen gegen Entgelt.
+phase: gruendung
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Genehmigungsbehörde nach dem Personenbeförderungsgesetz
+kanal: post
+kosten: null
+sanktion:
+  text:
+    de: 'Bußgeld bis 20.000 €, wenn du Personen mit Kraftfahrzeugen ohne die erforderliche Genehmigung oder einstweilige Erlaubnis beförderst (§ 61 Abs. 1 Nr. 1, Abs. 2 PBefG).'
+  schwere: mittel
+dringend_ohne_termin: true
+automatisierung: hinweis
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Personenbeförderungsgesetz § 1
+  url: https://www.gesetze-im-internet.de/pbefg/__1.html
+  abgerufen: '2026-10-22'
+- titel: Personenbeförderungsgesetz (Volltext, § 2)
+  url: https://www.gesetze-im-internet.de/pbefg/BJNR002410961.html
+  abgerufen: '2026-10-22'
+  fundstelle: § 2 Abs. 1 Satz 1
+- titel: Personenbeförderungsgesetz § 61 (Ordnungswidrigkeiten)
+  url: https://www.gesetze-im-internet.de/pbefg/__61.html
+  abgerufen: '2026-10-22'
+fachlich_zu_pruefen:
+- 'neu am 22.10.2026, Prüfung durch RA Dr. Weber ausstehend'
+- 'Auslöser: neue Angabe profil.fahrzeuge.befoerderung („Personen gegen Entgelt“), gefragt bei Transport und Logistik mit Firmenfahrzeugen; weitere Ausnahmen und Freistellungen über § 1 Abs. 2 PBefG hinaus nicht geprüft; zuständige Behörde je Land nicht hinterlegt'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

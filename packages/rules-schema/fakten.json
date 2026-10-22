@@ -333,6 +333,27 @@
       "ab": 2
     },
     {
+      "pfad": "profil.produkte.bfsg_produkte",
+      "typ": "enum_liste",
+      "werte": [
+        "universalrechner",
+        "zahlungsterminal",
+        "selbstbedienungsterminal",
+        "telekommunikation",
+        "audiovisuell",
+        "ebook_reader",
+        "keine"
+      ],
+      "herleitung": "Onboarding (Prüfvermerk RA Dr. Weber 22.10.2026, G.70): Produkte nach § 1 Abs. 2 BFSG im Sortiment – Hardwaresysteme für Universalrechner (Nr. 1), Zahlungsterminals (Nr. 2 Buchst. a), Selbstbedienungsterminals (Nr. 2 Buchst. b), Verbraucherendgeräte für Telekommunikationsdienste (Nr. 3) und für audiovisuelle Mediendienste (Nr. 4), E-Book-Lesegeräte (Nr. 5)",
+      "ab": 2
+    },
+    {
+      "pfad": "profil.produkte.verpackung_ab",
+      "typ": "datum",
+      "herleitung": "Onboarding (Prüfvermerk RA Dr. Weber 22.10.2026, G.71): ab wann der Betrieb erstmals verpackte Waren in Verkehr bringt – nur, wenn er damit noch nicht begonnen hat; Bezug der Registrierung vor dem erstmaligen Bereitstellen (§§ 6, 7 VerpackDG)",
+      "ab": 2
+    },
+    {
       "pfad": "profil.produkte.hersteller",
       "typ": "bool",
       "herleitung": "Onboarding (R10): stellt eigene Produkte her, verkauft unter eigenem Namen bzw. eigener Marke oder importiert von außerhalb der EU",
@@ -414,6 +435,17 @@
       "pfad": "profil.fahrzeuge.ausland",
       "typ": "bool",
       "herleitung": "Onboarding (R12): Güterbeförderung auch grenzüberschreitend oder als Kabotage (VO (EG) Nr. 561/2006 ab 2,5 t seit 1.7.2026, Gemeinschaftslizenz)",
+      "ab": 2
+    },
+    {
+      "pfad": "profil.fahrzeuge.befoerderung",
+      "typ": "enum_liste",
+      "werte": [
+        "fremde_gueter",
+        "eigene_gueter",
+        "personen"
+      ],
+      "herleitung": "Onboarding (Prüfvermerk RA Dr. Weber 22.10.2026, H.5): was mit den Firmenfahrzeugen befördert wird – Güter für andere (gewerblicher Güterkraftverkehr, § 1 Abs. 1 GüKG), nur eigene Güter (Werkverkehr, § 1 Abs. 2, 3 GüKG), Personen gegen Entgelt (§§ 1, 2 PBefG)",
       "ab": 2
     },
     {
@@ -701,7 +733,7 @@
         "beantragt",
         "eingetragen"
       ],
-      "herleitung": "Onboarding / Gründungsassistent (Kapitalgesellschaft, R12 auch GmbH & Co. KG und Partnerschaftsgesellschaft: Handels- bzw. Partnerschaftsregister)",
+      "herleitung": "Onboarding / Gründungsassistent (Kapitalgesellschaft, R12 auch GmbH & Co. KG und Partnerschaftsgesellschaft: Handels- bzw. Partnerschaftsregister; Freigabe Weber 22.10.2026, B.16: bei der GbR das Gesellschaftsregister – „eingetragen“ = eGbR, § 707 BGB)",
       "ab": 3
     },
     {
@@ -759,7 +791,7 @@
     {
       "pfad": "abgeleitet.ist_eingetragene_gesellschaft",
       "typ": "bool",
-      "herleitung": "rechtsform in {ug, gmbh, gmbh_co_kg, partg, partg_mbb} – juristische Person oder eingetragene Personengesellschaft (§ 20 Abs. 1 GwG)",
+      "herleitung": "rechtsform in {ug, gmbh, gmbh_co_kg, partg, partg_mbb} oder rechtsform = gbr und gesellschaft.handelsregister = eingetragen (eGbR, § 707 BGB; bei der GbR ohne Registerangabe unbekannt) – juristische Person oder eingetragene Personengesellschaft (§ 20 Abs. 1 GwG)",
       "ab": 2
     },
     {

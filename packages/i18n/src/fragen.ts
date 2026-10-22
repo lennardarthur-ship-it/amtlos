@@ -82,23 +82,35 @@ export const SCHRITTE: Schritt[] = [
     ],
   },
   {
-    id: "gesellschaft",
-    titel: { de: "Gesellschaft", en: "Company" },
-    // R12 (Rechtsprüfung Befund 1): auch GmbH & Co. KG und Partnerschaftsgesellschaften werden eingetragen
-    nurWenn: { feld: "rechtsform", in: ["ug", "gmbh", "gmbh_co_kg", "partg", "partg_mbb"] },
+    id: "register",
+    titel: { de: "Register", en: "Register" },
+    // R12 (Rechtsprüfung Befund 1): auch GmbH & Co. KG und Partnerschaftsgesellschaften werden eingetragen;
+    // Freigabe Weber 22.10.2026 (B.16): die GbR kann sich ins Gesellschaftsregister eintragen lassen (eGbR, § 707 BGB)
+    nurWenn: { feld: "rechtsform", in: ["ug", "gmbh", "gmbh_co_kg", "partg", "partg_mbb", "gbr"] },
     fragen: [
       {
         feld: "gesellschaft.handelsregister",
         schnell: true,
         art: "auswahl",
         frage: { de: "Ist deine Gesellschaft schon im Register eingetragen?", en: "Is your company already entered in the register?" },
-        hilfe: { de: "Gemeint ist das Handelsregister, bei der Partnerschaftsgesellschaft das Partnerschaftsregister. Danach richtet sich, welche Gründungsschritte noch anstehen.", en: "This means the commercial register, for a partnership company the partnership register. This decides which founding steps are still ahead." },
+        hilfe: {
+          de: "Gemeint ist das Handelsregister, bei der Partnerschaftsgesellschaft das Partnerschaftsregister. Danach richtet sich, welche Gründungsschritte noch anstehen. Bei der GbR ist es das Gesellschaftsregister: Die Eintragung ist freiwillig – „Eingetragen“ wählst du nur, wenn eure GbR dort steht und den Zusatz „eGbR“ führt.",
+          en: "This means the commercial register, for a partnership company the partnership register. This decides which founding steps are still ahead. For a GbR it is the register of civil-law partnerships: registration is voluntary – choose “Entered” only if your GbR is entered there and uses the suffix “eGbR”.",
+        },
         optionen: {
           nicht_beantragt: { de: "Noch nicht beantragt", en: "Not applied for yet" },
           beantragt: { de: "Beantragt, noch nicht eingetragen", en: "Applied for, not yet entered" },
           eingetragen: { de: "Eingetragen", en: "Entered" },
         },
       },
+    ],
+  },
+  {
+    id: "gesellschaft",
+    titel: { de: "Gesellschaft", en: "Company" },
+    // R12 (Rechtsprüfung Befund 1): auch GmbH & Co. KG und Partnerschaftsgesellschaften werden eingetragen
+    nurWenn: { feld: "rechtsform", in: ["ug", "gmbh", "gmbh_co_kg", "partg", "partg_mbb"] },
+    fragen: [
       {
         feld: "gesellschaft.geschaeftsjahr",
         art: "auswahl",
@@ -354,6 +366,21 @@ export const SCHRITTE: Schritt[] = [
         frage: { de: "Fahrt ihr mit Waren auch ins Ausland?", en: "Do you also carry goods abroad?" },
         hilfe: { de: "Grenzüberschreitende Fahrten oder Fahrten innerhalb eines anderen EU-Staats. Dafür gelten ab 2,5 t eigene Regeln.", en: "Cross-border trips or trips within another EU country. Separate rules apply from 2.5 t." },
       },
+      // Prüfvermerk RA Dr. Weber 22.10.2026 (H.5): Werkverkehr ist erlaubnisfrei (§ 1 Abs. 2, 3 GüKG), Personenbeförderung braucht eine Genehmigung (PBefG)
+      {
+        feld: "fahrzeuge.befoerderung",
+        art: "mehrfach",
+        frage: { de: "Was befördert ihr mit euren Fahrzeugen?", en: "What do you transport with your vehicles?" },
+        hilfe: {
+          de: "Wer nur eigene Waren und eigenes Material für den eigenen Betrieb fährt (Werkverkehr), braucht keine Erlaubnis für den Güterkraftverkehr. Für Güter anderer gegen Entgelt und für die Beförderung von Personen gelten eigene Erlaubnisse.",
+          en: "If you only carry your own goods and material for your own business (own-account transport), you do not need a haulage licence. Separate permits apply to carrying other people's goods for payment and to carrying passengers.",
+        },
+        optionen: {
+          fremde_gueter: { de: "Güter für andere gegen Entgelt (z. B. Spedition, Kurier- und Paketdienst)", en: "Goods for others for payment (e.g. haulage, courier and parcel service)" },
+          eigene_gueter: { de: "Nur eigene Waren und eigenes Material (Werkverkehr)", en: "Only our own goods and material (own-account transport)" },
+          personen: { de: "Personen gegen Entgelt (z. B. Taxi, Mietwagen, Bus)", en: "Passengers for payment (e.g. taxi, hire car, bus)" },
+        },
+      },
       {
         feld: "umwelt.taetigkeiten",
         art: "mehrfach",
@@ -581,6 +608,35 @@ export const SCHRITTE: Schritt[] = [
           lebensmittel: { de: "Lebensmittel", en: "Food" },
           kosmetik: { de: "Kosmetik", en: "Cosmetics" },
           digital: { de: "Digitale Produkte", en: "Digital products" },
+        },
+      },
+      // Prüfvermerk RA Dr. Weber 22.10.2026 (G.70): Produktliste § 1 Abs. 2 BFSG als Auswahl
+      {
+        feld: "produkte.bfsg_produkte",
+        art: "mehrfach",
+        frage: { de: "Verkaufst du eines dieser Produkte an Verbraucher?", en: "Do you sell any of these products to consumers?" },
+        hilfe: {
+          de: "Für diese Produkte gelten Anforderungen an die Barrierefreiheit (§ 1 Abs. 2 Barrierefreiheitsstärkungsgesetz), wenn sie nach dem 28.6.2025 in Verkehr gebracht wurden.",
+          en: "Accessibility requirements apply to these products (§ 1(2) Accessibility Strengthening Act, BFSG) if they were placed on the market after 28.6.2025.",
+        },
+        optionen: {
+          universalrechner: { de: "Computer, Notebooks und Tablets mit Betriebssystem", en: "Computers, notebooks and tablets with operating system" },
+          zahlungsterminal: { de: "Zahlungsterminals (Kartenterminals)", en: "Payment terminals (card terminals)" },
+          selbstbedienungsterminal: { de: "Geld-, Fahrkarten- oder Check-in-Automaten, interaktive Informationsterminals", en: "Cash machines, ticket or check-in machines, interactive information terminals" },
+          telekommunikation: { de: "Smartphones, Telefone, Router und andere Endgeräte für Telefon und Internet", en: "Smartphones, telephones, routers and other devices for phone and internet services" },
+          audiovisuell: { de: "Smart-TVs, Streaming-Boxen und andere Geräte für Fernsehen und Video-Dienste", en: "Smart TVs, streaming boxes and other devices for TV and video services" },
+          ebook_reader: { de: "E-Book-Reader", en: "E-book readers" },
+          keine: { de: "Nichts davon", en: "None of these" },
+        },
+      },
+      // Prüfvermerk RA Dr. Weber 22.10.2026 (G.71): Registrierung vor dem erstmaligen Bereitstellen verpackter Waren (§§ 6, 7 VerpackDG)
+      {
+        feld: "produkte.verpackung_ab",
+        art: "datum",
+        frage: { de: "Ab wann bringst du zum ersten Mal verpackte Waren in Verkehr?", en: "From when will you first place packaged goods on the market?" },
+        hilfe: {
+          de: "Nur angeben, wenn du damit noch nicht angefangen hast. Vor diesem Tag musst du im Verpackungsregister LUCID registriert und an einem System beteiligt sein. Verkaufst du schon verpackte Waren, lass die Frage leer.",
+          en: "Only answer if you have not started yet. Before this day you must be registered in the LUCID packaging register and take part in a system. If you already sell packaged goods, leave this empty.",
         },
       },
       {

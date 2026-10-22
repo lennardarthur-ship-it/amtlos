@@ -9,6 +9,7 @@ fakten:
   # R12: Lenkzeiten und Erlaubnis nach Gesamtmasse – ein Lkw über 3,5 t
   profil.fahrzeuge.anzahl: 2
   profil.fahrzeuge.gesamtmasse: [ueber_3_5t]
+  profil.fahrzeuge.befoerderung: [fremde_gueter]
   profil.erlaubnis.gewo_paragraphen: ["34c"]
   profil.beschaeftigte.gesamt: 15
   profil.rentenversicherung.pflichtgruppe: [keine]

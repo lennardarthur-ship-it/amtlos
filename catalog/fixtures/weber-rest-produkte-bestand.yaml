@@ -1,0 +1,19 @@
+persona: onlinehandel
+beschreibung: "Prüfvermerk RA Dr. Weber 22.10.2026 (G.70, G.71): Bestandshändler mit verpackter Ware ohne Startdatum – Registrierung gilt, aber kein (überfälliger) Termin; Elektrogeräte ohne Angabe zur BFSG-Produktliste bleiben unklar"
+stichtag: "2026-10-22"
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: "2015-04-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [onlinehandel]
+  profil.beschaeftigte.gesamt: 4
+  profil.kunden.segmente: [b2c]
+  profil.vertrieb.kanaele: [onlineshop]
+  profil.produkte.arten: [verpackung, elektrogeraete]
+  profil.bundesland: BE
+erwartet:
+  produkte.verpackung: gilt
+  produkte.barrierefreiheit: unbekannt
+fehlende_fakten:
+  produkte.verpackung: [profil.produkte.verpackung_ab]
+  produkte.barrierefreiheit: [profil.produkte.bfsg_produkte]
