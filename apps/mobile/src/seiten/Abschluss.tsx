@@ -159,7 +159,7 @@ function VorschauSeite({ id }: { id: string }) {
     <Unterseite titel={TEXT.vorschau}>
       {/* das Dokument als Blatt Papier mit Rand und Schatten (E-144) */}
       <View style={{ flex: 1, padding: 16 }}>
-        <View style={{ flex: 1, borderRadius: RADIUS.blatt, overflow: "hidden", backgroundColor: "#ffffff", shadowColor: "#063b29", shadowOpacity: 0.18, shadowRadius: 16, shadowOffset: { width: 0, height: 6 }, elevation: 6 }}>
+        <View style={{ flex: 1, borderRadius: RADIUS.blatt, overflow: "hidden", backgroundColor: "#ffffff", shadowColor: "#120e3a", shadowOpacity: 0.18, shadowRadius: 16, shadowOffset: { width: 0, height: 6 }, elevation: 6 }}>
           <Vorschau html={dokumentHtml(v, u.daten, betriebFuerDokument(absenderFuer(z.stand, u), z.pro))} quer={v.querformat} />
         </View>
       </View>
@@ -215,7 +215,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
   const letzteCent = letzte && /€\s*$/.test(letzte[1]) ? centAus(letzte[1].replace(/\s*€\s*$/, "")) : null;
   return (
     <View>
-      {/* Bühne (E-142): Stand, Empfänger bzw. Ergebnis und das Dokument als Blatt Papier auf dem tiefen Grün */}
+      {/* Bühne (E-142): Stand, Empfänger bzw. Ergebnis und das Dokument als Blatt Papier auf dem Navy der Bühne */}
       <View style={{ paddingTop: 8, gap: 6 }}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
           {fertig || fest ? <Symbol name={fest && !geteilt ? "lock.fill" : "checkmark.circle.fill"} groesse={20} farbe={f.minze} gewicht="semibold" /> : null}
@@ -267,7 +267,7 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
             {stempel ? (
               // Eingangsstempel oben rechts auf dem Blatt – Papier ist immer weiß, daher feste Farben
               <StempelAuftritt key={stempel} jetzt={stempelNeu.current === stempel} stil={{ position: "absolute", top: 14, right: 12 }}>
-                <Stempel groesse={104} farbe={stempel === "bezahlt" ? "#0a7d55" : "#06573b"} grund="rgba(255,255,255,0.86)" text={stempel === "bezahlt" ? TEXT.stempel_bezahlt : TEXT.stempel_geteilt} unter={stempel === "bezahlt" ? datumDe(`${u.bezahlt!}T12:00:00Z`) : datumDe(u.festgeschrieben!)} />
+                <Stempel groesse={104} farbe={stempel === "bezahlt" ? "#08785a" : "#3b30c4"} grund="rgba(255,255,255,0.86)" text={stempel === "bezahlt" ? TEXT.stempel_bezahlt : TEXT.stempel_geteilt} unter={stempel === "bezahlt" ? datumDe(`${u.bezahlt!}T12:00:00Z`) : datumDe(u.festgeschrieben!)} />
               </StempelAuftritt>
             ) : null}
           </Papier>

@@ -54,7 +54,7 @@ export default async function UnterweisungSeite({ params, searchParams }: { para
         <p className="mt-1 text-klein text-tinte-leise">{datumLang(w.datum, s)} · {w.durchgefuehrt_von}</p>
       </header>
       {sp.fehler ? <p role="alert" className="rounded-md border-2 border-frist bg-frist-hauch p-4">{sp.fehler}</p> : null}
-      {sp.erledigt ? <p role="status" className="rounded-md border-2 border-amt bg-amt-hauch p-4">{fuelle(x.unterweisung.erledigt, { n: sp.erledigt })}</p> : null}
+      {sp.erledigt ? <p role="status" className="rounded-md border-2 border-erfolg bg-erfolg-hauch p-4">{fuelle(x.unterweisung.erledigt, { n: sp.erledigt })}</p> : null}
 
       <section aria-label={x.unterweisung.inhalt} className="whitespace-pre-wrap rounded-md border border-linie bg-blatt p-4">{w.inhalt}</section>
 

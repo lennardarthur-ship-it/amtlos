@@ -75,7 +75,7 @@ export default async function BeurteilungSeite({ params, searchParams }: { param
         {b.taetigkeiten ? <p className="mt-2 whitespace-pre-wrap">{b.taetigkeiten}</p> : null}
       </header>
       {sp.fehler ? <p role="alert" className="rounded-md border-2 border-frist bg-frist-hauch p-4">{sp.fehler}</p> : null}
-      {sp.erledigt ? <p role="status" className="rounded-md border-2 border-amt bg-amt-hauch p-4">{fuelle(x.gb.erledigt, { n: sp.erledigt })}</p> : null}
+      {sp.erledigt ? <p role="status" className="rounded-md border-2 border-erfolg bg-erfolg-hauch p-4">{fuelle(x.gb.erledigt, { n: sp.erledigt })}</p> : null}
       {b.abgeschlossen_am ? (
         <p>
           {fuelle(x.gb.abgeschlossen, { datum: datumLang(b.abgeschlossen_am.slice(0, 10), s) })}

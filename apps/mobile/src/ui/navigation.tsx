@@ -34,7 +34,7 @@ export type SeitenParams = { id: string; schluessel: string };
 export const WurzelNavKontext = createContext<NavigationProp<ParamListBase> | null>(null);
 const BlattKontext = createContext(false);
 /**
- * Helle Statusleiste, solange diese Seite sichtbar ist (E-144: alle Leisten liegen auf der grünen Bühne). Über
+ * Helle Statusleiste, solange diese Seite sichtbar ist (E-144: alle Leisten liegen auf der Bühne (Navy)). Über
  * expo-status-bar statt der Option der Navigationsleiste – die greift in dieser App nicht.
  */
 export function HellerStatus() {
@@ -176,7 +176,7 @@ export function useKopf({ titel, rechts, schliessen, gross, buehne }: { titel: s
   // große Schrift oder schmal (R10): Textknopf rechts als runder Symbolknopf – sonst läge „Übersicht“ über dem Titel
   const { fontScale, width } = useWindowDimensions();
   const eng = fontScale > 1.3 || width < 340;
-  // Bühne (E-142): Leiste und Grund im tiefen Grün, Schrift weiß, Knöpfe Minze – z. B. der Abschluss einer Rechnung
+  // Bühne (E-142): Leiste und Grund im Navy der Bühne, Schrift weiß, Knöpfe Minze – z. B. der Abschluss einer Rechnung
   useLayoutEffect(() => {
     if (buehne === undefined) return;
     navigation.setOptions(
@@ -226,7 +226,7 @@ export function TastaturRahmen({ children, grund }: { children: ReactNode; grund
 }
 
 /**
- * Unterseite (E-144): grüne Leiste mit dem Titel groß darunter auf der Bühne, der Inhalt auf dem hellen Blatt –
+ * Unterseite (E-144): dunkle Leiste mit dem Titel groß darunter auf der Bühne, der Inhalt auf dem hellen Blatt –
  * Fußleisten bleiben über der Tastatur. Ohne Titel (z. B. gelöschter Eintrag) nur das Blatt.
  */
 export function Unterseite({ titel, unter, children, rechts, schliessen }: { titel: string; unter?: string; children: ReactNode; rechts?: KopfKnopfDef | null; schliessen?: boolean }) {

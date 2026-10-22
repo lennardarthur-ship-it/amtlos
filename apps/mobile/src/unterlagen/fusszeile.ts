@@ -40,7 +40,7 @@ export function fussAngaben(html: string): FussAngaben {
   }
   const r = meta("amtlos-raender").split(",").map(Number);
   const raender = r.length === 4 && r.every((x) => Number.isFinite(x) && x >= 0 && x < 60) ? (r as [number, number, number, number]) : undefined;
-  return { gestalt: meta("amtlos-gestalt") || "nachweis", links: meta("amtlos-fuss-links"), rechts: meta("amtlos-fuss-rechts"), spalten, farbe: meta("amtlos-farbe") || "#2f3a45", ...(raender ? { raender } : {}) };
+  return { gestalt: meta("amtlos-gestalt") || "nachweis", links: meta("amtlos-fuss-links"), rechts: meta("amtlos-fuss-rechts"), spalten, farbe: meta("amtlos-farbe") || "#3b30c4", ...(raender ? { raender } : {}) };
 }
 
 /** Zeichen, die die Schrift darstellen kann (Latin-1, Latin Extended-A und Satzzeichen; Helvetica nur WinAnsi). */

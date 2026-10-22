@@ -162,7 +162,7 @@ export function KontoSeite() {
       <View>
         <Karte stil={{ paddingVertical: 14, gap: 6 }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-            {k.laeuft ? <ActivityIndicator color={f.amt} /> : <Symbol name={k.fehler ? "exclamationmark.triangle" : "checkmark.circle.fill"} groesse={22} farbe={k.fehler ? f.frist : f.amt} />}
+            {k.laeuft ? <ActivityIndicator color={f.amt} /> : <Symbol name={k.fehler ? "exclamationmark.triangle" : "checkmark.circle.fill"} groesse={22} farbe={k.fehler ? f.frist : f.erfolg} />}
             <T fett>{k.laeuft ? TEXT.konto_laeuft : TEXT.konto_an}</T>
           </View>
           <T v="klein" leise>{TEXT.konto_letzte(k.letzte ? zeitpunkt(k.letzte) : null)}</T>

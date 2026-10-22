@@ -67,7 +67,7 @@ export default async function PanneSeite({ params, searchParams }: { params: Pro
         </p>
       </header>
       {sp.fehler ? <p role="alert" className="rounded-md border-2 border-frist bg-frist-hauch p-4">{sp.fehler}</p> : null}
-      {sp.erledigt ? <p role="status" className="rounded-md border-2 border-amt bg-amt-hauch p-4">{fuelle(x.panne.erledigt, { n: sp.erledigt })}</p> : null}
+      {sp.erledigt ? <p role="status" className="rounded-md border-2 border-erfolg bg-erfolg-hauch p-4">{fuelle(x.panne.erledigt, { n: sp.erledigt })}</p> : null}
 
       <section aria-labelledby="angaben">
         <h2 id="angaben" className="text-gross font-bold">{x.panne.angaben}</h2>

@@ -35,5 +35,5 @@ export const aktuelleMarke = cache(async (): Promise<Marke | null> => {
 export function markenStil(m: Marke): string {
   const satz = (farbe: string, flaeche: string, tief: string) =>
     `--color-amt:${farbe};--color-amt-tief:color-mix(in srgb, ${farbe} 75%, ${tief});--color-amt-hauch:color-mix(in srgb, ${farbe} 12%, ${flaeche});`;
-  return `:root{${satz(m.farbe_hell, "#ffffff", "#000000")}}@media (prefers-color-scheme: dark){:root{${satz(m.farbe_dunkel, "#19212a", "#ffffff")}}}`;
+  return `:root{${satz(m.farbe_hell, "#ffffff", "#000000")}}@media (prefers-color-scheme: dark){:root{${satz(m.farbe_dunkel, "#1a1930", "#ffffff")}}}`;
 }

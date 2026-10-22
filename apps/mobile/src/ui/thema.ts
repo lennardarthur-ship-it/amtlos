@@ -2,32 +2,39 @@ import { useEffect, useState } from "react";
 import { AccessibilityInfo, LayoutAnimation, Platform, StyleSheet, useColorScheme } from "react-native";
 
 /**
- * Designsystem der App (docs/06-design.md, E-142 „Bühne und Papier“): Jede Tab-Seite beginnt auf der dunkelgrünen
- * Bühne mit der einen Zahl, die zählt; darunter schiebt sich ein helles Blatt mit dem Rest. Schrift ist Onest (wie im
- * App-Symbol und auf der Website), Akzent Minze auf Grün, Amtsgrün auf Hell. Statusfarben nie allein, immer mit Text.
+ * Designsystem der App (docs/06-design.md, E-142 „Bühne und Papier“, Farbwelt des Logos): Jede Tab-Seite beginnt auf
+ * der dunkelblauen Bühne (Navy) mit der einen Zahl, die zählt; darunter schiebt sich ein helles Blatt mit dem Rest.
+ * Schrift ist Onest (wie auf der Website), Akzent Indigo auf Hell (dunkel: helles Violett), Minze als Signal auf der
+ * Bühne und als Farbe für Erfolg/Erledigt (auf Hell als dunkle Minze). Statusfarben nie allein, immer mit Text.
  */
 const HELL = {
-  /** Grund des Blatts unter der Bühne (leicht grünliches Grau) */
-  papier: "#f4f6f5",
+  /** Grund des Blatts unter der Bühne (Grau mit einem Hauch Navy) */
+  papier: "#f4f4f9",
   /** Karten, Listen, Eingabefelder */
   blatt: "#ffffff",
   /** Füllung: Suchfeld, Zweitknöpfe, gedrückte Zeilen */
-  flaeche: "#e8eeeb",
-  tinte: "#0c1f18",
-  /** Nebentext (≥ 4,5:1 auf Weiß und auf dem Blatt) */
-  tinteLeise: "#56655f",
-  linie: "#d5ddd9",
-  linieLeise: "#e6ece9",
+  flaeche: "#e9e8f3",
+  tinte: "#120e3a",
+  /** Nebentext (≥ 4,5:1 auf Weiß, Papier und Fläche) */
+  tinteLeise: "#585672",
+  linie: "#d8d7e6",
+  linieLeise: "#e8e7f1",
   /** Rahmen von Eingabefeldern: mindestens 3:1 (WCAG 1.4.11) */
-  rahmen: "#75837d",
-  zeiger: "#b4c0bb",
-  amt: "#0a7d55",
-  amtTief: "#06573b",
-  amtHauch: "#e1f3ea",
+  rahmen: "#78768f",
+  zeiger: "#b8b6cc",
+  /** Handeln: Links, Auswahl, Fortschritt, Symbole – Indigo des Logos */
+  amt: "#3b30c4",
+  amtTief: "#2a2196",
+  amtHauch: "#ecebff",
   amtText: "#ffffff",
-  minze: "#7fe3b8",
-  /** Hauptknopf auf dem Blatt: das tiefe Grün der Bühne */
-  haupt: "#063b29",
+  /** Minze des Logos: Signal auf der Bühne (nie als Text auf Hell) */
+  minze: "#7cf5c8",
+  /** Erfolg/Erledigt als Text und Zeichen auf Hell: dunkle Minze (5,5:1 auf Weiß) */
+  erfolg: "#08785a",
+  erfolgTief: "#055740",
+  erfolgHauch: "#dcf8ec",
+  /** Hauptknopf auf dem Blatt: das Navy der Bühne */
+  haupt: "#120e3a",
   hauptText: "#ffffff",
   frist: "#d70015",
   fristHauch: "#ffe9ea",
@@ -37,65 +44,68 @@ const HELL = {
   baldScheibe: "#fff2dc",
   /** Kreis hinter einem Symbol auf einer bernsteinfarbenen Karte */
   baldKreis: "#ffffff",
-  lila: "#5e5ce6",
-  lilaHauch: "#ecebfd",
+  lila: "#8a3fbf",
+  lilaHauch: "#f3e9fa",
   gold: "#a05a00",
   goldHauch: "#fff2dc",
   blau: "#0a64d6",
   blauHauch: "#e5effd",
-  /** Bühne: dunkles Amtsgrün mit weißer Schrift und Minze */
-  buehne: "#063b29",
+  /** Bühne: Navy mit weißer Schrift und Minze */
+  buehne: "#120e3a",
   buehneText: "#ffffff",
   buehneLeise: "rgba(255,255,255,0.74)",
-  /** Zweitknöpfe, Suchfeld und Plaketten auf der Bühne: deckend – das §-Motiv scheint nicht durch */
-  buehneFlaeche: "#1e5240",
-  buehneKnopf: "#7fe3b8",
-  buehneKnopfText: "#063b29",
+  /** Zweitknöpfe, Suchfeld und Plaketten auf der Bühne: deckend – das Bildzeichen scheint nicht durch */
+  buehneFlaeche: "#2b2668",
+  buehneKnopf: "#7cf5c8",
+  buehneKnopfText: "#120e3a",
   /** Tab-Leiste: dunkle Kapsel */
-  kapsel: "#0c1f18",
+  kapsel: "#0e0b2e",
   /** Rand der Kapsel (nur dunkel sichtbar) */
   kapselRand: "transparent",
   leiste: "rgba(255,255,255,0.8)",
   schatten: 0.08,
 };
 const DUNKEL: typeof HELL = {
-  papier: "#0b0f0d",
-  blatt: "#18201c",
-  flaeche: "#24302b",
-  tinte: "#f2f5f3",
-  tinteLeise: "#a3b3ac",
-  linie: "#2c3832",
-  linieLeise: "#222c27",
-  rahmen: "#75847d",
-  zeiger: "#4f5c56",
-  amt: "#30d68b",
-  amtTief: "#8ff0c1",
-  amtHauch: "#0f3324",
-  amtText: "#00180d",
-  minze: "#7fe3b8",
-  haupt: "#7fe3b8",
-  hauptText: "#063b29",
+  papier: "#0b0a16",
+  blatt: "#18172b",
+  flaeche: "#25243d",
+  tinte: "#f3f3f8",
+  tinteLeise: "#aaa9c2",
+  linie: "#2e2d47",
+  linieLeise: "#222137",
+  rahmen: "#7c7a98",
+  zeiger: "#54526f",
+  amt: "#a79dff",
+  amtTief: "#cdc7ff",
+  amtHauch: "#272263",
+  amtText: "#120e3a",
+  minze: "#7cf5c8",
+  erfolg: "#7cf5c8",
+  erfolgTief: "#b5fadf",
+  erfolgHauch: "#123a35",
+  haupt: "#7cf5c8",
+  hauptText: "#120e3a",
   frist: "#ff7a70",
   fristHauch: "#3a1715",
   bald: "#ffb340",
   baldHauch: "#2e2414",
   baldScheibe: "rgba(255,179,64,0.14)",
   baldKreis: "rgba(255,179,64,0.14)",
-  lila: "#a5a3ff",
-  lilaHauch: "#25243f",
+  lila: "#d7a6f5",
+  lilaHauch: "#2f2140",
   gold: "#ffb340",
   goldHauch: "#3a2a10",
   blau: "#6eb4ff",
   blauHauch: "#132a46",
-  buehne: "#0a2a1e",
+  buehne: "#17124a",
   buehneText: "#ffffff",
   buehneLeise: "rgba(255,255,255,0.72)",
-  buehneFlaeche: "#1d3a2f",
-  buehneKnopf: "#7fe3b8",
-  buehneKnopfText: "#063b29",
-  kapsel: "#2a3a33",
+  buehneFlaeche: "#2c2669",
+  buehneKnopf: "#7cf5c8",
+  buehneKnopfText: "#120e3a",
+  kapsel: "#2a2750",
   kapselRand: "rgba(255,255,255,0.08)",
-  leiste: "rgba(24,32,28,0.9)",
+  leiste: "rgba(24,23,43,0.9)",
   schatten: 0,
 };
 export type Farben = typeof HELL;
@@ -132,7 +142,7 @@ export function useFarben(): Farben {
 /** Weicher Schatten für Karten (nur hell). */
 export function schattenStil(f: Farben, staerke = 1) {
   if (!f.schatten) return null;
-  return { shadowColor: "#063b29", shadowOpacity: f.schatten * staerke, shadowRadius: 14 * staerke, shadowOffset: { width: 0, height: 4 * staerke }, elevation: 2 * staerke };
+  return { shadowColor: "#120e3a", shadowOpacity: f.schatten * staerke, shadowRadius: 14 * staerke, shadowOffset: { width: 0, height: 4 * staerke }, elevation: 2 * staerke };
 }
 
 export const istIos = Platform.OS === "ios";

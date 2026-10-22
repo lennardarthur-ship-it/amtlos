@@ -30,11 +30,11 @@ Bei Nachweis, Vertrag und Handbuch stehen Abschnittsnummer und Rechtsgrundlage *
 | Tinte 3 | `#5c666f` | Rechtsgrundlagen in der Randspalte (5,9:1 auf Weiß; früher `#7a838c` mit 3,85:1 zu hell) |
 | Linie | `#c9d0d6` | Tabellenlinien, Trennstriche |
 | Linie leise | `#e4e8eb` | Zeilen in Angabenlisten |
-| Hausfarbe | aus „Mein Betrieb“, Standard Graphit `#2f3a45`; zu helle Farben werden auf ≥ 4,5:1 zu Weiß abgedunkelt (`akzent()`, z. B. `#c27c0e` → `#a3680c`) | Kopfzeile, Randnummern, Linien unter Tabellenköpfen und Zwischensummen, Farbleiste im Aushang – nicht die Linie über dem Rechnungsbetrag (Tinte) |
+| Hausfarbe | aus „Mein Betrieb“, Standard Indigo `#3b30c4` (Logo-Farbe, 8,7:1 zu Weiß; bis 2026-10-22 Graphit `#2f3a45`); zu helle Farben werden auf ≥ 4,5:1 zu Weiß abgedunkelt (`akzent()`, z. B. `#c27c0e` → `#a3680c`) | Kopfzeile, Randnummern, Linien unter Tabellenköpfen und Zwischensummen, Farbleiste im Aushang – nicht die Linie über dem Rechnungsbetrag (Tinte) |
 | Hausfarbe Hauch | 8 % der Hausfarbe auf Weiß | Kennungsleiste, Zahlungsblock, Formular-Abschnittsköpfe |
 | Papier | `#ffffff` | Blatt |
 
-Acht Hausfarben stehen zur Wahl (Graphit, Marineblau, Petrol, Tannengrün, Bordeaux, Rostbraun, Aubergine, Oliv). Alle sind dunkel genug für weiße Schrift (Kontrast ≥ 7:1) und bleiben im Schwarz-Weiß-Druck unterscheidbar grau. Eine eigene Farbe (#rrggbb) wird bei gleichem Farbton und gleicher Sättigung so weit abgedunkelt, bis sie 4,5:1 zu Weiß erreicht. Die Betriebsanweisung für Gefahrstoffe nutzt zusätzlich die orange Kennfarbe der DGUV-Muster, abgedunkelt auf `#c2540a` (weiße Schrift 4,6:1); auch die Aufzählungspunkte in den Kästen stehen in dieser Kennfarbe.
+Neun Hausfarben stehen zur Wahl (Indigo als Standard, Graphit, Marineblau, Petrol, Tannengrün, Bordeaux, Rostbraun, Aubergine, Oliv). Alle sind dunkel genug für weiße Schrift (Kontrast ≥ 7:1) und bleiben im Schwarz-Weiß-Druck unterscheidbar grau. Eine eigene Farbe (#rrggbb) wird bei gleichem Farbton und gleicher Sättigung so weit abgedunkelt, bis sie 4,5:1 zu Weiß erreicht. Die Betriebsanweisung für Gefahrstoffe nutzt zusätzlich die orange Kennfarbe der DGUV-Muster, abgedunkelt auf `#c2540a` (weiße Schrift 4,6:1); auch die Aufzählungspunkte in den Kästen stehen in dieser Kennfarbe.
 
 ## Schrift
 

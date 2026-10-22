@@ -410,7 +410,7 @@ export function kontrast(a: string, b: string): number {
  * Flächen des Designsystems, auf denen die Markenfarbe stehen muss (Links auf Papier und Blatt, Knopftext in
  * Blattfarbe auf der Markenfarbe). Mindestens 4,5 : 1 (WCAG 2.2 AA, normaler Text).
  */
-export const MARKEN_FLAECHEN = { hell: ["#ffffff", "#f2f3ef"], dunkel: ["#19212a", "#11171d"] } as const;
+export const MARKEN_FLAECHEN = { hell: ["#ffffff", "#f3f3f8"], dunkel: ["#1a1930", "#0f0e1c"] } as const;
 export const MINDESTKONTRAST = 4.5;
 
 export function pruefeMarke(d: MarkeDaten): string[] {

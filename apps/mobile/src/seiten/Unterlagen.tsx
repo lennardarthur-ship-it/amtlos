@@ -74,7 +74,7 @@ export const UnterlageZeile = memo(function UnterlageZeile({ u, letzte, fehlt, b
       ? { text: TEXT.marke.storniert, ton: "leise" as const }
       : u.festgeschrieben && !storno
         ? u.bezahlt
-          ? { text: TEXT.marke.bezahlt, ton: "amt" as const }
+          ? { text: TEXT.marke.bezahlt, ton: "erfolg" as const }
           : ueber > 0
             ? { text: TEXT.marke.ueberfaellig, ton: "frist" as const }
             : { text: TEXT.marke.offen, ton: "bald" as const }

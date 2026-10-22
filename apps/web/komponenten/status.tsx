@@ -6,7 +6,7 @@ const FARBE: Record<AnzeigeStatus, string> = {
   faellig_bald: "text-bald",
   angabe_fehlt: "text-tinte",
   offen: "text-tinte",
-  erledigt: "text-amt",
+  erledigt: "text-erfolg",
   nicht_zutreffend: "text-tinte-leise",
   entfallen: "text-tinte-leise",
 };

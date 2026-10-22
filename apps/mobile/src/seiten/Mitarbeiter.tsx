@@ -70,7 +70,7 @@ function AufenthaltKopie({ p, setze }: { p: Person; setze: (werte: Partial<Perso
   return (
     <Karte stil={{ marginTop: 16, paddingVertical: 14, gap: 10 }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-        <Symbol name={datei ? "checkmark.circle" : "doc.text"} groesse={20} farbe={datei ? f.amt : f.tinteLeise} />
+        <Symbol name={datei ? "checkmark.circle" : "doc.text"} groesse={20} farbe={datei ? f.erfolg : f.tinteLeise} />
         <View style={{ flex: 1 }}>
           <T fett>{TEXT.r12p_aufenthalt_kopie}</T>
           <T v="caption" leise>{datei ? TEXT.r12p_aufenthalt_kopie_da(art.toUpperCase()) : TEXT.r12p_aufenthalt_kopie_text}</T>

@@ -194,7 +194,7 @@ describe("Markenfarben: Kontrast nach WCAG", () => {
     expect(kontrast("#ffffff", "#ffffff")).toBeCloseTo(1, 5);
   });
   it("die Amtlos-Farben selbst bestehen die Prüfung", () => {
-    expect(pruefeMarke({ schluessel: "amtlos", name: "Amtlos", farbe_hell: "#136f5b", farbe_dunkel: "#5cc2a6" })).toEqual([]);
+    expect(pruefeMarke({ schluessel: "amtlos", name: "Amtlos", farbe_hell: "#3b30c4", farbe_dunkel: "#a79dff" })).toEqual([]);
   });
   it("lehnt zu helle oder zu dunkle Farben und unsichere Logos ab", () => {
     const f = pruefeMarke({ schluessel: "X", name: "A", farbe_hell: "#ffcc00", farbe_dunkel: "#203040", logo_url: "javascript:alert(1)" });

@@ -328,8 +328,12 @@ export const fassungNachsatz = (d: Daten) => (fassungText(d) ? nachsatz(fassungT
 
 export type Gestalt = "brief" | "vertrag" | "aushang" | "nachweis" | "formular" | "handbuch";
 
-/** Hausfarben zur Auswahl: dunkel genug für weiße Schrift und für Schwarz-Weiß-Druck (Kontrast ≥ 7:1 zu Weiß). */
+/**
+ * Hausfarben zur Auswahl: dunkel genug für weiße Schrift und für Schwarz-Weiß-Druck (Kontrast ≥ 7:1 zu Weiß). Die erste
+ * ist der Standard ohne eigene Wahl – Indigo aus dem Logo (8,7:1 zu Weiß); wer eine andere gewählt hat, behält sie.
+ */
 export const HAUSFARBEN: { wert: string; text: string }[] = [
+  { wert: "#3b30c4", text: "Indigo" },
   { wert: "#2f3a45", text: "Graphit" },
   { wert: "#1f3a5f", text: "Marineblau" },
   { wert: "#0f5560", text: "Petrol" },
@@ -374,7 +378,7 @@ function hexAus(h: number, s: number, l: number): string {
 export const MINDESTKONTRAST = 4.5;
 
 /**
- * Hausfarbe aus „Mein Betrieb“ (nur #rrggbb), sonst Graphit. Zu helle Farben (Kontrast zu Weiß unter 4,5 : 1) werden
+ * Hausfarbe aus „Mein Betrieb“ (nur #rrggbb), sonst Indigo (Standard). Zu helle Farben (Kontrast zu Weiß unter 4,5 : 1) werden
  * bei gleichem Farbton und gleicher Sättigung so weit abgedunkelt, bis der Kontrast reicht – z. B. #c27c0e → #9a6210.
  */
 export function akzent(b: Betrieb): string {

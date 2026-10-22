@@ -4,20 +4,23 @@
 
 /*
  * Amtlos-Designsystem (docs/06-design.md)
- * Papier und Tinte: ruhig, behördennah, ohne Behördenhärte.
+ * Papier und Tinte: ruhig, behördennah, ohne Behördenhärte. Farbwelt des Logos: Tinte Navy, Handeln Indigo,
+ * Erledigt Minze (auf Hell als dunkle Minze); Grautöne leicht zum Navy getönt.
  * Ein prägendes Element: das Fristblatt. Statusfarben nur zusammen mit Text oder Form.
  */
 @theme {
   --font-sans: "Atkinson Hyperlegible", ui-sans-serif, system-ui, sans-serif;
 
-  --color-papier: #f2f3ef;      /* Seitenfläche: kühles Recyclingpapier */
+  --color-papier: #f3f3f8;      /* Seitenfläche: kühles Papier mit einem Hauch Navy */
   --color-blatt: #ffffff;       /* Flächen, auf denen gelesen wird */
-  --color-tinte: #1b2a3a;       /* Text */
-  --color-tinte-leise: #4a5868; /* Nebeninformation, ≥ 7:1 auf Blatt */
-  --color-linie: #d3d8d0;       /* Trennlinien */
-  --color-amt: #136f5b;         /* Handeln: Knöpfe, Links, Erledigt-Stempel */
-  --color-amt-tief: #0d5143;
-  --color-amt-hauch: #e3efeb;
+  --color-tinte: #120e3a;       /* Text: Navy des Logos */
+  --color-tinte-leise: #4b4966; /* Nebeninformation, ≥ 7:1 auf Blatt und Papier */
+  --color-linie: #d6d5e3;       /* Trennlinien */
+  --color-amt: #3b30c4;         /* Handeln: Knöpfe, Links (Indigo des Logos) */
+  --color-amt-tief: #2a2196;
+  --color-amt-hauch: #ecebff;
+  --color-erfolg: #08785a;      /* Erledigt: Stempel, Fristblatt (dunkle Minze, ≥ 4,5:1) */
+  --color-erfolg-hauch: #dcf8ec;
   --color-frist: #b42318;       /* überfällig */
   --color-frist-hauch: #fbe9e7;
   --color-bald: #a84a06;        /* bald fällig, als Text kontraststark */
@@ -38,14 +41,16 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-papier: #11171d;
-    --color-blatt: #19212a;
-    --color-tinte: #e6eae3;
-    --color-tinte-leise: #aeb8c2;
-    --color-linie: #2f3a45;
-    --color-amt: #5cc2a6;
-    --color-amt-tief: #8ad8c2;
-    --color-amt-hauch: #183a33;
+    --color-papier: #0f0e1c;
+    --color-blatt: #1a1930;
+    --color-tinte: #ecebf5;
+    --color-tinte-leise: #b3b1cc;
+    --color-linie: #33314d;
+    --color-amt: #a79dff;
+    --color-amt-tief: #cdc7ff;
+    --color-amt-hauch: #2a2566;
+    --color-erfolg: #7cf5c8;
+    --color-erfolg-hauch: #143c37;
     --color-frist: #ff8a7a;
     --color-frist-hauch: #3d1d1a;
     --color-bald: #f5b453;
@@ -156,7 +161,7 @@ body {
 }
 .fristblatt[data-status="ueberfaellig"] { --streifen: var(--color-frist); background: var(--color-frist-hauch); border-color: var(--color-frist); }
 .fristblatt[data-status="faellig_bald"] { --streifen: var(--color-bald); background: var(--color-bald-hauch); }
-.fristblatt[data-status="erledigt"] { --streifen: var(--color-amt); color: var(--color-tinte-leise); }
+.fristblatt[data-status="erledigt"] { --streifen: var(--color-erfolg); color: var(--color-tinte-leise); }
 .fristblatt[data-status="angabe_fehlt"],
 .fristblatt[data-ohne-datum] { --streifen: transparent; border-style: dashed; border-width: 2px; }
 .fristblatt-wochentag { font-size: var(--text-klein); color: var(--color-tinte-leise); }
@@ -167,9 +172,9 @@ body {
 .stempel {
   display: inline-block;
   padding: 0.125rem 0.5rem;
-  border: 2px solid var(--color-amt);
+  border: 2px solid var(--color-erfolg);
   border-radius: 4px;
-  color: var(--color-amt);
+  color: var(--color-erfolg);
   font-weight: 700;
   transform: rotate(-4deg);
 }

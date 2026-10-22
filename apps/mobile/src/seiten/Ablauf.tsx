@@ -346,7 +346,7 @@ export function Ablauf({ id, neu, amEnde, start }: { id: string; neu?: boolean; 
   useKopf({
     titel: vorlage?.titel ?? "",
     schliessen: true,
-    // Bühne (E-142, E-144): Leiste und Grund im tiefen Grün – Schritte und Abschluss
+    // Bühne (E-142, E-144): Leiste und Grund in der Bühnenfarbe – Schritte und Abschluss
     buehne: true,
     rechts: amAbschlussKopf || !vorlage ? null : { text: TEXT.uebersicht, onPress: () => { merken(vorlage, z.daten(id), z); setSchritt(n); } },
   });

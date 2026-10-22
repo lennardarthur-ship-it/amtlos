@@ -40,8 +40,8 @@ function Formular({ m, aktion }: { m?: Marke; aktion: (f: FormData) => Promise<v
       <label className="block"><span className="font-bold">Schlüssel</span><input name="schluessel" required pattern="[a-z0-9][a-z0-9-]{1,39}" defaultValue={m?.schluessel} className="feld mt-1" /></label>
       <label className="block"><span className="font-bold">Name (wird statt „{MARKE.name}“ angezeigt)</span><input name="name" required defaultValue={m?.name} className="feld mt-1" /></label>
       <label className="block md:col-span-2"><span className="font-bold">Hostnamen (durch Komma getrennt)</span><input name="hosts" defaultValue={m?.hosts.join(", ")} className="feld mt-1" /></label>
-      <label className="block"><span className="font-bold">Farbe hell (#rrggbb, mind. 4,5 : 1 auf Weiß)</span><input name="farbe_hell" required defaultValue={m?.farbe_hell ?? "#136f5b"} className="feld mt-1" /></label>
-      <label className="block"><span className="font-bold">Farbe dunkel (#rrggbb, mind. 4,5 : 1 auf Dunkel)</span><input name="farbe_dunkel" required defaultValue={m?.farbe_dunkel ?? "#5cc2a6"} className="feld mt-1" /></label>
+      <label className="block"><span className="font-bold">Farbe hell (#rrggbb, mind. 4,5 : 1 auf Weiß)</span><input name="farbe_hell" required defaultValue={m?.farbe_hell ?? "#3b30c4"} className="feld mt-1" /></label>
+      <label className="block"><span className="font-bold">Farbe dunkel (#rrggbb, mind. 4,5 : 1 auf Dunkel)</span><input name="farbe_dunkel" required defaultValue={m?.farbe_dunkel ?? "#a79dff"} className="feld mt-1" /></label>
       <label className="block"><span className="font-bold">Logo (https-Adresse, optional)</span><input name="logo_url" type="url" defaultValue={m?.logo_url ?? ""} className="feld mt-1" /></label>
       <label className="block"><span className="font-bold">Support-E-Mail (optional)</span><input name="support_email" type="email" defaultValue={m?.support_email ?? ""} className="feld mt-1" /></label>
       <label className="flex items-center gap-3"><input type="checkbox" name="aktiv" defaultChecked={m?.aktiv ?? true} className="size-5" /> <span>Aktiv</span></label>

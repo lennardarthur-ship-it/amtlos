@@ -156,7 +156,7 @@ const lupeHtml = (name, l, oben) => {
 };
 
 /**
- * iOS-Statusleiste (B16): 9:41 links, rechts Netz, WLAN und voller Akku – weiß auf der grünen Bühne, dunkel auf hellem
+ * iOS-Statusleiste (B16): 9:41 links, rechts Netz, WLAN und voller Akku – weiß auf der dunklen Bühne (Navy), dunkel auf hellem
  * Grund. Höhe 54 pt wie beim iPhone mit Dynamic Island, in Bildschirm-Pixeln der Aufnahme (3×); skaliert mit dem Bild.
  */
 const statusleiste = (breite) => {
@@ -171,7 +171,7 @@ const statusleiste = (breite) => {
     </span></div>`;
 };
 // Farbe der obersten Bildzeile → Grund der Statusleiste; Schrift hell oder dunkel je nach Helligkeit
-const statusFarbe = `<script>document.querySelectorAll(".schirm").forEach((s)=>{const i=s.querySelector("img");const los=()=>{const c=document.createElement("canvas");c.width=i.naturalWidth;c.height=4;const x=c.getContext("2d");x.drawImage(i,0,0);const [r,g,b]=x.getImageData(Math.round(i.naturalWidth/2),1,1,1).data;const st=s.querySelector(".status");st.style.background="rgb("+r+","+g+","+b+")";st.style.color=(0.299*r+0.587*g+0.114*b)>150?"#0c1f18":"#fff"};i.complete?los():i.onload=los})</script>`;
+const statusFarbe = `<script>document.querySelectorAll(".schirm").forEach((s)=>{const i=s.querySelector("img");const los=()=>{const c=document.createElement("canvas");c.width=i.naturalWidth;c.height=4;const x=c.getContext("2d");x.drawImage(i,0,0);const [r,g,b]=x.getImageData(Math.round(i.naturalWidth/2),1,1,1).data;const st=s.querySelector(".status");st.style.background="rgb("+r+","+g+","+b+")";st.style.color=(0.299*r+0.587*g+0.114*b)>150?"#120e3a":"#fff"};i.complete?los():i.onload=los})</script>`;
 
 const satz = await browser.newPage({ viewport: { width: 1290, height: 2796 }, deviceScaleFactor: 1 });
 for (const [i, b] of texte.bilder.entries()) {
@@ -182,8 +182,8 @@ for (const [i, b] of texte.bilder.entries()) {
   body{background:#120E3A;font-family:A;color:#fff;position:relative}
   .text{position:absolute;top:150px;left:110px;right:110px}
   h1{font-family:S;font-weight:800;font-size:104px;line-height:1.04;margin:0;letter-spacing:-3px}
-  p{font-size:52px;line-height:1.3;margin:36px 0 0;color:#7fe3b8}
-  .geraet{position:absolute;left:140px;right:140px;top:${b.oben ?? 760}px;border-radius:88px;padding:16px;background:linear-gradient(#f4f7f5,#cfd9d4);box-shadow:0 0 0 3px rgba(255,255,255,.18),0 50px 140px rgba(0,0,0,.45)}
+  p{font-size:52px;line-height:1.3;margin:36px 0 0;color:#7cf5c8}
+  .geraet{position:absolute;left:140px;right:140px;top:${b.oben ?? 760}px;border-radius:88px;padding:16px;background:linear-gradient(#f4f4f9,#d0cfe0);box-shadow:0 0 0 3px rgba(255,255,255,.18),0 50px 140px rgba(0,0,0,.45)}
   .schirm{border-radius:72px;overflow:hidden}
   .status{display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;font-family:A;font-weight:600}
   .geraet img{display:block;width:100%}
@@ -207,17 +207,20 @@ if (WEB) {
     await web.screenshot({ path: path.join(WEB, `${datei}.jpg`), type: "jpeg", quality: 82 });
   }
   const og = await browser.newPage({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 });
+  // Bildzeichen des Logos (Ebenen mit Haken, Fassung auf Dunkel) vor dem Namen
+  const ZEICHEN = fs.readFileSync(path.resolve(APP, "../../packages/marke/logo/svg/betriebsklar-zeichen-auf-dunkel.svg"), "utf8").replace(/<title>[^<]*<\/title>/, "").replace("<svg ", '<svg aria-hidden="true" ');
   const titel = texte.bilder[0].titel;
   await og.setContent(`<!doctype html><html><head><meta charset="utf-8"><style>${css}
   html,body{margin:0;width:1200px;height:630px;overflow:hidden}
   body{background:#120E3A;font-family:A;color:#fff;position:relative}
   .text{position:absolute;left:72px;top:96px;width:600px}
-  .marke{font-weight:600;font-size:34px;color:#7fe3b8;letter-spacing:.5px}
+  .marke{display:flex;align-items:center;gap:14px;font-weight:600;font-size:34px;color:#fff;letter-spacing:.5px}
+  .marke svg{width:60px;height:60px;flex:none}
   h1{font-family:S;font-weight:800;font-size:66px;line-height:1.04;margin:24px 0 0;letter-spacing:-2px}
-  p{font-size:30px;line-height:1.35;margin:28px 0 0;color:#7fe3b8}
-  .geraet{position:absolute;left:760px;top:70px;width:372px;border-radius:44px;padding:8px;background:linear-gradient(#f4f7f5,#cfd9d4);box-shadow:0 0 0 2px rgba(255,255,255,.18),0 30px 80px rgba(0,0,0,.45)}
+  p{font-size:30px;line-height:1.35;margin:28px 0 0;color:#7cf5c8}
+  .geraet{position:absolute;left:760px;top:70px;width:372px;border-radius:44px;padding:8px;background:linear-gradient(#f4f4f9,#d0cfe0);box-shadow:0 0 0 2px rgba(255,255,255,.18),0 30px 80px rgba(0,0,0,.45)}
   .geraet img{display:block;width:100%;border-radius:36px}
-  </style></head><body><div class="text"><div class="marke">${MARKE.name}</div><h1>${titel}</h1><p>Pflichten-Check, Rechnungen und über 30 Vorlagen für kleine Betriebe – auf dem iPhone.</p></div>
+  </style></head><body><div class="text"><div class="marke">${ZEICHEN}${MARKE.name}</div><h1>${titel}</h1><p>Pflichten-Check, Rechnungen und über 30 Vorlagen für kleine Betriebe – auf dem iPhone.</p></div>
   <div class="geraet"><img src="${png(texte.bilder[0].bildschirm)}"></div></body></html>`, { waitUntil: "load" });
   await og.screenshot({ path: path.join(WEB, "og.jpg"), type: "jpeg", quality: 85 });
 }

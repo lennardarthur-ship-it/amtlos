@@ -29,7 +29,7 @@ export default async function ChecklisteSeite({ params }: { params: Promise<{ id
             <ul className="mt-3 border-t border-linie">
               {schritte.map((z) => (
                 <li key={z.pflicht_id} className="flex items-start gap-3 border-b border-linie py-3">
-                  <span aria-hidden className={`mt-1 inline-block h-4 w-4 shrink-0 rounded-sm border-2 ${z.status === "erledigt" ? "border-amt bg-amt" : "border-tinte-leise"}`} />
+                  <span aria-hidden className={`mt-1 inline-block h-4 w-4 shrink-0 rounded-sm border-2 ${z.status === "erledigt" ? "border-erfolg bg-erfolg" : "border-tinte-leise"}`} />
                   <div className="min-w-0">
                     <Link href={`/pflichten/${z.pflicht_id}/${z.periode}`} className="verweis font-bold">{z.titel}</Link>
                     <p className="text-klein">{z.kurz}</p>

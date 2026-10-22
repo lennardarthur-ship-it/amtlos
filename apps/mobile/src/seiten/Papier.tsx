@@ -8,11 +8,11 @@ import { RADIUS, SCHRIFT } from "../ui/thema";
 import { euroText } from "../unterlagen/ablage";
 
 /** Papier ist immer weiß mit dunkler Schrift – wie das spätere PDF, auch im Dunkelmodus. */
-const TINTE = "#0c1f18";
-const LEISE = "#5b6b65";
-const LINIE = "#e3e9e6";
-/** gedrückter Bereich: Amtsgrün-Hauch (B12) */
-const GEDRUECKT = "#e1f3ea";
+const TINTE = "#16142e";
+const LEISE = "#5a5870";
+const LINIE = "#e6e5ee";
+/** gedrückter Bereich: Indigo-Hauch (B12) */
+const GEDRUECKT = "#ecebff";
 const FEHLT = "#a05a00";
 const FEHLT_GRUND = "#fff2dc";
 

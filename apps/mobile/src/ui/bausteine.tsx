@@ -89,8 +89,11 @@ export function Symbol({ name, groesse = 22, farbe, gewicht = "medium" }: { name
   );
 }
 
-/** Töne für Kacheln und Plaketten. Auf den Seiten nur Grün, Grau und Bernstein (Rot für Überfälliges) – Lila, Gold und Blau sind veraltet. */
-export type Ton = "amt" | "bald" | "frist" | "leise" | "lila" | "gold" | "blau";
+/**
+ * Töne für Kacheln und Plaketten. Auf den Seiten nur Indigo (`amt`), Minze für Erledigtes (`erfolg`), Grau und Bernstein
+ * (Rot für Überfälliges) – Lila, Gold und Blau sind veraltet.
+ */
+export type Ton = "amt" | "erfolg" | "bald" | "frist" | "leise" | "lila" | "gold" | "blau";
 export const tonFarben = (f: Farben, ton: Ton) =>
   ton === "bald"
     ? { grund: f.baldScheibe, zeichen: f.bald }
@@ -104,7 +107,9 @@ export const tonFarben = (f: Farben, ton: Ton) =>
             ? { grund: f.goldHauch, zeichen: f.gold }
             : ton === "blau"
               ? { grund: f.blauHauch, zeichen: f.blau }
-              : { grund: f.amtHauch, zeichen: f.amt };
+              : ton === "erfolg"
+                ? { grund: f.erfolgHauch, zeichen: f.erfolg }
+                : { grund: f.amtHauch, zeichen: f.amt };
 
 /** Symbol auf einem getönten, weich abgerundeten Quadrat – vor Listenzeilen und in leeren Zuständen (E-142). */
 export function Kachel({ symbol, ton = "amt", groesse = 40 }: { symbol: string; ton?: Ton; groesse?: number }) {
@@ -136,15 +141,15 @@ export function tageBis(termin: string, heute: string): number {
 
 /**
  * Fristblatt (docs/06-design.md): Datum wie auf einem Abreißkalender – Wochentag, großer Tag, Monat. Der Streifen
- * oben trägt den Status (rot überfällig, bernstein bald, grün erledigt). Für VoiceOver verborgen; das Datum steht
+ * oben trägt den Status (rot überfällig, bernstein bald, Minze erledigt). Für VoiceOver verborgen; das Datum steht
  * immer zusätzlich als Text daneben.
  */
 export function Fristblatt({ termin, heute, erledigt, groesse = 46 }: { termin: string; heute: string; erledigt?: boolean; groesse?: number }) {
   const f = useFarben();
   const d = new Date(`${termin}T12:00:00Z`);
   const tage = tageBis(termin, heute);
-  // getöntes Quadrat mit Tag und Monat – der Ton trägt den Status (rot überfällig, bernstein bald, grün erledigt)
-  const t = erledigt ? tonFarben(f, "amt") : tage < 0 ? tonFarben(f, "frist") : tage <= 14 ? tonFarben(f, "bald") : { grund: f.flaeche, zeichen: f.tinte };
+  // getöntes Quadrat mit Tag und Monat – der Ton trägt den Status (rot überfällig, bernstein bald, Minze erledigt)
+  const t = erledigt ? tonFarben(f, "erfolg") : tage < 0 ? tonFarben(f, "frist") : tage <= 14 ? tonFarben(f, "bald") : { grund: f.flaeche, zeichen: f.tinte };
   const fmt = (o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", ...o }).format(d).replace(".", "");
   return (
     <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={{ width: groesse, height: groesse, borderRadius: RADIUS.klein, backgroundColor: t.grund, alignItems: "center", justifyContent: "center" }}>
@@ -154,35 +159,61 @@ export function Fristblatt({ termin, heute, erledigt, groesse = 46 }: { termin: 
   );
 }
 
-/** Geschafft: gefüllter grüner Kreis mit Haken – der Moment nach dem Check, nach dem Teilen. */
+/** Geschafft: gefüllter Kreis in Erfolgsfarbe (Minze) mit Haken – der Moment nach dem Check, nach dem Teilen. */
 export function Erfolg({ groesse = 64 }: { groesse?: number }) {
   const f = useFarben();
   return (
     <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden>
-      <Symbol name="checkmark.circle.fill" groesse={groesse} farbe={f.amt} gewicht="regular" />
+      <Symbol name="checkmark.circle.fill" groesse={groesse} farbe={f.erfolg} gewicht="regular" />
+    </View>
+  );
+}
+
+/** #rrggbb → [r, g, b] */
+const rgb = (hex: string) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)) as [number, number, number];
+/** Farbe `vorn` mit Anteil `anteil` (0..1) deckend über `grund` gemischt – für leise Grafiken ohne Überlagerung. */
+export function mische(vorn: string, anteil: number, grund: string): string {
+  const v = rgb(vorn);
+  const g = rgb(grund);
+  return `#${v.map((c, i) => Math.round(c * anteil + g[i]! * (1 - anteil)).toString(16).padStart(2, "0")).join("")}`;
+}
+
+/** Farben des Logos (packages/marke/logo): Indigo, Violett, Minze */
+export const LOGO = { navy: "#120e3a", indigo: "#3b30c4", violett: "#6e5bff", minze: "#7cf5c8" } as const;
+
+/**
+ * Bildzeichen der Marke (Logo, packages/marke/logo/svg/betriebsklar-zeichen-auf-dunkel.svg): drei gestapelte Rauten
+ * (Ebenen), oben mit Haken. Aus Views gebaut (keine SVG-Bibliothek nötig): Quadrat um 45° gedreht und gestaucht.
+ * `farben` = [unten, Mitte, oben], `haken` = Farbe des Hakens, `grund` = Farbe der Fläche dahinter (Fugen zwischen
+ * den Ebenen). Rein dekorativ.
+ */
+export function BildZeichen({ breite, farben, haken, grund, stil }: { breite: number; farben: [string, string, string]; haken: string; grund: string; stil?: StyleProp<ViewStyle> }) {
+  const u = breite / 64; // eine Einheit des Logo-Rasters (Raute 64 breit, 30 hoch, Abstand 13)
+  const a = breite / Math.SQRT2;
+  const raute = (mitte: number, farbe: string, i: number) => (
+    <View key={i} style={{ position: "absolute", left: (breite - a) / 2, top: mitte * u - a / 2, width: a, height: a, backgroundColor: farbe, borderWidth: i ? 2.2 * u : 0, borderColor: grund, borderRadius: 1.2 * u, transform: [{ scaleY: 30 / 64 }, { rotate: "45deg" }] }} />
+  );
+  // Haken wie im Logo: (39 | 43,5) → (47 | 48) → (61 | 38), Strichstärke 6 – zwei abgerundete Balken
+  const balken = (x1: number, y1: number, x2: number, y2: number) => {
+    const laenge = Math.hypot(x2 - x1, y2 - y1) + 6;
+    return <View style={{ position: "absolute", left: ((x1 + x2) / 2 - 18) * u - (laenge * u) / 2, top: ((y1 + y2) / 2 - 28) * u - 3 * u, width: laenge * u, height: 6 * u, borderRadius: 3 * u, backgroundColor: haken, transform: [{ rotate: `${(Math.atan2(y2 - y1, x2 - x1) * 180) / Math.PI}deg` }] }} />;
+  };
+  return (
+    <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden pointerEvents="none" style={[{ width: breite, height: 56 * u }, stil]}>
+      {[41, 28, 15].map((m, i) => raute(m, farben[i]!, i))}
+      {balken(39.5, 43.5, 47, 48)}
+      {balken(47, 48, 60.5, 38.5)}
     </View>
   );
 }
 
 /**
- * Bildmotiv (E-139): ein Zeichen aus der Welt der Pflichten und Rechnungen (§, €) als große, angeschnittene Grafik auf
- * der Bühne – das wiederkehrende Bildelement statt Illustrationen. Rein dekorativ.
- */
-export function Motiv({ zeichen, groesse = 220, farbe, stil }: { zeichen: string; groesse?: number; farbe: string; stil?: StyleProp<TextStyle> }) {
-  return (
-    <RNText accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={[{ position: "absolute", ...SCHRIFT.display, fontSize: groesse, lineHeight: groesse * 1.1, color: farbe, letterSpacing: -groesse * 0.04, includeFontPadding: false }, stil]}>
-      {zeichen}
-    </RNText>
-  );
-}
-
-/**
- * Der Amtlos-Stempel (wie im App-Symbol): doppelter Ring mit Haken, leicht gedreht – „amtlich erledigt, ohne Amt“.
- * Das eine wiederkehrende Bildzeichen: Einladung, leere Listen, geschaffte Schritte. Rein dekorativ.
+ * Der Stempel: doppelter Ring mit Haken, leicht gedreht – „erledigt“. Steht für geschaffte Schritte (Check, geteilt,
+ * bezahlt); Standardfarbe ist die Erfolgsfarbe (Minze, auf Hell als dunkle Minze). Rein dekorativ.
  */
 export function Stempel({ groesse = 64, farbe, grund, text, unter }: { groesse?: number; farbe?: string; grund?: string; text?: string; unter?: string }) {
   const f = useFarben();
-  const c = farbe ?? f.amt;
+  const c = farbe ?? f.erfolg;
   const ring = Math.max(2, Math.round(groesse * 0.075));
   return (
     <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={{ width: groesse, height: groesse, transform: [{ rotate: "-12deg" }] }}>
@@ -232,7 +263,7 @@ const tippen = () => {
 };
 
 /**
- * Knöpfe (E-142): der eine Hauptknopf (tiefes Grün, dunkel: Minze), `ton` für Zweitrangiges (ruhige Fläche), `leise`
+ * Knöpfe (E-142): der eine Hauptknopf (Navy der Bühne, dunkel: Minze), `ton` für Zweitrangiges (ruhige Fläche), `leise`
  * als Umriss, `buehne` als Minze-Knopf auf der Bühne, `glas` als Zweitknopf auf der Bühne. 54 pt hoch, abgerundete
  * Rechtecke, geben beim Drücken leicht nach, Haptik beim Tippen.
  */
@@ -388,8 +419,8 @@ export function Fakt({ symbol: _symbol, ton, text, letzte }: { symbol: string; t
 }
 
 /**
- * Das eine Kästchen (A6): 22 pt, Ecken 6, gewählt gefüllt in Amtsgrün mit Haken (13 pt). `invers`: auf gefüllter
- * dunkler Fläche (gewählter Chip) – dann weiß mit grünem Haken. Rein dekorativ; Zustand trägt das Element darum.
+ * Das eine Kästchen (A6): 22 pt, Ecken 6, gewählt gefüllt in Indigo mit Haken (13 pt). `invers`: auf gefüllter
+ * dunkler Fläche (gewählter Chip) – dann weiß mit Haken in Indigo. Rein dekorativ; Zustand trägt das Element darum.
  */
 export function Kaestchen({ an, invers, groesse = 22 }: { an: boolean; invers?: boolean; groesse?: number }) {
   const f = useFarben();
@@ -493,8 +524,8 @@ export function Marke({ text, ton }: { text: string; ton: Ton }) {
   const t = tonFarben(f, ton);
   return (
     <View style={{ paddingHorizontal: 9, paddingVertical: 3, borderRadius: RADIUS.pille, backgroundColor: t.grund }}>
-      {/* Grün auf Grünhauch: das tiefe Grün, sonst reicht der Kontrast für 12 pt nicht */}
-      <T v="mini" farbe={ton === "amt" ? f.amtTief : t.zeichen} stil={{ fontSize: 12, lineHeight: 15 }}>{text}</T>
+      {/* Ton auf eigenem Hauch: die tiefe Variante, damit 12 pt sicher über 4,5:1 liegen */}
+      <T v="mini" farbe={ton === "amt" ? f.amtTief : ton === "erfolg" ? f.erfolgTief : t.zeichen} stil={{ fontSize: 12, lineHeight: 15 }}>{text}</T>
     </View>
   );
 }
@@ -503,8 +534,8 @@ export function Marke({ text, ton }: { text: string; ton: Ton }) {
 export function Hinweis({ text, art = "info", symbol }: { text: string; art?: "info" | "warnung" | "fehler" | "erfolg"; symbol?: string }) {
   const f = useFarben();
   // Orange nur für echte Warnungen – neutrale Hinweise ruhig, sonst wirkt alles wie eine Warnung
-  const farbe = art === "fehler" ? f.frist : art === "erfolg" ? f.amt : art === "warnung" ? f.bald : f.tinteLeise;
-  const hg = art === "fehler" ? f.fristHauch : art === "erfolg" ? f.amtHauch : art === "warnung" ? f.baldHauch : f.flaeche;
+  const farbe = art === "fehler" ? f.frist : art === "erfolg" ? f.erfolg : art === "warnung" ? f.bald : f.tinteLeise;
+  const hg = art === "fehler" ? f.fristHauch : art === "erfolg" ? f.erfolgHauch : art === "warnung" ? f.baldHauch : f.flaeche;
   // Fehler immer ansagen (VoiceOver kennt keine Live-Regionen); Erfolg und Info nur, wenn sie sich nach dem ersten
   // Zeichnen ändern – sonst sagt jede Seite beim Öffnen ihre stehenden Hinweise an
   const gezeichnet = useRef(false);
@@ -527,7 +558,7 @@ export function Hinweis({ text, art = "info", symbol }: { text: string; art?: "i
 /** Statuszeile: Form + Text, Farbe nie allein. */
 export function Status({ status, text }: { status: string; text: string }) {
   const f = useFarben();
-  const farbe = status === "ueberfaellig" ? f.frist : status === "faellig_bald" ? f.bald : status === "erledigt" ? f.amt : f.tinteLeise;
+  const farbe = status === "ueberfaellig" ? f.frist : status === "faellig_bald" ? f.bald : status === "erledigt" ? f.erfolg : f.tinteLeise;
   return (
     <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
       <View style={{ width: 8, height: 8, borderRadius: status === "erledigt" ? 2 : 4, backgroundColor: farbe }} />
@@ -554,7 +585,7 @@ export function Karte({ children, stil, rahmen }: { children: ReactNode; stil?: 
   );
 }
 
-/** Gemeinsamer Stil für Eingabeflächen (Textfeld, Datum, Auswahlzeile): Rahmen ≥ 3:1, im Fokus Amtsgrün. */
+/** Gemeinsamer Stil für Eingabeflächen (Textfeld, Datum, Auswahlzeile): Rahmen ≥ 3:1, im Fokus Indigo. */
 /**
  * Eingabefläche wie in iOS: gefüllt, ohne Rahmen (grau in einer Karte, weiß auf grauem Grund); im Fokus und bei
  * Fehlern ein farbiger Rand. Die Beschriftung steht immer sichtbar darüber (E-140).
@@ -572,7 +603,7 @@ export function feldRahmen(f: Farben, zustand: { fokus?: boolean; fehler?: boole
     backgroundColor: f.flaeche,
   };
 }
-// Web-Vorschau: kein Browser-Fokusrahmen (der eigene Rahmen in Amtsgrün zeigt den Fokus)
+// Web-Vorschau: kein Browser-Fokusrahmen (der eigene Rahmen in Indigo zeigt den Fokus)
 const feldText = (f: Farben): TextStyle => ({ color: f.tinte, ...SCHRIFT.regular, fontSize: GROESSE.basis, ...(istIos ? null : ({ outlineStyle: "none" } as unknown as TextStyle)) });
 
 /** Beschriftetes Textfeld; die Beschriftung steht darüber und ist mit dem Feld verbunden. */
@@ -721,7 +752,7 @@ export function DatumFeld({ label, wert, aendern, hilfe, ohneHeute, ohneLabel, j
   );
 }
 
-/** Chip für Auswahl und Mehrfachauswahl: rund, gewählt in Amtsgrün mit Häkchen (Farbe nie allein). */
+/** Chip für Auswahl und Mehrfachauswahl: rund, gewählt in Indigo mit Häkchen (Farbe nie allein). */
 function Chip({ text, an, rolle, onPress, kaestchen }: { text: string; an: boolean; rolle: "radio" | "checkbox"; onPress: () => void; kaestchen?: boolean }) {
   const f = useFarben();
   const inKarte = useInKarte();
@@ -780,7 +811,7 @@ export function Schalter({ label, wert, aendern, hilfe }: { label: string; wert:
       </View>
       {/* nur Anzeige – Zustand und Bedienung trägt die Zeile */}
       <View pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden>
-        {/* Web: ohne activeThumbColor färbt react-native-web den Knopf im An-Zustand grün (A11) */}
+        {/* Web: ohne activeThumbColor färbt react-native-web den Knopf im An-Zustand grün (Browserstandard) (A11) */}
         {/* R12 (Kurier #20): auch der innere Schalter trägt die Beschriftung – im Web taucht er sonst unbeschriftet auf */}
         <Switch value={wert} accessibilityLabel={label} focusable={false} trackColor={{ true: f.haupt, false: f.linie }} thumbColor="#ffffff" ios_backgroundColor={f.linie} {...({ activeThumbColor: "#ffffff", tabIndex: -1, "aria-label": label } as object)} />
       </View>
@@ -800,7 +831,7 @@ function ListenRahmen({ label, rolle, children }: { label: string; rolle?: "radi
 }
 
 /**
- * Große Antwortkarte (Fragen im Pflichten-Check): eine Karte je Möglichkeit, gewählt mit grünem Rahmen und
+ * Große Antwortkarte (Fragen im Pflichten-Check): eine Karte je Möglichkeit, gewählt mit Rahmen in Indigo und
  * Radiokreis bzw. Kästchen – wie in den besten Frage-Antwort-Apps, mit großen Tippflächen.
  */
 function AntwortKarte({ text, an, rolle, onPress, unter }: { text: string; an: boolean; rolle: "radio" | "checkbox"; onPress: () => void; /** R12: kleine Zeile darunter, z. B. „aus deiner Branche“ */ unter?: string }) {
@@ -1048,7 +1079,7 @@ export function ChipLeiste<W extends string>({ label, wert, aendern, optionen, h
   );
 }
 
-/** „Hinzufügen“ – überall gleich (A23): gestrichelte Karte mit grünem Plus-Kreis. */
+/** „Hinzufügen“ – überall gleich (A23): gestrichelte Karte mit Plus-Kreis in Indigo. */
 export function HinzufuegenKnopf({ text, label, onPress, stil }: { text: string; label?: string; onPress: () => void; stil?: StyleProp<ViewStyle> }) {
   const f = useFarben();
   return (

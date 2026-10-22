@@ -91,7 +91,7 @@ function Kapsel({ state, navigation }: BottomTabBarProps) {
                   if (!an && !e.defaultPrevented) navigation.navigate(r.name);
                 }}
                 hitSlop={4}
-                style={({ pressed }) => ({ height: 52, ...(wort ? { paddingHorizontal: pillenRand } : beschriftet ? { flex: 1, maxWidth: 72 } : { width: knopf }), flexShrink: wort ? 1 : 0, minWidth: 0, borderRadius: 26, flexDirection: beschriftet ? "column" : "row", alignItems: "center", justifyContent: "center", gap: beschriftet ? 2 : 7, backgroundColor: an ? "rgba(127,227,184,0.16)" : "transparent", opacity: pressed ? 0.7 : 1 })}
+                style={({ pressed }) => ({ height: 52, ...(wort ? { paddingHorizontal: pillenRand } : beschriftet ? { flex: 1, maxWidth: 72 } : { width: knopf }), flexShrink: wort ? 1 : 0, minWidth: 0, borderRadius: 26, flexDirection: beschriftet ? "column" : "row", alignItems: "center", justifyContent: "center", gap: beschriftet ? 2 : 7, backgroundColor: an ? "rgba(124,245,200,0.16)" : "transparent", opacity: pressed ? 0.7 : 1 })}
               >
                 <Symbol name={an ? k.symbolAn : k.symbol} groesse={beschriftet ? 19 : symbol} farbe={an ? f.minze : "rgba(255,255,255,0.72)"} gewicht={an ? "semibold" : "regular"} />
                 {wort ? <T v="klein" farbe={f.minze} stil={{ ...SCHRIFT.bold, flexShrink: 1 }} numberOfLines={1} maxFontSizeMultiplier={1.35}>{TEXT.tabs_kurz[k.id]}</T> : null}

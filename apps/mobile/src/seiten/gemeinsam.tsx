@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Bereich } from "@amtlos/fachlogik";
 import { rechtsHinweis, type HinweisArt } from "../rechtshinweis";
 import { euroText } from "../unterlagen/ablage";
-import { BuehnenText, Motiv, Symbol, T, useGrosseSchrift } from "../ui/bausteine";
+import { BildZeichen, BuehnenText, LOGO, Symbol, T, mische, useGrosseSchrift } from "../ui/bausteine";
 import { HellerStatus, TastaturRahmen, useImBlatt, useKopf, type KopfKnopfDef } from "../ui/navigation";
 import { BLATT_OBEN, RADIUS, RAND, SCHRIFT, schattenStil, useFarben } from "../ui/thema";
 import { trennen } from "../ui/trennen";
@@ -14,15 +14,20 @@ import { trennen } from "../ui/trennen";
 /** Platz unter dem Blatt für die schwebende Tab-Leiste. */
 export const UNTEN_FREI = 120;
 
-/** Das §-Motiv der Bühne – überall an derselben Stelle und gleich leise (A2), damit es nichts überlagert. */
+/**
+ * Das Bildzeichen der Marke (Ebenen mit Haken) groß und angeschnitten auf der Bühne – überall an derselben Stelle und
+ * gleich leise (A2), damit es nichts überlagert. Deckend gemischte Töne statt Transparenz: keine dunkleren Überlappungen.
+ */
 function BuehnenMotiv() {
-  return <Motiv zeichen="§" groesse={340} farbe="rgba(127,227,184,0.045)" stil={{ right: -84, top: -56 }} />;
+  const f = useFarben();
+  const g = f.buehne;
+  return <BildZeichen breite={300} grund={g} farben={[mische(LOGO.indigo, 0.22, g), mische(LOGO.violett, 0.13, g), mische(LOGO.minze, 0.07, g)]} haken={g} stil={{ position: "absolute", right: -92, top: -38 }} />;
 }
 
 /**
- * Tab-Seite (E-142 „Bühne und Papier“): oben die dunkelgrüne Bühne mit Zeile darüber, großem Titel und dem, was auf
+ * Tab-Seite (E-142 „Bühne und Papier“): oben die dunkle Bühne (Navy) mit Zeile darüber, großem Titel und dem, was auf
  * dieser Seite zählt (Betrag, Jahr, Knöpfe); darunter schiebt sich das helle Blatt mit dem Rest. Statusleiste hell,
- * solange die Seite sichtbar ist. Unter dem Blatt geht der helle Grund weiter (kein Grün beim Ziehen nach oben).
+ * solange die Seite sichtbar ist. Unter dem Blatt geht der helle Grund weiter (keine Bühnenfarbe beim Ziehen nach oben).
  */
 export function BuehnenSeite({ ueber, titel, satz, rechts, buehne, children, ...rest }: ScrollViewProps & { ueber?: string; titel?: string; satz?: boolean; rechts?: ReactNode; buehne?: ReactNode }) {
   const f = useFarben();
@@ -48,7 +53,7 @@ export function BuehnenSeite({ ueber, titel, satz, rechts, buehne, children, ...
         </View>
         <View style={{ flexGrow: 1, backgroundColor: f.papier, borderTopLeftRadius: RADIUS.buehne, borderTopRightRadius: RADIUS.buehne, paddingHorizontal: RAND, paddingTop: BLATT_OBEN, paddingBottom: UNTEN_FREI }}>
           {children}
-          {/* heller Grund unter dem Blatt – beim Ziehen über das Ende hinaus kein Grün */}
+          {/* heller Grund unter dem Blatt – beim Ziehen über das Ende hinaus keine Bühnenfarbe */}
           {Platform.OS === "web" ? null : <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: -1000, height: 1000, backgroundColor: f.papier }} />}
         </View>
       </ScrollView>
@@ -84,7 +89,7 @@ export function BuehnenListe<T>({ ueber, titel, buehne, kopf, fuss, daten, zeile
   const unten = (
     <View style={{ backgroundColor: f.papier, paddingHorizontal: RAND, paddingBottom: UNTEN_FREI, flexGrow: 1 }}>
       {fuss}
-      {/* heller Grund unter dem Blatt – beim Ziehen über das Ende hinaus kein Grün (im Web verlängerte er die Liste) */}
+      {/* heller Grund unter dem Blatt – beim Ziehen über das Ende hinaus keine Bühnenfarbe (im Web verlängerte er die Liste) */}
       {Platform.OS === "web" ? null : <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: -1000, height: 1000, backgroundColor: f.papier }} />}
     </View>
   );
@@ -135,7 +140,7 @@ export function GrosserBetrag({ cent, groesse: wunsch = 60, label }: { cent: num
 }
 
 /**
- * Unterseite oder Blatt im Bühnen-Aufbau (E-144): Die Navigationsleiste wird grün, darunter setzt sich die Bühne fort
+ * Unterseite oder Blatt im Bühnen-Aufbau (E-144): Die Navigationsleiste nimmt die Bühnenfarbe an, darunter setzt sich die Bühne fort
  * mit Titel, einem Satz und dem, was zählt; das helle Blatt trägt den Rest. Ein Fuß (Hauptknopf) bleibt unten stehen.
  */
 /**

@@ -289,7 +289,7 @@ export function PflichtZeile({ p, letzte, erledigt, ohneWichtig }: { p: PflichtI
     <Zeile
       // mit Termin: das Fristblatt (Datum auf einen Blick); ohne Termin eine ruhige graue Kachel mit dem Bereich (A24) –
       // kein bernsteinfarbenes „!“, das wie eine Frist aussieht
-      links={termin ? <Fristblatt termin={termin} heute={heute()} /> : <Kachel symbol={erledigt ? "checkmark" : BEREICH_SYMBOL_KAT[p.kategorie] ?? "doc.text"} ton={erledigt ? "amt" : "leise"} groesse={46} />}
+      links={termin ? <Fristblatt termin={termin} heute={heute()} /> : <Kachel symbol={erledigt ? "checkmark" : BEREICH_SYMBOL_KAT[p.kategorie] ?? "doc.text"} ton={erledigt ? "erfolg" : "leise"} groesse={46} />}
       titel={p.titel}
       text={unter}
       // „Wichtig“ als Plakette unter dem Titel – VoiceOver liest sie mit

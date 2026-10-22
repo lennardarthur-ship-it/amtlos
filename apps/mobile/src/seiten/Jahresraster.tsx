@@ -82,7 +82,7 @@ export function Jahresraster({ gilt, tag }: { gilt: readonly PflichtInfo[]; tag:
               accessibilityHint={TEXT.r12_monat_hinweis}
               onPress={() => nav.oeffnen(`monat-${mo.schluessel}`, () => <MonatSeite monat={mo} gilt={gilt} />, true)}
               // R11 (UX #13): flach statt knopfartig – nur der laufende Monat ist hervorgehoben
-              style={({ pressed }) => ({ flex: 1, minWidth: 0, minHeight: 54, borderRadius: RADIUS.klein, padding: 6, justifyContent: "space-between", opacity: pressed ? 0.7 : 1, backgroundColor: mo.jetzt ? f.minze : "transparent", borderTopWidth: mo.jetzt ? 0 : 1, borderColor: mo.termine ? "rgba(127,227,184,0.55)" : "rgba(255,255,255,0.18)" })}
+              style={({ pressed }) => ({ flex: 1, minWidth: 0, minHeight: 54, borderRadius: RADIUS.klein, padding: 6, justifyContent: "space-between", opacity: pressed ? 0.7 : 1, backgroundColor: mo.jetzt ? f.minze : "transparent", borderTopWidth: mo.jetzt ? 0 : 1, borderColor: mo.termine ? "rgba(124,245,200,0.55)" : "rgba(255,255,255,0.18)" })}
             >
               <T v="caption" numberOfLines={1} maxFontSizeMultiplier={1.4} farbe={mo.jetzt ? f.buehneKnopfText : f.buehneLeise} stil={{ ...SCHRIFT.halb, fontSize: 12, lineHeight: 14 }}>{mo.kurz}</T>
               {mo.termine ? <T maxFontSizeMultiplier={1.4} farbe={mo.jetzt ? f.buehneKnopfText : f.buehneText} stil={{ ...SCHRIFT.display, fontSize: 17, lineHeight: 19 }}>{String(mo.termine)}</T> : null}

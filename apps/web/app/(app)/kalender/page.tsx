@@ -70,7 +70,7 @@ export default async function KalenderSeite() {
                               {ueberfaelligAlt ? `${d.tag}.${k.faellig_am!.slice(5, 7)}.` : `${d.wochentag} ${d.tag}.`}
                             </span>
                             <span className={`flex min-w-0 items-start gap-2 hyphens-auto [overflow-wrap:anywhere] ${k.status === "erledigt" ? "text-tinte-leise line-through" : ""}`}>
-                              <StatusForm status={k.status} className={`mt-1.5 ${k.status === "ueberfaellig" ? "text-frist" : k.status === "faellig_bald" ? "text-bald" : k.status === "erledigt" ? "text-amt" : ""}`} />
+                              <StatusForm status={k.status} className={`mt-1.5 ${k.status === "ueberfaellig" ? "text-frist" : k.status === "faellig_bald" ? "text-bald" : k.status === "erledigt" ? "text-erfolg" : ""}`} />
                               <span>
                                 {k.titel}
                                 <span className="sr-only"> ({x.status[k.status]})</span>
