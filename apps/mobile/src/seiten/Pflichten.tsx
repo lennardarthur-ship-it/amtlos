@@ -21,6 +21,8 @@ import { useProSperre } from "./Pro";
 import { kanzleienSichtbar } from "./Kanzleien";
 import { SteuerberatungSeite } from "./Steuerberatung";
 import { erinnerungenAbgleichen, erinnerungenAktiv, pflichtAnsicht } from "../pro/regeln";
+import { GEWERBE_PFLICHT } from "../gewerbe/felder";
+import { GewerbeOnlineSeite } from "./GewerbeOnline";
 
 const datumDe = (iso: string) => datumKurz(`${iso}T12:00:00Z`);
 const TAG_LANG = new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", weekday: "long", day: "numeric", month: "long", year: "numeric" });
@@ -54,7 +56,7 @@ export function Balken({ prozent, grund, farbe, label }: { prozent: number; grun
   );
 }
 
-function PflichtDetail({ id }: { id: string }) {
+export function PflichtDetail({ id }: { id: string }) {
   const z = useAmtlos();
   const f = useFarben();
   const starten = useStarten();
@@ -161,6 +163,12 @@ function PflichtDetail({ id }: { id: string }) {
       {gilt && p.erledigung.art === "laufend" ? <Hinweis text={p.erledigung.zeitraum ? TEXT.r10_laufend(p.erledigung.zeitraum, zeitraumText(heute())) : TEXT.r10_laufend_termin} /> : null}
       {gilt && bestaetigen && !abgehakt ? <Hinweis text={TEXT.r10_bestaetigen_hinweis(bestaetigen)} /> : null}
       {p.wiederkehrend && p.naechsterTermin ? <Hinweis text={TEXT.wiederkehrend_hinweis(datumDe(p.naechsterTermin))} /> : null}
+      {/* Gewerbe online anmelden – Schritt für Schritt: frei, auch ohne Pro */}
+      {p.id === GEWERBE_PFLICHT ? (
+        <Karte stil={{ marginTop: 8 }}>
+          <Zeile symbol="globe" ton="amt" titel={TEXT.go_einstieg} text={TEXT.go_einstieg_text} onPress={() => nav.oeffnen("gewerbe-online", () => <GewerbeOnlineSeite />, true)} letzte />
+        </Karte>
+      ) : null}
       {p.teaser ? <ProTeaser /> : null}
       <Karte stil={{ marginTop: 8, paddingTop: 0 }}>
         {p.grund ? zeile(TEXT.warum, p.grund) : null}

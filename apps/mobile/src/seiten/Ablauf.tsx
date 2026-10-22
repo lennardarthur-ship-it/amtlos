@@ -295,7 +295,7 @@ function Fortschritt({ n, aktuell }: { n: number; aktuell: number }) {
  * Vorschau und „PDF teilen“. Gespeichert wird bei jeder Eingabe. Eine neue, unveränderte Unterlage verschwindet beim
  * Schließen wieder. `amEnde`: bestehende Unterlagen öffnen beim Abschluss (Vorschau und Übersicht).
  */
-export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?: boolean }) {
+export function Ablauf({ id, neu, amEnde, start }: { id: string; neu?: boolean; amEnde?: boolean; /** Schritt beim Öffnen (z. B. „im Datenblatt ergänzen“) */ start?: number }) {
   const z = useAmtlos();
   const nav = useNav();
   const f = useFarben();
@@ -303,7 +303,7 @@ export function Ablauf({ id, neu, amEnde }: { id: string; neu?: boolean; amEnde?
   const vorlage = unterlage ? vorlageFuer(unterlage.vorlage) : undefined;
   const n = vorlage?.abschnitte.length ?? 0;
   const fest = Boolean(unterlage?.festgeschrieben);
-  const [schritt, setSchritt] = useState(amEnde || fest ? n : 0);
+  const [schritt, setSchritt] = useState(amEnde || fest ? n : start !== undefined && start >= 0 && start < n ? start : 0);
   const teilen = useTeilen(id);
   const anfang = useRef(unterlage ? JSON.stringify(unterlage.daten) : "");
   const zRef = useRef(z);

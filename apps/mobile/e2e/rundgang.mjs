@@ -456,6 +456,57 @@ try {
   await knopf("Schließen").click();
   await warte(800);
 
+  // Gewerbe online anmelden – Schritt für Schritt: aus dem Abschluss des Datenblatts, Felder des GewA 1 mit „fehlt“,
+  // Weg zum Portal (München → Bundesportal), Abhaken mit Tag, Sprung zurück ins Datenblatt. Fotos in 375 pt.
+  await neu();
+  await feld("Vorlage suchen").fill("gewerbe");
+  await warte();
+  await tippe(p.getByRole("button", { name: /^Gewerbeanmeldung/ }).first());
+  await warte(900);
+  pruefe((await feld("Vor- und Nachname").inputValue()) === "Alex Muster", "Name im Datenblatt nicht aus dem Betrieb vorbelegt");
+  await feld("Geburtsort").fill("München, Deutschland");
+  await knopf("Weiter").click();
+  await warte();
+  await feld("Angemeldete Tätigkeit").fill("Friseurhandwerk");
+  await knopf("Zur Unterlage").click();
+  await warte(1200);
+  await tippe(p.getByRole("button", { name: /^Online anmelden – Schritt für Schritt/ }).locator("visible=true").last());
+  await warte(1000);
+  pruefe((await sichtbar("GewA 1 · Feld 4")) && (await sichtbar("Muster")) && (await sichtbar("Friseurhandwerk")), "Felder des GewA 1 mit den Werten fehlen");
+  pruefe(await sichtbar("fehlt – im Datenblatt ergänzen"), "fehlende Angabe nicht markiert");
+  pruefe((await sichtbar("Das brauchst du")) && (await sichtbar("Bundesportal")) && (await sichtbar("je nach Gemeinde")), "„Das brauchst du“ oder Bundesportal fehlt (München)");
+  pruefe((await sichtbar(`${MARKE.name} übermittelt nichts an Behörden`)) && (await sichtbar("keine Rechts")), "Hinweise „übermittelt nichts“ und Rechtshinweis fehlen");
+  const groesse = p.viewportSize();
+  await p.setViewportSize({ width: 375, height: 812 });
+  await warte(700);
+  await foto("gewerbe-online-oben-375");
+  await p.getByRole("button", { name: "Zum Online-Antrag", exact: true }).locator("visible=true").last().evaluate((el) => el.scrollIntoView({ block: "center" }));
+  await warte(500);
+  await foto("gewerbe-online-mitte-375");
+  await p.getByTestId("rechtshinweis-vorlage").locator("visible=true").last().evaluate((el) => el.scrollIntoView({ block: "end" }));
+  await warte(500);
+  await foto("gewerbe-online-unten-375");
+  await p.setViewportSize(groesse);
+  await warte(500);
+  // Zum Online-Antrag: öffnet das Bundesportal (Antwort im Rundgang ersetzt, kein Netz nötig)
+  await ctx.route("https://verwaltung.bund.de/**", (r) => r.fulfill({ status: 200, contentType: "text/html", body: "<title>Bundesportal</title>" }));
+  const [portal] = await Promise.all([ctx.waitForEvent("page"), tippe(knopf("Zum Online-Antrag"))]);
+  await portal.waitForLoadState();
+  pruefe(portal.url() === "https://verwaltung.bund.de/leistungsverzeichnis/DE/leistung/99050012104000", `Online-Antrag öffnet ${portal.url()}`);
+  await portal.close();
+  await warte(400);
+  await tippe(knopf("Erledigt markieren"));
+  await warte(700);
+  pruefe(await sichtbar("als erledigt vermerkt"), "Gewerbeanmeldung nicht abgehakt");
+  await tippe(knopf("Haken entfernen"));
+  await warte(500);
+  // „Im Datenblatt ergänzen“ springt zurück in den Ablauf, zum Schritt mit dem Geburtsdatum
+  await tippe(p.getByRole("button", { name: "Im Datenblatt ergänzen: Geburtsdatum", exact: true }).locator("visible=true").last());
+  await warte(1000);
+  pruefe((await p.getByLabel("Geburtsdatum", { exact: true }).locator("visible=true").count()) > 0, "„Im Datenblatt ergänzen“ springt nicht zum Feld");
+  await knopf("Schließen").click();
+  await warte(800);
+
   // E-Rechnung empfangen (E-133): XRechnung über die Dateiauswahl → Beleg, ausgefüllt; danach das Paket für die Steuerberatung
   const F = await import(new URL("../../../packages/fachlogik/dist/index.js", import.meta.url).href);
   const eingang = F.xrechnungUbl({ nummer: "L-2026-77", rechnungsdatum: "2026-10-08", leistungsdatum: "2026-10-08", faellig_am: "2026-10-22", steller: { name: "Friseurbedarf Müller GmbH", strasse: "Lagerweg 4", plz: "85748", ort: "Garching", land: "DE", email: "rechnung@mueller.example", telefon: "089 9", steuernummer: null, ust_idnr: "DE811111111", iban: "DE02120300000000202051" }, kunde: { name: "Salon Sonne", strasse: "Hauptstraße 1", plz: "80331", ort: "München", land: "DE", email: "info@salon.example", geschaeftskunde: true }, positionen: [{ bezeichnung: "Farbe 60 ml", menge: 10, einheit: "stueck", preis_cent: 650, ust_satz: 19 }], kleinunternehmer: false }, F.KU_HINWEIS);
@@ -573,7 +624,7 @@ try {
   await feld("Passwort").fill("sonnenschein-2026");
   await knopf("Öffnen").click();
   await warte(2500);
-  pruefe(await sichtbar("Salon Sonne · 5 Unterlagen · 1 Beleg · 1 Kassenabschluss · 1 Mitarbeiter · 1 Kunde"), "Inhalt der Sicherung nicht angezeigt");
+  pruefe(await sichtbar("Salon Sonne · 6 Unterlagen · 1 Beleg · 1 Kassenabschluss · 1 Mitarbeiter · 1 Kunde"), "Inhalt der Sicherung nicht angezeigt");
   pruefe(await sichtbar("Nichts Neueres geht verloren"), "Zusammenführen statt Ersetzen nicht erklärt");
   await foto("wiederherstellen");
   await knopf("Jetzt wiederherstellen").click();

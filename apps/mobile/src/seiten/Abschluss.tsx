@@ -24,6 +24,8 @@ import { Ablauf, fehltJeSchritt } from "./Ablauf";
 import { useProSperre } from "./Pro";
 import { VORLAGEN_FREI_JE_MONAT, ausgabeErlaubt, betriebFuerDokument, eRechnungErlaubt, uebrig, zaehltFuerKontingent } from "../pro/regeln";
 import { Ansage, useAnsage } from "./felder";
+import { GEWERBE_VORLAGE } from "../gewerbe/felder";
+import { GewerbeOnlineSeite } from "./GewerbeOnline";
 
 /**
  * Nachkontrolle Dr. Weber (21.10.2026): Form der Unterlage als Kasten – am Anfang des Ablaufs und im Abschluss vor dem
@@ -293,6 +295,12 @@ export function Abschluss({ id, springen, fehler, drucken: druckenLos, eRechnung
             {typeof d.storno_zu === "string" && d.storno_zu ? <Hinweis text={TEXT.storniert_zu(d.storno_zu)} /> : null}
             {v.storno && !u.storniertDurch ? <Zahlung id={id} /> : null}
           </View>
+        ) : null}
+        {/* Datenblatt Gewerbeanmeldung: weiter zum Online-Antrag – frei, auch ohne Pro */}
+        {v.id === GEWERBE_VORLAGE ? (
+          <Karte stil={{ marginTop: fest ? 12 : 0, marginBottom: 12 }}>
+            <Zeile symbol="globe" ton="amt" titel={TEXT.go_einstieg} text={TEXT.go_einstieg_text} onPress={() => nav.oeffnen(`gewerbe-online-${id}`, () => <GewerbeOnlineSeite unterlageId={id} ergaenzen={springen} />, true)} letzte />
+          </Karte>
         ) : null}
         {ergebnis.length > 1 ? (
           <Karte stil={{ marginTop: fest ? 12 : 0, paddingVertical: 8 }}>
