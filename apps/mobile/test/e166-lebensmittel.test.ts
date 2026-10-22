@@ -7,7 +7,7 @@ import { GEFAHRENANALYSE, leereDaten, LEERER_BETRIEB, vorlageFuer } from "@amtlo
 import { KATALOG, auswertung, type Profil } from "../src/pflichten/check";
 
 const ids = (l: { id: string }[]) => l.map((p) => p.id);
-const foodtruck: Profil = { "taetigkeit.branchen": ["gastronomie_lebensmittel"], rechtsform: "einzelunternehmen", "taetigkeit.einordnung": "gewerbe", bundesland: "BW", "beschaeftigte.gesamt": 0, "erlaubnis.gewo_paragraphen": ["55"], "vertrieb.kanaele": ["marktstand"], gruendungsdatum: "2026-12-01" };
+const foodtruck: Profil = { "taetigkeit.branchen": ["gastronomie_lebensmittel"], rechtsform: "einzelunternehmen", "taetigkeit.einordnung": "gewerbe", bundesland: "BW", "beschaeftigte.gesamt": 0, "erlaubnis.gewo_paragraphen": ["55"], "vertrieb.kanaele": ["marktstand"], gruendungsdatum: "2026-12-01", "gastro.wassertank": true, "gastro.wassertank_ab": "2026-12-01" };
 const cafe: Profil = { "taetigkeit.branchen": ["gastronomie_lebensmittel"], rechtsform: "einzelunternehmen", "taetigkeit.einordnung": "gewerbe", bundesland: "SN", "beschaeftigte.gesamt": 2, "vertrieb.kanaele": ["ladengeschaeft"], "erlaubnis.gewo_paragraphen": [], gruendungsdatum: "2022-03-01" };
 
 describe("Pflichten-Check: Rückverfolgbarkeit und Trinkwasser im Foodtruck", () => {

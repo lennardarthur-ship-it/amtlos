@@ -499,6 +499,32 @@ export const SCHRITTE: Schritt[] = [
         frage: { de: "Verkaufst du Essen oder Getränke zum Mitnehmen in Einwegverpackungen?", en: "Do you sell food or drinks to take away in single-use packaging?" },
         hilfe: { de: "Zum Beispiel Kaffeebecher, Salatschalen oder Boxen aus Kunststoff.", en: "For example coffee cups, salad bowls or plastic boxes." },
       },
+      // Prüfbericht Lebensmittelhygiene 22.10.2026 (Frage 14): abgepackte Ware im Regal – Kennzeichnung nach Art. 9 LMIV
+      {
+        feld: "gastro.vorverpackt",
+        art: "janein",
+        frage: { de: "Verkaufst du selbst abgepackte Lebensmittel?", en: "Do you sell food that you package yourself?" },
+        hilfe: { de: "Zum Beispiel Kekse, Marmelade oder Granola, die du abfüllst und ins Regal stellst.", en: "For example biscuits, jam or granola that you pack and put on the shelf." },
+      },
+      // Prüfbericht Lebensmittelhygiene 22.10.2026 (Frage 14): Wassertank im Foodtruck oder Stand (§ 11 Abs. 2 TrinkwV)
+      {
+        feld: "gastro.wassertank",
+        art: "janein",
+        frage: { de: "Hat dein Fahrzeug oder Stand einen eigenen Wassertank?", en: "Does your vehicle or stall have its own water tank?" },
+        hilfe: {
+          de: "Gemeint ist ein Tank mit Leitungen, aus dem du Wasser zum Zubereiten, Spülen oder Händewaschen nimmst. Schließt du dich nur am Standplatz an eine Wasserleitung an, antworte mit Nein.",
+          en: "This means a tank with pipes from which you take water for preparing food, washing up or washing hands. If you only connect to a water pipe at your pitch, answer No.",
+        },
+      },
+      {
+        feld: "gastro.wassertank_ab",
+        art: "datum",
+        frage: { de: "Seit wann nutzt du den Wassertank – oder wann nimmst du ihn in Betrieb?", en: "Since when have you used the water tank – or when will you start using it?" },
+        hilfe: {
+          de: "Die Inbetriebnahme zeigst du spätestens vier Wochen vorher beim Gesundheitsamt an.",
+          en: "You notify the public health office at least four weeks before you start using it.",
+        },
+      },
       {
         feld: "produkte.arten",
         art: "mehrfach",

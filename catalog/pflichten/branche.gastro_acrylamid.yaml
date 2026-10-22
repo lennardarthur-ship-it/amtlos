@@ -1,0 +1,63 @@
+# Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Frage 1 zu L-032 und Frage 14 (c)): Acrylamid minimieren nach VO (EU) 2017/2158
+schema_version: 1
+id: branche.gastro_acrylamid
+version: 1
+katalog_nr: H.1
+titel:
+  de: Acrylamid beim Backen und Frittieren gering halten
+kurz:
+  de: Backst du Brot oder Backwaren oder frittierst du zum Beispiel Pommes frites, hältst du mit einfachen Maßnahmen Acrylamid gering.
+erklaerung:
+  de: >-
+    Acrylamid entsteht, wenn stärkehaltige Lebensmittel stark gebräunt werden – etwa Brot, feine Backwaren, Pommes frites
+    und andere frittierte Kartoffelerzeugnisse. Betriebe, die solche Lebensmittel herstellen, wenden die
+    Minimierungsmaßnahmen der Verordnung (EU) 2017/2158 an. Zum Beispiel: goldgelb statt dunkelbraun backen und
+    frittieren, Backzeit und -temperatur nach Rezeptur einhalten, Frittierfett höchstens 175 °C heiß. Die
+    Lebensmittelüberwachung prüft das vor allem bei Bäckereien. Amtlos fragt nicht ab, ob du backst oder eine Fritteuse
+    nutzt – trifft beides nicht zu, betrifft dich das nicht.
+rechtsgrundlage:
+- Verordnung (EU) 2017/2158
+kategorie: branche
+einordnung: hinweis
+branchen:
+- gastronomie_lebensmittel
+ausloeser:
+  feld: profil.taetigkeit.branchen
+  op: enthaelt
+  wert: gastronomie_lebensmittel
+  label:
+    de: Dein Betrieb gehört zur Gastronomie oder Lebensmittelbranche.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Kontrolle durch die Lebensmittelüberwachung
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+aktion:
+  art: abhaken
+aenderungsnotiz:
+  de: 'Neu nach der fachlichen Prüfung Lebensmittelhygiene (22.10.2026): Acrylamid beim Backen und Frittieren gering halten.'
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Verordnung (EU) 2017/2158 zur Festlegung von Minimierungsmaßnahmen und Richtwerten für die Senkung des Acrylamidgehalts in Lebensmitteln (Inhaltsübersicht über umwelt-online)
+  url: https://umwelt-online.de/recht/eu/17d/17d_2158in.htm
+  abgerufen: '2026-10-22'
+fachlich_zu_pruefen:
+- 'Neu nach Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Frage 1 zu L-032 und Frage 14 (c), ✎) als Hinweis – Bericht noch nicht unterschrieben'
+- 'Fundstelle für kleine Betriebe: Der Bericht nennt „Anhang II Teil B für kleine Betriebe“. Nach der Inhaltsübersicht der Verordnung (umwelt-online) gilt Teil B zusätzlich zu Teil A für Betriebe nach Art. 2 Abs. 3; das Merkblatt der Stadt Chemnitz (merkblatt_acrylamid.pdf) nennt für Betriebe nach Art. 2 Abs. 2 (Einzelhandel, direkt vor Ort) Anhang II Teil A – Teil A oder B mit dem Prüfer klären, deshalb im Text ohne Teil'
+- 'Als Hinweis über die Branche – Amtlos fragt weder „Bäckerei“ noch „Fritteuse“ ab; Bäckerei nur in den Vorlagen erkennbar (Handwerk mit Lebensmitteln oder Name des Betriebs)'
+- 'Frittierfett höchstens 175 °C laut Prüfbericht (L-075: DGF, BGN-Leitlinie 2018)'
+- 'Folgen bei Nichterfüllung – Sanktion fachlich ergänzen (laut Bericht nicht Gegenstand der fachlichen Prüfung)'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null
