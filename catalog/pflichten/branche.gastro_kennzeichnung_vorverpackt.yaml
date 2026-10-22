@@ -1,0 +1,68 @@
+# Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Frage 14 (a)): Kennzeichnung vorverpackter Lebensmittel nach Art. 9 LMIV
+schema_version: 1
+id: branche.gastro_kennzeichnung_vorverpackt
+version: 1
+katalog_nr: H.1
+titel:
+  de: Selbst abgepackte Lebensmittel kennzeichnen
+kurz:
+  de: Stellst du selbst abgepackte Lebensmittel ins Regal – etwa Kekse, Marmelade oder Granola –, gehören die Pflichtangaben auf die Packung.
+erklaerung:
+  de: >-
+    Für vorverpackte Lebensmittel schreibt Art. 9 LMIV vor, was auf der Packung stehen muss. Dazu gehören unter anderem
+    die Bezeichnung, das Zutatenverzeichnis, die Allergene – im Zutatenverzeichnis hervorgehoben, zum Beispiel fett –,
+    die Nettofüllmenge, das Mindesthaltbarkeits- oder Verbrauchsdatum, Name und Anschrift deines Betriebs und die
+    Nährwertdeklaration. Handwerklich hergestellte Lebensmittel, die du in kleinen Mengen direkt an Endverbraucher oder an
+    Geschäfte vor Ort abgibst, brauchen keine Nährwertdeklaration (Anhang V Nr. 19 LMIV). Die übrigen Angaben brauchen
+    sie trotzdem.
+rechtsgrundlage:
+- Art. 9 Verordnung (EU) Nr. 1169/2011 (LMIV)
+- Anhang V Nr. 19 Verordnung (EU) Nr. 1169/2011 (LMIV)
+kategorie: branche
+branchen:
+- gastronomie_lebensmittel
+ausloeser:
+  all:
+  - feld: profil.taetigkeit.branchen
+    op: enthaelt
+    wert: gastronomie_lebensmittel
+    label:
+      de: Dein Betrieb gehört zur Gastronomie oder Lebensmittelbranche.
+  - feld: profil.gastro.vorverpackt
+    op: ==
+    wert: true
+    label:
+      de: Du verkaufst selbst abgepackte Lebensmittel.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Kontrolle durch die Lebensmittelüberwachung
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+aktion:
+  art: abhaken
+aenderungsnotiz:
+  de: 'Neu nach der fachlichen Prüfung Lebensmittelhygiene (22.10.2026): Kennzeichnung von Lebensmitteln, die du selbst abpackst.'
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Verordnung (EU) Nr. 1169/2011, Artikel 9 (Wortlaut über gesetze.legal)
+  url: https://gesetze.legal/eu/vo_eu_2011_1169/9
+  abgerufen: '2026-10-22'
+fachlich_zu_pruefen:
+- 'Neu nach Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Frage 14 (a), ✎) – Bericht noch nicht unterschrieben; Art. 9 Abs. 1 am Wortlaut gelesen (gesetze.legal), Anhang V Nr. 19 LMIV nicht am Wortlaut gelesen'
+- 'Abgrenzung „vorverpackt“ gegen lose bzw. auf Wunsch der Kundschaft verpackte Ware (Begriff in Art. 2 LMIV) nicht im Text – fachlich klären, ob die App das erklären soll'
+- 'Nur über die Branche Gastronomie/Lebensmittel und die neue Frage „Verkaufst du selbst abgepackte Lebensmittel?“ – Onlinehändler mit eigenen Lebensmitteln sehen den Eintrag nicht'
+- 'Folgen bei Nichterfüllung – Sanktion fachlich ergänzen (laut Bericht nicht Gegenstand der fachlichen Prüfung)'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

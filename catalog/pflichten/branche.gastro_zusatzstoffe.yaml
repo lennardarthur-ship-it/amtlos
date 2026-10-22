@@ -1,17 +1,18 @@
 # R12 (Rechtsprüfung Befund 12): Zusatzstoffe bei loser Ware kenntlich machen
 schema_version: 1
 id: branche.gastro_zusatzstoffe
-version: 1
+version: 2
 katalog_nr: H.1
 titel:
   de: Zusatzstoffe bei loser Ware kenntlich machen
 kurz:
   de: Bei loser Ware und auf der Speisekarte machst du bestimmte Zusatzstoffe kenntlich, etwa „mit Farbstoff“ oder „mit Konservierungsstoff“.
 erklaerung:
-  de: 'Für Lebensmittel, die du lose abgibst – an der Theke, im Restaurant oder im Imbiss –, gibst du bestimmte Zusatzstoffe an: zum Beispiel „mit Farbstoff“, „mit Konservierungsstoff“ oder „konserviert“, „mit Antioxidationsmittel“, „mit Geschmacksverstärker“ oder „mit Süßungsmittel“ (§ 5 LMZDV). Üblich sind Fußnoten auf der Speisekarte oder ein Schild an der Ware. Stattdessen kannst du die Angaben auch in einem Aushang, einer schriftlichen Aufstellung oder elektronisch bereithalten, wenn du deutlich darauf hinweist (§ 5 Abs. 3 LMZDV). Die Allergenkennzeichnung ist eine eigene Pflicht.'
+  de: 'Für Lebensmittel, die du lose abgibst – an der Theke, im Restaurant oder im Imbiss –, gibst du bestimmte Zusatzstoffe an (§ 5 LMZDV): „mit Farbstoff“, „mit Konservierungsstoff“ oder „konserviert“, „mit Antioxidationsmittel“, „mit Geschmacksverstärker“, „geschwefelt“, „geschwärzt“, „gewachst“, „mit Phosphat“, „mit Süßungsmittel(n)“, „enthält eine Phenylalaninquelle“ und „kann bei übermäßigem Verzehr abführend wirken“. Für Getränke kommen „koffeinhaltig“ und „chininhaltig“ dazu – diese Angaben stammen nicht aus der LMZDV, sondern aus Anhang III Nr. 4 LMIV in Verbindung mit § 2 LMIDV. Üblich sind Fußnoten auf der Speisekarte oder ein Schild an der Ware. Stattdessen kannst du die Angaben auch in einem Aushang, einer schriftlichen Aufstellung oder elektronisch bereithalten, wenn du deutlich darauf hinweist (§ 5 Abs. 3 LMZDV). Die Allergenkennzeichnung ist eine eigene Pflicht; in der Allergenliste von Amtlos kannst du die Zusatzstoffe gleich mit angeben – dann hängt ein Blatt mit beidem aus.'
 rechtsgrundlage:
 - § 5 LMZDV
 - Verordnung (EG) Nr. 1333/2008
+- Anhang III Nr. 4 Verordnung (EU) Nr. 1169/2011 (LMIV) i. V. m. § 2 LMIDV
 kategorie: branche
 branchen:
 - gastronomie_lebensmittel
@@ -36,6 +37,8 @@ sanktion:
 automatisierung: hinweis
 aktion:
   art: abhaken
+aenderungsnotiz:
+  de: 'Nach der fachlichen Prüfung Lebensmittelhygiene (22.10.2026): vollständige Liste der Angaben, „koffeinhaltig“ und „chininhaltig“ richtig zugeordnet; die Zusatzstoffe gibst du in der Allergenliste mit an.'
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -45,7 +48,9 @@ quellen:
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
 - Neu nach Rechtsprüfung R12 (Befund 12) – Fundstelle § 5 LMZDV vom 2.6.2021 (BGBl. I S. 1362) laut Text der LMZDV (Lebensmittelüberwachung Bremen), im BGBl. gegenlesen
-- '„koffeinhaltig“ und „geschwefelt“ stehen nicht in § 5 LMZDV – Fundstelle offen; Höhe des Bußgelds fachlich ergänzen'
+- 'Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Fragen 12 und 13, ✔): Rechtsgrundlage § 5 LMZDV stimmt, Liste der Kenntlichmachungen laut Bericht übernommen; „koffeinhaltig“ und „chininhaltig“ nach Anhang III Nr. 4 LMIV i. V. m. § 2 LMIDV (§ 2 LMIDV nicht am Wortlaut gelesen); Zusatzstoffe in die Allergenliste statt eigener Vorlage – Bericht noch nicht unterschrieben'
+- 'Azofarbstoffe mit Warnhinweis: Der Bericht nennt „Anhang V LMIV“ – der Warnhinweis steht nach unserem Kenntnisstand in Anhang V VO (EG) Nr. 1333/2008; Fundstelle klären, bevor der Hinweis in den Text kommt'
+- 'Höhe des Bußgelds fachlich ergänzen (laut Bericht nicht Gegenstand der fachlichen Prüfung)'
 pruefung:
   status: entwurf
   geprueft_von: null

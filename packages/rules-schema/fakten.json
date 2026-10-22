@@ -275,6 +275,24 @@
       "ab": 2
     },
     {
+      "pfad": "profil.gastro.wassertank",
+      "typ": "bool",
+      "herleitung": "Onboarding (Prüfbericht Lebensmittelhygiene 22.10.2026, Frage 14): Fahrzeug oder Verkaufsstand hat einen eigenen Wassertank – mobile Wasserversorgungsanlage (§ 2 Nr. 2 Buchst. d, § 11 Abs. 2 TrinkwV)",
+      "ab": 2
+    },
+    {
+      "pfad": "profil.gastro.wassertank_ab",
+      "typ": "datum",
+      "herleitung": "Onboarding (Prüfbericht Lebensmittelhygiene 22.10.2026, Frage 14): Inbetriebnahme des Wassertanks (auch geplant) – Bezug der Anzeigefrist vier Wochen vorher (§ 11 Abs. 2 TrinkwV)",
+      "ab": 2
+    },
+    {
+      "pfad": "profil.gastro.vorverpackt",
+      "typ": "bool",
+      "herleitung": "Onboarding (Prüfbericht Lebensmittelhygiene 22.10.2026, Frage 14): verkauft selbst abgepackte Lebensmittel, z. B. Kekse, Marmelade oder Granola im Regal – Kennzeichnung nach Art. 9 LMIV",
+      "ab": 2
+    },
+    {
       "pfad": "profil.produkte.arten",
       "typ": "enum_liste",
       "werte": [

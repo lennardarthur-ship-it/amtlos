@@ -1,7 +1,7 @@
 # E-166 (Prüfmappe Lebensmittelhygiene, Frage 14): Rückverfolgbarkeit nach Art. 18 VO (EG) Nr. 178/2002
 schema_version: 1
 id: branche.gastro_rueckverfolgbarkeit
-version: 1
+version: 2
 katalog_nr: H.1
 titel:
   de: Rückverfolgbarkeit sicherstellen
@@ -16,19 +16,34 @@ erklaerung:
     mit Kuchen belieferst, oder Firmen, für die du ein Catering machst. Die Angaben teilst du der Lebensmittelüberwachung
     auf Aufforderung mit. In der Praxis heißt das: Lieferant, Ware, Menge und Datum aus Lieferschein oder Rechnung
     geordnet aufbewahren, bei Lieferungen an andere Betriebe ebenso Abnehmer, Ware und Datum. Für Lebensmittel
-    tierischen Ursprungs gibt es zusätzliche Vorgaben (Durchführungsverordnung (EU) Nr. 931/2011).
+    tierischen Ursprungs gibt es zusätzliche Vorgaben (Durchführungsverordnung (EU) Nr. 931/2011). Bei Verdacht auf
+    unsichere Ware: Ware sperren, Lebensmittelüberwachung informieren (Art. 19 VO (EG) Nr. 178/2002).
 rechtsgrundlage:
 - Art. 18 Verordnung (EG) Nr. 178/2002
+- Art. 19 Verordnung (EG) Nr. 178/2002
 - Durchführungsverordnung (EU) Nr. 931/2011
 kategorie: branche
 branchen:
 - gastronomie_lebensmittel
+- onlinehandel
 ausloeser:
-  feld: profil.taetigkeit.branchen
-  op: enthaelt
-  wert: gastronomie_lebensmittel
-  label:
-    de: Dein Betrieb gehört zur Gastronomie oder Lebensmittelbranche.
+  any:
+  - feld: profil.taetigkeit.branchen
+    op: enthaelt
+    wert: gastronomie_lebensmittel
+    label:
+      de: Dein Betrieb gehört zur Gastronomie oder Lebensmittelbranche.
+  - all:
+    - feld: profil.taetigkeit.branchen
+      op: enthaelt
+      wert: onlinehandel
+      label:
+        de: Du handelst online.
+    - feld: profil.produkte.arten
+      op: enthaelt
+      wert: lebensmittel
+      label:
+        de: Du verkaufst Lebensmittel.
 frist:
   typ: dauerhaft
 wiederholung:
@@ -46,7 +61,7 @@ automatisierung: hinweis
 aktion:
   art: abhaken
 aenderungsnotiz:
-  de: 'Neu nach der Vorbereitung der fachlichen Prüfung Lebensmittelhygiene (22.10.2026): Rückverfolgbarkeit eine Stufe zurück und eine Stufe vor.'
+  de: 'Nach der fachlichen Prüfung Lebensmittelhygiene (22.10.2026): gilt jetzt auch für Onlinehändler mit Lebensmitteln; dazu, was du bei Verdacht auf unsichere Ware tust.'
 status_recht: in_kraft
 gueltig_ab: '2005-01-01'
 gueltig_bis: null
@@ -54,13 +69,16 @@ quellen:
 - titel: Verordnung (EG) Nr. 178/2002, Artikel 18 (Wortlaut über gesetze.legal)
   url: https://gesetze.legal/eu/vo_eg_2002_178/18
   abgerufen: '2026-10-22'
+- titel: Verordnung (EG) Nr. 178/2002, Artikel 19 (Wortlaut über gesetze.legal)
+  url: https://gesetze.legal/eu/vo_eg_2002_178/19
+  abgerufen: '2026-10-22'
 - titel: Verordnung (EG) Nr. 178/2002 (EUR-Lex)
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32002R0178
   abgerufen: null
 fachlich_zu_pruefen:
 - 'Neu (E-166): Art. 18 Abs. 2 und 3 am Wortlaut geprüft (gesetze.legal); Geltung ab 1.1.2005 (Art. 65 VO (EG) Nr. 178/2002) an EUR-Lex gegenlesen'
-- 'Durchführungsverordnung (EU) Nr. 931/2011 (Lebensmittel tierischen Ursprungs): Anwendungsbereich für Einzelhandel und Gastronomie nicht geprüft – nur als Hinweis genannt'
-- 'Auslöser wie die übrigen Gastro-Pflichten nur über die Branche – Händler mit Lebensmitteln ohne diese Branche (z. B. Onlineshop mit Feinkost) sehen den Eintrag nicht; ob er auch über profil.produkte.arten ausgelöst werden soll, fachlich entscheiden'
+- 'Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Frage 14, ✔): Text und Auslöser richtig; DVO (EU) Nr. 931/2011 als Hinweis so belassen; auch bei Onlinehändlern mit Lebensmitteln auslösen (Branche Onlinehandel und „Was verkaufst du?“ Lebensmittel) und Rückruf-Satz nach Art. 19 VO (EG) Nr. 178/2002 ergänzt – umgesetzt, Bericht noch nicht unterschrieben'
+- 'Lebensmittel ohne Branche Gastronomie oder Onlinehandel (z. B. Kiosk mit „Sonstige“) lösen den Eintrag weiter nicht aus'
 - Folgen bei Nichterfüllung (Bußgeld nach LFGB bzw. Lebensmittelrechtlicher Straf- und Bußgeldverordnung) nicht geprüft – Sanktion fachlich ergänzen
 pruefung:
   status: entwurf

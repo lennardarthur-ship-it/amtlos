@@ -1,0 +1,64 @@
+# Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Frage 14 (b), Frage 15): Materialien mit Lebensmittelkontakt – Konformitätserklärungen
+schema_version: 1
+id: branche.gastro_kontaktmaterialien
+version: 1
+katalog_nr: H.1
+titel:
+  de: Konformitätserklärungen für Verpackungen und Behälter ablegen
+kurz:
+  de: Für Verpackungen, Kunststoffbehälter und andere Materialien, die mit Lebensmitteln in Berührung kommen, forderst du die Konformitätserklärung vom Lieferanten an und legst sie ab.
+erklaerung:
+  de: >-
+    Materialien und Gegenstände, die mit Lebensmitteln in Berührung kommen – zum Beispiel Verpackungen, To-go-Becher,
+    Frischhaltedosen oder Kunststoffbehälter –, müssen dafür geeignet sein (Verordnung (EG) Nr. 1935/2004). Für Kunststoff
+    gelten zusätzlich die Vorgaben der Verordnung (EU) Nr. 10/2011. Dein Lieferant gibt dir dazu eine schriftliche
+    Konformitätserklärung (Art. 16 VO (EG) Nr. 1935/2004, Art. 15 VO (EU) Nr. 10/2011). Fordere sie vom Lieferanten an
+    und lege sie ab – die Lebensmittelüberwachung fragt bei Kontrollen danach.
+rechtsgrundlage:
+- Verordnung (EG) Nr. 1935/2004
+- Verordnung (EU) Nr. 10/2011
+kategorie: branche
+einordnung: hinweis
+branchen:
+- gastronomie_lebensmittel
+ausloeser:
+  feld: profil.taetigkeit.branchen
+  op: enthaelt
+  wert: gastronomie_lebensmittel
+  label:
+    de: Dein Betrieb gehört zur Gastronomie oder Lebensmittelbranche.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst; Konformitätserklärung vom Lieferanten
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Die Folgen sind noch nicht fachlich erfasst.
+  schwere: mittel
+automatisierung: hinweis
+aktion:
+  art: abhaken
+aenderungsnotiz:
+  de: 'Neu nach der fachlichen Prüfung Lebensmittelhygiene (22.10.2026): Konformitätserklärungen für Materialien mit Lebensmittelkontakt.'
+status_recht: in_kraft
+gueltig_ab: null
+gueltig_bis: null
+quellen:
+- titel: Verordnung (EG) Nr. 1935/2004, Artikel 16 (Wortlaut über gesetze.legal)
+  url: https://gesetze.legal/eu/vo_eg_2004_1935/16
+  abgerufen: '2026-10-22'
+- titel: Verordnung (EU) Nr. 10/2011, Artikel 15 (Wortlaut über gesetze.legal)
+  url: https://gesetze.legal/eu/vo_eu_2011_10/15
+  abgerufen: '2026-10-22'
+fachlich_zu_pruefen:
+- 'Neu nach Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, Frage 14 (b) und Frage 15, ✎) als Hinweis – Bericht noch nicht unterschrieben; Art. 16 VO (EG) Nr. 1935/2004 und Art. 15 VO (EU) Nr. 10/2011 am Wortlaut gelesen (gesetze.legal: Erklärung auf allen Stufen außer dem Einzelhandel)'
+- 'Als Hinweis über die Branche – Amtlos fragt nicht ab, welche Verpackungen und Behälter der Betrieb nutzt'
+- 'Folgen bei Nichterfüllung – Sanktion fachlich ergänzen (laut Bericht nicht Gegenstand der fachlichen Prüfung)'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

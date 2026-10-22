@@ -1,7 +1,7 @@
 # Katalog H.1 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.gastro_haccp
-version: 4
+version: 5
 katalog_nr: H.1
 titel:
   de: Eigenkontrollen nach HACCP
@@ -16,7 +16,14 @@ erklaerung:
     sein; wo die Gefahrenanalyse keinen kritischen Kontrollpunkt ergibt, genügt die gute Hygienepraxis. Das ist eine
     laufende Aufgabe, keine einmalige. Amtlos bietet eine Vorlage mit Gefahrenanalyse je Arbeitsschritt, kritischen
     Kontrollpunkten, Kontrolllisten mit Grenzwerten, die du festlegst, und Messprotokoll – ein Protokoll gilt für seinen
-    Monat.
+    Monat. Hilfe für deine Branche geben die nationalen Leitlinien für eine gute Hygienepraxis: für Café, Restaurant und
+    Imbiss die DEHOGA-„Leitlinie für eine Gute Hygienepraxis in der Gastronomie“ (3. Auflage 2022, Bezug über den
+    DEHOGA-Shop), für Bäckerei und Konditorei die „Leitlinie für eine Gute Lebensmittelhygiene-Praxis im Bäcker- und
+    Konditorenhandwerk“ des Zentralverbands des Deutschen Bäckerhandwerks (2012) und für Foodtruck und Marktstand die
+    BGN-„Leitlinie für eine gute Lebensmittelhygienepraxis in ortsveränderlichen Betriebsstätten“ (2018). Bei einer
+    Kontrolle fragt die Lebensmittelüberwachung oft auch nach der Wartung des Fettabscheiders (Gastronomie mit Fritteuse,
+    nach der Abwassersatzung deiner Gemeinde), nach der Wartung der Kühlgeräte und nach der Eichung deiner Waagen – leg
+    diese Nachweise zu deinen Eigenkontrollen.
 rechtsgrundlage:
 - Art. 5 Verordnung (EG) Nr. 852/2004
 kategorie: branche
@@ -63,11 +70,18 @@ quellen:
 - titel: Bekanntmachung der Kommission zur Umsetzung von Managementsystemen für Lebensmittelsicherheit (2022/C 355/01)
   url: https://umwelt-online.de/recht/eu/22a/22a_c355_01_bek.htm
   abgerufen: '2026-10-22'
+- titel: Lebensmittelverband Deutschland – Nationale „Leitlinien für eine Gute Hygienepraxis“ mit Bezugsquellen (Stand Juli 2026)
+  url: https://www.lebensmittelverband.de/fileadmin/Seiten/Lebensmittel/Sicherheit_und_Recht/Hygiene/Leitlinien_GHP_mit_Bezugsquellen_Stand_7_2026.pdf
+  abgerufen: '2026-10-22'
+- titel: BGN – Leitlinie für eine gute Lebensmittelhygienepraxis in ortsveränderlichen Betriebsstätten (2018)
+  url: https://bgn-branchenwissen.de/praxishilfen-von-a-z/foodtrucks/lebensmittelhygienepraxis.pdf
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Grenzwerte (z. B. Kühltemperaturen) und Kontrollhäufigkeit nicht in der Spezifikation – Betrieb legt sie fest; Vorschläge
   fachlich ergänzen
-- Leitlinien für gute Hygienepraxis je Branche verlinken
+- 'Leitlinien je Branchengruppe (Prüfbericht Lebensmittelhygiene, Tim Baum, 22.10.2026, Frage 1): Liste des Lebensmittelverbands (Stand 7/2026) und BGN-Leitlinie verlinkt; DEHOGA- und Bäckerhandwerk-Leitlinie nur mit Titel – kein frei abrufbarer Link geprüft (laut Liste Bezug über DEHOGA-Shop bzw. Zentralverband)'
+- 'Fettabscheider, Wartung Kühlgeräte, Eichung Waagen nur als Hinweis (Prüfbericht Frage 15: „Hinweis genügt“); Fundstellen (Abwassersatzung, Eichrecht) nicht geprüft'
 - 'E-166: Vorlage um Gefahrenanalyse, CCP-Entscheidung (Entscheidungsbaum nach Codex CXC 1-1969, Fassung 2023), Verifizierung und Dokumentation ergänzt – Umfang für kleine Betriebe im Rahmen der Flexibilität (Bekanntmachung 2022/C 355/01, Anhang II nur auszugsweise gelesen) fachlich bestätigen'
 - Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
 - Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
