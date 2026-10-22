@@ -2,14 +2,14 @@
 # Wortlaut gelesen am 22.10.2026: § 14 BattDG, Art. 62 VO (EU) 2023/1542, § 4 Abs. 2 und § 60 BattDG
 schema_version: 1
 id: produkte.geraetebatterien_ruecknahme
-version: 1
+version: 2
 katalog_nr: G.72
 titel:
   de: Altbatterien zurücknehmen, wenn du Gerätebatterien verkaufst
 kurz:
   de: Verkaufst du Gerätebatterien oder Batterien für leichte Verkehrsmittel, nimmst du Altbatterien dieser Art von Endnutzern kostenlos zurück – auch ohne Neukauf.
 erklaerung:
-  de: 'Händler nehmen Geräte-Altbatterien und Altbatterien für leichte Verkehrsmittel (LV-Altbatterien, etwa aus E-Bikes und E-Scootern) vom Endnutzer im Geschäft oder in unmittelbarer Nähe unentgeltlich zurück – unabhängig von chemischer Zusammensetzung, Marke, Herkunft, Baugröße und Beschaffenheit und ohne dass ein Neukauf verlangt werden darf (Art. 62 Abs. 1 VO (EU) 2023/1542, § 14 Abs. 1 Satz 1 BattDG). Die Pflicht gilt für die Batteriekategorien, die du als Neubatterien führst oder geführt hast, und für die Mengen, die Endnutzer üblicherweise abgeben; Geräte mit eingebauten Altbatterien fallen nicht darunter – für sie gilt das Elektrogesetz (§ 14 Abs. 1 Satz 2 bis 4 BattDG). Verkaufst du im Fernabsatz, richtest du Rückgabemöglichkeiten in zumutbarer Entfernung zu deinen Kunden ein (§ 14 Abs. 2 BattDG, Art. 62 Abs. 4, 5 VO (EU) 2023/1542). Die zurückgenommenen Altbatterien überlässt du einer für die Batteriekategorie zugelassenen Organisation für Herstellerverantwortung (§ 14 Abs. 3 BattDG). Batterien bereitstellen darfst du nur, wenn Endnutzer Altbatterien bei dir zurückgeben können (§ 4 Abs. 2 BattDG).'
+  de: 'Händler nehmen Geräte-Altbatterien und Altbatterien für leichte Verkehrsmittel (LV-Altbatterien, etwa aus E-Bikes und E-Scootern) vom Endnutzer im Geschäft oder in unmittelbarer Nähe unentgeltlich zurück – unabhängig von chemischer Zusammensetzung, Marke, Herkunft, Baugröße und Beschaffenheit und ohne dass ein Neukauf verlangt werden darf (Art. 62 Abs. 1 VO (EU) 2023/1542, § 14 Abs. 1 Satz 1 BattDG). Die Rücknahme ist auf dein eigenes Sortiment und auf haushaltsübliche Mengen beschränkt: Sie gilt für die Batteriekategorien, die du als Neubatterien führst oder geführt hast, und für die Menge, derer sich private Endnutzer üblicherweise entledigen (§ 14 Abs. 1 Satz 2 BattDG). Produkte mit eingebauten Altbatterien fallen nicht darunter – für sie gelten das Elektrogesetz und die Altfahrzeug-Verordnung (§ 14 Abs. 1 Satz 3 BattDG). Verkaufst du im Fernabsatz, richtest du Rückgabemöglichkeiten in zumutbarer Entfernung zu deinen Kunden ein (§ 14 Abs. 2 BattDG, Art. 62 Abs. 4, 5 VO (EU) 2023/1542). Die zurückgenommenen Altbatterien überlässt du einer für die Batteriekategorie zugelassenen Organisation für Herstellerverantwortung (§ 14 Abs. 3 BattDG). Batterien bereitstellen darfst du nur, wenn Endnutzer Altbatterien bei dir zurückgeben können (§ 4 Abs. 2 BattDG).'
 rechtsgrundlage:
 - § 14 BattDG
 - § 4 Abs. 2 BattDG
@@ -56,10 +56,11 @@ quellen:
   url: https://www.gesetze-im-internet.de/battdg/__60.html
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'neu am 22.10.2026, Prüfung durch RA Dr. Weber ausstehend'
+- 'Freigabe RA Dr. Weber Runde 2 (23.10.2026): § 14 BattDG (Rücknahmepflicht des Händlers für Geräte- und LV-Altbatterien, unentgeltlich, ohne Kaufzwang), Art. 62 VO (EU) 2023/1542 und Sanktionsstaffel (§ 60 Abs. 1 Nr. 1 Buchst. b, Nr. 6, Abs. 2 Nr. 26, Abs. 3 BattDG) bestätigt; Hinweis „Rücknahme auf haushaltsübliche Mengen des eigenen Sortiments beschränkt (§ 14 Abs. 1 S. 2 BattDG)“ im Text (Wortlaut gesetze.legal, 22.10.2026: „die Menge an Altbatterien, derer sich private Endnutzer üblicherweise entledigen“; Abs. 1 hat drei Sätze – Verweis „Satz 2 bis 4“ berichtigt)'
 - 'Auslöser „Batterien“ im Sortiment (profil.produkte.arten) – das Profil unterscheidet nicht nach Batteriekategorie; wer nur Geräte mit eingebauten Batterien oder nur Starterbatterien verkauft, fällt nicht unter § 14 BattDG (Starterbatterien: produkte.starterbatterien_ruecknahme)'
-- 'Sanktion: § 60 Abs. 1 Nr. 1 Buchst. b, Nr. 6 und Abs. 2 Nr. 26, Abs. 3 BattDG am 22.10.2026 gelesen (gesetze-im-internet.de) – Höhe je Nummer fachlich zu bestätigen'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-23'
+  geprueft_version: 2

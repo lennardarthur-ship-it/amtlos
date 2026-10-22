@@ -65,11 +65,13 @@ quellen:
   url: https://www.fgs.de/news-and-insights/blog/detail/eu-ai-act-was-ab-dem-2-august-2026-gilt-und-was-verschoben-wurde
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
-- 'Prüfvermerk RA Dr. Weber 22.10.2026 (Amtsblatt gegenlesen): am 22.10.2026 im Amtsblatt gelesen – Erwägungsgrund 40 nennt 2.12.2027 (Anhang III) und 2.8.2028 (Anhang I), Erwägungsgrund 46 und ELI-Daten das Inkrafttreten am 27.7.2026 (ABl. L vom 24.7.2026); den verfügenden Text der Änderung von Art. 113 konnte das Werkzeug auf EUR-Lex nicht abrufen (Seite nach 96.975 Zeichen abgeschnitten, auch mit Lesestart weiter hinten; ELI-Seite für das Werkzeug gesperrt). Am 22.10.2026 über die Konsolidierung von buzer.de gelesen (Gegenüberstellung alte/neue Fassung, Änderung durch Art. 1 VO (EU) 2026/1744, ABl. L, 2026/1744, 24.7.2026): Art. 113 Buchst. c n. F. – Kapitel III Abschnitte 1 bis 3 (außer Art. 6 Abs. 5) gelten für Hochrisiko-KI nach Art. 6 Abs. 2 und Anhang III ab 2.12.2027 (Ziff. i), nach Art. 6 Abs. 1 und Anhang I ab 2.8.2028 (Ziff. ii); neuer Buchst. d: Art. 102 bis 110 ab 27.7.2026 – Termine im Eintrag bestätigt. gesetze.legal zeigt noch die alte Fassung (Buchst. c: 2.8.2027). Amtsblatt selbst bleibt gegenzulesen'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026 (Amtsblatt gegenlesen): am 22.10.2026 im Amtsblatt gelesen – Erwägungsgrund 40 nennt 2.12.2027 (Anhang III) und 2.8.2028 (Anhang I), Erwägungsgrund 46 und ELI-Daten das Inkrafttreten am 27.7.2026 (ABl. L vom 24.7.2026); den verfügenden Text der Änderung von Art. 113 konnte das Werkzeug auf EUR-Lex nicht abrufen (Seite nach 96.975 Zeichen abgeschnitten, auch mit Lesestart weiter hinten; ELI-Seite für das Werkzeug gesperrt). Am 22.10.2026 über die Konsolidierung von buzer.de gelesen (Gegenüberstellung alte/neue Fassung, Änderung durch Art. 1 VO (EU) 2026/1744, ABl. L, 2026/1744, 24.7.2026): Art. 113 Buchst. c n. F. – Kapitel III Abschnitte 1 bis 3 (außer Art. 6 Abs. 5) gelten für Hochrisiko-KI nach Art. 6 Abs. 2 und Anhang III ab 2.12.2027 (Ziff. i), nach Art. 6 Abs. 1 und Anhang I ab 2.8.2028 (Ziff. ii); neuer Buchst. d: Art. 102 bis 110 ab 27.7.2026 – Termine im Eintrag bestätigt. gesetze.legal zeigt noch die alte Fassung (Buchst. c: 2.8.2027). Freigabe RA Dr. Weber Runde 2 (23.10.2026): Termine über die konsolidierte Fassung von Art. 113 belegt – ausreichend'
 - 'Status bleibt „beschlossen“ bis 2.12.2027; Anhang-I-Fälle (2.8.2028) und Bestandssysteme (Art. 111: bis 2.8.2030) nicht als eigene Regel abgebildet'
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Vorbereitungs-Checkliste fachlich prüfen
+- 'Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen'
+- 'Vorbereitungs-Checkliste fachlich prüfen'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-23'
+  geprueft_version: 5

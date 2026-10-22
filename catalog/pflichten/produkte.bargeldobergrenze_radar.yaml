@@ -66,10 +66,12 @@ quellen:
   url: https://www.springlex.eu/de/packages/aml/amlr-regulation/article-80/
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'neu am 22.10.2026, Prüfung durch RA Dr. Weber ausstehend'
-- 'Auslöser wie produkte.geldwaesche_gueterhaendler (Warenverkauf mit hohen Barzahlungen) – Art. 80 erfasst auch Dienstleistungen und das Leisten von Barzahlungen; das Profil fragt hohe Barzahlungen nur für Waren ab'
+- 'Freigabe RA Dr. Weber Runde 2 (23.10.2026): Art. 80 Abs. 1 (10.000 €, auch Teilbeträge) und Art. 90 Abs. 1 (Geltung ab 10.7.2027) VO (EU) 2024/1624 bestätigt; Status „beschlossen“ richtig; Sanktionen national (Art. 80 Abs. 5) noch offen'
+- 'Auslöser wie produkte.geldwaesche_gueterhaendler (Warenverkauf mit hohen Barzahlungen) – Art. 80 erfasst auch Dienstleistungen und das Leisten von Barzahlungen; das Profil fragt hohe Barzahlungen nur für Waren ab. Laut Prüfer auf Dienstleistungen erweitern, sobald das Profil das hergibt – braucht eine neue Angabe (die Frage profil.handel.hohe_bargeschaefte fragt nur nach Waren), noch nicht umgesetzt'
 - 'Sanktion: Art. 80 Abs. 5 verlangt Sanktionen der Mitgliedstaaten; deutsche Bußgeldnorm am 22.10.2026 nicht gesucht – ergänzen, sobald geregelt. Amtsblatt-Text (EUR-Lex) nicht abgerufen, Wortlaut aus Haufe-Normtext und Springlex'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-23'
+  geprueft_version: 1

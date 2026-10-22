@@ -1,7 +1,7 @@
 # R11 (Nutzertest Tischlerei Befund 16): digitaler Lohnnachweis an die Unfallversicherung (§ 165 Abs. 1 SGB VII i. V. m. § 99 SGB IV)
 schema_version: 1
 id: personal.lohnnachweis_bg
-version: 3
+version: 4
 katalog_nr: D.40
 titel:
   de: Lohnnachweis an die Berufsgenossenschaft
@@ -38,7 +38,7 @@ kanal: partner
 kosten: null
 sanktion:
   text:
-    de: 'Bußgeld bis 2.500 €, wenn der Lohnnachweis nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig gemeldet wird (§ 209 Abs. 1 Nr. 5 Buchst. a, Abs. 3 SGB VII in Verbindung mit § 165 Abs. 1 SGB VII).'
+    de: 'Bußgeld bis 25.000 € (§ 111 Abs. 1 Nr. 5 SGB IV i. V. m. § 99 Abs. 1 SGB IV; daneben § 209 Abs. 1 Nr. 5 SGB VII).'
   schwere: mittel
 automatisierung: partner
 erledigung:
@@ -65,8 +65,10 @@ quellen:
   url: https://lxgesetze.de/sgb-iv/111
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Freigabe RA Dr. Weber 22.10.2026: Rechtsgrundlage und Sanktion wie empfohlen mit 2.500 € (§ 209 Abs. 1 Nr. 5 Buchst. a, Abs. 3 SGB VII; Wortlaut lxgesetze.de, Stand 12.5.2026 – eine Nr. 5a gibt es nicht). Prüfauftrag „ob daneben § 111 Abs. 1 Nr. 5 SGB IV greift“: Der Wortlaut nennt den Lohnnachweis „entgegen § 99 Absatz 1 Satz 1“ ausdrücklich, Geldbuße bis 25.000 € (§ 111 Abs. 4 SGB IV; lxgesetze.de, Stand 24.7.2026) – Verhältnis der beiden Normen und Anzeige mit dem Prüfer klären'
+- 'Freigabe RA Dr. Weber Runde 2 (23.10.2026) (ändern): beide Normen genannt – § 111 Abs. 1 Nr. 5, Abs. 4 SGB IV (bis 25.000 €) ist die Bußgeldnorm mit dem höheren Rahmen und bei Tateinheit maßgeblich (§ 19 Abs. 1, 2 OWiG), § 209 Abs. 1 Nr. 5 Buchst. a, Abs. 3 SGB VII (bis 2.500 €) daneben; Sanktionstext in seiner Formulierung, Schwere „mittel“'
 pruefung:
-  status: entwurf
-  geprueft_von: null
-  geprueft_am: null
+  status: freigegeben
+  geprueft_von:
+    - RA Dr. Ulrich Weber
+  geprueft_am: '2026-10-23'
+  geprueft_version: 4

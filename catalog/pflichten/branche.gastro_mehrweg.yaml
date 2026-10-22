@@ -2,17 +2,18 @@
 # Rechtsstand 21.10.2026: seit 12.8.2026 §§ 60, 61 VerpackDG (BGBl. 2026 I Nr. 207), inhaltlich gleich
 schema_version: 1
 id: branche.gastro_mehrweg
-version: 4
+version: 5
 katalog_nr: G.73
 titel:
   de: Mehrweg zum Mitnehmen anbieten
 kurz:
   de: Verkaufst du Essen oder Getränke zum Mitnehmen in Einwegverpackungen aus Kunststoff oder Einwegbechern, bietest du auch Mehrweg an.
 erklaerung:
-  de: 'Wer Speisen in Einwegkunststoffverpackungen oder Getränke in Einwegbechern erst beim Verkauf befüllt, muss sie auch in einer Mehrwegverpackung anbieten – nicht teurer und gut sichtbar mit einem Hinweis (§ 60 VerpackDG). Ausgenommen sind kleine Betriebe mit höchstens fünf Beschäftigten und höchstens 80 m² Verkaufsfläche; sie müssen stattdessen auf Wunsch mitgebrachte Behälter der Kundschaft befüllen und darauf hinweisen (§ 61 VerpackDG). Teilzeitkräfte zählen dabei mit 0,5 (bis 20 Wochenstunden) bzw. 0,75 (bis 30 Wochenstunden). Beim Foodtruck ist die Verkaufsfläche die Fläche des Fahrzeugs; lieferst du aus, zählen auch Lager- und Versandflächen. Seit 12.8.2026 steht die Pflicht im Verpackungsrecht-Durchführungsgesetz, das das Verpackungsgesetz abgelöst hat.'
+  de: 'Wer Speisen in Einwegkunststoffverpackungen oder Getränke in Einwegbechern erst beim Verkauf befüllt, muss sie auch in einer Mehrwegverpackung anbieten – nicht teurer und gut sichtbar mit einem Hinweis (§ 60 VerpackDG). Ausgenommen sind kleine Betriebe mit höchstens fünf Beschäftigten und höchstens 80 m² Verkaufsfläche; sie müssen stattdessen auf Wunsch mitgebrachte Behälter der Kundschaft befüllen und darauf hinweisen (§ 61 VerpackDG). Teilzeitkräfte zählen dabei mit 0,5 (bis 20 Wochenstunden) bzw. 0,75 (bis 30 Wochenstunden). Beim Foodtruck ist die Verkaufsfläche die Fläche des Fahrzeugs; lieferst du aus, zählen auch Lager- und Versandflächen. Serviceverpackungen (Becher, Boxen): Die Systembeteiligung kann der Lieferant übernehmen – die Registrierung in LUCID bleibt deine eigene Pflicht (§ 7 Abs. 2 VerpackDG). Seit 12.8.2026 steht die Pflicht im Verpackungsrecht-Durchführungsgesetz, das das Verpackungsgesetz abgelöst hat.'
 rechtsgrundlage:
 - § 60 VerpackDG
 - § 61 VerpackDG
+- § 7 Abs. 2 VerpackDG
 kategorie: branche
 branchen:
 - gastronomie_lebensmittel
@@ -51,6 +52,9 @@ quellen:
 - titel: Verpackungsrecht-Durchführungsgesetz § 61
   url: https://www.gesetze-im-internet.de/verpackdg/__61.html
   abgerufen: '2026-10-21'
+- titel: Verpackungsrecht-Durchführungsgesetz § 7
+  url: https://www.gesetze-im-internet.de/verpackdg/__7.html
+  abgerufen: '2026-10-22'
 - titel: WPK – Neues Verpackungsrecht in Kraft (13.8.2026)
   url: https://www.wpk.de/neu/neues-verpackungsrecht-in-kraft-hinweise-der-zentralen-stelle-verpackungsregister/
   abgerufen: '2026-10-21'
@@ -59,7 +63,7 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Prüfvermerk RA Dr. Weber 22.10.2026: Ausnahme (höchstens fünf Beschäftigte UND höchstens 80 m²), Teilzeitzählung, Foodtruck- und Lieferflächen sowie Sanktion bestätigt und im Text'
-- 'Prüfvermerk RA Dr. Weber 22.10.2026: „LUCID für Serviceverpackungen – Pflicht liegt beim Vorvertreiber, wenn er die Beteiligung übernimmt (§ 7 Abs. 2 VerpackDG)“ – nicht übernommen: § 7 Abs. 2 VerpackDG (am 22.10.2026 gelesen) lässt die Systembeteiligung und insoweit die Pflichten nach §§ 6, 9, 10 auf den Vorvertreiber übergehen, „der Hersteller nach Absatz 1 Satz 1 bleibt jedoch zusätzlich selbst zur Registrierung nach § 6 verpflichtet“ – Rückfrage an den Prüfer; Herstellereigenschaft nach EWKFondsG offen'
+- 'Freigabe RA Dr. Weber Runde 2 (23.10.2026) (ändern): § 7 Abs. 2 VerpackDG – nur die Systembeteiligung geht auf den Vorvertreiber über, die Registrierung nach § 6 bleibt eigene Pflicht – bestätigt und in seiner Formulierung in die Erklärung übernommen. Verlangter eigener Hinweis „Herstellereigenschaft nach EWKFondsG: Abgabepflicht für Einwegkunststoff-Serviceverpackungen ab 1.1.2024 (§ 3 Nr. 3, § 7 EWKFondsG)“ NICHT angelegt: § 3 Nr. 3 EWKFondsG (Hersteller, ausdrücklich auch Befüller) am Wortlaut bestätigt (gesetze-im-internet.de, lxgesetze.de, 22.10.2026); § 7 EWKFondsG regelt aber die Registrierung der Hersteller beim Umweltbundesamt vor Aufnahme der Tätigkeit (gesetze.legal, 22.10.2026), die Abgabepflicht steht in § 12 („Abgabepflicht“, Inhaltsübersicht gesetze-im-internet.de), das Datum 1.1.2024 nicht in § 7 – Fundstelle mit dem Prüfer klären'
 pruefung:
   status: entwurf
   geprueft_von: null
