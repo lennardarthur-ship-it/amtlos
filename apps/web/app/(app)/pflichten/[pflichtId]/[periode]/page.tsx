@@ -194,10 +194,11 @@ export default async function PflichtSeite({ params }: { params: Params }) {
           {x.karte.quellen}
         </h2>
         <p className="mt-1">{d.rechtsgrundlage.join(", ")}</p>
+        {/* WCAG 2.2 2.5.8: untereinanderstehende Quellen-Links brauchen mindestens 24 px Zielhöhe */}
         <ul className="mt-2 space-y-1">
           {d.quellen.map((q) => (
             <li key={q.url}>
-              <a href={q.url} className="verweis" rel="noopener noreferrer" target="_blank">
+              <a href={q.url} className="verweis inline-block min-h-6 py-0.5" rel="noopener noreferrer" target="_blank">
                 {q.titel}
               </a>
               {q.abgerufen ? null : <span className="text-tinte-leise"> ({x.karte.nicht_abgerufen})</span>}
