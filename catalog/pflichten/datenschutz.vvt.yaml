@@ -1,15 +1,14 @@
 # Katalog F.58 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: datenschutz.vvt
-version: 2
+version: 3
 katalog_nr: F.58
 titel:
   de: Verzeichnis der Verarbeitungstätigkeiten führen
 kurz:
-  de: Du führst ein Verzeichnis, welche Daten über Menschen du wofür verarbeitest.
+  de: Du führst ein Verzeichnis, welche Daten über Menschen du wofür verarbeitest – auch als Kleinbetrieb.
 erklaerung:
-  de: Das Verzeichnis beschreibt je Verarbeitung Zweck, betroffene Personen, Datenarten, Empfänger und Löschfristen. Amtlos
-    hilft beim Anlegen und erzeugt das Verzeichnis als PDF.
+  de: 'Das Verzeichnis beschreibt je Verarbeitung Zweck, betroffene Personen, Datenarten, Empfänger und Löschfristen. Die Ausnahme für Unternehmen mit weniger als 250 Beschäftigten (Art. 30 Abs. 5 DSGVO) greift nicht, wenn die Verarbeitung nicht nur gelegentlich erfolgt oder besondere Daten wie Gesundheitsdaten umfasst – nach Auffassung der Aufsichtsbehörden ist das bei Kunden- und Beschäftigtendaten praktisch immer so. Amtlos hilft beim Anlegen und erzeugt das Verzeichnis als PDF.'
 begriffe:
 - begriff:
     de: Verarbeitungstätigkeit
@@ -46,7 +45,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Bußgeld nach Art. 83 Abs. 4 DSGVO.
+    de: Bußgeld bis 10 Mio. € oder bei Unternehmen bis 2 % des weltweiten Jahresumsatzes des Vorjahres, je nachdem, welcher Betrag höher ist (Art. 83 Abs. 4 Buchst. a DSGVO).
   schwere: mittel
 automatisierung: dokument_generator
 aktion:
@@ -62,8 +61,6 @@ quellen:
   abgerufen: null
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Ausnahme nach Art. 30 Abs. 5 DSGVO (unter 250 Beschäftigte) – wann greift sie? Darstellung prüfen
-- 'Sanktion aus der Rechtsprüfung R10 (G-16) übernommen – Fundstelle bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

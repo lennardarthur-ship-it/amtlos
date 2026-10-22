@@ -1,14 +1,14 @@
 # Katalog F.61 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: datenschutz.dsb
-version: 2
+version: 3
 katalog_nr: F.61
 titel:
   de: Datenschutzbeauftragten benennen
 kurz:
   de: Ein Datenschutzbeauftragter ist vorgesehen, wenn in der Regel mindestens 20 Personen ständig mit der automatisierten Verarbeitung personenbezogener Daten beschäftigt sind – unabhängig davon auch bei bestimmten Verarbeitungen, etwa umfangreicher Überwachung oder Gesundheitsdaten als Kerntätigkeit.
 erklaerung:
-  de: 'Ein Datenschutzbeauftragter ist in drei Fällen vorgesehen: wenn in der Regel mindestens 20 Personen ständig mit der automatisierten Verarbeitung personenbezogener Daten beschäftigt sind (§ 38 Abs. 1 Satz 1 BDSG) – gezählt werden Personen, nicht Vollzeitstellen, auch Teilzeitkräfte und Auszubildende; wenn die Kerntätigkeit in einer umfangreichen regelmäßigen und systematischen Überwachung von Personen oder in der umfangreichen Verarbeitung besonderer Daten wie Gesundheitsdaten besteht (Art. 37 Abs. 1 Buchst. b, c DSGVO); oder unabhängig von der Zahl, wenn eine Verarbeitung einer Datenschutz-Folgenabschätzung unterliegt oder Daten geschäftsmäßig zur Übermittlung oder für Markt- und Meinungsforschung verarbeitet werden (§ 38 Abs. 1 Satz 2 BDSG). Ob einer dieser Fälle vorliegt, klärt im Zweifel die Datenschutzaufsicht deines Landes. Die Bundesregierung plant, § 38 BDSG bis Ende 2026 zu streichen; ein Gesetz gibt es noch nicht.'
+  de: 'Ein Datenschutzbeauftragter ist in drei Fällen vorgesehen: wenn in der Regel mindestens 20 Personen ständig mit der automatisierten Verarbeitung personenbezogener Daten beschäftigt sind (§ 38 Abs. 1 Satz 1 BDSG) – gezählt werden Personen, nicht Vollzeitstellen, auch Teilzeitkräfte, Auszubildende und in den Betrieb eingebundene freie Mitarbeitende; wenn die Kerntätigkeit in einer umfangreichen regelmäßigen und systematischen Überwachung von Personen oder in der umfangreichen Verarbeitung besonderer Daten wie Gesundheitsdaten besteht (Art. 37 Abs. 1 Buchst. b, c DSGVO) – eine einzelne Ärztin oder ein einzelner Therapeut verarbeitet nach Erwägungsgrund 91 DSGVO nicht „umfangreich“; oder unabhängig von der Zahl, wenn eine Verarbeitung einer Datenschutz-Folgenabschätzung unterliegt oder Daten geschäftsmäßig zur Übermittlung oder für Markt- und Meinungsforschung verarbeitet werden (§ 38 Abs. 1 Satz 2 BDSG). Den Datenschutzbeauftragten benennst du unverzüglich, sobald einer dieser Fälle eintritt. Ob einer dieser Fälle vorliegt, klärt im Zweifel die Datenschutzaufsicht deines Landes. Die Bundesregierung plant, § 38 BDSG bis Ende 2026 zu streichen; ein Gesetz gibt es noch nicht.'
 rechtsgrundlage:
 - § 38 BDSG
 - Art. 37 Abs. 1 Buchst. b, c DSGVO
@@ -76,10 +76,7 @@ quellen:
   url: https://gesetze.legal/eu/vo_eu_2016_679/37
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- 'Vorprüfung 21.10.2026: Sanktion ergänzt – Art. 83 Abs. 4 Buchst. a nennt Art. 25 bis 39 (Art. 37); Wortlaut über gdpr-text.com gelesen, EUR-Lex für das Werkzeug gesperrt'
-- 'Vorprüfung 21.10.2026 (F.61): Auslöser um Art. 37 Abs. 1 Buchst. b, c DSGVO und § 38 Abs. 1 Satz 2 BDSG ergänzt (neue Angabe profil.datenschutz.dsb_gruende; gefragt wird bei Gesundheitsdaten, Videoüberwachung oder Ortung – Website-Tracking allein löst die Frage nicht aus) – Wortlaut beider Normen gelesen; Abgrenzung „Kerntätigkeit“ und „umfangreich“ fachlich bestätigen'
-- 'Vorprüfung 21.10.2026 (G-05): Zählweise § 38 Abs. 1 Satz 1 BDSG – „Personen“ (Köpfe, auch Teilzeit, Azubis; freie Mitarbeitende nach herrschender Ansicht ebenfalls) – bestätigen'
+- 'Frist „unverzüglich nach Eintritt der Voraussetzung“ (Prüfvermerk RA Dr. Weber 22.10.2026) nur im Text – kein Ereignis dafür'
 pruefung:
   status: entwurf
   geprueft_von: null

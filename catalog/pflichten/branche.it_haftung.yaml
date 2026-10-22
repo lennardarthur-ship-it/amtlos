@@ -43,10 +43,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/bgb/__309.html
   abgerufen: null
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Hinweis statt Pflicht – Darstellung bestätigen
-- Rechtsgrundlagen ergänzt
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- 'Hinweis, §§ 276, 309 Nr. 7 BGB und „keine Frist“ bestätigt (Prüfvermerk RA Dr. Weber 22.10.2026)'
 pruefung:
   status: entwurf
   geprueft_von: null

@@ -1,0 +1,83 @@
+# Prüfvermerk RA Dr. Weber 22.10.2026 zu produkte.gpsr (G.73): Fernabsatzangaben (Art. 19) nur beim Online-Verkauf – eigener Auslöser
+schema_version: 1
+id: produkte.gpsr_fernabsatz
+version: 1
+katalog_nr: G.73
+titel:
+  de: 'Produktsicherheit (GPSR): Angaben im Online-Angebot'
+kurz:
+  de: Verkaufst du Verbraucherprodukte online oder auf einem Marktplatz, nennst du die Angaben zu Hersteller, Produkt und Sicherheit
+    schon im Angebot.
+erklaerung:
+  de: Wer Produkte im Fernabsatz anbietet – zum Beispiel im Onlineshop, in einer App oder auf einem Marktplatz –, nennt im Angebot
+    deutlich und gut sichtbar den Hersteller mit Name, Handelsmarke, Postanschrift und elektronischer Adresse, gegebenenfalls die
+    verantwortliche Person in der EU, die Angaben zur Identifizierung des Produkts, etwa ein Bild und den Typ, sowie Warnhinweise
+    und Sicherheitsinformationen (Art. 19 GPSR). Das gilt auch für fremde Markenware. Lebensmittel fallen nicht unter die Verordnung.
+rechtsgrundlage:
+- Art. 19 Verordnung (EU) 2023/988 (GPSR)
+- Art. 2 Abs. 3 VO (EU) 2023/988 (Lebensmittel ausgenommen)
+kategorie: produkte
+branchen:
+- onlinehandel
+ausloeser:
+  all:
+  - feld: profil.kunden.segmente
+    op: enthaelt
+    wert: b2c
+    label:
+      de: Du verkaufst an Verbraucher.
+  - feld: profil.produkte.arten
+    op: enthaelt_eines
+    wert:
+    - physisch
+    - elektrogeraete
+    - batterien
+    - kosmetik
+    label:
+      de: Du verkaufst Waren.
+  - feld: profil.vertrieb.kanaele
+    op: enthaelt_eines
+    wert:
+    - onlineshop
+    - marktplatz
+    - app
+    label:
+      de: Du verkaufst über einen Onlineshop, einen Marktplatz oder eine App.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: einmalig
+stelle:
+  de: Du selbst
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: 'Bußgeld bis 10.000 €, wenn ein Produkt im Fernabsatz ohne die Angaben nach Art. 19 GPSR bereitgestellt wird (§ 28 Abs. 2 Nr. 26, Abs. 3 ProdSG).'
+  schwere: mittel
+dringend_ohne_termin: true
+automatisierung: hinweis
+aenderungsnotiz:
+  de: Neu nach der rechtlichen Prüfung (22.10.2026) – die Angaben im Online-Angebot stehen jetzt in einem eigenen Eintrag.
+aktion:
+  art: link
+  ziel: app.onlinecheck
+status_recht: in_kraft
+gueltig_ab: '2024-12-13'
+gueltig_bis: null
+quellen:
+- titel: Verordnung (EU) 2023/988
+  url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32023R0988
+  abgerufen: null
+- titel: Produktsicherheitsgesetz § 28 (Bußgeldvorschriften)
+  url: https://www.gesetze-im-internet.de/prodsg_2021/__28.html
+  abgerufen: '2026-10-22'
+fachlich_zu_pruefen:
+- 'Neu nach Prüfvermerk RA Dr. Weber 22.10.2026 zu produkte.gpsr („Auslöser trennen“) – Eintrag selbst noch nicht geprüft'
+- 'Inhalt aus der bisherigen Fassung von produkte.gpsr; § 28 Abs. 2 Nr. 26 ProdSG verweist auf Art. 19 Buchst. a bis d GPSR (am 22.10.2026 gelesen); Art. 19 GPSR nicht im Wortlaut gelesen'
+- 'Schwere „mittel“ wie bisher bei produkte.gpsr – fachlich festlegen'
+- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

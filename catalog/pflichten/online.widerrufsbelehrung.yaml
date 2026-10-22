@@ -1,20 +1,21 @@
 # Katalog G.68 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.widerrufsbelehrung
-version: 5
+version: 6
 katalog_nr: G.68
 titel:
   de: Über das Widerrufsrecht belehren
 kurz:
   de: Bei Verträgen mit Verbrauchern über Fernabsatz belehrst du über das Widerrufsrecht.
 erklaerung:
-  de: Verbraucher haben bei Fernabsatzverträgen in der Regel ein Widerrufsrecht, über das du vor Vertragsschluss informieren musst. Bei Dienstleistungen, etwa Kursen oder Handwerksleistungen, erlischt das Widerrufsrecht, wenn du die Leistung vollständig erbracht hast und der Kunde vorher ausdrücklich zugestimmt und bestätigt hat, dass er sein Widerrufsrecht dann verliert (§ 356 Abs. 5 Nr. 2 BGB). Beginnst du auf Verlangen des Kunden vor Ablauf der Widerrufsfrist, schuldet er bei einem Widerruf Wertersatz für das bereits Geleistete – aber nur, wenn du ihn ordnungsgemäß belehrt hast (§ 357a Abs. 2 BGB). Bei Freizeitangeboten mit festem Termin kann das Widerrufsrecht ausgeschlossen sein (§ 312g Abs. 2 Nr. 9 BGB); ob das für deine Kurse gilt, ist im Einzelfall zu prüfen.
+  de: Verbraucher haben bei Fernabsatzverträgen in der Regel ein Widerrufsrecht, über das du vor Vertragsschluss informieren musst. Bei Dienstleistungen, etwa Kursen oder Handwerksleistungen, erlischt das Widerrufsrecht, wenn du die Leistung vollständig erbracht hast und der Kunde vorher ausdrücklich zugestimmt und bestätigt hat, dass er sein Widerrufsrecht dann verliert (§ 356 Abs. 5 Nr. 2 BGB). Beginnst du auf Verlangen des Kunden vor Ablauf der Widerrufsfrist, schuldet er bei einem Widerruf Wertersatz für das bereits Geleistete – aber nur, wenn du ihn ordnungsgemäß belehrt hast (§ 357a Abs. 2 BGB). Verwende das Muster nach Anlage 1 zum EGBGB in der Fassung ab 19.6.2026 mit dem Gestaltungshinweis zum Widerrufsbutton. Ausnahmen vom Widerrufsrecht stehen in § 312g Abs. 2 BGB – bei Freizeitkursen und anderen Freizeitangeboten mit festem Termin etwa ist es ausgeschlossen, auch online (§ 312g Abs. 2 Nr. 9 BGB).
 rechtsgrundlage:
 - § 312d BGB
 - § 355 BGB
 - § 356 Abs. 3–5 BGB
 - § 357a Abs. 2 BGB
-- § 312g Abs. 2 Nr. 9 BGB
+- § 312g Abs. 2 BGB
+- Art. 246a EGBGB, Anlage 1
 kategorie: online
 branchen:
 - onlinehandel
@@ -58,15 +59,11 @@ quellen:
   url: https://www.buzer.de/356_BGB.htm
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
-- 'R12 (Nutzertest Coach #11): Dienstleistungs-Hinweise (§ 356 Abs. 4, § 357a Abs. 2 BGB) ergänzt; § 312g Abs. 2 Nr. 9 BGB bei Kursen mit festem Termin (auch online) unsicher; Fernabsatz per Telefon, E-Mail oder Messenger als eigene Pflicht (branche.widerruf_fernabsatz)'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Muster-Widerrufsbelehrung erst nach Prüfung
-- Ausnahmen vom Widerrufsrecht als Hinweis
 - Muster nach Gestaltungshinweis 3 (Widerrufsbutton, Anlage 1 zu Art. 246a § 1 Abs. 2 S. 2 EGBGB) anpassen (Rechtsprüfung R11 Befund 9)
 - Verträge außerhalb von Geschäftsräumen als eigene Pflicht (branche.widerruf_ausserhalb_geschaeftsraeume)
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
-- 'Vorprüfung 21.10.2026: Sanktion ergänzt – seit 19.6.2026 steht die Höchstfrist von zwölf Monaten und 14 Tagen in § 356 Abs. 4 Satz 1 BGB (BGBl. 2026 I Nr. 28), der Fristbeginn in Abs. 3'
-- 'Vorprüfung 21.10.2026: Erlöschen bei Dienstleistungen seit 19.6.2026 in § 356 Abs. 5 Nr. 2 BGB (vorher Abs. 4, buzer.de) – Zitat angepasst'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: § 312d, Art. 246a EGBGB, § 355, § 356 Abs. 3–5 n. F., § 357a Abs. 2 bestätigt; Muster nach Anlage 1 EGBGB mit Gestaltungshinweis (Stand 19.6.2026) und Ausnahmen § 312g Abs. 2 als Hinweis im Text'
 pruefung:
   status: entwurf
   geprueft_von: null

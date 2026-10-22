@@ -1,7 +1,7 @@
 # Katalog G.69 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.vsbg_hinweis
-version: 4
+version: 5
 katalog_nr: G.69
 titel:
   de: Hinweis zur Verbraucherstreitbeilegung
@@ -21,6 +21,20 @@ ausloeser:
     wert: b2c
     label:
       de: Du verkaufst an Verbraucher.
+  # Prüfvermerk RA Dr. Weber 22.10.2026: Auslöser „AGB“ kann entfallen, Website genügt
+  - any:
+    - feld: profil.online.website
+      op: ==
+      wert: true
+      label:
+        de: Du hast eine Website.
+    - feld: profil.vertrieb.kanaele
+      op: enthaelt_eines
+      wert:
+      - onlineshop
+      - app
+      label:
+        de: Du verkaufst über einen Onlineshop oder eine App.
   - feld: profil.beschaeftigte.gesamt
     op: '>'
     wert:
@@ -41,7 +55,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: 'Kein eigenes Bußgeld vorgesehen.'
+    de: 'Kein eigenes Bußgeld vorgesehen; fehlt der Hinweis, kann das als Wettbewerbsverstoß abgemahnt werden (§ 3a UWG).'
   schwere: mittel
 automatisierung: hinweis
 status_recht: in_kraft
@@ -62,10 +76,7 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Zählweise (G-05)
-- Auslöser „Website oder AGB“ – AGB sind nicht im Profil
-- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 41 VSBG (einzige Bußgeldvorschrift laut Inhaltsübersicht; erfasst nur § 2 Abs. 2 – unberechtigte Bezeichnung als Verbraucherschlichtungsstelle; über lxgesetze) gelesen; wettbewerbsrechtliche Folgen (UWG) nicht geprüft – fachlich zu bestätigen'
-- 'Vorprüfung 21.10.2026 (G-05): § 36 Abs. 3 VSBG gelesen (Stichtag 31.12. des Vorjahres, zehn oder weniger Personen) – Stichtag ist im Auslöser nicht abgebildet'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: § 36 Abs. 1, 3 VSBG und Zählweise nach Köpfen bestätigt, Folge UWG-Abmahnung (§ 3a UWG) eingetragen, Auslöser Website (oder Onlineshop/App) statt AGB. Offen: Stichtag 31.12. des Vorjahres ist im Auslöser nicht abgebildet'
 pruefung:
   status: entwurf
   geprueft_von: null

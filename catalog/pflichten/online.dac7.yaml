@@ -1,7 +1,7 @@
 # Katalog G.74 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.dac7
-version: 3
+version: 4
 katalog_nr: G.74
 titel:
   de: Meldungen der Plattformen an das Finanzamt (DAC7) verstehen
@@ -9,8 +9,8 @@ kurz:
   de: Marktplätze melden Verkäufer und Umsätze an das Bundeszentralamt für Steuern – deine Angaben in der Steuererklärung
     sollten dazu passen.
 erklaerung:
-  de: Nach dem Plattformen-Steuertransparenzgesetz (DAC7) melden Plattformen bestimmte Verkäufer. Amtlos erklärt, was gemeldet
-    wird.
+  de: Nach dem Plattformen-Steuertransparenzgesetz (DAC7) melden Plattformen bestimmte Verkäufer – dich, wenn du im Jahr mindestens 30
+    Verkäufe oder 2.000 € Vergütung über die Plattform hattest (§ 4 Abs. 5 Nr. 4 PStTG). Amtlos erklärt, was gemeldet wird.
 rechtsgrundlage:
 - PStTG
 kategorie: online
@@ -45,8 +45,7 @@ quellen:
   abgerufen: null
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Meldeschwellen der Plattformen nicht in der Spezifikation
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- 'Hinweis und Meldeschwelle (§ 4 Abs. 5 Nr. 4 PStTG) nach Prüfvermerk RA Dr. Weber 22.10.2026'
 pruefung:
   status: entwurf
   geprueft_von: null

@@ -1,0 +1,64 @@
+# Verjährung der Mängelansprüche (H.2) – Werte laut Prüfvermerk RA Dr. Weber (22.10.2026) zu branche.handwerk_gewaehrleistung.
+- schema_version: 1
+  id: branche.gewaehrleistung.werk_jahre
+  version: 1
+  katalog_nr: H.2
+  bezeichnung: { de: "Verjährung der Mängelansprüche bei Werkleistungen an Sachen", en: "Limitation period for defect claims for work on things" }
+  einheit: jahre
+  wert: 2
+  gueltig_ab: "2002-01-01"
+  gueltig_bis: null
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 634a Abs. 1 Nr. 1 BGB"]
+  quellen:
+    - { titel: Bürgerliches Gesetzbuch § 634a, url: "https://www.gesetze-im-internet.de/bgb/__634a.html", abgerufen: null }
+  fachlich_zu_pruefen: ["Wert laut Prüfvermerk RA Dr. Weber 22.10.2026; gueltig_ab ist Platzhalter (Schuldrechtsmodernisierung), nicht geprüft"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+
+- schema_version: 1
+  id: branche.gewaehrleistung.bauwerk_jahre
+  version: 1
+  katalog_nr: H.2
+  bezeichnung: { de: "Verjährung der Mängelansprüche bei Bauwerken", en: "Limitation period for defect claims for buildings" }
+  einheit: jahre
+  wert: 5
+  gueltig_ab: "2002-01-01"
+  gueltig_bis: null
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 634a Abs. 1 Nr. 2 BGB"]
+  quellen:
+    - { titel: Bürgerliches Gesetzbuch § 634a, url: "https://www.gesetze-im-internet.de/bgb/__634a.html", abgerufen: null }
+  fachlich_zu_pruefen: ["Wert laut Prüfvermerk RA Dr. Weber 22.10.2026; gueltig_ab ist Platzhalter (Schuldrechtsmodernisierung), nicht geprüft"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+
+- schema_version: 1
+  id: branche.gewaehrleistung.kauf_jahre
+  version: 1
+  katalog_nr: H.2
+  bezeichnung: { de: "Verjährung der Mängelansprüche beim Kauf", en: "Limitation period for defect claims in a sale" }
+  einheit: jahre
+  wert: 2
+  gueltig_ab: "2002-01-01"
+  gueltig_bis: null
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 438 Abs. 1 Nr. 3 BGB"]
+  quellen:
+    - { titel: Bürgerliches Gesetzbuch § 438, url: "https://www.gesetze-im-internet.de/bgb/__438.html", abgerufen: null }
+  fachlich_zu_pruefen: ["Wert laut Prüfvermerk RA Dr. Weber 22.10.2026; gueltig_ab ist Platzhalter (Schuldrechtsmodernisierung), nicht geprüft"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }
+
+- schema_version: 1
+  id: branche.gewaehrleistung.beweislastumkehr_jahre
+  version: 1
+  katalog_nr: H.2
+  bezeichnung: { de: "Zeitraum der Beweislastumkehr beim Verbrauchsgüterkauf", en: "Period of reversal of the burden of proof in consumer sales" }
+  einheit: jahre
+  wert: 1
+  gueltig_ab: "2022-01-01"
+  gueltig_bis: null
+  status_recht: in_kraft
+  rechtsgrundlage: ["§ 477 BGB"]
+  quellen:
+    - { titel: Bürgerliches Gesetzbuch § 477, url: "https://www.gesetze-im-internet.de/bgb/__477.html", abgerufen: null }
+  fachlich_zu_pruefen: ["Wert laut Prüfvermerk RA Dr. Weber 22.10.2026; gueltig_ab (Umsetzung der Warenkaufrichtlinie) nicht geprüft"]
+  pruefung: { status: entwurf, geprueft_von: null, geprueft_am: null }

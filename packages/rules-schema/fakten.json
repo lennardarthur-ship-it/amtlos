@@ -640,6 +640,12 @@
       "ab": 6
     },
     {
+      "pfad": "profil.nis2.betroffen_seit",
+      "typ": "datum",
+      "herleitung": "Onboarding (Prüfvermerk RA Dr. Weber 22.10.2026, F.64): seit wann das Unternehmen (erstmals oder erneut) unter NIS2 fällt – Bezug der Registrierungsfrist von drei Monaten (§ 33 BSIG); bei Betroffenheit schon zum Inkrafttreten der 6.12.2025",
+      "ab": 6
+    },
+    {
       "pfad": "profil.gesellschafter.anzahl",
       "typ": "ganzzahl",
       "herleitung": "Onboarding / Cap Table",

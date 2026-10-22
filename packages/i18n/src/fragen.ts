@@ -743,6 +743,11 @@ export const SCHRITTE: Schritt[] = [
         feld: "datenschutz.dsb_gruende",
         art: "mehrfach",
         frage: { de: "Trifft einer dieser Fälle auf deine Datenverarbeitung zu?", en: "Does any of these apply to your data processing?" },
+        // Prüfvermerk RA Dr. Weber 22.10.2026 (F.61): Erwägungsgrund 91 DSGVO – ein einzelner Arzt oder Therapeut verarbeitet nicht „umfangreich“
+        hilfe: {
+          de: "Arbeitest du allein als Ärztin, Therapeut oder in einem ähnlichen Beruf mit den Daten deiner Patientinnen und Patienten, gilt das nach Erwägungsgrund 91 DSGVO nicht als umfangreiche Verarbeitung.",
+          en: "If you work alone as a doctor, therapist or in a similar profession with your patients' data, this does not count as large-scale processing under Recital 91 GDPR.",
+        },
         optionen: {
           kerntaetigkeit_ueberwachung: {
             de: "Kern deines Geschäfts ist, Menschen umfangreich und regelmäßig zu beobachten (z. B. Ortung, Tracking oder Videoüberwachung als Dienstleistung)",
@@ -777,6 +782,16 @@ export const SCHRITTE: Schritt[] = [
         frage: { de: "Fällt dein Unternehmen unter die NIS2-Regeln zur Cybersicherheit?", en: "Is your business covered by the NIS2 cybersecurity rules?" },
         hilfe: { de: "Das hängt von Branche und Größe ab. Das BSI bietet dafür eine Betroffenheitsprüfung an.", en: "This depends on sector and size. The BSI (German Federal Office for Information Security) offers a check." },
         optionen: { ja: { de: "Ja", en: "Yes" }, nein: { de: "Nein", en: "No" }, unklar: { de: "Weiß ich nicht", en: "I don't know" } },
+      },
+      // Prüfvermerk RA Dr. Weber 22.10.2026 (F.64): Registrierung spätestens drei Monate nach Beginn der Betroffenheit (§ 33 BSIG)
+      {
+        feld: "nis2.betroffen_seit",
+        art: "datum",
+        frage: { de: "Seit wann fällt dein Unternehmen unter NIS2?", en: "Since when has your business been covered by NIS2?" },
+        hilfe: {
+          de: "Warst du schon betroffen, als das NIS-2-Umsetzungsgesetz in Kraft trat, ist das der 6.12.2025. Ab diesem Tag hast du drei Monate Zeit, dich beim BSI zu registrieren.",
+          en: "If you were already covered when the NIS2 Implementation Act came into force, this is 6.12.2025. From that day you have three months to register with the BSI.",
+        },
       },
     ],
   },

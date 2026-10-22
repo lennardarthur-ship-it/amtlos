@@ -1,18 +1,19 @@
 # Katalog H.2 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.handwerk_gewaehrleistung
-version: 3
+version: 4
 katalog_nr: H.2
 titel:
   de: Gewährleistung im Blick behalten
 kurz:
   de: Für deine Werkleistungen haftest du für Mängel. Dokumentiere Abnahmen und behalte die Fristen im Blick.
 erklaerung:
-  de: Wie lange Mängelansprüche bestehen, hängt von der Art des Werks ab. Stellst du Waren her und lieferst sie – etwa als Bäckerei oder Konditorei, auch Torten auf Bestellung –, gilt Kaufrecht (§ 650 BGB); die Mängelrechte richten sich dann nach §§ 437, 438 BGB. Amtlos erinnert nach fachlicher Freigabe an das Ende der Fristen.
+  de: Wie lange Mängelansprüche bestehen, hängt von der Art des Werks ab – bei Werkleistungen an Sachen in der Regel 2 Jahre (§ 634a Abs. 1 Nr. 1 BGB), bei Bauwerken 5 Jahre (§ 634a Abs. 1 Nr. 2 BGB). Stellst du Waren her und lieferst sie – etwa als Bäckerei oder Konditorei, auch Torten auf Bestellung –, gilt Kaufrecht (§ 650 BGB); die Mängelrechte richten sich dann nach §§ 437, 438 BGB und verjähren in der Regel nach 2 Jahren (§ 438 Abs. 1 Nr. 3 BGB). Verkaufst du an Verbraucher, wird bei einem Mangel, der sich im ersten Jahr zeigt, vermutet, dass er schon bei Übergabe da war (§ 477 BGB). Amtlos erinnert nach fachlicher Freigabe an das Ende der Fristen.
 rechtsgrundlage:
 - §§ 634, 634a BGB
 - § 650 BGB
 - §§ 437, 438 BGB
+- § 477 BGB
 kategorie: branche
 branchen:
 - handwerk
@@ -47,8 +48,7 @@ quellen:
 fachlich_zu_pruefen:
 - 'R12 (Nutzertest Bäckerei #13): Kaufrecht bei Herstellung und Lieferung beweglicher Sachen (§ 650 BGB) ergänzt'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Verjährungsfristen je Werkart nicht in der Spezifikation – als Regelwerte ergänzen
-- Ist das eine Pflicht oder ein Hinweis? Darstellung bestätigen
+- 'Hinweis bestätigt; Fristen als Regelwerte (catalog/regelwerte/branche.yaml) und im Text nach Prüfvermerk RA Dr. Weber 22.10.2026'
 pruefung:
   status: entwurf
   geprueft_von: null

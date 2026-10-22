@@ -258,13 +258,18 @@
   "titel": "Hygieneplan führen",
   "kurz": "In Beauty- und Kosmetikbetrieben legst du in einem Hygieneplan fest, wie Geräte, Flächen und Hände gereinigt und desinfiziert werden.",
   "rechtsgrundlage": [
-   "IfSG",
-   "Hygieneverordnungen der Länder"
+   "§ 17 Abs. 4 IfSG",
+   "Hygieneverordnungen der Länder (z. B. BW HygieneVO, BY HygV, NRW HygVO)",
+   "§ 73 Abs. 1a Nr. 24, Abs. 2 IfSG"
   ],
   "quellen": [
    {
     "titel": "Infektionsschutzgesetz",
     "url": "https://www.gesetze-im-internet.de/ifsg/"
+   },
+   {
+    "titel": "Infektionsschutzgesetz § 73 (Bußgeldvorschriften)",
+    "url": "https://www.gesetze-im-internet.de/ifsg/__73.html"
    }
   ],
   "geprueft": false
@@ -402,7 +407,7 @@
  {
   "id": "datenschutz.avv",
   "titel": "Auftragsverarbeitungsverträge abschließen",
-  "kurz": "Mit Dienstleistern, die für dich Daten verarbeiten (z. B. Cloud, Lohnbüro, Newsletter-Tool), schließt du einen Auftragsverarbeitungsvertrag.",
+  "kurz": "Mit Dienstleistern, die für dich Daten verarbeiten (z. B. Cloud, IT-Hoster, Newsletter-Tool), schließt du einen Auftragsverarbeitungsvertrag.",
   "rechtsgrundlage": [
    "Art. 28 DSGVO"
   ],
@@ -470,7 +475,8 @@
   "kurz": "Wenn du Videoüberwachung einsetzt, machst du sie erkennbar und dokumentierst den Zweck.",
   "rechtsgrundlage": [
    "Art. 6 Abs. 1 lit. f DSGVO",
-   "Art. 13 DSGVO"
+   "Art. 13 DSGVO",
+   "§ 87 Abs. 1 Nr. 6 BetrVG"
   ],
   "quellen": [
    {
@@ -491,7 +497,7 @@
  {
   "id": "datenschutz.vvt",
   "titel": "Verzeichnis der Verarbeitungstätigkeiten führen",
-  "kurz": "Du führst ein Verzeichnis, welche Daten über Menschen du wofür verarbeitest.",
+  "kurz": "Du führst ein Verzeichnis, welche Daten über Menschen du wofür verarbeitest – auch als Kleinbetrieb.",
   "rechtsgrundlage": [
    "Art. 30 DSGVO"
   ],
@@ -625,7 +631,8 @@
   "titel": "Datenschutzerklärung auf der Website",
   "kurz": "Auf deiner Website informierst du in einer Datenschutzerklärung über die Verarbeitung von Daten.",
   "rechtsgrundlage": [
-   "Art. 13 DSGVO"
+   "Art. 13 DSGVO",
+   "§ 25 TDDDG"
   ],
   "quellen": [
    {

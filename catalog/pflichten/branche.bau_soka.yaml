@@ -1,15 +1,14 @@
 # Katalog H.4 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.bau_soka
-version: 2
+version: 3
 katalog_nr: H.4
 titel:
   de: Teilnahme an SOKA-BAU
 kurz:
   de: Baubetriebe mit gewerblichen Beschäftigten nehmen an den Sozialkassenverfahren der Bauwirtschaft (SOKA-BAU) teil.
 erklaerung:
-  de: Die Sozialkassen regeln unter anderem Urlaub und Berufsbildung in der Bauwirtschaft. Ob dein Betrieb erfasst ist, hängt
-    von den überwiegenden Tätigkeiten ab.
+  de: 'Die Sozialkassen regeln unter anderem Urlaub und Berufsbildung in der Bauwirtschaft. Erfasst ist dein Betrieb, wenn er arbeitszeitlich überwiegend bauliche Leistungen nach § 1 Abs. 2 VTV erbringt – prüfe das anhand der Arbeitszeit deiner Beschäftigten. Die Beiträge meldest du monatlich bis zum 15. des Folgemonats.'
 rechtsgrundlage:
 - Tarifverträge über das Sozialkassenverfahren (VTV)
 - SokaSiG
@@ -28,19 +27,27 @@ ausloeser:
     wert: true
     label:
       de: Du beschäftigst mindestens eine Person.
+# Prüfvermerk RA Dr. Weber 22.10.2026: Meldung monatlich bis zum 15. des Folgemonats
 frist:
-  typ: dauerhaft
+  typ: wiederkehrend
+  rhythmus: monatlich
+  faellig:
+    art: tag_nach_periodenende
+    monate_nach: 1
+    tag: 15
+  verschiebung:
+    regel: keine
+    kalender: bundeseinheitlich
 wiederholung:
-  art: einmalig
+  art: periodisch
 stelle:
   de: SOKA-BAU
 kanal: portal
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
-  schwere: mittel
-dringend_ohne_termin: true
+    de: 'Die Beiträge zu den Sozialkassen sind Pflicht (VTV, allgemeinverbindlich bzw. SokaSiG); nicht gemeldete Beiträge fordert die SOKA-BAU bis zu vier Jahre nach, mit Verzugszinsen. Ein Bußgeld gibt es nicht.'
+  schwere: hoch
 automatisierung: hinweis
 status_recht: in_kraft
 gueltig_ab: null
@@ -50,12 +57,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/sokasig/
   abgerufen: null
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Erfassung nach überwiegender Tätigkeit – Prüfhinweis ergänzen
-- Meldefristen nicht in der Spezifikation
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
-- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: Folgen, Prüfhinweis (§ 1 Abs. 2 VTV), monatliche Meldung bis zum 15. des Folgemonats und Schwere „hoch“ übernommen. Verschiebung bei Wochenende/Feiertag nicht angegeben – „keine“; ob der Termin für alle Baubetriebe mit Beschäftigten gilt, hängt von der Erfassung nach VTV ab (nur als Prüfhinweis)'
 pruefung:
   status: entwurf
   geprueft_von: null

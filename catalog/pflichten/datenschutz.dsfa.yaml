@@ -1,7 +1,7 @@
 # Katalog F.62 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: datenschutz.dsfa
-version: 4
+version: 5
 katalog_nr: F.62
 titel:
   de: Prüfen, ob eine Datenschutz-Folgenabschätzung nötig ist
@@ -9,7 +9,7 @@ kurz:
   de: Verarbeitest du besonders sensible Daten oder überwachst du mit Video, prüfst du, ob eine Datenschutz-Folgenabschätzung
     nötig ist.
 erklaerung:
-  de: Bei voraussichtlich hohem Risiko für die Betroffenen ist vorab eine Folgenabschätzung durchzuführen und zu dokumentieren. Arbeitest du allein mit den Daten deiner Patientinnen oder Kunden – etwa als Ärztin oder Therapeut, ähnlich wohl auch als Trainerin mit Gesundheitsfragebogen –, gilt das in der Regel nicht als umfangreiche Verarbeitung (Erwägungsgrund 91 DSGVO). Dann genügt es meist, kurz festzuhalten, warum keine Folgenabschätzung nötig ist.
+  de: Bei voraussichtlich hohem Risiko für die Betroffenen ist vorab eine Folgenabschätzung durchzuführen und zu dokumentieren. Arbeitest du allein mit den Daten deiner Patientinnen oder Kunden – etwa als Ärztin oder Therapeut, ähnlich wohl auch als Trainerin mit Gesundheitsfragebogen –, gilt das in der Regel nicht als umfangreiche Verarbeitung (Erwägungsgrund 91 DSGVO). Dann genügt es meist, kurz festzuhalten, warum keine Folgenabschätzung nötig ist. Ziehe außerdem die Liste der Datenschutzkonferenz heran, für welche Verarbeitungen immer eine Folgenabschätzung nötig ist (Muss-Liste) – darauf stehen zum Beispiel die umfangreiche Videoüberwachung öffentlich zugänglicher Bereiche und die Ortung von Beschäftigten.
 rechtsgrundlage:
 - Art. 35 DSGVO
 - Erwägungsgrund 91 DSGVO
@@ -52,10 +52,8 @@ quellen:
   url: https://gdpr-text.com/es/read/article-83
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
-- 'R12 (Nutzertest Coach #13): Hinweis für einzelne Selbstständige nach Erwägungsgrund 91 S. 4 (dort: Ärzte, Gesundheitsberufe, Rechtsanwälte) – Übertragung auf Trainer und Coaches unsicher'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Auslöser (Gesundheitsdaten, Video) sind eine Vorauswahl – Liste der Aufsichtsbehörden (Muss-Liste) einbeziehen
-- 'Vorprüfung 21.10.2026: Sanktion ergänzt – Art. 83 Abs. 4 Buchst. a nennt Art. 25 bis 39 (Art. 35); Wortlaut über gdpr-text.com gelesen, EUR-Lex für das Werkzeug gesperrt'
+- 'Muss-Liste der DSK als Verweis im Text (Prüfvermerk RA Dr. Weber 22.10.2026); Ortung nicht als Auslöser ergänzt (vom Prüfvermerk nicht verlangt; die DSFA-Pflicht bei Ortung steht in datenschutz.ortung) – als Auslöser vorschlagen; Link zur Muss-Liste nicht geprüft'
 pruefung:
   status: entwurf
   geprueft_von: null

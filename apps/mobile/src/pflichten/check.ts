@@ -143,6 +143,8 @@ function passtImmer(feld: string, p: Profil): boolean {
   if ((feld === "ifsg.beschaeftigte" || feld === "ifsg.selbst" || feld === "gastro.to_go" || feld === "gastro.vorverpackt" || feld === "gastro.wassertank") && !inBranche(p, "gastronomie_lebensmittel")) return false;
   // Inbetriebnahme des Wassertanks nur, wenn es einen gibt (wie die Anschaffung der Kasse)
   if (feld === "gastro.wassertank_ab" && p["gastro.wassertank"] !== true) return false;
+  // Prüfvermerk RA Dr. Weber 22.10.2026: Beginn der NIS2-Betroffenheit nur, wenn das Unternehmen darunter fällt
+  if (feld === "nis2.betroffen_seit" && p["nis2.betroffen"] !== "ja") return false;
   // Alkoholausschank nur bei Gaststätte bzw. Getränkeausschank; Anschaffung der Kasse nur mit elektronischer Kasse
   if (feld === "erlaubnis.alkohol" && p["erlaubnis.gaststaette"] !== true) return false;
   if (feld === "kasse.angeschafft_am" && p["kasse.elektronisch"] !== true) return false;

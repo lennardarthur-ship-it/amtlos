@@ -1,7 +1,7 @@
 # Katalog G.69 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.os_link
-version: 4
+version: 5
 katalog_nr: G.69
 titel:
   de: Link zur OS-Plattform entfernen
@@ -42,7 +42,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Keine eigene Pflicht mehr – ein Hinweis auf die abgeschaltete Plattform ist überholt.
+    de: Keine eigene Pflicht mehr – ein Hinweis auf die abgeschaltete Plattform ist überholt. Ein veralteter Link birgt ein geringes, aber nicht ausgeschlossenes Abmahnrisiko wegen Irreführung.
   schwere: niedrig
 automatisierung: hinweis
 einordnung: hinweis
@@ -65,8 +65,7 @@ quellen:
   url: https://www.ihk.de/fulda/handel-dienstleistungen/eu-plattform-zur-streitbeilegung-wird-abgeschafft-6503696
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
-- 'Aufhebung zum 20.07.2025 durch VO (EU) 2024/3228 (R10, Rechtsprüfung) – Fundstelle der Quelle eintragen; ob ein noch vorhandener Link selbst ein Wettbewerbsrisiko ist, offen'
-- 'Vorprüfung 21.10.2026 (G.69): Link entfernen bestätigt (VO (EU) 2024/3228, Abschaltung und Wegfall der Linkpflicht 20.7.2025 laut IHK Fulda); Hinweistext im Online-Check (i18n os_link) angepasst'
+- 'Aufhebung zum 20.07.2025 durch VO (EU) 2024/3228 bestätigt, Abmahnrisiko eines veralteten Links nach Prüfvermerk RA Dr. Weber 22.10.2026 – Fundstelle (ABl.) der Quelle noch eintragen'
 pruefung:
   status: entwurf
   geprueft_von: null

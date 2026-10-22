@@ -1,18 +1,19 @@
 # Katalog H.5 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.transport_lenkzeiten
-version: 4
+version: 5
 katalog_nr: H.5
 titel:
   de: Lenk- und Ruhezeiten einhalten und mit dem Fahrtenschreiber aufzeichnen
 kurz:
   de: Für Fahrzeuge über 3,5 t – grenzüberschreitend schon über 2,5 t – gelten die EU-Lenk- und Ruhezeiten; aufgezeichnet wird mit dem Fahrtenschreiber.
 erklaerung:
-  de: Die Lenk- und Ruhezeiten der Verordnung (EG) Nr. 561/2006 gelten für die Güterbeförderung mit Fahrzeugen über 3,5 t zulässiger Gesamtmasse (mit Anhänger). Seit dem 1.7.2026 gelten sie auch für Fahrzeuge über 2,5 t bis 3,5 t bei grenzüberschreitenden Fahrten und Kabotage; diese Fahrzeuge brauchen einen intelligenten Fahrtenschreiber der neuesten Generation. Die Daten aus Fahrtenschreiber und Fahrerkarte liest du regelmäßig aus und bewahrst sie auf. Für Werkverkehr bis 3,5 t gibt es unter bestimmten Bedingungen Ausnahmen (Art. 3 Buchst. ha VO (EG) Nr. 561/2006).
+  de: Die Lenk- und Ruhezeiten der Verordnung (EG) Nr. 561/2006 gelten für die Güterbeförderung mit Fahrzeugen über 3,5 t zulässiger Gesamtmasse (mit Anhänger). Seit dem 1.7.2026 gelten sie auch für Fahrzeuge über 2,5 t bis 3,5 t bei grenzüberschreitenden Fahrten und Kabotage; diese Fahrzeuge brauchen einen intelligenten Fahrtenschreiber der neuesten Generation. Die Daten der Fahrerkarte liest du spätestens alle 28 Tage aus, den Massenspeicher des Fahrtenschreibers spätestens alle 90 Tage, und bewahrst sie ein Jahr auf (§ 2a FPersV). Ausnahmen gibt es unter anderem für Werkverkehr bis 3,5 t (Art. 3 Buchst. ha VO (EG) Nr. 561/2006) und für Handwerker mit Fahrzeugen bis 7,5 t im Umkreis von 100 km, wenn das Fahren nicht ihre Haupttätigkeit ist (Art. 3 Buchst. aa VO (EG) Nr. 561/2006).
 rechtsgrundlage:
 - Verordnung (EG) Nr. 561/2006
 - Verordnung (EU) Nr. 165/2014
 - FPersG
+- § 2a FPersV
 kategorie: branche
 branchen:
 - transport_logistik
@@ -53,7 +54,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: 'Bußgeld bis 30.000 € für dich als Unternehmer, wenn du nicht dafür sorgst, dass deine Fahrer Lenkzeiten, Fahrtunterbrechungen und Ruhezeiten einhalten (§ 8a Abs. 1 Nr. 2, Abs. 4 FPersG); für Fahrer bis 5.000 € (§ 8a Abs. 2 Nr. 1, Abs. 4 FPersG).'
+    de: 'Bußgeld bis 30.000 € für dich als Unternehmer, wenn du nicht dafür sorgst, dass deine Fahrer Lenkzeiten, Fahrtunterbrechungen und Ruhezeiten einhalten (§ 8a Abs. 1 Nr. 2, Abs. 4 FPersG); für Fahrer bis 5.000 € (§ 8a Abs. 2 Nr. 1, Abs. 4 FPersG). Verstöße beim Fahrtenschreiber ahndet § 8 FPersG in Verbindung mit der FPersV.'
   schwere: mittel
 dringend_ohne_termin: true
 automatisierung: hinweis
@@ -71,9 +72,8 @@ quellen:
   url: https://www.gesetze-im-internet.de/fahrpersstg/__8a.html
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'R12 (Nutzertest Kurier #2): Auslöser nach zulässiger Gesamtmasse und grenzüberschreitenden Fahrten (seit 1.7.2026 ab 2,5 t, IHK München) – Ausnahmen (Werkverkehr Art. 3 Buchst. ha, Handwerkerregelung) sowie Auslese- und Aufbewahrungsfristen fachlich ergänzen'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 8a Abs. 1 Nr. 2 (Art. 6, 7, 8 VO (EG) Nr. 561/2006), Abs. 2 Nr. 1 und Abs. 4 FPersG gelesen; Verstöße beim Fahrtenschreiber (VO (EU) Nr. 165/2014) laufen über § 8 Abs. 1 Nr. 1 Buchst. b FPersG und die FPersV – nicht ergänzt – fachlich zu bestätigen'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: Geltungsbereich (ab 3,5 t, grenzüberschreitend ab 2,5 t seit 1.7.2026), Ausnahmen (Werkverkehr, Art. 3 Buchst. aa), Auslese- und Aufbewahrungsfristen (§ 2a FPersV), Sanktion § 8a FPersG und Hinweis § 8 FPersG/FPersV übernommen; Ausnahmen nicht im Auslöser'
 - 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 pruefung:
   status: entwurf

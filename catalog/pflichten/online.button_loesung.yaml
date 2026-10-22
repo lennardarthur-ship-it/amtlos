@@ -1,14 +1,14 @@
 # Katalog G.68 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.button_loesung
-version: 3
+version: 4
 katalog_nr: G.68
 titel:
   de: Bestellbutton eindeutig beschriften (Button-Lösung)
 kurz:
   de: Der Button, mit dem Verbraucher kostenpflichtig bestellen, muss eindeutig auf die Zahlungspflicht hinweisen.
 erklaerung:
-  de: Nach § 312j BGB kommt ohne eindeutige Beschriftung kein wirksamer Vertrag zustande.
+  de: 'Nach § 312j BGB kommt ohne eindeutige Beschriftung kein wirksamer Vertrag zustande. Zulässig sind etwa „zahlungspflichtig bestellen“, „kostenpflichtig bestellen“ oder „kaufen“, nicht dagegen „bestellen“, „weiter“ oder „anmelden“.'
 rechtsgrundlage:
 - § 312j BGB
 kategorie: online
@@ -53,8 +53,7 @@ quellen:
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Zulässige Beschriftungen als Beispiele ergänzen
-- 'Vorprüfung 21.10.2026: Sanktion ergänzt – § 312j Abs. 4 BGB gelesen'
+- 'Beispiele zulässiger und unzulässiger Beschriftungen nach Prüfvermerk RA Dr. Weber 22.10.2026'
 pruefung:
   status: entwurf
   geprueft_von: null

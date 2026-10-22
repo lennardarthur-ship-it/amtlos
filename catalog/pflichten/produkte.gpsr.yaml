@@ -1,22 +1,26 @@
 # Katalog G.73 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Prüfvermerk RA Dr. Weber 22.10.2026: Auslöser getrennt – hier nur die Sorgfaltspflichten der Händler (Art. 12 GPSR);
+# Herstellerpflichten in produkte.gpsr_hersteller, Fernabsatzangaben in produkte.gpsr_fernabsatz
 schema_version: 1
 id: produkte.gpsr
-version: 7
+version: 8
 katalog_nr: G.73
 titel:
-  de: 'Produktsicherheit (GPSR): Angaben und verantwortliche Person'
+  de: 'Produktsicherheit (GPSR): Angaben vor dem Verkauf prüfen'
 kurz:
-  de: Verbraucherprodukte brauchen Herstellerangaben, Sicherheitsinformationen und eine verantwortliche Person in der EU. Verkaufst
-    du fremde Markenware, prüfst du vor dem Verkauf, ob diese Angaben vorhanden sind.
+  de: Verkaufst du Verbraucherprodukte, prüfst du vor dem Verkauf, ob Herstellerangaben, Kennzeichnung und Sicherheitsinformationen
+    vorhanden sind.
 erklaerung:
-  de: Die Produktsicherheitsverordnung gilt seit 13.12.2024. Für die verantwortliche Person in der EU, die Herstellerangaben und
-    die Sicherheitsinformationen sorgen Hersteller und Importeure. Als Händlerin oder Händler fremder Ware prüfst du vor dem Verkauf,
-    ob Hersteller, gegebenenfalls Importeur und die nötigen Angaben auf dem Produkt oder der Verpackung stehen. Wer Produkte im Fernabsatz
-    anbietet (zum Beispiel im Onlineshop oder auf einem Marktplatz), nennt diese Angaben schon beim Angebot. Lebensmittel fallen
-    nicht unter die Verordnung.
+  de: Die Produktsicherheitsverordnung gilt seit 13.12.2024. Als Händlerin oder Händler – auch von fremder Markenware – prüfst du
+    vor dem Verkauf mit der gebotenen Sorgfalt, ob Hersteller, gegebenenfalls Einführer, die Angaben zur Identifizierung sowie
+    Anweisungen und Sicherheitsinformationen auf dem Produkt, der Verpackung oder einer beigefügten Unterlage stehen (Art. 12 GPSR).
+    Fehlt etwas oder hältst du das Produkt für nicht sicher, stellst du es nicht bereit. Stellst du selbst her, verkaufst du unter
+    eigener Marke, führst du von außerhalb der EU ein oder verkaufst du online, gelten zusätzliche Pflichten in eigenen Einträgen.
+    Für Kosmetik geht die Kosmetikverordnung vor, die GPSR gilt ergänzend (Art. 2 Abs. 1). Lebensmittel fallen nicht unter die
+    Verordnung.
 rechtsgrundlage:
-- Verordnung (EU) 2023/988 (GPSR)
-- Art. 2 Abs. 3 VO (EU) 2023/988 (Lebensmittel ausgenommen)
+- Art. 12 Verordnung (EU) 2023/988 (GPSR)
+- Art. 2 Abs. 1, 3 VO (EU) 2023/988 (Kosmetik ergänzend, Lebensmittel ausgenommen)
 kategorie: produkte
 branchen:
 - onlinehandel
@@ -46,16 +50,12 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: 'Bußgeld bis 10.000 €, wenn Herstellerangaben oder Sicherheitsinformationen fehlen oder im Fernabsatz die Pflichtangaben nach Art. 19 GPSR fehlen (§ 28 Abs. 2 Nr. 5, 6, 26, Abs. 3 ProdSG).'
+    de: 'Bußgeld bis 10.000 €, wenn du ein Produkt bereitstellst, obwohl du es für nicht sicher hältst oder die vorgeschriebenen Angaben fehlen (§ 28 Abs. 2 Nr. 21, Abs. 3 ProdSG in Verbindung mit Art. 12 Abs. 3 GPSR).'
   schwere: mittel
-dringend_ohne_termin: true
 automatisierung: hinweis
 aenderungsnotiz:
-  de: Lebensmittel lösen die Pflicht nicht mehr aus (Art. 2 Abs. 3). Für Händlerinnen und Händler fremder Markenware ist beschrieben,
-    was sie prüfen.
-aktion:
-  art: link
-  ziel: app.onlinecheck
+  de: Hier stehen jetzt nur noch die Prüfpflichten als Händlerin oder Händler. Pflichten als Hersteller oder Einführer und die Angaben
+    im Online-Angebot haben eigene Einträge.
 status_recht: in_kraft
 gueltig_ab: '2024-12-13'
 gueltig_bis: null
@@ -68,11 +68,8 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Pflichten für Händler vs. Hersteller trennen
-- 'Lebensmittel als Auslöser entfernt (Art. 2 Abs. 3 GPSR, R10); Abgrenzung zur Kosmetikverordnung offen – bei Kosmetik geht die Kosmetikverordnung vor, GPSR nur ergänzend (Art. 2 Abs. 1); Umfang nach Art. 19 GPSR prüfen (Nutzertest Kosmetik R11)'
-- 'Händlerin fremder Markenware im Laden ohne Fernabsatz: nur Sorgfaltspflichten nach Art. 12 – Auslöser auf Hersteller/Importeur/Fernabsatz einschränken? Schwere „hoch“ für Händler angemessen?'
-- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 28 Abs. 2 Nr. 5 (Art. 9 Abs. 6, Art. 11 Abs. 3), Nr. 6 (Art. 9 Abs. 7, Art. 11 Abs. 4), Nr. 26 (Art. 19) und Abs. 3 ProdSG gelesen; Art. 12 Abs. 1 GPSR (Sorgfaltspflichten der Händler) ist in § 28 Abs. 2 ProdSG nicht genannt; Art. 16 GPSR (Nr. 24, 25) nicht zugeordnet – fachlich zu bestätigen'
-- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: Auslöser getrennt – Händler (Art. 12, Schwere „mittel“) hier, Herstellerpflichten (Art. 9, 11) in produkte.gpsr_hersteller (Auslöser profil.produkte.hersteller), Fernabsatzangaben (Art. 19) in produkte.gpsr_fernabsatz (Onlineshop, Marktplatz, App); Kosmetik: Kosmetikverordnung geht vor (Art. 2 Abs. 1). „Dringend ohne Termin“ entfernt, weil Folgen erfasst und Schwere bewusst „mittel“; Online-Check-Link in den Fernabsatz-Eintrag verschoben'
+- 'Sanktion: § 28 Abs. 2 Nr. 21 ProdSG verweist auf Art. 12 Abs. 3 GPSR (am 22.10.2026 gelesen); Art. 12 GPSR selbst nicht im Wortlaut gelesen, Inhalt von Abs. 3 sinngemäß'
 pruefung:
   status: entwurf
   geprueft_von: null

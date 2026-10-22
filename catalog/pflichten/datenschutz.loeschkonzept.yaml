@@ -1,15 +1,14 @@
 # Katalog F.58 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: datenschutz.loeschkonzept
-version: 2
+version: 3
 katalog_nr: F.58
 titel:
   de: Löschkonzept festlegen
 kurz:
   de: Du legst fest, wann welche Daten gelöscht werden – unter Beachtung der Aufbewahrungsfristen.
 erklaerung:
-  de: Daten dürfen nur so lange gespeichert werden, wie es für den Zweck nötig ist. Gesetzliche Aufbewahrungspflichten (z.
-    B. für Rechnungen) gehen vor.
+  de: 'Daten dürfen nur so lange gespeichert werden, wie es für den Zweck nötig ist. Gesetzliche Aufbewahrungsfristen, etwa nach § 147 AO und § 257 HGB, gehen vor (Art. 17 Abs. 3 Buchst. b DSGVO); danach löschst du.'
 rechtsgrundlage:
 - Art. 5 Abs. 1 lit. e DSGVO
 - Art. 17 DSGVO
@@ -60,9 +59,6 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Zusammenspiel mit Aufbewahrungsfristen (C.32, G-21) erläutern
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (Art. 83 Abs. 5 Buchst. a (Art. 5) und b (Art. 12 bis 22) DSGVO über gesetze.legal gelesen) – fachlich zu bestätigen'
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf
   geprueft_von: null

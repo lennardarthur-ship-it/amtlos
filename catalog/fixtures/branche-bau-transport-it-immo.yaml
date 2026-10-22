@@ -19,9 +19,13 @@ erwartet:
   branche.bau_baustellenverordnung: gilt
   branche.transport_erlaubnis: gilt
   branche.transport_lenkzeiten: gilt
-  branche.it_scheinselbststaendigkeit: gilt
+  # Prüfvermerk RA Dr. Weber 22.10.2026: nur die Freelancer-Seite (ein Auftraggeber) – die GmbH mit Beschäftigten ist Auftraggeberin
+  branche.it_scheinselbststaendigkeit: gilt_nicht
   branche.it_haftung: gilt
   branche.immo_weiterbildung: gilt
   branche.immo_gwg: gilt
   branche.gesundheit_erlaubnisse: gilt_nicht
   branche.gastro_haccp: gilt_nicht
+termine_enthaelt:
+  # Prüfvermerk RA Dr. Weber 22.10.2026: SOKA-BAU-Meldung monatlich bis zum 15. des Folgemonats (keine Verschiebung angegeben)
+  branche.bau_soka: [["2026-10", "2026-11-15"]]

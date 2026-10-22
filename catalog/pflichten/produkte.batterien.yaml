@@ -1,7 +1,7 @@
 # Katalog G.72 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: produkte.batterien
-version: 5
+version: 6
 katalog_nr: G.72
 titel:
   de: Batterien registrieren (BattDG)
@@ -9,7 +9,7 @@ kurz:
   de: Bringst du Batterien oder Geräte mit Batterien selbst erstmals in Deutschland in Verkehr, registrierst du dich vorher nach dem
     Batteriegesetz.
 erklaerung:
-  de: Hersteller von Batterien müssen sich vor dem Inverkehrbringen registrieren. Hersteller ist auch, wer unter eigener Marke verkauft
+  de: Hersteller von Batterien müssen sich vor dem Inverkehrbringen bei der stiftung ear registrieren. Hersteller ist auch, wer unter eigener Marke verkauft
     oder Batterien bzw. Geräte mit Batterien nach Deutschland einführt. Wer bei einem Händler in Deutschland kauft und weiterverkauft
     oder einbaut, ist in der Regel nicht Hersteller.
 rechtsgrundlage:
@@ -34,7 +34,7 @@ frist:
 wiederholung:
   art: einmalig
 stelle:
-  de: Zuständige Stelle nach BattDG
+  de: stiftung elektro-altgeräte register (ear)
 kanal: portal
 kosten: null
 sanktion:
@@ -60,10 +60,8 @@ quellen:
   url: https://www.gesetze-im-internet.de/battdg/__4.html
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Rückfrage „selbst erstmals in Deutschland in Verkehr (Herstellung, Eigenmarke, Import)“ vor dem Auslösen (R10, K-430) – Installateur mit Einkauf im inländischen Großhandel als Nicht-Hersteller bestätigen; Pflichten als Vertreiber (Rücknahme) nicht abgebildet'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: Herstellerbegriff und Installateur mit Inlandseinkauf als Vertreiber bestätigt; Vertreiberpflichten (Rücknahme von Gerätebatterien) als eigener Hinweis – Eintrag fehlt noch'
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Zuständige Stelle und Registrierungsweg ergänzen
-- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 4 Abs. 1, 3 und § 60 Abs. 1 Nr. 1, Abs. 2 Nr. 23 (Art. 55 Abs. 2 UAbs. 1 Satz 1 VO (EU) 2023/1542 in Verbindung mit § 5 Abs. 1), Abs. 3 BattDG gelesen – fachlich zu bestätigen'
 - 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 pruefung:
   status: entwurf

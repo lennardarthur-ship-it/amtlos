@@ -1,25 +1,36 @@
 # Katalog H.8 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: branche.immo_gwg
-version: 3
+version: 4
 katalog_nr: H.8
 titel:
   de: Geldwäschegesetz für Immobilien- und Finanzbranche
 kurz:
   de: Immobilienmakler und viele Finanzdienstleister sind Verpflichtete nach dem Geldwäschegesetz.
 erklaerung:
-  de: Dazu gehören Risikoanalyse, Identifizierung der Vertragspartner und Verdachtsmeldungen.
+  de: Verpflichtet sind unter anderem Immobilienmakler (§ 2 Abs. 1 Nr. 14 GwG), Finanzanlagen- und Darlehensvermittler sowie Versicherungsvermittler, soweit sie Lebensversicherungen vermitteln (§ 2 Abs. 1 Nr. 6 ff. GwG). Dazu gehören Risikoanalyse, Identifizierung der Vertragspartner und Verdachtsmeldungen.
 rechtsgrundlage:
 - § 2 GwG
 kategorie: branche
 branchen:
 - immobilien_finanzen
 ausloeser:
-  feld: profil.taetigkeit.branchen
-  op: enthaelt
-  wert: immobilien_finanzen
-  label:
-    de: Dein Betrieb gehört zur Immobilien- oder Finanzbranche.
+  all:
+  - feld: profil.taetigkeit.branchen
+    op: enthaelt
+    wert: immobilien_finanzen
+    label:
+      de: Dein Betrieb gehört zur Immobilien- oder Finanzbranche.
+  # Prüfvermerk RA Dr. Weber 22.10.2026: Makler, Finanzanlagenvermittler, Versicherungsvermittler, Darlehensvermittler
+  - feld: profil.erlaubnis.gewo_paragraphen
+    op: enthaelt_eines
+    wert:
+    - 34c
+    - 34d
+    - 34f
+    - 34i
+    label:
+      de: Du bist als Makler oder als Finanzanlagen-, Versicherungs- oder Darlehensvermittler tätig (Erlaubnis nach § 34c, § 34d, § 34f oder § 34i GewO).
 frist:
   typ: dauerhaft
 wiederholung:
@@ -46,8 +57,7 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Welche Tätigkeiten genau (Makler, Vermittler) – Auslöser verfeinern
-- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 56 Abs. 1 Satz 1 Nr. 1 (§ 5 Abs. 1), Nr. 3 (§ 6 Abs. 1), Nr. 15 (§ 10 Abs. 1 Nr. 1) und Abs. 3 GwG gelesen; Höchstbeträge für Verpflichtete nach § 2 Abs. 1 Nr. 1 bis 3, 6 bis 9 (5 Mio. € bzw. 10 % des Gesamtumsatzes) nicht im Text beziffert – fachlich zu bestätigen'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: § 2 Abs. 1 Nr. 14, Nr. 6 ff. GwG und Sanktion § 56 bestätigt; Auslöser auf Makler und Vermittler verfeinert (Erlaubnis nach § 34c, § 34d, § 34f, § 34i GewO) – § 34c umfasst auch Wohnimmobilienverwalter, § 34d alle Versicherungsvermittler (GwG nur bei Lebensversicherungen): der Auslöser ist dort weiter als die Pflicht'
 - 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
 pruefung:
   status: entwurf

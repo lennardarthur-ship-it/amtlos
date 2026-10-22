@@ -1,14 +1,14 @@
 # R12 (Nutzertest Kfz #1): Altölverordnung – Rücknahme beim Ölverkauf
 schema_version: 1
 id: umwelt.altoel_ruecknahme
-version: 2
+version: 3
 katalog_nr: U.3
 titel:
   de: Altöl zurücknehmen, wenn du Motor- oder Getriebeöl verkaufst
 kurz:
   de: Verkaufst du Motor- oder Getriebeöl an Endverbraucher, richtest du vorher eine Annahmestelle für Altöl ein und weist Privatkunden mit einer Schrifttafel darauf hin.
 erklaerung:
-  de: Wer gewerbsmäßig Verbrennungsmotoren- oder Getriebeöl an Endverbraucher abgibt, richtet vor der Abgabe eine Annahmestelle für gebrauchte Öle ein oder weist eine solche durch eine vertragliche Vereinbarung nach (§ 8 Abs. 1 AltölV). Bei der Abgabe an private Endverbraucher weist du am Ort des Verkaufs mit leicht erkennbaren und lesbaren Schrifttafeln auf die Annahmestelle hin.
+  de: Wer gewerbsmäßig Verbrennungsmotoren- oder Getriebeöl an Endverbraucher abgibt, richtet vor der Abgabe eine Annahmestelle für gebrauchte Öle ein oder weist eine solche durch eine vertragliche Vereinbarung nach (§ 8 Abs. 1 AltölV). Bei der Abgabe an private Endverbraucher weist du am Ort des Verkaufs mit leicht erkennbaren und lesbaren Schrifttafeln auf die Annahmestelle hin. Die Annahmestelle nimmt gebrauchte Öle bis zur Menge des bei dir gekauften Öls an (§ 8 Abs. 2 AltölV).
 rechtsgrundlage:
 - § 8 AltölV
 kategorie: umwelt
@@ -49,8 +49,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/krwg/__69.html
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Neu nach Nutzertest R12 (Kfz #1) – § 8 Abs. 1 AltölV geprüft; Annahme bis zur Menge des gekauften Öls (§ 8 Abs. 2) fachlich ergänzen'
-- 'Vorprüfung 22.10.2026: Sanktion aus dem Wortlaut ergänzt – § 10 Abs. 1 Nr. 6 AltölV (§ 8 Abs. 1; über lxgesetze) und § 69 Abs. 1 Nr. 8, Abs. 3 KrWG gelesen – fachlich zu bestätigen'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: § 8 Abs. 1, 2 AltölV (Annahmestelle, Hinweis, Menge bis zur verkauften Menge) und Sanktion bestätigt'
 pruefung:
   status: entwurf
   geprueft_von: null

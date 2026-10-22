@@ -1,14 +1,14 @@
 # Katalog F.58 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: datenschutz.informationspflichten
-version: 2
+version: 3
 katalog_nr: F.58
 titel:
   de: Über die Datenverarbeitung informieren
 kurz:
   de: Wenn du Daten erhebst, informierst du die Menschen darüber – etwa in einer Datenschutzerklärung oder einem Informationsblatt.
 erklaerung:
-  de: Die Information nennt unter anderem Zweck, Rechtsgrundlage, Empfänger, Speicherdauer und die Rechte der Betroffenen.
+  de: 'Die Information nennt unter anderem Zweck, Rechtsgrundlage, Empfänger, Speicherdauer und die Rechte der Betroffenen; die Pflichtinhalte nach Art. 13 Abs. 1 und 2 DSGVO findest du als Checkliste in der Vorlage „Datenschutzinformation“. Du informierst bei der Erhebung der Daten (Art. 13 DSGVO); erhältst du die Daten nicht von der Person selbst, spätestens innerhalb eines Monats (Art. 14 DSGVO).'
 rechtsgrundlage:
 - Art. 13 DSGVO
 - Art. 14 DSGVO
@@ -41,7 +41,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Bußgeld nach Art. 83 Abs. 5 DSGVO.
+    de: Bußgeld bis 20 Mio. € oder bei Unternehmen bis 4 % des weltweiten Jahresumsatzes des Vorjahres, je nachdem, welcher Betrag höher ist (Art. 83 Abs. 5 Buchst. b DSGVO).
   schwere: mittel
 automatisierung: dokument_generator
 status_recht: in_kraft
@@ -52,10 +52,7 @@ quellen:
   url: https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:32016R0679
   abgerufen: null
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Pflichtinhalte als Checkliste fachlich ergänzen
 - Vorlage Datenschutzerklärung (6.4) erst nach Prüfung
-- 'Sanktion aus der Rechtsprüfung R10 (G-16) übernommen – Fundstelle bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

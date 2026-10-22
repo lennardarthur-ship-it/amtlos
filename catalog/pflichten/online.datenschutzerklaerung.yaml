@@ -1,17 +1,18 @@
 # Katalog G.66 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.datenschutzerklaerung
-version: 4
+version: 5
 katalog_nr: G.66
 titel:
   de: Datenschutzerklärung auf der Website
 kurz:
   de: Auf deiner Website informierst du in einer Datenschutzerklärung über die Verarbeitung von Daten.
 erklaerung:
-  de: Die Datenschutzerklärung muss von jeder Seite erreichbar sein. Inhaltlich folgt sie den Informationspflichten der DSGVO.
-    Erledigt ist sie, wenn sie auf deiner Website veröffentlicht ist.
+  de: Die Datenschutzerklärung muss ab der Live-Schaltung deiner Website bereitstehen und von jeder Seite erreichbar sein. Inhaltlich
+    folgt sie den Informationspflichten der DSGVO. Erledigt ist sie, wenn sie auf deiner Website veröffentlicht ist.
 rechtsgrundlage:
 - Art. 13 DSGVO
+- § 25 TDDDG
 kategorie: online
 branchen:
 - onlinehandel
@@ -60,10 +61,8 @@ quellen:
   url: https://gdpr-text.com/es/read/article-83
   abgerufen: '2026-10-21'
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 - Vorlage erst nach fachlicher Prüfung (6.4)
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
-- 'Vorprüfung 21.10.2026: Sanktion ergänzt – Art. 83 Abs. 5 Buchst. b (Betroffenenrechte Art. 13); Wortlaut über gdpr-text.com gelesen'
+- 'Frist „ab Live-Schaltung“ (Prüfvermerk RA Dr. Weber 22.10.2026) nur im Text – kein Ereignis dafür'
 pruefung:
   status: entwurf
   geprueft_von: null

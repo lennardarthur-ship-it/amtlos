@@ -1,18 +1,17 @@
 # Katalog F.64 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: it_sicherheit.nis2_pruefen
-version: 3
+version: 4
 katalog_nr: F.64
 titel:
   de: Prüfen, ob NIS2 für dich gilt
 kurz:
   de: Kläre, ob dein Unternehmen nach Sektor und Größe unter die NIS2-Regeln fällt.
 erklaerung:
-  de: NIS2 betrifft Unternehmen bestimmter Sektoren ab einer bestimmten Größe. Wer betroffen ist, muss sich beim BSI registrieren
-    und Sicherheitsvorfälle melden. Beantworte die Frage im Profil, sobald du es weißt.
+  de: 'NIS2 betrifft Unternehmen bestimmter Sektoren ab einer bestimmten Größe – in der Regel ab 50 Beschäftigten oder mehr als 10 Mio. € Jahresumsatz und Jahresbilanzsumme. Unabhängig von der Größe erfasst sind unter anderem Vertrauensdiensteanbieter, Registries von Top-Level-Domains, DNS-Diensteanbieter und Anbieter öffentlicher Telekommunikationsnetze (§ 28 Abs. 3 BSIG). Wer betroffen ist, muss sich beim BSI registrieren und Sicherheitsvorfälle melden. Beantworte die Frage im Profil, sobald du es weißt.'
 rechtsgrundlage:
 - NIS2-Richtlinie (EU) 2022/2555
-- BSIG
+- § 28 BSIG
 kategorie: it_sicherheit
 ausloeser:
   all:
@@ -33,6 +32,13 @@ ausloeser:
       - feld: profil.beschaeftigte.gesamt
         op: <
         wert: 50
+      # Prüfvermerk RA Dr. Weber 22.10.2026: Umsatzschwelle 10 Mio. € – ohne Angabe wie bisher als klein gewertet (Bilanzsumme nicht im Profil)
+      - any:
+        - feld: profil.umsatz.vorjahr
+          op: nicht_vorhanden
+        - feld: profil.umsatz.vorjahr
+          op: '<='
+          wert: 10000000
       - any:
         - feld: profil.taetigkeit.branchen
           op: nicht_vorhanden
@@ -43,7 +49,7 @@ ausloeser:
             - it_agentur_freelancer
             - sonstige
     label:
-      de: Dein Betrieb ist groß genug oder in einer Branche, für die NIS2 auch ohne Größenschwelle gelten kann.
+      de: Dein Betrieb ist groß genug (mindestens 50 Beschäftigte oder mehr als 10 Mio. € Umsatz) oder in einer Branche, für die NIS2 auch ohne Größenschwelle gelten kann.
 frist:
   typ: dauerhaft
 wiederholung:
@@ -70,10 +76,7 @@ quellen:
   abgerufen: null
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Sektoren und Größenschwellen stehen nicht in der Spezifikation – als Betroffenheitscheck fachlich ergänzen
-- Vorbereitender Schritt – Darstellung bestätigen
-- 'Ausgeblendet bei unter 50 Beschäftigten außer IT/Andere (R11) – Umsatz- und Bilanzschwelle (über 10 Mio. €) und größenunabhängige Sektoren (z. B. DNS, Vertrauensdienste, Telekommunikation) nicht abgebildet; bestätigen'
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: größenunabhängige Sektoren (§ 28 Abs. 3 BSIG) als Liste im Text, Umsatzschwelle 10 Mio. € im Auslöser (Vorjahresumsatz; Bilanzsumme nicht im Profil, ohne Umsatzangabe als klein gewertet); vollständige Sektorenliste nicht hinterlegt; § 28 Abs. 3 BSIG nicht im Wortlaut gelesen'
 pruefung:
   status: entwurf
   geprueft_von: null

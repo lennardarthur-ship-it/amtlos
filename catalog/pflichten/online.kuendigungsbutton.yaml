@@ -1,15 +1,14 @@
 # Katalog G.68 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: online.kuendigungsbutton
-version: 3
+version: 4
 katalog_nr: G.68
 titel:
   de: Kündigungsbutton bei Abos
 kurz:
   de: Können Verbraucher auf deiner Website Abos abschließen, brauchst du einen Kündigungsbutton.
 erklaerung:
-  de: § 312k BGB verlangt eine einfache Kündigungsmöglichkeit über die Website für Dauerschuldverhältnisse, die online geschlossen
-    werden können.
+  de: '§ 312k BGB verlangt eine einfache Kündigungsmöglichkeit über die Website – nur für Dauerschuldverhältnisse mit Verbrauchern, die im Internet abgeschlossen werden können. Die Schaltfläche ist mit „Verträge hier kündigen“ beschriftet und führt zu einer Bestätigungsseite, auf der der Kunde seine Angaben macht, mit einer Bestätigungsschaltfläche „jetzt kündigen“ (§ 312k Abs. 2 BGB). Den Eingang der Kündigung bestätigst du dem Kunden (§ 312k Abs. 4 BGB).'
 rechtsgrundlage:
 - § 312k BGB
 kategorie: online
@@ -52,8 +51,7 @@ quellen:
   abgerufen: null
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Vorgeschriebene Beschriftung und Ablauf (Bestätigungsseite) fachlich ergänzen
-- 'Vorprüfung 21.10.2026: Sanktion ergänzt – § 312k Abs. 6 BGB gelesen'
+- 'Beschriftung, Bestätigungsseite (Abs. 2), Eingangsbestätigung (Abs. 4) und Folge (Abs. 6) nach Prüfvermerk RA Dr. Weber 22.10.2026'
 pruefung:
   status: entwurf
   geprueft_von: null
