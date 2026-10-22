@@ -20,7 +20,14 @@ from openpyxl.worksheet.datavalidation import DataValidation
 
 HIER = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HIER, "../.."))
-ZIEL = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else "freigabe-katalog")
+ARGS = [a for a in sys.argv[1:] if not a.startswith("--")]
+ZIEL = os.path.abspath(ARGS[0] if ARGS else "freigabe-katalog")
+# Runde 2: nur noch nicht (in dieser Version) freigegebene Einträge, mit unserer Rückfrage je Eintrag
+NUR_OFFEN = "--nur-offen" in sys.argv
+RUECKFRAGEN = {}
+if "--rueckfragen" in sys.argv:
+    import json
+    RUECKFRAGEN = json.load(open(sys.argv[sys.argv.index("--rueckfragen") + 1], encoding="utf-8"))
 os.makedirs(ZIEL, exist_ok=True)
 
 STEUER_GRUENDUNG = {"gruendung.fragebogen_steuerliche_erfassung", "gruendung.ust_idnr"}
@@ -89,12 +96,18 @@ def frist(f):
 eintraege = []
 for pfad in sorted(glob.glob(os.path.join(ROOT, "catalog/pflichten/*.yaml"))):
     d = yaml.safe_load(open(pfad, encoding="utf-8"))
+    pr = d.get("pruefung") or {}
+    if NUR_OFFEN and pr.get("status") == "freigegeben" and pr.get("geprueft_version") == d.get("version"):
+        continue
     eintraege.append(d)
 eintraege.sort(key=lambda d: [int(x) if x.isdigit() else x for x in str(d.get("katalog_nr", "")).replace(".", " ").split()])
 
 KOPF = ["Nr", "ID", "Version", "Titel", "Kurztext", "Wann es gilt (Auslöser)", "Frist", "Rechtsgrundlage", "Folgen bei Verstoß", "Schwere",
         "Rechtsstand", "Quellen", "Offene Fachfragen (unser Vermerk)", "Entscheidung", "Änderung / Anmerkung"]
 BREITE = [7, 30, 8, 34, 50, 40, 26, 34, 50, 9, 12, 40, 55, 16, 50]
+if RUECKFRAGEN:
+    KOPF.insert(13, "Unsere Rückfrage / was wir umgesetzt haben")
+    BREITE.insert(13, 60)
 GELB = PatternFill("solid", fgColor="FFF4CC")
 GRAU = PatternFill("solid", fgColor="EDEDED")
 
@@ -115,18 +128,19 @@ for schluessel, (name, person) in PRUEFER.items():
         fzp = "\n".join(f"• {t}" for t in (d.get("fachlich_zu_pruefen") or []))
         ws.append([d.get("katalog_nr"), d["id"], d.get("version"), de(d.get("titel")), de(d.get("kurz")), ausloeser(d.get("ausloeser")),
                    frist(d.get("frist")), "; ".join(d.get("rechtsgrundlage") or []), de(s.get("text")), s.get("schwere", ""),
-                   d.get("status_recht", ""), quellen, fzp, "", ""])
+                   d.get("status_recht", ""), quellen, fzp] + ([RUECKFRAGEN.get(d["id"], "")] if RUECKFRAGEN else []) + ["", ""])
     for i, b in enumerate(BREITE, start=1):
         ws.column_dimensions[ws.cell(1, i).column_letter].width = b
     for zeile in ws.iter_rows(min_row=2):
         for c in zeile:
             c.alignment = Alignment(wrap_text=True, vertical="top")
-        zeile[13].fill = GELB
-        zeile[14].fill = GELB
+        zeile[-2].fill = GELB
+        zeile[-1].fill = GELB
     dv = DataValidation(type="list", formula1='"freigegeben,ändern,streichen"', allow_blank=True)
     ws.add_data_validation(dv)
     if teil:
-        dv.add(f"N2:N{len(teil) + 1}")
+        sp = ws.cell(1, len(KOPF) - 1).column_letter
+        dv.add(f"{sp}2:{sp}{len(teil) + 1}")
     ws.freeze_panes = "C2"
     ws.auto_filter.ref = ws.dimensions
 
@@ -135,7 +149,7 @@ for schluessel, (name, person) in PRUEFER.items():
         [f"Freigabe Pflichtenkatalog Betriebsklar – {name}"],
         [""],
         ["Betriebsklar (iPhone-App, Lang Ventures UG (haftungsbeschränkt) i. G.) zeigt kleinen Betrieben aus einem festen Katalog, welche Pflichten typischerweise gelten (regelbasiert, keine KI, keine Einzelfallprüfung)."],
-        [f"Diese Datei enthält die {len(teil)} Einträge Ihres Fachgebiets. Bitte je Zeile in der gelben Spalte „Entscheidung“ wählen: freigegeben / ändern / streichen, bei „ändern“ die Änderung daneben eintragen."],
+        [f"Diese Datei enthält die {len(teil)} noch offenen Einträge Ihres Fachgebiets (Runde 2). Alle anderen sind nach Ihrer ersten Rückmeldung umgesetzt und freigegeben. In der Spalte „Unsere Rückfrage“ steht je Eintrag, was wir umgesetzt haben, wo wir nach dem Gesetzeswortlaut von Ihrem Hinweis abweichen oder was neu ist. Bitte je Zeile in der gelben Spalte „Entscheidung“ wählen: freigegeben / ändern / streichen."] if NUR_OFFEN else [f"Diese Datei enthält die {len(teil)} Einträge Ihres Fachgebiets. Bitte je Zeile in der gelben Spalte „Entscheidung“ wählen: freigegeben / ändern / streichen, bei „ändern“ die Änderung daneben eintragen."],
         ["Die Spalte „Folgen bei Verstoß“ haben wir am 22.10.2026 vorab aus dem Gesetzeswortlaut ergänzt (Fundstelle steht dabei; Vermerk in „Offene Fachfragen“). Bitte besonders hier prüfen."],
         ["„Offene Fachfragen“ sind unsere eigenen Zweifel zum Eintrag – bitte beantworten oder als erledigt markieren."],
         ["Geprüft wird: Rechtsgrundlage, Auslöser (für wen gilt es), Frist, Folgen, Kurztext in einfacher Sprache. Die App formuliert bedingt („gilt typischerweise, wenn …“) und verweist auf Beratung."],
@@ -168,7 +182,9 @@ for schluessel, (name, person) in PRUEFER.items():
         for c in r:
             c.alignment = Alignment(wrap_text=True, vertical="top")
 
-    datei = f"Betriebsklar-Freigabe-Katalog-{name.replace(' ', '')}.xlsx"
+    if not teil:
+        continue
+    datei = f"Betriebsklar-Freigabe-Katalog-{name.replace(' ', '')}{'-Runde2' if NUR_OFFEN else ''}.xlsx"
     wb.save(os.path.join(ZIEL, datei))
     offen = sum(1 for d in teil if "noch nicht fachlich erfasst" in de((d.get("sanktion") or {}).get("text")))
     uebersicht.append((name, person, len(teil), offen, datei))
