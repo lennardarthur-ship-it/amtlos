@@ -1128,7 +1128,7 @@ Ergebnis der Durchsicht durch eine Fachkraft für Arbeitssicherheit vom 22.10.20
 (7) Szenarien: Risiko in den Gefährdungsbeurteilungen auf Schwere/Wahrscheinlichkeit umgestellt (gleiche Stufen), die neuen Vorlagen je Szenario begründet übersprungen; Rundgang wählt Schwere und Wahrscheinlichkeit und geht über den Schritt „Prüfungen der Arbeitsmittel“. Offene Punkte: PRUEFLISTE T-150 bis T-155.
 ### E-168 · Rückmeldung der Fachkraft für Arbeitssicherheit (2026-10-22)
 
-Die Fachkraft bestätigt die abweichenden Umsetzungen (B-002, B-106, B-031) und die drei Korrekturen am Gesetzestext: § 48 JArbSchG erst ab drei Jugendlichen (ab einem § 47), Bußgelder nach GefStoffV über § 26 ChemG bis 50.000 € (im Katalog von den 5.000 € nach § 25 ArbSchG getrennt), Unterweisung Biostoffe nach § 14 Abs. 3 BioStoffV (in Vorlage und Hinweisen korrigiert). Angebot für die Durchsicht der neuen Teile (ca. 5–7 Stunden nach Aufwand) – Freigabe beim Gründer. B-105 weiterhin durch einen Betriebsarzt zu bestätigen.
+Die Fachkraft bestätigt die abweichenden Umsetzungen (B-002, B-106, B-031) und die drei Korrekturen am Gesetzestext: § 48 JArbSchG erst ab drei Jugendlichen (ab einem § 47), Bußgelder nach GefStoffV über § 26 ChemG bis 50.000 € (im Katalog von den 5.000 € nach § 25 ArbSchG getrennt), Unterweisung Biostoffe nach § 14 Abs. 3 BioStoffV (in Vorlage und Hinweisen korrigiert). Die Prüfung ist abgeschlossen und bezahlt; die Antwort mit dem Aufwandsangebot war versehentlich verschickt, eine weitere Durchsicht ist nicht beauftragt. Ein „geprüft von“-Hinweis wird weiterhin nicht gesetzt (keine namentliche Freigabe). B-105 weiterhin durch einen Betriebsarzt zu bestätigen.
 
 ---
 
