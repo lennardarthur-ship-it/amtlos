@@ -44,6 +44,7 @@ import { fussAngaben, fusszeileStempeln } from "../src/unterlagen/fusszeile";
 import { mitSchriften } from "../src/unterlagen/schriften";
 import { deckblattHtml, mappeDateiname, mappeZusammenfuegen, mappenAuswahl, seitenzahl, startSeiten } from "../src/unterlagen/kontrollmappe";
 import { auswertung, type Profil } from "../src/pflichten/check";
+import { vereinnahmterUmsatz } from "../src/unterlagen/kuUmsatz";
 import * as D from "./jahr-szenario-praxis-daten";
 import { MARKE } from "@amtlos/marke";
 
@@ -684,6 +685,17 @@ export function standBauen(): Bau {
       weiteres: eintraege("steuererklaerung", "weiteres", [{ was: "Krankenversicherung (privat) und Pflegeversicherung", betrag: "6.480,00", beleg: true }, { was: "Basisrente (Rürup), Beiträge 2026", betrag: "6.000,00", beleg: true }], h),
       notiz: `Umsätze 2026 (vereinnahmt, netto): steuerpflichtig ${euro(jq.pflichtig)} €, steuerfrei nach § 4 Nr. 14 UStG ${euro(jq.frei)} € → Umsatzschlüssel ${jq.exakt.toFixed(2).replace(".", ",")} % (gerundet ${jq.quote} %, vorläufig ${D.QUOTE_VORLAEUFIG} %). USt 19 % ${euro(uj.ust)} € + § 13b ${euro(uj.st13b)} €; Vorsteuer ${euro(uj.vorsteuer)} €. Jahreszahllast ${euro(uj.jahr)} €, Vorauszahlungen ${euro(uj.vorauszahlungen)} € → Abschlusszahlung ${euro(uj.abschluss)} €. Freier Beruf: keine Gewerbesteuer. Kleinunternehmergrenze: steuerpflichtiger Umsatz 2026 über 25.000 €? ${jq.pflichtig > 2500000 ? "ja" : "nein"} (steuerfreie Heilbehandlungen zählen nicht).` }) });
   vergleich("Steuererklärung", "Gewinn = EÜR (unabhängig)", ausEuro(gewinn[1]) * (gewinn[0] === "Verlust" ? -1 : 1), eu.ergebnis);
+  // StB Busch, Runde 2 (C.23): Gesamtumsatz nach § 19 Abs. 2 UStG laut App ohne die steuerfreien Heilbehandlungen (Positionen
+  // zu 0 % auf Rechnungen mit Hinweis auf die Steuerbefreiung) – nur Rechnungen (Abrechnungszentrum und Zuzahlungen sind keine
+  // Rechnungen in der App, ohnehin steuerfrei). Offene Rechnungen zählen nur in der Zählweise mit Ersatzregel.
+  {
+    const ku = vereinnahmterUmsatz(s, "2026-01-01", "2026-12-31");
+    const summe = (l: number[]) => l.reduce((a, b) => a + b, 0);
+    const offen = D.vorgaenge().filter((x) => x.art === "rechnung" && !x.bezahlt && !x.r.storno && x.datum.startsWith("2026-"));
+    vergleich("Kleinunternehmergrenze", "Umsatz 2026 laut App nur aus Zahlungseingängen = steuerpflichtige Rechnungsumsätze (bezahlt)", ku.cent - ku.ersatz_cent, summe(qs.map((q) => q.rePflichtig)));
+    vergleich("Kleinunternehmergrenze", "Umsatz 2026 laut App mit Ersatzregel (offene Rechnungen ohne steuerfreie Positionen)", ku.cent, summe(qs.map((q) => q.rePflichtig)) + summe(offen.map((x) => x.s.pflichtig)));
+    vergleich("Kleinunternehmergrenze", "herausgerechnete steuerfreie Heilbehandlungen (bezahlt und offen)", ku.steuerfrei_cent, summe(qs.map((q) => q.reFrei)) + summe(offen.map((x) => x.s.frei)));
+  }
   {
     const erg = v("steuererklaerung").ergebnis?.(unterlage("steuer").daten) ?? [];
     infos.push(`Unterlagen zur Steuererklärung (Formular-Ergebnis): ${erg.map(([a, b]) => `${a} ${b}`).join(", ") || "–"}.`);

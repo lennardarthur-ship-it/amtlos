@@ -1,7 +1,8 @@
 # Katalog C.23 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt; Auslöser seit v5 nach Zahlungseingängen (vereinnahmte Entgelte)
+# v6 (StB Busch, Runde 2, Empfehlung): Text zu steuerfreien Umsätzen und Anlagenverkäufen; Auslöser unverändert (mit Ersatzregel)
 schema_version: 1
 id: steuern.kleinunternehmer_warnung_95
-version: 5
+version: 6
 katalog_nr: C.23
 titel:
   de: Kleinunternehmergrenze zu 95 % erreicht
@@ -12,9 +13,10 @@ erklaerung:
     Entgelten – die Zahlungen, die du netto erhältst, nicht die Rechnungen nach Rechnungsdatum. Amtlos zählt dafür die
     Zahlungseingänge auf deine Rechnungen in Amtlos (netto) und deine Kasseneinnahmen laut Tagesabschlüssen; Leistungen an
     Unternehmen im Ausland zählen nicht mit. Hast du bei einer Rechnung keinen Zahlungseingang vermerkt, zählt Amtlos sie
-    vorsichtshalber mit dem Rechnungsdatum – vermerke Zahlungseingänge, dann rechnet Amtlos genauer. Steuerfreie Umsätze wie
-    Heilbehandlungen und Verkäufe von Anlagevermögen zählen für die Grenze nicht mit; Amtlos kann sie nicht unterscheiden und
-    zählt sie mit. Einnahmen außerhalb von Amtlos sind nicht enthalten.
+    vorsichtshalber mit dem Rechnungsdatum – vermerke Zahlungseingänge, dann rechnet Amtlos genauer. Steuerfreie Umsätze (z. B.
+    Heilbehandlungen) rechnet Amtlos heraus, wenn du sie auf der Rechnung mit „0 % / steuerfrei“ und dem Hinweis auf die
+    Steuerbefreiung erfasst. Verkäufe von Anlagegütern zählen nicht zur Grenze – erfasst du sie als Rechnung, kann der angezeigte
+    Wert zu hoch sein. Einnahmen außerhalb von Amtlos sind nicht enthalten.
 rechtsgrundlage:
 - § 19 UStG
 kategorie: steuern
@@ -92,7 +94,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/ustg_1980/__19.html
   abgerufen: null
 fachlich_zu_pruefen:
-- 'StB Busch 22.10.2026: Umsatzbegriff sind die vereinnahmten Entgelte (netto, Zufluss; § 19 Abs. 2 Satz 1 UStG n. F.) – umgesetzt (v5): Auslöser über finanzen.umsatz.vereinnahmt_laufendes_jahr (Zahlungseingänge auf Rechnungen, Kasse, Sachentnahmen; App: unterlagen/kuUmsatz.ts). Zu prüfen: Ersatzregel für Rechnungen ohne Zahlungsvermerk (zählen mit dem Rechnungsdatum), Einbezug der Sachentnahmen (§ 3 Abs. 1b UStG), keine Kürzung um steuerfreie Umsätze und Anlagevermögen (App kann sie nicht unterscheiden); der Server kennt keine Zahlungseingänge und zählt dort alle Rechnungen nach Rechnungsdatum'
+- 'StB Busch 22.10.2026, Runde 2 (freigegeben, v5): vorsichtige Zählung für eine Warnung vertretbar – offene Rechnungen ab Rechnungsdatum (Ersatzregel) und Sachentnahmen (§ 3 Abs. 1b UStG) bestätigt. Umgesetzt (v6) nach seiner Empfehlung: Text zu steuerfreien Umsätzen und Anlagenverkäufen; steuerfreie Umsätze (Positionen zu 0 % auf Rechnungen mit Steuerart „befreit“) rechnet die App jetzt heraus. Zu prüfen: nur der neue Textteil (Versionssprung hebt die Freigabe in der App auf). Server: kennt keine Zahlungseingänge und zählt alle Rechnungen nach Rechnungsdatum (wie die Ersatzregel)'
 - 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
   status: entwurf

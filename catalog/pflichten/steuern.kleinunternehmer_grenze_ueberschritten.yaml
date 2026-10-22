@@ -1,7 +1,8 @@
 # Katalog C.23 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt; Auslöser seit v5 nach Zahlungseingängen (vereinnahmte Entgelte)
+# v6 (StB Busch, Runde 2): nur tatsächliche Zahlungseingänge ohne offene Rechnungen (finanzen.umsatz.bezahlt_*), steuerfreie Umsätze herausgerechnet
 schema_version: 1
 id: steuern.kleinunternehmer_grenze_ueberschritten
-version: 5
+version: 6
 katalog_nr: C.23
 titel:
   de: 'Kleinunternehmergrenze überschritten: Umsatzsteuer prüfen'
@@ -12,11 +13,12 @@ erklaerung:
     der gestellten Rechnungen nach Rechnungsdatum. Bis einschließlich 25.000 € bzw. 100.000 € bleibt dein Umsatz steuerfrei. Ab
     dem Umsatz, mit dem du die Grenze überschreitest, gilt die Regelbesteuerung – du stellst Rechnungen mit Umsatzsteuer und gibst
     Voranmeldungen ab; eine eigene Frist gibt es dafür nicht. Lag dein Umsatz im Vorjahr über 25.000 €, gilt die Regelung in diesem
-    Jahr von Anfang an nicht. Amtlos zählt dafür die Zahlungseingänge auf deine Rechnungen in Amtlos (netto) und deine
-    Kasseneinnahmen laut Tagesabschlüssen; Leistungen an Unternehmen im Ausland zählen nicht mit. Hast du bei einer Rechnung
-    keinen Zahlungseingang vermerkt, zählt Amtlos sie vorsichtshalber mit dem Rechnungsdatum – vermerke Zahlungseingänge, dann
-    rechnet Amtlos genauer. Steuerfreie Umsätze wie Heilbehandlungen und Verkäufe von Anlagevermögen zählen für die Grenze nicht
-    mit; Amtlos kann sie nicht unterscheiden und zählt sie mit. Einnahmen außerhalb von Amtlos sind nicht enthalten.
+    Jahr von Anfang an nicht. Amtlos zählt dafür nur Geld, das du schon bekommen hast – die Zahlungseingänge auf deine Rechnungen
+    in Amtlos (netto), deine Kasseneinnahmen laut Tagesabschlüssen und deine Sachentnahmen; Leistungen an Unternehmen im Ausland
+    zählen nicht mit. Rechnungen ohne vermerkten Zahlungseingang zählen hier nicht – vermerke deine Zahlungseingänge, sonst ist
+    der Wert zu niedrig. Steuerfreie Umsätze (z. B. Heilbehandlungen) rechnet Amtlos heraus, wenn du sie auf der Rechnung mit
+    „0 % / steuerfrei“ und dem Hinweis auf die Steuerbefreiung erfasst. Verkäufe von Anlagegütern zählen nicht zur Grenze – erfasst
+    du sie als Rechnung, kann der angezeigte Wert zu hoch sein. Einnahmen außerhalb von Amtlos sind nicht enthalten.
 rechtsgrundlage:
 - § 19 UStG
 kategorie: steuern
@@ -66,27 +68,27 @@ ausloeser:
         label:
           de: Du hast dein Unternehmen in diesem Jahr gegründet.
       - &id001
-        feld: finanzen.umsatz.vereinnahmt_laufendes_jahr
+        feld: finanzen.umsatz.bezahlt_laufendes_jahr
         op: vorhanden
         label:
           de: Du erfasst Rechnungen oder Kasseneinnahmen in Amtlos.
-      - feld: finanzen.umsatz.vereinnahmt_laufendes_jahr
+      - feld: finanzen.umsatz.bezahlt_laufendes_jahr
         op: '>'
         wert:
           regelwert: steuern.ustg19.grenze_gruendungsjahr
         label:
-          de: Deine Einnahmen laut Amtlos (Zahlungseingänge und Kasse, netto) liegen im Gründungsjahr über 25.000 €; die Grenze im Gründungsjahr liegt bei 25.000 €.
+          de: Deine Einnahmen laut Amtlos (erhaltene Zahlungen und Kasse, netto, ohne offene Rechnungen) liegen im Gründungsjahr über 25.000 €; die Grenze im Gründungsjahr liegt bei 25.000 €.
     - all:
       - feld: abgeleitet.ist_gruendungsjahr
         op: ==
         wert: false
       - *id001
-      - feld: finanzen.umsatz.vereinnahmt_laufendes_jahr
+      - feld: finanzen.umsatz.bezahlt_laufendes_jahr
         op: '>'
         wert:
           regelwert: steuern.ustg19.grenze_laufendes_jahr
         label:
-          de: Deine Einnahmen laut Amtlos (Zahlungseingänge und Kasse, netto) liegen in diesem Jahr über 100.000 €; die Grenze liegt bei 100.000 €.
+          de: Deine Einnahmen laut Amtlos (erhaltene Zahlungen und Kasse, netto, ohne offene Rechnungen) liegen in diesem Jahr über 100.000 €; die Grenze liegt bei 100.000 €.
     - all:
       - feld: abgeleitet.ist_gruendungsjahr
         op: ==
@@ -94,14 +96,14 @@ ausloeser:
       - feld: abgeleitet.noch_nicht_gestartet
         op: ==
         wert: false
-      - feld: finanzen.umsatz.vereinnahmt_vorjahr
+      - feld: finanzen.umsatz.bezahlt_vorjahr
         op: vorhanden
-      - feld: finanzen.umsatz.vereinnahmt_vorjahr
+      - feld: finanzen.umsatz.bezahlt_vorjahr
         op: '>'
         wert:
           regelwert: steuern.ustg19.grenze_vorjahr
         label:
-          de: Deine Einnahmen laut Amtlos (Zahlungseingänge und Kasse, netto) lagen im Vorjahr über 25.000 €.
+          de: Deine Einnahmen laut Amtlos (erhaltene Zahlungen und Kasse, netto, ohne offene Rechnungen) lagen im Vorjahr über 25.000 €.
 frist:
   typ: dauerhaft
 wiederholung:
@@ -126,7 +128,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/ustg_1980/__19.html
   abgerufen: null
 fachlich_zu_pruefen:
-- 'StB Busch 22.10.2026: Umsatzbegriff sind die vereinnahmten Entgelte (netto, Zufluss; § 19 Abs. 2 Satz 1 UStG n. F.) – umgesetzt (v5): Auslöser über finanzen.umsatz.vereinnahmt_laufendes_jahr und …_vorjahr (Zahlungseingänge auf Rechnungen, Kasse, Sachentnahmen; App: unterlagen/kuUmsatz.ts). Zu prüfen: Ersatzregel für Rechnungen ohne Zahlungsvermerk (zählen mit dem Rechnungsdatum), Einbezug der Sachentnahmen (§ 3 Abs. 1b UStG), keine Kürzung um steuerfreie Umsätze und Anlagevermögen (App kann sie nicht unterscheiden); der Server kennt keine Zahlungseingänge und zählt dort alle Rechnungen nach Rechnungsdatum'
+- 'StB Busch 22.10.2026, Runde 2 – umgesetzt (v6): Umsatzbegriff vereinnahmte Entgelte (netto, Zufluss; § 19 Abs. 2 Satz 1 UStG n. F.). Auslöser über finanzen.umsatz.bezahlt_laufendes_jahr und …_vorjahr: nur tatsächliche Zahlungseingänge auf Rechnungen, Kasse und Sachentnahmen (§ 3 Abs. 1b UStG, bestätigt); offene Rechnungen zählen nicht (§ 14c Abs. 2 UStG) – liegt die Grenze nur mit ihnen darüber, zeigt Amtlos steuern.kleinunternehmer_grenze_offene_rechnungen. Steuerfreie Umsätze (Positionen zu 0 % auf Rechnungen mit Steuerart „befreit“) rechnet die App heraus; Anlagenverkäufe kann sie nicht erkennen (Hinweis im Text). Zu prüfen: Wortlaut der Erklärung und Abgrenzung „steuerfrei“ nur mit Hinweis auf die Steuerbefreiung; der Server kennt keine Zahlungseingänge – dort gelten nur die Zweige aus den Profilangaben'
 pruefung:
   status: entwurf
   geprueft_von: null

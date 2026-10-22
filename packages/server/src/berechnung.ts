@@ -73,6 +73,11 @@ export async function neuberechnenInTx(
   // die vereinnahmten Entgelte (§ 19 Abs. 2 UStG, StB Busch 22.10.2026); der Server speichert keine Zahlungseingänge, also
   // gilt hier für alle Rechnungen die Ersatzregel „Rechnung ohne Zahlungsvermerk zählt mit dem Rechnungsdatum“ (fakten.json).
   // `finanzen.umsatz.laufendes_jahr` bleibt für ältere Katalog-Releases.
+  // StB Busch, Runde 2: „Grenze überschritten“ und „ab 1. Januar“ zählen nur tatsächliche Zahlungseingänge
+  // (`finanzen.umsatz.bezahlt_*`). Die liefert der Server bewusst NICHT – ihre Zweige sind im Katalog über „vorhanden“
+  // abgesichert und gelten hier nicht; die Einträge entscheiden dann nur nach den Profilangaben (Prognose, Vorjahr) und
+  // bleiben ohne sie offen. Liegen die Rechnungen nach Rechnungsdatum über einer Grenze, zeigt der Server stattdessen den
+  // Hinweis `steuern.kleinunternehmer_grenze_offene_rechnungen`. Eine Steuerart „befreit“ gibt es in app.rechnung nicht.
   const jahr = Number(stichtag.slice(0, 4));
   const umsatz = await umsatzLaufendesJahr(tx, unternehmenId, jahr);
   if (umsatz !== null) {

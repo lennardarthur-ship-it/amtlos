@@ -11,6 +11,7 @@ fakten:
   profil.bundesland: BY
   profil.gemeinde_ags: 09162000
   finanzen.umsatz.vereinnahmt_laufendes_jahr: 80000
+  finanzen.umsatz.bezahlt_laufendes_jahr: 80000
 erwartet:
   steuern.kleinunternehmer_warnung_80: gilt
   steuern.kleinunternehmer_warnung_95: gilt_nicht

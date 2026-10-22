@@ -10,7 +10,10 @@ fakten:
   profil.bundesland: BE
   finanzen.umsatz.vereinnahmt_laufendes_jahr: 25000.01
   finanzen.umsatz.vereinnahmt_vorjahr: 0
+  finanzen.umsatz.bezahlt_laufendes_jahr: 25000.01
+  finanzen.umsatz.bezahlt_vorjahr: 0
 erwartet:
   steuern.kleinunternehmer_grenze_ueberschritten: gilt
   steuern.kleinunternehmer_warnung_95: gilt_nicht
   steuern.kleinunternehmer_warnung_80: gilt_nicht
+  steuern.kleinunternehmer_grenze_offene_rechnungen: gilt_nicht

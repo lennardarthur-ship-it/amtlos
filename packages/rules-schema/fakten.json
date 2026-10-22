@@ -839,13 +839,25 @@
     {
       "pfad": "finanzen.umsatz.vereinnahmt_laufendes_jahr",
       "typ": "betrag",
-      "herleitung": "Gesamtumsatz nach § 19 Abs. 2 UStG (nach vereinnahmten Entgelten, netto; StB Busch 22.10.2026) vom 1.1. bis zum Stichtag aus den Daten in Amtlos, nur wenn dort Rechnungen gestellt bzw. Kassenabschlüsse erfasst sind. App (apps/mobile/src/unterlagen/kuUmsatz.ts): Zahlungseingänge auf Ausgangsrechnungen (je Zahlung bzw. am Tag „bezahlt“, Schlussrechnung abzüglich Abschläge, bezahlte Stornos negativ), Kasseneinnahmen laut Tagesabschlüssen, Sachentnahmen; ohne Gutschriften und ohne nicht steuerbare Umsätze (Kleinunternehmer-Leistungen an Unternehmen im Ausland, OSS). Ersatzregel (vorsichtig): Rechnungen ohne jeden Zahlungsvermerk zählen mit dem Rechnungsdatum; unbezahlt stornierte Rechnungen samt Storno zählen nicht. Server (packages/server/src/finanzen.ts): speichert keine Zahlungseingänge, daher gilt dort die Ersatzregel für alle gestellten Rechnungen (Rechnungsdatum). Steuerfreie Umsätze nach § 4 Nr. 8 i, 9 b, 11–29 UStG und Umsätze mit Anlagevermögen (§ 19 Abs. 2 Satz 1 Nr. 1, 2 und Satz 2) werden nicht abgezogen, weil Amtlos sie nicht unterscheidet; [FACHLICH ZU PRÜFEN] Ersatzregel und Einbezug der Sachentnahmen",
+      "herleitung": "Gesamtumsatz nach § 19 Abs. 2 UStG (nach vereinnahmten Entgelten, netto; StB Busch 22.10.2026) vom 1.1. bis zum Stichtag aus den Daten in Amtlos, MIT Ersatzregel für offene Rechnungen – Zählweise der Warnungen 80 %/95 % (StB Busch: für eine Warnung vertretbar). Nur wenn in Amtlos Rechnungen gestellt bzw. Kassenabschlüsse erfasst sind. App (apps/mobile/src/unterlagen/kuUmsatz.ts): Zahlungseingänge auf Ausgangsrechnungen (je Zahlung bzw. am Tag „bezahlt“, Schlussrechnung abzüglich Abschläge, bezahlte Stornos negativ), Kasseneinnahmen laut Tagesabschlüssen, Sachentnahmen (§ 3 Abs. 1b UStG, von StB Busch bestätigt); ohne Gutschriften, ohne nicht steuerbare Umsätze (Kleinunternehmer-Leistungen an Unternehmen im Ausland, OSS) und ohne steuerfreie Umsätze (Positionen zu 0 % auf Rechnungen mit der Steuerart „befreit“, z. B. Heilbehandlungen; der Nullsteuersatz nach § 12 Abs. 3 UStG zählt mit). Ersatzregel (vorsichtig): Rechnungen ohne jeden Zahlungsvermerk zählen mit dem Rechnungsdatum; unbezahlt stornierte Rechnungen samt Storno zählen nicht. Server (packages/server/src/finanzen.ts): speichert keine Zahlungseingänge, daher gilt dort die Ersatzregel für alle gestellten Rechnungen (Rechnungsdatum; eine Steuerart „befreit“ gibt es dort nicht). Verkäufe von Anlagegütern (§ 19 Abs. 2 Satz 2 UStG) erkennt Amtlos nicht – als Rechnung erfasst, ist der Wert zu hoch",
       "ab": 4
     },
     {
       "pfad": "finanzen.umsatz.vereinnahmt_vorjahr",
       "typ": "betrag",
       "herleitung": "Wie finanzen.umsatz.vereinnahmt_laufendes_jahr, für das ganze vorangegangene Kalenderjahr – Untergrenze: Umsätze außerhalb von Amtlos (oder vor der Nutzung) fehlen, daher nur für „über der Grenze“ geeignet, nicht für „höchstens“",
+      "ab": 4
+    },
+    {
+      "pfad": "finanzen.umsatz.bezahlt_laufendes_jahr",
+      "typ": "betrag",
+      "herleitung": "Gesamtumsatz nach § 19 Abs. 2 UStG wie finanzen.umsatz.vereinnahmt_laufendes_jahr, aber OHNE Ersatzregel: nur tatsächliche Zahlungseingänge auf Ausgangsrechnungen, Kasseneinnahmen und Sachentnahmen vom 1.1. bis zum Stichtag – offene Rechnungen zählen nicht (StB Busch 22.10.2026, Runde 2: wer wegen offener Rechnungen zu früh Umsatzsteuer ausweist, schuldet sie nach § 14c Abs. 2 UStG). Zählweise für „Grenze überschritten“ und „ab 1. Januar“. Nur in der App (apps/mobile/src/unterlagen/kuUmsatz.ts); der Server kennt keine Zahlungseingänge und liefert den Fakt nicht – die Zweige mit diesem Fakt sind dort über „vorhanden“ abgesichert und gelten nicht",
+      "ab": 4
+    },
+    {
+      "pfad": "finanzen.umsatz.bezahlt_vorjahr",
+      "typ": "betrag",
+      "herleitung": "Wie finanzen.umsatz.bezahlt_laufendes_jahr, für das ganze vorangegangene Kalenderjahr – Untergrenze (Umsätze außerhalb von Amtlos fehlen), daher nur für „über der Grenze“ geeignet. Nur in der App",
       "ab": 4
     },
     {

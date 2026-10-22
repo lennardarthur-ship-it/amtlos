@@ -464,6 +464,17 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       const p = (await alsKim(http().get("/v1/pflichten")).expect(200)).body;
       expect(p.find((x: { pflicht_id: string }) => x.pflicht_id === "steuern.kleinunternehmer_warnung_80")?.ergebnis).toBe("gilt");
       expect(p.find((x: { pflicht_id: string }) => x.pflicht_id === "steuern.kleinunternehmer_warnung_95")?.ergebnis).toBe("gilt_nicht");
+      // StB Busch Runde 2: über 100.000 € nach Rechnungsdatum – der Server kennt keine Zahlungseingänge (finanzen.umsatz.bezahlt_*
+      // fehlen), also nicht „Grenze überschritten“ (ohne Prognose offen), sondern der Hinweis zu den offenen Rechnungen
+      const e2 = (await alsKim(http().post("/v1/rechnungen")).send({ kunde_id: ku.id, leistungsdatum: `${jahr}-09-02`, positionen: [{ bezeichnung: "Skizze", menge: 1, einheit: "stueck", preis_cent: 2_000_000, ust_art: "regel" }] }).expect(201)).body;
+      await alsKim(http().post(`/v1/rechnungen/${e2.id}/stellen`)).expect(201);
+      await neuberechnen(worker, u, "test", { kalender: new StandardKalender() });
+      const p2 = (await alsKim(http().get("/v1/pflichten")).expect(200)).body as { pflicht_id: string; ergebnis: string }[];
+      const erg = (id: string) => p2.find((x) => x.pflicht_id === id)?.ergebnis;
+      expect(erg("steuern.kleinunternehmer_grenze_ueberschritten")).not.toBe("gilt");
+      expect(erg("steuern.kleinunternehmer_naechstes_jahr")).not.toBe("gilt");
+      expect(erg("steuern.kleinunternehmer_grenze_offene_rechnungen")).toBe("gilt");
+      expect(erg("steuern.kleinunternehmer_warnung_95")).toBe("gilt_nicht");
     });
 
     it("Kassen: Erfassen löst die Meldepflicht mit Frist aus", async () => {
