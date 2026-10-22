@@ -550,10 +550,12 @@ export function offeneVoraussetzungen(p: PflichtInfo, a: Auswertung, e: Erledigt
 /**
  * Katalog für dieses Profil auswerten. Pflichten im Rechtsänderungs-Radar (Entwurf, geplant) zählen nicht mit.
  * Ereignisse leitet `ereignisseAusStand` aus Profil und Unterlagen ab (z. B. Beschäftigte ⇒ Einstellung).
+ * `finanzen`: Fakten aus Rechnungen, Kasse und Zahlungseingängen auf dem Gerät mit vollem Pfad (`finanzen.*`, z. B. der
+ * vereinnahmte Umsatz für die Kleinunternehmer-Wächter aus unterlagen/kuUmsatz.ts `umsatzFakten`).
  */
-export function auswertung(antworten: Profil, stichtag: string, unterlagen: readonly UnterlageFuerEreignis[] = [], mitarbeiter: readonly MitarbeiterFuerCheck[] = []): Auswertung {
+export function auswertung(antworten: Profil, stichtag: string, unterlagen: readonly UnterlageFuerEreignis[] = [], mitarbeiter: readonly MitarbeiterFuerCheck[] = [], finanzen: Readonly<Record<string, number>> = {}): Auswertung {
   const profil = profilMitStand(antworten, stichtag, mitarbeiter);
-  const fakten = Object.fromEntries(Object.entries(profil).filter(([, w]) => w !== null && w !== undefined).map(([k, w]) => [`profil.${k}`, w]));
+  const fakten: Record<string, unknown> = { ...Object.fromEntries(Object.entries(profil).filter(([, w]) => w !== null && w !== undefined).map(([k, w]) => [`profil.${k}`, w])), ...Object.fromEntries(Object.entries(finanzen).filter(([k, w]) => k.startsWith("finanzen.") && Number.isFinite(w))) };
   const ereignisse = ereignisseAusStand(profil, stichtag, unterlagen, mitarbeiter);
   const lohnExtern = profil["personal.lohn_durch"] === "steuerberatung" || profil["personal.lohn_durch"] === "lohnbuero";
   const seit = plusMonate(stichtag, -BESTAND_AB_MONATEN);

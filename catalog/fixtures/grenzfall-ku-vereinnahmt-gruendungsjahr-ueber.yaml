@@ -1,0 +1,16 @@
+persona: grenzfall
+beschreibung: 'StB Busch 22.10.2026 (C.23): Gründungsjahr, vereinnahmter Umsatz laut Amtlos 25.000,01 € – Grenze im
+  Gründungsjahr überschritten, keine 95-%-Warnung mehr'
+stichtag: '2026-10-11'
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: '2026-03-01'
+  profil.taetigkeit.einordnung: gewerbe
+  profil.ust.kleinunternehmer: true
+  profil.bundesland: BE
+  finanzen.umsatz.vereinnahmt_laufendes_jahr: 25000.01
+  finanzen.umsatz.vereinnahmt_vorjahr: 0
+erwartet:
+  steuern.kleinunternehmer_grenze_ueberschritten: gilt
+  steuern.kleinunternehmer_warnung_95: gilt_nicht
+  steuern.kleinunternehmer_warnung_80: gilt_nicht

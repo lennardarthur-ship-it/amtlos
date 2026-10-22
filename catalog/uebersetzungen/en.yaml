@@ -847,8 +847,6 @@ eintraege:
     – the type and number of first-aid kits depend on the number of employees and the hazard (§ 25 DGUV Regulation 1, ASR A4.3). A notice states the emergency number, first aiders and what to do in an accident
     (§ 24(5) DGUV Regulation 1). All first aid given is documented, for example in the first-aid log, and the documentation is kept confidential for five years (§ 24(6) DGUV Regulation 1). First aiders
     are a separate obligation.'
-- de: Du stellst Rechnungen mit Amtlos.
-  en: You issue invoices with Amtlos.
 - de: Du stellst jemanden ein – maßgeblich ist bei Jugendlichen die Aufnahme der ersten Beschäftigung.
   en: You hire someone – for young people, what counts is the start of their first employment.
 - de: Du stellst jemanden ein.
@@ -2595,24 +2593,6 @@ eintraege:
   en: These include identifying contracting partners and risk management. The obligations apply to transactions in which you receive or make cash payments of at least €10,000 yourself or through third parties (§ 10(6a) no. 1(c) GwG), for high-value goods such as precious metals from €2,000 (letter b) and for works of art from a transaction value of €10,000 (letter a). As an obliged entity you also register with the Financial Intelligence Unit (goAML), even without a suspicious case (§ 45(1) sentence 2 GwG).
 - de: Dein Betrieb ist kein Kleinstbetrieb außerhalb der IT-Branche.
   en: Your business is not a micro business outside the IT sector.
-- de: Deine Rechnungen in Amtlos summieren sich auf mindestens 80 % der Kleinunternehmergrenze; die Grenze liegt bei 100.000 €, im Gründungsjahr bei 25.000 €.
-  en: Your invoices in Amtlos add up to at least 80% of the small business limit; the limit is €100,000, in the founding year €25,000.
-- de: Deine Rechnungen in Amtlos summieren sich auf mindestens 95 % der Kleinunternehmergrenze; die Grenze liegt bei 100.000 €, im Gründungsjahr bei 25.000 €.
-  en: Your invoices in Amtlos add up to at least 95% of the small business limit; the limit is €100,000, in the founding year €25,000.
-- de: Deine Rechnungen in Amtlos summieren sich im Gründungsjahr auf mehr als 25.000 €; die Grenze im Gründungsjahr liegt bei 25.000 €.
-  en: Your invoices in Amtlos add up to more than €25,000 in the founding year; the limit in the founding year is €25,000.
-- de: Deine Rechnungen in Amtlos summieren sich im Gründungsjahr auf mindestens 20.000 €; die Grenze im Gründungsjahr liegt bei 25.000 €.
-  en: Your invoices in Amtlos add up to at least €20,000 in the founding year; the limit in the founding year is €25,000.
-- de: Deine Rechnungen in Amtlos summieren sich im Gründungsjahr auf mindestens 23.750 €; die Grenze im Gründungsjahr liegt bei 25.000 €.
-  en: Your invoices in Amtlos add up to at least €23,750 in the founding year; the limit in the founding year is €25,000.
-- de: Deine Rechnungen in Amtlos summieren sich in diesem Jahr auf mehr als 100.000 €; die Grenze liegt bei 100.000 €.
-  en: Your invoices in Amtlos add up to more than €100,000 this year; the limit is €100,000.
-- de: Deine Rechnungen in Amtlos summieren sich in diesem Jahr auf mehr als 25.000 €; die Grenze liegt bei 25.000 €.
-  en: Your invoices in Amtlos add up to more than €25,000 this year; the limit is €25,000.
-- de: Deine Rechnungen in Amtlos summieren sich in diesem Jahr auf mindestens 80.000 €; die Grenze liegt bei 100.000 €.
-  en: Your invoices in Amtlos add up to at least €80,000 this year; the limit is €100,000.
-- de: Deine Rechnungen in Amtlos summieren sich in diesem Jahr auf mindestens 95.000 €; die Grenze liegt bei 100.000 €.
-  en: Your invoices in Amtlos add up to at least €95,000 this year; the limit is €100,000.
 - de: Deine Verarbeitung fällt unter Art. 37 Abs. 1 Buchst. b, c DSGVO oder § 38 Abs. 1 Satz 2 BDSG.
   en: Your processing falls under Art. 37(1)(b), (c) GDPR or § 38(1) sentence 2 BDSG.
 - de: Die Hinweispflicht nach § 36 VSBG gilt für Unternehmer, die eine Website unterhalten oder AGB verwenden. Ausgenommen ist, wer am 31. Dezember des Vorjahres zehn oder weniger Personen beschäftigt hat (§ 36 Abs. 3 VSBG) – gezählt werden Personen, nicht Vollzeitstellen.
@@ -3027,11 +3007,6 @@ eintraege:
     Finanzamt kann die Erklärung früher anfordern oder die Frist auf Antrag verlängern (§ 149 Abs. 4, § 109 AO).
   en: The annual return summarises the VAT for the whole year – without a tax adviser by 31 July of the following year, with a tax adviser by the end of February of the year after next (§ 149 AO). The tax
     office can request the return earlier or extend the deadline on application (§ 149(4), § 109 AO).
-- de: Die Kleinunternehmerregelung endet ab dem Umsatz, der die Grenze überschreitet. Maßgeblich ist der Umsatz nach vereinnahmten Entgelten – die Zahlungen, die du netto erhältst, nicht die Rechnungen
-    nach Rechnungsdatum. Amtlos zählt bisher die Rechnungen, die du in Amtlos gestellt hast (netto, nach Rechnungsdatum); ob sie bezahlt sind, ist darin noch nicht berücksichtigt. Rechnungen außerhalb von
-    Amtlos sind nicht enthalten.
-  en: The small business scheme ends from the sale that exceeds the limit. What counts is turnover based on payments received – the net amounts you are paid, not the invoices by invoice date. Amtlos currently
-    counts the invoices you issued in Amtlos (net, by invoice date); whether they have been paid is not yet taken into account. Invoices outside Amtlos are not included.
 - de: 'Die Kleinunternehmerregelung gilt, wenn dein Umsatz im Vorjahr höchstens 25.000 € betrug und im laufenden Jahr 100.000 € nicht übersteigt. Die 25.000 € beziehen sich also auf das Vorjahr: Liegt dein
     Umsatz in diesem Jahr über 25.000 €, aber höchstens bei 100.000 €, bleibst du dieses Jahr Kleinunternehmer – ab 1. Januar des nächsten Jahres gilt dann die Regelbesteuerung. Die 100.000 € sind die harte
     Grenze im laufenden Jahr: Ab dem Umsatz, mit dem du sie überschreitest, endet die Regelung sofort. Im Gründungsjahr gilt 25.000 € als harte Grenze für das laufende Jahr. Maßgeblich ist der Umsatz nach
@@ -3040,17 +3015,6 @@ eintraege:
     but at most €100,000, you remain a small business this year – from 1 January of next year, standard taxation applies. The €100,000 is the hard limit for the current year: from the sale with which you
     exceed it, the scheme ends immediately. In the founding year, €25,000 is the hard limit for the current year. What counts is turnover based on payments received (net, by date of payment), not the total
     of invoices by invoice date. If you opt out of the scheme, you are bound for five years.'
-- de: Die Kleinunternehmerregelung setzt voraus, dass dein Umsatz im Vorjahr höchstens 25.000 € betrug. Überschreitest du diese Grenze in diesem Jahr, ohne über 100.000 € zu kommen, gilt die Regelung bis
-    zum Jahresende weiter. Ab 1. Januar weist du auf deinen Rechnungen Umsatzsteuer aus, gibst Umsatzsteuer-Voranmeldungen und die Umsatzsteuer-Jahreserklärung ab und kannst die Vorsteuer aus deinen Eingangsrechnungen
-    abziehen. Wie oft du die Voranmeldung abgibst, legt das Finanzamt nach der voraussichtlichen Steuer fest – bei mehr als 9.000 € monatlich, sonst vierteljährlich (§ 18 Abs. 2 UStG); es steht im Schreiben
-    des Finanzamts. Hast du als Kleinunternehmer Wirtschaftsgüter angeschafft, die du weiter nutzt, kann beim Wechsel eine Berichtigung der Vorsteuer in Frage kommen (§ 15a UStG). Maßgeblich für die Grenze
-    ist der Umsatz nach vereinnahmten Entgelten (netto, nach Zahlungseingang), nicht die Summe der Rechnungen nach Rechnungsdatum; Amtlos zählt bisher die in Amtlos gestellten Rechnungen. Stelle Rechnungsvorlage,
-    Preise und Buchhaltung rechtzeitig um.
-  en: The small business scheme requires that your turnover last year was at most €25,000. If you exceed this limit this year without going above €100,000, the scheme continues until the end of the year.
-    From 1 January you show VAT on your invoices, file advance VAT returns and the annual VAT return, and can deduct input VAT from your purchase invoices. How often you file the advance return is set by
-    the tax office based on the expected tax – monthly above €9,000, otherwise quarterly (§ 18(2) UStG); it is stated in the tax office's letter. If you bought assets as a small business that you continue
-    to use, an input VAT adjustment may apply when you switch (§ 15a UStG). What counts for the limit is turnover based on payments received (net, by date of payment), not the total of invoices by invoice
-    date; Amtlos currently counts the invoices issued in Amtlos. Adjust your invoice template, prices and bookkeeping in good time.
 - de: Die Monatsfrist läuft ab dem Beginn deiner Tätigkeit, nicht ab der Gründung der Gesellschaft; fällt das Fristende auf ein Wochenende oder einen Feiertag, verschiebt es sich auf den nächsten Werktag.
   en: The one-month deadline runs from the start of your business activity, not from the founding of the company; if it ends on a weekend or public holiday, it moves to the next working day.
 - de: Die Pflicht zum Versand strukturierter E-Rechnungen (XRechnung oder ZUGFeRD) gilt ab 1.1.2027 für Unternehmen mit mehr als 800.000 € Vorjahresumsatz. Kleinunternehmer sind befreit. Eine PDF-Rechnung
@@ -3166,14 +3130,6 @@ eintraege:
     usually charge you their own VAT.
 - de: 'Klargestellt: Der One-Stop-Shop ist ein Wahlrecht – ohne ihn registrierst du dich in jedem Land. Gilt jetzt auch für Kleinunternehmer.'
   en: 'Clarified: The One-Stop-Shop is optional – without it you register in each country. Now also applies to small businesses.'
-- de: Maßgeblich ist der Gesamtumsatz nach vereinnahmten Entgelten – also die Zahlungen, die du netto erhältst, nicht die Summe der gestellten Rechnungen nach Rechnungsdatum. Bis einschließlich 25.000 €
-    bzw. 100.000 € bleibt dein Umsatz steuerfrei. Ab dem Umsatz, mit dem du die Grenze überschreitest, gilt die Regelbesteuerung – du stellst Rechnungen mit Umsatzsteuer und gibst Voranmeldungen ab; eine
-    eigene Frist gibt es dafür nicht. Lag dein Umsatz im Vorjahr über 25.000 €, gilt die Regelung in diesem Jahr von Anfang an nicht. Amtlos zählt bisher die Rechnungen, die du in Amtlos gestellt hast (netto,
-    nach Rechnungsdatum) – ob und wann sie bezahlt wurden, ist darin noch nicht berücksichtigt.
-  en: What counts is total turnover based on payments received – i.e. the net amounts you are paid, not the total of invoices issued by invoice date. Up to and including €25,000 or €100,000, your turnover
-    remains tax-exempt. From the sale with which you exceed the limit, standard taxation applies – you issue invoices with VAT and file advance returns; there is no separate deadline for this. If your turnover
-    last year was above €25,000, the scheme does not apply at all this year. Amtlos currently counts the invoices you issued in Amtlos (net, by invoice date) – whether and when they were paid is not yet
-    taken into account.
 - de: Nach deinen Angaben liegt dein Umsatz über einer Kleinunternehmergrenze. Überschreitest du im laufenden Jahr 100.000 € (im Gründungsjahr 25.000 €), ist schon der Umsatz, mit dem du die Grenze überschreitest,
     steuerpflichtig.
   en: According to your information, your turnover is above a small business limit. If you exceed €100,000 in the current year (€25,000 in the founding year), the very sale with which you exceed the limit
@@ -3689,3 +3645,61 @@ eintraege:
   en: § 312k BGB requires a simple way to cancel via the website – only for continuing obligations with consumers that can be concluded online. The button is labelled "Verträge hier kündigen" (cancel contracts
     here) and leads to a confirmation page on which the customer enters their details, with a confirmation button "jetzt kündigen" (cancel now) (§ 312k(2) BGB). You confirm receipt of the cancellation to
     the customer (§ 312k(4) BGB).
+- de: Du erfasst Rechnungen oder Kasseneinnahmen in Amtlos.
+  en: You record invoices or cash register takings in Amtlos.
+- de: Deine Einnahmen laut Amtlos (Zahlungseingänge und Kasse, netto) erreichen im Gründungsjahr mindestens 20.000 €; die Grenze im Gründungsjahr liegt bei 25.000 €.
+  en: Your income according to Amtlos (payments received and cash register, net) reaches at least €20,000 in the founding year; the limit in the founding year is €25,000.
+- de: Deine Einnahmen laut Amtlos (Zahlungseingänge und Kasse, netto) erreichen im Gründungsjahr mindestens 23.750 €; die Grenze im Gründungsjahr liegt bei 25.000 €.
+  en: Your income according to Amtlos (payments received and cash register, net) reaches at least €23,750 in the founding year; the limit in the founding year is €25,000.
+- de: Deine Einnahmen laut Amtlos (Zahlungseingänge und Kasse, netto) erreichen in diesem Jahr mindestens 80.000 €; die Grenze liegt bei 100.000 €.
+  en: Your income according to Amtlos (payments received and cash register, net) reaches at least €80,000 this year; the limit is €100,000.
+- de: Deine Einnahmen laut Amtlos (Zahlungseingänge und Kasse, netto) erreichen in diesem Jahr mindestens 95.000 €; die Grenze liegt bei 100.000 €.
+  en: Your income according to Amtlos (payments received and cash register, net) reaches at least €95,000 this year; the limit is €100,000.
+- de: Deine Einnahmen laut Amtlos (Zahlungseingänge und Kasse, netto) erreichen mindestens 80 % der Kleinunternehmergrenze; die Grenze liegt bei 100.000 €, im Gründungsjahr bei 25.000 €.
+  en: Your income according to Amtlos (payments received and cash register, net) reaches at least 80% of the small business limit; the limit is €100,000, in the founding year €25,000.
+- de: Deine Einnahmen laut Amtlos (Zahlungseingänge und Kasse, netto) erreichen mindestens 95 % der Kleinunternehmergrenze; die Grenze liegt bei 100.000 €, im Gründungsjahr bei 25.000 €.
+  en: Your income according to Amtlos (payments received and cash register, net) reaches at least 95% of the small business limit; the limit is €100,000, in the founding year €25,000.
+- de: Deine Einnahmen laut Amtlos (Zahlungseingänge und Kasse, netto) lagen im Vorjahr über 25.000 €.
+  en: Your income according to Amtlos (payments received and cash register, net) was above €25,000 last year.
+- de: Deine Einnahmen laut Amtlos (Zahlungseingänge und Kasse, netto) liegen im Gründungsjahr über 25.000 €; die Grenze im Gründungsjahr liegt bei 25.000 €.
+  en: Your income according to Amtlos (payments received and cash register, net) is above €25,000 in the founding year; the limit in the founding year is €25,000.
+- de: Deine Einnahmen laut Amtlos (Zahlungseingänge und Kasse, netto) liegen in diesem Jahr über 100.000 €; die Grenze liegt bei 100.000 €.
+  en: Your income according to Amtlos (payments received and cash register, net) is above €100,000 this year; the limit is €100,000.
+- de: Deine Einnahmen laut Amtlos (Zahlungseingänge und Kasse, netto) liegen in diesem Jahr über 25.000 €; die Grenze liegt bei 25.000 €.
+  en: Your income according to Amtlos (payments received and cash register, net) is above €25,000 this year; the limit is €25,000.
+- de: Maßgeblich ist der Gesamtumsatz nach vereinnahmten Entgelten – also die Zahlungen, die du netto erhältst, nicht die Summe der gestellten Rechnungen nach Rechnungsdatum. Bis einschließlich 25.000 €
+    bzw. 100.000 € bleibt dein Umsatz steuerfrei. Ab dem Umsatz, mit dem du die Grenze überschreitest, gilt die Regelbesteuerung – du stellst Rechnungen mit Umsatzsteuer und gibst Voranmeldungen ab; eine
+    eigene Frist gibt es dafür nicht. Lag dein Umsatz im Vorjahr über 25.000 €, gilt die Regelung in diesem Jahr von Anfang an nicht. Amtlos zählt dafür die Zahlungseingänge auf deine Rechnungen in Amtlos
+    (netto) und deine Kasseneinnahmen laut Tagesabschlüssen; Leistungen an Unternehmen im Ausland zählen nicht mit. Hast du bei einer Rechnung keinen Zahlungseingang vermerkt, zählt Amtlos sie vorsichtshalber
+    mit dem Rechnungsdatum – vermerke Zahlungseingänge, dann rechnet Amtlos genauer. Steuerfreie Umsätze wie Heilbehandlungen und Verkäufe von Anlagevermögen zählen für die Grenze nicht mit; Amtlos kann
+    sie nicht unterscheiden und zählt sie mit. Einnahmen außerhalb von Amtlos sind nicht enthalten.
+  en: What counts is total turnover based on payments received – i.e. the net amounts you are paid, not the total of invoices issued by invoice date. Up to and including €25,000 or €100,000, your turnover
+    remains tax-exempt. From the sale with which you exceed the limit, standard taxation applies – you issue invoices with VAT and file advance returns; there is no separate deadline for this. If your turnover
+    last year was above €25,000, the scheme does not apply at all this year. Amtlos counts the payments received on your invoices in Amtlos (net) and your cash register takings according to the daily closings;
+    services to businesses abroad are not included. If you have not recorded a payment for an invoice, Amtlos counts it, to be on the safe side, at the invoice date – record payments received and Amtlos
+    calculates more precisely. Tax-exempt sales such as medical treatments and sales of fixed assets do not count towards the limit; Amtlos cannot tell them apart and counts them. Income outside Amtlos
+    is not included.
+- de: Die Kleinunternehmerregelung setzt voraus, dass dein Umsatz im Vorjahr höchstens 25.000 € betrug. Überschreitest du diese Grenze in diesem Jahr, ohne über 100.000 € zu kommen, gilt die Regelung bis
+    zum Jahresende weiter. Ab 1. Januar weist du auf deinen Rechnungen Umsatzsteuer aus, gibst Umsatzsteuer-Voranmeldungen und die Umsatzsteuer-Jahreserklärung ab und kannst die Vorsteuer aus deinen Eingangsrechnungen
+    abziehen. Wie oft du die Voranmeldung abgibst, legt das Finanzamt nach der voraussichtlichen Steuer fest – bei mehr als 9.000 € monatlich, sonst vierteljährlich (§ 18 Abs. 2 UStG); es steht im Schreiben
+    des Finanzamts. Hast du als Kleinunternehmer Wirtschaftsgüter angeschafft, die du weiter nutzt, kann beim Wechsel eine Berichtigung der Vorsteuer in Frage kommen (§ 15a UStG). Maßgeblich für die Grenze
+    ist der Umsatz nach vereinnahmten Entgelten (netto, nach Zahlungseingang), nicht die Summe der Rechnungen nach Rechnungsdatum. Amtlos zählt dafür die Zahlungseingänge auf deine Rechnungen in Amtlos
+    (netto) und deine Kasseneinnahmen laut Tagesabschlüssen; Leistungen an Unternehmen im Ausland zählen nicht mit. Hast du bei einer Rechnung keinen Zahlungseingang vermerkt, zählt Amtlos sie vorsichtshalber
+    mit dem Rechnungsdatum – vermerke Zahlungseingänge, dann rechnet Amtlos genauer. Steuerfreie Umsätze wie Heilbehandlungen und Verkäufe von Anlagevermögen zählen für die Grenze nicht mit; Amtlos kann
+    sie nicht unterscheiden und zählt sie mit. Einnahmen außerhalb von Amtlos sind nicht enthalten. Stelle Rechnungsvorlage, Preise und Buchhaltung rechtzeitig um.
+  en: The small business scheme requires that your turnover last year was at most €25,000. If you exceed this limit this year without going above €100,000, the scheme continues until the end of the year.
+    From 1 January you show VAT on your invoices, file advance VAT returns and the annual VAT return, and can deduct input VAT from your purchase invoices. How often you file the advance return is set by
+    the tax office based on the expected tax – monthly above €9,000, otherwise quarterly (§ 18(2) UStG); it is stated in the tax office's letter. If you bought assets as a small business that you continue
+    to use, an input VAT adjustment may apply when you switch (§ 15a UStG). What counts for the limit is turnover based on payments received (net, by date of payment), not the total of invoices by invoice
+    date. Amtlos counts the payments received on your invoices in Amtlos (net) and your cash register takings according to the daily closings; services to businesses abroad are not included. If you have
+    not recorded a payment for an invoice, Amtlos counts it, to be on the safe side, at the invoice date – record payments received and Amtlos calculates more precisely. Tax-exempt sales such as medical
+    treatments and sales of fixed assets do not count towards the limit; Amtlos cannot tell them apart and counts them. Income outside Amtlos is not included. Adjust your invoice template, prices and bookkeeping
+    in good time.
+- de: Die Kleinunternehmerregelung endet ab dem Umsatz, der die Grenze überschreitet. Maßgeblich ist der Umsatz nach vereinnahmten Entgelten – die Zahlungen, die du netto erhältst, nicht die Rechnungen
+    nach Rechnungsdatum. Amtlos zählt dafür die Zahlungseingänge auf deine Rechnungen in Amtlos (netto) und deine Kasseneinnahmen laut Tagesabschlüssen; Leistungen an Unternehmen im Ausland zählen nicht
+    mit. Hast du bei einer Rechnung keinen Zahlungseingang vermerkt, zählt Amtlos sie vorsichtshalber mit dem Rechnungsdatum – vermerke Zahlungseingänge, dann rechnet Amtlos genauer. Steuerfreie Umsätze
+    wie Heilbehandlungen und Verkäufe von Anlagevermögen zählen für die Grenze nicht mit; Amtlos kann sie nicht unterscheiden und zählt sie mit. Einnahmen außerhalb von Amtlos sind nicht enthalten.
+  en: The small business scheme ends from the sale that exceeds the limit. What counts is turnover based on payments received – the net amounts you are paid, not the invoices by invoice date. Amtlos counts
+    the payments received on your invoices in Amtlos (net) and your cash register takings according to the daily closings; services to businesses abroad are not included. If you have not recorded a payment
+    for an invoice, Amtlos counts it, to be on the safe side, at the invoice date – record payments received and Amtlos calculates more precisely. Tax-exempt sales such as medical treatments and sales of
+    fixed assets do not count towards the limit; Amtlos cannot tell them apart and counts them. Income outside Amtlos is not included.

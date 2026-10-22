@@ -1,8 +1,8 @@
 # R10: neu (Nutzertest Freiberuf: Vorjahr unter 25.000 €, laufendes Jahr darüber, aber höchstens 100.000 € – ab 1.1. des Folgejahres Regelbesteuerung, § 19 Abs. 1 UStG)
-# StB-Durchsicht Busch 22.10.2026 umgesetzt bis auf den Auslöser (Zahlungseingänge)
+# StB-Durchsicht Busch 22.10.2026 umgesetzt; Auslöser seit v4 nach Zahlungseingängen (vereinnahmte Entgelte)
 schema_version: 1
 id: steuern.kleinunternehmer_naechstes_jahr
-version: 3
+version: 4
 katalog_nr: C.23
 titel:
   de: Ab 1. Januar Regelbesteuerung
@@ -16,8 +16,12 @@ erklaerung:
     Steuer fest – bei mehr als 9.000 € monatlich, sonst vierteljährlich (§ 18 Abs. 2 UStG); es steht im Schreiben des Finanzamts.
     Hast du als Kleinunternehmer Wirtschaftsgüter angeschafft, die du weiter nutzt, kann beim Wechsel eine Berichtigung der Vorsteuer
     in Frage kommen (§ 15a UStG). Maßgeblich für die Grenze ist der Umsatz nach vereinnahmten Entgelten (netto, nach Zahlungseingang),
-    nicht die Summe der Rechnungen nach Rechnungsdatum; Amtlos zählt bisher die in Amtlos gestellten Rechnungen. Stelle Rechnungsvorlage,
-    Preise und Buchhaltung rechtzeitig um.'
+    nicht die Summe der Rechnungen nach Rechnungsdatum. Amtlos zählt dafür die Zahlungseingänge auf deine Rechnungen in Amtlos (netto)
+    und deine Kasseneinnahmen laut Tagesabschlüssen; Leistungen an Unternehmen im Ausland zählen nicht mit. Hast du bei einer
+    Rechnung keinen Zahlungseingang vermerkt, zählt Amtlos sie vorsichtshalber mit dem Rechnungsdatum – vermerke Zahlungseingänge,
+    dann rechnet Amtlos genauer. Steuerfreie Umsätze wie Heilbehandlungen und Verkäufe von Anlagevermögen zählen für die Grenze
+    nicht mit; Amtlos kann sie nicht unterscheiden und zählt sie mit. Einnahmen außerhalb von Amtlos sind nicht enthalten. Stelle
+    Rechnungsvorlage, Preise und Buchhaltung rechtzeitig um.'
 rechtsgrundlage:
 - § 19 Abs. 1 UStG
 kategorie: steuern
@@ -40,6 +44,14 @@ ausloeser:
       regelwert: steuern.ustg19.grenze_vorjahr
     label:
       de: Dein Umsatz im Vorjahr lag höchstens bei 25.000 €.
+  - not:
+      all:
+      - feld: finanzen.umsatz.vereinnahmt_vorjahr
+        op: vorhanden
+      - feld: finanzen.umsatz.vereinnahmt_vorjahr
+        op: '>'
+        wert:
+          regelwert: steuern.ustg19.grenze_vorjahr
   - any:
     - all:
       - feld: profil.umsatz.prognose_laufendes_jahr
@@ -53,15 +65,15 @@ ausloeser:
         wert:
           regelwert: steuern.ustg19.grenze_laufendes_jahr
     - all:
-      - feld: finanzen.umsatz.laufendes_jahr
+      - feld: finanzen.umsatz.vereinnahmt_laufendes_jahr
         op: vorhanden
-      - feld: finanzen.umsatz.laufendes_jahr
+      - feld: finanzen.umsatz.vereinnahmt_laufendes_jahr
         op: '>'
         wert:
           regelwert: steuern.ustg19.grenze_vorjahr
         label:
-          de: Deine Rechnungen in Amtlos summieren sich in diesem Jahr auf mehr als 25.000 €; die Grenze liegt bei 25.000 €.
-      - feld: finanzen.umsatz.laufendes_jahr
+          de: Deine Einnahmen laut Amtlos (Zahlungseingänge und Kasse, netto) liegen in diesem Jahr über 25.000 €; die Grenze liegt bei 25.000 €.
+      - feld: finanzen.umsatz.vereinnahmt_laufendes_jahr
         op: <=
         wert:
           regelwert: steuern.ustg19.grenze_laufendes_jahr
@@ -95,7 +107,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/ustg_1980/__18.html
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'StB Busch 22.10.2026: Umsatzbegriff sind die vereinnahmten Entgelte statt der Rechnungssumme – der Auslöser über finanzen.umsatz.laufendes_jahr zählt weiter gestellte Rechnungen nach Rechnungsdatum (keine Zahlungsdaten im Fakt); nur Hinweis im Text'
+- 'StB Busch 22.10.2026: Umsatzbegriff sind die vereinnahmten Entgelte (netto, Zufluss; § 19 Abs. 2 Satz 1 UStG n. F.) – umgesetzt (v4): Auslöser über finanzen.umsatz.vereinnahmt_laufendes_jahr (Zahlungseingänge auf Rechnungen, Kasse, Sachentnahmen; App: unterlagen/kuUmsatz.ts); liegt finanzen.umsatz.vereinnahmt_vorjahr über 25.000 €, entfällt der Eintrag (dann gilt „Grenze überschritten“). Zu prüfen: Ersatzregel für Rechnungen ohne Zahlungsvermerk (zählen mit dem Rechnungsdatum), Einbezug der Sachentnahmen (§ 3 Abs. 1b UStG), keine Kürzung um steuerfreie Umsätze und Anlagevermögen (App kann sie nicht unterscheiden); der Server kennt keine Zahlungseingänge und zählt dort alle Rechnungen nach Rechnungsdatum'
 - 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
   status: entwurf

@@ -69,9 +69,17 @@ export async function neuberechnenInTx(
   for (const i of bestand) if (i.status === "erledigt" && i.erledigt_am && !(i.pflicht_id in erledigt)) erledigt[i.pflicht_id] = i.erledigt_am;
 
   const fakten = profilZuFakten(profil.daten);
-  // Kleinunternehmer-Wächter (C.23): Umsatz aus den Rechnungen in Amtlos, nur wenn welche gestellt wurden
-  const umsatz = await umsatzLaufendesJahr(tx, unternehmenId, Number(stichtag.slice(0, 4)));
-  if (umsatz !== null) fakten["finanzen.umsatz.laufendes_jahr"] = umsatz;
+  // Kleinunternehmer-Wächter (C.23): Umsatz aus den Rechnungen in Amtlos, nur wenn welche gestellt wurden. Maßgeblich sind
+  // die vereinnahmten Entgelte (§ 19 Abs. 2 UStG, StB Busch 22.10.2026); der Server speichert keine Zahlungseingänge, also
+  // gilt hier für alle Rechnungen die Ersatzregel „Rechnung ohne Zahlungsvermerk zählt mit dem Rechnungsdatum“ (fakten.json).
+  // `finanzen.umsatz.laufendes_jahr` bleibt für ältere Katalog-Releases.
+  const jahr = Number(stichtag.slice(0, 4));
+  const umsatz = await umsatzLaufendesJahr(tx, unternehmenId, jahr);
+  if (umsatz !== null) {
+    fakten["finanzen.umsatz.laufendes_jahr"] = umsatz;
+    fakten["finanzen.umsatz.vereinnahmt_laufendes_jahr"] = umsatz;
+    fakten["finanzen.umsatz.vereinnahmt_vorjahr"] = (await umsatzLaufendesJahr(tx, unternehmenId, jahr - 1)) ?? 0;
+  }
   const fenster = { von: plusMonate(stichtag, -3), bis: plusMonate(stichtag, 12) };
   const ergebnisse = auswerten({ katalog: aktiv.katalog, fakten, ereignisse, stichtag, kalender, erledigt, fenster });
 

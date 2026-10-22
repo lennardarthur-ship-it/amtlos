@@ -445,7 +445,8 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       expect(okt.uebermittlung.verfuegbar).toBe(false);
     });
 
-    it("Kleinunternehmer-Wächter: Warnung bei 80 % aus dem Umsatz der Rechnungen", async () => {
+    // vereinnahmter Umsatz (StB Busch 22.10.2026): der Server kennt keine Zahlungseingänge – Ersatzregel Rechnungsdatum
+    it("Kleinunternehmer-Wächter: Warnung bei 80 % aus dem Umsatz der Rechnungen (Ersatzregel Rechnungsdatum)", async () => {
       const kim = await token("kim");
       const u = (await http().post("/v1/unternehmen").set("Authorization", `Bearer ${kim}`).send({ name: "Kims Atelier" }).expect(201)).body.id;
       const alsKim = (x: request.Test) => x.set("Authorization", `Bearer ${kim}`).set("X-Unternehmen-Id", u);

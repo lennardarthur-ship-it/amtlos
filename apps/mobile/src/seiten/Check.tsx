@@ -7,6 +7,7 @@ import { HellerStatus, TastaturRahmen, useKopf, useNav } from "../ui/navigation"
 import { BLATT_OBEN, RADIUS, RAND, SCHRIFT, useFarben } from "../ui/thema";
 import { CHECK_FELDER, auswertung, checkFragenAnzahl, beantwortet, checkFragen, dringlichkeit, folgeAntworten, offeneFragenNachWirkung, selten, zaehlung, zusatzFragen, type Profil } from "../pflichten/check";
 import { heute } from "../unterlagen/speicher";
+import { umsatzFakten } from "../unterlagen/kuUmsatz";
 import { PflichtZeile } from "./Pflichten";
 import { langBestehend, schonDaKandidaten } from "./schonDa";
 import { WasHastDuSchon } from "./WasHastDu";
@@ -203,7 +204,7 @@ export function CheckAblauf({ felder, einleitung = true }: { felder?: string[]; 
       setZwischen(true);
     }
   }, [voll, amEnde, zusatz, z.stand.profil, liste]);
-  const a = useMemo(() => (amEnde && voll && zusatz ? auswertung(z.stand.profil, heute(), z.stand.unterlagen, z.stand.mitarbeiter) : null), [amEnde, voll, zusatz, z.stand.profil, z.stand.unterlagen, z.stand.mitarbeiter]);
+  const a = useMemo(() => (amEnde && voll && zusatz ? auswertung(z.stand.profil, heute(), z.stand.unterlagen, z.stand.mitarbeiter, umsatzFakten(z.stand, heute())) : null), [amEnde, voll, zusatz, z.stand.profil, z.stand.unterlagen, z.stand.mitarbeiter, z.stand.kasse, z.stand.sachentnahmen]);
   const d = useMemo(() => (a ? dringlichkeit(a, { erledigt: z.stand.erledigt, unterlagen: z.stand.unterlagen, betrieb: z.stand.betrieb }, heute()) : null), [a, z.stand.erledigt, z.stand.unterlagen, z.stand.betrieb]);
   // R10: Pflichten, Hinweise und Optionen getrennt (Rechtsprüfung) – „Mit diesen fängst du an“ nur echte Pflichten
   const zahl = a ? zaehlung(a.gilt) : { pflichten: 0, hinweise: 0, optionen: 0 };

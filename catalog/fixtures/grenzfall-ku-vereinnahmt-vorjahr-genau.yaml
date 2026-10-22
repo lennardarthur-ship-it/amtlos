@@ -1,0 +1,18 @@
+persona: grenzfall
+beschreibung: 'StB Busch 22.10.2026 (C.23): vereinnahmter Umsatz laut Amtlos im Vorjahr genau 25.000 € (nicht überschritten),
+  in diesem Jahr 30.000 € – ab 1. Januar Regelbesteuerung, Grenze nicht überschritten'
+stichtag: '2026-10-11'
+fakten:
+  profil.rechtsform: freiberuf
+  profil.gruendungsdatum: '2022-01-01'
+  profil.taetigkeit.einordnung: freiberuf
+  profil.ust.kleinunternehmer: true
+  profil.umsatz.vorjahr: 20000
+  profil.umsatz.prognose_laufendes_jahr: 30000
+  profil.bundesland: BY
+  profil.gemeinde_ags: 09162000
+  finanzen.umsatz.vereinnahmt_vorjahr: 25000
+  finanzen.umsatz.vereinnahmt_laufendes_jahr: 30000
+erwartet:
+  steuern.kleinunternehmer_grenze_ueberschritten: gilt_nicht
+  steuern.kleinunternehmer_naechstes_jahr: gilt

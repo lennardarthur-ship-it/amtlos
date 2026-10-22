@@ -1,5 +1,5 @@
 persona: grenzfall
-beschreibung: 'Kleinunternehmer-Wächter (C.23): Umsatz aus Rechnungen in Amtlos 100000.01
+beschreibung: 'Kleinunternehmer-Wächter (C.23): vereinnahmter Umsatz laut Amtlos (Zahlungseingänge, Kasse) 100000.01
   € bei Grenze 100.000 € (Warnstufen 80 %/95 %)'
 stichtag: '2026-10-11'
 fakten:
@@ -10,7 +10,7 @@ fakten:
   profil.umsatz.vorjahr: 20000
   profil.bundesland: BY
   profil.gemeinde_ags: 09162000
-  finanzen.umsatz.laufendes_jahr: 100000.01
+  finanzen.umsatz.vereinnahmt_laufendes_jahr: 100000.01
 erwartet:
   steuern.kleinunternehmer_warnung_95: gilt_nicht
   steuern.kleinunternehmer_grenze_ueberschritten: gilt

@@ -801,7 +801,19 @@
     {
       "pfad": "finanzen.umsatz.laufendes_jahr",
       "typ": "betrag",
-      "herleitung": "Summe der in Amtlos gestellten Ausgangsrechnungen (netto, Stornos abgezogen) im Kalenderjahr nach Rechnungsdatum bis Stichtag; [FACHLICH ZU PRÜFEN] Umsatzbegriff § 19 UStG: maßgeblich sind die vereinnahmten Entgelte (netto, Zufluss; StB Busch 22.10.2026) – Umstellung auf Zahlungseingänge offen, der Server kennt bisher keine Zahlungen",
+      "herleitung": "Abgelöst durch finanzen.umsatz.vereinnahmt_laufendes_jahr (StB Busch 22.10.2026) – nur noch für ältere Katalog-Releases: Summe der in Amtlos gestellten Ausgangsrechnungen (netto, Stornos abgezogen) im Kalenderjahr nach Rechnungsdatum (Server)",
+      "ab": 4
+    },
+    {
+      "pfad": "finanzen.umsatz.vereinnahmt_laufendes_jahr",
+      "typ": "betrag",
+      "herleitung": "Gesamtumsatz nach § 19 Abs. 2 UStG (nach vereinnahmten Entgelten, netto; StB Busch 22.10.2026) vom 1.1. bis zum Stichtag aus den Daten in Amtlos, nur wenn dort Rechnungen gestellt bzw. Kassenabschlüsse erfasst sind. App (apps/mobile/src/unterlagen/kuUmsatz.ts): Zahlungseingänge auf Ausgangsrechnungen (je Zahlung bzw. am Tag „bezahlt“, Schlussrechnung abzüglich Abschläge, bezahlte Stornos negativ), Kasseneinnahmen laut Tagesabschlüssen, Sachentnahmen; ohne Gutschriften und ohne nicht steuerbare Umsätze (Kleinunternehmer-Leistungen an Unternehmen im Ausland, OSS). Ersatzregel (vorsichtig): Rechnungen ohne jeden Zahlungsvermerk zählen mit dem Rechnungsdatum; unbezahlt stornierte Rechnungen samt Storno zählen nicht. Server (packages/server/src/finanzen.ts): speichert keine Zahlungseingänge, daher gilt dort die Ersatzregel für alle gestellten Rechnungen (Rechnungsdatum). Steuerfreie Umsätze nach § 4 Nr. 8 i, 9 b, 11–29 UStG und Umsätze mit Anlagevermögen (§ 19 Abs. 2 Satz 1 Nr. 1, 2 und Satz 2) werden nicht abgezogen, weil Amtlos sie nicht unterscheidet; [FACHLICH ZU PRÜFEN] Ersatzregel und Einbezug der Sachentnahmen",
+      "ab": 4
+    },
+    {
+      "pfad": "finanzen.umsatz.vereinnahmt_vorjahr",
+      "typ": "betrag",
+      "herleitung": "Wie finanzen.umsatz.vereinnahmt_laufendes_jahr, für das ganze vorangegangene Kalenderjahr – Untergrenze: Umsätze außerhalb von Amtlos (oder vor der Nutzung) fehlen, daher nur für „über der Grenze“ geeignet, nicht für „höchstens“",
       "ab": 4
     },
     {
