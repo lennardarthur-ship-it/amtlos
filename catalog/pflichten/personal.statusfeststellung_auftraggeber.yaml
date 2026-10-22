@@ -1,14 +1,14 @@
 # R12 (Nutzertest Kurier #6): Scheinselbstständigkeit bei Subunternehmern – Statusfeststellung als Auftraggeber
 schema_version: 1
 id: personal.statusfeststellung_auftraggeber
-version: 1
+version: 2
 katalog_nr: A.12
 titel:
   de: Scheinselbstständigkeit bei Subunternehmern vermeiden
 kurz:
   de: Arbeiten Solo-Selbstständige für dich wie Angestellte, droht Scheinselbstständigkeit – ein Statusfeststellungsverfahren schafft Klarheit.
 erklaerung:
-  de: 'Ob jemand selbstständig oder in Wahrheit beschäftigt ist, richtet sich nach der tatsächlichen Zusammenarbeit: Weisungen zu Zeit, Ort und Art der Arbeit, die Eingliederung in deinen Betrieb und fehlendes unternehmerisches Risiko sprechen für eine Beschäftigung (§ 7 Abs. 1 SGB IV). Den Antrag auf Statusfeststellung bei der Deutschen Rentenversicherung können beide Seiten stellen, also auch du als Auftraggeber (§ 7a SGB IV).'
+  de: 'Ob jemand selbstständig oder in Wahrheit beschäftigt ist, richtet sich nach der tatsächlichen Zusammenarbeit: Weisungen zu Zeit, Ort und Art der Arbeit, die Eingliederung in deinen Betrieb und fehlendes unternehmerisches Risiko sprechen für eine Beschäftigung (§ 7 Abs. 1 SGB IV). Den Antrag auf Statusfeststellung bei der Deutschen Rentenversicherung können beide Seiten stellen, also auch du als Auftraggeber (§ 7a Abs. 1 SGB IV) – seit 2022 auch als Prognoseentscheidung vor Beginn der Zusammenarbeit (§ 7a Abs. 4a SGB IV).'
 rechtsgrundlage:
 - § 7 Abs. 1 SGB IV
 - § 7a SGB IV
@@ -45,8 +45,6 @@ quellen:
 - titel: Sozialgesetzbuch IV § 7a
   url: https://www.gesetze-im-internet.de/sgb_4/__7a.html
   abgerufen: null
-fachlich_zu_pruefen:
-- 'Neu nach Nutzertest R12 (Kurier #6) – Folgen (§ 28e, § 25 SGB IV, § 266a StGB) bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

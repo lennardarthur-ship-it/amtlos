@@ -1,17 +1,16 @@
 # Katalog A.5 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gruendung.elster_konto
-version: 1
+version: 2
 katalog_nr: A.5
 titel:
   de: ELSTER-Konto beantragen
 kurz:
-  de: Beantrage frühzeitig ein ELSTER-Konto – die Aktivierung kommt per Post und dauert einige Tage.
+  de: 'Beantrage frühzeitig ein ELSTER-Konto, wenn du den Fragebogen selbst abgibst – die Aktivierung kommt per Post und dauert einige Tage.'
 erklaerung:
-  de: Über ELSTER übermittelst du Steuererklärungen und Anmeldungen ans Finanzamt, als Erstes den Fragebogen zur steuerlichen
-    Erfassung. Weil die Aktivierungsdaten per Post kommen, solltest du das Konto früh beantragen.
+  de: 'Über ELSTER übermittelst du Steuererklärungen und Anmeldungen ans Finanzamt, als Erstes den Fragebogen zur steuerlichen Erfassung, den du elektronisch abgibst (§ 138 Abs. 1b AO). Weil die Aktivierungsdaten per Post kommen, solltest du das Konto früh beantragen. Übernimmt eine Steuerberatung die Übermittlung, gibt sie den Fragebogen für dich ab.'
 rechtsgrundlage:
-- § 138 AO (Voraussetzung für die elektronische Übermittlung)
+- § 138 Abs. 1b AO (Voraussetzung für die elektronische Übermittlung)
 kategorie: gruendung
 ausloeser:
   immer: true
@@ -39,10 +38,6 @@ quellen:
 - titel: ELSTER
   url: https://www.elster.de/
   abgerufen: null
-fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Vorbereitender Schritt ohne eigene Rechtspflicht – Darstellung bestätigen
-- Gilt für alle oder nur ohne Steuerberatung?
 pruefung:
   status: entwurf
   geprueft_von: null

@@ -1,14 +1,14 @@
 # R12 (Rechtsprüfung Befund 6): Bewachungsgewerbe – Wachpersonen vor dem Einsatz anmelden
 schema_version: 1
 id: personal.bewacherregister
-version: 3
+version: 4
 katalog_nr: A.3
 titel:
   de: Wachpersonen im Bewacherregister anmelden
 kurz:
   de: Im Bewachungsgewerbe meldest du jede Wachperson über das Bewacherregister an, bevor sie Bewachungsaufgaben übernimmt.
 erklaerung:
-  de: Gewerbetreibende mit Erlaubnis nach § 34a GewO, ihre Wachpersonen und die Betriebsleitung werden im Bewacherregister beim Statistischen Bundesamt geführt (§ 11b GewO). Jede Wachperson meldest du vor der Beschäftigung mit Bewachungsaufgaben an; einsetzen darfst du sie erst, wenn die Behörde ihre Zuverlässigkeit geprüft und dir das Ergebnis mitgeteilt hat (§ 16 Abs. 1, 2 BewachV). Endet die Beschäftigung, meldest du die Person innerhalb von sechs Wochen ab (§ 11b GewO).
+  de: Gewerbetreibende mit Erlaubnis nach § 34a GewO, ihre Wachpersonen und die Betriebsleitung werden im Bewacherregister beim Statistischen Bundesamt geführt (§ 11b GewO). Jede Wachperson meldest du vor der Beschäftigung mit Bewachungsaufgaben an; einsetzen darfst du sie erst, wenn die Behörde ihre Zuverlässigkeit geprüft und dir das Ergebnis mitgeteilt hat (§ 16 Abs. 1, 2 BewachV). Endet die Beschäftigung, meldest du die Person über das Bewacherregister ab, spätestens sechs Wochen nach dem Ende (§ 11b Abs. 6 GewO, § 16 Abs. 6 BewachV).
 rechtsgrundlage:
 - § 11b GewO
 - § 16 BewachV
@@ -43,8 +43,7 @@ kosten: null
 sanktion:
   text:
     de: 'Bußgeld bis 3.000 €, wenn du eine Person mit Bewachungsaufgaben betraust, ohne das Anmeldeverfahren über das Bewacherregister einzuhalten und die Mitteilung der Behörde erhalten zu haben (§ 22 Abs. 1 Nr. 1 in Verbindung mit § 16 Abs. 1 BewachV, § 144 Abs. 2 Nr. 1b, Abs. 4 GewO).'
-  schwere: mittel
-dringend_ohne_termin: true
+  schwere: hoch
 automatisierung: hinweis
 erledigung:
   art: bestaetigen
@@ -67,9 +66,7 @@ quellen:
   url: https://lxgesetze.de/gewo/144
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- Neu nach Rechtsprüfung R12 (Befund 6) – § 11b GewO und § 16 BewachV geprüft; Folgen bei Nichterfüllung fachlich ergänzen
-- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 22 Abs. 1 Nr. 1, § 16 Abs. 1 BewachV amtlich gelesen, § 144 Abs. 4 GewO über lxgesetze.de (Stand 20.7.2026); Abmeldung nach § 11b GewO nicht geprüft; Schwere bleibt bis zur fachlichen Bestätigung „mittel“ (Vorschlag: „hoch“)) – fachlich zu bestätigen'
+- 'Freigabe RA Dr. Weber 22.10.2026: Schwere „hoch“ umgesetzt. Seine Änderung „Ausscheiden einer Wachperson unverzüglich melden (§ 11b Abs. 3 GewO i. V. m. § 16 Abs. 3 BewachV)“ nicht umgesetzt: Laut Wortlaut (lxgesetze.de, gesetze-im-internet.de, 22.10.2026) regelt § 11b Abs. 3 GewO Speicherbefugnisse der Registerbehörde und § 16 Abs. 3 BewachV die Anmeldung mit vorhandener Registernummer; die Abmeldung richtet sich nach § 11b Abs. 6 GewO (Verweis in § 16 Abs. 6 BewachV) – „sechs Wochen nach Beendigung des Beschäftigungsverhältnisses über das Bewacherregister“; „unverzüglich, spätestens 14 Tage“ gilt dort nur für Änderungsmeldungen (Satz 2, 3). Text nennt die sechs Wochen – mit dem Prüfer klären'
 pruefung:
   status: entwurf
   geprueft_von: null

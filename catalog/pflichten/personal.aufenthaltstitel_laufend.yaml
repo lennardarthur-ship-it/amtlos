@@ -1,16 +1,17 @@
 # R12 (Nutzertest Kurier #7, Zoll #5): Aufenthaltstitel für die Dauer der Beschäftigung
 schema_version: 1
 id: personal.aufenthaltstitel_laufend
-version: 1
+version: 2
 katalog_nr: D.38
 titel:
   de: Aufenthaltstitel während der Beschäftigung im Blick behalten
 kurz:
   de: Für Beschäftigte von außerhalb der EU bewahrst du die Kopie des Aufenthaltstitels für die ganze Dauer der Beschäftigung auf und achtest auf das Ablaufdatum.
 erklaerung:
-  de: Die Kopie des Aufenthaltstitels oder der Erlaubnis zur Beschäftigung bewahrst du für die Dauer der Beschäftigung auf, auf Papier oder elektronisch (§ 4a Abs. 5 AufenthG). Läuft der Titel ab, darf die Person nur weiterarbeiten, wenn ein neuer Titel oder eine Bescheinigung der Ausländerbehörde die Beschäftigung erlaubt – lass dir dann die neue Kopie geben. Endet die Beschäftigung vorzeitig, kann eine Mitteilung an die Ausländerbehörde nötig sein.
+  de: Die Kopie des Aufenthaltstitels oder der Erlaubnis zur Beschäftigung bewahrst du für die Dauer der Beschäftigung auf, auf Papier oder elektronisch (§ 4a Abs. 5 AufenthG). Läuft der Titel ab, darf die Person nur weiterarbeiten, wenn ein neuer Titel oder eine Bescheinigung der Ausländerbehörde die Beschäftigung erlaubt – lass dir dann die neue Kopie geben. Endet die Beschäftigung vorzeitig, teilst du das der Ausländerbehörde binnen vier Wochen mit (§ 4a Abs. 5 S. 3 Nr. 3 AufenthG).
 rechtsgrundlage:
 - § 4a Abs. 5 AufenthG
+- § 98 Abs. 2a Nr. 2 AufenthG
 kategorie: personal
 branchen:
 - gebaeudereinigung
@@ -39,7 +40,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Wer jemanden ohne die erforderliche Erlaubnis beschäftigt, riskiert ein Bußgeld bis 500.000 € (§ 404 Abs. 2 Nr. 3, Abs. 3 SGB III).
+    de: Wer jemanden ohne die erforderliche Erlaubnis beschäftigt, riskiert ein Bußgeld bis 500.000 € (§ 404 Abs. 2 Nr. 3, Abs. 3 SGB III). Endet die Beschäftigung vorzeitig und teilst du das der Ausländerbehörde nicht binnen vier Wochen mit, riskierst du bis 30.000 € (§ 98 Abs. 2a Nr. 2, Abs. 5 AufenthG); für eine fehlende Kopie sieht § 98 AufenthG kein eigenes Bußgeld vor.
   schwere: hoch
 automatisierung: hinweis
 aktion:
@@ -51,9 +52,11 @@ quellen:
 - titel: Aufenthaltsgesetz § 4a
   url: https://www.gesetze-im-internet.de/aufenthg_2004/__4a.html
   abgerufen: null
+- titel: '§ 98 AufenthG, Wortlaut (gesetze.legal)'
+  url: https://gesetze.legal/bund/aufenthg/98
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Neu nach Nutzertest R12 (Kurier #7) – laufende Pflicht für die Dauer der Beschäftigung (§ 4a Abs. 5 AufenthG); Mitteilung bei vorzeitigem Ende binnen vier Wochen (§ 4a Abs. 5 S. 3 Nr. 3) unsicher'
-- Sanktion § 404 Abs. 2 Nr. 3, Abs. 3 SGB III laut Zoll-Prüfung – bestätigen; Bußgeld für die fehlende Kopie (§ 98 AufenthG?) offen
+- 'Freigabe RA Dr. Weber 22.10.2026: Ergänzung „Bußgeld für fehlende Kopie/Mitteilung – § 98 Abs. 2a Nr. 1, 2, Abs. 5 AufenthG (Höhe am Wortlaut prüfen)“ nur teilweise umgesetzt: Laut Wortlaut (gesetze.legal, anwalt24.de, 22.10.2026) erfasst Abs. 2a Nr. 2 die Mitteilung nach § 4a Abs. 5 Satz 3 Nr. 3 (bis 30.000 €, Abs. 5) – übernommen; Abs. 2a Nr. 1 betrifft die Beauftragung mit Dienst- oder Werkleistungen (§ 4a Abs. 5 Satz 1, bis 500.000 €), für die Kopie (Satz 3 Nr. 2) gibt es keinen Tatbestand – Abweichung vom Prüfer bestätigen lassen'
 pruefung:
   status: entwurf
   geprueft_von: null

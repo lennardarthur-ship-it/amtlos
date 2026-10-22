@@ -17,8 +17,11 @@ describe("Pflichten-Check", () => {
     expect(felder).not.toContain("gesellschaft.handelsregister");
     // Einzelunternehmen: keine Investoren-Frage (Nutzertests Mehmet, Jonas, Sabine)
     expect(felder).not.toContain("gesellschafter.auslaendische_investoren");
-    const nein = { ...salon, "gesellschafter.auslaendische_investoren": false };
+    // Freigabe Weber 22.10.2026: die AWV-Meldung gilt für alle Zahlungen von/an Gebietsfremde über 50.000 € – auch Einzelunternehmen werden danach gefragt
+    expect(felder).toContain("auslandszahlungen.ueber_meldegrenze");
+    const nein = { ...salon, "gesellschafter.auslaendische_investoren": false, "auslandszahlungen.ueber_meldegrenze": false };
     expect(ids(auswertung(nein, "2026-10-13").unbekannt)).not.toEqual(expect.arrayContaining(["gesellschaft.awv_meldung"]));
+    expect(ids(auswertung({ ...salon, "auslandszahlungen.ueber_meldegrenze": true }, "2026-10-13").gilt)).toContain("gesellschaft.awv_meldung");
     const gmbh = { ...salon, rechtsform: "gmbh" };
     expect(offeneFragenNachWirkung(auswertung(gmbh, "2026-10-13"), gmbh).map((o) => o.feld)).toContain("gesellschafter.auslaendische_investoren");
     // ohne Beschäftigte keine Fragen zum Personal

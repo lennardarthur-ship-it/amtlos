@@ -54,10 +54,6 @@ quellen:
 - titel: Einkommensteuergesetz § 18
   url: https://www.gesetze-im-internet.de/estg/__18.html
   abgerufen: null
-fachlich_zu_pruefen:
-- 'R12 (Nutzertest Coach #3, #4): unterrichtende Tätigkeit, Personal Training (Einzelfall, unsicher) und Freibetrag 24.500 € ergänzt; bei „Weiß ich nicht“ als offener Punkt „jetzt dran“'
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Ist das eine Pflicht oder ein vorbereitender Schritt? Darstellung als Aufgabe bestätigen
 pruefung:
   status: entwurf
   geprueft_von: null

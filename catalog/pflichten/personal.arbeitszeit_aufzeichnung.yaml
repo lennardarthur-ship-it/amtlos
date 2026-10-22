@@ -1,14 +1,14 @@
 # Katalog D.42 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.arbeitszeit_aufzeichnung
-version: 5
+version: 6
 katalog_nr: D.42
 titel:
   de: Arbeitszeit aufzeichnen
 kurz:
   de: Du zeichnest die Arbeitszeit deiner Beschäftigten auf.
 erklaerung:
-  de: Nach der Rechtsprechung des Bundesarbeitsgerichts besteht bereits eine Pflicht zur Arbeitszeiterfassung. Unabhängig davon verlangt das Arbeitszeitgesetz, die über acht Stunden hinausgehende Arbeitszeit an Werktagen aufzuzeichnen und diese Nachweise mindestens zwei Jahre aufzubewahren (§ 16 Abs. 2 ArbZG). Amtlos bietet eine Zeiterfassung, die auf die geplante Neuregelung vorbereitet ist.
+  de: Nach der Rechtsprechung des Bundesarbeitsgerichts besteht bereits eine Pflicht zur Arbeitszeiterfassung. Eine bestimmte Form schreibt das BAG nicht vor – auch Papier reicht, wenn die Erfassung objektiv, verlässlich und zugänglich ist; die Aufzeichnung darfst du den Beschäftigten übertragen. Unabhängig davon verlangt das Arbeitszeitgesetz, die über acht Stunden hinausgehende Arbeitszeit an Werktagen und die Arbeit an Sonn- und Feiertagen aufzuzeichnen und diese Nachweise mindestens zwei Jahre aufzubewahren (§ 16 Abs. 2 ArbZG). Amtlos bietet eine Zeiterfassung, die auf die geplante Neuregelung vorbereitet ist.
 rechtsgrundlage:
 - § 3 Abs. 2 Nr. 1 ArbSchG (BAG, 13.9.2022 – 1 ABR 22/21)
 - § 16 Abs. 2 ArbZG
@@ -51,11 +51,6 @@ quellen:
 - titel: 'Arbeitsschutzgesetz § 25'
   url: https://www.gesetze-im-internet.de/arbschg/__25.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'R12 (Nutzertest Bäckerei #9): § 16 Abs. 2 ArbZG ergänzt – Aufzeichnung der Sonn- und Feiertagsarbeit bestätigen'
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Anforderungen an die Form (bis zur Neuregelung) fachlich formulieren
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 22 Abs. 1 Nr. 9, Abs. 2 ArbZG amtlich gelesen; § 25 ArbSchG nennt § 3 nicht (Prüfergebnis Sifa: offen für Rechtsanwalt)) – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

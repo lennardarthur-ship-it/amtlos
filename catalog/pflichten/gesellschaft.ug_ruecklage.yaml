@@ -1,14 +1,14 @@
 # Katalog B.14 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.ug_ruecklage
-version: 2
+version: 3
 katalog_nr: B.14
 titel:
   de: Rücklage der UG bilden
 kurz:
   de: Eine UG muss jedes Jahr ein Viertel ihres Jahresüberschusses in eine Rücklage stellen.
 erklaerung:
-  de: 'Die UG (haftungsbeschränkt) bildet in ihrer Bilanz eine gesetzliche Rücklage: ein Viertel des Jahresüberschusses, gemindert um einen Verlustvortrag aus dem Vorjahr (§ 5a Abs. 3 GmbHG). Die Rücklage darf nur für eine Kapitalerhöhung aus Gesellschaftsmitteln oder zum Ausgleich von Verlusten verwendet werden. Die Pflicht endet erst, wenn das Stammkapital durch eine Kapitalerhöhung mindestens 25.000 € erreicht (§ 5a Abs. 5 GmbHG) – eine Rücklage in dieser Höhe allein reicht nicht.'
+  de: 'Die UG (haftungsbeschränkt) bildet in ihrer Bilanz eine gesetzliche Rücklage: ein Viertel des Jahresüberschusses, gemindert um einen Verlustvortrag aus dem Vorjahr (§ 5a Abs. 3 GmbHG). Die Rücklage darf nur für eine Kapitalerhöhung aus Gesellschaftsmitteln oder zum Ausgleich von Verlusten verwendet werden. Die Pflicht endet erst, wenn das Stammkapital durch eine Kapitalerhöhung mindestens 25.000 € erreicht (§ 5a Abs. 5 GmbHG) – eine Rücklage in dieser Höhe allein reicht nicht. Die Rücklage bildest du mit der Feststellung des Jahresabschlusses.'
 rechtsgrundlage:
 - § 5a Abs. 3 GmbHG
 - § 5a Abs. 5 GmbHG
@@ -39,9 +39,6 @@ quellen:
 - titel: GmbH-Gesetz § 5a
   url: https://www.gesetze-im-internet.de/gmbhg/__5a.html
   abgerufen: null
-fachlich_zu_pruefen:
-- 'R12 (Rechtsprüfung, UG-Rücklage): Verlustvortrag (§ 5a Abs. 3 S. 1), Ende nur durch Kapitalerhöhung (§ 5a Abs. 5), Nichtigkeit (§ 256 AktG analog, herrschende Meinung) – bestätigen'
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
 pruefung:
   status: entwurf
   geprueft_von: null

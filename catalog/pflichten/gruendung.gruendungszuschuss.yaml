@@ -1,15 +1,14 @@
 # Katalog A.13 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gruendung.gruendungszuschuss
-version: 2
+version: 3
 katalog_nr: A.13
 titel:
   de: Gründungszuschuss beantragen
 kurz:
   de: Wenn du Arbeitslosengeld I bekommst, kannst du einen Gründungszuschuss beantragen – vor dem Start.
 erklaerung:
-  de: Der Gründungszuschuss ist eine Förderung der Agentur für Arbeit. Er muss vor Beginn der Selbstständigkeit beantragt
-    werden.
+  de: 'Der Gründungszuschuss ist eine Förderung der Agentur für Arbeit. Er muss vor Beginn der Selbstständigkeit beantragt werden. Voraussetzung ist unter anderem ein Restanspruch auf Arbeitslosengeld I von mindestens 150 Tagen (§ 93 Abs. 2 Nr. 1 SGB III).'
 rechtsgrundlage:
 - § 93 SGB III
 kategorie: gruendung
@@ -54,9 +53,6 @@ quellen:
 - titel: Sozialgesetzbuch III § 93
   url: https://www.gesetze-im-internet.de/sgb_3/__93.html
   abgerufen: null
-fachlich_zu_pruefen:
-- Weitere Förderungen (Spezifikation A.13) als eigene Einträge?
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf
   geprueft_von: null

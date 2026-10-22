@@ -47,10 +47,6 @@ quellen:
 - titel: Einkommensteuergesetz § 41a
   url: https://www.gesetze-im-internet.de/estg/__41a.html
   abgerufen: null
-fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Vorbereitender Schritt – Darstellung bestätigen
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf
   geprueft_von: null

@@ -1,15 +1,14 @@
 # Katalog D.41 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.nachweisgesetz
-version: 3
+version: 4
 katalog_nr: D.41
 titel:
   de: Arbeitsbedingungen schriftlich festhalten
 kurz:
-  de: Für jede neue beschäftigte Person hältst du die wesentlichen Arbeitsbedingungen schriftlich oder in zulässiger Form
-    fest.
+  de: 'Für jede neue beschäftigte Person hältst du die wesentlichen Arbeitsbedingungen schriftlich oder in Textform fest – in den Branchen nach dem Schwarzarbeitsbekämpfungsgesetz, seit 30.12.2025 auch im Friseur- und Kosmetikgewerbe, bleibt es bei der Schriftform.'
 erklaerung:
-  de: Das Nachweisgesetz verlangt, dass die wesentlichen Arbeitsbedingungen dokumentiert und der beschäftigten Person ausgehändigt werden. Name und Anschrift der Vertragsparteien, Arbeitsentgelt und Arbeitszeit müssen spätestens am ersten Arbeitstag vorliegen, Beginn, Befristung, Arbeitsort, Tätigkeit, Probezeit, Arbeit auf Abruf und Überstunden spätestens am siebten Kalendertag, die übrigen Angaben binnen eines Monats (§ 2 Abs. 1 Satz 9 NachwG). Deshalb erscheint die Pflicht schon, sobald eine Einstellung mit Arbeitsbeginn eingetragen ist; der Termin ist der erste Arbeitstag.
+  de: Das Nachweisgesetz verlangt, dass die wesentlichen Arbeitsbedingungen dokumentiert und der beschäftigten Person ausgehändigt werden. Name und Anschrift der Vertragsparteien, Arbeitsentgelt und Arbeitszeit müssen spätestens am ersten Arbeitstag vorliegen, Beginn, Befristung, Arbeitsort, Tätigkeit, Probezeit, Arbeit auf Abruf und Überstunden spätestens am siebten Kalendertag, die übrigen Angaben binnen eines Monats (§ 2 Abs. 1 Satz 9 NachwG). Seit 1.1.2025 reicht die Textform, wenn das Dokument für die beschäftigte Person zugänglich ist, gespeichert und ausgedruckt werden kann und du sie aufforderst, den Empfang zu bestätigen (§ 2 Abs. 1 Satz 2 NachwG). In den Branchen nach § 2a Abs. 1 SchwarzArbG – seit 30.12.2025 auch im Friseur- und Kosmetikgewerbe – bleibt die Schriftform vorgeschrieben (§ 2 Abs. 1 Satz 6 NachwG). Deshalb erscheint die Pflicht schon, sobald eine Einstellung mit Arbeitsbeginn eingetragen ist; der Termin ist der erste Arbeitstag.
 rechtsgrundlage:
 - NachwG
 kategorie: personal
@@ -58,10 +57,9 @@ quellen:
 - titel: Nachweisgesetz § 2
   url: https://www.gesetze-im-internet.de/nachwg/BJNR094610995.html
   abgerufen: '2026-10-21'
-fachlich_zu_pruefen:
-- Zulässige Form (Schriftform/elektronisch) aktuell?
-- 'Sanktion aus der Rechtsprüfung R10 (G-16) übernommen – Fundstelle bestätigen'
-- 'Vorprüfung 21.10.2026 (T-50): Auslöser auch bei geplanter Einstellung (Ereignis „einstellung“ mit künftigem Arbeitsbeginn); Fristen nach § 2 Abs. 1 Satz 9 NachwG gelesen (Nr. 1, 7, 8 erster Arbeitstag; Nr. 2–6, 9, 10 siebter Kalendertag; übrige ein Monat) – Termin bleibt der erste Arbeitstag für alle Angaben'
+- titel: 'Nachweisgesetz § 2, geltende Fassung (buzer.de)'
+  url: https://www.buzer.de/gesetz/5010/al0-210457.htm
+  abgerufen: '2026-10-22'
 pruefung:
   status: entwurf
   geprueft_von: null

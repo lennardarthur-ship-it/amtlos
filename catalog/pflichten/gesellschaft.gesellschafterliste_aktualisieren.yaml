@@ -1,17 +1,16 @@
 # Katalog B.15 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.gesellschafterliste_aktualisieren
-version: 2
+version: 3
 katalog_nr: B.15
 titel:
   de: Gesellschafterliste aktualisieren
 kurz:
-  de: Wenn sich im Gesellschafterkreis etwas ändert, muss eine neue Gesellschafterliste zum Handelsregister – über den Notar.
+  de: 'Wenn sich im Gesellschafterkreis etwas ändert, muss unverzüglich eine neue Gesellschafterliste zum Handelsregister – über den Notar, wenn er an der Änderung mitgewirkt hat, sonst durch die Geschäftsführung.'
 erklaerung:
-  de: Änderungen im Gesellschafterkreis werden notariell abgewickelt; die aktualisierte Gesellschafterliste wird beim Handelsregister
-    eingereicht.
+  de: 'Nach jeder Veränderung in den Personen der Gesellschafter oder im Umfang ihrer Beteiligung reicht die Geschäftsführung unverzüglich nach Wirksamwerden der Veränderung eine aktualisierte Gesellschafterliste beim Handelsregister ein (§ 40 Abs. 1 S. 1 GmbHG). Hat ein Notar an der Veränderung mitgewirkt, reicht er die Liste ein (§ 40 Abs. 2 GmbHG).'
 rechtsgrundlage:
-- GmbHG
+- § 40 GmbHG
 kategorie: gesellschaft
 ausloeser:
   all:
@@ -31,7 +30,7 @@ wiederholung:
   neu_ausloesen_bei:
   - ereignis: gesellschafterwechsel
 stelle:
-  de: Notarin oder Notar; Registergericht
+  de: 'Notarin oder Notar bzw. Geschäftsführung; Registergericht'
 kanal: notar
 kosten: null
 sanktion:
@@ -46,10 +45,6 @@ quellen:
 - titel: GmbH-Gesetz § 40
   url: https://www.gesetze-im-internet.de/gmbhg/__40.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- Frist für die Einreichung ergänzen
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (§ 40 GmbHG enthält kein Buß- oder Zwangsgeld, nur die Haftung nach Abs. 3; bei Mitwirkung eines Notars reicht dieser die Liste ein (§ 40 Abs. 2))'
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf
   geprueft_von: null

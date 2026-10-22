@@ -1,14 +1,14 @@
 # Katalog A.9 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gruendung.rundfunkbeitrag
-version: 3
+version: 4
 katalog_nr: A.9
 titel:
   de: Rundfunkbeitrag für Betriebsstätten und Firmenfahrzeuge zahlen
 kurz:
   de: Für jede Betriebsstätte außerhalb deiner Wohnung und für Firmenfahrzeuge zahlst du Rundfunkbeitrag – du meldest sie an und meldest Änderungen.
 erklaerung:
-  de: 'Im nicht privaten Bereich zahlst du für jede Betriebsstätte einen Rundfunkbeitrag, gestaffelt nach der Zahl der Beschäftigten: mit bis zu acht Beschäftigten ein Drittel des Beitrags, mit neun bis 19 Beschäftigten einen ganzen Beitrag, mit mehr Beschäftigten entsprechend mehr (§ 5 Abs. 1 RBStV). Ein Arbeitsraum in deiner eigenen Wohnung ist frei, wenn für die Wohnung schon Rundfunkbeitrag gezahlt wird (§ 5 Abs. 5 Nr. 3 RBStV). Für betrieblich genutzte Kraftfahrzeuge zahlst du je Fahrzeug ein Drittel des Beitrags; je beitragspflichtiger Betriebsstätte ist ein Fahrzeug frei (§ 5 Abs. 2 Nr. 2 RBStV). Den Beginn, neue Betriebsstätten und Fahrzeuge sowie Änderungen meldest du dem Beitragsservice (§ 8 RBStV).'
+  de: 'Im nicht privaten Bereich zahlst du für jede Betriebsstätte einen Rundfunkbeitrag, gestaffelt nach der Zahl der Beschäftigten: mit bis zu acht Beschäftigten ein Drittel des Beitrags, mit neun bis 19 Beschäftigten einen ganzen Beitrag, mit mehr Beschäftigten entsprechend mehr (§ 5 Abs. 1 RBStV). Ein Arbeitsraum in deiner eigenen Wohnung ist frei, wenn für die Wohnung schon Rundfunkbeitrag gezahlt wird (§ 5 Abs. 5 Nr. 3 RBStV). Für betrieblich genutzte Kraftfahrzeuge zahlst du je Fahrzeug ein Drittel des Beitrags; je beitragspflichtiger Betriebsstätte ist ein Fahrzeug frei (§ 5 Abs. 2 Nr. 2 RBStV). Den Beginn, neue Betriebsstätten und Fahrzeuge sowie Änderungen meldest du dem Beitragsservice innerhalb eines Monats (§ 8 Abs. 1 RBStV). Vermietest du Hotel- oder Gästezimmer zur vorübergehenden Beherbergung, fällt dafür zusätzlich Rundfunkbeitrag an (§ 5 Abs. 2 Nr. 1 RBStV).'
 rechtsgrundlage:
 - § 5 RBStV
 - § 8 RBStV
@@ -63,12 +63,6 @@ quellen:
 - titel: § 17 OWiG, Wortlaut (lxgesetze.de)
   url: https://lxgesetze.de/owig/17
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'R12 (Rechtsprüfung Befund 7, T-101): Wohnung frei (§ 5 Abs. 5 Nr. 3), Kfz (§ 5 Abs. 2 Nr. 2), Staffel (§ 5 Abs. 1) – Wortlaut über Bayern.Recht geprüft; laufende Pflicht je Betriebsstätte statt Gründungsschritt'
-- Anzeigepflichten nach § 8 RBStV (Frist, jährliche Meldung geänderter Beschäftigtenzahlen?) bestätigen; Hotel- und Gästezimmer (§ 5 Abs. 2 Nr. 1) nicht abgebildet
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Höhe nach Zahl der Beschäftigten – Staffel als Regelwert?
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (§ 12 RBStV über Bayern.Recht gelesen (Staatsvertrag, in allen Ländern gleich))'
 pruefung:
   status: entwurf
   geprueft_von: null

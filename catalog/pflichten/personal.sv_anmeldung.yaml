@@ -1,7 +1,7 @@
 # Katalog D.38 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.sv_anmeldung
-version: 2
+version: 3
 katalog_nr: D.38
 titel:
   de: Beschäftigte bei der Sozialversicherung anmelden
@@ -41,7 +41,7 @@ kanal: partner
 kosten: null
 sanktion:
   text:
-    de: Bußgeld bis 25.000 € (§ 111 SGB IV).
+    de: 'Bußgeld bis 25.000 € (§ 111 Abs. 1 Nr. 2, Abs. 4 SGB IV).'
   schwere: hoch
 automatisierung: partner
 erledigung:
@@ -58,10 +58,6 @@ quellen:
 - titel: Sozialgesetzbuch IV § 28a
   url: https://www.gesetze-im-internet.de/sgb_4/__28a.html
   abgerufen: null
-fachlich_zu_pruefen:
-- 'Frist nach § 6 DEÜV (erste Entgeltabrechnung, spätestens sechs Wochen) als „spätestens sechs Wochen nach Beginn“ umgesetzt (R10, Rechtsprüfung) – die frühere Abrechnung als Termin ist nicht abgebildet'
-- 'Sanktion aus der Rechtsprüfung R10 (G-16) übernommen – Fundstelle bestätigen'
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf
   geprueft_von: null

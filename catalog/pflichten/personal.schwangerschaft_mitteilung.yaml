@@ -1,14 +1,15 @@
 # Katalog D.43 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Offen (Produkt, kein Prüfpunkt): zuständige Behörde je Land als Liste pflegen (Freigabe Weber 22.10.2026)
 schema_version: 1
 id: personal.schwangerschaft_mitteilung
-version: 3
+version: 4
 katalog_nr: D.43
 titel:
   de: Schwangerschaft der Aufsichtsbehörde mitteilen
 kurz:
-  de: Teilt dir eine Beschäftigte ihre Schwangerschaft mit, informierst du die Aufsichtsbehörde.
+  de: 'Teilt dir eine Beschäftigte ihre Schwangerschaft mit, informierst du unverzüglich die Aufsichtsbehörde.'
 erklaerung:
-  de: Die Mitteilung an die zuständige Aufsichtsbehörde ist Pflicht des Arbeitgebers.
+  de: 'Die Mitteilung an die zuständige Aufsichtsbehörde ist Pflicht des Arbeitgebers und geht unverzüglich hinaus (§ 27 Abs. 1 S. 1 MuSchG). Zuständig ist die Arbeitsschutzbehörde bzw. Gewerbeaufsicht deines Landes, zum Beispiel in Baden-Württemberg das Regierungspräsidium, in Bayern das Gewerbeaufsichtsamt.'
 rechtsgrundlage:
 - § 27 MuSchG
 kategorie: personal
@@ -30,7 +31,7 @@ frist:
 wiederholung:
   art: einmalig
 stelle:
-  de: Aufsichtsbehörde für Mutterschutz (je Land)
+  de: 'Arbeitsschutzbehörde bzw. Gewerbeaufsicht des Landes'
 kanal: post
 kosten: null
 sanktion:
@@ -51,9 +52,6 @@ quellen:
 - titel: § 32 MuSchG, Wortlaut (gesetze.legal)
   url: https://gesetze.legal/bund/muschg/32
   abgerufen: '2026-10-21'
-fachlich_zu_pruefen:
-- Zuständige Behörde je Land
-- 'Vorprüfung 21.10.2026: Sanktion ergänzt – § 32 Abs. 1 Nr. 11 (§ 27 Abs. 1 Satz 1) und Abs. 2 über gesetze.legal gelesen'
 pruefung:
   status: entwurf
   geprueft_von: null

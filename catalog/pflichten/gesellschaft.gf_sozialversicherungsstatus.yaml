@@ -1,17 +1,17 @@
 # Katalog B.17 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.gf_sozialversicherungsstatus
-version: 1
+version: 2
 katalog_nr: B.17
 titel:
   de: Sozialversicherungsstatus der Geschäftsführung klären
 kurz:
   de: Kläre, ob Geschäftsführerinnen und Geschäftsführer sozialversicherungspflichtig sind – zum Beispiel mit einer Statusfeststellung.
 erklaerung:
-  de: Ob eine Geschäftsführerin oder ein Geschäftsführer sozialversicherungspflichtig beschäftigt ist, hängt vom Einzelfall
-    ab. Sicherheit schafft eine Statusfeststellung bei der Deutschen Rentenversicherung.
+  de: 'Ob eine Geschäftsführerin oder ein Geschäftsführer sozialversicherungspflichtig beschäftigt ist, hängt vom Einzelfall ab. Für Selbstständigkeit spricht nach der Rechtsprechung des Bundessozialgerichts ein Anteil von mindestens 50 % oder eine Sperrminorität. Kläre den Status vor der ersten Entgeltabrechnung. Meldest du einen Gesellschafter-Geschäftsführer zur Sozialversicherung an, leitet die Einzugsstelle das Statusfeststellungsverfahren von Amts wegen ein (§ 7a Abs. 1 S. 2 SGB IV); Sicherheit schafft auch ein eigener Antrag bei der Deutschen Rentenversicherung.'
 rechtsgrundlage:
 - § 7a SGB IV
+- § 25 Abs. 1 SGB IV
 kategorie: gesellschaft
 ausloeser:
   feld: abgeleitet.ist_kapitalgesellschaft
@@ -29,7 +29,7 @@ kanal: post
 kosten: null
 sanktion:
   text:
-    de: Die Folgen sind noch nicht fachlich erfasst.
+    de: 'Wird ein Geschäftsführer zu Unrecht nicht als Beschäftigter geführt, sind Beiträge bis zu vier Jahre nachzuzahlen (§ 25 Abs. 1 SGB IV), bei Vorsatz strafbar (§ 266a StGB).'
   schwere: mittel
 automatisierung: hinweis
 status_recht: in_kraft
@@ -39,11 +39,6 @@ quellen:
 - titel: Sozialgesetzbuch IV § 7a
   url: https://www.gesetze-im-internet.de/sgb_4/__7a.html
   abgerufen: null
-fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Kriterien (Beteiligung, Sperrminorität) nicht in der Spezifikation – nur als Hinweis auf die Statusfeststellung darstellen
-- Folgen bei Nichterfüllung nicht in der Spezifikation genannt – Sanktion fachlich ergänzen
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf
   geprueft_von: null

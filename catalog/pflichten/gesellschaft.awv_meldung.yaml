@@ -1,25 +1,30 @@
 # Katalog B.21 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.awv_meldung
-version: 3
+version: 4
 katalog_nr: B.21
 titel:
   de: Auslandszahlungen nach AWV melden
 kurz:
-  de: Bei grenzüberschreitenden Zahlungen über der Meldegrenze – zum Beispiel Investorengeld aus dem Ausland – besteht eine
-    Meldepflicht.
+  de: 'Zahlungen über 50.000 €, die du von Gebietsfremden erhältst oder an Gebietsfremde leistest – zum Beispiel Investorengeld aus dem Ausland –, meldest du der Bundesbank.'
 erklaerung:
-  de: Die Außenwirtschaftsverordnung verlangt Meldungen bei grenzüberschreitenden Zahlungen über einer Meldegrenze. Frag bei
-    deiner Bank oder der Bundesbank nach der aktuellen Grenze.
+  de: 'Die Außenwirtschaftsverordnung verlangt Meldungen für Zahlungen, die du von Gebietsfremden erhältst oder an Gebietsfremde leistest (§ 67 AWV). Meldepflichtig sind seit dem 1.1.2025 Zahlungen über 50.000 € (§ 67 Abs. 2 Nr. 1 AWV) – das gilt für alle solchen Zahlungen, nicht nur für Geld von Investoren. Ausgenommen sind Zahlungen für die Einfuhr, Ausfuhr oder Verbringung von Waren. Die Meldung geht elektronisch an die Deutsche Bundesbank.'
 rechtsgrundlage:
-- AWV
+- § 67 AWV
 kategorie: gesellschaft
 ausloeser:
-  feld: profil.gesellschafter.auslaendische_investoren
-  op: ==
-  wert: true
-  label:
-    de: Du hast Investoren aus dem Ausland.
+  any:
+  - feld: profil.gesellschafter.auslaendische_investoren
+    op: ==
+    wert: true
+    label:
+      de: Du hast Investoren aus dem Ausland.
+  # Freigabe Weber 22.10.2026: Meldepflicht für alle Zahlungen von/an Gebietsfremde über 50.000 € (außer Warenverkehr), nicht nur bei Investoren
+  - feld: profil.auslandszahlungen.ueber_meldegrenze
+    op: ==
+    wert: true
+    label:
+      de: Du erhältst Zahlungen aus dem Ausland oder leistest Zahlungen ins Ausland über 50.000 €.
 frist:
   typ: dauerhaft
 wiederholung:
@@ -49,12 +54,11 @@ quellen:
 - titel: Außenwirtschaftsverordnung § 67
   url: https://www.gesetze-im-internet.de/awv_2013/__67.html
   abgerufen: '2026-10-22'
+- titel: 'Außenwirtschaftsverordnung § 71'
+  url: https://www.gesetze-im-internet.de/awv_2013/__71.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Meldegrenze als Regelwert erfassen (nicht in der Spezifikation)
-- Meldefrist ergänzen
-- Auch ohne Investoren bei Auslandszahlungen über der Grenze – weiterer Auslöser?
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (§ 81 Abs. 2 Nr. 19 AWV (Meldung nach § 67 Abs. 1) und § 19 Abs. 6 AWG gelesen; Meldegrenze laut § 67 Abs. 2 Nr. 1 AWV 50.000 € – Erklärung nennt keine Grenze, ggf. ergänzen)'
+- 'Freigabe RA Dr. Weber 22.10.2026: Meldegrenze und Auslöser umgesetzt. Meldefrist NICHT übernommen – er nennt „bis zum 7. Kalendertag des Folgemonats (§ 71 Abs. 8 AWV)“; laut Wortlaut (gesetze-im-internet.de und lexmea.de, 22.10.2026) hat § 71 AWV sechs Absätze, Abs. 6: Meldungen nach § 67 „bis zum siebten Werktag des folgenden Monats“ (so auch Forvis Mazars 3/2025) – Frist mit dem Prüfer klären'
 pruefung:
   status: entwurf
   geprueft_von: null

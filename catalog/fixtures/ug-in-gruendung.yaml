@@ -20,6 +20,8 @@ fakten:
   profil.beschaeftigte.gesamt: 0
   profil.gesellschafter.anzahl: 2
   profil.gesellschafter.auslaendische_investoren: false
+  # Freigabe Weber 22.10.2026: AWV-Meldung auch ohne Investoren bei Zahlungen von/an Gebietsfremde über 50.000 €
+  profil.auslandszahlungen.ueber_meldegrenze: false
   profil.gesellschaft.handelsregister: nicht_beantragt
   profil.gesellschaft.geschaeftsjahr: kalenderjahr
   profil.bundesland: SN

@@ -46,6 +46,9 @@ eintraege:
   en: As a trader, you are automatically a member of the IHK or Chamber of Crafts and pay a fee based on your earnings.
 - de: Als Kleinunternehmer darfst du bestimmte Umsatzgrenzen nicht überschreiten – sonst endet die Regelung.
   en: Under the small business scheme, you must not exceed certain revenue limits – otherwise the scheme ends.
+- de: Als Versicherungsvermittler oder Versicherungsberater, Finanzanlagen- oder Immobiliardarlehensvermittler lässt du dich nach der Erlaubnis ins Vermittlerregister eintragen und hältst die Angaben aktuell.
+  en: As an insurance intermediary or insurance adviser, financial investment or real estate loan intermediary you register in the intermediary register after receiving your permit and keep the details
+    up to date.
 - de: Anfrage einer betroffenen Person beantworten
   en: Respond to a request from a data subject
 - de: Anlässe mit Fundstellen im Anhang der ArbMedVV, Vorsorgekartei und Fristen nach AMR 2.1 ergänzt.
@@ -80,6 +83,8 @@ eintraege:
   en: Workplaces from which the employment quota applies
 - de: Arbeitsschutz mit Auftraggebern und anderen Firmen abstimmen
   en: Coordinate occupational safety with clients and other companies
+- de: Arbeitsschutzbehörde bzw. Gewerbeaufsicht des Landes
+  en: State occupational safety authority or trade inspectorate (Gewerbeaufsicht)
 - de: Arbeitsunfall der Berufsgenossenschaft anzeigen
   en: Report a workplace accident to the employers' liability insurance association
 - de: Arbeitszeit aufzeichnen
@@ -102,12 +107,16 @@ eintraege:
   en: Retention period for commercial and business letters
 - de: Aufbewahrungsfrist für Jahresabschlüsse, Bücher und Organisationsunterlagen
   en: Retention period for annual financial statements, books and organisational documents
-- de: Aufsichtsbehörde für Mutterschutz (je Land)
-  en: Supervisory authority for maternity protection (per federal state)
 - de: Auftragsverarbeitung
   en: Processing on behalf
 - de: Auftragsverarbeitungsverträge abschließen
   en: Conclude data processing agreements
+- de: Ausbildende beantragen unverzüglich nach Abschluss des Berufsausbildungsvertrags die Eintragung in das Verzeichnis der Berufsausbildungsverhältnisse bei der zuständigen Stelle – im Handwerk bei der
+    Handwerkskammer (Lehrlingsrolle), sonst meist bei der IHK (§ 36 Abs. 1 BBiG) – am besten gleich nach der Unterschrift; als spätesten Termin zeigt Amtlos den Ausbildungsbeginn. Eine Ausfertigung der
+    Vertragsniederschrift fügst du bei. Ohne Eintragung wird der Azubi nicht zur Abschlussprüfung zugelassen.
+  en: Training employers apply for entry in the register of vocational training relationships with the competent body without delay after concluding the training contract – in the crafts with the Chamber
+    of Crafts (apprentice register), otherwise usually with the IHK (§ 36(1) BBiG) – ideally right after signing; Amtlos shows the start of training as the latest date. You enclose a copy of the written
+    contract. Without the entry the apprentice is not admitted to the final examination.
 - de: Ausgenommen sind Kleinstunternehmen mit weniger als 10 Beschäftigten und höchstens 2 Mio. € Umsatz oder Bilanzsumme – diese Ausnahme gilt für Dienstleistungen. Der Online-Check macht automatisierte
     Basistests nach WCAG.
   en: Micro-enterprises with fewer than 10 employees and no more than €2 million in revenue or balance sheet total are exempt; this exemption applies to services. The online check runs automated basic tests
@@ -132,6 +141,20 @@ eintraege:
   en: 'Apply for an ELSTER account early: the activation comes by post and takes a few days.'
 - de: Bei Beteiligungen ausländischer Investoren an Unternehmen in sensiblen Sektoren kann der Staat die Investition prüfen. Amtlos gibt hier nur einen allgemeinen Hinweis.
   en: If foreign investors take stakes in companies in sensitive sectors, the state may review the investment. Amtlos only gives a general note here.
+- de: Beantrage frühzeitig ein ELSTER-Konto, wenn du den Fragebogen selbst abgibst – die Aktivierung kommt per Post und dauert einige Tage.
+  en: If you submit the questionnaire yourself, apply for an ELSTER account early – the activation comes by post and takes a few days.
+- de: Bei 2 bis 20 anwesenden Versicherten brauchst du mindestens einen Ersthelfer, bei mehr Anwesenden je nach Betriebsart 5 oder 10 Prozent (§ 26 Abs. 1 DGUV Vorschrift 1). Ersthelfer werden bei einer
+    von der BG ermächtigten Stelle ausgebildet und in der Regel alle zwei Jahre fortgebildet (§ 26 Abs. 2, 3 DGUV Vorschrift 1); die Kosten der Lehrgänge trägt meist die BG. Als Inhaberin oder Inhaber zählst
+    du nur mit, wenn du selbst versichert bist – Amtlos zählt vorsichtshalber alle Anwesenden, also schon ab der ersten beschäftigten Person. Plane Vertretungen für Urlaub, Krankheit und Schichten ein.
+    Verbandkasten, Notruf-Aushang und Verbandbuch sind eine eigene Pflicht, Brandschutzhelfer ebenfalls.
+  en: With 2 to 20 insured persons present you need at least one first aider, with more people present 5 or 10 per cent depending on the type of business (§ 26(1) DGUV Regulation 1). First aiders are trained
+    at a body authorised by the BG and usually receive refresher training every two years (§ 26(2), (3) DGUV Regulation 1); the BG usually pays for the courses. As the owner you only count if you are insured
+    yourself – to be on the safe side, Amtlos counts everyone present, so already from the first employee. Plan substitutes for holidays, illness and shifts. First-aid kit, emergency call notice and first-aid
+    log are a separate obligation, as are fire safety assistants.
+- de: Bei Beteiligungen ausländischer Investoren an Unternehmen in sensiblen Sektoren kann der Staat die Investition prüfen. Welche Sektoren sensibel sind und ab welchem Anteil an den Stimmrechten (je nach
+    Sektor 10 %, 20 % oder 25 %) geprüft wird, regelt die Außenwirtschaftsverordnung (§ 55a AWV). Amtlos gibt hier nur einen allgemeinen Hinweis.
+  en: If foreign investors take stakes in companies in sensitive sectors, the state may review the investment. Which sectors are sensitive and from which share of the voting rights (10%, 20% or 25% depending
+    on the sector) a review takes place is set out in the Foreign Trade and Payments Ordinance (§ 55a AWV). Amtlos only gives a general note here.
 - de: Bei Verträgen mit Verbrauchern über Fernabsatz belehrst du über das Widerrufsrecht.
   en: For distance contracts with consumers, you inform them about the right of withdrawal.
 - de: Bei Zahlungsunfähigkeit oder Überschuldung muss die Geschäftsführung rechtzeitig Insolvenz beantragen.
@@ -146,8 +169,6 @@ eintraege:
   en: If your financial year differs from the calendar year, Amtlos does not calculate the date yet; the deadline is twelve months after the end of the financial year.
 - de: Bei einer Datenpanne meldest du sie binnen 72 Stunden der Datenschutz-Aufsichtsbehörde.
   en: If there is a data breach, you report it to the data protection supervisory authority within 72 hours.
-- de: Bei grenzüberschreitenden Zahlungen über der Meldegrenze – zum Beispiel Investorengeld aus dem Ausland – besteht eine Meldepflicht.
-  en: For cross-border payments above the reporting threshold – for example investor money from abroad – there is a reporting obligation.
 - de: Beim BSI registrieren (NIS2)
   en: Register with the BSI (NIS2)
 - de: Beitragsnachweis übermitteln
@@ -184,6 +205,16 @@ eintraege:
   en: If you operate a beverage dispensing system with a CO2 cylinder or a liquefied gas system, you have it inspected by a qualified person before commissioning and regularly afterwards.
 - de: Betreuungsformen (Regelbetreuung, Unternehmermodell) erklärt; Folgen ergänzt.
   en: Forms of support (standard support, entrepreneur model) explained; consequences added.
+- de: Betriebe ab 20 Arbeitsplätzen beschäftigen auf mindestens 5 % der Arbeitsplätze schwerbehinderte Menschen (§ 154 Abs. 1 SGB IX); sonst zahlen sie eine nach der Erfüllung der Quote gestaffelte Ausgleichsabgabe
+    (§ 160 Abs. 2 SGB IX). Die Anzeige und die Ausgleichsabgabe sind bis zum 31. März für das Vorjahr fällig (§ 163 Abs. 2 SGB IX); fällt der Tag auf ein Wochenende oder einen Feiertag, reicht der nächste
+    Werktag (§ 26 Abs. 3 SGB X). Als Arbeitsplätze zählen Stellen von Arbeitnehmern und Auszubildenden; Stellen mit weniger als 18 Wochenstunden – oft Minijobs – und Stellen für höchstens acht Wochen zählen
+    nicht (§ 156 Abs. 1, 3 SGB IX). Teilzeitstellen ab 18 Stunden zählen voll, Ausbildungsstellen bleiben bei der Mindestzahl außer Betracht (§ 157 Abs. 1 SGB IX). Wer insgesamt weniger als 20 Personen
+    beschäftigt, liegt sicher unter der Schwelle.
+  en: Businesses with 20 or more workplaces employ severely disabled people in at least 5% of the workplaces (§ 154(1) SGB IX); otherwise they pay a compensatory levy graded by how far the quota is met
+    (§ 160(2) SGB IX). The report and the compensatory levy are due by 31 March for the previous year (§ 163(2) SGB IX); if that day falls on a weekend or public holiday, the next working day is sufficient
+    (§ 26(3) SGB X). Workplaces are positions of employees and apprentices; positions with fewer than 18 hours a week – often mini-jobs – and positions for no more than eight weeks do not count (§ 156(1),
+    (3) SGB IX). Part-time positions of 18 hours or more count in full; training positions are disregarded for the minimum number (§ 157(1) SGB IX). Anyone employing fewer than 20 people in total is safely
+    below the threshold.
 - de: Betriebsanweisungen für Maschinen und Arbeitsmittel
   en: Operating instructions for machines and work equipment
 - de: Betriebsarzt
@@ -222,8 +253,8 @@ eintraege:
   en: Federal Employment Agency (Bundesagentur für Arbeit), establishment number service
 - de: Bundesamt für Sicherheit in der Informationstechnik (BSI)
   en: Federal Office for Information Security (BSI)
-- de: Bundesministerium für Wirtschaft und Klimaschutz
-  en: Federal Ministry for Economic Affairs and Climate Action
+- de: Bundesministerium für Wirtschaft und Energie (BMWE)
+  en: Federal Ministry for Economic Affairs and Energy (BMWE)
 - de: Bundeszentralamt für Steuern
   en: Federal Central Tax Office (Bundeszentralamt für Steuern)
 - de: Bundeszentralamt für Steuern (BZSt)
@@ -237,10 +268,20 @@ eintraege:
   en: Fine of up to €10,000 if first-aid supplies or alarm facilities are missing or first aid given is not documented (§ 32 DGUV Regulation 1 in conjunction with § 209(1) no. 1, (3) SGB VII).
 - de: 'Bußgeld bis 10.000 €, wenn Herstellerangaben oder Sicherheitsinformationen fehlen oder im Fernabsatz die Pflichtangaben nach Art. 19 GPSR fehlen (§ 28 Abs. 2 Nr. 5, 6, 26, Abs. 3 ProdSG).'
   en: 'Fine of up to €10,000 if manufacturer details or safety information are missing or, in distance selling, the mandatory information under Art. 19 GPSR is missing (§ 28(2) nos. 5, 6, 26, (3) ProdSG).'
+- de: Bußgeld bis 10.000 €, wenn die Anzeige nicht, nicht richtig, nicht vollständig, nicht in der vorgeschriebenen Weise oder nicht rechtzeitig erstattet wird (§ 238 Abs. 1 Nr. 3, Abs. 2 SGB IX). Für eine
+    nicht rechtzeitig gezahlte Ausgleichsabgabe fällt ein Säumniszuschlag an (§ 160 Abs. 4 S. 2 SGB IX).
+  en: Fine of up to €10,000 if the report is not made, or is made incorrectly, incompletely, not in the prescribed manner or late (§ 238(1) no. 3, (2) SGB IX). If the compensatory levy is not paid on time,
+    a late payment surcharge applies (§ 160(4) sentence 2 SGB IX).
+- de: Bußgeld bis 10.000 €, wenn die Betreuung fehlt (Bußgeldvorschrift der DGUV Vorschrift 2 deiner BG in Verbindung mit § 209 Abs. 1 Nr. 1, Abs. 3 SGB VII).
+  en: Fine of up to €10,000 if support is missing (the fine provision of your BG's DGUV Regulation 2 in conjunction with § 209(1) no. 1, (3) SGB VII).
 - de: 'Bußgeld bis 10.000 €, wenn die Ware nicht auch in Mehrwegverpackungen angeboten wird, Mehrweg teurer oder zu schlechteren Bedingungen angeboten wird oder der Hinweis fehlt (§ 66 Abs. 1 Nr. 26, 28, 29, Abs. 3 VerpackDG).'
   en: 'Fine of up to €10,000 if the goods are not also offered in reusable packaging, reusable packaging is offered at a higher price or on worse terms, or the notice is missing (§ 66(1) nos. 26, 28, 29, (3) VerpackDG).'
 - de: Bußgeld bis 10.000 €, wenn die erforderlichen Ersthelfer fehlen (§ 32 DGUV Vorschrift 1 in Verbindung mit § 209 Abs. 1 Nr. 1, Abs. 3 SGB VII).
   en: Fine of up to €10,000 if the required first aiders are missing (§ 32 DGUV Regulation 1 in conjunction with § 209(1) no. 1, (3) SGB VII).
+- de: Bußgeld bis 10.000 €, wenn du ein zulassungspflichtiges Handwerk ohne Eintragung in die Handwerksrolle betreibst (§ 117 Abs. 1 Nr. 1, Abs. 2 HwO); erbringst du dabei Dienst- oder Werkleistungen in
+    erheblichem Umfang, bis 50.000 € (§ 8 Abs. 1 Nr. 1 Buchst. e, Abs. 5 SchwarzArbG).
+  en: Fine of up to €10,000 if you run a licensed craft without being entered in the crafts register (§ 117(1) no. 1, (2) HwO); if you provide services or work to a considerable extent in doing so, up to
+    €50,000 (§ 8(1) no. 1(e), (5) SchwarzArbG).
 - de: Bußgeld bis 10.000 €, wenn elektrische Anlagen und Betriebsmittel nicht geprüft werden (§ 9 DGUV Vorschrift 3 in Verbindung mit § 209 Abs. 1 Nr. 1, Abs. 3 SGB VII).
   en: Fine of up to €10,000 if electrical installations and equipment are not inspected (§ 9 DGUV Regulation 3 in conjunction with § 209(1) no. 1, (3) SGB VII).
 - de: 'Bußgeld bis 100.000 €, wenn Abfälle nicht richtig getrennt gesammelt werden (§ 13 Abs. 1 Nr. 1 GewAbfV in Verbindung mit § 69 Abs. 1 Nr. 8, Abs. 3 KrWG), und bis 10.000 €, wenn die Dokumentation fehlt oder nicht rechtzeitig vorgelegt wird (§ 13 Abs. 2 Nr. 1, 2 GewAbfV in Verbindung mit § 69 Abs. 2 Nr. 15, Abs. 3 KrWG).'
@@ -261,6 +302,9 @@ eintraege:
   en: 'Fine of up to €100,000 if no collection point is set up or proven, or the notice is missing (§ 10(1) no. 6 AltölV in conjunction with § 69(1) no. 8, (3) KrWG).'
 - de: 'Bußgeld bis 150.000 € bei Vorsatz, sonst bis 100.000 €, etwa wenn Risikoanalyse, interne Sicherungsmaßnahmen oder die Identifizierung fehlen; bei schwerwiegenden, wiederholten oder systematischen Verstößen bis 1 Mio. € oder bis zum Zweifachen des wirtschaftlichen Vorteils, für Verpflichtete nach § 2 Abs. 1 Nr. 1 bis 3 und 6 bis 9 GwG auch mehr (§ 56 Abs. 1 Satz 1 Nr. 1, 3, 15, Abs. 3 GwG).'
   en: 'Fine of up to €150,000 for intent, otherwise up to €100,000, for example if the risk analysis, internal safeguards or identification are missing; for serious, repeated or systematic violations up to €1 million or up to twice the economic benefit, and more for obliged entities under § 2(1) nos. 1 to 3 and 6 to 9 GwG (§ 56(1) sentence 1 nos. 1, 3, 15, (3) GwG).'
+- de: Bußgeld bis 2.500 €, wenn der Lohnnachweis nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig gemeldet wird (§ 209 Abs. 1 Nr. 5 Buchst. a, Abs. 3 SGB VII in Verbindung mit § 165 Abs. 1
+    SGB VII).
+  en: Fine of up to €2,500 if the wage statement (Lohnnachweis) is not submitted, or is submitted incorrectly, incompletely or late (§ 209(1) no. 5(a), (3) SGB VII in conjunction with § 165(1) SGB VII).
 - de: Bußgeld bis 2.500 €, wenn die Anzeige nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig erstattet wird (§ 209 Abs. 1 Nr. 9, Abs. 3 SGB VII).
   en: Fine of up to €2,500 if the report is not filed, not filed correctly, completely or on time (§ 209(1) no. 9, (3) SGB VII).
 - de: 'Bußgeld bis 2.500 €, wenn die Mitteilung zum Unternehmensbeginn nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig gemacht wird (§ 209 Abs. 1 Nr. 8, Abs. 3 SGB VII). Eine Gewerbeanzeige in derselben Woche erfüllt die Pflicht (§ 192 Abs. 1 SGB VII).'
@@ -271,6 +315,11 @@ eintraege:
   en: 'Fine of up to €25,000 if transactions that must be booked are not recorded or recorded incorrectly and this makes tax evasion possible (§ 379(1) sentence 1 no. 3, (6) AO). Anyone who does not keep legally required commercial books or does not prepare the balance sheet on time commits a criminal offence if payments are later stopped or insolvency proceedings are opened or rejected for lack of assets: imprisonment of up to two years or a fine (§ 283b(1) nos. 1, 3, (3) StGB).'
 - de: 'Bußgeld bis 25.000 €, wenn die Kasse nicht oder nicht richtig verwendet oder nicht oder nicht richtig durch eine TSE geschützt wird und dadurch Steuerverkürzungen ermöglicht werden (§ 379 Abs. 1 Satz 1 Nr. 4, 5, Abs. 6 AO). Für die fehlende Belegausgabe nach § 146a Abs. 2 AO sieht § 379 AO kein Bußgeld vor.'
   en: 'Fine of up to €25,000 if the cash register is not used or not used correctly, or not protected or not correctly protected by a TSE, and this makes tax evasion possible (§ 379(1) sentence 1 nos. 4, 5, (6) AO). § 379 AO provides no fine for failing to issue receipts under § 146a(2) AO.'
+- de: Bußgeld bis 25.000 €, wenn du die Sofortmeldung nicht, nicht richtig, nicht vollständig, nicht in der vorgeschriebenen Weise oder nicht rechtzeitig erstattest (§ 111 Abs. 1 Nr. 2 Buchst. b, Abs. 4
+    SGB IV).
+  en: Fine of up to €25,000 if you do not file the immediate report, or file it incorrectly, incompletely, not in the prescribed manner or late (§ 111(1) no. 2(b), (4) SGB IV).
+- de: Bußgeld bis 30.000 € (§ 21 Abs. 1 Nr. 7, Abs. 3 MiLoG).
+  en: Fine of up to €30,000 (§ 21(1) no. 7, (3) MiLoG).
 - de: 'Bußgeld bis 30.000 €, wenn eine meldepflichtige Zahlung nicht, nicht richtig, nicht vollständig oder nicht rechtzeitig gemeldet wird (§ 81 Abs. 2 Nr. 19 AWV in Verbindung mit § 19 Abs. 3 Nr. 1 Buchst. b, Abs. 6 AWG).'
   en: 'Fine of up to €30,000 if a reportable payment is not reported, or not reported correctly, completely or on time (§ 81(2) no. 19 AWV in conjunction with § 19(3) no. 1 letter b, (6) AWG).'
 - de: 'Bußgeld bis 20.000 €, wenn gewerblicher Güterkraftverkehr ohne die nach § 3 Abs. 1 GüKG erforderliche Gemeinschaftslizenz durchgeführt wird (§ 19 Abs. 1 Nr. 1b, Abs. 7 GüKG); ebenso grenzüberschreitend ohne Gemeinschaftslizenz nach Art. 3 VO (EG) Nr. 1072/2009 (§ 19 Abs. 2 Nr. 1, Abs. 7 GüKG).'
@@ -336,6 +385,16 @@ eintraege:
   en: The tax office has set prepayments.
 - de: Das Kapital, das die Gesellschafter bei der Gründung einer GmbH oder UG mindestens aufbringen.
   en: The minimum capital that the shareholders contribute when founding a GmbH or UG.
+- de: Das Nachweisgesetz verlangt, dass die wesentlichen Arbeitsbedingungen dokumentiert und der beschäftigten Person ausgehändigt werden. Name und Anschrift der Vertragsparteien, Arbeitsentgelt und Arbeitszeit
+    müssen spätestens am ersten Arbeitstag vorliegen, Beginn, Befristung, Arbeitsort, Tätigkeit, Probezeit, Arbeit auf Abruf und Überstunden spätestens am siebten Kalendertag, die übrigen Angaben binnen
+    eines Monats (§ 2 Abs. 1 Satz 9 NachwG). Seit 1.1.2025 reicht die Textform, wenn das Dokument für die beschäftigte Person zugänglich ist, gespeichert und ausgedruckt werden kann und du sie aufforderst,
+    den Empfang zu bestätigen (§ 2 Abs. 1 Satz 2 NachwG). In den Branchen nach § 2a Abs. 1 SchwarzArbG – seit 30.12.2025 auch im Friseur- und Kosmetikgewerbe – bleibt die Schriftform vorgeschrieben (§ 2
+    Abs. 1 Satz 6 NachwG). Deshalb erscheint die Pflicht schon, sobald eine Einstellung mit Arbeitsbeginn eingetragen ist; der Termin ist der erste Arbeitstag.
+  en: The Documentation Act (Nachweisgesetz) requires that the essential working conditions are documented and handed to the employee. Names and addresses of the parties, pay and working hours must be provided
+    by the first working day at the latest; start date, fixed term, place of work, duties, probation, on-call work and overtime by the seventh calendar day; the other details within one month (§ 2(1) sentence
+    9 NachwG). Since 1.1.2025 text form is sufficient if the document is accessible to the employee, can be saved and printed, and you ask them to confirm receipt (§ 2(1) sentence 2 NachwG). In the sectors
+    under § 2a(1) SchwarzArbG – since 30.12.2025 also in hairdressing and beauty – the written form remains required (§ 2(1) sentence 6 NachwG). That is why this obligation appears as soon as a hiring with
+    a start date has been entered; the due date is the first working day.
 - de: Das Verzeichnis beschreibt je Verarbeitung Zweck, betroffene Personen, Datenarten, Empfänger und Löschfristen. Amtlos hilft beim Anlegen und erzeugt das Verzeichnis als PDF.
   en: For each processing activity, the record describes the purpose, people affected, types of data, recipients and deletion periods. Amtlos helps you set it up and generates the record as a PDF.
 - de: Daten deiner Beschäftigten verarbeitest du nur, soweit es für das Arbeitsverhältnis nötig ist.
@@ -420,10 +479,20 @@ eintraege:
   en: The contribution statement notifies the health insurance fund of the contributions. It must be received two working days before the due date and is submitted by your payroll software.
 - de: Der Button, mit dem Verbraucher kostenpflichtig bestellen, muss eindeutig auf die Zahlungspflicht hinweisen.
   en: The button consumers use to place a paid order must clearly indicate the obligation to pay.
-- de: Der Gründungszuschuss ist eine Förderung der Agentur für Arbeit. Er muss vor Beginn der Selbstständigkeit beantragt werden.
-  en: The start-up grant (Gründungszuschuss) is funding from the Federal Employment Agency (Agentur für Arbeit). You must apply for it before you start your self-employment.
+- de: Der Gründungszuschuss ist eine Förderung der Agentur für Arbeit. Er muss vor Beginn der Selbstständigkeit beantragt werden. Voraussetzung ist unter anderem ein Restanspruch auf Arbeitslosengeld I
+    von mindestens 150 Tagen (§ 93 Abs. 2 Nr. 1 SGB III).
+  en: The start-up grant (Gründungszuschuss) is funding from the Federal Employment Agency (Agentur für Arbeit). You must apply for it before you start your self-employment. One requirement is a remaining
+    entitlement to unemployment benefit I of at least 150 days (§ 93(2) no. 1 SGB III).
 - de: Der Jahresabschluss wird öffentlich zugänglich beim Unternehmensregister eingereicht.
   en: The annual financial statements are filed with the company register (Unternehmensregister), where they are publicly accessible.
+- de: Der Mindestlohn beträgt 13,90 € je Stunde ab 1.1.2026 und 14,60 € ab 1.1.2027. Amtlos führt die Werte mit Gültigkeitszeitraum. In manchen Branchen gelten höhere Branchenmindestlöhne aus allgemeinverbindlichen
+    Tarifverträgen oder Verordnungen nach dem Arbeitnehmer-Entsendegesetz, zum Beispiel in der Gebäudereinigung, in Teilen des Bau- und Ausbaugewerbes und in der Pflege. Prüfe, ob einer für deinen Betrieb
+    gilt – Amtlos kennt die Beträge noch nicht. Ausgenommen vom gesetzlichen Mindestlohn sind unter anderem Auszubildende, Pflichtpraktika, freiwillige Praktika bis zu drei Monaten, Jugendliche unter 18
+    ohne abgeschlossene Berufsausbildung und Langzeitarbeitslose in den ersten sechs Monaten der Beschäftigung (§ 22 MiLoG).
+  en: The minimum wage is €13.90 per hour from 1.1.2026 and €14.60 from 1.1.2027. Amtlos keeps the values with their validity period. In some sectors higher sector minimum wages apply under collective agreements
+    declared generally binding or ordinances under the Posted Workers Act, for example in building cleaning, parts of construction and finishing trades and in care. Check whether one applies to your business
+    – Amtlos does not know the amounts yet. Exempt from the statutory minimum wage are, among others, apprentices, mandatory internships, voluntary internships of up to three months, young people under
+    18 without completed vocational training and the long-term unemployed in the first six months of employment (§ 22 MiLoG).
 - de: Der Vertrag regelt, wie der Dienstleister die Daten nach deinen Weisungen verarbeitet. Amtlos führt die Liste deiner Dienstleister und legt die Verträge ab.
   en: The agreement sets out how the service provider processes the data according to your instructions. Amtlos keeps the list of your service providers and files the agreements.
 - de: Deutsche Bundesbank
@@ -438,6 +507,12 @@ eintraege:
   en: German Pension Insurance (Deutsche Rentenversicherung), clearing office (Clearingstelle)
 - de: Die Anforderungen ergeben sich aus dem Infektionsschutz und den Hygieneverordnungen der Länder.
   en: The requirements come from infection protection law and the hygiene ordinances of the federal states.
+- de: Die Außenwirtschaftsverordnung verlangt Meldungen für Zahlungen, die du von Gebietsfremden erhältst oder an Gebietsfremde leistest (§ 67 AWV). Meldepflichtig sind seit dem 1.1.2025 Zahlungen über
+    50.000 € (§ 67 Abs. 2 Nr. 1 AWV) – das gilt für alle solchen Zahlungen, nicht nur für Geld von Investoren. Ausgenommen sind Zahlungen für die Einfuhr, Ausfuhr oder Verbringung von Waren. Die Meldung
+    geht elektronisch an die Deutsche Bundesbank.
+  en: The Foreign Trade and Payments Ordinance requires reports for payments you receive from or make to non-residents (§ 67 AWV). Since 1.1.2025, payments of more than €50,000 must be reported (§ 67(2)
+    no. 1 AWV) – this applies to all such payments, not only to money from investors. Payments for the import, export or transfer of goods are exempt. The report is submitted electronically to the Deutsche
+    Bundesbank.
 - de: Die Baustellenverordnung verteilt die Pflichten nach Rollen. Der Bauherr kündigt größere Baustellen mindestens zwei Wochen vor Einrichtung der Behörde an – bei mehr als 30 Arbeitstagen mit mehr als
     20 gleichzeitig Beschäftigten oder mehr als 500 Personentagen (§ 2 Abs. 2 BaustellV) –, lässt einen Sicherheits- und Gesundheitsschutzplan (SiGe-Plan) erstellen, wenn mehrere Arbeitgeber tätig sind
     und eine Vorankündigung nötig ist oder besonders gefährliche Arbeiten anfallen (§ 2 Abs. 3), und bestellt bei mehreren Arbeitgebern einen Koordinator (§ 3 Abs. 1). Als ausführende Firma triffst du die
@@ -450,10 +525,16 @@ eintraege:
     own hall, the obligations under §§ 2 and 3 apply to you.
 - de: Die Beiträge zur Sozialversicherung sind am drittletzten Bankarbeitstag des Monats fällig.
   en: Social security contributions are due on the third-to-last bank working day of the month.
+- de: Die Berufsgenossenschaft berechnet ihren Beitrag aus den Arbeitsentgelten. Dafür übermittelst du nach Ablauf jedes Kalenderjahres bis zum 16. Februar des Folgejahres den digitalen Lohnnachweis (§
+    165 Abs. 1 SGB VII in Verbindung mit § 99 SGB IV), in der Regel über das Lohnprogramm oder deine Steuerberatung. Die Jahresmeldung zur Unfallversicherung je beschäftigter Person ist eine eigene Meldung.
+  en: The employers' liability insurance association calculates its contribution from wages. For this you submit the digital wage statement after the end of each calendar year, by 16 February of the following
+    year (§ 165(1) SGB VII in conjunction with § 99 SGB IV), usually via the payroll software or your tax adviser. The annual accident insurance report for each employee is a separate report.
 - de: Die Berufsgenossenschaft ist die gesetzliche Unfallversicherung für Betriebe. Welche zuständig ist, hängt von deiner Branche ab. Ob du dich selbst als Unternehmer versichern musst, hängt ebenfalls
-    von der Branche ab.
+    von der Branche ab. Die Woche beginnt mit der Aufnahme der Tätigkeit, nicht mit der Gründung einer Gesellschaft (§ 192 Abs. 1 SGB VII). Anmelden muss sich jedes Unternehmen, unabhängig von Rechtsform
+    und Beschäftigten – ausgenommen Unternehmen, für die eine Unfallkasse oder die Sozialversicherung für Landwirtschaft, Forsten und Gartenbau (SVLFG) zuständig ist.
   en: The employers' liability insurance association (Berufsgenossenschaft) is the statutory accident insurance for businesses. Which one is responsible depends on your industry. Whether you must insure
-    yourself as a business owner also depends on the industry.
+    yourself as a business owner also depends on the industry. The week starts when you begin the activity, not when a company is founded (§ 192(1) SGB VII). Every business must register, regardless of
+    legal form and employees – except businesses for which a public accident insurance fund (Unfallkasse) or the social insurance for agriculture, forestry and horticulture (SVLFG) is responsible.
 - de: Die Betriebsnummer identifiziert deinen Betrieb in allen Meldungen zur Sozialversicherung. Du beantragst sie beim Betriebsnummern-Service der Bundesagentur für Arbeit, bevor die erste Person bei dir
     anfängt.
   en: The establishment number identifies your business in all social security reports. You apply for it at the establishment number service of the Federal Employment Agency (Bundesagentur für Arbeit) before
@@ -483,22 +564,52 @@ eintraege:
     this in the risk assessment. For carcinogenic, germ-cell mutagenic or reprotoxic substances of category 1A or 1B, the exposure register is added as a separate obligation.
 - de: Die Gemeinde hat Gewerbesteuer-Vorauszahlungen festgesetzt.
   en: The municipality has set trade tax prepayments.
+- de: Die Geschäftsführung einer GmbH oder UG hat gesetzliche Pflichten. Wer sie verletzt, kann persönlich haften. Dazu gehören vor allem, die Sozialversicherungsbeiträge der Beschäftigten abzuführen (§
+    266a StGB), Steuern zu erklären und zu zahlen (§§ 34, 69 AO), nach Eintritt der Insolvenzreife keine Zahlungen mehr zu leisten (§ 15b InsO), bei Verlust der Hälfte des Stammkapitals die Gesellschafterversammlung
+    einzuberufen (§ 49 Abs. 3 GmbHG) und die Gesellschafterliste aktuell zu halten (§ 40 GmbHG). Das zur Erhaltung des Stammkapitals nötige Vermögen darf nicht an Gesellschafter ausgezahlt werden (§ 30
+    GmbHG) – typische Fälle sind ein überhöhtes Gehalt für Gesellschafter-Geschäftsführer und Darlehen an Gesellschafter. Verbotene Auszahlungen sind zu erstatten (§ 31 GmbHG), die Geschäftsführung haftet
+    dafür (§ 43 Abs. 3 GmbHG). Bei der GmbH & Co. KG treffen diese Pflichten die Geschäftsführung der Komplementär-GmbH; die Kapitalerhaltung gilt nach der Rechtsprechung des BGH entsprechend für Auszahlungen
+    an Kommanditisten, soweit das Vermögen der Komplementär-GmbH betroffen ist. Für deinen Einzelfall hilft eine Rechtsberatung.
+  en: The managing directors of a GmbH or UG have statutory duties. Anyone who breaches them can be personally liable. Above all, these include paying the employees' social security contributions (§ 266a
+    StGB), filing and paying taxes (§§ 34, 69 AO), making no further payments once the company is insolvent (§ 15b InsO), calling a shareholders' meeting if half of the share capital is lost (§ 49(3) GmbHG)
+    and keeping the list of shareholders up to date (§ 40 GmbHG). Assets needed to maintain the share capital must not be paid out to shareholders (§ 30 GmbHG) – typical cases are an excessive salary for
+    shareholder managing directors and loans to shareholders. Prohibited payments must be repaid (§ 31 GmbHG), and the managing directors are liable for them (§ 43(3) GmbHG). In a GmbH & Co. KG these duties
+    fall on the managing directors of the general partner GmbH; according to Federal Court of Justice (BGH) case law, capital maintenance applies accordingly to payments to limited partners insofar as the
+    assets of the general partner GmbH are affected. Legal advice helps with your individual case.
+- de: Die Gewerbeanzeige machst du bei deiner Gemeinde, meist online. Die Gebühr hängt von der Gemeinde ab. Das Gewerbeamt informiert danach Finanzamt, IHK oder Handwerkskammer und weitere Stellen. Ummelden
+    musst du auch, wenn du die Tätigkeit wechselst oder auf Waren oder Leistungen ausdehnst, die bei Betrieben der angemeldeten Art nicht geschäftsüblich sind (§ 14 Abs. 1 S. 2 Nr. 2 GewO). Die Anzeige
+    erstattest du gleichzeitig mit dem Beginn, Um- und Abmeldung ebenso gleichzeitig mit der Änderung oder der Aufgabe des Betriebs (§ 14 Abs. 1 GewO). Für bestimmte Reisegewerbe ohne Reisegewerbekarte
+    gilt eine eigene Anzeigepflicht (§ 55c GewO).
+  en: You file the trade registration with your municipality, usually online. The fee depends on the municipality. The trade office then informs the tax office, the IHK or Chamber of Crafts and other bodies.
+    You must also update the registration if you change your activity or extend it to goods or services that are not customary for businesses of the registered type (§ 14(1) sentence 2 no. 2 GewO). You
+    file the registration at the same time as you start, and changes and deregistration likewise at the same time as the change or the closure of the business (§ 14(1) GewO). Certain itinerant trades without
+    an itinerant trade card have their own notification duty (§ 55c GewO).
 - de: Die Gewerbesteuer hängt vom Hebesatz deiner Gemeinde ab. Einzelunternehmen und Personengesellschaften haben einen Freibetrag. Die Erklärung gibst du ohne Steuerberatung bis 31. Juli des Folgejahres ab, mit Steuerberatung bis Ende Februar des übernächsten Jahres (§ 149 AO).
   en: Trade tax depends on your municipality's multiplier (Hebesatz). Sole proprietorships and partnerships have a tax-free allowance. You file the return without a tax adviser by 31 July of the following year, with a tax adviser by the end of February of the year after that (§ 149 AO).
 - de: Die GoBD regeln, wie Bücher und Belege elektronisch geführt und aufbewahrt werden. Die Verfahrensdokumentation beschreibt deine Abläufe.
   en: The GoBD set out how books and receipts are kept and stored electronically. The process documentation describes your procedures.
-- de: Die Gründung einer GmbH oder UG beginnt mit dem Gesellschaftsvertrag, den ein Notar beurkundet. Die Beurkundung ist auch online möglich. Für die GmbH beträgt das Stammkapital mindestens 25.000 €,
-    davon ist mindestens die Hälfte einzuzahlen. Eine UG kann ab 1 € gegründet werden.
-  en: Founding a GmbH or UG starts with the articles of association, which are notarised by a notary. Notarisation is also possible online. For a GmbH, the share capital is at least €25,000, of which at
-    least half must be paid in. A UG can be founded from €1.
+- de: Die Gründung einer GmbH oder UG beginnt mit dem Gesellschaftsvertrag, den ein Notar beurkundet (§ 2 GmbHG). Die Beurkundung ist auch online per Videokommunikation beim Notar möglich, auch mit dem
+    Musterprotokoll (§ 2 Abs. 3 GmbHG). Für die GmbH beträgt das Stammkapital mindestens 25.000 €, davon ist mindestens die Hälfte einzuzahlen. Eine UG kann ab 1 € gegründet werden.
+  en: Founding a GmbH or UG starts with the articles of association, which are notarised by a notary (§ 2 GmbHG). Notarisation is also possible online by video communication with the notary, including with
+    the model protocol (§ 2(3) GmbHG). For a GmbH, the share capital is at least €25,000, of which at least half must be paid in. A UG can be founded from €1.
 - de: Die Höhe steht im Bescheid deiner Gemeinde.
   en: The amount is stated in your municipality's tax notice.
 - de: Die Information nennt unter anderem Zweck, Rechtsgrundlage, Empfänger, Speicherdauer und die Rechte der Betroffenen.
   en: The information includes, among other things, the purpose, legal basis, recipients, storage period and the rights of the people affected.
 - de: Die Jahreserklärung fasst die Umsatzsteuer des ganzen Jahres zusammen – ohne Steuerberatung bis 31. Juli des Folgejahres, mit Steuerberatung bis Ende Februar des übernächsten Jahres (§ 149 AO).
   en: The annual return summarises the VAT for the whole year – without a tax adviser by 31 July of the following year, with a tax adviser by the end of February of the year after that (§ 149 AO).
+- de: Die Jahresmeldung übermittelt das Lohnprogramm für alle, die über den Jahreswechsel beschäftigt sind – bis zum 15. Februar des Folgejahres (§ 10 DEÜV). Fällt der 15. Februar auf ein Wochenende oder
+    einen Feiertag, reicht der nächste Werktag (§ 26 Abs. 3 SGB X). Die Jahresmeldung zur Unfallversicherung (§ 28a Abs. 2a SGB IV) ist eine eigene Meldung, ebenfalls bis zum 16. Februar.
+  en: The payroll software submits the annual report for everyone employed over the turn of the year – by 15 February of the following year (§ 10 DEÜV). If 15 February falls on a weekend or public holiday,
+    the next working day is sufficient (§ 26(3) SGB X). The annual report for accident insurance (§ 28a(2a) SGB IV) is a separate report, also due by 16 February.
 - de: Die Kleinunternehmerregelung endet ab dem Umsatz, der die Grenze überschreitet. Amtlos zählt dafür die Rechnungen, die du in Amtlos gestellt hast. Rechnungen außerhalb von Amtlos sind nicht enthalten.
   en: The small business scheme (Kleinunternehmerregelung) ends from the sale that exceeds the limit. For this, Amtlos counts the invoices you issued in Amtlos. Invoices outside Amtlos are not included.
+- de: Die Kopie des Aufenthaltstitels oder der Erlaubnis zur Beschäftigung bewahrst du für die Dauer der Beschäftigung auf, auf Papier oder elektronisch (§ 4a Abs. 5 AufenthG). Läuft der Titel ab, darf
+    die Person nur weiterarbeiten, wenn ein neuer Titel oder eine Bescheinigung der Ausländerbehörde die Beschäftigung erlaubt – lass dir dann die neue Kopie geben. Endet die Beschäftigung vorzeitig, teilst
+    du das der Ausländerbehörde binnen vier Wochen mit (§ 4a Abs. 5 S. 3 Nr. 3 AufenthG).
+  en: You keep the copy of the residence permit or work permit for the duration of employment, on paper or electronically (§ 4a(5) AufenthG). If the permit expires, the person may only continue working
+    if a new permit or a certificate from the immigration authority allows the employment – then ask for the new copy. If the employment ends early, you notify the immigration authority within four weeks
+    (§ 4a(5) sentence 3 no. 3 AufenthG).
 - de: Die Lebensmittelinformationsverordnung verlangt Angaben zu Allergenen. Amtlos führt eine Allergenliste je Gericht und erstellt daraus eine Übersicht zum Aushängen.
   en: The Food Information Regulation (LMIV) requires information on allergens. Amtlos keeps an allergen list per dish and creates an overview from it for you to post.
 - de: Die Lohnabrechnung selbst macht ein systemgeprüfter Partner; Amtlos liefert Stammdaten und Fristen.
@@ -509,8 +620,17 @@ eintraege:
   en: The people who ultimately own or control a company.
 - de: Die Minijob-Grenze ist an den Mindestlohn gekoppelt. Amtlos führt die Werte mit Gültigkeitszeitraum.
   en: The mini-job limit is linked to the minimum wage. Amtlos keeps the values with their validity period.
-- de: Die Mitteilung an die zuständige Aufsichtsbehörde ist Pflicht des Arbeitgebers.
-  en: Notifying the competent supervisory authority is the employer's obligation.
+- de: Die Mitgliedschaft entsteht automatisch mit dem Gewerbe; du musst dich nicht selbst anmelden. Die Kammer meldet sich bei dir und setzt den Beitrag fest; fällig wird er nach dem Bescheid, einen gesetzlichen
+    Termin gibt es nicht. Kleingewerbetreibende ohne Eintragung im Handelsregister sind bei der IHK beitragsfrei, solange ihr Gewerbeertrag 5.200 € im Jahr nicht übersteigt (§ 3 Abs. 3 S. 3 IHKG). Gründerinnen
+    und Gründer – natürliche Personen, nicht im Handelsregister eingetragen – sind in den ersten zwei Jahren vom Grundbeitrag befreit, wenn ihr Gewerbeertrag 25.000 € nicht übersteigt (§ 3 Abs. 3 S. 4 IHKG).
+    Die Handwerkskammern regeln ihre Beiträge in eigenen Beitragsordnungen.
+  en: Membership arises automatically with the trade; you do not need to register yourself. The chamber will contact you and set the fee; it is due according to the notice, there is no statutory date. Small
+    traders not entered in the commercial register pay no IHK fee as long as their trade income does not exceed €5,200 a year (§ 3(3) sentence 3 IHKG). Founders – natural persons not entered in the commercial
+    register – are exempt from the basic fee in the first two years if their trade income does not exceed €25,000 (§ 3(3) sentence 4 IHKG). The Chambers of Crafts set their fees in their own fee regulations.
+- de: Die Mitteilung an die zuständige Aufsichtsbehörde ist Pflicht des Arbeitgebers und geht unverzüglich hinaus (§ 27 Abs. 1 S. 1 MuSchG). Zuständig ist die Arbeitsschutzbehörde bzw. Gewerbeaufsicht deines
+    Landes, zum Beispiel in Baden-Württemberg das Regierungspräsidium, in Bayern das Gewerbeaufsichtsamt.
+  en: Notifying the competent supervisory authority is the employer's obligation and must be done without delay (§ 27(1) sentence 1 MuSchG). The responsible body is your state's occupational safety authority
+    or trade inspectorate, for example the Regierungspräsidium in Baden-Württemberg and the Gewerbeaufsichtsamt in Bavaria.
 - de: Die Pflicht zum Versand strukturierter E-Rechnungen (XRechnung oder ZUGFeRD) gilt ab 1.1.2027 für Unternehmen mit mehr als 800.000 € Vorjahresumsatz. Kleinunternehmer sind befreit. Eine PDF-Rechnung
     ist keine E-Rechnung.
   en: The obligation to send structured e-invoices (XRechnung or ZUGFeRD) applies from 1.1.2027 to businesses with more than €800,000 in previous year's revenue. Small businesses under the small business
@@ -519,10 +639,26 @@ eintraege:
   en: The Price Indication Ordinance (Preisangabenverordnung) governs how prices must be stated to consumers.
 - de: Die Sozialkassen regeln unter anderem Urlaub und Berufsbildung in der Bauwirtschaft. Ob dein Betrieb erfasst ist, hängt von den überwiegenden Tätigkeiten ab.
   en: Among other things, the social funds cover holidays and vocational training in the construction industry. Whether your business is covered depends on its predominant activities.
-- de: Die Statusfeststellung ist eine Möglichkeit, keine Pflicht. Sie schafft Sicherheit, wenn das Risiko der Scheinselbstständigkeit besteht.
-  en: The status determination is an option, not an obligation. It gives you certainty if there is a risk of bogus self-employment.
-- de: Die Umlagen finanzieren die Erstattung von Entgeltfortzahlung, Mutterschaftsleistungen und das Insolvenzgeld. Die eAU rufst du bei der Krankenkasse ab, meist über das Lohnprogramm.
-  en: The levies fund reimbursement of continued pay during illness, maternity benefits and insolvency pay. You retrieve the eAU from the health insurance fund (Krankenkasse), usually via the payroll software.
+- de: Die Statusfeststellung ist eine Möglichkeit, keine Pflicht. Sie schafft Sicherheit, wenn das Risiko der Scheinselbstständigkeit besteht. Für eine Beschäftigung sprechen vor allem Weisungsgebundenheit,
+    die Eingliederung in die Arbeitsorganisation des Auftraggebers, fehlendes Unternehmerrisiko und nur ein Auftraggeber (§ 7 Abs. 1 S. 2 SGB IV und Rechtsprechung des Bundessozialgerichts).
+  en: The status determination is an option, not an obligation. It gives you certainty if there is a risk of bogus self-employment. Indicators of employment are above all being bound by instructions, integration
+    into the client's work organisation, no entrepreneurial risk and having only one client (§ 7(1) sentence 2 SGB IV and case law of the Federal Social Court).
+- de: 'Die UG (haftungsbeschränkt) bildet in ihrer Bilanz eine gesetzliche Rücklage: ein Viertel des Jahresüberschusses, gemindert um einen Verlustvortrag aus dem Vorjahr (§ 5a Abs. 3 GmbHG). Die Rücklage
+    darf nur für eine Kapitalerhöhung aus Gesellschaftsmitteln oder zum Ausgleich von Verlusten verwendet werden. Die Pflicht endet erst, wenn das Stammkapital durch eine Kapitalerhöhung mindestens 25.000
+    € erreicht (§ 5a Abs. 5 GmbHG) – eine Rücklage in dieser Höhe allein reicht nicht. Die Rücklage bildest du mit der Feststellung des Jahresabschlusses.'
+  en: 'The UG (haftungsbeschränkt) forms a statutory reserve in its balance sheet: a quarter of the annual surplus, reduced by any loss carried forward from the previous year (§ 5a(3) GmbHG). The reserve
+    may only be used for a capital increase from company funds or to offset losses. The obligation only ends when the share capital reaches at least €25,000 through a capital increase (§ 5a(5) GmbHG) –
+    a reserve of that amount alone is not enough. You form the reserve when the annual financial statements are adopted.'
+- de: Die Umlagen finanzieren die Erstattung von Entgeltfortzahlung (U1), Mutterschaftsleistungen (U2) und das Insolvenzgeld (U3). Die U1 zahlen nur Betriebe mit in der Regel höchstens 30 Beschäftigten
+    (§ 1 Abs. 1 AAG), die U2 alle Arbeitgeber, die U3 ebenfalls alle (§ 358 SGB III). Du zahlst sie mit den Beiträgen und meldest sie mit dem Beitragsnachweis. Die eAU rufst du bei der Krankenkasse ab,
+    meist über das Lohnprogramm.
+  en: The levies fund reimbursement of continued pay during illness (U1), maternity benefits (U2) and insolvency pay (U3). Only businesses with usually no more than 30 employees pay U1 (§ 1(1) AAG), all
+    employers pay U2 and likewise all pay U3 (§ 358 SGB III). You pay them with the contributions and report them in the contribution statement. You retrieve the eAU from the health insurance fund (Krankenkasse),
+    usually via the payroll software.
+- de: 'Die Umlagen sind Teil des Gesamtsozialversicherungsbeitrags: bei Verspätung Säumniszuschlag 1 % je Monat (§ 24 SGB IV). Für den eAU-Abruf ist keine Sanktion vorgesehen; ohne Abruf fehlt der Nachweis
+    der Arbeitsunfähigkeit.'
+  en: 'The levies are part of the total social security contribution: if late, a late payment surcharge of 1% per month applies (§ 24 SGB IV). No sanction is provided for retrieving the eAU; without retrieval
+    you lack proof of incapacity for work.'
 - de: Die Umsatzsteuer-Identifikationsnummer brauchst du für Geschäfte innerhalb der EU.
   en: You need the VAT identification number for business within the EU.
 - de: Die Unfallversicherung für Arbeitsunfälle und Berufskrankheiten in deiner Branche.
@@ -595,6 +731,8 @@ eintraege:
   en: You place packaged goods on the market.
 - de: Du erbringst Bauleistungen.
   en: You provide construction services.
+- de: Du erhältst Zahlungen aus dem Ausland oder leistest Zahlungen ins Ausland über 50.000 €.
+  en: You receive payments from abroad or make payments abroad of more than €50,000.
 - de: Du führst ein Verzeichnis, welche Daten über Menschen du wofür verarbeitest.
   en: You keep a record of which data about people you process and for what purpose.
 - de: Du gehörst zu einer Gruppe von Selbstständigen, die rentenversicherungspflichtig sein kann.
@@ -621,6 +759,8 @@ eintraege:
   en: You have discovered a data breach.
 - de: Du hast eine Dauerfristverlängerung.
   en: You have a permanent deadline extension (Dauerfristverlängerung).
+- de: Du hast eine Erlaubnis als Versicherungsvermittler oder Versicherungsberater, Finanzanlagen- oder Immobiliardarlehensvermittler.
+  en: You have a permit as an insurance intermediary or insurance adviser, financial investment or real estate loan intermediary.
 - de: Du hast eine Erlaubnis nach § 34c, § 34d oder § 34f GewO.
   en: You have a permit under § 34c, § 34d or § 34f GewO.
 - de: Du hast eine Kasse außer Betrieb genommen.
@@ -800,13 +940,13 @@ eintraege:
 - de: Ein Jahr nach Aufnahme der ersten Beschäftigung lässt du dir von Jugendlichen die Bescheinigung über die erste Nachuntersuchung vorlegen; die Untersuchung darf höchstens drei Monate zurückliegen (§
     33 Abs. 1 JArbSchG). Neun Monate nach Beginn weist du die jugendliche Person nachdrücklich auf den Termin hin und forderst sie auf, die Nachuntersuchung machen zu lassen (§ 33 Abs. 1 Satz 2 JArbSchG).
     Liegt die Bescheinigung 14 Monate nach Aufnahme der ersten Beschäftigung nicht vor, darfst du die Person nicht weiter beschäftigen (§ 33 Abs. 3 JArbSchG). Amtlos rechnet ab der Einstellung und erinnert
-    drei Monate vor dem Termin – hat die Person schon vorher anderswo gearbeitet, zählt der Beginn dieser ersten Beschäftigung. Die Erstuntersuchung vor Beginn ist eine eigene Pflicht. Ein Gesetzesantrag
-    (BR-Drs. 735/25) will die Untersuchungen ändern; er ist nicht in Kraft.
+    drei Monate vor dem Termin – hat die Person schon vorher anderswo gearbeitet, zählt der Beginn dieser ersten Beschäftigung. Wechselt sie aus einem anderen Betrieb zu dir, genügt die dort vorgelegte
+    Bescheinigung. Die Erstuntersuchung vor Beginn ist eine eigene Pflicht. Ein Gesetzesantrag (BR-Drs. 735/25) will die Untersuchungen ändern; er ist nicht in Kraft.
   en: One year after the start of their first employment, you have young people show you the certificate of the first follow-up examination; the examination may be no more than three months old (§ 33(1)
     JArbSchG). Nine months after the start, you emphatically point out the deadline to the young person and ask them to have the follow-up examination done (§ 33(1) sentence 2 JArbSchG). If the certificate
     is not available 14 months after the start of the first employment, you may not continue to employ the person (§ 33(3) JArbSchG). Amtlos counts from the hiring and reminds you three months before the
-    deadline – if the person already worked elsewhere before, the start of that first employment counts. The initial examination before the start is a separate obligation. A legislative proposal (BR-Drs.
-    735/25) wants to change the examinations; it is not in force.
+    deadline – if the person already worked elsewhere before, the start of that first employment counts. If they move to you from another business, the certificate presented there is sufficient. The initial
+    examination before the start is a separate obligation. A legislative proposal (BR-Drs. 735/25) wants to change the examinations; it is not in force.
 - de: Ein Jahr nach jeder Unterweisung erinnert Amtlos an die Wiederholung. Mit der neuen Unterweisung ist die alte erledigt. Hast du deine letzte Unterweisung noch nicht in Amtlos erfasst, erfasse sie – dann kennt Amtlos den nächsten Termin.
   en: One year after each safety briefing, Amtlos reminds you to repeat it. The new safety briefing completes the old one. If you have not yet recorded your last safety briefing in Amtlos, record it – then Amtlos knows the next date.
 - de: Ein Jugendlicher, der in das Berufsleben eintritt, darf nur beschäftigt werden, wenn er innerhalb der letzten 14 Monate vor Beginn von einer Ärztin oder einem Arzt untersucht worden ist und dir die
@@ -832,6 +972,8 @@ eintraege:
   en: An invoice as a structured data record that software can read automatically.
 - de: Eine UG muss jedes Jahr ein Viertel ihres Jahresüberschusses in eine Rücklage stellen.
   en: A UG must put a quarter of its annual net profit into a reserve every year.
+- de: Eine Vergütung unter der Mindestausbildungsvergütung ist unwirksam; Auszubildende können die Differenz nachfordern (§ 17 Abs. 1, § 25 BBiG). Kein Bußgeld.
+  en: Pay below the minimum training allowance is invalid; apprentices can claim the difference (§ 17(1), § 25 BBiG). No fine.
 - de: Eine achtstellige Nummer, unter der dein Betrieb bei der Sozialversicherung geführt wird.
   en: An eight-digit number under which your business is registered with social security.
 - de: Eine ausreichende Zahl von Beschäftigten machst du durch Unterweisung und Übung mit dem Löschen von Entstehungsbränden vertraut (§ 10 Abs. 2 ArbSchG, § 22 Abs. 2 DGUV Vorschrift 1). Nach ASR A2.2
@@ -920,18 +1062,33 @@ eintraege:
   en: Liberal profession (freier Beruf)
 - de: Freistellungsbescheinigung für Bauleistungen beantragen
   en: Apply for an exemption certificate for construction work
-- de: Fällig sind die Beiträge am drittletzten Bankarbeitstag des laufenden Monats. Das Lohnprogramm berechnet sie; die Krankenkassen ziehen sie in der Regel ein.
-  en: The contributions are due on the third-to-last bank working day of the current month. The payroll software calculates them; the health insurance funds usually collect them by direct debit.
+- de: Fällig sind die Beiträge am drittletzten Bankarbeitstag des laufenden Monats. Das Lohnprogramm berechnet sie; die Krankenkassen ziehen sie in der Regel ein. Das gilt auch für die Beiträge an die Minijob-Zentrale.
+  en: The contributions are due on the third-to-last bank working day of the current month. The payroll software calculates them; the health insurance funds usually collect them by direct debit. This also
+    applies to contributions to the Minijob-Zentrale.
 - de: Fördergeber (z. B. BMWE, KfW, Länder)
   en: Funding bodies (e.g. BMWE, KfW, federal states)
 - de: Förderprogramme prüfen (Option)
   en: Check funding programmes (optional)
+- de: Für Auszubildende gilt nicht der gesetzliche Mindestlohn (§ 22 Abs. 3 MiLoG), sondern eine angemessene Vergütung, mindestens die Mindestausbildungsvergütung nach § 17 BBiG. Sie steigt mit jedem Ausbildungsjahr
+    und wird jährlich angepasst. Gilt für dich ein Tarifvertrag, geht dessen Vergütung vor (§ 17 Abs. 3, 4 BBiG). Amtlos kennt die Beträge noch nicht – frag deine Kammer.
+  en: Apprentices are not covered by the statutory minimum wage (§ 22(3) MiLoG) but by an appropriate allowance, at least the minimum training allowance under § 17 BBiG. It rises with each year of training
+    and is adjusted annually. If a collective agreement applies to you, its pay takes precedence (§ 17(3), (4) BBiG). Amtlos does not know the amounts yet – ask your chamber.
 - de: Für Beschäftigte zahlst du Umlagen (U1, U2, U3) und rufst Arbeitsunfähigkeitsbescheinigungen elektronisch ab.
   en: For employees, you pay levies (U1, U2, U3) and retrieve sick notes electronically.
 - de: Für Jugendliche gelten Erstuntersuchung, Arbeitszeitgrenzen und eine Aushangpflicht.
   en: For young people, an initial medical examination, working time limits and a notice posting obligation apply.
 - de: Für Mitarbeiterbeteiligungen gibt es steuerliche Sonderregeln (§ 19a EStG) und virtuelle Modelle (VSOP). Amtlos erklärt die Modelle; Vorlagen folgen mit dem Dokumentengenerator.
   en: For employee participation, there are special tax rules (§ 19a EStG) and virtual models (VSOP). Amtlos explains the models; templates will follow with the document generator.
+- de: Für Jugendliche gilt ein kürzerer Abstand als die jährliche Unterweisung der übrigen Beschäftigten. Vor Beginn der Beschäftigung und bei wesentlichen Änderungen unterweist du sie über die Gefahren
+    und die Schutzmaßnahmen; danach wiederholst du die Unterweisung mindestens halbjährlich (§ 29 JArbSchG). Die Frist läuft für jede jugendliche Person ab ihrer letzten Unterweisung. Amtlos erinnert sechs
+    Monate nach der letzten Unterweisung, die du in Amtlos erfasst – unterweist du Jugendliche einzeln, erfasse jede Unterweisung.
+  en: For young people, a shorter interval applies than the annual instruction of other employees. Before employment begins and when there are significant changes, you instruct them about the hazards and
+    the protective measures; after that you repeat the instruction at least every six months (§ 29 JArbSchG). The deadline runs for each young person from their last instruction. Amtlos reminds you six
+    months after the last instruction you record in Amtlos – if you instruct young people individually, record each instruction.
+- de: 'Für Mitarbeiterbeteiligungen gibt es steuerliche Sonderregeln: Bei Anteilen an jungen Unternehmen kann die Besteuerung des geldwerten Vorteils aufgeschoben werden (§ 19a EStG). Eine schuldrechtliche
+    Alternative ohne echte Anteile sind virtuelle Modelle (VSOP). Amtlos erklärt die Modelle; Vorlagen folgen mit dem Dokumentengenerator.'
+  en: 'For employee participation, there are special tax rules: for shares in young companies, taxation of the non-cash benefit can be deferred (§ 19a EStG). A contractual alternative without real shares
+    are virtual models (VSOP). Amtlos explains the models; templates will follow with the document generator.'
 - de: Für Tätigkeiten mit Feuchtarbeit oder hautbelastenden Stoffen legst du in einem Hautschutzplan Schutz, Reinigung und Pflege fest.
   en: For work involving wet work or substances that stress the skin, you set out protection, cleaning and care in a skin protection plan.
 - de: Für bestimmte Produkte (z. B. Computer, Smartphones, E-Book-Reader) gelten Barrierefreiheitsanforderungen – die Kleinstunternehmen-Ausnahme gilt dafür nicht verlässlich.
@@ -952,8 +1109,10 @@ eintraege:
   en: 'There is no separate fine for the duties of the executing company under § 5 BaustellV – § 7 BaustellV only covers the client''s advance notice and health and safety plan. The authority can order measures; a breach of the enforceable order costs up to €30,000 (§ 22(3) sentence 1 no. 1, § 25(1) no. 2 letter a, (2) ArbSchG).'
 - de: Für eine UG oder GmbH lässt du den Gesellschaftsvertrag notariell beurkunden – auch online möglich.
   en: For a UG or GmbH, you have the articles of association (Gesellschaftsvertrag) notarised – this is also possible online.
-- de: Für jede neue beschäftigte Person hältst du die wesentlichen Arbeitsbedingungen schriftlich oder in zulässiger Form fest.
-  en: For every new employee, you record the essential working conditions in writing or in another permitted form.
+- de: Für jede neue beschäftigte Person hältst du die wesentlichen Arbeitsbedingungen schriftlich oder in Textform fest – in den Branchen nach dem Schwarzarbeitsbekämpfungsgesetz, seit 30.12.2025 auch im
+    Friseur- und Kosmetikgewerbe, bleibt es bei der Schriftform.
+  en: For every new employee, you record the essential working conditions in writing or in text form – in the sectors under the Act to Combat Undeclared Work, since 30.12.2025 also in hairdressing and beauty,
+    the written form remains required.
 - de: Gefahrstoffverzeichnis und Betriebsanweisungen
   en: Hazardous substances register and operating instructions
 - de: Gefährdungsbeurteilung
@@ -968,10 +1127,18 @@ eintraege:
   en: Anti-Money Laundering Act for real estate and finance
 - de: Gemeinde (Steueramt)
   en: Municipality (tax office, Steueramt)
+- de: Gemeinde (als Straßenbaubehörde); auf Märkten der Veranstalter
+  en: Municipality (as road authority); at markets the organiser
 - de: Geplant ist eine Pflicht zur elektronischen Arbeitszeiterfassung, mit Übergangsfristen nach Betriebsgröße.
   en: An obligation to record working time electronically is planned, with transition periods depending on company size.
 - de: 'Geschäftsführer, die die Liste nicht einreichen, haften denjenigen, deren Beteiligung sich geändert hat, und den Gläubigern der Gesellschaft für den daraus entstandenen Schaden als Gesamtschuldner (§ 40 Abs. 3 GmbHG).'
   en: 'Managing directors who do not file the list are jointly and severally liable for the resulting damage to those whose shareholding has changed and to the company''s creditors (§ 40(3) GmbHG).'
+- de: Gesellschaften müssen ihre wirtschaftlich Berechtigten dem Transparenzregister mitteilen und die Angaben bei Änderungen aktualisieren. Das gilt für UG und GmbH ebenso wie für eingetragene Personengesellschaften,
+    also auch für die GmbH & Co. KG und die Partnerschaftsgesellschaft (§ 20 Abs. 1 GwG) – seit 2024 auch für eine GbR, die sich ins Gesellschaftsregister eintragen lässt (eGbR). Die Mitteilung machst du
+    unverzüglich nach der Eintragung und nach jeder Änderung (§ 20 Abs. 1 GwG).
+  en: Companies must report their beneficial owners to the transparency register and update the details when they change. This applies to UG and GmbH as well as to registered partnerships, including the
+    GmbH & Co. KG and the partnership company (§ 20(1) GwG) – since 2024 also to a GbR entered in the company register (eGbR). You make the report without delay after registration and after every change
+    (§ 20(1) GwG).
 - de: Gesellschafterliste aktualisieren
   en: Update the list of shareholders
 - de: Gesellschaftsvertrag beim Notar beurkunden
@@ -1000,6 +1167,12 @@ eintraege:
   en: Pay trade tax prepayments
 - de: Gewerbesteuererklärung abgeben
   en: File the trade tax return
+- de: Gewerbetreibende mit Erlaubnis nach § 34a GewO, ihre Wachpersonen und die Betriebsleitung werden im Bewacherregister beim Statistischen Bundesamt geführt (§ 11b GewO). Jede Wachperson meldest du vor
+    der Beschäftigung mit Bewachungsaufgaben an; einsetzen darfst du sie erst, wenn die Behörde ihre Zuverlässigkeit geprüft und dir das Ergebnis mitgeteilt hat (§ 16 Abs. 1, 2 BewachV). Endet die Beschäftigung,
+    meldest du die Person über das Bewacherregister ab, spätestens sechs Wochen nach dem Ende (§ 11b Abs. 6 GewO, § 16 Abs. 6 BewachV).
+  en: Traders with a permit under § 34a GewO, their security staff and management are recorded in the security register at the Federal Statistical Office (§ 11b GewO). You register each security guard before
+    employing them on security tasks; you may only deploy them once the authority has checked their reliability and informed you of the result (§ 16(1), (2) BewachV). When the employment ends, you deregister
+    the person via the security register, at the latest six weeks after the end (§ 11b(6) GewO, § 16(6) BewachV).
 - de: Gewährleistung im Blick behalten
   en: Keep warranty in mind
 - de: 'Gibst du die Erklärung zu spät ab, kann das Finanzamt einen Verspätungszuschlag festsetzen; wird sie nicht binnen 14 Monaten nach Ablauf des Kalenderjahres abgegeben, muss es das in der Regel (§ 152 Abs. 1 bis 3 AO). Er beträgt für jeden angefangenen Monat 0,25 % der festgesetzten Steuer abzüglich Vorauszahlungen und anzurechnender Steuerabzugsbeträge, mindestens 25 €, höchstens 25.000 € (§ 152 Abs. 5 Satz 2, Abs. 10 AO). Die Abgabe kann das Finanzamt außerdem mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO).'
@@ -1012,6 +1185,12 @@ eintraege:
   en: Now applies to all businesses with employees – ladders, steps and racks must also be inspected.
 - de: 'GmbH und UG bestehen vor der Eintragung als solche nicht; wer vorher in ihrem Namen handelt, haftet persönlich und solidarisch (§ 11 Abs. 1, 2 GmbHG). Die Erstanmeldung einer GmbH erzwingt das Registergericht nicht (§ 79 Abs. 2 GmbHG). Andere Anmeldepflichten, etwa der GmbH & Co. KG oder der Partnerschaft, kann es mit Zwangsgeld bis 5.000 € durchsetzen (§ 14 HGB, § 5 Abs. 2 PartGG).'
   en: 'A GmbH or UG does not exist as such before registration; anyone who acts in its name beforehand is personally and jointly liable (§ 11(1), (2) GmbHG). The registry court does not enforce the initial registration of a GmbH (§ 79(2) GmbHG). Other registration duties, for example of a GmbH & Co. KG or a partnership, it can enforce with a coercive fine of up to €5,000 (§ 14 HGB, § 5(2) PartGG).'
+- de: GmbH und UG meldet der Notar zum Handelsregister an. Zur Anmeldung gehört die Gesellschafterliste, und die Geschäftsführung versichert, dass die Einlagen geleistet sind (§§ 7, 8 GmbHG). Die GmbH &
+    Co. KG meldest du ebenfalls über einen Notar zum Handelsregister an (§ 106 HGB i. V. m. § 161 Abs. 2 HGB), die Partnerschaftsgesellschaft zum Partnerschaftsregister (§ 4 PartGG). Spätere Änderungen,
+    etwa im Gesellschaftsvertrag oder bei der Geschäftsführung, werden ebenfalls angemeldet. Bis zur Eintragung haftet, wer im Namen der GmbH oder UG handelt, persönlich (§ 11 Abs. 2 GmbHG).
+  en: The notary registers a GmbH or UG with the commercial register. The application includes the list of shareholders, and the managing directors confirm that the contributions have been made (§§ 7, 8
+    GmbHG). You also register a GmbH & Co. KG with the commercial register via a notary (§ 106 HGB in conjunction with § 161(2) HGB), and a partnership company with the partnership register (§ 4 PartGG).
+    Later changes, for example to the articles or the management, are registered as well. Until registration, anyone acting in the name of the GmbH or UG is personally liable (§ 11(2) GmbHG).
 - de: GoBD
   en: GoBD
 - de: GoBD einhalten und Verfahrensdokumentation führen
@@ -1056,6 +1235,15 @@ eintraege:
   en: In the questionnaire you state, among other things, whether you use the small business scheme (Kleinunternehmerregelung), and estimate your revenue and profit. After that you receive your tax number.
 - de: Im Gesellschafterkreis hat sich etwas geändert.
   en: Something has changed among the shareholders.
+- de: 'Im nicht privaten Bereich zahlst du für jede Betriebsstätte einen Rundfunkbeitrag, gestaffelt nach der Zahl der Beschäftigten: mit bis zu acht Beschäftigten ein Drittel des Beitrags, mit neun bis
+    19 Beschäftigten einen ganzen Beitrag, mit mehr Beschäftigten entsprechend mehr (§ 5 Abs. 1 RBStV). Ein Arbeitsraum in deiner eigenen Wohnung ist frei, wenn für die Wohnung schon Rundfunkbeitrag gezahlt
+    wird (§ 5 Abs. 5 Nr. 3 RBStV). Für betrieblich genutzte Kraftfahrzeuge zahlst du je Fahrzeug ein Drittel des Beitrags; je beitragspflichtiger Betriebsstätte ist ein Fahrzeug frei (§ 5 Abs. 2 Nr. 2 RBStV).
+    Den Beginn, neue Betriebsstätten und Fahrzeuge sowie Änderungen meldest du dem Beitragsservice innerhalb eines Monats (§ 8 Abs. 1 RBStV). Vermietest du Hotel- oder Gästezimmer zur vorübergehenden Beherbergung,
+    fällt dafür zusätzlich Rundfunkbeitrag an (§ 5 Abs. 2 Nr. 1 RBStV).'
+  en: 'Outside the private sphere you pay a broadcasting fee for each business premises, graded by the number of employees: with up to eight employees a third of the fee, with nine to 19 employees one full
+    fee, with more employees correspondingly more (§ 5(1) RBStV). A workroom in your own home is exempt if the broadcasting fee is already paid for the home (§ 5(5) no. 3 RBStV). For motor vehicles used
+    for business you pay a third of the fee per vehicle; one vehicle per business premises liable to the fee is exempt (§ 5(2) no. 2 RBStV). You report the start, new premises and vehicles and any changes
+    to the Beitragsservice within one month (§ 8(1) RBStV). If you let hotel or guest rooms for temporary accommodation, an additional broadcasting fee is due for them (§ 5(2) no. 1 RBStV).'
 - de: Immobilienmakler und viele Finanzdienstleister sind Verpflichtete nach dem Geldwäschegesetz.
   en: Real estate agents and many financial service providers are obliged entities under the Anti-Money Laundering Act (Geldwäschegesetz).
 - de: In Beauty- und Kosmetikbetrieben legst du in einem Hygieneplan fest, wie Geräte, Flächen und Hände gereinigt und desinfiziert werden.
@@ -1078,6 +1266,36 @@ eintraege:
   en: In your industry, you register new employees immediately, at the latest when they start work.
 - de: Innerhalb einer Woche nach Gründung meldest du dein Unternehmen bei der zuständigen Berufsgenossenschaft an – auch ohne Mitarbeiter.
   en: Within one week of founding, you register your business with the responsible employers' liability insurance association (Berufsgenossenschaft), even without employees.
+- de: In deiner Branche weist du jede neue beschäftigte Person vor Arbeitsbeginn schriftlich darauf hin, dass sie bei der Arbeit einen Ausweis dabeihaben muss.
+  en: In your sector you inform every new employee in writing, before they start work, that they must carry ID at work.
+- de: 'In den Branchen nach § 28a Abs. 4 SGB IV ist eine Sofortmeldung spätestens bei Arbeitsbeginn Pflicht: Baugewerbe, Gaststätten- und Beherbergungsgewerbe, Personenbeförderung, Speditions-, Transport-
+    und damit verbundenes Logistikgewerbe, Schaustellergewerbe, Gebäudereinigung, Auf- und Abbau von Messen und Ausstellungen, Fleischwirtschaft (ohne Fleischerhandwerk), Prostitutionsgewerbe, Wach- und
+    Sicherheitsgewerbe sowie seit 30.12.2025 Friseur- und Kosmetikgewerbe (auch Nagelstudios) und plattformbasierte Lieferdienste. Die Forstwirtschaft gehört seitdem nicht mehr dazu. Zum Baugewerbe zählen
+    auch Ausbaugewerke wie die Elektroinstallation (§ 101 Abs. 2 SGB III in Verbindung mit der Baubetriebe-Verordnung). Die Anmeldung zur Sozialversicherung mit der ersten Lohnabrechnung kommt dazu.'
+  en: 'In the sectors under § 28a(4) SGB IV an immediate report at the latest when work starts is mandatory: construction, restaurants and accommodation, passenger transport, haulage, transport and related
+    logistics, fairground and showmen''s trade, building cleaning, setting up and dismantling trade fairs and exhibitions, meat industry (excluding butchers'' trade), prostitution, guarding and security
+    services and, since 30.12.2025, hairdressing and beauty trades (including nail studios) and platform-based delivery services. Forestry has no longer been included since then. Construction also includes
+    finishing trades such as electrical installation (§ 101(2) SGB III in conjunction with the Construction Businesses Ordinance). The social security registration with the first payroll comes in addition.'
+- de: In den Branchen nach § 2a Schwarzarbeitsbekämpfungsgesetz müssen Beschäftigte bei der Arbeit ihren Personalausweis, Pass oder ein Ersatzpapier mitführen und dem Zoll auf Verlangen vorlegen. Du weist
+    jede Person vor Beginn der Dienst- oder Werkleistungen nachweislich und schriftlich auf diese Pflicht hin (§ 2a Abs. 2 SchwarzArbG) – am besten zusammen mit dem Arbeitsvertrag. Den Hinweis bewahrst
+    du für die Dauer der Beschäftigung auf und legst ihn bei einer Prüfung durch den Zoll vor. Ein unterschriebener Satz im Arbeitsvertrag reicht, wenn du ihn gesondert vorlegen kannst; sonst nimm ein eigenes
+    Blatt mit Unterschrift. Die Mitführungspflicht gilt für alle, die in diesen Branchen Leistungen erbringen – auch für dich als Inhaberin oder Inhaber (§ 2a Abs. 1 SchwarzArbG).
+  en: In the sectors under § 2a of the Act to Combat Undeclared Work, employees must carry their ID card, passport or a substitute document at work and show it to customs on request. You inform each person
+    of this duty verifiably and in writing before the services or work begin (§ 2a(2) SchwarzArbG) – ideally together with the employment contract. You keep the notice for the duration of employment and
+    present it during a customs inspection. A signed sentence in the employment contract is enough if you can present it separately; otherwise use a separate signed sheet. The duty to carry ID applies to
+    everyone who provides services in these sectors – including you as the owner (§ 2a(1) SchwarzArbG).
+- de: In der Gefährdungsbeurteilung ermittelst du, ob Beschäftigte Lärm ausgesetzt sind – wenn nötig mit Messungen durch eine fachkundige Person (§ 3, § 4 LärmVibrationsArbSchV). Die Auslösewerte liegen
+    bei 80 und 85 dB(A) Tages-Lärmexpositionspegel bzw. 135 und 137 dB(C) Spitzenschalldruckpegel (§ 6). Technische Maßnahmen wie leisere Maschinen und Kapselung gehen vor (§ 7 Abs. 1). Ab dem unteren Auslösewert
+    stellst du Gehörschutz bereit und unterweist die Beschäftigten, ab dem oberen Auslösewert müssen sie ihn tragen (§ 8, § 11). Bereiche, in denen der obere Auslösewert überschritten werden kann, kennzeichnest
+    du als Lärmbereich und stellst ein Lärmminderungsprogramm auf (§ 7 Abs. 4, 5). Arbeitsmedizinische Vorsorge ist ab 80 dB(A) anzubieten und ab 85 dB(A) Pflicht – das steht bei der Vorsorge. Für Vibrationen
+    (zum Beispiel Bohrhammer, Rüttelplatte) gilt dieselbe Verordnung.
+  en: In the risk assessment you determine whether employees are exposed to noise – if necessary with measurements by a competent person (§ 3, § 4 LärmVibrationsArbSchV). The action values are 80 and 85
+    dB(A) daily noise exposure level and 135 and 137 dB(C) peak sound pressure level (§ 6). Technical measures such as quieter machines and enclosures take priority (§ 7(1)). From the lower action value
+    you provide hearing protection and instruct employees; from the upper action value they must wear it (§ 8, § 11). Areas where the upper action value may be exceeded are marked as noise areas, and you
+    draw up a noise reduction programme (§ 7(4), (5)). Occupational health care must be offered from 80 dB(A) and is mandatory from 85 dB(A) – this is covered under preventive care. The same ordinance applies
+    to vibration (for example hammer drill, vibrating plate).
+- de: Innerhalb einer Woche nach Beginn deiner Tätigkeit meldest du dein Unternehmen bei der zuständigen Berufsgenossenschaft an – auch ohne Mitarbeiter.
+  en: Within one week of starting your activity, you register your business with the responsible employers' liability insurance association (Berufsgenossenschaft), even without employees.
 - de: Innerhalb eines Monats nach dem Start meldest du dich über ELSTER beim Finanzamt an.
   en: Within one month of starting, you register with the tax office (Finanzamt) via ELSTER.
 - de: Insolvenzantragspflicht kennen
@@ -1116,10 +1334,17 @@ eintraege:
   en: Label AI content and AI interaction
 - de: KI-Kompetenz
   en: AI literacy
+- de: Kapitalgesellschaften und die GmbH & Co. KG (§ 264a HGB) müssen ihren Jahresabschluss beim Unternehmensregister offenlegen, binnen zwölf Monaten nach Ende des Geschäftsjahres (§ 325 Abs. 1a HGB).
+    Kleinstkapitalgesellschaften können ihn stattdessen hinterlegen (§ 326 Abs. 2 HGB). Nach der Gründung ist der erste Stichtag das Ende des ersten Geschäftsjahres nach der Eintragung, auch wenn es ein
+    Rumpfgeschäftsjahr ist.
+  en: Corporations and the GmbH & Co. KG (§ 264a HGB) must disclose their annual financial statements in the company register within twelve months after the end of the financial year (§ 325(1a) HGB). Micro
+    companies can deposit them instead (§ 326(2) HGB). After founding, the first reporting date is the end of the first financial year after registration, even if it is a short financial year.
 - de: Kapitalgesellschaften zahlen Körperschaftsteuer und geben dafür jährlich eine Erklärung ab – ohne Steuerberatung bis 31. Juli des Folgejahres, mit Steuerberatung bis Ende Februar des übernächsten Jahres (§ 149 AO).
   en: Corporations pay corporate income tax and file an annual return for it – without a tax adviser by 31 July of the following year, with a tax adviser by the end of February of the year after that (§ 149 AO).
 - de: Kasse mit TSE betreiben und Belege ausgeben
   en: Operate a cash register with TSE and issue receipts
+- de: Kein eigenes Bußgeld vorgesehen (§ 101 BBiG nennt § 14 Abs. 2 BBiG nicht). Ohne geführten Ausbildungsnachweis fehlt eine Voraussetzung für die Zulassung zur Abschlussprüfung (§ 43 Abs. 1 Nr. 2 BBiG).
+  en: No separate fine is provided (§ 101 BBiG does not mention § 14(2) BBiG). Without a kept training record, one requirement for admission to the final examination is missing (§ 43(1) no. 2 BBiG).
 - de: 'Kein eigenes Bußgeld vorgesehen.'
   en: 'No separate fine is provided for.'
 - de: Keine Handlung nötig; der Beitrag wird festgesetzt.
@@ -1130,6 +1355,10 @@ eintraege:
   en: Not an obligation. Once you have started, you can no longer apply.
 - de: Keine Pflicht. Ohne Klärung bleibt das Risiko einer späteren Einstufung als Beschäftigung.
   en: Not an obligation. Without clarification, the risk remains that you will later be classified as an employee.
+- de: Keine Sanktion für die Information selbst; Änderungen der Verhältnisse sind der Krankenkasse unverzüglich mitzuteilen (§ 206 Abs. 1 SGB V), Verstoß bis 2.500 € (§ 307 Abs. 1, 2 SGB V). Wer hauptberuflich
+    selbstständig ist, verliert die Versicherungspflicht als Arbeitnehmer (§ 5 Abs. 5 SGB V) und muss sich freiwillig oder privat versichern.
+  en: No sanction for the information itself; changes in your circumstances must be reported to the health insurer without delay (§ 206(1) SGB V), breaches up to €2,500 (§ 307(1), (2) SGB V). Anyone whose
+    main occupation is self-employment loses compulsory insurance as an employee (§ 5(5) SGB V) and must take out voluntary or private insurance.
 - de: Keine eigene Handlung, solange kein sensibler Sektor betroffen ist.
   en: No action of your own as long as no sensitive sector is affected.
 - de: Keine eigene Pflicht – Erklärung der Plattformmeldungen.
@@ -1202,8 +1431,8 @@ eintraege:
   en: Market surveillance authorities of the federal states
 - de: Melde jede elektronische Kasse innerhalb eines Monats nach der Anschaffung über ELSTER – je Betriebsstätte.
   en: Register every electronic cash register via ELSTER within one month of purchase – per business premises.
-- de: Melde, wer hinter deiner Gesellschaft steht, und halte die Angaben aktuell.
-  en: Report who is behind your company and keep the information up to date.
+- de: Melde unverzüglich, wer hinter deiner Gesellschaft steht, und halte die Angaben aktuell.
+  en: Report without delay who is behind your company and keep the information up to date.
 - de: Meldungen der Plattformen an das Finanzamt (DAC7) verstehen
   en: Understand platform reports to the tax office (DAC7)
 - de: Meldungen zur Sozialversicherung erfordern zertifizierte Software – Amtlos arbeitet dafür mit einem Lohnpartner.
@@ -1232,6 +1461,19 @@ eintraege:
   en: You conclude a data processing agreement (DPA) with service providers that process data for you (e.g. cloud, payroll office, newsletter tool).
 - de: Mit der Selbstständigkeit kann sich deine Krankenversicherung ändern. Wer hauptberuflich selbstständig ist, kümmert sich selbst um seine Versicherung und die Beiträge.
   en: Becoming self-employed can change your health insurance. If self-employment is your main occupation, you take care of your own insurance and contributions.
+- de: Mit dem selbstständigen Führen von Fahrzeugen beauftragst du nur Personen, die mindestens 18 Jahre alt, körperlich und geistig geeignet, im Führen des Fahrzeugs unterwiesen sind und ihre Befähigung
+    nachgewiesen haben (§ 35 DGUV Vorschrift 70). Die Beauftragung schriftlich festzuhalten ist nicht vorgeschrieben, aber als Nachweis empfehlenswert. Unterweise sie zu Abfahrtkontrolle, Verhalten bei
+    Pannen und Ladungssicherung. Die Ladung ist so zu verstauen und zu sichern, dass sie selbst bei Vollbremsung oder plötzlicher Ausweichbewegung nicht verrutscht, umfällt, hin- und herrollt oder herabfällt
+    (§ 22 Abs. 1 StVO).
+  en: You only assign the independent driving of vehicles to people who are at least 18 years old, physically and mentally suitable, instructed in driving the vehicle and have proven their competence (§
+    35 DGUV Regulation 70). Recording the assignment in writing is not required but recommended as evidence. Instruct them on departure checks, what to do in case of a breakdown and load securing. The load
+    must be stowed and secured so that it does not slip, fall over, roll back and forth or fall off even during emergency braking or a sudden evasive manoeuvre (§ 22(1) StVO).
+- de: Mit der Selbstständigkeit kann sich deine Krankenversicherung ändern. Das betrifft dich als Person – als Einzelunternehmerin, Gesellschafter oder, je nach Status, als Geschäftsführerin einer GmbH.
+    Wer hauptberuflich selbstständig ist, kümmert sich selbst um seine Versicherung und die Beiträge. Machst du dich im Nebenerwerb selbstständig, teilst du der Kasse den Umfang mit, damit sie prüfen kann,
+    ob die Selbstständigkeit hauptberuflich ist. Änderungen der Verhältnisse teilst du unverzüglich mit (§ 206 Abs. 1 SGB V).
+  en: Becoming self-employed can change your health insurance. This concerns you as a person – as a sole trader, partner or, depending on your status, managing director of a GmbH. If self-employment is
+    your main occupation, you take care of your own insurance and contributions. If you become self-employed as a sideline, you tell your health insurer how much you work so that it can check whether self-employment
+    is your main occupation. You report changes in your circumstances without delay (§ 206(1) SGB V).
 - de: Mit der Steuerberatung klären, welcher Rhythmus ab 2027 gilt
   en: Clarify with your tax adviser which filing frequency applies from 2027
 - de: Mit mehr als 10 Beschäftigten informierst du auf Website und in AGB, ob du an Streitbeilegungsverfahren teilnimmst.
@@ -1256,8 +1498,19 @@ eintraege:
   en: Under the Workplace Ordinance, you take precautions against fires and have extinguishing equipment checked regularly for functionality (§ 4(3) ArbStättV). How many fire extinguishers you need depends
     on the size and fire risk of the rooms (Technical Rule for Workplaces ASR A2.2). You have the fire extinguishers inspected by a competent person at least every two years. Fire safety assistants among
     your employees are a separate obligation.
+- de: Nach der Rechtsprechung des Bundesarbeitsgerichts besteht bereits eine Pflicht zur Arbeitszeiterfassung. Eine bestimmte Form schreibt das BAG nicht vor – auch Papier reicht, wenn die Erfassung objektiv,
+    verlässlich und zugänglich ist; die Aufzeichnung darfst du den Beschäftigten übertragen. Unabhängig davon verlangt das Arbeitszeitgesetz, die über acht Stunden hinausgehende Arbeitszeit an Werktagen
+    und die Arbeit an Sonn- und Feiertagen aufzuzeichnen und diese Nachweise mindestens zwei Jahre aufzubewahren (§ 16 Abs. 2 ArbZG). Amtlos bietet eine Zeiterfassung, die auf die geplante Neuregelung vorbereitet
+    ist.
+  en: According to the case law of the Federal Labour Court, there is already an obligation to record working time. The court does not prescribe a particular form – paper is also fine if the recording is
+    objective, reliable and accessible; you may delegate the recording to your employees. Independently of this, the Working Hours Act requires you to record working time exceeding eight hours on working
+    days and work on Sundays and public holidays and to keep these records for at least two years (§ 16(2) ArbZG). Amtlos offers time recording that is prepared for the planned new rules.
 - de: Nach jedem Geschäftsjahr erstellst du Bilanz und Gewinn- und Verlustrechnung; die Gesellschafter stellen den Abschluss fest.
   en: After each financial year, you prepare a balance sheet and profit and loss statement; the shareholders approve the financial statements.
+- de: Nach jeder Veränderung in den Personen der Gesellschafter oder im Umfang ihrer Beteiligung reicht die Geschäftsführung unverzüglich nach Wirksamwerden der Veränderung eine aktualisierte Gesellschafterliste
+    beim Handelsregister ein (§ 40 Abs. 1 S. 1 GmbHG). Hat ein Notar an der Veränderung mitgewirkt, reicht er die Liste ein (§ 40 Abs. 2 GmbHG).
+  en: After every change in the persons of the shareholders or the extent of their shareholding, the managing directors file an updated list of shareholders with the commercial register without delay once
+    the change takes effect (§ 40(1) sentence 1 GmbHG). If a notary was involved in the change, the notary files the list (§ 40(2) GmbHG).
 - de: Nach § 25 TDDDG ist für das Speichern und Auslesen von Informationen auf dem Endgerät grundsätzlich eine Einwilligung nötig, außer es ist unbedingt erforderlich. Der Consent-Check deiner Website folgt
     mit dem Online-Check (Abschnitt 7).
   en: Under § 25 TDDDG, storing and reading information on a user's device generally requires consent unless it is strictly necessary. The consent check for your website will follow with the online check
@@ -1272,10 +1525,20 @@ eintraege:
   en: None yet; planned rules.
 - de: Notarin oder Notar
   en: Notary
-- de: Notarin oder Notar; Registergericht
-  en: Notary; registry court (Registergericht)
-- de: Ob eine Geschäftsführerin oder ein Geschäftsführer sozialversicherungspflichtig beschäftigt ist, hängt vom Einzelfall ab. Sicherheit schafft eine Statusfeststellung bei der Deutschen Rentenversicherung.
-  en: Whether a managing director is employed subject to social security depends on the individual case. A status determination by the German Pension Insurance (Deutsche Rentenversicherung) provides certainty.
+- de: Notarin oder Notar bzw. Geschäftsführung; Registergericht
+  en: Notary or managing directors; registry court (Registergericht)
+- de: Ob eine Geschäftsführerin oder ein Geschäftsführer sozialversicherungspflichtig beschäftigt ist, hängt vom Einzelfall ab. Für Selbstständigkeit spricht nach der Rechtsprechung des Bundessozialgerichts
+    ein Anteil von mindestens 50 % oder eine Sperrminorität. Kläre den Status vor der ersten Entgeltabrechnung. Meldest du einen Gesellschafter-Geschäftsführer zur Sozialversicherung an, leitet die Einzugsstelle
+    das Statusfeststellungsverfahren von Amts wegen ein (§ 7a Abs. 1 S. 2 SGB IV); Sicherheit schafft auch ein eigener Antrag bei der Deutschen Rentenversicherung.
+  en: Whether a managing director is employed subject to social security depends on the individual case. According to the case law of the Federal Social Court, a shareholding of at least 50% or a blocking
+    minority indicates self-employment. Clarify the status before the first payroll. If you register a shareholder managing director for social security, the collecting agency starts the status determination
+    procedure ex officio (§ 7a(1) sentence 2 SGB IV); your own application to the German Pension Insurance (Deutsche Rentenversicherung) also provides certainty.
+- de: 'Ob jemand selbstständig oder in Wahrheit beschäftigt ist, richtet sich nach der tatsächlichen Zusammenarbeit: Weisungen zu Zeit, Ort und Art der Arbeit, die Eingliederung in deinen Betrieb und fehlendes
+    unternehmerisches Risiko sprechen für eine Beschäftigung (§ 7 Abs. 1 SGB IV). Den Antrag auf Statusfeststellung bei der Deutschen Rentenversicherung können beide Seiten stellen, also auch du als Auftraggeber
+    (§ 7a Abs. 1 SGB IV) – seit 2022 auch als Prognoseentscheidung vor Beginn der Zusammenarbeit (§ 7a Abs. 4a SGB IV).'
+  en: 'Whether someone is self-employed or in fact employed depends on how you actually work together: instructions on the time, place and type of work, integration into your business and no entrepreneurial
+    risk indicate employment (§ 7(1) SGB IV). Either party can apply to the Deutsche Rentenversicherung for a status determination, including you as the client (§ 7a(1) SGB IV) – since 2022 also as a forecast
+    decision before the cooperation starts (§ 7a(4a) SGB IV).'
 - de: Offenlegung
   en: Publication
 - de: Ohne Anmeldezeitraum kann Amtlos keine Termine berechnen.
@@ -1286,6 +1549,10 @@ eintraege:
   en: Without an exemption certificate, clients must withhold part of your invoice as construction withholding tax.
 - de: Ohne Konto kannst du den Fragebogen zur steuerlichen Erfassung nicht elektronisch übermitteln.
   en: Without an account, you cannot submit the tax registration questionnaire electronically.
+- de: 'Ohne Nachweis der Einzahlung lehnt das Registergericht die Eintragung ab (§ 9c Abs. 1 GmbHG). Wer in der Anmeldung falsch versichert, dass die Einlagen geleistet sind, macht sich strafbar: Freiheitsstrafe
+    bis zu drei Jahren oder Geldstrafe (§ 82 Abs. 1 Nr. 1 GmbHG). Vor der Eintragung besteht die Gesellschaft als solche nicht; wer in ihrem Namen handelt, haftet persönlich (§ 11 Abs. 1, 2 GmbHG).'
+  en: 'Without proof of payment the registry court refuses the registration (§ 9c(1) GmbHG). Anyone who falsely declares in the registration that the contributions have been made commits a criminal offence:
+    imprisonment of up to three years or a fine (§ 82(1) no. 1 GmbHG). Before registration the company does not exist as such; anyone who acts in its name is personally liable (§ 11(1), (2) GmbHG).'
 - de: Ohne diese Einordnung bleibt offen, welche Anmeldungen du brauchst.
   en: Without this classification, it remains unclear which registrations you need.
 - de: Ohne diese Klärung bleibt offen, ob Registrierung und Meldepflichten gelten.
@@ -1302,6 +1569,16 @@ eintraege:
   en: Persons constantly involved in automated processing from which a data protection officer must be appointed
 - de: Pflichten und Haftung der Geschäftsführung kennen
   en: Know the duties and liability of managing directors
+- de: 'Pflichtversichert sind zum Beispiel selbstständige Lehrerinnen und Erzieher, Pflegepersonen und Selbstständige, die auf Dauer und im Wesentlichen nur für einen Auftraggeber arbeiten – jeweils nur,
+    wenn sie im Zusammenhang mit ihrer Tätigkeit regelmäßig keinen versicherungspflichtigen Arbeitnehmer beschäftigen (§ 2 S. 1 Nr. 1, 2 und 9 SGB VI); ein Minijobber zählt dabei mit, wenn er nicht von
+    der Rentenversicherungspflicht befreit ist (§ 6 Abs. 1b SGB VI) –, außerdem Handwerker in der Handwerksrolle (§ 2 S. 1 Nr. 8 SGB VI). Yoga-, Fitness- und Personal Trainer gelten bei der Deutschen Rentenversicherung
+    in der Regel als Lehrende. Versicherungsfrei bleibt, wessen Arbeitseinkommen regelmäßig höchstens 603 € im Monat beträgt (geringfügige selbstständige Tätigkeit, § 5 Abs. 2 SGB VI, § 8 Abs. 3 SGB IV;
+    ab 2027: 633 €). Die Meldung an die Deutsche Rentenversicherung muss innerhalb von drei Monaten nach Aufnahme der Tätigkeit erfolgen (§ 190a SGB VI); danach zahlst du laufend Beiträge.'
+  en: 'Compulsorily insured are, for example, self-employed teachers and educators, carers and self-employed people who work permanently and essentially for only one client – in each case only if they regularly
+    employ no employee subject to insurance in connection with their activity (§ 2 sentence 1 nos. 1, 2 and 9 SGB VI); a mini-jobber counts if not exempted from compulsory pension insurance (§ 6(1b) SGB
+    VI) – as well as craftspeople entered in the crafts register (§ 2 sentence 1 no. 8 SGB VI). Yoga, fitness and personal trainers are usually regarded as teachers by the Deutsche Rentenversicherung. Anyone
+    whose earned income regularly does not exceed €603 a month remains exempt (minor self-employment, § 5(2) SGB VI, § 8(3) SGB IV; from 2027: €633). You must register with the Deutsche Rentenversicherung
+    within three months of starting the activity (§ 190a SGB VI); after that you pay contributions on an ongoing basis.'
 - de: Preise richtig angeben
   en: State prices correctly
 - de: 'Produktsicherheit (GPSR): Angaben und verantwortliche Person'
@@ -1334,8 +1611,8 @@ eintraege:
   en: 'UG reserve: share of annual net profit'
 - de: SOKA-BAU
   en: SOKA-BAU
-- de: Sag deiner Krankenversicherung, dass du selbstständig bist. Hauptberuflich Selbstständige versichern sich selbst.
-  en: Tell your health insurance that you are self-employed. If self-employment is your main occupation, you insure yourself.
+- de: Sag deiner Krankenversicherung unverzüglich, dass du selbstständig bist. Hauptberuflich Selbstständige versichern sich selbst.
+  en: Tell your health insurance without delay that you are self-employed. If self-employment is your main occupation, you insure yourself.
 - de: Scheinselbstständigkeit
   en: Bogus self-employment (Scheinselbstständigkeit)
 - de: Scheinselbstständigkeit vermeiden
@@ -1344,6 +1621,14 @@ eintraege:
   en: Notify the supervisory authority of a pregnancy
 - de: Seit 28.6.2025 müssen bestimmte Dienstleistungen wie Onlineshops barrierefrei sein – mit Barrierefreiheitserklärung.
   en: Since 28.6.2025, certain services such as online shops must be accessible, with an accessibility statement.
+- de: Seit dem 1.1.2024 gibt es das Gesellschaftsregister für die GbR (§ 707 BGB). Die Eintragung ist freiwillig. Faktisch nötig wird sie, wenn die GbR Rechte an Grundstücken erwerben (§ 47 Abs. 2 GBO)
+    oder sich an einer anderen Gesellschaft beteiligen will, die in einem Register steht – etwa an einer GmbH (Gesellschafterliste, § 40 Abs. 1 S. 3 GmbHG), an einer Aktiengesellschaft (Aktienregister,
+    § 67 AktG) oder an einer eingetragenen GbR (§ 707a Abs. 1 S. 2 BGB). Nach der Eintragung führt die Gesellschaft den Zusatz „eingetragene Gesellschaft bürgerlichen Rechts“ oder „eGbR“ (§ 707a Abs. 2
+    BGB) und meldet als eingetragene GbR ihre wirtschaftlich Berechtigten dem Transparenzregister (§ 20 Abs. 1 GwG).
+  en: Since 1.1.2024 there has been a company register for the GbR (§ 707 BGB). Entry is voluntary. In practice it becomes necessary if the GbR wants to acquire rights to land (§ 47(2) GBO) or hold a stake
+    in another company that is listed in a register – for example in a GmbH (list of shareholders, § 40(1) sentence 3 GmbHG), a stock corporation (share register, § 67 AktG) or a registered GbR (§ 707a(1)
+    sentence 2 BGB). After entry the company uses the addition “eingetragene Gesellschaft bürgerlichen Rechts” or “eGbR” (§ 707a(2) BGB) and, as a registered GbR, reports its beneficial owners to the transparency
+    register (§ 20(1) GwG).
 - de: Seit der Neuregelung von § 22 SGB VII (anzuwenden ab 29.5.2026) bestellen Unternehmen mit regelmäßig 50 oder mehr Beschäftigten Sicherheitsbeauftragte; Zahl und Auswahl richten sich nach den Unfall-
     und Gesundheitsgefahren und der Zahl der Beschäftigten. Bei mehr als 20 und weniger als 50 Beschäftigten ist ein Sicherheitsbeauftragter nur nötig, wenn nach der Gefährdungsbeurteilung eine besondere
     Gefährdung für Leben und Gesundheit besteht; die Berufsgenossenschaft kann die Kriterien festlegen und die Bestellung anordnen. Sicherheitsbeauftragte unterstützen dich ehrenamtlich bei der Umsetzung
@@ -1391,8 +1676,8 @@ eintraege:
   en: Technical and organisational measures to protect personal data.
 - de: Teilnahme an SOKA-BAU
   en: Participation in SOKA-BAU
-- de: Teilt dir eine Beschäftigte ihre Schwangerschaft mit, informierst du die Aufsichtsbehörde.
-  en: If an employee tells you she is pregnant, you inform the supervisory authority.
+- de: Teilt dir eine Beschäftigte ihre Schwangerschaft mit, informierst du unverzüglich die Aufsichtsbehörde.
+  en: If an employee tells you she is pregnant, you inform the supervisory authority without delay.
 - de: Termin ist jetzt der erste Arbeitstag (Erinnerung am Tag davor); Folgen ergänzt.
   en: The deadline is now the first working day (reminder the day before); consequences added.
 - de: Transparenzregister (Bundesanzeiger Verlag)
@@ -1504,8 +1789,9 @@ eintraege:
   en: If you work with hazardous substances, you keep a register, write operating instructions and instruct orally every year with signature.
 - de: Wenn jemand formal selbstständig ist, tatsächlich aber wie ein Angestellter arbeitet.
   en: When someone is formally self-employed but actually works like an employee.
-- de: Wenn sich im Gesellschafterkreis etwas ändert, muss eine neue Gesellschafterliste zum Handelsregister – über den Notar.
-  en: If anything changes among the shareholders, a new list of shareholders (Gesellschafterliste) must be submitted to the commercial register (Handelsregister) – via the notary.
+- de: Wenn sich im Gesellschafterkreis etwas ändert, muss unverzüglich eine neue Gesellschafterliste zum Handelsregister – über den Notar, wenn er an der Änderung mitgewirkt hat, sonst durch die Geschäftsführung.
+  en: If anything changes among the shareholders, a new list of shareholders (Gesellschafterliste) must be submitted to the commercial register (Handelsregister) without delay – via the notary if they were
+    involved in the change, otherwise by the managing directors.
 - de: Wer Jugendliche beschäftigt, braucht vorab eine ärztliche Erstuntersuchung (§ 32 JArbSchG), muss besondere Arbeitszeitgrenzen einhalten und das Jugendarbeitsschutzgesetz mit der Anschrift der Aufsichtsbehörde
     aushängen oder auslegen (§ 47 JArbSchG); ab drei Jugendlichen hängst du außerdem Beginn und Ende ihrer Arbeitszeit und Pausen aus (§ 48 JArbSchG). Jugendliche arbeiten nur zwischen 6 und 20 Uhr (§ 14
     Abs. 1 JArbSchG); in Bäckereien und Konditoreien dürfen Jugendliche über 16 Jahre ab 5 Uhr arbeiten, Jugendliche über 17 Jahre in Bäckereien ab 4 Uhr (§ 14 Abs. 2 Nr. 4, Abs. 3 JArbSchG). Gefährliche
@@ -1522,14 +1808,52 @@ eintraege:
     durch freie Tage oder Zuschlag.
   en: Anyone working for you as a night worker can have an occupational medical examination at your expense before starting and then every three years, from age 50 every year, and receives compensation
     through days off or a bonus.
-- de: 'Wer ein erlaubnispflichtiges Gewerbe ohne Erlaubnis betreibt, riskiert ein Bußgeld bis 5.000 €, bei Finanzanlagenvermittlung und Honorar-Finanzanlagenberatung bis 50.000 € (§ 144 Abs. 1 Nr. 1, Abs. 4 GewO). Eine Gaststätte ohne die nach § 2 Abs. 1 GastG erforderliche Erlaubnis kostet bis 5.000 € (§ 28 Abs. 1 Nr. 1, Abs. 3 GastG) – soweit in deinem Land das Gaststättengesetz des Bundes gilt.'
-  en: 'Anyone who operates a trade requiring a licence without one risks a fine of up to €5,000, for financial investment brokerage and fee-based financial investment advice up to €50,000 (§ 144(1) no. 1, (4) GewO). A restaurant or bar without the licence required under § 2(1) GastG costs up to €5,000 (§ 28(1) no. 1, (3) GastG) – where the federal Restaurant Act (Gaststättengesetz) applies in your state.'
-- de: 'Wer in der Anmeldung falsch versichert, dass die Einlagen geleistet sind, macht sich strafbar: Freiheitsstrafe bis zu drei Jahren oder Geldstrafe (§ 82 Abs. 1 Nr. 1 GmbHG). Vor der Eintragung besteht die Gesellschaft als solche nicht; wer in ihrem Namen handelt, haftet persönlich (§ 11 Abs. 1, 2 GmbHG).'
-  en: 'Anyone who falsely declares in the registration that the contributions have been made commits a criminal offence: imprisonment of up to three years or a fine (§ 82(1) no. 1 GmbHG). Before registration the company does not exist as such; anyone who acts in its name is personally liable (§ 11(1), (2) GmbHG).'
+- de: Wer ein erlaubnispflichtiges Gewerbe ohne Erlaubnis betreibt, riskiert ein Bußgeld bis 5.000 €, bei Finanzanlagenvermittlung und Honorar-Finanzanlagenberatung bis 50.000 € (§ 144 Abs. 1 Nr. 1, Abs.
+    4 GewO). Eine Gaststätte ohne die nach § 2 Abs. 1 GastG erforderliche Erlaubnis kostet bis 5.000 € (§ 28 Abs. 1 Nr. 1, Abs. 3 GastG) – soweit in deinem Land das Gaststättengesetz des Bundes gilt. In
+    Ländern mit Anzeigepflicht gelten die Bußgelder des Landesgesetzes.
+  en: Anyone who operates a trade requiring a licence without one risks a fine of up to €5,000, for financial investment brokerage and fee-based financial investment advice up to €50,000 (§ 144(1) no. 1,
+    (4) GewO). A restaurant or bar without the licence required under § 2(1) GastG costs up to €5,000 (§ 28(1) no. 1, (3) GastG) – where the federal Restaurant Act (Gaststättengesetz) applies in your state.
+    In states with a notification requirement, the fines of the state law apply.
+- de: Wer eine Erlaubnis nach § 34d, § 34f, § 34h oder § 34i GewO hat – als Versicherungsberater auch nach § 34e GewO (§ 34e Abs. 2 GewO) –, lässt sich unverzüglich nach Aufnahme der Tätigkeit in das Vermittlerregister
+    eintragen, das die IHK führt (§ 11a GewO). Änderungen meldest du ebenfalls. Versicherungsvermittler bilden sich außerdem jedes Jahr weiter – das steht bei der Weiterbildungspflicht.
+  en: Anyone with a permit under § 34d, § 34f, § 34h or § 34i GewO – as an insurance adviser also under § 34e GewO (§ 34e(2) GewO) – registers in the intermediary register kept by the IHK without delay
+    after starting the activity (§ 11a GewO). You also report changes. Insurance intermediaries also complete further training every year – see the further training obligation.
+- de: Wer einen anderen Unternehmer mit Werk- oder Dienstleistungen beauftragt, haftet wie ein Bürge dafür, dass dieser und alle weiteren Nachunternehmer ihren Beschäftigten den Mindestlohn zahlen (§ 13
+    MiLoG i. V. m. § 14 AEntG). Im Baugewerbe haftest du außerdem für die Sozialversicherungsbeiträge der Nachunternehmer, wenn der Gesamtwert der Bauleistungen 275.000 € erreicht (§ 28e Abs. 3a SGB IV),
+    bei Paketdiensten für die Zustellung von Paketen bis 32 kg (§ 28e Abs. 3f, 3g SGB IV); Botenfahrten etwa einer Apotheke sind keine Paketzustellung in diesem Sinn. In der Bau-, Fleisch- und Paketbranche
+    haftest du auch für die Beiträge zur Unfallversicherung (§ 150 Abs. 3 SGB VII). Ist der Nachunternehmer präqualifiziert, entlastet dich das (§ 28e Abs. 3b SGB IV). Lass dir deshalb vor und während der
+    Zusammenarbeit Nachweise geben, etwa Unbedenklichkeitsbescheinigungen der Krankenkasse und der Berufsgenossenschaft, eine Erklärung zum Mindestlohn und die Gewerbeanmeldung, und vereinbare Kontrollrechte
+    im Vertrag.
+  en: Anyone who commissions another business to carry out work or services is liable like a guarantor for that business and all further subcontractors paying their staff the minimum wage (§ 13 MiLoG in
+    conjunction with § 14 AEntG). In construction you are also liable for the subcontractors' social security contributions if the total value of the construction work reaches €275,000 (§ 28e(3a) SGB IV),
+    and in parcel services for delivering parcels up to 32 kg (§ 28e(3f), (3g) SGB IV); courier runs, for example for a pharmacy, are not parcel delivery in this sense. In construction, the meat industry
+    and parcel services you are also liable for accident insurance contributions (§ 150(3) SGB VII). If the subcontractor is prequalified, this relieves you (§ 28e(3b) SGB IV). So ask for evidence before
+    and during the cooperation, such as clearance certificates from the health insurer and the employers' liability insurance association, a minimum wage declaration and the trade registration, and agree
+    inspection rights in the contract.
+- de: Wer jemanden ohne die erforderliche Erlaubnis beschäftigt, riskiert ein Bußgeld bis 500.000 € (§ 404 Abs. 2 Nr. 3, Abs. 3 SGB III). Endet die Beschäftigung vorzeitig und teilst du das der Ausländerbehörde
+    nicht binnen vier Wochen mit, riskierst du bis 30.000 € (§ 98 Abs. 2a Nr. 2, Abs. 5 AufenthG); für eine fehlende Kopie sieht § 98 AufenthG kein eigenes Bußgeld vor.
+  en: Anyone who employs someone without the required permit risks a fine of up to €500,000 (§ 404(2) no. 3, (3) SGB III). If the employment ends early and you do not notify the immigration authority within
+    four weeks, you risk up to €30,000 (§ 98(2a) no. 2, (5) AufenthG); § 98 AufenthG provides no separate fine for a missing copy.
+- de: Wer nicht die Staatsangehörigkeit eines EU- oder EWR-Staats oder der Schweiz hat, darf nur arbeiten, wenn der Aufenthaltstitel das erlaubt. Als Arbeitgeber prüfst du vor Beginn, ob ein solcher Titel
+    oder eine Erlaubnis zur Beschäftigung vorliegt, und bewahrst für die Dauer der Beschäftigung eine Kopie auf, auf Papier oder elektronisch (§ 4a Abs. 5 AufenthG). Achte auf das Ablaufdatum des Titels.
+    Endet die Beschäftigung vorzeitig, teilst du das der Ausländerbehörde binnen vier Wochen mit (§ 4a Abs. 5 S. 3 Nr. 3 AufenthG).
+  en: Anyone who is not a national of an EU or EEA state or Switzerland may only work if their residence permit allows it. As employer you check before they start whether such a permit or a permission to
+    work exists and keep a copy for the duration of employment, on paper or electronically (§ 4a(5) AufenthG). Watch the expiry date of the permit. If the employment ends early, you notify the immigration
+    authority within four weeks (§ 4a(5) sentence 3 no. 3 AufenthG).
 - de: Wer wenig Umsatz macht, kann ohne Umsatzsteuer abrechnen.
   en: If you have low revenue, you can invoice without VAT.
+- de: 'Wer öffentliche Straßen, Wege und Plätze über den Gemeingebrauch hinaus nutzt – etwa mit einem Foodtruck oder Verkaufsstand –, braucht eine Sondernutzungserlaubnis nach dem Straßenrecht des Landes;
+    zuständig ist meist die Gemeinde als Straßenbaubehörde. Auf privaten Flächen brauchst du die Zustimmung der Eigentümer. Auf Wochenmärkten, Volksfesten und anderen von der Gemeinde festgesetzten Veranstaltungen
+    vergibt der Veranstalter die Standplätze (§§ 64 ff., § 70 GewO). Für die Preise gilt die Preisangabenverordnung: Du gibst den Gesamtpreis an (§ 3 PAngV), bei Waren nach Gewicht oder Volumen auch den
+    Grundpreis (§ 4 PAngV). Die Regeln für Gaststätten (§ 13 PAngV) gelten nur für Gaststätten mit Sitzplätzen bzw. Bewirtung.'
+  en: 'Anyone who uses public roads, paths and squares beyond common use – for example with a food truck or sales stand – needs a special use permit under the state''s road law; usually the municipality
+    is responsible as the road authority. On private land you need the owner''s consent. At weekly markets, festivals and other events set by the municipality, the organiser allocates the pitches (§§ 64
+    et seq., § 70 GewO). Prices are governed by the Price Indication Ordinance (PAngV): you state the total price (§ 3 PAngV) and, for goods sold by weight or volume, also the unit price (§ 4 PAngV). The
+    rules for restaurants (§ 13 PAngV) only apply to restaurants with seating or table service.'
 - de: Widerrufsbutton für Online-Verträge
   en: Withdrawal button for online contracts
+- de: Wird ein Geschäftsführer zu Unrecht nicht als Beschäftigter geführt, sind Beiträge bis zu vier Jahre nachzuzahlen (§ 25 Abs. 1 SGB IV), bei Vorsatz strafbar (§ 266a StGB).
+  en: If a managing director is wrongly not treated as an employee, contributions must be paid retrospectively for up to four years (§ 25(1) SGB IV); if intentional, it is a criminal offence (§ 266a StGB).
 - de: Wird eine Grenze überschritten, fällt ab diesem Umsatz Umsatzsteuer an.
   en: If a limit is exceeded, VAT is due from that sale onwards.
 - de: Wirtschaftlich Berechtigte
@@ -1548,6 +1872,8 @@ eintraege:
   en: 'If you pay late, a late-payment surcharge (Säumniszuschlag) of 1 % of the overdue amount, rounded down to the nearest €50, accrues for each month or part of a month; for a delay of up to three days it is not charged (§ 240(1), (3) AO). Anyone who does not pay the advance payment, or not in full or on time, also risks a fine of up to €30,000 (§ 26a(1), (3) UStG in conjunction with § 18(1) sentence 4 UStG). For a late advance return the tax office can impose a late-filing surcharge (§ 152(1) AO).'
 - de: 'Zahlst du nicht rechtzeitig, fällt für jeden angefangenen Monat ein Säumniszuschlag von 1 % des auf 50 € abgerundeten rückständigen Betrags an; bei bis zu drei Tagen Verspätung wird er nicht erhoben (§ 240 Abs. 1, 3 AO, für die Gewerbesteuer über § 1 Abs. 2 Nr. 5 AO).'
   en: 'If you pay late, a late-payment surcharge (Säumniszuschlag) of 1 % of the overdue amount, rounded down to the nearest €50, accrues for each month or part of a month; for a delay of up to three days it is not charged (§ 240(1), (3) AO, for trade tax via § 1(2) no. 5 AO).'
+- de: Zahlungen über 50.000 €, die du von Gebietsfremden erhältst oder an Gebietsfremde leistest – zum Beispiel Investorengeld aus dem Ausland –, meldest du der Bundesbank.
+  en: You report payments of more than €50,000 that you receive from or make to non-residents – for example investor money from abroad – to the Bundesbank.
 - de: Zentrale Stelle Verpackungsregister (LUCID)
   en: Central Agency Packaging Register (Zentrale Stelle Verpackungsregister, LUCID)
 - de: Zur Prüfung befähigte Person, z. B. Schankanlagen- oder Gasfachbetrieb
@@ -1570,6 +1896,8 @@ eintraege:
   en: stiftung elektro-altgeräte register (ear)
 - de: '§ 12 ArbSchG ist nicht unmittelbar bußgeldbewehrt: Die Aufsicht kann die Unterweisung anordnen, ein Verstoß gegen die Anordnung kostet bis 30.000 € (§ 25 Abs. 1 Nr. 2 Buchst. a, Abs. 2 ArbSchG). Bei Gefahrstoffen, Biostoffen und Arbeitsmitteln ist die fehlende Unterweisung direkt bußgeldbewehrt: bei Gefahrstoffen bis 50.000 € (§ 22 Abs. 1 Nr. 25 GefStoffV in Verbindung mit § 26 Abs. 1 Nr. 8 Buchst. b, Abs. 3 ChemG), bei Biostoffen und Arbeitsmitteln bis 5.000 € (§ 20 Abs. 1 Nr. 23 BioStoffV, § 22 Abs. 1 Nr. 26 BetrSichV in Verbindung mit § 25 Abs. 1 Nr. 1, Abs. 2 ArbSchG).'
   en: '§ 12 ArbSchG is not directly subject to fines: the authority can order the instruction, and a breach of the order costs up to €30,000 (§ 25(1) no. 2 letter a, (2) ArbSchG). For hazardous substances, biological agents and work equipment, missing instruction is directly subject to fines: for hazardous substances up to €50,000 (§ 22(1) no. 25 GefStoffV in conjunction with § 26(1) no. 8 letter b, (3) ChemG), for biological agents and work equipment up to €5,000 (§ 20(1) no. 23 BioStoffV, § 22(1) no. 26 BetrSichV in conjunction with § 25(1) no. 1, (2) ArbSchG).'
+- de: § 146 GewO sieht dafür kein eigenes Bußgeld vor. Die Behörde fordert die Unterlagen an; ergibt die Prüfung Unzuverlässigkeit, kann sie das Gewerbe untersagen (§ 35 GewO).
+  en: § 146 GewO provides no separate fine for this. The authority requests the documents; if the check shows you are unreliable, it can prohibit the trade (§ 35 GewO).
 - de: '§ 26a UStG nennt kein eigenes Bußgeld dafür, E-Rechnungen nicht empfangen zu können.'
   en: '§ 26a UStG provides no separate fine for not being able to receive e-invoices.'
 - de: '§ 26a UStG nennt kein eigenes Bußgeld für fehlende Pflichtangaben; wer eine Rechnung nicht oder nicht rechtzeitig ausstellt, riskiert bis 5.000 € (§ 26a Abs. 2 Nr. 1, Abs. 3 UStG). Weist du mehr Umsatzsteuer aus, als du schuldest, oder Steuer, obwohl du dazu nicht berechtigt bist, schuldest du den ausgewiesenen Betrag (§ 14c Abs. 1, 2 UStG). Dein Kunde braucht eine Rechnung nach § 14 UStG für den Vorsteuerabzug (§ 15 Abs. 1 Satz 1 Nr. 1 Satz 2 UStG).'
@@ -1584,18 +1912,24 @@ eintraege:
   en: '§ 5b EStG provides no separate fine. The tax office can enforce the transmission with a coercive fine (Zwangsgeld) of up to €25,000 (§§ 328, 329 AO).'
 - de: '§§ 5, 6 ArbSchG sind nicht unmittelbar bußgeldbewehrt: Die Aufsicht kann die nötigen Maßnahmen anordnen, ein Verstoß gegen die vollziehbare Anordnung kostet bis 30.000 € (§ 22 Abs. 3 Satz 1 Nr. 1, § 25 Abs. 1 Nr. 2 Buchst. a, Abs. 2 ArbSchG). Für die Dokumentation gelten außerdem die Bußgelder bei „Gefährdungsbeurteilung erstellen“.'
   en: '§§ 5, 6 ArbSchG are not directly subject to fines: the authority can order the necessary measures, and a breach of the enforceable order costs up to €30,000 (§ 22(3) sentence 1 no. 1, § 25(1) no. 2 letter a, (2) ArbSchG). For the documentation, the fines listed under “Create a risk assessment” also apply.'
-- de: Änderungen im Gesellschafterkreis werden notariell abgewickelt; die aktualisierte Gesellschafterliste wird beim Handelsregister eingereicht.
-  en: Changes among the shareholders are handled by a notary; the updated list of shareholders is filed with the commercial register (Handelsregister).
 - de: Ärztliche Erstuntersuchung Jugendlicher vor Beginn
   en: Initial medical examination of young people before they start
-- de: Über ELSTER übermittelst du Steuererklärungen und Anmeldungen ans Finanzamt, als Erstes den Fragebogen zur steuerlichen Erfassung. Weil die Aktivierungsdaten per Post kommen, solltest du das Konto
-    früh beantragen.
-  en: You use ELSTER to submit tax returns and filings to the tax office (Finanzamt), starting with the tax registration questionnaire (Fragebogen zur steuerlichen Erfassung). Because the activation data
-    comes by post, you should apply for the account early.
+- de: Über ELSTER übermittelst du Steuererklärungen und Anmeldungen ans Finanzamt, als Erstes den Fragebogen zur steuerlichen Erfassung, den du elektronisch abgibst (§ 138 Abs. 1b AO). Weil die Aktivierungsdaten
+    per Post kommen, solltest du das Konto früh beantragen. Übernimmt eine Steuerberatung die Übermittlung, gibt sie den Fragebogen für dich ab.
+  en: You use ELSTER to submit tax returns and filings to the tax office (Finanzamt), starting with the tax registration questionnaire (Fragebogen zur steuerlichen Erfassung), which you submit electronically
+    (§ 138(1b) AO). Because the activation data comes by post, you should apply for the account early. If a tax adviser handles the submission, they submit the questionnaire for you.
 - de: Über das Widerrufsrecht belehren
   en: Inform customers about the right of withdrawal
 - de: Über die Datenverarbeitung informieren
   en: Inform people about data processing
+- de: Überwachungsbedürftig sind unter anderem der Handel mit hochwertigen Gebrauchtwaren, Fahrzeugen, Edelmetallen, Schmuck und Altmetall, Auskunfteien und Detekteien, die Vermittlung von Ehen, Partnerschaften,
+    Reisen und Unterkünften sowie Schlüsseldienste und der Einbau von Sicherungseinrichtungen (§ 38 Abs. 1 GewO). Beim Handel mit Gebrauchtwaren erfasst das Gesetz den An- und Verkauf hochwertiger Konsumgüter
+    (§ 38 Abs. 1 Nr. 1 GewO) – Second-Hand-Kleidung oder gebrauchte Bücher regelmäßig nicht. Nach der Gewerbeanzeige prüft die Behörde deine Zuverlässigkeit. Dafür beantragst du unverzüglich ein Führungszeugnis
+    und eine Auskunft aus dem Gewerbezentralregister zur Vorlage bei der Behörde; tust du es nicht, holt die Behörde sie selbst ein.
+  en: Trades requiring supervision include dealing in high-value second-hand goods, vehicles, precious metals, jewellery and scrap metal, credit agencies and detective agencies, brokering marriages, partnerships,
+    travel and accommodation, as well as locksmith services and installing security devices (§ 38(1) GewO). For second-hand trading the law covers the buying and selling of high-value consumer goods (§
+    38(1) no. 1 GewO) – second-hand clothing or used books generally not. After the trade registration the authority checks your reliability. For this you apply without delay for a certificate of good conduct
+    and an extract from the central trade register to submit to the authority; if you don't, the authority obtains them itself.
 - de: –
   en: –
 - de: Elektrische Betriebsmittel müssen in bestimmten Abständen geprüft werden. Ein Prüfprotokoll gilt bis zur nächsten Prüfung, die darin steht (sonst bis zum Richtwert für die gewählten Einsatzbedingungen) – dann erinnert Amtlos wieder.
@@ -1680,12 +2014,8 @@ eintraege:
   en: For mini-jobbers and in the sectors under § 2a of the Act to Combat Undeclared Work you continuously record the start, end and duration of working hours.
 - de: Dein Betrieb gehört zu einer Branche nach § 2a Schwarzarbeitsbekämpfungsgesetz.
   en: Your business belongs to a sector under § 2a of the Act to Combat Undeclared Work.
-- de: Bußgeld bis 30.000 € (§ 21 MiLoG).
-  en: Fine of up to €30,000 (§ 21 MiLoG).
 - de: Bußgeld bis 2.000 € (§ 4 NachwG).
   en: Fine of up to €2,000 (§ 4 NachwG).
-- de: Bußgeld bis 25.000 € (§ 111 SGB IV).
-  en: Fine of up to €25,000 (§ 111 SGB IV).
 - de: Über das Lohnprogramm gemeldet
   en: Reported via the payroll software
 - de: Jede neue beschäftigte Person meldest du mit der ersten Lohnabrechnung bei der Krankenkasse an, spätestens sechs Wochen nach Beginn.
@@ -1832,8 +2162,6 @@ eintraege:
   en: 'List of sectors under the Act to Modernise the Fight against Undeclared Work – new: hairdressing, beauty and platform-based delivery services; forestry is no longer included.'
 - de: Bußgeld bis 1.000 € (§ 146 Abs. 2 GewO).
   en: Fine of up to €1,000 (§ 146(2) GewO).
-- de: Bußgeld bis 10.000 € (§ 117 HwO); bei erheblichem Umfang auch nach § 8 SchwarzArbG.
-  en: Fine of up to €10,000 (§ 117 HwO); in serious cases also under § 8 SchwarzArbG.
 - de: Bußgeld bis 15 Mio. € oder 3 % des weltweiten Jahresumsatzes, bei kleinen und mittleren Unternehmen der niedrigere Betrag (Art. 99 KI-VO).
   en: Fine of up to €15 million or 3 % of worldwide annual turnover, for small and medium-sized enterprises whichever is lower (Art. 99 AI Act).
 - de: Bußgeld bis 20.000 €, wenn keine interne Meldestelle eingerichtet ist (§ 40 Abs. 2 Nr. 2, Abs. 6 HinSchG).
@@ -1860,22 +2188,14 @@ eintraege:
   en: Your VAT last year was above the limit for monthly advance returns.
 - de: Der Anmeldezeitraum folgt aus der Lohnsteuer des Vorjahres (§ 41a Abs. 2 EStG) – über 5.000 € monatlich, über 1.080 € vierteljährlich, sonst jährlich. Im ersten Jahr zählt die aufs Jahr hochgerechnete Lohnsteuer des ersten vollen Monats. Trag den Zeitraum in deinem Profil ein; Amtlos berechnet daraus die Termine.
   en: The filing period follows from last year's wage tax (§ 41a(2) EStG) – over €5,000 monthly, over €1,080 quarterly, otherwise yearly. In the first year the wage tax of the first full month projected to a full year counts. Enter the period in your profile; Amtlos calculates the deadlines from it.
-- de: Der Mindestlohn beträgt 13,90 € je Stunde ab 1.1.2026 und 14,60 € ab 1.1.2027. Amtlos führt die Werte mit Gültigkeitszeitraum. In manchen Branchen gelten höhere Branchenmindestlöhne aus allgemeinverbindlichen Tarifverträgen oder Verordnungen nach dem Arbeitnehmer-Entsendegesetz, zum Beispiel in der Gebäudereinigung, in Teilen des Bau- und Ausbaugewerbes und in der Pflege. Prüfe, ob einer für deinen Betrieb gilt – Amtlos kennt die Beträge noch nicht.
-  en: The minimum wage is €13.90 per hour from 1.1.2026 and €14.60 from 1.1.2027. Amtlos keeps the values with their validity period. In some sectors higher sector minimum wages apply under collective agreements declared generally binding or ordinances under the Posted Workers Act, for example in building cleaning, parts of construction and finishing trades and in care. Check whether one applies to your business – Amtlos does not know the amounts yet.
 - de: Die Abmeldung geht über das Lohnprogramm an die Krankenkasse bzw. die Minijob-Zentrale. Sie ist mit der ersten folgenden Entgeltabrechnung fällig, spätestens sechs Wochen nach dem Ende der Beschäftigung (§ 8 DEÜV). Amtlos zeigt den spätesten Termin.
   en: The deregistration goes via the payroll software to the health insurer or the Minijob-Zentrale. It is due with the next payroll, at the latest six weeks after the end of employment (§ 8 DEÜV). Amtlos shows the latest deadline.
-- de: Die Außenwirtschaftsverordnung verlangt Meldungen bei grenzüberschreitenden Zahlungen über einer Meldegrenze. Frag bei deiner Bank oder der Bundesbank nach der aktuellen Grenze.
-  en: The Foreign Trade and Payments Ordinance requires reports for cross-border payments above a reporting threshold. Ask your bank or the Bundesbank for the current threshold.
-- de: Die Berufsgenossenschaft berechnet ihren Beitrag aus den Arbeitsentgelten. Dafür übermittelst du nach Ablauf jedes Kalenderjahres den digitalen Lohnnachweis (§ 99 SGB VII), in der Regel über das Lohnprogramm oder deine Steuerberatung.
-  en: The employers' liability insurance association calculates its contribution from wages. For this you submit the digital wage statement after the end of each calendar year (§ 99 SGB VII), usually via the payroll software or your tax adviser.
 - de: Die Bescheinigung nach § 43 Abs. 1 IfSG (früher „Gesundheitszeugnis“) brauchst auch du selbst, wenn du gewerbsmäßig mit Lebensmitteln nach § 42 IfSG arbeitest – zum Beispiel beim Kochen, Zubereiten oder Ausgeben. Die Belehrung macht das Gesundheitsamt oder ein beauftragter Arzt; vereinbare den Termin früh. Bei Aufnahme der Tätigkeit darf die Bescheinigung höchstens drei Monate alt sein. Hast du schon eine aus einer früheren Tätigkeit, brauchst du keine neue.
   en: You need the certificate under § 43(1) IfSG (formerly "health certificate") yourself too if you work commercially with food under § 42 IfSG – for example cooking, preparing or serving. The briefing is given by the public health office or an appointed doctor; book the appointment early. When you start the activity, the certificate may be at most three months old. If you already have one from earlier work, you don't need a new one.
 - de: Die Datenschutzerklärung muss von jeder Seite erreichbar sein. Inhaltlich folgt sie den Informationspflichten der DSGVO. Erledigt ist sie, wenn sie auf deiner Website veröffentlicht ist.
   en: The privacy policy must be accessible from every page. Its content follows the information obligations of the GDPR. It is done once it is published on your website.
 - de: Die Erstbelehrung macht das Gesundheitsamt oder ein beauftragter Arzt. Die Bescheinigung darf bei Aufnahme der Tätigkeit höchstens drei Monate alt sein; du bewahrst sie im Betrieb auf. Das gilt nur für die erstmalige Tätigkeit mit Lebensmitteln nach § 42 IfSG. Wer schon eine Bescheinigung aus einer früheren Tätigkeit hat, braucht keine neue – dann reichen diese Bescheinigung und deine Belehrung. Bürokräfte ohne Umgang mit Lebensmitteln brauchen beides nicht. Danach belehrst du deine Beschäftigten selbst – siehe „Belehrung nach § 43 IfSG durch den Arbeitgeber“.
   en: The initial briefing is given by the public health office or an appointed doctor. The certificate may be at most three months old when the activity starts; you keep it at the business. This only applies to the first-time activity with food under § 42 IfSG. Anyone who already has a certificate from earlier work does not need a new one – that certificate and your briefing are then enough. Office staff without contact with food need neither. After that you brief your staff yourself – see "Briefing under § 43 IfSG by the employer".
-- de: Die Jahresmeldung übermittelt das Lohnprogramm für alle, die über den Jahreswechsel beschäftigt sind – bis zum 15. Februar des Folgejahres (§ 10 DEÜV). Die Jahresmeldung zur Unfallversicherung ist eine eigene Meldung.
-  en: The payroll software submits the annual report for everyone employed over the turn of the year – by 15 February of the following year (§ 10 DEÜV). The annual report for accident insurance is a separate report.
 - de: Du arbeitest selbst zum ersten Mal mit Lebensmitteln.
   en: You work with food yourself for the first time.
 - de: Du beschäftigst Menschen ohne EU-, EWR- oder Schweizer Staatsangehörigkeit.
@@ -1914,8 +2234,6 @@ eintraege:
   en: The questionnaire is only done once you have submitted it in ELSTER – for this you first need the ELSTER account.
 - de: Feuerlöscher bereitstellen und prüfen lassen
   en: Provide fire extinguishers and have them inspected
-- de: Für Auszubildende gilt nicht der gesetzliche Mindestlohn (§ 22 Abs. 3 MiLoG), sondern eine angemessene Vergütung, mindestens die Mindestausbildungsvergütung nach § 17 BBiG. Sie steigt mit jedem Ausbildungsjahr und wird jährlich angepasst; ein geltender Tarifvertrag kann höhere Sätze vorsehen. Amtlos kennt die Beträge noch nicht – frag deine Kammer.
-  en: Apprentices are not covered by the statutory minimum wage (§ 22(3) MiLoG) but by an appropriate allowance, at least the minimum training allowance under § 17 BBiG. It rises with each year of training and is adjusted annually; an applicable collective agreement may provide higher rates. Amtlos does not know the amounts yet – ask your chamber.
 - de: Für Gründungen gibt es Förderprogramme – etwa den Gründungszuschuss der Arbeitsagentur, Gründungskredite der KfW und der Förderbanken der Länder und geförderte Gründungsberatung; für Startups mit Kapitalgesellschaft auch EXIST und INVEST.
   en: There are funding programmes for start-ups – for example the start-up grant of the employment agency, start-up loans from KfW and the state development banks and subsidised start-up advice; for start-ups with a corporation also EXIST and INVEST.
 - de: Für jede beschäftigte Person geht bis zum 15. Februar eine Jahresmeldung für das Vorjahr an die Krankenkasse.
@@ -1932,8 +2250,6 @@ eintraege:
   en: Submitted in ELSTER
 - de: In deiner Gaststätte legst du ein Preisverzeichnis aus und hängst neben dem Eingang die Preise der wichtigsten Speisen und Getränke aus.
   en: In your restaurant you provide a price list and display the prices of the main food and drinks next to the entrance.
-- de: 'In den Branchen nach § 28a Abs. 4 SGB IV ist eine Sofortmeldung spätestens bei Arbeitsbeginn Pflicht: Baugewerbe, Gaststätten- und Beherbergungsgewerbe, Personenbeförderung, Speditions-, Transport- und damit verbundenes Logistikgewerbe, Schaustellergewerbe, Gebäudereinigung, Auf- und Abbau von Messen und Ausstellungen, Fleischwirtschaft (ohne Fleischerhandwerk), Prostitutionsgewerbe, Wach- und Sicherheitsgewerbe sowie seit 1.1.2026 Friseur- und Kosmetikgewerbe und plattformbasierte Lieferdienste. Die Forstwirtschaft gehört seitdem nicht mehr dazu. Die Anmeldung zur Sozialversicherung mit der ersten Lohnabrechnung kommt dazu.'
-  en: 'In the sectors under § 28a(4) SGB IV an immediate report at the latest when work starts is mandatory: construction, restaurants and accommodation, passenger transport, haulage, transport and related logistics, fairground and showmen''s trade, building cleaning, setting up and dismantling trade fairs and exhibitions, meat industry (excluding butchers'' trade), prostitution, guarding and security services and, since 1.1.2026, hairdressing and beauty trades and platform-based delivery services. Forestry has no longer been included since then. The social security registration with the first payroll comes in addition.'
 - de: Jugendliche halbjährlich unterweisen
   en: Brief young people every six months
 - de: Kannst du einen Streit mit einem Verbraucher nicht beilegen, nennst du ihm eine zuständige Schlichtungsstelle und sagst, ob du teilnimmst.
@@ -1990,8 +2306,6 @@ eintraege:
   en: Anyone who works with food at your business for the first time needs the certificate of the briefing by the public health office before the first working day.
 - de: 'Wer gewerbsmäßig leicht verderbliche Lebensmittel herstellt, behandelt oder in Verkehr bringt, braucht dafür Fachkenntnisse aus einer Schulung (§ 4 Lebensmittelhygiene-Verordnung). Als Lebensmittelunternehmer stellst du sicher, dass alle, die mit Lebensmitteln umgehen, ihrer Tätigkeit entsprechend in Hygiene geschult und überwacht werden (Anhang II Kapitel XII VO (EG) Nr. 852/2004). Die Fachkenntnisse musst du der Lebensmittelüberwachung auf Verlangen nachweisen (§ 4 Abs. 1 Satz 2 LMHV) – bei Kontrollen wird der Schulungsnachweis verlangt. Halte jede Schulung deshalb schriftlich fest: Datum, Themen, wer geschult hat und wer teilgenommen hat, mit Unterschrift. Üblich ist eine Wiederholung einmal im Jahr (DIN 10514). Die Hygieneschulung ist nicht dasselbe wie die Belehrung nach dem Infektionsschutzgesetz: Die IfSG-Belehrung geht um Krankheiten, die Hygieneschulung um Fachwissen zur Lebensmittelhygiene. Du kannst beides am selben Termin machen, brauchst aber für jede eine eigene Unterschriftsliste. Wer eine Berufsausbildung mit Lebensmittelhygiene abgeschlossen hat, zum Beispiel als Bäcker/in oder Koch/Köchin, gilt in der Regel als ausreichend geschult (§ 4 Abs. 2 LMHV).'
   en: 'Anyone who commercially produces, handles or places perishable food on the market needs the relevant knowledge from training (§ 4 Food Hygiene Ordinance, LMHV). As a food business operator, you make sure that everyone who handles food is trained and supervised in hygiene according to their work (Annex II Chapter XII Regulation (EC) No 852/2004). You must prove this knowledge to the food control authority on request (§ 4(1) sentence 2 LMHV) – inspectors ask for the training record. So record every training session in writing: date, topics, who gave the training and who took part, with signatures. Repeating it once a year is customary (DIN 10514). Hygiene training is not the same as the instruction under the Infection Protection Act: the IfSG instruction is about diseases, hygiene training is about food hygiene know-how. You can do both on the same date, but you need a separate signature list for each. Anyone who has completed vocational training that includes food hygiene, for example as a baker or cook, is generally considered sufficiently trained (§ 4(2) LMHV).'
-- de: Wer nicht die Staatsangehörigkeit eines EU- oder EWR-Staats oder der Schweiz hat, darf nur arbeiten, wenn der Aufenthaltstitel das erlaubt. Als Arbeitgeber prüfst du vor Beginn, ob ein solcher Titel oder eine Erlaubnis zur Beschäftigung vorliegt, und bewahrst für die Dauer der Beschäftigung eine Kopie auf, auf Papier oder elektronisch (§ 4a Abs. 5 AufenthG). Achte auf das Ablaufdatum des Titels.
-  en: Anyone who is not a national of an EU or EEA state or Switzerland may only work if their residence permit allows it. As employer you check before they start whether such a permit or a permission to work exists and keep a copy for the duration of employment, on paper or electronically (§ 4a(5) AufenthG). Watch the expiry date of the permit.
 - de: Zur Prüfung befähigte Person
   en: Person qualified to inspect
 - de: § 17 MiLoG verlangt Aufzeichnungen für geringfügig Beschäftigte und für Beschäftigte in den Branchen nach § 2a Schwarzarbeitsbekämpfungsgesetz (zum Beispiel Bau, Gaststätten und Hotels, Transport und Logistik, Gebäudereinigung, seit 2026 auch Friseur- und Kosmetikbetriebe). Aufzuzeichnen ist spätestens bis zum Ablauf des siebten Tages nach der Arbeitsleistung; die Aufzeichnungen bewahrst du zwei Jahre auf. Das ist eine laufende Pflicht – ein Arbeitszeitnachweis gilt für seinen Monat.
@@ -2008,8 +2322,6 @@ eintraege:
   en: Liability as client for the minimum wage paid by subcontractors
 - de: Als Halter machst du dich strafbar, wenn du anordnest oder zulässt, dass jemand dein Fahrzeug ohne die erforderliche Fahrerlaubnis führt (§ 21 Abs. 1 Nr. 2 StVG). Kontrolliere deshalb vor der ersten Fahrt den Führerschein im Original und danach regelmäßig – üblich ist etwa alle sechs Monate; eine feste Frist nennt das Gesetz nicht. Halte Datum, Klassen und Ergebnis fest.
   en: As the vehicle keeper you commit an offence if you order or allow someone to drive your vehicle without the required driving licence (§ 21(1) no. 2 StVG). So check the original driving licence before the first trip and regularly afterwards – about every six months is common practice; the law sets no fixed interval. Record the date, licence classes and result.
-- de: Als Versicherungs-, Finanzanlagen- oder Immobiliardarlehensvermittler lässt du dich nach der Erlaubnis ins Vermittlerregister eintragen und hältst die Angaben aktuell.
-  en: As an insurance, financial investment or real estate loan intermediary you register in the intermediary register after receiving your permit and keep the details up to date.
 - de: Altbatterien zurücknehmen, wenn du Fahrzeugbatterien verkaufst
   en: Accept returned batteries if you sell vehicle batteries
 - de: Altöl zurücknehmen, wenn du Motor- oder Getriebeöl verkaufst
@@ -2022,8 +2334,6 @@ eintraege:
   en: Work on vehicle air-conditioning systems in which refrigerant is recovered or refilled may only be carried out by persons with a certificate of competence. This is governed by the EU F-gas Regulation (EU) 2024/573 and the German Chemicals Climate Protection Ordinance (ChemKlimaschutzV). Keep your staff's certificates ready.
 - de: Aufenthaltstitel während der Beschäftigung im Blick behalten
   en: Keep an eye on residence permits during employment
-- de: Ausbildende beantragen unverzüglich nach Abschluss des Berufsausbildungsvertrags die Eintragung in das Verzeichnis der Berufsausbildungsverhältnisse bei der zuständigen Stelle – im Handwerk bei der Handwerkskammer (Lehrlingsrolle), sonst meist bei der IHK (§ 36 Abs. 1 BBiG). Eine Ausfertigung der Vertragsniederschrift fügst du bei. Ohne Eintragung wird der Azubi nicht zur Abschlussprüfung zugelassen.
-  en: Training employers apply for entry in the register of vocational training relationships with the competent body without delay after concluding the training contract – in the crafts with the Chamber of Crafts (apprentice register), otherwise usually with the IHK (§ 36(1) BBiG). You enclose a copy of the written contract. Without the entry the apprentice is not admitted to the final examination.
 - de: Ausbildungsnachweis regelmäßig durchsehen
   en: Review the training record regularly
 - de: Ausbildungsvertrag ins Verzeichnis eintragen lassen
@@ -2084,24 +2394,14 @@ eintraege:
   en: Your company is entered in the commercial or partnership register.
 - de: Den Ausbildungsvertrag meldest du gleich nach Abschluss bei deiner Kammer zur Eintragung ins Verzeichnis der Berufsausbildungsverhältnisse an.
   en: Right after concluding it, you submit the training contract to your chamber for entry in the register of vocational training relationships.
-- de: Die Geschäftsführung einer GmbH oder UG hat gesetzliche Pflichten. Wer sie verletzt, kann persönlich haften. Dazu gehören vor allem, die Sozialversicherungsbeiträge der Beschäftigten abzuführen (§ 266a StGB), Steuern zu erklären und zu zahlen (§§ 34, 69 AO), nach Eintritt der Insolvenzreife keine Zahlungen mehr zu leisten (§ 15b InsO), bei Verlust der Hälfte des Stammkapitals die Gesellschafterversammlung einzuberufen (§ 49 Abs. 3 GmbHG) und die Gesellschafterliste aktuell zu halten (§ 40 GmbHG). Das zur Erhaltung des Stammkapitals nötige Vermögen darf nicht an Gesellschafter ausgezahlt werden (§ 30 GmbHG) – typische Fälle sind ein überhöhtes Gehalt für Gesellschafter-Geschäftsführer und Darlehen an Gesellschafter. Verbotene Auszahlungen sind zu erstatten (§ 31 GmbHG), die Geschäftsführung haftet dafür (§ 43 Abs. 3 GmbHG). Bei der GmbH & Co. KG treffen diese Pflichten die Geschäftsführung der Komplementär-GmbH. Für deinen Einzelfall hilft eine Rechtsberatung.
-  en: The managing directors of a GmbH or UG have statutory duties. Anyone who breaches them can be personally liable. Above all, these include paying the employees' social security contributions (§ 266a StGB), filing and paying taxes (§§ 34, 69 AO), making no further payments once the company is insolvent (§ 15b InsO), calling a shareholders' meeting if half of the share capital is lost (§ 49(3) GmbHG) and keeping the list of shareholders up to date (§ 40 GmbHG). Assets needed to maintain the share capital must not be paid out to shareholders (§ 30 GmbHG) – typical cases are an excessive salary for shareholder managing directors and loans to shareholders. Prohibited payments must be repaid (§ 31 GmbHG), and the managing directors are liable for them (§ 43(3) GmbHG). In a GmbH & Co. KG these duties fall on the managing directors of the general partner GmbH. Legal advice helps with your individual case.
 - de: Die Gesellschaft wird zum Handelsregister angemeldet, die Partnerschaftsgesellschaft zum Partnerschaftsregister – GmbH und UG entstehen erst mit der Eintragung.
   en: The company is registered with the commercial register, a partnership company with the partnership register – a GmbH or UG only comes into existence on entry.
-- de: Die Gewerbeanzeige machst du bei deiner Gemeinde, meist online. Die Gebühr hängt von der Gemeinde ab. Das Gewerbeamt informiert danach Finanzamt, IHK oder Handwerkskammer und weitere Stellen. Ummelden musst du auch, wenn du die Tätigkeit wechselst oder auf Waren oder Leistungen ausdehnst, die bei Betrieben der angemeldeten Art nicht geschäftsüblich sind (§ 14 Abs. 1 S. 2 Nr. 2 GewO). Für bestimmte Reisegewerbe ohne Reisegewerbekarte gilt eine eigene Anzeigepflicht (§ 55c GewO).
-  en: You file the trade registration with your municipality, usually online. The fee depends on the municipality. The trade office then informs the tax office, the IHK or Chamber of Crafts and other bodies. You must also update the registration if you change your activity or extend it to goods or services that are not customary for businesses of the registered type (§ 14(1) sentence 2 no. 2 GewO). Certain itinerant trades without an itinerant trade card have their own notification duty (§ 55c GewO).
 - de: Die Haftungsbeschränkung der PartG mbB gilt nur, solange die Partnerschaft die vom Berufsrecht vorgeschriebene Berufshaftpflichtversicherung unterhält.
   en: The limitation of liability of a PartG mbB only applies as long as the partnership maintains the professional liability insurance required by professional law.
 - de: Die Insolvenzantragspflicht nach § 15a InsO trifft die Geschäftsführung. Der Antrag ist ohne schuldhaftes Zögern zu stellen, spätestens drei Wochen nach Eintritt der Zahlungsunfähigkeit und sechs Wochen nach Eintritt der Überschuldung. Bei der GmbH & Co. KG gilt das ebenso, weil keine natürliche Person unbeschränkt haftet; antragspflichtig ist dann die Geschäftsführung der Komplementär-GmbH (§ 15a Abs. 1 S. 3 InsO).
   en: The duty to file for insolvency under § 15a InsO lies with the managing directors. The application must be filed without culpable delay, at the latest three weeks after insolvency and six weeks after over-indebtedness occurs. The same applies to a GmbH & Co. KG because no natural person has unlimited liability; the duty then lies with the managing directors of the general partner GmbH (§ 15a(1) sentence 3 InsO).
-- de: Die Kopie des Aufenthaltstitels oder der Erlaubnis zur Beschäftigung bewahrst du für die Dauer der Beschäftigung auf, auf Papier oder elektronisch (§ 4a Abs. 5 AufenthG). Läuft der Titel ab, darf die Person nur weiterarbeiten, wenn ein neuer Titel oder eine Bescheinigung der Ausländerbehörde die Beschäftigung erlaubt – lass dir dann die neue Kopie geben. Endet die Beschäftigung vorzeitig, kann eine Mitteilung an die Ausländerbehörde nötig sein.
-  en: You keep the copy of the residence permit or work permit for the duration of employment, on paper or electronically (§ 4a(5) AufenthG). If the permit expires, the person may only continue working if a new permit or a certificate from the immigration authority allows the employment – then ask for the new copy. If the employment ends early, a notification to the immigration authority may be required.
 - de: Die Lenk- und Ruhezeiten der Verordnung (EG) Nr. 561/2006 gelten für die Güterbeförderung mit Fahrzeugen über 3,5 t zulässiger Gesamtmasse (mit Anhänger). Seit dem 1.7.2026 gelten sie auch für Fahrzeuge über 2,5 t bis 3,5 t bei grenzüberschreitenden Fahrten und Kabotage; diese Fahrzeuge brauchen einen intelligenten Fahrtenschreiber der neuesten Generation. Die Daten aus Fahrtenschreiber und Fahrerkarte liest du regelmäßig aus und bewahrst sie auf. Für Werkverkehr bis 3,5 t gibt es unter bestimmten Bedingungen Ausnahmen (Art. 3 Buchst. ha VO (EG) Nr. 561/2006).
   en: The driving and rest times of Regulation (EC) No 561/2006 apply to the carriage of goods with vehicles over 3.5 t permissible total mass (including trailer). Since 1.7.2026 they also apply to vehicles over 2.5 t up to 3.5 t on cross-border trips and cabotage; these vehicles need a smart tachograph of the latest generation. You download the data from the tachograph and driver card regularly and keep it. For own-account transport up to 3.5 t there are exemptions under certain conditions (Art. 3(ha) Regulation (EC) No 561/2006).
-- de: Die Mitgliedschaft entsteht automatisch mit dem Gewerbe; du musst dich nicht selbst anmelden. Die Kammer meldet sich bei dir und setzt den Beitrag fest. Kleingewerbetreibende ohne Eintragung im Handelsregister sind bei der IHK beitragsfrei, solange ihr Gewerbeertrag 5.200 € im Jahr nicht übersteigt (§ 3 Abs. 3 IHKG).
-  en: Membership arises automatically with the trade; you do not need to register yourself. The chamber will contact you and set the fee. Small traders not entered in the commercial register pay no IHK fee as long as their trade income does not exceed €5,200 a year (§ 3(3) IHKG).
-- de: 'Die UG (haftungsbeschränkt) bildet in ihrer Bilanz eine gesetzliche Rücklage: ein Viertel des Jahresüberschusses, gemindert um einen Verlustvortrag aus dem Vorjahr (§ 5a Abs. 3 GmbHG). Die Rücklage darf nur für eine Kapitalerhöhung aus Gesellschaftsmitteln oder zum Ausgleich von Verlusten verwendet werden. Die Pflicht endet erst, wenn das Stammkapital durch eine Kapitalerhöhung mindestens 25.000 € erreicht (§ 5a Abs. 5 GmbHG) – eine Rücklage in dieser Höhe allein reicht nicht.'
-  en: 'The UG (haftungsbeschränkt) forms a statutory reserve in its balance sheet: a quarter of the annual surplus, reduced by any loss carried forward from the previous year (§ 5a(3) GmbHG). The reserve may only be used for a capital increase from company funds or to offset losses. The obligation only ends when the share capital reaches at least €25,000 through a capital increase (§ 5a(5) GmbHG) – a reserve of that amount alone is not enough.'
 - de: Du beauftragst Subunternehmer.
   en: You hire subcontractors.
 - de: Du bietest arbeitsmedizinische Vorsorge an oder veranlasst sie – je nach Tätigkeit, etwa bei Bildschirmarbeit, Lärm, Feuchtarbeit, Mehlstaub oder Schweißrauch.
@@ -2110,8 +2410,6 @@ eintraege:
   en: As a sole proprietorship or GbR you are not entered in the commercial register.
 - de: Du hast eine Betriebsstätte außerhalb deiner Wohnung, in der gewerbliche Abfälle anfallen.
   en: You have business premises outside your home where commercial waste arises.
-- de: Du hast eine Erlaubnis als Versicherungs-, Finanzanlagen- oder Immobiliardarlehensvermittler.
-  en: You have a permit as an insurance, financial investment or real estate loan intermediary.
 - de: Du hast eine Erlaubnis für das Bewachungsgewerbe (§ 34a GewO).
   en: You have a permit for the security trade (§ 34a GewO).
 - de: Du hast mindestens eine Betriebsstätte außerhalb deiner Wohnung.
@@ -2198,20 +2496,12 @@ eintraege:
   en: Keep hazardous waste separate, dispose of it and keep records
 - de: Gefährliche Abfälle vermischst du nicht mit anderen Abfällen (§ 9a KrWG). Du übergibst sie einem dafür zugelassenen Entsorger und bewahrst die Belege auf, etwa Übernahmescheine oder Entsorgungsnachweise. Als Erzeuger gefährlicher Abfälle führst du ein Register über Art, Menge und Verbleib (§ 49 Abs. 3 KrWG); die Belege nach der Nachweisverordnung gehören dazu. Für kleine Mengen gelten Erleichterungen – frag deinen Entsorger oder die Abfallbehörde.
   en: You do not mix hazardous waste with other waste (§ 9a KrWG). You hand it over to a licensed disposal company and keep the receipts, such as acceptance slips or disposal certificates. As a producer of hazardous waste you keep a register of its type, quantity and whereabouts (§ 49(3) KrWG); the records under the Waste Records Ordinance (NachwV) form part of it. Simplifications apply to small quantities – ask your disposal company or the waste authority.
-- de: Gemeinde (Straßenverkehrs- bzw. Ordnungsamt); Marktveranstalter
-  en: Municipality (road traffic or public order office); market organiser
 - de: Gesellschaft im Register eintragen lassen
   en: Have the company entered in the register
-- de: Gesellschaften müssen ihre wirtschaftlich Berechtigten dem Transparenzregister mitteilen und die Angaben bei Änderungen aktualisieren. Das gilt für UG und GmbH ebenso wie für eingetragene Personengesellschaften, also auch für die GmbH & Co. KG und die Partnerschaftsgesellschaft (§ 20 Abs. 1 GwG) – seit 2024 auch für eine GbR, die sich ins Gesellschaftsregister eintragen lässt (eGbR).
-  en: Companies must report their beneficial owners to the transparency register and update the details when they change. This applies to UG and GmbH as well as to registered partnerships, including the GmbH & Co. KG and the partnership company (§ 20(1) GwG) – since 2024 also to a GbR entered in the company register (eGbR).
 - de: Gewerbeabfälle getrennt sammeln und dokumentieren
   en: Collect commercial waste separately and document it
 - de: Gewerbetreibende machen die für ihren Betrieb geltenden Vorschriften des Jugendschutzgesetzes durch einen deutlich sichtbaren und gut lesbaren Aushang bekannt (§ 3 Abs. 1 JuSchG) – in Gaststätten etwa die Regeln zum Aufenthalt von Kindern und Jugendlichen (§ 4 JuSchG), beim Verkauf von Alkohol und Tabak die Abgabeverbote (§§ 9, 10 JuSchG). Fertige Aushänge gibt es bei Kammern und Verbänden.
   en: Traders make the provisions of the Youth Protection Act that apply to their business known by a clearly visible and legible notice (§ 3(1) JuSchG) – in restaurants for example the rules on children and young people being on the premises (§ 4 JuSchG), when selling alcohol and tobacco the sales bans (§§ 9, 10 JuSchG). Ready-made notices are available from chambers and associations.
-- de: Gewerbetreibende mit Erlaubnis nach § 34a GewO, ihre Wachpersonen und die Betriebsleitung werden im Bewacherregister beim Statistischen Bundesamt geführt (§ 11b GewO). Jede Wachperson meldest du vor der Beschäftigung mit Bewachungsaufgaben an; einsetzen darfst du sie erst, wenn die Behörde ihre Zuverlässigkeit geprüft und dir das Ergebnis mitgeteilt hat (§ 16 Abs. 1, 2 BewachV). Endet die Beschäftigung, meldest du die Person innerhalb von sechs Wochen ab (§ 11b GewO).
-  en: Traders with a permit under § 34a GewO, their security staff and management are recorded in the security register at the Federal Statistical Office (§ 11b GewO). You register each security guard before employing them on security tasks; you may only deploy them once the authority has checked their reliability and informed you of the result (§ 16(1), (2) BewachV). When the employment ends, you deregister the person within six weeks (§ 11b GewO).
-- de: GmbH und UG meldet der Notar zum Handelsregister an. Zur Anmeldung gehört die Gesellschafterliste, und die Geschäftsführung versichert, dass die Einlagen geleistet sind (§§ 7, 8 GmbHG). Die GmbH & Co. KG meldest du ebenfalls über einen Notar zum Handelsregister an (§ 106 HGB i. V. m. § 161 Abs. 2 HGB), die Partnerschaftsgesellschaft zum Partnerschaftsregister (§ 4 PartGG). Spätere Änderungen, etwa im Gesellschaftsvertrag oder bei der Geschäftsführung, werden ebenfalls angemeldet.
-  en: The notary registers a GmbH or UG with the commercial register. The application includes the list of shareholders, and the managing directors confirm that the contributions have been made (§§ 7, 8 GmbHG). You also register a GmbH & Co. KG with the commercial register via a notary (§ 106 HGB in conjunction with § 161(2) HGB), and a partnership company with the partnership register (§ 4 PartGG). Later changes, for example to the articles or the management, are registered as well.
 - de: Handwerkskammer bzw. IHK
   en: Chamber of Crafts or IHK
 - de: Hast du dich nicht gemeldet, fordert die Rentenversicherung die Beiträge rückwirkend nach – in der Regel für vier Jahre nach Ablauf des Kalenderjahres, in dem sie fällig wurden, bei Vorsatz für 30 Jahre (§ 25 Abs. 1 SGB IV).
@@ -2238,8 +2528,6 @@ eintraege:
   en: Domestically, driving and rest times already apply to vehicles over 2.8 t up to 3.5 t – without a tachograph you record them on daily record sheets.
 - de: Im Vermittlerregister eingetragen
   en: Entered in the intermediary register
-- de: 'Im nicht privaten Bereich zahlst du für jede Betriebsstätte einen Rundfunkbeitrag, gestaffelt nach der Zahl der Beschäftigten: mit bis zu acht Beschäftigten ein Drittel des Beitrags, mit neun bis 19 Beschäftigten einen ganzen Beitrag, mit mehr Beschäftigten entsprechend mehr (§ 5 Abs. 1 RBStV). Ein Arbeitsraum in deiner eigenen Wohnung ist frei, wenn für die Wohnung schon Rundfunkbeitrag gezahlt wird (§ 5 Abs. 5 Nr. 3 RBStV). Für betrieblich genutzte Kraftfahrzeuge zahlst du je Fahrzeug ein Drittel des Beitrags; je beitragspflichtiger Betriebsstätte ist ein Fahrzeug frei (§ 5 Abs. 2 Nr. 2 RBStV). Den Beginn, neue Betriebsstätten und Fahrzeuge sowie Änderungen meldest du dem Beitragsservice (§ 8 RBStV).'
-  en: 'Outside the private sphere you pay a broadcasting fee for each business premises, graded by the number of employees: with up to eight employees a third of the fee, with nine to 19 employees one full fee, with more employees correspondingly more (§ 5(1) RBStV). A workroom in your own home is exempt if the broadcasting fee is already paid for the home (§ 5(5) no. 3 RBStV). For motor vehicles used for business you pay a third of the fee per vehicle; one vehicle per business premises liable to the fee is exempt (§ 5(2) no. 2 RBStV). You report the start, new premises and vehicles and any changes to the Beitragsservice (§ 8 RBStV).'
 - de: Immobilienmakler und Wohnimmobilienverwalter bilden sich innerhalb von drei Kalenderjahren 20 Stunden weiter (§ 34c Abs. 2a GewO), Versicherungsvermittler 15 Stunden je Kalenderjahr (§ 34d Abs. 9 GewO). Die Nachweise bewahrst du auf und legst sie der Behörde auf Verlangen vor.
   en: Real estate agents and residential property managers complete 20 hours of further training within three calendar years (§ 34c(2a) GewO), insurance intermediaries 15 hours per calendar year (§ 34d(9) GewO). You keep the records and present them to the authority on request.
 - de: In Gaststätten und Verkaufsstellen dürfen Bier, Wein, Sekt und ähnliche Getränke nicht an Kinder und Jugendliche unter 16 Jahren abgegeben werden, Branntwein und branntweinhaltige Getränke, auch Mischgetränke, nicht an unter 18-Jährige; auch den Verzehr darfst du ihnen nicht gestatten (§ 9 Abs. 1 JuSchG). Tabakwaren, E-Zigaretten und Shishas gibst du nicht an Kinder und Jugendliche unter 18 Jahren ab und gestattest ihnen das Rauchen nicht (§ 10 Abs. 1, 4 JuSchG). Lass dir im Zweifel das Alter nachweisen (§ 2 Abs. 2 JuSchG) und weise dein Personal ein.
@@ -2248,18 +2536,12 @@ eintraege:
   en: In restaurants and shops with alcohol or tobacco you post the youth protection rules where they are clearly visible.
 - de: In deinem Betrieb fallen gefährliche Abfälle an.
   en: Hazardous waste arises in your business.
-- de: In deiner Branche weist du jede neue beschäftigte Person spätestens bei Arbeitsbeginn schriftlich darauf hin, dass sie bei der Arbeit einen Ausweis dabeihaben muss.
-  en: In your sector you inform every new employee in writing, at the latest when they start work, that they must carry ID at work.
-- de: In den Branchen nach § 2a Schwarzarbeitsbekämpfungsgesetz müssen Beschäftigte bei der Arbeit ihren Personalausweis, Pass oder ein Ersatzpapier mitführen und dem Zoll auf Verlangen vorlegen. Du weist jede Person nachweislich und schriftlich auf diese Pflicht hin, spätestens wenn sie mit der Arbeit beginnt – am besten zusammen mit dem Arbeitsvertrag. Den Hinweis bewahrst du für die Dauer der Beschäftigung auf und legst ihn bei einer Prüfung durch den Zoll vor. Ein Satz im Arbeitsvertrag oder ein eigenes Blatt mit Unterschrift reicht. Auch du selbst führst deinen Ausweis mit, wenn du in diesen Branchen arbeitest (§ 2a Abs. 1 SchwarzArbG).
-  en: In the sectors under § 2a of the Act to Combat Undeclared Work, employees must carry their ID card, passport or a substitute document at work and show it to customs on request. You inform each person of this duty verifiably and in writing, at the latest when they start work – ideally together with the employment contract. You keep the notice for the duration of employment and present it during a customs inspection. A sentence in the employment contract or a separate signed sheet is enough. You also carry your own ID when you work in these sectors (§ 2a(1) SchwarzArbG).
 - de: In der Partnerschaftsgesellschaft mit beschränkter Berufshaftung haftet für Schäden aus fehlerhafter Berufsausübung nur das Gesellschaftsvermögen – aber nur, wenn die Partnerschaft eine zu diesem Zweck durch Gesetz vorgegebene Berufshaftpflichtversicherung unterhält (§ 8 Abs. 4 PartGG). Mindestversicherungssumme und weitere Anforderungen regelt das jeweilige Berufsrecht, etwa für Rechtsanwälte, Steuerberater oder Architekten. Der Name der Partnerschaft enthält den Zusatz „mit beschränkter Berufshaftung“ oder eine Abkürzung wie „mbB“.
   en: In a partnership company with limited professional liability, only the company's assets are liable for damage caused by professional errors – but only if the partnership maintains professional liability insurance prescribed by law for this purpose (§ 8(4) PartGG). The minimum sum insured and other requirements are set by the relevant professional law, for example for lawyers, tax advisers or architects. The name of the partnership contains the addition “mit beschränkter Berufshaftung” or an abbreviation such as “mbB”.
 - de: Ins Vermittlerregister eintragen lassen
   en: Register in the intermediary register
 - de: Jugendschutzgesetz aushängen
   en: Post the Youth Protection Act
-- de: Kapitalgesellschaften und die GmbH & Co. KG (§ 264a HGB) müssen ihren Jahresabschluss beim Unternehmensregister offenlegen, binnen zwölf Monaten nach Ende des Geschäftsjahres. Kleinstkapitalgesellschaften können ihn stattdessen hinterlegen.
-  en: Corporations and the GmbH & Co. KG (§ 264a HGB) must disclose their annual financial statements in the company register within twelve months after the end of the financial year. Micro companies can deposit them instead.
 - de: Kaufmann ist, wer ein Handelsgewerbe betreibt. Das ist jedes Gewerbe, das nach Art und Umfang einen in kaufmännischer Weise eingerichteten Geschäftsbetrieb erfordert (§ 1 HGB) – Anzeichen sind etwa hoher Umsatz, mehrere Beschäftigte, ein Lager oder viele Geschäftsbeziehungen. Feste Schwellen nennt das Gesetz nicht. Ein Istkaufmann meldet seine Firma zur Eintragung ins Handelsregister an (§ 29 HGB); das Registergericht kann das mit Zwangsgeld durchsetzen (§ 14 HGB). Das Handelsgesetzbuch gilt schon vor der Eintragung. Eine GbR mit Handelsgewerbe ist kraft Gesetzes eine OHG (§ 105 Abs. 1 HGB). Die Grenzen des § 241a HGB betreffen nur die Buchführung, nicht die Frage, ob du Kaufmann bist.
   en: A merchant (Kaufmann) is anyone who carries on a commercial trade. That is any trade that by its nature and size requires a commercially organised business (§ 1 HGB) – signs include high turnover, several employees, a warehouse or many business relationships. The law sets no fixed thresholds. A merchant by trade applies for entry of their business name in the commercial register (§ 29 HGB); the registry court can enforce this with a coercive fine (§ 14 HGB). The Commercial Code applies even before entry. A GbR carrying on a commercial trade is by law a general partnership (OHG) (§ 105(1) HGB). The thresholds of § 241a HGB only concern bookkeeping, not whether you are a merchant.
 - de: Keine eigene Pflicht – Hinweis.
@@ -2292,8 +2574,6 @@ eintraege:
   en: Under Art. 50 of the AI Act, people must be able to recognise that they are interacting with an AI (para. 1, since 2.8.2026). Providers of generative AI systems mark their outputs in a machine-readable way (para. 2); for systems already placed on the market before 2.8.2026, a transition period until 2.12.2026 applies. Anyone who only uses AI (deployer) labels deepfakes – deceptively real images, videos or audio – and AI-generated texts intended to inform the public on matters of public interest (para. 4). Not every AI advertising image is covered – what matters is whether it looks deceptively real.
 - de: Nach der EU-Verpackungsverordnung befüllen Take-away-Betriebe ab 12.2.2027 mitgebrachte Behälter; ab 12.2.2028 kommt ein Mehrwegangebot dazu, Kleinstunternehmen ausgenommen.
   en: Under the EU Packaging Regulation, take-away businesses fill containers brought by customers from 12.2.2027; from 12.2.2028 a reusable option is added, micro-enterprises excepted.
-- de: Nach der Rechtsprechung des Bundesarbeitsgerichts besteht bereits eine Pflicht zur Arbeitszeiterfassung. Unabhängig davon verlangt das Arbeitszeitgesetz, die über acht Stunden hinausgehende Arbeitszeit an Werktagen aufzuzeichnen und diese Nachweise mindestens zwei Jahre aufzubewahren (§ 16 Abs. 2 ArbZG). Amtlos bietet eine Zeiterfassung, die auf die geplante Neuregelung vorbereitet ist.
-  en: According to the case law of the Federal Labour Court, there is already an obligation to record working time. Independently of this, the Working Hours Act requires you to record working time exceeding eight hours on working days and to keep these records for at least two years (§ 16(2) ArbZG). Amtlos offers time recording that is prepared for the planned new rules.
 - de: 'Nachtarbeit: Untersuchung ermöglichen und ausgleichen'
   en: 'Night work: allow medical examinations and provide compensation'
 - de: Nachtzeit ist die Zeit von 23 bis 6 Uhr, in Bäckereien und Konditoreien von 22 bis 5 Uhr (§ 2 Abs. 3 ArbZG). Nachtarbeit ist Arbeit, die mehr als zwei Stunden der Nachtzeit umfasst (§ 2 Abs. 4 ArbZG); Nachtarbeitnehmer ist, wer normalerweise in Wechselschicht nachts arbeitet oder an mindestens 48 Tagen im Jahr (§ 2 Abs. 5 ArbZG). Nachtarbeitnehmer dürfen sich vor Beginn der Beschäftigung und danach in Abständen von nicht weniger als drei Jahren arbeitsmedizinisch untersuchen lassen, ab 50 Jahren jährlich; die Kosten trägst du, wenn du die Untersuchung nicht kostenlos durch einen Betriebsarzt anbietest (§ 6 Abs. 3 ArbZG). Für die Nachtarbeit gewährst du eine angemessene Zahl bezahlter freier Tage oder einen angemessenen Zuschlag, soweit kein Tarifvertrag gilt (§ 6 Abs. 5 ArbZG). Die werktägliche Arbeitszeit darf acht Stunden nur überschreiten, bis zu zehn Stunden, wenn innerhalb eines Kalendermonats oder von vier Wochen im Durchschnitt acht Stunden nicht überschritten werden (§ 6 Abs. 2 ArbZG).
@@ -2302,8 +2582,6 @@ eintraege:
   en: If you accept orders from private customers by phone, email or messenger, they usually have a 14-day right of withdrawal – you inform them about it before the contract is concluded.
 - de: Ob du freiberuflich oder gewerblich tätig bist, entscheidet über die Gewerbeanzeige, die Gewerbesteuer und die Mitgliedschaft in IHK oder Handwerkskammer. Freiberuflich sind neben Berufen wie Ärztin, Architekt oder Journalistin auch unterrichtende und erzieherische Tätigkeiten (§ 18 Abs. 1 Nr. 1 EStG), etwa Kurse und Unterricht. Personal Training ohne Unterrichtscharakter kann dagegen gewerblich sein – das hängt vom Einzelfall ab. Gewerbesteuer fällt bei Einzelunternehmen und Personengesellschaften erst an, wenn der Gewerbeertrag den Freibetrag von 24.500 € übersteigt (§ 11 Abs. 1 GewStG). Solange die Einordnung offen ist, kann Amtlos diese Pflichten nicht sicher bestimmen.
   en: Whether you work as a freelancer or a trader determines the trade registration, trade tax and membership in the IHK or Chamber of Crafts. Besides professions such as doctor, architect or journalist, teaching and educational activities are also liberal professions (§ 18(1) no. 1 EStG), such as courses and lessons. Personal training without a teaching character can, on the other hand, be a trade – this depends on the individual case. For sole proprietorships and partnerships, trade tax only applies once trade income exceeds the allowance of €24,500 (§ 11(1) GewStG). As long as the classification is open, Amtlos cannot determine these obligations reliably.
-- de: 'Ob jemand selbstständig oder in Wahrheit beschäftigt ist, richtet sich nach der tatsächlichen Zusammenarbeit: Weisungen zu Zeit, Ort und Art der Arbeit, die Eingliederung in deinen Betrieb und fehlendes unternehmerisches Risiko sprechen für eine Beschäftigung (§ 7 Abs. 1 SGB IV). Den Antrag auf Statusfeststellung bei der Deutschen Rentenversicherung können beide Seiten stellen, also auch du als Auftraggeber (§ 7a SGB IV).'
-  en: 'Whether someone is self-employed or in fact employed depends on how you actually work together: instructions on the time, place and type of work, integration into your business and no entrepreneurial risk indicate employment (§ 7(1) SGB IV). Either party can apply to the Deutsche Rentenversicherung for a status determination, including you as the client (§ 7a SGB IV).'
 - de: Ohne die vorgeschriebene Versicherung entfällt die Haftungsbeschränkung – dann haften die Partner nach den allgemeinen Regeln auch persönlich (§ 8 Abs. 1, 2 PartGG).
   en: Without the required insurance the limitation of liability no longer applies – the partners are then also personally liable under the general rules (§ 8(1), (2) PartGG).
 - de: Ortest du Fahrzeuge oder Beschäftigte per GPS oder Telematik, brauchst du eine Rechtsgrundlage, informierst die Betroffenen, legst Zweck und Löschfrist fest und schließt mit dem Anbieter einen Vertrag.
@@ -2314,8 +2592,6 @@ eintraege:
   en: Location data of vehicles driven by staff is personal data. You need a legal basis for it, such as performance of the contract or a legitimate interest like route planning, theft protection or proof to customers (Art. 6(1)(b) or (f) GDPR), and you weigh up the staff's interests. Define what you use the data for and use it only for that (Art. 5(1)(b) GDPR); permanent monitoring of performance and behaviour is generally not permitted, and tracking should be off during breaks and free time. Inform staff in advance (Art. 13 GDPR), set a deletion period and conclude a data processing agreement with the telematics provider (Art. 28 GDPR). You check separately whether a data protection impact assessment is needed.
 - de: Papier, Glas, Kunststoffe, Metalle, Holz, Textilien und Bioabfälle aus deinem Betrieb sammelst du getrennt und hältst fest, wie du sie entsorgst.
   en: You collect paper, glass, plastics, metals, wood, textiles and bio-waste from your business separately and record how you dispose of them.
-- de: 'Pflichtversichert sind zum Beispiel selbstständige Lehrerinnen und Erzieher, Pflegepersonen und Selbstständige, die auf Dauer und im Wesentlichen nur für einen Auftraggeber arbeiten – jeweils nur, wenn sie im Zusammenhang mit ihrer Tätigkeit regelmäßig keinen versicherungspflichtigen Arbeitnehmer beschäftigen (§ 2 S. 1 Nr. 1, 2 und 9 SGB VI) –, außerdem Handwerker in der Handwerksrolle (§ 2 S. 1 Nr. 8 SGB VI). Yoga-, Fitness- und Personal Trainer gelten bei der Deutschen Rentenversicherung in der Regel als Lehrende. Versicherungsfrei bleibt, wessen Arbeitseinkommen regelmäßig höchstens 603 € im Monat beträgt (geringfügige selbstständige Tätigkeit, § 5 Abs. 2 SGB VI, § 8 Abs. 3 SGB IV; ab 2027: 633 €). Die Meldung an die Deutsche Rentenversicherung muss innerhalb von drei Monaten nach Aufnahme der Tätigkeit erfolgen (§ 190a SGB VI); danach zahlst du laufend Beiträge.'
-  en: 'Compulsorily insured are, for example, self-employed teachers and educators, carers and self-employed people who work permanently and essentially for only one client – in each case only if they regularly employ no employee subject to insurance in connection with their activity (§ 2 sentence 1 nos. 1, 2 and 9 SGB VI) – as well as craftspeople entered in the crafts register (§ 2 sentence 1 no. 8 SGB VI). Yoga, fitness and personal trainers are usually regarded as teachers by the Deutsche Rentenversicherung. Anyone whose earned income regularly does not exceed €603 a month remains exempt (minor self-employment, § 5(2) SGB VI, § 8(3) SGB IV; from 2027: €633). You must register with the Deutsche Rentenversicherung within three months of starting the activity (§ 190a SGB VI); after that you pay contributions on an ongoing basis.'
 - de: Registergericht (über den Notar); Beratung bei IHK oder Handwerkskammer
   en: Registry court (via the notary); advice from the IHK or Chamber of Crafts
 - de: Rentenversicherungspflicht als Selbstständige prüfen und melden
@@ -2330,8 +2606,6 @@ eintraege:
   en: Since 2.8.2026 people must be able to recognise that they are talking to an AI, for example with chatbots. You label deceptively real AI images, videos and audio (deepfakes).
 - de: Seit 2024 kann sich eine GbR ins Gesellschaftsregister eintragen lassen – nötig wird das, wenn sie etwa ein Grundstück erwerben oder sich an einer anderen Gesellschaft beteiligen will.
   en: Since 2024 a GbR can be entered in the company register – this becomes necessary if it wants to acquire land or hold a stake in another company, for example.
-- de: Seit dem 1.1.2024 gibt es das Gesellschaftsregister für die GbR (§ 707 BGB). Die Eintragung ist freiwillig. Faktisch nötig wird sie, wenn die GbR Rechte an Grundstücken erwerben (§ 47 Abs. 2 GBO) oder sich an einer anderen Gesellschaft beteiligen will, die in einem Register steht. Nach der Eintragung führt die Gesellschaft den Zusatz „eingetragene Gesellschaft bürgerlichen Rechts“ oder „eGbR“ (§ 707a Abs. 2 BGB) und meldet ihre wirtschaftlich Berechtigten dem Transparenzregister (§ 20 Abs. 1 GwG).
-  en: Since 1.1.2024 there has been a company register for the GbR (§ 707 BGB). Entry is voluntary. In practice it becomes necessary if the GbR wants to acquire rights to land (§ 47(2) GBO) or hold a stake in another company that is listed in a register. After entry the company uses the addition “eingetragene Gesellschaft bürgerlichen Rechts” or “eGbR” (§ 707a(2) BGB) and reports its beneficial owners to the transparency register (§ 20(1) GwG).
 - de: Standplatz für Foodtruck oder Verkaufsstand klären
   en: Clarify the pitch for a food truck or sales stand
 - de: Stellt sich eine Beschäftigung heraus, zahlst du die Sozialversicherungsbeiträge nach, in der Regel für bis zu vier Jahre (§ 28e, § 25 SGB IV); wer Beiträge vorsätzlich vorenthält, macht sich strafbar (§ 266a StGB).
@@ -2352,18 +2626,10 @@ eintraege:
   en: Anyone who shows VAT on invoices files an advance return via ELSTER monthly or quarterly, depending on the amount of tax in the previous year. If your turnover is above the small business limit, the obligation certainly applies – the only open question is whether monthly or quarterly. The tax office sets the rhythm – it is stated in your notices. If you don't know it and Amtlos doesn't know last year's tax, Amtlos provisionally assumes quarterly. Amtlos prepares the figures; you submit them yourself.
 - de: 'Wer den Antrag nicht, nicht richtig oder nicht rechtzeitig stellt, macht sich strafbar: Freiheitsstrafe bis zu drei Jahren oder Geldstrafe, bei Fahrlässigkeit bis zu einem Jahr oder Geldstrafe (§ 15a Abs. 4, 5 InsO). Zahlungen nach Eintritt der Insolvenzreife muss die Geschäftsführung der Gesellschaft in der Regel ersetzen (§ 15b InsO).'
   en: 'Anyone who does not file, files incorrectly or files late commits a criminal offence: imprisonment of up to three years or a fine, in case of negligence up to one year or a fine (§ 15a(4), (5) InsO). The managing directors must usually reimburse the company for payments made after insolvency occurred (§ 15b InsO).'
-- de: Wer eine Erlaubnis nach § 34d, § 34f, § 34h oder § 34i GewO hat, lässt sich unverzüglich nach Aufnahme der Tätigkeit in das Vermittlerregister eintragen, das die IHK führt (§ 11a GewO). Änderungen meldest du ebenfalls. Versicherungsvermittler bilden sich außerdem jedes Jahr weiter – das steht bei der Weiterbildungspflicht.
-  en: Anyone with a permit under § 34d, § 34f, § 34h or § 34i GewO registers in the intermediary register kept by the IHK without delay after starting the activity (§ 11a GewO). You also report changes. Insurance intermediaries also complete further training every year – see the further training obligation.
-- de: Wer einen anderen Unternehmer mit Werk- oder Dienstleistungen beauftragt, haftet wie ein Bürge dafür, dass dieser und alle weiteren Nachunternehmer ihren Beschäftigten den Mindestlohn zahlen (§ 13 MiLoG i. V. m. § 14 AEntG). Im Baugewerbe und bei Paketdiensten haftest du außerdem für die Sozialversicherungsbeiträge der Nachunternehmer (§ 28e SGB IV). Lass dir deshalb vor und während der Zusammenarbeit Nachweise geben, etwa Unbedenklichkeitsbescheinigungen der Krankenkasse und der Berufsgenossenschaft, eine Erklärung zum Mindestlohn und die Gewerbeanmeldung, und vereinbare Kontrollrechte im Vertrag.
-  en: Anyone who commissions another business to carry out work or services is liable like a guarantor for that business and all further subcontractors paying their staff the minimum wage (§ 13 MiLoG in conjunction with § 14 AEntG). In construction and parcel services you are also liable for the subcontractors' social security contributions (§ 28e SGB IV). So ask for evidence before and during the cooperation, such as clearance certificates from the health insurer and the employers' liability insurance association, a minimum wage declaration and the trade registration, and agree inspection rights in the contract.
 - de: Wer gewerbliche Siedlungsabfälle erzeugt, sammelt Papier, Pappe und Karton, Glas, Kunststoffe, Metalle, Holz, Textilien und Bioabfälle getrennt und gibt sie vorrangig zur Vorbereitung zur Wiederverwendung oder zum Recycling weiter (§ 3 Abs. 1 GewAbfV). Die Getrenntsammlung dokumentierst du, etwa mit Lageplänen, Fotos, Liefer- oder Wiegescheinen und Entsorgungsverträgen (§ 3 Abs. 3 GewAbfV). Ist die Trennung technisch nicht möglich oder wirtschaftlich nicht zumutbar, gelten Ausnahmen, die du ebenfalls dokumentierst. Gefährliche Abfälle haben eigene Pflichten.
   en: Anyone who produces commercial municipal waste collects paper, paperboard and cardboard, glass, plastics, metals, wood, textiles and bio-waste separately and passes them on primarily for preparation for re-use or recycling (§ 3(1) GewAbfV). You document the separate collection, for example with site plans, photos, delivery or weighing slips and disposal contracts (§ 3(3) GewAbfV). If separation is technically impossible or economically unreasonable, exemptions apply, which you also document. Hazardous waste has its own obligations.
 - de: Wer gewerbsmäßig Verbrennungsmotoren- oder Getriebeöl an Endverbraucher abgibt, richtet vor der Abgabe eine Annahmestelle für gebrauchte Öle ein oder weist eine solche durch eine vertragliche Vereinbarung nach (§ 8 Abs. 1 AltölV). Bei der Abgabe an private Endverbraucher weist du am Ort des Verkaufs mit leicht erkennbaren und lesbaren Schrifttafeln auf die Annahmestelle hin.
   en: Anyone who commercially supplies combustion engine or gear oil to end users sets up a collection point for used oils before supplying it, or proves one by contractual agreement (§ 8(1) AltölV). When selling to private end users you point to the collection point at the place of sale with easily recognisable and legible signs.
-- de: Wer jemanden ohne die erforderliche Erlaubnis beschäftigt, riskiert ein Bußgeld bis 500.000 € (§ 404 Abs. 2 Nr. 3, Abs. 3 SGB III).
-  en: Anyone who employs someone without the required permit risks a fine of up to €500,000 (§ 404(2) no. 3, (3) SGB III).
-- de: Wer öffentliche Straßen, Wege und Plätze über den Gemeingebrauch hinaus nutzt – etwa mit einem Foodtruck oder Verkaufsstand –, braucht eine Sondernutzungserlaubnis nach dem Straßenrecht des Landes, meist von der Gemeinde. Auf privaten Flächen brauchst du die Zustimmung der Eigentümer. Auf Wochenmärkten, Volksfesten und anderen von der Gemeinde festgesetzten Veranstaltungen vergibt der Veranstalter die Standplätze (§§ 64 ff., § 70 GewO).
-  en: Anyone who uses public roads, paths and squares beyond common use – for example with a food truck or sales stand – needs a special use permit under the state's road law, usually from the municipality. On private land you need the owner's consent. At weekly markets, festivals and other events set by the municipality, the organiser allocates the pitches (§§ 64 et seq., § 70 GewO).
 - de: Wie lange Mängelansprüche bestehen, hängt von der Art des Werks ab. Stellst du Waren her und lieferst sie – etwa als Bäckerei oder Konditorei, auch Torten auf Bestellung –, gilt Kaufrecht (§ 650 BGB); die Mängelrechte richten sich dann nach §§ 437, 438 BGB. Amtlos erinnert nach fachlicher Freigabe an das Ende der Fristen.
   en: How long warranty claims last depends on the type of work. If you make and deliver goods – for example as a bakery or confectionery, including cakes made to order – sales law applies (§ 650 BGB); warranty rights then follow §§ 437, 438 BGB. After expert approval, Amtlos will remind you when the periods end.
 - de: Wird die Rücklage nicht gebildet, sind die Feststellung des Jahresabschlusses und der Gewinnverwendungsbeschluss nach herrschender Meinung nichtig (§ 256 AktG entsprechend).
@@ -2376,8 +2642,6 @@ eintraege:
   en: Indicate additives for loose goods
 - de: Öl- und Leichtflüssigkeitsabscheider warten und prüfen lassen
   en: Have oil and light-liquid separators serviced and inspected
-- de: Überwachungsbedürftig sind unter anderem der Handel mit hochwertigen Gebrauchtwaren, Fahrzeugen, Edelmetallen, Schmuck und Altmetall, Auskunfteien und Detekteien, die Vermittlung von Ehen, Partnerschaften, Reisen und Unterkünften sowie Schlüsseldienste und der Einbau von Sicherungseinrichtungen (§ 38 Abs. 1 GewO). Nach der Gewerbeanzeige prüft die Behörde deine Zuverlässigkeit. Dafür beantragst du unverzüglich ein Führungszeugnis und eine Auskunft aus dem Gewerbezentralregister zur Vorlage bei der Behörde; tust du es nicht, holt die Behörde sie selbst ein.
-  en: Trades requiring supervision include dealing in high-value second-hand goods, vehicles, precious metals, jewellery and scrap metal, credit agencies and detective agencies, brokering marriages, partnerships, travel and accommodation, as well as locksmith services and installing security devices (§ 38(1) GewO). After the trade registration the authority checks your reliability. For this you apply without delay for a certificate of good conduct and an extract from the central trade register to submit to the authority; if you don't, the authority obtains them itself.
 - de: Wer Speisen in Einwegkunststoffverpackungen oder Getränke in Einwegbechern erst beim Verkauf befüllt, muss sie auch in einer Mehrwegverpackung anbieten – nicht teurer und gut sichtbar mit einem Hinweis (§ 60 VerpackDG). Ausgenommen sind kleine Betriebe mit höchstens fünf Beschäftigten und höchstens 80 m² Verkaufsfläche; sie müssen stattdessen auf Wunsch mitgebrachte Behälter der Kundschaft befüllen und darauf hinweisen (§ 61 VerpackDG). Seit 12.8.2026 steht die Pflicht im Verpackungsrecht-Durchführungsgesetz, das das Verpackungsgesetz abgelöst hat.
   en: Anyone who fills food into single-use plastic packaging or drinks into single-use cups only at the point of sale must also offer them in reusable packaging – not more expensive and with a clearly visible notice (§ 60 VerpackDG). Small businesses with no more than five employees and no more than 80 m² of sales area are exempt; instead, they must fill containers brought by customers on request and point this out (§ 61 VerpackDG). Since 12.8.2026, the obligation is set out in the Packaging Law Implementation Act (Verpackungsrecht-Durchführungsgesetz), which replaced the Packaging Act (Verpackungsgesetz).
 - de: Die Verordnung (EU) 2025/40 über Verpackungen gilt seit 12.8.2026 und bringt für Speisen und Getränke zum Mitnehmen zwei Stufen. Bis 12.2.2027 müssen Kundinnen und Kunden kalte oder heiße Getränke und verzehrfertige Speisen in selbst mitgebrachte Behälter füllen lassen können – nicht teurer als in Einwegverpackung und mit gut sichtbarem Hinweis (Art. 32). Bis 12.2.2028 bietest du zusätzlich Mehrwegverpackungen aus einem Mehrwegsystem zur Wahl an (Art. 33); Kleinstunternehmen sind davon ausgenommen. Die deutsche Mehrwegangebotspflicht (§§ 60, 61 VerpackDG) gilt daneben weiter.
@@ -2422,8 +2686,6 @@ eintraege:
   en: Since 2.2.2025, Art. 4 of the AI Act required ensuring a sufficient level of AI literacy. Since the Digital Omnibus (Regulation (EU) 2026/1744, in force since 27.7.2026), Art. 4 only requires measures that promote the AI literacy of the people who work with AI systems on your behalf; a specific level of literacy is no longer prescribed. A short training with proof remains a simple way to show this; Amtlos offers training courses with confirmation.
 - de: Bei Barzahlungen ab 10.000 € – beim Handel mit Edelmetallen schon ab 2.000 € – sieht das Geldwäschegesetz Sorgfaltspflichten für Güterhändler vor.
   en: For cash payments of €10,000 or more – €2,000 or more when trading in precious metals – the Anti-Money Laundering Act (Geldwäschegesetz) provides for due diligence obligations for dealers in goods.
-- de: Betriebe ab 20 Arbeitsplätzen haben eine Beschäftigungsquote. Die Anzeige und die Ausgleichsabgabe sind bis zum 31. März für das Vorjahr fällig. Als Arbeitsplätze zählen Stellen von Arbeitnehmern und Auszubildenden; Stellen mit weniger als 18 Wochenstunden – oft Minijobs – und Stellen für höchstens acht Wochen zählen nicht (§ 156 Abs. 1, 3 SGB IX). Teilzeitstellen ab 18 Stunden zählen voll, Ausbildungsstellen bleiben bei der Mindestzahl außer Betracht (§ 157 Abs. 1 SGB IX). Wer insgesamt weniger als 20 Personen beschäftigt, liegt sicher unter der Schwelle.
-  en: Businesses with 20 or more workplaces have an employment quota. The report and the compensatory levy are due by 31 March for the previous year. Workplaces are positions of employees and apprentices; positions with fewer than 18 hours a week – often mini-jobs – and positions for no more than eight weeks do not count (§ 156(1), (3) SGB IX). Part-time positions of 18 hours or more count in full; training positions are disregarded for the minimum number (§ 157(1) SGB IX). Anyone employing fewer than 20 people in total is safely below the threshold.
 - de: Bußgeld bis 10 Mio. € für besonders wichtige und bis 7 Mio. € für wichtige Einrichtungen, wenn eine Meldung fehlt, falsch oder zu spät ist; bei mehr als 500 Mio. € Gesamtumsatz bis 2 % bzw. 1,4 % des weltweiten Umsatzes (§ 65 Abs. 2 Nr. 4, Abs. 5 Satz 1 Nr. 1, Abs. 6, 7 BSIG).
   en: Fine of up to €10 million for particularly important entities and up to €7 million for important entities if a report is missing, incorrect or late; with total revenue above €500 million up to 2% or 1.4% of worldwide revenue (§ 65(2) no. 4, (5) sentence 1 no. 1, (6), (7) BSIG).
 - de: Bußgeld bis 10 Mio. € oder bis 2 % des weltweiten Jahresumsatzes, je nachdem, welcher Betrag höher ist (Art. 83 Abs. 4 Buchst. a DSGVO).
@@ -2452,8 +2714,6 @@ eintraege:
   en: Fine of up to €500,000 if registration is missing, incorrect or late (§ 65(2) no. 6, (5) sentence 1 no. 5 BSIG).
 - de: Das Hinweisgeberschutzgesetz verlangt von Beschäftigungsgebern mit in der Regel mindestens 50 Beschäftigten eine interne Meldestelle (§ 12 Abs. 2 HinSchG). Gezählt werden Köpfe, nicht Vollzeitstellen – Beschäftigte sind neben Arbeitnehmern auch Auszubildende (§ 3 Abs. 8 HinSchG).
   en: The Whistleblower Protection Act requires employers with usually at least 50 employees to have an internal reporting channel (§ 12(2) HinSchG). Heads are counted, not full-time positions – employees include apprentices as well as workers (§ 3(8) HinSchG).
-- de: Das Nachweisgesetz verlangt, dass die wesentlichen Arbeitsbedingungen dokumentiert und der beschäftigten Person ausgehändigt werden. Name und Anschrift der Vertragsparteien, Arbeitsentgelt und Arbeitszeit müssen spätestens am ersten Arbeitstag vorliegen, Beginn, Befristung, Arbeitsort, Tätigkeit, Probezeit, Arbeit auf Abruf und Überstunden spätestens am siebten Kalendertag, die übrigen Angaben binnen eines Monats (§ 2 Abs. 1 Satz 9 NachwG). Deshalb erscheint die Pflicht schon, sobald eine Einstellung mit Arbeitsbeginn eingetragen ist; der Termin ist der erste Arbeitstag.
-  en: The Documentation Act (Nachweisgesetz) requires that the essential working conditions are documented and handed to the employee. Names and addresses of the parties, pay and working hours must be provided by the first working day at the latest; start date, fixed term, place of work, duties, probation, on-call work and overtime by the seventh calendar day; the other details within one month (§ 2(1) sentence 9 NachwG). That is why this obligation appears as soon as a hiring with a start date has been entered; the due date is the first working day.
 - de: Dazu gehören unter anderem die Identifizierung der Vertragspartner und ein Risikomanagement. Die Pflichten greifen bei Transaktionen, bei denen du Barzahlungen über mindestens 10.000 € selbst oder durch Dritte annimmst oder leistest (§ 10 Abs. 6a Nr. 1 Buchst. c GwG), bei hochwertigen Gütern wie Edelmetallen schon ab 2.000 € (Buchst. b) und bei Kunstgegenständen ab einem Transaktionswert von 10.000 € (Buchst. a). Als Verpflichteter registrierst du dich außerdem bei der Zentralstelle für Finanztransaktionsuntersuchungen (goAML), auch ohne Verdachtsfall (§ 45 Abs. 1 S. 2 GwG).
   en: These include identifying contracting partners and risk management. The obligations apply to transactions in which you receive or make cash payments of at least €10,000 yourself or through third parties (§ 10(6a) no. 1(c) GwG), for high-value goods such as precious metals from €2,000 (letter b) and for works of art from a transaction value of €10,000 (letter a). As an obliged entity you also register with the Financial Intelligence Unit (goAML), even without a suspicious case (§ 45(1) sentence 2 GwG).
 - de: Dein Betrieb ist kein Kleinstbetrieb außerhalb der IT-Branche.
@@ -2648,8 +2908,6 @@ eintraege:
   en: 'If the Working Hours Act (Arbeitszeitgesetz) is not displayed, there is a risk of a fine of up to €5,000 (§ 22(1) no. 8, (2) ArbZG); the same applies to the Youth Employment Protection Act with the address of the supervisory authority and to the notice of working hours and breaks of young people (§ 59(1) no. 7, 8, (3) JArbSchG). § 32 MuSchG provides no fine for displaying the Maternity Protection Act. The consequences for the AGG and the accident prevention regulations have not yet been professionally recorded.'
 - de: 'Bußgeld bis 1.000 €, wenn du den Hinweis nicht, nicht richtig, nicht vollständig, nicht in der vorgeschriebenen Weise oder nicht rechtzeitig gibst, ihn nicht für die vorgeschriebene Dauer aufbewahrst oder nicht vorlegst (§ 8 Abs. 2 Nr. 2, Abs. 5 SchwarzArbG). Wer bei der Arbeit seinen Ausweis nicht mitführt oder nicht vorlegt, riskiert bis 5.000 € (§ 8 Abs. 2 Nr. 1, Abs. 5 SchwarzArbG).'
   en: 'Fine of up to €1,000 if you do not give the notice, or give it incorrectly, incompletely, not in the prescribed manner or late, do not retain it for the required period or do not present it (§ 8(2) no. 2, (5) SchwarzArbG). Anyone who does not carry or present their ID at work risks up to €5,000 (§ 8(2) no. 1, (5) SchwarzArbG).'
-- de: 'Kein eigenes Bußgeld vorgesehen (§ 101 BBiG nennt § 14 Abs. 2 BBiG nicht).'
-  en: 'No separate fine is provided (§ 101 BBiG does not mention § 14(2) BBiG).'
 - de: 'Bußgeld bis 1.000 €, wenn du die Eintragung nicht, nicht richtig, nicht in der vorgeschriebenen Weise oder nicht rechtzeitig beantragst (§ 101 Abs. 1 Nr. 9, Abs. 2 BBiG).'
   en: 'Fine of up to €1,000 if you do not apply for registration, or apply incorrectly, not in the prescribed manner or late (§ 101(1) no. 9, (2) BBiG).'
 - de: 'Kein eigenes Bußgeld vorgesehen (§ 111 SGB IV nennt § 28f Abs. 3 nicht). Liegt der Beitragsnachweis nicht zwei Arbeitstage vor Fälligkeit vor, kann die Einzugsstelle das Arbeitsentgelt schätzen, bis der Nachweis ordnungsgemäß übermittelt ist (§ 28f Abs. 3 Satz 2 SGB IV).'
@@ -2658,8 +2916,6 @@ eintraege:
   en: 'No separate fine is provided for the application itself; failing to report changes or the closure of the business, or reporting them incorrectly, incompletely, not in the prescribed manner or late, is subject to a fine (up to €5,000, § 111(1) no. 1a, (4) SGB IV in conjunction with § 18i(4) SGB IV). Without an establishment number you cannot take part in the social insurance reporting procedures (§ 18i(1) SGB IV).'
 - de: 'Bußgeld bis 3.000 €, wenn du eine Person mit Bewachungsaufgaben betraust, ohne das Anmeldeverfahren über das Bewacherregister einzuhalten und die Mitteilung der Behörde erhalten zu haben (§ 22 Abs. 1 Nr. 1 in Verbindung mit § 16 Abs. 1 BewachV, § 144 Abs. 2 Nr. 1b, Abs. 4 GewO).'
   en: 'Fine of up to €3,000 if you entrust a person with security tasks without following the registration procedure via the security register (Bewacherregister) and receiving the authority''s notification (§ 22(1) no. 1 in conjunction with § 16(1) BewachV, § 144(2) no. 1b, (4) GewO).'
-- de: 'Bußgeld bis 25.000 €, wenn der Lohnnachweis nicht, nicht richtig, nicht vollständig, nicht in der vorgeschriebenen Weise oder nicht rechtzeitig übermittelt wird (§ 111 Abs. 1 Nr. 5, Abs. 4 SGB IV in Verbindung mit § 99 Abs. 1 Satz 1 SGB IV).'
-  en: 'Fine of up to €25,000 if the payroll report (Lohnnachweis) is not submitted, or is submitted incorrectly, incompletely, not in the prescribed manner or late (§ 111(1) no. 5, (4) SGB IV in conjunction with § 99(1) sentence 1 SGB IV).'
 - de: 'Gibst du die Lohnsteuer-Anmeldung nicht oder nicht fristgerecht ab, kann das Finanzamt einen Verspätungszuschlag festsetzen. Er richtet sich nach Dauer und Häufigkeit der Fristüberschreitung und der Höhe der Steuer und beträgt höchstens 25.000 € (§ 152 Abs. 1, 8, 10 AO).'
   en: 'If you do not file the wage tax return (Lohnsteuer-Anmeldung) or file it late, the tax office can impose a late filing surcharge. It depends on the length and frequency of the delay and the amount of tax and is at most €25,000 (§ 152(1), (8), (10) AO).'
 - de: 'Übersteigt das Arbeitsentgelt regelmäßig die Geringfügigkeitsgrenze, ist die Beschäftigung nicht mehr geringfügig (§ 8 Abs. 1 Nr. 1 SGB IV); dann gelten die allgemeinen Regeln der Sozialversicherung. Unschädlich ist nur ein unvorhersehbares Überschreiten in höchstens zwei Kalendermonaten innerhalb eines Zeitjahres um höchstens den Betrag der Geringfügigkeitsgrenze (§ 8 Abs. 1b SGB IV).'
@@ -2668,8 +2924,6 @@ eintraege:
   en: 'Fine of up to €5,000 if you do not carry out the risk assessment, or carry it out incorrectly or late, or do not lay down the necessary protective measures, or do so incorrectly or late (§ 32(1) no. 6, 7, (2) MuSchG); if you let a woman carry out an activity that is not permitted under § 10(3) MuSchG, up to €30,000 (§ 32(1) no. 8, (2) MuSchG).'
 - de: 'Für Untersuchung und Ausgleich ist kein eigenes Bußgeld vorgesehen (§ 22 ArbZG nennt § 6 Abs. 3 und 5 nicht). Wer über die nach § 6 Abs. 2 ArbZG zulässige Arbeitszeit hinaus beschäftigt, riskiert ein Bußgeld bis 30.000 € (§ 22 Abs. 1 Nr. 1, Abs. 2 ArbZG).'
   en: 'No separate fine is provided for the medical examination and the compensation (§ 22 ArbZG does not mention § 6(3) and (5)). Anyone who employs night workers beyond the working time permitted under § 6(2) ArbZG risks a fine of up to €30,000 (§ 22(1) no. 1, (2) ArbZG).'
-- de: 'Bußgeld bis 10.000 €, wenn die Anzeige nicht, nicht richtig, nicht vollständig, nicht in der vorgeschriebenen Weise oder nicht rechtzeitig erstattet wird (§ 238 Abs. 1 Nr. 3, Abs. 2 SGB IX).'
-  en: 'Fine of up to €10,000 if the report is not made, or is made incorrectly, incompletely, not in the prescribed manner or late (§ 238(1) no. 3, (2) SGB IX).'
 - de: 'Bußgeld bis 25.000 €, wenn die Meldung nicht, nicht richtig, nicht vollständig, nicht in der vorgeschriebenen Weise oder nicht rechtzeitig erstattet wird (§ 111 Abs. 1 Nr. 2, Abs. 4 SGB IV).'
   en: 'Fine of up to €25,000 if the report is not made, or is made incorrectly, incompletely, not in the prescribed manner or late (§ 111(1) no. 2, (4) SGB IV).'
 - de: 'Acrylamid entsteht, wenn stärkehaltige Lebensmittel stark gebräunt werden – etwa Brot, feine Backwaren, Pommes frites und andere frittierte Kartoffelerzeugnisse. Betriebe, die solche Lebensmittel

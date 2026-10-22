@@ -1,4 +1,5 @@
 # R12 (Nutzertest Bäckerei #2): Nachtarbeit – Untersuchung und Ausgleich (§ 6 ArbZG)
+# Offen (Produkt, kein Prüfpunkt): Gefährdungsbaustein Nachtarbeit in der Vorlage Gefährdungsbeurteilung
 schema_version: 1
 id: personal.nachtarbeit
 version: 3
@@ -55,10 +56,6 @@ quellen:
 - titel: 'Arbeitszeitgesetz § 22'
   url: https://www.gesetze-im-internet.de/arbzg/__22.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Neu nach Nutzertest R12 (Bäckerei #2) – Folgen fachlich ergänzen (§ 6 Abs. 3 ArbZG steht nicht in § 22 Abs. 1 ArbZG); Gefährdungsbaustein Nachtarbeit fehlt'
-- 'Prüfergebnis Sifa 22.10.2026: Untersuchung nach § 6 Abs. 3 ArbZG ist keine Vorsorge nach ArbMedVV; Auslöser über die Frage „regelmäßig nachts“ mit Hilfetext nach § 2 Abs. 5 ArbZG – eigene Angabe „Nachtarbeitnehmer“ wäre genauer'
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 22 Abs. 1, 2 ArbZG amtlich gelesen) – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

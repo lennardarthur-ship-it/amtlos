@@ -1,18 +1,20 @@
 # R12 (Rechtsprüfung Befund 17): Foodtruck und Verkaufsstand – Standplatz
 schema_version: 1
 id: branche.mobiler_verkauf_standplatz
-version: 1
+version: 2
 katalog_nr: A.3
 titel:
   de: Standplatz für Foodtruck oder Verkaufsstand klären
 kurz:
   de: Verkaufst du von einem Fahrzeug oder Stand auf öffentlichen Straßen und Plätzen, brauchst du in der Regel eine Sondernutzungserlaubnis; auf Märkten vergibt der Veranstalter die Plätze.
 erklaerung:
-  de: Wer öffentliche Straßen, Wege und Plätze über den Gemeingebrauch hinaus nutzt – etwa mit einem Foodtruck oder Verkaufsstand –, braucht eine Sondernutzungserlaubnis nach dem Straßenrecht des Landes, meist von der Gemeinde. Auf privaten Flächen brauchst du die Zustimmung der Eigentümer. Auf Wochenmärkten, Volksfesten und anderen von der Gemeinde festgesetzten Veranstaltungen vergibt der Veranstalter die Standplätze (§§ 64 ff., § 70 GewO).
+  de: 'Wer öffentliche Straßen, Wege und Plätze über den Gemeingebrauch hinaus nutzt – etwa mit einem Foodtruck oder Verkaufsstand –, braucht eine Sondernutzungserlaubnis nach dem Straßenrecht des Landes; zuständig ist meist die Gemeinde als Straßenbaubehörde. Auf privaten Flächen brauchst du die Zustimmung der Eigentümer. Auf Wochenmärkten, Volksfesten und anderen von der Gemeinde festgesetzten Veranstaltungen vergibt der Veranstalter die Standplätze (§§ 64 ff., § 70 GewO). Für die Preise gilt die Preisangabenverordnung: Du gibst den Gesamtpreis an (§ 3 PAngV), bei Waren nach Gewicht oder Volumen auch den Grundpreis (§ 4 PAngV). Die Regeln für Gaststätten (§ 13 PAngV) gelten nur für Gaststätten mit Sitzplätzen bzw. Bewirtung.'
 rechtsgrundlage:
 - Straßengesetz des Landes
 - §§ 64 ff. GewO
 - § 70 GewO
+- § 3 PAngV
+- § 4 PAngV
 kategorie: branche
 branchen:
 - gastronomie_lebensmittel
@@ -33,7 +35,7 @@ frist:
 wiederholung:
   art: einmalig
 stelle:
-  de: Gemeinde (Straßenverkehrs- bzw. Ordnungsamt); Marktveranstalter
+  de: 'Gemeinde (als Straßenbaubehörde); auf Märkten der Veranstalter'
 kanal: post
 kosten: null
 sanktion:
@@ -49,8 +51,6 @@ quellen:
 - titel: Gewerbeordnung § 70
   url: https://www.gesetze-im-internet.de/gewo/__70.html
   abgerufen: null
-fachlich_zu_pruefen:
-- Neu nach Rechtsprüfung R12 (Befund 17) – Preisangabe beim Foodtruck (§ 3 statt § 7 PAngV) zu klären; Zuständigkeit je Land
 pruefung:
   status: entwurf
   geprueft_von: null

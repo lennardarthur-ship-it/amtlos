@@ -50,10 +50,6 @@ quellen:
 - titel: SGB IV § 111
   url: https://www.gesetze-im-internet.de/sgb_4/__111.html
   abgerufen: '2026-10-21'
-fachlich_zu_pruefen:
-- 'Frist nach Rechtsprüfung R11 (Befund 4): mit der nächsten Entgeltabrechnung, spätestens sechs Wochen nach Ende (§ 8 DEÜV) – als sechs Wochen nach dem Austritt abgebildet; bestätigen'
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
-- 'Vorprüfung 21.10.2026: Sanktion ergänzt – § 111 Abs. 1 Nr. 2 (Meldungen nach § 28a) und Abs. 4 gelesen'
 pruefung:
   status: entwurf
   geprueft_von: null

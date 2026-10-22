@@ -1,15 +1,14 @@
 # Katalog B.20 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.mitarbeiterbeteiligung
-version: 2
+version: 3
 katalog_nr: B.20
 titel:
   de: Mitarbeiterbeteiligung prüfen (Option)
 kurz:
   de: Wenn du Mitarbeitende am Unternehmen beteiligen willst, gibt es dafür besondere Regeln und Modelle wie VSOP.
 erklaerung:
-  de: Für Mitarbeiterbeteiligungen gibt es steuerliche Sonderregeln (§ 19a EStG) und virtuelle Modelle (VSOP). Amtlos erklärt
-    die Modelle; Vorlagen folgen mit dem Dokumentengenerator.
+  de: 'Für Mitarbeiterbeteiligungen gibt es steuerliche Sonderregeln: Bei Anteilen an jungen Unternehmen kann die Besteuerung des geldwerten Vorteils aufgeschoben werden (§ 19a EStG). Eine schuldrechtliche Alternative ohne echte Anteile sind virtuelle Modelle (VSOP). Amtlos erklärt die Modelle; Vorlagen folgen mit dem Dokumentengenerator.'
 begriffe:
 - begriff:
     de: VSOP
@@ -51,10 +50,6 @@ quellen:
 - titel: Einkommensteuergesetz § 19a
   url: https://www.gesetze-im-internet.de/estg/__19a.html
   abgerufen: null
-fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Option, keine Pflicht – Darstellung bestätigen
-- Inhalt der Erklärung zu § 19a EStG und VSOP fachlich festlegen
 pruefung:
   status: entwurf
   geprueft_von: null

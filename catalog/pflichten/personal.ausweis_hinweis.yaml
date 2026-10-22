@@ -1,14 +1,15 @@
 # R11 (Rechtsprüfung Befund 2): Hinweispflicht nach § 2a Abs. 2 SchwarzArbG für die Branchen nach § 2a Abs. 1 (SchwarzArbMoDiG)
+# Freigabe Weber 22.10.2026: Termin „vor Beginn“ (Vortag) statt „spätestens bei Arbeitsbeginn“; eigener Auslöser für Inhaber ohne Beschäftigte empfohlen – bräuchte einen eigenen Eintrag ohne Einstellungsbezug, hier nur als Satz in der Erklärung
 schema_version: 1
 id: personal.ausweis_hinweis
-version: 3
+version: 4
 katalog_nr: D.38
 titel:
   de: Schriftlich auf die Ausweispflicht hinweisen
 kurz:
-  de: In deiner Branche weist du jede neue beschäftigte Person spätestens bei Arbeitsbeginn schriftlich darauf hin, dass sie bei der Arbeit einen Ausweis dabeihaben muss.
+  de: 'In deiner Branche weist du jede neue beschäftigte Person vor Arbeitsbeginn schriftlich darauf hin, dass sie bei der Arbeit einen Ausweis dabeihaben muss.'
 erklaerung:
-  de: In den Branchen nach § 2a Schwarzarbeitsbekämpfungsgesetz müssen Beschäftigte bei der Arbeit ihren Personalausweis, Pass oder ein Ersatzpapier mitführen und dem Zoll auf Verlangen vorlegen. Du weist jede Person nachweislich und schriftlich auf diese Pflicht hin, spätestens wenn sie mit der Arbeit beginnt – am besten zusammen mit dem Arbeitsvertrag. Den Hinweis bewahrst du für die Dauer der Beschäftigung auf und legst ihn bei einer Prüfung durch den Zoll vor. Ein Satz im Arbeitsvertrag oder ein eigenes Blatt mit Unterschrift reicht. Auch du selbst führst deinen Ausweis mit, wenn du in diesen Branchen arbeitest (§ 2a Abs. 1 SchwarzArbG).
+  de: In den Branchen nach § 2a Schwarzarbeitsbekämpfungsgesetz müssen Beschäftigte bei der Arbeit ihren Personalausweis, Pass oder ein Ersatzpapier mitführen und dem Zoll auf Verlangen vorlegen. Du weist jede Person vor Beginn der Dienst- oder Werkleistungen nachweislich und schriftlich auf diese Pflicht hin (§ 2a Abs. 2 SchwarzArbG) – am besten zusammen mit dem Arbeitsvertrag. Den Hinweis bewahrst du für die Dauer der Beschäftigung auf und legst ihn bei einer Prüfung durch den Zoll vor. Ein unterschriebener Satz im Arbeitsvertrag reicht, wenn du ihn gesondert vorlegen kannst; sonst nimm ein eigenes Blatt mit Unterschrift. Die Mitführungspflicht gilt für alle, die in diesen Branchen Leistungen erbringen – auch für dich als Inhaberin oder Inhaber (§ 2a Abs. 1 SchwarzArbG).
 rechtsgrundlage:
 - § 2a Abs. 2 SchwarzArbG
 - § 2a Abs. 1 SchwarzArbG
@@ -56,7 +57,7 @@ frist:
   bezug:
     ereignis: einstellung
   versatz: P0D
-  zeitpunkt: spaetestens
+  zeitpunkt: vor_beginn
   je_ereignis: true
   verschiebung:
     regel: keine
@@ -88,12 +89,6 @@ quellen:
 - titel: 'Schwarzarbeitsbekämpfungsgesetz § 8'
   url: https://www.gesetze-im-internet.de/schwarzarbg_2004/__8.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'R12 (Rechtsprüfung Befund 13): Termin „spätestens bei Arbeitsbeginn“ statt Vortag; Mitführungspflicht auch für Inhaber und Selbstständige nach Zoll-Praxis („tätige Personen“, § 2a Abs. 1) – bestätigen; eigener Auslöser für Inhaber ohne Beschäftigte fehlt'
-- 'Wortlaut § 2a Abs. 2 SchwarzArbG n. F. im BGBl. gegenlesen: „nachweislich und schriftlich“ und Aufbewahrung laut HWK Chemnitz; „vor Erbringung der Dienst- oder Werkleistung“ laut CMS (neu); Hinweispflicht bestand schon vor dem SchwarzArbMoDiG'
-- Ob ein Satz im Arbeitsvertrag als Hinweis genügt – bestätigen
-- Bußgeld (§ 8 SchwarzArbG) – Nummer und Höhe fachlich ergänzen
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt (§ 8 Abs. 2 Nr. 1, 2 und Abs. 5 SchwarzArbG amtlich gelesen (Nr. 2 fällt unter „übrige Fälle“, bis 1.000 €); Teilaufzählung „nicht aufbewahrt, nicht vorgelegt“ sinngemäß – Wortlaut bestätigen) – fachlich zu bestätigen'
 pruefung:
   status: entwurf
   geprueft_von: null

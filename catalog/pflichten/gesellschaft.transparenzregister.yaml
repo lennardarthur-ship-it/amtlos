@@ -1,14 +1,14 @@
 # Katalog B.16 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.transparenzregister
-version: 4
+version: 5
 katalog_nr: B.16
 titel:
   de: Wirtschaftlich Berechtigte ans Transparenzregister melden
 kurz:
-  de: Melde, wer hinter deiner Gesellschaft steht, und halte die Angaben aktuell.
+  de: 'Melde unverzüglich, wer hinter deiner Gesellschaft steht, und halte die Angaben aktuell.'
 erklaerung:
-  de: Gesellschaften müssen ihre wirtschaftlich Berechtigten dem Transparenzregister mitteilen und die Angaben bei Änderungen aktualisieren. Das gilt für UG und GmbH ebenso wie für eingetragene Personengesellschaften, also auch für die GmbH & Co. KG und die Partnerschaftsgesellschaft (§ 20 Abs. 1 GwG) – seit 2024 auch für eine GbR, die sich ins Gesellschaftsregister eintragen lässt (eGbR).
+  de: Gesellschaften müssen ihre wirtschaftlich Berechtigten dem Transparenzregister mitteilen und die Angaben bei Änderungen aktualisieren. Das gilt für UG und GmbH ebenso wie für eingetragene Personengesellschaften, also auch für die GmbH & Co. KG und die Partnerschaftsgesellschaft (§ 20 Abs. 1 GwG) – seit 2024 auch für eine GbR, die sich ins Gesellschaftsregister eintragen lässt (eGbR). Die Mitteilung machst du unverzüglich nach der Eintragung und nach jeder Änderung (§ 20 Abs. 1 GwG).
 begriffe:
 - begriff:
     de: Wirtschaftlich Berechtigte
@@ -24,7 +24,8 @@ ausloeser:
   wert: true
   label:
     de: Deine Gesellschaft wird im Handels- oder Partnerschaftsregister eingetragen.
-# R11 (Nutzertest Tischlerei #4): keine Gründungs-Phase – Altgesellschaften (vor 1.8.2021) hatten Nachmeldepflichten (§ 59 Abs. 8 GwG), Änderungen laufend
+# R11 (Nutzertest Tischlerei #4): keine Gründungs-Phase – Altgesellschaften (vor 1.8.2021) hatten Nachmeldepflichten (§ 59 Abs. 8 GwG), laut Freigabe Weber 22.10.2026 bis 31.12.2022 abgelaufen (nur historisch); Änderungen laufend
+# Frist „unverzüglich“ (§ 20 Abs. 1 GwG) nur im Text – das Datum der Eintragung bzw. Änderung kennt die App nicht; Rechtsform eGbR im Fragebogen siehe gesellschaft.egbr_hinweis
 frist:
   typ: dauerhaft
 wiederholung:
@@ -64,11 +65,6 @@ quellen:
 - titel: § 56 GwG, Wortlaut (gesetze.legal, Spiegel des Bundesrechts)
   url: https://gesetze.legal/bund/gwg/56
   abgerufen: '2026-10-21'
-fachlich_zu_pruefen:
-- 'R12 (Rechtsprüfung Befund 1, K-205): Auslöser auf GmbH & Co. KG, PartG und PartG mbB erweitert (§ 20 Abs. 1 GwG, eingetragene Personengesellschaften); eGbR nur im Text – eigene Rechtsform „eGbR“ fehlt im Fragebogen'
-- Einzelvorschriften §§ 19, 20 GwG zugeordnet (R11); Nachmeldepflicht für Gesellschaften vor 1.8.2021 (§ 59 Abs. 8 GwG) nur im Kommentar – Fristen bestätigen
-- Frist nach Gründung und bei Änderung ergänzen
-- 'Vorprüfung 21.10.2026: Sanktion ergänzt – § 56 Abs. 1 Nr. 55 (Mitteilung nach § 20 Abs. 1), Beträge Abs. 1 und 3 über gesetze.legal gelesen (gesetze-im-internet für das Werkzeug gesperrt); Staffelung nach dem Bußgeldkatalog des Bundesverwaltungsamts nicht abgebildet'
 pruefung:
   status: entwurf
   geprueft_von: null

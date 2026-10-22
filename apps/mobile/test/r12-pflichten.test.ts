@@ -58,7 +58,9 @@ describe("R12: Coach – Bestandsbetrieb, Rentenversicherung, Einordnung", () =>
 
   it("bei 0 Beschäftigten hängen Jugendarbeitsschutz, Minijob-Grenze und Ausbildungsvergütung nicht mehr ab; Einzelperson ohne Investoren", () => {
     const a = auswertung(coach, "2026-10-21");
-    for (const id of ["personal.jugendarbeitsschutz", "personal.minijob_grenze", "personal.ausbildungsverguetung", "gesellschaft.awv_meldung", "gesellschaft.investitionspruefung_hinweis"]) expect(ids(a.unbekannt), id).not.toContain(id);
+    for (const id of ["personal.jugendarbeitsschutz", "personal.minijob_grenze", "personal.ausbildungsverguetung", "gesellschaft.investitionspruefung_hinweis"]) expect(ids(a.unbekannt), id).not.toContain(id);
+    // Freigabe Weber 22.10.2026: AWV-Meldung hängt bei Einzelpersonen nur noch an der Frage nach Auslandszahlungen über 50.000 €, nicht an Investoren
+    expect(a.unbekannt.find((p) => p.id === "gesellschaft.awv_meldung")?.offeneFragen).toEqual(["auslandszahlungen.ueber_meldegrenze"]);
   });
 
   it("die neue Branche fragt nach Aufträgen per Messenger, Musik im Kurs und Gesundheitsdaten", () => {

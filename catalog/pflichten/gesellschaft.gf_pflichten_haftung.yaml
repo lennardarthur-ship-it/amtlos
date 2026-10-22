@@ -1,14 +1,14 @@
 # Katalog B.17 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: gesellschaft.gf_pflichten_haftung
-version: 5
+version: 6
 katalog_nr: B.17
 titel:
   de: Pflichten und Haftung der Geschäftsführung kennen
 kurz:
   de: Als Geschäftsführerin oder Geschäftsführer hast du besondere Pflichten und kannst persönlich haften.
 erklaerung:
-  de: Die Geschäftsführung einer GmbH oder UG hat gesetzliche Pflichten. Wer sie verletzt, kann persönlich haften. Dazu gehören vor allem, die Sozialversicherungsbeiträge der Beschäftigten abzuführen (§ 266a StGB), Steuern zu erklären und zu zahlen (§§ 34, 69 AO), nach Eintritt der Insolvenzreife keine Zahlungen mehr zu leisten (§ 15b InsO), bei Verlust der Hälfte des Stammkapitals die Gesellschafterversammlung einzuberufen (§ 49 Abs. 3 GmbHG) und die Gesellschafterliste aktuell zu halten (§ 40 GmbHG). Das zur Erhaltung des Stammkapitals nötige Vermögen darf nicht an Gesellschafter ausgezahlt werden (§ 30 GmbHG) – typische Fälle sind ein überhöhtes Gehalt für Gesellschafter-Geschäftsführer und Darlehen an Gesellschafter. Verbotene Auszahlungen sind zu erstatten (§ 31 GmbHG), die Geschäftsführung haftet dafür (§ 43 Abs. 3 GmbHG). Bei der GmbH & Co. KG treffen diese Pflichten die Geschäftsführung der Komplementär-GmbH. Für deinen Einzelfall hilft eine Rechtsberatung.
+  de: Die Geschäftsführung einer GmbH oder UG hat gesetzliche Pflichten. Wer sie verletzt, kann persönlich haften. Dazu gehören vor allem, die Sozialversicherungsbeiträge der Beschäftigten abzuführen (§ 266a StGB), Steuern zu erklären und zu zahlen (§§ 34, 69 AO), nach Eintritt der Insolvenzreife keine Zahlungen mehr zu leisten (§ 15b InsO), bei Verlust der Hälfte des Stammkapitals die Gesellschafterversammlung einzuberufen (§ 49 Abs. 3 GmbHG) und die Gesellschafterliste aktuell zu halten (§ 40 GmbHG). Das zur Erhaltung des Stammkapitals nötige Vermögen darf nicht an Gesellschafter ausgezahlt werden (§ 30 GmbHG) – typische Fälle sind ein überhöhtes Gehalt für Gesellschafter-Geschäftsführer und Darlehen an Gesellschafter. Verbotene Auszahlungen sind zu erstatten (§ 31 GmbHG), die Geschäftsführung haftet dafür (§ 43 Abs. 3 GmbHG). Bei der GmbH & Co. KG treffen diese Pflichten die Geschäftsführung der Komplementär-GmbH; die Kapitalerhaltung gilt nach der Rechtsprechung des BGH entsprechend für Auszahlungen an Kommanditisten, soweit das Vermögen der Komplementär-GmbH betroffen ist. Für deinen Einzelfall hilft eine Rechtsberatung.
 rechtsgrundlage:
 - § 43 GmbHG
 - §§ 30, 31 GmbHG
@@ -65,13 +65,6 @@ quellen:
 - titel: GmbH-Gesetz § 40
   url: https://www.gesetze-im-internet.de/gmbhg/__40.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'R12 (Rechtsprüfung Befunde 1 und 10): Kapitalerhaltung (§§ 30, 31, 43 Abs. 3 GmbHG) ergänzt; GmbH & Co. KG einbezogen – Übertragung auf die KG (Auszahlungen an Kommanditisten, § 30 GmbHG entsprechend) bestätigen'
-- Normen aus dem Nutzertest Tischlerei (R11) ergänzt – Auswahl und Rechtsgrundlage § 43 GmbHG bestätigen
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Inhalt der Erklärung (welche Pflichten, § 43 GmbHG) fachlich festlegen – Spezifikation nennt nur „Pflichten und Haftung erklären“
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Folgen je genannter Vorschrift aus dem Wortlaut; Schwere „mittel“ belassen (Hinweis-Pflicht) – „hoch“ fachlich erwägen)'
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
 pruefung:
   status: entwurf
   geprueft_von: null
