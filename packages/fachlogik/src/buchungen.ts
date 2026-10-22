@@ -34,8 +34,18 @@
  *   Kanzlei folgt (nach dem Testimport) – bis dahin bleibt 3560.
  * - B-2: Nullsteuersatz (§ 12 Abs. 3 UStG) auf ein eigenes Erlöskonto mit Kz-87-Automatik.
  * - B-4/B-9/B-10/B-11: einzelne Konten über die Kontenvorgaben der Kanzlei (kontenvorgaben.ts, `kontenFuer`).
+ *
+ * E-165 (Abschnitt 10 Prio 3):
+ * - A-3 Personenkonten (Kontenvorgabe, Standard aus): Rechnungen, Skonto, Zahlungseingänge und Gutschriften auf dem
+ *   Personenkonto des Kunden (`personenkonto`, Debitor 10000–69999 bzw. bei Gutschriften Kreditor) statt Forderungen
+ *   bzw. Verbindlichkeiten; Belege per Überweisung/Karte auf dem Kreditor des Lieferanten (`o.kreditoren`). Belegfeld 1
+ *   bleibt die Rechnungs- bzw. Belegnummer – damit zieht DATEV die offenen Posten aus (OPOS).
+ * - 5.2 Vorsteuer-Teilabzug je Beleg (§ 15 Abs. 4 UStG): ein Beleg mit abziehbarem Anteil wird je Steuersatz in zwei
+ *   Zeilen gebucht – der abziehbare Teil brutto mit BU 9/8 (DATEV rechnet daraus genau die abziehbare Vorsteuer), der
+ *   nicht abziehbare Teil brutto ohne Steuerschlüssel auf demselben Aufwandskonto (Automatikkonto: BU 40). § 13b-Belege
+ *   entsprechend auf die Konten „mit“ bzw. „ohne Vorsteuer“.
  */
-import { belegKennung, belegSkonto, kategorieFuer, zahltag, type AnlageArt, type Beleg } from "./belege.js";
+import { belegKennung, belegSkonto, belegTeilabzug, kategorieFuer, vorsteuerAufteilung, vorsteuerVerhaeltnis, zahltag, type AnlageArt, type Beleg } from "./belege.js";
 import { formImNamen } from "./dokumente/betrieb.js";
 import type { Kontenvorgaben } from "./kontenvorgaben.js";
 import { restGruppen, summen, type Abschlag, type Position } from "./rechnung.js";
@@ -133,6 +143,11 @@ export interface AusgangsRechnungFuerBuchung {
   abschlaege?: Abschlag[];
   /** StB-Prüfung (5.2): OSS – Leistung an eine Privatperson im EU-Ausland mit der Steuer des Bestimmungslands */
   oss?: { land: string; satz: number } | null;
+  /**
+   * E-165 (A-3): Personenkonto des Kunden (Debitor) bzw. bei Gutschriften des Leistenden (Kreditor) – nur gesetzt, wenn
+   * die Kontenvorgabe „Personenkonten“ an ist; sonst die Sammelkonten Forderungen/Verbindlichkeiten.
+   */
+  personenkonto?: string | null;
 }
 
 /**
@@ -408,7 +423,7 @@ export function buchungenAusRechnungen(rechnungen: AusgangsRechnungFuerBuchung[]
         betrag_cent: Math.abs(brutto),
         // eine negative Summe (nur bei negativen Positionen) steht im Haben; ein Storno auf derselben Seite mit Generalumkehr
         soll_haben: brutto < 0 ? "H" : "S",
-        konto: k.forderungen,
+        konto: r.personenkonto || k.forderungen,
         gegenkonto: erloeskonto(k, g.satz, r),
         bu_schluessel: "",
         belegfeld1: belegfeld1Aus(r.nummer),
@@ -447,7 +462,7 @@ function gutschriftBuchungen(r: AusgangsRechnungFuerBuchung, kontenrahmen: Konte
       datum: r.datum,
       betrag_cent: Math.abs(brutto),
       soll_haben: brutto < 0 ? "S" : "H",
-      konto: k.verbindlichkeiten,
+      konto: r.personenkonto || k.verbindlichkeiten,
       gegenkonto: k.gutschrift,
       bu_schluessel: g.satz ? buAufwand(kontenrahmen, k.gutschrift, g.satz, !r.empfaenger_ku) : "",
       belegfeld1: belegfeld1Aus(r.nummer),
@@ -486,7 +501,7 @@ export const zmBetroffen = (r: Pick<AusgangsRechnungFuerBuchung, "steuerart" | "
  * schuldet, auf eigene Konten (UNSICHER, PRUEFLISTE) und mit der USt-IdNr. des Empfängers – sonst mindert DATEV
  * Kz 41/60/21 und die Zusammenfassende Meldung nicht. StB-Prüfung (A-1): diese Reihenfolge ist richtig.
  */
-export function skontoBuchungenRechnung(r: Pick<AusgangsRechnungFuerBuchung, "id" | "nummer" | "kunde" | "kleinunternehmer" | "positionen"> & Partial<Pick<AusgangsRechnungFuerBuchung, "steuerart" | "kunde_land" | "kunde_ust_idnr" | "abschlaege" | "oss">>, minderungen: { id: string; datum: string; brutto_cent: number }[], kontenrahmen: Kontenrahmen, o?: BuchungsOptionen): Buchung[] {
+export function skontoBuchungenRechnung(r: Pick<AusgangsRechnungFuerBuchung, "id" | "nummer" | "kunde" | "kleinunternehmer" | "positionen"> & Partial<Pick<AusgangsRechnungFuerBuchung, "steuerart" | "kunde_land" | "kunde_ust_idnr" | "abschlaege" | "oss" | "personenkonto">>, minderungen: { id: string; datum: string; brutto_cent: number }[], kontenrahmen: Kontenrahmen, o?: BuchungsOptionen): Buchung[] {
   const k = kontenFuer(kontenrahmen, o?.vorgaben);
   const gruppen = restGruppen(r);
   const sonder = skontoSonderfall(r);
@@ -507,7 +522,7 @@ export function skontoBuchungenRechnung(r: Pick<AusgangsRechnungFuerBuchung, "id
         konto: oss ? k.erloese.oss : sonder && nullSatz ? (sonder === "igl" ? k.skontiGewaehrtIgl : k.skontiGewaehrtRc) : skontoKonto(k.skontiGewaehrt, r.kleinunternehmer ? null : a.satz),
         ...(oss ? { eu_ustid: ossLandKennzeichen(oss.land), eu_steuersatz: oss.satz } : {}),
         ...(sonder && nullSatz && ustid ? { eu_ustid: ustid } : {}),
-        gegenkonto: k.forderungen,
+        gegenkonto: r.personenkonto || k.forderungen,
         bu_schluessel: "",
         belegfeld1: belegfeld1Aus(r.nummer),
         buchungstext: kuerze(`Skonto RE ${r.nummer} ${kuerze(r.kunde, NAME_IM_TEXT)}`, 60),
@@ -527,7 +542,7 @@ export function skontoBuchungenRechnung(r: Pick<AusgangsRechnungFuerBuchung, "id
  * Forderungen, zum Zahltag; eine Erstattung (Storno mit Rückzahlung) Bank im Haben. So steht zum Stichtag der offene
  * Betrag auf dem Forderungskonto. Skonto bzw. Minderung bucht `skontoBuchungenRechnung`. Ohne Steuer (Geldbewegung).
  */
-export function zahlungsBuchungenRechnung(r: Pick<AusgangsRechnungFuerBuchung, "id" | "nummer" | "kunde" | "art">, zahlungen: readonly { id: string; datum: string; betrag_cent: number }[], kontenrahmen: Kontenrahmen, o?: BuchungsOptionen): Buchung[] {
+export function zahlungsBuchungenRechnung(r: Pick<AusgangsRechnungFuerBuchung, "id" | "nummer" | "kunde" | "art"> & Partial<Pick<AusgangsRechnungFuerBuchung, "personenkonto">>, zahlungen: readonly { id: string; datum: string; betrag_cent: number }[], kontenrahmen: Kontenrahmen, o?: BuchungsOptionen): Buchung[] {
   const k = kontenFuer(kontenrahmen, o?.vorgaben);
   const storno = r.art === "storno";
   return zahlungen
@@ -540,7 +555,7 @@ export function zahlungsBuchungenRechnung(r: Pick<AusgangsRechnungFuerBuchung, "
         betrag_cent: Math.abs(z.betrag_cent),
         soll_haben: eingang ? "S" : "H",
         konto: k.bank,
-        gegenkonto: k.forderungen,
+        gegenkonto: r.personenkonto || k.forderungen,
         bu_schluessel: "",
         belegfeld1: belegfeld1Aus(r.nummer),
         buchungstext: kuerze(`${storno ? "Erstattung" : "Zahlung"} RE ${r.nummer} ${kuerze(r.kunde, NAME_IM_TEXT)}`, 60),
@@ -573,6 +588,29 @@ export interface BelegBuchungsOptionen extends BuchungsOptionen {
   kapitalgesellschaft?: boolean;
   kleinunternehmer?: boolean;
   kasseAb?: string | null;
+  /** E-165 (A-3): Kreditor je Beleg-ID – ersetzt das Verbindlichkeitskonto bei Belegen per Überweisung/Karte */
+  kreditoren?: ReadonlyMap<string, string>;
+}
+
+/** Konto des Zahlungswegs eines Belegs, mit Personenkonten der Kreditor statt Verbindlichkeiten (E-165). */
+function zahlkontoBeleg(b: Beleg, k: Konten, o?: BelegBuchungsOptionen): string {
+  const konto = belegGegenkonto(b, k, o?.kasseAb, o?.kapitalgesellschaft, o?.vorgaben);
+  const kreditor = o?.kreditoren?.get(b.id);
+  return kreditor && konto === k.verbindlichkeiten ? kreditor : konto;
+}
+
+/**
+ * E-165 (5.2): Bruttobetrag eines Steuersatzes in einen Teil mit abziehbarer Vorsteuer und einen ohne aufteilen – der
+ * Teil mit Vorsteuer so, dass DATEV aus ihm (BU 9/8, Steuer = brutto × p / (100 + p)) genau `abziehbar` rechnet.
+ * § 13b (`netto`): der Teil, dessen Steuer (× p / 100) den abziehbaren Betrag ergibt.
+ */
+export function teilenNachVorsteuer(betrag_cent: number, satz: number, abziehbar_cent: number, netto = false): { mit: number; ohne: number } {
+  const p = netto ? (satz > 0 ? satz : 19) : satz;
+  if (p <= 0 || abziehbar_cent <= 0) return { mit: 0, ohne: betrag_cent };
+  const vz = betrag_cent < 0 ? -1 : 1;
+  const ganz = Math.abs(betrag_cent);
+  const mit = Math.min(ganz, Math.round((Math.abs(abziehbar_cent) * (netto ? 100 : 100 + p)) / p));
+  return { mit: vz * mit, ohne: vz * (ganz - mit) };
 }
 
 /**
@@ -607,20 +645,28 @@ export function skontoBuchungenBelege(belege: Beleg[], kontenrahmen: Kontenrahme
       const mitVst = b.vorsteuer && !o?.kleinunternehmer;
       const satz = a.satz ?? 0;
       const aufwand = kat.id === "waren" ? null : belegSachkonto(b, satz, kontenrahmen, k, o);
-      aus.push({
+      const zeile = (betrag: number, vst: boolean, guidZusatz: string): Buchung => ({
         datum: zahltag(b),
-        betrag_cent: Math.abs(a.brutto_cent),
-        soll_haben: a.brutto_cent < 0 ? "H" : "S",
-        konto: belegGegenkonto(b, k, o?.kasseAb, o?.kapitalgesellschaft, o?.vorgaben),
-        gegenkonto: aufwand ?? skontoKonto(k.skontiErhalten, mitVst ? a.satz : null),
-        bu_schluessel: aufwand ? buAufwand(kontenrahmen, aufwand, satz, b.vorsteuer && !o?.kleinunternehmer) : "",
+        betrag_cent: Math.abs(betrag),
+        soll_haben: betrag < 0 ? "H" : "S",
+        konto: zahlkontoBeleg(b, k, o),
+        gegenkonto: aufwand ?? skontoKonto(k.skontiErhalten, vst ? a.satz : null),
+        bu_schluessel: aufwand ? buAufwand(kontenrahmen, aufwand, satz, vst) : "",
         belegfeld1,
         buchungstext: kuerze(`Skonto ${kuerze(b.lieferant, NAME_IM_TEXT)} ${kat.kurz}`, 60),
         ust_satz: a.satz,
         art: "ausgabe",
         quelle_id: b.id,
-        guid: buchungsGuid(`${b.id}|skonto`, a.satz),
+        guid: buchungsGuid(`${b.id}|skonto${guidZusatz}`, a.satz),
       });
+      // E-165: Teilabzug – die Minderung trifft abziehbaren und nicht abziehbaren Teil im Verhältnis des Belegs
+      if (mitVst && belegTeilabzug(b) && satz > 0) {
+        const t = teilenNachVorsteuer(a.brutto_cent, satz, Math.round(Math.abs(a.ust_cent) * vorsteuerVerhaeltnis(b, satz)));
+        if (t.mit) aus.push(zeile(t.mit, true, ""));
+        if (t.ohne) aus.push(zeile(t.ohne, false, "|nicht-abziehbar"));
+        continue;
+      }
+      aus.push(zeile(a.brutto_cent, mitVst, ""));
     }
   }
   return aus;
@@ -643,29 +689,42 @@ export function buchungenAusBelegen(belege: Beleg[], kontenrahmen: Kontenrahmen,
     if (!belegImStapel(b, o)) continue;
     const kat = kategorieFuer(b.kategorie);
     // § 13b: mit Vorsteuerabzug die Konten „19 % Vorsteuer und 19 % Umsatzsteuer“, sonst „ohne Vorsteuer“ (R11)
-    const k13b = b.steuerschuld ? KONTEN_13B[kontenrahmen][b.vorsteuer && !o?.kleinunternehmer ? "mit" : "ohne"] : null;
-    const zahlkonto = belegGegenkonto(b, k, o?.kasseAb, o?.kapitalgesellschaft, o?.vorgaben);
+    const mitVst = b.vorsteuer && !o?.kleinunternehmer;
+    const zahlkonto = zahlkontoBeleg(b, k, o);
     const buchungstext = kuerze(`${kuerze(b.lieferant, NAME_IM_TEXT)} ${kat.kurz}`, 60);
     const belegfeld1 = belegfeld1Aus(belegKennung(b, o?.nummern?.get(b.id) ?? belegfeld1Aus(b.id).slice(0, 12).toUpperCase()));
+    // E-165 (5.2): abziehbare Vorsteuer je Satz bei Teilabzug
+    const teil = mitVst && belegTeilabzug(b) ? vorsteuerAufteilung(b) : null;
     for (const s of b.steuer) {
       if (!s.brutto_cent) continue;
-      // § 13b: Automatikkonto für die Steuer (und ggf. die Vorsteuer); sonst das Sachkonto der Kategorie
-      const sachkonto = k13b ? k13b[b.steuerschuld!] : belegSachkonto(b, s.satz, kontenrahmen, k, o);
-      aus.push({
-        datum: b.datum,
-        betrag_cent: Math.abs(s.brutto_cent),
-        // Ausgabe: Zahlungskonto im Haben; eine Gutschrift des Lieferanten (negativ) im Soll
-        soll_haben: s.brutto_cent < 0 ? "S" : "H",
-        konto: zahlkonto,
-        gegenkonto: sachkonto,
-        bu_schluessel: b.steuerschuld ? "" : buAufwand(kontenrahmen, sachkonto, s.satz, b.vorsteuer && !o?.kleinunternehmer),
-        belegfeld1,
-        buchungstext,
-        ust_satz: s.satz,
-        art: "ausgabe",
-        quelle_id: b.id,
-        guid: buchungsGuid(b.id, s.satz),
-      });
+      const zeile = (betrag: number, vst: boolean, guidZusatz: string, text = buchungstext): Buchung => {
+        // § 13b: Automatikkonto für die Steuer (und ggf. die Vorsteuer); sonst das Sachkonto der Kategorie
+        const sachkonto = b.steuerschuld ? KONTEN_13B[kontenrahmen][vst ? "mit" : "ohne"][b.steuerschuld] : belegSachkonto(b, s.satz, kontenrahmen, k, o);
+        return {
+          datum: b.datum,
+          betrag_cent: Math.abs(betrag),
+          // Ausgabe: Zahlungskonto im Haben; eine Gutschrift des Lieferanten (negativ) im Soll
+          soll_haben: betrag < 0 ? "S" : "H",
+          konto: zahlkonto,
+          gegenkonto: sachkonto,
+          bu_schluessel: b.steuerschuld ? "" : buAufwand(kontenrahmen, sachkonto, s.satz, vst),
+          belegfeld1,
+          buchungstext: text,
+          ust_satz: s.satz,
+          art: "ausgabe",
+          quelle_id: b.id,
+          guid: buchungsGuid(`${b.id}${guidZusatz}`, s.satz),
+        };
+      };
+      const t = teil?.find((x) => x.satz === s.satz);
+      if (teil && t && t.abziehbar_cent < t.ust_cent && (s.satz > 0 || b.steuerschuld)) {
+        // Teilabzug: abziehbarer Teil mit Vorsteuer, Rest ohne – zwei Zeilen mit eigener GUID
+        const g = teilenNachVorsteuer(s.brutto_cent, s.satz, t.abziehbar_cent, !!b.steuerschuld);
+        if (g.mit) aus.push(zeile(g.mit, true, "", kuerze(`${buchungstext} VSt-Anteil`, 60)));
+        if (g.ohne) aus.push(zeile(g.ohne, false, "|nicht-abziehbar", kuerze(`${buchungstext} ohne VSt`, 60)));
+        continue;
+      }
+      aus.push(zeile(s.brutto_cent, mitVst, ""));
     }
   }
   return aus;
@@ -951,6 +1010,8 @@ export function pruefpunkteBuchungen(): string[] {
     "R12 Kasse (GoBD): nur Bargeld über die Kasse – Kartenanteil und App-Zahlungen direkt Geldtransit (1360/1460) an Erlöse 19 %/7 % (8400/8300 bzw. 4400/4300), „auf Rechnung“ Forderungen an Erlöse, der Rest Kasse (1000/1600) an Erlöse; unbare Zahlungen werden im Verhältnis der Umsätze je Steuersatz aufgeteilt (die Kasse kennt die Zuordnung nicht). Kartentrinkgeld (an das Personal bar ausgezahlt) Geldtransit an Kasse ohne Steuer. Gutscheine: Einzweck-Verkauf Erlös zum Satz des Gutscheins, Einlösung kein zweiter Erlös; Mehrzweck-Verkauf an „sonstige Verbindlichkeiten“ (SKR03 1700, SKR04 3500 – UNSICHER), Einlösung Verbindlichkeit an Erlöse. Bargeld zur Bank Geldtransit an Kasse; Privatentnahme 1800/2100 an Kasse; Privateinlage Kasse an 1890/2180 – mit Eigenbeleg-Nummer in Belegfeld 1. Kassendifferenzen: Überschuss Kasse an Erlöse 19 %, Fehlbetrag 4900/6300 an Kasse (mit der Kanzlei abstimmen). Barbelege vor dem ersten Kassenabschluss gegen Privateinlage. Leistungsdatum und Feld 116 = Tag des Z-Bons.",
     "R12 Skonto: gewährte Skonti SKR03 8736 (19 %), 8731 (7 %), 8730 (ohne USt, Kleinunternehmer, 0 %), SKR04 4736/4731/4730 an Forderungen zum Zahltag; auf innergemeinschaftliche Lieferungen SKR03 8743 / SKR04 4743, auf Umsätze mit Steuerschuld des Empfängers (§ 13b, EU-Leistung) SKR03 8741 / SKR04 4741 – beide UNSICHER, mit USt-IdNr. in Feld 40. Erhaltene Skonti nur bei „Waren und Material“ auf SKR03 3736/3731/3730, SKR04 5736/5731/5730; bei anderen Kategorien gegen das Aufwandskonto mit BU wie der Beleg. Die Skontokonten mit Steuersatz gelten als Automatikkonten (kein BU-Schlüssel). Bei Ist-Versteuerung wird je Zahlung der erhaltene Betrag plus Skonto als Erlös und das Skonto als Minderung gebucht.",
     "R12 Sachentnahmen: Privatentnahmen (1800/2100) an „Entnahme durch den Unternehmer … (Waren)“ 7 % SKR03 8915 / SKR04 4610 bzw. 19 % SKR03 8910 / SKR04 4620 – brutto, Automatik. Kontonummern UNSICHER, gegen den aktuellen Kontenrahmen prüfen; Kleinunternehmer: nicht gebucht.",
+    "E-165 Personenkonten (Kontenvorgabe, Standard aus): Debitor (10000–69999) statt Forderungen bei Rechnungen, Skonto und Zahlungseingängen, Kreditor (70000–99999) statt Verbindlichkeiten bei Belegen per Überweisung/Karte und Gutschriften; Belegfeld 1 = Rechnungs- bzw. Belegnummer für den OP-Ausgleich. Bar und privat bezahlte Belege bleiben auf Kasse/Privat. Stammdaten als EXTF „Debitoren/Kreditoren“ (Kategorie 16, Formatversion 5). Ist-Versteuerung bilanzierender Betriebe: Feld 116 (Zahltag) unverändert – laut Kanzlei braucht Ist + Bilanzierung vermutlich Personenkonten (Mandantenstamm „Ist“ mit OPOS), im Testimport bestätigen.",
+    "E-165 Vorsteuer-Teilabzug (§ 15 Abs. 4 UStG): je Steuersatz zwei Buchungen – abziehbarer Teil brutto mit BU 9/8 (Betrag so gerundet, dass DATEV genau die abziehbare Vorsteuer rechnet), nicht abziehbarer Teil brutto ohne BU auf demselben Aufwandskonto (Automatikkonto BU 40); § 13b-Belege anteilig auf 3123/3143 bzw. 5923/5943. Alternativen: DATEV-Buchungsschlüssel 90/9000 bzw. 9xxx „aufzuteilende Vorsteuer“ (ganze Vorsteuer auf das Konto „Aufzuteilende Vorsteuer“, Aufteilung durch die Kanzlei – DATEV-Hilfe-Dokument 0904313) oder voll mit BU und Umbuchung auf „Nicht abziehbare Vorsteuer“ – bitte bestätigen, welche Variante gewünscht ist.",
     "Belegfeld 1 wird auf die DATEV-zulässigen Zeichen (Ziffern, Buchstaben, $ & % * + - /) gekürzt, Umlaute werden umschrieben – stimmt die Zeichenliste? Textfelder werden nach Windows-1252 kodiert; andere Zeichen werden „?“.",
   ];
 }

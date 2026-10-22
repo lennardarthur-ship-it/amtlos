@@ -2,15 +2,16 @@ import { useState } from "react";
 import { View } from "react-native";
 import { BUCHUNGSKONTEN, KONTENVORGABE_FELDER, kontenFuer, kontenvorgabenAus, kontenvorgabenAusJson, kontenvorgabenGesetzt, kontenvorgabenJson, type KontenvorgabeKonto, type Kontenvorgaben } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
-import { Feld, Hinweis, Karte, Schalter, T, TextKnopf, Wahl } from "../ui/bausteine";
+import { Feld, Hinweis, Karte, Schalter, T, TextKnopf, Wahl, Zeile } from "../ui/bausteine";
 import { useMeldung } from "../ui/meldung";
 import { Unterseite } from "../ui/navigation";
 import { dateiTeilen, dateiWaehlen } from "../unterlagen/sicherungDatei";
+import { personenkontenListe } from "../unterlagen/steuerpaket";
 import { useAmtlos } from "../zustand";
 import { Inhalt } from "./gemeinsam";
 
 /** Anzahl der gesetzten Vorgaben (Konten und Optionen) – für den Einstieg auf der Seite „Steuerberatung“. */
-export const kontenvorgabenAnzahl = (v: Kontenvorgaben | undefined) => (v ? Object.keys(v.konten ?? {}).length + [v.belegeGegenBank, v.zahlungenBuchen, v.gewinnermittlung].filter((x) => x !== undefined).length : 0);
+export const kontenvorgabenAnzahl = (v: Kontenvorgaben | undefined) => (v ? Object.keys(v.konten ?? {}).length + [v.belegeGegenBank, v.zahlungenBuchen, v.personenkonten, v.gewinnermittlung].filter((x) => x !== undefined).length : 0);
 
 /** Standardkonto eines Felds im Kontenrahmen (ohne Vorgaben) – als Platzhalter. */
 function standardKonto(id: KontenvorgabeKonto, kr: "SKR03" | "SKR04"): string {
@@ -96,6 +97,9 @@ export function KontenvorgabenSeite() {
         <T v="klein" fett stil={{ marginTop: 22 }}>{TEXT.stb_kv_optionen}</T>
         <Schalter label={TEXT.stb_kv_bank} hilfe={TEXT.stb_kv_bank_hilfe} wert={v.belegeGegenBank === true} aendern={(x) => setzen({ ...v, belegeGegenBank: x })} />
         <Schalter label={TEXT.stb_kv_zahlungen} hilfe={TEXT.stb_kv_zahlungen_hilfe} wert={v.zahlungenBuchen === true} aendern={(x) => setzen({ ...v, zahlungenBuchen: x })} />
+        {/* E-165 (StB-Prüfung A-3): Personenkonten – Standard aus; vergebene Nummern nur zum Ansehen */}
+        <Schalter label={TEXT.stb_kv_personenkonten} hilfe={TEXT.stb_kv_personenkonten_hilfe} wert={v.personenkonten === true} aendern={(x) => setzen({ ...v, personenkonten: x })} />
+        {v.personenkonten ? <Personenkonten /> : null}
         <Wahl
           label={TEXT.stb_kv_gewinn}
           hilfe={TEXT.stb_kv_gewinn_hilfe}
@@ -125,5 +129,24 @@ export function KontenvorgabenSeite() {
         </View>
       </Inhalt>
     </Unterseite>
+  );
+}
+
+/** E-165: vergebene Personenkonten (Kunden und Lieferanten) – nur zum Ansehen. */
+function Personenkonten() {
+  const z = useAmtlos();
+  const liste = personenkontenListe(z.stand);
+  return (
+    <View style={{ marginTop: 10, gap: 6 }}>
+      <T v="klein" fett>{TEXT.stb_kv_pk_titel(liste.length)}</T>
+      <T v="caption" leise>{liste.length ? TEXT.stb_kv_pk_hilfe : TEXT.stb_kv_pk_leer}</T>
+      {liste.length ? (
+        <Karte>
+          {liste.map((e, i) => (
+            <Zeile key={`${e.art}-${e.konto}`} symbol={e.art === "debitor" ? "person" : "shippingbox"} titel={e.name} text={e.art === "debitor" ? TEXT.stb_kv_pk_debitor : TEXT.stb_kv_pk_kreditor} wert={e.konto} letzte={i === liste.length - 1} />
+          ))}
+        </Karte>
+      ) : null}
+    </View>
   );
 }

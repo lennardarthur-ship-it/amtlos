@@ -101,6 +101,8 @@ export function SteuerberatungSeite({ kanzleienZuerst }: { kanzleienZuerst?: boo
       setFortschritt(TEXT.steuerpaket_fortschritt_zip);
       // gezeichnet, bevor das Packen den Thread belegt
       await new Promise((r) => setTimeout(r, 30));
+      // E-165: Personenkonten vor dem Paket vergeben und speichern (das Paket vergibt dieselben Nummern) – dauerhaft gleich
+      z.personenkontenVergeben();
       const p = steuerpaket(z.stand, zr, sb, dateien, new Date().toISOString(), { rechnungsPdfs });
       setFortschritt(null);
       if (!(await dateiTeilenBytes(p.dateiname, p.zip, "application/zip"))) return;

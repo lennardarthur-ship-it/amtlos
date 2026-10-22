@@ -26,6 +26,7 @@ import { UeberGruppe } from "./Recht";
 import { SteuerberatungSeite } from "./Steuerberatung";
 import { KontrollmappeSeite } from "./Kontrollmappe";
 import { KontoZeile } from "./Konto";
+import { gemischteUmsaetze, vorsteuerquoteAus } from "../unterlagen/ustAusRechnungen";
 import { MitarbeiterZusatz } from "./Mitarbeiter";
 import { StaettenSeite, staettenText } from "./BetriebStaetten";
 import { syncAngeboten } from "../konto/konfig";
@@ -53,6 +54,8 @@ export function PersonSeite({ art, id, neu }: { art: PersonenArt; id: string; ne
         <Felder felder={PERSONEN_FELDER[art]} werte={p} fehlt={[]} setze={(k, w) => z.personSetzen(art, { ...p, [k]: typeof w === "string" ? w : null })} />
         {/* R12 Personal: Betriebsstätte, Aufenthaltstitel, doppelter Name */}
         {art === "mitarbeiter" ? <MitarbeiterZusatz p={p} /> : null}
+        {/* E-165: Personenkonto des Kunden – vergeben von der App, nur zum Ansehen */}
+        {art === "kunde" && p.personenkonto ? <T v="caption" leise stil={{ marginTop: 10 }}>{TEXT.person_personenkonto(p.personenkonto)}</T> : null}
         <TextKnopf
           symbol="trash"
           gefahr
@@ -170,6 +173,8 @@ export function BetriebFormular({ teil, teile }: { teil?: Teil; teile?: Teil[] }
   const sperre = useProSperre();
   const f = useFarben();
   const [b, setB] = useState<BetriebDaten>(stand.betrieb);
+  // E-165: Vorsteuerquote nur zeigen, wenn es steuerfreie und steuerpflichtige Rechnungen gibt (oder schon eine Quote)
+  const gemischt = gemischteUmsaetze(stand.unterlagen, stand.betrieb);
   // geprüft wird ein Feld erst nach dem Verlassen (beim Tippen wäre jede halbe IBAN „ungültig“) – gespeicherte Werte sofort
   const [verlassen, setVerlassen] = useState<Set<keyof BetriebDaten>>(() => new Set((["iban", "plz", "email"] as const).filter((k) => (stand.betrieb[k] ?? "").trim())));
   const feld = (k: keyof BetriebDaten) => ({
@@ -243,6 +248,8 @@ export function BetriebFormular({ teil, teile }: { teil?: Teil; teile?: Teil[] }
             <Wahl label={TEXT.b_versteuerung} hilfe={TEXT.b_versteuerung_hilfe} wert={b.versteuerung || "soll"} aendern={(w) => feld("versteuerung").aendern(w)} optionen={VERSTEUERUNG.map((o) => ({ wert: o.wert, text: TEXT.r11_versteuerung[o.wert] ?? o.text }))} />
             {/* R11 (Kosmetik #2/#8): Wechsel von der Kleinunternehmerregelung – bis wann galt sie? */}
             <DatumFeld label={TEXT.b_ku_bis} hilfe={TEXT.b_ku_bis_hilfe} wert={b.ku_bis || null} aendern={(w) => feld("ku_bis").aendern(w ?? "")} ohneHeute />
+            {/* E-165 (StB-Prüfung 5.2): Vorsteuerquote nur bei steuerfreien und steuerpflichtigen Umsätzen */}
+            {gemischt || (b.vorsteuerquote ?? "").trim() ? <Feld label={TEXT.b_vorsteuerquote} hilfe={TEXT.b_vorsteuerquote_hilfe} {...feld("vorsteuerquote")} keyboardType="decimal-pad" placeholder="z. B. 13" optional fehler={(b.vorsteuerquote ?? "").trim() && vorsteuerquoteAus(b) === null ? TEXT.beleg_vst_anteil_falsch : null} /> : null}
           </Karte>
         </View>
       ) : null}

@@ -18,10 +18,10 @@ Stand: 22.10.2026. Die Szenario-Pakete dieser Mappe sind mit dem neuen Stand erz
 | 2 | Verfahrensdoku: Kasse (TSE, DSFinV-K, Ausfall), ersetzendes Scannen, IKS; Kassenbuch umbenannt | D-9, D-10 | umgesetzt |
 | 2 | Vollsicherung außerhalb des Geräts mit Erinnerung und Nachweis | D-11 | umgesetzt (Erinnerung nach 30 Tagen) |
 | 2 | Hinweis „Übertragungshilfe, keine Steuerberatung“ auf den PDFs; KU-Warnung als Rechenergebnis | 8 | umgesetzt auf USt-VA, EÜR, Steuererklärung-Unterlagen, Lohnkonto-Übersicht, ZM, OSS – bewusst nicht auf der Bilanz (vom Geschäftsführer unterschrieben, offengelegt) |
-| 3 | Personenkonten | A-3 | offen |
+| 3 | Personenkonten | A-3 | umgesetzt (Nachtrag 2, E-165): optionale Kontenvorgabe, Standard aus |
 | 3 | USt-Zahlungen in der EÜR | E-1 | als Hinweis (Zehn-Tage-Regel) |
 | 3 | Bewirtung 30 % nicht abziehbar | E-3 | umgesetzt |
-| 3 | Vorsteuer-Teilabzug je Beleg; Schalter nach E-Rechnungs-Import bei steuerfreien Betrieben | 5.2 | offen (Praxis hat auch 19-%-Umsätze; Teilabzug je Beleg nötig) |
+| 3 | Vorsteuer-Teilabzug je Beleg; Schalter nach E-Rechnungs-Import bei steuerfreien Betrieben | 5.2 | umgesetzt (Nachtrag 2, E-165) |
 | 3 | Bilanzvorlage: Ertragsteuern, Angaben unter der Bilanz, Unterschriften aller Geschäftsführer; Lohnkonto-Übersicht | E-5, E-7 | umgesetzt |
 | 3 | Gutschrift-Nummernkreis, Einheitencodes, AllowanceCharge, BT-30 | B-12, C-14, C-16, C-17 | umgesetzt (Gutschrift-Nummernkreis als Hinweis + getrennte Zählung „GS-“) |
 | 3 | Partnermodell: Kammeranfrage, Vertrag ohne Provision und Exklusivität | 8 | vorbereitet (Funktion verborgen), Kammeranfrage folgt |
@@ -56,3 +56,20 @@ Szenarien nach dem Nachtrag: Café 314/314, Salon 380/380, Freiberuf 267/267, Sh
 
 Offene Fragen an Sie: SKR04-Gegenstück zu 0731; Steuerschlüssel auf 8320/4320 (Land/Satz in Feld 40/41 reichen?); Konto 8290/4290 für den Nullsteuersatz; Ergebnis des Testimports nach Abschnitt 3.3.
 
+## Nachtrag 2 – 22.10.2026: Personenkonten und Vorsteuer-Teilabzug (E-165)
+
+Die beiden noch offenen Maßnahmen aus Abschnitt 10, Prio 3.
+
+| Punkt | Ihr Hinweis | Umsetzung |
+|---|---|---|
+| Personenkonten (A-3, E-1) | Optional je Kunde/Lieferant ein Personenkonto (10000 ff./70000 ff.), damit die Kanzlei OPOS führen kann; Bankzahlungen weiter aus dem Kontoauszug | Neue Kontenvorgabe **„Personenkonten für Kunden und Lieferanten (OPOS)“, Standard aus** (JSON `optionen.personenkonten`). Debitoren 10000–69999, Kreditoren 70000–99999 (DATEV-Standard bei Sachkontenlänge 4 laut Lexware- und Pickware-Hilfe), fortlaufend nach erstem Auftreten, dauerhaft am Kunden bzw. im neuen Lieferanten-Verzeichnis gespeichert (Schlüssel USt-IdNr. bzw. Name). Stapel: Debitor an Erlös, Skonto an Debitor, Bank an Debitor nur mit „Zahlungseingänge buchen“; Sachkonto mit BU an Kreditor (Belege per Überweisung/Karte); bar/privat unverändert; Belegfeld 1 = Rechnungs- bzw. Belegnummer. Neue Datei `EXTF_Debitoren_Kreditoren_<Zeitraum>.csv` (EXTF 700, Kategorie 16, Formatversion 5; Konto, Name, Anschrift, USt-IdNr.). Soll- und Ist-Versteuerung; bei Ist + Bilanz bleibt Feld 116 (Zahltag), die LIESMICH nennt Personenkonten + OPOS als empfohlene Einrichtung – bitte im Testimport bestätigen. In der App: Schalter mit Erklärung in den Kontenvorgaben, vergebene Nummern dort und am Kunden nur zum Ansehen |
+| Vorsteuer-Teilabzug je Beleg (5.2, Frage 16) | Für gemischt genutzte Eingänge Aufteilungsschlüssel (§ 15 Abs. 4 UStG); mindestens „teilweise abziehbar (x %)“ und Hinweis, dass die Kanzlei den Schlüssel festlegt; Schalter nach E-Rechnungs-Import bei reinen Heilbehandlungsbetrieben „aus“ | Beleg „Vorsteuer voll / anteilig (Prozent oder Betrag) / aus“ mit Hinweis auf den Schlüssel der Kanzlei. Voranmeldung nur der abziehbare Teil (auch Kz 67 bei § 13b), EÜR: abziehbarer Teil „Gezahlte Vorsteuer“, Rest als Ausgabe der Kategorie; DATEV je Satz zwei Zeilen (abziehbarer Teil mit BU 9/8, Rest ohne Steuer; Automatikkonto BU 40); Belegliste Spalte „Vorsteuerabzug“. Neu in „Mein Betrieb“: **Vorsteuerquote (%)** (nur bei steuerfreien und steuerpflichtigen Umsätzen). E-Rechnungs-Import: nur steuerfreie Umsätze → aus (wie bisher); gemischte Umsätze → anteilig mit der Vorsteuerquote bzw. ohne Quote aus, jeweils mit Hinweis; am Beleg Warnung, solange „voll“ gewählt ist |
+| Umsätze außerhalb der App (Praxis) | – (Abweichung im Praxis-Szenario) | LIESMICH unter „Nicht enthalten“: Sammelauszahlungen eines Abrechnungszentrums für Kassenpatienten (§ 302 SGB V) samt verrechneter Gebühren, Zuzahlungen und Verkäufe am Empfang; Einnahme ist der Betrag vor Gebühr (bei Branche „Gesundheit und Pflege“ bzw. steuerfreien Rechnungen mit Kz 48) |
+
+Praxis-Szenario mit der Funktion: gemischt genutzte Belege anteilig 13 % (Vorsteuerquote 13 % in „Mein Betrieb“), die Voranmeldungen übernehmen Kz 66 und Kz 67 ohne Nachtrag von Hand. Vorsteuer Q1–Q4: 148,80 € / 127,07 € / 4,67 € / 72,77 €, Zahllast 693,34 € / 1.435,83 € / 996,32 € / 1.073,88 € (Anteil je Beleg gerundet – Q1 1 Cent mehr als die bisherige Rundung auf die Quartalssumme). Erwartungswerte unabhängig je Beleg gerechnet; zusätzlich geprüft: Belegliste (Anteil, Summe abziehbare Vorsteuer), DATEV (zwei Zeilen je gemischtem Beleg, Vorsteuer aus den Zeilen mit BU 9 bzw. Automatikkonto = abziehbare Vorsteuer).
+
+Salon: unabhängige Gegenprobe „mit Personenkonten“ als eigenes Paket (`…-mit-Personenkonten.zip`), das Standardpaket bleibt unverändert: keine Buchung auf 1410/1610, jede Rechnungsbuchung auf dem Debitor ihres Kunden, Saldo aller Debitoren = alle Rechnungen 2026, falsch adressierte Rechnung 2026-010 und Storno 2026-011 gleichen sich auf ihrem Debitor aus, Kreditoren je Lieferant, Stammdaten-Datei (Kopf und Konten), LIESMICH.
+
+Szenarien nach Nachtrag 2: Café 314/314, Salon 391/391 (380 + 11 Prüfungen „mit Personenkonten“), Freiberuf 267/267, Shop 391/391, **Praxis 365/365** (vorher 351/354), Elektro 437/437; KoSIT in allen Szenarien akzeptiert.
+
+Offene Fragen an Sie (zusätzlich): Nummernkreise und Stammdatenformat der Personenkonten im Testimport (T-129); Teilabzug als zwei Zeilen, mit DATEV-BU 90/9xxx „aufzuteilende Vorsteuer“ (DATEV-Hilfe-Dokument 0904313) oder Umbuchung auf „Nicht abziehbare Vorsteuer“ (T-130); Ist + Bilanzierung mit Personenkonten (Mandantenstamm „Ist“ mit OPOS).

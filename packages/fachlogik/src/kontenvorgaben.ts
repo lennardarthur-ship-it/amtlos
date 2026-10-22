@@ -40,6 +40,11 @@ export interface Kontenvorgaben {
    * Kanzlei vom 22.10.2026: Kanzleien buchen die Bank aus dem Kontoauszug)
    */
   zahlungenBuchen?: boolean;
+  /**
+   * E-165 (StB-Prüfung A-3): Personenkonten für Kunden und Lieferanten (OPOS) – je Kunde ein Debitor (10000–69999), je
+   * Lieferant ein Kreditor (70000–99999) statt der Sammelkonten Forderungen/Verbindlichkeiten. Standard NEIN.
+   */
+  personenkonten?: boolean;
   /** Gewinnermittlung festlegen; ohne Angabe nach Rechtsform bzw. Mitteilung des Finanzamts (A-4/E-4) */
   gewinnermittlung?: "bilanz" | "euer";
   /** Herkunft: Name der Kanzlei und Stand der Vorgabe (aus der Importdatei) – für LIESMICH */
@@ -85,6 +90,7 @@ export function kontenvorgabenAus(roh: unknown): Kontenvorgaben {
   if (Object.keys(konten).length) aus.konten = konten;
   if (typeof r.belegeGegenBank === "boolean") aus.belegeGegenBank = r.belegeGegenBank;
   if (typeof r.zahlungenBuchen === "boolean") aus.zahlungenBuchen = r.zahlungenBuchen;
+  if (typeof r.personenkonten === "boolean") aus.personenkonten = r.personenkonten;
   if (r.gewinnermittlung === "bilanz" || r.gewinnermittlung === "euer") aus.gewinnermittlung = r.gewinnermittlung;
   const kanzlei = text(r.kanzlei, 80);
   if (kanzlei) aus.kanzlei = kanzlei;
@@ -93,7 +99,7 @@ export function kontenvorgabenAus(roh: unknown): Kontenvorgaben {
 }
 
 /** Sind Vorgaben gesetzt (mindestens ein Konto oder eine Option)? */
-export const kontenvorgabenGesetzt = (v: Kontenvorgaben | null | undefined) => !!v && (Object.keys(v.konten ?? {}).length > 0 || v.belegeGegenBank !== undefined || v.zahlungenBuchen !== undefined || v.gewinnermittlung !== undefined);
+export const kontenvorgabenGesetzt = (v: Kontenvorgaben | null | undefined) => !!v && (Object.keys(v.konten ?? {}).length > 0 || v.belegeGegenBank !== undefined || v.zahlungenBuchen !== undefined || v.personenkonten !== undefined || v.gewinnermittlung !== undefined);
 
 /** Kennung des Dateiformats der Kanzlei-Datei */
 export const KONTENVORGABEN_FORMAT = "kontenvorgaben";
@@ -110,7 +116,7 @@ export interface KontenvorgabenImport {
  * Kontenvorgaben aus der JSON-Datei der Kanzlei lesen. Format (Version 1):
  * `{ "format": "kontenvorgaben", "version": 1, "kanzlei": "…", "stand": "JJJJ-MM-TT", "kontenrahmen": "SKR03",
  *    "konten": { "verrechnungGesellschafter": "0731", … }, "optionen": { "belegeGegenBank": false, "zahlungenBuchen": false,
- *    "gewinnermittlung": "bilanz" } }` – alle Angaben außer `konten` bzw. `optionen` freiwillig.
+ *    "personenkonten": false, "gewinnermittlung": "bilanz" } }` – alle Angaben außer `konten` bzw. `optionen` freiwillig.
  * Wirft einen Fehler mit lesbarer Meldung, wenn die Datei kein solches Objekt ist.
  */
 export function kontenvorgabenAusJson(inhalt: string): KontenvorgabenImport {
@@ -131,7 +137,7 @@ export function kontenvorgabenAusJson(inhalt: string): KontenvorgabenImport {
     else if (!istSachkonto(w)) warnungen.push(`${KONTENVORGABE_FELDER.find((f) => f.id === k)!.titel}: „${String(w)}“ ist keine vierstellige Kontonummer`);
   }
   const optionen = r.optionen && typeof r.optionen === "object" && !Array.isArray(r.optionen) ? (r.optionen as Record<string, unknown>) : {};
-  for (const k of Object.keys(optionen)) if (!["belegeGegenBank", "zahlungenBuchen", "gewinnermittlung"].includes(k)) warnungen.push(`unbekannte Option „${k}“`);
+  for (const k of Object.keys(optionen)) if (!["belegeGegenBank", "zahlungenBuchen", "personenkonten", "gewinnermittlung"].includes(k)) warnungen.push(`unbekannte Option „${k}“`);
   const vorgaben = kontenvorgabenAus({ ...optionen, konten, kanzlei: r.kanzlei, stand: r.stand });
   if (!kontenvorgabenGesetzt(vorgaben)) throw new Error("Die Datei enthält keine gültigen Konten oder Optionen.");
   const kr = r.kontenrahmen === "SKR03" || r.kontenrahmen === "SKR04" ? r.kontenrahmen : undefined;
@@ -141,7 +147,7 @@ export function kontenvorgabenAusJson(inhalt: string): KontenvorgabenImport {
 
 /** Kontenvorgaben als Datei im selben Format (zum Weitergeben an die Kanzlei oder ein zweites Gerät). */
 export function kontenvorgabenJson(v: Kontenvorgaben, kontenrahmen: Kontenrahmen): string {
-  const { konten, belegeGegenBank, zahlungenBuchen, gewinnermittlung, kanzlei, stand } = v;
-  const optionen = { ...(belegeGegenBank !== undefined ? { belegeGegenBank } : {}), ...(zahlungenBuchen !== undefined ? { zahlungenBuchen } : {}), ...(gewinnermittlung ? { gewinnermittlung } : {}) };
+  const { konten, belegeGegenBank, zahlungenBuchen, personenkonten, gewinnermittlung, kanzlei, stand } = v;
+  const optionen = { ...(belegeGegenBank !== undefined ? { belegeGegenBank } : {}), ...(zahlungenBuchen !== undefined ? { zahlungenBuchen } : {}), ...(personenkonten !== undefined ? { personenkonten } : {}), ...(gewinnermittlung ? { gewinnermittlung } : {}) };
   return JSON.stringify({ format: KONTENVORGABEN_FORMAT, version: 1, ...(kanzlei ? { kanzlei } : {}), ...(stand ? { stand } : {}), kontenrahmen, konten: konten ?? {}, optionen }, null, 2) + "\n";
 }

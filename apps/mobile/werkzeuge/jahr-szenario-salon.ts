@@ -705,6 +705,15 @@ export function jahrMitZahlungen(s: Stand, dateien: Record<string, Uint8Array>):
   return steuerpaket(s, { von: "2026-01-01", bis: "2026-12-31", name: "2026" }, sb, dateien, "2027-02-15T10:00:00");
 }
 
+/**
+ * E-165 (StB-Prüfung A-3): unabhängige Gegenprobe mit der Kontenvorgabe „Personenkonten für Kunden und Lieferanten
+ * (OPOS)“ – eigenes Paket „mit Personenkonten“; das Standardpaket (Vorgabe aus) bleibt unverändert.
+ */
+export function jahrMitPersonenkonten(s: Stand, dateien: Record<string, Uint8Array>): PaketErgebnis {
+  const sb = { ...s.steuerberatung, kontenvorgaben: { ...s.steuerberatung.kontenvorgaben, personenkonten: true } };
+  return steuerpaket({ ...s, steuerberatung: sb }, { von: "2026-01-01", bis: "2026-12-31", name: "2026" }, sb, dateien, "2027-02-15T10:00:00");
+}
+
 // ---------------------------------------------------------------- Belegdateien (so, wie die Lieferanten sie ausstellen würden)
 
 const esc = (x: string) => x.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");

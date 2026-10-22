@@ -379,6 +379,11 @@ export function kaeuferFremd(r: Pick<GeleseneRechnung, "empfaenger">, betrieb: {
 /** R11: Notiz, wenn die Vorsteuer aus ist, weil der Betrieb nur steuerfreie Umsätze ohne Vorsteuerabzug hat. */
 export const NUR_STEUERFREI_HINWEIS = "Vorsteuer ausgeschaltet: Deine Rechnungen sind bisher nur steuerfrei ohne Vorsteuerabzug (§ 4 Nr. 8–29 UStG) – dann ist keine Vorsteuer abziehbar (§ 15 Abs. 2 UStG). Dient die Eingangsleistung auch steuerpflichtigen Umsätzen, bitte prüfen.";
 
+/** E-165: Hinweis im Beleg bei gemischten Umsätzen ohne Vorsteuerquote in „Mein Betrieb“ */
+export const GEMISCHT_HINWEIS = "Vorsteuer zunächst ausgeschaltet: Du hast steuerfreie und steuerpflichtige Umsätze – abziehbar ist die Vorsteuer nur, soweit die Eingangsleistung steuerpflichtigen Umsätzen dient (§ 15 Abs. 2, 4 UStG). Bitte am Beleg wählen: voll, anteilig (Prozent oder Betrag) oder keine. Den Aufteilungsschlüssel legt deine Steuerberatung fest.";
+/** E-165: Hinweis im Beleg, wenn die Vorsteuerquote aus „Mein Betrieb“ vorbelegt wurde */
+export const GEMISCHT_QUOTE_HINWEIS = (p: number) => `Vorsteuer anteilig ${String(p).replace(".", ",")} % (Vorsteuerquote aus „Mein Betrieb“): Du hast steuerfreie und steuerpflichtige Umsätze (§ 15 Abs. 4 UStG). Dient die Eingangsleistung nur steuerpflichtigen Umsätzen, „voll“ wählen; nur steuerfreien, Vorsteuer ausschalten. Den Aufteilungsschlüssel legt deine Steuerberatung fest.`;
+
 /** Hinweis im Beleg, wenn die E-Rechnung an einen anderen Käufer gerichtet ist (§ 15 Abs. 1 Nr. 1 UStG). */
 export const KAEUFER_FREMD = (name: string) => `Die E-Rechnung ist an „${name}“ gerichtet, nicht an deinen Betrieb – ohne Rechnung an dich ist kein Vorsteuerabzug möglich (§ 15 Abs. 1 Nr. 1 UStG). Vorsteuer ausgeschaltet, bitte prüfen.`;
 
@@ -389,8 +394,11 @@ export const KAEUFER_FREMD = (name: string) => `Die E-Rechnung ist an „${name}
  * Kleinunternehmer (§ 19 UStG, `o.kleinunternehmer`): Vorsteuer-Schalter aus – wie beim Beleg von Hand.
  * R11: ebenso, wenn der Betrieb nur steuerfreie Umsätze ohne Vorsteuerabzug hat (§ 4 Nr. 8–29, § 15 Abs. 2 UStG,
  * `o.nurSteuerfrei`) – mit Hinweis in der Notiz; der Schalter lässt sich wieder einschalten.
+ * StB-Prüfung (5.2, E-165): Hat der Betrieb steuerfreie UND steuerpflichtige Umsätze (`o.gemischt`), wäre „voll
+ * abziehbar“ zu viel. Mit der Vorsteuerquote aus „Mein Betrieb“ (`o.vorsteuerquote`) startet der Beleg anteilig mit
+ * diesem Prozentsatz, ohne Quote mit Vorsteuer aus – jeweils mit Hinweis, den Anteil für diesen Beleg zu prüfen.
  */
-export function belegAusERechnung(r: GeleseneRechnung, id: string, jetztIso: string, o: { kleinunternehmer?: boolean; nurSteuerfrei?: boolean; betrieb?: { name: string; plz?: string | null; verantwortlich?: string | null } } = {}): Beleg {
+export function belegAusERechnung(r: GeleseneRechnung, id: string, jetztIso: string, o: { kleinunternehmer?: boolean; nurSteuerfrei?: boolean; gemischt?: boolean; vorsteuerquote?: number | null; betrieb?: { name: string; plz?: string | null; verantwortlich?: string | null } } = {}): Beleg {
   const hinweise: string[] = [];
   // R10: fremd adressierte E-Rechnung – Warnung in der Notiz und kein Vorsteuerabzug
   const fremd = !!o.betrieb && kaeuferFremd(r, o.betrieb);
@@ -419,6 +427,10 @@ export function belegAusERechnung(r: GeleseneRechnung, id: string, jetztIso: str
   if (r.saetze.some((s) => s.kategorie === "K")) hinweise.push("Innergemeinschaftlicher Erwerb: Erwerbsteuer selbst anmelden und als Vorsteuer abziehen.");
   const ohneAbzug = !!o.nurSteuerfrei && !o.kleinunternehmer && !fremd && (r.summen.ust_cent > 0 || !!steuerschuld);
   if (ohneAbzug) hinweise.push(NUR_STEUERFREI_HINWEIS);
+  // E-165: gemischte Umsätze – anteilig nach der Vorsteuerquote des Betriebs bzw. ohne Quote erst einmal aus
+  const quote = o.vorsteuerquote && o.vorsteuerquote > 0 && o.vorsteuerquote < 100 ? Math.round(o.vorsteuerquote * 100) / 100 : null;
+  const gemischt = !!o.gemischt && !o.nurSteuerfrei && !o.kleinunternehmer && !fremd && (r.summen.ust_cent > 0 || !!steuerschuld);
+  if (gemischt) hinweise.push(quote ? GEMISCHT_QUOTE_HINWEIS(quote) : GEMISCHT_HINWEIS);
   const notiz = [
     r.verwendungszweck ? `Verwendungszweck: ${r.verwendungszweck}` : null,
     r.lieferant.iban ? `IBAN: ${r.lieferant.iban}` : null,
@@ -434,7 +446,11 @@ export function belegAusERechnung(r: GeleseneRechnung, id: string, jetztIso: str
     nummer: r.nummer || null,
     kategorie: "sonstiges",
     steuer,
-    vorsteuer: !fremd && !o.kleinunternehmer && !o.nurSteuerfrei && (r.summen.ust_cent > 0 || !!steuerschuld),
+    vorsteuer: !fremd && !o.kleinunternehmer && !o.nurSteuerfrei && (!gemischt || !!quote) && (r.summen.ust_cent > 0 || !!steuerschuld),
+    ...(gemischt && quote ? { vorsteuer_anteil: quote } : {}),
+    // E-165 (Personenkonten): USt-IdNr. und Anschrift des Lieferanten für die Kreditoren-Stammdaten
+    ...(r.lieferant.ust_idnr ? { lieferant_ust_idnr: r.lieferant.ust_idnr.replace(/\s/g, "").toUpperCase().slice(0, 20) } : {}),
+    ...(r.lieferant.strasse || r.lieferant.ort ? { lieferant_anschrift: [r.lieferant.strasse, [r.lieferant.plz, r.lieferant.ort].filter(Boolean).join(" ")].filter(Boolean).join("\n").slice(0, 300) } : {}),
     zahlung: "bank",
     bezahlt: null,
     notiz: notiz || null,

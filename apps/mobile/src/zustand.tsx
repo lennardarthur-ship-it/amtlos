@@ -15,6 +15,7 @@ import { base64, ausBase64, type Dateien } from "./unterlagen/sicherung";
 import { kontoVergessen } from "./konto/sitzung";
 import { syncZusammenfuehren } from "./konto/sync";
 import { dateienImStand, doppeltePerson, korrigieren, personenZusammenfuehren, staetteLoeschen, staetteSetzen, unterlageStaette, type Betriebsstaette } from "./unterlagen/speicher";
+import { personenkontenVergeben } from "./unterlagen/steuerpaket";
 import { belegeFestschreiben, kassenbuchFestschreiben, kassensturzSpeichern, sachentnahmeLoeschen, sachentnahmeSpeichern } from "./unterlagen/speicher";
 import { LEERER_STAND, StandFehler, ausgabeMoeglich, belegLoeschen, belegSetzen, neueId, steuerberatungSetzen, aendern, allesLoeschenErlaubt, anlegen, ausgeben, bezahltSetzen, kasseKorrigieren, kasseSpeichern, zahlungVermerken, zusammenfuehren, type Zusammenfuehrung, betriebSetzen, erledigtSetzen, felderSetzen, istLesbar, profilSetzen, stornieren, kopieren, loeschen, personLoeschen, personMerken, personSetzen, standAus, standGleich, type Stand, type Unterlage } from "./unterlagen/speicher";
 
@@ -146,6 +147,8 @@ interface Zustand {
   /** Erfolgsmoment (Rechnung geteilt, Check fertig, Zahlung vermerkt) – fragt ggf. nach einer Bewertung */
   erfolg(): void;
   steuerberatungSetzen(sb: Stand["steuerberatung"]): void;
+  /** E-165: fehlende Personenkonten vergeben und speichern (nur mit Kontenvorgabe „Personenkonten“) – gibt den Stand zurück */
+  personenkontenVergeben(): Stand;
   /** Belege (E-133) */
   /** R12 GoBD: festgeschriebene Belege nur mit Grund – false, wenn die Änderung deshalb nicht übernommen wurde */
   belegSetzen(b: Beleg, grund?: string): boolean;
@@ -617,7 +620,13 @@ export function AmtlosAnbieter({ children }: { children: ReactNode }) {
         setzen({ ...aktuell.current, nutzungsbedingungen: { fassung, zeitpunkt: new Date().toISOString() } });
         schreiben();
       },
-      steuerberatungSetzen: (sb) => setzen(steuerberatungSetzen(aktuell.current, sb)),
+      // E-165: beim Einschalten der Personenkonten gleich die Nummern vergeben (danach beim Paket)
+      steuerberatungSetzen: (sb) => setzen(personenkontenVergeben(steuerberatungSetzen(aktuell.current, sb))),
+      personenkontenVergeben: () => {
+        const neu = personenkontenVergeben(aktuell.current);
+        if (neu !== aktuell.current) setzen(neu);
+        return aktuell.current;
+      },
       belegSetzen: (b, grund) => {
         const vorher = aktuell.current;
         const neu = belegSetzen(vorher, b, new Date(), grund);

@@ -209,6 +209,31 @@ export function nurSteuerfreieUmsaetze(unterlagen: Unterlage[], betrieb: Betrieb
   );
 }
 
+/**
+ * E-165 (StB-Prüfung 5.2): Der Betrieb hat steuerfreie Umsätze ohne Vorsteuerabzug (§ 4 Nr. 8–29 UStG, Kz 48) UND
+ * steuerpflichtige Umsätze (z. B. Praxis mit Heilbehandlungen und Wellness) – dann ist die Vorsteuer aus gemischt
+ * genutzten Eingangsleistungen nur anteilig abziehbar (§ 15 Abs. 4 UStG). Die Vorsteuerquote aus „Mein Betrieb“ zählt
+ * als Angabe des Betriebs: ist sie gesetzt, gilt der Betrieb ebenfalls als gemischt.
+ */
+export function gemischteUmsaetze(unterlagen: Unterlage[], betrieb: Betrieb): boolean {
+  if (vorsteuerquoteAus(betrieb) !== null) return true;
+  const r = festeRechnungen(unterlagen).filter((u) => !kuRechnung(u) && !istStornoU(u));
+  let frei = false;
+  let pflichtig = false;
+  for (const u of r) {
+    const { daten } = eRechnungAus(u.daten, betrieb);
+    if (daten.steuerart === "befreit" && kennzahlBefreiung(daten.befreiungsgrund) === "48") frei = true;
+    if (daten.positionen.some((p) => (p.ust_satz ?? 0) > 0)) pflichtig = true;
+  }
+  return frei && pflichtig;
+}
+
+/** E-165: Vorsteuerquote aus „Mein Betrieb“ in Prozent (0 < x < 100), sonst null. */
+export function vorsteuerquoteAus(betrieb: Pick<Betrieb, "vorsteuerquote">): number | null {
+  const n = Number((betrieb.vorsteuerquote ?? "").replace(",", ".").replace(/[%\s]/g, ""));
+  return (betrieb.vorsteuerquote ?? "").trim() && Number.isFinite(n) && n > 0 && n < 100 ? Math.round(n * 100) / 100 : null;
+}
+
 /** Festgeschriebene Rechnungen ohne vermerkten Zahlungseingang (nicht storniert, keine Stornorechnung, keine Gutschrift). */
 export const offeneRechnungen = (unterlagen: Unterlage[]) => festeRechnungen(unterlagen).filter((u) => !u.bezahlt && !u.storniertDurch && !(typeof u.daten.storno_zu === "string" && u.daten.storno_zu));
 

@@ -156,7 +156,7 @@ describe("Kontenvorgaben im Stand", () => {
     expect(MIGRATIONEN[6]!({ version: 6, steuerberatung: { kontenrahmen: "SKR03", kontenvorgaben: { konten: { bank: "12" } } } })).toEqual({ version: 6, steuerberatung: { kontenrahmen: "SKR03" } });
     expect(MIGRATIONEN[6]!({ version: 6 })).toEqual({ version: 6 });
     const s = standAus(JSON.stringify({ ...LEERER_STAND, steuerberatung: { ...SB, kontenvorgaben: { konten: { gutscheinVerbindlichkeit: "1701", bank: "x" }, belegeGegenBank: true } } }));
-    expect(s.version).toBe(7);
+    expect(s.version).toBe(8);
     expect(s.steuerberatung.kontenvorgaben).toEqual({ konten: { gutscheinVerbindlichkeit: "1701" }, belegeGegenBank: true });
     expect(standAus(JSON.stringify({ ...LEERER_STAND, steuerberatung: SB })).steuerberatung.kontenvorgaben).toBeUndefined();
   });

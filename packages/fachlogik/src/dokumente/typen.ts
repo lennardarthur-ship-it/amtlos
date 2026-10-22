@@ -42,9 +42,14 @@ export interface Betrieb {
   bic?: string;
   /** Website (Briefkopf, Fußzeile) */
   website?: string;
+  /**
+   * E-165 (StB-Prüfung 5.2): vorläufige Vorsteuerquote in Prozent bei steuerfreien und steuerpflichtigen Umsätzen
+   * (§ 15 Abs. 4 UStG, Schlüssel von der Steuerberatung) – belegt den Anteil beim Einlesen einer E-Rechnung vor. Leer: keine.
+   */
+  vorsteuerquote?: string;
 }
 
-export const LEERER_BETRIEB: Betrieb = { name: "", strasse: "", plz: "", ort: "", verantwortlich: "", telefon: "", email: "", steuernummer: "", ust_idnr: "", iban: "", bundesland: "", rechtsform: "", registergericht: "", registernummer: "", vertretung: "", versteuerung: "", ku_bis: "", logo: "", farbe: "", bank: "", bic: "", website: "" };
+export const LEERER_BETRIEB: Betrieb = { name: "", strasse: "", plz: "", ort: "", verantwortlich: "", telefon: "", email: "", steuernummer: "", ust_idnr: "", iban: "", bundesland: "", rechtsform: "", registergericht: "", registernummer: "", vertretung: "", versteuerung: "", ku_bis: "", logo: "", farbe: "", bank: "", bic: "", website: "", vorsteuerquote: "" };
 
 /** Ein Wert in einem Listeneintrag. */
 export type EintragWert = string | boolean | string[] | null;

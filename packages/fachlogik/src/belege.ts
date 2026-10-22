@@ -73,6 +73,20 @@ export interface Beleg {
    * (Maschinen, Betriebs- und Geschäftsausstattung, Fahrzeug, Software). Ohne Angabe: Betriebs- und Geschäftsausstattung.
    */
   anlage_art?: AnlageArt | null;
+  /**
+   * StB-Prüfung (5.2, E-165): Vorsteuer nur teilweise abziehbar (§ 15 Abs. 4 UStG) – abziehbarer Anteil in Prozent
+   * (größer 0, kleiner 100, höchstens zwei Nachkommastellen), z. B. für gemischt genutzte Eingangsleistungen einer Praxis
+   * mit steuerfreien Heilbehandlungen (§ 4 Nr. 14 UStG) und steuerpflichtigen Umsätzen. Gilt nur mit `vorsteuer`.
+   */
+  vorsteuer_anteil?: number | null;
+  /**
+   * Alternative zu `vorsteuer_anteil`: abziehbare Vorsteuer als Betrag in Cent (größer 0, kleiner als die Steuer des
+   * Belegs). Bei mehreren Steuersätzen nach der Steuer je Satz verteilt. Ist beides gesetzt, gilt der Betrag.
+   */
+  vorsteuer_betrag_cent?: number | null;
+  /** E-165 (Personenkonten): USt-IdNr. und Anschrift des Lieferanten, soweit bekannt (aus der E-Rechnung) */
+  lieferant_ust_idnr?: string | null;
+  lieferant_anschrift?: string | null;
 }
 
 /** StB-Prüfung (B-10): Arten von Anlagegütern mit eigenem Anlagenkonto */
@@ -108,6 +122,8 @@ export interface BelegFassung {
   steuerschuld?: Steuerschuld | null;
   skonto_cent?: number | null;
   anlage_art?: AnlageArt | null;
+  vorsteuer_anteil?: number | null;
+  vorsteuer_betrag_cent?: number | null;
   /** R12 GoBD: Grund, mit dem diese Fassung nach der Festschreibung ersetzt wurde */
   grund?: string | null;
 }
@@ -194,7 +210,7 @@ export interface BelegSummen {
   vorsteuer_cent: number;
 }
 
-export function belegSummen(b: Pick<Beleg, "steuer" | "vorsteuer"> & { steuerschuld?: Steuerschuld | null }): BelegSummen {
+export function belegSummen(b: Pick<Beleg, "steuer" | "vorsteuer"> & Partial<Pick<Beleg, "vorsteuer_anteil" | "vorsteuer_betrag_cent">> & { steuerschuld?: Steuerschuld | null }): BelegSummen {
   // § 13b: die Rechnung weist keine Umsatzsteuer aus – der Betrag ist netto, die Steuer schuldet der Betrieb (steuerschuldFuer)
   if (b.steuerschuld) {
     const n = b.steuer.reduce((a, s) => a + s.brutto_cent, 0);
@@ -209,7 +225,59 @@ export function belegSummen(b: Pick<Beleg, "steuer" | "vorsteuer"> & { steuersch
     netto += a.netto_cent;
     ust += a.ust_cent;
   }
-  return { brutto_cent: brutto, netto_cent: netto, ust_cent: ust, vorsteuer_cent: b.vorsteuer ? ust : 0 };
+  // E-165: nur der abziehbare Teil zählt als Vorsteuer (Teilabzug nach § 15 Abs. 4 UStG)
+  const vorsteuer = b.vorsteuer ? vorsteuerAufteilung(b).reduce((a, x) => a + x.abziehbar_cent, 0) : 0;
+  return { brutto_cent: brutto, netto_cent: netto, ust_cent: ust, vorsteuer_cent: vorsteuer };
+}
+
+/** Umsatzsteuer eines Belegs je Steuersatz – ausgewiesen bzw. bei § 13b die selbst geschuldete Steuer. */
+function steuerJeSatz(b: Pick<Beleg, "steuer"> & { steuerschuld?: Steuerschuld | null }): { satz: number; brutto_cent: number; ust_cent: number }[] {
+  return b.steuer.map((s) => ({ satz: s.satz, brutto_cent: s.brutto_cent, ust_cent: b.steuerschuld ? rundeCent((s.brutto_cent * satz13b(s.satz)) / 100) : ausBrutto(s.brutto_cent, s.satz).ust_cent }));
+}
+
+/** E-165: Ist am Beleg ein Teilabzug eingetragen (Prozent oder Betrag)? */
+export const belegTeilabzug = (b: Partial<Pick<Beleg, "vorsteuer" | "vorsteuer_anteil" | "vorsteuer_betrag_cent">>) => !!b.vorsteuer && (!!b.vorsteuer_betrag_cent || !!b.vorsteuer_anteil);
+
+export interface VorsteuerTeil {
+  satz: number;
+  /** Umsatzsteuer dieses Satzes (bei § 13b: die selbst geschuldete Steuer) */
+  ust_cent: number;
+  /** davon als Vorsteuer abziehbar */
+  abziehbar_cent: number;
+}
+
+/**
+ * StB-Prüfung (5.2, E-165): Vorsteuer eines Belegs je Steuersatz mit abziehbarem Teil – ohne Vorsteuerabzug 0, ohne
+ * Teilabzug die ganze Steuer, mit Prozentsatz die Steuer × Anteil (kaufmännisch gerundet je Satz), mit Betrag dieser
+ * Betrag nach der Steuer je Satz verteilt (Rest auf den Satz mit der höchsten Steuer). Gilt auch für § 13b-Belege
+ * (Kz 67 nur anteilig). Die Aufteilung selbst (Schlüssel nach § 15 Abs. 4 UStG) legt die Steuerberatung fest.
+ */
+export function vorsteuerAufteilung(b: Pick<Beleg, "steuer" | "vorsteuer"> & Partial<Pick<Beleg, "vorsteuer_anteil" | "vorsteuer_betrag_cent">> & { steuerschuld?: Steuerschuld | null }): VorsteuerTeil[] {
+  const je = steuerJeSatz(b).filter((x) => x.ust_cent);
+  if (!b.vorsteuer) return je.map((x) => ({ satz: x.satz, ust_cent: x.ust_cent, abziehbar_cent: 0 }));
+  const gesamt = je.reduce((a, x) => a + x.ust_cent, 0);
+  const betrag = b.vorsteuer_betrag_cent && b.vorsteuer_betrag_cent > 0 ? Math.min(b.vorsteuer_betrag_cent, gesamt) : 0;
+  if (betrag && gesamt) {
+    const teile = je.map((x) => ({ satz: x.satz, ust_cent: x.ust_cent, abziehbar_cent: Math.floor((betrag * x.ust_cent) / gesamt) }));
+    const rest = betrag - teile.reduce((a, x) => a + x.abziehbar_cent, 0);
+    if (rest && teile.length) teile.reduce((m, x) => (x.ust_cent > m.ust_cent ? x : m), teile[0]!).abziehbar_cent += rest;
+    return teile;
+  }
+  const p = b.vorsteuer_anteil;
+  if (p && p > 0 && p < 100) return je.map((x) => ({ satz: x.satz, ust_cent: x.ust_cent, abziehbar_cent: rundeCent((x.ust_cent * p) / 100) }));
+  return je.map((x) => ({ satz: x.satz, ust_cent: x.ust_cent, abziehbar_cent: x.ust_cent }));
+}
+
+/** Abziehbarer Teil der Vorsteuer eines Satzes als Verhältnis 0…1 (für Skonto und Buchungen). */
+export function vorsteuerVerhaeltnis(b: Parameters<typeof vorsteuerAufteilung>[0], satz: number): number {
+  const t = vorsteuerAufteilung(b).find((x) => x.satz === satz);
+  return t && t.ust_cent ? t.abziehbar_cent / t.ust_cent : b.vorsteuer ? 1 : 0;
+}
+
+/** E-165: abziehbarer Teil der Vorsteuer aus einem Skonto (die Minderung trifft Vorsteuer im Verhältnis des Belegs). */
+export function belegSkontoAbziehbar(b: Pick<Beleg, "steuer" | "skonto_cent" | "vorsteuer"> & Partial<Pick<Beleg, "vorsteuer_anteil" | "vorsteuer_betrag_cent">> & { steuerschuld?: Steuerschuld | null }): number {
+  if (!b.vorsteuer) return 0;
+  return belegSkonto(b).reduce((a, x) => a + rundeCent(x.ust_cent * vorsteuerVerhaeltnis(b, x.satz ?? 0)), 0);
 }
 
 /**
@@ -300,11 +368,12 @@ export function vorsteuerFuer(belege: Beleg[], von: string, bis: string): { cent
   for (const b of belege) {
     if (b.ungueltig) continue;
     const tag = zahltag(b);
-    if (b.vorsteuer && b.skonto_cent && tag >= von && tag <= bis) skonto -= belegSkonto(b).reduce((a, x) => a + x.ust_cent, 0);
+    // E-165: Skonto mindert nur den abziehbaren Teil der Vorsteuer
+    if (b.vorsteuer && b.skonto_cent && tag >= von && tag <= bis) skonto -= belegSkontoAbziehbar(b);
     if (b.datum < von || b.datum > bis) continue;
     const s = belegSummen(b);
-    if (b.vorsteuer && s.ust_cent) {
-      cent += s.ust_cent;
+    if (b.vorsteuer && s.vorsteuer_cent) {
+      cent += s.vorsteuer_cent;
       anzahl++;
     } else if (s.ust_cent) ohne++;
   }
@@ -350,7 +419,8 @@ export function steuerschuldFuer(belege: Beleg[], von: string, bis: string): Ste
       r.bau_netto_cent += netto;
       r.bau_steuer_cent += steuer;
     }
-    if (b.vorsteuer) r.vorsteuer_cent += steuer;
+    // E-165: Vorsteuer aus § 13b (Kz 67) nur zum abziehbaren Teil
+    if (b.vorsteuer) r.vorsteuer_cent += vorsteuerAufteilung(b).reduce((a, x) => a + x.abziehbar_cent, 0);
     r.anzahl++;
   }
   return r;
@@ -373,15 +443,16 @@ export function ausgabenFuer(belege: Beleg[], jahr: string): { zeilen: EuerAusga
     const s = belegSummen(b);
     // R12: Skonto mindert Ausgabe und Vorsteuer – gezahlt ist der Betrag nach Abzug (§ 11 Abs. 2 EStG)
     const sk = belegSkonto(b);
-    const skNetto = sk.reduce((a, x) => a + x.netto_cent, 0);
-    const skUst = sk.reduce((a, x) => a + x.ust_cent, 0);
-    vorsteuer += s.vorsteuer_cent - (b.vorsteuer ? skUst : 0);
+    const skBrutto = sk.reduce((a, x) => a + x.netto_cent + x.ust_cent, 0);
+    // E-165: abziehbarer Teil der Vorsteuer (voll, anteilig oder keiner) – der nicht abziehbare Teil ist Betriebsausgabe
+    const skAbziehbar = belegSkontoAbziehbar(b);
+    vorsteuer += s.vorsteuer_cent - skAbziehbar;
     if (k.anlage) {
       anlagen.push(b);
       continue;
     }
-    // ohne Vorsteuerabzug ist der Bruttobetrag die Betriebsausgabe
-    const betrag = b.vorsteuer ? s.netto_cent - skNetto : s.brutto_cent - skNetto - skUst;
+    // ohne Vorsteuerabzug ist der Bruttobetrag die Betriebsausgabe, mit Teilabzug brutto abzüglich abziehbarer Vorsteuer
+    const betrag = s.brutto_cent - skBrutto - (s.vorsteuer_cent - skAbziehbar);
     const z = nach.get(k.id) ?? { kategorie: k, netto_cent: 0, anzahl: 0 };
     z.netto_cent += betrag;
     z.anzahl++;
@@ -466,6 +537,7 @@ function fassungAus(roh: unknown): BelegFassung | null {
     ...(steuerschuldAus(r.steuerschuld) ? { steuerschuld: steuerschuldAus(r.steuerschuld) } : {}),
     ...(skontoAusRoh(r.skonto_cent) ? { skonto_cent: skontoAusRoh(r.skonto_cent) } : {}),
     ...(anlageArtAus(r.anlage_art) ? { anlage_art: anlageArtAus(r.anlage_art) } : {}),
+    ...teilabzugAus(r),
     ...(s("grund") ? { grund: s("grund").slice(0, 300) } : {}),
   };
 }
@@ -474,6 +546,21 @@ function fassungAus(roh: unknown): BelegFassung | null {
 const skontoAusRoh = (w: unknown): number | null => (typeof w === "number" && Number.isInteger(w) && w > 0 ? w : null);
 
 const steuerschuldAus = (w: unknown): Steuerschuld | null => (w === "bau" || w === "eu" ? w : null);
+
+/** E-165: Anteil der abziehbaren Vorsteuer in Prozent – größer 0, kleiner 100, auf zwei Nachkommastellen; sonst null. */
+export function vorsteuerAnteilAus(w: unknown): number | null {
+  const n = typeof w === "string" ? Number(w.replace(",", ".").replace(/[%\s]/g, "")) : typeof w === "number" ? w : NaN;
+  if (!Number.isFinite(n) || n <= 0 || n >= 100) return null;
+  return Math.round(n * 100) / 100;
+}
+/** E-165: Teilabzug aus einem gespeicherten Beleg – Betrag (ganze Cent > 0) geht vor Prozent. */
+function teilabzugAus(r: Record<string, unknown>): Pick<Beleg, "vorsteuer_anteil" | "vorsteuer_betrag_cent"> {
+  const betrag = typeof r.vorsteuer_betrag_cent === "number" && Number.isInteger(r.vorsteuer_betrag_cent) && r.vorsteuer_betrag_cent > 0 ? r.vorsteuer_betrag_cent : null;
+  if (betrag) return { vorsteuer_betrag_cent: betrag };
+  const p = vorsteuerAnteilAus(r.vorsteuer_anteil);
+  return p ? { vorsteuer_anteil: p } : {};
+}
+const textAus = (w: unknown, n: number) => (typeof w === "string" && w.trim() ? w.trim().slice(0, n) : null);
 
 /**
  * Gespeicherten Beleg prüfen und bereinigen (unbekannte Felder fallen weg); null, wenn Kernangaben fehlen. Wer den
@@ -510,12 +597,15 @@ export function belegAus(roh: unknown): Beleg | null {
     ...(BELEGNUMMER.test(s("nr")) ? { nr: s("nr") } : {}),
     ...(anlageArtAus(r.anlage_art) ? { anlage_art: anlageArtAus(r.anlage_art) } : {}),
     ...(/^\d{4}-\d{2}-\d{2}T/.test(s("festgeschrieben")) ? { festgeschrieben: s("festgeschrieben") } : {}),
+    ...teilabzugAus(r),
+    ...(textAus(r.lieferant_ust_idnr, 20) ? { lieferant_ust_idnr: textAus(r.lieferant_ust_idnr, 20) } : {}),
+    ...(textAus(r.lieferant_anschrift, 300) ? { lieferant_anschrift: textAus(r.lieferant_anschrift, 300) } : {}),
   };
 }
 
 /** Inhalt eines Belegs als frühere Fassung (für das Änderungsprotokoll); `grund`: warum sie ersetzt wurde (R12 GoBD). */
 export function belegFassung(b: Beleg, bis: string, grund?: string): BelegFassung {
-  return { ...(grund ? { grund: grund.trim().slice(0, 300) } : {}), bis, datum: b.datum, lieferant: b.lieferant, nummer: b.nummer ?? null, kategorie: b.kategorie, steuer: b.steuer.map((x) => ({ ...x })), vorsteuer: b.vorsteuer, zahlung: b.zahlung, bezahlt: b.bezahlt ?? null, notiz: b.notiz ?? null, datei: b.datei ?? null, ...(b.steuerschuld ? { steuerschuld: b.steuerschuld } : {}), ...(b.skonto_cent ? { skonto_cent: b.skonto_cent } : {}), ...(b.anlage_art ? { anlage_art: b.anlage_art } : {}) };
+  return { ...(grund ? { grund: grund.trim().slice(0, 300) } : {}), bis, datum: b.datum, lieferant: b.lieferant, nummer: b.nummer ?? null, kategorie: b.kategorie, steuer: b.steuer.map((x) => ({ ...x })), vorsteuer: b.vorsteuer, zahlung: b.zahlung, bezahlt: b.bezahlt ?? null, notiz: b.notiz ?? null, datei: b.datei ?? null, ...(b.steuerschuld ? { steuerschuld: b.steuerschuld } : {}), ...(b.skonto_cent ? { skonto_cent: b.skonto_cent } : {}), ...(b.anlage_art ? { anlage_art: b.anlage_art } : {}), ...(b.vorsteuer_betrag_cent ? { vorsteuer_betrag_cent: b.vorsteuer_betrag_cent } : b.vorsteuer_anteil ? { vorsteuer_anteil: b.vorsteuer_anteil } : {}) };
 }
 
 /** Hat sich der Inhalt (nicht nur der Zeitstempel) eines Belegs geändert? */

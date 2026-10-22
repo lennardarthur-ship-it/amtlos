@@ -107,7 +107,7 @@ export interface Betriebsstaette {
 export const HAUPT_STAETTE = "haupt";
 
 export interface Stand {
-  version: 7;
+  version: 8;
   betrieb: Betrieb;
   unterlagen: Unterlage[];
   /** Belege und Eingangsrechnungen (E-133); Dateien liegen verschlüsselt daneben (unterlagen/dateien.ts) */
@@ -115,6 +115,12 @@ export interface Stand {
   /** gespeicherte Personen, die Vorlagen vorausfüllen (E-124) */
   mitarbeiter: Person[];
   kunden: Person[];
+  /**
+   * E-165 (StB-Prüfung A-3): Lieferanten-Verzeichnis für Personenkonten – je Lieferant (Name bzw. USt-IdNr.) ein Eintrag
+   * mit dem dauerhaft vergebenen Kreditorenkonto (`personenkonto`). Entsteht nur mit der Kontenvorgabe „Personenkonten“;
+   * Kunden tragen ihr Debitorenkonto im selben Feld in `kunden`.
+   */
+  lieferanten: Person[];
   /** Antworten im Pflichten-Check (E-126), Schlüssel wie im Server-Profil ohne „profil.“ */
   profil: Record<string, string | number | boolean | string[] | null>;
   /** abgehakte Pflichten: Pflicht-ID → Datum */
@@ -185,7 +191,7 @@ export interface Stand {
 }
 
 /** Aktuelle Version des gespeicherten Stands. Höhere Versionen stammen aus einer neueren App und werden nie überschrieben. */
-export const STAND_VERSION = 7;
+export const STAND_VERSION = 8;
 
 /**
  * Migrationen: Eintrag n hebt einen Stand von Version n auf n + 1.
@@ -200,6 +206,8 @@ export const STAND_VERSION = 7;
  *   die App fragt erst danach, wenn die eigenen Bedingungen freigegeben sind.
  * - 6 → 7 (StB-Prüfung Heckler und Busch): Kontenvorgaben der Kanzlei (`steuerberatung.kontenvorgaben`) – anfangs keine,
  *   es gelten die Standardkonten des Kontenrahmens; Vorhandenes wird nur bereinigt.
+ * - 7 → 8 (E-165, Personenkonten): Lieferanten-Verzeichnis (`lieferanten`, anfangs leer). Personenkonten werden erst
+ *   vergeben, wenn die Kontenvorgabe „Personenkonten“ eingeschaltet ist (`personenkontenVergeben` in steuerpaket.ts).
  */
 export const MIGRATIONEN: Record<number, (roh: Record<string, unknown>) => Record<string, unknown>> = {
   1: (roh) => ({ ...roh, kasse: Array.isArray(roh.kasse) ? roh.kasse : [] }),
@@ -245,6 +253,7 @@ export const MIGRATIONEN: Record<number, (roh: Record<string, unknown>) => Recor
     const { kontenvorgaben: _alt, ...rest } = roh.steuerberatung;
     return { ...roh, steuerberatung: kontenvorgabenGesetzt(v) ? { ...rest, kontenvorgaben: v } : rest };
   },
+  7: (roh) => ({ ...roh, lieferanten: Array.isArray(roh.lieferanten) ? roh.lieferanten : [] }),
 };
 
 export class StandFehler extends Error {
@@ -268,7 +277,7 @@ export function migrieren(roh: Record<string, unknown>): Record<string, unknown>
   return { ...r, version: STAND_VERSION };
 }
 
-export const LEERER_STAND: Stand = { version: 7, kasse: [], kassenstuerze: [], sachentnahmen: [], protokoll: [], betriebsstaetten: [], betrieb: LEERER_BETRIEB, unterlagen: [], belege: [], mitarbeiter: [], kunden: [], profil: {}, erledigt: {}, erinnerungen: false, appSperre: false, cloudSicherung: false, proTest: false, bewertung: { erfolge: 0 }, steuerberatung: { kontenrahmen: "SKR03", beraternummer: "", mandantennummer: "" }, geloescht: {}, zeiten: {}, belegArchiv: [], fremd: { unterlagen: [], belege: [] } };
+export const LEERER_STAND: Stand = { version: 8, kasse: [], kassenstuerze: [], sachentnahmen: [], protokoll: [], betriebsstaetten: [], betrieb: LEERER_BETRIEB, unterlagen: [], belege: [], mitarbeiter: [], kunden: [], lieferanten: [], profil: {}, erledigt: {}, erinnerungen: false, appSperre: false, cloudSicherung: false, proTest: false, bewertung: { erfolge: 0 }, steuerberatung: { kontenrahmen: "SKR03", beraternummer: "", mandantennummer: "" }, geloescht: {}, zeiten: {}, belegArchiv: [], fremd: { unterlagen: [], belege: [] } };
 
 function profilAus(roh: unknown): Stand["profil"] {
   if (!roh || typeof roh !== "object" || Array.isArray(roh)) return {};
@@ -422,7 +431,7 @@ export function standAus(json: string | null): Stand {
   const partnerId = partnerIdAus(r.partnerId);
   const nutzungsbedingungen = zustimmungAus(r.nutzungsbedingungen);
   return belegNummernSichern({
-    version: 7,
+    version: 8,
     kasse: kassenVereinen([], kasse),
     kassenstuerze,
     sachentnahmen,
@@ -435,6 +444,7 @@ export function standAus(json: string | null): Stand {
     fremd: { unterlagen: fremdeUnterlagen, belege: fremdeBelege, ...(fremdeKasse.length ? { kasse: fremdeKasse } : {}) },
     mitarbeiter: personenAus(r.mitarbeiter),
     kunden: personenAus(r.kunden),
+    lieferanten: personenAus(r.lieferanten),
     profil: profilAus(r.profil),
     erledigt: erledigtAus(r.erledigt),
     erinnerungen: r.erinnerungen === true,
@@ -1439,6 +1449,7 @@ export function zusammenfuehren(aktuell: Stand, gesichert: Stand, jetzt = new Da
     belegArchiv: alleBelege.filter((b) => b.ungueltig),
     mitarbeiter: personen(aktuell.mitarbeiter, gesichert.mitarbeiter),
     kunden: personen(aktuell.kunden, gesichert.kunden),
+    lieferanten: personen(aktuell.lieferanten, gesichert.lieferanten),
     profil: { ...gesichert.profil, ...aktuell.profil },
     erledigt,
     geloescht,

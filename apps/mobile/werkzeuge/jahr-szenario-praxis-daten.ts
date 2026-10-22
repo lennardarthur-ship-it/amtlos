@@ -60,6 +60,8 @@ export const BETRIEB = {
   rechtsform: "Einzelunternehmen",
   versteuerung: "ist",
   farbe: "#2E6F73",
+  /** E-165: vorläufige Vorsteuerquote in „Mein Betrieb“ (= QUOTE_VORLAEUFIG, von der Steuerberatung) */
+  vorsteuerquote: "13",
 };
 /** IBAN des Medizintechnik-Händlers in seiner E-Rechnung (erfunden, mit gültiger Prüfziffer) */
 export const LIEFERANT_IBAN = ibanDe("85050300", "221045678");
@@ -485,8 +487,14 @@ const qGrenzen = (q: string) => {
   return { von, bis };
 };
 
-/** Vorsteuer eines Belegs nach Zuordnung und Quote (gemischt: Anteil wird je Quartal auf die Summe gerechnet) */
 export const steuer13b = (b: BelegRoh) => (b.p13b ? rund((belegSumme(b).netto * 19) / 100) : 0);
+
+/**
+ * E-165: abziehbare Vorsteuer (Kz 66) eines Belegs nach Zuordnung – „pflichtig“ voll, „gemischt“ der Anteil nach der
+ * vorläufigen Quote, kaufmännisch gerundet JE BELEG (so rechnen Voranmeldung, EÜR und DATEV-Stapel je Beleg und Satz),
+ * „frei“/„keine“ nichts. § 13b-Belege: 0 (ihre Vorsteuer steht in Kz 67, siehe `vst13b`).
+ */
+export const vstAbziehbarBeleg = (b: BelegRoh, quote = QUOTE_VORLAEUFIG) => (b.p13b ? 0 : b.zuordnung === "pflichtig" ? belegSumme(b).ust : b.zuordnung === "gemischt" ? rund((belegSumme(b).ust * quote) / 100) : 0);
 
 /**
  * Voranmeldung je Quartal (Ist): Umsätze nach Zahlungseingang, Vorsteuer nach Belegdatum, vorläufige Quote 13 %.
@@ -506,7 +514,9 @@ export function ustQuartale(quote = QUOTE_VORLAEUFIG) {
     const ust = (z: Zuordnung) => sum(belege.filter((b) => b.zuordnung === z).map((b) => belegSumme(b).ust));
     const vstVoll = ust("pflichtig");
     const gemischtGesamt = ust("gemischt");
-    const vstAnteil = rund((gemischtGesamt * quote) / 100);
+    // E-165: Anteil je Beleg gerundet (vorher: auf die Quartalssumme – Abweichung höchstens wenige Cent)
+    const vstAnteil = sum(belege.filter((b) => b.zuordnung === "gemischt").map((b) => vstAbziehbarBeleg(b, quote)));
+    const vstAnteilSumme = rund((gemischtGesamt * quote) / 100);
     const bmg13b = sum(belege.filter((b) => b.p13b).map((b) => belegSumme(b).netto));
     const st13b = sum(belege.filter((b) => b.p13b).map(steuer13b));
     // Vorsteuer aus § 13b: nur anteilig, weil die Leistung gemischt genutzt wird
@@ -523,9 +533,12 @@ export function ustQuartale(quote = QUOTE_VORLAEUFIG) {
       /** Steuer auf Kz 81 (ELSTER rechnet sie aus der Bemessungsgrundlage) */ ust19,
       /** Summe der Steuer laut Rechnungen + Empfang (zum Vergleich mit ust19) */ ustAusgewiesen: reUst + em.ust,
       /** Kz 48: steuerfreie Umsätze ohne Vorsteuerabzug (§ 4 Nr. 8 bis 29 UStG) */ kz48: reFrei + gkv + zz,
-      bmg13b, st13b, vstVoll, gemischtGesamt, vstAnteil, vst13b, vorsteuer, zahllast,
-      /** was „Aus Rechnungen übernehmen“ der App liefern sollte: nur Rechnungen und Belege mit Vorsteuer-Schalter an (= „pflichtig“) */
-      app: { umsatz_19: rePflichtig, umsatz_frei: reFrei, vorsteuer: vstVoll },
+      bmg13b, st13b, vstVoll, gemischtGesamt, vstAnteil, vstAnteilSumme, vst13b, vorsteuer, zahllast,
+      /**
+       * was „Aus Rechnungen übernehmen“ der App liefern sollte – E-165: Belege „pflichtig“ voll, „gemischt“ anteilig
+       * (Vorsteuer-Teilabzug je Beleg), dazu Kz 67 aus § 13b anteilig
+       */
+      app: { umsatz_19: rePflichtig, umsatz_frei: reFrei, vorsteuer: vstVoll + vstAnteil, vorsteuer13b: vst13b },
       /** Vorsteuer, wenn alle Belege mit dem Startwert „Vorsteuer abziehbar“ an blieben */
       vstStandard,
       /** Vorsteuer, die ein Inhaber ohne Aufteilung bekäme, wenn er gemischte Belege „an“ ließe und nur die rein steuerfreien ausschaltete */
@@ -570,16 +583,16 @@ export function euerUnabhaengig() {
   const einnahmen = rePflichtig + reFrei + reUst + empfangNetto + empfangUst + gkv + zuzahlungen;
   const imJahr = BELEGE.filter((b) => zahltagBeleg(b).startsWith(`${JAHR}-`));
   const nachKategorie: Record<string, { brutto: number; appSicht: number; anzahl: number }> = {};
-  let vstPflichtigBezahlt = 0;
+  let vstAbziehbarBezahlt = 0;
   for (const b of imJahr) {
     if (b.kategorie === "anlage") continue;
     const sm = belegSumme(b);
     nachKategorie[b.kategorie] ??= { brutto: 0, appSicht: 0, anzahl: 0 };
     nachKategorie[b.kategorie]!.brutto += sm.brutto;
-    // in der App: Vorsteuer-Schalter nur bei „pflichtig“ an → netto, sonst brutto
-    nachKategorie[b.kategorie]!.appSicht += b.zuordnung === "pflichtig" ? sm.netto : sm.brutto;
+    // E-165: in der App ist die Ausgabe brutto abzüglich abziehbarer Vorsteuer (pflichtig: netto, gemischt: brutto − Anteil)
+    nachKategorie[b.kategorie]!.appSicht += sm.brutto - vstAbziehbarBeleg(b);
     nachKategorie[b.kategorie]!.anzahl++;
-    if (b.zuordnung === "pflichtig") vstPflichtigBezahlt += sm.ust;
+    vstAbziehbarBezahlt += vstAbziehbarBeleg(b);
   }
   const ausgabenBelege = sum(Object.values(nachKategorie).map((k) => k.brutto));
   const vaGezahlt = VA_Q4_2025.betrag + sum(qs.filter((q) => VA_ZAHLTAG[q.q]!.startsWith(`${JAHR}-`)).map((q) => q.zahllast));
@@ -589,7 +602,7 @@ export function euerUnabhaengig() {
   const ausgaben = ausgabenBelege + vaGezahlt;
   return {
     rePflichtig, reFrei, reUst, empfangNetto, empfangUst, gkv, zuzahlungen, einnahmen, reAnzahl: reBez.length,
-    nachKategorie, vstPflichtigBezahlt, ausgabenBelege, vaGezahlt, afa, afaBasis, ausgaben, ergebnis: einnahmen - ausgaben - afa,
+    nachKategorie, vstAbziehbarBezahlt, ausgabenBelege, vaGezahlt, afa, afaBasis, ausgaben, ergebnis: einnahmen - ausgaben - afa,
     belegeImJahr: imJahr.length,
     offen: sum(vorgaenge().filter((x) => x.vz === 1 && !x.bezahlt && !x.r.storno).map((x) => x.s.brutto)),
     gkvGebuehren: sum(GKV.filter((g) => g.zufluss.startsWith(`${JAHR}-`)).map((g) => azGebuehr(g.betrag))),

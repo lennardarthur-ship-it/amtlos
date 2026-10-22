@@ -73,12 +73,20 @@ import {
   type Kontenrahmen,
   type Kontenvorgaben,
   type RechnungsDaten,
+  belegTeilabzug,
+  datevDebitorenKreditoren,
+  gleicherPartner,
+  istPersonenkonto,
+  naechstesPersonenkonto,
+  type Person,
+  type PersonenkontoArt,
+  type PersonenkontoStamm,
 } from "@amtlos/fachlogik";
 import { APP_VERSION } from "../version";
 import { T as TEXT } from "../texte";
 import { utf8 } from "./sicherung";
 import { GUTSCHRIFT_HINWEIS, istGutschrift, kuImZeitraum, zuordnungsTage } from "./ustAusRechnungen";
-import { absenderFuer, nichtZaehlend, type ProtokollEintrag, type Stand, type Unterlage } from "./speicher";
+import { absenderFuer, neueId, nichtZaehlend, type ProtokollEintrag, type Stand, type Unterlage } from "./speicher";
 import { kassenAbdeckung } from "./kasse";
 import { MARKE } from "@amtlos/marke";
 
@@ -267,6 +275,102 @@ function gutschriftAusgaben(s: Stand, jahr: string): { netto: number; ust: numbe
     anzahl++;
   }
   return { netto, ust, anzahl };
+}
+
+// ---------------------------------------------------------------- Personenkonten (E-165, StB-Prüfung A-3)
+
+/** Geschäftspartner einer Rechnung bzw. eines Belegs für das Personenkonto */
+interface Partner {
+  name: string;
+  ust_idnr?: string | null;
+  anschrift?: string | null;
+  land?: string | null;
+  privat?: boolean;
+}
+
+/** Partner einer gestellten Rechnung: Kunde (Debitor) bzw. bei einer Gutschrift der Leistende (Kreditor). */
+function rechnungsPartner(s: Stand, u: Unterlage): Partner & { art: PersonenkontoArt } {
+  const { daten } = eRechnungAus(u.daten, absenderFuer(s, u));
+  const anschrift = typeof u.daten.kunde_anschrift === "string" ? u.daten.kunde_anschrift : null;
+  return { art: istGutschrift(u) ? "kreditor" : "debitor", name: daten.kunde.name, ust_idnr: daten.kunde.ust_idnr ?? null, anschrift, land: daten.kunde.land ?? null, privat: u.daten.kunde_art === "privat" };
+}
+
+/** Belege, die im Stapel auf das Verbindlichkeitskonto gingen – nur sie bekommen einen Kreditor. */
+const belegMitKreditor = (b: Beleg) => b.zahlung === "bank" && b.kategorie !== "personal" && !!b.lieferant.trim();
+
+/** Gespeicherter Eintrag (Kunde bzw. Lieferant), der zum Partner passt. */
+const passend = (liste: readonly Person[], p: Partner) => liste.find((x) => gleicherPartner({ name: x.name, ust_idnr: x.ust_idnr }, p));
+
+/**
+ * E-165 (A-3): Personenkonten vergeben – nur mit der Kontenvorgabe „Personenkonten“. Jeder Kunde gestellter Rechnungen
+ * bekommt einmal ein Debitorenkonto (10000–69999), jeder Lieferant von Belegen per Überweisung/Karte (und jeder
+ * Leistende einer Gutschrift) ein Kreditorenkonto (70000–99999) – in der Reihenfolge des ersten Auftretens (Rechnungs-
+ * bzw. Belegdatum). Gespeichert am Kunden (`kunden`, angelegt, wenn er fehlt) bzw. im Lieferanten-Verzeichnis
+ * (`lieferanten`); eine einmal vergebene Nummer ändert sich nie. Ohne Änderung kommt derselbe Stand zurück.
+ */
+export function personenkontenVergeben(s: Stand, jetzt = new Date()): Stand {
+  if (!s.steuerberatung.kontenvorgaben?.personenkonten) return s;
+  const iso = jetzt.toISOString();
+  const listen: Record<PersonenkontoArt, Person[]> = { debitor: [...s.kunden], kreditor: [...s.lieferanten] };
+  let geaendert = false;
+  const belegt = () => [...listen.debitor, ...listen.kreditor].map((p) => p.personenkonto);
+  const vergeben = (art: PersonenkontoArt, p: Partner) => {
+    if (!p.name.trim()) return;
+    const liste = listen[art];
+    const da = passend(liste, p);
+    if (da && istPersonenkonto(da.personenkonto, art)) return;
+    const nr = naechstesPersonenkonto(belegt(), art);
+    if (!nr) return;
+    geaendert = true;
+    if (da) listen[art] = liste.map((x) => (x === da ? { ...x, personenkonto: nr, geaendert: iso } : x));
+    else listen[art] = [...liste, { id: neueId(), name: p.name.trim(), ...(p.anschrift ? { anschrift: p.anschrift } : {}), ...(p.ust_idnr ? { ust_idnr: p.ust_idnr } : {}), ...(p.land && p.land !== "DE" ? { land: p.land } : {}), ...(p.privat ? { art: "privat" } : {}), personenkonto: nr, geaendert: iso } as Person];
+  };
+  const vorgaenge = [
+    ...gestellteRechnungen(s).map((u) => ({ datum: String(u.daten.datum), sort: `r${String(u.daten.nummer ?? "")}`, los: () => { const p = rechnungsPartner(s, u); vergeben(p.art, p); } })),
+    ...s.belege.filter(belegMitKreditor).map((b) => ({ datum: b.datum, sort: `b${b.nr ?? b.id}`, los: () => vergeben("kreditor", { name: b.lieferant, ust_idnr: b.lieferant_ust_idnr ?? null, anschrift: b.lieferant_anschrift ?? null }) })),
+  ].sort((a, b) => a.datum.localeCompare(b.datum) || a.sort.localeCompare(b.sort, "de", { numeric: true }));
+  for (const v of vorgaenge) v.los();
+  return geaendert ? { ...s, kunden: listen.debitor, lieferanten: listen.kreditor } : s;
+}
+
+/** Personenkonto einer gestellten Rechnung (Debitor bzw. bei Gutschriften Kreditor) – null ohne vergebene Nummer. */
+export function personenkontoRechnung(s: Stand, u: Unterlage): string | null {
+  const p = rechnungsPartner(s, u);
+  const nr = passend(p.art === "debitor" ? s.kunden : s.lieferanten, p)?.personenkonto;
+  return istPersonenkonto(nr, p.art) ? nr : null;
+}
+
+/** Kreditor je Beleg-ID (nur Belege per Überweisung/Karte mit vergebener Nummer). */
+export function kreditorenBelege(s: Stand): Map<string, string> {
+  const m = new Map<string, string>();
+  for (const b of s.belege) {
+    if (!belegMitKreditor(b)) continue;
+    const nr = passend(s.lieferanten, { name: b.lieferant, ust_idnr: b.lieferant_ust_idnr ?? null })?.personenkonto;
+    if (istPersonenkonto(nr, "kreditor")) m.set(b.id, nr);
+  }
+  return m;
+}
+
+/** Alle vergebenen Personenkonten (Stammdaten) – Kunden und Lieferanten, nach Nummer. */
+export function personenkontenListe(s: Pick<Stand, "kunden" | "lieferanten">): (PersonenkontoStamm & { art: PersonenkontoArt })[] {
+  const eintrag = (p: Person, art: PersonenkontoArt) => (istPersonenkonto(p.personenkonto, art) ? [{ art, konto: p.personenkonto, name: p.name, anschrift: p.anschrift ?? null, land: p.land ?? null, ust_idnr: p.ust_idnr ?? null, privat: p.art === "privat" }] : []);
+  return [...s.kunden.flatMap((p) => eintrag(p, "debitor")), ...s.lieferanten.flatMap((p) => eintrag(p, "kreditor"))].sort((a, b) => a.konto.localeCompare(b.konto));
+}
+
+/** Personenkonten, die zweimal vergeben sind (z. B. offline auf zwei Geräten) – für die LIESMICH. */
+export const personenkontenDoppelt = (s: Pick<Stand, "kunden" | "lieferanten">) => {
+  const n = personenkontenListe(s).map((e) => e.konto);
+  return [...new Set(n.filter((k, i) => n.indexOf(k) !== i))];
+};
+
+/** E-165: steuerfreie Heilbehandlungen o. Ä. (Kz 48) unter den Rechnungen bzw. Branche „Gesundheit und Pflege“ */
+function umsaetzeAusserhalbDerApp(s: Stand): boolean {
+  const branchen = s.profil["taetigkeit.branchen"];
+  if (Array.isArray(branchen) && branchen.includes("gesundheit_pflege")) return true;
+  return umsatzRechnungen(s).some((u) => {
+    const { daten } = eRechnungAus(u.daten, absenderFuer(s, u));
+    return daten.steuerart === "befreit" && kennzahlBefreiung(daten.befreiungsgrund) === "48";
+  });
 }
 
 /** Jahre mit Daten (Zahlungen von Rechnungen, Zahltage von Belegen), neueste zuerst. */
@@ -588,6 +692,14 @@ export function rechnungenCsv(s: Stand, z: Zeitraum, gutschriften = false, pdfs?
   );
 }
 
+/** E-165: Vorsteuerabzug eines Belegs als Text für die Belegliste */
+function vorsteuerText(b: Beleg, ust: number, vorsteuer: number): string {
+  if (!ust && !b.steuerschuld) return "";
+  if (!b.vorsteuer) return "keine";
+  if (!belegTeilabzug(b)) return "voll";
+  return b.vorsteuer_betrag_cent ? `anteilig: ${betrag(b.vorsteuer_betrag_cent)} € abziehbar` : `anteilig: ${String(b.vorsteuer_anteil).replace(".", ",")} % (${betrag(vorsteuer)} € abziehbar)`;
+}
+
 /** Belege des Zeitraums nach Belegdatum, bei gleichem Datum in der Reihenfolge der Erfassung. */
 const belegeImZeitraum = (s: Stand, z: Zeitraum) => s.belege.filter((b) => imZeitraum(b.datum, z)).sort((a, b) => a.datum.localeCompare(b.datum) || a.erstellt.localeCompare(b.erstellt) || a.id.localeCompare(b.id));
 
@@ -641,11 +753,13 @@ export function belegeCsv(s: Stand, z: Zeitraum, dateinamen: Map<string, string>
       zeitDe(b.erstellt),
       b.festgeschrieben ? zeitDe(b.festgeschrieben) : "",
       String(b.historie?.length ?? 0),
+      // E-165: Vorsteuer-Teilabzug (§ 15 Abs. 4 UStG) – Anteil bzw. Betrag; „voll“, „keine“ bei Steuer ohne Abzug
+      vorsteuerText(b, sm.ust_cent, sm.vorsteuer_cent),
     ];
   });
-  const summenZeile = ["Summe", "", "", "", "", "", "", "", betrag(summe.netto), betrag(summe.ust), betrag(summe.vorsteuer), betrag(summe.brutto), "", "", "", "", "", "", "", "", "", ""];
+  const summenZeile = ["Summe", "", "", "", "", "", "", "", betrag(summe.netto), betrag(summe.ust), betrag(summe.vorsteuer), betrag(summe.brutto), "", "", "", "", "", "", "", "", "", "", ""];
   return csv(
-    [`${MARKE.name}-Belegnr.`, "Datum", "Lieferant", "Belegnummer (Lieferant)", "Belegfeld 1 (DATEV)", "Kategorie", "Zeile Anlage EÜR", "Konto (DATEV)", "Netto", "USt", "Vorsteuer", "Brutto", "Steuersätze", "Zahlung", "Zahltag (für EÜR verwendet)", "Datei", "Notiz", "Steuerschuldnerschaft", "Im Buchungsstapel", "Erfasst am", "Festgeschrieben am", "Änderungen (siehe Änderungsprotokoll)"],
+    [`${MARKE.name}-Belegnr.`, "Datum", "Lieferant", "Belegnummer (Lieferant)", "Belegfeld 1 (DATEV)", "Kategorie", "Zeile Anlage EÜR", "Konto (DATEV)", "Netto", "USt", "Vorsteuer", "Brutto", "Steuersätze", "Zahlung", "Zahltag (für EÜR verwendet)", "Datei", "Notiz", "Steuerschuldnerschaft", "Im Buchungsstapel", "Erfasst am", "Festgeschrieben am", "Änderungen (siehe Änderungsprotokoll)", "Vorsteuerabzug"],
     zeilen.length ? [...zeilen, summenZeile] : [],
   );
 }
@@ -932,6 +1046,7 @@ export function kontenvorgabenText(v: Kontenvorgaben | undefined, k: ReturnType<
   const teile = KONTENVORGABE_FELDER.filter((f) => v!.konten?.[f.id]).map((f) => `${f.titel} ${konto(f.id) || v!.konten![f.id]}`);
   if (v!.belegeGegenBank !== undefined) teile.push(`Belege gegen Bank: ${ja(v!.belegeGegenBank)}`);
   if (v!.zahlungenBuchen !== undefined) teile.push(`Zahlungseingänge buchen: ${ja(v!.zahlungenBuchen)}`);
+  if (v!.personenkonten !== undefined) teile.push(`Personenkonten für Kunden und Lieferanten: ${ja(v!.personenkonten)}`);
   if (v!.gewinnermittlung) teile.push(`Gewinnermittlung: ${v!.gewinnermittlung === "bilanz" ? "Bilanz" : "EÜR"}`);
   const herkunft = [v!.kanzlei, v!.stand ? `Stand ${datumDe(v!.stand)}` : ""].filter(Boolean).join(", ");
   return `${herkunft ? `${herkunft}: ` : ""}${teile.join("; ")}`;
@@ -955,7 +1070,13 @@ export function paketZippen(inhalt: Record<string, Uint8Array>): Uint8Array {
  * Das Paket für die Steuerberatung. `dateien` liefert die Bytes einer Belegdatei (verschlüsselt abgelegt, vom Aufrufer
  * entschlüsselt). `jetzt` als ISO-Zeitpunkt für den DATEV-Kopf. Mit `o.rechnungsPdfs` kommen die Rechnungs-PDFs dazu.
  */
-export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: Record<string, Uint8Array>, jetzt: string, o: PaketOptionen = {}): PaketErgebnis {
+export function steuerpaket(standRoh: Stand, z: Zeitraum, sb: Steuerberatung, dateien: Record<string, Uint8Array>, jetzt: string, o: PaketOptionen = {}): PaketErgebnis {
+  // E-165 (A-3): mit der Kontenvorgabe „Personenkonten“ fehlende Nummern vergeben (der Aufrufer speichert sie vorher,
+  // dann ändert sich hier nichts) – Rechnungen auf Debitoren, Belege per Überweisung/Karte auf Kreditoren
+  const personenkonten = sb.kontenvorgaben?.personenkonten === true;
+  const s = personenkonten ? personenkontenVergeben({ ...standRoh, steuerberatung: { ...standRoh.steuerberatung, kontenvorgaben: sb.kontenvorgaben } }, new Date(jetzt)) : standRoh;
+  const kreditoren = personenkonten ? kreditorenBelege(s) : undefined;
+  const mitPk = (u: Unterlage, r: AusgangsRechnungFuerBuchung): AusgangsRechnungFuerBuchung => (personenkonten ? { ...r, personenkonto: personenkontoRechnung(s, u) } : r);
   const alle = gestellteRechnungen(s)
     .filter((u) => imZeitraum(String(u.daten.datum), z))
     .sort((a, b) => String(a.daten.datum).localeCompare(String(b.daten.datum)) || nachNummer(String(a.daten.nummer ?? ""), String(b.daten.nummer ?? "")));
@@ -994,7 +1115,7 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
   const zahlungsBuchungen = gestellteRechnungen(s)
     .filter((u) => !gutscheine.has(u.id) && !istGutschrift(u) && !istStorno(u) && u.zahlungen?.length)
     .flatMap((u) => {
-      const r = rechnungFuerBuchung(u, s.betrieb, { tage, betriebKu: ku });
+      const r = mitPk(u, rechnungFuerBuchung(u, s.betrieb, { tage, betriebKu: ku }));
       const anteile = zahlungsAnteile(restGruppen(r), u.zahlungen!).filter((a) => imZeitraum(a.zahlung.datum, z));
       const minderungen = anteile.filter((a) => a.zahlung.minderung_cent).map((a) => ({ id: a.zahlung.id, datum: a.zahlung.datum, brutto_cent: a.minderung.reduce((x, m) => x + m.brutto_cent, 0) }));
       // Ist: Erlös je Zahlung mit erhaltenem Betrag plus Skonto, zum Zahltag; Soll: der Erlös steht schon mit der Rechnung
@@ -1011,7 +1132,7 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
     ? gestellteRechnungen(s)
         .filter((u) => !gutscheine.has(u.id) && !istGutschrift(u) && !barKassiert.has(u.id))
         .flatMap((u) => {
-          const r = rechnungFuerBuchung(u, s.betrieb, { tage, betriebKu: ku });
+          const r = mitPk(u, rechnungFuerBuchung(u, s.betrieb, { tage, betriebKu: ku }));
           const zl = !istStorno(u) && u.zahlungen?.length ? u.zahlungen.filter((x) => imZeitraum(x.datum, z)).map((x) => ({ id: x.id, datum: x.datum, betrag_cent: x.betrag_cent })) : u.bezahlt && imZeitraum(u.bezahlt, z) ? [{ id: "bezahlt", datum: u.bezahlt, betrag_cent: istStorno(u) ? summen(r.positionen, r.kleinunternehmer).brutto_cent : zahlbetrag(r) }] : [];
           return zahlungsBuchungenRechnung(r, zl, sb.kontenrahmen, bo);
         })
@@ -1022,11 +1143,11 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
   const skontoBelege = s.belege.filter((b) => b.skonto_cent && imZeitraum(zahltag(b), z));
   // Gutschriften gehen als Aufwand in den Stapel (R10), Rechnungen als Erlös
   const buchungen = [
-    ...buchungenAusRechnungen(imStapel.map((u) => ({ ...rechnungFuerBuchung(u, s.betrieb, { tage, betriebKu: ku }), ...(nachZahlung(u) ? { datum: u.bezahlt! } : {}) })), sb.kontenrahmen, bo),
+    ...buchungenAusRechnungen(imStapel.map((u) => ({ ...mitPk(u, rechnungFuerBuchung(u, s.betrieb, { tage, betriebKu: ku })), ...(nachZahlung(u) ? { datum: u.bezahlt! } : {}) })), sb.kontenrahmen, bo),
     ...zahlungsBuchungen,
     ...zahlungsEingaenge,
-    ...buchungenAusBelegen(belege, sb.kontenrahmen, { ...bo, nummern, kapitalgesellschaft: kapital, kleinunternehmer: ku, kasseAb: ab }),
-    ...skontoBuchungenBelege(skontoBelege, sb.kontenrahmen, { ...bo, nummern, kapitalgesellschaft: kapital, kleinunternehmer: ku, kasseAb: ab }),
+    ...buchungenAusBelegen(belege, sb.kontenrahmen, { ...bo, nummern, kapitalgesellschaft: kapital, kleinunternehmer: ku, kasseAb: ab, kreditoren }),
+    ...skontoBuchungenBelege(skontoBelege, sb.kontenrahmen, { ...bo, nummern, kapitalgesellschaft: kapital, kleinunternehmer: ku, kasseAb: ab, kreditoren }),
     ...kassenBuchungen(kasseImZeitraum, sb.kontenrahmen, { ...bo, kleinunternehmer: ku, kapitalgesellschaft: kapital }),
     // R12 GoBD: Kassendifferenzen (Kassenbuch = Kassenkonto) und Sachentnahmen
     ...kassenDifferenzBuchungen(kassenWarnungen(s.kasse, s.belege).differenzen.filter((d) => imZeitraum(d.datum, z)), sb.kontenrahmen, { ...bo, kleinunternehmer: ku }),
@@ -1034,7 +1155,10 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
   ].sort((a, b) => a.datum.localeCompare(b.datum));
   // StB-Prüfung (A-4): Saldo des Forderungskontos im Stapel (Generalumkehr mit umgekehrtem Vorzeichen) – bei
   // bilanzierenden Betrieben mit Zahlungseingängen die offenen Forderungen aus Rechnungen des Zeitraums zum Stichtag
-  const saldo = (konto: string) => buchungen.reduce((a, b) => a + (b.konto === konto ? buchungsVorzeichen(b) * b.betrag_cent : 0) - (b.gegenkonto === konto ? buchungsVorzeichen(b) * b.betrag_cent : 0), 0);
+  const saldoVon = (passt: (konto: string) => boolean) => buchungen.reduce((a, b) => a + (passt(b.konto) ? buchungsVorzeichen(b) * b.betrag_cent : 0) - (passt(b.gegenkonto) ? buchungsVorzeichen(b) * b.betrag_cent : 0), 0);
+  // E-165: mit Personenkonten stehen die Forderungen auf den Debitoren – Saldo über alle Debitorenkonten
+  const saldo = (konto: string) => (personenkonten && konto === k.forderungen ? saldoVon((x) => x === konto || istPersonenkonto(x, "debitor")) : saldoVon((x) => x === konto));
+  const forderungsKonto = personenkonten ? `${k.forderungen} bzw. Debitoren` : k.forderungen;
   // A-4 (Nachtrag 22.10.2026): offene Forderungen zum Stichtag aus den Rechnungen des Zeitraums – wie die Rechnungsliste
   const offenZumEnde = rechnungen.reduce((a, u) => {
     const r = rechnungFuerBuchung(u, s.betrieb);
@@ -1053,6 +1177,12 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
   const rechtsform = rechtsformFuer(s);
   const dfv = s.profil["ust.dauerfristverlaengerung"] === true;
   const inhalt: Record<string, Uint8Array> = {};
+  // E-165: Stammdaten der Personenkonten, die in diesem Stapel vorkommen
+  const imStapelKonten = new Set(buchungen.flatMap((b) => [b.konto, b.gegenkonto]));
+  const stamm = personenkonten ? personenkontenListe(s).filter((e) => imStapelKonten.has(e.konto)) : [];
+  const doppelt = personenkonten ? personenkontenDoppelt(s) : [];
+  if (stamm.length) inhalt[`EXTF_Debitoren_Kreditoren_${z.name}.csv`] = datevExtfBytes(datevDebitorenKreditoren(stamm, { beraternummer: sb.beraternummer, mandantennummer: sb.mandantennummer, wjBeginn: `${z.von.slice(0, 4)}-01-01`, erzeugtAm: jetzt }));
+  const teilabzug = belege.filter((b) => belegTeilabzug(b) && !ku);
   inhalt[`EXTF_Buchungsstapel_${z.name}.csv`] = datevExtfBytes(datevExtf(buchungen, { beraternummer: sb.beraternummer, mandantennummer: sb.mandantennummer, wjBeginn: `${z.von.slice(0, 4)}-01-01`, von: z.von, bis: z.bis, kontenrahmen: sb.kontenrahmen, bezeichnung: `${MARKE.name} ${z.name}`, erzeugtAm: jetzt }));
   inhalt[`Buchungsliste_${z.name}.csv`] = utf8(buchungslisteCsv(buchungen));
   // Rechnungs-PDFs (vom Aufrufer erzeugt): Rechnungen/<Nummer>_<Kunde>.pdf, dieselben Namen in der Spalte „Datei“
@@ -1159,14 +1289,23 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
       const oss = alle.filter((u) => !istGutschrift(u) && eRechnungAus(u.daten, absenderFuer(s, u)).daten.oss);
       return oss.length ? [`${oss.length} OSS-${oss.length === 1 ? "Rechnung" : "Rechnungen"} (${oss.map((u) => String(u.daten.nummer ?? "")).slice(0, 10).join(", ")}) mit der Umsatzsteuer des Bestimmungslands: im Stapel auf ${k.erloese.oss} mit Land in Feld 40 und Steuersatz in Feld 41 – sie gehören in die OSS-Erklärung beim BZSt, nicht in die deutsche Voranmeldung. Feld 40 trägt nur das Länderkennzeichen (Privatpersonen, keine USt-IdNr.). Steuerschlüssel bitte prüfen (Konto über die Kontenvorgaben).`] : [];
     })()),
+    // E-165 (5.2): Vorsteuer-Teilabzug – zwei Buchungen je Beleg und Steuersatz
+    ...(teilabzug.length ? [`${teilabzug.length} ${teilabzug.length === 1 ? "Beleg ist" : "Belege sind"} nur teilweise zum Vorsteuerabzug berechtigt (§ 15 Abs. 4 UStG, Anteil laut Belegliste, Spalte „Vorsteuerabzug“): im Stapel je Steuersatz zwei Buchungen – der abziehbare Teil brutto mit BU-Schlüssel (DATEV rechnet daraus genau die abziehbare Vorsteuer), der nicht abziehbare Teil brutto ohne Steuer auf demselben Aufwandskonto (Text „ohne VSt“). Den Aufteilungsschlüssel legt die Kanzlei fest – bitte prüfen.`] : []),
+    // E-165 (A-3): Personenkonten mit Stammdaten
+    ...(personenkonten
+      ? [
+          `Personenkonten (Kontenvorgabe): Rechnungen, Skonto${zahlungenBuchen ? ", Zahlungseingänge" : ""} und Gutschriften stehen auf dem Personenkonto des Kunden (Debitoren 10000–69999) bzw. Leistenden, Belege per Überweisung oder Karte auf dem Kreditor des Lieferanten (70000–99999) statt auf ${k.forderungen}/${k.verbindlichkeiten}; bar und privat bezahlte Belege wie bisher. Belegfeld 1 = Rechnungs- bzw. Belegnummer – damit lassen sich die Zahlungen aus dem Kontoauszug ausziffern (OPOS). ${stamm.length ? `Stammdaten (Name, Anschrift, USt-IdNr.) in EXTF_Debitoren_Kreditoren_${z.name}.csv (${stamm.length} ${stamm.length === 1 ? "Konto" : "Konten"}) – vor dem Buchungsstapel importieren.` : "Im Zeitraum kommt kein Personenkonto vor."}`,
+          ...(doppelt.length ? [`Personenkonten doppelt vergeben (${doppelt.join(", ")}) – vermutlich auf zwei Geräten gleichzeitig. Bitte vor dem Import klären.`] : []),
+        ]
+      : []),
     // StB-Prüfung (A-4): Soll-Stapel bilanzierender Betriebe mit Zahlungseingängen und offenen Forderungen zum Stichtag
     ...(bilanz
       ? [
           `Bilanzierender Betrieb${rechtsform ? ` (${rechtsform.text})` : ""}: Soll-Stapel – Rechnungen stehen mit dem Rechnungsdatum als Forderungen an Erlöse im Stapel (Leistungsdatum in Feld 115)${
             zahlungenBuchen
-              ? `, Zahlungseingänge als Bank (${k.bank}) an Forderungen (${k.forderungen}) zum Zahltag (Kontenvorgabe „Zahlungseingänge buchen“). Saldo ${k.forderungen} aus diesem Stapel zum ${datumDe(z.bis)}: ${betrag(saldo(k.forderungen))} € (offene Forderungen, siehe Rechnungsliste). Beim Buchen der Kontoauszüge diese Zahlungseingänge nicht noch einmal buchen – oder in den Kontenvorgaben „Zahlungseingänge buchen“ ausschalten.`
-              : `. Zahlungseingänge sind nicht gebucht – die Kanzlei bucht die Bank aus dem Kontoauszug (Bank an Forderungen ${k.forderungen}). Deshalb stehen im Stapel alle Rechnungen des Zeitraums als Forderung: Saldo ${k.forderungen} aus diesem Stapel zum ${datumDe(z.bis)}: ${betrag(saldo(k.forderungen))} €. Erst nach dem Buchen der Kontoauszüge bleiben die offenen Forderungen stehen – laut Rechnungsliste zum ${datumDe(z.bis)}: ${betrag(offenZumEnde)} €. Wer die Zahlungseingänge aus ${MARKE.name} übernehmen will: in den Kontenvorgaben „Zahlungseingänge buchen“ einschalten – dann die Zahlungen aus dem Kontoauszug nicht noch einmal buchen.`
-          }${ist ? " Ist-Versteuerung: Feld „Datum Zuord. Steuerperiode“ trägt den Zahltag; alternativ im Mandantenstamm „Ist“ mit OPOS – bitte beim Testimport prüfen." : ""}`,
+              ? `, Zahlungseingänge als Bank (${k.bank}) an Forderungen (${forderungsKonto}) zum Zahltag (Kontenvorgabe „Zahlungseingänge buchen“). Saldo ${forderungsKonto} aus diesem Stapel zum ${datumDe(z.bis)}: ${betrag(saldo(k.forderungen))} € (offene Forderungen, siehe Rechnungsliste). Beim Buchen der Kontoauszüge diese Zahlungseingänge nicht noch einmal buchen – oder in den Kontenvorgaben „Zahlungseingänge buchen“ ausschalten.`
+              : `. Zahlungseingänge sind nicht gebucht – die Kanzlei bucht die Bank aus dem Kontoauszug (Bank an Forderungen ${forderungsKonto}). Deshalb stehen im Stapel alle Rechnungen des Zeitraums als Forderung: Saldo ${forderungsKonto} aus diesem Stapel zum ${datumDe(z.bis)}: ${betrag(saldo(k.forderungen))} €. Erst nach dem Buchen der Kontoauszüge bleiben die offenen Forderungen stehen – laut Rechnungsliste zum ${datumDe(z.bis)}: ${betrag(offenZumEnde)} €. Wer die Zahlungseingänge aus ${MARKE.name} übernehmen will: in den Kontenvorgaben „Zahlungseingänge buchen“ einschalten – dann die Zahlungen aus dem Kontoauszug nicht noch einmal buchen.`
+          }${ist ? ` Ist-Versteuerung: Feld „Datum Zuord. Steuerperiode“ trägt den Zahltag; alternativ im Mandantenstamm „Ist“ mit OPOS – bitte beim Testimport prüfen. ${personenkonten ? "Personenkonten sind eingeschaltet (Kontenvorgabe) – die empfohlene Einrichtung für Ist-Versteuerung mit Bilanzierung: Die Kanzlei kann OPOS führen und die Steuer nach Zahlungseingang zuordnen." : "Empfohlene Einrichtung laut Kanzlei für Ist-Versteuerung mit Bilanzierung: Personenkonten mit OPOS – in den Kontenvorgaben „Personenkonten für Kunden und Lieferanten (OPOS)“ einschalten."}` : ""}`,
         ]
       : []),
   ];
@@ -1196,6 +1335,7 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
       ...(wichtig.length ? [`Wichtig`, ...wichtig.map((w) => `- ${w}`), ``] : []),
       `Inhalt`,
       `- EXTF_Buchungsstapel_${z.name}.csv: DATEV-Format „Buchungsstapel“ (${sb.kontenrahmen}), ${buchungen.length} Buchungen. Festschreibung 0 (Kopf und Feld 114): Der Stapel wird beim Import nicht festgeschrieben – erst nach Prüfung in der Kanzlei festschreiben. Belegbuchungen mit dem Zahlungskonto in Feld „Konto“ und dem Sachkonto mit BU-Schlüssel in Feld „Gegenkonto“; Stornos als Generalumkehr (Feld 118 = 1). Feld 103 „Buchungs GUID“ bleibt leer, die stabile Kennung steht in Beleginfo 1 („Buchungs-GUID“). Bitte vor der Übernahme einen Testimport machen.${sb.beraternummer && sb.mandantennummer ? "" : " Berater- und Mandantennummer fehlen und sind für den Import nötig."}`,
+      ...(stamm.length ? [`- EXTF_Debitoren_Kreditoren_${z.name}.csv: DATEV-Format „Debitoren/Kreditoren“ (Stammdaten der ${stamm.length} Personenkonten im Stapel: Nummer, Name, Anschrift, USt-IdNr.) – vor dem Buchungsstapel importieren.`] : []),
       `- Buchungsliste_${z.name}.csv: dieselben Buchungen zum Lesen (Semikolon, UTF-8), mit stabiler Buchungs-GUID je Buchung und Kennzeichen „Generalumkehr“.`,
       `- Rechnungen_${z.name}.csv: ${rechnungen.length} gestellte Rechnungen mit Steuerart, Netto, USt, Brutto, Fälligkeit, Zahlungseingang und offenem Betrag; Summen je Steuersatz am Ende.`,
       ...(gutschriften.length ? [`- Gutschriften_${z.name}.csv: ${gutschriften.length} ${gutschriften.length === 1 ? "Gutschrift" : "Gutschriften"}, die der Betrieb als Leistungsempfänger ausgestellt hat – nicht in der Rechnungsliste; im Buchungsstapel als Aufwand (bezogene Leistungen).`] : []),
@@ -1216,8 +1356,10 @@ export function steuerpaket(s: Stand, z: Zeitraum, sb: Steuerberatung, dateien: 
       `- An das Finanzamt gezahlte Umsatzsteuer-Vorauszahlungen und Erstattungen.`,
       `- Abschreibungen (AfA) und Anlagenverzeichnis.`,
       `- Lohnjournal bzw. Lohnabrechnungen.`,
+      // E-165 (Praxis): Umsätze, die nicht über Rechnungen der App laufen (Abrechnungszentrum, Zuzahlungen, Empfang)
+      ...(umsaetzeAusserhalbDerApp(s) ? [`- Umsätze, die nicht über Rechnungen aus ${MARKE.name} laufen: z. B. Sammelauszahlungen eines Abrechnungszentrums für Kassenpatienten (Abrechnung mit den Krankenkassen nach § 302 SGB V) samt der damit verrechneten Gebühren, Zuzahlungen der Patienten und Verkäufe am Empfang. Einnahme ist der Betrag vor Abzug der Gebühr; die Gebühr ist eine eigene Ausgabe. Diese Umsätze fehlen im Buchungsstapel und in der Voranmeldung der App.`] : []),
       ``,
-      `Zuordnung: Rechnungen nach Rechnungsdatum${istEuer ? " (im Buchungsstapel nach Zahlungseingang)" : ""}, Belege nach Belegdatum. Im Buchungsstapel stehen bei Rechnungen das Leistungsdatum (Feld „Leistungsdatum“) und der Tag, nach dem die App die Umsatzsteuer zuordnet (Feld „Datum Zuord. Steuerperiode“). Forderungen und Verbindlichkeiten gehen auf die Konten ohne Kontokorrent (${k.forderungen}/${k.verbindlichkeiten})${vorgaben?.belegeGegenBank ? `; Belege per Überweisung oder Karte direkt gegen Bank (${k.bank}, Kontenvorgabe)` : ""}.${pdfs ? "" : " Die PDFs der Ausgangsrechnungen liegen beim Betrieb."}`,
+      `Zuordnung: Rechnungen nach Rechnungsdatum${istEuer ? " (im Buchungsstapel nach Zahlungseingang)" : ""}, Belege nach Belegdatum. Im Buchungsstapel stehen bei Rechnungen das Leistungsdatum (Feld „Leistungsdatum“) und der Tag, nach dem die App die Umsatzsteuer zuordnet (Feld „Datum Zuord. Steuerperiode“). ${personenkonten ? `Forderungen und Verbindlichkeiten gehen auf Personenkonten (Debitoren 10000 ff., Kreditoren 70000 ff., Kontenvorgabe); Barbelege und Kasse wie bisher` : `Forderungen und Verbindlichkeiten gehen auf die Konten ohne Kontokorrent (${k.forderungen}/${k.verbindlichkeiten})`}${vorgaben?.belegeGegenBank ? `; Belege per Überweisung oder Karte direkt gegen Bank (${k.bank}, Kontenvorgabe)` : ""}.${pdfs ? "" : " Die PDFs der Ausgangsrechnungen liegen beim Betrieb."}`,
       // Kleinunternehmer geben in der Regel keine Voranmeldung ab – dann kein Satz dazu; sonst nach „Mein Betrieb“ (Soll/Ist)
       ...(ku
         ? []

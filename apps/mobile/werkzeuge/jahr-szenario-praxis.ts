@@ -39,7 +39,7 @@ import {
 import { unzipSync } from "fflate";
 import { LEERER_STAND, anlegen, ausgeben, belegSetzen, bezahltSetzen, felderSetzen, personSetzen, profilSetzen, steuerberatungSetzen, stornieren, type Stand, type Unterlage } from "../src/unterlagen/speicher";
 import { euerUebernahme, steuerpaket, type PaketErgebnis, type Zeitraum } from "../src/unterlagen/steuerpaket";
-import { nurSteuerfreieUmsaetze, umsaetzeFuer } from "../src/unterlagen/ustAusRechnungen";
+import { gemischteUmsaetze, nurSteuerfreieUmsaetze, umsaetzeFuer, vorsteuerquoteAus } from "../src/unterlagen/ustAusRechnungen";
 import { fussAngaben, fusszeileStempeln } from "../src/unterlagen/fusszeile";
 import { mitSchriften } from "../src/unterlagen/schriften";
 import { deckblattHtml, mappeDateiname, mappeZusammenfuegen, mappenAuswahl, seitenzahl, startSeiten } from "../src/unterlagen/kontrollmappe";
@@ -296,8 +296,10 @@ export function standBauen(): Bau {
   const belegDateien: Bau["belegDateien"] = [];
   for (const b of D.BELEGE) {
     const jetzt = t(b.datum, 18).toISOString();
-    // Die App kennt nur „Vorsteuer abziehbar“ an/aus – gemischt genutzte Belege werden ausgeschaltet und der Anteil von Hand in die Voranmeldung eingetragen
-    const vst = b.zuordnung === "pflichtig";
+    // E-165 (StB-Prüfung 5.2): gemischt genutzte Belege mit Vorsteuer-Teilabzug (vorläufige Quote 13 %, § 15 Abs. 4 UStG);
+    // rein steuerfrei genutzte ohne Vorsteuer, rein steuerpflichtig genutzte voll
+    const vst = b.zuordnung === "pflichtig" || b.zuordnung === "gemischt";
+    const anteil = b.zuordnung === "gemischt" ? { vorsteuer_anteil: D.QUOTE_VORLAEUFIG } : {};
     if (b.datei === "xml") {
       const xml = xrechnungUbl(
         {
@@ -315,19 +317,23 @@ export function standBauen(): Bau {
         auffaellig.push(`E-Rechnung ${b.nummer} ließ sich nicht lesen (eRechnungLesen → null).`);
         continue;
       }
-      // wie die App (seiten/Belege.tsx): bei nur steuerfreien Umsätzen startet der Vorsteuer-Schalter „aus“ (StB-Prüfung 5.2)
-      const roh = belegAusERechnung(gelesen, b.id, jetzt, { kleinunternehmer: false, nurSteuerfrei: nurSteuerfreieUmsaetze(s.unterlagen, s.betrieb) });
-      infos.push(`E-Rechnung ${b.nummer} eingelesen: Lieferant „${roh.lieferant}“, Kategorie zunächst „${kategorieFuer(roh.kategorie).titel}“, Vorsteuer ${roh.vorsteuer ? "AN" : "aus"} – für ein Gerät, das nur der steuerfreien Heilbehandlung dient, von Hand auf „Anschaffung über 800 €“ und Vorsteuer aus gestellt. Notiz: ${(roh.notiz ?? "").replace(/\n/g, " | ")}`);
-      vergleichText("E-Rechnung einlesen", `${b.nummer}: Vorsteuer-Schalter nach dem Einlesen (Gerät nur für steuerfreie Heilbehandlung → kein Abzug, § 15 Abs. 2 Nr. 1 UStG)`, roh.vorsteuer ? "an" : "aus", "aus");
-      s = belegSetzen(s, { ...roh, kategorie: b.kategorie, vorsteuer: vst, bezahlt: b.bezahlt, datei: `${b.id}.xml` }, t(b.datum, 18));
+      // wie die App (seiten/Belege.tsx): bei nur steuerfreien Umsätzen startet der Vorsteuer-Schalter „aus“, bei gemischten
+      // Umsätzen anteilig mit der Vorsteuerquote aus „Mein Betrieb“ (StB-Prüfung 5.2, E-165)
+      const roh = belegAusERechnung(gelesen, b.id, jetzt, { kleinunternehmer: false, nurSteuerfrei: nurSteuerfreieUmsaetze(s.unterlagen, s.betrieb), gemischt: gemischteUmsaetze(s.unterlagen, s.betrieb), vorsteuerquote: vorsteuerquoteAus(s.betrieb) });
+      const vstText = (x: Beleg) => (!x.vorsteuer ? "aus" : x.vorsteuer_anteil ? `anteilig ${x.vorsteuer_anteil} %` : x.vorsteuer_betrag_cent ? `anteilig ${euro(x.vorsteuer_betrag_cent)} €` : "voll");
+      infos.push(`E-Rechnung ${b.nummer} eingelesen: Lieferant „${roh.lieferant}“, Kategorie zunächst „${kategorieFuer(roh.kategorie).titel}“, Vorsteuer ${vstText(roh)} – für ein Gerät, das nur der steuerfreien Heilbehandlung dient, von Hand auf „Anschaffung über 800 €“ und Vorsteuer aus gestellt. Notiz: ${(roh.notiz ?? "").replace(/\n/g, " | ")}`);
+      // Praxis mit steuerfreien UND steuerpflichtigen Umsätzen: nicht „voll“, sondern der vorläufige Anteil aus „Mein Betrieb“ zum Prüfen
+      vergleichText("E-Rechnung einlesen", `${b.nummer}: Vorsteuer nach dem Einlesen (gemischte Umsätze, Vorsteuerquote ${D.BETRIEB.vorsteuerquote} % in „Mein Betrieb“ → anteilig vorbelegt, nicht voll; § 15 Abs. 4 UStG)`, vstText(roh), `anteilig ${D.QUOTE_VORLAEUFIG} %`);
+      vergleichText("E-Rechnung einlesen", `${b.nummer}: Hinweis im Beleg, den Anteil zu prüfen`, /Vorsteuerquote aus „Mein Betrieb“/.test(roh.notiz ?? "") ? "ja" : "nein", "ja");
+      s = belegSetzen(s, { ...roh, kategorie: b.kategorie, vorsteuer: vst, vorsteuer_anteil: null, ...anteil, bezahlt: b.bezahlt, datei: `${b.id}.xml` }, t(b.datum, 18));
       belegDateien.push({ datei: `${b.id}.xml`, xml });
     } else {
       const sm = D.belegSumme(b);
       const beleg: Beleg = {
         id: b.id, datum: b.datum, lieferant: b.lieferant, nummer: b.nummer, kategorie: b.kategorie,
         steuer: sm.jeSatz.map((x) => ({ satz: x.satz, brutto_cent: x.brutto })),
-        vorsteuer: vst, zahlung: b.zahlung, bezahlt: b.bezahlt, notiz: b.notiz ?? null, datei: `${b.id}.pdf`, quelle: "foto", erstellt: jetzt, geaendert: jetzt,
-        // R10: CloudOffice (Irland) als § 13b-Beleg – Kz 46/47 kommen aus dem Beleg; die anteilige Vorsteuer (Kz 67) trägt die Praxis von Hand ein
+        vorsteuer: vst, ...anteil, zahlung: b.zahlung, bezahlt: b.bezahlt, notiz: b.notiz ?? null, datei: `${b.id}.pdf`, quelle: "foto", erstellt: jetzt, geaendert: jetzt,
+        // R10: CloudOffice (Irland) als § 13b-Beleg – Kz 46/47 kommen aus dem Beleg; E-165: die anteilige Vorsteuer (Kz 67) auch
         ...(b.p13b ? { steuerschuld: "eu" as const } : {}),
       };
       s = belegSetzen(s, beleg, t(b.datum, 18));
@@ -336,10 +342,10 @@ export function standBauen(): Bau {
     const app = belegSummen(s.belege.find((x) => x.id === b.id)!);
     const sm = D.belegSumme(b);
     vergleich(`Beleg ${b.id} ${b.lieferant}`, "Brutto", app.brutto_cent, sm.brutto);
-    vergleich(`Beleg ${b.id} ${b.lieferant}`, `Vorsteuer in der App (${b.zuordnung})`, app.vorsteuer_cent, vst ? sm.ust : 0);
+    vergleich(`Beleg ${b.id} ${b.lieferant}`, `Vorsteuer in der App (${b.zuordnung}${b.zuordnung === "gemischt" && !b.p13b ? ` – ${D.QUOTE_VORLAEUFIG} %` : ""})`, app.vorsteuer_cent, D.vstAbziehbarBeleg(b));
   }
-  /** derselbe Stand mit den Startwerten der App: neuer Beleg „Vorsteuer abziehbar“ an (Belege.tsx), E-Rechnung mit USt ebenso */
-  const sStandard: Stand = { ...s, belege: s.belege.map((b) => ({ ...b, vorsteuer: true })) };
+  /** derselbe Stand mit den Startwerten der App: neuer Beleg „Vorsteuer abziehbar“ voll (Belege.tsx), E-Rechnung mit USt ebenso */
+  const sStandard: Stand = { ...s, belege: s.belege.map((b) => ({ ...b, vorsteuer: true, vorsteuer_anteil: null, vorsteuer_betrag_cent: null })) };
 
   // ---------------------------------------------------------------- Website und Datenschutz
   const B = D.BETRIEB;
@@ -574,7 +580,7 @@ export function standBauen(): Bau {
   for (const eq of erwartet) {
     const id = `ust-${eq.q}`;
     let zeile: Omit<UstZeile, "formular"> | null = null;
-    dok({ id, vorlage: "ust_voranmeldung", datum: VA_ERSTELLT[eq.q]!, worum: `USt-Voranmeldung ${eq.q} (Ist): „Aus Rechnungen übernehmen“ (umsaetzeFuer, ${eq.rechnungen} Rechnungen mit Zahlungseingang), dann von Hand: 19 % +${euro(eq.empfang.netto)} € Empfang, ohne USt +${euro(eq.gkv)} € Kassen (Abrechnungszentrum) +${euro(eq.zuzahlungen)} € Zuzahlungen, Vorsteuer +${euro(eq.vstAnteil + eq.vst13b)} € (13 % aus gemischten Belegen${eq.st13b ? " und § 13b" : ""})${eq.st13b ? `, § 13b (Kz 46/47: ${euro(eq.bmg13b)} € / ${euro(eq.st13b)} €) nur als Notiz` : ""}.`,
+    dok({ id, vorlage: "ust_voranmeldung", datum: VA_ERSTELLT[eq.q]!, worum: `USt-Voranmeldung ${eq.q} (Ist): „Aus Rechnungen übernehmen“ (umsaetzeFuer, ${eq.rechnungen} Rechnungen mit Zahlungseingang), dann von Hand: 19 % +${euro(eq.empfang.netto)} € Empfang, ohne USt +${euro(eq.gkv)} € Kassen (Abrechnungszentrum) +${euro(eq.zuzahlungen)} € Zuzahlungen. Vorsteuer kommt jetzt vollständig aus den Belegen (E-165: voll bzw. anteilig 13 % je Beleg${eq.st13b ? `, § 13b Kz 46/47 ${euro(eq.bmg13b)} € / ${euro(eq.st13b)} € und Kz 67 anteilig ${euro(eq.vst13b)} €` : ""}).`,
       daten: () => ({ versteuerung: "ist" }),
       danach: () => {
         const erg = umsaetzeFuer(s.unterlagen, eq.q, s.betrieb, "ist", s.belege, false)!;
@@ -583,7 +589,8 @@ export function standBauen(): Bau {
         vergleich(`USt-Übernahme ${eq.q}`, "Umsätze 19 % aus Rechnungen (nach Zahlungseingang)", ausEuro(erg.werte.umsatz_19 ?? "0"), eq.app.umsatz_19);
         vergleich(`USt-Übernahme ${eq.q}`, "Umsätze 7 %", ausEuro(erg.werte.umsatz_7 ?? "0"), 0);
         vergleich(`USt-Übernahme ${eq.q}`, "Umsätze ohne USt aus Rechnungen (steuerfreie Heilbehandlung)", ausEuro(erg.werte.umsatz_48 ?? "0"), eq.app.umsatz_frei);
-        vergleich(`USt-Übernahme ${eq.q}`, "Vorsteuer aus Belegen mit Schalter „an“ (nur rein steuerpflichtig genutzte)", ausEuro(erg.werte.vorsteuer ?? "0"), eq.app.vorsteuer);
+        vergleich(`USt-Übernahme ${eq.q}`, `Vorsteuer aus Belegen (pflichtig voll, gemischt ${D.QUOTE_VORLAEUFIG} % je Beleg – E-165)`, ausEuro(erg.werte.vorsteuer ?? "0"), eq.app.vorsteuer);
+        vergleich(`USt-Übernahme ${eq.q}`, "Vorsteuer aus § 13b (Kz 67, anteilig)", ausEuro(erg.werte.vorsteuer_13b ?? "0"), eq.app.vorsteuer13b);
         vergleich(`USt-Übernahme ${eq.q}`, "Vorsteuer mit den Startwerten der App (alle Belege „an“)", ausEuro(std.werte.vorsteuer ?? "0"), eq.vstStandard);
         const plus = (k: string, c: number) => euro(ausEuro(erg.werte[k] ?? "0") + c);
         s = felderSetzen(s, id, {
@@ -591,14 +598,12 @@ export function standBauen(): Bau {
           umsatz_19: plus("umsatz_19", eq.empfang.netto),
           // seit r9 eigenes Feld Kz 48 (steuerfreie Umsätze ohne Vorsteuerabzug)
           umsatz_48: plus("umsatz_48", eq.gkv + eq.zuzahlungen),
-          vorsteuer: plus("vorsteuer", eq.vstAnteil),
-          // Vorsteuer aus § 13b nur anteilig (gemischt genutzt, § 15 Abs. 4 UStG) – von Hand in Kz 67
-          ...(eq.vst13b ? { vorsteuer_13b: euro(eq.vst13b) } : {}),
+          // E-165: Vorsteuer (Kz 66) und Vorsteuer aus § 13b (Kz 67) unverändert aus der Übernahme – kein Nachtrag von Hand
           notiz: [
             `Umsätze ohne USt sind steuerfreie Heilbehandlungen nach § 4 Nr. 14 UStG → Kz 48 (steuerfreie Umsätze ohne Vorsteuerabzug), nicht Kz 41/43. Darin: Rechnungen ${euro(eq.reFrei)} €, Abrechnungszentrum ${euro(eq.gkv)} €, Zuzahlungen ${euro(eq.zuzahlungen)} €.`,
             `19 %: Rechnungen ${euro(eq.rePflichtig)} € + Empfang (EC-Terminal) ${euro(eq.empfang.netto)} €.`,
-            `Vorsteuer: voll abziehbar ${euro(eq.vstVoll)} €; gemischt genutzte Belege ${euro(eq.gemischtGesamt)} € × ${D.QUOTE_VORLAEUFIG} % = ${euro(eq.vstAnteil)} € (vorläufiger Umsatzschlüssel, § 15 Abs. 4 UStG)${eq.st13b ? `; Vorsteuer aus § 13b ${euro(eq.vst13b)} € (Kz 67)` : ""}.`,
-            ...(eq.st13b ? [`§ 13b UStG (CloudOffice Ireland Ltd.): Bemessungsgrundlage ${euro(eq.bmg13b)} € (Kz 46), Steuer ${euro(eq.st13b)} € (Kz 47) aus dem Beleg übernommen; Vorsteuer daraus anteilig ${euro(eq.vst13b)} € (Kz 67).`] : []),
+            `Vorsteuer: voll abziehbar ${euro(eq.vstVoll)} €; gemischt genutzte Belege mit Teilabzug ${D.QUOTE_VORLAEUFIG} % je Beleg ${euro(eq.vstAnteil)} € (von ${euro(eq.gemischtGesamt)} €, vorläufiger Umsatzschlüssel, § 15 Abs. 4 UStG)${eq.st13b ? `; Vorsteuer aus § 13b ${euro(eq.vst13b)} € (Kz 67)` : ""}.`,
+            ...(eq.st13b ? [`§ 13b UStG (CloudOffice Ireland Ltd.): Bemessungsgrundlage ${euro(eq.bmg13b)} € (Kz 46), Steuer ${euro(eq.st13b)} € (Kz 47), Vorsteuer daraus anteilig ${euro(eq.vst13b)} € (Kz 67) – alles aus dem Beleg übernommen.`] : []),
           ].join("\n"),
         }, t(VA_ERSTELLT[eq.q]!, 10));
       } });
@@ -631,12 +636,12 @@ export function standBauen(): Bau {
       vergleich("EÜR-Übernahme", "Umsatzsteuerpflichtige Einnahmen aus Rechnungen (netto)", zahl(uebernahme.einnahmen, EUER_ZEILE_STEUERPFLICHTIG), eu.rePflichtig);
       vergleich("EÜR-Übernahme", "Steuerfreie Einnahmen aus Rechnungen (Heilbehandlung)", zahl(uebernahme.einnahmen, EUER_ZEILE_STEUERFREI), eu.reFrei);
       vergleich("EÜR-Übernahme", "Vereinnahmte Umsatzsteuer aus Rechnungen", zahl(uebernahme.einnahmen, "Vereinnahmte Umsatzsteuer sowie Umsatzsteuer auf unentgeltliche Wertabgaben"), eu.reUst);
-      vergleich("EÜR-Übernahme", "Gezahlte Vorsteuer (nur Belege mit Schalter „an“)", zahl(uebernahme.ausgaben, "Gezahlte Vorsteuerbeträge"), eu.vstPflichtigBezahlt);
+      vergleich("EÜR-Übernahme", "Gezahlte Vorsteuer (abziehbarer Teil: pflichtig voll, gemischt 13 % – E-165)", zahl(uebernahme.ausgaben, "Gezahlte Vorsteuerbeträge"), eu.vstAbziehbarBezahlt);
       vergleich("EÜR-Übernahme", "Betriebsausgaben aus Belegen gesamt (inkl. Vorsteuerzeile, ohne Anlage)", uebernahme.ausgaben.reduce((a, x) => a + ausEuro(x.betrag ?? "0"), 0), eu.ausgabenBelege);
       for (const [kat, w] of Object.entries(eu.nachKategorie)) {
         const titel = kategorieFuer(kat).titel;
         const zeile = uebernahme.ausgaben.find((x) => (x.text ?? "").startsWith(titel));
-        vergleich("EÜR-Übernahme", `Kategorie ${titel} (wie in der App: netto bei Vorsteuer an, sonst brutto)`, zeile ? ausEuro(zeile.betrag ?? "0") : 0, w.appSicht);
+        vergleich("EÜR-Übernahme", `Kategorie ${titel} (brutto abzüglich abziehbarer Vorsteuer – nicht abziehbare Vorsteuer ist Ausgabe)`, zeile ? ausEuro(zeile.betrag ?? "0") : 0, w.appSicht);
       }
       vergleichText("EÜR-Übernahme", "Anlagen (Kombigerät) gemeldet", String(uebernahme.anlagen), "1");
       vergleichText("EÜR-Übernahme", "unbezahlte Rechnungen des Jahres", String(uebernahme.unbezahlt), "2");

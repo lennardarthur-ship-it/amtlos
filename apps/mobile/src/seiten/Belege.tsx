@@ -1,6 +1,6 @@
 import { memo, useEffect, useRef, useState } from "react";
 import { Image, Linking, View } from "react-native";
-import { ANLAGE_ARTEN, KATEGORIEN, STEUERSAETZE, STEUERSCHULD_ARTEN, ZAHLUNGSWEGE, belegAusERechnung, belegGezahlt, belegSummen, cent, eRechnungAusPdf, eRechnungLesen, kaeuferFremd, kategorieFuer, steuerschuldBetrag, zeitDe, type Beleg } from "@amtlos/fachlogik";
+import { ANLAGE_ARTEN, KATEGORIEN, STEUERSAETZE, STEUERSCHULD_ARTEN, ZAHLUNGSWEGE, belegAusERechnung, belegGezahlt, belegSummen, belegTeilabzug, cent, eRechnungAusPdf, eRechnungLesen, kaeuferFremd, kategorieFuer, steuerschuldBetrag, vorsteuerAnteilAus, vorsteuerAufteilung, zeitDe, type Beleg } from "@amtlos/fachlogik";
 import { T as TEXT } from "../texte";
 import { regelwert } from "../pflichten/check";
 import { AuswahlZeile } from "../ui/auswahlseite";
@@ -13,7 +13,7 @@ import { ausUtf8 } from "../unterlagen/sicherung";
 import { dateiTeilenBytes, dateiWaehlenBytes } from "../unterlagen/sicherungDatei";
 import { belegEndgueltigLoeschbar, leererBeleg, neueId } from "../unterlagen/speicher";
 import { istKleinunternehmer } from "../unterlagen/steuerpaket";
-import { nurSteuerfreieUmsaetze } from "../unterlagen/ustAusRechnungen";
+import { gemischteUmsaetze, nurSteuerfreieUmsaetze, vorsteuerquoteAus } from "../unterlagen/ustAusRechnungen";
 import { useAmtlos } from "../zustand";
 import { bestaetigen } from "../ui/bestaetigen";
 import { BuehnenBlatt, GrosserBetrag, datumKurz } from "./gemeinsam";
@@ -71,7 +71,7 @@ export function useBelegErfassen() {
         if (gelesen) {
           // R10: Käufer der E-Rechnung gegen „Mein Betrieb“ prüfen – fremd adressiert: Vorsteuer aus, Warnung
           const betrieb = { name: z.stand.betrieb.name, plz: z.stand.betrieb.plz, verantwortlich: z.stand.betrieb.verantwortlich };
-          const b = { ...belegAusERechnung(gelesen, neueId(), new Date().toISOString(), { kleinunternehmer: ku || kuZeit(gelesen.datum), nurSteuerfrei: nurSteuerfreieUmsaetze(z.stand.unterlagen, z.stand.betrieb), betrieb }), datei: name };
+          const b = { ...belegAusERechnung(gelesen, neueId(), new Date().toISOString(), { kleinunternehmer: ku || kuZeit(gelesen.datum), nurSteuerfrei: nurSteuerfreieUmsaetze(z.stand.unterlagen, z.stand.betrieb), gemischt: gemischteUmsaetze(z.stand.unterlagen, z.stand.betrieb), vorsteuerquote: vorsteuerquoteAus(z.stand.betrieb), betrieb }), datei: name };
           anlegen(b, false);
           if (kaeuferFremd(gelesen, betrieb)) melden(TEXT.beleg_kaeufer_fremd, "info");
           else melden(TEXT.erechnung_gelesen(gelesen.lieferant.name, euro(gelesen.summen.brutto_cent)));
@@ -196,6 +196,8 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
   const ku = istKleinunternehmer(z.stand);
   const kuBis = (z.stand.betrieb.ku_bis ?? "").trim();
   const [vorsteuerOffen, setVorsteuerOffen] = useState(false);
+  // E-165: steuerfreie und steuerpflichtige Umsätze – Hinweis „voll nur bei rein steuerpflichtiger Verwendung“
+  const gemischt = gemischteUmsaetze(z.stand.unterlagen, z.stand.betrieb);
   // R12: Skonto beim Bezahlen als Text, damit „4,“ beim Tippen nicht verloren geht
   const [skontoText, setSkontoText] = useState(() => betragText(b?.skonto_cent ?? 0));
   useEffect(
@@ -286,6 +288,8 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
           ))}
         </Karte>
         {ku ? null : <Schalter label={TEXT.beleg_vorsteuer} hilfe={TEXT.beleg_vorsteuer_hilfe} wert={b.vorsteuer} aendern={(w) => setze({ vorsteuer: w })} />}
+        {/* E-165 (StB-Prüfung 5.2): Vorsteuer voll oder anteilig abziehbar (§ 15 Abs. 4 UStG) */}
+        {!ku && b.vorsteuer ? <VorsteuerTeil b={b} setze={setze} gemischt={gemischt} /> : null}
         {/* R10: § 13b als Leistungsempfänger – auch für Kleinunternehmer */}
         <Schalter label={TEXT.beleg_steuerschuld} hilfe={TEXT.beleg_steuerschuld_hilfe} wert={!!b.steuerschuld} aendern={(w) => setze({ steuerschuld: w ? (b.steuerschuld ?? "eu") : null })} />
         {b.steuerschuld ? (
@@ -345,6 +349,76 @@ export function BelegSeite({ id, neu }: { id: string; neu?: boolean }) {
           stil={{ marginTop: 24 }}
         />}
     </BuehnenBlatt>
+  );
+}
+
+/**
+ * E-165 (StB-Prüfung 5.2): Vorsteuer eines Belegs voll oder anteilig abziehbar – Anteil in Prozent oder als Betrag.
+ * Darunter, was abziehbar ist und was als Ausgabe zählt. Bei gemischten Umsätzen ein Hinweis, solange „voll“ gewählt ist.
+ */
+function VorsteuerTeil({ b, setze, gemischt }: { b: Beleg; setze: (w: Partial<Beleg>) => void; gemischt: boolean }) {
+  const teile = vorsteuerAufteilung(b);
+  const ust = teile.reduce((a, x) => a + x.ust_cent, 0);
+  const [anteilig, setAnteilig] = useState(() => belegTeilabzug(b));
+  const [art, setArt] = useState<"prozent" | "betrag">(() => (b.vorsteuer_betrag_cent ? "betrag" : "prozent"));
+  const [prozentText, setProzentText] = useState(() => (b.vorsteuer_anteil ? String(b.vorsteuer_anteil).replace(".", ",") : ""));
+  const [betragTextV, setBetragTextV] = useState(() => betragText(b.vorsteuer_betrag_cent ?? 0));
+  if (!ust) return null;
+  const abziehbar = teile.reduce((a, x) => a + x.abziehbar_cent, 0);
+  const betragFalsch = betragTextV.trim() !== "" && (() => {
+    const c = cent(betragTextV);
+    return c === null || c <= 0 || c >= ust;
+  })();
+  return (
+    <View>
+      <Wahl
+        label={TEXT.beleg_vst_umfang}
+        wert={anteilig ? "anteilig" : "voll"}
+        aendern={(w) => {
+          setAnteilig(w === "anteilig");
+          if (w === "voll") setze({ vorsteuer_anteil: null, vorsteuer_betrag_cent: null });
+        }}
+        optionen={[
+          { wert: "voll" as const, text: TEXT.beleg_vst_voll },
+          { wert: "anteilig" as const, text: TEXT.beleg_vst_anteilig },
+        ]}
+      />
+      {anteilig ? (
+        <View>
+          <Wahl
+            label={TEXT.beleg_vst_art}
+            wert={art}
+            aendern={(w) => {
+              setArt(w);
+              // umrechnen, damit der Anteil beim Wechsel erhalten bleibt (13 % → 29,34 € und umgekehrt)
+              const teil = belegTeilabzug(b) && abziehbar > 0 && abziehbar < ust;
+              if (w === "prozent") {
+                const text = prozentText.trim() || (teil ? String(Math.round((abziehbar / ust) * 10000) / 100).replace(".", ",") : "");
+                setProzentText(text);
+                setze({ vorsteuer_betrag_cent: null, vorsteuer_anteil: vorsteuerAnteilAus(text) });
+              } else {
+                const text = betragTextV.trim() || (teil ? betragText(abziehbar) : "");
+                setBetragTextV(text);
+                const c = cent(text);
+                setze({ vorsteuer_anteil: null, vorsteuer_betrag_cent: c && c > 0 && c < ust ? c : null });
+              }
+            }}
+            optionen={[
+              { wert: "prozent" as const, text: TEXT.beleg_vst_prozent },
+              { wert: "betrag" as const, text: TEXT.beleg_vst_betrag },
+            ]}
+          />
+          {art === "prozent" ? (
+            <Feld label={TEXT.beleg_vst_anteil} hilfe={TEXT.beleg_vst_anteil_hilfe} wert={prozentText} aendern={(w) => { setProzentText(w); setze({ vorsteuer_betrag_cent: null, vorsteuer_anteil: vorsteuerAnteilAus(w) }); }} keyboardType="decimal-pad" placeholder="z. B. 13" fehler={prozentText.trim() && vorsteuerAnteilAus(prozentText) === null ? TEXT.beleg_vst_anteil_falsch : null} />
+          ) : (
+            <Feld label={TEXT.beleg_vst_betrag_feld} hilfe={TEXT.beleg_vst_anteil_hilfe} wert={betragTextV} aendern={(w) => { setBetragTextV(w); const c = cent(w); setze({ vorsteuer_anteil: null, vorsteuer_betrag_cent: c && c > 0 && c < ust ? c : null }); }} keyboardType="decimal-pad" placeholder="0,00" fehler={betragFalsch ? TEXT.beleg_vst_betrag_falsch(euro(ust)) : null} />
+          )}
+          <T v="caption" leise stil={{ marginTop: 4 }}>{belegTeilabzug(b) ? TEXT.beleg_vst_ergebnis(euro(abziehbar), euro(ust - abziehbar)) : TEXT.beleg_vst_anteil_fehlt}</T>
+        </View>
+      ) : gemischt ? (
+        <Hinweis art="warnung" text={TEXT.beleg_vst_gemischt} />
+      ) : null}
+    </View>
   );
 }
 

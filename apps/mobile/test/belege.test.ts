@@ -132,9 +132,9 @@ describe("Paket für die Steuerberatung (E-133)", () => {
     expect(re[2]).toBe("Summe 19 %;;;;;;;100,00;19,00;119,00;19 %;;;;");
     expect(re[3]).toBe("Summe gesamt;;;;;;;100,00;19,00;119,00;;;;0,00;");
     const be = strFromU8(inhalt["Belege_2026-Q4.csv"]!).replace(/^\uFEFF/, "").split("\r\n");
-    expect(be[0]).toBe(`${MARKE.name}-Belegnr.;Datum;Lieferant;Belegnummer (Lieferant);Belegfeld 1 (DATEV);Kategorie;Zeile Anlage EÜR;Konto (DATEV);Netto;USt;Vorsteuer;Brutto;Steuersätze;Zahlung;Zahltag (für EÜR verwendet);Datei;Notiz;Steuerschuldnerschaft;Im Buchungsstapel;Erfasst am;Festgeschrieben am;Änderungen (siehe Änderungsprotokoll)`);
-    expect(be[1]).toBe("B2026-001;02.10.2026;Müller & Söhne;L-b1;L-b1;Waren und Material;Waren, Rohstoffe und Hilfsstoffe einschließlich der Nebenkosten;3400;100,00;19,00;19,00;119,00;19 %;Überweisung oder Karte;02.10.2026 (fehlt – Belegdatum verwendet);B2026-001_2026-10-02_Mueller-Soehne_L-b1.jpg;;;ja;02.10.2026, 10:00;;0");
-    expect(be[2]).toBe("Summe;;;;;;;;100,00;19,00;19,00;119,00;;;;;;;;;;");
+    expect(be[0]).toBe(`${MARKE.name}-Belegnr.;Datum;Lieferant;Belegnummer (Lieferant);Belegfeld 1 (DATEV);Kategorie;Zeile Anlage EÜR;Konto (DATEV);Netto;USt;Vorsteuer;Brutto;Steuersätze;Zahlung;Zahltag (für EÜR verwendet);Datei;Notiz;Steuerschuldnerschaft;Im Buchungsstapel;Erfasst am;Festgeschrieben am;Änderungen (siehe Änderungsprotokoll);Vorsteuerabzug`);
+    expect(be[1]).toBe("B2026-001;02.10.2026;Müller & Söhne;L-b1;L-b1;Waren und Material;Waren, Rohstoffe und Hilfsstoffe einschließlich der Nebenkosten;3400;100,00;19,00;19,00;119,00;19 %;Überweisung oder Karte;02.10.2026 (fehlt – Belegdatum verwendet);B2026-001_2026-10-02_Mueller-Soehne_L-b1.jpg;;;ja;02.10.2026, 10:00;;0;voll");
+    expect(be[2]).toBe("Summe;;;;;;;;100,00;19,00;19,00;119,00;;;;;;;;;;;");
     expect(Array.from(inhalt["Belege/B2026-001_2026-10-02_Mueller-Soehne_L-b1.jpg"]!)).toEqual([1, 2, 3]);
     // DATEV: Belegfeld 1 wie in der Belegliste, Buchungs-GUID gesetzt
     const extf = strFromU8(inhalt["EXTF_Buchungsstapel_2026-Q4.csv"]!, true).split("\r\n");

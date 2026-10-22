@@ -8,7 +8,7 @@ Kanzlei – im DATEV-Buchungsstapel, in Buchungsliste und Belegliste und in den 
 
 - **In der App:** Steuerberatung → „Kontenvorgaben der Kanzlei“. Felder leer lassen = Standardkonto. Dort lässt sich die
   Datei der Kanzlei laden und die eigene Einstellung als Datei teilen.
-- **Gespeichert:** im Stand unter `steuerberatung.kontenvorgaben` (Datensicherung, Synchronisation; Migration 6 → 7).
+- **Gespeichert:** im Stand unter `steuerberatung.kontenvorgaben` (Datensicherung, Synchronisation; Migration 6 → 7); Personenkonten am Kunden bzw. im Lieferanten-Verzeichnis (Migration 7 → 8).
 - **Im Paket:** `LIESMICH.txt` nennt unter „Mandant“ die verwendeten Vorgaben (oder „keine – Standardkonten des
   Kontenrahmens“) und die Gewinnermittlung.
 - Code: `packages/fachlogik/src/kontenvorgaben.ts` (Format, Prüfung), `buchungen.ts` (`kontenFuer`, Standardkonten).
@@ -33,6 +33,7 @@ Eine JSON-Datei (UTF-8, mit oder ohne BOM), z. B. `kontenvorgaben.json`:
   "optionen": {
     "belegeGegenBank": false,
     "zahlungenBuchen": false,
+    "personenkonten": false,
     "gewinnermittlung": "bilanz"
   }
 }
@@ -76,7 +77,22 @@ Die Art des Anlageguts wählt der Betrieb beim Beleg der Kategorie „Anschaffun
 |---|---|---|
 | `belegeGegenBank` | `true` / `false` (Standard) | Belege mit Zahlungsweg „Überweisung oder Karte“ direkt gegen `bank` statt gegen `verbindlichkeiten` |
 | `zahlungenBuchen` | `true` / `false` (Standard) | Nur bilanzierende Betriebe: Zahlungseingänge auf Rechnungen als Bank an Forderungen (Soll-Stapel, Befund A-4). **Standard aus** (Nachtrag der Kanzlei vom 22.10.2026): Kanzleien buchen die Bank aus dem Kontoauszug; im Stapel stehen dann alle Rechnungen des Zeitraums als Forderung, `LIESMICH.txt` nennt den Saldo und die laut Rechnungsliste offenen Forderungen. Ein nur, wenn die Kanzlei die Zahlungseingänge aus der App übernimmt – dann nicht noch einmal aus dem Kontoauszug buchen |
+| `personenkonten` | `true` / `false` (Standard) | E-165 (Befund A-3): **Personenkonten für Kunden und Lieferanten (OPOS)** statt der Sammelkonten `forderungen`/`verbindlichkeiten` – siehe Abschnitt „Personenkonten“. **Standard aus** |
 | `gewinnermittlung` | `"bilanz"` / `"euer"` / fehlt | Fehlt: nach Rechtsform (GmbH, UG, AG, GmbH & Co. KG, e. K.) bzw. Mitteilung des Finanzamts (§ 141 AO) – Bilanz; sonst EÜR. Bei Bilanz sperrt die App die EÜR-Übernahme (E-4) und gibt einen Soll-Stapel aus (Zahlungseingänge nur mit `zahlungenBuchen`) |
+
+## Personenkonten (Option `personenkonten`, E-165)
+
+Für Kanzleien, die offene Posten führen wollen (Prüfbericht A-3: „Optional je Kunde/Lieferant Personenkonto (10000 ff./70000 ff.) aus der Kunden-/Lieferantenliste, damit die Kanzlei OPOS führen kann; Bankzahlungen weiterhin aus dem Kontoauszug“).
+
+- **Nummern:** DATEV-Standardnummerierung bei Sachkontenlänge 4 – Debitoren **10000–69999**, Kreditoren **70000–99999** (Quellen: Lexware-Hilfe „Warum sind die Bereiche für Kunden- und Lieferantennummern fest definiert?“ – „Kundennummern 10000 bis 69999 … Lieferantennummern 70000 bis 99999“, wie in DATEV; Pickware-Hilfe „Kundennummern bei Einzel-Debitorenkonten“; abgerufen am 22.10.2026). Fortlaufend ab 10000 bzw. 70000 in der Reihenfolge des ersten Auftretens (Rechnungs- bzw. Belegdatum). Die Sachkontenlänge im DATEV-Kopf bleibt 4.
+- **Dauerhaft:** Einmal vergeben, bleibt die Nummer am Kunden (`kunden[].personenkonto`, angelegt, wenn der Kunde fehlt) bzw. im Lieferanten-Verzeichnis (`lieferanten`, Schlüssel USt-IdNr. bzw. Name ohne Groß-/Kleinschreibung und Satzzeichen) – auch wenn später frühere Rechnungen dazukommen. Vergeben wird beim Einschalten und vor jedem Steuerberater-Paket. Ein anders geschriebener Empfängername (z. B. falsch adressierte Rechnung) ist ein eigener Partner; Rechnung und Storno gleichen sich auf demselben Personenkonto aus.
+- **Buchungen:** Rechnungen Debitor an Erlös (Soll-Stapel: Rechnungsdatum; Ist-EÜR: Zahltag), gewährtes Skonto Skontokonto an Debitor, Zahlungseingänge Bank an Debitor nur mit `zahlungenBuchen`; Gutschriften Kreditor des Leistenden an Aufwand; Belege per Überweisung/Karte Sachkonto mit BU an Kreditor (mit `belegeGegenBank` weiter gegen Bank). Bar und privat bezahlte Belege, Kasse und Sachentnahmen unverändert. **Belegfeld 1** ist die Rechnungs- bzw. Belegnummer – so lassen sich die Zahlungen aus dem Kontoauszug gegen den offenen Posten ausziffern.
+- **Stammdaten:** `EXTF_Debitoren_Kreditoren_<Zeitraum>.csv` im Paket – DATEV-Format „Debitoren/Kreditoren“ (EXTF, Version 700, Datenkategorie 16, Formatversion 5 laut Formatübersichten von Drittanbietern), Spalten 1–40: Konto, Name (Unternehmen bzw. „keine Angabe“ bei Privatpersonen), Adressattyp, Kurzbezeichnung, EU-Land und USt-IdNr., Adressart, Straße, PLZ, Ort, Land. Vor dem Buchungsstapel importieren. **Im Testimport prüfen** (PRUEFLISTE T-129).
+- **Ist-Versteuerung bilanzierender Betriebe:** Feld 116 „Datum Zuord. Steuerperiode“ trägt weiter den Zahltag. Laut Kanzlei braucht Ist-Versteuerung mit Bilanzierung vermutlich Personenkonten (Mandantenstamm „Ist“ mit OPOS) – `LIESMICH.txt` nennt Personenkonten + OPOS als empfohlene Einrichtung; im Testimport bestätigen.
+
+## Vorsteuer-Teilabzug je Beleg (E-165)
+
+Keine Kontenvorgabe, aber für die Buchung wichtig: Ein Beleg kann „Vorsteuer anteilig“ tragen (Prozent oder Betrag, § 15 Abs. 4 UStG). Im Stapel steht er je Steuersatz in **zwei Zeilen** – der abziehbare Teil brutto mit BU 9/8 (so gerundet, dass DATEV genau die abziehbare Vorsteuer rechnet), der nicht abziehbare Teil brutto ohne Steuer auf demselben Aufwandskonto (Automatikkonto BU 40, Text „ohne VSt“); § 13b-Belege anteilig auf 3123/3143 bzw. 5923/5943. Die Belegliste nennt den Anteil (Spalte „Vorsteuerabzug“). DATEV kennt dafür auch die Buchungsschlüssel 90/9000 bzw. 9xxx „aufzuteilende Vorsteuer“ (ganze Vorsteuer auf das Konto „Aufzuteilende Vorsteuer“, die Kanzlei teilt auf – DATEV-Hilfe-Dokument 0904313); welche Variante die Kanzlei möchte: PRUEFLISTE T-130.
 
 ## Grenze
 

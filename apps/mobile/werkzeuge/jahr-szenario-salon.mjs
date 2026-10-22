@@ -290,6 +290,43 @@ function paketPruefen(name, zr, erg, ordner) {
     vergleich(`Paket ${name} (Vorgabe „Zahlungseingänge buchen“)`, "DATEV: Anzahl Buchungen = ohne Vorgabe + je Zahlungseingang/Erstattung eine", String(mit.length), String(erwBuchungen + zahlungenImZeitraum.length));
     const saldoMit = summe(mit.map((z) => (z[6] === "1410" ? 1 : z[7] === "1410" ? -1 : 0) * (z[1] === "H" ? -1 : 1) * (z[117] === "1" ? -1 : 1) * centAus(z[0])));
     vergleich(`Paket ${name} (Vorgabe „Zahlungseingänge buchen“)`, "DATEV: Saldo Forderungen 1410 zum 31.12. = offene Rechnungen (A-4)", saldoMit, offen);
+    // E-165 (A-3): unabhängige Gegenprobe „mit Personenkonten“ – eigenes Paket, das Standardpaket bleibt wie oben
+    const pkErg = S.jahrMitPersonenkonten(s, belegBytes);
+    fs.writeFileSync(path.join(OUT, pkErg.dateiname.replace(/\.zip$/, "-mit-Personenkonten.zip")), pkErg.zip);
+    const pkInhalt = S.unzipSync(pkErg.zip);
+    for (const [p, bytes] of Object.entries(pkInhalt)) {
+      fs.mkdirSync(path.dirname(path.join(OUT, "steuerpaket-jahr-personenkonten", p)), { recursive: true });
+      fs.writeFileSync(path.join(OUT, "steuerpaket-jahr-personenkonten", p), bytes);
+    }
+    merke("steuerpaket-jahr-personenkonten/", "Gegenprobe Jahrespaket mit der Kontenvorgabe „Personenkonten für Kunden und Lieferanten (OPOS)“ (E-165).");
+    const pz = csvLesen(pkInhalt[`EXTF_Buchungsstapel_${zr.name}.csv`], "latin1").slice(2);
+    const bereichPk = `Paket ${name} (Vorgabe „Personenkonten“)`;
+    vergleich(`Paket ${name}`, "Standardpaket ohne Stammdaten „Debitoren/Kreditoren“ (Vorgabe Standard aus)", Object.keys(inhalt).some((p) => p.startsWith("EXTF_Debitoren")) ? "ja" : "nein", "nein");
+    // Erwartung aus den Rohdaten: Debitoren je Empfänger (Name wie auf der Rechnung – die falsch adressierte 2026-010
+    // „Möwe Event GmbH“ und ihr Storno bekommen einen eigenen Debitor) nach der ersten Rechnung (Datum, Nummer) ab 10000, Kreditoren je
+    // Lieferant (Name ohne Groß-/Kleinschreibung und Satzzeichen) von Belegen per Überweisung/Karte (ohne Personal) ab 70000
+    const norm = (n) => n.toLowerCase().replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss").replace(/[^a-z0-9]+/g, " ").trim();
+    const empfaenger = (x) => x.r.kundeAbweichend?.name ?? D.KUNDEN[x.kunde].name;
+    const deb = new Map();
+    for (const x of [...D.vorgaenge()].sort((a, b) => a.datum.localeCompare(b.datum) || a.nummer.localeCompare(b.nummer, "de", { numeric: true }))) if (!deb.has(norm(empfaenger(x)))) deb.set(norm(empfaenger(x)), { nr: String(10000 + deb.size), name: empfaenger(x) });
+    const kredBelege = D.BELEGE.filter((b) => b.zahlung === "bank" && b.kategorie !== "personal");
+    const kred = new Map();
+    for (const b of [...kredBelege].sort((a, b) => a.datum.localeCompare(b.datum))) if (!kred.has(norm(b.lieferant))) kred.set(norm(b.lieferant), String(70000 + kred.size));
+    vergleich(bereichPk, "DATEV: keine Buchung auf den Sammelkonten 1410/1610", String(pz.filter((z) => ["1410", "1610"].includes(z[6]) || ["1410", "1610"].includes(z[7])).length), "0");
+    vergleich(bereichPk, "DATEV: Anzahl Buchungen wie ohne Personenkonten", pz.length, erwBuchungen);
+    const rechnungsZeilen = vg.flatMap((x) => Object.values(x.s.gruppen).filter((g) => g.netto + g.ust !== 0).map(() => [x.nummer, deb.get(norm(empfaenger(x))).nr]));
+    vergleich(bereichPk, "DATEV: jede Rechnungsbuchung auf dem Debitor ihres Kunden (Belegfeld 1 = Rechnungsnummer)", rechnungsZeilen.filter(([nr, k]) => !pz.some((z) => z[10] === nr && z[6] === k)).map(([nr]) => nr).join(", ") || "alle", "alle");
+    const saldoDeb = summe(pz.map((z) => (/^[1-6]\d{4}$/.test(z[6]) ? 1 : /^[1-6]\d{4}$/.test(z[7]) ? -1 : 0) * (z[1] === "H" ? -1 : 1) * (z[117] === "1" ? -1 : 1) * centAus(z[0])));
+    vergleich(bereichPk, "DATEV: Saldo aller Debitoren zum 31.12. = alle Rechnungen 2026 (wie 1410 ohne Personenkonten)", saldoDeb, alleRechnungen);
+    const falsch = deb.get(norm("Möwe Event GmbH")).nr;
+    vergleich(bereichPk, `DATEV: falsch adressierte Rechnung 2026-010 und ihr Storno 2026-011 gleichen sich auf demselben Debitor ${falsch} aus (Saldo 0)`, summe(pz.map((z) => (z[6] === falsch ? 1 : z[7] === falsch ? -1 : 0) * (z[1] === "H" ? -1 : 1) * (z[117] === "1" ? -1 : 1) * centAus(z[0]))), 0);
+    vergleich(bereichPk, "DATEV: Belege per Überweisung/Karte auf dem Kreditor ihres Lieferanten (Anzahl Buchungen)", pz.filter((z) => /^[7-9]\d{4}$/.test(z[6])).length, summe(kredBelege.map((b) => b.saetze.filter((x) => x.betrag).length)));
+    vergleich(bereichPk, "DATEV: Kreditoren je Lieferant (Nummer → Anzahl verschiedener Lieferanten)", new Set(pz.filter((z) => /^[7-9]\d{4}$/.test(z[6])).map((z) => z[6])).size, kred.size);
+    const stamm = csvLesen(pkInhalt[`EXTF_Debitoren_Kreditoren_${zr.name}.csv`], "latin1");
+    vergleich(bereichPk, "Stammdaten: Kopf EXTF/700/Kategorie 16 „Debitoren/Kreditoren“/Formatversion 5", stamm[0].slice(0, 5).join("|"), "EXTF|700|16|Debitoren/Kreditoren|5");
+    vergleich(bereichPk, "Stammdaten: Konten = Debitoren und Kreditoren (Nummer und Name)", stamm.slice(2).map((z) => `${z[0]} ${z[1] || z[5]}`).join("; "), [...[...deb.values()].map((d) => `${d.nr} ${d.name}`), ...[...kred].map(([n, nr]) => `${nr} ${kredBelege.find((b) => norm(b.lieferant) === n).lieferant}`)].sort().join("; "));
+    const lmPk = Buffer.from(pkInhalt["LIESMICH.txt"]).toString("utf8");
+    vergleich(bereichPk, "LIESMICH: Personenkonten erklärt, Stammdaten-Datei genannt, Ist + Bilanz: Personenkonten als empfohlene Einrichtung", /Personenkonten \(Kontenvorgabe\)/.test(lmPk) && lmPk.includes(`EXTF_Debitoren_Kreditoren_${zr.name}.csv`) && /die empfohlene Einrichtung für Ist-Versteuerung mit Bilanzierung/.test(lmPk) ? "ja" : "nein", "ja");
   }
   if (bl.some((b) => b.zahlung === "privat")) {
     const privat = zeilen.filter((z) => z[6] === "1890" || z[7] === "1890").length;

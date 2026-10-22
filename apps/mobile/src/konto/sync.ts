@@ -182,6 +182,7 @@ export function syncZusammenfuehren(lokal: Stand, entfernt: Stand): SyncZusammen
     belegArchiv: belege.filter((b) => b.ungueltig),
     mitarbeiter: nachId<Person>(lokal.mitarbeiter, entfernt.mitarbeiter, geloescht, "m:"),
     kunden: nachId<Person>(lokal.kunden, entfernt.kunden, geloescht, "k:"),
+    lieferanten: nachId<Person>(lokal.lieferanten, entfernt.lieferanten, geloescht, "l:"),
     fremd: fremdVereinen(lokal.fremd, entfernt.fremd),
     // R12: Kassenabschlüsse sind festgeschrieben – nach ID vereinen, nie löschen; Korrekturen beider Geräte bleiben
     kasse: kassenVereinen(lokal.kasse, entfernt.kasse),
