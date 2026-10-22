@@ -1,0 +1,58 @@
+# Prüfvermerk RA Dr. Weber 22.10.2026 (F.60): Benachrichtigung der Betroffenen bei hohem Risiko (Art. 34 DSGVO) als eigene Pflicht
+# Frist „unverzüglich“ (Art. 34 Abs. 1) nur im Text – kein fester Tag; das Risiko bewertest du im Datenpanne-Formular, der Katalog kennt es nicht
+schema_version: 1
+id: datenschutz.datenpanne_benachrichtigung
+version: 1
+katalog_nr: F.60
+titel:
+  de: Bei hohem Risiko die Betroffenen benachrichtigen
+kurz:
+  de: Bringt eine Datenpanne voraussichtlich ein hohes Risiko für die betroffenen Menschen, benachrichtigst du sie unverzüglich.
+erklaerung:
+  de: 'Hat die Verletzung des Schutzes personenbezogener Daten voraussichtlich ein hohes Risiko für die persönlichen Rechte und Freiheiten der Betroffenen zur Folge, benachrichtigst du die betroffenen Personen unverzüglich (Art. 34 Abs. 1 DSGVO) – zusätzlich zur Meldung an die Aufsichtsbehörde. Die Benachrichtigung beschreibt in klarer und einfacher Sprache, was passiert ist, und nennt mindestens eine Kontaktstelle für weitere Informationen, die wahrscheinlichen Folgen und die Maßnahmen, die du ergriffen hast oder vorschlägst (Art. 34 Abs. 2 in Verbindung mit Art. 33 Abs. 3 Buchst. b bis d DSGVO). Nicht nötig ist sie, wenn die betroffenen Daten geschützt waren – etwa durch Verschlüsselung –, wenn du durch spätere Maßnahmen sichergestellt hast, dass das hohe Risiko aller Wahrscheinlichkeit nach nicht mehr besteht, oder wenn sie unverhältnismäßigen Aufwand bedeuten würde; dann informierst du stattdessen öffentlich oder auf ähnlich wirksame Weise (Art. 34 Abs. 3 DSGVO). Die Aufsichtsbehörde kann verlangen, dass du die Benachrichtigung nachholst (Art. 34 Abs. 4 DSGVO).'
+rechtsgrundlage:
+- Art. 34 DSGVO
+kategorie: datenschutz
+ausloeser:
+  ereignis: datenpanne
+  op: eingetreten
+  label:
+    de: Du hast eine Datenpanne entdeckt.
+frist:
+  typ: dauerhaft
+wiederholung:
+  art: bei_aenderung
+  neu_ausloesen_bei:
+  - ereignis: datenpanne
+stelle:
+  de: Die betroffenen Personen
+kanal: intern_dokumentieren
+kosten: null
+sanktion:
+  text:
+    de: Bußgeld bis 10 Mio. € oder bei Unternehmen bis 2 % des weltweiten Jahresumsatzes des Vorjahres, je nachdem, welcher Betrag höher ist (Art. 83 Abs. 4 Buchst. a DSGVO).
+  schwere: hoch
+automatisierung: hinweis
+erledigung:
+  art: bestaetigen
+  bestaetigung:
+    de: Betroffene benachrichtigt oder kein hohes Risiko festgestellt
+status_recht: in_kraft
+gueltig_ab: '2018-05-25'
+gueltig_bis: null
+quellen:
+- titel: Art. 34 DSGVO, Wortlaut (gesetze.legal)
+  url: https://gesetze.legal/eu/vo_eu_2016_679/34
+  abgerufen: '2026-10-22'
+- titel: Art. 33 DSGVO, Wortlaut (gesetze.legal)
+  url: https://gesetze.legal/eu/vo_eu_2016_679/33
+  abgerufen: '2026-10-22'
+  fundstelle: Art. 33 Abs. 3 Buchst. b bis d
+fachlich_zu_pruefen:
+- 'neu am 22.10.2026, Prüfung durch RA Dr. Weber ausstehend'
+- 'Auslöser ist jede erfasste Datenpanne – ob voraussichtlich ein hohes Risiko besteht, kennt der Katalog nicht (die Bewertung steht im Datenpanne-Formular); Frist „unverzüglich“ nur im Text, kein Termin'
+- 'Sanktion Art. 83 Abs. 4 Buchst. a DSGVO (Pflichten nach Art. 25 bis 39) wie bei datenschutz.datenpanne_meldung – fachlich zu bestätigen'
+pruefung:
+  status: entwurf
+  geprueft_von: null
+  geprueft_am: null

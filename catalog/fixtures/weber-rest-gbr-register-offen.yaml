@@ -1,0 +1,18 @@
+persona: kleiner_betrieb
+beschreibung: "Freigabe RA Dr. Weber 22.10.2026 (B.16): GbR ohne Angabe zum Gesellschaftsregister – Transparenzregister und Registeranmeldung unklar, gefragt wird nur nach dem Register (die Rechtsform ist bekannt); der Hinweis zur Eintragung bleibt stehen"
+stichtag: "2026-10-22"
+fakten:
+  profil.rechtsform: gbr
+  profil.gruendungsdatum: "2024-06-01"
+  profil.taetigkeit.einordnung: freiberuf
+  profil.taetigkeit.branchen: [it_agentur_freelancer]
+  profil.beschaeftigte.gesamt: 0
+  profil.bundesland: HH
+erwartet:
+  gesellschaft.transparenzregister: unbekannt
+  gesellschaft.handelsregister_anmeldung: unbekannt
+  gesellschaft.egbr_hinweis: gilt
+  gesellschaft.istkaufmann_pruefen: gilt_nicht
+fehlende_fakten:
+  gesellschaft.transparenzregister: [profil.gesellschaft.handelsregister]
+  gesellschaft.handelsregister_anmeldung: [profil.gesellschaft.handelsregister]

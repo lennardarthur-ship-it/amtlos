@@ -26,4 +26,9 @@ erwartet:
   it_sicherheit.nis2_meldepflichten: gilt_nicht
   ki.kompetenz: gilt_nicht
   datenschutz.datenpanne_meldung: gilt
+  # Prüfvermerk RA Dr. Weber 22.10.2026: Benachrichtigung der Betroffenen (Art. 34 DSGVO) als eigene Pflicht
+  datenschutz.datenpanne_benachrichtigung: gilt
   datenschutz.betroffenenanfrage: gilt
+termine_enthaelt:
+  # 72 Stunden (Art. 33 Abs. 1 DSGVO): Panne am 9.10. entdeckt – Kalendertermin 11.10., der letzte volle Tag innerhalb der 72 Stunden
+  datenschutz.datenpanne_meldung: [["aenderung-20261009", "2026-10-11"]]

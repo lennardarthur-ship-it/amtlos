@@ -1,7 +1,7 @@
 # R12 (Rechtsprüfung Befund 18): MoPeG – Gesellschaftsregister für die GbR
 schema_version: 1
 id: gesellschaft.egbr_hinweis
-version: 2
+version: 3
 katalog_nr: B.16
 titel:
   de: GbR ins Gesellschaftsregister eintragen? (eGbR)
@@ -17,12 +17,23 @@ rechtsgrundlage:
 - § 67 AktG
 - § 20 Abs. 1 GwG
 kategorie: gesellschaft
+# Freigabe Weber 22.10.2026: eGbR über die Registerfrage (profil.gesellschaft.handelsregister, bei der GbR das Gesellschaftsregister) –
+# für eine schon eingetragene GbR entfällt der Hinweis; ohne Angabe bleibt er stehen (freiwillige Eintragung)
 ausloeser:
-  feld: profil.rechtsform
-  op: ==
-  wert: gbr
-  label:
-    de: Dein Unternehmen ist eine GbR.
+  all:
+  - feld: profil.rechtsform
+    op: ==
+    wert: gbr
+    label:
+      de: Dein Unternehmen ist eine GbR.
+  - any:
+    - feld: profil.gesellschaft.handelsregister
+      op: nicht_vorhanden
+    - feld: profil.gesellschaft.handelsregister
+      op: '!='
+      wert: eingetragen
+    label:
+      de: Eure GbR steht noch nicht im Gesellschaftsregister.
 frist:
   typ: dauerhaft
 wiederholung:
@@ -45,7 +56,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/bgb/__707.html
   abgerufen: null
 fachlich_zu_pruefen:
-- 'Freigabe RA Dr. Weber 22.10.2026: „Rechtsform ‚eGbR‘ im Fragebogen ergänzen“ – nicht umgesetzt: eine neue Rechtsform berührt fakten.json, die abgeleiteten Fakten der Regel-Engine (ist_eingetragene_gesellschaft u. a.), die Fragen in packages/i18n, check.ts und die Auslöser anderer Einträge (z. B. Transparenzregister, Istkaufmann) – Entscheidung des Hauptbearbeiters'
+- 'Freigabe RA Dr. Weber 22.10.2026: „Rechtsform ‚eGbR‘ im Fragebogen ergänzen“ – umgesetzt als Unterart der GbR, nicht als neue Rechtsform: die Registerfrage (profil.gesellschaft.handelsregister) wird auch der GbR gestellt (Gesellschaftsregister), „eingetragen“ = eGbR. abgeleitet.ist_eingetragene_gesellschaft gilt dann auch für die eGbR (Transparenzregister nur für die eingetragene GbR, § 20 Abs. 1 GwG); die GbR-Auslöser (Istkaufmann, Feststellungserklärung) gelten für GbR und eGbR unverändert; dieser Hinweis entfällt für die eingetragene GbR. Kein Auslöser eines freigegebenen Eintrags geändert'
 pruefung:
   status: entwurf
   geprueft_von: null

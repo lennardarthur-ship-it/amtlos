@@ -189,7 +189,8 @@ export function BetriebFormular({ teil, teile }: { teil?: Teil; teile?: Teil[] }
   });
   const zeigt = (t: Teil) => (teile ? teile.includes(t) : !teil || teil === t) && (t !== "gesellschaft" || Boolean(teil) || mitGesellschaft(stand.profil, b));
   // Rechtsform aus dem Pflichten-Check vorbelegen, solange sie leer ist (R10) – einmal beim Öffnen des Abschnitts
-  const ausCheck = RECHTSFORM_AUS_CHECK[String(stand.profil.rechtsform ?? "")];
+  // eine GbR im Gesellschaftsregister führt den Zusatz „eGbR“ (§ 707a Abs. 2 BGB)
+  const ausCheck = stand.profil.rechtsform === "gbr" && stand.profil["gesellschaft.handelsregister"] === "eingetragen" ? "eGbR" : RECHTSFORM_AUS_CHECK[String(stand.profil.rechtsform ?? "")];
   useEffect(() => {
     if (zeigt("gesellschaft") && ausCheck && !(b.rechtsform ?? "").trim()) feld("rechtsform").aendern(ausCheck);
     // nur beim Öffnen des Formulars

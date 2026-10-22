@@ -9,11 +9,13 @@ fakten:
   profil.fahrzeuge.anzahl: 2
   profil.fahrzeuge.gesamtmasse: [2_5_bis_2_8t]
   profil.fahrzeuge.ausland: true
+  profil.fahrzeuge.befoerderung: [fremde_gueter]
   profil.nachunternehmer: false
   profil.bundesland: BY
 erwartet:
   branche.transport_lenkzeiten: gilt
   branche.transport_erlaubnis: gilt
+  branche.personenbefoerderung_genehmigung: gilt_nicht
   branche.transport_lenkzeiten_national: gilt_nicht
   personal.nachunternehmerhaftung: gilt_nicht
   arbeitsschutz.fahrzeuge_pruefen: gilt_nicht

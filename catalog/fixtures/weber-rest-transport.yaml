@@ -1,0 +1,17 @@
+persona: kleiner_betrieb
+beschreibung: "Prüfvermerk RA Dr. Weber 22.10.2026 (H.5): Taxi- und Mietwagenbetrieb, daneben Lkw über 3,5 t nur für eigenes Material (Werkverkehr) – Genehmigung nach PBefG, keine Erlaubnis für den Güterkraftverkehr (§ 1 Abs. 2, 3 GüKG)"
+stichtag: "2026-10-22"
+fakten:
+  profil.rechtsform: einzelunternehmen
+  profil.gruendungsdatum: "2026-12-01"
+  profil.taetigkeit.einordnung: gewerbe
+  profil.taetigkeit.branchen: [transport_logistik]
+  profil.beschaeftigte.gesamt: 0
+  profil.fahrzeuge.anzahl: 3
+  profil.fahrzeuge.gesamtmasse: [bis_2_5t, ueber_3_5t]
+  profil.fahrzeuge.ausland: false
+  profil.fahrzeuge.befoerderung: [personen, eigene_gueter]
+  profil.bundesland: NI
+erwartet:
+  branche.personenbefoerderung_genehmigung: gilt
+  branche.transport_erlaubnis: gilt_nicht

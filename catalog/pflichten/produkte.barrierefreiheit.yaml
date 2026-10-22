@@ -1,7 +1,7 @@
 # Katalog G.70 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: produkte.barrierefreiheit
-version: 4
+version: 5
 katalog_nr: G.70
 titel:
   de: Prüfen, ob deine Produkte unter das BFSG fallen
@@ -13,12 +13,25 @@ erklaerung:
 rechtsgrundlage:
 - § 1 Abs. 2 BFSG
 kategorie: produkte
+# Prüfvermerk RA Dr. Weber 22.10.2026: Produktliste § 1 Abs. 2 BFSG als Auswahl (profil.produkte.bfsg_produkte)
 ausloeser:
-  feld: profil.produkte.arten
-  op: enthaelt
-  wert: elektrogeraete
-  label:
-    de: Du verkaufst Elektrogeräte.
+  all:
+  - feld: profil.produkte.arten
+    op: enthaelt
+    wert: elektrogeraete
+    label:
+      de: Du verkaufst Elektrogeräte.
+  - feld: profil.produkte.bfsg_produkte
+    op: enthaelt_eines
+    wert:
+    - universalrechner
+    - zahlungsterminal
+    - selbstbedienungsterminal
+    - telekommunikation
+    - audiovisuell
+    - ebook_reader
+    label:
+      de: Du verkaufst Produkte, die das Barrierefreiheitsstärkungsgesetz nennt (§ 1 Abs. 2 BFSG).
 frist:
   typ: dauerhaft
 wiederholung:
@@ -48,7 +61,7 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- 'Prüfvermerk RA Dr. Weber 22.10.2026: Produktliste § 1 Abs. 2 BFSG „als Auswahl hinterlegen“ – als Liste im Text umgesetzt, keine Auswahlfrage (Auslöser bleibt „Elektrogeräte“); Sanktion bestätigt'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: Produktliste § 1 Abs. 2 BFSG „als Auswahl hinterlegen“ – umgesetzt als Auswahlfrage profil.produkte.bfsg_produkte (Nr. 1 bis 5, Wortlaut gelesen 22.10.2026); Auslöser Elektrogeräte und mindestens ein Produkt der Liste, ohne Angabe „unklar“; Beispiele in den Antworten (Notebook, Tablet, Smartphone, Router, Smart-TV) fachlich bestätigen; Sanktion bestätigt'
 pruefung:
   status: entwurf
   geprueft_von: null

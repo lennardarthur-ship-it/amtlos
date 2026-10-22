@@ -11,6 +11,8 @@ fakten:
   profil.vertrieb.kanaele: [onlineshop, marktplatz, abo]
   profil.produkte.arten: [elektrogeraete, batterien, verpackung]
   profil.produkte.erstinverkehrbringer: true
+  # Prüfvermerk RA Dr. Weber 22.10.2026: Produktliste § 1 Abs. 2 BFSG als Auswahl
+  profil.produkte.bfsg_produkte: [universalrechner, ebook_reader]
   profil.online.website: true
   profil.handel.hohe_bargeschaefte: false
   profil.bundesland: NW
@@ -23,6 +25,9 @@ erwartet:
   produkte.barrierefreiheit: gilt
   produkte.elektrogeraete: gilt
   produkte.batterien: gilt
+  # Händler von Gerätebatterien: Rücknahme (§ 14 BattDG); keine hohen Barzahlungen – kein Radar zur Bargeldobergrenze
+  produkte.geraetebatterien_ruecknahme: gilt
+  produkte.bargeldobergrenze_radar: gilt_nicht
   produkte.gpsr: gilt
   online.marktplatz_angaben: gilt
   online.dac7: gilt
