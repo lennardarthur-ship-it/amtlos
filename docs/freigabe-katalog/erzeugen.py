@@ -24,6 +24,8 @@ ARGS = [a for a in sys.argv[1:] if not a.startswith("--")]
 ZIEL = os.path.abspath(ARGS[0] if ARGS else "freigabe-katalog")
 # Runde 2: nur noch nicht (in dieser Version) freigegebene Einträge, mit unserer Rückfrage je Eintrag
 NUR_OFFEN = "--nur-offen" in sys.argv
+IDS = set(sys.argv[sys.argv.index("--ids") + 1].split(",")) if "--ids" in sys.argv else None
+NAME = sys.argv[sys.argv.index("--name") + 1] if "--name" in sys.argv else None
 RUNDE = int(sys.argv[sys.argv.index("--runde") + 1]) if "--runde" in sys.argv else 2
 RUECKFRAGEN = {}
 if "--rueckfragen" in sys.argv:
@@ -98,6 +100,8 @@ eintraege = []
 for pfad in sorted(glob.glob(os.path.join(ROOT, "catalog/pflichten/*.yaml"))):
     d = yaml.safe_load(open(pfad, encoding="utf-8"))
     pr = d.get("pruefung") or {}
+    if IDS is not None and d["id"] not in IDS:
+        continue
     if NUR_OFFEN and pr.get("status") == "freigegeben" and pr.get("geprueft_version") == d.get("version"):
         continue
     eintraege.append(d)
@@ -114,7 +118,7 @@ GRAU = PatternFill("solid", fgColor="EDEDED")
 
 uebersicht = []
 for schluessel, (name, person) in PRUEFER.items():
-    teil = [d for d in eintraege if gebiet(d) == schluessel]
+    teil = [d for d in eintraege if gebiet(d) == schluessel] if IDS is None else (eintraege if schluessel == "recht" else [])
     wb = Workbook()
     ws = wb.active
     ws.title = "Einträge"
@@ -185,6 +189,10 @@ for schluessel, (name, person) in PRUEFER.items():
 
     if not teil:
         continue
+    if NAME:
+        name = NAME
+    if "--person" in sys.argv:
+        person = sys.argv[sys.argv.index("--person") + 1]
     datei = f"Betriebsklar-Freigabe-Katalog-{name.replace(' ', '')}{f'-Runde{RUNDE}' if NUR_OFFEN else ''}.xlsx"
     wb.save(os.path.join(ZIEL, datei))
     offen = sum(1 for d in teil if "noch nicht fachlich erfasst" in de((d.get("sanktion") or {}).get("text")))

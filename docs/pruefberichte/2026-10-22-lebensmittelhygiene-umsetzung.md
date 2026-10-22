@@ -69,3 +69,14 @@ Stand: 22.10.2026. Die Prüfmappe v2 ist aus dem geänderten Code neu erzeugt. A
 6. **Neue Zeilen:** Die Zeilen Lagerung, Allergenmanagement, Eiswürfelbereiter, Schankanlage und Milchschäumer sowie die drei neuen Katalogeinträge haben wir ausformuliert. Bitte prüfen, sie tragen noch „fachlich zu prüfen“.
 7. **Markierungen:** Bei den Erhitzungs- und Heißhalte-CCP (bisher L-025–L-028, L-034, L-040, L-041) haben wir die Markierung entfernt, weil Sie diese als die richtigen CCP nennen. Einverstanden?
 8. **Prüfvermerk:** Bitte den Prüfvermerk unterschreiben, sobald die Nachkontrolle passt. Und dürfen wir in der App einen Satz wie „Vorlagen fachlich durchgesehen von Tim Baum, Lebensmittelfachbeauftragter (Stand …)“ zeigen? Den Wortlaut stimmen wir gern mit Ihnen ab.
+
+## Nachtrag (23.10.2026): Ihre Berichtigung ist umgesetzt
+
+Die Fragen 1 bis 3 oben haben Sie mit dem berichtigten Bericht beantwortet. Umgesetzt ist:
+
+- **Acrylamid:** Kleine Betriebe fallen unter Anhang II Teil A. Teil B gilt nur zusätzlich für Filial- und Franchisebetriebe (Gefahrenanalyse „Backen“ und Katalog).
+- **Azofarbstoffe:** In der Allergenliste gibt es eine neue Ziffer 14. Wer sie wählt, muss die E-Nummer angeben (E 102, 104, 110, 122, 124, 129). Der Warnhinweis „Kann Aktivität und Aufmerksamkeit bei Kindern beeinträchtigen“ steht in der Legende; Grundlage sind Art. 24 i. V. m. Anhang V der VO (EG) Nr. 1333/2008.
+- **Koffein:** Ziffer 12 trägt jetzt den Wortlaut „Erhöhter Koffeingehalt. Für Kinder und schwangere oder stillende Frauen nicht empfohlen“. Dazu kommt ein Pflichtfeld für den Gehalt in mg/100 ml. Der Hinweis gilt nur für Erfrischungsgetränke über 150 mg/l, nicht für Kaffee und Tee.
+- **„chininhaltig“:** Rechtsgrundlage ist jetzt § 5 Abs. 1 AromenDV.
+
+Die Prüfmappe in diesem Paket ist aus dem aktuellen Stand neu erzeugt. Die Baustein-Nummern können sich gegenüber Ihrem Bericht verschoben haben.
