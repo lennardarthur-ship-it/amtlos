@@ -2,16 +2,18 @@
 # Wortlaut gelesen am 22.10.2026: § 1 Abs. 1, 2, § 2 Abs. 1 Satz 1, § 61 Abs. 1 Nr. 1, Abs. 2 PBefG (gesetze-im-internet.de)
 schema_version: 1
 id: branche.personenbefoerderung_genehmigung
-version: 1
+version: 2
 katalog_nr: H.5
 titel:
   de: Genehmigung für die Personenbeförderung
 kurz:
   de: Wer Personen entgeltlich oder geschäftsmäßig mit Kraftfahrzeugen befördert – etwa mit Taxi, Mietwagen oder Bus –, braucht eine Genehmigung nach dem Personenbeförderungsgesetz.
 erklaerung:
-  de: 'Das Personenbeförderungsgesetz gilt für die entgeltliche oder geschäftsmäßige Beförderung von Personen; als Entgelt zählen auch wirtschaftliche Vorteile (§ 1 Abs. 1 PBefG). Wer mit Kraftfahrzeugen im Linienverkehr oder im Gelegenheitsverkehr – dazu gehören Taxi- und Mietwagenverkehr – Personen befördert, muss eine Genehmigung haben (§ 2 Abs. 1 Satz 1 PBefG). Ausgenommen sind Fahrten mit Personenkraftwagen, die unentgeltlich sind oder deren Gesamtentgelt je Kilometer den Betrag nach § 5 Abs. 2 Satz 1 des Bundesreisekostengesetzes nicht übersteigt (§ 1 Abs. 2 PBefG). Die Genehmigung beantragst du vor dem Start bei der zuständigen Genehmigungsbehörde deines Landes.'
+  de: 'Das Personenbeförderungsgesetz gilt für die entgeltliche oder geschäftsmäßige Beförderung von Personen; als Entgelt zählen auch wirtschaftliche Vorteile (§ 1 Abs. 1 PBefG). Wer mit Kraftfahrzeugen im Linienverkehr oder im Gelegenheitsverkehr – dazu gehören Taxi- und Mietwagenverkehr – Personen befördert, muss eine Genehmigung haben (§ 2 Abs. 1 Satz 1 PBefG). Ausgenommen sind Fahrten mit Personenkraftwagen, die unentgeltlich sind oder deren Gesamtentgelt je Kilometer den Betrag nach § 5 Abs. 2 Satz 1 des Bundesreisekostengesetzes nicht übersteigt (§ 1 Abs. 2 PBefG). Weitere Fälle stellt die Freistellungs-Verordnung frei, zum Beispiel die unentgeltliche Beförderung von Beschäftigten durch den Arbeitgeber zu betrieblichen Zwecken zwischen Arbeitsstätten desselben Betriebs (§ 1 Nr. 4 Buchst. h FrStllgV). Die Genehmigung beantragst du vor dem Start bei der Genehmigungsbehörde deines Landes, meist beim Landkreis oder bei der kreisfreien Stadt. Wer Taxi oder Mietwagen fährt, braucht außerdem eine Fahrerlaubnis zur Fahrgastbeförderung (§ 48 Abs. 1 FeV); als Halter darfst du die Fahrt ohne sie nicht anordnen oder zulassen (§ 48 Abs. 7 FeV).'
 rechtsgrundlage:
 - §§ 1, 2 PBefG
+- § 1 Nr. 4 Buchst. h FrStllgV
+- § 48 FeV
 kategorie: branche
 branchen:
 - transport_logistik
@@ -33,7 +35,7 @@ frist:
 wiederholung:
   art: einmalig
 stelle:
-  de: Genehmigungsbehörde nach dem Personenbeförderungsgesetz
+  de: Genehmigungsbehörde des Landes (meist Landkreis oder kreisfreie Stadt)
 kanal: post
 kosten: null
 sanktion:
@@ -56,9 +58,17 @@ quellen:
 - titel: Personenbeförderungsgesetz § 61 (Ordnungswidrigkeiten)
   url: https://www.gesetze-im-internet.de/pbefg/__61.html
   abgerufen: '2026-10-22'
+- titel: Freistellungs-Verordnung § 1
+  url: https://www.gesetze-im-internet.de/frstllgv/__1.html
+  abgerufen: '2026-10-22'
+  fundstelle: § 1 Nr. 4 Buchst. h
+- titel: Fahrerlaubnis-Verordnung § 48
+  url: https://www.gesetze-im-internet.de/fev_2010/__48.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'neu am 22.10.2026, Prüfung durch RA Dr. Weber ausstehend'
-- 'Auslöser: neue Angabe profil.fahrzeuge.befoerderung („Personen gegen Entgelt“), gefragt bei Transport und Logistik mit Firmenfahrzeugen; weitere Ausnahmen und Freistellungen über § 1 Abs. 2 PBefG hinaus nicht geprüft; zuständige Behörde je Land nicht hinterlegt'
+- 'Freigabe RA Dr. Weber Runde 2 (23.10.2026): §§ 1, 2 PBefG und § 61 Abs. 1 Nr. 1, Abs. 2 (20.000 €) bestätigt. Ergänzt: Fahrerlaubnis zur Fahrgastbeförderung (§ 48 Abs. 1, 7 FeV, Wortlaut gelesen) und zuständige Stelle (Genehmigungsbehörde des Landes, meist Landkreis/kreisfreie Stadt)'
+- 'Hinweis „Freistellungen § 1 Abs. 2 PBefG (Gesamtentgelt deckt nur Betriebskosten; Werkverkehr mit eigenen Beschäftigten)“ nicht wie angegeben übernommen: § 1 Abs. 2 PBefG (gesetze-im-internet.de, 22.10.2026) nennt Pkw-Fahrten, die unentgeltlich sind oder deren Gesamtentgelt je Kilometer den Betrag nach § 5 Abs. 2 Satz 1 BRKG nicht übersteigt (steht schon im Text), und Krankenkraftwagen – weder Betriebskosten noch Werkverkehr. Stattdessen ergänzt: Freistellung nach § 1 Nr. 4 Buchst. h FrStllgV (unentgeltliche Beförderung von Arbeitnehmern durch den Arbeitgeber zu betrieblichen Zwecken zwischen Arbeitsstätten desselben Betriebes, Wortlaut gelesen) – vom Prüfer bestätigen lassen'
+- 'Auslöser: Angabe profil.fahrzeuge.befoerderung („Personen gegen Entgelt“), gefragt bei Transport und Logistik mit Firmenfahrzeugen'
 pruefung:
   status: entwurf
   geprueft_von: null

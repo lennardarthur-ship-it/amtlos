@@ -619,11 +619,12 @@ export const SCHRITTE: Schritt[] = [
           de: "Für diese Produkte gelten Anforderungen an die Barrierefreiheit (§ 1 Abs. 2 Barrierefreiheitsstärkungsgesetz), wenn sie nach dem 28.6.2025 in Verkehr gebracht wurden.",
           en: "Accessibility requirements apply to these products (§ 1(2) Accessibility Strengthening Act, BFSG) if they were placed on the market after 28.6.2025.",
         },
+        // Runde 2 RA Dr. Weber (23.10.2026): Notebook, Tablet, Smartphone = Nr. 1 (Hardwaresysteme), Router = Nr. 3, Smart-TV = Nr. 4, E-Book-Reader = Nr. 5
         optionen: {
-          universalrechner: { de: "Computer, Notebooks und Tablets mit Betriebssystem", en: "Computers, notebooks and tablets with operating system" },
+          universalrechner: { de: "Computer, Notebooks, Tablets und Smartphones mit Betriebssystem", en: "Computers, notebooks, tablets and smartphones with operating system" },
           zahlungsterminal: { de: "Zahlungsterminals (Kartenterminals)", en: "Payment terminals (card terminals)" },
           selbstbedienungsterminal: { de: "Geld-, Fahrkarten- oder Check-in-Automaten, interaktive Informationsterminals", en: "Cash machines, ticket or check-in machines, interactive information terminals" },
-          telekommunikation: { de: "Smartphones, Telefone, Router und andere Endgeräte für Telefon und Internet", en: "Smartphones, telephones, routers and other devices for phone and internet services" },
+          telekommunikation: { de: "Telefone, Router und andere Endgeräte für Telefon und Internet", en: "Telephones, routers and other devices for phone and internet services" },
           audiovisuell: { de: "Smart-TVs, Streaming-Boxen und andere Geräte für Fernsehen und Video-Dienste", en: "Smart TVs, streaming boxes and other devices for TV and video services" },
           ebook_reader: { de: "E-Book-Reader", en: "E-book readers" },
           keine: { de: "Nichts davon", en: "None of these" },

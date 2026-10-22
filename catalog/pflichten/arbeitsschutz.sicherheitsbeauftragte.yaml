@@ -1,16 +1,17 @@
 # Prüfergebnis Sifa 22.10.2026 (C Fehlende Pflichten „Sicherheitsbeauftragte“): § 22 SGB VII n. F. (anzuwenden ab 29.5.2026)
 schema_version: 1
 id: arbeitsschutz.sicherheitsbeauftragte
-version: 2
+version: 3
 katalog_nr: E.52
 titel:
   de: Sicherheitsbeauftragte bestellen
 kurz:
   de: Ab regelmäßig 50 Beschäftigten bestellst du Sicherheitsbeauftragte – ab 21 Beschäftigten schon dann, wenn die Gefährdungsbeurteilung eine besondere Gefährdung ergibt.
 erklaerung:
-  de: 'Seit der Neuregelung von § 22 SGB VII (anzuwenden ab 29.5.2026) bestellen Unternehmen mit regelmäßig 50 oder mehr Beschäftigten Sicherheitsbeauftragte; Zahl und Auswahl richten sich nach den Unfall- und Gesundheitsgefahren und der Zahl der Beschäftigten. Bei mehr als 20 und weniger als 50 Beschäftigten ist ein Sicherheitsbeauftragter nur nötig, wenn nach der Gefährdungsbeurteilung eine besondere Gefährdung für Leben und Gesundheit besteht; die Berufsgenossenschaft kann die Kriterien festlegen und die Bestellung anordnen. Sicherheitsbeauftragte unterstützen dich ehrenamtlich bei der Umsetzung des Arbeitsschutzes und nehmen an Lehrgängen der BG teil.'
+  de: 'Seit der Neuregelung von § 22 SGB VII (anzuwenden ab 29.5.2026) bestellen Unternehmen mit regelmäßig 50 oder mehr Beschäftigten Sicherheitsbeauftragte; Zahl und Auswahl richten sich nach den Unfall- und Gesundheitsgefahren und der Zahl der Beschäftigten. Bei mehr als 20 und weniger als 50 Beschäftigten ist ein Sicherheitsbeauftragter nur nötig, wenn nach der Gefährdungsbeurteilung eine besondere Gefährdung für Leben und Gesundheit besteht; die Berufsgenossenschaft kann die Kriterien festlegen und die Bestellung anordnen. Gezählt wird nach Köpfen: Teilzeitkräfte zählen voll, ebenso Auszubildende und Leiharbeitnehmer in dem Betrieb, in dem sie eingesetzt sind – eine anteilige Umrechnung wie beim Kündigungsschutz gibt es hier nicht (DGUV Regel 100-001, Abschnitt 4.2). Wie viele Sicherheitsbeauftragte du brauchst, richtet sich nach Anlage 2 zur DGUV Vorschrift 1 (Betriebsgröße und Gefährdung). Sicherheitsbeauftragte unterstützen dich ehrenamtlich bei der Umsetzung des Arbeitsschutzes und nehmen an Lehrgängen der BG teil.'
 rechtsgrundlage:
 - § 22 Abs. 1 SGB VII
+- § 20 DGUV Vorschrift 1
 kategorie: arbeitsschutz
 ausloeser:
   feld: profil.beschaeftigte.gesamt
@@ -51,7 +52,7 @@ quellen:
   url: https://www.ukbw.de/fileadmin/user_upload/Mediathek/UVV/DGUV_Vorschrift_1.pdf
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Zählweise der Beschäftigten (Teilzeit, G-05) – laut Freigabe Sifa 22.10.2026 Rechtsfrage, mit dem Anwalt klären'
+- 'Zählweise (G-05) laut RA Dr. Weber (Antwort auf die Rechtsfrage aus der Sifa-Prüfung, Rückmeldung Runde 2): Schwelle „regelmäßig mehr als 20 Beschäftigte“ (§ 22 SGB VII, § 20 DGUV Vorschrift 1) nach Köpfen – Teilzeit voll, Auszubildende und Leiharbeitnehmer beim Entleiher, keine anteilige Umrechnung wie in § 23 KSchG (DGUV Regel 100-001, Abschnitt 4.2); Zahl der Sicherheitsbeauftragten nach Anlage 2 DGUV Vorschrift 1 – im Text. Der Auslöser zählt so: profil.beschaeftigte.gesamt ist die Kopfzahl aus der Frage „Wie viele Menschen arbeiten für dich?“ (Hilfe: Vollzeit, Teilzeit, Minijob, Azubis), ohne Umrechnung; die Engine leitet daraus keine eigene Zählung ab (packages/rules-engine/src/fakten.ts). Leiharbeitnehmer nennt die Hilfe nicht ausdrücklich – die Angabe gilt für alle Personal-Pflichten (z. B. Sozialversicherung), deshalb nicht erweitert'
 pruefung:
   status: entwurf
   geprueft_von: null

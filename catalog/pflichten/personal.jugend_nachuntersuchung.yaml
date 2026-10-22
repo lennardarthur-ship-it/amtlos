@@ -1,7 +1,7 @@
 # R11 (Nutzertest Tischlerei Befund 7): Nachuntersuchung nach § 33 JArbSchG als eigene Pflicht
 schema_version: 1
 id: personal.jugend_nachuntersuchung
-version: 3
+version: 4
 katalog_nr: D.44
 titel:
   de: Ärztliche Nachuntersuchung Jugendlicher nach einem Jahr
@@ -43,7 +43,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Ohne Bescheinigung nach 14 Monaten darfst du die jugendliche Person nicht weiter beschäftigen (§ 33 Abs. 3 JArbSchG).
+    de: Ohne Bescheinigung nach 14 Monaten darfst du die jugendliche Person nicht weiter beschäftigen (§ 33 Abs. 3 JArbSchG); Verstöße kosten bis 30.000 € (§ 58 Abs. 1 Nr. 23, Abs. 4 JArbSchG).
   schwere: hoch
 automatisierung: hinweis
 status_recht: in_kraft
@@ -56,6 +56,11 @@ quellen:
 - titel: Jugendarbeitsschutzgesetz (§§ 32, 33)
   url: https://www.gesetze-im-internet.de/jarbschg/BJNR009650976.html
   abgerufen: '2026-10-22'
+- titel: Jugendarbeitsschutzgesetz § 58
+  url: https://www.gesetze-im-internet.de/jarbschg/__58.html
+  abgerufen: '2026-10-22'
+fachlich_zu_pruefen:
+- 'Freigabe RA Dr. Weber Runde 2 (23.10.2026) (zu personal.jugend_erstuntersuchung): Bußgeld § 58 Abs. 1 Nr. 23 JArbSchG („entgegen § 33 Abs. 3 einen Jugendlichen ohne ärztliche Bescheinigung über die erste Nachuntersuchung weiterbeschäftigt“), Abs. 4 bis 30.000 € eingetragen – Wortlaut am 22.10.2026 gelesen (gesetze-im-internet.de)'
 pruefung:
   status: freigegeben
   geprueft_von:

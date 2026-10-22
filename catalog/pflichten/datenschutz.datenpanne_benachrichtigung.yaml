@@ -49,9 +49,7 @@ quellen:
   abgerufen: '2026-10-22'
   fundstelle: Art. 33 Abs. 3 Buchst. b bis d
 fachlich_zu_pruefen:
-- 'neu am 22.10.2026, Prüfung durch RA Dr. Weber ausstehend'
-- 'Auslöser ist jede erfasste Datenpanne – ob voraussichtlich ein hohes Risiko besteht, kennt der Katalog nicht (die Bewertung steht im Datenpanne-Formular); Frist „unverzüglich“ nur im Text, kein Termin'
-- 'Sanktion Art. 83 Abs. 4 Buchst. a DSGVO (Pflichten nach Art. 25 bis 39) wie bei datenschutz.datenpanne_meldung – fachlich zu bestätigen'
+- 'Freigabe RA Dr. Weber Runde 2 (23.10.2026): Art. 34 Abs. 1 DSGVO („unverzüglich“) und Sanktion Art. 83 Abs. 4 Buchst. a bestätigt; die verlangten Ergänzungen – Ausnahmen nach Art. 34 Abs. 3 (Verschlüsselung, nachträgliche Maßnahmen, unverhältnismäßiger Aufwand mit öffentlicher Bekanntmachung) und Inhalt nach Art. 34 Abs. 2 i. V. m. Art. 33 Abs. 3 Buchst. b–d – stehen schon in der Erklärung. Auslöser über das Datenpanne-Formular in Ordnung, wenn die Risikobewertung dort steht: Das Formular (packages/fachlogik/src/dokumente/datenschutz.ts) erfasst die Bewertung (kein Risiko, Risiko, hohes Risiko) und die Benachrichtigung der Betroffenen; Frist „unverzüglich“ nur im Text, kein Termin'
 pruefung:
   status: entwurf
   geprueft_von: null

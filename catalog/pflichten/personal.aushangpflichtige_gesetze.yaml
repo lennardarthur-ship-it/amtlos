@@ -1,7 +1,7 @@
 # Katalog D.48 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
 schema_version: 1
 id: personal.aushangpflichtige_gesetze
-version: 4
+version: 5
 katalog_nr: D.48
 titel:
   de: Aushangpflichtige Gesetze aushängen
@@ -32,7 +32,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: 'Fehlt der Aushang des Arbeitszeitgesetzes, droht ein Bußgeld bis 5.000 € (§ 22 Abs. 1 Nr. 8, Abs. 2 ArbZG), ebenso beim Jugendarbeitsschutzgesetz mit der Anschrift der Aufsichtsbehörde und beim Aushang der Arbeitszeit und Pausen der Jugendlichen (§ 59 Abs. 1 Nr. 7, 8, Abs. 3 JArbSchG). Für den Aushang des Mutterschutzgesetzes sieht § 32 MuSchG kein Bußgeld vor. Für die Information nach dem AGG gibt es kein Bußgeld; fehlt sie, droht aber ein Entschädigungsrisiko (§ 15 AGG). Für die Unfallverhütungsvorschriften sind die Folgen noch nicht fachlich erfasst.'
+    de: 'Fehlt der Aushang des Arbeitszeitgesetzes, droht ein Bußgeld bis 5.000 € (§ 22 Abs. 1 Nr. 8, Abs. 2 ArbZG), ebenso beim Jugendarbeitsschutzgesetz mit der Anschrift der Aufsichtsbehörde und beim Aushang der Arbeitszeit und Pausen der Jugendlichen (§ 59 Abs. 1 Nr. 7, 8, Abs. 3 JArbSchG). Für den Aushang des Mutterschutzgesetzes sieht § 32 MuSchG kein Bußgeld vor. Für die Information nach dem AGG gibt es kein Bußgeld; fehlt sie, droht aber ein Entschädigungsrisiko (§ 15 AGG). Für das Zugänglichmachen der Unfallverhütungsvorschriften gibt es kein Bußgeld.'
   schwere: niedrig
 automatisierung: hinweis
 aktion:
@@ -64,8 +64,8 @@ quellen:
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
 - 'Prüfergebnis Sifa 22.10.2026 umgesetzt (Liste je Belegschaft); abweichend vom Prüfergebnis gilt § 48 JArbSchG erst ab drei Jugendlichen (Wortlaut geprüft); Liste für alle anzuzeigen laut Prüfvermerk RA Dr. Weber 22.10.2026 vertretbar'
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- 'Prüfvermerk RA Dr. Weber 22.10.2026: ArbZG, JArbSchG, MuSchG bestätigt; AGG-Folge (§ 15 AGG) übernommen. Nicht übernommen: „DGUV Vorschrift 1 § 12 – Verstoß bußgeldbewehrt nach § 209 Abs. 1 Nr. 1 SGB VII (bis 10.000 €)“ – § 32 DGUV Vorschrift 1 (Fassung BGN, am 22.10.2026 gelesen) nennt nur § 12 Abs. 2 (Vorschriften den mit Maßnahmen betrauten Personen zur Verfügung stellen), nicht § 12 Abs. 1 (den Versicherten zugänglich machen); Rückfrage an den Prüfer'
+- 'Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen'
+- 'Prüfvermerk RA Dr. Weber 22.10.2026: ArbZG, JArbSchG, MuSchG bestätigt; AGG-Folge (§ 15 AGG) übernommen. Freigabe RA Dr. Weber Runde 2 (23.10.2026): § 32 DGUV Vorschrift 1 verweist nur auf § 12 Abs. 2, für das Zugänglichmachen nach Abs. 1 kein Bußgeld – Folge „keine“ eingetragen. Seinen Zusatz „Aufsicht kann Anordnung nach § 17 SGB VII treffen“ nicht übernommen: § 17 SGB VII regelt Überwachung und Beratung; die Anordnung im Einzelfall zur Erfüllung der Pflichten aus Unfallverhütungsvorschriften steht in § 19 Abs. 1 Satz 1 Nr. 1 SGB VII (lxgesetze.de, 22.10.2026) – bei Bedarf mit dieser Fundstelle ergänzen'
 pruefung:
   status: entwurf
   geprueft_von: null

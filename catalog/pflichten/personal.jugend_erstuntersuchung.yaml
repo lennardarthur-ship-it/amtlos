@@ -2,7 +2,7 @@
 # Beobachten: BR-Drs. 735/25 (NRW) will §§ 32, 33 JArbSchG ändern – nicht in Kraft
 schema_version: 1
 id: personal.jugend_erstuntersuchung
-version: 1
+version: 2
 katalog_nr: D.44
 titel:
   de: Ärztliche Erstuntersuchung Jugendlicher vor Beginn
@@ -44,7 +44,7 @@ kanal: intern_dokumentieren
 kosten: null
 sanktion:
   text:
-    de: Ohne Bescheinigung darfst du die jugendliche Person nicht beschäftigen (§ 32 Abs. 1 JArbSchG); Verstöße kosten bis 30.000 € (§ 58 Abs. 1, 4 JArbSchG).
+    de: Ohne Bescheinigung darfst du die jugendliche Person nicht beschäftigen (§ 32 Abs. 1 JArbSchG); Verstöße kosten bis 30.000 € (§ 58 Abs. 1 Nr. 22, Abs. 4 JArbSchG).
   schwere: hoch
 automatisierung: hinweis
 status_recht: in_kraft
@@ -61,7 +61,7 @@ quellen:
   url: https://gesetze.legal/bund/jarbschg/58
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Freigabe RA Dr. Weber 22.10.2026 unter der Bedingung „Nummer am Wortlaut gegenlesen“: Er nennt § 58 Abs. 1 Nr. 20, Abs. 4 JArbSchG. Laut Wortlaut (gesetze.legal, hensche.de, 22.10.2026) betrifft Nr. 20 Arbeiten unter Tage (§ 24); „entgegen § 32 Abs. 1 einen Jugendlichen ohne ärztliche Bescheinigung über die Erstuntersuchung beschäftigt“ ist Nr. 22 (Geldbuße bis 30.000 €, Abs. 4) – Nr. 20 nicht übernommen, Sanktionstext unverändert (§ 58 Abs. 1, 4); Nr. 22 vom Prüfer bestätigen lassen'
+- 'Freigabe RA Dr. Weber Runde 2 (23.10.2026): § 58 Abs. 1 Nr. 22, Abs. 4 JArbSchG bestätigt (am Wortlaut gegengelesen; Nr. 20 aus der ersten Rückmeldung war falsch) – Nummer in den Sanktionstext übernommen'
 pruefung:
   status: entwurf
   geprueft_von: null
