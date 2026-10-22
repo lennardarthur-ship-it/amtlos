@@ -1,18 +1,21 @@
-# Katalog C.29 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog C.29 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt
 schema_version: 1
 id: steuern.rechnungen_pflichtangaben
-version: 3
+version: 4
 katalog_nr: C.29
 titel:
   de: Rechnungen mit allen Pflichtangaben schreiben
 kurz:
-  de: Deine Rechnungen müssen bestimmte Angaben enthalten. Als Kleinunternehmer brauchst du einen Hinweis auf § 19 UStG.
+  de: Deine Rechnungen müssen bestimmte Angaben enthalten. Als Kleinunternehmer brauchst du den Hinweis, dass die Steuerbefreiung für Kleinunternehmer gilt (§ 34a UStDV).
 erklaerung:
-  de: Welche Angaben eine Rechnung braucht, regelt § 14 UStG. Für Kleinbetragsrechnungen gelten Erleichterungen. Kleinunternehmer
-    weisen auf die Steuerbefreiung nach § 19 UStG hin.
+  de: Welche Angaben eine Rechnung braucht, regelt § 14 UStG. Für Kleinbetragsrechnungen bis 250 € brutto gelten Erleichterungen
+    (§ 33 UStDV). Kleinunternehmer weisen darauf hin, dass die Steuerbefreiung für Kleinunternehmer gilt (§ 34a UStDV). Bist du
+    zur Rechnung verpflichtet, stellst du sie innerhalb von sechs Monaten nach Ausführung der Leistung aus (§ 14 Abs. 2 Satz 1
+    Nr. 1 und 2 UStG).
 rechtsgrundlage:
 - § 14 UStG
 - § 19 UStG
+- §§ 33, 34a UStDV
 kategorie: steuern
 ausloeser:
   immer: true
@@ -51,10 +54,14 @@ quellen:
 - titel: § 15 UStG, Wortlaut (lxgesetze.de)
   url: https://lxgesetze.de/ustg/15
   abgerufen: '2026-10-22'
+- titel: Umsatzsteuer-Durchführungsverordnung § 33 (Rechnungen über Kleinbeträge)
+  url: https://www.gesetze-im-internet.de/ustdv_1980/__33.html
+  abgerufen: null
+- titel: Umsatzsteuer-Durchführungsverordnung § 34a (Rechnungen von Kleinunternehmern)
+  url: https://www.gesetze-im-internet.de/ustdv_1980/__34a.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- Liste der Pflichtangaben und Kleinbetragsgrenze als Inhalt ergänzen
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Kleinunternehmer mit Steuerausweis als Fall des § 14c Abs. 2 nicht ausdrücklich im Wortlaut – bestätigen)'
+- Liste der Pflichtangaben (§ 14 Abs. 4 UStG) als Inhalt ergänzen
 pruefung:
   status: entwurf
   geprueft_von: null

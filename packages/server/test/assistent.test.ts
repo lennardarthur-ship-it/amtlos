@@ -47,7 +47,7 @@ describe("Frag Amtlos (Suche im Katalog)", () => {
     expect(istBeratungsfrage("Kann ich in meinem Fall die Kosten absetzen?")).toBe(true);
     expect(istBeratungsfrage("Wann ist die Lohnsteuer-Anmeldung fällig?")).toBe(false);
     expect(frage("Soll ich eine GmbH gründen?").art).toBe("beratung");
-    const u = frage("Wie backe ich ein Sauerteigbrot?");
+    const u = frage("Wie flicke ich einen Fahrradschlauch?");
     expect(u).toMatchObject({ art: "unsicher", treffer: [], regelwerte: [] });
   });
 });

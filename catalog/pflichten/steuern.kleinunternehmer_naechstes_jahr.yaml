@@ -1,7 +1,8 @@
 # R10: neu (Nutzertest Freiberuf: Vorjahr unter 25.000 €, laufendes Jahr darüber, aber höchstens 100.000 € – ab 1.1. des Folgejahres Regelbesteuerung, § 19 Abs. 1 UStG)
+# StB-Durchsicht Busch 22.10.2026 umgesetzt bis auf den Auslöser (Zahlungseingänge)
 schema_version: 1
 id: steuern.kleinunternehmer_naechstes_jahr
-version: 2
+version: 3
 katalog_nr: C.23
 titel:
   de: Ab 1. Januar Regelbesteuerung
@@ -10,8 +11,13 @@ kurz:
 erklaerung:
   de: 'Die Kleinunternehmerregelung setzt voraus, dass dein Umsatz im Vorjahr höchstens 25.000 € betrug. Überschreitest du diese
     Grenze in diesem Jahr, ohne über 100.000 € zu kommen, gilt die Regelung bis zum Jahresende weiter. Ab 1. Januar weist du auf
-    deinen Rechnungen Umsatzsteuer aus, gibst Umsatzsteuer-Voranmeldungen ab und kannst die Vorsteuer aus deinen Eingangsrechnungen
-    abziehen. Stelle Rechnungsvorlage, Preise und Buchhaltung rechtzeitig um.'
+    deinen Rechnungen Umsatzsteuer aus, gibst Umsatzsteuer-Voranmeldungen und die Umsatzsteuer-Jahreserklärung ab und kannst die
+    Vorsteuer aus deinen Eingangsrechnungen abziehen. Wie oft du die Voranmeldung abgibst, legt das Finanzamt nach der voraussichtlichen
+    Steuer fest – bei mehr als 9.000 € monatlich, sonst vierteljährlich (§ 18 Abs. 2 UStG); es steht im Schreiben des Finanzamts.
+    Hast du als Kleinunternehmer Wirtschaftsgüter angeschafft, die du weiter nutzt, kann beim Wechsel eine Berichtigung der Vorsteuer
+    in Frage kommen (§ 15a UStG). Maßgeblich für die Grenze ist der Umsatz nach vereinnahmten Entgelten (netto, nach Zahlungseingang),
+    nicht die Summe der Rechnungen nach Rechnungsdatum; Amtlos zählt bisher die in Amtlos gestellten Rechnungen. Stelle Rechnungsvorlage,
+    Preise und Buchhaltung rechtzeitig um.'
 rechtsgrundlage:
 - § 19 Abs. 1 UStG
 kategorie: steuern
@@ -82,9 +88,14 @@ quellen:
 - titel: Umsatzsteuergesetz § 19
   url: https://www.gesetze-im-internet.de/ustg_1980/__19.html
   abgerufen: null
+- titel: Umsatzsteuergesetz § 15a
+  url: https://www.gesetze-im-internet.de/ustg_1980/__15a.html
+  abgerufen: null
+- titel: Umsatzsteuergesetz § 18
+  url: https://www.gesetze-im-internet.de/ustg_1980/__18.html
+  abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Neu (R10): Folgen der Regelbesteuerung ab 1.1. (Rechnungen mit USt, Voranmeldung, Vorsteuerabzug) – Formulierung und Vollständigkeit bestätigen, z. B. Rhythmus der Voranmeldung im Folgejahr'
-- 'Prognose statt tatsächlicher Umsatz – Formulierung „nach deinen Angaben“ bestätigen'
+- 'StB Busch 22.10.2026: Umsatzbegriff sind die vereinnahmten Entgelte statt der Rechnungssumme – der Auslöser über finanzen.umsatz.laufendes_jahr zählt weiter gestellte Rechnungen nach Rechnungsdatum (keine Zahlungsdaten im Fakt); nur Hinweis im Text'
 - 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
   status: entwurf

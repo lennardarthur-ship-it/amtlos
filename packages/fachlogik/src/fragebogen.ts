@@ -64,7 +64,8 @@ export function fragebogenVorbereitung(name: string, p: Record<string, unknown>,
       angaben: [
         { feld: "name", label: l("name"), wert: name, schritt: "" },
         { feld: "rechtsform", label: l("rechtsform"), wert: RECHTSFORM[p.rechtsform as string]?.[s] ?? null, schritt: "rechtsform" },
-        { feld: "gruendungsdatum", label: l("beginn"), wert: datum(p.gruendungsdatum, s), schritt: "start" },
+        // StB Busch 22.10.2026: Beginn der Tätigkeit – bei eingetragenen Gesellschaften die eigene Angabe, sonst das Startdatum
+        { feld: "gruendungsdatum", label: l("beginn"), wert: datum(p.taetigkeit_beginn ?? p.gruendungsdatum, s), schritt: "start" },
         { feld: "taetigkeit.einordnung", label: l("taetigkeit"), wert: EINORDNUNG[p["taetigkeit.einordnung"] as string]?.[s] ?? null, schritt: "taetigkeit" },
         { feld: "gemeinde_ags", label: l("ort"), wert: p.gemeinde_ags ? `${p.gemeinde_ags as string}${p.bundesland ? ` (${p.bundesland as string})` : ""}` : null, schritt: "ort" },
       ],

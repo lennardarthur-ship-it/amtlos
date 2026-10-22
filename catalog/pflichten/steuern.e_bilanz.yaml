@@ -1,7 +1,7 @@
-# Katalog B.18 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog B.18 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt
 schema_version: 1
 id: steuern.e_bilanz
-version: 3
+version: 4
 katalog_nr: B.18
 titel:
   de: E-Bilanz ans Finanzamt übermitteln
@@ -9,9 +9,13 @@ kurz:
   de: Wenn du bilanzierst, übermittelst du Bilanz und Gewinn- und Verlustrechnung elektronisch ans Finanzamt.
 erklaerung:
   de: Die E-Bilanz ist die elektronische Übermittlung von Bilanz und Gewinn- und Verlustrechnung an das Finanzamt. Sie gilt für
-    alle, die Bücher führen und bilanzieren – nicht nur für Gesellschaften. Eine Bilanz als PDF erledigt sie nicht.
+    alle, die Bücher führen und bilanzieren – nicht nur für Gesellschaften. Eine Bilanz als PDF erledigt sie nicht. Du übermittelst
+    sie mit der Körperschaftsteuer- bzw. Einkommensteuer- oder Feststellungserklärung, also in denselben Fristen (§ 149 AO) – ohne
+    Steuerberatung bis 31. Juli des Folgejahres, mit Steuerberatung bis Ende Februar des übernächsten Jahres. Zur Vermeidung
+    unbilliger Härten kann das Finanzamt auf Antrag auf die elektronische Übermittlung verzichten (§ 5b Abs. 2 EStG).
 rechtsgrundlage:
 - § 5b EStG
+- § 149 AO
 kategorie: steuern
 ausloeser:
   # R10: an die Buchführungspflicht gekoppelt (§ 5b EStG gilt für alle, die bilanzieren) – gleiche Bedingung wie steuern.buchfuehrungspflicht
@@ -104,16 +108,27 @@ ausloeser:
       label:
         de: Das Finanzamt hat dir mitgeteilt, dass du Bücher führen musst.
 frist:
-  typ: dauerhaft
+  typ: wiederkehrend
+  rhythmus: jaehrlich
+  # StB Busch 22.10.2026: mit der KSt- bzw. ESt-/Feststellungserklärung – Fristen wie dort (§ 149 Abs. 2, 3 AO, § 108 Abs. 3 AO)
+  faellig:
+    art: tag_nach_periodenende
+    monate_nach: 7
+    tag: 31
+  verlaengerung:
+    wenn: { feld: profil.steuerberater, op: "==", wert: true }
+    versatz: P7M
+  verschiebung: { regel: naechster_werktag, kalender: bundesland }
+  erinnerung: [P30D, P7D]
 wiederholung:
-  art: einmalig
+  art: periodisch
 stelle:
   de: Finanzamt
 kanal: elster
 kosten: null
 sanktion:
   text:
-    de: '§ 5b EStG nennt kein eigenes Bußgeld. Das Finanzamt kann die Übermittlung mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO).'
+    de: '§ 5b EStG nennt kein eigenes Bußgeld. Das Finanzamt kann die Übermittlung mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO). Die Steuererklärung ist erst mit der E-Bilanz vollständig; bei Verspätung droht ein Verspätungszuschlag (§ 152 AO).'
   schwere: mittel
 automatisierung: hinweis
 erledigung:
@@ -122,7 +137,7 @@ erledigung:
   bestaetigung:
     de: An das Finanzamt übermittelt
 aenderungsnotiz:
-  de: Gilt jetzt für alle, die zur Buchführung verpflichtet sind, nicht nur für Kapitalgesellschaften.
+  de: Jetzt mit Termin – die E-Bilanz übermittelst du in denselben Fristen wie die Steuererklärung.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -136,10 +151,13 @@ quellen:
 - titel: § 329 AO (Zwangsgeld), Wortlaut (lexetius.com)
   url: https://lexetius.com/AO/329,2
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- Frist (gekoppelt an die Steuererklärung) als Regeldaten ergänzen
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Verspätungszuschlag über die Steuererklärung nicht geprüft)'
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- titel: Abgabenordnung § 149 (Abgabe der Steuererklärungen)
+  url: https://dejure.org/gesetze/AO/149.html
+  abgerufen: 2026-10-13
+- titel: Abgabenordnung § 152 (Verspätungszuschlag)
+  url: https://www.gesetze-im-internet.de/ao_1977/__152.html
+  abgerufen: '2026-10-22'
+fachlich_zu_pruefen: []
 pruefung:
   status: entwurf
   geprueft_von: null

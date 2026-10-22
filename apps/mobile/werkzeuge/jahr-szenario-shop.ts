@@ -118,6 +118,8 @@ export const PROFIL: Profil = {
   "vorauszahlung.gewst": true,
   "kunden.segmente": ["b2c", "b2b"],
   "kunden.regionen": ["inland", "eu"],
+  // StB Busch 22.10.2026: Meldezeitraum der Zusammenfassenden Meldung wird abgefragt – Lina meldet monatlich (die Regel)
+  "ust.zm_meldezeitraum": "monatlich",
   // Marktstand seit r9 als eigene Antwort; Lohnsteuer „keine“ (nur Minijob mit Pauschsteuer); Investoren-Frage für alle Rechtsformen
   "vertrieb.kanaele": ["onlineshop", "marktstand"],
   "personal.lohnsteuer_anmeldezeitraum": "keine",
@@ -723,9 +725,9 @@ export function standBauen(): Bau {
   for (const [id, soll, warum] of ERWARTET) vergleichText(`Pflichten-Check (${D.de(stichtag)})`, `${id} (${warum})`, istDa(id), soll);
   const termin = (id: string) => [...a.gilt, ...a.gruendung].find((p) => p.id === id)?.naechsterTermin ?? "–";
   vergleichText(`Pflichten-Check (${D.de(stichtag)})`, "USt-Voranmeldung: nächster Termin (monatlich, Januar → 10.02.2026)", termin("steuern.ust_voranmeldung"), "2026-02-10");
-  // R11 (Steuerprüfung 16): mit Warenlieferungen rechnet der Katalog mit dem monatlichen Termin (25.) – die Wahl „vierteljährlich bei
-  // igL bis 50.000 € je Quartal“ fragt die App nicht ab; nur sonstige Leistungen wären immer vierteljährlich
-  vergleichText(`Pflichten-Check (${D.de(stichtag)})`, "Zusammenfassende Meldung: nächster Termin (monatlich am 25., verschoben auf Montag 26.01.2026; vierteljährlich 27.04.2026 wäre bei igL bis 50.000 € je Quartal zulässig, § 18a Abs. 1 UStG)", termin("steuern.zusammenfassende_meldung"), "2026-01-26");
+  // StB Busch 22.10.2026: Meldezeitraum wird abgefragt (hier monatlich); die App nennt den 25. ohne Verschiebung nach § 108 Abs. 3 AO,
+  // weil nicht abschließend geklärt ist, ob das BZSt die Frist verschiebt – 25.01.2026 ist ein Sonntag
+  vergleichText(`Pflichten-Check (${D.de(stichtag)})`, "Zusammenfassende Meldung: nächster Termin (monatlich am 25., ohne Verschiebung – 25.01.2026 ist ein Sonntag; vierteljährlich wäre bei igL bis 50.000 € je Quartal wählbar, § 18a Abs. 1 Satz 2 UStG)", termin("steuern.zusammenfassende_meldung"), "2026-01-25");
   {
     const sommer = auswertung(s.profil, "2026-07-01", s.unterlagen.filter((u) => (u.ausgegeben ?? "") < "2026-07-02"));
     vergleichText("Pflichten-Check (01.07.2026)", "online.widerrufsbutton (gilt ab 19.06.2026)", sommer.gilt.some((p) => p.id === "online.widerrufsbutton") ? "gilt" : "fehlt", "gilt");

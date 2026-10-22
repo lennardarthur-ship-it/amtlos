@@ -1,14 +1,15 @@
-# Katalog C.33 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog C.33 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt
 schema_version: 1
 id: steuern.kassenmeldung_ausserbetriebnahme
-version: 4
+version: 5
 katalog_nr: C.33
 titel:
   de: Außerbetriebnahme einer Kasse melden
 kurz:
   de: Wenn du eine elektronische Kasse nicht mehr nutzt, meldest du das innerhalb eines Monats über ELSTER.
 erklaerung:
-  de: Auch die Außerbetriebnahme einer elektronischen Kasse muss dem Finanzamt innerhalb eines Monats gemeldet werden.
+  de: Auch die Außerbetriebnahme einer elektronischen Kasse muss dem Finanzamt innerhalb eines Monats gemeldet werden. In der
+    Mitteilung erfasst du je Betriebsstätte alle Kassen; die Frist läuft für jede Außerbetriebnahme neu.
 rechtsgrundlage:
 - § 146a AO
 kategorie: steuern
@@ -23,7 +24,9 @@ frist:
     ereignis: kasse_ausser_betrieb
   versatz: P1M
   zeitpunkt: spaetestens
-  # R11 (Steuerprüfung 19): Fristende am Wochenende oder Feiertag nach § 108 Abs. 3 AO – laut Prüferin unsicher
+  # StB Busch 22.10.2026: Bezug auf jedes Ereignis, nicht nur das erste
+  je_ereignis: true
+  # Fristende am Wochenende oder Feiertag: § 108 Abs. 3 AO ist anzuwenden (StB Busch 22.10.2026)
   verschiebung:
     regel: naechster_werktag
     kalender: bundesland
@@ -45,7 +48,7 @@ erledigung:
   bestaetigung:
     de: In ELSTER gemeldet
 aenderungsnotiz:
-  de: Das Datenblatt aus Amtlos bereitet die Meldung nur vor. Erledigt ist sie, wenn du bestätigst, dass du sie in ELSTER übermittelt hast.
+  de: Jede Außerbetriebnahme hat jetzt ihre eigene Monatsfrist, nicht nur die erste.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -62,10 +65,7 @@ quellen:
 - titel: § 329 AO (Zwangsgeld), Wortlaut (lexetius.com)
   url: https://lexetius.com/AO/329,2
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Verschiebung auf den nächsten Werktag nach § 108 Abs. 3 AO (Steuerprüfung R11 Befund 19, „dürfte greifen“, unsicher) – bestätigen'
-- 'Mehrere Kassen: je Ereignis eine Meldung (derzeit Bezug auf die erste Außerbetriebnahme)'
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen'
+fachlich_zu_pruefen: []
 pruefung:
   status: entwurf
   geprueft_von: null

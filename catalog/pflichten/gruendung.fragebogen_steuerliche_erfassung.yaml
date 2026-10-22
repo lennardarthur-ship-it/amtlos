@@ -1,7 +1,7 @@
-# Katalog A.5 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog A.5 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt
 schema_version: 1
 id: gruendung.fragebogen_steuerliche_erfassung
-version: 4
+version: 5
 katalog_nr: A.5
 titel:
   de: Fragebogen zur steuerlichen Erfassung abgeben
@@ -9,14 +9,17 @@ kurz:
   de: Innerhalb eines Monats nach dem Start meldest du dich über ELSTER beim Finanzamt an.
 erklaerung:
   de: Im Fragebogen gibst du unter anderem an, ob du die Kleinunternehmerregelung nutzt, und schätzt Umsatz und Gewinn. Danach
-    bekommst du deine Steuernummer.
+    bekommst du deine Steuernummer. Die Frist von einem Monat beginnt mit der Eröffnung des Betriebs bzw. der Aufnahme der
+    Tätigkeit (§ 138 Abs. 1b Satz 1, Abs. 4 AO) – bei UG und GmbH also nicht schon mit der Beurkundung oder der Eintragung
+    ins Handelsregister. Ohne Steuernummer (oder USt-IdNr.) fehlt auf deinen Rechnungen eine Pflichtangabe (§ 14 Abs. 4 Satz 1
+    Nr. 2 UStG).
 begriffe:
 - begriff:
     de: Kleinunternehmerregelung
   erklaerung:
     de: Wer wenig Umsatz macht, kann ohne Umsatzsteuer abrechnen.
 rechtsgrundlage:
-- § 138 AO
+- § 138 Abs. 1b, Abs. 4 AO
 kategorie: gruendung
 ausloeser:
   immer: true
@@ -25,13 +28,16 @@ voraussetzungen:
 - gruendung.elster_konto
 frist:
   typ: relativ
+  # StB Busch 22.10.2026: Fristbeginn ist die Eröffnung des Betriebs bzw. die Aufnahme der Tätigkeit (§ 138 Abs. 1b Satz 1,
+  # Abs. 4 AO), nicht das Gründungsdatum – Beginn der Tätigkeit, ohne eigene Angabe das Startdatum aus dem Profil
   bezug:
-    fakt: profil.gruendungsdatum
+    fakt: abgeleitet.taetigkeit_beginn
   versatz: P1M
   zeitpunkt: spaetestens
+  # StB Busch 22.10.2026: § 108 Abs. 3 AO gilt
   verschiebung:
-    regel: keine
-    kalender: bundeseinheitlich
+    regel: naechster_werktag
+    kalender: bundesland
 wiederholung:
   art: einmalig
 stelle:
@@ -53,13 +59,17 @@ erledigung:
   bestaetigung:
     de: In ELSTER übermittelt
 aenderungsnotiz:
-  de: Erledigt ist der Fragebogen erst, wenn du ihn in ELSTER übermittelt hast – vorher brauchst du das ELSTER-Konto.
+  de: Die Monatsfrist läuft ab dem Beginn deiner Tätigkeit, nicht ab der Gründung der Gesellschaft; fällt das Fristende auf ein
+    Wochenende oder einen Feiertag, verschiebt es sich auf den nächsten Werktag.
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
 quellen:
 - titel: Abgabenordnung § 138
   url: https://www.gesetze-im-internet.de/ao_1977/__138.html
+  abgerufen: null
+- titel: Abgabenordnung § 108 (Fristen und Termine)
+  url: https://dejure.org/gesetze/AO/108.html
   abgerufen: null
 - titel: Abgabenordnung § 379 (Steuergefährdung)
   url: https://www.gesetze-im-internet.de/ao_1977/__379.html
@@ -70,11 +80,11 @@ quellen:
 - titel: § 329 AO (Zwangsgeld), Wortlaut (lexetius.com)
   url: https://lexetius.com/AO/329,2
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Fristbeginn: Aufnahme der Tätigkeit = Gründungsdatum im Profil? bestätigen'
-- Verschiebung bei Fristende am Wochenende/Feiertag festlegen
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Schwere „mittel“ mit dringend_ohne_termin belassen: Wortlaut ergibt kein Bußgeld, „hoch“ fachlich entscheiden)'
-- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (Sanktion in der Vorprüfung nicht an der Primärquelle belegt) – nach Ergänzung wieder „hoch“'
+- titel: Umsatzsteuergesetz § 14
+  url: https://www.gesetze-im-internet.de/ustg_1980/__14.html
+  abgerufen: null
+  fundstelle: § 14 Abs. 4 Satz 1 Nr. 2 UStG
+fachlich_zu_pruefen: []
 pruefung:
   status: entwurf
   geprueft_von: null

@@ -1,7 +1,7 @@
-# Katalog C.25 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog C.25 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt
 schema_version: 1
 id: steuern.zusammenfassende_meldung
-version: 5
+version: 6
 katalog_nr: C.25
 titel:
   de: Zusammenfassende Meldung abgeben
@@ -9,12 +9,15 @@ kurz:
   de: Wenn du Lieferungen oder Leistungen an Unternehmen in anderen EU-Ländern erbringst, meldest du sie bis zum 25. nach Ablauf des Meldezeitraums in der Zusammenfassenden Meldung.
 erklaerung:
   de: Die Zusammenfassende Meldung ist bei innergemeinschaftlichen Leistungen an Unternehmen (B2B) abzugeben. Du übermittelst sie
-    bis zum 25. Tag nach Ablauf jedes Kalendermonats an das Bundeszentralamt für Steuern. Vierteljährlich reicht, wenn deine
-    innergemeinschaftlichen Lieferungen je Quartal höchstens 50.000 € betragen; erbringst du nur sonstige Leistungen (keine
-    Warenlieferungen), meldest du immer vierteljährlich. Kleinunternehmer geben keine Zusammenfassende Meldung ab (§ 18a Abs. 4 UStG).
-    Amtlos rechnet bei Warenlieferungen mit dem monatlichen Termin. Ändert sich die Bemessungsgrundlage später (z. B. Skonto
-    oder Rücksendung), berichtigst du die Meldung für den ursprünglichen Zeitraum innerhalb eines Monats (§ 18a Abs. 10 UStG).
-    Amtlos stellt die Beträge je USt-IdNr. aus deinen Rechnungen zusammen (Vorlage „Zusammenfassende Meldung“); du übermittelst selbst.
+    bis zum 25. Tag nach Ablauf des Meldezeitraums an das Bundeszentralamt für Steuern. Bei Warenlieferungen ist der Kalendermonat
+    die Regel; vierteljährlich darfst du melden, wenn deine innergemeinschaftlichen Lieferungen weder im laufenden noch in einem
+    der vier vorangegangenen Quartale jeweils 50.000 € übersteigen (§ 18a Abs. 1 Satz 2 UStG). Erbringst du nur sonstige Leistungen
+    (keine Warenlieferungen), meldest du vierteljährlich. Amtlos fragt deshalb nach deinem Meldezeitraum. Fällt der 25. auf ein
+    Wochenende oder einen Feiertag, nennt Amtlos trotzdem den 25. – ob sich die Frist verschiebt, ist nicht abschließend geklärt.
+    Kleinunternehmer geben keine Zusammenfassende Meldung ab (§ 18a Abs. 4 UStG). Ändert sich die Bemessungsgrundlage später
+    (z. B. Skonto oder Rücksendung), berichtigst du die Meldung für den ursprünglichen Zeitraum innerhalb eines Monats (§ 18a
+    Abs. 10 UStG). Amtlos stellt die Beträge je USt-IdNr. aus deinen Rechnungen zusammen (Vorlage „Zusammenfassende Meldung“);
+    du übermittelst selbst.
 rechtsgrundlage:
 - § 18a UStG
 kategorie: steuern
@@ -37,27 +40,52 @@ ausloeser:
       de: Du hast Kunden in anderen EU-Ländern.
 frist:
   typ: wiederkehrend
-  # R11 (Steuerprüfung 16): nur sonstige Leistungen → vierteljährlich; mit Warenlieferungen monatlich (vierteljährlich bis 50.000 € je Quartal, nicht abgefragt)
+  # StB Busch 22.10.2026: Meldezeitraum abfragen – monatlich als Regel, vierteljährlich wählbar bis 50.000 € je Quartal
+  # (§ 18a Abs. 1 Satz 2 UStG), nur sonstige Leistungen vierteljährlich. Mit Warenlieferungen ohne Angabe fragt Amtlos nach.
   rhythmus:
     waehle:
     - wenn:
-        feld: profil.produkte.arten
-        op: enthaelt_eines
-        wert:
-        - physisch
-        - verpackung
-        - elektrogeraete
-        - batterien
-        - lebensmittel
-        - kosmetik
+        all:
+        - feld: profil.ust.zm_meldezeitraum
+          op: vorhanden
+        - feld: profil.ust.zm_meldezeitraum
+          op: in
+          wert:
+          - quartalsweise
+          - keine_warenlieferungen
+      dann: quartalsweise
+    - wenn:
+        all:
+        - feld: profil.ust.zm_meldezeitraum
+          op: vorhanden
+        - feld: profil.ust.zm_meldezeitraum
+          op: ==
+          wert: monatlich
+      dann: monatlich
+    - wenn:
+        all:
+        - feld: profil.produkte.arten
+          op: enthaelt_eines
+          wert:
+          - physisch
+          - verpackung
+          - elektrogeraete
+          - batterien
+          - lebensmittel
+          - kosmetik
+        # ohne Angabe zum Meldezeitraum offen (Rückfrage); „weiß ich nicht“ ⇒ monatlich als Regel
+        - feld: profil.ust.zm_meldezeitraum
+          op: ==
+          wert: unklar
       dann: monatlich
     sonst: quartalsweise
   faellig:
     art: tag_nach_periodenende
     monate_nach: 1
     tag: 25
+  # StB Busch 22.10.2026: ob das BZSt die Frist nach § 108 Abs. 3 AO verschiebt, ist nicht abschließend geklärt – den 25. nennen
   verschiebung:
-    regel: naechster_werktag
+    regel: keine
     kalender: bundeseinheitlich
 wiederholung:
   art: periodisch
@@ -71,22 +99,19 @@ sanktion:
   schwere: mittel
 automatisierung: formular_vorausfuellen
 aenderungsnotiz:
-  de: 'Steuerliche Prüfung (Heckler und Busch, 21.10.2026, C-9): Vorlage „Zusammenfassende Meldung“ aus den Rechnungen, Hinweis auf die Berichtigung nach § 18a Abs. 10 UStG.'
+  de: 'Amtlos fragt jetzt nach deinem Meldezeitraum (monatlich oder vierteljährlich) und nennt immer den 25. als Termin, ohne Verschiebung auf den nächsten Werktag.'
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
 quellen:
 - titel: Umsatzsteuergesetz § 18a
   url: https://www.gesetze-im-internet.de/ustg_1980/__18a.html
-  abgerufen: null
+  abgerufen: '2026-10-22'
+  fundstelle: § 18a Abs. 1 Satz 1 bis 4 UStG
 - titel: UStG § 26a (Bußgeldvorschriften)
   url: https://www.gesetze-im-internet.de/ustg_1980/__26a.html
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Termine nach Steuerprüfung R11 (Befund 16): 25. nach Ablauf des Meldezeitraums; nur sonstige Leistungen vierteljährlich, mit Warenlieferungen monatlich (Wahl vierteljährlich bis 50.000 € je Quartal nicht abgefragt); Verschiebung nach § 108 Abs. 3 AO bestätigen'
-- 'Kleinunternehmer ausgenommen (§ 18a Abs. 4 UStG, Steuerprüfung R11 „eindeutig“)'
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Zuständig ist das Bundeszentralamt für Steuern (§ 26a Abs. 4 UStG))'
-- 'Steuerliche Prüfung 21.10.2026 (C-9): Pflicht mit Frist bestätigt; Zuordnung in der Vorlage – Lieferungen nach Rechnungsdatum (spätestens Monat nach der Lieferung, § 18a Abs. 8 UStG), sonstige Leistungen nach Ausführung – bestätigen'
+fachlich_zu_pruefen: []
 pruefung:
   status: entwurf
   geprueft_von: null

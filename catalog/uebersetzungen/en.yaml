@@ -7,8 +7,6 @@ status: maschinell
 eintraege:
 - de: ARD ZDF Deutschlandradio Beitragsservice
   en: ARD ZDF Deutschlandradio Beitragsservice
-- de: Ab 1.1.2028 gilt die Pflicht zum Versand strukturierter E-Rechnungen für alle Unternehmen im B2B-Geschäft, außer Kleinunternehmern nach § 19 UStG.
-  en: From 1.1.2028, the obligation to send structured e-invoices applies to all businesses in B2B trade, except small businesses under § 19 UStG.
 - de: Ab 20 Arbeitsplätzen zeigst du jedes Jahr bis 31.3. die Beschäftigung schwerbehinderter Menschen an und zahlst gegebenenfalls die Ausgleichsabgabe.
   en: If you have 20 or more workplaces, you report the employment of severely disabled persons every year by 31.3. and pay the compensatory levy (Ausgleichsabgabe) if applicable.
 - de: Ab 50 Beschäftigten richtest du eine interne Meldestelle für Hinweisgeber ein.
@@ -93,8 +91,6 @@ eintraege:
   en: Record working hours under § 17 MiLoG
 - de: 'Arbeitszeiten jetzt schon elektronisch erfassen (Amtlos: Personal → Arbeitszeiten)'
   en: 'Start recording working hours electronically now (Amtlos: Staff → Working hours)'
-- de: Auch die Außerbetriebnahme einer elektronischen Kasse muss dem Finanzamt innerhalb eines Monats gemeldet werden.
-  en: The decommissioning of an electronic cash register must also be reported to the tax office (Finanzamt) within one month.
 - de: Auf Baustellen beachtest du als ausführende Firma die Hinweise des Koordinators und den Sicherheits- und Gesundheitsschutzplan; Vorankündigung, Plan und Koordinator sind Sache des Bauherrn.
   en: On construction sites, as the contractor you follow the coordinator's instructions and the safety and health protection plan; prior notice, plan and coordinator are matters for the client (Bauherr).
 - de: Auf Online-Marktplätzen stellst du deine Händlerangaben vollständig bereit.
@@ -173,8 +169,6 @@ eintraege:
   en: Register with the BSI (NIS2)
 - de: Beitragsnachweis übermitteln
   en: Submit the contribution statement
-- de: Belege und Rechnungen monatlich vollständig halten
-  en: Keep receipts and invoices complete every month
 - de: Bericht zur Entgelttransparenz (geplant)
   en: Pay transparency report (planned)
 - de: Berufserlaubnis und Zulassung
@@ -457,8 +451,6 @@ eintraege:
   en: Your company is not yet entered in the commercial register (Handelsregister).
 - de: Deine Krankenversicherung
   en: Your health insurance
-- de: Deine Rechnungen müssen bestimmte Angaben enthalten. Als Kleinunternehmer brauchst du einen Hinweis auf § 19 UStG.
-  en: Your invoices must contain certain details. Under the small business scheme, you need a reference to § 19 UStG.
 - de: Deine Selbstständigkeit hat noch nicht begonnen.
   en: Your self-employment has not started yet.
 - de: Deine Tätigkeit fällt unter eine erlaubnispflichtige Vorschrift der Gewerbeordnung.
@@ -541,8 +533,6 @@ eintraege:
     your first person starts working for you.
 - de: Die Bilanz in elektronischer Form, die ans Finanzamt übermittelt wird.
   en: The balance sheet in electronic form, submitted to the tax office (Finanzamt).
-- de: Die Einkommensteuererklärung übermittelst du elektronisch – ohne Steuerberatung bis 31. Juli des Folgejahres, mit Steuerberatung bis Ende Februar des übernächsten Jahres (§ 149 AO).
-  en: You submit your income tax return electronically – without a tax adviser by 31 July of the following year, with a tax adviser by the end of February of the year after that (§ 149 AO).
 - de: 'Die Einnahmenüberschussrechnung übermittelst du nach amtlich vorgeschriebenem Datensatz (§ 60 Abs. 4 EStDV); das Finanzamt kann sie mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO). Wird die Steuererklärung zu spät abgegeben, droht ein Verspätungszuschlag (§ 152 AO).'
   en: 'You transmit the income surplus calculation using the official data record (§ 60(4) EStDV); the tax office can enforce it with a coercive fine (Zwangsgeld) of up to €25,000 (§§ 328, 329 AO). If the tax return is filed late, a late-filing surcharge may be imposed (§ 152 AO).'
 - de: Die Folgen sind noch nicht fachlich erfasst.
@@ -592,6 +582,10 @@ eintraege:
     Musterprotokoll (§ 2 Abs. 3 GmbHG). Für die GmbH beträgt das Stammkapital mindestens 25.000 €, davon ist mindestens die Hälfte einzuzahlen. Eine UG kann ab 1 € gegründet werden.
   en: Founding a GmbH or UG starts with the articles of association, which are notarised by a notary (§ 2 GmbHG). Notarisation is also possible online by video communication with the notary, including with
     the model protocol (§ 2(3) GmbHG). For a GmbH, the share capital is at least €25,000, of which at least half must be paid in. A UG can be founded from €1.
+- de: Die Gründung einer GmbH oder UG beginnt mit dem Gesellschaftsvertrag, den ein Notar beurkundet. Die Beurkundung ist auch online möglich. Für die GmbH beträgt das Stammkapital mindestens 25.000 €,
+    davon ist mindestens die Hälfte einzuzahlen. Eine UG kann ab 1 € gegründet werden.
+  en: Founding a GmbH or UG starts with the articles of association, which are notarised by a notary. Notarisation is also possible online. For a GmbH, the share capital is at least €25,000, of which at
+    least half must be paid in. A UG can be founded from €1.
 - de: Die Höhe steht im Bescheid deiner Gemeinde.
   en: The amount is stated in your municipality's tax notice.
 - de: Die Information nennt unter anderem Zweck, Rechtsgrundlage, Empfänger, Speicherdauer und die Rechte der Betroffenen.
@@ -635,6 +629,8 @@ eintraege:
     ist keine E-Rechnung.
   en: The obligation to send structured e-invoices (XRechnung or ZUGFeRD) applies from 1.1.2027 to businesses with more than €800,000 in previous year's revenue. Small businesses under the small business
     scheme (Kleinunternehmerregelung) are exempt. A PDF invoice is not an e-invoice.
+- de: Die Mitteilung an die zuständige Aufsichtsbehörde ist Pflicht des Arbeitgebers.
+  en: Notifying the competent supervisory authority is the employer's obligation.
 - de: Die Preisangabenverordnung regelt, wie Preise gegenüber Verbrauchern anzugeben sind.
   en: The Price Indication Ordinance (Preisangabenverordnung) governs how prices must be stated to consumers.
 - de: Die Sozialkassen regeln unter anderem Urlaub und Berufsbildung in der Bauwirtschaft. Ob dein Betrieb erfasst ist, hängt von den überwiegenden Tätigkeiten ab.
@@ -661,6 +657,10 @@ eintraege:
     you lack proof of incapacity for work.'
 - de: Die Umsatzsteuer-Identifikationsnummer brauchst du für Geschäfte innerhalb der EU.
   en: You need the VAT identification number for business within the EU.
+- de: Die Statusfeststellung ist eine Möglichkeit, keine Pflicht. Sie schafft Sicherheit, wenn das Risiko der Scheinselbstständigkeit besteht.
+  en: The status determination is an option, not an obligation. It gives you certainty if there is a risk of bogus self-employment.
+- de: Die Umlagen finanzieren die Erstattung von Entgeltfortzahlung, Mutterschaftsleistungen und das Insolvenzgeld. Die eAU rufst du bei der Krankenkasse ab, meist über das Lohnprogramm.
+  en: The levies fund reimbursement of continued pay during illness, maternity benefits and insolvency pay. You retrieve the eAU from the health insurance fund (Krankenkasse), usually via the payroll software.
 - de: Die Unfallversicherung für Arbeitsunfälle und Berufskrankheiten in deiner Branche.
   en: The accident insurance for workplace accidents and occupational diseases in your industry.
 - de: Die Unterweisung erklärt die Gefährdungen am Arbeitsplatz und die Schutzmaßnahmen aus der Gefährdungsbeurteilung; sie findet während der Arbeitszeit statt, bei der Einstellung vor Aufnahme der Tätigkeit
@@ -765,8 +765,6 @@ eintraege:
   en: You have a permit under § 34c, § 34d or § 34f GewO.
 - de: Du hast eine Kasse außer Betrieb genommen.
   en: You have decommissioned a cash register.
-- de: Du erbringst Bauleistungen für andere Unternehmen.
-  en: You provide construction work for other businesses.
 - de: Du hast eine Website.
   en: You have a website.
 - de: Du hast im Vorjahr gegründet.
@@ -966,8 +964,6 @@ eintraege:
   en: An employee has told you she is pregnant.
 - de: Eine Beschäftigung endet.
   en: An employment ends.
-- de: Eine E-Rechnung ist ein strukturierter Datensatz. Eine PDF-Rechnung ist keine E-Rechnung.
-  en: An e-invoice is a structured data record. A PDF invoice is not an e-invoice.
 - de: Eine Rechnung als strukturierter Datensatz, den Software automatisch lesen kann.
   en: An invoice as a structured data record that software can read automatically.
 - de: Eine UG muss jedes Jahr ein Viertel ihres Jahresüberschusses in eine Rücklage stellen.
@@ -1016,8 +1012,6 @@ eintraege:
   en: Electronic certificate of incapacity for work (sick note) that you retrieve from the health insurance fund.
 - de: Elektronische Arbeitszeiterfassung (geplante Neuregelung)
   en: Electronic time recording (planned new rules)
-- de: Elektronische Aufzeichnungssysteme müssen durch eine zertifizierte technische Sicherheitseinrichtung geschützt sein. Zu jedem Geschäftsvorfall ist ein Beleg auszugeben.
-  en: Electronic recording systems must be protected by a certified technical security device. A receipt must be issued for every business transaction.
 - de: Elektronische Kasse beim Finanzamt melden
   en: Register your electronic cash register with the tax office
 - de: Entgeltstruktur nach Geschlecht auswerten (mit Lohnbüro)
@@ -1175,8 +1169,6 @@ eintraege:
     the person via the security register, at the latest six weeks after the end (§ 11b(6) GewO, § 16(6) BewachV).
 - de: Gewährleistung im Blick behalten
   en: Keep warranty in mind
-- de: 'Gibst du die Erklärung zu spät ab, kann das Finanzamt einen Verspätungszuschlag festsetzen; wird sie nicht binnen 14 Monaten nach Ablauf des Kalenderjahres abgegeben, muss es das in der Regel (§ 152 Abs. 1 bis 3 AO). Er beträgt für jeden angefangenen Monat 0,25 % der festgesetzten Steuer abzüglich Vorauszahlungen und anzurechnender Steuerabzugsbeträge, mindestens 25 €, höchstens 25.000 € (§ 152 Abs. 5 Satz 2, Abs. 10 AO). Die Abgabe kann das Finanzamt außerdem mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO).'
-  en: 'If you file the return late, the tax office can impose a late-filing surcharge (Verspätungszuschlag); if it is not filed within 14 months after the end of the calendar year, it must as a rule do so (§ 152(1) to (3) AO). For each month or part of a month it amounts to 0.25 % of the assessed tax less prepayments and creditable withheld taxes, at least €25, at most €25,000 (§ 152(5) sentence 2, (10) AO). The tax office can also enforce filing with a coercive fine (Zwangsgeld) of up to €25,000 (§§ 328, 329 AO).'
 - de: 'Gibst du die Erklärung zu spät ab, kann das Finanzamt einen Verspätungszuschlag festsetzen; wird sie nicht binnen 14 Monaten nach Ablauf des Kalenderjahres abgegeben, muss es das in der Regel. Er beträgt für jeden angefangenen Monat 25 €, höchstens 25.000 € (§ 152 Abs. 6, Abs. 10 AO). Die Abgabe kann das Finanzamt außerdem mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO).'
   en: 'If you file the return late, the tax office can impose a late-filing surcharge (Verspätungszuschlag); if it is not filed within 14 months after the end of the calendar year, it must as a rule do so. It amounts to €25 for each month or part of a month, at most €25,000 (§ 152(6), (10) AO). The tax office can also enforce filing with a coercive fine (Zwangsgeld) of up to €25,000 (§§ 328, 329 AO).'
 - de: Gilt jetzt auch für Gastronomie, Gebäudereinigung, Praxen sowie Handwerk und Bau mit Gefahrstoffen.
@@ -1231,8 +1223,6 @@ eintraege:
   en: You use AI tools.
 - de: Ihr nutzt elektrische Geräte im Betrieb.
   en: You use electrical equipment in your business.
-- de: Im Fragebogen gibst du unter anderem an, ob du die Kleinunternehmerregelung nutzt, und schätzt Umsatz und Gewinn. Danach bekommst du deine Steuernummer.
-  en: In the questionnaire you state, among other things, whether you use the small business scheme (Kleinunternehmerregelung), and estimate your revenue and profit. After that you receive your tax number.
 - de: Im Gesellschafterkreis hat sich etwas geändert.
   en: Something has changed among the shareholders.
 - de: 'Im nicht privaten Bereich zahlst du für jede Betriebsstätte einen Rundfunkbeitrag, gestaffelt nach der Zahl der Beschäftigten: mit bis zu acht Beschäftigten ein Drittel des Beitrags, mit neun bis
@@ -1545,8 +1535,6 @@ eintraege:
   en: Without the filing period, Amtlos cannot calculate any dates.
 - de: Ohne Bescheinigung darfst du die jugendliche Person nicht beschäftigen (§ 32 Abs. 1 JArbSchG); Verstöße kosten bis 30.000 € (§ 58 Abs. 1, 4 JArbSchG).
   en: Without the certificate you may not employ the young person (§ 32(1) JArbSchG); breaches cost up to €30,000 (§ 58(1), (4) JArbSchG).
-- de: Ohne Freistellungsbescheinigung müssen Auftraggeber einen Teil deiner Rechnung als Bauabzugsteuer einbehalten.
-  en: Without an exemption certificate, clients must withhold part of your invoice as construction withholding tax.
 - de: Ohne Konto kannst du den Fragebogen zur steuerlichen Erfassung nicht elektronisch übermitteln.
   en: Without an account, you cannot submit the tax registration questionnaire electronically.
 - de: 'Ohne Nachweis der Einzahlung lehnt das Registergericht die Eintragung ab (§ 9c Abs. 1 GmbHG). Wer in der Anmeldung falsch versichert, dass die Einlagen geleistet sind, macht sich strafbar: Freiheitsstrafe
@@ -1746,8 +1734,6 @@ eintraege:
   en: Removal of the threshold under § 38 BDSG (planned)
 - de: Weiterbildungspflicht (Immobilien und Finanzen)
   en: Continuing education obligation (real estate and finance)
-- de: Welche Angaben eine Rechnung braucht, regelt § 14 UStG. Für Kleinbetragsrechnungen gelten Erleichterungen. Kleinunternehmer weisen auf die Steuerbefreiung nach § 19 UStG hin.
-  en: § 14 UStG sets out which details an invoice needs. Simplified rules apply to small-amount invoices. Small businesses under the small business scheme refer to the tax exemption under § 19 UStG.
 - de: Welche Erlaubnis nötig ist, hängt vom Beruf ab (z. B. Heilpraktiker, Pflege, Physiotherapie). Ohne sie darfst du die Tätigkeit nicht ausüben.
   en: Which permit you need depends on the profession (e.g. alternative practitioner (Heilpraktiker), nursing, physiotherapy). Without it, you may not carry out the activity.
 - de: Welche Gesetze du aushängst, auslegst oder elektronisch zugänglich machst, hängt von der Belegschaft ab. Ab der ersten beschäftigten Person – das Arbeitszeitgesetz mit den geltenden Rechtsverordnungen,
@@ -1768,13 +1754,8 @@ eintraege:
   en: If the municipality has set trade tax prepayments, you pay them on 15 February, 15 May, 15 August and 15 November.
 - de: Wenn du Arbeitslosengeld I bekommst, kannst du einen Gründungszuschuss beantragen – vor dem Start.
   en: If you receive unemployment benefit I (Arbeitslosengeld I), you can apply for a start-up grant (Gründungszuschuss), before you start.
-- de: Wenn du Bauleistungen erbringst, beantragst du beim Finanzamt eine Freistellungsbescheinigung, damit deine Auftraggeber keine Bauabzugsteuer einbehalten.
-  en: If you provide construction services, you apply to the tax office (Finanzamt) for an exemption certificate (Freistellungsbescheinigung) so that your clients do not withhold construction withholding
-    tax (Bauabzugsteuer).
 - de: Wenn du Daten erhebst, informierst du die Menschen darüber – etwa in einer Datenschutzerklärung oder einem Informationsblatt.
   en: When you collect data, you inform the people concerned – for example in a privacy policy or an information sheet.
-- de: Wenn du Geschäfte mit Kunden in anderen EU-Ländern machst, beantragst du eine USt-IdNr. beim Bundeszentralamt für Steuern.
-  en: If you do business with customers in other EU countries, you apply for a VAT ID number (USt-IdNr.) from the Federal Central Tax Office (Bundeszentralamt für Steuern).
 - de: Wenn du Mitarbeitende am Unternehmen beteiligen willst, gibt es dafür besondere Regeln und Modelle wie VSOP.
   en: If you want to give employees a stake in the company, there are special rules and models such as VSOP.
 - de: Wenn du Videoüberwachung einsetzt, machst du sie erkennbar und dokumentierst den Zweck.
@@ -1864,8 +1845,6 @@ eintraege:
   en: Knowledge and skills to use AI systems competently and to understand their opportunities and risks.
 - de: Zahl das Stammkapital auf das Geschäftskonto ein, bevor die Gesellschaft zum Handelsregister angemeldet wird.
   en: Pay the share capital into the business account before the company is registered with the commercial register (Handelsregister).
-- de: 'Zahlst du nicht rechtzeitig, fällt für jeden angefangenen Monat ein Säumniszuschlag von 1 % des auf 50 € abgerundeten rückständigen Betrags an; bei bis zu drei Tagen Verspätung wird er nicht erhoben (§ 240 Abs. 1, 3 AO).'
-  en: 'If you pay late, a late-payment surcharge (Säumniszuschlag) of 1 % of the overdue amount, rounded down to the nearest €50, accrues for each month or part of a month; for a delay of up to three days it is not charged (§ 240(1), (3) AO).'
 - de: 'Zahlst du nicht rechtzeitig, fällt für jeden angefangenen Monat ein Säumniszuschlag von 1 % des auf 50 € abgerundeten rückständigen Betrags an; bei bis zu drei Tagen Verspätung wird er nicht erhoben (§ 240 Abs. 1, 3 AO). Hast du sie nicht oder nicht richtig berechnet, kann das Finanzamt sie festsetzen (§ 48 Abs. 3 UStDV).'
   en: 'If you pay late, a late-payment surcharge (Säumniszuschlag) of 1 % of the overdue amount, rounded down to the nearest €50, accrues for each month or part of a month; for a delay of up to three days it is not charged (§ 240(1), (3) AO). If you did not calculate it or calculated it incorrectly, the tax office can assess it (§ 48(3) UStDV).'
 - de: 'Zahlst du nicht rechtzeitig, fällt für jeden angefangenen Monat ein Säumniszuschlag von 1 % des auf 50 € abgerundeten rückständigen Betrags an; bei bis zu drei Tagen Verspätung wird er nicht erhoben (§ 240 Abs. 1, 3 AO). Wer die Vorauszahlung nicht, nicht vollständig oder nicht rechtzeitig zahlt, riskiert außerdem ein Bußgeld bis 30.000 € (§ 26a Abs. 1, 3 UStG in Verbindung mit § 18 Abs. 1 Satz 4 UStG). Für eine verspätete Voranmeldung kann das Finanzamt einen Verspätungszuschlag festsetzen (§ 152 Abs. 1 AO).'
@@ -1908,8 +1887,6 @@ eintraege:
   en: '§ 379 AO does not cover the notification under § 146a(4) AO – no separate fine is provided for it. The tax office can enforce the notification with a coercive fine (Zwangsgeld) of up to €25,000 (§§ 328, 329 AO).'
 - de: '§ 379 Abs. 2 Nr. 1 AO erfasst nur Mitteilungen nach § 138 Abs. 2 AO – für die Angaben zur steuerlichen Erfassung ist kein eigenes Bußgeld vorgesehen. Das Finanzamt kann sie mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO).'
   en: '§ 379(2) no. 1 AO only covers notifications under § 138(2) AO – no separate fine is provided for the information for tax registration. The tax office can enforce it with a coercive fine (Zwangsgeld) of up to €25,000 (§§ 328, 329 AO).'
-- de: '§ 5b EStG nennt kein eigenes Bußgeld. Das Finanzamt kann die Übermittlung mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO).'
-  en: '§ 5b EStG provides no separate fine. The tax office can enforce the transmission with a coercive fine (Zwangsgeld) of up to €25,000 (§§ 328, 329 AO).'
 - de: '§§ 5, 6 ArbSchG sind nicht unmittelbar bußgeldbewehrt: Die Aufsicht kann die nötigen Maßnahmen anordnen, ein Verstoß gegen die vollziehbare Anordnung kostet bis 30.000 € (§ 22 Abs. 3 Satz 1 Nr. 1, § 25 Abs. 1 Nr. 2 Buchst. a, Abs. 2 ArbSchG). Für die Dokumentation gelten außerdem die Bußgelder bei „Gefährdungsbeurteilung erstellen“.'
   en: '§§ 5, 6 ArbSchG are not directly subject to fines: the authority can order the necessary measures, and a breach of the enforceable order costs up to €30,000 (§ 22(3) sentence 1 no. 1, § 25(1) no. 2 letter a, (2) ArbSchG). For the documentation, the fines listed under “Create a risk assessment” also apply.'
 - de: Ärztliche Erstuntersuchung Jugendlicher vor Beginn
@@ -2042,10 +2019,6 @@ eintraege:
   en: The General Product Safety Regulation has applied since 13.12.2024. Manufacturers and importers take care of the responsible person in the EU, the manufacturer details and the safety information. As a dealer of other brands' goods you check before selling whether the manufacturer, where applicable the importer, and the required details are on the product or packaging. Anyone offering products at a distance (for example in an online shop or on a marketplace) states these details in the offer. Food is not covered by the regulation.
 - de: Lebensmittel lösen die Pflicht nicht mehr aus (Art. 2 Abs. 3). Für Händlerinnen und Händler fremder Markenware ist beschrieben, was sie prüfen.
   en: Food no longer triggers the obligation (Art. 2(3)). For dealers of other brands' goods it is described what they check.
-- de: 'Buchungsbelege einschließlich Rechnungen: 8 Jahre. Jahresabschlüsse, Bücher und Organisationsunterlagen: 10 Jahre. Handels- und Geschäftsbriefe: 6 Jahre. Die Frist läuft aber nicht ab, solange die Unterlagen für Steuern von Bedeutung sind, deren Festsetzungsfrist noch nicht abgelaufen ist – zum Beispiel bei einer laufenden Betriebsprüfung oder einem offenen Einspruch. Amtlos zeigt dir, ab wann du Unterlagen frühestens löschen darfst; ob noch etwas offen ist, klärst du vorher mit deiner Steuerberatung.'
-  en: 'Accounting vouchers including invoices: 8 years. Annual financial statements, books and organisational documents: 10 years. Commercial and business letters: 6 years. However, the period does not expire as long as the documents matter for taxes whose assessment period has not yet expired – for example during an ongoing tax audit or an open objection. Amtlos shows you the earliest date you may delete documents; check with your tax adviser beforehand whether anything is still open.'
-- de: 'Ergänzt: Die Aufbewahrungsfrist läuft nicht ab, solange für die Unterlagen eine Festsetzungsfrist noch offen ist (§ 147 Abs. 3 S. 5 AO).'
-  en: 'Added: the retention period does not expire as long as an assessment period for the documents is still open (§ 147(3) sentence 5 AO).'
 - de: Bücher nach den Regeln der doppelten Buchführung führen Kapitalgesellschaften und die GmbH & Co. KG immer. Eingetragene Kaufleute (e. K.) sind befreit, wenn sie an zwei aufeinanderfolgenden Abschlussstichtagen höchstens 800.000 € Umsatz und 80.000 € Jahresüberschuss haben (§ 241a HGB). Steuerlich wirst du nach § 141 AO erst buchführungspflichtig, wenn das Finanzamt es dir mitteilt – das kann es, wenn dein Umsatz über 800.000 € oder dein Gewinn über 80.000 € liegt. Bis dahin ermittelst du den Gewinn mit der Einnahmen-Überschuss-Rechnung. Die Buchführung ist eine laufende Pflicht; den Jahresabschluss macht in der Regel deine Steuerberatung.
   en: Corporations and the GmbH & Co. KG always keep double-entry books. Registered merchants (e. K.) are exempt if on two consecutive balance sheet dates they have no more than €800,000 turnover and €80,000 annual net profit (§ 241a HGB). For tax purposes you only become obliged to keep books under § 141 AO when the tax office notifies you – it can do so if your turnover exceeds €800,000 or your profit €80,000. Until then you determine profit with the cash-basis accounts (EÜR). Bookkeeping is an ongoing obligation; the annual financial statements are usually prepared by your tax adviser.
 - de: Dein Unternehmen ist eine GmbH & Co. KG und damit nach dem Handelsgesetzbuch buchführungspflichtig.
@@ -2072,60 +2045,34 @@ eintraege:
   en: Registered merchants below the limits of § 241a HGB are no longer obliged to keep books; the obligation under § 141 AO only applies after notification by the tax office. A document no longer completes bookkeeping.
 - de: Wenn du bilanzierst, übermittelst du Bilanz und Gewinn- und Verlustrechnung elektronisch ans Finanzamt.
   en: If you prepare balance sheets, you transmit the balance sheet and profit and loss account electronically to the tax office.
-- de: Die E-Bilanz ist die elektronische Übermittlung von Bilanz und Gewinn- und Verlustrechnung an das Finanzamt. Sie gilt für alle, die Bücher führen und bilanzieren – nicht nur für Gesellschaften. Eine Bilanz als PDF erledigt sie nicht.
-  en: The e-balance sheet is the electronic transmission of the balance sheet and profit and loss account to the tax office. It applies to everyone who keeps books and prepares balance sheets – not only to companies. A balance sheet as a PDF does not complete it.
 - de: An das Finanzamt übermittelt
   en: Transmitted to the tax office
-- de: Gilt jetzt für alle, die zur Buchführung verpflichtet sind, nicht nur für Kapitalgesellschaften.
-  en: Now applies to everyone obliged to keep books, not only to corporations.
 - de: Du bist als Einzelperson unternehmerisch tätig.
   en: You run your business as an individual.
 - de: Bei GbR, Partnerschaftsgesellschaft und GmbH & Co. KG gibt die Gesellschaft jetzt die Feststellungserklärung ab (eigene Pflicht); die Einkommensteuererklärung machen die Gesellschafter persönlich.
   en: For a GbR, partnership company and GmbH & Co. KG, the company now files the declaration of separate determination (separate obligation); the partners file income tax returns personally.
-- de: Wer nicht zur doppelten Buchführung verpflichtet ist, ermittelt den Gewinn mit der Einnahmen-Überschuss-Rechnung. Das gilt auch für eingetragene Kaufleute unter den Grenzen des § 241a HGB und für Gewerbetreibende, denen das Finanzamt keine Buchführungspflicht mitgeteilt hat.
-  en: Anyone not obliged to keep double-entry books determines profit with the cash-basis accounts (EÜR). This also applies to registered merchants below the limits of § 241a HGB and to traders whom the tax office has not notified of a bookkeeping obligation.
-- de: Gilt jetzt auch für eingetragene Kaufleute unter den Grenzen des § 241a HGB und bis zur Mitteilung des Finanzamts nach § 141 AO.
-  en: Now also applies to registered merchants below the limits of § 241a HGB and until notification by the tax office under § 141 AO.
 - de: Erklärung zur gesonderten und einheitlichen Feststellung abgeben
   en: File the declaration of separate and uniform determination
 - de: Einmal im Jahr gibt eure Gesellschaft elektronisch die Feststellungserklärung ab; die Gesellschafter versteuern ihren Anteil in ihrer eigenen Einkommensteuererklärung.
   en: Once a year your company electronically files the declaration of separate determination; the partners pay tax on their share in their own income tax returns.
-- de: Bei einer Personengesellschaft stellt das Finanzamt den Gewinn der Gesellschaft gesondert und einheitlich fest und verteilt ihn auf die Gesellschafter. Dafür gibt die Gesellschaft jedes Jahr eine Feststellungserklärung ab – ohne Steuerberatung bis 31. Juli des Folgejahres, mit Steuerberatung bis Ende Februar des übernächsten Jahres. Jede Gesellschafterin und jeder Gesellschafter gibt zusätzlich die eigene Einkommensteuererklärung ab.
-  en: For a partnership, the tax office determines the company's profit separately and uniformly and allocates it to the partners. For this the company files a declaration of separate determination every year – without a tax adviser by 31 July of the following year, with a tax adviser by the end of February of the year after. Each partner also files their own income tax return.
 - de: Dein Unternehmen ist eine Personengesellschaft.
   en: Your business is a partnership.
-- de: Elektronische Kassen müssen dem Finanzamt gemeldet werden, innerhalb eines Monats nach Anschaffung oder Außerbetriebnahme. Bestandskassen waren bis 31.7.2025 zu melden. Die Meldung geht nur über ELSTER (amtlich vorgeschriebener Datensatz); ein ausgedrucktes oder geteiltes Datenblatt erfüllt sie nicht.
-  en: Electronic tills must be reported to the tax office within one month of purchase or decommissioning. Existing tills had to be reported by 31.7.2025. The report can only be made via ELSTER (officially prescribed data set); a printed or shared data sheet does not fulfil it.
 - de: In ELSTER gemeldet
   en: Reported in ELSTER
-- de: Das Datenblatt aus Amtlos bereitet die Meldung nur vor. Erledigt ist sie, wenn du bestätigst, dass du sie in ELSTER übermittelt hast.
-  en: The data sheet from Amtlos only prepares the report. It is done once you confirm that you transmitted it in ELSTER.
 - de: Ab 1. Januar Regelbesteuerung
   en: Standard VAT from 1 January
-- de: Die Kleinunternehmerregelung setzt voraus, dass dein Umsatz im Vorjahr höchstens 25.000 € betrug. Überschreitest du diese Grenze in diesem Jahr, ohne über 100.000 € zu kommen, gilt die Regelung bis zum Jahresende weiter. Ab 1. Januar weist du auf deinen Rechnungen Umsatzsteuer aus, gibst Umsatzsteuer-Voranmeldungen ab und kannst die Vorsteuer aus deinen Eingangsrechnungen abziehen. Stelle Rechnungsvorlage, Preise und Buchhaltung rechtzeitig um.
-  en: The small business scheme requires that your turnover last year was no more than €25,000. If you exceed this limit this year without going over €100,000, the scheme continues until the end of the year. From 1 January you show VAT on your invoices, file advance VAT returns and can deduct input VAT from your purchase invoices. Adjust your invoice template, prices and bookkeeping in good time.
 - de: Dein Umsatz im Vorjahr lag höchstens bei 25.000 €.
   en: Your turnover last year was no more than €25,000.
 - de: Dein erwarteter Umsatz in diesem Jahr liegt über 25.000 €.
   en: Your expected turnover this year exceeds €25,000.
 - de: Ab 1. Januar fällt Umsatzsteuer an, auch wenn du sie nicht berechnest.
   en: From 1 January VAT is due, even if you do not charge it.
-- de: 'Die Kleinunternehmerregelung gilt, wenn dein Umsatz im Vorjahr höchstens 25.000 € betrug und im laufenden Jahr 100.000 € nicht übersteigt. Die 25.000 € beziehen sich also auf das Vorjahr: Liegt dein Umsatz in diesem Jahr über 25.000 €, aber höchstens bei 100.000 €, bleibst du dieses Jahr Kleinunternehmer – ab 1. Januar des nächsten Jahres gilt dann die Regelbesteuerung. Die 100.000 € sind die harte Grenze im laufenden Jahr: Ab dem Umsatz, mit dem du sie überschreitest, endet die Regelung sofort. Im Gründungsjahr gilt 25.000 € als harte Grenze für das laufende Jahr. Wer auf die Regelung verzichtet, ist fünf Jahre daran gebunden.'
-  en: 'The small business scheme applies if your turnover last year was no more than €25,000 and does not exceed €100,000 in the current year. So the €25,000 refers to the previous year: if your turnover this year exceeds €25,000 but stays at or below €100,000, you remain a small business this year – from 1 January of next year standard VAT taxation applies. The €100,000 is the hard limit in the current year: the scheme ends immediately with the sale that exceeds it. In the founding year, €25,000 is the hard limit for the current year. If you waive the scheme, you are bound for five years.'
-- de: 'Klarer erklärt: 25.000 € ist die Grenze für das Vorjahr, 100.000 € die harte Grenze im laufenden Jahr.'
-  en: 'Explained more clearly: €25,000 is the limit for the previous year, €100,000 the hard limit in the current year.'
-- de: Bei monatlicher Abgabe mit Dauerfristverlängerung zahlst du bis zum 10. Februar eine Sondervorauszahlung von einem Elftel der Vorauszahlungen des Vorjahres. Sie wird in der Voranmeldung für Dezember angerechnet (Kennzahl 39).
-  en: With monthly filing and a permanent filing extension you pay a special advance payment of one eleventh of the previous year's advance payments by 10 February. It is credited in the advance return for December (box 39).
-- de: 'Termin ergänzt: jedes Jahr bis 10. Februar, ein Elftel der Vorauszahlungen des Vorjahres, angerechnet im Dezember.'
-  en: 'Deadline added: every year by 10 February, one eleventh of the previous year''s advance payments, credited in December.'
 - de: Du gibst die Voranmeldung regelmäßig ab.
   en: You file the advance return regularly.
 - de: Dein Umsatz im Vorjahr lag über der Kleinunternehmergrenze.
   en: Your turnover last year exceeded the small business limit.
 - de: Dein erwarteter Umsatz in diesem Jahr liegt über der Kleinunternehmergrenze.
   en: Your expected turnover this year exceeds the small business limit.
-- de: Über der Kleinunternehmergrenze gilt die Voranmeldung jetzt sicher, auch wenn die Steuer des Vorjahres nicht bekannt ist – du kannst den Rhythmus direkt angeben.
-  en: Above the small business limit the advance return now applies for certain, even if last year's tax is unknown – you can state the filing frequency directly.
 - de: Befreiung von der Buchführung nach § 241a HGB – Umsatzgrenze
   en: Exemption from bookkeeping under § 241a HGB – turnover limit
 - de: Befreiung von der Buchführung nach § 241a HGB – Grenze Jahresüberschuss
@@ -2230,8 +2177,6 @@ eintraege:
   en: Once a year you report the previous year's wages to the employers' liability insurance association – usually via the payroll software.
 - de: Endet eine Beschäftigung, meldest du die Person mit der nächsten Lohnabrechnung bei der Krankenkasse ab, spätestens sechs Wochen nach dem Ende.
   en: When employment ends, you deregister the person with the health insurer with the next payroll, at the latest six weeks after the end.
-- de: Erledigt ist der Fragebogen erst, wenn du ihn in ELSTER übermittelt hast – vorher brauchst du das ELSTER-Konto.
-  en: The questionnaire is only done once you have submitted it in ELSTER – for this you first need the ELSTER account.
 - de: Feuerlöscher bereitstellen und prüfen lassen
   en: Provide fire extinguishers and have them inspected
 - de: Für Gründungen gibt es Förderprogramme – etwa den Gründungszuschuss der Arbeitsagentur, Gründungskredite der KfW und der Förderbanken der Länder und geförderte Gründungsberatung; für Startups mit Kapitalgesellschaft auch EXIST und INVEST.
@@ -2622,8 +2567,6 @@ eintraege:
   en: Register security guards in the security register
 - de: Wer Klimaanlagen in Fahrzeugen befüllt, wartet oder Kältemittel absaugt, braucht eine Bescheinigung über die Sachkunde für fluorierte Treibhausgase.
   en: Anyone who fills or services air-conditioning systems in vehicles or recovers refrigerant needs a certificate of competence for fluorinated greenhouse gases.
-- de: Wer Umsatzsteuer auf Rechnungen ausweist, gibt je nach Höhe der Steuer im Vorjahr monatlich oder vierteljährlich eine Voranmeldung über ELSTER ab. Liegt dein Umsatz über der Kleinunternehmergrenze, gilt die Pflicht sicher – offen ist dann nur, ob monatlich oder vierteljährlich. Den Rhythmus legt das Finanzamt fest – er steht in deinen Bescheiden. Weißt du ihn nicht und kennt Amtlos die Steuer des Vorjahres nicht, rechnet Amtlos vorläufig mit vierteljährlich. Amtlos bereitet die Zahlen vor; du übermittelst selbst.
-  en: Anyone who shows VAT on invoices files an advance return via ELSTER monthly or quarterly, depending on the amount of tax in the previous year. If your turnover is above the small business limit, the obligation certainly applies – the only open question is whether monthly or quarterly. The tax office sets the rhythm – it is stated in your notices. If you don't know it and Amtlos doesn't know last year's tax, Amtlos provisionally assumes quarterly. Amtlos prepares the figures; you submit them yourself.
 - de: 'Wer den Antrag nicht, nicht richtig oder nicht rechtzeitig stellt, macht sich strafbar: Freiheitsstrafe bis zu drei Jahren oder Geldstrafe, bei Fahrlässigkeit bis zu einem Jahr oder Geldstrafe (§ 15a Abs. 4, 5 InsO). Zahlungen nach Eintritt der Insolvenzreife muss die Geschäftsführung der Gesellschaft in der Regel ersetzen (§ 15b InsO).'
   en: 'Anyone who does not file, files incorrectly or files late commits a criminal offence: imprisonment of up to three years or a fine, in case of negligence up to one year or a fine (§ 15a(4), (5) InsO). The managing directors must usually reimburse the company for payments made after insolvency occurred (§ 15b InsO).'
 - de: Wer gewerbliche Siedlungsabfälle erzeugt, sammelt Papier, Pappe und Karton, Glas, Kunststoffe, Metalle, Holz, Textilien und Bioabfälle getrennt und gibt sie vorrangig zur Vorbereitung zur Wiederverwendung oder zum Recycling weiter (§ 3 Abs. 1 GewAbfV). Die Getrenntsammlung dokumentierst du, etwa mit Lageplänen, Fotos, Liefer- oder Wiegescheinen und Entsorgungsverträgen (§ 3 Abs. 3 GewAbfV). Ist die Trennung technisch nicht möglich oder wirtschaftlich nicht zumutbar, gelten Ausnahmen, die du ebenfalls dokumentierst. Gefährliche Abfälle haben eigene Pflichten.
@@ -2676,10 +2619,6 @@ eintraege:
   en: Since 12.8.2026, the EU Packaging Regulation (EU) 2025/40 and the Packaging Law Implementation Act (Verpackungsrecht-Durchführungsgesetz, VerpackDG) apply; the latter replaced the Packaging Act (Verpackungsgesetz). You continue to register with the Central Agency Packaging Register (Zentrale Stelle Verpackungsregister, LUCID) and join a system for packaging that typically ends up with private end consumers (§§ 6, 7 VerpackDG).
 - de: Die Ausnahme von der monatlichen Voranmeldung für Neugründer gilt nur bis einschließlich 2026 – eine Verlängerung ist bisher nicht beschlossen.
   en: The exception from monthly advance VAT returns for new businesses only applies up to and including 2026 – an extension has not been adopted so far.
-- de: 'Für die Jahre 2021 bis 2026 richtet sich der Voranmeldungszeitraum im Gründungsjahr und im Folgejahr nach der voraussichtlichen Steuer (§ 18 Abs. 2 Satz 6 UStG). Ab 2027 gilt nach dem Gesetz wieder Satz 4: Im Jahr der Gründung und im Folgejahr gibst du die Voranmeldung monatlich ab. Stand: Oktober 2026 – eine Verlängerung ist nicht beschlossen, kann aber noch kommen. Hast du 2026 gegründet, klärst du mit dem Finanzamt oder der Steuerberatung, welcher Rhythmus 2027 für dich gilt.'
-  en: 'For the years 2021 to 2026, the advance return period in the year of founding and the following year depends on the expected tax (§ 18 Abs. 2 Satz 6 UStG). From 2027, the law again provides for sentence 4: in the year of founding and the following year, you file the advance return monthly. Status: October 2026 – an extension has not been adopted, but may still come. If you founded your business in 2026, clarify with the tax office or your tax adviser which filing rhythm applies to you in 2027.'
-- de: Noch keine – die Änderung gilt ab 2027.
-  en: None yet – the change applies from 2027.
 - de: Ab dem 1. Januar 2027 sind Rechnungen an Unternehmen als E-Rechnung vorgeschrieben, wenn der Vorjahresumsatz über 800.000 € liegt.
   en: From 1 January 2027, invoices to businesses must be e-invoices if the previous year's revenue is above €800,000.
 - de: Art. 4 KI-Verordnung verlangte seit 2.2.2025, ein ausreichendes Maß an KI-Kompetenz sicherzustellen. Seit dem Digital-Omnibus (VO (EU) 2026/1744, in Kraft seit 27.7.2026) verlangt Art. 4 nur noch Maßnahmen, die die KI-Kompetenz der Personen fördern, die in deinem Auftrag mit KI-Systemen arbeiten; ein bestimmtes Kompetenzniveau ist nicht mehr vorgeschrieben. Eine kurze Schulung mit Nachweis bleibt ein einfacher Weg, das zu zeigen; Amtlos bietet Schulungen mit Bestätigung.
@@ -2740,8 +2679,6 @@ eintraege:
   en: Your processing falls under Art. 37(1)(b), (c) GDPR or § 38(1) sentence 2 BDSG.
 - de: Die Hinweispflicht nach § 36 VSBG gilt für Unternehmer, die eine Website unterhalten oder AGB verwenden. Ausgenommen ist, wer am 31. Dezember des Vorjahres zehn oder weniger Personen beschäftigt hat (§ 36 Abs. 3 VSBG) – gezählt werden Personen, nicht Vollzeitstellen.
   en: The information duty under § 36 VSBG applies to traders who run a website or use general terms and conditions. Exempt is anyone who employed ten or fewer people on 31 December of the previous year (§ 36(3) VSBG) – people are counted, not full-time positions.
-- de: Die Kleinunternehmerregelung endet ab dem Umsatz, der die Grenze überschreitet. Ab wann du Umsatzsteuer ausweist und anmeldest, klären Finanzamt oder Steuerberatung mit dir.
-  en: The small business scheme ends from the sale that exceeds the limit. The tax office or your tax adviser will clarify with you from when you show and file VAT.
 - de: Die Pflicht zum Link auf die Online-Streitbeilegungsplattform der EU ist seit 20.07.2025 entfallen, die Plattform ist abgeschaltet. Steht der Link noch auf deiner Website, in AGB oder Impressum, entferne ihn.
   en: The obligation to link to the EU online dispute resolution platform has not applied since 20.07.2025, and the platform has been shut down. If the link is still on your website, in your terms and conditions or legal notice, remove it.
 - de: Du hast eine Einstellung vereinbart.
@@ -2780,8 +2717,6 @@ eintraege:
   en: According to your answers, double-entry bookkeeping with annual financial statements may apply – always for corporations, for others depending on legal form and size.
 - de: Nach deinen Angaben liegt dein Umsatz in diesem Jahr über 25.000 €. Nach § 19 UStG gilt die Kleinunternehmerregelung dann bis zum Jahresende weiter, ab 1. Januar des nächsten Jahres ist die Regelbesteuerung vorgesehen.
   en: According to your answers, your revenue this year is above €25,000. Under § 19 UStG the small business scheme then continues until the end of the year; from 1 January of the next year standard taxation is provided for.
-- de: Nach deinen Angaben liegt dein Umsatz über einer Kleinunternehmergrenze. Für Umsätze über der Grenze sieht § 19 UStG Umsatzsteuer vor – ab wann genau, klären Finanzamt oder Steuerberatung.
-  en: According to your answers, your revenue is above a small business limit. For sales above the limit, § 19 UStG provides for VAT – the tax office or your tax adviser will clarify from when exactly.
 - de: Ohne Belehrung kann der Kunde bis zu 12 Monate und 14 Tage widerrufen und muss für erbrachte Leistungen in der Regel keinen Wertersatz zahlen (§ 356 Abs. 3, 4, § 357a Abs. 2 BGB).
   en: Without information on the right of withdrawal, the customer can withdraw for up to 12 months and 14 days and as a rule does not have to pay compensation for services already provided (§ 356(3), (4), § 357a(2) BGB).
 - de: Ohne ordnungsgemäße Belehrung beginnt die Widerrufsfrist nicht; das Widerrufsrecht erlischt dann erst spätestens 12 Monate und 14 Tage nach Vertragsschluss bzw. Erhalt der Ware (§ 356 Abs. 3, 4 BGB).
@@ -2806,8 +2741,6 @@ eintraege:
   en: You process health data, use video surveillance or locate employees or vehicles.
 - de: OSS-Erklärung beim Bundeszentralamt für Steuern abgeben
   en: Submit the OSS return to the Federal Central Tax Office (Bundeszentralamt für Steuern)
-- de: Verkaufst du an Privatpersonen in anderen EU-Ländern über der Lieferschwelle von 10.000 €, meldest du diese Umsätze vierteljährlich im One-Stop-Shop – bis zum Ende des Monats nach dem Quartal.
-  en: If you sell to private individuals in other EU countries above the delivery threshold of €10,000, you report these sales quarterly in the One-Stop-Shop – by the end of the month after the quarter.
 - de: Du verkaufst an Privatpersonen.
   en: You sell to private individuals.
 - de: Du verkaufst online, über einen Marktplatz, eine App oder im Abo.
@@ -2816,14 +2749,6 @@ eintraege:
   en: Federal Central Tax Office (Bundeszentralamt für Steuern, BZStOnline portal)
 - de: Bei verspäteter Erklärung oder Zahlung erinnert das Bundeszentralamt bzw. der Bestimmungsstaat; Zuschläge und Zinsen richten sich nach dem Recht der Bestimmungsländer. Wer wiederholt gegen die Vorschriften des Verfahrens verstößt, kann davon ausgeschlossen werden und muss sich dann in jedem Bestimmungsland registrieren.
   en: If the return or payment is late, the Federal Central Tax Office or the Member State of consumption sends a reminder; surcharges and interest follow the law of the Member States of consumption. Anyone who repeatedly breaches the rules of the scheme can be excluded from it and must then register in each Member State of consumption.
-- de: 'Neu nach der steuerlichen Prüfung (Heckler und Busch, 21.10.2026): OSS-Erklärung mit Frist zum Monatsende nach dem Quartal, ohne Verschiebung.'
-  en: 'New after the tax review (Heckler und Busch, 21.10.2026): OSS return with a deadline at the end of the month after the quarter, without postponement.'
-- de: 'Steuerliche Prüfung (Heckler und Busch, 21.10.2026, C-9): Vorlage „Zusammenfassende Meldung“ aus den Rechnungen, Hinweis auf die Berichtigung nach § 18a Abs. 10 UStG.'
-  en: 'Tax review (Heckler und Busch, 21.10.2026, C-9): “EC Sales List” template from the invoices, note on corrections under § 18a(10) UStG.'
-- de: Fernverkäufe von Waren und bestimmte Leistungen (z. B. digitale Leistungen) an Privatpersonen in anderen EU-Ländern sind im Bestimmungsland steuerbar, sobald sie EU-weit im Vorjahr oder im laufenden Jahr zusammen 10.000 € netto übersteigen (§ 3c Abs. 4 UStG) – oder wenn du auf die Schwelle verzichtest. Statt dich in jedem Land zu registrieren, meldest du diese Umsätze je Land und Steuersatz im One-Stop-Shop (OSS) beim Bundeszentralamt für Steuern. Die Teilnahme zeigst du vorher über das BZStOnline-Portal an. Erklärung und Zahlung sind bis zum letzten Tag des Monats nach Ablauf des Quartals fällig (§ 18j Abs. 4 UStG); die Frist verschiebt sich nicht auf den nächsten Werktag. OSS-Umsätze gehören nicht in die deutsche Umsatzsteuer-Voranmeldung. Ob du über der Schwelle liegst, ergibt sich aus deinen Umsätzen – Amtlos fragt die Höhe nicht ab. Amtlos stellt die Umsätze aus Rechnungen mit „OSS“ je Land und Steuersatz zusammen; du übermittelst selbst.
-  en: Distance sales of goods and certain services (e.g. digital services) to private individuals in other EU countries are taxable in the country of destination once, EU-wide, they exceed €10,000 net in total in the previous year or the current year (§ 3c(4) UStG) – or if you waive the threshold. Instead of registering in each country, you report these sales per country and tax rate in the One-Stop-Shop (OSS) at the Federal Central Tax Office. You register for the scheme in advance via the BZStOnline portal. The return and payment are due by the last day of the month after the end of the quarter (§ 18j(4) UStG); the deadline is not moved to the next working day. OSS sales do not belong in the German advance VAT return. Whether you are above the threshold depends on your sales – Amtlos does not ask for the amount. Amtlos compiles the sales from invoices marked “OSS” per country and tax rate; you submit the return yourself.
-- de: Die Zusammenfassende Meldung ist bei innergemeinschaftlichen Leistungen an Unternehmen (B2B) abzugeben. Du übermittelst sie bis zum 25. Tag nach Ablauf jedes Kalendermonats an das Bundeszentralamt für Steuern. Vierteljährlich reicht, wenn deine innergemeinschaftlichen Lieferungen je Quartal höchstens 50.000 € betragen; erbringst du nur sonstige Leistungen (keine Warenlieferungen), meldest du immer vierteljährlich. Kleinunternehmer geben keine Zusammenfassende Meldung ab (§ 18a Abs. 4 UStG). Amtlos rechnet bei Warenlieferungen mit dem monatlichen Termin. Ändert sich die Bemessungsgrundlage später (z. B. Skonto oder Rücksendung), berichtigst du die Meldung für den ursprünglichen Zeitraum innerhalb eines Monats (§ 18a Abs. 10 UStG). Amtlos stellt die Beträge je USt-IdNr. aus deinen Rechnungen zusammen (Vorlage „Zusammenfassende Meldung“); du übermittelst selbst.
-  en: The recapitulative statement must be filed for intra-Community supplies and services to businesses (B2B). You submit it by the 25th day after the end of each calendar month to the Federal Central Tax Office. Quarterly is enough if your intra-Community supplies of goods are at most €50,000 per quarter; if you only provide services (no supplies of goods), you always file quarterly. Small businesses do not file a recapitulative statement (§ 18a(4) UStG). For supplies of goods Amtlos uses the monthly deadline. If the taxable amount changes later (e.g. cash discount or returns), you correct the report for the original period within one month (§ 18a(10) UStG). Amtlos compiles the amounts per VAT ID from your invoices (template “EC Sales List”); you submit it yourself.
 - de: Rückverfolgbarkeit sicherstellen
   en: Ensure traceability
 - de: Du kannst jederzeit sagen, von wem du Lebensmittel und Zutaten bekommen hast – und an welche Unternehmen du selbst lieferst. Geordnet aufbewahrte Lieferscheine und Rechnungen sind der einfachste Weg.
@@ -3102,3 +3027,284 @@ eintraege:
   en: As soon as you employ at least one person, the hazards at every workplace must be assessed, protective measures defined and documented. Amtlos creates a template for this suited to your sector. Review
     the assessment when the workplace or activities change, when there are new work equipment or substances, after accidents and near misses, in case of occupational diseases or health complaints, after
     results of occupational health care, when there are new regulations or findings, and when you employ young people or an employee informs you of her pregnancy.
+- de: Ab 1.1.2028 gilt die Pflicht zum Versand strukturierter E-Rechnungen für alle Unternehmen im B2B-Geschäft, außer Kleinunternehmern nach § 19 UStG. Ausgenommen sind Kleinbetragsrechnungen bis 250 €
+    und Fahrausweise (§§ 33, 34 UStDV).
+  en: From 1.1.2028, the obligation to send structured e-invoices applies to all businesses in B2B trade, except small businesses under § 19 UStG. Small-amount invoices up to €250 and travel tickets are
+    exempt (§§ 33, 34 UStDV).
+- de: Amtlos fragt jetzt nach deinem Meldezeitraum (monatlich oder vierteljährlich) und nennt immer den 25. als Termin, ohne Verschiebung auf den nächsten Werktag.
+  en: Amtlos now asks for your reporting period (monthly or quarterly) and always shows the 25th as the deadline, without moving it to the next working day.
+- de: Auch die Außerbetriebnahme einer elektronischen Kasse muss dem Finanzamt innerhalb eines Monats gemeldet werden. In der Mitteilung erfasst du je Betriebsstätte alle Kassen; die Frist läuft für jede
+    Außerbetriebnahme neu.
+  en: Taking an electronic cash register out of service must also be reported to the tax office within one month. In the notification you list all registers for each business premises; the deadline runs
+    anew for each register taken out of service.
+- de: Bei einer Personengesellschaft stellt das Finanzamt den Gewinn der Gesellschaft gesondert und einheitlich fest und verteilt ihn auf die Gesellschafter. Dafür gibt die Gesellschaft jedes Jahr eine
+    Feststellungserklärung ab – ohne Steuerberatung bis 31. Juli des Folgejahres, mit Steuerberatung bis Ende Februar des übernächsten Jahres. Jede Gesellschafterin und jeder Gesellschafter gibt zusätzlich
+    die eigene Einkommensteuererklärung ab. Die Feststellung entfällt ausnahmsweise, wenn nur eine der beteiligten Personen mit ihren Einkünften im Inland steuerpflichtig ist, oder in Fällen von geringer
+    Bedeutung (§ 180 Abs. 3 AO).
+  en: For a partnership, the tax office determines the partnership's profit separately and uniformly and allocates it to the partners. For this the partnership files a declaration of separate and uniform
+    determination (Feststellungserklärung) every year – without a tax adviser by 31 July of the following year, with a tax adviser by the end of February of the year after next. Each partner also files
+    their own income tax return. Exceptionally, no determination is made if only one of the persons involved is liable to tax in Germany on their income, or in cases of minor importance (§ 180(3) AO).
+- de: Bei monatlicher Abgabe mit Dauerfristverlängerung zahlst du bis zum 10. Februar eine Sondervorauszahlung von einem Elftel der Vorauszahlungen des Vorjahres. Sie wird in der Voranmeldung für Dezember
+    angerechnet (Kennzahl 39). Im ersten Jahr zahlst du sie mit dem Antrag auf Dauerfristverlängerung, danach jedes Jahr bis zum 10. Februar. Hast du deine Tätigkeit erst in diesem Jahr begonnen, wird sie
+    aus den voraussichtlichen Vorauszahlungen berechnet (§ 47 Abs. 2 UStDV). Erscheint der Steueranspruch gefährdet, kann das Finanzamt die Dauerfristverlängerung widerrufen (§ 46 Satz 2 UStDV).
+  en: If you file monthly with a permanent filing extension, you pay a special advance payment of one eleventh of the previous year's advance payments by 10 February. It is credited in the advance return
+    for December (box 39). In the first year you pay it together with the application for the permanent extension, after that every year by 10 February. If you only started your business this year, it is
+    calculated from the expected advance payments (§ 47(2) UStDV). If the tax claim appears to be at risk, the tax office can revoke the permanent extension (§ 46 sentence 2 UStDV).
+- de: 'Buchungsbelege einschließlich Rechnungen: 8 Jahre. Jahresabschlüsse, Bücher und Organisationsunterlagen: 10 Jahre. Handels- und Geschäftsbriefe: 6 Jahre. Die Frist beginnt mit dem Schluss des Kalenderjahres,
+    in dem du die letzte Eintragung gemacht, den Brief erhalten oder abgesandt hast oder der Beleg entstanden ist (§ 147 Abs. 4 AO). Lieferscheine, die keine Buchungsbelege sind, musst du seit 2025 nur
+    bis zum Erhalt bzw. Versand der Rechnung aufbewahren (§ 147 Abs. 3 Satz 3, 4 AO). Die Frist läuft aber nicht ab, solange die Unterlagen für Steuern von Bedeutung sind, deren Festsetzungsfrist noch nicht
+    abgelaufen ist – zum Beispiel bei einer laufenden Betriebsprüfung oder einem offenen Einspruch. Amtlos zeigt dir, ab wann du Unterlagen frühestens löschen darfst; ob noch etwas offen ist, klärst du
+    vorher mit deiner Steuerberatung.'
+  en: 'Accounting vouchers including invoices: 8 years. Annual accounts, books and organisational documents: 10 years. Commercial and business letters: 6 years. The period starts at the end of the calendar
+    year in which you made the last entry, received or sent the letter, or in which the voucher was created (§ 147(4) AO). Since 2025, delivery notes that are not accounting vouchers only need to be kept
+    until the invoice is received or sent (§ 147(3) sentences 3, 4 AO). However, the period does not expire as long as the documents matter for taxes whose assessment period has not yet expired – for example
+    during an ongoing tax audit or an open objection. Amtlos shows you the earliest date you may delete documents; check beforehand with your tax adviser whether anything is still open.'
+- de: Bußgeld bis 25.000 €, wenn die Kasse nicht oder nicht richtig verwendet oder nicht oder nicht richtig durch eine TSE geschützt wird und dadurch Steuerverkürzungen ermöglicht werden (§ 379 Abs. 1 Satz
+    1 Nr. 4, 5, Abs. 6 AO). Für die fehlende Belegausgabe nach § 146a Abs. 2 AO sieht § 379 AO kein Bußgeld vor. Ohne ordnungsgemäße TSE verliert die Kassenführung ihre Beweiskraft; das Finanzamt kann Umsätze
+    hinzuschätzen (§ 158, § 162 AO). Die Kasse kann jederzeit ohne Ankündigung geprüft werden (Kassen-Nachschau, § 146b AO).
+  en: Fine up to €25,000 if the register is not used or not used correctly, or not protected or not protected correctly by a TSE, and this makes tax evasion possible (§ 379(1) sentence 1 nos. 4, 5, (6)
+    AO). § 379 AO provides no fine for failing to issue a receipt under § 146a(2) AO. Without a proper TSE, your cash records lose their evidential value; the tax office can add estimated sales (§ 158,
+    § 162 AO). The register can be inspected at any time without notice (cash inspection, Kassen-Nachschau, § 146b AO).
+- de: Deine Rechnungen müssen bestimmte Angaben enthalten. Als Kleinunternehmer brauchst du den Hinweis, dass die Steuerbefreiung für Kleinunternehmer gilt (§ 34a UStDV).
+  en: Your invoices must contain certain details. As a small business, you need a note that the small business exemption applies (§ 34a UStDV).
+- de: Die E-Bilanz ist die elektronische Übermittlung von Bilanz und Gewinn- und Verlustrechnung an das Finanzamt. Sie gilt für alle, die Bücher führen und bilanzieren – nicht nur für Gesellschaften. Eine
+    Bilanz als PDF erledigt sie nicht. Du übermittelst sie mit der Körperschaftsteuer- bzw. Einkommensteuer- oder Feststellungserklärung, also in denselben Fristen (§ 149 AO) – ohne Steuerberatung bis 31.
+    Juli des Folgejahres, mit Steuerberatung bis Ende Februar des übernächsten Jahres. Zur Vermeidung unbilliger Härten kann das Finanzamt auf Antrag auf die elektronische Übermittlung verzichten (§ 5b
+    Abs. 2 EStG).
+  en: The E-Bilanz is the electronic transmission of the balance sheet and profit and loss account to the tax office. It applies to everyone who keeps books and draws up balance sheets – not only to companies.
+    A balance sheet as a PDF does not fulfil it. You transmit it with the corporation tax, income tax or separate determination return, i.e. within the same deadlines (§ 149 AO) – without a tax adviser
+    by 31 July of the following year, with a tax adviser by the end of February of the year after next. To avoid undue hardship, the tax office can waive electronic transmission on application (§ 5b(2)
+    EStG).
+- de: Die Einkommensteuererklärung übermittelst du elektronisch – ohne Steuerberatung bis 31. Juli des Folgejahres, mit Steuerberatung bis Ende Februar des übernächsten Jahres (§ 149 AO). Das Finanzamt
+    kann die Erklärung früher anfordern oder die Frist auf Antrag verlängern (§ 149 Abs. 4, § 109 AO).
+  en: You file your income tax return electronically – without a tax adviser by 31 July of the following year, with a tax adviser by the end of February of the year after next (§ 149 AO). The tax office
+    can request the return earlier or extend the deadline on application (§ 149(4), § 109 AO).
+- de: Die Folgen einer verspäteten oder fehlenden Voranmeldung stehen bei „Umsatzsteuer-Voranmeldung abgeben“.
+  en: The consequences of a late or missing advance return are listed under “File the advance VAT return”.
+- de: Die Folgen sind jetzt beschrieben, und die Fundstelle des aktuellen GoBD-Schreibens ist ergänzt.
+  en: The consequences are now described, and the reference to the current GoBD letter has been added.
+- de: Die Folgen sind jetzt vollständig beschrieben (Schätzung, Strafbarkeit) und als „hoch“ eingestuft.
+  en: The consequences are now fully described (estimate, criminal liability) and rated “high”.
+- de: Die Gewerbesteuer hängt vom Hebesatz deiner Gemeinde ab. Einzelunternehmen und Personengesellschaften haben einen Freibetrag. Die Erklärung gibst du ohne Steuerberatung bis 31. Juli des Folgejahres
+    ab, mit Steuerberatung bis Ende Februar des übernächsten Jahres (§ 149 AO). Das Finanzamt kann die Erklärung früher anfordern oder die Frist auf Antrag verlängern (§ 149 Abs. 4, § 109 AO).
+  en: Trade tax depends on your municipality's multiplier. Sole proprietorships and partnerships have an allowance. You file the return without a tax adviser by 31 July of the following year, with a tax
+    adviser by the end of February of the year after next (§ 149 AO). The tax office can request the return earlier or extend the deadline on application (§ 149(4), § 109 AO).
+- de: Die GoBD regeln, wie Bücher und Belege elektronisch geführt und aufbewahrt werden. Die Verfahrensdokumentation beschreibt deine Abläufe. Maßgeblich ist das BMF-Schreiben vom 28.11.2019, geändert am
+    11.03.2024 und am 14.07.2025.
+  en: The GoBD set out how books and vouchers are kept and stored electronically. The procedural documentation describes your processes. The governing text is the Federal Ministry of Finance (BMF) letter
+    of 28.11.2019, amended on 11.03.2024 and on 14.07.2025.
+- de: Die GoBD selbst sehen kein Bußgeld vor. Sind Bücher und Aufzeichnungen nicht ordnungsgemäß, verlieren sie ihre Beweiskraft (§ 158 AO) und das Finanzamt kann schätzen (§ 162 AO). Bußgeld bis 25.000
+    €, wenn dadurch Steuerverkürzungen ermöglicht werden (§ 379 Abs. 1 Satz 1 Nr. 3, Abs. 6 AO). Eine fehlende Verfahrensdokumentation allein führt nicht zur Verwerfung, wenn die Nachvollziehbarkeit gegeben
+    ist (GoBD Rz. 155).
+  en: The GoBD themselves provide no fine. If books and records are not kept properly, they lose their evidential value (§ 158 AO) and the tax office can estimate (§ 162 AO). Fine up to €25,000 if this
+    makes tax evasion possible (§ 379(1) sentence 1 no. 3, (6) AO). Missing procedural documentation alone does not lead to the books being rejected if they can still be traced and verified (GoBD para.
+    155).
+- de: Die Jahreserklärung fasst die Umsatzsteuer des ganzen Jahres zusammen – ohne Steuerberatung bis 31. Juli des Folgejahres, mit Steuerberatung bis Ende Februar des übernächsten Jahres (§ 149 AO). Das
+    Finanzamt kann die Erklärung früher anfordern oder die Frist auf Antrag verlängern (§ 149 Abs. 4, § 109 AO).
+  en: The annual return summarises the VAT for the whole year – without a tax adviser by 31 July of the following year, with a tax adviser by the end of February of the year after next (§ 149 AO). The tax
+    office can request the return earlier or extend the deadline on application (§ 149(4), § 109 AO).
+- de: Die Kleinunternehmerregelung endet ab dem Umsatz, der die Grenze überschreitet. Maßgeblich ist der Umsatz nach vereinnahmten Entgelten – die Zahlungen, die du netto erhältst, nicht die Rechnungen
+    nach Rechnungsdatum. Amtlos zählt bisher die Rechnungen, die du in Amtlos gestellt hast (netto, nach Rechnungsdatum); ob sie bezahlt sind, ist darin noch nicht berücksichtigt. Rechnungen außerhalb von
+    Amtlos sind nicht enthalten.
+  en: The small business scheme ends from the sale that exceeds the limit. What counts is turnover based on payments received – the net amounts you are paid, not the invoices by invoice date. Amtlos currently
+    counts the invoices you issued in Amtlos (net, by invoice date); whether they have been paid is not yet taken into account. Invoices outside Amtlos are not included.
+- de: 'Die Kleinunternehmerregelung gilt, wenn dein Umsatz im Vorjahr höchstens 25.000 € betrug und im laufenden Jahr 100.000 € nicht übersteigt. Die 25.000 € beziehen sich also auf das Vorjahr: Liegt dein
+    Umsatz in diesem Jahr über 25.000 €, aber höchstens bei 100.000 €, bleibst du dieses Jahr Kleinunternehmer – ab 1. Januar des nächsten Jahres gilt dann die Regelbesteuerung. Die 100.000 € sind die harte
+    Grenze im laufenden Jahr: Ab dem Umsatz, mit dem du sie überschreitest, endet die Regelung sofort. Im Gründungsjahr gilt 25.000 € als harte Grenze für das laufende Jahr. Maßgeblich ist der Umsatz nach
+    vereinnahmten Entgelten (netto, nach Zahlungseingang), nicht die Summe der Rechnungen nach Rechnungsdatum. Wer auf die Regelung verzichtet, ist fünf Jahre daran gebunden.'
+  en: 'The small business scheme applies if your turnover last year was at most €25,000 and does not exceed €100,000 this year. So the €25,000 refers to last year: if your turnover this year is above €25,000
+    but at most €100,000, you remain a small business this year – from 1 January of next year, standard taxation applies. The €100,000 is the hard limit for the current year: from the sale with which you
+    exceed it, the scheme ends immediately. In the founding year, €25,000 is the hard limit for the current year. What counts is turnover based on payments received (net, by date of payment), not the total
+    of invoices by invoice date. If you opt out of the scheme, you are bound for five years.'
+- de: Die Kleinunternehmerregelung setzt voraus, dass dein Umsatz im Vorjahr höchstens 25.000 € betrug. Überschreitest du diese Grenze in diesem Jahr, ohne über 100.000 € zu kommen, gilt die Regelung bis
+    zum Jahresende weiter. Ab 1. Januar weist du auf deinen Rechnungen Umsatzsteuer aus, gibst Umsatzsteuer-Voranmeldungen und die Umsatzsteuer-Jahreserklärung ab und kannst die Vorsteuer aus deinen Eingangsrechnungen
+    abziehen. Wie oft du die Voranmeldung abgibst, legt das Finanzamt nach der voraussichtlichen Steuer fest – bei mehr als 9.000 € monatlich, sonst vierteljährlich (§ 18 Abs. 2 UStG); es steht im Schreiben
+    des Finanzamts. Hast du als Kleinunternehmer Wirtschaftsgüter angeschafft, die du weiter nutzt, kann beim Wechsel eine Berichtigung der Vorsteuer in Frage kommen (§ 15a UStG). Maßgeblich für die Grenze
+    ist der Umsatz nach vereinnahmten Entgelten (netto, nach Zahlungseingang), nicht die Summe der Rechnungen nach Rechnungsdatum; Amtlos zählt bisher die in Amtlos gestellten Rechnungen. Stelle Rechnungsvorlage,
+    Preise und Buchhaltung rechtzeitig um.
+  en: The small business scheme requires that your turnover last year was at most €25,000. If you exceed this limit this year without going above €100,000, the scheme continues until the end of the year.
+    From 1 January you show VAT on your invoices, file advance VAT returns and the annual VAT return, and can deduct input VAT from your purchase invoices. How often you file the advance return is set by
+    the tax office based on the expected tax – monthly above €9,000, otherwise quarterly (§ 18(2) UStG); it is stated in the tax office's letter. If you bought assets as a small business that you continue
+    to use, an input VAT adjustment may apply when you switch (§ 15a UStG). What counts for the limit is turnover based on payments received (net, by date of payment), not the total of invoices by invoice
+    date; Amtlos currently counts the invoices issued in Amtlos. Adjust your invoice template, prices and bookkeeping in good time.
+- de: Die Monatsfrist läuft ab dem Beginn deiner Tätigkeit, nicht ab der Gründung der Gesellschaft; fällt das Fristende auf ein Wochenende oder einen Feiertag, verschiebt es sich auf den nächsten Werktag.
+  en: The one-month deadline runs from the start of your business activity, not from the founding of the company; if it ends on a weekend or public holiday, it moves to the next working day.
+- de: Die Pflicht zum Versand strukturierter E-Rechnungen (XRechnung oder ZUGFeRD) gilt ab 1.1.2027 für Unternehmen mit mehr als 800.000 € Vorjahresumsatz. Kleinunternehmer sind befreit. Eine PDF-Rechnung
+    ist keine E-Rechnung. Ausgenommen sind Kleinbetragsrechnungen bis 250 € und Fahrausweise (§§ 33, 34 UStDV).
+  en: The obligation to send structured e-invoices (XRechnung or ZUGFeRD) applies from 1.1.2027 to businesses with more than €800,000 turnover in the previous year. Small businesses are exempt. A PDF invoice
+    is not an e-invoice. Small-amount invoices up to €250 and travel tickets are exempt (§§ 33, 34 UStDV).
+- de: Die Rückkehr zur monatlichen Voranmeldung für Neugründer ist geltendes Recht ab 1. Januar 2027; wer 2026 gegründet hat, meldet 2027 monatlich.
+  en: The return to monthly advance returns for new businesses is law in force from 1 January 2027; if you founded in 2026, you file monthly in 2027.
+- de: Die Umsatzsteuer-Identifikationsnummer brauchst du für Geschäfte mit Unternehmen in anderen EU-Ländern – wenn du an sie lieferst oder leistest, aber auch, wenn du bei ihnen einkaufst, z. B. Software
+    oder Werbung. Eine Frist gibt es nicht; du beantragst sie online beim Bundeszentralamt für Steuern oder gleich im Fragebogen zur steuerlichen Erfassung. Verkaufst du nur an Privatpersonen in anderen
+    EU-Ländern (One-Stop-Shop), ist sie nicht erforderlich, für die Registrierung im One-Stop-Shop aber üblich. Auch als Kleinunternehmer kannst du sie beantragen und solltest es bei Einkäufen in anderen
+    EU-Ländern tun – die Steuer, die du dabei schuldest (§ 13b UStG), fällt auch für Kleinunternehmer an.
+  en: You need the VAT identification number for business with companies in other EU countries – when you supply goods or services to them, but also when you buy from them, e.g. software or advertising.
+    There is no deadline; you apply online at the Federal Central Tax Office or directly in the tax registration questionnaire. If you only sell to consumers in other EU countries (One-Stop-Shop), it is
+    not required, but it is usual for registering for the One-Stop-Shop. Small businesses can apply for it too and should do so when buying in other EU countries – the tax you owe on such purchases (§ 13b
+    UStG) also applies to small businesses.
+- de: Die Zusammenfassende Meldung ist bei innergemeinschaftlichen Leistungen an Unternehmen (B2B) abzugeben. Du übermittelst sie bis zum 25. Tag nach Ablauf des Meldezeitraums an das Bundeszentralamt für
+    Steuern. Bei Warenlieferungen ist der Kalendermonat die Regel; vierteljährlich darfst du melden, wenn deine innergemeinschaftlichen Lieferungen weder im laufenden noch in einem der vier vorangegangenen
+    Quartale jeweils 50.000 € übersteigen (§ 18a Abs. 1 Satz 2 UStG). Erbringst du nur sonstige Leistungen (keine Warenlieferungen), meldest du vierteljährlich. Amtlos fragt deshalb nach deinem Meldezeitraum.
+    Fällt der 25. auf ein Wochenende oder einen Feiertag, nennt Amtlos trotzdem den 25. – ob sich die Frist verschiebt, ist nicht abschließend geklärt. Kleinunternehmer geben keine Zusammenfassende Meldung
+    ab (§ 18a Abs. 4 UStG). Ändert sich die Bemessungsgrundlage später (z. B. Skonto oder Rücksendung), berichtigst du die Meldung für den ursprünglichen Zeitraum innerhalb eines Monats (§ 18a Abs. 10 UStG).
+    Amtlos stellt die Beträge je USt-IdNr. aus deinen Rechnungen zusammen (Vorlage „Zusammenfassende Meldung“); du übermittelst selbst.
+  en: The recapitulative statement (Zusammenfassende Meldung) must be filed for intra-EU supplies to businesses (B2B). You submit it to the Federal Central Tax Office by the 25th day after the end of the
+    reporting period. For deliveries of goods, the calendar month is the rule; you may report quarterly if your intra-EU deliveries do not exceed €50,000 in the current quarter or in any of the four preceding
+    quarters (§ 18a(1) sentence 2 UStG). If you only provide other services (no deliveries of goods), you report quarterly. That is why Amtlos asks for your reporting period. If the 25th falls on a weekend
+    or public holiday, Amtlos still shows the 25th – whether the deadline moves has not been conclusively settled. Small businesses do not file a recapitulative statement (§ 18a(4) UStG). If the taxable
+    amount changes later (e.g. discount or return), you correct the statement for the original period within one month (§ 18a(10) UStG). Amtlos compiles the amounts per VAT ID from your invoices (template
+    “Recapitulative statement”); you submit it yourself.
+- de: Du bist im Bau oder im Handwerk tätig.
+  en: You work in construction or a skilled trade.
+- de: Du erbringst Bauleistungen für Unternehmen oder öffentliche Auftraggeber.
+  en: You provide construction work for businesses or public-sector clients.
+- de: Du kaufst bei Unternehmen in anderen EU-Ländern ein.
+  en: You buy from businesses in other EU countries.
+- de: Eine E-Rechnung ist ein strukturierter Datensatz. Eine PDF-Rechnung ist keine E-Rechnung. Für den Empfang genügt ein E-Mail-Postfach (BMF-Schreiben vom 15.10.2024). Das gilt für alle Unternehmen,
+    auch für Kleinunternehmer.
+  en: An e-invoice is a structured data set. A PDF invoice is not an e-invoice. An e-mail inbox is enough for receiving them (BMF letter of 15.10.2024). This applies to all businesses, including small businesses.
+- de: Elektronische Aufzeichnungssysteme müssen durch eine zertifizierte technische Sicherheitseinrichtung geschützt sein. Zu jedem Geschäftsvorfall ist ein Beleg auszugeben. Von der Belegausgabepflicht
+    befreit das Finanzamt nur auf Antrag (§ 148 AO).
+  en: Electronic recording systems must be protected by a certified technical security device. A receipt must be issued for every transaction. The tax office only exempts you from the obligation to issue
+    receipts on application (§ 148 AO).
+- de: Elektronische Kassen müssen dem Finanzamt gemeldet werden, innerhalb eines Monats nach Anschaffung oder Außerbetriebnahme. Für Bestandskassen ist die Meldefrist 31.7.2025 abgelaufen – noch nicht gemeldete
+    Kassen meldest du unverzüglich nach. Die Meldung geht nur über ELSTER (amtlich vorgeschriebener Datensatz); ein ausgedrucktes oder geteiltes Datenblatt erfüllt sie nicht.
+  en: Electronic cash registers must be reported to the tax office within one month of purchase or decommissioning. For existing registers, the reporting deadline of 31.7.2025 has passed – report registers
+    not yet reported without delay. The report can only be made via ELSTER (officially prescribed data set); a printed or shared data sheet does not fulfil it.
+- de: 'Ergänzt: Für die Grenzen zählt der Umsatz nach Zahlungseingang, nicht nach Rechnungsdatum.'
+  en: 'Added: For the limits, turnover counts by date of payment, not by invoice date.'
+- de: 'Ergänzt: Im ersten Jahr zahlst du mit dem Antrag; bei Neugründung zählen die voraussichtlichen Vorauszahlungen.'
+  en: 'Added: In the first year you pay with the application; for a new business the expected advance payments count.'
+- de: 'Ergänzt: Noch nicht gemeldete Bestandskassen meldest du unverzüglich nach.'
+  en: 'Added: Report existing registers not yet reported without delay.'
+- de: 'Ergänzt: Wann die Frist beginnt, und dass Lieferscheine, die keine Buchungsbelege sind, nur bis zur Rechnung aufbewahrt werden müssen.'
+  en: 'Added: When the period starts, and that delivery notes that are not accounting vouchers only have to be kept until the invoice.'
+- de: 'Fernverkäufe von Waren und bestimmte Leistungen (z. B. digitale Leistungen) an Privatpersonen in anderen EU-Ländern sind im Bestimmungsland steuerbar, sobald sie EU-weit im Vorjahr oder im laufenden
+    Jahr zusammen 10.000 € netto übersteigen (§ 3c Abs. 4 UStG) – oder wenn du auf die Schwelle verzichtest. Darunter bleibt der Ort in Deutschland. Das One-Stop-Shop-Verfahren (OSS) ist ein Wahlrecht:
+    Nutzt du es, meldest du diese Umsätze je Land und Steuersatz beim Bundeszentralamt für Steuern; nutzt du es nicht, musst du dich in jedem Bestimmungsland registrieren. Die Teilnahme zeigst du vorher
+    über das BZStOnline-Portal an. Erklärung und Zahlung sind bis zum letzten Tag des Monats nach Ablauf des Quartals fällig (§ 18j Abs. 4 UStG); die Frist verschiebt sich nicht auf den nächsten Werktag.
+    OSS-Umsätze gehören nicht in die deutsche Umsatzsteuer-Voranmeldung. Auch als Kleinunternehmer: § 19 UStG gilt nur für Umsätze im Inland – Fernverkäufe über 10.000 € sind im Bestimmungsland steuerpflichtig.
+    Ob du über der Schwelle liegst, ergibt sich aus deinen Umsätzen – Amtlos fragt die Höhe nicht ab. Amtlos stellt die Umsätze aus Rechnungen mit „OSS“ je Land und Steuersatz zusammen; du übermittelst
+    selbst.'
+  en: 'Distance sales of goods and certain services (e.g. digital services) to consumers in other EU countries are taxable in the country of destination as soon as they exceed €10,000 net in total EU-wide
+    in the previous or current year (§ 3c(4) UStG) – or if you waive the threshold. Below that, the place of supply stays in Germany. The One-Stop-Shop procedure (OSS) is optional: if you use it, you report
+    these sales per country and tax rate to the Federal Central Tax Office; if you don''t, you must register in each country of destination. You notify your participation in advance via the BZStOnline portal.
+    The return and payment are due by the last day of the month after the end of the quarter (§ 18j(4) UStG); the deadline does not move to the next working day. OSS sales do not belong in the German advance
+    VAT return. Small businesses too: § 19 UStG only applies to domestic sales – distance sales above €10,000 are taxable in the country of destination. Whether you are above the threshold depends on your
+    sales – Amtlos does not ask for the amount. Amtlos compiles the sales from invoices marked “OSS” per country and tax rate; you submit it yourself.'
+- de: 'Für die Jahre 2021 bis 2026 richtet sich der Voranmeldungszeitraum im Gründungsjahr und im Folgejahr nach der voraussichtlichen Steuer (§ 18 Abs. 2 Satz 6 UStG). Ab 2027 gilt nach dem Gesetz wieder
+    Satz 4: Im Jahr der Gründung und im Folgejahr gibst du die Voranmeldung monatlich ab. Hast du 2026 gegründet, ist 2027 dein Folgejahr – du gibst dann monatliche Voranmeldungen ab; die Aussetzung erfasst
+    nur die Jahre bis 2026. Die Voranmeldung ist bis zum 10. Tag nach Ablauf des Monats fällig, mit Dauerfristverlängerung einen Monat später (§ 18 Abs. 1 UStG, §§ 46 ff. UStDV). Stand: Oktober 2026 – eine
+    Verlängerung ist nicht beschlossen, kann aber mit dem Jahressteuergesetz noch kommen.'
+  en: 'For the years 2021 to 2026, the advance return period in the founding year and the following year depends on the expected tax (§ 18(2) sentence 6 UStG). From 2027, sentence 4 of the law applies again:
+    in the year of founding and the following year, you file the advance return monthly. If you founded in 2026, 2027 is your following year – you then file monthly advance returns; the suspension only
+    covers the years up to 2026. The advance return is due by the 10th day after the end of the month, with a permanent filing extension one month later (§ 18(1) UStG, §§ 46 et seq. UStDV). As of October
+    2026 – an extension has not been passed, but could still come with the annual tax act.'
+- de: Gibst du die Erklärung zu spät ab, kann das Finanzamt einen Verspätungszuschlag festsetzen; wird sie nicht binnen 14 Monaten nach Ablauf des Kalenderjahres abgegeben, muss es das in der Regel (§ 152
+    Abs. 1 bis 3 AO). Er beträgt für jeden angefangenen Monat 0,25 % der festgesetzten Steuer abzüglich Vorauszahlungen und anzurechnender Steuerabzugsbeträge, mindestens 25 € für jeden angefangenen Monat,
+    höchstens 25.000 € (§ 152 Abs. 5 Satz 2, Abs. 10 AO). Das Finanzamt kann die Besteuerungsgrundlagen schätzen (§ 162 AO). Die Abgabe kann das Finanzamt außerdem mit Zwangsgeld bis 25.000 € durchsetzen
+    (§§ 328, 329 AO).
+  en: If you file the return late, the tax office can impose a late-filing surcharge; if it is not filed within 14 months after the end of the calendar year, it generally must do so (§ 152(1) to (3) AO).
+    It amounts to 0.25% of the assessed tax less advance payments and creditable withholding taxes for each month or part of a month, at least €25 for each month or part of a month, at most €25,000 (§ 152(5)
+    sentence 2, (10) AO). The tax office can estimate the tax base (§ 162 AO). The tax office can also enforce filing with a coercive fine of up to €25,000 (§§ 328, 329 AO).
+- de: Gibst du die Erklärung zu spät ab, kann das Finanzamt einen Verspätungszuschlag festsetzen; wird sie nicht binnen 14 Monaten nach Ablauf des Kalenderjahres abgegeben, muss es das in der Regel (§ 152
+    Abs. 2, 6 AO). Für die Feststellung von Einkünften beträgt er für jeden angefangenen Monat 0,0625 % der positiven Summe der festgestellten Einkünfte, mindestens 25 € für jeden angefangenen Monat, höchstens
+    25.000 € (§ 152 Abs. 7, 10 AO); die Pauschale von 25 € je angefangenem Monat (§ 152 Abs. 6 AO) gilt nur, soweit Abs. 7 nicht greift. Die Abgabe kann das Finanzamt außerdem mit Zwangsgeld bis 25.000
+    € durchsetzen (§§ 328, 329 AO).
+  en: If you file the return late, the tax office can impose a late-filing surcharge; if it is not filed within 14 months after the end of the calendar year, it generally must do so (§ 152(2), (6) AO).
+    For the determination of income it amounts to 0.0625% of the positive total of the determined income for each month or part of a month, at least €25 for each month or part of a month, at most €25,000
+    (§ 152(7), (10) AO); the flat rate of €25 per month or part of a month (§ 152(6) AO) only applies where paragraph 7 does not. The tax office can also enforce filing with a coercive fine of up to €25,000
+    (§§ 328, 329 AO).
+- de: Gilt jetzt auch, wenn du bei Unternehmen in anderen EU-Ländern einkaufst, und nur noch bei Geschäften mit Unternehmen.
+  en: Now also applies if you buy from businesses in other EU countries, and only to business with companies.
+- de: Gilt nur noch bei Bauleistungen für Unternehmen oder öffentliche Auftraggeber; ergänzt, dass die Bescheinigung befristet ist.
+  en: Now only applies to construction work for businesses or public-sector clients; added that the certificate is time-limited.
+- de: Im Fragebogen gibst du unter anderem an, ob du die Kleinunternehmerregelung nutzt, und schätzt Umsatz und Gewinn. Danach bekommst du deine Steuernummer. Die Frist von einem Monat beginnt mit der Eröffnung
+    des Betriebs bzw. der Aufnahme der Tätigkeit (§ 138 Abs. 1b Satz 1, Abs. 4 AO) – bei UG und GmbH also nicht schon mit der Beurkundung oder der Eintragung ins Handelsregister. Ohne Steuernummer (oder
+    USt-IdNr.) fehlt auf deinen Rechnungen eine Pflichtangabe (§ 14 Abs. 4 Satz 1 Nr. 2 UStG).
+  en: In the questionnaire you state, among other things, whether you use the small business scheme and estimate turnover and profit. You then receive your tax number. The one-month deadline starts when
+    the business is opened or the activity begins (§ 138(1b) sentence 1, (4) AO) – for a UG or GmbH, not already with the notarisation or the entry in the commercial register. Without a tax number (or VAT
+    ID), your invoices lack a mandatory detail (§ 14(4) sentence 1 no. 2 UStG).
+- de: Jede Außerbetriebnahme hat jetzt ihre eigene Monatsfrist, nicht nur die erste.
+  en: Each decommissioning now has its own one-month deadline, not just the first.
+- de: Jetzt mit Termin – die Anlage EÜR übermittelst du in denselben Fristen wie die Einkommensteuer- bzw. Feststellungserklärung.
+  en: Now with a deadline – you submit the Anlage EÜR within the same deadlines as the income tax or separate determination return.
+- de: Jetzt mit Termin – die E-Bilanz übermittelst du in denselben Fristen wie die Steuererklärung.
+  en: Now with a deadline – you transmit the E-Bilanz within the same deadlines as the tax return.
+- de: Kapitalgesellschaften zahlen Körperschaftsteuer und geben dafür jährlich eine Erklärung ab – ohne Steuerberatung bis 31. Juli des Folgejahres, mit Steuerberatung bis Ende Februar des übernächsten
+    Jahres (§ 149 AO). Das Finanzamt kann die Erklärung früher anfordern oder die Frist auf Antrag verlängern (§ 149 Abs. 4, § 109 AO).
+  en: Corporations pay corporation tax and file an annual return for it – without a tax adviser by 31 July of the following year, with a tax adviser by the end of February of the year after next (§ 149
+    AO). The tax office can request the return earlier or extend the deadline on application (§ 149(4), § 109 AO).
+- de: Keine Pflicht und kein Bußgeld. Ohne USt-IdNr. kannst du keine steuerfreie innergemeinschaftliche Lieferung abrechnen und keine Zusammenfassende Meldung abgeben (§ 14a Abs. 3, § 18a UStG). Lieferanten
+    aus anderen EU-Ländern berechnen dir dann in der Regel ihre eigene Umsatzsteuer.
+  en: No obligation and no fine. Without a VAT ID you cannot invoice a tax-exempt intra-EU delivery or file a recapitulative statement (§ 14a(3), § 18a UStG). Suppliers from other EU countries will then
+    usually charge you their own VAT.
+- de: 'Klargestellt: Der One-Stop-Shop ist ein Wahlrecht – ohne ihn registrierst du dich in jedem Land. Gilt jetzt auch für Kleinunternehmer.'
+  en: 'Clarified: The One-Stop-Shop is optional – without it you register in each country. Now also applies to small businesses.'
+- de: Maßgeblich ist der Gesamtumsatz nach vereinnahmten Entgelten – also die Zahlungen, die du netto erhältst, nicht die Summe der gestellten Rechnungen nach Rechnungsdatum. Bis einschließlich 25.000 €
+    bzw. 100.000 € bleibt dein Umsatz steuerfrei. Ab dem Umsatz, mit dem du die Grenze überschreitest, gilt die Regelbesteuerung – du stellst Rechnungen mit Umsatzsteuer und gibst Voranmeldungen ab; eine
+    eigene Frist gibt es dafür nicht. Lag dein Umsatz im Vorjahr über 25.000 €, gilt die Regelung in diesem Jahr von Anfang an nicht. Amtlos zählt bisher die Rechnungen, die du in Amtlos gestellt hast (netto,
+    nach Rechnungsdatum) – ob und wann sie bezahlt wurden, ist darin noch nicht berücksichtigt.
+  en: What counts is total turnover based on payments received – i.e. the net amounts you are paid, not the total of invoices issued by invoice date. Up to and including €25,000 or €100,000, your turnover
+    remains tax-exempt. From the sale with which you exceed the limit, standard taxation applies – you issue invoices with VAT and file advance returns; there is no separate deadline for this. If your turnover
+    last year was above €25,000, the scheme does not apply at all this year. Amtlos currently counts the invoices you issued in Amtlos (net, by invoice date) – whether and when they were paid is not yet
+    taken into account.
+- de: Nach deinen Angaben liegt dein Umsatz über einer Kleinunternehmergrenze. Überschreitest du im laufenden Jahr 100.000 € (im Gründungsjahr 25.000 €), ist schon der Umsatz, mit dem du die Grenze überschreitest,
+    steuerpflichtig.
+  en: According to your information, your turnover is above a small business limit. If you exceed €100,000 in the current year (€25,000 in the founding year), the very sale with which you exceed the limit
+    is already taxable.
+- de: Ohne Freistellungsbescheinigung müssen Auftraggeber einen Teil deiner Rechnung als Bauabzugsteuer einbehalten. Das gilt nur für Bauleistungen an Unternehmer oder juristische Personen des öffentlichen
+    Rechts; Privatleute als Bauherren behalten nichts ein (§ 48 Abs. 1 EStG). Bauleistungen sind alle Leistungen, die der Herstellung, Instandsetzung, Instandhaltung, Änderung oder Beseitigung von Bauwerken
+    dienen – auch im Handwerk, z. B. eine Elektroinstallation. Eine Frist gibt es nicht; beantrage die Bescheinigung vor der ersten Bauleistung. Sie gilt befristet – die Geltungsdauer steht in der Bescheinigung
+    (§ 48b Abs. 3 EStG); beantrage rechtzeitig vor Ablauf eine neue.
+  en: Without an exemption certificate, clients must withhold part of your invoice as construction withholding tax. This only applies to construction work for businesses or legal entities under public law;
+    private individuals as builders withhold nothing (§ 48(1) EStG). Construction work means any work serving the construction, repair, maintenance, alteration or demolition of buildings – including in
+    skilled trades, e.g. an electrical installation. There is no deadline; apply for the certificate before your first construction job. It is time-limited – the period of validity is stated in the certificate
+    (§ 48b(3) EStG); apply for a new one in good time before it expires.
+- de: Verkaufst du an Privatpersonen in anderen EU-Ländern über der Lieferschwelle von 10.000 €, meldest du diese Umsätze vierteljährlich im One-Stop-Shop (oder registrierst dich in jedem Land) – bis zum
+    Ende des Monats nach dem Quartal.
+  en: If you sell to consumers in other EU countries above the €10,000 delivery threshold, you report these sales quarterly in the One-Stop-Shop (or register in each country) – by the end of the month after
+    the quarter.
+- de: Welche Angaben eine Rechnung braucht, regelt § 14 UStG. Für Kleinbetragsrechnungen bis 250 € brutto gelten Erleichterungen (§ 33 UStDV). Kleinunternehmer weisen darauf hin, dass die Steuerbefreiung
+    für Kleinunternehmer gilt (§ 34a UStDV). Bist du zur Rechnung verpflichtet, stellst du sie innerhalb von sechs Monaten nach Ausführung der Leistung aus (§ 14 Abs. 2 Satz 1 Nr. 1 und 2 UStG).
+  en: Which details an invoice needs is set out in § 14 UStG. Small-amount invoices up to €250 gross have simplified requirements (§ 33 UStDV). Small businesses state that the small business exemption applies
+    (§ 34a UStDV). If you are obliged to issue an invoice, you do so within six months after the supply (§ 14(2) sentence 1 nos. 1 and 2 UStG).
+- de: Wenn du Bauleistungen für Unternehmen oder öffentliche Auftraggeber erbringst, beantragst du beim Finanzamt eine Freistellungsbescheinigung, damit deine Auftraggeber keine Bauabzugsteuer einbehalten.
+  en: If you provide construction work for businesses or public-sector clients, you apply to the tax office for an exemption certificate so that your clients do not withhold construction withholding tax.
+- de: Wenn du mit Unternehmen in anderen EU-Ländern Geschäfte machst – als Kunde oder als Lieferant –, beantragst du eine USt-IdNr. beim Bundeszentralamt für Steuern.
+  en: If you do business with companies in other EU countries – as a customer or as a supplier –, you apply for a VAT ID at the Federal Central Tax Office.
+- de: Wer Umsatzsteuer auf Rechnungen ausweist, gibt je nach Höhe der Steuer im Vorjahr monatlich oder vierteljährlich eine Voranmeldung über ELSTER ab. Liegt dein Umsatz über der Kleinunternehmergrenze,
+    gilt die Pflicht sicher – offen ist dann nur, ob monatlich oder vierteljährlich. Den Rhythmus legt das Finanzamt fest – er steht im Schreiben des Finanzamts. Weißt du ihn nicht und kennt Amtlos die
+    Steuer des Vorjahres nicht, rechnet Amtlos vorläufig mit vierteljährlich. Hast du 2026 oder später gegründet, gibst du ab 2027 im Gründungsjahr und im Folgejahr monatlich ab (§ 18 Abs. 2 Satz 4 UStG).
+    Amtlos bereitet die Zahlen vor; du übermittelst selbst.
+  en: Anyone who shows VAT on invoices files an advance return via ELSTER monthly or quarterly, depending on last year's tax. If your turnover is above the small business limit, the obligation definitely
+    applies – the only open question is whether monthly or quarterly. The tax office sets the frequency – it is stated in the tax office's letter. If you don't know it and Amtlos does not know last year's
+    tax, Amtlos provisionally assumes quarterly. If you founded in 2026 or later, from 2027 you file monthly in the founding year and the following year (§ 18(2) sentence 4 UStG). Amtlos prepares the figures;
+    you submit them yourself.
+- de: Wer nicht zur doppelten Buchführung verpflichtet ist, ermittelt den Gewinn mit der Einnahmen-Überschuss-Rechnung. Das gilt auch für eingetragene Kaufleute unter den Grenzen des § 241a HGB und für
+    Gewerbetreibende, denen das Finanzamt keine Buchführungspflicht mitgeteilt hat. Die Anlage EÜR übermittelst du mit der Einkommensteuer- bzw. Feststellungserklärung, also in denselben Fristen (§ 149
+    AO) – ohne Steuerberatung bis 31. Juli des Folgejahres, mit Steuerberatung bis Ende Februar des übernächsten Jahres.
+  en: Anyone not obliged to keep double-entry books determines their profit with the cash-basis accounts (Einnahmen-Überschuss-Rechnung). This also applies to registered merchants below the limits of §
+    241a HGB and to traders whom the tax office has not notified of an obligation to keep books. You submit the Anlage EÜR with the income tax or separate determination return, i.e. within the same deadlines
+    (§ 149 AO) – without a tax adviser by 31 July of the following year, with a tax adviser by the end of February of the year after next.
+- de: Zahlst du nicht rechtzeitig, fällt für jeden angefangenen Monat ein Säumniszuschlag von 1 % des auf 50 € abgerundeten rückständigen Betrags an; bei bis zu drei Tagen Verspätung wird er nicht erhoben
+    (§ 240 Abs. 1, 3 AO). Wer die Vorauszahlung nicht, nicht vollständig oder nicht rechtzeitig zahlt, riskiert außerdem ein Bußgeld bis 30.000 € (§ 26a Abs. 1, 3 UStG in Verbindung mit § 18 Abs. 1 Satz
+    4 UStG). Für eine verspätete Voranmeldung kann das Finanzamt einen Verspätungszuschlag festsetzen (§ 152 Abs. 1 AO). Gibst du keine Voranmeldung ab, kann das Finanzamt die Steuer schätzen (§ 162 AO);
+    die Nichtabgabe kann als Steuerhinterziehung strafbar sein (§ 370 Abs. 1 Nr. 2 AO).
+  en: If you don't pay on time, a late-payment surcharge of 1% of the overdue amount rounded down to €50 is charged for each month or part of a month; for a delay of up to three days it is not charged (§
+    240(1), (3) AO). Anyone who does not pay the advance payment, does not pay it in full or not on time also risks a fine of up to €30,000 (§ 26a(1), (3) UStG in conjunction with § 18(1) sentence 4 UStG).
+    For a late advance return, the tax office can impose a late-filing surcharge (§ 152(1) AO). If you don't file an advance return, the tax office can estimate the tax (§ 162 AO); not filing can be punishable
+    as tax evasion (§ 370(1) no. 2 AO).
+- de: Zahlst du nicht rechtzeitig, fällt für jeden angefangenen Monat ein Säumniszuschlag von 1 % des auf 50 € abgerundeten rückständigen Betrags an; bei bis zu drei Tagen Verspätung wird er nicht erhoben
+    – diese Schonfrist gilt nur bei Überweisung, nicht bei Bar- oder Scheckzahlung (§ 240 Abs. 1, 3 AO).
+  en: If you don't pay on time, a late-payment surcharge of 1% of the overdue amount rounded down to €50 is charged for each month or part of a month; for a delay of up to three days it is not charged –
+    this grace period only applies to bank transfers, not to cash or cheque payments (§ 240(1), (3) AO).
+- de: Zahlst du nicht rechtzeitig, fällt für jeden angefangenen Monat ein Säumniszuschlag von 1 % des auf 50 € abgerundeten rückständigen Betrags an; bei bis zu drei Tagen Verspätung wird er nicht erhoben
+    – diese Schonfrist gilt nur bei Überweisung, nicht bei Bar- oder Scheckzahlung (§ 240 Abs. 1, 3 AO, für die Gewerbesteuer über § 1 Abs. 2 Nr. 5 AO).
+  en: If you don't pay on time, a late-payment surcharge of 1% of the overdue amount rounded down to €50 is charged for each month or part of a month; for a delay of up to three days it is not charged –
+    this grace period only applies to bank transfers, not to cash or cheque payments (§ 240(1), (3) AO, for trade tax via § 1(2) no. 5 AO).
+- de: § 5b EStG nennt kein eigenes Bußgeld. Das Finanzamt kann die Übermittlung mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO). Die Steuererklärung ist erst mit der E-Bilanz vollständig; bei Verspätung
+    droht ein Verspätungszuschlag (§ 152 AO).
+  en: § 5b EStG provides no fine of its own. The tax office can enforce transmission with a coercive fine of up to €25,000 (§§ 328, 329 AO). The tax return is only complete with the E-Bilanz; if it is late,
+    a late-filing surcharge may be imposed (§ 152 AO).

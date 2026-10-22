@@ -1,0 +1,15 @@
+persona: gewerbe
+beschreibung: StB Busch 22.10.2026 – Warenlieferungen an Unternehmen in der EU ohne Angabe zum Meldezeitraum – Amtlos fragt nach (monatlich ist die Regel, vierteljährlich wählbar)
+stichtag: "2026-10-11"
+fakten:
+  profil.rechtsform: gmbh
+  profil.gruendungsdatum: "2018-01-01"
+  profil.ust.kleinunternehmer: false
+  profil.kunden.segmente: [b2b]
+  profil.kunden.regionen: [inland, eu]
+  profil.produkte.arten: [physisch]
+  profil.bundesland: NW
+erwartet:
+  steuern.zusammenfassende_meldung: gilt
+fehlende_fakten:
+  steuern.zusammenfassende_meldung: [profil.ust.zm_meldezeitraum]

@@ -1,7 +1,7 @@
-# Katalog C.33 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog C.33 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt
 schema_version: 1
 id: steuern.kassenmeldung
-version: 5
+version: 6
 katalog_nr: C.33
 titel:
   de: Elektronische Kasse beim Finanzamt melden
@@ -9,7 +9,7 @@ kurz:
   de: Melde jede elektronische Kasse innerhalb eines Monats nach der Anschaffung über ELSTER – je Betriebsstätte.
 erklaerung:
   de: Elektronische Kassen müssen dem Finanzamt gemeldet werden, innerhalb eines Monats nach Anschaffung oder Außerbetriebnahme.
-    Bestandskassen waren bis 31.7.2025 zu melden. Die Meldung geht nur über ELSTER (amtlich vorgeschriebener Datensatz); ein ausgedrucktes
+    Für Bestandskassen ist die Meldefrist 31.7.2025 abgelaufen – noch nicht gemeldete Kassen meldest du unverzüglich nach. Die Meldung geht nur über ELSTER (amtlich vorgeschriebener Datensatz); ein ausgedrucktes
     oder geteiltes Datenblatt erfüllt sie nicht.
 rechtsgrundlage:
 - § 146a AO
@@ -26,7 +26,7 @@ frist:
     ereignis: kasse_angeschafft
   versatz: P1M
   zeitpunkt: spaetestens
-  # R11 (Steuerprüfung 19): Fristende am Wochenende oder Feiertag nach § 108 Abs. 3 AO – laut Prüferin unsicher
+  # Fristende am Wochenende oder Feiertag: § 108 Abs. 3 AO ist anzuwenden (StB Busch 22.10.2026)
   verschiebung:
     regel: naechster_werktag
     kalender: bundesland
@@ -49,7 +49,7 @@ erledigung:
   bestaetigung:
     de: In ELSTER gemeldet
 aenderungsnotiz:
-  de: Das Datenblatt aus Amtlos bereitet die Meldung nur vor. Erledigt ist sie, wenn du bestätigst, dass du sie in ELSTER übermittelt hast.
+  de: 'Ergänzt: Noch nicht gemeldete Bestandskassen meldest du unverzüglich nach.'
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -66,12 +66,7 @@ quellen:
 - titel: § 329 AO (Zwangsgeld), Wortlaut (lexetius.com)
   url: https://lexetius.com/AO/329,2
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Verschiebung auf den nächsten Werktag nach § 108 Abs. 3 AO (Steuerprüfung R11 Befund 19, „dürfte greifen“, unsicher) – bestätigen'
-- 'Bestandskassen (Meldefrist 31.7.2025): Pflicht für Kassen ohne gemeldetes Anschaffungsdatum abbilden'
-- Verschiebung bei Fristende am Wochenende festlegen
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Schwere „mittel“ mit dringend_ohne_termin belassen: Wortlaut ergibt kein Bußgeld, „hoch“ fachlich entscheiden)'
-- 'Vorprüfung 21.10.2026: Schwere vorläufig von „hoch“ auf „mittel“ gesenkt, bis die Sanktion fachlich erfasst ist (§ 379 Abs. 1 Satz 1 AO (gelesen auf gesetze-im-internet) nennt § 146a nur mit Abs. 1 (Nr. 4–6: Verwendung, Schutz, Vertrieb); Nr. 7 betrifft die Aufbewahrung nach § 147 AO. Eine Bußgeldnorm für die Mitteilung nach § 146a Abs. 4 AO wurde nicht gefunden – der Vorschlag „§ 379 Abs. 1 Nr. 7 AO, bis 25.000 €“ aus dem Prüfbericht trifft nicht zu) – nach Ergänzung wieder „hoch“'
+fachlich_zu_pruefen: []
 pruefung:
   status: entwurf
   geprueft_von: null

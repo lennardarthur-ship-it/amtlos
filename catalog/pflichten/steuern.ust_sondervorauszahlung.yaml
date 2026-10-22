@@ -1,7 +1,7 @@
-# Katalog C.24 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog C.24 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt
 schema_version: 1
 id: steuern.ust_sondervorauszahlung
-version: 4
+version: 5
 katalog_nr: C.24
 titel:
   de: Sondervorauszahlung zur Umsatzsteuer leisten
@@ -10,9 +10,13 @@ kurz:
     von einem Elftel.
 erklaerung:
   de: Bei monatlicher Abgabe mit Dauerfristverlängerung zahlst du bis zum 10. Februar eine Sondervorauszahlung von einem Elftel
-    der Vorauszahlungen des Vorjahres. Sie wird in der Voranmeldung für Dezember angerechnet (Kennzahl 39).
+    der Vorauszahlungen des Vorjahres. Sie wird in der Voranmeldung für Dezember angerechnet (Kennzahl 39). Im ersten Jahr zahlst
+    du sie mit dem Antrag auf Dauerfristverlängerung, danach jedes Jahr bis zum 10. Februar. Hast du deine Tätigkeit erst in diesem
+    Jahr begonnen, wird sie aus den voraussichtlichen Vorauszahlungen berechnet (§ 47 Abs. 2 UStDV). Erscheint der Steueranspruch
+    gefährdet, kann das Finanzamt die Dauerfristverlängerung widerrufen (§ 46 Satz 2 UStDV).
 rechtsgrundlage:
 - § 18 UStG
+- §§ 46 bis 48 UStDV
 kategorie: steuern
 ausloeser:
   all:
@@ -74,7 +78,7 @@ sanktion:
   schwere: mittel
 automatisierung: formular_vorausfuellen
 aenderungsnotiz:
-  de: 'Termin ergänzt: jedes Jahr bis 10. Februar, ein Elftel der Vorauszahlungen des Vorjahres, angerechnet im Dezember.'
+  de: 'Ergänzt: Im ersten Jahr zahlst du mit dem Antrag; bei Neugründung zählen die voraussichtlichen Vorauszahlungen.'
 status_recht: in_kraft
 gueltig_ab: null
 gueltig_bis: null
@@ -88,10 +92,13 @@ quellen:
 - titel: § 48 UStDV, Wortlaut (lxgesetze.de)
   url: https://lxgesetze.de/ustdv/48
   abgerufen: '2026-10-22'
-fachlich_zu_pruefen:
-- 'Termin 10.02. und 1/11 der Vorjahres-Vorauszahlungen ergänzt (R10, Steuerprüfung) – Verschiebung auf den nächsten Werktag bestätigen'
-- 'Nur Monatszahler (§§ 46–48 UStDV, Steuerprüfung R11 Befund 17) – Auslöser über Rhythmus „monatlich“ oder Vorjahressteuer; Text zu Kz 39 in der App beim Steuer-Agenten'
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (§ 26a Abs. 1 UStG nennt die Sondervorauszahlung nicht; Widerruf der Dauerfristverlängerung in § 48 UStDV nicht geregelt)'
+- titel: Umsatzsteuer-Durchführungsverordnung § 46
+  url: https://www.gesetze-im-internet.de/ustdv_1980/__46.html
+  abgerufen: null
+- titel: Umsatzsteuer-Durchführungsverordnung § 47
+  url: https://www.gesetze-im-internet.de/ustdv_1980/__47.html
+  abgerufen: null
+fachlich_zu_pruefen: []
 pruefung:
   status: entwurf
   geprueft_von: null

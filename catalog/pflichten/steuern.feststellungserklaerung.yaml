@@ -1,7 +1,8 @@
 # R10: neu (Steuerprüfung: bei Personengesellschaften gibt die Gesellschaft die Feststellungserklärung ab, § 180 AO; die Gesellschafter die ESt)
+# StB-Durchsicht Busch 22.10.2026 umgesetzt (bis auf 19 Monate, siehe fachlich_zu_pruefen)
 schema_version: 1
 id: steuern.feststellungserklaerung
-version: 2
+version: 3
 katalog_nr: C.27
 titel:
   de: Erklärung zur gesonderten und einheitlichen Feststellung abgeben
@@ -12,7 +13,8 @@ erklaerung:
   de: Bei einer Personengesellschaft stellt das Finanzamt den Gewinn der Gesellschaft gesondert und einheitlich fest und verteilt
     ihn auf die Gesellschafter. Dafür gibt die Gesellschaft jedes Jahr eine Feststellungserklärung ab – ohne Steuerberatung bis
     31. Juli des Folgejahres, mit Steuerberatung bis Ende Februar des übernächsten Jahres. Jede Gesellschafterin und jeder Gesellschafter
-    gibt zusätzlich die eigene Einkommensteuererklärung ab.
+    gibt zusätzlich die eigene Einkommensteuererklärung ab. Die Feststellung entfällt ausnahmsweise, wenn nur eine der beteiligten
+    Personen mit ihren Einkünften im Inland steuerpflichtig ist, oder in Fällen von geringer Bedeutung (§ 180 Abs. 3 AO).
 rechtsgrundlage:
 - § 180 Abs. 1 Nr. 2 Buchst. a AO
 - § 181 AO
@@ -50,7 +52,7 @@ kanal: elster
 kosten: null
 sanktion:
   text:
-    de: 'Gibst du die Erklärung zu spät ab, kann das Finanzamt einen Verspätungszuschlag festsetzen; wird sie nicht binnen 14 Monaten nach Ablauf des Kalenderjahres abgegeben, muss es das in der Regel. Er beträgt für jeden angefangenen Monat 25 €, höchstens 25.000 € (§ 152 Abs. 6, Abs. 10 AO). Die Abgabe kann das Finanzamt außerdem mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO).'
+    de: 'Gibst du die Erklärung zu spät ab, kann das Finanzamt einen Verspätungszuschlag festsetzen; wird sie nicht binnen 14 Monaten nach Ablauf des Kalenderjahres abgegeben, muss es das in der Regel (§ 152 Abs. 2, 6 AO). Für die Feststellung von Einkünften beträgt er für jeden angefangenen Monat 0,0625 % der positiven Summe der festgestellten Einkünfte, mindestens 25 € für jeden angefangenen Monat, höchstens 25.000 € (§ 152 Abs. 7, 10 AO); die Pauschale von 25 € je angefangenem Monat (§ 152 Abs. 6 AO) gilt nur, soweit Abs. 7 nicht greift. Die Abgabe kann das Finanzamt außerdem mit Zwangsgeld bis 25.000 € durchsetzen (§§ 328, 329 AO).'
   schwere: mittel
 automatisierung: formular_vorausfuellen
 status_recht: in_kraft
@@ -60,6 +62,10 @@ quellen:
 - titel: Abgabenordnung § 180 (Gesonderte Feststellung von Besteuerungsgrundlagen)
   url: https://www.gesetze-im-internet.de/ao_1977/__180.html
   abgerufen: null
+- titel: § 180 AO, Wortlaut (lxgesetze.de)
+  url: https://lxgesetze.de/ao/180
+  abgerufen: '2026-10-22'
+  fundstelle: § 180 Abs. 3 Satz 1 Nr. 1 und 2 AO
 - titel: Abgabenordnung § 149 (Abgabe der Steuererklärungen)
   url: https://dejure.org/gesetze/AO/149.html
   abgerufen: 2026-10-13
@@ -73,9 +79,7 @@ quellen:
   url: https://lexetius.com/AO/329,2
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Neu nach Steuerprüfung R10 (§ 180 AO, eindeutig); Fristen wie bei der Einkommensteuer (§ 149 AO über § 181 Abs. 1 AO) übernommen – bestätigen'
-- 'Ausnahme für Gesellschaften mit nur einem Beteiligten bzw. Fälle ohne Feststellung (§ 180 Abs. 3 AO) nicht abgebildet'
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (§ 152 Abs. 6 AO (Erklärungen zur gesonderten Feststellung) gelesen)'
+- 'StB Busch 22.10.2026 verlangt „zwingend nach 14 bzw. 19 Monaten (beraten)“ – die 19 Monate nicht übernommen: § 152 Abs. 2 Nr. 1 AO nennt 14 Monate; die 19 Monate (Nr. 2) gelten nur in den Fällen des § 149 Abs. 2 Satz 2 AO (Land- und Forstwirtschaft mit abweichendem Wirtschaftsjahr). Wortlaut gesetze-im-internet.de am 22.10.2026 – Rückfrage an StB Busch'
 pruefung:
   status: entwurf
   geprueft_von: null

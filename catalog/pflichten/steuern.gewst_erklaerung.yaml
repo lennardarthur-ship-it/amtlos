@@ -1,14 +1,14 @@
-# Katalog C.27 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog C.27 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt (bis auf 19 Monate, siehe fachlich_zu_pruefen)
 schema_version: 1
 id: steuern.gewst_erklaerung
-version: 3
+version: 4
 katalog_nr: C.27
 titel:
   de: Gewerbesteuererklärung abgeben
 kurz:
   de: Einmal im Jahr gibst du elektronisch die Gewerbesteuererklärung ab.
 erklaerung:
-  de: Die Gewerbesteuer hängt vom Hebesatz deiner Gemeinde ab. Einzelunternehmen und Personengesellschaften haben einen Freibetrag. Die Erklärung gibst du ohne Steuerberatung bis 31. Juli des Folgejahres ab, mit Steuerberatung bis Ende Februar des übernächsten Jahres (§ 149 AO).
+  de: Die Gewerbesteuer hängt vom Hebesatz deiner Gemeinde ab. Einzelunternehmen und Personengesellschaften haben einen Freibetrag. Die Erklärung gibst du ohne Steuerberatung bis 31. Juli des Folgejahres ab, mit Steuerberatung bis Ende Februar des übernächsten Jahres (§ 149 AO). Das Finanzamt kann die Erklärung früher anfordern oder die Frist auf Antrag verlängern (§ 149 Abs. 4, § 109 AO).
 begriffe:
 - begriff:
     de: Hebesatz
@@ -95,14 +95,8 @@ quellen:
   url: https://lexetius.com/AO/329,2
   abgerufen: '2026-10-22'
 fachlich_zu_pruefen:
-- 'Einzelunternehmen und Personengesellschaften nur bei Gewerbeertrag über 24.500 € (§ 25 Abs. 1 Nr. 1 GewStDV), sonst auf Aufforderung des Finanzamts oder zur Feststellung eines Verlusts – Gewinn als Näherung für den Gewerbeertrag (Hinzurechnungen nicht berücksichtigt); Nutzertests R11 Kosmetik und Gründerin, bestätigen'
-- Fristen nach § 149 Abs. 2 und 3 AO ergänzt (E-129, Quelle Recherche 13.10.2026 über dejure.org und Finanzamt BW) – gegen amtliche Fassung prüfen
-- Übergangsfristen Art. 97 § 36 EGAO (Veranlagungszeiträume bis 2024) sind nicht abgebildet – ab Veranlagungszeitraum 2025 gilt § 149 AO regulär
-- Vorabanforderung nach § 149 Abs. 4 AO (frühere Frist im Einzelfall) und Fristverlängerung auf Antrag nicht abgebildet
-- 'Verschiebung auf den nächsten Werktag nach § 108 Abs. 3 AO – Feiertagskalender des Bundeslands prüfen'
 - Freibetrag (C.34) als Regelwert führen
-- 'Sanktion am 22.10.2026 aus dem Wortlaut ergänzt – fachlich zu bestätigen (Gewerbesteuererklärung als Erklärung zur Festsetzung des Steuermessbetrags nach § 152 Abs. 6 AO behandelt – bestätigen)'
-- Rechtsgrundlage ergänzt, steht nicht in der Spezifikation
+- 'StB Busch 22.10.2026 verlangt „zwingend nach 14 Monaten, in beratenen Fällen nach 19 Monaten“ – die 19 Monate nicht übernommen: § 152 Abs. 2 Nr. 1 AO nennt 14 Monate; die 19 Monate (Nr. 2) gelten nur in den Fällen des § 149 Abs. 2 Satz 2 AO (Land- und Forstwirtschaft mit abweichendem Wirtschaftsjahr). Wortlaut gesetze-im-internet.de am 22.10.2026 – Rückfrage an StB Busch'
 pruefung:
   status: entwurf
   geprueft_von: null

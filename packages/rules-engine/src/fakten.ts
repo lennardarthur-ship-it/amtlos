@@ -31,6 +31,11 @@ export function mitAbgeleitetenFakten(profil: Fakten, stichtag: Datum): Fakten {
     f["abgeleitet.ist_vorjahr_gruendungsjahr"] = j === s - 1;
     f["abgeleitet.noch_nicht_gestartet"] = gruendung > stichtag; // ISO-Daten sind lexikographisch vergleichbar
   }
+  // StB Busch 22.10.2026: Fristen ab Eröffnung bzw. Aufnahme der Tätigkeit (§ 138 Abs. 4 AO) – eigene Angabe, sonst das
+  // Startdatum (die Startfrage lautet „Wann hast du angefangen oder wann willst du anfangen?“)
+  const beginn = profil["profil.taetigkeit_beginn"];
+  if (typeof beginn === "string") f["abgeleitet.taetigkeit_beginn"] = beginn;
+  else if (typeof gruendung === "string") f["abgeleitet.taetigkeit_beginn"] = gruendung;
   if (typeof beschaeftigte === "number") f["abgeleitet.hat_beschaeftigte"] = beschaeftigte >= 1;
   return f;
 }
@@ -44,6 +49,7 @@ export const QUELLFAKTEN: Readonly<Record<string, readonly string[]>> = {
   "abgeleitet.ist_gruendungsjahr": ["profil.gruendungsdatum"],
   "abgeleitet.ist_vorjahr_gruendungsjahr": ["profil.gruendungsdatum"],
   "abgeleitet.noch_nicht_gestartet": ["profil.gruendungsdatum"],
+  "abgeleitet.taetigkeit_beginn": ["profil.gruendungsdatum"],
   "abgeleitet.hat_beschaeftigte": ["profil.beschaeftigte.gesamt"],
 };
 

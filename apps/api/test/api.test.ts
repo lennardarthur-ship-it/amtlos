@@ -899,9 +899,12 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
 
     it("Radar zeigt geplante Regeln, die dich betreffen würden, mit Wahrscheinlichkeit und Vorbereitung", async () => {
       const r = (await alsRosa(http().get("/v1/radar")).expect(200)).body as { eintraege: { pflicht_id: string; art: string; betroffen: string; wahrscheinlichkeit: string; vorbereitung: string[]; erwartet_ab: string | null }[]; werte: unknown[] };
+      // StB Busch 22.10.2026: die monatliche Voranmeldung für Neugründer ist geltendes Recht ab 2027 – „kommend“ statt Radar
       const neugruender = r.eintraege.find((e) => e.pflicht_id === "steuern.ust_va_neugruender_radar");
-      expect(neugruender).toMatchObject({ art: "radar", betroffen: "ja", erwartet_ab: "2027-01-01" });
-      expect(neugruender!.vorbereitung.length).toBeGreaterThan(0);
+      expect(neugruender).toMatchObject({ art: "kommend", betroffen: "ja", erwartet_ab: "2027-01-01" });
+      const hochrisiko = r.eintraege.find((e) => e.pflicht_id === "ki.hochrisiko");
+      expect(hochrisiko).toMatchObject({ art: "radar", betroffen: "ja", erwartet_ab: "2027-12-02" });
+      expect(hochrisiko!.vorbereitung.length).toBeGreaterThan(0);
       // R11 (Rechtsprüfung Befund 8): Art. 50 Abs. 1 KI-VO gilt seit 2.8.2026 – keine Radar-Regel mehr, sondern in Kraft
       expect(r.eintraege.some((e) => e.pflicht_id === "ki.transparenz")).toBe(false);
       expect(r.eintraege.some((e) => e.pflicht_id === "gruendung.berufsgenossenschaft")).toBe(false); // keine normalen Pflichten
@@ -918,7 +921,7 @@ describe.skipIf(!DB_VERFUEGBAR)("API (End-to-End gegen PostgreSQL)", () => {
       const m = (await alsRosa(http().post("/v1/frage")).send({ frage: "Wie hoch ist der Mindestlohn pro Stunde?" }).expect(201)).body;
       expect(m.regelwerte[0]).toMatchObject({ id: "personal.mindestlohn.stunde" });
       expect((await alsRosa(http().post("/v1/frage")).send({ frage: "Soll ich lieber eine GmbH gründen?" }).expect(201)).body.art).toBe("beratung");
-      expect((await alsRosa(http().post("/v1/frage")).send({ frage: "Wie backe ich ein Sauerteigbrot?" }).expect(201)).body.art).toBe("unsicher");
+      expect((await alsRosa(http().post("/v1/frage")).send({ frage: "Wie flicke ich einen Fahrradschlauch?" }).expect(201)).body.art).toBe("unsicher");
     });
 
     it("Benachrichtigungen: nur eigene, gelesen markieren", async () => {

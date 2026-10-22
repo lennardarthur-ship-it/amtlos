@@ -1,15 +1,17 @@
-# Katalog C.23 · Startbestand aus Spezifikation Abschnitt 4 (E-054), ungeprüft
+# Katalog C.23 · Startbestand aus Spezifikation Abschnitt 4 (E-054); StB-Durchsicht Busch 22.10.2026 umgesetzt bis auf den Auslöser (Zahlungseingänge)
 schema_version: 1
 id: steuern.kleinunternehmer_warnung_95
-version: 3
+version: 4
 katalog_nr: C.23
 titel:
   de: Kleinunternehmergrenze zu 95 % erreicht
 kurz:
   de: Deine Rechnungen in Amtlos summieren sich auf mindestens 95 % der Kleinunternehmergrenze; die Grenze liegt bei 100.000 €, im Gründungsjahr bei 25.000 €.
 erklaerung:
-  de: Die Kleinunternehmerregelung endet ab dem Umsatz, der die Grenze überschreitet. Amtlos zählt dafür die Rechnungen, die
-    du in Amtlos gestellt hast. Rechnungen außerhalb von Amtlos sind nicht enthalten.
+  de: Die Kleinunternehmerregelung endet ab dem Umsatz, der die Grenze überschreitet. Maßgeblich ist der Umsatz nach vereinnahmten
+    Entgelten – die Zahlungen, die du netto erhältst, nicht die Rechnungen nach Rechnungsdatum. Amtlos zählt bisher die Rechnungen,
+    die du in Amtlos gestellt hast (netto, nach Rechnungsdatum); ob sie bezahlt sind, ist darin noch nicht berücksichtigt. Rechnungen
+    außerhalb von Amtlos sind nicht enthalten.
 rechtsgrundlage:
 - § 19 UStG
 kategorie: steuern
@@ -87,10 +89,7 @@ quellen:
   url: https://www.gesetze-im-internet.de/ustg_1980/__19.html
   abgerufen: null
 fachlich_zu_pruefen:
-- Frist nicht in der Spezifikation genannt – Frist und Verschiebung fachlich ergänzen
-- 'Umsatzbegriff für die Grenze (G-06): Summe der gestellten Rechnungen (netto, abzüglich Stornos) im Kalenderjahr nach Rechnungsdatum
-  – bestätigen'
-- Warnstufen 80 % und 95 % aus der Spezifikation
+- 'StB Busch 22.10.2026 (G-06): Umsatzbegriff sind die vereinnahmten Entgelte (netto) statt gestellter Rechnungen nach Rechnungsdatum – der Auslöser über finanzen.umsatz.laufendes_jahr zählt weiter die Rechnungen (keine Zahlungsdaten im Fakt); nur Hinweis im Text'
 - 'Vorprüfung 21.10.2026 (Abschnitt 7, RDG): Formulierung als Information bzw. Rechenergebnis statt Vorwegnahme des Ergebnisses (Liste in rdg-katalog.md)'
 pruefung:
   status: entwurf
