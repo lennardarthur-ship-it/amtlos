@@ -5,7 +5,7 @@
  */
 import { teilnahmeTabelle } from "./arbeitsschutz.js";
 import { ALLERGENE_UMFANG, HACCP, HAUTSCHUTZ_FRISEUR, HYGIENE, IFSG, LOSE_WARE } from "./bausteine.js";
-import { AUFZEICHNUNGEN, CCP_BEGRUENDUNG, CCP_FRAGEN, CCP_FRAGEN_QUELLE, CCP_VORSCHLAEGE, GEFAHRENANALYSE, GEFAHR_ARTEN, GEFAHR_KURZ, HACCP_AUFBEWAHRUNG, HACCP_FLEXIBEL, HYGIENE_BAECKEREI, HYGIENE_FOODTRUCK, PROZESSSCHRITTE, VERIFIZIERUNG } from "./haccp.js";
+import { AUFZEICHNUNGEN, CCP_BEGRUENDUNG, CCP_EINSTUFUNG, CCP_FRAGEN, CCP_FRAGEN_QUELLE, CCP_HINWEIS, CCP_VORSCHLAEGE, GEFAHRENANALYSE, GEFAHR_ARTEN, GEFAHR_KURZ, GHP_HINWEIS, GHP_KURZ, GRENZWERT_HACCP, GRENZWERT_HILFE, HACCP_AUFBEWAHRUNG, HACCP_AUFBEWAHRUNG_QUELLE, HACCP_FLEXIBEL, HACCP_RUECKRUF, HACCP_VEREINFACHT, HYGIENE_BAECKEREI, HYGIENE_FOODTRUCK, PROZESSSCHRITTE, VERIFIZIERUNG } from "./haccp.js";
 import { KOPF_LINIE, ZELLE_LINIE, abschnitt, absatz, angaben, ankreuzen, auswahl, datumDe, dokument, esc, ja, liste, nachsatz, neufassung, plusMonate, punkte, stabileOption, tabelle, text, unterschriften, zelle, zusammen } from "./html.js";
 import { ALLERGENE, optionen } from "./konstanten.js";
 import type { Betrieb, Daten, Eintrag, Vorlage, Vorschlag } from "./typen.js";
@@ -201,10 +201,12 @@ function haccpKern(d: Daten): string {
   const gZeilen = g.length
     ? g.map((x) => [`<strong>${zelle(text(x, "schritt"))}</strong>`, `${art(x) ? `<span class="klein">${esc(art(x))}</span><br>` : ""}${zelle(text(x, "gefahr"))}`, zelle(text(x, "lenkung")), ccpZelle(x)])
     : PROZESSSCHRITTE.map((s) => [`<strong>${esc(s)}</strong>`, "", "", '<span class="klein">ja · nein</span>']);
-  const fragen = `<div class="zusammen"><h3>Entscheidungshilfe: Ist der Schritt ein kritischer Kontrollpunkt (CCP)?</h3><p class="klein">Je Gefahr die Fragen der Reihe nach beantworten:</p>${nummernListe(CCP_FRAGEN)}<p class="klein">${esc(CCP_FRAGEN_QUELLE)}.</p></div>`;
+  const fragen = `<div class="zusammen"><h3>Entscheidungshilfe: Ist der Schritt ein kritischer Kontrollpunkt (CCP)?</h3><p class="klein">Je Gefahr die Fragen der Reihe nach beantworten:</p>${nummernListe(CCP_FRAGEN)}<p class="klein">${esc(CCP_HINWEIS)} ${esc(CCP_FRAGEN_QUELLE)}.</p></div>`;
   const ueberwachung = (x: Eintrag) => [["Wie", text(x, "ueberwachung")], ["Wer", text(x, "wer")], ["Wie oft", text(x, "wann")]].filter(([, w]) => w).map(([k, w]) => `<span class="klein">${k}:</span> ${zelle(w!)}`).join("<br>");
+  // Prüfbericht Lebensmittelhygiene: Kühlzeilen als „Kontrollpunkt (GHP)“; ohne Einstufung (frühere Einträge) ein CCP
+  const ghp = (x: Eintrag) => text(x, "einstufung") === "ghp";
   const cZeilen = c.length
-    ? c.map((x) => [`<strong>${zelle(text(x, "schritt"))}</strong>${text(x, "gefahr") ? `<br><span class="klein">${zelle(text(x, "gefahr"))}</span>` : ""}`, zelle(text(x, "grenzwert")), ueberwachung(x), zelle(text(x, "korrektur"))])
+    ? c.map((x) => [`<strong>${zelle(text(x, "schritt"))}</strong>${ghp(x) ? `<br><span class="klein"><em>${esc(GHP_KURZ)}</em></span>` : ""}${text(x, "gefahr") ? `<br><span class="klein">${zelle(text(x, "gefahr"))}</span>` : ""}`, zelle(text(x, "grenzwert")), ueberwachung(x), zelle(text(x, "korrektur"))])
     : Array.from({ length: 4 }, () => ["", "", '<span class="klein">Wie:<br>Wer:<br>Wie oft:</span>', ""]);
   const verif = auswahl(d, "verifizierung").map((w) => VERIFIZIERUNG.find((o) => o.wert === w)?.text ?? w);
   const aufz = auswahl(d, "aufzeichnungen").map((w) => AUFZEICHNUNGEN.find((o) => o.wert === w)?.text ?? w);
@@ -218,14 +220,15 @@ function haccpKern(d: Daten): string {
     ) +
     abschnitt(
       "Kritische Kontrollpunkte (CCP)",
-      tabelle(["CCP / Prozessschritt", "Grenzwert", "Überwachung", "Korrekturmaßnahme"], cZeilen, { breiten: ["20%", "24%", "28%", "28%"], ...(c.length ? {} : { hoch: true }) }),
+      tabelle(["CCP / Prozessschritt", "Grenzwert", "Überwachung", "Korrekturmaßnahme"], cZeilen, { breiten: ["20%", "24%", "28%", "28%"], ...(c.length ? {} : { hoch: true }) }) +
+        (c.some(ghp) ? `<p class="klein">${esc(GHP_HINWEIS)}</p>` : ""),
       { rand: "Art. 5 Abs. 2 lit. c–e" },
     ) +
     abschnitt(
       "Verifizierung und Dokumentation",
       // je Teil Überschrift, Liste und Angabe zusammen (kein Umbruch mitten in der Liste)
       zusammen(`<h3>Verifizierung: So prüfen wir, ob das Verfahren wirkt</h3>${verif.length ? punkte(verif) : ankreuzen(VERIFIZIERUNG.map((o) => o.text))}${angaben([["Nächste Überprüfung", datumDe(text(d, "naechste_pruefung"))]])}`) +
-        zusammen(`<h3>Aufzeichnungen</h3>${aufz.length ? punkte(aufz) : ankreuzen(AUFZEICHNUNGEN.map((o) => o.text))}${angaben([["Aufbewahrung", text(d, "aufbewahrung")]])}`) +
+        zusammen(`<h3>Aufzeichnungen</h3>${aufz.length ? punkte(aufz) : ankreuzen(AUFZEICHNUNGEN.map((o) => o.text))}<p class="klein">${esc(HACCP_RUECKRUF)}</p>${angaben([["Aufbewahrung", text(d, "aufbewahrung")]])}`) +
         `<p class="klein">${esc(HACCP_FLEXIBEL)}</p>`,
       { rand: "Art. 5 Abs. 2 lit. f, g; Abs. 4" },
     )
@@ -271,7 +274,7 @@ export const haccp: Vorlage = {
             { id: "arten", art: "mehrfach", label: "Art der Gefahr", optionen: GEFAHR_ARTEN },
             { id: "gefahr", art: "mehrzeilig", label: "Gefahr", pflicht: true },
             { id: "lenkung", art: "mehrzeilig", label: "Lenkungsmaßnahme", pflicht: true, hilfe: "Was du tust, damit die Gefahr nicht eintritt – z. B. kühlen, durcherhitzen, trennen, reinigen." },
-            { id: "ccp", art: "wahl", label: "Kritischer Kontrollpunkt (CCP)?", optionen: CCP_WAHL, vorbelegung: "offen", hilfe: `Entscheidungshilfe, Fragen der Reihe nach: ${CCP_FRAGEN.map((f, i) => `${i + 1}. ${f}`).join(" ")}` },
+            { id: "ccp", art: "wahl", label: "Kritischer Kontrollpunkt (CCP)?", optionen: CCP_WAHL, vorbelegung: "offen", hilfe: `Entscheidungshilfe, Fragen der Reihe nach: ${CCP_FRAGEN.map((f, i) => `${i + 1}. ${f}`).join(" ")} ${CCP_HINWEIS} Kühlen ist kein CCP: Es bremst Keime nur, beseitigt sie aber nicht – trag es als Kontrollpunkt mit Aufzeichnung ein.` },
             { id: "begruendung", art: "text", label: "Begründung", vorschlaege: CCP_BEGRUENDUNG },
           ],
         },
@@ -280,7 +283,7 @@ export const haccp: Vorlage = {
     {
       // E-166 (Art. 5 Abs. 2 Buchst. c–e): Grenzwert, Überwachung (wer, wie, wie oft) und Korrekturmaßnahme je CCP
       titel: "Kritische Kontrollpunkte",
-      hilfe: "Für jeden Schritt, den du als CCP bestimmt hast: Grenzwert, wie und wie oft wer misst, und was bei einer Abweichung passiert. Die Zahlen sind Vorschläge mit Quelle – prüfe sie für deinen Betrieb.",
+      hilfe: "Für jeden Schritt, den du als CCP bestimmt hast: Grenzwert, wie und wie oft wer misst, und was bei einer Abweichung passiert. Kühlstellen kannst du hier als „Kontrollpunkt (GHP)“ mitführen – gemessen und eingetragen wird gleich. Die Zahlen sind Vorschläge mit Quelle – prüfe sie für deinen Betrieb.",
       felder: [
         {
           id: "ccps",
@@ -293,8 +296,10 @@ export const haccp: Vorlage = {
           gruppenLabel: "Branche",
           felder: [
             { id: "schritt", art: "text", label: "CCP / Prozessschritt", pflicht: true, vorschlaegeAus: { liste: "gefahren", feld: "schritt" } },
+            // Prüfbericht Lebensmittelhygiene: Kühlzeilen sind Kontrollpunkte der guten Hygienepraxis (optional, ohne Angabe: CCP)
+            { id: "einstufung", art: "wahl", label: "Einstufung", optionen: CCP_EINSTUFUNG, vorbelegung: "ccp", hilfe: GHP_HINWEIS },
             { id: "gefahr", art: "text", label: "Gefahr" },
-            { id: "grenzwert", art: "mehrzeilig", label: "Grenzwert", pflicht: true },
+            { id: "grenzwert", art: "mehrzeilig", label: "Grenzwert", pflicht: true, hilfe: GRENZWERT_HILFE },
             { id: "ueberwachung", art: "mehrzeilig", label: "Überwachung: wie", vorschlaege: ["Einstichthermometer in die dickste Stelle", "Thermometer im Gerät ablesen", "Sichtkontrolle"] },
             { id: "wer", art: "text", label: "Überwachung: wer", vorschlaege: ["Inhaber/in", "Koch / Köchin", "Beschäftigte", "Standbetreiber/in"] },
             { id: "wann", art: "text", label: "Überwachung: wie oft", vorschlaege: ["bei jeder Charge", "täglich zu Arbeitsbeginn", "bei jeder Lieferung", "stichprobenartig je Verkaufstag"] },
@@ -318,7 +323,7 @@ export const haccp: Vorlage = {
           vorschlaege: HACCP,
           felder: [
             { id: "punkt", art: "text", label: "Kontrollpunkt", pflicht: true },
-            { id: "grenzwert", art: "mehrzeilig", label: "Grenzwert", pflicht: true },
+            { id: "grenzwert", art: "mehrzeilig", label: "Grenzwert", pflicht: true, hilfe: GRENZWERT_HILFE },
             { id: "haeufigkeit", art: "mehrzeilig", label: "Häufigkeit", vorschlaege: ["täglich", "bei jeder Lieferung", "wöchentlich"] },
             { id: "korrektur", art: "mehrzeilig", label: "Korrekturmaßnahme", pflicht: true },
           ],
@@ -333,12 +338,12 @@ export const haccp: Vorlage = {
         { id: "verifizierung", art: "bausteine", label: "Verifizierung", optionen: VERIFIZIERUNG },
         { id: "naechste_pruefung", art: "datum", label: "Nächste Überprüfung des Verfahrens" },
         { id: "aufzeichnungen", art: "bausteine", label: "Aufzeichnungen", optionen: AUFZEICHNUNGEN },
-        { id: "aufbewahrung", art: "text", label: "Aufbewahrung der Aufzeichnungen", vorbelegung: { text: HACCP_AUFBEWAHRUNG }, hilfe: "Art. 5 Abs. 4 Buchst. c VO (EG) Nr. 852/2004 verlangt einen „angemessenen Zeitraum“ – frag deine Lebensmittelüberwachung, was sie erwartet." },
+        { id: "aufbewahrung", art: "text", label: "Aufbewahrung der Aufzeichnungen", vorbelegung: { text: HACCP_AUFBEWAHRUNG }, hilfe: `Eine gesetzliche Frist gibt es nicht. Startwert nach ${HACCP_AUFBEWAHRUNG_QUELLE}.` },
       ],
     },
     {
       titel: "Messungen",
-      hilfe: "Optional – wenn du lieber auf Papier einträgst, lass die Liste leer oder nimm das Monatsraster zum Aushängen.",
+      hilfe: `Optional – wenn du lieber auf Papier einträgst, lass die Liste leer oder nimm das Monatsraster zum Aushängen. ${HACCP_VEREINFACHT}`,
       felder: [
         // Monatsraster (R10): ein Blatt je Monat zum Aushängen – je Gerät eine Zeile, je Tag ein Kästchen
         { id: "raster", art: "schalter", label: "Monatsraster zum Aushängen (Gerät × Tag 1–31)", hilfe: "Ein Blatt für den Monat: je Gerät eine Zeile mit Grenzwert, je Tag ein Kästchen für Messwert und Kürzel." },
@@ -674,33 +679,57 @@ const HYGIENE_SPALTEN: [string, string, string][] = [
  * Themenbereichen statt der Beauty-Zeilen (Instrumentenaufbereitung, Hautdesinfektion). Die Eigenkontrollen nach HACCP
  * (Art. 5) bleiben eine eigene Vorlage. Zahlen sind übliche Richtwerte; alles fachlich zu prüfen (Lebensmittelhygiene).
  */
-export const HYGIENE_THEMEN_LEBENSMITTEL = ["Reinigung und Desinfektion", "Personalhygiene", "Schädlingsbekämpfung", "Temperaturkontrollen", "Wareneingang", "Trennung rein/unrein", "Abfall", "Trinkwasser", "Schulungen"] as const;
+export const HYGIENE_THEMEN_LEBENSMITTEL = ["Reinigung und Desinfektion", "Personalhygiene", "Schädlingsbekämpfung", "Temperaturkontrollen", "Wareneingang", "Lagerung", "Trennung rein/unrein", "Allergenmanagement", "Abfall", "Trinkwasser", "Schulungen"] as const;
+/**
+ * Prüfbericht Lebensmittelhygiene (Baum, 22.10.2026): neue Themenbereiche „Lagerung“ (Anhang II Kap. IX) und
+ * „Allergenmanagement“. Pläne, die noch keinen der beiden nutzen (vor dem Prüfbericht angelegt), prüft der Hinweis
+ * „fehlt noch“ nur auf die bisherigen Themenbereiche.
+ */
+export const HYGIENE_THEMEN_NEU: readonly string[] = ["Lagerung", "Allergenmanagement"];
 const PRUEFEN_LM = "fachlich zu prüfen";
-const RICHTWERT = "üblicher Richtwert, fachlich zu prüfen";
-const lm = (thema: (typeof HYGIENE_THEMEN_LEBENSMITTEL)[number], was: string, wann: string, womit: string, wie: string, wer: string, quelle: string): Vorschlag => ({
+/**
+ * `geprueft`: vom Prüfbericht Lebensmittelhygiene bestätigt oder nach dessen Änderungsliste angepasst – ohne „fachlich zu
+ * prüfen“. Zeilen, die der Bericht nicht einzeln nennt, und neue Zeilen behalten die Markierung.
+ */
+const lm = (thema: (typeof HYGIENE_THEMEN_LEBENSMITTEL)[number], was: string, wann: string, womit: string, wie: string, wer: string, quelle: string, geprueft = false): Vorschlag => ({
   gruppe: "Gastronomie / Café",
   titel: was,
   werte: { thema, was, wann, womit, wie, wer },
-  quelle: `${quelle} – ${PRUEFEN_LM}`,
+  quelle: geprueft ? quelle : `${quelle} – ${PRUEFEN_LM}`,
 });
 export const HYGIENE_LEBENSMITTEL: Vorschlag[] = [
-  lm("Reinigung und Desinfektion", "Arbeitsflächen und Schneidbretter", "nach jedem Arbeitsgang; nach rohem Fleisch, Geflügel, Fisch oder Eiern sofort; zum Arbeitsende", "Reinigungsmittel; für Lebensmittelbereiche geeignetes Desinfektionsmittel (Produkt eintragen)", "grob reinigen, desinfizieren nach Herstellerangabe (Konzentration, Einwirkzeit), mit Trinkwasser nachspülen, wenn der Hersteller es vorgibt", "Beschäftigte", "Anhang II Kap. I, II, V VO (EG) Nr. 852/2004"),
+  // L-091: Desinfektionsmittel aus der DVG-Liste (Lebensmittelbereich) oder mit Herstellernachweis der Eignung
+  lm("Reinigung und Desinfektion", "Arbeitsflächen und Schneidbretter", "nach jedem Arbeitsgang; nach rohem Fleisch, Geflügel, Fisch oder Eiern sofort; zum Arbeitsende", "Reinigungsmittel; Desinfektionsmittel aus der DVG-Liste für den Lebensmittelbereich oder mit Herstellernachweis der Eignung für Lebensmittelbetriebe (DVG-gelistetes Produkt eintragen)", "grob reinigen, desinfizieren nach Herstellerangabe (Konzentration, Einwirkzeit), mit Trinkwasser nachspülen, wenn der Hersteller es vorgibt", "Beschäftigte", "Anhang II Kap. I, II, V VO (EG) Nr. 852/2004; DVG-Desinfektionsmittelliste (Lebensmittelbereich)", true),
   lm("Reinigung und Desinfektion", "Geräte und Maschinen (z. B. Aufschnittmaschine, Mixer, Kaffeemaschine)", "nach Gebrauch, mindestens täglich", "Reinigungsmittel, Desinfektionsmittel", "vom Strom trennen, zerlegen, reinigen, desinfizieren, trocknen lassen, zusammensetzen", "Beschäftigte", "Anhang II Kap. V VO (EG) Nr. 852/2004"),
   lm("Reinigung und Desinfektion", "Kühl- und Tiefkühlgeräte", "wöchentlich und bei Verschmutzung sofort; Tiefkühlgeräte bei Eisbildung abtauen", "Reinigungsmittel, Desinfektionsmittel", "ausräumen, Ware prüfen (Mindesthaltbarkeits- und Verbrauchsdatum), auswischen, desinfizieren, trocknen, wieder einräumen", "Beschäftigte", "Anhang II Kap. V VO (EG) Nr. 852/2004"),
-  lm("Reinigung und Desinfektion", "Geschirr, Besteck, Gläser", "nach Gebrauch", "Geschirrspülmaschine mit Reiniger und Klarspüler", "Spül- und Klarspültemperatur nach Herstellerangabe; Temperaturanzeige täglich ablesen", "Beschäftigte", "Anhang II Kap. II Nr. 2 VO (EG) Nr. 852/2004"),
+  // L-094: Klarspültemperatur als Kontrollpunkt – Richtwert nach DIN 10510/10511, die Herstellerangabe geht vor
+  lm("Reinigung und Desinfektion", "Geschirr, Besteck, Gläser", "nach Gebrauch", "Geschirrspülmaschine mit Reiniger und Klarspüler", "Spül- und Klarspültemperatur nach Herstellerangabe; Klarspültemperatur täglich an der Anzeige ablesen (gewerbliche Spülmaschine: Richtwert 80–85 °C nach DIN 10510/10511, die Herstellerangabe geht vor)", "Beschäftigte", "Anhang II Kap. II Nr. 2 VO (EG) Nr. 852/2004; DIN 10510/10511", true),
+  // Prüfbericht Lebensmittelhygiene (Frage 4, Café): Reinigungsintervalle nach Herstellerangabe, Milchschäumer täglich
+  lm("Reinigung und Desinfektion", "Milchschäumer und Milchlanzen", "täglich", "Reinigungsmittel nach Herstellerangabe", "zerlegen bzw. durchspülen und reinigen nach Herstellerangabe", "Beschäftigte", "Anhang II Kap. V VO (EG) Nr. 852/2004"),
+  lm("Reinigung und Desinfektion", "Eiswürfelbereiter", "nach Herstellerangabe", "Reinigungs- und Desinfektionsmittel nach Herstellerangabe", "reinigen und desinfizieren nach Herstellerangabe; Eis nur aus Trinkwasser", "Beschäftigte", "Anhang II Kap. V, Kap. VII VO (EG) Nr. 852/2004"),
+  lm("Reinigung und Desinfektion", "Getränkeschankanlage", "nach Herstellerangabe", "Reinigungsmittel nach Herstellerangabe", "Leitungen und Zapfhähne reinigen nach Herstellerangabe; Reinigung eintragen", "Beschäftigte", "Anhang II Kap. V VO (EG) Nr. 852/2004"),
   lm("Reinigung und Desinfektion", "Fußböden, Wände, Abflüsse", "Fußböden täglich zum Arbeitsende; Wände und Abflüsse wöchentlich", "Bodenreiniger", "kehren, nass wischen, trocknen lassen; Abflüsse reinigen", "Beschäftigte", "Anhang II Kap. II Nr. 1 VO (EG) Nr. 852/2004"),
-  lm("Reinigung und Desinfektion", "Reinigungstücher und Reinigungsgeräte", "Tücher täglich wechseln, bei Verschmutzung sofort", "Waschmaschine, heißes Waschprogramm (60 °C – " + RICHTWERT + ")", "Tücher farbig nach Bereichen trennen; Reinigungsgeräte sauber und trocken aufbewahren", "Beschäftigte", "Anhang II Kap. I VO (EG) Nr. 852/2004"),
-  lm("Personalhygiene", "Händewaschen", "vor Arbeitsbeginn; nach Pausen und dem Toilettengang; nach rohem Fleisch, Geflügel oder Eiern; nach Abfall, Naseputzen, Rauchen", "Handwaschbecken mit Warm- und Kaltwasser, Flüssigseife, Einmalhandtücher", "gründlich waschen (etwa 30 Sekunden), mit Einmalhandtuch abtrocknen", "alle", "Anhang II Kap. I Nr. 4, Kap. VIII VO (EG) Nr. 852/2004"),
+  // L-096: übliche Praxis, keine Rechtsnorm – Markierung „Richtwert“
+  lm("Reinigung und Desinfektion", "Reinigungstücher und Reinigungsgeräte", "Tücher täglich wechseln, bei Verschmutzung sofort", "Waschmaschine: mindestens 60 °C oder desinfizierendes Waschverfahren (Richtwert)", "Tücher farbig nach Bereichen trennen; Reinigungsgeräte sauber und trocken aufbewahren", "Beschäftigte", "Anhang II Kap. I VO (EG) Nr. 852/2004", true),
+  // L-097: 20–30 Sekunden (BZgA/RKI)
+  lm("Personalhygiene", "Händewaschen", "vor Arbeitsbeginn; nach Pausen und dem Toilettengang; nach rohem Fleisch, Geflügel oder Eiern; nach Abfall, Naseputzen, Rauchen", "Handwaschbecken mit Warm- und Kaltwasser, Flüssigseife, Einmalhandtücher", "gründlich waschen (20–30 Sekunden), mit Einmalhandtuch abtrocknen", "alle", "Anhang II Kap. I Nr. 4, Kap. VIII VO (EG) Nr. 852/2004; BZgA/RKI", true),
   lm("Personalhygiene", "Arbeitskleidung und Schmuck", "täglich und bei Verschmutzung wechseln", "saubere Arbeitskleidung, Kopfbedeckung bzw. Haarnetz, Schürze", "Arbeitskleidung nur im Betrieb tragen; Ringe, Uhren, Armbänder ablegen; Fingernägel kurz und ohne Lack; Wunden an Händen wasserfest abdecken, Handschuh darüber", "alle", "Anhang II Kap. VIII Nr. 1 VO (EG) Nr. 852/2004"),
   lm("Personalhygiene", "Krankheit (§ 42 IfSG)", "vor Arbeitsbeginn und sofort, wenn Krankheitszeichen auftreten", "Meldung an die verantwortliche Person", "Bei Durchfall, Erbrechen, Fieber, Gelbsucht oder infizierten Wunden: sofort melden und nicht mit Lebensmitteln arbeiten, bis ärztlich geklärt ist, dass kein Tätigkeitsverbot nach § 42 IfSG besteht", "alle", "§ 42 IfSG; Anhang II Kap. VIII Nr. 2 VO (EG) Nr. 852/2004"),
-  lm("Schädlingsbekämpfung", "Schädlingsmonitoring", "täglich Sichtkontrolle; Monitoringstellen nach Plan (z. B. monatlich – " + RICHTWERT + ")", "Klebefallen bzw. Monitore, Lageplan der Stellen; Fliegengitter", "auf Kot, Fraßspuren, Gespinste und Tiere achten; Befall sofort melden, Fachbetrieb beauftragen; Kontrollen und Maßnahmen aufschreiben", "verantwortliche Person", "Anhang II Kap. IX Nr. 4 VO (EG) Nr. 852/2004"),
-  lm("Temperaturkontrollen", "Kühlgeräte", "täglich zu Arbeitsbeginn", "Thermometer; Messprotokoll der Eigenkontrollen (HACCP)", "höchstens +7 °C (" + RICHTWERT + "; strengere Werte z. B. für Hackfleisch, Geflügel, Fisch nach Herstellerangabe); bei Abweichung Ursache beheben, Ware bewerten, eintragen", "Beschäftigte", "Anhang II Kap. IX Nr. 5 VO (EG) Nr. 852/2004"),
-  lm("Temperaturkontrollen", "Tiefkühlgeräte", "täglich zu Arbeitsbeginn", "Thermometer; Messprotokoll der Eigenkontrollen (HACCP)", "−18 °C oder kälter (" + RICHTWERT + "); bei Abweichung Ursache beheben, Ware bewerten, eintragen", "Beschäftigte", "Anhang II Kap. IX Nr. 5 VO (EG) Nr. 852/2004"),
-  lm("Wareneingang", "Wareneingang", "bei jeder Lieferung", "Thermometer, Lieferschein", "Verpackung, Kennzeichnung, Mindesthaltbarkeits- und Verbrauchsdatum prüfen; Temperatur gekühlter und tiefgekühlter Ware messen; Mängel zurückweisen; Kühlware sofort einräumen", "Beschäftigte", "Anhang II Kap. IX Nr. 1, 2 VO (EG) Nr. 852/2004"),
+  // L-100 und L-077: einheitlich monatlich
+  lm("Schädlingsbekämpfung", "Schädlingsmonitoring", "täglich Sichtkontrolle; Monitoringstellen monatlich", "Klebefallen bzw. Monitore, Lageplan der Stellen; Fliegengitter", "auf Kot, Fraßspuren, Gespinste und Tiere achten; Befall sofort melden, Fachbetrieb beauftragen; Kontrollen und Maßnahmen aufschreiben", "verantwortliche Person", "Anhang II Kap. IX Nr. 4 VO (EG) Nr. 852/2004", true),
+  // L-101, L-102 (Frage 7): der Grenzwert steht nur in den Eigenkontrollen, damit nicht zwei Dokumente verschiedene Werte nennen
+  lm("Temperaturkontrollen", "Kühlgeräte", "täglich zu Arbeitsbeginn", "Thermometer; Messprotokoll der Eigenkontrollen (HACCP)", `Temperatur ablesen und eintragen; ${GRENZWERT_HACCP}; bei Abweichung Ursache beheben, Ware bewerten, eintragen`, "Beschäftigte", "Anhang II Kap. IX Nr. 5 VO (EG) Nr. 852/2004", true),
+  lm("Temperaturkontrollen", "Tiefkühlgeräte", "täglich zu Arbeitsbeginn", "Thermometer; Messprotokoll der Eigenkontrollen (HACCP)", `Temperatur ablesen und eintragen; ${GRENZWERT_HACCP}; bei Abweichung Ursache beheben, Ware bewerten, eintragen`, "Beschäftigte", "Anhang II Kap. IX Nr. 5 VO (EG) Nr. 852/2004", true),
+  lm("Wareneingang", "Wareneingang", "bei jeder Lieferung", "Thermometer, Lieferschein", `Verpackung, Kennzeichnung, Mindesthaltbarkeits- und Verbrauchsdatum prüfen; Temperatur gekühlter und tiefgekühlter Ware messen (${GRENZWERT_HACCP}); Mängel zurückweisen; Kühlware sofort einräumen`, "Beschäftigte", "Anhang II Kap. IX Nr. 1, 2 VO (EG) Nr. 852/2004"),
+  // Prüfbericht Lebensmittelhygiene (Frage 6): neuer Themenbereich „Lagerung“ (Anhang II Kap. IX)
+  lm("Lagerung", "Lagerung von Lebensmitteln", "beim Einräumen und laufend", "beschriftete, verschlossene Behälter; Regale", "Mindesthaltbarkeits- und Verbrauchsdatum prüfen; zuerst verbrauchen, was zuerst eingelagert wurde (First in – first out); angebrochene Ware mit Datum beschriften; Trockenlager vom Boden abgehoben; Reinigungsmittel getrennt von Lebensmitteln lagern", "Beschäftigte", "Anhang II Kap. IX VO (EG) Nr. 852/2004"),
   lm("Trennung rein/unrein", "Trennung rein/unrein", "ständig", "getrennte Arbeitsbereiche oder zeitliche Trennung; Schneidbretter nach Farben; abgedeckte Behälter", "rohe und verzehrfertige Lebensmittel getrennt lagern und bearbeiten (Rohes unten im Kühlgerät); Schmutzgeschirr, Abfall und Verpackungen nicht über Flächen für Lebensmittel; Reinigungsmittel getrennt von Lebensmitteln lagern", "alle", "Anhang II Kap. IX Nr. 3, Kap. I Nr. 10 VO (EG) Nr. 852/2004; § 3 LMHV"),
+  // Prüfbericht Lebensmittelhygiene (Frage 6, Frage 10): neuer Themenbereich „Allergenmanagement“
+  lm("Allergenmanagement", "Allergene in Rezepturen und Auskunft", "ständig; Allergenliste bei jeder Rezept- oder Lieferantenänderung sofort aktualisieren", "Rezepturen, Zutatenlisten der Lieferanten, Allergenliste (eigene Vorlage)", "Rezepturen mit Allergenen festhalten und Zutatenlisten aufbewahren; Allergenliste aktuell halten; Personal einweisen: keine Auskunft ins Blaue, im Zweifel in Rezeptur oder Allergenliste nachsehen; getrennte Geräte bzw. Reinigung zwischen Chargen", "verantwortliche Person; alle", "Art. 44 LMIV; Anhang II Kap. IX Nr. 3 VO (EG) Nr. 852/2004"),
   lm("Abfall", "Abfall und Speisereste", "mehrmals täglich und zum Arbeitsende leeren; Behälter wöchentlich reinigen", "verschließbare Behälter, möglichst mit Fußbedienung", "Abfall nicht in Räumen mit Lebensmitteln sammeln; Speisereste getrennt sammeln und über einen Entsorger abgeben; Abfallplatz sauber und frei von Schädlingen halten", "Beschäftigte", "Anhang II Kap. VI VO (EG) Nr. 852/2004"),
   lm("Trinkwasser", "Trinkwasser und Eis", "laufend; nach längerem Stillstand Leitungen spülen", "Trinkwasser aus der Hausinstallation", "für Lebensmittel, Eis und das Reinigen von Flächen für Lebensmittel nur Trinkwasser verwenden; Eisbereiter und Wasserfilter nach Herstellerangabe reinigen bzw. wechseln", "Beschäftigte", "Anhang II Kap. VII VO (EG) Nr. 852/2004"),
-  lm("Schulungen", "Schulung Lebensmittelhygiene", "vor der ersten Tätigkeit und regelmäßig wiederholen (z. B. jährlich – " + RICHTWERT + ")", "Schulung nach § 4 LMHV und Anhang II Kap. XII VO (EG) Nr. 852/2004; Belehrung nach § 43 IfSG (eigene Vorlage)", "Inhalte: Personalhygiene, Reinigung, Temperaturen, Trennung rein/unrein, Allergene; Teilnahme mit Unterschrift festhalten", "verantwortliche Person", "§ 4 LMHV; Anhang II Kap. XII VO (EG) Nr. 852/2004"),
+  // L-107: jährlich (DIN 10514); Nachweis mit der Vorlage Schulungsnachweis
+  lm("Schulungen", "Schulung Lebensmittelhygiene", "vor der ersten Tätigkeit und jährlich wiederholen", "Schulung nach § 4 LMHV und Anhang II Kap. XII VO (EG) Nr. 852/2004; Belehrung nach § 43 IfSG (eigene Vorlage)", "Inhalte: Personalhygiene, Reinigung, Temperaturen, Trennung rein/unrein, Allergene; Teilnahme mit Unterschrift festhalten (Vorlage „Schulungsnachweis Lebensmittelhygiene“)", "verantwortliche Person", "§ 4 LMHV; Anhang II Kap. XII VO (EG) Nr. 852/2004; DIN 10514", true),
 ];
 /** Querverweis auf die Eigenkontrollen und die Belehrung im Plan eines Lebensmittelbetriebs. */
 export const HYGIENE_VERWEIS_HACCP = "Eigenkontrollen nach HACCP (Kontrollpunkte, Temperaturen messen und eintragen, Korrekturmaßnahmen): eigene Vorlage „Eigenkontrollen (HACCP)“. Belehrung nach § 43 IfSG: eigene Vorlage.";
@@ -778,9 +807,9 @@ export const hygieneplan: Vorlage = {
   abschnitte: [
     {
       titel: "Bereich",
-      hilfe: "Friseur, Kosmetik, Nagelstudio, Fußpflege: Welche Anforderungen genau gelten, regelt die Hygieneverordnung deines Bundeslands; Desinfektionsmittel nach Herstellerangabe bzw. VAH-Liste. Lebensmittelbetriebe: allgemeine Hygienevorschriften nach Art. 4 und Anhang II VO (EG) Nr. 852/2004 und Lebensmittelhygiene-Verordnung (LMHV) – die Vorschläge der Gruppe „Gastronomie / Café“ decken Reinigung und Desinfektion, Personalhygiene, Schädlinge, Temperaturen, Wareneingang, Trennung rein/unrein, Abfall, Trinkwasser und Schulungen ab; dazu kommen Zeilen für Bäckerei sowie für Foodtruck und mobilen Verkauf (Wassertank, Handwaschgelegenheit, Kühlung unterwegs, Abfall und Abwasser, Standplatzwechsel). Die Eigenkontrollen nach HACCP haben eine eigene Vorlage.",
+      hilfe: "Friseur, Kosmetik, Nagelstudio, Fußpflege: Welche Anforderungen genau gelten, regelt die Hygieneverordnung deines Bundeslands; Desinfektionsmittel nach Herstellerangabe bzw. VAH-Liste. Lebensmittelbetriebe: allgemeine Hygienevorschriften nach Art. 4 und Anhang II VO (EG) Nr. 852/2004 und Lebensmittelhygiene-Verordnung (LMHV) – die Vorschläge der Gruppe „Gastronomie / Café“ decken Reinigung und Desinfektion, Personalhygiene, Schädlinge, Temperaturen, Wareneingang, Lagerung, Trennung rein/unrein, Allergenmanagement, Abfall, Trinkwasser und Schulungen ab; Grenzwerte stehen nur in den Eigenkontrollen (HACCP); dazu kommen Zeilen für Bäckerei sowie für Foodtruck und mobilen Verkauf (Wassertank, Handwaschgelegenheit, Kühlung unterwegs, Abfall und Abwasser, Standplatzwechsel). Die Eigenkontrollen nach HACCP haben eine eigene Vorlage.",
       felder: [
-        { id: "art", art: "wahl", label: "Art des Betriebs", optionen: [{ wert: "beauty", text: "Friseur, Kosmetik, Nagelstudio, Fußpflege" }, { wert: "lebensmittel", text: "Lebensmittelbetrieb (Café, Küche, Bäckerei, Foodtruck)" }], vorbelegung: "beauty", vorbelegungJe: { gastro_cafe: "lebensmittel" }, hilfe: "Bestimmt die Rechtsgrundlage und den Aufbau des Plans. Für Lebensmittelbetriebe: Vorschläge der Gruppen „Gastronomie / Café“, „Bäckerei“ und „Foodtruck / mobiler Verkauf“ – Zahlen darin sind übliche Richtwerte und fachlich zu prüfen." },
+        { id: "art", art: "wahl", label: "Art des Betriebs", optionen: [{ wert: "beauty", text: "Friseur, Kosmetik, Nagelstudio, Fußpflege" }, { wert: "lebensmittel", text: "Lebensmittelbetrieb (Café, Küche, Bäckerei, Foodtruck)" }], vorbelegung: "beauty", vorbelegungJe: { gastro_cafe: "lebensmittel" }, hilfe: "Bestimmt die Rechtsgrundlage und den Aufbau des Plans. Für Lebensmittelbetriebe: Vorschläge der Gruppen „Gastronomie / Café“, „Bäckerei“ und „Foodtruck / mobiler Verkauf“ – die Grenzwerte für Temperaturen stehen in den Eigenkontrollen (HACCP)." },
         { id: "bereich", art: "text", label: "Bereich", vorschlaege: ["Friseursalon", "Kosmetik", "Nagelstudio", "Fußpflege", "Küche", "Theke und Gastraum", "Backstube und Verkauf", "Foodtruck"] },
       ],
     },
@@ -826,7 +855,9 @@ export const hygieneplan: Vorlage = {
     const beauty = e.filter((x) => BEAUTY_ZEILE.test(["was", "wann", "womit", "wie"].map((k) => text(x, k)).join(" "))).map((x) => text(x, "was"));
     if (beauty.length) r.push(`Lebensmittelbetrieb: ${beauty.length === 1 ? "Der Eintrag" : "Die Einträge"} „${beauty.join("“, „")}“ ${beauty.length === 1 ? "gehört" : "gehören"} in einen Beauty-Betrieb – entferne ${beauty.length === 1 ? "ihn" : "sie"} und nimm die Vorschläge für Lebensmittelbetriebe („Gastronomie / Café“, „Bäckerei“, „Foodtruck / mobiler Verkauf“).`);
     if (e.some((x) => text(x, "thema"))) {
-      const fehlt = HYGIENE_THEMEN_LEBENSMITTEL.filter((t) => !e.some((x) => text(x, "thema") === t));
+      // Prüfbericht Lebensmittelhygiene: die neuen Themenbereiche erst prüfen, wenn der Plan einen davon nutzt (sonst ein Plan von vorher)
+      const neu = e.some((x) => HYGIENE_THEMEN_NEU.includes(text(x, "thema")));
+      const fehlt = HYGIENE_THEMEN_LEBENSMITTEL.filter((t) => (neu || !HYGIENE_THEMEN_NEU.includes(t)) && !e.some((x) => text(x, "thema") === t));
       if (fehlt.length) r.push(`Lebensmittelbetrieb: Im Plan fehlt noch ${fehlt.join(", ")}.`);
     }
     return r;

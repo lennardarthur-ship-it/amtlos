@@ -842,8 +842,8 @@ table.risikomatrix td:first-child, table.risikomatrix th:first-child { text-alig
 .g-aushang.kompakt table.liste td { padding: 1.2mm 2mm; }
 .g-aushang.kompakt table.liste:not(.matrix):not(.legende) td:first-child { font-size: 10.5pt; line-height: 1.2; }
 /* Hygieneplan Lebensmittelbetrieb: Themenbereich über dem ersten Eintrag des Bereichs */
-/* leeres Blatt: je Themenbereich Platz zum Eintragen von Hand */
-.g-aushang.lebensmittel table.liste.hoch td { height: 9.5mm; vertical-align: top; }
+/* leeres Blatt: je Themenbereich Platz zum Eintragen von Hand (elf Themenbereiche seit dem Prüfbericht Lebensmittelhygiene – eine Seite) */
+.g-aushang.lebensmittel table.liste.hoch td { height: 7.4mm; padding-top: 1.2mm; padding-bottom: 1.2mm; vertical-align: top; }
 .g-aushang.lebensmittel table.liste td .thema { display: block; margin-bottom: 0.8mm; font-size: 7.6pt; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--akzent); }
 .g-aushang.kompakt h1 { font-size: 22pt; margin-top: 4mm; }
 .g-aushang.kompakt .unter { font-size: 11pt; margin-bottom: 3mm; }

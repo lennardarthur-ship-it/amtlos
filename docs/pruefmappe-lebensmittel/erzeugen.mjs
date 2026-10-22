@@ -60,6 +60,8 @@ for (const v of VORLAGEN) {
 // 2. Bausteine: alles, was die App in diesen Vorlagen zum Antippen anbietet, mit Kurzbeleg. Beim Hygieneplan nur die
 //    Vorschläge der Gruppe „Gastronomie / Café“ (Lebensmittelbetrieb), nicht die der Beauty-Betriebe.
 const ausBausteinen = new Map();
+// Prüfbericht Lebensmittelhygiene (L-043–L-046): die Begründungen zur CCP-Entscheidung haben die Quelle der Entscheidungshilfe
+for (const t of F.CCP_BEGRUENDUNG) ausBausteinen.set(t, { quelle: F.CCP_FRAGEN_QUELLE, unsicher: false });
 for (const wert of Object.values(F.BS)) {
   const listen = Array.isArray(wert) ? [wert] : wert && typeof wert === "object" ? Object.values(wert).filter(Array.isArray) : [];
   for (const l of listen) for (const o of l) if (o && typeof o === "object" && typeof o.text === "string" && !ausBausteinen.has(o.text)) ausBausteinen.set(o.text, { quelle: o.quelle ?? "", unsicher: Boolean(o.unsicher) });
@@ -68,7 +70,7 @@ for (const wert of Object.values(F.BS)) {
 // E-166: dazu die Zeilen für Bäckerei und Foodtruck / mobilen Verkauf
 const LEBENSMITTEL = new Set([...F.HYGIENE_LEBENSMITTEL, ...F.HYGIENE_BAECKEREI, ...F.HYGIENE_FOODTRUCK]);
 const BEAUTY = /Friseur|Kosmetik|Nagel|Fußpflege/;
-const FELD = { grenzwert: "Grenzwert", haeufigkeit: "Häufigkeit", korrektur: "Korrekturmaßnahme", thema: "Themenbereich", wann: "Wann / wie oft", womit: "Womit", wie: "Wie", wer: "Wer", arten: "Art der Gefahr", gefahr: "Gefahr", lenkung: "Lenkungsmaßnahme", ccp: "CCP", begruendung: "Begründung", ueberwachung: "Überwachung: wie" };
+const FELD = { einstufung: "Einstufung", grenzwert: "Grenzwert", haeufigkeit: "Häufigkeit", korrektur: "Korrekturmaßnahme", thema: "Themenbereich", wann: "Wann / wie oft", womit: "Womit", wie: "Wie", wer: "Wer", arten: "Art der Gefahr", gefahr: "Gefahr", lenkung: "Lenkungsmaßnahme", ccp: "CCP", begruendung: "Begründung", ueberwachung: "Überwachung: wie" };
 // E-166: Felder der Gefahrenanalyse und der CCP heißen teils anders als im Hygieneplan
 const FELD_HACCP = { wer: "Überwachung: wer", wann: "Überwachung: wie oft" };
 const inhaltAus = (werte, titel, haccp = false) =>
@@ -103,7 +105,8 @@ const markierung = (b) => {
   const m = [];
   if (b.unsicher || /unsicher/i.test(b.quelle)) m.push("unsicher");
   if (/zu prüfen/i.test(t)) m.push("fachlich zu prüfen");
-  if (/°C/.test(`${b.titel} ${b.inhalt}`)) m.push("Temperaturwert: fachlich zu prüfen (T-34, T-94)");
+  // Prüfbericht Lebensmittelhygiene (22.10.2026): Temperaturwerte nur noch markieren, wo der Baustein selbst „zu prüfen“ trägt
+  if (/°C/.test(`${b.titel} ${b.inhalt}`) && /zu prüfen/i.test(t)) m.push("Temperaturwert: fachlich zu prüfen (T-34, T-94)");
   if (/abweichende Behördenangabe|\(lose: |Behördenangaben unterschiedlich|teils werden/.test(t)) m.push("zwei Behördenwerte");
   if (!b.quelle) m.push(/§|Art\.|VO \(EG\)|LMIV|IfSG/.test(`${b.titel} ${b.inhalt}`) ? "ohne Quellenfeld (Fundstelle im Text)" : "ohne Quelle");
   return m.join("; ") || "Quelle genannt";
@@ -126,9 +129,9 @@ const zaehle = (re) => bausteine.filter((b) => re.test(b.markierung)).length;
 const bm = [
   "# Bausteine der Lebensmittel-Vorlagen",
   "",
-  `Aus dem Code erzeugt am ${new Date().toISOString().slice(0, 10)} (\`packages/fachlogik/src/dokumente/bausteine.ts\` – erzeugt von \`packages/fachlogik/werkzeuge/bausteine-erzeugen.mjs\` aus der Recherche \`docs/recherche/2026-10-12/lebensmittel_beauty.json\`, mit Korrekturen der Druckfassung –, ergänzt in \`branchen.ts\`: Hygieneplan für Lebensmittelbetriebe, und in \`haccp.ts\` (E-166): Gefahrenanalyse, kritische Kontrollpunkte, Verifizierung, Aufzeichnungen, Hygieneplan-Zeilen für Bäckerei und Foodtruck). Es steht alles, was die App in den Vorlagen ${VORLAGEN.map((v) => `„${v.titel}“`).join(", ")} (nur Lebensmittelbetrieb) zum Antippen anbietet. Der Betrieb übernimmt einen Baustein und passt ihn an; nichts davon ist bisher fachlich freigegeben (PRUEFLISTE T-34, T-57, T-94).`,
+  `Aus dem Code erzeugt am ${new Date().toISOString().slice(0, 10)} (\`packages/fachlogik/src/dokumente/bausteine.ts\` – erzeugt von \`packages/fachlogik/werkzeuge/bausteine-erzeugen.mjs\` aus der Recherche \`docs/recherche/2026-10-12/lebensmittel_beauty.json\`, mit Korrekturen der Druckfassung –, ergänzt in \`branchen.ts\`: Hygieneplan für Lebensmittelbetriebe, und in \`haccp.ts\` (E-166): Gefahrenanalyse, kritische Kontrollpunkte, Verifizierung, Aufzeichnungen, Hygieneplan-Zeilen für Bäckerei und Foodtruck). Es steht alles, was die App in den Vorlagen ${VORLAGEN.map((v) => `„${v.titel}“`).join(", ")} (nur Lebensmittelbetrieb) zum Antippen anbietet. Der Betrieb übernimmt einen Baustein und passt ihn an. Eingearbeitet ist der Prüfbericht Lebensmittelhygiene vom 22.10.2026 (Abschnitte A und B): Bausteine, die er bestätigt oder deren Änderung umgesetzt ist, tragen keine Markierung „fachlich zu prüfen“ mehr; die Nummern (L-…) haben sich durch neue Bausteine verschoben.`,
   "",
-  `**${bausteine.length} Bausteine**, davon ${zaehle(/Temperaturwert/)} mit Temperaturwert (alle „fachlich zu prüfen“), ${zaehle(/zwei Behördenwerte/)} mit zwei verschiedenen Behördenwerten, ${zaehle(/(^|; )fachlich zu prüfen/)} im Code ausdrücklich „fachlich zu prüfen“ bzw. „üblicher Richtwert, fachlich zu prüfen“, ${zaehle(/unsicher/)} „unsicher“, ${zaehle(/ohne Quelle/)} ohne Quelle. Die Nummern (L-…) sind die der CSV-Datei.`,
+  `**${bausteine.length} Bausteine**, davon ${zaehle(/Temperaturwert/)} mit Temperaturwert, der noch „fachlich zu prüfen“ ist, ${zaehle(/zwei Behördenwerte/)} mit zwei verschiedenen Behördenwerten, ${zaehle(/(^|; )fachlich zu prüfen/)} im Code ausdrücklich „fachlich zu prüfen“ bzw. „üblicher Richtwert, fachlich zu prüfen“, ${zaehle(/unsicher/)} „unsicher“, ${zaehle(/ohne Quelle/)} ohne Quelle. Die Nummern (L-…) sind die der CSV-Datei.`,
   "",
   "**Branchen (seit E-166):** Gefahrenanalyse und kritische Kontrollpunkte der HACCP-Vorlage sowie die Hygieneplan-Zeilen gibt es für die Gruppen „Gastronomie / Café“, „Bäckerei“ und „Foodtruck / mobiler Verkauf“ (Spalte „Gruppe in der App“). Die App zeigt die passende Gruppe zuerst: Bäckerei bei Handwerk und Lebensmitteln bzw. am Namen, Foodtruck bei Lebensmitteln mit Reisegewerbe oder Marktstand bzw. am Namen. Die Kontrollpunkte der Eigenkontrollen, Allergene und IfSG haben keine Gruppe. Eine Gruppe für Metzgereien gibt es nicht (keine eigene Branche im Pflichten-Check).",
   "",
@@ -153,8 +156,8 @@ bm.push("", "## Feste Texte der Vorlagen", "");
 bm.push("### Allergenliste: die 14 Hauptallergene (Anhang II LMIV) mit Erläuterung", "", "| Nr. | Bezeichnung in der App | Erläuterung auf dem Aushang (Recherche) |", "|---|---|---|", ...Object.values(F.ALLERGENE).map((a, i) => `| ${i + 1} | ${md(a)} | ${md(F.BS.ALLERGENE_UMFANG[i]?.umfasst ?? "")} |`), "");
 bm.push("### Allergene bei loser Ware (Recherche, `LOSE_WARE`)", "", `Rechtsgrundlage (Fußtext des Aushangs): ${F.BS.LOSE_WARE.rechtsgrundlage}`, "", `Anforderung: ${F.BS.LOSE_WARE.anforderung}`, "", "Schriftliche Formen:", ...F.BS.LOSE_WARE.formen.map((t) => `- ${t}`), "");
 bm.push("### Belehrung nach § 43 IfSG: Tätigkeitsverbote, Krankheitszeichen, Lebensmittel (Abschnitt „Tätigkeitsverbote nach § 42 Abs. 1 IfSG“)", "", "Personen (§ 42 Abs. 1 IfSG):", ...F.BS.IFSG.personen.map((t) => `- ${t}`), "", "Krankheitszeichen („Woran Sie das erkennen“):", ...F.BS.IFSG.symptome.map((t) => `- ${t}`), "", "Lebensmittel (§ 42 Abs. 2 IfSG):", ...F.BS.IFSG.lebensmittel.map((t) => `- ${t}`), "");
-bm.push("### HACCP: Prozessschritte, Entscheidungshilfe für CCP, Flexibilität, Aufbewahrung (E-166)", "", `Prozessschritte auf dem leeren Blatt: ${F.PROZESSSCHRITTE.join(", ")}`, "", `Entscheidungshilfe (${F.CCP_FRAGEN_QUELLE}):`, ...F.CCP_FRAGEN.map((t, i) => `${i + 1}. ${t}`), "", `Begründungen zum Antippen: ${F.CCP_BEGRUENDUNG.join(" · ")}`, "", `Fußtext Flexibilität: ${F.HACCP_FLEXIBEL}`, "", `Aufbewahrung (Startwert): ${F.HACCP_AUFBEWAHRUNG}`, "");
-bm.push("### Hygieneplan Lebensmittelbetrieb: Themenbereiche und Querverweis", "", ...F.HYGIENE_THEMEN_LEBENSMITTEL.map((t, i) => `${i + 1}. ${t}`), "", `Fußtext: ${F.HYGIENE_VERWEIS_HACCP}`, "");
+bm.push("### HACCP: Prozessschritte, Entscheidungshilfe für CCP, Flexibilität, Aufbewahrung (E-166)", "", `Prozessschritte auf dem leeren Blatt: ${F.PROZESSSCHRITTE.join(", ")}`, "", `Entscheidungshilfe (${F.CCP_FRAGEN_QUELLE}):`, ...F.CCP_FRAGEN.map((t, i) => `${i + 1}. ${t}`), "", `Hinweis unter der Entscheidungshilfe: ${F.CCP_HINWEIS}`, "", `Begründungen zum Antippen: ${F.CCP_BEGRUENDUNG.join(" · ")}`, "", `Kennzeichnung in der CCP-Tabelle: ${F.GHP_HINWEIS}`, "", `Hilfetext Grenzwert: ${F.GRENZWERT_HILFE}`, "", `Fußtext Flexibilität: ${F.HACCP_FLEXIBEL}`, "", `Hinweis in der App (Messungen): ${F.HACCP_VEREINFACHT}`, "", `Aufbewahrung (Startwert): ${F.HACCP_AUFBEWAHRUNG} (${F.HACCP_AUFBEWAHRUNG_QUELLE})`, "", `Fester Satz bei den Aufzeichnungen: ${F.HACCP_RUECKRUF}`, "");
+bm.push("### Hygieneplan Lebensmittelbetrieb: Themenbereiche und Querverweis", "", ...F.HYGIENE_THEMEN_LEBENSMITTEL.map((t, i) => `${i + 1}. ${t}${F.HYGIENE_THEMEN_NEU.includes(t) ? " (neu nach dem Prüfbericht)" : ""}`), "", `Fußtext: ${F.HYGIENE_VERWEIS_HACCP}`, "");
 fs.writeFileSync(path.join(ZIEL, "bausteine.md"), bm.join("\n"));
 
 // 3. Katalog: alle Gastro-Pflichten außer dem Preisverzeichnis (Preisrecht) und die Verpackungspflichten – Spalten wie beim Anwalt
@@ -218,7 +221,7 @@ fs.writeFileSync(path.join(ZIEL, "PRUEFLISTE-lebensmittel.md"), auszug.join("\n"
 kopiere(path.join(HIER, "README.md"), path.join(ZIEL, "README.md"));
 fs.rmSync(ROH, { recursive: true, force: true });
 const pdfs = fs.existsSync(vorlagen) ? fs.readdirSync(vorlagen).length : 0;
-console.log(`✓ Prüfmappe Lebensmittelhygiene in ${ZIEL}: ${pdfs} Vorlagen-PDFs (${VORLAGEN.length} Vorlagen), ${bausteine.length} Bausteine (${zaehle(/Temperaturwert/)} mit Temperaturwert), ${zeilen.length} Pflichten, ${lm.length + fach.length} Prüflisten-Punkte (+${kenntnis.length} zur Kenntnis, ${kZeilen.length} Katalogpunkte)`);
+console.log(`✓ Prüfmappe Lebensmittelhygiene in ${ZIEL}: ${pdfs} Vorlagen-PDFs (${VORLAGEN.length} Vorlagen), ${bausteine.length} Bausteine (${zaehle(/Temperaturwert/)} mit offenem Temperaturwert), ${zeilen.length} Pflichten, ${lm.length + fach.length} Prüflisten-Punkte (+${kenntnis.length} zur Kenntnis, ${kZeilen.length} Katalogpunkte)`);
 if (befunde.length) console.log(`! Satzspiegel-Befunde des Prüfwerkzeugs zu diesen Vorlagen:\n${befunde.join("\n")}`);
 if (fehlendeVorlagen.length) console.log(`! Vorlagen nicht erzeugt: ${fehlendeVorlagen.join(", ")}`);
 if (fehlendeIds.length) console.log(`! Katalogeinträge nicht gefunden: ${fehlendeIds.join(", ")}`);

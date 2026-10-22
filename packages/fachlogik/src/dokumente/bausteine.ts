@@ -2,6 +2,7 @@
  * Bausteine aus der Recherche vom 12.10.2026 (docs/recherche/2026-10-12) – ERZEUGT von werkzeuge/bausteine-erzeugen.mjs,
  * nicht von Hand ändern. Jeder Baustein trägt einen Kurzbeleg; „unsicher“ = nicht wörtlich an der Primärquelle geprüft.
  * Fachliche Durchsicht Arbeitsschutz vom 22.10.2026 eingearbeitet (E-167, Zuordnung in sifa.ts); Abnahme: PRUEFLISTE T-62.
+ * Grenzwerte der Kontrollpunkte nach dem Prüfbericht Lebensmittelhygiene vom 22.10.2026 (LM_BAUM im Skript).
  */
 import type { Option, Vorschlag } from "./typen.js";
 
@@ -2526,11 +2527,11 @@ export const HACCP: Vorschlag[] = [
   "titel": "Kühllagerung allgemein – Temperaturkontrolle Kühleinrichtungen",
   "werte": {
    "punkt": "Kühllagerung allgemein – Temperaturkontrolle Kühleinrichtungen",
-   "grenzwert": "Soll-Temperaturen je Kühleinrichtung festlegen; Kühlschrank +4 bis +7 °C",
+   "grenzwert": "Kühlschrank höchstens +7 °C",
    "haeufigkeit": "Ist-Temperatur mindestens einmal täglich messen und dokumentieren",
    "korrektur": "Bei Abweichung bzw. sensorischer Veränderung: Ware entnehmen und ggf. verwerfen, Verantwortliche informieren, Kühltemperatur korrigieren oder Reparaturauftrag an Fachfirma; Korrekturmaßnahme dokumentieren."
   },
-  "quelle": "Lebensmittelüberwachung Mainz"
+  "quelle": "BgVV 1999; LAVES Niedersachsen, Merkblatt Lagertemperaturen 08/2022 (DIN 10508:2019); Lebensmittelüberwachung Mainz"
  },
  {
   "titel": "Kühlung Fleisch und Fleischerzeugnisse (frisch)",
@@ -2556,11 +2557,21 @@ export const HACCP: Vorschlag[] = [
   "titel": "Kühlung Hackfleisch",
   "werte": {
    "punkt": "Kühlung Hackfleisch",
-   "grenzwert": "vorverpackt (SB) bzw. nicht am Ort der Abgabe hergestellt: max. +2 °C; am Ort der Abgabe hergestellt / lose: max. +7 °C (abweichende Behördenangabe: +7 bzw. +4 °C je nach Abgabezeitpunkt)",
+   "grenzwert": "zugekauft bzw. vorverpackt: max. +2 °C",
    "haeufigkeit": "täglich",
    "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren."
   },
-  "quelle": "Lebensmittelüberwachung Mainz; LAVES Niedersachsen (lose: +7 bzw. +4 °C je nach Abgabezeitpunkt)"
+  "quelle": "Tier-LMHV Anlage 5 Kap. II Nr. 3.1.3, 3.3.1; LAVES Niedersachsen; Lebensmittelüberwachung Mainz"
+ },
+ {
+  "titel": "Kühlung Hackfleisch – nur bei eigener Herstellung",
+  "werte": {
+   "punkt": "Kühlung Hackfleisch – nur bei eigener Herstellung",
+   "grenzwert": "selbst hergestellt, lose abgegeben: max. +7 °C Umgebung; Abgabe am Tag der Herstellung",
+   "haeufigkeit": "täglich",
+   "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren."
+  },
+  "quelle": "Tier-LMHV Anlage 5 Kap. II Nr. 3.1.3, 3.3.1; LAVES Niedersachsen"
  },
  {
   "titel": "Kühlung Fleischzubereitungen",
@@ -2576,11 +2587,11 @@ export const HACCP: Vorschlag[] = [
   "titel": "Kühlung Geflügelfleisch (auch Federwild, Kleinwild/Hasen)",
   "werte": {
    "punkt": "Kühlung Geflügelfleisch (auch Federwild, Kleinwild/Hasen)",
-   "grenzwert": "max. +4 °C (abweichende Behördenangabe: −2 bis max. +4 °C)",
+   "grenzwert": "max. +4 °C",
    "haeufigkeit": "täglich",
    "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren."
   },
-  "quelle": "Lebensmittelüberwachung Mainz (max. +4 °C); LAVES Niedersachsen (−2 bis max. +4 °C)"
+  "quelle": "VO (EG) Nr. 853/2004 Anhang III Abschn. II Kap. V Nr. 3; LAVES Niedersachsen; Lebensmittelüberwachung Mainz"
  },
  {
   "titel": "Kühlung Fisch frisch, gekochte Krebs- und Weichtiere",
@@ -2626,11 +2637,11 @@ export const HACCP: Vorschlag[] = [
   "titel": "Kühlung Eiprodukte / roheihaltige Lebensmittel",
   "werte": {
    "punkt": "Kühlung Eiprodukte / roheihaltige Lebensmittel",
-   "grenzwert": "Eiprodukte max. +4 °C; roheihaltige Lebensmittel: max. +7 °C bzw. max. +4 °C (Behördenangaben unterschiedlich)",
+   "grenzwert": "max. +4 °C; roheihaltige Speisen innerhalb von 24 Stunden verbrauchen",
    "haeufigkeit": "täglich",
    "korrektur": "Ware entnehmen/ggf. verwerfen, Kühlung korrigieren, dokumentieren."
   },
-  "quelle": "Lebensmittelüberwachung Mainz (roheihaltig +7 °C); LAVES Niedersachsen (roheihaltig +4 °C)"
+  "quelle": "LAVES Niedersachsen, Merkblatt Lagertemperaturen 08/2022 (DIN 10508:2019); Verbrauch binnen 24 Stunden: BgVV 1999"
  },
  {
   "titel": "Kühlung feine Backwaren / Konditorwaren mit nicht durcherhitzter Füllung oder Auflage; Feinkost-, Obst-/Gemüsesalate, belegte Brötchen, Desserts",
@@ -2646,11 +2657,11 @@ export const HACCP: Vorschlag[] = [
   "titel": "Tiefkühlung (Tiefkühltruhe/-raum, tiefgefrorene Lebensmittel)",
   "werte": {
    "punkt": "Tiefkühlung (Tiefkühltruhe/-raum, tiefgefrorene Lebensmittel)",
-   "grenzwert": "−18 °C oder kälter; kurzfristig bis −15 °C zulässig",
+   "grenzwert": "−18 °C oder kälter; kurzfristiger Anstieg um höchstens 3 K beim Transport oder Abtauen",
    "haeufigkeit": "täglich",
    "korrektur": "Ware prüfen, ggf. verwerfen (nicht wieder einfrieren, wenn angetaut), Gerät korrigieren/Reparatur, dokumentieren."
   },
-  "quelle": "Lebensmittelüberwachung Mainz; LAVES Niedersachsen"
+  "quelle": "VO (EG) Nr. 37/2005; TLMV; LAVES Niedersachsen; Lebensmittelüberwachung Mainz"
  },
  {
   "titel": "Speiseeis",
@@ -2666,11 +2677,11 @@ export const HACCP: Vorschlag[] = [
   "titel": "Heißhalten / Ausgabetemperatur warmer Speisen",
   "werte": {
    "punkt": "Heißhalten / Ausgabetemperatur warmer Speisen",
-   "grenzwert": "mindestens +60 °C an allen Stellen bzw. im Kern; teils werden mind. +65 °C für max. 3 Stunden angegeben",
-   "haeufigkeit": "stichprobenartig bei Ausgabe",
-   "korrektur": "Zu kalte warme Speisen bis zum Aufkochen nacherhitzen; sonst verwerfen; dokumentieren."
+   "grenzwert": "mindestens +60 °C an allen Stellen, höchstens 3 Stunden",
+   "haeufigkeit": "bei Beginn der Ausgabe und danach alle 2 Stunden",
+   "korrektur": "Zu kalte warme Speisen auf mindestens +72 °C Kerntemperatur nacherhitzen, nur einmal; sonst verwerfen; dokumentieren."
   },
-  "quelle": "+60 °C: BfR 2020, LAVES Niedersachsen, Lebensmittelüberwachung Mainz; +65 °C (älterer Wert): BfR 2008, BgVV, DIN-Normen, LAVES-Merkblatt B. cereus"
+  "quelle": "BfR-Stellungnahme 037/2020; BfR, Presseinformation 13/2024; LAVES Niedersachsen 08/2022; DIN 10508:2019 (+65 °C als Praxiszuschlag, Kreis Paderborn 2026)"
  },
  {
   "titel": "Ausgabetemperatur Kaltspeisen und Salate",
@@ -2678,9 +2689,9 @@ export const HACCP: Vorschlag[] = [
    "punkt": "Ausgabetemperatur Kaltspeisen und Salate",
    "grenzwert": "max. +7 °C",
    "haeufigkeit": "stichprobenartig",
-   "korrektur": "Bei Unterbrechung der Kühlkette von mehr als 30 Minuten Lebensmittel entsorgen; dokumentieren."
+   "korrektur": "Kaltspeisen höchstens 2 Stunden ungekühlt ausgeben, danach entsorgen; Produkttemperatur bei der Kontrolle über +7 °C: entsorgen; dokumentieren."
   },
-  "quelle": "Lebensmittelüberwachung Mainz"
+  "quelle": "Lebensmittelüberwachung Mainz; BgVV 1999 Abschnitt 4; DEHOGA-Leitlinie"
  },
  {
   "titel": "Abkühlen heißer Speisen",
@@ -2690,27 +2701,27 @@ export const HACCP: Vorschlag[] = [
    "haeufigkeit": "bei jedem Abkühlvorgang",
    "korrektur": "Bei Überschreitung: Speise nicht weiter lagern, verwerfen; Abkühlverfahren (flache Behälter, Schnellkühler) anpassen."
   },
-  "quelle": "oberallgaeu.org (BgVV-Temperaturempfehlungen)"
+  "quelle": "BgVV, Temperaturanforderungen und -empfehlungen für Lebensmittel (1999), Abschnitt 4"
  },
  {
   "titel": "Wareneingangskontrolle",
   "werte": {
    "punkt": "Wareneingangskontrolle",
-   "grenzwert": "Temperatur bei Anlieferung (Messung): Tiefkühlware −18 °C (kurzfristig −15 °C); Fleisch/Fleischerzeugnisse +4 °C; Fisch +2 °C; Hackfleisch +2 °C; Geflügel/Wild +4 °C. Sichtkontrolle: keine Verunreinigungen, einwandfreie Verpackung, einwandfreier Geruch, gültiges MHD, Beschaffenheit des Lieferfahrzeugs, Kennzeichnung",
+   "grenzwert": "Temperatur bei Anlieferung (Messung): Tiefkühlware −18 °C oder kälter (kurzfristiger Anstieg um höchstens 3 K); Fleisch/Fleischerzeugnisse +7 °C; Geflügel +4 °C; Hackfleisch +2 °C; Fleischzubereitungen +4 °C; Fisch +2 °C; Konsummilch +8 °C; Milcherzeugnisse +10 °C. Sichtkontrolle: keine Verunreinigungen, einwandfreie Verpackung, einwandfreier Geruch, gültiges MHD, Beschaffenheit des Lieferfahrzeugs, Kennzeichnung",
    "haeufigkeit": "stichprobenartig bei jeder Lieferung; Dokumentation z. B. durch Vermerk auf Lieferschein oder Rechnung",
    "korrektur": "Zurückweisung der Ware; Mängel und Maßnahme dokumentieren (Datum, Lieferung, Mangel, Korrekturmaßnahme, Handzeichen)."
   },
-  "quelle": "Lebensmittelüberwachung Mainz (Formular Wareneingangskontrolle, Merkblatt)"
+  "quelle": "Werte wie die Kontrollpunkte der Kühlung (VO (EG) Nr. 853/2004; Tier-LMHV Anlage 5; BgVV 1999; LAVES Niedersachsen); Lebensmittelüberwachung Mainz (Formular Wareneingangskontrolle, Merkblatt)"
  },
  {
   "titel": "Frittierfett – polare Anteile",
   "werte": {
    "punkt": "Frittierfett – polare Anteile",
-   "grenzwert": "24 % polare Anteile (Grenze der Genusstauglichkeit): Fett wechseln; Frittiertemperatur mind. +160 °C, max. +175 °C",
+   "grenzwert": "Eingriffswert 20 % polare Anteile: Fett wechseln (Grenze der Genusstauglichkeit 24 %); Frittiertemperatur mind. +160 °C, max. +175 °C",
    "haeufigkeit": "nach Durchsatz; Wechselzeitpunkt über Eigenkontrollen ermitteln; Temperaturkontrollen und Fettwechsel dokumentieren",
    "korrektur": "Fett wechseln bei Erreichen des Grenzwerts oder Verderbsmerkmalen (stechender, kratziger Geruch/Geschmack, bläulicher Rauch, verstärkte Schaumbildung); nach Gebrauch filtrieren, in Ruhephasen abdecken; Fritteuse entleeren und reinigen; Altfett in verschließbaren Behältern bis zur Abholung durch Fachfirma lagern."
   },
-  "quelle": "zvl.jena.de; 24 % polare Anteile: DGF-Empfehlung"
+  "quelle": "DGF-Empfehlung; ALS (24 % polare Anteile); BGN-Leitlinie ortsveränderliche Betriebsstätten 2018; zvl.jena.de"
  },
  {
   "titel": "Reinigung und Desinfektion (Reinigungsplan Küche)",
@@ -2727,7 +2738,7 @@ export const HACCP: Vorschlag[] = [
   "werte": {
    "punkt": "Schädlingsmonitoring",
    "grenzwert": "kein Befall (Sichtkontrolle)",
-   "haeufigkeit": "regelmäßige vorbeugende Sichtkontrollen, mindestens einmal pro Quartal, dokumentiert",
+   "haeufigkeit": "regelmäßige vorbeugende Sichtkontrollen, mindestens einmal im Monat, dokumentiert",
    "korrektur": "Bekämpfung (ggf. Fachfirma); Datum, Bereich, Feststellung, Art der Bekämpfung, Ausführender dokumentieren."
   },
   "quelle": "Lebensmittelüberwachung Mainz"

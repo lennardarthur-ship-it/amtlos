@@ -38,7 +38,7 @@ describe("HACCP-Vorlage in der App", () => {
     expect(d.gefahren).toEqual([]);
     expect(d.ccps).toEqual([]);
     expect(d.verantwortlich).toBe("Mara Lindner");
-    expect(String(d.aufbewahrung)).toMatch(/angemessenen Zeitraum/);
+    expect(String(d.aufbewahrung)).toMatch(/^12 Monate/);
     expect(GEFAHRENANALYSE.some((x) => x.gruppe === "Foodtruck / mobiler Verkauf")).toBe(true);
   });
 });

@@ -472,6 +472,52 @@ for (const [nr, liste, schluessel, aenderungen] of SIFA) {
   }
 }
 /**
+ * Prüfbericht Lebensmittelhygiene (Tim Baum, 22.10.2026, docs/pruefberichte/2026-10-22-lebensmittelhygiene-baum.txt):
+ * Tabelle „Grenzwerte je Kontrollpunkt“ und Änderungsliste – je Kontrollpunkt ein Wert, Quellen aus der Tabelle. Je
+ * Eintrag die Nummer der Prüfmappe (L-…). Pfade wie bei SIFA; jede Änderung muss greifen. Nicht genannte Kontrollpunkte
+ * (✔ ohne Änderung) bleiben unverändert.
+ */
+const LAVES = "LAVES Niedersachsen, Merkblatt Lagertemperaturen 08/2022 (DIN 10508:2019)";
+const LM_BAUM = [
+  ["L-057", "Kühllagerung allgemein – Temperaturkontrolle Kühleinrichtungen", { "werte.grenzwert": "Kühlschrank höchstens +7 °C", quelle: `BgVV 1999; ${LAVES}; Lebensmittelüberwachung Mainz` }],
+  ["L-060", "Kühlung Hackfleisch", { "werte.grenzwert": "zugekauft bzw. vorverpackt: max. +2 °C", quelle: "Tier-LMHV Anlage 5 Kap. II Nr. 3.1.3, 3.3.1; LAVES Niedersachsen; Lebensmittelüberwachung Mainz" }],
+  ["L-062", "Kühlung Geflügelfleisch (auch Federwild, Kleinwild/Hasen)", { "werte.grenzwert": "max. +4 °C", quelle: "VO (EG) Nr. 853/2004 Anhang III Abschn. II Kap. V Nr. 3; LAVES Niedersachsen; Lebensmittelüberwachung Mainz" }],
+  ["L-067", "Kühlung Eiprodukte / roheihaltige Lebensmittel", { "werte.grenzwert": "max. +4 °C; roheihaltige Speisen innerhalb von 24 Stunden verbrauchen", quelle: `${LAVES}; Verbrauch binnen 24 Stunden: BgVV 1999` }],
+  ["L-069", "Tiefkühlung (Tiefkühltruhe/-raum, tiefgefrorene Lebensmittel)", { "werte.grenzwert": "−18 °C oder kälter; kurzfristiger Anstieg um höchstens 3 K beim Transport oder Abtauen", quelle: "VO (EG) Nr. 37/2005; TLMV; LAVES Niedersachsen; Lebensmittelüberwachung Mainz" }],
+  ["L-071", "Heißhalten / Ausgabetemperatur warmer Speisen", {
+    "werte.grenzwert": "mindestens +60 °C an allen Stellen, höchstens 3 Stunden",
+    "werte.haeufigkeit": "bei Beginn der Ausgabe und danach alle 2 Stunden",
+    "werte.korrektur": "Zu kalte warme Speisen auf mindestens +72 °C Kerntemperatur nacherhitzen, nur einmal; sonst verwerfen; dokumentieren.",
+    quelle: "BfR-Stellungnahme 037/2020; BfR, Presseinformation 13/2024; LAVES Niedersachsen 08/2022; DIN 10508:2019 (+65 °C als Praxiszuschlag, Kreis Paderborn 2026)",
+  }],
+  ["L-072", "Ausgabetemperatur Kaltspeisen und Salate", { "werte.korrektur": "Kaltspeisen höchstens 2 Stunden ungekühlt ausgeben, danach entsorgen; Produkttemperatur bei der Kontrolle über +7 °C: entsorgen; dokumentieren.", quelle: "Lebensmittelüberwachung Mainz; BgVV 1999 Abschnitt 4; DEHOGA-Leitlinie" }],
+  ["L-073", "Abkühlen heißer Speisen", { quelle: "BgVV, Temperaturanforderungen und -empfehlungen für Lebensmittel (1999), Abschnitt 4" }],
+  ["L-074", "Wareneingangskontrolle", {
+    "werte.grenzwert": "Temperatur bei Anlieferung (Messung): Tiefkühlware −18 °C oder kälter (kurzfristiger Anstieg um höchstens 3 K); Fleisch/Fleischerzeugnisse +7 °C; Geflügel +4 °C; Hackfleisch +2 °C; Fleischzubereitungen +4 °C; Fisch +2 °C; Konsummilch +8 °C; Milcherzeugnisse +10 °C. Sichtkontrolle: keine Verunreinigungen, einwandfreie Verpackung, einwandfreier Geruch, gültiges MHD, Beschaffenheit des Lieferfahrzeugs, Kennzeichnung",
+    quelle: "Werte wie die Kontrollpunkte der Kühlung (VO (EG) Nr. 853/2004; Tier-LMHV Anlage 5; BgVV 1999; LAVES Niedersachsen); Lebensmittelüberwachung Mainz (Formular Wareneingangskontrolle, Merkblatt)",
+  }],
+  ["L-075", "Frittierfett – polare Anteile", { "werte.grenzwert": "Eingriffswert 20 % polare Anteile: Fett wechseln (Grenze der Genusstauglichkeit 24 %); Frittiertemperatur mind. +160 °C, max. +175 °C", quelle: "DGF-Empfehlung; ALS (24 % polare Anteile); BGN-Leitlinie ortsveränderliche Betriebsstätten 2018; zvl.jena.de" }],
+  ["L-077", "Schädlingsmonitoring", { "werte.haeufigkeit": "regelmäßige vorbeugende Sichtkontrollen, mindestens einmal im Monat, dokumentiert" }],
+];
+for (const [nr, schluessel, aenderungen] of LM_BAUM) {
+  const gefunden = daten.HACCP.filter((x) => x.titel === schluessel);
+  if (gefunden.length !== 1) throw new Error(`Lebensmittel ${nr}: HACCP „${schluessel}“ ${gefunden.length}-mal gefunden`);
+  for (const [pfad, neu] of Object.entries(aenderungen)) {
+    const teile = pfad.split(".");
+    const ziel = teile.slice(0, -1).reduce((o, k) => o[k], gefunden[0]);
+    const feld = teile.at(-1);
+    const alt = ziel[feld];
+    ziel[feld] = neu;
+    if (ziel[feld] === alt) throw new Error(`Lebensmittel ${nr} greift nicht: HACCP „${schluessel}“ ${pfad}`);
+  }
+}
+/** L-060: ein Wert je Zeile – der Wert für selbst hergestelltes Hackfleisch als eigene Zeile direkt dahinter. */
+{
+  const i = daten.HACCP.findIndex((x) => x.titel === "Kühlung Hackfleisch");
+  const titel = "Kühlung Hackfleisch – nur bei eigener Herstellung";
+  daten.HACCP.splice(i + 1, 0, { titel, werte: { ...daten.HACCP[i].werte, punkt: titel, grenzwert: "selbst hergestellt, lose abgegeben: max. +7 °C Umgebung; Abgabe am Tag der Herstellung" }, quelle: "Tier-LMHV Anlage 5 Kap. II Nr. 3.1.3, 3.3.1; LAVES Niedersachsen" });
+}
+/**
  * E-167, B-036 (Prüfstand „bestätigt“): Fettbrand nach Fettmenge getrennt (BGN ASI 2.15 Nr. 4) – bis 50 l, 50 bis 100 l,
  * über 100 l. Der bisherige Vorschlag vermischte die Stufen („geübte Person“ gilt erst ab 50 l). Drei Vorschläge statt
  * einem; gespeicherte Gefährdungsbeurteilungen behalten ihren übernommenen Text.
@@ -516,9 +562,10 @@ const kopf = `/**
  * Bausteine aus der Recherche vom 12.10.2026 (docs/recherche/2026-10-12) – ERZEUGT von werkzeuge/bausteine-erzeugen.mjs,
  * nicht von Hand ändern. Jeder Baustein trägt einen Kurzbeleg; „unsicher“ = nicht wörtlich an der Primärquelle geprüft.
  * Fachliche Durchsicht Arbeitsschutz vom 22.10.2026 eingearbeitet (E-167, Zuordnung in sifa.ts); Abnahme: PRUEFLISTE T-62.
+ * Grenzwerte der Kontrollpunkte nach dem Prüfbericht Lebensmittelhygiene vom 22.10.2026 (LM_BAUM im Skript).
  */
 import type { Option, Vorschlag } from "./typen.js";
 `;
 const rumpf = Object.entries(daten).map(([k, v]) => `export const ${k}: ${typen[k]} = ${JSON.stringify(v, null, 1)};`).join("\n\n");
 fs.writeFileSync(path.join(hier, "../src/dokumente/bausteine.ts"), `${kopf}\n${rumpf}\n`);
-console.log(`✓ bausteine.ts: ${daten.GEFAEHRDUNGEN.length} Gefährdungen (${SIFA.length} Korrekturen der Sifa-Durchsicht), ${vvt.length} Verarbeitungen, ${tom.length} TOM, ${Object.keys(dse).length} DSE-Bausteine, ${haccp.length} HACCP-Punkte, ${hygiene.length} Hygiene-Zeilen`);
+console.log(`✓ bausteine.ts: ${daten.GEFAEHRDUNGEN.length} Gefährdungen (${SIFA.length} Korrekturen der Sifa-Durchsicht), ${vvt.length} Verarbeitungen, ${tom.length} TOM, ${Object.keys(dse).length} DSE-Bausteine, ${daten.HACCP.length} HACCP-Punkte, ${hygiene.length} Hygiene-Zeilen`);

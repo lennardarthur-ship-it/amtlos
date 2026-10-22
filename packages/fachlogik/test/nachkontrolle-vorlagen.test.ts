@@ -5,7 +5,8 @@
 import { describe, expect, it } from "vitest";
 import { MARKE } from "@amtlos/marke";
 import { dokumentHtml, leereDaten, vorlageFuer, type Betrieb, type Daten, type Feld, type ListenFeld } from "../src/index.js";
-import { HYGIENE_LEBENSMITTEL, HYGIENE_THEMEN_LEBENSMITTEL } from "../src/dokumente/branchen.js";
+import { HYGIENE_LEBENSMITTEL, HYGIENE_THEMEN_LEBENSMITTEL, HYGIENE_THEMEN_NEU } from "../src/dokumente/branchen.js";
+import { GRENZWERT_HACCP } from "../src/dokumente/haccp.js";
 import { NACHWG_AUSSCHLUSSFRIST_BEISPIEL, NACHWG_SCHRIFTFORM_HINWEIS, NACHWG_SCHRIFTFORM_PDF } from "../src/dokumente/personal.js";
 
 const B: Betrieb = { name: "Salon Sonne", strasse: "Hauptstraße 1", plz: "80331", ort: "München", verantwortlich: "Alex Sonnberg", telefon: "089 123456", email: "hallo@salon-sonne.example", steuernummer: "143/123/45678", ust_idnr: "", iban: "", bundesland: "Bayern" };
@@ -106,20 +107,26 @@ describe("Hygieneplan für Lebensmittelbetriebe", () => {
   it("Vorschläge decken alle Themenbereiche ab und stehen unter „Gastronomie / Café“", () => {
     expect(lm).toEqual(HYGIENE_LEBENSMITTEL);
     expect([...new Set(lm.map((x) => x.werte.thema))]).toEqual([...HYGIENE_THEMEN_LEBENSMITTEL]);
-    expect(HYGIENE_THEMEN_LEBENSMITTEL).toEqual(["Reinigung und Desinfektion", "Personalhygiene", "Schädlingsbekämpfung", "Temperaturkontrollen", "Wareneingang", "Trennung rein/unrein", "Abfall", "Trinkwasser", "Schulungen"]);
+    // Prüfbericht Lebensmittelhygiene: dazu „Lagerung“ und „Allergenmanagement“
+    expect(HYGIENE_THEMEN_LEBENSMITTEL).toEqual(["Reinigung und Desinfektion", "Personalhygiene", "Schädlingsbekämpfung", "Temperaturkontrollen", "Wareneingang", "Lagerung", "Trennung rein/unrein", "Allergenmanagement", "Abfall", "Trinkwasser", "Schulungen"]);
     const alles = JSON.stringify(lm);
     for (const s of ["Händewaschen", "Arbeitskleidung und Schmuck", "Ringe, Uhren", "§ 42 IfSG", "Schädlingsmonitoring", "Wareneingang", "rohe und verzehrfertige", "Abfall", "Trinkwasser", "§ 4 LMHV"]) expect(alles, s).toContain(s);
-    for (const x of lm) expect(x.quelle, x.titel).toMatch(/fachlich zu prüfen$/);
+    // Prüfbericht Lebensmittelhygiene: bestätigte bzw. geänderte Zeilen ohne „fachlich zu prüfen“, die übrigen und neue mit
+    const geprueft = ["Arbeitsflächen und Schneidbretter", "Geschirr, Besteck, Gläser", "Reinigungstücher und Reinigungsgeräte", "Händewaschen", "Schädlingsmonitoring", "Kühlgeräte", "Tiefkühlgeräte", "Schulung Lebensmittelhygiene"];
+    for (const x of lm) expect(x.quelle, x.titel).toMatch(geprueft.includes(x.titel) ? /^(?!.*zu prüfen)/ : /fachlich zu prüfen$/);
+    for (const s of ["DVG-gelistetes Produkt eintragen", "80–85 °C nach DIN 10510/10511, die Herstellerangabe geht vor", "mindestens 60 °C oder desinfizierendes Waschverfahren (Richtwert)", "20–30 Sekunden", "Monitoringstellen monatlich", "jährlich wiederholen", "Schulungsnachweis Lebensmittelhygiene", "Milchschäumer und Milchlanzen", "Eiswürfelbereiter", "Getränkeschankanlage", "First in – first out", "keine Auskunft ins Blaue"]) expect(alles, s).toContain(s);
   });
-  it("Temperaturen nur als Richtwerte, fachlich zu prüfen", () => {
+  it("Temperaturzeilen: Grenzwert nur in den Eigenkontrollen (HACCP), Richtwerte nur als Richtwert", () => {
     const kuehl = lm.find((x) => x.titel === "Kühlgeräte")!;
     const tief = lm.find((x) => x.titel === "Tiefkühlgeräte")!;
-    expect(kuehl.werte.wie).toMatch(/höchstens \+7 °C \(üblicher Richtwert, fachlich zu prüfen/);
-    expect(tief.werte.wie).toMatch(/−18 °C oder kälter \(üblicher Richtwert, fachlich zu prüfen\)/);
-    // jede Zahl mit Einheit in den Vorschlägen steht bei „Richtwert“ oder „Herstellerangabe“
+    for (const x of [kuehl, tief]) {
+      expect(x.werte.wie).toContain(GRENZWERT_HACCP);
+      expect(x.werte.wie).not.toMatch(/°C/);
+    }
+    // Zahlen mit °C nur noch als Richtwert (Spülmaschine, Waschprogramm)
     for (const x of lm)
       for (const w of Object.values(x.werte))
-        if (typeof w === "string" && /\d+\s?°C/.test(w)) expect(w, x.titel).toMatch(/Richtwert, fachlich zu prüfen/);
+        if (typeof w === "string" && /\d+\s?°C/.test(w)) expect(w, x.titel).toMatch(/Richtwert/);
   });
   it("keine Beauty-Inhalte im Lebensmittel-Plan; HACCP als eigene Vorlage verlinkt", () => {
     const h = html("hygieneplan", voll());
@@ -137,6 +144,13 @@ describe("Hygieneplan für Lebensmittelbetriebe", () => {
     const h = v("hygieneplan").hinweise!(d, B).join(" ");
     expect(h).toContain(`„${beauty.werte.was}“ gehört in einen Beauty-Betrieb`);
     expect(h).toMatch(/fehlt noch Personalhygiene, Schädlingsbekämpfung/);
+    // Plan von vorher (keiner der neuen Themenbereiche): kein Hinweis auf „Lagerung“ und „Allergenmanagement“
+    expect(h).not.toMatch(/Lagerung|Allergenmanagement/);
+    const alt = voll({ eintraege: lm.filter((x) => !HYGIENE_THEMEN_NEU.includes(String(x.werte.thema))).map((x) => ({ ...x.werte })) });
+    expect(v("hygieneplan").hinweise!(alt, B)).toEqual([]);
+    // neuer Plan mit einem der neuen Themenbereiche: der andere wird verlangt
+    const neu = voll({ eintraege: lm.filter((x) => x.werte.thema !== "Allergenmanagement").map((x) => ({ ...x.werte })) });
+    expect(v("hygieneplan").hinweise!(neu, B).join(" ")).toMatch(/fehlt noch Allergenmanagement\./);
     expect(v("hygieneplan").hinweise!({ art: "beauty", eintraege: [{ ...beauty.werte }] }, B)).toEqual([]);
     expect(html("hygieneplan", { art: "beauty", eintraege: [{ ...beauty.werte }] })).toContain("Hygieneverordnung des Landes");
   });

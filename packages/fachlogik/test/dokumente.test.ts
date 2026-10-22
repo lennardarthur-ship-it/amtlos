@@ -524,15 +524,14 @@ describe("Dokumentvorlagen", () => {
     const leer = (id: string, b: Betrieb = BETRIEB) => html(id, leereDaten(vorlageFuer(id)!, b, "2026-10-12"), b);
     const pruefe = (id: string, d: Daten, b: Betrieb = BETRIEB) => vorlageFuer(id)!.pruefen!(d, b);
     const kopfLinie = (titel: string) => `<dt>${titel}</dt><dd><span class="fuellen"></span></dd>`;
-    // HACCP: Quellen stehen im Feld „quelle“, nicht im Drucktext; beide Grenzwerte bleiben stehen
+    // HACCP: Quellen stehen im Feld „quelle“, nicht im Drucktext; Prüfbericht Lebensmittelhygiene: ein Grenzwert je Kontrollpunkt
     // E-166: die Kontrollpunkte sind nicht mehr die erste Liste (davor Gefahrenanalyse und CCP)
     const haccp = vorlageFuer("haccp")!.abschnitte.flatMap((a) => a.felder).find((f) => f.id === "punkte")!;
     const vorschlaege = haccp.art === "liste" ? haccp.vorschlaege! : [];
     for (const v of vorschlaege) for (const k of ["grenzwert", "haeufigkeit", "korrektur"]) expect(String(v.werte[k])).not.toMatch(/Mainz|LAVES|BfR|BgVV|DGF|Älterer Wert/);
     const heiss = vorschlaege.find((v) => v.titel.startsWith("Heißhalten"))!;
-    expect(String(heiss.werte.grenzwert)).toContain("+60 °C");
-    expect(String(heiss.werte.grenzwert)).toContain("+65 °C");
-    expect(heiss.quelle).toContain("BfR 2008");
+    expect(String(heiss.werte.grenzwert)).toBe("mindestens +60 °C an allen Stellen, höchstens 3 Stunden");
+    expect(heiss.quelle).toContain("BfR-Stellungnahme 037/2020");
     // Datenschutzinformation: keine Quellenvermerke im Text, Löschung als Aussage
     const dsi = html("datenschutzinformation", { fuer_wen: "Kunden", verarbeitungen: ["Kundenverwaltung / Kundenkartei", "Videoüberwachung (z. B. Verkaufsraum, Eingang, Lager)", "Bewerbungsverfahren", "E-Mail-Newsletter / E-Mail-Werbung"], interessen: "Schutz" });
     expect(dsi).not.toMatch(/BayLDA-Muster|laut DSK/);
